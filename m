@@ -1,51 +1,53 @@
 Return-Path: <cyrus@holtmann.org>
-From: Anatol Pomozov <anatol.pomozov@gmail.com>
-To: marcel@holtmann.org,
-	gustavo@padovan.org,
-	johan.hedberg@gmail.com
-Cc: linux-bluetooth@vger.kernel.org,
-	Anatol Pomozov <anatol.pomozov@gmail.com>
-Subject: [PATCH] bluetooth: Fix crash in the driver initialization codepath
-Date: Wed, 30 Jul 2014 15:57:03 -0700
-Message-Id: <1406761023-21290-1-git-send-email-anatol.pomozov@gmail.com>
+MIME-Version: 1.0
+Sender: armansito@google.com
+In-Reply-To: <C58178E2-35CE-4076-96B1-542D3EE15C15@holtmann.org>
+References: <1406758441-10335-1-git-send-email-armansito@chromium.org>
+	<C58178E2-35CE-4076-96B1-542D3EE15C15@holtmann.org>
+Date: Wed, 30 Jul 2014 15:48:19 -0700
+Message-ID: <CAHrH25RxrdcP0S4+vQw5=YfRnUCf+aW9t9KEeTGL8r98-FeUmw@mail.gmail.com>
+Subject: Re: [PATCH v1] shared/gatt: Use iterator based discovery result structure.
+From: Arman Uguray <armansito@chromium.org>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-btmrvl_add_card() function calls kthread_run that might return error
-(e.g. if current thread is killed). If one tries to use the error
-value as a pointer then invalid memory access oops happens.
+Hi Marcel,
 
-Check kthread_run() return value, if it is an error then release resources correctly.
+> patch has been applied.
+>
 
-TEST=boot computer with BT modules enabled. I see the error message that BT device
-initialization failed. Now kernel does not crash. Hint: to enable BT run
-'rmmod btmrvl_sdio; modprobe btmrvl_sdio'
+Thanks!
 
-Signed-off-by: Anatol Pomozov <anatol.pomozov@gmail.com>
----
- drivers/bluetooth/btmrvl_main.c | 5 +++++
- 1 file changed, 5 insertions(+)
+>> +bool bt_gatt_iter_init(struct bt_gatt_iter *iter, struct bt_gatt_result *result);
+>> +bool bt_gatt_iter_next_service(struct bt_gatt_iter *iter,
+>> +                                     struct bt_gatt_service *service);
+>
+> One option here is to not bother with the interim struct bt_gatt_service. Especially since I think we will need that actually for an higher abstraction at some point.
+>
+>         bool bt_gatt_iter_next_service(struct bt_gatt_iter *iter,
+>                                         uint16_t *start_handle,
+>                                         uint16_t *end_handle,
+>                                         uint8_t *uuid[16]);
+>
 
-diff --git a/drivers/bluetooth/btmrvl_main.c b/drivers/bluetooth/btmrvl_main.c
-index e9dbddb..d95ebf6 100644
---- a/drivers/bluetooth/btmrvl_main.c
-+++ b/drivers/bluetooth/btmrvl_main.c
-@@ -645,12 +645,17 @@ struct btmrvl_private *btmrvl_add_card(void *card)
- 	init_waitqueue_head(&priv->main_thread.wait_q);
- 	priv->main_thread.task = kthread_run(btmrvl_service_main_thread,
- 				&priv->main_thread, "btmrvl_main_service");
-+	if (IS_ERR(priv->main_thread.task))
-+		goto err_thread;
- 
- 	priv->btmrvl_dev.card = card;
- 	priv->btmrvl_dev.tx_dnld_rdy = true;
- 
- 	return priv;
- 
-+err_thread:
-+	btmrvl_free_adapter(priv);
-+
- err_adapter:
- 	kfree(priv);
- 
--- 
-2.0.0.526.g5318336
+That makes sense. I think as bt_gatt_client starts taking shape I will
+know what to do about these.
+
+
+>> +typedef void (*bt_gatt_discovery_callback_t)(bool success, uint8_t att_code,
+>> +                                             struct bt_gatt_result *result,
+>>                                               void *user_data);
+>
+> It might be a good idea to shrink this to results + user_data. We could retrieve the ATT error code and general success status from bt_gatt_result pointer we give the callback function.
+>
+
+I'm fine with this idea, then again it's nice to be overall consistent
+with the other callbacks. I don't know if we'd want to perhaps
+generalize bt_gatt_result to contain more than just discovery results
+(I kind of like the raw pointer for long value reads for instance).
+
+
+Cheers,
+Arman
