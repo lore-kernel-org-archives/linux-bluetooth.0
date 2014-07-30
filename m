@@ -2,178 +2,318 @@ Return-Path: <cyrus@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: alex.aring@gmail.com
-Subject: [PATCH 1/5] 6lowpan: iphc: Fix block comments to match networking style
-Date: Wed, 30 Jul 2014 03:48:40 +0200
-Message-Id: <1406684924-40906-1-git-send-email-marcel@holtmann.org>
+Subject: [PATCH 2/5] 6lowpan: iphc: Fix issues with alignment matching open parenthesis
+Date: Wed, 30 Jul 2014 03:48:41 +0200
+Message-Id: <1406684924-40906-2-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch fixes all the block comment issues found by checkpatch.pl and
-makes them match the network style now.
+This patch fixes all the issues with alignment matching of open
+parenthesis found by checkpatch.pl and makes them follow the
+network coding style now.
 
-WARNING: networking block comments don't use an empty /* line, use /* Comment...
-+/*
-+ * Based on patches from Jon Smirl <jonsmirl@gmail.com>
+CHECK: Alignment should match open parenthesis
++static int uncompress_addr(struct sk_buff *skb,
++				struct in6_addr *ipaddr, const u8 address_mode,
 
-WARNING: networking block comments don't use an empty /* line, use /* Comment...
-+/*
-+ * Uncompress address function for source and
+CHECK: Alignment should match open parenthesis
++static int uncompress_context_based_src_addr(struct sk_buff *skb,
++						struct in6_addr *ipaddr,
 
-WARNING: networking block comments don't use an empty /* line, use /* Comment...
-+/*
-+ * Uncompress address function for source context
+CHECK: Alignment should match open parenthesis
++static int skb_deliver(struct sk_buff *skb, struct ipv6hdr *hdr,
++		struct net_device *dev, skb_delivery_cb deliver_skb)
 
-WARNING: networking block comments don't use an empty /* line, use /* Comment...
-+		/*
-+		 * UDP lenght needs to be infered from the lower layers
+CHECK: Alignment should match open parenthesis
++	new = skb_copy_expand(skb, sizeof(struct ipv6hdr), skb_tailroom(skb),
++								GFP_ATOMIC);
 
-WARNING: networking block comments don't use an empty /* line, use /* Comment...
-+	/*
-+	 * Traffic Class and FLow Label carried in-line
+CHECK: Alignment should match open parenthesis
++	raw_dump_table(__func__, "raw skb data dump before receiving",
++			new->data, new->len);
 
-WARNING: networking block comments don't use an empty /* line, use /* Comment...
-+	/*
-+	 * Traffic class carried in-line
+CHECK: Alignment should match open parenthesis
++lowpan_uncompress_multicast_daddr(struct sk_buff *skb,
++		struct in6_addr *ipaddr,
 
-WARNING: networking block comments don't use an empty /* line, use /* Comment...
-+	/*
-+	 * Flow Label carried in-line
+CHECK: Alignment should match open parenthesis
++	raw_dump_inline(NULL, "Reconstructed ipv6 multicast addr is",
++				ipaddr->s6_addr, 16);
 
-WARNING: networking block comments don't use an empty /* line, use /* Comment...
-+		/*
-+		 * replace the compressed UDP head by the uncompressed UDP
+CHECK: Alignment should match open parenthesis
++int lowpan_process_data(struct sk_buff *skb, struct net_device *dev,
++		const u8 *saddr, const u8 saddr_type, const u8 saddr_len,
 
-WARNING: networking block comments don't use an empty /* line, use /* Comment...
-+	/*
-+	 * As we copy some bit-length fields, in the IPHC encoding bytes,
+CHECK: Alignment should match open parenthesis
++	raw_dump_table(__func__, "raw skb data dump uncompressed",
++				skb->data, skb->len);
 
-WARNING: networking block comments don't use an empty /* line, use /* Comment...
-+	/*
-+	 * Traffic class, flow label
+CHECK: Alignment should match open parenthesis
++		err = uncompress_addr(skb, &hdr.saddr, tmp, saddr,
++					saddr_type, saddr_len);
 
-WARNING: networking block comments don't use an empty /* line, use /* Comment...
-+	/*
-+	 * Hop limit
+CHECK: Alignment should match open parenthesis
++		err = uncompress_addr(skb, &hdr.daddr, tmp, daddr,
++					daddr_type, daddr_len);
+
+CHECK: Alignment should match open parenthesis
++		pr_debug("dest: stateless compression mode %d dest %pI6c\n",
++			tmp, &hdr.daddr);
+
+CHECK: Alignment should match open parenthesis
++		raw_dump_table(__func__, "raw UDP header dump",
++				      (u8 *)&uh, sizeof(uh));
+
+CHECK: Alignment should match open parenthesis
++	raw_dump_table(__func__, "raw header dump", (u8 *)&hdr,
++							sizeof(hdr));
+
+CHECK: Alignment should match open parenthesis
++int lowpan_header_compress(struct sk_buff *skb, struct net_device *dev,
++			unsigned short type, const void *_daddr,
+
+CHECK: Alignment should match open parenthesis
++	raw_dump_table(__func__, "raw skb network header dump",
++		skb_network_header(skb), sizeof(struct ipv6hdr));
+
+CHECK: Alignment should match open parenthesis
++	raw_dump_table(__func__,
++			"sending raw skb network uncompressed packet",
+
+CHECK: Alignment should match open parenthesis
++	if (((hdr->flow_lbl[0] & 0x0F) == 0) &&
++	     (hdr->flow_lbl[1] == 0) && (hdr->flow_lbl[2] == 0)) {
+
+WARNING: quoted string split across lines
++			pr_debug("dest address unicast link-local %pI6c "
++				"iphc1 0x%02x\n", &hdr->daddr, iphc1);
+
+CHECK: Alignment should match open parenthesis
++	raw_dump_table(__func__, "raw skb data dump compressed",
++				skb->data, skb->len);
 
 Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- net/6lowpan/iphc.c | 33 +++++++++++----------------------
- 1 file changed, 11 insertions(+), 22 deletions(-)
+ net/6lowpan/iphc.c | 74 ++++++++++++++++++++++++++----------------------------
+ 1 file changed, 35 insertions(+), 39 deletions(-)
 
 diff --git a/net/6lowpan/iphc.c b/net/6lowpan/iphc.c
-index de78deb49959..3069eb615ace 100644
+index 3069eb615ace..c718253a4e07 100644
 --- a/net/6lowpan/iphc.c
 +++ b/net/6lowpan/iphc.c
-@@ -3,8 +3,7 @@
-  * written by Alexander Smirnov <alex.bluesman.smirnov@gmail.com>
-  */
- 
--/*
-- * Based on patches from Jon Smirl <jonsmirl@gmail.com>
-+/* Based on patches from Jon Smirl <jonsmirl@gmail.com>
-  * Copyright (c) 2011 Jon Smirl <jonsmirl@gmail.com>
-  *
-  * This program is free software; you can redistribute it and/or modify
-@@ -58,8 +57,7 @@
- #include <net/ipv6.h>
- #include <net/af_ieee802154.h>
- 
--/*
-- * Uncompress address function for source and
-+/* Uncompress address function for source and
-  * destination address(non-multicast).
-  *
+@@ -63,9 +63,9 @@
   * address_mode is sam value or dam value.
-@@ -140,8 +138,7 @@ static int uncompress_addr(struct sk_buff *skb,
- 	return 0;
- }
+  */
+ static int uncompress_addr(struct sk_buff *skb,
+-				struct in6_addr *ipaddr, const u8 address_mode,
+-				const u8 *lladdr, const u8 addr_type,
+-				const u8 addr_len)
++			   struct in6_addr *ipaddr, const u8 address_mode,
++			   const u8 *lladdr, const u8 addr_type,
++			   const u8 addr_len)
+ {
+ 	bool fail;
  
--/*
-- * Uncompress address function for source context
-+/* Uncompress address function for source context
+@@ -142,8 +142,8 @@ static int uncompress_addr(struct sk_buff *skb,
   * based address(non-multicast).
   */
  static int uncompress_context_based_src_addr(struct sk_buff *skb,
-@@ -316,8 +313,7 @@ uncompress_udp_header(struct sk_buff *skb, struct udphdr *uh)
- 						 sizeof(uh->check));
+-						struct in6_addr *ipaddr,
+-						const u8 sam)
++					     struct in6_addr *ipaddr,
++					     const u8 sam)
+ {
+ 	switch (sam) {
+ 	case LOWPAN_IPHC_ADDR_00:
+@@ -172,13 +172,13 @@ static int uncompress_context_based_src_addr(struct sk_buff *skb,
+ }
+ 
+ static int skb_deliver(struct sk_buff *skb, struct ipv6hdr *hdr,
+-		struct net_device *dev, skb_delivery_cb deliver_skb)
++		       struct net_device *dev, skb_delivery_cb deliver_skb)
+ {
+ 	struct sk_buff *new;
+ 	int stat;
+ 
+ 	new = skb_copy_expand(skb, sizeof(struct ipv6hdr), skb_tailroom(skb),
+-								GFP_ATOMIC);
++			      GFP_ATOMIC);
+ 	kfree_skb(skb);
+ 
+ 	if (!new)
+@@ -193,7 +193,7 @@ static int skb_deliver(struct sk_buff *skb, struct ipv6hdr *hdr,
+ 	new->dev = dev;
+ 
+ 	raw_dump_table(__func__, "raw skb data dump before receiving",
+-			new->data, new->len);
++		       new->data, new->len);
+ 
+ 	stat = deliver_skb(new, dev);
+ 
+@@ -205,10 +205,9 @@ static int skb_deliver(struct sk_buff *skb, struct ipv6hdr *hdr,
+ /* Uncompress function for multicast destination address,
+  * when M bit is set.
+  */
+-static int
+-lowpan_uncompress_multicast_daddr(struct sk_buff *skb,
+-		struct in6_addr *ipaddr,
+-		const u8 dam)
++static int lowpan_uncompress_multicast_daddr(struct sk_buff *skb,
++					     struct in6_addr *ipaddr,
++					     const u8 dam)
+ {
+ 	bool fail;
+ 
+@@ -254,13 +253,12 @@ lowpan_uncompress_multicast_daddr(struct sk_buff *skb,
+ 	}
+ 
+ 	raw_dump_inline(NULL, "Reconstructed ipv6 multicast addr is",
+-				ipaddr->s6_addr, 16);
++			ipaddr->s6_addr, 16);
+ 
+ 	return 0;
+ }
+ 
+-static int
+-uncompress_udp_header(struct sk_buff *skb, struct udphdr *uh)
++static int uncompress_udp_header(struct sk_buff *skb, struct udphdr *uh)
+ {
+ 	bool fail;
+ 	u8 tmp = 0, val = 0;
+@@ -336,16 +334,16 @@ err:
+ static const u8 lowpan_ttl_values[] = { 0, 1, 64, 255 };
+ 
+ int lowpan_process_data(struct sk_buff *skb, struct net_device *dev,
+-		const u8 *saddr, const u8 saddr_type, const u8 saddr_len,
+-		const u8 *daddr, const u8 daddr_type, const u8 daddr_len,
+-		u8 iphc0, u8 iphc1, skb_delivery_cb deliver_skb)
++			const u8 *saddr, const u8 saddr_type, const u8 saddr_len,
++			const u8 *daddr, const u8 daddr_type, const u8 daddr_len,
++			u8 iphc0, u8 iphc1, skb_delivery_cb deliver_skb)
+ {
+ 	struct ipv6hdr hdr = {};
+ 	u8 tmp, num_context = 0;
+ 	int err;
+ 
+ 	raw_dump_table(__func__, "raw skb data dump uncompressed",
+-				skb->data, skb->len);
++		       skb->data, skb->len);
+ 
+ 	/* another if the CID flag is set */
+ 	if (iphc1 & LOWPAN_IPHC_CID) {
+@@ -424,13 +422,12 @@ int lowpan_process_data(struct sk_buff *skb, struct net_device *dev,
+ 	if (iphc1 & LOWPAN_IPHC_SAC) {
+ 		/* Source address context based uncompression */
+ 		pr_debug("SAC bit is set. Handle context based source address.\n");
+-		err = uncompress_context_based_src_addr(
+-				skb, &hdr.saddr, tmp);
++		err = uncompress_context_based_src_addr(skb, &hdr.saddr, tmp);
+ 	} else {
+ 		/* Source address uncompression */
+ 		pr_debug("source address stateless compression\n");
+ 		err = uncompress_addr(skb, &hdr.saddr, tmp, saddr,
+-					saddr_type, saddr_len);
++				      saddr_type, saddr_len);
+ 	}
+ 
+ 	/* Check on error of previous branch */
+@@ -446,16 +443,17 @@ int lowpan_process_data(struct sk_buff *skb, struct net_device *dev,
+ 			pr_debug("dest: context-based mcast compression\n");
+ 			/* TODO: implement this */
+ 		} else {
+-			err = lowpan_uncompress_multicast_daddr(
+-						skb, &hdr.daddr, tmp);
++			err = lowpan_uncompress_multicast_daddr(skb, &hdr.daddr,
++								tmp);
++
+ 			if (err)
+ 				goto drop;
  		}
- 
--		/*
--		 * UDP lenght needs to be infered from the lower layers
-+		/* UDP length needs to be infered from the lower layers
- 		 * here, we obtain the hint from the remaining size of the
- 		 * frame
- 		 */
-@@ -362,8 +358,7 @@ int lowpan_process_data(struct sk_buff *skb, struct net_device *dev,
- 
- 	/* Traffic Class and Flow Label */
- 	switch ((iphc0 & LOWPAN_IPHC_TF) >> 3) {
--	/*
--	 * Traffic Class and FLow Label carried in-line
-+	/* Traffic Class and FLow Label carried in-line
- 	 * ECN + DSCP + 4-bit Pad + Flow Label (4 bytes)
- 	 */
- 	case 0: /* 00b */
-@@ -376,8 +371,7 @@ int lowpan_process_data(struct sk_buff *skb, struct net_device *dev,
- 		hdr.flow_lbl[0] = ((tmp >> 2) & 0x30) | (tmp << 6) |
- 					(hdr.flow_lbl[0] & 0x0f);
- 		break;
--	/*
--	 * Traffic class carried in-line
-+	/* Traffic class carried in-line
- 	 * ECN + DSCP (1 byte), Flow Label is elided
- 	 */
- 	case 2: /* 10b */
-@@ -387,8 +381,7 @@ int lowpan_process_data(struct sk_buff *skb, struct net_device *dev,
- 		hdr.priority = ((tmp >> 2) & 0x0f);
- 		hdr.flow_lbl[0] = ((tmp << 6) & 0xC0) | ((tmp >> 2) & 0x30);
- 		break;
--	/*
--	 * Flow Label carried in-line
-+	/* Flow Label carried in-line
- 	 * ECN + 2-bit Pad + Flow Label (3 bytes), DSCP is elided
- 	 */
- 	case 1: /* 01b */
-@@ -474,8 +467,7 @@ int lowpan_process_data(struct sk_buff *skb, struct net_device *dev,
- 		if (uncompress_udp_header(skb, &uh))
+ 	} else {
+ 		err = uncompress_addr(skb, &hdr.daddr, tmp, daddr,
+-					daddr_type, daddr_len);
++				      daddr_type, daddr_len);
+ 		pr_debug("dest: stateless compression mode %d dest %pI6c\n",
+-			tmp, &hdr.daddr);
++			 tmp, &hdr.daddr);
+ 		if (err)
  			goto drop;
+ 	}
+@@ -484,7 +482,7 @@ int lowpan_process_data(struct sk_buff *skb, struct net_device *dev,
+ 		skb_copy_to_linear_data(skb, &uh, sizeof(struct udphdr));
  
--		/*
--		 * replace the compressed UDP head by the uncompressed UDP
-+		/* replace the compressed UDP head by the uncompressed UDP
- 		 * header
- 		 */
- 		new = skb_copy_expand(skb, sizeof(struct udphdr),
-@@ -624,8 +616,7 @@ int lowpan_header_compress(struct sk_buff *skb, struct net_device *dev,
+ 		raw_dump_table(__func__, "raw UDP header dump",
+-				      (u8 *)&uh, sizeof(uh));
++			       (u8 *)&uh, sizeof(uh));
+ 
+ 		hdr.nexthdr = UIP_PROTO_UDP;
+ 	}
+@@ -499,8 +497,7 @@ int lowpan_process_data(struct sk_buff *skb, struct net_device *dev,
+ 		hdr.version, ntohs(hdr.payload_len), hdr.nexthdr,
+ 		hdr.hop_limit, &hdr.daddr);
+ 
+-	raw_dump_table(__func__, "raw header dump", (u8 *)&hdr,
+-							sizeof(hdr));
++	raw_dump_table(__func__, "raw header dump", (u8 *)&hdr, sizeof(hdr));
+ 
+ 	return skb_deliver(skb, &hdr, dev, deliver_skb);
+ 
+@@ -594,8 +591,8 @@ static void compress_udp_header(u8 **hc_ptr, struct sk_buff *skb)
+ }
+ 
+ int lowpan_header_compress(struct sk_buff *skb, struct net_device *dev,
+-			unsigned short type, const void *_daddr,
+-			const void *_saddr, unsigned int len)
++			   unsigned short type, const void *_daddr,
++			   const void *_saddr, unsigned int len)
+ {
+ 	u8 tmp, iphc0, iphc1, *hc_ptr;
+ 	struct ipv6hdr *hdr;
+@@ -610,11 +607,11 @@ int lowpan_header_compress(struct sk_buff *skb, struct net_device *dev,
+ 
+ 	pr_debug("IPv6 header dump:\n\tversion = %d\n\tlength  = %d\n"
+ 		 "\tnexthdr = 0x%02x\n\thop_lim = %d\n\tdest    = %pI6c\n",
+-		hdr->version, ntohs(hdr->payload_len), hdr->nexthdr,
+-		hdr->hop_limit, &hdr->daddr);
++		 hdr->version, ntohs(hdr->payload_len), hdr->nexthdr,
++		 hdr->hop_limit, &hdr->daddr);
+ 
  	raw_dump_table(__func__, "raw skb network header dump",
- 		skb_network_header(skb), sizeof(struct ipv6hdr));
+-		skb_network_header(skb), sizeof(struct ipv6hdr));
++		       skb_network_header(skb), sizeof(struct ipv6hdr));
  
--	/*
--	 * As we copy some bit-length fields, in the IPHC encoding bytes,
-+	/* As we copy some bit-length fields, in the IPHC encoding bytes,
+ 	/* As we copy some bit-length fields, in the IPHC encoding bytes,
  	 * we sometimes use |=
- 	 * If the field is 0, and the current bit value in memory is 1,
- 	 * this does not work. We therefore reset the IPHC encoding here
-@@ -644,8 +635,7 @@ int lowpan_header_compress(struct sk_buff *skb, struct net_device *dev,
- 			"sending raw skb network uncompressed packet",
- 			skb->data, skb->len);
+@@ -631,9 +628,8 @@ int lowpan_header_compress(struct sk_buff *skb, struct net_device *dev,
+ 	raw_dump_inline(__func__, "daddr",
+ 			(unsigned char *)_daddr, IEEE802154_ADDR_LEN);
  
--	/*
--	 * Traffic class, flow label
-+	/* Traffic class, flow label
+-	raw_dump_table(__func__,
+-			"sending raw skb network uncompressed packet",
+-			skb->data, skb->len);
++	raw_dump_table(__func__, "sending raw skb network uncompressed packet",
++		       skb->data, skb->len);
+ 
+ 	/* Traffic class, flow label
  	 * If flow label is 0, compress it. If traffic class is 0, compress it
- 	 * We have to process both in the same time as the offset of traffic
- 	 * class depends on the presence of version and flow label
-@@ -696,8 +686,7 @@ int lowpan_header_compress(struct sk_buff *skb, struct net_device *dev,
- 		lowpan_push_hc_data(&hc_ptr, &hdr->nexthdr,
- 				    sizeof(hdr->nexthdr));
+@@ -763,7 +759,7 @@ int lowpan_header_compress(struct sk_buff *skb, struct net_device *dev,
+ 			iphc1 |= lowpan_compress_addr_64(&hc_ptr,
+ 				LOWPAN_IPHC_DAM_BIT, &hdr->daddr, _daddr);
+ 			pr_debug("dest address unicast link-local %pI6c "
+-				"iphc1 0x%02x\n", &hdr->daddr, iphc1);
++				 "iphc1 0x%02x\n", &hdr->daddr, iphc1);
+ 		} else {
+ 			pr_debug("dest address unicast %pI6c\n", &hdr->daddr);
+ 			lowpan_push_hc_data(&hc_ptr, hdr->daddr.s6_addr, 16);
+@@ -785,7 +781,7 @@ int lowpan_header_compress(struct sk_buff *skb, struct net_device *dev,
+ 	pr_debug("header len %d skb %u\n", (int)(hc_ptr - head), skb->len);
  
--	/*
--	 * Hop limit
-+	/* Hop limit
- 	 * if 1:   compress, encoding is 01
- 	 * if 64:  compress, encoding is 10
- 	 * if 255: compress, encoding is 11
+ 	raw_dump_table(__func__, "raw skb data dump compressed",
+-				skb->data, skb->len);
++		       skb->data, skb->len);
+ 	return 0;
+ }
+ EXPORT_SYMBOL_GPL(lowpan_header_compress);
 -- 
 1.9.3
 
