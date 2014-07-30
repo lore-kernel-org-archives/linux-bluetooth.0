@@ -1,25 +1,117 @@
 Return-Path: <cyrus@holtmann.org>
-From: Murat Kilivan <Murat.Kilivan@csr.com>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: HoG: Support multi output report
-Date: Wed, 30 Jul 2014 14:34:00 +0000
-Message-ID: <45F17F5803927D43967AFEED068E781E0879D3C7@CAMEUREXM02.EUROPE.ROOT.PRI>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+In-Reply-To: <CAN_7+Yagfpk4CCPeFxVLfsmekZS1r9sV1DnPcq635Ji0PtBEZA@mail.gmail.com>
+References: <1406713130-3825-1-git-send-email-marcin.kraglak@tieto.com>
+	<1406713130-3825-4-git-send-email-marcin.kraglak@tieto.com>
+	<CABBYNZ+c8MEoyUnA540yibdkvgJpi2c+-ZHUjNyALqiTsx2WXw@mail.gmail.com>
+	<CAN_7+Yagfpk4CCPeFxVLfsmekZS1r9sV1DnPcq635Ji0PtBEZA@mail.gmail.com>
+Date: Wed, 30 Jul 2014 14:54:39 +0300
+Message-ID: <CABBYNZ+PNtNLVFQX87=+1T9kTqV=YsZmmR00P6M-KNwwR-CUpw@mail.gmail.com>
+Subject: Re: [PATCH 4/5] android/gatt: Always connect with BT_SEC_LOW security
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Lukasz Rymanowski <lukasz.rymanowski@gmail.com>
+Cc: Marcin Kraglak <marcin.kraglak@tieto.com>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Lukasz,
 
-I have a BLE HID device which has 2 output reports and it is discovered properly by BlueZ. However, when I try to send an output report it always calls the first registered report id's handle. It doesn't matter what the first byte is in the message.
+On Wed, Jul 30, 2014 at 2:37 PM, Lukasz Rymanowski
+<lukasz.rymanowski@gmail.com> wrote:
+> Hi Luiz,
+>
+> On Wed, Jul 30, 2014 at 12:41 PM, Luiz Augusto von Dentz
+> <luiz.dentz@gmail.com> wrote:
+>> Hi Marcin,
+>>
+>> On Wed, Jul 30, 2014 at 12:38 PM, Marcin Kraglak
+>> <marcin.kraglak@tieto.com> wrote:
+>>> Set BT_SEC_LOW for all LE connections. Only specific profiles need
+>>> higher security, now it is possible to elevate security with public
+>>> GATT API.
+>>> ---
+>>>  android/gatt.c | 6 +-----
+>>>  1 file changed, 1 insertion(+), 5 deletions(-)
+>>>
+>>> diff --git a/android/gatt.c b/android/gatt.c
+>>> index 49ca2b6..11d7a2c 100644
+>>> --- a/android/gatt.c
+>>> +++ b/android/gatt.c
+>>> @@ -1433,7 +1433,6 @@ reply:
+>>>
+>>>  static int connect_le(struct gatt_device *dev)
+>>>  {
+>>> -       BtIOSecLevel sec_level;
+>>>         GIOChannel *io;
+>>>         GError *gerr = NULL;
+>>>         char addr[18];
+>>> @@ -1450,9 +1449,6 @@ static int connect_le(struct gatt_device *dev)
+>>>
+>>>         DBG("Connection attempt to: %s", addr);
+>>>
+>>> -       sec_level = bt_device_is_bonded(&dev->bdaddr) ? BT_IO_SEC_MEDIUM :
+>>> -                                                               BT_IO_SEC_LOW;
+>>> -
+>>>         /*
+>>>          * If address type is random it might be that IRK was received and
+>>>          * random is just for faking Android Framework. ID address should be
+>>> @@ -1478,7 +1474,7 @@ static int connect_le(struct gatt_device *dev)
+>>>                         BT_IO_OPT_DEST_BDADDR, bdaddr,
+>>>                         BT_IO_OPT_DEST_TYPE, bdaddr_type,
+>>>                         BT_IO_OPT_CID, ATT_CID,
+>>> -                       BT_IO_OPT_SEC_LEVEL, sec_level,
+>>> +                       BT_IO_OPT_SEC_LEVEL, BT_IO_SEC_LOW,
+>>>                         BT_IO_OPT_INVALID);
+>>>         if (!io) {
+>>>                 error("gatt: Failed bt_io_connect(%s): %s", addr,
+>>> --
+>>> 1.9.3
+>>
+>> This does not work for HoG:
+>>
+>> "If the HID Host receives the L2CAP Connection Parameter Update
+>> request but has not
+>> yet completed service discovery or has not completed encryption, the
+>> HID Host may
+>> send the L2CAP Connection Parameter Update Response with the Result field
+>> indicating that the request has been rejected."
+>>
+>
+> I think that with "[PATCH 3/5] anroid/hidhost: Set security to MEDUIM
+> after connect"  there is no issue with HOG.
+> That patch basically triggers pairing or enable encryption (if device
+> are bonded) just after LE link is created.
 
-How can I send to a different output report?
+It depends when the connection parameter update is sent, if it is
+before the userspace can upgrade the security requirement and the
+remote device rejects it then it might never update. Anyway, the
+argument bellow still stand, why would you have LTK distributed and
+not encrypt?
 
-I can supply any log/debug output if it is needed.
+Id say the very purpose of signed writes is meant for when you don't
+have LTK, but perhaps Im missing something.
 
-Murat Kilivan
+>> IMO what we should do instead is pass what security level we want
+>> based on the profiles that has requested the connection, in case of
+>> HoG then we can set medium security and other might set it to low,
+>> note that elevating security later is less secure then having it from
+>> the start so I hope this is not just to fulfill some stupid PTS test
+>> that does bonding but requires not to encrypt.
+>>
+>>
+>> --
+>> Luiz Augusto von Dentz
+>> --
+>> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+>> the body of a message to majordomo@vger.kernel.org
+>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>
+> BR
+> Lukasz
 
 
-Member of the CSR plc group of companies. CSR plc registered in England and Wales, registered number 4187346, registered office Churchill House, Cambridge Business Park, Cowley Road, Cambridge, CB4 0WZ, United Kingdom
-More information can be found at www.csr.com. Keep up to date with CSR on our technical blog, www.csr.com/blog, CSR people blog, www.csr.com/people, YouTube, www.youtube.com/user/CSRplc, Facebook, www.facebook.com/pages/CSR/191038434253534, or follow us on Twitter at www.twitter.com/CSR_plc.
-New for 2014, you can now access the wide range of products powered by aptX at www.aptx.com.
+
+-- 
+Luiz Augusto von Dentz
