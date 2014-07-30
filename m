@@ -1,70 +1,41 @@
 Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH BlueZ] android/avrcp: Fix crash while discovering records
-Date: Wed, 30 Jul 2014 12:27:49 +0200
-Message-ID: <5027418.PFgxn8lnIq@uw000953>
-In-Reply-To: <1406714403-3474-1-git-send-email-luiz.dentz@gmail.com>
-References: <1406714403-3474-1-git-send-email-luiz.dentz@gmail.com>
+Subject: Re: [PATCH 0/8] Add PAN test cases
+Date: Wed, 30 Jul 2014 12:06:34 +0200
+Message-ID: <7996130.28PUDB3RGD@uw000953>
+In-Reply-To: <1406635292-30691-1-git-send-email-ravikumar.veeramally@linux.intel.com>
+References: <1406635292-30691-1-git-send-email-ravikumar.veeramally@linux.intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+Hi Ravi,
 
-On Wednesday 30 of July 2014 13:00:03 Luiz Augusto von Dentz wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+On Tuesday 29 of July 2014 15:01:24 Ravi kumar Veeramally wrote:
+> Ravi kumar Veeramally (8):
+>   android/tester: Fix memory leak
+>   android/tester-ng: Add PAN init test case
+>   android/tester-ng: Add PAN Connect test case
+>   android/tester-ng: Add PAN Disconnect test case
+>   anrdroid/tester-ng: Add PAN Get Local Role test case
+>   android/tester-ng: Add PAN Enable PANU test case
+>   android/tester-ng: Add PAN Enable NAP test case
+>   android/tester-ng: Add PAN Enable None test case
 > 
-> If the device is removed before SDP discovery is completed the following
-> crash can happen:
-> 
-> Invalid read of size 4
->     at 0x11CA6A: avrcp_device_free (avrcp.c:472)
->     by 0x11D70F: search_cb (avrcp.c:944)
->     by 0x13749D: search_completed_cb (sdp-client.c:176)
->     by 0x134E0F: sdp_process (sdp.c:4345)
->     by 0x1374F5: search_process_cb (sdp-client.c:201)
->     by 0x48BD9C7: g_io_unix_dispatch (giounix.c:166)
->     by 0x48C2CCB: g_main_context_dispatch (gmain.c:2539)
->     by 0x48C2ED9: g_main_context_iterate.isra.19 (gmain.c:3146)
->     by 0x48C3167: g_main_loop_run (gmain.c:3340)
->     by 0x10D00D: main (main.c:538)
-> Address 0x4bcb904 is 20 bytes inside a block of size 24 free'd
->     at 0x4897E6C: free (in /system/lib/valgrind/vgpreload_memcheck-arm-linux.so)
->     by 0x48C5E2B: g_free (gmem.c:252)
->     by 0x11A52F: bt_a2dp_notify_state (a2dp.c:238)
->     by 0x1172C1: process_disconnect (avdtp.c:1005)
->     by 0x48C146B: g_list_foreach (gslist.c:840)
->     by 0x48CD869: g_slist_free_full (gslist.c:177)
->     by 0x117CAB: connection_lost (avdtp.c:1021)
->     by 0x11A02F: session_cb (avdtp.c:2081)
->     by 0x48BD9C7: g_io_unix_dispatch (giounix.c:166)
->     by 0x48C2CCB: g_main_context_dispatch (gmain.c:2539)
->     by 0x48C2ED9: g_main_context_iterate.isra.19 (gmain.c:3146)
->     by 0x48C3167: g_main_loop_run (gmain.c:3340)
-> ---
->  android/avrcp.c | 3 +++
->  1 file changed, 3 insertions(+)
-> 
-> diff --git a/android/avrcp.c b/android/avrcp.c
-> index caf9335..8c5cf8a 100644
-> --- a/android/avrcp.c
-> +++ b/android/avrcp.c
-> @@ -892,6 +892,9 @@ static void search_cb(sdp_list_t *recs, int err, gpointer data)
->  
->  	DBG("");
->  
-> +	if (!g_slist_find(devices, dev))
-> +		return;
-> +
->  	if (err < 0) {
->  		error("Unable to get AV_REMOTE_SVCLASS_ID SDP record: %s",
->  							strerror(-err));
+>  android/Makefile.am   |   1 +
+>  android/tester-main.c |  83 +++++++++++++++++++
+>  android/tester-main.h |   8 ++
+>  android/tester-pan.c  | 219 ++++++++++++++++++++++++++++++++++++++++++++++++++
+>  4 files changed, 311 insertions(+)
+>  create mode 100644 android/tester-pan.c
 > 
 
-Patch applied, thanks.
+Patch 1/8 is now applied. Other patches need rebase. Also since now old tester
+is removed, lets again prefix tester patches with 'android/tester'.
+ 
 
 -- 
 Best regards, 
