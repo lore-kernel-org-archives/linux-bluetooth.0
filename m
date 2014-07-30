@@ -1,53 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
 Sender: armansito@google.com
-In-Reply-To: <C58178E2-35CE-4076-96B1-542D3EE15C15@holtmann.org>
-References: <1406758441-10335-1-git-send-email-armansito@chromium.org>
-	<C58178E2-35CE-4076-96B1-542D3EE15C15@holtmann.org>
-Date: Wed, 30 Jul 2014 15:48:19 -0700
-Message-ID: <CAHrH25RxrdcP0S4+vQw5=YfRnUCf+aW9t9KEeTGL8r98-FeUmw@mail.gmail.com>
-Subject: Re: [PATCH v1] shared/gatt: Use iterator based discovery result structure.
+In-Reply-To: <A9D88074-2B24-4EBE-BF38-B185F0206A23@holtmann.org>
+References: <1406664819-24970-1-git-send-email-armansito@chromium.org>
+	<CABBYNZJdppvFb_KCBAzX9_3aVpx8r47myxPFW_ZgLUnESDJ+Hg@mail.gmail.com>
+	<3E59062F-919F-46E2-99F3-39BFCDB0C706@holtmann.org>
+	<CAHrH25S+Kny+h6QmGpfydvMaYEu-odB_Vd1Jkdh27PtLoe9xqQ@mail.gmail.com>
+	<A9D88074-2B24-4EBE-BF38-B185F0206A23@holtmann.org>
+Date: Wed, 30 Jul 2014 15:30:18 -0700
+Message-ID: <CAHrH25RLzdw_wY5O+BpNaa75SHy0V7iq-aY4pLWwiba3JbO7UQ@mail.gmail.com>
+Subject: Re: [PATCH] shared/att: Handle disconnects.
 From: Arman Uguray <armansito@chromium.org>
 To: Marcel Holtmann <marcel@holtmann.org>
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
+Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Marcel,
 
-> patch has been applied.
+
+> the struct io is an internal detail to bt_att. I do not follow the comment regards to upper layer. The input into bt_att_new will be a file descriptor.
 >
 
-Thanks!
+What I meant was that, upon receiving the timeout callback, should
+whoever created the bt_att be responsible for explicitly destroying
+the connection by calling bt_att_unref (which will internally free the
+struct io)? Just thinking out loud.
 
->> +bool bt_gatt_iter_init(struct bt_gatt_iter *iter, struct bt_gatt_result *result);
->> +bool bt_gatt_iter_next_service(struct bt_gatt_iter *iter,
->> +                                     struct bt_gatt_service *service);
->
-> One option here is to not bother with the interim struct bt_gatt_service. Especially since I think we will need that actually for an higher abstraction at some point.
->
->         bool bt_gatt_iter_next_service(struct bt_gatt_iter *iter,
->                                         uint16_t *start_handle,
->                                         uint16_t *end_handle,
->                                         uint8_t *uuid[16]);
+
+> So what I thinking is that we just do io_destroy(att->io) and then att->io = NULL.
 >
 
-That makes sense. I think as bt_gatt_client starts taking shape I will
-know what to do about these.
+In the disconnect case, is this safe to do from directly inside the
+disconnect callback given to io_set_disconnect_handler?
 
 
->> +typedef void (*bt_gatt_discovery_callback_t)(bool success, uint8_t att_code,
->> +                                             struct bt_gatt_result *result,
->>                                               void *user_data);
->
-> It might be a good idea to shrink this to results + user_data. We could retrieve the ATT error code and general success status from bt_gatt_result pointer we give the callback function.
->
-
-I'm fine with this idea, then again it's nice to be overall consistent
-with the other callbacks. I don't know if we'd want to perhaps
-generalize bt_gatt_result to contain more than just discovery results
-(I kind of like the raw pointer for long value reads for instance).
-
-
-Cheers,
+Thanks,
 Arman
