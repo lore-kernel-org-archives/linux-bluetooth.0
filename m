@@ -1,72 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: Sebastian Chlad <sebastian.chlad@tieto.com>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.6\))
+Subject: Re: [PATCH 1/3] Bluetooth: Rename HCI_PAIRABLE to HCI_BONDABLE
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1406701344-23842-1-git-send-email-johan.hedberg@gmail.com>
+Date: Tue, 29 Jul 2014 23:28:59 -0700
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] android/pts: RFCOMM PTS update.
-Date: Wed, 30 Jul 2014 11:26:24 +0200
-Message-ID: <13529513.ev1i7PCfTT@uw000953>
-In-Reply-To: <1406643138-16988-1-git-send-email-sebastian.chlad@tieto.com>
-References: <1406643138-16988-1-git-send-email-sebastian.chlad@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Message-Id: <D4177AD8-BF86-4D33-B369-6E91478DD8C7@holtmann.org>
+References: <1406701344-23842-1-git-send-email-johan.hedberg@gmail.com>
+To: Johan Hedberg <johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Sebastian,
+Hi Johan,
 
-On Tuesday 29 of July 2014 16:12:18 Sebastian Chlad wrote:
-> Number of issues on PTS 5.2 for RFCOMM found. Problems with Credits
-> (PTS issue #12421), Channel disconnect (PTS issue #12414), accepting
-> UIH and UA frames (PTS issue #12397).
+> The HCI_PAIRABLE flag isn't actually controlling whether we're pairable
+> but whether we're bondable. Therefore, rename it accordingly.
+> 
+> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 > ---
->  android/pts-rfcomm.txt | 18 +++++++++++-------
->  1 file changed, 11 insertions(+), 7 deletions(-)
-> 
-> diff --git a/android/pts-rfcomm.txt b/android/pts-rfcomm.txt
-> index b96caab..9bfc7a2 100644
-> --- a/android/pts-rfcomm.txt
-> +++ b/android/pts-rfcomm.txt
-> @@ -17,17 +17,21 @@ Test Name		Result	Notes
->  TC_RFC_BV_01_C		PASS	rctest -n -P 1 <btaddr>
->  TC_RFC_BV_02_C		PASS	rctest -r -P 1
->  TC_RFC_BV_03_C		PASS	rctest -r -P 1
-> -TC_RFC_BV_04_C		FAIL
-> +TC_RFC_BV_04_C		FAIL	PTS issue #12421
-> +				PTS issue #12414
->  				NOTE: DISC on DLC is expected; IUT disconnects
->  					rfcomm session (close)
-> -TC_RFC_BV_05_C		INC
-> +TC_RFC_BV_05_C		PASS	rctest -n -P 4 <btaddr>
-> +				Note: test requires IUT to connect on the given
-> +				channel. sdptool browse <btaddr> to check the
-> +				channel.
->  TC_RFC_BV_06_C		PASS	rctest -r -P 1
->  TC_RFC_BV_07_C		PASS	rctest -r -P 1
-> -TC_RFC_BV_08_C		INC
-> +TC_RFC_BV_08_C		INC	PTS issue #12397
->  				NOTE: Incorrect frame type sent in response to
->  					the DISC command
->  TC_RFC_BV_11_C		PASS	rctest -r -P 1
-> -TC_RFC_BV_13_C		FAIL
-> +TC_RFC_BV_13_C		FAIL	PTS issue #12397
->  				NOTE: IUT sent the correct frame type (UIH)
->  				but the parameters did not match the
->  				requirements
-> @@ -35,7 +39,7 @@ TC_RFC_BV_14_C		N/A
->  TC_RFC_BV_15_C		PASS	rctest -r -P 1
->  TC_RFC_BV_17_C		PASS	rctest -d -P 1
->  TC_RFC_BV_19_C		PASS
-> -TC_RFC_BV_21_C		INC
-> -TC_RFC_BV_22_C		INC
-> -TC_RFC_BV_25_C		INC
-> +TC_RFC_BV_21_C		INC	PTS issue #12421
-> +TC_RFC_BV_22_C		INC	PTS issue #12421
-> +TC_RFC_BV_25_C		INC	PTS issue #12421
->  -------------------------------------------------------------------------------
-> 
+> include/net/bluetooth/hci.h | 2 +-
+> net/bluetooth/hci_core.c    | 4 ++--
+> net/bluetooth/hci_event.c   | 4 ++--
+> net/bluetooth/mgmt.c        | 8 ++++----
+> net/bluetooth/smp.c         | 6 +++---
+> 5 files changed, 12 insertions(+), 12 deletions(-)
 
-Applied, thanks.
+patch has been applied to bluetooth-next tree.
 
--- 
-Best regards, 
-Szymon Janc
+Regards
+
+Marcel
+
