@@ -1,46 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.6\))
-Subject: Re: [PATCH] shared/gatt: Use iterator based discovery result structure.
+Subject: Re: [PATCH] shared/att: Handle disconnects.
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <CAHrH25QOoRJjziR6K1rh3s5HAvKEaX62+LWB022G5E1eZ_WppA@mail.gmail.com>
-Date: Wed, 30 Jul 2014 15:17:45 -0700
-Cc: Arman Uguray <armansito@chromium.org>,
-	BlueZ development <linux-bluetooth@vger.kernel.org>
-Message-Id: <968A3D86-D36A-432B-AB2F-1269D55B2BC9@holtmann.org>
-References: <1406664949-25196-1-git-send-email-armansito@chromium.org> <B1DE8040-EA3D-4B9B-9649-033A8FB49F46@holtmann.org> <CAHrH25QOoRJjziR6K1rh3s5HAvKEaX62+LWB022G5E1eZ_WppA@mail.gmail.com>
-To: Arman Uguray <armansito@google.com>
+In-Reply-To: <CAHrH25S+Kny+h6QmGpfydvMaYEu-odB_Vd1Jkdh27PtLoe9xqQ@mail.gmail.com>
+Date: Wed, 30 Jul 2014 15:16:53 -0700
+Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Message-Id: <A9D88074-2B24-4EBE-BF38-B185F0206A23@holtmann.org>
+References: <1406664819-24970-1-git-send-email-armansito@chromium.org> <CABBYNZJdppvFb_KCBAzX9_3aVpx8r47myxPFW_ZgLUnESDJ+Hg@mail.gmail.com> <3E59062F-919F-46E2-99F3-39BFCDB0C706@holtmann.org> <CAHrH25S+Kny+h6QmGpfydvMaYEu-odB_Vd1Jkdh27PtLoe9xqQ@mail.gmail.com>
+To: Arman Uguray <armansito@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Arman,
 
->>> +struct result_ptrs {
->>> +     struct bt_gatt_result *head;
->>> +     struct bt_gatt_result *tail;
->>> +};
->>> +
->>> +struct discovery_op {
->>> +     struct bt_att *att;
->>> +     uint16_t end_handle;
->>> +     int ref_count;
->>> +     bt_uuid_t uuid;
->>> +     struct result_ptrs result;
->> 
->> Does this nested struct give you any benefit. Why not just include head and tail pointers directly.
->> 
+> I think the current way we have things is pretty simple and clean
+> already, but I'll go ahead with your suggestion if you guys prefer
+> that.
 > 
-> I initially thought that I would reuse the result ptrs but I didn't so
-> it's not that necessary any more.
+> One small question: is it safe to call io_destroy inside the
+> disconnect callback? If not, then we would have to post an
+> asynchronous task to clean up the IO and this would complicate the
+> code a little bit. We would actually still want to mark the the att
+> structure as invalid somehow so that any calls made to bt_att_send,
+> bt_att_register etc before the IO is freed can return false, which
+> would lead us to have a "bool invalid" field somewhere.
 > 
-> 
->> I was actually thinking that struct bt_gatt_result will keep the tail pointer all by itself. That way it is self-contained.
-> 
-> I'd rather have the head and tail pointers inside discovery_op. It's a
-> bit weird for each "link" (i.e. struct bt_gatt_result) to have a tail
-> pointer, which the iterator itself won't ever use later.
+> In the timeout case, it might make sense to destroy the IO there. Then
+> again, we could leave it up to the upper layer to unref the bt_att
+> which would then destroy the connection.
 
-then go for putting them in discovery_op. We can optimize things later since these are all internal details.
+the struct io is an internal detail to bt_att. I do not follow the comment regards to upper layer. The input into bt_att_new will be a file descriptor.
+
+So what I thinking is that we just do io_destroy(att->io) and then att->io = NULL. 
 
 Regards
 
