@@ -1,29 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.6\))
-Subject: Re: [PATCH] Bluetooth: Fix check for connected state when pairing
+Subject: Re: [PATCH bluetooth-next 0/2] 6lowpan cleanup
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1406698548-14240-1-git-send-email-johan.hedberg@gmail.com>
-Date: Tue, 29 Jul 2014 22:55:07 -0700
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <3B9916DC-CEA5-4EEC-B2B3-060E418C448F@holtmann.org>
-References: <1406698548-14240-1-git-send-email-johan.hedberg@gmail.com>
-To: Johan Hedberg <johan.hedberg@gmail.com>
+In-Reply-To: <1406698512-29405-1-git-send-email-varkabhadram@gmail.com>
+Date: Tue, 29 Jul 2014 22:55:03 -0700
+Cc: linux-zigbee-devel@lists.sourceforge.net,
+	BlueZ development <linux-bluetooth@vger.kernel.org>,
+	alex.aring@gmail.com, Varka Bhadram <varkab@cdac.in>
+Message-Id: <6716F0F9-E054-498A-9D10-B583665A7F26@holtmann.org>
+References: <1406698512-29405-1-git-send-email-varkabhadram@gmail.com>
+To: varkabhadram@gmail.com
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+Hi Varka,
 
-> Both BT_CONNECTED and BT_CONFIG state mean that we have a baseband link
-> available. We should therefore check for either of these when pairing
-> and deciding whether to call hci_conn_security() directly.
+> This series removes the unused macros and function for 6lowpan
 > 
-> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
-> ---
-> net/bluetooth/mgmt.c | 2 +-
-> 1 file changed, 1 insertion(+), 1 deletion(-)
+> Varka Bhadram (2):
+>  6lowpan: remove unused macros
+>  6lowpan: remove unused function
+> 
+> include/net/6lowpan.h |   26 --------------------------
+> 1 file changed, 26 deletions(-)
 
-patch has been applied to bluetooth-next tree.
+both patches have been applied to bluetooth-next tree.
 
 Regards
 
