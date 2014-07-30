@@ -1,72 +1,47 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 30 Jul 2014 08:38:17 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org, alex.aring@gmail.com
-Subject: Re: [PATCH 1/5] 6lowpan: iphc: Fix block comments to match
- networking style
-Message-ID: <20140730053817.GA14296@t440s.P-661HNU-F1>
-References: <1406684924-40906-1-git-send-email-marcel@holtmann.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1406684924-40906-1-git-send-email-marcel@holtmann.org>
+From: varkabhadram@gmail.com
+To: linux-zigbee-devel@lists.sourceforge.net
+Cc: linux-bluetooth@vger.kernel.org, alex.aring@gmail.com,
+	Varka Bhadram <varkab@cdac.in>
+Subject: [PATCH bluetooth-next 2/2] 6lowpan: remove unused function
+Date: Wed, 30 Jul 2014 11:05:12 +0530
+Message-Id: <1406698512-29405-3-git-send-email-varkabhadram@gmail.com>
+In-Reply-To: <1406698512-29405-1-git-send-email-varkabhadram@gmail.com>
+References: <1406698512-29405-1-git-send-email-varkabhadram@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+From: Varka Bhadram <varkab@cdac.in>
 
-On Wed, Jul 30, 2014, Marcel Holtmann wrote:
-> This patch fixes all the block comment issues found by checkpatch.pl and
-> makes them match the network style now.
-> 
-> WARNING: networking block comments don't use an empty /* line, use /* Comment...
-> +/*
-> + * Based on patches from Jon Smirl <jonsmirl@gmail.com>
-> 
-> WARNING: networking block comments don't use an empty /* line, use /* Comment...
-> +/*
-> + * Uncompress address function for source and
-> 
-> WARNING: networking block comments don't use an empty /* line, use /* Comment...
-> +/*
-> + * Uncompress address function for source context
-> 
-> WARNING: networking block comments don't use an empty /* line, use /* Comment...
-> +		/*
-> +		 * UDP lenght needs to be infered from the lower layers
-> 
-> WARNING: networking block comments don't use an empty /* line, use /* Comment...
-> +	/*
-> +	 * Traffic Class and FLow Label carried in-line
-> 
-> WARNING: networking block comments don't use an empty /* line, use /* Comment...
-> +	/*
-> +	 * Traffic class carried in-line
-> 
-> WARNING: networking block comments don't use an empty /* line, use /* Comment...
-> +	/*
-> +	 * Flow Label carried in-line
-> 
-> WARNING: networking block comments don't use an empty /* line, use /* Comment...
-> +		/*
-> +		 * replace the compressed UDP head by the uncompressed UDP
-> 
-> WARNING: networking block comments don't use an empty /* line, use /* Comment...
-> +	/*
-> +	 * As we copy some bit-length fields, in the IPHC encoding bytes,
-> 
-> WARNING: networking block comments don't use an empty /* line, use /* Comment...
-> +	/*
-> +	 * Traffic class, flow label
-> 
-> WARNING: networking block comments don't use an empty /* line, use /* Comment...
-> +	/*
-> +	 * Hop limit
-> 
-> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
-> ---
->  net/6lowpan/iphc.c | 33 +++++++++++----------------------
->  1 file changed, 11 insertions(+), 22 deletions(-)
+This patch removes the unused function.
 
-All 5 patches in this set have been applied to bluetooth-next. Thanks.
+Signed-off-by: Varka Bhadram <varkab@cdac.in>
+---
+ include/net/6lowpan.h |   11 -----------
+ 1 file changed, 11 deletions(-)
 
-Johan
+diff --git a/include/net/6lowpan.h b/include/net/6lowpan.h
+index 614920a..d184df1 100644
+--- a/include/net/6lowpan.h
++++ b/include/net/6lowpan.h
+@@ -240,17 +240,6 @@ static inline int lowpan_fetch_skb_u8(struct sk_buff *skb, u8 *val)
+ 	return 0;
+ }
+ 
+-static inline int lowpan_fetch_skb_u16(struct sk_buff *skb, u16 *val)
+-{
+-	if (unlikely(!pskb_may_pull(skb, 2)))
+-		return -EINVAL;
+-
+-	*val = (skb->data[0] << 8) | skb->data[1];
+-	skb_pull(skb, 2);
+-
+-	return 0;
+-}
+-
+ static inline bool lowpan_fetch_skb(struct sk_buff *skb,
+ 		void *data, const unsigned int len)
+ {
+-- 
+1.7.9.5
+
