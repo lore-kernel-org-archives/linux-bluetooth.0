@@ -1,32 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.6\))
-Subject: Re: [PATCH 2/3] Bluetooth: Rename pairable mgmt setting to bondable
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1406701344-23842-2-git-send-email-johan.hedberg@gmail.com>
-Date: Tue, 29 Jul 2014 23:28:51 -0700
+Date: Wed, 30 Jul 2014 09:26:32 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
 Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <35A03E81-DEF3-49B3-B355-1BC658383257@holtmann.org>
-References: <1406701344-23842-1-git-send-email-johan.hedberg@gmail.com> <1406701344-23842-2-git-send-email-johan.hedberg@gmail.com>
-To: Johan Hedberg <johan.hedberg@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth: Fix sparse warning from HID new leds handling
+Message-ID: <20140730062632.GA23949@t440s.P-661HNU-F1>
+References: <1406700525-18066-1-git-send-email-marcel@holtmann.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1406700525-18066-1-git-send-email-marcel@holtmann.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+Hi Marcel,
 
-> This setting maps to the HCI_BONDABLE flag which tracks whether we're
-> bondable or not. Therefore, rename the mgmt setting and respective
-> command accordingly.
+On Wed, Jul 30, 2014, Marcel Holtmann wrote:
+> The new leds bit handling produces this spares warning.
 > 
-> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+>   CHECK   net/bluetooth/hidp/core.c
+> net/bluetooth/hidp/core.c:156:60: warning: dubious: x | !y
+> 
+> Just fix it by doing an explicit x << 0 shift operation.
+> 
+> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 > ---
-> include/net/bluetooth/mgmt.h |  4 ++--
-> net/bluetooth/mgmt.c         | 14 +++++++-------
-> 2 files changed, 9 insertions(+), 9 deletions(-)
+>  net/bluetooth/hidp/core.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
-patch has been applied to bluetooth-next tree.
+Applied to bluetooth-next. Thanks.
 
-Regards
-
-Marcel
-
+Johan
