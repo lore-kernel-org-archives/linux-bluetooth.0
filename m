@@ -1,79 +1,138 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1406713130-3825-4-git-send-email-marcin.kraglak@tieto.com>
-References: <1406713130-3825-1-git-send-email-marcin.kraglak@tieto.com>
-	<1406713130-3825-4-git-send-email-marcin.kraglak@tieto.com>
-Date: Wed, 30 Jul 2014 13:41:09 +0300
-Message-ID: <CABBYNZ+c8MEoyUnA540yibdkvgJpi2c+-ZHUjNyALqiTsx2WXw@mail.gmail.com>
-Subject: Re: [PATCH 4/5] android/gatt: Always connect with BT_SEC_LOW security
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+From: Szymon Janc <szymon.janc@tieto.com>
 To: Marcin Kraglak <marcin.kraglak@tieto.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 1/5] android/gatt: Split set_security() function
+Date: Wed, 30 Jul 2014 12:37:09 +0200
+Message-ID: <1499940.vN5kL8FkWq@uw000953>
+In-Reply-To: <1406713130-3825-1-git-send-email-marcin.kraglak@tieto.com>
+References: <1406713130-3825-1-git-send-email-marcin.kraglak@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Marcin,
 
-On Wed, Jul 30, 2014 at 12:38 PM, Marcin Kraglak
-<marcin.kraglak@tieto.com> wrote:
-> Set BT_SEC_LOW for all LE connections. Only specific profiles need
-> higher security, now it is possible to elevate security with public
-> GATT API.
+On Wednesday 30 of July 2014 11:38:46 Marcin Kraglak wrote:
+> Split function to set_security() and set_auth_type(). Set_security()
+> will be used in public API.
 > ---
->  android/gatt.c | 6 +-----
->  1 file changed, 1 insertion(+), 5 deletions(-)
->
+>  android/gatt.c | 51 +++++++++++++++++++++++++++++----------------------
+>  1 file changed, 29 insertions(+), 22 deletions(-)
+> 
 > diff --git a/android/gatt.c b/android/gatt.c
-> index 49ca2b6..11d7a2c 100644
+> index 2ddbf29..31558d0 100644
 > --- a/android/gatt.c
 > +++ b/android/gatt.c
-> @@ -1433,7 +1433,6 @@ reply:
->
->  static int connect_le(struct gatt_device *dev)
+> @@ -2832,27 +2832,12 @@ static int get_sec_level(struct gatt_device *dev)
+>  	return sec_level;
+>  }
+>  
+> -static bool set_security(struct gatt_device *device, int auth_type)
+> +static bool set_security(struct gatt_device *device, int req_sec_level)
 >  {
-> -       BtIOSecLevel sec_level;
->         GIOChannel *io;
->         GError *gerr = NULL;
->         char addr[18];
-> @@ -1450,9 +1449,6 @@ static int connect_le(struct gatt_device *dev)
->
->         DBG("Connection attempt to: %s", addr);
->
-> -       sec_level = bt_device_is_bonded(&dev->bdaddr) ? BT_IO_SEC_MEDIUM :
-> -                                                               BT_IO_SEC_LOW;
+> -	int req_sec_level, sec_level;
+> +	int sec_level;
+>  	GError *gerr = NULL;
+>  	GIOChannel *io;
+>  
+> -	switch (auth_type) {
+> -	case HAL_GATT_AUTHENTICATION_MITM:
+> -		req_sec_level = BT_SECURITY_HIGH;
+> -		break;
+> -	case HAL_GATT_AUTHENTICATION_NO_MITM:
+> -		req_sec_level = BT_SECURITY_MEDIUM;
+> -		break;
+> -	case HAL_GATT_AUTHENTICATION_NONE:
+> -		req_sec_level = BT_SECURITY_LOW;
+> -		break;
+> -	default:
+> -		error("gatt: Invalid auth_type value: %d", auth_type);
+> -		return false;
+> -	}
 > -
->         /*
->          * If address type is random it might be that IRK was received and
->          * random is just for faking Android Framework. ID address should be
-> @@ -1478,7 +1474,7 @@ static int connect_le(struct gatt_device *dev)
->                         BT_IO_OPT_DEST_BDADDR, bdaddr,
->                         BT_IO_OPT_DEST_TYPE, bdaddr_type,
->                         BT_IO_OPT_CID, ATT_CID,
-> -                       BT_IO_OPT_SEC_LEVEL, sec_level,
-> +                       BT_IO_OPT_SEC_LEVEL, BT_IO_SEC_LOW,
->                         BT_IO_OPT_INVALID);
->         if (!io) {
->                 error("gatt: Failed bt_io_connect(%s): %s", addr,
-> --
-> 1.9.3
+>  	sec_level = get_sec_level(device);
+>  	if (sec_level < 0)
+>  		return false;
+> @@ -2875,6 +2860,28 @@ static bool set_security(struct gatt_device *device, int auth_type)
+>  	return true;
+>  }
+>  
+> +static bool set_auth_type(struct gatt_device *device, int auth_type)
+> +{
+> +	int sec_level;
+> +
+> +	switch (auth_type) {
+> +	case HAL_GATT_AUTHENTICATION_MITM:
+> +		sec_level = BT_SECURITY_HIGH;
+> +		break;
+> +	case HAL_GATT_AUTHENTICATION_NO_MITM:
+> +		sec_level = BT_SECURITY_MEDIUM;
+> +		break;
+> +	case HAL_GATT_AUTHENTICATION_NONE:
+> +		sec_level = BT_SECURITY_LOW;
+> +		break;
+> +	default:
+> +		error("gatt: Invalid auth_type value: %d", auth_type);
+> +		return false;
+> +	}
+> +
+> +	return set_security(device, sec_level);
+> +}
+> +
+>  static void handle_client_read_characteristic(const void *buf, uint16_t len)
+>  {
+>  	const struct hal_cmd_gatt_client_read_characteristic *cmd = buf;
+> @@ -2915,7 +2922,7 @@ static void handle_client_read_characteristic(const void *buf, uint16_t len)
+>  		goto failed;
+>  	}
+>  
+> -	if (!set_security(conn->device, cmd->auth_req)) {
+> +	if (!set_auth_type(conn->device, cmd->auth_req)) {
+>  		error("gatt: Failed to set security %d", cmd->auth_req);
+>  		status = HAL_STATUS_FAILED;
+>  		free(cb_data);
+> @@ -3052,7 +3059,7 @@ static void handle_client_write_characteristic(const void *buf, uint16_t len)
+>  		}
+>  	}
+>  
+> -	if (!set_security(conn->device, cmd->auth_req)) {
+> +	if (!set_auth_type(conn->device, cmd->auth_req)) {
+>  		error("gatt: Failed to set security %d", cmd->auth_req);
+>  		status = HAL_STATUS_FAILED;
+>  		goto failed;
+> @@ -3267,7 +3274,7 @@ static void handle_client_read_descriptor(const void *buf, uint16_t len)
+>  		goto failed;
+>  	}
+>  
+> -	if (!set_security(conn->device, cmd->auth_req)) {
+> +	if (!set_auth_type(conn->device, cmd->auth_req)) {
+>  		error("gatt: Failed to set security %d", cmd->auth_req);
+>  		status = HAL_STATUS_FAILED;
+>  		free(cb_data);
+> @@ -3399,7 +3406,7 @@ static void handle_client_write_descriptor(const void *buf, uint16_t len)
+>  		}
+>  	}
+>  
+> -	if (!set_security(conn->device, cmd->auth_req)) {
+> +	if (!set_auth_type(conn->device, cmd->auth_req)) {
+>  		error("gatt: Failed to set security %d", cmd->auth_req);
+>  		status = HAL_STATUS_FAILED;
+>  		goto failed;
+> @@ -3882,7 +3889,7 @@ static uint8_t test_increase_security(bdaddr_t *bdaddr, uint16_t u1)
+>  	if (!device)
+>  		return HAL_STATUS_FAILED;
+>  
+> -	if (!set_security(device, u1))
+> +	if (!set_auth_type(device, u1))
+>  		return HAL_STATUS_FAILED;
+>  
+>  	return HAL_STATUS_SUCCESS;
+> 
 
-This does not work for HoG:
-
-"If the HID Host receives the L2CAP Connection Parameter Update
-request but has not
-yet completed service discovery or has not completed encryption, the
-HID Host may
-send the L2CAP Connection Parameter Update Response with the Result field
-indicating that the request has been rejected."
-
-IMO what we should do instead is pass what security level we want
-based on the profiles that has requested the connection, in case of
-HoG then we can set medium security and other might set it to low,
-note that elevating security later is less secure then having it from
-the start so I hope this is not just to fulfill some stupid PTS test
-that does bonding but requires not to encrypt.
-
+All 5 patches applied. Thanks.
 
 -- 
-Luiz Augusto von Dentz
+Best regards, 
+Szymon Janc
