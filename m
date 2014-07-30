@@ -1,137 +1,70 @@
 Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
-To: Marcin Kraglak <marcin.kraglak@tieto.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/5] android/gatt: Split set_security() function
-Date: Wed, 30 Jul 2014 12:37:09 +0200
-Message-ID: <1499940.vN5kL8FkWq@uw000953>
-In-Reply-To: <1406713130-3825-1-git-send-email-marcin.kraglak@tieto.com>
-References: <1406713130-3825-1-git-send-email-marcin.kraglak@tieto.com>
+Subject: Re: [PATCH BlueZ] android/avrcp: Fix crash while discovering records
+Date: Wed, 30 Jul 2014 12:27:49 +0200
+Message-ID: <5027418.PFgxn8lnIq@uw000953>
+In-Reply-To: <1406714403-3474-1-git-send-email-luiz.dentz@gmail.com>
+References: <1406714403-3474-1-git-send-email-luiz.dentz@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcin,
+Hi Luiz,
 
-On Wednesday 30 of July 2014 11:38:46 Marcin Kraglak wrote:
-> Split function to set_security() and set_auth_type(). Set_security()
-> will be used in public API.
+On Wednesday 30 of July 2014 13:00:03 Luiz Augusto von Dentz wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> 
+> If the device is removed before SDP discovery is completed the following
+> crash can happen:
+> 
+> Invalid read of size 4
+>     at 0x11CA6A: avrcp_device_free (avrcp.c:472)
+>     by 0x11D70F: search_cb (avrcp.c:944)
+>     by 0x13749D: search_completed_cb (sdp-client.c:176)
+>     by 0x134E0F: sdp_process (sdp.c:4345)
+>     by 0x1374F5: search_process_cb (sdp-client.c:201)
+>     by 0x48BD9C7: g_io_unix_dispatch (giounix.c:166)
+>     by 0x48C2CCB: g_main_context_dispatch (gmain.c:2539)
+>     by 0x48C2ED9: g_main_context_iterate.isra.19 (gmain.c:3146)
+>     by 0x48C3167: g_main_loop_run (gmain.c:3340)
+>     by 0x10D00D: main (main.c:538)
+> Address 0x4bcb904 is 20 bytes inside a block of size 24 free'd
+>     at 0x4897E6C: free (in /system/lib/valgrind/vgpreload_memcheck-arm-linux.so)
+>     by 0x48C5E2B: g_free (gmem.c:252)
+>     by 0x11A52F: bt_a2dp_notify_state (a2dp.c:238)
+>     by 0x1172C1: process_disconnect (avdtp.c:1005)
+>     by 0x48C146B: g_list_foreach (gslist.c:840)
+>     by 0x48CD869: g_slist_free_full (gslist.c:177)
+>     by 0x117CAB: connection_lost (avdtp.c:1021)
+>     by 0x11A02F: session_cb (avdtp.c:2081)
+>     by 0x48BD9C7: g_io_unix_dispatch (giounix.c:166)
+>     by 0x48C2CCB: g_main_context_dispatch (gmain.c:2539)
+>     by 0x48C2ED9: g_main_context_iterate.isra.19 (gmain.c:3146)
+>     by 0x48C3167: g_main_loop_run (gmain.c:3340)
 > ---
->  android/gatt.c | 51 +++++++++++++++++++++++++++++----------------------
->  1 file changed, 29 insertions(+), 22 deletions(-)
+>  android/avrcp.c | 3 +++
+>  1 file changed, 3 insertions(+)
 > 
-> diff --git a/android/gatt.c b/android/gatt.c
-> index 2ddbf29..31558d0 100644
-> --- a/android/gatt.c
-> +++ b/android/gatt.c
-> @@ -2832,27 +2832,12 @@ static int get_sec_level(struct gatt_device *dev)
->  	return sec_level;
->  }
+> diff --git a/android/avrcp.c b/android/avrcp.c
+> index caf9335..8c5cf8a 100644
+> --- a/android/avrcp.c
+> +++ b/android/avrcp.c
+> @@ -892,6 +892,9 @@ static void search_cb(sdp_list_t *recs, int err, gpointer data)
 >  
-> -static bool set_security(struct gatt_device *device, int auth_type)
-> +static bool set_security(struct gatt_device *device, int req_sec_level)
->  {
-> -	int req_sec_level, sec_level;
-> +	int sec_level;
->  	GError *gerr = NULL;
->  	GIOChannel *io;
+>  	DBG("");
 >  
-> -	switch (auth_type) {
-> -	case HAL_GATT_AUTHENTICATION_MITM:
-> -		req_sec_level = BT_SECURITY_HIGH;
-> -		break;
-> -	case HAL_GATT_AUTHENTICATION_NO_MITM:
-> -		req_sec_level = BT_SECURITY_MEDIUM;
-> -		break;
-> -	case HAL_GATT_AUTHENTICATION_NONE:
-> -		req_sec_level = BT_SECURITY_LOW;
-> -		break;
-> -	default:
-> -		error("gatt: Invalid auth_type value: %d", auth_type);
-> -		return false;
-> -	}
-> -
->  	sec_level = get_sec_level(device);
->  	if (sec_level < 0)
->  		return false;
-> @@ -2875,6 +2860,28 @@ static bool set_security(struct gatt_device *device, int auth_type)
->  	return true;
->  }
->  
-> +static bool set_auth_type(struct gatt_device *device, int auth_type)
-> +{
-> +	int sec_level;
+> +	if (!g_slist_find(devices, dev))
+> +		return;
 > +
-> +	switch (auth_type) {
-> +	case HAL_GATT_AUTHENTICATION_MITM:
-> +		sec_level = BT_SECURITY_HIGH;
-> +		break;
-> +	case HAL_GATT_AUTHENTICATION_NO_MITM:
-> +		sec_level = BT_SECURITY_MEDIUM;
-> +		break;
-> +	case HAL_GATT_AUTHENTICATION_NONE:
-> +		sec_level = BT_SECURITY_LOW;
-> +		break;
-> +	default:
-> +		error("gatt: Invalid auth_type value: %d", auth_type);
-> +		return false;
-> +	}
-> +
-> +	return set_security(device, sec_level);
-> +}
-> +
->  static void handle_client_read_characteristic(const void *buf, uint16_t len)
->  {
->  	const struct hal_cmd_gatt_client_read_characteristic *cmd = buf;
-> @@ -2915,7 +2922,7 @@ static void handle_client_read_characteristic(const void *buf, uint16_t len)
->  		goto failed;
->  	}
->  
-> -	if (!set_security(conn->device, cmd->auth_req)) {
-> +	if (!set_auth_type(conn->device, cmd->auth_req)) {
->  		error("gatt: Failed to set security %d", cmd->auth_req);
->  		status = HAL_STATUS_FAILED;
->  		free(cb_data);
-> @@ -3052,7 +3059,7 @@ static void handle_client_write_characteristic(const void *buf, uint16_t len)
->  		}
->  	}
->  
-> -	if (!set_security(conn->device, cmd->auth_req)) {
-> +	if (!set_auth_type(conn->device, cmd->auth_req)) {
->  		error("gatt: Failed to set security %d", cmd->auth_req);
->  		status = HAL_STATUS_FAILED;
->  		goto failed;
-> @@ -3267,7 +3274,7 @@ static void handle_client_read_descriptor(const void *buf, uint16_t len)
->  		goto failed;
->  	}
->  
-> -	if (!set_security(conn->device, cmd->auth_req)) {
-> +	if (!set_auth_type(conn->device, cmd->auth_req)) {
->  		error("gatt: Failed to set security %d", cmd->auth_req);
->  		status = HAL_STATUS_FAILED;
->  		free(cb_data);
-> @@ -3399,7 +3406,7 @@ static void handle_client_write_descriptor(const void *buf, uint16_t len)
->  		}
->  	}
->  
-> -	if (!set_security(conn->device, cmd->auth_req)) {
-> +	if (!set_auth_type(conn->device, cmd->auth_req)) {
->  		error("gatt: Failed to set security %d", cmd->auth_req);
->  		status = HAL_STATUS_FAILED;
->  		goto failed;
-> @@ -3882,7 +3889,7 @@ static uint8_t test_increase_security(bdaddr_t *bdaddr, uint16_t u1)
->  	if (!device)
->  		return HAL_STATUS_FAILED;
->  
-> -	if (!set_security(device, u1))
-> +	if (!set_auth_type(device, u1))
->  		return HAL_STATUS_FAILED;
->  
->  	return HAL_STATUS_SUCCESS;
+>  	if (err < 0) {
+>  		error("Unable to get AV_REMOTE_SVCLASS_ID SDP record: %s",
+>  							strerror(-err));
 > 
 
-All 5 patches applied. Thanks.
+Patch applied, thanks.
 
 -- 
 Best regards, 
