@@ -1,51 +1,98 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.6\))
-Subject: Re: [PATCH] shared/att: Handle disconnects.
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <CABBYNZJdppvFb_KCBAzX9_3aVpx8r47myxPFW_ZgLUnESDJ+Hg@mail.gmail.com>
-Date: Wed, 30 Jul 2014 09:27:12 -0700
-Cc: Arman Uguray <armansito@chromium.org>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Message-Id: <3E59062F-919F-46E2-99F3-39BFCDB0C706@holtmann.org>
-References: <1406664819-24970-1-git-send-email-armansito@chromium.org> <CABBYNZJdppvFb_KCBAzX9_3aVpx8r47myxPFW_ZgLUnESDJ+Hg@mail.gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+From: Martin Townsend <mtownsend1973@gmail.com>
+To: linux-zigbee-devel@lists.sourceforge.net,
+	linux-bluetooth@vger.kernel.org
+Cc: Martin Townsend <martin.townsend@xsilon.com>
+Subject: [PATCH 1/2] Remove dev parameter from skb_delivery_cb in 6lowpan.
+Date: Wed, 30 Jul 2014 15:55:04 +0100
+Message-Id: <1406732105-17500-2-git-send-email-martin.townsend@xsilon.com>
+In-Reply-To: <1406732105-17500-1-git-send-email-martin.townsend@xsilon.com>
+References: <1406732105-17500-1-git-send-email-martin.townsend@xsilon.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+This parameter is never used by any functions that are passed to
+lowpan_process_data which uses this callback.
 
->> This patch adds disconnect handling to bt_att, in which
->> io_set_disconnect_handler is used to set up a handler which cancels all
->> pending and queued ATT operations, marks the bt_att structure as invalid
->> and notifies the user via a specialized callback which can be set using
->> bt_att_set_disconnect_cb.
->> ---
->> src/shared/att.c | 62 +++++++++++++++++++++++++++++++++++++++++++++++++++++---
->> src/shared/att.h |  5 +++++
->> 2 files changed, 64 insertions(+), 3 deletions(-)
->> 
->> diff --git a/src/shared/att.c b/src/shared/att.c
->> index 0d27dfa..bc856dc 100644
->> --- a/src/shared/att.c
->> +++ b/src/shared/att.c
->> @@ -49,7 +49,11 @@ struct bt_att {
->>        int fd;
->>        bool close_on_unref;
->>        struct io *io;
->> -       bool invalid;  /* bt_att becomes invalid when a request times out */
->> +
->> +       /* bt_att becomes invalid when a request times out or if the physical
->> +        * link is disconnected.
->> +        */
->> +       bool invalid;
-> 
-> Usually this can be done by freeing and setting the io to NULL so it
-> is no longer connected.
+Signed-off-by: Martin Townsend <martin.townsend@xsilon.com>
+---
+ include/net/6lowpan.h         | 2 +-
+ net/6lowpan/iphc.c            | 2 +-
+ net/bluetooth/6lowpan.c       | 4 ++--
+ net/ieee802154/6lowpan_rtnl.c | 5 ++---
+ 4 files changed, 6 insertions(+), 7 deletions(-)
 
-this might be a simpler way to achieve this. Not having a valid IO around means that we do not have a transport anymore.
-
-Regards
-
-Marcel
+diff --git a/include/net/6lowpan.h b/include/net/6lowpan.h
+index 79b530f..995cce86 100644
+--- a/include/net/6lowpan.h
++++ b/include/net/6lowpan.h
+@@ -422,7 +422,7 @@ lowpan_uncompress_size(const struct sk_buff *skb, u16 *dgram_offset)
+ 	return skb->len + uncomp_header - ret;
+ }
+ 
+-typedef int (*skb_delivery_cb)(struct sk_buff *skb, struct net_device *dev);
++typedef int (*skb_delivery_cb)(struct sk_buff *skb);
+ 
+ int lowpan_process_data(struct sk_buff *skb, struct net_device *dev,
+ 		const u8 *saddr, const u8 saddr_type, const u8 saddr_len,
+diff --git a/net/6lowpan/iphc.c b/net/6lowpan/iphc.c
+index e82c9cc..b4bb27c 100644
+--- a/net/6lowpan/iphc.c
++++ b/net/6lowpan/iphc.c
+@@ -195,7 +195,7 @@ static int skb_deliver(struct sk_buff *skb, struct ipv6hdr *hdr,
+ 	raw_dump_table(__func__, "raw skb data dump before receiving",
+ 		       new->data, new->len);
+ 
+-	stat = deliver_skb(new, dev);
++	stat = deliver_skb(new);
+ 
+ 	kfree_skb(new);
+ 
+diff --git a/net/bluetooth/6lowpan.c b/net/bluetooth/6lowpan.c
+index 5a7f81d..f5df93f 100644
+--- a/net/bluetooth/6lowpan.c
++++ b/net/bluetooth/6lowpan.c
+@@ -197,7 +197,7 @@ static struct lowpan_dev *lookup_dev(struct l2cap_conn *conn)
+ 	return dev;
+ }
+ 
+-static int give_skb_to_upper(struct sk_buff *skb, struct net_device *dev)
++static int give_skb_to_upper(struct sk_buff *skb)
+ {
+ 	struct sk_buff *skb_cp;
+ 	int ret;
+@@ -283,7 +283,7 @@ static int recv_pkt(struct sk_buff *skb, struct net_device *dev,
+ 		skb_reset_network_header(local_skb);
+ 		skb_set_transport_header(local_skb, sizeof(struct ipv6hdr));
+ 
+-		if (give_skb_to_upper(local_skb, dev) != NET_RX_SUCCESS) {
++		if (give_skb_to_upper(local_skb) != NET_RX_SUCCESS) {
+ 			kfree_skb(local_skb);
+ 			goto drop;
+ 		}
+diff --git a/net/ieee802154/6lowpan_rtnl.c b/net/ieee802154/6lowpan_rtnl.c
+index 016b77e..637caa6 100644
+--- a/net/ieee802154/6lowpan_rtnl.c
++++ b/net/ieee802154/6lowpan_rtnl.c
+@@ -143,8 +143,7 @@ static int lowpan_header_create(struct sk_buff *skb, struct net_device *dev,
+ 			type, (void *)&da, (void *)&sa, 0);
+ }
+ 
+-static int lowpan_give_skb_to_devices(struct sk_buff *skb,
+-				      struct net_device *dev)
++static int lowpan_give_skb_to_devices(struct sk_buff *skb)
+ {
+ 	struct lowpan_dev_record *entry;
+ 	struct sk_buff *skb_cp;
+@@ -484,7 +483,7 @@ static int lowpan_rcv(struct sk_buff *skb, struct net_device *dev,
+ 		/* Pull off the 1-byte of 6lowpan header. */
+ 		skb_pull(skb, 1);
+ 
+-		ret = lowpan_give_skb_to_devices(skb, NULL);
++		ret = lowpan_give_skb_to_devices(skb);
+ 		if (ret == NET_RX_DROP)
+ 			goto drop;
+ 	} else {
+-- 
+1.9.1
 
