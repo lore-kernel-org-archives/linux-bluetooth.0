@@ -1,36 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
-From: johan.hedberg@gmail.com
+From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Fix check for connected state when pairing
-Date: Wed, 30 Jul 2014 08:35:48 +0300
-Message-Id: <1406698548-14240-1-git-send-email-johan.hedberg@gmail.com>
+Cc: alex.aring@gmail.com
+Subject: [PATCH 4/5] 6lowpan: iphc: Fix missing braces for if statement
+Date: Wed, 30 Jul 2014 03:48:43 +0200
+Message-Id: <1406684924-40906-4-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@intel.com>
+CHECK: braces {} should be used on all arms of this statement
++	if ((iphc0 & 0x03) != LOWPAN_IPHC_TTL_I)
+[...]
++	else {
+[...]
 
-Both BT_CONNECTED and BT_CONFIG state mean that we have a baseband link
-available. We should therefore check for either of these when pairing
-and deciding whether to call hci_conn_security() directly.
-
-Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- net/bluetooth/mgmt.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ net/6lowpan/iphc.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 5d18efcb8467..0b15b7618beb 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -3213,7 +3213,7 @@ static int pair_device(struct sock *sk, struct hci_dev *hdev, void *data,
- 	conn->io_capability = cp->io_cap;
- 	cmd->user_data = conn;
+diff --git a/net/6lowpan/iphc.c b/net/6lowpan/iphc.c
+index e6cf68e8667f..9e47702d24dd 100644
+--- a/net/6lowpan/iphc.c
++++ b/net/6lowpan/iphc.c
+@@ -408,9 +408,9 @@ int lowpan_process_data(struct sk_buff *skb, struct net_device *dev,
+ 	}
  
--	if (conn->state == BT_CONNECTED &&
-+	if ((conn->state == BT_CONNECTED || conn->state == BT_CONFIG) &&
- 	    hci_conn_security(conn, sec_level, auth_type, true))
- 		pairing_complete(cmd, 0);
- 
+ 	/* Hop Limit */
+-	if ((iphc0 & 0x03) != LOWPAN_IPHC_TTL_I)
++	if ((iphc0 & 0x03) != LOWPAN_IPHC_TTL_I) {
+ 		hdr.hop_limit = lowpan_ttl_values[iphc0 & 0x03];
+-	else {
++	} else {
+ 		if (lowpan_fetch_skb(skb, &hdr.hop_limit,
+ 				     sizeof(hdr.hop_limit)))
+ 			goto drop;
 -- 
 1.9.3
 
