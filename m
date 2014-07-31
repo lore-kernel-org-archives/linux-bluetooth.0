@@ -3,81 +3,70 @@ From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: szymon.janc@tieto.com,
 	Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH 4/6] android/gatt: Refactor trigger connection function.
-Date: Thu, 31 Jul 2014 13:11:13 +0200
-Message-Id: <1406805075-16150-5-git-send-email-lukasz.rymanowski@tieto.com>
+Subject: [PATCH 2/6] android/bluetooth: Add API to add device to auto connect list
+Date: Thu, 31 Jul 2014 13:11:11 +0200
+Message-Id: <1406805075-16150-3-git-send-email-lukasz.rymanowski@tieto.com>
 In-Reply-To: <1406805075-16150-1-git-send-email-lukasz.rymanowski@tieto.com>
 References: <1406805075-16150-1-git-send-email-lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Refactor code so it is clear what action we take in different connection
-states.
 ---
- android/gatt.c | 39 +++++++++++++++++++++++++--------------
- 1 file changed, 25 insertions(+), 14 deletions(-)
+ android/bluetooth.c | 31 +++++++++++++++++++++++++++++++
+ android/bluetooth.h |  1 +
+ 2 files changed, 32 insertions(+)
 
-diff --git a/android/gatt.c b/android/gatt.c
-index 11d7a2c..448bcb8 100644
---- a/android/gatt.c
-+++ b/android/gatt.c
-@@ -1751,31 +1751,42 @@ static int connect_bredr(struct gatt_device *dev)
- 
- static bool trigger_connection(struct app_connection *connection)
- {
-+	bool ret;
-+
- 	switch (connection->device->state) {
- 	case DEVICE_DISCONNECTED:
-+		/*
-+		 *  If device was last seen over BR/EDR connect over it.
-+		 *  Note: Connection state is handled in connect_bredr() func
-+		 */
-+		if (bt_device_last_seen_bearer(&connection->device->bdaddr) ==
-+								BDADDR_BREDR)
-+			return connect_bredr(connection->device) == 0;
-+
-+		/* Trigger discovery if not already started */
-+		if (!scanning) {
-+			if (!bt_le_discovery_start()) {
-+				error("gatt: Could not start scan");
-+				ret = false;
-+				break;
-+			}
-+		}
-+		ret = true;
- 		device_set_state(connection->device, DEVICE_CONNECT_INIT);
- 		break;
- 	case DEVICE_CONNECTED:
- 		send_app_connect_notify(connection, GATT_SUCCESS);
-+		ret = true;
- 		break;
-+	case DEVICE_CONNECT_READY:
-+	case DEVICE_CONNECT_INIT:
- 	default:
-+		/* In those cases connection is already triggered. */
-+		ret = true;
- 		break;
- 	}
- 
--	/* If device was last seen over BR/EDR connect over it */
--	if (bt_device_last_seen_bearer(&connection->device->bdaddr) ==
--								BDADDR_BREDR)
--		return connect_bredr(connection->device) == 0;
--
--	/* after state change trigger discovering */
--	if (!scanning && (connection->device->state == DEVICE_CONNECT_INIT))
--		if (!bt_le_discovery_start()) {
--			error("gatt: Could not start scan");
--
--			return false;
--		}
--
--	return true;
-+	return ret;
+diff --git a/android/bluetooth.c b/android/bluetooth.c
+index 18a2ae9..3d8bfc8 100644
+--- a/android/bluetooth.c
++++ b/android/bluetooth.c
+@@ -1490,6 +1490,37 @@ bool bt_device_set_uuids(const bdaddr_t *addr, GSList *uuids)
+ 	return true;
  }
  
- static uint8_t unregister_app(int client_if)
++bool bt_auto_connect_add(const bdaddr_t *addr)
++{
++	struct mgmt_cp_add_device cp;
++	struct device *dev;
++
++	if (!main_opts.kernel_conn_control)
++		return false;
++
++	dev = find_device(addr);
++	if (!dev)
++		return false;
++
++	if (dev->bdaddr_type == BDADDR_BREDR) {
++		DBG("auto-connection feature is not available for BR/EDR");
++		return false;
++	}
++
++	memset(&cp, 0, sizeof(cp));
++	bacpy(&cp.addr.bdaddr, addr);
++	cp.addr.type = dev->bdaddr_type;
++	cp.action = 0x02;
++
++	if (mgmt_send(mgmt_if, MGMT_OP_ADD_DEVICE, adapter.index, sizeof(cp),
++						&cp, NULL, NULL, NULL) > 0)
++		return true;
++
++	error("Failed to add device");
++
++	return false;
++}
++
+ static bool rssi_above_threshold(int old, int new)
+ {
+ 	/* only 8 dBm or more */
+diff --git a/android/bluetooth.h b/android/bluetooth.h
+index bd81703..9b83baa 100644
+--- a/android/bluetooth.h
++++ b/android/bluetooth.h
+@@ -86,3 +86,4 @@ uint16_t bt_get_gatt_ccc(const bdaddr_t *addr);
+ 
+ const bdaddr_t *bt_get_id_addr(const bdaddr_t *addr, uint8_t *type);
+ 
++bool bt_auto_connect_add(const bdaddr_t *addr);
 -- 
 1.8.4
 
