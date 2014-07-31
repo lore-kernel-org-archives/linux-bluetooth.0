@@ -3,68 +3,81 @@ From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: szymon.janc@tieto.com,
 	Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH 6/6] android/bluetooth: Clear auto connect list on startup
-Date: Thu, 31 Jul 2014 13:11:15 +0200
-Message-Id: <1406805075-16150-7-git-send-email-lukasz.rymanowski@tieto.com>
+Subject: [PATCH 4/6] android/gatt: Refactor trigger connection function.
+Date: Thu, 31 Jul 2014 13:11:13 +0200
+Message-Id: <1406805075-16150-5-git-send-email-lukasz.rymanowski@tieto.com>
 In-Reply-To: <1406805075-16150-1-git-send-email-lukasz.rymanowski@tieto.com>
 References: <1406805075-16150-1-git-send-email-lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-In android we add devices to auto connect list when application trigger
-connect. We need to make sure that when bluetooth is turn on there is
-no devices in auto connect list in the kernel.
+Refactor code so it is clear what action we take in different connection
+states.
 ---
- android/bluetooth.c | 29 +++++++++++++++++++++++++++++
- 1 file changed, 29 insertions(+)
+ android/gatt.c | 39 +++++++++++++++++++++++++--------------
+ 1 file changed, 25 insertions(+), 14 deletions(-)
 
-diff --git a/android/bluetooth.c b/android/bluetooth.c
-index def9d0b..c94f7e7 100644
---- a/android/bluetooth.c
-+++ b/android/bluetooth.c
-@@ -3123,6 +3123,34 @@ static void add_mps_record(void)
+diff --git a/android/gatt.c b/android/gatt.c
+index 11d7a2c..448bcb8 100644
+--- a/android/gatt.c
++++ b/android/gatt.c
+@@ -1751,31 +1751,42 @@ static int connect_bredr(struct gatt_device *dev)
+ 
+ static bool trigger_connection(struct app_connection *connection)
+ {
++	bool ret;
++
+ 	switch (connection->device->state) {
+ 	case DEVICE_DISCONNECTED:
++		/*
++		 *  If device was last seen over BR/EDR connect over it.
++		 *  Note: Connection state is handled in connect_bredr() func
++		 */
++		if (bt_device_last_seen_bearer(&connection->device->bdaddr) ==
++								BDADDR_BREDR)
++			return connect_bredr(connection->device) == 0;
++
++		/* Trigger discovery if not already started */
++		if (!scanning) {
++			if (!bt_le_discovery_start()) {
++				error("gatt: Could not start scan");
++				ret = false;
++				break;
++			}
++		}
++		ret = true;
+ 		device_set_state(connection->device, DEVICE_CONNECT_INIT);
+ 		break;
+ 	case DEVICE_CONNECTED:
+ 		send_app_connect_notify(connection, GATT_SUCCESS);
++		ret = true;
+ 		break;
++	case DEVICE_CONNECT_READY:
++	case DEVICE_CONNECT_INIT:
+ 	default:
++		/* In those cases connection is already triggered. */
++		ret = true;
+ 		break;
  	}
+ 
+-	/* If device was last seen over BR/EDR connect over it */
+-	if (bt_device_last_seen_bearer(&connection->device->bdaddr) ==
+-								BDADDR_BREDR)
+-		return connect_bredr(connection->device) == 0;
+-
+-	/* after state change trigger discovering */
+-	if (!scanning && (connection->device->state == DEVICE_CONNECT_INIT))
+-		if (!bt_le_discovery_start()) {
+-			error("gatt: Could not start scan");
+-
+-			return false;
+-		}
+-
+-	return true;
++	return ret;
  }
  
-+static void clear_auto_connect_list_complete(uint8_t status,
-+							uint16_t length,
-+							const void *param,
-+							void *user_data)
-+{
-+	if (status != MGMT_STATUS_SUCCESS)
-+		error("Failed to clear auto connect list: %s (0x%02x)",
-+						mgmt_errstr(status), status);
-+}
-+
-+static void clear_auto_connect_list(void)
-+{
-+	struct mgmt_cp_remove_device cp;
-+
-+	if (!main_opts.kernel_conn_control)
-+		return;
-+
-+	memset(&cp, 0, sizeof(cp));
-+
-+	if (mgmt_send(mgmt_if, MGMT_OP_REMOVE_DEVICE, adapter.index,
-+					sizeof(cp), &cp,
-+					clear_auto_connect_list_complete,
-+					NULL, NULL) > 0)
-+		return;
-+
-+	error("Could not clear auto connect list");
-+}
-+
- static void read_info_complete(uint8_t status, uint16_t length,
- 					const void *param, void *user_data)
- {
-@@ -3180,6 +3208,7 @@ static void read_info_complete(uint8_t status, uint16_t length,
- 	register_mgmt_handlers();
- 
- 	clear_uuids();
-+	clear_auto_connect_list();
- 
- 	set_io_capability();
- 	set_device_id();
+ static uint8_t unregister_app(int client_if)
 -- 
 1.8.4
 
