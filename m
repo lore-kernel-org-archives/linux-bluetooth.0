@@ -1,74 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1406632365-21136-1-git-send-email-luiz.dentz@gmail.com>
-References: <1406632365-21136-1-git-send-email-luiz.dentz@gmail.com>
-Date: Thu, 31 Jul 2014 11:18:30 +0300
-Message-ID: <CABBYNZKPWa0OEdSvq9y_HDW4dzPWTDmq_F1ViM2QyrDR5b1aqw@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 1/2] android/hog: Cache report value
+In-Reply-To: <45F17F5803927D43967AFEED068E781E0879D3C7@CAMEUREXM02.EUROPE.ROOT.PRI>
+References: <45F17F5803927D43967AFEED068E781E0879D3C7@CAMEUREXM02.EUROPE.ROOT.PRI>
+Date: Thu, 31 Jul 2014 11:10:51 +0300
+Message-ID: <CABBYNZ+8XuHJjMFUMc-eXbVr7gKU5=ViwbqKgtSg-h5NT87oWA@mail.gmail.com>
+Subject: Re: HoG: Support multi output report
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+To: Murat Kilivan <Murat.Kilivan@csr.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Murat,
 
-On Tue, Jul 29, 2014 at 2:12 PM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+On Wed, Jul 30, 2014 at 5:34 PM, Murat Kilivan <Murat.Kilivan@csr.com> wrote:
+> Hi,
 >
-> Report value will be used for implementing support for UHID_FEATURE
-> event.
-> ---
->  android/hog.c | 15 ++++++++++++++-
->  1 file changed, 14 insertions(+), 1 deletion(-)
+> I have a BLE HID device which has 2 output reports and it is discovered properly by BlueZ. However, when I try to send an output report it always calls the first registered report id's handle. It doesn't matter what the first byte is in the message.
 >
-> diff --git a/android/hog.c b/android/hog.c
-> index ef5690c..85a6982 100644
-> --- a/android/hog.c
-> +++ b/android/hog.c
-> @@ -105,6 +105,8 @@ struct report {
->         uint16_t                ccc_handle;
->         guint                   notifyid;
->         struct gatt_char        *decl;
-> +       uint16_t                len;
-> +       uint8_t                 *value;
->  };
+> How can I send to a different output report?
 >
->  static void report_value_cb(const guint8 *pdu, guint16 len, gpointer user_data)
-> @@ -290,8 +292,18 @@ static void discover_report(GAttrib *attrib, uint16_t start, uint16_t end,
->  static void report_read_cb(guint8 status, const guint8 *pdu, guint16 len,
->                                                         gpointer user_data)
->  {
-> -       if (status != 0)
-> +       struct report *report = user_data;
-> +
-> +       if (status != 0) {
->                 error("Error reading Report value: %s", att_ecode2str(status));
-> +               return;
-> +       }
-> +
-> +       if (report->value)
-> +               g_free(report->value);
-> +
-> +       report->value = g_memdup(pdu, len);
-> +       report->len = len;
->  }
->
->  static struct report *report_new(struct bt_hog *hog, struct gatt_char *chr)
-> @@ -690,6 +702,7 @@ static void report_free(void *data)
->  {
->         struct report *report = data;
->
-> +       g_free(report->value);
->         g_free(report->decl);
->         g_free(report);
->  }
-> --
-> 1.9.3
+> I can supply any log/debug output if it is needed.
 
-Applied.
+I had the impression that you would have to have another instance to
+access the second output but perhaps we should check the report id but
+then the question is how do you know what are the available report
+ids? We never expose those to uHID so is this supposed to be
+hardcoded?
 
-
--- 
-Luiz Augusto von Dentz
+Futhermore the HoG code has been changed in android/hog.c and at some
+point it will be moved to src/shared so it can be reused by input
+plugin.
