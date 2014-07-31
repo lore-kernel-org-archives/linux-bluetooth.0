@@ -3,70 +3,84 @@ From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: szymon.janc@tieto.com,
 	Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH 2/6] android/bluetooth: Add API to add device to auto connect list
-Date: Thu, 31 Jul 2014 13:11:11 +0200
-Message-Id: <1406805075-16150-3-git-send-email-lukasz.rymanowski@tieto.com>
+Subject: [PATCH 5/6] android/gatt: Use kernel auto connect feature if possible
+Date: Thu, 31 Jul 2014 13:11:14 +0200
+Message-Id: <1406805075-16150-6-git-send-email-lukasz.rymanowski@tieto.com>
 In-Reply-To: <1406805075-16150-1-git-send-email-lukasz.rymanowski@tieto.com>
 References: <1406805075-16150-1-git-send-email-lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- android/bluetooth.c | 31 +++++++++++++++++++++++++++++++
- android/bluetooth.h |  1 +
- 2 files changed, 32 insertions(+)
+ android/gatt.c | 27 +++++++++++++++++++++++++++
+ 1 file changed, 27 insertions(+)
 
-diff --git a/android/bluetooth.c b/android/bluetooth.c
-index 18a2ae9..3d8bfc8 100644
---- a/android/bluetooth.c
-+++ b/android/bluetooth.c
-@@ -1490,6 +1490,37 @@ bool bt_device_set_uuids(const bdaddr_t *addr, GSList *uuids)
- 	return true;
+diff --git a/android/gatt.c b/android/gatt.c
+index 448bcb8..de0912d 100644
+--- a/android/gatt.c
++++ b/android/gatt.c
+@@ -1383,6 +1383,8 @@ static void connect_cb(GIOChannel *io, GError *gerr, gpointer user_data)
+ 
+ 	device_set_state(dev, DEVICE_CONNECTED);
+ 
++	bt_auto_connect_remove(&dev->bdaddr);
++
+ 	/* Send exchange mtu request as we assume being client and server */
+ 	/* TODO: Dont exchange mtu if no client apps */
+ 	send_exchange_mtu_request(dev);
+@@ -1529,6 +1531,10 @@ static void le_device_found_handler(const bdaddr_t *addr, uint8_t addr_type,
+ 						sizeof(*ev) + ev->len, ev);
+ 
+ connect:
++	/* We use auto connect feature from kernel if possible */
++	if (main_opts.kernel_conn_control)
++		return;
++
+ 	dev = find_device_by_addr(addr);
+ 	if (!dev) {
+ 		if (!bonded)
+@@ -1749,6 +1755,19 @@ static int connect_bredr(struct gatt_device *dev)
+ 	return 0;
  }
  
-+bool bt_auto_connect_add(const bdaddr_t *addr)
++static bool auto_connect(struct gatt_device *dev)
 +{
-+	struct mgmt_cp_add_device cp;
-+	struct device *dev;
++	bool err;
 +
-+	if (!main_opts.kernel_conn_control)
++	err = bt_auto_connect_add(&dev->bdaddr);
++	if (!err)
 +		return false;
 +
-+	dev = find_device(addr);
-+	if (!dev)
-+		return false;
++	device_set_state(dev, DEVICE_CONNECT_INIT);
 +
-+	if (dev->bdaddr_type == BDADDR_BREDR) {
-+		DBG("auto-connection feature is not available for BR/EDR");
-+		return false;
-+	}
-+
-+	memset(&cp, 0, sizeof(cp));
-+	bacpy(&cp.addr.bdaddr, addr);
-+	cp.addr.type = dev->bdaddr_type;
-+	cp.action = 0x02;
-+
-+	if (mgmt_send(mgmt_if, MGMT_OP_ADD_DEVICE, adapter.index, sizeof(cp),
-+						&cp, NULL, NULL, NULL) > 0)
-+		return true;
-+
-+	error("Failed to add device");
-+
-+	return false;
++	return true;
 +}
 +
- static bool rssi_above_threshold(int old, int new)
+ static bool trigger_connection(struct app_connection *connection)
  {
- 	/* only 8 dBm or more */
-diff --git a/android/bluetooth.h b/android/bluetooth.h
-index bd81703..9b83baa 100644
---- a/android/bluetooth.h
-+++ b/android/bluetooth.h
-@@ -86,3 +86,4 @@ uint16_t bt_get_gatt_ccc(const bdaddr_t *addr);
+ 	bool ret;
+@@ -1763,6 +1782,13 @@ static bool trigger_connection(struct app_connection *connection)
+ 								BDADDR_BREDR)
+ 			return connect_bredr(connection->device) == 0;
  
- const bdaddr_t *bt_get_id_addr(const bdaddr_t *addr, uint8_t *type);
- 
-+bool bt_auto_connect_add(const bdaddr_t *addr);
++		/*
++		 * For LE devices use auto connect feature if possible
++		 * Note: Connection state is handled inside auto_connect() func
++		 */
++		if (main_opts.kernel_conn_control)
++			return auto_connect(connection->device);
++
+ 		/* Trigger discovery if not already started */
+ 		if (!scanning) {
+ 			if (!bt_le_discovery_start()) {
+@@ -1771,6 +1797,7 @@ static bool trigger_connection(struct app_connection *connection)
+ 				break;
+ 			}
+ 		}
++
+ 		ret = true;
+ 		device_set_state(connection->device, DEVICE_CONNECT_INIT);
+ 		break;
 -- 
 1.8.4
 
