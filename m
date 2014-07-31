@@ -1,32 +1,50 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Thu, 31 Jul 2014 13:38:20 -0400
+From: "John W. Linville" <linville@tuxdriver.com>
+To: linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: pull request: bluetooth-next 2014-07-31
+Message-ID: <20140731173820.GC17560@tuxdriver.com>
+References: <20140731074357.GA26071@t440s.lan>
 MIME-Version: 1.0
-In-Reply-To: <CB57FC0A-030C-498D-A3E3-988BEF192ACB@holtmann.org>
-References: <1405986034-29122-1-git-send-email-armansito@chromium.org>
-	<1405986034-29122-2-git-send-email-armansito@chromium.org>
-	<3D02B219753AD44CBDDDE484323B1774112D2C2C@SHSMSX104.ccr.corp.intel.com>
-	<CAHrH25QAR=y6Dtn4Y-t=EX1h6Oxn9ir7rWft2m+mVsBHfab1Wg@mail.gmail.com>
-	<409335B4-82B3-40D2-970A-D39416F02591@holtmann.org>
-	<CAHrH25To=NvJC+4E6U-2S5pMc1qORvKOpbG2atY9=CFn4Zwcew@mail.gmail.com>
-	<3D02B219753AD44CBDDDE484323B1774112D2F48@SHSMSX104.ccr.corp.intel.com>
-	<CAHrH25RkJ8x0SEx5g89496i=iWazorTpvXg7jySdUfBqMht1Pg@mail.gmail.com>
-	<CB57FC0A-030C-498D-A3E3-988BEF192ACB@holtmann.org>
-Date: Thu, 31 Jul 2014 20:11:23 -0700
-Message-ID: <CAHrH25TDf0OeVnD+vOjUqKB_L=bFb3+qvu3LsUZ=_CXu21Fd7w@mail.gmail.com>
-Subject: Re: [RFC v1 1/1] doc/gatt-api: New API properties and methods for the
- GATT D-Bus API.
-From: Arman Uguray <armansito@chromium.org>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: "Gu, Chao Jie" <chao.jie.gu@intel.com>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20140731074357.GA26071@t440s.lan>
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+On Thu, Jul 31, 2014 at 10:43:57AM +0300, Johan Hedberg wrote:
+> Hi John,
+> 
+> Here's one more (hopefully last) pull request for 3.17.
+> 
+> We've got:
+> 
+> - 6lowpan fixes/cleanups
+> - A couple crash fixes, one for the Marvell HCI driver and another in LE SMP.
+> - Fix for an incorrect connected state check
+> - Fix for the bondable requirement during pairing (an issue which had
+>   crept in because of using "pairable" when in fact the actual meaning
+>   was "bondable" (these have different meanings in Bluetooth)
+> 
+> Let me know if there are any issues. Thanks.
+> 
+> Johan
+> 
+> ---
+> The following changes since commit 568ba389be505f505b7fbeedb9ab4ece27603fc9:
+> 
+>   brcmfmac: Fix OOB interrupt not working for BCM43362 (2014-07-29 10:32:57 -0400)
+> 
+> are available in the git repository at:
+> 
+>   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git for-upstream
+> 
+> for you to fetch changes up to 8500d791c458ccbbb3e2d3fa9a0320ffd5729069:
+> 
+>   Bluetooth: Fix crash in the Marvell driver initialization codepath (2014-07-31 01:07:28 +0200)
 
-I think this all makes sense and the API is in a reasonable shape now.
-All of the properties/methods can integrate nicely with client and
-server implementations (with one or two properties being optional for
-server). I think we can revisit GattManager1 once we start thinking
-about the server code but for now I think this is good for client.
-And, of course, we can always add new properties/methods later.
+Pulling now...
+
+-- 
+John W. Linville		Someday the world will need a hero, and you
+linville@tuxdriver.com			might be all we have.  Be ready.
