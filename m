@@ -1,33 +1,79 @@
 Return-Path: <cyrus@holtmann.org>
-From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: szymon.janc@tieto.com,
-	Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH 0/6] android/gatt: Make usage of kernel auto connect feat.
-Date: Thu, 31 Jul 2014 13:11:09 +0200
-Message-Id: <1406805075-16150-1-git-send-email-lukasz.rymanowski@tieto.com>
+From: Murat Kilivan <Murat.Kilivan@csr.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: RE: HoG: Support multi output report
+Date: Thu, 31 Jul 2014 10:07:51 +0000
+Message-ID: <45F17F5803927D43967AFEED068E781E0879D954@CAMEUREXM02.EUROPE.ROOT.PRI>
+References: <45F17F5803927D43967AFEED068E781E0879D3C7@CAMEUREXM02.EUROPE.ROOT.PRI>
+ <CABBYNZ+8XuHJjMFUMc-eXbVr7gKU5=ViwbqKgtSg-h5NT87oWA@mail.gmail.com>
+In-Reply-To: <CABBYNZ+8XuHJjMFUMc-eXbVr7gKU5=ViwbqKgtSg-h5NT87oWA@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Following patches add support to BfA to use kernel auto connect list
-when mgmt interface is 1.7 or highier.
-
-Tested on PC with latest kernel.
-
-Lukasz Rymanowski (6):
-  android/bluetooth: Add flag for kernel connection control
-  android/bluetooth: Add API to add device to auto connect list
-  android/bluetooth: Add API to remove device from auto connect list
-  android/gatt: Refactor trigger connection function.
-  android/gatt: Use kernel auto connect feature if possible
-  android/bluetooth: Clear auto connect list on startup
-
- android/bluetooth.c | 94 +++++++++++++++++++++++++++++++++++++++++++++++++++++
- android/bluetooth.h | 10 ++++++
- android/gatt.c      | 66 +++++++++++++++++++++++++++++--------
- android/main.c      |  4 +++
- 4 files changed, 160 insertions(+), 14 deletions(-)
-
--- 
-1.8.4
-
+Pk9uIFRodXJzLCBKdWx5IDMxLCAyMDE0IGF0IDA5OjExIEFNLCBMdWl6IEF1
+Z3VzdG8gdm9uIERlbnR6IDxsdWl6LmRlbnR6QGdtYWlsLmNvbT4gd3JvdGU6
+DQo+SGkgTXVyYXQsDQoNCkhpIEx1aXosDQoNCj4NCj5PbiBXZWQsIEp1bCAz
+MCwgMjAxNCBhdCA1OjM0IFBNLCBNdXJhdCBLaWxpdmFuIDxNdXJhdC5LaWxp
+dmFuQGNzci5jb20+IHdyb3RlOg0KPj4gSGksDQo+Pg0KPj4gSSBoYXZlIGEg
+QkxFIEhJRCBkZXZpY2Ugd2hpY2ggaGFzIDIgb3V0cHV0IHJlcG9ydHMgYW5k
+IGl0IGlzIGRpc2NvdmVyZWQgcHJvcGVybHkgYnkgQmx1ZVouIEhvd2V2ZXIs
+IHdoZW4gSSB0cnkgdG8gc2VuZCBhbiBvdXRwdXQgcmVwb3J0IGl0IGFsd2F5
+cyA+Y2FsbHMgdGhlIGZpcnN0IHJlZ2lzdGVyZWQgcmVwb3J0IGlkJ3MgaGFu
+ZGxlLiBJdCBkb2Vzbid0IG1hdHRlciB3aGF0IHRoZSBmaXJzdCBieXRlIGlz
+IGluIHRoZSBtZXNzYWdlLg0KPj4NCj4+IEhvdyBjYW4gSSBzZW5kIHRvIGEg
+ZGlmZmVyZW50IG91dHB1dCByZXBvcnQ/DQo+Pg0KPj4gSSBjYW4gc3VwcGx5
+IGFueSBsb2cvZGVidWcgb3V0cHV0IGlmIGl0IGlzIG5lZWRlZC4NCj4NCj5J
+IGhhZCB0aGUgaW1wcmVzc2lvbiB0aGF0IHlvdSB3b3VsZCBoYXZlIHRvIGhh
+dmUgYW5vdGhlciBpbnN0YW5jZSB0byBhY2Nlc3MgdGhlIHNlY29uZCBvdXRw
+dXQgYnV0IHBlcmhhcHMgd2Ugc2hvdWxkIGNoZWNrIHRoZSByZXBvcnQgaWQg
+YnV0IHRoZW4gdGhlIHF1ZXN0aW9uIGlzIGhvdyBkbyB5b3Uga25vdyB3aGF0
+IGFyZSB0aGUgYXZhaWxhYmxlIHJlcG9ydCBpZHM/IFdlIG5ldmVyIGV4cG9z
+ZSB0aG9zZSB0byB1SElEIHNvIGlzIHRoaXMgc3VwcG9zZWQgdG8gYmUgaGFy
+ZGNvZGVkPw0KDQpUaGUgYXZhaWxhYmxlIHJlcG9ydCBpZHMgY2FuIGJlIGZv
+dW5kIGluIHRoZSByZXBvcnQgbWFwLiANCg0KSGVyZSBpcyB0aGUgYmx1ZXRv
+b3RoZCBsb2csIEl0IHNlZW1zIHR3byBvdXRwdXQgcmVwb3J0cyAoaWQ6NSBh
+bmQgaWQ6NikgaGF2ZSBiZWVuIHJlZ2lzdGVyZWQuIA0KDQpibHVldG9vdGhk
+WzIzNDJdOiBwcm9maWxlcy9pbnB1dC9ob2cuYzpyZXBvcnRfcmVmZXJlbmNl
+X2NiKCkgUmVwb3J0IElEOiAweDA1IFJlcG9ydCB0eXBlOiAweDAzDQpibHVl
+dG9vdGhkWzIzNDJdOiBhdHRyaWIvZ2F0dHJpYi5jOmdfYXR0cmliX3VucmVm
+KCkgMHg4MzZhODQ4OiByZWY9Ng0KYmx1ZXRvb3RoZFsyMzQyXTogYXR0cmli
+L2dhdHRyaWIuYzpnX2F0dHJpYl9yZWYoKSAweDgzNmE4NDg6IHJlZj03DQpi
+bHVldG9vdGhkWzIzNDJdOiBwcm9maWxlcy9pbnB1dC9ob2cuYzpyZXBvcnRf
+cmVmZXJlbmNlX2NiKCkgUmVwb3J0IElEOiAweDA1IFJlcG9ydCB0eXBlOiAw
+eDAyDQpibHVldG9vdGhkWzIzNDJdOiBhdHRyaWIvZ2F0dHJpYi5jOmdfYXR0
+cmliX3VucmVmKCkgMHg4MzZhODQ4OiByZWY9Ng0KYmx1ZXRvb3RoZFsyMzQy
+XTogYXR0cmliL2dhdHRyaWIuYzpnX2F0dHJpYl9yZWYoKSAweDgzNmE4NDg6
+IHJlZj03DQpibHVldG9vdGhkWzIzNDJdOiBwcm9maWxlcy9pbnB1dC9ob2cu
+YzpyZXBvcnRfY2NjX3dyaXR0ZW5fY2IoKSBSZXBvcnQgY2hhcmFjdGVyaXN0
+aWMgZGVzY3JpcHRvciB3cml0dGVuOiBub3RpZmljYXRpb25zIGVuYWJsZWQN
+CmJsdWV0b290aGRbMjM0Ml06IGF0dHJpYi9nYXR0cmliLmM6Z19hdHRyaWJf
+dW5yZWYoKSAweDgzNmE4NDg6IHJlZj02DQpibHVldG9vdGhkWzIzNDJdOiBh
+dHRyaWIvZ2F0dHJpYi5jOmdfYXR0cmliX3JlZigpIDB4ODM2YTg0ODogcmVm
+PTcNCmJsdWV0b290aGRbMjM0Ml06IHByb2ZpbGVzL2lucHV0L2hvZy5jOnJl
+cG9ydF9yZWZlcmVuY2VfY2IoKSBSZXBvcnQgSUQ6IDB4MDUgUmVwb3J0IHR5
+cGU6IDB4MDENCmJsdWV0b290aGRbMjM0Ml06IGF0dHJpYi9nYXR0cmliLmM6
+Z19hdHRyaWJfdW5yZWYoKSAweDgzNmE4NDg6IHJlZj02DQpibHVldG9vdGhk
+WzIzNDJdOiBhdHRyaWIvZ2F0dHJpYi5jOmdfYXR0cmliX3JlZigpIDB4ODM2
+YTg0ODogcmVmPTcNCmJsdWV0b290aGRbMjM0Ml06IHByb2ZpbGVzL2lucHV0
+L2hvZy5jOnJlcG9ydF9yZWZlcmVuY2VfY2IoKSBSZXBvcnQgSUQ6IDB4MDYg
+UmVwb3J0IHR5cGU6IDB4MDINCg0KPg0KPkZ1dGhlcm1vcmUgdGhlIEhvRyBj
+b2RlIGhhcyBiZWVuIGNoYW5nZWQgaW4gYW5kcm9pZC9ob2cuYyBhbmQgYXQg
+c29tZSBwb2ludCBpdCB3aWxsIGJlIG1vdmVkIHRvIHNyYy9zaGFyZWQgc28g
+aXQgY2FuIGJlIHJldXNlZCBieSBpbnB1dCBwbHVnaW4uDQoKCk1lbWJlciBv
+ZiB0aGUgQ1NSIHBsYyBncm91cCBvZiBjb21wYW5pZXMuIENTUiBwbGMgcmVn
+aXN0ZXJlZCBpbiBFbmdsYW5kIGFuZCBXYWxlcywgcmVnaXN0ZXJlZCBudW1i
+ZXIgNDE4NzM0NiwgcmVnaXN0ZXJlZCBvZmZpY2UgQ2h1cmNoaWxsIEhvdXNl
+LCBDYW1icmlkZ2UgQnVzaW5lc3MgUGFyaywgQ293bGV5IFJvYWQsIENhbWJy
+aWRnZSwgQ0I0IDBXWiwgVW5pdGVkIEtpbmdkb20KTW9yZSBpbmZvcm1hdGlv
+biBjYW4gYmUgZm91bmQgYXQgd3d3LmNzci5jb20uIEtlZXAgdXAgdG8gZGF0
+ZSB3aXRoIENTUiBvbiBvdXIgdGVjaG5pY2FsIGJsb2csIHd3dy5jc3IuY29t
+L2Jsb2csIENTUiBwZW9wbGUgYmxvZywgd3d3LmNzci5jb20vcGVvcGxlLCBZ
+b3VUdWJlLCB3d3cueW91dHViZS5jb20vdXNlci9DU1JwbGMsIEZhY2Vib29r
+LCB3d3cuZmFjZWJvb2suY29tL3BhZ2VzL0NTUi8xOTEwMzg0MzQyNTM1MzQs
+IG9yIGZvbGxvdyB1cyBvbiBUd2l0dGVyIGF0IHd3dy50d2l0dGVyLmNvbS9D
+U1JfcGxjLgpOZXcgZm9yIDIwMTQsIHlvdSBjYW4gbm93IGFjY2VzcyB0aGUg
+d2lkZSByYW5nZSBvZiBwcm9kdWN0cyBwb3dlcmVkIGJ5IGFwdFggYXQgd3d3
+LmFwdHguY29tLgo=
