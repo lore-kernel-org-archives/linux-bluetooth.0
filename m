@@ -1,59 +1,73 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 1 Aug 2014 13:35:17 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCHv4 09/12] tools: Fix memory leak
-Message-ID: <20140801103517.GA24358@t440s.P-661HNU-F1>
-References: <1406643661-29323-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <1406643661-29323-9-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Message-ID: <53DB6528.2040704@pengutronix.de>
+Date: Fri, 01 Aug 2014 12:00:08 +0200
+From: Marc Kleine-Budde <mkl@pengutronix.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1406643661-29323-9-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+To: Alexander Aring <alex.aring@gmail.com>,
+ Martin Townsend <martin.townsend@xsilon.com>
+CC: linux-zigbee-devel@lists.sourceforge.net,
+ linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org,
+ Marcel Holtmann <marcel@holtmann.org>
+Subject: Re: [PATCH bluetooth-next] 6lowpan: Remove ununsed dev parameter
+ from skb_delivery_cb callback.
+References: <53DB5A53.5000004@xsilon.com> <20140801094144.GA11159@omega>
+In-Reply-To: <20140801094144.GA11159@omega>
+Content-Type: multipart/signed; micalg=pgp-sha1;
+ protocol="application/pgp-signature";
+ boundary="sW21PaPpMMLflXEDaMP64sLo59OVB3Fg0"
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--sW21PaPpMMLflXEDaMP64sLo59OVB3Fg0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Jul 29, 2014, Andrei Emeltchenko wrote:
-> lmpver and hciver are allocated through malloc and need to be freed.
-> ---
->  tools/parser/hci.c | 19 ++++++++++++++++---
->  1 file changed, 16 insertions(+), 3 deletions(-)
+On 08/01/2014 11:41 AM, Alexander Aring wrote:
+> Hi Martin,
+>=20
+> On Fri, Aug 01, 2014 at 10:13:55AM +0100, Martin Townsend wrote:
+>> This parameter is never used by any function implementing this callbac=
+k.
+>> ---
+>>  include/net/6lowpan.h         | 2 +-
+>>  net/6lowpan/iphc.c            | 2 +-
+>>  net/bluetooth/6lowpan.c       | 4 ++--
+>>  net/ieee802154/6lowpan_rtnl.c | 5 ++---
+>>  4 files changed, 6 insertions(+), 7 deletions(-)
+>>
+>=20
+> I don't test it yet, but you need to add a Signed-off-by: ...
+>=20
+> You can create this with -s parameter while git format-patch.
 
-I've applied all 8 patches before this one.
+Usually the Sob is added during the commit with the -s parameter, i.e:
 
-> diff --git a/tools/parser/hci.c b/tools/parser/hci.c
-> index 351f843..1a639af 100644
-> --- a/tools/parser/hci.c
-> +++ b/tools/parser/hci.c
-> @@ -2445,17 +2445,25 @@ static inline void read_local_version_dump(int level, struct frame *frm)
->  		p_indent(level, frm);
->  		printf("Error: %s\n", status2str(rp->status));
->  	} else {
-> +		char *lmpver = lmp_vertostr(rp->lmp_ver);
-> +		char *hciver = hci_vertostr(rp->hci_ver);
-> +
->  		p_indent(level, frm);
->  		printf("HCI Version: %s (0x%x) HCI Revision: 0x%x\n",
-> -					hci_vertostr(rp->hci_ver),
-> +					hciver ? hciver : "n/a",
->  					rp->hci_ver, btohs(rp->hci_rev));
->  		p_indent(level, frm);
->  		printf("LMP Version: %s (0x%x) LMP Subversion: 0x%x\n",
-> -					lmp_vertostr(rp->lmp_ver),
-> +					lmpver ? lmpver : "n/a",
->  					rp->lmp_ver, btohs(rp->lmp_subver));
->  		p_indent(level, frm);
->  		printf("Manufacturer: %s (%d)\n",
->  				bt_compidtostr(manufacturer), manufacturer);
-> +
-> +		if (lmpver)
-> +			bt_free(lmpver);
-> +		if (hciver)
-> +			bt_free(hciver);
+    git commit -s
 
-These trace back to using malloc (in hci_uint2str) so I suppose free is
-more appropriate than bt_free (which should be used for bt_malloc).
+You can modify your commit and add the Sob with:
 
-Johan
+    git commit --amend -s
+
+Marc
+--=20
+Pengutronix e.K.                  | Marc Kleine-Budde           |
+Industrial Linux Solutions        | Phone: +49-231-2826-924     |
+Vertretung West/Dortmund          | Fax:   +49-5121-206917-5555 |
+Amtsgericht Hildesheim, HRA 2686  | http://www.pengutronix.de   |
+
+
+--sW21PaPpMMLflXEDaMP64sLo59OVB3Fg0
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+Comment: Using GnuPG with Icedove - http://www.enigmail.net/
+
+iEYEARECAAYFAlPbZSgACgkQjTAFq1RaXHNFngCfQgc/NATlNwqQbMR7zqhJL9/F
+qVQAn04ZRIiF1ySpgi7OhRe51GqFBZ+E
+=7BWt
+-----END PGP SIGNATURE-----
+
+--sW21PaPpMMLflXEDaMP64sLo59OVB3Fg0--
