@@ -1,46 +1,66 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 1 Aug 2014 14:54:00 +0300
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCHv4 09/12] tools: Fix memory leak
-Message-ID: <20140801115306.GD9036@aemeltch-MOBL1>
-References: <1406643661-29323-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <1406643661-29323-9-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <20140801103517.GA24358@t440s.P-661HNU-F1>
- <20140801111238.GB9036@aemeltch-MOBL1>
- <20140801112124.GA28357@t440s.P-661HNU-F1>
- <20140801112703.GC9036@aemeltch-MOBL1>
- <20140801113310.GA28681@t440s.P-661HNU-F1>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20140801113310.GA28681@t440s.P-661HNU-F1>
+Subject: [PATCH BlueZ v2 3/3] build: Remove mpris-proxy from experimental
+Date: Fri,  1 Aug 2014 14:49:14 +0300
+Message-Id: <1406893754-11650-3-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <1406893754-11650-1-git-send-email-luiz.dentz@gmail.com>
+References: <1406893754-11650-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-On Fri, Aug 01, 2014 at 02:33:10PM +0300, Johan Hedberg wrote:
-> > > > > > +		if (lmpver)
-> > > > > > +			bt_free(lmpver);
-> > > > > > +		if (hciver)
-> > > > > > +			bt_free(hciver);
-> > > > > 
-> > > > > These trace back to using malloc (in hci_uint2str) so I suppose free is
-> > > > > more appropriate than bt_free (which should be used for bt_malloc).
-> > > > 
-> > > > OK, I will change it to free(). Shall I also change other similar
-> > > > bt_free() calls which I took as example?
-> > > 
-> > > I'm not sure it's worth bothering with legacy code like this which will
-> > > eventually disappear from the tree.
-> > 
-> > Those constructions are in hcitool and hciconfig
-> 
-> Still legacy code. If you really feel like there's nothing else
-> important to work on feel free to send patches for that.
+This makes mpris-proxy tool to be compiled without --enable-experimental
+---
+ Makefile.tools | 13 +++++++------
+ 1 file changed, 7 insertions(+), 6 deletions(-)
 
-The question is if we change some programming practice shall we make other
-code looks consistent.
+diff --git a/Makefile.tools b/Makefile.tools
+index bf38b5d..3616a46 100644
+--- a/Makefile.tools
++++ b/Makefile.tools
+@@ -178,7 +178,8 @@ endif
+ if TOOLS
+ bin_PROGRAMS += tools/hciattach tools/hciconfig tools/hcitool tools/hcidump \
+ 			tools/rfcomm tools/rctest tools/l2test tools/l2ping \
+-			tools/sdptool tools/ciptool tools/bccmd tools/bluemoon
++			tools/sdptool tools/ciptool tools/bccmd \
++			tools/bluemoon tools/mpris-proxy
+ 
+ tools_hciattach_SOURCES = tools/hciattach.c tools/hciattach.h \
+ 						tools/hciattach_st.c \
+@@ -250,6 +251,9 @@ tools_bluemoon_SOURCES = tools/bluemoon.c monitor/bt.h \
+ 				src/shared/queue.h src/shared/queue.c \
+ 				src/shared/ringbuf.h src/shared/ringbuf.c
+ 
++tools_mpris_proxy_SOURCES = tools/mpris-proxy.c
++tools_mpris_proxy_LDADD = gdbus/libgdbus-internal.la @GLIB_LIBS@ @DBUS_LIBS@
++
+ dist_man_MANS += tools/hciattach.1 tools/hciconfig.1 \
+ 			tools/hcitool.1 tools/hcidump.1 \
+ 			tools/rfcomm.1 tools/rctest.1 tools/l2ping.1 \
+@@ -279,8 +283,8 @@ noinst_PROGRAMS += tools/bdaddr tools/avinfo tools/avtest \
+ 			tools/hcieventmask tools/hcisecfilter \
+ 			tools/btmgmt tools/btinfo tools/btattach \
+ 			tools/btsnoop tools/btproxy tools/btiotest \
+-			tools/mpris-proxy tools/cltest tools/seq2bseq \
+-			tools/hex2hcd tools/ibeacon
++			tools/cltest tools/seq2bseq tools/hex2hcd \
++			tools/ibeacon
+ 
+ tools_bdaddr_SOURCES = tools/bdaddr.c src/oui.h src/oui.c
+ tools_bdaddr_LDADD = lib/libbluetooth-internal.la @UDEV_LIBS@
+@@ -336,9 +340,6 @@ tools_btproxy_SOURCES = tools/btproxy.c monitor/bt.h \
+ tools_btiotest_SOURCES = tools/btiotest.c btio/btio.h btio/btio.c
+ tools_btiotest_LDADD = lib/libbluetooth-internal.la @GLIB_LIBS@
+ 
+-tools_mpris_proxy_SOURCES = tools/mpris-proxy.c
+-tools_mpris_proxy_LDADD = gdbus/libgdbus-internal.la @GLIB_LIBS@ @DBUS_LIBS@
+-
+ tools_cltest_SOURCES = tools/cltest.c monitor/mainloop.h monitor/mainloop.c
+ tools_cltest_LDADD = lib/libbluetooth-internal.la
+ 
+-- 
+1.9.3
 
-Best regards 
-Andrei Emeltchenko 
