@@ -1,47 +1,81 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <53DC883A.1050304@xsilon.com>
-Date: Sat, 02 Aug 2014 07:42:02 +0100
-From: Martin Townsend <martin.townsend@xsilon.com>
-MIME-Version: 1.0
-To: Marc Kleine-Budde <mkl@pengutronix.de>,
- linux-zigbee-devel@lists.sourceforge.net,
- linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org
-CC: Marcel Holtmann <marcel@holtmann.org>,
- Alexander Aring <alex.aring@gmail.com>
-Subject: Re: [PATCH bluetooth-next] Simplify lowpan receive path so skb is
- freed in lowpan_rcv when dropped.
-References: <53DBB278.7090106@xsilon.com> <53DBB610.6020503@pengutronix.de>
-In-Reply-To: <53DBB610.6020503@pengutronix.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+From: Loic Poulain <loic.poulain@intel.com>
+To: marcel@holtmann.org, gustavo@padovan.org, johan.hedberg@gmail.com
+Cc: linux-bluetooth@vger.kernel.org,
+	Loic Poulain <loic.poulain@intel.com>
+Subject: [RFC] Bluetooth: HCI H5 fast retransmit
+Date: Fri,  1 Aug 2014 18:37:56 +0200
+Message-Id: <1406911076-8714-1-git-send-email-loic.poulain@intel.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-I've just realised I've forgot to ensure skb_inout now points to the new 
-skb when copy expanding.
-Sorry about that, I'll respin the patch.
+HCI H5 protocol is based on timeout to retransmit dropped packets.
+According to the specification, this timeout should be calculated
+based on the baudrate and the maximum packet size.
 
-- Martin.
+In the current implementation, this timeout is set to 250ms.
+Moreover this timer is re-triggered for 250ms at each packet transmission
+without taking care of the previous non acked packet timeout.
+So, in the worst case, the delay before retransmission of a packet is
+tx_win*250ms. Common H5 tx_win is 4.
 
-On 01/08/14 16:45, Marc Kleine-Budde wrote:
-> On 08/01/2014 05:30 PM, Martin Townsend wrote:
->> Signed-off-by: Martin Townsend <martin.townsend@xsilon.com>
->> ---
->>   include/net/6lowpan.h         |  2 +-
->>   net/6lowpan/iphc.c            | 22 +++++++++++++---------
->>   net/bluetooth/6lowpan.c       | 12 ++++++++----
->>   net/ieee802154/6lowpan_rtnl.c | 12 ++++++------
->>   4 files changed, 28 insertions(+), 20 deletions(-)
->>
->> diff --git a/include/net/6lowpan.h b/include/net/6lowpan.h
->> index d7e9169..aa0381e 100644
->> --- a/include/net/6lowpan.h
->> +++ b/include/net/6lowpan.h
->> @@ -374,7 +374,7 @@ lowpan_uncompress_size(const struct sk_buff *skb, u16 *dgram_offset)
->>   
->>   typedef int (*skb_delivery_cb)(struct sk_buff *skb);
->>   
->> -int lowpan_process_data(struct sk_buff *skb, struct net_device *dev,
->> +int lowpan_process_data(struct sk_buff **skb_inout, struct net_device *dev,
-> Why do you make the first parameter a double pointer?
->
-> Marc
->
+These delays are not acceptable in case of "real time".
+Despite buffering, It may lead to audio cuts with A2DP profile.
+
+Rather than decreasing timeout with a magic value, I propose to implement
+a fast retransmit mechanism:
+If a sender receives a specified number of invalid acks (basically, duplicate
+ACKs), the sender can be reasonably confident that its oldest non-acknowledged
+H5 packet was dropped.
+
+This mechanism is out of the H5 specification.
+However, without breaking compatibility, it gives good results in practical
+tests.
+
+Signed-off-by: Loic Poulain <loic.poulain@intel.com>
+---
+ drivers/bluetooth/hci_h5.c | 13 ++++++++++++-
+ 1 file changed, 12 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/bluetooth/hci_h5.c b/drivers/bluetooth/hci_h5.c
+index fede8ca..8092daa 100644
+--- a/drivers/bluetooth/hci_h5.c
++++ b/drivers/bluetooth/hci_h5.c
+@@ -45,6 +45,8 @@
+  */
+ #define H5_MAX_LEN (4 + 0xfff + 2)
+
++#define H5_MAX_INV_ACK 2
++
+ /* Convenience macros for reading Three-wire header values */
+ #define H5_HDR_SEQ(hdr)		((hdr)[0] & 0x07)
+ #define H5_HDR_ACK(hdr)		(((hdr)[0] >> 3) & 0x07)
+@@ -74,6 +76,7 @@ struct h5 {
+ 	struct sk_buff		*rx_skb;	/* Receive buffer */
+ 	size_t			rx_pending;	/* Expecting more bytes */
+ 	u8			rx_ack;		/* Last ack number received */
++	u8			rx_inv_ack;	/* Invalid acks counter */
+
+ 	int			(*rx_func) (struct hci_uart *hu, u8 c);
+
+@@ -240,8 +243,16 @@ static void h5_pkt_cull(struct h5 *h5)
+ 		seq = (seq - 1) % 8;
+ 	}
+
+-	if (seq != h5->rx_ack)
++	if (seq != h5->rx_ack) {
+ 		BT_ERR("Controller acked invalid packet");
++		if (++h5->rx_inv_ack >= H5_MAX_INV_ACK) {
++			BT_ERR("H5 fast retransmit");
++			h5->rx_inv_ack = 0;
++			mod_timer(&h5->timer, 0);
++		}
++	} else {
++		h5->rx_inv_ack = 0;
++	}
+
+ 	i = 0;
+ 	skb_queue_walk_safe(&h5->unack, skb, tmp) {
+--
+1.8.3.2
+
