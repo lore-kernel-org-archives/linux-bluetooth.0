@@ -3,81 +3,33 @@ From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: szymon.janc@tieto.com,
 	Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH v2 4/6] android/gatt: Refactor trigger connection function.
-Date: Fri,  1 Aug 2014 10:45:31 +0200
-Message-Id: <1406882733-6064-5-git-send-email-lukasz.rymanowski@tieto.com>
-In-Reply-To: <1406882733-6064-1-git-send-email-lukasz.rymanowski@tieto.com>
-References: <1406882733-6064-1-git-send-email-lukasz.rymanowski@tieto.com>
+Subject: [PATCH v2 0/6] android/gatt: Make usage of kernel auto connect feat.
+Date: Fri,  1 Aug 2014 10:45:27 +0200
+Message-Id: <1406882733-6064-1-git-send-email-lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Refactor code so it is clear what action we take in different connection
-states.
----
- android/gatt.c | 39 +++++++++++++++++++++++++--------------
- 1 file changed, 25 insertions(+), 14 deletions(-)
+Following patches add support to BfA to use kernel auto connect list
+when mgmt interface is 1.7 or highier.
 
-diff --git a/android/gatt.c b/android/gatt.c
-index 11d7a2c..448bcb8 100644
---- a/android/gatt.c
-+++ b/android/gatt.c
-@@ -1751,31 +1751,42 @@ static int connect_bredr(struct gatt_device *dev)
- 
- static bool trigger_connection(struct app_connection *connection)
- {
-+	bool ret;
-+
- 	switch (connection->device->state) {
- 	case DEVICE_DISCONNECTED:
-+		/*
-+		 *  If device was last seen over BR/EDR connect over it.
-+		 *  Note: Connection state is handled in connect_bredr() func
-+		 */
-+		if (bt_device_last_seen_bearer(&connection->device->bdaddr) ==
-+								BDADDR_BREDR)
-+			return connect_bredr(connection->device) == 0;
-+
-+		/* Trigger discovery if not already started */
-+		if (!scanning) {
-+			if (!bt_le_discovery_start()) {
-+				error("gatt: Could not start scan");
-+				ret = false;
-+				break;
-+			}
-+		}
-+		ret = true;
- 		device_set_state(connection->device, DEVICE_CONNECT_INIT);
- 		break;
- 	case DEVICE_CONNECTED:
- 		send_app_connect_notify(connection, GATT_SUCCESS);
-+		ret = true;
- 		break;
-+	case DEVICE_CONNECT_READY:
-+	case DEVICE_CONNECT_INIT:
- 	default:
-+		/* In those cases connection is already triggered. */
-+		ret = true;
- 		break;
- 	}
- 
--	/* If device was last seen over BR/EDR connect over it */
--	if (bt_device_last_seen_bearer(&connection->device->bdaddr) ==
--								BDADDR_BREDR)
--		return connect_bredr(connection->device) == 0;
--
--	/* after state change trigger discovering */
--	if (!scanning && (connection->device->state == DEVICE_CONNECT_INIT))
--		if (!bt_le_discovery_start()) {
--			error("gatt: Could not start scan");
--
--			return false;
--		}
--
--	return true;
-+	return ret;
- }
- 
- static uint8_t unregister_app(int client_if)
+Tested on PC with latest kernel.
+
+v2: Fix in Patch 5/6. Forgot one if check
+
+Lukasz Rymanowski (6):
+  android/bluetooth: Add flag for kernel connection control
+  android/bluetooth: Add API to add device to auto connect list
+  android/bluetooth: Add API to remove device from auto connect list
+  android/gatt: Refactor trigger connection function.
+  android/gatt: Use kernel auto connect feature if possible
+  android/bluetooth: Clear auto connect list on startup
+
+ android/bluetooth.c | 94 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+ android/bluetooth.h | 10 ++++++
+ android/gatt.c      | 70 ++++++++++++++++++++++++++++++---------
+ android/main.c      |  4 +++
+ 4 files changed, 163 insertions(+), 15 deletions(-)
+
 -- 
 1.8.4
 
