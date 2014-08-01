@@ -1,40 +1,59 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 1 Aug 2014 13:36:45 +0300
+Date: Fri, 1 Aug 2014 13:35:17 +0300
 From: Johan Hedberg <johan.hedberg@gmail.com>
 To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCHv4 10/12] obexd: Fix memory leak
-Message-ID: <20140801103645.GB24358@t440s.P-661HNU-F1>
+Subject: Re: [PATCHv4 09/12] tools: Fix memory leak
+Message-ID: <20140801103517.GA24358@t440s.P-661HNU-F1>
 References: <1406643661-29323-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <1406643661-29323-10-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <1406643661-29323-9-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1406643661-29323-10-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1406643661-29323-9-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Andrei,
 
 On Tue, Jul 29, 2014, Andrei Emeltchenko wrote:
-> Fixes memory leak for folder_listing_cb().
+> lmpver and hciver are allocated through malloc and need to be freed.
 > ---
->  obexd/client/map.c | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
-> 
-> diff --git a/obexd/client/map.c b/obexd/client/map.c
-> index d2d3d81..331aebc 100644
-> --- a/obexd/client/map.c
-> +++ b/obexd/client/map.c
-> @@ -271,8 +271,10 @@ static void folder_listing_cb(struct obc_session *session,
->  	}
->  
->  	reply = dbus_message_new_method_return(request->msg);
-> -	if (reply == NULL)
-> +	if (reply == NULL) {
-> +		g_free(contents);
->  		return;
-> +	}
+>  tools/parser/hci.c | 19 ++++++++++++++++---
+>  1 file changed, 16 insertions(+), 3 deletions(-)
 
-Shouldn't you call pending_requesT_free(request) before returning?
+I've applied all 8 patches before this one.
+
+> diff --git a/tools/parser/hci.c b/tools/parser/hci.c
+> index 351f843..1a639af 100644
+> --- a/tools/parser/hci.c
+> +++ b/tools/parser/hci.c
+> @@ -2445,17 +2445,25 @@ static inline void read_local_version_dump(int level, struct frame *frm)
+>  		p_indent(level, frm);
+>  		printf("Error: %s\n", status2str(rp->status));
+>  	} else {
+> +		char *lmpver = lmp_vertostr(rp->lmp_ver);
+> +		char *hciver = hci_vertostr(rp->hci_ver);
+> +
+>  		p_indent(level, frm);
+>  		printf("HCI Version: %s (0x%x) HCI Revision: 0x%x\n",
+> -					hci_vertostr(rp->hci_ver),
+> +					hciver ? hciver : "n/a",
+>  					rp->hci_ver, btohs(rp->hci_rev));
+>  		p_indent(level, frm);
+>  		printf("LMP Version: %s (0x%x) LMP Subversion: 0x%x\n",
+> -					lmp_vertostr(rp->lmp_ver),
+> +					lmpver ? lmpver : "n/a",
+>  					rp->lmp_ver, btohs(rp->lmp_subver));
+>  		p_indent(level, frm);
+>  		printf("Manufacturer: %s (%d)\n",
+>  				bt_compidtostr(manufacturer), manufacturer);
+> +
+> +		if (lmpver)
+> +			bt_free(lmpver);
+> +		if (hciver)
+> +			bt_free(hciver);
+
+These trace back to using malloc (in hci_uint2str) so I suppose free is
+more appropriate than bt_free (which should be used for bt_malloc).
 
 Johan
