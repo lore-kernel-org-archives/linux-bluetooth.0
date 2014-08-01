@@ -1,43 +1,70 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 1 Aug 2014 11:48:05 +0300
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCHv4 01/12] core: Remove unneeded assignment
-Message-ID: <20140801084802.GA9036@aemeltch-MOBL1>
-References: <1405587306-20020-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <1406643661-29323-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1406643661-29323-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Cc: szymon.janc@tieto.com,
+	Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+Subject: [PATCH v2 3/6] android/bluetooth: Add API to remove device from auto connect list
+Date: Fri,  1 Aug 2014 10:45:30 +0200
+Message-Id: <1406882733-6064-4-git-send-email-lukasz.rymanowski@tieto.com>
+In-Reply-To: <1406882733-6064-1-git-send-email-lukasz.rymanowski@tieto.com>
+References: <1406882733-6064-1-git-send-email-lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-ping
+---
+ android/bluetooth.c | 28 ++++++++++++++++++++++++++++
+ android/bluetooth.h |  2 ++
+ 2 files changed, 30 insertions(+)
 
-On Tue, Jul 29, 2014 at 05:20:50PM +0300, Andrei Emeltchenko wrote:
-> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-> 
-> Variable rfcomm is never used after assignment
-> ---
->  src/profile.c | 1 -
->  1 file changed, 1 deletion(-)
-> 
-> diff --git a/src/profile.c b/src/profile.c
-> index 528525a..7aca3be 100644
-> --- a/src/profile.c
-> +++ b/src/profile.c
-> @@ -1272,7 +1272,6 @@ static uint32_t ext_start_servers(struct ext_profile *ext,
->  			error("RFCOMM server failed for %s: %s",
->  						ext->name, err->message);
->  			g_free(rfcomm);
-> -			rfcomm = NULL;
->  			g_clear_error(&err);
->  			goto failed;
->  		} else {
-> -- 
-> 1.9.1
-> 
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+diff --git a/android/bluetooth.c b/android/bluetooth.c
+index 3d8bfc8..def9d0b 100644
+--- a/android/bluetooth.c
++++ b/android/bluetooth.c
+@@ -1521,6 +1521,34 @@ bool bt_auto_connect_add(const bdaddr_t *addr)
+ 	return false;
+ }
+ 
++void bt_auto_connect_remove(const bdaddr_t *addr)
++{
++	struct mgmt_cp_remove_device cp;
++	struct device *dev;
++
++	if (!main_opts.kernel_conn_control)
++		return;
++
++	dev = find_device(addr);
++	if (!dev)
++		return;
++
++	if (dev->bdaddr_type == BDADDR_BREDR) {
++		DBG("auto-connection feature is not available for BR/EDR");
++		return;
++	}
++
++	memset(&cp, 0, sizeof(cp));
++	bacpy(&cp.addr.bdaddr, addr);
++	cp.addr.type = dev->bdaddr_type;
++
++	if (mgmt_send(mgmt_if, MGMT_OP_REMOVE_DEVICE, adapter.index,
++					sizeof(cp), &cp, NULL, NULL, NULL) > 0)
++		return;
++
++	error("Failed to remove device");
++}
++
+ static bool rssi_above_threshold(int old, int new)
+ {
+ 	/* only 8 dBm or more */
+diff --git a/android/bluetooth.h b/android/bluetooth.h
+index 9b83baa..d767a89 100644
+--- a/android/bluetooth.h
++++ b/android/bluetooth.h
+@@ -87,3 +87,5 @@ uint16_t bt_get_gatt_ccc(const bdaddr_t *addr);
+ const bdaddr_t *bt_get_id_addr(const bdaddr_t *addr, uint8_t *type);
+ 
+ bool bt_auto_connect_add(const bdaddr_t *addr);
++
++void bt_auto_connect_remove(const bdaddr_t *addr);
+-- 
+1.8.4
+
