@@ -1,42 +1,77 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv2 5/6] proximity: Fix use after free
-Date: Fri,  1 Aug 2014 11:29:11 +0300
-Message-Id: <1406881752-24897-5-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1406881752-24897-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <CABBYNZJSfWa8r8Ab-Dp3cmSwcxQc_7t7W0Cb2EALobM4RQnLkw@mail.gmail.com>
- <1406881752-24897-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <CAMudyAvk_DptZh5b_yM1OTxrCO5B_5wzu3Ky-_8vT6=V2ZA8eQ@mail.gmail.com>
+References: <1406805075-16150-1-git-send-email-lukasz.rymanowski@tieto.com>
+	<CABBYNZ+UL_eJFeGT2wZa==fXTRiwrSZ8D1UO+=SzRbPjyEUXvw@mail.gmail.com>
+	<CAMudyAvk_DptZh5b_yM1OTxrCO5B_5wzu3Ky-_8vT6=V2ZA8eQ@mail.gmail.com>
+Date: Fri, 1 Aug 2014 11:27:49 +0300
+Message-ID: <CABBYNZ+heVnoPGnWR1dWMCdUX-pg4srt7BByZ-LYunRTwsYpsw@mail.gmail.com>
+Subject: Re: [PATCH 0/6] android/gatt: Make usage of kernel auto connect feat.
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	Szymon Janc <szymon.janc@tieto.com>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Hi Lukasz,
 
-First remove object from the list and then remove it.
----
- profiles/proximity/monitor.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+On Fri, Aug 1, 2014 at 11:04 AM, Lukasz Rymanowski
+<lukasz.rymanowski@tieto.com> wrote:
+> Hi Luiz,
+>
+> On 1 August 2014 09:48, Luiz Augusto von Dentz <luiz.dentz@gmail.com> wrote:
+>> Hi Lukasz,
+>>
+>> On Thu, Jul 31, 2014 at 2:11 PM, Lukasz Rymanowski
+>> <lukasz.rymanowski@tieto.com> wrote:
+>>> Following patches add support to BfA to use kernel auto connect list
+>>> when mgmt interface is 1.7 or highier.
+>>>
+>>> Tested on PC with latest kernel.
+>>>
+>>> Lukasz Rymanowski (6):
+>>>   android/bluetooth: Add flag for kernel connection control
+>>>   android/bluetooth: Add API to add device to auto connect list
+>>>   android/bluetooth: Add API to remove device from auto connect list
+>>
+>> Im not quite sure why you introduce as a public API, I mean it does
+>> not seem like you would control the list externally so perhaps these
+>> functions should be made static.
+>>
+>
+> android/gatt uses it. Patch 5/6
 
-diff --git a/profiles/proximity/monitor.c b/profiles/proximity/monitor.c
-index f2e0739..b05cdd7 100644
---- a/profiles/proximity/monitor.c
-+++ b/profiles/proximity/monitor.c
-@@ -606,13 +606,13 @@ static void monitor_destroy(gpointer user_data)
- {
- 	struct monitor *monitor = user_data;
- 
-+	monitors = g_slist_remove(monitors, monitor);
-+
- 	btd_device_unref(monitor->device);
- 	g_free(monitor->linklosslevel);
- 	g_free(monitor->immediatelevel);
- 	g_free(monitor->signallevel);
- 	g_free(monitor);
--
--	monitors = g_slist_remove(monitors, monitor);
- }
- 
- static struct monitor *register_monitor(struct btd_device *device)
+Nevermind, I did not realize that it was two different files.
+
+>>>   android/gatt: Refactor trigger connection function.
+>>>   android/gatt: Use kernel auto connect feature if possible
+>>>   android/bluetooth: Clear auto connect list on startup
+>>>
+>>>  android/bluetooth.c | 94 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+>>>  android/bluetooth.h | 10 ++++++
+>>>  android/gatt.c      | 66 +++++++++++++++++++++++++++++--------
+>>>  android/main.c      |  4 +++
+>>>  4 files changed, 160 insertions(+), 14 deletions(-)
+>>>
+>>> --
+>>> 1.8.4
+>>>
+>>> --
+>>> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+>>> the body of a message to majordomo@vger.kernel.org
+>>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>>
+>>
+>>
+>> --
+>> Luiz Augusto von Dentz
+>
+> BR
+> Lukasz
+
+
+
 -- 
-1.9.1
-
+Luiz Augusto von Dentz
