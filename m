@@ -1,70 +1,95 @@
 Return-Path: <cyrus@holtmann.org>
-From: Sebastian Chlad <sebastian.chlad@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Sebastian Chlad <sebastian.chlad@tieto.com>
-Subject: [PATCH] android/pts: PTS testing results for SM
-Date: Fri,  1 Aug 2014 11:29:52 +0200
-Message-Id: <1406885392-23611-1-git-send-email-sebastian.chlad@tieto.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Message-ID: <53DB5A53.5000004@xsilon.com>
+Date: Fri, 01 Aug 2014 10:13:55 +0100
+From: Martin Townsend <martin.townsend@xsilon.com>
+MIME-Version: 1.0
+To: linux-zigbee-devel@lists.sourceforge.net,
+ linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org
+CC: Alexander Aring <alex.aring@gmail.com>,
+ Marcel Holtmann <marcel@holtmann.org>
+Subject: [PATCH bluetooth-next] 6lowpan: Remove ununsed dev parameter from
+ skb_delivery_cb callback.
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+This parameter is never used by any function implementing this callback.
 ---
- android/pts-sm.txt | 13 +++++--------
- 1 file changed, 5 insertions(+), 8 deletions(-)
+ include/net/6lowpan.h         | 2 +-
+ net/6lowpan/iphc.c            | 2 +-
+ net/bluetooth/6lowpan.c       | 4 ++--
+ net/ieee802154/6lowpan_rtnl.c | 5 ++---
+ 4 files changed, 6 insertions(+), 7 deletions(-)
 
-diff --git a/android/pts-sm.txt b/android/pts-sm.txt
-index af892ef..8f1034b 100644
---- a/android/pts-sm.txt
-+++ b/android/pts-sm.txt
-@@ -2,7 +2,7 @@ PTS test results for SM
+diff --git a/include/net/6lowpan.h b/include/net/6lowpan.h
+index d184df1..d7e9169 100644
+--- a/include/net/6lowpan.h
++++ b/include/net/6lowpan.h
+@@ -372,7 +372,7 @@ lowpan_uncompress_size(const struct sk_buff *skb, u16 *dgram_offset)
+ 	return skb->len + uncomp_header - ret;
+ }
  
- PTS version: 5.2
- Tested: 25-July-2014
--Android version: 4.4.2
-+Android version: 4.4.4
- kernel version: 3.17
+-typedef int (*skb_delivery_cb)(struct sk_buff *skb, struct net_device *dev);
++typedef int (*skb_delivery_cb)(struct sk_buff *skb);
  
- Results:
-@@ -15,7 +15,7 @@ NONE	test result is none
- -------------------------------------------------------------------------------
- Test Name		Result	Notes
- -------------------------------------------------------------------------------
--TC_PROT_BV_01_C		PASS
-+TC_PROT_BV_01_C		PASS	btmgmt pair -c 0x03 -t 0x01 <addr>
- TC_PROT_BV_02_C		PASS	btmgmt advertising on
- 				btmgmt pair -c 0x03 -t 0x01 <addr>
- TC_JW_BV_01_C		PASS	btmgmt pairable off
-@@ -67,6 +67,7 @@ TC_OOB_BI_02_C		NA
- TC_EKS_BV_01_C		PASS
- TC_EKS_BV_02_C		PASS
- TC_EKS_BI_01_C		INC	btmgmt io-cap 0x03
-+				PTS issue #12449
- TC_EKS_BI_02_C		PASS
- TC_SIGN_BV_01_C		INC	PTS issue #12305
- TC_SIGN_BV_03_C		PASS	haltest
-@@ -84,10 +85,7 @@ TC_KDU_BV_02_C		PASS	PTS issue #12302
- 				Set PIXIT TSPX_peer_type to 01
- TC_KDU_BV_03_C		PASS	btmgmt pairable on
- 				btmgmt advertising on
--
- TC_KDU_BV_04_C		PASS	btmgmt pair -c 0x03 -t 0x01 <addr>
--
--
- TC_KDU_BV_05_C		PASS	PTS issue #12302
- 				Note: Can pass it with following instructions:
- 				btmgmt privacy on
-@@ -96,9 +94,8 @@ TC_KDU_BV_05_C		PASS	PTS issue #12302
- 				Set PIXIT TSPX_peer_type to 01
- TC_KDU_BV_06_C		PASS	btmgmt pair -c 0x03 -t 0x01 <addr>
- TC_KDU_BV_07_C		PASS	btmgmt pairable on
--
--
- TC_SIP_BV_01_C		PASS	btmgmt pair -c 0x03 -t 0x01 <addr>
--TC_SIP_BV_02_C		PASS	l2test -n -J4 -V le_public <addr>
-+TC_SIP_BV_02_C		INC	l2test -n -J4 -V le_public <addr>
-+				PTS issue #12460
- TC_SIE_BV_01_C		PASS	btmgmt pair -c 0x03 -t 0x01 <addr>
- -------------------------------------------------------------------------------
+ int lowpan_process_data(struct sk_buff *skb, struct net_device *dev,
+ 		const u8 *saddr, const u8 saddr_type, const u8 saddr_len,
+diff --git a/net/6lowpan/iphc.c b/net/6lowpan/iphc.c
+index 350ecfa..92eed6d 100644
+--- a/net/6lowpan/iphc.c
++++ b/net/6lowpan/iphc.c
+@@ -195,7 +195,7 @@ static int skb_deliver(struct sk_buff *skb, struct ipv6hdr *hdr,
+ 	raw_dump_table(__func__, "raw skb data dump before receiving",
+ 		       new->data, new->len);
+ 
+-	stat = deliver_skb(new, dev);
++	stat = deliver_skb(new);
+ 
+ 	kfree_skb(new);
+ 
+diff --git a/net/bluetooth/6lowpan.c b/net/bluetooth/6lowpan.c
+index 5a7f81d..f5df93f 100644
+--- a/net/bluetooth/6lowpan.c
++++ b/net/bluetooth/6lowpan.c
+@@ -197,7 +197,7 @@ static struct lowpan_dev *lookup_dev(struct l2cap_conn *conn)
+ 	return dev;
+ }
+ 
+-static int give_skb_to_upper(struct sk_buff *skb, struct net_device *dev)
++static int give_skb_to_upper(struct sk_buff *skb)
+ {
+ 	struct sk_buff *skb_cp;
+ 	int ret;
+@@ -283,7 +283,7 @@ static int recv_pkt(struct sk_buff *skb, struct net_device *dev,
+ 		skb_reset_network_header(local_skb);
+ 		skb_set_transport_header(local_skb, sizeof(struct ipv6hdr));
+ 
+-		if (give_skb_to_upper(local_skb, dev) != NET_RX_SUCCESS) {
++		if (give_skb_to_upper(local_skb) != NET_RX_SUCCESS) {
+ 			kfree_skb(local_skb);
+ 			goto drop;
+ 		}
+diff --git a/net/ieee802154/6lowpan_rtnl.c b/net/ieee802154/6lowpan_rtnl.c
+index fe6bd7a..3154775 100644
+--- a/net/ieee802154/6lowpan_rtnl.c
++++ b/net/ieee802154/6lowpan_rtnl.c
+@@ -143,8 +143,7 @@ static int lowpan_header_create(struct sk_buff *skb,
+ 			type, (void *)&da, (void *)&sa, 0);
+ }
+ 
+-static int lowpan_give_skb_to_devices(struct sk_buff *skb,
+-					struct net_device *dev)
++static int lowpan_give_skb_to_devices(struct sk_buff *skb)
+ {
+ 	struct lowpan_dev_record *entry;
+ 	struct sk_buff *skb_cp;
+@@ -480,7 +479,7 @@ static int lowpan_rcv(struct sk_buff *skb, struct net_device *dev,
+ 		/* Pull off the 1-byte of 6lowpan header. */
+ 		skb_pull(skb, 1);
+ 
+-		ret = lowpan_give_skb_to_devices(skb, NULL);
++		ret = lowpan_give_skb_to_devices(skb);
+ 		if (ret == NET_RX_DROP)
+ 			goto drop;
+ 	} else {
 -- 
-1.8.5.3
-
+1.9.1
