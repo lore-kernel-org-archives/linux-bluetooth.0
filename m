@@ -1,95 +1,116 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <53DB5A53.5000004@xsilon.com>
-Date: Fri, 01 Aug 2014 10:13:55 +0100
-From: Martin Townsend <martin.townsend@xsilon.com>
 MIME-Version: 1.0
-To: linux-zigbee-devel@lists.sourceforge.net,
- linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org
-CC: Alexander Aring <alex.aring@gmail.com>,
- Marcel Holtmann <marcel@holtmann.org>
-Subject: [PATCH bluetooth-next] 6lowpan: Remove ununsed dev parameter from
- skb_delivery_cb callback.
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <CABBYNZ+n75zwYi9opO7KeS-edmFCDJA9m9QUgmh_kjtNJNa_VA@mail.gmail.com>
+References: <1406805075-16150-1-git-send-email-lukasz.rymanowski@tieto.com>
+	<1406805075-16150-6-git-send-email-lukasz.rymanowski@tieto.com>
+	<CABBYNZ+n75zwYi9opO7KeS-edmFCDJA9m9QUgmh_kjtNJNa_VA@mail.gmail.com>
+Date: Fri, 1 Aug 2014 11:05:46 +0200
+Message-ID: <CAMudyAsA5vhwcxLiz+bsjy9O+6Nfdzs7bi2DRrZdBWETFwNNAw@mail.gmail.com>
+Subject: Re: [PATCH 5/6] android/gatt: Use kernel auto connect feature if possible
+From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	Szymon Janc <szymon.janc@tieto.com>
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This parameter is never used by any function implementing this callback.
----
- include/net/6lowpan.h         | 2 +-
- net/6lowpan/iphc.c            | 2 +-
- net/bluetooth/6lowpan.c       | 4 ++--
- net/ieee802154/6lowpan_rtnl.c | 5 ++---
- 4 files changed, 6 insertions(+), 7 deletions(-)
+Hi Luiz,
 
-diff --git a/include/net/6lowpan.h b/include/net/6lowpan.h
-index d184df1..d7e9169 100644
---- a/include/net/6lowpan.h
-+++ b/include/net/6lowpan.h
-@@ -372,7 +372,7 @@ lowpan_uncompress_size(const struct sk_buff *skb, u16 *dgram_offset)
- 	return skb->len + uncomp_header - ret;
- }
- 
--typedef int (*skb_delivery_cb)(struct sk_buff *skb, struct net_device *dev);
-+typedef int (*skb_delivery_cb)(struct sk_buff *skb);
- 
- int lowpan_process_data(struct sk_buff *skb, struct net_device *dev,
- 		const u8 *saddr, const u8 saddr_type, const u8 saddr_len,
-diff --git a/net/6lowpan/iphc.c b/net/6lowpan/iphc.c
-index 350ecfa..92eed6d 100644
---- a/net/6lowpan/iphc.c
-+++ b/net/6lowpan/iphc.c
-@@ -195,7 +195,7 @@ static int skb_deliver(struct sk_buff *skb, struct ipv6hdr *hdr,
- 	raw_dump_table(__func__, "raw skb data dump before receiving",
- 		       new->data, new->len);
- 
--	stat = deliver_skb(new, dev);
-+	stat = deliver_skb(new);
- 
- 	kfree_skb(new);
- 
-diff --git a/net/bluetooth/6lowpan.c b/net/bluetooth/6lowpan.c
-index 5a7f81d..f5df93f 100644
---- a/net/bluetooth/6lowpan.c
-+++ b/net/bluetooth/6lowpan.c
-@@ -197,7 +197,7 @@ static struct lowpan_dev *lookup_dev(struct l2cap_conn *conn)
- 	return dev;
- }
- 
--static int give_skb_to_upper(struct sk_buff *skb, struct net_device *dev)
-+static int give_skb_to_upper(struct sk_buff *skb)
- {
- 	struct sk_buff *skb_cp;
- 	int ret;
-@@ -283,7 +283,7 @@ static int recv_pkt(struct sk_buff *skb, struct net_device *dev,
- 		skb_reset_network_header(local_skb);
- 		skb_set_transport_header(local_skb, sizeof(struct ipv6hdr));
- 
--		if (give_skb_to_upper(local_skb, dev) != NET_RX_SUCCESS) {
-+		if (give_skb_to_upper(local_skb) != NET_RX_SUCCESS) {
- 			kfree_skb(local_skb);
- 			goto drop;
- 		}
-diff --git a/net/ieee802154/6lowpan_rtnl.c b/net/ieee802154/6lowpan_rtnl.c
-index fe6bd7a..3154775 100644
---- a/net/ieee802154/6lowpan_rtnl.c
-+++ b/net/ieee802154/6lowpan_rtnl.c
-@@ -143,8 +143,7 @@ static int lowpan_header_create(struct sk_buff *skb,
- 			type, (void *)&da, (void *)&sa, 0);
- }
- 
--static int lowpan_give_skb_to_devices(struct sk_buff *skb,
--					struct net_device *dev)
-+static int lowpan_give_skb_to_devices(struct sk_buff *skb)
- {
- 	struct lowpan_dev_record *entry;
- 	struct sk_buff *skb_cp;
-@@ -480,7 +479,7 @@ static int lowpan_rcv(struct sk_buff *skb, struct net_device *dev,
- 		/* Pull off the 1-byte of 6lowpan header. */
- 		skb_pull(skb, 1);
- 
--		ret = lowpan_give_skb_to_devices(skb, NULL);
-+		ret = lowpan_give_skb_to_devices(skb);
- 		if (ret == NET_RX_DROP)
- 			goto drop;
- 	} else {
--- 
-1.9.1
+On 1 August 2014 10:50, Luiz Augusto von Dentz <luiz.dentz@gmail.com> wrote:
+> Hi Lukasz,
+>
+> On Thu, Jul 31, 2014 at 2:11 PM, Lukasz Rymanowski
+> <lukasz.rymanowski@tieto.com> wrote:
+>> ---
+>>  android/gatt.c | 27 +++++++++++++++++++++++++++
+>>  1 file changed, 27 insertions(+)
+>>
+>> diff --git a/android/gatt.c b/android/gatt.c
+>> index 448bcb8..de0912d 100644
+>> --- a/android/gatt.c
+>> +++ b/android/gatt.c
+>> @@ -1383,6 +1383,8 @@ static void connect_cb(GIOChannel *io, GError *gerr, gpointer user_data)
+>>
+>>         device_set_state(dev, DEVICE_CONNECTED);
+>>
+>> +       bt_auto_connect_remove(&dev->bdaddr);
+>
+> In cases like HoG it would be better to have it permanent on the auto
+> connect list, we could perhaps add this as a flag to
+> bt_gatt_register_app (along with initial security level?) otherwise we
+> have to manually retrigger every time.
+
+:) We just have this discussion here about that couple minutes ago.
+And yes,I do plan to add flag autoconnect to connect function. This
+will come soon.
+
+>
+>>         /* Send exchange mtu request as we assume being client and server */
+>>         /* TODO: Dont exchange mtu if no client apps */
+>>         send_exchange_mtu_request(dev);
+>> @@ -1529,6 +1531,10 @@ static void le_device_found_handler(const bdaddr_t *addr, uint8_t addr_type,
+>>                                                 sizeof(*ev) + ev->len, ev);
+>>
+>>  connect:
+>> +       /* We use auto connect feature from kernel if possible */
+>> +       if (main_opts.kernel_conn_control)
+>> +               return;
+>> +
+>>         dev = find_device_by_addr(addr);
+>>         if (!dev) {
+>>                 if (!bonded)
+>> @@ -1749,6 +1755,19 @@ static int connect_bredr(struct gatt_device *dev)
+>>         return 0;
+>>  }
+>>
+>> +static bool auto_connect(struct gatt_device *dev)
+>> +{
+>> +       bool err;
+>> +
+>> +       err = bt_auto_connect_add(&dev->bdaddr);
+>> +       if (!err)
+>> +               return false;
+>> +
+>> +       device_set_state(dev, DEVICE_CONNECT_INIT);
+>> +
+>> +       return true;
+>> +}
+>> +
+>>  static bool trigger_connection(struct app_connection *connection)
+>>  {
+>>         bool ret;
+>> @@ -1763,6 +1782,13 @@ static bool trigger_connection(struct app_connection *connection)
+>>                                                                 BDADDR_BREDR)
+>>                         return connect_bredr(connection->device) == 0;
+>>
+>> +               /*
+>> +                * For LE devices use auto connect feature if possible
+>> +                * Note: Connection state is handled inside auto_connect() func
+>> +                */
+>> +               if (main_opts.kernel_conn_control)
+>> +                       return auto_connect(connection->device);
+>> +
+>>                 /* Trigger discovery if not already started */
+>>                 if (!scanning) {
+>>                         if (!bt_le_discovery_start()) {
+>> @@ -1771,6 +1797,7 @@ static bool trigger_connection(struct app_connection *connection)
+>>                                 break;
+>>                         }
+>>                 }
+>> +
+>>                 ret = true;
+>>                 device_set_state(connection->device, DEVICE_CONNECT_INIT);
+>>                 break;
+>> --
+>> 1.8.4
+>>
+>> --
+>> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+>> the body of a message to majordomo@vger.kernel.org
+>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>
+>
+>
+> --
+> Luiz Augusto von Dentz
