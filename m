@@ -1,93 +1,57 @@
 Return-Path: <cyrus@holtmann.org>
-From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: szymon.janc@tieto.com,
-	Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH v2 1/6] android/bluetooth: Add flag for kernel connection control
-Date: Fri,  1 Aug 2014 10:45:28 +0200
-Message-Id: <1406882733-6064-2-git-send-email-lukasz.rymanowski@tieto.com>
-In-Reply-To: <1406882733-6064-1-git-send-email-lukasz.rymanowski@tieto.com>
-References: <1406882733-6064-1-git-send-email-lukasz.rymanowski@tieto.com>
+Subject: [PATCHv3 4/6] gobex: Fix use after free
+Date: Fri,  1 Aug 2014 11:44:37 +0300
+Message-Id: <1406882679-28568-4-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1406882679-28568-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <CABBYNZJSfWa8r8Ab-Dp3cmSwcxQc_7t7W0Cb2EALobM4RQnLkw@mail.gmail.com>
+ <1406882679-28568-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch introduces main_opts struct which is global.
-This is design to keep some generic options which are static and useful
-in different part of code. For now we keep there info about kernel
-connection control capabilities. Later it can be used also for other
-properties.
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-This patch also set option kernel connection control to TRUE if mgmt interface
-is 1.7 or higier. Kernel connect control means that things like
-background scan, auto connect or white list are supported by kernel and
-can be used by daemon.
+Refactor function transfer_get_req_first() to avoid use after free.
 ---
- android/bluetooth.c | 6 ++++++
- android/bluetooth.h | 7 +++++++
- android/main.c      | 4 ++++
- 3 files changed, 17 insertions(+)
+ gobex/gobex-transfer.c | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
 
-diff --git a/android/bluetooth.c b/android/bluetooth.c
-index a8d85ce..18a2ae9 100644
---- a/android/bluetooth.c
-+++ b/android/bluetooth.c
-@@ -3269,6 +3269,12 @@ static void read_version_complete(uint8_t status, uint16_t length,
- 		goto failed;
- 	}
+diff --git a/gobex/gobex-transfer.c b/gobex/gobex-transfer.c
+index efae72b..d7707f9 100644
+--- a/gobex/gobex-transfer.c
++++ b/gobex/gobex-transfer.c
+@@ -553,7 +553,8 @@ static gssize get_get_data(void *buf, gsize len, gpointer user_data)
+ 	return ret;
+ }
  
-+	/* Starting from mgmt 1.7, kernel can handle connection control */
-+	if (MGMT_VERSION(mgmt_version, mgmt_revision) >= MGMT_VERSION(1, 7)) {
-+		info("Kernel connection control will be used");
-+		main_opts.kernel_conn_control = true;
-+	}
-+
- 	mgmt_register(mgmt_if, MGMT_EV_INDEX_ADDED, MGMT_INDEX_NONE,
- 					mgmt_index_added_event, cb, NULL);
- 	mgmt_register(mgmt_if, MGMT_EV_INDEX_REMOVED, MGMT_INDEX_NONE,
-diff --git a/android/bluetooth.h b/android/bluetooth.h
-index e00634c..bd81703 100644
---- a/android/bluetooth.h
-+++ b/android/bluetooth.h
-@@ -26,6 +26,12 @@ enum bt_csrk_type {
- 	REMOTE_CSRK,
- };
- 
-+struct main_opts {
-+	bool kernel_conn_control;
-+};
-+
-+extern struct main_opts main_opts;
-+
- typedef void (*bt_bluetooth_ready)(int err, const bdaddr_t *addr);
- bool bt_bluetooth_start(int index, bool mgmt_dbg, bt_bluetooth_ready cb);
- 
-@@ -79,3 +85,4 @@ void bt_store_gatt_ccc(const bdaddr_t *addr, uint16_t value);
- uint16_t bt_get_gatt_ccc(const bdaddr_t *addr);
- 
- const bdaddr_t *bt_get_id_addr(const bdaddr_t *addr, uint8_t *type);
-+
-diff --git a/android/main.c b/android/main.c
-index 0a0c150..d991181 100644
---- a/android/main.c
-+++ b/android/main.c
-@@ -64,6 +64,8 @@
- #define STARTUP_GRACE_SECONDS 5
- #define SHUTDOWN_GRACE_SECONDS 10
- 
-+struct main_opts main_opts;
-+
- static guint bluetooth_start_timeout = 0;
- 
- static bdaddr_t adapter_bdaddr;
-@@ -477,6 +479,8 @@ int main(int argc, char *argv[])
+-static void transfer_get_req_first(struct transfer *transfer, GObexPacket *rsp)
++static gboolean transfer_get_req_first(struct transfer *transfer,
++							GObexPacket *rsp)
+ {
  	GError *err = NULL;
- 	guint signal;
  
-+	memset(&main_opts, 0, sizeof(main_opts));
+@@ -564,7 +565,10 @@ static void transfer_get_req_first(struct transfer *transfer, GObexPacket *rsp)
+ 	if (!g_obex_send(transfer->obex, rsp, &err)) {
+ 		transfer_complete(transfer, err);
+ 		g_error_free(err);
++		return FALSE;
+ 	}
 +
- 	context = g_option_context_new(NULL);
- 	g_option_context_add_main_entries(context, options, NULL);
++	return TRUE;
+ }
  
+ static void transfer_get_req(GObex *obex, GObexPacket *req, gpointer user_data)
+@@ -596,7 +600,8 @@ guint g_obex_get_rsp_pkt(GObex *obex, GObexPacket *rsp,
+ 	transfer = transfer_new(obex, G_OBEX_OP_GET, complete_func, user_data);
+ 	transfer->data_producer = data_func;
+ 
+-	transfer_get_req_first(transfer, rsp);
++	if (!transfer_get_req_first(transfer, rsp))
++		return 0;
+ 
+ 	if (!g_slist_find(transfers, transfer))
+ 		return 0;
 -- 
-1.8.4
+1.9.1
 
