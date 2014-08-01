@@ -1,115 +1,65 @@
 Return-Path: <cyrus@holtmann.org>
-From: johan.hedberg@gmail.com
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/3] Bluetooth: Add convenience function to check for pending power off
-Date: Fri,  1 Aug 2014 11:13:30 +0300
-Message-Id: <1406880812-19731-1-git-send-email-johan.hedberg@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <CABBYNZ+UL_eJFeGT2wZa==fXTRiwrSZ8D1UO+=SzRbPjyEUXvw@mail.gmail.com>
+References: <1406805075-16150-1-git-send-email-lukasz.rymanowski@tieto.com>
+	<CABBYNZ+UL_eJFeGT2wZa==fXTRiwrSZ8D1UO+=SzRbPjyEUXvw@mail.gmail.com>
+Date: Fri, 1 Aug 2014 10:04:12 +0200
+Message-ID: <CAMudyAvk_DptZh5b_yM1OTxrCO5B_5wzu3Ky-_8vT6=V2ZA8eQ@mail.gmail.com>
+Subject: Re: [PATCH 0/6] android/gatt: Make usage of kernel auto connect feat.
+From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	Szymon Janc <szymon.janc@tieto.com>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@intel.com>
+Hi Luiz,
 
-There are several situations where we're interested in knowing whether
-we're currently in the process of powering off an adapter. This patch
-adds a convenience function for the purpose and makes it public since
-we'll soon need to access it from hci_event.c as well.
+On 1 August 2014 09:48, Luiz Augusto von Dentz <luiz.dentz@gmail.com> wrote:
+> Hi Lukasz,
+>
+> On Thu, Jul 31, 2014 at 2:11 PM, Lukasz Rymanowski
+> <lukasz.rymanowski@tieto.com> wrote:
+>> Following patches add support to BfA to use kernel auto connect list
+>> when mgmt interface is 1.7 or highier.
+>>
+>> Tested on PC with latest kernel.
+>>
+>> Lukasz Rymanowski (6):
+>>   android/bluetooth: Add flag for kernel connection control
+>>   android/bluetooth: Add API to add device to auto connect list
+>>   android/bluetooth: Add API to remove device from auto connect list
+>
+> Im not quite sure why you introduce as a public API, I mean it does
+> not seem like you would control the list externally so perhaps these
+> functions should be made static.
+>
 
-Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
----
- include/net/bluetooth/hci_core.h |  1 +
- net/bluetooth/mgmt.c             | 52 +++++++++++++++++++++-------------------
- 2 files changed, 29 insertions(+), 24 deletions(-)
+android/gatt uses it. Patch 5/6
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index b5d5af3aa469..8394abc4fd87 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -1351,6 +1351,7 @@ void mgmt_device_found(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
- void mgmt_remote_name(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
- 		      u8 addr_type, s8 rssi, u8 *name, u8 name_len);
- void mgmt_discovering(struct hci_dev *hdev, u8 discovering);
-+bool mgmt_powering_down(struct hci_dev *hdev);
- void mgmt_new_ltk(struct hci_dev *hdev, struct smp_ltk *key, bool persistent);
- void mgmt_new_irk(struct hci_dev *hdev, struct smp_irk *irk);
- void mgmt_new_csrk(struct hci_dev *hdev, struct smp_csrk *csrk,
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index b8554d429d88..c9de0d9945f5 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -6281,25 +6281,35 @@ static void unpair_device_rsp(struct pending_cmd *cmd, void *data)
- 	mgmt_pending_remove(cmd);
- }
- 
-+bool mgmt_powering_down(struct hci_dev *hdev)
-+{
-+	struct pending_cmd *cmd;
-+	struct mgmt_mode *cp;
-+
-+	cmd = mgmt_pending_find(MGMT_OP_SET_POWERED, hdev);
-+	if (!cmd)
-+		return false;
-+
-+	cp = cmd->param;
-+	if (!cp->val)
-+		return true;
-+
-+	return false;
-+}
-+
- void mgmt_device_disconnected(struct hci_dev *hdev, bdaddr_t *bdaddr,
- 			      u8 link_type, u8 addr_type, u8 reason,
- 			      bool mgmt_connected)
- {
- 	struct mgmt_ev_device_disconnected ev;
--	struct pending_cmd *power_off;
- 	struct sock *sk = NULL;
- 
--	power_off = mgmt_pending_find(MGMT_OP_SET_POWERED, hdev);
--	if (power_off) {
--		struct mgmt_mode *cp = power_off->param;
--
--		/* The connection is still in hci_conn_hash so test for 1
--		 * instead of 0 to know if this is the last one.
--		 */
--		if (!cp->val && hci_conn_count(hdev) == 1) {
--			cancel_delayed_work(&hdev->power_off);
--			queue_work(hdev->req_workqueue, &hdev->power_off.work);
--		}
-+	/* The connection is still in hci_conn_hash so test for 1
-+	 * instead of 0 to know if this is the last one.
-+	 */
-+	if (mgmt_powering_down(hdev) && hci_conn_count(hdev) == 1) {
-+		cancel_delayed_work(&hdev->power_off);
-+		queue_work(hdev->req_workqueue, &hdev->power_off.work);
- 	}
- 
- 	if (!mgmt_connected)
-@@ -6359,19 +6369,13 @@ void mgmt_connect_failed(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
- 			 u8 addr_type, u8 status)
- {
- 	struct mgmt_ev_connect_failed ev;
--	struct pending_cmd *power_off;
--
--	power_off = mgmt_pending_find(MGMT_OP_SET_POWERED, hdev);
--	if (power_off) {
--		struct mgmt_mode *cp = power_off->param;
- 
--		/* The connection is still in hci_conn_hash so test for 1
--		 * instead of 0 to know if this is the last one.
--		 */
--		if (!cp->val && hci_conn_count(hdev) == 1) {
--			cancel_delayed_work(&hdev->power_off);
--			queue_work(hdev->req_workqueue, &hdev->power_off.work);
--		}
-+	/* The connection is still in hci_conn_hash so test for 1
-+	 * instead of 0 to know if this is the last one.
-+	 */
-+	if (mgmt_powering_down(hdev) && hci_conn_count(hdev) == 1) {
-+		cancel_delayed_work(&hdev->power_off);
-+		queue_work(hdev->req_workqueue, &hdev->power_off.work);
- 	}
- 
- 	bacpy(&ev.addr.bdaddr, bdaddr);
--- 
-1.9.3
+>>   android/gatt: Refactor trigger connection function.
+>>   android/gatt: Use kernel auto connect feature if possible
+>>   android/bluetooth: Clear auto connect list on startup
+>>
+>>  android/bluetooth.c | 94 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+>>  android/bluetooth.h | 10 ++++++
+>>  android/gatt.c      | 66 +++++++++++++++++++++++++++++--------
+>>  android/main.c      |  4 +++
+>>  4 files changed, 160 insertions(+), 14 deletions(-)
+>>
+>> --
+>> 1.8.4
+>>
+>> --
+>> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+>> the body of a message to majordomo@vger.kernel.org
+>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>
+>
+>
+> --
+> Luiz Augusto von Dentz
 
+BR
+Lukasz
