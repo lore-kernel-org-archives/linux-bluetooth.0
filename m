@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv3 5/6] proximity: Fix use after free
-Date: Fri,  1 Aug 2014 11:44:38 +0300
-Message-Id: <1406882679-28568-5-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv3 6/6] gdbus: Fix use after free
+Date: Fri,  1 Aug 2014 11:44:39 +0300
+Message-Id: <1406882679-28568-6-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1406882679-28568-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <CABBYNZJSfWa8r8Ab-Dp3cmSwcxQc_7t7W0Cb2EALobM4RQnLkw@mail.gmail.com>
  <1406882679-28568-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
@@ -12,31 +12,55 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-First remove object from the list and then remove it.
+Refactor filter_data_remove_callback so that we do not iterate over
+freed pointer.
 ---
- profiles/proximity/monitor.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ gdbus/watch.c | 11 ++++++++---
+ 1 file changed, 8 insertions(+), 3 deletions(-)
 
-diff --git a/profiles/proximity/monitor.c b/profiles/proximity/monitor.c
-index f2e0739..b05cdd7 100644
---- a/profiles/proximity/monitor.c
-+++ b/profiles/proximity/monitor.c
-@@ -606,13 +606,13 @@ static void monitor_destroy(gpointer user_data)
- {
- 	struct monitor *monitor = user_data;
- 
-+	monitors = g_slist_remove(monitors, monitor);
-+
- 	btd_device_unref(monitor->device);
- 	g_free(monitor->linklosslevel);
- 	g_free(monitor->immediatelevel);
- 	g_free(monitor->signallevel);
- 	g_free(monitor);
--
--	monitors = g_slist_remove(monitors, monitor);
+diff --git a/gdbus/watch.c b/gdbus/watch.c
+index 0f99f4f..474d3d4 100644
+--- a/gdbus/watch.c
++++ b/gdbus/watch.c
+@@ -362,6 +362,7 @@ static void service_data_free(struct service_data *data)
+ 	callback->data = NULL;
  }
  
- static struct monitor *register_monitor(struct btd_device *device)
++/* Returns TRUE if data is freed */
+ static gboolean filter_data_remove_callback(struct filter_data *data,
+ 						struct filter_callback *cb)
+ {
+@@ -383,7 +384,7 @@ static gboolean filter_data_remove_callback(struct filter_data *data,
+ 	/* Don't remove the filter if other callbacks exist or data is lock
+ 	 * processing callbacks */
+ 	if (data->callbacks || data->lock)
+-		return TRUE;
++		return FALSE;
+ 
+ 	if (data->registered && !remove_match(data))
+ 		return FALSE;
+@@ -405,7 +406,9 @@ static DBusHandlerResult signal_filter(DBusConnection *connection,
+ 
+ 		if (cb->signal_func && !cb->signal_func(connection, message,
+ 							cb->user_data)) {
+-			filter_data_remove_callback(data, cb);
++			if (filter_data_remove_callback(data, cb))
++				break;
++
+ 			continue;
+ 		}
+ 
+@@ -489,7 +492,9 @@ static DBusHandlerResult service_filter(DBusConnection *connection,
+ 		/* Only auto remove if it is a bus name watch */
+ 		if (data->argument[0] == ':' &&
+ 				(cb->conn_func == NULL || cb->disc_func == NULL)) {
+-			filter_data_remove_callback(data, cb);
++			if (filter_data_remove_callback(data, cb))
++				break;
++
+ 			continue;
+ 		}
+ 
 -- 
 1.9.1
 
