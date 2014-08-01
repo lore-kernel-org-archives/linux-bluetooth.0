@@ -1,56 +1,61 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] android/doc: Add instructions for android-ia
-Date: Fri,  1 Aug 2014 16:40:02 +0300
-Message-Id: <1406900402-12528-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <2063314.tMJNTMrmhB@uw000953>
+References: <1406882733-6064-1-git-send-email-lukasz.rymanowski@tieto.com>
+	<2063314.tMJNTMrmhB@uw000953>
+Date: Fri, 1 Aug 2014 15:32:13 +0200
+Message-ID: <CAMudyAu+V=yrMzUJk98HeMfC7Mq5x0tSPxBgDzOc6O4VKV=VRQ@mail.gmail.com>
+Subject: Re: [PATCH v2 0/6] android/gatt: Make usage of kernel auto connect feat.
+From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+To: Szymon Janc <szymon.janc@tieto.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Hi Szymon,
 
-Add instructions for building Android image based on android-ia from
-01.org.
----
- android/README | 25 +++++++++++++++++++++++++
- 1 file changed, 25 insertions(+)
+On 1 August 2014 15:19, Szymon Janc <szymon.janc@tieto.com> wrote:
+> Hi Łukasz,
+>
+> On Friday 01 of August 2014 10:45:27 Lukasz Rymanowski wrote:
+>> Following patches add support to BfA to use kernel auto connect list
+>> when mgmt interface is 1.7 or highier.
+>>
+>> Tested on PC with latest kernel.
+>>
+>> v2: Fix in Patch 5/6. Forgot one if check
+>>
+>> Lukasz Rymanowski (6):
+>>   android/bluetooth: Add flag for kernel connection control
+>>   android/bluetooth: Add API to add device to auto connect list
+>>   android/bluetooth: Add API to remove device from auto connect list
+>>   android/gatt: Refactor trigger connection function.
+>>   android/gatt: Use kernel auto connect feature if possible
+>>   android/bluetooth: Clear auto connect list on startup
+>>
+>>  android/bluetooth.c | 94 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+>>  android/bluetooth.h | 10 ++++++
+>>  android/gatt.c      | 70 ++++++++++++++++++++++++++++++---------
+>>  android/main.c      |  4 +++
+>>  4 files changed, 163 insertions(+), 15 deletions(-)
+>>
+>
+> This looks all good to me but it doesn't apply:
+>
+> Applying: android/bluetooth: Add flag for kernel connection control
+> /home/janccszy/devel/bluez_korg/.git/rebase-apply/patch:45: new blank line at EOF.
+> +
+> fatal: 1 line adds whitespace errors.
+>
+> Please fix whitespace issues and resend.
+>
 
-diff --git a/android/README b/android/README
-index fb00f40..79434fc 100644
---- a/android/README
-+++ b/android/README
-@@ -84,6 +84,31 @@ After full build is done it is possible to rebuild only BlueZ:
- 'mm' (or 'mm -B' to force rebuilding of all files)
- 'adb sync' to update target device.
- 
-+Downloading and building for Intel devices
-+------------------------------------------
-+
-+Sample Android tree with all required components for Intel devices based on
-+Intel reference image (https://01.org/android-ia) is availabe at
-+https://code.google.com/p/android-bluez/
-+
-+This tree provides support for Dell XPS12, Minnowboard MAX, Intel NUC,
-+Acer Iconia W700 and other devices mentioned in:
-+https://01.org/android-ia/guides/devices
-+
-+Downloading:
-+repo init -u https://code.google.com/p/android-bluez.manifest/ -b android-ia \
-+	-m topic/bluez/master
-+repo sync
-+
-+Building:
-+source build/envsetup.sh
-+lunch haswell_generic-eng
-+make -j8
-+
-+Installing:
-+Live and Install image is $OUT/live.img
-+Flash live.img to USB flash and boot from it. More instructions here:
-+https://01.org/android-ia/guides/developers/build-and-install
- 
- Linux Kernel requirements
- -------------------------
--- 
-1.9.1
+Fixed in V3.
 
+> --
+> Best regards,
+> Szymon Janc
+
+BR
+Lukasz
