@@ -1,57 +1,54 @@
 Return-Path: <cyrus@holtmann.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.6\))
-Subject: Re: [PATCH v3 bluetooth-next] Simplify lowpan receive path so skb is freed in, lowpan_rcv when dropped.
+Subject: Re: [PATCH] drivers/bluetooth: Toshiba Qualcomm AR9565 (ath3k) bluetooth fix
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20140804094815.GA16774@omega>
-Date: Mon, 4 Aug 2014 08:35:48 -0700
-Cc: Martin Townsend <martin.townsend@xsilon.com>,
-	linux-zigbee-devel@lists.sourceforge.net,
-	BlueZ development <linux-bluetooth@vger.kernel.org>,
-	linux-wpan@vger.kernel.org
-Message-Id: <215A7DE1-74A1-4454-8DDF-98E960F7260D@holtmann.org>
-References: <53DF4B10.7000209@xsilon.com> <20140804090403.GB15334@omega> <53DF4F7B.4090307@xsilon.com> <20140804093630.GD15334@omega> <20140804094147.GE15334@omega> <20140804094815.GA16774@omega>
-To: Alexander Aring <alex.aring@gmail.com>
+In-Reply-To: <1500387.0D3PNSTLgV@venture>
+Date: Mon, 4 Aug 2014 08:30:08 -0700
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <FAD0FF20-81D3-4FC0-A059-BC4BFCE47B51@holtmann.org>
+References: <1500387.0D3PNSTLgV@venture>
+To: Vincent Elger Zwanenburg <vincentezw@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Alex,
+Hi Vincent,
 
->>>> The changes were made to a clone of bluetooth-next, do I have the right repository?
->>>> 
->>>> martin@martin-HP-ProDesk-490-G1-MT:~/workspace/bluetooth-next$ git ls-remote
->>>> From git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git
->>>> 
->>> yes, but maybe it's a little bit outdated. Try to update it, on top of
->>> git log should be the patches:
->>> 
->>> http://git.kernel.org/cgit/linux/kernel/git/bluetooth/bluetooth-next.git/log/
->>> 
->> 
->> I think I know now why it fails. This patch depends on your previous patch
->> ("6lowpan: Remove ununsed dev parameter from skb_delivery_cb
->> callback."), otherwise I get merge conflicts.
->> 
->> Normally you need to send this in a series of patches to avoid something
->> like this. Now you need to wait until your patch ("6lowpan: Remove
->> ununsed dev parameter from skb_delivery_cb callback.") go into the
->> bluetooth-next tree.
->> 
+> From:  Vincent Elger Zwanenburg <vincentz@topmail.ie>
+> Date:   Mon Aug 4 01:34:27 2014 +0100
 > 
-> Or write in the patch file under the "---" lines:
+> Fixes bluetooth support on Toshiba C55-B-138 notebooks by 1) adding an ignore 
+> line into btusb.c for its PID/VID combination and 2) assigning the VID/PID 
+> combination in ath3k.c to load the BTUSB_ATH3012 driver.
 > 
-> "This patch depends on..." if Marcel can deal with this kind of
-> dependency notification.
+> relevant usb-devices command output:
 > 
-> Otherwise nobody knows what's going on now and want to apply it on
-> bluetooth-next, like me...
+> T:  Bus=01 Lev=02 Prnt=05 Port=00 Cnt=01 Dev#= 10 Spd=12  MxCh= 0
+> D:  Ver= 1.10 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
+> P:  Vendor=0930 ProdID=0227 Rev=00.02
+> C:  #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
+> I:  If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> I:  If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
 > 
-> 
-> btw. lines after "---" will be ignored by applying.
+> Signed-off-by: Vincent Elger Zwanenburg <vincentz@topmail.ie>
+> ---
+> diff -uprN -X linux-3.16-rc7-vanilla/Documentation/dontdiff linux-3.16-rc7-
+> vanilla/drivers/bluetooth/ath3k.c /usr/src/linux-
+> mine/drivers/bluetooth/ath3k.c
+> --- linux-3.16-rc7-vanilla/drivers/bluetooth/ath3k.c    2014-07-27 
+> 20:41:55.000000000 +0100
+> +++ /usr/src/linux-mine/drivers/bluetooth/ath3k.c       2014-08-03 
+> 04:24:37.449746557 +0100
+> @@ -75,6 +75,7 @@ static const struct usb_device_id ath3k_
+>        /* Atheros AR3012 with sflash firmware*/
+>        { USB_DEVICE(0x0489, 0xe04d) },
+>        { USB_DEVICE(0x0489, 0xe04e) },
+> +       { USB_DEVICE(0x0930, 0x0227) },
+>        { USB_DEVICE(0x0489, 0xe057) },
+>        { USB_DEVICE(0x0489, 0xe056) },
+>        { USB_DEVICE(0x0489, 0xe05f) },
 
-so I am fine either way. You can mention this in the section after --- or you just send a patch set that is versioned [PATCH x/y].
-
-Just right now I am delaying applying net/6lowpan/ patches until John, Dave and I have resolved the merge conflicts for getting the current patches into net-next. After that I will start actively applying these patches.
+please fix your mail client since this message is broken. With this it is impossible to apply the patch.
 
 Regards
 
