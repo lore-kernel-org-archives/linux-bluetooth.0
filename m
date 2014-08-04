@@ -1,69 +1,86 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFC BlueZ 2/2] unit/test-queue: Add /queue/foreach_vargs
-Date: Mon,  4 Aug 2014 16:48:52 +0300
-Message-Id: <1407160132-19567-2-git-send-email-luiz.dentz@gmail.com>
-In-Reply-To: <1407160132-19567-1-git-send-email-luiz.dentz@gmail.com>
-References: <1407160132-19567-1-git-send-email-luiz.dentz@gmail.com>
+Subject: [RFC BlueZ 1/2] shared/queue: Add queue_foreach_vargs
+Date: Mon,  4 Aug 2014 16:48:51 +0300
+Message-Id: <1407160132-19567-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
+This adds queue_foreach_vargs which contrary to queue_foreach can take
+a variable number of parameters which is very convenient considering
+there is no way to direct access the elements of the queue.
 ---
- unit/test-queue.c | 31 +++++++++++++++++++++++++++++++
- 1 file changed, 31 insertions(+)
+ src/shared/queue.c | 29 +++++++++++++++++++++++++++++
+ src/shared/queue.h |  6 ++++++
+ 2 files changed, 35 insertions(+)
 
-diff --git a/unit/test-queue.c b/unit/test-queue.c
-index 5cbe529..445568e 100644
---- a/unit/test-queue.c
-+++ b/unit/test-queue.c
-@@ -99,6 +99,36 @@ static void test_foreach_remove_all(void)
- 	queue_destroy(queue, NULL);
+diff --git a/src/shared/queue.c b/src/shared/queue.c
+index 3ca3ca6..3093afe 100644
+--- a/src/shared/queue.c
++++ b/src/shared/queue.c
+@@ -211,6 +211,35 @@ void queue_foreach(struct queue *queue, queue_foreach_func_t function,
+ 	queue_unref(queue);
  }
  
-+static void foreach_vargs(void *data, va_list *ap)
++void queue_foreach_vargs(struct queue *queue,
++				queue_foreach_func_vargs_t function, ...)
 +{
-+	struct queue *queue;
-+	unsigned int i;
-+	char *s;
++	struct queue_entry *entry;
 +
-+	queue = va_arg(ap, struct queue *);
-+	g_assert(queue != NULL);
++	if (!queue || !function)
++		return;
 +
-+	i = va_arg(ap, unsigned int);
-+	g_assert_cmpint(i, ==, 1);
++	entry = queue->head;
++	if (!entry)
++		return;
 +
-+	s = va_arg(ap, char *);
-+	g_assert_cmpstr(s, ==, "2");
++	queue_ref(queue);
++	while (entry && queue->ref_count > 1) {
++		struct queue_entry *tmp = entry;
++		va_list ap;
++
++		entry = tmp->next;
++
++		va_start(ap, function);
++		function(tmp->data, &ap);
++		va_end(ap);
++
++		if (!queue_find_entry(queue, entry))
++			break;
++	}
++	queue_unref(queue);
 +}
 +
-+static void test_foreach_vargs(void)
-+{
-+	struct queue *queue;
-+
-+	queue = queue_new();
-+	g_assert(queue != NULL);
-+
-+	queue_push_tail(queue, UINT_TO_PTR(1));
-+	queue_push_tail(queue, UINT_TO_PTR(2));
-+
-+	queue_foreach_vargs(queue, foreach_vargs, queue, 1, "2");
-+	queue_destroy(queue, NULL);
-+}
-+
- int main(int argc, char *argv[])
+ static bool direct_match(const void *a, const void *b)
  {
- 	g_test_init(&argc, &argv, NULL);
-@@ -106,6 +136,7 @@ int main(int argc, char *argv[])
- 	g_test_add_func("/queue/basic", test_basic);
- 	g_test_add_func("/queue/foreach_destroy", test_foreach_destroy);
- 	g_test_add_func("/queue/foreach_remove_all", test_foreach_remove_all);
-+	g_test_add_func("/queue/foreach_vargs", test_foreach_vargs);
+ 	return a == b;
+diff --git a/src/shared/queue.h b/src/shared/queue.h
+index 709590b..e773aa5 100644
+--- a/src/shared/queue.h
++++ b/src/shared/queue.h
+@@ -22,6 +22,7 @@
+  */
  
- 	return g_test_run();
- }
+ #include <stdbool.h>
++#include <stdarg.h>
+ 
+ typedef void (*queue_destroy_func_t)(void *data);
+ 
+@@ -41,6 +42,11 @@ typedef void (*queue_foreach_func_t)(void *data, void *user_data);
+ void queue_foreach(struct queue *queue, queue_foreach_func_t function,
+ 							void *user_data);
+ 
++typedef void (*queue_foreach_func_vargs_t)(void *data, va_list *ap);
++
++void queue_foreach_vargs(struct queue *queue,
++				queue_foreach_func_vargs_t function, ...);
++
+ typedef bool (*queue_match_func_t)(const void *a, const void *b);
+ 
+ void *queue_find(struct queue *queue, queue_match_func_t function,
 -- 
 1.9.3
 
