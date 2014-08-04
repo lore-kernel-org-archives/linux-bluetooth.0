@@ -1,70 +1,59 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 4 Aug 2014 17:41:10 +0200
-From: Alexander Aring <alex.aring@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.6\))
+Subject: Re: [PATCH v3 bluetooth-next] Simplify lowpan receive path so skb is freed in, lowpan_rcv when dropped.
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20140804094815.GA16774@omega>
+Date: Mon, 4 Aug 2014 08:35:48 -0700
 Cc: Martin Townsend <martin.townsend@xsilon.com>,
 	linux-zigbee-devel@lists.sourceforge.net,
 	BlueZ development <linux-bluetooth@vger.kernel.org>,
 	linux-wpan@vger.kernel.org
-Subject: Re: [PATCH v3 bluetooth-next] Simplify lowpan receive path so skb is
- freed in, lowpan_rcv when dropped.
-Message-ID: <20140804154108.GA16842@omega>
-References: <53DF4B10.7000209@xsilon.com>
- <20140804090403.GB15334@omega>
- <53DF4F7B.4090307@xsilon.com>
- <20140804093630.GD15334@omega>
- <20140804094147.GE15334@omega>
- <20140804094815.GA16774@omega>
- <215A7DE1-74A1-4454-8DDF-98E960F7260D@holtmann.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-In-Reply-To: <215A7DE1-74A1-4454-8DDF-98E960F7260D@holtmann.org>
+Message-Id: <215A7DE1-74A1-4454-8DDF-98E960F7260D@holtmann.org>
+References: <53DF4B10.7000209@xsilon.com> <20140804090403.GB15334@omega> <53DF4F7B.4090307@xsilon.com> <20140804093630.GD15334@omega> <20140804094147.GE15334@omega> <20140804094815.GA16774@omega>
+To: Alexander Aring <alex.aring@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hi Alex,
 
-On Mon, Aug 04, 2014 at 08:35:48AM -0700, Marcel Holtmann wrote:
-> Hi Alex,
+>>>> The changes were made to a clone of bluetooth-next, do I have the right repository?
+>>>> 
+>>>> martin@martin-HP-ProDesk-490-G1-MT:~/workspace/bluetooth-next$ git ls-remote
+>>>> From git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git
+>>>> 
+>>> yes, but maybe it's a little bit outdated. Try to update it, on top of
+>>> git log should be the patches:
+>>> 
+>>> http://git.kernel.org/cgit/linux/kernel/git/bluetooth/bluetooth-next.git/log/
+>>> 
+>> 
+>> I think I know now why it fails. This patch depends on your previous patch
+>> ("6lowpan: Remove ununsed dev parameter from skb_delivery_cb
+>> callback."), otherwise I get merge conflicts.
+>> 
+>> Normally you need to send this in a series of patches to avoid something
+>> like this. Now you need to wait until your patch ("6lowpan: Remove
+>> ununsed dev parameter from skb_delivery_cb callback.") go into the
+>> bluetooth-next tree.
+>> 
 > 
-> >>>> The changes were made to a clone of bluetooth-next, do I have the right repository?
-> >>>> 
-> >>>> martin@martin-HP-ProDesk-490-G1-MT:~/workspace/bluetooth-next$ git ls-remote
-> >>>> From git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git
-> >>>> 
-> >>> yes, but maybe it's a little bit outdated. Try to update it, on top of
-> >>> git log should be the patches:
-> >>> 
-> >>> http://git.kernel.org/cgit/linux/kernel/git/bluetooth/bluetooth-next.git/log/
-> >>> 
-> >> 
-> >> I think I know now why it fails. This patch depends on your previous patch
-> >> ("6lowpan: Remove ununsed dev parameter from skb_delivery_cb
-> >> callback."), otherwise I get merge conflicts.
-> >> 
-> >> Normally you need to send this in a series of patches to avoid something
-> >> like this. Now you need to wait until your patch ("6lowpan: Remove
-> >> ununsed dev parameter from skb_delivery_cb callback.") go into the
-> >> bluetooth-next tree.
-> >> 
-> > 
-> > Or write in the patch file under the "---" lines:
-> > 
-> > "This patch depends on..." if Marcel can deal with this kind of
-> > dependency notification.
-> > 
-> > Otherwise nobody knows what's going on now and want to apply it on
-> > bluetooth-next, like me...
-> > 
-> > 
-> > btw. lines after "---" will be ignored by applying.
+> Or write in the patch file under the "---" lines:
 > 
-> so I am fine either way. You can mention this in the section after --- or you just send a patch set that is versioned [PATCH x/y].
+> "This patch depends on..." if Marcel can deal with this kind of
+> dependency notification.
 > 
-> Just right now I am delaying applying net/6lowpan/ patches until John, Dave and I have resolved the merge conflicts for getting the current patches into net-next. After that I will start actively applying these patches.
+> Otherwise nobody knows what's going on now and want to apply it on
+> bluetooth-next, like me...
 > 
+> 
+> btw. lines after "---" will be ignored by applying.
 
-Thanks for explanation and carry about the merge conflicts. Sorry about
-that there exists now a huge merge conflicts, but this should never
-happen if all 802.15.4/6lowpan stuff goes into bluetooth.
+so I am fine either way. You can mention this in the section after --- or you just send a patch set that is versioned [PATCH x/y].
 
-- Alex
+Just right now I am delaying applying net/6lowpan/ patches until John, Dave and I have resolved the merge conflicts for getting the current patches into net-next. After that I will start actively applying these patches.
+
+Regards
+
+Marcel
+
