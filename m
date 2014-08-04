@@ -1,45 +1,68 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 4 Aug 2014 14:30:49 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v4 0/6] android/gatt: Make usage of kernel auto connect
- feat.
-Message-ID: <20140804113049.GA27808@t440s.lan>
-References: <1407148459-20125-1-git-send-email-lukasz.rymanowski@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1407148459-20125-1-git-send-email-lukasz.rymanowski@tieto.com>
+From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
+Subject: [PATCH 1/4] android/bluetooth: Fix retriggering the discovery
+Date: Mon,  4 Aug 2014 12:53:33 +0200
+Message-Id: <1407149616-2224-2-git-send-email-jakub.tyszkowski@tieto.com>
+In-Reply-To: <1407149616-2224-1-git-send-email-jakub.tyszkowski@tieto.com>
+References: <1407149616-2224-1-git-send-email-jakub.tyszkowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Lukasz,
+Previously le device found callback was set every time we triggered the scan
+from gatt. But it does no longer work like that. This callback is now set
+when gatt profile is registered and should not be used for checking if we
+should be retriggering the scan. Expected discovery flag should be
+used directly instead.
+---
+ android/bluetooth.c | 18 +++++++++++++-----
+ 1 file changed, 13 insertions(+), 5 deletions(-)
 
-On Mon, Aug 04, 2014, Lukasz Rymanowski wrote:
-> Following patches add support to BfA to use kernel auto connect list
-> when mgmt interface is 1.7 or highier.
-> 
-> Tested on PC with latest kernel.
-> 
-> v2: Fix in Patch 5/6. Forgot one if check
-> v3: Rebase + whitespace fix
-> v4: Handle Johan comment
-> 
-> Note: For android new backports are needed. Will be done early next week.
-> 
-> Lukasz Rymanowski (6):
->   android/bluetooth: Add flag for kernel connection control
->   android/bluetooth: Add API to add device to auto connect list
->   android/bluetooth: Add API to remove device from auto connect list
->   android/gatt: Refactor trigger connection function.
->   android/gatt: Use kernel auto connect feature if possible
->   android/bluetooth: Clear auto connect list on startup
-> 
->  android/bluetooth.c | 101 ++++++++++++++++++++++++++++++++++++++++++++++++++++
->  android/bluetooth.h |   6 ++++
->  android/gatt.c      |  70 ++++++++++++++++++++++++++++--------
->  3 files changed, 162 insertions(+), 15 deletions(-)
+diff --git a/android/bluetooth.c b/android/bluetooth.c
+index cd1772a..48866b3 100644
+--- a/android/bluetooth.c
++++ b/android/bluetooth.c
+@@ -3714,9 +3714,16 @@ bool bt_le_discovery_start(void)
+ 
+ 	adapter.le_scanning = true;
+ 
+-	/* If core is discovering, don't bother */
+-	if (adapter.cur_discovery_type != SCAN_TYPE_NONE)
++	/*
++	 * If core is discovering - just set expected next scan type.
++	 * It will be triggered in case current scan session is almost done
++	 * i.e. we missed LE phase in interleaved scan, or we're trying to
++	 * connect to device that was already discovered.
++	 */
++	if (adapter.cur_discovery_type != SCAN_TYPE_NONE) {
++		adapter.exp_discovery_type = SCAN_TYPE_LE;
+ 		return true;
++	}
+ 
+ 	if (start_discovery(SCAN_TYPE_LE))
+ 		return true;
+@@ -4703,7 +4710,7 @@ static void handle_cancel_discovery_cmd(const void *buf, uint16_t len)
+ 		if (get_supported_discovery_type() != SCAN_TYPE_LE)
+ 			break;
+ 
+-		if (gatt_device_found_cb) {
++		if (adapter.exp_discovery_type == SCAN_TYPE_LE) {
+ 			status = HAL_STATUS_BUSY;
+ 			goto failed;
+ 		}
+@@ -4721,8 +4728,9 @@ static void handle_cancel_discovery_cmd(const void *buf, uint16_t len)
+ 			goto failed;
+ 		}
+ 
+-		adapter.exp_discovery_type = gatt_device_found_cb ?
+-						SCAN_TYPE_LE : SCAN_TYPE_NONE;
++		if (adapter.exp_discovery_type != SCAN_TYPE_LE)
++			adapter.exp_discovery_type = SCAN_TYPE_NONE;
++
+ 		break;
+ 	}
+ 
+-- 
+1.9.1
 
-All patches have been applied. Thanks.
-
-Johan
