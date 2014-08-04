@@ -1,33 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
-From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
-Subject: [PATCH 0/4] Initial set of GATT test cases
-Date: Mon,  4 Aug 2014 12:53:32 +0200
-Message-Id: <1407149616-2224-1-git-send-email-jakub.tyszkowski@tieto.com>
+MIME-Version: 1.0
+In-Reply-To: <001301cfafc0$ef11b350$cd3519f0$@samsung.com>
+References: <001301cfafc0$ef11b350$cd3519f0$@samsung.com>
+Date: Mon, 4 Aug 2014 13:45:08 +0300
+Message-ID: <CABBYNZKfvD271JoWqCW=Lupu-22scZRAJ0D8ksG8bXfUP8gBkg@mail.gmail.com>
+Subject: Re: AVCTP and AVRCP packet decoder file structure in btmon
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Vikrampal <vikram.pal@samsung.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	Dmitry Kasatkin <d.kasatkin@samsung.com>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This adds some basic test cases for the GATT profile.
+Hi Vikrampal,
 
-There is an issue with the latest bluetooth-next that is triggered by the
-"Gatt Client - Double Listen" case. With the Ubuntu's vanila 3.14 kernel it is
-not triggered, so I assumed it is not tester's fault. This needs to be
-investigated. I'll fill an issue in Girra for that.
+We can start by reusing avctp.c to place AV/C and AVRCP decoders,
+later on we can review if it is the case of splitting. Also please
+note that android/Android.mk needs updating if we change anything on
+the build of btmon.
 
-Regards,
-Jakub Tyszkowski (4):
-  android/bluetooth: Fix retriggering the discovery
-  android/tester: Add Gatt Client basic test cases
-  android/tester: Add Gatt Client connect cases
-  android/tester: Add Gatt Client Listen cases
+On Mon, Aug 4, 2014 at 11:48 AM, Vikrampal <vikram.pal@samsung.com> wrote:
+> Hi,
+>
+> I'm working on AVRCP packet decoder for Bluetooth monitor module.
+> There's a separate file avctp.c/h for AVCTP packet decoder.
+>
+> The file avctp.c is not a big file as such. So, I'm thinking whether or not
+> I should
+> include AVRCP decoder in this file itself.
+>
+> Shall I create a separate file for AVRCP decoding?
+>
+> If both AVCTP & AVRCP go in the same file then what should be the
+> appropriate name of the file or shall I create a separate file for AVRCP as
+> well.
+>
+> Please advise me. Thanks!
+>
+> Regards,
+> Vikram
+>
 
- android/bluetooth.c   |  18 +-
- android/tester-gatt.c | 444 ++++++++++++++++++++++++++++++++++++++++++++++++++
- android/tester-main.c | 120 +++++++++++++-
- android/tester-main.h |  30 ++++
- 4 files changed, 602 insertions(+), 10 deletions(-)
 
---
-1.9.1
 
+-- 
+Luiz Augusto von Dentz
