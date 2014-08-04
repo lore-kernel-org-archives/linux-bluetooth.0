@@ -1,22 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 4 Aug 2014 10:13:19 +0200
-From: Alexander Aring <alex.aring@gmail.com>
-To: Martin Townsend <martin.townsend@xsilon.com>
-Cc: linux-zigbee-devel@lists.sourceforge.net,
-	linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org,
-	Marcel Holtmann <marcel@holtmann.org>
-Subject: Re: [PATCH v2 bluetooth-next] Simplify lowpan receive path so skb is
- freed in lowpan_rcv when dropped.
-Message-ID: <20140804081317.GA9272@omega>
-References: <53DCE75C.2030305@xsilon.com>
+Date: Mon, 4 Aug 2014 09:24:46 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org, szymon.janc@tieto.com
+Subject: Re: [PATCH v3 1/6] android/bluetooth: Add flag for kernel connection
+ control
+Message-ID: <20140804062446.GB9924@t440s.P-661HNU-F1>
+References: <1406899885-5338-1-git-send-email-lukasz.rymanowski@tieto.com>
+ <1406899885-5338-2-git-send-email-lukasz.rymanowski@tieto.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-In-Reply-To: <53DCE75C.2030305@xsilon.com>
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1406899885-5338-2-git-send-email-lukasz.rymanowski@tieto.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Martin,
+Hi Lukasz,
 
-this patch doesn't apply for me on current bluetooth-next. Can you
-respin the patch? Thanks.
+On Fri, Aug 01, 2014, Lukasz Rymanowski wrote:
+> +struct main_opts {
+> +	bool kernel_conn_control;
+> +};
+> +
+> +extern struct main_opts main_opts;
 
-- Alex
+I'd prefer if we could avoid this hcid-era (i.e. BlueZ 3.x) style
+construct. Perhaps a simple static bool kernel_conn_control in
+bluetooth.c and then a getter function for modules like gatt.c to get
+the value, e.g. bool bt_kernel_conn_control(void);
+
+Johan
