@@ -1,38 +1,59 @@
 Return-Path: <cyrus@holtmann.org>
-From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: johan.hedberg@gmail.com,
-	Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH v4 0/6] android/gatt: Make usage of kernel auto connect feat.
-Date: Mon,  4 Aug 2014 12:34:13 +0200
-Message-Id: <1407148459-20125-1-git-send-email-lukasz.rymanowski@tieto.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Mon, 4 Aug 2014 11:48:15 +0200
+From: Alexander Aring <alex.aring@gmail.com>
+To: Martin Townsend <martin.townsend@xsilon.com>
+Cc: linux-zigbee-devel@lists.sourceforge.net,
+	linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org,
+	Marcel Holtmann <marcel@holtmann.org>
+Subject: Re: [PATCH v3 bluetooth-next] Simplify lowpan receive path so skb is
+ freed in, lowpan_rcv when dropped.
+Message-ID: <20140804094815.GA16774@omega>
+References: <53DF4B10.7000209@xsilon.com>
+ <20140804090403.GB15334@omega>
+ <53DF4F7B.4090307@xsilon.com>
+ <20140804093630.GD15334@omega>
+ <20140804094147.GE15334@omega>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20140804094147.GE15334@omega>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Following patches add support to BfA to use kernel auto connect list
-when mgmt interface is 1.7 or highier.
+On Mon, Aug 04, 2014 at 11:41:47AM +0200, Alexander Aring wrote:
+> Martin,
+> 
+> On Mon, Aug 04, 2014 at 11:36:30AM +0200, Alexander Aring wrote:
+> > On Mon, Aug 04, 2014 at 10:16:43AM +0100, Martin Townsend wrote:
+> > > The changes were made to a clone of bluetooth-next, do I have the right repository?
+> > > 
+> > > martin@martin-HP-ProDesk-490-G1-MT:~/workspace/bluetooth-next$ git ls-remote
+> > > From git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git
+> > > 
+> > yes, but maybe it's a little bit outdated. Try to update it, on top of
+> > git log should be the patches:
+> > 
+> > http://git.kernel.org/cgit/linux/kernel/git/bluetooth/bluetooth-next.git/log/
+> > 
+> 
+> I think I know now why it fails. This patch depends on your previous patch
+> ("6lowpan: Remove ununsed dev parameter from skb_delivery_cb
+> callback."), otherwise I get merge conflicts.
+> 
+> Normally you need to send this in a series of patches to avoid something
+> like this. Now you need to wait until your patch ("6lowpan: Remove
+> ununsed dev parameter from skb_delivery_cb callback.") go into the
+> bluetooth-next tree.
+> 
 
-Tested on PC with latest kernel.
+Or write in the patch file under the "---" lines:
 
-v2: Fix in Patch 5/6. Forgot one if check
-v3: Rebase + whitespace fix
-v4: Handle Johan comment
+"This patch depends on..." if Marcel can deal with this kind of
+dependency notification.
 
-Note: For android new backports are needed. Will be done early next week.
+Otherwise nobody knows what's going on now and want to apply it on
+bluetooth-next, like me...
 
-Lukasz Rymanowski (6):
-  android/bluetooth: Add flag for kernel connection control
-  android/bluetooth: Add API to add device to auto connect list
-  android/bluetooth: Add API to remove device from auto connect list
-  android/gatt: Refactor trigger connection function.
-  android/gatt: Use kernel auto connect feature if possible
-  android/bluetooth: Clear auto connect list on startup
 
- android/bluetooth.c | 101 ++++++++++++++++++++++++++++++++++++++++++++++++++++
- android/bluetooth.h |   6 ++++
- android/gatt.c      |  70 ++++++++++++++++++++++++++++--------
- 3 files changed, 162 insertions(+), 15 deletions(-)
+btw. lines after "---" will be ignored by appling.
 
--- 
-1.8.4
 
+- Alex
