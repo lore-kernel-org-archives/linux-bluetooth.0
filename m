@@ -3,68 +3,68 @@ From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: johan.hedberg@gmail.com,
 	Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH v4 6/6] android/bluetooth: Clear auto connect list on startup
-Date: Mon,  4 Aug 2014 12:34:19 +0200
-Message-Id: <1407148459-20125-7-git-send-email-lukasz.rymanowski@tieto.com>
+Subject: [PATCH v4 3/6] android/bluetooth: Add API to remove device from auto connect list
+Date: Mon,  4 Aug 2014 12:34:16 +0200
+Message-Id: <1407148459-20125-4-git-send-email-lukasz.rymanowski@tieto.com>
 In-Reply-To: <1407148459-20125-1-git-send-email-lukasz.rymanowski@tieto.com>
 References: <1407148459-20125-1-git-send-email-lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-In android we add devices to auto connect list when application trigger
-connect. We need to make sure that when bluetooth is turn on there is
-no devices in auto connect list in the kernel.
 ---
- android/bluetooth.c | 29 +++++++++++++++++++++++++++++
- 1 file changed, 29 insertions(+)
+ android/bluetooth.c | 28 ++++++++++++++++++++++++++++
+ android/bluetooth.h |  2 ++
+ 2 files changed, 30 insertions(+)
 
 diff --git a/android/bluetooth.c b/android/bluetooth.c
-index 34690b7..38ee9a9 100644
+index a4a77c8..34690b7 100644
 --- a/android/bluetooth.c
 +++ b/android/bluetooth.c
-@@ -3129,6 +3129,34 @@ static void add_mps_record(void)
- 	}
+@@ -1527,6 +1527,34 @@ bool bt_auto_connect_add(const bdaddr_t *addr)
+ 	return false;
  }
  
-+static void clear_auto_connect_list_complete(uint8_t status,
-+							uint16_t length,
-+							const void *param,
-+							void *user_data)
-+{
-+	if (status != MGMT_STATUS_SUCCESS)
-+		error("Failed to clear auto connect list: %s (0x%02x)",
-+						mgmt_errstr(status), status);
-+}
-+
-+static void clear_auto_connect_list(void)
++void bt_auto_connect_remove(const bdaddr_t *addr)
 +{
 +	struct mgmt_cp_remove_device cp;
++	struct device *dev;
 +
 +	if (!kernel_conn_control)
 +		return;
 +
-+	memset(&cp, 0, sizeof(cp));
-+
-+	if (mgmt_send(mgmt_if, MGMT_OP_REMOVE_DEVICE, adapter.index,
-+					sizeof(cp), &cp,
-+					clear_auto_connect_list_complete,
-+					NULL, NULL) > 0)
++	dev = find_device(addr);
++	if (!dev)
 +		return;
 +
-+	error("Could not clear auto connect list");
++	if (dev->bdaddr_type == BDADDR_BREDR) {
++		DBG("auto-connection feature is not available for BR/EDR");
++		return;
++	}
++
++	memset(&cp, 0, sizeof(cp));
++	bacpy(&cp.addr.bdaddr, addr);
++	cp.addr.type = dev->bdaddr_type;
++
++	if (mgmt_send(mgmt_if, MGMT_OP_REMOVE_DEVICE, adapter.index,
++					sizeof(cp), &cp, NULL, NULL, NULL) > 0)
++		return;
++
++	error("Failed to remove device");
 +}
 +
- static void read_info_complete(uint8_t status, uint16_t length,
- 					const void *param, void *user_data)
+ static bool rssi_above_threshold(int old, int new)
  {
-@@ -3186,6 +3214,7 @@ static void read_info_complete(uint8_t status, uint16_t length,
- 	register_mgmt_handlers();
+ 	/* only 8 dBm or more */
+diff --git a/android/bluetooth.h b/android/bluetooth.h
+index 4a7063d..ac7f3ad 100644
+--- a/android/bluetooth.h
++++ b/android/bluetooth.h
+@@ -83,3 +83,5 @@ const bdaddr_t *bt_get_id_addr(const bdaddr_t *addr, uint8_t *type);
+ bool bt_kernel_conn_control(void);
  
- 	clear_uuids();
-+	clear_auto_connect_list();
- 
- 	set_io_capability();
- 	set_device_id();
+ bool bt_auto_connect_add(const bdaddr_t *addr);
++
++void bt_auto_connect_remove(const bdaddr_t *addr);
 -- 
 1.8.4
 
