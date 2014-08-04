@@ -1,67 +1,49 @@
 Return-Path: <cyrus@holtmann.org>
-From: Vikrampal <vikram.pal@samsung.com>
-To: 'Luiz Augusto von Dentz' <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	'Dmitry Kasatkin' <d.kasatkin@samsung.com>
-References: <001301cfafc0$ef11b350$cd3519f0$@samsung.com>
- <CABBYNZKfvD271JoWqCW=Lupu-22scZRAJ0D8ksG8bXfUP8gBkg@mail.gmail.com>
-In-reply-to: <CABBYNZKfvD271JoWqCW=Lupu-22scZRAJ0D8ksG8bXfUP8gBkg@mail.gmail.com>
-Subject: RE: AVCTP and AVRCP packet decoder file structure in btmon
-Date: Tue, 05 Aug 2014 12:24:44 +0530
-Message-id: <002f01cfb07a$2502c170$6f084450$@samsung.com>
-MIME-version: 1.0
-Content-type: text/plain; charset=UTF-8
+From: Vincent Elger Zwanenburg <vincentezw@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] drivers/bluetooth/: Toshiba Qualcomm AR9565 (ath3k) bluetooth fix for C55-B-138 notebooks
+Date: Tue, 05 Aug 2014 00:31:36 +0100
+Message-ID: <1721217.JWeHGVIyOq@venture>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Sure Luiz!
+From:  Vincent Elger Zwanenburg <vincentz@topmail.ie>
+Date:   Tue Aug 5 01:34:27 2014 +0100
 
-However, I've one more small doubt. If I'm submitting a series of patches
-Such as 1/4, 2/4, 3/4, 4/4... I guess in such scenarios no need to ensure that
-the patches separately compiles. What we need to ensure is that all the patches together
-gets compiled properly. Am I mistaken?
+Assign the BTUSB_ATH3012 driver to the Toshiba USB Vendor ID and Product ID combination in btusb.c and ath3k.c.
 
-> -----Original Message-----
-> From: Luiz Augusto von Dentz [mailto:luiz.dentz@gmail.com]
-> Sent: Monday, August 04, 2014 4:15 PM
-> To: Vikrampal
-> Cc: linux-bluetooth@vger.kernel.org; Dmitry Kasatkin
-> Subject: Re: AVCTP and AVRCP packet decoder file structure in btmon
-> 
-> Hi Vikrampal,
-> 
-> We can start by reusing avctp.c to place AV/C and AVRCP decoders, later on
-> we can review if it is the case of splitting. Also please note that
-> android/Android.mk needs updating if we change anything on the build of
-> btmon.
-> 
-> On Mon, Aug 4, 2014 at 11:48 AM, Vikrampal <vikram.pal@samsung.com>
-> wrote:
-> > Hi,
-> >
-> > I'm working on AVRCP packet decoder for Bluetooth monitor module.
-> > There's a separate file avctp.c/h for AVCTP packet decoder.
-> >
-> > The file avctp.c is not a big file as such. So, I'm thinking whether
-> > or not I should include AVRCP decoder in this file itself.
-> >
-> > Shall I create a separate file for AVRCP decoding?
-> >
-> > If both AVCTP & AVRCP go in the same file then what should be the
-> > appropriate name of the file or shall I create a separate file for
-> > AVRCP as well.
-> >
-> > Please advise me. Thanks!
-> >
-> > Regards,
-> > Vikram
-> >
-> 
-> 
-> 
-> --
-> Luiz Augusto von Dentz
-
-Regards,
-Vikram
+Signed-off-by: Vincent Elger Zwanenburg <vincentz@topmail.ie>
+---
+diff -uprN -X linux-3.16-vanilla/Documentation/dontdiff linux-3.16-vanilla/drivers/bluetooth/ath3k.c /usr/src/linux-3.16/drivers/bluetooth/ath3k.c
+--- linux-3.16-vanilla/drivers/bluetooth/ath3k.c	2014-08-03 23:25:02.000000000 +0100
++++ /usr/src/linux-3.16/drivers/bluetooth/ath3k.c	2014-08-05 00:29:29.428745755 +0100
+@@ -87,6 +87,7 @@ static const struct usb_device_id ath3k_
+ 	{ USB_DEVICE(0x04CA, 0x300b) },
+ 	{ USB_DEVICE(0x0930, 0x0219) },
+ 	{ USB_DEVICE(0x0930, 0x0220) },
++	{ USB_DEVICE(0x0930, 0x0227) },
+ 	{ USB_DEVICE(0x0b05, 0x17d0) },
+ 	{ USB_DEVICE(0x0CF3, 0x0036) },
+ 	{ USB_DEVICE(0x0CF3, 0x3004) },
+@@ -136,6 +137,7 @@ static const struct usb_device_id ath3k_
+ 	{ USB_DEVICE(0x04ca, 0x300b), .driver_info = BTUSB_ATH3012 },
+ 	{ USB_DEVICE(0x0930, 0x0219), .driver_info = BTUSB_ATH3012 },
+ 	{ USB_DEVICE(0x0930, 0x0220), .driver_info = BTUSB_ATH3012 },
++	{ USB_DEVICE(0x0930, 0x0227), .driver_info = BTUSB_ATH3012 },
+ 	{ USB_DEVICE(0x0b05, 0x17d0), .driver_info = BTUSB_ATH3012 },
+ 	{ USB_DEVICE(0x0CF3, 0x0036), .driver_info = BTUSB_ATH3012 },
+ 	{ USB_DEVICE(0x0cf3, 0x3004), .driver_info = BTUSB_ATH3012 },
+diff -uprN -X linux-3.16-vanilla/Documentation/dontdiff linux-3.16-vanilla/drivers/bluetooth/btusb.c /usr/src/linux-3.16/drivers/bluetooth/btusb.c
+--- linux-3.16-vanilla/drivers/bluetooth/btusb.c	2014-08-03 23:25:02.000000000 +0100
++++ /usr/src/linux-3.16/drivers/bluetooth/btusb.c	2014-08-05 00:27:43.394078791 +0100
+@@ -159,6 +159,7 @@ static const struct usb_device_id blackl
+ 	{ USB_DEVICE(0x04ca, 0x300b), .driver_info = BTUSB_ATH3012 },
+ 	{ USB_DEVICE(0x0930, 0x0219), .driver_info = BTUSB_ATH3012 },
+ 	{ USB_DEVICE(0x0930, 0x0220), .driver_info = BTUSB_ATH3012 },
++	{ USB_DEVICE(0x0930, 0x0227), .driver_info = BTUSB_ATH3012 },
+ 	{ USB_DEVICE(0x0b05, 0x17d0), .driver_info = BTUSB_ATH3012 },
+ 	{ USB_DEVICE(0x0cf3, 0x0036), .driver_info = BTUSB_ATH3012 },
+ 	{ USB_DEVICE(0x0cf3, 0x3004), .driver_info = BTUSB_ATH3012 },
 
