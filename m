@@ -1,68 +1,97 @@
 Return-Path: <cyrus@holtmann.org>
-From: Vincent Elger Zwanenburg <vincentezw@gmail.com>
+From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] drivers/bluetooth: Toshiba Qualcomm AR9565 (ath3k) bluetooth fix
-Date: Mon, 04 Aug 2014 11:35:41 +0100
-Message-ID: <1500387.0D3PNSTLgV@venture>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Cc: johan.hedberg@gmail.com,
+	Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+Subject: [PATCH v4 5/6] android/gatt: Use kernel auto connect feature if possible
+Date: Mon,  4 Aug 2014 12:34:18 +0200
+Message-Id: <1407148459-20125-6-git-send-email-lukasz.rymanowski@tieto.com>
+In-Reply-To: <1407148459-20125-1-git-send-email-lukasz.rymanowski@tieto.com>
+References: <1407148459-20125-1-git-send-email-lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From:  Vincent Elger Zwanenburg <vincentz@topmail.ie>
-Date:   Mon Aug 4 01:34:27 2014 +0100
-
-Fixes bluetooth support on Toshiba C55-B-138 notebooks by 1) adding an ignore 
-line into btusb.c for its PID/VID combination and 2) assigning the VID/PID 
-combination in ath3k.c to load the BTUSB_ATH3012 driver.
-
-relevant usb-devices command output:
-
-T:  Bus=01 Lev=02 Prnt=05 Port=00 Cnt=01 Dev#= 10 Spd=12  MxCh= 0
-D:  Ver= 1.10 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-P:  Vendor=0930 ProdID=0227 Rev=00.02
-C:  #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
-I:  If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-I:  If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-
-Signed-off-by: Vincent Elger Zwanenburg <vincentz@topmail.ie>
 ---
-diff -uprN -X linux-3.16-rc7-vanilla/Documentation/dontdiff linux-3.16-rc7-
-vanilla/drivers/bluetooth/ath3k.c /usr/src/linux-
-mine/drivers/bluetooth/ath3k.c
---- linux-3.16-rc7-vanilla/drivers/bluetooth/ath3k.c    2014-07-27 
-20:41:55.000000000 +0100
-+++ /usr/src/linux-mine/drivers/bluetooth/ath3k.c       2014-08-03 
-04:24:37.449746557 +0100
-@@ -75,6 +75,7 @@ static const struct usb_device_id ath3k_
-        /* Atheros AR3012 with sflash firmware*/
-        { USB_DEVICE(0x0489, 0xe04d) },
-        { USB_DEVICE(0x0489, 0xe04e) },
-+       { USB_DEVICE(0x0930, 0x0227) },
-        { USB_DEVICE(0x0489, 0xe057) },
-        { USB_DEVICE(0x0489, 0xe056) },
-        { USB_DEVICE(0x0489, 0xe05f) },
-@@ -123,6 +124,7 @@ static const struct usb_device_id ath3k_
+ android/gatt.c | 31 ++++++++++++++++++++++++++++++-
+ 1 file changed, 30 insertions(+), 1 deletion(-)
+
+diff --git a/android/gatt.c b/android/gatt.c
+index 448bcb8..89748d2 100644
+--- a/android/gatt.c
++++ b/android/gatt.c
+@@ -1383,6 +1383,8 @@ static void connect_cb(GIOChannel *io, GError *gerr, gpointer user_data)
  
-        /* Atheros AR3012 with sflash firmware*/
-        { USB_DEVICE(0x0489, 0xe04e), .driver_info = BTUSB_ATH3012 },
-+       { USB_DEVICE(0x0930, 0x0227), .driver_info = BTUSB_ATH3012 },
-        { USB_DEVICE(0x0489, 0xe04d), .driver_info = BTUSB_ATH3012 },
-        { USB_DEVICE(0x0489, 0xe056), .driver_info = BTUSB_ATH3012 },
-        { USB_DEVICE(0x0489, 0xe057), .driver_info = BTUSB_ATH3012 },
-diff -uprN -X linux-3.16-rc7-vanilla/Documentation/dontdiff linux-3.16-rc7-
-vanilla/drivers/bluetooth/btusb.c /usr/src/linux-
-mine/drivers/bluetooth/btusb.c
---- linux-3.16-rc7-vanilla/drivers/bluetooth/btusb.c    2014-07-27 
-20:41:55.000000000 +0100
-+++ /usr/src/linux-mine/drivers/bluetooth/btusb.c       2014-08-03 
-04:12:09.386738905 +0100
-@@ -158,6 +158,7 @@ static const struct usb_device_id blackl
-        { USB_DEVICE(0x04ca, 0x3008), .driver_info = BTUSB_ATH3012 },
-        { USB_DEVICE(0x04ca, 0x300b), .driver_info = BTUSB_ATH3012 },
-        { USB_DEVICE(0x0930, 0x0219), .driver_info = BTUSB_ATH3012 },
-+       { USB_DEVICE(0x0930, 0x0227), .driver_info = BTUSB_ATH3012 },
-        { USB_DEVICE(0x0930, 0x0220), .driver_info = BTUSB_ATH3012 },
-        { USB_DEVICE(0x0b05, 0x17d0), .driver_info = BTUSB_ATH3012 },
-        { USB_DEVICE(0x0cf3, 0x0036), .driver_info = BTUSB_ATH3012 },
+ 	device_set_state(dev, DEVICE_CONNECTED);
+ 
++	bt_auto_connect_remove(&dev->bdaddr);
++
+ 	/* Send exchange mtu request as we assume being client and server */
+ 	/* TODO: Dont exchange mtu if no client apps */
+ 	send_exchange_mtu_request(dev);
+@@ -1529,6 +1531,10 @@ static void le_device_found_handler(const bdaddr_t *addr, uint8_t addr_type,
+ 						sizeof(*ev) + ev->len, ev);
+ 
+ connect:
++	/* We use auto connect feature from kernel if possible */
++	if (bt_kernel_conn_control())
++		return;
++
+ 	dev = find_device_by_addr(addr);
+ 	if (!dev) {
+ 		if (!bonded)
+@@ -1749,6 +1755,19 @@ static int connect_bredr(struct gatt_device *dev)
+ 	return 0;
+ }
+ 
++static bool auto_connect(struct gatt_device *dev)
++{
++	bool err;
++
++	err = bt_auto_connect_add(&dev->bdaddr);
++	if (!err)
++		return false;
++
++	device_set_state(dev, DEVICE_CONNECT_INIT);
++
++	return true;
++}
++
+ static bool trigger_connection(struct app_connection *connection)
+ {
+ 	bool ret;
+@@ -1763,6 +1782,13 @@ static bool trigger_connection(struct app_connection *connection)
+ 								BDADDR_BREDR)
+ 			return connect_bredr(connection->device) == 0;
+ 
++		/*
++		 * For LE devices use auto connect feature if possible
++		 * Note: Connection state is handled inside auto_connect() func
++		 */
++		if (bt_kernel_conn_control())
++			return auto_connect(connection->device);
++
+ 		/* Trigger discovery if not already started */
+ 		if (!scanning) {
+ 			if (!bt_le_discovery_start()) {
+@@ -1771,6 +1797,7 @@ static bool trigger_connection(struct app_connection *connection)
+ 				break;
+ 			}
+ 		}
++
+ 		ret = true;
+ 		device_set_state(connection->device, DEVICE_CONNECT_INIT);
+ 		break;
+@@ -6091,7 +6118,9 @@ static void connect_confirm(GIOChannel *io, void *user_data)
+ 
+ 		dev->bdaddr_type = dst_type;
+ 	} else {
+-		if (dev->state != DEVICE_DISCONNECTED) {
++		if ((dev->state != DEVICE_DISCONNECTED) &&
++					!(dev->state == DEVICE_CONNECT_INIT &&
++					bt_kernel_conn_control())) {
+ 			char addr[18];
+ 
+ 			ba2str(&dst, addr);
+-- 
+1.8.4
 
