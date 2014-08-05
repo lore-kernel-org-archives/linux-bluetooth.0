@@ -1,127 +1,131 @@
 Return-Path: <cyrus@holtmann.org>
-From: Aravind Parvathala <Aravind.Parvathala@csr.com>
-To: David Herrmann <dh.herrmann@gmail.com>
-CC: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	Murat Kilivan <Murat.Kilivan@csr.com>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: RE: Re: HoG: Support multi output report
-Date: Tue, 5 Aug 2014 13:34:36 +0000
-Message-ID: <34DE67E73839C446B4269BCE8A1F303A01248EE1AD@CAMEUREXM01.EUROPE.ROOT.PRI>
-References: <34DE67E73839C446B4269BCE8A1F303A01248EBDD5@CAMEUREXM01.EUROPE.ROOT.PRI>
-	<CABBYNZJsbwsT9d5AxpDwtWVZFw60mY5TevGbTJqO_AowV4G2fw@mail.gmail.com>
-	<CANq1E4SdffkdwvH1WhjqZ9V0GHLs0TUq-rQRj7tEVvhuzQL-TA@mail.gmail.com>
-	<CABBYNZJLdVouwdcCD2zw9UnrcvubwutNGU4qbHJN75Qx3FpEow@mail.gmail.com>
-	<34DE67E73839C446B4269BCE8A1F303A01248EE0BC@CAMEUREXM01.EUROPE.ROOT.PRI>
- <CANq1E4Rwfq4hNGFLKv9VCkcodW+0V0-8ZjB6EgaKhKdpmG16iA@mail.gmail.com>
-In-Reply-To: <CANq1E4Rwfq4hNGFLKv9VCkcodW+0V0-8ZjB6EgaKhKdpmG16iA@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ] core: Fix Device1.Disconnect not always disabling auto connect
+Date: Tue,  5 Aug 2014 16:30:46 +0300
+Message-Id: <1407245446-16366-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-SGVsbG8sDQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJv
-bTogRGF2aWQgSGVycm1hbm4gW21haWx0bzpkaC5oZXJybWFubkBnbWFpbC5j
-b21dDQo+IFNlbnQ6IDA1IEF1Z3VzdCAyMDE0IDE0OjI2DQo+IFRvOiBBcmF2
-aW5kIFBhcnZhdGhhbGENCj4gQ2M6IEx1aXogQXVndXN0byB2b24gRGVudHo7
-IE11cmF0IEtpbGl2YW47IGxpbnV4LWJsdWV0b290aEB2Z2VyLmtlcm5lbC5v
-cmcNCj4gU3ViamVjdDogUmU6IFJlOiBIb0c6IFN1cHBvcnQgbXVsdGkgb3V0
-cHV0IHJlcG9ydA0KPiANCj4gSGkNCj4gDQo+ID4+ID4gT2ssIEkgbm93IHRv
-b2sgdGhlIHRpbWUgdG8gcmVhZCB0aHJvdWdoIHRoZSBIb0cgc3BlY3MuIEl0
-IHNheXM6DQo+ID4+ID4NCj4gPj4gPiAgICAgIkZvciBkYXRhIHRyYW5zZmVy
-cmVkIHRvIEhJRCBEZXZpY2UgZnJvbSBSZXBvcnQgSG9zdCwNCj4gPj4gPiAg
-ICAgIFJlcG9ydCBJRCBpcyByZW1vdmVkIGZyb20gZGF0YSByZWNlaXZlZCBm
-cm9tIGENCj4gPj4gPiAgICAgIFVTQiBISUQgQ2xhc3MgZHJpdmVyIGJlZm9y
-ZSBiZWluZyB0cmFuc21pdHRlZCB0byB0aGUNCj4gPj4gPiAgICAgIEhJRCBE
-ZXZpY2UgKHVzdWFsbHkgYSB3cml0ZSBjb21tYW5kIHRvIGEgUmVwb3J0DQo+
-ID4+ID4gICAgICBjaGFyYWN0ZXJpc3RpYyB2YWx1ZSBvciBhcyBhIHdyaXRl
-IHJlcXVlc3QgdG8gYQ0KPiA+PiA+ICAgICAgUmVwb3J0IGNoYXJhY3Rlcmlz
-dGljIHZhbHVlIGZvciBISUQgU2VydmljZSBkYXRhKS4iDQo+ID4+ID4NCj4g
-Pj4gPiBFYWNoIFVISURfT1VUUFVUIG1lc3NhZ2UgcmVjZWl2ZWQgYnkgQmx1
-ZVogY29udGFpbnMgdGhlIHJlcG9ydC1JRA0KPiA+PiA+IGFzIDEtYnl0ZSBw
-cmVmaXggb2YgdGhlIG1lc3NhZ2UuIFRoZXJlZm9yZSwgeW91J3JlIHN1cHBv
-c2VkIHRvDQo+ID4+ID4gc3RyaXAgaXQgZnJvbSB0aGUgbWVzc2FnZSBhbmQg
-Zm9yd2FyZCBpdCB0byB0aGUgcmlnaHQgdGFyZ2V0Lg0KPiA+PiA+DQo+ID4+
-ID4gSSBoYXZlIG5vIGlkZWEgaG93IEdBVFQgd29ya3MsIGJ1dCBJIGFzc3Vt
-ZSB5b3Ugd3JpdGUgdG8gYW4NCj4gPj4gPiBhdHRyaWJ1dGUgdGhhdCBpcyBu
-YW1lZCBhZnRlciB0aGUgcmVwb3J0LUlEIG9mIHRoZSBvdXRwdXQgcmVwb3J0
-Lg0KPiA+PiA+IFNvIHlvdSBwYXJzZSB0aGlzIDEtYnl0ZSBwcmVmaXgsIHNl
-bGVjdCB0aGUgY29ycmVjdCBhdHRyaWJ1dGUgYmFzZWQNCj4gPj4gPiBvbiB0
-aGlzIGluZm9ybWF0aW9uIGFuZCB0aGVuIHNlbmQgdGhlIG1lc3NhZ2UgKHdp
-dGhvdXQgdGhlIDEtYnl0ZQ0KPiA+PiA+IHByZWZpeCkgdG8gdGhlIHNlbGVj
-dGVkIGF0dHJpYnV0ZS4NCj4gPg0KPiA+IEZvciBlYWNoIHJlcG9ydCAobm90
-ZSB0aGF0IGl0IGlzIG5vdCBmb3IgZWFjaCByZXBvcnQgSUQsIGJlY2F1c2Ug
-eW91IGNvdWxkDQo+IGhhdmUgYW4gaW5wdXQsIGFuIG91dHB1dCBhcyB3ZWxs
-IGFzIGEgZmVhdHVyZSByZXBvcnQgYWxsIG9mIHdoaWNoIGFyZSB1c2luZyB0
-aGUNCj4gc2FtZSByZXBvcnQgSUQpLCB0aGVyZSBpcyBhIGNvcnJlc3BvbmRp
-bmcgY2hhcmFjdGVyaXN0aWMgd2hpY2ggaXMgZGlzY292ZXJhYmxlLg0KPiBU
-aGUgcmVwb3J0IG1hcCBpbmRpY2F0ZXMgd2hpY2ggYXJlIGFsbCB0aGUgcmVw
-b3J0IElEcyBhbmQgdGhlIGNvcnJlc3BvbmRpbmcNCj4gdHlwZSAocHVycG9z
-ZSkuIEFzIHNob3duIGJ5IE11cmF0LCB0aGUgZGVidWcgbG9ncyBzaG93IHRo
-YXQgYWxsIHRob3NlDQo+IHJlcG9ydCBJRHMgd2VyZSBkaXNjb3ZlcmVkIGZy
-b20gdGhlIHJlcG9ydCBtYXAuDQo+ID4NCj4gPiBFYWNoIGRlZGljYXRlZCBj
-aGFyYWN0ZXJpc3RpYyBmb3IgZWFjaCBvZiB0aGUgcmVwb3J0cywgY2Fycnkg
-YSAiUmVwb3J0DQo+IFJlZmVyZW5jZSBjaGFyYWN0ZXJpc3RpYyBkZXNjcmlw
-dG9yIiB3aGljaCBzcGVjaWZpZXMgdGhlIHJlcG9ydCBJRCBhbmQgcmVwb3J0
-DQo+IHR5cGUgYXNzb2NpYXRlZCB3aXRoIHRoYXQgY2hhcmFjdGVyaXN0aWMu
-IEhlbmNlIEkgd291bGQgaW1hZ2luZSB0aGUgYmx1ZS16DQo+IGRyaXZlciB3
-b3VsZCBuZWVkIHRvIGtlZXAgdGhlIG1hcHBpbmcgb2YgcmVwb3J0IElEL1R5
-cGUgVnMgdGhlDQo+IENoYXJhY3RlcmlzdGljIGhhbmRsZS4NCj4gPg0KPiA+
-IEZvciBhbiBvdXRwdXQgcmVwb3J0LCB0aGUgZHJpdmVyIHdvdWxkIGRpcmVj
-dCB0aGUgY29udGVudHMgb2YgdGhlIHJlcG9ydA0KPiBvdmVyIHRoZSBjb3Jy
-ZXNwb25kaW5nIGhhbmRsZSBhcyAiV3JpdGUgcmVxdWVzdCIuIFRoaXMgZGF0
-YSB3aWxsIG5vdCBoYXZlDQo+IChhbmQgZG9lcyBub3QgbmVlZCB0byBoYXZl
-KSB0aGUgcmVwb3J0IElEIGFzIHRoZSBCTEUgZGV2aWNlIGFscmVhZHkga25v
-d3MNCj4gd2hpY2ggcmVwb3J0IElEIGlzIGFzc29jaWF0ZWQgd2l0aCB0aGUg
-Y2hhcmFjdGVyaXN0aWMgaGFuZGxlLg0KPiA+DQo+ID4gRm9yIGFuIGlucHV0
-IHJlcG9ydCwgaXTigJlzIHRoZSBzYW1lIGV4Y2VwdCB0aGF0IHRoZSBCTEUg
-ZGV2aWNlIHdpbGwgaXNzdWUgYQ0KPiB3cml0ZSByZXF1ZXN0IHRvIHRoZSBC
-bHVlLXogaG9zdCBvbiB0aGUgY29ycmVzcG9uZGluZyBoYW5kbGUuIEFnYWlu
-IHRoZQ0KPiBwYXlsb2FkIHdpbGwgbm90IGhhdmUgYW55IHJlcG9ydCBJRCwg
-YmVjYXVzZSB0aGUgQmx1ZS16IGhvc3QgaXMgZXhwZWN0ZWQgdG8NCj4gYmUg
-YWJsZSB0byBtYXAgdGhlIHBheWxvYWQgb2YgdGhlIG9yaWdpbmF0aW5nIGNo
-YXJhY3RlcmlzdGljIGhhbmRsZSB0byB0aGUNCj4gY29ycmVzcG9uZGluZyBp
-bnB1dCByZXBvcnQgSUQuDQo+ID4NCj4gPiBTYW1lIGlzIGFwcGxpY2FibGUg
-dG8gdGhlIGZlYXR1cmUgcmVwb3J0IGFzIHdlbGwgYnV0IGluIHRoaXMgY2Fz
-ZSAsIEkgaW1hZ2luZSBpdA0KPiBpcyBhIHJlYWQvd3JpdGUgcmVxdWVzdC1y
-ZXNwb25zZSB0eXBlIG9mIGV4Y2hhbmdlIGFzIHlvdSB3b3VsZA0KPiByZWFk
-aW5nL3dyaXRpbmcgc3RhdGljIGNvbmZpZ3VyYXRpb24gZGF0YSByYXRoZXIu
-DQo+ID4NCj4gPg0KPiA+IFNvIGl0IGlzIG5vdCByZWFsbHkgYSBDaGFyYWN0
-ZXJpc3RpYyAgYXR0cmlidXRlIG5hbWVkIGFmdGVyIHRoZSByZXBvcnQtSUQs
-IGJ1dA0KPiBtYXBwZWQgdG8gYSByZXBvcnQgSUQuIEFzIHN0YXRlZCBlYXJs
-aWVyLCB0aGUgYXNzb2NpYXRlZCAiIFJlcG9ydCBSZWZlcmVuY2UNCj4gY2hh
-cmFjdGVyaXN0aWMgZGVzY3JpcHRvciAiIGhvbGRzIHRoZSBpbmZvcm1hdGlv
-biB3aGljaCBpcyBrZXkgdG8gdHJhbnNsYXRlDQo+IGZyb20gdGhlIEJMRSBk
-YXRhIHRvIHRoZSBISUQgZGF0YSBhbmQgdmljZS12ZXJzYS4NCj4gDQo+IFll
-cywgdGhpcyB3YXMgcmVhbGx5IGhlbHBmdWwsIHRoYW5rcyEgVGhlIEJsdWVa
-IGNvZGUgbG9va3MgYWxtb3N0IHJpZ2h0LCBleGNlcHQNCj4gZm9yIHRoZSBj
-b2RlIHRoYXQgbWFwcyBVSElEX09VVFBVVCBldmVudHMgZnJvbSB0aGUga2Vy
-bmVsIHRvIHRoZSBjb3JyZWN0DQo+IGF0dHJpYnV0ZS4gSXQgY3VycmVudGx5
-IG9ubHkgdXNlcyB0aGUgdHlwZSBpbmZvcm1hdGlvbi4gSSB3aWxsIHNlbmQg
-YSBwYXRjaCB0byBmaXgNCj4gdGhpcy4NCg0KRXhjZWxsZW50IHRoYW5rcywg
-dGhhdCBtYWtlcyBzZW5zZS4gSWYgaXQgaXMgb25seSB1c2luZyB0aGUgdHlw
-ZSBpbmZvcm1hdGlvbiBpdCB3b3VsZCBwcm9iYWJseSBiZSBleHBlY3Rpbmcg
-dGhhdCBhIGdpdmVuIEhJRCByYXcgZGV2aWNlIHdpbGwgZXZlciBoYXZlIG9u
-bHkgYSBzaW5nbGUgcmVwb3J0IG9mIGEgZ2l2ZW4gdHlwZS4gV2hpbGUgdGhp
-cyBtaWdodCBiZSB0aGUgbWFqb3JpdHkgY2FzZSwgSElEIGRvZXNuJ3QgaW1w
-b3NlIHN1Y2ggcmVzdHJpY3Rpb25zLiBTbyB5b3VyIHBhdGNoIHdvdWxkIGJl
-IHF1aXRlIHVzZWZ1bC4NCg0KSSBkb24ndCBrbm93IGlmIE11cmF0IChvciBh
-bnlvbmUpIG1lbnRpb25lZCB0aGlzLCBidXQgYXBwYXJlbnRseSBpdCB3YXMg
-aW1wbGVtZW50ZWQgY29ycmVjdGx5IG9uIHRoZSBBbmRyb2lkIGhvc3RzIChJ
-IGJlbGlldmUgNC40LngpLiAgSSB3YXMgdG9sZCB0aGF0J3MgYSB2YXJpYW50
-IG9mIEJsdWUteiBjYWxsZWQgQmx1ZWRyb2lkLCBidXQgdGhhdCBjb3VsZCBi
-ZSBhIHJlZmVyZW5jZSBpZiB0aGVyZSBpcyBhbnkgZnVydGhlciBjb25mdXNp
-b25zIG9uIHdoYXQgbWlnaHQgYmUgdGhlIHJpZ2h0IHRoaW5nIHRvIGRvLg0K
-DQpDaGVlcnMsDQpBcmF2aW5kDQoKCk1lbWJlciBvZiB0aGUgQ1NSIHBsYyBn
-cm91cCBvZiBjb21wYW5pZXMuIENTUiBwbGMgcmVnaXN0ZXJlZCBpbiBFbmds
-YW5kIGFuZCBXYWxlcywgcmVnaXN0ZXJlZCBudW1iZXIgNDE4NzM0NiwgcmVn
-aXN0ZXJlZCBvZmZpY2UgQ2h1cmNoaWxsIEhvdXNlLCBDYW1icmlkZ2UgQnVz
-aW5lc3MgUGFyaywgQ293bGV5IFJvYWQsIENhbWJyaWRnZSwgQ0I0IDBXWiwg
-VW5pdGVkIEtpbmdkb20KTW9yZSBpbmZvcm1hdGlvbiBjYW4gYmUgZm91bmQg
-YXQgd3d3LmNzci5jb20uIEtlZXAgdXAgdG8gZGF0ZSB3aXRoIENTUiBvbiBv
-dXIgdGVjaG5pY2FsIGJsb2csIHd3dy5jc3IuY29tL2Jsb2csIENTUiBwZW9w
-bGUgYmxvZywgd3d3LmNzci5jb20vcGVvcGxlLCBZb3VUdWJlLCB3d3cueW91
-dHViZS5jb20vdXNlci9DU1JwbGMsIEZhY2Vib29rLCB3d3cuZmFjZWJvb2su
-Y29tL3BhZ2VzL0NTUi8xOTEwMzg0MzQyNTM1MzQsIG9yIGZvbGxvdyB1cyBv
-biBUd2l0dGVyIGF0IHd3dy50d2l0dGVyLmNvbS9DU1JfcGxjLgpOZXcgZm9y
-IDIwMTQsIHlvdSBjYW4gbm93IGFjY2VzcyB0aGUgd2lkZSByYW5nZSBvZiBw
-cm9kdWN0cyBwb3dlcmVkIGJ5IGFwdFggYXQgd3d3LmFwdHguY29tLgo=
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+
+Disconnect has the ability to disable auto connect temporarily until
+Connect is then called again, but currently it can only do that if
+the device is connected.
+---
+ src/device.c | 77 ++++++++++++++++++++++++++++++++----------------------------
+ 1 file changed, 41 insertions(+), 36 deletions(-)
+
+diff --git a/src/device.c b/src/device.c
+index 6eba0af..d63e627 100644
+--- a/src/device.c
++++ b/src/device.c
+@@ -1169,6 +1169,40 @@ void device_request_disconnect(struct btd_device *device, DBusMessage *msg)
+ 							device);
+ }
+ 
++static void device_set_auto_connect(struct btd_device *device, gboolean enable)
++{
++	char addr[18];
++
++	if (!device || !device->le)
++		return;
++
++	ba2str(&device->bdaddr, addr);
++
++	DBG("%s auto connect: %d", addr, enable);
++
++	if (device->auto_connect == enable)
++		return;
++
++	device->auto_connect = enable;
++
++	/* Disabling auto connect */
++	if (enable == FALSE) {
++		adapter_connect_list_remove(device->adapter, device);
++		adapter_auto_connect_remove(device->adapter, device);
++		return;
++	}
++
++	/* Enabling auto connect */
++	adapter_auto_connect_add(device->adapter, device);
++
++	if (device->attrib) {
++		DBG("Already connected");
++		return;
++	}
++
++	adapter_connect_list_add(device->adapter, device);
++}
++
+ static DBusMessage *dev_disconnect(DBusConnection *conn, DBusMessage *msg,
+ 							void *user_data)
+ {
+@@ -1178,8 +1212,10 @@ static DBusMessage *dev_disconnect(DBusConnection *conn, DBusMessage *msg,
+ 	 * Disable connections through passive scanning until
+ 	 * Device1.Connect is called
+ 	 */
+-	if (device->auto_connect)
++	if (device->auto_connect) {
+ 		device->disable_auto_connect = TRUE;
++		device_set_auto_connect(device, FALSE);
++	}
+ 
+ 	device_request_disconnect(device, msg);
+ 
+@@ -1484,7 +1520,10 @@ static DBusMessage *dev_connect(DBusConnection *conn, DBusMessage *msg,
+ 
+ 		btd_device_set_temporary(dev, FALSE);
+ 
+-		dev->disable_auto_connect = FALSE;
++		if (dev->disable_auto_connect) {
++			dev->disable_auto_connect = FALSE;
++			device_set_auto_connect(dev, TRUE);
++		}
+ 
+ 		err = device_connect_le(dev);
+ 		if (err < 0)
+@@ -4099,40 +4138,6 @@ void device_set_rssi(struct btd_device *device, int8_t rssi)
+ 						DEVICE_INTERFACE, "RSSI");
+ }
+ 
+-static void device_set_auto_connect(struct btd_device *device, gboolean enable)
+-{
+-	char addr[18];
+-
+-	if (!device || !device->le)
+-		return;
+-
+-	ba2str(&device->bdaddr, addr);
+-
+-	DBG("%s auto connect: %d", addr, enable);
+-
+-	if (device->auto_connect == enable)
+-		return;
+-
+-	device->auto_connect = enable;
+-
+-	/* Disabling auto connect */
+-	if (enable == FALSE) {
+-		adapter_connect_list_remove(device->adapter, device);
+-		adapter_auto_connect_remove(device->adapter, device);
+-		return;
+-	}
+-
+-	/* Enabling auto connect */
+-	adapter_auto_connect_add(device->adapter, device);
+-
+-	if (device->attrib) {
+-		DBG("Already connected");
+-		return;
+-	}
+-
+-	adapter_connect_list_add(device->adapter, device);
+-}
+-
+ static gboolean start_discovery(gpointer user_data)
+ {
+ 	struct btd_device *device = user_data;
+-- 
+1.9.3
+
