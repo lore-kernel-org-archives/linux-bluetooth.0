@@ -1,194 +1,135 @@
 Return-Path: <cyrus@holtmann.org>
-From: Aravind Parvathala <Aravind.Parvathala@csr.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	David Herrmann <dh.herrmann@gmail.com>
-CC: Murat Kilivan <Murat.Kilivan@csr.com>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: RE: Re: HoG: Support multi output report
-Date: Tue, 5 Aug 2014 12:43:23 +0000
-Message-ID: <34DE67E73839C446B4269BCE8A1F303A01248EE0BC@CAMEUREXM01.EUROPE.ROOT.PRI>
+MIME-Version: 1.0
+In-Reply-To: <CABBYNZJLdVouwdcCD2zw9UnrcvubwutNGU4qbHJN75Qx3FpEow@mail.gmail.com>
 References: <34DE67E73839C446B4269BCE8A1F303A01248EBDD5@CAMEUREXM01.EUROPE.ROOT.PRI>
 	<CABBYNZJsbwsT9d5AxpDwtWVZFw60mY5TevGbTJqO_AowV4G2fw@mail.gmail.com>
 	<CANq1E4SdffkdwvH1WhjqZ9V0GHLs0TUq-rQRj7tEVvhuzQL-TA@mail.gmail.com>
- <CABBYNZJLdVouwdcCD2zw9UnrcvubwutNGU4qbHJN75Qx3FpEow@mail.gmail.com>
-In-Reply-To: <CABBYNZJLdVouwdcCD2zw9UnrcvubwutNGU4qbHJN75Qx3FpEow@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+	<CABBYNZJLdVouwdcCD2zw9UnrcvubwutNGU4qbHJN75Qx3FpEow@mail.gmail.com>
+Date: Tue, 5 Aug 2014 14:33:56 +0200
+Message-ID: <CANq1E4Tgf=EY2ixrTCpOcf5OKjWVBiufO9N9-3breZA_eCPY5w@mail.gmail.com>
+Subject: Re: Re: HoG: Support multi output report
+From: David Herrmann <dh.herrmann@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: Murat Kilivan <Murat.Kilivan@csr.com>,
+	Aravind Parvathala <Aravind.Parvathala@csr.com>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-SGkgRGF2aWQgYW5kIEx1aXosDQoJSSBhbSBub3QgZmFtaWxpYXIgdG8gdGhl
-IGltcGxlbWVudGF0aW9uIG9mIHRoZSBrZXJuZWwgZHJpdmVyIGZvciBCbHVl
-LXogc28gbXkgY29tbWVudHMgYXJlIG1vcmUgZ2VuZXJhbCBmcm9tIHRoZSBC
-TEUgSElEIHNlcnZpY2UgcGVyc3BlY3RpdmUuDQoNCj4gLS0tLS1PcmlnaW5h
-bCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogTHVpeiBBdWd1c3RvIHZvbiBEZW50
-eiBbbWFpbHRvOmx1aXouZGVudHpAZ21haWwuY29tXQ0KPiBTZW50OiAwNSBB
-dWd1c3QgMjAxNCAxMzoyMg0KPiBUbzogRGF2aWQgSGVycm1hbm4NCj4gQ2M6
-IE11cmF0IEtpbGl2YW47IEFyYXZpbmQgUGFydmF0aGFsYTsgbGludXgtYmx1
-ZXRvb3RoQHZnZXIua2VybmVsLm9yZw0KPiBTdWJqZWN0OiBSZTogUmU6IEhv
-RzogU3VwcG9ydCBtdWx0aSBvdXRwdXQgcmVwb3J0DQo+IA0KPiBIaSBEYXZp
-ZCwNCj4gDQo+IE9uIFR1ZSwgQXVnIDUsIDIwMTQgYXQgMjo1NSBQTSwgRGF2
-aWQgSGVycm1hbm4gPGRoLmhlcnJtYW5uQGdtYWlsLmNvbT4NCj4gd3JvdGU6
-DQo+ID4gSGkNCj4gPg0KPiA+IE9uIE1vbiwgQXVnIDQsIDIwMTQgYXQgMTA6
-MjEgQU0sIEx1aXogQXVndXN0byB2b24gRGVudHoNCj4gPiA8bHVpei5kZW50
-ekBnbWFpbC5jb20+IHdyb3RlOg0KPiA+Pj4gV2hhdCBkaWQgeW91IG1lYW4g
-YnkgYW5vdGhlciBpbnN0YW5jZT8gSXMgdGhlcmUgYSB3YXkgdG8gY29uZmln
-dXJlIHRoZQ0KPiBibHVlLXogc3RhY2sgdG8gY3JlYXRlIHNlcGFyYXRlIGlu
-c3RhbmNlcyAoYXJlIHRoZXkgaGlkcmF3IGRldmljZSBpbnN0YW5jZXMgb3IN
-Cj4gc29tZXRoaW5nIGVsc2UpIGZvciBlYWNoIG9mIHRoZSBISUQgb3V0cHV0
-IHJlcG9ydD8NCj4gPj4NCj4gPj4gVGFrZSBhIGxvb2sgYXQgYW5kcm9pZC9o
-b2cuYyBpdCBzdXBwb3J0cyBtdWx0aXBsZSBpbnN0YW5jZXMgYWxyZWFkeQ0K
-PiA+PiB5b3UgYmFzaWNhbGx5IGNhbiBoYXZlIG1vcmUgdGhhbiBvbmUgSElE
-IHNlcnZpY2UgaW4geW91ciBwcmltYXJpZXMNCj4gPj4gd2hpY2ggSSBiZWxp
-ZXZlIGlzIHdoYXQgUFRTIGRvZXMuDQo+ID4+DQo+ID4+PiBBbnkgc3VnZ2Vz
-dGlvbnMgb24gaG93IHRvIGFjaGlldmUgdGhhdD8gQ2FuIHRoZSBISUQgcmVw
-b3J0IG1hcCBiZQ0KPiBjb25maWd1cmVkIHN1Y2ggdGhhdCB0aGVyZSBhcmUg
-dHdvIGRpZmZlcmVudCBjb2xsZWN0aW9ucywgZWFjaCB3aXRoIG9uZQ0KPiBv
-dXRwdXQgcmVwb3J0IHNvIHRoYXQgdGhlIGtlcm5lbCBlbnVtZXJhdGVzIHRo
-ZW0gYXMgdHdvIGRpZmZlcmVudCBkZXZpY2UNCj4gaW5zdGFuY2VzPw0KPiA+
-Pg0KPiA+PiBUaGV5IGFyZSB0d28gY29tcGxldGVseSBzZXBhcmF0ZSBpbnN0
-YW5jZXMgd2l0aCB0aGVpciBvd24gcmVwb3J0IG1hcA0KPiA+PiBhbmQgaW4g
-dGhhdCBjYXNlIHdlIHdvdWxkIGNyZWF0ZSBlYWNoIGluZGl2aWR1YWwgaW5z
-dGFuY2UgYXMgYQ0KPiA+PiBzZXBhcmF0ZSB1SElEIGRldmljZS4NCj4gPj4N
-Cj4gPj4gQERhdmlkOiBJZiB3ZSBnb3QgbXVsdGlwbGUgb3V0cHV0IHJlcG9y
-dHMgaG93IGRvIHRoZSBkcml2ZXIgZGlzY292ZXINCj4gdGhlbT8NCj4gPg0K
-PiA+IE9rLCBJIG5vdyB0b29rIHRoZSB0aW1lIHRvIHJlYWQgdGhyb3VnaCB0
-aGUgSG9HIHNwZWNzLiBJdCBzYXlzOg0KPiA+DQo+ID4gICAgICJGb3IgZGF0
-YSB0cmFuc2ZlcnJlZCB0byBISUQgRGV2aWNlIGZyb20gUmVwb3J0IEhvc3Qs
-DQo+ID4gICAgICBSZXBvcnQgSUQgaXMgcmVtb3ZlZCBmcm9tIGRhdGEgcmVj
-ZWl2ZWQgZnJvbSBhDQo+ID4gICAgICBVU0IgSElEIENsYXNzIGRyaXZlciBi
-ZWZvcmUgYmVpbmcgdHJhbnNtaXR0ZWQgdG8gdGhlDQo+ID4gICAgICBISUQg
-RGV2aWNlICh1c3VhbGx5IGEgd3JpdGUgY29tbWFuZCB0byBhIFJlcG9ydA0K
-PiA+ICAgICAgY2hhcmFjdGVyaXN0aWMgdmFsdWUgb3IgYXMgYSB3cml0ZSBy
-ZXF1ZXN0IHRvIGENCj4gPiAgICAgIFJlcG9ydCBjaGFyYWN0ZXJpc3RpYyB2
-YWx1ZSBmb3IgSElEIFNlcnZpY2UgZGF0YSkuIg0KPiA+DQo+ID4gRWFjaCBV
-SElEX09VVFBVVCBtZXNzYWdlIHJlY2VpdmVkIGJ5IEJsdWVaIGNvbnRhaW5z
-IHRoZSByZXBvcnQtSUQgYXMNCj4gPiAxLWJ5dGUgcHJlZml4IG9mIHRoZSBt
-ZXNzYWdlLiBUaGVyZWZvcmUsIHlvdSdyZSBzdXBwb3NlZCB0byBzdHJpcCBp
-dA0KPiA+IGZyb20gdGhlIG1lc3NhZ2UgYW5kIGZvcndhcmQgaXQgdG8gdGhl
-IHJpZ2h0IHRhcmdldC4NCj4gPg0KPiA+IEkgaGF2ZSBubyBpZGVhIGhvdyBH
-QVRUIHdvcmtzLCBidXQgSSBhc3N1bWUgeW91IHdyaXRlIHRvIGFuIGF0dHJp
-YnV0ZQ0KPiA+IHRoYXQgaXMgbmFtZWQgYWZ0ZXIgdGhlIHJlcG9ydC1JRCBv
-ZiB0aGUgb3V0cHV0IHJlcG9ydC4gU28geW91IHBhcnNlDQo+ID4gdGhpcyAx
-LWJ5dGUgcHJlZml4LCBzZWxlY3QgdGhlIGNvcnJlY3QgYXR0cmlidXRlIGJh
-c2VkIG9uIHRoaXMNCj4gPiBpbmZvcm1hdGlvbiBhbmQgdGhlbiBzZW5kIHRo
-ZSBtZXNzYWdlICh3aXRob3V0IHRoZSAxLWJ5dGUgcHJlZml4KSB0bw0KPiA+
-IHRoZSBzZWxlY3RlZCBhdHRyaWJ1dGUuDQoNCkZvciBlYWNoIHJlcG9ydCAo
-bm90ZSB0aGF0IGl0IGlzIG5vdCBmb3IgZWFjaCByZXBvcnQgSUQsIGJlY2F1
-c2UgeW91IGNvdWxkIGhhdmUgYW4gaW5wdXQsIGFuIG91dHB1dCBhcyB3ZWxs
-IGFzIGEgZmVhdHVyZSByZXBvcnQgYWxsIG9mIHdoaWNoIGFyZSB1c2luZyB0
-aGUgc2FtZSByZXBvcnQgSUQpLCB0aGVyZSBpcyBhIGNvcnJlc3BvbmRpbmcg
-Y2hhcmFjdGVyaXN0aWMgd2hpY2ggaXMgZGlzY292ZXJhYmxlLiBUaGUgcmVw
-b3J0IG1hcCBpbmRpY2F0ZXMgd2hpY2ggYXJlIGFsbCB0aGUgcmVwb3J0IElE
-cyBhbmQgdGhlIGNvcnJlc3BvbmRpbmcgdHlwZSAocHVycG9zZSkuIEFzIHNo
-b3duIGJ5IE11cmF0LCB0aGUgZGVidWcgbG9ncyBzaG93IHRoYXQgYWxsIHRo
-b3NlIHJlcG9ydCBJRHMgd2VyZSBkaXNjb3ZlcmVkIGZyb20gdGhlIHJlcG9y
-dCBtYXAuIA0KDQpFYWNoIGRlZGljYXRlZCBjaGFyYWN0ZXJpc3RpYyBmb3Ig
-ZWFjaCBvZiB0aGUgcmVwb3J0cywgY2FycnkgYSAiUmVwb3J0IFJlZmVyZW5j
-ZSBjaGFyYWN0ZXJpc3RpYyBkZXNjcmlwdG9yIiB3aGljaCBzcGVjaWZpZXMg
-dGhlIHJlcG9ydCBJRCBhbmQgcmVwb3J0IHR5cGUgYXNzb2NpYXRlZCB3aXRo
-IHRoYXQgY2hhcmFjdGVyaXN0aWMuIEhlbmNlIEkgd291bGQgaW1hZ2luZSB0
-aGUgYmx1ZS16IGRyaXZlciB3b3VsZCBuZWVkIHRvIGtlZXAgdGhlIG1hcHBp
-bmcgb2YgcmVwb3J0IElEL1R5cGUgVnMgdGhlIENoYXJhY3RlcmlzdGljIGhh
-bmRsZS4NCg0KRm9yIGFuIG91dHB1dCByZXBvcnQsIHRoZSBkcml2ZXIgd291
-bGQgZGlyZWN0IHRoZSBjb250ZW50cyBvZiB0aGUgcmVwb3J0IG92ZXIgdGhl
-IGNvcnJlc3BvbmRpbmcgaGFuZGxlIGFzICJXcml0ZSByZXF1ZXN0Ii4gVGhp
-cyBkYXRhIHdpbGwgbm90IGhhdmUgKGFuZCBkb2VzIG5vdCBuZWVkIHRvIGhh
-dmUpIHRoZSByZXBvcnQgSUQgYXMgdGhlIEJMRSBkZXZpY2UgYWxyZWFkeSBr
-bm93cyB3aGljaCByZXBvcnQgSUQgaXMgYXNzb2NpYXRlZCB3aXRoIHRoZSBj
-aGFyYWN0ZXJpc3RpYyBoYW5kbGUuDQoNCkZvciBhbiBpbnB1dCByZXBvcnQs
-IGl04oCZcyB0aGUgc2FtZSBleGNlcHQgdGhhdCB0aGUgQkxFIGRldmljZSB3
-aWxsIGlzc3VlIGEgd3JpdGUgcmVxdWVzdCB0byB0aGUgQmx1ZS16IGhvc3Qg
-b24gdGhlIGNvcnJlc3BvbmRpbmcgaGFuZGxlLiBBZ2FpbiB0aGUgcGF5bG9h
-ZCB3aWxsIG5vdCBoYXZlIGFueSByZXBvcnQgSUQsIGJlY2F1c2UgdGhlIEJs
-dWUteiBob3N0IGlzIGV4cGVjdGVkIHRvIGJlIGFibGUgdG8gbWFwIHRoZSBw
-YXlsb2FkIG9mIHRoZSBvcmlnaW5hdGluZyBjaGFyYWN0ZXJpc3RpYyBoYW5k
-bGUgdG8gdGhlIGNvcnJlc3BvbmRpbmcgaW5wdXQgcmVwb3J0IElELg0KDQpT
-YW1lIGlzIGFwcGxpY2FibGUgdG8gdGhlIGZlYXR1cmUgcmVwb3J0IGFzIHdl
-bGwgYnV0IGluIHRoaXMgY2FzZSAsIEkgaW1hZ2luZSBpdCBpcyBhIHJlYWQv
-d3JpdGUgcmVxdWVzdC1yZXNwb25zZSB0eXBlIG9mIGV4Y2hhbmdlIGFzIHlv
-dSB3b3VsZCByZWFkaW5nL3dyaXRpbmcgc3RhdGljIGNvbmZpZ3VyYXRpb24g
-ZGF0YSByYXRoZXIuDQoNCg0KU28gaXQgaXMgbm90IHJlYWxseSBhIENoYXJh
-Y3RlcmlzdGljICBhdHRyaWJ1dGUgbmFtZWQgYWZ0ZXIgdGhlIHJlcG9ydC1J
-RCwgYnV0IG1hcHBlZCB0byBhIHJlcG9ydCBJRC4gQXMgc3RhdGVkIGVhcmxp
-ZXIsIHRoZSBhc3NvY2lhdGVkICIgUmVwb3J0IFJlZmVyZW5jZSBjaGFyYWN0
-ZXJpc3RpYyBkZXNjcmlwdG9yICIgaG9sZHMgdGhlIGluZm9ybWF0aW9uIHdo
-aWNoIGlzIGtleSB0byB0cmFuc2xhdGUgZnJvbSB0aGUgQkxFIGRhdGEgdG8g
-dGhlIEhJRCBkYXRhIGFuZCB2aWNlLXZlcnNhLg0KDQo+ID4NCj4gPiBMb29r
-aW5nIGF0IGhvZy5jIGluIHRoZSBpbnB1dC1wcm9maWxlLCBJIGNhbiBzZWUg
-dGhpczoNCj4gPg0KPiA+DQo+ID4gICAgICAgICBzdGF0aWMgaW50IHJlcG9y
-dF90eXBlX2NtcChnY29uc3Rwb2ludGVyIGEsDQo+ID4gICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgZ2NvbnN0cG9p
-bnRlciBiKQ0KPiA+ICAgICAgICAgew0KPiA+ICAgICAgICAgICAgICAgIGNv
-bnN0IHN0cnVjdCByZXBvcnQgKnJlcG9ydCA9IGE7DQo+ID4gICAgICAgICAg
-ICAgICAgdWludDhfdCB0eXBlID0gR1BPSU5URVJfVE9fVUlOVChiKTsNCj4g
-Pg0KPiA+ICAgICAgICAgICAgICAgIHJldHVybiByZXBvcnQtPnR5cGUgLSB0
-eXBlOw0KPiA+ICAgICAgICAgfQ0KPiA+DQo+ID4gICAgICAgICAuLi5mb3J3
-YXJkX3JlcG9ydCgpLi4uDQo+ID4gICAgICAgICBsID0gZ19zbGlzdF9maW5k
-X2N1c3RvbShob2dkZXYtPnJlcG9ydHMsDQo+ID4gICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgR1VJTlRfVE9fUE9J
-TlRFUih0eXBlKSwNCj4gPiAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICByZXBvcnRfdHlwZV9jbXApOw0KPiA+ICAg
-ICAgICAgaWYgKCFsKQ0KPiA+ICAgICAgICAgICAgICAgIHJldHVybjsNCj4g
-Pg0KPiA+IE5vdyBJIGFzc3VtZSB5b3UgcmF0aGVyIHdhbnQgdGhpczoNCj4g
-Pg0KPiA+ICAgICAgICAgc3RhdGljIGludCByZXBvcnRfdHlwZV9jbXAoZ2Nv
-bnN0cG9pbnRlciBhLA0KPiA+ICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgIGdjb25zdHBvaW50ZXIgYikNCj4gPiAg
-ICAgICAgIHsNCj4gPiAgICAgICAgICAgICAgICAgY29uc3Qgc3RydWN0IHJl
-cG9ydCAqcmVwb3J0ID0gYTsNCj4gPiAgICAgICAgICAgICAgICAgY29uc3Qg
-c3RydWN0IHJlcG9ydCAqY21wID0gYjsNCj4gPg0KPiA+ICAgICAgICAgICAg
-ICAgICBpZiAocmVwb3J0LT50eXBlICE9IGNtcC0+dHlwZSkNCj4gPiAgICAg
-ICAgICAgICAgICAgICAgICAgIHJldHVybiByZXBvcnQtPnR5cGUgLSBjbXAt
-PnR5cGU7DQo+ID4NCj4gPiAgICAgICAgICAgICAgICAgcmV0dXJuIHJlcG9y
-dC0+aWQgLSBjbXAtPmlkOw0KPiA+ICAgICAgICAgfQ0KPiANCj4gQnV0IHRo
-YXQgaXMgdGhlIHZlcnkgcXVlc3Rpb24sIGhvdyBjYW4gdGhlIGRyaXZlciBr
-bm93IHdoYXQgaWRzIHRvIHVzZSB0bw0KPiBtYWtlcyB1cyBhYmxlIHRvIG1h
-dGNoIGJ5IGlkIGxpa2UgeW91IGRpZCBhYm92ZSwgd2hlbiB3ZSBjcmVhdGUg
-dGhlIGRldmljZQ0KPiB3ZSBkb24ndCBzZWVtIHRvIGluZm9ybSB0aGUgcmVw
-b3J0IGlkcywgcGVyaGFwcyB3ZSBzaG91bGQgdHJ5IHRvIG1hdGNoIGJ5IGlk
-DQo+IGJ1dCBpZiB0aGF0IGZhaWxzIHVzZSB0aGUgY3VycmVudCBsb2dpYyB0
-byBtYXRjaCBieSB0eXBlIG90aGVyd2lzZSBpdCB3aWxsDQo+IHByb2JhYmx5
-IGJlIHZlcnkgaGFyZCB0byBjb21lIHVwIHdpdGggYSBnZW5lcmljIGRyaXZl
-ciB0aGF0IGRvZXNuJ3Qga25vdw0KPiB3aGF0IHJlcG9ydCBpZCB0byB1c2Ug
-b3IgcGVyaGFwcyB0aGUgZHJpdmVyIHNob3VsZCBuZXZlciBzZW5kIGFueSBv
-dXRwdXQNCj4gd2l0aG91dCBhIHByb3BlciByZXBvcnQgaWQ/DQo+IA0KPiA+
-ICAgICAgICAgLi4uZm9yd2FyZF9yZXBvcnQoKS4uLg0KPiA+ICAgICAgICAg
-c3RydWN0IHJlcG9ydCByZXAgPSB7IC50eXBlID0gSE9HUF9SRVBPUlRfVFlQ
-RV9PVVRQVVQsDQo+ID4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAuaWQgPSBob2dkZXYtPmhhc19yZXBvcnRfaWQgPw0KPiA+IGV2LT51Lm91
-dHB1dC5kYXRhWzBdIDogMCB9Ow0KPiA+ICAgICAgICAgbCA9IGdfc2xpc3Rf
-ZmluZF9jdXN0b20oaG9nZGV2LT5yZXBvcnRzLA0KPiA+ICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICZyZXAsDQo+
-ID4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgcmVwb3J0X3R5cGVfY21wKTsNCj4gPiAgICAgICAgIGlmICghbCkN
-Cj4gPiAgICAgICAgICAgICAgICByZXR1cm47DQo+ID4NCj4gPiAoc29ycnkg
-Zm9yIHRoZSBmb3JtYXR0aW5nLi4gSSBob3BlIHlvdSBnZXQgbXkgcG9pbnQp
-DQo+ID4NCj4gPiBOb3RlIHRoYXQgeW91ciBoYWNrIHdpdGggImhvZ2Rldi0+
-aGFzX3JlcG9ydF9pZCIgaXMgbm8gbG9uZ2VyIG5lZWRlZA0KPiA+IGluIG15
-IG5ldyBVSElEIGV4dGVuc2lvbnMuIFRoZSBrZXJuZWwgdGhlbiBpbmZvcm1z
-IHlvdSB3aGV0aGVyIHRoZQ0KPiA+IGRldmljZSB1c2VzIHJlcG9ydC1JRHMg
-b3Igbm90LiBUaGF0IGlzLCB5b3Uga25vdyBmb3Igc3VyZSB3aGV0aGVyIHRo
-ZQ0KPiA+IGZpcnN0IGJ5dGUgb2YgYSBtZXNzYWdlIGlzIGEgcmVwb3J0LUlE
-IG9yIHdoZXRoZXIgaXQgbXVzdCBiZSBza2lwcGVkLg0KPiANCj4gSSBqdXN0
-IHJlY2VudGx5IHN0YXJ0IGhhY2tpbmcgb24gaXQgc28gSSBkb24ndCBrbm93
-IGV4YWN0bHkgd2h5IHdlIGRpZCBoYXZlDQo+IGhhc19yZXBvcnRfaWQgaW4g
-dGhlIGZpcnN0IHBsYWNlLCBhbnl3YXkgZ29vZCB0aGF0IHdlIGFyZSBldm9s
-dmluZyB0aGlzIGNvZGUuDQo+IA0KPiAtLQ0KPiBMdWl6IEF1Z3VzdG8gdm9u
-IERlbnR6DQo+IA0KPiANCj4gIFRvIHJlcG9ydCB0aGlzIGVtYWlsIGFzIHNw
-YW0gY2xpY2sNCj4gaHR0cHM6Ly93d3cubWFpbGNvbnRyb2wuY29tL3NyL01a
-YnF2WXM1UXdKdnBlYWV0VXdoQ1E9PQ0KPiBQN0ghNzcwcDZCcVdFZWszdTEh
-RllIdE5sdVJjeDRabXg5bzJXR2tta2VLMFJwaGxiN0RUQT09IC4NCgoKTWVt
-YmVyIG9mIHRoZSBDU1IgcGxjIGdyb3VwIG9mIGNvbXBhbmllcy4gQ1NSIHBs
-YyByZWdpc3RlcmVkIGluIEVuZ2xhbmQgYW5kIFdhbGVzLCByZWdpc3RlcmVk
-IG51bWJlciA0MTg3MzQ2LCByZWdpc3RlcmVkIG9mZmljZSBDaHVyY2hpbGwg
-SG91c2UsIENhbWJyaWRnZSBCdXNpbmVzcyBQYXJrLCBDb3dsZXkgUm9hZCwg
-Q2FtYnJpZGdlLCBDQjQgMFdaLCBVbml0ZWQgS2luZ2RvbQpNb3JlIGluZm9y
-bWF0aW9uIGNhbiBiZSBmb3VuZCBhdCB3d3cuY3NyLmNvbS4gS2VlcCB1cCB0
-byBkYXRlIHdpdGggQ1NSIG9uIG91ciB0ZWNobmljYWwgYmxvZywgd3d3LmNz
-ci5jb20vYmxvZywgQ1NSIHBlb3BsZSBibG9nLCB3d3cuY3NyLmNvbS9wZW9w
-bGUsIFlvdVR1YmUsIHd3dy55b3V0dWJlLmNvbS91c2VyL0NTUnBsYywgRmFj
-ZWJvb2ssIHd3dy5mYWNlYm9vay5jb20vcGFnZXMvQ1NSLzE5MTAzODQzNDI1
-MzUzNCwgb3IgZm9sbG93IHVzIG9uIFR3aXR0ZXIgYXQgd3d3LnR3aXR0ZXIu
-Y29tL0NTUl9wbGMuCk5ldyBmb3IgMjAxNCwgeW91IGNhbiBub3cgYWNjZXNz
-IHRoZSB3aWRlIHJhbmdlIG9mIHByb2R1Y3RzIHBvd2VyZWQgYnkgYXB0WCBh
-dCB3d3cuYXB0eC5jb20uCg==
+Hi
+
+On Tue, Aug 5, 2014 at 2:21 PM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> Hi David,
+>
+> On Tue, Aug 5, 2014 at 2:55 PM, David Herrmann <dh.herrmann@gmail.com> wrote:
+>> Hi
+>>
+>> On Mon, Aug 4, 2014 at 10:21 AM, Luiz Augusto von Dentz
+>> <luiz.dentz@gmail.com> wrote:
+>>>> What did you mean by another instance? Is there a way to configure the blue-z stack to create separate instances (are they hidraw device instances or something else) for each of the HID output report?
+>>>
+>>> Take a look at android/hog.c it supports multiple instances already
+>>> you basically can have more than one HID service in your primaries
+>>> which I believe is what PTS does.
+>>>
+>>>> Any suggestions on how to achieve that? Can the HID report map be configured such that there are two different collections, each with one output report so that the kernel enumerates them as two different device instances?
+>>>
+>>> They are two completely separate instances with their own report map
+>>> and in that case we would create each individual instance as a
+>>> separate uHID device.
+>>>
+>>> @David: If we got multiple output reports how do the driver discover them?
+>>
+>> Ok, I now took the time to read through the HoG specs. It says:
+>>
+>>     "For data transferred to HID Device from Report Host,
+>>      Report ID is removed from data received from a
+>>      USB HID Class driver before being transmitted to the
+>>      HID Device (usually a write command to a Report
+>>      characteristic value or as a write request to a
+>>      Report characteristic value for HID Service data)."
+>>
+>> Each UHID_OUTPUT message received by BlueZ contains the report-ID as
+>> 1-byte prefix of the message. Therefore, you're supposed to strip it
+>> from the message and forward it to the right target.
+>>
+>> I have no idea how GATT works, but I assume you write to an attribute
+>> that is named after the report-ID of the output report. So you parse
+>> this 1-byte prefix, select the correct attribute based on this
+>> information and then send the message (without the 1-byte prefix) to
+>> the selected attribute.
+>>
+>> Looking at hog.c in the input-profile, I can see this:
+>>
+>>
+>>         static int report_type_cmp(gconstpointer a,
+>>                                                 gconstpointer b)
+>>         {
+>>                const struct report *report = a;
+>>                uint8_t type = GPOINTER_TO_UINT(b);
+>>
+>>                return report->type - type;
+>>         }
+>>
+>>         ...forward_report()...
+>>         l = g_slist_find_custom(hogdev->reports,
+>>                                                 GUINT_TO_POINTER(type),
+>>                                                 report_type_cmp);
+>>         if (!l)
+>>                return;
+>>
+>> Now I assume you rather want this:
+>>
+>>         static int report_type_cmp(gconstpointer a,
+>>                                                 gconstpointer b)
+>>         {
+>>                 const struct report *report = a;
+>>                 const struct report *cmp = b;
+>>
+>>                 if (report->type != cmp->type)
+>>                        return report->type - cmp->type;
+>>
+>>                 return report->id - cmp->id;
+>>         }
+>
+> But that is the very question, how can the driver know what ids to use
+> to makes us able to match by id like you did above, when we create the
+> device we don't seem to inform the report ids, perhaps we should try
+> to match by id but if that fails use the current logic to match by
+> type otherwise it will probably be very hard to come up with a generic
+> driver that doesn't know what report id to use or perhaps the driver
+> should never send any output without a proper report id?
+
+Ugh? Why not just use my code? It should work just fine, doesn't it? I
+cannot really see the problem here. char_discovered_cb() reads all the
+GATT report IDs the remote device supports. A remote device *must*
+advertise all reports, so the match-function must be able to find the
+correct GATT report associated to a UHID_OUTPUT message.
+
+>>         ...forward_report()...
+>>         struct report rep = { .type = HOGP_REPORT_TYPE_OUTPUT,
+>>                                 .id = hogdev->has_report_id ?
+>> ev->u.output.data[0] : 0 };
+>>         l = g_slist_find_custom(hogdev->reports,
+>>                                                 &rep,
+>>                                                 report_type_cmp);
+>>         if (!l)
+>>                return;
+>>
+>> (sorry for the formatting.. I hope you get my point)
+>>
+>> Note that your hack with "hogdev->has_report_id" is no longer needed
+>> in my new UHID extensions. The kernel then informs you whether the
+>> device uses report-IDs or not. That is, you know for sure whether the
+>> first byte of a message is a report-ID or whether it must be skipped.
+>
+> I just recently start hacking on it so I don't know exactly why we did
+> have has_report_id in the first place, anyway good that we are
+> evolving this code.
+
+It's not upstream, yet. So the "has_report_id" hack is still needed.
+
+Thanks
+David
