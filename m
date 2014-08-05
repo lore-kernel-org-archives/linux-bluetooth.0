@@ -1,39 +1,63 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 5 Aug 2014 10:56:22 +0300
+Date: Tue, 5 Aug 2014 10:58:35 +0300
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCHv3 1/6] gobex: Fix use after free
-Message-ID: <20140805075616.GA26104@aemeltch-MOBL1>
-References: <CABBYNZJSfWa8r8Ab-Dp3cmSwcxQc_7t7W0Cb2EALobM4RQnLkw@mail.gmail.com>
- <1406882679-28568-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: Re: [PATCH] android/doc: Add instructions for android-ia
+Message-ID: <20140805075834.GD26104@aemeltch-MOBL1>
+References: <1406900402-12528-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1406882679-28568-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1406900402-12528-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ping
 
-On Fri, Aug 01, 2014 at 11:44:34AM +0300, Andrei Emeltchenko wrote:
+On Fri, Aug 01, 2014 at 04:40:02PM +0300, Andrei Emeltchenko wrote:
 > From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 > 
-> transfer_complete() frees transfer pointer.
+> Add instructions for building Android image based on android-ia from
+> 01.org.
 > ---
->  gobex/gobex-transfer.c | 1 +
->  1 file changed, 1 insertion(+)
+>  android/README | 25 +++++++++++++++++++++++++
+>  1 file changed, 25 insertions(+)
 > 
-> diff --git a/gobex/gobex-transfer.c b/gobex/gobex-transfer.c
-> index 8498177..6dc7d9f 100644
-> --- a/gobex/gobex-transfer.c
-> +++ b/gobex/gobex-transfer.c
-> @@ -378,6 +378,7 @@ static void transfer_put_req_first(struct transfer *transfer, GObexPacket *req,
->  	if (!g_obex_send(transfer->obex, rsp, &err)) {
->  		transfer_complete(transfer, err);
->  		g_error_free(err);
-> +		return;
->  	}
+> diff --git a/android/README b/android/README
+> index fb00f40..79434fc 100644
+> --- a/android/README
+> +++ b/android/README
+> @@ -84,6 +84,31 @@ After full build is done it is possible to rebuild only BlueZ:
+>  'mm' (or 'mm -B' to force rebuilding of all files)
+>  'adb sync' to update target device.
 >  
->  	if (rspcode != G_OBEX_RSP_CONTINUE)
+> +Downloading and building for Intel devices
+> +------------------------------------------
+> +
+> +Sample Android tree with all required components for Intel devices based on
+> +Intel reference image (https://01.org/android-ia) is availabe at
+> +https://code.google.com/p/android-bluez/
+> +
+> +This tree provides support for Dell XPS12, Minnowboard MAX, Intel NUC,
+> +Acer Iconia W700 and other devices mentioned in:
+> +https://01.org/android-ia/guides/devices
+> +
+> +Downloading:
+> +repo init -u https://code.google.com/p/android-bluez.manifest/ -b android-ia \
+> +	-m topic/bluez/master
+> +repo sync
+> +
+> +Building:
+> +source build/envsetup.sh
+> +lunch haswell_generic-eng
+> +make -j8
+> +
+> +Installing:
+> +Live and Install image is $OUT/live.img
+> +Flash live.img to USB flash and boot from it. More instructions here:
+> +https://01.org/android-ia/guides/developers/build-and-install
+>  
+>  Linux Kernel requirements
+>  -------------------------
 > -- 
 > 1.9.1
 > 
