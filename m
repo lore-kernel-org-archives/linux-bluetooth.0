@@ -1,83 +1,115 @@
 Return-Path: <cyrus@holtmann.org>
-From: Sebastian Chlad <sebastian.chlad@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Sebastian Chlad <sebastian.chlad@tieto.com>
-Subject: [PATCH] android/pts: PTS files update for PBAP
-Date: Tue,  5 Aug 2014 11:32:48 +0200
-Message-Id: <1407231168-19714-1-git-send-email-sebastian.chlad@tieto.com>
+From: Vikrampal <vikram.pal@samsung.com>
+To: 'Luiz Augusto von Dentz' <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	'Dmitry Kasatkin' <d.kasatkin@samsung.com>
+References: <001301cfafc0$ef11b350$cd3519f0$@samsung.com>
+ <CABBYNZKfvD271JoWqCW=Lupu-22scZRAJ0D8ksG8bXfUP8gBkg@mail.gmail.com>
+ <002f01cfb07a$2502c170$6f084450$@samsung.com>
+ <CABBYNZLfh7gQHriCxU4KggpWYYyS37Z85ZCsjSLKnxU1+BoPOg@mail.gmail.com>
+In-reply-to: 
+Subject: RE: AVCTP and AVRCP packet decoder file structure in btmon
+Date: Tue, 05 Aug 2014 14:43:42 +0530
+Message-id: <003601cfb08d$8ff8fa90$afeaefb0$@samsung.com>
+MIME-version: 1.0
+Content-type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Test round for PBAP against PTS 5.2 as well as PICS and PIXIT
-checked against PTS 5.2.
----
- android/pics-pbap.txt  |  2 +-
- android/pixit-pbap.txt |  3 ++-
- android/pts-pbap.txt   | 10 ++++++----
- 3 files changed, 9 insertions(+), 6 deletions(-)
 
-diff --git a/android/pics-pbap.txt b/android/pics-pbap.txt
-index 3673a79..bcb71b6 100644
---- a/android/pics-pbap.txt
-+++ b/android/pics-pbap.txt
-@@ -1,6 +1,6 @@
- PBAP PICS for the PTS tool.
- 
--PTS version: 5.1
-+PTS version: 5.2
- 
- * - different than PTS defaults
- # - not yet implemented/supported
-diff --git a/android/pixit-pbap.txt b/android/pixit-pbap.txt
-index fc89e15..7bc374b 100644
---- a/android/pixit-pbap.txt
-+++ b/android/pixit-pbap.txt
-@@ -1,6 +1,6 @@
- PBAP PIXIT for the PTS tool.
- 
--PTS version: 5.1
-+PTS version: 5.2
- 
- * - different than PTS defaults
- & - should be set to IUT Bluetooth address
-@@ -32,4 +32,5 @@ TSPX_rfcomm_channel					2
- TSPX_obex_auth_password					0000
- TSPX_no_confirmations					False
- TSPX_PSE_vCardSelector					0000000000000001
-+TSPX_Automation						False
- -------------------------------------------------------------------------------
-diff --git a/android/pts-pbap.txt b/android/pts-pbap.txt
-index ac6797f..4f8b534 100644
---- a/android/pts-pbap.txt
-+++ b/android/pts-pbap.txt
-@@ -1,8 +1,8 @@
- PTS test results for PBAP
- 
--PTS version: 5.1
--Tested: 08-April-2014
--Android version: 4.4.2
-+PTS version: 5.2
-+Tested: 04-August-2014
-+Android version: 4.4.4
- 
- Results:
- PASS	test passed
-@@ -126,12 +126,14 @@ TC_PSE_PBB_BV_46_C	N/A
- TC_PSE_PBB_BV_28_C	N/A
- TC_PSE_PBB_BV_29_C	N/A
- TC_PSE_PBB_BV_30_C	N/A
--TC_PSE_PBB_BV_31_C	PASS
-+TC_PSE_PBB_BV_31_C	INC	JIRA #BA-71
- TC_PSE_PBB_BV_32_C	N/A
- TC_PSE_PBF_BV_01_I	PASS
- TC_PSE_PBF_BV_02_I	PASS	Tester must verify vcard content received by PTS
-+TC_PSE_PBF_BV_03_I	PASS
- TC_PSE_PDF_BV_01_I	PASS	Tester must compare phone book size with the
- 				value given by PTS
-+TC_PSE_PDF_BV_06_I	PASS
- TC_PSE_BC_BV_03_I	N/A
- TC_PSE_CON_BV_02_I	N/A
- TC_PSE_ROB_BV_01_I	N/A
--- 
-1.8.5.3
+
+> -----Original Message-----
+> From: Vikrampal [mailto:vikram.pal@samsung.com]
+> Sent: Tuesday, August 05, 2014 2:43 PM
+> To: 'Luiz Augusto von Dentz'
+> Cc: 'linux-bluetooth@vger.kernel.org'; 'Dmitry Kasatkin'
+> Subject: RE: AVCTP and AVRCP packet decoder file structure in btmon
+> 
+> Hi Luiz,
+> 
+> If I submit interdependent patches in one go then I guess the patches are
+> taken in order i.e. 1/4, 2/4, 3/4, 4/4.
+> 
+> That means we can take just 2/4 out and expect it to compile since it depends
+* That means we can NOT take just 2/4 out and expect it to compile since it depends
+> on 1/4.
+> 
+> Am I correct?
+> 
+> > -----Original Message-----
+> > From: Luiz Augusto von Dentz [mailto:luiz.dentz@gmail.com]
+> > Sent: Tuesday, August 05, 2014 1:32 PM
+> > To: Vikrampal
+> > Cc: linux-bluetooth@vger.kernel.org; Dmitry Kasatkin
+> > Subject: Re: AVCTP and AVRCP packet decoder file structure in btmon
+> >
+> > Hi Vikrampal,
+> >
+> > I do like to test patches individually so please make sure they
+> > compile and in general we don't allow commits that do not compile
+> > because they can break bisect.
+> >
+> > On Tue, Aug 5, 2014 at 9:54 AM, Vikrampal <vikram.pal@samsung.com>
+> > wrote:
+> > > Sure Luiz!
+> > >
+> > > However, I've one more small doubt. If I'm submitting a series of
+> > > patches Such as 1/4, 2/4, 3/4, 4/4... I guess in such scenarios no
+> > > need to ensure that the patches separately compiles. What we need to
+> > > ensure is that all the patches together gets compiled properly. Am I
+> > mistaken?
+> > >
+> > >> -----Original Message-----
+> > >> From: Luiz Augusto von Dentz [mailto:luiz.dentz@gmail.com]
+> > >> Sent: Monday, August 04, 2014 4:15 PM
+> > >> To: Vikrampal
+> > >> Cc: linux-bluetooth@vger.kernel.org; Dmitry Kasatkin
+> > >> Subject: Re: AVCTP and AVRCP packet decoder file structure in btmon
+> > >>
+> > >> Hi Vikrampal,
+> > >>
+> > >> We can start by reusing avctp.c to place AV/C and AVRCP decoders,
+> > >> later on we can review if it is the case of splitting. Also please
+> > >> note that android/Android.mk needs updating if we change anything
+> > >> on the build of btmon.
+> > >>
+> > >> On Mon, Aug 4, 2014 at 11:48 AM, Vikrampal
+> > <vikram.pal@samsung.com>
+> > >> wrote:
+> > >> > Hi,
+> > >> >
+> > >> > I'm working on AVRCP packet decoder for Bluetooth monitor module.
+> > >> > There's a separate file avctp.c/h for AVCTP packet decoder.
+> > >> >
+> > >> > The file avctp.c is not a big file as such. So, I'm thinking
+> > >> > whether or not I should include AVRCP decoder in this file itself.
+> > >> >
+> > >> > Shall I create a separate file for AVRCP decoding?
+> > >> >
+> > >> > If both AVCTP & AVRCP go in the same file then what should be the
+> > >> > appropriate name of the file or shall I create a separate file
+> > >> > for AVRCP as well.
+> > >> >
+> > >> > Please advise me. Thanks!
+> > >> >
+> > >> > Regards,
+> > >> > Vikram
+> > >> >
+> > >>
+> > >>
+> > >>
+> > >> --
+> > >> Luiz Augusto von Dentz
+> > >
+> > > Regards,
+> > > Vikram
+> > >
+> >
+> >
+> >
+> > --
+> > Luiz Augusto von Dentz
+> 
+> Regards,
+> Vikram
 
