@@ -1,120 +1,123 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1407245896-23211-1-git-send-email-dh.herrmann@gmail.com>
-References: <1407245896-23211-1-git-send-email-dh.herrmann@gmail.com>
-Date: Tue, 5 Aug 2014 17:54:30 +0300
-Message-ID: <CABBYNZJfpU5w9BE52fMnaW1NP=WHqb3XMn8U=k6eHx=NzAossw@mail.gmail.com>
-Subject: Re: [PATCH] hog: fix output-report to attr mapping
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: David Herrmann <dh.herrmann@gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	Murat Kilivan <Murat.Kilivan@csr.com>,
-	Aravind Parvathala <Aravind.Parvathala@csr.com>
-Content-Type: text/plain; charset=UTF-8
+From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] Android/pts: Update PTS files for PAN
+Date: Tue,  5 Aug 2014 16:48:56 +0200
+Message-Id: <1407250136-25920-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi David,
+PICS and PIXITs updated to PTS 5.2. Regression done for Android
+4.4.4.
+---
+ android/pics-pan.txt  |  4 ++--
+ android/pixit-pan.txt |  4 ++--
+ android/pts-pan.txt   | 29 ++++++++++-------------------
+ 3 files changed, 14 insertions(+), 23 deletions(-)
 
-On Tue, Aug 5, 2014 at 4:38 PM, David Herrmann <dh.herrmann@gmail.com> wrote:
-> Instead of mapping all UHID_OUTPUT events blindly to the first hid output
-> report found, we now map it to the correct attribute. We use the rtype and
-> report-id information in each UHID_OUTPUT message and map it according to
-> the mapping-characteristics provided by the device.
-> ---
->  profiles/input/hog.c | 55 ++++++++++++++++++++++++++++++++++------------------
->  1 file changed, 36 insertions(+), 19 deletions(-)
->
-> diff --git a/profiles/input/hog.c b/profiles/input/hog.c
-> index df2b30b..30f9ed1 100644
-> --- a/profiles/input/hog.c
-> +++ b/profiles/input/hog.c
-> @@ -306,12 +306,16 @@ static void external_report_reference_cb(guint8 status, const guint8 *pdu,
->                                         external_service_char_cb, hogdev);
->  }
->
-> -static int report_type_cmp(gconstpointer a, gconstpointer b)
-> +static int report_cmp(gconstpointer a, gconstpointer b)
->  {
-> -       const struct report *report = a;
-> -       uint8_t type = GPOINTER_TO_UINT(b);
-> +       const struct report *ra = a, *rb = b;
->
-> -       return report->type - type;
-> +       /* sort by type first.. */
-> +       if (ra->type != rb->type)
-> +               return ra->type - rb->type;
-> +
-> +       /* ..then by id */
-> +       return ra->id - rb->id;
->  }
->
->  static void output_written_cb(guint8 status, const guint8 *pdu,
-> @@ -326,31 +330,44 @@ static void output_written_cb(guint8 status, const guint8 *pdu,
->  static void forward_report(struct uhid_event *ev, void *user_data)
->  {
->         struct hog_device *hogdev = user_data;
-> -       struct report *report;
-> +       struct report *report, cmp;
->         GSList *l;
-> -       void *data;
-> -       int size;
-> -       guint type;
-> +       uint8_t *data;
-> +       int size, type, id;
-> +
-> +       switch (ev->u.output.rtype) {
-> +       case UHID_FEATURE_REPORT:
-> +               type = HOG_REPORT_TYPE_FEATURE;
-> +               break;
-> +       case UHID_OUTPUT_REPORT:
-> +               type = HOG_REPORT_TYPE_OUTPUT;
-> +               break;
-> +       case UHID_INPUT_REPORT:
-> +               type = HOG_REPORT_TYPE_INPUT;
-> +               break;
-> +       default:
-> +               return;
-> +       }
->
-> -       if (hogdev->has_report_id) {
-> -               data = ev->u.output.data + 1;
-> -               size = ev->u.output.size - 1;
-> -       } else {
-> -               data = ev->u.output.data;
-> -               size = ev->u.output.size;
-> +       id = 0;
-> +       data = ev->u.output.data;
-> +       size = ev->u.output.size;
-> +       if (hogdev->has_report_id && size > 0) {
-> +               id = *data++;
-> +               --size;
->         }
->
-> -       type = HOG_REPORT_TYPE_OUTPUT;
-> +       cmp.type = type;
-> +       cmp.id = id;
->
-> -       l = g_slist_find_custom(hogdev->reports, GUINT_TO_POINTER(type),
-> -                                                       report_type_cmp);
-> +       l = g_slist_find_custom(hogdev->reports, &cmp, report_cmp);
->         if (!l)
->                 return;
->
->         report = l->data;
->
-> -       DBG("Sending report type %d to device 0x%04X handle 0x%X", type,
-> -                               hogdev->id, report->decl->value_handle);
-> +       DBG("Sending report type %d ID %d to device 0x%04X handle 0x%X",
-> +                       type, id, hogdev->id, report->decl->value_handle);
->
->         if (hogdev->attrib == NULL)
->                 return;
-> --
-> 2.0.4
-
-Pushed, thanks.
-
-
+diff --git a/android/pics-pan.txt b/android/pics-pan.txt
+index f78fc10..b59bef7 100644
+--- a/android/pics-pan.txt
++++ b/android/pics-pan.txt
+@@ -1,6 +1,6 @@
+ PAN PICS for the PTS tool.
+ 
+-PTS version: 5.1
++PTS version: 5.2
+ 
+ * - different than PTS defaults
+ # - not yet implemented/supported
+@@ -47,7 +47,7 @@ TSPC_PAN_2_6b	False		NAP: Support link-local address configuration
+ TSPC_PAN_2_7	False		NAP: Support ping client for IPv4 (O)
+ TSPC_PAN_2_8	False		NAP: Support DHCP Client for IPv4 (O)
+ TSPC_PAN_2_9	False		NAP: Support DNS/LLMNR Resolver for IPv4 (O)
+-TSPC_PAN_2_9a	False		NAP: Support LLMNR Sender for IPv4 (C.5)
++TSPC_PAN_2_9a	False (*)	NAP: Support LLMNR Sender for IPv4 (C.5)
+ TSPC_PAN_2_9b	False		NAP: Support LLMNR Responder for IPv4 (O)
+ TSPC_PAN_2_10	False		NAP: Support HTTP Client for IPv4 (O)
+ TSPC_PAN_2_11	False		NAP: Support WAP Client for IPv4 (O)
+diff --git a/android/pixit-pan.txt b/android/pixit-pan.txt
+index 9053715..a4233c6 100644
+--- a/android/pixit-pan.txt
++++ b/android/pixit-pan.txt
+@@ -1,6 +1,6 @@
+ PAN PIXIT for the PTS tool.
+ 
+-PTS version: 5.1
++PTS version: 5.2
+ 
+ * - different than PTS defaults
+ & - should be set to IUT or PTS Bluetooth address respectively
+@@ -18,7 +18,7 @@ TSPX_security_enabled					False
+ TSPX_pin_code						0000
+ TSPX_delete_link_key					False
+ TSPX_use_implicit_send					True
+-TSPX_iut_ip_address					192.168.167.152
++TSPX_iut_ip_address					192.168.1.100 (*&)
+ TSPX_iut_port_number					4242
+ TSPX_PTS_ip_address					192.168.168.100
+ TSPX_PTS_port_number					4242
+diff --git a/android/pts-pan.txt b/android/pts-pan.txt
+index 88f903d..5e3248c 100644
+--- a/android/pts-pan.txt
++++ b/android/pts-pan.txt
+@@ -1,8 +1,8 @@
+ PTS test results for PAN
+ 
+-PTS version: 5.1
+-Tested: 07-April-2014
+-Android version: 4.4.2
++PTS version: 5.2
++Tested: 05-August-2014
++Android version: 4.4.4
+ 
+ Results:
+ PASS	test passed
+@@ -34,12 +34,7 @@ TC_BNEP_NAP_FORWARD_UNICAST_BV_05_C	N/A
+ TC_BNEP_NAP_FORWARD_UNICAST_BV_06_C	N/A
+ TC_BNEP_NAP_MULTICAST_0_BV_03_C		N/A
+ TC_BNEP_NAP_MULTICAST_0_BV_04_C		N/A
+-TC_BNEP_BRIDGE_RX_BV_02_I		PASS	Tester needs to send one
+-						forward-unicast	BNEP packet
+-						with given data (5 times)
+-						0x00, 0x01, 0xFF followed by
+-						0x00, 0x01, 0x9E, 0x9F
+-						sendip -d <hexdata>
++TC_BNEP_BRIDGE_RX_BV_02_I		INC	PTS issue #12464
+ TC_BNEP_BRIDGE_TX_BV_01_I		PASS
+ TC_NAP_Ipv4_Autonet_BV_01_I		N/A
+ TC_NAP_Ipv6_Autonet_BV_02_I		N/A
+@@ -56,14 +51,12 @@ TC_SDP_NAP_BV_01_C			PASS
+ TC_MISC_NAP_UUID_BV_01_C		PASS
+ TC_MISC_NAP_UUID_BV_02_C		PASS
+ TC_BNEP_PANU_BROADCAST_0_BV_04_C	N/A
+-TC_PANU_Ipv4_Autonet_BV_01_I		PASS	When prompted connect to PTS.
+-						From IUT: issue ARP request
+-						iperf -c <addr> -p <port#>
++TC_PANU_Ipv4_Autonet_BV_01_I		PASS	After DHCP request fail send
++						DHCP address request.
++						From IUT: send address request
++						dhcpd -r 169.254.x.x bt-pan
+ TC_PANU_Ipv6_Autonet_BV_02_I		N/A
+-TC_PANU_IP_LLMNR_BV_01_I		PASS	When prompted connect to PTS.
+-						From IUT: send LLMNR request
+-						command
+-						iperf -c <addr> -p <port#>
++TC_PANU_IP_LLMNR_BV_01_I		INC	PTS TSE errata #5871
+ TC_PANU_IP_LLMNR_BV_02_I		N/A
+ TC_PANU_IP_DHCP_BV_03_I			N/A
+ TC_PANU_IP_DNS_BV_01_I			N/A
+@@ -71,9 +64,7 @@ TC_PANU_IP_APP_BV_01_I			N/A
+ TC_PANU_IP_APP_BV_02_I			N/A
+ TC_PANU_IP_APP_BV_03_I			N/A
+ TC_PANU_IP_APP_BV_04_I			N/A
+-TC_PANU_IP_APP_BV_05_I			PASS	When prompted, connect to PTS
+-						and then when prompted terminate
+-						connection (IUT side)
++TC_PANU_IP_APP_BV_05_I			PASS
+ TC_SDP_PANU_BV_01_C			N/A
+ TC_MISC_PANU_UUID_BV_01_C		N/A
+ TC_MISC_PANU_UUID_BV_02_C		N/A
 -- 
-Luiz Augusto von Dentz
+1.9.3
+
