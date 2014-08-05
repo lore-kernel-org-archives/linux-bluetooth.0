@@ -2,98 +2,112 @@ Return-Path: <cyrus@holtmann.org>
 From: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
-Subject: [PATCH_v2 5/8] android/pan: Notify control state callback on HAL .enable call
-Date: Tue,  5 Aug 2014 14:19:11 +0300
-Message-Id: <1407237554-5079-6-git-send-email-ravikumar.veeramally@linux.intel.com>
+Subject: [PATCH_v2 2/8] android/tester: Add PAN Connect test case
+Date: Tue,  5 Aug 2014 14:19:08 +0300
+Message-Id: <1407237554-5079-3-git-send-email-ravikumar.veeramally@linux.intel.com>
 In-Reply-To: <1407237554-5079-1-git-send-email-ravikumar.veeramally@linux.intel.com>
 References: <1407237554-5079-1-git-send-email-ravikumar.veeramally@linux.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- android/pan.c | 21 ++++++++++++++-------
- 1 file changed, 14 insertions(+), 7 deletions(-)
+ android/tester-pan.c | 79 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 79 insertions(+)
 
-diff --git a/android/pan.c b/android/pan.c
-index c11ee29..d8572cc 100644
---- a/android/pan.c
-+++ b/android/pan.c
-@@ -255,7 +255,8 @@ static void bt_pan_notify_conn_state(struct pan_device *dev, uint8_t state)
- 		pan_device_remove(dev);
- }
+diff --git a/android/tester-pan.c b/android/tester-pan.c
+index caead9c..df0e4ec 100644
+--- a/android/tester-pan.c
++++ b/android/tester-pan.c
+@@ -23,10 +23,89 @@
  
--static void bt_pan_notify_ctrl_state(struct pan_device *dev, uint8_t state)
-+static void bt_pan_notify_ctrl_state(struct pan_device *dev, uint8_t state,
-+								uint8_t status)
- {
- 	struct hal_ev_pan_ctrl_state ev;
+ static struct queue *list; /* List of pan test cases */
  
-@@ -263,13 +264,13 @@ static void bt_pan_notify_ctrl_state(struct pan_device *dev, uint8_t state)
- 
- 	ev.state = state;
- 	ev.local_role = local_role;
--	ev.status = HAL_STATUS_SUCCESS;
-+	ev.status = status;
- 
- 	memset(ev.name, 0, sizeof(ev.name));
- 
- 	if (local_role == HAL_PAN_ROLE_NAP)
- 		memcpy(ev.name, BNEP_BRIDGE, sizeof(BNEP_BRIDGE));
--	else
-+	else if (local_role == HAL_PAN_ROLE_PANU)
- 		memcpy(ev.name, dev->iface, sizeof(dev->iface));
- 
- 	ipc_send_notif(hal_ipc, HAL_SERVICE_ID_PAN, HAL_EV_PAN_CTRL_STATE,
-@@ -301,7 +302,7 @@ static void bnep_conn_cb(char *iface, int err, void *data)
- 
- 	DBG("%s connected", dev->iface);
- 
--	bt_pan_notify_ctrl_state(dev, HAL_PAN_CTRL_ENABLED);
-+	bt_pan_notify_ctrl_state(dev, HAL_PAN_CTRL_ENABLED, HAL_STATUS_SUCCESS);
- 	bt_pan_notify_conn_state(dev, HAL_PAN_STATE_CONNECTED);
- }
- 
-@@ -534,7 +535,7 @@ static gboolean nap_setup_cb(GIOChannel *chan, GIOCondition cond,
- 	g_io_channel_unref(dev->io);
- 	dev->io = NULL;
- 
--	bt_pan_notify_ctrl_state(dev, HAL_PAN_CTRL_ENABLED);
-+	bt_pan_notify_ctrl_state(dev, HAL_PAN_CTRL_ENABLED, HAL_STATUS_SUCCESS);
- 	bt_pan_notify_conn_state(dev, HAL_PAN_STATE_CONNECTED);
- 
- 	return FALSE;
-@@ -648,7 +649,7 @@ static int register_nap_server(void)
- static void bt_pan_enable(const void *buf, uint16_t len)
- {
- 	const struct hal_cmd_pan_enable *cmd = buf;
--	uint8_t status;
-+	uint8_t status, state;
- 	int err;
- 
- 	DBG("");
-@@ -665,8 +666,10 @@ static void bt_pan_enable(const void *buf, uint16_t len)
- 	case HAL_PAN_ROLE_NAP:
- 		break;
- 	case HAL_PAN_ROLE_NONE:
-+		local_role = HAL_PAN_ROLE_NONE;
- 		status = HAL_STATUS_SUCCESS;
--		goto reply;
-+		state = HAL_PAN_CTRL_DISABLED;
-+		goto notify;
- 	default:
- 		status = HAL_STATUS_UNSUPPORTED;
- 		goto reply;
-@@ -681,6 +684,10 @@ static void bt_pan_enable(const void *buf, uint16_t len)
- 	}
- 
- 	status = HAL_STATUS_SUCCESS;
-+	state = HAL_PAN_CTRL_ENABLED;
++struct emu_cid_data {
++	uint16_t nap_handle;
++	uint16_t nap_cid;
++};
 +
-+notify:
-+	bt_pan_notify_ctrl_state(NULL, state, status);
++struct emu_cid_data cid_data;
++static uint8_t pan_conn_req_pdu[] = {0x01, 0x01, 0x02, 0x11, 0x16, 0x11, 0x15};
++static uint8_t pan_conn_rsp_pdu[] = {0x01, 0x02, 0x00, 0x00};
++
++static void pan_nap_cid_hook_cb(const void *data, uint16_t len, void *user_data)
++{
++	struct test_data *t_data = tester_get_data();
++	struct emu_cid_data *cid_data = user_data;
++	struct bthost *bthost = hciemu_client_get_host(t_data->hciemu);
++
++	if (!memcmp((uint8_t *) data, pan_conn_req_pdu,
++						sizeof(pan_conn_req_pdu)))
++		bthost_send_cid(bthost, cid_data->nap_handle, cid_data->nap_cid,
++				pan_conn_rsp_pdu, sizeof(pan_conn_rsp_pdu));
++}
++
++static void pan_connect_request_cb(uint16_t handle, uint16_t cid,
++							void *user_data)
++{
++	struct test_data *data = tester_get_data();
++	struct bthost *bthost = hciemu_client_get_host(data->hciemu);
++
++	cid_data.nap_handle = handle;
++	cid_data.nap_cid = cid;
++
++	bthost_add_cid_hook(bthost, handle, cid, pan_nap_cid_hook_cb,
++								&cid_data);
++}
++
++static struct emu_set_l2cap_data l2cap_setup_data = {
++	.psm = 15,
++	.func = pan_connect_request_cb,
++	.user_data = NULL,
++};
++
++static void pan_connect_action(void)
++{
++	struct test_data *data = tester_get_data();
++	const uint8_t *pan_addr = hciemu_get_client_bdaddr(data->hciemu);
++	struct step *step = g_new0(struct step, 1);
++	bt_bdaddr_t bdaddr;
++
++	bdaddr2android((const bdaddr_t *) pan_addr, &bdaddr);
++
++	step->action_status = data->if_pan->connect(&bdaddr,
++					BTPAN_ROLE_PANU, BTPAN_ROLE_PANNAP);
++
++	schedule_action_verification(step);
++}
++
+ static struct test_case test_cases[] = {
+ 	TEST_CASE_BREDRLE("PAN Init",
+ 		ACTION_SUCCESS(dummy_action, NULL),
+ 	),
++	TEST_CASE_BREDRLE("PAN Connect - Success",
++		ACTION_SUCCESS(bluetooth_enable_action, NULL),
++		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_ON),
++		ACTION_SUCCESS(emu_setup_powered_remote_action, NULL),
++		ACTION_SUCCESS(emu_set_ssp_mode_action, NULL),
++		ACTION_SUCCESS(emu_add_l2cap_server_action, &l2cap_setup_data),
++		ACTION_SUCCESS(pan_connect_action, NULL),
++		CALLBACK_PAN_CONN_STATE(CB_PAN_CONNECTION_STATE,
++					BT_STATUS_SUCCESS,
++					BTPAN_STATE_CONNECTING,
++					BTPAN_ROLE_PANU, BTPAN_ROLE_PANNAP),
++		CALLBACK_PAN_CTRL_STATE(CB_PAN_CONTROL_STATE, BT_STATUS_SUCCESS,
++					BTPAN_STATE_ENABLED, BTPAN_ROLE_PANU),
++		CALLBACK_PAN_CONN_STATE(CB_PAN_CONNECTION_STATE,
++					BT_STATUS_SUCCESS,
++					BTPAN_STATE_CONNECTED,
++					BTPAN_ROLE_PANU, BTPAN_ROLE_PANNAP),
++		ACTION_SUCCESS(bluetooth_disable_action, NULL),
++		CALLBACK_PAN_CONN_STATE(CB_PAN_CONNECTION_STATE,
++					BT_STATUS_SUCCESS,
++					BTPAN_STATE_DISCONNECTED,
++					BTPAN_ROLE_PANU, BTPAN_ROLE_PANNAP),
++		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_OFF),
++	),
+ };
  
- reply:
- 	ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_PAN, HAL_OP_PAN_ENABLE, status);
+ struct queue *get_pan_tests(void)
 -- 
 1.9.1
 
