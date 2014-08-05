@@ -1,28 +1,120 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 5 Aug 2014 22:07:01 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH BlueZ] core: Fix Device1.Disconnect not always disabling
- auto connect
-Message-ID: <20140805190701.GA8665@t440s.P-661HNU-F1>
-References: <1407245446-16366-1-git-send-email-luiz.dentz@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1407245446-16366-1-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <1407245896-23211-1-git-send-email-dh.herrmann@gmail.com>
+References: <1407245896-23211-1-git-send-email-dh.herrmann@gmail.com>
+Date: Tue, 5 Aug 2014 17:54:30 +0300
+Message-ID: <CABBYNZJfpU5w9BE52fMnaW1NP=WHqb3XMn8U=k6eHx=NzAossw@mail.gmail.com>
+Subject: Re: [PATCH] hog: fix output-report to attr mapping
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: David Herrmann <dh.herrmann@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	Murat Kilivan <Murat.Kilivan@csr.com>,
+	Aravind Parvathala <Aravind.Parvathala@csr.com>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+Hi David,
 
-On Tue, Aug 05, 2014, Luiz Augusto von Dentz wrote:
-> Disconnect has the ability to disable auto connect temporarily until
-> Connect is then called again, but currently it can only do that if
-> the device is connected.
+On Tue, Aug 5, 2014 at 4:38 PM, David Herrmann <dh.herrmann@gmail.com> wrote:
+> Instead of mapping all UHID_OUTPUT events blindly to the first hid output
+> report found, we now map it to the correct attribute. We use the rtype and
+> report-id information in each UHID_OUTPUT message and map it according to
+> the mapping-characteristics provided by the device.
 > ---
->  src/device.c | 77 ++++++++++++++++++++++++++++++++----------------------------
->  1 file changed, 41 insertions(+), 36 deletions(-)
+>  profiles/input/hog.c | 55 ++++++++++++++++++++++++++++++++++------------------
+>  1 file changed, 36 insertions(+), 19 deletions(-)
+>
+> diff --git a/profiles/input/hog.c b/profiles/input/hog.c
+> index df2b30b..30f9ed1 100644
+> --- a/profiles/input/hog.c
+> +++ b/profiles/input/hog.c
+> @@ -306,12 +306,16 @@ static void external_report_reference_cb(guint8 status, const guint8 *pdu,
+>                                         external_service_char_cb, hogdev);
+>  }
+>
+> -static int report_type_cmp(gconstpointer a, gconstpointer b)
+> +static int report_cmp(gconstpointer a, gconstpointer b)
+>  {
+> -       const struct report *report = a;
+> -       uint8_t type = GPOINTER_TO_UINT(b);
+> +       const struct report *ra = a, *rb = b;
+>
+> -       return report->type - type;
+> +       /* sort by type first.. */
+> +       if (ra->type != rb->type)
+> +               return ra->type - rb->type;
+> +
+> +       /* ..then by id */
+> +       return ra->id - rb->id;
+>  }
+>
+>  static void output_written_cb(guint8 status, const guint8 *pdu,
+> @@ -326,31 +330,44 @@ static void output_written_cb(guint8 status, const guint8 *pdu,
+>  static void forward_report(struct uhid_event *ev, void *user_data)
+>  {
+>         struct hog_device *hogdev = user_data;
+> -       struct report *report;
+> +       struct report *report, cmp;
+>         GSList *l;
+> -       void *data;
+> -       int size;
+> -       guint type;
+> +       uint8_t *data;
+> +       int size, type, id;
+> +
+> +       switch (ev->u.output.rtype) {
+> +       case UHID_FEATURE_REPORT:
+> +               type = HOG_REPORT_TYPE_FEATURE;
+> +               break;
+> +       case UHID_OUTPUT_REPORT:
+> +               type = HOG_REPORT_TYPE_OUTPUT;
+> +               break;
+> +       case UHID_INPUT_REPORT:
+> +               type = HOG_REPORT_TYPE_INPUT;
+> +               break;
+> +       default:
+> +               return;
+> +       }
+>
+> -       if (hogdev->has_report_id) {
+> -               data = ev->u.output.data + 1;
+> -               size = ev->u.output.size - 1;
+> -       } else {
+> -               data = ev->u.output.data;
+> -               size = ev->u.output.size;
+> +       id = 0;
+> +       data = ev->u.output.data;
+> +       size = ev->u.output.size;
+> +       if (hogdev->has_report_id && size > 0) {
+> +               id = *data++;
+> +               --size;
+>         }
+>
+> -       type = HOG_REPORT_TYPE_OUTPUT;
+> +       cmp.type = type;
+> +       cmp.id = id;
+>
+> -       l = g_slist_find_custom(hogdev->reports, GUINT_TO_POINTER(type),
+> -                                                       report_type_cmp);
+> +       l = g_slist_find_custom(hogdev->reports, &cmp, report_cmp);
+>         if (!l)
+>                 return;
+>
+>         report = l->data;
+>
+> -       DBG("Sending report type %d to device 0x%04X handle 0x%X", type,
+> -                               hogdev->id, report->decl->value_handle);
+> +       DBG("Sending report type %d ID %d to device 0x%04X handle 0x%X",
+> +                       type, id, hogdev->id, report->decl->value_handle);
+>
+>         if (hogdev->attrib == NULL)
+>                 return;
+> --
+> 2.0.4
 
-Applied. Thanks.
+Pushed, thanks.
 
-Johan
+
+-- 
+Luiz Augusto von Dentz
