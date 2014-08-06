@@ -1,50 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
-From: Gowtham Anandha Babu <gowtham.ab@samsung.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: bharat.panda@samsung.com
-Subject: Query regarding MAP 1.2 implementation
-Date: Wed, 06 Aug 2014 17:00:41 +0530
-Message-id: <000001cfb169$e4d01bc0$ae705340$@samsung.com>
-MIME-version: 1.0
-Content-type: text/plain; charset=us-ascii
+MIME-Version: 1.0
+Reply-To: mvogt1@gmail.com
+Date: Wed, 6 Aug 2014 12:27:07 +0200
+Message-ID: <CAOE8yMCnd+1RGM+wLLDMHaBBakAdbPANtK5f8H-QOVTJnUhBAA@mail.gmail.com>
+Subject: Bug?: 14KB/s throughput with Asus BT-400 (BCM20702A0)
+From: Martin Vogt <mvogt1@gmail.com>
+To: linux-bluetooth <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi All,
+Hello,
 
-I am currently working on MAP implementation in BlueZ.
-I am trying below things to make MAS connect with remote MCE client.
+I have two ASUS BT-400 bluetooth adapter (chip: BCM20702A0) and
+did some benchmarking.
 
-Below are the steps we followed;
+The benchmarks is a simple Server->Client RfComm application,
+which prints the throughput in KB/s.
 
-On MCE device: 
---> MAS search
---> MAS connect
---> SET PATH (/)
+When using the BT-400 adapter as a sender and a "speedlink"
+(CSR8510 Nanosira M2272) as receiver I get around 140 Kb/s,
+which is fine, and the maximum throughput I ever get in Bluetooth.
 
-On Bluez, obexd:
---> Run "bluetoothd"
---> Run "obexd"
---> On SET_PATH command it sends the obex session value as NULL.
+When I replace the "speedlink" with the BT-400 the throughput falls
+back to 14 KB/s, which is very/unusable slow and looks like a bug.
 
+This happens on Ubuntu 13.10 (3.11.0-20) and 14.04 (3.13.0-32-generic).
 
-obexd[32713]: obexd/plugins/bluetooth.c:profile_new_connection() device
-/org/bluez/hci0/dev_00_1B_DC_07_33_4E
-obexd[32713]: obexd/src/obex.c:obex_session_start()
-obexd[32713]: obexd/src/obex.c:cmd_connect()
-obexd[32713]: CONNECT(0x0), (null)(0xffffffff)
-obexd[32713]: obexd/src/obex.c:cmd_connect() Selected driver: Message Access
-server
-obexd[32713]: obexd/plugins/mas.c:mas_connect() 
-obexd[32713]: CONNECT(0x0), (null)(0x0)
-obexd[32713]: obexd/src/obex.c:cmd_setpath()
-obexd[32713]: obexd/src/obex.c:cmd_setpath() (null)
-obexd[32713]: SETPATH(0x5), (null)(0xffffffff)
-obexd[32713]: obexd/src/obex.c:parse_name() NAME:
-obexd[32713]: obexd/plugins/mas.c:mas_setpath() SETPATH: name  nonhdr 0x20
-obexd[32713]: SETPATH(0x5), NOT_FOUND(0x44)
+If I replace the BT-400 on the sender side with the "speedlink"
+the throughput stays the same with 14 KB/s.
 
-Do we need to configure or run anything else before starting up obexd?
+==> Thus the BT-400 adapter is only slow on the receiver side.
 
+regards,
 
-
+Martin
