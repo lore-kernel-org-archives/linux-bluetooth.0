@@ -1,140 +1,66 @@
 Return-Path: <cyrus@holtmann.org>
-From: Vikrampal Yadav <vikram.pal@samsung.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: vikram.pal@samsung.com, cpgs@samsung.com
-Subject: [PATCH 1/6] monitor: Add AV/C and AVRCP GetCapabilities support
-Date: Wed, 06 Aug 2014 17:59:11 +0530
-Message-id: <1407328156-27218-1-git-send-email-vikram.pal@samsung.com>
+MIME-Version: 1.0
+In-Reply-To: <000001cfb169$e4d01bc0$ae705340$@samsung.com>
+References: <000001cfb169$e4d01bc0$ae705340$@samsung.com>
+Date: Wed, 6 Aug 2014 15:02:49 +0300
+Message-ID: <CABBYNZKTc7DYz5OSJOYm8uTDRzOOzfLMaOPGg-U7TTneaRiH_A@mail.gmail.com>
+Subject: Re: Query regarding MAP 1.2 implementation
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Gowtham Anandha Babu <gowtham.ab@samsung.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	Bharat Panda <bharat.panda@samsung.com>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Support for decoding AV/C commands and GetCapabilities added in
-Bluetooth monitor.
----
- monitor/avctp.c | 101 +++++++++++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 100 insertions(+), 1 deletion(-)
+Hi,
 
-diff --git a/monitor/avctp.c b/monitor/avctp.c
-index d0594d7..c0ec6a2 100644
---- a/monitor/avctp.c
-+++ b/monitor/avctp.c
-@@ -43,10 +43,101 @@
- #include "sdp.h"
- #include "avctp.h"
- 
-+static const char *ctype2str(uint8_t ctype)
-+{
-+	return "Unknown";
-+}
-+
-+static const char *subunit2str(uint8_t subunit)
-+{
-+	return "Reserved";
-+}
-+
-+static const char *opcode2str(uint8_t opcode)
-+{
-+	return "Unknown";
-+}
-+
-+static void avrcp_passthrough_packet(const struct l2cap_frame *frame)
-+{
-+}
-+
-+static void avrcp_pdu_packet(const struct l2cap_frame *frame, uint8_t ctype,
-+                                uint8_t indent)
-+{
-+}
-+
-+static void avrcp_control_packet(const struct l2cap_frame *frame)
-+{
-+        uint8_t ctype, address, subunit, opcode, indent = 2;
-+        struct l2cap_frame avrcp_frame;
-+
-+        ctype = *((uint8_t *) frame->data);
-+        address = *((uint8_t *) (frame->data + 1));
-+        opcode = *((uint8_t *) (frame->data + 2));
-+
-+        print_field("AV/C: %s: address 0x%02x opcode 0x%02x", ctype2str(ctype),
-+                        address, opcode);
-+
-+        subunit = address >> 3;
-+
-+        print_field("%*cSubunit: %s", indent, ' ', subunit2str(subunit));
-+
-+        print_field("%*cOpcode: %s", indent, ' ', opcode2str(opcode));
-+
-+        /* Skip non-panel subunit packets */
-+        if (subunit != 0x09) {
-+                packet_hexdump(frame->data, frame->size);
-+                return;
-+        }
-+
-+        /* Not implemented should not contain any operand */
-+        if (ctype == 0x8) {
-+                packet_hexdump(frame->data, frame->size);
-+                return;
-+        }
-+
-+	switch (opcode) {
-+        case 0x7c:
-+                avrcp_passthrough_packet(frame);
-+                break;
-+        case 0x00:
-+                print_field("%*cCompany ID: 0x%02x%02x%02x", indent, ' ',
-+                                *((uint8_t *) (frame->data + 3)),
-+                                *((uint8_t *) (frame->data + 4)),
-+                                *((uint8_t *) (frame->data + 5)));
-+
-+                l2cap_frame_pull(&avrcp_frame, frame, 6);
-+                avrcp_pdu_packet(&avrcp_frame, ctype, 10);
-+                break;
-+        default:
-+                packet_hexdump(frame->data, frame->size);
-+        }
-+}
-+
-+static void avrcp_browsing_packet(const struct l2cap_frame *frame, uint8_t hdr)
-+{
-+}
-+
-+static void avrcp_packet(const struct l2cap_frame *frame, uint8_t hdr)
-+{
-+        switch (frame->psm) {
-+                case 0x17:
-+                        avrcp_control_packet(frame);
-+                        break;
-+                case 0x1B:
-+                        avrcp_browsing_packet(frame, hdr);
-+                        break;
-+                default:
-+                        packet_hexdump(frame->data, frame->size);
-+        }
-+}
-+
- void avctp_packet(const struct l2cap_frame *frame)
- {
-         uint8_t hdr;
-         uint16_t pid;
-+	struct l2cap_frame avctp_frame;
-         const char *pdu_color;
- 
-         if (frame->size < 3) {
-@@ -70,5 +161,13 @@ void avctp_packet(const struct l2cap_frame *frame)
-                         hdr & 0x02 ? "Response" : "Command",
-                         hdr & 0x0c, hdr >> 4, pid);
- 
--	packet_hexdump(frame->data + 3, frame->size - 3);
-+	l2cap_frame_pull(&avctp_frame, frame, 3);
-+
-+        /* Copy psm as other protocols may need it later */
-+        avctp_frame.psm = frame->psm;
-+
-+        if (pid == 0x110e || pid == 0x110c)
-+                avrcp_packet(&avctp_frame, hdr);
-+        else
-+                packet_hexdump(frame->data + 3, frame->size - 3);
- }
+On Wed, Aug 6, 2014 at 2:30 PM, Gowtham Anandha Babu
+<gowtham.ab@samsung.com> wrote:
+> Hi All,
+>
+> I am currently working on MAP implementation in BlueZ.
+> I am trying below things to make MAS connect with remote MCE client.
+>
+> Below are the steps we followed;
+>
+> On MCE device:
+> --> MAS search
+> --> MAS connect
+> --> SET PATH (/)
+>
+> On Bluez, obexd:
+> --> Run "bluetoothd"
+> --> Run "obexd"
+> --> On SET_PATH command it sends the obex session value as NULL.
+>
+>
+> obexd[32713]: obexd/plugins/bluetooth.c:profile_new_connection() device
+> /org/bluez/hci0/dev_00_1B_DC_07_33_4E
+> obexd[32713]: obexd/src/obex.c:obex_session_start()
+> obexd[32713]: obexd/src/obex.c:cmd_connect()
+> obexd[32713]: CONNECT(0x0), (null)(0xffffffff)
+> obexd[32713]: obexd/src/obex.c:cmd_connect() Selected driver: Message Access
+> server
+> obexd[32713]: obexd/plugins/mas.c:mas_connect()
+> obexd[32713]: CONNECT(0x0), (null)(0x0)
+> obexd[32713]: obexd/src/obex.c:cmd_setpath()
+> obexd[32713]: obexd/src/obex.c:cmd_setpath() (null)
+> obexd[32713]: SETPATH(0x5), (null)(0xffffffff)
+> obexd[32713]: obexd/src/obex.c:parse_name() NAME:
+> obexd[32713]: obexd/plugins/mas.c:mas_setpath() SETPATH: name  nonhdr 0x20
+> obexd[32713]: SETPATH(0x5), NOT_FOUND(0x44)
+>
+> Do we need to configure or run anything else before starting up obexd?
+
+You are probably missing a backend implementation for your message
+database, currently we are building with dummy as backend but the idea
+is that we switch to a runtime solution probably we a D-Bus agent
+interface to interact with these requests using a file descriptor to
+optimize the data transfer. iirc samsung has done a D-Bus backend for
+BlueZ 4 in Tizen perhaps you can star by looking what kind of
+interface is there.
+
+
 -- 
-1.9.1
-
+Luiz Augusto von Dentz
