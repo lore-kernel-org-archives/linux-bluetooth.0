@@ -1,24 +1,23 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 6 Aug 2014 12:07:56 +0300
+Date: Wed, 6 Aug 2014 12:07:32 +0300
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
+To: Sebastian Chlad <sebastian.chlad@tieto.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] gitignore: Update renamed file name tools/mpris-player
- to tools/mpris-proxy
-Message-ID: <20140806090756.GB13446@t440s.lan>
-References: <1407313671-24513-1-git-send-email-ravikumar.veeramally@linux.intel.com>
+Subject: Re: [PATCH] android/pts: Update HID PTS text file
+Message-ID: <20140806090732.GA13446@t440s.lan>
+References: <1407313593-8646-1-git-send-email-sebastian.chlad@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1407313671-24513-1-git-send-email-ravikumar.veeramally@linux.intel.com>
+In-Reply-To: <1407313593-8646-1-git-send-email-sebastian.chlad@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Ravi,
+Hi Sebastian,
 
-On Wed, Aug 06, 2014, Ravi kumar Veeramally wrote:
+On Wed, Aug 06, 2014, Sebastian Chlad wrote:
 > ---
->  .gitignore | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  android/pts-hid.txt | 1 +
+>  1 file changed, 1 insertion(+)
 
 Applied. Thanks.
 
