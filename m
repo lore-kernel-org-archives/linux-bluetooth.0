@@ -1,37 +1,25 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Wed, 6 Aug 2014 12:07:56 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] gitignore: Update renamed file name tools/mpris-player
+ to tools/mpris-proxy
+Message-ID: <20140806090756.GB13446@t440s.lan>
+References: <1407313671-24513-1-git-send-email-ravikumar.veeramally@linux.intel.com>
 MIME-Version: 1.0
-Reply-To: mvogt1@gmail.com
-Date: Wed, 6 Aug 2014 12:27:07 +0200
-Message-ID: <CAOE8yMCnd+1RGM+wLLDMHaBBakAdbPANtK5f8H-QOVTJnUhBAA@mail.gmail.com>
-Subject: Bug?: 14KB/s throughput with Asus BT-400 (BCM20702A0)
-From: Martin Vogt <mvogt1@gmail.com>
-To: linux-bluetooth <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1407313671-24513-1-git-send-email-ravikumar.veeramally@linux.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello,
+Hi Ravi,
 
-I have two ASUS BT-400 bluetooth adapter (chip: BCM20702A0) and
-did some benchmarking.
+On Wed, Aug 06, 2014, Ravi kumar Veeramally wrote:
+> ---
+>  .gitignore | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
-The benchmarks is a simple Server->Client RfComm application,
-which prints the throughput in KB/s.
+Applied. Thanks.
 
-When using the BT-400 adapter as a sender and a "speedlink"
-(CSR8510 Nanosira M2272) as receiver I get around 140 Kb/s,
-which is fine, and the maximum throughput I ever get in Bluetooth.
-
-When I replace the "speedlink" with the BT-400 the throughput falls
-back to 14 KB/s, which is very/unusable slow and looks like a bug.
-
-This happens on Ubuntu 13.10 (3.11.0-20) and 14.04 (3.13.0-32-generic).
-
-If I replace the BT-400 on the sender side with the "speedlink"
-the throughput stays the same with 14 KB/s.
-
-==> Thus the BT-400 adapter is only slow on the receiver side.
-
-regards,
-
-Martin
+Johan
