@@ -1,181 +1,321 @@
 Return-Path: <cyrus@holtmann.org>
-From: Sebastian Chlad <sebastian.chlad@tieto.com>
+From: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Sebastian Chlad <sebastian.chlad@tieto.com>
-Subject: [PATCH] android/pts: Update PTS files for L2CAP
-Date: Wed,  6 Aug 2014 16:11:27 +0200
-Message-Id: <1407334287-6721-1-git-send-email-sebastian.chlad@tieto.com>
+Cc: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
+Subject: [PATCH 1/3] android/tester: Add HDP init test case
+Date: Wed,  6 Aug 2014 16:41:48 +0300
+Message-Id: <1407332510-3831-2-git-send-email-ravikumar.veeramally@linux.intel.com>
+In-Reply-To: <1407332510-3831-1-git-send-email-ravikumar.veeramally@linux.intel.com>
+References: <1407332510-3831-1-git-send-email-ravikumar.veeramally@linux.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-PICS and PIXITs checked against PTS 5.2. Regression round on PTS
-5.2 against Android 4.4.4.
 ---
- android/pics-l2cap.txt  | 11 ++++++----
- android/pixit-l2cap.txt |  2 +-
- android/pts-l2cap.txt   | 57 +++++++++++++++++++++++++++----------------------
- 3 files changed, 40 insertions(+), 30 deletions(-)
+ android/Makefile.am   |   1 +
+ android/tester-hdp.c  |  48 ++++++++++++++++++++++
+ android/tester-main.c | 111 ++++++++++++++++++++++++++++++++++++++++++++++++++
+ android/tester-main.h |  29 +++++++++++++
+ 4 files changed, 189 insertions(+)
+ create mode 100644 android/tester-hdp.c
 
-diff --git a/android/pics-l2cap.txt b/android/pics-l2cap.txt
-index 53e6b9f..8e726e4 100644
---- a/android/pics-l2cap.txt
-+++ b/android/pics-l2cap.txt
-@@ -1,6 +1,6 @@
- L2CAP PICS for the PTS tool.
+diff --git a/android/Makefile.am b/android/Makefile.am
+index 79f6a0d..ac3a766 100644
+--- a/android/Makefile.am
++++ b/android/Makefile.am
+@@ -158,6 +158,7 @@ android_android_tester_SOURCES = emulator/btdev.h emulator/btdev.c \
+ 				android/tester-socket.c \
+ 				android/tester-hidhost.c \
+ 				android/tester-pan.c \
++				android/tester-hdp.c \
+ 				android/tester-gatt.c \
+ 				android/tester-main.h android/tester-main.c
  
--PTS version: 5.1
-+PTS version: 5.2
+diff --git a/android/tester-hdp.c b/android/tester-hdp.c
+new file mode 100644
+index 0000000..0988fec
+--- /dev/null
++++ b/android/tester-hdp.c
+@@ -0,0 +1,48 @@
++/*
++ * Copyright (C) 2014 Intel Corporation
++ *
++ * Licensed under the Apache License, Version 2.0 (the "License");
++ * you may not use this file except in compliance with the License.
++ * You may obtain a copy of the License at
++ *
++ *      http://www.apache.org/licenses/LICENSE-2.0
++ *
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" BASIS,
++ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++ * See the License for the specific language governing permissions and
++ * limitations under the License.
++ *
++ */
++
++#include <stdbool.h>
++
++#include "emulator/bthost.h"
++#include "tester-main.h"
++#include "android/utils.h"
++
++static struct queue *list; /* List of hdp test cases */
++
++static struct test_case test_cases[] = {
++	TEST_CASE_BREDRLE("HDP Init",
++		ACTION_SUCCESS(dummy_action, NULL),
++	),
++};
++
++struct queue *get_hdp_tests(void)
++{
++	uint16_t i = 0;
++
++	list = queue_new();
++
++	for (; i < sizeof(test_cases) / sizeof(test_cases[0]); ++i)
++		if (!queue_push_tail(list, &test_cases[i]))
++			return NULL;
++
++	return list;
++}
++
++void remove_hdp_tests(void)
++{
++	queue_destroy(list, NULL);
++}
+diff --git a/android/tester-main.c b/android/tester-main.c
+index 203a1b6..a9ccfcd 100644
+--- a/android/tester-main.c
++++ b/android/tester-main.c
+@@ -467,6 +467,36 @@ static bool match_data(struct step *step)
+ 			return false;
+ 		}
  
- * - different than PTS defaults
- # - not yet implemented/supported
-@@ -70,7 +70,8 @@ TSPC_L2CAP_2_31	False		AMP Manager Support (C.12)
- TSPC_L2CAP_2_32	False		ERTM over AMP (C.12)
- TSPC_L2CAP_2_33	False		Streaming Mode Source over AMP Support (C.15)
- TSPC_L2CAP_2_34	False		Streaming Mode Sink over AMP Support (C.15)
--TSPC_L2CAP_2_35	True (*)	Unicast Connectionless Data, Reception (C.1, C.16)
-+TSPC_L2CAP_2_35	True (*)	Unicast Connectionless Data, Reception
-+				(C.1, C.16)
- TSPC_L2CAP_2_36	True (*)	Ability to transmit an unencrypted packet over
- 					a Unicast connectionless L2CAP
- 					channel (C.16)
-@@ -105,7 +106,8 @@ C.10: Optional IF TSPC_L2CAP_2_12 is claimed, ELSE Excluded.
- C.11: Optional IF TSPC_L2CAP_2_12 is claimed, ELSE Excluded.
- C.12: Mandatory IF SUM_ICS 31/9 (3.0 + HS) is claimed, ELSE Optional.
- C.13: Mandatory IF SUM_ICS 31/9 (3.0 + HS) is claimed, ELSE Optional.
--C.14: Optional IF SUM_ICS 31/8 OR 31/9 OR 31/10 OR 31/11 is claimed, ELSE Excluded.
-+C.14: Optional IF SUM_ICS 31/8 OR 31/9 OR 31/10 OR 31/11 is claimed,
-+	ELSE Excluded.
- C.15: Optional IF TSPC_L2CAP_2_29 is claimed, ELSE Excluded.
- C.16: Optional IF (SUM_ICS 31/8 OR SUM_ICS 31/9 OR 31/10 OR 31/11) is claimed,
-        ELSE Excluded.
-@@ -154,6 +156,7 @@ C.4: Mandatory IF BR/EDR OR BR/EDR/LE is claimed, ELSE Excluded.
- C.5: Optional IF BR/EDR OR BR/EDR/LE is claimed, ELSE Excluded.
- C.6: Mandatory IF LE OR BR/EDR/LE is claimed, ELSE Excluded.
- C.7: Optional if TSPC_L2CAP_2_44 OR TSPC_L2CAP_2_38 is supported, ELSE Excluded.
--C.8: Mandatory if TSPC_L2CAP_2_44 OR TSPC_L2CAP_2_38 is supported, ELSE Excluded.
-+C.8: Mandatory if TSPC_L2CAP_2_44 OR TSPC_L2CAP_2_38 is supported,
-+	ELSE Excluded.
- C.9: Optional if TSPC_L2CAP_2_44 OR TSPC_L2CAP_2_38 is supported, ELSE Excluded.
- -------------------------------------------------------------------------------
-diff --git a/android/pixit-l2cap.txt b/android/pixit-l2cap.txt
-index 914a995..401e584 100644
---- a/android/pixit-l2cap.txt
-+++ b/android/pixit-l2cap.txt
-@@ -1,6 +1,6 @@
- L2CAP PIXIT for the PTS tool.
++		if (exp->callback_result.app_id !=
++					step->callback_result.app_id) {
++			tester_debug("Callback app_id don't match");
++			return false;
++		}
++
++		if (exp->callback_result.channel_id !=
++					step->callback_result.channel_id) {
++			tester_debug("Callback channel_id don't match");
++			return false;
++		}
++
++		if (exp->callback_result.mdep_cfg_index !=
++					step->callback_result.mdep_cfg_index) {
++			tester_debug("Callback mdep_cfg_index don't match");
++			return false;
++		}
++
++		if (exp->callback_result.app_state !=
++					step->callback_result.app_state) {
++			tester_debug("Callback app_state don't match");
++			return false;
++		}
++
++		if (exp->callback_result.channel_state !=
++					step->callback_result.channel_state) {
++			tester_debug("Callback channel_state don't match");
++			return false;
++		}
++
+ 		if (exp->callback_result.pairing_variant !=
+ 					step->callback_result.pairing_variant) {
+ 			tester_debug("Callback pairing result don't match");
+@@ -1023,6 +1053,38 @@ static btpan_callbacks_t btpan_callbacks = {
+ 	.connection_state_cb = pan_connection_state_cb,
+ };
  
--PTS version: 5.1
-+PTS version: 5.2
++static void hdp_app_reg_state_cb(int app_id, bthl_app_reg_state_t state)
++{
++	struct step *step = g_new0(struct step, 1);
++
++	step->callback = CB_HDP_APP_REG_STATE;
++	step->callback_result.app_id = app_id;
++	step->callback_result.app_state = state;
++
++	schedule_callback_call(step);
++}
++
++static void hdp_channel_state_cb(int app_id, bt_bdaddr_t *bd_addr,
++				int mdep_cfg_index, int channel_id,
++				bthl_channel_state_t state, int fd)
++{
++	struct step *step = g_new0(struct step, 1);
++
++	step->callback = CB_HDP_CHANNEL_STATE;
++	step->callback_result.app_id = app_id;
++	step->callback_result.channel_id = channel_id;
++	step->callback_result.mdep_cfg_index = mdep_cfg_index;
++	step->callback_result.channel_state = state;
++
++	schedule_callback_call(step);
++}
++
++static bthl_callbacks_t bthl_callbacks = {
++	.size = sizeof(bthl_callbacks),
++	.app_reg_state_cb = hdp_app_reg_state_cb,
++	.channel_state_cb = hdp_channel_state_cb,
++};
++
+ static const btgatt_client_callbacks_t btgatt_client_callbacks = {
+ 	.register_client_cb = gattc_register_client_cb,
+ 	.scan_result_cb = gattc_scan_result_cb,
+@@ -1250,6 +1312,42 @@ static void setup_pan(const void *test_data)
+ 	tester_setup_complete();
+ }
  
- * - different than PTS defaults
- & - should be set to IUT Bluetooth address
-diff --git a/android/pts-l2cap.txt b/android/pts-l2cap.txt
-index 29e6d7c..11ea04f 100644
---- a/android/pts-l2cap.txt
-+++ b/android/pts-l2cap.txt
-@@ -1,8 +1,8 @@
- PTS test results for L2CAP
++static void setup_hdp(const void *test_data)
++{
++	struct test_data *data = tester_get_data();
++	bt_status_t status;
++	const void *hdp;
++
++	if (!setup_base(data)) {
++		tester_setup_failed();
++		return;
++	}
++
++	status = data->if_bluetooth->init(&bt_callbacks);
++	if (status != BT_STATUS_SUCCESS) {
++		data->if_bluetooth = NULL;
++		tester_setup_failed();
++		return;
++	}
++
++	hdp = data->if_bluetooth->get_profile_interface(BT_PROFILE_HEALTH_ID);
++	if (!hdp) {
++		tester_setup_failed();
++		return;
++	}
++
++	data->if_hdp = hdp;
++
++	status = data->if_hdp->init(&bthl_callbacks);
++	if (status != BT_STATUS_SUCCESS) {
++		data->if_hdp = NULL;
++		tester_setup_failed();
++		return;
++	}
++
++	tester_setup_complete();
++}
++
+ static void setup_gatt(const void *test_data)
+ {
+ 	struct test_data *data = tester_get_data();
+@@ -1309,6 +1407,11 @@ static void teardown(const void *test_data)
+ 		data->if_pan = NULL;
+ 	}
  
--PTS version: 5.1
--Tested: 27-June-2014
--Android version: 4.4.2
-+PTS version: 5.2
-+Tested: 14-July-2014
-+Android version: 4.4.4
- Kernel version: 3.17
++	if (data->if_hdp) {
++		data->if_hdp->cleanup();
++		data->if_hdp = NULL;
++	}
++
+ 	if (data->if_bluetooth) {
+ 		data->if_bluetooth->cleanup();
+ 		data->if_bluetooth = NULL;
+@@ -1758,6 +1861,13 @@ static void add_pan_tests(void *data, void *user_data)
+ 	test(tc, setup_pan, generic_test_function, teardown);
+ }
  
- Results:
-@@ -58,8 +58,10 @@ TC_CMC_BV_08_C		PASS	l2test -r -X streaming -P 4113
- TC_CMC_BV_09_C		PASS	l2test -r -X basic -P 4113
- TC_CMC_BV_10_C		PASS	l2test -n -P 4113 <bdaddr>
- TC_CMC_BV_11_C		PASS	l2test -n -P 4113 <bdaddr>
--TC_CMC_BV_12_C		PASS	l2test -s -X ertm -P 4113 -U <bdaddr>
--TC_CMC_BV_13_C		PASS	l2test -s -X ertm -P 4113 -U <bdaddr>
-+TC_CMC_BV_12_C		INC	l2test -s -X ertm -P 4113 -U <bdaddr>
-+				JIRA #BA-77
-+TC_CMC_BV_13_C		INC	l2test -s -X ertm -P 4113 -U <bdaddr>
-+				JIRA #BA-78
- TC_CMC_BV_14_C		PASS	l2test -r -X streaming -P 4113
- TC_CMC_BV_15_C		PASS	l2test -r -X streaming -P 4113
- TC_CMC_BI_01_C		PASS	l2test -r -X ertm -P 4113
-@@ -71,10 +73,9 @@ TC_CMC_BI_06_C		PASS	l2test -r -P 4113
- TC_FOC_BV_01_C		PASS	l2test -r -X ertm -P 4113 -F 0
- TC_FOC_BV_02_C		PASS	l2test -r -X ertm -P 4113 -F 0
- TC_FOC_BV_03_C		PASS	l2test -r -X ertm -P 4113 -F 0
--TC_FOC_BV_04_C		PASS	l2test -r -X ertm -P 4113 -F 0
--TC_OFS_BV_01_C		PASS	l2test -x -X ertm -P 4113 -F 0 N 1
-+TC_OFS_BV_01_C		PASS	l2test -x -X ertm -P 4113 -F 0 -N 1
- TC_OFS_BV_02_C		PASS	l2test -r -X ertm -P 4113 -F 0
--TC_OFS_BV_03_C		PASS	l2test -r -X streaming -P 4113 -F 0
-+TC_OFS_BV_03_C		PASS	l2test -x -X streaming -P 4113 -F 0 -N 1
- TC_OFS_BV_04_C		PASS	l2test -r -X streaming -P 4113 -F 0
- TC_OFS_BV_05_C		PASS	l2test -x -X ertm -P 4113 -N 1
- TC_OFS_BV_06_C		PASS	l2test -r -X ertm -P 4113
-@@ -85,31 +86,34 @@ TC_ERM_BV_02_C		PASS	l2test -r -X ertm -P 4113
- TC_ERM_BV_03_C		PASS	l2test -r -X ertm -P 4113
- TC_ERM_BV_05_C		PASS	l2test -x -X ertm -P 4113 -N 2 -Y 2
- TC_ERM_BV_06_C		PASS	l2test -x -X ertm -P 4113 -N 2 -Y 2
--TC_ERM_BV_07_C		PASS	l2test -X ertm -P 4113
-+TC_ERM_BV_07_C		INC	l2test -X ertm -P 4113
-+				JIRA #BA-79
- TC_ERM_BV_08_C		PASS	l2test -x -X ertm -P 4113 -N 1
- TC_ERM_BV_09_C		PASS	l2test -X ertm -P 4113
- TC_ERM_BV_10_C		PASS	l2test -x -X ertm -P 4113 -N 1
- TC_ERM_BV_11_C		PASS	l2test -x -X ertm -P 4113 -N 1 -Q 1
- TC_ERM_BV_12_C		PASS	l2test -x -X ertm -P 4113 -R -N 1 -Q 1
--TC_ERM_BV_13_C		PASS
--TC_ERM_BV_14_C		PASS
--TC_ERM_BV_15_C		PASS	l2test -X ertm -P 4113 -N 4 -Y 4
-+TC_ERM_BV_13_C		INC	JIRA #BA-80
-+TC_ERM_BV_14_C		INC	JIRA #BA-81
-+TC_ERM_BV_15_C		INC	l2test -X ertm -P 4113 -N 4 -Y 4
- TC_ERM_BV_16_C		N/A
- TC_ERM_BV_17_C		PASS	l2test -X ertm -P 4113
--TC_ERM_BV_18_C		PASS
--TC_ERM_BV_19_C		PASS	l2test -x -X ertm -P 4113 -N 1
-+TC_ERM_BV_18_C		INC	JIRA #BA-82
-+TC_ERM_NV_19_C		INC	JIRA #BA-83
- TC_ERM_BV_20_C		PASS	l2test -x -X ertm -P 4113 -N 1
--TC_ERM_BV_21_C		PASS	l2test -w -X ertm -P 4113 -N 3
--TC_ERM_BV_22_C		PASS
--TC_ERM_BV_23_C		PASS
-+TC_ERM_BV_21_C		INC	l2test -w -X ertm -P 4113 -N 3
-+				JIRA #BA-84
-+TC_ERM_BV_22_C		INC	JIRA #BA-85
-+TC_ERM_BV_23_C		INC	JIRA #BA-86
- TC_ERM_BI_01_C		N/A
- TC_ERM_BI_02_C		PASS	l2test -X ertm -P 4113
--TC_ERM_BI_03_C		PASS
--TC_ERM_BI_04_C		PASS
--TC_ERM_BI_05_C		PASS
-+TC_ERM_BI_03_C		INC	l2test -w -X ertm -P 4113 -N 2
-+				JIRA #BA-87
-+TC_ERM_BI_04_C		INC	JIRA #BA-88
-+TC_ERM_BI_05_C		INC	JIRA #BA-89
- TC_STM_BV_01_C		PASS	l2test -x -X streaming -P 4113 -N 3 -Y 3
- TC_STM_BV_02_C		PASS	l2test -r -X streaming -P 4113
--TC_STM_BV_03_C		PASS
-+TC_STM_BV_03_C		INC	JIRA #BA-76
- TC_STM_BV_11_C		N/A
- TC_STM_BV_12_C		N/A
- TC_STM_BV_13_C		N/A
-@@ -142,9 +146,12 @@ TC_ECF_BV_05_C		N/A
- TC_ECF_BV_06_C		N/A
- TC_ECF_BV_07_C		N/A
- TC_ECF_BV_08_C		N/A
--TC_LE_CPU_BV_01_C	PASS	l2test -r -V le_public -J 4
--TC_LE_CPU_BV_02_C	PASS	l2test -n -V le_public -J 4 <braddr>
--TC_LE_CPU_BI_01_C	PASS	l2test -n -V le_public -J 4 <braddr>
-+				NOTE: add some notes; daemon should be stopped
-+				hciattach
-+TC_LE_CPU_BV_01_C	INC	l2test -r -V le_public -J 4
-+				JIRA #BA-75
-+TC_LE_CPU_BV_02_C	INC	l2test -n -V le_public -J 4 <braddr>
-+TC_LE_CPU_BI_01_C	INC	l2test -n -V le_public -J 4 <braddr>
- TC_LE_CPU_BI_02_C	INC	PTS issue #12339
- 				l2test -r -V le_public -J 4
--TC_LE_REJ_BV_01_C	PASS	l2test -n -V le_public -J 4 <braddr>
-+TC_LE_REJ_BV_01_C	INC	l2test -n -V le_public -J 4 <braddr>
++static void add_hdp_tests(void *data, void *user_data)
++{
++	struct test_case *tc = data;
++
++	test(tc, setup_hdp, generic_test_function, teardown);
++}
++
+ static void add_gatt_tests(void *data, void *user_data)
+ {
+ 	struct test_case *tc = data;
+@@ -1775,6 +1885,7 @@ int main(int argc, char *argv[])
+ 	queue_foreach(get_socket_tests(), add_socket_tests, NULL);
+ 	queue_foreach(get_hidhost_tests(), add_hidhost_tests, NULL);
+ 	queue_foreach(get_pan_tests(), add_pan_tests, NULL);
++	queue_foreach(get_hdp_tests(), add_hdp_tests, NULL);
+ 	queue_foreach(get_gatt_tests(), add_gatt_tests, NULL);
+ 
+ 	if (tester_run())
+diff --git a/android/tester-main.h b/android/tester-main.h
+index 5a5cba4..f0ea095 100644
+--- a/android/tester-main.h
++++ b/android/tester-main.h
+@@ -47,6 +47,7 @@
+ #include <hardware/bt_sock.h>
+ #include <hardware/bt_hh.h>
+ #include <hardware/bt_pan.h>
++#include <hardware/bt_hl.h>
+ #include <hardware/bt_gatt.h>
+ #include <hardware/bt_gatt_client.h>
+ #include <hardware/bt_gatt_server.h>
+@@ -162,6 +163,21 @@
+ 		.callback_result.remote_role = cb_remote_role, \
+ 	}
+ 
++#define CALLBACK_HDP_APP_REG_STATE(cb, cb_app_id, cb_state) { \
++		.callback = cb, \
++		.callback_result.app_id = cb_app_id, \
++		.callback_result.app_state = cb_state, \
++	}
++
++#define CALLBACK_HDP_CHANNEL_STATE(cb, cb_app_id, cb_channel_id, \
++					cb_mdep_cfg_index, cb_state) { \
++		.callback = cb, \
++		.callback_result.app_id = cb_app_id, \
++		.callback_result.channel_id = cb_channel_id, \
++		.callback_result.mdep_cfg_index = cb_mdep_cfg_index, \
++		.callback_result.channel_state = cb_state, \
++	}
++
+ #define CALLBACK_DEVICE_PROPS(props, prop_cnt) \
+ 	CALLBACK_PROPS(CB_BT_REMOTE_DEVICE_PROPERTIES, props, prop_cnt)
+ 
+@@ -221,6 +237,10 @@ typedef enum {
+ 	CB_PAN_CONTROL_STATE,
+ 	CB_PAN_CONNECTION_STATE,
+ 
++	/* HDP cb */
++	CB_HDP_APP_REG_STATE,
++	CB_HDP_CHANNEL_STATE,
++
+ 	/* Gatt client */
+ 	CB_GATTC_REGISTER_CLIENT,
+ 	CB_GATTC_SCAN_RESULT,
+@@ -267,6 +287,7 @@ struct test_data {
+ 	const btsock_interface_t *if_sock;
+ 	const bthh_interface_t *if_hid;
+ 	const btpan_interface_t *if_pan;
++	const bthl_interface_t *if_hdp;
+ 	const btgatt_interface_t *if_gatt;
+ 
+ 	const void *test_data;
+@@ -337,6 +358,12 @@ struct bt_callback_data {
+ 	btpan_connection_state_t conn_state;
+ 	int local_role;
+ 	int remote_role;
++
++	int app_id;
++	int channel_id;
++	int mdep_cfg_index;
++	bthl_app_reg_state_t app_state;
++	bthl_channel_state_t channel_state;
+ };
+ 
+ /*
+@@ -370,6 +397,8 @@ struct queue *get_hidhost_tests(void);
+ void remove_hidhost_tests(void);
+ struct queue *get_pan_tests(void);
+ void remove_pan_tests(void);
++struct queue *get_hdp_tests(void);
++void remove_hdp_tests(void);
+ struct queue *get_gatt_tests(void);
+ void remove_gatt_tests(void);
+ 
 -- 
-1.8.5.3
+1.9.1
 
