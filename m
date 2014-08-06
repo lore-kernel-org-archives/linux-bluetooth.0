@@ -1,72 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
-From: Vikrampal <vikram.pal@samsung.com>
-To: 'Antonio Ospite' <ao2@ao2.it>
-Cc: 'Luiz Augusto von Dentz' <luiz.dentz@gmail.com>,
-	linux-bluetooth@vger.kernel.org,
-	'Dmitry Kasatkin' <d.kasatkin@samsung.com>
-References: <001301cfafc0$ef11b350$cd3519f0$@samsung.com>
- <CABBYNZKfvD271JoWqCW=Lupu-22scZRAJ0D8ksG8bXfUP8gBkg@mail.gmail.com>
- <002f01cfb07a$2502c170$6f084450$@samsung.com>
- <20140805135138.4d27987b16680f617c27582b@ao2.it>
-In-reply-to: <20140805135138.4d27987b16680f617c27582b@ao2.it>
-Subject: RE: AVCTP and AVRCP packet decoder file structure in btmon
-Date: Wed, 06 Aug 2014 13:48:25 +0530
-Message-id: <006401cfb14f$02a42bc0$07ec8340$@samsung.com>
-MIME-version: 1.0
-Content-type: text/plain; charset=us-ascii
+Date: Wed, 6 Aug 2014 10:40:25 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH_v2 0/8] Add PAN test cases
+Message-ID: <20140806074025.GE31308@t440s.lan>
+References: <1407237554-5079-1-git-send-email-ravikumar.veeramally@linux.intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1407237554-5079-1-git-send-email-ravikumar.veeramally@linux.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Thanks Antonio for useful advice!
+Hi Ravi,
 
-> -----Original Message-----
-> From: Antonio Ospite [mailto:ao2@ao2.it]
-> Sent: Tuesday, August 05, 2014 5:22 PM
-> To: Vikrampal
-> Cc: 'Luiz Augusto von Dentz'; linux-bluetooth@vger.kernel.org; 'Dmitry
-> Kasatkin'
-> Subject: Re: AVCTP and AVRCP packet decoder file structure in btmon
+On Tue, Aug 05, 2014, Ravi kumar Veeramally wrote:
+> v2: Fixed comments.
 > 
-> On Tue, 05 Aug 2014 12:24:44 +0530
-> Vikrampal <vikram.pal@samsung.com> wrote:
+> Ravi kumar Veeramally (8):
+>   android/tester: Add PAN init test case
+>   android/tester: Add PAN Connect test case
+>   android/tester: Add PAN Disconnect test case
+>   android/tester: Add PAN Get Local Role test case
+>   android/pan: Notify control state callback on HAL .enable call
+>   android/tester: Add PAN Enable NAP test case
+>   android/tester: Add PAN Enable PANU test case
+>   android/tester: Add PAN Enable None test case
 > 
-> > Sure Luiz!
-> >
-> > However, I've one more small doubt. If I'm submitting a series of
-> > patches Such as 1/4, 2/4, 3/4, 4/4... I guess in such scenarios no
-> > need to ensure that the patches separately compiles. What we need to
-> > ensure is that all the patches together gets compiled properly. Am I
-> mistaken?
-> >
-> 
-> Make sure that sub-sequences of a series produce sensible code.
-> 
-> The code should $VALIDATE with 1/4 applied.
-> The code should $VALIDATE with 1/4 and 2/4 applied.
-> The code should $VALIDATE with 1/4, 2/4 and 3/4 applied.
-> The code should $VALIDATE with 1/4, 2/4, 3/4 and 4/4 applied.
-> 
-> The definition of VALIDATE can vary project by project or feature by
-feature;
-> the minimum requirement should be that compilation always succeeds.
-> 
-> You can use something like:
-> 
-> 	git rebase -i --exec "make" some_parent_branch
-> 
-> to test that compilation passes after each commit.
-> 
-> Ciao,
->    Antonio
-> 
-> --
-> Antonio Ospite
-> http://ao2.it
-> 
-> A: Because it messes up the order in which people normally read text.
->    See http://en.wikipedia.org/wiki/Posting_style
-> Q: Why is top-posting such a bad thing?
+>  android/Makefile.am   |   1 +
+>  android/pan.c         |  21 +++--
+>  android/tester-main.c | 109 +++++++++++++++++++++
+>  android/tester-main.h |  29 ++++++
+>  android/tester-pan.c  | 256 ++++++++++++++++++++++++++++++++++++++++++++++++++
+>  5 files changed, 409 insertions(+), 7 deletions(-)
+>  create mode 100644 android/tester-pan.c
 
-Regards,
-Vikram
+All patches in this set have been applied. Thanks.
 
+Johan
