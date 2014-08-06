@@ -4,9 +4,9 @@ Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.6\))
 Subject: Re: [PATCH 1/3] Bluetooth: Add convenience function to check for pending power off
 From: Marcel Holtmann <marcel@holtmann.org>
 In-Reply-To: <1406880812-19731-1-git-send-email-johan.hedberg@gmail.com>
-Date: Wed, 6 Aug 2014 13:00:52 -0700
+Date: Wed, 6 Aug 2014 13:00:39 -0700
 Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <243E3BCA-5FCD-41D1-946B-3C805C0FB99B@holtmann.org>
+Message-Id: <1149A2D1-35FB-4920-ACCD-6BE8F8B1D9A7@holtmann.org>
 References: <1406880812-19731-1-git-send-email-johan.hedberg@gmail.com>
 To: Johan Hedberg <johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
