@@ -2,131 +2,140 @@ Return-Path: <cyrus@holtmann.org>
 From: Vikrampal Yadav <vikram.pal@samsung.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: vikram.pal@samsung.com, cpgs@samsung.com
-Subject: [PATCH 5/6] monitor: Add AV/C and AVRCP GetCapabilities support
-Date: Wed, 06 Aug 2014 17:59:15 +0530
-Message-id: <1407328156-27218-5-git-send-email-vikram.pal@samsung.com>
+Subject: [PATCH 4/6] monitor: Add AV/C and AVRCP GetCapabilities support
+Date: Wed, 06 Aug 2014 17:59:14 +0530
+Message-id: <1407328156-27218-4-git-send-email-vikram.pal@samsung.com>
 In-reply-to: <1407328156-27218-1-git-send-email-vikram.pal@samsung.com>
 References: <1407328156-27218-1-git-send-email-vikram.pal@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Support for decoding AV/C commands and GetCapabilities added in
+upport for decoding AV/C commands and GetCapabilities added in
 Bluetooth monitor.
 ---
- monitor/avctp.c | 86 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 86 insertions(+)
+ monitor/avctp.c | 98 +++++++++++++++++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 96 insertions(+), 2 deletions(-)
 
 diff --git a/monitor/avctp.c b/monitor/avctp.c
-index 28605fb..f85a1ee 100644
+index 8eca5da..28605fb 100644
 --- a/monitor/avctp.c
 +++ b/monitor/avctp.c
-@@ -79,6 +79,30 @@
+@@ -79,6 +79,38 @@
  #define AVC_OP_SUBUNITINFO              0x31
  #define AVC_OP_PASSTHROUGH              0x7c
  
-+/* error statuses */
-+#define AVRCP_STATUS_INVALID_COMMAND                    0x00
-+#define AVRCP_STATUS_INVALID_PARAMETER                  0x01
-+#define AVRCP_STATUS_NOT_FOUND                          0x02
-+#define AVRCP_STATUS_INTERNAL_ERROR                     0x03
-+#define AVRCP_STATUS_SUCCESS                            0x04
-+#define AVRCP_STATUS_UID_CHANGED                        0x05
-+#define AVRCP_STATUS_INVALID_DIRECTION                  0x07
-+#define AVRCP_STATUS_NOT_DIRECTORY                      0x08
-+#define AVRCP_STATUS_DOES_NOT_EXIST                     0x09
-+#define AVRCP_STATUS_INVALID_SCOPE                      0x0a
-+#define AVRCP_STATUS_OUT_OF_BOUNDS                      0x0b
-+#define AVRCP_STATUS_IS_DIRECTORY                       0x0c
-+#define AVRCP_STATUS_MEDIA_IN_USE                       0x0d
-+#define AVRCP_STATUS_NOW_PLAYING_LIST_FULL              0x0e
-+#define AVRCP_STATUS_SEARCH_NOT_SUPPORTED               0x0f
-+#define AVRCP_STATUS_SEARCH_IN_PROGRESS                 0x10
-+#define AVRCP_STATUS_INVALID_PLAYER_ID                  0x11
-+#define AVRCP_STATUS_PLAYER_NOT_BROWSABLE               0x12
-+#define AVRCP_STATUS_PLAYER_NOT_ADDRESSED               0x13
-+#define AVRCP_STATUS_NO_VALID_SEARCH_RESULTS            0x14
-+#define AVRCP_STATUS_NO_AVAILABLE_PLAYERS               0x15
-+#define AVRCP_STATUS_ADDRESSED_PLAYER_CHANGED           0x16
++/* pdu ids */
++#define AVRCP_GET_CAPABILITIES          0x10
++#define AVRCP_LIST_PLAYER_ATTRIBUTES    0x11
++#define AVRCP_LIST_PLAYER_VALUES        0x12
++#define AVRCP_GET_CURRENT_PLAYER_VALUE  0x13
++#define AVRCP_SET_PLAYER_VALUE          0x14
++#define AVRCP_GET_PLAYER_ATTRIBUTE_TEXT 0x15
++#define AVRCP_GET_PLAYER_VALUE_TEXT     0x16
++#define AVRCP_DISPLAYABLE_CHARSET       0x17
++#define AVRCP_CT_BATTERY_STATUS         0x18
++#define AVRCP_GET_ELEMENT_ATTRIBUTES    0x20
++#define AVRCP_GET_PLAY_STATUS           0x30
++#define AVRCP_REGISTER_NOTIFICATION     0x31
++#define AVRCP_REQUEST_CONTINUING        0x40
++#define AVRCP_ABORT_CONTINUING          0x41
++#define AVRCP_SET_ABSOLUTE_VOLUME       0x50
++#define AVRCP_SET_ADDRESSED_PLAYER      0x60
++#define AVRCP_SET_BROWSED_PLAYER        0x70
++#define AVRCP_GET_FOLDER_ITEMS          0x71
++#define AVRCP_CHANGE_PATH               0x72
++#define AVRCP_GET_ITEM_ATTRIBUTES       0x73
++#define AVRCP_PLAY_ITEM                 0x74
++#define AVRCP_SEARCH                    0x80
++#define AVRCP_ADD_TO_NOW_PLAYING        0x90
++#define AVRCP_GENERAL_REJECT            0xA0
 +
- /* pdu ids */
- #define AVRCP_GET_CAPABILITIES          0x10
- #define AVRCP_LIST_PLAYER_ATTRIBUTES    0x11
-@@ -195,6 +219,58 @@ static const char *opcode2str(uint8_t opcode)
-         }
- }
++/* Packet types */
++#define AVRCP_PACKET_TYPE_SINGLE        0x00
++#define AVRCP_PACKET_TYPE_START         0x01
++#define AVRCP_PACKET_TYPE_CONTINUING    0x02
++#define AVRCP_PACKET_TYPE_END           0x03
++
+ static const char *ctype2str(uint8_t ctype)
+ {
+         switch (ctype & 0x0f) {
+@@ -165,12 +197,74 @@ static const char *opcode2str(uint8_t opcode)
  
-+static const char *error2str(uint8_t status)
-+{
-+        switch (status) {
-+        case AVRCP_STATUS_INVALID_COMMAND:
-+                return "Invalid Command";
-+        case AVRCP_STATUS_INVALID_PARAMETER:
-+                return "Invalid Parameter";
-+        case AVRCP_STATUS_NOT_FOUND:
-+                return "Not Found";
-+        case AVRCP_STATUS_INTERNAL_ERROR:
-+                return "Internal Error";
-+        case AVRCP_STATUS_SUCCESS:
-+                return "Success";
-+        case AVRCP_STATUS_UID_CHANGED:
-+                return "UID Changed";
-+        case AVRCP_STATUS_INVALID_DIRECTION:
-+                return "Invalid Direction";
-+        case AVRCP_STATUS_NOT_DIRECTORY:
-+                return "Not a Directory";
-+        case AVRCP_STATUS_DOES_NOT_EXIST:
-+                return "Does Not Exist";
-+        case AVRCP_STATUS_INVALID_SCOPE:
-+                return "Invalid Scope";
-+        case AVRCP_STATUS_OUT_OF_BOUNDS:
-+                return "Range Out of Bonds";
-+        case AVRCP_STATUS_MEDIA_IN_USE:
-+                return "Media in Use";
-+        case AVRCP_STATUS_IS_DIRECTORY:
-+                return "UID is a Directory";
-+        case AVRCP_STATUS_NOW_PLAYING_LIST_FULL:
-+                return "Now Playing List Full";
-+        case AVRCP_STATUS_SEARCH_NOT_SUPPORTED:
-+                return "Seach Not Supported";
-+        case AVRCP_STATUS_SEARCH_IN_PROGRESS:
-+                return "Search in Progress";
-+        case AVRCP_STATUS_INVALID_PLAYER_ID:
-+                return "Invalid Player ID";
-+        case AVRCP_STATUS_PLAYER_NOT_BROWSABLE:
-+                return "Player Not Browsable";
-+	case AVRCP_STATUS_PLAYER_NOT_ADDRESSED:
-+                return "Player Not Addressed";
-+        case AVRCP_STATUS_NO_VALID_SEARCH_RESULTS:
-+                return "No Valid Search Result";
-+        case AVRCP_STATUS_NO_AVAILABLE_PLAYERS:
-+                return "No Available Players";
-+        case AVRCP_STATUS_ADDRESSED_PLAYER_CHANGED:
-+                return "Addressed Player Changed";
+ static const char *pdu2str(uint8_t pduid)
+ {
+-	return "Unknown";
++        switch (pduid) {
++        case AVRCP_GET_CAPABILITIES:
++                return "GetCapabilities";
++        case AVRCP_LIST_PLAYER_ATTRIBUTES:
++                return "ListPlayerApplicationSettingAttributes";
++        case AVRCP_LIST_PLAYER_VALUES:
++                return "ListPlayerApplicationSettingValues";
++        case AVRCP_GET_CURRENT_PLAYER_VALUE:
++                return "GetCurrentPlayerApplicationSettingValue";
++        case AVRCP_SET_PLAYER_VALUE:
++                return "SetPlayerApplicationSettingValue";
++        case AVRCP_GET_PLAYER_ATTRIBUTE_TEXT:
++                return "GetPlayerApplicationSettingAttributeText";
++        case AVRCP_GET_PLAYER_VALUE_TEXT:
++                return "GetPlayerApplicationSettingValueText";
++        case AVRCP_DISPLAYABLE_CHARSET:
++                return "InformDisplayableCharacterSet";
++        case AVRCP_CT_BATTERY_STATUS:
++                return "InformBatteryStatusOfCT";
++        case AVRCP_GET_ELEMENT_ATTRIBUTES:
++                return "GetElementAttributes";
++        case AVRCP_GET_PLAY_STATUS:
++                return "GetPlayStatus";
++        case AVRCP_REGISTER_NOTIFICATION:
++                return "RegisterNotification";
++        case AVRCP_REQUEST_CONTINUING:
++                return "RequestContinuingResponse";
++        case AVRCP_ABORT_CONTINUING:
++                return "AbortContinuingResponse";
++        case AVRCP_SET_ABSOLUTE_VOLUME:
++                return "SetAbsoluteVolume";
++        case AVRCP_SET_ADDRESSED_PLAYER:
++                return "SetAddressedPlayer";
++        case AVRCP_SET_BROWSED_PLAYER:
++                return "SetBrowsedPlayer";
++        case AVRCP_GET_FOLDER_ITEMS:
++                return "GetFolderItems";
++        case AVRCP_CHANGE_PATH:
++                return "ChangePath";
++	case AVRCP_GET_ITEM_ATTRIBUTES:
++                return "GetItemAttributes";
++        case AVRCP_PLAY_ITEM:
++                return "PlayItem";
++        case AVRCP_SEARCH:
++                return "Search";
++        case AVRCP_ADD_TO_NOW_PLAYING:
++                return "AddToNowPlaying";
++        case AVRCP_GENERAL_REJECT:
++                return "GeneralReject";
 +        default:
 +                return "Unknown";
 +        }
-+}
-+
- static const char *pdu2str(uint8_t pduid)
- {
-         switch (pduid) {
-@@ -395,6 +471,16 @@ static const struct avrcp_ctrl_pdu_data avrcp_ctrl_pdu_table[] = {
- 
- static void avrcp_rejected_packet(const struct l2cap_frame *frame)
- {
-+        uint8_t status;
-+
-+        if (frame->size < 1) {
-+                print_text(COLOR_ERROR, "PDU malformed");
-+                packet_hexdump(frame->data, frame->size);
-+                return;
-+        }
-+
-+        status = *((uint8_t *) frame->data);
-+        print_field("Error: 0x%02x (%s)", status, error2str(status));
  }
  
- static void avrcp_pdu_packet(const struct l2cap_frame *frame, uint8_t ctype,
+ static const char *pt2str(uint8_t pt)
+ {
+-	return "Unknown";
++        switch (pt) {
++        case AVRCP_PACKET_TYPE_SINGLE:
++                return "Single";
++        case AVRCP_PACKET_TYPE_START:
++                return "Start";
++        case AVRCP_PACKET_TYPE_CONTINUING:
++                return "Continuing";
++        case AVRCP_PACKET_TYPE_END:
++                return "End";
++        default:
++                return "Unknown";
++        }
+ }
+ 
+ static void avrcp_passthrough_packet(const struct l2cap_frame *frame)
 -- 
 1.9.1
 
