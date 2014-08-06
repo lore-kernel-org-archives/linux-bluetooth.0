@@ -1,30 +1,72 @@
 Return-Path: <cyrus@holtmann.org>
-From: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
-Subject: [PATCH] gitignore: Update renamed file name tools/mpris-player to tools/mpris-proxy
-Date: Wed,  6 Aug 2014 11:27:51 +0300
-Message-Id: <1407313671-24513-1-git-send-email-ravikumar.veeramally@linux.intel.com>
+From: Vikrampal <vikram.pal@samsung.com>
+To: 'Antonio Ospite' <ao2@ao2.it>
+Cc: 'Luiz Augusto von Dentz' <luiz.dentz@gmail.com>,
+	linux-bluetooth@vger.kernel.org,
+	'Dmitry Kasatkin' <d.kasatkin@samsung.com>
+References: <001301cfafc0$ef11b350$cd3519f0$@samsung.com>
+ <CABBYNZKfvD271JoWqCW=Lupu-22scZRAJ0D8ksG8bXfUP8gBkg@mail.gmail.com>
+ <002f01cfb07a$2502c170$6f084450$@samsung.com>
+ <20140805135138.4d27987b16680f617c27582b@ao2.it>
+In-reply-to: <20140805135138.4d27987b16680f617c27582b@ao2.it>
+Subject: RE: AVCTP and AVRCP packet decoder file structure in btmon
+Date: Wed, 06 Aug 2014 13:48:25 +0530
+Message-id: <006401cfb14f$02a42bc0$07ec8340$@samsung.com>
+MIME-version: 1.0
+Content-type: text/plain; charset=us-ascii
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- .gitignore | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Thanks Antonio for useful advice!
 
-diff --git a/.gitignore b/.gitignore
-index 1a7b417..1ee35e2 100644
---- a/.gitignore
-+++ b/.gitignore
-@@ -63,7 +63,7 @@ tools/bluemoon
- tools/seq2bseq
- tools/hex2hcd
- tools/btiotest
--tools/mpris-player
-+tools/mpris-proxy
- tools/bluetooth-player
- tools/l2cap-tester
- tools/sco-tester
--- 
-1.9.1
+> -----Original Message-----
+> From: Antonio Ospite [mailto:ao2@ao2.it]
+> Sent: Tuesday, August 05, 2014 5:22 PM
+> To: Vikrampal
+> Cc: 'Luiz Augusto von Dentz'; linux-bluetooth@vger.kernel.org; 'Dmitry
+> Kasatkin'
+> Subject: Re: AVCTP and AVRCP packet decoder file structure in btmon
+> 
+> On Tue, 05 Aug 2014 12:24:44 +0530
+> Vikrampal <vikram.pal@samsung.com> wrote:
+> 
+> > Sure Luiz!
+> >
+> > However, I've one more small doubt. If I'm submitting a series of
+> > patches Such as 1/4, 2/4, 3/4, 4/4... I guess in such scenarios no
+> > need to ensure that the patches separately compiles. What we need to
+> > ensure is that all the patches together gets compiled properly. Am I
+> mistaken?
+> >
+> 
+> Make sure that sub-sequences of a series produce sensible code.
+> 
+> The code should $VALIDATE with 1/4 applied.
+> The code should $VALIDATE with 1/4 and 2/4 applied.
+> The code should $VALIDATE with 1/4, 2/4 and 3/4 applied.
+> The code should $VALIDATE with 1/4, 2/4, 3/4 and 4/4 applied.
+> 
+> The definition of VALIDATE can vary project by project or feature by
+feature;
+> the minimum requirement should be that compilation always succeeds.
+> 
+> You can use something like:
+> 
+> 	git rebase -i --exec "make" some_parent_branch
+> 
+> to test that compilation passes after each commit.
+> 
+> Ciao,
+>    Antonio
+> 
+> --
+> Antonio Ospite
+> http://ao2.it
+> 
+> A: Because it messes up the order in which people normally read text.
+>    See http://en.wikipedia.org/wiki/Posting_style
+> Q: Why is top-posting such a bad thing?
+
+Regards,
+Vikram
 
