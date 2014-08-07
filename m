@@ -1,44 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.6\))
-Subject: Re: [PATCH] 6lowpan: Allow 6LoWPAN to be modular
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1407424003-15073-1-git-send-email-geert@linux-m68k.org>
-Date: Thu, 7 Aug 2014 09:00:36 -0700
-Cc: Alexander Aring <alex.aring@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-zigbee-devel@lists.sourceforge.net,
-	BlueZ development <linux-bluetooth@vger.kernel.org>,
-	linux-wpan@vger.kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Message-Id: <ABE15994-F47B-4E4B-A6FC-79C6BCAC9FF3@holtmann.org>
-References: <1407424003-15073-1-git-send-email-geert@linux-m68k.org>
-To: Geert Uytterhoeven <geert@linux-m68k.org>
-Sender: linux-kernel-owner@vger.kernel.org
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+To: Alexander Aring <alex.aring@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>
+Cc: linux-zigbee-devel@lists.sourceforge.net,
+	linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Geert Uytterhoeven <geert@linux-m68k.org>
+Subject: [PATCH] 6lowpan: Allow 6LoWPAN to be modular
+Date: Thu,  7 Aug 2014 17:06:43 +0200
+Message-Id: <1407424003-15073-1-git-send-email-geert@linux-m68k.org>
+Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Geert,
+Change config symbol 6LOWPAN from type bool to type tristate, so
+6LoWPAN can be built modular, just like IPV6
 
-> Change config symbol 6LOWPAN from type bool to type tristate, so
-> 6LoWPAN can be built modular, just like IPV6
-> 
-> Signed-off-by: Geert Uytterhoeven <geert@linux-m68k.org>
-> ---
-> net/6lowpan/Kconfig | 2 +-
-> 1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/net/6lowpan/Kconfig b/net/6lowpan/Kconfig
-> index 028a5c6d1f61..e4a02ef55102 100644
-> --- a/net/6lowpan/Kconfig
-> +++ b/net/6lowpan/Kconfig
-> @@ -1,5 +1,5 @@
-> config 6LOWPAN
-> -	bool "6LoWPAN Support"
-> +	tristate "6LoWPAN Support"
+Signed-off-by: Geert Uytterhoeven <geert@linux-m68k.org>
+---
+ net/6lowpan/Kconfig | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-is this a regression from the previous CONFIG_6LOWPAN separation that we introduced? If it is, then it might be easiest if Dave just takes it into his net tree. Otherwise I take it through bluetooth-next.
-
-Regards
-
-Marcel
+diff --git a/net/6lowpan/Kconfig b/net/6lowpan/Kconfig
+index 028a5c6d1f61..e4a02ef55102 100644
+--- a/net/6lowpan/Kconfig
++++ b/net/6lowpan/Kconfig
+@@ -1,5 +1,5 @@
+ config 6LOWPAN
+-	bool "6LoWPAN Support"
++	tristate "6LoWPAN Support"
+ 	depends on IPV6
+ 	---help---
+ 	  This enables IPv6 over Low power Wireless Personal Area Network -
+-- 
+1.9.1
 
