@@ -1,65 +1,63 @@
 Return-Path: <cyrus@holtmann.org>
-From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+From: johan.hedberg@gmail.com
 To: linux-bluetooth@vger.kernel.org
-Cc: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [RFC] android/bluetooth: Update pairing status on pair complete event
-Date: Thu,  7 Aug 2014 10:39:00 +0200
-Message-Id: <1407400740-29565-1-git-send-email-lukasz.rymanowski@tieto.com>
+Subject: [PATCH 9/9] Bluetooth: Move parts of fixed channel initialization to l2cap_add_scid
+Date: Thu,  7 Aug 2014 10:12:31 +0300
+Message-Id: <1407395551-30810-10-git-send-email-johan.hedberg@gmail.com>
+In-Reply-To: <1407395551-30810-1-git-send-email-johan.hedberg@gmail.com>
+References: <1407395551-30810-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-So far BfA updates android bond state after link key(s) are
-distributed. With LE pairing it might happen that no keys are
-distributed e.g remote device has Initiator Key Distribution and
-Responder Key Distribution set to 0. In such case link is encrypted with
-STK and after its disconnected, pairing needs to be done again.
+From: Johan Hedberg <johan.hedberg@intel.com>
 
-With this patch Android will get update about pairing complete just
-after BfA gets pairing complete from the kernel. It solve issue with not
-updated Android settings application, which is hanging on "Pairing", in
-case when no keys are distributed.
+The l2cap_add_scid function is used for registering a fixed L2CAP
+channel. Instead of having separate initialization of the channel type
+and outgoing MTU in l2cap_sock.c it's more intuitive to do these things
+in the l2cap_add_scid function itself (and thereby make the
+functionality available to other users besides l2cap_sock.c).
 
-However, bacause Android does not see the difference between bonded /
-paired devices and because Android does not allow to update its bond
-state if it is not in bonding state, BfA updates Android with BONDED
-state on pair_complete with success. This is how we are doing so far
-for bonding and non-bonding pairing.
-
-Note: BfA will update its bonded state after link key(s) are
-distribiuted.
+Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- android/bluetooth.c | 13 +++++--------
- 1 file changed, 5 insertions(+), 8 deletions(-)
+ net/bluetooth/l2cap_core.c | 4 ++++
+ net/bluetooth/l2cap_sock.c | 9 ---------
+ 2 files changed, 4 insertions(+), 9 deletions(-)
 
-diff --git a/android/bluetooth.c b/android/bluetooth.c
-index 655844d..8c32d48 100644
---- a/android/bluetooth.c
-+++ b/android/bluetooth.c
-@@ -4065,19 +4065,16 @@ static void pair_device_complete(uint8_t status, uint16_t length,
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index fbe8c37f1a9e..4db668068804 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -210,6 +210,10 @@ int l2cap_add_scid(struct l2cap_chan *chan,  __u16 scid)
+ {
+ 	write_lock(&chan_list_lock);
  
- 	DBG("status %u", status);
++	/* Override the defaults (which are for conn-oriented) */
++	chan->omtu = L2CAP_DEFAULT_MTU;
++	chan->chan_type = L2CAP_CHAN_FIXED;
++
+ 	chan->scid = scid;
  
--	/*
--	 * On success bond state change will be send when new link key or LTK
--	 * event is received
--	 */
--	if (status == MGMT_STATUS_SUCCESS)
--		return;
+ 	write_unlock(&chan_list_lock);
+diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
+index 5a42f6a818c0..ed06f88e6f10 100644
+--- a/net/bluetooth/l2cap_sock.c
++++ b/net/bluetooth/l2cap_sock.c
+@@ -99,15 +99,6 @@ static int l2cap_sock_bind(struct socket *sock, struct sockaddr *addr, int alen)
+ 	if (!bdaddr_type_is_valid(la.l2_bdaddr_type))
+ 		return -EINVAL;
+ 
+-	if (la.l2_cid) {
+-		/* When the socket gets created it defaults to
+-		 * CHAN_CONN_ORIENTED, so we need to overwrite the
+-		 * default here.
+-		 */
+-		chan->chan_type = L2CAP_CHAN_FIXED;
+-		chan->omtu = L2CAP_DEFAULT_MTU;
+-	}
 -
- 	dev = find_device(&rp->addr.bdaddr);
- 	if (!dev)
- 		return;
- 
-+	/*
-+	 * Update pairing and paired status. Bonded status will be updated once
-+	 * any link key come
-+	 */
- 	update_device_state(dev, rp->addr.type, status_mgmt2hal(status), false,
--								false, false);
-+								!status, false);
- }
- 
- static uint8_t select_device_bearer(struct device *dev)
+ 	if (bdaddr_type_is_le(la.l2_bdaddr_type)) {
+ 		/* We only allow ATT user space socket */
+ 		if (la.l2_cid &&
 -- 
-1.8.4
+1.9.3
 
