@@ -1,71 +1,65 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 1/2] input/hog: Remove unnecessary variables
-Date: Thu,  7 Aug 2014 12:03:50 +0300
-Message-Id: <1407402231-32496-1-git-send-email-luiz.dentz@gmail.com>
+Cc: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+Subject: [RFC] android/bluetooth: Update pairing status on pair complete event
+Date: Thu,  7 Aug 2014 10:39:00 +0200
+Message-Id: <1407400740-29565-1-git-send-email-lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+So far BfA updates android bond state after link key(s) are
+distributed. With LE pairing it might happen that no keys are
+distributed e.g remote device has Initiator Key Distribution and
+Responder Key Distribution set to 0. In such case link is encrypted with
+STK and after its disconnected, pairing needs to be done again.
 
+With this patch Android will get update about pairing complete just
+after BfA gets pairing complete from the kernel. It solve issue with not
+updated Android settings application, which is hanging on "Pairing", in
+case when no keys are distributed.
+
+However, bacause Android does not see the difference between bonded /
+paired devices and because Android does not allow to update its bond
+state if it is not in bonding state, BfA updates Android with BONDED
+state on pair_complete with success. This is how we are doing so far
+for bonding and non-bonding pairing.
+
+Note: BfA will update its bonded state after link key(s) are
+distribiuted.
 ---
- profiles/input/hog.c | 17 +++++++----------
- 1 file changed, 7 insertions(+), 10 deletions(-)
+ android/bluetooth.c | 13 +++++--------
+ 1 file changed, 5 insertions(+), 8 deletions(-)
 
-diff --git a/profiles/input/hog.c b/profiles/input/hog.c
-index 30f9ed1..b9aba65 100644
---- a/profiles/input/hog.c
-+++ b/profiles/input/hog.c
-@@ -333,33 +333,30 @@ static void forward_report(struct uhid_event *ev, void *user_data)
- 	struct report *report, cmp;
- 	GSList *l;
- 	uint8_t *data;
--	int size, type, id;
-+	int size;
+diff --git a/android/bluetooth.c b/android/bluetooth.c
+index 655844d..8c32d48 100644
+--- a/android/bluetooth.c
++++ b/android/bluetooth.c
+@@ -4065,19 +4065,16 @@ static void pair_device_complete(uint8_t status, uint16_t length,
  
- 	switch (ev->u.output.rtype) {
- 	case UHID_FEATURE_REPORT:
--		type = HOG_REPORT_TYPE_FEATURE;
-+		cmp.type = HOG_REPORT_TYPE_FEATURE;
- 		break;
- 	case UHID_OUTPUT_REPORT:
--		type = HOG_REPORT_TYPE_OUTPUT;
-+		cmp.type = HOG_REPORT_TYPE_OUTPUT;
- 		break;
- 	case UHID_INPUT_REPORT:
--		type = HOG_REPORT_TYPE_INPUT;
-+		cmp.type = HOG_REPORT_TYPE_INPUT;
- 		break;
- 	default:
- 		return;
- 	}
+ 	DBG("status %u", status);
  
--	id = 0;
-+	cmp.id = 0;
- 	data = ev->u.output.data;
- 	size = ev->u.output.size;
- 	if (hogdev->has_report_id && size > 0) {
--		id = *data++;
-+		cmp.id = *data++;
- 		--size;
- 	}
- 
--	cmp.type = type;
--	cmp.id = id;
+-	/*
+-	 * On success bond state change will be send when new link key or LTK
+-	 * event is received
+-	 */
+-	if (status == MGMT_STATUS_SUCCESS)
+-		return;
 -
- 	l = g_slist_find_custom(hogdev->reports, &cmp, report_cmp);
- 	if (!l)
+ 	dev = find_device(&rp->addr.bdaddr);
+ 	if (!dev)
  		return;
-@@ -367,7 +364,7 @@ static void forward_report(struct uhid_event *ev, void *user_data)
- 	report = l->data;
  
- 	DBG("Sending report type %d ID %d to device 0x%04X handle 0x%X",
--			type, id, hogdev->id, report->decl->value_handle);
-+		cmp.type, cmp.id, hogdev->id, report->decl->value_handle);
++	/*
++	 * Update pairing and paired status. Bonded status will be updated once
++	 * any link key come
++	 */
+ 	update_device_state(dev, rp->addr.type, status_mgmt2hal(status), false,
+-								false, false);
++								!status, false);
+ }
  
- 	if (hogdev->attrib == NULL)
- 		return;
+ static uint8_t select_device_bearer(struct device *dev)
 -- 
-1.9.3
+1.8.4
 
