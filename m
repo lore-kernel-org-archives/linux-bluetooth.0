@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: johan.hedberg@gmail.com
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 3/9] Bluetooth: Resume BT_CONNECTED state after LE security elevation
-Date: Thu,  7 Aug 2014 22:56:44 +0300
-Message-Id: <1407441410-13312-4-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH v2 1/9] Bluetooth: Fix reference counting of global L2CAP channels
+Date: Thu,  7 Aug 2014 22:56:42 +0300
+Message-Id: <1407441410-13312-2-git-send-email-johan.hedberg@gmail.com>
 In-Reply-To: <1407441410-13312-1-git-send-email-johan.hedberg@gmail.com>
 References: <1407441410-13312-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,56 +11,161 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-The LE ATT socket uses a special trick where it temporarily sets
-BT_CONFIG state for the duration of a security level elevation. In order
-to not require special hacks for going back to BT_CONNECTED state in the
-l2cap_core.c code the most reasonable place to resume the state is the
-resume callback. This patch adds a new flag to track the pending
-security level change and ensures that the state is set back to
-BT_CONNECTED in the resume callback in case the flag is set.
+When looking up entries from the global L2CAP channel list there needs
+to be a guarantee that other code doesn't go and remove the entry after
+a channel has been returned by the lookup function. This patch makes
+sure that the channel reference is incremented before the read lock is
+released in the global channel lookup functions. The patch also adds the
+corresponding l2cap_chan_put() calls once the channels pointers are
+no-longer needed.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- include/net/bluetooth/l2cap.h | 1 +
- net/bluetooth/l2cap_sock.c    | 6 ++++++
- 2 files changed, 7 insertions(+)
+ net/bluetooth/l2cap_core.c | 36 ++++++++++++++++++++++++++++--------
+ 1 file changed, 28 insertions(+), 8 deletions(-)
 
-diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
-index 8df15ad0d43f..4a51e7596608 100644
---- a/include/net/bluetooth/l2cap.h
-+++ b/include/net/bluetooth/l2cap.h
-@@ -708,6 +708,7 @@ enum {
- 	FLAG_EFS_ENABLE,
- 	FLAG_DEFER_SETUP,
- 	FLAG_LE_CONN_REQ_SENT,
-+	FLAG_PENDING_SECURITY,
- };
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index 46547b920f88..a47a14efd5aa 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -1440,6 +1440,7 @@ static struct l2cap_chan *l2cap_global_chan_by_scid(int state, u16 cid,
+ 			src_match = !bacmp(&c->src, src);
+ 			dst_match = !bacmp(&c->dst, dst);
+ 			if (src_match && dst_match) {
++				l2cap_chan_hold(c);
+ 				read_unlock(&chan_list_lock);
+ 				return c;
+ 			}
+@@ -1453,6 +1454,9 @@ static struct l2cap_chan *l2cap_global_chan_by_scid(int state, u16 cid,
+ 		}
+ 	}
  
- enum {
-diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
-index 1884f72083c2..5a42f6a818c0 100644
---- a/net/bluetooth/l2cap_sock.c
-+++ b/net/bluetooth/l2cap_sock.c
-@@ -790,6 +790,7 @@ static int l2cap_sock_setsockopt(struct socket *sock, int level, int optname,
- 		if (chan->scid == L2CAP_CID_ATT) {
- 			if (smp_conn_security(conn->hcon, sec.level))
- 				break;
-+			set_bit(FLAG_PENDING_SECURITY, &chan->flags);
- 			sk->sk_state = BT_CONFIG;
- 			chan->state = BT_CONFIG;
- 
-@@ -1359,6 +1360,11 @@ static void l2cap_sock_resume_cb(struct l2cap_chan *chan)
- {
- 	struct sock *sk = chan->data;
- 
-+	if (test_and_clear_bit(FLAG_PENDING_SECURITY, &chan->flags)) {
-+		sk->sk_state = BT_CONNECTED;
-+		chan->state = BT_CONNECTED;
-+	}
++	if (c1)
++		l2cap_chan_hold(c1);
 +
- 	clear_bit(BT_SK_SUSPEND, &bt_sk(sk)->flags);
- 	sk->sk_state_change(sk);
+ 	read_unlock(&chan_list_lock);
+ 
+ 	return c1;
+@@ -1475,13 +1479,13 @@ static void l2cap_le_conn_ready(struct l2cap_conn *conn)
+ 
+ 	/* Client ATT sockets should override the server one */
+ 	if (__l2cap_get_chan_by_dcid(conn, L2CAP_CID_ATT))
+-		return;
++		goto put;
+ 
+ 	dst_type = bdaddr_type(hcon, hcon->dst_type);
+ 
+ 	/* If device is blocked, do not create a channel for it */
+ 	if (hci_bdaddr_list_lookup(&hdev->blacklist, &hcon->dst, dst_type))
+-		return;
++		goto put;
+ 
+ 	/* For LE slave connections, make sure the connection interval
+ 	 * is in the range of the minium and maximum interval that has
+@@ -1517,6 +1521,8 @@ static void l2cap_le_conn_ready(struct l2cap_conn *conn)
+ 
+ clean:
+ 	l2cap_chan_unlock(pchan);
++put:
++	l2cap_chan_put(pchan);
  }
+ 
+ static void l2cap_conn_ready(struct l2cap_conn *conn)
+@@ -1794,6 +1800,7 @@ static struct l2cap_chan *l2cap_global_chan_by_psm(int state, __le16 psm,
+ 			src_match = !bacmp(&c->src, src);
+ 			dst_match = !bacmp(&c->dst, dst);
+ 			if (src_match && dst_match) {
++				l2cap_chan_hold(c);
+ 				read_unlock(&chan_list_lock);
+ 				return c;
+ 			}
+@@ -1807,6 +1814,9 @@ static struct l2cap_chan *l2cap_global_chan_by_psm(int state, __le16 psm,
+ 		}
+ 	}
+ 
++	if (c1)
++		l2cap_chan_hold(c1);
++
+ 	read_unlock(&chan_list_lock);
+ 
+ 	return c1;
+@@ -3884,6 +3894,7 @@ static struct l2cap_chan *l2cap_connect(struct l2cap_conn *conn,
+ response:
+ 	l2cap_chan_unlock(pchan);
+ 	mutex_unlock(&conn->chan_lock);
++	l2cap_chan_put(pchan);
+ 
+ sendresp:
+ 	rsp.scid   = cpu_to_le16(scid);
+@@ -5497,6 +5508,7 @@ static int l2cap_le_connect_req(struct l2cap_conn *conn,
+ response_unlock:
+ 	l2cap_chan_unlock(pchan);
+ 	mutex_unlock(&conn->chan_lock);
++	l2cap_chan_put(pchan);
+ 
+ 	if (result == L2CAP_CR_PEND)
+ 		return 0;
+@@ -6845,12 +6857,12 @@ static void l2cap_conless_channel(struct l2cap_conn *conn, __le16 psm,
+ 	struct l2cap_chan *chan;
+ 
+ 	if (hcon->type != ACL_LINK)
+-		goto drop;
++		goto free_skb;
+ 
+ 	chan = l2cap_global_chan_by_psm(0, psm, &hcon->src, &hcon->dst,
+ 					ACL_LINK);
+ 	if (!chan)
+-		goto drop;
++		goto free_skb;
+ 
+ 	BT_DBG("chan %p, len %d", chan, skb->len);
+ 
+@@ -6864,10 +6876,14 @@ static void l2cap_conless_channel(struct l2cap_conn *conn, __le16 psm,
+ 	bacpy(&bt_cb(skb)->bdaddr, &hcon->dst);
+ 	bt_cb(skb)->psm = psm;
+ 
+-	if (!chan->ops->recv(chan, skb))
++	if (!chan->ops->recv(chan, skb)) {
++		l2cap_chan_put(chan);
+ 		return;
++	}
+ 
+ drop:
++	l2cap_chan_put(chan);
++free_skb:
+ 	kfree_skb(skb);
+ }
+ 
+@@ -6878,22 +6894,26 @@ static void l2cap_att_channel(struct l2cap_conn *conn,
+ 	struct l2cap_chan *chan;
+ 
+ 	if (hcon->type != LE_LINK)
+-		goto drop;
++		goto free_skb;
+ 
+ 	chan = l2cap_global_chan_by_scid(BT_CONNECTED, L2CAP_CID_ATT,
+ 					 &hcon->src, &hcon->dst);
+ 	if (!chan)
+-		goto drop;
++		goto free_skb;
+ 
+ 	BT_DBG("chan %p, len %d", chan, skb->len);
+ 
+ 	if (chan->imtu < skb->len)
+ 		goto drop;
+ 
+-	if (!chan->ops->recv(chan, skb))
++	if (!chan->ops->recv(chan, skb)) {
++		l2cap_chan_put(chan);
+ 		return;
++	}
+ 
+ drop:
++	l2cap_chan_put(chan);
++free_skb:
+ 	kfree_skb(skb);
+ }
+ 
 -- 
 1.9.3
 
