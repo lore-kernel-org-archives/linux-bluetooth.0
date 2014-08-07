@@ -1,38 +1,52 @@
 Return-Path: <cyrus@holtmann.org>
 From: johan.hedberg@gmail.com
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 0/9] Bluetooth: More generic L2CAP fixed channel handling
-Date: Thu,  7 Aug 2014 10:12:22 +0300
-Message-Id: <1407395551-30810-1-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH 2/2] Bluetooth: Fix confusion between parent and child channel for 6lowpan
+Date: Thu,  7 Aug 2014 10:03:32 +0300
+Message-Id: <1407395012-30446-2-git-send-email-johan.hedberg@gmail.com>
+In-Reply-To: <1407395012-30446-1-git-send-email-johan.hedberg@gmail.com>
+References: <1407395012-30446-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+From: Johan Hedberg <johan.hedberg@intel.com>
 
-Here's a set of patches to make fixed L2CAP channel handling more
-generic. The main special-casing that's removed here is for ATT
-channels. The A2MP stuff is left for later since its semantics would
-change from creating the context only when there's data on the channel
-to as soon as we have a baseband link (which I'm not sure is desirable).
+The new_connection L2CAP channel callback creates a new channel based on
+the provided parent channel. The 6lowpan code was confusingly naming the
+child channel "pchan" and the parent channel "chan". This patch swaps
+the names.
 
-The main motivation for all of this work is to pave the way to convert
-SMP to fully use the l2cap_chan infrastructure.
+Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+---
+ net/bluetooth/6lowpan.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
-Johan
-
-----------------------------------------------------------------
-Johan Hedberg (9):
-      Bluetooth: Fix reference counting of global L2CAP channels
-      Bluetooth: Fix __l2cap_no_conn_pending() usage with all channels
-      Bluetooth: Resume BT_CONNECTED state after LE security elevation
-      Bluetooth: Remove special handling of ATT in l2cap_security_cfm()
-      Bluetooth: Refactor l2cap_connect_cfm
-      Bluetooth: Move L2CAP fixed channel creation into l2cap_conn_cfm
-      Bluetooth: Improve fixed channel lookup based on link type
-      Bluetooth: Remove special ATT data channel handling
-      Bluetooth: Move parts of fixed channel initialization to l2cap_add_scid
-
- include/net/bluetooth/l2cap.h |   1 +
- net/bluetooth/l2cap_core.c    | 244 ++++++++++++++++++--------------------
- net/bluetooth/l2cap_sock.c    |  15 +--
+diff --git a/net/bluetooth/6lowpan.c b/net/bluetooth/6lowpan.c
+index 206b65ccd5b8..35ebe79c87b0 100644
+--- a/net/bluetooth/6lowpan.c
++++ b/net/bluetooth/6lowpan.c
+@@ -772,16 +772,16 @@ static inline void chan_ready_cb(struct l2cap_chan *chan)
+ 	ifup(dev->netdev);
+ }
+ 
+-static inline struct l2cap_chan *chan_new_conn_cb(struct l2cap_chan *chan)
++static inline struct l2cap_chan *chan_new_conn_cb(struct l2cap_chan *pchan)
+ {
+-	struct l2cap_chan *pchan;
++	struct l2cap_chan *chan;
+ 
+-	pchan = chan_open(chan);
+-	pchan->ops = chan->ops;
++	chan = chan_open(pchan);
++	chan->ops = pchan->ops;
+ 
+ 	BT_DBG("chan %p pchan %p", chan, pchan);
+ 
+-	return pchan;
++	return chan;
+ }
+ 
+ static void delete_netdev(struct work_struct *work)
+-- 
+1.9.3
 
