@@ -1,77 +1,162 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-Date: Thu, 7 Aug 2014 14:37:38 +0200
-Message-ID: <CAMuHMdXnGXGqy7B2-wujVxUPA9+3ZfYhcdKb6_jpDV4P7_KMxw@mail.gmail.com>
-Subject: Modular 6LoWPAN? (was: Re: 6lowpan: introduce new net/6lowpan directory)
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-To: Alexander Aring <alex.aring@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-kernel-owner@vger.kernel.org
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ 2/2] android/hog: Fix report lookup
+Date: Thu,  7 Aug 2014 12:03:51 +0300
+Message-Id: <1407402231-32496-2-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <1407402231-32496-1-git-send-email-luiz.dentz@gmail.com>
+References: <1407402231-32496-1-git-send-email-luiz.dentz@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Alexander,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-On Wed, Aug 6, 2014 at 6:46 PM, Linux Kernel Mailing List
-<linux-kernel@vger.kernel.org> wrote:
-> Gitweb:     http://git.kernel.org/linus/;a=commit;h=2c6bed7cfcd3f594ed9e4d6919fa2ebea2243d19
-> Commit:     2c6bed7cfcd3f594ed9e4d6919fa2ebea2243d19
-> Parent:     6c53823ae0e10e723131055e1e65dd6a328a228e
-> Refname:    refs/heads/master
-> Author:     Alexander Aring <alex.aring@gmail.com>
-> AuthorDate: Fri Jul 11 10:24:18 2014 +0200
-> Committer:  Marcel Holtmann <marcel@holtmann.org>
-> CommitDate: Sat Jul 12 01:53:30 2014 +0200
->
->     6lowpan: introduce new net/6lowpan directory
->
->     This patch moves generic code which is used by bluetooth and ieee802154
->     6lowpan to a new net/6lowpan directory. This directory contains generic
->     6LoWPAN code which is shared between bluetooth and ieee802154 MAC-Layer.
->
->     This is the IPHC - "IPv6 Header Compression" format at the moment. Which
->     is described by RFC 6282 [0]. The BLTE 6LoWPAN draft describes that the
->     IPHC is the same format like IEEE 802.15.4, see [1].
->
->     Futuremore we can put more code into this directory which is shared
->     between BLTE and IEEE 802.15.4 6LoWPAN like RFC 6775 or the routing
->     protocol RPL RFC 6550.
->
->     To avoid naming conflicts I renamed 6lowpan-y to ieee802154_6lowpan-y
->     in net/ieee802154/Makefile.
->
->     [0] http://tools.ietf.org/html/rfc6282
->     [1] http://tools.ietf.org/html/draft-ietf-6lowpan-btle-12#section-3.2
->     [2] http://tools.ietf.org/html/rfc6775
->     [3] http://tools.ietf.org/html/rfc6550
->
->     Signed-off-by: Alexander Aring <alex.aring@gmail.com>
->     Acked-by: Jukka Rissanen <jukka.rissanen@linux.intel.com>
->     Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+This fixes not utilizing the report id to match the characteristic that
+map it.
+---
+ android/hog.c | 87 ++++++++++++++++++++++++++++++++++++-----------------------
+ 1 file changed, 53 insertions(+), 34 deletions(-)
 
-> --- /dev/null
-> +++ b/net/6lowpan/Kconfig
-> @@ -0,0 +1,6 @@
-> +config 6LOWPAN
-> +       bool "6LoWPAN Support"
+diff --git a/android/hog.c b/android/hog.c
+index 09a16d5..51c7c64 100644
+--- a/android/hog.c
++++ b/android/hog.c
+@@ -382,12 +382,47 @@ static void external_report_reference_cb(guint8 status, const guint8 *pdu,
+ 					external_service_char_cb, hog);
+ }
+ 
+-static int report_type_cmp(gconstpointer a, gconstpointer b)
++
++static int report_cmp(gconstpointer a, gconstpointer b)
++{
++	const struct report *ra = a, *rb = b;
++
++	/* sort by type first.. */
++	if (ra->type != rb->type)
++		return ra->type - rb->type;
++
++	/* skip id check in case of report id 0 */
++	if (!rb->id)
++		return 0;
++
++	/* ..then by id */
++	return ra->id - rb->id;
++}
++
++static struct report *find_report(struct bt_hog *hog, uint8_t type, uint8_t id)
+ {
+-	const struct report *report = a;
+-	uint8_t type = GPOINTER_TO_UINT(b);
++	struct report cmp;
++	GSList *l;
++
++	switch (type) {
++	case UHID_FEATURE_REPORT:
++		cmp.type = HOG_REPORT_TYPE_FEATURE;
++		break;
++	case UHID_OUTPUT_REPORT:
++		cmp.type = HOG_REPORT_TYPE_OUTPUT;
++		break;
++	case UHID_INPUT_REPORT:
++		cmp.type = HOG_REPORT_TYPE_INPUT;
++		break;
++	default:
++		return NULL;
++	}
++
++	cmp.id = hog->has_report_id ? id : 0;
+ 
+-	return report->type - type;
++	l = g_slist_find_custom(hog->reports, &cmp, report_cmp);
++
++	return l ? l->data : NULL;
+ }
+ 
+ static void output_written_cb(guint8 status, const guint8 *pdu,
+@@ -403,30 +438,22 @@ static void forward_report(struct uhid_event *ev, void *user_data)
+ {
+ 	struct bt_hog *hog = user_data;
+ 	struct report *report;
+-	GSList *l;
+ 	void *data;
+ 	int size;
+-	guint type;
+-
+-	if (hog->has_report_id) {
+-		data = ev->u.output.data + 1;
+-		size = ev->u.output.size - 1;
+-	} else {
+-		data = ev->u.output.data;
+-		size = ev->u.output.size;
+-	}
+ 
+-	type = HOG_REPORT_TYPE_OUTPUT;
+-
+-	l = g_slist_find_custom(hog->reports, GUINT_TO_POINTER(type),
+-							report_type_cmp);
+-	if (!l)
++	report = find_report(hog, ev->u.output.rtype, ev->u.output.data[0]);
++	if (!report)
+ 		return;
+ 
+-	report = l->data;
++	data = ev->u.output.data;
++	size = ev->u.output.size;
++	if (hog->has_report_id && size > 0) {
++		data++;
++		--size;
++	}
+ 
+-	DBG("Sending report type %d to handle 0x%X", type,
+-						report->decl->value_handle);
++	DBG("Sending report type %d ID %d to handle 0x%X", report->type,
++				report->id, report->decl->value_handle);
+ 
+ 	if (hog->attrib == NULL)
+ 		return;
+@@ -443,7 +470,6 @@ static void get_report(struct uhid_event *ev, void *user_data)
+ {
+ 	struct bt_hog *hog = user_data;
+ 	struct report *report;
+-	GSList *l;
+ 	struct uhid_event rsp;
+ 	int err;
+ 
+@@ -451,16 +477,12 @@ static void get_report(struct uhid_event *ev, void *user_data)
+ 	rsp.type = UHID_FEATURE_ANSWER;
+ 	rsp.u.feature_answer.id = ev->u.feature.id;
+ 
+-	l = g_slist_find_custom(hog->reports,
+-				GUINT_TO_POINTER(ev->u.feature.rtype),
+-				report_type_cmp);
+-	if (!l) {
++	report = find_report(hog, ev->u.feature.rtype, ev->u.feature.rnum);
++	if (!report) {
+ 		rsp.u.feature_answer.err = ENOTSUP;
+ 		goto done;
+ 	}
+ 
+-	report = l->data;
+-
+ 	if (!report->value) {
+ 		rsp.u.feature_answer.err = EIO;
+ 		goto done;
+@@ -1090,13 +1112,10 @@ int bt_hog_send_report(struct bt_hog *hog, void *data, size_t size, int type)
+ 	if (!hog->attrib)
+ 		return -ENOTCONN;
+ 
+-	l = g_slist_find_custom(hog->reports, GUINT_TO_POINTER(type),
+-							report_type_cmp);
+-	if (!l)
++	report = find_report(hog, type, 0);
++	if (!report)
+ 		return -ENOTSUP;
+ 
+-	report = l->data;
+-
+ 	DBG("hog: Write report, handle 0x%X", report->decl->value_handle);
+ 
+ 	if (report->decl->properties & GATT_CHR_PROP_WRITE)
+-- 
+1.9.3
 
-Is there any specific reason 6LOWPAN is bool instead of tristate?
-IPV6 can be modular.
-
-> +       depends on IPV6
-> +       ---help---
-> +         This enables IPv6 over Low power Wireless Personal Area Network -
-> +         "6LoWPAN" which is supported by IEEE 802.15.4 or Bluetooth stacks.
-
-Gr{oetje,eeting}s,
-
-                        Geert
-
---
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
-
-In personal conversations with technical people, I call myself a hacker. But
-when I'm talking to journalists I just say "programmer" or something like that.
-                                -- Linus Torvalds
