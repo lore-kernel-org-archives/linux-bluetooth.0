@@ -1,36 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-To: Alexander Aring <alex.aring@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>
-Cc: linux-zigbee-devel@lists.sourceforge.net,
-	linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Geert Uytterhoeven <geert@linux-m68k.org>
-Subject: [PATCH] 6lowpan: Allow 6LoWPAN to be modular
-Date: Thu,  7 Aug 2014 17:06:43 +0200
-Message-Id: <1407424003-15073-1-git-send-email-geert@linux-m68k.org>
-Sender: linux-wpan-owner@vger.kernel.org
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ] android/tester-hidhost: Make cid_data static
+Date: Thu,  7 Aug 2014 17:28:59 +0300
+Message-Id: <1407421739-18124-1-git-send-email-luiz.dentz@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Change config symbol 6LOWPAN from type bool to type tristate, so
-6LoWPAN can be built modular, just like IPV6
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Signed-off-by: Geert Uytterhoeven <geert@linux-m68k.org>
 ---
- net/6lowpan/Kconfig | 2 +-
+ android/tester-hidhost.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/net/6lowpan/Kconfig b/net/6lowpan/Kconfig
-index 028a5c6d1f61..e4a02ef55102 100644
---- a/net/6lowpan/Kconfig
-+++ b/net/6lowpan/Kconfig
-@@ -1,5 +1,5 @@
- config 6LOWPAN
--	bool "6LoWPAN Support"
-+	tristate "6LoWPAN Support"
- 	depends on IPV6
- 	---help---
- 	  This enables IPv6 over Low power Wireless Personal Area Network -
+diff --git a/android/tester-hidhost.c b/android/tester-hidhost.c
+index c6296aa..c7e3a67 100644
+--- a/android/tester-hidhost.c
++++ b/android/tester-hidhost.c
+@@ -57,7 +57,7 @@ struct emu_cid_data {
+ 	uint16_t intr_cid;
+ };
+ 
+-struct emu_cid_data cid_data;
++static struct emu_cid_data cid_data;
+ 
+ static const uint8_t did_req_pdu[] = { 0x06, /* PDU id */
+ 			0x00, 0x00, /* Transaction id */
 -- 
-1.9.1
+1.9.3
 
