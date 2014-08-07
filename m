@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: johan.hedberg@gmail.com
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 2/9] Bluetooth: Fix __l2cap_no_conn_pending() usage with all channels
-Date: Thu,  7 Aug 2014 22:56:43 +0300
-Message-Id: <1407441410-13312-3-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH v2 5/9] Bluetooth: Refactor l2cap_connect_cfm
+Date: Thu,  7 Aug 2014 22:56:46 +0300
+Message-Id: <1407441410-13312-6-git-send-email-johan.hedberg@gmail.com>
 In-Reply-To: <1407441410-13312-1-git-send-email-johan.hedberg@gmail.com>
 References: <1407441410-13312-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,31 +11,40 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-The __l2cap_no_conn_pending() function would previously only return a
-meaningful value for connection oriented channels and was therefore not
-useful for anything else. As preparation of making the L2CAP code more
-generic allow the function to be called for other channel types as well
-by returning a meaningful value for them.
+This patch is a simple refactoring of l2cap_connect_cfm to allow easier
+extension of the function.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- net/bluetooth/l2cap_core.c | 3 +++
- 1 file changed, 3 insertions(+)
+ net/bluetooth/l2cap_core.c | 13 ++++++++-----
+ 1 file changed, 8 insertions(+), 5 deletions(-)
 
 diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index a47a14efd5aa..a0a910eb897b 100644
+index 54cbfcd4da44..7a5cff89b792 100644
 --- a/net/bluetooth/l2cap_core.c
 +++ b/net/bluetooth/l2cap_core.c
-@@ -1082,6 +1082,9 @@ static void l2cap_send_rr_or_rnr(struct l2cap_chan *chan, bool poll)
+@@ -7268,13 +7268,16 @@ void l2cap_connect_cfm(struct hci_conn *hcon, u8 status)
  
- static inline int __l2cap_no_conn_pending(struct l2cap_chan *chan)
- {
-+	if (chan->chan_type != L2CAP_CHAN_CONN_ORIENTED)
-+		return true;
+ 	BT_DBG("hcon %p bdaddr %pMR status %d", hcon, &hcon->dst, status);
+ 
+-	if (!status) {
+-		conn = l2cap_conn_add(hcon);
+-		if (conn)
+-			l2cap_conn_ready(conn);
+-	} else {
++	if (status) {
+ 		l2cap_conn_del(hcon, bt_to_errno(status));
++		return;
+ 	}
 +
- 	return !test_bit(CONF_CONNECT_PEND, &chan->conf_state);
++	conn = l2cap_conn_add(hcon);
++	if (!conn)
++		return;
++
++	l2cap_conn_ready(conn);
  }
  
+ int l2cap_disconn_ind(struct hci_conn *hcon)
 -- 
 1.9.3
 
