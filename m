@@ -1,40 +1,69 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <53E3B2AF.50605@intel.com>
-Date: Thu, 07 Aug 2014 19:09:03 +0200
-From: Loic Poulain <loic.poulain@intel.com>
 MIME-Version: 1.0
+Sender: geert.uytterhoeven@gmail.com
+In-Reply-To: <ABE15994-F47B-4E4B-A6FC-79C6BCAC9FF3@holtmann.org>
+References: <1407424003-15073-1-git-send-email-geert@linux-m68k.org>
+	<ABE15994-F47B-4E4B-A6FC-79C6BCAC9FF3@holtmann.org>
+Date: Thu, 7 Aug 2014 18:44:35 +0200
+Message-ID: <CAMuHMdU214_aDNQBH=Nk6DZwsdCB3FQY1DY0ZQ8WQGQ86dGFUQ@mail.gmail.com>
+Subject: Re: [PATCH] 6lowpan: Allow 6LoWPAN to be modular
+From: Geert Uytterhoeven <geert@linux-m68k.org>
 To: Marcel Holtmann <marcel@holtmann.org>
-CC: "Gustavo F. Padovan" <gustavo@padovan.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	linux-bluetooth@vger.kernel.org
-Subject: Re: [RFC] Bluetooth: HCI H5 fast retransmit
-References: <1406911076-8714-1-git-send-email-loic.poulain@intel.com> <D672899E-220D-4633-A74A-9C50021C2AE8@holtmann.org>
-In-Reply-To: <D672899E-220D-4633-A74A-9C50021C2AE8@holtmann.org>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Sender: linux-bluetooth-owner@vger.kernel.org
+Cc: Alexander Aring <alex.aring@gmail.com>, "David S. Miller" <davem@davemloft.net>,
+	linux-zigbee-devel@lists.sourceforge.net,
+	BlueZ development <linux-bluetooth@vger.kernel.org>, linux-wpan@vger.kernel.org,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Marcel,
 
-This patch is not so much out-of-scope of the H5 because specification
-only gives "recommended parameters" regarding timeout calculation.
+On Thu, Aug 7, 2014 at 6:00 PM, Marcel Holtmann <marcel@holtmann.org> wrote:
+>> Change config symbol 6LOWPAN from type bool to type tristate, so
+>> 6LoWPAN can be built modular, just like IPV6
+>>
+>> Signed-off-by: Geert Uytterhoeven <geert@linux-m68k.org>
+>> ---
+>> net/6lowpan/Kconfig | 2 +-
+>> 1 file changed, 1 insertion(+), 1 deletion(-)
+>>
+>> diff --git a/net/6lowpan/Kconfig b/net/6lowpan/Kconfig
+>> index 028a5c6d1f61..e4a02ef55102 100644
+>> --- a/net/6lowpan/Kconfig
+>> +++ b/net/6lowpan/Kconfig
+>> @@ -1,5 +1,5 @@
+>> config 6LOWPAN
+>> -     bool "6LoWPAN Support"
+>> +     tristate "6LoWPAN Support"
+>
+> is this a regression from the previous CONFIG_6LOWPAN separation that we introduced? If it is, then it might be easiest if Dave just takes it into his net tree. Otherwise I take it through bluetooth-next.
 
-I tested it with only one H5 controller (rtl8723).
-This mechanism is very beneficial with this controller due to a
-relative high packet loss.
+I hadn't thought about that... Checking...
 
-However I'm going to rework this patch to be more specific (only fast
-retransmit if the invalid ack number is a duplicate of the last acked 
-packet)
-+ comments.
+Yes, I believe this is a regression.
 
-I don't see any obvious H5 incompatibility issue, therefore, extra flag
-shouldn't be required.
+In v3.16, my allmodconfig build had:
 
-Regards,
-Loic
+CONFIG_IEEE802154_6LOWPAN=m
+CONFIG_6LOWPAN_IPHC=m
+CONFIG_BT_6LOWPAN=y
 
--- 
-Intel Open Source Technology Center
-http://oss.intel.com/
+Without my patch it has:
 
+CONFIG_6LOWPAN=y
+CONFIG_IEEE802154_6LOWPAN=m
+CONFIG_BT_6LOWPAN=m
+
+and iphc is what's in net/6lowpan/built-in.o now.
+
+Gr{oetje,eeting}s,
+
+                        Geert
+
+--
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
+
+In personal conversations with technical people, I call myself a hacker. But
+when I'm talking to journalists I just say "programmer" or something like that.
+                                -- Linus Torvalds
