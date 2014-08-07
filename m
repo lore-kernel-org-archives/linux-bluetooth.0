@@ -1,44 +1,130 @@
 Return-Path: <cyrus@holtmann.org>
 From: johan.hedberg@gmail.com
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 0/9] Bluetooth: More generic L2CAP fixed channel handling
-Date: Thu,  7 Aug 2014 22:56:41 +0300
-Message-Id: <1407441410-13312-1-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH v2 8/9] Bluetooth: Remove special ATT data channel handling
+Date: Thu,  7 Aug 2014 22:56:49 +0300
+Message-Id: <1407441410-13312-9-git-send-email-johan.hedberg@gmail.com>
+In-Reply-To: <1407441410-13312-1-git-send-email-johan.hedberg@gmail.com>
+References: <1407441410-13312-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+From: Johan Hedberg <johan.hedberg@intel.com>
 
-Here's v2 of my set with comments on patch 1/9 taken into account.
+Now that we've got the fixed channel infrastructure cleaned up in a
+generic way there's no longer a need to have a dedicated function for
+handling data on the ATT channel. Instead the generic
+l2cap_data_channel() handler will be able to do the exact same thing.
 
->From the original cover letter:
+Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+---
+ net/bluetooth/l2cap_core.c | 79 ----------------------------------------------
+ 1 file changed, 79 deletions(-)
 
-"
-Here's a set of patches to make fixed L2CAP channel handling more
-generic. The main special-casing that's removed here is for ATT
-channels. The A2MP stuff is left for later since its semantics would
-change from creating the context only when there's data on the channel
-to as soon as we have a baseband link (which I'm not sure is desirable).
-
-The main motivation for all of this work is to pave the way to convert
-SMP to fully use the l2cap_chan infrastructure.
-"
-
-----------------------------------------------------------------
-Johan Hedberg (9):
-      Bluetooth: Fix reference counting of global L2CAP channels
-      Bluetooth: Fix __l2cap_no_conn_pending() usage with all channels
-      Bluetooth: Resume BT_CONNECTED state after LE security elevation
-      Bluetooth: Remove special handling of ATT in l2cap_security_cfm()
-      Bluetooth: Refactor l2cap_connect_cfm
-      Bluetooth: Move L2CAP fixed channel creation into l2cap_conn_cfm
-      Bluetooth: Improve fixed channel lookup based on link type
-      Bluetooth: Remove special ATT data channel handling
-      Bluetooth: Move parts of fixed channel initialization to l2cap_add_scid
-
- include/net/bluetooth/l2cap.h |   1 +
- net/bluetooth/l2cap_core.c    | 245 ++++++++++++++++++--------------------
- net/bluetooth/l2cap_sock.c    |  15 +--
- 3 files changed, 122 insertions(+), 139 deletions(-)
-
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index 191b58f48245..09eb4e3e8ab2 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -1420,51 +1420,6 @@ static void l2cap_conn_start(struct l2cap_conn *conn)
+ 	mutex_unlock(&conn->chan_lock);
+ }
+ 
+-/* Find socket with cid and source/destination bdaddr.
+- * Returns closest match, locked.
+- */
+-static struct l2cap_chan *l2cap_global_chan_by_scid(int state, u16 cid,
+-						    bdaddr_t *src,
+-						    bdaddr_t *dst)
+-{
+-	struct l2cap_chan *c, *c1 = NULL;
+-
+-	read_lock(&chan_list_lock);
+-
+-	list_for_each_entry(c, &chan_list, global_l) {
+-		if (state && c->state != state)
+-			continue;
+-
+-		if (c->scid == cid) {
+-			int src_match, dst_match;
+-			int src_any, dst_any;
+-
+-			/* Exact match. */
+-			src_match = !bacmp(&c->src, src);
+-			dst_match = !bacmp(&c->dst, dst);
+-			if (src_match && dst_match) {
+-				l2cap_chan_hold(c);
+-				read_unlock(&chan_list_lock);
+-				return c;
+-			}
+-
+-			/* Closest match */
+-			src_any = !bacmp(&c->src, BDADDR_ANY);
+-			dst_any = !bacmp(&c->dst, BDADDR_ANY);
+-			if ((src_match && dst_any) || (src_any && dst_match) ||
+-			    (src_any && dst_any))
+-				c1 = c;
+-		}
+-	}
+-
+-	if (c1)
+-		l2cap_chan_hold(c1);
+-
+-	read_unlock(&chan_list_lock);
+-
+-	return c1;
+-}
+-
+ static void l2cap_le_conn_ready(struct l2cap_conn *conn)
+ {
+ 	struct hci_conn *hcon = conn->hcon;
+@@ -6854,36 +6809,6 @@ free_skb:
+ 	kfree_skb(skb);
+ }
+ 
+-static void l2cap_att_channel(struct l2cap_conn *conn,
+-			      struct sk_buff *skb)
+-{
+-	struct hci_conn *hcon = conn->hcon;
+-	struct l2cap_chan *chan;
+-
+-	if (hcon->type != LE_LINK)
+-		goto free_skb;
+-
+-	chan = l2cap_global_chan_by_scid(BT_CONNECTED, L2CAP_CID_ATT,
+-					 &hcon->src, &hcon->dst);
+-	if (!chan)
+-		goto free_skb;
+-
+-	BT_DBG("chan %p, len %d", chan, skb->len);
+-
+-	if (chan->imtu < skb->len)
+-		goto drop;
+-
+-	if (!chan->ops->recv(chan, skb)) {
+-		l2cap_chan_put(chan);
+-		return;
+-	}
+-
+-drop:
+-	l2cap_chan_put(chan);
+-free_skb:
+-	kfree_skb(skb);
+-}
+-
+ static void l2cap_recv_frame(struct l2cap_conn *conn, struct sk_buff *skb)
+ {
+ 	struct l2cap_hdr *lh = (void *) skb->data;
+@@ -6929,10 +6854,6 @@ static void l2cap_recv_frame(struct l2cap_conn *conn, struct sk_buff *skb)
+ 		l2cap_conless_channel(conn, psm, skb);
+ 		break;
+ 
+-	case L2CAP_CID_ATT:
+-		l2cap_att_channel(conn, skb);
+-		break;
+-
+ 	case L2CAP_CID_LE_SIGNALING:
+ 		l2cap_le_sig_channel(conn, skb);
+ 		break;
+-- 
+1.9.3
 
