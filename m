@@ -1,35 +1,25 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=US-ASCII
-Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.6\))
-Subject: Re: [RFC] Bluetooth: HCI H5 fast retransmit
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <53E3B2AF.50605@intel.com>
-Date: Thu, 7 Aug 2014 12:05:34 -0700
-Cc: "Gustavo F. Padovan" <gustavo@padovan.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	linux-bluetooth@vger.kernel.org
-Message-Id: <ED31149A-8FD2-4BF5-B67A-2312F104F984@holtmann.org>
-References: <1406911076-8714-1-git-send-email-loic.poulain@intel.com> <D672899E-220D-4633-A74A-9C50021C2AE8@holtmann.org> <53E3B2AF.50605@intel.com>
-To: Loic Poulain <loic.poulain@intel.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Thu, 07 Aug 2014 12:05:12 -0700 (PDT)
+Message-Id: <20140807.120512.1190683458101132981.davem@davemloft.net>
+To: geert@linux-m68k.org
+Cc: alex.aring@gmail.com, linux-zigbee-devel@lists.sourceforge.net,
+	linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] 6lowpan: Allow 6LoWPAN to be modular
+From: David Miller <davem@davemloft.net>
+In-Reply-To: <1407424003-15073-1-git-send-email-geert@linux-m68k.org>
+References: <1407424003-15073-1-git-send-email-geert@linux-m68k.org>
+Mime-Version: 1.0
+Content-Type: Text/Plain; charset=us-ascii
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Loic,
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Date: Thu,  7 Aug 2014 17:06:43 +0200
 
-> This patch is not so much out-of-scope of the H5 because specification
-> only gives "recommended parameters" regarding timeout calculation.
+> Change config symbol 6LOWPAN from type bool to type tristate, so
+> 6LoWPAN can be built modular, just like IPV6
 > 
-> I tested it with only one H5 controller (rtl8723).
-> This mechanism is very beneficial with this controller due to a
-> relative high packet loss.
-> 
-> However I'm going to rework this patch to be more specific (only fast
-> retransmit if the invalid ack number is a duplicate of the last acked packet)
-> + comments.
+> Signed-off-by: Geert Uytterhoeven <geert@linux-m68k.org>
 
-sounds good. Go for it.
-
-Regards
-
-Marcel
-
+Applied, thanks.
