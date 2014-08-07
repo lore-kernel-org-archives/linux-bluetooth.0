@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: johan.hedberg@gmail.com
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 4/9] Bluetooth: Remove special handling of ATT in l2cap_security_cfm()
-Date: Thu,  7 Aug 2014 10:12:26 +0300
-Message-Id: <1407395551-30810-5-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH 2/9] Bluetooth: Fix __l2cap_no_conn_pending() usage with all channels
+Date: Thu,  7 Aug 2014 10:12:24 +0300
+Message-Id: <1407395551-30810-3-git-send-email-johan.hedberg@gmail.com>
 In-Reply-To: <1407395551-30810-1-git-send-email-johan.hedberg@gmail.com>
 References: <1407395551-30810-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,40 +11,31 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-With the update to sk->resume() and __l2cap_no_conn_pending() we
-no-longer need to have special handling of ATT channels in the
-l2cap_security_cfm() function. The chan->sec_level update when
-encryption has been enabled is safe to do for any kind of channel, and
-the loop takes later care of calling chan->ready() or chan->resume() if
-necessary.
+The __l2cap_no_conn_pending() function would previously only return a
+meaningful value for connection oriented channels and was therefore not
+useful for anything else. As preparation of making the L2CAP code more
+generic allow the function to be called for other channel types as well
+by returning a meaningful value for them.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- net/bluetooth/l2cap_core.c | 11 ++---------
- 1 file changed, 2 insertions(+), 9 deletions(-)
+ net/bluetooth/l2cap_core.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
 diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 887f030beb5b..ff66d14cfd34 100644
+index a49e9646a6b9..887f030beb5b 100644
 --- a/net/bluetooth/l2cap_core.c
 +++ b/net/bluetooth/l2cap_core.c
-@@ -7343,15 +7343,8 @@ int l2cap_security_cfm(struct hci_conn *hcon, u8 status, u8 encrypt)
- 			continue;
- 		}
+@@ -1082,6 +1082,9 @@ static void l2cap_send_rr_or_rnr(struct l2cap_chan *chan, bool poll)
  
--		if (chan->scid == L2CAP_CID_ATT) {
--			if (!status && encrypt) {
--				chan->sec_level = hcon->sec_level;
--				l2cap_chan_ready(chan);
--			}
--
--			l2cap_chan_unlock(chan);
--			continue;
--		}
-+		if (!status && encrypt)
-+			chan->sec_level = hcon->sec_level;
+ static inline int __l2cap_no_conn_pending(struct l2cap_chan *chan)
+ {
++	if (chan->chan_type != L2CAP_CHAN_CONN_ORIENTED)
++		return true;
++
+ 	return !test_bit(CONF_CONNECT_PEND, &chan->conf_state);
+ }
  
- 		if (!__l2cap_no_conn_pending(chan)) {
- 			l2cap_chan_unlock(chan);
 -- 
 1.9.3
 
