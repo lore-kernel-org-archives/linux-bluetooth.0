@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: johan.hedberg@gmail.com
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 6/9] Bluetooth: Move L2CAP fixed channel creation into l2cap_conn_cfm
-Date: Thu,  7 Aug 2014 10:12:28 +0300
-Message-Id: <1407395551-30810-7-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH 7/9] Bluetooth: Improve fixed channel lookup based on link type
+Date: Thu,  7 Aug 2014 10:12:29 +0300
+Message-Id: <1407395551-30810-8-git-send-email-johan.hedberg@gmail.com>
 In-Reply-To: <1407395551-30810-1-git-send-email-johan.hedberg@gmail.com>
 References: <1407395551-30810-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,195 +11,60 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-In order to remove special handling of fixed L2CAP channels we need to
-start creating them in a single place instead of having per-channel
-exceptions. The most natural place is the l2cap_conn_cfm() function
-which is called whenever there is a new baseband link.
-
-The only really special case so far has been the ATT socket, so in order
-not to break the code in between this patch removes the ATT special
-handling at the same time as it adds the generic fixed channel handling
-from l2cap_le_conn_ready() into the hci_conn_cfm() function. As a
-related change the channel locking in l2cap_conn_ready() becomes simpler
-and we can thereby move the smp_conn_security() call into the
-l2cap_le_conn_ready() function.
+When notifying global fixed channels of new connections it doesn't make
+sense to consider channels meant for a different link type than the one
+available. This patch adds an extra parameter to the
+l2cap_global_fixed_chan() lookup function and ensures that only channels
+matching the current hci_conn type are looked up.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- net/bluetooth/l2cap_core.c | 124 +++++++++++++++++++++++++++++----------------
- 1 file changed, 80 insertions(+), 44 deletions(-)
+ net/bluetooth/l2cap_core.c | 11 ++++++++---
+ 1 file changed, 8 insertions(+), 3 deletions(-)
 
 diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 304fa444efd3..197b811e6206 100644
+index 197b811e6206..a1bd591253d5 100644
 --- a/net/bluetooth/l2cap_core.c
 +++ b/net/bluetooth/l2cap_core.c
-@@ -1469,26 +1469,14 @@ static void l2cap_le_conn_ready(struct l2cap_conn *conn)
+@@ -7233,7 +7233,7 @@ int l2cap_connect_ind(struct hci_dev *hdev, bdaddr_t *bdaddr)
+  * global list (by passing NULL as first parameter).
+  */
+ static struct l2cap_chan *l2cap_global_fixed_chan(struct l2cap_chan *c,
+-						  bdaddr_t *src)
++						  bdaddr_t *src, u8 link_type)
  {
- 	struct hci_conn *hcon = conn->hcon;
- 	struct hci_dev *hdev = hcon->hdev;
--	struct l2cap_chan *chan, *pchan;
--	u8 dst_type;
+ 	read_lock(&chan_list_lock);
  
--	BT_DBG("");
--
--	/* Check if we have socket listening on cid */
--	pchan = l2cap_global_chan_by_scid(BT_LISTEN, L2CAP_CID_ATT,
--					  &hcon->src, &hcon->dst);
--	if (!pchan)
--		return;
--
--	/* Client ATT sockets should override the server one */
--	if (__l2cap_get_chan_by_dcid(conn, L2CAP_CID_ATT))
--		goto put;
--
--	dst_type = bdaddr_type(hcon, hcon->dst_type);
-+	BT_DBG("%s conn %p", hdev->name, conn);
+@@ -7249,6 +7249,10 @@ static struct l2cap_chan *l2cap_global_fixed_chan(struct l2cap_chan *c,
+ 			continue;
+ 		if (bacmp(&c->src, src) && bacmp(&c->src, BDADDR_ANY))
+ 			continue;
++		if (link_type == ACL_LINK && c->src_type != BDADDR_BREDR)
++			continue;
++		if (link_type == LE_LINK && c->src_type == BDADDR_BREDR)
++			continue;
  
--	/* If device is blocked, do not create a channel for it */
--	if (hci_bdaddr_list_lookup(&hdev->blacklist, &hcon->dst, dst_type))
--		goto put;
-+	/* For outgoing pairing which doesn't necessarily have an
-+	 * associated socket (e.g. mgmt_pair_device).
-+	 */
-+	if (hcon->out)
-+		smp_conn_security(hcon, hcon->pending_sec_level);
+ 		l2cap_chan_hold(c);
+ 		read_unlock(&chan_list_lock);
+@@ -7289,7 +7293,7 @@ void l2cap_connect_cfm(struct hci_conn *hcon, u8 status)
+ 	 * we left off, because the list lock would prevent calling the
+ 	 * potentially sleeping l2cap_chan_lock() function.
+ 	 */
+-	pchan = l2cap_global_fixed_chan(NULL, &hdev->bdaddr);
++	pchan = l2cap_global_fixed_chan(NULL, &hdev->bdaddr, hcon->type);
+ 	while (pchan) {
+ 		struct l2cap_chan *chan, *next;
  
- 	/* For LE slave connections, make sure the connection interval
- 	 * is in the range of the minium and maximum interval that has
-@@ -1508,24 +1496,6 @@ static void l2cap_le_conn_ready(struct l2cap_conn *conn)
- 		l2cap_send_cmd(conn, l2cap_get_ident(conn),
- 			       L2CAP_CONN_PARAM_UPDATE_REQ, sizeof(req), &req);
+@@ -7310,7 +7314,8 @@ void l2cap_connect_cfm(struct hci_conn *hcon, u8 status)
+ 
+ 		l2cap_chan_unlock(pchan);
+ next:
+-		next = l2cap_global_fixed_chan(pchan, &hdev->bdaddr);
++		next = l2cap_global_fixed_chan(pchan, &hdev->bdaddr,
++					       hcon->type);
+ 		l2cap_chan_put(pchan);
+ 		pchan = next;
  	}
--
--	l2cap_chan_lock(pchan);
--
--	chan = pchan->ops->new_connection(pchan);
--	if (!chan)
--		goto clean;
--
--	bacpy(&chan->src, &hcon->src);
--	bacpy(&chan->dst, &hcon->dst);
--	chan->src_type = bdaddr_type(hcon, hcon->src_type);
--	chan->dst_type = dst_type;
--
--	__l2cap_chan_add(conn, chan);
--
--clean:
--	l2cap_chan_unlock(pchan);
--put:
--	l2cap_chan_put(pchan);
- }
- 
- static void l2cap_conn_ready(struct l2cap_conn *conn)
-@@ -1535,17 +1505,11 @@ static void l2cap_conn_ready(struct l2cap_conn *conn)
- 
- 	BT_DBG("conn %p", conn);
- 
--	/* For outgoing pairing which doesn't necessarily have an
--	 * associated socket (e.g. mgmt_pair_device).
--	 */
--	if (hcon->out && hcon->type == LE_LINK)
--		smp_conn_security(hcon, hcon->pending_sec_level);
--
--	mutex_lock(&conn->chan_lock);
--
- 	if (hcon->type == LE_LINK)
- 		l2cap_le_conn_ready(conn);
- 
-+	mutex_lock(&conn->chan_lock);
-+
- 	list_for_each_entry(chan, &conn->chan_l, list) {
- 
- 		l2cap_chan_lock(chan);
-@@ -7264,9 +7228,44 @@ int l2cap_connect_ind(struct hci_dev *hdev, bdaddr_t *bdaddr)
- 	return exact ? lm1 : lm2;
- }
- 
-+/* Find the next fixed channel in BT_LISTEN state, continue iteration
-+ * from an existing channel in the list or from the beginning of the
-+ * global list (by passing NULL as first parameter).
-+ */
-+static struct l2cap_chan *l2cap_global_fixed_chan(struct l2cap_chan *c,
-+						  bdaddr_t *src)
-+{
-+	read_lock(&chan_list_lock);
-+
-+	if (c)
-+		c = list_next_entry(c, global_l);
-+	else
-+		c = list_entry(chan_list.next, typeof(*c), global_l);
-+
-+	list_for_each_entry_from(c, &chan_list, global_l) {
-+		if (c->chan_type != L2CAP_CHAN_FIXED)
-+			continue;
-+		if (c->state != BT_LISTEN)
-+			continue;
-+		if (bacmp(&c->src, src) && bacmp(&c->src, BDADDR_ANY))
-+			continue;
-+
-+		l2cap_chan_hold(c);
-+		read_unlock(&chan_list_lock);
-+		return c;
-+	}
-+
-+	read_unlock(&chan_list_lock);
-+
-+	return NULL;
-+}
-+
- void l2cap_connect_cfm(struct hci_conn *hcon, u8 status)
- {
-+	struct hci_dev *hdev = hcon->hdev;
- 	struct l2cap_conn *conn;
-+	struct l2cap_chan *pchan;
-+	u8 dst_type;
- 
- 	BT_DBG("hcon %p bdaddr %pMR status %d", hcon, &hcon->dst, status);
- 
-@@ -7279,6 +7278,43 @@ void l2cap_connect_cfm(struct hci_conn *hcon, u8 status)
- 	if (!conn)
- 		return;
- 
-+	dst_type = bdaddr_type(hcon, hcon->dst_type);
-+
-+	/* If device is blocked, do not create channels for it */
-+	if (hci_bdaddr_list_lookup(&hdev->blacklist, &hcon->dst, dst_type))
-+		return;
-+
-+	/* Find fixed channels and notify them of the new connection. We
-+	 * use multiple individual lookups, continuing each time where
-+	 * we left off, because the list lock would prevent calling the
-+	 * potentially sleeping l2cap_chan_lock() function.
-+	 */
-+	pchan = l2cap_global_fixed_chan(NULL, &hdev->bdaddr);
-+	while (pchan) {
-+		struct l2cap_chan *chan, *next;
-+
-+		/* Client fixed channels should override server ones */
-+		if (__l2cap_get_chan_by_dcid(conn, pchan->scid))
-+			goto next;
-+
-+		l2cap_chan_lock(pchan);
-+		chan = pchan->ops->new_connection(pchan);
-+		if (chan) {
-+			bacpy(&chan->src, &hcon->src);
-+			bacpy(&chan->dst, &hcon->dst);
-+			chan->src_type = bdaddr_type(hcon, hcon->src_type);
-+			chan->dst_type = dst_type;
-+
-+			__l2cap_chan_add(conn, chan);
-+		}
-+
-+		l2cap_chan_unlock(pchan);
-+next:
-+		next = l2cap_global_fixed_chan(pchan, &hdev->bdaddr);
-+		l2cap_chan_put(pchan);
-+		pchan = next;
-+	}
-+
- 	l2cap_conn_ready(conn);
- }
- 
 -- 
 1.9.3
 
