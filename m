@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: johan.hedberg@gmail.com
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 3/4] Bluetooth: Make AES crypto context private to SMP
-Date: Fri,  8 Aug 2014 09:37:17 +0300
-Message-Id: <1407479838-5652-4-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH 2/4] Bluetooth: Add SMP L2CAP channel skeleton
+Date: Fri,  8 Aug 2014 09:37:16 +0300
+Message-Id: <1407479838-5652-3-git-send-email-johan.hedberg@gmail.com>
 In-Reply-To: <1407479838-5652-1-git-send-email-johan.hedberg@gmail.com>
 References: <1407479838-5652-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,178 +11,204 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-Now that we have per-adapter SMP data thanks to the root SMP L2CAP
-channel we can take advantage of it and attach the AES crypto context
-(only used for SMP) to it. This means that the smp_irk_matches() and
-smp_generate_rpa() function can be converted to internally handle the
-AES context.
+This patch creates the initial SMP L2CAP channels and a skeleton for
+their callbacks. There is one per-adapter channel created upon adapter
+registration, and then one channel per-connection created through the
+new_connection callback. The channels are registered with the reserved
+CID 0x1f for now in order to not conflict with existing SMP
+functionality. Once everything is in place the value can be changed to
+what it should be, i.e. L2CAP_CID_SMP.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- include/net/bluetooth/hci_core.h |  1 -
- net/bluetooth/hci_core.c         | 13 ++-----------
- net/bluetooth/smp.c              | 41 +++++++++++++++++++++++++++-------------
- net/bluetooth/smp.h              |  5 ++---
- 4 files changed, 32 insertions(+), 28 deletions(-)
+ include/net/bluetooth/hci_core.h |   1 +
+ include/net/bluetooth/l2cap.h    |   1 +
+ net/bluetooth/smp.c              | 131 ++++++++++++++++++++++++++++++++++++++-
+ 3 files changed, 132 insertions(+), 1 deletion(-)
 
 diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 2571fc1cb1c5..5f0b77b71b45 100644
+index cc2eb7730fbc..2571fc1cb1c5 100644
 --- a/include/net/bluetooth/hci_core.h
 +++ b/include/net/bluetooth/hci_core.h
-@@ -302,7 +302,6 @@ struct hci_dev {
- 	__u32			req_status;
+@@ -303,6 +303,7 @@ struct hci_dev {
  	__u32			req_result;
  
--	struct crypto_blkcipher	*tfm_aes;
- 	void			*smp_data;
+ 	struct crypto_blkcipher	*tfm_aes;
++	void			*smp_data;
  
  	struct discovery_state	discovery;
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 88575a633601..abeb5e47311e 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -3234,11 +3234,8 @@ struct smp_irk *hci_find_irk_by_rpa(struct hci_dev *hdev, bdaddr_t *rpa)
- 			return irk;
- 	}
+ 	struct hci_conn_hash	conn_hash;
+diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
+index a72965f6bc2f..1a037ba4b6f4 100644
+--- a/include/net/bluetooth/l2cap.h
++++ b/include/net/bluetooth/l2cap.h
+@@ -637,6 +637,7 @@ struct l2cap_conn {
  
--	if (!hdev->tfm_aes)
--		return NULL;
--
- 	list_for_each_entry(irk, &hdev->identity_resolving_keys, list) {
--		if (smp_irk_matches(hdev->tfm_aes, irk->val, rpa)) {
-+		if (smp_irk_matches(hdev, irk->val, rpa)) {
- 			bacpy(&irk->rpa, rpa);
- 			return irk;
- 		}
-@@ -3887,13 +3884,7 @@ int hci_update_random_address(struct hci_request *req, bool require_privacy,
- 		    !bacmp(&hdev->random_addr, &hdev->rpa))
- 			return 0;
+ 	struct delayed_work	security_timer;
+ 	struct smp_chan		*smp_chan;
++	struct l2cap_chan	*smp;
  
--		if (!hdev->tfm_aes) {
--			BT_ERR("%s crypto not available to generate RPA",
--			       hdev->name);
--			return -EOPNOTSUPP;
--		}
--
--		err = smp_generate_rpa(hdev->tfm_aes, hdev->irk, &hdev->rpa);
-+		err = smp_generate_rpa(hdev, hdev->irk, &hdev->rpa);
- 		if (err < 0) {
- 			BT_ERR("%s failed to generate new RPA", hdev->name);
- 			return err;
+ 	struct list_head	chan_l;
+ 	struct mutex		chan_lock;
 diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
-index 2362ae35a4d5..6925fc4caaee 100644
+index ab07649ecc77..2362ae35a4d5 100644
 --- a/net/bluetooth/smp.c
 +++ b/net/bluetooth/smp.c
-@@ -139,12 +139,18 @@ static int smp_ah(struct crypto_blkcipher *tfm, u8 irk[16], u8 r[3], u8 res[3])
+@@ -1456,8 +1456,106 @@ int smp_distribute_keys(struct l2cap_conn *conn)
  	return 0;
  }
  
--bool smp_irk_matches(struct crypto_blkcipher *tfm, u8 irk[16],
--		     bdaddr_t *bdaddr)
-+bool smp_irk_matches(struct hci_dev *hdev, u8 irk[16], bdaddr_t *bdaddr)
- {
-+	struct l2cap_chan *chan = hdev->smp_data;
-+	struct crypto_blkcipher *tfm;
- 	u8 hash[3];
- 	int err;
- 
-+	if (!chan || !chan->data)
-+		return false;
++static void smp_teardown_cb(struct l2cap_chan *chan, int err)
++{
++	struct l2cap_conn *conn = chan->conn;
 +
-+	tfm = chan->data;
++	BT_DBG("chan %p", chan);
 +
- 	BT_DBG("RPA %pMR IRK %*phN", bdaddr, 16, irk);
- 
- 	err = smp_ah(tfm, irk, &bdaddr->b[3], hash);
-@@ -154,10 +160,17 @@ bool smp_irk_matches(struct crypto_blkcipher *tfm, u8 irk[16],
- 	return !memcmp(bdaddr->b, hash, 3);
- }
- 
--int smp_generate_rpa(struct crypto_blkcipher *tfm, u8 irk[16], bdaddr_t *rpa)
-+int smp_generate_rpa(struct hci_dev *hdev, u8 irk[16], bdaddr_t *rpa)
- {
-+	struct l2cap_chan *chan = hdev->smp_data;
-+	struct crypto_blkcipher *tfm;
- 	int err;
- 
-+	if (!chan || !chan->data)
-+		return -EOPNOTSUPP;
++	conn->smp = NULL;
++	l2cap_chan_put(chan);
++}
 +
-+	tfm = chan->data;
++static void smp_ready_cb(struct l2cap_chan *chan)
++{
++	struct l2cap_conn *conn = chan->conn;
 +
- 	get_random_bytes(&rpa->b[3], 3);
- 
- 	rpa->b[5] &= 0x3f;	/* Clear two most significant bits */
-@@ -1555,25 +1568,25 @@ static const struct l2cap_ops smp_root_chan_ops = {
++	BT_DBG("chan %p", chan);
++
++	conn->smp = chan;
++	l2cap_chan_hold(chan);
++}
++
++static struct sk_buff *smp_alloc_skb_cb(struct l2cap_chan *chan,
++					unsigned long hdr_len,
++					unsigned long len, int nb)
++{
++	struct sk_buff *skb;
++
++	skb = bt_skb_alloc(hdr_len + len, GFP_KERNEL);
++	if (!skb)
++		return ERR_PTR(-ENOMEM);
++
++	skb->priority = HCI_PRIO_MAX;
++	bt_cb(skb)->chan = chan;
++
++	return skb;
++}
++
++static const struct l2cap_ops smp_chan_ops = {
++	.name			= "Security Manager",
++	.ready			= smp_ready_cb,
++	.alloc_skb		= smp_alloc_skb_cb,
++	.teardown		= smp_teardown_cb,
++
++	.new_connection		= l2cap_chan_no_new_connection,
++	.recv			= l2cap_chan_no_recv,
++	.state_change		= l2cap_chan_no_state_change,
++	.close			= l2cap_chan_no_close,
++	.defer			= l2cap_chan_no_defer,
++	.suspend		= l2cap_chan_no_suspend,
++	.resume			= l2cap_chan_no_resume,
++	.set_shutdown		= l2cap_chan_no_set_shutdown,
++	.get_sndtimeo		= l2cap_chan_no_get_sndtimeo,
++	.memcpy_fromiovec	= l2cap_chan_no_memcpy_fromiovec,
++};
++
++static inline struct l2cap_chan *smp_new_conn_cb(struct l2cap_chan *pchan)
++{
++	struct l2cap_chan *chan;
++
++	BT_DBG("pchan %p", pchan);
++
++	chan = l2cap_chan_create();
++	if (!chan)
++		return NULL;
++
++	chan->chan_type	= pchan->chan_type;
++	chan->ops	= &smp_chan_ops;
++	chan->scid	= pchan->scid;
++	chan->dcid	= chan->scid;
++	chan->imtu	= pchan->imtu;
++	chan->omtu	= pchan->omtu;
++	chan->mode	= pchan->mode;
++
++	BT_DBG("created chan %p", chan);
++
++	return chan;
++}
++
++static const struct l2cap_ops smp_root_chan_ops = {
++	.name			= "Security Manager Root",
++	.new_connection		= smp_new_conn_cb,
++
++	/* None of these are implemented for the root channel */
++	.close			= l2cap_chan_no_close,
++	.alloc_skb		= l2cap_chan_no_alloc_skb,
++	.recv			= l2cap_chan_no_recv,
++	.state_change		= l2cap_chan_no_state_change,
++	.teardown		= l2cap_chan_no_teardown,
++	.ready			= l2cap_chan_no_ready,
++	.defer			= l2cap_chan_no_defer,
++	.suspend		= l2cap_chan_no_suspend,
++	.resume			= l2cap_chan_no_resume,
++	.set_shutdown		= l2cap_chan_no_set_shutdown,
++	.get_sndtimeo		= l2cap_chan_no_get_sndtimeo,
++	.memcpy_fromiovec	= l2cap_chan_no_memcpy_fromiovec,
++};
++
  int smp_register(struct hci_dev *hdev)
  {
- 	struct l2cap_chan *chan;
-+	struct crypto_blkcipher	*tfm_aes;
- 
++	struct l2cap_chan *chan;
++
  	BT_DBG("%s", hdev->name);
  
--	hdev->tfm_aes = crypto_alloc_blkcipher("ecb(aes)", 0,
--					       CRYPTO_ALG_ASYNC);
--	if (IS_ERR(hdev->tfm_aes)) {
--		int err = PTR_ERR(hdev->tfm_aes);
-+	tfm_aes = crypto_alloc_blkcipher("ecb(aes)", 0, CRYPTO_ALG_ASYNC);
-+	if (IS_ERR(tfm_aes)) {
-+		int err = PTR_ERR(tfm_aes);
- 		BT_ERR("Unable to create crypto context");
--		hdev->tfm_aes = NULL;
+ 	hdev->tfm_aes = crypto_alloc_blkcipher("ecb(aes)", 0,
+@@ -1469,15 +1567,46 @@ int smp_register(struct hci_dev *hdev)
  		return err;
  	}
  
- 	chan = l2cap_chan_create();
- 	if (!chan) {
--		crypto_free_blkcipher(hdev->tfm_aes);
--		hdev->tfm_aes = NULL;
-+		crypto_free_blkcipher(tfm_aes);
- 		return -ENOMEM;
- 	}
- 
-+	chan->data = tfm_aes;
++	chan = l2cap_chan_create();
++	if (!chan) {
++		crypto_free_blkcipher(hdev->tfm_aes);
++		hdev->tfm_aes = NULL;
++		return -ENOMEM;
++	}
 +
- 	/* FIXME: Using reserved 0x1f value for now - to be changed to
- 	 * L2CAP_CID_SMP once all functionality is in place.
- 	 */
-@@ -1596,15 +1609,17 @@ int smp_register(struct hci_dev *hdev)
++	/* FIXME: Using reserved 0x1f value for now - to be changed to
++	 * L2CAP_CID_SMP once all functionality is in place.
++	 */
++	l2cap_add_scid(chan, 0x1f);
++
++	l2cap_chan_set_defaults(chan);
++
++	bacpy(&chan->src, &hdev->bdaddr);
++	chan->src_type = BDADDR_LE_PUBLIC;
++	chan->state = BT_LISTEN;
++	chan->mode = L2CAP_MODE_BASIC;
++	chan->imtu = L2CAP_DEFAULT_MTU;
++	chan->ops = &smp_root_chan_ops;
++
++	hdev->smp_data = chan;
++
+ 	return 0;
+ }
+ 
  void smp_unregister(struct hci_dev *hdev)
  {
- 	struct l2cap_chan *chan = hdev->smp_data;
-+	struct crypto_blkcipher *tfm_aes;
+-	BT_DBG("%s", hdev->name);
++	struct l2cap_chan *chan = hdev->smp_data;
++
++	if (!chan)
++		return;
++
++	BT_DBG("%s chan %p", hdev->name, chan);
  
- 	if (!chan)
- 		return;
- 
- 	BT_DBG("%s chan %p", hdev->name, chan);
- 
--	if (hdev->tfm_aes) {
--		crypto_free_blkcipher(hdev->tfm_aes);
--		hdev->tfm_aes = NULL;
-+	tfm_aes = chan->data;
-+	if (tfm_aes) {
-+		chan->data = NULL;
-+		crypto_free_blkcipher(tfm_aes);
+ 	if (hdev->tfm_aes) {
+ 		crypto_free_blkcipher(hdev->tfm_aes);
+ 		hdev->tfm_aes = NULL;
  	}
- 
- 	hdev->smp_data = NULL;
-diff --git a/net/bluetooth/smp.h b/net/bluetooth/smp.h
-index 6e29359f60a3..d3f6bd617940 100644
---- a/net/bluetooth/smp.h
-+++ b/net/bluetooth/smp.h
-@@ -132,9 +132,8 @@ int smp_user_confirm_reply(struct hci_conn *conn, u16 mgmt_op, __le32 passkey);
- 
- void smp_chan_destroy(struct l2cap_conn *conn);
- 
--bool smp_irk_matches(struct crypto_blkcipher *tfm, u8 irk[16],
--		     bdaddr_t *bdaddr);
--int smp_generate_rpa(struct crypto_blkcipher *tfm, u8 irk[16], bdaddr_t *rpa);
-+bool smp_irk_matches(struct hci_dev *hdev, u8 irk[16], bdaddr_t *bdaddr);
-+int smp_generate_rpa(struct hci_dev *hdev, u8 irk[16], bdaddr_t *rpa);
- 
- int smp_register(struct hci_dev *hdev);
- void smp_unregister(struct hci_dev *hdev);
++
++	hdev->smp_data = NULL;
++	l2cap_chan_put(chan);
+ }
 -- 
 1.9.3
 
