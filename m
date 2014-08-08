@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: johan.hedberg@gmail.com
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 2/5] Bluetooth: Fix IRK lookup when tfm_aes is not available
-Date: Fri,  8 Aug 2014 09:32:49 +0300
-Message-Id: <1407479572-4868-3-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH 1/5] Bluetooth: Fix hci_update_random_address() error return for no crypto
+Date: Fri,  8 Aug 2014 09:32:48 +0300
+Message-Id: <1407479572-4868-2-git-send-email-johan.hedberg@gmail.com>
 In-Reply-To: <1407479572-4868-1-git-send-email-johan.hedberg@gmail.com>
 References: <1407479572-4868-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,30 +11,32 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-If the AES crypto has not been initialized properly we should cleanly
-return from the hci_find_irk_by_rpa() function. Right now this will not
-happen in practice, but once (in subsequent patches) SMP init is moved
-to after the HCI init procedure it is possible that the pointer is NULL.
+If the AES crypto context is not available we cannot generate new RPAs.
+We should therefore cleanly return an error from the function
+responsible for updating the random address.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- net/bluetooth/hci_core.c | 3 +++
- 1 file changed, 3 insertions(+)
+ net/bluetooth/hci_core.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
 diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 860477090d78..4a1ec259099e 100644
+index 217ef83fb541..860477090d78 100644
 --- a/net/bluetooth/hci_core.c
 +++ b/net/bluetooth/hci_core.c
-@@ -3232,6 +3232,9 @@ struct smp_irk *hci_find_irk_by_rpa(struct hci_dev *hdev, bdaddr_t *rpa)
- 			return irk;
- 	}
+@@ -3882,6 +3882,12 @@ int hci_update_random_address(struct hci_request *req, bool require_privacy,
+ 		    !bacmp(&hdev->random_addr, &hdev->rpa))
+ 			return 0;
  
-+	if (!hdev->tfm_aes)
-+		return NULL;
++		if (!hdev->tfm_aes) {
++			BT_ERR("%s crypto not available to generate RPA",
++			       hdev->name);
++			return -EOPNOTSUPP;
++		}
 +
- 	list_for_each_entry(irk, &hdev->identity_resolving_keys, list) {
- 		if (smp_irk_matches(hdev->tfm_aes, irk->val, rpa)) {
- 			bacpy(&irk->rpa, rpa);
+ 		err = smp_generate_rpa(hdev->tfm_aes, hdev->irk, &hdev->rpa);
+ 		if (err < 0) {
+ 			BT_ERR("%s failed to generate new RPA", hdev->name);
 -- 
 1.9.3
 
