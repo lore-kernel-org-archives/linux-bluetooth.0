@@ -1,49 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.6\))
-Subject: Re: [PATCH 0/9] Bluetooth: More generic L2CAP fixed channel handling
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1407395551-30810-1-git-send-email-johan.hedberg@gmail.com>
-Date: Fri, 8 Aug 2014 10:43:44 -0700
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <9C1AFCEE-A3C5-4E40-BA4B-2FB362970BB3@holtmann.org>
-References: <1407395551-30810-1-git-send-email-johan.hedberg@gmail.com>
-To: Johan Hedberg <johan.hedberg@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+From: Loic Poulain <loic.poulain@intel.com>
+To: marcel@holtmann.org,
+	gustavo@padovan.org,
+	johan.hedberg@gmail.com
+Cc: linux-bluetooth@vger.kernel.org,
+	Loic Poulain <loic.poulain@intel.com>
+Subject: [PATCH] Bluetooth: Fix HCI H5 corrupted ack value
+Date: Fri,  8 Aug 2014 19:07:16 +0200
+Message-Id: <1407517636-8484-1-git-send-email-loic.poulain@intel.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+In this expression: seq = (seq - 1) % 8
+seq (u8) is implicitly converted to an int in the arithmetic operation.
+So if seq value is 0, operation is ((0 - 1) % 8) => (-1 % 8) => -1.
+The new seq value is 0xff which is an invalid ACK value, we expect 0x07.
+It leads to frequent dropped ACK and retransmission.
+Fix this by using '&' binary operator instead of '%'.
 
-> Here's a set of patches to make fixed L2CAP channel handling more
-> generic. The main special-casing that's removed here is for ATT
-> channels. The A2MP stuff is left for later since its semantics would
-> change from creating the context only when there's data on the channel
-> to as soon as we have a baseband link (which I'm not sure is desirable).
-> 
-> The main motivation for all of this work is to pave the way to convert
-> SMP to fully use the l2cap_chan infrastructure.
-> 
-> Johan
-> 
-> ----------------------------------------------------------------
-> Johan Hedberg (9):
->      Bluetooth: Fix reference counting of global L2CAP channels
->      Bluetooth: Fix __l2cap_no_conn_pending() usage with all channels
->      Bluetooth: Resume BT_CONNECTED state after LE security elevation
->      Bluetooth: Remove special handling of ATT in l2cap_security_cfm()
->      Bluetooth: Refactor l2cap_connect_cfm
->      Bluetooth: Move L2CAP fixed channel creation into l2cap_conn_cfm
->      Bluetooth: Improve fixed channel lookup based on link type
->      Bluetooth: Remove special ATT data channel handling
->      Bluetooth: Move parts of fixed channel initialization to l2cap_add_scid
-> 
-> include/net/bluetooth/l2cap.h |   1 +
-> net/bluetooth/l2cap_core.c    | 244 ++++++++++++++++++--------------------
-> net/bluetooth/l2cap_sock.c    |  15 +--
+Signed-off-by: Loic Poulain <loic.poulain@intel.com>
+---
+ drivers/bluetooth/hci_h5.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-all 9 patches have been applied to bluetooth-next tree.
-
-Regards
-
-Marcel
-
+diff --git a/drivers/bluetooth/hci_h5.c b/drivers/bluetooth/hci_h5.c
+index fede8ca..5d9148f 100644
+--- a/drivers/bluetooth/hci_h5.c
++++ b/drivers/bluetooth/hci_h5.c
+@@ -237,7 +237,7 @@ static void h5_pkt_cull(struct h5 *h5)
+ 			break;
+ 
+ 		to_remove--;
+-		seq = (seq - 1) % 8;
++		seq = (seq - 1) & 0x07;
+ 	}
+ 
+ 	if (seq != h5->rx_ack)
+-- 
+1.8.3.2
