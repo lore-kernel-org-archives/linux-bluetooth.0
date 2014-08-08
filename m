@@ -1,70 +1,56 @@
 Return-Path: <cyrus@holtmann.org>
-From: Sebastian Chlad <sebastian.chlad@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Sebastian Chlad <sebastian.chlad@tieto.com>
-Subject: [PATCH] android/pts: PTS files for MCAP
-Date: Fri,  8 Aug 2014 13:58:20 +0200
-Message-Id: <1407499100-12028-1-git-send-email-sebastian.chlad@tieto.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Message-ID: <53E4B9DB.7060301@gmail.com>
+Date: Fri, 08 Aug 2014 17:21:55 +0530
+From: Varka Bhadram <varkabhadram@gmail.com>
+MIME-Version: 1.0
+To: Alexander Aring <alex.aring@gmail.com>
+CC: linux-wpan@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+	Varka Bhadram <varkab@cdac.in>
+Subject: Re: [PATCH bluetooth-next] MAINTAINERS: update maintainers info
+References: <1407497303-6795-1-git-send-email-varkabhadram@gmail.com> <20140808113833.GA18109@omega> <53E4B8DD.9020007@gmail.com>
+In-Reply-To: <53E4B8DD.9020007@gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Update for PIXIT and PICS for MCAP on PTS 5.2 as well as regression
-test round on Android 4.4.4 against PTS 5.2
----
- android/pics-mcap.txt  | 2 +-
- android/pixit-mcap.txt | 2 +-
- android/pts-mcap.txt   | 8 ++++----
- 3 files changed, 6 insertions(+), 6 deletions(-)
+On 08/08/2014 05:17 PM, Varka Bhadram wrote:
+> On 08/08/2014 05:08 PM, Alexander Aring wrote:
+>> Hi,
+>>
+>> On Fri, Aug 08, 2014 at 04:58:23PM +0530, varkabhadram@gmail.com wrote:
+>>> From: Varka Bhadram <varkab@cdac.in>
+>>>
+>>> adds the mailing list address for bluetooth 6loWPAN and
+>>> IEEE-802.15.4 subsystems. Also adds web page info.
+>>>
+>>> Signed-off-by: Varka Bhadram <varkab@cdac.in>
+>>> ---
+>>>   MAINTAINERS |    8 +++++---
+>>>   1 file changed, 5 insertions(+), 3 deletions(-)
+>>>
+>>> diff --git a/MAINTAINERS b/MAINTAINERS
+>>> index 05e5450..4e08a78 100644
+>>> --- a/MAINTAINERS
+>>> +++ b/MAINTAINERS
+>>> @@ -154,6 +154,7 @@ F:    drivers/scsi/53c700*
+>>>   M:    Alexander Aring <alex.aring@gmail.com>
+>>>   L:    linux-zigbee-devel@lists.sourceforge.net (moderated for 
+>>> non-subscribers)
+>> what's about to remove this mailinglist? It's the deprecated one. :-)
+>
+> I generated this against net-next tree... Its not applying on 
+> bluetooth-next.
+>
+> In bluetooth-next IEEE-802.15.4 MAINTAINERS not updated. May be they 
+> have not
+> net/net-next.
+>
+> On which tree we have to do this..?
+>
+May be we need to send this to net-next...?
 
-diff --git a/android/pics-mcap.txt b/android/pics-mcap.txt
-index 3b1086a..adc97d7 100644
---- a/android/pics-mcap.txt
-+++ b/android/pics-mcap.txt
-@@ -1,6 +1,6 @@
- MCAP PICS for the PTS tool.
- 
--PTS version: 5.1
-+PTS version: 5.2
- 
- * - different than PTS defaults
- # - not yet implemented/supported
-diff --git a/android/pixit-mcap.txt b/android/pixit-mcap.txt
-index 81cc6dc..fb6f456 100644
---- a/android/pixit-mcap.txt
-+++ b/android/pixit-mcap.txt
-@@ -1,6 +1,6 @@
- MCAP PIXIT for the PTS tool.
- 
--PTS version: 5.1
-+PTS version: 5.2
- 
- * - different than PTS defaults
- & - should be set to IUT Bluetooth address
-diff --git a/android/pts-mcap.txt b/android/pts-mcap.txt
-index 55b51d7..c35fefb 100644
---- a/android/pts-mcap.txt
-+++ b/android/pts-mcap.txt
-@@ -1,8 +1,8 @@
- PTS test results for MCAP
- 
--PTS version: 5.1
--Tested: 27-June-2014
--Android version: 4.4.2
-+PTS version: 5.2
-+Tested: 07-August-2014
-+Android version: 4.4.4
- 
- Results:
- PASS	test passed
-@@ -37,7 +37,7 @@ TC_MCAP_CM_REC_BV_02_C	PASS	mcaptest -C 4099 -D 4101
- TC_MCAP_CM_REC_BV_03_C	N/A
- TC_MCAP_CM_REC_BV_04_C	PASS	mcaptest -C 4099 -D 4101
- 				Note: It may be necessary to confirm pairing
--					twice (second time when UIT is back in
-+					twice (second time when IUT is back in
- 					range).
- TC_MCAP_CM_REC_BV_05_C	N/A
- TC_MCAP_CM_REC_BV_06_C	PASS	mcaptest -C 4099 -D 4101
+
 -- 
-1.8.5.3
+Regards,
+Varka Bhadram.
 
