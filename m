@@ -1,54 +1,38 @@
 Return-Path: <cyrus@holtmann.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.6\))
-Subject: Re: [PATCH] Add a new PID/VID 0227/0930 for AR3012. 
+Subject: Re: [PATCH bluetooth-next] MAINTAINERS: update maintainers info
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1407497636-15450-1-git-send-email-vincentz@topmail.ie>
-Date: Fri, 8 Aug 2014 10:56:47 -0700
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <90590FFF-B23C-47A7-B85D-523FC693B984@holtmann.org>
-References: <1407497636-15450-1-git-send-email-vincentz@topmail.ie>
-To: Vincent Zwanenburg <vincentz@topmail.ie>
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <1407499365-7271-1-git-send-email-varkabhadram@gmail.com>
+Date: Fri, 8 Aug 2014 10:54:57 -0700
+Cc: linux-wpan@vger.kernel.org,
+	BlueZ development <linux-bluetooth@vger.kernel.org>,
+	Varka Bhadram <varkab@cdac.in>
+Message-Id: <8E237A8C-E3F2-4D43-A400-9826EB56CA90@holtmann.org>
+References: <1407499365-7271-1-git-send-email-varkabhadram@gmail.com>
+To: varkabhadram@gmail.com
+Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Vincent,
+Hi Varka,
 
-> usb devices info:
+> From: Varka Bhadram <varkab@cdac.in>
 > 
-> T:  Bus=01 Lev=02 Prnt=05 Port=00 Cnt=01 Dev#= 20 Spd=12   MxCh= 0
-> D:  Ver= 1.10 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-> P:  Vendor=0930 ProdID=0227 Rev= 0.02
-> C:* #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
-> A:  FirstIf#= 0 IfCount= 2 Cls=e0(wlcon) Sub=01 Prot=01
-> I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
-> E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-> E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-> I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-> I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-> I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-> I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-> I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-> I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+> adds the mailing list address for bluetooth 6loWPAN and
+> IEEE-802.15.4 subsystems. Also adds web page info.
 > 
-> Signed-off-by: Vincent Zwanenburg <vincentz@topmail.ie>
+> Signed-off-by: Varka Bhadram <varkab@cdac.in>
 > ---
-> drivers/bluetooth/ath3k.c | 2 ++
-> drivers/bluetooth/btusb.c | 1 +
-> 2 files changed, 3 insertions(+)
+> Hi,
+> 
+> Previosly its my mistake i have not updated my local bluetooth-next
+> tree. Sorry for the noise.
+> 
+> Thanks
+> Varka Bhadram.
+> 
+> MAINTAINERS |    9 +++++----
+> 1 file changed, 5 insertions(+), 4 deletions(-)
 
 patch has been applied to bluetooth-next tree.
 
