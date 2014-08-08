@@ -1,6 +1,6 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <53E4B8DD.9020007@gmail.com>
-Date: Fri, 08 Aug 2014 17:17:41 +0530
+Message-ID: <53E4B74F.6050602@gmail.com>
+Date: Fri, 08 Aug 2014 17:11:03 +0530
 From: Varka Bhadram <varkabhadram@gmail.com>
 MIME-Version: 1.0
 To: Alexander Aring <alex.aring@gmail.com>
@@ -36,12 +36,9 @@ On 08/08/2014 05:08 PM, Alexander Aring wrote:
 >>   L:	linux-zigbee-devel@lists.sourceforge.net (moderated for non-subscribers)
 > what's about to remove this mailinglist? It's the deprecated one. :-)
 
-I generated this against net-next tree... Its not applying on bluetooth-next.
+Ohhh.. sorry for that..
 
-In bluetooth-next IEEE-802.15.4 MAINTAINERS not updated. May be they have not
-net/net-next.
 
-On which tree we have to do this..?
 
 -- 
 Regards,
