@@ -3,34 +3,40 @@ From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: luiz.dentz@gmail.com,
 	Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH 2/2] android/a2dp: Fix for PTS testcase
-Date: Fri,  8 Aug 2014 15:42:34 +0200
-Message-Id: <1407505354-23072-2-git-send-email-lukasz.rymanowski@tieto.com>
-In-Reply-To: <1407505354-23072-1-git-send-email-lukasz.rymanowski@tieto.com>
-References: <1407505354-23072-1-git-send-email-lukasz.rymanowski@tieto.com>
+Subject: [PATCH 1/2] android/a2dp: Improve avdtp_close function
+Date: Fri,  8 Aug 2014 15:42:33 +0200
+Message-Id: <1407505354-23072-1-git-send-email-lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch is a fix for PTS TC_SRC_REL_BV_01_I
-PTS expects us to CLOSE stream not to ABORT the stream when
-disconnecting A2DP.
+With this patch avdtp_close does avdtp_abort under the hood in case
+stream is not yet in OPEN state.
 ---
- android/avdtp.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ android/avdtp.c | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
 
 diff --git a/android/avdtp.c b/android/avdtp.c
-index 85ef94b..3985fb3 100644
+index 89f4860..85ef94b 100644
 --- a/android/avdtp.c
 +++ b/android/avdtp.c
-@@ -2180,7 +2180,8 @@ void avdtp_shutdown(struct avdtp *session)
- 	for (l = session->streams; l; l = g_slist_next(l)) {
- 		struct avdtp_stream *stream = l->data;
+@@ -3244,14 +3244,15 @@ int avdtp_close(struct avdtp *session, struct avdtp_stream *stream,
+ 	if (!g_slist_find(session->streams, stream))
+ 		return -EINVAL;
  
--		if (stream->abort_int || avdtp_abort(session, stream) == 0)
-+		if (stream->abort_int ||
-+					avdtp_close(session, stream, TRUE) == 0)
- 			aborting = true;
+-	if (stream->lsep->state < AVDTP_STATE_OPEN)
+-		return -EINVAL;
+-
+ 	if (stream->close_int == TRUE) {
+ 		error("avdtp_close: rejecting since close is already initiated");
+ 		return -EINVAL;
  	}
+ 
++	/* If stream is not yet in the OPEN state, let's use ABORT_CMD */
++	if (stream->lsep->state < AVDTP_STATE_OPEN)
++		return avdtp_abort(session, stream);
++
+ 	if (immediate && session->req && stream == session->req->stream)
+ 		return avdtp_abort(session, stream);
  
 -- 
 1.8.4
