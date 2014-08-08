@@ -1,34 +1,63 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 8 Aug 2014 16:34:11 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 0/3] Initial HDP E2E test cases
-Message-ID: <20140808133411.GA15133@t440s.ger.corp.intel.com>
-References: <1407332510-3831-1-git-send-email-ravikumar.veeramally@linux.intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1407332510-3831-1-git-send-email-ravikumar.veeramally@linux.intel.com>
+From: varkabhadram@gmail.com
+To: linux-wpan@vger.kernel.org, linux-bluetooth@vger.kernel.org
+Cc: Varka Bhadram <varkab@cdac.in>
+Subject: [PATCH bluetooth-next] MAINTAINERS: update maintainers info
+Date: Fri,  8 Aug 2014 17:32:45 +0530
+Message-Id: <1407499365-7271-1-git-send-email-varkabhadram@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Ravi,
+From: Varka Bhadram <varkab@cdac.in>
 
-On Wed, Aug 06, 2014, Ravi kumar Veeramally wrote:
-> Patchset contains HDP initial (app register and unregister) test cases.
-> 
-> Ravi kumar Veeramally (3):
->   android/tester: Add HDP init test case
->   android/tester: Add HDP App Register test cases
->   android/tester: Add HDP App Unregister test case
-> 
->  android/Makefile.am   |   1 +
->  android/tester-hdp.c  | 225 ++++++++++++++++++++++++++++++++++++++++++++++++++
->  android/tester-main.c | 111 +++++++++++++++++++++++++
->  android/tester-main.h |  29 +++++++
->  4 files changed, 366 insertions(+)
->  create mode 100644 android/tester-hdp.c
+adds the mailing list address for bluetooth 6loWPAN and
+IEEE-802.15.4 subsystems. Also adds web page info.
 
-All three patches have been applied. Thanks.
+Signed-off-by: Varka Bhadram <varkab@cdac.in>
+---
+Hi,
 
-Johan
+Previosly its my mistake i have not updated my local bluetooth-next
+tree. Sorry for the noise.
+
+Thanks
+Varka Bhadram.
+
+ MAINTAINERS |    9 +++++----
+ 1 file changed, 5 insertions(+), 4 deletions(-)
+
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 05e5450..43f3df1 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -152,8 +152,8 @@ F:	drivers/scsi/53c700*
+ 
+ 6LOWPAN GENERIC (BTLE/IEEE 802.15.4)
+ M:	Alexander Aring <alex.aring@gmail.com>
+-L:	linux-zigbee-devel@lists.sourceforge.net (moderated for non-subscribers)
+ L:	linux-bluetooth@vger.kernel.org
++L:	linux-wpan@vger.kernel.org
+ S:	Maintained
+ F:	net/6lowpan/
+ F:	include/net/6lowpan.h
+@@ -4560,13 +4560,14 @@ F:	drivers/idle/i7300_idle.c
+ 
+ IEEE 802.15.4 SUBSYSTEM
+ M:	Alexander Aring <alex.aring@gmail.com>
+-L:	linux-zigbee-devel@lists.sourceforge.net (moderated for non-subscribers)
+-W:	http://apps.sourceforge.net/trac/linux-zigbee
+-T:	git git://git.kernel.org/pub/scm/linux/kernel/git/lowpan/lowpan.git
++L:	linux-wpan@vger.kernel.org
++W:	https://github.com/linux-wpan
++T:	git git://github.com/linux-wpan/linux-wpan-next.git
+ S:	Maintained
+ F:	net/ieee802154/
+ F:	net/mac802154/
+ F:	drivers/net/ieee802154/
++F:	Documentation/networking/ieee802154.txt
+ 
+ IGUANAWORKS USB IR TRANSCEIVER
+ M:	Sean Young <sean@mess.org>
+-- 
+1.7.9.5
+
