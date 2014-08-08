@@ -1,81 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 8 Aug 2014 13:16:39 +0200
-From: Alexander Aring <alex.aring@gmail.com>
-To: varkabhadram@gmail.com
-Cc: linux-wpan@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-	Varka Bhadram <varkab@cdac.in>
-Subject: Re: [PATCH bluetooth-next] MAINTAINERS: add mailing list
-Message-ID: <20140808111637.GA17088@omega>
-References: <1407495439-5906-1-git-send-email-varkabhadram@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-In-Reply-To: <1407495439-5906-1-git-send-email-varkabhadram@gmail.com>
+In-Reply-To: <1407420787-8293-1-git-send-email-luiz.dentz@gmail.com>
+References: <1407420787-8293-1-git-send-email-luiz.dentz@gmail.com>
+Date: Fri, 8 Aug 2014 14:04:14 +0300
+Message-ID: <CABBYNZJ5V4YMhjdjZ-ONpAejgmA1Tm1oPK6ebr+_AkSU=-r4Bg@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 1/3] android/tester: Fix duplicate const
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Varka,
+Hi,
 
-On Fri, Aug 08, 2014 at 04:27:19PM +0530, varkabhadram@gmail.com wrote:
-> From: Varka Bhadram <varkab@cdac.in>
-> 
-> adds the mailing list address for bluetooth generic 6lowpan and
-> 802.15.4 subsystems
-> 
-> Signed-off-by: Varka Bhadram <varkab@cdac.in>
+On Thu, Aug 7, 2014 at 5:13 PM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>
 > ---
->  MAINTAINERS |    2 ++
->  1 file changed, 2 insertions(+)
-> 
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index 05e5450..59a4108 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -154,6 +154,7 @@ F:	drivers/scsi/53c700*
->  M:	Alexander Aring <alex.aring@gmail.com>
->  L:	linux-zigbee-devel@lists.sourceforge.net (moderated for non-subscribers)
->  L:	linux-bluetooth@vger.kernel.org
-> +L:	linux-wpan@vger.kernel.org
->  S:	Maintained
->  F:	net/6lowpan/
->  F:	include/net/6lowpan.h
-> @@ -4561,6 +4562,7 @@ F:	drivers/idle/i7300_idle.c
->  IEEE 802.15.4 SUBSYSTEM
->  M:	Alexander Aring <alex.aring@gmail.com>
->  L:	linux-zigbee-devel@lists.sourceforge.net (moderated for non-subscribers)
-> +L:	linux-wpan@vger.kernel.org
->  W:	http://apps.sourceforge.net/trac/linux-zigbee
->  T:	git git://git.kernel.org/pub/scm/linux/kernel/git/lowpan/lowpan.git
->  S:	Maintained
+>  android/tester-main.h | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/android/tester-main.h b/android/tester-main.h
+> index 5a5cba4..3f0d46e 100644
+> --- a/android/tester-main.h
+> +++ b/android/tester-main.h
+> @@ -358,7 +358,7 @@ struct test_case {
+>         const uint8_t emu_type;
+>         const char *title;
+>         const uint16_t step_num;
+> -       const struct step const *step;
+> +       const struct step *step;
+>  };
+>
+>  /* Get, remove test cases API */
+> --
+> 1.9.3
 
-ah, okay. Seems that both entries are in bluetooth-next now, so we can
-do this.
-
-Please drop the old linux zigbee one and replace the "T:" entry in
-IEEE 802.15.4 SUBSYSTEM into:
-
-git git://github.com/linux-wpan/linux-wpan-next.git
-
-also add a "W:" entry for the website:
-
-https://github.com/linux-wpan
+Patches 1 and 2 pushed, patch 3 will be redesigned.
 
 
-and there are several files missing in IEEE 802.15.4 SUBSYSTEM. I want
-to do this all of these things in one patch. Please add these missing
-files like:
-
-Documentation/networking/ieee802154.txt
-include/** <-- search for 802154 stuff
-
-
-
-Marcel, maybe we should add:
-
-T: git git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git
-
-in 6LOWPAN_GENERIC. Do you agree with that?
-
-
-Thanks.
-
-- Alex
+-- 
+Luiz Augusto von Dentz
