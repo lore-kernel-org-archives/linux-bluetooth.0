@@ -1,354 +1,409 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-Sender: arakhov@google.com
-In-Reply-To: <574DE1E1-7A53-4629-88FC-7164EC1880AA@holtmann.org>
-References: <CAD81oNZL0qATu_z_TJT8psaMhpmV34w6xmA2+=OKerSE1NSvOw@mail.gmail.com>
-	<CABBYNZ+zRKzv4yTc8M2Fi0eN6gC921b9zaey5FKGVq_bJJueBg@mail.gmail.com>
-	<CAD81oNbjd3-Y_7C=75TfBP0oXjA3eFWbezsD8nROUrseUJZNhg@mail.gmail.com>
-	<CAD81oNZkRk-KFcE1bkj8TWiqe7dyVjHJADicT-f5KEkKtcnbyA@mail.gmail.com>
-	<574DE1E1-7A53-4629-88FC-7164EC1880AA@holtmann.org>
-Date: Fri, 8 Aug 2014 00:32:16 -0700
-Message-ID: <CAD81oNY41-8DhJCOetLa_TCrPLBeiJFHQJ7TxawydwQ5S_Lmwg@mail.gmail.com>
-Subject: Re: [A2DP] Incoming connections do not succeed
-From: Artem Rakhov <arakhov@chromium.org>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: multipart/mixed; boundary=001a11c12346685e390500193488
+From: johan.hedberg@gmail.com
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH 4/4] Bluetooth: Convert SMP to use l2cap_chan infrastructure
+Date: Fri,  8 Aug 2014 09:37:18 +0300
+Message-Id: <1407479838-5652-5-git-send-email-johan.hedberg@gmail.com>
+In-Reply-To: <1407479838-5652-1-git-send-email-johan.hedberg@gmail.com>
+References: <1407479838-5652-1-git-send-email-johan.hedberg@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
---001a11c12346685e390500193488
-Content-Type: text/plain; charset=UTF-8
+From: Johan Hedberg <johan.hedberg@intel.com>
 
-Hi Marcel,
+Now that we have all the necessary pieces in place we can fully convert
+SMP to use the L2CAP channel infrastructure. This patch adds the
+necessary callbacks and removes the now unneeded conn->smp_chan pointer.
 
-Please find Packet Logger's btsnoop log in the attachment.
+One notable behavioral change in this patch comes from the following
+code snippet:
 
-So far I have 2 observations:
-1. Mac does not require any authorization (most likely it's not the cause)
-2. I found another BT speaker which works properly. At first, I'm
-seeing the same behavior: speaker initiates connection, BlueZ sends
-Configure Request (with no MTU), then speaker disconnects. But after
-that the device tries to initiate connection for the second time, and
-this time it is successful: after BlueZ sends Configure Request with
-no MTU, speaker answers with another Configure Request (with some
-MTU), and connection is established normally. Is it possible, that
-BlueZ is doing something wrong, but then this new speaker tries
-something else, while the old one does not?
+-       case L2CAP_CID_SMP:
+-               if (smp_sig_channel(conn, skb))
+-                       l2cap_conn_del(conn->hcon, EACCES);
 
-I also tried kernel 3.10 and latest BlueZ, it didn't change anything.
+This piece of code was essentially forcing a disconnection if garbage
+SMP data was received. The l2cap_conn_del() function is private to
+l2cap_conn.c so we don't have access to it anymore when using the L2CAP
+channel callbacks. Therefore, the behavior of the new code is simply to
+return errors in the recv() callback (which is simply the old
+smp_sig_channel()), but no disconnection will occur.
 
-Thanks,
-Artem
+Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+---
+ include/net/bluetooth/l2cap.h |   1 -
+ net/bluetooth/l2cap_core.c    |  10 ----
+ net/bluetooth/smp.c           | 122 +++++++++++++++++++++++-------------------
+ net/bluetooth/smp.h           |   1 -
+ 4 files changed, 66 insertions(+), 68 deletions(-)
 
-On Mon, Jul 28, 2014 at 10:29 PM, Marcel Holtmann <marcel@holtmann.org> wrote:
-> Hi Artem,
->
->> Have tried to connect the speaker to Macbook Pro (OS X, does not use
->> BlueZ). For some reason, when speaker initiates the incoming
->> connection, it connects via L2CAP to different PSM.
->> First, it goes to PSM 0x01 (Service Discovery Protocol), then
->> disconnects. Then it connects to 0x03 (RFCOMM) and keeps the
->> connection. After that speaker connects to PSM 0x01 again, and drops
->> connection.
->> And then finally the Mac itself initiates two L2CAP connections to
->> speaker, with correct PSM 0x19 (AVDTP). On device with BlueZ L2CAP
->> connection goes straight to PSM 0x19.
->>
->> Here is a log from Macbook for the first connection to AVDTP:
->> [Jul 28 21:06:37.848]  [L2CAP SEND]  Connection Request - PSM: 0x0019
->>               Connection Request - PSM: 0x0019
->>               Identifier: 0x81
->>               Size: 4 (0x0004)
->>               PSM: 0x0019 - AVDTP (Audio/Video Distribution Transport
->> Protocol).
->>               Source CID: 0x0043
->>               Channel ID: 0x0001  Length: 0x0008 (08) [ 0B 20 0C 00
->> 08 00 01 00 ]
->>               00000000: 0800 0100 0281 0400 1900 4300            ..........C.
->
-> you know that hcidump and btmon can read Packet Logger files created on OS X. So maybe sending a binary pklg file around might be helpful for anybody looking at the details here.
->
-> Regards
->
-> Marcel
->
+diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
+index 1a037ba4b6f4..bda6252e3722 100644
+--- a/include/net/bluetooth/l2cap.h
++++ b/include/net/bluetooth/l2cap.h
+@@ -636,7 +636,6 @@ struct l2cap_conn {
+ 	__u8			disc_reason;
+ 
+ 	struct delayed_work	security_timer;
+-	struct smp_chan		*smp_chan;
+ 	struct l2cap_chan	*smp;
+ 
+ 	struct list_head	chan_l;
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index 8acfe6f57b5e..40b6c06ab2c0 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -1651,11 +1651,6 @@ static void l2cap_conn_del(struct hci_conn *hcon, int err)
+ 	if (conn->info_state & L2CAP_INFO_FEAT_MASK_REQ_SENT)
+ 		cancel_delayed_work_sync(&conn->info_timer);
+ 
+-	if (test_and_clear_bit(HCI_CONN_LE_SMP_PEND, &hcon->flags)) {
+-		cancel_delayed_work_sync(&conn->security_timer);
+-		smp_chan_destroy(conn);
+-	}
+-
+ 	hcon->l2cap_data = NULL;
+ 	conn->hchan = NULL;
+ 	l2cap_conn_put(conn);
+@@ -6862,11 +6857,6 @@ static void l2cap_recv_frame(struct l2cap_conn *conn, struct sk_buff *skb)
+ 		l2cap_le_sig_channel(conn, skb);
+ 		break;
+ 
+-	case L2CAP_CID_SMP:
+-		if (smp_sig_channel(conn, skb))
+-			l2cap_conn_del(conn->hcon, EACCES);
+-		break;
+-
+ 	default:
+ 		l2cap_data_channel(conn, cid, skb);
+ 		break;
+diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
+index 6925fc4caaee..744f678ac3e8 100644
+--- a/net/bluetooth/smp.c
++++ b/net/bluetooth/smp.c
+@@ -248,44 +248,29 @@ static int smp_s1(struct smp_chan *smp, u8 k[16], u8 r1[16], u8 r2[16],
+ 	return err;
+ }
+ 
+-static struct sk_buff *smp_build_cmd(struct l2cap_conn *conn, u8 code,
+-				     u16 dlen, void *data)
++static void smp_send_cmd(struct l2cap_conn *conn, u8 code, u16 len, void *data)
+ {
+-	struct sk_buff *skb;
+-	struct l2cap_hdr *lh;
+-	int len;
+-
+-	len = L2CAP_HDR_SIZE + sizeof(code) + dlen;
+-
+-	if (len > conn->mtu)
+-		return NULL;
++	struct l2cap_chan *chan = conn->smp;
++	struct kvec iv[2];
++	struct msghdr msg;
+ 
+-	skb = bt_skb_alloc(len, GFP_ATOMIC);
+-	if (!skb)
+-		return NULL;
++	if (!chan)
++		return;
+ 
+-	lh = (struct l2cap_hdr *) skb_put(skb, L2CAP_HDR_SIZE);
+-	lh->len = cpu_to_le16(sizeof(code) + dlen);
+-	lh->cid = cpu_to_le16(L2CAP_CID_SMP);
++	BT_DBG("code 0x%2.2x", code);
+ 
+-	memcpy(skb_put(skb, sizeof(code)), &code, sizeof(code));
++	iv[0].iov_base = &code;
++	iv[0].iov_len = 1;
+ 
+-	memcpy(skb_put(skb, dlen), data, dlen);
++	iv[1].iov_base = data;
++	iv[1].iov_len = len;
+ 
+-	return skb;
+-}
++	memset(&msg, 0, sizeof(msg));
+ 
+-static void smp_send_cmd(struct l2cap_conn *conn, u8 code, u16 len, void *data)
+-{
+-	struct sk_buff *skb = smp_build_cmd(conn, code, len, data);
++	msg.msg_iov = (struct iovec *) &iv;
++	msg.msg_iovlen = 2;
+ 
+-	BT_DBG("code 0x%2.2x", code);
+-
+-	if (!skb)
+-		return;
+-
+-	skb->priority = HCI_PRIO_MAX;
+-	hci_send_acl(conn->hchan, skb, 0);
++	l2cap_chan_send(chan, &msg, 1 + len);
+ 
+ 	cancel_delayed_work_sync(&conn->security_timer);
+ 	schedule_delayed_work(&conn->security_timer, SMP_TIMEOUT);
+@@ -315,7 +300,8 @@ static void build_pairing_cmd(struct l2cap_conn *conn,
+ 			      struct smp_cmd_pairing *req,
+ 			      struct smp_cmd_pairing *rsp, __u8 authreq)
+ {
+-	struct smp_chan *smp = conn->smp_chan;
++	struct l2cap_chan *chan = conn->smp;
++	struct smp_chan *smp = chan->data;
+ 	struct hci_conn *hcon = conn->hcon;
+ 	struct hci_dev *hdev = hcon->hdev;
+ 	u8 local_dist = 0, remote_dist = 0;
+@@ -358,7 +344,8 @@ static void build_pairing_cmd(struct l2cap_conn *conn,
+ 
+ static u8 check_enc_key_size(struct l2cap_conn *conn, __u8 max_key_size)
+ {
+-	struct smp_chan *smp = conn->smp_chan;
++	struct l2cap_chan *chan = conn->smp;
++	struct smp_chan *smp = chan->data;
+ 
+ 	if ((max_key_size > SMP_MAX_ENC_KEY_SIZE) ||
+ 	    (max_key_size < SMP_MIN_ENC_KEY_SIZE))
+@@ -418,7 +405,8 @@ static int tk_request(struct l2cap_conn *conn, u8 remote_oob, u8 auth,
+ 						u8 local_io, u8 remote_io)
+ {
+ 	struct hci_conn *hcon = conn->hcon;
+-	struct smp_chan *smp = conn->smp_chan;
++	struct l2cap_chan *chan = conn->smp;
++	struct smp_chan *smp = chan->data;
+ 	u8 method;
+ 	u32 passkey = 0;
+ 	int ret = 0;
+@@ -589,6 +577,7 @@ static u8 smp_random(struct smp_chan *smp)
+ 
+ static struct smp_chan *smp_chan_create(struct l2cap_conn *conn)
+ {
++	struct l2cap_chan *chan = conn->smp;
+ 	struct smp_chan *smp;
+ 
+ 	smp = kzalloc(sizeof(*smp), GFP_ATOMIC);
+@@ -606,7 +595,7 @@ static struct smp_chan *smp_chan_create(struct l2cap_conn *conn)
+ 	}
+ 
+ 	smp->conn = conn;
+-	conn->smp_chan = smp;
++	chan->data = smp;
+ 
+ 	hci_conn_hold(conn->hcon);
+ 
+@@ -615,7 +604,8 @@ static struct smp_chan *smp_chan_create(struct l2cap_conn *conn)
+ 
+ void smp_chan_destroy(struct l2cap_conn *conn)
+ {
+-	struct smp_chan *smp = conn->smp_chan;
++	struct l2cap_chan *chan = conn->smp;
++	struct smp_chan *smp = chan->data;
+ 	bool complete;
+ 
+ 	BUG_ON(!smp);
+@@ -646,14 +636,15 @@ void smp_chan_destroy(struct l2cap_conn *conn)
+ 		}
+ 	}
+ 
++	chan->data = NULL;
+ 	kfree(smp);
+-	conn->smp_chan = NULL;
+ 	hci_conn_drop(conn->hcon);
+ }
+ 
+ int smp_user_confirm_reply(struct hci_conn *hcon, u16 mgmt_op, __le32 passkey)
+ {
+ 	struct l2cap_conn *conn = hcon->l2cap_data;
++	struct l2cap_chan *chan;
+ 	struct smp_chan *smp;
+ 	u32 value;
+ 
+@@ -662,7 +653,11 @@ int smp_user_confirm_reply(struct hci_conn *hcon, u16 mgmt_op, __le32 passkey)
+ 	if (!conn || !test_bit(HCI_CONN_LE_SMP_PEND, &hcon->flags))
+ 		return -ENOTCONN;
+ 
+-	smp = conn->smp_chan;
++	chan = conn->smp;
++	if (!chan)
++		return -ENOTCONN;
++
++	smp = chan->data;
+ 
+ 	switch (mgmt_op) {
+ 	case MGMT_OP_USER_PASSKEY_REPLY:
+@@ -709,10 +704,12 @@ static u8 smp_cmd_pairing_req(struct l2cap_conn *conn, struct sk_buff *skb)
+ 	if (conn->hcon->role != HCI_ROLE_SLAVE)
+ 		return SMP_CMD_NOTSUPP;
+ 
+-	if (!test_and_set_bit(HCI_CONN_LE_SMP_PEND, &conn->hcon->flags))
++	if (!test_and_set_bit(HCI_CONN_LE_SMP_PEND, &conn->hcon->flags)) {
+ 		smp = smp_chan_create(conn);
+-	else
+-		smp = conn->smp_chan;
++	} else {
++		struct l2cap_chan *chan = conn->smp;
++		smp = chan->data;
++	}
+ 
+ 	if (!smp)
+ 		return SMP_UNSPECIFIED;
+@@ -766,7 +763,8 @@ static u8 smp_cmd_pairing_req(struct l2cap_conn *conn, struct sk_buff *skb)
+ static u8 smp_cmd_pairing_rsp(struct l2cap_conn *conn, struct sk_buff *skb)
+ {
+ 	struct smp_cmd_pairing *req, *rsp = (void *) skb->data;
+-	struct smp_chan *smp = conn->smp_chan;
++	struct l2cap_chan *chan = conn->smp;
++	struct smp_chan *smp = chan->data;
+ 	u8 key_size, auth = SMP_AUTH_NONE;
+ 	int ret;
+ 
+@@ -827,7 +825,8 @@ static u8 smp_cmd_pairing_rsp(struct l2cap_conn *conn, struct sk_buff *skb)
+ 
+ static u8 smp_cmd_pairing_confirm(struct l2cap_conn *conn, struct sk_buff *skb)
+ {
+-	struct smp_chan *smp = conn->smp_chan;
++	struct l2cap_chan *chan = conn->smp;
++	struct smp_chan *smp = chan->data;
+ 
+ 	BT_DBG("conn %p %s", conn, conn->hcon->out ? "master" : "slave");
+ 
+@@ -850,7 +849,8 @@ static u8 smp_cmd_pairing_confirm(struct l2cap_conn *conn, struct sk_buff *skb)
+ 
+ static u8 smp_cmd_pairing_random(struct l2cap_conn *conn, struct sk_buff *skb)
+ {
+-	struct smp_chan *smp = conn->smp_chan;
++	struct l2cap_chan *chan = conn->smp;
++	struct smp_chan *smp = chan->data;
+ 
+ 	BT_DBG("conn %p", conn);
+ 
+@@ -1023,7 +1023,8 @@ int smp_conn_security(struct hci_conn *hcon, __u8 sec_level)
+ static int smp_cmd_encrypt_info(struct l2cap_conn *conn, struct sk_buff *skb)
+ {
+ 	struct smp_cmd_encrypt_info *rp = (void *) skb->data;
+-	struct smp_chan *smp = conn->smp_chan;
++	struct l2cap_chan *chan = conn->smp;
++	struct smp_chan *smp = chan->data;
+ 
+ 	BT_DBG("conn %p", conn);
+ 
+@@ -1044,7 +1045,8 @@ static int smp_cmd_encrypt_info(struct l2cap_conn *conn, struct sk_buff *skb)
+ static int smp_cmd_master_ident(struct l2cap_conn *conn, struct sk_buff *skb)
+ {
+ 	struct smp_cmd_master_ident *rp = (void *) skb->data;
+-	struct smp_chan *smp = conn->smp_chan;
++	struct l2cap_chan *chan = conn->smp;
++	struct smp_chan *smp = chan->data;
+ 	struct hci_dev *hdev = conn->hcon->hdev;
+ 	struct hci_conn *hcon = conn->hcon;
+ 	struct smp_ltk *ltk;
+@@ -1080,7 +1082,8 @@ static int smp_cmd_master_ident(struct l2cap_conn *conn, struct sk_buff *skb)
+ static int smp_cmd_ident_info(struct l2cap_conn *conn, struct sk_buff *skb)
+ {
+ 	struct smp_cmd_ident_info *info = (void *) skb->data;
+-	struct smp_chan *smp = conn->smp_chan;
++	struct l2cap_chan *chan = conn->smp;
++	struct smp_chan *smp = chan->data;
+ 
+ 	BT_DBG("");
+ 
+@@ -1102,7 +1105,8 @@ static int smp_cmd_ident_addr_info(struct l2cap_conn *conn,
+ 				   struct sk_buff *skb)
+ {
+ 	struct smp_cmd_ident_addr_info *info = (void *) skb->data;
+-	struct smp_chan *smp = conn->smp_chan;
++	struct l2cap_chan *chan = conn->smp;
++	struct smp_chan *smp = chan->data;
+ 	struct hci_conn *hcon = conn->hcon;
+ 	bdaddr_t rpa;
+ 
+@@ -1156,7 +1160,8 @@ distribute:
+ static int smp_cmd_sign_info(struct l2cap_conn *conn, struct sk_buff *skb)
+ {
+ 	struct smp_cmd_sign_info *rp = (void *) skb->data;
+-	struct smp_chan *smp = conn->smp_chan;
++	struct l2cap_chan *chan = conn->smp;
++	struct smp_chan *smp = chan->data;
+ 	struct hci_dev *hdev = conn->hcon->hdev;
+ 	struct smp_csrk *csrk;
+ 
+@@ -1187,8 +1192,9 @@ static int smp_cmd_sign_info(struct l2cap_conn *conn, struct sk_buff *skb)
+ 	return 0;
+ }
+ 
+-int smp_sig_channel(struct l2cap_conn *conn, struct sk_buff *skb)
++static int smp_recv_cb(struct l2cap_chan *chan, struct sk_buff *skb)
+ {
++	struct l2cap_conn *conn = chan->conn;
+ 	struct hci_conn *hcon = conn->hcon;
+ 	__u8 code, reason;
+ 	int err = 0;
+@@ -1290,7 +1296,8 @@ done:
+ 
+ static void smp_notify_keys(struct l2cap_conn *conn)
+ {
+-	struct smp_chan *smp = conn->smp_chan;
++	struct l2cap_chan *chan = conn->smp;
++	struct smp_chan *smp = chan->data;
+ 	struct hci_conn *hcon = conn->hcon;
+ 	struct hci_dev *hdev = hcon->hdev;
+ 	struct smp_cmd_pairing *req = (void *) &smp->preq[1];
+@@ -1357,7 +1364,8 @@ static void smp_notify_keys(struct l2cap_conn *conn)
+ int smp_distribute_keys(struct l2cap_conn *conn)
+ {
+ 	struct smp_cmd_pairing *req, *rsp;
+-	struct smp_chan *smp = conn->smp_chan;
++	struct l2cap_chan *chan = conn->smp;
++	struct smp_chan *smp = chan->data;
+ 	struct hci_conn *hcon = conn->hcon;
+ 	struct hci_dev *hdev = hcon->hdev;
+ 	__u8 *keydist;
+@@ -1475,6 +1483,11 @@ static void smp_teardown_cb(struct l2cap_chan *chan, int err)
+ 
+ 	BT_DBG("chan %p", chan);
+ 
++	if (test_and_clear_bit(HCI_CONN_LE_SMP_PEND, &conn->hcon->flags)) {
++		cancel_delayed_work_sync(&conn->security_timer);
++		smp_chan_destroy(conn);
++	}
++
+ 	conn->smp = NULL;
+ 	l2cap_chan_put(chan);
+ }
+@@ -1508,11 +1521,11 @@ static struct sk_buff *smp_alloc_skb_cb(struct l2cap_chan *chan,
+ static const struct l2cap_ops smp_chan_ops = {
+ 	.name			= "Security Manager",
+ 	.ready			= smp_ready_cb,
++	.recv			= smp_recv_cb,
+ 	.alloc_skb		= smp_alloc_skb_cb,
+ 	.teardown		= smp_teardown_cb,
+ 
+ 	.new_connection		= l2cap_chan_no_new_connection,
+-	.recv			= l2cap_chan_no_recv,
+ 	.state_change		= l2cap_chan_no_state_change,
+ 	.close			= l2cap_chan_no_close,
+ 	.defer			= l2cap_chan_no_defer,
+@@ -1587,10 +1600,7 @@ int smp_register(struct hci_dev *hdev)
+ 
+ 	chan->data = tfm_aes;
+ 
+-	/* FIXME: Using reserved 0x1f value for now - to be changed to
+-	 * L2CAP_CID_SMP once all functionality is in place.
+-	 */
+-	l2cap_add_scid(chan, 0x1f);
++	l2cap_add_scid(chan, L2CAP_CID_SMP);
+ 
+ 	l2cap_chan_set_defaults(chan);
+ 
+diff --git a/net/bluetooth/smp.h b/net/bluetooth/smp.h
+index d3f6bd617940..161ace3c3234 100644
+--- a/net/bluetooth/smp.h
++++ b/net/bluetooth/smp.h
+@@ -126,7 +126,6 @@ enum {
+ /* SMP Commands */
+ bool smp_sufficient_security(struct hci_conn *hcon, u8 sec_level);
+ int smp_conn_security(struct hci_conn *hcon, __u8 sec_level);
+-int smp_sig_channel(struct l2cap_conn *conn, struct sk_buff *skb);
+ int smp_distribute_keys(struct l2cap_conn *conn);
+ int smp_user_confirm_reply(struct hci_conn *conn, u16 mgmt_op, __le32 passkey);
+ 
+-- 
+1.9.3
 
---001a11c12346685e390500193488
-Content-Type: application/octet-stream; name="bluetooth_packet.btsnoop"
-Content-Disposition: attachment; filename="bluetooth_packet.btsnoop"
-Content-Transfer-Encoding: base64
-X-Attachment-Id: f_hyl2lc3t0
-
-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
---001a11c12346685e390500193488--
