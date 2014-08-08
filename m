@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: johan.hedberg@gmail.com
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 4/5] Bluetooth: Move SMP initialization after HCI init
-Date: Fri,  8 Aug 2014 09:32:51 +0300
-Message-Id: <1407479572-4868-5-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH 3/5] Bluetooth: Refactor SMP (de)initialization into separate functions
+Date: Fri,  8 Aug 2014 09:32:50 +0300
+Message-Id: <1407479572-4868-4-git-send-email-johan.hedberg@gmail.com>
 In-Reply-To: <1407479572-4868-1-git-send-email-johan.hedberg@gmail.com>
 References: <1407479572-4868-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,55 +11,96 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-First of all, it's wasteful to initialize SMP if it's never going to be
-used (e.g. on non-LE controllers). Second of all, when we move to use
-l2cap_chan we need to know the real local address, meaning we must have
-completed at least part of the HCI init. This patch moves the SMP
-initialization to after the HCI init procedure and makes it depend on
-whether the controller actually supports LE.
+As preparation for converting SMP to use the l2cap_chan infrastructure
+refactor the (de)initialization into separate functions.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- net/bluetooth/hci_core.c | 10 +++-------
- 1 file changed, 3 insertions(+), 7 deletions(-)
+ net/bluetooth/hci_core.c | 46 ++++++++++++++++++++++++++++++++++------------
+ 1 file changed, 34 insertions(+), 12 deletions(-)
 
 diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 1f691c50abbc..9eb2869b183b 100644
+index 4a1ec259099e..1f691c50abbc 100644
 --- a/net/bluetooth/hci_core.c
 +++ b/net/bluetooth/hci_core.c
-@@ -1926,6 +1926,8 @@ static int __hci_init(struct hci_dev *hdev)
- 		debugfs_create_u16("discov_interleaved_timeout", 0644,
- 				   hdev->debugfs,
- 				   &hdev->discov_interleaved_timeout);
-+
-+		hci_register_smp(hdev);
+@@ -1764,6 +1764,34 @@ static void hci_init4_req(struct hci_request *req, unsigned long opt)
  	}
+ }
  
- 	return 0;
-@@ -4127,13 +4129,9 @@ int hci_register_dev(struct hci_dev *hdev)
++static int hci_register_smp(struct hci_dev *hdev)
++{
++	int err;
++
++	BT_DBG("%s", hdev->name);
++
++	hdev->tfm_aes = crypto_alloc_blkcipher("ecb(aes)", 0,
++					       CRYPTO_ALG_ASYNC);
++	if (IS_ERR(hdev->tfm_aes)) {
++		BT_ERR("Unable to create crypto context");
++		err = PTR_ERR(hdev->tfm_aes);
++		hdev->tfm_aes = NULL;
++		return err;
++	}
++
++	return 0;
++}
++
++static void hci_unregister_smp(struct hci_dev *hdev)
++{
++	BT_DBG("%s", hdev->name);
++
++	if (hdev->tfm_aes) {
++		crypto_free_blkcipher(hdev->tfm_aes);
++		hdev->tfm_aes = NULL;
++	}
++}
++
+ static int __hci_init(struct hci_dev *hdev)
+ {
+ 	int err;
+@@ -4099,18 +4127,13 @@ int hci_register_dev(struct hci_dev *hdev)
  
  	dev_set_name(&hdev->dev, "%s", hdev->name);
  
--	error = hci_register_smp(hdev);
--	if (error)
--		goto err_wqueue;
--
+-	hdev->tfm_aes = crypto_alloc_blkcipher("ecb(aes)", 0,
+-					       CRYPTO_ALG_ASYNC);
+-	if (IS_ERR(hdev->tfm_aes)) {
+-		BT_ERR("Unable to create crypto context");
+-		error = PTR_ERR(hdev->tfm_aes);
+-		hdev->tfm_aes = NULL;
++	error = hci_register_smp(hdev);
++	if (error)
+ 		goto err_wqueue;
+-	}
+ 
  	error = device_add(&hdev->dev);
  	if (error < 0)
--		goto err_smp;
-+		goto err_wqueue;
+-		goto err_tfm;
++		goto err_smp;
  
  	hdev->rfkill = rfkill_alloc(hdev->name, &hdev->dev,
  				    RFKILL_TYPE_BLUETOOTH, &hci_rfkill_ops,
-@@ -4175,8 +4173,6 @@ int hci_register_dev(struct hci_dev *hdev)
+@@ -4152,8 +4175,8 @@ int hci_register_dev(struct hci_dev *hdev)
  
  	return id;
  
--err_smp:
--	hci_unregister_smp(hdev);
+-err_tfm:
+-	crypto_free_blkcipher(hdev->tfm_aes);
++err_smp:
++	hci_unregister_smp(hdev);
  err_wqueue:
  	destroy_workqueue(hdev->workqueue);
  	destroy_workqueue(hdev->req_workqueue);
+@@ -4205,8 +4228,7 @@ void hci_unregister_dev(struct hci_dev *hdev)
+ 		rfkill_destroy(hdev->rfkill);
+ 	}
+ 
+-	if (hdev->tfm_aes)
+-		crypto_free_blkcipher(hdev->tfm_aes);
++	hci_unregister_smp(hdev);
+ 
+ 	device_del(&hdev->dev);
+ 
 -- 
 1.9.3
 
