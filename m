@@ -1,26 +1,28 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 8 Aug 2014 17:29:07 +0300
+Date: Fri, 8 Aug 2014 16:35:24 +0300
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: Re: [PATCH 1/2] android/a2dp: Improve avdtp_close function
-Message-ID: <20140808142907.GA18870@t440s.P-661HNU-F1>
-References: <1407505354-23072-1-git-send-email-lukasz.rymanowski@tieto.com>
+To: Sebastian Chlad <sebastian.chlad@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] android/pts: PTS files for MCAP
+Message-ID: <20140808133524.GB15133@t440s.ger.corp.intel.com>
+References: <1407499100-12028-1-git-send-email-sebastian.chlad@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1407505354-23072-1-git-send-email-lukasz.rymanowski@tieto.com>
+In-Reply-To: <1407499100-12028-1-git-send-email-sebastian.chlad@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Lukasz,
+Hi Sebastian,
 
-On Fri, Aug 08, 2014, Lukasz Rymanowski wrote:
-> With this patch avdtp_close does avdtp_abort under the hood in case
-> stream is not yet in OPEN state.
+On Fri, Aug 08, 2014, Sebastian Chlad wrote:
+> Update for PIXIT and PICS for MCAP on PTS 5.2 as well as regression
+> test round on Android 4.4.4 against PTS 5.2
 > ---
->  android/avdtp.c | 7 ++++---
->  1 file changed, 4 insertions(+), 3 deletions(-)
+>  android/pics-mcap.txt  | 2 +-
+>  android/pixit-mcap.txt | 2 +-
+>  android/pts-mcap.txt   | 8 ++++----
+>  3 files changed, 6 insertions(+), 6 deletions(-)
 
-Both patches have been applied. Thanks.
+Applied. Thanks.
 
 Johan
