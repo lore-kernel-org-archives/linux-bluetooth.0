@@ -1,46 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.6\))
-Subject: Re: [PATCH 0/4] Bluetooth: Convert SMP to use l2cap_chan
+Subject: Re: [PATCH 0/5] Bluetooth: Add dedicated SMP (de)initialization functions
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1407479838-5652-1-git-send-email-johan.hedberg@gmail.com>
-Date: Fri, 8 Aug 2014 10:47:36 -0700
+In-Reply-To: <1407479572-4868-1-git-send-email-johan.hedberg@gmail.com>
+Date: Fri, 8 Aug 2014 10:47:30 -0700
 Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <1320930F-C0A3-4CAE-A4FD-D160D26A2493@holtmann.org>
-References: <1407479838-5652-1-git-send-email-johan.hedberg@gmail.com>
+Message-Id: <47B15D32-48CE-4D2C-B6C9-9DCDE04632B0@holtmann.org>
+References: <1407479572-4868-1-git-send-email-johan.hedberg@gmail.com>
 To: Johan Hedberg <johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Johan,
 
-> With this patches we do the initial conversion of SMP to use l2cap_chan
-> and its related callbacks. There are many more simplifications possible
-> after this, but to keep the conversion minimal I haven't done those yet.
-> To keep the code compiling and functional between each patch the code
-> that introduces the initial callbacks uses a custom 0x1f CID not to
-> intefere with the legacy SMP CID handling. Only in the last patch which
-> adds fully functional SMP handling through l2cap_chan is this custom CID
-> converted back to the proper L2CAP_CID_SMP.
+> For us to have a clean way to create the root (per-adapter) SMP L2CAP
+> channel it's best to move the code responsible for this to specialized
+> functions in smp.c. For now this only involves the AES crypto context
+> creation and destruction.
 > 
 > Johan
 > 
 > ----------------------------------------------------------------
-> Johan Hedberg (4):
->      Bluetooth: Add more L2CAP convenience callbacks
->      Bluetooth: Add SMP L2CAP channel skeleton
->      Bluetooth: Make AES crypto context private to SMP
->      Bluetooth: Convert SMP to use l2cap_chan infrastructure
+> Johan Hedberg (5):
+>      Bluetooth: Fix hci_update_random_address() error return for no crypto
+>      Bluetooth: Fix IRK lookup when tfm_aes is not available
+>      Bluetooth: Refactor SMP (de)initialization into separate functions
+>      Bluetooth: Move SMP initialization after HCI init
+>      Bluetooth: Move SMP (de)initialization to smp.c
 > 
-> include/net/bluetooth/hci_core.h |   2 +-
-> include/net/bluetooth/l2cap.h    |  27 +++-
-> net/bluetooth/hci_core.c         |  13 +-
-> net/bluetooth/l2cap_core.c       |  10 --
-> net/bluetooth/smp.c              | 280 +++++++++++++++++++++++++++--------
-> net/bluetooth/smp.h              |   6 +-
-> 6 files changed, 248 insertions(+), 90 deletions(-)
+> net/bluetooth/hci_core.c | 27 +++++++++++++--------------
+> net/bluetooth/smp.c      | 26 ++++++++++++++++++++++++++
+> net/bluetooth/smp.h      |  3 +++
+> 3 files changed, 42 insertions(+), 14 deletions(-)
 
-all 4 patches have been applied to bluetooth-next tree.
+all 5 patches have been applied to bluetooth-next tree.
 
 Regards
 
