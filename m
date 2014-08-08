@@ -1,42 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
 From: johan.hedberg@gmail.com
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/5] Bluetooth: Fix hci_update_random_address() error return for no crypto
-Date: Fri,  8 Aug 2014 09:32:48 +0300
-Message-Id: <1407479572-4868-2-git-send-email-johan.hedberg@gmail.com>
-In-Reply-To: <1407479572-4868-1-git-send-email-johan.hedberg@gmail.com>
-References: <1407479572-4868-1-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH 0/5] Bluetooth: Add dedicated SMP (de)initialization functions
+Date: Fri,  8 Aug 2014 09:32:47 +0300
+Message-Id: <1407479572-4868-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@intel.com>
+Hi,
 
-If the AES crypto context is not available we cannot generate new RPAs.
-We should therefore cleanly return an error from the function
-responsible for updating the random address.
+For us to have a clean way to create the root (per-adapter) SMP L2CAP
+channel it's best to move the code responsible for this to specialized
+functions in smp.c. For now this only involves the AES crypto context
+creation and destruction.
 
-Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
----
- net/bluetooth/hci_core.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+Johan
 
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 217ef83fb541..860477090d78 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -3882,6 +3882,12 @@ int hci_update_random_address(struct hci_request *req, bool require_privacy,
- 		    !bacmp(&hdev->random_addr, &hdev->rpa))
- 			return 0;
- 
-+		if (!hdev->tfm_aes) {
-+			BT_ERR("%s crypto not available to generate RPA",
-+			       hdev->name);
-+			return -EOPNOTSUPP;
-+		}
-+
- 		err = smp_generate_rpa(hdev->tfm_aes, hdev->irk, &hdev->rpa);
- 		if (err < 0) {
- 			BT_ERR("%s failed to generate new RPA", hdev->name);
--- 
-1.9.3
+----------------------------------------------------------------
+Johan Hedberg (5):
+      Bluetooth: Fix hci_update_random_address() error return for no crypto
+      Bluetooth: Fix IRK lookup when tfm_aes is not available
+      Bluetooth: Refactor SMP (de)initialization into separate functions
+      Bluetooth: Move SMP initialization after HCI init
+      Bluetooth: Move SMP (de)initialization to smp.c
+
+ net/bluetooth/hci_core.c | 27 +++++++++++++--------------
+ net/bluetooth/smp.c      | 26 ++++++++++++++++++++++++++
+ net/bluetooth/smp.h      |  3 +++
+ 3 files changed, 42 insertions(+), 14 deletions(-)
 
