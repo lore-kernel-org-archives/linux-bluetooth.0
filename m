@@ -1,52 +1,145 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <CAD81oNY41-8DhJCOetLa_TCrPLBeiJFHQJ7TxawydwQ5S_Lmwg@mail.gmail.com>
-References: <CAD81oNZL0qATu_z_TJT8psaMhpmV34w6xmA2+=OKerSE1NSvOw@mail.gmail.com>
-	<CABBYNZ+zRKzv4yTc8M2Fi0eN6gC921b9zaey5FKGVq_bJJueBg@mail.gmail.com>
-	<CAD81oNbjd3-Y_7C=75TfBP0oXjA3eFWbezsD8nROUrseUJZNhg@mail.gmail.com>
-	<CAD81oNZkRk-KFcE1bkj8TWiqe7dyVjHJADicT-f5KEkKtcnbyA@mail.gmail.com>
-	<574DE1E1-7A53-4629-88FC-7164EC1880AA@holtmann.org>
-	<CAD81oNY41-8DhJCOetLa_TCrPLBeiJFHQJ7TxawydwQ5S_Lmwg@mail.gmail.com>
-Date: Sun, 10 Aug 2014 10:32:41 +0300
-Message-ID: <CABBYNZLEDBFa-wV5L5Pfi-PzA877PxSrktsVLpzCRuQ4nu1eKQ@mail.gmail.com>
-Subject: Re: [A2DP] Incoming connections do not succeed
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Artem Rakhov <arakhov@chromium.org>
-Cc: Marcel Holtmann <marcel@holtmann.org>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+From: Alexander Aring <alex.aring@gmail.com>
+To: linux-wpan@vger.kernel.org
+Cc: linux-bluetooth@vger.kernel.org, jukka.rissanen@linux.intel.com,
+	Alexander Aring <alex.aring@gmail.com>
+Subject: [RFC bluetooth-next 8/8] 6lowpan: add ipv6 skeleton
+Date: Sat,  9 Aug 2014 21:02:23 +0200
+Message-Id: <1407610943-27701-9-git-send-email-alex.aring@gmail.com>
+In-Reply-To: <1407610943-27701-1-git-send-email-alex.aring@gmail.com>
+References: <1407610943-27701-1-git-send-email-alex.aring@gmail.com>
+Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Artem,
+Currenlty not support. Received packets with this nhc id should be
+dropped.
 
-On Fri, Aug 8, 2014 at 10:32 AM, Artem Rakhov <arakhov@chromium.org> wrote:
-> Hi Marcel,
->
-> Please find Packet Logger's btsnoop log in the attachment.
->
-> So far I have 2 observations:
-> 1. Mac does not require any authorization (most likely it's not the cause)
-> 2. I found another BT speaker which works properly. At first, I'm
-> seeing the same behavior: speaker initiates connection, BlueZ sends
-> Configure Request (with no MTU), then speaker disconnects. But after
-> that the device tries to initiate connection for the second time, and
-> this time it is successful: after BlueZ sends Configure Request with
-> no MTU, speaker answers with another Configure Request (with some
-> MTU), and connection is established normally. Is it possible, that
-> BlueZ is doing something wrong, but then this new speaker tries
-> something else, while the old one does not?
+Signed-off-by: Alexander Aring <alex.aring@gmail.com>
+---
+ net/6lowpan/nhc/Makefile |  3 ++-
+ net/6lowpan/nhc/core.c   |  8 ++++++++
+ net/6lowpan/nhc/ipv6.c   | 48 ++++++++++++++++++++++++++++++++++++++++++++++++
+ net/6lowpan/nhc/ipv6.h   | 11 +++++++++++
+ 4 files changed, 69 insertions(+), 1 deletion(-)
+ create mode 100644 net/6lowpan/nhc/ipv6.c
+ create mode 100644 net/6lowpan/nhc/ipv6.h
 
-I could not find anything l2cap related in this logs, but I notice
-there a LE scanning ongoing perhaps you have should try disabling it
-with Disconnect method for now. Anyway A2DP code is not really
-involved with L2CAP connection setup so we would have to look at the
-kernel changes but I quick check doesn't show anything and you said
-you have tried with 3.10 so Im afraid this is only reproducible with
-some specific device.
-
-Btw, if you want to really isolate the problem you can try to connect
-using avinfo or l2test directly.
-
-
+diff --git a/net/6lowpan/nhc/Makefile b/net/6lowpan/nhc/Makefile
+index 9915c31..4d91480 100644
+--- a/net/6lowpan/nhc/Makefile
++++ b/net/6lowpan/nhc/Makefile
+@@ -6,4 +6,5 @@ nhc-y := core.o \
+ 	 route.o \
+ 	 frag.o \
+ 	 dest.o \
+-	 mobil.o
++	 mobil.o \
++	 ipv6.o
+diff --git a/net/6lowpan/nhc/core.c b/net/6lowpan/nhc/core.c
+index 1ee9750..66907ff 100644
+--- a/net/6lowpan/nhc/core.c
++++ b/net/6lowpan/nhc/core.c
+@@ -21,6 +21,7 @@
+ #include "frag.h"
+ #include "dest.h"
+ #include "mobil.h"
++#include "ipv6.h"
+ 
+ static struct rb_root rb_root = RB_ROOT;
+ static struct lowpan_nhc *lowpan_nexthdr_nhcs[NEXTHDR_MAX];
+@@ -203,9 +204,15 @@ int lowpan_init_nhc(void)
+ 	ret = lowpan_init_nhc_mobil();
+ 	if (ret < 0)
+ 		goto mobil_fail;
++
++	ret = lowpan_init_nhc_ipv6();
++	if (ret < 0)
++		goto ipv6_fail;
+ out:
+ 	return ret;
+ 
++ipv6_fail:
++	lowpan_cleanup_nhc_mobil();
+ mobil_fail:
+ 	lowpan_cleanup_nhc_dest();
+ dest_fail:
+@@ -227,4 +234,5 @@ void lowpan_cleanup_nhc(void)
+ 	lowpan_cleanup_nhc_frag();
+ 	lowpan_cleanup_nhc_dest();
+ 	lowpan_cleanup_nhc_mobil();
++	lowpan_cleanup_nhc_ipv6();
+ }
+diff --git a/net/6lowpan/nhc/ipv6.c b/net/6lowpan/nhc/ipv6.c
+new file mode 100644
+index 0000000..59202cf
+--- /dev/null
++++ b/net/6lowpan/nhc/ipv6.c
+@@ -0,0 +1,48 @@
++/*	6LoWPAN IPv6 Header compression
++ *
++ *
++ *	Authors:
++ *	Alexander Aring		<aar@pengutronix.de>
++ *
++ *	This program is free software; you can redistribute it and/or
++ *	modify it under the terms of the GNU General Public License
++ *	as published by the Free Software Foundation; either version
++ *	2 of the License, or (at your option) any later version.
++ */
++
++#include <net/6lowpan.h>
++#include <linux/skbuff.h>
++
++#include "core.h"
++#include "ipv6.h"
++
++static int ipv6_uncompress(struct sk_buff **skb)
++{
++	return -ENOTSUPP;
++}
++
++static int ipv6_compress(struct sk_buff *skb, u8 **hc_ptr)
++{
++	return -ENOTSUPP;
++}
++
++static void ipv6_nhid_setup(struct lowpan_nhc *nhc)
++{
++	nhc->id[0] = LOWPAN_NHC_IPV6_ID_0;
++	nhc->idmask[0] = LOWPAN_NHC_IPV6_MASK_0;
++}
++
++LOWPAN_NHC(ipv6_nhc, "IPv6 Header", NEXTHDR_IPV6, ipv6_nhid_setup,
++	   LOWPAN_NHC_IPV6_LEN, ipv6_uncompress, ipv6_compress);
++
++int lowpan_init_nhc_ipv6(void)
++{
++	return lowpan_add_nhc(&ipv6_nhc);
++}
++EXPORT_SYMBOL(lowpan_init_nhc_ipv6);
++
++void lowpan_cleanup_nhc_ipv6(void)
++{
++	lowpan_del_nhc(&ipv6_nhc);
++}
++EXPORT_SYMBOL(lowpan_cleanup_nhc_ipv6);
+diff --git a/net/6lowpan/nhc/ipv6.h b/net/6lowpan/nhc/ipv6.h
+new file mode 100644
+index 0000000..defc183
+--- /dev/null
++++ b/net/6lowpan/nhc/ipv6.h
+@@ -0,0 +1,11 @@
++#ifndef __6LOWPAN_NHC_IPV6_H
++#define __6LOWPAN_NHC_IPV6_H
++
++#define LOWPAN_NHC_IPV6_LEN	1
++#define LOWPAN_NHC_IPV6_ID_0	0xee
++#define LOWPAN_NHC_IPV6_MASK_0	0xfe
++
++int lowpan_init_nhc_ipv6(void);
++void lowpan_cleanup_nhc_ipv6(void);
++
++#endif /* __6LOWPAN_NHC_IPV6_H */
 -- 
-Luiz Augusto von Dentz
+2.0.3
+
