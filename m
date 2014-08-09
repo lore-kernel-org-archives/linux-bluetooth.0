@@ -1,91 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
-From: Alexander Aring <alex.aring@gmail.com>
-To: linux-wpan@vger.kernel.org
-Cc: linux-bluetooth@vger.kernel.org, jukka.rissanen@linux.intel.com,
-	Alexander Aring <alex.aring@gmail.com>
-Subject: [RFC bluetooth-next 0/8] 6lowpan: introduce generic next header compression layer
-Date: Sat,  9 Aug 2014 21:02:15 +0200
-Message-Id: <1407610943-27701-1-git-send-email-alex.aring@gmail.com>
-Sender: linux-wpan-owner@vger.kernel.org
+MIME-Version: 1.0
+Date: Sat, 9 Aug 2014 02:32:13 -0400
+Message-ID: <CALNtCMkA=9GZWNBse7TN1u-ygWEm3zt-aNvjqhyzZV9jDCtL_g@mail.gmail.com>
+Subject: Gatttool: Why limited to 5 connections?
+From: Nancy Ouyang <nancy.ouyang@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+I connect to five devices by spawning gatttools with pexpect in
+python*. When I try to connect to a sixth device (using the same CSR
+4.0 dongle for all connections) manually I encounter:
 
-this patch series introduce a generic interface for the 6LoWPAN header
-compression. Inside the 6LoWPAN header there is a variable length next
-header id if the compression bit inside the IPHC header is set. [0]
-This implementation use a red-black tree to find the nhc structure with
-the received variable length nhc id. Then it call the uncompression callback
-on received side. On sending side it used the nexthdr attribute of IPv6 header
-and call the compression callback on sending side.
+sudo gatttool -b DC:05:4F:BC:F6:4A -It random
+[DC:05:4F:BC:F6:4A][LE]> connect
+Attempting to connect to DC:05:4F:BC:F6:4A
+Error: connect error: Too many links (31)
 
-We currently support only one next header compression, this is UDP. The callbacks
-for compression and uncompression contains the necessary informations to do UDP
-compression/uncompression only. If you need more informations inside the callbacks
-feel free to change it while supporting new next header compression formats.
+Is this a gatttool limitation or a hardware limitation? I cloned the
+source at http://git.kernel.org/cgit/bluetooth/bluez.git and ran ~$
+grep -r "attempting" but did not get any results, and am unsure where
+to go next. I have searched the archives of this mailing list
+"gatttool too many links" but did not find relevant results.
 
-It's just a basic support to handle this in a more generic way instead of hacking
-everything in iphc.c file.
+I would like to connect to 20 devices over bluetooth low energy, which
+I think should be possible hardware- and firmware-wise.
 
-Also adding basic support for RFC6282 next header compression values. We don't
-these, but we should drop these packets then instead sending garbage to next
-layer.
+Thanks,
+--Nancy
 
-It's currently RFC, if nobody screams I will send "real" patches. Maybe we can
-do some things better.
+=====
+System settings: Ubuntu 14.04, bluez v5.20, CSR 4.0 dongle, adafruit
+ble nrf8001 breakout.
 
-- Alex
+reference:
 
-[0] http://tools.ietf.org/html/rfc6282#section-4.1
-
-Alexander Aring (8):
-  6lowpan: add generic nhc layer interface
-  6lowpan: nhc layer udp compression
-  6lowpan: add hop-by-hop options skeleton
-  6lowpan: add routing skeleton
-  6lowpan: add fragment skeleton
-  6lowpan: add destination options skeleton
-  6lowpan: add mobility skeleton
-  6lowpan: add ipv6 skeleton
-
- net/6lowpan/Makefile     |   1 +
- net/6lowpan/iphc.c       | 184 +++++-------------------------------
- net/6lowpan/nhc/Makefile |  10 ++
- net/6lowpan/nhc/core.c   | 238 +++++++++++++++++++++++++++++++++++++++++++++++
- net/6lowpan/nhc/core.h   | 122 ++++++++++++++++++++++++
- net/6lowpan/nhc/dest.c   |  49 ++++++++++
- net/6lowpan/nhc/dest.h   |  11 +++
- net/6lowpan/nhc/frag.c   |  49 ++++++++++
- net/6lowpan/nhc/frag.h   |  11 +++
- net/6lowpan/nhc/hop.c    |  48 ++++++++++
- net/6lowpan/nhc/hop.h    |  11 +++
- net/6lowpan/nhc/ipv6.c   |  48 ++++++++++
- net/6lowpan/nhc/ipv6.h   |  11 +++
- net/6lowpan/nhc/mobil.c  |  49 ++++++++++
- net/6lowpan/nhc/mobil.h  |  11 +++
- net/6lowpan/nhc/route.c  |  48 ++++++++++
- net/6lowpan/nhc/route.h  |  11 +++
- net/6lowpan/nhc/udp.c    | 173 ++++++++++++++++++++++++++++++++++
- net/6lowpan/nhc/udp.h    |   9 ++
- 19 files changed, 931 insertions(+), 163 deletions(-)
- create mode 100644 net/6lowpan/nhc/Makefile
- create mode 100644 net/6lowpan/nhc/core.c
- create mode 100644 net/6lowpan/nhc/core.h
- create mode 100644 net/6lowpan/nhc/dest.c
- create mode 100644 net/6lowpan/nhc/dest.h
- create mode 100644 net/6lowpan/nhc/frag.c
- create mode 100644 net/6lowpan/nhc/frag.h
- create mode 100644 net/6lowpan/nhc/hop.c
- create mode 100644 net/6lowpan/nhc/hop.h
- create mode 100644 net/6lowpan/nhc/ipv6.c
- create mode 100644 net/6lowpan/nhc/ipv6.h
- create mode 100644 net/6lowpan/nhc/mobil.c
- create mode 100644 net/6lowpan/nhc/mobil.h
- create mode 100644 net/6lowpan/nhc/route.c
- create mode 100644 net/6lowpan/nhc/route.h
- create mode 100644 net/6lowpan/nhc/udp.c
- create mode 100644 net/6lowpan/nhc/udp.h
-
--- 
-2.0.3
-
+* using the c files directly instead of pexpect:
+http://stackoverflow.com/questions/16224561/multiple-ble-connections-using-linux-and-bluez-5-0
+* my pexpect code: https://gist.github.com/nouyang/2a6a733d8facd23115a4
+* explanation of my hardware setup & pexpect code:
+http://www.orangenarwhals.com/?p=911
