@@ -3,9 +3,9 @@ From: Alexander Aring <alex.aring@gmail.com>
 To: linux-wpan@vger.kernel.org
 Cc: linux-bluetooth@vger.kernel.org, jukka.rissanen@linux.intel.com,
 	Alexander Aring <alex.aring@gmail.com>
-Subject: [RFC bluetooth-next 5/8] 6lowpan: add fragment skeleton
-Date: Sat,  9 Aug 2014 21:02:20 +0200
-Message-Id: <1407610943-27701-6-git-send-email-alex.aring@gmail.com>
+Subject: [RFC bluetooth-next 4/8] 6lowpan: add routing skeleton
+Date: Sat,  9 Aug 2014 21:02:19 +0200
+Message-Id: <1407610943-27701-5-git-send-email-alex.aring@gmail.com>
 In-Reply-To: <1407610943-27701-1-git-send-email-alex.aring@gmail.com>
 References: <1407610943-27701-1-git-send-email-alex.aring@gmail.com>
 Sender: linux-wpan-owner@vger.kernel.org
@@ -18,64 +18,64 @@ Signed-off-by: Alexander Aring <alex.aring@gmail.com>
 ---
  net/6lowpan/nhc/Makefile |  3 ++-
  net/6lowpan/nhc/core.c   |  8 ++++++++
- net/6lowpan/nhc/frag.c   | 49 ++++++++++++++++++++++++++++++++++++++++++++++++
- net/6lowpan/nhc/frag.h   | 11 +++++++++++
- 4 files changed, 70 insertions(+), 1 deletion(-)
- create mode 100644 net/6lowpan/nhc/frag.c
- create mode 100644 net/6lowpan/nhc/frag.h
+ net/6lowpan/nhc/route.c  | 48 ++++++++++++++++++++++++++++++++++++++++++++++++
+ net/6lowpan/nhc/route.h  | 11 +++++++++++
+ 4 files changed, 69 insertions(+), 1 deletion(-)
+ create mode 100644 net/6lowpan/nhc/route.c
+ create mode 100644 net/6lowpan/nhc/route.h
 
 diff --git a/net/6lowpan/nhc/Makefile b/net/6lowpan/nhc/Makefile
-index 81aa18d..e524c57 100644
+index b82135a..81aa18d 100644
 --- a/net/6lowpan/nhc/Makefile
 +++ b/net/6lowpan/nhc/Makefile
-@@ -3,4 +3,5 @@ obj-$(CONFIG_6LOWPAN) += nhc.o
+@@ -2,4 +2,5 @@ obj-$(CONFIG_6LOWPAN) += nhc.o
+ 
  nhc-y := core.o \
  	 udp.o \
- 	 hop.o \
--	 route.o
-+	 route.o \
-+	 frag.o
+-	 hop.o
++	 hop.o \
++	 route.o
 diff --git a/net/6lowpan/nhc/core.c b/net/6lowpan/nhc/core.c
-index db499bb..728dd06 100644
+index 80ed357..db499bb 100644
 --- a/net/6lowpan/nhc/core.c
 +++ b/net/6lowpan/nhc/core.c
-@@ -18,6 +18,7 @@
+@@ -17,6 +17,7 @@
+ #include "core.h"
  #include "udp.h"
  #include "hop.h"
- #include "route.h"
-+#include "frag.h"
++#include "route.h"
  
  static struct rb_root rb_root = RB_ROOT;
  static struct lowpan_nhc *lowpan_nexthdr_nhcs[NEXTHDR_MAX];
-@@ -188,9 +189,15 @@ int lowpan_init_nhc(void)
- 	ret = lowpan_init_nhc_route();
+@@ -183,9 +184,15 @@ int lowpan_init_nhc(void)
+ 	ret = lowpan_init_nhc_hop();
  	if (ret < 0)
- 		goto route_fail;
+ 		goto hop_fail;
 +
-+	ret = lowpan_init_nhc_frag();
++	ret = lowpan_init_nhc_route();
 +	if (ret < 0)
-+		goto frag_fail;
++		goto route_fail;
  out:
  	return ret;
  
-+frag_fail:
-+	lowpan_cleanup_nhc_route();
- route_fail:
- 	lowpan_cleanup_nhc_hop();
++route_fail:
++	lowpan_cleanup_nhc_hop();
  hop_fail:
-@@ -203,4 +210,5 @@ void lowpan_cleanup_nhc(void)
+ 	lowpan_cleanup_nhc_udp();
+ 	goto out;
+@@ -195,4 +202,5 @@ void lowpan_cleanup_nhc(void)
+ {
  	lowpan_cleanup_nhc_udp();
  	lowpan_cleanup_nhc_hop();
- 	lowpan_cleanup_nhc_route();
-+	lowpan_cleanup_nhc_frag();
++	lowpan_cleanup_nhc_route();
  }
-diff --git a/net/6lowpan/nhc/frag.c b/net/6lowpan/nhc/frag.c
+diff --git a/net/6lowpan/nhc/route.c b/net/6lowpan/nhc/route.c
 new file mode 100644
-index 0000000..ac07a73
+index 0000000..e5d8045
 --- /dev/null
-+++ b/net/6lowpan/nhc/frag.c
-@@ -0,0 +1,49 @@
-+/*	6LoWPAN IPv6 Fragment Header compression
++++ b/net/6lowpan/nhc/route.c
+@@ -0,0 +1,48 @@
++/*	6LoWPAN IPv6 Routing Header compression
 + *
 + *
 + *	Authors:
@@ -91,56 +91,55 @@ index 0000000..ac07a73
 +#include <linux/skbuff.h>
 +
 +#include "core.h"
-+#include "frag.h"
++#include "route.h"
 +
-+static int frag_uncompress(struct sk_buff **skb)
++static int route_uncompress(struct sk_buff **skb)
 +{
 +	return -ENOTSUPP;
 +}
 +
-+static int frag_compress(struct sk_buff *skb, u8 **hc_ptr)
++static int route_compress(struct sk_buff *skb, u8 **hc_ptr)
 +{
 +	return -ENOTSUPP;
 +}
 +
-+static void frag_nhid_setup(struct lowpan_nhc *nhc)
++static void route_nhid_setup(struct lowpan_nhc *nhc)
 +{
-+	nhc->id[0] = LOWPAN_NHC_FRAG_ID_0;
-+	nhc->idmask[0] = LOWPAN_NHC_FRAG_MASK_0;
++	nhc->id[0] = LOWPAN_NHC_ROUTE_ID_0;
++	nhc->idmask[0] = LOWPAN_NHC_ROUTE_MASK_0;
 +}
 +
-+LOWPAN_NHC(frag_nhc, "IPv6 Fragment Header", NEXTHDR_FRAGMENT,
-+	   frag_nhid_setup, LOWPAN_NHC_FRAG_LEN, frag_uncompress,
-+	   frag_compress);
++LOWPAN_NHC(route_nhc, "IPv6 Routing Header", NEXTHDR_ROUTING, route_nhid_setup,
++	   LOWPAN_NHC_ROUTE_LEN, route_uncompress, route_compress);
 +
-+int lowpan_init_nhc_frag(void)
++int lowpan_init_nhc_route(void)
 +{
-+	return lowpan_add_nhc(&frag_nhc);
++	return lowpan_add_nhc(&route_nhc);
 +}
-+EXPORT_SYMBOL(lowpan_init_nhc_frag);
++EXPORT_SYMBOL(lowpan_init_nhc_route);
 +
-+void lowpan_cleanup_nhc_frag(void)
++void lowpan_cleanup_nhc_route(void)
 +{
-+	lowpan_del_nhc(&frag_nhc);
++	lowpan_del_nhc(&route_nhc);
 +}
-+EXPORT_SYMBOL(lowpan_cleanup_nhc_frag);
-diff --git a/net/6lowpan/nhc/frag.h b/net/6lowpan/nhc/frag.h
++EXPORT_SYMBOL(lowpan_cleanup_nhc_route);
+diff --git a/net/6lowpan/nhc/route.h b/net/6lowpan/nhc/route.h
 new file mode 100644
-index 0000000..e760720
+index 0000000..78cd6b5
 --- /dev/null
-+++ b/net/6lowpan/nhc/frag.h
++++ b/net/6lowpan/nhc/route.h
 @@ -0,0 +1,11 @@
-+#ifndef __6LOWPAN_NHC_FRAG_H
-+#define __6LOWPAN_NHC_FRAG_H
++#ifndef __6LOWPAN_NHC_ROUTE_H
++#define __6LOWPAN_NHC_ROUTE_H
 +
-+#define LOWPAN_NHC_FRAG_LEN	1
-+#define LOWPAN_NHC_FRAG_ID_0	0xe4
-+#define LOWPAN_NHC_FRAG_MASK_0	0xfe
++#define LOWPAN_NHC_ROUTE_LEN	1
++#define LOWPAN_NHC_ROUTE_ID_0	0xe2
++#define LOWPAN_NHC_ROUTE_MASK_0	0xfe
 +
-+int lowpan_init_nhc_frag(void);
-+void lowpan_cleanup_nhc_frag(void);
++int lowpan_init_nhc_route(void);
++void lowpan_cleanup_nhc_route(void);
 +
-+#endif /* __6LOWPAN_NHC_FRAG_H */
++#endif /* __6LOWPAN_NHC_ROUTE_H */
 -- 
 2.0.3
 
