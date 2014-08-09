@@ -3,9 +3,9 @@ From: Alexander Aring <alex.aring@gmail.com>
 To: linux-wpan@vger.kernel.org
 Cc: linux-bluetooth@vger.kernel.org, jukka.rissanen@linux.intel.com,
 	Alexander Aring <alex.aring@gmail.com>
-Subject: [RFC bluetooth-next 7/8] 6lowpan: add mobility skeleton
-Date: Sat,  9 Aug 2014 21:02:22 +0200
-Message-Id: <1407610943-27701-8-git-send-email-alex.aring@gmail.com>
+Subject: [RFC bluetooth-next 6/8] 6lowpan: add destination options skeleton
+Date: Sat,  9 Aug 2014 21:02:21 +0200
+Message-Id: <1407610943-27701-7-git-send-email-alex.aring@gmail.com>
 In-Reply-To: <1407610943-27701-1-git-send-email-alex.aring@gmail.com>
 References: <1407610943-27701-1-git-send-email-alex.aring@gmail.com>
 Sender: linux-wpan-owner@vger.kernel.org
@@ -18,64 +18,64 @@ Signed-off-by: Alexander Aring <alex.aring@gmail.com>
 ---
  net/6lowpan/nhc/Makefile |  3 ++-
  net/6lowpan/nhc/core.c   |  8 ++++++++
- net/6lowpan/nhc/mobil.c  | 49 ++++++++++++++++++++++++++++++++++++++++++++++++
- net/6lowpan/nhc/mobil.h  | 11 +++++++++++
+ net/6lowpan/nhc/dest.c   | 49 ++++++++++++++++++++++++++++++++++++++++++++++++
+ net/6lowpan/nhc/dest.h   | 11 +++++++++++
  4 files changed, 70 insertions(+), 1 deletion(-)
- create mode 100644 net/6lowpan/nhc/mobil.c
- create mode 100644 net/6lowpan/nhc/mobil.h
+ create mode 100644 net/6lowpan/nhc/dest.c
+ create mode 100644 net/6lowpan/nhc/dest.h
 
 diff --git a/net/6lowpan/nhc/Makefile b/net/6lowpan/nhc/Makefile
-index 1b67930..9915c31 100644
+index e524c57..1b67930 100644
 --- a/net/6lowpan/nhc/Makefile
 +++ b/net/6lowpan/nhc/Makefile
-@@ -5,4 +5,5 @@ nhc-y := core.o \
+@@ -4,4 +4,5 @@ nhc-y := core.o \
+ 	 udp.o \
  	 hop.o \
  	 route.o \
- 	 frag.o \
--	 dest.o
-+	 dest.o \
-+	 mobil.o
+-	 frag.o
++	 frag.o \
++	 dest.o
 diff --git a/net/6lowpan/nhc/core.c b/net/6lowpan/nhc/core.c
-index 73d9e1e..1ee9750 100644
+index 728dd06..73d9e1e 100644
 --- a/net/6lowpan/nhc/core.c
 +++ b/net/6lowpan/nhc/core.c
-@@ -20,6 +20,7 @@
+@@ -19,6 +19,7 @@
+ #include "hop.h"
  #include "route.h"
  #include "frag.h"
- #include "dest.h"
-+#include "mobil.h"
++#include "dest.h"
  
  static struct rb_root rb_root = RB_ROOT;
  static struct lowpan_nhc *lowpan_nexthdr_nhcs[NEXTHDR_MAX];
-@@ -198,9 +199,15 @@ int lowpan_init_nhc(void)
- 	ret = lowpan_init_nhc_dest();
+@@ -193,9 +194,15 @@ int lowpan_init_nhc(void)
+ 	ret = lowpan_init_nhc_frag();
  	if (ret < 0)
- 		goto dest_fail;
+ 		goto frag_fail;
 +
-+	ret = lowpan_init_nhc_mobil();
++	ret = lowpan_init_nhc_dest();
 +	if (ret < 0)
-+		goto mobil_fail;
++		goto dest_fail;
  out:
  	return ret;
  
-+mobil_fail:
-+	lowpan_cleanup_nhc_dest();
- dest_fail:
- 	lowpan_cleanup_nhc_frag();
++dest_fail:
++	lowpan_cleanup_nhc_frag();
  frag_fail:
-@@ -219,4 +226,5 @@ void lowpan_cleanup_nhc(void)
+ 	lowpan_cleanup_nhc_route();
+ route_fail:
+@@ -211,4 +218,5 @@ void lowpan_cleanup_nhc(void)
+ 	lowpan_cleanup_nhc_hop();
  	lowpan_cleanup_nhc_route();
  	lowpan_cleanup_nhc_frag();
- 	lowpan_cleanup_nhc_dest();
-+	lowpan_cleanup_nhc_mobil();
++	lowpan_cleanup_nhc_dest();
  }
-diff --git a/net/6lowpan/nhc/mobil.c b/net/6lowpan/nhc/mobil.c
+diff --git a/net/6lowpan/nhc/dest.c b/net/6lowpan/nhc/dest.c
 new file mode 100644
-index 0000000..66c7817
+index 0000000..29469f3
 --- /dev/null
-+++ b/net/6lowpan/nhc/mobil.c
++++ b/net/6lowpan/nhc/dest.c
 @@ -0,0 +1,49 @@
-+/*	6LoWPAN IPv6 Mobility Header compression
++/*	6LoWPAN IPv6 Destination Options Header compression
 + *
 + *
 + *	Authors:
@@ -91,56 +91,56 @@ index 0000000..66c7817
 +#include <linux/skbuff.h>
 +
 +#include "core.h"
-+#include "mobil.h"
++#include "dest.h"
 +
-+static int mobil_uncompress(struct sk_buff **skb)
++static int dest_uncompress(struct sk_buff **skb)
 +{
 +	return -ENOTSUPP;
 +}
 +
-+static int mobil_compress(struct sk_buff *skb, u8 **hc_ptr)
++static int dest_compress(struct sk_buff *skb, u8 **hc_ptr)
 +{
 +	return -ENOTSUPP;
 +}
 +
-+static void mobil_nhid_setup(struct lowpan_nhc *nhc)
++static void dest_nhid_setup(struct lowpan_nhc *nhc)
 +{
-+	nhc->id[0] = LOWPAN_NHC_MOBIL_ID_0;
-+	nhc->idmask[0] = LOWPAN_NHC_MOBIL_MASK_0;
++	nhc->id[0] = LOWPAN_NHC_DEST_ID_0;
++	nhc->idmask[0] = LOWPAN_NHC_DEST_MASK_0;
 +}
 +
-+LOWPAN_NHC(mobil_nhc, "IPv6 Mobility Header", NEXTHDR_MOBILITY,
-+	   mobil_nhid_setup, LOWPAN_NHC_MOBIL_LEN, mobil_uncompress,
-+	   mobil_compress);
++LOWPAN_NHC(dest_nhc, "IPv6 Destination Options Header", NEXTHDR_DEST,
++	   dest_nhid_setup, LOWPAN_NHC_DEST_LEN, dest_uncompress,
++	   dest_compress);
 +
-+int lowpan_init_nhc_mobil(void)
++int lowpan_init_nhc_dest(void)
 +{
-+	return lowpan_add_nhc(&mobil_nhc);
++	return lowpan_add_nhc(&dest_nhc);
 +}
-+EXPORT_SYMBOL(lowpan_init_nhc_mobil);
++EXPORT_SYMBOL(lowpan_init_nhc_dest);
 +
-+void lowpan_cleanup_nhc_mobil(void)
++void lowpan_cleanup_nhc_dest(void)
 +{
-+	lowpan_del_nhc(&mobil_nhc);
++	lowpan_del_nhc(&dest_nhc);
 +}
-+EXPORT_SYMBOL(lowpan_cleanup_nhc_mobil);
-diff --git a/net/6lowpan/nhc/mobil.h b/net/6lowpan/nhc/mobil.h
++EXPORT_SYMBOL(lowpan_cleanup_nhc_dest);
+diff --git a/net/6lowpan/nhc/dest.h b/net/6lowpan/nhc/dest.h
 new file mode 100644
-index 0000000..fcfdb55
+index 0000000..f537e3f
 --- /dev/null
-+++ b/net/6lowpan/nhc/mobil.h
++++ b/net/6lowpan/nhc/dest.h
 @@ -0,0 +1,11 @@
-+#ifndef __6LOWPAN_NHC_MOBIL_H
-+#define __6LOWPAN_NHC_MOBIL_H
++#ifndef __6LOWPAN_NHC_DEST_H
++#define __6LOWPAN_NHC_DEST_H
 +
-+#define LOWPAN_NHC_MOBIL_LEN	1
-+#define LOWPAN_NHC_MOBIL_ID_0	0xe8
-+#define LOWPAN_NHC_MOBIL_MASK_0	0xfe
++#define LOWPAN_NHC_DEST_LEN	1
++#define LOWPAN_NHC_DEST_ID_0	0xe6
++#define LOWPAN_NHC_DEST_MASK_0	0xfe
 +
-+int lowpan_init_nhc_mobil(void);
-+void lowpan_cleanup_nhc_mobil(void);
++int lowpan_init_nhc_dest(void);
++void lowpan_cleanup_nhc_dest(void);
 +
-+#endif /* __6LOWPAN_NHC_MOBIL_H */
++#endif /* __6LOWPAN_NHC_DEST_H */
 -- 
 2.0.3
 
