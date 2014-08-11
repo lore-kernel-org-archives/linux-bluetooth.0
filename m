@@ -1,81 +1,51 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 11 Aug 2014 16:22:33 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCHv2 01/10] monitor: Fix segmentation fault with malformed
- packet
-Message-ID: <20140811132233.GA27174@t440s>
-References: <1407743445-1329-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1407743445-1329-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <53E8BCF6.6040502@linux.intel.com>
+References: <53E8BCF6.6040502@linux.intel.com>
+Date: Mon, 11 Aug 2014 16:12:03 +0300
+Message-ID: <CABBYNZK0NOKzBAeBAvp=FTA7ysk6yZm_kwUqDTdJmUhfsmJ-Tw@mail.gmail.com>
+Subject: Re: Bug: bluetoothd dies when connecting device
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Tanu Kaskinen <tanu.kaskinen@linux.intel.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+Hi Tanu,
 
-On Mon, Aug 11, 2014, Andrei Emeltchenko wrote:
-> Do not allow to read more then buffer size.
-> This fixes segmentation fault reading capture from target (apparently
-> end of the trace was broken).
-> ---
->  monitor/btsnoop.c    | 7 +++++++
->  src/shared/btsnoop.c | 5 +++++
->  src/shared/btsnoop.h | 2 ++
->  3 files changed, 14 insertions(+)
-> 
-> diff --git a/monitor/btsnoop.c b/monitor/btsnoop.c
-> index fafeff8..ec19812 100644
-> --- a/monitor/btsnoop.c
-> +++ b/monitor/btsnoop.c
-> @@ -304,6 +304,13 @@ int btsnoop_read_hci(struct timeval *tv, uint16_t *index, uint16_t *opcode,
->  	}
->  
->  	toread = be32toh(pkt.size);
-> +	if (toread > MAX_PACKET_SIZE) {
-> +		perror("Packet len suspicially big: %u", toread);
-> +		close(btsnoop_fd);
-> +		btsnoop_fd = -1;
-> +		return -1;
-> +	}
-> +
->  	flags = be32toh(pkt.flags);
->  
->  	ts = be64toh(pkt.ts) - 0x00E03AB44A676000ll;
-> diff --git a/src/shared/btsnoop.c b/src/shared/btsnoop.c
-> index 17a872c..521be10 100644
-> --- a/src/shared/btsnoop.c
-> +++ b/src/shared/btsnoop.c
-> @@ -415,6 +415,11 @@ bool btsnoop_read_hci(struct btsnoop *btsnoop, struct timeval *tv,
->  	}
->  
->  	toread = be32toh(pkt.size);
-> +	if (toread > MAX_PACKET_SIZE) {
-> +		btsnoop->aborted = true;
-> +		return false;
-> +	}
-> +
->  	flags = be32toh(pkt.flags);
->  
->  	ts = be64toh(pkt.ts) - 0x00E03AB44A676000ll;
+On Mon, Aug 11, 2014 at 3:54 PM, Tanu Kaskinen
+<tanu.kaskinen@linux.intel.com> wrote:
+> Hi,
+>
+> I tried to work on the oFono HFP patches for PulseAudio, but I couldn't
+> really do anything, because BlueZ is basically not working at all on my
+> machine. When I try to connect my Nokia BH-505 headset, bluetoothd sort of
+> dies. The process doesn't terminate, but it disconnects from D-Bus.
+>
+> I'm on Fedora 20, PulseAudio and BlueZ are compiled from current git master.
+> oFono is not involved here in any way. I have attached an annotated log of
+> the headset connecting process, in case someone wants to investigate this.
+> The starting scenario in the log is that pulseaudio and bluetoothd are not
+> running, and I have previously removed the headset from the BlueZ database.
+> First I start pulseaudio with verbose logging and timestamps in the
+> background, then in the same terminal I start bluetoothd with -d -n options
+> in the background, and then still in the same terminal I start bluetoothctl
+> to issue the commands for connecting the headset, so pulseuadio, bluetoothd
+> and bluetoothctl output are all interleaved. Connecting the device appears
+> to work at first, but when PulseAudio tries to start streaming to the
+> headset, things fall apart.
 
-The above two chunks should probably be in separate patches. One for
-shared/btsnoop and the other for btmon.
+It is very likely a problem with SELinux (either set it to disabled or
+permissive should make it work) blocking fd passing and making us
+disconnect, also note that I have also start working on porting the
+patches here:
 
-> diff --git a/src/shared/btsnoop.h b/src/shared/btsnoop.h
-> index 2c55d02..9f73913 100644
-> --- a/src/shared/btsnoop.h
-> +++ b/src/shared/btsnoop.h
-> @@ -44,6 +44,8 @@
->  #define BTSNOOP_OPCODE_SCO_TX_PKT	6
->  #define BTSNOOP_OPCODE_SCO_RX_PKT	7
->  
-> +#define MAX_PACKET_SIZE (1486 + 4)
+https://gitorious.org/pulseaudio/vudentzs-mainline/commits/fceee2a876110186f8fdc87743e3ee7f7bf8c1ae
 
-Where does this number come from? At least provide an explanation in the
-form of a code comment so that the reader can determine that it is
-correct. Also, you're violating the name space used by this header file.
-Everything else in it is prefixed by btsnoop_* or BTSNOOP_*.
+I did not went through the comments you did so perhaps you can ignore
+them for now, but I do include some on top that makes it work with
+oFono.
 
-Johan
+-- 
+Luiz Augusto von Dentz
