@@ -1,51 +1,47 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1407752016-14863-1-git-send-email-luiz.dentz@gmail.com>
-References: <1407752016-14863-1-git-send-email-luiz.dentz@gmail.com>
-Date: Mon, 11 Aug 2014 18:03:55 +0300
-Message-ID: <CABBYNZLifRUFZ4h4=tCVuO7cOzhvf34NmsEpNrbYDfX8FePtdA@mail.gmail.com>
-Subject: Re: [PATCH BlueZ v2 1/7] android: Fix not including shared/queue.c in
- A2DP plugin
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ] Revert "gdbus: Don't include just added interfaces in GetManagedObjects"
+Date: Mon, 11 Aug 2014 17:58:37 +0300
+Message-Id: <1407769117-21353-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-On Mon, Aug 11, 2014 at 1:13 PM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->
-> This can cause the followin error:
-> audio.a2dp.default.so: undefined symbol: queue_foreach
-> ---
-> v2: Rebase properly
->
->  android/Makefile.am | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
->
-> diff --git a/android/Makefile.am b/android/Makefile.am
-> index ac3a766..263a506 100644
-> --- a/android/Makefile.am
-> +++ b/android/Makefile.am
-> @@ -198,7 +198,9 @@ android_audio_a2dp_default_la_SOURCES = android/audio-msg.h \
->                                         android/hardware/audio.h \
->                                         android/hardware/audio_effect.h \
->                                         android/hardware/hardware.h \
-> -                                       android/system/audio.h
-> +                                       android/system/audio.h \
-> +                                       src/shared/queue.h \
-> +                                       src/shared/queue.c
->
->  android_audio_sco_default_la_SOURCES = android/hal-log.h \
->                                         android/sco-msg.h \
-> --
-> 1.9.3
->
+This actually creates a problem since the code now does flush any pending
+message on the queue any signal will be send right away before the
+actual reply to GetManagedObjects which will not contain those interfaces.
+---
+ gdbus/object.c | 8 +-------
+ 1 file changed, 1 insertion(+), 7 deletions(-)
 
-Pushed.
-
+diff --git a/gdbus/object.c b/gdbus/object.c
+index 13cf9a9..4d5a64c 100644
+--- a/gdbus/object.c
++++ b/gdbus/object.c
+@@ -1088,7 +1088,6 @@ static const GDBusMethodTable introspect_methods[] = {
+ static void append_interfaces(struct generic_data *data, DBusMessageIter *iter)
+ {
+ 	DBusMessageIter array;
+-	GSList *l;
+ 
+ 	dbus_message_iter_open_container(iter, DBUS_TYPE_ARRAY,
+ 				DBUS_DICT_ENTRY_BEGIN_CHAR_AS_STRING
+@@ -1100,12 +1099,7 @@ static void append_interfaces(struct generic_data *data, DBusMessageIter *iter)
+ 				DBUS_DICT_ENTRY_END_CHAR_AS_STRING
+ 				DBUS_DICT_ENTRY_END_CHAR_AS_STRING, &array);
+ 
+-	for (l = data->interfaces; l != NULL; l = l->next) {
+-		if (g_slist_find(data->added, l->data))
+-			continue;
+-
+-		append_interface(l->data, &array);
+-	}
++	g_slist_foreach(data->interfaces, append_interface, &array);
+ 
+ 	dbus_message_iter_close_container(iter, &array);
+ }
 -- 
-Luiz Augusto von Dentz
+1.9.3
+
