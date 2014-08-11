@@ -1,25 +1,27 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 11 Aug 2014 16:39:18 +0300
+Date: Mon, 11 Aug 2014 16:38:53 +0300
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+To: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] android/pixit: TSPX_security_enabled is not default
-Message-ID: <20140811133918.GD28382@t440s>
-References: <1407747291-12996-1-git-send-email-lukasz.rymanowski@tieto.com>
+Subject: Re: [PATCH] Android/pts: Update PTS files for IOPT
+Message-ID: <20140811133853.GC28382@t440s>
+References: <1407744412-3768-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1407747291-12996-1-git-send-email-lukasz.rymanowski@tieto.com>
+In-Reply-To: <1407744412-3768-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Lukasz,
+Hi Grzegorz,
 
-On Mon, Aug 11, 2014, Lukasz Rymanowski wrote:
-> Mark that TSPX_security_enable PIXIT is changed compared to default
-> settings
+On Mon, Aug 11, 2014, Grzegorz Kolodziejczyk wrote:
+> PICS and PIXITs updated to PTS 5.2. Regression done for Android
+> 4.4.4.
 > ---
->  android/pixit-l2cap.txt | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  android/pics-iopt.txt  | 12 ++++++------
+>  android/pixit-iopt.txt |  2 +-
+>  android/pts-iopt.txt   | 10 +++++-----
+>  3 files changed, 12 insertions(+), 12 deletions(-)
 
 Applied. Thanks.
 
