@@ -1,25 +1,47 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 11 Aug 2014 10:17:37 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] android/pts: Update A2DP test results
-Message-ID: <20140811071737.GA21813@t440s>
-References: <1407528038-4159-1-git-send-email-lukasz.rymanowski@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1407528038-4159-1-git-send-email-lukasz.rymanowski@tieto.com>
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] android/tester: Fix using uninitialized variable
+Date: Mon, 11 Aug 2014 10:17:02 +0300
+Message-Id: <1407741422-30755-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Lukasz,
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-On Fri, Aug 08, 2014, Lukasz Rymanowski wrote:
-> Updated test result for TC_SRC_REL_BV_01_I
-> ---
->  android/pts-a2dp.txt | 3 +--
->  1 file changed, 1 insertion(+), 2 deletions(-)
+Fix typo not initializing variable. Silence warnings:
 
-Applied. Thanks.
+...
+/android/tester-hdp.c: 71 in create_app()
+/android/tester-hdp.c: 97 in create_app()
+...
+>>>     Using uninitialized value "mdep2". Field
+>>>     "mdep2.mdep_description" is uninitialized.
+71              reg->mdep_cfg[1] = mdep2;
+...
+>>>     Using uninitialized value "mdep2". Field
+>>>     "mdep2.mdep_description" is uninitialized.
+97              reg->mdep_cfg[1] = mdep2;
+...
+---
+ android/tester-hdp.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-Johan
+diff --git a/android/tester-hdp.c b/android/tester-hdp.c
+index 9193609..bfe8a99 100644
+--- a/android/tester-hdp.c
++++ b/android/tester-hdp.c
+@@ -43,8 +43,9 @@ static bthl_reg_param_t *create_app(hdp_app_reg_type type)
+ 
+ 	mdep1.data_type = 4100;
+ 	mdep1.mdep_description = "pulse-oximeter";
++
+ 	mdep2.data_type = 4100;
+-	mdep1.mdep_description = "pulse-oximeter";
++	mdep2.mdep_description = "pulse-oximeter";
+ 
+ 	switch (type) {
+ 	case HDP_APP_SINK_RELIABLE:
+-- 
+1.9.1
+
