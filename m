@@ -1,37 +1,215 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-Sender: armansito@google.com
-In-Reply-To: <7BB5EFE5-886B-4422-AA58-99372B14380D@holtmann.org>
-References: <1405986034-29122-1-git-send-email-armansito@chromium.org>
-	<1405986034-29122-2-git-send-email-armansito@chromium.org>
-	<3D02B219753AD44CBDDDE484323B1774112D2C2C@SHSMSX104.ccr.corp.intel.com>
-	<CAHrH25QAR=y6Dtn4Y-t=EX1h6Oxn9ir7rWft2m+mVsBHfab1Wg@mail.gmail.com>
-	<409335B4-82B3-40D2-970A-D39416F02591@holtmann.org>
-	<CAHrH25To=NvJC+4E6U-2S5pMc1qORvKOpbG2atY9=CFn4Zwcew@mail.gmail.com>
-	<3D02B219753AD44CBDDDE484323B1774112D2F48@SHSMSX104.ccr.corp.intel.com>
-	<CAHrH25RkJ8x0SEx5g89496i=iWazorTpvXg7jySdUfBqMht1Pg@mail.gmail.com>
-	<CB57FC0A-030C-498D-A3E3-988BEF192ACB@holtmann.org>
-	<CAHrH25TDf0OeVnD+vOjUqKB_L=bFb3+qvu3LsUZ=_CXu21Fd7w@mail.gmail.com>
-	<3D02B219753AD44CBDDDE484323B1774112ECA19@SHSMSX104.ccr.corp.intel.com>
-	<B24F6699-B579-455E-8D83-9922ED923CAA@holtmann.org>
-	<CAHrH25SgBJSF=X+-qhFwSWjjqWHZuthHp4bFL2OXcUdTF_WWkg@mail.gmail.com>
-	<7BB5EFE5-886B-4422-AA58-99372B14380D@holtmann.org>
-Date: Mon, 11 Aug 2014 13:38:38 -0700
-Message-ID: <CAHrH25Q0ZmoK4vyaPLi7Hx1CEM1dg3P2fczXOTASLaU=ArFF7Q@mail.gmail.com>
-Subject: Re: [RFC v1 1/1] doc/gatt-api: New API properties and methods for the
- GATT D-Bus API.
 From: Arman Uguray <armansito@chromium.org>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: "Gu, Chao Jie" <chao.jie.gu@intel.com>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+To: linux-bluetooth@vger.kernel.org
+Cc: Arman Uguray <armansito@chromium.org>
+Subject: [RFC v2 1/1] doc/gatt-api: New API properties and methods for the GATT D-Bus API.
+Date: Mon, 11 Aug 2014 13:37:07 -0700
+Message-Id: <1407789427-7118-2-git-send-email-armansito@chromium.org>
+In-Reply-To: <1407789427-7118-1-git-send-email-armansito@chromium.org>
+References: <1407789427-7118-1-git-send-email-armansito@chromium.org>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+This patch introduces the following new properties to the GattService1
+interface:
 
-> then send me a patch that updates the API documentation for what it is suppose to be and deletes pieces are obsolete now.
->
+  Device: A remote-service-only property that contains the D-Bus object
+  path of the associated device.
 
-Sent v2 with the most recent feedback addressed.
+  Primary: Reflects whether or not a services is primary or secondary.
 
--Arman
+This patch also introduces new methods to GattCharacteristic1 and
+GattDescriptor1 for reading and writing the corresponding attribute
+values and a new signal for being notified of received notifications and
+indications.
+
+The "Value" D-Bus property is removed from both interfaces
+and replaced with asynchronous ReadValue and WriteValue functions. This
+is due to the fact that DBus.Properties.Get is synchronous and without
+an asynchronous way of issuing a GATT value read request, there are
+cases where a single read and cache based approach becomes limiting
+(e.g. when a characteristic allows reads but no notifications) and
+relying on the PropertyChanged signal to retrieve the value of a read
+request asynchonously as well as to signal notifications/indications
+makes for a vague API.
+---
+ doc/gatt-api.txt | 124 +++++++++++++++++++++++++++++++++++++++++++++++++------
+ 1 file changed, 112 insertions(+), 12 deletions(-)
+
+diff --git a/doc/gatt-api.txt b/doc/gatt-api.txt
+index 8c7975c..f7125a2 100644
+--- a/doc/gatt-api.txt
++++ b/doc/gatt-api.txt
+@@ -32,6 +32,25 @@ Properties	string UUID [read-only]
+ 
+ 			128-bit service UUID.
+ 
++		boolean Primary [read-only]
++
++			Indicates whether or not this GATT service is a
++			primary service. If false, the service is secondary.
++
++		object Device [read-only, optional]
++
++			Object path of the Bluetooth device the service
++			belongs to. Only present on services from remote
++			devices.
++
++		array{object} Characteristics [read-only]
++
++			Array of object paths representing the characteristics
++			of this service. This property is set only when the
++			characteristic discovery has been completed, however the
++			characteristic objects will become available via
++			ObjectManager as soon as they get discovered.
++
+ 		array{object} Includes [read-only]: Not implemented
+ 
+ 			Array of object paths representing the included
+@@ -48,6 +67,50 @@ Service		org.bluez
+ Interface	org.bluez.GattCharacteristic1 [Experimental]
+ Object path	[variable prefix]/{hci0,hci1,...}/dev_XX_XX_XX_XX_XX_XX/serviceXX/charYYYY
+ 
++Methods		array{byte} ReadValue()
++
++			Issues a request to read the value of the
++			characteristic and returns the value if the
++			operation was successful.
++
++			Possible Errors: org.bluez.Error.Failed
++					 org.bluez.Error.InProgress
++					 org.bluez.Error.ReadNotPermitted
++					 org.bluez.Error.NotAuthorized
++					 org.bluez.Error.NotPaired
++					 org.bluez.Error.NotSupported
++
++		void WriteValue(array{byte} value)
++
++			Issues a request to write the value of the
++			characteristic.
++
++			Possible Errors: org.bluez.Error.Failed
++					 org.bluez.Error.InProgress
++					 org.bluez.Error.WriteNotPermitted
++					 org.bluez.Error.InvalidValueLength
++					 org.bluez.Error.NotAuthorized
++					 org.bluez.Error.NotPaired
++					 org.bluez.Error.NotSupported
++
++		void StartNotify()
++
++			Starts a notification session from this characteristic
++			if it supports value notifications or indications.
++
++			Possible Errors: org.bluez.Error.Failed
++					 org.bluez.Error.InProgress
++					 org.bluez.Error.NotSupported
++
++		void StopNotify()
++
++			This method will cancel any previous StartNotify
++			transaction. Note that notifications from a
++			characteristic are shared between sessions thus
++			calling StopNotify will release a single session.
++
++			Possible Errors: org.bluez.Error.Failed
++
+ Properties	string UUID [read-only]
+ 
+ 			128-bit characteristic UUID.
+@@ -57,12 +120,19 @@ Properties	string UUID [read-only]
+ 			Object path of the GATT service the characteristc
+ 			belongs to.
+ 
+-		array{byte} Value [read-write]
++		array{byte} Value [read-only, optional]
++
++			The cached value of the characteristic. This property
++			gets updated only after a successful read request and
++			when a notification or indication is received, upon
++			which a PropertiesChanged signal will be emitted.
+ 
+-			Value read from the remote Bluetooth device or from
+-			the external application implementing GATT services.
++		boolean Notifying [read-only]
+ 
+-		array{string} Flags [read-only, optional]
++			True, if notifications or indications on this
++			characteristic are currently enabled.
++
++		array{string} Flags [read-only]
+ 
+ 			Defines how the characteristic value can be used. See
+ 			Core spec "Table 3.5: Characteristic Properties bit
+@@ -79,6 +149,14 @@ Properties	string UUID [read-only]
+ 				"reliable-write"
+ 				"writable-auxiliaries"
+ 
++		array{object} Descriptors [read-only]
++
++			Array of object paths representing the descriptors
++			of this service. This property is set only when the
++			descriptor discovery has been completed, however the
++			descriptor objects will become available via
++			ObjectManager as soon as they get discovered.
++
+ 
+ Characteristic Descriptors hierarchy
+ ====================================
+@@ -89,6 +167,32 @@ Service		org.bluez
+ Interface	org.bluez.GattDescriptor1 [Experimental]
+ Object path	[variable prefix]/{hci0,hci1,...}/dev_XX_XX_XX_XX_XX_XX/serviceXX/charYYYY/descriptorZZZ
+ 
++Methods		array{byte} ReadValue()
++
++			Issues a request to read the value of the
++			characteristic and returns the value if the
++			operation was successful.
++
++			Possible Errors: org.bluez.Error.Failed
++					 org.bluez.Error.InProgress
++					 org.bluez.Error.ReadNotPermitted
++					 org.bluez.Error.NotAuthorized
++					 org.bluez.Error.NotPaired
++					 org.bluez.Error.NotSupported
++
++		void WriteValue(array{byte} value)
++
++			Issues a request to write the value of the
++			characteristic.
++
++			Possible Errors: org.bluez.Error.Failed
++					 org.bluez.Error.InProgress
++					 org.bluez.Error.WriteNotPermitted
++					 org.bluez.Error.InvalidValueLength
++					 org.bluez.Error.NotAuthorized
++					 org.bluez.Error.NotPaired
++					 org.bluez.Error.NotSupported
++
+ Properties	string UUID [read-only]
+ 
+ 			128-bit descriptor UUID.
+@@ -98,16 +202,12 @@ Properties	string UUID [read-only]
+ 			Object path of the GATT characteristc the descriptor
+ 			belongs to.
+ 
+-		array{byte} Value [read-write]
+-
+-			Raw characteristic descriptor value read from the
+-			remote Bluetooth device or from the external
+-			application implementing GATT services.
++		array{byte} Value [read-only, optional]
+ 
+-		string Permissions [read-only]: To be defined
++			The cached value of the descriptor. This property
++			gets updated only after a successful read request, upon
++			which a PropertiesChanged signal will be emitted.
+ 
+-			Defines read/write authentication and authorization
+-			requirements.
+ 
+ Service Manager hierarchy
+ =============================
+-- 
+2.0.0.526.g5318336
+
