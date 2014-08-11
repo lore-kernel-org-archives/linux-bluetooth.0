@@ -6,47 +6,52 @@ Cc: marcel@holtmann.org,
 	kernel@pengutronix.de,
 	Varka Bhadram <varkab@cdac.in>,
 	Alexander Aring <alex.aring@gmail.com>
-Subject: [PATCH 1/4] mac802154: cleanup in rx path
-Date: Mon, 11 Aug 2014 13:25:07 +0200
-Message-Id: <1407756310-26592-2-git-send-email-alex.aring@gmail.com>
+Subject: [PATCH 2/4] mac802154: common error path
+Date: Mon, 11 Aug 2014 13:25:08 +0200
+Message-Id: <1407756310-26592-3-git-send-email-alex.aring@gmail.com>
 In-Reply-To: <1407756310-26592-1-git-send-email-alex.aring@gmail.com>
 References: <1407756310-26592-1-git-send-email-alex.aring@gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Varka Bhadram <varkab@cdac.in>
 
-This patch replace the sizeof(struct rx_work) with sizeof(*work)
-and directly passing the skb in mac802154_subif_rx()
+By introducing label fail, making the common error path for
+mac802154_llsec_decrypt() and packet type default case.
 
 Signed-off-by: Varka Bhadram <varkab@cdac.in>
 Signed-off-by: Alexander Aring <alex.aring@gmail.com>
 ---
- net/mac802154/rx.c | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
+ net/mac802154/wpan.c | 10 ++++++----
+ 1 file changed, 6 insertions(+), 4 deletions(-)
 
-diff --git a/net/mac802154/rx.c b/net/mac802154/rx.c
-index 7f820a1..a14cf9e 100644
---- a/net/mac802154/rx.c
-+++ b/net/mac802154/rx.c
-@@ -86,9 +86,8 @@ fail:
- static void mac802154_rx_worker(struct work_struct *work)
- {
- 	struct rx_work *rw = container_of(work, struct rx_work, work);
--	struct sk_buff *skb = rw->skb;
+diff --git a/net/mac802154/wpan.c b/net/mac802154/wpan.c
+index 3c3069f..ce17570 100644
+--- a/net/mac802154/wpan.c
++++ b/net/mac802154/wpan.c
+@@ -472,8 +472,7 @@ mac802154_subif_frame(struct mac802154_sub_if_data *sdata, struct sk_buff *skb,
+ 	rc = mac802154_llsec_decrypt(&sdata->sec, skb);
+ 	if (rc) {
+ 		pr_debug("decryption failed: %i\n", rc);
+-		kfree_skb(skb);
+-		return NET_RX_DROP;
++		goto fail;
+ 	}
  
--	mac802154_subif_rx(rw->dev, skb, rw->lqi);
-+	mac802154_subif_rx(rw->dev, rw->skb, rw->lqi);
- 	kfree(rw);
+ 	sdata->dev->stats.rx_packets++;
+@@ -485,9 +484,12 @@ mac802154_subif_frame(struct mac802154_sub_if_data *sdata, struct sk_buff *skb,
+ 	default:
+ 		pr_warn("ieee802154: bad frame received (type = %d)\n",
+ 			mac_cb(skb)->type);
+-		kfree_skb(skb);
+-		return NET_RX_DROP;
++		goto fail;
+ 	}
++
++fail:
++	kfree_skb(skb);
++	return NET_RX_DROP;
  }
  
-@@ -101,7 +100,7 @@ ieee802154_rx_irqsafe(struct ieee802154_dev *dev, struct sk_buff *skb, u8 lqi)
- 	if (!skb)
- 		return;
- 
--	work = kzalloc(sizeof(struct rx_work), GFP_ATOMIC);
-+	work = kzalloc(sizeof(*work), GFP_ATOMIC);
- 	if (!work)
- 		return;
- 
+ static void mac802154_print_addr(const char *name,
 -- 
 2.0.3
