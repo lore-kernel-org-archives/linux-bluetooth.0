@@ -3,135 +3,147 @@ From: Vikrampal Yadav <vikram.pal@samsung.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: luiz.dentz@gmail.com, d.kasatkin@samsung.com,
 	vikram.pal@samsung.com
-Subject: [PATCH 4/6] monitor: Add AVRCP specific AV/C PDUs' macros and helper
+Subject: [PATCH 2/6] monitor: Add AV/C commands related macros and helper
  functions
-Date: Mon, 11 Aug 2014 19:56:40 +0530
-Message-id: <1407767202-7693-4-git-send-email-vikram.pal@samsung.com>
+Date: Mon, 11 Aug 2014 19:56:38 +0530
+Message-id: <1407767202-7693-2-git-send-email-vikram.pal@samsung.com>
 In-reply-to: <1407767202-7693-1-git-send-email-vikram.pal@samsung.com>
 References: <1407767202-7693-1-git-send-email-vikram.pal@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Added AVRCP specific AV/C PDUs related stuffs such as macros
-and helper functions.
+Added AV/C commands related stuffs such as macros and helper
+functions.
 ---
- monitor/avctp.c | 98 +++++++++++++++++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 96 insertions(+), 2 deletions(-)
+ monitor/avctp.c | 111 ++++++++++++++++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 108 insertions(+), 3 deletions(-)
 
 diff --git a/monitor/avctp.c b/monitor/avctp.c
-index 8eca5da..28605fb 100644
+index c0ec6a2..2a41a7c 100644
 --- a/monitor/avctp.c
 +++ b/monitor/avctp.c
-@@ -79,6 +79,38 @@
- #define AVC_OP_SUBUNITINFO              0x31
- #define AVC_OP_PASSTHROUGH              0x7c
+@@ -43,19 +43,124 @@
+ #include "sdp.h"
+ #include "avctp.h"
  
-+/* pdu ids */
-+#define AVRCP_GET_CAPABILITIES          0x10
-+#define AVRCP_LIST_PLAYER_ATTRIBUTES    0x11
-+#define AVRCP_LIST_PLAYER_VALUES        0x12
-+#define AVRCP_GET_CURRENT_PLAYER_VALUE  0x13
-+#define AVRCP_SET_PLAYER_VALUE          0x14
-+#define AVRCP_GET_PLAYER_ATTRIBUTE_TEXT 0x15
-+#define AVRCP_GET_PLAYER_VALUE_TEXT     0x16
-+#define AVRCP_DISPLAYABLE_CHARSET       0x17
-+#define AVRCP_CT_BATTERY_STATUS         0x18
-+#define AVRCP_GET_ELEMENT_ATTRIBUTES    0x20
-+#define AVRCP_GET_PLAY_STATUS           0x30
-+#define AVRCP_REGISTER_NOTIFICATION     0x31
-+#define AVRCP_REQUEST_CONTINUING        0x40
-+#define AVRCP_ABORT_CONTINUING          0x41
-+#define AVRCP_SET_ABSOLUTE_VOLUME       0x50
-+#define AVRCP_SET_ADDRESSED_PLAYER      0x60
-+#define AVRCP_SET_BROWSED_PLAYER        0x70
-+#define AVRCP_GET_FOLDER_ITEMS          0x71
-+#define AVRCP_CHANGE_PATH               0x72
-+#define AVRCP_GET_ITEM_ATTRIBUTES       0x73
-+#define AVRCP_PLAY_ITEM                 0x74
-+#define AVRCP_SEARCH                    0x80
-+#define AVRCP_ADD_TO_NOW_PLAYING        0x90
-+#define AVRCP_GENERAL_REJECT            0xA0
++/* ctype entries */
++#define AVC_CTYPE_CONTROL               0x0
++#define AVC_CTYPE_STATUS                0x1
++#define AVC_CTYPE_SPECIFIC_INQUIRY      0x2
++#define AVC_CTYPE_NOTIFY                0x3
++#define AVC_CTYPE_GENERAL_INQUIRY       0x4
++#define AVC_CTYPE_NOT_IMPLEMENTED       0x8
++#define AVC_CTYPE_ACCEPTED              0x9
++#define AVC_CTYPE_REJECTED              0xA
++#define AVC_CTYPE_IN_TRANSITION         0xB
++#define AVC_CTYPE_STABLE                0xC
++#define AVC_CTYPE_CHANGED               0xD
++#define AVC_CTYPE_INTERIM               0xF
 +
-+/* Packet types */
-+#define AVRCP_PACKET_TYPE_SINGLE        0x00
-+#define AVRCP_PACKET_TYPE_START         0x01
-+#define AVRCP_PACKET_TYPE_CONTINUING    0x02
-+#define AVRCP_PACKET_TYPE_END           0x03
++/* subunit type */
++#define AVC_SUBUNIT_MONITOR             0x00
++#define AVC_SUBUNIT_AUDIO               0x01
++#define AVC_SUBUNIT_PRINTER             0x02
++#define AVC_SUBUNIT_DISC                0x03
++#define AVC_SUBUNIT_TAPE                0x04
++#define AVC_SUBUNIT_TURNER              0x05
++#define AVC_SUBUNIT_CA                  0x06
++#define AVC_SUBUNIT_CAMERA              0x07
++#define AVC_SUBUNIT_PANEL               0x09
++#define AVC_SUBUNIT_BULLETIN_BOARD      0x0a
++#define AVC_SUBUNIT_CAMERA_STORAGE      0x0b
++#define AVC_SUBUNIT_VENDOR_UNIQUE       0x0c
++#define AVC_SUBUNIT_EXTENDED            0x1e
++#define AVC_SUBUNIT_UNIT                0x1f
++
++/* opcodes */
++#define AVC_OP_VENDORDEP                0x00
++#define AVC_OP_UNITINFO                 0x30
++#define AVC_OP_SUBUNITINFO              0x31
++#define AVC_OP_PASSTHROUGH              0x7c
 +
  static const char *ctype2str(uint8_t ctype)
  {
-         switch (ctype & 0x0f) {
-@@ -165,12 +197,74 @@ static const char *opcode2str(uint8_t opcode)
- 
- static const char *pdu2str(uint8_t pduid)
- {
 -	return "Unknown";
-+        switch (pduid) {
-+        case AVRCP_GET_CAPABILITIES:
-+                return "GetCapabilities";
-+        case AVRCP_LIST_PLAYER_ATTRIBUTES:
-+                return "ListPlayerApplicationSettingAttributes";
-+        case AVRCP_LIST_PLAYER_VALUES:
-+                return "ListPlayerApplicationSettingValues";
-+        case AVRCP_GET_CURRENT_PLAYER_VALUE:
-+                return "GetCurrentPlayerApplicationSettingValue";
-+        case AVRCP_SET_PLAYER_VALUE:
-+                return "SetPlayerApplicationSettingValue";
-+        case AVRCP_GET_PLAYER_ATTRIBUTE_TEXT:
-+                return "GetPlayerApplicationSettingAttributeText";
-+        case AVRCP_GET_PLAYER_VALUE_TEXT:
-+                return "GetPlayerApplicationSettingValueText";
-+        case AVRCP_DISPLAYABLE_CHARSET:
-+                return "InformDisplayableCharacterSet";
-+        case AVRCP_CT_BATTERY_STATUS:
-+                return "InformBatteryStatusOfCT";
-+        case AVRCP_GET_ELEMENT_ATTRIBUTES:
-+                return "GetElementAttributes";
-+        case AVRCP_GET_PLAY_STATUS:
-+                return "GetPlayStatus";
-+        case AVRCP_REGISTER_NOTIFICATION:
-+                return "RegisterNotification";
-+        case AVRCP_REQUEST_CONTINUING:
-+                return "RequestContinuingResponse";
-+        case AVRCP_ABORT_CONTINUING:
-+                return "AbortContinuingResponse";
-+        case AVRCP_SET_ABSOLUTE_VOLUME:
-+                return "SetAbsoluteVolume";
-+        case AVRCP_SET_ADDRESSED_PLAYER:
-+                return "SetAddressedPlayer";
-+        case AVRCP_SET_BROWSED_PLAYER:
-+                return "SetBrowsedPlayer";
-+        case AVRCP_GET_FOLDER_ITEMS:
-+                return "GetFolderItems";
-+        case AVRCP_CHANGE_PATH:
-+                return "ChangePath";
-+	case AVRCP_GET_ITEM_ATTRIBUTES:
-+                return "GetItemAttributes";
-+        case AVRCP_PLAY_ITEM:
-+                return "PlayItem";
-+        case AVRCP_SEARCH:
-+                return "Search";
-+        case AVRCP_ADD_TO_NOW_PLAYING:
-+                return "AddToNowPlaying";
-+        case AVRCP_GENERAL_REJECT:
-+                return "GeneralReject";
++        switch (ctype & 0x0f) {
++        case AVC_CTYPE_CONTROL:
++                return "Control";
++        case AVC_CTYPE_STATUS:
++                return "Status";
++        case AVC_CTYPE_SPECIFIC_INQUIRY:
++                return "Specific Inquiry";
++        case AVC_CTYPE_NOTIFY:
++                return "Notify";
++        case AVC_CTYPE_GENERAL_INQUIRY:
++                return "General Inquiry";
++        case AVC_CTYPE_NOT_IMPLEMENTED:
++                return "Not Implemented";
++        case AVC_CTYPE_ACCEPTED:
++                return "Accepted";
++        case AVC_CTYPE_REJECTED:
++                return "Rejected";
++        case AVC_CTYPE_IN_TRANSITION:
++                return "In Transition";
++        case AVC_CTYPE_STABLE:
++                return "Stable";
++        case AVC_CTYPE_CHANGED:
++                return "Changed";
++        case AVC_CTYPE_INTERIM:
++                return "Interim";
 +        default:
 +                return "Unknown";
 +        }
  }
  
- static const char *pt2str(uint8_t pt)
+ static const char *subunit2str(uint8_t subunit)
+ {
+-	return "Reserved";
++        switch (subunit) {
++        case AVC_SUBUNIT_MONITOR:
++                return "Monitor";
++        case AVC_SUBUNIT_AUDIO:
++                return "Audio";
++        case AVC_SUBUNIT_PRINTER:
++                return "Printer";
++        case AVC_SUBUNIT_DISC:
++                return "Disc";
++        case AVC_SUBUNIT_TAPE:
++                return "Tape";
++        case AVC_SUBUNIT_TURNER:
++                return "Turner";
++        case AVC_SUBUNIT_CA:
++                return "CA";
++        case AVC_SUBUNIT_CAMERA:
++                return "Camera";
++        case AVC_SUBUNIT_PANEL:
++                return "Panel";
++        case AVC_SUBUNIT_BULLETIN_BOARD:
++                return "Bulleting Board";
++        case AVC_SUBUNIT_CAMERA_STORAGE:
++                return "Camera Storage";
++        case AVC_SUBUNIT_VENDOR_UNIQUE:
++                return "Vendor Unique";
++        case AVC_SUBUNIT_EXTENDED:
++                return "Extended to next byte";
++        case AVC_SUBUNIT_UNIT:
++                return "Unit";
++        default:
++                return "Reserved";
++        }
+ }
+ 
+ static const char *opcode2str(uint8_t opcode)
  {
 -	return "Unknown";
-+        switch (pt) {
-+        case AVRCP_PACKET_TYPE_SINGLE:
-+                return "Single";
-+        case AVRCP_PACKET_TYPE_START:
-+                return "Start";
-+        case AVRCP_PACKET_TYPE_CONTINUING:
-+                return "Continuing";
-+        case AVRCP_PACKET_TYPE_END:
-+                return "End";
++        switch (opcode) {
++        case AVC_OP_VENDORDEP:
++                return "Vendor Dependent";
++        case AVC_OP_UNITINFO:
++                return "Unit Info";
++        case AVC_OP_SUBUNITINFO:
++                return "Subunit Info";
++        case AVC_OP_PASSTHROUGH:
++                return "Passthrough";
 +        default:
 +                return "Unknown";
 +        }
