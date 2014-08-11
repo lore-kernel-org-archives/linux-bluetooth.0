@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv2 08/10] proximity: Fix use after free
-Date: Mon, 11 Aug 2014 10:50:43 +0300
-Message-Id: <1407743445-1329-8-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv2 04/10] tools: Fix resource leak closing sk
+Date: Mon, 11 Aug 2014 10:50:39 +0300
+Message-Id: <1407743445-1329-4-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1407743445-1329-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1407743445-1329-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,31 +11,30 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-First remove object from the list and then remove it.
 ---
- profiles/proximity/monitor.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ tools/avinfo.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/profiles/proximity/monitor.c b/profiles/proximity/monitor.c
-index f2e0739..b05cdd7 100644
---- a/profiles/proximity/monitor.c
-+++ b/profiles/proximity/monitor.c
-@@ -606,13 +606,13 @@ static void monitor_destroy(gpointer user_data)
- {
- 	struct monitor *monitor = user_data;
+diff --git a/tools/avinfo.c b/tools/avinfo.c
+index 7d58e25..d9f809b 100644
+--- a/tools/avinfo.c
++++ b/tools/avinfo.c
+@@ -583,6 +583,7 @@ static int l2cap_connect(bdaddr_t *src, bdaddr_t *dst)
  
-+	monitors = g_slist_remove(monitors, monitor);
-+
- 	btd_device_unref(monitor->device);
- 	g_free(monitor->linklosslevel);
- 	g_free(monitor->immediatelevel);
- 	g_free(monitor->signallevel);
- 	g_free(monitor);
--
--	monitors = g_slist_remove(monitors, monitor);
- }
+ 	if (bind(sk, (struct sockaddr *) &l2a, sizeof(l2a)) < 0) {
+ 		printf("Bind failed. %s (%d)\n", strerror(errno), errno);
++		close(sk);
+ 		return -errno;
+ 	}
  
- static struct monitor *register_monitor(struct btd_device *device)
+@@ -593,6 +594,7 @@ static int l2cap_connect(bdaddr_t *src, bdaddr_t *dst)
+ 
+ 	if (connect(sk, (struct sockaddr *) &l2a, sizeof(l2a)) < 0) {
+ 		printf("Connect failed. %s(%d)\n", strerror(errno), errno);
++		close(sk);
+ 		return -errno;
+ 	}
+ 
 -- 
 1.9.1
 
