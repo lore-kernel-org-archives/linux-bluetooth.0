@@ -1,26 +1,67 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 11 Aug 2014 13:39:02 +0200
 From: Alexander Aring <alex.aring@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: marcel@holtmann.org, linux-wpan@vger.kernel.org, kernel@pengutronix.de
-Subject: Re: pull-request: wpan-next 2014-08-11
-Message-ID: <20140811113900.GA24354@omega>
-References: <1407756310-26592-1-git-send-email-alex.aring@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Cc: marcel@holtmann.org,
+	linux-wpan@vger.kernel.org,
+	kernel@pengutronix.de,
+	Varka Bhadram <varkab@cdac.in>,
+	Alexander Aring <alex.aring@gmail.com>
+Subject: [PATCH 4/4] mac802154: common tx error path
+Date: Mon, 11 Aug 2014 13:25:10 +0200
+Message-Id: <1407756310-26592-5-git-send-email-alex.aring@gmail.com>
 In-Reply-To: <1407756310-26592-1-git-send-email-alex.aring@gmail.com>
+References: <1407756310-26592-1-git-send-email-alex.aring@gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+From: Varka Bhadram <varkab@cdac.in>
 
-On Mon, Aug 11, 2014 at 01:25:06PM +0200, Alexander Aring wrote:
-> Hi Marcel,
-> 
-> this is a pull request for the bluetooth-next tree. The pull request contains
-> some cleanup patches for mac802154 and the ieee802154 6lowpan part.
+This patch introduce the common error path on failure of Tx by
+inserting the label 'err_tx'.
 
-I fight with my git setup and this was a complete fail.
+Signed-off-by: Varka Bhadram <varkab@cdac.in>
+Signed-off-by: Alexander Aring <alex.aring@gmail.com>
+---
+ net/mac802154/tx.c | 15 ++++++++-------
+ 1 file changed, 8 insertions(+), 7 deletions(-)
 
-Sorry, for the noise.
-
-- Alex
+diff --git a/net/mac802154/tx.c b/net/mac802154/tx.c
+index 8124353..fdf4c0e6 100644
+--- a/net/mac802154/tx.c
++++ b/net/mac802154/tx.c
+@@ -89,8 +89,7 @@ netdev_tx_t mac802154_tx(struct mac802154_priv *priv, struct sk_buff *skb,
+ 
+ 	if (!(priv->phy->channels_supported[page] & (1 << chan))) {
+ 		WARN_ON(1);
+-		kfree_skb(skb);
+-		return NETDEV_TX_OK;
++		goto err_tx;
+ 	}
+ 
+ 	mac802154_monitors_rx(mac802154_to_priv(&priv->hw), skb);
+@@ -103,12 +102,10 @@ netdev_tx_t mac802154_tx(struct mac802154_priv *priv, struct sk_buff *skb,
+ 		data[1] = crc >> 8;
+ 	}
+ 
+-	if (skb_cow_head(skb, priv->hw.extra_tx_headroom)) {
+-		kfree_skb(skb);
+-		return NETDEV_TX_OK;
+-	}
++	if (skb_cow_head(skb, priv->hw.extra_tx_headroom))
++		goto err_tx;
+ 
+-	work = kzalloc(sizeof(struct xmit_work), GFP_ATOMIC);
++	work = kzalloc(sizeof(*work), GFP_ATOMIC);
+ 	if (!work) {
+ 		kfree_skb(skb);
+ 		return NETDEV_TX_BUSY;
+@@ -129,4 +126,8 @@ netdev_tx_t mac802154_tx(struct mac802154_priv *priv, struct sk_buff *skb,
+ 	queue_work(priv->dev_workqueue, &work->work);
+ 
+ 	return NETDEV_TX_OK;
++
++err_tx:
++	kfree_skb(skb);
++	return NETDEV_TX_OK;
+ }
+-- 
+2.0.3
