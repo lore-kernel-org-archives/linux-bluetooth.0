@@ -1,53 +1,70 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1407764285.2710.4.camel@tkkaskin-mobl3.ger.corp.intel.com>
-Subject: Re: Bug: bluetoothd dies when connecting device
-From: Tanu Kaskinen <tanu.kaskinen@linux.intel.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Date: Mon, 11 Aug 2014 16:38:05 +0300
-In-Reply-To: <CABBYNZK0NOKzBAeBAvp=FTA7ysk6yZm_kwUqDTdJmUhfsmJ-Tw@mail.gmail.com>
-References: <53E8BCF6.6040502@linux.intel.com>
-	 <CABBYNZK0NOKzBAeBAvp=FTA7ysk6yZm_kwUqDTdJmUhfsmJ-Tw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+Date: Mon, 11 Aug 2014 16:37:20 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCHv2 10/10] obexd: Fix possible NULL dereference
+Message-ID: <20140811133720.GB28382@t440s>
+References: <1407743445-1329-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <1407743445-1329-10-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1407743445-1329-10-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Mon, 2014-08-11 at 16:12 +0300, Luiz Augusto von Dentz wrote:
-> Hi Tanu,
-> 
-> On Mon, Aug 11, 2014 at 3:54 PM, Tanu Kaskinen
-> <tanu.kaskinen@linux.intel.com> wrote:
-> > Hi,
-> >
-> > I tried to work on the oFono HFP patches for PulseAudio, but I couldn't
-> > really do anything, because BlueZ is basically not working at all on my
-> > machine. When I try to connect my Nokia BH-505 headset, bluetoothd sort of
-> > dies. The process doesn't terminate, but it disconnects from D-Bus.
-> >
-> > I'm on Fedora 20, PulseAudio and BlueZ are compiled from current git master.
-> > oFono is not involved here in any way. I have attached an annotated log of
-> > the headset connecting process, in case someone wants to investigate this.
-> > The starting scenario in the log is that pulseaudio and bluetoothd are not
-> > running, and I have previously removed the headset from the BlueZ database.
-> > First I start pulseaudio with verbose logging and timestamps in the
-> > background, then in the same terminal I start bluetoothd with -d -n options
-> > in the background, and then still in the same terminal I start bluetoothctl
-> > to issue the commands for connecting the headset, so pulseuadio, bluetoothd
-> > and bluetoothctl output are all interleaved. Connecting the device appears
-> > to work at first, but when PulseAudio tries to start streaming to the
-> > headset, things fall apart.
-> 
-> It is very likely a problem with SELinux (either set it to disabled or
-> permissive should make it work) blocking fd passing and making us
-> disconnect,
+Hi Andrei,
 
-Thanks for the tip, disabling SELinux seemed to do at least something. I
-can't test the use case, because now pulseaudio complains that
-"properties changed in unknown adapter", i.e. somehow pulseaudio doesn't
-find /org/bluez/hci0 during initialization and then is very confused
-when changes happen in that adapter. I'll have to debug this later.
+On Mon, Aug 11, 2014, Andrei Emeltchenko wrote:
+> In a case snprintf fails we have NULL dereference. Fixes clang warnings
+> below:
+> ...
+> obexd/client/map.c:471:9: warning: Access to field 'message' results in
+> a dereference of a null pointer (loaded from variable 'err')
+>                                                            err->message);
+>                                                            ^~~~~~~~~~~~
+> obexd/client/map.c:772:9: warning: Access to field 'message' results in
+> a dereference of a null pointer (loaded from variable 'err')
+>                                                            err->message);
+>                                                            ^~~~~~~~~~~~
+> ...
+> ---
+>  obexd/client/map.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
 
--- 
-Tanu
+I've applied patches 3-9 (1 & 2 already had feedback). This one needs a
+bit more consideration too:
 
+> diff --git a/obexd/client/map.c b/obexd/client/map.c
+> index 47afc31..ed535e2 100644
+> --- a/obexd/client/map.c
+> +++ b/obexd/client/map.c
+> @@ -468,7 +468,7 @@ static DBusMessage *map_msg_get(DBusConnection *connection,
+>  
+>  fail:
+>  	reply = g_dbus_create_error(message, ERROR_INTERFACE ".Failed", "%s",
+> -								err->message);
+> +						err ? err->message : "");
+>  	g_error_free(err);
+>  	return reply;
+>  }
+> @@ -769,7 +769,7 @@ static void set_status(const GDBusPropertyTable *property,
+>  
+>  fail:
+>  	g_dbus_pending_property_error(id, ERROR_INTERFACE ".Failed", "%s",
+> -								err->message);
+> +						err ? err->message : "");
+>  	g_error_free(err);
+>  }
+
+It seems to me that the only code path that can lead to err being still
+NULL is this one:
+
+        if (snprintf(handle, sizeof(handle), "%" PRIx64, msg->handle) < 0)
+                goto fail;
+
+All others should have err != NULL. I don't really see how snprintf
+could ever fail in this case, so probably the simplest solution would be
+to just remove the error check there?
+
+Johan
