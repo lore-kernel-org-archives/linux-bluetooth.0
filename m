@@ -1,42 +1,51 @@
 Return-Path: <cyrus@holtmann.org>
-From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH] android/health: Fix reconnect scenario
-Date: Mon, 11 Aug 2014 19:23:32 +0200
-Message-Id: <1407777812-15652-1-git-send-email-lukasz.rymanowski@tieto.com>
+MIME-Version: 1.0
+In-Reply-To: <1407752016-14863-1-git-send-email-luiz.dentz@gmail.com>
+References: <1407752016-14863-1-git-send-email-luiz.dentz@gmail.com>
+Date: Mon, 11 Aug 2014 18:03:55 +0300
+Message-ID: <CABBYNZLifRUFZ4h4=tCVuO7cOzhvf34NmsEpNrbYDfX8FePtdA@mail.gmail.com>
+Subject: Re: [PATCH BlueZ v2 1/7] android: Fix not including shared/queue.c in
+ A2DP plugin
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-When trying to reconnect to HDP device, BfA tries to connect MDL even
-MCL is not connected.
+Hi,
 
-D/BlueZ   ( 2218): external/bluetooth/bluez/android/hal-health.c:connect_channel()
-I/bluetoothd( 2220): bluetoothd[2221]: external/bluetooth/bluez/android/health.c:bt_health_connect_channel()
-I/bluetoothd( 2220): bluetoothd[2221]: external/bluetooth/bluez/android/health.c:create_channel() mdep 1
-D/BlueZ   ( 2218): external/bluetooth/bluez/android/hal-bluetooth.c:handle_acl_state_changed() state 0
-I/bluetoothd( 2220): bluetoothd[2221]: external/bluetooth/bluez/android/mcap-lib.c:mcap_create_mdl()
-I/bluetoothd( 2220): bluetoothd[2221]: health: error creating mdl MCL is not connected
+On Mon, Aug 11, 2014 at 1:13 PM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>
+> This can cause the followin error:
+> audio.a2dp.default.so: undefined symbol: queue_foreach
+> ---
+> v2: Rebase properly
+>
+>  android/Makefile.am | 4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
+>
+> diff --git a/android/Makefile.am b/android/Makefile.am
+> index ac3a766..263a506 100644
+> --- a/android/Makefile.am
+> +++ b/android/Makefile.am
+> @@ -198,7 +198,9 @@ android_audio_a2dp_default_la_SOURCES = android/audio-msg.h \
+>                                         android/hardware/audio.h \
+>                                         android/hardware/audio_effect.h \
+>                                         android/hardware/hardware.h \
+> -                                       android/system/audio.h
+> +                                       android/system/audio.h \
+> +                                       src/shared/queue.h \
+> +                                       src/shared/queue.c
+>
+>  android_audio_sco_default_la_SOURCES = android/hal-log.h \
+>                                         android/sco-msg.h \
+> --
+> 1.9.3
+>
 
-This patch makes sure that MCL is connected before trying to connect
-MDL.
----
- android/health.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Pushed.
 
-diff --git a/android/health.c b/android/health.c
-index 2d80365..f4edc3e 100644
---- a/android/health.c
-+++ b/android/health.c
-@@ -1949,7 +1949,7 @@ static void bt_health_connect_channel(const void *buf, uint16_t len)
- 		}
- 	}
- 
--	if (!dev->mcl) {
-+	if (!dev->mcl || (dev->mcl && !dev->mcl_conn)) {
- 		if (connect_mcl(channel) < 0) {
- 			error("health: error retrieving HDP SDP record");
- 			goto fail;
 -- 
-1.8.4
-
+Luiz Augusto von Dentz
