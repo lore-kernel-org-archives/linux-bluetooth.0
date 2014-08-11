@@ -6,62 +6,47 @@ Cc: marcel@holtmann.org,
 	kernel@pengutronix.de,
 	Varka Bhadram <varkab@cdac.in>,
 	Alexander Aring <alex.aring@gmail.com>
-Subject: [PATCH 4/4] mac802154: common tx error path
-Date: Mon, 11 Aug 2014 13:25:10 +0200
-Message-Id: <1407756310-26592-5-git-send-email-alex.aring@gmail.com>
+Subject: [PATCH 1/4] mac802154: cleanup in rx path
+Date: Mon, 11 Aug 2014 13:25:07 +0200
+Message-Id: <1407756310-26592-2-git-send-email-alex.aring@gmail.com>
 In-Reply-To: <1407756310-26592-1-git-send-email-alex.aring@gmail.com>
 References: <1407756310-26592-1-git-send-email-alex.aring@gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Varka Bhadram <varkab@cdac.in>
 
-This patch introduce the common error path on failure of Tx by
-inserting the label 'err_tx'.
+This patch replace the sizeof(struct rx_work) with sizeof(*work)
+and directly passing the skb in mac802154_subif_rx()
 
 Signed-off-by: Varka Bhadram <varkab@cdac.in>
 Signed-off-by: Alexander Aring <alex.aring@gmail.com>
 ---
- net/mac802154/tx.c | 15 ++++++++-------
- 1 file changed, 8 insertions(+), 7 deletions(-)
+ net/mac802154/rx.c | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
 
-diff --git a/net/mac802154/tx.c b/net/mac802154/tx.c
-index 8124353..fdf4c0e6 100644
---- a/net/mac802154/tx.c
-+++ b/net/mac802154/tx.c
-@@ -89,8 +89,7 @@ netdev_tx_t mac802154_tx(struct mac802154_priv *priv, struct sk_buff *skb,
+diff --git a/net/mac802154/rx.c b/net/mac802154/rx.c
+index 7f820a1..a14cf9e 100644
+--- a/net/mac802154/rx.c
++++ b/net/mac802154/rx.c
+@@ -86,9 +86,8 @@ fail:
+ static void mac802154_rx_worker(struct work_struct *work)
+ {
+ 	struct rx_work *rw = container_of(work, struct rx_work, work);
+-	struct sk_buff *skb = rw->skb;
  
- 	if (!(priv->phy->channels_supported[page] & (1 << chan))) {
- 		WARN_ON(1);
--		kfree_skb(skb);
--		return NETDEV_TX_OK;
-+		goto err_tx;
- 	}
- 
- 	mac802154_monitors_rx(mac802154_to_priv(&priv->hw), skb);
-@@ -103,12 +102,10 @@ netdev_tx_t mac802154_tx(struct mac802154_priv *priv, struct sk_buff *skb,
- 		data[1] = crc >> 8;
- 	}
- 
--	if (skb_cow_head(skb, priv->hw.extra_tx_headroom)) {
--		kfree_skb(skb);
--		return NETDEV_TX_OK;
--	}
-+	if (skb_cow_head(skb, priv->hw.extra_tx_headroom))
-+		goto err_tx;
- 
--	work = kzalloc(sizeof(struct xmit_work), GFP_ATOMIC);
-+	work = kzalloc(sizeof(*work), GFP_ATOMIC);
- 	if (!work) {
- 		kfree_skb(skb);
- 		return NETDEV_TX_BUSY;
-@@ -129,4 +126,8 @@ netdev_tx_t mac802154_tx(struct mac802154_priv *priv, struct sk_buff *skb,
- 	queue_work(priv->dev_workqueue, &work->work);
- 
- 	return NETDEV_TX_OK;
-+
-+err_tx:
-+	kfree_skb(skb);
-+	return NETDEV_TX_OK;
+-	mac802154_subif_rx(rw->dev, skb, rw->lqi);
++	mac802154_subif_rx(rw->dev, rw->skb, rw->lqi);
+ 	kfree(rw);
  }
+ 
+@@ -101,7 +100,7 @@ ieee802154_rx_irqsafe(struct ieee802154_dev *dev, struct sk_buff *skb, u8 lqi)
+ 	if (!skb)
+ 		return;
+ 
+-	work = kzalloc(sizeof(struct rx_work), GFP_ATOMIC);
++	work = kzalloc(sizeof(*work), GFP_ATOMIC);
+ 	if (!work)
+ 		return;
+ 
 -- 
 2.0.3
