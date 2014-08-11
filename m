@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v2 6/7]  android/tester: Add A2DP Resume - Success test case
-Date: Mon, 11 Aug 2014 13:13:35 +0300
-Message-Id: <1407752016-14863-6-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v2 4/7] android/tester: Add A2DP connect - Success test case
+Date: Mon, 11 Aug 2014 13:13:33 +0300
+Message-Id: <1407752016-14863-4-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1407752016-14863-1-git-send-email-luiz.dentz@gmail.com>
 References: <1407752016-14863-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,68 +12,127 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
 ---
- android/tester-a2dp.c | 46 ++++++++++++++++++++++++++++++++++++++++++++++
- android/tester-main.c | 16 ++++++++++++++++
- android/tester-main.h |  7 +++++++
- 3 files changed, 69 insertions(+)
+ android/tester-a2dp.c | 114 ++++++++++++++++++++++++++++++++++++++++++++++++++
+ android/tester-main.c |  12 ++++++
+ android/tester-main.h |   8 ++++
+ 3 files changed, 134 insertions(+)
 
 diff --git a/android/tester-a2dp.c b/android/tester-a2dp.c
-index ecb0740..6757d75 100644
+index d2b6516..a86dcec 100644
 --- a/android/tester-a2dp.c
 +++ b/android/tester-a2dp.c
-@@ -45,6 +45,8 @@ static const uint8_t req_open[] = { 0x30, 0x06, 0x04 };
- static const uint8_t rsp_open[] = { 0x32, 0x06 };
- static const uint8_t req_close[] = { 0x40, 0x08, 0x04 };
- static const uint8_t rsp_close[] = { 0x42, 0x08 };
-+static const uint8_t req_start[] = { 0x40, 0x07, 0x04 };
-+static const uint8_t rsp_start[] = { 0x42, 0x07 };
+@@ -18,15 +18,129 @@
+ #include <stdbool.h>
  
- const struct pdu {
- 	const uint8_t *req;
-@@ -57,6 +59,7 @@ const struct pdu {
- 	{ req_cfg, sizeof(req_cfg), rsp_cfg, sizeof(rsp_cfg) },
- 	{ req_open, sizeof(req_open), rsp_open, sizeof(rsp_open) },
- 	{ req_close, sizeof(req_close), rsp_close, sizeof(rsp_close) },
-+	{ req_start, sizeof(req_start), rsp_start, sizeof(rsp_start) },
- 	{ },
- };
+ #include "emulator/bthost.h"
++#include "src/shared/util.h"
++
+ #include "tester-main.h"
+ #include "android/utils.h"
  
-@@ -141,6 +144,30 @@ static void a2dp_disconnect_action(void)
- 	schedule_action_verification(step);
- }
+ static struct queue *list;
  
-+static void audio_resume_action(void)
++struct emu_cid_data {
++	uint16_t handle;
++	uint16_t cid;
++};
++
++static struct emu_cid_data cid_data;
++
++static const uint8_t req_dsc[] = { 0x00, 0x01 };
++static const uint8_t rsp_dsc[] = { 0x02, 0x01, 0x04, 0x08 };
++static const uint8_t req_get[] = { 0x10, 0x02, 0x04 };
++static const uint8_t rsp_get[] = { 0x12, 0x02, 0x01, 0x00, 0x07, 0x06, 0x00,
++						0x00, 0xff, 0xff, 0x02, 0x40 };
++static const uint8_t req_cfg[] = { 0x20, 0x03, 0x04, 0x04, 0x01, 0x00, 0x07,
++					0x06, 0x00, 0x00, 0x21, 0x15, 0x02,
++					0x40 };
++static const uint8_t rsp_cfg[] = { 0x22, 0x03 };
++static const uint8_t req_open[] = { 0x30, 0x06, 0x04 };
++static const uint8_t rsp_open[] = { 0x32, 0x06 };
++
++const struct pdu {
++	const uint8_t *req;
++	size_t req_len;
++	const uint8_t *rsp;
++	size_t rsp_len;
++} pdus[] = {
++	{ req_dsc, sizeof(req_dsc), rsp_dsc, sizeof(rsp_dsc) },
++	{ req_get, sizeof(req_get), rsp_get, sizeof(rsp_get) },
++	{ req_cfg, sizeof(req_cfg), rsp_cfg, sizeof(rsp_cfg) },
++	{ req_open, sizeof(req_open), rsp_open, sizeof(rsp_open) },
++	{ },
++};
++
++static void print_data(const char *str, void *user_data)
++{
++	tester_debug("a2dp: %s", str);
++}
++
++static void a2dp_cid_hook_cb(const void *data, uint16_t len, void *user_data)
++{
++	struct emu_cid_data *cid_data = user_data;
++	struct test_data *t_data = tester_get_data();
++	struct bthost *bthost = hciemu_client_get_host(t_data->hciemu);
++	int i;
++
++	util_hexdump('>', data, len, print_data, NULL);
++
++	for (i = 0; pdus[i].req; i++) {
++		if (pdus[i].req_len != len)
++			continue;
++
++		if (memcmp(pdus[i].req, data, len))
++			continue;
++
++		util_hexdump('<', pdus[i].rsp, pdus[i].rsp_len, print_data,
++									NULL);
++
++		bthost_send_cid(bthost, cid_data->handle, cid_data->cid,
++						pdus[i].rsp, pdus[i].rsp_len);
++	}
++}
++
++static void a2dp_connect_request_cb(uint16_t handle, uint16_t cid,
++							void *user_data)
 +{
 +	struct test_data *data = tester_get_data();
++	struct bthost *bthost = hciemu_client_get_host(data->hciemu);
++
++	if (cid_data.handle)
++		return;
++
++	cid_data.handle = handle;
++	cid_data.cid = cid;
++
++	bthost_add_cid_hook(bthost, handle, cid, a2dp_cid_hook_cb, &cid_data);
++}
++
++static struct emu_set_l2cap_data l2cap_setup_data = {
++	.psm = 25,
++	.func = a2dp_connect_request_cb,
++	.user_data = NULL,
++};
++
++static void a2dp_connect_action(void)
++{
++	struct test_data *data = tester_get_data();
++	const uint8_t *addr = hciemu_get_client_bdaddr(data->hciemu);
 +	struct step *step = g_new0(struct step, 1);
-+	int err;
++	bt_bdaddr_t bdaddr;
 +
-+	err = data->audio->open_output_stream(data->audio,
-+						0,
-+						AUDIO_DEVICE_OUT_ALL_A2DP,
-+						AUDIO_OUTPUT_FLAG_NONE,
-+						NULL,
-+						&data->if_stream);
-+	if (err < 0) {
-+		step->action_status = BT_STATUS_FAIL;
-+		goto done;
-+	}
++	bdaddr2android((const bdaddr_t *) addr, &bdaddr);
 +
-+	/* Write something to force resume */
-+	data->if_stream->write(data->if_stream, &err, sizeof(err));
++	step->action_status = data->if_a2dp->connect(&bdaddr);
 +
-+done:
 +	schedule_action_verification(step);
 +}
 +
  static struct test_case test_cases[] = {
  	TEST_CASE_BREDRLE("A2DP Init",
  		ACTION_SUCCESS(dummy_action, NULL),
-@@ -180,6 +207,25 @@ static struct test_case test_cases[] = {
- 		ACTION_SUCCESS(bluetooth_disable_action, NULL),
- 		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_OFF),
  	),
-+	TEST_CASE_BREDRLE("A2DP Resume - Success",
++	TEST_CASE_BREDRLE("A2DP Connect - Success",
 +		ACTION_SUCCESS(bluetooth_enable_action, NULL),
 +		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_ON),
 +		ACTION_SUCCESS(emu_setup_powered_remote_action, NULL),
@@ -84,9 +143,6 @@ index ecb0740..6757d75 100644
 +					BTAV_CONNECTION_STATE_CONNECTING),
 +		CALLBACK_AV_CONN_STATE(CB_A2DP_CONN_STATE,
 +					BTAV_CONNECTION_STATE_CONNECTED),
-+		ACTION_SUCCESS(audio_resume_action, NULL),
-+		CALLBACK_AV_AUDIO_STATE(CB_A2DP_AUDIO_STATE,
-+					BTAV_AUDIO_STATE_STARTED),
 +		ACTION_SUCCESS(bluetooth_disable_action, NULL),
 +		CALLBACK_AV_CONN_STATE(CB_A2DP_CONN_STATE,
 +					BTAV_CONNECTION_STATE_DISCONNECTED),
@@ -96,18 +152,19 @@ index ecb0740..6757d75 100644
  
  struct queue *get_a2dp_tests(void)
 diff --git a/android/tester-main.c b/android/tester-main.c
-index 51820cf..5f41ff1 100644
+index 6a250a3..51820cf 100644
 --- a/android/tester-main.c
 +++ b/android/tester-main.c
-@@ -1096,9 +1096,20 @@ static void a2dp_connection_state_cb(btav_connection_state_t state,
- 	schedule_callback_call(step);
- }
+@@ -1085,8 +1085,20 @@ static bthl_callbacks_t bthl_callbacks = {
+ 	.channel_state_cb = hdp_channel_state_cb,
+ };
  
-+static void a2dp_audio_state_cb(btav_audio_state_t state, bt_bdaddr_t *bd_addr)
++static void a2dp_connection_state_cb(btav_connection_state_t state,
++							bt_bdaddr_t *bd_addr)
 +{
 +	struct step *step = g_new0(struct step, 1);
 +
-+	step->callback = CB_A2DP_AUDIO_STATE;
++	step->callback = CB_A2DP_CONN_STATE;
 +	step->callback_result.state = state;
 +
 +	schedule_callback_call(step);
@@ -115,32 +172,19 @@ index 51820cf..5f41ff1 100644
 +
  static btav_callbacks_t bta2dp_callbacks = {
  	.size = sizeof(bta2dp_callbacks),
- 	.connection_state_cb = a2dp_connection_state_cb,
-+	.audio_state_cb = a2dp_audio_state_cb,
++	.connection_state_cb = a2dp_connection_state_cb,
  };
  
  static const btgatt_client_callbacks_t btgatt_client_callbacks = {
-@@ -1475,6 +1486,11 @@ static void teardown(const void *test_data)
- 		data->if_hdp = NULL;
- 	}
- 
-+	if (data->if_stream) {
-+		data->audio->close_output_stream(data->audio, data->if_stream);
-+		data->if_stream = NULL;
-+	}
-+
- 	if (data->if_a2dp) {
- 		data->if_a2dp->cleanup();
- 		data->if_a2dp = NULL;
 diff --git a/android/tester-main.h b/android/tester-main.h
-index 32f173b..ad87878 100644
+index 2cefe5c..32f173b 100644
 --- a/android/tester-main.h
 +++ b/android/tester-main.h
-@@ -185,6 +185,11 @@
- 		.callback_result.state = cb_state, \
+@@ -180,6 +180,11 @@
+ 		.callback_result.channel_state = cb_state, \
  	}
  
-+#define CALLBACK_AV_AUDIO_STATE(cb, cb_state) { \
++#define CALLBACK_AV_CONN_STATE(cb, cb_state) { \
 +		.callback = cb, \
 +		.callback_result.state = cb_state, \
 +	}
@@ -148,22 +192,16 @@ index 32f173b..ad87878 100644
  #define CALLBACK_DEVICE_PROPS(props, prop_cnt) \
  	CALLBACK_PROPS(CB_BT_REMOTE_DEVICE_PROPERTIES, props, prop_cnt)
  
-@@ -250,6 +255,7 @@ typedef enum {
+@@ -243,6 +248,9 @@ typedef enum {
+ 	CB_HDP_APP_REG_STATE,
+ 	CB_HDP_CHANNEL_STATE,
  
- 	/* A2DP cb */
- 	CB_A2DP_CONN_STATE,
-+	CB_A2DP_AUDIO_STATE,
- 
++	/* A2DP cb */
++	CB_A2DP_CONN_STATE,
++
  	/* Gatt client */
  	CB_GATTC_REGISTER_CLIENT,
-@@ -300,6 +306,7 @@ struct test_data {
- 	const btpan_interface_t *if_pan;
- 	const bthl_interface_t *if_hdp;
- 	const btav_interface_t *if_a2dp;
-+	struct audio_stream_out *if_stream;
- 	const btgatt_interface_t *if_gatt;
- 
- 	const void *test_data;
+ 	CB_GATTC_SCAN_RESULT,
 -- 
 1.9.3
 
