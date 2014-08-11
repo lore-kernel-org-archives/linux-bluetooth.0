@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: johan.hedberg@gmail.com
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 9/9] Bluetooth: Make smp_chan_destroy() private to smp.c
-Date: Mon, 11 Aug 2014 22:06:44 +0300
-Message-Id: <1407784004-12448-10-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH v2 6/9] Bluetooth: Remove unused l2cap_conn->security_timer
+Date: Mon, 11 Aug 2014 22:06:41 +0300
+Message-Id: <1407784004-12448-7-git-send-email-johan.hedberg@gmail.com>
 In-Reply-To: <1407784004-12448-1-git-send-email-johan.hedberg@gmail.com>
 References: <1407784004-12448-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,146 +11,65 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-There are no external users of smp_chan_destroy() so make it private to
-smp.c. The patch also moves the function higher up in the c-file in
-order to avoid forward declarations.
+Now that there are no-longer any users for l2cap_conn->security_timer we
+can go ahead and simply remove it. The patch makes initialization of the
+conn->info_timer unconditional since it's better not to leave any
+l2cap_conn data structures uninitialized no matter what the underlying
+transport.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- net/bluetooth/smp.c | 100 ++++++++++++++++++++++++++--------------------------
- net/bluetooth/smp.h |   2 --
- 2 files changed, 50 insertions(+), 52 deletions(-)
+ include/net/bluetooth/l2cap.h |  1 -
+ net/bluetooth/l2cap_core.c    | 18 +-----------------
+ 2 files changed, 1 insertion(+), 18 deletions(-)
 
-diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
-index 312ea5ec2d7d..07ca4ce0943b 100644
---- a/net/bluetooth/smp.c
-+++ b/net/bluetooth/smp.c
-@@ -366,6 +366,56 @@ static u8 check_enc_key_size(struct l2cap_conn *conn, __u8 max_key_size)
- 	return 0;
+diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
+index 40f34866b6da..cedda399f9c0 100644
+--- a/include/net/bluetooth/l2cap.h
++++ b/include/net/bluetooth/l2cap.h
+@@ -638,7 +638,6 @@ struct l2cap_conn {
+ 
+ 	__u8			disc_reason;
+ 
+-	struct delayed_work	security_timer;
+ 	struct l2cap_chan	*smp;
+ 
+ 	struct list_head	chan_l;
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index 404998efa7e2..0cd7ed99558b 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -1659,19 +1659,6 @@ static void l2cap_conn_del(struct hci_conn *hcon, int err)
+ 	l2cap_conn_put(conn);
  }
  
-+static void smp_chan_destroy(struct l2cap_conn *conn)
-+{
-+	struct l2cap_chan *chan = conn->smp;
-+	struct smp_chan *smp = chan->data;
-+	bool complete;
-+
-+	BUG_ON(!smp);
-+
-+	cancel_delayed_work_sync(&smp->security_timer);
-+	/* In case the timeout freed the SMP context */
-+	if (!chan->data)
-+		return;
-+
-+	if (work_pending(&smp->distribute_work)) {
-+		cancel_work_sync(&smp->distribute_work);
-+		if (!chan->data)
-+			return;
-+	}
-+
-+	complete = test_bit(SMP_FLAG_COMPLETE, &smp->flags);
-+	mgmt_smp_complete(conn->hcon, complete);
-+
-+	kfree(smp->csrk);
-+	kfree(smp->slave_csrk);
-+
-+	crypto_free_blkcipher(smp->tfm_aes);
-+
-+	/* If pairing failed clean up any keys we might have */
-+	if (!complete) {
-+		if (smp->ltk) {
-+			list_del(&smp->ltk->list);
-+			kfree(smp->ltk);
-+		}
-+
-+		if (smp->slave_ltk) {
-+			list_del(&smp->slave_ltk->list);
-+			kfree(smp->slave_ltk);
-+		}
-+
-+		if (smp->remote_irk) {
-+			list_del(&smp->remote_irk->list);
-+			kfree(smp->remote_irk);
-+		}
-+	}
-+
-+	chan->data = NULL;
-+	kfree(smp);
-+	hci_conn_drop(conn->hcon);
-+}
-+
- static void smp_failure(struct l2cap_conn *conn, u8 reason)
- {
- 	struct hci_conn *hcon = conn->hcon;
-@@ -812,56 +862,6 @@ static struct smp_chan *smp_chan_create(struct l2cap_conn *conn)
- 	return smp;
- }
- 
--void smp_chan_destroy(struct l2cap_conn *conn)
+-static void security_timeout(struct work_struct *work)
 -{
--	struct l2cap_chan *chan = conn->smp;
--	struct smp_chan *smp = chan->data;
--	bool complete;
+-	struct l2cap_conn *conn = container_of(work, struct l2cap_conn,
+-					       security_timer.work);
 -
--	BUG_ON(!smp);
+-	BT_DBG("conn %p", conn);
 -
--	cancel_delayed_work_sync(&smp->security_timer);
--	/* In case the timeout freed the SMP context */
--	if (!chan->data)
--		return;
--
--	if (work_pending(&smp->distribute_work)) {
--		cancel_work_sync(&smp->distribute_work);
--		if (!chan->data)
--			return;
+-	if (test_and_clear_bit(HCI_CONN_LE_SMP_PEND, &conn->hcon->flags)) {
+-		smp_chan_destroy(conn);
+-		l2cap_conn_del(conn->hcon, ETIMEDOUT);
 -	}
--
--	complete = test_bit(SMP_FLAG_COMPLETE, &smp->flags);
--	mgmt_smp_complete(conn->hcon, complete);
--
--	kfree(smp->csrk);
--	kfree(smp->slave_csrk);
--
--	crypto_free_blkcipher(smp->tfm_aes);
--
--	/* If pairing failed clean up any keys we might have */
--	if (!complete) {
--		if (smp->ltk) {
--			list_del(&smp->ltk->list);
--			kfree(smp->ltk);
--		}
--
--		if (smp->slave_ltk) {
--			list_del(&smp->slave_ltk->list);
--			kfree(smp->slave_ltk);
--		}
--
--		if (smp->remote_irk) {
--			list_del(&smp->remote_irk->list);
--			kfree(smp->remote_irk);
--		}
--	}
--
--	chan->data = NULL;
--	kfree(smp);
--	hci_conn_drop(conn->hcon);
 -}
 -
- int smp_user_confirm_reply(struct hci_conn *hcon, u16 mgmt_op, __le32 passkey)
+ static void disconn_work(struct work_struct *work)
  {
- 	struct l2cap_conn *conn = hcon->l2cap_data;
-diff --git a/net/bluetooth/smp.h b/net/bluetooth/smp.h
-index 59a594278a85..cf1094617c69 100644
---- a/net/bluetooth/smp.h
-+++ b/net/bluetooth/smp.h
-@@ -128,8 +128,6 @@ bool smp_sufficient_security(struct hci_conn *hcon, u8 sec_level);
- int smp_conn_security(struct hci_conn *hcon, __u8 sec_level);
- int smp_user_confirm_reply(struct hci_conn *conn, u16 mgmt_op, __le32 passkey);
+ 	struct l2cap_conn *conn = container_of(work, struct l2cap_conn,
+@@ -6948,10 +6935,7 @@ static struct l2cap_conn *l2cap_conn_add(struct hci_conn *hcon)
+ 	INIT_LIST_HEAD(&conn->chan_l);
+ 	INIT_LIST_HEAD(&conn->users);
  
--void smp_chan_destroy(struct l2cap_conn *conn);
--
- bool smp_irk_matches(struct hci_dev *hdev, u8 irk[16], bdaddr_t *bdaddr);
- int smp_generate_rpa(struct hci_dev *hdev, u8 irk[16], bdaddr_t *rpa);
+-	if (hcon->type == LE_LINK)
+-		INIT_DELAYED_WORK(&conn->security_timer, security_timeout);
+-	else
+-		INIT_DELAYED_WORK(&conn->info_timer, l2cap_info_timeout);
++	INIT_DELAYED_WORK(&conn->info_timer, l2cap_info_timeout);
+ 
+ 	INIT_WORK(&conn->disconn_work, disconn_work);
  
 -- 
 1.9.3
