@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 7/7] android/tester: Add A2DP Suspend - Success test case
-Date: Mon, 11 Aug 2014 13:06:30 +0300
-Message-Id: <1407751590-6301-7-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 6/7]  android/tester: Add A2DP Resume - Success test case
+Date: Mon, 11 Aug 2014 13:06:29 +0300
+Message-Id: <1407751590-6301-6-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1407751590-6301-1-git-send-email-luiz.dentz@gmail.com>
 References: <1407751590-6301-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,52 +12,68 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
 ---
- android/tester-a2dp.c | 35 +++++++++++++++++++++++++++++++++++
- 1 file changed, 35 insertions(+)
+ android/tester-a2dp.c | 46 ++++++++++++++++++++++++++++++++++++++++++++++
+ android/tester-main.c | 16 ++++++++++++++++
+ android/tester-main.h |  7 +++++++
+ 3 files changed, 69 insertions(+)
 
 diff --git a/android/tester-a2dp.c b/android/tester-a2dp.c
-index 6757d75..3d006bc 100644
+index ecb0740..6757d75 100644
 --- a/android/tester-a2dp.c
 +++ b/android/tester-a2dp.c
-@@ -47,6 +47,8 @@ static const uint8_t req_close[] = { 0x40, 0x08, 0x04 };
+@@ -45,6 +45,8 @@ static const uint8_t req_open[] = { 0x30, 0x06, 0x04 };
+ static const uint8_t rsp_open[] = { 0x32, 0x06 };
+ static const uint8_t req_close[] = { 0x40, 0x08, 0x04 };
  static const uint8_t rsp_close[] = { 0x42, 0x08 };
- static const uint8_t req_start[] = { 0x40, 0x07, 0x04 };
- static const uint8_t rsp_start[] = { 0x42, 0x07 };
-+static const uint8_t req_suspend[] = { 0x50, 0x09, 0x04 };
-+static const uint8_t rsp_suspend[] = { 0x52, 0x09 };
++static const uint8_t req_start[] = { 0x40, 0x07, 0x04 };
++static const uint8_t rsp_start[] = { 0x42, 0x07 };
  
  const struct pdu {
  	const uint8_t *req;
-@@ -60,6 +62,7 @@ const struct pdu {
+@@ -57,6 +59,7 @@ const struct pdu {
+ 	{ req_cfg, sizeof(req_cfg), rsp_cfg, sizeof(rsp_cfg) },
  	{ req_open, sizeof(req_open), rsp_open, sizeof(rsp_open) },
  	{ req_close, sizeof(req_close), rsp_close, sizeof(rsp_close) },
- 	{ req_start, sizeof(req_start), rsp_start, sizeof(rsp_start) },
-+	{ req_suspend, sizeof(req_suspend), rsp_suspend, sizeof(rsp_start) },
++	{ req_start, sizeof(req_start), rsp_start, sizeof(rsp_start) },
  	{ },
  };
  
-@@ -168,6 +171,16 @@ done:
+@@ -141,6 +144,30 @@ static void a2dp_disconnect_action(void)
  	schedule_action_verification(step);
  }
  
-+static void audio_suspend_action(void)
++static void audio_resume_action(void)
 +{
 +	struct test_data *data = tester_get_data();
 +	struct step *step = g_new0(struct step, 1);
++	int err;
 +
-+	data->if_stream->common.standby(&data->if_stream->common);
++	err = data->audio->open_output_stream(data->audio,
++						0,
++						AUDIO_DEVICE_OUT_ALL_A2DP,
++						AUDIO_OUTPUT_FLAG_NONE,
++						NULL,
++						&data->if_stream);
++	if (err < 0) {
++		step->action_status = BT_STATUS_FAIL;
++		goto done;
++	}
 +
++	/* Write something to force resume */
++	data->if_stream->write(data->if_stream, &err, sizeof(err));
++
++done:
 +	schedule_action_verification(step);
 +}
 +
  static struct test_case test_cases[] = {
  	TEST_CASE_BREDRLE("A2DP Init",
  		ACTION_SUCCESS(dummy_action, NULL),
-@@ -226,6 +239,28 @@ static struct test_case test_cases[] = {
- 					BTAV_CONNECTION_STATE_DISCONNECTED),
+@@ -180,6 +207,25 @@ static struct test_case test_cases[] = {
+ 		ACTION_SUCCESS(bluetooth_disable_action, NULL),
  		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_OFF),
  	),
-+	TEST_CASE_BREDRLE("A2DP Suspend - Success",
++	TEST_CASE_BREDRLE("A2DP Resume - Success",
 +		ACTION_SUCCESS(bluetooth_enable_action, NULL),
 +		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_ON),
 +		ACTION_SUCCESS(emu_setup_powered_remote_action, NULL),
@@ -71,9 +87,6 @@ index 6757d75..3d006bc 100644
 +		ACTION_SUCCESS(audio_resume_action, NULL),
 +		CALLBACK_AV_AUDIO_STATE(CB_A2DP_AUDIO_STATE,
 +					BTAV_AUDIO_STATE_STARTED),
-+		ACTION_SUCCESS(audio_suspend_action, NULL),
-+		CALLBACK_AV_AUDIO_STATE(CB_A2DP_AUDIO_STATE,
-+					BTAV_AUDIO_STATE_STOPPED),
 +		ACTION_SUCCESS(bluetooth_disable_action, NULL),
 +		CALLBACK_AV_CONN_STATE(CB_A2DP_CONN_STATE,
 +					BTAV_CONNECTION_STATE_DISCONNECTED),
@@ -82,6 +95,75 @@ index 6757d75..3d006bc 100644
  };
  
  struct queue *get_a2dp_tests(void)
+diff --git a/android/tester-main.c b/android/tester-main.c
+index d834964..4c58015 100644
+--- a/android/tester-main.c
++++ b/android/tester-main.c
+@@ -1094,9 +1094,20 @@ static void a2dp_connection_state_cb(btav_connection_state_t state,
+ 	schedule_callback_call(step);
+ }
+ 
++static void a2dp_audio_state_cb(btav_audio_state_t state, bt_bdaddr_t *bd_addr)
++{
++	struct step *step = g_new0(struct step, 1);
++
++	step->callback = CB_A2DP_AUDIO_STATE;
++	step->callback_result.state = state;
++
++	schedule_callback_call(step);
++}
++
+ static btav_callbacks_t bta2dp_callbacks = {
+ 	.size = sizeof(bta2dp_callbacks),
+ 	.connection_state_cb = a2dp_connection_state_cb,
++	.audio_state_cb = a2dp_audio_state_cb,
+ };
+ 
+ static const btgatt_client_callbacks_t btgatt_client_callbacks = {
+@@ -1473,6 +1484,11 @@ static void teardown(const void *test_data)
+ 		data->if_hdp = NULL;
+ 	}
+ 
++	if (data->if_stream) {
++		data->audio->close_output_stream(data->audio, data->if_stream);
++		data->if_stream = NULL;
++	}
++
+ 	if (data->if_a2dp) {
+ 		data->if_a2dp->cleanup();
+ 		data->if_a2dp = NULL;
+diff --git a/android/tester-main.h b/android/tester-main.h
+index 32f173b..ad87878 100644
+--- a/android/tester-main.h
++++ b/android/tester-main.h
+@@ -185,6 +185,11 @@
+ 		.callback_result.state = cb_state, \
+ 	}
+ 
++#define CALLBACK_AV_AUDIO_STATE(cb, cb_state) { \
++		.callback = cb, \
++		.callback_result.state = cb_state, \
++	}
++
+ #define CALLBACK_DEVICE_PROPS(props, prop_cnt) \
+ 	CALLBACK_PROPS(CB_BT_REMOTE_DEVICE_PROPERTIES, props, prop_cnt)
+ 
+@@ -250,6 +255,7 @@ typedef enum {
+ 
+ 	/* A2DP cb */
+ 	CB_A2DP_CONN_STATE,
++	CB_A2DP_AUDIO_STATE,
+ 
+ 	/* Gatt client */
+ 	CB_GATTC_REGISTER_CLIENT,
+@@ -300,6 +306,7 @@ struct test_data {
+ 	const btpan_interface_t *if_pan;
+ 	const bthl_interface_t *if_hdp;
+ 	const btav_interface_t *if_a2dp;
++	struct audio_stream_out *if_stream;
+ 	const btgatt_interface_t *if_gatt;
+ 
+ 	const void *test_data;
 -- 
 1.9.3
 
