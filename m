@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: johan.hedberg@gmail.com
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 2/9] Bluetooth: Add public l2cap_conn_shutdown() API to request disconnection
-Date: Mon, 11 Aug 2014 22:06:37 +0300
-Message-Id: <1407784004-12448-3-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH v2 3/9] Bluetooth: Call l2cap_conn_shutdown() when SMP recv callback fails
+Date: Mon, 11 Aug 2014 22:06:38 +0300
+Message-Id: <1407784004-12448-4-git-send-email-johan.hedberg@gmail.com>
 In-Reply-To: <1407784004-12448-1-git-send-email-johan.hedberg@gmail.com>
 References: <1407784004-12448-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,96 +11,56 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-Since we no-longer do special handling of SMP within l2cap_core.c we
-don't have any code for calling l2cap_conn_del() when smp.c doesn't like
-the data it gets. At the same time we cannot simply export
-l2cap_conn_del() since it will try to lock the channels it calls into
-whereas we already hold the lock in the smp.c l2cap_chan callbacks (i.e.
-it'd lead to a deadlock).
-
-This patch adds a new l2cap_conn_shutdown() API which is very similar to
-l2cap_conn_del() except that it defers the call to l2cap_conn_del()
-through a workqueue, thereby making it safe to use it from an L2CAP
-channel callback.
+To restore pre-l2cap_chan functionality we should be trying to
+disconnect the connection when receviving garbage SMP data (i.e. when
+the SMP command handler fails). This patch renames the command handler
+back to smp_sig_channel() and adds a smp_recv_cb() wrapper function for
+calling it. If smp_sig_channel() fails the code calls
+l2cap_conn_shutdown().
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- include/net/bluetooth/l2cap.h |  4 ++++
- net/bluetooth/l2cap_core.c    | 25 +++++++++++++++++++++++++
- 2 files changed, 29 insertions(+)
+ net/bluetooth/smp.c | 20 +++++++++++++++++++-
+ 1 file changed, 19 insertions(+), 1 deletion(-)
 
-diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
-index bda6252e3722..40f34866b6da 100644
---- a/include/net/bluetooth/l2cap.h
-+++ b/include/net/bluetooth/l2cap.h
-@@ -625,6 +625,9 @@ struct l2cap_conn {
- 
- 	struct delayed_work	info_timer;
- 
-+	int			disconn_err;
-+	struct work_struct	disconn_work;
-+
- 	struct sk_buff		*rx_skb;
- 	__u32			rx_len;
- 	__u8			tx_ident;
-@@ -944,6 +947,7 @@ void l2cap_logical_cfm(struct l2cap_chan *chan, struct hci_chan *hchan,
- 		       u8 status);
- void __l2cap_physical_cfm(struct l2cap_chan *chan, int result);
- 
-+void l2cap_conn_shutdown(struct l2cap_conn *conn, int err);
- void l2cap_conn_get(struct l2cap_conn *conn);
- void l2cap_conn_put(struct l2cap_conn *conn);
- 
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 4de1e1827055..404998efa7e2 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -1627,6 +1627,9 @@ static void l2cap_conn_del(struct hci_conn *hcon, int err)
- 	if (work_pending(&conn->pending_rx_work))
- 		cancel_work_sync(&conn->pending_rx_work);
- 
-+	if (work_pending(&conn->disconn_work))
-+		cancel_work_sync(&conn->disconn_work);
-+
- 	l2cap_unregister_all_users(conn);
- 
- 	mutex_lock(&conn->chan_lock);
-@@ -1669,6 +1672,26 @@ static void security_timeout(struct work_struct *work)
- 	}
+diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
+index 28014ad3d2d3..7a295d7edc44 100644
+--- a/net/bluetooth/smp.c
++++ b/net/bluetooth/smp.c
+@@ -1375,7 +1375,7 @@ static int smp_cmd_sign_info(struct l2cap_conn *conn, struct sk_buff *skb)
+ 	return 0;
  }
  
-+static void disconn_work(struct work_struct *work)
-+{
-+	struct l2cap_conn *conn = container_of(work, struct l2cap_conn,
-+					       disconn_work);
-+
-+	BT_DBG("conn %p", conn);
-+
-+	l2cap_conn_del(conn->hcon, conn->disconn_err);
-+}
-+
-+void l2cap_conn_shutdown(struct l2cap_conn *conn, int err)
-+{
-+	struct hci_dev *hdev = conn->hcon->hdev;
-+
-+	BT_DBG("conn %p err %d", conn, err);
-+
-+	conn->disconn_err = err;
-+	queue_work(hdev->workqueue, &conn->disconn_work);
-+}
-+
- static void l2cap_conn_free(struct kref *ref)
+-static int smp_recv_cb(struct l2cap_chan *chan, struct sk_buff *skb)
++static int smp_sig_channel(struct l2cap_chan *chan, struct sk_buff *skb)
  {
- 	struct l2cap_conn *conn = container_of(ref, struct l2cap_conn, ref);
-@@ -6930,6 +6953,8 @@ static struct l2cap_conn *l2cap_conn_add(struct hci_conn *hcon)
- 	else
- 		INIT_DELAYED_WORK(&conn->info_timer, l2cap_info_timeout);
+ 	struct l2cap_conn *conn = chan->conn;
+ 	struct hci_conn *hcon = conn->hcon;
+@@ -1514,6 +1514,24 @@ static void smp_ready_cb(struct l2cap_chan *chan)
+ 	l2cap_chan_hold(chan);
+ }
  
-+	INIT_WORK(&conn->disconn_work, disconn_work);
++static int smp_recv_cb(struct l2cap_chan *chan, struct sk_buff *skb)
++{
++	int err;
 +
- 	skb_queue_head_init(&conn->pending_rx);
- 	INIT_WORK(&conn->pending_rx_work, process_pending_rx);
- 
++	BT_DBG("chan %p", chan);
++
++	err = smp_sig_channel(chan, skb);
++	if (err) {
++		struct l2cap_conn *conn = chan->conn;
++
++		cancel_delayed_work_sync(&conn->security_timer);
++
++		l2cap_conn_shutdown(chan->conn, -err);
++	}
++
++	return err;
++}
++
+ static struct sk_buff *smp_alloc_skb_cb(struct l2cap_chan *chan,
+ 					unsigned long hdr_len,
+ 					unsigned long len, int nb)
 -- 
 1.9.3
 
