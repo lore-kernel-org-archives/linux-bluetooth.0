@@ -1,27 +1,30 @@
 Return-Path: <cyrus@holtmann.org>
-From: Arman Uguray <armansito@chromium.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Arman Uguray <armansito@chromium.org>
-Subject: [RFC v2 0/1] doc/gatt-api: New API properties and methods for the GATT D-Bus API.
-Date: Mon, 11 Aug 2014 13:37:06 -0700
-Message-Id: <1407789427-7118-1-git-send-email-armansito@chromium.org>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.6\))
+Subject: Re: pull-request: wpan-next 2014-08-11
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20140811113900.GA24354@omega>
+Date: Mon, 11 Aug 2014 12:24:15 -0700
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>,
+	linux-wpan@vger.kernel.org, kernel@pengutronix.de
+Message-Id: <726D299E-45F1-4D51-8AB9-FEF53D30DEFF@holtmann.org>
+References: <1407756310-26592-1-git-send-email-alex.aring@gmail.com> <20140811113900.GA24354@omega>
+To: Alexander Aring <alex.aring@gmail.com>
+Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch set addressed further feedback:
+Hi Alex,
 
-* v2:
-    - Added a "NotAuthorized" error for the ReadValue/WriteValue methods. This
-      is in addition to the "NotPaired" error.
+>> this is a pull request for the bluetooth-next tree. The pull request contains
+>> some cleanup patches for mac802154 and the ieee802154 6lowpan part.
+> 
+> I fight with my git setup and this was a complete fail.
+> 
+> Sorry, for the noise.
 
-    - Added a "InvalidValueLength" error to the WriteValue methods.
+no problem. And I am totally fine if you just send patch series using git send-email. I can as easily apply them as a pull request.
 
-Arman Uguray (1):
-  doc/gatt-api: New API properties and methods for the GATT D-Bus API.
+Regards
 
- doc/gatt-api.txt | 122 +++++++++++++++++++++++++++++++++++++++++++++++++------
- 1 file changed, 110 insertions(+), 12 deletions(-)
-
--- 
-2.0.0.526.g5318336
+Marcel
 
