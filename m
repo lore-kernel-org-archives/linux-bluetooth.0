@@ -1,47 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Gu, Chao Jie" <chao.jie.gu@intel.com>
-To: Arman Uguray <armansito@chromium.org>, Marcel Holtmann
-	<marcel@holtmann.org>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: RE: [RFC v1 1/1] doc/gatt-api: New API properties and methods for
- the GATT D-Bus API.
-Date: Mon, 11 Aug 2014 09:56:28 +0000
-Message-ID: <3D02B219753AD44CBDDDE484323B1774112ECA19@SHSMSX104.ccr.corp.intel.com>
-References: <1405986034-29122-1-git-send-email-armansito@chromium.org>
-	<1405986034-29122-2-git-send-email-armansito@chromium.org>
-	<3D02B219753AD44CBDDDE484323B1774112D2C2C@SHSMSX104.ccr.corp.intel.com>
-	<CAHrH25QAR=y6Dtn4Y-t=EX1h6Oxn9ir7rWft2m+mVsBHfab1Wg@mail.gmail.com>
-	<409335B4-82B3-40D2-970A-D39416F02591@holtmann.org>
-	<CAHrH25To=NvJC+4E6U-2S5pMc1qORvKOpbG2atY9=CFn4Zwcew@mail.gmail.com>
-	<3D02B219753AD44CBDDDE484323B1774112D2F48@SHSMSX104.ccr.corp.intel.com>
-	<CAHrH25RkJ8x0SEx5g89496i=iWazorTpvXg7jySdUfBqMht1Pg@mail.gmail.com>
-	<CB57FC0A-030C-498D-A3E3-988BEF192ACB@holtmann.org>
- <CAHrH25TDf0OeVnD+vOjUqKB_L=bFb3+qvu3LsUZ=_CXu21Fd7w@mail.gmail.com>
-In-Reply-To: <CAHrH25TDf0OeVnD+vOjUqKB_L=bFb3+qvu3LsUZ=_CXu21Fd7w@mail.gmail.com>
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
+From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+Subject: [PATCH] android/pixit: TSPX_security_enabled is not default
+Date: Mon, 11 Aug 2014 10:54:51 +0200
+Message-Id: <1407747291-12996-1-git-send-email-lukasz.rymanowski@tieto.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-SGkgbWFyY2VsLA0KCUZvciB0aGUgTmV3IEdhdHQgREJ1cyBBUEkgZGVmaW5pdGlvbiBpcyBpbXBv
-cnRhbnQgZm9yIHVzZXIgdG8gdXNlLCBzbyB0aHJvdWdoIHRoZSBkaXNjdXNzaW9uLCBhcm1hbidz
-IHByb3Bvc2FsIG1ha2UgbXVjaCBzZW5zZS4NCglXaWxsIHRoaXMgcHJvcG9zYWwgYmUgYWNjZXB0
-ZWQgYW5kIHdoZW4gd2lpbCBibHVleiBhbm5vdW5jZXMgbmV3IEdhdHQgQVBJID8NCiANClRoYW5r
-cw0KQ2hhb2ppZQ0KPiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBsaW51eC1i
-bHVldG9vdGgtb3duZXJAdmdlci5rZXJuZWwub3JnDQo+IFttYWlsdG86bGludXgtYmx1ZXRvb3Ro
-LW93bmVyQHZnZXIua2VybmVsLm9yZ10gT24gQmVoYWxmIE9mIEFybWFuIFVndXJheQ0KPiBTZW50
-OiBGcmlkYXksIEF1Z3VzdCAwMSwgMjAxNCAxMToxMSBBTQ0KPiBUbzogTWFyY2VsIEhvbHRtYW5u
-DQo+IENjOiBHdSwgQ2hhbyBKaWU7IGxpbnV4LWJsdWV0b290aEB2Z2VyLmtlcm5lbC5vcmcNCj4g
-U3ViamVjdDogUmU6IFtSRkMgdjEgMS8xXSBkb2MvZ2F0dC1hcGk6IE5ldyBBUEkgcHJvcGVydGll
-cyBhbmQgbWV0aG9kcyBmb3IgdGhlDQo+IEdBVFQgRC1CdXMgQVBJLg0KPiANCj4gSGkgTWFyY2Vs
-LA0KPiANCj4gSSB0aGluayB0aGlzIGFsbCBtYWtlcyBzZW5zZSBhbmQgdGhlIEFQSSBpcyBpbiBh
-IHJlYXNvbmFibGUgc2hhcGUgbm93Lg0KPiBBbGwgb2YgdGhlIHByb3BlcnRpZXMvbWV0aG9kcyBj
-YW4gaW50ZWdyYXRlIG5pY2VseSB3aXRoIGNsaWVudCBhbmQgc2VydmVyDQo+IGltcGxlbWVudGF0
-aW9ucyAod2l0aCBvbmUgb3IgdHdvIHByb3BlcnRpZXMgYmVpbmcgb3B0aW9uYWwgZm9yIHNlcnZl
-cikuIEkgdGhpbmsNCj4gd2UgY2FuIHJldmlzaXQgR2F0dE1hbmFnZXIxIG9uY2Ugd2Ugc3RhcnQg
-dGhpbmtpbmcgYWJvdXQgdGhlIHNlcnZlciBjb2RlIGJ1dA0KPiBmb3Igbm93IEkgdGhpbmsgdGhp
-cyBpcyBnb29kIGZvciBjbGllbnQuDQo+IEFuZCwgb2YgY291cnNlLCB3ZSBjYW4gYWx3YXlzIGFk
-ZCBuZXcgcHJvcGVydGllcy9tZXRob2RzIGxhdGVyLg0KPiAtLQ0KPiBUbyB1bnN1YnNjcmliZSBm
-cm9tIHRoaXMgbGlzdDogc2VuZCB0aGUgbGluZSAidW5zdWJzY3JpYmUgbGludXgtYmx1ZXRvb3Ro
-IiBpbiB0aGUNCj4gYm9keSBvZiBhIG1lc3NhZ2UgdG8gbWFqb3Jkb21vQHZnZXIua2VybmVsLm9y
-ZyBNb3JlIG1ham9yZG9tbyBpbmZvIGF0DQo+IGh0dHA6Ly92Z2VyLmtlcm5lbC5vcmcvbWFqb3Jk
-b21vLWluZm8uaHRtbA0K
+Mark that TSPX_security_enable PIXIT is changed compared to default
+settings
+---
+ android/pixit-l2cap.txt | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/android/pixit-l2cap.txt b/android/pixit-l2cap.txt
+index 914a995..c63704d 100644
+--- a/android/pixit-l2cap.txt
++++ b/android/pixit-l2cap.txt
+@@ -12,7 +12,7 @@ Parameter Name                                         Value
+ TSPX_bd_addr_iut                                       112233445566 (*&)
+ TSPX_client_class_of_device                            100104
+ TSPX_server_class_of_device                            100104
+-TSPX_security_enabled                                  TRUE
++TSPX_security_enabled                                  TRUE (*)
+ TSPX_delete_link_key                                   FALSE
+ TSPX_pin_code                                          0000
+ TSPX_flushto                                           FFFF
+-- 
+1.8.4
+
