@@ -1,45 +1,28 @@
 Return-Path: <cyrus@holtmann.org>
-From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH] Bluetooth: Fix ERTM L2CAP resend packet
-Date: Tue, 12 Aug 2014 13:04:26 +0200
-Message-Id: <1407841466-24720-1-git-send-email-lukasz.rymanowski@tieto.com>
+Date: Tue, 12 Aug 2014 10:58:59 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH BlueZ] Revert "gdbus: Don't include just added interfaces
+ in GetManagedObjects"
+Message-ID: <20140812075859.GA16197@t440s.ger.corp.intel.com>
+References: <1407769117-21353-1-git-send-email-luiz.dentz@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1407769117-21353-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-I-Frame which is going to be resend already has FCS field added and set
-(if it was required). Adding additional FCS field calculated from data +
-old FCS in resend function is incorrect.
+Hi Luiz,
 
-This patch fix that.
+On Mon, Aug 11, 2014, Luiz Augusto von Dentz wrote:
+> This actually creates a problem since the code now does flush any pending
+> message on the queue any signal will be send right away before the
+> actual reply to GetManagedObjects which will not contain those interfaces.
+> ---
+>  gdbus/object.c | 8 +-------
+>  1 file changed, 1 insertion(+), 7 deletions(-)
 
-Cached on PTS testing.
+Applied. Thanks.
 
-Signed-off-by: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
----
- net/bluetooth/l2cap_core.c | 7 ++++---
- 1 file changed, 4 insertions(+), 3 deletions(-)
-
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 0cd7ed9..7b0d744 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -1968,10 +1968,11 @@ static void l2cap_ertm_resend(struct l2cap_chan *chan)
- 					   tx_skb->data + L2CAP_HDR_SIZE);
- 		}
- 
-+		/* Update FCS */
- 		if (chan->fcs == L2CAP_FCS_CRC16) {
--			u16 fcs = crc16(0, (u8 *) tx_skb->data, tx_skb->len);
--			put_unaligned_le16(fcs, skb_put(tx_skb,
--							L2CAP_FCS_SIZE));
-+			u16 fcs = crc16(0, (u8 *)tx_skb->data, tx_skb->len -
-+					L2CAP_FCS_SIZE);
-+			put_unaligned_le16(fcs, tx_skb->tail - L2CAP_FCS_SIZE);
- 		}
- 
- 		l2cap_do_send(chan, tx_skb);
--- 
-1.8.4
-
+Johan
