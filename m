@@ -1,30 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
-From: Sebastian Chlad <sebastian.chlad@tieto.com>
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Sebastian Chlad <sebastian.chlad@tieto.com>
-Subject: [PATCH] Interim test results for L2CAP
-Date: Tue, 12 Aug 2014 15:38:05 +0200
-Message-Id: <1407850686-26782-1-git-send-email-sebastian.chlad@tieto.com>
-In-Reply-To: <1407334287-6721-1-git-send-email-sebastian.chlad@tieto.com>
-References: <1407334287-6721-1-git-send-email-sebastian.chlad@tieto.com>
+Subject: [PATCHv3 4/5] monitor: Handle default switch case
+Date: Tue, 12 Aug 2014 15:46:35 +0300
+Message-Id: <1407847596-14781-4-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1407847596-14781-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <20140812090449.GA18519@t440s.ger.corp.intel.com>
+ <1407847596-14781-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Tests run on a kernel with L.Rymanowski's patch:
-"Bluetooth: Fix ERTM L2CAP resend packet"
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Moreover instructions updated for CMC tests. Test run with -z option.
+Fixes issues with junk packets.
+---
+ monitor/analyze.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-LE tests are passing. Test round was affected by the test environment.
-
-Sebastian Chlad (1):
-  android/pts: Update PTS files for L2CAP
-
- android/pics-l2cap.txt  | 11 +++++++----
- android/pixit-l2cap.txt |  2 +-
- android/pts-l2cap.txt   | 45 ++++++++++++++++++++++++---------------------
- 3 files changed, 32 insertions(+), 26 deletions(-)
-
+diff --git a/monitor/analyze.c b/monitor/analyze.c
+index b027b3c..4c52d12 100644
+--- a/monitor/analyze.c
++++ b/monitor/analyze.c
+@@ -309,6 +309,9 @@ void analyze_trace(const char *path)
+ 		case BTSNOOP_OPCODE_SCO_RX_PKT:
+ 			sco_pkt(&tv, index, buf, pktlen);
+ 			break;
++		default:
++			fprintf(stderr, "Wrong opcode %u", opcode);
++			goto done;
+ 		}
+ 
+ 		num_packets++;
 -- 
-1.8.5.3
+1.9.1
 
