@@ -1,70 +1,55 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <53EB6393.8070107@linux.intel.com>
-References: <1407777812-15652-1-git-send-email-lukasz.rymanowski@tieto.com>
-	<53EB6393.8070107@linux.intel.com>
-Date: Wed, 13 Aug 2014 17:30:55 +0300
-Message-ID: <CABBYNZ+hYxYcU-heUFHpvyHkCPv7Qk+xtgvedcqAWuXF8-TWmw@mail.gmail.com>
-Subject: Re: [PATCH] android/health: Fix reconnect scenario
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
-Cc: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+Subject: [PATCH] Bluetooth: Improve data packing in SAR mode
+Date: Wed, 13 Aug 2014 16:01:41 +0200
+Message-Id: <1407938501-25659-1-git-send-email-lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+There is no need to decrease pdu size with L2CAP SDU lenght in Start
+L2CAP SDU frame. Start packtet is just 2 bytes longer as specified and
+we can keep payload as long as possible.
 
-On Wed, Aug 13, 2014 at 4:09 PM, Ravi kumar Veeramally
-<ravikumar.veeramally@linux.intel.com> wrote:
-> ping.
->
->
-> On 08/11/2014 08:23 PM, Lukasz Rymanowski wrote:
->>
->> When trying to reconnect to HDP device, BfA tries to connect MDL even
->> MCL is not connected.
->>
->> D/BlueZ   ( 2218):
->> external/bluetooth/bluez/android/hal-health.c:connect_channel()
->> I/bluetoothd( 2220): bluetoothd[2221]:
->> external/bluetooth/bluez/android/health.c:bt_health_connect_channel()
->> I/bluetoothd( 2220): bluetoothd[2221]:
->> external/bluetooth/bluez/android/health.c:create_channel() mdep 1
->> D/BlueZ   ( 2218):
->> external/bluetooth/bluez/android/hal-bluetooth.c:handle_acl_state_changed()
->> state 0
->> I/bluetoothd( 2220): bluetoothd[2221]:
->> external/bluetooth/bluez/android/mcap-lib.c:mcap_create_mdl()
->> I/bluetoothd( 2220): bluetoothd[2221]: health: error creating mdl MCL is
->> not connected
->>
->> This patch makes sure that MCL is connected before trying to connect
->> MDL.
->> ---
->>   android/health.c | 2 +-
->>   1 file changed, 1 insertion(+), 1 deletion(-)
->>
->> diff --git a/android/health.c b/android/health.c
->> index 2d80365..f4edc3e 100644
->> --- a/android/health.c
->> +++ b/android/health.c
->> @@ -1949,7 +1949,7 @@ static void bt_health_connect_channel(const void
->> *buf, uint16_t len)
->>                 }
->>         }
->>   -     if (!dev->mcl) {
->> +       if (!dev->mcl || (dev->mcl && !dev->mcl_conn)) {
->>                 if (connect_mcl(channel) < 0) {
->>                         error("health: error retrieving HDP SDP record");
->>                         goto fail;
->
->
-> Ravi.
+Signed-off-by: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+---
+When testing SAR L2CAP against PTS, L2CAP channel is usually
+configured in that way, that SDU = MPS * 3. PTS expets then 3
+I-Frames from IUT: Start, Continuation and End frame.
 
-Pushed, thanks.
+Without this fix, we sent 4 I-Frames. We could pass a test
+by using -b option in l2test and send just two bytes less than
+SDU length but it was hakish :) With this patch no need to use -b
+option.
 
+ net/bluetooth/l2cap_core.c | 5 +----
+ 1 file changed, 1 insertion(+), 4 deletions(-)
 
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index 7b0d744..8fe9f4b 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -2276,7 +2276,6 @@ static int l2cap_segment_sdu(struct l2cap_chan *chan,
+ 	} else {
+ 		sar = L2CAP_SAR_START;
+ 		sdu_len = len;
+-		pdu_len -= L2CAP_SDULEN_SIZE;
+ 	}
+ 
+ 	while (len > 0) {
+@@ -2291,10 +2290,8 @@ static int l2cap_segment_sdu(struct l2cap_chan *chan,
+ 		__skb_queue_tail(seg_queue, skb);
+ 
+ 		len -= pdu_len;
+-		if (sdu_len) {
++		if (sdu_len)
+ 			sdu_len = 0;
+-			pdu_len += L2CAP_SDULEN_SIZE;
+-		}
+ 
+ 		if (len <= pdu_len) {
+ 			sar = L2CAP_SAR_END;
 -- 
-Luiz Augusto von Dentz
+1.8.4
+
