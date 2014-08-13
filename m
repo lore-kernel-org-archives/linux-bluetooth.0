@@ -1,169 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 13 Aug 2014 14:49:56 +0530
-From: Himangi Saraogi <himangi774@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>,
-	Gustavo Padovan <gustavo@padovan.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc: Julia Lawall <julia.lawall@lip6.fr>
-Subject: [PATCH] drivers/bluetooth: Remove typedef bt3c_info_t
-Message-ID: <20140813091956.GA3117@himangi-Dell>
+Date: Wed, 13 Aug 2014 12:19:13 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCHv3 4/5] monitor: Handle default switch case
+Message-ID: <20140813091913.GA19215@t440s.lan>
+References: <20140812090449.GA18519@t440s.ger.corp.intel.com>
+ <1407847596-14781-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <1407847596-14781-4-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1407847596-14781-4-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The Linux kernel coding style guidelines suggest not using typedefs
-for structure types. This patch gets rid of the typedef for
-bt3c_info_t. Also, the name of the struct is changed to drop the _t,
-to make the name look less typedef-like.
+Hi Andrei,
 
-The following Coccinelle semantic patch detects the case:
+On Tue, Aug 12, 2014, Andrei Emeltchenko wrote:
+> Fixes issues with junk packets.
+> ---
+>  monitor/analyze.c | 3 +++
+>  1 file changed, 3 insertions(+)
 
-@tn@
-identifier i;
-type td;
-@@
+I've applied the four other patches, but there's a small fix needed for
+this one:
 
--typedef
- struct i { ... }
--td
- ;
+> +		default:
+> +			fprintf(stderr, "Wrong opcode %u", opcode);
+> +			goto done;
 
-@@
-type tn.td;
-identifier tn.i;
-@@
+Seems like you've forgotten a \n at the end of the string.
 
--td
-+ struct i
-
-Signed-off-by: Himangi Saraogi <himangi774@gmail.com>
-Acked-by: Julia Lawall <julia.lawall@lip6.fr>
----
- drivers/bluetooth/bt3c_cs.c | 27 ++++++++++++++-------------
- 1 file changed, 14 insertions(+), 13 deletions(-)
-
-diff --git a/drivers/bluetooth/bt3c_cs.c b/drivers/bluetooth/bt3c_cs.c
-index 1d82721..4f7e8d4 100644
---- a/drivers/bluetooth/bt3c_cs.c
-+++ b/drivers/bluetooth/bt3c_cs.c
-@@ -67,7 +67,7 @@ MODULE_FIRMWARE("BT3CPCC.bin");
- /* ======================== Local structures ======================== */
- 
- 
--typedef struct bt3c_info_t {
-+struct bt3c_info {
- 	struct pcmcia_device *p_dev;
- 
- 	struct hci_dev *hdev;
-@@ -80,7 +80,7 @@ typedef struct bt3c_info_t {
- 	unsigned long rx_state;
- 	unsigned long rx_count;
- 	struct sk_buff *rx_skb;
--} bt3c_info_t;
-+};
- 
- 
- static int bt3c_config(struct pcmcia_device *link);
-@@ -175,7 +175,7 @@ static int bt3c_write(unsigned int iobase, int fifo_size, __u8 *buf, int len)
- }
- 
- 
--static void bt3c_write_wakeup(bt3c_info_t *info)
-+static void bt3c_write_wakeup(struct bt3c_info *info)
- {
- 	if (!info) {
- 		BT_ERR("Unknown device");
-@@ -214,7 +214,7 @@ static void bt3c_write_wakeup(bt3c_info_t *info)
- }
- 
- 
--static void bt3c_receive(bt3c_info_t *info)
-+static void bt3c_receive(struct bt3c_info *info)
- {
- 	unsigned int iobase;
- 	int size = 0, avail;
-@@ -336,7 +336,7 @@ static void bt3c_receive(bt3c_info_t *info)
- 
- static irqreturn_t bt3c_interrupt(int irq, void *dev_inst)
- {
--	bt3c_info_t *info = dev_inst;
-+	struct bt3c_info *info = dev_inst;
- 	unsigned int iobase;
- 	int iir;
- 	irqreturn_t r = IRQ_NONE;
-@@ -388,7 +388,7 @@ static irqreturn_t bt3c_interrupt(int irq, void *dev_inst)
- 
- static int bt3c_hci_flush(struct hci_dev *hdev)
- {
--	bt3c_info_t *info = hci_get_drvdata(hdev);
-+	struct bt3c_info *info = hci_get_drvdata(hdev);
- 
- 	/* Drop TX queue */
- 	skb_queue_purge(&(info->txq));
-@@ -418,7 +418,7 @@ static int bt3c_hci_close(struct hci_dev *hdev)
- 
- static int bt3c_hci_send_frame(struct hci_dev *hdev, struct sk_buff *skb)
- {
--	bt3c_info_t *info = hci_get_drvdata(hdev);
-+	struct bt3c_info *info = hci_get_drvdata(hdev);
- 	unsigned long flags;
- 
- 	switch (bt_cb(skb)->pkt_type) {
-@@ -451,7 +451,8 @@ static int bt3c_hci_send_frame(struct hci_dev *hdev, struct sk_buff *skb)
- /* ======================== Card services HCI interaction ======================== */
- 
- 
--static int bt3c_load_firmware(bt3c_info_t *info, const unsigned char *firmware,
-+static int bt3c_load_firmware(struct bt3c_info *info,
-+			      const unsigned char *firmware,
- 			      int count)
- {
- 	char *ptr = (char *) firmware;
-@@ -536,7 +537,7 @@ error:
- }
- 
- 
--static int bt3c_open(bt3c_info_t *info)
-+static int bt3c_open(struct bt3c_info *info)
- {
- 	const struct firmware *firmware;
- 	struct hci_dev *hdev;
-@@ -603,7 +604,7 @@ error:
- }
- 
- 
--static int bt3c_close(bt3c_info_t *info)
-+static int bt3c_close(struct bt3c_info *info)
- {
- 	struct hci_dev *hdev = info->hdev;
- 
-@@ -620,7 +621,7 @@ static int bt3c_close(bt3c_info_t *info)
- 
- static int bt3c_probe(struct pcmcia_device *link)
- {
--	bt3c_info_t *info;
-+	struct bt3c_info *info;
- 
- 	/* Create new info device */
- 	info = devm_kzalloc(&link->dev, sizeof(*info), GFP_KERNEL);
-@@ -683,7 +684,7 @@ static int bt3c_check_config_notpicky(struct pcmcia_device *p_dev,
- 
- static int bt3c_config(struct pcmcia_device *link)
- {
--	bt3c_info_t *info = link->priv;
-+	struct bt3c_info *info = link->priv;
- 	int i;
- 	unsigned long try;
- 
-@@ -724,7 +725,7 @@ failed:
- 
- static void bt3c_release(struct pcmcia_device *link)
- {
--	bt3c_info_t *info = link->priv;
-+	struct bt3c_info *info = link->priv;
- 
- 	bt3c_close(info);
- 
--- 
-1.9.1
+Johan
