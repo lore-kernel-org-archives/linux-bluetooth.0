@@ -3,153 +3,136 @@ From: Vikrampal Yadav <vikram.pal@samsung.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: luiz.dentz@gmail.com, d.kasatkin@samsung.com,
 	vikram.pal@samsung.com, cpgs@samsung.com
-Subject: [PATCH v3 2/6] monitor: Add AV/C commands related macros and helper
- functions
-Date: Wed, 13 Aug 2014 15:13:31 +0530
-Message-id: <1407923015-26468-2-git-send-email-vikram.pal@samsung.com>
-In-reply-to: <1407923015-26468-1-git-send-email-vikram.pal@samsung.com>
-References: <1407923015-26468-1-git-send-email-vikram.pal@samsung.com>
+Subject: [PATCH v3 1/6] monitor: Add AVRCP specific AV/C commands support
+Date: Wed, 13 Aug 2014 15:13:30 +0530
+Message-id: <1407923015-26468-1-git-send-email-vikram.pal@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Added AV/C commands related stuffs such as macros and helper
-functions in Bluetooth monitor.
+Support for decoding AVRCP specific AV/C commands added in
+Bluetooth monitor.
 ---
- monitor/avctp.c | 111 ++++++++++++++++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 108 insertions(+), 3 deletions(-)
+ monitor/avctp.c | 98 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 97 insertions(+), 1 deletion(-)
 
 diff --git a/monitor/avctp.c b/monitor/avctp.c
-index c151c08..f3ce40e 100644
+index d7f461f..c151c08 100644
 --- a/monitor/avctp.c
 +++ b/monitor/avctp.c
-@@ -43,19 +43,124 @@
+@@ -43,10 +43,101 @@
  #include "sdp.h"
  #include "avctp.h"
  
-+/* ctype entries */
-+#define AVC_CTYPE_CONTROL		0x0
-+#define AVC_CTYPE_STATUS		0x1
-+#define AVC_CTYPE_SPECIFIC_INQUIRY	0x2
-+#define AVC_CTYPE_NOTIFY		0x3
-+#define AVC_CTYPE_GENERAL_INQUIRY	0x4
-+#define AVC_CTYPE_NOT_IMPLEMENTED	0x8
-+#define AVC_CTYPE_ACCEPTED		0x9
-+#define AVC_CTYPE_REJECTED		0xA
-+#define AVC_CTYPE_IN_TRANSITION		0xB
-+#define AVC_CTYPE_STABLE		0xC
-+#define AVC_CTYPE_CHANGED		0xD
-+#define AVC_CTYPE_INTERIM		0xF
++static const char *ctype2str(uint8_t ctype)
++{
++	return "Unknown";
++}
 +
-+/* subunit type */
-+#define AVC_SUBUNIT_MONITOR		0x00
-+#define AVC_SUBUNIT_AUDIO		0x01
-+#define AVC_SUBUNIT_PRINTER		0x02
-+#define AVC_SUBUNIT_DISC		0x03
-+#define AVC_SUBUNIT_TAPE		0x04
-+#define AVC_SUBUNIT_TURNER		0x05
-+#define AVC_SUBUNIT_CA			0x06
-+#define AVC_SUBUNIT_CAMERA		0x07
-+#define AVC_SUBUNIT_PANEL		0x09
-+#define AVC_SUBUNIT_BULLETIN_BOARD	0x0a
-+#define AVC_SUBUNIT_CAMERA_STORAGE	0x0b
-+#define AVC_SUBUNIT_VENDOR_UNIQUE	0x0c
-+#define AVC_SUBUNIT_EXTENDED		0x1e
-+#define AVC_SUBUNIT_UNIT		0x1f
++static const char *subunit2str(uint8_t subunit)
++{
++	return "Reserved";
++}
 +
-+/* opcodes */
-+#define AVC_OP_VENDORDEP		0x00
-+#define AVC_OP_UNITINFO			0x30
-+#define AVC_OP_SUBUNITINFO		0x31
-+#define AVC_OP_PASSTHROUGH		0x7c
++static const char *opcode2str(uint8_t opcode)
++{
++	return "Unknown";
++}
 +
- static const char *ctype2str(uint8_t ctype)
- {
--	return "Unknown";
-+	switch (ctype & 0x0f) {
-+	case AVC_CTYPE_CONTROL:
-+		return "Control";
-+	case AVC_CTYPE_STATUS:
-+		return "Status";
-+	case AVC_CTYPE_SPECIFIC_INQUIRY:
-+		return "Specific Inquiry";
-+	case AVC_CTYPE_NOTIFY:
-+		return "Notify";
-+	case AVC_CTYPE_GENERAL_INQUIRY:
-+		return "General Inquiry";
-+	case AVC_CTYPE_NOT_IMPLEMENTED:
-+		return "Not Implemented";
-+	case AVC_CTYPE_ACCEPTED:
-+		return "Accepted";
-+	case AVC_CTYPE_REJECTED:
-+		return "Rejected";
-+	case AVC_CTYPE_IN_TRANSITION:
-+		return "In Transition";
-+	case AVC_CTYPE_STABLE:
-+		return "Stable";
-+	case AVC_CTYPE_CHANGED:
-+		return "Changed";
-+	case AVC_CTYPE_INTERIM:
-+		return "Interim";
-+	default:
-+		return "Unknown";
++static void avrcp_passthrough_packet(const struct l2cap_frame *frame)
++{
++}
++
++static void avrcp_pdu_packet(const struct l2cap_frame *frame, uint8_t ctype,
++				uint8_t indent)
++{
++}
++
++static void avrcp_control_packet(const struct l2cap_frame *frame)
++{
++	uint8_t ctype, address, subunit, opcode, indent = 2;
++	struct l2cap_frame avrcp_frame;
++
++	ctype = *((uint8_t *) frame->data);
++	address = *((uint8_t *) (frame->data + 1));
++	opcode = *((uint8_t *) (frame->data + 2));
++
++	print_field("AV/C: %s: address 0x%02x opcode 0x%02x",
++				ctype2str(ctype), address, opcode);
++
++	subunit = address >> 3;
++
++	print_field("%*cSubunit: %s", indent, ' ', subunit2str(subunit));
++
++	print_field("%*cOpcode: %s", indent, ' ', opcode2str(opcode));
++
++	/* Skip non-panel subunit packets */
++	if (subunit != 0x09) {
++		packet_hexdump(frame->data, frame->size);
++		return;
 +	}
- }
- 
- static const char *subunit2str(uint8_t subunit)
- {
--	return "Reserved";
-+	switch (subunit) {
-+	case AVC_SUBUNIT_MONITOR:
-+		return "Monitor";
-+	case AVC_SUBUNIT_AUDIO:
-+		return "Audio";
-+	case AVC_SUBUNIT_PRINTER:
-+		return "Printer";
-+	case AVC_SUBUNIT_DISC:
-+		return "Disc";
-+	case AVC_SUBUNIT_TAPE:
-+		return "Tape";
-+	case AVC_SUBUNIT_TURNER:
-+		return "Turner";
-+	case AVC_SUBUNIT_CA:
-+		return "CA";
-+	case AVC_SUBUNIT_CAMERA:
-+		return "Camera";
-+	case AVC_SUBUNIT_PANEL:
-+		return "Panel";
-+	case AVC_SUBUNIT_BULLETIN_BOARD:
-+		return "Bulleting Board";
-+	case AVC_SUBUNIT_CAMERA_STORAGE:
-+		return "Camera Storage";
-+	case AVC_SUBUNIT_VENDOR_UNIQUE:
-+		return "Vendor Unique";
-+	case AVC_SUBUNIT_EXTENDED:
-+		return "Extended to next byte";
-+	case AVC_SUBUNIT_UNIT:
-+		return "Unit";
-+	default:
-+		return "Reserved";
++
++	/* Not implemented should not contain any operand */
++	if (ctype == 0x8) {
++		packet_hexdump(frame->data, frame->size);
++		return;
 +	}
- }
- 
- static const char *opcode2str(uint8_t opcode)
- {
--	return "Unknown";
++
 +	switch (opcode) {
-+	case AVC_OP_VENDORDEP:
-+		return "Vendor Dependent";
-+	case AVC_OP_UNITINFO:
-+		return "Unit Info";
-+	case AVC_OP_SUBUNITINFO:
-+		return "Subunit Info";
-+	case AVC_OP_PASSTHROUGH:
-+		return "Passthrough";
++	case 0x7c:
++		avrcp_passthrough_packet(frame);
++		break;
++	case 0x00:
++		print_field("%*cCompany ID: 0x%02x%02x%02x", indent, ' ',
++					*((uint8_t *) (frame->data + 3)),
++					*((uint8_t *) (frame->data + 4)),
++					*((uint8_t *) (frame->data + 5)));
++
++		l2cap_frame_pull(&avrcp_frame, frame, 6);
++		avrcp_pdu_packet(&avrcp_frame, ctype, 10);
++		break;
 +	default:
-+		return "Unknown";
++		packet_hexdump(frame->data, frame->size);
 +	}
- }
++}
++
++static void avrcp_browsing_packet(const struct l2cap_frame *frame, uint8_t hdr)
++{
++}
++
++static void avrcp_packet(const struct l2cap_frame *frame, uint8_t hdr)
++{
++	switch (frame->psm) {
++	case 0x17:
++		avrcp_control_packet(frame);
++		break;
++	case 0x1B:
++		avrcp_browsing_packet(frame, hdr);
++		break;
++	default:
++		packet_hexdump(frame->data, frame->size);
++	}
++}
++
+ void avctp_packet(const struct l2cap_frame *frame)
+ {
+ 	uint8_t hdr;
+ 	uint16_t pid;
++	struct l2cap_frame avctp_frame;
+ 	const char *pdu_color;
  
- static void avrcp_passthrough_packet(const struct l2cap_frame *frame)
+ 	if (frame->size < 3) {
+@@ -70,5 +161,10 @@ void avctp_packet(const struct l2cap_frame *frame)
+ 				hdr & 0x02 ? "Response" : "Command",
+ 				hdr & 0x0c, hdr >> 4, pid);
+ 
+-	packet_hexdump(frame->data + 3, frame->size - 3);
++	l2cap_frame_pull(&avctp_frame, frame, 3);
++
++	if (pid == 0x110e || pid == 0x110c)
++		avrcp_packet(&avctp_frame, hdr);
++	else
++		packet_hexdump(frame->data + 3, frame->size - 3);
+ }
 -- 
 1.9.1
 
