@@ -1,69 +1,54 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=windows-1252
+Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.6\))
-Subject: Re: [PATCH] Bluetooth: Fix ERTM L2CAP resend packet
+Subject: Re: [PATCH] Bluetooth: bluecard_cs.c: Remove typedef bluecard_info_t
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1407841466-24720-1-git-send-email-lukasz.rymanowski@tieto.com>
-Date: Wed, 13 Aug 2014 10:23:23 -0700
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <D9DCCFA5-D511-4211-B4B1-11CE8587A635@holtmann.org>
-References: <1407841466-24720-1-git-send-email-lukasz.rymanowski@tieto.com>
-To: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <20140813092331.GA3272@himangi-Dell>
+Date: Wed, 13 Aug 2014 10:18:11 -0700
+Cc: "Gustavo F. Padovan" <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Julia Lawall <julia.lawall@lip6.fr>
+Message-Id: <D0003696-4642-4804-A119-B10454751E23@holtmann.org>
+References: <20140813092331.GA3272@himangi-Dell>
+To: Himangi Saraogi <himangi774@gmail.com>
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Lukasz,
+Hi Himangi,
 
-> I-Frame which is going to be resend already has FCS field added and set
-> (if it was required). Adding additional FCS field calculated from data +
-> old FCS in resend function is incorrect.
+> The Linux kernel coding style guidelines suggest not using typedefs
+> for structure types. This patch gets rid of the typedef for
+> bluecard_info_t. Also, the name of the struct is changed to drop the _t,
+> to make the name look less typedef-like.
 > 
-> This patch fix that.
+> The following Coccinelle semantic patch detects the case:
 > 
-> Cached on PTS testing.
-
-"Issue has been found during PTS testing."
-
-No caching ;)
-
+> @tn@
+> identifier i;
+> type td;
+> @@
 > 
-> Signed-off-by: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+> -typedef
+> struct i { ... }
+> -td
+> ;
+> 
+> @@
+> type tn.td;
+> identifier tn.i;
+> @@
+> 
+> -td
+> + struct i
+> 
+> Signed-off-by: Himangi Saraogi <himangi774@gmail.com>
+> Acked-by: Julia Lawall <julia.lawall@lip6.fr>
 > ---
-> net/bluetooth/l2cap_core.c | 7 ++++---
-> 1 file changed, 4 insertions(+), 3 deletions(-)
-> 
-> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-> index 0cd7ed9..7b0d744 100644
-> --- a/net/bluetooth/l2cap_core.c
-> +++ b/net/bluetooth/l2cap_core.c
-> @@ -1968,10 +1968,11 @@ static void l2cap_ertm_resend(struct l2cap_chan *chan)
-> 					   tx_skb->data + L2CAP_HDR_SIZE);
-> 		}
-> 
-> +		/* Update FCS */
-> 		if (chan->fcs == L2CAP_FCS_CRC16) {
-> -			u16 fcs = crc16(0, (u8 *) tx_skb->data, tx_skb->len);
-> -			put_unaligned_le16(fcs, skb_put(tx_skb,
-> -							L2CAP_FCS_SIZE));
-> +			u16 fcs = crc16(0, (u8 *)tx_skb->data, tx_skb->len -
-> +					L2CAP_FCS_SIZE);
+> drivers/bluetooth/bluecard_cs.c | 35 ++++++++++++++++++-----------------
+> 1 file changed, 18 insertions(+), 17 deletions(-)
 
-+                       u16 fcs = crc16(0, (u8 *) tx_skb->data,
-+                                       tx_skb->len - L2CAP_FCS_SIZE);
-
-> +			put_unaligned_le16(fcs, tx_skb->tail - L2CAP_FCS_SIZE);
-> 		}
-
-  CC      net/bluetooth/l2cap_core.o
-net/bluetooth/l2cap_core.c: In function ‘l2cap_ertm_resend’:
-net/bluetooth/l2cap_core.c:1975:4: warning: passing argument 2 of ‘put_unaligned_le16’ makes pointer from integer without a cast [enabled by default]
-    put_unaligned_le16(fcs, tx_skb->tail - L2CAP_FCS_SIZE);
-    ^
-In file included from ./arch/x86/include/asm/unaligned.h:8:0,
-                 from include/net/bluetooth/l2cap.h:30,
-                 from net/bluetooth/l2cap_core.c:38:
-include/linux/unaligned/access_ok.h:37:91: note: expected ‘void *’ but argument is of type ‘sk_buff_data_t’  static inline void put_unaligned_le16(u16 val, void *p)
-                                                                                           ^
+patch has been applied to bluetooth-next tree.
 
 Regards
 
