@@ -1,85 +1,60 @@
 Return-Path: <cyrus@holtmann.org>
-From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+From: Sebastian Chlad <sebastian.chlad@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH] tools/l2test: And listen and not receive mode option
-Date: Wed, 13 Aug 2014 11:11:14 +0200
-Message-Id: <1407921074-19966-1-git-send-email-lukasz.rymanowski@tieto.com>
+Cc: Sebastian Chlad <sebastian.chlad@tieto.com>
+Subject: [PATCH] android/pts: Correct trivial typos
+Date: Wed, 13 Aug 2014 11:02:16 +0200
+Message-Id: <1407920536-9518-1-git-send-email-sebastian.chlad@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch adds -l option which allows to create listening l2cap socket
-without any send or receive action after connection is done.
-
-This is useful to trigger LOCAL BUSY mode in PTS ERTM testing.
 ---
- tools/l2test.c | 18 +++++++++++++++++-
- 1 file changed, 17 insertions(+), 1 deletion(-)
+ android/pts-pbap.txt |  2 +-
+ android/pts-sm.txt   | 16 ++++++++--------
+ 2 files changed, 9 insertions(+), 9 deletions(-)
 
-diff --git a/tools/l2test.c b/tools/l2test.c
-index 67ca70a..9fd3c46 100644
---- a/tools/l2test.c
-+++ b/tools/l2test.c
-@@ -70,6 +70,7 @@ enum {
- 	CSENDRECV,
- 	INFOREQ,
- 	PAIRING,
-+	LNRCV,
- };
- 
- static unsigned char *buf;
-@@ -1036,6 +1037,12 @@ static void send_and_recv_mode(int sk)
- 	return;
- }
- 
-+static void not_receive_mode(int sk) {
-+
-+	syslog(LOG_INFO, "Connected and not receiving !");
-+	while (1) {};
-+}
-+
- static void reconnect_mode(char *svr)
- {
- 	while (1) {
-@@ -1290,6 +1297,7 @@ static void usage(void)
- 		"\t-d listen and dump incoming data\n"
- 		"\t-x listen, then send, then dump incoming data\n"
- 		"\t-t listen, then send and receive at the same time\n"
-+		"\t-l listen, then do nothing (don't receive, don't send)\n"
- 		"\t-q connect, then send and receive at the same time\n"
- 		"\t-s connect and send\n"
- 		"\t-u connect and receive\n"
-@@ -1335,7 +1343,7 @@ int main(int argc, char *argv[])
- 
- 	bacpy(&bdaddr, BDADDR_ANY);
- 
--	while ((opt = getopt(argc, argv, "rdscuwmntqxyzpb:a:"
-+	while ((opt = getopt(argc, argv, "rdlscuwmntqxyzpb:a:"
- 		"i:P:I:O:J:B:N:L:W:C:D:X:F:Q:Z:Y:H:K:V:RUGAESMT")) != EOF) {
- 		switch (opt) {
- 		case 'r':
-@@ -1360,6 +1368,10 @@ int main(int argc, char *argv[])
- 			mode = DUMP;
- 			break;
- 
-+		case 'l':
-+			mode = LNRCV;
-+			break;
-+
- 		case 'c':
- 			mode = RECONNECT;
- 			need_addr = 1;
-@@ -1646,6 +1658,10 @@ int main(int argc, char *argv[])
- 		case PAIRING:
- 			do_pairing(argv[optind]);
- 			exit(0);
-+
-+		case LNRCV:
-+			do_listen(not_receive_mode);
-+			break;
- 	}
- 
- 	syslog(LOG_INFO, "Exit");
+diff --git a/android/pts-pbap.txt b/android/pts-pbap.txt
+index 4f8b534..bead56d 100644
+--- a/android/pts-pbap.txt
++++ b/android/pts-pbap.txt
+@@ -141,5 +141,5 @@ TC_PSE_SRM_BI_03_I	N/A
+ TC_PSE_SRM_BI_05_I	N/A
+ TC_PSE_SRM_BV_08_I	N/A
+ TC_PSE_SRMP_BI_02_I	N/A
+-TX_PSE_SRMP_BV_02_I	N/A
++TC_PSE_SRMP_BV_02_I	N/A
+ -------------------------------------------------------------------------------
+diff --git a/android/pts-sm.txt b/android/pts-sm.txt
+index 8f1034b..d2cf1d7 100644
+--- a/android/pts-sm.txt
++++ b/android/pts-sm.txt
+@@ -52,18 +52,18 @@ TC_PKE_BI_03_C		PASS	btmgmt io-cap 0x04
+ 				btmgmt advertising on
+ 				btmgmt monitor
+ 				Note: Enter invalid passkey in PTS
+-TC_OOB_BV_01_C		NA
+-TC_OOB_BV_02_C		NA
+-TC_OOB_BV_03_C		NA
+-TC_OOB_BV_04_C		NA
++TC_OOB_BV_01_C		N/A
++TC_OOB_BV_02_C		N/A
++TC_OOB_BV_03_C		N/A
++TC_OOB_BV_04_C		N/A
+ TC_OOB_BV_05_C		PASS
+ TC_OOB_BV_06_C		PASS
+ TC_OOB_BV_07_C		PASS
+ TC_OOB_BV_08_C		PASS
+-TC_OOB_BV_09_C		NA
+-TC_OOB_BV_10_C		NA
+-TC_OOB_BI_01_C		NA
+-TC_OOB_BI_02_C		NA
++TC_OOB_BV_09_C		N/A
++TC_OOB_BV_10_C		N/A
++TC_OOB_BI_01_C		N/A
++TC_OOB_BI_02_C		N/A
+ TC_EKS_BV_01_C		PASS
+ TC_EKS_BV_02_C		PASS
+ TC_EKS_BI_01_C		INC	btmgmt io-cap 0x03
 -- 
-1.8.4
+1.8.5.3
 
