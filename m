@@ -1,48 +1,68 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <53EB6393.8070107@linux.intel.com>
-Date: Wed, 13 Aug 2014 16:09:39 +0300
-From: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
 MIME-Version: 1.0
-To: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>,
-	linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] android/health: Fix reconnect scenario
-References: <1407777812-15652-1-git-send-email-lukasz.rymanowski@tieto.com>
-In-Reply-To: <1407777812-15652-1-git-send-email-lukasz.rymanowski@tieto.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
+In-Reply-To: <1407931725-6576-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1407931725-6576-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Date: Wed, 13 Aug 2014 15:31:33 +0300
+Message-ID: <CABBYNZ+JgHH4KXNGKKEh_ogptAniyoQh=Cj0Q-RrcWEQ4xQs2w@mail.gmail.com>
+Subject: Re: [PATCH] monitor: Fix use of uninitialized value
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-ping.
+Hi Andrei,
 
-On 08/11/2014 08:23 PM, Lukasz Rymanowski wrote:
-> When trying to reconnect to HDP device, BfA tries to connect MDL even
-> MCL is not connected.
+On Wed, Aug 13, 2014 at 3:08 PM, Andrei Emeltchenko
+<Andrei.Emeltchenko.news@gmail.com> wrote:
+> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 >
-> D/BlueZ   ( 2218): external/bluetooth/bluez/android/hal-health.c:connect_channel()
-> I/bluetoothd( 2220): bluetoothd[2221]: external/bluetooth/bluez/android/health.c:bt_health_connect_channel()
-> I/bluetoothd( 2220): bluetoothd[2221]: external/bluetooth/bluez/android/health.c:create_channel() mdep 1
-> D/BlueZ   ( 2218): external/bluetooth/bluez/android/hal-bluetooth.c:handle_acl_state_changed() state 0
-> I/bluetoothd( 2220): bluetoothd[2221]: external/bluetooth/bluez/android/mcap-lib.c:mcap_create_mdl()
-> I/bluetoothd( 2220): bluetoothd[2221]: health: error creating mdl MCL is not connected
->
-> This patch makes sure that MCL is connected before trying to connect
-> MDL.
+> Fixes clang warnings below:
+> ...
+>  CC       monitor/avctp.o
+> monitor/avctp.c:600:2: warning: Function call argument is an
+> uninitialized value
+>         print_indent(indent, ctrl_pdu_data_color, "AVRCP: ",
+> pdu2str(pduid),
+>         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+> monitor/display.h:47:2: note: expanded from macro 'print_indent'
+>         printf("%*c%s%s%s%s" fmt "%s\n", (indent), ' ', \
+>         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+> 1 warning generated.
+> ...
 > ---
->   android/health.c | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
+>  monitor/avctp.c | 6 ++----
+>  1 file changed, 2 insertions(+), 4 deletions(-)
 >
-> diff --git a/android/health.c b/android/health.c
-> index 2d80365..f4edc3e 100644
-> --- a/android/health.c
-> +++ b/android/health.c
-> @@ -1949,7 +1949,7 @@ static void bt_health_connect_channel(const void *buf, uint16_t len)
->   		}
->   	}
->   
-> -	if (!dev->mcl) {
-> +	if (!dev->mcl || (dev->mcl && !dev->mcl_conn)) {
->   		if (connect_mcl(channel) < 0) {
->   			error("health: error retrieving HDP SDP record");
->   			goto fail;
+> diff --git a/monitor/avctp.c b/monitor/avctp.c
+> index 9eeac7f..4f87837 100644
+> --- a/monitor/avctp.c
+> +++ b/monitor/avctp.c
+> @@ -590,16 +590,14 @@ static void avrcp_pdu_packet(const struct l2cap_frame *frame, uint8_t ctype,
+>         uint16_t len;
+>         int i;
+>         const struct avrcp_ctrl_pdu_data *ctrl_pdu_data = NULL;
+> -       const char *ctrl_pdu_data_color;
+>         struct l2cap_frame avrcp_frame;
+>
+>         pduid = *((uint8_t *) frame->data);
+>         pt = *((uint8_t *) (frame->data + 1));
+>         len = get_be16(frame->data + 2);
+>
+> -       print_indent(indent, ctrl_pdu_data_color, "AVRCP: ", pdu2str(pduid),
+> -                                               COLOR_OFF, " pt %s len 0x%04x",
+> -                                               pt2str(pt), len);
+> +       print_indent(indent, COLOR_OFF, "AVRCP: ", pdu2str(pduid), COLOR_OFF,
+> +                                       " pt %s len 0x%04x", pt2str(pt), len);
+>
+>         if ((frame->size < 4) || ((frame->size - 4) != len)) {
+>                 print_text(COLOR_ERROR, "PDU malformed");
+> --
+> 1.9.1
 
-Ravi.
+Applied, thanks.
+
+
+-- 
+Luiz Augusto von Dentz
