@@ -1,46 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.6\))
+MIME-Version: 1.0
+In-Reply-To: <20140812124529.GA2842@t440s.lan>
+References: <1407791934-3778-1-git-send-email-armansito@chromium.org>
+	<1407791934-3778-2-git-send-email-armansito@chromium.org>
+	<20140812124529.GA2842@t440s.lan>
+Date: Tue, 12 Aug 2014 19:42:55 -0700
+Message-ID: <CAHrH25TtWgoWWHcTRKg2ff2hO6JON32729rNmpA5iEZQ1MjP6Q@mail.gmail.com>
 Subject: Re: [PATCH v2 1/1] shared/att: Handle disconnects.
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1407791934-3778-2-git-send-email-armansito@chromium.org>
-Date: Tue, 12 Aug 2014 19:52:24 -0700
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <947AB89D-2418-4371-A684-F292E888C9B0@holtmann.org>
-References: <1407791934-3778-1-git-send-email-armansito@chromium.org> <1407791934-3778-2-git-send-email-armansito@chromium.org>
-To: Arman Uguray <armansito@chromium.org>
+From: Arman Uguray <armansito@chromium.org>
+To: BlueZ development <linux-bluetooth@vger.kernel.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Arman,
+Hi Johan,
 
-> This patch adds disconnect handling to bt_att, in which
-> io_set_disconnect_handler is used to set up a handler which cancels all
-> pending and queued ATT operations, marks the bt_att structure as invalid
-> and notifies the user via a specialized callback which can be set using
-> bt_att_set_disconnect_cb.
-> 
-> Once the bt_att structure is invalidated, either due to a timed-out ATT protocol
-> request/indication or a disconnect, it now destroys the underlying io structure.
-> ---
-> src/shared/att.c         | 85 +++++++++++++++++++++++++++++++++++-------------
-> src/shared/att.h         |  5 +++
-> src/shared/io-mainloop.c |  5 +++
-> 3 files changed, 73 insertions(+), 22 deletions(-)
-> 
-> diff --git a/src/shared/att.c b/src/shared/att.c
-> index 0d27dfa..b5ab742 100644
-> --- a/src/shared/att.c
-> +++ b/src/shared/att.c
-> @@ -47,9 +47,7 @@ struct att_send_op;
-> struct bt_att {
-> 	int ref_count;
-> 	int fd;
-> -	bool close_on_unref;
+> Sorry to keep pushing for further iterations of this patch, but I think
+> it'd be good to split this into two separate changes: first one for the
+> io code and a second one for ATT.
+>
 
-I like to keep the close_on_unref logic. So please do not remove it.
+No worries, will do in the next patch set.
 
-Regards
+> Looking at how shared/io-glib.c does this (which I assume you've
+> verified doesn't need fixing) another (and possibly even better)
+> approach is to do the ref when adding the fd to the mainloop and the
+> unref in the destroy callback. I'll leave it up to you to choose which
+> one you want to go with.
 
-Marcel
-
+Ah, I see. I think that's a better approach and it's consistent with
+io-glib, so I'll go with your suggestion.
