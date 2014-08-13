@@ -1,38 +1,69 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=windows-1252
 Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.6\))
-Subject: Re: [PATCH] Bluetooth: Improve data packing in SAR mode
+Subject: Re: [PATCH] Bluetooth: Fix ERTM L2CAP resend packet
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1407938501-25659-1-git-send-email-lukasz.rymanowski@tieto.com>
-Date: Wed, 13 Aug 2014 10:27:21 -0700
+In-Reply-To: <1407841466-24720-1-git-send-email-lukasz.rymanowski@tieto.com>
+Date: Wed, 13 Aug 2014 10:23:23 -0700
 Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <C6D223AE-A16B-41A2-8AE2-ECC6741485AE@holtmann.org>
-References: <1407938501-25659-1-git-send-email-lukasz.rymanowski@tieto.com>
+Message-Id: <D9DCCFA5-D511-4211-B4B1-11CE8587A635@holtmann.org>
+References: <1407841466-24720-1-git-send-email-lukasz.rymanowski@tieto.com>
 To: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Lukasz,
 
-> There is no need to decrease pdu size with L2CAP SDU lenght in Start
-> L2CAP SDU frame. Start packtet is just 2 bytes longer as specified and
-> we can keep payload as long as possible.
+> I-Frame which is going to be resend already has FCS field added and set
+> (if it was required). Adding additional FCS field calculated from data +
+> old FCS in resend function is incorrect.
+> 
+> This patch fix that.
+> 
+> Cached on PTS testing.
+
+"Issue has been found during PTS testing."
+
+No caching ;)
+
 > 
 > Signed-off-by: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 > ---
-> When testing SAR L2CAP against PTS, L2CAP channel is usually
-> configured in that way, that SDU = MPS * 3. PTS expets then 3
-> I-Frames from IUT: Start, Continuation and End frame.
+> net/bluetooth/l2cap_core.c | 7 ++++---
+> 1 file changed, 4 insertions(+), 3 deletions(-)
 > 
-> Without this fix, we sent 4 I-Frames. We could pass a test
-> by using -b option in l2test and send just two bytes less than
-> SDU length but it was hakish :) With this patch no need to use -b
-> option.
+> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+> index 0cd7ed9..7b0d744 100644
+> --- a/net/bluetooth/l2cap_core.c
+> +++ b/net/bluetooth/l2cap_core.c
+> @@ -1968,10 +1968,11 @@ static void l2cap_ertm_resend(struct l2cap_chan *chan)
+> 					   tx_skb->data + L2CAP_HDR_SIZE);
+> 		}
 > 
-> net/bluetooth/l2cap_core.c | 5 +----
-> 1 file changed, 1 insertion(+), 4 deletions(-)
+> +		/* Update FCS */
+> 		if (chan->fcs == L2CAP_FCS_CRC16) {
+> -			u16 fcs = crc16(0, (u8 *) tx_skb->data, tx_skb->len);
+> -			put_unaligned_le16(fcs, skb_put(tx_skb,
+> -							L2CAP_FCS_SIZE));
+> +			u16 fcs = crc16(0, (u8 *)tx_skb->data, tx_skb->len -
+> +					L2CAP_FCS_SIZE);
 
-patch has been applied to bluetooth-next tree.
++                       u16 fcs = crc16(0, (u8 *) tx_skb->data,
++                                       tx_skb->len - L2CAP_FCS_SIZE);
+
+> +			put_unaligned_le16(fcs, tx_skb->tail - L2CAP_FCS_SIZE);
+> 		}
+
+  CC      net/bluetooth/l2cap_core.o
+net/bluetooth/l2cap_core.c: In function ‘l2cap_ertm_resend’:
+net/bluetooth/l2cap_core.c:1975:4: warning: passing argument 2 of ‘put_unaligned_le16’ makes pointer from integer without a cast [enabled by default]
+    put_unaligned_le16(fcs, tx_skb->tail - L2CAP_FCS_SIZE);
+    ^
+In file included from ./arch/x86/include/asm/unaligned.h:8:0,
+                 from include/net/bluetooth/l2cap.h:30,
+                 from net/bluetooth/l2cap_core.c:38:
+include/linux/unaligned/access_ok.h:37:91: note: expected ‘void *’ but argument is of type ‘sk_buff_data_t’  static inline void put_unaligned_le16(u16 val, void *p)
+                                                                                           ^
 
 Regards
 
