@@ -1,56 +1,56 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Wed, 13 Aug 2014 17:57:25 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] android/health: Fix reconnect scenario
+Message-ID: <20140813145725.GA11644@t440s.P-661HNU-F1>
+References: <1407777812-15652-1-git-send-email-lukasz.rymanowski@tieto.com>
+MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.6\))
-Subject: Re: [PATCH] bluetooth/btuart_cs: Remove typedef btuart_info_t
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20140813092139.GA3189@himangi-Dell>
-Date: Wed, 13 Aug 2014 10:18:01 -0700
-Cc: "Gustavo F. Padovan" <gustavo@padovan.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Julia Lawall <julia.lawall@lip6.fr>
-Message-Id: <845CA98D-39F0-4F2F-8ADF-7DBE1D7BA4ED@holtmann.org>
-References: <20140813092139.GA3189@himangi-Dell>
-To: Himangi Saraogi <himangi774@gmail.com>
-Sender: linux-kernel-owner@vger.kernel.org
+In-Reply-To: <1407777812-15652-1-git-send-email-lukasz.rymanowski@tieto.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Himangi,
+Hi Lukasz,
 
-> The Linux kernel coding style guidelines suggest not using typedefs
-> for structure types. This patch gets rid of the typedef for
-> btuart_info_t. Also, the name of the struct is changed to drop the _t,
-> to make the name look less typedef-like.
+On Mon, Aug 11, 2014, Lukasz Rymanowski wrote:
+> When trying to reconnect to HDP device, BfA tries to connect MDL even
+> MCL is not connected.
 > 
-> The following Coccinelle semantic patch detects the case:
+> D/BlueZ   ( 2218): external/bluetooth/bluez/android/hal-health.c:connect_channel()
+> I/bluetoothd( 2220): bluetoothd[2221]: external/bluetooth/bluez/android/health.c:bt_health_connect_channel()
+> I/bluetoothd( 2220): bluetoothd[2221]: external/bluetooth/bluez/android/health.c:create_channel() mdep 1
+> D/BlueZ   ( 2218): external/bluetooth/bluez/android/hal-bluetooth.c:handle_acl_state_changed() state 0
+> I/bluetoothd( 2220): bluetoothd[2221]: external/bluetooth/bluez/android/mcap-lib.c:mcap_create_mdl()
+> I/bluetoothd( 2220): bluetoothd[2221]: health: error creating mdl MCL is not connected
 > 
-> @tn@
-> identifier i;
-> type td;
-> @@
-> 
-> -typedef
-> struct i { ... }
-> -td
-> ;
-> 
-> @@
-> type tn.td;
-> identifier tn.i;
-> @@
-> 
-> -td
-> + struct i
-> 
-> Signed-off-by: Himangi Saraogi <himangi774@gmail.com>
-> Acked-by: Julia Lawall <julia.lawall@lip6.fr>
+> This patch makes sure that MCL is connected before trying to connect
+> MDL.
 > ---
-> drivers/bluetooth/btuart_cs.c | 27 ++++++++++++++-------------
-> 1 file changed, 14 insertions(+), 13 deletions(-)
+>  android/health.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/android/health.c b/android/health.c
+> index 2d80365..f4edc3e 100644
+> --- a/android/health.c
+> +++ b/android/health.c
+> @@ -1949,7 +1949,7 @@ static void bt_health_connect_channel(const void *buf, uint16_t len)
+>  		}
+>  	}
+>  
+> -	if (!dev->mcl) {
+> +	if (!dev->mcl || (dev->mcl && !dev->mcl_conn)) {
 
-patch has been applied to bluetooth-next tree.
+The patch looks good but the second check for dev->mcl is a bit
+redundant as this part is only evaluated if the first part (!dev->mcl)
+was false. So the more concise form would be:
 
-Regards
+	if (!dev->mcl || !dev->mcl_conn)
 
-Marcel
+However, could you explain to me why these separate variables are needed
+to begin with? Why isn't dev->mcl cleared in the mcl_disconnected()
+function that sets dev->mcl_conn to false but doesn't do anything to the
+dev->mcl pointer?
 
+Johan
