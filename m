@@ -1,56 +1,82 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 13 Aug 2014 17:57:25 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] android/health: Fix reconnect scenario
-Message-ID: <20140813145725.GA11644@t440s.P-661HNU-F1>
-References: <1407777812-15652-1-git-send-email-lukasz.rymanowski@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1407777812-15652-1-git-send-email-lukasz.rymanowski@tieto.com>
+From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH 2/2] android/gatt: Add helper to create listen data
+Date: Wed, 13 Aug 2014 16:50:16 +0200
+Message-Id: <1407941416-28453-2-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+In-Reply-To: <1407941416-28453-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+References: <1407941416-28453-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Lukasz,
+---
+ android/gatt.c | 29 +++++++++++++++++++----------
+ 1 file changed, 19 insertions(+), 10 deletions(-)
 
-On Mon, Aug 11, 2014, Lukasz Rymanowski wrote:
-> When trying to reconnect to HDP device, BfA tries to connect MDL even
-> MCL is not connected.
-> 
-> D/BlueZ   ( 2218): external/bluetooth/bluez/android/hal-health.c:connect_channel()
-> I/bluetoothd( 2220): bluetoothd[2221]: external/bluetooth/bluez/android/health.c:bt_health_connect_channel()
-> I/bluetoothd( 2220): bluetoothd[2221]: external/bluetooth/bluez/android/health.c:create_channel() mdep 1
-> D/BlueZ   ( 2218): external/bluetooth/bluez/android/hal-bluetooth.c:handle_acl_state_changed() state 0
-> I/bluetoothd( 2220): bluetoothd[2221]: external/bluetooth/bluez/android/mcap-lib.c:mcap_create_mdl()
-> I/bluetoothd( 2220): bluetoothd[2221]: health: error creating mdl MCL is not connected
-> 
-> This patch makes sure that MCL is connected before trying to connect
-> MDL.
-> ---
->  android/health.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/android/health.c b/android/health.c
-> index 2d80365..f4edc3e 100644
-> --- a/android/health.c
-> +++ b/android/health.c
-> @@ -1949,7 +1949,7 @@ static void bt_health_connect_channel(const void *buf, uint16_t len)
->  		}
->  	}
->  
-> -	if (!dev->mcl) {
-> +	if (!dev->mcl || (dev->mcl && !dev->mcl_conn)) {
+diff --git a/android/gatt.c b/android/gatt.c
+index 7b3db06..5d78101 100644
+--- a/android/gatt.c
++++ b/android/gatt.c
+@@ -1851,6 +1851,20 @@ struct listen_data {
+ 	bool start;
+ };
+ 
++static struct listen_data *create_listen_data(int32_t client_id, bool start)
++{
++	struct listen_data *d;
++
++	d = new0(struct listen_data, 1);
++	if (!d)
++		return NULL;
++
++	d->client_id = client_id;
++	d->start = start;
++
++	return d;
++}
++
+ static void set_advertising_cb(uint8_t status, void *user_data)
+ {
+ 	struct listen_data *l = user_data;
+@@ -1885,16 +1899,13 @@ static void handle_client_unregister(const void *buf, uint16_t len)
+ 						INT_TO_PTR(cmd->client_if));
+ 
+ 	if (listening_client) {
+-		data = new0(struct listen_data, 1);
++		data = create_listen_data(cmd->client_if, false);
+ 		if (!data) {
+-			error("gatt: Could not allocate memory for listen data");
++			error("gatt: Could not allocate listen data");
+ 			status = HAL_STATUS_NOMEM;
+ 			goto reply;
+ 		}
+ 
+-		data->client_id = cmd->client_if;
+-		data->start = false;
+-
+ 		if (!bt_le_set_advertising(data->start, set_advertising_cb,
+ 								data)) {
+ 			error("gatt: Could not set advertising");
+@@ -2072,16 +2083,14 @@ static void handle_client_listen(const void *buf, uint16_t len)
+ 		}
+ 	}
+ 
+-	data = new0(struct listen_data, 1);
++	data = create_listen_data(cmd->client_if, cmd->start);
+ 	if (!data) {
+-		error("gatt: Could not allocate memory for listen data");
++		error("gatt: Could not allocate listen data");
++
+ 		status = HAL_STATUS_NOMEM;
+ 		goto reply;
+ 	}
+ 
+-	data->client_id = cmd->client_if;
+-	data->start = cmd->start;
+-
+ 	if (!bt_le_set_advertising(cmd->start, set_advertising_cb, data)) {
+ 		error("gatt: Could not set advertising");
+ 		status = HAL_STATUS_FAILED;
+-- 
+1.9.3
 
-The patch looks good but the second check for dev->mcl is a bit
-redundant as this part is only evaluated if the first part (!dev->mcl)
-was false. So the more concise form would be:
-
-	if (!dev->mcl || !dev->mcl_conn)
-
-However, could you explain to me why these separate variables are needed
-to begin with? Why isn't dev->mcl cleared in the mcl_disconnected()
-function that sets dev->mcl_conn to false but doesn't do anything to the
-dev->mcl pointer?
-
-Johan
