@@ -1,147 +1,70 @@
 Return-Path: <cyrus@holtmann.org>
-From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/2] android/gatt: Stop listening while unregistering app
-Date: Wed, 13 Aug 2014 16:50:15 +0200
-Message-Id: <1407941416-28453-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+MIME-Version: 1.0
+In-Reply-To: <53EB6393.8070107@linux.intel.com>
+References: <1407777812-15652-1-git-send-email-lukasz.rymanowski@tieto.com>
+	<53EB6393.8070107@linux.intel.com>
+Date: Wed, 13 Aug 2014 17:30:55 +0300
+Message-ID: <CABBYNZ+hYxYcU-heUFHpvyHkCPv7Qk+xtgvedcqAWuXF8-TWmw@mail.gmail.com>
+Subject: Re: [PATCH] android/health: Fix reconnect scenario
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
+Cc: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Client gets stucked on advertising while unregistering app with not
-stopped listening.
----
- android/gatt.c | 102 ++++++++++++++++++++++++++++++++++++---------------------
- 1 file changed, 64 insertions(+), 38 deletions(-)
+Hi,
 
-diff --git a/android/gatt.c b/android/gatt.c
-index 89748d2..7b3db06 100644
---- a/android/gatt.c
-+++ b/android/gatt.c
-@@ -1834,15 +1834,79 @@ static uint8_t unregister_app(int client_if)
- 	return HAL_STATUS_SUCCESS;
- }
- 
-+static void send_client_listen_notify(int32_t id, int32_t status)
-+{
-+	struct hal_ev_gatt_client_listen ev;
-+
-+	/* Server if because of typo in android headers */
-+	ev.server_if = id;
-+	ev.status = status;
-+
-+	ipc_send_notif(hal_ipc, HAL_SERVICE_ID_GATT, HAL_EV_GATT_CLIENT_LISTEN,
-+							sizeof(ev), &ev);
-+}
-+
-+struct listen_data {
-+	int32_t client_id;
-+	bool start;
-+};
-+
-+static void set_advertising_cb(uint8_t status, void *user_data)
-+{
-+	struct listen_data *l = user_data;
-+
-+	send_client_listen_notify(l->client_id, status);
-+
-+	/* In case of success update advertising state*/
-+	if (!status)
-+		advertising_cnt = l->start ? 1 : 0;
-+
-+	/*
-+	 * Let's remove client from the list in two cases
-+	 * 1. Start failed
-+	 * 2. Stop succeed
-+	 */
-+	if ((l->start && status) || (!l->start && !status))
-+		queue_remove(listen_apps, INT_TO_PTR(l->client_id));
-+
-+	free(l);
-+}
-+
- static void handle_client_unregister(const void *buf, uint16_t len)
- {
- 	const struct hal_cmd_gatt_client_unregister *cmd = buf;
- 	uint8_t status;
-+	void *listening_client;
-+	struct listen_data *data;
- 
- 	DBG("");
- 
-+	listening_client = queue_find(listen_apps, match_by_value,
-+						INT_TO_PTR(cmd->client_if));
-+
-+	if (listening_client) {
-+		data = new0(struct listen_data, 1);
-+		if (!data) {
-+			error("gatt: Could not allocate memory for listen data");
-+			status = HAL_STATUS_NOMEM;
-+			goto reply;
-+		}
-+
-+		data->client_id = cmd->client_if;
-+		data->start = false;
-+
-+		if (!bt_le_set_advertising(data->start, set_advertising_cb,
-+								data)) {
-+			error("gatt: Could not set advertising");
-+			status = HAL_STATUS_FAILED;
-+			free(data);
-+			goto reply;
-+		}
-+	}
-+
- 	status = unregister_app(cmd->client_if);
- 
-+reply:
- 	ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_GATT,
- 					HAL_OP_GATT_CLIENT_UNREGISTER, status);
- }
-@@ -1948,44 +2012,6 @@ static void handle_client_disconnect(const void *buf, uint16_t len)
- 					HAL_OP_GATT_CLIENT_DISCONNECT, status);
- }
- 
--static void send_client_listen_notify(int32_t id, int32_t status)
--{
--	struct hal_ev_gatt_client_listen ev;
--
--	/* Server if because of typo in android headers */
--	ev.server_if = id;
--	ev.status = status;
--
--	ipc_send_notif(hal_ipc, HAL_SERVICE_ID_GATT, HAL_EV_GATT_CLIENT_LISTEN,
--							sizeof(ev), &ev);
--}
--
--struct listen_data {
--	int32_t client_id;
--	bool start;
--};
--
--static void set_advertising_cb(uint8_t status, void *user_data)
--{
--	struct listen_data *l = user_data;
--
--	send_client_listen_notify(l->client_id, status);
--
--	/* In case of success update advertising state*/
--	if (!status)
--		advertising_cnt = l->start ? 1 : 0;
--
--	/*
--	 * Let's remove client from the list in two cases
--	 * 1. Start failed
--	 * 2. Stop succeed
--	 */
--	if ((l->start && status) || (!l->start && !status))
--		queue_remove(listen_apps, INT_TO_PTR(l->client_id));
--
--	free(l);
--}
--
- static void handle_client_listen(const void *buf, uint16_t len)
- {
- 	const struct hal_cmd_gatt_client_listen *cmd = buf;
+On Wed, Aug 13, 2014 at 4:09 PM, Ravi kumar Veeramally
+<ravikumar.veeramally@linux.intel.com> wrote:
+> ping.
+>
+>
+> On 08/11/2014 08:23 PM, Lukasz Rymanowski wrote:
+>>
+>> When trying to reconnect to HDP device, BfA tries to connect MDL even
+>> MCL is not connected.
+>>
+>> D/BlueZ   ( 2218):
+>> external/bluetooth/bluez/android/hal-health.c:connect_channel()
+>> I/bluetoothd( 2220): bluetoothd[2221]:
+>> external/bluetooth/bluez/android/health.c:bt_health_connect_channel()
+>> I/bluetoothd( 2220): bluetoothd[2221]:
+>> external/bluetooth/bluez/android/health.c:create_channel() mdep 1
+>> D/BlueZ   ( 2218):
+>> external/bluetooth/bluez/android/hal-bluetooth.c:handle_acl_state_changed()
+>> state 0
+>> I/bluetoothd( 2220): bluetoothd[2221]:
+>> external/bluetooth/bluez/android/mcap-lib.c:mcap_create_mdl()
+>> I/bluetoothd( 2220): bluetoothd[2221]: health: error creating mdl MCL is
+>> not connected
+>>
+>> This patch makes sure that MCL is connected before trying to connect
+>> MDL.
+>> ---
+>>   android/health.c | 2 +-
+>>   1 file changed, 1 insertion(+), 1 deletion(-)
+>>
+>> diff --git a/android/health.c b/android/health.c
+>> index 2d80365..f4edc3e 100644
+>> --- a/android/health.c
+>> +++ b/android/health.c
+>> @@ -1949,7 +1949,7 @@ static void bt_health_connect_channel(const void
+>> *buf, uint16_t len)
+>>                 }
+>>         }
+>>   -     if (!dev->mcl) {
+>> +       if (!dev->mcl || (dev->mcl && !dev->mcl_conn)) {
+>>                 if (connect_mcl(channel) < 0) {
+>>                         error("health: error retrieving HDP SDP record");
+>>                         goto fail;
+>
+>
+> Ravi.
+
+Pushed, thanks.
+
+
 -- 
-1.9.3
-
+Luiz Augusto von Dentz
