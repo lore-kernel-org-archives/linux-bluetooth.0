@@ -1,55 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
-From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH] Bluetooth: Improve data packing in SAR mode
-Date: Wed, 13 Aug 2014 16:01:41 +0200
-Message-Id: <1407938501-25659-1-git-send-email-lukasz.rymanowski@tieto.com>
+Subject: [PATCH 3/3] android/pts: Update IOPT test results
+Date: Wed, 13 Aug 2014 15:44:37 +0200
+Message-Id: <1407937477-25402-3-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+In-Reply-To: <1407937477-25402-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+References: <1407937477-25402-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-There is no need to decrease pdu size with L2CAP SDU lenght in Start
-L2CAP SDU frame. Start packtet is just 2 bytes longer as specified and
-we can keep payload as long as possible.
-
-Signed-off-by: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 ---
-When testing SAR L2CAP against PTS, L2CAP channel is usually
-configured in that way, that SDU = MPS * 3. PTS expets then 3
-I-Frames from IUT: Start, Continuation and End frame.
+ android/pts-iopt.txt | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-Without this fix, we sent 4 I-Frames. We could pass a test
-by using -b option in l2test and send just two bytes less than
-SDU length but it was hakish :) With this patch no need to use -b
-option.
-
- net/bluetooth/l2cap_core.c | 5 +----
- 1 file changed, 1 insertion(+), 4 deletions(-)
-
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 7b0d744..8fe9f4b 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -2276,7 +2276,6 @@ static int l2cap_segment_sdu(struct l2cap_chan *chan,
- 	} else {
- 		sar = L2CAP_SAR_START;
- 		sdu_len = len;
--		pdu_len -= L2CAP_SDULEN_SIZE;
- 	}
- 
- 	while (len > 0) {
-@@ -2291,10 +2290,8 @@ static int l2cap_segment_sdu(struct l2cap_chan *chan,
- 		__skb_queue_tail(seg_queue, skb);
- 
- 		len -= pdu_len;
--		if (sdu_len) {
-+		if (sdu_len)
- 			sdu_len = 0;
--			pdu_len += L2CAP_SDULEN_SIZE;
--		}
- 
- 		if (len <= pdu_len) {
- 			sar = L2CAP_SAR_END;
+diff --git a/android/pts-iopt.txt b/android/pts-iopt.txt
+index 20962af..a0fe000 100644
+--- a/android/pts-iopt.txt
++++ b/android/pts-iopt.txt
+@@ -19,5 +19,7 @@ TC_COD_BV_02_I	N/A	Under PTS 5.1 test shall be disabled as there is
+ 			PICS settings for HFP shall be disabled for IOPT
+ TC_SDSS_BV_02_I	PASS
+ TC_SDSA_BV_03_I	FAIL	JIRA #BA-92
+-TC_SDR_BV_04_I	FAIL	JIRA #BA-95
++TC_SDR_BV_04_I	PASS	for every PTS profiles:
++			haltest: bluetooth get_remote_service_record <addr>
++							<requred 128 sdp uuid>
+ -------------------------------------------------------------------------------
 -- 
-1.8.4
+1.9.3
 
