@@ -1,98 +1,147 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1407921074-19966-1-git-send-email-lukasz.rymanowski@tieto.com>
-References: <1407921074-19966-1-git-send-email-lukasz.rymanowski@tieto.com>
-Date: Wed, 13 Aug 2014 11:41:35 +0200
-Message-ID: <CAMudyAvCUJjg2BJ-rZCJ6BwWZHWpzVONe-LVhOF2h_Vjn84f4g@mail.gmail.com>
-Subject: Re: [PATCH] tools/l2test: And listen and not receive mode option
-From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Cc: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Content-Type: text/plain; charset=UTF-8
+From: Vikrampal Yadav <vikram.pal@samsung.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: luiz.dentz@gmail.com, d.kasatkin@samsung.com,
+	vikram.pal@samsung.com, cpgs@samsung.com
+Subject: [PATCH v3 6/6] monitor: Add AVRCP GetCapabilities support
+Date: Wed, 13 Aug 2014 15:13:35 +0530
+Message-id: <1407923015-26468-6-git-send-email-vikram.pal@samsung.com>
+In-reply-to: <1407923015-26468-1-git-send-email-vikram.pal@samsung.com>
+References: <1407923015-26468-1-git-send-email-vikram.pal@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Support for decoding AVRCP GetCapabilities added in
+Bluetooth monitor.
+---
+ monitor/avctp.c | 100 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 100 insertions(+)
 
-On 13 August 2014 11:11, Lukasz Rymanowski <lukasz.rymanowski@tieto.com> wrote:
-> This patch adds -l option which allows to create listening l2cap socket
-> without any send or receive action after connection is done.
->
-> This is useful to trigger LOCAL BUSY mode in PTS ERTM testing.
-> ---
->  tools/l2test.c | 18 +++++++++++++++++-
->  1 file changed, 17 insertions(+), 1 deletion(-)
->
-> diff --git a/tools/l2test.c b/tools/l2test.c
-> index 67ca70a..9fd3c46 100644
-> --- a/tools/l2test.c
-> +++ b/tools/l2test.c
-> @@ -70,6 +70,7 @@ enum {
->         CSENDRECV,
->         INFOREQ,
->         PAIRING,
-> +       LNRCV,
->  };
->
->  static unsigned char *buf;
-> @@ -1036,6 +1037,12 @@ static void send_and_recv_mode(int sk)
->         return;
->  }
->
-> +static void not_receive_mode(int sk) {
-> +
-> +       syslog(LOG_INFO, "Connected and not receiving !");
-> +       while (1) {};
-> +}
-> +
->  static void reconnect_mode(char *svr)
->  {
->         while (1) {
-> @@ -1290,6 +1297,7 @@ static void usage(void)
->                 "\t-d listen and dump incoming data\n"
->                 "\t-x listen, then send, then dump incoming data\n"
->                 "\t-t listen, then send and receive at the same time\n"
-> +               "\t-l listen, then do nothing (don't receive, don't send)\n"
->                 "\t-q connect, then send and receive at the same time\n"
->                 "\t-s connect and send\n"
->                 "\t-u connect and receive\n"
-> @@ -1335,7 +1343,7 @@ int main(int argc, char *argv[])
->
->         bacpy(&bdaddr, BDADDR_ANY);
->
-> -       while ((opt = getopt(argc, argv, "rdscuwmntqxyzpb:a:"
-> +       while ((opt = getopt(argc, argv, "rdlscuwmntqxyzpb:a:"
->                 "i:P:I:O:J:B:N:L:W:C:D:X:F:Q:Z:Y:H:K:V:RUGAESMT")) != EOF) {
->                 switch (opt) {
->                 case 'r':
-> @@ -1360,6 +1368,10 @@ int main(int argc, char *argv[])
->                         mode = DUMP;
->                         break;
->
-> +               case 'l':
-> +                       mode = LNRCV;
-> +                       break;
-> +
->                 case 'c':
->                         mode = RECONNECT;
->                         need_addr = 1;
-> @@ -1646,6 +1658,10 @@ int main(int argc, char *argv[])
->                 case PAIRING:
->                         do_pairing(argv[optind]);
->                         exit(0);
-> +
-> +               case LNRCV:
-> +                       do_listen(not_receive_mode);
-> +                       break;
->         }
->
->         syslog(LOG_INFO, "Exit");
-> --
-> 1.8.4
->
+diff --git a/monitor/avctp.c b/monitor/avctp.c
+index bc8f469..9eeac7f 100644
+--- a/monitor/avctp.c
++++ b/monitor/avctp.c
+@@ -79,6 +79,21 @@
+ #define AVC_OP_SUBUNITINFO		0x31
+ #define AVC_OP_PASSTHROUGH		0x7c
+ 
++/* notification events */
++#define AVRCP_EVENT_PLAYBACK_STATUS_CHANGED		0x01
++#define AVRCP_EVENT_TRACK_CHANGED			0x02
++#define AVRCP_EVENT_TRACK_REACHED_END			0x03
++#define AVRCP_EVENT_TRACK_REACHED_START			0x04
++#define AVRCP_EVENT_PLAYBACK_POS_CHANGED		0x05
++#define AVRCP_EVENT_BATT_STATUS_CHANGED			0x06
++#define AVRCP_EVENT_SYSTEM_STATUS_CHANGED		0x07
++#define AVRCP_EVENT_PLAYER_APPLICATION_SETTING_CHANGED	0x08
++#define AVRCP_EVENT_NOW_PLAYING_CONTENT_CHANGED		0x09
++#define AVRCP_EVENT_AVAILABLE_PLAYERS_CHANGED		0x0a
++#define AVRCP_EVENT_ADDRESSED_PLAYER_CHANGED		0x0b
++#define AVRCP_EVENT_UIDS_CHANGED			0x0c
++#define AVRCP_EVENT_VOLUME_CHANGED			0x0d
++
+ /* error statuses */
+ #define AVRCP_STATUS_INVALID_COMMAND			0x00
+ #define AVRCP_STATUS_INVALID_PARAMETER			0x01
+@@ -219,6 +234,52 @@ static const char *opcode2str(uint8_t opcode)
+ 	}
+ }
+ 
++static char *cap2str(uint8_t cap)
++{
++	switch (cap) {
++	case 0x2:
++		return "CompanyID";
++	case 0x3:
++		return "EventsID";
++	default:
++		return "Unknown";
++	}
++}
++
++static char *event2str(uint8_t event)
++{
++	switch (event) {
++	case AVRCP_EVENT_PLAYBACK_STATUS_CHANGED:
++		return "EVENT_PLAYBACK_STATUS_CHANGED";
++	case AVRCP_EVENT_TRACK_CHANGED:
++		return "EVENT_TRACK_CHANGED";
++	case AVRCP_EVENT_TRACK_REACHED_END:
++		return "EVENT_TRACK_REACHED_END";
++	case AVRCP_EVENT_TRACK_REACHED_START:
++		return "EVENT_TRACK_REACHED_START";
++	case AVRCP_EVENT_PLAYBACK_POS_CHANGED:
++		return "EVENT_PLAYBACK_POS_CHANGED";
++	case AVRCP_EVENT_BATT_STATUS_CHANGED:
++		return "EVENT_BATT_STATUS_CHANGED";
++	case AVRCP_EVENT_SYSTEM_STATUS_CHANGED:
++		return "EVENT_SYSTEM_STATUS_CHANGED";
++	case AVRCP_EVENT_PLAYER_APPLICATION_SETTING_CHANGED:
++		return "EVENT_PLAYER_APPLICATION_SETTING_CHANGED";
++	case AVRCP_EVENT_NOW_PLAYING_CONTENT_CHANGED:
++		return "EVENT_NOW_PLAYING_CONTENT_CHANGED";
++	case AVRCP_EVENT_AVAILABLE_PLAYERS_CHANGED:
++		return "EVENT_AVAILABLE_PLAYERS_CHANGED";
++	case AVRCP_EVENT_ADDRESSED_PLAYER_CHANGED:
++		return "EVENT_ADDRESSED_PLAYER_CHANGED";
++	case AVRCP_EVENT_UIDS_CHANGED:
++		return "EVENT_UIDS_CHANGED";
++	case AVRCP_EVENT_VOLUME_CHANGED:
++		return "EVENT_VOLUME_CHANGED";
++	default:
++		return "Reserved";
++	}
++}
++
+ static const char *error2str(uint8_t status)
+ {
+ 	switch (status) {
+@@ -351,6 +412,45 @@ static void avrcp_get_capabilities(const struct l2cap_frame *frame,
+ 					uint8_t ctype, uint8_t len,
+ 					uint8_t indent)
+ {
++	uint8_t cap, count;
++	int i;
++
++	if (len < 1) {
++		print_text(COLOR_ERROR, "PDU malformed");
++		packet_hexdump(frame->data, frame->size);
++		return;
++	}
++
++	cap = *((uint8_t *) frame->data);
++	print_field("%*cCapabilityID: 0x%02x (%s)", (indent - 8), ' ', cap,
++								cap2str(cap));
++
++	if (len == 1)
++		return;
++
++	count = *((uint8_t *) (frame->data + 1));
++	print_field("%*cCapabilityCount: 0x%02x", (indent - 8), ' ', count);
++
++	switch (cap) {
++	case 0x2:
++		for (; count > 0; count--) {
++			print_field("%s: 0x", cap2str(cap));
++			for (i = 0; i < 3; i++)
++				print_field("%*c%02x", (indent - 8), ' ',
++					*((uint8_t *) (frame->data + 2 + i)));
++		}
++		break;
++	case 0x3:
++		for (i = 0; count > 0; count--, i++) {
++			uint8_t event;
++			event = *((uint8_t *) (frame->data + 2 + i));
++			print_field("%*c%s: 0x%02x (%s)", (indent - 8), ' ',
++					cap2str(cap), event, event2str(event));
++		}
++		break;
++	default:
++		packet_hexdump(frame->data + 1, frame->size - 1);
++	}
+ }
+ 
+ static void avrcp_list_player_attributes(const struct l2cap_frame *frame,
+-- 
+1.9.1
 
-You can ignore this patch. Just find out that using optiion -r with a
-delay (-K) and small receive buffer (-H) I can pass PTS test.
-
-BR
-Lukasz
