@@ -1,31 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <3D02B219753AD44CBDDDE484323B1774112F0DB2@SHSMSX104.ccr.corp.intel.com>
-References: <1407789427-7118-1-git-send-email-armansito@chromium.org>
-	<1407789427-7118-2-git-send-email-armansito@chromium.org>
-	<3D02B219753AD44CBDDDE484323B1774112F0DB2@SHSMSX104.ccr.corp.intel.com>
-Date: Wed, 13 Aug 2014 10:45:23 -0700
-Message-ID: <CAHrH25QHpf0tjD2YaNvAOzMvSOPc_CcixMpoJ4Lx6MThJf_43Q@mail.gmail.com>
-Subject: Re: [RFC v2 1/1] doc/gatt-api: New API properties and methods for the
- GATT D-Bus API.
-From: Arman Uguray <armansito@chromium.org>
-To: "Gu, Chao Jie" <chao.jie.gu@intel.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.6\))
+Subject: Re: [PATCH] Bluetooth: Improve data packing in SAR mode
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1407938501-25659-1-git-send-email-lukasz.rymanowski@tieto.com>
+Date: Wed, 13 Aug 2014 10:27:21 -0700
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <C6D223AE-A16B-41A2-8AE2-ECC6741485AE@holtmann.org>
+References: <1407938501-25659-1-git-send-email-lukasz.rymanowski@tieto.com>
+To: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Chaojie,
+Hi Lukasz,
 
-> Following your new proposal to implement, there is one details that I missed before which condition the services would set up under the local remote device. I think this "optional" maybe is not essential. Gatt Hiearchy should always set up when it connected to remote devices.
->
+> There is no need to decrease pdu size with L2CAP SDU lenght in Start
+> L2CAP SDU frame. Start packtet is just 2 bytes longer as specified and
+> we can keep payload as long as possible.
+> 
+> Signed-off-by: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+> ---
+> When testing SAR L2CAP against PTS, L2CAP channel is usually
+> configured in that way, that SDU = MPS * 3. PTS expets then 3
+> I-Frames from IUT: Start, Continuation and End frame.
+> 
+> Without this fix, we sent 4 I-Frames. We could pass a test
+> by using -b option in l2test and send just two bytes less than
+> SDU length but it was hakish :) With this patch no need to use -b
+> option.
+> 
+> net/bluetooth/l2cap_core.c | 5 +----
+> 1 file changed, 1 insertion(+), 4 deletions(-)
 
-I marked it as optional since it only applies when BlueZ is the
-central. If BlueZ is acting as a server for services that are
-registered through GattManager1, then this property doesn't make much
-sense. Even though the server-side implementation won't happen for
-some time, the idea is that server and client D-Bus APIs will use the
-same interface definitions.
+patch has been applied to bluetooth-next tree.
 
-Thanks,
-Arman
+Regards
+
+Marcel
+
