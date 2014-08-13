@@ -1,24 +1,23 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 13 Aug 2014 14:52:27 +0530
+Date: Wed, 13 Aug 2014 14:51:39 +0530
 From: Himangi Saraogi <himangi774@gmail.com>
 To: Marcel Holtmann <marcel@holtmann.org>,
 	Gustavo Padovan <gustavo@padovan.org>,
 	Johan Hedberg <johan.hedberg@gmail.com>,
 	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
 Cc: Julia Lawall <julia.lawall@lip6.fr>
-Subject: [PATCH] bluetooth/dtl1_cs: Remove typedefs nsh_t and dtl1_info_t
-Message-ID: <20140813092227.GA3221@himangi-Dell>
+Subject: [PATCH] bluetooth/btuart_cs: Remove typedef btuart_info_t
+Message-ID: <20140813092139.GA3189@himangi-Dell>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 The Linux kernel coding style guidelines suggest not using typedefs
-for structure types. This patch gets rid of the typedefs for nsh_t and
-dtl1_info_t. Also, the name of the struct is changed to drop the _t,
+for structure types. This patch gets rid of the typedef for
+btuart_info_t. Also, the name of the struct is changed to drop the _t,
 to make the name look less typedef-like.
 
-The following Coccinelle semantic patch detects the case for dtl1_info_t
-and a similar patch finds the nsh_t case:
+The following Coccinelle semantic patch detects the case:
 
 @tn@
 identifier i;
@@ -41,159 +40,130 @@ identifier tn.i;
 Signed-off-by: Himangi Saraogi <himangi774@gmail.com>
 Acked-by: Julia Lawall <julia.lawall@lip6.fr>
 ---
- drivers/bluetooth/dtl1_cs.c | 36 ++++++++++++++++++------------------
- 1 file changed, 18 insertions(+), 18 deletions(-)
+ drivers/bluetooth/btuart_cs.c | 27 ++++++++++++++-------------
+ 1 file changed, 14 insertions(+), 13 deletions(-)
 
-diff --git a/drivers/bluetooth/dtl1_cs.c b/drivers/bluetooth/dtl1_cs.c
-index 2bd8fad..78e10f0 100644
---- a/drivers/bluetooth/dtl1_cs.c
-+++ b/drivers/bluetooth/dtl1_cs.c
+diff --git a/drivers/bluetooth/btuart_cs.c b/drivers/bluetooth/btuart_cs.c
+index fb948f0..abb4d21 100644
+--- a/drivers/bluetooth/btuart_cs.c
++++ b/drivers/bluetooth/btuart_cs.c
 @@ -62,7 +62,7 @@ MODULE_LICENSE("GPL");
  /* ======================== Local structures ======================== */
  
  
--typedef struct dtl1_info_t {
-+struct dtl1_info {
+-typedef struct btuart_info_t {
++struct btuart_info {
  	struct pcmcia_device *p_dev;
  
  	struct hci_dev *hdev;
-@@ -78,7 +78,7 @@ typedef struct dtl1_info_t {
+@@ -75,7 +75,7 @@ typedef struct btuart_info_t {
  	unsigned long rx_state;
  	unsigned long rx_count;
  	struct sk_buff *rx_skb;
--} dtl1_info_t;
+-} btuart_info_t;
 +};
  
  
- static int dtl1_config(struct pcmcia_device *link);
-@@ -94,11 +94,11 @@ static int dtl1_config(struct pcmcia_device *link);
- #define RECV_WAIT_DATA  1
- 
- 
--typedef struct {
-+struct nsh {
- 	u8 type;
- 	u8 zero;
- 	u16 len;
--} __packed nsh_t;	/* Nokia Specific Header */
-+} __packed;	/* Nokia Specific Header */
- 
- #define NSHL  4				/* Nokia Specific Header Length */
- 
-@@ -126,7 +126,7 @@ static int dtl1_write(unsigned int iobase, int fifo_size, __u8 *buf, int len)
+ static int btuart_config(struct pcmcia_device *link);
+@@ -127,7 +127,7 @@ static int btuart_write(unsigned int iobase, int fifo_size, __u8 *buf, int len)
  }
  
  
--static void dtl1_write_wakeup(dtl1_info_t *info)
-+static void dtl1_write_wakeup(struct dtl1_info *info)
+-static void btuart_write_wakeup(btuart_info_t *info)
++static void btuart_write_wakeup(struct btuart_info *info)
  {
  	if (!info) {
  		BT_ERR("Unknown device");
-@@ -176,7 +176,7 @@ static void dtl1_write_wakeup(dtl1_info_t *info)
+@@ -172,7 +172,7 @@ static void btuart_write_wakeup(btuart_info_t *info)
  }
  
  
--static void dtl1_control(dtl1_info_t *info, struct sk_buff *skb)
-+static void dtl1_control(struct dtl1_info *info, struct sk_buff *skb)
+-static void btuart_receive(btuart_info_t *info)
++static void btuart_receive(struct btuart_info *info)
  {
- 	u8 flowmask = *(u8 *)skb->data;
- 	int i;
-@@ -199,10 +199,10 @@ static void dtl1_control(dtl1_info_t *info, struct sk_buff *skb)
+ 	unsigned int iobase;
+ 	int boguscount = 0;
+@@ -286,7 +286,7 @@ static void btuart_receive(btuart_info_t *info)
+ 
+ static irqreturn_t btuart_interrupt(int irq, void *dev_inst)
+ {
+-	btuart_info_t *info = dev_inst;
++	struct btuart_info *info = dev_inst;
+ 	unsigned int iobase;
+ 	int boguscount = 0;
+ 	int iir, lsr;
+@@ -340,7 +340,8 @@ static irqreturn_t btuart_interrupt(int irq, void *dev_inst)
  }
  
  
--static void dtl1_receive(dtl1_info_t *info)
-+static void dtl1_receive(struct dtl1_info *info)
+-static void btuart_change_speed(btuart_info_t *info, unsigned int speed)
++static void btuart_change_speed(struct btuart_info *info,
++				unsigned int speed)
  {
+ 	unsigned long flags;
  	unsigned int iobase;
--	nsh_t *nsh;
-+	struct nsh *nsh;
- 	int boguscount = 0;
+@@ -397,7 +398,7 @@ static void btuart_change_speed(btuart_info_t *info, unsigned int speed)
  
- 	if (!info) {
-@@ -227,7 +227,7 @@ static void dtl1_receive(dtl1_info_t *info)
- 		}
- 
- 		*skb_put(info->rx_skb, 1) = inb(iobase + UART_RX);
--		nsh = (nsh_t *)info->rx_skb->data;
-+		nsh = (struct nsh *)info->rx_skb->data;
- 
- 		info->rx_count--;
- 
-@@ -287,7 +287,7 @@ static void dtl1_receive(dtl1_info_t *info)
- 
- static irqreturn_t dtl1_interrupt(int irq, void *dev_inst)
+ static int btuart_hci_flush(struct hci_dev *hdev)
  {
--	dtl1_info_t *info = dev_inst;
-+	struct dtl1_info *info = dev_inst;
- 	unsigned int iobase;
- 	unsigned char msr;
- 	int boguscount = 0;
-@@ -365,7 +365,7 @@ static int dtl1_hci_open(struct hci_dev *hdev)
- 
- static int dtl1_hci_flush(struct hci_dev *hdev)
- {
--	dtl1_info_t *info = hci_get_drvdata(hdev);
-+	struct dtl1_info *info = hci_get_drvdata(hdev);
+-	btuart_info_t *info = hci_get_drvdata(hdev);
++	struct btuart_info *info = hci_get_drvdata(hdev);
  
  	/* Drop TX queue */
  	skb_queue_purge(&(info->txq));
-@@ -387,9 +387,9 @@ static int dtl1_hci_close(struct hci_dev *hdev)
+@@ -427,7 +428,7 @@ static int btuart_hci_close(struct hci_dev *hdev)
  
- static int dtl1_hci_send_frame(struct hci_dev *hdev, struct sk_buff *skb)
+ static int btuart_hci_send_frame(struct hci_dev *hdev, struct sk_buff *skb)
  {
--	dtl1_info_t *info = hci_get_drvdata(hdev);
-+	struct dtl1_info *info = hci_get_drvdata(hdev);
- 	struct sk_buff *s;
--	nsh_t nsh;
-+	struct nsh nsh;
+-	btuart_info_t *info = hci_get_drvdata(hdev);
++	struct btuart_info *info = hci_get_drvdata(hdev);
  
  	switch (bt_cb(skb)->pkt_type) {
  	case HCI_COMMAND_PKT:
-@@ -436,7 +436,7 @@ static int dtl1_hci_send_frame(struct hci_dev *hdev, struct sk_buff *skb)
+@@ -455,7 +456,7 @@ static int btuart_hci_send_frame(struct hci_dev *hdev, struct sk_buff *skb)
  /* ======================== Card services HCI interaction ======================== */
  
  
--static int dtl1_open(dtl1_info_t *info)
-+static int dtl1_open(struct dtl1_info *info)
+-static int btuart_open(btuart_info_t *info)
++static int btuart_open(struct btuart_info *info)
  {
  	unsigned long flags;
  	unsigned int iobase = info->p_dev->resource[0]->start;
-@@ -505,7 +505,7 @@ static int dtl1_open(dtl1_info_t *info)
+@@ -521,7 +522,7 @@ static int btuart_open(btuart_info_t *info)
  }
  
  
--static int dtl1_close(dtl1_info_t *info)
-+static int dtl1_close(struct dtl1_info *info)
+-static int btuart_close(btuart_info_t *info)
++static int btuart_close(struct btuart_info *info)
  {
  	unsigned long flags;
  	unsigned int iobase = info->p_dev->resource[0]->start;
-@@ -534,7 +534,7 @@ static int dtl1_close(dtl1_info_t *info)
+@@ -550,7 +551,7 @@ static int btuart_close(btuart_info_t *info)
  
- static int dtl1_probe(struct pcmcia_device *link)
+ static int btuart_probe(struct pcmcia_device *link)
  {
--	dtl1_info_t *info;
-+	struct dtl1_info *info;
+-	btuart_info_t *info;
++	struct btuart_info *info;
  
  	/* Create new info device */
  	info = devm_kzalloc(&link->dev, sizeof(*info), GFP_KERNEL);
-@@ -552,7 +552,7 @@ static int dtl1_probe(struct pcmcia_device *link)
+@@ -613,7 +614,7 @@ static int btuart_check_config_notpicky(struct pcmcia_device *p_dev,
  
- static void dtl1_detach(struct pcmcia_device *link)
+ static int btuart_config(struct pcmcia_device *link)
  {
--	dtl1_info_t *info = link->priv;
-+	struct dtl1_info *info = link->priv;
+-	btuart_info_t *info = link->priv;
++	struct btuart_info *info = link->priv;
+ 	int i;
+ 	int try;
  
- 	dtl1_close(info);
- 	pcmcia_disable_device(link);
-@@ -571,7 +571,7 @@ static int dtl1_confcheck(struct pcmcia_device *p_dev, void *priv_data)
+@@ -654,7 +655,7 @@ failed:
  
- static int dtl1_config(struct pcmcia_device *link)
+ static void btuart_release(struct pcmcia_device *link)
  {
--	dtl1_info_t *info = link->priv;
-+	struct dtl1_info *info = link->priv;
- 	int ret;
+-	btuart_info_t *info = link->priv;
++	struct btuart_info *info = link->priv;
  
- 	/* Look for a generic full-sized window */
+ 	btuart_close(info);
+ 
 -- 
 1.9.1
