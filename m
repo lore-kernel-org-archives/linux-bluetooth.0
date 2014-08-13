@@ -3,213 +3,132 @@ From: Vikrampal Yadav <vikram.pal@samsung.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: luiz.dentz@gmail.com, d.kasatkin@samsung.com,
 	vikram.pal@samsung.com, cpgs@samsung.com
-Subject: [PATCH v3 3/6] monitor: Handle AVRCP specific AV/C PDUs
-Date: Wed, 13 Aug 2014 15:13:32 +0530
-Message-id: <1407923015-26468-3-git-send-email-vikram.pal@samsung.com>
+Subject: [PATCH v3 5/6] monitor: Add AV/C specific PDUs' error macros and
+ functions
+Date: Wed, 13 Aug 2014 15:13:34 +0530
+Message-id: <1407923015-26468-5-git-send-email-vikram.pal@samsung.com>
 In-reply-to: <1407923015-26468-1-git-send-email-vikram.pal@samsung.com>
 References: <1407923015-26468-1-git-send-email-vikram.pal@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Added handling of AVRCP specific AV/C PDUs.
+Added AV/C specific PDUs' error macros and functions in
+Bluetooth monitor.
 ---
- monitor/avctp.c | 176 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 176 insertions(+)
+ monitor/avctp.c | 86 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 86 insertions(+)
 
 diff --git a/monitor/avctp.c b/monitor/avctp.c
-index f3ce40e..6b3b066 100644
+index 5550c81..bc8f469 100644
 --- a/monitor/avctp.c
 +++ b/monitor/avctp.c
-@@ -163,13 +163,189 @@ static const char *opcode2str(uint8_t opcode)
+@@ -79,6 +79,30 @@
+ #define AVC_OP_SUBUNITINFO		0x31
+ #define AVC_OP_PASSTHROUGH		0x7c
+ 
++/* error statuses */
++#define AVRCP_STATUS_INVALID_COMMAND			0x00
++#define AVRCP_STATUS_INVALID_PARAMETER			0x01
++#define AVRCP_STATUS_NOT_FOUND				0x02
++#define AVRCP_STATUS_INTERNAL_ERROR			0x03
++#define AVRCP_STATUS_SUCCESS				0x04
++#define AVRCP_STATUS_UID_CHANGED			0x05
++#define AVRCP_STATUS_INVALID_DIRECTION			0x07
++#define AVRCP_STATUS_NOT_DIRECTORY			0x08
++#define AVRCP_STATUS_DOES_NOT_EXIST			0x09
++#define AVRCP_STATUS_INVALID_SCOPE			0x0a
++#define AVRCP_STATUS_OUT_OF_BOUNDS			0x0b
++#define AVRCP_STATUS_IS_DIRECTORY			0x0c
++#define AVRCP_STATUS_MEDIA_IN_USE			0x0d
++#define AVRCP_STATUS_NOW_PLAYING_LIST_FULL		0x0e
++#define AVRCP_STATUS_SEARCH_NOT_SUPPORTED		0x0f
++#define AVRCP_STATUS_SEARCH_IN_PROGRESS			0x10
++#define AVRCP_STATUS_INVALID_PLAYER_ID			0x11
++#define AVRCP_STATUS_PLAYER_NOT_BROWSABLE		0x12
++#define AVRCP_STATUS_PLAYER_NOT_ADDRESSED		0x13
++#define AVRCP_STATUS_NO_VALID_SEARCH_RESULTS		0x14
++#define AVRCP_STATUS_NO_AVAILABLE_PLAYERS		0x15
++#define AVRCP_STATUS_ADDRESSED_PLAYER_CHANGED		0x16
++
+ /* pdu ids */
+ #define AVRCP_GET_CAPABILITIES		0x10
+ #define AVRCP_LIST_PLAYER_ATTRIBUTES	0x11
+@@ -195,6 +219,58 @@ static const char *opcode2str(uint8_t opcode)
  	}
  }
  
-+static const char *pdu2str(uint8_t pduid)
++static const char *error2str(uint8_t status)
 +{
-+	return "Unknown";
++	switch (status) {
++	case AVRCP_STATUS_INVALID_COMMAND:
++		return "Invalid Command";
++	case AVRCP_STATUS_INVALID_PARAMETER:
++		return "Invalid Parameter";
++	case AVRCP_STATUS_NOT_FOUND:
++		return "Not Found";
++	case AVRCP_STATUS_INTERNAL_ERROR:
++		return "Internal Error";
++	case AVRCP_STATUS_SUCCESS:
++		return "Success";
++	case AVRCP_STATUS_UID_CHANGED:
++		return "UID Changed";
++	case AVRCP_STATUS_INVALID_DIRECTION:
++		return "Invalid Direction";
++	case AVRCP_STATUS_NOT_DIRECTORY:
++		return "Not a Directory";
++	case AVRCP_STATUS_DOES_NOT_EXIST:
++		return "Does Not Exist";
++	case AVRCP_STATUS_INVALID_SCOPE:
++		return "Invalid Scope";
++	case AVRCP_STATUS_OUT_OF_BOUNDS:
++		return "Range Out of Bonds";
++	case AVRCP_STATUS_MEDIA_IN_USE:
++		return "Media in Use";
++	case AVRCP_STATUS_IS_DIRECTORY:
++		return "UID is a Directory";
++	case AVRCP_STATUS_NOW_PLAYING_LIST_FULL:
++		return "Now Playing List Full";
++	case AVRCP_STATUS_SEARCH_NOT_SUPPORTED:
++		return "Seach Not Supported";
++	case AVRCP_STATUS_SEARCH_IN_PROGRESS:
++		return "Search in Progress";
++	case AVRCP_STATUS_INVALID_PLAYER_ID:
++		return "Invalid Player ID";
++	case AVRCP_STATUS_PLAYER_NOT_BROWSABLE:
++		return "Player Not Browsable";
++	case AVRCP_STATUS_PLAYER_NOT_ADDRESSED:
++		return "Player Not Addressed";
++	case AVRCP_STATUS_NO_VALID_SEARCH_RESULTS:
++		return "No Valid Search Result";
++	case AVRCP_STATUS_NO_AVAILABLE_PLAYERS:
++		return "No Available Players";
++	case AVRCP_STATUS_ADDRESSED_PLAYER_CHANGED:
++		return "Addressed Player Changed";
++	default:
++		return "Unknown";
++	}
 +}
 +
-+static const char *pt2str(uint8_t pt)
-+{
-+	return "Unknown";
-+}
-+
- static void avrcp_passthrough_packet(const struct l2cap_frame *frame)
+ static const char *pdu2str(uint8_t pduid)
  {
- }
+ 	switch (pduid) {
+@@ -395,6 +471,16 @@ static const struct avrcp_ctrl_pdu_data avrcp_ctrl_pdu_table[] = {
  
-+static void avrcp_get_capabilities(const struct l2cap_frame *frame,
-+					uint8_t ctype, uint8_t len,
-+					uint8_t indent)
-+{
-+}
-+
-+static void avrcp_list_player_attributes(const struct l2cap_frame *frame,
-+						uint8_t ctype, uint8_t len,
-+						uint8_t indent)
-+{
-+}
-+
-+static void avrcp_list_player_values(const struct l2cap_frame *frame,
-+					uint8_t ctype, uint8_t len,
-+					uint8_t indent)
-+{
-+}
-+
-+static void avrcp_get_current_player_value(const struct l2cap_frame *frame,
-+						uint8_t ctype, uint8_t len,
-+						uint8_t indent)
-+{
-+}
-+
-+static void avrcp_set_player_value(const struct l2cap_frame *frame,
-+					uint8_t ctype, uint8_t len,
-+					uint8_t indent)
-+{
-+}
-+
-+static void avrcp_get_player_attribute_text(const struct l2cap_frame *frame,
-+						uint8_t ctype, uint8_t len,
-+						uint8_t indent)
-+{
-+}
-+
-+static void avrcp_get_player_value_text(const struct l2cap_frame *frame,
-+					uint8_t ctype, uint8_t len,
-+					uint8_t indent)
-+{
-+}
-+
-+static void avrcp_displayable_charset(const struct l2cap_frame *frame,
-+					uint8_t ctype, uint8_t len,
-+					uint8_t indent)
-+{
-+}
-+
-+static void avrcp_ct_battery_status(const struct l2cap_frame *frame,
-+					uint8_t ctype, uint8_t len,
-+					uint8_t indent)
-+{
-+}
-+
-+static void avrcp_get_element_attributes(const struct l2cap_frame *frame,
-+						uint8_t ctype, uint8_t len,
-+						uint8_t indent)
-+{
-+}
-+
-+static void avrcp_get_play_status(const struct l2cap_frame *frame,
-+					uint8_t ctype, uint8_t len,
-+					uint8_t indent)
-+{
-+}
-+
-+static void avrcp_register_notification(const struct l2cap_frame *frame,
-+					uint8_t ctype, uint8_t len,
-+					uint8_t indent)
-+{
-+}
-+
-+static void avrcp_set_absolute_volume(const struct l2cap_frame *frame,
-+					uint8_t ctype, uint8_t len,
-+					uint8_t indent)
-+{
-+}
-+
-+static void avrcp_set_addressed_player(const struct l2cap_frame *frame,
-+					uint8_t ctype, uint8_t len,
-+					uint8_t indent)
-+{
-+}
-+
-+static void avrcp_play_item(const struct l2cap_frame *frame,
-+				uint8_t ctype, uint8_t len,
-+				uint8_t indent)
-+{
-+}
-+
-+static void avrcp_add_to_now_playing(const struct l2cap_frame *frame,
-+					uint8_t ctype, uint8_t len,
-+					uint8_t indent)
-+{
-+}
-+
-+struct avrcp_ctrl_pdu_data {
-+	uint8_t pduid;
-+	void (*func) (const struct l2cap_frame *frame, uint8_t ctype,
-+	uint8_t len, uint8_t indent);
-+};
-+
-+static const struct avrcp_ctrl_pdu_data avrcp_ctrl_pdu_table[] = {
-+	{ 0x10, avrcp_get_capabilities			},
-+	{ 0x11, avrcp_list_player_attributes		},
-+	{ 0x12, avrcp_list_player_values		},
-+	{ 0x13, avrcp_get_current_player_value		},
-+	{ 0x14, avrcp_set_player_value			},
-+	{ 0x15, avrcp_get_player_attribute_text		},
-+	{ 0x16, avrcp_get_player_value_text		},
-+	{ 0x17, avrcp_displayable_charset		},
-+	{ 0x18, avrcp_ct_battery_status			},
-+	{ 0x20, avrcp_get_element_attributes		},
-+	{ 0x30, avrcp_get_play_status			},
-+	{ 0x31, avrcp_register_notification		},
-+	{ 0x50, avrcp_set_absolute_volume		},
-+	{ 0x60, avrcp_set_addressed_player		},
-+	{ 0x74, avrcp_play_item				},
-+	{ 0x90, avrcp_add_to_now_playing		},
-+	{ }
-+};
-+
-+static void avrcp_rejected_packet(const struct l2cap_frame *frame)
-+{
-+}
-+
- static void avrcp_pdu_packet(const struct l2cap_frame *frame, uint8_t ctype,
- 				uint8_t indent)
+ static void avrcp_rejected_packet(const struct l2cap_frame *frame)
  {
-+	uint8_t pduid, pt;
-+	uint16_t len;
-+	int i;
-+	const struct avrcp_ctrl_pdu_data *ctrl_pdu_data = NULL;
-+	const char *ctrl_pdu_data_color;
-+	struct l2cap_frame avrcp_frame;
++	uint8_t status;
 +
-+	pduid = *((uint8_t *) frame->data);
-+	pt = *((uint8_t *) (frame->data + 1));
-+	len = get_be16(frame->data + 2);
-+
-+	print_indent(indent, ctrl_pdu_data_color, "AVRCP: ", pdu2str(pduid),
-+						COLOR_OFF, " pt %s len 0x%04x",
-+						pt2str(pt), len);
-+
-+	if ((frame->size < 4) || ((frame->size - 4) != len)) {
++	if (frame->size < 1) {
 +		print_text(COLOR_ERROR, "PDU malformed");
 +		packet_hexdump(frame->data, frame->size);
 +		return;
 +	}
 +
-+	if (ctype == 0xA) {
-+		avrcp_rejected_packet(frame);
-+		return;
-+	}
-+
-+	for (i = 0; avrcp_ctrl_pdu_table[i].func; i++) {
-+		if (avrcp_ctrl_pdu_table[i].pduid == pduid) {
-+			ctrl_pdu_data = &avrcp_ctrl_pdu_table[i];
-+			break;
-+		}
-+	}
-+
-+	if (!ctrl_pdu_data || !ctrl_pdu_data->func) {
-+		packet_hexdump(frame->data + 4, frame->size - 4);
-+		return;
-+	}
-+
-+	l2cap_frame_pull(&avrcp_frame, frame, 4);
-+	ctrl_pdu_data->func(&avrcp_frame, ctype, len, indent + 2);
++	status = *((uint8_t *) frame->data);
++	print_field("Error: 0x%02x (%s)", status, error2str(status));
  }
  
- static void avrcp_control_packet(const struct l2cap_frame *frame)
+ static void avrcp_pdu_packet(const struct l2cap_frame *frame, uint8_t ctype,
 -- 
 1.9.1
 
