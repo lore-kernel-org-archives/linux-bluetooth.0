@@ -1,35 +1,66 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.6\))
+Date: Fri, 15 Aug 2014 09:58:46 +1000
+From: Stephen Rothwell <sfr@canb.auug.org.au>
+To: Johan Hedberg <johan.hedberg@gmail.com>
+Cc: linville@tuxdriver.com, linux-wireless@vger.kernel.org,
+	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
 Subject: Re: pull request: bluetooth-next 2014-08-14
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <20140815095846.009d6015@canb.auug.org.au>
 In-Reply-To: <20140815095547.75d9e9d4@canb.auug.org.au>
-Date: Thu, 14 Aug 2014 18:30:54 -0700
-Cc: Johan Hedberg <johan.hedberg@gmail.com>,
-	"John W. Linville" <linville@tuxdriver.com>,
-	"linux-wireless@vger.kernel.org Wireless"
-	<linux-wireless@vger.kernel.org>,
-	BlueZ development <linux-bluetooth@vger.kernel.org>,
-	linux-kernel@vger.kernel.org
-Message-Id: <027436B7-E5DF-4AFB-B43C-65AB41D0200D@holtmann.org>
-References: <20140814145000.GA14226@t440s.P-661HNU-F1> <20140815095547.75d9e9d4@canb.auug.org.au>
-To: Stephen Rothwell <sfr@canb.auug.org.au>
-Sender: linux-kernel-owner@vger.kernel.org
+References: <20140814145000.GA14226@t440s.P-661HNU-F1>
+	<20140815095547.75d9e9d4@canb.auug.org.au>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ boundary="Sig_/VDngPEM7XPLmJY2tSpyYRsk"; protocol="application/pgp-signature"
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Stephen,
+--Sig_/VDngPEM7XPLmJY2tSpyYRsk
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
->> Here's our first bluetooth-next pull request for the 3.18 kernel. Our
->> tree is based on net-next so you'd need to pull from there first before
->> pulling from our tree.
-> 
+Hi Johan,
+
+On Fri, 15 Aug 2014 09:55:47 +1000 Stephen Rothwell <sfr@canb.auug.org.au> =
+wrote:
+>
+> On Thu, 14 Aug 2014 17:50:00 +0300 Johan Hedberg <johan.hedberg@gmail.com=
+> wrote:
+> >
+> > Here's our first bluetooth-next pull request for the 3.18 kernel. Our
+> > tree is based on net-next so you'd need to pull from there first before
+> > pulling from our tree.
+>=20
 > This is in a branch that will be included in linux-next today.  I guess
 > you didn't read my (very often) repeated request that no v3.18 material
 > be included until after v3.17-rc1 is released ... Please do not do that.
 
-to be honest I did not know about this rule. Next time, I will create a special tree for the time during the merge window so that we can continue pushing out patches for the next release. For us the world is not standing still just because we have a 2 week merge window.
+It has also all been rebased since yesterday ...
 
-Regards
+--=20
+Cheers,
+Stephen Rothwell                    sfr@canb.auug.org.au
 
-Marcel
+--Sig_/VDngPEM7XPLmJY2tSpyYRsk
+Content-Type: application/pgp-signature; name=signature.asc
+Content-Disposition: attachment; filename=signature.asc
 
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iQIcBAEBCAAGBQJT7U1CAAoJEMDTa8Ir7ZwV7QgP/1QeLHrm7cy+hvvhxdDTMo+M
+LPrsvib/BiDKKHye4/QMrBR015KnZfOvcoeVkVoLFcOKuaIYQD99seik57tT5rEk
+DpILNPUmQdqo6tr74IcmOOU+drya69yFjQDBEfVEVbywr3UpR1BYeUCFga4LZmsI
+UQSBuz3VGg4LMK1tP73WdVngYozE8GkqmeS96XqqBv/pmxvVgNnEqaCvQnPadYcw
+m620oA6d1mnuLHG/mi+kvIcadyh5VCJ0gcsYRuK2SiJEy5C6sClP+qGbHTc9qOlu
+0NgpchFWfpj7HhmUz51/AZ0GaBSWTsu3R4Zacz0ivv736PVEMLFWW62Tqn4EUaG+
+zXjWR151dKa04Jp1oWZMgelnGtIkmnCKsR+1Eb5RSPTSpB2df3F8kQ2eM8uUEq8l
+Ljby/RNx+nNwv65ju2jiCPCe1K/acgS8NkBcpeacFrMF+V9s0jjxorBfUwgiEX71
+vizRGsjhIc3o6dmJDSFPze4pcBAGcmODdLY15QTruH4V89cxhP7NnHK/BWhXjKlx
+G8ItLaShI8l9ZEof27MacSJuL72v5+YrhVBoDGqJdtTQON+Blad/wnL1j88SGLsa
+H0RQMMXWzQc3z8cmAqoXgbW2ZhDL22RuZqt7qyae9pzhfgcK10fcDaX6T0v0QG/E
+vW6Pk8gt7JxkY7Gjhvlr
+=14vK
+-----END PGP SIGNATURE-----
+
+--Sig_/VDngPEM7XPLmJY2tSpyYRsk--
