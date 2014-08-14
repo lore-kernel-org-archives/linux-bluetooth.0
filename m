@@ -1,60 +1,98 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 15 Aug 2014 09:55:47 +1000
-From: Stephen Rothwell <sfr@canb.auug.org.au>
-To: Johan Hedberg <johan.hedberg@gmail.com>
-Cc: linville@tuxdriver.com, linux-wireless@vger.kernel.org,
-	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: pull request: bluetooth-next 2014-08-14
-Message-ID: <20140815095547.75d9e9d4@canb.auug.org.au>
-In-Reply-To: <20140814145000.GA14226@t440s.P-661HNU-F1>
-References: <20140814145000.GA14226@t440s.P-661HNU-F1>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- boundary="Sig_/BizOQNKk7dPO++rI1T/Yfet"; protocol="application/pgp-signature"
-Sender: linux-kernel-owner@vger.kernel.org
+In-Reply-To: <1407931517-16264-1-git-send-email-vikram.pal@samsung.com>
+References: <1407931517-16264-1-git-send-email-vikram.pal@samsung.com>
+Date: Thu, 14 Aug 2014 18:11:49 +0300
+Message-ID: <CABBYNZ+S3wmFxYNwYJih-7xoQFmoqL81RMUp4UqOQ8_oxOsyUQ@mail.gmail.com>
+Subject: Re: [PATCH] monitor: Add AVRCP ListPlayerApplicationSettingAttributes support
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Vikrampal Yadav <vikram.pal@samsung.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	Dmitry Kasatkin <d.kasatkin@samsung.com>, cpgs@samsung.com
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
---Sig_/BizOQNKk7dPO++rI1T/Yfet
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+Hi,
 
-Hi Johan,
-
-On Thu, 14 Aug 2014 17:50:00 +0300 Johan Hedberg <johan.hedberg@gmail.com> =
-wrote:
+On Wed, Aug 13, 2014 at 3:05 PM, Vikrampal Yadav <vikram.pal@samsung.com> wrote:
+> Support for decoding AVRCP ListPlayerApplicationSettingAttributes
+> added in Bluetooth monitor.
+> ---
+>  monitor/avctp.c | 41 +++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 41 insertions(+)
 >
-> Here's our first bluetooth-next pull request for the 3.18 kernel. Our
-> tree is based on net-next so you'd need to pull from there first before
-> pulling from our tree.
+> diff --git a/monitor/avctp.c b/monitor/avctp.c
+> index 9eeac7f..a25945b 100644
+> --- a/monitor/avctp.c
+> +++ b/monitor/avctp.c
+> @@ -150,6 +150,13 @@
+>  #define AVRCP_PACKET_TYPE_CONTINUING   0x02
+>  #define AVRCP_PACKET_TYPE_END          0x03
+>
+> +/* player attributes */
+> +#define AVRCP_ATTRIBUTE_ILEGAL         0x00
+> +#define AVRCP_ATTRIBUTE_EQUALIZER      0x01
+> +#define AVRCP_ATTRIBUTE_REPEAT_MODE    0x02
+> +#define AVRCP_ATTRIBUTE_SHUFFLE                0x03
+> +#define AVRCP_ATTRIBUTE_SCAN           0x04
+> +
+>  static const char *ctype2str(uint8_t ctype)
+>  {
+>         switch (ctype & 0x0f) {
+> @@ -404,6 +411,24 @@ static const char *pt2str(uint8_t pt)
+>         }
+>  }
+>
+> +static const char *attr2str(uint8_t attr)
+> +{
+> +       switch (attr) {
+> +       case AVRCP_ATTRIBUTE_ILEGAL:
+> +               return "Illegal";
+> +       case AVRCP_ATTRIBUTE_EQUALIZER:
+> +               return "Equalizer ON/OFF Status";
+> +       case AVRCP_ATTRIBUTE_REPEAT_MODE:
+> +               return "Repeat Mode Status";
+> +       case AVRCP_ATTRIBUTE_SHUFFLE:
+> +               return "Shuffle ON/OFF Status";
+> +       case AVRCP_ATTRIBUTE_SCAN:
+> +               return "Scan ON/OFF Status";
+> +       default:
+> +               return "Unknown";
+> +       }
+> +}
+> +
+>  static void avrcp_passthrough_packet(const struct l2cap_frame *frame)
+>  {
+>  }
+> @@ -457,6 +482,22 @@ static void avrcp_list_player_attributes(const struct l2cap_frame *frame,
+>                                                 uint8_t ctype, uint8_t len,
+>                                                 uint8_t indent)
+>  {
+> +       uint8_t num;
+> +       int i;
+> +
+> +       if (len == 0)
+> +               return;
+> +
+> +       num = *((uint8_t *) frame->data);
+> +       print_field("%*cAttributeCount: 0x%02x", (indent - 8), ' ', num);
+> +
+> +       for (i = 0; num > 0; num--, i++) {
+> +               uint8_t attr;
+> +
+> +               attr = *((uint8_t *) (frame->data + 1 + i));
+> +               print_field("%*cAttributeID: 0x%02x (%s)", (indent - 8), ' ',
+> +                                                       attr, attr2str(attr));
+> +       }
+>  }
+>
+>  static void avrcp_list_player_values(const struct l2cap_frame *frame,
+> --
+> 1.9.1
 
-This is in a branch that will be included in linux-next today.  I guess
-you didn't read my (very often) repeated request that no v3.18 material
-be included until after v3.17-rc1 is released ... Please do not do that.
+Applied, thanks.
 
---=20
-Cheers,
-Stephen Rothwell                    sfr@canb.auug.org.au
 
---Sig_/BizOQNKk7dPO++rI1T/Yfet
-Content-Type: application/pgp-signature; name=signature.asc
-Content-Disposition: attachment; filename=signature.asc
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-
-iQIcBAEBCAAGBQJT7UyIAAoJEMDTa8Ir7ZwVjpYP/1TKmiRpxHutHSX8MRuieAZf
-l9EsZg0ikPdOJft0kSqzCTdw6uNBnNkMCkkHC1oAMwjWJ39oJ/CvNwjj1lqEfd6F
-C4TgF60+1PoKR8iK5Nz8Gf/KvPPJGjEhzAJzTVRL2hgMP4YiWsCegwYpzuq/TibZ
-ZzMIw23U5Neg2aseOBw6jWvPGGKx2Z68Zma/rF6IUHCq4A30gBMk6EfXPyWPTKrW
-kLI97mqKnu+lUF/O4UYB8mewkzVm5ktxeAH5zNYQEo8hYF2p4WkMmM4rf+680vI4
-JZ3vFMIYVkOTN5idTw859IhitQimRFR9zu0uZdhwm3jrnx5OADhc8a+P3D3ORv8J
-iCRQXtZ+sr30FwMQxGSwsTi3tFKBoyKHZNBc8BdACA5uFyEGnXCx9f1tMTnNsLJo
-Z9qauI5tLzblsCNVv93xZaFELnuAs9u0aSVU+FDbnMGvjJUkS/uNTRhLoxDc8mLF
-d6+E0/tz07SB19rNwSm8j3J/nmhpO5DvUoHO7iccKEsOrHDnbc/dkylEhky2vLKO
-g+m/Ap6k+FXpYBm91QPHfrDejpXLORIkkTqW3m5sXksPjQhZZfCntSuTD4D2lqjr
-muEzg/HJSh3M9BwvB3qpGgxtgOT2V+x85JTPR5mYGGOYD7GoIi4CiYs99GAw4NNS
-5sW1qNXHoxgnv62ryX+V
-=Fr+3
------END PGP SIGNATURE-----
-
---Sig_/BizOQNKk7dPO++rI1T/Yfet--
+-- 
+Luiz Augusto von Dentz
