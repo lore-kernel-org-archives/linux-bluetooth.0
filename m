@@ -1,35 +1,46 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.6\))
-Subject: Re: [PATCH v2] Bluetooth: Fix ERTM L2CAP resend packet
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1408001734-23910-1-git-send-email-lukasz.rymanowski@tieto.com>
-Date: Thu, 14 Aug 2014 00:48:27 -0700
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <04FA0725-27F7-4EC6-80FE-49F77BFCBFA4@holtmann.org>
-References: <1408001734-23910-1-git-send-email-lukasz.rymanowski@tieto.com>
-To: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+Subject: [PATCH v2] Bluetooth: Fix ERTM L2CAP resend packet
+Date: Thu, 14 Aug 2014 09:35:34 +0200
+Message-Id: <1408001734-23910-1-git-send-email-lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Lukasz,
+I-Frame which is going to be resend already has FCS field added and set
+(if it was required). Adding additional FCS field calculated from data +
+old FCS in resend function is incorrect.
 
-> I-Frame which is going to be resend already has FCS field added and set
-> (if it was required). Adding additional FCS field calculated from data +
-> old FCS in resend function is incorrect.
-> 
-> This patch fix that.
-> 
-> Issue has been found during PTS testing.
-> 
-> Signed-off-by: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-> ---
-> net/bluetooth/l2cap_core.c | 8 +++++---
-> 1 file changed, 5 insertions(+), 3 deletions(-)
+This patch fix that.
 
-patch has been applied to bluetooth-next tree.
+Issue has been found during PTS testing.
 
-Regards
+Signed-off-by: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+---
+ net/bluetooth/l2cap_core.c | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
 
-Marcel
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index ebe7454..43e2d74 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -1968,10 +1968,12 @@ static void l2cap_ertm_resend(struct l2cap_chan *chan)
+ 					   tx_skb->data + L2CAP_HDR_SIZE);
+ 		}
+ 
++		/* Update FCS */
+ 		if (chan->fcs == L2CAP_FCS_CRC16) {
+-			u16 fcs = crc16(0, (u8 *) tx_skb->data, tx_skb->len);
+-			put_unaligned_le16(fcs, skb_put(tx_skb,
+-							L2CAP_FCS_SIZE));
++			u16 fcs = crc16(0, (u8 *)tx_skb->data, tx_skb->len -
++					L2CAP_FCS_SIZE);
++			put_unaligned_le16(fcs, skb_tail_pointer(tx_skb) -
++					   L2CAP_FCS_SIZE);
+ 		}
+ 
+ 		l2cap_do_send(chan, tx_skb);
+-- 
+1.8.4
 
