@@ -1,137 +1,132 @@
 Return-Path: <cyrus@holtmann.org>
 From: johan.hedberg@gmail.com
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/2] Bluetooth: Fix using hci_conn_get() for hci_conn pointers
-Date: Fri, 15 Aug 2014 20:49:18 +0300
-Message-Id: <1408124959-27128-1-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH v3] Bluetooth: Fix hci_conn reference counting for auto-connections
+Date: Fri, 15 Aug 2014 20:33:00 +0300
+Message-Id: <1408123980-26578-1-git-send-email-johan.hedberg@gmail.com>
+In-Reply-To: <1408122859-24674-1-git-send-email-johan.hedberg@gmail.com>
+References: <1408122859-24674-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-Wherever we keep hci_conn pointers around we should be using
-hci_conn_get/put to ensure that they stay valid. This patch fixes
-all places violating against the principle currently.
+Recently the LE passive scanning and auto-connections feature was
+introduced. It uses the hci_connect_le() API which returns a hci_conn
+along with a reference count to that object. All previous users would
+tie this returned reference to some existing object, such as an L2CAP
+channel, and there'd be no leaked references this way. For
+auto-connections however the reference was returned but not stored
+anywhere, leaving established connections with one higher reference
+count than they should have.
+
+Instead of playing special tricks with hci_conn_hold/drop this patch
+associates the returned reference from hci_connect_le() with the object
+that in practice does own this reference, i.e. the hci_conn_params
+struct that caused us to initiate a connection in the first place. Once
+the connection is established or fails to establish this reference is
+removed appropriately.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- net/bluetooth/hci_conn.c  |  1 +
- net/bluetooth/hci_core.c  |  8 ++++++--
- net/bluetooth/hci_event.c |  3 ++-
- net/bluetooth/mgmt.c      | 10 +++++++---
- 4 files changed, 16 insertions(+), 6 deletions(-)
+ include/net/bluetooth/hci_core.h |  2 ++
+ net/bluetooth/hci_conn.c         |  8 ++++++++
+ net/bluetooth/hci_core.c         |  5 +++++
+ net/bluetooth/hci_event.c        | 17 +++++++++++++++--
+ 4 files changed, 30 insertions(+), 2 deletions(-)
 
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 5f0b77b71b45..b0ded1333865 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -464,6 +464,8 @@ struct hci_conn_params {
+ 		HCI_AUTO_CONN_ALWAYS,
+ 		HCI_AUTO_CONN_LINK_LOSS,
+ 	} auto_connect;
++
++	struct hci_conn *conn;
+ };
+ 
+ extern struct list_head hci_dev_list;
 diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index faff6247ac8f..4ecc9d5fce7a 100644
+index b50dabb3f86a..faff6247ac8f 100644
 --- a/net/bluetooth/hci_conn.c
 +++ b/net/bluetooth/hci_conn.c
-@@ -595,6 +595,7 @@ void hci_le_conn_failed(struct hci_conn *conn, u8 status)
- 					   conn->dst_type);
- 	if (params && params->conn) {
- 		hci_conn_drop(params->conn);
-+		hci_conn_put(params->conn);
- 		params->conn = NULL;
- 	}
+@@ -589,6 +589,14 @@ EXPORT_SYMBOL(hci_get_route);
+ void hci_le_conn_failed(struct hci_conn *conn, u8 status)
+ {
+ 	struct hci_dev *hdev = conn->hdev;
++	struct hci_conn_params *params;
++
++	params = hci_pend_le_action_lookup(&hdev->pend_le_conns, &conn->dst,
++					   conn->dst_type);
++	if (params && params->conn) {
++		hci_conn_drop(params->conn);
++		params->conn = NULL;
++	}
+ 
+ 	conn->state = BT_CLOSED;
  
 diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 455f3fee46d3..cd775d1f7d47 100644
+index abeb5e47311e..455f3fee46d3 100644
 --- a/net/bluetooth/hci_core.c
 +++ b/net/bluetooth/hci_core.c
-@@ -3729,8 +3729,10 @@ void hci_conn_params_del(struct hci_dev *hdev, bdaddr_t *addr, u8 addr_type)
+@@ -3729,6 +3729,9 @@ void hci_conn_params_del(struct hci_dev *hdev, bdaddr_t *addr, u8 addr_type)
  	if (!params)
  		return;
  
--	if (params->conn)
-+	if (params->conn) {
- 		hci_conn_drop(params->conn);
-+		hci_conn_put(params->conn);
-+	}
- 
++	if (params->conn)
++		hci_conn_drop(params->conn);
++
  	list_del(&params->action);
  	list_del(&params->list);
-@@ -3762,8 +3764,10 @@ void hci_conn_params_clear_all(struct hci_dev *hdev)
+ 	kfree(params);
+@@ -3759,6 +3762,8 @@ void hci_conn_params_clear_all(struct hci_dev *hdev)
  	struct hci_conn_params *params, *tmp;
  
  	list_for_each_entry_safe(params, tmp, &hdev->le_conn_params, list) {
--		if (params->conn)
-+		if (params->conn) {
- 			hci_conn_drop(params->conn);
-+			hci_conn_put(params->conn);
-+		}
++		if (params->conn)
++			hci_conn_drop(params->conn);
  		list_del(&params->action);
  		list_del(&params->list);
  		kfree(params);
 diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index d2ee162ecddb..e6a496ae0318 100644
+index da7ab6b9bb69..3a99f30a3317 100644
 --- a/net/bluetooth/hci_event.c
 +++ b/net/bluetooth/hci_event.c
-@@ -4231,6 +4231,7 @@ static void hci_le_conn_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
+@@ -4226,8 +4226,13 @@ static void hci_le_conn_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
+ 	hci_proto_connect_cfm(conn, ev->status);
+ 
+ 	params = hci_conn_params_lookup(hdev, &conn->dst, conn->dst_type);
+-	if (params)
++	if (params) {
  		list_del_init(&params->action);
- 		if (params->conn) {
- 			hci_conn_drop(params->conn);
-+			hci_conn_put(params->conn);
- 			params->conn = NULL;
- 		}
- 	}
-@@ -4322,7 +4323,7 @@ static void check_pending_le_conn(struct hci_dev *hdev, bdaddr_t *addr,
- 		 * the parameters get removed and keep the reference
- 		 * count consistent once the connection is established.
- 		 */
--		params->conn = conn;
-+		params->conn = hci_conn_get(conn);
- 		return;
- 	}
- 
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index c2457435a670..c2d571c10544 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -3063,6 +3063,7 @@ static void pairing_complete(struct pending_cmd *cmd, u8 status)
- 	conn->disconn_cfm_cb = NULL;
- 
- 	hci_conn_drop(conn);
-+	hci_conn_put(conn);
- 
- 	mgmt_pending_remove(cmd);
- }
-@@ -4914,6 +4915,7 @@ static void get_conn_info_complete(struct pending_cmd *cmd, void *data)
- 		     match->mgmt_status, &rp, sizeof(rp));
- 
- 	hci_conn_drop(conn);
-+	hci_conn_put(conn);
- 
- 	mgmt_pending_remove(cmd);
- }
-@@ -5070,7 +5072,7 @@ static int get_conn_info(struct sock *sk, struct hci_dev *hdev, void *data,
- 		}
- 
- 		hci_conn_hold(conn);
--		cmd->user_data = conn;
-+		cmd->user_data = hci_conn_get(conn);
- 
- 		conn->conn_info_timestamp = jiffies;
- 	} else {
-@@ -5134,8 +5136,10 @@ send_rsp:
- 	cmd_complete(cmd->sk, cmd->index, cmd->opcode, mgmt_status(status),
- 		     &rp, sizeof(rp));
- 	mgmt_pending_remove(cmd);
--	if (conn)
-+	if (conn) {
- 		hci_conn_drop(conn);
-+		hci_conn_put(conn);
++		if (params->conn) {
++			hci_conn_drop(params->conn);
++			params->conn = NULL;
++		}
 +	}
  
  unlock:
- 	hci_dev_unlock(hdev);
-@@ -5198,7 +5202,7 @@ static int get_clock_info(struct sock *sk, struct hci_dev *hdev, void *data,
+ 	hci_update_background_scan(hdev);
+@@ -4309,8 +4314,16 @@ static void check_pending_le_conn(struct hci_dev *hdev, bdaddr_t *addr,
  
- 	if (conn) {
- 		hci_conn_hold(conn);
--		cmd->user_data = conn;
-+		cmd->user_data = hci_conn_get(conn);
+ 	conn = hci_connect_le(hdev, addr, addr_type, BT_SECURITY_LOW,
+ 			      HCI_LE_AUTOCONN_TIMEOUT, HCI_ROLE_MASTER);
+-	if (!IS_ERR(conn))
++	if (!IS_ERR(conn)) {
++		/* Store the pointer since we don't really have any
++		 * other owner of the object besides the params that
++		 * triggered it. This way we can abort the connection if
++		 * the parameters get removed and keep the reference
++		 * count consistent once the connection is established.
++		 */
++		params->conn = conn;
+ 		return;
++	}
  
- 		hci_cp.handle = cpu_to_le16(conn->handle);
- 		hci_cp.which = 0x01; /* Piconet clock */
+ 	switch (PTR_ERR(conn)) {
+ 	case -EBUSY:
 -- 
 1.9.3
 
