@@ -1,133 +1,98 @@
 Return-Path: <cyrus@holtmann.org>
 From: johan.hedberg@gmail.com
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Fix hci_conn reference counting for auto-connections
-Date: Fri, 15 Aug 2014 16:33:18 +0300
-Message-Id: <1408109598-11901-1-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH] Bluetooth: Fix hci_conn reference counting for fixed channels
+Date: Fri, 15 Aug 2014 15:45:48 +0300
+Message-Id: <1408106748-2278-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-Recently the LE passive scanning and auto-connections feature was
-introduced. It uses the hci_connect_le() API which returns a hci_conn
-along with a reference count to that object. All previous users would
-tie this returned reference to some existing object, such as an L2CAP
-channel, and there'd be no leaked references this way. For
-auto-connections however the reference was returned but not stored
-anywhere, leaving established connections with one higher reference
-count than they should have.
+Now that SMP has been converted to use fixed channels we've got a bit of
+a problem with the hci_conn reference counting. So far the L2CAP code
+has kept a reference for each L2CAP channel that was notified of the
+connection. With SMP however this would mean that the connection is
+never dropped even though there are no other users of it. Furthermore,
+SMP already does its own hci_conn reference counting internally,
+starting from a security or pairing request and ending with the key
+distribution.
 
-Instead of playing special tricks with hci_conn_hold/drop this patch
-associates the returned reference from hci_connect_le() with the object
-that in practice does own this reference, i.e. the hci_conn_params
-struct that caused us to initiate a connection in the first place. Once
-the connection is established or fails to establish this reference is
-removed appropriately.
+This patch makes L2CAP fixed channels default to the L2CAP core not
+keeping a hci_conn reference for them. A new FLAG_HOLD_HCI_CONN flag is
+added so that L2CAP users can declare an exception to this rule and hold
+a reference even for their fixed channels. One such exception is the
+L2CAP socket layer which does want a reference for each socket (e.g. an
+ATT socket which uses a fixed channel).
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
+ include/net/bluetooth/l2cap.h |  1 +
+ net/bluetooth/l2cap_core.c    | 12 ++++++++++--
+ net/bluetooth/l2cap_sock.c    |  8 ++++++++
+ 3 files changed, 19 insertions(+), 2 deletions(-)
 
-We should ensure that this patch goes to 3.17 since otherwise we have a
-hci_conn reference count leak there for connections created using the
-new passive-scanning auto-connect feature. I wasn't actually able to
-verify that this really fixes the bug (originally reported by Lukasz)
-because of the way that the non-Android bluetoothd behaves (it never
-just closes the ATT socket), however I was at least able to verify that
-there doesn't seem to be any bad side-effects.
-
- include/net/bluetooth/hci_core.h |  2 ++
- net/bluetooth/hci_conn.c         |  8 ++++++++
- net/bluetooth/hci_core.c         |  5 +++++
- net/bluetooth/hci_event.c        | 11 +++++++++--
- 4 files changed, 24 insertions(+), 2 deletions(-)
-
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 5f0b77b71b45..b0ded1333865 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -464,6 +464,8 @@ struct hci_conn_params {
- 		HCI_AUTO_CONN_ALWAYS,
- 		HCI_AUTO_CONN_LINK_LOSS,
- 	} auto_connect;
-+
-+	struct hci_conn *conn;
+diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
+index cedda399f9c0..1558eccb19db 100644
+--- a/include/net/bluetooth/l2cap.h
++++ b/include/net/bluetooth/l2cap.h
+@@ -711,6 +711,7 @@ enum {
+ 	FLAG_DEFER_SETUP,
+ 	FLAG_LE_CONN_REQ_SENT,
+ 	FLAG_PENDING_SECURITY,
++	FLAG_HOLD_HCI_CONN,
  };
  
- extern struct list_head hci_dev_list;
-diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index b50dabb3f86a..faff6247ac8f 100644
---- a/net/bluetooth/hci_conn.c
-+++ b/net/bluetooth/hci_conn.c
-@@ -589,6 +589,14 @@ EXPORT_SYMBOL(hci_get_route);
- void hci_le_conn_failed(struct hci_conn *conn, u8 status)
- {
- 	struct hci_dev *hdev = conn->hdev;
-+	struct hci_conn_params *params;
-+
-+	params = hci_pend_le_action_lookup(&hdev->pend_le_conns, &conn->dst,
-+					   conn->dst_type);
-+	if (params && params->conn) {
-+		hci_conn_drop(params->conn);
-+		params->conn = NULL;
-+	}
+ enum {
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index 777c41dbfdbe..a6559225bb50 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -546,7 +546,10 @@ void __l2cap_chan_add(struct l2cap_conn *conn, struct l2cap_chan *chan)
  
- 	conn->state = BT_CLOSED;
+ 	l2cap_chan_hold(chan);
  
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index abeb5e47311e..455f3fee46d3 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -3729,6 +3729,9 @@ void hci_conn_params_del(struct hci_dev *hdev, bdaddr_t *addr, u8 addr_type)
- 	if (!params)
- 		return;
+-	hci_conn_hold(conn->hcon);
++	/* Only keep a reference for fixed channels if they requested it */
++	if (chan->chan_type != L2CAP_CHAN_FIXED ||
++	    test_bit(FLAG_HOLD_HCI_CONN, &chan->flags))
++		hci_conn_hold(conn->hcon);
  
-+	if (params->conn)
-+		hci_conn_drop(params->conn);
-+
- 	list_del(&params->action);
- 	list_del(&params->list);
- 	kfree(params);
-@@ -3759,6 +3762,8 @@ void hci_conn_params_clear_all(struct hci_dev *hdev)
- 	struct hci_conn_params *params, *tmp;
+ 	list_add(&chan->list, &conn->chan_l);
+ }
+@@ -577,7 +580,12 @@ void l2cap_chan_del(struct l2cap_chan *chan, int err)
  
- 	list_for_each_entry_safe(params, tmp, &hdev->le_conn_params, list) {
-+		if (params->conn)
-+			hci_conn_drop(params->conn);
- 		list_del(&params->action);
- 		list_del(&params->list);
- 		kfree(params);
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index da7ab6b9bb69..b44b83d4a8e6 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -4226,8 +4226,13 @@ static void hci_le_conn_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
- 	hci_proto_connect_cfm(conn, ev->status);
+ 		chan->conn = NULL;
  
- 	params = hci_conn_params_lookup(hdev, &conn->dst, conn->dst_type);
--	if (params)
-+	if (params) {
- 		list_del_init(&params->action);
-+		if (params && params->conn) {
-+			hci_conn_drop(params->conn);
-+			params->conn = NULL;
-+		}
-+	}
+-		if (chan->scid != L2CAP_CID_A2MP)
++		/* Reference was only held for non-fixed channels or
++		 * fixed channels that explicitly requested it using the
++		 * FLAG_HOLD_HCI_CONN flag.
++		 */
++		if (chan->chan_type != L2CAP_CHAN_FIXED ||
++		    test_bit(FLAG_HOLD_HCI_CONN, &chan->flags))
+ 			hci_conn_drop(conn->hcon);
  
- unlock:
- 	hci_update_background_scan(hdev);
-@@ -4309,8 +4314,10 @@ static void check_pending_le_conn(struct hci_dev *hdev, bdaddr_t *addr,
+ 		if (mgr && mgr->bredr_chan == chan)
+diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
+index ed06f88e6f10..75eff0056b42 100644
+--- a/net/bluetooth/l2cap_sock.c
++++ b/net/bluetooth/l2cap_sock.c
+@@ -146,6 +146,14 @@ static int l2cap_sock_bind(struct socket *sock, struct sockaddr *addr, int alen)
+ 	case L2CAP_CHAN_RAW:
+ 		chan->sec_level = BT_SECURITY_SDP;
+ 		break;
++	case L2CAP_CHAN_FIXED:
++		/* Fixed channels default to the L2CAP core not holding a
++		 * hci_conn reference for them. For fixed channels mapping to
++		 * L2CAP sockets we do want to hold a reference so set the
++		 * appropriate flag to request it.
++		 */
++		set_bit(FLAG_HOLD_HCI_CONN, &l2cap_pi(sk)->chan->flags);
++		break;
+ 	}
  
- 	conn = hci_connect_le(hdev, addr, addr_type, BT_SECURITY_LOW,
- 			      HCI_LE_AUTOCONN_TIMEOUT, HCI_ROLE_MASTER);
--	if (!IS_ERR(conn))
-+	if (!IS_ERR(conn)) {
-+		params->conn = conn;
- 		return;
-+	}
- 
- 	switch (PTR_ERR(conn)) {
- 	case -EBUSY:
+ 	bacpy(&chan->src, &la.l2_bdaddr);
 -- 
 1.9.3
 
