@@ -1,11 +1,11 @@
 Return-Path: <cyrus@holtmann.org>
 From: johan.hedberg@gmail.com
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v3] Bluetooth: Fix hci_conn reference counting for auto-connections
-Date: Fri, 15 Aug 2014 20:33:00 +0300
-Message-Id: <1408123980-26578-1-git-send-email-johan.hedberg@gmail.com>
-In-Reply-To: <1408122859-24674-1-git-send-email-johan.hedberg@gmail.com>
-References: <1408122859-24674-1-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH v2] Bluetooth: Fix hci_conn reference counting for auto-connections
+Date: Fri, 15 Aug 2014 20:14:19 +0300
+Message-Id: <1408122859-24674-1-git-send-email-johan.hedberg@gmail.com>
+In-Reply-To: <1408109598-11901-1-git-send-email-johan.hedberg@gmail.com>
+References: <1408109598-11901-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
@@ -32,8 +32,8 @@ Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
  include/net/bluetooth/hci_core.h |  2 ++
  net/bluetooth/hci_conn.c         |  8 ++++++++
  net/bluetooth/hci_core.c         |  5 +++++
- net/bluetooth/hci_event.c        | 17 +++++++++++++++--
- 4 files changed, 30 insertions(+), 2 deletions(-)
+ net/bluetooth/hci_event.c        | 11 +++++++++--
+ 4 files changed, 24 insertions(+), 2 deletions(-)
 
 diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
 index 5f0b77b71b45..b0ded1333865 100644
@@ -91,7 +91,7 @@ index abeb5e47311e..455f3fee46d3 100644
  		list_del(&params->list);
  		kfree(params);
 diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index da7ab6b9bb69..3a99f30a3317 100644
+index da7ab6b9bb69..9f57067c3009 100644
 --- a/net/bluetooth/hci_event.c
 +++ b/net/bluetooth/hci_event.c
 @@ -4226,8 +4226,13 @@ static void hci_le_conn_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
@@ -109,18 +109,12 @@ index da7ab6b9bb69..3a99f30a3317 100644
  
  unlock:
  	hci_update_background_scan(hdev);
-@@ -4309,8 +4314,16 @@ static void check_pending_le_conn(struct hci_dev *hdev, bdaddr_t *addr,
+@@ -4309,8 +4314,10 @@ static void check_pending_le_conn(struct hci_dev *hdev, bdaddr_t *addr,
  
  	conn = hci_connect_le(hdev, addr, addr_type, BT_SECURITY_LOW,
  			      HCI_LE_AUTOCONN_TIMEOUT, HCI_ROLE_MASTER);
 -	if (!IS_ERR(conn))
 +	if (!IS_ERR(conn)) {
-+		/* Store the pointer since we don't really have any
-+		 * other owner of the object besides the params that
-+		 * triggered it. This way we can abort the connection if
-+		 * the parameters get removed and keep the reference
-+		 * count consistent once the connection is established.
-+		 */
 +		params->conn = conn;
  		return;
 +	}
