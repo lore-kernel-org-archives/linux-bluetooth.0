@@ -1,29 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 15 Aug 2014 10:45:45 -0400
-From: "John W. Linville" <linville@tuxdriver.com>
-To: linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: pull request: bluetooth-next 2014-08-14
-Message-ID: <20140815144545.GL4953@tuxdriver.com>
-References: <20140814145000.GA14226@t440s.P-661HNU-F1>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20140814145000.GA14226@t440s.P-661HNU-F1>
-Sender: linux-kernel-owner@vger.kernel.org
+From: johan.hedberg@gmail.com
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] Bluetooth: Optimize connection parameter lookup for LE connections
+Date: Fri, 15 Aug 2014 16:39:11 +0300
+Message-Id: <1408109951-12386-1-git-send-email-johan.hedberg@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Thu, Aug 14, 2014 at 05:50:00PM +0300, Johan Hedberg wrote:
-> Hi John,
-> 
-> Here's our first bluetooth-next pull request for the 3.18 kernel. Our
-> tree is based on net-next so you'd need to pull from there first before
-> pulling from our tree.
+From: Johan Hedberg <johan.hedberg@intel.com>
 
-What did you need from net-next that made you base on that instead
-of wireless-next?  I generally like to decide for myself what level
-of net-next needs to be the base of wireless-next...
+When we get an LE connection complete event there's really no reason to
+look through the entire connection parameter list as the entry should be
+present in the hdev->pend_le_conns list too. This patch changes the
+lookup code to do a more restricted lookup only in the pend_le_conns
+list.
 
-John
+Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+---
+ net/bluetooth/hci_event.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 827117160ac5..88a7e9c91df9 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -4225,7 +4225,8 @@ static void hci_le_conn_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
+ 
+ 	hci_proto_connect_cfm(conn, ev->status);
+ 
+-	params = hci_conn_params_lookup(hdev, &conn->dst, conn->dst_type);
++	params = hci_pend_le_action_lookup(&hdev->pend_le_conns, &conn->dst,
++					   conn->dst_type);
+ 	if (params) {
+ 		list_del_init(&params->action);
+ 		if (params && params->conn) {
 -- 
-John W. Linville		Someday the world will need a hero, and you
-linville@tuxdriver.com			might be all we have.  Be ready.
+1.9.3
+
