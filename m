@@ -1,158 +1,102 @@
 Return-Path: <cyrus@holtmann.org>
 From: johan.hedberg@gmail.com
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 8/9] Bluetooth: Fix using hci_conn_get() for hci_conn pointers
-Date: Sun, 17 Aug 2014 23:28:57 +0300
-Message-Id: <1408307337-8026-1-git-send-email-johan.hedberg@gmail.com>
-In-Reply-To: <1408126019-29761-9-git-send-email-johan.hedberg@gmail.com>
-References: <1408126019-29761-9-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH v2 3/9] Bluetooth: Fix hci_conn reference counting for fixed channels
+Date: Fri, 15 Aug 2014 21:17:06 +0300
+Message-Id: <1408126626-31010-1-git-send-email-johan.hedberg@gmail.com>
+In-Reply-To: <1408126019-29761-4-git-send-email-johan.hedberg@gmail.com>
+References: <1408126019-29761-4-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-Wherever we keep hci_conn pointers around we should be using
-hci_conn_get/put to ensure that they stay valid. This patch fixes
-all places violating against the principle currently.
+Now that SMP has been converted to use fixed channels we've got a bit of
+a problem with the hci_conn reference counting. So far the L2CAP code
+has kept a reference for each L2CAP channel that was notified of the
+connection. With SMP however this would mean that the connection is
+never dropped even though there are no other users of it. Furthermore,
+SMP already does its own hci_conn reference counting internally,
+starting from a security or pairing request and ending with the key
+distribution.
+
+This patch makes L2CAP fixed channels default to the L2CAP core not
+keeping a hci_conn reference for them. A new FLAG_HOLD_HCI_CONN flag is
+added so that L2CAP users can declare an exception to this rule and hold
+a reference even for their fixed channels. One such exception is the
+L2CAP socket layer which does want a reference for each socket (e.g. an
+ATT socket which uses a fixed channel).
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
-v2: Fix missing hci_conn_get() in pair_device()
+v2: Simplify chan reference in set_bit() call
 
- net/bluetooth/hci_conn.c  |  1 +
- net/bluetooth/hci_core.c  |  9 +++++++--
- net/bluetooth/hci_event.c |  3 ++-
- net/bluetooth/mgmt.c      | 12 ++++++++----
- 4 files changed, 18 insertions(+), 7 deletions(-)
+ include/net/bluetooth/l2cap.h |  1 +
+ net/bluetooth/l2cap_core.c    | 12 ++++++++++--
+ net/bluetooth/l2cap_sock.c    |  8 ++++++++
+ 3 files changed, 19 insertions(+), 2 deletions(-)
 
-diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index faff6247ac8f..4ecc9d5fce7a 100644
---- a/net/bluetooth/hci_conn.c
-+++ b/net/bluetooth/hci_conn.c
-@@ -595,6 +595,7 @@ void hci_le_conn_failed(struct hci_conn *conn, u8 status)
- 					   conn->dst_type);
- 	if (params && params->conn) {
- 		hci_conn_drop(params->conn);
-+		hci_conn_put(params->conn);
- 		params->conn = NULL;
- 	}
+diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
+index cedda399f9c0..1558eccb19db 100644
+--- a/include/net/bluetooth/l2cap.h
++++ b/include/net/bluetooth/l2cap.h
+@@ -711,6 +711,7 @@ enum {
+ 	FLAG_DEFER_SETUP,
+ 	FLAG_LE_CONN_REQ_SENT,
+ 	FLAG_PENDING_SECURITY,
++	FLAG_HOLD_HCI_CONN,
+ };
  
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 9b7145959a49..ed60d37ea646 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -2541,6 +2541,7 @@ static void hci_pend_le_actions_clear(struct hci_dev *hdev)
- 	list_for_each_entry(p, &hdev->le_conn_params, list) {
- 		if (p->conn) {
- 			hci_conn_drop(p->conn);
-+			hci_conn_put(p->conn);
- 			p->conn = NULL;
- 		}
- 		list_del_init(&p->action);
-@@ -3734,8 +3735,10 @@ void hci_conn_params_del(struct hci_dev *hdev, bdaddr_t *addr, u8 addr_type)
- 	if (!params)
- 		return;
+ enum {
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index 777c41dbfdbe..a6559225bb50 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -546,7 +546,10 @@ void __l2cap_chan_add(struct l2cap_conn *conn, struct l2cap_chan *chan)
  
--	if (params->conn)
-+	if (params->conn) {
- 		hci_conn_drop(params->conn);
-+		hci_conn_put(params->conn);
-+	}
+ 	l2cap_chan_hold(chan);
  
- 	list_del(&params->action);
- 	list_del(&params->list);
-@@ -3767,8 +3770,10 @@ void hci_conn_params_clear_all(struct hci_dev *hdev)
- 	struct hci_conn_params *params, *tmp;
+-	hci_conn_hold(conn->hcon);
++	/* Only keep a reference for fixed channels if they requested it */
++	if (chan->chan_type != L2CAP_CHAN_FIXED ||
++	    test_bit(FLAG_HOLD_HCI_CONN, &chan->flags))
++		hci_conn_hold(conn->hcon);
  
- 	list_for_each_entry_safe(params, tmp, &hdev->le_conn_params, list) {
--		if (params->conn)
-+		if (params->conn) {
- 			hci_conn_drop(params->conn);
-+			hci_conn_put(params->conn);
-+		}
- 		list_del(&params->action);
- 		list_del(&params->list);
- 		kfree(params);
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index d2ee162ecddb..e6a496ae0318 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -4231,6 +4231,7 @@ static void hci_le_conn_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
- 		list_del_init(&params->action);
- 		if (params->conn) {
- 			hci_conn_drop(params->conn);
-+			hci_conn_put(params->conn);
- 			params->conn = NULL;
- 		}
- 	}
-@@ -4322,7 +4323,7 @@ static void check_pending_le_conn(struct hci_dev *hdev, bdaddr_t *addr,
- 		 * the parameters get removed and keep the reference
- 		 * count consistent once the connection is established.
- 		 */
--		params->conn = conn;
-+		params->conn = hci_conn_get(conn);
- 		return;
- 	}
- 
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index c2457435a670..d8c66663ade8 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -3063,6 +3063,7 @@ static void pairing_complete(struct pending_cmd *cmd, u8 status)
- 	conn->disconn_cfm_cb = NULL;
- 
- 	hci_conn_drop(conn);
-+	hci_conn_put(conn);
- 
- 	mgmt_pending_remove(cmd);
+ 	list_add(&chan->list, &conn->chan_l);
  }
-@@ -3212,7 +3213,7 @@ static int pair_device(struct sock *sk, struct hci_dev *hdev, void *data,
+@@ -577,7 +580,12 @@ void l2cap_chan_del(struct l2cap_chan *chan, int err)
+ 
+ 		chan->conn = NULL;
+ 
+-		if (chan->scid != L2CAP_CID_A2MP)
++		/* Reference was only held for non-fixed channels or
++		 * fixed channels that explicitly requested it using the
++		 * FLAG_HOLD_HCI_CONN flag.
++		 */
++		if (chan->chan_type != L2CAP_CHAN_FIXED ||
++		    test_bit(FLAG_HOLD_HCI_CONN, &chan->flags))
+ 			hci_conn_drop(conn->hcon);
+ 
+ 		if (mgr && mgr->bredr_chan == chan)
+diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
+index ed06f88e6f10..31f106e61ca2 100644
+--- a/net/bluetooth/l2cap_sock.c
++++ b/net/bluetooth/l2cap_sock.c
+@@ -146,6 +146,14 @@ static int l2cap_sock_bind(struct socket *sock, struct sockaddr *addr, int alen)
+ 	case L2CAP_CHAN_RAW:
+ 		chan->sec_level = BT_SECURITY_SDP;
+ 		break;
++	case L2CAP_CHAN_FIXED:
++		/* Fixed channels default to the L2CAP core not holding a
++		 * hci_conn reference for them. For fixed channels mapping to
++		 * L2CAP sockets we do want to hold a reference so set the
++		 * appropriate flag to request it.
++		 */
++		set_bit(FLAG_HOLD_HCI_CONN, &chan->flags);
++		break;
  	}
  
- 	conn->io_capability = cp->io_cap;
--	cmd->user_data = conn;
-+	cmd->user_data = hci_conn_get(conn);
- 
- 	if ((conn->state == BT_CONNECTED || conn->state == BT_CONFIG) &&
- 	    hci_conn_security(conn, sec_level, auth_type, true))
-@@ -4914,6 +4915,7 @@ static void get_conn_info_complete(struct pending_cmd *cmd, void *data)
- 		     match->mgmt_status, &rp, sizeof(rp));
- 
- 	hci_conn_drop(conn);
-+	hci_conn_put(conn);
- 
- 	mgmt_pending_remove(cmd);
- }
-@@ -5070,7 +5072,7 @@ static int get_conn_info(struct sock *sk, struct hci_dev *hdev, void *data,
- 		}
- 
- 		hci_conn_hold(conn);
--		cmd->user_data = conn;
-+		cmd->user_data = hci_conn_get(conn);
- 
- 		conn->conn_info_timestamp = jiffies;
- 	} else {
-@@ -5134,8 +5136,10 @@ send_rsp:
- 	cmd_complete(cmd->sk, cmd->index, cmd->opcode, mgmt_status(status),
- 		     &rp, sizeof(rp));
- 	mgmt_pending_remove(cmd);
--	if (conn)
-+	if (conn) {
- 		hci_conn_drop(conn);
-+		hci_conn_put(conn);
-+	}
- 
- unlock:
- 	hci_dev_unlock(hdev);
-@@ -5198,7 +5202,7 @@ static int get_clock_info(struct sock *sk, struct hci_dev *hdev, void *data,
- 
- 	if (conn) {
- 		hci_conn_hold(conn);
--		cmd->user_data = conn;
-+		cmd->user_data = hci_conn_get(conn);
- 
- 		hci_cp.handle = cpu_to_le16(conn->handle);
- 		hci_cp.which = 0x01; /* Piconet clock */
+ 	bacpy(&chan->src, &la.l2_bdaddr);
 -- 
 1.9.3
 
