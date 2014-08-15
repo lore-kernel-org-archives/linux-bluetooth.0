@@ -1,49 +1,50 @@
 Return-Path: <cyrus@holtmann.org>
 From: johan.hedberg@gmail.com
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/9] Bluetooth: Fix incorrect LE CoC PDU length restriction based on HCI MTU
-Date: Fri, 15 Aug 2014 21:06:51 +0300
-Message-Id: <1408126019-29761-2-git-send-email-johan.hedberg@gmail.com>
-In-Reply-To: <1408126019-29761-1-git-send-email-johan.hedberg@gmail.com>
-References: <1408126019-29761-1-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH 0/9] Bluetooth: Reference counting and other fixes
+Date: Fri, 15 Aug 2014 21:06:50 +0300
+Message-Id: <1408126019-29761-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@intel.com>
+Hi,
 
-The l2cap_create_le_flowctl_pdu() function that l2cap_segment_le_sdu()
-calls is perfectly capable of doing packet fragmentation if given bigger
-PDUs than the HCI buffers allow. Forcing the PDU length based on the HCI
-MTU (conn->mtu) would therefore needlessly strict operation on hardware
-with limited LE buffers (e.g. both Intel and Broadcom seem to have this
-set to just 27 bytes).
+Since we're not at the moment applying anything new to bluetooth-next
+(due to the merge window being still open) I'm sending all my pending
+patches in a single set to ease applying them in the correct order.
 
-This patch removes the restriction and makes it possible to send PDUs of
-the full length that the remote MPS value allows.
+The two patches requiring some special consideration for 3.17 and stable
+kernel trees are the following two:
 
-Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
----
- net/bluetooth/l2cap_core.c | 6 +-----
- 1 file changed, 1 insertion(+), 5 deletions(-)
+   Bluetooth: Fix incorrect LE CoC PDU length restriction based on HCI MTU
+   Bluetooth: Fix hci_conn reference counting for auto-connections
 
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 4a90438d99df..52b56808d5d3 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -2358,12 +2358,8 @@ static int l2cap_segment_le_sdu(struct l2cap_chan *chan,
- 
- 	BT_DBG("chan %p, msg %p, len %zu", chan, msg, len);
- 
--	pdu_len = chan->conn->mtu - L2CAP_HDR_SIZE;
--
--	pdu_len = min_t(size_t, pdu_len, chan->remote_mps);
--
- 	sdu_len = len;
--	pdu_len -= L2CAP_SDULEN_SIZE;
-+	pdu_len = chan->remote_mps - L2CAP_SDULEN_SIZE;
- 
- 	while (len > 0) {
- 		if (len <= pdu_len)
--- 
-1.9.3
+Of those two the second one is a "must have" for 3.17 whereas the first
+one would be nice to get fixed for older kernels. All other patches in
+this set are fine to wait for 3.18.
+
+Johan
+
+----------------------------------------------------------------
+Johan Hedberg (9):
+      Bluetooth: Fix incorrect LE CoC PDU length restriction based on HCI MTU
+      Bluetooth: Remove unnecessary l2cap_chan_unlock before l2cap_chan_add
+      Bluetooth: Fix hci_conn reference counting for fixed channels
+      Bluetooth: Fix hci_conn reference counting for auto-connections
+      Bluetooth: Set addr_type only when it's needed
+      Bluetooth: Optimize connection parameter lookup for LE connections
+      Bluetooth: Improve *_get() functions to return the object type
+      Bluetooth: Fix using hci_conn_get() for hci_conn pointers
+      Bluetooth: Refactor connection parameter freeing into its own function
+
+ include/net/bluetooth/hci_core.h |  5 ++++-
+ include/net/bluetooth/l2cap.h    |  3 ++-
+ net/bluetooth/hci_conn.c         |  9 +++++++++
+ net/bluetooth/hci_core.c         | 33 +++++++++++++++++++++++----------
+ net/bluetooth/hci_event.c        | 31 +++++++++++++++++++++++--------
+ net/bluetooth/hidp/core.c        | 10 ++++------
+ net/bluetooth/l2cap_core.c       | 26 ++++++++++++++------------
+ net/bluetooth/l2cap_sock.c       |  8 ++++++++
+ net/bluetooth/mgmt.c             | 10 +++++++---
+ 9 files changed, 94 insertions(+), 41 deletions(-)
 
