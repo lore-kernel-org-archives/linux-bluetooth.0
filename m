@@ -1,40 +1,47 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+From: johan.hedberg@gmail.com
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] android: Fix memory leak
-Date: Fri, 15 Aug 2014 13:30:40 +0300
-Message-Id: <1408098640-18166-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCH] Bluetooth: Fix incorrect LE CoC PDU length restriction based on HCI MTU
+Date: Fri, 15 Aug 2014 12:47:33 +0300
+Message-Id: <1408096053-10556-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+From: Johan Hedberg <johan.hedberg@intel.com>
 
-protos gets allocated and needs to be freed
+The l2cap_create_le_flowctl_pdu() function that l2cap_segment_le_sdu()
+calls is perfectly capable of doing packet fragmentation if given bigger
+PDUs than the HCI buffers allow. Forcing the PDU length based on the HCI
+MTU (conn->mtu) would therefore needlessly strict operation on hardware
+with limited LE buffers (e.g. both Intel and Broadcom seem to have this
+set to just 27 bytes).
+
+This patch removes the restriction and makes it possible to send PDUs of
+the full length that the remote MPS value allows.
+
+Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- android/bluetooth.c | 9 +++++++--
- 1 file changed, 7 insertions(+), 2 deletions(-)
+ net/bluetooth/l2cap_core.c | 6 +-----
+ 1 file changed, 1 insertion(+), 5 deletions(-)
 
-diff --git a/android/bluetooth.c b/android/bluetooth.c
-index d3a0c20..ba68e98 100644
---- a/android/bluetooth.c
-+++ b/android/bluetooth.c
-@@ -1144,9 +1144,14 @@ static void find_remote_sdp_rec_cb(sdp_list_t *recs, int err,
- 			goto done;
- 		}
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index 4a90438d99df..52b56808d5d3 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -2358,12 +2358,8 @@ static int l2cap_segment_le_sdu(struct l2cap_chan *chan,
  
--		if (!sdp_get_access_protos(sdp_rec, &protos))
-+		if (!sdp_get_access_protos(sdp_rec, &protos)) {
- 			channel = sdp_get_proto_port(protos, L2CAP_UUID);
--		else
-+
-+			sdp_list_foreach(protos,
-+						(sdp_list_func_t) sdp_list_free,
-+						NULL);
-+			sdp_list_free(protos, NULL);
-+		} else
- 			channel = -1;
+ 	BT_DBG("chan %p, msg %p, len %zu", chan, msg, len);
  
- 		if (channel < 0) {
+-	pdu_len = chan->conn->mtu - L2CAP_HDR_SIZE;
+-
+-	pdu_len = min_t(size_t, pdu_len, chan->remote_mps);
+-
+ 	sdu_len = len;
+-	pdu_len -= L2CAP_SDULEN_SIZE;
++	pdu_len = chan->remote_mps - L2CAP_SDULEN_SIZE;
+ 
+ 	while (len > 0) {
+ 		if (len <= pdu_len)
 -- 
-1.9.1
+1.9.3
 
