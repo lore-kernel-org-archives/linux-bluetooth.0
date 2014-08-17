@@ -1,39 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
 From: johan.hedberg@gmail.com
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 3/4] Bluetooth: Set disc_timeout to 0 when calling hci_chan_del
-Date: Mon, 18 Aug 2014 00:41:43 +0300
-Message-Id: <1408311704-31747-3-git-send-email-johan.hedberg@gmail.com>
-In-Reply-To: <1408311704-31747-1-git-send-email-johan.hedberg@gmail.com>
-References: <1408311704-31747-1-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH 1/4] Bluetooth: Use zero timeout for immediate scheduling
+Date: Mon, 18 Aug 2014 00:41:41 +0300
+Message-Id: <1408311704-31747-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-The hci_chan_del() function is used in scenarios where we've decided we
-want to get rid of the underlying baseband link. It makes therefore
-sense to force the disc_timeout to 0 so that the disconnection routines
-are immediately scheduled.
+There's no point in passing a "small" timeout to queue_delayed_work() to
+try to get the callback faster scheduled. Passing 0 is perfectly valid
+and will cause a shortcut to a direct queue_work().
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- net/bluetooth/hci_conn.c | 3 +++
- 1 file changed, 3 insertions(+)
+ include/net/bluetooth/hci_core.h | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index 7815826a48e4..cb04a4e3c829 100644
---- a/net/bluetooth/hci_conn.c
-+++ b/net/bluetooth/hci_conn.c
-@@ -1316,6 +1316,9 @@ void hci_chan_del(struct hci_chan *chan)
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index aa75eee8ad7f..18c24f6fce6c 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -791,7 +791,7 @@ static inline void hci_conn_drop(struct hci_conn *conn)
+ 				if (!conn->out)
+ 					timeo *= 2;
+ 			} else {
+-				timeo = msecs_to_jiffies(10);
++				timeo = 0;
+ 			}
+ 			break;
  
- 	synchronize_rcu();
+@@ -800,7 +800,7 @@ static inline void hci_conn_drop(struct hci_conn *conn)
+ 			break;
  
-+	/* Force the connection to be immediately dropped */
-+	conn->disc_timeout = 0;
-+
- 	hci_conn_drop(conn);
- 	hci_conn_put(conn);
+ 		default:
+-			timeo = msecs_to_jiffies(10);
++			timeo = 0;
+ 			break;
+ 		}
  
 -- 
 1.9.3
