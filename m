@@ -1,49 +1,61 @@
 Return-Path: <cyrus@holtmann.org>
-From: johan.hedberg@gmail.com
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 2/4] Bluetooth: Fix hci_conn reference counting with hci_chan
-Date: Mon, 18 Aug 2014 00:41:42 +0300
-Message-Id: <1408311704-31747-2-git-send-email-johan.hedberg@gmail.com>
-In-Reply-To: <1408311704-31747-1-git-send-email-johan.hedberg@gmail.com>
-References: <1408311704-31747-1-git-send-email-johan.hedberg@gmail.com>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.6\))
+Subject: Re: [PATCH 0/9] Bluetooth: Reference counting and other fixes
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1408126019-29761-1-git-send-email-johan.hedberg@gmail.com>
+Date: Sun, 17 Aug 2014 16:35:39 -0500
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <75FA9245-93AC-4BF3-8A67-FC6DE9586533@holtmann.org>
+References: <1408126019-29761-1-git-send-email-johan.hedberg@gmail.com>
+To: Johan Hedberg <johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@intel.com>
+Hi Johan,
 
-The hci_chan_del() function was doing a hci_conn_drop() but there was no
-matching hci_conn_hold() in the hci_chan_create() function. Furthermore,
-as the hci_chan struct holds a pointer to the hci_conn there should be
-proper use of hci_conn_get/put. This patch fixes both issues so that
-hci_chan does correct reference counting of the hci_conn object.
+> Since we're not at the moment applying anything new to bluetooth-next
+> (due to the merge window being still open) I'm sending all my pending
+> patches in a single set to ease applying them in the correct order.
+> 
+> The two patches requiring some special consideration for 3.17 and stable
+> kernel trees are the following two:
+> 
+>   Bluetooth: Fix incorrect LE CoC PDU length restriction based on HCI MTU
+>   Bluetooth: Fix hci_conn reference counting for auto-connections
+> 
+> Of those two the second one is a "must have" for 3.17 whereas the first
+> one would be nice to get fixed for older kernels. All other patches in
+> this set are fine to wait for 3.18.
+> 
+> Johan
+> 
+> ----------------------------------------------------------------
+> Johan Hedberg (9):
+>      Bluetooth: Fix incorrect LE CoC PDU length restriction based on HCI MTU
+>      Bluetooth: Remove unnecessary l2cap_chan_unlock before l2cap_chan_add
+>      Bluetooth: Fix hci_conn reference counting for fixed channels
+>      Bluetooth: Fix hci_conn reference counting for auto-connections
+>      Bluetooth: Set addr_type only when it's needed
+>      Bluetooth: Optimize connection parameter lookup for LE connections
+>      Bluetooth: Improve *_get() functions to return the object type
+>      Bluetooth: Fix using hci_conn_get() for hci_conn pointers
+>      Bluetooth: Refactor connection parameter freeing into its own function
+> 
+> include/net/bluetooth/hci_core.h |  5 ++++-
+> include/net/bluetooth/l2cap.h    |  3 ++-
+> net/bluetooth/hci_conn.c         |  9 +++++++++
+> net/bluetooth/hci_core.c         | 33 +++++++++++++++++++++++----------
+> net/bluetooth/hci_event.c        | 31 +++++++++++++++++++++++--------
+> net/bluetooth/hidp/core.c        | 10 ++++------
+> net/bluetooth/l2cap_core.c       | 26 ++++++++++++++------------
+> net/bluetooth/l2cap_sock.c       |  8 ++++++++
+> net/bluetooth/mgmt.c             | 10 +++++++---
+> 9 files changed, 94 insertions(+), 41 deletions(-)
 
-Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
----
- net/bluetooth/hci_conn.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+all 9 patches have been applied to bluetooth-next tree.
 
-diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index 4ecc9d5fce7a..7815826a48e4 100644
---- a/net/bluetooth/hci_conn.c
-+++ b/net/bluetooth/hci_conn.c
-@@ -1295,7 +1295,8 @@ struct hci_chan *hci_chan_create(struct hci_conn *conn)
- 	if (!chan)
- 		return NULL;
- 
--	chan->conn = conn;
-+	chan->conn = hci_conn_get(conn);
-+	hci_conn_hold(conn);
- 	skb_queue_head_init(&chan->data_q);
- 	chan->state = BT_CONNECTED;
- 
-@@ -1316,6 +1317,7 @@ void hci_chan_del(struct hci_chan *chan)
- 	synchronize_rcu();
- 
- 	hci_conn_drop(conn);
-+	hci_conn_put(conn);
- 
- 	skb_queue_purge(&chan->data_q);
- 	kfree(chan);
--- 
-1.9.3
+Regards
+
+Marcel
 
