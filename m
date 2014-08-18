@@ -1,57 +1,47 @@
 Return-Path: <cyrus@holtmann.org>
-From: johan.hedberg@gmail.com
+From: Szymon Janc <szymon.janc@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 0/8] Bluetooth: SMP & disconnection fixes
-Date: Mon, 18 Aug 2014 20:33:26 +0300
-Message-Id: <1408383214-16366-1-git-send-email-johan.hedberg@gmail.com>
+Cc: Szymon Janc <szymon.janc@tieto.com>
+Subject: [PATCH] android/pts: Update PAN PICS and tests results
+Date: Mon, 18 Aug 2014 14:21:13 +0200
+Message-Id: <1408364473-1182-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Specification Errata #3558 makes LLMNR support optional as LLMNR Draft
+was never adopted by IETF. AOSP doesn't support LLMNR.
+---
+ android/pics-pan.txt | 3 ++-
+ android/pts-pan.txt  | 2 +-
+ 2 files changed, 3 insertions(+), 2 deletions(-)
 
-The previous patches for SMP disconnection (that already got applied) do
-indeed fix the hci_conn_hold/drop ballance and do ensure that we
-disconnect the link when the SMP code wants it. Unfortunately the
-patches introduce a regression to a third use case which is the one
-where we want to bring the link down when there are no more active users
-for it.
-
-It turns out that relying on connection users to diligently call
-hci_conn_drop() isn't a reliable way to ensure that the connection goes
-away. Firstly, we can't have hci_chan own such a reference (since it's
-"always there") and secondly there might not be any users at all
-(besides SMP) in which case there will be no-one to call hci_conn_drop.
-
-A simpler solution is to just do a direct disonnect from smp.c with the
-help of the hci_disconnect() function. This has the side effect of not
-sending any SMP Failure PDU first, but the cases needing a disconnection
-do not really need that PDU to be sent (i.e. SMP timeout or garbage
-data).
-
-The last three patches in this set unify hci_disconnect() usage to also
-cover the Disconnect Device mgmt command and move clock offset reading
-into the function to ensure all users have this feature at their
-disposal.
-
-Johan
-
-----------------------------------------------------------------
-Johan Hedberg (8):
-      Bluetooth: Remove hci_conn_hold/drop from hci_chan
-      Bluetooth: Set discon_timeout to 0 in l2cap_conn_del
-      Bluetooth: Use hci_disconnect for immediate disconnection from SMP
-      Bluetooth: Remove unused l2cap_conn_shutdown API
-      Bluetooth: Fix SMP error and response to be mutually exclusive
-      Bluetooth: Update hci_disconnect() to return an error value
-      Bluetooth: Use hci_disconnect() for mgmt_disconnect_device()
-      Bluetooth: Move clock offset reading into hci_disconnect()
-
- include/net/bluetooth/hci_core.h |  2 +-
- include/net/bluetooth/l2cap.h    |  4 ----
- net/bluetooth/hci_conn.c         | 41 ++++++++++++++----------------------
- net/bluetooth/l2cap_core.c       | 28 +++---------------------
- net/bluetooth/mgmt.c             |  6 +-----
- net/bluetooth/smp.c              | 17 ++++++---------
- 6 files changed, 28 insertions(+), 70 deletions(-)
-
+diff --git a/android/pics-pan.txt b/android/pics-pan.txt
+index b59bef7..20b91c7 100644
+--- a/android/pics-pan.txt
++++ b/android/pics-pan.txt
+@@ -124,7 +124,8 @@ TSPC_PAN_4_2	True (*)	PANU: Support IPv4 (C.1)
+ TSPC_PAN_4_3	False		PANU: Support ping client for IPv4 (O)
+ TSPC_PAN_4_4	False		PANU: Support DHCP client for  IPv4 (O)
+ TSPC_PAN_4_5	False		PANU: Support DNS/LLMNR Resolver for IPv4 (O)
+-TSPC_PAN_4_5a	True		PANU: Support LLMNR Sender for IPv4 (C.2)
++TSPC_PAN_4_5a	False (*)	PANU: Support LLMNR Sender for IPv4 (C.2)
++				Reference: SE #3558, TSE #4382, TCW #448
+ TSPC_PAN_4_5b	False		PANU: Support LLMNR Responder for IPv4 (O)
+ TSPC_PAN_4_6	False		PANU: Support HTTP Client for IPv4 (O)
+ TSPC_PAN_4_7	False		PANU: Support WAP Client for IPv4 (O)
+diff --git a/android/pts-pan.txt b/android/pts-pan.txt
+index 5e3248c..0af186c 100644
+--- a/android/pts-pan.txt
++++ b/android/pts-pan.txt
+@@ -56,7 +56,7 @@ TC_PANU_Ipv4_Autonet_BV_01_I		PASS	After DHCP request fail send
+ 						From IUT: send address request
+ 						dhcpd -r 169.254.x.x bt-pan
+ TC_PANU_Ipv6_Autonet_BV_02_I		N/A
+-TC_PANU_IP_LLMNR_BV_01_I		INC	PTS TSE errata #5871
++TC_PANU_IP_LLMNR_BV_01_I		N/A	SE #3558, TSE #4382, TCW #448
+ TC_PANU_IP_LLMNR_BV_02_I		N/A
+ TC_PANU_IP_DHCP_BV_03_I			N/A
+ TC_PANU_IP_DNS_BV_01_I			N/A
+-- 
+1.9.3
 
