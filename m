@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: johan.hedberg@gmail.com
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 5/8] Bluetooth: Fix SMP error and response to be mutually exclusive
-Date: Mon, 18 Aug 2014 20:33:31 +0300
-Message-Id: <1408383214-16366-6-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH 6/8] Bluetooth: Update hci_disconnect() to return an error value
+Date: Mon, 18 Aug 2014 20:33:32 +0300
+Message-Id: <1408383214-16366-7-git-send-email-johan.hedberg@gmail.com>
 In-Reply-To: <1408383214-16366-1-git-send-email-johan.hedberg@gmail.com>
 References: <1408383214-16366-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,78 +11,51 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-Returning failure from the SMP data parsing function will cause an
-immediate disconnect, making any attempts to send a response PDU futile.
-This patch updates the function to always either send a response or
-return an error, but never both at the same time:
-
-* In the case that HCI_LE_ENABLED is not set we want to send a Pairing Not
-  Supported response but it is not required to force a disconnection, so
-  do not set the error return in this case.
-
-* If we get garbage SMP data we can just fail with the handler function
-  instead of also trying to send an SMP Failure PDU.
-
-* There's no reason to force a disconnection if we receive an unknown SMP
-  command. Instead simply send a proper Command Not Supported SMP
-  response.
+We'll soon use hci_disconnect() from places that are interested to know
+whether the hci_send_cmd() really succeeded or not. This patch updates
+hci_disconnect() to pass on any error returned from hci_send_cmd().
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- net/bluetooth/smp.c | 13 +++++--------
- 1 file changed, 5 insertions(+), 8 deletions(-)
+ include/net/bluetooth/hci_core.h | 2 +-
+ net/bluetooth/hci_conn.c         | 4 ++--
+ 2 files changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
-index 496584921fdc..16c181181775 100644
---- a/net/bluetooth/smp.c
-+++ b/net/bluetooth/smp.c
-@@ -1430,7 +1430,6 @@ static int smp_sig_channel(struct l2cap_chan *chan, struct sk_buff *skb)
- 		return -EILSEQ;
- 
- 	if (!test_bit(HCI_LE_ENABLED, &hcon->hdev->dev_flags)) {
--		err = -EOPNOTSUPP;
- 		reason = SMP_PAIRING_NOTSUPP;
- 		goto done;
- 	}
-@@ -1447,7 +1446,6 @@ static int smp_sig_channel(struct l2cap_chan *chan, struct sk_buff *skb)
- 	if (code != SMP_CMD_PAIRING_REQ && code != SMP_CMD_SECURITY_REQ &&
- 	    !test_bit(HCI_CONN_LE_SMP_PEND, &hcon->flags)) {
- 		BT_ERR("Unexpected SMP command 0x%02x. Disconnecting.", code);
--		reason = SMP_CMD_NOTSUPP;
- 		err = -EOPNOTSUPP;
- 		goto done;
- 	}
-@@ -1459,7 +1457,6 @@ static int smp_sig_channel(struct l2cap_chan *chan, struct sk_buff *skb)
- 
- 	case SMP_CMD_PAIRING_FAIL:
- 		smp_failure(conn, 0);
--		reason = 0;
- 		err = -EPERM;
- 		break;
- 
-@@ -1501,17 +1498,17 @@ static int smp_sig_channel(struct l2cap_chan *chan, struct sk_buff *skb)
- 
- 	default:
- 		BT_DBG("Unknown command code 0x%2.2x", code);
--
- 		reason = SMP_CMD_NOTSUPP;
--		err = -EOPNOTSUPP;
- 		goto done;
- 	}
- 
- done:
--	if (reason)
--		smp_failure(conn, reason);
--	if (!err)
-+	if (!err) {
-+		if (reason)
-+			smp_failure(conn, reason);
- 		kfree_skb(skb);
-+	}
-+
- 	return err;
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index dbe73642c54c..2b6e04d37593 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -703,7 +703,7 @@ static inline struct hci_conn *hci_conn_hash_lookup_state(struct hci_dev *hdev,
+ 	return NULL;
  }
  
+-void hci_disconnect(struct hci_conn *conn, __u8 reason);
++int hci_disconnect(struct hci_conn *conn, __u8 reason);
+ bool hci_setup_sync(struct hci_conn *conn, __u16 handle);
+ void hci_sco_setup(struct hci_conn *conn, __u8 status);
+ 
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+index 5157a0990732..dd2df20b0f7d 100644
+--- a/net/bluetooth/hci_conn.c
++++ b/net/bluetooth/hci_conn.c
+@@ -122,7 +122,7 @@ static void hci_reject_sco(struct hci_conn *conn)
+ 	hci_send_cmd(conn->hdev, HCI_OP_REJECT_SYNC_CONN_REQ, sizeof(cp), &cp);
+ }
+ 
+-void hci_disconnect(struct hci_conn *conn, __u8 reason)
++int hci_disconnect(struct hci_conn *conn, __u8 reason)
+ {
+ 	struct hci_cp_disconnect cp;
+ 
+@@ -132,7 +132,7 @@ void hci_disconnect(struct hci_conn *conn, __u8 reason)
+ 
+ 	cp.handle = cpu_to_le16(conn->handle);
+ 	cp.reason = reason;
+-	hci_send_cmd(conn->hdev, HCI_OP_DISCONNECT, sizeof(cp), &cp);
++	return hci_send_cmd(conn->hdev, HCI_OP_DISCONNECT, sizeof(cp), &cp);
+ }
+ 
+ static void hci_amp_disconn(struct hci_conn *conn)
 -- 
 1.9.3
 
