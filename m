@@ -2,80 +2,30 @@ Return-Path: <cyrus@holtmann.org>
 From: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
-Subject: [PATCH 3/4] android/health: Add some information messages
-Date: Mon, 18 Aug 2014 12:07:01 +0300
-Message-Id: <1408352822-21572-3-git-send-email-ravikumar.veeramally@linux.intel.com>
-In-Reply-To: <1408352822-21572-1-git-send-email-ravikumar.veeramally@linux.intel.com>
-References: <1408352822-21572-1-git-send-email-ravikumar.veeramally@linux.intel.com>
+Subject: [PATCH 1/4] android/health: Fix connect channel failure case
+Date: Mon, 18 Aug 2014 12:06:59 +0300
+Message-Id: <1408352822-21572-1-git-send-email-ravikumar.veeramally@linux.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+There is a possibilty of created channel is being added to queue,
+but on failure case it does channel free but not removed from queue.
 ---
- android/health.c | 9 +++++++--
- 1 file changed, 7 insertions(+), 2 deletions(-)
+ android/health.c | 1 +
+ 1 file changed, 1 insertion(+)
 
 diff --git a/android/health.c b/android/health.c
-index 361b043..e188683 100644
+index f4edc3e..f86fd26 100644
 --- a/android/health.c
 +++ b/android/health.c
-@@ -1233,6 +1233,7 @@ static void mcap_mdl_connected_cb(struct mcap_mdl *mdl, void *data)
- 		return;
- 	}
- 
-+	info("health: MDL connected");
- 	send_channel_state_notify(channel, HAL_HEALTH_CHANNEL_CONNECTED, fd);
- 
+@@ -1978,6 +1978,7 @@ static void bt_health_connect_channel(const void *buf, uint16_t len)
  	return;
-@@ -1245,7 +1246,7 @@ static void mcap_mdl_closed_cb(struct mcap_mdl *mdl, void *data)
- {
- 	struct health_channel *channel = data;
  
--	info("MDL closed");
-+	info("health: MDL closed");
- 
- 	if (!channel)
- 		return;
-@@ -1271,6 +1272,7 @@ static void mcap_mdl_deleted_cb(struct mcap_mdl *mdl, void *data)
- 	dev = channel->dev;
- 
- 	DBG("device %p channel %p mdl %p", dev, channel, mdl);
-+	info("health: MDL deleted");
- 
- 	/* mdl == NULL means, delete all mdls */
- 	if (!mdl) {
-@@ -1822,7 +1824,7 @@ static void create_mcl_cb(struct mcap_mcl *mcl, GError *err, gpointer data)
- 	if (!channel->dev->mcl)
- 		channel->dev->mcl = mcap_mcl_ref(mcl);
- 
--	info("MCL connected");
-+	info("health: MCL connected");
- 
- 	ret = set_mcl_cb(channel->dev->mcl, channel, &gerr);
- 	if (!ret) {
-@@ -2048,6 +2050,7 @@ static void mcl_connected(struct mcap_mcl *mcl, gpointer data)
- 
- 	DBG("");
- 
-+	info("health: MCL connected");
- 	ret = set_mcl_cb(mcl, NULL, &gerr);
- 	if (!ret) {
- 		error("health: error setting mcl callbacks: %s", gerr->message);
-@@ -2061,6 +2064,7 @@ static void mcl_reconnected(struct mcap_mcl *mcl, gpointer data)
- 
- 	DBG("");
- 
-+	info("health: MCL reconnected");
- 	dev = search_dev_by_mcl(mcl);
- 	if (!dev) {
- 		error("device data does not exists");
-@@ -2074,6 +2078,7 @@ static void mcl_disconnected(struct mcap_mcl *mcl, gpointer data)
- 
- 	DBG("");
- 
-+	info("health: MCL disconnected");
- 	dev = search_dev_by_mcl(mcl);
- 	mcap_mcl_unref(dev->mcl);
- 	dev->mcl = NULL;
+ fail:
++	queue_remove(channel->dev->channels, channel);
+ 	free_health_channel(channel);
+ 	ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_HEALTH,
+ 			HAL_OP_HEALTH_CONNECT_CHANNEL, HAL_STATUS_FAILED);
 -- 
 1.9.1
 
