@@ -1,68 +1,122 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Mon, 18 Aug 2014 09:48:48 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Bharat Panda <bharat.panda@samsung.com>
+Cc: linux-bluetooth@vger.kernel.org, cpgs@samsung.com
+Subject: Re: [PATCH ] GATT: Fixed PTS issues for multiple write request
+Message-ID: <20140818064848.GA7214@t440s.P-661HNU-F1>
+References: <1408342269-25170-1-git-send-email-bharat.panda@samsung.com>
 MIME-Version: 1.0
-Sender: arakhov@google.com
-In-Reply-To: <CABBYNZLEDBFa-wV5L5Pfi-PzA877PxSrktsVLpzCRuQ4nu1eKQ@mail.gmail.com>
-References: <CAD81oNZL0qATu_z_TJT8psaMhpmV34w6xmA2+=OKerSE1NSvOw@mail.gmail.com>
-	<CABBYNZ+zRKzv4yTc8M2Fi0eN6gC921b9zaey5FKGVq_bJJueBg@mail.gmail.com>
-	<CAD81oNbjd3-Y_7C=75TfBP0oXjA3eFWbezsD8nROUrseUJZNhg@mail.gmail.com>
-	<CAD81oNZkRk-KFcE1bkj8TWiqe7dyVjHJADicT-f5KEkKtcnbyA@mail.gmail.com>
-	<574DE1E1-7A53-4629-88FC-7164EC1880AA@holtmann.org>
-	<CAD81oNY41-8DhJCOetLa_TCrPLBeiJFHQJ7TxawydwQ5S_Lmwg@mail.gmail.com>
-	<CABBYNZLEDBFa-wV5L5Pfi-PzA877PxSrktsVLpzCRuQ4nu1eKQ@mail.gmail.com>
-Date: Mon, 18 Aug 2014 00:11:00 -0700
-Message-ID: <CAD81oNZYeobbhMawvhrjTFSTY-aqEXYh9x3aTSOoH8u1Y6nHDQ@mail.gmail.com>
-Subject: Re: [A2DP] Incoming connections do not succeed
-From: Artem Rakhov <arakhov@chromium.org>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1408342269-25170-1-git-send-email-bharat.panda@samsung.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+Hi Bharat,
 
-I have also tried kernel 3.14, it didn't help.
-How can I use avinfo for test? Looks like it shows only basic
-information for the device. And it works fine with the speaker.
-I tried to use avtest: when I try to connect to the speaker,
-everything seems to be working good. Is there any way to use it to
-test incoming connections?
+On Mon, Aug 18, 2014, Bharat Panda wrote:
+> Updates gatt attribute db using offset value. This fixes below
+> PTS TCs.
+> 
+> TP/GAW/SR/BV-06-C
+> TP/GAW/SR/BV-10-C
+> TP/GAW/SR/BI-14-C
+> TP/GAW/SR/BI-15-C
+> TP/GAW/SR/BV-05-C
+> TP/GAW/SR/BI-07-C
+> TP/GAW/SR/BI-08-C
+> TP/GAW/SR/BI-34-C
+> TP/GAW/SR/BI-25-C
+> TP/GAW/SR/BI-26-C
+> ---
+>  plugins/gatt-example.c        |  2 +-
+>  profiles/alert/server.c       | 16 ++++++-------
+>  profiles/proximity/linkloss.c |  2 +-
+>  profiles/time/server.c        |  6 ++---
+>  src/attrib-server.c           | 53 +++++++++++++++++++++++++++++++++++--------
+>  src/attrib-server.h           |  2 +-
+>  6 files changed, 57 insertions(+), 24 deletions(-)
 
-Thanks,
-Artem
+Your commit message should have a bit more content, i.e. give some more
+background to the issue and justify & explain the way that you're
+solving it. Also, the subject seems misleading to me as this is related
+to long writes and not "multiple write".
 
-On Sun, Aug 10, 2014 at 12:32 AM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> Hi Artem,
->
-> On Fri, Aug 8, 2014 at 10:32 AM, Artem Rakhov <arakhov@chromium.org> wrote:
->> Hi Marcel,
->>
->> Please find Packet Logger's btsnoop log in the attachment.
->>
->> So far I have 2 observations:
->> 1. Mac does not require any authorization (most likely it's not the cause)
->> 2. I found another BT speaker which works properly. At first, I'm
->> seeing the same behavior: speaker initiates connection, BlueZ sends
->> Configure Request (with no MTU), then speaker disconnects. But after
->> that the device tries to initiate connection for the second time, and
->> this time it is successful: after BlueZ sends Configure Request with
->> no MTU, speaker answers with another Configure Request (with some
->> MTU), and connection is established normally. Is it possible, that
->> BlueZ is doing something wrong, but then this new speaker tries
->> something else, while the old one does not?
->
-> I could not find anything l2cap related in this logs, but I notice
-> there a LE scanning ongoing perhaps you have should try disabling it
-> with Disconnect method for now. Anyway A2DP code is not really
-> involved with L2CAP connection setup so we would have to look at the
-> kernel changes but I quick check doesn't show anything and you said
-> you have tried with 3.10 so Im afraid this is only reproducible with
-> some specific device.
->
-> Btw, if you want to really isolate the problem you can try to connect
-> using avinfo or l2test directly.
->
->
-> --
-> Luiz Augusto von Dentz
+> -	case ATT_OP_READ_MULTI_REQ:
+>  	case ATT_OP_PREP_WRITE_REQ:
+> +		length = dec_prep_write_req(ipdu, len, &start, &offset, value, &vlen);
+> +		if (length == 0) {
+> +			status = ATT_ECODE_INVALID_PDU;
+> +			goto done;
+> +		}
+> +
+> +		length = write_value(channel, start, value, vlen, opdu,
+> +									channel->mtu, offset);
+> +		break;
+> +
+>  	case ATT_OP_EXEC_WRITE_REQ:
+> +		break;
+> +	case ATT_OP_READ_MULTI_REQ:
+>  	default:
+>  		DBG("Unsupported request 0x%02x", ipdu[0]);
+>  		status = ATT_ECODE_REQ_NOT_SUPP;
+
+This doesn't look right. The changes should not be taking effect until
+execute write has been issued. Here it seems the write_value() makes an
+irreversible change to the database.
+
+> -	a->data = g_try_realloc(a->data, len);
+> +	if (offset) {
+> +		uint8_t *temp;
+> +		temp = malloc(sizeof(uint8_t) * a->len);
+> +		if (temp == NULL) {
+> +			DBG("Unable to allocate memory");
+> +			return -ENOMEM;
+> +		}
+> +		memcpy(temp, a->data, a->len);
+> +		a->data = g_try_realloc(a->data, (a->len + (a->len - offset) + len));
+
+This calculation doesn't look right. Shouldn't the new size be simply
+offset + len? Or if offset + len is less than the original length and
+the specification requires to preserve the data after it (which I'm not
+sure it does) then you'd need some extra condition here. You'd also not
+need realloc in this case since the buffer wouldn't grow.
+
+> +		memcpy(a->data, temp, a->len);
+
+First of all the "try" versions of GLib allocation functions may return
+NULL so you can't just copy to a->data without checking first. However,
+most of this code is completely unnecessary: realloc maintains the the
+contents of the memory so there's no need of a temporary buffer here.
+
+> +		free(temp);
+> +	}
+> +	else {
+> +		a->data = g_try_realloc(a->data, len);
+> +	}
+
+The coding style is:
+
+	if (...) {
+		...
+		...
+	} else {
+		...
+		...
+	}
+
+> +	if (offset) {
+> +		a->len = a->len + (a->len - offset) + len;
+
+Shouldn't this be a->len = offset + len?
+
+> +		memcpy((a->data + offset), value, len);
+> +	}
+> +	else {
+> +		a->len = len;
+> +		memcpy(a->data, value, len);
+> +	}
+
+Same thing as earlier with the if-else coding style.
+
+Johan
