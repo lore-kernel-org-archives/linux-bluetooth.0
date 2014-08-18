@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: johan.hedberg@gmail.com
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 8/8] Bluetooth: Move clock offset reading into hci_disconnect()
-Date: Mon, 18 Aug 2014 20:33:34 +0300
-Message-Id: <1408383214-16366-9-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH 3/8] Bluetooth: Use hci_disconnect for immediate disconnection from SMP
+Date: Mon, 18 Aug 2014 20:33:29 +0300
+Message-Id: <1408383214-16366-4-git-send-email-johan.hedberg@gmail.com>
 In-Reply-To: <1408383214-16366-1-git-send-email-johan.hedberg@gmail.com>
 References: <1408383214-16366-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,66 +11,45 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-To give all hci_disconnect() users the advantage of getting the clock
-offset read automatically this patch moves the necessary code from
-hci_ocnn_timeout() into hci_disconnect(). This way we pretty much always
-update the clock offset when disconnecting.
+Relying on the l2cap_conn_del procedure (triggered through the
+l2cap_conn_shutdown API) to get the connection disconnected is not
+reliable as it depends on all users releasing (through hci_conn_drop)
+and that there's at least one user (so hci_conn_drop is called at least
+one time).
+
+A much simpler and more reliable solution is to call hci_disconnect()
+directly from the SMP code when we want to disconnect. One side-effect
+this has is that it prevents any SMP Failure PDU from being sent before
+the disconnection, however neither one of the scenarios where
+l2cap_conn_shutdown was used really requires this.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- net/bluetooth/hci_conn.c | 32 +++++++++++++-------------------
- 1 file changed, 13 insertions(+), 19 deletions(-)
+ net/bluetooth/smp.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index dd2df20b0f7d..e3d7ae9e2edd 100644
---- a/net/bluetooth/hci_conn.c
-+++ b/net/bluetooth/hci_conn.c
-@@ -128,6 +128,19 @@ int hci_disconnect(struct hci_conn *conn, __u8 reason)
+diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
+index 07ca4ce0943b..496584921fdc 100644
+--- a/net/bluetooth/smp.c
++++ b/net/bluetooth/smp.c
+@@ -829,7 +829,7 @@ static void smp_timeout(struct work_struct *work)
  
- 	BT_DBG("hcon %p", conn);
+ 	BT_DBG("conn %p", conn);
  
-+	/* When we are master of an established connection and it enters
-+	 * the disconnect timeout, then go ahead and try to read the
-+	 * current clock offset.  Processing of the result is done
-+	 * within the event handling and hci_clock_offset_evt function.
-+	 */
-+	if (conn->type == ACL_LINK && conn->role == HCI_ROLE_MASTER) {
-+		struct hci_dev *hdev = conn->hdev;
-+		struct hci_cp_read_clock_offset cp;
-+
-+		cp.handle = cpu_to_le16(conn->handle);
-+		hci_send_cmd(hdev, HCI_OP_READ_CLOCK_OFFSET, sizeof(cp), &cp);
-+	}
-+
- 	conn->state = BT_DISCONN;
+-	l2cap_conn_shutdown(conn, ETIMEDOUT);
++	hci_disconnect(conn->hcon, HCI_ERROR_REMOTE_USER_TERM);
+ }
  
- 	cp.handle = cpu_to_le16(conn->handle);
-@@ -325,25 +338,6 @@ static void hci_conn_timeout(struct work_struct *work)
- 			hci_amp_disconn(conn);
- 		} else {
- 			__u8 reason = hci_proto_disconn_ind(conn);
--
--			/* When we are master of an established connection
--			 * and it enters the disconnect timeout, then go
--			 * ahead and try to read the current clock offset.
--			 *
--			 * Processing of the result is done within the
--			 * event handling and hci_clock_offset_evt function.
--			 */
--			if (conn->type == ACL_LINK &&
--			    conn->role == HCI_ROLE_MASTER) {
--				struct hci_dev *hdev = conn->hdev;
--				struct hci_cp_read_clock_offset cp;
--
--				cp.handle = cpu_to_le16(conn->handle);
--
--				hci_send_cmd(hdev, HCI_OP_READ_CLOCK_OFFSET,
--					     sizeof(cp), &cp);
--			}
--
- 			hci_disconnect(conn, reason);
- 		}
- 		break;
+ static struct smp_chan *smp_chan_create(struct l2cap_conn *conn)
+@@ -1569,7 +1569,7 @@ static int smp_recv_cb(struct l2cap_chan *chan, struct sk_buff *skb)
+ 		if (smp)
+ 			cancel_delayed_work_sync(&smp->security_timer);
+ 
+-		l2cap_conn_shutdown(chan->conn, -err);
++		hci_disconnect(chan->conn->hcon, HCI_ERROR_AUTH_FAILURE);
+ 	}
+ 
+ 	return err;
 -- 
 1.9.3
 
