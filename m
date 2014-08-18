@@ -1,67 +1,76 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.6\))
-Subject: Re: [PATCH 0/8] Bluetooth: SMP & disconnection fixes
-From: Marcel Holtmann <marcel@holtmann.org>
+From: johan.hedberg@gmail.com
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH 8/8] Bluetooth: Move clock offset reading into hci_disconnect()
+Date: Mon, 18 Aug 2014 20:33:34 +0300
+Message-Id: <1408383214-16366-9-git-send-email-johan.hedberg@gmail.com>
 In-Reply-To: <1408383214-16366-1-git-send-email-johan.hedberg@gmail.com>
-Date: Mon, 18 Aug 2014 16:09:58 -0500
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <5454BA15-8A88-47C1-8E14-75AB634AC9F2@holtmann.org>
 References: <1408383214-16366-1-git-send-email-johan.hedberg@gmail.com>
-To: Johan Hedberg <johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+From: Johan Hedberg <johan.hedberg@intel.com>
 
-> The previous patches for SMP disconnection (that already got applied) do
-> indeed fix the hci_conn_hold/drop ballance and do ensure that we
-> disconnect the link when the SMP code wants it. Unfortunately the
-> patches introduce a regression to a third use case which is the one
-> where we want to bring the link down when there are no more active users
-> for it.
-> 
-> It turns out that relying on connection users to diligently call
-> hci_conn_drop() isn't a reliable way to ensure that the connection goes
-> away. Firstly, we can't have hci_chan own such a reference (since it's
-> "always there") and secondly there might not be any users at all
-> (besides SMP) in which case there will be no-one to call hci_conn_drop.
-> 
-> A simpler solution is to just do a direct disonnect from smp.c with the
-> help of the hci_disconnect() function. This has the side effect of not
-> sending any SMP Failure PDU first, but the cases needing a disconnection
-> do not really need that PDU to be sent (i.e. SMP timeout or garbage
-> data).
-> 
-> The last three patches in this set unify hci_disconnect() usage to also
-> cover the Disconnect Device mgmt command and move clock offset reading
-> into the function to ensure all users have this feature at their
-> disposal.
-> 
-> Johan
-> 
-> ----------------------------------------------------------------
-> Johan Hedberg (8):
->      Bluetooth: Remove hci_conn_hold/drop from hci_chan
->      Bluetooth: Set discon_timeout to 0 in l2cap_conn_del
->      Bluetooth: Use hci_disconnect for immediate disconnection from SMP
->      Bluetooth: Remove unused l2cap_conn_shutdown API
->      Bluetooth: Fix SMP error and response to be mutually exclusive
->      Bluetooth: Update hci_disconnect() to return an error value
->      Bluetooth: Use hci_disconnect() for mgmt_disconnect_device()
->      Bluetooth: Move clock offset reading into hci_disconnect()
-> 
-> include/net/bluetooth/hci_core.h |  2 +-
-> include/net/bluetooth/l2cap.h    |  4 ----
-> net/bluetooth/hci_conn.c         | 41 ++++++++++++++----------------------
-> net/bluetooth/l2cap_core.c       | 28 +++---------------------
-> net/bluetooth/mgmt.c             |  6 +-----
-> net/bluetooth/smp.c              | 17 ++++++---------
-> 6 files changed, 28 insertions(+), 70 deletions(-)
+To give all hci_disconnect() users the advantage of getting the clock
+offset read automatically this patch moves the necessary code from
+hci_ocnn_timeout() into hci_disconnect(). This way we pretty much always
+update the clock offset when disconnecting.
 
-all 8 patches have been applied to bluetooth-next tree.
+Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+---
+ net/bluetooth/hci_conn.c | 32 +++++++++++++-------------------
+ 1 file changed, 13 insertions(+), 19 deletions(-)
 
-Regards
-
-Marcel
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+index dd2df20b0f7d..e3d7ae9e2edd 100644
+--- a/net/bluetooth/hci_conn.c
++++ b/net/bluetooth/hci_conn.c
+@@ -128,6 +128,19 @@ int hci_disconnect(struct hci_conn *conn, __u8 reason)
+ 
+ 	BT_DBG("hcon %p", conn);
+ 
++	/* When we are master of an established connection and it enters
++	 * the disconnect timeout, then go ahead and try to read the
++	 * current clock offset.  Processing of the result is done
++	 * within the event handling and hci_clock_offset_evt function.
++	 */
++	if (conn->type == ACL_LINK && conn->role == HCI_ROLE_MASTER) {
++		struct hci_dev *hdev = conn->hdev;
++		struct hci_cp_read_clock_offset cp;
++
++		cp.handle = cpu_to_le16(conn->handle);
++		hci_send_cmd(hdev, HCI_OP_READ_CLOCK_OFFSET, sizeof(cp), &cp);
++	}
++
+ 	conn->state = BT_DISCONN;
+ 
+ 	cp.handle = cpu_to_le16(conn->handle);
+@@ -325,25 +338,6 @@ static void hci_conn_timeout(struct work_struct *work)
+ 			hci_amp_disconn(conn);
+ 		} else {
+ 			__u8 reason = hci_proto_disconn_ind(conn);
+-
+-			/* When we are master of an established connection
+-			 * and it enters the disconnect timeout, then go
+-			 * ahead and try to read the current clock offset.
+-			 *
+-			 * Processing of the result is done within the
+-			 * event handling and hci_clock_offset_evt function.
+-			 */
+-			if (conn->type == ACL_LINK &&
+-			    conn->role == HCI_ROLE_MASTER) {
+-				struct hci_dev *hdev = conn->hdev;
+-				struct hci_cp_read_clock_offset cp;
+-
+-				cp.handle = cpu_to_le16(conn->handle);
+-
+-				hci_send_cmd(hdev, HCI_OP_READ_CLOCK_OFFSET,
+-					     sizeof(cp), &cp);
+-			}
+-
+ 			hci_disconnect(conn, reason);
+ 		}
+ 		break;
+-- 
+1.9.3
 
