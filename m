@@ -1,52 +1,57 @@
 Return-Path: <cyrus@holtmann.org>
 From: johan.hedberg@gmail.com
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/8] Bluetooth: Remove hci_conn_hold/drop from hci_chan
-Date: Mon, 18 Aug 2014 20:33:27 +0300
-Message-Id: <1408383214-16366-2-git-send-email-johan.hedberg@gmail.com>
-In-Reply-To: <1408383214-16366-1-git-send-email-johan.hedberg@gmail.com>
-References: <1408383214-16366-1-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH 0/8] Bluetooth: SMP & disconnection fixes
+Date: Mon, 18 Aug 2014 20:33:26 +0300
+Message-Id: <1408383214-16366-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@intel.com>
+Hi,
 
-We can't have hci_chan contribute to the "active" reference counting of
-the hci_conn since otherwise the connection would never get dropped when
-there are no more users (since hci_chan would be counted as a user).
-This patch removes hold() when creating the hci_chan and drop() when
-destroying it.
+The previous patches for SMP disconnection (that already got applied) do
+indeed fix the hci_conn_hold/drop ballance and do ensure that we
+disconnect the link when the SMP code wants it. Unfortunately the
+patches introduce a regression to a third use case which is the one
+where we want to bring the link down when there are no more active users
+for it.
 
-Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
----
- net/bluetooth/hci_conn.c | 5 +----
- 1 file changed, 1 insertion(+), 4 deletions(-)
+It turns out that relying on connection users to diligently call
+hci_conn_drop() isn't a reliable way to ensure that the connection goes
+away. Firstly, we can't have hci_chan own such a reference (since it's
+"always there") and secondly there might not be any users at all
+(besides SMP) in which case there will be no-one to call hci_conn_drop.
 
-diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index aaa7e388d026..5157a0990732 100644
---- a/net/bluetooth/hci_conn.c
-+++ b/net/bluetooth/hci_conn.c
-@@ -1301,7 +1301,6 @@ struct hci_chan *hci_chan_create(struct hci_conn *conn)
- 		return NULL;
- 
- 	chan->conn = hci_conn_get(conn);
--	hci_conn_hold(conn);
- 	skb_queue_head_init(&chan->data_q);
- 	chan->state = BT_CONNECTED;
- 
-@@ -1321,11 +1320,9 @@ void hci_chan_del(struct hci_chan *chan)
- 
- 	synchronize_rcu();
- 
--	/* Force the connection to be immediately dropped */
--	conn->disc_timeout = 0;
-+	/* Prevent new hci_chan's to be created for this hci_conn */
- 	set_bit(HCI_CONN_DROP, &conn->flags);
- 
--	hci_conn_drop(conn);
- 	hci_conn_put(conn);
- 
- 	skb_queue_purge(&chan->data_q);
--- 
-1.9.3
+A simpler solution is to just do a direct disonnect from smp.c with the
+help of the hci_disconnect() function. This has the side effect of not
+sending any SMP Failure PDU first, but the cases needing a disconnection
+do not really need that PDU to be sent (i.e. SMP timeout or garbage
+data).
+
+The last three patches in this set unify hci_disconnect() usage to also
+cover the Disconnect Device mgmt command and move clock offset reading
+into the function to ensure all users have this feature at their
+disposal.
+
+Johan
+
+----------------------------------------------------------------
+Johan Hedberg (8):
+      Bluetooth: Remove hci_conn_hold/drop from hci_chan
+      Bluetooth: Set discon_timeout to 0 in l2cap_conn_del
+      Bluetooth: Use hci_disconnect for immediate disconnection from SMP
+      Bluetooth: Remove unused l2cap_conn_shutdown API
+      Bluetooth: Fix SMP error and response to be mutually exclusive
+      Bluetooth: Update hci_disconnect() to return an error value
+      Bluetooth: Use hci_disconnect() for mgmt_disconnect_device()
+      Bluetooth: Move clock offset reading into hci_disconnect()
+
+ include/net/bluetooth/hci_core.h |  2 +-
+ include/net/bluetooth/l2cap.h    |  4 ----
+ net/bluetooth/hci_conn.c         | 41 ++++++++++++++----------------------
+ net/bluetooth/l2cap_core.c       | 28 +++---------------------
+ net/bluetooth/mgmt.c             |  6 +-----
+ net/bluetooth/smp.c              | 17 ++++++---------
+ 6 files changed, 28 insertions(+), 70 deletions(-)
+
 
