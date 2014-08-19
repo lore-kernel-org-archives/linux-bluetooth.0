@@ -4,36 +4,36 @@ To: linux-bluetooth@vger.kernel.org
 Cc: marcel@holtmann.org,
 	linux-wpan@vger.kernel.org,
 	kernel@pengutronix.de,
+	Martin Townsend <martin.townsend@xsilon.com>,
 	Alexander Aring <alex.aring@gmail.com>
-Subject: [PATCHv2 bluetooth 4/5] ieee802154: 6lowpan: ensure of sending 1280 packets
-Date: Tue, 19 Aug 2014 19:03:31 +0200
-Message-Id: <1408467812-30483-5-git-send-email-alex.aring@gmail.com>
+Subject: [PATCHv2 bluetooth 1/5] mac802154: fixed potential skb leak with mac802154_parse_frame_start
+Date: Tue, 19 Aug 2014 19:03:28 +0200
+Message-Id: <1408467812-30483-2-git-send-email-alex.aring@gmail.com>
 In-Reply-To: <1408467812-30483-1-git-send-email-alex.aring@gmail.com>
 References: <1408467812-30483-1-git-send-email-alex.aring@gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch changes the 1281 MTU to 1280. Others stack have only a 1280
-byte array for uncompressed 6LoWPAN packets, this avoid that these
-stacks have an overflow. Sending 1281 uncompressed 6LoWPAN packets isn't
-also rfc complaint.
+From: Martin Townsend <martin.townsend@xsilon.com>
 
+This patch fix a memory leak if received frame was not able to parse.
+
+Signed-off-by: Martin Townsend <martin.townsend@xsilon.com>
 Signed-off-by: Alexander Aring <alex.aring@gmail.com>
 ---
- net/ieee802154/6lowpan_rtnl.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ net/mac802154/wpan.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/net/ieee802154/6lowpan_rtnl.c b/net/ieee802154/6lowpan_rtnl.c
-index 71fa7d4..6591d27 100644
---- a/net/ieee802154/6lowpan_rtnl.c
-+++ b/net/ieee802154/6lowpan_rtnl.c
-@@ -437,7 +437,7 @@ static void lowpan_setup(struct net_device *dev)
- 	/* Frame Control + Sequence Number + Address fields + Security Header */
- 	dev->hard_header_len	= 2 + 1 + 20 + 14;
- 	dev->needed_tailroom	= 2; /* FCS */
--	dev->mtu		= 1281;
-+	dev->mtu		= IPV6_MIN_MTU;
- 	dev->tx_queue_len	= 0;
- 	dev->flags		= IFF_BROADCAST | IFF_MULTICAST;
- 	dev->watchdog_timeo	= 0;
+diff --git a/net/mac802154/wpan.c b/net/mac802154/wpan.c
+index 3c3069f..4c13323 100644
+--- a/net/mac802154/wpan.c
++++ b/net/mac802154/wpan.c
+@@ -573,6 +573,7 @@ void mac802154_wpans_rx(struct mac802154_priv *priv, struct sk_buff *skb)
+ 	ret = mac802154_parse_frame_start(skb, &hdr);
+ 	if (ret) {
+ 		pr_debug("got invalid frame\n");
++		kfree_skb(skb);
+ 		return;
+ 	}
+ 
 -- 
 2.0.4
