@@ -1,55 +1,50 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] android/pts: Update PAN PICS and tests results
-Date: Tue, 19 Aug 2014 19:32:32 +0200
-Message-ID: <8761123.h3VrdQbOa7@leonov>
-In-Reply-To: <1408364473-1182-1-git-send-email-szymon.janc@tieto.com>
-References: <1408364473-1182-1-git-send-email-szymon.janc@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.6\))
+Subject: Re: [PATCHv2 bluetooth 0/5] mac802154: ieee802154: stable patches
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1408467812-30483-1-git-send-email-alex.aring@gmail.com>
+Date: Tue, 19 Aug 2014 12:20:36 -0500
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>,
+	linux-wpan@vger.kernel.org, kernel@pengutronix.de
+Message-Id: <36287626-7FA7-459F-BB4F-B6E94E517694@holtmann.org>
+References: <1408467812-30483-1-git-send-email-alex.aring@gmail.com>
+To: Alexander Aring <alex.aring@gmail.com>
+Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Monday 18 of August 2014 14:21:13 Szymon Janc wrote:
-> Specification Errata #3558 makes LLMNR support optional as LLMNR Draft
-> was never adopted by IETF. AOSP doesn't support LLMNR.
-> ---
->  android/pics-pan.txt | 3 ++-
->  android/pts-pan.txt  | 2 +-
->  2 files changed, 3 insertions(+), 2 deletions(-)
+Hi Alex,
+
+> these patches contains patches for the bluetooth branch.
 > 
-> diff --git a/android/pics-pan.txt b/android/pics-pan.txt
-> index b59bef7..20b91c7 100644
-> --- a/android/pics-pan.txt
-> +++ b/android/pics-pan.txt
-> @@ -124,7 +124,8 @@ TSPC_PAN_4_2	True (*)	PANU: Support IPv4 (C.1)
->  TSPC_PAN_4_3	False		PANU: Support ping client for IPv4 (O)
->  TSPC_PAN_4_4	False		PANU: Support DHCP client for  IPv4 (O)
->  TSPC_PAN_4_5	False		PANU: Support DNS/LLMNR Resolver for IPv4 (O)
-> -TSPC_PAN_4_5a	True		PANU: Support LLMNR Sender for IPv4 (C.2)
-> +TSPC_PAN_4_5a	False (*)	PANU: Support LLMNR Sender for IPv4 (C.2)
-> +				Reference: SE #3558, TSE #4382, TCW #448
->  TSPC_PAN_4_5b	False		PANU: Support LLMNR Responder for IPv4 (O)
->  TSPC_PAN_4_6	False		PANU: Support HTTP Client for IPv4 (O)
->  TSPC_PAN_4_7	False		PANU: Support WAP Client for IPv4 (O)
-> diff --git a/android/pts-pan.txt b/android/pts-pan.txt
-> index 5e3248c..0af186c 100644
-> --- a/android/pts-pan.txt
-> +++ b/android/pts-pan.txt
-> @@ -56,7 +56,7 @@ TC_PANU_Ipv4_Autonet_BV_01_I		PASS	After DHCP 
-request fail
-> send From IUT: send address request
->  						dhcpd -r 169.254.x.x bt-pan
->  TC_PANU_Ipv6_Autonet_BV_02_I		N/A
-> -TC_PANU_IP_LLMNR_BV_01_I		INC	PTS TSE errata #5871
-> +TC_PANU_IP_LLMNR_BV_01_I		N/A	SE #3558, TSE #4382, TCW #448
->  TC_PANU_IP_LLMNR_BV_02_I		N/A
->  TC_PANU_IP_DHCP_BV_03_I			N/A
->  TC_PANU_IP_DNS_BV_01_I			N/A
+> This series includes memory leak fixes and an errno value fix.
+> Also there are two patches for sending and receiving 1280 6LoWPAN packets,
+> which makes the IEEE 802.15.4 6LoWPAN stack more RFC compliant.
+> 
+> - Alex
+> 
+> changes v2:
+> - remove ieee802154_lowpan in lowpan_frag_rcv to avoid compiler warning
+> 
+> Alexander Aring (2):
+>  ieee802154: 6lowpan_rtnl: fix correct errno value
+>  ieee802154: 6lowpan: ensure of sending 1280 packets
+> 
+> Martin Townsend (3):
+>  mac802154: fixed potential skb leak with mac802154_parse_frame_start
+>  ieee802154: mac802154: handle the reserved dest mode by dropping the
+>    packet
+>  ieee802154: 6lowpan: ensure MTU of 1280 for 6lowpan
+> 
+> include/net/netns/ieee802154_6lowpan.h |  1 -
+> net/ieee802154/6lowpan_rtnl.c          |  4 ++--
+> net/ieee802154/reassembly.c            | 15 +++------------
+> net/mac802154/wpan.c                   |  6 +++++-
+> 4 files changed, 10 insertions(+), 16 deletions(-)
 
-Pushed.
+I have applied this series to bluetooth tree now.
 
--- 
-BR
-Szymon Janc
+Regards
+
+Marcel
+
