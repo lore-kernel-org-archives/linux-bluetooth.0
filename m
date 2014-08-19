@@ -1,72 +1,59 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 2/2] gdbus: Fix crash when watch is toggled or disconnected
-Date: Tue, 19 Aug 2014 15:05:09 +0300
-Message-Id: <1408449909-3461-2-git-send-email-luiz.dentz@gmail.com>
-In-Reply-To: <1408449909-3461-1-git-send-email-luiz.dentz@gmail.com>
-References: <1408449909-3461-1-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 1/2] gdbus: Fix crash when calling g_dbus_add_service_watch
+Date: Tue, 19 Aug 2014 15:05:08 +0300
+Message-Id: <1408449909-3461-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This partially reverts 510b32b7156625b9df737c916b7a7a5c6fb285b9 since it
-still necessary to take a reference before calling dbus_watch_handle
-since internally it can call watch_info_free as in the following trace:
+If g_dbus_add_service_watch is called for service which bus name is
+already known the following crash can happen:
 
- Invalid read of size 8
-   at 0x121085: watch_func (mainloop.c:105)
-   by 0x4C72694: g_main_context_dispatch (gmain.c:2539)
-   by 0x4C729C7: g_main_context_iterate.isra.23 (gmain.c:3146)
-   by 0x4C72DC1: g_main_loop_run (gmain.c:3340)
-   by 0x120541: main (main.c:551)
- Address 0x5bbcd90 is 16 bytes inside a block of size 24 free'd
-   at 0x4A079AE: free (vg_replace_malloc.c:427)
-   by 0x4C7837E: g_free (gmem.c:252)
-   by 0x4F708BF: dbus_watch_set_data (dbus-watch.c:614)
-   by 0x4F70938: _dbus_watch_unref (dbus-watch.c:132)
-   by 0x4F6E9A7: _dbus_transport_handle_watch (dbus-transport.c:884)
-   by 0x4F59AFB: _dbus_connection_handle_watch (dbus-connection.c:1497)
-   by 0x4F70AF9: dbus_watch_handle (dbus-watch.c:683)
-   by 0x121084: watch_func (mainloop.c:103)
-   by 0x4C72694: g_main_context_dispatch (gmain.c:2539)
-   by 0x4C729C7: g_main_context_iterate.isra.23 (gmain.c:3146)
-   by 0x4C72DC1: g_main_loop_run (gmain.c:3340)
-   by 0x120541: main (main.c:551)
+invalid read of size 1
+  at 0x4C2A2F2: strlen (in /usr/lib64/valgrind/vgpreload_memcheck-amd64-linux.so)
+  by 0x4E97722: g_strdup (in /usr/lib64/libglib-2.0.so.0.3800.2)
+  by 0x405B0C: update_name_cache (watch.c:435)
+  by 0x405C37: update_service (watch.c:593)
+  by 0x4E7A2A5: g_main_context_dispatch (in /usr/lib64/libglib-2.0.so.0.3800.2)
+  by 0x4E7A627: ??? (in /usr/lib64/libglib-2.0.so.0.3800.2)
+  by 0x4E7AA39: g_main_loop_run (in /usr/lib64/libglib-2.0.so.0.3800.2)
+  by 0x4038EA: client_ready (test-gdbus-client.c:1014)
+  by 0x4E9E5E0: ??? (in /usr/lib64/libglib-2.0.so.0.3800.2)
+  by 0x4E9E7A5: ??? (in /usr/lib64/libglib-2.0.so.0.3800.2)
+  by 0x4E9EB1A: g_test_run_suite (in /usr/lib64/libglib-2.0.so.0.3800.2)
+  by 0x403614: main (test-gdbus-client.c:1058)
+Address 0x5dbe5d0 is 0 bytes inside a block of size 7 free'd
+  at 0x4C28577: free (in /usr/lib64/valgrind/vgpreload_memcheck-amd64-linux.so)
+  by 0x4E7FF7E: g_free (in /usr/lib64/libglib-2.0.so.0.3800.2)
+  by 0x405B04: update_name_cache (watch.c:434)
+  by 0x405C37: update_service (watch.c:593)
+  by 0x4E7A2A5: g_main_context_dispatch (in /usr/lib64/libglib-2.0.so.0.3800.2)
+  by 0x4E7A627: ??? (in /usr/lib64/libglib-2.0.so.0.3800.2)
+  by 0x4E7AA39: g_main_loop_run (in /usr/lib64/libglib-2.0.so.0.3800.2)
+  by 0x4038EA: client_ready (test-gdbus-client.c:1014)
+  by 0x4E9E5E0: ??? (in /usr/lib64/libglib-2.0.so.0.3800.2)
+  by 0x4E9E7A5: ??? (in /usr/lib64/libglib-2.0.so.0.3800.2)
+  by 0x4E9EB1A: g_test_run_suite (in /usr/lib64/libglib-2.0.so.0.3800.2)
+  by 0x403614: main (test-gdbus-client.c:1058)
 ---
- gdbus/mainloop.c | 10 ++++++++--
- 1 file changed, 8 insertions(+), 2 deletions(-)
+ gdbus/watch.c | 1 -
+ 1 file changed, 1 deletion(-)
 
-diff --git a/gdbus/mainloop.c b/gdbus/mainloop.c
-index 435fb93..3e88eac 100644
---- a/gdbus/mainloop.c
-+++ b/gdbus/mainloop.c
-@@ -88,16 +88,22 @@ static gboolean watch_func(GIOChannel *chan, GIOCondition cond, gpointer data)
- 	struct watch_info *info = data;
- 	unsigned int flags = 0;
- 	DBusDispatchStatus status;
-+	DBusConnection *conn;
+diff --git a/gdbus/watch.c b/gdbus/watch.c
+index 474d3d4..2f5e865 100644
+--- a/gdbus/watch.c
++++ b/gdbus/watch.c
+@@ -595,7 +595,6 @@ static gboolean update_service(void *user_data)
+ 	struct filter_callback *cb = data->callback;
+ 	DBusConnection *conn;
  
- 	if (cond & G_IO_IN)  flags |= DBUS_WATCH_READABLE;
- 	if (cond & G_IO_OUT) flags |= DBUS_WATCH_WRITABLE;
- 	if (cond & G_IO_HUP) flags |= DBUS_WATCH_HANGUP;
- 	if (cond & G_IO_ERR) flags |= DBUS_WATCH_ERROR;
+-	update_name_cache(data->name, data->owner);
+ 	conn = dbus_connection_ref(data->conn);
+ 	service_data_free(data);
  
-+	/* Protect connection from being destroyed by dbus_watch_handle */
-+	conn = dbus_connection_ref(info->conn);
-+
- 	dbus_watch_handle(info->watch, flags);
- 
--	status = dbus_connection_get_dispatch_status(info->conn);
--	queue_dispatch(info->conn, status);
-+	status = dbus_connection_get_dispatch_status(conn);
-+	queue_dispatch(conn, status);
-+
-+	dbus_connection_unref(conn);
- 
- 	return TRUE;
- }
 -- 
 1.9.3
 
