@@ -1,26 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
-From: Sebastian Chlad <sebastian.chlad@tieto.com>
+From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Sebastian Chlad <sebastian.chlad@tieto.com>
-Subject: [PATCH] L2CAP tests on PTS 5.2
-Date: Tue, 19 Aug 2014 10:32:33 +0200
-Message-Id: <1408437154-7274-1-git-send-email-sebastian.chlad@tieto.com>
-In-Reply-To: <1407334287-6721-1-git-send-email-sebastian.chlad@tieto.com>
-References: <1407334287-6721-1-git-send-email-sebastian.chlad@tieto.com>
+Cc: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+Subject: [PATCH] android/pts: Updated GAP test result
+Date: Tue, 19 Aug 2014 10:12:24 +0200
+Message-Id: <1408435944-22125-1-git-send-email-lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-With the latest bluetooth-next all l2cap tests are passing except the one
-on which there is an errata filled (bluetooth.org)
+Updated test result and instruction for TC_BOND_BON_BV_04_C
+---
+Since kernel version has been updated we should schedule regression run.
 
-Sebastian Chlad (1):
-  android/pts: Update PTS files for L2CAP
+ android/pts-gap.txt | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
- android/pics-l2cap.txt  | 11 +++++++----
- android/pixit-l2cap.txt |  2 +-
- android/pts-l2cap.txt   | 46 ++++++++++++++++++++++++----------------------
- 3 files changed, 32 insertions(+), 27 deletions(-)
-
+diff --git a/android/pts-gap.txt b/android/pts-gap.txt
+index af75dff..0158707 100644
+--- a/android/pts-gap.txt
++++ b/android/pts-gap.txt
+@@ -3,7 +3,7 @@ PTS test results for GAP
+ PTS version: 5.2
+ Tested: 01-August-2014
+ Android version: 4.4.4
+-Kernel version: 3.17
++Kernel version: 3.18
+ 
+ Results:
+ PASS	test passed
+@@ -180,11 +180,11 @@ TC_BOND_BON_BV_01_C	INC	gattc register_client
+ TC_BOND_BON_BV_02_C	PASS
+ TC_BOND_BON_BV_03_C	PASS	gattc register_client
+ 				gattc listen 1
+-TC_BOND_BON_BV_04_C	FAIL	haltest: gattc_register_client
++TC_BOND_BON_BV_04_C	PASS	haltest: gattc_register_client
+ 				gattc connect <client_id> <address>
+-				bluetooth remove_bond <address>
++				gattc disconnect
+ 				gattc connect <client_id> <address>
+-				JIRA #BA-70
++				gattc test_command 226 <addr> 0 2
+ TC_SEC_AUT_BV_11_C	PASS	haltest: gattc register_client
+ 				gatts register_server
+ 				gatts add_service 2 <uuid> 3
 -- 
-1.8.5.3
+1.8.4
 
