@@ -4,41 +4,34 @@ To: linux-bluetooth@vger.kernel.org
 Cc: marcel@holtmann.org,
 	linux-wpan@vger.kernel.org,
 	kernel@pengutronix.de,
-	Martin Townsend <martin.townsend@xsilon.com>,
 	Alexander Aring <alex.aring@gmail.com>
-Subject: [PATCHv2 bluetooth 3/5] ieee802154: mac802154: handle the reserved dest mode by dropping the packet
-Date: Tue, 19 Aug 2014 19:03:30 +0200
-Message-Id: <1408467812-30483-4-git-send-email-alex.aring@gmail.com>
+Subject: [PATCHv2 bluetooth 2/5] ieee802154: 6lowpan_rtnl: fix correct errno value
+Date: Tue, 19 Aug 2014 19:03:29 +0200
+Message-Id: <1408467812-30483-3-git-send-email-alex.aring@gmail.com>
 In-Reply-To: <1408467812-30483-1-git-send-email-alex.aring@gmail.com>
 References: <1408467812-30483-1-git-send-email-alex.aring@gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Martin Townsend <martin.townsend@xsilon.com>
+This patch correct the return value of lowpan_alloc_frag if an error
+occur. Errno numbers should always be negative.
 
-If received frame contains the reserved destination address mode. The
-frame should be dropped and free the skb.
-
-Signed-off-by: Martin Townsend <martin.townsend@xsilon.com>
 Signed-off-by: Alexander Aring <alex.aring@gmail.com>
 ---
- net/mac802154/wpan.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+ net/ieee802154/6lowpan_rtnl.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/net/mac802154/wpan.c b/net/mac802154/wpan.c
-index 4c13323..5478388 100644
---- a/net/mac802154/wpan.c
-+++ b/net/mac802154/wpan.c
-@@ -462,7 +462,10 @@ mac802154_subif_frame(struct mac802154_sub_if_data *sdata, struct sk_buff *skb,
- 			skb->pkt_type = PACKET_OTHERHOST;
- 		break;
- 	default:
--		break;
-+		spin_unlock_bh(&sdata->mib_lock);
-+		pr_debug("invalid dest mode\n");
-+		kfree_skb(skb);
-+		return NET_RX_DROP;
+diff --git a/net/ieee802154/6lowpan_rtnl.c b/net/ieee802154/6lowpan_rtnl.c
+index 016b77e..71fa7d4 100644
+--- a/net/ieee802154/6lowpan_rtnl.c
++++ b/net/ieee802154/6lowpan_rtnl.c
+@@ -246,7 +246,7 @@ lowpan_alloc_frag(struct sk_buff *skb, int size,
+ 			return ERR_PTR(-rc);
+ 		}
+ 	} else {
+-		frag = ERR_PTR(ENOMEM);
++		frag = ERR_PTR(-ENOMEM);
  	}
  
- 	spin_unlock_bh(&sdata->mib_lock);
+ 	return frag;
 -- 
 2.0.4
