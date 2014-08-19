@@ -1,55 +1,103 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=windows-1252
-Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.6\))
-Subject: Re: [PATCH bluetooth 0/5] mac802154: ieee802154: stable patches
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1408438983-13892-1-git-send-email-alex.aring@gmail.com>
-Date: Tue, 19 Aug 2014 11:44:11 -0500
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>,
-	linux-wpan@vger.kernel.org, kernel@pengutronix.de
-Message-Id: <79B561AB-5717-4F81-9725-FDA13BC2A789@holtmann.org>
-References: <1408438983-13892-1-git-send-email-alex.aring@gmail.com>
-To: Alexander Aring <alex.aring@gmail.com>
-Sender: linux-wpan-owner@vger.kernel.org
+From: Szymon Janc <szymon.janc@tieto.com>
+To: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 2/4] android/health: Remove mcl instance on mcl_disconnected call back
+Date: Tue, 19 Aug 2014 18:43:53 +0200
+Message-ID: <5832975.EmNLQ3qPM9@leonov>
+In-Reply-To: <1408352822-21572-2-git-send-email-ravikumar.veeramally@linux.intel.com>
+References: <1408352822-21572-1-git-send-email-ravikumar.veeramally@linux.intel.com> <1408352822-21572-2-git-send-email-ravikumar.veeramally@linux.intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Alex,
+Hi Ravi,
 
-> these patches contains patches for the bluetooth branch.
+On Monday 18 of August 2014 12:07:00 Ravi kumar Veeramally wrote:
+> MCAP library is maintaining two sets of mcl list. On mcl_disconnected
+> call mcl instance is removed from regular mcl list and cached in mcl_cache
+> list. health.c doesn't maintain any cached mcls list. So mcl_conn variable
+> doesn't make any sense of not being connected on mcl_disconnected call back.
+> So unref mcl on mcl_disconnected and don't do anything in mcl_unached
+> callback. ---
+>  android/health.c | 18 ++++--------------
+>  1 file changed, 4 insertions(+), 14 deletions(-)
 > 
-> This series includes memory leak fixes and an errno value fix.
-> Also there are two patches for sending and receiving 1280 6LoWPAN packets,
-> which makes the IEEE 802.15.4 6LoWPAN stack more RFC compliant.
+> diff --git a/android/health.c b/android/health.c
+> index f86fd26..361b043 100644
+> --- a/android/health.c
+> +++ b/android/health.c
+> @@ -85,7 +85,6 @@ struct health_device {
+>  	uint16_t app_id;
 > 
-> - Alex
+>  	struct mcap_mcl *mcl;
+> -	bool mcl_conn;
 > 
-> Alexander Aring (2):
->  ieee802154: 6lowpan_rtnl: fix correct errno value
->  ieee802154: 6lowpan: ensure of sending 1280 packets
+>  	struct queue *channels;     /* data channels */
 > 
-> Martin Townsend (3):
->  mac802154: fixed potential skb leak with mac802154_parse_frame_start
->  ieee802154: mac802154: handle the reserved dest mode by dropping the
->    packet
->  ieee802154: 6lowpan: ensure MTU of 1280 for 6lowpan
+> @@ -193,7 +192,6 @@ static void unref_mcl(struct health_device *dev)
+>  	mcap_close_mcl(dev->mcl, FALSE);
+>  	mcap_mcl_unref(dev->mcl);
+>  	dev->mcl = NULL;
+> -	dev->mcl_conn = false;
+>  }
 > 
-> include/net/netns/ieee802154_6lowpan.h |  1 -
-> net/ieee802154/6lowpan_rtnl.c          |  4 ++--
-> net/ieee802154/reassembly.c            | 13 +++----------
-> net/mac802154/wpan.c                   |  6 +++++-
-> 4 files changed, 10 insertions(+), 14 deletions(-)
+>  static void free_health_device(void *data)
+> @@ -1824,7 +1822,6 @@ static void create_mcl_cb(struct mcap_mcl *mcl, GError
+> *err, gpointer data) if (!channel->dev->mcl)
+>  		channel->dev->mcl = mcap_mcl_ref(mcl);
+> 
+> -	channel->dev->mcl_conn = true;
+>  	info("MCL connected");
+> 
+>  	ret = set_mcl_cb(channel->dev->mcl, channel, &gerr);
+> @@ -1949,7 +1946,7 @@ static void bt_health_connect_channel(const void *buf,
+> uint16_t len) }
+>  	}
+> 
+> -	if (!dev->mcl || (dev->mcl && !dev->mcl_conn)) {
+> +	if (!dev->mcl) {
+>  		if (connect_mcl(channel) < 0) {
+>  			error("health: error retrieving HDP SDP record");
+>  			goto fail;
+> @@ -2069,8 +2066,6 @@ static void mcl_reconnected(struct mcap_mcl *mcl,
+> gpointer data) error("device data does not exists");
+>  		return;
+>  	}
+> -
+> -	dev->mcl_conn = true;
+>  }
+> 
+>  static void mcl_disconnected(struct mcap_mcl *mcl, gpointer data)
+> @@ -2080,18 +2075,13 @@ static void mcl_disconnected(struct mcap_mcl *mcl,
+> gpointer data) DBG("");
+> 
+>  	dev = search_dev_by_mcl(mcl);
+> -	if (dev)
+> -		dev->mcl_conn = false;
+> +	mcap_mcl_unref(dev->mcl);
+> +	dev->mcl = NULL;
 
-all 5 patches have been applied to bluetooth tree.
+So, previously dev was check for NULL before accessing it. Now it is not.
+Is this always true that dev is not NULL here?
 
-However is it possible you introduced a compile warning.
+>  }
+> 
+>  static void mcl_uncached(struct mcap_mcl *mcl, gpointer data)
+>  {
+> -	struct health_device *dev;
+> -
+> -	DBG("");
+> -
+> -	dev = search_dev_by_mcl(mcl);
+> -	free_health_device(dev);
+> +	/* mcap library maintains cache of mcls, not required here*/
+>  }
+> 
+>  bool bt_health_register(struct ipc *ipc, const bdaddr_t *addr, uint8_t
+> mode)
 
-  CC      net/ieee802154/reassembly.o
-net/ieee802154/reassembly.c: In function ‘lowpan_frag_rcv’:
-net/ieee802154/reassembly.c:358:34: warning: unused variable ‘ieee802154_lowpan’ [-Wunused-variable]
-  struct netns_ieee802154_lowpan *ieee802154_lowpan =
-                                  ^
-
-Regards
-
-Marcel
-
+-- 
+BR
+Szymon Janc
