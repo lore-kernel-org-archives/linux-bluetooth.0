@@ -4,36 +4,40 @@ To: linux-bluetooth@vger.kernel.org
 Cc: marcel@holtmann.org,
 	linux-wpan@vger.kernel.org,
 	kernel@pengutronix.de,
-	Martin Townsend <martin.townsend@xsilon.com>,
 	Alexander Aring <alex.aring@gmail.com>
-Subject: [PATCHv2 bluetooth 1/5] mac802154: fixed potential skb leak with mac802154_parse_frame_start
-Date: Tue, 19 Aug 2014 19:03:28 +0200
-Message-Id: <1408467812-30483-2-git-send-email-alex.aring@gmail.com>
-In-Reply-To: <1408467812-30483-1-git-send-email-alex.aring@gmail.com>
-References: <1408467812-30483-1-git-send-email-alex.aring@gmail.com>
+Subject: [PATCHv2 bluetooth 0/5] mac802154: ieee802154: stable patches
+Date: Tue, 19 Aug 2014 19:03:27 +0200
+Message-Id: <1408467812-30483-1-git-send-email-alex.aring@gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Martin Townsend <martin.townsend@xsilon.com>
+Hi Marcel,
 
-This patch fix a memory leak if received frame was not able to parse.
+these patches contains patches for the bluetooth branch.
 
-Signed-off-by: Martin Townsend <martin.townsend@xsilon.com>
-Signed-off-by: Alexander Aring <alex.aring@gmail.com>
----
- net/mac802154/wpan.c | 1 +
- 1 file changed, 1 insertion(+)
+This series includes memory leak fixes and an errno value fix.
+Also there are two patches for sending and receiving 1280 6LoWPAN packets,
+which makes the IEEE 802.15.4 6LoWPAN stack more RFC compliant.
 
-diff --git a/net/mac802154/wpan.c b/net/mac802154/wpan.c
-index 3c3069f..4c13323 100644
---- a/net/mac802154/wpan.c
-+++ b/net/mac802154/wpan.c
-@@ -573,6 +573,7 @@ void mac802154_wpans_rx(struct mac802154_priv *priv, struct sk_buff *skb)
- 	ret = mac802154_parse_frame_start(skb, &hdr);
- 	if (ret) {
- 		pr_debug("got invalid frame\n");
-+		kfree_skb(skb);
- 		return;
- 	}
- 
+- Alex
+
+changes v2:
+ - remove ieee802154_lowpan in lowpan_frag_rcv to avoid compiler warning
+
+Alexander Aring (2):
+  ieee802154: 6lowpan_rtnl: fix correct errno value
+  ieee802154: 6lowpan: ensure of sending 1280 packets
+
+Martin Townsend (3):
+  mac802154: fixed potential skb leak with mac802154_parse_frame_start
+  ieee802154: mac802154: handle the reserved dest mode by dropping the
+    packet
+  ieee802154: 6lowpan: ensure MTU of 1280 for 6lowpan
+
+ include/net/netns/ieee802154_6lowpan.h |  1 -
+ net/ieee802154/6lowpan_rtnl.c          |  4 ++--
+ net/ieee802154/reassembly.c            | 15 +++------------
+ net/mac802154/wpan.c                   |  6 +++++-
+ 4 files changed, 10 insertions(+), 16 deletions(-)
+
 -- 
 2.0.4
