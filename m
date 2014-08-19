@@ -1,32 +1,91 @@
 Return-Path: <cyrus@holtmann.org>
-From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
+From: Alexander Aring <alex.aring@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
-Subject: [PATCH] android/pts: Update GAP result for handling directed advertising
-Date: Tue, 19 Aug 2014 11:32:07 +0200
-Message-Id: <1408440727-31627-1-git-send-email-jakub.tyszkowski@tieto.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Cc: marcel@holtmann.org,
+	linux-wpan@vger.kernel.org,
+	kernel@pengutronix.de,
+	Martin Townsend <martin.townsend@xsilon.com>,
+	Alexander Aring <alex.aring@gmail.com>
+Subject: [PATCH bluetooth 5/5] ieee802154: 6lowpan: ensure MTU of 1280 for 6lowpan
+Date: Tue, 19 Aug 2014 11:03:03 +0200
+Message-Id: <1408438983-13892-6-git-send-email-alex.aring@gmail.com>
+In-Reply-To: <1408438983-13892-1-git-send-email-alex.aring@gmail.com>
+References: <1408438983-13892-1-git-send-email-alex.aring@gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Previously used connection procedure was to slow for remotes preforming
-directed advertising. This issue is no longer valid on the latest kernel
-and auto connection support added recently to the daemon.
+From: Martin Townsend <martin.townsend@xsilon.com>
+
+This patch drops the userspace accessable sysfs entry for the maximum
+datagram size of a 6LoWPAN fragment packet.
+
+A fragment should not have a datagram size value greater than 1280 byte.
+Instead of make this value configurable, we accept 1280 datagram size
+fragment packets only.
+
+Signed-off-by: Martin Townsend <martin.townsend@xsilon.com>
+Signed-off-by: Alexander Aring <alex.aring@gmail.com>
 ---
- android/pts-gap.txt | 1 -
- 1 file changed, 1 deletion(-)
+ include/net/netns/ieee802154_6lowpan.h |  1 -
+ net/ieee802154/reassembly.c            | 13 +++----------
+ 2 files changed, 3 insertions(+), 11 deletions(-)
 
-diff --git a/android/pts-gap.txt b/android/pts-gap.txt
-index af75dff..d154a38 100644
---- a/android/pts-gap.txt
-+++ b/android/pts-gap.txt
-@@ -137,7 +137,6 @@ TC_CONN_GCEP_BV_03_C	PASS	gattc connect
- 				gattc disconnect
- TC_CONN_GCEP_BV_04_C	INC	Privacy feature - PTS issue #12308
- TC_CONN_SCEP_BV_01_C	PASS	'gattc connect' prior to pressing OK on PTS
--				Note: test is not always passing. JIRA: BA-55
- TC_CONN_SCEP_BV_02_C	INC	Privacy feature - PTS issue #12308
- TC_CONN_DCEP_BV_01_C	PASS	'gattc connect' prior to pressing OK on PTS
- TC_CONN_DCEP_BV_02_C	INC	Privacy feature - PTS issue #12308
+diff --git a/include/net/netns/ieee802154_6lowpan.h b/include/net/netns/ieee802154_6lowpan.h
+index e207096..8170f8d 100644
+--- a/include/net/netns/ieee802154_6lowpan.h
++++ b/include/net/netns/ieee802154_6lowpan.h
+@@ -16,7 +16,6 @@ struct netns_sysctl_lowpan {
+ struct netns_ieee802154_lowpan {
+ 	struct netns_sysctl_lowpan sysctl;
+ 	struct netns_frags	frags;
+-	int			max_dsize;
+ };
+ 
+ #endif
+diff --git a/net/ieee802154/reassembly.c b/net/ieee802154/reassembly.c
+index ffec6ce..9dc85e5 100644
+--- a/net/ieee802154/reassembly.c
++++ b/net/ieee802154/reassembly.c
+@@ -366,8 +366,10 @@ int lowpan_frag_rcv(struct sk_buff *skb, const u8 frag_type)
+ 	if (err < 0)
+ 		goto err;
+ 
+-	if (frag_info->d_size > ieee802154_lowpan->max_dsize)
++	if (frag_info->d_size > IPV6_MIN_MTU) {
++		net_warn_ratelimited("lowpan_frag_rcv: datagram size exceeds MTU\n");
+ 		goto err;
++	}
+ 
+ 	fq = fq_find(net, frag_info, &source, &dest);
+ 	if (fq != NULL) {
+@@ -415,13 +417,6 @@ static struct ctl_table lowpan_frags_ns_ctl_table[] = {
+ 		.mode		= 0644,
+ 		.proc_handler	= proc_dointvec_jiffies,
+ 	},
+-	{
+-		.procname	= "6lowpanfrag_max_datagram_size",
+-		.data		= &init_net.ieee802154_lowpan.max_dsize,
+-		.maxlen		= sizeof(int),
+-		.mode		= 0644,
+-		.proc_handler	= proc_dointvec
+-	},
+ 	{ }
+ };
+ 
+@@ -458,7 +453,6 @@ static int __net_init lowpan_frags_ns_sysctl_register(struct net *net)
+ 		table[1].data = &ieee802154_lowpan->frags.low_thresh;
+ 		table[1].extra2 = &ieee802154_lowpan->frags.high_thresh;
+ 		table[2].data = &ieee802154_lowpan->frags.timeout;
+-		table[3].data = &ieee802154_lowpan->max_dsize;
+ 
+ 		/* Don't export sysctls to unprivileged users */
+ 		if (net->user_ns != &init_user_ns)
+@@ -533,7 +527,6 @@ static int __net_init lowpan_frags_init_net(struct net *net)
+ 	ieee802154_lowpan->frags.high_thresh = IPV6_FRAG_HIGH_THRESH;
+ 	ieee802154_lowpan->frags.low_thresh = IPV6_FRAG_LOW_THRESH;
+ 	ieee802154_lowpan->frags.timeout = IPV6_FRAG_TIMEOUT;
+-	ieee802154_lowpan->max_dsize = 0xFFFF;
+ 
+ 	inet_frags_init_net(&ieee802154_lowpan->frags);
+ 
 -- 
-1.9.1
-
+2.0.3
