@@ -1,41 +1,80 @@
 Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
-To: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
+To: Marcin Kraglak <marcin.kraglak@tieto.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] android/pts: Update GAP result for handling directed advertising
-Date: Tue, 19 Aug 2014 19:33:58 +0200
-Message-ID: <46961852.2dRGyApmYi@leonov>
-In-Reply-To: <1408440727-31627-1-git-send-email-jakub.tyszkowski@tieto.com>
-References: <1408440727-31627-1-git-send-email-jakub.tyszkowski@tieto.com>
+Subject: Re: [PATCH] android/pts: Update GAP PTS test results
+Date: Tue, 19 Aug 2014 19:33:31 +0200
+Message-ID: <1985511.uWbpPDjJKP@leonov>
+In-Reply-To: <1408434655-3490-1-git-send-email-marcin.kraglak@tieto.com>
+References: <1408434655-3490-1-git-send-email-marcin.kraglak@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jakub,
+Hi Marcin,
 
-On Tuesday 19 of August 2014 11:32:07 Jakub Tyszkowski wrote:
-> Previously used connection procedure was to slow for remotes preforming
-> directed advertising. This issue is no longer valid on the latest kernel
-> and auto connection support added recently to the daemon.
+On Tuesday 19 of August 2014 09:50:55 Marcin Kraglak wrote:
 > ---
->  android/pts-gap.txt | 1 -
->  1 file changed, 1 deletion(-)
+>  android/pts-gap.txt | 36 ++++++++++++++++++++++++++----------
+>  1 file changed, 26 insertions(+), 10 deletions(-)
 > 
 > diff --git a/android/pts-gap.txt b/android/pts-gap.txt
-> index af75dff..d154a38 100644
+> index af75dff..6e0936a 100644
 > --- a/android/pts-gap.txt
 > +++ b/android/pts-gap.txt
-> @@ -137,7 +137,6 @@ TC_CONN_GCEP_BV_03_C	PASS	gattc connect
->  				gattc disconnect
->  TC_CONN_GCEP_BV_04_C	INC	Privacy feature - PTS issue #12308
->  TC_CONN_SCEP_BV_01_C	PASS	'gattc connect' prior to pressing OK on PTS
-> -				Note: test is not always passing. JIRA: BA-55
->  TC_CONN_SCEP_BV_02_C	INC	Privacy feature - PTS issue #12308
->  TC_CONN_DCEP_BV_01_C	PASS	'gattc connect' prior to pressing OK on PTS
->  TC_CONN_DCEP_BV_02_C	INC	Privacy feature - PTS issue #12308
+> @@ -3,7 +3,7 @@ PTS test results for GAP
+>  PTS version: 5.2
+>  Tested: 01-August-2014
+>  Android version: 4.4.4
+> -Kernel version: 3.17
+> +Kernel version: 3.18
+> 
+>  Results:
+>  PASS	test passed
+> @@ -397,14 +397,30 @@ TC_DM_LEP_BV_05_C	PASS	btmgmt find -b
+>  TC_DM_LEP_BV_06_C	PASS
+>  TC_DM_LEP_BV_07_C	PASS
+>  TC_DM_LEP_BV_08_C	PASS
+> -TC_DM_LEP_BV_09_C	INC	JIRA #BA-64
+> -TC_DM_LEP_BV_10_C	INC	haltest:
+> -				gattc listen 1
+> -				gattc listen 1 0
+> +TC_DM_LEP_BV_09_C	PASS	haltest:
+> +				bluetooth enable
+> +				bluetooth set_adapter_property
+> +					BT_PROPERTY_ADAPTER_SCAN_MODE
+> +					BT_SCAN_MODE_CONNECTABLE_DISCOVERABLE
+> +				gattc register_client
+>  				bluetooth start_discovery
+> -				bluetooth cancel_discovery
+> -				gattc listen 1
+> -				gattc listen 1 0
+> -				bluetooth create_bond
+> -TC_DM_LEP_BV_11_C	INC
+> +				gattc connect
+> +				l2test -n -P 31 <PTS addr>
+> +				disconnect
+> +TC_DM_LEP_BV_10_C	PASS	haltest:
+> +				bluetooth enable
+> +				bluetooth set_adapter_property
+> +					BT_PROPERTY_ADAPTER_SCAN_MODE
+> +					BT_SCAN_MODE_CONNECTABLE_DISCOVERABLE
+> +				gattc register_client
+> +				gattc listen
+> +				bluetooth start_discovery
+> +				l2test -n -P 31 <PTS addr>
+> +TC_DM_LEP_BV_11_C	PASS	haltest:
+> +				bluetooth enable
+> +				bluetooth set_adapter_property
+> +					BT_PROPERTY_ADAPTER_SCAN_MODE
+> +					BT_SCAN_MODE_CONNECTABLE_DISCOVERABLE
+> +				gattc register_client
+> +				gattc connect
+>  ---------------------------------------------------------------------------
+> ----
 
-Applied. Thanks.
+Applied, thanks.
 
 -- 
 BR
