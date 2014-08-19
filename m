@@ -1,59 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 1/2] gdbus: Fix crash when calling g_dbus_add_service_watch
-Date: Tue, 19 Aug 2014 15:05:08 +0300
-Message-Id: <1408449909-3461-1-git-send-email-luiz.dentz@gmail.com>
+Cc: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
+Subject: [PATCH] android/pts: Update GAP result for handling directed advertising
+Date: Tue, 19 Aug 2014 11:32:07 +0200
+Message-Id: <1408440727-31627-1-git-send-email-jakub.tyszkowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-
-If g_dbus_add_service_watch is called for service which bus name is
-already known the following crash can happen:
-
-invalid read of size 1
-  at 0x4C2A2F2: strlen (in /usr/lib64/valgrind/vgpreload_memcheck-amd64-linux.so)
-  by 0x4E97722: g_strdup (in /usr/lib64/libglib-2.0.so.0.3800.2)
-  by 0x405B0C: update_name_cache (watch.c:435)
-  by 0x405C37: update_service (watch.c:593)
-  by 0x4E7A2A5: g_main_context_dispatch (in /usr/lib64/libglib-2.0.so.0.3800.2)
-  by 0x4E7A627: ??? (in /usr/lib64/libglib-2.0.so.0.3800.2)
-  by 0x4E7AA39: g_main_loop_run (in /usr/lib64/libglib-2.0.so.0.3800.2)
-  by 0x4038EA: client_ready (test-gdbus-client.c:1014)
-  by 0x4E9E5E0: ??? (in /usr/lib64/libglib-2.0.so.0.3800.2)
-  by 0x4E9E7A5: ??? (in /usr/lib64/libglib-2.0.so.0.3800.2)
-  by 0x4E9EB1A: g_test_run_suite (in /usr/lib64/libglib-2.0.so.0.3800.2)
-  by 0x403614: main (test-gdbus-client.c:1058)
-Address 0x5dbe5d0 is 0 bytes inside a block of size 7 free'd
-  at 0x4C28577: free (in /usr/lib64/valgrind/vgpreload_memcheck-amd64-linux.so)
-  by 0x4E7FF7E: g_free (in /usr/lib64/libglib-2.0.so.0.3800.2)
-  by 0x405B04: update_name_cache (watch.c:434)
-  by 0x405C37: update_service (watch.c:593)
-  by 0x4E7A2A5: g_main_context_dispatch (in /usr/lib64/libglib-2.0.so.0.3800.2)
-  by 0x4E7A627: ??? (in /usr/lib64/libglib-2.0.so.0.3800.2)
-  by 0x4E7AA39: g_main_loop_run (in /usr/lib64/libglib-2.0.so.0.3800.2)
-  by 0x4038EA: client_ready (test-gdbus-client.c:1014)
-  by 0x4E9E5E0: ??? (in /usr/lib64/libglib-2.0.so.0.3800.2)
-  by 0x4E9E7A5: ??? (in /usr/lib64/libglib-2.0.so.0.3800.2)
-  by 0x4E9EB1A: g_test_run_suite (in /usr/lib64/libglib-2.0.so.0.3800.2)
-  by 0x403614: main (test-gdbus-client.c:1058)
+Previously used connection procedure was to slow for remotes preforming
+directed advertising. This issue is no longer valid on the latest kernel
+and auto connection support added recently to the daemon.
 ---
- gdbus/watch.c | 1 -
+ android/pts-gap.txt | 1 -
  1 file changed, 1 deletion(-)
 
-diff --git a/gdbus/watch.c b/gdbus/watch.c
-index 474d3d4..2f5e865 100644
---- a/gdbus/watch.c
-+++ b/gdbus/watch.c
-@@ -595,7 +595,6 @@ static gboolean update_service(void *user_data)
- 	struct filter_callback *cb = data->callback;
- 	DBusConnection *conn;
- 
--	update_name_cache(data->name, data->owner);
- 	conn = dbus_connection_ref(data->conn);
- 	service_data_free(data);
- 
+diff --git a/android/pts-gap.txt b/android/pts-gap.txt
+index af75dff..d154a38 100644
+--- a/android/pts-gap.txt
++++ b/android/pts-gap.txt
+@@ -137,7 +137,6 @@ TC_CONN_GCEP_BV_03_C	PASS	gattc connect
+ 				gattc disconnect
+ TC_CONN_GCEP_BV_04_C	INC	Privacy feature - PTS issue #12308
+ TC_CONN_SCEP_BV_01_C	PASS	'gattc connect' prior to pressing OK on PTS
+-				Note: test is not always passing. JIRA: BA-55
+ TC_CONN_SCEP_BV_02_C	INC	Privacy feature - PTS issue #12308
+ TC_CONN_DCEP_BV_01_C	PASS	'gattc connect' prior to pressing OK on PTS
+ TC_CONN_DCEP_BV_02_C	INC	Privacy feature - PTS issue #12308
 -- 
-1.9.3
+1.9.1
 
