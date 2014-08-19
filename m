@@ -1,62 +1,71 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 19 Aug 2014 18:51:38 +0200
-From: Alexander Aring <alex.aring@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>,
-	linux-wpan@vger.kernel.org, kernel@pengutronix.de
-Subject: Re: [PATCH bluetooth 0/5] mac802154: ieee802154: stable patches
-Message-ID: <20140819165136.GB1116@omega>
-References: <1408438983-13892-1-git-send-email-alex.aring@gmail.com>
- <79B561AB-5717-4F81-9725-FDA13BC2A789@holtmann.org>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] android/bluetooth: Fix device found notification
+Date: Tue, 19 Aug 2014 18:50:17 +0200
+Message-ID: <2852516.jjknLa9UKB@leonov>
+In-Reply-To: <1408455929-8219-1-git-send-email-lukasz.rymanowski@tieto.com>
+References: <1408455929-8219-1-git-send-email-lukasz.rymanowski@tieto.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-In-Reply-To: <79B561AB-5717-4F81-9725-FDA13BC2A789@holtmann.org>
+Content-Type: text/plain; charset="utf-8"
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hi Łukasz,
 
-On Tue, Aug 19, 2014 at 11:44:11AM -0500, Marcel Holtmann wrote:
-> Hi Alex,
+On Tuesday 19 of August 2014 15:45:29 Lukasz Rymanowski wrote:
+> If device is dual mode and can be seen on both LE and BREDR, then
+> bdaddr_type in device struct keeps LE address type of that device.
 > 
-> > these patches contains patches for the bluetooth branch.
-> > 
-> > This series includes memory leak fixes and an errno value fix.
-> > Also there are two patches for sending and receiving 1280 6LoWPAN packets,
-> > which makes the IEEE 802.15.4 6LoWPAN stack more RFC compliant.
-> > 
-> > - Alex
-> > 
-> > Alexander Aring (2):
-> >  ieee802154: 6lowpan_rtnl: fix correct errno value
-> >  ieee802154: 6lowpan: ensure of sending 1280 packets
-> > 
-> > Martin Townsend (3):
-> >  mac802154: fixed potential skb leak with mac802154_parse_frame_start
-> >  ieee802154: mac802154: handle the reserved dest mode by dropping the
-> >    packet
-> >  ieee802154: 6lowpan: ensure MTU of 1280 for 6lowpan
-> > 
-> > include/net/netns/ieee802154_6lowpan.h |  1 -
-> > net/ieee802154/6lowpan_rtnl.c          |  4 ++--
-> > net/ieee802154/reassembly.c            | 13 +++----------
-> > net/mac802154/wpan.c                   |  6 +++++-
-> > 4 files changed, 10 insertions(+), 14 deletions(-)
+> During discovery, we should take current bdaddr_type to decide about
+> passing that device up to application or not. Using dev->braddr_type might
+> be misleading
 > 
-> all 5 patches have been applied to bluetooth tree.
+> This patch fix scenario when remote device is known as LE device and
+> recently has been found on inquiry seesion as DUAL mode device. In such
+> case, based on braddr_type and eir flags we could incorectly skip
+> new device notification for Android framework.
+> ---
+>  android/bluetooth.c | 7 ++++---
+>  1 file changed, 4 insertions(+), 3 deletions(-)
 > 
-> However is it possible you introduced a compile warning.
+> diff --git a/android/bluetooth.c b/android/bluetooth.c
+> index 5f163f1..64a7696 100644
+> --- a/android/bluetooth.c
+> +++ b/android/bluetooth.c
+> @@ -1830,7 +1830,8 @@ static void update_device(struct device *dev, int8_t
+> rssi, HAL_EV_REMOTE_DEVICE_PROPS, size, buf);
+>  }
 > 
->   CC      net/ieee802154/reassembly.o
-> net/ieee802154/reassembly.c: In function ‘lowpan_frag_rcv’:
-> net/ieee802154/reassembly.c:358:34: warning: unused variable ‘ieee802154_lowpan’ [-Wunused-variable]
->   struct netns_ieee802154_lowpan *ieee802154_lowpan =
->                                   ^
+> -static bool is_new_device(const struct device *dev, unsigned int flags)
+> +static bool is_new_device(const struct device *dev, unsigned int flags,
+> +							uint8_t bdaddr_type)
+>  {
+>  	if (dev->found)
+>  		return false;
+> @@ -1838,7 +1839,7 @@ static bool is_new_device(const struct device *dev,
+> unsigned int flags) if (dev->bredr_paired || dev->le_paired)
+>  		return false;
+> 
+> -	if (dev->bdaddr_type != BDADDR_BREDR &&
+> +	if (bdaddr_type != BDADDR_BREDR &&
+>  				!(flags & (EIR_LIM_DISC | EIR_GEN_DISC)))
+>  		return false;
+> 
+> @@ -1867,7 +1868,7 @@ static void update_found_device(const bdaddr_t
+> *bdaddr, uint8_t bdaddr_type, * Device found event needs to be send also
+> for known device if this is * new discovery session. Otherwise framework
+> will ignore it.
+>  	 */
+> -	if (is_new_device(dev, eir.flags))
+> +	if (is_new_device(dev, eir.flags, bdaddr_type))
+>  		update_new_device(dev, rssi, &eir);
+>  	else
+>  		update_device(dev, rssi, &eir, bdaddr_type);
 
-indeed, I will send a v2 of this series. Sorry.
+Patch applied, thanks.
 
-I will integrate the "compile warning check" in my workflow for the next
-time.
-
-Thanks.
-
-- Alex
+-- 
+BR
+Szymon Janc
