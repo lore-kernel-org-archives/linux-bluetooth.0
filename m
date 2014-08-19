@@ -2,120 +2,122 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH 09/11] android/test: Add HAL IPC reconnect tests
-Date: Tue, 19 Aug 2014 21:51:10 +0200
-Message-Id: <1408477872-24160-9-git-send-email-szymon.janc@tieto.com>
+Subject: [PATCH 05/11] android/test: Add initial HAL IPC unit tests
+Date: Tue, 19 Aug 2014 21:51:06 +0200
+Message-Id: <1408477872-24160-5-git-send-email-szymon.janc@tieto.com>
 In-Reply-To: <1408477872-24160-1-git-send-email-szymon.janc@tieto.com>
 References: <1408477872-24160-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- android/test-hal-ipc.c | 84 ++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 84 insertions(+)
+ .gitignore             |  1 +
+ android/Makefile.am    |  9 ++++++++
+ android/test-hal-ipc.c | 63 ++++++++++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 73 insertions(+)
+ create mode 100644 android/test-hal-ipc.c
 
-diff --git a/android/test-hal-ipc.c b/android/test-hal-ipc.c
-index bc86a3e..44485c4 100644
---- a/android/test-hal-ipc.c
-+++ b/android/test-hal-ipc.c
-@@ -231,6 +231,82 @@ static void test_disconnect_stress(const void *data)
- 		test_disconnect(data);
- }
+diff --git a/.gitignore b/.gitignore
+index 1ee35e2..35e96ab 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -131,6 +131,7 @@ android/android-tester
+ android/ipc-tester
+ android/bluetoothd-snoop
+ android/test-ipc
++android/test-hal-ipc
+ android/test-*.log
+ android/test-*.trs
  
-+static bool reconnected = false;
+diff --git a/android/Makefile.am b/android/Makefile.am
+index 4b93c5b..bc9efe3 100644
+--- a/android/Makefile.am
++++ b/android/Makefile.am
+@@ -231,6 +231,15 @@ android_test_ipc_SOURCES = android/test-ipc.c \
+ 				android/ipc.c android/ipc.h
+ android_test_ipc_LDADD = @GLIB_LIBS@
+ 
++unit_tests += android/test-hal-ipc
 +
-+static void reconnect_cb(void *data)
++android_test_hal_ipc_SOURCES = android/test-hal-ipc.c \
++				src/shared/util.h src/shared/util.c \
++				android/ipc-common.h \
++				android/hal-ipc.c android/hal-ipc.h
++android_test_hal_ipc_LDADD = @GLIB_LIBS@
++android_test_hal_ipc_LDFLAGS = $(AM_LDFLAGS) -pthread
++
+ plugin_LTLIBRARIES += android/audio.a2dp.default.la
+ 
+ android_audio_a2dp_default_la_CFLAGS = $(AM_CFLAGS) -I$(srcdir)/android \
+diff --git a/android/test-hal-ipc.c b/android/test-hal-ipc.c
+new file mode 100644
+index 0000000..22b6072
+--- /dev/null
++++ b/android/test-hal-ipc.c
+@@ -0,0 +1,63 @@
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2014  Intel Corporation. All rights reserved.
++ *
++ *
++ *  This library is free software; you can redistribute it and/or
++ *  modify it under the terms of the GNU Lesser General Public
++ *  License as published by the Free Software Foundation; either
++ *  version 2.1 of the License, or (at your option) any later version.
++ *
++ *  This library is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ *  Lesser General Public License for more details.
++ *
++ *  You should have received a copy of the GNU Lesser General Public
++ *  License along with this library; if not, write to the Free Software
++ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ *
++ */
++
++#ifdef HAVE_CONFIG_H
++#include <config.h>
++#endif
++
++#include <stdio.h>
++#include <unistd.h>
++#include <stdlib.h>
++#include <stdbool.h>
++#include <inttypes.h>
++#include <sys/socket.h>
++#include <sys/un.h>
++
++#include <glib.h>
++#include "android/ipc-common.h"
++#include "android/hal-ipc.h"
++
++static const char HAL_SK_PATH[] = "\0test_hal_ipc_socket";
++
++static void test_init(void)
 +{
-+	disconnected = true;
-+
-+	if (!reconnected) {
-+		reconnected = true;
-+		g_assert(hal_ipc_accept());
-+		return;
-+	}
-+
-+	pthread_mutex_lock(&cv_mutex);
-+	pthread_cond_signal(&cv);
-+	pthread_mutex_unlock(&cv_mutex);
-+}
-+
-+static void test_reconnect(const void *data)
-+{
-+	pid_t pid;
-+	bool cmd_first = (bool) data;
-+	struct timespec ts;
-+
-+	cleanup_hal();
-+
 +	g_assert(hal_ipc_init(HAL_SK_PATH, sizeof(HAL_SK_PATH)));
-+
-+	pid = fork();
-+	if (pid == 0) {
-+		connect_hal();
-+		disconnect_hal(cmd_first);
-+		connect_hal();
-+		disconnect_hal(cmd_first);
-+		exit(0);
-+	}
-+
-+	g_assert(pid > 0);
-+
-+	hal_ipc_set_disconnect_cb(reconnect_cb, NULL);
-+
-+	pthread_mutex_lock(&cv_mutex);
-+
-+	g_assert(hal_ipc_accept());
-+
-+	wait(NULL);
-+
-+	clock_gettime(CLOCK_REALTIME, &ts);
-+	ts.tv_sec += 15;
-+
-+	/*
-+	 * This is not needed in real usecase but here we want to test if
-+	 * disconnect callback was properly called on socket shutdown so
-+	 * we need to wait until it happen before calling cleanup (otherwise
-+	 * we might have a race where cleanup is called before notif thread is
-+	 * scheduled resulting in clean shutdown
-+	 */
-+	g_assert(pthread_cond_timedwait(&cv, &cv_mutex, &ts) == 0);
-+	pthread_mutex_unlock(&cv_mutex);
 +
 +	hal_ipc_cleanup();
 +
-+	g_assert(disconnected);
-+	disconnected = false;
++	g_assert(hal_ipc_init(HAL_SK_PATH, sizeof(HAL_SK_PATH)));
 +
-+	g_assert(reconnected);
-+	reconnected = false;
++	hal_ipc_cleanup();
 +}
 +
-+static void test_reconnect_stress(const void *data)
++int main(int argc, char *argv[])
 +{
-+	int i;
++	g_test_init(&argc, &argv, NULL);
 +
-+	for (i = 0; i < 9999; i++)
-+		test_reconnect(data);
++	if (!g_test_verbose())
++		fclose(stderr);
++
++	g_test_add_func("/android_hal_ipc/init", test_init);
++
++	return g_test_run();
 +}
-+
- int main(int argc, char *argv[])
- {
- 	g_test_init(&argc, &argv, NULL);
-@@ -249,6 +325,14 @@ int main(int argc, char *argv[])
- 							test_disconnect);
- 	g_test_add_data_func("/android_hal_ipc/disconnect2_stress",
- 					(void *) false, test_disconnect_stress);
-+	g_test_add_data_func("/android_hal_ipc/reconnect1", (void *) true,
-+							test_reconnect);
-+	g_test_add_data_func("/android_hal_ipc/reconnect_stress",
-+					(void *) true, test_reconnect_stress);
-+	g_test_add_data_func("/android_hal_ipc/reconnect2", (void *) false,
-+							test_reconnect);
-+	g_test_add_data_func("/android_hal_ipc/reconnect2_stress",
-+					(void *) false, test_reconnect_stress);
- 
- 	return g_test_run();
- }
 -- 
 1.9.3
 
