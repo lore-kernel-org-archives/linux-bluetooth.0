@@ -1,41 +1,60 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/4] android/health: Fix connect channel failure case
-Date: Tue, 19 Aug 2014 18:42:30 +0200
-Message-ID: <3374360.1SjBy6sgGZ@leonov>
-In-Reply-To: <1408352822-21572-1-git-send-email-ravikumar.veeramally@linux.intel.com>
-References: <1408352822-21572-1-git-send-email-ravikumar.veeramally@linux.intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+Subject: [PATCH] android/bluetooth: Fix device found notification
+Date: Tue, 19 Aug 2014 15:45:29 +0200
+Message-Id: <1408455929-8219-1-git-send-email-lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Ravi,
+If device is dual mode and can be seen on both LE and BREDR, then
+bdaddr_type in device struct keeps LE address type of that device.
 
-On Monday 18 of August 2014 12:06:59 Ravi kumar Veeramally wrote:
-> There is a possibilty of created channel is being added to queue,
-> but on failure case it does channel free but not removed from queue.
-> ---
->  android/health.c | 1 +
->  1 file changed, 1 insertion(+)
-> 
-> diff --git a/android/health.c b/android/health.c
-> index f4edc3e..f86fd26 100644
-> --- a/android/health.c
-> +++ b/android/health.c
-> @@ -1978,6 +1978,7 @@ static void bt_health_connect_channel(const void *buf,
-> uint16_t len) return;
-> 
->  fail:
-> +	queue_remove(channel->dev->channels, channel);
->  	free_health_channel(channel);
->  	ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_HEALTH,
->  			HAL_OP_HEALTH_CONNECT_CHANNEL, HAL_STATUS_FAILED);
+During discovery, we should take current bdaddr_type to decide about
+passing that device up to application or not. Using dev->braddr_type might
+be misleading
 
-I've applied patches 1, 3 and 4. Thanks.
+This patch fix scenario when remote device is known as LE device and
+recently has been found on inquiry seesion as DUAL mode device. In such
+case, based on braddr_type and eir flags we could incorectly skip
+new device notification for Android framework.
+---
+ android/bluetooth.c | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
 
+diff --git a/android/bluetooth.c b/android/bluetooth.c
+index 5f163f1..64a7696 100644
+--- a/android/bluetooth.c
++++ b/android/bluetooth.c
+@@ -1830,7 +1830,8 @@ static void update_device(struct device *dev, int8_t rssi,
+ 					HAL_EV_REMOTE_DEVICE_PROPS, size, buf);
+ }
+ 
+-static bool is_new_device(const struct device *dev, unsigned int flags)
++static bool is_new_device(const struct device *dev, unsigned int flags,
++							uint8_t bdaddr_type)
+ {
+ 	if (dev->found)
+ 		return false;
+@@ -1838,7 +1839,7 @@ static bool is_new_device(const struct device *dev, unsigned int flags)
+ 	if (dev->bredr_paired || dev->le_paired)
+ 		return false;
+ 
+-	if (dev->bdaddr_type != BDADDR_BREDR &&
++	if (bdaddr_type != BDADDR_BREDR &&
+ 				!(flags & (EIR_LIM_DISC | EIR_GEN_DISC)))
+ 		return false;
+ 
+@@ -1867,7 +1868,7 @@ static void update_found_device(const bdaddr_t *bdaddr, uint8_t bdaddr_type,
+ 	 * Device found event needs to be send also for known device if this is
+ 	 * new discovery session. Otherwise framework will ignore it.
+ 	 */
+-	if (is_new_device(dev, eir.flags))
++	if (is_new_device(dev, eir.flags, bdaddr_type))
+ 		update_new_device(dev, rssi, &eir);
+ 	else
+ 		update_device(dev, rssi, &eir, bdaddr_type);
 -- 
-BR
-Szymon Janc
+1.8.4
+
