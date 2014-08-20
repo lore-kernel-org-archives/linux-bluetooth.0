@@ -1,5 +1,6 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
+Sender: arakhov@google.com
 In-Reply-To: <CAD81oNZYeobbhMawvhrjTFSTY-aqEXYh9x3aTSOoH8u1Y6nHDQ@mail.gmail.com>
 References: <CAD81oNZL0qATu_z_TJT8psaMhpmV34w6xmA2+=OKerSE1NSvOw@mail.gmail.com>
 	<CABBYNZ+zRKzv4yTc8M2Fi0eN6gC921b9zaey5FKGVq_bJJueBg@mail.gmail.com>
@@ -9,34 +10,39 @@ References: <CAD81oNZL0qATu_z_TJT8psaMhpmV34w6xmA2+=OKerSE1NSvOw@mail.gmail.com>
 	<CAD81oNY41-8DhJCOetLa_TCrPLBeiJFHQJ7TxawydwQ5S_Lmwg@mail.gmail.com>
 	<CABBYNZLEDBFa-wV5L5Pfi-PzA877PxSrktsVLpzCRuQ4nu1eKQ@mail.gmail.com>
 	<CAD81oNZYeobbhMawvhrjTFSTY-aqEXYh9x3aTSOoH8u1Y6nHDQ@mail.gmail.com>
-Date: Wed, 20 Aug 2014 15:54:12 -0700
-Message-ID: <CAD81oNYbM2tpSbhdfih1ir2BnszwvOkGBKbOiKG70Gcp6qHVRA@mail.gmail.com>
+Date: Wed, 20 Aug 2014 15:52:26 -0700
+Message-ID: <CAD81oNZrVONCOTKtsXn2-A3a8KPy_qzU0HU3oO6Xw+FR5NqpQA@mail.gmail.com>
 Subject: Re: [A2DP] Incoming connections do not succeed
-From: Artem Rakhov <arakhov@google.com>
+From: Artem Rakhov <arakhov@chromium.org>
 To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 Cc: Marcel Holtmann <marcel@holtmann.org>,
 	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: multipart/mixed; boundary=001a11c17ab68d3a060501177bac
+Content-Type: multipart/mixed; boundary=047d7b6771aa411c380501177524
 List-ID: <linux-bluetooth.vger.kernel.org>
 
---001a11c17ab68d3a060501177bac
+--047d7b6771aa411c380501177524
+Content-Type: multipart/alternative; boundary=047d7b6771aa411c2c0501177522
+
+--047d7b6771aa411c2c0501177522
 Content-Type: text/plain; charset=UTF-8
 
 Hello,
 
-I found the way to use avtest for testing incoming connections from
-the speaker. If anyone is interested: stopped bluetoothd, powered BT
-back to on, used "avtest --reject 0". Also had to change avtest to
-answer like source instead of sink, which is set by default.
+I found the way to use avtest for testing incoming connections from the
+speaker. If anyone is interested: stopped bluetoothd, powered BT back to
+on, used "avtest --reject 0". Also had to change avtest to answer like
+source instead of sink, which is set by default.
 
-Incoming connections to avtest are always successful. And logs are
-very similar (attached). I think the main difference is that the
-bluetoothd requires authorization, while avtest does not.
+Incoming connections to avtest are always successful. And logs are very
+similar (attached). I think the main difference is that the bluetoothd
+requires authorization, while avtest does not.
 
 Thanks,
 Artem
 
+
 On Mon, Aug 18, 2014 at 12:11 AM, Artem Rakhov <arakhov@chromium.org> wrote:
+
 > Hi Luiz,
 >
 > I have also tried kernel 3.14, it didn't help.
@@ -51,45 +57,132 @@ On Mon, Aug 18, 2014 at 12:11 AM, Artem Rakhov <arakhov@chromium.org> wrote:
 >
 > On Sun, Aug 10, 2014 at 12:32 AM, Luiz Augusto von Dentz
 > <luiz.dentz@gmail.com> wrote:
->> Hi Artem,
->>
->> On Fri, Aug 8, 2014 at 10:32 AM, Artem Rakhov <arakhov@chromium.org> wrote:
->>> Hi Marcel,
->>>
->>> Please find Packet Logger's btsnoop log in the attachment.
->>>
->>> So far I have 2 observations:
->>> 1. Mac does not require any authorization (most likely it's not the cause)
->>> 2. I found another BT speaker which works properly. At first, I'm
->>> seeing the same behavior: speaker initiates connection, BlueZ sends
->>> Configure Request (with no MTU), then speaker disconnects. But after
->>> that the device tries to initiate connection for the second time, and
->>> this time it is successful: after BlueZ sends Configure Request with
->>> no MTU, speaker answers with another Configure Request (with some
->>> MTU), and connection is established normally. Is it possible, that
->>> BlueZ is doing something wrong, but then this new speaker tries
->>> something else, while the old one does not?
->>
->> I could not find anything l2cap related in this logs, but I notice
->> there a LE scanning ongoing perhaps you have should try disabling it
->> with Disconnect method for now. Anyway A2DP code is not really
->> involved with L2CAP connection setup so we would have to look at the
->> kernel changes but I quick check doesn't show anything and you said
->> you have tried with 3.10 so Im afraid this is only reproducible with
->> some specific device.
->>
->> Btw, if you want to really isolate the problem you can try to connect
->> using avinfo or l2test directly.
->>
->>
->> --
->> Luiz Augusto von Dentz
+> > Hi Artem,
+> >
+> > On Fri, Aug 8, 2014 at 10:32 AM, Artem Rakhov <arakhov@chromium.org>
+> wrote:
+> >> Hi Marcel,
+> >>
+> >> Please find Packet Logger's btsnoop log in the attachment.
+> >>
+> >> So far I have 2 observations:
+> >> 1. Mac does not require any authorization (most likely it's not the
+> cause)
+> >> 2. I found another BT speaker which works properly. At first, I'm
+> >> seeing the same behavior: speaker initiates connection, BlueZ sends
+> >> Configure Request (with no MTU), then speaker disconnects. But after
+> >> that the device tries to initiate connection for the second time, and
+> >> this time it is successful: after BlueZ sends Configure Request with
+> >> no MTU, speaker answers with another Configure Request (with some
+> >> MTU), and connection is established normally. Is it possible, that
+> >> BlueZ is doing something wrong, but then this new speaker tries
+> >> something else, while the old one does not?
+> >
+> > I could not find anything l2cap related in this logs, but I notice
+> > there a LE scanning ongoing perhaps you have should try disabling it
+> > with Disconnect method for now. Anyway A2DP code is not really
+> > involved with L2CAP connection setup so we would have to look at the
+> > kernel changes but I quick check doesn't show anything and you said
+> > you have tried with 3.10 so Im afraid this is only reproducible with
+> > some specific device.
+> >
+> > Btw, if you want to really isolate the problem you can try to connect
+> > using avinfo or l2test directly.
+> >
+> >
+> > --
+> > Luiz Augusto von Dentz
+>
 
---001a11c17ab68d3a060501177bac
+--047d7b6771aa411c2c0501177522
+Content-Type: text/html; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+
+<div dir=3D"ltr">Hello,<div><br></div><div>I found the way to use avtest fo=
+r testing incoming connections from the speaker. If anyone is interested: s=
+topped bluetoothd, powered BT back to on, used &quot;avtest --reject 0&quot=
+;. Also had to change avtest to answer like source instead of sink, which i=
+s set by default.</div>
+<div><br></div><div>Incoming connections to avtest are always successful. A=
+nd logs are very similar (attached). I think the main difference is that th=
+e bluetoothd requires authorization, while avtest does not.</div><div><br>
+</div><div>Thanks,</div><div>Artem</div></div><div class=3D"gmail_extra"><b=
+r><br><div class=3D"gmail_quote">On Mon, Aug 18, 2014 at 12:11 AM, Artem Ra=
+khov <span dir=3D"ltr">&lt;<a href=3D"mailto:arakhov@chromium.org" target=
+=3D"_blank">arakhov@chromium.org</a>&gt;</span> wrote:<br>
+<blockquote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1p=
+x #ccc solid;padding-left:1ex">Hi Luiz,<br>
+<br>
+I have also tried kernel 3.14, it didn&#39;t help.<br>
+How can I use avinfo for test? Looks like it shows only basic<br>
+information for the device. And it works fine with the speaker.<br>
+I tried to use avtest: when I try to connect to the speaker,<br>
+everything seems to be working good. Is there any way to use it to<br>
+test incoming connections?<br>
+<br>
+Thanks,<br>
+Artem<br>
+<div class=3D"HOEnZb"><div class=3D"h5"><br>
+On Sun, Aug 10, 2014 at 12:32 AM, Luiz Augusto von Dentz<br>
+&lt;<a href=3D"mailto:luiz.dentz@gmail.com">luiz.dentz@gmail.com</a>&gt; wr=
+ote:<br>
+&gt; Hi Artem,<br>
+&gt;<br>
+&gt; On Fri, Aug 8, 2014 at 10:32 AM, Artem Rakhov &lt;<a href=3D"mailto:ar=
+akhov@chromium.org">arakhov@chromium.org</a>&gt; wrote:<br>
+&gt;&gt; Hi Marcel,<br>
+&gt;&gt;<br>
+&gt;&gt; Please find Packet Logger&#39;s btsnoop log in the attachment.<br>
+&gt;&gt;<br>
+&gt;&gt; So far I have 2 observations:<br>
+&gt;&gt; 1. Mac does not require any authorization (most likely it&#39;s no=
+t the cause)<br>
+&gt;&gt; 2. I found another BT speaker which works properly. At first, I&#3=
+9;m<br>
+&gt;&gt; seeing the same behavior: speaker initiates connection, BlueZ send=
+s<br>
+&gt;&gt; Configure Request (with no MTU), then speaker disconnects. But aft=
+er<br>
+&gt;&gt; that the device tries to initiate connection for the second time, =
+and<br>
+&gt;&gt; this time it is successful: after BlueZ sends Configure Request wi=
+th<br>
+&gt;&gt; no MTU, speaker answers with another Configure Request (with some<=
+br>
+&gt;&gt; MTU), and connection is established normally. Is it possible, that=
+<br>
+&gt;&gt; BlueZ is doing something wrong, but then this new speaker tries<br=
+>
+&gt;&gt; something else, while the old one does not?<br>
+&gt;<br>
+&gt; I could not find anything l2cap related in this logs, but I notice<br>
+&gt; there a LE scanning ongoing perhaps you have should try disabling it<b=
+r>
+&gt; with Disconnect method for now. Anyway A2DP code is not really<br>
+&gt; involved with L2CAP connection setup so we would have to look at the<b=
+r>
+&gt; kernel changes but I quick check doesn&#39;t show anything and you sai=
+d<br>
+&gt; you have tried with 3.10 so Im afraid this is only reproducible with<b=
+r>
+&gt; some specific device.<br>
+&gt;<br>
+&gt; Btw, if you want to really isolate the problem you can try to connect<=
+br>
+&gt; using avinfo or l2test directly.<br>
+&gt;<br>
+&gt;<br>
+&gt; --<br>
+&gt; Luiz Augusto von Dentz<br>
+</div></div></blockquote></div><br></div>
+
+--047d7b6771aa411c2c0501177522--
+
+--047d7b6771aa411c380501177524
 Content-Type: application/octet-stream; name=btmon_avtest
 Content-Disposition: attachment; filename=btmon_avtest
 Content-Transfer-Encoding: base64
-X-Attachment-Id: f_hz39bhdp0
+X-Attachment-Id: f_hz38u7ck0
 
 bHVldG9vdGggbW9uaXRvciB2ZXIgNS4xOQo9IE5ldyBJbmRleDogM0M6Nzc6RTY6NjA6NUM6QjIg
 KEJSL0VEUixVU0IsaGNpMCkgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
@@ -424,11 +517,11 @@ IFBhY2tldHMgKDB4MTMpIHBsZW4gNSAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
 ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFtoY2kwXSAyMy4zMDY1
 NDAKICAgICAgICBOdW0gaGFuZGxlczogMQogICAgICAgIEhhbmRsZTogMjEKICAgICAgICBDb3Vu
 dDogMQ==
---001a11c17ab68d3a060501177bac
+--047d7b6771aa411c380501177524
 Content-Type: application/octet-stream; name=btmon_bluetoothd
 Content-Disposition: attachment; filename=btmon_bluetoothd
 Content-Transfer-Encoding: base64
-X-Attachment-Id: f_hz39bhe51
+X-Attachment-Id: f_hz38ubeq1
 
 Qmx1ZXRvb3RoIG1vbml0b3IgdmVyIDUuMTkKPSBOZXcgSW5kZXg6IDNDOjc3OkU2OjYwOjVDOkIy
 IChCUi9FRFIsVVNCLGhjaTApICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
@@ -648,4 +741,4 @@ ICAgICBbaGNpMF0gMjIuMzU1NzU5CiAgICAgICAgU3RhdHVzOiBTdWNjZXNzICgweDAwKQogICAg
 ICAgIEhhbmRsZTogMjEKICAgICAgICBSZWFzb246IFJlbW90ZSBVc2VyIFRlcm1pbmF0ZWQgQ29u
 bmVjdGlvbiAoMHgxMykKQCBEZXZpY2UgRGlzY29ubmVjdGVkOiAxMDpCNzpGNjowMTozMTpFRCAo
 MCkgcmVhc29uIDM=
---001a11c17ab68d3a060501177bac--
+--047d7b6771aa411c380501177524--
