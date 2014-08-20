@@ -2,231 +2,235 @@ Return-Path: <cyrus@holtmann.org>
 From: Arman Uguray <armansito@chromium.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Arman Uguray <armansito@chromium.org>
-Subject: [PATCH BlueZ 03/11] shared/gatt-client: Added initial skeleton and simple functions.
-Date: Wed, 20 Aug 2014 13:15:29 -0700
-Message-Id: <1408565737-8187-4-git-send-email-armansito@chromium.org>
+Subject: [PATCH BlueZ 08/11] shared/gatt-client: Implement initial service discovery.
+Date: Wed, 20 Aug 2014 13:15:34 -0700
+Message-Id: <1408565737-8187-9-git-send-email-armansito@chromium.org>
 In-Reply-To: <1408565737-8187-1-git-send-email-armansito@chromium.org>
 References: <1408565737-8187-1-git-send-email-armansito@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch introduces shared/gatt-client, which provides a central/client side
-implementation of the Generic Attribute Profile. An instance of bt_gatt_client
-will provide a central database of all GATT services, characteristics, and
-descriptors that have been discovered on a peripheral and will provide API
-functions to obtain information about discovered attributes, registering
-handlers for "Service Changed" indications, as well as providing
-reference-counted access to "Client Characteristic Configuration" descriptors.
----
- Makefile.am              |   3 +-
- src/shared/TODO          |  13 ++++++
- src/shared/gatt-client.c | 101 +++++++++++++++++++++++++++++++++++++++++++++++
- src/shared/gatt-client.h |  54 +++++++++++++++++++++++++
- 4 files changed, 170 insertions(+), 1 deletion(-)
- create mode 100644 src/shared/TODO
- create mode 100644 src/shared/gatt-client.c
- create mode 100644 src/shared/gatt-client.h
+This code implements the following portion of attribute discovery:
 
-diff --git a/Makefile.am b/Makefile.am
-index 88fcb49..6aed8e2 100644
---- a/Makefile.am
-+++ b/Makefile.am
-@@ -158,7 +158,8 @@ src_bluetoothd_SOURCES = $(builtin_sources) \
- 			src/shared/util.h src/shared/util.c \
- 			src/shared/mgmt.h src/shared/mgmt.c \
- 			src/shared/att-types.h src/shared/att.h src/shared/att.c \
--			src/shared/gatt-helpers.h src/shared/gatt-helpers.c
-+			src/shared/gatt-helpers.h src/shared/gatt-helpers.c \
-+			src/shared/gatt-client.h src/shared/gatt-client.c
- src_bluetoothd_LDADD = lib/libbluetooth-internal.la gdbus/libgdbus-internal.la \
- 			@GLIB_LIBS@ @DBUS_LIBS@ -ldl -lrt
- src_bluetoothd_LDFLAGS = $(AM_LDFLAGS) -Wl,--export-dynamic \
+  - Initial MTU exchange.
+  - Primary service discovery.
+
+Discovery results aren't stored yet.
+---
+ src/shared/TODO          |   1 -
+ src/shared/gatt-client.c | 151 ++++++++++++++++++++++++++++++++++++++++++++++-
+ src/shared/gatt-client.h |   3 +-
+ 3 files changed, 152 insertions(+), 3 deletions(-)
+
 diff --git a/src/shared/TODO b/src/shared/TODO
-new file mode 100644
-index 0000000..2881c97
---- /dev/null
+index d59e153..6f51890 100644
+--- a/src/shared/TODO
 +++ b/src/shared/TODO
-@@ -0,0 +1,13 @@
-+TODOs for shared/gatt-client
-+
-+* Add util_debug support.
-+* Add high-level abstraction for services, characteristics, and descriptors.
-+* Implement service discovery.
-+* Implement characteristic discovery.
-+* Implement descriptor discovery.
-+* Handle request timeouts.
-+* Make bt_gatt_client observe disconnect events. Handle bonded/non-bonded cases.
-+* Add support for auto-connects using a different bt_att.
-+* Add functions for reference counted access to enable/disable
-+  notifications/indications.
-+* Add support for "Service Changed".
+@@ -1,7 +1,6 @@
+ TODOs for shared/gatt-client
+ 
+ * Add high-level abstraction for services, characteristics, and descriptors.
+-* Implement service discovery.
+ * Implement characteristic discovery.
+ * Implement descriptor discovery.
+ * Handle request timeouts.
 diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
-new file mode 100644
-index 0000000..53a7de1
---- /dev/null
+index a0d85e3..a46ff4e 100644
+--- a/src/shared/gatt-client.c
 +++ b/src/shared/gatt-client.c
-@@ -0,0 +1,101 @@
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2014  Google Inc.
-+ *
-+ *
-+ *  This library is free software; you can redistribute it and/or
-+ *  modify it under the terms of the GNU Lesser General Public
-+ *  License as published by the Free Software Foundation; either
-+ *  version 2.1 of the License, or (at your option) any later version.
-+ *
-+ *  This library is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ *  Lesser General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU Lesser General Public
-+ *  License along with this library; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-+ *
-+ */
+@@ -23,8 +23,14 @@
+ 
+ #include "src/shared/att.h"
+ #include "src/shared/gatt-client.h"
++#include "lib/uuid.h"
++#include "src/shared/gatt-helpers.h"
+ #include "src/shared/util.h"
+ 
++#ifndef MAX
++#define MAX(a, b) ((a) > (b) ? (a) : (b))
++#endif
 +
-+#include "src/shared/att.h"
-+#include "src/shared/gatt-client.h"
-+#include "src/shared/util.h"
+ struct bt_gatt_client {
+ 	struct bt_att *att;
+ 	bool persist;
+@@ -32,6 +38,8 @@ struct bt_gatt_client {
+ 	bt_gatt_client_debug_func_t debug_callback;
+ 	bt_gatt_client_destroy_func_t debug_destroy;
+ 	void *debug_data;
 +
-+struct bt_gatt_client {
-+	struct bt_att *att;
-+	bool persist;
++	bool in_init;
+ };
+ 
+ struct bt_gatt_client *bt_gatt_client_new(struct bt_att *att)
+@@ -97,12 +105,153 @@ bool bt_gatt_client_set_debug(struct bt_gatt_client *client,
+ 
+ 	return true;
+ }
++
++struct async_op {
++	struct bt_gatt_client *client;
++	int ref_count;
++	bt_gatt_client_callback_t callback;
++	void *user_data;
++	bt_gatt_client_destroy_func_t destroy;
 +};
 +
-+struct bt_gatt_client *bt_gatt_client_new(struct bt_att *att)
++static struct async_op *async_op_ref(struct async_op *op)
 +{
-+	struct bt_gatt_client *client;
++	__sync_fetch_and_add(&op->ref_count, 1);
 +
-+	if (!att)
-+		return NULL;
-+
-+	client = new0(struct bt_gatt_client, 1);
-+	if (!client)
-+		return NULL;
-+
-+	client->att = bt_att_ref(att);
-+
-+	return client;
++	return op;
 +}
 +
-+void bt_gatt_client_destroy(struct bt_gatt_client *client)
++static void async_op_unref(void *data)
 +{
-+	if (!client)
++	struct async_op *op = data;
++
++	if (__sync_sub_and_fetch(&op->ref_count, 1))
 +		return;
 +
-+	bt_att_unref(client->att);
-+	free(client);
++	if (op->destroy)
++		op->destroy(op->user_data);
++
++	free(data);
 +}
 +
-+bool bt_gatt_client_set_persist(struct bt_gatt_client *client,
-+							bool do_persist)
++static void discover_primary_cb(bool success, uint8_t att_ecode,
++						struct bt_gatt_result *result,
++						void *user_data)
 +{
-+	if (!client)
++	struct async_op *op = user_data;
++	struct bt_gatt_client *client = op->client;
++	struct bt_gatt_iter iter;
++	uint16_t start, end;
++	uint8_t uuid[16];
++	char uuid_str[MAX_LEN_UUID_STR];
++	bt_uuid_t tmp;
++
++	if (!success) {
++		util_debug(client->debug_callback, client->debug_data,
++					"Primary service discovery failed."
++					" ATT ECODE: 0x%02x", att_ecode);
++		goto done;
++	}
++
++	if (!result || !bt_gatt_iter_init(&iter, result)) {
++		success = false;
++		att_ecode = 0;
++		goto done;
++	}
++
++	util_debug(client->debug_callback, client->debug_data,
++					"Primary services found: %u",
++					bt_gatt_result_service_count(result));
++
++	while (bt_gatt_iter_next_service(&iter, &start, &end, uuid)) {
++		/* TODO: discover characteristics and store the service. */
++
++		/* Log debug message. */
++		tmp.type = BT_UUID128;
++		memcpy(tmp.value.u128.data, uuid, sizeof(uuid));
++		bt_uuid_to_string(&tmp, uuid_str, sizeof(uuid_str));
++		util_debug(client->debug_callback, client->debug_data,
++				"start: 0x%04x, end: 0x%04x, uuid: %s",
++				start, end, uuid_str);
++	}
++
++done:
++	client->in_init = false;
++
++	if (op->callback)
++		op->callback(success, att_ecode, op->user_data);
++}
++
++static void exchange_mtu_cb(bool success, uint8_t att_ecode, void *user_data)
++{
++	struct async_op *op = user_data;
++	struct bt_gatt_client *client = op->client;
++
++	if (!success) {
++		util_debug(client->debug_callback, client->debug_data,
++				"MTU Exchange failed. ATT ECODE: 0x%02x",
++				att_ecode);
++
++		client->in_init = false;
++
++		if (op->callback)
++			op->callback(success, att_ecode, op->user_data);
++
++		return;
++	}
++
++	util_debug(client->debug_callback, client->debug_data,
++					"MTU exchange complete, with MTU: %u",
++					bt_att_get_mtu(client->att));
++
++	if (bt_gatt_discover_primary_services(client->att, NULL,
++							discover_primary_cb,
++							async_op_ref(op),
++							async_op_unref))
++		return;
++
++	util_debug(client->debug_callback, client->debug_data,
++			"Failed to initiate primary service discovery");
++
++	client->in_init = false;
++
++	if (op->callback)
++		op->callback(false, 0, op->user_data);
++
++	async_op_unref(op);
++}
++
+ bool bt_gatt_client_init(struct bt_gatt_client *client, uint16_t mtu,
+ 					bt_gatt_client_callback_t callback,
+ 					void *user_data,
+ 					bt_gatt_client_destroy_func_t destroy)
+ {
+-	// TODO
++	struct async_op *op;
++
++	if (!client || client->in_init)
 +		return false;
 +
-+	client->persist = do_persist;
++	op = new0(struct async_op, 1);
++	if (!op)
++		return false;
++
++	op->client = client;
++	op->callback = callback;
++	op->user_data = user_data;
++	op->destroy = destroy;
++
++	/* Configure the MTU */
++	if (!bt_gatt_exchange_mtu(client->att, MAX(BT_ATT_DEFAULT_LE_MTU, mtu),
++							exchange_mtu_cb,
++							async_op_ref(op),
++							async_op_unref)) {
++		free(op);
++		return false;
++	}
++
++	client->in_init = true;
 +
 +	return true;
-+}
-+
-+struct bt_att *bt_gatt_client_get_att(struct bt_gatt_client *client)
-+{
-+	if (!client)
-+		return NULL;
-+
-+	return client->att;
-+}
-+
-+bool bt_gatt_client_init(struct bt_gatt_client *client, uint16_t mtu,
-+					bt_gatt_client_callback_t callback,
-+					void *user_data,
-+					bt_gatt_client_destroy_func_t destroy)
-+{
-+	// TODO
-+}
-+
-+unsigned int bt_gatt_client_register_service_changed(
-+				struct bt_gatt_client *client,
-+				uint16_t handle,
-+				bt_gatt_client_service_changed_func_t callback,
-+				void *user_data,
-+				bt_gatt_client_destroy_func_t destroy)
-+{
-+	// TODO
-+	return 0;
-+}
-+
-+bool bt_gatt_client_unregister_service_changed(struct bt_gatt_client *client,
-+							unsigned int id)
-+{
-+	// TODO
-+	return false;
-+}
+ }
+ 
+ unsigned int bt_gatt_client_register_service_changed(
 diff --git a/src/shared/gatt-client.h b/src/shared/gatt-client.h
-new file mode 100644
-index 0000000..a978691
---- /dev/null
+index 4038b1e..7a46cca 100644
+--- a/src/shared/gatt-client.h
 +++ b/src/shared/gatt-client.h
-@@ -0,0 +1,54 @@
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2014  Google Inc.
-+ *
-+ *
-+ *  This library is free software; you can redistribute it and/or
-+ *  modify it under the terms of the GNU Lesser General Public
-+ *  License as published by the Free Software Foundation; either
-+ *  version 2.1 of the License, or (at your option) any later version.
-+ *
-+ *  This library is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ *  Lesser General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU Lesser General Public
-+ *  License along with this library; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-+ *
-+ */
-+
-+#include <stdbool.h>
-+#include <stdint.h>
-+
-+struct bt_gatt_client;
-+
-+struct bt_gatt_client *bt_gatt_client_new(struct bt_att *att);
-+void bt_gatt_client_destroy(struct bt_gatt_client *client);
-+
-+bool bt_gatt_client_set_persist(struct bt_gatt_client *client,
-+							bool do_persist);
-+
-+struct bt_att *bt_gatt_client_get_att(struct bt_gatt_client *client);
-+
-+typedef void (*bt_gatt_client_destroy_func_t)(void *user_data);
-+typedef void (*bt_gatt_client_callback_t)(void *user_data);
-+typedef void (*bt_gatt_client_service_changed_func_t)(uint16_t handle,
+@@ -35,7 +35,8 @@ bool bt_gatt_client_set_persist(struct bt_gatt_client *client,
+ struct bt_att *bt_gatt_client_get_att(struct bt_gatt_client *client);
+ 
+ typedef void (*bt_gatt_client_destroy_func_t)(void *user_data);
+-typedef void (*bt_gatt_client_callback_t)(void *user_data);
++typedef void (*bt_gatt_client_callback_t)(bool success, uint8_t att_ecode,
 +							void *user_data);
-+
-+bool bt_gatt_client_init(struct bt_gatt_client *client, uint16_t mtu,
-+					bt_gatt_client_callback_t callback,
-+					void *user_data,
-+					bt_gatt_client_destroy_func_t destroy);
-+
-+unsigned int bt_gatt_client_register_service_changed(
-+				struct bt_gatt_client *client,
-+				uint16_t handle,
-+				bt_gatt_client_service_changed_func_t callback,
-+				void *user_data,
-+				bt_gatt_client_destroy_func_t destroy);
-+bool bt_gatt_client_unregister_service_changed(struct bt_gatt_client *client,
-+							unsigned int id);
+ typedef void (*bt_gatt_client_service_changed_func_t)(uint16_t handle,
+ 							void *user_data);
+ typedef void (*bt_gatt_client_debug_func_t)(const char *str, void *user_data);
 -- 
 2.1.0.rc2.206.gedb03e5
 
