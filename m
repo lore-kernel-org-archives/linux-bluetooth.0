@@ -1,72 +1,59 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1408449909-3461-1-git-send-email-luiz.dentz@gmail.com>
-References: <1408449909-3461-1-git-send-email-luiz.dentz@gmail.com>
-Date: Wed, 20 Aug 2014 11:04:20 +0300
-Message-ID: <CABBYNZ+F7ZS0G6C=_AqG4nWpnsDvMzYFH2SkuY_RStF7cR7o6A@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 1/2] gdbus: Fix crash when calling g_dbus_add_service_watch
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] android/health: Fix NULL dereference
+Date: Wed, 20 Aug 2014 10:02:03 +0300
+Message-Id: <1408518123-30621-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-On Tue, Aug 19, 2014 at 3:05 PM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->
-> If g_dbus_add_service_watch is called for service which bus name is
-> already known the following crash can happen:
->
-> invalid read of size 1
->   at 0x4C2A2F2: strlen (in /usr/lib64/valgrind/vgpreload_memcheck-amd64-linux.so)
->   by 0x4E97722: g_strdup (in /usr/lib64/libglib-2.0.so.0.3800.2)
->   by 0x405B0C: update_name_cache (watch.c:435)
->   by 0x405C37: update_service (watch.c:593)
->   by 0x4E7A2A5: g_main_context_dispatch (in /usr/lib64/libglib-2.0.so.0.3800.2)
->   by 0x4E7A627: ??? (in /usr/lib64/libglib-2.0.so.0.3800.2)
->   by 0x4E7AA39: g_main_loop_run (in /usr/lib64/libglib-2.0.so.0.3800.2)
->   by 0x4038EA: client_ready (test-gdbus-client.c:1014)
->   by 0x4E9E5E0: ??? (in /usr/lib64/libglib-2.0.so.0.3800.2)
->   by 0x4E9E7A5: ??? (in /usr/lib64/libglib-2.0.so.0.3800.2)
->   by 0x4E9EB1A: g_test_run_suite (in /usr/lib64/libglib-2.0.so.0.3800.2)
->   by 0x403614: main (test-gdbus-client.c:1058)
-> Address 0x5dbe5d0 is 0 bytes inside a block of size 7 free'd
->   at 0x4C28577: free (in /usr/lib64/valgrind/vgpreload_memcheck-amd64-linux.so)
->   by 0x4E7FF7E: g_free (in /usr/lib64/libglib-2.0.so.0.3800.2)
->   by 0x405B04: update_name_cache (watch.c:434)
->   by 0x405C37: update_service (watch.c:593)
->   by 0x4E7A2A5: g_main_context_dispatch (in /usr/lib64/libglib-2.0.so.0.3800.2)
->   by 0x4E7A627: ??? (in /usr/lib64/libglib-2.0.so.0.3800.2)
->   by 0x4E7AA39: g_main_loop_run (in /usr/lib64/libglib-2.0.so.0.3800.2)
->   by 0x4038EA: client_ready (test-gdbus-client.c:1014)
->   by 0x4E9E5E0: ??? (in /usr/lib64/libglib-2.0.so.0.3800.2)
->   by 0x4E9E7A5: ??? (in /usr/lib64/libglib-2.0.so.0.3800.2)
->   by 0x4E9EB1A: g_test_run_suite (in /usr/lib64/libglib-2.0.so.0.3800.2)
->   by 0x403614: main (test-gdbus-client.c:1058)
-> ---
->  gdbus/watch.c | 1 -
->  1 file changed, 1 deletion(-)
->
-> diff --git a/gdbus/watch.c b/gdbus/watch.c
-> index 474d3d4..2f5e865 100644
-> --- a/gdbus/watch.c
-> +++ b/gdbus/watch.c
-> @@ -595,7 +595,6 @@ static gboolean update_service(void *user_data)
->         struct filter_callback *cb = data->callback;
->         DBusConnection *conn;
->
-> -       update_name_cache(data->name, data->owner);
->         conn = dbus_connection_ref(data->conn);
->         service_data_free(data);
->
-> --
-> 1.9.3
+In a case get_app(), get_device(), get_channel() fail prevent
+dereference of NULL pointer. Fixes clang warnings:
+...
+android/health.c:1980:15: warning: Access to field 'dev' results in a
+dereference of a null pointer (loaded from variable 'channel')
+        queue_remove(channel->dev->channels, channel);
+                     ^~~~~~~~~~~~
+1 warning generated.
+...
+---
+ android/health.c | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
 
-Applied.
-
-
+diff --git a/android/health.c b/android/health.c
+index c8af90e..665482e 100644
+--- a/android/health.c
++++ b/android/health.c
+@@ -1931,15 +1931,15 @@ static void bt_health_connect_channel(const void *buf, uint16_t len)
+ 
+ 	app = get_app(cmd->app_id);
+ 	if (!app)
+-		goto fail;
++		goto send_rsp;
+ 
+ 	dev = get_device(app, cmd->bdaddr);
+ 	if (!dev)
+-		goto fail;
++		goto send_rsp;
+ 
+ 	channel = get_channel(app, cmd->mdep_index, dev);
+ 	if (!channel)
+-		goto fail;
++		goto send_rsp;
+ 
+ 	if (!queue_length(dev->channels)) {
+ 		if (channel->type != CHANNEL_TYPE_RELIABLE) {
+@@ -1979,6 +1979,8 @@ static void bt_health_connect_channel(const void *buf, uint16_t len)
+ fail:
+ 	queue_remove(channel->dev->channels, channel);
+ 	free_health_channel(channel);
++
++send_rsp:
+ 	ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_HEALTH,
+ 			HAL_OP_HEALTH_CONNECT_CHANNEL, HAL_STATUS_FAILED);
+ }
 -- 
-Luiz Augusto von Dentz
+1.9.1
+
