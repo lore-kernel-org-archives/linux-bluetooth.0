@@ -3,53 +3,56 @@ From: Vikrampal Yadav <vikram.pal@samsung.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: luiz.dentz@gmail.com, d.kasatkin@samsung.com,
 	vikram.pal@samsung.com, cpgs@samsung.com
-Subject: [PATCH 7/7] monitor: Fix AVRCP rejected packet handling error
-Date: Wed, 20 Aug 2014 14:54:07 +0530
-Message-id: <1408526647-23894-7-git-send-email-vikram.pal@samsung.com>
+Subject: [PATCH 3/7] monitor: Add AVRCP SetPlayerApplicationSettingValue support
+Date: Wed, 20 Aug 2014 14:54:03 +0530
+Message-id: <1408526647-23894-3-git-send-email-vikram.pal@samsung.com>
 In-reply-to: <1408526647-23894-1-git-send-email-vikram.pal@samsung.com>
 References: <1408526647-23894-1-git-send-email-vikram.pal@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Rectified the handling of AVRCP rejected packets in btmon.
+Support for decoding AVRCP SetPlayerApplicationSettingValue
+added in Bluetooth monitor.
 ---
- monitor/avctp.c | 9 ++++++---
- 1 file changed, 6 insertions(+), 3 deletions(-)
+ monitor/avctp.c | 25 +++++++++++++++++++++++++
+ 1 file changed, 25 insertions(+)
 
 diff --git a/monitor/avctp.c b/monitor/avctp.c
-index c75b3ff..32dfd15 100644
+index 1aff224..a0a3a4c 100644
 --- a/monitor/avctp.c
 +++ b/monitor/avctp.c
-@@ -910,7 +910,8 @@ static const struct avrcp_ctrl_pdu_data avrcp_ctrl_pdu_table[] = {
- 	{ }
- };
- 
--static void avrcp_rejected_packet(const struct l2cap_frame *frame)
-+static void avrcp_rejected_packet(const struct l2cap_frame *frame,
-+					uint8_t indent)
+@@ -631,6 +631,31 @@ static void avrcp_set_player_value(const struct l2cap_frame *frame,
+ 					uint8_t ctype, uint8_t len,
+ 					uint8_t indent)
  {
- 	uint8_t status;
- 
-@@ -921,7 +922,8 @@ static void avrcp_rejected_packet(const struct l2cap_frame *frame)
- 	}
- 
- 	status = *((uint8_t *) frame->data);
--	print_field("Error: 0x%02x (%s)", status, error2str(status));
-+	print_field("%*cError: 0x%02x (%s)", (indent - 8), ' ',
-+					status, error2str(status));
++	uint8_t num, i;
++
++	if (ctype > AVC_CTYPE_GENERAL_INQUIRY)
++		return;
++
++	if (len < 1) {
++		print_text(COLOR_ERROR, "PDU malformed");
++		packet_hexdump(frame->data, frame->size);
++		return;
++	}
++
++	num = *((uint8_t *) frame->data);
++	print_field("%*cAttributeCount: 0x%02x", (indent - 8), ' ', num);
++
++	for (i = 0; num > 0; num--, i++) {
++		uint8_t attr, value;
++
++		attr = *((uint8_t *) (frame->data + 1 + (i * 2)));
++		print_field("%*cAttributeID: 0x%02x (%s)", (indent - 8), ' ',
++							attr, attr2str(attr));
++
++		value = *((uint8_t *) (frame->data + 2 + (i * 2)));
++		print_field("%*cValueID: 0x%02x (%s)", (indent - 8), ' ',
++						value, value2str(attr, value));
++	}
  }
  
- static void avrcp_pdu_packet(const struct l2cap_frame *frame, uint8_t ctype,
-@@ -947,7 +949,8 @@ static void avrcp_pdu_packet(const struct l2cap_frame *frame, uint8_t ctype,
- 	}
- 
- 	if (ctype == 0xA) {
--		avrcp_rejected_packet(frame);
-+		l2cap_frame_pull(&avrcp_frame, frame, 4);
-+		avrcp_rejected_packet(&avrcp_frame, indent + 2);
- 		return;
- 	}
- 
+ static void avrcp_get_player_attribute_text(const struct l2cap_frame *frame,
 -- 
 1.9.1
 
