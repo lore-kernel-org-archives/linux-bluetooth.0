@@ -1,97 +1,101 @@
 Return-Path: <cyrus@holtmann.org>
-From: Arman Uguray <armansito@chromium.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Arman Uguray <armansito@chromium.org>
-Subject: [PATCH BlueZ 02/11] shared/gatt-helpers: Added result count functions.
-Date: Wed, 20 Aug 2014 13:15:28 -0700
-Message-Id: <1408565737-8187-3-git-send-email-armansito@chromium.org>
-In-Reply-To: <1408565737-8187-1-git-send-email-armansito@chromium.org>
-References: <1408565737-8187-1-git-send-email-armansito@chromium.org>
+Date: Wed, 20 Aug 2014 22:14:38 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: linville@tuxdriver.com
+Cc: alex.aring@gmail.com, linux-wireless@vger.kernel.org,
+	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: pull request: bluetooth 2014-08-20
+Message-ID: <20140820191438.GA16364@t440s.P-661HNU-F1>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="X1bOJ3K7DJ5YkBrT"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Added functions that return the number of services, characteristics, and
-descriptors contained in a bt_gatt_result.
+
+--X1bOJ3K7DJ5YkBrT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+
+Hi John,
+
+Here's a set of patches for the 3.17-rc series.
+
+It contains a connection reference counting fix for LE where a
+connection might stay up even though it should get disconnected.
+
+The other 802.15.4 6LoWPAN related patches were sent to the bluetooth
+tree by Alexander Aring and described as follows by him:
+
+"
+these patches contains patches for the bluetooth branch.
+
+This series includes memory leak fixes and an errno value fix.
+Also there are two patches for sending and receiving 1280 6LoWPAN
+packets, which makes the IEEE 802.15.4 6LoWPAN stack more RFC
+compliant.
+"
+
+Please let me know if there are any issues pulling. Thanks.
+
+Johan
+
 ---
- src/shared/gatt-helpers.c | 49 +++++++++++++++++++++++++++++++++++++++++++++++
- src/shared/gatt-helpers.h |  4 ++++
- 2 files changed, 53 insertions(+)
+The following changes since commit 77b2f2865956b7573f9b040db7a9f808b434acd1:
 
-diff --git a/src/shared/gatt-helpers.c b/src/shared/gatt-helpers.c
-index ff49867..00813f5 100644
---- a/src/shared/gatt-helpers.c
-+++ b/src/shared/gatt-helpers.c
-@@ -88,6 +88,55 @@ static void result_destroy(struct bt_gatt_result *result)
- 	}
- }
- 
-+static unsigned int result_element_count(struct bt_gatt_result *result)
-+{
-+	unsigned int count = 0;
-+	struct bt_gatt_result *cur;
-+
-+	cur = result;
-+
-+	while (cur) {
-+		count += cur->pdu_len / cur->data_len;
-+		cur = cur->next;
-+	}
-+
-+	return count;
-+}
-+
-+unsigned int bt_gatt_result_service_count(struct bt_gatt_result *result)
-+{
-+	if (!result)
-+		return 0;
-+
-+	if (result->opcode != BT_ATT_OP_READ_BY_GRP_TYPE_RSP &&
-+			result->opcode != BT_ATT_OP_FIND_BY_TYPE_VAL_RSP)
-+		return 0;
-+
-+	return result_element_count(result);
-+}
-+
-+unsigned int bt_gatt_result_characteristic_count(struct bt_gatt_result *result)
-+{
-+	if (!result)
-+		return 0;
-+
-+	if (result->opcode != BT_ATT_OP_READ_BY_TYPE_RSP)
-+		return 0;
-+
-+	return result_element_count(result);
-+}
-+
-+unsigned int bt_gatt_result_descriptor_count(struct bt_gatt_result *result)
-+{
-+	if (!result)
-+		return 0;
-+
-+	if (result->opcode != BT_ATT_OP_FIND_INFO_RSP)
-+		return 0;
-+
-+	return result_element_count(result);
-+}
-+
- bool bt_gatt_iter_init(struct bt_gatt_iter *iter, struct bt_gatt_result *result)
- {
- 	if (!iter || !result)
-diff --git a/src/shared/gatt-helpers.h b/src/shared/gatt-helpers.h
-index cdf83ba..d63fac1 100644
---- a/src/shared/gatt-helpers.h
-+++ b/src/shared/gatt-helpers.h
-@@ -35,6 +35,10 @@ struct bt_gatt_iter {
- 	uint16_t pos;
- };
- 
-+unsigned int bt_gatt_result_service_count(struct bt_gatt_result *result);
-+unsigned int bt_gatt_result_characteristic_count(struct bt_gatt_result *result);
-+unsigned int bt_gatt_result_descriptor_count(struct bt_gatt_result *result);
-+
- bool bt_gatt_iter_init(struct bt_gatt_iter *iter, struct bt_gatt_result *result);
- bool bt_gatt_iter_next_service(struct bt_gatt_iter *iter,
- 				uint16_t *start_handle, uint16_t *end_handle,
--- 
-2.1.0.rc2.206.gedb03e5
+  iwlwifi: mvm: disable scheduled scan to prevent firmware crash (2014-08-14 19:47:41 +0300)
 
+are available in the git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git for-upstream
+
+for you to fetch changes up to f161dd4122ffa73e4e12000309dca65bec80d416:
+
+  Bluetooth: Fix hci_conn reference counting for auto-connections (2014-08-20 21:57:39 +0300)
+
+----------------------------------------------------------------
+Alexander Aring (2):
+      ieee802154: 6lowpan_rtnl: fix correct errno value
+      ieee802154: 6lowpan: ensure of sending 1280 packets
+
+Johan Hedberg (1):
+      Bluetooth: Fix hci_conn reference counting for auto-connections
+
+Martin Townsend (3):
+      mac802154: fixed potential skb leak with mac802154_parse_frame_start
+      ieee802154: mac802154: handle the reserved dest mode by dropping the packet
+      ieee802154: 6lowpan: ensure MTU of 1280 for 6lowpan
+
+ include/net/bluetooth/hci_core.h       |  2 ++
+ include/net/netns/ieee802154_6lowpan.h |  1 -
+ net/bluetooth/hci_conn.c               |  8 ++++++++
+ net/bluetooth/hci_core.c               | 14 ++++++++++++--
+ net/bluetooth/hci_event.c              | 17 +++++++++++++++--
+ net/ieee802154/6lowpan_rtnl.c          |  4 ++--
+ net/ieee802154/reassembly.c            | 15 +++------------
+ net/mac802154/wpan.c                   |  6 +++++-
+ 8 files changed, 47 insertions(+), 20 deletions(-)
+
+
+--X1bOJ3K7DJ5YkBrT
+Content-Type: application/pgp-signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQIcBAEBAgAGBQJT9POeAAoJECQj9vv5qNQSfgUP/3+HHLSsXC9hy7Hp3pnwFHjs
+lqLo52Zb3gFooFJpsJNuQXjjg4/NSBiBhy5fIKl2q8Ctfns/d/ayeLEA6qeX0q9J
+hFt4HkNa+pufKrg0h9ds9IUOfvlJOLzdUHY2i9MAxvFTeU01rs1p4o5lme8OUwyl
+s9nWhhmb0Bk9BfSXMfh19S3ZF4mneqRBX4pYIf1XIcFaSe0uqcNburZ+I0Cjp62Y
+zdGQxsFmI3AR6dYV/jn9R10cayB4/OVCHtPERij4PDYHuNarxvzVNn5mQFMfoEyD
+OWEdzGbQrp58EIQ2SJqZPf/T3csex8qIfnW6yBCQ/1HOMH6aeLE4o9kCvDsgtN82
+b8N4dH6xyZ9lmVLk9AgCXn9jq1Sdq5G53TMleyuuIS6g3tIsvixtuIJc7tAMKPFS
+wuhBc2AOtkcu/2fyAwlh4yd7PxKW8kflt1aq2Bq3DnDk8kJ5ZR0TLhPzsrM4Su2w
+KH+4stmtttoDHu1gYHC2Oo7UFbGuFKidOx9d3+soH0UGHwkr2/jHHv2cjgFjkMBO
+v5vbsT/Er6SQbhpX5d7DmaPoLUUPJ8SzyzRlp+7o4WHpu1m1C8HaVCXLtGEyI70D
+Ct3e72hgbS6o/Z9nW9fQnMx7OkA2awO1Gbmc63IJnHVwJwJ9kepW6ZhC74fNXJzq
+QtobOojfS8pOYEdv8MSO
+=gBqN
+-----END PGP SIGNATURE-----
+
+--X1bOJ3K7DJ5YkBrT--
