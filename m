@@ -1,10 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1408349660-31890-1-git-send-email-luiz.dentz@gmail.com>
-References: <1408349660-31890-1-git-send-email-luiz.dentz@gmail.com>
-Date: Wed, 20 Aug 2014 11:04:38 +0300
-Message-ID: <CABBYNZLHaF0Ku2goVFMSa+zZjQGH2C8Xdb3xO-1zcJutzZp+Dw@mail.gmail.com>
-Subject: Re: [PATCH BlueZ] input: Fix crash when receiving event from uHID
+In-Reply-To: <1408449909-3461-1-git-send-email-luiz.dentz@gmail.com>
+References: <1408449909-3461-1-git-send-email-luiz.dentz@gmail.com>
+Date: Wed, 20 Aug 2014 11:04:20 +0300
+Message-ID: <CABBYNZ+F7ZS0G6C=_AqG4nWpnsDvMzYFH2SkuY_RStF7cR7o6A@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 1/2] gdbus: Fix crash when calling g_dbus_add_service_watch
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
@@ -13,43 +13,54 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi,
 
-On Mon, Aug 18, 2014 at 11:14 AM, Luiz Augusto von Dentz
+On Tue, Aug 19, 2014 at 3:05 PM, Luiz Augusto von Dentz
 <luiz.dentz@gmail.com> wrote:
 > From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 >
-> uHID device is created only once so it is possible that the kernel send
-> events when there is no connection causing the following crash:
+> If g_dbus_add_service_watch is called for service which bus name is
+> already known the following crash can happen:
 >
-> Invalid read of size 4
->    at 0x4EBC650: g_io_channel_unix_get_fd (in /usr/lib64/libglib-2.0.so.0.3800.2)
->    by 0x42C56A: hidp_send_message (device.c:160)
->    by 0x46EF1C: queue_foreach (queue.c:206)
->    by 0x42E3B0: uhid_read_handler (uhid.c:98)
->    by 0x46E82C: read_callback (io-glib.c:168)
->    by 0x4E7A2A5: g_main_context_dispatch (in /usr/lib64/libglib-2.0.so.0.3800.2)
->    by 0x4E7A627: ??? (in /usr/lib64/libglib-2.0.so.0.3800.2)
->    by 0x4E7AA39: g_main_loop_run (in /usr/lib64/libglib-2.0.so.0.3800.2)
->    by 0x40A972: main (main.c:607)
->  Address 0x70 is not stack'd, malloc'd or (recently) free'd
+> invalid read of size 1
+>   at 0x4C2A2F2: strlen (in /usr/lib64/valgrind/vgpreload_memcheck-amd64-linux.so)
+>   by 0x4E97722: g_strdup (in /usr/lib64/libglib-2.0.so.0.3800.2)
+>   by 0x405B0C: update_name_cache (watch.c:435)
+>   by 0x405C37: update_service (watch.c:593)
+>   by 0x4E7A2A5: g_main_context_dispatch (in /usr/lib64/libglib-2.0.so.0.3800.2)
+>   by 0x4E7A627: ??? (in /usr/lib64/libglib-2.0.so.0.3800.2)
+>   by 0x4E7AA39: g_main_loop_run (in /usr/lib64/libglib-2.0.so.0.3800.2)
+>   by 0x4038EA: client_ready (test-gdbus-client.c:1014)
+>   by 0x4E9E5E0: ??? (in /usr/lib64/libglib-2.0.so.0.3800.2)
+>   by 0x4E9E7A5: ??? (in /usr/lib64/libglib-2.0.so.0.3800.2)
+>   by 0x4E9EB1A: g_test_run_suite (in /usr/lib64/libglib-2.0.so.0.3800.2)
+>   by 0x403614: main (test-gdbus-client.c:1058)
+> Address 0x5dbe5d0 is 0 bytes inside a block of size 7 free'd
+>   at 0x4C28577: free (in /usr/lib64/valgrind/vgpreload_memcheck-amd64-linux.so)
+>   by 0x4E7FF7E: g_free (in /usr/lib64/libglib-2.0.so.0.3800.2)
+>   by 0x405B04: update_name_cache (watch.c:434)
+>   by 0x405C37: update_service (watch.c:593)
+>   by 0x4E7A2A5: g_main_context_dispatch (in /usr/lib64/libglib-2.0.so.0.3800.2)
+>   by 0x4E7A627: ??? (in /usr/lib64/libglib-2.0.so.0.3800.2)
+>   by 0x4E7AA39: g_main_loop_run (in /usr/lib64/libglib-2.0.so.0.3800.2)
+>   by 0x4038EA: client_ready (test-gdbus-client.c:1014)
+>   by 0x4E9E5E0: ??? (in /usr/lib64/libglib-2.0.so.0.3800.2)
+>   by 0x4E9E7A5: ??? (in /usr/lib64/libglib-2.0.so.0.3800.2)
+>   by 0x4E9EB1A: g_test_run_suite (in /usr/lib64/libglib-2.0.so.0.3800.2)
+>   by 0x403614: main (test-gdbus-client.c:1058)
 > ---
->  profiles/input/device.c | 5 +++++
->  1 file changed, 5 insertions(+)
+>  gdbus/watch.c | 1 -
+>  1 file changed, 1 deletion(-)
 >
-> diff --git a/profiles/input/device.c b/profiles/input/device.c
-> index 6b5a290..cfa5e23 100644
-> --- a/profiles/input/device.c
-> +++ b/profiles/input/device.c
-> @@ -149,6 +149,11 @@ static bool hidp_send_message(GIOChannel *chan, uint8_t hdr,
->         ssize_t len;
->         uint8_t msg[size + 1];
+> diff --git a/gdbus/watch.c b/gdbus/watch.c
+> index 474d3d4..2f5e865 100644
+> --- a/gdbus/watch.c
+> +++ b/gdbus/watch.c
+> @@ -595,7 +595,6 @@ static gboolean update_service(void *user_data)
+>         struct filter_callback *cb = data->callback;
+>         DBusConnection *conn;
 >
-> +       if (!chan) {
-> +               error("BT socket not connected");
-> +               return false;
-> +       }
-> +
->         if (data == NULL)
->                 size = 0;
+> -       update_name_cache(data->name, data->owner);
+>         conn = dbus_connection_ref(data->conn);
+>         service_data_free(data);
 >
 > --
 > 1.9.3
