@@ -1,45 +1,51 @@
 Return-Path: <cyrus@holtmann.org>
-From: Natanael Copa <ncopa@alpinelinux.org>
+From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Natanael Copa <ncopa@alpinelinux.org>
-Subject: [PATCH v2] tools: fix headers for bcm43xx
-Date: Wed, 20 Aug 2014 11:06:21 +0200
-Message-Id: <1408525581-2679-1-git-send-email-ncopa@alpinelinux.org>
-In-Reply-To: <CBEB55B4-D5B1-4C9E-AA29-63D2F72B5F61@holtmann.org>
-References: <CBEB55B4-D5B1-4C9E-AA29-63D2F72B5F61@holtmann.org>
+Cc: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+Subject: [PATCH 2/2] android/bluetooth: Add debug log to select_device_bearer
+Date: Wed, 20 Aug 2014 10:10:24 +0200
+Message-Id: <1408522224-27670-2-git-send-email-lukasz.rymanowski@tieto.com>
+In-Reply-To: <1408522224-27670-1-git-send-email-lukasz.rymanowski@tieto.com>
+References: <1408522224-27670-1-git-send-email-lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-PATH_MAX is defined in limits.h so include it explicitly.
-
-This fixes the following compile error on musl libc (Alpine Linux):
-tools/hciattach_bcm43xx.c: In function 'bcm43xx_locate_patch':
-tools/hciattach_bcm43xx.c:313:14: error: 'PATH_MAX' undeclared (first use in this function)
-    char path[PATH_MAX];
-                  ^
+This patch refactor a bit select_device_bearer function so we can get
+debug log out of it. This log might be very useful in dual mode devices
+scenarios
 ---
-This is a delayed follow-up of:
-http://comments.gmane.org/gmane.linux.bluez.kernel/47523
+ android/bluetooth.c | 13 ++++++++++---
+ 1 file changed, 10 insertions(+), 3 deletions(-)
 
-Changes since v1:
- - remove signed-off-by line
- - fix typo in commit message
-
- tools/hciattach_bcm43xx.c | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/tools/hciattach_bcm43xx.c b/tools/hciattach_bcm43xx.c
-index ad9b239..cb4bfb9 100644
---- a/tools/hciattach_bcm43xx.c
-+++ b/tools/hciattach_bcm43xx.c
-@@ -34,6 +34,7 @@
- #include <errno.h>
- #include <dirent.h>
- #include <time.h>
-+#include <limits.h>
+diff --git a/android/bluetooth.c b/android/bluetooth.c
+index 59dd047..20f2c8c 100644
+--- a/android/bluetooth.c
++++ b/android/bluetooth.c
+@@ -4216,14 +4216,21 @@ static void pair_device_complete(uint8_t status, uint16_t length,
  
- #include <bluetooth/bluetooth.h>
- #include <bluetooth/hci.h>
+ static uint8_t select_device_bearer(struct device *dev)
+ {
++	uint8_t res;
++
+ 	if (dev->bredr && dev->le) {
+ 		if (dev->le_seen > dev->bredr_seen)
+-			return dev->bdaddr_type;
++			res = dev->bdaddr_type;
++		else
++			res = BDADDR_BREDR;
+ 
+-		return BDADDR_BREDR;
++	} else {
++		res = dev->bredr ? BDADDR_BREDR : dev->bdaddr_type;
+ 	}
+ 
+-	return dev->bredr ? BDADDR_BREDR : dev->bdaddr_type;
++	DBG("Selected bearer %d", res);
++
++	return res;
+ }
+ 
+ uint8_t bt_device_last_seen_bearer(const bdaddr_t *bdaddr)
 -- 
-2.1.0
+1.8.4
 
