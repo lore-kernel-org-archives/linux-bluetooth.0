@@ -1,314 +1,185 @@
 Return-Path: <cyrus@holtmann.org>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH BlueZ] android/avrcp: Register CT record
+Date: Wed, 20 Aug 2014 12:15:54 +0200
+Message-ID: <5440125.NYeb5SyJSk@leonov>
+In-Reply-To: <1408528873-14870-1-git-send-email-luiz.dentz@gmail.com>
+References: <1408528873-14870-1-git-send-email-luiz.dentz@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <1408477872-24160-1-git-send-email-szymon.janc@tieto.com>
-References: <1408477872-24160-1-git-send-email-szymon.janc@tieto.com>
-Date: Wed, 20 Aug 2014 13:38:28 +0300
-Message-ID: <CABBYNZKK_BLOM3LCUCS5vRC4JpFfJPp8TaGfQz3y-GZ93DV8Tg@mail.gmail.com>
-Subject: Re: [PATCH 01/11] android/hal-ipc: Refactor handling of IPC error
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Szymon Janc <szymon.janc@tieto.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="us-ascii"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Szymon,
+Hi Luiz,
 
-On Tue, Aug 19, 2014 at 10:51 PM, Szymon Janc <szymon.janc@tieto.com> wrote:
-> Move all error handling to notification thread. This makes single
-> point of error (ie exit()) and is a preparation for custom
-> disconnect callback.
-
-Does this imply every ipc must have a notification thread? iirc this
-was not the case for audio.
-
+On Wednesday 20 of August 2014 13:01:13 Luiz Augusto von Dentz wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> 
+> This fixes TC_SDAS_BV_03_I which requires CT record.
 > ---
->  android/hal-ipc.c | 134 +++++++++++++++++++++++++++++++++++++-----------------
->  1 file changed, 93 insertions(+), 41 deletions(-)
->
-> diff --git a/android/hal-ipc.c b/android/hal-ipc.c
-> index 363072c..1f5cc52 100644
-> --- a/android/hal-ipc.c
-> +++ b/android/hal-ipc.c
-> @@ -39,7 +39,7 @@ static int listen_sk = -1;
->  static int cmd_sk = -1;
->  static int notif_sk = -1;
->
-> -static pthread_mutex_t cmd_sk_mutex = PTHREAD_MUTEX_INITIALIZER;
-> +static pthread_mutex_t ipc_mutex = PTHREAD_MUTEX_INITIALIZER;
->
->  static pthread_t notif_th = 0;
->
-> @@ -133,6 +133,7 @@ static void *notification_handler(void *data)
->         struct iovec iv;
->         struct cmsghdr *cmsg;
->         char cmsgbuf[CMSG_SPACE(sizeof(int))];
-> +       bool failed = false;
->         char buf[IPC_MTU];
->         ssize_t ret;
->         int fd;
-> @@ -157,20 +158,22 @@ static void *notification_handler(void *data)
->                 if (ret < 0) {
->                         error("Receiving notifications failed: %s",
->                                                         strerror(errno));
-> -                       goto failed;
-> +                       failed = true;
-> +                       break;
->                 }
->
->                 /* socket was shutdown */
->                 if (ret == 0) {
-> -                       pthread_mutex_lock(&cmd_sk_mutex);
-> +                       pthread_mutex_lock(&ipc_mutex);
->                         if (cmd_sk == -1) {
-> -                               pthread_mutex_unlock(&cmd_sk_mutex);
-> +                               pthread_mutex_unlock(&ipc_mutex);
->                                 break;
->                         }
-> -                       pthread_mutex_unlock(&cmd_sk_mutex);
-> +                       pthread_mutex_unlock(&ipc_mutex);
->
-> -                       error("Notification socket closed");
-> -                       goto failed;
-> +                       error("Notification socket closed unexpectedly");
-> +                       failed = true;
-> +                       break;
->                 }
->
->                 fd = -1;
-> @@ -185,21 +188,25 @@ static void *notification_handler(void *data)
->                         }
->                 }
->
-> -               if (!handle_msg(buf, ret, fd))
-> -                       goto failed;
-> +               if (!handle_msg(buf, ret, fd)) {
-> +                       failed = true;
-> +                       break;
-> +               }
->         }
->
-> +       pthread_mutex_lock(&ipc_mutex);
->         close(notif_sk);
->         notif_sk = -1;
-> +       pthread_mutex_unlock(&ipc_mutex);
->
->         bt_thread_disassociate();
->
->         DBG("exit");
->
-> -       return NULL;
-> +       if (failed)
-> +               exit(EXIT_FAILURE);
->
-> -failed:
-> -       exit(EXIT_FAILURE);
-> +       return NULL;
->  }
->
->  static int accept_connection(int sk)
-> @@ -238,32 +245,67 @@ bool hal_ipc_accept(void)
+>  android/avrcp.c | 103
+> +++++++++++++++++++++++++++++++++++++++++++++++++++----- 1 file changed, 95
+> insertions(+), 8 deletions(-)
+> 
+> diff --git a/android/avrcp.c b/android/avrcp.c
+> index 8c5cf8a..0f4750f 100644
+> --- a/android/avrcp.c
+> +++ b/android/avrcp.c
+> @@ -55,7 +55,8 @@
+>  #define AVRCP_FEATURE_CATEGORY_4	0x0008
+> 
+>  static bdaddr_t adapter_addr;
+> -static uint32_t record_id = 0;
+> +static uint32_t record_tg_id = 0;
+> +static uint32_t record_ct_id = 0;
+>  static GSList *devices = NULL;
+>  static GIOChannel *server = NULL;
+>  static struct ipc *hal_ipc = NULL;
+> @@ -397,7 +398,7 @@ static const struct ipc_handler cmd_handlers[] = {
+>  	{ handle_set_volume, false, sizeof(struct hal_cmd_avrcp_set_volume) },
+>  };
+> 
+> -static sdp_record_t *avrcp_record(void)
+> +static sdp_record_t *avrcp_tg_record(void)
 >  {
->         int err;
->
-> +       pthread_mutex_lock(&ipc_mutex);
-> +       if (cmd_sk >= 0) {
-> +               close(cmd_sk);
-> +               cmd_sk = -1;
-> +       }
-> +
-> +       if (notif_sk >= 0) {
-> +               close(notif_sk);
-> +               notif_sk = -1;
-> +       }
-> +
-> +       /*
-> +        * If notification thread is running this means accept was called
-> +        * from notification thread context . We need to detach thread to not
-> +        * leak resources.
-> +        *
-> +        * TODO should we verify if context is really notification thread?
-> +        * calling accept from other thread when IPC is running is an illegal
-> +        * usage anyway..
-> +        */
-> +       if (notif_th) {
-> +               pthread_detach(notif_th);
-> +               notif_th = 0;
-> +       }
-> +
->         cmd_sk = accept_connection(listen_sk);
->         if (cmd_sk < 0)
-> -               return false;
-> +               goto failed;
->
->         notif_sk = accept_connection(listen_sk);
-> -       if (notif_sk < 0) {
-> -               close(cmd_sk);
-> -               cmd_sk = -1;
-> -               return false;
-> -       }
-> +       if (notif_sk < 0)
-> +               goto failed;
->
->         err = pthread_create(&notif_th, NULL, notification_handler, NULL);
->         if (err) {
->                 notif_th = 0;
->                 error("Failed to start notification thread: %d (%s)", err,
->                                                         strerror(err));
-> +               goto failed;
-> +       }
-> +
-> +       pthread_mutex_unlock(&ipc_mutex);
-> +
-> +       info("IPC connected");
-> +
-> +       return true;
-> +
-> +failed:
-> +       if (cmd_sk >= 0) {
->                 close(cmd_sk);
->                 cmd_sk = -1;
-> +       }
-> +
-> +       if (notif_sk >= 0) {
->                 close(notif_sk);
->                 notif_sk = -1;
-> -               return false;
->         }
->
-> -       info("IPC connected");
-> +       pthread_mutex_unlock(&ipc_mutex);
->
-> -       return true;
-> +       return false;
+>  	sdp_list_t *svclass_id, *pfseq, *apseq, *root;
+>  	uuid_t root_uuid, l2cap, avctp, avrtg;
+> @@ -465,6 +466,76 @@ static sdp_record_t *avrcp_record(void)
+>  	return record;
 >  }
->
->  bool hal_ipc_init(const char *path, size_t size)
-> @@ -307,23 +349,28 @@ bool hal_ipc_init(const char *path, size_t size)
->
->  void hal_ipc_cleanup(void)
+> 
+> +static sdp_record_t *avrcp_ct_record(void)
+> +{
+> +	sdp_list_t *svclass_id, *pfseq, *apseq, *root;
+> +	uuid_t root_uuid, l2cap, avctp, avrct, avrctr;
+> +	sdp_profile_desc_t profile[1];
+> +	sdp_list_t *aproto, *proto[2];
+> +	sdp_record_t *record;
+> +	sdp_data_t *psm, *version, *features;
+> +	uint16_t lp = AVCTP_CONTROL_PSM;
+> +	uint16_t avrcp_ver = 0x0105, avctp_ver = 0x0104;
+> +	uint16_t feat = ( AVRCP_FEATURE_CATEGORY_1 |
+> +						AVRCP_FEATURE_CATEGORY_2 |
+> +						AVRCP_FEATURE_CATEGORY_3 |
+> +						AVRCP_FEATURE_CATEGORY_4);
+> +
+> +	record = sdp_record_alloc();
+> +	if (!record)
+> +		return NULL;
+> +
+> +	sdp_uuid16_create(&root_uuid, PUBLIC_BROWSE_GROUP);
+> +	root = sdp_list_append(NULL, &root_uuid);
+> +	sdp_set_browse_groups(record, root);
+> +
+> +	/* Service Class ID List */
+> +	sdp_uuid16_create(&avrct, AV_REMOTE_SVCLASS_ID);
+> +	svclass_id = sdp_list_append(NULL, &avrct);
+> +	sdp_uuid16_create(&avrctr, AV_REMOTE_CONTROLLER_SVCLASS_ID);
+> +	svclass_id = sdp_list_append(svclass_id, &avrctr);
+> +	sdp_set_service_classes(record, svclass_id);
+> +
+> +	/* Protocol Descriptor List */
+> +	sdp_uuid16_create(&l2cap, L2CAP_UUID);
+> +	proto[0] = sdp_list_append(NULL, &l2cap);
+> +	psm = sdp_data_alloc(SDP_UINT16, &lp);
+> +	proto[0] = sdp_list_append(proto[0], psm);
+> +	apseq = sdp_list_append(NULL, proto[0]);
+> +
+> +	sdp_uuid16_create(&avctp, AVCTP_UUID);
+> +	proto[1] = sdp_list_append(NULL, &avctp);
+> +	version = sdp_data_alloc(SDP_UINT16, &avctp_ver);
+> +	proto[1] = sdp_list_append(proto[1], version);
+> +	apseq = sdp_list_append(apseq, proto[1]);
+> +
+> +	aproto = sdp_list_append(NULL, apseq);
+> +	sdp_set_access_protos(record, aproto);
+> +
+> +	/* Bluetooth Profile Descriptor List */
+> +	sdp_uuid16_create(&profile[0].uuid, AV_REMOTE_PROFILE_ID);
+> +	profile[0].version = avrcp_ver;
+> +	pfseq = sdp_list_append(NULL, &profile[0]);
+> +	sdp_set_profile_descs(record, pfseq);
+> +
+> +	features = sdp_data_alloc(SDP_UINT16, &feat);
+> +	sdp_attr_add(record, SDP_ATTR_SUPPORTED_FEATURES, features);
+> +
+> +	sdp_set_info_attr(record, "AVRCP CT", NULL, NULL);
+> +
+> +	free(psm);
+> +	free(version);
+> +	sdp_list_free(proto[0], NULL);
+> +	sdp_list_free(proto[1], NULL);
+> +	sdp_list_free(apseq, NULL);
+> +	sdp_list_free(pfseq, NULL);
+> +	sdp_list_free(aproto, NULL);
+> +	sdp_list_free(root, NULL);
+> +	sdp_list_free(svclass_id, NULL);
+> +
+> +	return record;
+> +}
+> +
+>  static void avrcp_device_free(void *data)
 >  {
-> +       pthread_t th;
+>  	struct avrcp_device *dev = data;
+> @@ -1014,18 +1085,31 @@ bool bt_avrcp_register(struct ipc *ipc, const
+> bdaddr_t *addr, uint8_t mode) return false;
+>  	}
+> 
+> -	rec = avrcp_record();
+> +	rec = avrcp_tg_record();
+>  	if (!rec) {
+> -		error("Failed to allocate AVRCP record");
+> +		error("Failed to allocate AVRCP TG record");
+>  		goto fail;
+>  	}
+> 
+>  	if (bt_adapter_add_record(rec, 0) < 0) {
+> -		error("Failed to register AVRCP record");
+> +		error("Failed to register AVRCP TG record");
+>  		sdp_record_free(rec);
+>  		goto fail;
+>  	}
+> -	record_id = rec->handle;
+> +	record_tg_id = rec->handle;
 > +
-> +       pthread_mutex_lock(&ipc_mutex);
-> +
->         close(listen_sk);
->         listen_sk = -1;
->
-> -       pthread_mutex_lock(&cmd_sk_mutex);
->         if (cmd_sk >= 0) {
->                 close(cmd_sk);
->                 cmd_sk = -1;
->         }
-> -       pthread_mutex_unlock(&cmd_sk_mutex);
-> -
-> -       if (notif_sk < 0)
-> -               return;
->
-> -       shutdown(notif_sk, SHUT_RD);
-> +       if (notif_sk >= 0)
-> +               shutdown(notif_sk, SHUT_RD);
->
-> -       pthread_join(notif_th, NULL);
-> +       th = notif_th;
->         notif_th = 0;
-> +
-> +       pthread_mutex_unlock(&ipc_mutex);
-> +
-> +       if (th)
-> +               pthread_join(th, NULL);
->  }
->
->  int hal_ipc_cmd(uint8_t service_id, uint8_t opcode, uint16_t len, void *param,
-> @@ -337,11 +384,6 @@ int hal_ipc_cmd(uint8_t service_id, uint8_t opcode, uint16_t len, void *param,
->         struct ipc_status s;
->         size_t s_len = sizeof(s);
->
-> -       if (cmd_sk < 0) {
-> -               error("Invalid cmd socket passed to hal_ipc_cmd");
-> -               goto failed;
-> -       }
-> -
->         if (!rsp || !rsp_len) {
->                 memset(&s, 0, s_len);
->                 rsp_len = &s_len;
-> @@ -358,26 +400,29 @@ int hal_ipc_cmd(uint8_t service_id, uint8_t opcode, uint16_t len, void *param,
->         iv[0].iov_base = &cmd;
->         iv[0].iov_len = sizeof(cmd);
->
-> -       iv[1].iov_base = param;
-> +       iv[1].iov_base = (void *) param;
+> +	rec = avrcp_ct_record();
+> +	if (!rec) {
+> +		error("Failed to allocate AVRCP CT record");
 
-Does this change is really necessary?
+Shouldn't TG record be removed here, or maybe in failed label?
 
->         iv[1].iov_len = len;
->
->         msg.msg_iov = iv;
->         msg.msg_iovlen = 2;
->
-> -       pthread_mutex_lock(&cmd_sk_mutex);
-> +       pthread_mutex_lock(&ipc_mutex);
+> +		goto fail;
+> +	}
 > +
-> +       if (cmd_sk < 0) {
-> +               error("Invalid cmd socket passed to hal_ipc_cmd");
-> +               goto failed_locked;
-> +       }
->
->         ret = sendmsg(cmd_sk, &msg, 0);
->         if (ret < 0) {
->                 error("Sending command failed:%s", strerror(errno));
-> -               pthread_mutex_unlock(&cmd_sk_mutex);
-> -               goto failed;
-> +               goto failed_locked;
->         }
->
->         /* socket was shutdown */
->         if (ret == 0) {
->                 error("Command socket closed");
-> -               pthread_mutex_unlock(&cmd_sk_mutex);
-> -               goto failed;
-> +               goto failed_locked;
->         }
->
->         memset(&msg, 0, sizeof(msg));
-> @@ -400,7 +445,7 @@ int hal_ipc_cmd(uint8_t service_id, uint8_t opcode, uint16_t len, void *param,
->
->         ret = recvmsg(cmd_sk, &msg, 0);
->
-> -       pthread_mutex_unlock(&cmd_sk_mutex);
-> +       pthread_mutex_unlock(&ipc_mutex);
->
->         if (ret < 0) {
->                 error("Receiving command response failed: %s", strerror(errno));
-> @@ -467,5 +512,12 @@ int hal_ipc_cmd(uint8_t service_id, uint8_t opcode, uint16_t len, void *param,
->         return BT_STATUS_SUCCESS;
->
->  failed:
-> -       exit(EXIT_FAILURE);
-> +       pthread_mutex_lock(&ipc_mutex);
+> +	if (bt_adapter_add_record(rec, 0) < 0) {
+> +		error("Failed to register AVRCP CT record");
+> +		sdp_record_free(rec);
+
+Ditto.
+
+> +		goto fail;
+> +	}
+> +	record_ct_id = rec->handle;
+> 
+>  	hal_ipc = ipc;
+> 
+> @@ -1051,8 +1135,11 @@ void bt_avrcp_unregister(void)
+>  	ipc_unregister(hal_ipc, HAL_SERVICE_ID_AVRCP);
+>  	hal_ipc = NULL;
+> 
+> -	bt_adapter_remove_record(record_id);
+> -	record_id = 0;
+> +	bt_adapter_remove_record(record_tg_id);
+> +	record_tg_id = 0;
 > +
-> +failed_locked:
-> +       if (notif_sk >= 0)
-> +               shutdown(notif_sk, SHUT_RD);
-> +       pthread_mutex_unlock(&ipc_mutex);
-
-Perhaps having ipc_shutdown would be a good idea here, it should
-probably only be called with the lock being held, also if notif_sk is
-not set perhaps it should shutdown the cmd_sk otherwise it can have no
-effect.
-
-> +
-> +       return BT_STATUS_FAIL;
->  }
-> --
-> 1.9.3
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-
-
+> +	bt_adapter_remove_record(record_ct_id);
+> +	record_ct_id = 0;
+> 
+>  	if (server) {
+>  		g_io_channel_shutdown(server, TRUE, NULL);
 
 -- 
-Luiz Augusto von Dentz
+BR
+Szymon Janc
