@@ -1,76 +1,169 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [RFC] android/bluetooth: Update pairing status on pair complete event
-Date: Wed, 20 Aug 2014 12:02:21 +0200
-Message-ID: <2178802.c2DUHlZXv8@leonov>
-In-Reply-To: <1407400740-29565-1-git-send-email-lukasz.rymanowski@tieto.com>
-References: <1407400740-29565-1-git-send-email-lukasz.rymanowski@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ] android/avrcp: Register CT record
+Date: Wed, 20 Aug 2014 13:01:13 +0300
+Message-Id: <1408528873-14870-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Łukasz,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-On Thursday 07 of August 2014 10:39:00 Lukasz Rymanowski wrote:
-> So far BfA updates android bond state after link key(s) are
-> distributed. With LE pairing it might happen that no keys are
-> distributed e.g remote device has Initiator Key Distribution and
-> Responder Key Distribution set to 0. In such case link is encrypted with
-> STK and after its disconnected, pairing needs to be done again.
-> 
-> With this patch Android will get update about pairing complete just
-> after BfA gets pairing complete from the kernel. It solve issue with not
-> updated Android settings application, which is hanging on "Pairing", in
-> case when no keys are distributed.
-> 
-> However, bacause Android does not see the difference between bonded /
-> paired devices and because Android does not allow to update its bond
-> state if it is not in bonding state, BfA updates Android with BONDED
-> state on pair_complete with success. This is how we are doing so far
-> for bonding and non-bonding pairing.
-> 
-> Note: BfA will update its bonded state after link key(s) are
-> distribiuted.
-> ---
->  android/bluetooth.c | 13 +++++--------
->  1 file changed, 5 insertions(+), 8 deletions(-)
-> 
-> diff --git a/android/bluetooth.c b/android/bluetooth.c
-> index 655844d..8c32d48 100644
-> --- a/android/bluetooth.c
-> +++ b/android/bluetooth.c
-> @@ -4065,19 +4065,16 @@ static void pair_device_complete(uint8_t status,
-> uint16_t length,
-> 
->  	DBG("status %u", status);
-> 
-> -	/*
-> -	 * On success bond state change will be send when new link key or LTK
-> -	 * event is received
-> -	 */
-> -	if (status == MGMT_STATUS_SUCCESS)
-> -		return;
-> -
->  	dev = find_device(&rp->addr.bdaddr);
->  	if (!dev)
->  		return;
-> 
-> +	/*
-> +	 * Update pairing and paired status. Bonded status will be updated once
-> +	 * any link key come
-> +	 */
->  	update_device_state(dev, rp->addr.type, status_mgmt2hal(status), false,
-> -								false, false);
-> +								!status, false);
->  }
-> 
->  static uint8_t select_device_bearer(struct device *dev)
+This fixes TC_SDAS_BV_03_I which requires CT record.
+---
+ android/avrcp.c | 103 +++++++++++++++++++++++++++++++++++++++++++++++++++-----
+ 1 file changed, 95 insertions(+), 8 deletions(-)
 
-Patch applied, thanks.
-
+diff --git a/android/avrcp.c b/android/avrcp.c
+index 8c5cf8a..0f4750f 100644
+--- a/android/avrcp.c
++++ b/android/avrcp.c
+@@ -55,7 +55,8 @@
+ #define AVRCP_FEATURE_CATEGORY_4	0x0008
+ 
+ static bdaddr_t adapter_addr;
+-static uint32_t record_id = 0;
++static uint32_t record_tg_id = 0;
++static uint32_t record_ct_id = 0;
+ static GSList *devices = NULL;
+ static GIOChannel *server = NULL;
+ static struct ipc *hal_ipc = NULL;
+@@ -397,7 +398,7 @@ static const struct ipc_handler cmd_handlers[] = {
+ 	{ handle_set_volume, false, sizeof(struct hal_cmd_avrcp_set_volume) },
+ };
+ 
+-static sdp_record_t *avrcp_record(void)
++static sdp_record_t *avrcp_tg_record(void)
+ {
+ 	sdp_list_t *svclass_id, *pfseq, *apseq, *root;
+ 	uuid_t root_uuid, l2cap, avctp, avrtg;
+@@ -465,6 +466,76 @@ static sdp_record_t *avrcp_record(void)
+ 	return record;
+ }
+ 
++static sdp_record_t *avrcp_ct_record(void)
++{
++	sdp_list_t *svclass_id, *pfseq, *apseq, *root;
++	uuid_t root_uuid, l2cap, avctp, avrct, avrctr;
++	sdp_profile_desc_t profile[1];
++	sdp_list_t *aproto, *proto[2];
++	sdp_record_t *record;
++	sdp_data_t *psm, *version, *features;
++	uint16_t lp = AVCTP_CONTROL_PSM;
++	uint16_t avrcp_ver = 0x0105, avctp_ver = 0x0104;
++	uint16_t feat = ( AVRCP_FEATURE_CATEGORY_1 |
++						AVRCP_FEATURE_CATEGORY_2 |
++						AVRCP_FEATURE_CATEGORY_3 |
++						AVRCP_FEATURE_CATEGORY_4);
++
++	record = sdp_record_alloc();
++	if (!record)
++		return NULL;
++
++	sdp_uuid16_create(&root_uuid, PUBLIC_BROWSE_GROUP);
++	root = sdp_list_append(NULL, &root_uuid);
++	sdp_set_browse_groups(record, root);
++
++	/* Service Class ID List */
++	sdp_uuid16_create(&avrct, AV_REMOTE_SVCLASS_ID);
++	svclass_id = sdp_list_append(NULL, &avrct);
++	sdp_uuid16_create(&avrctr, AV_REMOTE_CONTROLLER_SVCLASS_ID);
++	svclass_id = sdp_list_append(svclass_id, &avrctr);
++	sdp_set_service_classes(record, svclass_id);
++
++	/* Protocol Descriptor List */
++	sdp_uuid16_create(&l2cap, L2CAP_UUID);
++	proto[0] = sdp_list_append(NULL, &l2cap);
++	psm = sdp_data_alloc(SDP_UINT16, &lp);
++	proto[0] = sdp_list_append(proto[0], psm);
++	apseq = sdp_list_append(NULL, proto[0]);
++
++	sdp_uuid16_create(&avctp, AVCTP_UUID);
++	proto[1] = sdp_list_append(NULL, &avctp);
++	version = sdp_data_alloc(SDP_UINT16, &avctp_ver);
++	proto[1] = sdp_list_append(proto[1], version);
++	apseq = sdp_list_append(apseq, proto[1]);
++
++	aproto = sdp_list_append(NULL, apseq);
++	sdp_set_access_protos(record, aproto);
++
++	/* Bluetooth Profile Descriptor List */
++	sdp_uuid16_create(&profile[0].uuid, AV_REMOTE_PROFILE_ID);
++	profile[0].version = avrcp_ver;
++	pfseq = sdp_list_append(NULL, &profile[0]);
++	sdp_set_profile_descs(record, pfseq);
++
++	features = sdp_data_alloc(SDP_UINT16, &feat);
++	sdp_attr_add(record, SDP_ATTR_SUPPORTED_FEATURES, features);
++
++	sdp_set_info_attr(record, "AVRCP CT", NULL, NULL);
++
++	free(psm);
++	free(version);
++	sdp_list_free(proto[0], NULL);
++	sdp_list_free(proto[1], NULL);
++	sdp_list_free(apseq, NULL);
++	sdp_list_free(pfseq, NULL);
++	sdp_list_free(aproto, NULL);
++	sdp_list_free(root, NULL);
++	sdp_list_free(svclass_id, NULL);
++
++	return record;
++}
++
+ static void avrcp_device_free(void *data)
+ {
+ 	struct avrcp_device *dev = data;
+@@ -1014,18 +1085,31 @@ bool bt_avrcp_register(struct ipc *ipc, const bdaddr_t *addr, uint8_t mode)
+ 		return false;
+ 	}
+ 
+-	rec = avrcp_record();
++	rec = avrcp_tg_record();
+ 	if (!rec) {
+-		error("Failed to allocate AVRCP record");
++		error("Failed to allocate AVRCP TG record");
+ 		goto fail;
+ 	}
+ 
+ 	if (bt_adapter_add_record(rec, 0) < 0) {
+-		error("Failed to register AVRCP record");
++		error("Failed to register AVRCP TG record");
+ 		sdp_record_free(rec);
+ 		goto fail;
+ 	}
+-	record_id = rec->handle;
++	record_tg_id = rec->handle;
++
++	rec = avrcp_ct_record();
++	if (!rec) {
++		error("Failed to allocate AVRCP CT record");
++		goto fail;
++	}
++
++	if (bt_adapter_add_record(rec, 0) < 0) {
++		error("Failed to register AVRCP CT record");
++		sdp_record_free(rec);
++		goto fail;
++	}
++	record_ct_id = rec->handle;
+ 
+ 	hal_ipc = ipc;
+ 
+@@ -1051,8 +1135,11 @@ void bt_avrcp_unregister(void)
+ 	ipc_unregister(hal_ipc, HAL_SERVICE_ID_AVRCP);
+ 	hal_ipc = NULL;
+ 
+-	bt_adapter_remove_record(record_id);
+-	record_id = 0;
++	bt_adapter_remove_record(record_tg_id);
++	record_tg_id = 0;
++
++	bt_adapter_remove_record(record_ct_id);
++	record_ct_id = 0;
+ 
+ 	if (server) {
+ 		g_io_channel_shutdown(server, TRUE, NULL);
 -- 
-BR
-Szymon Janc
+1.9.3
+
