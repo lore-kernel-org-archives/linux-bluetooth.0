@@ -1,43 +1,166 @@
 Return-Path: <cyrus@holtmann.org>
-From: Vinicius Costa Gomes <vcgomes@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] audio/avdtp: Fix invalid reference counting
-Date: Wed, 20 Aug 2014 11:06:52 -0300
-Message-Id: <1408543612-5615-1-git-send-email-vcgomes@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <004601cfbc78$294ea0f0$7bebe2d0$@samsung.com>
+References: <1408526647-23894-1-git-send-email-vikram.pal@samsung.com>
+	<1408526647-23894-4-git-send-email-vikram.pal@samsung.com>
+	<004601cfbc78$294ea0f0$7bebe2d0$@samsung.com>
+Date: Wed, 20 Aug 2014 16:48:52 +0300
+Message-ID: <CABBYNZKnyfWtSuqfoHN9s0dyhZTcccyXW-MvU9UAMae=DU8DzA@mail.gmail.com>
+Subject: Re: [PATCH 4/7] monitor: Add AVRCP GetPlayerApplicationSettingAttributeText
+ support
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Vikrampal <vikram.pal@samsung.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	Dmitry Kasatkin <d.kasatkin@samsung.com>, cpgs@samsung.com
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-If the AVDTP session is terminated via any other mean than
-'connection_lost()' (the only place that btd_device_unref() was called),
-there was a dangling reference to the device.
+Hi Vikrampal,
 
-This can be easily reproduced by suspending the host while using an A2DP
-speaker. It has the very misleading effect of being unable to create the
-device when the system resumes.
----
- profiles/audio/avdtp.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+On Wed, Aug 20, 2014 at 4:10 PM, Vikrampal <vikram.pal@samsung.com> wrote:
+> Hi Luiz,
+>
+>> -----Original Message-----
+>> From: Vikrampal Yadav [mailto:vikram.pal@samsung.com]
+>> Sent: Wednesday, August 20, 2014 2:54 PM
+>> To: linux-bluetooth@vger.kernel.org
+>> Cc: luiz.dentz@gmail.com; d.kasatkin@samsung.com;
+>> vikram.pal@samsung.com; cpgs@samsung.com
+>> Subject: [PATCH 4/7] monitor: Add AVRCP
+>> GetPlayerApplicationSettingAttributeText support
+>>
+>> Support for decoding AVRCP GetPlayerApplicationSettingAttributeText
+>> added in Bluetooth monitor.
+>> ---
+>>  monitor/avctp.c | 82
+>> +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+>>  1 file changed, 82 insertions(+)
+>>
+>> diff --git a/monitor/avctp.c b/monitor/avctp.c index a0a3a4c..a3a2d84
+>> 100644
+>> --- a/monitor/avctp.c
+>> +++ b/monitor/avctp.c
+>> @@ -28,6 +28,7 @@
+>>
+>>  #include <stdio.h>
+>>  #include <stdlib.h>
+>> +#include <ctype.h>
+>>  #include <string.h>
+>>  #include <inttypes.h>
+>>
+>> @@ -483,6 +484,39 @@ static const char *value2str(uint8_t attr, uint8_t
+>> value)
+>>       }
+>>  }
+>>
+>> +static const char *charset2str(uint16_t charset) {
+>> +     switch (charset) {
+>> +     case 1:
+>> +     case 2:
+>> +             return "Reserved";
+>> +     case 3:
+>> +             return "ASCII";
+>> +     case 4:
+>> +             return "ISO_8859-1";
+>> +     case 5:
+>> +             return "ISO_8859-2";
+>> +     case 6:
+>> +             return "ISO_8859-3";
+>> +     case 7:
+>> +             return "ISO_8859-4";
+>> +     case 8:
+>> +             return "ISO_8859-5";
+>> +     case 9:
+>> +             return "ISO_8859-6";
+>> +     case 10:
+>> +             return "ISO_8859-7";
+>> +     case 11:
+>> +             return "ISO_8859-8";
+>> +     case 12:
+>> +             return "ISO_8859-9";
+>> +     case 106:
+>> +             return "UTF-8";
+>> +     default:
+>> +             return "Unknown";
+>> +     }
+>> +}
+>> +
+>>  static void avrcp_passthrough_packet(const struct l2cap_frame *frame)  {
+> }
+>> @@ -662,6 +696,54 @@ static void avrcp_get_player_attribute_text(const
+>> struct l2cap_frame *frame,
+>>                                               uint8_t ctype, uint8_t len,
+>>                                               uint8_t indent)
+>>  {
+>> +     uint8_t num, i, j;
+>> +
+>> +     if (len < 1) {
+>> +             print_text(COLOR_ERROR, "PDU malformed");
+>> +             packet_hexdump(frame->data, frame->size);
+>> +             return;
+>> +     }
+>> +
+>> +     num = *((uint8_t *) frame->data);
+>> +     print_field("%*cAttributeCount: 0x%02x", (indent - 8), ' ', num);
+>> +
+>> +     if (ctype > AVC_CTYPE_GENERAL_INQUIRY) {
+>> +             for (i = 0; num > 0; num--, i++) {
+>> +                     uint8_t attr, len;
+>> +                     uint8_t totallen = 0;
+>> +                     uint16_t charset;
+>> +
+>> +                     attr = *((uint8_t *) (frame->data + 1 + 4 * i +
+>> totallen));
+>> +                     print_field("%*cAttributeID: 0x%02x (%s)",
+>> +                             (indent - 8), ' ', attr, attr2str(attr));
+>> +
+>> +                     charset = get_be16(frame->data + 2 + 4 * i +
+> totallen);
+>> +                     print_field("%*cCharsetID: 0x%04x (%s)",
+>> +                                     (indent - 8), ' ', charset,
+>> +                                     charset2str(charset));
+>> +
+>> +                     len = *((uint8_t *) (frame->data + 4 + 4 * i +
+> totallen));
+>> +                     print_field("%*cStringLength: 0x%02x",
+>> +                                     (indent - 8), ' ', len);
+>> +
+>> +                     totallen =+ len;
+>> +
+>> +                     printf("String: ");
+>> +                     for (j = 0; len > 0; len--, j++) {
+>> +                             uint8_t c = *((uint8_t *) (frame->data + 5 +
+> 4
+>> * i + totallen + j));
+>> +                             printf("%1c", isprint(c) ? c : '.');
+>> +                     }
+>> +                     printf("\n");
+>> +             }
+>> +     } else {
+>> +             for (i = 0; num > 0; num--, i++) {
+>> +                     uint8_t attr;
+>> +
+>> +                     attr = *((uint8_t *) (frame->data + 1 + i));
+>> +                     print_field("%*cAttributeID: 0x%02x (%s)",
+>> +                             (indent - 8), ' ', attr, attr2str(attr));
+>> +             }
+>> +     }
+>>  }
+>>
+>>  static void avrcp_get_player_value_text(const struct l2cap_frame *frame,
+>> --
+>> 1.9.1
+>
+> Even after using goto, one particular line uint8_t c = *((uint8_t *)
+> (frame->data + 5 + 4 * i + totallen + j));
+> Is going upto 85 characters. Is it acceptable?
+> If not how to break this particular line meaningfully?
 
-diff --git a/profiles/audio/avdtp.c b/profiles/audio/avdtp.c
-index 8a7d1c0..ba5f0e5 100644
---- a/profiles/audio/avdtp.c
-+++ b/profiles/audio/avdtp.c
-@@ -1135,6 +1135,7 @@ static void avdtp_free(void *data)
- 
- 	g_free(session->buf);
- 
-+	btd_device_unref(session->device);
- 	g_free(session);
- }
- 
-@@ -1160,7 +1161,6 @@ static void connection_lost(struct avdtp *session, int err)
- 		return;
- 
- 	server->sessions = g_slist_remove(server->sessions, session);
--	btd_device_unref(session->device);
- 	avdtp_free(session);
- }
- 
+You don't have to assign in the declaration, actually all those offset
+calculation looks very hard to understand so perhaps you should be
+pulling ahead on each iteration.
+
+
 -- 
-2.0.4
-
+Luiz Augusto von Dentz
