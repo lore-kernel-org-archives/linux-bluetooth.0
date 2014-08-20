@@ -1,36 +1,55 @@
 Return-Path: <cyrus@holtmann.org>
-From: Natanael Copa <ncopa@alpinelinux.org>
+From: Vikrampal Yadav <vikram.pal@samsung.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Natanael Copa <ncopa@alpinelinux.org>
-Subject: [PATCH] shared: include limits.h for PATH_MAX
-Date: Wed, 20 Aug 2014 11:17:47 +0200
-Message-Id: <1408526267-12159-1-git-send-email-ncopa@alpinelinux.org>
+Cc: luiz.dentz@gmail.com, d.kasatkin@samsung.com,
+	vikram.pal@samsung.com, cpgs@samsung.com
+Subject: [PATCH 6/7] monitor: Add AVRCP InformDisplayableCharacterSet support
+Date: Wed, 20 Aug 2014 14:54:06 +0530
+Message-id: <1408526647-23894-6-git-send-email-vikram.pal@samsung.com>
+In-reply-to: <1408526647-23894-1-git-send-email-vikram.pal@samsung.com>
+References: <1408526647-23894-1-git-send-email-vikram.pal@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-PATH_MAX is defined in limits.h so include it explicitly.
-
-This fixes the following compile error on musl libc (Alpine Linux):
-src/shared/util.c: In function 'util_get_dt':
-src/shared/util.c:99:16: error: 'PATH_MAX' undeclared (first use in this function)
-  char filename[PATH_MAX];
-                ^
+Support for decoding AVRCP InformDisplayableCharacterSet added
+in Bluetooth monitor.
 ---
- src/shared/util.c | 1 +
- 1 file changed, 1 insertion(+)
+ monitor/avctp.c | 22 ++++++++++++++++++++++
+ 1 file changed, 22 insertions(+)
 
-diff --git a/src/shared/util.c b/src/shared/util.c
-index 8530440..74ffb08 100644
---- a/src/shared/util.c
-+++ b/src/shared/util.c
-@@ -32,6 +32,7 @@
- #include <sys/stat.h>
- #include <unistd.h>
- #include <dirent.h>
-+#include <limits.h>
+diff --git a/monitor/avctp.c b/monitor/avctp.c
+index 6444c28..c75b3ff 100644
+--- a/monitor/avctp.c
++++ b/monitor/avctp.c
+@@ -812,6 +812,28 @@ static void avrcp_displayable_charset(const struct l2cap_frame *frame,
+ 					uint8_t ctype, uint8_t len,
+ 					uint8_t indent)
+ {
++	uint8_t num, i;
++
++	if (ctype > AVC_CTYPE_GENERAL_INQUIRY)
++		return;
++
++	if (len < 2) {
++		print_text(COLOR_ERROR, "PDU malformed");
++		packet_hexdump(frame->data, frame->size);
++		return;
++	}
++
++	num = *((uint8_t *) frame->data);
++	print_field("%*cCharsetCount: 0x%02x", (indent - 8), ' ', num);
++
++	for (i = 0; num > 0; num--, i++) {
++		uint16_t charset;
++
++		charset = get_be16(frame->data + 1 + (2 * i));
++		print_field("%*cCharsetID: 0x%04x (%s)",
++					(indent - 8), ' ', charset,
++					charset2str(charset));
++	}
+ }
  
- #include "src/shared/util.h"
- 
+ static void avrcp_ct_battery_status(const struct l2cap_frame *frame,
 -- 
-2.1.0
+1.9.1
 
