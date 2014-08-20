@@ -1,174 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
+MIME-Version: 1.0
+In-Reply-To: <1408526267-12159-1-git-send-email-ncopa@alpinelinux.org>
+References: <1408526267-12159-1-git-send-email-ncopa@alpinelinux.org>
+Date: Wed, 20 Aug 2014 13:41:56 +0300
+Message-ID: <CABBYNZKaJy+VNNL-X2b5GRP3qHoxynCaWdVjxWMtZH1gW27atA@mail.gmail.com>
+Subject: Re: [PATCH] shared: include limits.h for PATH_MAX
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 BlueZ] android/avrcp: Register CT record
-Date: Wed, 20 Aug 2014 13:47:04 +0300
-Message-Id: <1408531624-22551-1-git-send-email-luiz.dentz@gmail.com>
+To: Natanael Copa <ncopa@alpinelinux.org>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Natanael,
 
-This fixes TC_SDAS_BV_03_I which requires CT record.
----
-v2: Fix not removing TG record in case CT record cannot be allocated or
-fails to be registered
+On Wed, Aug 20, 2014 at 12:17 PM, Natanael Copa <ncopa@alpinelinux.org> wrote:
+> PATH_MAX is defined in limits.h so include it explicitly.
+>
+> This fixes the following compile error on musl libc (Alpine Linux):
+> src/shared/util.c: In function 'util_get_dt':
+> src/shared/util.c:99:16: error: 'PATH_MAX' undeclared (first use in this function)
+>   char filename[PATH_MAX];
+>                 ^
+> ---
+>  src/shared/util.c | 1 +
+>  1 file changed, 1 insertion(+)
+>
+> diff --git a/src/shared/util.c b/src/shared/util.c
+> index 8530440..74ffb08 100644
+> --- a/src/shared/util.c
+> +++ b/src/shared/util.c
+> @@ -32,6 +32,7 @@
+>  #include <sys/stat.h>
+>  #include <unistd.h>
+>  #include <dirent.h>
+> +#include <limits.h>
+>
+>  #include "src/shared/util.h"
+>
+> --
+> 2.1.0
 
- android/avrcp.c | 105 +++++++++++++++++++++++++++++++++++++++++++++++++++-----
- 1 file changed, 97 insertions(+), 8 deletions(-)
+Applied, thanks.
 
-diff --git a/android/avrcp.c b/android/avrcp.c
-index 8c5cf8a..5f93c3c 100644
---- a/android/avrcp.c
-+++ b/android/avrcp.c
-@@ -55,7 +55,8 @@
- #define AVRCP_FEATURE_CATEGORY_4	0x0008
- 
- static bdaddr_t adapter_addr;
--static uint32_t record_id = 0;
-+static uint32_t record_tg_id = 0;
-+static uint32_t record_ct_id = 0;
- static GSList *devices = NULL;
- static GIOChannel *server = NULL;
- static struct ipc *hal_ipc = NULL;
-@@ -397,7 +398,7 @@ static const struct ipc_handler cmd_handlers[] = {
- 	{ handle_set_volume, false, sizeof(struct hal_cmd_avrcp_set_volume) },
- };
- 
--static sdp_record_t *avrcp_record(void)
-+static sdp_record_t *avrcp_tg_record(void)
- {
- 	sdp_list_t *svclass_id, *pfseq, *apseq, *root;
- 	uuid_t root_uuid, l2cap, avctp, avrtg;
-@@ -465,6 +466,76 @@ static sdp_record_t *avrcp_record(void)
- 	return record;
- }
- 
-+static sdp_record_t *avrcp_ct_record(void)
-+{
-+	sdp_list_t *svclass_id, *pfseq, *apseq, *root;
-+	uuid_t root_uuid, l2cap, avctp, avrct, avrctr;
-+	sdp_profile_desc_t profile[1];
-+	sdp_list_t *aproto, *proto[2];
-+	sdp_record_t *record;
-+	sdp_data_t *psm, *version, *features;
-+	uint16_t lp = AVCTP_CONTROL_PSM;
-+	uint16_t avrcp_ver = 0x0105, avctp_ver = 0x0104;
-+	uint16_t feat = ( AVRCP_FEATURE_CATEGORY_1 |
-+						AVRCP_FEATURE_CATEGORY_2 |
-+						AVRCP_FEATURE_CATEGORY_3 |
-+						AVRCP_FEATURE_CATEGORY_4);
-+
-+	record = sdp_record_alloc();
-+	if (!record)
-+		return NULL;
-+
-+	sdp_uuid16_create(&root_uuid, PUBLIC_BROWSE_GROUP);
-+	root = sdp_list_append(NULL, &root_uuid);
-+	sdp_set_browse_groups(record, root);
-+
-+	/* Service Class ID List */
-+	sdp_uuid16_create(&avrct, AV_REMOTE_SVCLASS_ID);
-+	svclass_id = sdp_list_append(NULL, &avrct);
-+	sdp_uuid16_create(&avrctr, AV_REMOTE_CONTROLLER_SVCLASS_ID);
-+	svclass_id = sdp_list_append(svclass_id, &avrctr);
-+	sdp_set_service_classes(record, svclass_id);
-+
-+	/* Protocol Descriptor List */
-+	sdp_uuid16_create(&l2cap, L2CAP_UUID);
-+	proto[0] = sdp_list_append(NULL, &l2cap);
-+	psm = sdp_data_alloc(SDP_UINT16, &lp);
-+	proto[0] = sdp_list_append(proto[0], psm);
-+	apseq = sdp_list_append(NULL, proto[0]);
-+
-+	sdp_uuid16_create(&avctp, AVCTP_UUID);
-+	proto[1] = sdp_list_append(NULL, &avctp);
-+	version = sdp_data_alloc(SDP_UINT16, &avctp_ver);
-+	proto[1] = sdp_list_append(proto[1], version);
-+	apseq = sdp_list_append(apseq, proto[1]);
-+
-+	aproto = sdp_list_append(NULL, apseq);
-+	sdp_set_access_protos(record, aproto);
-+
-+	/* Bluetooth Profile Descriptor List */
-+	sdp_uuid16_create(&profile[0].uuid, AV_REMOTE_PROFILE_ID);
-+	profile[0].version = avrcp_ver;
-+	pfseq = sdp_list_append(NULL, &profile[0]);
-+	sdp_set_profile_descs(record, pfseq);
-+
-+	features = sdp_data_alloc(SDP_UINT16, &feat);
-+	sdp_attr_add(record, SDP_ATTR_SUPPORTED_FEATURES, features);
-+
-+	sdp_set_info_attr(record, "AVRCP CT", NULL, NULL);
-+
-+	free(psm);
-+	free(version);
-+	sdp_list_free(proto[0], NULL);
-+	sdp_list_free(proto[1], NULL);
-+	sdp_list_free(apseq, NULL);
-+	sdp_list_free(pfseq, NULL);
-+	sdp_list_free(aproto, NULL);
-+	sdp_list_free(root, NULL);
-+	sdp_list_free(svclass_id, NULL);
-+
-+	return record;
-+}
-+
- static void avrcp_device_free(void *data)
- {
- 	struct avrcp_device *dev = data;
-@@ -1014,18 +1085,33 @@ bool bt_avrcp_register(struct ipc *ipc, const bdaddr_t *addr, uint8_t mode)
- 		return false;
- 	}
- 
--	rec = avrcp_record();
-+	rec = avrcp_tg_record();
- 	if (!rec) {
--		error("Failed to allocate AVRCP record");
-+		error("Failed to allocate AVRCP TG record");
- 		goto fail;
- 	}
- 
- 	if (bt_adapter_add_record(rec, 0) < 0) {
--		error("Failed to register AVRCP record");
-+		error("Failed to register AVRCP TG record");
- 		sdp_record_free(rec);
- 		goto fail;
- 	}
--	record_id = rec->handle;
-+	record_tg_id = rec->handle;
-+
-+	rec = avrcp_ct_record();
-+	if (!rec) {
-+		error("Failed to allocate AVRCP CT record");
-+		bt_adapter_remove_record(record_tg_id);
-+		goto fail;
-+	}
-+
-+	if (bt_adapter_add_record(rec, 0) < 0) {
-+		error("Failed to register AVRCP CT record");
-+		bt_adapter_remove_record(record_tg_id);
-+		sdp_record_free(rec);
-+		goto fail;
-+	}
-+	record_ct_id = rec->handle;
- 
- 	hal_ipc = ipc;
- 
-@@ -1051,8 +1137,11 @@ void bt_avrcp_unregister(void)
- 	ipc_unregister(hal_ipc, HAL_SERVICE_ID_AVRCP);
- 	hal_ipc = NULL;
- 
--	bt_adapter_remove_record(record_id);
--	record_id = 0;
-+	bt_adapter_remove_record(record_tg_id);
-+	record_tg_id = 0;
-+
-+	bt_adapter_remove_record(record_ct_id);
-+	record_ct_id = 0;
- 
- 	if (server) {
- 		g_io_channel_shutdown(server, TRUE, NULL);
+
 -- 
-1.9.3
-
+Luiz Augusto von Dentz
