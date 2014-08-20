@@ -1,70 +1,75 @@
 Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
-To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] android/health: Fix NULL dereference
-Date: Wed, 20 Aug 2014 12:02:41 +0200
-Message-ID: <2064054.lsmHskdC9y@leonov>
-In-Reply-To: <1408518123-30621-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1408518123-30621-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: Re: [RFC] android/bluetooth: Update pairing status on pair complete event
+Date: Wed, 20 Aug 2014 12:02:21 +0200
+Message-ID: <2178802.c2DUHlZXv8@leonov>
+In-Reply-To: <1407400740-29565-1-git-send-email-lukasz.rymanowski@tieto.com>
+References: <1407400740-29565-1-git-send-email-lukasz.rymanowski@tieto.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+Hi Łukasz,
 
-On Wednesday 20 of August 2014 10:02:03 Andrei Emeltchenko wrote:
-> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+On Thursday 07 of August 2014 10:39:00 Lukasz Rymanowski wrote:
+> So far BfA updates android bond state after link key(s) are
+> distributed. With LE pairing it might happen that no keys are
+> distributed e.g remote device has Initiator Key Distribution and
+> Responder Key Distribution set to 0. In such case link is encrypted with
+> STK and after its disconnected, pairing needs to be done again.
 > 
-> In a case get_app(), get_device(), get_channel() fail prevent
-> dereference of NULL pointer. Fixes clang warnings:
-> ...
-> android/health.c:1980:15: warning: Access to field 'dev' results in a
-> dereference of a null pointer (loaded from variable 'channel')
->         queue_remove(channel->dev->channels, channel);
->                      ^~~~~~~~~~~~
-> 1 warning generated.
-> ...
+> With this patch Android will get update about pairing complete just
+> after BfA gets pairing complete from the kernel. It solve issue with not
+> updated Android settings application, which is hanging on "Pairing", in
+> case when no keys are distributed.
+> 
+> However, bacause Android does not see the difference between bonded /
+> paired devices and because Android does not allow to update its bond
+> state if it is not in bonding state, BfA updates Android with BONDED
+> state on pair_complete with success. This is how we are doing so far
+> for bonding and non-bonding pairing.
+> 
+> Note: BfA will update its bonded state after link key(s) are
+> distribiuted.
 > ---
->  android/health.c | 8 +++++---
->  1 file changed, 5 insertions(+), 3 deletions(-)
+>  android/bluetooth.c | 13 +++++--------
+>  1 file changed, 5 insertions(+), 8 deletions(-)
 > 
-> diff --git a/android/health.c b/android/health.c
-> index c8af90e..665482e 100644
-> --- a/android/health.c
-> +++ b/android/health.c
-> @@ -1931,15 +1931,15 @@ static void bt_health_connect_channel(const void
-> *buf, uint16_t len)
+> diff --git a/android/bluetooth.c b/android/bluetooth.c
+> index 655844d..8c32d48 100644
+> --- a/android/bluetooth.c
+> +++ b/android/bluetooth.c
+> @@ -4065,19 +4065,16 @@ static void pair_device_complete(uint8_t status,
+> uint16_t length,
 > 
->  	app = get_app(cmd->app_id);
->  	if (!app)
-> -		goto fail;
-> +		goto send_rsp;
+>  	DBG("status %u", status);
 > 
->  	dev = get_device(app, cmd->bdaddr);
+> -	/*
+> -	 * On success bond state change will be send when new link key or LTK
+> -	 * event is received
+> -	 */
+> -	if (status == MGMT_STATUS_SUCCESS)
+> -		return;
+> -
+>  	dev = find_device(&rp->addr.bdaddr);
 >  	if (!dev)
-> -		goto fail;
-> +		goto send_rsp;
+>  		return;
 > 
->  	channel = get_channel(app, cmd->mdep_index, dev);
->  	if (!channel)
-> -		goto fail;
-> +		goto send_rsp;
-> 
->  	if (!queue_length(dev->channels)) {
->  		if (channel->type != CHANNEL_TYPE_RELIABLE) {
-> @@ -1979,6 +1979,8 @@ static void bt_health_connect_channel(const void *buf,
-> uint16_t len) fail:
->  	queue_remove(channel->dev->channels, channel);
->  	free_health_channel(channel);
-> +
-> +send_rsp:
->  	ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_HEALTH,
->  			HAL_OP_HEALTH_CONNECT_CHANNEL, HAL_STATUS_FAILED);
+> +	/*
+> +	 * Update pairing and paired status. Bonded status will be updated once
+> +	 * any link key come
+> +	 */
+>  	update_device_state(dev, rp->addr.type, status_mgmt2hal(status), false,
+> -								false, false);
+> +								!status, false);
 >  }
+> 
+>  static uint8_t select_device_bearer(struct device *dev)
 
-Applied, thanks.
+Patch applied, thanks.
 
 -- 
 BR
