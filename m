@@ -1,116 +1,236 @@
 Return-Path: <cyrus@holtmann.org>
+Message-ID: <53F5920A.3090503@xsilon.com>
+Date: Thu, 21 Aug 2014 07:30:34 +0100
+From: Martin Townsend <martin.townsend@xsilon.com>
 MIME-Version: 1.0
-Sender: arakhov@google.com
-In-Reply-To: <CAD81oNYbM2tpSbhdfih1ir2BnszwvOkGBKbOiKG70Gcp6qHVRA@mail.gmail.com>
-References: <CAD81oNZL0qATu_z_TJT8psaMhpmV34w6xmA2+=OKerSE1NSvOw@mail.gmail.com>
-	<CABBYNZ+zRKzv4yTc8M2Fi0eN6gC921b9zaey5FKGVq_bJJueBg@mail.gmail.com>
-	<CAD81oNbjd3-Y_7C=75TfBP0oXjA3eFWbezsD8nROUrseUJZNhg@mail.gmail.com>
-	<CAD81oNZkRk-KFcE1bkj8TWiqe7dyVjHJADicT-f5KEkKtcnbyA@mail.gmail.com>
-	<574DE1E1-7A53-4629-88FC-7164EC1880AA@holtmann.org>
-	<CAD81oNY41-8DhJCOetLa_TCrPLBeiJFHQJ7TxawydwQ5S_Lmwg@mail.gmail.com>
-	<CABBYNZLEDBFa-wV5L5Pfi-PzA877PxSrktsVLpzCRuQ4nu1eKQ@mail.gmail.com>
-	<CAD81oNZYeobbhMawvhrjTFSTY-aqEXYh9x3aTSOoH8u1Y6nHDQ@mail.gmail.com>
-	<CAD81oNYbM2tpSbhdfih1ir2BnszwvOkGBKbOiKG70Gcp6qHVRA@mail.gmail.com>
-Date: Wed, 20 Aug 2014 23:42:12 -0700
-Message-ID: <CAD81oNYAkFvHhFnvjSPjp+Wwnz8haJZjmE3MCuJmtom1FWfL1w@mail.gmail.com>
-Subject: Re: [A2DP] Incoming connections do not succeed
-From: Artem Rakhov <arakhov@chromium.org>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>, gustavo@padovan.org
-Content-Type: text/plain; charset=UTF-8
+To: Marcel Holtmann <marcel@holtmann.org>
+CC: linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org
+Subject: Re: [Linux-zigbee-devel] [PATCH v2 bluetooth-next] Simplify lowpan
+ receive path so skb is freed in lowpan_rcv when dropped.
+References: <53DCE75C.2030305@xsilon.com>
+In-Reply-To: <53DCE75C.2030305@xsilon.com>
+Content-Type: text/plain; charset=windows-1252
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Looks like I found the problem.
+Hi Marcel,
 
-Creation of all sockets and all the read/write operations are handled
-in btio.c in BlueZ. It allows to set various options for sockets. One
-of these options is called 'defer' (BT_IO_OPT_DEFER_TIMEOUT). By
-default it is equal to 30. In fact, no profile in BlueZ use this
-option, and it is never equal to anything else. And create_io()
-function in btio.c also does not use this. The only place 'defer'
-option is passed to a kernel level is bt_io_listen() function:
+I was just wondering what the status of this patch is?
 
-if (confirm)
-    setsockopt(sock, SOL_BLUETOOTH, BT_DEFER_SETUP, &opts.defer,
-sizeof(opts.defer));
+- Martin.
 
-As far as I understand, BT_DEFER_SETUP is a kernel option which
-enables Defer Setup feature for L2CAP channel. It is a binary flag,
-and looks like it has nothing to do with timeout. And it makes no
-sense to pass 30 as a value for binary flag.
-
-So I don't see any connection between these two things. As a result,
-we almost always turn on Defer Setup feature, which causes connection
-problems with my speaker and potentially with other BT devices. My
-suggestion is to completely remove 'defer' option from btio.c
-
-Another question is: when and where do we actually need to enable this
-Defer Setup feature?
-
-Thanks,
-Artem
-
-On Wed, Aug 20, 2014 at 3:54 PM, Artem Rakhov <arakhov@google.com> wrote:
-> Hello,
+On 02/08/14 14:27, Martin Townsend wrote:
+> Signed-off-by: Martin Townsend<martin.townsend@xsilon.com>
+> ---
+>   include/net/6lowpan.h         |  2 +-
+>   net/6lowpan/iphc.c            | 29 ++++++++++++++++-------------
+>   net/bluetooth/6lowpan.c       | 12 ++++++++----
+>   net/ieee802154/6lowpan_rtnl.c | 12 ++++++------
+>   4 files changed, 31 insertions(+), 24 deletions(-)
 >
-> I found the way to use avtest for testing incoming connections from
-> the speaker. If anyone is interested: stopped bluetoothd, powered BT
-> back to on, used "avtest --reject 0". Also had to change avtest to
-> answer like source instead of sink, which is set by default.
->
-> Incoming connections to avtest are always successful. And logs are
-> very similar (attached). I think the main difference is that the
-> bluetoothd requires authorization, while avtest does not.
->
-> Thanks,
-> Artem
->
-> On Mon, Aug 18, 2014 at 12:11 AM, Artem Rakhov <arakhov@chromium.org> wrote:
->> Hi Luiz,
->>
->> I have also tried kernel 3.14, it didn't help.
->> How can I use avinfo for test? Looks like it shows only basic
->> information for the device. And it works fine with the speaker.
->> I tried to use avtest: when I try to connect to the speaker,
->> everything seems to be working good. Is there any way to use it to
->> test incoming connections?
->>
->> Thanks,
->> Artem
->>
->> On Sun, Aug 10, 2014 at 12:32 AM, Luiz Augusto von Dentz
->> <luiz.dentz@gmail.com> wrote:
->>> Hi Artem,
->>>
->>> On Fri, Aug 8, 2014 at 10:32 AM, Artem Rakhov <arakhov@chromium.org> wrote:
->>>> Hi Marcel,
->>>>
->>>> Please find Packet Logger's btsnoop log in the attachment.
->>>>
->>>> So far I have 2 observations:
->>>> 1. Mac does not require any authorization (most likely it's not the cause)
->>>> 2. I found another BT speaker which works properly. At first, I'm
->>>> seeing the same behavior: speaker initiates connection, BlueZ sends
->>>> Configure Request (with no MTU), then speaker disconnects. But after
->>>> that the device tries to initiate connection for the second time, and
->>>> this time it is successful: after BlueZ sends Configure Request with
->>>> no MTU, speaker answers with another Configure Request (with some
->>>> MTU), and connection is established normally. Is it possible, that
->>>> BlueZ is doing something wrong, but then this new speaker tries
->>>> something else, while the old one does not?
->>>
->>> I could not find anything l2cap related in this logs, but I notice
->>> there a LE scanning ongoing perhaps you have should try disabling it
->>> with Disconnect method for now. Anyway A2DP code is not really
->>> involved with L2CAP connection setup so we would have to look at the
->>> kernel changes but I quick check doesn't show anything and you said
->>> you have tried with 3.10 so Im afraid this is only reproducible with
->>> some specific device.
->>>
->>> Btw, if you want to really isolate the problem you can try to connect
->>> using avinfo or l2test directly.
->>>
->>>
->>> --
->>> Luiz Augusto von Dentz
+> diff --git a/include/net/6lowpan.h b/include/net/6lowpan.h
+> index d7e9169..aa0381e 100644
+> --- a/include/net/6lowpan.h
+> +++ b/include/net/6lowpan.h
+> @@ -374,7 +374,7 @@ lowpan_uncompress_size(const struct sk_buff *skb, u16 *dgram_offset)
+>   
+>   typedef int (*skb_delivery_cb)(struct sk_buff *skb);
+>   
+> -int lowpan_process_data(struct sk_buff *skb, struct net_device *dev,
+> +int lowpan_process_data(struct sk_buff **skb_inout, struct net_device *dev,
+>   		const u8 *saddr, const u8 saddr_type, const u8 saddr_len,
+>   		const u8 *daddr, const u8 daddr_type, const u8 daddr_len,
+>   		u8 iphc0, u8 iphc1, skb_delivery_cb skb_deliver);
+> diff --git a/net/6lowpan/iphc.c b/net/6lowpan/iphc.c
+> index 92eed6d..18dac0a 100644
+> --- a/net/6lowpan/iphc.c
+> +++ b/net/6lowpan/iphc.c
+> @@ -179,11 +179,11 @@ static int skb_deliver(struct sk_buff *skb, struct ipv6hdr *hdr,
+>   
+>   	new = skb_copy_expand(skb, sizeof(struct ipv6hdr), skb_tailroom(skb),
+>   			      GFP_ATOMIC);
+> -	kfree_skb(skb);
+> -
+>   	if (!new)
+>   		return -ENOMEM;
+>   
+> +	kfree_skb(skb);
+> +
+>   	skb_push(new, sizeof(struct ipv6hdr));
+>   	skb_reset_network_header(new);
+>   	skb_copy_to_linear_data(new, hdr, sizeof(struct ipv6hdr));
+> @@ -196,6 +196,8 @@ static int skb_deliver(struct sk_buff *skb, struct ipv6hdr *hdr,
+>   		       new->data, new->len);
+>   
+>   	stat = deliver_skb(new);
+> +	if (stat < 0)
+> +		stat = NET_RX_DROP;
+>   
+>   	kfree_skb(new);
+>   
+> @@ -333,7 +335,7 @@ err:
+>   /* TTL uncompression values */
+>   static const u8 lowpan_ttl_values[] = { 0, 1, 64, 255 };
+>   
+> -int lowpan_process_data(struct sk_buff *skb, struct net_device *dev,
+> +int lowpan_process_data(struct sk_buff **skb_inout, struct net_device *dev,
+>   			const u8 *saddr, const u8 saddr_type, const u8 saddr_len,
+>   			const u8 *daddr, const u8 daddr_type, const u8 daddr_len,
+>   			u8 iphc0, u8 iphc1, skb_delivery_cb deliver_skb)
+> @@ -341,6 +343,8 @@ int lowpan_process_data(struct sk_buff *skb, struct net_device *dev,
+>   	struct ipv6hdr hdr = {};
+>   	u8 tmp, num_context = 0;
+>   	int err;
+> +	int err_ret = -EINVAL;
+> +	struct sk_buff *skb = *skb_inout;
+>   
+>   	raw_dump_table(__func__, "raw skb data dump uncompressed",
+>   		       skb->data, skb->len);
+> @@ -461,7 +465,6 @@ int lowpan_process_data(struct sk_buff *skb, struct net_device *dev,
+>   	/* UDP data uncompression */
+>   	if (iphc0 & LOWPAN_IPHC_NH_C) {
+>   		struct udphdr uh;
+> -		struct sk_buff *new;
+>   
+>   		if (uncompress_udp_header(skb, &uh))
+>   			goto drop;
+> @@ -469,14 +472,15 @@ int lowpan_process_data(struct sk_buff *skb, struct net_device *dev,
+>   		/* replace the compressed UDP head by the uncompressed UDP
+>   		 * header
+>   		 */
+> -		new = skb_copy_expand(skb, sizeof(struct udphdr),
+> +		skb = skb_copy_expand(skb, sizeof(struct udphdr),
+>   				      skb_tailroom(skb), GFP_ATOMIC);
+> -		kfree_skb(skb);
+> -
+> -		if (!new)
+> -			return -ENOMEM;
+> -
+> -		skb = new;
+> +		if (!skb) {
+> +			err_ret = -ENOMEM;
+> +			goto drop;
+> +		}
+> +		
+> +		kfree_skb(*skb_inout);
+> +		*skb_inout = skb;
+>   
+>   		skb_push(skb, sizeof(struct udphdr));
+>   		skb_reset_transport_header(skb);
+> @@ -503,8 +507,7 @@ int lowpan_process_data(struct sk_buff *skb, struct net_device *dev,
+>   	return skb_deliver(skb, &hdr, dev, deliver_skb);
+>   
+>   drop:
+> -	kfree_skb(skb);
+> -	return -EINVAL;
+> +	return err_ret;
+>   }
+>   EXPORT_SYMBOL_GPL(lowpan_process_data);
+>   
+> diff --git a/net/bluetooth/6lowpan.c b/net/bluetooth/6lowpan.c
+> index f5df93f..38a2987 100644
+> --- a/net/bluetooth/6lowpan.c
+> +++ b/net/bluetooth/6lowpan.c
+> @@ -215,7 +215,7 @@ static int give_skb_to_upper(struct sk_buff *skb)
+>   	return ret;
+>   }
+>   
+> -static int process_data(struct sk_buff *skb, struct net_device *netdev,
+> +static int process_data(struct sk_buff **skb_inout, struct net_device *netdev,
+>   			struct l2cap_chan *chan)
+>   {
+>   	const u8 *saddr, *daddr;
+> @@ -223,6 +223,7 @@ static int process_data(struct sk_buff *skb, struct net_device *netdev,
+>   	struct lowpan_dev *dev;
+>   	struct lowpan_peer *peer;
+>   	unsigned long flags;
+> +	struct sk_buff *skb = *skb_inout;
+>   
+>   	dev = lowpan_dev(netdev);
+>   
+> @@ -245,13 +246,12 @@ static int process_data(struct sk_buff *skb, struct net_device *netdev,
+>   	if (lowpan_fetch_skb_u8(skb, &iphc1))
+>   		goto drop;
+>   
+> -	return lowpan_process_data(skb, netdev,
+> +	return lowpan_process_data(skb_inout, netdev,
+>   				   saddr, IEEE802154_ADDR_LONG, EUI64_ADDR_LEN,
+>   				   daddr, IEEE802154_ADDR_LONG, EUI64_ADDR_LEN,
+>   				   iphc0, iphc1, give_skb_to_upper);
+>   
+>   drop:
+> -	kfree_skb(skb);
+>   	return -EINVAL;
+>   }
+>   
+> @@ -300,7 +300,11 @@ static int recv_pkt(struct sk_buff *skb, struct net_device *dev,
+>   			if (!local_skb)
+>   				goto drop;
+>   
+> -			ret = process_data(local_skb, dev, chan);
+> +			ret = process_data(&local_skb, dev, chan);
+> +			if (ret < 0) {
+> +				kfree_skb(local_skb);
+> +				goto drop;
+> +			}
+>   			if (ret != NET_RX_SUCCESS)
+>   				goto drop;
+>   
+> diff --git a/net/ieee802154/6lowpan_rtnl.c b/net/ieee802154/6lowpan_rtnl.c
+> index 3154775..3ae7646 100644
+> --- a/net/ieee802154/6lowpan_rtnl.c
+> +++ b/net/ieee802154/6lowpan_rtnl.c
+> @@ -166,11 +166,12 @@ static int lowpan_give_skb_to_devices(struct sk_buff *skb)
+>   	return stat;
+>   }
+>   
+> -static int process_data(struct sk_buff *skb, const struct ieee802154_hdr *hdr)
+> +static int process_data(struct sk_buff **skb_inout, const struct ieee802154_hdr *hdr)
+>   {
+>   	u8 iphc0, iphc1;
+>   	struct ieee802154_addr_sa sa, da;
+>   	void *sap, *dap;
+> +	struct sk_buff *skb = *skb_inout;
+>   
+>   	raw_dump_table(__func__, "raw skb data dump", skb->data, skb->len);
+>   	/* at least two bytes will be used for the encoding */
+> @@ -196,13 +197,12 @@ static int process_data(struct sk_buff *skb, const struct ieee802154_hdr *hdr)
+>   	else
+>   		dap = &da.hwaddr;
+>   
+> -	return lowpan_process_data(skb, skb->dev, sap, sa.addr_type,
+> +	return lowpan_process_data(skb_inout, skb->dev, sap, sa.addr_type,
+>   				   IEEE802154_ADDR_LEN, dap, da.addr_type,
+>   				   IEEE802154_ADDR_LEN, iphc0, iphc1,
+>   				   lowpan_give_skb_to_devices);
+>   
+>   drop:
+> -	kfree_skb(skb);
+>   	return -EINVAL;
+>   }
+>   
+> @@ -485,14 +485,14 @@ static int lowpan_rcv(struct sk_buff *skb, struct net_device *dev,
+>   	} else {
+>   		switch (skb->data[0] & 0xe0) {
+>   		case LOWPAN_DISPATCH_IPHC:	/* ipv6 datagram */
+> -			ret = process_data(skb, &hdr);
+> +			ret = process_data(&skb, &hdr);
+>   			if (ret == NET_RX_DROP)
+>   				goto drop;
+>   			break;
+>   		case LOWPAN_DISPATCH_FRAG1:	/* first fragment header */
+>   			ret = lowpan_frag_rcv(skb, LOWPAN_DISPATCH_FRAG1);
+>   			if (ret == 1) {
+> -				ret = process_data(skb, &hdr);
+> +				ret = process_data(&skb, &hdr);
+>   				if (ret == NET_RX_DROP)
+>   					goto drop;
+>   			}
+> @@ -500,7 +500,7 @@ static int lowpan_rcv(struct sk_buff *skb, struct net_device *dev,
+>   		case LOWPAN_DISPATCH_FRAGN:	/* next fragments headers */
+>   			ret = lowpan_frag_rcv(skb, LOWPAN_DISPATCH_FRAGN);
+>   			if (ret == 1) {
+> -				ret = process_data(skb, &hdr);
+> +				ret = process_data(&skb, &hdr);
+>   				if (ret == NET_RX_DROP)
+>   					goto drop;
+>   			}
