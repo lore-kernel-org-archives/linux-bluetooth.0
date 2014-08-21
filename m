@@ -1,152 +1,118 @@
 Return-Path: <cyrus@holtmann.org>
-From: Bharat Bhusan Panda <bharat.panda@samsung.com>
-To: 'Johan Hedberg' <johan.hedberg@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org, cpgs@samsung.com
-References: <1408342269-25170-1-git-send-email-bharat.panda@samsung.com>
- <20140818064848.GA7214@t440s.P-661HNU-F1>
-In-reply-to: <20140818064848.GA7214@t440s.P-661HNU-F1>
-Subject: RE: [PATCH ] GATT: Fixed PTS issues for multiple write request
-Date: Thu, 21 Aug 2014 18:08:28 +0530
-Message-id: <011c01cfbd3c$dab69540$9023bfc0$@samsung.com>
-MIME-version: 1.0
-Content-type: text/plain; charset=us-ascii
+MIME-Version: 1.0
+In-Reply-To: <1408615488-31534-2-git-send-email-jakub.tyszkowski@tieto.com>
+References: <1408615488-31534-1-git-send-email-jakub.tyszkowski@tieto.com>
+	<1408615488-31534-2-git-send-email-jakub.tyszkowski@tieto.com>
+Date: Thu, 21 Aug 2014 14:58:13 +0300
+Message-ID: <CABBYNZKw-ropQpjGuq0Ko7rTmXJBuTzHOi9Fu0R20EH3GJ58Ng@mail.gmail.com>
+Subject: Re: [PATCH 2/2] android/hid: Force encryption for keyboards
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+Hi Jakub,
 
-> On Mon, Aug 18, 2014, Bharat Panda wrote:
-> > Updates gatt attribute db using offset value. This fixes below PTS
-> > TCs.
-> >
-> > TP/GAW/SR/BV-06-C
-> > TP/GAW/SR/BV-10-C
-> > TP/GAW/SR/BI-14-C
-> > TP/GAW/SR/BI-15-C
-> > TP/GAW/SR/BV-05-C
-> > TP/GAW/SR/BI-07-C
-> > TP/GAW/SR/BI-08-C
-> > TP/GAW/SR/BI-34-C
-> > TP/GAW/SR/BI-25-C
-> > TP/GAW/SR/BI-26-C
-> > ---
-> >  plugins/gatt-example.c        |  2 +-
-> >  profiles/alert/server.c       | 16 ++++++-------
-> >  profiles/proximity/linkloss.c |  2 +-
-> >  profiles/time/server.c        |  6 ++---
-> >  src/attrib-server.c           | 53 +++++++++++++++++++++++++++++++++++-
-> -------
-> >  src/attrib-server.h           |  2 +-
-> >  6 files changed, 57 insertions(+), 24 deletions(-)
-> 
-> Your commit message should have a bit more content, i.e. give some more
-> background to the issue and justify & explain the way that you're solving
-it.
-> Also, the subject seems misleading to me as this is related to long writes
-and
-> not "multiple write".
-
-I have added descriptive content for the same patch in my following patch
-that I submitted.
+On Thu, Aug 21, 2014 at 1:04 PM, Jakub Tyszkowski
+<jakub.tyszkowski@tieto.com> wrote:
+> Encryption is mandatory for keyboards.
+> ---
+>  android/hidhost.c | 27 ++++++++++++++++++++++++---
+>  1 file changed, 24 insertions(+), 3 deletions(-)
 >
-> > -	case ATT_OP_READ_MULTI_REQ:
-> >  	case ATT_OP_PREP_WRITE_REQ:
-> > +		length = dec_prep_write_req(ipdu, len, &start, &offset,
-> value, &vlen);
-> > +		if (length == 0) {
-> > +			status = ATT_ECODE_INVALID_PDU;
-> > +			goto done;
-> > +		}
-> > +
-> > +		length = write_value(channel, start, value, vlen, opdu,
-> > +
-> 	channel->mtu, offset);
-> > +		break;
-> > +
-> >  	case ATT_OP_EXEC_WRITE_REQ:
-> > +		break;
-> > +	case ATT_OP_READ_MULTI_REQ:
-> >  	default:
-> >  		DBG("Unsupported request 0x%02x", ipdu[0]);
-> >  		status = ATT_ECODE_REQ_NOT_SUPP;
-> 
-> This doesn't look right. The changes should not be taking effect until
-execute
-> write has been issued. Here it seems the write_value() makes an
-irreversible
-> change to the database.
-Fixed this issue in the following patch.
-> 
-> > -	a->data = g_try_realloc(a->data, len);
-> > +	if (offset) {
-> > +		uint8_t *temp;
-> > +		temp = malloc(sizeof(uint8_t) * a->len);
-> > +		if (temp == NULL) {
-> > +			DBG("Unable to allocate memory");
-> > +			return -ENOMEM;
-> > +		}
-> > +		memcpy(temp, a->data, a->len);
-> > +		a->data = g_try_realloc(a->data, (a->len + (a->len - offset)
-+
-> > +len));
-> 
-> This calculation doesn't look right. Shouldn't the new size be simply
-offset +
-> len? Or if offset + len is less than the original length and the
-specification
-> requires to preserve the data after it (which I'm not sure it does) then
-you'd
-> need some extra condition here. You'd also not need realloc in this case
-since
-> the buffer wouldn't grow.
+> diff --git a/android/hidhost.c b/android/hidhost.c
+> index 07985d8..d57b24b 100644
+> --- a/android/hidhost.c
+> +++ b/android/hidhost.c
+> @@ -579,6 +579,7 @@ static void control_connect_cb(GIOChannel *chan, GError *conn_err,
+>  {
+>         struct hid_device *dev = user_data;
+>         GError *err = NULL;
+> +       int sec_level;
+>
+>         DBG("");
+>
+> @@ -589,12 +590,15 @@ static void control_connect_cb(GIOChannel *chan, GError *conn_err,
+>                 goto failed;
+>         }
+>
+> +       /* Encryption is mandatory for keyboards */
+> +       sec_level = (dev->subclass & 0x40) ? BT_IO_SEC_MEDIUM : BT_IO_SEC_LOW;
+> +
+>         /* Connect to the HID interrupt channel */
+>         dev->intr_io = bt_io_connect(interrupt_connect_cb, dev, NULL, &err,
+>                                         BT_IO_OPT_SOURCE_BDADDR, &adapter_addr,
+>                                         BT_IO_OPT_DEST_BDADDR, &dev->dst,
+>                                         BT_IO_OPT_PSM, L2CAP_PSM_HIDP_INTR,
+> -                                       BT_IO_OPT_SEC_LEVEL, BT_IO_SEC_LOW,
+> +                                       BT_IO_OPT_SEC_LEVEL, sec_level,
+>                                         BT_IO_OPT_INVALID);
+>         if (!dev->intr_io) {
+>                 error("hidhost: Failed to connect interrupt channel (%s)",
+> @@ -618,6 +622,7 @@ static void hid_sdp_search_cb(sdp_list_t *recs, int err, gpointer data)
+>         struct hid_device *dev = data;
+>         sdp_list_t *list;
+>         GError *gerr = NULL;
+> +       int sec_level = BT_IO_SEC_LOW;
+>
+>         DBG("");
+>
+> @@ -640,9 +645,14 @@ static void hid_sdp_search_cb(sdp_list_t *recs, int err, gpointer data)
+>                         dev->country = data->val.uint8;
+>
+>                 data = sdp_data_get(rec, SDP_ATTR_HID_DEVICE_SUBCLASS);
+> -               if (data)
+> +               if (data) {
+>                         dev->subclass = data->val.uint8;
+>
+> +                       /* Encryption is mandatory for keyboards */
+> +                       if (dev->subclass & 0x40)
+> +                               sec_level =  BT_IO_SEC_MEDIUM;
+> +               }
 
-Fixed and added proper length to cache the write data.
-> 
-> > +		memcpy(a->data, temp, a->len);
-> 
-> First of all the "try" versions of GLib allocation functions may return
-NULL so
-> you can't just copy to a->data without checking first. However, most of
-this
-> code is completely unnecessary: realloc maintains the the contents of the
-> memory so there's no need of a temporary buffer here.
-> 
-> > +		free(temp);
-> > +	}
-> > +	else {
-> > +		a->data = g_try_realloc(a->data, len);
-> > +	}
-> 
-> The coding style is:
-> 
-> 	if (...) {
-> 		...
-> 		...
-> 	} else {
-> 		...
-> 		...
-> 	}
-> 
-> > +	if (offset) {
-> > +		a->len = a->len + (a->len - offset) + len;
-> 
-> Shouldn't this be a->len = offset + len?
+I prefer to store this info in the device struct e..g dev->sec_level
 
-There were lots of case handling for calculating the proper length value,
-added in following patch.
-> 
-> > +		memcpy((a->data + offset), value, len);
-> > +	}
-> > +	else {
-> > +		a->len = len;
-> > +		memcpy(a->data, value, len);
-> > +	}
-> 
-> Same thing as earlier with the if-else coding style.
-> 
-A new patch has been submitted, with above review comments incorporated,
-also added multiple write request support as well as long write fix.
+>                 data = sdp_data_get(rec, SDP_ATTR_HID_BOOT_DEVICE);
+>                 if (data)
+>                         dev->boot_dev = data->val.uint8;
+> @@ -673,6 +683,17 @@ static void hid_sdp_search_cb(sdp_list_t *recs, int err, gpointer data)
+>         }
+>
+>         if (dev->ctrl_io) {
+> +               /* Encryption is mandatory for keyboards */
+> +               if ((dev->subclass & 0x40) && !bt_io_set(dev->ctrl_io, &gerr,
+> +                                       BT_IO_OPT_SEC_LEVEL, BT_IO_SEC_MEDIUM,
+> +                                       BT_IO_OPT_INVALID)) {
+> +                       error("hidhost: Cannot rise security level: %s",
+> +                                                               gerr->message);
+> +                       g_error_free(gerr);
+> +
+> +                       goto fail;
+> +               }
+> +
+>                 if (uhid_create(dev) < 0)
+>                         goto fail;
+>                 return;
+> @@ -682,7 +703,7 @@ static void hid_sdp_search_cb(sdp_list_t *recs, int err, gpointer data)
+>                                         BT_IO_OPT_SOURCE_BDADDR, &adapter_addr,
+>                                         BT_IO_OPT_DEST_BDADDR, &dev->dst,
+>                                         BT_IO_OPT_PSM, L2CAP_PSM_HIDP_CTRL,
+> -                                       BT_IO_OPT_SEC_LEVEL, BT_IO_SEC_LOW,
+> +                                       BT_IO_OPT_SEC_LEVEL, sec_level,
+>                                         BT_IO_OPT_INVALID);
+>         if (gerr) {
+>                 error("hidhost: Failed to connect control channel (%s)",
+> --
+> 1.9.1
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
-Regards,
-Bharat
 
+
+-- 
+Luiz Augusto von Dentz
