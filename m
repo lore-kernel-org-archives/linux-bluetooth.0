@@ -2,99 +2,41 @@ Return-Path: <cyrus@holtmann.org>
 From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
-Subject: [PATCH 2/2] android/hid: Force encryption for keyboards
-Date: Thu, 21 Aug 2014 12:04:48 +0200
-Message-Id: <1408615488-31534-2-git-send-email-jakub.tyszkowski@tieto.com>
-In-Reply-To: <1408615488-31534-1-git-send-email-jakub.tyszkowski@tieto.com>
-References: <1408615488-31534-1-git-send-email-jakub.tyszkowski@tieto.com>
+Subject: [PATCH 1/2] android/hid: Reject connections from unknown devices
+Date: Thu, 21 Aug 2014 12:04:47 +0200
+Message-Id: <1408615488-31534-1-git-send-email-jakub.tyszkowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Encryption is mandatory for keyboards.
 ---
- android/hidhost.c | 27 ++++++++++++++++++++++++---
- 1 file changed, 24 insertions(+), 3 deletions(-)
+ android/hidhost.c | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
 
 diff --git a/android/hidhost.c b/android/hidhost.c
-index 07985d8..d57b24b 100644
+index da5f818..07985d8 100644
 --- a/android/hidhost.c
 +++ b/android/hidhost.c
-@@ -579,6 +579,7 @@ static void control_connect_cb(GIOChannel *chan, GError *conn_err,
- {
- 	struct hid_device *dev = user_data;
- 	GError *err = NULL;
-+	int sec_level;
+@@ -1410,6 +1410,20 @@ static void connect_cb(GIOChannel *chan, GError *err, gpointer user_data)
+ 	ba2str(&dst, address);
+ 	DBG("Incoming connection from %s on PSM %d", address, psm);
  
- 	DBG("");
- 
-@@ -589,12 +590,15 @@ static void control_connect_cb(GIOChannel *chan, GError *conn_err,
- 		goto failed;
- 	}
- 
-+	/* Encryption is mandatory for keyboards */
-+	sec_level = (dev->subclass & 0x40) ? BT_IO_SEC_MEDIUM : BT_IO_SEC_LOW;
++	if (!bt_device_is_bonded(&dst)) {
++		uint8_t hdr = (HID_MSG_CONTROL | HID_VIRTUAL_CABLE_UNPLUG);
++		int sk = g_io_channel_unix_get_fd(chan);
 +
- 	/* Connect to the HID interrupt channel */
- 	dev->intr_io = bt_io_connect(interrupt_connect_cb, dev, NULL, &err,
- 					BT_IO_OPT_SOURCE_BDADDR, &adapter_addr,
- 					BT_IO_OPT_DEST_BDADDR, &dev->dst,
- 					BT_IO_OPT_PSM, L2CAP_PSM_HIDP_INTR,
--					BT_IO_OPT_SEC_LEVEL, BT_IO_SEC_LOW,
-+					BT_IO_OPT_SEC_LEVEL, sec_level,
- 					BT_IO_OPT_INVALID);
- 	if (!dev->intr_io) {
- 		error("hidhost: Failed to connect interrupt channel (%s)",
-@@ -618,6 +622,7 @@ static void hid_sdp_search_cb(sdp_list_t *recs, int err, gpointer data)
- 	struct hid_device *dev = data;
- 	sdp_list_t *list;
- 	GError *gerr = NULL;
-+	int sec_level = BT_IO_SEC_LOW;
- 
- 	DBG("");
- 
-@@ -640,9 +645,14 @@ static void hid_sdp_search_cb(sdp_list_t *recs, int err, gpointer data)
- 			dev->country = data->val.uint8;
- 
- 		data = sdp_data_get(rec, SDP_ATTR_HID_DEVICE_SUBCLASS);
--		if (data)
-+		if (data) {
- 			dev->subclass = data->val.uint8;
- 
-+			/* Encryption is mandatory for keyboards */
-+			if (dev->subclass & 0x40)
-+				sec_level =  BT_IO_SEC_MEDIUM;
-+		}
++		warn("hidhost: Rejected connection from unknown device %s",
++								address);
 +
- 		data = sdp_data_get(rec, SDP_ATTR_HID_BOOT_DEVICE);
- 		if (data)
- 			dev->boot_dev = data->val.uint8;
-@@ -673,6 +683,17 @@ static void hid_sdp_search_cb(sdp_list_t *recs, int err, gpointer data)
- 	}
- 
- 	if (dev->ctrl_io) {
-+		/* Encryption is mandatory for keyboards */
-+		if ((dev->subclass & 0x40) && !bt_io_set(dev->ctrl_io, &gerr,
-+					BT_IO_OPT_SEC_LEVEL, BT_IO_SEC_MEDIUM,
-+					BT_IO_OPT_INVALID)) {
-+			error("hidhost: Cannot rise security level: %s",
-+								gerr->message);
-+			g_error_free(gerr);
++		if (write(sk, &hdr, sizeof(hdr)) < 0)
++			error("hidhost: Unable to send virtual cable unplug");
 +
-+			goto fail;
-+		}
++		g_io_channel_shutdown(chan, TRUE, NULL);
++		return;
++	}
 +
- 		if (uhid_create(dev) < 0)
- 			goto fail;
- 		return;
-@@ -682,7 +703,7 @@ static void hid_sdp_search_cb(sdp_list_t *recs, int err, gpointer data)
- 					BT_IO_OPT_SOURCE_BDADDR, &adapter_addr,
- 					BT_IO_OPT_DEST_BDADDR, &dev->dst,
- 					BT_IO_OPT_PSM, L2CAP_PSM_HIDP_CTRL,
--					BT_IO_OPT_SEC_LEVEL, BT_IO_SEC_LOW,
-+					BT_IO_OPT_SEC_LEVEL, sec_level,
- 					BT_IO_OPT_INVALID);
- 	if (gerr) {
- 		error("hidhost: Failed to connect control channel (%s)",
+ 	switch (psm) {
+ 	case L2CAP_PSM_HIDP_CTRL:
+ 		l = g_slist_find_custom(devices, &dst, device_cmp);
 -- 
 1.9.1
 
