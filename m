@@ -1,118 +1,100 @@
 Return-Path: <cyrus@holtmann.org>
-From: Vikrampal Yadav <vikram.pal@samsung.com>
+From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: luiz.dentz@gmail.com, d.kasatkin@samsung.com,
-	vikram.pal@samsung.com, cpgs@samsung.com
-Subject: [PATCH v2 1/6] monitor: Add AVRCP ListPlayerApplicationSettingValues
- support
-Date: Thu, 21 Aug 2014 16:00:20 +0530
-Message-id: <1408617025-6841-1-git-send-email-vikram.pal@samsung.com>
+Cc: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
+Subject: [PATCH 2/2] android/hid: Force encryption for keyboards
+Date: Thu, 21 Aug 2014 12:04:48 +0200
+Message-Id: <1408615488-31534-2-git-send-email-jakub.tyszkowski@tieto.com>
+In-Reply-To: <1408615488-31534-1-git-send-email-jakub.tyszkowski@tieto.com>
+References: <1408615488-31534-1-git-send-email-jakub.tyszkowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Support for decoding AVRCP ListPlayerApplicationSettingValues
-added in Bluetooth monitor.
+Encryption is mandatory for keyboards.
 ---
- monitor/avctp.c | 79 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 79 insertions(+)
+ android/hidhost.c | 27 ++++++++++++++++++++++++---
+ 1 file changed, 24 insertions(+), 3 deletions(-)
 
-diff --git a/monitor/avctp.c b/monitor/avctp.c
-index ec2adcd..35eca02 100644
---- a/monitor/avctp.c
-+++ b/monitor/avctp.c
-@@ -429,6 +429,60 @@ static const char *attr2str(uint8_t attr)
+diff --git a/android/hidhost.c b/android/hidhost.c
+index 07985d8..d57b24b 100644
+--- a/android/hidhost.c
++++ b/android/hidhost.c
+@@ -579,6 +579,7 @@ static void control_connect_cb(GIOChannel *chan, GError *conn_err,
+ {
+ 	struct hid_device *dev = user_data;
+ 	GError *err = NULL;
++	int sec_level;
+ 
+ 	DBG("");
+ 
+@@ -589,12 +590,15 @@ static void control_connect_cb(GIOChannel *chan, GError *conn_err,
+ 		goto failed;
  	}
- }
  
-+static const char *value2str(uint8_t attr, uint8_t value)
-+{
-+	switch (attr) {
-+	case AVRCP_ATTRIBUTE_ILEGAL:
-+		return "Illegal";
-+	case AVRCP_ATTRIBUTE_EQUALIZER:
-+		switch (value) {
-+		case 0x01:
-+			return "OFF";
-+		case 0x02:
-+			return "ON";
-+		default:
-+			return "Reserved";
-+		}
-+	case AVRCP_ATTRIBUTE_REPEAT_MODE:
-+		switch (value) {
-+		case 0x01:
-+			return "OFF";
-+		case 0x02:
-+			return "Single Track Repeat";
-+		case 0x03:
-+			return "All Track Repeat";
-+		case 0x04:
-+			return "Group Repeat";
-+		default:
-+			return "Reserved";
-+		}
-+	case AVRCP_ATTRIBUTE_SHUFFLE:
-+		switch (value) {
-+		case 0x01:
-+			return "OFF";
-+		case 0x02:
-+			return "All Track Suffle";
-+		case 0x03:
-+			return "Group Suffle";
-+		default:
-+			return "Reserved";
-+		}
-+	case AVRCP_ATTRIBUTE_SCAN:
-+		switch (value) {
-+		case 0x01:
-+			return "OFF";
-+		case 0x02:
-+			return "All Track Scan";
-+		case 0x03:
-+			return "Group Scan";
-+		default:
-+			return "Reserved";
-+		}
-+	default:
-+		return "Unknown";
-+	}
-+}
++	/* Encryption is mandatory for keyboards */
++	sec_level = (dev->subclass & 0x40) ? BT_IO_SEC_MEDIUM : BT_IO_SEC_LOW;
 +
- static void avrcp_passthrough_packet(const struct l2cap_frame *frame)
- {
- }
-@@ -504,6 +558,31 @@ static void avrcp_list_player_values(const struct l2cap_frame *frame,
- 					uint8_t ctype, uint8_t len,
- 					uint8_t indent)
- {
-+	static uint8_t attr = 0;
-+	uint8_t num, i;
-+
-+	if (len < 1) {
-+		print_text(COLOR_ERROR, "PDU malformed");
-+		packet_hexdump(frame->data, frame->size);
-+		return;
-+	}
-+
-+	if (ctype > AVC_CTYPE_GENERAL_INQUIRY) {
-+		num = *((uint8_t *) frame->data);
-+		print_field("%*cValueCount: 0x%02x", (indent - 8), ' ', num);
-+
-+		for (i = 0; num > 0; num--, i++) {
-+			uint8_t value;
-+
-+			value = *((uint8_t *) (frame->data + 1 + i));
-+			print_field("%*cValueID: 0x%02x (%s)", (indent - 8),
-+					' ', value, value2str(attr, value));
-+		}
-+	} else {
-+		attr = *((uint8_t *) frame->data);
-+		print_field("%*cAttributeID: 0x%02x (%s)", (indent - 8), ' ',
-+							attr, attr2str(attr));
-+	}
- }
+ 	/* Connect to the HID interrupt channel */
+ 	dev->intr_io = bt_io_connect(interrupt_connect_cb, dev, NULL, &err,
+ 					BT_IO_OPT_SOURCE_BDADDR, &adapter_addr,
+ 					BT_IO_OPT_DEST_BDADDR, &dev->dst,
+ 					BT_IO_OPT_PSM, L2CAP_PSM_HIDP_INTR,
+-					BT_IO_OPT_SEC_LEVEL, BT_IO_SEC_LOW,
++					BT_IO_OPT_SEC_LEVEL, sec_level,
+ 					BT_IO_OPT_INVALID);
+ 	if (!dev->intr_io) {
+ 		error("hidhost: Failed to connect interrupt channel (%s)",
+@@ -618,6 +622,7 @@ static void hid_sdp_search_cb(sdp_list_t *recs, int err, gpointer data)
+ 	struct hid_device *dev = data;
+ 	sdp_list_t *list;
+ 	GError *gerr = NULL;
++	int sec_level = BT_IO_SEC_LOW;
  
- static void avrcp_get_current_player_value(const struct l2cap_frame *frame,
+ 	DBG("");
+ 
+@@ -640,9 +645,14 @@ static void hid_sdp_search_cb(sdp_list_t *recs, int err, gpointer data)
+ 			dev->country = data->val.uint8;
+ 
+ 		data = sdp_data_get(rec, SDP_ATTR_HID_DEVICE_SUBCLASS);
+-		if (data)
++		if (data) {
+ 			dev->subclass = data->val.uint8;
+ 
++			/* Encryption is mandatory for keyboards */
++			if (dev->subclass & 0x40)
++				sec_level =  BT_IO_SEC_MEDIUM;
++		}
++
+ 		data = sdp_data_get(rec, SDP_ATTR_HID_BOOT_DEVICE);
+ 		if (data)
+ 			dev->boot_dev = data->val.uint8;
+@@ -673,6 +683,17 @@ static void hid_sdp_search_cb(sdp_list_t *recs, int err, gpointer data)
+ 	}
+ 
+ 	if (dev->ctrl_io) {
++		/* Encryption is mandatory for keyboards */
++		if ((dev->subclass & 0x40) && !bt_io_set(dev->ctrl_io, &gerr,
++					BT_IO_OPT_SEC_LEVEL, BT_IO_SEC_MEDIUM,
++					BT_IO_OPT_INVALID)) {
++			error("hidhost: Cannot rise security level: %s",
++								gerr->message);
++			g_error_free(gerr);
++
++			goto fail;
++		}
++
+ 		if (uhid_create(dev) < 0)
+ 			goto fail;
+ 		return;
+@@ -682,7 +703,7 @@ static void hid_sdp_search_cb(sdp_list_t *recs, int err, gpointer data)
+ 					BT_IO_OPT_SOURCE_BDADDR, &adapter_addr,
+ 					BT_IO_OPT_DEST_BDADDR, &dev->dst,
+ 					BT_IO_OPT_PSM, L2CAP_PSM_HIDP_CTRL,
+-					BT_IO_OPT_SEC_LEVEL, BT_IO_SEC_LOW,
++					BT_IO_OPT_SEC_LEVEL, sec_level,
+ 					BT_IO_OPT_INVALID);
+ 	if (gerr) {
+ 		error("hidhost: Failed to connect control channel (%s)",
 -- 
 1.9.1
 
