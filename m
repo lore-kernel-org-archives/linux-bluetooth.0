@@ -1,42 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
-From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
-Subject: [PATCH 1/2] android/hid: Reject connections from unknown devices
-Date: Thu, 21 Aug 2014 12:04:47 +0200
-Message-Id: <1408615488-31534-1-git-send-email-jakub.tyszkowski@tieto.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Thu, 21 Aug 2014 10:39:47 +0200
+From: Alexander Aring <alex.aring@gmail.com>
+To: Martin Townsend <martin.townsend@xsilon.com>
+Cc: linux-zigbee-devel@lists.sourceforge.net,
+	linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org,
+	Marcel Holtmann <marcel@holtmann.org>
+Subject: Re: [PATCH v2 bluetooth-next] Simplify lowpan receive path so skb is
+ freed in lowpan_rcv when dropped.
+Message-ID: <20140821083945.GA29484@omega>
+References: <53DCE75C.2030305@xsilon.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+In-Reply-To: <53DCE75C.2030305@xsilon.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- android/hidhost.c | 14 ++++++++++++++
- 1 file changed, 14 insertions(+)
+Hi Martin,
 
-diff --git a/android/hidhost.c b/android/hidhost.c
-index da5f818..07985d8 100644
---- a/android/hidhost.c
-+++ b/android/hidhost.c
-@@ -1410,6 +1410,20 @@ static void connect_cb(GIOChannel *chan, GError *err, gpointer user_data)
- 	ba2str(&dst, address);
- 	DBG("Incoming connection from %s on PSM %d", address, psm);
- 
-+	if (!bt_device_is_bonded(&dst)) {
-+		uint8_t hdr = (HID_MSG_CONTROL | HID_VIRTUAL_CABLE_UNPLUG);
-+		int sk = g_io_channel_unix_get_fd(chan);
-+
-+		warn("hidhost: Rejected connection from unknown device %s",
-+								address);
-+
-+		if (write(sk, &hdr, sizeof(hdr)) < 0)
-+			error("hidhost: Unable to send virtual cable unplug");
-+
-+		g_io_channel_shutdown(chan, TRUE, NULL);
-+		return;
-+	}
-+
- 	switch (psm) {
- 	case L2CAP_PSM_HIDP_CTRL:
- 		l = g_slist_find_custom(devices, &dst, device_cmp);
--- 
-1.9.1
+this patch wasn't able to apply and now it doesn't apply either (because
+lot of other changes). I thought you will resend a v3 and then I will
+care about reviewing. Then putting Acked-by, then Marcel will put it on
+the right repositories.
 
+If you can, describe the changes in the commit msg (please note the 80
+line width there).
+
+This patch is also something for bluetooth (not bluetooth-next), it's a
+bug fix. But this depends how Marcel will dealing with this issue. It's
+a bugfix with a huge change of lines. I would base it on bluetooth,
+because it's a bug fix.
+
+- Alex
