@@ -1,37 +1,86 @@
 Return-Path: <cyrus@holtmann.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.6\))
-Subject: Re: [A2DP] Incoming connections do not succeed
+Subject: Re: [PATCH BlueZ 03/11] shared/gatt-client: Added initial skeleton and simple functions.
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <CAD81oNb2p5ux2U2vKvSQb8Z2o+gjbZwEh0H4jb4VdEueBDez0A@mail.gmail.com>
-Date: Thu, 21 Aug 2014 15:24:27 -0500
-Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	"Gustavo F. Padovan" <gustavo@padovan.org>
-Message-Id: <3775CFA8-F840-440C-AC0E-FC639F542AA6@holtmann.org>
-References: <CAD81oNZL0qATu_z_TJT8psaMhpmV34w6xmA2+=OKerSE1NSvOw@mail.gmail.com> <CABBYNZ+zRKzv4yTc8M2Fi0eN6gC921b9zaey5FKGVq_bJJueBg@mail.gmail.com> <CAD81oNbjd3-Y_7C=75TfBP0oXjA3eFWbezsD8nROUrseUJZNhg@mail.gmail.com> <CAD81oNZkRk-KFcE1bkj8TWiqe7dyVjHJADicT-f5KEkKtcnbyA@mail.gmail.com> <574DE1E1-7A53-4629-88FC-7164EC1880AA@holtmann.org> <CAD81oNY41-8DhJCOetLa_TCrPLBeiJFHQJ7TxawydwQ5S_Lmwg@mail.gmail.com> <CABBYNZLEDBFa-wV5L5Pfi-PzA877PxSrktsVLpzCRuQ4nu1eKQ@mail.gmail.com> <CAD81oNZYeobbhMawvhrjTFSTY-aqEXYh9x3aTSOoH8u1Y6nHDQ@mail.gmail.com> <CAD81oNYbM2tpSbhdfih1ir2BnszwvOkGBKbOiKG70Gcp6qHVRA@mail.gmail.com> <CAD81oNYAkFvHhFnvjSPjp+Wwnz8haJZjmE3MCuJmtom1FWfL1w@mail.gmail.com> <CABBYNZKQy9Q37Fe-E+Qf90c-waeWB+yk-Mnk+VAwqN7cTTfDQA@mail.gmail.com> <2EF4B6C6-2375-45B7-B1AF-D30C4799AC93@holtmann.org> <CABBYNZK=t=otqjW1B64MwWO8cc9aLs+RovVp=5KFEBbB3zysow@mail.gmail.com> <2854D296-3CCA-4628-90B5-76D03EF2660D@holtmann.org> <CAD81oNb2p5ux2U2vKvSQb8Z2o+gjbZwEh0H4jb4VdEueBDez0A@mail.gmail
- .com>
-To: Artem Rakhov <arakhov@chromium.org>
+In-Reply-To: <CAHrH25QxTU7i+hq0Sd6htboQkA5Y8WGtkT7w7HSHCdmvOJYwtQ@mail.gmail.com>
+Date: Thu, 21 Aug 2014 15:22:58 -0500
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Message-Id: <BF6538CE-3F1E-4F73-8E9C-6BE256482E55@holtmann.org>
+References: <1408565737-8187-1-git-send-email-armansito@chromium.org> <1408565737-8187-4-git-send-email-armansito@chromium.org> <41D7DE0B-C63B-4AD5-9C53-B323E787219A@holtmann.org> <CAHrH25QxTU7i+hq0Sd6htboQkA5Y8WGtkT7w7HSHCdmvOJYwtQ@mail.gmail.com>
+To: Arman Uguray <armansito@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Artem,
+Hi Arman,
 
-please do not top post on this mailing list. It does break the reading thread.
-
-> Here is hcitool info:
+>> great idea with the TODO. However please just use top-level TODO and patches modifying the TODO should be all by itself.
+>> 
 > 
-> BD Address:  10:B7:F6:01:31:ED
-> Device Name: Monster Clarity
-> LMP Version: 2.1 (0x4) LMP Subversion: 0x189c
-> Manufacturer: Cambridge Silicon Radio (10)
-> Features page 0: 0x01 0x00 0x00 0x00 0x00 0x00 0x00 0x00
-> <3-slot packets>
-> Features page 1: 0xff 0xff 0x8f 0xfe 0x9b 0xff 0x59 0x83
-> 
-> Label also says Precision Micro Bluetooth Speaker 100.
+> The top-level TODO has an ATT/GATT section though I don't know how
+> up-to-date that is. For now, I can create a separate shared/gatt
+> section for the work that I'm doing.
 
-normally all CSR based solutions should just work. Maybe this is just a bad firmware. Are you sure that Connection Pending is really causing the observed problem. It sounds strange to hit that on a CSR based speaker.
+create a new section if you find it clearer. Otherwise stick it into the existing section.
+
+>>> +struct bt_att *bt_gatt_client_get_att(struct bt_gatt_client *client);
+>> 
+>> I really hope that we do not need this. Lets try really hard to avoid it.
+>> 
+> 
+> I'll go ahead and remove this.
+> 
+> 
+>>> +bool bt_gatt_client_init(struct bt_gatt_client *client, uint16_t mtu,
+>>> +                                     bt_gatt_client_callback_t callback,
+>>> +                                     void *user_data,
+>>> +                                     bt_gatt_client_destroy_func_t destroy);
+>> 
+>> Do not bother with it like this. Let do it like this:
+>> 
+>>        client = bt_gatt_client_new(att);
+>> 
+>>        bt_gatt_client_set_mtu(client, mtu);
+>>        bt_gatt_client_set_ready_handler(client, callback, my_data, my_destroy);
+>> 
+>> Since we are not multi-threaded this will be safe and a lot cleaner to read.
+>> 
+> 
+> We can have a single ready handler but I kind of like a general
+> initialize function that first does the MTU exchange and then
+> discovers all the attributes (this is what bt_gatt_client_init does
+> though it's not really clear from the name that it also performs
+> discovery, so I can change that).
+
+I do not like the fact of _new() an object and have to call _init() to use. Actually calling _new() should trigger all needed transaction. We might want to just do this:
+
+	client = bt_gatt_client_new(att, mtu);
+
+And it will start the service discovery right away. As I said, it is fine to start the service discovery and set the ready handler later. Since we are main loop and single threaded this is totally fine.
+
+>>> +
+>>> +unsigned int bt_gatt_client_register_service_changed(
+>>> +                             struct bt_gatt_client *client,
+>>> +                             uint16_t handle,
+>>> +                             bt_gatt_client_service_changed_func_t callback,
+>>> +                             void *user_data,
+>>> +                             bt_gatt_client_destroy_func_t destroy);
+>>> +bool bt_gatt_client_unregister_service_changed(struct bt_gatt_client *client,
+>>> +                                                     unsigned int id);
+>> 
+>> Are we expecting more than one here. If not, then better use bt_gatt_client_set_changed_handler.
+>> 
+> 
+> My idea here was that each profile/plugin can register its own handler
+> for the handles that they are interested in and get notified of a
+> changed service. We could also have a single service changed handler
+> here and the daemon code can then use that to go and probe each
+> plugin/profile based on that.
+
+I am not sure about this. The services changed should be handled centrally in the client itself. It might be better than allow to register a changed notifier on the bt_gatt_service that we get.
+
+Lets not bring handles into the game right here. It might be better to push this detail to later when the code is more complete.
 
 Regards
 
