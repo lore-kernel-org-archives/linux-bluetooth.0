@@ -1,270 +1,117 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <CABBYNZKkMiOErfLsApUYprYaBO4TywDAvpFS7XTe9cDcMnUASQ@mail.gmail.com>
-References: <1408565737-8187-1-git-send-email-armansito@chromium.org>
-	<1408565737-8187-4-git-send-email-armansito@chromium.org>
-	<CABBYNZKkMiOErfLsApUYprYaBO4TywDAvpFS7XTe9cDcMnUASQ@mail.gmail.com>
-Date: Thu, 21 Aug 2014 09:42:42 -0700
-Message-ID: <CAHrH25TBKpkoJ3EGwEOYK6YDoxeTpoDz=3Q86Ft=jA64ptS0dw@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 03/11] shared/gatt-client: Added initial skeleton
- and simple functions.
-From: Arman Uguray <armansito@chromium.org>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.6\))
+Subject: Re: [A2DP] Incoming connections do not succeed
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <CABBYNZK=t=otqjW1B64MwWO8cc9aLs+RovVp=5KFEBbB3zysow@mail.gmail.com>
+Date: Thu, 21 Aug 2014 09:28:33 -0500
+Cc: Artem Rakhov <arakhov@chromium.org>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	"Gustavo F. Padovan" <gustavo@padovan.org>
+Message-Id: <2854D296-3CCA-4628-90B5-76D03EF2660D@holtmann.org>
+References: <CAD81oNZL0qATu_z_TJT8psaMhpmV34w6xmA2+=OKerSE1NSvOw@mail.gmail.com> <CABBYNZ+zRKzv4yTc8M2Fi0eN6gC921b9zaey5FKGVq_bJJueBg@mail.gmail.com> <CAD81oNbjd3-Y_7C=75TfBP0oXjA3eFWbezsD8nROUrseUJZNhg@mail.gmail.com> <CAD81oNZkRk-KFcE1bkj8TWiqe7dyVjHJADicT-f5KEkKtcnbyA@mail.gmail.com> <574DE1E1-7A53-4629-88FC-7164EC1880AA@holtmann.org> <CAD81oNY41-8DhJCOetLa_TCrPLBeiJFHQJ7TxawydwQ5S_Lmwg@mail.gmail.com> <CABBYNZLEDBFa-wV5L5Pfi-PzA877PxSrktsVLpzCRuQ4nu1eKQ@mail.gmail.com> <CAD81oNZYeobbhMawvhrjTFSTY-aqEXYh9x3aTSOoH8u1Y6nHDQ@mail.gmail.com> <CAD81oNYbM2tpSbhdfih1ir2BnszwvOkGBKbOiKG70Gcp6qHVRA@mail.gmail.com> <CAD81oNYAkFvHhFnvjSPjp+Wwnz8haJZjmE3MCuJmtom1FWfL1w@mail.gmail.com> <CABBYNZKQy9Q37Fe-E+Qf90c-waeWB+yk-Mnk+VAwqN7cTTfDQA@mail.gmail.com> <2EF4B6C6-2375-45B7-B1AF-D30C4799AC93@holtmann.org> <CABBYNZK=t=otqjW1B64MwWO8cc9aLs+RovVp=5KFEBbB3zysow@mail.gmail.com>
 To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-HI Luiz,
+Hi Luiz,
 
-I'm fine with merging some of the gatt-helpers with gatt-client later;
-so that gatt-helpers would only be used internally for discovery and
-all the read/write functions can accept a bt_gatt_client instead of a
-bt_att directly. And, the bt_gatt_client_get_att function could go
-away.
+>>>> Looks like I found the problem.
+>>>> 
+>>>> Creation of all sockets and all the read/write operations are handled
+>>>> in btio.c in BlueZ. It allows to set various options for sockets. One
+>>>> of these options is called 'defer' (BT_IO_OPT_DEFER_TIMEOUT). By
+>>>> default it is equal to 30. In fact, no profile in BlueZ use this
+>>>> option, and it is never equal to anything else. And create_io()
+>>>> function in btio.c also does not use this. The only place 'defer'
+>>>> option is passed to a kernel level is bt_io_listen() function:
+>>>> 
+>>>> if (confirm)
+>>>>   setsockopt(sock, SOL_BLUETOOTH, BT_DEFER_SETUP, &opts.defer,
+>>>> sizeof(opts.defer));
+>>> 
+>>> Yep the use of this API is wrong, we either set or reset the flag but
+>>> there is no timeout involved, but this alone would not cause the
+>>> problem since the kernel ignore the actual value and just set the flag
+>>> properly:
+>>> 
+>>> if (opt) {
+>>>   set_bit(BT_SK_DEFER_SETUP, &bt_sk(sk)->flags);
+>>>   set_bit(FLAG_DEFER_SETUP, &chan->flags);
+>>> }
+>>> 
+>>>> As far as I understand, BT_DEFER_SETUP is a kernel option which
+>>>> enables Defer Setup feature for L2CAP channel. It is a binary flag,
+>>>> and looks like it has nothing to do with timeout. And it makes no
+>>>> sense to pass 30 as a value for binary flag.
+>>>> 
+>>>> So I don't see any connection between these two things. As a result,
+>>>> we almost always turn on Defer Setup feature, which causes connection
+>>>> problems with my speaker and potentially with other BT devices. My
+>>>> suggestion is to completely remove 'defer' option from btio.c
+>>>> 
+>>>> Another question is: when and where do we actually need to enable this
+>>>> Defer Setup feature?
+>>> 
+>>> Defer Setup is quite fundamental to be able to authorize connection
+>>> properly otherwise we would have to accept the connection upfront to
+>>> be able to identify who is connecting, L2CAP has the authorization
+>>> pending as response for this very reason and apparently your headset
+>>> cannot handle it properly:
+>>> 
+>>> < ACL Data TX: Handle 21 flags 0x00 dlen 16
+>>>                                                            [hci0]
+>>> 22.030160
+>>>     L2CAP: Connection Response (0x03) ident 2 len 8
+>>>       Destination CID: 64
+>>>       Source CID: 65
+>>>       Result: Connection pending (0x0001)
+>>>       Status: Authorization pending (0x0002)
+>>> 
+>>> 
+>>> But note that bluetoothd accepts the connection almost immediately in
+>>> the next frame (probably because the device is trusted):
+>>> 
+>>> < ACL Data TX: Handle 21 flags 0x00 dlen 16
+>>>                                                            [hci0]
+>>> 22.030595
+>>>     L2CAP: Connection Response (0x03) ident 2 len 8
+>>>       Destination CID: 64
+>>>       Source CID: 65
+>>>       Result: Connection successful (0x0000)
+>>>       Status: No further information available (0x0000)
+>>> 
+>>> This is part of the core specification, unfortunately it doesn't seems
+>>> that any test of the testing specification do actually test it, so
+>>> chances are that the headset could qualify just because PTS never send
+>>> authorization/connection pending status.
+>> 
+>> it is basic L2CAP behavior since Bluetooth 1.0b specification. It always worked like this. And many many devices are using it exactly like this. It gets ever funnier when the Bluetooth stack puts the Connection Pending and Connection Successful into the same ACL frame.
+> 
+> I suspected it is a very basic since iirc we introduce Defer Setup
+> long time ago and never run into this specific problem. Now if that
+> actually gets in the same ACL frame this could cause a stack to ignore
+> the subsequent response which perhaps is the problem here.
 
-I'm building this one step at a time and wanted to get the general
-GATT procedures out of the way first; hence I sent out gatt-helpers
-before gatt-client.
+I don't think so since there is a test case for this. Question is just if the remote device can really handle the Connection Pending correctly.
 
-Let me know if that makes sense.
+>> Is the conclusion that the headset can not handle L2CAP Connection Pending status? Just for my entertainment, can you run hcitool info against that headset and see what manufacturer it is. I am really curious on who got this wrong. Which model is this exactly?
+> 
+> No idea, perhaps Artem is willing to disclose the model, from the logs
+> it seems it hangs if authorization pending is sent and then at some
+> point it probably timeout and disconnects.
+> 
+> We do have some logic to handle devices that connect but do not
+> configure any stream, perhaps we could fit this in the same category
+> and if they disconnect while authorizing we attempt to reconnect, it
+> is probably to much of a hack but if the device is really popular then
+> perhaps it is worth trying.
 
-On Thu, Aug 21, 2014 at 6:23 AM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> Hi Arman,
->
-> On Wed, Aug 20, 2014 at 11:15 PM, Arman Uguray <armansito@chromium.org> wrote:
->> This patch introduces shared/gatt-client, which provides a central/client side
->> implementation of the Generic Attribute Profile. An instance of bt_gatt_client
->> will provide a central database of all GATT services, characteristics, and
->> descriptors that have been discovered on a peripheral and will provide API
->> functions to obtain information about discovered attributes, registering
->> handlers for "Service Changed" indications, as well as providing
->> reference-counted access to "Client Characteristic Configuration" descriptors.
->> ---
->>  Makefile.am              |   3 +-
->>  src/shared/TODO          |  13 ++++++
->>  src/shared/gatt-client.c | 101 +++++++++++++++++++++++++++++++++++++++++++++++
->>  src/shared/gatt-client.h |  54 +++++++++++++++++++++++++
->>  4 files changed, 170 insertions(+), 1 deletion(-)
->>  create mode 100644 src/shared/TODO
->>  create mode 100644 src/shared/gatt-client.c
->>  create mode 100644 src/shared/gatt-client.h
->>
->> diff --git a/Makefile.am b/Makefile.am
->> index 88fcb49..6aed8e2 100644
->> --- a/Makefile.am
->> +++ b/Makefile.am
->> @@ -158,7 +158,8 @@ src_bluetoothd_SOURCES = $(builtin_sources) \
->>                         src/shared/util.h src/shared/util.c \
->>                         src/shared/mgmt.h src/shared/mgmt.c \
->>                         src/shared/att-types.h src/shared/att.h src/shared/att.c \
->> -                       src/shared/gatt-helpers.h src/shared/gatt-helpers.c
->> +                       src/shared/gatt-helpers.h src/shared/gatt-helpers.c \
->> +                       src/shared/gatt-client.h src/shared/gatt-client.c
->>  src_bluetoothd_LDADD = lib/libbluetooth-internal.la gdbus/libgdbus-internal.la \
->>                         @GLIB_LIBS@ @DBUS_LIBS@ -ldl -lrt
->>  src_bluetoothd_LDFLAGS = $(AM_LDFLAGS) -Wl,--export-dynamic \
->> diff --git a/src/shared/TODO b/src/shared/TODO
->> new file mode 100644
->> index 0000000..2881c97
->> --- /dev/null
->> +++ b/src/shared/TODO
->> @@ -0,0 +1,13 @@
->> +TODOs for shared/gatt-client
->> +
->> +* Add util_debug support.
->> +* Add high-level abstraction for services, characteristics, and descriptors.
->> +* Implement service discovery.
->> +* Implement characteristic discovery.
->> +* Implement descriptor discovery.
->> +* Handle request timeouts.
->> +* Make bt_gatt_client observe disconnect events. Handle bonded/non-bonded cases.
->> +* Add support for auto-connects using a different bt_att.
->> +* Add functions for reference counted access to enable/disable
->> +  notifications/indications.
->> +* Add support for "Service Changed".
->> diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
->> new file mode 100644
->> index 0000000..53a7de1
->> --- /dev/null
->> +++ b/src/shared/gatt-client.c
->> @@ -0,0 +1,101 @@
->> +/*
->> + *
->> + *  BlueZ - Bluetooth protocol stack for Linux
->> + *
->> + *  Copyright (C) 2014  Google Inc.
->> + *
->> + *
->> + *  This library is free software; you can redistribute it and/or
->> + *  modify it under the terms of the GNU Lesser General Public
->> + *  License as published by the Free Software Foundation; either
->> + *  version 2.1 of the License, or (at your option) any later version.
->> + *
->> + *  This library is distributed in the hope that it will be useful,
->> + *  but WITHOUT ANY WARRANTY; without even the implied warranty of
->> + *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
->> + *  Lesser General Public License for more details.
->> + *
->> + *  You should have received a copy of the GNU Lesser General Public
->> + *  License along with this library; if not, write to the Free Software
->> + *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
->> + *
->> + */
->> +
->> +#include "src/shared/att.h"
->> +#include "src/shared/gatt-client.h"
->> +#include "src/shared/util.h"
->> +
->> +struct bt_gatt_client {
->> +       struct bt_att *att;
->> +       bool persist;
->> +};
->> +
->> +struct bt_gatt_client *bt_gatt_client_new(struct bt_att *att)
->> +{
->> +       struct bt_gatt_client *client;
->> +
->> +       if (!att)
->> +               return NULL;
->> +
->> +       client = new0(struct bt_gatt_client, 1);
->> +       if (!client)
->> +               return NULL;
->> +
->> +       client->att = bt_att_ref(att);
->> +
->> +       return client;
->> +}
->> +
->> +void bt_gatt_client_destroy(struct bt_gatt_client *client)
->> +{
->> +       if (!client)
->> +               return;
->> +
->> +       bt_att_unref(client->att);
->> +       free(client);
->> +}
->> +
->> +bool bt_gatt_client_set_persist(struct bt_gatt_client *client,
->> +                                                       bool do_persist)
->> +{
->> +       if (!client)
->> +               return false;
->> +
->> +       client->persist = do_persist;
->> +
->> +       return true;
->> +}
->> +
->> +struct bt_att *bt_gatt_client_get_att(struct bt_gatt_client *client)
->> +{
->> +       if (!client)
->> +               return NULL;
->> +
->> +       return client->att;
->> +}
->> +
->> +bool bt_gatt_client_init(struct bt_gatt_client *client, uint16_t mtu,
->> +                                       bt_gatt_client_callback_t callback,
->> +                                       void *user_data,
->> +                                       bt_gatt_client_destroy_func_t destroy)
->> +{
->> +       // TODO
->> +}
->> +
->> +unsigned int bt_gatt_client_register_service_changed(
->> +                               struct bt_gatt_client *client,
->> +                               uint16_t handle,
->> +                               bt_gatt_client_service_changed_func_t callback,
->> +                               void *user_data,
->> +                               bt_gatt_client_destroy_func_t destroy)
->> +{
->> +       // TODO
->> +       return 0;
->> +}
->> +
->> +bool bt_gatt_client_unregister_service_changed(struct bt_gatt_client *client,
->> +                                                       unsigned int id)
->> +{
->> +       // TODO
->> +       return false;
->> +}
->> diff --git a/src/shared/gatt-client.h b/src/shared/gatt-client.h
->> new file mode 100644
->> index 0000000..a978691
->> --- /dev/null
->> +++ b/src/shared/gatt-client.h
->> @@ -0,0 +1,54 @@
->> +/*
->> + *
->> + *  BlueZ - Bluetooth protocol stack for Linux
->> + *
->> + *  Copyright (C) 2014  Google Inc.
->> + *
->> + *
->> + *  This library is free software; you can redistribute it and/or
->> + *  modify it under the terms of the GNU Lesser General Public
->> + *  License as published by the Free Software Foundation; either
->> + *  version 2.1 of the License, or (at your option) any later version.
->> + *
->> + *  This library is distributed in the hope that it will be useful,
->> + *  but WITHOUT ANY WARRANTY; without even the implied warranty of
->> + *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
->> + *  Lesser General Public License for more details.
->> + *
->> + *  You should have received a copy of the GNU Lesser General Public
->> + *  License along with this library; if not, write to the Free Software
->> + *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
->> + *
->> + */
->> +
->> +#include <stdbool.h>
->> +#include <stdint.h>
->> +
->> +struct bt_gatt_client;
->> +
->> +struct bt_gatt_client *bt_gatt_client_new(struct bt_att *att);
->> +void bt_gatt_client_destroy(struct bt_gatt_client *client);
->> +
->> +bool bt_gatt_client_set_persist(struct bt_gatt_client *client,
->> +                                                       bool do_persist);
->> +
->> +struct bt_att *bt_gatt_client_get_att(struct bt_gatt_client *client);
->> +
->> +typedef void (*bt_gatt_client_destroy_func_t)(void *user_data);
->> +typedef void (*bt_gatt_client_callback_t)(void *user_data);
->> +typedef void (*bt_gatt_client_service_changed_func_t)(uint16_t handle,
->> +                                                       void *user_data);
->> +
->> +bool bt_gatt_client_init(struct bt_gatt_client *client, uint16_t mtu,
->> +                                       bt_gatt_client_callback_t callback,
->> +                                       void *user_data,
->> +                                       bt_gatt_client_destroy_func_t destroy);
->> +
->> +unsigned int bt_gatt_client_register_service_changed(
->> +                               struct bt_gatt_client *client,
->> +                               uint16_t handle,
->> +                               bt_gatt_client_service_changed_func_t callback,
->> +                               void *user_data,
->> +                               bt_gatt_client_destroy_func_t destroy);
->> +bool bt_gatt_client_unregister_service_changed(struct bt_gatt_client *client,
->> +                                                       unsigned int id);
->> --
->> 2.1.0.rc2.206.gedb03e5
->
-> Perhaps I lost track during my holidays but I was expecting a very
-> different API, one that does not expose bt_att instance to begin with,
-> it seems like the user will need to managed both bt_att instance and
-> bt_gatt_client instance at same time? It does seems more logical to me
-> that gatt-helper and gatt-client should be part of the same API using
-> the same instance (e.g. bt_gatt), with this type of design you can do
-> a proper queuing if one is necessary like for example detect if an
-> operation is already ongoing and just attach the callback and user
-> data to the existing operation instead of queuing another command in
-> bt_att.
->
->
-> --
-> Luiz Augusto von Dentz
+That is something that could work. Since I rather not change the kernel logic to handle and accept() plus a read() right after it with a special delay turning this into a Connection Succesful.
+
+It might be also worthwhile to check if there is a firmware update for this speaker available. I can imagine that this causes issues for a few stacks.
+
+Regards
+
+Marcel
+
