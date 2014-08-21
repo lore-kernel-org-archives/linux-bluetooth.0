@@ -1,42 +1,55 @@
 Return-Path: <cyrus@holtmann.org>
-From: Marcin Kraglak <marcin.kraglak@tieto.com>
+From: Vikrampal Yadav <vikram.pal@samsung.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] android/pts: Update GAP PTS test results
-Date: Thu, 21 Aug 2014 12:23:15 +0200
-Message-Id: <1408616595-25940-1-git-send-email-marcin.kraglak@tieto.com>
+Cc: luiz.dentz@gmail.com, d.kasatkin@samsung.com,
+	vikram.pal@samsung.com, cpgs@samsung.com
+Subject: [PATCH v2 6/6] monitor: Add AVRCP InformDisplayableCharacterSet support
+Date: Thu, 21 Aug 2014 16:00:25 +0530
+Message-id: <1408617025-6841-6-git-send-email-vikram.pal@samsung.com>
+In-reply-to: <1408617025-6841-1-git-send-email-vikram.pal@samsung.com>
+References: <1408617025-6841-1-git-send-email-vikram.pal@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Support for decoding AVRCP InformDisplayableCharacterSet added in
+Bluetooth monitor.
 ---
- android/pts-gap.txt | 15 +++++++++++----
- 1 file changed, 11 insertions(+), 4 deletions(-)
+ monitor/avctp.c | 22 ++++++++++++++++++++++
+ 1 file changed, 22 insertions(+)
 
-diff --git a/android/pts-gap.txt b/android/pts-gap.txt
-index 3076310..05a2ddb 100644
---- a/android/pts-gap.txt
-+++ b/android/pts-gap.txt
-@@ -172,10 +172,17 @@ TC_BOND_NBON_BV_02_C	PASS	haltest: gattc register_client
- 				bluetooth create_bond <address>
- 				bluetooth remove_bond <address>
- TC_BOND_NBON_BV_03_C	PASS	haltest: gattc listen
--TC_BOND_BON_BV_01_C	INC	gattc register_client
--				gattc listen 1
--				bluetooth create_bond <pts_bdaddr>
--				JIRA #BA-68
-+TC_BOND_BON_BV_01_C	PASS	#12503 however it is possible to pass it without
-+				entering securid (Bonding - No MITM):
-+				btmgmt power on
-+				btmgmt le on
-+				btmgmt ssp on
-+				btmgmt connectable on
-+				btmgmt discov on
-+				btmgmt advertising on
-+				btmgmt pairable on
-+				To bond with PTS execute
-+				btmgmt pair -t 0x01 -c 0x03 <PTS addr>
- TC_BOND_BON_BV_02_C	PASS
- TC_BOND_BON_BV_03_C	PASS	gattc register_client
- 				gattc listen 1
+diff --git a/monitor/avctp.c b/monitor/avctp.c
+index e0ab981..591fb22 100644
+--- a/monitor/avctp.c
++++ b/monitor/avctp.c
+@@ -817,6 +817,28 @@ static void avrcp_displayable_charset(const struct l2cap_frame *frame,
+ 					uint8_t ctype, uint8_t len,
+ 					uint8_t indent)
+ {
++	uint8_t num, i;
++
++	if (ctype > AVC_CTYPE_GENERAL_INQUIRY)
++		return;
++
++	if (len < 2) {
++		print_text(COLOR_ERROR, "PDU malformed");
++		packet_hexdump(frame->data, frame->size);
++		return;
++	}
++
++	num = *((uint8_t *) frame->data);
++	print_field("%*cCharsetCount: 0x%02x", (indent - 8), ' ', num);
++
++	for (i = 0; num > 0; num--, i++) {
++		uint16_t charset;
++
++		charset = get_be16(frame->data + 1 + (2 * i));
++		print_field("%*cCharsetID: 0x%04x (%s)",
++					(indent - 8), ' ', charset,
++					charset2str(charset));
++	}
+ }
+ 
+ static void avrcp_ct_battery_status(const struct l2cap_frame *frame,
 -- 
-1.9.3
+1.9.1
 
