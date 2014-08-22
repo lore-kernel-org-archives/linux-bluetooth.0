@@ -1,259 +1,127 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] android/handsfree: Fix alignment
-Date: Fri, 22 Aug 2014 10:20:32 +0200
-Message-ID: <1600595.PUnPVAOPMQ@uw000953>
-In-Reply-To: <1408539959-5545-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1408539959-5545-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <1408617025-6841-1-git-send-email-vikram.pal@samsung.com>
+References: <1408617025-6841-1-git-send-email-vikram.pal@samsung.com>
+Date: Fri, 22 Aug 2014 10:47:36 +0300
+Message-ID: <CABBYNZJgE055ROKUEHZZbYmaf7gpdnML3qUp+uEoR56CKWrSXQ@mail.gmail.com>
+Subject: Re: [PATCH v2 1/6] monitor: Add AVRCP ListPlayerApplicationSettingValues
+ support
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Vikrampal Yadav <vikram.pal@samsung.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	Dmitry Kasatkin <d.kasatkin@samsung.com>, cpgs@samsung.com
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+Hi Vikrampal,
 
-On Wednesday 20 of August 2014 16:05:59 Andrei Emeltchenko wrote:
-> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-> 
+On Thu, Aug 21, 2014 at 1:30 PM, Vikrampal Yadav <vikram.pal@samsung.com> wrote:
+> Support for decoding AVRCP ListPlayerApplicationSettingValues
+> added in Bluetooth monitor.
 > ---
->  android/handsfree.c | 50 +++++++++++++++++++++++++-------------------------
->  1 file changed, 25 insertions(+), 25 deletions(-)
-> 
-> diff --git a/android/handsfree.c b/android/handsfree.c
-> index bad7086..c06f65c 100644
-> --- a/android/handsfree.c
-> +++ b/android/handsfree.c
-> @@ -360,7 +360,7 @@ static void at_cmd_vgs(struct hfp_gw_result *result, enum hfp_gw_cmd_type type,
+>  monitor/avctp.c | 79 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 79 insertions(+)
+>
+> diff --git a/monitor/avctp.c b/monitor/avctp.c
+> index ec2adcd..35eca02 100644
+> --- a/monitor/avctp.c
+> +++ b/monitor/avctp.c
+> @@ -429,6 +429,60 @@ static const char *attr2str(uint8_t attr)
+>         }
 >  }
->  
->  static void at_cmd_cops(struct hfp_gw_result *result, enum hfp_gw_cmd_type type,
-> -							void *user_data)
-> +								void *user_data)
+>
+> +static const char *value2str(uint8_t attr, uint8_t value)
+> +{
+> +       switch (attr) {
+> +       case AVRCP_ATTRIBUTE_ILEGAL:
+> +               return "Illegal";
+> +       case AVRCP_ATTRIBUTE_EQUALIZER:
+> +               switch (value) {
+> +               case 0x01:
+> +                       return "OFF";
+> +               case 0x02:
+> +                       return "ON";
+> +               default:
+> +                       return "Reserved";
+> +               }
+> +       case AVRCP_ATTRIBUTE_REPEAT_MODE:
+> +               switch (value) {
+> +               case 0x01:
+> +                       return "OFF";
+> +               case 0x02:
+> +                       return "Single Track Repeat";
+> +               case 0x03:
+> +                       return "All Track Repeat";
+> +               case 0x04:
+> +                       return "Group Repeat";
+> +               default:
+> +                       return "Reserved";
+> +               }
+> +       case AVRCP_ATTRIBUTE_SHUFFLE:
+> +               switch (value) {
+> +               case 0x01:
+> +                       return "OFF";
+> +               case 0x02:
+> +                       return "All Track Suffle";
+> +               case 0x03:
+> +                       return "Group Suffle";
+> +               default:
+> +                       return "Reserved";
+> +               }
+> +       case AVRCP_ATTRIBUTE_SCAN:
+> +               switch (value) {
+> +               case 0x01:
+> +                       return "OFF";
+> +               case 0x02:
+> +                       return "All Track Scan";
+> +               case 0x03:
+> +                       return "Group Scan";
+> +               default:
+> +                       return "Reserved";
+> +               }
+> +       default:
+> +               return "Unknown";
+> +       }
+> +}
+> +
+>  static void avrcp_passthrough_packet(const struct l2cap_frame *frame)
 >  {
->  	unsigned int val;
->  
-> @@ -390,7 +390,7 @@ static void at_cmd_cops(struct hfp_gw_result *result, enum hfp_gw_cmd_type type,
 >  }
->  
->  static void at_cmd_bia(struct hfp_gw_result *result, enum hfp_gw_cmd_type type,
-> -							void *user_data)
-> +								void *user_data)
+> @@ -504,6 +558,31 @@ static void avrcp_list_player_values(const struct l2cap_frame *frame,
+>                                         uint8_t ctype, uint8_t len,
+>                                         uint8_t indent)
 >  {
->  	unsigned int val, i, def;
->  	bool tmp[IND_COUNT];
-> @@ -435,7 +435,7 @@ failed:
+> +       static uint8_t attr = 0;
+> +       uint8_t num, i;
+> +
+> +       if (len < 1) {
+> +               print_text(COLOR_ERROR, "PDU malformed");
+> +               packet_hexdump(frame->data, frame->size);
+> +               return;
+> +       }
+> +
+> +       if (ctype > AVC_CTYPE_GENERAL_INQUIRY) {
+> +               num = *((uint8_t *) frame->data);
+> +               print_field("%*cValueCount: 0x%02x", (indent - 8), ' ', num);
+> +
+> +               for (i = 0; num > 0; num--, i++) {
+> +                       uint8_t value;
+> +
+> +                       value = *((uint8_t *) (frame->data + 1 + i));
+> +                       print_field("%*cValueID: 0x%02x (%s)", (indent - 8),
+> +                                       ' ', value, value2str(attr, value));
+> +               }
+> +       } else {
+> +               attr = *((uint8_t *) frame->data);
+> +               print_field("%*cAttributeID: 0x%02x (%s)", (indent - 8), ' ',
+> +                                                       attr, attr2str(attr));
+> +       }
 >  }
->  
->  static void at_cmd_a(struct hfp_gw_result *result, enum hfp_gw_cmd_type type,
-> -							void *user_data)
-> +								void *user_data)
->  {
->  	DBG("");
->  
-> @@ -460,7 +460,7 @@ static void at_cmd_a(struct hfp_gw_result *result, enum hfp_gw_cmd_type type,
->  }
->  
->  static void at_cmd_d(struct hfp_gw_result *result, enum hfp_gw_cmd_type type,
-> -							void *user_data)
-> +								void *user_data)
->  {
->  	char buf[IPC_MTU];
->  	struct hal_ev_handsfree_dial *ev = (void *) buf;
-> @@ -503,7 +503,7 @@ static void at_cmd_d(struct hfp_gw_result *result, enum hfp_gw_cmd_type type,
->  }
->  
->  static void at_cmd_ccwa(struct hfp_gw_result *result, enum hfp_gw_cmd_type type,
-> -							void *user_data)
-> +								void *user_data)
->  {
->  	unsigned int val;
->  
-> @@ -531,7 +531,7 @@ static void at_cmd_ccwa(struct hfp_gw_result *result, enum hfp_gw_cmd_type type,
->  }
->  
->  static void at_cmd_chup(struct hfp_gw_result *result, enum hfp_gw_cmd_type type,
-> -							void *user_data)
-> +								void *user_data)
->  {
->  	DBG("");
->  
-> @@ -556,7 +556,7 @@ static void at_cmd_chup(struct hfp_gw_result *result, enum hfp_gw_cmd_type type,
->  }
->  
->  static void at_cmd_clcc(struct hfp_gw_result *result, enum hfp_gw_cmd_type type,
-> -							void *user_data)
-> +								void *user_data)
->  {
->  	DBG("");
->  
-> @@ -578,7 +578,7 @@ static void at_cmd_clcc(struct hfp_gw_result *result, enum hfp_gw_cmd_type type,
->  }
->  
->  static void at_cmd_cmee(struct hfp_gw_result *result, enum hfp_gw_cmd_type type,
-> -							void *user_data)
-> +								void *user_data)
->  {
->  	unsigned int val;
->  
-> @@ -606,7 +606,7 @@ static void at_cmd_cmee(struct hfp_gw_result *result, enum hfp_gw_cmd_type type,
->  }
->  
->  static void at_cmd_clip(struct hfp_gw_result *result, enum hfp_gw_cmd_type type,
-> -							void *user_data)
-> +								void *user_data)
->  {
->  	unsigned int val;
->  
-> @@ -634,7 +634,7 @@ static void at_cmd_clip(struct hfp_gw_result *result, enum hfp_gw_cmd_type type,
->  }
->  
->  static void at_cmd_vts(struct hfp_gw_result *result, enum hfp_gw_cmd_type type,
-> -							void *user_data)
-> +								void *user_data)
->  {
->  	struct hal_ev_handsfree_dtmf ev;
->  	char str[2];
-> @@ -672,7 +672,7 @@ static void at_cmd_vts(struct hfp_gw_result *result, enum hfp_gw_cmd_type type,
->  }
->  
->  static void at_cmd_cnum(struct hfp_gw_result *result, enum hfp_gw_cmd_type type,
-> -							void *user_data)
-> +								void *user_data)
->  {
->  	DBG("");
->  
-> @@ -694,7 +694,7 @@ static void at_cmd_cnum(struct hfp_gw_result *result, enum hfp_gw_cmd_type type,
->  }
->  
->  static void at_cmd_binp(struct hfp_gw_result *result, enum hfp_gw_cmd_type type,
-> -							void *user_data)
-> +								void *user_data)
->  {
->  	DBG("");
->  
-> @@ -704,7 +704,7 @@ static void at_cmd_binp(struct hfp_gw_result *result, enum hfp_gw_cmd_type type,
->  }
->  
->  static void at_cmd_bldn(struct hfp_gw_result *result, enum hfp_gw_cmd_type type,
-> -							void *user_data)
-> +								void *user_data)
->  {
->  	struct hal_ev_handsfree_dial ev;
->  
-> @@ -728,7 +728,7 @@ static void at_cmd_bldn(struct hfp_gw_result *result, enum hfp_gw_cmd_type type,
->  }
->  
->  static void at_cmd_bvra(struct hfp_gw_result *result, enum hfp_gw_cmd_type type,
-> -							void *user_data)
-> +								void *user_data)
->  {
->  	struct hal_ev_handsfree_vr_state ev;
->  	unsigned int val;
-> @@ -761,7 +761,7 @@ static void at_cmd_bvra(struct hfp_gw_result *result, enum hfp_gw_cmd_type type,
->  }
->  
->  static void at_cmd_nrec(struct hfp_gw_result *result, enum hfp_gw_cmd_type type,
-> -							void *user_data)
-> +								void *user_data)
->  {
->  	struct hal_ev_handsfree_nrec ev;
->  	unsigned int val;
-> @@ -799,7 +799,7 @@ static void at_cmd_nrec(struct hfp_gw_result *result, enum hfp_gw_cmd_type type,
->  }
->  
->  static void at_cmd_bsir(struct hfp_gw_result *result, enum hfp_gw_cmd_type type,
-> -							void *user_data)
-> +								void *user_data)
->  {
->  	DBG("");
->  
-> @@ -809,7 +809,7 @@ static void at_cmd_bsir(struct hfp_gw_result *result, enum hfp_gw_cmd_type type,
->  }
->  
->  static void at_cmd_btrh(struct hfp_gw_result *result, enum hfp_gw_cmd_type type,
-> -							void *user_data)
-> +								void *user_data)
->  {
->  	DBG("");
->  
-> @@ -928,7 +928,7 @@ static bool connect_sco(void)
->  }
->  
->  static void at_cmd_bcc(struct hfp_gw_result *result, enum hfp_gw_cmd_type type,
-> -							void *user_data)
-> +								void *user_data)
->  {
->  	DBG("");
->  
-> @@ -965,7 +965,7 @@ static void at_cmd_bcc(struct hfp_gw_result *result, enum hfp_gw_cmd_type type,
->  }
->  
->  static void at_cmd_bcs(struct hfp_gw_result *result, enum hfp_gw_cmd_type type,
-> -							void *user_data)
-> +								void *user_data)
->  {
->  	unsigned int val;
->  
-> @@ -1003,7 +1003,7 @@ static void at_cmd_bcs(struct hfp_gw_result *result, enum hfp_gw_cmd_type type,
->  }
->  
->  static void at_cmd_ckpd(struct hfp_gw_result *result, enum hfp_gw_cmd_type type,
-> -							void *user_data)
-> +								void *user_data)
->  {
->  	unsigned int val;
->  
-> @@ -1064,7 +1064,7 @@ static void register_post_slc_at(void)
->  }
->  
->  static void at_cmd_cmer(struct hfp_gw_result *result, enum hfp_gw_cmd_type type,
-> -							void *user_data)
-> +								void *user_data)
->  {
->  	unsigned int val;
->  
-> @@ -1109,7 +1109,7 @@ static void at_cmd_cmer(struct hfp_gw_result *result, enum hfp_gw_cmd_type type,
->  }
->  
->  static void at_cmd_cind(struct hfp_gw_result *result, enum hfp_gw_cmd_type type,
-> -							void *user_data)
-> +								void *user_data)
->  {
->  	char *buf, *ptr;
->  	int len;
-> @@ -1166,7 +1166,7 @@ static void at_cmd_cind(struct hfp_gw_result *result, enum hfp_gw_cmd_type type,
->  }
->  
->  static void at_cmd_brsf(struct hfp_gw_result *result, enum hfp_gw_cmd_type type,
-> -							void *user_data)
-> +								void *user_data)
->  {
->  	unsigned int feat;
->  
-> @@ -1194,7 +1194,7 @@ static void at_cmd_brsf(struct hfp_gw_result *result, enum hfp_gw_cmd_type type,
->  }
->  
->  static void at_cmd_chld(struct hfp_gw_result *result, enum hfp_gw_cmd_type type,
-> -							void *user_data)
-> +								void *user_data)
->  {
->  	struct hal_ev_handsfree_chld ev;
->  	unsigned int val;
-> @@ -1243,7 +1243,7 @@ static struct hfp_codec *find_codec_by_type(uint8_t type)
->  }
->  
->  static void at_cmd_bac(struct hfp_gw_result *result, enum hfp_gw_cmd_type type,
-> -							void *user_data)
-> +								void *user_data)
->  {
->  	unsigned int val;
->  
-> 
 
-Applied, thanks.
+What I suggested regarding the goto is valid for all the patches, also
+you seem to disregard my comment about advancing in the frame instead
+of an offset for the very begging of the frame.
 
 -- 
-Best regards, 
-Szymon Janc
+Luiz Augusto von Dentz
