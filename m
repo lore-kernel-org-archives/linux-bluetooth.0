@@ -1,52 +1,30 @@
 Return-Path: <cyrus@holtmann.org>
-From: Arman Uguray <armansito@chromium.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Arman Uguray <armansito@chromium.org>
-Subject: [PATCH BlueZ v1 00/13] Introducing shared/gatt-client
-Date: Fri, 22 Aug 2014 17:47:34 -0700
-Message-Id: <1408754867-13313-1-git-send-email-armansito@chromium.org>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Fri, 22 Aug 2014 10:51:40 -0500
+From: Greg KH <gregkh@linuxfoundation.org>
+To: Tim Niemeyer <tim.niemeyer@corscience.de>
+Cc: Felipe Balbi <balbi@ti.com>, stable@vger.kernel.org,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Gustavo Padovan <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>, jslaby@suse.cz,
+	grant.likely@linaro.org, linux-bluetooth@vger.kernel.org,
+	andreas@biessmann.de
+Subject: Re: [PATCH] bluetooth: hci_ldisc: fix deadlock condition
+Message-ID: <20140822155140.GA18880@kroah.com>
+References: <1398265117-11793-2-git-send-email-balbi@ti.com>
+ <1408715107-21299-1-git-send-email-tim.niemeyer@corscience.de>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1408715107-21299-1-git-send-email-tim.niemeyer@corscience.de>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-* v1:
-  - Moved the TODOs to the top-level TODO file in a new ATT/GATT section.
-  - Removed bt_gatt_client_init. Instead, added a
-    bt_gatt_client_set_ready_handler to set up a handler which gets called when
-    discovery is over. Discovery is initiated in bt_gatt_client_new instead.
-  - Removed bt_gatt_client_get_att.
-  - Removed the (un)register_service_changed functions for now.
-  - Removed bt_gatt_client_destroy in favor of ref/unref functions.
-  - Dropped "_handler" from bt_att_(un)register_disconnect_handler functions.
+On Fri, Aug 22, 2014 at 03:45:07PM +0200, Tim Niemeyer wrote:
+> This Patch was applied to 3.10 and 3.2. It's probably missed on 3.4.
 
-Arman Uguray (13):
-  TODO: Add items for tasks involving the new shared ATT/GATT stack
-  shared/gatt-helpers: Remove service, characteristic, descriptor
-    structures.
-  shared/gatt-helpers: Added result count functions.
-  shared/gatt-client: Added initial skeleton and simple functions.
-  shared/att: Support multiple disconnect handlers.
-  shared/att: Add BT_ATT_DEFAULT_LE_MTU macro.
-  shared/gatt-helpers: Fixed typo in callback args.
-  shared/gatt-client: Add bt_gatt_client_set_debug.
-  shared/gatt-client: Implement initial service discovery.
-  shared/gatt-client: Add service iterator functions.
-  shared/gatt-client: Implement characteristic discovery.
-  shared/gatt-client: Implement descriptor discovery.
-  TODO: shared/gatt-client has been defined and discovery implemented
+Does it apply there?
 
- Makefile.am               |   3 +-
- TODO                      |  90 ++++++-
- src/shared/att-types.h    |   2 +
- src/shared/att.c          | 161 ++++++++++--
- src/shared/att.h          |  11 +-
- src/shared/gatt-client.c  | 652 ++++++++++++++++++++++++++++++++++++++++++++++
- src/shared/gatt-client.h  |  90 +++++++
- src/shared/gatt-helpers.c | 100 +++++--
- src/shared/gatt-helpers.h |  36 +--
- 9 files changed, 1064 insertions(+), 81 deletions(-)
- create mode 100644 src/shared/gatt-client.c
- create mode 100644 src/shared/gatt-client.h
+What is the git id of the commit?
 
--- 
-2.1.0.rc2.206.gedb03e5
+thanks,
 
+greg k-h
