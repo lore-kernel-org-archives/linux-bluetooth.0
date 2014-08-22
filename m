@@ -1,53 +1,53 @@
 Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
-To: Marcin Kraglak <marcin.kraglak@tieto.com>
+To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] android/pts: Update GAP PTS test results
-Date: Fri, 22 Aug 2014 10:21:09 +0200
-Message-ID: <2956675.sA7ZkmbgK2@uw000953>
-In-Reply-To: <1408616595-25940-1-git-send-email-marcin.kraglak@tieto.com>
-References: <1408616595-25940-1-git-send-email-marcin.kraglak@tieto.com>
+Subject: Re: [PATCH] android: Fix header include
+Date: Fri, 22 Aug 2014 10:20:49 +0200
+Message-ID: <1641453.pzoKud3VOE@uw000953>
+In-Reply-To: <1408540007-7621-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1408540007-7621-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcin,
+Hi Andrei,
 
-On Thursday 21 of August 2014 12:23:15 Marcin Kraglak wrote:
+On Wednesday 20 of August 2014 16:06:47 Andrei Emeltchenko wrote:
+> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> 
+> Since Android KitKat we can use sys/prctl.h and sys/capability.h
+> as specified in the manual page. Fixes also build warnings:
+> ...
+> warning: implicit declaration of function 'prctl'
+> [-Wimplicit-function-declaration]
+>   if (prctl(PR_SET_KEEPCAPS, 1) < 0) {
+>   ^
+> ...
 > ---
->  android/pts-gap.txt | 15 +++++++++++----
->  1 file changed, 11 insertions(+), 4 deletions(-)
+>  android/main.c | 4 +---
+>  1 file changed, 1 insertion(+), 3 deletions(-)
 > 
-> diff --git a/android/pts-gap.txt b/android/pts-gap.txt
-> index 3076310..05a2ddb 100644
-> --- a/android/pts-gap.txt
-> +++ b/android/pts-gap.txt
-> @@ -172,10 +172,17 @@ TC_BOND_NBON_BV_02_C	PASS	haltest: gattc register_client
->  				bluetooth create_bond <address>
->  				bluetooth remove_bond <address>
->  TC_BOND_NBON_BV_03_C	PASS	haltest: gattc listen
-> -TC_BOND_BON_BV_01_C	INC	gattc register_client
-> -				gattc listen 1
-> -				bluetooth create_bond <pts_bdaddr>
-> -				JIRA #BA-68
-> +TC_BOND_BON_BV_01_C	PASS	#12503 however it is possible to pass it without
-> +				entering securid (Bonding - No MITM):
-> +				btmgmt power on
-> +				btmgmt le on
-> +				btmgmt ssp on
-> +				btmgmt connectable on
-> +				btmgmt discov on
-> +				btmgmt advertising on
-> +				btmgmt pairable on
-> +				To bond with PTS execute
-> +				btmgmt pair -t 0x01 -c 0x03 <PTS addr>
->  TC_BOND_BON_BV_02_C	PASS
->  TC_BOND_BON_BV_03_C	PASS	gattc register_client
->  				gattc listen 1
+> diff --git a/android/main.c b/android/main.c
+> index 0a0c150..5299789 100644
+> --- a/android/main.c
+> +++ b/android/main.c
+> @@ -36,10 +36,8 @@
+>  #include <unistd.h>
+>  
+>  #include <sys/signalfd.h>
+> -#if defined(ANDROID)
+> +#include <sys/prctl.h>
+>  #include <sys/capability.h>
+> -#include <linux/prctl.h>
+> -#endif
+>  
+>  #include <glib.h>
+>  
 > 
 
-Patch applied, thanks.
+Applied. Thanks.
 
 -- 
 Best regards, 
