@@ -1,161 +1,73 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1408703129-12414-1-git-send-email-luiz.dentz@gmail.com>
-References: <1408703129-12414-1-git-send-email-luiz.dentz@gmail.com>
-Date: Mon, 25 Aug 2014 11:49:33 +0300
-Message-ID: <CABBYNZLkK1X-e+p_xfMmduXeY9GjFB+Tx1YP6H5psFba_iFaYQ@mail.gmail.com>
-Subject: Re: [PATCH BlueZ] monitor: Add helper functions to get data from
- L2CAP frames
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-bluetooth-owner@vger.kernel.org
+Message-ID: <1408787426.28950.41.camel@redi7>
+Subject: Re: [PATCH] bluetooth: hci_ldisc: fix deadlock condition
+From: Tim Niemeyer <tim.niemeyer@mastersword.de>
+To: Greg KH <gregkh@linuxfoundation.org>
+Cc: Tim Niemeyer <tim.niemeyer@corscience.de>, Felipe Balbi <balbi@ti.com>,
+ stable@vger.kernel.org, Linux Kernel Mailing List
+ <linux-kernel@vger.kernel.org>,  Marcel Holtmann <marcel@holtmann.org>,
+ Gustavo Padovan <gustavo@padovan.org>, Johan Hedberg
+ <johan.hedberg@gmail.com>, jslaby@suse.cz, grant.likely@linaro.org,
+ linux-bluetooth@vger.kernel.org, andreas@biessmann.de
+Date: Sat, 23 Aug 2014 11:50:26 +0200
+In-Reply-To: <20140822155140.GA18880@kroah.com>
+References: <1398265117-11793-2-git-send-email-balbi@ti.com>
+	 <1408715107-21299-1-git-send-email-tim.niemeyer@corscience.de>
+	 <20140822155140.GA18880@kroah.com>
+Content-Type: multipart/signed; micalg="pgp-sha1"; protocol="application/pgp-signature";
+	boundary="=-Tl0AkOFJRvT8Gx8qyy+w"
+Mime-Version: 1.0
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
 
-On Fri, Aug 22, 2014 at 1:25 PM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->
-> ---
->  monitor/l2cap.h | 118 +++++++++++++++++++++++++++++++++++++++++++++++++++-----
->  1 file changed, 109 insertions(+), 9 deletions(-)
->
-> diff --git a/monitor/l2cap.h b/monitor/l2cap.h
-> index a0f844b..645e3ef 100644
-> --- a/monitor/l2cap.h
-> +++ b/monitor/l2cap.h
-> @@ -40,15 +40,115 @@ struct l2cap_frame {
->  static inline void l2cap_frame_pull(struct l2cap_frame *frame,
->                                 const struct l2cap_frame *source, uint16_t len)
->  {
-> -       frame->index   = source->index;
-> -       frame->in      = source->in;
-> -       frame->handle  = source->handle;
-> -       frame->cid     = source->cid;
-> -       frame->psm     = source->psm;
-> -       frame->chan    = source->chan;
-> -       frame->mode    = source->mode;
-> -       frame->data    = source->data + len;
-> -       frame->size    = source->size - len;
-> +       if (frame != source) {
-> +               frame->index   = source->index;
-> +               frame->in      = source->in;
-> +               frame->handle  = source->handle;
-> +               frame->cid     = source->cid;
-> +               frame->psm     = source->psm;
-> +               frame->chan    = source->chan;
-> +               frame->mode    = source->mode;
-> +       }
-> +
-> +       frame->data = source->data + len;
-> +       frame->size = source->size - len;
-> +}
-> +
-> +static inline int l2cap_frame_get_u8(struct l2cap_frame *frame, uint8_t *value)
-> +{
-> +       if (frame->size < sizeof(*value))
-> +               return -1;
-> +
-> +       if (value)
-> +               *value = *((uint8_t *) frame->data);
-> +
-> +       l2cap_frame_pull(frame, frame, sizeof(*value));
-> +
-> +       return 0;
-> +}
-> +
-> +static inline int l2cap_frame_get_be16(struct l2cap_frame *frame,
-> +                                                               uint16_t *value)
-> +{
-> +       if (frame->size < sizeof(*value))
-> +               return -1;
-> +
-> +       if (value)
-> +               *value = get_be16(frame->data);
-> +
-> +       l2cap_frame_pull(frame, frame, sizeof(*value));
-> +
-> +       return 0;
-> +}
-> +
-> +static inline int l2cap_frame_get_le16(struct l2cap_frame *frame,
-> +                                                               uint16_t *value)
-> +{
-> +       if (frame->size < sizeof(*value))
-> +               return -1;
-> +
-> +       if (value)
-> +               *value = get_le16(frame->data);
-> +
-> +       l2cap_frame_pull(frame, frame, sizeof(*value));
-> +
-> +       return 0;
-> +}
-> +
-> +static inline int l2cap_frame_get_be32(struct l2cap_frame *frame,
-> +                                                               uint32_t *value)
-> +{
-> +       if (frame->size < sizeof(*value))
-> +               return -1;
-> +
-> +       if (value)
-> +               *value = get_be32(frame->data);
-> +
-> +       l2cap_frame_pull(frame, frame, sizeof(*value));
-> +
-> +       return 0;
-> +}
-> +
-> +static inline int l2cap_frame_get_le32(struct l2cap_frame *frame,
-> +                                                               uint32_t *value)
-> +{
-> +       if (frame->size < sizeof(*value))
-> +               return -1;
-> +
-> +       if (value)
-> +               *value = get_le32(frame->data);
-> +
-> +       l2cap_frame_pull(frame, frame, sizeof(*value));
-> +
-> +       return 0;
-> +}
-> +
-> +static inline int l2cap_frame_get_be64(struct l2cap_frame *frame,
-> +                                                               uint64_t *value)
-> +{
-> +       if (frame->size < sizeof(*value))
-> +               return -1;
-> +
-> +       if (value)
-> +               *value = get_be64(frame->data);
-> +
-> +       l2cap_frame_pull(frame, frame, sizeof(*value));
-> +
-> +       return 0;
-> +}
-> +
-> +static inline int l2cap_frame_get_le64(struct l2cap_frame *frame,
-> +                                                               uint64_t *value)
-> +{
-> +       if (frame->size < sizeof(*value))
-> +               return -1;
-> +
-> +       if (value)
-> +               *value = get_le64(frame->data);
-> +
-> +       l2cap_frame_pull(frame, frame, sizeof(*value));
-> +
-> +       return 0;
->  }
->
->  void l2cap_packet(uint16_t index, bool in, uint16_t handle, uint8_t flags,
-> --
-> 1.9.3
+--=-Tl0AkOFJRvT8Gx8qyy+w
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Pushed.
+Hi
 
+Am Freitag, den 22.08.2014, 10:51 -0500 schrieb Greg KH:
+> On Fri, Aug 22, 2014 at 03:45:07PM +0200, Tim Niemeyer wrote:
+> > This Patch was applied to 3.10 and 3.2. It's probably missed on 3.4.
+>=20
+> Does it apply there?
+The original patch applies not cleanly on 3.4. The init_work is not
+available there.
 
--- 
-Luiz Augusto von Dentz
+I backported it and it's the same result as the backport from Andreas.
+He tested the patch on 3.4.87. The attached patch of my last mail
+applies.
+
+> What is the git id of the commit?
+Sorry, missed it:
+
+commit da64c27d3c93ee9f89956b9de86c4127eb244494 upstream
+commit a22d29e6e5757b1daed7d0b409a815eb33f66e4e stable-3.10
+commit 87520218746b8d973670e37237666f174590898c stable-3.2
+
+Tim
+
+--=-Tl0AkOFJRvT8Gx8qyy+w
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: This is a digitally signed message part
+Content-Transfer-Encoding: 7bit
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iQIcBAABAgAGBQJT+GPiAAoJELKJ8occyPNxgo0P/0UGwmyZZmxPcIAU7y96257D
+onr4hDttLeCd0gS20/x2oUS8XIugbNNjWsz0TNalhTb6DHdOM1cKchyXyd0sgwgP
+aRBzoIpEn47csBNK6illq+poTFy9FKguy3f7B6t/ho+gva1ljr5W8UB+emXuEVL0
+ioALxyvXIzLxZKuenqcdjToLTI+/L2Wmr+G/Hh2S4L1rh29NwJcU0KzLprFKcLUn
+1Hedwnf0rCasLfSGq2z6OVUC9vLZ+CAjtXy8RlAbiUb+61adgKcdpRgc1tkae4E0
+u7VqHNd3IV285mBgbjUi/DpILntKmbeQaLxFyQ/tdpC8tWpgBgsXcT7pm8oCBf67
+z41s1y1F6pR+iaGYyeQ20qV9IbR/6T0f0i2R1m5p/BQ7+0bHtjb0fowvqtICAAbp
+PmiOHzeZNvDJR/2QR4XiisCeZPdKpfCOixVruMN7ztcal4YD3D08vM0DFlK2/P8N
+7zhFxKGPY/aarm+QzIMwlFIPeK987P4bwvyAUpFqg/gJjdvwcoKgsCrl3VY/rd8f
+7MqCzVcD3kUWjldjTotdIc8wX+TeBol2hnQvVvP0+2dlxljHTS7YpyfLnWik490c
+sBUwUL/LNfBI2Orp2Ro4ubikygqH/9lkGuwHXEzPoHFtwxB+QIu/X0AVqb50M1v0
+18LmXnmibepPVmlYH3CJ
+=wVoQ
+-----END PGP SIGNATURE-----
+
+--=-Tl0AkOFJRvT8Gx8qyy+w--
