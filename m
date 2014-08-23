@@ -2,32 +2,96 @@ Return-Path: <cyrus@holtmann.org>
 From: Arman Uguray <armansito@chromium.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Arman Uguray <armansito@chromium.org>
-Subject: [PATCH BlueZ v1 07/13] shared/gatt-helpers: Fixed typo in callback args.
-Date: Fri, 22 Aug 2014 17:47:41 -0700
-Message-Id: <1408754867-13313-8-git-send-email-armansito@chromium.org>
+Subject: [PATCH BlueZ v1 03/13] shared/gatt-helpers: Added result count functions.
+Date: Fri, 22 Aug 2014 17:47:37 -0700
+Message-Id: <1408754867-13313-4-git-send-email-armansito@chromium.org>
 In-Reply-To: <1408754867-13313-1-git-send-email-armansito@chromium.org>
 References: <1408754867-13313-1-git-send-email-armansito@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Fixed a small typo in one of the callback arguments.
+Added functions that return the number of services, characteristics, and
+descriptors contained in a bt_gatt_result.
 ---
- src/shared/gatt-helpers.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ src/shared/gatt-helpers.c | 49 +++++++++++++++++++++++++++++++++++++++++++++++
+ src/shared/gatt-helpers.h |  4 ++++
+ 2 files changed, 53 insertions(+)
 
+diff --git a/src/shared/gatt-helpers.c b/src/shared/gatt-helpers.c
+index ff49867..00813f5 100644
+--- a/src/shared/gatt-helpers.c
++++ b/src/shared/gatt-helpers.c
+@@ -88,6 +88,55 @@ static void result_destroy(struct bt_gatt_result *result)
+ 	}
+ }
+ 
++static unsigned int result_element_count(struct bt_gatt_result *result)
++{
++	unsigned int count = 0;
++	struct bt_gatt_result *cur;
++
++	cur = result;
++
++	while (cur) {
++		count += cur->pdu_len / cur->data_len;
++		cur = cur->next;
++	}
++
++	return count;
++}
++
++unsigned int bt_gatt_result_service_count(struct bt_gatt_result *result)
++{
++	if (!result)
++		return 0;
++
++	if (result->opcode != BT_ATT_OP_READ_BY_GRP_TYPE_RSP &&
++			result->opcode != BT_ATT_OP_FIND_BY_TYPE_VAL_RSP)
++		return 0;
++
++	return result_element_count(result);
++}
++
++unsigned int bt_gatt_result_characteristic_count(struct bt_gatt_result *result)
++{
++	if (!result)
++		return 0;
++
++	if (result->opcode != BT_ATT_OP_READ_BY_TYPE_RSP)
++		return 0;
++
++	return result_element_count(result);
++}
++
++unsigned int bt_gatt_result_descriptor_count(struct bt_gatt_result *result)
++{
++	if (!result)
++		return 0;
++
++	if (result->opcode != BT_ATT_OP_FIND_INFO_RSP)
++		return 0;
++
++	return result_element_count(result);
++}
++
+ bool bt_gatt_iter_init(struct bt_gatt_iter *iter, struct bt_gatt_result *result)
+ {
+ 	if (!iter || !result)
 diff --git a/src/shared/gatt-helpers.h b/src/shared/gatt-helpers.h
-index d63fac1..443e6c5 100644
+index cdf83ba..d63fac1 100644
 --- a/src/shared/gatt-helpers.h
 +++ b/src/shared/gatt-helpers.h
-@@ -54,7 +54,7 @@ typedef void (*bt_gatt_destroy_func_t)(void *user_data);
+@@ -35,6 +35,10 @@ struct bt_gatt_iter {
+ 	uint16_t pos;
+ };
  
- typedef void (*bt_gatt_result_callback_t)(bool success, uint8_t att_ecode,
- 							void *user_data);
--typedef void (*bt_gatt_discovery_callback_t)(bool success, uint8_t att_code,
-+typedef void (*bt_gatt_discovery_callback_t)(bool success, uint8_t att_ecode,
- 						struct bt_gatt_result *result,
- 						void *user_data);
- typedef void (*bt_gatt_read_callback_t)(bool success, uint8_t att_ecode,
++unsigned int bt_gatt_result_service_count(struct bt_gatt_result *result);
++unsigned int bt_gatt_result_characteristic_count(struct bt_gatt_result *result);
++unsigned int bt_gatt_result_descriptor_count(struct bt_gatt_result *result);
++
+ bool bt_gatt_iter_init(struct bt_gatt_iter *iter, struct bt_gatt_result *result);
+ bool bt_gatt_iter_next_service(struct bt_gatt_iter *iter,
+ 				uint16_t *start_handle, uint16_t *end_handle,
 -- 
 2.1.0.rc2.206.gedb03e5
 
