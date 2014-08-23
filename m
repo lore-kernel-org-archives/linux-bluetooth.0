@@ -2,65 +2,87 @@ Return-Path: <cyrus@holtmann.org>
 From: Arman Uguray <armansito@chromium.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Arman Uguray <armansito@chromium.org>
-Subject: [PATCH BlueZ v1 06/13] shared/att: Add BT_ATT_DEFAULT_LE_MTU macro.
-Date: Fri, 22 Aug 2014 17:47:40 -0700
-Message-Id: <1408754867-13313-7-git-send-email-armansito@chromium.org>
+Subject: [PATCH BlueZ v1 08/13] shared/gatt-client: Add bt_gatt_client_set_debug.
+Date: Fri, 22 Aug 2014 17:47:42 -0700
+Message-Id: <1408754867-13313-9-git-send-email-armansito@chromium.org>
 In-Reply-To: <1408754867-13313-1-git-send-email-armansito@chromium.org>
 References: <1408754867-13313-1-git-send-email-armansito@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Moved the ATT_DEFAULT_LE_MTU to att-types.h to make it public.
+Added the bt_gatt_client_set_debug function, which sets up a callback to be used
+internally by util_debug.
 ---
- src/shared/att-types.h | 2 ++
- src/shared/att.c       | 6 +++---
- 2 files changed, 5 insertions(+), 3 deletions(-)
+ src/shared/gatt-client.c | 24 ++++++++++++++++++++++++
+ src/shared/gatt-client.h |  6 ++++++
+ 2 files changed, 30 insertions(+)
 
-diff --git a/src/shared/att-types.h b/src/shared/att-types.h
-index 1637f6f..b85c969 100644
---- a/src/shared/att-types.h
-+++ b/src/shared/att-types.h
-@@ -23,6 +23,8 @@
- 
- #include <stdint.h>
- 
-+#define BT_ATT_DEFAULT_LE_MTU 23
+diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
+index 8d5c126..eeca394 100644
+--- a/src/shared/gatt-client.c
++++ b/src/shared/gatt-client.c
+@@ -28,6 +28,10 @@
+ struct bt_gatt_client {
+ 	struct bt_att *att;
+ 	int ref_count;
 +
- /* ATT protocol opcodes */
- #define BT_ATT_OP_ERROR_RSP	      		0x01
- #define BT_ATT_OP_MTU_REQ			0x02
-diff --git a/src/shared/att.c b/src/shared/att.c
-index 73f5552..a5cab45 100644
---- a/src/shared/att.c
-+++ b/src/shared/att.c
-@@ -35,8 +35,8 @@
- #include "src/shared/timeout.h"
- #include "lib/uuid.h"
- #include "src/shared/att.h"
-+#include "src/shared/att-types.h"
++	bt_gatt_client_debug_func_t debug_callback;
++	bt_gatt_client_destroy_func_t debug_destroy;
++	void *debug_data;
+ };
  
--#define ATT_DEFAULT_LE_MTU		23
- #define ATT_MIN_PDU_LEN			1  /* At least 1 byte for the opcode. */
- #define ATT_OP_CMD_MASK			0x40
- #define ATT_OP_SIGNED_MASK		0x80
-@@ -698,7 +698,7 @@ struct bt_att *bt_att_new(int fd)
+ struct bt_gatt_client *bt_gatt_client_new(struct bt_att *att, uint16_t mtu)
+@@ -66,6 +70,9 @@ void bt_gatt_client_unref(struct bt_gatt_client *client)
+ 	if (__sync_sub_and_fetch(&client->ref_count, 1))
+ 		return;
  
- 	att->fd = fd;
++	if (client->debug_destroy)
++		client->debug_destroy(client->debug_data);
++
+ 	bt_att_unref(client->att);
+ 	free(client);
+ }
+@@ -77,3 +84,20 @@ bool bt_gatt_client_set_ready_handler(struct bt_gatt_client *client,
+ {
+ 	// TODO
+ }
++
++bool bt_gatt_client_set_debug(struct bt_gatt_client *client,
++					bt_gatt_client_debug_func_t callback,
++					void *user_data,
++					bt_gatt_client_destroy_func_t destroy) {
++	if (!client)
++		return false;
++
++	if (client->debug_destroy)
++		client->debug_destroy(client->debug_data);
++
++	client->debug_callback = callback;
++	client->debug_destroy = destroy;
++	client->debug_data = user_data;
++
++	return true;
++}
+diff --git a/src/shared/gatt-client.h b/src/shared/gatt-client.h
+index 757db65..45c6010 100644
+--- a/src/shared/gatt-client.h
++++ b/src/shared/gatt-client.h
+@@ -34,9 +34,15 @@ void bt_gatt_client_unref(struct bt_gatt_client *client);
+ typedef void (*bt_gatt_client_destroy_func_t)(void *user_data);
+ typedef void (*bt_gatt_client_callback_t)(bool success, uint8_t att_ecode,
+ 							void *user_data);
++typedef void (*bt_gatt_client_debug_func_t)(const char *str, void *user_data);
  
--	att->mtu = ATT_DEFAULT_LE_MTU;
-+	att->mtu = BT_ATT_DEFAULT_LE_MTU;
- 	att->buf = malloc(att->mtu);
- 	if (!att->buf)
- 		goto fail;
-@@ -833,7 +833,7 @@ bool bt_att_set_mtu(struct bt_att *att, uint16_t mtu)
- 	if (!att)
- 		return false;
+ bool bt_gatt_client_set_ready_handler(struct bt_gatt_client *client,
+ 					bt_gatt_client_callback_t callback,
+ 					void *user_data,
+ 					bt_gatt_client_destroy_func_t destroy);
  
--	if (mtu < ATT_DEFAULT_LE_MTU)
-+	if (mtu < BT_ATT_DEFAULT_LE_MTU)
- 		return false;
- 
- 	buf = malloc(mtu);
++bool bt_gatt_client_set_debug(struct bt_gatt_client *client,
++					bt_gatt_client_debug_func_t callback,
++					void *user_data,
++					bt_gatt_client_destroy_func_t destroy);
++
 -- 
 2.1.0.rc2.206.gedb03e5
 
