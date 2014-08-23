@@ -2,300 +2,189 @@ Return-Path: <cyrus@holtmann.org>
 From: Arman Uguray <armansito@chromium.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Arman Uguray <armansito@chromium.org>
-Subject: [PATCH BlueZ v1 05/13] shared/att: Support multiple disconnect handlers.
-Date: Fri, 22 Aug 2014 17:47:39 -0700
-Message-Id: <1408754867-13313-6-git-send-email-armansito@chromium.org>
+Subject: [PATCH BlueZ v1 02/13] shared/gatt-helpers: Remove service, characteristic, descriptor structures.
+Date: Fri, 22 Aug 2014 17:47:36 -0700
+Message-Id: <1408754867-13313-3-git-send-email-armansito@chromium.org>
 In-Reply-To: <1408754867-13313-1-git-send-email-armansito@chromium.org>
 References: <1408754867-13313-1-git-send-email-armansito@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch adds support for registering multiple disconnect handlers with an
-instance of struct bt_att. Unregistering is achieved via a new function AND
-through bt_att_unregister_all and all disconnect callbacks get automatically
-unregistered after a single disconnect event.
+This patch removes the service, characteristic, and descriptor structures
+declared in gatt-helpers.h. These aren't really necessary, especially since
+there will be another higher-level version of these for shared/gatt-client.
 ---
- src/shared/att.c | 155 ++++++++++++++++++++++++++++++++++++++++++++++---------
- src/shared/att.h |  11 ++--
- 2 files changed, 139 insertions(+), 27 deletions(-)
+ src/shared/gatt-helpers.c | 51 +++++++++++++++++++++++++----------------------
+ src/shared/gatt-helpers.h | 30 +++++++---------------------
+ 2 files changed, 34 insertions(+), 47 deletions(-)
 
-diff --git a/src/shared/att.c b/src/shared/att.c
-index b5ab742..73f5552 100644
---- a/src/shared/att.c
-+++ b/src/shared/att.c
-@@ -60,6 +60,10 @@ struct bt_att {
- 	bool in_notify;
- 	bool need_notify_cleanup;
- 
-+	struct queue *disconn_list;	/* List of disconnect handlers */
-+	bool in_disconn;
-+	bool need_disconn_cleanup;
-+
- 	uint8_t *buf;
- 	uint16_t mtu;
- 
-@@ -73,10 +77,6 @@ struct bt_att {
- 	bt_att_debug_func_t debug_callback;
- 	bt_att_destroy_func_t debug_destroy;
- 	void *debug_data;
--
--	bt_att_disconnect_func_t disconn_callback;
--	bt_att_destroy_func_t disconn_destroy;
--	void *disconn_data;
+diff --git a/src/shared/gatt-helpers.c b/src/shared/gatt-helpers.c
+index 047f64c..ff49867 100644
+--- a/src/shared/gatt-helpers.c
++++ b/src/shared/gatt-helpers.c
+@@ -134,13 +134,14 @@ struct discovery_op {
  };
  
- enum att_op_type {
-@@ -233,6 +233,46 @@ static void mark_notify_removed(void *data, void *user_data)
- 	notify->removed = true;
- }
- 
-+struct att_disconn {
-+	unsigned int id;
-+	bool removed;
-+	bt_att_disconnect_func_t callback;
-+	bt_att_destroy_func_t destroy;
-+	void *user_data;
-+};
-+
-+static void destroy_att_disconn(void *data)
-+{
-+	struct att_disconn *disconn = data;
-+
-+	if (disconn->destroy)
-+		disconn->destroy(disconn->user_data);
-+
-+	free(disconn);
-+}
-+
-+static bool match_disconn_id(const void *a, const void *b)
-+{
-+	const struct att_disconn *disconn = a;
-+	unsigned int id = PTR_TO_UINT(b);
-+
-+	return disconn->id == id;
-+}
-+
-+static bool match_disconn_removed(const void *a, const void *b)
-+{
-+	const struct att_disconn *disconn = a;
-+
-+	return disconn->removed;
-+}
-+
-+static void mark_disconn_removed(void *data, void *user_data)
-+{
-+	struct att_disconn *disconn = data;
-+
-+	disconn->removed = true;
-+}
-+
- static bool encode_pdu(struct att_send_op *op, const void *pdu,
- 						uint16_t length, uint16_t mtu)
+ bool bt_gatt_iter_next_service(struct bt_gatt_iter *iter,
+-						struct bt_gatt_service *service)
++				uint16_t *start_handle, uint16_t *end_handle,
++				uint8_t uuid[16])
  {
-@@ -605,21 +645,42 @@ static bool can_read_data(struct io *io, void *user_data)
- 	return true;
- }
+ 	struct discovery_op *op;
+ 	const void *pdu_ptr;
+-	bt_uuid_t uuid;
++	bt_uuid_t tmp;
  
-+static void disconn_handler(void *data, void *user_data)
-+{
-+	struct att_disconn *disconn = data;
-+
-+	if (disconn->removed)
-+		return;
-+
-+	if (disconn->callback)
-+		disconn->callback(disconn->user_data);
-+}
-+
- static bool disconnect_cb(struct io *io, void *user_data)
- {
- 	struct bt_att *att = user_data;
- 
--	bt_att_cancel_all(att);
--	bt_att_unregister_all(att);
--
- 	io_destroy(att->io);
- 	att->io = NULL;
- 
- 	util_debug(att->debug_callback, att->debug_data,
- 						"Physical link disconnected");
- 
--	if (att->disconn_callback)
--		att->disconn_callback(att->disconn_data);
-+	bt_att_ref(att);
-+	att->in_disconn = true;
-+	queue_foreach(att->disconn_list, disconn_handler, NULL);
-+	att->in_disconn = false;
-+
-+	if (att->need_disconn_cleanup) {
-+		queue_remove_all(att->disconn_list, match_disconn_removed, NULL,
-+							destroy_att_disconn);
-+		att->need_disconn_cleanup = false;
-+	}
-+
-+	bt_att_cancel_all(att);
-+	bt_att_unregister_all(att);
-+
-+	bt_att_unref(att);
- 
- 	return false;
- }
-@@ -662,6 +723,10 @@ struct bt_att *bt_att_new(int fd)
- 	if (!att->notify_list)
- 		goto fail;
- 
-+	att->disconn_list = queue_new();
-+	if (!att->disconn_list)
-+		goto fail;
-+
- 	if (!io_set_read_handler(att->io, can_read_data, att, NULL))
- 		goto fail;
- 
-@@ -674,6 +739,8 @@ fail:
- 	queue_destroy(att->req_queue, NULL);
- 	queue_destroy(att->ind_queue, NULL);
- 	queue_destroy(att->write_queue, NULL);
-+	queue_destroy(att->notify_list, NULL);
-+	queue_destroy(att->disconn_list, NULL);
- 	io_destroy(att->io);
- 	free(att->buf);
- 	free(att);
-@@ -709,6 +776,7 @@ void bt_att_unref(struct bt_att *att)
- 	queue_destroy(att->ind_queue, NULL);
- 	queue_destroy(att->write_queue, NULL);
- 	queue_destroy(att->notify_list, NULL);
-+	queue_destroy(att->disconn_list, NULL);
- 	att->req_queue = NULL;
- 	att->ind_queue = NULL;
- 	att->write_queue = NULL;
-@@ -720,9 +788,6 @@ void bt_att_unref(struct bt_att *att)
- 	if (att->debug_destroy)
- 		att->debug_destroy(att->debug_data);
- 
--	if (att->disconn_destroy)
--		att->disconn_destroy(att->disconn_data);
--
- 	free(att->buf);
- 	att->buf = NULL;
- 
-@@ -800,20 +865,57 @@ bool bt_att_set_timeout_cb(struct bt_att *att, bt_att_timeout_func_t callback,
- 	return true;
- }
- 
--bool bt_att_set_disconnect_cb(struct bt_att *att,
-+unsigned int bt_att_register_disconnect(struct bt_att *att,
- 					bt_att_disconnect_func_t callback,
- 					void *user_data,
- 					bt_att_destroy_func_t destroy)
- {
--	if (!att)
-+	struct att_disconn *disconn;
-+
-+	if (!att || !att->io)
-+		return 0;
-+
-+	disconn = new0(struct att_disconn, 1);
-+	if (!disconn)
-+		return 0;
-+
-+	disconn->callback = callback;
-+	disconn->destroy = destroy;
-+	disconn->user_data = user_data;
-+
-+	if (att->next_reg_id < 1)
-+		att->next_reg_id = 1;
-+
-+	disconn->id = att->next_reg_id++;
-+
-+	if (!queue_push_tail(att->disconn_list, disconn)) {
-+		free(disconn);
-+		return 0;
-+	}
-+
-+	return disconn->id;
-+}
-+
-+bool bt_att_unregister_disconnect(struct bt_att *att, unsigned int id)
-+{
-+	struct att_disconn *disconn;
-+
-+	if (!att || !id)
+-	if (!iter->result || !service)
++	if (!iter || !iter->result || !start_handle || !end_handle || !uuid)
  		return false;
  
--	if (att->disconn_destroy)
--		att->disconn_destroy(att->disconn_data);
-+	disconn = queue_find(att->disconn_list, match_disconn_id,
-+							UINT_TO_PTR(id));
-+	if (!disconn)
-+		return false;
-+
-+	if (!att->in_disconn) {
-+		queue_remove(att->disconn_list, disconn);
-+		destroy_att_disconn(disconn);
-+		return true;
-+	}
+ 	op = iter->result->op;
+@@ -148,17 +149,16 @@ bool bt_gatt_iter_next_service(struct bt_gatt_iter *iter,
  
--	att->disconn_callback = callback;
--	att->disconn_destroy = destroy;
--	att->disconn_data = user_data;
-+	disconn->removed = true;
-+	att->need_disconn_cleanup = true;
+ 	switch (iter->result->opcode) {
+ 	case BT_ATT_OP_READ_BY_GRP_TYPE_RSP:
+-		service->start = get_le16(pdu_ptr);
+-		service->end = get_le16(pdu_ptr + 2);
+-		convert_uuid_le(pdu_ptr + 4, iter->result->data_len - 4,
+-								service->uuid);
++		*start_handle = get_le16(pdu_ptr);
++		*end_handle = get_le16(pdu_ptr + 2);
++		convert_uuid_le(pdu_ptr + 4, iter->result->data_len - 4, uuid);
+ 		break;
+ 	case BT_ATT_OP_FIND_BY_TYPE_VAL_RSP:
+-		service->start = get_le16(pdu_ptr);
+-		service->end = get_le16(pdu_ptr + 2);
++		*start_handle = get_le16(pdu_ptr);
++		*end_handle = get_le16(pdu_ptr + 2);
  
- 	return true;
+-		bt_uuid_to_uuid128(&op->uuid, &uuid);
+-		memcpy(service->uuid, uuid.value.u128.data, 16);
++		bt_uuid_to_uuid128(&op->uuid, &tmp);
++		memcpy(uuid, tmp.value.u128.data, 16);
+ 		break;
+ 	default:
+ 		return false;
+@@ -175,12 +175,15 @@ bool bt_gatt_iter_next_service(struct bt_gatt_iter *iter,
  }
-@@ -996,14 +1098,21 @@ bool bt_att_unregister_all(struct bt_att *att)
- 	if (!att)
+ 
+ bool bt_gatt_iter_next_characteristic(struct bt_gatt_iter *iter,
+-					struct bt_gatt_characteristic *chrc)
++				uint16_t *start_handle, uint16_t *end_handle,
++				uint16_t *value_handle, uint8_t *properties,
++				uint8_t uuid[16])
+ {
+ 	struct discovery_op *op;
+ 	const void *pdu_ptr;
+ 
+-	if (!iter->result || !chrc)
++	if (!iter || !iter->result || !start_handle || !end_handle ||
++					!value_handle || !properties || !uuid)
  		return false;
  
--	if (!att->in_notify) {
-+	if (att->in_notify) {
-+		queue_foreach(att->notify_list, mark_notify_removed, NULL);
-+		att->need_notify_cleanup = true;
-+	} else {
- 		queue_remove_all(att->notify_list, NULL, NULL,
- 							destroy_att_notify);
--		return true;
+ 	if (iter->result->opcode != BT_ATT_OP_READ_BY_TYPE_RSP)
+@@ -189,10 +192,10 @@ bool bt_gatt_iter_next_characteristic(struct bt_gatt_iter *iter,
+ 	op = iter->result->op;
+ 	pdu_ptr = iter->result->pdu + iter->pos;
+ 
+-	chrc->start = get_le16(pdu_ptr);
+-	chrc->properties = ((uint8_t *) pdu_ptr)[2];
+-	chrc->value = get_le16(pdu_ptr + 3);
+-	convert_uuid_le(pdu_ptr + 5, iter->result->data_len - 5, chrc->uuid);
++	*start_handle = get_le16(pdu_ptr);
++	*properties = ((uint8_t *) pdu_ptr)[2];
++	*value_handle = get_le16(pdu_ptr + 3);
++	convert_uuid_le(pdu_ptr + 5, iter->result->data_len - 5, uuid);
+ 
+ 	iter->pos += iter->result->data_len;
+ 	if (iter->pos == iter->result->pdu_len) {
+@@ -201,21 +204,21 @@ bool bt_gatt_iter_next_characteristic(struct bt_gatt_iter *iter,
  	}
  
--	queue_foreach(att->notify_list, mark_notify_removed, NULL);
--	att->need_notify_cleanup = true;
-+	if (att->in_disconn) {
-+		queue_foreach(att->disconn_list, mark_disconn_removed, NULL);
-+		att->need_disconn_cleanup = true;
-+	} else {
-+		queue_remove_all(att->disconn_list, NULL, NULL,
-+							destroy_att_disconn);
-+	}
+ 	if (!iter->result) {
+-		chrc->end = op->end_handle;
++		*end_handle = op->end_handle;
+ 		return true;
+ 	}
+ 
+-	chrc->end = get_le16(iter->result->pdu + iter->pos) - 1;
++	*end_handle = get_le16(iter->result->pdu + iter->pos) - 1;
  
  	return true;
  }
-diff --git a/src/shared/att.h b/src/shared/att.h
-index cf44704..1063021 100644
---- a/src/shared/att.h
-+++ b/src/shared/att.h
-@@ -54,10 +54,6 @@ bool bt_att_set_mtu(struct bt_att *att, uint16_t mtu);
- bool bt_att_set_timeout_cb(struct bt_att *att, bt_att_timeout_func_t callback,
- 						void *user_data,
- 						bt_att_destroy_func_t destroy);
--bool bt_att_set_disconnect_cb(struct bt_att *att,
--					bt_att_disconnect_func_t callback,
--					void *user_data,
--					bt_att_destroy_func_t destroy);
  
- unsigned int bt_att_send(struct bt_att *att, uint8_t opcode,
- 					const void *pdu, uint16_t length,
-@@ -72,4 +68,11 @@ unsigned int bt_att_register(struct bt_att *att, uint8_t opcode,
- 						void *user_data,
- 						bt_att_destroy_func_t destroy);
- bool bt_att_unregister(struct bt_att *att, unsigned int id);
-+
-+unsigned int bt_att_register_disconnect(struct bt_att *att,
-+					bt_att_disconnect_func_t callback,
-+					void *user_data,
-+					bt_att_destroy_func_t destroy);
-+bool bt_att_unregister_disconnect(struct bt_att *att, unsigned int id);
-+
- bool bt_att_unregister_all(struct bt_att *att);
+-bool bt_gatt_iter_next_descriptor(struct bt_gatt_iter *iter,
+-						struct bt_gatt_descriptor *desc)
++bool bt_gatt_iter_next_descriptor(struct bt_gatt_iter *iter, uint16_t *handle,
++							uint8_t uuid[16])
+ {
+ 	const void *pdu_ptr;
+ 
+-	if (!iter->result || !desc)
++	if (!iter || !iter->result || !handle || !uuid)
+ 		return false;
+ 
+ 	if (iter->result->opcode != BT_ATT_OP_FIND_INFO_RSP)
+@@ -223,8 +226,8 @@ bool bt_gatt_iter_next_descriptor(struct bt_gatt_iter *iter,
+ 
+ 	pdu_ptr = iter->result->pdu + iter->pos;
+ 
+-	desc->handle = get_le16(pdu_ptr);
+-	convert_uuid_le(pdu_ptr + 2, iter->result->data_len - 2, desc->uuid);
++	*handle = get_le16(pdu_ptr);
++	convert_uuid_le(pdu_ptr + 2, iter->result->data_len - 2, uuid);
+ 
+ 	iter->pos += iter->result->data_len;
+ 	if (iter->pos == iter->result->pdu_len) {
+diff --git a/src/shared/gatt-helpers.h b/src/shared/gatt-helpers.h
+index 95dd8b7..cdf83ba 100644
+--- a/src/shared/gatt-helpers.h
++++ b/src/shared/gatt-helpers.h
+@@ -28,25 +28,6 @@
+ #include <stdbool.h>
+ #include <stdint.h>
+ 
+-struct bt_gatt_service {
+-	uint16_t start;
+-	uint16_t end;
+-	uint8_t uuid[16];
+-};
+-
+-struct bt_gatt_characteristic {
+-	uint16_t start;
+-	uint16_t end;
+-	uint16_t value;
+-	uint8_t properties;
+-	uint8_t uuid[16];
+-};
+-
+-struct bt_gatt_descriptor {
+-	uint16_t handle;
+-	uint8_t uuid[16];
+-};
+-
+ struct bt_gatt_result;
+ 
+ struct bt_gatt_iter {
+@@ -56,11 +37,14 @@ struct bt_gatt_iter {
+ 
+ bool bt_gatt_iter_init(struct bt_gatt_iter *iter, struct bt_gatt_result *result);
+ bool bt_gatt_iter_next_service(struct bt_gatt_iter *iter,
+-					struct bt_gatt_service *service);
++				uint16_t *start_handle, uint16_t *end_handle,
++				uint8_t uuid[16]);
+ bool bt_gatt_iter_next_characteristic(struct bt_gatt_iter *iter,
+-				struct bt_gatt_characteristic *characteristic);
+-bool bt_gatt_iter_next_descriptor(struct bt_gatt_iter *iter,
+-					struct bt_gatt_descriptor *descriptor);
++				uint16_t *start_handle, uint16_t *end_handle,
++				uint16_t *value_handle, uint8_t *properties,
++				uint8_t uuid[16]);
++bool bt_gatt_iter_next_descriptor(struct bt_gatt_iter *iter, uint16_t *handle,
++							uint8_t uuid[16]);
+ 
+ typedef void (*bt_gatt_destroy_func_t)(void *user_data);
+ 
 -- 
 2.1.0.rc2.206.gedb03e5
 
