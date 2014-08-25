@@ -1,134 +1,45 @@
 Return-Path: <cyrus@holtmann.org>
-From: Vikrampal Yadav <vikram.pal@samsung.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: luiz.dentz@gmail.com, d.kasatkin@samsung.com,
-	vikram.pal@samsung.com, cpgs@samsung.com
-Subject: [PATCH v3] monitor: Add AVRCP ListPlayerApplicationSettingValues
- support
-Date: Mon, 25 Aug 2014 16:34:09 +0530
-Message-id: <1408964649-4665-1-git-send-email-vikram.pal@samsung.com>
+Message-ID: <1408961443.27910.149.camel@pohly-mobl1.fritz.box>
+Subject: org.bluez.obex.Transfer1 Suspend/Resume in queued state
+From: Patrick Ohly <patrick.ohly@intel.com>
+To: Luiz Von Dentz <luiz.von.dentz@intel.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	Mateusz Potrola <mateusz.polrola@gmail.com>
+Date: Mon, 25 Aug 2014 12:10:43 +0200
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Support for decoding AVRCP ListPlayerApplicationSettingValues
-added in Bluetooth monitor.
----
- monitor/avctp.c | 95 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 95 insertions(+)
+Hello!
 
-diff --git a/monitor/avctp.c b/monitor/avctp.c
-index ec2adcd..cf86548 100644
---- a/monitor/avctp.c
-+++ b/monitor/avctp.c
-@@ -429,6 +429,60 @@ static const char *attr2str(uint8_t attr)
- 	}
- }
- 
-+static const char *value2str(uint8_t attr, uint8_t value)
-+{
-+	switch (attr) {
-+	case AVRCP_ATTRIBUTE_ILEGAL:
-+		return "Illegal";
-+	case AVRCP_ATTRIBUTE_EQUALIZER:
-+		switch (value) {
-+		case 0x01:
-+			return "OFF";
-+		case 0x02:
-+			return "ON";
-+		default:
-+			return "Reserved";
-+		}
-+	case AVRCP_ATTRIBUTE_REPEAT_MODE:
-+		switch (value) {
-+		case 0x01:
-+			return "OFF";
-+		case 0x02:
-+			return "Single Track Repeat";
-+		case 0x03:
-+			return "All Track Repeat";
-+		case 0x04:
-+			return "Group Repeat";
-+		default:
-+			return "Reserved";
-+		}
-+	case AVRCP_ATTRIBUTE_SHUFFLE:
-+		switch (value) {
-+		case 0x01:
-+			return "OFF";
-+		case 0x02:
-+			return "All Track Suffle";
-+		case 0x03:
-+			return "Group Suffle";
-+		default:
-+			return "Reserved";
-+		}
-+	case AVRCP_ATTRIBUTE_SCAN:
-+		switch (value) {
-+		case 0x01:
-+			return "OFF";
-+		case 0x02:
-+			return "All Track Scan";
-+		case 0x03:
-+			return "Group Scan";
-+		default:
-+			return "Reserved";
-+		}
-+	default:
-+		return "Unknown";
-+	}
-+}
-+
- static void avrcp_passthrough_packet(const struct l2cap_frame *frame)
- {
- }
-@@ -504,6 +558,47 @@ static void avrcp_list_player_values(const struct l2cap_frame *frame,
- 					uint8_t ctype, uint8_t len,
- 					uint8_t indent)
- {
-+	struct l2cap_frame avrcp_frame;
-+	static uint8_t attr = 0;
-+	uint8_t num, i;
-+
-+	if (len < 1)
-+		goto error;
-+
-+	l2cap_frame_pull(&avrcp_frame, frame, 0);
-+
-+	if (ctype > AVC_CTYPE_GENERAL_INQUIRY)
-+		goto response;
-+
-+	if (l2cap_frame_get_u8(&avrcp_frame, &attr))
-+		goto error;
-+
-+	print_field("%*cAttributeID: 0x%02x (%s)", (indent - 8), ' ',
-+						attr, attr2str(attr));
-+
-+	return;
-+
-+response:
-+	if (l2cap_frame_get_u8(&avrcp_frame, &num))
-+		goto error;
-+
-+	print_field("%*cValueCount: 0x%02x", (indent - 8), ' ', num);
-+
-+	for (i = 0; num > 0; num--, i++) {
-+		uint8_t value;
-+
-+		if (l2cap_frame_get_u8(&avrcp_frame, &value))
-+			goto error;
-+
-+		print_field("%*cValueID: 0x%02x (%s)", (indent - 8),
-+					' ', value, value2str(attr, value));
-+	}
-+
-+	return;
-+
-+error:
-+	print_text(COLOR_ERROR, "PDU malformed");
-+	packet_hexdump(frame->data, frame->size);
- }
- 
- static void avrcp_get_current_player_value(const struct l2cap_frame *frame,
+When testing support for Suspend/Resume in SyncEvolution's PBAP backend
+I ran into a situation that is not handled well at the moment:
+
+     1. PullAll creates a new transfer and queues it.
+     2. Suspend is called while the transfer is not running yet ->
+        "GDBus.Error:org.bluez.obex.Error.NotInProgress: Not in
+        progress"
+     3. When ready, the transfer runs (untested; at the moment,
+        SyncEvolution cancels the transfer when receiving the error).
+
+The only way how SyncEvolution can suspend in this case is to catch the
+error, wait for the "active" Status and retry to suspend. This is
+sub-optimal (besides being more complex) because the whole point of the
+suspend is to not interfere with other activities until the transfer
+gets resumed again.
+
+Would it be possible to get rid of the NotInProgress error during Status
+= "queued", for example by keeping the transfer in the queued state
+until it gets resumed?
+
 -- 
-1.9.1
+Best Regards, Patrick Ohly
+
+The content of this message is my personal opinion only and although
+I am an employee of Intel, the statements I make here in no way
+represent Intel's position on the issue, nor am I authorized to speak
+on behalf of Intel on this matter.
+
+
 
