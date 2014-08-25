@@ -2,11 +2,11 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 2/3] android/health: Call MDL shutdown after mdl_deleted_cb callback
-Date: Mon, 25 Aug 2014 11:49:01 +0200
-Message-ID: <1711265.HQivQYrQOI@uw000953>
-In-Reply-To: <1408698607-23815-2-git-send-email-ravikumar.veeramally@linux.intel.com>
-References: <1408698607-23815-1-git-send-email-ravikumar.veeramally@linux.intel.com> <1408698607-23815-2-git-send-email-ravikumar.veeramally@linux.intel.com>
+Subject: Re: [PATCH 1/3] android/health: Remove mcl instance on mcl_disconnected call back
+Date: Mon, 25 Aug 2014 11:39:19 +0200
+Message-ID: <1471101.Hvbh4fLBkX@uw000953>
+In-Reply-To: <1408698607-23815-1-git-send-email-ravikumar.veeramally@linux.intel.com>
+References: <1408698607-23815-1-git-send-email-ravikumar.veeramally@linux.intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -14,93 +14,89 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Ravi,
 
-On Friday 22 of August 2014 12:10:06 Ravi kumar Veeramally wrote:
-> Shutdown_mdl shutdown io channels and unrefs it. After that related
-> callbacks will shutdown or close and free its data. Due to timing
-> issue process_md_delete_mdl_req send delete confirmation response to
-> peer before properly shutting down all opened data channels.
+On Friday 22 of August 2014 12:10:05 Ravi kumar Veeramally wrote:
+> MCAP library is maintaining two sets of mcl list. On mcl_disconnected
+> call mcl instance is removed from regular mcl list and cached in mcl_cache
+> list. health.c doesn't maintain any cached mcls list. So mcl_conn variable
+> doesn't make any sense of not being connected on mcl_disconnected call back.
+> So unref mcl on mcl_disconnected and don't do anything in mcl_unached callback.
 > ---
->  android/health.c   | 25 ++++---------------------
->  android/mcap-lib.c |  6 ++----
->  2 files changed, 6 insertions(+), 25 deletions(-)
+>  android/health.c | 17 +++--------------
+>  1 file changed, 3 insertions(+), 14 deletions(-)
 > 
 > diff --git a/android/health.c b/android/health.c
-> index ee6c11b..f49110a 100644
+> index 665482e..ee6c11b 100644
 > --- a/android/health.c
 > +++ b/android/health.c
-> @@ -1254,34 +1254,17 @@ static void mcap_mdl_closed_cb(struct mcap_mdl *mdl, void *data)
->  	channel->mdl_conn = false;
+> @@ -85,7 +85,6 @@ struct health_device {
+>  	uint16_t app_id;
+>  
+>  	struct mcap_mcl *mcl;
+> -	bool mcl_conn;
+>  
+>  	struct queue *channels;     /* data channels */
+>  
+> @@ -193,7 +192,6 @@ static void unref_mcl(struct health_device *dev)
+>  	mcap_close_mcl(dev->mcl, FALSE);
+>  	mcap_mcl_unref(dev->mcl);
+>  	dev->mcl = NULL;
+> -	dev->mcl_conn = false;
 >  }
 >  
-> -static void notify_channel(void *data, void *user_data)
-> -{
-> -	struct health_channel *channel = data;
-> -
-> -	send_channel_state_notify(channel, HAL_HEALTH_CHANNEL_DESTROYED, -1);
-> -}
-> -
->  static void mcap_mdl_deleted_cb(struct mcap_mdl *mdl, void *data)
->  {
-> -	struct health_channel *channel = data;
-> -	struct health_device *dev;
-> -
-> -	if (!channel)
-> -		return;
-> -
-> -	dev = channel->dev;
-> +	struct health_channel *channel;
+>  static void free_health_device(void *data)
+> @@ -1826,7 +1824,6 @@ static void create_mcl_cb(struct mcap_mcl *mcl, GError *err, gpointer data)
+>  	if (!channel->dev->mcl)
+>  		channel->dev->mcl = mcap_mcl_ref(mcl);
 >  
-> -	DBG("device %p channel %p mdl %p", dev, channel, mdl);
->  	info("health: MDL deleted");
+> -	channel->dev->mcl_conn = true;
+>  	info("health: MCL connected");
 >  
-> -	/* mdl == NULL means, delete all mdls */
-> -	if (!mdl) {
-> -		queue_foreach(dev->channels, notify_channel, NULL);
-> -		queue_remove_all(dev->channels, NULL, NULL,
-> -						free_health_channel);
-> +	channel = search_channel_by_mdl(mdl);
-> +	if (!channel)
->  		return;
-> -	}
->  
-> +	DBG("channel %p mdl %p", channel, mdl);
->  	destroy_channel(channel);
->  }
->  
-> diff --git a/android/mcap-lib.c b/android/mcap-lib.c
-> index f208fac..1706d9f 100644
-> --- a/android/mcap-lib.c
-> +++ b/android/mcap-lib.c
-> @@ -1007,10 +1007,10 @@ static void mcap_del_mdl(gpointer elem, gpointer user_data)
->  	struct mcap_mdl *mdl = elem;
->  	gboolean notify = *(gboolean *) user_data;
->  
-> -	shutdown_mdl(mdl);
->  	if (notify)
->  		mdl->mcl->cb->mdl_deleted(mdl, mdl->mcl->cb->user_data);
->  
-> +	shutdown_mdl(mdl);
->  	mcap_mdl_unref(mdl);
->  }
->  
-> @@ -1231,13 +1231,11 @@ static void process_md_delete_mdl_req(struct mcap_mcl *mcl, void *cmd,
->  	req = cmd;
->  	mdlid = ntohs(req->mdl);
->  	if (mdlid == MCAP_ALL_MDLIDS) {
-> -		notify = FALSE;
-> +		notify = TRUE;
->  		g_slist_foreach(mcl->mdls, mcap_del_mdl, &notify);
->  		g_slist_free(mcl->mdls);
->  		mcl->mdls = NULL;
->  		mcl->state = MCL_CONNECTED;
-> -		/* NULL mdl means ALL_MDLS */
-> -		mcl->cb->mdl_deleted(NULL, mcl->cb->user_data);
->  		goto resp;
+>  	ret = set_mcl_cb(channel->dev->mcl, channel, &gerr);
+> @@ -1948,7 +1945,7 @@ static void bt_health_connect_channel(const void *buf, uint16_t len)
+>  		}
 >  	}
 >  
+> -	if (!dev->mcl || (dev->mcl && !dev->mcl_conn)) {
+> +	if (!dev->mcl) {
+>  		if (connect_mcl(channel) < 0) {
+>  			error("health: error retrieving HDP SDP record");
+>  			goto fail;
+> @@ -2072,8 +2069,6 @@ static void mcl_reconnected(struct mcap_mcl *mcl, gpointer data)
+>  		error("device data does not exists");
+>  		return;
+>  	}
+> -
+> -	dev->mcl_conn = true;
+>  }
+>  
+>  static void mcl_disconnected(struct mcap_mcl *mcl, gpointer data)
+> @@ -2084,18 +2079,12 @@ static void mcl_disconnected(struct mcap_mcl *mcl, gpointer data)
+>  
+>  	info("health: MCL disconnected");
+>  	dev = search_dev_by_mcl(mcl);
+> -	if (dev)
+> -		dev->mcl_conn = false;
+> +	unref_mcl(dev);
+>  }
+>  
+>  static void mcl_uncached(struct mcap_mcl *mcl, gpointer data)
+>  {
+> -	struct health_device *dev;
+> -
+> -	DBG("");
+> -
+> -	dev = search_dev_by_mcl(mcl);
+> -	free_health_device(dev);
+> +	/* mcap library maintains cache of mcls, not required here */
+>  }
+>  
+>  bool bt_health_register(struct ipc *ipc, const bdaddr_t *addr, uint8_t mode)
 > 
 
-Applied. Thanks.
+This patch is now applied, thanks.
+
+I had to fix commit message line length limit, so please keep it 72 characters
+in future.
 
 -- 
 Best regards, 
