@@ -1,41 +1,161 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 0/4] Fix for android-tester: Gatt - Double Listen case
-Date: Mon, 25 Aug 2014 11:11:08 +0200
-Message-ID: <1889590.ENdnTkPaDa@uw000953>
-In-Reply-To: <1408711249-6683-1-git-send-email-jakub.tyszkowski@tieto.com>
-References: <1408711249-6683-1-git-send-email-jakub.tyszkowski@tieto.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <1408703129-12414-1-git-send-email-luiz.dentz@gmail.com>
+References: <1408703129-12414-1-git-send-email-luiz.dentz@gmail.com>
+Date: Mon, 25 Aug 2014 11:49:33 +0300
+Message-ID: <CABBYNZLkK1X-e+p_xfMmduXeY9GjFB+Tx1YP6H5psFba_iFaYQ@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] monitor: Add helper functions to get data from
+ L2CAP frames
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jakub,
+Hi,
 
-On Friday 22 of August 2014 14:40:45 Jakub Tyszkowski wrote:
-> This patch set fixes the issue with Gatt: Double Listen test case, in which
-> we were trying to reconnect the emulated remote while the ACL was still
-> connected.
-> 
-> Jakub Tyszkowski (2):
->   android/tester: Wait for ACL disconnection before reconnect
->   android/tester: Make Gatt stop listening after ACL disconnects
-> 
-> Marcin Kraglak (2):
->   emulator/bthost: Add hci disconnect
->   android/tester: Force remotes ACL disconnection
-> 
->  android/tester-gatt.c | 23 ++++++++++++++++++++---
->  android/tester-main.c | 15 ++++++++++++++-
->  emulator/bthost.c     | 11 +++++++++++
->  emulator/bthost.h     |  3 +++
->  4 files changed, 48 insertions(+), 4 deletions(-)
-> 
+On Fri, Aug 22, 2014 at 1:25 PM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>
+> ---
+>  monitor/l2cap.h | 118 +++++++++++++++++++++++++++++++++++++++++++++++++++-----
+>  1 file changed, 109 insertions(+), 9 deletions(-)
+>
+> diff --git a/monitor/l2cap.h b/monitor/l2cap.h
+> index a0f844b..645e3ef 100644
+> --- a/monitor/l2cap.h
+> +++ b/monitor/l2cap.h
+> @@ -40,15 +40,115 @@ struct l2cap_frame {
+>  static inline void l2cap_frame_pull(struct l2cap_frame *frame,
+>                                 const struct l2cap_frame *source, uint16_t len)
+>  {
+> -       frame->index   = source->index;
+> -       frame->in      = source->in;
+> -       frame->handle  = source->handle;
+> -       frame->cid     = source->cid;
+> -       frame->psm     = source->psm;
+> -       frame->chan    = source->chan;
+> -       frame->mode    = source->mode;
+> -       frame->data    = source->data + len;
+> -       frame->size    = source->size - len;
+> +       if (frame != source) {
+> +               frame->index   = source->index;
+> +               frame->in      = source->in;
+> +               frame->handle  = source->handle;
+> +               frame->cid     = source->cid;
+> +               frame->psm     = source->psm;
+> +               frame->chan    = source->chan;
+> +               frame->mode    = source->mode;
+> +       }
+> +
+> +       frame->data = source->data + len;
+> +       frame->size = source->size - len;
+> +}
+> +
+> +static inline int l2cap_frame_get_u8(struct l2cap_frame *frame, uint8_t *value)
+> +{
+> +       if (frame->size < sizeof(*value))
+> +               return -1;
+> +
+> +       if (value)
+> +               *value = *((uint8_t *) frame->data);
+> +
+> +       l2cap_frame_pull(frame, frame, sizeof(*value));
+> +
+> +       return 0;
+> +}
+> +
+> +static inline int l2cap_frame_get_be16(struct l2cap_frame *frame,
+> +                                                               uint16_t *value)
+> +{
+> +       if (frame->size < sizeof(*value))
+> +               return -1;
+> +
+> +       if (value)
+> +               *value = get_be16(frame->data);
+> +
+> +       l2cap_frame_pull(frame, frame, sizeof(*value));
+> +
+> +       return 0;
+> +}
+> +
+> +static inline int l2cap_frame_get_le16(struct l2cap_frame *frame,
+> +                                                               uint16_t *value)
+> +{
+> +       if (frame->size < sizeof(*value))
+> +               return -1;
+> +
+> +       if (value)
+> +               *value = get_le16(frame->data);
+> +
+> +       l2cap_frame_pull(frame, frame, sizeof(*value));
+> +
+> +       return 0;
+> +}
+> +
+> +static inline int l2cap_frame_get_be32(struct l2cap_frame *frame,
+> +                                                               uint32_t *value)
+> +{
+> +       if (frame->size < sizeof(*value))
+> +               return -1;
+> +
+> +       if (value)
+> +               *value = get_be32(frame->data);
+> +
+> +       l2cap_frame_pull(frame, frame, sizeof(*value));
+> +
+> +       return 0;
+> +}
+> +
+> +static inline int l2cap_frame_get_le32(struct l2cap_frame *frame,
+> +                                                               uint32_t *value)
+> +{
+> +       if (frame->size < sizeof(*value))
+> +               return -1;
+> +
+> +       if (value)
+> +               *value = get_le32(frame->data);
+> +
+> +       l2cap_frame_pull(frame, frame, sizeof(*value));
+> +
+> +       return 0;
+> +}
+> +
+> +static inline int l2cap_frame_get_be64(struct l2cap_frame *frame,
+> +                                                               uint64_t *value)
+> +{
+> +       if (frame->size < sizeof(*value))
+> +               return -1;
+> +
+> +       if (value)
+> +               *value = get_be64(frame->data);
+> +
+> +       l2cap_frame_pull(frame, frame, sizeof(*value));
+> +
+> +       return 0;
+> +}
+> +
+> +static inline int l2cap_frame_get_le64(struct l2cap_frame *frame,
+> +                                                               uint64_t *value)
+> +{
+> +       if (frame->size < sizeof(*value))
+> +               return -1;
+> +
+> +       if (value)
+> +               *value = get_le64(frame->data);
+> +
+> +       l2cap_frame_pull(frame, frame, sizeof(*value));
+> +
+> +       return 0;
+>  }
+>
+>  void l2cap_packet(uint16_t index, bool in, uint16_t handle, uint8_t flags,
+> --
+> 1.9.3
 
-Patches 1-3 applied. Thanks.
+Pushed.
+
 
 -- 
-Best regards, 
-Szymon Janc
+Luiz Augusto von Dentz
