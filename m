@@ -1,51 +1,53 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 25 Aug 2014 15:59:06 -0400
+Date: Mon, 25 Aug 2014 15:35:46 -0400
 From: "John W. Linville" <linville@tuxdriver.com>
-To: linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: pull request: bluetooth-next 2014-08-14
-Message-ID: <20140825195906.GF1966@tuxdriver.com>
-References: <20140814145000.GA14226@t440s.P-661HNU-F1>
+To: alex.aring@gmail.com, linux-wireless@vger.kernel.org,
+	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: pull request: bluetooth 2014-08-20
+Message-ID: <20140825193545.GE1966@tuxdriver.com>
+References: <20140820191438.GA16364@t440s.P-661HNU-F1>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20140814145000.GA14226@t440s.P-661HNU-F1>
+In-Reply-To: <20140820191438.GA16364@t440s.P-661HNU-F1>
 Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Thu, Aug 14, 2014 at 05:50:00PM +0300, Johan Hedberg wrote:
+On Wed, Aug 20, 2014 at 10:14:38PM +0300, Johan Hedberg wrote:
 > Hi John,
 > 
-> Here's our first bluetooth-next pull request for the 3.18 kernel. Our
-> tree is based on net-next so you'd need to pull from there first before
-> pulling from our tree.
+> Here's a set of patches for the 3.17-rc series.
 > 
-> The changes consists of:
+> It contains a connection reference counting fix for LE where a
+> connection might stay up even though it should get disconnected.
 > 
-> 	- Coding style fixes to HCI drivers
-> 	- Corrupted ack value fix for the H5 HCI driver
-> 	- A couple of Enhanced L2CAP fixes
-> 	- Conversion of SMP code to use common L2CAP channel API
-> 	- Page scan optimizations when using the kernel-side whitelist
-> 	- Various mac802154 and and ieee802154 6lowpan cleanups
-> 	- One new Atheros USB ID
+> The other 802.15.4 6LoWPAN related patches were sent to the bluetooth
+> tree by Alexander Aring and described as follows by him:
+> 
+> "
+> these patches contains patches for the bluetooth branch.
+> 
+> This series includes memory leak fixes and an errno value fix.
+> Also there are two patches for sending and receiving 1280 6LoWPAN
+> packets, which makes the IEEE 802.15.4 6LoWPAN stack more RFC
+> compliant.
+> "
 > 
 > Please let me know if there are any issues pulling. Thanks.
 > 
 > Johan
 > 
 > ---
-> The following changes since commit f0094b28f3038936c1985be64dbe83f0e950b671:
+> The following changes since commit 77b2f2865956b7573f9b040db7a9f808b434acd1:
 > 
->   Merge git://git.kernel.org/pub/scm/linux/kernel/git/davem/net (2014-08-13 18:27:40 -0600)
+>   iwlwifi: mvm: disable scheduled scan to prevent firmware crash (2014-08-14 19:47:41 +0300)
 > 
 > are available in the git repository at:
 > 
+>   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git for-upstream
 > 
->   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git for-upstream
+> for you to fetch changes up to f161dd4122ffa73e4e12000309dca65bec80d416:
 > 
-> for you to fetch changes up to 13cac15296afe7e42088ecfcd0f1d4b658248c46:
-> 
->   Bluetooth: Fix ERTM L2CAP resend packet (2014-08-14 09:47:02 +0200)
+>   Bluetooth: Fix hci_conn reference counting for auto-connections (2014-08-20 21:57:39 +0300)
 
 Pulling now...
 
