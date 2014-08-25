@@ -1,55 +1,85 @@
 Return-Path: <cyrus@holtmann.org>
-From: Marcin Kraglak <marcin.kraglak@tieto.com>
+From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/2] android/client: Fix incorrect data parsing
-Date: Mon, 25 Aug 2014 15:40:01 +0200
-Message-Id: <1408974002-8986-1-git-send-email-marcin.kraglak@tieto.com>
+Cc: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
+Subject: [PATCHv3 1/2] android/hid: Reject connections from unknown devices
+Date: Mon, 25 Aug 2014 14:54:18 +0200
+Message-Id: <1408971259-21929-2-git-send-email-jakub.tyszkowski@tieto.com>
+In-Reply-To: <1408971259-21929-1-git-send-email-jakub.tyszkowski@tieto.com>
+References: <1408971259-21929-1-git-send-email-jakub.tyszkowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Use fill_buffer function in processing write_characteristic
-and send_indication functions.
+Don't accept input from not bonded devices.
 ---
- android/client/if-gatt.c | 19 ++++++++++++-------
- 1 file changed, 12 insertions(+), 7 deletions(-)
+ android/hidhost.c | 33 ++++++++++++++++++++++++---------
+ 1 file changed, 24 insertions(+), 9 deletions(-)
 
-diff --git a/android/client/if-gatt.c b/android/client/if-gatt.c
-index 8154bfd..325f986 100644
---- a/android/client/if-gatt.c
-+++ b/android/client/if-gatt.c
-@@ -1191,11 +1191,12 @@ static void write_characteristic_p(int argc, const char **argv)
- 		return;
+diff --git a/android/hidhost.c b/android/hidhost.c
+index da5f818..bb725c1 100644
+--- a/android/hidhost.c
++++ b/android/hidhost.c
+@@ -950,6 +950,19 @@ failed:
+ 									status);
+ }
+ 
++static bool bt_hid_write_virtual_unplug(GIOChannel *chan)
++{
++	uint8_t hdr = HID_MSG_CONTROL | HID_VIRTUAL_CABLE_UNPLUG;
++	int fd = g_io_channel_unix_get_fd(chan);
++
++	if (write(fd, &hdr, sizeof(hdr)) == sizeof(hdr))
++		return true;
++
++	error("hidhost: Error writing virtual unplug command: %s (%d)",
++							strerror(errno), errno);
++	return false;
++}
++
+ static void bt_hid_virtual_unplug(const void *buf, uint16_t len)
+ {
+ 	const struct hal_cmd_hidhost_virtual_unplug *cmd = buf;
+@@ -957,8 +970,6 @@ static void bt_hid_virtual_unplug(const void *buf, uint16_t len)
+ 	GSList *l;
+ 	uint8_t status;
+ 	bdaddr_t dst;
+-	uint8_t hdr;
+-	int fd;
+ 
+ 	DBG("");
+ 
+@@ -977,13 +988,7 @@ static void bt_hid_virtual_unplug(const void *buf, uint16_t len)
+ 		goto failed;
  	}
  
--	/* len in chars */
--	len = strlen(argv[6]);
--	scan_field(argv[6], len, value, sizeof(value));
--	/* len in bytes converted from ascii chars */
--	len = (len + 1) / 2;
-+	if (strncmp(argv[6], "0X", 2) && strncmp(argv[6], "0x", 2)) {
-+		haltest_error("Value must be hex string");
+-	hdr = HID_MSG_CONTROL | HID_VIRTUAL_CABLE_UNPLUG;
+-
+-	fd = g_io_channel_unix_get_fd(dev->ctrl_io);
+-
+-	if (write(fd, &hdr, sizeof(hdr)) < 0) {
+-		error("hidhost: Error writing virtual unplug command: %s (%d)",
+-						strerror(errno), errno);
++	if (!bt_hid_write_virtual_unplug(dev->ctrl_io)) {
+ 		status = HAL_STATUS_FAILED;
+ 		goto failed;
+ 	}
+@@ -1410,6 +1415,16 @@ static void connect_cb(GIOChannel *chan, GError *err, gpointer user_data)
+ 	ba2str(&dst, address);
+ 	DBG("Incoming connection from %s on PSM %d", address, psm);
+ 
++	if (!bt_device_is_bonded(&dst)) {
++		warn("hidhost: Rejecting connection from unknown device %s",
++								address);
++		if (psm == L2CAP_PSM_HIDP_CTRL)
++			bt_hid_write_virtual_unplug(chan);
++
++		g_io_channel_shutdown(chan, TRUE, NULL);
 +		return;
 +	}
 +
-+	len = fill_buffer(argv[6] + 2, value, sizeof(value));
- 
- 	/* auth_req */
- 	if (argc > 7)
-@@ -1791,8 +1792,12 @@ static void gatts_send_indication_p(int argc, const char *argv[])
- 	confirm = atoi(argv[5]);
- 
- 	if (argc > 6) {
--		len = strlen(argv[6]);
--		scan_field(argv[6], len, (uint8_t *) data, sizeof(data));
-+		if (strncmp(argv[6], "0X", 2) && strncmp(argv[6], "0x", 2)) {
-+			haltest_error("Value must be hex string");
-+			return;
-+		}
-+
-+		len = fill_buffer(argv[6] + 2, data, sizeof(data));
- 	}
- 
- 	EXEC(if_gatt->server->send_indication, server_if, attr_handle, conn_id,
+ 	switch (psm) {
+ 	case L2CAP_PSM_HIDP_CTRL:
+ 		l = g_slist_find_custom(devices, &dst, device_cmp);
 -- 
-1.9.3
+1.9.1
 
