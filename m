@@ -1,45 +1,86 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1408961443.27910.149.camel@pohly-mobl1.fritz.box>
-Subject: org.bluez.obex.Transfer1 Suspend/Resume in queued state
-From: Patrick Ohly <patrick.ohly@intel.com>
-To: Luiz Von Dentz <luiz.von.dentz@intel.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	Mateusz Potrola <mateusz.polrola@gmail.com>
-Date: Mon, 25 Aug 2014 12:10:43 +0200
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+From: Szymon Janc <szymon.janc@tieto.com>
+To: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 3/3] android/health: Cache MDL file desciptor
+Date: Mon, 25 Aug 2014 11:56:48 +0200
+Message-ID: <1520077.kvNWHOJ9O5@uw000953>
+In-Reply-To: <1408698607-23815-3-git-send-email-ravikumar.veeramally@linux.intel.com>
+References: <1408698607-23815-1-git-send-email-ravikumar.veeramally@linux.intel.com> <1408698607-23815-3-git-send-email-ravikumar.veeramally@linux.intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello!
+Hi Ravi,
 
-When testing support for Suspend/Resume in SyncEvolution's PBAP backend
-I ran into a situation that is not handled well at the moment:
+On Friday 22 of August 2014 12:10:07 Ravi kumar Veeramally wrote:
+> PTS expects to close all data channels before sending delete confirmation
+> to peer. But file descriptor passed over IPC to hal needs to be closed.
+> Due to timing issue IPC notification is triggering after sending
+> confirmation. So cache fd and shutdown on channel free will solve the issue.
+> ---
+>  android/health.c | 7 +++++++
+>  1 file changed, 7 insertions(+)
+> 
+> diff --git a/android/health.c b/android/health.c
+> index f49110a..29c1d15 100644
+> --- a/android/health.c
+> +++ b/android/health.c
+> @@ -102,6 +102,7 @@ struct health_channel {
+>  	struct mcap_mdl *mdl;
+>  	bool mdl_conn;
+>  	uint16_t mdl_id; /* MDL ID */
+> +	int fd;
+>  
+>  	uint16_t id; /* channel id */
+>  };
+> @@ -168,6 +169,9 @@ static void free_health_channel(void *data)
+>  	if (!channel)
+>  		return;
+>  
+> +	if (channel->fd >= 0)
+> +		shutdown(channel->fd, SHUT_RDWR);
 
-     1. PullAll creates a new transfer and queues it.
-     2. Suspend is called while the transfer is not running yet ->
-        "GDBus.Error:org.bluez.obex.Error.NotInProgress: Not in
-        progress"
-     3. When ready, the transfer runs (untested; at the moment,
-        SyncEvolution cancels the transfer when receiving the error).
+Shouldn't channel->fd be closed here as well? (I think in what we have in
+git now we also miss closing after sending fd over IPC, but that would not
+matter if we cache fd with this patch.)
 
-The only way how SyncEvolution can suspend in this case is to catch the
-error, wait for the "active" Status and retry to suspend. This is
-sub-optimal (besides being more complex) because the whole point of the
-suspend is to not interfere with other activities until the transfer
-gets resumed again.
+Also I think fd should be closed for echo scenario ie by setting
+close_on_unref flag in glib io?
 
-Would it be possible to get rid of the NotInProgress error during Status
-= "queued", for example by keeping the transfer in the queued state
-until it gets resumed?
+Thoughts?
+
+> +
+>  	unref_mdl(channel);
+>  	free(channel);
+>  }
+> @@ -1234,6 +1238,7 @@ static void mcap_mdl_connected_cb(struct mcap_mdl *mdl, void *data)
+>  	}
+>  
+>  	info("health: MDL connected");
+> +	channel->fd = fd;
+>  	send_channel_state_notify(channel, HAL_HEALTH_CHANNEL_CONNECTED, fd);
+>  
+>  	return;
+> @@ -1357,6 +1362,7 @@ static struct health_channel *create_channel(struct health_app *app,
+>  	channel->type = mdep->channel_type;
+>  	channel->id = channel_id++;
+>  	channel->dev = dev;
+> +	channel->fd = -1;
+>  
+>  	if (!queue_push_tail(dev->channels, channel)) {
+>  		free_health_channel(channel);
+> @@ -1547,6 +1553,7 @@ static void connect_mdl_cb(struct mcap_mdl *mdl, GError *gerr, gpointer data)
+>  		if (channel->type != CHANNEL_TYPE_RELIABLE)
+>  			goto fail;
+>  
+> +	channel->fd = fd;
+>  	send_channel_state_notify(channel, HAL_HEALTH_CHANNEL_CONNECTED, fd);
+>  
+>  	return;
+> 
 
 -- 
-Best Regards, Patrick Ohly
-
-The content of this message is my personal opinion only and although
-I am an employee of Intel, the statements I make here in no way
-represent Intel's position on the issue, nor am I authorized to speak
-on behalf of Intel on this matter.
-
-
-
+Best regards, 
+Szymon Janc
