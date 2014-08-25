@@ -1,103 +1,58 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/3] android/health: Remove mcl instance on mcl_disconnected call back
-Date: Mon, 25 Aug 2014 11:39:19 +0200
-Message-ID: <1471101.Hvbh4fLBkX@uw000953>
-In-Reply-To: <1408698607-23815-1-git-send-email-ravikumar.veeramally@linux.intel.com>
-References: <1408698607-23815-1-git-send-email-ravikumar.veeramally@linux.intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <1408698180-23301-2-git-send-email-jakub.tyszkowski@tieto.com>
+References: <1408698180-23301-1-git-send-email-jakub.tyszkowski@tieto.com>
+	<1408698180-23301-2-git-send-email-jakub.tyszkowski@tieto.com>
+Date: Mon, 25 Aug 2014 12:38:30 +0300
+Message-ID: <CABBYNZ+5LPNFevacH4P6xXJhGjVLVgM98a10UyPo-iaMyg3UWg@mail.gmail.com>
+Subject: Re: [PATCHv2 1/2] android/hid: Reject connections from unknown devices
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Ravi,
+Hi Jakub,
 
-On Friday 22 of August 2014 12:10:05 Ravi kumar Veeramally wrote:
-> MCAP library is maintaining two sets of mcl list. On mcl_disconnected
-> call mcl instance is removed from regular mcl list and cached in mcl_cache
-> list. health.c doesn't maintain any cached mcls list. So mcl_conn variable
-> doesn't make any sense of not being connected on mcl_disconnected call back.
-> So unref mcl on mcl_disconnected and don't do anything in mcl_unached callback.
+On Fri, Aug 22, 2014 at 12:02 PM, Jakub Tyszkowski
+<jakub.tyszkowski@tieto.com> wrote:
+> Don't accept input from not bonded devices.
 > ---
->  android/health.c | 17 +++--------------
->  1 file changed, 3 insertions(+), 14 deletions(-)
-> 
-> diff --git a/android/health.c b/android/health.c
-> index 665482e..ee6c11b 100644
-> --- a/android/health.c
-> +++ b/android/health.c
-> @@ -85,7 +85,6 @@ struct health_device {
->  	uint16_t app_id;
->  
->  	struct mcap_mcl *mcl;
-> -	bool mcl_conn;
->  
->  	struct queue *channels;     /* data channels */
->  
-> @@ -193,7 +192,6 @@ static void unref_mcl(struct health_device *dev)
->  	mcap_close_mcl(dev->mcl, FALSE);
->  	mcap_mcl_unref(dev->mcl);
->  	dev->mcl = NULL;
-> -	dev->mcl_conn = false;
->  }
->  
->  static void free_health_device(void *data)
-> @@ -1826,7 +1824,6 @@ static void create_mcl_cb(struct mcap_mcl *mcl, GError *err, gpointer data)
->  	if (!channel->dev->mcl)
->  		channel->dev->mcl = mcap_mcl_ref(mcl);
->  
-> -	channel->dev->mcl_conn = true;
->  	info("health: MCL connected");
->  
->  	ret = set_mcl_cb(channel->dev->mcl, channel, &gerr);
-> @@ -1948,7 +1945,7 @@ static void bt_health_connect_channel(const void *buf, uint16_t len)
->  		}
->  	}
->  
-> -	if (!dev->mcl || (dev->mcl && !dev->mcl_conn)) {
-> +	if (!dev->mcl) {
->  		if (connect_mcl(channel) < 0) {
->  			error("health: error retrieving HDP SDP record");
->  			goto fail;
-> @@ -2072,8 +2069,6 @@ static void mcl_reconnected(struct mcap_mcl *mcl, gpointer data)
->  		error("device data does not exists");
->  		return;
->  	}
-> -
-> -	dev->mcl_conn = true;
->  }
->  
->  static void mcl_disconnected(struct mcap_mcl *mcl, gpointer data)
-> @@ -2084,18 +2079,12 @@ static void mcl_disconnected(struct mcap_mcl *mcl, gpointer data)
->  
->  	info("health: MCL disconnected");
->  	dev = search_dev_by_mcl(mcl);
-> -	if (dev)
-> -		dev->mcl_conn = false;
-> +	unref_mcl(dev);
->  }
->  
->  static void mcl_uncached(struct mcap_mcl *mcl, gpointer data)
->  {
-> -	struct health_device *dev;
-> -
-> -	DBG("");
-> -
-> -	dev = search_dev_by_mcl(mcl);
-> -	free_health_device(dev);
-> +	/* mcap library maintains cache of mcls, not required here */
->  }
->  
->  bool bt_health_register(struct ipc *ipc, const bdaddr_t *addr, uint8_t mode)
-> 
+>  android/hidhost.c | 14 ++++++++++++++
+>  1 file changed, 14 insertions(+)
+>
+> diff --git a/android/hidhost.c b/android/hidhost.c
+> index da5f818..07985d8 100644
+> --- a/android/hidhost.c
+> +++ b/android/hidhost.c
+> @@ -1410,6 +1410,20 @@ static void connect_cb(GIOChannel *chan, GError *err, gpointer user_data)
+>         ba2str(&dst, address);
+>         DBG("Incoming connection from %s on PSM %d", address, psm);
+>
+> +       if (!bt_device_is_bonded(&dst)) {
+> +               uint8_t hdr = (HID_MSG_CONTROL | HID_VIRTUAL_CABLE_UNPLUG);
+> +               int sk = g_io_channel_unix_get_fd(chan);
+> +
+> +               warn("hidhost: Rejected connection from unknown device %s",
+> +                                                               address);
+> +
+> +               if (write(sk, &hdr, sizeof(hdr)) < 0)
+> +                       error("hidhost: Unable to send virtual cable unplug");
+> +
+> +               g_io_channel_shutdown(chan, TRUE, NULL);
+> +               return;
+> +       }
+> +
+>         switch (psm) {
+>         case L2CAP_PSM_HIDP_CTRL:
+>                 l = g_slist_find_custom(devices, &dst, device_cmp);
+> --
+> 1.9.1
 
-This patch is now applied, thanks.
+I think we can a helper function to send HID_VIRTUAL_CABLE_UNPLUG,
+that way we can share code with bt_hid_virtual_unplug
 
-I had to fix commit message line length limit, so please keep it 72 characters
-in future.
 
 -- 
-Best regards, 
-Szymon Janc
+Luiz Augusto von Dentz
