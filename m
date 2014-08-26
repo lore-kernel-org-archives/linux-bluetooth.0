@@ -1,40 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1409060382.7335.25.camel@pohly-mobl1.fritz.box>
-References: <1409060382.7335.25.camel@pohly-mobl1.fritz.box>
-Date: Tue, 26 Aug 2014 16:52:30 +0300
-Message-ID: <CACumGOKfr8XBtYAOxoDKh6vqQnJGbq4xPCDggGRV-PEu_3LnBw@mail.gmail.com>
-Subject: Re: Suspend + abort session => obexd unusable
-From: "Von Dentz, Luiz" <luiz.von.dentz@intel.com>
-To: Patrick Ohly <patrick.ohly@intel.com>
-Cc: Mateusz Potrola <mateusz.polrola@gmail.com>,
-	Bluez <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] android/handsfree: Refactor handle_dial()
+Date: Tue, 26 Aug 2014 16:43:21 +0300
+Message-Id: <1409060601-14384-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Patrick,
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-On Tue, Aug 26, 2014 at 4:39 PM, Patrick Ohly <patrick.ohly@intel.com> wrote:
-> Hello Luiz!
->
-> I noticed a problem in obexd and/or Bluez 5.21 (Debian Testing):
->
-> - PullAll from Samsung Galaxy S3
-> - Suspend
-> - kill the process who called obexd
-> - try to pull again from a different process
-> => GDBus.Error:org.bluez.obex.Error.Failed: Unable to find service
-> record
->
-> obexd notices that its client died (there is a InterfacesRemoved signal
-> for the transfer and session path), but the cleanup seems to leave the
-> device or the local side in an unusable state.
->
-> Killing obexd and restarting it makes it possible to access the phone
-> again.
->
-> I've not been able to reproduce this without suspending first.
+Call callback only once.
+---
+ android/hal-handsfree.c | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
 
-It might be related to the patch Ive just sent, there is a bug where
-Transfer.Cancel would not work in case it is suspended.
+diff --git a/android/hal-handsfree.c b/android/hal-handsfree.c
+index 0f5e1d7..986e745 100644
+--- a/android/hal-handsfree.c
++++ b/android/hal-handsfree.c
+@@ -86,6 +86,7 @@ static void handle_dial(void *buf, uint16_t len, int fd)
+ {
+ 	struct hal_ev_handsfree_dial *ev = buf;
+ 	uint16_t num_len = ev->number_len;
++	char *number = NULL;
+ 
+ 	if (len != sizeof(*ev) + num_len ||
+ 			(num_len != 0 && ev->number[num_len - 1] != '\0')) {
+@@ -97,9 +98,9 @@ static void handle_dial(void *buf, uint16_t len, int fd)
+ 		return;
+ 
+ 	if (ev->number_len)
+-		cbs->dial_call_cmd_cb((char *) ev->number);
+-	else
+-		cbs->dial_call_cmd_cb(NULL);
++		number = (char *) ev->number;
++
++	cbs->dial_call_cmd_cb(number);
+ }
+ 
+ static void handle_dtmf(void *buf, uint16_t len, int fd)
+-- 
+1.9.1
+
