@@ -3,10 +3,10 @@ From: Vikrampal Yadav <vikram.pal@samsung.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: luiz.dentz@gmail.com, d.kasatkin@samsung.com,
 	vikram.pal@samsung.com, cpgs@samsung.com
-Subject: [PATCH v3 1/5] monitor: Add AVRCP
+Subject: [PATCH v3 1/4] monitor: Add AVRCP
  GetCurrentPlayerApplicationSettingValue support
-Date: Tue, 26 Aug 2014 19:50:48 +0530
-Message-id: <1409062852-29295-1-git-send-email-vikram.pal@samsung.com>
+Date: Tue, 26 Aug 2014 19:49:20 +0530
+Message-id: <1409062763-29247-1-git-send-email-vikram.pal@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
