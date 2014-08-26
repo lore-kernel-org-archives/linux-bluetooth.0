@@ -1,88 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
-From: Vikrampal Yadav <vikram.pal@samsung.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: luiz.dentz@gmail.com, d.kasatkin@samsung.com,
-	vikram.pal@samsung.com, cpgs@samsung.com
-Subject: [PATCH v3 1/4] monitor: Add AVRCP
- GetCurrentPlayerApplicationSettingValue support
-Date: Tue, 26 Aug 2014 19:49:20 +0530
-Message-id: <1409062763-29247-1-git-send-email-vikram.pal@samsung.com>
+MIME-Version: 1.0
+In-Reply-To: <1409060382.7335.25.camel@pohly-mobl1.fritz.box>
+References: <1409060382.7335.25.camel@pohly-mobl1.fritz.box>
+Date: Tue, 26 Aug 2014 16:52:30 +0300
+Message-ID: <CACumGOKfr8XBtYAOxoDKh6vqQnJGbq4xPCDggGRV-PEu_3LnBw@mail.gmail.com>
+Subject: Re: Suspend + abort session => obexd unusable
+From: "Von Dentz, Luiz" <luiz.von.dentz@intel.com>
+To: Patrick Ohly <patrick.ohly@intel.com>
+Cc: Mateusz Potrola <mateusz.polrola@gmail.com>,
+	Bluez <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Support for decoding AVRCP GetCurrentPlayerApplicationSettingValue
-added in Bluetooth monitor.
----
- monitor/avctp.c | 49 +++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 49 insertions(+)
+Hi Patrick,
 
-diff --git a/monitor/avctp.c b/monitor/avctp.c
-index 5543a49..936c40d 100644
---- a/monitor/avctp.c
-+++ b/monitor/avctp.c
-@@ -611,6 +611,54 @@ response:
- 	return true;
- }
- 
-+static bool avrcp_get_current_player_value(struct l2cap_frame *frame,
-+						uint8_t ctype, uint8_t len,
-+						uint8_t indent)
-+{
-+	uint8_t num;
-+
-+	if (!l2cap_frame_get_u8(frame, &num))
-+		return false;
-+
-+        if (ctype > AVC_CTYPE_GENERAL_INQUIRY)
-+		goto response;
-+
-+	print_field("%*cAttributeCount: 0x%02x", (indent - 8), ' ', num);
-+
-+	for (; num > 0; num--) {
-+		uint8_t attr;
-+
-+		if (!l2cap_frame_get_u8(frame, &attr))
-+			return false;
-+
-+		print_field("%*cAttributeID: 0x%02x (%s)", (indent - 8),
-+						' ', attr, attr2str(attr));
-+	}
-+
-+	return true;
-+
-+response:
-+	print_field("%*cValueCount: 0x%02x", (indent - 8), ' ', num);
-+
-+	for (; num > 0; num--) {
-+		uint8_t attr, value;
-+
-+		if (!l2cap_frame_get_u8(frame, &attr))
-+			return false;
-+
-+		print_field("%*cAttributeID: 0x%02x (%s)", (indent - 8),
-+						' ', attr, attr2str(attr));
-+
-+		if (!l2cap_frame_get_u8(frame, &value))
-+			return false;
-+
-+		print_field("%*cValueID: 0x%02x (%s)", (indent - 8),
-+					' ', value, value2str(attr, value));
-+	}
-+
-+	return true;
-+}
-+
- struct avrcp_ctrl_pdu_data {
- 	uint8_t pduid;
- 	bool (*func) (struct l2cap_frame *frame, uint8_t ctype, uint8_t len,
-@@ -621,6 +669,7 @@ static const struct avrcp_ctrl_pdu_data avrcp_ctrl_pdu_table[] = {
- 	{ 0x10, avrcp_get_capabilities			},
- 	{ 0x11, avrcp_list_player_attributes		},
- 	{ 0x12, avrcp_list_player_values		},
-+	{ 0x13, avrcp_get_current_player_value		},
- 	{ }
- };
- 
--- 
-1.9.1
+On Tue, Aug 26, 2014 at 4:39 PM, Patrick Ohly <patrick.ohly@intel.com> wrote:
+> Hello Luiz!
+>
+> I noticed a problem in obexd and/or Bluez 5.21 (Debian Testing):
+>
+> - PullAll from Samsung Galaxy S3
+> - Suspend
+> - kill the process who called obexd
+> - try to pull again from a different process
+> => GDBus.Error:org.bluez.obex.Error.Failed: Unable to find service
+> record
+>
+> obexd notices that its client died (there is a InterfacesRemoved signal
+> for the transfer and session path), but the cleanup seems to leave the
+> device or the local side in an unusable state.
+>
+> Killing obexd and restarting it makes it possible to access the phone
+> again.
+>
+> I've not been able to reproduce this without suspending first.
 
+It might be related to the patch Ive just sent, there is a bug where
+Transfer.Cancel would not work in case it is suspended.
