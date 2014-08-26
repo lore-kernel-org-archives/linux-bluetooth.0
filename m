@@ -1,90 +1,95 @@
 Return-Path: <cyrus@holtmann.org>
-From: Sebastian Chlad <sebastian.chlad@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Sebastian Chlad <sebastian.chlad@tieto.com>
-Subject: [PATCH] android/pts: HDP regression tests
-Date: Tue, 26 Aug 2014 11:07:56 +0200
-Message-Id: <1409044076-30066-1-git-send-email-sebastian.chlad@tieto.com>
+MIME-Version: 1.0
+In-Reply-To: <1408979217.7335.9.camel@pohly-mobl1.fritz.box>
+References: <1408961443.27910.149.camel@pohly-mobl1.fritz.box>
+	<CABBYNZLTF9s1v=wTSSLN0A2zPEgyAAyKhpJ+KaLDSLfZxCG-Tg@mail.gmail.com>
+	<1408979217.7335.9.camel@pohly-mobl1.fritz.box>
+Date: Tue, 26 Aug 2014 11:07:48 +0300
+Message-ID: <CABBYNZLJBSJZkiVin0uLo=jy6-ZvyAvU+FM_03p7cri67OzPdQ@mail.gmail.com>
+Subject: Re: org.bluez.obex.Transfer1 Suspend/Resume in queued state
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Patrick Ohly <patrick.ohly@intel.com>
+Cc: Luiz Von Dentz <luiz.von.dentz@intel.com>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	Mateusz Potrola <mateusz.polrola@gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Regression round for HDP against PTS 5.2 and Android 4.4.4
----
- android/pics-hdp.txt  | 4 ++--
- android/pixit-hdp.txt | 8 ++++----
- android/pts-hdp.txt   | 6 +++---
- 3 files changed, 9 insertions(+), 9 deletions(-)
+Hi Patrick,
 
-diff --git a/android/pics-hdp.txt b/android/pics-hdp.txt
-index d48e576..b179f9e 100644
---- a/android/pics-hdp.txt
-+++ b/android/pics-hdp.txt
-@@ -1,6 +1,6 @@
- HDP PICS for the PTS tool.
- 
--PTS version: 5.1
-+PTS version: 5.2
- 
- * - different than PTS defaults
- # - not yet implemented/supported
-@@ -14,7 +14,7 @@ O - optional
- Parameter Name	Selected	Description
- -------------------------------------------------------------------------------
- TSPC_HDP_0_1	False		HDP 1.0 (C.1)
--TSPC_HDP_0_2	True		HDP 1.1(C.1)
-+TSPC_HDP_0_2	True		HDP 1.1 (C.1)
- -------------------------------------------------------------------------------
- C.1: Mandatory to support only one Profile version.
- -------------------------------------------------------------------------------
-diff --git a/android/pixit-hdp.txt b/android/pixit-hdp.txt
-index 24cdcec..c0ad7e2 100644
---- a/android/pixit-hdp.txt
-+++ b/android/pixit-hdp.txt
-@@ -1,6 +1,6 @@
- HDP PIXIT for the PTS tool.
- 
--PTS version: 5.1
-+PTS version: 5.2
- 
- * - different than PTS defaults
- & - should be set to IUT Bluetooth address
-@@ -9,7 +9,7 @@ PTS version: 5.1
- -------------------------------------------------------------------------------
- Parameter Name						Value
- -------------------------------------------------------------------------------
--TSPX_security_enabled					TRUE (*)
-+TSPX_security_enabled					TRUE
- TSPX_delete_link_key					FALSE
- TSPX_bd_addr_iut					112233445566 (*&)
- TSPX_sink_device_class_of_device			00900
-@@ -23,9 +23,9 @@ TSPX_MCAP_sync_lead_time				0BB8
- TSPX_MCAP_timestamp_native_resolution			2233
- TSPX_MCAP_timestamp_native_accuracy			1400
- TSPX_MCAP_timestamp_required_accuracy			6400
--TSPX_DC_max					1
-+TSPX_DC_max						1
- TSPX_secure_simple_pairing_pass_key_confirmation	FALSE
--TSPX_time_guard						6000000
-+TSPX_time_guard						60000000
- TSPX_ieee_device_specialization				10417
- TSPX_ieee_standard_configuration			TRUE
- TSPX_MCAP_bluetooth_clock_access_resolution		55
-diff --git a/android/pts-hdp.txt b/android/pts-hdp.txt
-index 4337e0e..2fad385 100644
---- a/android/pts-hdp.txt
-+++ b/android/pts-hdp.txt
-@@ -1,8 +1,8 @@
- PTS test results for HDP
- 
--PTS version: 5.1
--Tested: 30-June-2014
--Android version: 4.4.2
-+PTS version: 5.2
-+Tested: 25-August-2014
-+Android version: 4.4.4
- 
- Results:
- PASS	test passed
+On Mon, Aug 25, 2014 at 6:06 PM, Patrick Ohly <patrick.ohly@intel.com> wrote:
+> On Mon, 2014-08-25 at 13:57 +0300, Luiz Augusto von Dentz wrote:
+>> Hi Patrick,
+>>
+>> On Mon, Aug 25, 2014 at 1:10 PM, Patrick Ohly <patrick.ohly@intel.com> wrote:
+>> > Hello!
+>> >
+>> > When testing support for Suspend/Resume in SyncEvolution's PBAP backend
+>> > I ran into a situation that is not handled well at the moment:
+>> >
+>> >      1. PullAll creates a new transfer and queues it.
+>> >      2. Suspend is called while the transfer is not running yet ->
+>> >         "GDBus.Error:org.bluez.obex.Error.NotInProgress: Not in
+>> >         progress"
+>> >      3. When ready, the transfer runs (untested; at the moment,
+>> >         SyncEvolution cancels the transfer when receiving the error).
+>>
+>> Well this behavior is documented:
+>> https://git.kernel.org/cgit/bluetooth/bluez.git/tree/doc/obex-api.txt
+>
+> I know. The implication slipped past me when we discussed the API,
+> otherwise I would have brought it up sooner.
+>
+>> > The only way how SyncEvolution can suspend in this case is to catch the
+>> > error, wait for the "active" Status and retry to suspend. This is
+>> > sub-optimal (besides being more complex) because the whole point of the
+>> > suspend is to not interfere with other activities until the transfer
+>> > gets resumed again.
+>>
+>> But why you want to suspend a transfer that is currently not active?
+>
+> Because otherwise it will become active, which is no longer desirable.
+>
+>>  I
+>> expected that the active would be suspended thus suspending the whole
+>> queue since OBEX can only support one at time.
+>
+> I'm not sure I follow here. Are you saying that if there is an active
+> transfer A and a queued transfer B, transfer A should get suspended?
+> That only works if they both came from the same process, which is not
+> guaranteed.
+
+Yep, I guess we ignored the fact different processes may create their
+own transfers but it is a valid point.
+
+> Even if they are, there's still the race that a suspend of A could hit
+> the time window when A has already completed and B became active.
+
+That is true, its more an IPC problem where things don't happen
+instantaneously but it can happen, but again as OBEX can only deal
+with 1 transfer at the time if the current transfer is suspended the
+next one wont continue, or perhaps we want a master suspend e.g.
+Session.Suspend that suspend everything at once but that Im afraid
+should only be possible by creator of the session.
+
+>> > Would it be possible to get rid of the NotInProgress error during Status
+>> > = "queued", for example by keeping the transfer in the queued state
+>> > until it gets resumed?
+>>
+>> Perhaps if we come up with a use case that benefit from it, maybe it
+>> is valid if we want to be able to suspend transfer after the active,
+>> or deeper in queue, has completed? I would turn it suspended and then
+>> a call to Resume should turn the transfer back to queued so it is
+>> easier to monitor what is going on.
+>
+> The use case is simple: a transfer was requested and should be either
+> completed or suspended after a Suspend() call. Having it change from
+> "queued" to "suspended" would be fine.
+
+I will start with this design then and allow transfer owner to suspend
+their transfer while they are queued, later we can discuss if we need
+a master suspend/resume
+
 -- 
-1.8.5.3
-
+Luiz Augusto von Dentz
