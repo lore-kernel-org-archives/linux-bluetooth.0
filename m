@@ -1,43 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] android/client: Fix incorrect memory access
-Date: Tue, 26 Aug 2014 16:42:19 +0300
-Message-Id: <1409060539-14321-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Message-ID: <1409060382.7335.25.camel@pohly-mobl1.fritz.box>
+Subject: Suspend + abort session => obexd unusable
+From: Patrick Ohly <patrick.ohly@intel.com>
+To: Luiz Von Dentz <luiz.von.dentz@intel.com>
+Cc: Mateusz Potrola <mateusz.polrola@gmail.com>,
+	Bluez <linux-bluetooth@vger.kernel.org>
+Date: Tue, 26 Aug 2014 15:39:42 +0200
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Hello Luiz!
 
-In case argc==3 we might access argv[3]. Make code more readable.
----
- android/client/if-hf.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+I noticed a problem in obexd and/or Bluez 5.21 (Debian Testing):
 
-diff --git a/android/client/if-hf.c b/android/client/if-hf.c
-index d0e7a66..77216df 100644
---- a/android/client/if-hf.c
-+++ b/android/client/if-hf.c
-@@ -576,7 +576,7 @@ static void at_response_c(int argc, const char **argv, enum_func *enum_func,
- static void at_response_p(int argc, const char **argv)
- {
- 	bthf_at_response_t response_code;
--	int error_code = 0;
-+	int error_code;
- 
- 	RETURN_IF_NULL(if_hf);
- 
-@@ -588,7 +588,9 @@ static void at_response_p(int argc, const char **argv)
- 	response_code = str2bthf_at_response_t(argv[2]);
- 
- 	/* error code */
--	if (argc >= 3)
-+	if (argc <= 3)
-+		error_code = 0;
-+	else
- 		error_code = atoi(argv[3]);
- 
- 	EXEC(if_hf->at_response, response_code, error_code);
+- PullAll from Samsung Galaxy S3
+- Suspend
+- kill the process who called obexd
+- try to pull again from a different process
+=> GDBus.Error:org.bluez.obex.Error.Failed: Unable to find service
+record
+
+obexd notices that its client died (there is a InterfacesRemoved signal
+for the transfer and session path), but the cleanup seems to leave the
+device or the local side in an unusable state.
+
+Killing obexd and restarting it makes it possible to access the phone
+again.
+
+I've not been able to reproduce this without suspending first.
+
 -- 
-1.9.1
+Best Regards, Patrick Ohly
+
+The content of this message is my personal opinion only and although
+I am an employee of Intel, the statements I make here in no way
+represent Intel's position on the issue, nor am I authorized to speak
+on behalf of Intel on this matter.
+
+
 
