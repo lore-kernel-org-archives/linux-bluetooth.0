@@ -1,167 +1,147 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <53FC67E9.8090501@tieto.com>
-Date: Tue, 26 Aug 2014 12:56:41 +0200
-From: Tyszkowski Jakub <jakub.tyszkowski@tieto.com>
 MIME-Version: 1.0
-To: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>,
-	linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/2] android/gatt: Stop listening while unregistering
- app
-References: <1407941416-28453-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
-In-Reply-To: <1407941416-28453-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
+In-Reply-To: <1408965382-4897-1-git-send-email-vikram.pal@samsung.com>
+References: <1408965382-4897-1-git-send-email-vikram.pal@samsung.com>
+Date: Tue, 26 Aug 2014 13:29:34 +0300
+Message-ID: <CABBYNZJ3MGHXrh-PzjAJrp_KwFYzMK0606b-j_ypY9TPbhmmFw@mail.gmail.com>
+Subject: Re: [PATCH v3] monitor: Add AVRCP ListPlayerApplicationSettingValues support
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Vikrampal Yadav <vikram.pal@samsung.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	Dmitry Kasatkin <d.kasatkin@samsung.com>, cpgs@samsung.com
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Grzegorz,
+Hi Vikrampal,
 
-On 08/13/2014 04:50 PM, Grzegorz Kolodziejczyk wrote:
-> Client gets stucked on advertising while unregistering app with not
-> stopped listening.
+On Mon, Aug 25, 2014 at 2:16 PM, Vikrampal Yadav <vikram.pal@samsung.com> wrote:
+> Support for decoding AVRCP ListPlayerApplicationSettingValues
+> added in Bluetooth monitor.
 > ---
->   android/gatt.c | 102 ++++++++++++++++++++++++++++++++++++---------------------
->   1 file changed, 64 insertions(+), 38 deletions(-)
+>  monitor/avctp.c | 95 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 95 insertions(+)
 >
-> diff --git a/android/gatt.c b/android/gatt.c
-> index 89748d2..7b3db06 100644
-> --- a/android/gatt.c
-> +++ b/android/gatt.c
-> @@ -1834,15 +1834,79 @@ static uint8_t unregister_app(int client_if)
->   	return HAL_STATUS_SUCCESS;
->   }
+> diff --git a/monitor/avctp.c b/monitor/avctp.c
+> index ec2adcd..123b229 100644
+> --- a/monitor/avctp.c
+> +++ b/monitor/avctp.c
+> @@ -429,6 +429,60 @@ static const char *attr2str(uint8_t attr)
+>         }
+>  }
 >
-> +static void send_client_listen_notify(int32_t id, int32_t status)
+> +static const char *value2str(uint8_t attr, uint8_t value)
 > +{
-> +	struct hal_ev_gatt_client_listen ev;
-> +
-> +	/* Server if because of typo in android headers */
-> +	ev.server_if = id;
-> +	ev.status = status;
-> +
-> +	ipc_send_notif(hal_ipc, HAL_SERVICE_ID_GATT, HAL_EV_GATT_CLIENT_LISTEN,
-> +							sizeof(ev), &ev);
+> +       switch (attr) {
+> +       case AVRCP_ATTRIBUTE_ILEGAL:
+> +               return "Illegal";
+> +       case AVRCP_ATTRIBUTE_EQUALIZER:
+> +               switch (value) {
+> +               case 0x01:
+> +                       return "OFF";
+> +               case 0x02:
+> +                       return "ON";
+> +               default:
+> +                       return "Reserved";
+> +               }
+> +       case AVRCP_ATTRIBUTE_REPEAT_MODE:
+> +               switch (value) {
+> +               case 0x01:
+> +                       return "OFF";
+> +               case 0x02:
+> +                       return "Single Track Repeat";
+> +               case 0x03:
+> +                       return "All Track Repeat";
+> +               case 0x04:
+> +                       return "Group Repeat";
+> +               default:
+> +                       return "Reserved";
+> +               }
+> +       case AVRCP_ATTRIBUTE_SHUFFLE:
+> +               switch (value) {
+> +               case 0x01:
+> +                       return "OFF";
+> +               case 0x02:
+> +                       return "All Track Suffle";
+> +               case 0x03:
+> +                       return "Group Suffle";
+> +               default:
+> +                       return "Reserved";
+> +               }
+> +       case AVRCP_ATTRIBUTE_SCAN:
+> +               switch (value) {
+> +               case 0x01:
+> +                       return "OFF";
+> +               case 0x02:
+> +                       return "All Track Scan";
+> +               case 0x03:
+> +                       return "Group Scan";
+> +               default:
+> +                       return "Reserved";
+> +               }
+> +       default:
+> +               return "Unknown";
+> +       }
 > +}
 > +
-> +struct listen_data {
-> +	int32_t client_id;
-> +	bool start;
-> +};
+>  static void avrcp_passthrough_packet(const struct l2cap_frame *frame)
+>  {
+>  }
+> @@ -504,6 +558,47 @@ static void avrcp_list_player_values(const struct l2cap_frame *frame,
+>                                         uint8_t ctype, uint8_t len,
+>                                         uint8_t indent)
+>  {
+> +       struct l2cap_frame avrcp_frame;
+> +       static uint8_t attr = 0;
+> +       uint8_t num;
 > +
-> +static void set_advertising_cb(uint8_t status, void *user_data)
-> +{
-> +	struct listen_data *l = user_data;
+> +       if (len < 1)
+> +               goto error;
 > +
-> +	send_client_listen_notify(l->client_id, status);
+> +       l2cap_frame_pull(&avrcp_frame, frame, 0);
 > +
-> +	/* In case of success update advertising state*/
-> +	if (!status)
-> +		advertising_cnt = l->start ? 1 : 0;
+> +       if (ctype > AVC_CTYPE_GENERAL_INQUIRY)
+> +               goto response;
 > +
-> +	/*
-> +	 * Let's remove client from the list in two cases
-> +	 * 1. Start failed
-> +	 * 2. Stop succeed
-> +	 */
-> +	if ((l->start && status) || (!l->start && !status))
-> +		queue_remove(listen_apps, INT_TO_PTR(l->client_id));
+> +       if (l2cap_frame_get_u8(&avrcp_frame, &attr))
+> +               goto error;
 > +
-> +	free(l);
-> +}
+> +       print_field("%*cAttributeID: 0x%02x (%s)", (indent - 8), ' ',
+> +                                               attr, attr2str(attr));
 > +
->   static void handle_client_unregister(const void *buf, uint16_t len)
->   {
->   	const struct hal_cmd_gatt_client_unregister *cmd = buf;
->   	uint8_t status;
-> +	void *listening_client;
-> +	struct listen_data *data;
+> +       return;
+> +
+> +response:
+> +       if (l2cap_frame_get_u8(&avrcp_frame, &num))
+> +               goto error;
+> +
+> +       print_field("%*cValueCount: 0x%02x", (indent - 8), ' ', num);
+> +
+> +       for (; num > 0; num--) {
+> +               uint8_t value;
+> +
+> +               if (l2cap_frame_get_u8(&avrcp_frame, &value))
+> +                       goto error;
+> +
+> +               print_field("%*cValueID: 0x%02x (%s)", (indent - 8),
+> +                                       ' ', value, value2str(attr, value));
+> +       }
+> +
+> +       return;
+> +
+> +error:
+> +       print_text(COLOR_ERROR, "PDU malformed");
+> +       packet_hexdump(frame->data, frame->size);
+>  }
 >
->   	DBG("");
->
-> +	listening_client = queue_find(listen_apps, match_by_value,
-> +						INT_TO_PTR(cmd->client_if));
-> +
-> +	if (listening_client) {
-> +		data = new0(struct listen_data, 1);
-> +		if (!data) {
-> +			error("gatt: Could not allocate memory for listen data");
-> +			status = HAL_STATUS_NOMEM;
-> +			goto reply;
-> +		}
-> +
-> +		data->client_id = cmd->client_if;
-> +		data->start = false;
-> +
-> +		if (!bt_le_set_advertising(data->start, set_advertising_cb,
-> +								data)) {
-> +			error("gatt: Could not set advertising");
-> +			status = HAL_STATUS_FAILED;
-> +			free(data);
-> +			goto reply;
-> +		}
-> +	}
+>  static void avrcp_get_current_player_value(const struct l2cap_frame *frame,
+> --
+> 1.9.1
 
-I think this should work like 'handle_client_listen': check the 
-'advertising_cnt' and stop only if the client that unregisters itself is 
-the last one that was advertising.
+Applied, but note that I redesign the table functions so we could
+actually do process the frame inline so only one call to
+l2cap_frame_pull is necessary.
 
-It would be good to actually extract this counter check and advertising 
-set from 'handle_client_listen' so it can be reused in 
-'handle_client_unregister'.
 
-> +
->   	status = unregister_app(cmd->client_if);
->
-> +reply:
->   	ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_GATT,
->   					HAL_OP_GATT_CLIENT_UNREGISTER, status);
->   }
-> @@ -1948,44 +2012,6 @@ static void handle_client_disconnect(const void *buf, uint16_t len)
->   					HAL_OP_GATT_CLIENT_DISCONNECT, status);
->   }
->
-> -static void send_client_listen_notify(int32_t id, int32_t status)
-> -{
-> -	struct hal_ev_gatt_client_listen ev;
-> -
-> -	/* Server if because of typo in android headers */
-> -	ev.server_if = id;
-> -	ev.status = status;
-> -
-> -	ipc_send_notif(hal_ipc, HAL_SERVICE_ID_GATT, HAL_EV_GATT_CLIENT_LISTEN,
-> -							sizeof(ev), &ev);
-> -}
-> -
-> -struct listen_data {
-> -	int32_t client_id;
-> -	bool start;
-> -};
-> -
-> -static void set_advertising_cb(uint8_t status, void *user_data)
-> -{
-> -	struct listen_data *l = user_data;
-> -
-> -	send_client_listen_notify(l->client_id, status);
-> -
-> -	/* In case of success update advertising state*/
-> -	if (!status)
-> -		advertising_cnt = l->start ? 1 : 0;
-> -
-> -	/*
-> -	 * Let's remove client from the list in two cases
-> -	 * 1. Start failed
-> -	 * 2. Stop succeed
-> -	 */
-> -	if ((l->start && status) || (!l->start && !status))
-> -		queue_remove(listen_apps, INT_TO_PTR(l->client_id));
-> -
-> -	free(l);
-> -}
-> -
->   static void handle_client_listen(const void *buf, uint16_t len)
->   {
->   	const struct hal_cmd_gatt_client_listen *cmd = buf;
->
-
-Regards,
-Jakub
-
+-- 
+Luiz Augusto von Dentz
