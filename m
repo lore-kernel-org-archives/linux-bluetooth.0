@@ -2,72 +2,72 @@ Return-Path: <cyrus@holtmann.org>
 From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH 5/5] android/tester: Add test for incoming bonding
-Date: Tue, 26 Aug 2014 22:41:52 +0200
-Message-Id: <1409085712-12402-5-git-send-email-lukasz.rymanowski@tieto.com>
+Subject: [PATCH 4/5] android/tester: Add function to set io cap to bthost
+Date: Tue, 26 Aug 2014 22:41:51 +0200
+Message-Id: <1409085712-12402-4-git-send-email-lukasz.rymanowski@tieto.com>
 In-Reply-To: <1409085712-12402-1-git-send-email-lukasz.rymanowski@tieto.com>
 References: <1409085712-12402-1-git-send-email-lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch add test for incoming just works bonding
+Some tests might need to change default io capabilities of bthost.
+This patch adds means to do it.
 ---
- android/tester-bluetooth.c | 35 +++++++++++++++++++++++++++++++++++
- 1 file changed, 35 insertions(+)
+ android/tester-main.c | 20 ++++++++++++++++++++
+ android/tester-main.h |  2 ++
+ 2 files changed, 22 insertions(+)
 
-diff --git a/android/tester-bluetooth.c b/android/tester-bluetooth.c
-index 018d712..7ea0684 100644
---- a/android/tester-bluetooth.c
-+++ b/android/tester-bluetooth.c
-@@ -444,6 +444,20 @@ static struct bt_action_data ssp_confirm_reject_reply = {
- 	.accept = FALSE,
- };
+diff --git a/android/tester-main.c b/android/tester-main.c
+index 310efb0..a001059 100644
+--- a/android/tester-main.c
++++ b/android/tester-main.c
+@@ -1665,6 +1665,26 @@ void emu_remote_disconnect_hci_action(void)
+ 	schedule_action_verification(step);
+ }
  
-+static  struct bt_action_data no_input_no_output_io_cap = {
-+	.io_cap = 0x03,
-+};
-+
-+static void conn_cb(uint16_t handle, void *user_data)
++void emu_set_io_cap(void)
 +{
 +	struct test_data *data = tester_get_data();
-+	struct bthost *bthost = hciemu_client_get_host(data->hciemu);
++	struct bthost *bthost;
++	struct step *current_data_step = queue_peek_head(data->steps);
++	struct bt_action_data *action_data = current_data_step->set_data;
++	struct step *step = g_new0(struct step, 1);
 +
-+	tester_print("New connection with handle 0x%04x", handle);
++	bthost = hciemu_client_get_host(data->hciemu);
 +
-+	bthost_request_auth(bthost, handle);
++	if (action_data)
++		bthost_set_io_capability(bthost, action_data->io_cap);
++	else
++		bthost_set_io_capability(bthost, 0x01);
++
++	step->action_status = BT_STATUS_SUCCESS;
++
++	schedule_action_verification(step);
 +}
 +
- static struct test_case test_cases[] = {
- 	TEST_CASE_BREDRLE("Bluetooth Init",
- 		ACTION_SUCCESS(dummy_action, NULL),
-@@ -1143,6 +1157,27 @@ static struct test_case test_cases[] = {
- 		ACTION_SUCCESS(bluetooth_disable_action, NULL),
- 		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_OFF),
- 	),
-+	TEST_CASE_BREDR("Bluetooth Accept Bond - Just Works - Success",
-+		ACTION_SUCCESS(bluetooth_enable_action, NULL),
-+		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_ON),
-+		ACTION_SUCCESS(bt_set_property_action,
-+					&prop_test_scanmode_conn_discov),
-+		CALLBACK_ADAPTER_PROPS(&prop_test_scanmode_conn_discov, 1),
-+		ACTION_SUCCESS(emu_setup_powered_remote_action, NULL),
-+		ACTION_SUCCESS(emu_set_ssp_mode_action, NULL),
-+		ACTION_SUCCESS(emu_set_io_cap, &no_input_no_output_io_cap),
-+		ACTION_SUCCESS(emu_set_connect_cb_action, conn_cb),
-+		ACTION_SUCCESS(emu_remote_connect_hci_action, NULL),
-+		CALLBACK_BOND_STATE(BT_BOND_STATE_BONDING,
-+						&prop_emu_remote_bdadr, 1),
-+		CALLBACK_BOND_STATE(BT_BOND_STATE_BONDED,
-+						&prop_emu_remote_bdadr, 1),
-+		ACTION_SUCCESS(bt_remove_bond_action, &emu_remote_bdaddr_val),
-+		CALLBACK_BOND_STATE(BT_BOND_STATE_NONE,
-+						&prop_emu_remote_bdadr, 1),
-+		ACTION_SUCCESS(bluetooth_disable_action, NULL),
-+		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_OFF),
-+	),
- };
+ void emu_add_l2cap_server_action(void)
+ {
+ 	struct test_data *data = tester_get_data();
+diff --git a/android/tester-main.h b/android/tester-main.h
+index e83933a..77f7660 100644
+--- a/android/tester-main.h
++++ b/android/tester-main.h
+@@ -332,6 +332,7 @@ struct bt_action_data {
+ 	const uint8_t pin_len;
+ 	const uint8_t ssp_variant;
+ 	const bool accept;
++	const uint16_t io_cap;
  
- struct queue *get_bluetooth_tests(void)
+ 	/* Socket HAL specific params */
+ 	const btsock_type_t sock_type;
+@@ -436,6 +437,7 @@ void emu_set_ssp_mode_action(void);
+ void emu_set_connect_cb_action(void);
+ void emu_remote_connect_hci_action(void);
+ void emu_remote_disconnect_hci_action(void);
++void emu_set_io_cap(void);
+ void emu_add_l2cap_server_action(void);
+ void emu_add_rfcomm_server_action(void);
+ 
 -- 
 1.8.4
 
