@@ -1,43 +1,68 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1409060382.7335.25.camel@pohly-mobl1.fritz.box>
-Subject: Suspend + abort session => obexd unusable
-From: Patrick Ohly <patrick.ohly@intel.com>
-To: Luiz Von Dentz <luiz.von.dentz@intel.com>
-Cc: Mateusz Potrola <mateusz.polrola@gmail.com>,
-	Bluez <linux-bluetooth@vger.kernel.org>
-Date: Tue, 26 Aug 2014 15:39:42 +0200
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+From: Szymon Janc <szymon.janc@tieto.com>
+To: Marcin Kraglak <marcin.kraglak@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCHv3 1/2] android/client: Fix incorrect data parsing
+Date: Tue, 26 Aug 2014 15:21:09 +0200
+Message-ID: <6050899.WYRYWitLqa@uw000953>
+In-Reply-To: <1409048454-16116-1-git-send-email-marcin.kraglak@tieto.com>
+References: <1409048454-16116-1-git-send-email-marcin.kraglak@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello Luiz!
+Hi Marcin,
 
-I noticed a problem in obexd and/or Bluez 5.21 (Debian Testing):
+On Tuesday 26 of August 2014 12:20:53 Marcin Kraglak wrote:
+> Use fill_buffer function in processing write_characteristic
+> and send_indication functions.
+> ---
+>  android/client/if-gatt.c | 20 +++++++++++++-------
+>  1 file changed, 13 insertions(+), 7 deletions(-)
+> 
+> diff --git a/android/client/if-gatt.c b/android/client/if-gatt.c
+> index 8154bfd..1d8def2 100644
+> --- a/android/client/if-gatt.c
+> +++ b/android/client/if-gatt.c
+> @@ -1191,11 +1191,12 @@ static void write_characteristic_p(int argc, const char **argv)
+>  		return;
+>  	}
+>  
+> -	/* len in chars */
+> -	len = strlen(argv[6]);
+> -	scan_field(argv[6], len, value, sizeof(value));
+> -	/* len in bytes converted from ascii chars */
+> -	len = (len + 1) / 2;
+> +	if (argv[6][0] != '0' || (argv[6][1] != 'X' && argv[6][1] != 'x')) {
+> +		haltest_error("Value must be hex string");
+> +		return;
+> +	}
+> +
+> +	len = fill_buffer(argv[6] + 2, value, sizeof(value));
+>  
+>  	/* auth_req */
+>  	if (argc > 7)
+> @@ -1791,8 +1792,13 @@ static void gatts_send_indication_p(int argc, const char *argv[])
+>  	confirm = atoi(argv[5]);
+>  
+>  	if (argc > 6) {
+> -		len = strlen(argv[6]);
+> -		scan_field(argv[6], len, (uint8_t *) data, sizeof(data));
+> +		if (argv[6][0] != '0' ||
+> +				(argv[6][1] != 'X' && argv[6][1] != 'x')) {
+> +			haltest_error("Value must be hex string");
+> +			return;
+> +		}
+> +
+> +		len = fill_buffer(argv[6] + 2, (uint8_t *) data, sizeof(data));
+>  	}
+>  
+>  	EXEC(if_gatt->server->send_indication, server_if, attr_handle, conn_id,
+> 
 
-- PullAll from Samsung Galaxy S3
-- Suspend
-- kill the process who called obexd
-- try to pull again from a different process
-=> GDBus.Error:org.bluez.obex.Error.Failed: Unable to find service
-record
-
-obexd notices that its client died (there is a InterfacesRemoved signal
-for the transfer and session path), but the cleanup seems to leave the
-device or the local side in an unusable state.
-
-Killing obexd and restarting it makes it possible to access the phone
-again.
-
-I've not been able to reproduce this without suspending first.
+Both patches applied, thanks.
 
 -- 
-Best Regards, Patrick Ohly
-
-The content of this message is my personal opinion only and although
-I am an employee of Intel, the statements I make here in no way
-represent Intel's position on the issue, nor am I authorized to speak
-on behalf of Intel on this matter.
-
-
-
+Best regards, 
+Szymon Janc
