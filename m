@@ -1,169 +1,67 @@
 Return-Path: <cyrus@holtmann.org>
-From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+From: Vikrampal Yadav <vikram.pal@samsung.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH 2/5] android/tester: Move emu related functions to tester main
-Date: Tue, 26 Aug 2014 22:41:49 +0200
-Message-Id: <1409085712-12402-2-git-send-email-lukasz.rymanowski@tieto.com>
-In-Reply-To: <1409085712-12402-1-git-send-email-lukasz.rymanowski@tieto.com>
-References: <1409085712-12402-1-git-send-email-lukasz.rymanowski@tieto.com>
+Cc: luiz.dentz@gmail.com, d.kasatkin@samsung.com,
+	vikram.pal@samsung.com, cpgs@samsung.com
+Subject: [PATCH v3 5/5] monitor: Add AVRCP InformDisplayableCharacterSet support
+Date: Tue, 26 Aug 2014 19:50:52 +0530
+Message-id: <1409062852-29295-5-git-send-email-vikram.pal@samsung.com>
+In-reply-to: <1409062852-29295-1-git-send-email-vikram.pal@samsung.com>
+References: <1409062852-29295-1-git-send-email-vikram.pal@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Those function can be used by other tester modules
-
-In addition function emu_remote_disconnect_hci_action has been changed a
-bit so it take handle from step data now. It was needed as cid_data was
-static in tester_gatt.c
+Support for decoding AVRCP InformDisplayableCharacterSet added in
+Bluetooth monitor.
 ---
- android/tester-gatt.c | 49 ++-----------------------------------------------
- android/tester-main.c | 51 +++++++++++++++++++++++++++++++++++++++++++++++++++
- android/tester-main.h |  3 +++
- 3 files changed, 56 insertions(+), 47 deletions(-)
+ monitor/avctp.c | 27 +++++++++++++++++++++++++++
+ 1 file changed, 27 insertions(+)
 
-diff --git a/android/tester-gatt.c b/android/tester-gatt.c
-index 1d66309..979a1de 100644
---- a/android/tester-gatt.c
-+++ b/android/tester-gatt.c
-@@ -253,52 +253,6 @@ static void gatt_conn_cb(uint16_t handle, void *user_data)
- 								&cid_data);
+diff --git a/monitor/avctp.c b/monitor/avctp.c
+index 1bfd9cf..28e1f34 100644
+--- a/monitor/avctp.c
++++ b/monitor/avctp.c
+@@ -863,6 +863,32 @@ response:
+ 	return true;
  }
  
--static void emu_set_connect_cb_action(void)
--{
--	struct test_data *data = tester_get_data();
--	struct bthost *bthost = hciemu_client_get_host(data->hciemu);
--	struct step *current_data_step = queue_peek_head(data->steps);
--	void *cb = current_data_step->set_data;
--	struct step *step = g_new0(struct step, 1);
--
--	bthost_set_connect_cb(bthost, cb, data);
--
--	step->action_status = BT_STATUS_SUCCESS;
--
--	schedule_action_verification(step);
--}
--
--static void emu_remote_connect_hci_action(void)
--{
--	struct test_data *data = tester_get_data();
--	struct bthost *bthost = hciemu_client_get_host(data->hciemu);
--	struct step *step = g_new0(struct step, 1);
--	const uint8_t *master_addr;
--
--	master_addr = hciemu_get_master_bdaddr(data->hciemu);
--
--	tester_print("Trying to connect hci");
--
--	bthost_hci_connect(bthost, master_addr, BDADDR_LE_PUBLIC);
--
--	step->action_status = BT_STATUS_SUCCESS;
--
--	schedule_action_verification(step);
--}
--
--static void emu_remote_disconnect_hci_action(void)
--{
--	struct test_data *data = tester_get_data();
--	struct bthost *bthost = hciemu_client_get_host(data->hciemu);
--	struct step *step = g_new0(struct step, 1);
--
--	bthost_hci_disconnect(bthost, cid_data.handle, 0x13);
--
--	step->action_status = BT_STATUS_SUCCESS;
--
--	schedule_action_verification(step);
--}
--
- static struct test_case test_cases[] = {
- 	TEST_CASE_BREDRLE("Gatt Init",
- 		ACTION_SUCCESS(dummy_action, NULL),
-@@ -467,7 +421,8 @@ static struct test_case test_cases[] = {
- 						prop_emu_remotes_default_set,
- 						CONN1_ID, CLIENT1_ID),
- 		/* Close ACL on emulated remotes side so it can reconnect */
--		ACTION_SUCCESS(emu_remote_disconnect_hci_action, NULL),
-+		ACTION_SUCCESS(emu_remote_disconnect_hci_action,
-+							&cid_data.handle),
- 		CALLBACK_STATE(CB_BT_ACL_STATE_CHANGED,
- 						BT_ACL_STATE_DISCONNECTED),
- 		ACTION_SUCCESS(gatt_client_do_listen_action, &client1_conn_req),
-diff --git a/android/tester-main.c b/android/tester-main.c
-index 369a943..c41ce1c 100644
---- a/android/tester-main.c
-+++ b/android/tester-main.c
-@@ -1608,6 +1608,57 @@ void emu_set_ssp_mode_action(void)
- 	schedule_action_verification(step);
- }
- 
-+void emu_set_connect_cb_action(void)
++static bool avrcp_displayable_charset(struct l2cap_frame *frame, uint8_t ctype,
++					uint8_t len, uint8_t indent)
 +{
-+	struct test_data *data = tester_get_data();
-+	struct bthost *bthost = hciemu_client_get_host(data->hciemu);
-+	struct step *current_data_step = queue_peek_head(data->steps);
-+	void *cb = current_data_step->set_data;
-+	struct step *step = g_new0(struct step, 1);
++	uint8_t num;
 +
-+	bthost_set_connect_cb(bthost, cb, data);
++	if (ctype > AVC_CTYPE_GENERAL_INQUIRY)
++		return true;
 +
-+	step->action_status = BT_STATUS_SUCCESS;
++	if (!l2cap_frame_get_u8(frame, &num))
++		return false;
 +
-+	schedule_action_verification(step);
-+}
++	print_field("%*cCharsetCount: 0x%02x", (indent - 8), ' ', num);
 +
-+void emu_remote_connect_hci_action(void)
-+{
-+	struct test_data *data = tester_get_data();
-+	struct bthost *bthost = hciemu_client_get_host(data->hciemu);
-+	struct step *step = g_new0(struct step, 1);
-+	const uint8_t *master_addr;
++	for (; num > 0; num--) {
++		uint16_t charset;
 +
-+	master_addr = hciemu_get_master_bdaddr(data->hciemu);
++		if (!l2cap_frame_get_be16(frame, &charset))
++			return false;
 +
-+	tester_print("Trying to connect hci");
-+
-+	bthost_hci_connect(bthost, master_addr, BDADDR_LE_PUBLIC);
-+
-+	step->action_status = BT_STATUS_SUCCESS;
-+
-+	schedule_action_verification(step);
-+}
-+
-+void emu_remote_disconnect_hci_action(void)
-+{
-+	struct test_data *data = tester_get_data();
-+	struct bthost *bthost = hciemu_client_get_host(data->hciemu);
-+	struct step *current_data_step = queue_peek_head(data->steps);
-+	uint16_t *handle = current_data_step->set_data;
-+	struct step *step = g_new0(struct step, 1);
-+
-+	if (handle) {
-+		bthost_hci_disconnect(bthost, *handle, 0x13);
-+		step->action_status = BT_STATUS_SUCCESS;
-+	} else {
-+		step->action_status = BT_STATUS_FAIL;
++		print_field("%*cCharsetID: 0x%04x (%s)", (indent - 8),
++					' ', charset, charset2str(charset));
 +	}
 +
-+	schedule_action_verification(step);
++	return true;
 +}
 +
- void emu_add_l2cap_server_action(void)
- {
- 	struct test_data *data = tester_get_data();
-diff --git a/android/tester-main.h b/android/tester-main.h
-index ad87878..3331e91 100644
---- a/android/tester-main.h
-+++ b/android/tester-main.h
-@@ -430,6 +430,9 @@ void schedule_action_verification(struct step *step);
- void emu_setup_powered_remote_action(void);
- void emu_set_pin_code_action(void);
- void emu_set_ssp_mode_action(void);
-+void emu_set_connect_cb_action(void);
-+void emu_remote_connect_hci_action(void);
-+void emu_remote_disconnect_hci_action(void);
- void emu_add_l2cap_server_action(void);
- void emu_add_rfcomm_server_action(void);
+ struct avrcp_ctrl_pdu_data {
+ 	uint8_t pduid;
+ 	bool (*func) (struct l2cap_frame *frame, uint8_t ctype, uint8_t len,
+@@ -877,6 +903,7 @@ static const struct avrcp_ctrl_pdu_data avrcp_ctrl_pdu_table[] = {
+ 	{ 0x14, avrcp_set_player_value			},
+ 	{ 0x15, avrcp_get_player_attribute_text		},
+ 	{ 0x16, avrcp_get_player_value_text		},
++	{ 0x17, avrcp_displayable_charset		},
+ 	{ }
+ };
  
 -- 
-1.8.4
+1.9.1
 
