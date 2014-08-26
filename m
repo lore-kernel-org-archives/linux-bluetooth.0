@@ -1,87 +1,90 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: Marcin Kraglak <marcin.kraglak@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCHv2 1/2] android/client: Fix incorrect data parsing
-Date: Tue, 26 Aug 2014 11:27:42 +0200
-Message-ID: <1439770.xPBATBfFEp@uw000953>
-In-Reply-To: <1408974654-22836-1-git-send-email-marcin.kraglak@tieto.com>
-References: <1408974654-22836-1-git-send-email-marcin.kraglak@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+From: Sebastian Chlad <sebastian.chlad@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Sebastian Chlad <sebastian.chlad@tieto.com>
+Subject: [PATCH] android/pts: HDP regression tests
+Date: Tue, 26 Aug 2014 11:07:56 +0200
+Message-Id: <1409044076-30066-1-git-send-email-sebastian.chlad@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcin,
+Regression round for HDP against PTS 5.2 and Android 4.4.4
+---
+ android/pics-hdp.txt  | 4 ++--
+ android/pixit-hdp.txt | 8 ++++----
+ android/pts-hdp.txt   | 6 +++---
+ 3 files changed, 9 insertions(+), 9 deletions(-)
 
-On Monday 25 of August 2014 15:50:53 Marcin Kraglak wrote:
-> Use fill_buffer function in processing write_characteristic
-> and send_indication functions.
-> ---
->  android/client/if-gatt.c | 23 ++++++++++++++---------
->  1 file changed, 14 insertions(+), 9 deletions(-)
-> 
-> diff --git a/android/client/if-gatt.c b/android/client/if-gatt.c
-> index 8154bfd..a4c6bc9 100644
-> --- a/android/client/if-gatt.c
-> +++ b/android/client/if-gatt.c
-> @@ -1191,11 +1191,12 @@ static void write_characteristic_p(int argc, const char **argv)
->  		return;
->  	}
->  
-> -	/* len in chars */
-> -	len = strlen(argv[6]);
-> -	scan_field(argv[6], len, value, sizeof(value));
-> -	/* len in bytes converted from ascii chars */
-> -	len = (len + 1) / 2;
-> +	if (strncmp(argv[6], "0X", 2) && strncmp(argv[6], "0x", 2)) {
-> +		haltest_error("Value must be hex string");
-> +		return;
-> +	}
-
-Why not just compare argv[6] == '0' and argv[7] == 'x' ?
-(Also there is strncasecmp() if you really insist on comparing strings).
-
-> +
-> +	len = fill_buffer(argv[6] + 2, value, sizeof(value));
->  
->  	/* auth_req */
->  	if (argc > 7)
-> @@ -1775,7 +1776,7 @@ static void gatts_send_indication_p(int argc, const char *argv[])
->  	int attr_handle;
->  	int conn_id;
->  	int confirm;
-> -	char data[200];
-> +	uint8_t data[200];
-
-Why this change? It looks like it makes no difference except of extra cast
-few lines later.
-
->  	int len = 0;
->  
->  	RETURN_IF_NULL(if_gatt);
-> @@ -1791,12 +1792,16 @@ static void gatts_send_indication_p(int argc, const char *argv[])
->  	confirm = atoi(argv[5]);
->  
->  	if (argc > 6) {
-> -		len = strlen(argv[6]);
-> -		scan_field(argv[6], len, (uint8_t *) data, sizeof(data));
-> +		if (strncmp(argv[6], "0X", 2) && strncmp(argv[6], "0x", 2)) {
-> +			haltest_error("Value must be hex string");
-> +			return;
-> +		}
-> +
-> +		len = fill_buffer(argv[6] + 2, data, sizeof(data));
->  	}
->  
->  	EXEC(if_gatt->server->send_indication, server_if, attr_handle, conn_id,
-> -							len, confirm, data);
-> +						len, confirm, (char *) data);
->  }
->  
->  /* send_response */
-> 
-
+diff --git a/android/pics-hdp.txt b/android/pics-hdp.txt
+index d48e576..b179f9e 100644
+--- a/android/pics-hdp.txt
++++ b/android/pics-hdp.txt
+@@ -1,6 +1,6 @@
+ HDP PICS for the PTS tool.
+ 
+-PTS version: 5.1
++PTS version: 5.2
+ 
+ * - different than PTS defaults
+ # - not yet implemented/supported
+@@ -14,7 +14,7 @@ O - optional
+ Parameter Name	Selected	Description
+ -------------------------------------------------------------------------------
+ TSPC_HDP_0_1	False		HDP 1.0 (C.1)
+-TSPC_HDP_0_2	True		HDP 1.1(C.1)
++TSPC_HDP_0_2	True		HDP 1.1 (C.1)
+ -------------------------------------------------------------------------------
+ C.1: Mandatory to support only one Profile version.
+ -------------------------------------------------------------------------------
+diff --git a/android/pixit-hdp.txt b/android/pixit-hdp.txt
+index 24cdcec..c0ad7e2 100644
+--- a/android/pixit-hdp.txt
++++ b/android/pixit-hdp.txt
+@@ -1,6 +1,6 @@
+ HDP PIXIT for the PTS tool.
+ 
+-PTS version: 5.1
++PTS version: 5.2
+ 
+ * - different than PTS defaults
+ & - should be set to IUT Bluetooth address
+@@ -9,7 +9,7 @@ PTS version: 5.1
+ -------------------------------------------------------------------------------
+ Parameter Name						Value
+ -------------------------------------------------------------------------------
+-TSPX_security_enabled					TRUE (*)
++TSPX_security_enabled					TRUE
+ TSPX_delete_link_key					FALSE
+ TSPX_bd_addr_iut					112233445566 (*&)
+ TSPX_sink_device_class_of_device			00900
+@@ -23,9 +23,9 @@ TSPX_MCAP_sync_lead_time				0BB8
+ TSPX_MCAP_timestamp_native_resolution			2233
+ TSPX_MCAP_timestamp_native_accuracy			1400
+ TSPX_MCAP_timestamp_required_accuracy			6400
+-TSPX_DC_max					1
++TSPX_DC_max						1
+ TSPX_secure_simple_pairing_pass_key_confirmation	FALSE
+-TSPX_time_guard						6000000
++TSPX_time_guard						60000000
+ TSPX_ieee_device_specialization				10417
+ TSPX_ieee_standard_configuration			TRUE
+ TSPX_MCAP_bluetooth_clock_access_resolution		55
+diff --git a/android/pts-hdp.txt b/android/pts-hdp.txt
+index 4337e0e..2fad385 100644
+--- a/android/pts-hdp.txt
++++ b/android/pts-hdp.txt
+@@ -1,8 +1,8 @@
+ PTS test results for HDP
+ 
+-PTS version: 5.1
+-Tested: 30-June-2014
+-Android version: 4.4.2
++PTS version: 5.2
++Tested: 25-August-2014
++Android version: 4.4.4
+ 
+ Results:
+ PASS	test passed
 -- 
-Best regards, 
-Szymon Janc
+1.8.5.3
+
