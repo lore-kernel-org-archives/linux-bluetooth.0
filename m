@@ -1,100 +1,52 @@
 Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
-To: Sebastian Chlad <sebastian.chlad@tieto.com>
+To: Marcin Kraglak <marcin.kraglak@tieto.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] android/pts: HDP regression tests
-Date: Tue, 26 Aug 2014 11:37:46 +0200
-Message-ID: <9397074.6cxBx7p9Yf@uw000953>
-In-Reply-To: <1409044076-30066-1-git-send-email-sebastian.chlad@tieto.com>
-References: <1409044076-30066-1-git-send-email-sebastian.chlad@tieto.com>
+Subject: Re: [PATCH] android/pts: Update PICS/PIXIT for GATT
+Date: Tue, 26 Aug 2014 11:37:12 +0200
+Message-ID: <1555247.pPp7cx5ehs@uw000953>
+In-Reply-To: <1409031467-32751-1-git-send-email-marcin.kraglak@tieto.com>
+References: <1409031467-32751-1-git-send-email-marcin.kraglak@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Sebastian,
+Hi Marcin,
 
-On Tuesday 26 of August 2014 11:07:56 Sebastian Chlad wrote:
-> Regression round for HDP against PTS 5.2 and Android 4.4.4
+On Tuesday 26 of August 2014 07:37:47 Marcin Kraglak wrote:
 > ---
->  android/pics-hdp.txt  | 4 ++--
->  android/pixit-hdp.txt | 8 ++++----
->  android/pts-hdp.txt   | 6 +++---
->  3 files changed, 9 insertions(+), 9 deletions(-)
+>  android/pics-gatt.txt  | 2 +-
+>  android/pixit-gatt.txt | 2 +-
+>  2 files changed, 2 insertions(+), 2 deletions(-)
 > 
-> diff --git a/android/pics-hdp.txt b/android/pics-hdp.txt
-> index d48e576..b179f9e 100644
-> --- a/android/pics-hdp.txt
-> +++ b/android/pics-hdp.txt
+> diff --git a/android/pics-gatt.txt b/android/pics-gatt.txt
+> index 0179d6d..0cd67b6 100644
+> --- a/android/pics-gatt.txt
+> +++ b/android/pics-gatt.txt
 > @@ -1,6 +1,6 @@
->  HDP PICS for the PTS tool.
+>  GATT PICS for the PTS tool.
 >  
 > -PTS version: 5.1
 > +PTS version: 5.2
 >  
 >  * - different than PTS defaults
->  # - not yet implemented/supported
-> @@ -14,7 +14,7 @@ O - optional
->  Parameter Name	Selected	Description
->  -------------------------------------------------------------------------------
->  TSPC_HDP_0_1	False		HDP 1.0 (C.1)
-> -TSPC_HDP_0_2	True		HDP 1.1(C.1)
-> +TSPC_HDP_0_2	True		HDP 1.1 (C.1)
->  -------------------------------------------------------------------------------
->  C.1: Mandatory to support only one Profile version.
->  -------------------------------------------------------------------------------
-> diff --git a/android/pixit-hdp.txt b/android/pixit-hdp.txt
-> index 24cdcec..c0ad7e2 100644
-> --- a/android/pixit-hdp.txt
-> +++ b/android/pixit-hdp.txt
+>  
+> diff --git a/android/pixit-gatt.txt b/android/pixit-gatt.txt
+> index c073452..08a80a3 100644
+> --- a/android/pixit-gatt.txt
+> +++ b/android/pixit-gatt.txt
 > @@ -1,6 +1,6 @@
->  HDP PIXIT for the PTS tool.
+>  GATT PIXIT for the PTS tool.
 >  
 > -PTS version: 5.1
 > +PTS version: 5.2
 >  
 >  * - different than PTS defaults
 >  & - should be set to IUT Bluetooth address
-> @@ -9,7 +9,7 @@ PTS version: 5.1
->  -------------------------------------------------------------------------------
->  Parameter Name						Value
->  -------------------------------------------------------------------------------
-> -TSPX_security_enabled					TRUE (*)
-> +TSPX_security_enabled					TRUE
->  TSPX_delete_link_key					FALSE
->  TSPX_bd_addr_iut					112233445566 (*&)
->  TSPX_sink_device_class_of_device			00900
-> @@ -23,9 +23,9 @@ TSPX_MCAP_sync_lead_time				0BB8
->  TSPX_MCAP_timestamp_native_resolution			2233
->  TSPX_MCAP_timestamp_native_accuracy			1400
->  TSPX_MCAP_timestamp_required_accuracy			6400
-> -TSPX_DC_max					1
-> +TSPX_DC_max						1
->  TSPX_secure_simple_pairing_pass_key_confirmation	FALSE
-> -TSPX_time_guard						6000000
-> +TSPX_time_guard						60000000
->  TSPX_ieee_device_specialization				10417
->  TSPX_ieee_standard_configuration			TRUE
->  TSPX_MCAP_bluetooth_clock_access_resolution		55
-> diff --git a/android/pts-hdp.txt b/android/pts-hdp.txt
-> index 4337e0e..2fad385 100644
-> --- a/android/pts-hdp.txt
-> +++ b/android/pts-hdp.txt
-> @@ -1,8 +1,8 @@
->  PTS test results for HDP
->  
-> -PTS version: 5.1
-> -Tested: 30-June-2014
-> -Android version: 4.4.2
-> +PTS version: 5.2
-> +Tested: 25-August-2014
-> +Android version: 4.4.4
->  
->  Results:
->  PASS	test passed
 > 
 
-Patch applied, thanks.
+Applied, thanks.
 
 -- 
 Best regards, 
