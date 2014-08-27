@@ -1,47 +1,46 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 27 Aug 2014 10:19:47 -0400
-From: Kyle McMartin <kyle@infradead.org>
-To: Tedd Ho-Jeong An <tedd.an@intel.com>
-Cc: linux-firmware@kernel.org,
-	Linux Bluetooth mailing list
-	<linux-bluetooth@vger.kernel.org>
-Subject: Re: linux-firmware: Updated firmware patch for Intel Bluetooth 7265
-Message-ID: <20140827141947.GD15412@merlin.infradead.org>
-References: <20140826161028.77b7b819@han1-desk-dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20140826161028.77b7b819@han1-desk-dev>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Szymon Janc <szymon.janc@tieto.com>
+Subject: [PATCH] android/avdtp: Constify data in avdtp_service_cap_new
+Date: Wed, 27 Aug 2014 15:01:19 +0200
+Message-Id: <1409144479-13862-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Tue, Aug 26, 2014 at 04:10:28PM -0700, Tedd Ho-Jeong An wrote:
-> From: Tedd Ho-Jeong An <tedd.an@intel.com>
-> 
-> This patch updates the firmware patch file for Intel Bluetooth 7265
-> 
-> - Fix HFP issue on EHCI
-> 
-> Signed-off-by: Tedd Ho-Jeong An <tedd.an@intel.com>
+---
+ android/avdtp.c | 3 ++-
+ android/avdtp.h | 3 ++-
+ 2 files changed, 4 insertions(+), 2 deletions(-)
 
-applied, thanks Tedd.
+diff --git a/android/avdtp.c b/android/avdtp.c
+index 3985fb3..074ca13 100644
+--- a/android/avdtp.c
++++ b/android/avdtp.c
+@@ -2960,7 +2960,8 @@ struct avdtp_service_capability *avdtp_get_codec(struct avdtp_remote_sep *sep)
+ }
+ 
+ struct avdtp_service_capability *avdtp_service_cap_new(uint8_t category,
+-							void *data, int length)
++							const void *data,
++							int length)
+ {
+ 	struct avdtp_service_capability *cap;
+ 
+diff --git a/android/avdtp.h b/android/avdtp.h
+index 28895ea..d5335e4 100644
+--- a/android/avdtp.h
++++ b/android/avdtp.h
+@@ -218,7 +218,8 @@ void avdtp_unref(struct avdtp *session);
+ struct avdtp *avdtp_ref(struct avdtp *session);
+ 
+ struct avdtp_service_capability *avdtp_service_cap_new(uint8_t category,
+-							void *data, int size);
++							const void *data,
++							int size);
+ 
+ struct avdtp_service_capability *avdtp_get_codec(struct avdtp_remote_sep *sep);
+ 
+-- 
+1.9.1
 
-regards, Kyle
-
-> ---
->  WHENCE                                   |   2 +-
->  intel/ibt-hw-37.8.10-fw-1.10.2.27.d.bseq | Bin 18017 -> 21775 bytes
->  2 files changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/WHENCE b/WHENCE
-> index bd65d8c..1e703b5 100644
-> --- a/WHENCE
-> +++ b/WHENCE
-> @@ -2311,7 +2311,7 @@ Version: WP_1345_01_patch_0.0.10.1
->  File: intel/ibt-hw-37.8.bseq
->  Version: 1339_02.00
->  File: intel/ibt-hw-37.8.10-fw-1.10.2.27.d.bseq
-> -Version: STP2_C0_1339_02_patch_27.1
-> +Version: STP2_C0_1339_02_patch_31.1
->  
->  Licence: Redistributable. See LICENCE.ibt_firmware for details
->  
