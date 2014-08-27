@@ -1,36 +1,47 @@
 Return-Path: <cyrus@holtmann.org>
-From: Bharat Bhusan Panda <bharat.panda@samsung.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: bharat.panda@samsung.com
-Subject: Query Regarding new Gatt server attribute database
-Date: Wed, 27 Aug 2014 20:52:50 +0530
-Message-id: <015d01cfc20a$c9160a00$5b421e00$@samsung.com>
-MIME-version: 1.0
-Content-type: text/plain; charset=us-ascii
+Date: Wed, 27 Aug 2014 10:19:47 -0400
+From: Kyle McMartin <kyle@infradead.org>
+To: Tedd Ho-Jeong An <tedd.an@intel.com>
+Cc: linux-firmware@kernel.org,
+	Linux Bluetooth mailing list
+	<linux-bluetooth@vger.kernel.org>
+Subject: Re: linux-firmware: Updated firmware patch for Intel Bluetooth 7265
+Message-ID: <20140827141947.GD15412@merlin.infradead.org>
+References: <20140826161028.77b7b819@han1-desk-dev>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20140826161028.77b7b819@han1-desk-dev>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi All,
+On Tue, Aug 26, 2014 at 04:10:28PM -0700, Tedd Ho-Jeong An wrote:
+> From: Tedd Ho-Jeong An <tedd.an@intel.com>
+> 
+> This patch updates the firmware patch file for Intel Bluetooth 7265
+> 
+> - Fix HFP issue on EHCI
+> 
+> Signed-off-by: Tedd Ho-Jeong An <tedd.an@intel.com>
 
-We are working on Gatt server implementation, for Tizen framework with BlueZ
-5.20 as base.
+applied, thanks Tedd.
 
-We have few query on adding new service info to gatt attrib server database,
-so that remote gatt client can discover the same.
+regards, Kyle
 
-On Calling "RegisterService" method to org.bluez.GattManager1, after getting
-proper data from GattService1, GattCharacteristic1 and GattDescriptor1
-interface,
-It calls, btd_gatt_add_service(),btd_gatt_add_char() and btd_gatt_add_desc
-respectively and updates the local_attribute_db. 
-Which should be read and updated, when remote gatt client connects and
-starts primary services discovery, but this does not happen, instead it
-reads from attrib server db in attrib-server.c.
-
-How can the local_attribute_db in gatt.c, be attached to ATT IO channel, as
-it has been done for attrib-server db in src/attrib-server.c?
-
-Thanks
-Best Regards,
-Bharat
-
+> ---
+>  WHENCE                                   |   2 +-
+>  intel/ibt-hw-37.8.10-fw-1.10.2.27.d.bseq | Bin 18017 -> 21775 bytes
+>  2 files changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/WHENCE b/WHENCE
+> index bd65d8c..1e703b5 100644
+> --- a/WHENCE
+> +++ b/WHENCE
+> @@ -2311,7 +2311,7 @@ Version: WP_1345_01_patch_0.0.10.1
+>  File: intel/ibt-hw-37.8.bseq
+>  Version: 1339_02.00
+>  File: intel/ibt-hw-37.8.10-fw-1.10.2.27.d.bseq
+> -Version: STP2_C0_1339_02_patch_27.1
+> +Version: STP2_C0_1339_02_patch_31.1
+>  
+>  Licence: Redistributable. See LICENCE.ibt_firmware for details
+>  
