@@ -1,31 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] android: Set exact Android version
-Date: Wed, 27 Aug 2014 14:54:20 +0300
-Message-Id: <1409140460-14029-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <1409060382.7335.25.camel@pohly-mobl1.fritz.box>
+References: <1409060382.7335.25.camel@pohly-mobl1.fritz.box>
+From: =?UTF-8?B?TWF0ZXVzeiBQw7PFgnJvbGE=?= <mateusz.polrola@gmail.com>
+Date: Wed, 27 Aug 2014 07:59:49 +0100
+Message-ID: <CAA8zYt6JCTCeAOZY8mX3k8z1HoONS=peqnX8PLLgspH-rbsm5A@mail.gmail.com>
+Subject: Re: Suspend + abort session => obexd unusable
+To: Patrick Ohly <patrick.ohly@intel.com>
+Cc: Luiz Von Dentz <luiz.von.dentz@intel.com>,
+	Bluez <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Hi Patrick, Luiz
 
-For local build set exact current Android version.
----
- android/Makefile.am | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+On Tue, Aug 26, 2014 at 2:39 PM, Patrick Ohly <patrick.ohly@intel.com> wrote:
+> I noticed a problem in obexd and/or Bluez 5.21 (Debian Testing):
+>
+> - PullAll from Samsung Galaxy S3
+> - Suspend
+> - kill the process who called obexd
+> - try to pull again from a different process
+> => GDBus.Error:org.bluez.obex.Error.Failed: Unable to find service
+> record
 
-diff --git a/android/Makefile.am b/android/Makefile.am
-index 4b93c5b..24714c4 100644
---- a/android/Makefile.am
-+++ b/android/Makefile.am
-@@ -1,6 +1,6 @@
- if ANDROID
- 
--AM_CFLAGS += -DANDROID_VERSION=0xFFFFFF
-+AM_CFLAGS += -DANDROID_VERSION=0x040404
- 
- android_plugindir = $(abs_top_srcdir)/android/.libs
- 
--- 
-1.9.1
+I also was able to reproduce the issue with Bluez 5.21 and Motorola
+RAZRi/HTC Desire Z using steps described by Patrick.
 
+> obexd notices that its client died (there is a InterfacesRemoved signal
+> for the transfer and session path), but the cleanup seems to leave the
+> device or the local side in an unusable state.
+
+What I noticed is that after killing client process, phone still seems
+to see active session - Bluetooth icon on the phone is still blue (it
+turns blue when there is an active session), so that may indicate that
+phone is left in unusable state.
+
+> Killing obexd and restarting it makes it possible to access the phone
+> again.
+
+For me also switching phone Bluetooth off and on makes it possible to
+create new session form different process, without need to restart
+obexd.
+
+Regards,
+Mateusz Półrola
