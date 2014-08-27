@@ -2,56 +2,57 @@ Return-Path: <cyrus@holtmann.org>
 From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH 3/3] android/gatt: Add remove bond handling
-Date: Wed, 27 Aug 2014 22:47:44 +0200
-Message-Id: <1409172464-30369-4-git-send-email-lukasz.rymanowski@tieto.com>
+Subject: [PATCH 2/3] android/hidhost: Add remove bond handling
+Date: Wed, 27 Aug 2014 22:47:43 +0200
+Message-Id: <1409172464-30369-3-git-send-email-lukasz.rymanowski@tieto.com>
 In-Reply-To: <1409172464-30369-1-git-send-email-lukasz.rymanowski@tieto.com>
 References: <1409172464-30369-1-git-send-email-lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-With this patch GATT is aware about unpaired devices so the local cache
-can be cleared
+With this patch HID/HOG is aware when remote device has been unpaired.
 ---
- android/gatt.c | 18 ++++++++++++++++++
- 1 file changed, 18 insertions(+)
+ android/hidhost.c | 20 ++++++++++++++++++++
+ 1 file changed, 20 insertions(+)
 
-diff --git a/android/gatt.c b/android/gatt.c
-index 89748d2..9dcac0b 100644
---- a/android/gatt.c
-+++ b/android/gatt.c
-@@ -6496,6 +6496,22 @@ static bool start_listening(void)
- 	return true;
+diff --git a/android/hidhost.c b/android/hidhost.c
+index 5b31c95..eeefb63 100644
+--- a/android/hidhost.c
++++ b/android/hidhost.c
+@@ -1483,6 +1483,24 @@ static void connect_cb(GIOChannel *chan, GError *err, gpointer user_data)
+ 	}
  }
  
-+static void gatt_unpaired_cb(const bdaddr_t *addr)
++static void hid_unpaired_cb(const bdaddr_t *addr)
 +{
-+	struct gatt_device *dev;
++	GSList *l;
++	struct hid_device *dev;
 +	char address[18];
 +
-+	dev = find_device_by_addr(addr);
-+	if (!dev)
++	l = g_slist_find_custom(devices, addr, device_cmp);
++	if (!l)
 +		return;
++
++	dev = l->data;
 +
 +	ba2str(addr, address);
 +	DBG("Unpaired device %s", address);
 +
-+	queue_remove(gatt_devices, dev);
-+	destroy_device(dev);
++	hid_device_remove(dev);
 +}
 +
- bool bt_gatt_register(struct ipc *ipc, const bdaddr_t *addr)
+ bool bt_hid_register(struct ipc *ipc, const bdaddr_t *addr, uint8_t mode)
  {
- 	DBG("");
-@@ -6541,6 +6557,8 @@ bool bt_gatt_register(struct ipc *ipc, const bdaddr_t *addr)
- 	info("gatt: LE: %s BR/EDR: %s", le_io ? "enabled" : "disabled",
- 					bredr_io ? "enabled" : "disabled");
+ 	GError *err = NULL;
+@@ -1525,6 +1543,8 @@ bool bt_hid_register(struct ipc *ipc, const bdaddr_t *addr, uint8_t mode)
+ 	ipc_register(hal_ipc, HAL_SERVICE_ID_HIDHOST, cmd_handlers,
+ 						G_N_ELEMENTS(cmd_handlers));
  
-+	bt_unpaired_register(gatt_unpaired_cb);
++	bt_unpaired_register(hid_unpaired_cb);
 +
  	return true;
+ }
  
- failed:
 -- 
 1.8.4
 
