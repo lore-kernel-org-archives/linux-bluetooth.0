@@ -1,128 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+From: Bharat Bhusan Panda <bharat.panda@samsung.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 1/7] obexd/client: Allow suspending transfer while they are queued
-Date: Wed, 27 Aug 2014 19:04:44 +0300
-Message-Id: <1409155490-25653-1-git-send-email-luiz.dentz@gmail.com>
+Cc: bharat.panda@samsung.com
+Subject: Query Regarding new Gatt server attribute database
+Date: Wed, 27 Aug 2014 20:52:50 +0530
+Message-id: <015d01cfc20a$c9160a00$5b421e00$@samsung.com>
+MIME-version: 1.0
+Content-type: text/plain; charset=us-ascii
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi All,
 
-Transfer may be created by different processes so it make sense to allow
-them to be suspended even if they are not active.
----
- obexd/client/transfer.c | 47 ++++++++++++++++++++++++++++++++++++++---------
- 1 file changed, 38 insertions(+), 9 deletions(-)
+We are working on Gatt server implementation, for Tizen framework with BlueZ
+5.20 as base.
 
-diff --git a/obexd/client/transfer.c b/obexd/client/transfer.c
-index bd2b1ab..0b5735b 100644
---- a/obexd/client/transfer.c
-+++ b/obexd/client/transfer.c
-@@ -62,6 +62,7 @@ enum {
- 	TRANSFER_STATUS_ACTIVE,
- 	TRANSFER_STATUS_SUSPENDED,
- 	TRANSFER_STATUS_COMPLETE,
-+	TRANSFER_STATUS_SUSPENDED_QUEUED,
- 	TRANSFER_STATUS_ERROR
- };
- 
-@@ -213,6 +214,7 @@ static DBusMessage *obc_transfer_suspend(DBusConnection *connection,
- {
- 	struct obc_transfer *transfer = user_data;
- 	const char *sender;
-+	uint8_t status;
- 
- 	sender = dbus_message_get_sender(message);
- 	if (g_strcmp0(transfer->owner, sender) != 0)
-@@ -220,14 +222,22 @@ static DBusMessage *obc_transfer_suspend(DBusConnection *connection,
- 				ERROR_INTERFACE ".NotAuthorized",
- 				"Not Authorized");
- 
--	if (transfer->xfer == 0)
-+	switch (transfer->status) {
-+	case TRANSFER_STATUS_QUEUED:
-+		status = TRANSFER_STATUS_SUSPENDED_QUEUED;
-+		break;
-+	case TRANSFER_STATUS_ACTIVE:
-+		if (transfer->xfer)
-+			g_obex_suspend(transfer->obex);
-+		status = TRANSFER_STATUS_SUSPENDED;
-+		break;
-+	default:
- 		return g_dbus_create_error(message,
- 				ERROR_INTERFACE ".NotInProgress",
- 				"Not in progress");
-+	}
- 
--	g_obex_suspend(transfer->obex);
--
--	transfer_set_status(transfer, TRANSFER_STATUS_SUSPENDED);
-+	transfer_set_status(transfer, status);
- 
- 	return g_dbus_create_reply(message, DBUS_TYPE_INVALID);
- }
-@@ -237,6 +247,7 @@ static DBusMessage *obc_transfer_resume(DBusConnection *connection,
- {
- 	struct obc_transfer *transfer = user_data;
- 	const char *sender;
-+	uint8_t status;
- 
- 	sender = dbus_message_get_sender(message);
- 	if (g_strcmp0(transfer->owner, sender) != 0)
-@@ -244,14 +255,24 @@ static DBusMessage *obc_transfer_resume(DBusConnection *connection,
- 				ERROR_INTERFACE ".NotAuthorized",
- 				"Not Authorized");
- 
--	if (transfer->xfer == 0)
-+	switch (transfer->status) {
-+	case TRANSFER_STATUS_SUSPENDED_QUEUED:
-+		status = TRANSFER_STATUS_QUEUED;
-+		break;
-+	case TRANSFER_STATUS_SUSPENDED:
-+		if (transfer->xfer)
-+			g_obex_resume(transfer->obex);
-+		else
-+			obc_transfer_start(transfer, NULL, NULL);
-+		status = TRANSFER_STATUS_ACTIVE;
-+		break;
-+	default:
- 		return g_dbus_create_error(message,
- 				ERROR_INTERFACE ".NotInProgress",
- 				"Not in progress");
-+	}
- 
--	g_obex_resume(transfer->obex);
--
--	transfer_set_status(transfer, TRANSFER_STATUS_ACTIVE);
-+	transfer_set_status(transfer, status);
- 
- 	return g_dbus_create_reply(message, DBUS_TYPE_INVALID);
- }
-@@ -338,6 +359,7 @@ static const char *status2str(uint8_t status)
- 		return "queued";
- 	case TRANSFER_STATUS_ACTIVE:
- 		return "active";
-+	case TRANSFER_STATUS_SUSPENDED_QUEUED:
- 	case TRANSFER_STATUS_SUSPENDED:
- 		return "suspended";
- 	case TRANSFER_STATUS_COMPLETE:
-@@ -861,7 +883,14 @@ static gboolean transfer_start_put(struct obc_transfer *transfer, GError **err)
- gboolean obc_transfer_start(struct obc_transfer *transfer, void *obex,
- 								GError **err)
- {
--	transfer->obex = g_obex_ref(obex);
-+	if (!transfer->obex)
-+		transfer->obex = g_obex_ref(obex);
-+
-+	if (transfer->status == TRANSFER_STATUS_SUSPENDED_QUEUED) {
-+		/* Reset status so the transfer can be resumed */
-+		transfer->status = TRANSFER_STATUS_SUSPENDED;
-+		return TRUE;
-+	}
- 
- 	switch (transfer->op) {
- 	case G_OBEX_OP_GET:
--- 
-1.9.3
+We have few query on adding new service info to gatt attrib server database,
+so that remote gatt client can discover the same.
+
+On Calling "RegisterService" method to org.bluez.GattManager1, after getting
+proper data from GattService1, GattCharacteristic1 and GattDescriptor1
+interface,
+It calls, btd_gatt_add_service(),btd_gatt_add_char() and btd_gatt_add_desc
+respectively and updates the local_attribute_db. 
+Which should be read and updated, when remote gatt client connects and
+starts primary services discovery, but this does not happen, instead it
+reads from attrib server db in attrib-server.c.
+
+How can the local_attribute_db in gatt.c, be attached to ATT IO channel, as
+it has been done for attrib-server db in src/attrib-server.c?
+
+Thanks
+Best Regards,
+Bharat
 
