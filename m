@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 3/7] gobex: Fix warning if g_obex_resume is called when disconnected
-Date: Wed, 27 Aug 2014 19:04:46 +0300
-Message-Id: <1409155490-25653-3-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 2/7] obexd/client: Fix not being able to cancel a suspended transfer
+Date: Wed, 27 Aug 2014 19:04:45 +0300
+Message-Id: <1409155490-25653-2-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1409155490-25653-1-git-send-email-luiz.dentz@gmail.com>
 References: <1409155490-25653-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,23 +11,46 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
+If a transfer is suspended it should be resumed before cancelling
+otherwise it will timeout.
 ---
- gobex/gobex.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ obexd/client/transfer.c | 9 +++++++++
+ 1 file changed, 9 insertions(+)
 
-diff --git a/gobex/gobex.c b/gobex/gobex.c
-index 16a4aae..e7b081f 100644
---- a/gobex/gobex.c
-+++ b/gobex/gobex.c
-@@ -514,7 +514,7 @@ static void enable_tx(GObex *obex)
- 	if (obex->suspended)
- 		return;
+diff --git a/obexd/client/transfer.c b/obexd/client/transfer.c
+index 0b5735b..c31a722 100644
+--- a/obexd/client/transfer.c
++++ b/obexd/client/transfer.c
+@@ -160,6 +160,9 @@ static DBusMessage *obc_transfer_cancel(DBusConnection *connection,
+ 				ERROR_INTERFACE ".InProgress",
+ 				"Cancellation already in progress");
  
--	if (obex->write_source > 0)
-+	if (!obex->io || obex->write_source > 0)
- 		return;
++	if (transfer->status == TRANSFER_STATUS_SUSPENDED)
++		g_obex_resume(transfer->obex);
++
+ 	if (transfer->req > 0) {
+ 		if (!g_obex_cancel_req(transfer->obex, transfer->req, TRUE))
+ 			return g_dbus_create_error(message,
+@@ -414,6 +417,9 @@ static void obc_transfer_free(struct obc_transfer *transfer)
+ {
+ 	DBG("%p", transfer);
  
- 	cond = G_IO_OUT | G_IO_HUP | G_IO_ERR | G_IO_NVAL;
++	if (transfer->status == TRANSFER_STATUS_SUSPENDED)
++		g_obex_resume(transfer->obex);
++
+ 	if (transfer->req > 0)
+ 		g_obex_cancel_req(transfer->obex, transfer->req, TRUE);
+ 
+@@ -659,6 +665,9 @@ static void xfer_complete(GObex *obex, GError *err, gpointer user_data)
+ 		transfer->progress_id = 0;
+ 	}
+ 
++	if (transfer->status == TRANSFER_STATUS_SUSPENDED)
++		g_obex_resume(transfer->obex);
++
+ 	if (err)
+ 		transfer_set_status(transfer, TRANSFER_STATUS_ERROR);
+ 	else
 -- 
 1.9.3
 
