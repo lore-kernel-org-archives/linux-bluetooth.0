@@ -1,39 +1,66 @@
 Return-Path: <cyrus@holtmann.org>
-From: Arman Uguray <armansito@chromium.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Arman Uguray <armansito@chromium.org>
-Subject: [PATCH BlueZ 0/7] Introduce tools/btgatt-client.
-Date: Thu, 28 Aug 2014 15:15:06 -0700
-Message-Id: <1409264113-12239-1-git-send-email-armansito@chromium.org>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.6\))
+Subject: Re: [PATCH BlueZ v2 00/13] Introduce shared/gatt-client
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1409261125-6673-1-git-send-email-armansito@chromium.org>
+Date: Thu, 28 Aug 2014 14:39:08 -0700
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <3461916D-5CED-43F4-86D7-22084E3E1195@holtmann.org>
+References: <1409261125-6673-1-git-send-email-armansito@chromium.org>
+To: Arman Uguray <armansito@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch set introduces tools/btgatt-client, which is an interactive
-command-line tool for shared/gatt-client. It has proved useful for testing and
-debugging the new shared GATT code, so I decided to send it upstream since I'm
-sure others will eventually find this useful as well.
+Hi Arman,
 
-Current capabilities include outputting ATT protocol PDUs sent over the
-underlying bt_att as verbose output, the initial MTU exchange, primary service &
-characteristic discovery and a simple command to browse currently discovered and
-cached services.
+> * v2:
+>  - Rebased on top of master
+>  - Fixed empty line at the end of file.
+>  - Other minor style fixes
+> 
+> * v1:
+>  - Moved the TODOs to the top-level TODO file in a new ATT/GATT section.
+>  - Removed bt_gatt_client_init. Instead, added a
+>    bt_gatt_client_set_ready_handler to set up a handler which gets called when
+>    discovery is over. Discovery is initiated in bt_gatt_client_new instead.
+>  - Removed bt_gatt_client_get_att.
+>  - Removed the (un)register_service_changed functions for now.
+>  - Removed bt_gatt_client_destroy in favor of ref/unref functions.
+>  - Dropped "_handler" from bt_att_(un)register_disconnect_handler functions.
+> 
+> Arman Uguray (13):
+>  TODO: Add items for tasks involving the new shared ATT/GATT stack
+>  shared/gatt-helpers: Remove service, characteristic, descriptor
+>    structures.
+>  shared/gatt-helpers: Added result count functions.
+>  shared/gatt-client: Added initial skeleton and simple functions.
+>  shared/att: Support multiple disconnect handlers.
+>  shared/att: Add BT_ATT_DEFAULT_LE_MTU macro.
+>  shared/gatt-helpers: Fixed typo in callback args.
+>  shared/gatt-client: Add bt_gatt_client_set_debug.
+>  shared/gatt-client: Implement initial service discovery.
+>  shared/gatt-client: Add service iterator functions.
+>  shared/gatt-client: Implement characteristic discovery.
+>  shared/gatt-client: Implement descriptor discovery.
+>  TODO: shared/gatt-client has been defined and discovery implemented
+> 
+> Makefile.am               |   3 +-
+> TODO                      |  90 ++++++-
+> src/shared/att-types.h    |   2 +
+> src/shared/att.c          | 161 ++++++++++--
+> src/shared/att.h          |  11 +-
+> src/shared/gatt-client.c  | 652 ++++++++++++++++++++++++++++++++++++++++++++++
+> src/shared/gatt-client.h  |  89 +++++++
+> src/shared/gatt-helpers.c | 100 +++++--
+> src/shared/gatt-helpers.h |  36 +--
+> 9 files changed, 1063 insertions(+), 81 deletions(-)
+> create mode 100644 src/shared/gatt-client.c
+> create mode 100644 src/shared/gatt-client.h
 
-Comments are very much welcome.
+all 13 patches have been applied.
 
-Arman Uguray (7):
-  tools/btgatt-client: Introduce tools/btgatt-client
-  tools/btgatt-client: Added L2CAP LE ATT connection.
-  tools/btgatt-client: Integrate bt_att and bt_gatt_client.
-  tools/btgatt-client: Add command parsing.
-  tools/btgatt-client: Add "ready" handler.
-  tools/btgatt-client: Add "services" command.
-  tools/btgatt: Add command argument support.
+Regards
 
- Makefile.tools        |  14 +-
- tools/btgatt-client.c | 674 ++++++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 687 insertions(+), 1 deletion(-)
- create mode 100644 tools/btgatt-client.c
-
--- 
-2.1.0.rc2.206.gedb03e5
+Marcel
 
