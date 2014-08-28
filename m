@@ -2,300 +2,175 @@ Return-Path: <cyrus@holtmann.org>
 From: Arman Uguray <armansito@chromium.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Arman Uguray <armansito@chromium.org>
-Subject: [PATCH BlueZ v2 05/13] shared/att: Support multiple disconnect handlers.
-Date: Thu, 28 Aug 2014 14:25:17 -0700
-Message-Id: <1409261125-6673-6-git-send-email-armansito@chromium.org>
+Subject: [PATCH BlueZ v2 04/13] shared/gatt-client: Added initial skeleton and simple functions.
+Date: Thu, 28 Aug 2014 14:25:16 -0700
+Message-Id: <1409261125-6673-5-git-send-email-armansito@chromium.org>
 In-Reply-To: <1409261125-6673-1-git-send-email-armansito@chromium.org>
 References: <1409261125-6673-1-git-send-email-armansito@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch adds support for registering multiple disconnect handlers with an
-instance of struct bt_att. Unregistering is achieved via a new function AND
-through bt_att_unregister_all and all disconnect callbacks get automatically
-unregistered after a single disconnect event.
+This patch introduces shared/gatt-client, which provides a central/client side
+implementation of the Generic Attribute Profile. An instance of bt_gatt_client
+will provide a central database of all GATT services, characteristics, and
+descriptors that have been discovered on a peripheral and will provide API
+functions to obtain information about discovered attributes, registering
+handlers for "Service Changed" indications, as well as providing
+reference-counted access to "Client Characteristic Configuration" descriptors.
 ---
- src/shared/att.c | 155 ++++++++++++++++++++++++++++++++++++++++++++++---------
- src/shared/att.h |  11 ++--
- 2 files changed, 139 insertions(+), 27 deletions(-)
+ Makefile.am              |  3 +-
+ src/shared/gatt-client.c | 79 ++++++++++++++++++++++++++++++++++++++++++++++++
+ src/shared/gatt-client.h | 41 +++++++++++++++++++++++++
+ 3 files changed, 122 insertions(+), 1 deletion(-)
+ create mode 100644 src/shared/gatt-client.c
+ create mode 100644 src/shared/gatt-client.h
 
-diff --git a/src/shared/att.c b/src/shared/att.c
-index b5ab742..73f5552 100644
---- a/src/shared/att.c
-+++ b/src/shared/att.c
-@@ -60,6 +60,10 @@ struct bt_att {
- 	bool in_notify;
- 	bool need_notify_cleanup;
- 
-+	struct queue *disconn_list;	/* List of disconnect handlers */
-+	bool in_disconn;
-+	bool need_disconn_cleanup;
+diff --git a/Makefile.am b/Makefile.am
+index 88fcb49..6aed8e2 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -158,7 +158,8 @@ src_bluetoothd_SOURCES = $(builtin_sources) \
+ 			src/shared/util.h src/shared/util.c \
+ 			src/shared/mgmt.h src/shared/mgmt.c \
+ 			src/shared/att-types.h src/shared/att.h src/shared/att.c \
+-			src/shared/gatt-helpers.h src/shared/gatt-helpers.c
++			src/shared/gatt-helpers.h src/shared/gatt-helpers.c \
++			src/shared/gatt-client.h src/shared/gatt-client.c
+ src_bluetoothd_LDADD = lib/libbluetooth-internal.la gdbus/libgdbus-internal.la \
+ 			@GLIB_LIBS@ @DBUS_LIBS@ -ldl -lrt
+ src_bluetoothd_LDFLAGS = $(AM_LDFLAGS) -Wl,--export-dynamic \
+diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
+new file mode 100644
+index 0000000..98fb456
+--- /dev/null
++++ b/src/shared/gatt-client.c
+@@ -0,0 +1,79 @@
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2014  Google Inc.
++ *
++ *
++ *  This library is free software; you can redistribute it and/or
++ *  modify it under the terms of the GNU Lesser General Public
++ *  License as published by the Free Software Foundation; either
++ *  version 2.1 of the License, or (at your option) any later version.
++ *
++ *  This library is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ *  Lesser General Public License for more details.
++ *
++ *  You should have received a copy of the GNU Lesser General Public
++ *  License along with this library; if not, write to the Free Software
++ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ *
++ */
 +
- 	uint8_t *buf;
- 	uint16_t mtu;
- 
-@@ -73,10 +77,6 @@ struct bt_att {
- 	bt_att_debug_func_t debug_callback;
- 	bt_att_destroy_func_t debug_destroy;
- 	void *debug_data;
--
--	bt_att_disconnect_func_t disconn_callback;
--	bt_att_destroy_func_t disconn_destroy;
--	void *disconn_data;
- };
- 
- enum att_op_type {
-@@ -233,6 +233,46 @@ static void mark_notify_removed(void *data, void *user_data)
- 	notify->removed = true;
- }
- 
-+struct att_disconn {
-+	unsigned int id;
-+	bool removed;
-+	bt_att_disconnect_func_t callback;
-+	bt_att_destroy_func_t destroy;
-+	void *user_data;
++#include "src/shared/att.h"
++#include "src/shared/gatt-client.h"
++#include "src/shared/util.h"
++
++struct bt_gatt_client {
++	struct bt_att *att;
++	int ref_count;
 +};
 +
-+static void destroy_att_disconn(void *data)
++struct bt_gatt_client *bt_gatt_client_new(struct bt_att *att, uint16_t mtu)
 +{
-+	struct att_disconn *disconn = data;
++	struct bt_gatt_client *client;
 +
-+	if (disconn->destroy)
-+		disconn->destroy(disconn->user_data);
++	if (!att)
++		return NULL;
 +
-+	free(disconn);
++	client = new0(struct bt_gatt_client, 1);
++	if (!client)
++		return NULL;
++
++	client->att = bt_att_ref(att);
++
++	/* TODO: Initiate MTU exchange and service discovery. */
++
++	return bt_gatt_client_ref(client);
 +}
 +
-+static bool match_disconn_id(const void *a, const void *b)
++struct bt_gatt_client *bt_gatt_client_ref(struct bt_gatt_client *client)
 +{
-+	const struct att_disconn *disconn = a;
-+	unsigned int id = PTR_TO_UINT(b);
++	if (!client)
++		return NULL;
 +
-+	return disconn->id == id;
++	__sync_fetch_and_add(&client->ref_count, 1);
++
++	return client;
 +}
 +
-+static bool match_disconn_removed(const void *a, const void *b)
++void bt_gatt_client_unref(struct bt_gatt_client *client)
 +{
-+	const struct att_disconn *disconn = a;
-+
-+	return disconn->removed;
-+}
-+
-+static void mark_disconn_removed(void *data, void *user_data)
-+{
-+	struct att_disconn *disconn = data;
-+
-+	disconn->removed = true;
-+}
-+
- static bool encode_pdu(struct att_send_op *op, const void *pdu,
- 						uint16_t length, uint16_t mtu)
- {
-@@ -605,21 +645,42 @@ static bool can_read_data(struct io *io, void *user_data)
- 	return true;
- }
- 
-+static void disconn_handler(void *data, void *user_data)
-+{
-+	struct att_disconn *disconn = data;
-+
-+	if (disconn->removed)
++	if (!client)
 +		return;
 +
-+	if (disconn->callback)
-+		disconn->callback(disconn->user_data);
++	if (__sync_sub_and_fetch(&client->ref_count, 1))
++		return;
++
++	bt_att_unref(client->att);
++	free(client);
 +}
 +
- static bool disconnect_cb(struct io *io, void *user_data)
- {
- 	struct bt_att *att = user_data;
- 
--	bt_att_cancel_all(att);
--	bt_att_unregister_all(att);
--
- 	io_destroy(att->io);
- 	att->io = NULL;
- 
- 	util_debug(att->debug_callback, att->debug_data,
- 						"Physical link disconnected");
- 
--	if (att->disconn_callback)
--		att->disconn_callback(att->disconn_data);
-+	bt_att_ref(att);
-+	att->in_disconn = true;
-+	queue_foreach(att->disconn_list, disconn_handler, NULL);
-+	att->in_disconn = false;
-+
-+	if (att->need_disconn_cleanup) {
-+		queue_remove_all(att->disconn_list, match_disconn_removed, NULL,
-+							destroy_att_disconn);
-+		att->need_disconn_cleanup = false;
-+	}
-+
-+	bt_att_cancel_all(att);
-+	bt_att_unregister_all(att);
-+
-+	bt_att_unref(att);
- 
- 	return false;
- }
-@@ -662,6 +723,10 @@ struct bt_att *bt_att_new(int fd)
- 	if (!att->notify_list)
- 		goto fail;
- 
-+	att->disconn_list = queue_new();
-+	if (!att->disconn_list)
-+		goto fail;
-+
- 	if (!io_set_read_handler(att->io, can_read_data, att, NULL))
- 		goto fail;
- 
-@@ -674,6 +739,8 @@ fail:
- 	queue_destroy(att->req_queue, NULL);
- 	queue_destroy(att->ind_queue, NULL);
- 	queue_destroy(att->write_queue, NULL);
-+	queue_destroy(att->notify_list, NULL);
-+	queue_destroy(att->disconn_list, NULL);
- 	io_destroy(att->io);
- 	free(att->buf);
- 	free(att);
-@@ -709,6 +776,7 @@ void bt_att_unref(struct bt_att *att)
- 	queue_destroy(att->ind_queue, NULL);
- 	queue_destroy(att->write_queue, NULL);
- 	queue_destroy(att->notify_list, NULL);
-+	queue_destroy(att->disconn_list, NULL);
- 	att->req_queue = NULL;
- 	att->ind_queue = NULL;
- 	att->write_queue = NULL;
-@@ -720,9 +788,6 @@ void bt_att_unref(struct bt_att *att)
- 	if (att->debug_destroy)
- 		att->debug_destroy(att->debug_data);
- 
--	if (att->disconn_destroy)
--		att->disconn_destroy(att->disconn_data);
--
- 	free(att->buf);
- 	att->buf = NULL;
- 
-@@ -800,20 +865,57 @@ bool bt_att_set_timeout_cb(struct bt_att *att, bt_att_timeout_func_t callback,
- 	return true;
- }
- 
--bool bt_att_set_disconnect_cb(struct bt_att *att,
-+unsigned int bt_att_register_disconnect(struct bt_att *att,
- 					bt_att_disconnect_func_t callback,
- 					void *user_data,
- 					bt_att_destroy_func_t destroy)
- {
--	if (!att)
-+	struct att_disconn *disconn;
-+
-+	if (!att || !att->io)
-+		return 0;
-+
-+	disconn = new0(struct att_disconn, 1);
-+	if (!disconn)
-+		return 0;
-+
-+	disconn->callback = callback;
-+	disconn->destroy = destroy;
-+	disconn->user_data = user_data;
-+
-+	if (att->next_reg_id < 1)
-+		att->next_reg_id = 1;
-+
-+	disconn->id = att->next_reg_id++;
-+
-+	if (!queue_push_tail(att->disconn_list, disconn)) {
-+		free(disconn);
-+		return 0;
-+	}
-+
-+	return disconn->id;
-+}
-+
-+bool bt_att_unregister_disconnect(struct bt_att *att, unsigned int id)
-+{
-+	struct att_disconn *disconn;
-+
-+	if (!att || !id)
- 		return false;
- 
--	if (att->disconn_destroy)
--		att->disconn_destroy(att->disconn_data);
-+	disconn = queue_find(att->disconn_list, match_disconn_id,
-+							UINT_TO_PTR(id));
-+	if (!disconn)
-+		return false;
-+
-+	if (!att->in_disconn) {
-+		queue_remove(att->disconn_list, disconn);
-+		destroy_att_disconn(disconn);
-+		return true;
-+	}
- 
--	att->disconn_callback = callback;
--	att->disconn_destroy = destroy;
--	att->disconn_data = user_data;
-+	disconn->removed = true;
-+	att->need_disconn_cleanup = true;
- 
- 	return true;
- }
-@@ -996,14 +1098,21 @@ bool bt_att_unregister_all(struct bt_att *att)
- 	if (!att)
- 		return false;
- 
--	if (!att->in_notify) {
-+	if (att->in_notify) {
-+		queue_foreach(att->notify_list, mark_notify_removed, NULL);
-+		att->need_notify_cleanup = true;
-+	} else {
- 		queue_remove_all(att->notify_list, NULL, NULL,
- 							destroy_att_notify);
--		return true;
- 	}
- 
--	queue_foreach(att->notify_list, mark_notify_removed, NULL);
--	att->need_notify_cleanup = true;
-+	if (att->in_disconn) {
-+		queue_foreach(att->disconn_list, mark_disconn_removed, NULL);
-+		att->need_disconn_cleanup = true;
-+	} else {
-+		queue_remove_all(att->disconn_list, NULL, NULL,
-+							destroy_att_disconn);
-+	}
- 
- 	return true;
- }
-diff --git a/src/shared/att.h b/src/shared/att.h
-index cf44704..1063021 100644
---- a/src/shared/att.h
-+++ b/src/shared/att.h
-@@ -54,10 +54,6 @@ bool bt_att_set_mtu(struct bt_att *att, uint16_t mtu);
- bool bt_att_set_timeout_cb(struct bt_att *att, bt_att_timeout_func_t callback,
- 						void *user_data,
- 						bt_att_destroy_func_t destroy);
--bool bt_att_set_disconnect_cb(struct bt_att *att,
--					bt_att_disconnect_func_t callback,
--					void *user_data,
--					bt_att_destroy_func_t destroy);
- 
- unsigned int bt_att_send(struct bt_att *att, uint8_t opcode,
- 					const void *pdu, uint16_t length,
-@@ -72,4 +68,11 @@ unsigned int bt_att_register(struct bt_att *att, uint8_t opcode,
- 						void *user_data,
- 						bt_att_destroy_func_t destroy);
- bool bt_att_unregister(struct bt_att *att, unsigned int id);
-+
-+unsigned int bt_att_register_disconnect(struct bt_att *att,
-+					bt_att_disconnect_func_t callback,
++bool bt_gatt_client_set_ready_handler(struct bt_gatt_client *client,
++					bt_gatt_client_callback_t callback,
 +					void *user_data,
-+					bt_att_destroy_func_t destroy);
-+bool bt_att_unregister_disconnect(struct bt_att *att, unsigned int id);
++					bt_gatt_client_destroy_func_t destroy)
++{
++	/* TODO */
++}
+diff --git a/src/shared/gatt-client.h b/src/shared/gatt-client.h
+new file mode 100644
+index 0000000..73af7c9
+--- /dev/null
++++ b/src/shared/gatt-client.h
+@@ -0,0 +1,41 @@
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2014  Google Inc.
++ *
++ *
++ *  This library is free software; you can redistribute it and/or
++ *  modify it under the terms of the GNU Lesser General Public
++ *  License as published by the Free Software Foundation; either
++ *  version 2.1 of the License, or (at your option) any later version.
++ *
++ *  This library is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ *  Lesser General Public License for more details.
++ *
++ *  You should have received a copy of the GNU Lesser General Public
++ *  License along with this library; if not, write to the Free Software
++ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ *
++ */
 +
- bool bt_att_unregister_all(struct bt_att *att);
++#include <stdbool.h>
++#include <stdint.h>
++
++struct bt_gatt_client;
++
++struct bt_gatt_client *bt_gatt_client_new(struct bt_att *att, uint16_t mtu);
++
++struct bt_gatt_client *bt_gatt_client_ref(struct bt_gatt_client *client);
++void bt_gatt_client_unref(struct bt_gatt_client *client);
++
++typedef void (*bt_gatt_client_destroy_func_t)(void *user_data);
++typedef void (*bt_gatt_client_callback_t)(bool success, uint8_t att_ecode,
++							void *user_data);
++
++bool bt_gatt_client_set_ready_handler(struct bt_gatt_client *client,
++					bt_gatt_client_callback_t callback,
++					void *user_data,
++					bt_gatt_client_destroy_func_t destroy);
 -- 
 2.1.0.rc2.206.gedb03e5
 
