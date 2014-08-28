@@ -1,25 +1,46 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <2A1DCF6B-5E80-44D2-AC49-FED73B1216E1@holtmann.org>
-References: <1408754867-13313-1-git-send-email-armansito@chromium.org>
-	<2A1DCF6B-5E80-44D2-AC49-FED73B1216E1@holtmann.org>
-Date: Thu, 28 Aug 2014 14:27:46 -0700
-Message-ID: <CAHrH25S5O9TT+wSErwpZ98mso-RJS9=38OzOukbTsxZ1dfqr5Q@mail.gmail.com>
-Subject: Re: [PATCH BlueZ v1 00/13] Introducing shared/gatt-client
 From: Arman Uguray <armansito@chromium.org>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+To: linux-bluetooth@vger.kernel.org
+Cc: Arman Uguray <armansito@chromium.org>
+Subject: [PATCH BlueZ v2 13/13] TODO: shared/gatt-client has been defined and discovery implemented
+Date: Thu, 28 Aug 2014 14:25:25 -0700
+Message-Id: <1409261125-6673-14-git-send-email-armansito@chromium.org>
+In-Reply-To: <1409261125-6673-1-git-send-email-armansito@chromium.org>
+References: <1409261125-6673-1-git-send-email-armansito@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+---
+ TODO | 16 ----------------
+ 1 file changed, 16 deletions(-)
 
-> Can you just rebase your patches against latest git so that I can apply them.
->
+diff --git a/TODO b/TODO
+index 39a1773..be56f28 100644
+--- a/TODO
++++ b/TODO
+@@ -145,22 +145,6 @@ ATT/GATT (new shared stack)
+   Priority: Medium
+   Complexity: C1
+ 
+-- Introduce shared/gatt-client as a standalone client implementation that can
+-  operate on a single instance of bt_att as the ATT protocol transport. The
+-  basic API should include functions for reference counting, setting a handler
+-  for util_debug, and a high-level abstraction for GATT services,
+-  characteristics, and descriptors.
+-
+-  Priority: Medium
+-  Complexity: C1
+-
+-- Implement attribute discovery for shared/gatt-client. All services,
+-  characteristics, and descriptors should be discovered and cached during the
+-  set up process, which should also involve the initial MTU exchange.
+-
+-  Priority: Medium
+-  Complexity: C1
+-
+ - Merge functions from shared/gatt-helpers involving value reads and writes into
+   shared/gatt-client. These functions should accept an instance of
+   bt_gatt_client instead of taking a bt_att directly.
+-- 
+2.1.0.rc2.206.gedb03e5
 
-Rebased and fixed the blank line. I just sent out v2 with the fixes.
-Let me know if you run into any issues.
-
-Thanks,
-Arman
