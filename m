@@ -1,53 +1,173 @@
 Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@gmail.com>
-To: Szymon Janc <szymon.janc@tieto.com>
+To: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] android/avdtp: Constify data in avdtp_service_cap_new
-Date: Thu, 28 Aug 2014 20:25:36 +0200
-Message-ID: <1950624.rjRFFKmpIc@athlon>
-In-Reply-To: <1409144479-13862-1-git-send-email-szymon.janc@tieto.com>
-References: <1409144479-13862-1-git-send-email-szymon.janc@tieto.com>
+Subject: Re: [PATCH v2 1/3] android/bluetooth: Add unpaired device callback
+Date: Thu, 28 Aug 2014 20:11:34 +0200
+Message-ID: <2089231.O9SO8dlSHL@athlon>
+In-Reply-To: <1409215042-11313-2-git-send-email-lukasz.rymanowski@tieto.com>
+References: <1409215042-11313-1-git-send-email-lukasz.rymanowski@tieto.com> <1409215042-11313-2-git-send-email-lukasz.rymanowski@tieto.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Wednesday 27 August 2014 15:01:19 Szymon Janc wrote:
-> ---
->  android/avdtp.c | 3 ++-
->  android/avdtp.h | 3 ++-
->  2 files changed, 4 insertions(+), 2 deletions(-)
-> 
-> diff --git a/android/avdtp.c b/android/avdtp.c
-> index 3985fb3..074ca13 100644
-> --- a/android/avdtp.c
-> +++ b/android/avdtp.c
-> @@ -2960,7 +2960,8 @@ struct avdtp_service_capability
-> *avdtp_get_codec(struct avdtp_remote_sep *sep) }
-> 
->  struct avdtp_service_capability *avdtp_service_cap_new(uint8_t category,
-> -							void *data, int length)
-> +							const void *data,
-> +							int length)
->  {
->  	struct avdtp_service_capability *cap;
-> 
-> diff --git a/android/avdtp.h b/android/avdtp.h
-> index 28895ea..d5335e4 100644
-> --- a/android/avdtp.h
-> +++ b/android/avdtp.h
-> @@ -218,7 +218,8 @@ void avdtp_unref(struct avdtp *session);
->  struct avdtp *avdtp_ref(struct avdtp *session);
-> 
->  struct avdtp_service_capability *avdtp_service_cap_new(uint8_t category,
-> -							void *data, int size);
-> +							const void *data,
-> +							int size);
-> 
->  struct avdtp_service_capability *avdtp_get_codec(struct avdtp_remote_sep
-> *sep);
+Hi Łukasz,
 
-Applied.
+On Thursday 28 August 2014 10:37:20 Lukasz Rymanowski wrote:
+> GATT, HID, HOG, might be interested in the fact that some device has
+> been unpaired in order to clear cache or similar. This patch adds means
+> to register callback for unpaired event.
+> ---
+>  android/bluetooth.c | 45 ++++++++++++++++++++++++++++++++++++++++++---
+>  android/bluetooth.h |  3 +++
+>  2 files changed, 45 insertions(+), 3 deletions(-)
+> 
+> diff --git a/android/bluetooth.c b/android/bluetooth.c
+> index 984ecba..e2a97a8 100644
+> --- a/android/bluetooth.c
+> +++ b/android/bluetooth.c
+> @@ -41,6 +41,7 @@
+>  #include "lib/uuid.h"
+>  #include "src/shared/util.h"
+>  #include "src/shared/mgmt.h"
+> +#include "src/shared/queue.h"
+>  #include "src/eir.h"
+>  #include "lib/sdp.h"
+>  #include "lib/sdp_lib.h"
+> @@ -223,6 +224,8 @@ static struct ipc *hal_ipc = NULL;
+> 
+>  static bool kernel_conn_control = false;
+> 
+> +static struct queue *unpaired_cb_list;
+
+Should be explicitly initialized to NULL.
+
+> +
+>  static void get_device_android_addr(struct device *dev, uint8_t *addr)
+>  {
+>  	/*
+> @@ -1688,6 +1691,19 @@ void bt_auto_connect_remove(const bdaddr_t *addr)
+>  	error("Failed to remove device");
+>  }
+> 
+> +static bool match_by_value(const void *data, const void *user_data)
+> +{
+> +	return data == user_data;
+> +}
+> +
+> +bool bt_unpaired_register(bt_unpaired_device_cb cb)
+> +{
+> +	if (queue_find(unpaired_cb_list, match_by_value, cb))
+> +		return false;
+> +
+> +	return queue_push_head(unpaired_cb_list, cb);
+> +}
+> +
+>  static bool rssi_above_threshold(int old, int new)
+>  {
+>  	/* only 8 dBm or more */
+> @@ -4313,6 +4329,14 @@ failed:
+>  									status);
+>  }
+> 
+> +static void send_unpaired_notification(void *data, void *user_data)
+> +{
+> +	bt_unpaired_device_cb cb = data;
+> +	struct mgmt_addr_info *addr = user_data;
+> +
+> +	cb(&addr->bdaddr, addr->type);
+> +}
+> +
+>  static void unpair_device_complete(uint8_t status, uint16_t length,
+>  					const void *param, void *user_data)
+>  {
+> @@ -4330,6 +4354,9 @@ static void unpair_device_complete(uint8_t status,
+> uint16_t length,
+> 
+>  	update_device_state(dev, rp->addr.type, HAL_STATUS_SUCCESS, false,
+>  								false, false);
+> +
+> +	queue_foreach(unpaired_cb_list, send_unpaired_notification,
+> +							(void *)&rp->addr);
+
+Is this (void *) cast needed?
+
+>  }
+> 
+>  static void handle_remove_bond_cmd(const void *buf, uint16_t len)
+> @@ -5114,6 +5141,12 @@ bool bt_bluetooth_register(struct ipc *ipc, uint8_t
+> mode)
+> 
+>  	DBG("mode 0x%x", mode);
+> 
+> +	unpaired_cb_list = queue_new();
+> +	if (!unpaired_cb_list) {
+> +		error("Can not allocate queue for unpaired callbacks");
+> +		return false;
+> +	}
+> +
+>  	missing_settings = adapter.current_settings ^
+>  					adapter.supported_settings;
+> 
+> @@ -5129,7 +5162,7 @@ bool bt_bluetooth_register(struct ipc *ipc, uint8_t
+> mode) /* Fail if controller does not support LE */
+>  		if (!(adapter.supported_settings & MGMT_SETTING_LE)) {
+>  			error("LE Mode not supported by controller");
+> -			return false;
+> +			goto failed;
+>  		}
+> 
+>  		/* If LE it is not yet enabled then enable it */
+> @@ -5144,7 +5177,7 @@ bool bt_bluetooth_register(struct ipc *ipc, uint8_t
+> mode) /* Fail if controller does not support BR/EDR */
+>  		if (!(adapter.supported_settings & MGMT_SETTING_BREDR)) {
+>  			error("BR/EDR Mode not supported");
+> -			return false;
+> +			goto failed;
+>  		}
+> 
+>  		/* Enable BR/EDR if it is not enabled */
+> @@ -5162,7 +5195,7 @@ bool bt_bluetooth_register(struct ipc *ipc, uint8_t
+> mode) break;
+>  	default:
+>  		error("Unknown mode 0x%x", mode);
+> -		return false;
+> +		goto failed;
+>  	}
+> 
+>  	hal_ipc = ipc;
+> @@ -5171,6 +5204,10 @@ bool bt_bluetooth_register(struct ipc *ipc, uint8_t
+> mode) G_N_ELEMENTS(cmd_handlers));
+> 
+>  	return true;
+> +
+> +failed:
+> +	queue_destroy(unpaired_cb_list, NULL);
+> +	return false;
+>  }
+> 
+>  void bt_bluetooth_unregister(void)
+> @@ -5185,4 +5222,6 @@ void bt_bluetooth_unregister(void)
+> 
+>  	ipc_unregister(hal_ipc, HAL_SERVICE_ID_CORE);
+>  	hal_ipc = NULL;
+> +
+> +	queue_destroy(unpaired_cb_list, NULL);
+>  }
+> diff --git a/android/bluetooth.h b/android/bluetooth.h
+> index ac7f3ad..185477c 100644
+> --- a/android/bluetooth.h
+> +++ b/android/bluetooth.h
+> @@ -85,3 +85,6 @@ bool bt_kernel_conn_control(void);
+>  bool bt_auto_connect_add(const bdaddr_t *addr);
+> 
+>  void bt_auto_connect_remove(const bdaddr_t *addr);
+> +
+> +typedef void (*bt_unpaired_device_cb)(const bdaddr_t *addr, uint8_t type);
+> +bool bt_unpaired_register(bt_unpaired_device_cb cb);
+
+Shouldn't we have an unregister function as well?
 
 -- 
 Szymon K. Janc
