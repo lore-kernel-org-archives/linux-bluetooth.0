@@ -2,175 +2,135 @@ Return-Path: <cyrus@holtmann.org>
 From: Arman Uguray <armansito@chromium.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Arman Uguray <armansito@chromium.org>
-Subject: [PATCH BlueZ v2 04/13] shared/gatt-client: Added initial skeleton and simple functions.
-Date: Thu, 28 Aug 2014 14:25:16 -0700
-Message-Id: <1409261125-6673-5-git-send-email-armansito@chromium.org>
+Subject: [PATCH BlueZ v2 01/13] TODO: Add items for tasks involving the new shared ATT/GATT stack
+Date: Thu, 28 Aug 2014 14:25:13 -0700
+Message-Id: <1409261125-6673-2-git-send-email-armansito@chromium.org>
 In-Reply-To: <1409261125-6673-1-git-send-email-armansito@chromium.org>
 References: <1409261125-6673-1-git-send-email-armansito@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch introduces shared/gatt-client, which provides a central/client side
-implementation of the Generic Attribute Profile. An instance of bt_gatt_client
-will provide a central database of all GATT services, characteristics, and
-descriptors that have been discovered on a peripheral and will provide API
-functions to obtain information about discovered attributes, registering
-handlers for "Service Changed" indications, as well as providing
-reference-counted access to "Client Characteristic Configuration" descriptors.
 ---
- Makefile.am              |  3 +-
- src/shared/gatt-client.c | 79 ++++++++++++++++++++++++++++++++++++++++++++++++
- src/shared/gatt-client.h | 41 +++++++++++++++++++++++++
- 3 files changed, 122 insertions(+), 1 deletion(-)
- create mode 100644 src/shared/gatt-client.c
- create mode 100644 src/shared/gatt-client.h
+ TODO | 106 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 104 insertions(+), 2 deletions(-)
 
-diff --git a/Makefile.am b/Makefile.am
-index 88fcb49..6aed8e2 100644
---- a/Makefile.am
-+++ b/Makefile.am
-@@ -158,7 +158,8 @@ src_bluetoothd_SOURCES = $(builtin_sources) \
- 			src/shared/util.h src/shared/util.c \
- 			src/shared/mgmt.h src/shared/mgmt.c \
- 			src/shared/att-types.h src/shared/att.h src/shared/att.c \
--			src/shared/gatt-helpers.h src/shared/gatt-helpers.c
-+			src/shared/gatt-helpers.h src/shared/gatt-helpers.c \
-+			src/shared/gatt-client.h src/shared/gatt-client.c
- src_bluetoothd_LDADD = lib/libbluetooth-internal.la gdbus/libgdbus-internal.la \
- 			@GLIB_LIBS@ @DBUS_LIBS@ -ldl -lrt
- src_bluetoothd_LDFLAGS = $(AM_LDFLAGS) -Wl,--export-dynamic \
-diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
-new file mode 100644
-index 0000000..98fb456
---- /dev/null
-+++ b/src/shared/gatt-client.c
-@@ -0,0 +1,79 @@
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2014  Google Inc.
-+ *
-+ *
-+ *  This library is free software; you can redistribute it and/or
-+ *  modify it under the terms of the GNU Lesser General Public
-+ *  License as published by the Free Software Foundation; either
-+ *  version 2.1 of the License, or (at your option) any later version.
-+ *
-+ *  This library is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ *  Lesser General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU Lesser General Public
-+ *  License along with this library; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-+ *
-+ */
+diff --git a/TODO b/TODO
+index 50678d3..39a1773 100644
+--- a/TODO
++++ b/TODO
+@@ -136,8 +136,110 @@ Low Energy
+   Priority: Low
+   Complexity: C2
+ 
+-ATT/GATT
+-========
++ATT/GATT (new shared stack)
++===========================
 +
-+#include "src/shared/att.h"
-+#include "src/shared/gatt-client.h"
-+#include "src/shared/util.h"
++- shared/att currently doesn't handle signed writes. It should be extended to
++  support signing outgoing and verify incoming ATT PDUs.
 +
-+struct bt_gatt_client {
-+	struct bt_att *att;
-+	int ref_count;
-+};
++  Priority: Medium
++  Complexity: C1
 +
-+struct bt_gatt_client *bt_gatt_client_new(struct bt_att *att, uint16_t mtu)
-+{
-+	struct bt_gatt_client *client;
++- Introduce shared/gatt-client as a standalone client implementation that can
++  operate on a single instance of bt_att as the ATT protocol transport. The
++  basic API should include functions for reference counting, setting a handler
++  for util_debug, and a high-level abstraction for GATT services,
++  characteristics, and descriptors.
 +
-+	if (!att)
-+		return NULL;
++  Priority: Medium
++  Complexity: C1
 +
-+	client = new0(struct bt_gatt_client, 1);
-+	if (!client)
-+		return NULL;
++- Implement attribute discovery for shared/gatt-client. All services,
++  characteristics, and descriptors should be discovered and cached during the
++  set up process, which should also involve the initial MTU exchange.
 +
-+	client->att = bt_att_ref(att);
++  Priority: Medium
++  Complexity: C1
 +
-+	/* TODO: Initiate MTU exchange and service discovery. */
++- Merge functions from shared/gatt-helpers involving value reads and writes into
++  shared/gatt-client. These functions should accept an instance of
++  bt_gatt_client instead of taking a bt_att directly.
 +
-+	return bt_gatt_client_ref(client);
-+}
++  Priority: Medium
++  Complexity: C1
 +
-+struct bt_gatt_client *bt_gatt_client_ref(struct bt_gatt_client *client)
-+{
-+	if (!client)
-+		return NULL;
++- Properly handle indications from the "Service Changed" characteristic.
++  shared/gatt-client should automatically rediscover all changed GATT services
++  and notify the upper layer using a specially assigned handler.
 +
-+	__sync_fetch_and_add(&client->ref_count, 1);
++  Priority: Medium
++  Complexity: C1
 +
-+	return client;
-+}
++- Define API functions in shared/gatt-client for enabling/disabling
++  characteristic handle-value notifications/indications on a reference counted
++  basis. Code that is no longer interested in notifications from a
++  characteristic should be able to unregister any callbacks without writing to
++  the "Client Characteristic Configuration" descriptor if there are others who
++  are still interested.
 +
-+void bt_gatt_client_unref(struct bt_gatt_client *client)
-+{
-+	if (!client)
-+		return;
++  Priority: Medium
++  Complexity: C2
 +
-+	if (__sync_sub_and_fetch(&client->ref_count, 1))
-+		return;
++- Introduce a handler interface to shared/gatt-client which can be used by the
++  upper layer to determine when the link has been disconnected or an ATT
++  protocol request times out.
 +
-+	bt_att_unref(client->att);
-+	free(client);
-+}
++  Priority: Medium
++  Complexity: C2
 +
-+bool bt_gatt_client_set_ready_handler(struct bt_gatt_client *client,
-+					bt_gatt_client_callback_t callback,
-+					void *user_data,
-+					bt_gatt_client_destroy_func_t destroy)
-+{
-+	/* TODO */
-+}
-diff --git a/src/shared/gatt-client.h b/src/shared/gatt-client.h
-new file mode 100644
-index 0000000..73af7c9
---- /dev/null
-+++ b/src/shared/gatt-client.h
-@@ -0,0 +1,41 @@
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2014  Google Inc.
-+ *
-+ *
-+ *  This library is free software; you can redistribute it and/or
-+ *  modify it under the terms of the GNU Lesser General Public
-+ *  License as published by the Free Software Foundation; either
-+ *  version 2.1 of the License, or (at your option) any later version.
-+ *
-+ *  This library is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ *  Lesser General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU Lesser General Public
-+ *  License along with this library; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-+ *
-+ */
++- Introduce long-term caching of attributes to shared/gatt-client, such that the
++  services, characteristics, and descriptors obtained from a peripheral are
++  remembered in the case of bonding. This may involve storing data about GATT
++  services to disk.
 +
-+#include <stdbool.h>
-+#include <stdint.h>
++  Priority: Low
++  Complexity: C4
 +
-+struct bt_gatt_client;
++- Introduce a new GATT client command-line tool to test and use a single
++  instance of bt_gatt_client.
 +
-+struct bt_gatt_client *bt_gatt_client_new(struct bt_att *att, uint16_t mtu);
++  Priority: Low
++  Complexity: C1
 +
-+struct bt_gatt_client *bt_gatt_client_ref(struct bt_gatt_client *client);
-+void bt_gatt_client_unref(struct bt_gatt_client *client);
++- Move all daemon plugins and profiles that are GATT based to use
++  shared/gatt-client instead of attrib/*. This is a complicated task that
++  potentially needs a new plugin/profile probing interface and a lot of
++  rewriting that can cause regressions in existing functionality. The biggest
++  challenge here is that an instance of bt_att (shared/att) and GAttrib
++  (attrib/gattrib) cannot coexist on the same file descriptor, since they will
++  cause ATT protocol violations by breaking the sequential request-response
++  structure. A special shared/gatt-client-gattrib implementation may be
++  necessary to move each profile/plugin to the new API before actually switching
++  to the shared/att based implementation.
 +
-+typedef void (*bt_gatt_client_destroy_func_t)(void *user_data);
-+typedef void (*bt_gatt_client_callback_t)(bool success, uint8_t att_ecode,
-+							void *user_data);
++  Priority: Medium
++  Complexity: C4
 +
-+bool bt_gatt_client_set_ready_handler(struct bt_gatt_client *client,
-+					bt_gatt_client_callback_t callback,
-+					void *user_data,
-+					bt_gatt_client_destroy_func_t destroy);
++- Implement the client portion of doc/gatt-api.txt using shared/gatt-client once
++  plugin/profile code uses it.
++
++  Priority: Medium
++  Complexity: C2
++
++- Introduce shared/gatt-server, which combined with shared/gatt-db, can be used
++  as a GATT server implementation.
++
++  Priority: Medium
++  Complexity: C2
++
++- Implement the server portion of doc/gatt-api.txt using shared/gatt-server once
++  it exists.
++
++  Priority: Medium
++  Complexity: C4
++
++ATT/GATT (old/outdated)
++=======================
+ 
+ - At the moment authentication and authorization is not supported at the
+   same time, read/write requirements in the attribute server needs to
 -- 
 2.1.0.rc2.206.gedb03e5
 
