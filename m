@@ -2,298 +2,235 @@ Return-Path: <cyrus@holtmann.org>
 From: Arman Uguray <armansito@chromium.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Arman Uguray <armansito@chromium.org>
-Subject: [PATCH BlueZ v2 10/13] shared/gatt-client: Add service iterator functions.
-Date: Thu, 28 Aug 2014 14:25:22 -0700
-Message-Id: <1409261125-6673-11-git-send-email-armansito@chromium.org>
+Subject: [PATCH BlueZ v2 09/13] shared/gatt-client: Implement initial service discovery.
+Date: Thu, 28 Aug 2014 14:25:21 -0700
+Message-Id: <1409261125-6673-10-git-send-email-armansito@chromium.org>
 In-Reply-To: <1409261125-6673-1-git-send-email-armansito@chromium.org>
 References: <1409261125-6673-1-git-send-email-armansito@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch introduces high-level structures and functions for iterating through,
-and storing, data about the discovered services.
+This code implements the following portion of attribute discovery:
+
+  - Initial MTU exchange.
+  - Primary service discovery.
+
+Discovery results aren't stored yet.
 ---
- src/shared/gatt-client.c | 148 +++++++++++++++++++++++++++++++++++++++++++++--
- src/shared/gatt-client.h |  42 ++++++++++++++
- 2 files changed, 186 insertions(+), 4 deletions(-)
+ src/shared/gatt-client.c | 168 ++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 166 insertions(+), 2 deletions(-)
 
 diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
-index 7a76234..64c598f 100644
+index 7c2b7c6..7a76234 100644
 --- a/src/shared/gatt-client.c
 +++ b/src/shared/gatt-client.c
-@@ -31,6 +31,13 @@
- #define MAX(a, b) ((a) > (b) ? (a) : (b))
- #endif
+@@ -23,17 +23,168 @@
  
-+#define UUID_BYTES (BT_GATT_UUID_SIZE * sizeof(uint8_t))
-+
-+struct service_list {
-+	bt_gatt_service_t service;
-+	struct service_list *next;
-+};
+ #include "src/shared/att.h"
+ #include "src/shared/gatt-client.h"
++#include "lib/uuid.h"
++#include "src/shared/gatt-helpers.h"
+ #include "src/shared/util.h"
+ 
++#ifndef MAX
++#define MAX(a, b) ((a) > (b) ? (a) : (b))
++#endif
 +
  struct bt_gatt_client {
  	struct bt_att *att;
  	int ref_count;
-@@ -43,9 +50,61 @@ struct bt_gatt_client {
+ 
++	bt_gatt_client_callback_t ready_callback;
++	bt_gatt_client_destroy_func_t ready_destroy;
++	void *ready_data;
++
+ 	bt_gatt_client_debug_func_t debug_callback;
  	bt_gatt_client_destroy_func_t debug_destroy;
  	void *debug_data;
- 
-+	struct service_list *svc_head, *svc_tail;
- 	bool in_init;
-+	bool ready;
++
++	bool in_init;
++};
++
++struct async_op {
++	struct bt_gatt_client *client;
++	int ref_count;
  };
  
-+static bool gatt_client_add_service(struct bt_gatt_client *client,
-+						uint16_t start, uint16_t end,
-+						uint8_t uuid[BT_GATT_UUID_SIZE])
++static struct async_op *async_op_ref(struct async_op *op)
 +{
-+	struct service_list *list;
++	__sync_fetch_and_add(&op->ref_count, 1);
 +
-+	list = new0(struct service_list, 1);
-+	if (!list)
-+		return false;
++	return op;
++}
 +
-+	list->service.start_handle = start;
-+	list->service.end_handle = end;
-+	memcpy(list->service.uuid, uuid, UUID_BYTES);
++static void async_op_unref(void *data)
++{
++	struct async_op *op = data;
 +
-+	if (!client->svc_head)
-+		client->svc_head = client->svc_tail = list;
-+	else {
-+		client->svc_tail->next = list;
-+		client->svc_tail = list;
++	if (__sync_sub_and_fetch(&op->ref_count, 1))
++		return;
++
++	free(data);
++}
++
++static void discover_primary_cb(bool success, uint8_t att_ecode,
++						struct bt_gatt_result *result,
++						void *user_data)
++{
++	struct async_op *op = user_data;
++	struct bt_gatt_client *client = op->client;
++	struct bt_gatt_iter iter;
++	uint16_t start, end;
++	uint8_t uuid[16];
++	char uuid_str[MAX_LEN_UUID_STR];
++	bt_uuid_t tmp;
++
++	if (!success) {
++		util_debug(client->debug_callback, client->debug_data,
++					"Primary service discovery failed."
++					" ATT ECODE: 0x%02x", att_ecode);
++		goto done;
 +	}
 +
-+	return true;
-+}
-+
-+static void service_destroy_characteristics(bt_gatt_service_t *service)
-+{
-+	unsigned int i;
-+
-+	for (i = 0; i < service->num_chrcs; i++)
-+		free((bt_gatt_descriptor_t *) service->chrcs[i].descs);
-+
-+	free((bt_gatt_characteristic_t *) service->chrcs);
-+}
-+
-+static void gatt_client_clear_services(struct bt_gatt_client *client)
-+{
-+	struct service_list *l, *tmp;
-+
-+	l = client->svc_head;
-+
-+	while (l) {
-+		service_destroy_characteristics(&l->service);
-+		tmp = l;
-+		l = tmp->next;
-+		free(tmp);
++	if (!result || !bt_gatt_iter_init(&iter, result)) {
++		success = false;
++		att_ecode = 0;
++		goto done;
 +	}
 +
-+	client->svc_head = client->svc_tail = NULL;
++	util_debug(client->debug_callback, client->debug_data,
++					"Primary services found: %u",
++					bt_gatt_result_service_count(result));
++
++	while (bt_gatt_iter_next_service(&iter, &start, &end, uuid)) {
++		/* TODO: discover characteristics and store the service. */
++
++		/* Log debug message. */
++		tmp.type = BT_UUID128;
++		memcpy(tmp.value.u128.data, uuid, sizeof(uuid));
++		bt_uuid_to_string(&tmp, uuid_str, sizeof(uuid_str));
++		util_debug(client->debug_callback, client->debug_data,
++				"start: 0x%04x, end: 0x%04x, uuid: %s",
++				start, end, uuid_str);
++	}
++
++done:
++	client->in_init = false;
++
++	if (client->ready_callback)
++		client->ready_callback(success, att_ecode, client->ready_data);
 +}
 +
- struct async_op {
- 	struct bt_gatt_client *client;
- 	int ref_count;
-@@ -76,7 +135,7 @@ static void discover_primary_cb(bool success, uint8_t att_ecode,
- 	struct bt_gatt_client *client = op->client;
- 	struct bt_gatt_iter iter;
- 	uint16_t start, end;
--	uint8_t uuid[16];
-+	uint8_t uuid[BT_GATT_UUID_SIZE];
- 	char uuid_str[MAX_LEN_UUID_STR];
- 	bt_uuid_t tmp;
- 
-@@ -98,8 +157,6 @@ static void discover_primary_cb(bool success, uint8_t att_ecode,
- 					bt_gatt_result_service_count(result));
- 
- 	while (bt_gatt_iter_next_service(&iter, &start, &end, uuid)) {
--		/* TODO: discover characteristics and store the service. */
--
- 		/* Log debug message. */
- 		tmp.type = BT_UUID128;
- 		memcpy(tmp.value.u128.data, uuid, sizeof(uuid));
-@@ -107,11 +164,25 @@ static void discover_primary_cb(bool success, uint8_t att_ecode,
- 		util_debug(client->debug_callback, client->debug_data,
- 				"start: 0x%04x, end: 0x%04x, uuid: %s",
- 				start, end, uuid_str);
-+
-+		/* Store the service */
-+		if (!gatt_client_add_service(client, start, end, uuid)) {
-+			util_debug(client->debug_callback, client->debug_data,
-+						"Failed to store service");
-+
-+			gatt_client_clear_services(client);
-+
-+			success = false;
-+			goto done;
-+		}
- 	}
- 
- done:
- 	client->in_init = false;
- 
-+	if (success)
-+		client->ready = true;
-+
- 	if (client->ready_callback)
- 		client->ready_callback(success, att_ecode, client->ready_data);
- }
-@@ -160,7 +231,7 @@ static bool gatt_client_init(struct bt_gatt_client *client, uint16_t mtu)
- {
- 	struct async_op *op;
- 
--	if (client->in_init)
-+	if (client->in_init || client->ready)
- 		return false;
- 
- 	op = new0(struct async_op, 1);
-@@ -231,6 +302,11 @@ void bt_gatt_client_unref(struct bt_gatt_client *client)
- 	free(client);
- }
- 
-+bool bt_gatt_client_is_ready(struct bt_gatt_client *client)
++static void exchange_mtu_cb(bool success, uint8_t att_ecode, void *user_data)
 +{
-+	return (client && client->ready);
++	struct async_op *op = user_data;
++	struct bt_gatt_client *client = op->client;
++
++	if (!success) {
++		util_debug(client->debug_callback, client->debug_data,
++				"MTU Exchange failed. ATT ECODE: 0x%02x",
++				att_ecode);
++
++		client->in_init = false;
++
++		if (client->ready_callback)
++			client->ready_callback(success, att_ecode,
++							client->ready_data);
++
++		return;
++	}
++
++	util_debug(client->debug_callback, client->debug_data,
++					"MTU exchange complete, with MTU: %u",
++					bt_att_get_mtu(client->att));
++
++	if (bt_gatt_discover_primary_services(client->att, NULL,
++							discover_primary_cb,
++							async_op_ref(op),
++							async_op_unref))
++		return;
++
++	util_debug(client->debug_callback, client->debug_data,
++			"Failed to initiate primary service discovery");
++
++	client->in_init = false;
++
++	if (client->ready_callback)
++		client->ready_callback(success, att_ecode, client->ready_data);
++
++	async_op_unref(op);
 +}
 +
- bool bt_gatt_client_set_ready_handler(struct bt_gatt_client *client,
- 					bt_gatt_client_callback_t callback,
- 					void *user_data,
-@@ -265,3 +341,67 @@ bool bt_gatt_client_set_debug(struct bt_gatt_client *client,
- 
- 	return true;
- }
-+
-+bool bt_gatt_service_iter_init(struct bt_gatt_service_iter *iter,
-+						struct bt_gatt_client *client)
++static bool gatt_client_init(struct bt_gatt_client *client, uint16_t mtu)
 +{
-+	if (!iter || !client)
-+		return false;
++	struct async_op *op;
 +
 +	if (client->in_init)
 +		return false;
 +
-+	memset(iter, 0, sizeof(*iter));
-+	iter->client = client;
-+	iter->ptr = NULL;
++	op = new0(struct async_op, 1);
++	if (!op)
++		return false;
++
++	op->client = client;
++
++	/* Configure the MTU */
++	if (!bt_gatt_exchange_mtu(client->att, MAX(BT_ATT_DEFAULT_LE_MTU, mtu),
++							exchange_mtu_cb,
++							async_op_ref(op),
++							async_op_unref)) {
++		if (client->ready_callback)
++			client->ready_callback(false, 0, client->ready_data);
++
++		free(op);
++	}
++
++	client->in_init = true;
 +
 +	return true;
 +}
 +
-+bool bt_gatt_service_iter_next(struct bt_gatt_service_iter *iter,
-+						bt_gatt_service_t *service)
-+{
-+	struct service_list *l;
+ struct bt_gatt_client *bt_gatt_client_new(struct bt_att *att, uint16_t mtu)
+ {
+ 	struct bt_gatt_client *client;
+@@ -47,7 +198,7 @@ struct bt_gatt_client *bt_gatt_client_new(struct bt_att *att, uint16_t mtu)
+ 
+ 	client->att = bt_att_ref(att);
+ 
+-	/* TODO: Initiate MTU exchange and service discovery. */
++	gatt_client_init(client, mtu);
+ 
+ 	return bt_gatt_client_ref(client);
+ }
+@@ -70,6 +221,9 @@ void bt_gatt_client_unref(struct bt_gatt_client *client)
+ 	if (__sync_sub_and_fetch(&client->ref_count, 1))
+ 		return;
+ 
++	if (client->ready_destroy)
++		client->ready_destroy(client->ready_data);
 +
-+	if (!iter || !service)
+ 	if (client->debug_destroy)
+ 		client->debug_destroy(client->debug_data);
+ 
+@@ -82,7 +236,17 @@ bool bt_gatt_client_set_ready_handler(struct bt_gatt_client *client,
+ 					void *user_data,
+ 					bt_gatt_client_destroy_func_t destroy)
+ {
+-	/* TODO */
++	if (!client)
 +		return false;
 +
-+	l = iter->ptr;
++	if (client->ready_destroy)
++		client->ready_destroy(client->ready_data);
 +
-+	if (!l)
-+		l = iter->client->svc_head;
-+	else
-+		l = l->next;
-+
-+	if (!l)
-+		return false;
-+
-+	*service = l->service;
-+	iter->ptr = l;
++	client->ready_callback = callback;
++	client->ready_destroy = destroy;
++	client->ready_data = user_data;
 +
 +	return true;
-+}
-+
-+bool bt_gatt_service_iter_next_by_handle(struct bt_gatt_service_iter *iter,
-+						uint16_t start_handle,
-+						bt_gatt_service_t *service)
-+{
-+	while (bt_gatt_service_iter_next(iter, service)) {
-+		if (service->start_handle == start_handle)
-+			return true;
-+	}
-+
-+	return false;
-+}
-+
-+bool bt_gatt_service_iter_next_by_uuid(struct bt_gatt_service_iter *iter,
-+					const uint8_t uuid[BT_GATT_UUID_SIZE],
-+					bt_gatt_service_t *service)
-+{
-+	while (bt_gatt_service_iter_next(iter, service)) {
-+		if (memcmp(service->uuid, uuid, UUID_BYTES) == 0)
-+			return true;
-+	}
-+
-+	return false;
-+}
-diff --git a/src/shared/gatt-client.h b/src/shared/gatt-client.h
-index 65da93c..a4cd132 100644
---- a/src/shared/gatt-client.h
-+++ b/src/shared/gatt-client.h
-@@ -23,6 +23,9 @@
+ }
  
- #include <stdbool.h>
- #include <stdint.h>
-+#include <stddef.h>
-+
-+#define BT_GATT_UUID_SIZE 16
- 
- struct bt_gatt_client;
- 
-@@ -36,6 +39,7 @@ typedef void (*bt_gatt_client_callback_t)(bool success, uint8_t att_ecode,
- 							void *user_data);
- typedef void (*bt_gatt_client_debug_func_t)(const char *str, void *user_data);
- 
-+bool bt_gatt_client_is_ready(struct bt_gatt_client *client);
- bool bt_gatt_client_set_ready_handler(struct bt_gatt_client *client,
- 					bt_gatt_client_callback_t callback,
- 					void *user_data,
-@@ -44,3 +48,41 @@ bool bt_gatt_client_set_debug(struct bt_gatt_client *client,
- 					bt_gatt_client_debug_func_t callback,
- 					void *user_data,
- 					bt_gatt_client_destroy_func_t destroy);
-+
-+typedef struct {
-+	uint16_t handle;
-+	uint8_t uuid[BT_GATT_UUID_SIZE];
-+} bt_gatt_descriptor_t;
-+
-+typedef struct {
-+	uint16_t handle;
-+	uint16_t value_handle;
-+	uint8_t properties;
-+	uint8_t uuid[BT_GATT_UUID_SIZE];
-+	const bt_gatt_descriptor_t *descs;
-+	size_t num_descs;
-+} bt_gatt_characteristic_t;
-+
-+typedef struct {
-+	uint16_t start_handle;
-+	uint16_t end_handle;
-+	uint8_t uuid[BT_GATT_UUID_SIZE];
-+	const bt_gatt_characteristic_t *chrcs;
-+	size_t num_chrcs;
-+} bt_gatt_service_t;
-+
-+struct bt_gatt_service_iter {
-+	struct bt_gatt_client *client;
-+	void *ptr;
-+};
-+
-+bool bt_gatt_service_iter_init(struct bt_gatt_service_iter *iter,
-+						struct bt_gatt_client *client);
-+bool bt_gatt_service_iter_next(struct bt_gatt_service_iter *iter,
-+						bt_gatt_service_t *service);
-+bool bt_gatt_service_iter_next_by_handle(struct bt_gatt_service_iter *iter,
-+						uint16_t start_handle,
-+						bt_gatt_service_t *service);
-+bool bt_gatt_service_iter_next_by_uuid(struct bt_gatt_service_iter *iter,
-+					const uint8_t uuid[BT_GATT_UUID_SIZE],
-+					bt_gatt_service_t *service);
+ bool bt_gatt_client_set_debug(struct bt_gatt_client *client,
 -- 
 2.1.0.rc2.206.gedb03e5
 
