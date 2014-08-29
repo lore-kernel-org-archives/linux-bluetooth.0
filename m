@@ -1,35 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
-From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH v3 0/3] Fix for handling unpaired devices
-Date: Fri, 29 Aug 2014 11:53:57 +0200
-Message-Id: <1409306040-3162-1-git-send-email-lukasz.rymanowski@tieto.com>
+From: "Gu, Chao Jie" <chao.jie.gu@intel.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	"marcel@holmann.org" <marcel@holmann.org>,
+	Arman Uguray <armansito@chromium.org>
+Subject: RE: [PATCH] gatt api V2
+Date: Fri, 29 Aug 2014 09:13:50 +0000
+Message-ID: <3D02B219753AD44CBDDDE484323B1774112F697D@SHSMSX104.ccr.corp.intel.com>
+References: <1409295566-13583-1-git-send-email-chao.jie.gu@intel.com>
+ <CABBYNZLqDtSk8h0-+BruH6i_+YxRrmoR8srf+KsAhvLvEq51-w@mail.gmail.com>
+In-Reply-To: <CABBYNZLqDtSk8h0-+BruH6i_+YxRrmoR8srf+KsAhvLvEq51-w@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Following patches fix scenario when remote device is unpaired and
-paired again. Issue found when testing HOG where basically after
-re-pair HOG was not functional.
-
-v2:
-* bt_unpaired_register returns bool
-* unpaired callback provides also bdaddr type
-
-v3:
-* Szymon comments addressed
-
-Lukasz Rymanowski (3):
-  android/bluetooth: Add unpaired device callback
-  android/hidhost: Add remove bond handling
-  android/gatt: Add remove bond handling
-
- android/bluetooth.c | 51 ++++++++++++++++++++++++++++++++++++++++++++++++---
- android/bluetooth.h |  4 ++++
- android/gatt.c      | 25 +++++++++++++++++++++++++
- android/hidhost.c   | 25 +++++++++++++++++++++++++
- 4 files changed, 102 insertions(+), 3 deletions(-)
-
--- 
-1.8.4
-
+PiBIaSwNCj4gDQo+IE9uIEZyaSwgQXVnIDI5LCAyMDE0IGF0IDk6NTkgQU0sIEd1IENoYW9qaWUg
+PGNoYW8uamllLmd1QGludGVsLmNvbT4gd3JvdGU6DQo+ID4gRnJvbTogQ2hhb2ppZSBHdSA8Y2hh
+by5qaWUuZ3VAaW50ZWwuY29tPg0KPiA+DQo+ID4gVGhpcyBwYXRjaCBmb2N1cyBvbiBpbXBsZW1l
+bnRpbmcgdGhlIEdhdHQgREJ1cyBBUEkgZGVmaW5lZCBpbiBnYXR0LWFwaS50eHQNCj4gZGlzY3Vz
+c2VkIGluIG1haWxpc3QgbGF0ZXN0bHkuIEl0IGltcGxlbWVudCBhbGwgdGhlIERCdXMgcHJvcGVy
+dHkgYW5kIG1ldGhvZA0KPiBleGNlcHQgZm9yIGFycmF5e29iamVjdH0gb2YgY2hhcmFjdGVyaXN0
+aWNzIGFuZCBkZXNjcmlwdG9ycy4gVGhyb3VnaCBvdXIgaW50ZXJuYWwNCj4gdGVzdCwgcGF0Y2hl
+IHdvcmsgd2VsbC4gSSB3b3VsZCBsaWtlIHRvIGNvbnRyaWJ1dGUgdGhpcyBmZWF0cnVlIGZvciBi
+bHVleiB1cHN0cmVhbS4NCj4gVGhpcyBmaXJzdCBwYXRjaCBpcyBqdXN0IGFuIGltcGxlbWVudGF0
+aW9uLCBtYXliZSBub3QgdmVyeSBjbG9zZWx5IHN1aXRhYmxlIGZvcg0KPiBkZXNpZ24gb3IgcHV0
+IGluIHRoZSByaWdodCBmaWxlLiBJdCB3b3VsZCBiZSBPSyB0byBtb2RpZnkgdG8gbWFrZSBtb3Jl
+IHNlbnNlLg0KPiA+IEFybWFuLCBNYXJjZWwsIHdvdWxkIHlvdSBsaWtlIHRvIHJldmlldyB0aGUg
+cGF0Y2ggYW5kIGdpdmUgc29tZSBzdWdnZXN0aW9uDQo+IGZvciB0aGUgcGF0Y2g/IEl0IHdvdWxk
+IGJlIGdyZWF0IGhvbm9yIGZvciBtZSB0byBjb250cmlidXRlIGxpdHRsZSB0byBibHVlei4NCj4g
+DQo+IFRvbyBiaWcgcGF0Y2ggdG8gcmV2aWV3IGFsbCBhdCBvbmNlLCBjb3VsZCB5b3UgcGxlYXNl
+IHNwbGl0LiBBbHNvIHBsZWFzZSBrZWVwIHRoZQ0KPiBwYXRjaCBkZXNjcmlwdGlvbiBsaW1pdGVk
+IHRvIDgwIGNvbHVtbnMgY29uc2lkZXJpbmcgdGhlIGV4dHJhIHNwYWNlcyB0aGF0IGdpdCBsb2cN
+Cj4gYWRkcy4NCj4gDQo+IA0KPiBMdWl6IEF1Z3VzdG8gdm9uIERlbnR6DQoNClRoYW5rcyBmb3Ig
+eW91ciBhZHZpY2UgLCBJIHdpbGwgZm9sbG93IHRoaXMgcnVsZQ0KDQpCZXN0IFJlZ2FyZHMNCkNo
+YW9qaWUgR3UNCg==
