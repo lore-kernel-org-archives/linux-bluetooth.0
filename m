@@ -2,254 +2,186 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH 6/6] android/avdtptest: Add support for receiving media as SINK
-Date: Fri, 29 Aug 2014 15:17:58 +0200
-Message-Id: <1409318278-798-6-git-send-email-szymon.janc@tieto.com>
+Subject: [PATCH 5/6] android/avdtptest: Add support for fragmentation
+Date: Fri, 29 Aug 2014 15:17:57 +0200
+Message-Id: <1409318278-798-5-git-send-email-szymon.janc@tieto.com>
 In-Reply-To: <1409318278-798-1-git-send-email-szymon.janc@tieto.com>
 References: <1409318278-798-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- android/avdtptest.c | 148 +++++++++++++++++++++++++++++++++++++++++++++++++---
- 1 file changed, 140 insertions(+), 8 deletions(-)
+ android/avdtptest.c | 81 ++++++++++++++++++++++++++++++++++++++++-------------
+ 1 file changed, 62 insertions(+), 19 deletions(-)
 
 diff --git a/android/avdtptest.c b/android/avdtptest.c
-index e4bb2d1..3cb9412 100644
+index 3fad0cc..e4bb2d1 100644
 --- a/android/avdtptest.c
 +++ b/android/avdtptest.c
-@@ -30,6 +30,7 @@
- #include <getopt.h>
- #include <unistd.h>
- #include <stdbool.h>
-+#include <errno.h>
- 
- #include <bluetooth/bluetooth.h>
- #include <bluetooth/hci.h>
-@@ -37,6 +38,7 @@
- 
- #include <glib.h>
- 
-+#include "src/shared/util.h"
- #include "btio/btio.h"
- #include "avdtp.h"
- 
-@@ -53,6 +55,7 @@ static bdaddr_t src;
- static bdaddr_t dst;
- 
+@@ -55,6 +55,8 @@ static bdaddr_t dst;
  static guint media_player = 0;
-+static guint media_recorder = 0;
  static guint idle_id = 0;
  
- static bool fragment = false;
-@@ -125,6 +128,107 @@ static void stop_media_player(void)
- 	media_player = 0;
++static bool fragment = false;
++
+ static const char sbc_codec[] = {0x00, 0x00, 0x11, 0x15, 0x02, 0x40};
+ static const char sbc_media_frame[] = {
+ 	0x00, 0x60, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01,
+@@ -221,6 +223,8 @@ static void connect_cb(GIOChannel *chan, GError *err, gpointer user_data)
+ 		return;
+ 	}
+ 
++	printf("Connected (imtu=%d omtu=%d)\n", imtu, omtu);
++
+ 	fd = g_io_channel_unix_get_fd(chan);
+ 
+ 	if (avdtp && avdtp_stream) {
+@@ -260,6 +264,25 @@ static void connect_cb(GIOChannel *chan, GError *err, gpointer user_data)
+ 	}
  }
  
-+#if __BYTE_ORDER == __LITTLE_ENDIAN
-+
-+struct rtp_header {
-+	unsigned cc:4;
-+	unsigned x:1;
-+	unsigned p:1;
-+	unsigned v:2;
-+
-+	unsigned pt:7;
-+	unsigned m:1;
-+
-+	uint16_t sequence_number;
-+	uint32_t timestamp;
-+	uint32_t ssrc;
-+	uint32_t csrc[0];
-+} __attribute__ ((packed));
-+
-+#elif __BYTE_ORDER == __BIG_ENDIAN
-+
-+struct rtp_header {
-+	unsigned v:2;
-+	unsigned p:1;
-+	unsigned x:1;
-+	unsigned cc:4;
-+
-+	unsigned m:1;
-+	unsigned pt:7;
-+
-+	uint16_t sequence_number;
-+	uint32_t timestamp;
-+	uint32_t ssrc;
-+	uint32_t csrc[0];
-+} __attribute__ ((packed));
-+
-+#else
-+#error "Unknown byte order"
-+#endif
-+
-+static gboolean media_reader(GIOChannel *source, GIOCondition condition,
-+								gpointer data)
++static GIOChannel *do_connect(GError **err)
 +{
-+	char buf[UINT16_MAX];
-+	struct rtp_header *rtp = (void *) buf;
-+	static bool decode = false;
-+	uint16_t imtu;
-+	int fd;
++	if (fragment)
++		return bt_io_connect(connect_cb, NULL, NULL, err,
++					BT_IO_OPT_SOURCE_BDADDR, &src,
++					BT_IO_OPT_DEST_BDADDR, &dst,
++					BT_IO_OPT_SEC_LEVEL, BT_IO_SEC_LOW,
++					BT_IO_OPT_PSM, AVDTP_PSM,
++					BT_IO_OPT_MTU, 48,
++					BT_IO_OPT_INVALID);
 +
-+	if (!avdtp_stream_get_transport(avdtp_stream, &fd, &imtu, NULL, NULL))
-+		return TRUE;
-+
-+	if (read(fd, buf, imtu) < 0) {
-+		printf("Reading failed (%s)\n", strerror(errno));
-+		return TRUE;
-+	}
-+
-+	if (!decode) {
-+		printf("V=%u P=%u X=%u CC=%u M=%u PT=%u SeqNr=%d\n",
-+			rtp->v, rtp->p, rtp->x, rtp->cc, rtp->m, rtp->pt,
-+			be16_to_cpu(rtp->sequence_number));
-+		decode = true;
-+	}
-+
-+	return TRUE;
++	return bt_io_connect(connect_cb, NULL, NULL, err,
++				BT_IO_OPT_SOURCE_BDADDR, &src,
++				BT_IO_OPT_DEST_BDADDR, &dst,
++				BT_IO_OPT_SEC_LEVEL, BT_IO_SEC_LOW,
++				BT_IO_OPT_PSM, AVDTP_PSM,
++				BT_IO_OPT_INVALID);
 +}
 +
-+static bool start_media_recorder(void)
+ static void open_cfm(struct avdtp *session, struct avdtp_local_sep *lsep,
+ 			struct avdtp_stream *stream, struct avdtp_error *err,
+ 			void *user_data)
+@@ -271,12 +294,7 @@ static void open_cfm(struct avdtp *session, struct avdtp_local_sep *lsep,
+ 	if (!initiator)
+ 		return;
+ 
+-	bt_io_connect(connect_cb, NULL, NULL, &gerr,
+-					BT_IO_OPT_SOURCE_BDADDR, &src,
+-					BT_IO_OPT_DEST_BDADDR, &dst,
+-					BT_IO_OPT_SEC_LEVEL, BT_IO_SEC_LOW,
+-					BT_IO_OPT_PSM, AVDTP_PSM,
+-					BT_IO_OPT_INVALID);
++	do_connect(&gerr);
+ 	if (gerr) {
+ 		printf("connect failed: %s\n", gerr->message);
+ 		g_error_free(gerr);
+@@ -356,6 +374,7 @@ static gboolean get_capability_ind(struct avdtp *session,
+ 					void *user_data)
+ {
+ 	struct avdtp_service_capability *service;
++	int i;
+ 
+ 	printf("%s\n", __func__);
+ 
+@@ -373,7 +392,18 @@ static gboolean get_capability_ind(struct avdtp *session,
+ 	*caps = g_slist_append(*caps, service);
+ 
+ 	service = avdtp_service_cap_new(AVDTP_MEDIA_CODEC, sbc_codec,
++						sizeof(sbc_codec));
++	*caps = g_slist_append(*caps, service);
++
++	if (fragment)
++		for (i = 0; i < 10; i++) {
++			service = avdtp_service_cap_new(AVDTP_MEDIA_CODEC,
++							sbc_codec,
+ 							sizeof(sbc_codec));
++			*caps = g_slist_append(*caps, service);
++		}
++
++	service = avdtp_service_cap_new(AVDTP_DELAY_REPORTING, NULL, 0);
+ 	*caps = g_slist_append(*caps, service);
+ 
+ 	return TRUE;
+@@ -530,7 +560,8 @@ static void usage(void)
+ 		"\t-i <hcidev>        HCI adapter\n"
+ 		"\t-c <bdaddr>        connect\n"
+ 		"\t-l                 listen\n"
+-		"\t-r                 reject commands\n");
++		"\t-r                 reject commands\n"
++		"\t-f                 fragment\n");
+ }
+ 
+ static struct option main_options[] = {
+@@ -541,9 +572,27 @@ static struct option main_options[] = {
+ 	{ "connect",		1, 0, 'c' },
+ 	{ "listen",		0, 0, 'l' },
+ 	{ "reject",		0, 0, 'r' },
++	{ "fragment",		0, 0, 'f' },
+ 	{ 0, 0, 0, 0 }
+ };
+ 
++static GIOChannel *do_listen(GError **err)
 +{
-+	int fd;
-+	uint16_t omtu;
-+	GIOChannel *chan;
++	if (fragment)
++		return bt_io_listen(connect_cb, NULL, NULL, NULL, err,
++					BT_IO_OPT_SOURCE_BDADDR, &src,
++					BT_IO_OPT_PSM, AVDTP_PSM,
++					BT_IO_OPT_SEC_LEVEL, BT_IO_SEC_LOW,
++					BT_IO_OPT_MTU, 48,
++					BT_IO_OPT_INVALID);
 +
-+	printf("Media recording started\n");
-+
-+	if (media_recorder || !avdtp_stream)
-+		return false;
-+
-+	if (!avdtp_stream_get_transport(avdtp_stream, &fd, NULL, &omtu, NULL))
-+		return false;
-+
-+	chan = g_io_channel_unix_new(fd);
-+
-+	media_recorder = g_io_add_watch(chan, G_IO_IN, media_reader, NULL);
-+	g_io_channel_unref(chan);
-+
-+	if (!media_recorder)
-+		return false;
-+
-+	return true;
++	return bt_io_listen(connect_cb, NULL, NULL, NULL, err,
++					BT_IO_OPT_SOURCE_BDADDR, &src,
++					BT_IO_OPT_PSM, AVDTP_PSM,
++					BT_IO_OPT_SEC_LEVEL, BT_IO_SEC_LOW,
++					BT_IO_OPT_INVALID);
 +}
 +
-+static void stop_media_recorder(void)
-+{
-+	if (!media_recorder)
-+		return;
-+
-+	printf("Media recording stopped\n");
-+
-+	g_source_remove(media_recorder);
-+	media_recorder = 0;
-+}
-+
- static void set_configuration_cfm(struct avdtp *session,
- 					struct avdtp_local_sep *lsep,
- 					struct avdtp_stream *stream,
-@@ -308,7 +412,10 @@ static void start_cfm(struct avdtp *session, struct avdtp_local_sep *lsep,
+ int main(int argc, char *argv[])
  {
- 	printf("%s\n", __func__);
+ 	GError *err = NULL;
+@@ -559,7 +608,7 @@ int main(int argc, char *argv[])
+ 		exit(1);
+ 	}
  
--	start_media_player();
-+	if (dev_role == AVDTP_SEP_TYPE_SOURCE)
-+		start_media_player();
-+	else
-+		start_media_recorder();
- }
+-	while ((opt = getopt_long(argc, argv, "d:hi:s:c:lr",
++	while ((opt = getopt_long(argc, argv, "d:hi:s:c:lrf",
+ 						main_options, NULL)) != EOF) {
+ 		switch (opt) {
+ 		case 'i':
+@@ -601,6 +650,9 @@ int main(int argc, char *argv[])
+ 		case 'r':
+ 			reject = true;
+ 			break;
++		case 'f':
++			fragment = true;
++			break;
+ 		case 'h':
+ 		default:
+ 			usage();
+@@ -617,19 +669,10 @@ int main(int argc, char *argv[])
  
- static void suspend_cfm(struct avdtp *session, struct avdtp_local_sep *lsep,
-@@ -317,7 +424,10 @@ static void suspend_cfm(struct avdtp *session, struct avdtp_local_sep *lsep,
- {
- 	printf("%s\n", __func__);
+ 	if (!bacmp(&dst, BDADDR_ANY)) {
+ 		printf("Listening...\n");
+-		io =  bt_io_listen(connect_cb, NULL, NULL, NULL, &err,
+-					BT_IO_OPT_SOURCE_BDADDR, &src,
+-					BT_IO_OPT_PSM, AVDTP_PSM,
+-					BT_IO_OPT_SEC_LEVEL, BT_IO_SEC_LOW,
+-					BT_IO_OPT_INVALID);
++		io = do_listen(&err);
+ 	} else {
+ 		printf("Connecting...\n");
+-		io = bt_io_connect(connect_cb, NULL, NULL, &err,
+-					BT_IO_OPT_SOURCE_BDADDR, &src,
+-					BT_IO_OPT_DEST_BDADDR, &dst,
+-					BT_IO_OPT_SEC_LEVEL, BT_IO_SEC_LOW,
+-					BT_IO_OPT_PSM, AVDTP_PSM,
+-					BT_IO_OPT_INVALID);
++		io = do_connect(&err);
+ 	}
  
--	stop_media_player();
-+	if (dev_role == AVDTP_SEP_TYPE_SOURCE)
-+		stop_media_player();
-+	else
-+		stop_media_recorder();
- }
- 
- static void close_cfm(struct avdtp *session, struct avdtp_local_sep *lsep,
-@@ -326,7 +436,11 @@ static void close_cfm(struct avdtp *session, struct avdtp_local_sep *lsep,
- {
- 	printf("%s\n", __func__);
- 
--	stop_media_player();
-+	if (dev_role == AVDTP_SEP_TYPE_SOURCE)
-+		stop_media_player();
-+	else
-+		stop_media_recorder();
-+
- 	avdtp_stream = NULL;
- }
- 
-@@ -336,7 +450,11 @@ static void abort_cfm(struct avdtp *session, struct avdtp_local_sep *lsep,
- {
- 	printf("%s\n", __func__);
- 
--	stop_media_player();
-+	if (dev_role == AVDTP_SEP_TYPE_SOURCE)
-+		stop_media_player();
-+	else
-+		stop_media_recorder();
-+
- 	avdtp_stream = NULL;
- }
- 
-@@ -466,7 +584,10 @@ static gboolean start_ind(struct avdtp *session, struct avdtp_local_sep *lsep,
- 	if (reject)
- 		return FALSE;
- 
--	start_media_player();
-+	if (dev_role == AVDTP_SEP_TYPE_SOURCE)
-+		start_media_player();
-+	else
-+		start_media_recorder();
- 
- 	return TRUE;
- }
-@@ -481,7 +602,10 @@ static gboolean suspend_ind(struct avdtp *session,
- 	if (reject)
- 		return FALSE;
- 
--	stop_media_player();
-+	if (dev_role == AVDTP_SEP_TYPE_SOURCE)
-+		stop_media_player();
-+	else
-+		stop_media_recorder();
- 
- 	return TRUE;
- }
-@@ -495,7 +619,11 @@ static gboolean close_ind(struct avdtp *session, struct avdtp_local_sep *sep,
- 	if (reject)
- 		return FALSE;
- 
--	stop_media_player();
-+	if (dev_role == AVDTP_SEP_TYPE_SOURCE)
-+		stop_media_player();
-+	else
-+		stop_media_recorder();
-+
- 	avdtp_stream = NULL;
- 
- 	return TRUE;
-@@ -507,7 +635,11 @@ static void abort_ind(struct avdtp *session, struct avdtp_local_sep *sep,
- {
- 	printf("%s\n", __func__);
- 
--	stop_media_player();
-+	if (dev_role == AVDTP_SEP_TYPE_SOURCE)
-+		stop_media_player();
-+	else
-+		stop_media_recorder();
-+
- 	avdtp_stream = NULL;
- }
- 
+ 	if (!io) {
 -- 
 1.9.1
 
