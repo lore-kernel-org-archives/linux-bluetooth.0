@@ -2,146 +2,124 @@ Return-Path: <cyrus@holtmann.org>
 From: Arman Uguray <armansito@chromium.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Arman Uguray <armansito@chromium.org>
-Subject: [PATCH BlueZ v1 2/7] tools/btgatt-client: Added L2CAP LE ATT connection.
-Date: Fri, 29 Aug 2014 08:34:07 -0700
-Message-Id: <1409326452-8534-3-git-send-email-armansito@chromium.org>
+Subject: [PATCH BlueZ v1 4/7] tools/btgatt-client: Add command parsing.
+Date: Fri, 29 Aug 2014 08:34:09 -0700
+Message-Id: <1409326452-8534-5-git-send-email-armansito@chromium.org>
 In-Reply-To: <1409326452-8534-1-git-send-email-armansito@chromium.org>
 References: <1409326452-8534-1-git-send-email-armansito@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch adds support for connection establishment with different security
-levels. Currently, only LE connections are supported.
+Added basic support for command parsing, including the "help" command. Also
+added a call to bt_gatt_client_set_debug.
 ---
- tools/btgatt-client.c | 80 ++++++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 79 insertions(+), 1 deletion(-)
+ tools/btgatt-client.c | 53 +++++++++++++++++++++++++++++++++++++++++++--------
+ 1 file changed, 45 insertions(+), 8 deletions(-)
 
 diff --git a/tools/btgatt-client.c b/tools/btgatt-client.c
-index a5ce70b..30e8e50 100644
+index 008cc9f..26f2d14 100644
 --- a/tools/btgatt-client.c
 +++ b/tools/btgatt-client.c
-@@ -28,15 +28,20 @@
- #include <stdbool.h>
- #include <stdint.h>
- #include <stdlib.h>
-+#include <unistd.h>
- #include <getopt.h>
- #include <limits.h>
-+#include <errno.h>
- 
- #include <bluetooth/bluetooth.h>
- #include <bluetooth/hci.h>
- #include <bluetooth/hci_lib.h>
-+#include <bluetooth/l2cap.h>
- 
- #include "monitor/mainloop.h"
- 
-+#define ATT_CID 4
-+
- static bool verbose = false;
- 
- static void print_prompt(void)
-@@ -65,6 +70,74 @@ static void prompt_read_cb(int fd, uint32_t events, void *user_data)
- 	free(line);
+@@ -68,7 +68,7 @@ static void att_disconnect_cb(void *user_data)
+ 	mainloop_quit();
  }
  
-+static int l2cap_le_att_connect(bdaddr_t *src, bdaddr_t *dst, uint8_t dst_type,
-+									int sec)
-+{
-+	int sock;
-+	struct sockaddr_l2 srcaddr, dstaddr;
-+	struct bt_security btsec;
-+
+-static void att_debug(const char *str, void *user_data)
++static void debug_cb(const char *str, void *user_data)
+ {
+ 	const char *prefix = user_data;
+ 
+@@ -108,9 +108,6 @@ static struct client *client_create(int fd, uint16_t mtu)
+ 		return NULL;
+ 	}
+ 
+-	if (verbose)
+-		bt_att_set_debug(att, att_debug, "att: ", NULL);
+-
+ 	cli->fd = fd;
+ 	cli->gatt = bt_gatt_client_new(att, mtu);
+ 	if (!cli->gatt) {
+@@ -120,6 +117,12 @@ static struct client *client_create(int fd, uint16_t mtu)
+ 		return NULL;
+ 	}
+ 
 +	if (verbose) {
-+		char srcaddr_str[18], dstaddr_str[18];
-+
-+		ba2str(src, srcaddr_str);
-+		ba2str(dst, dstaddr_str);
-+
-+		printf("Opening L2CAP LE connection on ATT channel:\n"
-+						"\t src: %s\n\tdest: %s\n",
-+						srcaddr_str, dstaddr_str);
++		bt_att_set_debug(att, debug_cb, "att: ", NULL);
++		bt_gatt_client_set_debug(cli->gatt, debug_cb, "gatt-client: ",
++									NULL);
 +	}
 +
-+	sock = socket(PF_BLUETOOTH, SOCK_SEQPACKET, BTPROTO_L2CAP);
-+	if (sock < 0) {
-+		perror("Failed to create L2CAP socket");
-+		return -1;
-+	}
+ 	/* bt_gatt_client already holds a reference */
+ 	bt_att_unref(att);
+ 
+@@ -131,21 +134,55 @@ static void client_destroy(struct client *cli)
+ 	bt_gatt_client_unref(cli->gatt);
+ }
+ 
 +
-+	/* Set up source address */
-+	memset(&srcaddr, 0, sizeof(srcaddr));
-+	srcaddr.l2_family = AF_BLUETOOTH;
-+	srcaddr.l2_cid = htobs(ATT_CID);
-+	srcaddr.l2_bdaddr_type = 0;
-+	bacpy(&srcaddr.l2_bdaddr, src);
++typedef void (*command_func_t)(struct client *cli);
 +
-+	if (bind(sock, (struct sockaddr *)&srcaddr, sizeof(srcaddr)) < 0) {
-+		perror("Failed to bind L2CAP socket");
-+		close(sock);
-+		return -1;
-+	}
++static void cmd_help(struct client *cli);
 +
-+	/* Set the security level */
-+	memset(&btsec, 0, sizeof(btsec));
-+	btsec.level = sec;
-+	if (setsockopt(sock, SOL_BLUETOOTH, BT_SECURITY, &btsec,
-+							sizeof(btsec)) != 0) {
-+		fprintf(stderr, "Failed to set L2CAP security level\n");
-+		close(sock);
-+		return -1;
-+	}
++static struct {
++	char *cmd;
++	command_func_t func;
++	char *doc;
++} command[] = {
++	{ "help", cmd_help, "\tDisplay help message" },
++	{ }
++};
 +
-+	/* Set up destination address */
-+	memset(&dstaddr, 0, sizeof(dstaddr));
-+	dstaddr.l2_family = AF_BLUETOOTH;
-+	dstaddr.l2_cid = htobs(ATT_CID);
-+	dstaddr.l2_bdaddr_type = dst_type;
-+	bacpy(&dstaddr.l2_bdaddr, dst);
++static void cmd_help(struct client *cli)
++{
++	int i;
 +
-+	printf("Connecting to device...");
-+	fflush(stdout);
-+
-+	if (connect(sock, (struct sockaddr *) &dstaddr, sizeof(dstaddr)) < 0) {
-+		perror(" Failed to connect");
-+		close(sock);
-+		return -1;
-+	}
-+
-+	printf(" Done\n");
-+
-+	return sock;
++	printf("Commands:\n");
++	for (i = 0; command[i].cmd; i++)
++		printf("\t%-15s\t%s\n", command[i].cmd, command[i].doc);
 +}
 +
- static void usage(void)
+ static void prompt_read_cb(int fd, uint32_t events, void *user_data)
  {
- 	printf("btgatt-client\n");
-@@ -95,12 +168,13 @@ static struct option main_options[] = {
- int main(int argc, char *argv[])
- {
- 	int opt;
--	int sec;
-+	int sec = BT_SECURITY_LOW;
- 	uint16_t mtu = 0;
- 	uint8_t dst_type = BDADDR_LE_PUBLIC;
- 	bool dst_addr_given = false;
- 	bdaddr_t src_addr, dst_addr;
- 	int dev_id = -1;
-+	int fd;
++	ssize_t read;
+ 	size_t len = 0;
+ 	char *line = NULL;
++	struct client *cli = user_data;
++	int i;
  
- 	while ((opt = getopt_long(argc, argv, "+hvs:m:t:d:i:",
- 						main_options, NULL)) != -1) {
-@@ -203,6 +277,10 @@ int main(int argc, char *argv[])
+ 	if (events & (EPOLLRDHUP | EPOLLHUP | EPOLLERR)) {
+ 		mainloop_quit();
+ 		return;
+ 	}
  
- 	mainloop_init();
+-	if (getline(&line, &len, stdin) == -1)
++	if ((read = getline(&line, &len, stdin)) == -1)
+ 		return;
  
-+	fd = l2cap_le_att_connect(&src_addr, &dst_addr, dst_type, sec);
-+	if (fd < 0)
-+		return EXIT_FAILURE;
+-	/* TODO: Process commands here */
+-	printf("  Typed line: %s\n", line);
++	for (i = 0; command[i].cmd; i++) {
++		if (strncmp(command[i].cmd, line, read - 1) == 0)
++			break;
++	}
 +
++	if (command[i].cmd)
++		command[i].func(cli);
++	else
++		fprintf(stderr, "Unknown command: %s\n", line);
++
+ 	print_prompt();
+ 
+ 	free(line);
+@@ -384,7 +421,7 @@ int main(int argc, char *argv[])
+ 
  	if (mainloop_add_fd(fileno(stdin),
  				EPOLLIN | EPOLLRDHUP | EPOLLHUP | EPOLLERR,
- 				prompt_read_cb, NULL, NULL) < 0) {
+-				prompt_read_cb, NULL, NULL) < 0) {
++				prompt_read_cb, cli, NULL) < 0) {
+ 		fprintf(stderr, "Failed to initialize console\n");
+ 		return EXIT_FAILURE;
+ 	}
 -- 
 2.1.0.rc2.206.gedb03e5
 
