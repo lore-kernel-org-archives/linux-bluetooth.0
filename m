@@ -1,146 +1,68 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ] monitor: Fix warnings when using l2cap_frame_get*
-Date: Fri, 29 Aug 2014 13:03:30 +0300
-Message-Id: <1409306610-24547-1-git-send-email-luiz.dentz@gmail.com>
+Cc: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+Subject: [PATCH v3 3/3] android/gatt: Add remove bond handling
+Date: Fri, 29 Aug 2014 11:54:00 +0200
+Message-Id: <1409306040-3162-4-git-send-email-lukasz.rymanowski@tieto.com>
+In-Reply-To: <1409306040-3162-1-git-send-email-lukasz.rymanowski@tieto.com>
+References: <1409306040-3162-1-git-send-email-lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-
+With this patch GATT is aware about unpaired devices so the local cache
+can be cleared
 ---
- monitor/avctp.c | 48 +++++++++++++++++++++---------------------------
- monitor/sdp.c   | 12 +++++-------
- 2 files changed, 26 insertions(+), 34 deletions(-)
+ android/gatt.c | 25 +++++++++++++++++++++++++
+ 1 file changed, 25 insertions(+)
 
-diff --git a/monitor/avctp.c b/monitor/avctp.c
-index 5543a49..64d4b58 100644
---- a/monitor/avctp.c
-+++ b/monitor/avctp.c
-@@ -512,15 +512,13 @@ static bool avrcp_get_capabilities(struct l2cap_frame *frame, uint8_t ctype,
- 	switch (cap) {
- 	case 0x2:
- 		for (; count > 0; count--) {
--			uint8_t company[3] = {};
-+			uint8_t company[3];
+diff --git a/android/gatt.c b/android/gatt.c
+index 89748d2..ae310f7 100644
+--- a/android/gatt.c
++++ b/android/gatt.c
+@@ -6496,10 +6496,34 @@ static bool start_listening(void)
+ 	return true;
+ }
  
--			if (frame->size < 3)
-+			if (!l2cap_frame_get_u8(frame, &company[0]) ||
-+				!l2cap_frame_get_u8(frame, &company[1]) ||
-+				!l2cap_frame_get_u8(frame, &company[2]))
- 				return false;
- 
--			l2cap_frame_get_u8(frame, &company[0]);
--			l2cap_frame_get_u8(frame, &company[1]);
--			l2cap_frame_get_u8(frame, &company[2]);
--
- 			print_field("%*c%s: 0x%02x%02x%02x", (indent - 8), ' ',
- 					cap2str(cap), company[0], company[1],
- 					company[2]);
-@@ -645,12 +643,14 @@ static bool avrcp_pdu_packet(struct l2cap_frame *frame, uint8_t ctype,
- 	int i;
- 	const struct avrcp_ctrl_pdu_data *ctrl_pdu_data = NULL;
- 
--	if (frame->size < 4)
-+	if (!l2cap_frame_get_u8(frame, &pduid))
-+		return false;
++static void gatt_unpaired_cb(const bdaddr_t *addr, uint8_t type)
++{
++	struct gatt_device *dev;
++	char address[18];
 +
-+	if (!l2cap_frame_get_u8(frame, &pt))
- 		return false;
- 
--	l2cap_frame_get_u8(frame, &pduid);
--	l2cap_frame_get_u8(frame, &pt);
--	l2cap_frame_get_be16(frame, &len);
-+	if (!l2cap_frame_get_be16(frame, &len))
-+		return false;
- 
- 	print_indent(indent, COLOR_OFF, "AVRCP: ", pdu2str(pduid), COLOR_OFF,
- 					" pt %s len 0x%04x", pt2str(pt), len);
-@@ -680,13 +680,11 @@ static bool avrcp_control_packet(struct l2cap_frame *frame)
++	dev = find_device_by_addr(addr);
++	if (!dev)
++		return;
++
++	if (dev->bdaddr_type != type)
++		return;
++
++	ba2str(addr, address);
++	DBG("Unpaired device %s", address);
++
++	queue_remove(gatt_devices, dev);
++	destroy_device(dev);
++}
++
+ bool bt_gatt_register(struct ipc *ipc, const bdaddr_t *addr)
  {
- 	uint8_t ctype, address, subunit, opcode, company[3], indent = 2;
+ 	DBG("");
  
--	if (frame->size < 3)
-+	if (!l2cap_frame_get_u8(frame, &ctype) ||
-+				!l2cap_frame_get_u8(frame, &address) ||
-+				!l2cap_frame_get_u8(frame, &opcode))
++	if (!bt_unpaired_register(gatt_unpaired_cb)) {
++		error("gatt: Could not register unpaired callback");
++		return false;
++	}
++
+ 	if (!start_listening())
  		return false;
  
--	l2cap_frame_get_u8(frame, &ctype);
--	l2cap_frame_get_u8(frame, &address);
--	l2cap_frame_get_u8(frame, &opcode);
--
- 	print_field("AV/C: %s: address 0x%02x opcode 0x%02x",
- 				ctype2str(ctype), address, opcode);
+@@ -6628,6 +6652,7 @@ void bt_gatt_unregister(void)
+ 	crypto = NULL;
  
-@@ -712,13 +710,11 @@ static bool avrcp_control_packet(struct l2cap_frame *frame)
- 	case 0x7c:
- 		return avrcp_passthrough_packet(frame);
- 	case 0x00:
--		if (frame->size < 3)
-+		if (!l2cap_frame_get_u8(frame, &company[0]) ||
-+				!l2cap_frame_get_u8(frame, &company[1]) ||
-+				!l2cap_frame_get_u8(frame, &company[2]))
- 			return false;
+ 	bt_le_unregister();
++	bt_unpaired_unregister(gatt_unpaired_cb);
+ }
  
--		l2cap_frame_get_u8(frame, &company[0]);
--		l2cap_frame_get_u8(frame, &company[1]);
--		l2cap_frame_get_u8(frame, &company[2]);
--
- 		print_field("%*cCompany ID: 0x%02x%02x%02x", indent, ' ',
- 					company[0], company[1], company[2]);
- 
-@@ -764,16 +760,14 @@ void avctp_packet(const struct l2cap_frame *frame)
- 	struct l2cap_frame avctp_frame;
- 	const char *pdu_color;
- 
--	if (frame->size < 3) {
-+	l2cap_frame_pull(&avctp_frame, frame, 0);
-+
-+	if (!l2cap_frame_get_u8(&avctp_frame, &hdr) ||
-+				!l2cap_frame_get_be16(&avctp_frame, &pid)) {
- 		print_text(COLOR_ERROR, "frame too short");
- 		packet_hexdump(frame->data, frame->size);
- 		return;
--        }
--
--	l2cap_frame_pull(&avctp_frame, frame, 0);
--
--	l2cap_frame_get_u8(&avctp_frame, &hdr);
--	l2cap_frame_get_be16(&avctp_frame, &pid);
-+	}
- 
- 	if (frame->in)
- 		pdu_color = COLOR_MAGENTA;
-diff --git a/monitor/sdp.c b/monitor/sdp.c
-index d0ad688..c171b9d 100644
---- a/monitor/sdp.c
-+++ b/monitor/sdp.c
-@@ -696,18 +696,16 @@ void sdp_packet(const struct l2cap_frame *frame)
- 	const char *pdu_color, *pdu_str;
- 	int i;
- 
--	if (frame->size < 5) {
-+	l2cap_frame_pull(&sdp_frame, frame, 0);
-+
-+	if (!l2cap_frame_get_u8(&sdp_frame, &pdu) ||
-+				!l2cap_frame_get_be16(&sdp_frame, &tid) ||
-+				!l2cap_frame_get_be16(&sdp_frame, &plen)) {
- 		print_text(COLOR_ERROR, "frame too short");
- 		packet_hexdump(frame->data, frame->size);
- 		return;
- 	}
- 
--	l2cap_frame_pull(&sdp_frame, frame, 0);
--
--	l2cap_frame_get_u8(&sdp_frame, &pdu);
--	l2cap_frame_get_be16(&sdp_frame, &tid);
--	l2cap_frame_get_be16(&sdp_frame, &plen);
--
- 	if (sdp_frame.size != plen) {
- 		print_text(COLOR_ERROR, "invalid frame size");
- 		packet_hexdump(sdp_frame.data, sdp_frame.size);
+ unsigned int bt_gatt_register_app(const char *uuid, gatt_type_t type,
 -- 
-1.9.3
+1.8.4
 
