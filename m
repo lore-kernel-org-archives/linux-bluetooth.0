@@ -2,263 +2,127 @@ Return-Path: <cyrus@holtmann.org>
 From: Arman Uguray <armansito@chromium.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Arman Uguray <armansito@chromium.org>
-Subject: [PATCH BlueZ v1 7/7] tools/btgatt: Add command argument support.
-Date: Fri, 29 Aug 2014 08:34:12 -0700
-Message-Id: <1409326452-8534-8-git-send-email-armansito@chromium.org>
+Subject: [PATCH BlueZ v1 5/7] tools/btgatt-client: Add "ready" handler.
+Date: Fri, 29 Aug 2014 08:34:10 -0700
+Message-Id: <1409326452-8534-6-git-send-email-armansito@chromium.org>
 In-Reply-To: <1409326452-8534-1-git-send-email-armansito@chromium.org>
 References: <1409326452-8534-1-git-send-email-armansito@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Added support for command arguments and added the -u and -a flags to the
-"services" command to filter services by UUID or by start handle.
+Added a ready handler which gets called by bt_gatt_client when the MTU exchange
+and service discovery procedures complete. Also added some (bad) coloring for
+verbose output.
 ---
- tools/btgatt-client.c | 177 +++++++++++++++++++++++++++++++++++++++++---------
- 1 file changed, 145 insertions(+), 32 deletions(-)
+ tools/btgatt-client.c | 48 ++++++++++++++++++++++++++++++++++++++++--------
+ 1 file changed, 40 insertions(+), 8 deletions(-)
 
 diff --git a/tools/btgatt-client.c b/tools/btgatt-client.c
-index 445cfc7..0f13d35 100644
+index 26f2d14..6299586 100644
 --- a/tools/btgatt-client.c
 +++ b/tools/btgatt-client.c
-@@ -167,11 +167,42 @@ static void print_uuid(const uint8_t uuid[16])
- 	printf("%s\n", uuid_str);
- }
+@@ -45,8 +45,17 @@
  
-+static void print_service(const bt_gatt_service_t *service)
-+{
-+	const bt_gatt_characteristic_t *chrc;
-+	size_t i, j;
+ #define ATT_CID 4
+ 
+-#define PRLOG(format, ...) \
+-	printf(format, __VA_ARGS__); print_prompt();
++#define PRLOG(...) \
++	printf(__VA_ARGS__); print_prompt();
 +
-+	printf(COLOR_RED "service" COLOR_OFF " - start: 0x%04x, "
-+				"end: 0x%04x, uuid: ",
-+				service->start_handle, service->end_handle);
-+	print_uuid(service->uuid);
-+
-+	for (i = 0; i < service->num_chrcs; i++) {
-+		chrc = service->chrcs + i;
-+		printf("\t  " COLOR_YELLOW "charac" COLOR_OFF
-+				" - start: 0x%04x, end: 0x%04x, "
-+				"value: 0x%04x, props: 0x%02x, uuid: ",
-+				chrc->start_handle,
-+				chrc->end_handle,
-+				chrc->value_handle,
-+				chrc->properties);
-+		print_uuid(service->chrcs[i].uuid);
-+
-+		for (j = 0; j < chrc->num_descs; j++) {
-+			printf("\t\t  " COLOR_MAGENTA "descr" COLOR_OFF
-+						" - handle: 0x%04x, uuid: ",
-+						chrc->descs[j].handle);
-+			print_uuid(chrc->descs[j].uuid);
-+		}
-+	}
-+
-+	printf("\n");
-+}
-+
- static void print_services(struct client *cli)
++#define COLOR_OFF	"\x1B[0m"
++#define COLOR_RED	"\x1B[0;91m"
++#define COLOR_GREEN	"\x1B[0;92m"
++#define COLOR_YELLOW	"\x1B[0;93m"
++#define COLOR_BLUE	"\x1B[0;94m"
++#define COLOR_MAGENTA	"\x1B[0;95m"
++#define COLOR_BOLDGRAY	"\x1B[1;30m"
++#define COLOR_BOLDWHITE	"\x1B[1;37m"
+ 
+ static bool verbose = false;
+ 
+@@ -57,7 +66,7 @@ struct client {
+ 
+ static void print_prompt(void)
  {
- 	struct bt_gatt_service_iter iter;
- 	bt_gatt_service_t service;
--	const bt_gatt_characteristic_t *chrc;
- 
- 	if (!bt_gatt_service_iter_init(&iter, cli->gatt)) {
- 		PRLOG("Failed to initialize service iterator\n");
-@@ -180,32 +211,41 @@ static void print_services(struct client *cli)
- 
- 	printf("\n");
- 
--	while (bt_gatt_service_iter_next(&iter, &service)) {
--		size_t i, j;
--
--		printf("service - start: 0x%04x, end: 0x%04x, uuid: ",
--				service.start_handle, service.end_handle);
--		print_uuid(service.uuid);
--
--		for (i = 0; i < service.num_chrcs; i++) {
--			chrc = service.chrcs + i;
--			printf("\t  charac - start: 0x%04x, end: 0x%04x, "
--					"value: 0x%04x, props: 0x%02x, uuid: ",
--					chrc->start_handle,
--					chrc->end_handle,
--					chrc->value_handle,
--					chrc->properties);
--			print_uuid(service.chrcs[i].uuid);
--
--			for (j = 0; j < chrc->num_descs; j++) {
--				printf("\t\t  descr - handle: 0x%04x, uuid: ",
--							chrc->descs[j].handle);
--				print_uuid(chrc->descs[j].uuid);
--			}
--		}
-+	while (bt_gatt_service_iter_next(&iter, &service))
-+		print_service(&service);
-+}
-+
-+static void print_services_by_uuid(struct client *cli, const bt_uuid_t *uuid)
-+{
-+	struct bt_gatt_service_iter iter;
-+	bt_gatt_service_t service;
- 
--		printf("\n");
-+	if (!bt_gatt_service_iter_init(&iter, cli->gatt)) {
-+		PRLOG("Failed to initialize service iterator\n");
-+		return;
- 	}
-+
-+	printf("\n");
-+
-+	while (bt_gatt_service_iter_next_by_uuid(&iter, uuid->value.u128.data,
-+								&service))
-+		print_service(&service);
-+}
-+
-+static void print_services_by_handle(struct client *cli, uint16_t handle)
-+{
-+	struct bt_gatt_service_iter iter;
-+	bt_gatt_service_t service;
-+
-+	if (!bt_gatt_service_iter_init(&iter, cli->gatt)) {
-+		PRLOG("Failed to initialize service iterator\n");
-+		return;
-+	}
-+
-+	printf("\n");
-+
-+	while (bt_gatt_service_iter_next_by_handle(&iter, handle, &service))
-+		print_service(&service);
+-	printf("[GATT client]# ");
++	printf(COLOR_BLUE "[GATT client]" COLOR_OFF "# ");
+ 	fflush(stdout);
  }
  
- static void ready_cb(bool success, uint8_t att_ecode, void *user_data)
-@@ -224,19 +264,78 @@ static void ready_cb(bool success, uint8_t att_ecode, void *user_data)
- 	print_prompt();
+@@ -68,13 +77,22 @@ static void att_disconnect_cb(void *user_data)
+ 	mainloop_quit();
  }
  
--static void cmd_services(struct client *cli)
-+static void services_usage(void)
-+{
-+	printf("Usage: services [options]\nOptions:\n"
-+		"\t -u, --uuid <uuid>\tService UUID\n"
-+		"\t -a, --handle <handle>\tService start handle\n"
-+		"\t -h, --help\t\tShow help message\n"
-+		"e.g.:\n"
-+		"\tservices\n\tservices -u 0x180d\n\tservices -a 0x0009\n");
-+}
-+
-+static void cmd_services(struct client *cli, char *cmd_str)
+-static void debug_cb(const char *str, void *user_data)
++static void att_debug_cb(const char *str, void *user_data)
  {
-+	char **ap, *argv[3];
-+	int argc = 0;
+ 	const char *prefix = user_data;
+ 
+-	PRLOG("%s%s\n", prefix, str);
++	PRLOG(COLOR_BOLDGRAY "%s" COLOR_BOLDWHITE "%s\n" COLOR_OFF, prefix, str);
+ }
+ 
++static void gatt_debug_cb(const char *str, void *user_data)
++{
++	const char *prefix = user_data;
 +
- 	if (!bt_gatt_client_is_ready(cli->gatt)) {
- 		printf("GATT client not initialized\n");
- 		return;
++	PRLOG(COLOR_GREEN "%s%s\n" COLOR_OFF, prefix, str);
++}
++
++static void ready_cb(bool success, uint8_t att_ecode, void *user_data);
++
+ static struct client *client_create(int fd, uint16_t mtu)
+ {
+ 	struct client *cli;
+@@ -118,11 +136,13 @@ static struct client *client_create(int fd, uint16_t mtu)
  	}
  
--	print_services(cli);
-+	for (ap = argv; (*ap = strsep(&cmd_str, " \t")) != NULL;) {
-+		if (**ap == '\0')
-+			continue;
+ 	if (verbose) {
+-		bt_att_set_debug(att, debug_cb, "att: ", NULL);
+-		bt_gatt_client_set_debug(cli->gatt, debug_cb, "gatt-client: ",
++		bt_att_set_debug(att, att_debug_cb, "att: ", NULL);
++		bt_gatt_client_set_debug(cli->gatt, gatt_debug_cb, "gatt: ",
+ 									NULL);
+ 	}
+ 
++	bt_gatt_client_set_ready_handler(cli->gatt, ready_cb, cli, NULL);
 +
-+		argc++;
-+		ap++;
-+
-+		if (argc > 2) {
-+			services_usage();
-+			return;
-+		}
-+	}
-+
-+	if (!argc) {
-+		print_services(cli);
-+		return;
-+	}
-+
-+	if (argc != 2) {
-+		services_usage();
-+		return;
-+	}
-+
-+	if (!strcmp(argv[0], "-u") || !strcmp(argv[0], "--uuid")) {
-+		bt_uuid_t tmp, uuid;
-+
-+		if (bt_string_to_uuid(&tmp, argv[1]) < 0) {
-+			printf("Invalid UUID: %s\n", argv[1]);
-+			return;
-+		}
-+
-+		bt_uuid_to_uuid128(&tmp, &uuid);
-+
-+		print_services_by_uuid(cli, &uuid);
-+	} else if (!strcmp(argv[0], "-a") || !strcmp(argv[0], "--handle")) {
-+		uint16_t handle;
-+		char *endptr = NULL;
-+
-+		handle = strtol(argv[1], &endptr, 16);
-+		if (!endptr || *endptr != '\0') {
-+			printf("Invalid start handle: %s\n", argv[1]);
-+			return;
-+		}
-+
-+		print_services_by_handle(cli, handle);
-+	} else
-+		services_usage();
+ 	/* bt_gatt_client already holds a reference */
+ 	bt_att_unref(att);
+ 
+@@ -134,11 +154,21 @@ static void client_destroy(struct client *cli)
+ 	bt_gatt_client_unref(cli->gatt);
  }
  
--static void cmd_help(struct client *cli);
-+static void cmd_help(struct client *cli, char *cmd_str);
++static void ready_cb(bool success, uint8_t att_ecode, void *user_data)
++{
++	if (!success) {
++		PRLOG("GATT discovery procedures failed - error code: 0x02%x\n",
++								att_ecode);
++		return;
++	}
  
 -typedef void (*command_func_t)(struct client *cli);
-+typedef void (*command_func_t)(struct client *cli, char *cmd_str);
++	PRLOG("GATT discovery procedures complete\n");
++}
  
+ static void cmd_help(struct client *cli);
+ 
++typedef void (*command_func_t)(struct client *cli);
++
  static struct {
  	char *cmd;
-@@ -248,7 +347,7 @@ static struct {
- 	{ }
- };
- 
--static void cmd_help(struct client *cli)
-+static void cmd_help(struct client *cli, char *cmd_str)
- {
- 	int i;
- 
-@@ -262,6 +361,7 @@ static void prompt_read_cb(int fd, uint32_t events, void *user_data)
- 	ssize_t read;
- 	size_t len = 0;
- 	char *line = NULL;
-+	char *cmd = NULL, *args;
- 	struct client *cli = user_data;
- 	int i;
- 
-@@ -273,13 +373,26 @@ static void prompt_read_cb(int fd, uint32_t events, void *user_data)
- 	if ((read = getline(&line, &len, stdin)) == -1)
- 		return;
- 
-+	if (read <= 1) {
-+		cmd_help(cli, NULL);
-+		print_prompt();
-+		return;
-+	}
-+
-+	line[read-1] = '\0';
-+	args = line;
-+
-+	while ((cmd = strsep(&args, " \t")))
-+		if (*cmd != '\0')
-+			break;
-+
- 	for (i = 0; command[i].cmd; i++) {
--		if (strncmp(command[i].cmd, line, read - 1) == 0)
-+		if (strcmp(command[i].cmd, cmd) == 0)
+ 	command_func_t func;
+@@ -178,6 +208,8 @@ static void prompt_read_cb(int fd, uint32_t events, void *user_data)
  			break;
  	}
  
++	print_prompt();
++
  	if (command[i].cmd)
--		command[i].func(cli);
-+		command[i].func(cli, args);
+ 		command[i].func(cli);
  	else
- 		fprintf(stderr, "Unknown command: %s\n", line);
- 
 -- 
 2.1.0.rc2.206.gedb03e5
 
