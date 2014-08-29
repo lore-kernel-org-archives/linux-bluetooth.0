@@ -1,59 +1,54 @@
 Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
-To: Marcin Kraglak <marcin.kraglak@tieto.com>
+To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCHv2 0/8] Android tester GATT test cases
-Date: Fri, 29 Aug 2014 16:05:15 +0200
-Message-ID: <6714487.IToMxBifua@uw000953>
-In-Reply-To: <1409300770-3938-1-git-send-email-marcin.kraglak@tieto.com>
-References: <1409300770-3938-1-git-send-email-marcin.kraglak@tieto.com>
+Subject: Re: [PATCH] android/handsfree: Refactor handle_dial()
+Date: Fri, 29 Aug 2014 15:58:51 +0200
+Message-ID: <3335162.mhnMEypyip@uw000953>
+In-Reply-To: <1409060601-14384-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1409060601-14384-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcin,
+Hi Andrei,
 
-On Friday 29 of August 2014 10:26:01 Marcin Kraglak wrote:
-> This patch set improve handling of ssp requests in few test cases
-> and adds GATT test cases for searching primary services and
-> characteristics.
+On Tuesday 26 of August 2014 16:43:21 Andrei Emeltchenko wrote:
+> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 > 
-> This set contains rebased version of pending commits.
+> Call callback only once.
+> ---
+>  android/hal-handsfree.c | 7 ++++---
+>  1 file changed, 4 insertions(+), 3 deletions(-)
 > 
-> Marcin Kraglak (8):
->   android/tester: Simplify ACTION_FAIl and ACTION_SUCCESS defines
->   android/tester: Add function to set default ssp handler
->   android/tester: Add support for search services callbacks
->   android/tester: Add GATT Client Search Service test case
->   android/tester: Add GATT Search Service 2 test case
->   android/tester: Add negative GATT Search Service test
->   android/tester: Add support for get_characteristic_cb()
->   android/tester: Add GATT get_characteristic test
-> 
->  android/tester-a2dp.c |   3 +
->  android/tester-gatt.c | 269 +++++++++++++++++++++++++++++++++++++++++++++++++-
->  android/tester-main.c | 122 ++++++++++++++++++++++-
->  android/tester-main.h |  44 ++++++---
->  android/tester-pan.c  |   3 +
->  5 files changed, 425 insertions(+), 16 deletions(-)
-> 
+> diff --git a/android/hal-handsfree.c b/android/hal-handsfree.c
+> index 0f5e1d7..986e745 100644
+> --- a/android/hal-handsfree.c
+> +++ b/android/hal-handsfree.c
+> @@ -86,6 +86,7 @@ static void handle_dial(void *buf, uint16_t len, int fd)
+>  {
+>  	struct hal_ev_handsfree_dial *ev = buf;
+>  	uint16_t num_len = ev->number_len;
+> +	char *number = NULL;
+>  
+>  	if (len != sizeof(*ev) + num_len ||
+>  			(num_len != 0 && ev->number[num_len - 1] != '\0')) {
+> @@ -97,9 +98,9 @@ static void handle_dial(void *buf, uint16_t len, int fd)
+>  		return;
+>  
+>  	if (ev->number_len)
+> -		cbs->dial_call_cmd_cb((char *) ev->number);
+> -	else
+> -		cbs->dial_call_cmd_cb(NULL);
+> +		number = (char *) ev->number;
+> +
+> +	cbs->dial_call_cmd_cb(number);
+>  }
+>  
+>  static void handle_dtmf(void *buf, uint16_t len, int fd)
 
-There seems to be a bug  that results in command being send after daemon
-shutdown resulting in:
-
-bluetoothd[22413]: src/sdpd-service.c:remove_record_from_server() Removing record with handle 0x10004
-bluetoothd[22413]: src/sdpd-service.c:remove_record_from_server() Removing record with handle 0x10003
-bluetoothd[22413]: Stopping SDP server
-bluetoothd[22413]: ExitBlueZ E: Notification socket closed
-Gatt Client - Scan - test passed
-
-Gatt Client - Scan - teardown
-BlueZ D: android/hal-gatt.c:cleanup() 
-BlueZ E: Sending command failed:Broken pipe
-
-
-This needs to be fixed before patches can go in.
+Patch applied. Thanks. 
 
 -- 
 Best regards, 
