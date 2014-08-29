@@ -1,59 +1,135 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-Sender: armansito@google.com
-In-Reply-To: <0032498A-436E-4A05-ABD0-BF02AC15F7B6@holtmann.org>
-References: <1409264113-12239-1-git-send-email-armansito@chromium.org>
-	<1409264113-12239-3-git-send-email-armansito@chromium.org>
-	<0032498A-436E-4A05-ABD0-BF02AC15F7B6@holtmann.org>
-Date: Fri, 29 Aug 2014 08:35:46 -0700
-Message-ID: <CAHrH25S6Y7EuWX4fTcoKEtTgrTbjLNLWv6t6YTe-J9fCP2VqSg@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 2/7] tools/btgatt-client: Added L2CAP LE ATT connection.
 From: Arman Uguray <armansito@chromium.org>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+To: linux-bluetooth@vger.kernel.org
+Cc: Arman Uguray <armansito@chromium.org>
+Subject: [PATCH BlueZ v1 6/7] tools/btgatt-client: Add "services" command.
+Date: Fri, 29 Aug 2014 08:34:11 -0700
+Message-Id: <1409326452-8534-7-git-send-email-armansito@chromium.org>
+In-Reply-To: <1409326452-8534-1-git-send-email-armansito@chromium.org>
+References: <1409326452-8534-1-git-send-email-armansito@chromium.org>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Added the "services" command, which enumerates all discovered services,
+characteristics, and descriptors.
+---
+ tools/btgatt-client.c | 74 ++++++++++++++++++++++++++++++++++++++++++++++++---
+ 1 file changed, 71 insertions(+), 3 deletions(-)
 
->> +static int l2cap_set_lm(int sock, int level)
->> +{
->> +     int lm_map[] = {
->> +             0,
->> +             L2CAP_LM_AUTH,
->> +             L2CAP_LM_AUTH | L2CAP_LM_ENCRYPT,
->> +             L2CAP_LM_AUTH | L2CAP_LM_ENCRYPT | L2CAP_LM_SECURE,
->> +     }, opt = lm_map[level];
->> +
->> +     if (setsockopt(sock, SOL_L2CAP, L2CAP_LM, &opt, sizeof(opt)) < 0)
->> +             return -errno;
->> +
->> +     return 0;
->> +}
->
-> can we please use BT_SECURITY option instead of the link mode. You have dug out something from 13 years ago now. I do not think that we have a kernel with LE support that does not support BT_SECURITY. So such a fallback will never be triggered.
->
+diff --git a/tools/btgatt-client.c b/tools/btgatt-client.c
+index 6299586..445cfc7 100644
+--- a/tools/btgatt-client.c
++++ b/tools/btgatt-client.c
+@@ -37,6 +37,7 @@
+ #include <bluetooth/hci.h>
+ #include <bluetooth/hci_lib.h>
+ #include <bluetooth/l2cap.h>
++#include "lib/uuid.h"
+ 
+ #include "monitor/mainloop.h"
+ #include "src/shared/util.h"
+@@ -154,15 +155,83 @@ static void client_destroy(struct client *cli)
+ 	bt_gatt_client_unref(cli->gatt);
+ }
+ 
++static void print_uuid(const uint8_t uuid[16])
++{
++	char uuid_str[MAX_LEN_UUID_STR];
++	bt_uuid_t tmp;
++
++	tmp.type = BT_UUID128;
++	memcpy(tmp.value.u128.data, uuid, 16 * sizeof(uint8_t));
++	bt_uuid_to_string(&tmp, uuid_str, sizeof(uuid_str));
++
++	printf("%s\n", uuid_str);
++}
++
++static void print_services(struct client *cli)
++{
++	struct bt_gatt_service_iter iter;
++	bt_gatt_service_t service;
++	const bt_gatt_characteristic_t *chrc;
++
++	if (!bt_gatt_service_iter_init(&iter, cli->gatt)) {
++		PRLOG("Failed to initialize service iterator\n");
++		return;
++	}
++
++	printf("\n");
++
++	while (bt_gatt_service_iter_next(&iter, &service)) {
++		size_t i, j;
++
++		printf("service - start: 0x%04x, end: 0x%04x, uuid: ",
++				service.start_handle, service.end_handle);
++		print_uuid(service.uuid);
++
++		for (i = 0; i < service.num_chrcs; i++) {
++			chrc = service.chrcs + i;
++			printf("\t  charac - start: 0x%04x, end: 0x%04x, "
++					"value: 0x%04x, props: 0x%02x, uuid: ",
++					chrc->start_handle,
++					chrc->end_handle,
++					chrc->value_handle,
++					chrc->properties);
++			print_uuid(service.chrcs[i].uuid);
++
++			for (j = 0; j < chrc->num_descs; j++) {
++				printf("\t\t  descr - handle: 0x%04x, uuid: ",
++							chrc->descs[j].handle);
++				print_uuid(chrc->descs[j].uuid);
++			}
++		}
++
++		printf("\n");
++	}
++}
++
+ static void ready_cb(bool success, uint8_t att_ecode, void *user_data)
+ {
++	struct client *cli = user_data;
++
+ 	if (!success) {
+-		PRLOG("GATT discovery procedures failed - error code: 0x02%x\n",
++		PRLOG("GATT discovery procedures failed - error code: 0x%02x\n",
+ 								att_ecode);
+ 		return;
+ 	}
+ 
+ 	PRLOG("GATT discovery procedures complete\n");
++
++	print_services(cli);
++	print_prompt();
++}
++
++static void cmd_services(struct client *cli)
++{
++	if (!bt_gatt_client_is_ready(cli->gatt)) {
++		printf("GATT client not initialized\n");
++		return;
++	}
++
++	print_services(cli);
+ }
+ 
+ static void cmd_help(struct client *cli);
+@@ -175,6 +244,7 @@ static struct {
+ 	char *doc;
+ } command[] = {
+ 	{ "help", cmd_help, "\tDisplay help message" },
++	{ "services", cmd_services, "\tShow discovered services" },
+ 	{ }
+ };
+ 
+@@ -208,8 +278,6 @@ static void prompt_read_cb(int fd, uint32_t events, void *user_data)
+ 			break;
+ 	}
+ 
+-	print_prompt();
+-
+ 	if (command[i].cmd)
+ 		command[i].func(cli);
+ 	else
+-- 
+2.1.0.rc2.206.gedb03e5
 
-Yeah, I didn't really know what I was doing; I pretty much just copied
-it from btio.
-
->> +     /* Set up source address */
->> +     memset(&srcaddr, 0, sizeof(srcaddr));
->> +     srcaddr.l2_family = AF_BLUETOOTH;
->> +     srcaddr.l2_cid = htobs(ATT_CID);
->> +     srcaddr.l2_bdaddr_type = BDADDR_LE_PUBLIC;
->
-> This one is dangerous if you end up with a LE only controller that does not have a public address.
->
->> +     bacpy(&srcaddr.l2_bdaddr, src);
->
-> I wonder if specifying BDADDR_ANY and bdaddr_type == 0 does the right thing here. There is one hole that we punched into the kernel checks for bind.
->
-
-Passing 0 for bdaddr_type seems to work fine. I already pass
-BDADDR_ANY in the main function if no -i flag is given.
-
-Just sent the updated patch set.
-
-Thanks,
-Arman
