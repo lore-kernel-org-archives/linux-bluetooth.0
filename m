@@ -1,131 +1,154 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <CABBYNZKbPeq9Xxr57EVOqLcY-TTLr6gM2a4yOxP_vBpukM+hqQ@mail.gmail.com>
-References: <CAO+8wm_qbHMA8RZmiGQUw-55TDWCXvm+f2zrLCCYXXv7CcL08g@mail.gmail.com>
-	<CABBYNZKbPeq9Xxr57EVOqLcY-TTLr6gM2a4yOxP_vBpukM+hqQ@mail.gmail.com>
-Date: Fri, 29 Aug 2014 18:23:01 -0700
-Message-ID: <CAO+8wm84JUdm4r5zY_eA5jZ1VjQKT94MdjEU0gQiHMekEiP3QA@mail.gmail.com>
-Subject: Re: connecting to a Motion 2in1 wiimote clone
-From: Kameron Larsen <kroylar@gmail.com>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+Subject: [PATCH] Bluetooth: Fix race on incoming connection
+Date: Fri, 29 Aug 2014 22:39:26 +0200
+Message-Id: <1409344766-6798-1-git-send-email-lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Fri, Aug 29, 2014 at 3:51 AM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> Hi Kameron,
->
-> On Fri, Aug 29, 2014 at 1:47 AM, Kameron Larsen <kroylar@gmail.com> wrote:
->> Hello all,
->>
->> I'm having some difficulty in scanning and connecting to a device
->> using bluetoothctl. The device in question is a Motion 2in1 Wiimote.
->> Its basically a cheap chinese wiimote clone.
->>
->> When I try to scan using bluetoothctl the device never shows up. When
->> I try to scan using "hcitool scan --iac=liac", the device shows up as:
->>
->> 2A:04:84:80:13:41 Nintendo RVL-CNT-01
->
-> That is strange bluetoothctl should see the device as well.
->
->> The device cannot be connected to in bluetoothctl but I can connect
->> using "hcitool cc 2A:04:84:80:13:41". If I connect using hctitool and
->> then immediately use "pair 2A:04:84:80:13:41" in bluetoothctl. It
->> looks like the device pairs but the wiimote disconnects before
->> finishing the process. If I then run "trust 2A:04:84:80:13:41",
->> bluetoothctl will show that the device connects anytime I press any
->> button, and then shortly disconnects.
->>
->> hcidump reveals that the something is wating for additional data but
->> it is not receiving what it expects.  Because this data was never
->> received the pairing process is left incomplete. However I can
->> reconnect by pressing any button on the remote. Whenever I do, it will
->> automatically disconnect after several seconds.
->
-> Have to register an agent to do the pairing? You should be able to do
-> that with bluetoothctl:
->
-> agent on
-> default-agent
->
->> Scouring the code, I've come to realize that this remote is not
->> responding to sdp queries and therefore bluez does not know what
->> services it supports. My logs show this error:
->>
->> 2A:04:84:80:13:41: error updating services: Input/output error (5)
->>
->> Without knowing the services (ie, HID) it fails in connect_event_cb
->> with the following error:
->>
->> Refusing input device connect: No such file or directory (2)
->
-> It seems some, or perhaps most, gaming controllers do not have SDP
-> working properly but first check if you are really able to pair
-> properly because if you don't we wont be able to discover what service
-> the remote device support.
+This patch fix race on incoming connection which leads to situaction
+when New Link Key Event is sent to user space before Device Connected
+Event.
 
-I believe it has paired properly. At least bluetoothctl lists it as paired.
+Logs:
+> HCI Event: Connect Request (0x04) plen 10
+        Address: 00:AA:01:01:00:00 (OUI 00-AA-01)
+        Class: 0x000000
+          Major class: Miscellaneous
+          Minor class: 0x00
+        Link type: ACL (0x01)
+< HCI Command: Accept Connection Request (0x01|0x0009) plen 7
+        Address: 00:AA:01:01:00:00 (OUI 00-AA-01)
+        Role: Slave (0x01)
+> HCI Event: Command Status (0x0f) plen 4
+      Accept Connection Request (0x01|0x0009) ncmd 1
+        Status: Success (0x00)
+> HCI Event: Connect Complete (0x03) plen 11
+        Status: Success (0x00)
+        Handle: 42
+        Address: 00:AA:01:01:00:00 (OUI 00-AA-01)
+        Link type: ACL (0x01)
+        Encryption: Disabled (0x00)
+> HCI Event: IO Capability Response (0x32) plen 9
+        Address: 00:AA:01:01:00:00 (OUI 00-AA-01)
+        IO capability: NoInputNoOutput (0x03)
+        OOB data: Authentication data not present (0x00)
+        Authentication: No Bonding - MITM not required (0x00)
+> HCI Event: IO Capability Request (0x31) plen 6
+        Address: 00:AA:01:01:00:00 (OUI 00-AA-01)
+< HCI Command: Read Remote Supported Features (0x01|0x001b) plen 2
+        Handle: 42
+> HCI Event: Command Status (0x0f) plen 4
+      Read Remote Supported Features (0x01|0x001b) ncmd 1
+        Status: Success (0x00)
+> HCI Event: Read Remote Supported Features (0x0b) plen 11
+        Handle: 42
+        Features: 0xa4 0x08 0x00 0xc0 0x18 0x1e 0x79 0x83
+          Encryption
+          Role switch
+          Sniff mode
+          SCO link
+          RSSI with inquiry results
+          Extended SCO link (EV3 packets)
+          AFH capable slave
+          AFH classification slave
+          Sniff subrating
+          Pause encryption
+          AFH capable master
+          AFH classification master
+          Extended Inquiry Response
+          Secure Simple Pairing
+          Encapsulated PDU
+          Erroneous Data Reporting
+          Non-flushable Packet Boundary Flag
+          Link Supervision Timeout Changed Event
+          Inquiry TX Power Level
+          Extended features
+< HCI Command: IO Capability Request Reply (0x01|0x002b) plen 9
+        Address: 00:AA:01:01:00:00 (OUI 00-AA-01)
+        IO capability: DisplayYesNo (0x01)
+        OOB data: Authentication data not present (0x00)
+        Authentication: No Bonding - MITM not required (0x00)
+> HCI Event: User Confirmation Request (0x33) plen 10
+        Address: 00:AA:01:01:00:00 (OUI 00-AA-01)
+        Passkey: 000000
+> HCI Event: Command Complete (0x0e) plen 10
+      IO Capability Request Reply (0x01|0x002b) ncmd 1
+        Status: Success (0x00)
+        Address: 00:AA:01:01:00:00 (OUI 00-AA-01)
+< HCI Command: Read Remote Extended Features (0x01|0x001c) plen 3
+        Handle: 42
+        Page: 1
+> HCI Event: Command Status (0x0f) plen 4
+      Read Remote Extended Features (0x01|0x001c) ncmd 1
+        Status: Success (0x00)
+> HCI Event: Read Remote Extended Features (0x23) plen 13
+        Status: Success (0x00)
+        Handle: 42
+        Page: 1/1
+        Features: 0x01 0x00 0x00 0x00 0x00 0x00 0x00 0x00
+          Secure Simple Pairing (Host Support)
+< HCI Command: User Confirmation Request Reply (0x01|0x002c) plen 6
+        Address: 00:AA:01:01:00:00 (OUI 00-AA-01)
+> HCI Event: Command Complete (0x0e) plen 10
+        Status: Success (0x00)
+        Address: 00:AA:01:01:00:00 (OUI 00-AA-01)
+> HCI Event: Simple Pairing Complete (0x36) plen 7
+        Status: Success (0x00)
+        Address: 00:AA:01:01:00:00 (OUI 00-AA-01)
+> HCI Event: Link Key Notification (0x18) plen 23
+        Address: 00:AA:01:01:00:00 (OUI 00-AA-01)
+        Link key: 00010203040506070809000102030405
+        Key type: Unauthenticated Combination key from P-256 (0x07)
+< HCI Command: Remote Name Request (0x01|0x0019) plen 10
+        Address: 00:AA:01:01:00:00 (OUI 00-AA-01)
+        Page scan repetition mode: R2 (0x02)
+        Page scan mode: Mandatory (0x00)
+        Clock offset: 0x0000
+> HCI Event: Command Status (0x0f) plen 4
+      Remote Name Request (0x01|0x0019) ncmd 1
+        Status: Success (0x00)
+> HCI Event: Remote Name Req Complete (0x07) plen 255
+        Status: Success (0x00)
+        Address: 00:AA:01:01:00:00 (OUI 00-AA-01)
+        Name:
+> HCI Event: Encryption Change (0x08) plen 4
+        Status: Success (0x00)
+        Handle: 42
+        Encryption: Enabled with E0 (0x01)
+@ New Link Key: 00:AA:01:01:00:00 (0)
+@ Device Connected: 00:AA:01:01:00:00 (0) flags 0x0000
 
-[bluetooth]# power on
-Changing power on succeeded
-[bluetooth]# agent
-Missing on/off/capability argument
-[bluetooth]# default-agent
-No agent is registered
-[bluetooth]# devices
-Device 00:02:5B:02:65:2A Avantree Hive
-Device 2A:04:84:80:13:41 Nintendo RVL-CNT-01
-[bluetooth]# remove 2A:04:84:80:13:41
-[DEL] Device 2A:04:84:80:13:41 Nintendo RVL-CNT-01
-Device has been removed
-[bluetooth]# untrust 2A:04:84:80:13:41
-Device 2A:04:84:80:13:41 not available
-[NEW] Device 2A:04:84:80:13:41 Nintendo RVL-CNT-01
+Signed-off-by: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+---
+ net/bluetooth/hci_event.c | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
 
-(At this point, I run "hcitool cc 2A:04:84:80:13:41" in a separate
-window, and immediately run the following command in bluetoothctl.)
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index e6a496a..55c9d12 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -3649,6 +3649,18 @@ static void hci_io_capa_request_evt(struct hci_dev *hdev, struct sk_buff *skb)
+ 	if (!conn)
+ 		goto unlock;
+ 
++	/* If flag HCI_CONN_MGMT_CONNECTED is not set in this point of time
++	 * that means remote is very quick with authenthication request and
++	 * kernel did make to ask for features and remote name.
++	 * To make sure that userspace will get device connected event before
++	 * any pairing related events, lets set HCI_CONN_MGMT_CONNECTED flag
++	 * here and send device connected event.
++	 */
++	if (!test_and_set_bit(HCI_CONN_MGMT_CONNECTED, &conn->flags))
++		mgmt_device_connected(hdev, &conn->dst, conn->type,
++				      conn->dst_type, 0, NULL, 0,
++				      conn->dev_class);
++
+ 	hci_conn_hold(conn);
+ 
+ 	if (!test_bit(HCI_MGMT, &hdev->dev_flags))
+-- 
+1.8.4
 
-[bluetooth]# pair 2A:04:84:80:13:41
-Attempting to pair with 2A:04:84:80:13:41
-
-(It pauses here until it times out according to hcidump, but then I
-get these messages)
-
-[CHG] Device 2A:04:84:80:13:41 Connected: no
-[CHG] Device 2A:04:84:80:13:41 Paired: yes
-Pairing successful
-[bluetooth]#
-
-At this pint the wiimote is already off. And the error I get from
-bluetoothd in the logs is:
-2A:04:84:80:13:41: error updating services: Input/output error (5)
-
-I can then attempt to reconnect by pressing any button on the wiimote:
-[CHG] Device 2A:04:84:80:13:41 Class: 0x002504
-[CHG] Device 2A:04:84:80:13:41 Icon: input-gaming
-[CHG] Device 2A:04:84:80:13:41 Connected: yes
-
-But then after ~8 seconds:
-[CHG] Device 2A:04:84:80:13:41 Connected: no
-
-And the logs show:
-Refusing input device connect: No such file or directory (2)
-Refusing connection from 2A:04:84:80:13:41: unknown device
-
-This I believe is correct behavior. As a comment in plugins/wiimote.c
-says that if we don't connect to the input service right away, the
-wiimote will turn off after about 5 seconds.
-
-> In case the pairing actually works but we still fail to resolve the
-> services you can create a custom plugin that upon detecting it is this
-> specific device generates a proper SDP record and add HID UUID via
-> btd_device_add_uuid.
-
-Awesome thanks! I think this is necessary. It looks like the wiimote
-is connecting (although some unusual process is needed for it to
-actually show up in bluetoothctl) and pairing (but also terminating
-due to a timeout). But when I reconnect, the device doesn't have any
-services associated with it due to sdp browse failing, and so we can't
-connect to its input device.
