@@ -2,10 +2,8 @@ Return-Path: <cyrus@holtmann.org>
 From: Marcin Kraglak <marcin.kraglak@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Subject: [PATCHv2 0/8] Android tester GATT test cases
-Date: Fri, 29 Aug 2014 10:26:02 +0200
-Message-Id: <1409300770-3938-2-git-send-email-marcin.kraglak@tieto.com>
-In-Reply-To: <1409300770-3938-1-git-send-email-marcin.kraglak@tieto.com>
-References: <1409300770-3938-1-git-send-email-marcin.kraglak@tieto.com>
+Date: Fri, 29 Aug 2014 10:26:01 +0200
+Message-Id: <1409300770-3938-1-git-send-email-marcin.kraglak@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
@@ -13,7 +11,7 @@ This patch set improve handling of ssp requests in few test cases
 and adds GATT test cases for searching primary services and
 characteristics.
 
-This patch set contains rebased pending commits.
+This set contains rebased version of pending commits.
 
 Marcin Kraglak (8):
   android/tester: Simplify ACTION_FAIl and ACTION_SUCCESS defines
