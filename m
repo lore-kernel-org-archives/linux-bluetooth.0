@@ -2,545 +2,184 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH 1/6] android: Add initial code for AVDTP testing tool
-Date: Fri, 29 Aug 2014 15:17:53 +0200
-Message-Id: <1409318278-798-1-git-send-email-szymon.janc@tieto.com>
+Subject: [PATCH 2/6] android/avdtptest: Add support for streaming
+Date: Fri, 29 Aug 2014 15:17:54 +0200
+Message-Id: <1409318278-798-2-git-send-email-szymon.janc@tieto.com>
+In-Reply-To: <1409318278-798-1-git-send-email-szymon.janc@tieto.com>
+References: <1409318278-798-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This tools is intended for AVDTP qualification with PTS.
 ---
- .gitignore          |   1 +
- android/Android.mk  |  33 ++++
- android/Makefile.am |  11 ++
- android/avdtptest.c | 440 ++++++++++++++++++++++++++++++++++++++++++++++++++++
- 4 files changed, 485 insertions(+)
- create mode 100644 android/avdtptest.c
+ android/avdtptest.c | 92 ++++++++++++++++++++++++++++++++++++++++++++++++++---
+ 1 file changed, 88 insertions(+), 4 deletions(-)
 
-diff --git a/.gitignore b/.gitignore
-index 1ee35e2..b6ccbe3 100644
---- a/.gitignore
-+++ b/.gitignore
-@@ -125,6 +125,7 @@ doc/btmon.1
- 
- android/system-emulator
- android/bluetoothd
-+android/avdtptest
- android/mcaptest
- android/haltest
- android/android-tester
-diff --git a/android/Android.mk b/android/Android.mk
-index 35b8506..b2b55f7 100644
---- a/android/Android.mk
-+++ b/android/Android.mk
-@@ -223,6 +223,39 @@ LOCAL_MODULE := mcaptest
- include $(BUILD_EXECUTABLE)
- 
- #
-+# avdtptest
-+#
-+
-+include $(CLEAR_VARS)
-+
-+LOCAL_SRC_FILES := \
-+	bluez/android/avdtptest.c \
-+	bluez/android/avdtp.c \
-+	bluez/src/log.c \
-+	bluez/btio/btio.c \
-+	bluez/lib/bluetooth.c \
-+	bluez/lib/hci.c \
-+
-+LOCAL_C_INCLUDES += \
-+	$(LOCAL_PATH)/bluez \
-+	$(call include-path-for, glib) \
-+	$(call include-path-for, glib)/glib \
-+
-+LOCAL_CFLAGS := $(BLUEZ_COMMON_CFLAGS)
-+
-+LOCAL_SHARED_LIBRARIES := \
-+	libglib \
-+
-+LOCAL_STATIC_LIBRARIES := \
-+	bluetooth-headers \
-+
-+LOCAL_MODULE_PATH := $(TARGET_OUT_OPTIONAL_EXECUTABLES)
-+LOCAL_MODULE_TAGS := debug
-+LOCAL_MODULE := avdtptest
-+
-+include $(BUILD_EXECUTABLE)
-+
-+#
- # btmon
- #
- 
-diff --git a/android/Makefile.am b/android/Makefile.am
-index 4b93c5b..e93a08b 100644
---- a/android/Makefile.am
-+++ b/android/Makefile.am
-@@ -109,6 +109,17 @@ android_mcaptest_CFLAGS = $(AM_CFLAGS)
- 
- android_mcaptest_LDADD = lib/libbluetooth-internal.la @GLIB_LIBS@
- 
-+noinst_PROGRAMS += android/avdtptest
-+
-+android_avdtptest_SOURCES = android/avdtptest.c \
-+				src/log.h src/log.c \
-+				btio/btio.h btio/btio.c \
-+				android/avdtp.h android/avdtp.c
-+
-+android_avdtptest_CFLAGS = $(AM_CFLAGS)
-+
-+android_avdtptest_LDADD = lib/libbluetooth-internal.la @GLIB_LIBS@
-+
- noinst_PROGRAMS += android/haltest
- 
- android_haltest_SOURCES = android/client/haltest.c \
 diff --git a/android/avdtptest.c b/android/avdtptest.c
-new file mode 100644
-index 0000000..a986a9b
---- /dev/null
+index a986a9b..402d931 100644
+--- a/android/avdtptest.c
 +++ b/android/avdtptest.c
-@@ -0,0 +1,440 @@
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2014 Intel Corporation
-+ *
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-+ *
-+ */
+@@ -48,6 +48,76 @@ struct avdtp_stream *avdtp_stream = NULL;
+ struct avdtp_local_sep *local_sep = NULL;
+ static GIOChannel *io = NULL;
+ 
++static guint media_player = 0;
 +
-+#ifdef HAVE_CONFIG_H
-+#include <config.h>
-+#endif
++static const char sbc_codec[] = {0x00, 0x00, 0x11, 0x15, 0x02, 0x40};
++static const char sbc_media_frame[] = {
++	0x00, 0x60, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01,
++	0x01, 0x9c, 0xfd, 0x40, 0xbd, 0xde, 0xa9, 0x75, 0x43, 0x20, 0x87, 0x64,
++	0x44, 0x32, 0x7f, 0xbe, 0xf7, 0x76, 0xfe, 0xf7, 0xbb, 0xbb, 0x7f, 0xbe,
++	0xf7, 0x76, 0xfe, 0xf7, 0xbb, 0xbb, 0x7f, 0xbe, 0xf7, 0x76, 0xfe, 0xf7,
++	0xbb, 0xbb, 0x80, 0x3e, 0xf7, 0x76, 0xfe, 0xf7, 0xbb, 0xbb, 0x83, 0x41,
++	0x07, 0x77, 0x09, 0x07, 0x43, 0xb3, 0x81, 0xbc, 0xf8, 0x77, 0x02, 0xe5,
++	0xa4, 0x3a, 0xa0, 0xcb, 0x38, 0xbb, 0x57, 0x90, 0xd9, 0x08, 0x9c, 0x1d,
++	0x86, 0x59, 0x01, 0x0c, 0x21, 0x44, 0x68, 0x35, 0xa8, 0x57, 0x97, 0x0e,
++	0x9b, 0xbb, 0x62, 0xc4, 0xca, 0x57, 0x04, 0xa1, 0xca, 0x3b, 0xa3, 0x48,
++	0xd2, 0x66, 0x11, 0x33, 0x6a, 0x3b, 0xb4, 0xbb, 0x08, 0x77, 0x17, 0x03,
++	0xb4, 0x3b, 0x79, 0x3b, 0x46, 0x97, 0x0e, 0xf7, 0x3d, 0xbb, 0x3d, 0x49,
++	0x25, 0x86, 0x88, 0xb4, 0xad, 0x3b, 0x62, 0xbb, 0xa4, 0x47, 0x29, 0x99,
++	0x3b, 0x3b, 0xaf, 0xc6, 0xd4, 0x37, 0x68, 0x94, 0x0a, 0xbb
++	};
 +
-+#include <stdio.h>
-+#include <stdlib.h>
-+#include <getopt.h>
-+#include <unistd.h>
-+#include <stdbool.h>
-+
-+#include <bluetooth/bluetooth.h>
-+#include <bluetooth/hci.h>
-+#include <bluetooth/hci_lib.h>
-+
-+#include <glib.h>
-+
-+#include "btio/btio.h"
-+#include "avdtp.h"
-+
-+static GMainLoop *mainloop = NULL;
-+static int dev_role = AVDTP_SEP_TYPE_SOURCE;
-+static bool initiator = false;
-+static struct avdtp *avdtp = NULL;
-+struct avdtp_stream *avdtp_stream = NULL;
-+struct avdtp_local_sep *local_sep = NULL;
-+static GIOChannel *io = NULL;
-+
-+static void set_configuration_cfm(struct avdtp *session,
-+					struct avdtp_local_sep *lsep,
-+					struct avdtp_stream *stream,
-+					struct avdtp_error *err,
-+					void *user_data)
++static gboolean media_writer(gpointer user_data)
 +{
-+	printf("%s\n", __func__);
-+}
-+
-+static void get_configuration_cfm(struct avdtp *session,
-+					struct avdtp_local_sep *lsep,
-+					struct avdtp_stream *stream,
-+					struct avdtp_error *err,
-+					void *user_data)
-+	{
-+	printf("%s\n", __func__);
-+}
-+
-+static void open_cfm(struct avdtp *session, struct avdtp_local_sep *lsep,
-+			struct avdtp_stream *stream, struct avdtp_error *err,
-+			void *user_data)
-+{
-+	printf("%s\n", __func__);
-+}
-+
-+static void start_cfm(struct avdtp *session, struct avdtp_local_sep *lsep,
-+			struct avdtp_stream *stream, struct avdtp_error *err,
-+			void *user_data)
-+{
-+	printf("%s\n", __func__);
-+}
-+
-+static void suspend_cfm(struct avdtp *session, struct avdtp_local_sep *lsep,
-+			struct avdtp_stream *stream,
-+			struct avdtp_error *err, void *user_data)
-+{
-+	printf("%s\n", __func__);
-+}
-+
-+static void close_cfm(struct avdtp *session, struct avdtp_local_sep *lsep,
-+			struct avdtp_stream *stream,
-+			struct avdtp_error *err, void *user_data)
-+{
-+	printf("%s\n", __func__);
-+
-+	avdtp_stream = NULL;
-+}
-+
-+static void abort_cfm(struct avdtp *session, struct avdtp_local_sep *lsep,
-+			struct avdtp_stream *stream,
-+			struct avdtp_error *err, void *user_data)
-+{
-+	printf("%s\n", __func__);
-+
-+	avdtp_stream = NULL;
-+}
-+
-+static void reconfigure_cfm(struct avdtp *session,
-+				struct avdtp_local_sep *lsep,
-+				struct avdtp_stream *stream,
-+				struct avdtp_error *err, void *user_data)
-+{
-+	printf("%s\n", __func__);
-+}
-+
-+static void delay_report_cfm(struct avdtp *session,
-+				struct avdtp_local_sep *lsep,
-+				struct avdtp_stream *stream,
-+				struct avdtp_error *err, void *user_data)
-+{
-+	printf("%s\n", __func__);
-+}
-+
-+static struct avdtp_sep_cfm sep_cfm = {
-+	.set_configuration	= set_configuration_cfm,
-+	.get_configuration	= get_configuration_cfm,
-+	.open			= open_cfm,
-+	.start			= start_cfm,
-+	.suspend		= suspend_cfm,
-+	.close			= close_cfm,
-+	.abort			= abort_cfm,
-+	.reconfigure		= reconfigure_cfm,
-+	.delay_report		= delay_report_cfm,
-+};
-+
-+static const char sbc_codec[] = {0x00, 0x00, 0xff, 0xff, 0x02, 0x40};
-+
-+static gboolean get_capability_ind(struct avdtp *session,
-+					struct avdtp_local_sep *sep,
-+					GSList **caps, uint8_t *err,
-+					void *user_data)
-+{
-+	struct avdtp_service_capability *service;
-+
-+	printf("%s\n", __func__);
-+
-+	*caps = NULL;
-+
-+	service = avdtp_service_cap_new(AVDTP_MEDIA_TRANSPORT, NULL, 0);
-+	*caps = g_slist_append(*caps, service);
-+
-+	service = avdtp_service_cap_new(AVDTP_MEDIA_CODEC, sbc_codec,
-+							sizeof(sbc_codec));
-+	*caps = g_slist_append(*caps, service);
-+
-+	return TRUE;
-+}
-+
-+static gboolean set_configuration_ind(struct avdtp *session,
-+					struct avdtp_local_sep *lsep,
-+					struct avdtp_stream *stream,
-+					GSList *caps,
-+					avdtp_set_configuration_cb cb,
-+					void *user_data)
-+{
-+	printf("%s\n", __func__);
-+
-+	avdtp_stream = stream;
-+
-+	cb(session, stream, NULL);
-+
-+	return TRUE;
-+}
-+
-+static gboolean get_configuration_ind(struct avdtp *session,
-+					struct avdtp_local_sep *lsep,
-+					uint8_t *err, void *user_data)
-+{
-+	printf("%s\n", __func__);
-+
-+	return FALSE;
-+}
-+
-+static gboolean open_ind(struct avdtp *session, struct avdtp_local_sep *lsep,
-+				struct avdtp_stream *stream, uint8_t *err,
-+				void *user_data)
-+{
-+	printf("%s\n", __func__);
-+
-+	return TRUE;
-+}
-+
-+static gboolean start_ind(struct avdtp *session, struct avdtp_local_sep *lsep,
-+				struct avdtp_stream *stream, uint8_t *err,
-+				void *user_data)
-+{
-+	printf("%s\n", __func__);
-+
-+	return TRUE;
-+}
-+
-+static gboolean suspend_ind(struct avdtp *session,
-+				struct avdtp_local_sep *sep,
-+				struct avdtp_stream *stream, uint8_t *err,
-+				void *user_data)
-+{
-+	printf("%s\n", __func__);
-+
-+	return FALSE;
-+}
-+
-+static gboolean close_ind(struct avdtp *session, struct avdtp_local_sep *sep,
-+				struct avdtp_stream *stream, uint8_t *err,
-+				void *user_data)
-+{
-+	printf("%s\n", __func__);
-+
-+	return FALSE;
-+}
-+
-+static void abort_ind(struct avdtp *session, struct avdtp_local_sep *sep,
-+			struct avdtp_stream *stream, uint8_t *err,
-+			void *user_data)
-+{
-+	printf("%s\n", __func__);
-+}
-+
-+static gboolean reconfigure_ind(struct avdtp *session,
-+				struct avdtp_local_sep *lsep,
-+				uint8_t *err, void *user_data)
-+{
-+	printf("%s\n", __func__);
-+
-+	return FALSE;
-+}
-+
-+static gboolean delayreport_ind(struct avdtp *session,
-+				struct avdtp_local_sep *lsep,
-+				uint8_t rseid, uint16_t delay,
-+				uint8_t *err, void *user_data)
-+{
-+	printf("%s\n", __func__);
-+
-+	return FALSE;
-+}
-+
-+static struct avdtp_sep_ind sep_ind = {
-+	.get_capability		= get_capability_ind,
-+	.set_configuration	= set_configuration_ind,
-+	.get_configuration	= get_configuration_ind,
-+	.open			= open_ind,
-+	.close			= close_ind,
-+	.start			= start_ind,
-+	.suspend		= suspend_ind,
-+	.abort			= abort_ind,
-+	.reconfigure		= reconfigure_ind,
-+	.delayreport		= delayreport_ind,
-+};
-+
-+static void disconnect_cb(void *user_data)
-+{
-+	printf("Disconnected\n");
-+
-+	g_main_loop_quit(mainloop);
-+}
-+
-+static void connect_cb(GIOChannel *chan, GError *err, gpointer user_data)
-+{
-+	uint16_t imtu, omtu;
-+	GError *gerr = NULL;
++	uint16_t omtu;
 +	int fd;
++	int to_write;
 +
-+	if (err) {
-+		printf("%s\n", err->message);
-+		g_main_loop_quit(mainloop);
-+		return;
-+	}
++	if (!avdtp_stream_get_transport(avdtp_stream, &fd, NULL, &omtu, NULL))
++		return TRUE;
 +
-+	bt_io_get(chan, &gerr,
-+			BT_IO_OPT_IMTU, &imtu,
-+			BT_IO_OPT_OMTU, &omtu,
-+			BT_IO_OPT_INVALID);
-+	if (gerr) {
-+		printf("%s\n", gerr->message);
-+		g_main_loop_quit(mainloop);
-+		return;
-+	}
++	if (omtu < sizeof(sbc_media_frame))
++		to_write = omtu;
++	else
++		to_write = sizeof(sbc_media_frame);
 +
-+	fd = g_io_channel_unix_get_fd(chan);
++	if (write(fd, sbc_media_frame, to_write))
++		return TRUE;
 +
-+	if (avdtp && avdtp_stream) {
-+		if (!avdtp_stream_set_transport(avdtp_stream, fd, imtu, omtu)) {
-+			printf("avdtp_stream_set_transport: failed\n");
-+			g_main_loop_quit(mainloop);
-+		}
-+
-+		g_io_channel_set_close_on_unref(chan, FALSE);
-+		return;
-+	}
-+
-+	/* TODO allow to set version from command line? */
-+	avdtp = avdtp_new(fd, imtu, omtu, 0x0103);
-+	if (!avdtp) {
-+		printf("Failed to create avdtp instance\n");
-+		g_main_loop_quit(mainloop);
-+		return;
-+	}
-+
-+	avdtp_add_disconnect_cb(avdtp, disconnect_cb, NULL);
-+
-+	/* TODO handle initiator */
++	return TRUE;
 +}
 +
-+static void usage(void)
++static bool start_media_player(void)
 +{
-+	printf("avdtptest - AVDTP testing ver %s\n", VERSION);
-+	printf("Usage:\n"
-+		"\tavdtptest [options]\n");
-+	printf("options:\n"
-+		"\t-d <device_role>   SRC (source) or SINK (sink)\n"
-+		"\t-s <stream_role>   INT (initiator) or ACP (acceptor)\n"
-+		"\t-i <hcidev>        HCI adapter\n"
-+		"\t-c <bdaddr>        connect\n"
-+		"\t-l                 listen\n");
++	int fd;
++	uint16_t omtu;
++
++	printf("Media streaming started\n");
++
++	if (media_player || !avdtp_stream)
++		return false;
++
++	if (!avdtp_stream_get_transport(avdtp_stream, &fd, NULL, &omtu, NULL))
++		return false;
++
++	media_player = g_timeout_add(200, media_writer, NULL);
++	if (!media_player)
++		return false;
++
++	return true;
 +}
 +
-+static struct option main_options[] = {
-+	{ "help",		0, 0, 'h' },
-+	{ "device_role",	1, 0, 'd' },
-+	{ "stream_role",	1, 0, 's' },
-+	{ "adapter",		1, 0, 'i' },
-+	{ "connect",		1, 0, 'c' },
-+	{ "listen",		0, 0, 'l' },
-+	{ 0, 0, 0, 0 }
-+};
-+
-+int main(int argc, char *argv[])
++static void stop_media_player(void)
 +{
-+	GError *err = NULL;
-+	bdaddr_t src, dst;
-+	int opt;
++	if (!media_player)
++		return;
 +
-+	bacpy(&src, BDADDR_ANY);
-+	bacpy(&dst, BDADDR_ANY);
++	printf("Media streaming stopped\n");
 +
-+	mainloop = g_main_loop_new(NULL, FALSE);
-+	if (!mainloop) {
-+		printf("Failed to create main loop\n");
-+
-+		exit(1);
-+	}
-+
-+	while ((opt = getopt_long(argc, argv, "d:hi:s:c:l",
-+						main_options, NULL)) != EOF) {
-+		switch (opt) {
-+		case 'i':
-+			if (!strncmp(optarg, "hci", 3))
-+				hci_devba(atoi(optarg + 3), &src);
-+			else
-+				str2ba(optarg, &src);
-+			break;
-+		case 'd':
-+			if (!strncasecmp(optarg, "SRC", sizeof("SRC"))) {
-+				dev_role = AVDTP_SEP_TYPE_SOURCE;
-+			} else if (!strncasecmp(optarg, "SINK",
-+							sizeof("SINK"))) {
-+				dev_role = AVDTP_SEP_TYPE_SINK;
-+			} else {
-+				usage();
-+				exit(0);
-+			}
-+			break;
-+		case 's':
-+			if (!strncasecmp(optarg, "INT", sizeof("INT"))) {
-+				initiator = true;
-+			} else if (!strncasecmp(optarg, "ACP", sizeof("ACP"))) {
-+				initiator = false;
-+			} else {
-+				usage();
-+				exit(0);
-+			}
-+			break;
-+		case 'c':
-+			if (str2ba(optarg, &dst) < 0) {
-+				usage();
-+				exit(0);
-+			}
-+			break;
-+		case 'l':
-+			bacpy(&dst, BDADDR_ANY);
-+			break;
-+		case 'h':
-+		default:
-+			usage();
-+			exit(0);
-+		}
-+	}
-+
-+	local_sep = avdtp_register_sep(dev_role, AVDTP_MEDIA_TYPE_AUDIO,
-+					0x00, FALSE, &sep_ind, &sep_cfm, NULL);
-+	if (!local_sep) {
-+		printf("Failed to register sep\n");
-+		exit(0);
-+	}
-+
-+	if (!bacmp(&dst, BDADDR_ANY)) {
-+		printf("Listening...\n");
-+		io =  bt_io_listen(connect_cb, NULL, NULL, NULL, &err,
-+					BT_IO_OPT_SOURCE_BDADDR, &src,
-+					BT_IO_OPT_PSM, AVDTP_PSM,
-+					BT_IO_OPT_SEC_LEVEL, BT_IO_SEC_LOW,
-+					BT_IO_OPT_INVALID);
-+	} else {
-+		printf("Connecting...\n");
-+		io = bt_io_connect(connect_cb, NULL, NULL, &err,
-+					BT_IO_OPT_SOURCE_BDADDR, &src,
-+					BT_IO_OPT_DEST_BDADDR, &dst,
-+					BT_IO_OPT_SEC_LEVEL, BT_IO_SEC_LOW,
-+					BT_IO_OPT_PSM, AVDTP_PSM,
-+					BT_IO_OPT_INVALID);
-+	}
-+
-+	if (!io) {
-+		printf("Failed: %s\n", err->message);
-+		g_error_free(err);
-+		exit(0);
-+	}
-+
-+	g_main_loop_run(mainloop);
-+
-+	printf("Done\n");
-+
-+	avdtp_unref(avdtp);
-+	avdtp = NULL;
-+
-+	g_main_loop_unref(mainloop);
-+	mainloop = NULL;
-+
-+	return 0;
++	g_source_remove(media_player);
++	media_player = 0;
 +}
++
+ static void set_configuration_cfm(struct avdtp *session,
+ 					struct avdtp_local_sep *lsep,
+ 					struct avdtp_stream *stream,
+@@ -78,6 +148,8 @@ static void start_cfm(struct avdtp *session, struct avdtp_local_sep *lsep,
+ 			void *user_data)
+ {
+ 	printf("%s\n", __func__);
++
++	start_media_player();
+ }
+ 
+ static void suspend_cfm(struct avdtp *session, struct avdtp_local_sep *lsep,
+@@ -85,6 +157,8 @@ static void suspend_cfm(struct avdtp *session, struct avdtp_local_sep *lsep,
+ 			struct avdtp_error *err, void *user_data)
+ {
+ 	printf("%s\n", __func__);
++
++	stop_media_player();
+ }
+ 
+ static void close_cfm(struct avdtp *session, struct avdtp_local_sep *lsep,
+@@ -93,6 +167,7 @@ static void close_cfm(struct avdtp *session, struct avdtp_local_sep *lsep,
+ {
+ 	printf("%s\n", __func__);
+ 
++	stop_media_player();
+ 	avdtp_stream = NULL;
+ }
+ 
+@@ -102,6 +177,7 @@ static void abort_cfm(struct avdtp *session, struct avdtp_local_sep *lsep,
+ {
+ 	printf("%s\n", __func__);
+ 
++	stop_media_player();
+ 	avdtp_stream = NULL;
+ }
+ 
+@@ -133,8 +209,6 @@ static struct avdtp_sep_cfm sep_cfm = {
+ 	.delay_report		= delay_report_cfm,
+ };
+ 
+-static const char sbc_codec[] = {0x00, 0x00, 0xff, 0xff, 0x02, 0x40};
+-
+ static gboolean get_capability_ind(struct avdtp *session,
+ 					struct avdtp_local_sep *sep,
+ 					GSList **caps, uint8_t *err,
+@@ -196,6 +270,8 @@ static gboolean start_ind(struct avdtp *session, struct avdtp_local_sep *lsep,
+ {
+ 	printf("%s\n", __func__);
+ 
++	start_media_player();
++
+ 	return TRUE;
+ }
+ 
+@@ -206,7 +282,9 @@ static gboolean suspend_ind(struct avdtp *session,
+ {
+ 	printf("%s\n", __func__);
+ 
+-	return FALSE;
++	stop_media_player();
++
++	return TRUE;
+ }
+ 
+ static gboolean close_ind(struct avdtp *session, struct avdtp_local_sep *sep,
+@@ -215,7 +293,10 @@ static gboolean close_ind(struct avdtp *session, struct avdtp_local_sep *sep,
+ {
+ 	printf("%s\n", __func__);
+ 
+-	return FALSE;
++	stop_media_player();
++	avdtp_stream = NULL;
++
++	return TRUE;
+ }
+ 
+ static void abort_ind(struct avdtp *session, struct avdtp_local_sep *sep,
+@@ -223,6 +304,9 @@ static void abort_ind(struct avdtp *session, struct avdtp_local_sep *sep,
+ 			void *user_data)
+ {
+ 	printf("%s\n", __func__);
++
++	stop_media_player();
++	avdtp_stream = NULL;
+ }
+ 
+ static gboolean reconfigure_ind(struct avdtp *session,
 -- 
 1.9.1
 
