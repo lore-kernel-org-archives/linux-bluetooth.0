@@ -2,14 +2,14 @@ Return-Path: <cyrus@holtmann.org>
 From: Gu Chaojie <chao.jie.gu@intel.com>
 To: linux-bluetooth@vger.kernel.org, marcel@holmann.org,
 	armansito@chromium.org
-Cc: Chaojie Gu <chao.jie.gu@intel.com>
+Cc: Changlong Xie <changlongx.xie@intel.com>
 Subject: [PATCH] gatt api V2
-Date: Fri, 29 Aug 2014 14:59:26 +0800
-Message-Id: <1409295566-13583-1-git-send-email-chao.jie.gu@intel.com>
+Date: Fri, 29 Aug 2014 14:44:36 +0800
+Message-Id: <1409294676-13367-1-git-send-email-chao.jie.gu@intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Chaojie Gu <chao.jie.gu@intel.com>
+From: Changlong Xie <changlongx.xie@intel.com>
 
 This patch focus on implementing the Gatt DBus API defined in gatt-api.txt discussed in mailist latestly. It implement all the DBus property and method except for array{object} of characteristics and descriptors. Through our internal test, patche work well. I would like to contribute this featrue for bluez upstream. This first patch is just an implementation, maybe not very closely suitable for design or put in the right file. It would be OK to modify to make more sense.
 Arman, Marcel, would you like to review the patch and give some suggestion for the patch? It would be great honor for me to contribute little to bluez.
