@@ -2,197 +2,127 @@ Return-Path: <cyrus@holtmann.org>
 From: Arman Uguray <armansito@chromium.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Arman Uguray <armansito@chromium.org>
-Subject: [PATCH BlueZ v2 3/7] tools/btgatt-client: Integrate bt_att and bt_gatt_client.
-Date: Sat, 30 Aug 2014 09:02:45 -0700
-Message-Id: <1409414569-20068-4-git-send-email-armansito@chromium.org>
+Subject: [PATCH BlueZ v2 5/7] tools/btgatt-client: Add "ready" handler.
+Date: Sat, 30 Aug 2014 09:02:47 -0700
+Message-Id: <1409414569-20068-6-git-send-email-armansito@chromium.org>
 In-Reply-To: <1409414569-20068-1-git-send-email-armansito@chromium.org>
 References: <1409414569-20068-1-git-send-email-armansito@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch adds the initial set up of a bt_att and bt_gatt_client around the
-connection socket.
+Added a ready handler which gets called by bt_gatt_client when the MTU exchange
+and service discovery procedures complete. Also added some (bad) coloring for
+verbose output.
 ---
- tools/btgatt-client.c | 117 ++++++++++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 114 insertions(+), 3 deletions(-)
+ tools/btgatt-client.c | 48 ++++++++++++++++++++++++++++++++++++++++--------
+ 1 file changed, 40 insertions(+), 8 deletions(-)
 
 diff --git a/tools/btgatt-client.c b/tools/btgatt-client.c
-index 30e8e50..008cc9f 100644
+index 26f2d14..6299586 100644
 --- a/tools/btgatt-client.c
 +++ b/tools/btgatt-client.c
-@@ -39,17 +39,98 @@
- #include <bluetooth/l2cap.h>
- 
- #include "monitor/mainloop.h"
-+#include "src/shared/util.h"
-+#include "src/shared/att.h"
-+#include "src/shared/gatt-client.h"
+@@ -45,8 +45,17 @@
  
  #define ATT_CID 4
  
-+#define PRLOG(format, ...) \
-+	printf(format, __VA_ARGS__); print_prompt();
+-#define PRLOG(format, ...) \
+-	printf(format, __VA_ARGS__); print_prompt();
++#define PRLOG(...) \
++	printf(__VA_ARGS__); print_prompt();
 +
++#define COLOR_OFF	"\x1B[0m"
++#define COLOR_RED	"\x1B[0;91m"
++#define COLOR_GREEN	"\x1B[0;92m"
++#define COLOR_YELLOW	"\x1B[0;93m"
++#define COLOR_BLUE	"\x1B[0;94m"
++#define COLOR_MAGENTA	"\x1B[0;95m"
++#define COLOR_BOLDGRAY	"\x1B[1;30m"
++#define COLOR_BOLDWHITE	"\x1B[1;37m"
+ 
  static bool verbose = false;
  
-+struct client {
-+	int fd;
-+	struct bt_gatt_client *gatt;
-+};
-+
+@@ -57,7 +66,7 @@ struct client {
+ 
  static void print_prompt(void)
  {
- 	printf("[GATT client]# ");
+-	printf("[GATT client]# ");
++	printf(COLOR_BLUE "[GATT client]" COLOR_OFF "# ");
  	fflush(stdout);
  }
  
-+static void att_disconnect_cb(void *user_data)
-+{
-+	printf("Device disconnected\n");
-+
-+	mainloop_quit();
-+}
-+
-+static void att_debug(const char *str, void *user_data)
+@@ -68,13 +77,22 @@ static void att_disconnect_cb(void *user_data)
+ 	mainloop_quit();
+ }
+ 
+-static void debug_cb(const char *str, void *user_data)
++static void att_debug_cb(const char *str, void *user_data)
+ {
+ 	const char *prefix = user_data;
+ 
+-	PRLOG("%s%s\n", prefix, str);
++	PRLOG(COLOR_BOLDGRAY "%s" COLOR_BOLDWHITE "%s\n" COLOR_OFF, prefix, str);
+ }
+ 
++static void gatt_debug_cb(const char *str, void *user_data)
 +{
 +	const char *prefix = user_data;
 +
-+	PRLOG("%s%s\n", prefix, str);
++	PRLOG(COLOR_GREEN "%s%s\n" COLOR_OFF, prefix, str);
 +}
 +
-+static struct client *client_create(int fd, uint16_t mtu)
-+{
-+	struct client *cli;
-+	struct bt_att *att;
++static void ready_cb(bool success, uint8_t att_ecode, void *user_data);
 +
-+	cli = new0(struct client, 1);
-+	if (!cli) {
-+		fprintf(stderr, "Failed to allocate memory for client\n");
-+		return NULL;
-+	}
-+
-+	att = bt_att_new(fd);
-+	if (!att) {
-+		fprintf(stderr, "Failed to initialze ATT transport layer\n");
-+		bt_att_unref(att);
-+		free(cli);
-+		return NULL;
-+	}
-+
-+	if (!bt_att_set_close_on_unref(att, true)) {
-+		fprintf(stderr, "Failed to set up ATT transport layer\n");
-+		bt_att_unref(att);
-+		free(cli);
-+		return NULL;
-+	}
-+
-+	if (!bt_att_register_disconnect(att, att_disconnect_cb, NULL, NULL)) {
-+		fprintf(stderr, "Failed to set ATT disconnect handler\n");
-+		bt_att_unref(att);
-+		free(cli);
-+		return NULL;
-+	}
-+
-+	if (verbose)
-+		bt_att_set_debug(att, att_debug, "att: ", NULL);
-+
-+	cli->fd = fd;
-+	cli->gatt = bt_gatt_client_new(att, mtu);
-+	if (!cli->gatt) {
-+		fprintf(stderr, "Failed to create GATT client\n");
-+		bt_att_unref(att);
-+		free(cli);
-+		return NULL;
-+	}
-+
-+	/* bt_gatt_client already holds a reference */
-+	bt_att_unref(att);
-+
-+	return cli;
-+}
-+
-+static void client_destroy(struct client *cli)
-+{
-+	bt_gatt_client_unref(cli->gatt);
-+}
-+
- static void prompt_read_cb(int fd, uint32_t events, void *user_data)
+ static struct client *client_create(int fd, uint16_t mtu)
  {
- 	size_t len = 0;
-@@ -70,6 +151,18 @@ static void prompt_read_cb(int fd, uint32_t events, void *user_data)
- 	free(line);
- }
- 
-+static void signal_cb(int signum, void *user_data)
-+{
-+	switch (signum) {
-+	case SIGINT:
-+	case SIGTERM:
-+		mainloop_quit();
-+		break;
-+	default:
-+		break;
-+	}
-+}
-+
- static int l2cap_le_att_connect(bdaddr_t *src, bdaddr_t *dst, uint8_t dst_type,
- 									int sec)
- {
-@@ -83,9 +176,9 @@ static int l2cap_le_att_connect(bdaddr_t *src, bdaddr_t *dst, uint8_t dst_type,
- 		ba2str(src, srcaddr_str);
- 		ba2str(dst, dstaddr_str);
- 
--		printf("Opening L2CAP LE connection on ATT channel:\n"
--						"\t src: %s\n\tdest: %s\n",
--						srcaddr_str, dstaddr_str);
-+		printf("btgatt-client: Opening L2CAP LE connection on ATT "
-+					"channel:\n\t src: %s\n\tdest: %s\n",
-+					srcaddr_str, dstaddr_str);
+ 	struct client *cli;
+@@ -118,11 +136,13 @@ static struct client *client_create(int fd, uint16_t mtu)
  	}
  
- 	sock = socket(PF_BLUETOOTH, SOCK_SEQPACKET, BTPROTO_L2CAP);
-@@ -175,6 +268,8 @@ int main(int argc, char *argv[])
- 	bdaddr_t src_addr, dst_addr;
- 	int dev_id = -1;
- 	int fd;
-+	sigset_t mask;
-+	struct client *cli;
- 
- 	while ((opt = getopt_long(argc, argv, "+hvs:m:t:d:i:",
- 						main_options, NULL)) != -1) {
-@@ -281,6 +376,12 @@ int main(int argc, char *argv[])
- 	if (fd < 0)
- 		return EXIT_FAILURE;
- 
-+	cli = client_create(fd, mtu);
-+	if (!cli) {
-+		close(fd);
-+		return EXIT_FAILURE;
-+	}
-+
- 	if (mainloop_add_fd(fileno(stdin),
- 				EPOLLIN | EPOLLRDHUP | EPOLLHUP | EPOLLERR,
- 				prompt_read_cb, NULL, NULL) < 0) {
-@@ -288,9 +389,19 @@ int main(int argc, char *argv[])
- 		return EXIT_FAILURE;
+ 	if (verbose) {
+-		bt_att_set_debug(att, debug_cb, "att: ", NULL);
+-		bt_gatt_client_set_debug(cli->gatt, debug_cb, "gatt-client: ",
++		bt_att_set_debug(att, att_debug_cb, "att: ", NULL);
++		bt_gatt_client_set_debug(cli->gatt, gatt_debug_cb, "gatt: ",
+ 									NULL);
  	}
  
-+	sigemptyset(&mask);
-+	sigaddset(&mask, SIGINT);
-+	sigaddset(&mask, SIGTERM);
++	bt_gatt_client_set_ready_handler(cli->gatt, ready_cb, cli, NULL);
 +
-+	mainloop_set_signal(&mask, signal_cb, NULL, NULL);
-+
- 	print_prompt();
+ 	/* bt_gatt_client already holds a reference */
+ 	bt_att_unref(att);
  
- 	mainloop_run();
- 
-+	printf("\n\nShutting down...\n");
-+
-+	client_destroy(cli);
-+
- 	return EXIT_SUCCESS;
+@@ -134,11 +154,21 @@ static void client_destroy(struct client *cli)
+ 	bt_gatt_client_unref(cli->gatt);
  }
+ 
++static void ready_cb(bool success, uint8_t att_ecode, void *user_data)
++{
++	if (!success) {
++		PRLOG("GATT discovery procedures failed - error code: 0x02%x\n",
++								att_ecode);
++		return;
++	}
+ 
+-typedef void (*command_func_t)(struct client *cli);
++	PRLOG("GATT discovery procedures complete\n");
++}
+ 
+ static void cmd_help(struct client *cli);
+ 
++typedef void (*command_func_t)(struct client *cli);
++
+ static struct {
+ 	char *cmd;
+ 	command_func_t func;
+@@ -178,6 +208,8 @@ static void prompt_read_cb(int fd, uint32_t events, void *user_data)
+ 			break;
+ 	}
+ 
++	print_prompt();
++
+ 	if (command[i].cmd)
+ 		command[i].func(cli);
+ 	else
 -- 
 2.1.0.rc2.206.gedb03e5
 
