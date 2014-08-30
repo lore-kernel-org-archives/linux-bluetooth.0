@@ -1,41 +1,29 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.6\))
-Subject: Re: [PATCH BlueZ v2 0/7] Introduce tools/btgatt-client.
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1409414569-20068-1-git-send-email-armansito@chromium.org>
-Date: Sat, 30 Aug 2014 09:48:25 -0700
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <07455C3A-D687-41EC-ABFF-40AD17618045@holtmann.org>
-References: <1409414569-20068-1-git-send-email-armansito@chromium.org>
-To: Arman Uguray <armansito@chromium.org>
-Sender: linux-bluetooth-owner@vger.kernel.org
+MIME-Version: 1.0
+Sender: armansito@google.com
+In-Reply-To: <0392E87D-1C2E-4921-A94F-2D94BD38DCF7@holtmann.org>
+References: <1407789427-7118-1-git-send-email-armansito@chromium.org>
+	<1407789427-7118-2-git-send-email-armansito@chromium.org>
+	<0392E87D-1C2E-4921-A94F-2D94BD38DCF7@holtmann.org>
+Date: Sat, 30 Aug 2014 09:06:47 -0700
+Message-ID: <CAHrH25RGYy3_YamDxcwAT8N5-De+g4UxG8BuS8qK-konEc3HqQ@mail.gmail.com>
+Subject: Re: [RFC v2 1/1] doc/gatt-api: New API properties and methods for the
+ GATT D-Bus API.
+From: Arman Uguray <armansito@chromium.org>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Arman,
+Hi Marcel,
 
-> * v2: Rebased on latest master & fixed conflicts in Makefile.tools
-> * v1: Removed L2CAP_LM socket options; using only BT_SECURITY now.
-> 
-> Arman Uguray (7):
->  tools/btgatt-client: Introduce tools/btgatt-client
->  tools/btgatt-client: Added L2CAP LE ATT connection.
->  tools/btgatt-client: Integrate bt_att and bt_gatt_client.
->  tools/btgatt-client: Add command parsing.
->  tools/btgatt-client: Add "ready" handler.
->  tools/btgatt-client: Add "services" command.
->  tools/btgatt: Add command argument support.
-> 
-> Makefile.tools        |  13 +-
-> tools/btgatt-client.c | 657 ++++++++++++++++++++++++++++++++++++++++++++++++++
-> 2 files changed, 669 insertions(+), 1 deletion(-)
-> create mode 100644 tools/btgatt-client.c
 
-all 7 patches have been applied.
+> I honestly forgot where we left off with this. I remember vaguely that the patch for the API document should got upstream, but I do not remember if it was this version or not. It also seems that neither Johan nor Luiz picked it up.
+>
 
-When adding new tools you need to remember to add the binary to .gitignore.
+The latest patch set was v2 (which is this one). I think I addressed
+all the concerns from the last two patches here though haven't heard
+from anyone since then.
 
-Regards
-
-Marcel
-
+Thanks,
+-Arman
