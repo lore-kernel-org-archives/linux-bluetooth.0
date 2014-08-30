@@ -2,124 +2,197 @@ Return-Path: <cyrus@holtmann.org>
 From: Arman Uguray <armansito@chromium.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Arman Uguray <armansito@chromium.org>
-Subject: [PATCH BlueZ v2 4/7] tools/btgatt-client: Add command parsing.
-Date: Sat, 30 Aug 2014 09:02:46 -0700
-Message-Id: <1409414569-20068-5-git-send-email-armansito@chromium.org>
+Subject: [PATCH BlueZ v2 3/7] tools/btgatt-client: Integrate bt_att and bt_gatt_client.
+Date: Sat, 30 Aug 2014 09:02:45 -0700
+Message-Id: <1409414569-20068-4-git-send-email-armansito@chromium.org>
 In-Reply-To: <1409414569-20068-1-git-send-email-armansito@chromium.org>
 References: <1409414569-20068-1-git-send-email-armansito@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Added basic support for command parsing, including the "help" command. Also
-added a call to bt_gatt_client_set_debug.
+This patch adds the initial set up of a bt_att and bt_gatt_client around the
+connection socket.
 ---
- tools/btgatt-client.c | 53 +++++++++++++++++++++++++++++++++++++++++++--------
- 1 file changed, 45 insertions(+), 8 deletions(-)
+ tools/btgatt-client.c | 117 ++++++++++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 114 insertions(+), 3 deletions(-)
 
 diff --git a/tools/btgatt-client.c b/tools/btgatt-client.c
-index 008cc9f..26f2d14 100644
+index 30e8e50..008cc9f 100644
 --- a/tools/btgatt-client.c
 +++ b/tools/btgatt-client.c
-@@ -68,7 +68,7 @@ static void att_disconnect_cb(void *user_data)
- 	mainloop_quit();
- }
+@@ -39,17 +39,98 @@
+ #include <bluetooth/l2cap.h>
  
--static void att_debug(const char *str, void *user_data)
-+static void debug_cb(const char *str, void *user_data)
- {
- 	const char *prefix = user_data;
+ #include "monitor/mainloop.h"
++#include "src/shared/util.h"
++#include "src/shared/att.h"
++#include "src/shared/gatt-client.h"
  
-@@ -108,9 +108,6 @@ static struct client *client_create(int fd, uint16_t mtu)
- 		return NULL;
- 	}
+ #define ATT_CID 4
  
--	if (verbose)
--		bt_att_set_debug(att, att_debug, "att: ", NULL);
--
- 	cli->fd = fd;
- 	cli->gatt = bt_gatt_client_new(att, mtu);
- 	if (!cli->gatt) {
-@@ -120,6 +117,12 @@ static struct client *client_create(int fd, uint16_t mtu)
- 		return NULL;
- 	}
- 
-+	if (verbose) {
-+		bt_att_set_debug(att, debug_cb, "att: ", NULL);
-+		bt_gatt_client_set_debug(cli->gatt, debug_cb, "gatt-client: ",
-+									NULL);
-+	}
++#define PRLOG(format, ...) \
++	printf(format, __VA_ARGS__); print_prompt();
 +
- 	/* bt_gatt_client already holds a reference */
- 	bt_att_unref(att);
+ static bool verbose = false;
  
-@@ -131,21 +134,55 @@ static void client_destroy(struct client *cli)
- 	bt_gatt_client_unref(cli->gatt);
- }
- 
-+
-+typedef void (*command_func_t)(struct client *cli);
-+
-+static void cmd_help(struct client *cli);
-+
-+static struct {
-+	char *cmd;
-+	command_func_t func;
-+	char *doc;
-+} command[] = {
-+	{ "help", cmd_help, "\tDisplay help message" },
-+	{ }
++struct client {
++	int fd;
++	struct bt_gatt_client *gatt;
 +};
 +
-+static void cmd_help(struct client *cli)
+ static void print_prompt(void)
+ {
+ 	printf("[GATT client]# ");
+ 	fflush(stdout);
+ }
+ 
++static void att_disconnect_cb(void *user_data)
 +{
-+	int i;
++	printf("Device disconnected\n");
 +
-+	printf("Commands:\n");
-+	for (i = 0; command[i].cmd; i++)
-+		printf("\t%-15s\t%s\n", command[i].cmd, command[i].doc);
++	mainloop_quit();
++}
++
++static void att_debug(const char *str, void *user_data)
++{
++	const char *prefix = user_data;
++
++	PRLOG("%s%s\n", prefix, str);
++}
++
++static struct client *client_create(int fd, uint16_t mtu)
++{
++	struct client *cli;
++	struct bt_att *att;
++
++	cli = new0(struct client, 1);
++	if (!cli) {
++		fprintf(stderr, "Failed to allocate memory for client\n");
++		return NULL;
++	}
++
++	att = bt_att_new(fd);
++	if (!att) {
++		fprintf(stderr, "Failed to initialze ATT transport layer\n");
++		bt_att_unref(att);
++		free(cli);
++		return NULL;
++	}
++
++	if (!bt_att_set_close_on_unref(att, true)) {
++		fprintf(stderr, "Failed to set up ATT transport layer\n");
++		bt_att_unref(att);
++		free(cli);
++		return NULL;
++	}
++
++	if (!bt_att_register_disconnect(att, att_disconnect_cb, NULL, NULL)) {
++		fprintf(stderr, "Failed to set ATT disconnect handler\n");
++		bt_att_unref(att);
++		free(cli);
++		return NULL;
++	}
++
++	if (verbose)
++		bt_att_set_debug(att, att_debug, "att: ", NULL);
++
++	cli->fd = fd;
++	cli->gatt = bt_gatt_client_new(att, mtu);
++	if (!cli->gatt) {
++		fprintf(stderr, "Failed to create GATT client\n");
++		bt_att_unref(att);
++		free(cli);
++		return NULL;
++	}
++
++	/* bt_gatt_client already holds a reference */
++	bt_att_unref(att);
++
++	return cli;
++}
++
++static void client_destroy(struct client *cli)
++{
++	bt_gatt_client_unref(cli->gatt);
 +}
 +
  static void prompt_read_cb(int fd, uint32_t events, void *user_data)
  {
-+	ssize_t read;
  	size_t len = 0;
- 	char *line = NULL;
-+	struct client *cli = user_data;
-+	int i;
+@@ -70,6 +151,18 @@ static void prompt_read_cb(int fd, uint32_t events, void *user_data)
+ 	free(line);
+ }
  
- 	if (events & (EPOLLRDHUP | EPOLLHUP | EPOLLERR)) {
- 		mainloop_quit();
- 		return;
++static void signal_cb(int signum, void *user_data)
++{
++	switch (signum) {
++	case SIGINT:
++	case SIGTERM:
++		mainloop_quit();
++		break;
++	default:
++		break;
++	}
++}
++
+ static int l2cap_le_att_connect(bdaddr_t *src, bdaddr_t *dst, uint8_t dst_type,
+ 									int sec)
+ {
+@@ -83,9 +176,9 @@ static int l2cap_le_att_connect(bdaddr_t *src, bdaddr_t *dst, uint8_t dst_type,
+ 		ba2str(src, srcaddr_str);
+ 		ba2str(dst, dstaddr_str);
+ 
+-		printf("Opening L2CAP LE connection on ATT channel:\n"
+-						"\t src: %s\n\tdest: %s\n",
+-						srcaddr_str, dstaddr_str);
++		printf("btgatt-client: Opening L2CAP LE connection on ATT "
++					"channel:\n\t src: %s\n\tdest: %s\n",
++					srcaddr_str, dstaddr_str);
  	}
  
--	if (getline(&line, &len, stdin) == -1)
-+	if ((read = getline(&line, &len, stdin)) == -1)
- 		return;
+ 	sock = socket(PF_BLUETOOTH, SOCK_SEQPACKET, BTPROTO_L2CAP);
+@@ -175,6 +268,8 @@ int main(int argc, char *argv[])
+ 	bdaddr_t src_addr, dst_addr;
+ 	int dev_id = -1;
+ 	int fd;
++	sigset_t mask;
++	struct client *cli;
  
--	/* TODO: Process commands here */
--	printf("  Typed line: %s\n", line);
-+	for (i = 0; command[i].cmd; i++) {
-+		if (strncmp(command[i].cmd, line, read - 1) == 0)
-+			break;
+ 	while ((opt = getopt_long(argc, argv, "+hvs:m:t:d:i:",
+ 						main_options, NULL)) != -1) {
+@@ -281,6 +376,12 @@ int main(int argc, char *argv[])
+ 	if (fd < 0)
+ 		return EXIT_FAILURE;
+ 
++	cli = client_create(fd, mtu);
++	if (!cli) {
++		close(fd);
++		return EXIT_FAILURE;
 +	}
 +
-+	if (command[i].cmd)
-+		command[i].func(cli);
-+	else
-+		fprintf(stderr, "Unknown command: %s\n", line);
+ 	if (mainloop_add_fd(fileno(stdin),
+ 				EPOLLIN | EPOLLRDHUP | EPOLLHUP | EPOLLERR,
+ 				prompt_read_cb, NULL, NULL) < 0) {
+@@ -288,9 +389,19 @@ int main(int argc, char *argv[])
+ 		return EXIT_FAILURE;
+ 	}
+ 
++	sigemptyset(&mask);
++	sigaddset(&mask, SIGINT);
++	sigaddset(&mask, SIGTERM);
++
++	mainloop_set_signal(&mask, signal_cb, NULL, NULL);
 +
  	print_prompt();
  
- 	free(line);
-@@ -384,7 +421,7 @@ int main(int argc, char *argv[])
+ 	mainloop_run();
  
- 	if (mainloop_add_fd(fileno(stdin),
- 				EPOLLIN | EPOLLRDHUP | EPOLLHUP | EPOLLERR,
--				prompt_read_cb, NULL, NULL) < 0) {
-+				prompt_read_cb, cli, NULL) < 0) {
- 		fprintf(stderr, "Failed to initialize console\n");
- 		return EXIT_FAILURE;
- 	}
++	printf("\n\nShutting down...\n");
++
++	client_destroy(cli);
++
+ 	return EXIT_SUCCESS;
+ }
 -- 
 2.1.0.rc2.206.gedb03e5
 
