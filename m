@@ -1,185 +1,108 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Mon, 1 Sep 2014 13:38:37 +0200
+From: Alexander Aring <alex.aring@gmail.com>
+To: Jukka Rissanen <jukka.rissanen@linux.intel.com>
+Cc: linux-wpan@vger.kernel.org, linux-bluetooth@vger.kernel.org
+Subject: Re: 6lowpan status
+Message-ID: <20140901113835.GA21564@omega>
+References: <1409567774.3120.57.camel@jrissane-mobl.ger.corp.intel.com>
 MIME-Version: 1.0
-In-Reply-To: <1409344766-6798-1-git-send-email-lukasz.rymanowski@tieto.com>
-References: <1409344766-6798-1-git-send-email-lukasz.rymanowski@tieto.com>
-Date: Mon, 1 Sep 2014 14:08:11 +0200
-Message-ID: <CAMudyAt0W7v_WUCsjm-uofPGja-4Cp8o+NVwtxoT2tSNRcnQ5A@mail.gmail.com>
-Subject: Re: [PATCH] Bluetooth: Fix race on incoming connection
-From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Cc: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>,
-	Johan Hedberg <johan.hedberg@gmail.com>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=utf-8
+In-Reply-To: <1409567774.3120.57.camel@jrissane-mobl.ger.corp.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi,
 
-On 29 August 2014 22:39, Lukasz Rymanowski <lukasz.rymanowski@tieto.com> wrote:
->
-> This patch fix race on incoming connection which leads to situaction
-> when New Link Key Event is sent to user space before Device Connected
-> Event.
->
+On Mon, Sep 01, 2014 at 01:36:14PM +0300, Jukka Rissanen wrote:
+> Hi Alex,
+> 
+> I saw your RFC mail (9 Aug) about generic compression layer. Was there
+> any functionality changes by this RFC or was it just refactoring the
+> code?
+> 
 
-I had a discussion on IRC about that issue with Johan and he correctly
-point out that downside of this patch is that user space will not get
-remote device name. However same thing kernel does on
-l2cap_connect_req.
+It's not just refactoring. The point is that there are many of RFC's
+outside which declare a next header compession format (like UDP). UDP is
+the only one next header compression which we currenlty support. If we
+don't add a layer to add a new header compression format, all people
+hack this into the iphc.c file. I don't know what you think about this
+but I really don't like that.
 
-What we could do here is some Device Name Update Event or similar, so
-eventually user space will get remote device name.
+This code adds a layer for this and supports all other known next header
+compression formats in the way that we drop the packets afterwards
+instead of deliver garabage to next layer (IPv6).
 
-We can also say  that this kernel behavior is OK ( frankly speaking
-BlueZ is handling it correctly) , then I do suggest to update
-mgmt-api.txt file with some note saying that "other pairing related
-events might come before that Device Connected Event".
+The layer avoids that everybody hacks static code into iphc file.
 
-Anyway, as mentioned above, this issue is not a problem for BlueZ but
-only BfA. It is because BlueZ is not that strict when it comes to
-event order. That is why I will do fix for BfA for now, so it can
-handle that case similar to BlueZ (Johan is OK with that), and then we
-think what to do with kernel (if anything)
+Please let me know if this is okay for you, then I will send a v2 with
+changes.
 
-> Logs:
-> > HCI Event: Connect Request (0x04) plen 10
->         Address: 00:AA:01:01:00:00 (OUI 00-AA-01)
->         Class: 0x000000
->           Major class: Miscellaneous
->           Minor class: 0x00
->         Link type: ACL (0x01)
-> < HCI Command: Accept Connection Request (0x01|0x0009) plen 7
->         Address: 00:AA:01:01:00:00 (OUI 00-AA-01)
->         Role: Slave (0x01)
-> > HCI Event: Command Status (0x0f) plen 4
->       Accept Connection Request (0x01|0x0009) ncmd 1
->         Status: Success (0x00)
-> > HCI Event: Connect Complete (0x03) plen 11
->         Status: Success (0x00)
->         Handle: 42
->         Address: 00:AA:01:01:00:00 (OUI 00-AA-01)
->         Link type: ACL (0x01)
->         Encryption: Disabled (0x00)
-> > HCI Event: IO Capability Response (0x32) plen 9
->         Address: 00:AA:01:01:00:00 (OUI 00-AA-01)
->         IO capability: NoInputNoOutput (0x03)
->         OOB data: Authentication data not present (0x00)
->         Authentication: No Bonding - MITM not required (0x00)
-> > HCI Event: IO Capability Request (0x31) plen 6
->         Address: 00:AA:01:01:00:00 (OUI 00-AA-01)
-> < HCI Command: Read Remote Supported Features (0x01|0x001b) plen 2
->         Handle: 42
-> > HCI Event: Command Status (0x0f) plen 4
->       Read Remote Supported Features (0x01|0x001b) ncmd 1
->         Status: Success (0x00)
-> > HCI Event: Read Remote Supported Features (0x0b) plen 11
->         Handle: 42
->         Features: 0xa4 0x08 0x00 0xc0 0x18 0x1e 0x79 0x83
->           Encryption
->           Role switch
->           Sniff mode
->           SCO link
->           RSSI with inquiry results
->           Extended SCO link (EV3 packets)
->           AFH capable slave
->           AFH classification slave
->           Sniff subrating
->           Pause encryption
->           AFH capable master
->           AFH classification master
->           Extended Inquiry Response
->           Secure Simple Pairing
->           Encapsulated PDU
->           Erroneous Data Reporting
->           Non-flushable Packet Boundary Flag
->           Link Supervision Timeout Changed Event
->           Inquiry TX Power Level
->           Extended features
-> < HCI Command: IO Capability Request Reply (0x01|0x002b) plen 9
->         Address: 00:AA:01:01:00:00 (OUI 00-AA-01)
->         IO capability: DisplayYesNo (0x01)
->         OOB data: Authentication data not present (0x00)
->         Authentication: No Bonding - MITM not required (0x00)
-> > HCI Event: User Confirmation Request (0x33) plen 10
->         Address: 00:AA:01:01:00:00 (OUI 00-AA-01)
->         Passkey: 000000
-> > HCI Event: Command Complete (0x0e) plen 10
->       IO Capability Request Reply (0x01|0x002b) ncmd 1
->         Status: Success (0x00)
->         Address: 00:AA:01:01:00:00 (OUI 00-AA-01)
-> < HCI Command: Read Remote Extended Features (0x01|0x001c) plen 3
->         Handle: 42
->         Page: 1
-> > HCI Event: Command Status (0x0f) plen 4
->       Read Remote Extended Features (0x01|0x001c) ncmd 1
->         Status: Success (0x00)
-> > HCI Event: Read Remote Extended Features (0x23) plen 13
->         Status: Success (0x00)
->         Handle: 42
->         Page: 1/1
->         Features: 0x01 0x00 0x00 0x00 0x00 0x00 0x00 0x00
->           Secure Simple Pairing (Host Support)
-> < HCI Command: User Confirmation Request Reply (0x01|0x002c) plen 6
->         Address: 00:AA:01:01:00:00 (OUI 00-AA-01)
-> > HCI Event: Command Complete (0x0e) plen 10
->         Status: Success (0x00)
->         Address: 00:AA:01:01:00:00 (OUI 00-AA-01)
-> > HCI Event: Simple Pairing Complete (0x36) plen 7
->         Status: Success (0x00)
->         Address: 00:AA:01:01:00:00 (OUI 00-AA-01)
-> > HCI Event: Link Key Notification (0x18) plen 23
->         Address: 00:AA:01:01:00:00 (OUI 00-AA-01)
->         Link key: 00010203040506070809000102030405
->         Key type: Unauthenticated Combination key from P-256 (0x07)
-> < HCI Command: Remote Name Request (0x01|0x0019) plen 10
->         Address: 00:AA:01:01:00:00 (OUI 00-AA-01)
->         Page scan repetition mode: R2 (0x02)
->         Page scan mode: Mandatory (0x00)
->         Clock offset: 0x0000
-> > HCI Event: Command Status (0x0f) plen 4
->       Remote Name Request (0x01|0x0019) ncmd 1
->         Status: Success (0x00)
-> > HCI Event: Remote Name Req Complete (0x07) plen 255
->         Status: Success (0x00)
->         Address: 00:AA:01:01:00:00 (OUI 00-AA-01)
->         Name:
-> > HCI Event: Encryption Change (0x08) plen 4
->         Status: Success (0x00)
->         Handle: 42
->         Encryption: Enabled with E0 (0x01)
-> @ New Link Key: 00:AA:01:01:00:00 (0)
-> @ Device Connected: 00:AA:01:01:00:00 (0) flags 0x0000
->
-> Signed-off-by: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-> ---
->  net/bluetooth/hci_event.c | 12 ++++++++++++
->  1 file changed, 12 insertions(+)
->
-> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-> index e6a496a..55c9d12 100644
-> --- a/net/bluetooth/hci_event.c
-> +++ b/net/bluetooth/hci_event.c
-> @@ -3649,6 +3649,18 @@ static void hci_io_capa_request_evt(struct hci_dev *hdev, struct sk_buff *skb)
->         if (!conn)
->                 goto unlock;
->
-> +       /* If flag HCI_CONN_MGMT_CONNECTED is not set in this point of time
-> +        * that means remote is very quick with authenthication request and
-> +        * kernel did make to ask for features and remote name.
-> +        * To make sure that userspace will get device connected event before
-> +        * any pairing related events, lets set HCI_CONN_MGMT_CONNECTED flag
-> +        * here and send device connected event.
-> +        */
-> +       if (!test_and_set_bit(HCI_CONN_MGMT_CONNECTED, &conn->flags))
-> +               mgmt_device_connected(hdev, &conn->dst, conn->type,
-> +                                     conn->dst_type, 0, NULL, 0,
-> +                                     conn->dev_class);
-> +
->         hci_conn_hold(conn);
->
->         if (!test_bit(HCI_MGMT, &hdev->dev_flags))
-> --
-> 1.8.4
->
+> Anyway, looks ok to me although I just browsed quickly through the code,
+> did not really review it :) Just wondering do we need more
+> subdirectories under 6lowpan or could we just put everything into
+> 6lowpan dir (just to keep it simple)? No big preference here thou.
+> 
 
-\Łukasz
+Don't know, but there is a unkown number of possible next header compression
+formats outside, we should split it in a new subdirectorie. What I
+actually mean, don't hack every next header compression format in a
+single file.
+
+For address compression/uncompression this is fine, there is no unknown
+numbers of compression ways.
+
+I know only IPHC and HC1. HC1 should be support for receiving side and
+it's obsolete, but this is rfc 4944 so it's only related to 802.15.4.
+
+Some or later we need to add support for this, but this should not used
+by bluetooth 6LoWPAN.
+
+> I saw the mail from Varka Bhadram (6 Aug) about RFC 6775 support. That
+> looked interesting. Did you get the code from him (if yes, could you
+> also send it to me)? Do you know why this guy have not send this stuff
+> to upstream?
+> 
+
+The 802.15.4 mac layer has some neighbor discovery issues which are not
+solved currently. It's about two kinds of mac addresses, for bluetooth
+it should be fine. A small description about this problem is here [1].
+
+We need some way to trigger 6LoWPAN/Layer 2 data across the IPv6 layer
+and this isn't easy. Everything what we do on runtime decisions makes
+the IPv6 stack slower and we should avoid that.
+
+
+
+I currently working on a big rework of the 802.15.4 layer and will try
+to bring this mainline at end of this month. Our mac layer is currenlty
+in an not useable state. :(
+
+I don't have time to make some effort after IPv6, currently I work on
+the rework and will solve the two kind mac addresses issues with the
+neighbor discovery cache, then we are in some state which we don't have
+some broken support of functionality.
+
+
+Maybe simple talk with Varka about what he did there, because I don't
+really know what he exactly did there. The code what I saw isn't
+mainline able. [0] What I know that RFC 6775 and the actually
+implementation need to handle the two kinds of mac addresses (which is
+broken currenlty) and need support of context based address compression.
+
+I don't have time to add support for this. I need to rescue the 802.15.4
+layer. Sorry! Maybe after that... or maybe somebody will do this work.
+It sounds for me crazy to support RFC6775 which has dependencies on
+other functionality which we doesn't support right now. For bluetooth
+the mac layer works great, we only needs support for context based
+address compression then.
+
+
+I CC the new mailinglist for IEEE 802.15.4/IEEE 802.15.4 6LoWPAN
+"linux-wpan" and bluetooth. We should not talk about this under the
+hood.
+
+- Alex
+
+[0] https://www.mail-archive.com/linux-zigbee-devel%40lists.sourceforge.net/msg02018.html
+[1] http://www.spinics.net/lists/netdev/msg291767.html
