@@ -1,554 +1,126 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/6] android: Add initial code for AVDTP testing tool
-Date: Mon, 01 Sep 2014 16:15:26 +0200
-Message-ID: <1453621.czAvkRCTZy@uw000953>
-In-Reply-To: <1409318278-798-1-git-send-email-szymon.janc@tieto.com>
-References: <1409318278-798-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <006d01cfc5e0$6b4df110$41e9d330$@samsung.com>
+References: <000001cfb169$e4d01bc0$ae705340$@samsung.com>
+	<CABBYNZKTc7DYz5OSJOYm8uTDRzOOzfLMaOPGg-U7TTneaRiH_A@mail.gmail.com>
+	<002101cfb550$afb1f400$0f15dc00$@samsung.com>
+	<CABBYNZL5OBA6iNhzTkpKTmSEj+5R_oU5KLOAsFcK0ZDHvridMw@mail.gmail.com>
+	<006d01cfc5e0$6b4df110$41e9d330$@samsung.com>
+Date: Mon, 1 Sep 2014 16:07:22 +0300
+Message-ID: <CABBYNZJnyVNyw2-odAPV621k-aiw8x83WNju7FZXW0=_5VUotw@mail.gmail.com>
+Subject: Re: Query regarding MAP 1.2 implementation
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Gowtham Anandha Babu <gowtham.ab@samsung.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	Bharat Panda <bharat.panda@samsung.com>
+Content-Type: multipart/mixed; boundary=001a113403d0f6da31050200aed0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Friday 29 of August 2014 15:17:53 Szymon Janc wrote:
-> This tools is intended for AVDTP qualification with PTS.
-> ---
->  .gitignore          |   1 +
->  android/Android.mk  |  33 ++++
->  android/Makefile.am |  11 ++
->  android/avdtptest.c | 440 ++++++++++++++++++++++++++++++++++++++++++++++++++++
->  4 files changed, 485 insertions(+)
->  create mode 100644 android/avdtptest.c
-> 
-> diff --git a/.gitignore b/.gitignore
-> index 1ee35e2..b6ccbe3 100644
-> --- a/.gitignore
-> +++ b/.gitignore
-> @@ -125,6 +125,7 @@ doc/btmon.1
->  
->  android/system-emulator
->  android/bluetoothd
-> +android/avdtptest
->  android/mcaptest
->  android/haltest
->  android/android-tester
-> diff --git a/android/Android.mk b/android/Android.mk
-> index 35b8506..b2b55f7 100644
-> --- a/android/Android.mk
-> +++ b/android/Android.mk
-> @@ -223,6 +223,39 @@ LOCAL_MODULE := mcaptest
->  include $(BUILD_EXECUTABLE)
->  
->  #
-> +# avdtptest
-> +#
-> +
-> +include $(CLEAR_VARS)
-> +
-> +LOCAL_SRC_FILES := \
-> +	bluez/android/avdtptest.c \
-> +	bluez/android/avdtp.c \
-> +	bluez/src/log.c \
-> +	bluez/btio/btio.c \
-> +	bluez/lib/bluetooth.c \
-> +	bluez/lib/hci.c \
-> +
-> +LOCAL_C_INCLUDES += \
-> +	$(LOCAL_PATH)/bluez \
-> +	$(call include-path-for, glib) \
-> +	$(call include-path-for, glib)/glib \
-> +
-> +LOCAL_CFLAGS := $(BLUEZ_COMMON_CFLAGS)
-> +
-> +LOCAL_SHARED_LIBRARIES := \
-> +	libglib \
-> +
-> +LOCAL_STATIC_LIBRARIES := \
-> +	bluetooth-headers \
-> +
-> +LOCAL_MODULE_PATH := $(TARGET_OUT_OPTIONAL_EXECUTABLES)
-> +LOCAL_MODULE_TAGS := debug
-> +LOCAL_MODULE := avdtptest
-> +
-> +include $(BUILD_EXECUTABLE)
-> +
-> +#
->  # btmon
->  #
->  
-> diff --git a/android/Makefile.am b/android/Makefile.am
-> index 4b93c5b..e93a08b 100644
-> --- a/android/Makefile.am
-> +++ b/android/Makefile.am
-> @@ -109,6 +109,17 @@ android_mcaptest_CFLAGS = $(AM_CFLAGS)
->  
->  android_mcaptest_LDADD = lib/libbluetooth-internal.la @GLIB_LIBS@
->  
-> +noinst_PROGRAMS += android/avdtptest
-> +
-> +android_avdtptest_SOURCES = android/avdtptest.c \
-> +				src/log.h src/log.c \
-> +				btio/btio.h btio/btio.c \
-> +				android/avdtp.h android/avdtp.c
-> +
-> +android_avdtptest_CFLAGS = $(AM_CFLAGS)
-> +
-> +android_avdtptest_LDADD = lib/libbluetooth-internal.la @GLIB_LIBS@
-> +
->  noinst_PROGRAMS += android/haltest
->  
->  android_haltest_SOURCES = android/client/haltest.c \
-> diff --git a/android/avdtptest.c b/android/avdtptest.c
-> new file mode 100644
-> index 0000000..a986a9b
-> --- /dev/null
-> +++ b/android/avdtptest.c
-> @@ -0,0 +1,440 @@
-> +/*
-> + *
-> + *  BlueZ - Bluetooth protocol stack for Linux
-> + *
-> + *  Copyright (C) 2014 Intel Corporation
-> + *
-> + *
-> + *  This program is free software; you can redistribute it and/or modify
-> + *  it under the terms of the GNU General Public License as published by
-> + *  the Free Software Foundation; either version 2 of the License, or
-> + *  (at your option) any later version.
-> + *
-> + *  This program is distributed in the hope that it will be useful,
-> + *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-> + *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-> + *  GNU General Public License for more details.
-> + *
-> + *  You should have received a copy of the GNU General Public License
-> + *  along with this program; if not, write to the Free Software
-> + *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-> + *
-> + */
-> +
-> +#ifdef HAVE_CONFIG_H
-> +#include <config.h>
-> +#endif
-> +
-> +#include <stdio.h>
-> +#include <stdlib.h>
-> +#include <getopt.h>
-> +#include <unistd.h>
-> +#include <stdbool.h>
-> +
-> +#include <bluetooth/bluetooth.h>
-> +#include <bluetooth/hci.h>
-> +#include <bluetooth/hci_lib.h>
-> +
-> +#include <glib.h>
-> +
-> +#include "btio/btio.h"
-> +#include "avdtp.h"
-> +
-> +static GMainLoop *mainloop = NULL;
-> +static int dev_role = AVDTP_SEP_TYPE_SOURCE;
-> +static bool initiator = false;
-> +static struct avdtp *avdtp = NULL;
-> +struct avdtp_stream *avdtp_stream = NULL;
-> +struct avdtp_local_sep *local_sep = NULL;
-> +static GIOChannel *io = NULL;
-> +
-> +static void set_configuration_cfm(struct avdtp *session,
-> +					struct avdtp_local_sep *lsep,
-> +					struct avdtp_stream *stream,
-> +					struct avdtp_error *err,
-> +					void *user_data)
-> +{
-> +	printf("%s\n", __func__);
-> +}
-> +
-> +static void get_configuration_cfm(struct avdtp *session,
-> +					struct avdtp_local_sep *lsep,
-> +					struct avdtp_stream *stream,
-> +					struct avdtp_error *err,
-> +					void *user_data)
-> +	{
-> +	printf("%s\n", __func__);
-> +}
-> +
-> +static void open_cfm(struct avdtp *session, struct avdtp_local_sep *lsep,
-> +			struct avdtp_stream *stream, struct avdtp_error *err,
-> +			void *user_data)
-> +{
-> +	printf("%s\n", __func__);
-> +}
-> +
-> +static void start_cfm(struct avdtp *session, struct avdtp_local_sep *lsep,
-> +			struct avdtp_stream *stream, struct avdtp_error *err,
-> +			void *user_data)
-> +{
-> +	printf("%s\n", __func__);
-> +}
-> +
-> +static void suspend_cfm(struct avdtp *session, struct avdtp_local_sep *lsep,
-> +			struct avdtp_stream *stream,
-> +			struct avdtp_error *err, void *user_data)
-> +{
-> +	printf("%s\n", __func__);
-> +}
-> +
-> +static void close_cfm(struct avdtp *session, struct avdtp_local_sep *lsep,
-> +			struct avdtp_stream *stream,
-> +			struct avdtp_error *err, void *user_data)
-> +{
-> +	printf("%s\n", __func__);
-> +
-> +	avdtp_stream = NULL;
-> +}
-> +
-> +static void abort_cfm(struct avdtp *session, struct avdtp_local_sep *lsep,
-> +			struct avdtp_stream *stream,
-> +			struct avdtp_error *err, void *user_data)
-> +{
-> +	printf("%s\n", __func__);
-> +
-> +	avdtp_stream = NULL;
-> +}
-> +
-> +static void reconfigure_cfm(struct avdtp *session,
-> +				struct avdtp_local_sep *lsep,
-> +				struct avdtp_stream *stream,
-> +				struct avdtp_error *err, void *user_data)
-> +{
-> +	printf("%s\n", __func__);
-> +}
-> +
-> +static void delay_report_cfm(struct avdtp *session,
-> +				struct avdtp_local_sep *lsep,
-> +				struct avdtp_stream *stream,
-> +				struct avdtp_error *err, void *user_data)
-> +{
-> +	printf("%s\n", __func__);
-> +}
-> +
-> +static struct avdtp_sep_cfm sep_cfm = {
-> +	.set_configuration	= set_configuration_cfm,
-> +	.get_configuration	= get_configuration_cfm,
-> +	.open			= open_cfm,
-> +	.start			= start_cfm,
-> +	.suspend		= suspend_cfm,
-> +	.close			= close_cfm,
-> +	.abort			= abort_cfm,
-> +	.reconfigure		= reconfigure_cfm,
-> +	.delay_report		= delay_report_cfm,
-> +};
-> +
-> +static const char sbc_codec[] = {0x00, 0x00, 0xff, 0xff, 0x02, 0x40};
-> +
-> +static gboolean get_capability_ind(struct avdtp *session,
-> +					struct avdtp_local_sep *sep,
-> +					GSList **caps, uint8_t *err,
-> +					void *user_data)
-> +{
-> +	struct avdtp_service_capability *service;
-> +
-> +	printf("%s\n", __func__);
-> +
-> +	*caps = NULL;
-> +
-> +	service = avdtp_service_cap_new(AVDTP_MEDIA_TRANSPORT, NULL, 0);
-> +	*caps = g_slist_append(*caps, service);
-> +
-> +	service = avdtp_service_cap_new(AVDTP_MEDIA_CODEC, sbc_codec,
-> +							sizeof(sbc_codec));
-> +	*caps = g_slist_append(*caps, service);
-> +
-> +	return TRUE;
-> +}
-> +
-> +static gboolean set_configuration_ind(struct avdtp *session,
-> +					struct avdtp_local_sep *lsep,
-> +					struct avdtp_stream *stream,
-> +					GSList *caps,
-> +					avdtp_set_configuration_cb cb,
-> +					void *user_data)
-> +{
-> +	printf("%s\n", __func__);
-> +
-> +	avdtp_stream = stream;
-> +
-> +	cb(session, stream, NULL);
-> +
-> +	return TRUE;
-> +}
-> +
-> +static gboolean get_configuration_ind(struct avdtp *session,
-> +					struct avdtp_local_sep *lsep,
-> +					uint8_t *err, void *user_data)
-> +{
-> +	printf("%s\n", __func__);
-> +
-> +	return FALSE;
-> +}
-> +
-> +static gboolean open_ind(struct avdtp *session, struct avdtp_local_sep *lsep,
-> +				struct avdtp_stream *stream, uint8_t *err,
-> +				void *user_data)
-> +{
-> +	printf("%s\n", __func__);
-> +
-> +	return TRUE;
-> +}
-> +
-> +static gboolean start_ind(struct avdtp *session, struct avdtp_local_sep *lsep,
-> +				struct avdtp_stream *stream, uint8_t *err,
-> +				void *user_data)
-> +{
-> +	printf("%s\n", __func__);
-> +
-> +	return TRUE;
-> +}
-> +
-> +static gboolean suspend_ind(struct avdtp *session,
-> +				struct avdtp_local_sep *sep,
-> +				struct avdtp_stream *stream, uint8_t *err,
-> +				void *user_data)
-> +{
-> +	printf("%s\n", __func__);
-> +
-> +	return FALSE;
-> +}
-> +
-> +static gboolean close_ind(struct avdtp *session, struct avdtp_local_sep *sep,
-> +				struct avdtp_stream *stream, uint8_t *err,
-> +				void *user_data)
-> +{
-> +	printf("%s\n", __func__);
-> +
-> +	return FALSE;
-> +}
-> +
-> +static void abort_ind(struct avdtp *session, struct avdtp_local_sep *sep,
-> +			struct avdtp_stream *stream, uint8_t *err,
-> +			void *user_data)
-> +{
-> +	printf("%s\n", __func__);
-> +}
-> +
-> +static gboolean reconfigure_ind(struct avdtp *session,
-> +				struct avdtp_local_sep *lsep,
-> +				uint8_t *err, void *user_data)
-> +{
-> +	printf("%s\n", __func__);
-> +
-> +	return FALSE;
-> +}
-> +
-> +static gboolean delayreport_ind(struct avdtp *session,
-> +				struct avdtp_local_sep *lsep,
-> +				uint8_t rseid, uint16_t delay,
-> +				uint8_t *err, void *user_data)
-> +{
-> +	printf("%s\n", __func__);
-> +
-> +	return FALSE;
-> +}
-> +
-> +static struct avdtp_sep_ind sep_ind = {
-> +	.get_capability		= get_capability_ind,
-> +	.set_configuration	= set_configuration_ind,
-> +	.get_configuration	= get_configuration_ind,
-> +	.open			= open_ind,
-> +	.close			= close_ind,
-> +	.start			= start_ind,
-> +	.suspend		= suspend_ind,
-> +	.abort			= abort_ind,
-> +	.reconfigure		= reconfigure_ind,
-> +	.delayreport		= delayreport_ind,
-> +};
-> +
-> +static void disconnect_cb(void *user_data)
-> +{
-> +	printf("Disconnected\n");
-> +
-> +	g_main_loop_quit(mainloop);
-> +}
-> +
-> +static void connect_cb(GIOChannel *chan, GError *err, gpointer user_data)
-> +{
-> +	uint16_t imtu, omtu;
-> +	GError *gerr = NULL;
-> +	int fd;
-> +
-> +	if (err) {
-> +		printf("%s\n", err->message);
-> +		g_main_loop_quit(mainloop);
-> +		return;
-> +	}
-> +
-> +	bt_io_get(chan, &gerr,
-> +			BT_IO_OPT_IMTU, &imtu,
-> +			BT_IO_OPT_OMTU, &omtu,
-> +			BT_IO_OPT_INVALID);
-> +	if (gerr) {
-> +		printf("%s\n", gerr->message);
-> +		g_main_loop_quit(mainloop);
-> +		return;
-> +	}
-> +
-> +	fd = g_io_channel_unix_get_fd(chan);
-> +
-> +	if (avdtp && avdtp_stream) {
-> +		if (!avdtp_stream_set_transport(avdtp_stream, fd, imtu, omtu)) {
-> +			printf("avdtp_stream_set_transport: failed\n");
-> +			g_main_loop_quit(mainloop);
-> +		}
-> +
-> +		g_io_channel_set_close_on_unref(chan, FALSE);
-> +		return;
-> +	}
-> +
-> +	/* TODO allow to set version from command line? */
-> +	avdtp = avdtp_new(fd, imtu, omtu, 0x0103);
-> +	if (!avdtp) {
-> +		printf("Failed to create avdtp instance\n");
-> +		g_main_loop_quit(mainloop);
-> +		return;
-> +	}
-> +
-> +	avdtp_add_disconnect_cb(avdtp, disconnect_cb, NULL);
-> +
-> +	/* TODO handle initiator */
-> +}
-> +
-> +static void usage(void)
-> +{
-> +	printf("avdtptest - AVDTP testing ver %s\n", VERSION);
-> +	printf("Usage:\n"
-> +		"\tavdtptest [options]\n");
-> +	printf("options:\n"
-> +		"\t-d <device_role>   SRC (source) or SINK (sink)\n"
-> +		"\t-s <stream_role>   INT (initiator) or ACP (acceptor)\n"
-> +		"\t-i <hcidev>        HCI adapter\n"
-> +		"\t-c <bdaddr>        connect\n"
-> +		"\t-l                 listen\n");
-> +}
-> +
-> +static struct option main_options[] = {
-> +	{ "help",		0, 0, 'h' },
-> +	{ "device_role",	1, 0, 'd' },
-> +	{ "stream_role",	1, 0, 's' },
-> +	{ "adapter",		1, 0, 'i' },
-> +	{ "connect",		1, 0, 'c' },
-> +	{ "listen",		0, 0, 'l' },
-> +	{ 0, 0, 0, 0 }
-> +};
-> +
-> +int main(int argc, char *argv[])
-> +{
-> +	GError *err = NULL;
-> +	bdaddr_t src, dst;
-> +	int opt;
-> +
-> +	bacpy(&src, BDADDR_ANY);
-> +	bacpy(&dst, BDADDR_ANY);
-> +
-> +	mainloop = g_main_loop_new(NULL, FALSE);
-> +	if (!mainloop) {
-> +		printf("Failed to create main loop\n");
-> +
-> +		exit(1);
-> +	}
-> +
-> +	while ((opt = getopt_long(argc, argv, "d:hi:s:c:l",
-> +						main_options, NULL)) != EOF) {
-> +		switch (opt) {
-> +		case 'i':
-> +			if (!strncmp(optarg, "hci", 3))
-> +				hci_devba(atoi(optarg + 3), &src);
-> +			else
-> +				str2ba(optarg, &src);
-> +			break;
-> +		case 'd':
-> +			if (!strncasecmp(optarg, "SRC", sizeof("SRC"))) {
-> +				dev_role = AVDTP_SEP_TYPE_SOURCE;
-> +			} else if (!strncasecmp(optarg, "SINK",
-> +							sizeof("SINK"))) {
-> +				dev_role = AVDTP_SEP_TYPE_SINK;
-> +			} else {
-> +				usage();
-> +				exit(0);
-> +			}
-> +			break;
-> +		case 's':
-> +			if (!strncasecmp(optarg, "INT", sizeof("INT"))) {
-> +				initiator = true;
-> +			} else if (!strncasecmp(optarg, "ACP", sizeof("ACP"))) {
-> +				initiator = false;
-> +			} else {
-> +				usage();
-> +				exit(0);
-> +			}
-> +			break;
-> +		case 'c':
-> +			if (str2ba(optarg, &dst) < 0) {
-> +				usage();
-> +				exit(0);
-> +			}
-> +			break;
-> +		case 'l':
-> +			bacpy(&dst, BDADDR_ANY);
-> +			break;
-> +		case 'h':
-> +		default:
-> +			usage();
-> +			exit(0);
-> +		}
-> +	}
-> +
-> +	local_sep = avdtp_register_sep(dev_role, AVDTP_MEDIA_TYPE_AUDIO,
-> +					0x00, FALSE, &sep_ind, &sep_cfm, NULL);
-> +	if (!local_sep) {
-> +		printf("Failed to register sep\n");
-> +		exit(0);
-> +	}
-> +
-> +	if (!bacmp(&dst, BDADDR_ANY)) {
-> +		printf("Listening...\n");
-> +		io =  bt_io_listen(connect_cb, NULL, NULL, NULL, &err,
-> +					BT_IO_OPT_SOURCE_BDADDR, &src,
-> +					BT_IO_OPT_PSM, AVDTP_PSM,
-> +					BT_IO_OPT_SEC_LEVEL, BT_IO_SEC_LOW,
-> +					BT_IO_OPT_INVALID);
-> +	} else {
-> +		printf("Connecting...\n");
-> +		io = bt_io_connect(connect_cb, NULL, NULL, &err,
-> +					BT_IO_OPT_SOURCE_BDADDR, &src,
-> +					BT_IO_OPT_DEST_BDADDR, &dst,
-> +					BT_IO_OPT_SEC_LEVEL, BT_IO_SEC_LOW,
-> +					BT_IO_OPT_PSM, AVDTP_PSM,
-> +					BT_IO_OPT_INVALID);
-> +	}
-> +
-> +	if (!io) {
-> +		printf("Failed: %s\n", err->message);
-> +		g_error_free(err);
-> +		exit(0);
-> +	}
-> +
-> +	g_main_loop_run(mainloop);
-> +
-> +	printf("Done\n");
-> +
-> +	avdtp_unref(avdtp);
-> +	avdtp = NULL;
-> +
-> +	g_main_loop_unref(mainloop);
-> +	mainloop = NULL;
-> +
-> +	return 0;
-> +}
-> 
+--001a113403d0f6da31050200aed0
+Content-Type: text/plain; charset=UTF-8
 
-Pushed.
+Hi,
+
+On Mon, Sep 1, 2014 at 3:29 PM, Gowtham Anandha Babu
+<gowtham.ab@samsung.com> wrote:
+
+> The current message-dummy.c looks like, it is creating a virtual folder in the system (Ex. Home/PC-NAME/map-messages/).
+> So, I created the map-messages directory in home/PC-NAME/. Then I tried SETPATH (mentioned in the previous thread).
+> The output is...
+>
+>  obexd[29146]: obexd/src/obex.c:cmd_setpath()
+> obexd[29146]: SETPATH(0x5), (null)(0xffffffff)
+> obexd[29146]: obexd/src/obex.c:parse_name() NAME:
+> obexd[29146]: obexd/plugins/mas.c:mas_setpath() SETPATH: name  nonhdr 0x20
+> obexd[29146]: SETPATH(0x5), SUCCESS(0x20)
+>
+> But When I tried to call GetFolderListing()
+> The output is...
+>
+> obexd[29146]: obexd/src/obex.c:cmd_get() session 0x1008c40
+> obexd[29146]: GET(0x3), (null)(0xffffffff)
+> obexd[29146]: obexd/src/obex.c:parse_type() TYPE: x-obex/folder-listing
+> obexd[29146]: obexd/plugins/mas.c:mas_get() GET: name (null) type x-obex/folder-listing mas 0x1015c00
+> obexd[29146]: obexd/plugins/mas.c:get_params() Error when parsing parameters!
+> obexd[29146]: GET(0x3), BAD_REQUEST(0x40)
+>
+> But I had few folders created inside the map-messages.
+
+Bad request is normally when there is something wrong with the command
+itself, the error comes from here:
+
+mas->inparams = g_obex_apparam_decode(buffer, size);
+if (mas->inparams == NULL) {
+    DBG("Error when parsing parameters!");
+    return -EBADR;
+}
+
+I suspect the problem is that there is no application parameters set
+which is fine since all the parameters of GetFolderListing are
+optional, please try with the attached patch I will send it shortly as
+a proper patch to the mailing list.
+
 
 -- 
-Best regards, 
-Szymon Janc
+Luiz Augusto von Dentz
+
+--001a113403d0f6da31050200aed0
+Content-Type: text/x-patch; charset=US-ASCII;
+	name="0001-obexd-mas-Fix-parsing-of-application-parameters.patch"
+Content-Disposition: attachment;
+	filename="0001-obexd-mas-Fix-parsing-of-application-parameters.patch"
+Content-Transfer-Encoding: base64
+X-Attachment-Id: f_hzjtmvsr0
+
+RnJvbSBmZjY3ZDg0YjZhMDdlMDUyMmVkZTMyYmI1YzY3ZjhlZjkxNDg4MWNmIE1vbiBTZXAgMTcg
+MDA6MDA6MDAgMjAwMQpGcm9tOiBMdWl6IEF1Z3VzdG8gdm9uIERlbnR6IDxsdWl6LnZvbi5kZW50
+ekBpbnRlbC5jb20+CkRhdGU6IE1vbiwgMSBTZXAgMjAxNCAxNjowMTo0MCArMDMwMApTdWJqZWN0
+OiBbUEFUQ0ggQmx1ZVpdIG9iZXhkL21hczogRml4IHBhcnNpbmcgb2YgYXBwbGljYXRpb24gcGFy
+YW1ldGVycwoKU29tZSBjb21tYW5kcyBkb24ndCBoYXZlIGFueSBtYW5kYXRvcnkgYXBwbGljYXRp
+b24gcGFyYW1ldGVyIHdoaWNoIG1lYW5zCmlucGFyYW1zIGNhbiBiZSBOVUxMIHdoaWNoIHNob3Vs
+ZCBub3QgYmUgdHJlYXRlZCBhcyBhIGJhZCByZXF1ZXN0LgotLS0KIG9iZXhkL3BsdWdpbnMvbWFz
+LmMgfCAyMiArKysrKysrKysrKysrKysrKy0tLS0tCiAxIGZpbGUgY2hhbmdlZCwgMTcgaW5zZXJ0
+aW9ucygrKSwgNSBkZWxldGlvbnMoLSkKCmRpZmYgLS1naXQgYS9vYmV4ZC9wbHVnaW5zL21hcy5j
+IGIvb2JleGQvcGx1Z2lucy9tYXMuYwppbmRleCA1NzI5YzIyLi42ZDc4NzFhIDEwMDY0NAotLS0g
+YS9vYmV4ZC9wbHVnaW5zL21hcy5jCisrKyBiL29iZXhkL3BsdWdpbnMvbWFzLmMKQEAgLTg0LDcg
+Kzg0LDcgQEAgc3RhdGljIGludCBnZXRfcGFyYW1zKHN0cnVjdCBvYmV4X3Nlc3Npb24gKm9zLCBz
+dHJ1Y3QgbWFzX3Nlc3Npb24gKm1hcykKIAogCXNpemUgPSBvYmV4X2dldF9hcHBhcmFtKG9zLCAm
+YnVmZmVyKTsKIAlpZiAoc2l6ZSA8IDApCi0JCXNpemUgPSAwOworCQlyZXR1cm4gMDsKIAogCW1h
+cy0+aW5wYXJhbXMgPSBnX29iZXhfYXBwYXJhbV9kZWNvZGUoYnVmZmVyLCBzaXplKTsKIAlpZiAo
+bWFzLT5pbnBhcmFtcyA9PSBOVUxMKSB7CkBAIC0yNDksNyArMjQ5LDkgQEAgc3RhdGljIHZvaWQg
+Z2V0X21lc3NhZ2VzX2xpc3RpbmdfY2Iodm9pZCAqc2Vzc2lvbiwgaW50IGVyciwgdWludDE2X3Qg
+c2l6ZSwKIAkJcmV0dXJuOwogCX0KIAotCWdfb2JleF9hcHBhcmFtX2dldF91aW50MTYobWFzLT5p
+bnBhcmFtcywgTUFQX0FQX01BWExJU1RDT1VOVCwgJm1heCk7CisJaWYgKG1hcy0+aW5wYXJhbXMp
+CisJCWdfb2JleF9hcHBhcmFtX2dldF91aW50MTYobWFzLT5pbnBhcmFtcywgTUFQX0FQX01BWExJ
+U1RDT1VOVCwKKwkJCQkJCQkJCSZtYXgpOwogCiAJaWYgKG1heCA9PSAwKSB7CiAJCWlmICghZW50
+cnkpCkBAIC0zOTcsNyArMzk5LDkgQEAgc3RhdGljIHZvaWQgZ2V0X2ZvbGRlcl9saXN0aW5nX2Ni
+KHZvaWQgKnNlc3Npb24sIGludCBlcnIsIHVpbnQxNl90IHNpemUsCiAJCXJldHVybjsKIAl9CiAK
+LQlnX29iZXhfYXBwYXJhbV9nZXRfdWludDE2KG1hcy0+aW5wYXJhbXMsIE1BUF9BUF9NQVhMSVNU
+Q09VTlQsICZtYXgpOworCWlmIChtYXMtPmlucGFyYW1zKQorCQlnX29iZXhfYXBwYXJhbV9nZXRf
+dWludDE2KG1hcy0+aW5wYXJhbXMsIE1BUF9BUF9NQVhMSVNUQ09VTlQsCisJCQkJCQkJCQkmbWF4
+KTsKIAogCWlmIChtYXggPT0gMCkgewogCQlpZiAoZXJyICE9IC1FQUdBSU4pCkBAIC00OTMsOCAr
+NDk3LDEyIEBAIHN0YXRpYyB2b2lkICpmb2xkZXJfbGlzdGluZ19vcGVuKGNvbnN0IGNoYXIgKm5h
+bWUsIGludCBvZmxhZywgbW9kZV90IG1vZGUsCiAKIAlEQkcoIm5hbWUgPSAlcyIsIG5hbWUpOwog
+Ci0JZ19vYmV4X2FwcGFyYW1fZ2V0X3VpbnQxNihtYXMtPmlucGFyYW1zLCBNQVBfQVBfTUFYTElT
+VENPVU5ULCAmbWF4KTsKLQlnX29iZXhfYXBwYXJhbV9nZXRfdWludDE2KG1hcy0+aW5wYXJhbXMs
+IE1BUF9BUF9TVEFSVE9GRlNFVCwgJm9mZnNldCk7CisJaWYgKG1hcy0+aW5wYXJhbXMpIHsKKwkJ
+Z19vYmV4X2FwcGFyYW1fZ2V0X3VpbnQxNihtYXMtPmlucGFyYW1zLCBNQVBfQVBfTUFYTElTVENP
+VU5ULAorCQkJCQkJCQkJJm1heCk7CisJCWdfb2JleF9hcHBhcmFtX2dldF91aW50MTYobWFzLT5p
+bnBhcmFtcywgTUFQX0FQX1NUQVJUT0ZGU0VULAorCQkJCQkJCQkmb2Zmc2V0KTsKKwl9CiAKIAkq
+ZXJyID0gbWVzc2FnZXNfZ2V0X2ZvbGRlcl9saXN0aW5nKG1hcy0+YmFja2VuZF9kYXRhLCBuYW1l
+LCBtYXgsCiAJCQkJCW9mZnNldCwgZ2V0X2ZvbGRlcl9saXN0aW5nX2NiLCBtYXMpOwpAQCAtNTI2
+LDYgKzUzNCw5IEBAIHN0YXRpYyB2b2lkICptc2dfbGlzdGluZ19vcGVuKGNvbnN0IGNoYXIgKm5h
+bWUsIGludCBvZmxhZywgbW9kZV90IG1vZGUsCiAJCXJldHVybiBOVUxMOwogCX0KIAorCWlmICgh
+bWFzLT5pbnBhcmFtcykKKwkJZ290byBkb25lOworCiAJZ19vYmV4X2FwcGFyYW1fZ2V0X3VpbnQx
+NihtYXMtPmlucGFyYW1zLCBNQVBfQVBfTUFYTElTVENPVU5ULCAmbWF4KTsKIAlnX29iZXhfYXBw
+YXJhbV9nZXRfdWludDE2KG1hcy0+aW5wYXJhbXMsIE1BUF9BUF9TVEFSVE9GRlNFVCwgJm9mZnNl
+dCk7CiAJZ19vYmV4X2FwcGFyYW1fZ2V0X3VpbnQ4KG1hcy0+aW5wYXJhbXMsIE1BUF9BUF9TVUJK
+RUNUTEVOR1RILApAQCAtNTQ4LDYgKzU1OSw3IEBAIHN0YXRpYyB2b2lkICptc2dfbGlzdGluZ19v
+cGVuKGNvbnN0IGNoYXIgKm5hbWUsIGludCBvZmxhZywgbW9kZV90IG1vZGUsCiAJZ19vYmV4X2Fw
+cGFyYW1fZ2V0X3VpbnQ4KG1hcy0+aW5wYXJhbXMsIE1BUF9BUF9GSUxURVJQUklPUklUWSwKIAkJ
+CQkJCSZmaWx0ZXIucHJpb3JpdHkpOwogCitkb25lOgogCSplcnIgPSBtZXNzYWdlc19nZXRfbWVz
+c2FnZXNfbGlzdGluZyhtYXMtPmJhY2tlbmRfZGF0YSwgbmFtZSwgbWF4LAogCQkJb2Zmc2V0LCBz
+dWJqZWN0X2xlbiwgJmZpbHRlciwKIAkJCWdldF9tZXNzYWdlc19saXN0aW5nX2NiLCBtYXMpOwot
+LSAKMS45LjMKCg==
+--001a113403d0f6da31050200aed0--
