@@ -1,108 +1,160 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 1 Sep 2014 13:38:37 +0200
-From: Alexander Aring <alex.aring@gmail.com>
-To: Jukka Rissanen <jukka.rissanen@linux.intel.com>
-Cc: linux-wpan@vger.kernel.org, linux-bluetooth@vger.kernel.org
-Subject: Re: 6lowpan status
-Message-ID: <20140901113835.GA21564@omega>
-References: <1409567774.3120.57.camel@jrissane-mobl.ger.corp.intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-In-Reply-To: <1409567774.3120.57.camel@jrissane-mobl.ger.corp.intel.com>
+In-Reply-To: <1409571044-24724-2-git-send-email-luiz.dentz@gmail.com>
+References: <1409571044-24724-1-git-send-email-luiz.dentz@gmail.com>
+	<1409571044-24724-2-git-send-email-luiz.dentz@gmail.com>
+Date: Mon, 1 Sep 2014 14:32:00 +0300
+Message-ID: <CABBYNZJCQs=56Hz9fdBV4KMWSkB5tWgusWe1BX7qxjYiW09ePA@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] monitor: Fix warnings when using l2cap_frame_get*
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi,
 
-On Mon, Sep 01, 2014 at 01:36:14PM +0300, Jukka Rissanen wrote:
-> Hi Alex,
-> 
-> I saw your RFC mail (9 Aug) about generic compression layer. Was there
-> any functionality changes by this RFC or was it just refactoring the
-> code?
-> 
+On Mon, Sep 1, 2014 at 2:30 PM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>
+> ---
+>  monitor/avctp.c | 48 +++++++++++++++++++++---------------------------
+>  monitor/sdp.c   | 12 +++++-------
+>  2 files changed, 26 insertions(+), 34 deletions(-)
+>
+> diff --git a/monitor/avctp.c b/monitor/avctp.c
+> index 5543a49..64d4b58 100644
+> --- a/monitor/avctp.c
+> +++ b/monitor/avctp.c
+> @@ -512,15 +512,13 @@ static bool avrcp_get_capabilities(struct l2cap_frame *frame, uint8_t ctype,
+>         switch (cap) {
+>         case 0x2:
+>                 for (; count > 0; count--) {
+> -                       uint8_t company[3] = {};
+> +                       uint8_t company[3];
+>
+> -                       if (frame->size < 3)
+> +                       if (!l2cap_frame_get_u8(frame, &company[0]) ||
+> +                               !l2cap_frame_get_u8(frame, &company[1]) ||
+> +                               !l2cap_frame_get_u8(frame, &company[2]))
+>                                 return false;
+>
+> -                       l2cap_frame_get_u8(frame, &company[0]);
+> -                       l2cap_frame_get_u8(frame, &company[1]);
+> -                       l2cap_frame_get_u8(frame, &company[2]);
+> -
+>                         print_field("%*c%s: 0x%02x%02x%02x", (indent - 8), ' ',
+>                                         cap2str(cap), company[0], company[1],
+>                                         company[2]);
+> @@ -645,12 +643,14 @@ static bool avrcp_pdu_packet(struct l2cap_frame *frame, uint8_t ctype,
+>         int i;
+>         const struct avrcp_ctrl_pdu_data *ctrl_pdu_data = NULL;
+>
+> -       if (frame->size < 4)
+> +       if (!l2cap_frame_get_u8(frame, &pduid))
+> +               return false;
+> +
+> +       if (!l2cap_frame_get_u8(frame, &pt))
+>                 return false;
+>
+> -       l2cap_frame_get_u8(frame, &pduid);
+> -       l2cap_frame_get_u8(frame, &pt);
+> -       l2cap_frame_get_be16(frame, &len);
+> +       if (!l2cap_frame_get_be16(frame, &len))
+> +               return false;
+>
+>         print_indent(indent, COLOR_OFF, "AVRCP: ", pdu2str(pduid), COLOR_OFF,
+>                                         " pt %s len 0x%04x", pt2str(pt), len);
+> @@ -680,13 +680,11 @@ static bool avrcp_control_packet(struct l2cap_frame *frame)
+>  {
+>         uint8_t ctype, address, subunit, opcode, company[3], indent = 2;
+>
+> -       if (frame->size < 3)
+> +       if (!l2cap_frame_get_u8(frame, &ctype) ||
+> +                               !l2cap_frame_get_u8(frame, &address) ||
+> +                               !l2cap_frame_get_u8(frame, &opcode))
+>                 return false;
+>
+> -       l2cap_frame_get_u8(frame, &ctype);
+> -       l2cap_frame_get_u8(frame, &address);
+> -       l2cap_frame_get_u8(frame, &opcode);
+> -
+>         print_field("AV/C: %s: address 0x%02x opcode 0x%02x",
+>                                 ctype2str(ctype), address, opcode);
+>
+> @@ -712,13 +710,11 @@ static bool avrcp_control_packet(struct l2cap_frame *frame)
+>         case 0x7c:
+>                 return avrcp_passthrough_packet(frame);
+>         case 0x00:
+> -               if (frame->size < 3)
+> +               if (!l2cap_frame_get_u8(frame, &company[0]) ||
+> +                               !l2cap_frame_get_u8(frame, &company[1]) ||
+> +                               !l2cap_frame_get_u8(frame, &company[2]))
+>                         return false;
+>
+> -               l2cap_frame_get_u8(frame, &company[0]);
+> -               l2cap_frame_get_u8(frame, &company[1]);
+> -               l2cap_frame_get_u8(frame, &company[2]);
+> -
+>                 print_field("%*cCompany ID: 0x%02x%02x%02x", indent, ' ',
+>                                         company[0], company[1], company[2]);
+>
+> @@ -764,16 +760,14 @@ void avctp_packet(const struct l2cap_frame *frame)
+>         struct l2cap_frame avctp_frame;
+>         const char *pdu_color;
+>
+> -       if (frame->size < 3) {
+> +       l2cap_frame_pull(&avctp_frame, frame, 0);
+> +
+> +       if (!l2cap_frame_get_u8(&avctp_frame, &hdr) ||
+> +                               !l2cap_frame_get_be16(&avctp_frame, &pid)) {
+>                 print_text(COLOR_ERROR, "frame too short");
+>                 packet_hexdump(frame->data, frame->size);
+>                 return;
+> -        }
+> -
+> -       l2cap_frame_pull(&avctp_frame, frame, 0);
+> -
+> -       l2cap_frame_get_u8(&avctp_frame, &hdr);
+> -       l2cap_frame_get_be16(&avctp_frame, &pid);
+> +       }
+>
+>         if (frame->in)
+>                 pdu_color = COLOR_MAGENTA;
+> diff --git a/monitor/sdp.c b/monitor/sdp.c
+> index d0ad688..c171b9d 100644
+> --- a/monitor/sdp.c
+> +++ b/monitor/sdp.c
+> @@ -696,18 +696,16 @@ void sdp_packet(const struct l2cap_frame *frame)
+>         const char *pdu_color, *pdu_str;
+>         int i;
+>
+> -       if (frame->size < 5) {
+> +       l2cap_frame_pull(&sdp_frame, frame, 0);
+> +
+> +       if (!l2cap_frame_get_u8(&sdp_frame, &pdu) ||
+> +                               !l2cap_frame_get_be16(&sdp_frame, &tid) ||
+> +                               !l2cap_frame_get_be16(&sdp_frame, &plen)) {
+>                 print_text(COLOR_ERROR, "frame too short");
+>                 packet_hexdump(frame->data, frame->size);
+>                 return;
+>         }
+>
+> -       l2cap_frame_pull(&sdp_frame, frame, 0);
+> -
+> -       l2cap_frame_get_u8(&sdp_frame, &pdu);
+> -       l2cap_frame_get_be16(&sdp_frame, &tid);
+> -       l2cap_frame_get_be16(&sdp_frame, &plen);
+> -
+>         if (sdp_frame.size != plen) {
+>                 print_text(COLOR_ERROR, "invalid frame size");
+>                 packet_hexdump(sdp_frame.data, sdp_frame.size);
+> --
+> 1.9.3
 
-It's not just refactoring. The point is that there are many of RFC's
-outside which declare a next header compession format (like UDP). UDP is
-the only one next header compression which we currenlty support. If we
-don't add a layer to add a new header compression format, all people
-hack this into the iphc.c file. I don't know what you think about this
-but I really don't like that.
-
-This code adds a layer for this and supports all other known next header
-compression formats in the way that we drop the packets afterwards
-instead of deliver garabage to next layer (IPv6).
-
-The layer avoids that everybody hacks static code into iphc file.
-
-Please let me know if this is okay for you, then I will send a v2 with
-changes.
-
-> Anyway, looks ok to me although I just browsed quickly through the code,
-> did not really review it :) Just wondering do we need more
-> subdirectories under 6lowpan or could we just put everything into
-> 6lowpan dir (just to keep it simple)? No big preference here thou.
-> 
-
-Don't know, but there is a unkown number of possible next header compression
-formats outside, we should split it in a new subdirectorie. What I
-actually mean, don't hack every next header compression format in a
-single file.
-
-For address compression/uncompression this is fine, there is no unknown
-numbers of compression ways.
-
-I know only IPHC and HC1. HC1 should be support for receiving side and
-it's obsolete, but this is rfc 4944 so it's only related to 802.15.4.
-
-Some or later we need to add support for this, but this should not used
-by bluetooth 6LoWPAN.
-
-> I saw the mail from Varka Bhadram (6 Aug) about RFC 6775 support. That
-> looked interesting. Did you get the code from him (if yes, could you
-> also send it to me)? Do you know why this guy have not send this stuff
-> to upstream?
-> 
-
-The 802.15.4 mac layer has some neighbor discovery issues which are not
-solved currently. It's about two kinds of mac addresses, for bluetooth
-it should be fine. A small description about this problem is here [1].
-
-We need some way to trigger 6LoWPAN/Layer 2 data across the IPv6 layer
-and this isn't easy. Everything what we do on runtime decisions makes
-the IPv6 stack slower and we should avoid that.
+Sorry for the noise this has been applied already.
 
 
-
-I currently working on a big rework of the 802.15.4 layer and will try
-to bring this mainline at end of this month. Our mac layer is currenlty
-in an not useable state. :(
-
-I don't have time to make some effort after IPv6, currently I work on
-the rework and will solve the two kind mac addresses issues with the
-neighbor discovery cache, then we are in some state which we don't have
-some broken support of functionality.
-
-
-Maybe simple talk with Varka about what he did there, because I don't
-really know what he exactly did there. The code what I saw isn't
-mainline able. [0] What I know that RFC 6775 and the actually
-implementation need to handle the two kinds of mac addresses (which is
-broken currenlty) and need support of context based address compression.
-
-I don't have time to add support for this. I need to rescue the 802.15.4
-layer. Sorry! Maybe after that... or maybe somebody will do this work.
-It sounds for me crazy to support RFC6775 which has dependencies on
-other functionality which we doesn't support right now. For bluetooth
-the mac layer works great, we only needs support for context based
-address compression then.
-
-
-I CC the new mailinglist for IEEE 802.15.4/IEEE 802.15.4 6LoWPAN
-"linux-wpan" and bluetooth. We should not talk about this under the
-hood.
-
-- Alex
-
-[0] https://www.mail-archive.com/linux-zigbee-devel%40lists.sourceforge.net/msg02018.html
-[1] http://www.spinics.net/lists/netdev/msg291767.html
+-- 
+Luiz Augusto von Dentz
