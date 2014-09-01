@@ -1,148 +1,303 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ] monitor: Fix warnings when using l2cap_frame_get*
-Date: Mon,  1 Sep 2014 14:30:43 +0300
-Message-Id: <1409571044-24724-2-git-send-email-luiz.dentz@gmail.com>
-In-Reply-To: <1409571044-24724-1-git-send-email-luiz.dentz@gmail.com>
-References: <1409571044-24724-1-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 1/2] doc: Add initial documentation for coding style
+Date: Mon,  1 Sep 2014 14:30:42 +0300
+Message-Id: <1409571044-24724-1-git-send-email-luiz.dentz@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=y
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
 ---
- monitor/avctp.c | 48 +++++++++++++++++++++---------------------------
- monitor/sdp.c   | 12 +++++-------
- 2 files changed, 26 insertions(+), 34 deletions(-)
+ doc/coding-style.txt | 276 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 276 insertions(+)
+ create mode 100644 doc/coding-style.txt
 
-diff --git a/monitor/avctp.c b/monitor/avctp.c
-index 5543a49..64d4b58 100644
---- a/monitor/avctp.c
-+++ b/monitor/avctp.c
-@@ -512,15 +512,13 @@ static bool avrcp_get_capabilities(struct l2cap_frame *frame, uint8_t ctype,
- 	switch (cap) {
- 	case 0x2:
- 		for (; count > 0; count--) {
--			uint8_t company[3] = {};
-+			uint8_t company[3];
- 
--			if (frame->size < 3)
-+			if (!l2cap_frame_get_u8(frame, &company[0]) ||
-+				!l2cap_frame_get_u8(frame, &company[1]) ||
-+				!l2cap_frame_get_u8(frame, &company[2]))
- 				return false;
- 
--			l2cap_frame_get_u8(frame, &company[0]);
--			l2cap_frame_get_u8(frame, &company[1]);
--			l2cap_frame_get_u8(frame, &company[2]);
--
- 			print_field("%*c%s: 0x%02x%02x%02x", (indent - 8), ' ',
- 					cap2str(cap), company[0], company[1],
- 					company[2]);
-@@ -645,12 +643,14 @@ static bool avrcp_pdu_packet(struct l2cap_frame *frame, uint8_t ctype,
- 	int i;
- 	const struct avrcp_ctrl_pdu_data *ctrl_pdu_data = NULL;
- 
--	if (frame->size < 4)
-+	if (!l2cap_frame_get_u8(frame, &pduid))
-+		return false;
+diff --git a/doc/coding-style.txt b/doc/coding-style.txt
+new file mode 100644
+index 0000000..ae9fcea
+--- /dev/null
++++ b/doc/coding-style.txt
+@@ -0,0 +1,276 @@
++﻿BlueZ coding style
++******************
 +
-+	if (!l2cap_frame_get_u8(frame, &pt))
- 		return false;
- 
--	l2cap_frame_get_u8(frame, &pduid);
--	l2cap_frame_get_u8(frame, &pt);
--	l2cap_frame_get_be16(frame, &len);
-+	if (!l2cap_frame_get_be16(frame, &len))
-+		return false;
- 
- 	print_indent(indent, COLOR_OFF, "AVRCP: ", pdu2str(pduid), COLOR_OFF,
- 					" pt %s len 0x%04x", pt2str(pt), len);
-@@ -680,13 +680,11 @@ static bool avrcp_control_packet(struct l2cap_frame *frame)
- {
- 	uint8_t ctype, address, subunit, opcode, company[3], indent = 2;
- 
--	if (frame->size < 3)
-+	if (!l2cap_frame_get_u8(frame, &ctype) ||
-+				!l2cap_frame_get_u8(frame, &address) ||
-+				!l2cap_frame_get_u8(frame, &opcode))
- 		return false;
- 
--	l2cap_frame_get_u8(frame, &ctype);
--	l2cap_frame_get_u8(frame, &address);
--	l2cap_frame_get_u8(frame, &opcode);
--
- 	print_field("AV/C: %s: address 0x%02x opcode 0x%02x",
- 				ctype2str(ctype), address, opcode);
- 
-@@ -712,13 +710,11 @@ static bool avrcp_control_packet(struct l2cap_frame *frame)
- 	case 0x7c:
- 		return avrcp_passthrough_packet(frame);
- 	case 0x00:
--		if (frame->size < 3)
-+		if (!l2cap_frame_get_u8(frame, &company[0]) ||
-+				!l2cap_frame_get_u8(frame, &company[1]) ||
-+				!l2cap_frame_get_u8(frame, &company[2]))
- 			return false;
- 
--		l2cap_frame_get_u8(frame, &company[0]);
--		l2cap_frame_get_u8(frame, &company[1]);
--		l2cap_frame_get_u8(frame, &company[2]);
--
- 		print_field("%*cCompany ID: 0x%02x%02x%02x", indent, ' ',
- 					company[0], company[1], company[2]);
- 
-@@ -764,16 +760,14 @@ void avctp_packet(const struct l2cap_frame *frame)
- 	struct l2cap_frame avctp_frame;
- 	const char *pdu_color;
- 
--	if (frame->size < 3) {
-+	l2cap_frame_pull(&avctp_frame, frame, 0);
++Every project has its coding style, and BlueZ is not an exception. This
++document describes the preferred coding style for BlueZ code, in order to keep
++some level of consistency among developers so that code can be easily
++understood and maintained.
 +
-+	if (!l2cap_frame_get_u8(&avctp_frame, &hdr) ||
-+				!l2cap_frame_get_be16(&avctp_frame, &pid)) {
- 		print_text(COLOR_ERROR, "frame too short");
- 		packet_hexdump(frame->data, frame->size);
- 		return;
--        }
--
--	l2cap_frame_pull(&avctp_frame, frame, 0);
--
--	l2cap_frame_get_u8(&avctp_frame, &hdr);
--	l2cap_frame_get_be16(&avctp_frame, &pid);
-+	}
- 
- 	if (frame->in)
- 		pdu_color = COLOR_MAGENTA;
-diff --git a/monitor/sdp.c b/monitor/sdp.c
-index d0ad688..c171b9d 100644
---- a/monitor/sdp.c
-+++ b/monitor/sdp.c
-@@ -696,18 +696,16 @@ void sdp_packet(const struct l2cap_frame *frame)
- 	const char *pdu_color, *pdu_str;
- 	int i;
- 
--	if (frame->size < 5) {
-+	l2cap_frame_pull(&sdp_frame, frame, 0);
++First of all, BlueZ coding style must follow every rule for Linux kernel
++(http://www.kernel.org/doc/Documentation/CodingStyle). There also exists a tool
++named checkpatch.pl to help you check the compliance with it. Just type
++"checkpatch.pl --no-tree patch_name" to check your patch. In theory, you need
++to clean up all the warnings and errors except this one: "ERROR: Missing
++Signed-off-by: line(s)". BlueZ does not used Signed-Off lines, so including
++them is actually an error.  In certain circumstances one can ignore the 80
++character per line limit.  This is generally only allowed if the alternative
++would make the code even less readable.
 +
-+	if (!l2cap_frame_get_u8(&sdp_frame, &pdu) ||
-+				!l2cap_frame_get_be16(&sdp_frame, &tid) ||
-+				!l2cap_frame_get_be16(&sdp_frame, &plen)) {
- 		print_text(COLOR_ERROR, "frame too short");
- 		packet_hexdump(frame->data, frame->size);
- 		return;
- 	}
- 
--	l2cap_frame_pull(&sdp_frame, frame, 0);
--
--	l2cap_frame_get_u8(&sdp_frame, &pdu);
--	l2cap_frame_get_be16(&sdp_frame, &tid);
--	l2cap_frame_get_be16(&sdp_frame, &plen);
--
- 	if (sdp_frame.size != plen) {
- 		print_text(COLOR_ERROR, "invalid frame size");
- 		packet_hexdump(sdp_frame.data, sdp_frame.size);
++Besides the kernel coding style above, BlueZ has special flavors for its own.
++Some of them are mandatory (marked as 'M'), while some others are optional
++(marked as 'O'), but generally preferred.
++
++M1: Blank line before and after an if/while/do/for statement
++============================================================
++There should be a blank line before if statement unless the if is nested and
++not preceded by an expression or variable declaration.
++
++Example:
++1)
++a = 1;
++if (b) {  // wrong
++
++2)
++a = 1
++
++if (b) {
++}
++a = 2;	// wrong
++
++3)
++if (a) {
++	if (b)  // correct
++
++4)
++b = 2;
++
++if (a) {	// correct
++
++}
++
++b = 3;
++
++The only exception to this rule applies when a variable is being checked for
++errors as such:
++err = stat(filename, &st);
++if (err || !S_ISDIR(st.st_mode))
++	return;
++
++
++M2: Multiple line comment
++=========================
++If your comments have more then one line, please start it from the second line.
++
++Example:
++/*
++ * first line comment	// correct
++ * ...
++ * last line comment
++ */
++
++
++M3: Space before and after operator
++===================================
++There should be a space before and after each operator.
++
++Example:
++a + b;  // correct
++
++
++M4: Wrap long lines
++===================
++If your condition in if, while, for statement or a function declaration is too
++long to fit in one line, the new line needs to be indented not aligned with the
++body.
++
++Example:
++1)
++if ((adapter->supported_settings & MGMT_SETTING_SSP) &&
++	!(adapter->current_settings & MGMT_SETTING_SSP)) // wrong
++
++2)
++if ((adapter->supported_settings & MGMT_SETTING_SSP) &&
++				!(adapter->current_settings & MGMT_SETTING_SSP))
++
++3)
++void btd_adapter_register_pin_cb(struct btd_adapter *adapter,
++				 btd_adapter_pin_cb_t cb) // wrong
++
++4)
++void btd_adapter_register_pin_cb(struct btd_adapter *adapter,
++							btd_adapter_pin_cb_t cb)
++
++The referred style for line wrapping is to indent as far as possible to the
++right without hitting the 80 columns limit.
++
++M5: Git commit message 50/72 formatting
++=======================================
++The commit message header should be within 50 characters. And if you have
++detailed explanatory text, wrap it to 72 character.
++
++
++M6: Space when doing type casting
++=================================
++There should be a space between new type and variable.
++
++Example:
++1)
++a = (int *)b;  // wrong
++2)
++a = (int *) b;  // correct
++
++
++M7: Don't initialize variable unnecessarily
++===========================================
++When declaring a variable, try not to initialize it unless necessary.
++
++Example:
++int i = 1;  // wrong
++
++for (i = 0; i < 3; i++) {
++}
++
++
++
++M8: Follow the order of include header elements
++===============================================
++When writing an include header the various elements should be in the following
++order:
++	- #includes
++	- forward declarations
++	- #defines
++	- enums
++	- typedefs
++	- function declarations and inline function definitions
++
++
++M9: Internal headers must not use include guards
++=================================================
++Any time when creating a new header file with non-public API, that header
++must not contain include guards.
++
++
++M10: Naming of enums
++====================
++Enums must have a descriptive name.  The enum type should be small caps and
++it should not be typedef-ed.  Enum contents should be in CAPITAL letters and
++prefixed by the enum type name.
++
++Example:
++
++enum animal_type {
++	ANIMAL_TYPE_FOUR_LEGS,
++	ANIMAL_TYPE_EIGHT_LEGS,
++	ANIMAL_TYPE_TWO_LEGS,
++};
++
++If the enum contents have values (e.g. from specification) the formatting
++should be as follows:
++
++enum animal_type {
++	ANIMAL_TYPE_FOUR_LEGS =		4,
++	ANIMAL_TYPE_EIGHT_LEGS =	8,
++	ANIMAL_TYPE_TWO_LEGS =		2,
++};
++
++M11: Enum as switch variable
++====================
++If the variable of a switch is an enum, you must not include a default in
++switch body. The reason for this is: If later on you modify the enum by adding
++a new type, and forget to change the switch accordingly, the compiler will
++complain the new added type hasn't been handled.
++
++Example:
++
++enum animal_type {
++	ANIMAL_TYPE_FOUR_LEGS =		4,
++	ANIMAL_TYPE_EIGHT_LEGS =	8,
++	ANIMAL_TYPE_TWO_LEGS =		2,
++};
++
++enum animal_type t;
++
++switch (t) {
++case ANIMAL_TYPE_FOUR_LEGS:
++	...
++	break;
++case ANIMAL_TYPE_EIGHT_LEGS:
++	...
++	break;
++case ANIMAL_TYPE_TWO_LEGS:
++	...
++	break;
++default:  // wrong
++	break;
++}
++
++However if the enum comes from an external header file outside BlueZ, such as
++Android headers, we cannot make any assumption of how the enum is defined and
++this rule might not apply.
++
++
++M12: Always use parenthesis with sizeof
++=======================================
++The expression argument to the sizeof operator should always be in
++parenthesis, too.
++
++Example:
++1)
++memset(stuff, 0, sizeof(*stuff));
++
++2)
++memset(stuff, 0, sizeof *stuff); // Wrong
++
++
++M13: Use void if function has no parameters
++===========================================
++A function with no parameters must use void in the parameter list.
++
++Example:
++1)
++void foo(void)
++{
++}
++
++2)
++void foo()	// Wrong
++{
++}
++
++O1: Shorten the name
++====================
++Better to use abbreviation, rather than full name, to name a variable,
++function, struct, etc.
++
++Example:
++mgmt_ev_device_connected  // too long
++ev  // better
++
++
++O2: Try to avoid complex if body
++================================
++It's better not to have a complicated statement for if. You may judge its
++contrary condition and return | break | continue | goto ASAP.
++
++Example:
++1)
++if (device) {  // worse
++	memset(&eir_data, 0, sizeof(eir_data));
++	if (eir_len > 0)
++		eir_parse(&eir_data, ev->eir, eir_len);
++	...
++} else {
++	error("Unable to get device object for %s", addr);
++	return;
++}
++
++2)
++if (!device) {
++	error("Unable to get device object for %s", addr);
++	return;
++}
++
++memset(&eir_data, 0, sizeof(eir_data));
++if (eir_len > 0)
++	eir_parse(&eir_data, ev->eir, eir_len);
++...
 -- 
 1.9.3
 
