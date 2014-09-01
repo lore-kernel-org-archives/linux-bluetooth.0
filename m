@@ -1,160 +1,145 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1409571044-24724-2-git-send-email-luiz.dentz@gmail.com>
-References: <1409571044-24724-1-git-send-email-luiz.dentz@gmail.com>
-	<1409571044-24724-2-git-send-email-luiz.dentz@gmail.com>
-Date: Mon, 1 Sep 2014 14:32:00 +0300
-Message-ID: <CABBYNZJCQs=56Hz9fdBV4KMWSkB5tWgusWe1BX7qxjYiW09ePA@mail.gmail.com>
-Subject: Re: [PATCH BlueZ] monitor: Fix warnings when using l2cap_frame_get*
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ 2/2] build: Add initial HACKING
+Date: Mon,  1 Sep 2014 14:30:44 +0300
+Message-Id: <1409571044-24724-3-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <1409571044-24724-1-git-send-email-luiz.dentz@gmail.com>
+References: <1409571044-24724-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-On Mon, Sep 1, 2014 at 2:30 PM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->
-> ---
->  monitor/avctp.c | 48 +++++++++++++++++++++---------------------------
->  monitor/sdp.c   | 12 +++++-------
->  2 files changed, 26 insertions(+), 34 deletions(-)
->
-> diff --git a/monitor/avctp.c b/monitor/avctp.c
-> index 5543a49..64d4b58 100644
-> --- a/monitor/avctp.c
-> +++ b/monitor/avctp.c
-> @@ -512,15 +512,13 @@ static bool avrcp_get_capabilities(struct l2cap_frame *frame, uint8_t ctype,
->         switch (cap) {
->         case 0x2:
->                 for (; count > 0; count--) {
-> -                       uint8_t company[3] = {};
-> +                       uint8_t company[3];
->
-> -                       if (frame->size < 3)
-> +                       if (!l2cap_frame_get_u8(frame, &company[0]) ||
-> +                               !l2cap_frame_get_u8(frame, &company[1]) ||
-> +                               !l2cap_frame_get_u8(frame, &company[2]))
->                                 return false;
->
-> -                       l2cap_frame_get_u8(frame, &company[0]);
-> -                       l2cap_frame_get_u8(frame, &company[1]);
-> -                       l2cap_frame_get_u8(frame, &company[2]);
-> -
->                         print_field("%*c%s: 0x%02x%02x%02x", (indent - 8), ' ',
->                                         cap2str(cap), company[0], company[1],
->                                         company[2]);
-> @@ -645,12 +643,14 @@ static bool avrcp_pdu_packet(struct l2cap_frame *frame, uint8_t ctype,
->         int i;
->         const struct avrcp_ctrl_pdu_data *ctrl_pdu_data = NULL;
->
-> -       if (frame->size < 4)
-> +       if (!l2cap_frame_get_u8(frame, &pduid))
-> +               return false;
-> +
-> +       if (!l2cap_frame_get_u8(frame, &pt))
->                 return false;
->
-> -       l2cap_frame_get_u8(frame, &pduid);
-> -       l2cap_frame_get_u8(frame, &pt);
-> -       l2cap_frame_get_be16(frame, &len);
-> +       if (!l2cap_frame_get_be16(frame, &len))
-> +               return false;
->
->         print_indent(indent, COLOR_OFF, "AVRCP: ", pdu2str(pduid), COLOR_OFF,
->                                         " pt %s len 0x%04x", pt2str(pt), len);
-> @@ -680,13 +680,11 @@ static bool avrcp_control_packet(struct l2cap_frame *frame)
->  {
->         uint8_t ctype, address, subunit, opcode, company[3], indent = 2;
->
-> -       if (frame->size < 3)
-> +       if (!l2cap_frame_get_u8(frame, &ctype) ||
-> +                               !l2cap_frame_get_u8(frame, &address) ||
-> +                               !l2cap_frame_get_u8(frame, &opcode))
->                 return false;
->
-> -       l2cap_frame_get_u8(frame, &ctype);
-> -       l2cap_frame_get_u8(frame, &address);
-> -       l2cap_frame_get_u8(frame, &opcode);
-> -
->         print_field("AV/C: %s: address 0x%02x opcode 0x%02x",
->                                 ctype2str(ctype), address, opcode);
->
-> @@ -712,13 +710,11 @@ static bool avrcp_control_packet(struct l2cap_frame *frame)
->         case 0x7c:
->                 return avrcp_passthrough_packet(frame);
->         case 0x00:
-> -               if (frame->size < 3)
-> +               if (!l2cap_frame_get_u8(frame, &company[0]) ||
-> +                               !l2cap_frame_get_u8(frame, &company[1]) ||
-> +                               !l2cap_frame_get_u8(frame, &company[2]))
->                         return false;
->
-> -               l2cap_frame_get_u8(frame, &company[0]);
-> -               l2cap_frame_get_u8(frame, &company[1]);
-> -               l2cap_frame_get_u8(frame, &company[2]);
-> -
->                 print_field("%*cCompany ID: 0x%02x%02x%02x", indent, ' ',
->                                         company[0], company[1], company[2]);
->
-> @@ -764,16 +760,14 @@ void avctp_packet(const struct l2cap_frame *frame)
->         struct l2cap_frame avctp_frame;
->         const char *pdu_color;
->
-> -       if (frame->size < 3) {
-> +       l2cap_frame_pull(&avctp_frame, frame, 0);
-> +
-> +       if (!l2cap_frame_get_u8(&avctp_frame, &hdr) ||
-> +                               !l2cap_frame_get_be16(&avctp_frame, &pid)) {
->                 print_text(COLOR_ERROR, "frame too short");
->                 packet_hexdump(frame->data, frame->size);
->                 return;
-> -        }
-> -
-> -       l2cap_frame_pull(&avctp_frame, frame, 0);
-> -
-> -       l2cap_frame_get_u8(&avctp_frame, &hdr);
-> -       l2cap_frame_get_be16(&avctp_frame, &pid);
-> +       }
->
->         if (frame->in)
->                 pdu_color = COLOR_MAGENTA;
-> diff --git a/monitor/sdp.c b/monitor/sdp.c
-> index d0ad688..c171b9d 100644
-> --- a/monitor/sdp.c
-> +++ b/monitor/sdp.c
-> @@ -696,18 +696,16 @@ void sdp_packet(const struct l2cap_frame *frame)
->         const char *pdu_color, *pdu_str;
->         int i;
->
-> -       if (frame->size < 5) {
-> +       l2cap_frame_pull(&sdp_frame, frame, 0);
-> +
-> +       if (!l2cap_frame_get_u8(&sdp_frame, &pdu) ||
-> +                               !l2cap_frame_get_be16(&sdp_frame, &tid) ||
-> +                               !l2cap_frame_get_be16(&sdp_frame, &plen)) {
->                 print_text(COLOR_ERROR, "frame too short");
->                 packet_hexdump(frame->data, frame->size);
->                 return;
->         }
->
-> -       l2cap_frame_pull(&sdp_frame, frame, 0);
-> -
-> -       l2cap_frame_get_u8(&sdp_frame, &pdu);
-> -       l2cap_frame_get_be16(&sdp_frame, &tid);
-> -       l2cap_frame_get_be16(&sdp_frame, &plen);
-> -
->         if (sdp_frame.size != plen) {
->                 print_text(COLOR_ERROR, "invalid frame size");
->                 packet_hexdump(sdp_frame.data, sdp_frame.size);
-> --
-> 1.9.3
+---
+ HACKING | 118 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 118 insertions(+)
+ create mode 100644 HACKING
 
-Sorry for the noise this has been applied already.
-
-
+diff --git a/HACKING b/HACKING
+new file mode 100644
+index 0000000..ca6d0c8
+--- /dev/null
++++ b/HACKING
+@@ -0,0 +1,118 @@
++Hacking on BlueZ
++****************
++
++
++Build tools requirements
++========================
++
++When building and testing directly from the repository it is important to
++have at least automake version 1.10 or later installed. All modern
++distributions should default to the latest version, but it seems that
++Debian's default is still an earlier version:
++
++  Check version
++    # dpkg -l '*automake*'
++
++  Install new version
++    # apt-get install automake1.10
++    # update-alternatives --config automake
++
++
++Working with the source code repository
++=======================================
++
++The repository contains two extra scripts that accomplish the bootstrap
++process. One is called "bootstrap" which is the basic scripts that uses the
++autotools scripts to create the needed files for building and installing.
++It makes sure to call the right programs depending on the usage of shared or
++static libraries or translations etc.
++
++The second program is called "bootstrap-configure". This program will make
++sure to properly clean the repository, call the "bootstrap" script and then
++call configure with proper settings for development. It will use the best
++options and pass them over to configure. These options normally include
++the enabling the maintainer mode and the debugging features.
++
++So while in a normal source project the call "./configure ..." is used to
++configure the project with its settings like prefix and extra options. In
++case of bare repositories call "./bootstrap-configure" and it will bootstrap
++the repository and calls configure with all the correct options to make
++development easier.
++
++In case of preparing for a release with "make distcheck", don't use
++bootstrap-configure since it could export development specific settings.
++
++So the normal steps to checkout, build and install such a repository is
++like this:
++
++  Checkout repository
++    # git clone git://git.kernel.org/pub/scm/bluetooth/bluez.git
++    # cd bluez
++
++  Configure and build
++    # ./bootstrap-configure
++    # make
++
++  Run unit tests
++    # make check
++
++  Check installation
++    # make install DESTDIR=$PWD/x
++    # find x
++    # rm -rf x
++
++  Check distribution
++    # make distcheck
++
++  Final installation
++    # sudo make install
++
++  Remove autogenerated files
++    # make maintainer-clean
++
++
++Running from within the source code repository
++==============================================
++
++When using "./configure --enable-maintainer-mode" the automake scripts will
++use the plugins directly from within the repository. This removes the need
++to use "make install" when testing "bluetoothd". The "bootstrap-configure"
++automatically includes this option.
++
++  Copy configuration file which specifies the required security policies
++    # sudo cp ./src/bluetooth.conf /etc/dbus-1/system.d/
++
++  Run daemon in foreground with debugging
++    # sudo ./src/bluetoothd -n -d
++
++  Run daemon with valgrind
++   # sudo valgrind --trace-children=yes --track-origins=yes --track-fds=yes
++   --show-possibly-lost=no --leak-check=full ./src/bluetoothd -n -d
++
++For production installations or distribution packaging it is important that
++the "--enable-maintainer-mode" option is NOT used.
++
++Note multiple arguments to -d can be specified, colon, comma or space
++separated. The arguments are relative source code filenames for which
++debugging output should be enabled; output shell-style globs are
++accepted (e.g.: 'plugins/*:src/main.c').
++
++Submitting patches
++==================
++
++If you fixed a bug or you want to add support for something, patches are
++welcome! In order to ease the inclusion of your patch, it's important to follow
++some rules, otherwise it will likely be rejected by maintainers:
++
++1) Do *not* add "Signed-off-by" lines in your commit messages. BlueZ does not
++use them, so including them is actually an error.
++
++2) Be sure to follow the coding style rules of BlueZ. They are listed in
++doc/coding-style.txt.
++
++3) Split your patch according to the top-level directories. E.g.: if you added
++a feature that touches files under 'include/', 'src/' and 'drivers/'
++directories, split in three separated patches, taking care not to
++break compilation.
++
++4) Bug fixes should be sent first as they take priority over new features.
 -- 
-Luiz Augusto von Dentz
+1.9.3
+
