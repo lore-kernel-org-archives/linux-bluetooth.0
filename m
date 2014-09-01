@@ -1,126 +1,145 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <006d01cfc5e0$6b4df110$41e9d330$@samsung.com>
+From: Gowtham Anandha Babu <gowtham.ab@samsung.com>
+To: 'Luiz Augusto von Dentz' <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org, bharat.panda@samsung.com
 References: <000001cfb169$e4d01bc0$ae705340$@samsung.com>
-	<CABBYNZKTc7DYz5OSJOYm8uTDRzOOzfLMaOPGg-U7TTneaRiH_A@mail.gmail.com>
-	<002101cfb550$afb1f400$0f15dc00$@samsung.com>
-	<CABBYNZL5OBA6iNhzTkpKTmSEj+5R_oU5KLOAsFcK0ZDHvridMw@mail.gmail.com>
-	<006d01cfc5e0$6b4df110$41e9d330$@samsung.com>
-Date: Mon, 1 Sep 2014 16:07:22 +0300
-Message-ID: <CABBYNZJnyVNyw2-odAPV621k-aiw8x83WNju7FZXW0=_5VUotw@mail.gmail.com>
-Subject: Re: Query regarding MAP 1.2 implementation
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Gowtham Anandha Babu <gowtham.ab@samsung.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	Bharat Panda <bharat.panda@samsung.com>
-Content-Type: multipart/mixed; boundary=001a113403d0f6da31050200aed0
+ <CABBYNZKTc7DYz5OSJOYm8uTDRzOOzfLMaOPGg-U7TTneaRiH_A@mail.gmail.com>
+ <002101cfb550$afb1f400$0f15dc00$@samsung.com>
+ <CABBYNZL5OBA6iNhzTkpKTmSEj+5R_oU5KLOAsFcK0ZDHvridMw@mail.gmail.com>
+In-reply-to: <CABBYNZL5OBA6iNhzTkpKTmSEj+5R_oU5KLOAsFcK0ZDHvridMw@mail.gmail.com>
+Subject: RE: Query regarding MAP 1.2 implementation
+Date: Mon, 01 Sep 2014 17:59:15 +0530
+Message-id: <006d01cfc5e0$6b4df110$41e9d330$@samsung.com>
+MIME-version: 1.0
+Content-type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
---001a113403d0f6da31050200aed0
-Content-Type: text/plain; charset=UTF-8
+Hi Luiz,
 
-Hi,
+> -----Original Message-----
+> From: Luiz Augusto von Dentz [mailto:luiz.dentz@gmail.com]
+> Sent: Monday, August 11, 2014 4:39 PM
+> To: Gowtham Anandha Babu
+> Subject: Re: Query regarding MAP 1.2 implementation
+> 
+> Hi,
+> 
+> Well you can start over a new implementation, in fact that was what I suggest
+> but first we need to agree on the D-Bus API which I expect you guys have
+> something in mind since Tizen backend did use D-Bus in its backend if Im not
+> mistaken, I have no idea about the Tizen solution really so I guess you will
+> need to figure it out if you want to reuse its code or not but there will be
+> changes to the interface thus my suggestion to start with the API definition.
+> 
+> On Mon, Aug 11, 2014 at 1:40 PM, Gowtham Anandha Babu
+> <gowtham.ab@samsung.com> wrote:
+> > Hi Luiz,
+> > Backend implementation for message database in tizen is showing so many
+> dependencies while setting up.
+> > When I am trying to install/Make map-agent, its is giving me "package vconf
+> not found" error.
+> > When I am trying to install/Make vconf, its giving me some other packages
+> not found error.
+> > It goes on.
+> >  Is there any other way/procedure to implement the backend message
+> database for MAS?
+> >
+> > -----Original Message-----
+> > From: linux-bluetooth-owner@vger.kernel.org
+> > [mailto:linux-bluetooth-owner@vger.kernel.org] On Behalf Of Luiz
+> > Augusto von Dentz
+> > Sent: Wednesday, August 06, 2014 5:33 PM
+> > To: Gowtham Anandha Babu
+> > Cc: linux-bluetooth@vger.kernel.org; Bharat Panda
+> > Subject: Re: Query regarding MAP 1.2 implementation
+> >
+> > Hi,
+> >
+> > On Wed, Aug 6, 2014 at 2:30 PM, Gowtham Anandha Babu
+> <gowtham.ab@samsung.com> wrote:
+> >> Hi All,
+> >>
+> >> I am currently working on MAP implementation in BlueZ.
+> >> I am trying below things to make MAS connect with remote MCE client.
+> >>
+> >> Below are the steps we followed;
+> >>
+> >> On MCE device:
+> >> --> MAS search
+> >> --> MAS connect
+> >> --> SET PATH (/)
+> >>
+> >> On Bluez, obexd:
+> >> --> Run "bluetoothd"
+> >> --> Run "obexd"
+> >> --> On SET_PATH command it sends the obex session value as NULL.
+> >>
+> >>
+> >> obexd[32713]: obexd/plugins/bluetooth.c:profile_new_connection()
+> >> device /org/bluez/hci0/dev_00_1B_DC_07_33_4E
+> >> obexd[32713]: obexd/src/obex.c:obex_session_start()
+> >> obexd[32713]: obexd/src/obex.c:cmd_connect()
+> >> obexd[32713]: CONNECT(0x0), (null)(0xffffffff)
+> >> obexd[32713]: obexd/src/obex.c:cmd_connect() Selected driver:
+> Message
+> >> Access server
+> >> obexd[32713]: obexd/plugins/mas.c:mas_connect()
+> >> obexd[32713]: CONNECT(0x0), (null)(0x0)
+> >> obexd[32713]: obexd/src/obex.c:cmd_setpath()
+> >> obexd[32713]: obexd/src/obex.c:cmd_setpath() (null)
+> >> obexd[32713]: SETPATH(0x5), (null)(0xffffffff)
+> >> obexd[32713]: obexd/src/obex.c:parse_name() NAME:
+> >> obexd[32713]: obexd/plugins/mas.c:mas_setpath() SETPATH: name
+> nonhdr
+> >> 0x20
+> >> obexd[32713]: SETPATH(0x5), NOT_FOUND(0x44)
+> >>
+> >> Do we need to configure or run anything else before starting up obexd?
+> >
+> > You are probably missing a backend implementation for your message
+> database, currently we are building with dummy as backend but the idea is
+> that we switch to a runtime solution probably we a D-Bus agent interface to
+> interact with these requests using a file descriptor to optimize the data
+> transfer. iirc samsung has done a D-Bus backend for BlueZ 4 in Tizen perhaps
+> you can star by looking what kind of interface is there.
+> >
+> >
+> > --
+> > Luiz Augusto von Dentz
+> > --
+> > To unsubscribe from this list: send the line "unsubscribe
+> > linux-bluetooth" in the body of a message to majordomo@vger.kernel.org
+> > More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> >
+> 
+> 
+> 
+> --
+> Luiz Augusto von Dentz
 
-On Mon, Sep 1, 2014 at 3:29 PM, Gowtham Anandha Babu
-<gowtham.ab@samsung.com> wrote:
+The current message-dummy.c looks like, it is creating a virtual folder in the system (Ex. Home/PC-NAME/map-messages/). 
+So, I created the map-messages directory in home/PC-NAME/. Then I tried SETPATH (mentioned in the previous thread).
+The output is...
 
-> The current message-dummy.c looks like, it is creating a virtual folder in the system (Ex. Home/PC-NAME/map-messages/).
-> So, I created the map-messages directory in home/PC-NAME/. Then I tried SETPATH (mentioned in the previous thread).
-> The output is...
->
->  obexd[29146]: obexd/src/obex.c:cmd_setpath()
-> obexd[29146]: SETPATH(0x5), (null)(0xffffffff)
-> obexd[29146]: obexd/src/obex.c:parse_name() NAME:
-> obexd[29146]: obexd/plugins/mas.c:mas_setpath() SETPATH: name  nonhdr 0x20
-> obexd[29146]: SETPATH(0x5), SUCCESS(0x20)
->
-> But When I tried to call GetFolderListing()
-> The output is...
->
-> obexd[29146]: obexd/src/obex.c:cmd_get() session 0x1008c40
-> obexd[29146]: GET(0x3), (null)(0xffffffff)
-> obexd[29146]: obexd/src/obex.c:parse_type() TYPE: x-obex/folder-listing
-> obexd[29146]: obexd/plugins/mas.c:mas_get() GET: name (null) type x-obex/folder-listing mas 0x1015c00
-> obexd[29146]: obexd/plugins/mas.c:get_params() Error when parsing parameters!
-> obexd[29146]: GET(0x3), BAD_REQUEST(0x40)
->
-> But I had few folders created inside the map-messages.
+ obexd[29146]: obexd/src/obex.c:cmd_setpath() 
+obexd[29146]: SETPATH(0x5), (null)(0xffffffff)
+obexd[29146]: obexd/src/obex.c:parse_name() NAME: 
+obexd[29146]: obexd/plugins/mas.c:mas_setpath() SETPATH: name  nonhdr 0x20
+obexd[29146]: SETPATH(0x5), SUCCESS(0x20)
 
-Bad request is normally when there is something wrong with the command
-itself, the error comes from here:
+But When I tried to call GetFolderListing()
+The output is...
 
-mas->inparams = g_obex_apparam_decode(buffer, size);
-if (mas->inparams == NULL) {
-    DBG("Error when parsing parameters!");
-    return -EBADR;
-}
+obexd[29146]: obexd/src/obex.c:cmd_get() session 0x1008c40
+obexd[29146]: GET(0x3), (null)(0xffffffff)
+obexd[29146]: obexd/src/obex.c:parse_type() TYPE: x-obex/folder-listing
+obexd[29146]: obexd/plugins/mas.c:mas_get() GET: name (null) type x-obex/folder-listing mas 0x1015c00
+obexd[29146]: obexd/plugins/mas.c:get_params() Error when parsing parameters!
+obexd[29146]: GET(0x3), BAD_REQUEST(0x40) 
 
-I suspect the problem is that there is no application parameters set
-which is fine since all the parameters of GetFolderListing are
-optional, please try with the attached patch I will send it shortly as
-a proper patch to the mailing list.
+But I had few folders created inside the map-messages. 
 
+Regards,
+Gowtham Anandha Babu
 
--- 
-Luiz Augusto von Dentz
-
---001a113403d0f6da31050200aed0
-Content-Type: text/x-patch; charset=US-ASCII;
-	name="0001-obexd-mas-Fix-parsing-of-application-parameters.patch"
-Content-Disposition: attachment;
-	filename="0001-obexd-mas-Fix-parsing-of-application-parameters.patch"
-Content-Transfer-Encoding: base64
-X-Attachment-Id: f_hzjtmvsr0
-
-RnJvbSBmZjY3ZDg0YjZhMDdlMDUyMmVkZTMyYmI1YzY3ZjhlZjkxNDg4MWNmIE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBMdWl6IEF1Z3VzdG8gdm9uIERlbnR6IDxsdWl6LnZvbi5kZW50
-ekBpbnRlbC5jb20+CkRhdGU6IE1vbiwgMSBTZXAgMjAxNCAxNjowMTo0MCArMDMwMApTdWJqZWN0
-OiBbUEFUQ0ggQmx1ZVpdIG9iZXhkL21hczogRml4IHBhcnNpbmcgb2YgYXBwbGljYXRpb24gcGFy
-YW1ldGVycwoKU29tZSBjb21tYW5kcyBkb24ndCBoYXZlIGFueSBtYW5kYXRvcnkgYXBwbGljYXRp
-b24gcGFyYW1ldGVyIHdoaWNoIG1lYW5zCmlucGFyYW1zIGNhbiBiZSBOVUxMIHdoaWNoIHNob3Vs
-ZCBub3QgYmUgdHJlYXRlZCBhcyBhIGJhZCByZXF1ZXN0LgotLS0KIG9iZXhkL3BsdWdpbnMvbWFz
-LmMgfCAyMiArKysrKysrKysrKysrKysrKy0tLS0tCiAxIGZpbGUgY2hhbmdlZCwgMTcgaW5zZXJ0
-aW9ucygrKSwgNSBkZWxldGlvbnMoLSkKCmRpZmYgLS1naXQgYS9vYmV4ZC9wbHVnaW5zL21hcy5j
-IGIvb2JleGQvcGx1Z2lucy9tYXMuYwppbmRleCA1NzI5YzIyLi42ZDc4NzFhIDEwMDY0NAotLS0g
-YS9vYmV4ZC9wbHVnaW5zL21hcy5jCisrKyBiL29iZXhkL3BsdWdpbnMvbWFzLmMKQEAgLTg0LDcg
-Kzg0LDcgQEAgc3RhdGljIGludCBnZXRfcGFyYW1zKHN0cnVjdCBvYmV4X3Nlc3Npb24gKm9zLCBz
-dHJ1Y3QgbWFzX3Nlc3Npb24gKm1hcykKIAogCXNpemUgPSBvYmV4X2dldF9hcHBhcmFtKG9zLCAm
-YnVmZmVyKTsKIAlpZiAoc2l6ZSA8IDApCi0JCXNpemUgPSAwOworCQlyZXR1cm4gMDsKIAogCW1h
-cy0+aW5wYXJhbXMgPSBnX29iZXhfYXBwYXJhbV9kZWNvZGUoYnVmZmVyLCBzaXplKTsKIAlpZiAo
-bWFzLT5pbnBhcmFtcyA9PSBOVUxMKSB7CkBAIC0yNDksNyArMjQ5LDkgQEAgc3RhdGljIHZvaWQg
-Z2V0X21lc3NhZ2VzX2xpc3RpbmdfY2Iodm9pZCAqc2Vzc2lvbiwgaW50IGVyciwgdWludDE2X3Qg
-c2l6ZSwKIAkJcmV0dXJuOwogCX0KIAotCWdfb2JleF9hcHBhcmFtX2dldF91aW50MTYobWFzLT5p
-bnBhcmFtcywgTUFQX0FQX01BWExJU1RDT1VOVCwgJm1heCk7CisJaWYgKG1hcy0+aW5wYXJhbXMp
-CisJCWdfb2JleF9hcHBhcmFtX2dldF91aW50MTYobWFzLT5pbnBhcmFtcywgTUFQX0FQX01BWExJ
-U1RDT1VOVCwKKwkJCQkJCQkJCSZtYXgpOwogCiAJaWYgKG1heCA9PSAwKSB7CiAJCWlmICghZW50
-cnkpCkBAIC0zOTcsNyArMzk5LDkgQEAgc3RhdGljIHZvaWQgZ2V0X2ZvbGRlcl9saXN0aW5nX2Ni
-KHZvaWQgKnNlc3Npb24sIGludCBlcnIsIHVpbnQxNl90IHNpemUsCiAJCXJldHVybjsKIAl9CiAK
-LQlnX29iZXhfYXBwYXJhbV9nZXRfdWludDE2KG1hcy0+aW5wYXJhbXMsIE1BUF9BUF9NQVhMSVNU
-Q09VTlQsICZtYXgpOworCWlmIChtYXMtPmlucGFyYW1zKQorCQlnX29iZXhfYXBwYXJhbV9nZXRf
-dWludDE2KG1hcy0+aW5wYXJhbXMsIE1BUF9BUF9NQVhMSVNUQ09VTlQsCisJCQkJCQkJCQkmbWF4
-KTsKIAogCWlmIChtYXggPT0gMCkgewogCQlpZiAoZXJyICE9IC1FQUdBSU4pCkBAIC00OTMsOCAr
-NDk3LDEyIEBAIHN0YXRpYyB2b2lkICpmb2xkZXJfbGlzdGluZ19vcGVuKGNvbnN0IGNoYXIgKm5h
-bWUsIGludCBvZmxhZywgbW9kZV90IG1vZGUsCiAKIAlEQkcoIm5hbWUgPSAlcyIsIG5hbWUpOwog
-Ci0JZ19vYmV4X2FwcGFyYW1fZ2V0X3VpbnQxNihtYXMtPmlucGFyYW1zLCBNQVBfQVBfTUFYTElT
-VENPVU5ULCAmbWF4KTsKLQlnX29iZXhfYXBwYXJhbV9nZXRfdWludDE2KG1hcy0+aW5wYXJhbXMs
-IE1BUF9BUF9TVEFSVE9GRlNFVCwgJm9mZnNldCk7CisJaWYgKG1hcy0+aW5wYXJhbXMpIHsKKwkJ
-Z19vYmV4X2FwcGFyYW1fZ2V0X3VpbnQxNihtYXMtPmlucGFyYW1zLCBNQVBfQVBfTUFYTElTVENP
-VU5ULAorCQkJCQkJCQkJJm1heCk7CisJCWdfb2JleF9hcHBhcmFtX2dldF91aW50MTYobWFzLT5p
-bnBhcmFtcywgTUFQX0FQX1NUQVJUT0ZGU0VULAorCQkJCQkJCQkmb2Zmc2V0KTsKKwl9CiAKIAkq
-ZXJyID0gbWVzc2FnZXNfZ2V0X2ZvbGRlcl9saXN0aW5nKG1hcy0+YmFja2VuZF9kYXRhLCBuYW1l
-LCBtYXgsCiAJCQkJCW9mZnNldCwgZ2V0X2ZvbGRlcl9saXN0aW5nX2NiLCBtYXMpOwpAQCAtNTI2
-LDYgKzUzNCw5IEBAIHN0YXRpYyB2b2lkICptc2dfbGlzdGluZ19vcGVuKGNvbnN0IGNoYXIgKm5h
-bWUsIGludCBvZmxhZywgbW9kZV90IG1vZGUsCiAJCXJldHVybiBOVUxMOwogCX0KIAorCWlmICgh
-bWFzLT5pbnBhcmFtcykKKwkJZ290byBkb25lOworCiAJZ19vYmV4X2FwcGFyYW1fZ2V0X3VpbnQx
-NihtYXMtPmlucGFyYW1zLCBNQVBfQVBfTUFYTElTVENPVU5ULCAmbWF4KTsKIAlnX29iZXhfYXBw
-YXJhbV9nZXRfdWludDE2KG1hcy0+aW5wYXJhbXMsIE1BUF9BUF9TVEFSVE9GRlNFVCwgJm9mZnNl
-dCk7CiAJZ19vYmV4X2FwcGFyYW1fZ2V0X3VpbnQ4KG1hcy0+aW5wYXJhbXMsIE1BUF9BUF9TVUJK
-RUNUTEVOR1RILApAQCAtNTQ4LDYgKzU1OSw3IEBAIHN0YXRpYyB2b2lkICptc2dfbGlzdGluZ19v
-cGVuKGNvbnN0IGNoYXIgKm5hbWUsIGludCBvZmxhZywgbW9kZV90IG1vZGUsCiAJZ19vYmV4X2Fw
-cGFyYW1fZ2V0X3VpbnQ4KG1hcy0+aW5wYXJhbXMsIE1BUF9BUF9GSUxURVJQUklPUklUWSwKIAkJ
-CQkJCSZmaWx0ZXIucHJpb3JpdHkpOwogCitkb25lOgogCSplcnIgPSBtZXNzYWdlc19nZXRfbWVz
-c2FnZXNfbGlzdGluZyhtYXMtPmJhY2tlbmRfZGF0YSwgbmFtZSwgbWF4LAogCQkJb2Zmc2V0LCBz
-dWJqZWN0X2xlbiwgJmZpbHRlciwKIAkJCWdldF9tZXNzYWdlc19saXN0aW5nX2NiLCBtYXMpOwot
-LSAKMS45LjMKCg==
---001a113403d0f6da31050200aed0--
