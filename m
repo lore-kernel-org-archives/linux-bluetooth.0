@@ -1,67 +1,98 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Gu, Chao Jie" <chao.jie.gu@intel.com>
-To: Arman Uguray <armansito@chromium.org>
-CC: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	"marcel@holmann.org" <marcel@holmann.org>
-Subject: RE: [PATCH] gatt api V2
-Date: Mon, 1 Sep 2014 08:12:27 +0000
-Message-ID: <3D02B219753AD44CBDDDE484323B1774112F6F57@SHSMSX104.ccr.corp.intel.com>
-References: <1409295566-13583-1-git-send-email-chao.jie.gu@intel.com>
-	<CABBYNZLqDtSk8h0-+BruH6i_+YxRrmoR8srf+KsAhvLvEq51-w@mail.gmail.com>
-	<3D02B219753AD44CBDDDE484323B1774112F697D@SHSMSX104.ccr.corp.intel.com>
- <CAHrH25ThNCf0wy29Me6Kh5e6YzMKLSiaNiUpU4qg_=HcwaHVCA@mail.gmail.com>
-In-Reply-To: <CAHrH25ThNCf0wy29Me6Kh5e6YzMKLSiaNiUpU4qg_=HcwaHVCA@mail.gmail.com>
-Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
+In-Reply-To: <CAO+8wm8f2HTLGWZ64jBtTXRQ+PhBzFXtjBncYQDnG7QXR38HHg@mail.gmail.com>
+References: <CAO+8wm_qbHMA8RZmiGQUw-55TDWCXvm+f2zrLCCYXXv7CcL08g@mail.gmail.com>
+	<CABBYNZKbPeq9Xxr57EVOqLcY-TTLr6gM2a4yOxP_vBpukM+hqQ@mail.gmail.com>
+	<CAO+8wm84JUdm4r5zY_eA5jZ1VjQKT94MdjEU0gQiHMekEiP3QA@mail.gmail.com>
+	<CAO+8wm8f2HTLGWZ64jBtTXRQ+PhBzFXtjBncYQDnG7QXR38HHg@mail.gmail.com>
+Date: Mon, 1 Sep 2014 10:48:02 +0300
+Message-ID: <CABBYNZK7i7ohoR_KbqW+u52rf3V-M6YX8BCE5PO82r3r5QOJ_w@mail.gmail.com>
+Subject: Re: connecting to a Motion 2in1 wiimote clone
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Kameron Larsen <kroylar@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-SGkgYXJtYW4sIA0KPiA+PiA+IFRoaXMgcGF0Y2ggZm9jdXMgb24gaW1wbGVtZW50aW5nIHRoZSBH
-YXR0IERCdXMgQVBJIGRlZmluZWQgaW4NCj4gPj4gPiBnYXR0LWFwaS50eHQNCj4gPj4gZGlzY3Vz
-c2VkIGluIG1haWxpc3QgbGF0ZXN0bHkuIEl0IGltcGxlbWVudCBhbGwgdGhlIERCdXMgcHJvcGVy
-dHkgYW5kDQo+ID4+IG1ldGhvZCBleGNlcHQgZm9yIGFycmF5e29iamVjdH0gb2YgY2hhcmFjdGVy
-aXN0aWNzIGFuZCBkZXNjcmlwdG9ycy4NCj4gPj4gVGhyb3VnaCBvdXIgaW50ZXJuYWwgdGVzdCwg
-cGF0Y2hlIHdvcmsgd2VsbC4gSSB3b3VsZCBsaWtlIHRvIGNvbnRyaWJ1dGUgdGhpcw0KPiBmZWF0
-cnVlIGZvciBibHVleiB1cHN0cmVhbS4NCj4gPj4gVGhpcyBmaXJzdCBwYXRjaCBpcyBqdXN0IGFu
-IGltcGxlbWVudGF0aW9uLCBtYXliZSBub3QgdmVyeSBjbG9zZWx5DQo+ID4+IHN1aXRhYmxlIGZv
-ciBkZXNpZ24gb3IgcHV0IGluIHRoZSByaWdodCBmaWxlLiBJdCB3b3VsZCBiZSBPSyB0byBtb2Rp
-ZnkgdG8gbWFrZSBtb3JlDQo+IHNlbnNlLg0KPiA+PiA+IEFybWFuLCBNYXJjZWwsIHdvdWxkIHlv
-dSBsaWtlIHRvIHJldmlldyB0aGUgcGF0Y2ggYW5kIGdpdmUgc29tZQ0KPiA+PiA+IHN1Z2dlc3Rp
-b24NCj4gPj4gZm9yIHRoZSBwYXRjaD8gSXQgd291bGQgYmUgZ3JlYXQgaG9ub3IgZm9yIG1lIHRv
-IGNvbnRyaWJ1dGUgbGl0dGxlIHRvIGJsdWV6Lg0KPiA+Pg0KPiANCj4gVGhhbmsgeW91IGZvciB5
-b3VyIHBhdGNoLiBUaGUgY3VycmVudCBkZXNpcmUgaXMgdG8gbWlncmF0ZSBhbGwgZGFlbW9uIGNv
-ZGUgdGhhdCB1c2VzDQo+IGF0dHJpYi8qIGZvciBHQVRUL0FUVCBvdmVyIHRvIHRoZSBuZXcgdXRp
-bGl0aWVzIGluIHNoYXJlZC8gKGdhdHQtY2xpZW50LCBhdHQsDQo+IGdhdHQtaGVscGVycywgZXRj
-LikuIEluIHRoZSBlbmQgaXQncyB1cCB0byB0aGUgbWFpbnRhaW5lcnMgYnV0IGNhbiB3ZSBob2xk
-IG9mZiBvbg0KPiBpbXBsZW1lbnRpbmcgdGhlIEQtQnVzIEFQSSB1bnRpbCB0aGUgc2hhcmVkIGNv
-ZGUgaXMgcmVhZHkgYW5kIGp1c3QgZG8gaXQgb25jZSB0aGUNCj4gcmlnaHQgd2F5IHVzaW5nIGJ0
-X2dhdHRfY2xpZW50PyBUaGVyZSBhcmUgZW5vdWdoIEdBdHRyaWIgZGVwZW5kZW5jaWVzIGluc2lk
-ZSB0aGUNCj4gZGFlbW9uIGNvZGUgdGhhdCBhZGRpbmcgbW9yZSBub3cgd2lsbCBqdXN0IGJlY29t
-ZSBhIGJpZ2dlciBidXJkZW4gaW4gdGhlIGZ1dHVyZS4NCj4gDQo+IEkgcmVjZW50bHkgYWRkZWQg
-YSBzZXQgb2YgaXRlbXMgdG8gdGhlIHRvcC1sZXZlbCBUT0RPIGZpbGUgcmVnYXJkaW5nIHRoZSBu
-ZXcNCj4gR0FUVC9BVFQgc3RhY2s7IEkgY2FuIHRhbGsgdG8geW91IG1vcmUgYWJvdXQgdGFja2xp
-bmcgdGhlIGl0ZW1zIHRoZXJlLg0KPiANCj4gT3RoZXJ3aXNlLCBpZiB0aGlzIGlzIGJsb2NraW5n
-IHBlb3BsZSBhbmQgZXZlcnlvbmUgcHJlZmVycyB0byBoYXZlIGEgd29ya2luZyBHQVRUDQo+IEQt
-QnVzIEFQSSBzb29uZXIgdGhhbiB0aGF0LCB0aGVuIEkgc3VnZ2VzdCBub3QgcHV0dGluZyBhbGwg
-b2YgdGhlIGNvZGUgaW4gc3JjL2RldmljZS5jLg0KPiBZb3Ugc2hvdWxkIHByb2JhYmx5IGFic3Ry
-YWN0IHRoYXQgYXdheSBpbiBhIHNlcGFyYXRlIG1vZHVsZSAoc3VjaCBhcyBhDQo+IHNyYy9nYXR0
-LWNsaWVudCkgYW5kIGhhdmUgZGV2aWNlLmMgaW5pdGlhbGl6ZSBpdC4gQWxzbywgcGxlYXNlIGJy
-ZWFrIHRoaXMgZG93biBpbnRvDQo+IG11bHRpcGxlIHNtYWxsZXIgcGF0Y2hlcyBhcyBMdWl6IHN1
-Z2dlc3RlZC4NCg0KSSBoYXZlIG5vdGljZWQgdGhhdCB5b3UgYXJlIGZvY3VzaW5nIG9uIHRoZSBH
-YXR0IHNoYXJlZCBsaWJyYXJ5IGRldmVsb3BtZW50IGluIG1haWxsaXN0IA0KbGF0ZXN0bHkuIEFu
-ZCB0aGVyZSBpcyBhbHdheXMgYSBxdWVzdGlvbiBpbiBtaW5kIHRoYXQgbm8gb3Bwb3J0dW5pdHkg
-dG8gYXNrIHlvdSAsIHdoeSB3ZQ0KcmVwbGFjZSBvbGQgR0FUVC9BVFQgYnkgbmV3IEdhdHQgc2hh
-cmVkIGxpYnJhcnk/IA0KDQpBY2NvcmRpbmcgdG8geW91ciBhZHZpY2UgLCBJIHNhdyB0aGUgZ2F0
-dCBUT0RPIGxpc3QgaXRlbXMgaW5jbHVkaW5nIGdhdHQtYXBpLnR4dCBwYXJ0Lg0KT2YgY291cnNl
-LCBuZXcgR2F0dCBEQnVzIEFQSSB3aWxsIGJhc2VkIG9uIHNoYXJlZC9nYXR0LWNsaWVudC4gQnV0
-IEkgYmVsaWV2ZSBtb3N0IGxvZ2ljYWwNCndvdWxkIGJlIGNvbW1vbiBleGNlcHQgZm9yIEFQSSBm
-cm9tIHNoYXJlZC9nYXR0LWNsaWVudC4NCg0KVGhlcmUgaXMgbm8gcHJvYmxlbSBob2xkaW5nIG9u
-IHVudGlsIHRoZSBzaGFyZWQgY29kZSBpcyByZWFkeSwgd2UgY2FuIHVzZSBvbGQgYmFzZSBhbmQg
-aW50ZXJuYWwNCnBhdGNoIHRvIHRyYW5zaXRpb24uDQoNCkkgc2F3IGEgbG90IG9mIFRPRE8gTGlz
-dCBpbiBHQVRUL0FUVCBwYXJ0LCBhbmQgZ2F0dC1hcGkudHh0IGJhc2Ugb24gbmV3IHNoYXJlZCBs
-aWJyYXJ5LiBTbyBJIHdpbGwNCnBheSBtb3JlIGF0dGVudGlvbiB0byBzaGFyZWQgbGlicmFyeSBj
-b2RlLiBTb21ldGltZXMgSSBhbSBub3Qgc3VyZSB5b3VyIHdvcmsgcGxhbiB3aGljaCBpdGVtcw0K
-d2lsbCBkbyBmaXJzdCwgd2hpY2ggbm90LiBTbyBpZiBhbnkgaGVscCBJIGNhbiBkbyBvciB3cm9u
-ZyBwYXRjaGVzIEkgc3VibWl0dGVkLCBqdXN0IHRhbGsgdG8gbWUsIA0KSSB3b3VsZCBhcHByZWNp
-YXRlIGl0Lg0KDQpUaGFua3MNCkNoYW9qaWUgR3UNCg==
+Hi Kameron,
+
+On Sat, Aug 30, 2014 at 6:14 AM, Kameron Larsen <kroylar@gmail.com> wrote:
+> On Fri, Aug 29, 2014 at 6:23 PM, Kameron Larsen <kroylar@gmail.com> wrote:
+>> On Fri, Aug 29, 2014 at 3:51 AM, Luiz Augusto von Dentz
+>> <luiz.dentz@gmail.com> wrote:
+>>> Hi Kameron,
+>>>
+>>> On Fri, Aug 29, 2014 at 1:47 AM, Kameron Larsen <kroylar@gmail.com> wrote:
+>>>> Hello all,
+>>>>
+>>>> I'm having some difficulty in scanning and connecting to a device
+>>>> using bluetoothctl. The device in question is a Motion 2in1 Wiimote.
+>>>> Its basically a cheap chinese wiimote clone.
+>>>>
+>>>> When I try to scan using bluetoothctl the device never shows up. When
+>>>> I try to scan using "hcitool scan --iac=liac", the device shows up as:
+>>>>
+>>>> 2A:04:84:80:13:41 Nintendo RVL-CNT-01
+>>>
+>>> That is strange bluetoothctl should see the device as well.
+>>>
+>>>> The device cannot be connected to in bluetoothctl but I can connect
+>>>> using "hcitool cc 2A:04:84:80:13:41". If I connect using hctitool and
+>>>> then immediately use "pair 2A:04:84:80:13:41" in bluetoothctl. It
+>>>> looks like the device pairs but the wiimote disconnects before
+>>>> finishing the process. If I then run "trust 2A:04:84:80:13:41",
+>>>> bluetoothctl will show that the device connects anytime I press any
+>>>> button, and then shortly disconnects.
+>>>>
+>>>> hcidump reveals that the something is wating for additional data but
+>>>> it is not receiving what it expects.  Because this data was never
+>>>> received the pairing process is left incomplete. However I can
+>>>> reconnect by pressing any button on the remote. Whenever I do, it will
+>>>> automatically disconnect after several seconds.
+>>>
+>>> Have to register an agent to do the pairing? You should be able to do
+>>> that with bluetoothctl:
+>>>
+>>> agent on
+>>> default-agent
+>>>
+>>>> Scouring the code, I've come to realize that this remote is not
+>>>> responding to sdp queries and therefore bluez does not know what
+>>>> services it supports. My logs show this error:
+>>>>
+>>>> 2A:04:84:80:13:41: error updating services: Input/output error (5)
+>>>>
+>>>> Without knowing the services (ie, HID) it fails in connect_event_cb
+>>>> with the following error:
+>>>>
+>>>> Refusing input device connect: No such file or directory (2)
+>>>
+>>> It seems some, or perhaps most, gaming controllers do not have SDP
+>>> working properly but first check if you are really able to pair
+>>> properly because if you don't we wont be able to discover what service
+>>> the remote device support.
+>>
+>> I believe it has paired properly. At least bluetoothctl lists it as paired.
+>>
+>> [bluetooth]# power on
+>> Changing power on succeeded
+>> [bluetooth]# agent
+>> Missing on/off/capability argument
+>> [bluetooth]# default-agent
+>> No agent is registered
+>
+> So I didn't actually turn the agent on in that test. Oops! But without
+> an agent why did it seem to work? Or maybe its not actually working
+> either with or without the agent. It just appears to be.
+>
+> I repeated the test with actually turning the agent on and registering
+> the default agent but it does exactly the same thing.
+
+Try capturing the HCI traces and paste the relevant parts here it
+should tell us if pairing is really succeeding and where it fails to
+resolve the services.
+
+
+-- 
+Luiz Augusto von Dentz
