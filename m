@@ -1,303 +1,151 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+From: Sebastian Chlad <sebastian.chlad@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 1/2] doc: Add initial documentation for coding style
-Date: Mon,  1 Sep 2014 14:30:42 +0300
-Message-Id: <1409571044-24724-1-git-send-email-luiz.dentz@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=y
+Cc: Sebastian Chlad <sebastian.chlad@tieto.com>
+Subject: [PATCH] android/pts: Interim PTS tests results for AVDTP
+Date: Mon,  1 Sep 2014 10:20:54 +0200
+Message-Id: <1409559654-4692-1-git-send-email-sebastian.chlad@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-
 ---
- doc/coding-style.txt | 276 +++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 276 insertions(+)
- create mode 100644 doc/coding-style.txt
+ android/pts-avdtp.txt | 102 +++++++++++++++++++++++++-------------------------
+ 1 file changed, 51 insertions(+), 51 deletions(-)
 
-diff --git a/doc/coding-style.txt b/doc/coding-style.txt
-new file mode 100644
-index 0000000..ae9fcea
---- /dev/null
-+++ b/doc/coding-style.txt
-@@ -0,0 +1,276 @@
-+﻿BlueZ coding style
-+******************
-+
-+Every project has its coding style, and BlueZ is not an exception. This
-+document describes the preferred coding style for BlueZ code, in order to keep
-+some level of consistency among developers so that code can be easily
-+understood and maintained.
-+
-+First of all, BlueZ coding style must follow every rule for Linux kernel
-+(http://www.kernel.org/doc/Documentation/CodingStyle). There also exists a tool
-+named checkpatch.pl to help you check the compliance with it. Just type
-+"checkpatch.pl --no-tree patch_name" to check your patch. In theory, you need
-+to clean up all the warnings and errors except this one: "ERROR: Missing
-+Signed-off-by: line(s)". BlueZ does not used Signed-Off lines, so including
-+them is actually an error.  In certain circumstances one can ignore the 80
-+character per line limit.  This is generally only allowed if the alternative
-+would make the code even less readable.
-+
-+Besides the kernel coding style above, BlueZ has special flavors for its own.
-+Some of them are mandatory (marked as 'M'), while some others are optional
-+(marked as 'O'), but generally preferred.
-+
-+M1: Blank line before and after an if/while/do/for statement
-+============================================================
-+There should be a blank line before if statement unless the if is nested and
-+not preceded by an expression or variable declaration.
-+
-+Example:
-+1)
-+a = 1;
-+if (b) {  // wrong
-+
-+2)
-+a = 1
-+
-+if (b) {
-+}
-+a = 2;	// wrong
-+
-+3)
-+if (a) {
-+	if (b)  // correct
-+
-+4)
-+b = 2;
-+
-+if (a) {	// correct
-+
-+}
-+
-+b = 3;
-+
-+The only exception to this rule applies when a variable is being checked for
-+errors as such:
-+err = stat(filename, &st);
-+if (err || !S_ISDIR(st.st_mode))
-+	return;
-+
-+
-+M2: Multiple line comment
-+=========================
-+If your comments have more then one line, please start it from the second line.
-+
-+Example:
-+/*
-+ * first line comment	// correct
-+ * ...
-+ * last line comment
-+ */
-+
-+
-+M3: Space before and after operator
-+===================================
-+There should be a space before and after each operator.
-+
-+Example:
-+a + b;  // correct
-+
-+
-+M4: Wrap long lines
-+===================
-+If your condition in if, while, for statement or a function declaration is too
-+long to fit in one line, the new line needs to be indented not aligned with the
-+body.
-+
-+Example:
-+1)
-+if ((adapter->supported_settings & MGMT_SETTING_SSP) &&
-+	!(adapter->current_settings & MGMT_SETTING_SSP)) // wrong
-+
-+2)
-+if ((adapter->supported_settings & MGMT_SETTING_SSP) &&
-+				!(adapter->current_settings & MGMT_SETTING_SSP))
-+
-+3)
-+void btd_adapter_register_pin_cb(struct btd_adapter *adapter,
-+				 btd_adapter_pin_cb_t cb) // wrong
-+
-+4)
-+void btd_adapter_register_pin_cb(struct btd_adapter *adapter,
-+							btd_adapter_pin_cb_t cb)
-+
-+The referred style for line wrapping is to indent as far as possible to the
-+right without hitting the 80 columns limit.
-+
-+M5: Git commit message 50/72 formatting
-+=======================================
-+The commit message header should be within 50 characters. And if you have
-+detailed explanatory text, wrap it to 72 character.
-+
-+
-+M6: Space when doing type casting
-+=================================
-+There should be a space between new type and variable.
-+
-+Example:
-+1)
-+a = (int *)b;  // wrong
-+2)
-+a = (int *) b;  // correct
-+
-+
-+M7: Don't initialize variable unnecessarily
-+===========================================
-+When declaring a variable, try not to initialize it unless necessary.
-+
-+Example:
-+int i = 1;  // wrong
-+
-+for (i = 0; i < 3; i++) {
-+}
-+
-+
-+
-+M8: Follow the order of include header elements
-+===============================================
-+When writing an include header the various elements should be in the following
-+order:
-+	- #includes
-+	- forward declarations
-+	- #defines
-+	- enums
-+	- typedefs
-+	- function declarations and inline function definitions
-+
-+
-+M9: Internal headers must not use include guards
-+=================================================
-+Any time when creating a new header file with non-public API, that header
-+must not contain include guards.
-+
-+
-+M10: Naming of enums
-+====================
-+Enums must have a descriptive name.  The enum type should be small caps and
-+it should not be typedef-ed.  Enum contents should be in CAPITAL letters and
-+prefixed by the enum type name.
-+
-+Example:
-+
-+enum animal_type {
-+	ANIMAL_TYPE_FOUR_LEGS,
-+	ANIMAL_TYPE_EIGHT_LEGS,
-+	ANIMAL_TYPE_TWO_LEGS,
-+};
-+
-+If the enum contents have values (e.g. from specification) the formatting
-+should be as follows:
-+
-+enum animal_type {
-+	ANIMAL_TYPE_FOUR_LEGS =		4,
-+	ANIMAL_TYPE_EIGHT_LEGS =	8,
-+	ANIMAL_TYPE_TWO_LEGS =		2,
-+};
-+
-+M11: Enum as switch variable
-+====================
-+If the variable of a switch is an enum, you must not include a default in
-+switch body. The reason for this is: If later on you modify the enum by adding
-+a new type, and forget to change the switch accordingly, the compiler will
-+complain the new added type hasn't been handled.
-+
-+Example:
-+
-+enum animal_type {
-+	ANIMAL_TYPE_FOUR_LEGS =		4,
-+	ANIMAL_TYPE_EIGHT_LEGS =	8,
-+	ANIMAL_TYPE_TWO_LEGS =		2,
-+};
-+
-+enum animal_type t;
-+
-+switch (t) {
-+case ANIMAL_TYPE_FOUR_LEGS:
-+	...
-+	break;
-+case ANIMAL_TYPE_EIGHT_LEGS:
-+	...
-+	break;
-+case ANIMAL_TYPE_TWO_LEGS:
-+	...
-+	break;
-+default:  // wrong
-+	break;
-+}
-+
-+However if the enum comes from an external header file outside BlueZ, such as
-+Android headers, we cannot make any assumption of how the enum is defined and
-+this rule might not apply.
-+
-+
-+M12: Always use parenthesis with sizeof
-+=======================================
-+The expression argument to the sizeof operator should always be in
-+parenthesis, too.
-+
-+Example:
-+1)
-+memset(stuff, 0, sizeof(*stuff));
-+
-+2)
-+memset(stuff, 0, sizeof *stuff); // Wrong
-+
-+
-+M13: Use void if function has no parameters
-+===========================================
-+A function with no parameters must use void in the parameter list.
-+
-+Example:
-+1)
-+void foo(void)
-+{
-+}
-+
-+2)
-+void foo()	// Wrong
-+{
-+}
-+
-+O1: Shorten the name
-+====================
-+Better to use abbreviation, rather than full name, to name a variable,
-+function, struct, etc.
-+
-+Example:
-+mgmt_ev_device_connected  // too long
-+ev  // better
-+
-+
-+O2: Try to avoid complex if body
-+================================
-+It's better not to have a complicated statement for if. You may judge its
-+contrary condition and return | break | continue | goto ASAP.
-+
-+Example:
-+1)
-+if (device) {  // worse
-+	memset(&eir_data, 0, sizeof(eir_data));
-+	if (eir_len > 0)
-+		eir_parse(&eir_data, ev->eir, eir_len);
-+	...
-+} else {
-+	error("Unable to get device object for %s", addr);
-+	return;
-+}
-+
-+2)
-+if (!device) {
-+	error("Unable to get device object for %s", addr);
-+	return;
-+}
-+
-+memset(&eir_data, 0, sizeof(eir_data));
-+if (eir_len > 0)
-+	eir_parse(&eir_data, ev->eir, eir_len);
-+...
+diff --git a/android/pts-avdtp.txt b/android/pts-avdtp.txt
+index db5702f..9c9cdfd 100644
+--- a/android/pts-avdtp.txt
++++ b/android/pts-avdtp.txt
+@@ -1,8 +1,8 @@
+ PTS test results for AVDTP
+ 
+-PTS version:
+-Tested: not tested
+-Android version:
++PTS version: 5.2
++Tested: 25-August-2014
++Android version: 4.4.4
+ 
+ Results:
+ PASS	test passed
+@@ -75,51 +75,51 @@ TC_ACP_SNK_TRA_RHC_BI_01_C		N/A
+ TC_ACP_SNK_TRA_RHC_BV_01_C		N/A
+ TC_ACP_SNK_TRA_RHC_BV_02_C		N/A
+ TC_ACP_SRC_L2C_EM_BV_02_C		N/A
+-TC_ACP_SRC_SIG_FRA_BV_01_C		N/A
+-TC_ACP_SRC_SIG_FRA_BV_02_C		N/A
+-TC_ACP_SRC_SIG_SEC_BI_01_C		N/A
+-TC_ACP_SRC_SIG_SEC_BV_02_C		N/A
+-TC_ACP_SRC_SIG_SMG_BV_06_C		N/A
+-TC_ACP_SRC_SIG_SMG_BV_08_C		N/A
+-TC_ACP_SRC_SIG_SMG_BV_10_C		N/A
+-TC_ACP_SRC_SIG_SMG_BV_12_C		N/A
+-TC_ACP_SRC_SIG_SMG_BV_14_C		N/A
+-TC_ACP_SRC_SIG_SMG_BV_16_C		N/A
+-TC_ACP_SRC_SIG_SMG_BV_18_C		N/A
+-TC_ACP_SRC_SIG_SMG_BV_20_C		N/A
+-TC_ACP_SRC_SIG_SMG_BV_22_C		N/A
+-TC_ACP_SRC_SIG_SMG_BV_24_C		N/A
+-TC_ACP_SRC_SIG_SMG_BV_26_C		N/A
+-TC_ACP_SRC_SIG_SMG_BV_27_C		N/A
+-TC_ACP_SRC_SIG_SMG_ESR05_BV_14_C	N/A
+-TC_ACP_SRC_SIG_SMG_BI_02_C		N/A
+-TC_ACP_SRC_SIG_SMG_BI_03_C		N/A
+-TC_ACP_SRC_SIG_SMG_BI_05_C		N/A
+-TC_ACP_SRC_SIG_SMG_BI_06_C		N/A
+-TC_ACP_SRC_SIG_SMG_BI_08_C		N/A
+-TC_ACP_SRC_SIG_SMG_BI_09_C		N/A
+-TC_ACP_SRC_SIG_SMG_BI_11_C		N/A
+-TC_ACP_SRC_SIG_SMG_BI_12_C		N/A
+-TC_ACP_SRC_SIG_SMG_BI_14_C		N/A
+-TC_ACP_SRC_SIG_SMG_BI_15_C		N/A
+-TC_ACP_SRC_SIG_SMG_BI_17_C		N/A
+-TC_ACP_SRC_SIG_SMG_BI_18_C		N/A
+-TC_ACP_SRC_SIG_SMG_BI_20_C		N/A
+-TC_ACP_SRC_SIG_SMG_BI_21_C		N/A
+-TC_ACP_SRC_SIG_SMG_BI_23_C		N/A
+-TC_ACP_SRC_SIG_SMG_BI_24_C		N/A
+-TC_ACP_SRC_SIG_SMG_BI_26_C		N/A
+-TC_ACP_SRC_SIG_SMG_BI_27_C		N/A
++TC_ACP_SRC_SIG_FRA_BV_01_C		INC
++TC_ACP_SRC_SIG_FRA_BV_02_C		PASS
++TC_ACP_SRC_SIG_SEC_BI_01_C		FAIL
++TC_ACP_SRC_SIG_SEC_BV_02_C		INC
++TC_ACP_SRC_SIG_SMG_BV_06_C		PASS
++TC_ACP_SRC_SIG_SMG_BV_08_C		PASS
++TC_ACP_SRC_SIG_SMG_BV_10_C		PASS
++TC_ACP_SRC_SIG_SMG_BV_12_C		PASS
++TC_ACP_SRC_SIG_SMG_BV_14_C		FAIL
++TC_ACP_SRC_SIG_SMG_BV_16_C		PASS
++TC_ACP_SRC_SIG_SMG_BV_18_C		PASS
++TC_ACP_SRC_SIG_SMG_BV_20_C		PASS
++TC_ACP_SRC_SIG_SMG_BV_22_C		PASS
++TC_ACP_SRC_SIG_SMG_BV_24_C		PASS
++TC_ACP_SRC_SIG_SMG_BV_26_C		PASS
++TC_ACP_SRC_SIG_SMG_BV_27_C		PASS
++TC_ACP_SRC_SIG_SMG_ESR05_BV_14_C	FAIL
++TC_ACP_SRC_SIG_SMG_BI_02_C		PASS
++TC_ACP_SRC_SIG_SMG_BI_03_C		INC
++TC_ACP_SRC_SIG_SMG_BI_05_C		PASS
++TC_ACP_SRC_SIG_SMG_BI_06_C		INC
++TC_ACP_SRC_SIG_SMG_BI_08_C		PASS
++TC_ACP_SRC_SIG_SMG_BI_09_C		NONE
++TC_ACP_SRC_SIG_SMG_BI_11_C		PASS
++TC_ACP_SRC_SIG_SMG_BI_12_C		INC
++TC_ACP_SRC_SIG_SMG_BI_14_C		FAIL
++TC_ACP_SRC_SIG_SMG_BI_15_C		FAIL
++TC_ACP_SRC_SIG_SMG_BI_17_C		PASS
++TC_ACP_SRC_SIG_SMG_BI_18_C		FAIL
++TC_ACP_SRC_SIG_SMG_BI_20_C		PASS
++TC_ACP_SRC_SIG_SMG_BI_21_C		FAIL
++TC_ACP_SRC_SIG_SMG_BI_23_C		PASS
++TC_ACP_SRC_SIG_SMG_BI_24_C		FAIL
++TC_ACP_SRC_SIG_SMG_BI_26_C		PASS
++TC_ACP_SRC_SIG_SMG_BI_27_C		FAIL
+ TC_ACP_SRC_SIG_SMG_BI_28_C		N/A
+-TC_ACP_SRC_SIG_SMG_BI_29_C		N/A
+-TC_ACP_SRC_SIG_SMG_BI_33_C		N/A
+-TC_ACP_SRC_SIG_SMG_BI_34_C		N/A
+-TC_ACP_SRC_SIG_SMG_ESR04_BI_28_C	N/A
+-TC_ACP_SRC_SIG_SMG_ESR05_BI_15_C	N/A
+-TC_ACP_SRC_SIG_SYN_BV_05_C		N/A
+-TC_ACP_SRC_SIG_SYN_BV_06_C		N/A
+-TC_ACP_SRC_TRA_BTR_BI_01_C		N/A
+-TC_ACP_SRC_TRA_BTR_BV_01_C		N/A
++TC_ACP_SRC_SIG_SMG_BI_29_C		INC
++TC_ACP_SRC_SIG_SMG_BI_33_C		PASS
++TC_ACP_SRC_SIG_SMG_BI_34_C		INC
++TC_ACP_SRC_SIG_SMG_ESR04_BI_28_C	PASS
++TC_ACP_SRC_SIG_SMG_ESR05_BI_15_C	FAIL
++TC_ACP_SRC_SIG_SYN_BV_05_C		PASS
++TC_ACP_SRC_SIG_SYN_BV_06_C		PASS
++TC_ACP_SRC_TRA_BTR_BI_01_C		PASS
++TC_ACP_SRC_TRA_BTR_BV_01_C		FAIL
+ TC_ACP_SRC_TRA_MUX_BI_01_C		N/A
+ TC_ACP_SRC_TRA_MUX_BV_05_C		N/A
+ TC_ACP_SRC_TRA_MUX_BV_06_C		N/A
+@@ -184,9 +184,9 @@ TC_INT_SNK_TRA_RHC_BI_01_C		N/A
+ TC_INT_SNK_TRA_RHC_BV_01_C		N/A
+ TC_INT_SNK_TRA_RHC_BV_02_C		N/A
+ TC_INT_SRC_L2C_BM_BV_03_C		N/A
+-TC_INT_SRC_L2C_BM_BV_06_C		N/A
+-TC_INT_SRC_SIG_FRA_BV_01_C		N/A
+-TC_INT_SRC_SIG_FRA_BV_02_C		N/A
++TC_INT_SRC_L2C_BM_BV_06_C		PASS
++TC_INT_SRC_SIG_FRA_BV_01_C		INC
++TC_INT_SRC_SIG_FRA_BV_02_C		PASS
+ TC_INT_SRC_SIG_SEC_BV_01_C		N/A
+ TC_INT_SRC_SIG_SMG_BV_05_C		N/A
+ TC_INT_SRC_SIG_SMG_BV_07_C		N/A
+@@ -205,7 +205,7 @@ TC_INT_SRC_SIG_SMG_ESR05_BV_13_C	N/A
+ TC_INT_SRC_SIG_SMG_BI_01_C		N/A
+ TC_INT_SRC_SIG_SMG_BI_04_C		N/A
+ TC_INT_SRC_SIG_SMG_BI_07_C		N/A
+-TC_INT_SRC_SIG_SMG_BI_10_C		N/A
++TC_INT_SRC_SIG_SMG_BI_10_C		PASS
+ TC_INT_SRC_SIG_SMG_BI_13_C		N/A
+ TC_INT_SRC_SIG_SMG_BI_16_C		N/A
+ TC_INT_SRC_SIG_SMG_BI_19_C		N/A
 -- 
-1.9.3
+1.8.5.3
 
