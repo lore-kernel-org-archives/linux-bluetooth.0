@@ -1,41 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
 From: johan.hedberg@gmail.com
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 2/2] Bluetooth: Add clarifying comment for LE CoC result value
-Date: Mon,  1 Sep 2014 09:45:03 +0300
-Message-Id: <1409553903-25260-2-git-send-email-johan.hedberg@gmail.com>
-In-Reply-To: <1409553903-25260-1-git-send-email-johan.hedberg@gmail.com>
-References: <1409553903-25260-1-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH 1/2] Bluetooth: Remove LE fixed channel mask bits
+Date: Mon,  1 Sep 2014 09:45:02 +0300
+Message-Id: <1409553903-25260-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-The "pending" L2CAP response value is not defined for LE CoC. This patch
-adds a clarifying comment to the code so that the reader will not think
-there is a bug in trying to use this value for LE CoC.
+The LE fixed channels are never exposed through the supported channels
+bit mask so just remove their defines to avoid any mistaken usage.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- net/bluetooth/l2cap_core.c | 5 +++++
- 1 file changed, 5 insertions(+)
+ include/net/bluetooth/l2cap.h | 3 ---
+ 1 file changed, 3 deletions(-)
 
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 2d9a2b58d2c8..ab405f0e53cb 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -5413,6 +5413,11 @@ static int l2cap_le_connect_req(struct l2cap_conn *conn,
+diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
+index be25eddea615..a8ac05b0e8e3 100644
+--- a/include/net/bluetooth/l2cap.h
++++ b/include/net/bluetooth/l2cap.h
+@@ -137,9 +137,6 @@ struct l2cap_conninfo {
+ #define L2CAP_FC_SIG_BREDR	0x02
+ #define L2CAP_FC_CONNLESS	0x04
+ #define L2CAP_FC_A2MP		0x08
+-#define L2CAP_FC_ATT		0x10
+-#define L2CAP_FC_SIG_LE		0x20
+-#define L2CAP_FC_SMP_LE		0x40
  
- 	if (test_bit(FLAG_DEFER_SETUP, &chan->flags)) {
- 		l2cap_state_change(chan, BT_CONNECT2);
-+		/* The following result value is actually not defined
-+		 * for LE CoC but we use it to let the function know
-+		 * that it should bail out after doing its cleanup
-+		 * instead of sending a response.
-+		 */
- 		result = L2CAP_CR_PEND;
- 		chan->ops->defer(chan);
- 	} else {
+ /* L2CAP Control Field bit masks */
+ #define L2CAP_CTRL_SAR			0xC000
 -- 
 1.9.3
 
