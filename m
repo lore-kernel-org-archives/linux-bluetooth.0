@@ -1,140 +1,88 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1409638090.3120.71.camel@jrissane-mobl.ger.corp.intel.com>
-Subject: Re: 6lowpan status
-From: Jukka Rissanen <jukka.rissanen@linux.intel.com>
-To: Alexander Aring <alex.aring@gmail.com>
-Cc: linux-wpan@vger.kernel.org, linux-bluetooth@vger.kernel.org
-Date: Tue, 02 Sep 2014 09:08:10 +0300
-In-Reply-To: <20140901113835.GA21564@omega>
-References: <1409567774.3120.57.camel@jrissane-mobl.ger.corp.intel.com>
-	 <20140901113835.GA21564@omega>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Sender: linux-wpan-owner@vger.kernel.org
+From: Gowtham Anandha Babu <gowtham.ab@samsung.com>
+To: 'Luiz Augusto von Dentz' <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+References: <000001cfb169$e4d01bc0$ae705340$@samsung.com>
+ <CABBYNZKTc7DYz5OSJOYm8uTDRzOOzfLMaOPGg-U7TTneaRiH_A@mail.gmail.com>
+ <002101cfb550$afb1f400$0f15dc00$@samsung.com>
+ <CABBYNZL5OBA6iNhzTkpKTmSEj+5R_oU5KLOAsFcK0ZDHvridMw@mail.gmail.com>
+ <006d01cfc5e0$6b4df110$41e9d330$@samsung.com>
+ <CABBYNZJnyVNyw2-odAPV621k-aiw8x83WNju7FZXW0=_5VUotw@mail.gmail.com>
+In-reply-to: <CABBYNZJnyVNyw2-odAPV621k-aiw8x83WNju7FZXW0=_5VUotw@mail.gmail.com>
+Subject: RE: Query regarding MAP 1.2 implementation
+Date: Tue, 02 Sep 2014 10:52:52 +0530
+Message-id: <000101cfc66e$00719660$0154c320$@samsung.com>
+MIME-version: 1.0
+Content-type: text/plain; charset=utf-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Alex,
 
-On ma, 2014-09-01 at 13:38 +0200, Alexander Aring wrote:
+Hi Luiz,
+
+> -----Original Message-----
+> From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-
+> owner@vger.kernel.org] On Behalf Of Luiz Augusto von Dentz
+> Sent: Monday, September 01, 2014 6:37 PM
+> To: Gowtham Anandha Babu
+> Cc: linux-bluetooth@vger.kernel.org; Bharat Panda
+> Subject: Re: Query regarding MAP 1.2 implementation
+> 
 > Hi,
 > 
-> On Mon, Sep 01, 2014 at 01:36:14PM +0300, Jukka Rissanen wrote:
-> > Hi Alex,
-> > 
-> > I saw your RFC mail (9 Aug) about generic compression layer. Was there
-> > any functionality changes by this RFC or was it just refactoring the
-> > code?
-> > 
+> On Mon, Sep 1, 2014 at 3:29 PM, Gowtham Anandha Babu
+> <gowtham.ab@samsung.com> wrote:
 > 
-> It's not just refactoring. The point is that there are many of RFC's
-> outside which declare a next header compession format (like UDP). UDP is
-> the only one next header compression which we currenlty support. If we
-> don't add a layer to add a new header compression format, all people
-> hack this into the iphc.c file. I don't know what you think about this
-> but I really don't like that.
+> > The current message-dummy.c looks like, it is creating a virtual folder in the
+> system (Ex. Home/PC-NAME/map-messages/).
+> > So, I created the map-messages directory in home/PC-NAME/. Then I tried
+> SETPATH (mentioned in the previous thread).
+> > The output is...
+> >
+> >  obexd[29146]: obexd/src/obex.c:cmd_setpath()
+> > obexd[29146]: SETPATH(0x5), (null)(0xffffffff)
+> > obexd[29146]: obexd/src/obex.c:parse_name() NAME:
+> > obexd[29146]: obexd/plugins/mas.c:mas_setpath() SETPATH: name
+> nonhdr
+> > 0x20
+> > obexd[29146]: SETPATH(0x5), SUCCESS(0x20)
+> >
+> > But When I tried to call GetFolderListing() The output is...
+> >
+> > obexd[29146]: obexd/src/obex.c:cmd_get() session 0x1008c40
+> > obexd[29146]: GET(0x3), (null)(0xffffffff)
+> > obexd[29146]: obexd/src/obex.c:parse_type() TYPE:
+> > x-obex/folder-listing
+> > obexd[29146]: obexd/plugins/mas.c:mas_get() GET: name (null) type
+> > x-obex/folder-listing mas 0x1015c00
+> > obexd[29146]: obexd/plugins/mas.c:get_params() Error when parsing
+> parameters!
+> > obexd[29146]: GET(0x3), BAD_REQUEST(0x40)
+> >
+> > But I had few folders created inside the map-messages.
 > 
-> This code adds a layer for this and supports all other known next header
-> compression formats in the way that we drop the packets afterwards
-> instead of deliver garabage to next layer (IPv6).
+> Bad request is normally when there is something wrong with the command
+> itself, the error comes from here:
 > 
-> The layer avoids that everybody hacks static code into iphc file.
-
-Ok, sounds like a plan.
-
+> mas->inparams = g_obex_apparam_decode(buffer, size);
+> if (mas->inparams == NULL) {
+>     DBG("Error when parsing parameters!");
+>     return -EBADR;
+> }
 > 
-> Please let me know if this is okay for you, then I will send a v2 with
-> changes.
-
-Sure, just send new version.
-
-> 
-> > Anyway, looks ok to me although I just browsed quickly through the code,
-> > did not really review it :) Just wondering do we need more
-> > subdirectories under 6lowpan or could we just put everything into
-> > 6lowpan dir (just to keep it simple)? No big preference here thou.
-> > 
-> 
-> Don't know, but there is a unkown number of possible next header compression
-> formats outside, we should split it in a new subdirectorie. What I
-> actually mean, don't hack every next header compression format in a
-> single file.
-
-I was not really thinking that all the stuff would be in single file. I
-was just pondering is there really a need for sub-directory, after all
-the number of files in net/6lowpan directory is currently very small so
-one option could be to put the nhc files directly into 6lowpan directory
-(and perhaps adding them nhc_ prefix). Anyway, this is minor thing and I
-am fine with having sub-directories.
-
-> 
-> For address compression/uncompression this is fine, there is no unknown
-> numbers of compression ways.
-> 
-> I know only IPHC and HC1. HC1 should be support for receiving side and
-> it's obsolete, but this is rfc 4944 so it's only related to 802.15.4.
-> 
-> Some or later we need to add support for this, but this should not used
-> by bluetooth 6LoWPAN.
-> 
-> > I saw the mail from Varka Bhadram (6 Aug) about RFC 6775 support. That
-> > looked interesting. Did you get the code from him (if yes, could you
-> > also send it to me)? Do you know why this guy have not send this stuff
-> > to upstream?
-> > 
-> 
-> The 802.15.4 mac layer has some neighbor discovery issues which are not
-> solved currently. It's about two kinds of mac addresses, for bluetooth
-> it should be fine. A small description about this problem is here [1].
-> 
-> We need some way to trigger 6LoWPAN/Layer 2 data across the IPv6 layer
-> and this isn't easy. Everything what we do on runtime decisions makes
-> the IPv6 stack slower and we should avoid that.
-
-Yep, agreed.
-
+> I suspect the problem is that there is no application parameters set which is
+> fine since all the parameters of GetFolderListing are optional, please try with
+> the attached patch I will send it shortly as a proper patch to the mailing list.
 > 
 > 
-> 
-> I currently working on a big rework of the 802.15.4 layer and will try
-> to bring this mainline at end of this month. Our mac layer is currenlty
-> in an not useable state. :(
-> 
-> I don't have time to make some effort after IPv6, currently I work on
-> the rework and will solve the two kind mac addresses issues with the
-> neighbor discovery cache, then we are in some state which we don't have
-> some broken support of functionality.
-> 
-> 
-> Maybe simple talk with Varka about what he did there, because I don't
-> really know what he exactly did there. The code what I saw isn't
-> mainline able. [0] What I know that RFC 6775 and the actually
-> implementation need to handle the two kinds of mac addresses (which is
-> broken currenlty) and need support of context based address compression.
-> 
-> I don't have time to add support for this. I need to rescue the 802.15.4
-> layer. Sorry! Maybe after that... or maybe somebody will do this work.
-> It sounds for me crazy to support RFC6775 which has dependencies on
-> other functionality which we doesn't support right now. For bluetooth
-> the mac layer works great, we only needs support for context based
-> address compression then.
-
-Ok. Currently I am also busy with some other stuff but I try to find
-some time to investigate the RFC6775 more. Cannot really promise any
-dates etc.
-
-> 
-> 
-> I CC the new mailinglist for IEEE 802.15.4/IEEE 802.15.4 6LoWPAN
-> "linux-wpan" and bluetooth. We should not talk about this under the
-> hood.
-> 
-> - Alex
-> 
-> [0] https://www.mail-archive.com/linux-zigbee-devel%40lists.sourceforge.net/msg02018.html
-> [1] http://www.spinics.net/lists/netdev/msg291767.html
+> --
+> Luiz Augusto von Dentz
 
 
-Cheers,
-Jukka
+I applied the patch which was attached in the previous reply. Still I am getting the same error. 
+I tried printing the "size" inside the get_params function. Its value is '0' for GetFolderListing request.
+If size=0, then g_obex_apparam_decode()  function always return NULL, which leads to "Error when parsing parameters!".
 
+Regards,
+Gowtham
 
