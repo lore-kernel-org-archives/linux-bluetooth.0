@@ -1,42 +1,61 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcin Kraglak <marcin.kraglak@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv2 6/8] android/tester: Add negative GATT Search Service test
-Date: Tue,  2 Sep 2014 14:04:29 +0200
-Message-Id: <1409659471-25171-7-git-send-email-marcin.kraglak@tieto.com>
+Subject: [PATCHv2 5/8] android/tester: Add GATT Search Service 2 test case
+Date: Tue,  2 Sep 2014 14:04:28 +0200
+Message-Id: <1409659471-25171-6-git-send-email-marcin.kraglak@tieto.com>
 In-Reply-To: <1409659471-25171-1-git-send-email-marcin.kraglak@tieto.com>
 References: <1409659471-25171-1-git-send-email-marcin.kraglak@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-In this test case no Primary Service will be returned.
+It tests searching for Primary Services. In this scenarion two
+services will be returned.
 ---
- android/tester-gatt.c | 30 ++++++++++++++++++++++++++++++
- 1 file changed, 30 insertions(+)
+ android/tester-gatt.c | 43 +++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 43 insertions(+)
 
 diff --git a/android/tester-gatt.c b/android/tester-gatt.c
-index 48799e4..ac31d38 100644
+index 1533d1f..48799e4 100644
 --- a/android/tester-gatt.c
 +++ b/android/tester-gatt.c
-@@ -156,6 +156,12 @@ static struct pdu search_service_2[] = {
+@@ -131,6 +131,13 @@ static btgatt_srvc_id_t service_1 = {
+ 			0x00, 0x10, 0x00, 0x00,  0x00, 0x18, 0x00, 0x00}
+ };
+ 
++static btgatt_srvc_id_t service_2 = {
++	.is_primary = true,
++	.id.inst_id = 1,
++	.id.uuid.uu = {0xfb, 0x34, 0x9b, 0x5f, 0x80, 0x00, 0x00, 0x80,
++			0x00, 0x10, 0x00, 0x00,  0x01, 0x18, 0x00, 0x00}
++};
++
+ static struct pdu search_service[] = {
+ 	raw_pdu(0x10, 0x01, 0x00, 0xff, 0xff, 0x00, 0x28),
+ 	raw_pdu(0x11, 0x06, 0x01, 0x00, 0x10, 0x00, 0x00, 0x18),
+@@ -139,6 +146,16 @@ static struct pdu search_service[] = {
  	end_pdu
  };
  
-+static struct pdu search_service_3[] = {
++static struct pdu search_service_2[] = {
 +	raw_pdu(0x10, 0x01, 0x00, 0xff, 0xff, 0x00, 0x28),
-+	raw_pdu(0x01, 0x08, 0x01, 0x00, 0x0a),
++	raw_pdu(0x11, 0x06, 0x01, 0x00, 0x10, 0x00, 0x00, 0x18),
++	raw_pdu(0x10, 0x11, 0x00, 0xff, 0xff, 0x00, 0x28),
++	raw_pdu(0x11, 0x06, 0x11, 0x00, 0x20, 0x00, 0x01, 0x18),
++	raw_pdu(0x10, 0x21, 0x00, 0xff, 0xff, 0x00, 0x28),
++	raw_pdu(0x01, 0x10, 0x21, 0x00, 0x0a),
 +	end_pdu
 +};
 +
  static void gatt_client_register_action(void)
  {
  	struct test_data *data = tester_get_data();
-@@ -611,6 +617,30 @@ static struct test_case test_cases[] = {
+@@ -568,6 +585,32 @@ static struct test_case test_cases[] = {
  		ACTION_SUCCESS(bluetooth_disable_action, NULL),
  		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_OFF),
  	),
-+	TEST_CASE_BREDRLE("Gatt Client - Search Service 3",
-+		ACTION_SUCCESS(init_pdus, search_service_3),
++	TEST_CASE_BREDRLE("Gatt Client - Search Service 2",
++		ACTION_SUCCESS(init_pdus, search_service_2),
 +		ACTION_SUCCESS(bluetooth_enable_action, NULL),
 +		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_ON),
 +		ACTION_SUCCESS(emu_setup_powered_remote_action, NULL),
@@ -55,6 +74,8 @@ index 48799e4..ac31d38 100644
 +						prop_emu_remotes_default_set,
 +						CONN1_ID, CLIENT1_ID),
 +		ACTION_SUCCESS(gatt_client_search_services, &search_services_1),
++		CALLBACK_GATTC_SEARCH_RESULT(CONN1_ID, &service_1),
++		CALLBACK_GATTC_SEARCH_RESULT(CONN1_ID, &service_2),
 +		CALLBACK_GATTC_SEARCH_COMPLETE(GATT_STATUS_SUCCESS, CONN1_ID),
 +		ACTION_SUCCESS(bluetooth_disable_action, NULL),
 +		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_OFF),
