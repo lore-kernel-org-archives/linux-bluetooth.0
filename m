@@ -1,205 +1,169 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcin Kraglak <marcin.kraglak@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv2 4/8] android/tester: Add GATT Client Search Service test case
-Date: Tue,  2 Sep 2014 14:04:27 +0200
-Message-Id: <1409659471-25171-5-git-send-email-marcin.kraglak@tieto.com>
+Subject: [PATCHv2 3/8] android/tester: Add support for search services callbacks
+Date: Tue,  2 Sep 2014 14:04:26 +0200
+Message-Id: <1409659471-25171-4-git-send-email-marcin.kraglak@tieto.com>
 In-Reply-To: <1409659471-25171-1-git-send-email-marcin.kraglak@tieto.com>
 References: <1409659471-25171-1-git-send-email-marcin.kraglak@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-It is basic test case for searching primary services.
+Add support for search_result_cb() and search_complete_cb()
+in android tester. It is needed for GATT client test cases.
 ---
- android/tester-gatt.c | 124 +++++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 123 insertions(+), 1 deletion(-)
+ android/tester-main.c | 56 +++++++++++++++++++++++++++++++++++++++++++++++++--
+ android/tester-main.h | 14 +++++++++++++
+ 2 files changed, 68 insertions(+), 2 deletions(-)
 
-diff --git a/android/tester-gatt.c b/android/tester-gatt.c
-index b680322..1533d1f 100644
---- a/android/tester-gatt.c
-+++ b/android/tester-gatt.c
-@@ -33,8 +33,23 @@
- #define CONN1_ID	1
- #define CONN2_ID	2
- 
-+#define data(args...) ((const unsigned char[]) { args })
+diff --git a/android/tester-main.c b/android/tester-main.c
+index 60ccac7..aebc1a1 100644
+--- a/android/tester-main.c
++++ b/android/tester-main.c
+@@ -395,6 +395,18 @@ static int verify_property(bt_property_t *exp_props, int exp_num_props,
+  * Check each test case step if test case expected
+  * data is set and match it with expected result.
+  */
 +
-+#define raw_pdu(args...)					\
-+	{							\
-+		.data = data(args),				\
-+		.size = sizeof(data(args)),			\
-+	}
++static bool verify_services(btgatt_srvc_id_t *a, btgatt_srvc_id_t *b)
++{
++	if (a->is_primary != b->is_primary)
++		return false;
 +
-+#define end_pdu { .data = NULL }
++	if (memcmp(&a->id.uuid, &b->id.uuid, sizeof(bt_uuid_t)))
++		return false;
 +
- static struct queue *list; /* List of gatt test cases */
- 
-+struct pdu {
-+	const uint8_t *data;
-+	uint16_t size;
-+};
++	return true;
++}
 +
- static bt_uuid_t client_app_uuid = {
- 	.uu = { 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01,
- 				0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01 },
-@@ -53,6 +68,11 @@ struct gatt_connect_data {
- 	const int conn_id;
- };
- 
-+struct gatt_search_service_data {
-+	const int conn_id;
-+	bt_uuid_t *filter_uuid;
-+};
-+
- static bt_uuid_t client2_app_uuid = {
- 	.uu = { 0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02,
- 				0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02 },
-@@ -92,6 +112,11 @@ static struct gatt_connect_data client2_conn_req = {
- 	.conn_id = CONN2_ID,
- };
- 
-+static struct gatt_search_service_data search_services_1 = {
-+	.conn_id = CONN1_ID,
-+	.filter_uuid = NULL,
-+};
-+
- static const uint8_t exchange_mtu_req_pdu[] = { 0x02, 0xa0, 0x02 };
- static const uint8_t exchange_mtu_resp_pdu[] = { 0x03, 0xa0, 0x02 };
- 
-@@ -99,6 +124,21 @@ static struct bt_action_data bearer_type = {
- 	.bearer_type = BDADDR_LE_PUBLIC,
- };
- 
-+static btgatt_srvc_id_t service_1 = {
-+	.is_primary = true,
-+	.id.inst_id = 0,
-+	.id.uuid.uu = {0xfb, 0x34, 0x9b, 0x5f, 0x80, 0x00, 0x00, 0x80,
-+			0x00, 0x10, 0x00, 0x00,  0x00, 0x18, 0x00, 0x00}
-+};
-+
-+static struct pdu search_service[] = {
-+	raw_pdu(0x10, 0x01, 0x00, 0xff, 0xff, 0x00, 0x28),
-+	raw_pdu(0x11, 0x06, 0x01, 0x00, 0x10, 0x00, 0x00, 0x18),
-+	raw_pdu(0x10, 0x11, 0x00, 0xff, 0xff, 0x00, 0x28),
-+	raw_pdu(0x01, 0x10, 0x11, 0x00, 0x0a),
-+	end_pdu
-+};
-+
- static void gatt_client_register_action(void)
+ static bool match_data(struct step *step)
  {
  	struct test_data *data = tester_get_data();
-@@ -216,6 +256,7 @@ static void gatt_cid_hook_cb(const void *data, uint16_t len, void *user_data)
- 	struct bthost *bthost = hciemu_client_get_host(t_data->hciemu);
- 	struct emu_cid_data *cid_data = user_data;
- 	const uint8_t *pdu = data;
-+	struct pdu *gatt_pdu = queue_peek_head(t_data->pdus);
- 
- 	switch (pdu[0]) {
- 	case L2CAP_ATT_EXCHANGE_MTU_REQ:
-@@ -232,7 +273,29 @@ static void gatt_cid_hook_cb(const void *data, uint16_t len, void *user_data)
- 
- 		break;
- 	default:
--		tester_print("Unknown ATT packet.");
-+		if (!gatt_pdu || !gatt_pdu->data) {
-+			tester_print("Unknown ATT packet.");
-+			break;
-+		}
+@@ -529,6 +541,13 @@ static bool match_data(struct step *step)
+ 			tester_debug("Gatt properties don't match");
+ 			return false;
+ 		}
 +
-+		if (gatt_pdu->size != len) {
-+			tester_print("Size of incoming frame is not valid");
-+			tester_print("Expected size = %d incoming size = %d",
-+							gatt_pdu->size, len);
-+			break;
++		if (exp->callback_result.service &&
++				!verify_services(step->callback_result.service,
++						exp->callback_result.service)) {
++			tester_debug("Gatt service doesn't match");
++			return false;
 +		}
-+
-+		if (memcmp(gatt_pdu->data, data, len)) {
-+			tester_print("Incoming data mismatch");
-+			break;
-+		}
-+		queue_pop_head(t_data->pdus);
-+		gatt_pdu = queue_pop_head(t_data->pdus);
-+		if (!gatt_pdu->data)
-+			break;
-+
-+		bthost_send_cid(bthost, cid_data->handle, cid_data->cid,
-+						gatt_pdu->data, gatt_pdu->size);
- 
- 		break;
  	}
-@@ -257,6 +320,40 @@ static void gatt_conn_cb(uint16_t handle, void *user_data)
- 								&cid_data);
+ 
+ 	return true;
+@@ -613,6 +632,9 @@ static void destroy_callback_step(void *data)
+ 	if (step->callback_result.properties)
+ 		free_properties(step);
+ 
++	if (step->callback_result.service)
++		free(step->callback_result.service);
++
+ 	g_free(step);
+ 	g_atomic_int_dec_and_test(&scheduled_cbacks_num);
+ }
+@@ -1030,6 +1052,27 @@ static void gattc_listen_cb(int status, int server_if)
+ 	schedule_callback_call(step);
  }
  
-+static void gatt_client_search_services(void)
++static void gattc_search_result_cb(int conn_id, btgatt_srvc_id_t *srvc_id)
 +{
-+	struct test_data *data = tester_get_data();
-+	struct step *current_data_step = queue_peek_head(data->steps);
 +	struct step *step = g_new0(struct step, 1);
-+	struct gatt_search_service_data *search_data;
-+	int status;
 +
-+	search_data = current_data_step->set_data;
++	step->callback = CB_GATTC_SEARCH_RESULT;
++	step->callback_result.conn_id = conn_id;
++	step->callback_result.service = g_memdup(srvc_id, sizeof(*srvc_id));
 +
-+	status = data->if_gatt->client->search_service(search_data->conn_id,
-+						search_data->filter_uuid);
-+	step->action_status = status;
-+
-+	schedule_action_verification(step);
++	schedule_callback_call(step);
 +}
 +
-+static void init_pdus(void)
++static void gattc_search_complete_cb(int conn_id, int status)
 +{
-+	struct test_data *data = tester_get_data();
-+	struct step *current_data_step = queue_peek_head(data->steps);
 +	struct step *step = g_new0(struct step, 1);
-+	struct pdu *pdu = current_data_step->set_data;
 +
-+	while (pdu->data) {
-+		queue_push_tail(data->pdus, pdu);
-+		pdu++;
++	step->callback = CB_GATTC_SEARCH_COMPLETE;
++	step->callback_result.conn_id = conn_id;
++
++	schedule_callback_call(step);
++}
++
+ static void pan_control_state_cb(btpan_control_state_t state,
+ 					bt_status_t error, int local_role,
+ 							const char *ifname)
+@@ -1130,8 +1173,8 @@ static const btgatt_client_callbacks_t btgatt_client_callbacks = {
+ 	.scan_result_cb = gattc_scan_result_cb,
+ 	.open_cb = gattc_connect_cb,
+ 	.close_cb = gattc_disconnect_cb,
+-	.search_complete_cb = NULL,
+-	.search_result_cb = NULL,
++	.search_complete_cb = gattc_search_complete_cb,
++	.search_result_cb = gattc_search_result_cb,
+ 	.get_characteristic_cb = NULL,
+ 	.get_descriptor_cb = NULL,
+ 	.get_included_service_cb = NULL,
+@@ -1236,6 +1279,12 @@ static bool setup_base(struct test_data *data)
+ 	if (!(data->steps = queue_new()))
+ 		return false;
+ 
++	data->pdus = queue_new();
++	if (!data->pdus) {
++		queue_destroy(data->steps, NULL);
++		return false;
 +	}
 +
-+	step->action_status = BT_STATUS_SUCCESS;
+ 	return true;
+ }
+ 
+@@ -1479,6 +1528,9 @@ static void teardown(const void *test_data)
+ 	queue_destroy(data->steps, NULL);
+ 	data->steps = NULL;
+ 
++	queue_destroy(data->pdus, NULL);
++	data->pdus = NULL;
 +
-+	schedule_action_verification(step);
-+}
+ 	if (data->if_gatt) {
+ 		data->if_gatt->cleanup();
+ 		data->if_gatt = NULL;
+diff --git a/android/tester-main.h b/android/tester-main.h
+index f7e3c90..aa7eb2a 100644
+--- a/android/tester-main.h
++++ b/android/tester-main.h
+@@ -134,6 +134,17 @@
+ 		.callback_result.client_id = cb_client_id, \
+ 	}
+ 
++#define CALLBACK_GATTC_SEARCH_RESULT(cb_conn_id, cb_service) { \
++		.callback = CB_GATTC_SEARCH_RESULT, \
++		.callback_result.conn_id = cb_conn_id, \
++		.callback_result.service = cb_service \
++	}
 +
- static struct test_case test_cases[] = {
- 	TEST_CASE_BREDRLE("Gatt Init",
- 		ACTION_SUCCESS(dummy_action, NULL),
-@@ -446,6 +543,31 @@ static struct test_case test_cases[] = {
- 		ACTION_SUCCESS(bluetooth_disable_action, NULL),
- 		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_OFF),
- 	),
-+	TEST_CASE_BREDRLE("Gatt Client - Search Service 1",
-+		ACTION_SUCCESS(init_pdus, search_service),
-+		ACTION_SUCCESS(bluetooth_enable_action, NULL),
-+		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_ON),
-+		ACTION_SUCCESS(emu_setup_powered_remote_action, NULL),
-+		ACTION_SUCCESS(emu_set_ssp_mode_action, NULL),
-+		ACTION_SUCCESS(emu_set_connect_cb_action, gatt_conn_cb),
-+		ACTION_SUCCESS(gatt_client_register_action, &client_app_uuid),
-+		CALLBACK_STATUS(CB_GATTC_REGISTER_CLIENT, BT_STATUS_SUCCESS),
-+		ACTION_SUCCESS(gatt_client_start_scan_action,
-+							INT_TO_PTR(CLIENT1_ID)),
-+		CLLBACK_GATTC_SCAN_RES(prop_emu_remotes_default_set, 1, TRUE),
-+		ACTION_SUCCESS(gatt_client_stop_scan_action,
-+							INT_TO_PTR(CLIENT1_ID)),
-+		ACTION_SUCCESS(gatt_client_connect_action,
-+							&client1_conn_req),
-+		CALLBACK_GATTC_CONNECT(GATT_STATUS_SUCCESS,
-+						prop_emu_remotes_default_set,
-+						CONN1_ID, CLIENT1_ID),
-+		ACTION_SUCCESS(gatt_client_search_services, &search_services_1),
-+		CALLBACK_GATTC_SEARCH_RESULT(CONN1_ID, &service_1),
-+		CALLBACK_GATTC_SEARCH_COMPLETE(GATT_STATUS_SUCCESS, CONN1_ID),
-+		ACTION_SUCCESS(bluetooth_disable_action, NULL),
-+		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_OFF),
-+	),
++#define CALLBACK_GATTC_SEARCH_COMPLETE(cb_res, cb_conn_id) { \
++		.callback = CB_GATTC_SEARCH_COMPLETE, \
++		.callback_result.conn_id = cb_conn_id \
++	}
++
+ #define CALLBACK_GATTC_DISCONNECT(cb_res, cb_prop, cb_conn_id, cb_client_id) { \
+ 		.callback = CB_GATTC_CLOSE, \
+ 		.callback_result.status = cb_res, \
+@@ -309,6 +320,8 @@ struct test_data {
+ 	guint signalfd;
+ 	uint16_t mgmt_index;
+ 	pid_t bluetoothd_pid;
++
++	struct queue *pdus;
  };
  
- struct queue *get_gatt_tests(void)
+ /*
+@@ -370,6 +383,7 @@ struct bt_callback_data {
+ 
+ 	int client_id;
+ 	int conn_id;
++	btgatt_srvc_id_t *service;
+ 
+ 	btpan_control_state_t ctrl_state;
+ 	btpan_connection_state_t conn_state;
 -- 
 1.9.0
 
