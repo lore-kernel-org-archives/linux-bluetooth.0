@@ -1,187 +1,74 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <53FC67E9.8090501@tieto.com>
-References: <1407941416-28453-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
-	<53FC67E9.8090501@tieto.com>
-Date: Tue, 2 Sep 2014 16:34:12 +0200
-Message-ID: <CAMv5GbcUsa65ybTY_YLf5ULMTPmTSQXRgRW+8v7b4Vxup3oqXQ@mail.gmail.com>
-Subject: Re: [PATCH 1/2] android/gatt: Stop listening while unregistering app
-From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
-To: Tyszkowski Jakub <jakub.tyszkowski@tieto.com>
-Cc: linux-bluetooth <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+Subject: [PATCH 5/5] android/tester: Add test verifying correct bond state notification
+Date: Tue,  2 Sep 2014 15:55:03 +0200
+Message-Id: <1409666103-14663-5-git-send-email-lukasz.rymanowski@tieto.com>
+In-Reply-To: <1409666103-14663-1-git-send-email-lukasz.rymanowski@tieto.com>
+References: <1409666103-14663-1-git-send-email-lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jakub,
+Added test which verify that remote device which is paired and not
+bonded has correct state in Android framework after ACL disconnection.
+---
+ android/tester-bluetooth.c | 28 ++++++++++++++++++++++++++++
+ 1 file changed, 28 insertions(+)
 
-On 26 August 2014 12:56, Tyszkowski Jakub <jakub.tyszkowski@tieto.com> wrote:
-> Hi Grzegorz,
->
->
-> On 08/13/2014 04:50 PM, Grzegorz Kolodziejczyk wrote:
->>
->> Client gets stucked on advertising while unregistering app with not
->> stopped listening.
->> ---
->>   android/gatt.c | 102
->> ++++++++++++++++++++++++++++++++++++---------------------
->>   1 file changed, 64 insertions(+), 38 deletions(-)
->>
->> diff --git a/android/gatt.c b/android/gatt.c
->> index 89748d2..7b3db06 100644
->> --- a/android/gatt.c
->> +++ b/android/gatt.c
->> @@ -1834,15 +1834,79 @@ static uint8_t unregister_app(int client_if)
->>         return HAL_STATUS_SUCCESS;
->>   }
->>
->> +static void send_client_listen_notify(int32_t id, int32_t status)
->> +{
->> +       struct hal_ev_gatt_client_listen ev;
->> +
->> +       /* Server if because of typo in android headers */
->> +       ev.server_if = id;
->> +       ev.status = status;
->> +
->> +       ipc_send_notif(hal_ipc, HAL_SERVICE_ID_GATT,
->> HAL_EV_GATT_CLIENT_LISTEN,
->> +                                                       sizeof(ev), &ev);
->> +}
->> +
->> +struct listen_data {
->> +       int32_t client_id;
->> +       bool start;
->> +};
->> +
->> +static void set_advertising_cb(uint8_t status, void *user_data)
->> +{
->> +       struct listen_data *l = user_data;
->> +
->> +       send_client_listen_notify(l->client_id, status);
->> +
->> +       /* In case of success update advertising state*/
->> +       if (!status)
->> +               advertising_cnt = l->start ? 1 : 0;
->> +
->> +       /*
->> +        * Let's remove client from the list in two cases
->> +        * 1. Start failed
->> +        * 2. Stop succeed
->> +        */
->> +       if ((l->start && status) || (!l->start && !status))
->> +               queue_remove(listen_apps, INT_TO_PTR(l->client_id));
->> +
->> +       free(l);
->> +}
->> +
->>   static void handle_client_unregister(const void *buf, uint16_t len)
->>   {
->>         const struct hal_cmd_gatt_client_unregister *cmd = buf;
->>         uint8_t status;
->> +       void *listening_client;
->> +       struct listen_data *data;
->>
->>         DBG("");
->>
->> +       listening_client = queue_find(listen_apps, match_by_value,
->> +
->> INT_TO_PTR(cmd->client_if));
->> +
->> +       if (listening_client) {
->> +               data = new0(struct listen_data, 1);
->> +               if (!data) {
->> +                       error("gatt: Could not allocate memory for listen
->> data");
->> +                       status = HAL_STATUS_NOMEM;
->> +                       goto reply;
->> +               }
->> +
->> +               data->client_id = cmd->client_if;
->> +               data->start = false;
->> +
->> +               if (!bt_le_set_advertising(data->start,
->> set_advertising_cb,
->> +                                                               data)) {
->> +                       error("gatt: Could not set advertising");
->> +                       status = HAL_STATUS_FAILED;
->> +                       free(data);
->> +                       goto reply;
->> +               }
->> +       }
->
->
-> I think this should work like 'handle_client_listen': check the
-> 'advertising_cnt' and stop only if the client that unregisters itself is the
-> last one that was advertising.
->
-> It would be good to actually extract this counter check and advertising set
-> from 'handle_client_listen' so it can be reused in
-> 'handle_client_unregister'.
->
-Yes, I'll change it to trace advertising counter.
->
->> +
->>         status = unregister_app(cmd->client_if);
->>
->> +reply:
->>         ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_GATT,
->>                                         HAL_OP_GATT_CLIENT_UNREGISTER,
->> status);
->>   }
->> @@ -1948,44 +2012,6 @@ static void handle_client_disconnect(const void
->> *buf, uint16_t len)
->>                                         HAL_OP_GATT_CLIENT_DISCONNECT,
->> status);
->>   }
->>
->> -static void send_client_listen_notify(int32_t id, int32_t status)
->> -{
->> -       struct hal_ev_gatt_client_listen ev;
->> -
->> -       /* Server if because of typo in android headers */
->> -       ev.server_if = id;
->> -       ev.status = status;
->> -
->> -       ipc_send_notif(hal_ipc, HAL_SERVICE_ID_GATT,
->> HAL_EV_GATT_CLIENT_LISTEN,
->> -                                                       sizeof(ev), &ev);
->> -}
->> -
->> -struct listen_data {
->> -       int32_t client_id;
->> -       bool start;
->> -};
->> -
->> -static void set_advertising_cb(uint8_t status, void *user_data)
->> -{
->> -       struct listen_data *l = user_data;
->> -
->> -       send_client_listen_notify(l->client_id, status);
->> -
->> -       /* In case of success update advertising state*/
->> -       if (!status)
->> -               advertising_cnt = l->start ? 1 : 0;
->> -
->> -       /*
->> -        * Let's remove client from the list in two cases
->> -        * 1. Start failed
->> -        * 2. Stop succeed
->> -        */
->> -       if ((l->start && status) || (!l->start && !status))
->> -               queue_remove(listen_apps, INT_TO_PTR(l->client_id));
->> -
->> -       free(l);
->> -}
->> -
->>   static void handle_client_listen(const void *buf, uint16_t len)
->>   {
->>         const struct hal_cmd_gatt_client_listen *cmd = buf;
->>
->
-> Regards,
-> Jakub
->
+diff --git a/android/tester-bluetooth.c b/android/tester-bluetooth.c
+index 7ea0684..a97e28e 100644
+--- a/android/tester-bluetooth.c
++++ b/android/tester-bluetooth.c
+@@ -448,6 +448,8 @@ static  struct bt_action_data no_input_no_output_io_cap = {
+ 	.io_cap = 0x03,
+ };
+ 
++static uint16_t test_conn_handle = 0;
++
+ static void conn_cb(uint16_t handle, void *user_data)
+ {
+ 	struct test_data *data = tester_get_data();
+@@ -455,6 +457,8 @@ static void conn_cb(uint16_t handle, void *user_data)
+ 
+ 	tester_print("New connection with handle 0x%04x", handle);
+ 
++	test_conn_handle = handle;
++
+ 	bthost_request_auth(bthost, handle);
+ }
+ 
+@@ -1178,6 +1182,30 @@ static struct test_case test_cases[] = {
+ 		ACTION_SUCCESS(bluetooth_disable_action, NULL),
+ 		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_OFF),
+ 	),
++	TEST_CASE_BREDR("Bluetooth Accept Bond - No Bond - Success",
++		ACTION_SUCCESS(bluetooth_enable_action, NULL),
++		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_ON),
++		ACTION_SUCCESS(bt_set_property_action,
++					&prop_test_scanmode_conn_discov),
++		CALLBACK_ADAPTER_PROPS(&prop_test_scanmode_conn_discov, 1),
++		ACTION_SUCCESS(emu_setup_powered_remote_action, NULL),
++		ACTION_SUCCESS(emu_set_ssp_mode_action, NULL),
++		ACTION_SUCCESS(emu_set_io_cap, &no_input_no_output_io_cap),
++		ACTION_SUCCESS(emu_set_connect_cb_action, conn_cb),
++		ACTION_SUCCESS(emu_remote_connect_hci_action, NULL),
++		CALLBACK_BOND_STATE(BT_BOND_STATE_BONDING,
++						&prop_emu_remote_bdadr, 1),
++		CALLBACK_BOND_STATE(BT_BOND_STATE_BONDED,
++						&prop_emu_remote_bdadr, 1),
++		ACTION_SUCCESS(emu_remote_disconnect_hci_action,
++							&test_conn_handle),
++		ACTION_SUCCESS(bluetooth_disable_action, NULL),
++		CALLBACK_BOND_STATE(BT_BOND_STATE_BONDING,
++						&prop_emu_remote_bdadr, 1),
++		CALLBACK_BOND_STATE(BT_BOND_STATE_NONE,
++						&prop_emu_remote_bdadr, 1),
++		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_OFF),
++	),
+ };
+ 
+ struct queue *get_bluetooth_tests(void)
+-- 
+1.8.4
 
-Best regards,
-Grzegorz
