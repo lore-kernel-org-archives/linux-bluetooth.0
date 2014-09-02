@@ -1,40 +1,75 @@
 Return-Path: <cyrus@holtmann.org>
-From: Marcin Kraglak <marcin.kraglak@tieto.com>
+From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv2 0/8] Android tester GATT test cases
-Date: Tue,  2 Sep 2014 14:04:23 +0200
-Message-Id: <1409659471-25171-1-git-send-email-marcin.kraglak@tieto.com>
+Cc: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+Subject: [PATCH v2] android/bluetooth: Fix handling paring related events
+Date: Tue,  2 Sep 2014 13:51:36 +0200
+Message-Id: <1409658696-7127-1-git-send-email-lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-v1:
-This patch set improve handling of ssp requests in few test cases
-and adds GATT test cases for searching primary services and
-characteristics.
+As it turns out it is possible that kernel send to user space mgmt
+events related to pairing before device connected event.
+In such case BfA was dropping such event because he does not know
+device.
 
-This set contains rebased version of pending commits.
+With this patch, if device is not in the cache, BfA will create it.
 
-v2:
-* rebased
-* fixed not comparing status of get_characteristic_cb
+Issue triggered by test: "Bluetooth Accept Bond - Just Works - Success"
+---
+v2: build error.
+ android/bluetooth.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
-Marcin Kraglak (8):
-  android/tester: Simplify ACTION_FAIL and ACTION_SUCCESS defines
-  android/tester: Add function to set default ssp handler
-  android/tester: Add support for search services callbacks
-  android/tester: Add GATT Client Search Service test case
-  android/tester: Add GATT Search Service 2 test case
-  android/tester: Add negative GATT Search Service test
-  android/tester: Add support for get_characteristic_cb()
-  android/tester: Add GATT get_characteristic test
-
- android/tester-a2dp.c |   3 +
- android/tester-gatt.c | 269 +++++++++++++++++++++++++++++++++++++++++++++++++-
- android/tester-main.c | 123 ++++++++++++++++++++++-
- android/tester-main.h |  44 ++++++---
- android/tester-pan.c  |   3 +
- 5 files changed, 426 insertions(+), 16 deletions(-)
-
+diff --git a/android/bluetooth.c b/android/bluetooth.c
+index 99e2aab..bd1e747 100644
+--- a/android/bluetooth.c
++++ b/android/bluetooth.c
+@@ -1240,7 +1240,7 @@ static void new_link_key_callback(uint16_t index, uint16_t length,
+ 		return;
+ 	}
+ 
+-	dev = find_device(&ev->key.addr.bdaddr);
++	dev = get_device(&ev->key.addr.bdaddr, ev->key.addr.type);
+ 	if (!dev)
+ 		return;
+ 
+@@ -1335,7 +1335,7 @@ static void user_confirm_request_callback(uint16_t index, uint16_t length,
+ 	ba2str(&ev->addr.bdaddr, dst);
+ 	DBG("%s confirm_hint %u", dst, ev->confirm_hint);
+ 
+-	dev = find_device(&ev->addr.bdaddr);
++	dev = get_device(&ev->addr.bdaddr, ev->addr.type);
+ 	if (!dev)
+ 		return;
+ 
+@@ -1363,7 +1363,7 @@ static void user_passkey_request_callback(uint16_t index, uint16_t length,
+ 	ba2str(&ev->addr.bdaddr, dst);
+ 	DBG("%s", dst);
+ 
+-	dev = find_device(&ev->addr.bdaddr);
++	dev = get_device(&ev->addr.bdaddr, ev->addr.type);
+ 	if (!dev)
+ 		return;
+ 
+@@ -2288,7 +2288,7 @@ static void new_csrk_callback(uint16_t index, uint16_t length,
+ 	}
+ 
+ 	ba2str(&ev->key.addr.bdaddr, dst);
+-	dev = find_device(&ev->key.addr.bdaddr);
++	dev = get_device(&ev->key.addr.bdaddr, ev->key.addr.type);
+ 	if (!dev)
+ 		return;
+ 
+@@ -2363,7 +2363,7 @@ static void new_irk_callback(uint16_t index, uint16_t length,
+ 	DBG("new IRK for %s, RPA %s", dst, rpa);
+ 
+ 	if (!bacmp(&ev->rpa, BDADDR_ANY)) {
+-		dev = find_device(&addr->bdaddr);
++		dev = get_device(&addr->bdaddr, addr->type);
+ 		if (!dev)
+ 			return;
+ 	} else {
 -- 
-1.9.0
+1.8.4
 
