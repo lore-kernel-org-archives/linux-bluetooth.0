@@ -2,42 +2,42 @@ Return-Path: <cyrus@holtmann.org>
 From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH 03/16] android/hidhost: Allow to use cached dev when connecting
-Date: Tue,  2 Sep 2014 12:09:48 +0200
-Message-Id: <1409652601-28689-4-git-send-email-lukasz.rymanowski@tieto.com>
+Subject: [PATCH 01/16] android/gatt: Fix for device type in gatt
+Date: Tue,  2 Sep 2014 12:09:46 +0200
+Message-Id: <1409652601-28689-2-git-send-email-lukasz.rymanowski@tieto.com>
 In-Reply-To: <1409652601-28689-1-git-send-email-lukasz.rymanowski@tieto.com>
 References: <1409652601-28689-1-git-send-email-lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-There is no reason to not allow connect when there is cached hid device
+This patch fixes remote device type in GATT cache, which should be
+updated on connect confirm
 ---
- android/hidhost.c | 11 ++++++-----
- 1 file changed, 6 insertions(+), 5 deletions(-)
+ android/gatt.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/android/hidhost.c b/android/hidhost.c
-index 652baa0..3dc3c25 100644
---- a/android/hidhost.c
-+++ b/android/hidhost.c
-@@ -867,12 +867,13 @@ static void bt_hid_connect(const void *buf, uint16_t len)
- 	android2bdaddr(&cmd->bdaddr, &dst);
+diff --git a/android/gatt.c b/android/gatt.c
+index ae310f7..aea0a9f 100644
+--- a/android/gatt.c
++++ b/android/gatt.c
+@@ -6115,8 +6115,6 @@ static void connect_confirm(GIOChannel *io, void *user_data)
+ 			error("gatt: Could not create device");
+ 			goto drop;
+ 		}
+-
+-		dev->bdaddr_type = dst_type;
+ 	} else {
+ 		if ((dev->state != DEVICE_DISCONNECTED) &&
+ 					!(dev->state == DEVICE_CONNECT_INIT &&
+@@ -6130,6 +6128,8 @@ static void connect_confirm(GIOChannel *io, void *user_data)
+ 		}
+ 	}
  
- 	l = g_slist_find_custom(devices, &dst, device_cmp);
--	if (l) {
--		status = HAL_STATUS_FAILED;
--		goto failed;
--	}
-+	if (l)
-+		dev = l->data;
-+	else
-+		dev = hid_device_new(&dst);
- 
--	dev = hid_device_new(&dst);
-+	if (dev->state != HAL_HIDHOST_STATE_DISCONNECTED)
-+		goto done;
- 
- 	ba2str(&dev->dst, addr);
- 	DBG("connecting to %s", addr);
++	dev->bdaddr_type = dst_type;
++
+ 	if (!bt_io_accept(io, connect_cb, device_ref(dev), NULL, NULL)) {
+ 		error("gatt: failed to accept connection");
+ 		device_unref(dev);
 -- 
 1.8.4
 
