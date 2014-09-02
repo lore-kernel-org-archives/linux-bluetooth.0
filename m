@@ -2,37 +2,42 @@ Return-Path: <cyrus@holtmann.org>
 From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH 02/16] android/hidhost: Remove invalid connecting state notification
-Date: Tue,  2 Sep 2014 12:09:47 +0200
-Message-Id: <1409652601-28689-3-git-send-email-lukasz.rymanowski@tieto.com>
+Subject: [PATCH 03/16] android/hidhost: Allow to use cached dev when connecting
+Date: Tue,  2 Sep 2014 12:09:48 +0200
+Message-Id: <1409652601-28689-4-git-send-email-lukasz.rymanowski@tieto.com>
 In-Reply-To: <1409652601-28689-1-git-send-email-lukasz.rymanowski@tieto.com>
 References: <1409652601-28689-1-git-send-email-lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-HIDHOST_STATE_CONNECTING is reserved for local initiated connections
-according to Android framework.
-Sending it on incoming connection might confuse Android state machines.
+There is no reason to not allow connect when there is cached hid device
 ---
- android/hidhost.c | 4 +---
- 1 file changed, 1 insertion(+), 3 deletions(-)
+ android/hidhost.c | 11 ++++++-----
+ 1 file changed, 6 insertions(+), 5 deletions(-)
 
 diff --git a/android/hidhost.c b/android/hidhost.c
-index 476742e..652baa0 100644
+index 652baa0..3dc3c25 100644
 --- a/android/hidhost.c
 +++ b/android/hidhost.c
-@@ -802,10 +802,8 @@ static void hog_conn_cb(const bdaddr_t *addr, int err, void *attrib)
- 		goto fail;
- 	}
+@@ -867,12 +867,13 @@ static void bt_hid_connect(const void *buf, uint16_t len)
+ 	android2bdaddr(&cmd->bdaddr, &dst);
  
--	if (!dev) {
-+	if (!dev)
- 		dev = hid_device_new(addr);
--		bt_hid_notify_state(dev, HAL_HIDHOST_STATE_CONNECTING);
+ 	l = g_slist_find_custom(devices, &dst, device_cmp);
+-	if (l) {
+-		status = HAL_STATUS_FAILED;
+-		goto failed;
 -	}
++	if (l)
++		dev = l->data;
++	else
++		dev = hid_device_new(&dst);
  
- 	if (!dev->hog) {
- 		/* TODO: Get device details and primary */
+-	dev = hid_device_new(&dst);
++	if (dev->state != HAL_HIDHOST_STATE_DISCONNECTED)
++		goto done;
+ 
+ 	ba2str(&dev->dst, addr);
+ 	DBG("connecting to %s", addr);
 -- 
 1.8.4
 
