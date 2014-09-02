@@ -2,66 +2,53 @@ Return-Path: <cyrus@holtmann.org>
 From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH 06/16] android/gatt: Add API to autoconnect GATT based devices
-Date: Tue,  2 Sep 2014 12:09:51 +0200
-Message-Id: <1409652601-28689-7-git-send-email-lukasz.rymanowski@tieto.com>
+Subject: [PATCH 05/16] android/gatt: Add tracking for autoconnect apps
+Date: Tue,  2 Sep 2014 12:09:50 +0200
+Message-Id: <1409652601-28689-6-git-send-email-lukasz.rymanowski@tieto.com>
 In-Reply-To: <1409652601-28689-1-git-send-email-lukasz.rymanowski@tieto.com>
 References: <1409652601-28689-1-git-send-email-lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Lets start to track which applications are interested in autoconnect
 ---
- android/gatt.c | 30 ++++++++++++++++++++++++++++++
- android/gatt.h |  1 +
- 2 files changed, 31 insertions(+)
+ android/gatt.c | 9 +++++++++
+ 1 file changed, 9 insertions(+)
 
 diff --git a/android/gatt.c b/android/gatt.c
-index f526c16..5d04ad8 100644
+index aea0a9f..f526c16 100644
 --- a/android/gatt.c
 +++ b/android/gatt.c
-@@ -6725,3 +6725,33 @@ bool bt_gatt_disconnect_app(unsigned int id, const bdaddr_t *addr)
+@@ -164,6 +164,8 @@ struct gatt_device {
+ 	int ref;
+ 	int conn_cnt;
  
- 	return true;
++	struct queue *autoconnect_apps;
++
+ 	struct queue *pending_requests;
+ };
+ 
+@@ -682,6 +684,7 @@ static void destroy_device(void *data)
+ 
+ 	queue_destroy(dev->services, destroy_service);
+ 	queue_destroy(dev->pending_requests, destroy_pending_request);
++	queue_destroy(dev->autoconnect_apps, NULL);
+ 
+ 	free(dev);
  }
-+
-+bool bt_gatt_add_autoconnect(unsigned int id, const bdaddr_t *addr)
-+{
-+	struct gatt_device *dev;
-+	struct gatt_app *app;
-+
-+	DBG("");
-+
-+	app = find_app_by_id(id);
-+	if (!app) {
-+		error("gatt: App ID=%d not found", id);
-+		return false;
+@@ -724,6 +727,12 @@ static struct gatt_device *create_device(const bdaddr_t *addr)
+ 		return NULL;
+ 	}
+ 
++	dev->autoconnect_apps = queue_new();
++	if (!dev->autoconnect_apps) {
++		error("gatt: Failed to allocate memory for client");
++		destroy_device(dev);
++		return NULL;
 +	}
-+
-+	dev = find_device_by_addr(addr);
-+	if (!dev) {
-+		error("gatt: Device not found");
-+		return false;
-+	}
-+
-+	/* Take reference of device for auto connect purpose */
-+	if (queue_isempty(dev->autoconnect_apps))
-+		device_ref(dev);
-+
-+	if (!queue_find(dev->autoconnect_apps, match_by_value,
-+							INT_TO_PTR(id)))
-+		return queue_push_head(dev->autoconnect_apps, INT_TO_PTR(id));
-+
-+	return true;
-+}
-diff --git a/android/gatt.h b/android/gatt.h
-index 027dda3..40699b2 100644
---- a/android/gatt.h
-+++ b/android/gatt.h
-@@ -39,3 +39,4 @@ bool bt_gatt_unregister_app(unsigned int id);
- bool bt_gatt_connect_app(unsigned int id, const bdaddr_t *addr);
- bool bt_gatt_disconnect_app(unsigned int id, const bdaddr_t *addr);
- bool bt_gatt_set_security(const bdaddr_t *bdaddr, int sec_level);
-+bool bt_gatt_add_autoconnect(unsigned int id, const bdaddr_t *addr);
+ 
+ 	dev->pending_requests = queue_new();
+ 	if (!dev->pending_requests) {
 -- 
 1.8.4
 
