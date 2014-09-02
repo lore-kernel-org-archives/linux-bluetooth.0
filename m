@@ -2,11 +2,11 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 07/16] android/gatt: Add API to remove autoconnect GATT based device
-Date: Tue, 02 Sep 2014 17:27:26 +0200
-Message-ID: <4381322.9SzXjEeX31@uw000953>
-In-Reply-To: <1409652601-28689-8-git-send-email-lukasz.rymanowski@tieto.com>
-References: <1409652601-28689-1-git-send-email-lukasz.rymanowski@tieto.com> <1409652601-28689-8-git-send-email-lukasz.rymanowski@tieto.com>
+Subject: Re: [PATCH 00/16] Move reconnect logic from HOG to GATT
+Date: Tue, 02 Sep 2014 17:19:57 +0200
+Message-ID: <4967090.QWpRfl20sL@uw000953>
+In-Reply-To: <1409652601-28689-1-git-send-email-lukasz.rymanowski@tieto.com>
+References: <1409652601-28689-1-git-send-email-lukasz.rymanowski@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -14,58 +14,39 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Łukasz,
 
-On Tuesday 02 of September 2014 12:09:52 Lukasz Rymanowski wrote:
-> ---
->  android/gatt.c | 23 +++++++++++++++++++++++
->  android/gatt.h |  1 +
->  2 files changed, 24 insertions(+)
+On Tuesday 02 of September 2014 12:09:45 Lukasz Rymanowski wrote:
+> Following patches moves reconnect feature from GATT clients to GATT.
+> GATT is in charge to decide if white list is used or legacy "passive scan"
 > 
-> diff --git a/android/gatt.c b/android/gatt.c
-> index 5d04ad8..0d0b56d 100644
-> --- a/android/gatt.c
-> +++ b/android/gatt.c
-> @@ -6755,3 +6755,26 @@ bool bt_gatt_add_autoconnect(unsigned int id, const bdaddr_t *addr)
->  
->  	return true;
->  }
-> +
-> +void bt_gatt_remove_autoconnect(unsigned int id, const bdaddr_t *addr)
-> +{
-> +	struct gatt_device *dev;
-> +
-> +	DBG("");
-> +
-> +	dev = find_device_by_addr(addr);
-> +	if (!dev) {
-> +		error("gatt: Device not found");
-> +		return;
-> +	}
-> +
-> +	queue_remove(dev->autoconnect_apps, INT_TO_PTR(id));
-> +
-> +	if (queue_isempty(dev->autoconnect_apps)) {
-> +		bt_auto_connect_remove(addr);
-> +		device_unref(dev);
-> +
-> +		if (dev->state == DEVICE_CONNECT_INIT)
-> +			device_set_state(dev, DEVICE_DISCONNECTED);
-
-This looks unclear to me since you are using dev after unref.
-Shouldn't unref be done after you no longer need to use it? Otherwise
-things might crash due to use-after-free.
-
-> +	}
-> +}
-> diff --git a/android/gatt.h b/android/gatt.h
-> index 40699b2..3382df9 100644
-> --- a/android/gatt.h
-> +++ b/android/gatt.h
-> @@ -40,3 +40,4 @@ bool bt_gatt_connect_app(unsigned int id, const bdaddr_t *addr);
->  bool bt_gatt_disconnect_app(unsigned int id, const bdaddr_t *addr);
->  bool bt_gatt_set_security(const bdaddr_t *bdaddr, int sec_level);
->  bool bt_gatt_add_autoconnect(unsigned int id, const bdaddr_t *addr);
-> +void bt_gatt_remove_autoconnect(unsigned int id, const bdaddr_t *addr);
+> There are also couple of fixes found in HOG during testing.
 > 
+> Tested on Android against kernel with mgmt version 1.6 and 1.7
+> 
+> Lukasz Rymanowski (16):
+>   android/gatt: Fix for device type in gatt
+>   android/hidhost: Remove invalid connecting state notification
+>   android/hidhost: Allow to use cached dev when connecting
+>   android/bluetooth: Add tracking if device is in white list
+>   android/gatt: Add tracking for autoconnect apps
+>   android/gatt: Add API to autoconnect GATT based devices
+>   android/gatt: Add API to remove autoconnect GATT based device
+>   android/gatt: Unsubscribe from autoconnect on unregister
+>   android/gatt: Extract remove_autoconnect_device helper
+>   android/gatt: Move find_conn up in the file
+>   android/gatt: Notify apps interested in autoconnect about connection
+>   android/gatt: Extract trigger le connection to new function
+>   android/gatt: Move auto_connect_le() up in the file
+>   android/gatt: Make sure GATT will reconnect after disconnection
+>   android/gatt: Remove device from white list on device destroy
+>   android/hidhost: Remove reconnect logic
+> 
+>  android/bluetooth.c |  23 ++++-
+>  android/gatt.c      | 246 +++++++++++++++++++++++++++++++++++++++-------------
+>  android/gatt.h      |   2 +
+>  android/hidhost.c   |  38 +++-----
+>  4 files changed, 218 insertions(+), 91 deletions(-)
+
+Patches 1-6 and 10-13 are now applied. Thanks.
 
 -- 
 Best regards, 
