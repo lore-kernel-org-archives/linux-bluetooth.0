@@ -2,107 +2,54 @@ Return-Path: <cyrus@holtmann.org>
 From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
-Subject: [PATCH 1/8] android/tester: Add action to verify encryption change
-Date: Wed,  3 Sep 2014 11:02:42 +0200
-Message-Id: <1409734969-10716-1-git-send-email-jakub.tyszkowski@tieto.com>
+Subject: [PATCH 3/5] android/tester: Fix hdp cases not handling ssp correctly
+Date: Wed,  3 Sep 2014 10:56:39 +0200
+Message-Id: <1409734601-8078-3-git-send-email-jakub.tyszkowski@tieto.com>
+In-Reply-To: <1409734601-8078-1-git-send-email-jakub.tyszkowski@tieto.com>
+References: <1409734601-8078-1-git-send-email-jakub.tyszkowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-When encryption change is verified encryption flag is cleared so we can
-detect another encryption change when device reconnects during execution
-of another step in the same test case.
 ---
- android/tester-main.c | 38 ++++++++++++++++++++++++++++++++++++++
- android/tester-main.h |  2 ++
- 2 files changed, 40 insertions(+)
+ android/tester-hdp.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/android/tester-main.c b/android/tester-main.c
-index f5f46fb..34a71ac 100644
---- a/android/tester-main.c
-+++ b/android/tester-main.c
-@@ -28,6 +28,8 @@ static gint scheduled_cbacks_num;
- #define EMULATOR_SIGNAL_TIMEOUT 2 /* in seconds */
- #define EMULATOR_SIGNAL "emulator_started"
- 
-+static const uint8_t hci_encr_change_hdr[] = { 0x04, 0x08, 0x04, 0x00 };
-+
- static gboolean check_callbacks_called(gpointer user_data)
- {
- 	/*
-@@ -213,6 +215,25 @@ static void mgmt_debug(const char *str, void *user_data)
- 	tester_print("%s%s", prefix, str);
- }
- 
-+static bool hciemu_post_encr_hook(const void *data, uint16_t len,
-+							void *user_data)
-+{
-+	struct test_data *t_data = tester_get_data();
-+
-+	/*
-+	 * Expected data: header (4 octets) + conn. handle (2 octets) +
-+	 * encryption flag (1 octet)
-+	 */
-+	if (len < sizeof(hci_encr_change_hdr) + 3)
-+		return true;
-+
-+	/* Verify header, skip conn. handle and check encryption */
-+	if (!memcmp(hci_encr_change_hdr, data, sizeof(hci_encr_change_hdr)))
-+		t_data->is_encrypted = ((uint8_t *)data)[6] ? true : false;
-+
-+	return true;
-+}
-+
- static void read_info_callback(uint8_t status, uint16_t length,
- 					const void *param, void *user_data)
- {
-@@ -250,6 +271,10 @@ static void read_info_callback(uint8_t status, uint16_t length,
- 		return;
- 	}
- 
-+	/* set hook for encryption change */
-+	hciemu_add_hook(data->hciemu, HCIEMU_HOOK_POST_EVT, 0x08,
-+						hciemu_post_encr_hook, NULL);
-+
- 	tester_pre_setup_complete();
- }
- 
-@@ -1804,6 +1829,19 @@ void emu_add_l2cap_server_action(void)
- 	schedule_action_verification(step);
- }
- 
-+void bt_verify_encryption_action(void)
-+{
-+	struct test_data *data = tester_get_data();
-+	struct step *step = g_new0(struct step, 1);
-+
-+	step->action_status = data->is_encrypted ? BT_STATUS_SUCCESS :
-+								BT_STATUS_FAIL;
-+
-+	data->is_encrypted = 0;
-+
-+	schedule_action_verification(step);
-+}
-+
- static void rfcomm_connect_cb(uint16_t handle, uint16_t cid, void *user_data,
- 								bool status)
- {
-diff --git a/android/tester-main.h b/android/tester-main.h
-index 46aacce..cb8300d 100644
---- a/android/tester-main.h
-+++ b/android/tester-main.h
-@@ -331,6 +331,7 @@ struct test_data {
- 	pid_t bluetoothd_pid;
- 
- 	struct queue *pdus;
-+	bool is_encrypted;
- };
- 
- /*
-@@ -477,3 +478,4 @@ void bt_ssp_reply_accept_action(void);
- void bt_cancel_bond_action(void);
- void bt_remove_bond_action(void);
- void set_default_ssp_request_handler(void);
-+void bt_verify_encryption_action(void);
+diff --git a/android/tester-hdp.c b/android/tester-hdp.c
+index bb73681..9ecef21 100644
+--- a/android/tester-hdp.c
++++ b/android/tester-hdp.c
+@@ -478,6 +478,7 @@ static struct test_case test_cases[] = {
+ 					BTHL_APP_REG_STATE_DEREG_SUCCESS),
+ 	),
+ 	TEST_CASE_BREDRLE("HDP Connect Source Reliable Channel",
++		ACTION_SUCCESS(set_default_ssp_request_handler, NULL),
+ 		ACTION_SUCCESS(bluetooth_enable_action, NULL),
+ 		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_ON),
+ 		ACTION_SUCCESS(emu_setup_powered_remote_action, NULL),
+@@ -498,6 +499,7 @@ static struct test_case test_cases[] = {
+ 						BTHL_CONN_STATE_CONNECTED),
+ 	),
+ 	TEST_CASE_BREDRLE("HDP Destroy Source Reliable Channel",
++		ACTION_SUCCESS(set_default_ssp_request_handler, NULL),
+ 		ACTION_SUCCESS(bluetooth_enable_action, NULL),
+ 		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_ON),
+ 		ACTION_SUCCESS(emu_setup_powered_remote_action, NULL),
+@@ -521,6 +523,7 @@ static struct test_case test_cases[] = {
+ 						BTHL_CONN_STATE_DESTROYED),
+ 	),
+ 	TEST_CASE_BREDRLE("HDP Connect Sink Streaming Channel",
++		ACTION_SUCCESS(set_default_ssp_request_handler, NULL),
+ 		ACTION_SUCCESS(bluetooth_enable_action, NULL),
+ 		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_ON),
+ 		ACTION_SUCCESS(emu_setup_powered_remote_action, NULL),
+@@ -544,6 +547,7 @@ static struct test_case test_cases[] = {
+ 						BTHL_CONN_STATE_CONNECTED),
+ 	),
+ 	TEST_CASE_BREDRLE("HDP Destroy Sink Streaming Channel",
++		ACTION_SUCCESS(set_default_ssp_request_handler, NULL),
+ 		ACTION_SUCCESS(bluetooth_enable_action, NULL),
+ 		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_ON),
+ 		ACTION_SUCCESS(emu_setup_powered_remote_action, NULL),
 -- 
 1.9.1
 
