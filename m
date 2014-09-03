@@ -1,104 +1,76 @@
 Return-Path: <cyrus@holtmann.org>
+From: "Gu, Chao Jie" <chao.jie.gu@intel.com>
+To: Arman Uguray <armansito@chromium.org>, Marcel Holtmann
+	<marcel@holtmann.org>
+CC: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: RE: [PATCH] gatt api V2
+Date: Wed, 3 Sep 2014 13:25:59 +0000
+Message-ID: <3D02B219753AD44CBDDDE484323B1774112F7F7A@SHSMSX104.ccr.corp.intel.com>
+References: <1409295566-13583-1-git-send-email-chao.jie.gu@intel.com>
+	<CABBYNZLqDtSk8h0-+BruH6i_+YxRrmoR8srf+KsAhvLvEq51-w@mail.gmail.com>
+	<3D02B219753AD44CBDDDE484323B1774112F697D@SHSMSX104.ccr.corp.intel.com>
+	<CAHrH25ThNCf0wy29Me6Kh5e6YzMKLSiaNiUpU4qg_=HcwaHVCA@mail.gmail.com>
+	<3D02B219753AD44CBDDDE484323B1774112F6F57@SHSMSX104.ccr.corp.intel.com>
+	<7926AF24-265F-454D-A502-C3554072752E@holtmann.org>
+ <CAHrH25TvLZz+xS11UssE-xKx09UHX9w--Y7YoLdaOBx3LGHxaQ@mail.gmail.com>
+In-Reply-To: <CAHrH25TvLZz+xS11UssE-xKx09UHX9w--Y7YoLdaOBx3LGHxaQ@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-In-Reply-To: <1409737684-16002-2-git-send-email-luiz.dentz@gmail.com>
-References: <1409737684-16002-1-git-send-email-luiz.dentz@gmail.com>
-	<1409737684-16002-2-git-send-email-luiz.dentz@gmail.com>
-Date: Wed, 3 Sep 2014 16:30:34 +0300
-Message-ID: <CABBYNZJ9mF_JN-kHzv8qbsAJNFnOMq1FF1Q63QQ6NK4aRk33NA@mail.gmail.com>
-Subject: Re: [PATCH BlueZ] obexd/mas: Fix parsing of application parameters
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
-
-On Wed, Sep 3, 2014 at 12:48 PM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->
-> Some commands don't have any mandatory application parameter which means
-> inparams can be NULL which should not be treated as a bad request.
-> ---
->  obexd/plugins/mas.c | 24 ++++++++++++++++++------
->  1 file changed, 18 insertions(+), 6 deletions(-)
->
-> diff --git a/obexd/plugins/mas.c b/obexd/plugins/mas.c
-> index 5729c22..24b26ae 100644
-> --- a/obexd/plugins/mas.c
-> +++ b/obexd/plugins/mas.c
-> @@ -83,8 +83,8 @@ static int get_params(struct obex_session *os, struct mas_session *mas)
->         ssize_t size;
->
->         size = obex_get_apparam(os, &buffer);
-> -       if (size < 0)
-> -               size = 0;
-> +       if (size <= 0)
-> +               return 0;
->
->         mas->inparams = g_obex_apparam_decode(buffer, size);
->         if (mas->inparams == NULL) {
-> @@ -249,7 +249,9 @@ static void get_messages_listing_cb(void *session, int err, uint16_t size,
->                 return;
->         }
->
-> -       g_obex_apparam_get_uint16(mas->inparams, MAP_AP_MAXLISTCOUNT, &max);
-> +       if (mas->inparams)
-> +               g_obex_apparam_get_uint16(mas->inparams, MAP_AP_MAXLISTCOUNT,
-> +                                                                       &max);
->
->         if (max == 0) {
->                 if (!entry)
-> @@ -397,7 +399,9 @@ static void get_folder_listing_cb(void *session, int err, uint16_t size,
->                 return;
->         }
->
-> -       g_obex_apparam_get_uint16(mas->inparams, MAP_AP_MAXLISTCOUNT, &max);
-> +       if (mas->inparams)
-> +               g_obex_apparam_get_uint16(mas->inparams, MAP_AP_MAXLISTCOUNT,
-> +                                                                       &max);
->
->         if (max == 0) {
->                 if (err != -EAGAIN)
-> @@ -493,8 +497,12 @@ static void *folder_listing_open(const char *name, int oflag, mode_t mode,
->
->         DBG("name = %s", name);
->
-> -       g_obex_apparam_get_uint16(mas->inparams, MAP_AP_MAXLISTCOUNT, &max);
-> -       g_obex_apparam_get_uint16(mas->inparams, MAP_AP_STARTOFFSET, &offset);
-> +       if (mas->inparams) {
-> +               g_obex_apparam_get_uint16(mas->inparams, MAP_AP_MAXLISTCOUNT,
-> +                                                                       &max);
-> +               g_obex_apparam_get_uint16(mas->inparams, MAP_AP_STARTOFFSET,
-> +                                                               &offset);
-> +       }
->
->         *err = messages_get_folder_listing(mas->backend_data, name, max,
->                                         offset, get_folder_listing_cb, mas);
-> @@ -526,6 +534,9 @@ static void *msg_listing_open(const char *name, int oflag, mode_t mode,
->                 return NULL;
->         }
->
-> +       if (!mas->inparams)
-> +               goto done;
-> +
->         g_obex_apparam_get_uint16(mas->inparams, MAP_AP_MAXLISTCOUNT, &max);
->         g_obex_apparam_get_uint16(mas->inparams, MAP_AP_STARTOFFSET, &offset);
->         g_obex_apparam_get_uint8(mas->inparams, MAP_AP_SUBJECTLENGTH,
-> @@ -548,6 +559,7 @@ static void *msg_listing_open(const char *name, int oflag, mode_t mode,
->         g_obex_apparam_get_uint8(mas->inparams, MAP_AP_FILTERPRIORITY,
->                                                 &filter.priority);
->
-> +done:
->         *err = messages_get_messages_listing(mas->backend_data, name, max,
->                         offset, subject_len, &filter,
->                         get_messages_listing_cb, mas);
-> --
-> 1.9.3
-
-Applied.
-
-
--- 
-Luiz Augusto von Dentz
+SGkgYXJtYW4sIA0KDQo+IFlvdSBjYW4gc3RhcnQgcGxheWluZyB3aXRoIHRoZSBjb2RlIGJ5IHVz
+aW5nIHRvb2xzL2J0Z2F0dC1jbGllbnQsIHdoaWNoIGdvdCBtZXJnZWQNCj4gaW50byB0aGUgdHJl
+ZSBvdmVyIHRoZSB3ZWVrZW5kLiBUaGlzIGJhc2ljYWxseSBkZW1vbnN0cmF0ZXMgaG93IHRoZSB0
+b29scyAmDQo+IGRhZW1vbiBjYW4gaW50ZXJhY3Qgd2l0aCBzaGFyZWQvZ2F0dC1jbGllbnQuIEFs
+c28gdGFrZSBhIGxvb2sgYXQgc2hhcmVkL2F0dCwNCj4gc2hhcmVkL2dhdHQtaGVscGVycywgYW5k
+IHNoYXJlZC9nYXR0LWNsaWVudCB3aGVyZSB0aGUgbmV3IGNvZGUgaXMgaW1wbGVtZW50ZWQuDQoN
+CkkgdGFrZSBzb21lIHRpbWUgZGVsdmVkIGluIHNoYXJlZC8qIGZpbGVzLCBhbHRob3VnaCBJIGNh
+bm5vdCB0YWtlIGEgbG9vayBhdCBjb2RlIGxpbmUgDQpvbmUgYnkgb25lIGluIHNob3J0IHRpbWUs
+LCB0aGUgd2hvbGUgc3RhY2sgYXBwZWFyIGNsZWFyIHRvIG1lIGhlbHAgd29yayBvbiB0aGlzLiAg
+IA0KV2hlbiBJIHVzZSB0aGUgYnRnYXR0LWNsaWVudCB0b29sIHRvIGNvbm5lY3QgTEUgZGV2aWNl
+IHRvZGF5LCBJIGdldCBhIHByb2JsZW0gYXMgYmVsb3dzOg0KLi9idGdhdHQtY2xpZW50IC1pIGhj
+aTAgLWQgREE6M0U6OUQ6NjU6NzU6QkUNCkNvbm5lY3RpbmcgdG8gZGV2aWNlIC4uLiBGYWlsZWQg
+dG8gY29ubmVjdDogT3BlcmF0aW9uIG5vdyBpbiBwcm9ncmVzcy4NCkkgdXNlZCBibHVldG9vdGhj
+dHJsIHRvIGNvbm5lY3QgdGhlIExFIGRldmljZSAsIGl0J3Mgb2suDQpJIGNvbXBhcmVkIGJ0Z2F0
+dC1jbGllbnQgbDJjYXAgY29ubmVjdCBwcm9jZXNzIHRvIHNldHVwIHNvY2tldCBwYXJhbWV0ZXIg
+d2l0aCBibHVldG9vdGhkDQpkaWQsIHRoZSBwcm9jZXNzIG9mIHNldHRpbmcgc29ja2V0IGNvbmZp
+Z3VyYXRpb24gc2VlbXMgdG8gYmUgdGhlIHNhbWUuDQpXaGF0IGRldGFpbHMgZGlkIEkgZm9yZ2V0
+IHRvIGRvIHRvIHJlc3VsdCBpbiB0aGlzIHByb2JsZW0/IERpZCB5b3UgZW5jb3VudGVyIG9uIHRo
+aXMgaXNzdWU/DQogDQo+IE9uZSBvZiB0aGUgVE9ET3MgeW91IGNhbiBpbml0aWFsbHkgbG9vayBh
+dCBpcyBzdXBwb3J0aW5nIHNpZ25lZCB3cml0ZXMgdXNpbmcNCj4gc2hhcmVkL2F0dC4gR2l2ZW4g
+dGhlIG5lY2Vzc2FyeSBrZXlzLCB3ZSB3YW50IHN0cnVjdCBidF9hdHQgdG8gYXV0b21hdGljYWxs
+eSBzaWduDQo+IG91dGdvaW5nIFBEVXMgKGZvciBjbGllbnQpIGFuZCB2ZXJpZnkgdGhlIHNpZ25h
+dHVyZSBvZiBpbmNvbWluZyBQRFVzIChmb3Igc2VydmVyKQ0KPiB3aGVuIHRoZSAic2lnbmVkIiBi
+aXQgb2YgdGhlIG9wY29kZSBpcyBzZXQgdG8gMS4gVGhlcmUgd2FzIGFuIGVtYWlsIGNvbnZlcnNh
+dGlvbg0KPiBzb21lIHRpbWUgYWdvIG9uIGhvdyB0byBhY2Nlc3MgdGhlIGtleXM7IGZlZWwgZnJl
+ZSB0byBkaWcgdGhhdCB1cCBhbmQgc2VlIHdoYXQgeW91DQo+IGNhbiBjb21lIHVwIHdpdGguDQoN
+Ck1heWJlIHRoZSBtYWlsIHRpdGxlIGRvZXMgbm90IGluY2x1ZGUgInNpZ25lZCB3cml0ZSIga2V5
+IHdvcmQsIGNhbiB5b3UgdGVsbCBtZSBhYm91dA0Kd2hpY2ggbW9udGggaW4gdGhhdCBkaXNjdXNz
+aW9uIGNhbWUgb3V0ID8NCg0KPiBUaGUgVE9ETyBpdGVtcyBtYXJrZWQgYXMgQzEvQzIgYXJlIGZh
+aXJseSBzdHJhaWdodGZvcndhcmQgdG8gaW1wbGVtZW50LiBUaGUNCj4gb3RoZXJzIHJlcXVpcmUg
+c29tZSBkaXNjdXNzaW9uL0FQSSBkZXNpZ24uIEkgdGhpbmsgdGhlIG1vc3QgY29tcGxleCB0YXNr
+IHdpbGwgYmUgdG8NCj4gbWlncmF0ZSB0aGUgZGFlbW9uIGNvZGUgZnJvbSBHQXR0cmliIHRvIHNo
+YXJlZC9nYXR0LWNsaWVudCwgc2luY2UgYSBsb3Qgb2YgdGhlDQo+IHBsdWdpbnMgdXNlIHRoYXQg
+Y29kZS4gV2UnbGwgbGlrZWx5IG5lZWQgYSBuZXcgcGx1Z2luIHByb2JpbmcgaW50ZXJmYWNlIGZv
+ciBHQVRULCBhcw0KPiB0aGUgcGx1Z2lucyB3b24ndCBwZXJmb3JtIHNlcnZpY2UgZGlzY292ZXJ5
+IGFueSBtb3JlLg0KPg0KSSBhZ3JlZSB0aGF0IHRoZXJlIGFyZSB0b28gbWFueSBkZXBlbmRlbmN5
+IG9uIEdBcnJ0aWIgbm93LCBpdCdzIGEgZGlmZmljdWx0IG1pZ3JhdGlvbg0Kd29yay4gWW91IHNh
+aWQgcHJvYmluZyBpbnRlcmZhY2UgZm9yIEdBVFQgdGhhdCBpcyBub3QgdmVyeSBjbGVhciB0byBt
+ZS4gRm9yIG15IHVuZGVyc3RhbmRpbmcsDQphbHRob3VnaCBwbHVnaW4gd29uJ3QgcGVyZm9ybSBz
+ZXJ2aWNlIGRpc2NvdmVyeSBhbnkgbW9yZSwgdGhleSBjYW4gdHJhbnZlcnNlIHRoZSBzZXJ2aWNl
+X2xpc3QNCmluIHRoZSBidF9nYXR0X2NsaWVudCBzdHJ1Y3R1cmUuIFNvIGZvciBwbHVnaW5zLCB0
+aGV5IG9ubHkgbmVlZCB0aGUgYnRfZ2F0dF9jbGllbnQgc3RydWN0dXJlICANCmNyZWF0ZWQgb25j
+ZSBkZXZpY2UgY29ubmVjdGVkLg0KIA0KPiBUaGUgbWFpbiB0aGluZyB0aGF0IG1ha2VzIHRoaXMg
+cGFydCBkaWZmaWN1bHQgaXMgdGhhdCBHQXR0cmliIGFuZCBidF9hdHQgY2Fubm90DQo+IG9wZXJh
+dGUgb24gdGhlIHNhbWUgc29ja2V0IGZkLCBzaW5jZSB0aGV5IHdpbGwgbGlrZWx5IGJyZWFrIHRo
+ZSBzZXF1ZW50aWFsIHByb3RvY29sDQo+IHJlcXVpcmVtZW50cyBvZiBBVFQsIHNvIHRoZSBwbHVn
+aW5zIGNhbid0IGJlIGVhc2lseSBjb252ZXJ0ZWQgb25lIGF0IGEgdGltZS4gV2UgbWF5DQo+IG5l
+ZWQgYSBkZXByZWNhdGlvbiBzdHJhdGVneSBmb3IgdGhpcyAoZS5nLiBwZXJoYXBzIGluaXRpYWxs
+eSBoYXZlIGENCj4gc2hhcmVkL2F0dC1nYXR0cmliLmMgb2Ygc29ydHMsIHRoYXQgaW50ZXJuYWxs
+eSB1c2VzIHRoZSBHQXR0cmliIGZyb20gZGV2aWNlLmMgYW5kIHRoZW4NCj4gd2Ugc3dpdGNoIHRv
+IHRoZSBzdHJ1Y3QgaW8gYmFzZWQgb25lIG9uY2UgYWxsIHBsdWdpbnMgaGF2ZSBiZWVuIGNvbnZl
+cnRlZCksIG9yDQo+IHBlcmhhcHMgd2UganVzdCBjb252ZXJ0IGl0IGFsbCBhdCBvbmNlIGluIG9u
+ZSBzd29vcGluZyBwYXRjaCBzZXQuIEVpdGhlciB3YXksIHNvbWUNCj4gZGlzY3Vzc2lvbiBpcyBu
+ZWVkZWQgb24gdGhpcyAocGVyaGFwcyBpbiBhIHNlcGFyYXRlIGVtYWlsIHRocmVhZCkuDQo+IA0K
+PiBJIGhvcGUgdGhpcyBoZWxwcyENCj4gQXJtYW4NCg0KVGhhbmtzDQpDaGFvamllIEd1DQo=
