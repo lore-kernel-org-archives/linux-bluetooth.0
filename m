@@ -2,56 +2,61 @@ Return-Path: <cyrus@holtmann.org>
 From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH v3 2/6] android/gatt: Unsubscribe from autoconnect on unregister
-Date: Wed,  3 Sep 2014 16:42:29 +0200
-Message-Id: <1409755353-6027-2-git-send-email-lukasz.rymanowski@tieto.com>
-In-Reply-To: <1409755353-6027-1-git-send-email-lukasz.rymanowski@tieto.com>
-References: <1409755353-6027-1-git-send-email-lukasz.rymanowski@tieto.com>
+Subject: [PATCH v3 1/6] android/gatt: Add API to remove autoconnect GATT based device
+Date: Wed,  3 Sep 2014 16:42:28 +0200
+Message-Id: <1409755353-6027-1-git-send-email-lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-When application does unregister, lets make sure that BfA does not keep
-any auto connect devices for this app.
 ---
- android/gatt.c | 21 +++++++++++++++++++++
- 1 file changed, 21 insertions(+)
+v2: Fixed issue found by Szymon
+v3: Fixes according to Luiz comments
+
+ android/gatt.c | 24 ++++++++++++++++++++++++
+ android/gatt.h |  1 +
+ 2 files changed, 25 insertions(+)
 
 diff --git a/android/gatt.c b/android/gatt.c
-index a3486ca..645f5f2 100644
+index aff5dc5..a3486ca 100644
 --- a/android/gatt.c
 +++ b/android/gatt.c
-@@ -1865,10 +1865,31 @@ static bool trigger_connection(struct app_connection *connection)
- 	return ret;
+@@ -6768,3 +6768,27 @@ bool bt_gatt_add_autoconnect(unsigned int id, const bdaddr_t *addr)
+ 
+ 	return true;
  }
- 
-+static void clear_autoconnect_devices(void *data, void *user_data)
++
++void bt_gatt_remove_autoconnect(unsigned int id, const bdaddr_t *addr)
 +{
-+	struct gatt_device *dev = data;
++	struct gatt_device *dev;
 +
-+	if (queue_remove(dev->autoconnect_apps, user_data))
-+		if (queue_isempty(dev->autoconnect_apps)) {
-+			bt_auto_connect_remove(&dev->bdaddr);
++	DBG("");
 +
-+			if (dev->state == DEVICE_CONNECT_INIT)
-+				device_set_state(dev, DEVICE_DISCONNECTED);
++	dev = find_device_by_addr(addr);
++	if (!dev) {
++		error("gatt: Device not found");
++		return;
++	}
 +
-+			device_unref(dev);
-+		}
++	queue_remove(dev->autoconnect_apps, INT_TO_PTR(id));
++
++	if (queue_isempty(dev->autoconnect_apps)) {
++		bt_auto_connect_remove(addr);
++
++		if (dev->state == DEVICE_CONNECT_INIT)
++			device_set_state(dev, DEVICE_DISCONNECTED);
++
++		device_unref(dev);
++	}
 +}
-+
- static uint8_t unregister_app(int client_if)
- {
- 	struct gatt_app *cl;
- 
-+	/*
-+	 * Make sure that there is no devices in auto connect list for this
-+	 * application
-+	 */
-+	queue_foreach(gatt_devices, clear_autoconnect_devices, INT_TO_PTR(client_if));
-+
- 	cl = queue_remove_if(gatt_apps, match_app_by_id, INT_TO_PTR(client_if));
- 	if (!cl) {
- 		error("gatt: client_if=%d not found", client_if);
+diff --git a/android/gatt.h b/android/gatt.h
+index 40699b2..3382df9 100644
+--- a/android/gatt.h
++++ b/android/gatt.h
+@@ -40,3 +40,4 @@ bool bt_gatt_connect_app(unsigned int id, const bdaddr_t *addr);
+ bool bt_gatt_disconnect_app(unsigned int id, const bdaddr_t *addr);
+ bool bt_gatt_set_security(const bdaddr_t *bdaddr, int sec_level);
+ bool bt_gatt_add_autoconnect(unsigned int id, const bdaddr_t *addr);
++void bt_gatt_remove_autoconnect(unsigned int id, const bdaddr_t *addr);
 -- 
 1.8.4
 
