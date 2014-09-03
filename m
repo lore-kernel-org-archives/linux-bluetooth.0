@@ -1,62 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
-From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH v3 1/6] android/gatt: Add API to remove autoconnect GATT based device
-Date: Wed,  3 Sep 2014 16:42:28 +0200
-Message-Id: <1409755353-6027-1-git-send-email-lukasz.rymanowski@tieto.com>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 1/2] android/bluetooth: Set unpaired cb list to NULL while unregistering bt
+Date: Wed, 03 Sep 2014 16:42:16 +0200
+Message-ID: <5343442.cWqiWZM8Bx@uw000953>
+In-Reply-To: <1409750233-23314-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+References: <1409750233-23314-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
-v2: Fixed issue found by Szymon
-v3: Fixes according to Luiz comments
+Hi Grzegorz,
 
- android/gatt.c | 24 ++++++++++++++++++++++++
- android/gatt.h |  1 +
- 2 files changed, 25 insertions(+)
+On Wednesday 03 of September 2014 15:17:12 Grzegorz Kolodziejczyk wrote:
+> Unpaired callback list for profiles needs to be set to NULL while
+> unregistering bluetooth. Other profiles may try to unregister and remove
+> its unpair cb, this cause invalid read callback list.
+> ---
+>  android/bluetooth.c | 1 +
+>  1 file changed, 1 insertion(+)
+> 
+> diff --git a/android/bluetooth.c b/android/bluetooth.c
+> index 8b47015..d275dea 100644
+> --- a/android/bluetooth.c
+> +++ b/android/bluetooth.c
+> @@ -5281,4 +5281,5 @@ void bt_bluetooth_unregister(void)
+>  	hal_ipc = NULL;
+>  
+>  	queue_destroy(unpaired_cb_list, NULL);
+> +	unpaired_cb_list = NULL;
+>  }
 
-diff --git a/android/gatt.c b/android/gatt.c
-index aff5dc5..a3486ca 100644
---- a/android/gatt.c
-+++ b/android/gatt.c
-@@ -6768,3 +6768,27 @@ bool bt_gatt_add_autoconnect(unsigned int id, const bdaddr_t *addr)
- 
- 	return true;
- }
-+
-+void bt_gatt_remove_autoconnect(unsigned int id, const bdaddr_t *addr)
-+{
-+	struct gatt_device *dev;
-+
-+	DBG("");
-+
-+	dev = find_device_by_addr(addr);
-+	if (!dev) {
-+		error("gatt: Device not found");
-+		return;
-+	}
-+
-+	queue_remove(dev->autoconnect_apps, INT_TO_PTR(id));
-+
-+	if (queue_isempty(dev->autoconnect_apps)) {
-+		bt_auto_connect_remove(addr);
-+
-+		if (dev->state == DEVICE_CONNECT_INIT)
-+			device_set_state(dev, DEVICE_DISCONNECTED);
-+
-+		device_unref(dev);
-+	}
-+}
-diff --git a/android/gatt.h b/android/gatt.h
-index 40699b2..3382df9 100644
---- a/android/gatt.h
-+++ b/android/gatt.h
-@@ -40,3 +40,4 @@ bool bt_gatt_connect_app(unsigned int id, const bdaddr_t *addr);
- bool bt_gatt_disconnect_app(unsigned int id, const bdaddr_t *addr);
- bool bt_gatt_set_security(const bdaddr_t *bdaddr, int sec_level);
- bool bt_gatt_add_autoconnect(unsigned int id, const bdaddr_t *addr);
-+void bt_gatt_remove_autoconnect(unsigned int id, const bdaddr_t *addr);
+Both patches applied (after fixing typo in prefix of 2nd patch), thanks.
+
 -- 
-1.8.4
-
+Best regards, 
+Szymon Janc
