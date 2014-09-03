@@ -1,81 +1,67 @@
 Return-Path: <cyrus@holtmann.org>
-From: Vikrampal Yadav <vikram.pal@samsung.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: luiz.dentz@gmail.com, d.kasatkin@samsung.com,
-	vikram.pal@samsung.com, cpgs@samsung.com
-Subject: [PATCH] monitor: Add AVRCP InformBatteryStatusOfCT support
-Date: Wed, 03 Sep 2014 19:55:28 +0530
-Message-id: <1409754328-26783-1-git-send-email-vikram.pal@samsung.com>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] android/tester: Fix build error
+Date: Wed, 03 Sep 2014 16:07:57 +0200
+Message-ID: <6353699.fM38oMxFUZ@uw000953>
+In-Reply-To: <1409726878-14547-1-git-send-email-lukasz.rymanowski@tieto.com>
+References: <1409726878-14547-1-git-send-email-lukasz.rymanowski@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Support for decoding AVRCP InformBatteryStatusOfCT added in
-Bluetooth monitor.
----
- monitor/avctp.c | 36 ++++++++++++++++++++++++++++++++++++
- 1 file changed, 36 insertions(+)
+Hi Łukasz,
 
-diff --git a/monitor/avctp.c b/monitor/avctp.c
-index 64d4b58..0a16b45 100644
---- a/monitor/avctp.c
-+++ b/monitor/avctp.c
-@@ -483,6 +483,24 @@ static const char *value2str(uint8_t attr, uint8_t value)
- 	}
- }
- 
-+static const char *status2str(uint8_t status)
-+{
-+	switch (status) {
-+	case 0x0:
-+		return "NORMAL";
-+	case 0x1:
-+		return "WARNING";
-+	case 0x2:
-+		return "CRITICAL";
-+	case 0x3:
-+		return "EXTERNAL";
-+	case 0x4:
-+		return "FULL_CHARGE";
-+	default:
-+		return "Reserved";
-+	}
-+}
-+
- static bool avrcp_passthrough_packet(struct l2cap_frame *frame)
- {
- 	packet_hexdump(frame->data, frame->size);
-@@ -609,6 +627,23 @@ response:
- 	return true;
- }
- 
-+static bool avrcp_ct_battery_status(struct l2cap_frame *frame, uint8_t ctype,
-+					uint8_t len, uint8_t indent)
-+{
-+	uint8_t status;
-+
-+	if (ctype > AVC_CTYPE_GENERAL_INQUIRY)
-+		return true;
-+
-+	if (!l2cap_frame_get_u8(frame, &status))
-+		return false;
-+
-+	print_field("%*cBatteryStatus: 0x%02x (%s)", (indent - 8),
-+					' ', status, status2str(status));
-+
-+	return true;
-+}
-+
- struct avrcp_ctrl_pdu_data {
- 	uint8_t pduid;
- 	bool (*func) (struct l2cap_frame *frame, uint8_t ctype, uint8_t len,
-@@ -619,6 +654,7 @@ static const struct avrcp_ctrl_pdu_data avrcp_ctrl_pdu_table[] = {
- 	{ 0x10, avrcp_get_capabilities			},
- 	{ 0x11, avrcp_list_player_attributes		},
- 	{ 0x12, avrcp_list_player_values		},
-+	{ 0x18, avrcp_ct_battery_status			},
- 	{ }
- };
- 
+On Wednesday 03 of September 2014 08:47:58 Lukasz Rymanowski wrote:
+> This fix following error seen when building with gcc 4.6.3
+> 
+> android/tester-gatt.c:135:2: error: initialized field overwritten
+> [-Werror=override-init]
+> android/tester-gatt.c:135:2: error: (near initialization for
+> ‘service_1’) [-Werror=override-init]
+> android/tester-gatt.c:142:2: error: initialized field overwritten
+> [-Werror=override-init]
+> android/tester-gatt.c:142:2: error: (near initialization for
+> ‘service_2’) [-Werror=override-init]
+> ---
+>  android/tester-gatt.c | 14 +++++++++-----
+>  1 file changed, 9 insertions(+), 5 deletions(-)
+> 
+> diff --git a/android/tester-gatt.c b/android/tester-gatt.c
+> index 625d949..2067ec3 100644
+> --- a/android/tester-gatt.c
+> +++ b/android/tester-gatt.c
+> @@ -131,16 +131,20 @@ static struct bt_action_data bearer_type = {
+>  
+>  static btgatt_srvc_id_t service_1 = {
+>  	.is_primary = true,
+> -	.id.inst_id = 0,
+> -	.id.uuid.uu = {0xfb, 0x34, 0x9b, 0x5f, 0x80, 0x00, 0x00, 0x80,
+> +	.id = {
+> +		.inst_id = 0,
+> +		.uuid.uu = {0xfb, 0x34, 0x9b, 0x5f, 0x80, 0x00, 0x00, 0x80,
+>  			0x00, 0x10, 0x00, 0x00,  0x00, 0x18, 0x00, 0x00}
+> +	}
+>  };
+>  
+>  static btgatt_srvc_id_t service_2 = {
+>  	.is_primary = true,
+> -	.id.inst_id = 1,
+> -	.id.uuid.uu = {0xfb, 0x34, 0x9b, 0x5f, 0x80, 0x00, 0x00, 0x80,
+> -			0x00, 0x10, 0x00, 0x00,  0x01, 0x18, 0x00, 0x00}
+> +	.id = {
+> +		.inst_id = 1,
+> +		.uuid.uu = {0xfb, 0x34, 0x9b, 0x5f, 0x80, 0x00, 0x00, 0x80,
+> +			0x00, 0x10, 0x00, 0x00,  0x01, 0x18, 0x00, 0x00},
+> +	}
+>  };
+>  
+>  static btgatt_gatt_id_t characteristic_1 = {
+
+Applied. Thanks. 
+
 -- 
-1.9.1
-
+Best regards, 
+Szymon Janc
