@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 2/5] android/tester: Add AVRCP Connect - Success test case
-Date: Wed,  3 Sep 2014 12:48:01 +0300
-Message-Id: <1409737684-16002-3-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ] obexd/mas: Fix parsing of application parameters
+Date: Wed,  3 Sep 2014 12:48:00 +0300
+Message-Id: <1409737684-16002-2-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1409737684-16002-1-git-send-email-luiz.dentz@gmail.com>
 References: <1409737684-16002-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,234 +11,82 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
+Some commands don't have any mandatory application parameter which means
+inparams can be NULL which should not be treated as a bad request.
 ---
- android/tester-avrcp.c | 209 +++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 209 insertions(+)
+ obexd/plugins/mas.c | 24 ++++++++++++++++++------
+ 1 file changed, 18 insertions(+), 6 deletions(-)
 
-diff --git a/android/tester-avrcp.c b/android/tester-avrcp.c
-index 60a57b4..35e9773 100644
---- a/android/tester-avrcp.c
-+++ b/android/tester-avrcp.c
-@@ -25,10 +25,219 @@
+diff --git a/obexd/plugins/mas.c b/obexd/plugins/mas.c
+index 5729c22..24b26ae 100644
+--- a/obexd/plugins/mas.c
++++ b/obexd/plugins/mas.c
+@@ -83,8 +83,8 @@ static int get_params(struct obex_session *os, struct mas_session *mas)
+ 	ssize_t size;
  
- static struct queue *list;
+ 	size = obex_get_apparam(os, &buffer);
+-	if (size < 0)
+-		size = 0;
++	if (size <= 0)
++		return 0;
  
-+struct emu_cid_data {
-+	uint16_t handle;
-+	uint16_t cid;
-+};
-+
-+static struct emu_cid_data sdp_data;
-+static struct emu_cid_data a2dp_data;
-+static struct emu_cid_data avrcp_data;
-+
-+static const uint8_t sdp_rsp_pdu[] = { 0x07, /* PDU id */
-+			0x00, 0x00, /* Transaction id */
-+			0x00, 0x7f, /* Response length */
-+			0x00, 0x7c, /* Attributes length */
-+			0x36, 0x00, 0x79, 0x36, 0x00, 0x3b, 0x09, 0x00, 0x00,
-+			0x0a, 0x00, 0x01, 0x00, 0x04, 0x09, 0x00, 0x01, 0x35,
-+			0x06, 0x19, 0x11, 0x0e, 0x19, 0x11, 0x0f, 0x09, 0x00,
-+			0x04, 0x35, 0x10, 0x35, 0x06, 0x19, 0x01, 0x00, 0x09,
-+			0x00, 0x17, 0x35, 0x06, 0x19, 0x00, 0x17, 0x09, 0x01,
-+			0x03, 0x09, 0x00, 0x09, 0x35, 0x08, 0x35, 0x06, 0x19,
-+			0x11, 0x0e, 0x09, 0x01, 0x00, 0x09, 0x03, 0x11, 0x09,
-+			0x00, 0x01, 0x36, 0x00, 0x38, 0x09, 0x00, 0x00, 0x0a,
-+			0x00, 0x01, 0x00, 0x05, 0x09, 0x00, 0x01, 0x35, 0x03,
-+			0x19, 0x11, 0x0c, 0x09, 0x00, 0x04, 0x35, 0x10, 0x35,
-+			0x06, 0x19, 0x01, 0x00, 0x09, 0x00, 0x17, 0x35, 0x06,
-+			0x19, 0x00, 0x17, 0x09, 0x01, 0x03, 0x09, 0x00, 0x09,
-+			0x35, 0x08, 0x35, 0x06, 0x19, 0x11, 0x0e, 0x09, 0x01,
-+			0x04, 0x09, 0x03, 0x11, 0x09, 0x00, 0x02,
-+			0x00}; /* no continuation */
-+static const uint8_t req_dsc[] = { 0x00, 0x01 };
-+static const uint8_t rsp_dsc[] = { 0x02, 0x01, 0x04, 0x08 };
-+static const uint8_t req_get[] = { 0x10, 0x02, 0x04 };
-+static const uint8_t rsp_get[] = { 0x12, 0x02, 0x01, 0x00, 0x07, 0x06, 0x00,
-+						0x00, 0xff, 0xff, 0x02, 0x40 };
-+static const uint8_t req_cfg[] = { 0x20, 0x03, 0x04, 0x04, 0x01, 0x00, 0x07,
-+					0x06, 0x00, 0x00, 0x21, 0x15, 0x02,
-+					0x40 };
-+static const uint8_t rsp_cfg[] = { 0x22, 0x03 };
-+static const uint8_t req_open[] = { 0x30, 0x06, 0x04 };
-+static const uint8_t rsp_open[] = { 0x32, 0x06 };
-+static const uint8_t req_close[] = { 0x40, 0x08, 0x04 };
-+static const uint8_t rsp_close[] = { 0x42, 0x08 };
-+static const uint8_t req_start[] = { 0x40, 0x07, 0x04 };
-+static const uint8_t rsp_start[] = { 0x42, 0x07 };
-+static const uint8_t req_suspend[] = { 0x50, 0x09, 0x04 };
-+static const uint8_t rsp_suspend[] = { 0x52, 0x09 };
-+
-+static const struct pdu {
-+	const uint8_t *req;
-+	size_t req_len;
-+	const uint8_t *rsp;
-+	size_t rsp_len;
-+} pdus[] = {
-+	{ req_dsc, sizeof(req_dsc), rsp_dsc, sizeof(rsp_dsc) },
-+	{ req_get, sizeof(req_get), rsp_get, sizeof(rsp_get) },
-+	{ req_cfg, sizeof(req_cfg), rsp_cfg, sizeof(rsp_cfg) },
-+	{ req_open, sizeof(req_open), rsp_open, sizeof(rsp_open) },
-+	{ req_close, sizeof(req_close), rsp_close, sizeof(rsp_close) },
-+	{ req_start, sizeof(req_start), rsp_start, sizeof(rsp_start) },
-+	{ req_suspend, sizeof(req_suspend), rsp_suspend, sizeof(rsp_start) },
-+	{ },
-+};
-+
-+static void print_avrcp(const char *str, void *user_data)
-+{
-+	tester_debug("avrcp: %s", str);
-+}
-+
-+static void avrcp_cid_hook_cb(const void *data, uint16_t len, void *user_data)
-+{
-+	util_hexdump('>', data, len, print_avrcp, NULL);
-+}
-+
-+static void avrcp_connect_request_cb(uint16_t handle, uint16_t cid,
-+							void *user_data)
-+{
-+	struct test_data *data = tester_get_data();
-+	struct bthost *bthost = hciemu_client_get_host(data->hciemu);
-+	struct emu_cid_data *cid_data = user_data;
-+
-+	cid_data->handle = handle;
-+	cid_data->cid = cid;
-+
-+	bthost_add_cid_hook(bthost, handle, cid, avrcp_cid_hook_cb, cid_data);
-+}
-+
-+static struct emu_set_l2cap_data avrcp_setup_data = {
-+	.psm = 23,
-+	.func = avrcp_connect_request_cb,
-+	.user_data = &avrcp_data,
-+};
-+
-+static void print_a2dp(const char *str, void *user_data)
-+{
-+	tester_debug("a2dp: %s", str);
-+}
-+
-+static void a2dp_cid_hook_cb(const void *data, uint16_t len, void *user_data)
-+{
-+	struct emu_cid_data *cid_data = user_data;
-+	struct test_data *t_data = tester_get_data();
-+	struct bthost *bthost = hciemu_client_get_host(t_data->hciemu);
-+	int i;
-+
-+	util_hexdump('>', data, len, print_a2dp, NULL);
-+
-+	for (i = 0; pdus[i].req; i++) {
-+		if (pdus[i].req_len != len)
-+			continue;
-+
-+		if (memcmp(pdus[i].req, data, len))
-+			continue;
-+
-+		util_hexdump('<', pdus[i].rsp, pdus[i].rsp_len, print_a2dp,
-+									NULL);
-+
-+		bthost_send_cid(bthost, cid_data->handle, cid_data->cid,
-+						pdus[i].rsp, pdus[i].rsp_len);
+ 	mas->inparams = g_obex_apparam_decode(buffer, size);
+ 	if (mas->inparams == NULL) {
+@@ -249,7 +249,9 @@ static void get_messages_listing_cb(void *session, int err, uint16_t size,
+ 		return;
+ 	}
+ 
+-	g_obex_apparam_get_uint16(mas->inparams, MAP_AP_MAXLISTCOUNT, &max);
++	if (mas->inparams)
++		g_obex_apparam_get_uint16(mas->inparams, MAP_AP_MAXLISTCOUNT,
++									&max);
+ 
+ 	if (max == 0) {
+ 		if (!entry)
+@@ -397,7 +399,9 @@ static void get_folder_listing_cb(void *session, int err, uint16_t size,
+ 		return;
+ 	}
+ 
+-	g_obex_apparam_get_uint16(mas->inparams, MAP_AP_MAXLISTCOUNT, &max);
++	if (mas->inparams)
++		g_obex_apparam_get_uint16(mas->inparams, MAP_AP_MAXLISTCOUNT,
++									&max);
+ 
+ 	if (max == 0) {
+ 		if (err != -EAGAIN)
+@@ -493,8 +497,12 @@ static void *folder_listing_open(const char *name, int oflag, mode_t mode,
+ 
+ 	DBG("name = %s", name);
+ 
+-	g_obex_apparam_get_uint16(mas->inparams, MAP_AP_MAXLISTCOUNT, &max);
+-	g_obex_apparam_get_uint16(mas->inparams, MAP_AP_STARTOFFSET, &offset);
++	if (mas->inparams) {
++		g_obex_apparam_get_uint16(mas->inparams, MAP_AP_MAXLISTCOUNT,
++									&max);
++		g_obex_apparam_get_uint16(mas->inparams, MAP_AP_STARTOFFSET,
++								&offset);
 +	}
-+}
-+
-+static void a2dp_connect_request_cb(uint16_t handle, uint16_t cid,
-+							void *user_data)
-+{
-+	struct test_data *data = tester_get_data();
-+	struct bthost *bthost = hciemu_client_get_host(data->hciemu);
-+	struct emu_cid_data *cid_data = user_data;
-+
-+	if (cid_data->handle)
-+		return;
-+
-+	cid_data->handle = handle;
-+	cid_data->cid = cid;
-+
-+	bthost_add_cid_hook(bthost, handle, cid, a2dp_cid_hook_cb, cid_data);
-+}
-+
-+static struct emu_set_l2cap_data a2dp_setup_data = {
-+	.psm = 25,
-+	.func = a2dp_connect_request_cb,
-+	.user_data = &a2dp_data,
-+};
-+
-+static void sdp_cid_hook_cb(const void *data, uint16_t len, void *user_data)
-+{
-+	struct test_data *t_data = tester_get_data();
-+	struct bthost *bthost = hciemu_client_get_host(t_data->hciemu);
-+	struct emu_cid_data *cid_data = user_data;
-+
-+	bthost_send_cid(bthost, cid_data->handle, cid_data->cid,
-+					sdp_rsp_pdu, sizeof(sdp_rsp_pdu));
-+}
-+static void sdp_connect_request_cb(uint16_t handle, uint16_t cid,
-+							void *user_data)
-+{
-+	struct test_data *data = tester_get_data();
-+	struct bthost *bthost = hciemu_client_get_host(data->hciemu);
-+	struct emu_cid_data *cid_data = user_data;
-+
-+	cid_data->handle = handle;
-+	cid_data->cid = cid;
-+
-+	bthost_add_cid_hook(bthost, handle, cid, sdp_cid_hook_cb, cid_data);
-+}
-+
-+static struct emu_set_l2cap_data sdp_setup_data = {
-+	.psm = 1,
-+	.func = sdp_connect_request_cb,
-+	.user_data = &sdp_data,
-+};
-+
-+static void avrcp_connect_action(void)
-+{
-+	struct test_data *data = tester_get_data();
-+	const uint8_t *addr = hciemu_get_client_bdaddr(data->hciemu);
-+	struct step *step = g_new0(struct step, 1);
-+	bt_bdaddr_t bdaddr;
-+
-+	sdp_data.handle = 0;
-+	sdp_data.cid = 0;
-+
-+	a2dp_data.handle = 0;
-+	a2dp_data.cid = 0;
-+
-+	avrcp_data.handle = 0;
-+	avrcp_data.cid = 0;
-+
-+	bdaddr2android((const bdaddr_t *) addr, &bdaddr);
-+
-+	step->action_status = data->if_a2dp->connect(&bdaddr);
-+
-+	schedule_action_verification(step);
-+}
-+
- static struct test_case test_cases[] = {
- 	TEST_CASE_BREDRLE("AVRCP Init",
- 		ACTION_SUCCESS(dummy_action, NULL),
- 	),
-+	TEST_CASE_BREDRLE("AVRCP Connect - Success",
-+		ACTION_SUCCESS(bluetooth_enable_action, NULL),
-+		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_ON),
-+		ACTION_SUCCESS(emu_setup_powered_remote_action, NULL),
-+		ACTION_SUCCESS(emu_set_ssp_mode_action, NULL),
-+		ACTION_SUCCESS(emu_add_l2cap_server_action, &sdp_setup_data),
-+		ACTION_SUCCESS(emu_add_l2cap_server_action, &a2dp_setup_data),
-+		ACTION_SUCCESS(emu_add_l2cap_server_action, &avrcp_setup_data),
-+		ACTION_SUCCESS(avrcp_connect_action, NULL),
-+		CALLBACK_AV_CONN_STATE(CB_A2DP_CONN_STATE,
-+					BTAV_CONNECTION_STATE_CONNECTING),
-+		CALLBACK_AV_CONN_STATE(CB_A2DP_CONN_STATE,
-+					BTAV_CONNECTION_STATE_CONNECTED),
-+		ACTION_SUCCESS(bluetooth_disable_action, NULL),
-+		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_OFF),
-+	),
- };
  
- struct queue *get_avrcp_tests(void)
+ 	*err = messages_get_folder_listing(mas->backend_data, name, max,
+ 					offset, get_folder_listing_cb, mas);
+@@ -526,6 +534,9 @@ static void *msg_listing_open(const char *name, int oflag, mode_t mode,
+ 		return NULL;
+ 	}
+ 
++	if (!mas->inparams)
++		goto done;
++
+ 	g_obex_apparam_get_uint16(mas->inparams, MAP_AP_MAXLISTCOUNT, &max);
+ 	g_obex_apparam_get_uint16(mas->inparams, MAP_AP_STARTOFFSET, &offset);
+ 	g_obex_apparam_get_uint8(mas->inparams, MAP_AP_SUBJECTLENGTH,
+@@ -548,6 +559,7 @@ static void *msg_listing_open(const char *name, int oflag, mode_t mode,
+ 	g_obex_apparam_get_uint8(mas->inparams, MAP_AP_FILTERPRIORITY,
+ 						&filter.priority);
+ 
++done:
+ 	*err = messages_get_messages_listing(mas->backend_data, name, max,
+ 			offset, subject_len, &filter,
+ 			get_messages_listing_cb, mas);
 -- 
 1.9.3
 
