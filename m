@@ -2,11 +2,11 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/2] android/bluetooth: Set unpaired cb list to NULL while unregistering bt
-Date: Wed, 03 Sep 2014 16:42:16 +0200
-Message-ID: <5343442.cWqiWZM8Bx@uw000953>
-In-Reply-To: <1409750233-23314-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
-References: <1409750233-23314-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+Subject: Re: [PATCH v2 1/2] android/gatt: Stop listening while unregistering app
+Date: Wed, 03 Sep 2014 16:40:12 +0200
+Message-ID: <3536681.b2gG5Gh31h@uw000953>
+In-Reply-To: <1409736417-17615-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+References: <1409736417-17615-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -14,26 +14,152 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Grzegorz,
 
-On Wednesday 03 of September 2014 15:17:12 Grzegorz Kolodziejczyk wrote:
-> Unpaired callback list for profiles needs to be set to NULL while
-> unregistering bluetooth. Other profiles may try to unregister and remove
-> its unpair cb, this cause invalid read callback list.
+On Wednesday 03 of September 2014 11:26:56 Grzegorz Kolodziejczyk wrote:
+> Adapter gets stucked on advertising while unregistering all apps with not
+> stopped listening.
 > ---
->  android/bluetooth.c | 1 +
->  1 file changed, 1 insertion(+)
+>  android/gatt.c | 110 +++++++++++++++++++++++++++++++++++++--------------------
+>  1 file changed, 72 insertions(+), 38 deletions(-)
 > 
-> diff --git a/android/bluetooth.c b/android/bluetooth.c
-> index 8b47015..d275dea 100644
-> --- a/android/bluetooth.c
-> +++ b/android/bluetooth.c
-> @@ -5281,4 +5281,5 @@ void bt_bluetooth_unregister(void)
->  	hal_ipc = NULL;
->  
->  	queue_destroy(unpaired_cb_list, NULL);
-> +	unpaired_cb_list = NULL;
+> diff --git a/android/gatt.c b/android/gatt.c
+> index aff5dc5..6970636 100644
+> --- a/android/gatt.c
+> +++ b/android/gatt.c
+> @@ -1883,15 +1883,87 @@ static uint8_t unregister_app(int client_if)
+>  	return HAL_STATUS_SUCCESS;
 >  }
+>  
+> +static void send_client_listen_notify(int32_t id, int32_t status)
+> +{
+> +	struct hal_ev_gatt_client_listen ev;
+> +
+> +	/* Server if because of typo in android headers */
+> +	ev.server_if = id;
+> +	ev.status = status;
+> +
+> +	ipc_send_notif(hal_ipc, HAL_SERVICE_ID_GATT, HAL_EV_GATT_CLIENT_LISTEN,
+> +							sizeof(ev), &ev);
+> +}
+> +
+> +struct listen_data {
+> +	int32_t client_id;
+> +	bool start;
+> +};
+> +
+> +static void set_advertising_cb(uint8_t status, void *user_data)
+> +{
+> +	struct listen_data *l = user_data;
+> +
+> +	send_client_listen_notify(l->client_id, status);
+> +
+> +	/* In case of success update advertising state*/
+> +	if (!status)
+> +		advertising_cnt = l->start ? 1 : 0;
+> +
+> +	/*
+> +	 * Let's remove client from the list in two cases
+> +	 * 1. Start failed
+> +	 * 2. Stop succeed
+> +	 */
+> +	if ((l->start && status) || (!l->start && !status))
+> +		queue_remove(listen_apps, INT_TO_PTR(l->client_id));
+> +
+> +	free(l);
+> +}
+> +
+>  static void handle_client_unregister(const void *buf, uint16_t len)
+>  {
+>  	const struct hal_cmd_gatt_client_unregister *cmd = buf;
+>  	uint8_t status;
+> +	void *listening_client;
+> +	struct listen_data *data;
+>  
+>  	DBG("");
+>  
+> +	listening_client = queue_find(listen_apps, match_by_value,
+> +						INT_TO_PTR(cmd->client_if));
+> +
+> +	if (listening_client) {
+> +		advertising_cnt--;
+> +		queue_remove(listen_apps, INT_TO_PTR(cmd->client_if));
+> +	} else {
+> +		status = unregister_app(cmd->client_if);
+> +		goto reply;
+> +	}
+> +
+> +	if (!advertising_cnt) {
+> +		data = new0(struct listen_data, 1);
+> +		if (!data) {
+> +			error("gatt: Could not allocate memory for listen data");
+> +			status = HAL_STATUS_NOMEM;
+> +			goto reply;
+> +		}
+> +
+> +		data->client_id = cmd->client_if;
+> +		data->start = false;
+> +
+> +		if (!bt_le_set_advertising(data->start, set_advertising_cb,
+> +								data)) {
+> +			error("gatt: Could not set advertising");
+> +			status = HAL_STATUS_FAILED;
+> +			free(data);
+> +			goto reply;
+> +		}
+> +	}
+> +
+>  	status = unregister_app(cmd->client_if);
+>  
+> +reply:
+>  	ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_GATT,
+>  					HAL_OP_GATT_CLIENT_UNREGISTER, status);
+>  }
+> @@ -1970,44 +2042,6 @@ static void handle_client_disconnect(const void *buf, uint16_t len)
+>  					HAL_OP_GATT_CLIENT_DISCONNECT, status);
+>  }
+>  
+> -static void send_client_listen_notify(int32_t id, int32_t status)
+> -{
+> -	struct hal_ev_gatt_client_listen ev;
+> -
+> -	/* Server if because of typo in android headers */
+> -	ev.server_if = id;
+> -	ev.status = status;
+> -
+> -	ipc_send_notif(hal_ipc, HAL_SERVICE_ID_GATT, HAL_EV_GATT_CLIENT_LISTEN,
+> -							sizeof(ev), &ev);
+> -}
+> -
+> -struct listen_data {
+> -	int32_t client_id;
+> -	bool start;
+> -};
+> -
+> -static void set_advertising_cb(uint8_t status, void *user_data)
+> -{
+> -	struct listen_data *l = user_data;
+> -
+> -	send_client_listen_notify(l->client_id, status);
+> -
+> -	/* In case of success update advertising state*/
+> -	if (!status)
+> -		advertising_cnt = l->start ? 1 : 0;
+> -
+> -	/*
+> -	 * Let's remove client from the list in two cases
+> -	 * 1. Start failed
+> -	 * 2. Stop succeed
+> -	 */
+> -	if ((l->start && status) || (!l->start && !status))
+> -		queue_remove(listen_apps, INT_TO_PTR(l->client_id));
+> -
+> -	free(l);
+> -}
+> -
+>  static void handle_client_listen(const void *buf, uint16_t len)
+>  {
+>  	const struct hal_cmd_gatt_client_listen *cmd = buf;
 
-Both patches applied (after fixing typo in prefix of 2nd patch), thanks.
+Both patches are now applied. Thanks. 
 
 -- 
 Best regards, 
