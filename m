@@ -1,69 +1,104 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <540718F0.3070506@tieto.com>
-Date: Wed, 03 Sep 2014 15:34:40 +0200
-From: Tyszkowski Jakub <jakub.tyszkowski@tieto.com>
 MIME-Version: 1.0
-To: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 5/8] emulator/btdev: Overwrite default feature mask when
- SPP is toggled
-References: <1409734969-10716-1-git-send-email-jakub.tyszkowski@tieto.com> <1409734969-10716-5-git-send-email-jakub.tyszkowski@tieto.com> <20140903093938.GA23986@t440s.lan>
-In-Reply-To: <20140903093938.GA23986@t440s.lan>
-Content-Type: text/plain; charset=windows-1252; format=flowed
+In-Reply-To: <1409737684-16002-2-git-send-email-luiz.dentz@gmail.com>
+References: <1409737684-16002-1-git-send-email-luiz.dentz@gmail.com>
+	<1409737684-16002-2-git-send-email-luiz.dentz@gmail.com>
+Date: Wed, 3 Sep 2014 16:30:34 +0300
+Message-ID: <CABBYNZJ9mF_JN-kHzv8qbsAJNFnOMq1FF1Q63QQ6NK4aRk33NA@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] obexd/mas: Fix parsing of application parameters
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+Hi,
 
-On 09/03/2014 11:39 AM, Johan Hedberg wrote:
-> Hi Jakub,
+On Wed, Sep 3, 2014 at 12:48 PM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 >
-> On Wed, Sep 03, 2014, Jakub Tyszkowski wrote:
->> Without this we cannot test the legacy HID Device reconnection, as L2Cap
->> connection is refused when SSP is reported in remote device's features.
->> ---
->>   emulator/btdev.c | 7 +++++++
->>   1 file changed, 7 insertions(+)
->>
->> diff --git a/emulator/btdev.c b/emulator/btdev.c
->> index 86fd3d9..8aebb8f 100644
->> --- a/emulator/btdev.c
->> +++ b/emulator/btdev.c
->> @@ -2332,6 +2332,13 @@ static void default_cmd(struct btdev *btdev, uint16_t opcode,
->>   			goto unsupported;
->>   		wspm = data;
->>   		btdev->simple_pairing_mode = wspm->mode;
->> +
->> +		/* set SSP feature mask */
->> +		if (wspm->mode)
->> +			btdev->features[6] |= 0x08;
->> +		else
->> +			btdev->features[6] &= ~0x08;
->> +
+> Some commands don't have any mandatory application parameter which means
+> inparams can be NULL which should not be treated as a bad request.
+> ---
+>  obexd/plugins/mas.c | 24 ++++++++++++++++++------
+>  1 file changed, 18 insertions(+), 6 deletions(-)
 >
-> This looks suspicious to me. The only thing that should matter is
-> whether the host features bit is set on or not. That already looks
-> correct to me in the btdev_get_host_features() function. I.e. isn't your
-> problem with some piece of code higher up in the stack that's not
-> keeping SSP properly disabled? (since what you're now doing is not just
-> disabling SSP but making it look like SSP was never supported to begin
-> with as soon as you disable it).
+> diff --git a/obexd/plugins/mas.c b/obexd/plugins/mas.c
+> index 5729c22..24b26ae 100644
+> --- a/obexd/plugins/mas.c
+> +++ b/obexd/plugins/mas.c
+> @@ -83,8 +83,8 @@ static int get_params(struct obex_session *os, struct mas_session *mas)
+>         ssize_t size;
 >
-> Johan
+>         size = obex_get_apparam(os, &buffer);
+> -       if (size < 0)
+> -               size = 0;
+> +       if (size <= 0)
+> +               return 0;
 >
+>         mas->inparams = g_obex_apparam_decode(buffer, size);
+>         if (mas->inparams == NULL) {
+> @@ -249,7 +249,9 @@ static void get_messages_listing_cb(void *session, int err, uint16_t size,
+>                 return;
+>         }
+>
+> -       g_obex_apparam_get_uint16(mas->inparams, MAP_AP_MAXLISTCOUNT, &max);
+> +       if (mas->inparams)
+> +               g_obex_apparam_get_uint16(mas->inparams, MAP_AP_MAXLISTCOUNT,
+> +                                                                       &max);
+>
+>         if (max == 0) {
+>                 if (!entry)
+> @@ -397,7 +399,9 @@ static void get_folder_listing_cb(void *session, int err, uint16_t size,
+>                 return;
+>         }
+>
+> -       g_obex_apparam_get_uint16(mas->inparams, MAP_AP_MAXLISTCOUNT, &max);
+> +       if (mas->inparams)
+> +               g_obex_apparam_get_uint16(mas->inparams, MAP_AP_MAXLISTCOUNT,
+> +                                                                       &max);
+>
+>         if (max == 0) {
+>                 if (err != -EAGAIN)
+> @@ -493,8 +497,12 @@ static void *folder_listing_open(const char *name, int oflag, mode_t mode,
+>
+>         DBG("name = %s", name);
+>
+> -       g_obex_apparam_get_uint16(mas->inparams, MAP_AP_MAXLISTCOUNT, &max);
+> -       g_obex_apparam_get_uint16(mas->inparams, MAP_AP_STARTOFFSET, &offset);
+> +       if (mas->inparams) {
+> +               g_obex_apparam_get_uint16(mas->inparams, MAP_AP_MAXLISTCOUNT,
+> +                                                                       &max);
+> +               g_obex_apparam_get_uint16(mas->inparams, MAP_AP_STARTOFFSET,
+> +                                                               &offset);
+> +       }
+>
+>         *err = messages_get_folder_listing(mas->backend_data, name, max,
+>                                         offset, get_folder_listing_cb, mas);
+> @@ -526,6 +534,9 @@ static void *msg_listing_open(const char *name, int oflag, mode_t mode,
+>                 return NULL;
+>         }
+>
+> +       if (!mas->inparams)
+> +               goto done;
+> +
+>         g_obex_apparam_get_uint16(mas->inparams, MAP_AP_MAXLISTCOUNT, &max);
+>         g_obex_apparam_get_uint16(mas->inparams, MAP_AP_STARTOFFSET, &offset);
+>         g_obex_apparam_get_uint8(mas->inparams, MAP_AP_SUBJECTLENGTH,
+> @@ -548,6 +559,7 @@ static void *msg_listing_open(const char *name, int oflag, mode_t mode,
+>         g_obex_apparam_get_uint8(mas->inparams, MAP_AP_FILTERPRIORITY,
+>                                                 &filter.priority);
+>
+> +done:
+>         *err = messages_get_messages_listing(mas->backend_data, name, max,
+>                         offset, subject_len, &filter,
+>                         get_messages_listing_cb, mas);
+> --
+> 1.9.3
 
-I'm trying to mimic reconnecting legacy HID device (which was previously 
-paired with PIN) to check if security level will be raised when keyboard 
-subclass is being found in remotes SDP records. To get the SDP records 
-we need to trigger SDP search when remote connects the control channel. 
-But we block such incoming connection with 'security block'.
-
-If I get the emulator code right, host and remote uses the same array of 
-features which is reason for this patch. When emulated remote tries to 
-connect l2cap on PSM other than the SDP one, it's being rejected if it 
-reports SSP in features.
-
-Regards,
-Jakub
+Applied.
 
 
-
+-- 
+Luiz Augusto von Dentz
