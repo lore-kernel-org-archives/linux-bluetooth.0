@@ -1,81 +1,92 @@
 Return-Path: <cyrus@holtmann.org>
-From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
+From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 2/2] android/gatt: Add helper to create listen data
-Date: Wed,  3 Sep 2014 11:26:57 +0200
-Message-Id: <1409736417-17615-2-git-send-email-grzegorz.kolodziejczyk@tieto.com>
-In-Reply-To: <1409736417-17615-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
-References: <1409736417-17615-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+Cc: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
+Subject: [PATCH 7/8] android/tester: Add support for rejected connections
+Date: Wed,  3 Sep 2014 11:02:48 +0200
+Message-Id: <1409734969-10716-7-git-send-email-jakub.tyszkowski@tieto.com>
+In-Reply-To: <1409734969-10716-1-git-send-email-jakub.tyszkowski@tieto.com>
+References: <1409734969-10716-1-git-send-email-jakub.tyszkowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+If we want the connection to be rejected, this can be notified to a
+device in various ways. HIDHost for example expects virtual cable
+unplug. This patch adds action for triggering rejected  reject
+connections, which requires custom verification on remotes side.
+Hid host will verify it by listenning on the ctrl channel for virtual
+cable unplug.
 ---
- android/gatt.c | 28 ++++++++++++++++++----------
- 1 file changed, 18 insertions(+), 10 deletions(-)
+ android/tester-main.c | 18 +++++++++++++++---
+ android/tester-main.h |  2 ++
+ 2 files changed, 17 insertions(+), 3 deletions(-)
 
-diff --git a/android/gatt.c b/android/gatt.c
-index 6970636..3383e7a 100644
---- a/android/gatt.c
-+++ b/android/gatt.c
-@@ -1900,6 +1900,20 @@ struct listen_data {
- 	bool start;
- };
+diff --git a/android/tester-main.c b/android/tester-main.c
+index 5266a08..edd4c38 100644
+--- a/android/tester-main.c
++++ b/android/tester-main.c
+@@ -1734,17 +1734,18 @@ void emu_set_connect_cb_action(void)
+ 	schedule_action_verification(step);
+ }
  
-+static struct listen_data *create_listen_data(int32_t client_id, bool start)
-+{
-+	struct listen_data *d;
-+
-+	d = new0(struct listen_data, 1);
-+	if (!d)
-+		return NULL;
-+
-+	d->client_id = client_id;
-+	d->start = start;
-+
-+	return d;
-+}
-+
- static void set_advertising_cb(uint8_t status, void *user_data)
+-void emu_remote_connect_hci_action(void)
++void emu_remote_connect_hci_rejected_action(void)
  {
- 	struct listen_data *l = user_data;
-@@ -1942,16 +1956,13 @@ static void handle_client_unregister(const void *buf, uint16_t len)
- 	}
+ 	struct test_data *data = tester_get_data();
+ 	struct bthost *bthost = hciemu_client_get_host(data->hciemu);
+ 	struct step *current_data_step = queue_peek_head(data->steps);
+ 	struct bt_action_data *action_data = current_data_step->set_data;
+-	struct step *step = g_new0(struct step, 1);
+ 	const uint8_t *master_addr;
  
- 	if (!advertising_cnt) {
--		data = new0(struct listen_data, 1);
-+		data = create_listen_data(cmd->client_if, false);
- 		if (!data) {
--			error("gatt: Could not allocate memory for listen data");
-+			error("gatt: Could not allocate listen data");
- 			status = HAL_STATUS_NOMEM;
- 			goto reply;
- 		}
+ 	master_addr = hciemu_get_master_bdaddr(data->hciemu);
  
--		data->client_id = cmd->client_if;
--		data->start = false;
--
- 		if (!bt_le_set_advertising(data->start, set_advertising_cb,
- 								data)) {
- 			error("gatt: Could not set advertising");
-@@ -2102,16 +2113,13 @@ static void handle_client_listen(const void *buf, uint16_t len)
- 		}
- 	}
++	data->expect_rejection = true;
++
+ 	tester_print("Trying to connect hci");
  
--	data = new0(struct listen_data, 1);
-+	data = create_listen_data(cmd->client_if, cmd->start);
- 	if (!data) {
--		error("gatt: Could not allocate memory for listen data");
-+		error("gatt: Could not allocate listen data");
- 		status = HAL_STATUS_NOMEM;
- 		goto reply;
- 	}
+ 	if (action_data)
+@@ -1753,8 +1754,19 @@ void emu_remote_connect_hci_action(void)
+ 	else
+ 		bthost_hci_connect(bthost, master_addr, BDADDR_BREDR);
  
--	data->client_id = cmd->client_if;
--	data->start = cmd->start;
--
- 	if (!bt_le_set_advertising(cmd->start, set_advertising_cb, data)) {
- 		error("gatt: Could not set advertising");
- 		status = HAL_STATUS_FAILED;
+-	step->action_status = BT_STATUS_SUCCESS;
++	/*
++	 * This needs custom action verification. For example Hidhost waits
++	 * for virtual cable unplug message on the ctrl channel to verify this.
++	 */
++}
+ 
++void emu_remote_connect_hci_action(void)
++{
++	struct step *step = g_new0(struct step, 1);
++
++	emu_remote_connect_hci_rejected_action();
++
++	step->action_status = BT_STATUS_SUCCESS;
+ 	schedule_action_verification(step);
+ }
+ 
+diff --git a/android/tester-main.h b/android/tester-main.h
+index f3cfcb2..4228bf1 100644
+--- a/android/tester-main.h
++++ b/android/tester-main.h
+@@ -348,6 +348,7 @@ struct test_data {
+ 
+ 	struct queue *pdus;
+ 	bool is_encrypted;
++	bool expect_rejection;
+ 
+ 	uint16_t sdp_call_cnt;
+ };
+@@ -474,6 +475,7 @@ void schedule_action_verification(struct step *step);
+ void emu_setup_powered_remote_action(void);
+ void emu_set_pin_code_action(void);
+ void emu_set_connect_cb_action(void);
++void emu_remote_connect_hci_rejected_action(void);
+ void emu_remote_connect_hci_action(void);
+ void emu_remote_disconnect_hci_action(void);
+ void emu_set_io_cap(void);
 -- 
-1.9.3
+1.9.1
 
