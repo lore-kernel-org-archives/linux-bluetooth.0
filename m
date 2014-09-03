@@ -1,45 +1,71 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 4/5] lib/sdp: Split error handing for length and transaction id
-Date: Wed,  3 Sep 2014 12:49:14 +0300
-Message-Id: <1409737755-16689-2-git-send-email-luiz.dentz@gmail.com>
-In-Reply-To: <1409737755-16689-1-git-send-email-luiz.dentz@gmail.com>
-References: <1409737755-16689-1-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 3/5] android/tester: Add AVRCP Disconnect - Success test case
+Date: Wed,  3 Sep 2014 12:49:13 +0300
+Message-Id: <1409737755-16689-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This split the handling of invalid PDU length and not matching
-transaction id adding proper debug logs.
 ---
- lib/sdp.c | 11 ++++++++---
- 1 file changed, 8 insertions(+), 3 deletions(-)
+ android/tester-avrcp.c | 35 +++++++++++++++++++++++++++++++++++
+ 1 file changed, 35 insertions(+)
 
-diff --git a/lib/sdp.c b/lib/sdp.c
-index e5e4622..201f6b0 100644
---- a/lib/sdp.c
-+++ b/lib/sdp.c
-@@ -4181,10 +4181,15 @@ int sdp_process(sdp_session_t *session)
- 		goto end;
- 	}
+diff --git a/android/tester-avrcp.c b/android/tester-avrcp.c
+index 35e9773..337a621 100644
+--- a/android/tester-avrcp.c
++++ b/android/tester-avrcp.c
+@@ -218,6 +218,20 @@ static void avrcp_connect_action(void)
+ 	schedule_action_verification(step);
+ }
  
--	if (n == 0 || reqhdr->tid != rsphdr->tid ||
--		(n != (int) (ntohs(rsphdr->plen) + sizeof(sdp_pdu_hdr_t)))) {
-+	if (reqhdr->tid != rsphdr->tid) {
- 		t->err = EPROTO;
--		SDPERR("Protocol error.");
-+		SDPERR("Protocol error: transaction id does not match");
-+		goto end;
-+	}
++static void avrcp_disconnect_action(void)
++{
++	struct test_data *data = tester_get_data();
++	const uint8_t *addr = hciemu_get_client_bdaddr(data->hciemu);
++	struct step *step = g_new0(struct step, 1);
++	bt_bdaddr_t bdaddr;
 +
-+	if (n != (int) (ntohs(rsphdr->plen) + sizeof(sdp_pdu_hdr_t))) {
-+		t->err = EPROTO;
-+		SDPERR("Protocol error: invalid length");
- 		goto end;
- 	}
++	bdaddr2android((const bdaddr_t *) addr, &bdaddr);
++
++	step->action_status = data->if_a2dp->disconnect(&bdaddr);
++
++	schedule_action_verification(step);
++}
++
+ static struct test_case test_cases[] = {
+ 	TEST_CASE_BREDRLE("AVRCP Init",
+ 		ACTION_SUCCESS(dummy_action, NULL),
+@@ -238,6 +252,27 @@ static struct test_case test_cases[] = {
+ 		ACTION_SUCCESS(bluetooth_disable_action, NULL),
+ 		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_OFF),
+ 	),
++	TEST_CASE_BREDRLE("AVRCP Disconnect - Success",
++		ACTION_SUCCESS(bluetooth_enable_action, NULL),
++		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_ON),
++		ACTION_SUCCESS(emu_setup_powered_remote_action, NULL),
++		ACTION_SUCCESS(emu_set_ssp_mode_action, NULL),
++		ACTION_SUCCESS(emu_add_l2cap_server_action, &sdp_setup_data),
++		ACTION_SUCCESS(emu_add_l2cap_server_action, &a2dp_setup_data),
++		ACTION_SUCCESS(emu_add_l2cap_server_action, &avrcp_setup_data),
++		ACTION_SUCCESS(avrcp_connect_action, NULL),
++		CALLBACK_AV_CONN_STATE(CB_A2DP_CONN_STATE,
++					BTAV_CONNECTION_STATE_CONNECTING),
++		CALLBACK_AV_CONN_STATE(CB_A2DP_CONN_STATE,
++					BTAV_CONNECTION_STATE_CONNECTED),
++		ACTION_SUCCESS(avrcp_disconnect_action, NULL),
++		CALLBACK_AV_CONN_STATE(CB_A2DP_CONN_STATE,
++					BTAV_CONNECTION_STATE_DISCONNECTING),
++		CALLBACK_AV_CONN_STATE(CB_A2DP_CONN_STATE,
++					BTAV_CONNECTION_STATE_DISCONNECTED),
++		ACTION_SUCCESS(bluetooth_disable_action, NULL),
++		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_OFF),
++	),
+ };
  
+ struct queue *get_avrcp_tests(void)
 -- 
 1.9.3
 
