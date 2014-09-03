@@ -1,166 +1,81 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v2 1/2] android/gatt: Stop listening while unregistering app
-Date: Wed, 03 Sep 2014 16:40:12 +0200
-Message-ID: <3536681.b2gG5Gh31h@uw000953>
-In-Reply-To: <1409736417-17615-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
-References: <1409736417-17615-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+From: Vikrampal Yadav <vikram.pal@samsung.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: luiz.dentz@gmail.com, d.kasatkin@samsung.com,
+	vikram.pal@samsung.com, cpgs@samsung.com
+Subject: [PATCH] monitor: Add AVRCP InformBatteryStatusOfCT support
+Date: Wed, 03 Sep 2014 19:55:28 +0530
+Message-id: <1409754328-26783-1-git-send-email-vikram.pal@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Grzegorz,
+Support for decoding AVRCP InformBatteryStatusOfCT added in
+Bluetooth monitor.
+---
+ monitor/avctp.c | 36 ++++++++++++++++++++++++++++++++++++
+ 1 file changed, 36 insertions(+)
 
-On Wednesday 03 of September 2014 11:26:56 Grzegorz Kolodziejczyk wrote:
-> Adapter gets stucked on advertising while unregistering all apps with not
-> stopped listening.
-> ---
->  android/gatt.c | 110 +++++++++++++++++++++++++++++++++++++--------------------
->  1 file changed, 72 insertions(+), 38 deletions(-)
-> 
-> diff --git a/android/gatt.c b/android/gatt.c
-> index aff5dc5..6970636 100644
-> --- a/android/gatt.c
-> +++ b/android/gatt.c
-> @@ -1883,15 +1883,87 @@ static uint8_t unregister_app(int client_if)
->  	return HAL_STATUS_SUCCESS;
->  }
->  
-> +static void send_client_listen_notify(int32_t id, int32_t status)
-> +{
-> +	struct hal_ev_gatt_client_listen ev;
-> +
-> +	/* Server if because of typo in android headers */
-> +	ev.server_if = id;
-> +	ev.status = status;
-> +
-> +	ipc_send_notif(hal_ipc, HAL_SERVICE_ID_GATT, HAL_EV_GATT_CLIENT_LISTEN,
-> +							sizeof(ev), &ev);
-> +}
-> +
-> +struct listen_data {
-> +	int32_t client_id;
-> +	bool start;
-> +};
-> +
-> +static void set_advertising_cb(uint8_t status, void *user_data)
-> +{
-> +	struct listen_data *l = user_data;
-> +
-> +	send_client_listen_notify(l->client_id, status);
-> +
-> +	/* In case of success update advertising state*/
-> +	if (!status)
-> +		advertising_cnt = l->start ? 1 : 0;
-> +
-> +	/*
-> +	 * Let's remove client from the list in two cases
-> +	 * 1. Start failed
-> +	 * 2. Stop succeed
-> +	 */
-> +	if ((l->start && status) || (!l->start && !status))
-> +		queue_remove(listen_apps, INT_TO_PTR(l->client_id));
-> +
-> +	free(l);
-> +}
-> +
->  static void handle_client_unregister(const void *buf, uint16_t len)
->  {
->  	const struct hal_cmd_gatt_client_unregister *cmd = buf;
->  	uint8_t status;
-> +	void *listening_client;
-> +	struct listen_data *data;
->  
->  	DBG("");
->  
-> +	listening_client = queue_find(listen_apps, match_by_value,
-> +						INT_TO_PTR(cmd->client_if));
-> +
-> +	if (listening_client) {
-> +		advertising_cnt--;
-> +		queue_remove(listen_apps, INT_TO_PTR(cmd->client_if));
-> +	} else {
-> +		status = unregister_app(cmd->client_if);
-> +		goto reply;
-> +	}
-> +
-> +	if (!advertising_cnt) {
-> +		data = new0(struct listen_data, 1);
-> +		if (!data) {
-> +			error("gatt: Could not allocate memory for listen data");
-> +			status = HAL_STATUS_NOMEM;
-> +			goto reply;
-> +		}
-> +
-> +		data->client_id = cmd->client_if;
-> +		data->start = false;
-> +
-> +		if (!bt_le_set_advertising(data->start, set_advertising_cb,
-> +								data)) {
-> +			error("gatt: Could not set advertising");
-> +			status = HAL_STATUS_FAILED;
-> +			free(data);
-> +			goto reply;
-> +		}
-> +	}
-> +
->  	status = unregister_app(cmd->client_if);
->  
-> +reply:
->  	ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_GATT,
->  					HAL_OP_GATT_CLIENT_UNREGISTER, status);
->  }
-> @@ -1970,44 +2042,6 @@ static void handle_client_disconnect(const void *buf, uint16_t len)
->  					HAL_OP_GATT_CLIENT_DISCONNECT, status);
->  }
->  
-> -static void send_client_listen_notify(int32_t id, int32_t status)
-> -{
-> -	struct hal_ev_gatt_client_listen ev;
-> -
-> -	/* Server if because of typo in android headers */
-> -	ev.server_if = id;
-> -	ev.status = status;
-> -
-> -	ipc_send_notif(hal_ipc, HAL_SERVICE_ID_GATT, HAL_EV_GATT_CLIENT_LISTEN,
-> -							sizeof(ev), &ev);
-> -}
-> -
-> -struct listen_data {
-> -	int32_t client_id;
-> -	bool start;
-> -};
-> -
-> -static void set_advertising_cb(uint8_t status, void *user_data)
-> -{
-> -	struct listen_data *l = user_data;
-> -
-> -	send_client_listen_notify(l->client_id, status);
-> -
-> -	/* In case of success update advertising state*/
-> -	if (!status)
-> -		advertising_cnt = l->start ? 1 : 0;
-> -
-> -	/*
-> -	 * Let's remove client from the list in two cases
-> -	 * 1. Start failed
-> -	 * 2. Stop succeed
-> -	 */
-> -	if ((l->start && status) || (!l->start && !status))
-> -		queue_remove(listen_apps, INT_TO_PTR(l->client_id));
-> -
-> -	free(l);
-> -}
-> -
->  static void handle_client_listen(const void *buf, uint16_t len)
->  {
->  	const struct hal_cmd_gatt_client_listen *cmd = buf;
-
-Both patches are now applied. Thanks. 
-
+diff --git a/monitor/avctp.c b/monitor/avctp.c
+index 64d4b58..0a16b45 100644
+--- a/monitor/avctp.c
++++ b/monitor/avctp.c
+@@ -483,6 +483,24 @@ static const char *value2str(uint8_t attr, uint8_t value)
+ 	}
+ }
+ 
++static const char *status2str(uint8_t status)
++{
++	switch (status) {
++	case 0x0:
++		return "NORMAL";
++	case 0x1:
++		return "WARNING";
++	case 0x2:
++		return "CRITICAL";
++	case 0x3:
++		return "EXTERNAL";
++	case 0x4:
++		return "FULL_CHARGE";
++	default:
++		return "Reserved";
++	}
++}
++
+ static bool avrcp_passthrough_packet(struct l2cap_frame *frame)
+ {
+ 	packet_hexdump(frame->data, frame->size);
+@@ -609,6 +627,23 @@ response:
+ 	return true;
+ }
+ 
++static bool avrcp_ct_battery_status(struct l2cap_frame *frame, uint8_t ctype,
++					uint8_t len, uint8_t indent)
++{
++	uint8_t status;
++
++	if (ctype > AVC_CTYPE_GENERAL_INQUIRY)
++		return true;
++
++	if (!l2cap_frame_get_u8(frame, &status))
++		return false;
++
++	print_field("%*cBatteryStatus: 0x%02x (%s)", (indent - 8),
++					' ', status, status2str(status));
++
++	return true;
++}
++
+ struct avrcp_ctrl_pdu_data {
+ 	uint8_t pduid;
+ 	bool (*func) (struct l2cap_frame *frame, uint8_t ctype, uint8_t len,
+@@ -619,6 +654,7 @@ static const struct avrcp_ctrl_pdu_data avrcp_ctrl_pdu_table[] = {
+ 	{ 0x10, avrcp_get_capabilities			},
+ 	{ 0x11, avrcp_list_player_attributes		},
+ 	{ 0x12, avrcp_list_player_values		},
++	{ 0x18, avrcp_ct_battery_status			},
+ 	{ }
+ };
+ 
 -- 
-Best regards, 
-Szymon Janc
+1.9.1
+
