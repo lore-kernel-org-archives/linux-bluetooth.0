@@ -1,116 +1,102 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1409727487-19074-2-git-send-email-lukasz.rymanowski@tieto.com>
-References: <1409727487-19074-1-git-send-email-lukasz.rymanowski@tieto.com>
-	<1409727487-19074-2-git-send-email-lukasz.rymanowski@tieto.com>
-Date: Wed, 3 Sep 2014 14:30:04 +0300
-Message-ID: <CABBYNZK3ncG7-emSn=-k6caiZ-hq2obvTTrESkHudWy6tfvsxg@mail.gmail.com>
-Subject: Re: [PATCH v2 2/6] android/gatt: Unsubscribe from autoconnect on unregister
+In-Reply-To: <CABBYNZJK37SuBuHqxjGO8aobBDukjiOOExciOoQZkGnp-1rGeA@mail.gmail.com>
+References: <000001cfb169$e4d01bc0$ae705340$@samsung.com>
+	<CABBYNZKTc7DYz5OSJOYm8uTDRzOOzfLMaOPGg-U7TTneaRiH_A@mail.gmail.com>
+	<002101cfb550$afb1f400$0f15dc00$@samsung.com>
+	<CABBYNZL5OBA6iNhzTkpKTmSEj+5R_oU5KLOAsFcK0ZDHvridMw@mail.gmail.com>
+	<006d01cfc5e0$6b4df110$41e9d330$@samsung.com>
+	<CABBYNZJnyVNyw2-odAPV621k-aiw8x83WNju7FZXW0=_5VUotw@mail.gmail.com>
+	<000101cfc66e$00719660$0154c320$@samsung.com>
+	<CABBYNZJK37SuBuHqxjGO8aobBDukjiOOExciOoQZkGnp-1rGeA@mail.gmail.com>
+Date: Wed, 3 Sep 2014 13:27:25 +0300
+Message-ID: <CABBYNZKJ6bOoYPPMEKL5LsFt+NFjOcxx6V2pV5b-WZ81dJeqOw@mail.gmail.com>
+Subject: Re: Query regarding MAP 1.2 implementation
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+To: Gowtham Anandha Babu <gowtham.ab@samsung.com>
 Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Lukasz,
+Hi,
 
-On Wed, Sep 3, 2014 at 9:58 AM, Lukasz Rymanowski
-<lukasz.rymanowski@tieto.com> wrote:
-> When application does unregister, lets make sure that BfA does not keep
-> any auto connect devices for this app.
-> ---
->  android/gatt.c | 43 +++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 43 insertions(+)
+On Tue, Sep 2, 2014 at 11:28 AM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> Hi,
 >
-> diff --git a/android/gatt.c b/android/gatt.c
-> index a3486ca..dea253e 100644
-> --- a/android/gatt.c
-> +++ b/android/gatt.c
-> @@ -370,6 +370,13 @@ static bool match_device_by_state(const void *data, const void *user_data)
->         return true;
->  }
+> On Tue, Sep 2, 2014 at 8:22 AM, Gowtham Anandha Babu
+> <gowtham.ab@samsung.com> wrote:
+>>
+>> Hi Luiz,
+>>
+>>> -----Original Message-----
+>>> From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-
+>>> owner@vger.kernel.org] On Behalf Of Luiz Augusto von Dentz
+>>> Sent: Monday, September 01, 2014 6:37 PM
+>>> To: Gowtham Anandha Babu
+>>> Cc: linux-bluetooth@vger.kernel.org; Bharat Panda
+>>> Subject: Re: Query regarding MAP 1.2 implementation
+>>>
+>>> Hi,
+>>>
+>>> On Mon, Sep 1, 2014 at 3:29 PM, Gowtham Anandha Babu
+>>> <gowtham.ab@samsung.com> wrote:
+>>>
+>>> > The current message-dummy.c looks like, it is creating a virtual folder in the
+>>> system (Ex. Home/PC-NAME/map-messages/).
+>>> > So, I created the map-messages directory in home/PC-NAME/. Then I tried
+>>> SETPATH (mentioned in the previous thread).
+>>> > The output is...
+>>> >
+>>> >  obexd[29146]: obexd/src/obex.c:cmd_setpath()
+>>> > obexd[29146]: SETPATH(0x5), (null)(0xffffffff)
+>>> > obexd[29146]: obexd/src/obex.c:parse_name() NAME:
+>>> > obexd[29146]: obexd/plugins/mas.c:mas_setpath() SETPATH: name
+>>> nonhdr
+>>> > 0x20
+>>> > obexd[29146]: SETPATH(0x5), SUCCESS(0x20)
+>>> >
+>>> > But When I tried to call GetFolderListing() The output is...
+>>> >
+>>> > obexd[29146]: obexd/src/obex.c:cmd_get() session 0x1008c40
+>>> > obexd[29146]: GET(0x3), (null)(0xffffffff)
+>>> > obexd[29146]: obexd/src/obex.c:parse_type() TYPE:
+>>> > x-obex/folder-listing
+>>> > obexd[29146]: obexd/plugins/mas.c:mas_get() GET: name (null) type
+>>> > x-obex/folder-listing mas 0x1015c00
+>>> > obexd[29146]: obexd/plugins/mas.c:get_params() Error when parsing
+>>> parameters!
+>>> > obexd[29146]: GET(0x3), BAD_REQUEST(0x40)
+>>> >
+>>> > But I had few folders created inside the map-messages.
+>>>
+>>> Bad request is normally when there is something wrong with the command
+>>> itself, the error comes from here:
+>>>
+>>> mas->inparams = g_obex_apparam_decode(buffer, size);
+>>> if (mas->inparams == NULL) {
+>>>     DBG("Error when parsing parameters!");
+>>>     return -EBADR;
+>>> }
+>>>
+>>> I suspect the problem is that there is no application parameters set which is
+>>> fine since all the parameters of GetFolderListing are optional, please try with
+>>> the attached patch I will send it shortly as a proper patch to the mailing list.
+>>>
+>>>
+>>> --
+>>> Luiz Augusto von Dentz
+>>
+>>
+>> I applied the patch which was attached in the previous reply. Still I am getting the same error.
+>> I tried printing the "size" inside the get_params function. Its value is '0' for GetFolderListing request.
+>> If size=0, then g_obex_apparam_decode()  function always return NULL, which leads to "Error when parsing parameters!".
 >
-> +static bool match_device_by_ac_id(const void *data, const void *user_data)
-> +{
-> +       const struct gatt_device *dev = data;
-> +
-> +       return queue_find(dev->autoconnect_apps, match_by_value, user_data);
-> +}
-> +
->  static bool match_pending_device(const void *data, const void *user_data)
->  {
->         const struct gatt_device *dev = data;
-> @@ -442,6 +449,11 @@ static struct gatt_device *find_device_by_state(uint32_t state)
->                                                         UINT_TO_PTR(state));
->  }
->
-> +static struct gatt_device *find_device_by_autoconnect_app_id(uint32_t id)
-> +{
-> +       return queue_find(gatt_devices, match_device_by_ac_id,
-> +                                                       UINT_TO_PTR(id));
-> +}
->  static bool match_srvc_by_element_id(const void *data, const void *user_data)
->  {
->         const struct element_id *exp_id = user_data;
-> @@ -1865,10 +1877,41 @@ static bool trigger_connection(struct app_connection *connection)
->         return ret;
->  }
->
-> +static void clear_autoconnect_devices(int app_id)
-> +{
-> +       struct gatt_device *dev;
-> +
-> +       /*
-> +        * Check if application was registered for any devices to
-> +        * reconnect
-> +        */
-> +       dev = find_device_by_autoconnect_app_id(app_id);
-> +       while (dev) {
-> +               queue_remove(dev->autoconnect_apps, INT_TO_PTR(app_id));
-> +
-> +               if (queue_isempty(dev->autoconnect_apps)) {
-> +                       bt_auto_connect_remove(&dev->bdaddr);
-> +
-> +                       if (dev->state == DEVICE_CONNECT_INIT)
-> +                               device_set_state(dev, DEVICE_DISCONNECTED);
-> +
-> +                       device_unref(dev);
-> +               }
-> +
-> +               dev = find_device_by_autoconnect_app_id(app_id);
-> +       };
+> My bad, the check should be size <= 0 otherwise it will still cause
+> this problem.
 
-Looks like there is a ';; after the while statement, please fix that.
-Also this looks very inefficient since it does
-find_device_by_autoconnect_app_id does a double lookup and we doing it
-in a while loop, I would suggest using queue_foreach(gatt_devices...
-then do queue_remove_if(dev->autoconnect_apps,  the result should be
-the same but with a single lookup in each queue.
-
-> +}
-> +
->  static uint8_t unregister_app(int client_if)
->  {
->         struct gatt_app *cl;
->
-> +       /*
-> +        * Make sure that there is no devices in auto connect list for this
-> +        * application
-> +        */
-> +       clear_autoconnect_devices(client_if);
-> +
->         cl = queue_remove_if(gatt_apps, match_app_by_id, INT_TO_PTR(client_if));
->         if (!cl) {
->                 error("gatt: client_if=%d not found", client_if);
-> --
-> 1.8.4
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-
+Let me know if you can test the patch, I would like to push it asap if it works.
 
 
 -- 
