@@ -1,83 +1,96 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <4381322.9SzXjEeX31@uw000953>
-References: <1409652601-28689-1-git-send-email-lukasz.rymanowski@tieto.com>
-	<1409652601-28689-8-git-send-email-lukasz.rymanowski@tieto.com>
-	<4381322.9SzXjEeX31@uw000953>
-Date: Wed, 3 Sep 2014 08:55:33 +0200
-Message-ID: <CAMudyAvxCBHgzZP5SLMprdo=Mf49N-bmWxPTSmoi33N7YfHAYQ@mail.gmail.com>
-Subject: Re: [PATCH 07/16] android/gatt: Add API to remove autoconnect GATT
- based device
 From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-To: Szymon Janc <szymon.janc@tieto.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+To: linux-bluetooth@vger.kernel.org
+Cc: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+Subject: [PATCH v2 6/6] android/hidhost: Remove reconnect logic
+Date: Wed,  3 Sep 2014 08:58:07 +0200
+Message-Id: <1409727487-19074-6-git-send-email-lukasz.rymanowski@tieto.com>
+In-Reply-To: <1409727487-19074-1-git-send-email-lukasz.rymanowski@tieto.com>
+References: <1409727487-19074-1-git-send-email-lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Szymon,
+GATT can handle reconnect now, so lets remove that part of code from
+here
+---
+ android/hidhost.c | 26 +++++++-------------------
+ 1 file changed, 7 insertions(+), 19 deletions(-)
 
-On 2 September 2014 17:27, Szymon Janc <szymon.janc@tieto.com> wrote:
-> Hi Łukasz,
->
-> On Tuesday 02 of September 2014 12:09:52 Lukasz Rymanowski wrote:
->> ---
->>  android/gatt.c | 23 +++++++++++++++++++++++
->>  android/gatt.h |  1 +
->>  2 files changed, 24 insertions(+)
->>
->> diff --git a/android/gatt.c b/android/gatt.c
->> index 5d04ad8..0d0b56d 100644
->> --- a/android/gatt.c
->> +++ b/android/gatt.c
->> @@ -6755,3 +6755,26 @@ bool bt_gatt_add_autoconnect(unsigned int id, const bdaddr_t *addr)
->>
->>       return true;
->>  }
->> +
->> +void bt_gatt_remove_autoconnect(unsigned int id, const bdaddr_t *addr)
->> +{
->> +     struct gatt_device *dev;
->> +
->> +     DBG("");
->> +
->> +     dev = find_device_by_addr(addr);
->> +     if (!dev) {
->> +             error("gatt: Device not found");
->> +             return;
->> +     }
->> +
->> +     queue_remove(dev->autoconnect_apps, INT_TO_PTR(id));
->> +
->> +     if (queue_isempty(dev->autoconnect_apps)) {
->> +             bt_auto_connect_remove(addr);
->> +             device_unref(dev);
->> +
->> +             if (dev->state == DEVICE_CONNECT_INIT)
->> +                     device_set_state(dev, DEVICE_DISCONNECTED);
->
-> This looks unclear to me since you are using dev after unref.
+diff --git a/android/hidhost.c b/android/hidhost.c
+index 3dc3c25..652b118 100644
+--- a/android/hidhost.c
++++ b/android/hidhost.c
+@@ -109,7 +109,6 @@ struct hid_device {
+ 	struct bt_uhid	*uhid;
+ 	uint8_t		last_hid_msg;
+ 	struct bt_hog	*hog;
+-	guint		reconnect_id;
+ 	int sec_level;
+ };
+ 
+@@ -125,9 +124,6 @@ static void hid_device_free(void *data)
+ {
+ 	struct hid_device *dev = data;
+ 
+-	if (dev->reconnect_id > 0)
+-		g_source_remove(dev->reconnect_id);
+-
+ 	if (dev->ctrl_watch > 0)
+ 		g_source_remove(dev->ctrl_watch);
+ 
+@@ -768,19 +764,6 @@ fail:
+ 	hid_device_remove(dev);
+ }
+ 
+-static gboolean hog_reconnect(void *user_data)
+-{
+-	struct hid_device *dev = user_data;
+-
+-	DBG("");
+-
+-	dev->reconnect_id = 0;
+-
+-	bt_gatt_connect_app(hog_app, &dev->dst);
+-
+-	return FALSE;
+-}
+-
+ static void hog_conn_cb(const bdaddr_t *addr, int err, void *attrib)
+ {
+ 	GSList *l;
+@@ -792,11 +775,10 @@ static void hog_conn_cb(const bdaddr_t *addr, int err, void *attrib)
+ 	if (err < 0) {
+ 		if (!dev)
+ 			return;
+-		if (dev->hog && !dev->reconnect_id) {
++		if (dev->hog) {
+ 			bt_hid_notify_state(dev,
+ 						HAL_HIDHOST_STATE_DISCONNECTED);
+ 			bt_hog_detach(dev->hog);
+-			dev->reconnect_id = g_idle_add(hog_reconnect, dev);
+ 			return;
+ 		}
+ 		goto fail;
+@@ -829,6 +811,9 @@ static void hog_conn_cb(const bdaddr_t *addr, int err, void *attrib)
+ 
+ 	bt_hid_notify_state(dev, HAL_HIDHOST_STATE_CONNECTED);
+ 
++	if (!bt_gatt_add_autoconnect(hog_app, &dev->dst))
++		error("hidhost: Could not add to autoconnect list");
++
+ 	return;
+ 
+ fail:
+@@ -1497,6 +1482,9 @@ static void hid_unpaired_cb(const bdaddr_t *addr, uint8_t type)
+ 	ba2str(addr, address);
+ 	DBG("Unpaired device %s", address);
+ 
++	if (hog_app)
++		bt_gatt_remove_autoconnect(hog_app, addr);
++
+ 	hid_device_remove(dev);
+ }
+ 
+-- 
+1.8.4
 
-Yup, this is a bug - will be fixed.
-
-> Shouldn't unref be done after you no longer need to use it? Otherwise
-> things might crash due to use-after-free.
->
->> +     }
->> +}
->> diff --git a/android/gatt.h b/android/gatt.h
->> index 40699b2..3382df9 100644
->> --- a/android/gatt.h
->> +++ b/android/gatt.h
->> @@ -40,3 +40,4 @@ bool bt_gatt_connect_app(unsigned int id, const bdaddr_t *addr);
->>  bool bt_gatt_disconnect_app(unsigned int id, const bdaddr_t *addr);
->>  bool bt_gatt_set_security(const bdaddr_t *bdaddr, int sec_level);
->>  bool bt_gatt_add_autoconnect(unsigned int id, const bdaddr_t *addr);
->> +void bt_gatt_remove_autoconnect(unsigned int id, const bdaddr_t *addr);
->>
->
-> --
-> Best regards,
-> Szymon Janc
-
-Lukasz
