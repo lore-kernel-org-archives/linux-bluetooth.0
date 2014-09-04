@@ -1,237 +1,139 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 1/5] android/tester: Add AVRCP init - Success test case
-Date: Thu,  4 Sep 2014 17:24:00 +0300
-Message-Id: <1409840644-32200-1-git-send-email-luiz.dentz@gmail.com>
+From: Gowtham Anandha Babu <gowtham.ab@samsung.com>
+To: 'Luiz Augusto von Dentz' <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org, bharat.panda@samsung.com,
+	p.sinha@samsung.com, d.kasatkin@samsung.com
+References: <1409204803-3705-1-git-send-email-gowtham.ab@samsung.com>
+ <CABBYNZJaruAHM3sAg6msQyvgGj=_+CehXmEmGzOt4gjE_b+10w@mail.gmail.com>
+ <000001cfc2a0$0032aa30$0097fe90$@samsung.com>
+ <CABBYNZLZj-+et7M7eXncm=YdkCx7H_GfYKuLBc49OFKHm6JP4Q@mail.gmail.com>
+In-reply-to: 
+Subject: RE: [MAP] obexd/client: Handle MAP event types
+Date: Thu, 04 Sep 2014 19:52:56 +0530
+Message-id: <000601cfc84b$d131d4c0$73957e40$@samsung.com>
+MIME-version: 1.0
+Content-type: multipart/mixed;
+ boundary="----=_NextPart_000_0007_01CFC879.EAEF8F00"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+This is a multipart message in MIME format.
 
----
- android/Makefile.am    |  1 +
- android/tester-avrcp.c | 50 +++++++++++++++++++++++++++++++++++
- android/tester-main.c  | 72 ++++++++++++++++++++++++++++++++++++++++++++++++++
- android/tester-main.h  |  4 +++
- 4 files changed, 127 insertions(+)
- create mode 100644 android/tester-avrcp.c
+------=_NextPart_000_0007_01CFC879.EAEF8F00
+Content-Type: text/plain;
+	charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-diff --git a/android/Makefile.am b/android/Makefile.am
-index e93a08b..49fbddc 100644
---- a/android/Makefile.am
-+++ b/android/Makefile.am
-@@ -171,6 +171,7 @@ android_android_tester_SOURCES = emulator/btdev.h emulator/btdev.c \
- 				android/tester-pan.c \
- 				android/tester-hdp.c \
- 				android/tester-a2dp.c \
-+				android/tester-avrcp.c \
- 				android/tester-gatt.c \
- 				android/tester-main.h android/tester-main.c
- 
-diff --git a/android/tester-avrcp.c b/android/tester-avrcp.c
-new file mode 100644
-index 0000000..60a57b4
---- /dev/null
-+++ b/android/tester-avrcp.c
-@@ -0,0 +1,50 @@
-+/*
-+ * Copyright (C) 2014 Intel Corporation
-+ *
-+ * Licensed under the Apache License, Version 2.0 (the "License");
-+ * you may not use this file except in compliance with the License.
-+ * You may obtain a copy of the License at
-+ *
-+ *      http://www.apache.org/licenses/LICENSE-2.0
-+ *
-+ * Unless required by applicable law or agreed to in writing, software
-+ * distributed under the License is distributed on an "AS IS" BASIS,
-+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-+ * See the License for the specific language governing permissions and
-+ * limitations under the License.
-+ *
-+ */
-+
-+#include <stdbool.h>
-+
-+#include "emulator/bthost.h"
-+#include "src/shared/util.h"
-+
-+#include "tester-main.h"
-+#include "android/utils.h"
-+
-+static struct queue *list;
-+
-+static struct test_case test_cases[] = {
-+	TEST_CASE_BREDRLE("AVRCP Init",
-+		ACTION_SUCCESS(dummy_action, NULL),
-+	),
-+};
-+
-+struct queue *get_avrcp_tests(void)
-+{
-+	uint16_t i = 0;
-+
-+	list = queue_new();
-+
-+	for (; i < sizeof(test_cases) / sizeof(test_cases[0]); ++i)
-+		if (!queue_push_tail(list, &test_cases[i]))
-+			return NULL;
-+
-+	return list;
-+}
-+
-+void remove_avrcp_tests(void)
-+{
-+	queue_destroy(list, NULL);
-+}
-diff --git a/android/tester-main.c b/android/tester-main.c
-index f5f46fb..37f3442 100644
---- a/android/tester-main.c
-+++ b/android/tester-main.c
-@@ -1212,6 +1212,10 @@ static btav_callbacks_t bta2dp_callbacks = {
- 	.audio_state_cb = a2dp_audio_state_cb,
- };
- 
-+static btrc_callbacks_t btavrcp_callbacks = {
-+	.size = sizeof(btavrcp_callbacks),
-+};
-+
- static const btgatt_client_callbacks_t btgatt_client_callbacks = {
- 	.register_client_cb = gattc_register_client_cb,
- 	.scan_result_cb = gattc_scan_result_cb,
-@@ -1528,6 +1532,60 @@ static void setup_a2dp(const void *test_data)
- 	tester_setup_complete();
- }
- 
-+static void setup_avrcp(const void *test_data)
-+{
-+	struct test_data *data = tester_get_data();
-+	const bt_interface_t *if_bt;
-+	bt_status_t status;
-+	const void *a2dp, *avrcp;
-+
-+	if (!setup_base(data)) {
-+		tester_setup_failed();
-+		return;
-+	}
-+
-+	if_bt = data->if_bluetooth;
-+
-+	status = if_bt->init(&bt_callbacks);
-+	if (status != BT_STATUS_SUCCESS) {
-+		data->if_bluetooth = NULL;
-+		tester_setup_failed();
-+		return;
-+	}
-+
-+	a2dp = if_bt->get_profile_interface(BT_PROFILE_ADVANCED_AUDIO_ID);
-+	if (!a2dp) {
-+		tester_setup_failed();
-+		return;
-+	}
-+
-+	data->if_a2dp = a2dp;
-+
-+	status = data->if_a2dp->init(&bta2dp_callbacks);
-+	if (status != BT_STATUS_SUCCESS) {
-+		data->if_a2dp = NULL;
-+		tester_setup_failed();
-+		return;
-+	}
-+
-+	avrcp = if_bt->get_profile_interface(BT_PROFILE_AV_RC_ID);
-+	if (!a2dp) {
-+		tester_setup_failed();
-+		return;
-+	}
-+
-+	data->if_avrcp = avrcp;
-+
-+	status = data->if_avrcp->init(&btavrcp_callbacks);
-+	if (status != BT_STATUS_SUCCESS) {
-+		data->if_avrcp = NULL;
-+		tester_setup_failed();
-+		return;
-+	}
-+
-+	tester_setup_complete();
-+}
-+
- static void setup_gatt(const void *test_data)
- {
- 	struct test_data *data = tester_get_data();
-@@ -1605,6 +1663,11 @@ static void teardown(const void *test_data)
- 		data->if_a2dp = NULL;
- 	}
- 
-+	if (data->if_avrcp) {
-+		data->if_avrcp->cleanup();
-+		data->if_avrcp = NULL;
-+	}
-+
- 	if (data->if_bluetooth) {
- 		data->if_bluetooth->cleanup();
- 		data->if_bluetooth = NULL;
-@@ -2125,6 +2188,7 @@ static void tester_testcases_cleanup(void)
- 	remove_hidhost_tests();
- 	remove_gatt_tests();
- 	remove_a2dp_tests();
-+	remove_avrcp_tests();
- 	remove_hdp_tests();
- 	remove_pan_tests();
- }
-@@ -2171,6 +2235,13 @@ static void add_a2dp_tests(void *data, void *user_data)
- 	test(tc, setup_a2dp, generic_test_function, teardown);
- }
- 
-+static void add_avrcp_tests(void *data, void *user_data)
-+{
-+	struct test_case *tc = data;
-+
-+	test(tc, setup_avrcp, generic_test_function, teardown);
-+}
-+
- static void add_gatt_tests(void *data, void *user_data)
- {
- 	struct test_case *tc = data;
-@@ -2190,6 +2261,7 @@ int main(int argc, char *argv[])
- 	queue_foreach(get_pan_tests(), add_pan_tests, NULL);
- 	queue_foreach(get_hdp_tests(), add_hdp_tests, NULL);
- 	queue_foreach(get_a2dp_tests(), add_a2dp_tests, NULL);
-+	queue_foreach(get_avrcp_tests(), add_avrcp_tests, NULL);
- 	queue_foreach(get_gatt_tests(), add_gatt_tests, NULL);
- 
- 	if (tester_run())
-diff --git a/android/tester-main.h b/android/tester-main.h
-index 46aacce..6cad803 100644
---- a/android/tester-main.h
-+++ b/android/tester-main.h
-@@ -50,6 +50,7 @@
- #include <hardware/bt_pan.h>
- #include <hardware/bt_hl.h>
- #include <hardware/bt_av.h>
-+#include <hardware/bt_rc.h>
- #include <hardware/bt_gatt.h>
- #include <hardware/bt_gatt_client.h>
- #include <hardware/bt_gatt_server.h>
-@@ -321,6 +322,7 @@ struct test_data {
- 	const bthl_interface_t *if_hdp;
- 	const btav_interface_t *if_a2dp;
- 	struct audio_stream_out *if_stream;
-+	const btrc_interface_t *if_avrcp;
- 	const btgatt_interface_t *if_gatt;
- 
- 	const void *test_data;
-@@ -443,6 +445,8 @@ struct queue *get_hdp_tests(void);
- void remove_hdp_tests(void);
- struct queue *get_a2dp_tests(void);
- void remove_a2dp_tests(void);
-+struct queue *get_avrcp_tests(void);
-+void remove_avrcp_tests(void);
- struct queue *get_gatt_tests(void);
- void remove_gatt_tests(void);
- 
--- 
-1.9.3
+Hi,
+
+> -----Original Message-----
+> From: Gowtham Anandha Babu [mailto:gowtham.ab@samsung.com]
+> Sent: Thursday, August 28, 2014 7:03 PM
+> To: 'Luiz Augusto von Dentz'
+> Cc: 'linux-bluetooth@vger.kernel.org'
+> Subject: RE: [MAP] obexd/client: Handle MAP event types
+>=20
+> Hi Luiz,
+>=20
+> > -----Original Message-----
+> > From: Luiz Augusto von Dentz [mailto:luiz.dentz@gmail.com]
+> > Sent: Thursday, August 28, 2014 3:16 PM
+> > To: Gowtham Anandha Babu
+> > Cc: linux-bluetooth@vger.kernel.org
+> > Subject: Re: [MAP] obexd/client: Handle MAP event types
+> >
+> > Hi,
+> >
+> > On Thu, Aug 28, 2014 at 12:11 PM, Gowtham Anandha Babu
+> > <gowtham.ab@samsung.com> wrote:
+> > > Hi Luiz,
+> > >     But in the obexd/client/mns.c
+> > >     Inside parse_event_report_type() function, event types are
+> > > assigned
+> > with the values MAP_ET_MEMORY_FULL and
+> MAP_ET_MEMORY_AVAILABLE.
+> > >     It should be handled in the map_handle_notification() inside =
+map.c.
+> >
+> > Please do not top post in the mailing list, use inline posting.
+> > Regarding the parsing, yes it does have proper handling of those =
+event
+> > but there is no mapping to the D-Bus API therefore we ignore those
+> > memory event. As I mentioned the they are not per message so they
+> > cannot be set as a status of a message, anyway it would not make
+> > sense, and having it on the MessageAccess interface has not been
+> > considered but first I need to have a proper user case where it =
+makes
+> sense to expose those events.
+> >
+> > Luiz Augusto von Dentz
+>=20
+>=20
+> The use cases are:
+> 1) What if one tries to push a message, but the space available in the =
+MSE
+> device is not enough. So MCE will receive Memory Full Event.
+> 2) Once the user cleared some memory in the MSE device, MCE should be
+> notified with Memory Available Event.
+> As you mentioned earlier, these cannot be set as a status of a =
+message. But
+> MCE device needs to be get notified about this events.
+>=20
+> If the MCE receives Memory Full event, it will set the status as =
+"delivery-
+> failure".
+> Once MSE device(server)  deletes some messages and send Memory
+> Available event then MCE will push the pending message.
+> Can it be done like this?
+>=20
+> Regards,
+> Gowtham
+
+Just a reminder. With little bit clarity , If MCE pushes the message, =
+the "Memory Full" event type is given by MSE. Then I think the status of =
+that message will be empty. Instead we can set the status as a =
+"sending-failure".
+Whatever explained I added in the attached patch for your kind perusal.
+
+Regards,
+Gowtham
+
+------=_NextPart_000_0007_01CFC879.EAEF8F00
+Content-Type: application/octet-stream;
+	name="0001-obexd-client-Handle-MAP-event-types.patch"
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: attachment;
+	filename="0001-obexd-client-Handle-MAP-event-types.patch"
+
+>From 448f7b2f3910e667e45f7e48ae01a96529be1a78 Mon Sep 17 00:00:00 2001=0A=
+From: gowtham babu <gowtham.ab@samsung.com>=0A=
+Date: Thu, 4 Sep 2014 19:35:49 +0530=0A=
+Subject: [MAP] obexd/client: Handle MAP event types=0A=
+=0A=
+Adds below MCE event types handling in map_handle_notification()=0A=
+MAP_ET_MEMORY_FULL=0A=
+---=0A=
+ obexd/client/map.c | 3 +++=0A=
+ 1 file changed, 3 insertions(+)=0A=
+=0A=
+diff --git a/obexd/client/map.c b/obexd/client/map.c=0A=
+index 520e492..d80ad98 100644=0A=
+--- a/obexd/client/map.c=0A=
++++ b/obexd/client/map.c=0A=
+@@ -1927,6 +1927,9 @@ static void map_handle_notification(struct =
+map_event *event, void *user_data)=0A=
+ 	case MAP_ET_MESSAGE_SHIFT:=0A=
+ 		map_handle_folder_changed(map, event, event->folder);=0A=
+ 		break;=0A=
++	case MAP_ET_MEMORY_FULL:=0A=
++		map_handle_status_changed(map, event, "sending-failure");=0A=
++		break;=0A=
+ 	default:=0A=
+ 		break;=0A=
+ 	}=0A=
+-- =0A=
+1.9.1=0A=
+=0A=
+
+------=_NextPart_000_0007_01CFC879.EAEF8F00--
 
