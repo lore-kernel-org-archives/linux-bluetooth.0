@@ -1,106 +1,93 @@
 Return-Path: <cyrus@holtmann.org>
-Sender: Larry Finger <larry.finger@gmail.com>
-Message-ID: <54089665.1040302@lwfinger.net>
-Date: Thu, 04 Sep 2014 11:42:13 -0500
-From: Larry Finger <Larry.Finger@lwfinger.net>
 MIME-Version: 1.0
-To: =?UTF-8?B?6ZmI6Imz6JCN?= <champion_chen@realsil.com.cn>,
- Daniel Drake <drake@endlessm.com>
-CC: Marcel Holtmann <marcel@holtmann.org>,
- "Gustavo F. Padovan" <gustavo@padovan.org>,
- Johan Hedberg <johan.hedberg@gmail.com>,
- Linux Bluetooth mailing list <linux-bluetooth@vger.kernel.org>,
- =?UTF-8?B?6K645Yev5Yev?= <kyle_xu@realsil.com.cn>
-Subject: Re: =?UTF-8?B?562U5aSNOiDnrZTlpI06IFtQQVRDSCB2Ml0gQmx1ZXRvb3RoOiA=?=
- =?UTF-8?B?YnR1c2I6IEFkZCBSZWFsdGVrIDg3MjMvODc2MSBzdXBwb3J0?=
-References: <1404218878-14218-1-git-send-email-drake@endlessm.com>	<16AC594D-6B3C-4CB6-B951-0763F3E4E27A@holtmann.org>	<CAD8Lp45HbA03MycDVu6akTfEET_ZzxrwGpH1TbiQrw5Z178aeA@mail.gmail.com>	<53B2D160.4010306@lwfinger.net>	<F9E90F3A-5FE4-407C-833A-5E852A260984@holtmann.org>	<54F70642BAB21D4498E1AA3EFE3D519A45FBED07@rsex2.realsil.com.cn>	<B6A2794A-32D2-4D66-9D61-A27D7DA247B1@holtmann.org>	<54F70642BAB21D4498E1AA3EFE3D519A45FBF299@rsex2.realsil.com.cn> <CAD8Lp44-=9RNWf2tfmCL14dWJRiZhGCtj042TprR7Q3m9hbNzA@mail.gmail.com> <54F70642BAB21D4498E1AA3EFE3D519A46010A1B@rsex2.realsil.com.cn>
-In-Reply-To: <54F70642BAB21D4498E1AA3EFE3D519A46010A1B@rsex2.realsil.com.cn>
-Content-Type: multipart/mixed;
- boundary="------------020409060200070909040802"
+In-Reply-To: <000601cfc84b$d131d4c0$73957e40$@samsung.com>
+References: <1409204803-3705-1-git-send-email-gowtham.ab@samsung.com>
+	<CABBYNZJaruAHM3sAg6msQyvgGj=_+CehXmEmGzOt4gjE_b+10w@mail.gmail.com>
+	<000001cfc2a0$0032aa30$0097fe90$@samsung.com>
+	<CABBYNZLZj-+et7M7eXncm=YdkCx7H_GfYKuLBc49OFKHm6JP4Q@mail.gmail.com>
+	<000601cfc84b$d131d4c0$73957e40$@samsung.com>
+Date: Thu, 4 Sep 2014 17:42:56 +0300
+Message-ID: <CABBYNZ+OKy0RMt-pZc_YwHD2EbxqD8Ae3bm7_afL9rhmj4XweQ@mail.gmail.com>
+Subject: Re: [MAP] obexd/client: Handle MAP event types
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Gowtham Anandha Babu <gowtham.ab@samsung.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	Bharat Panda <bharat.panda@samsung.com>, p.sinha@samsung.com,
+	Dmitry Kasatkin <d.kasatkin@samsung.com>
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This is a multi-part message in MIME format.
---------------020409060200070909040802
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Hi,
 
-On 09/03/2014 10:34 PM, 陈艳萍 wrote:
-> Hi Daniel,
-> 	Attached file is btusb driver add realtek Bluetooth support with firmware, we have tested under Ubuntu 14.04.
+On Thu, Sep 4, 2014 at 5:22 PM, Gowtham Anandha Babu
+<gowtham.ab@samsung.com> wrote:
+> Hi,
+>
+>> -----Original Message-----
+>> From: Gowtham Anandha Babu [mailto:gowtham.ab@samsung.com]
+>> Sent: Thursday, August 28, 2014 7:03 PM
+>> To: 'Luiz Augusto von Dentz'
+>> Cc: 'linux-bluetooth@vger.kernel.org'
+>> Subject: RE: [MAP] obexd/client: Handle MAP event types
+>>
+>> Hi Luiz,
+>>
+>> > -----Original Message-----
+>> > From: Luiz Augusto von Dentz [mailto:luiz.dentz@gmail.com]
+>> > Sent: Thursday, August 28, 2014 3:16 PM
+>> > To: Gowtham Anandha Babu
+>> > Cc: linux-bluetooth@vger.kernel.org
+>> > Subject: Re: [MAP] obexd/client: Handle MAP event types
+>> >
+>> > Hi,
+>> >
+>> > On Thu, Aug 28, 2014 at 12:11 PM, Gowtham Anandha Babu
+>> > <gowtham.ab@samsung.com> wrote:
+>> > > Hi Luiz,
+>> > >     But in the obexd/client/mns.c
+>> > >     Inside parse_event_report_type() function, event types are
+>> > > assigned
+>> > with the values MAP_ET_MEMORY_FULL and
+>> MAP_ET_MEMORY_AVAILABLE.
+>> > >     It should be handled in the map_handle_notification() inside map.c.
+>> >
+>> > Please do not top post in the mailing list, use inline posting.
+>> > Regarding the parsing, yes it does have proper handling of those event
+>> > but there is no mapping to the D-Bus API therefore we ignore those
+>> > memory event. As I mentioned the they are not per message so they
+>> > cannot be set as a status of a message, anyway it would not make
+>> > sense, and having it on the MessageAccess interface has not been
+>> > considered but first I need to have a proper user case where it makes
+>> sense to expose those events.
+>> >
+>> > Luiz Augusto von Dentz
+>>
+>>
+>> The use cases are:
+>> 1) What if one tries to push a message, but the space available in the MSE
+>> device is not enough. So MCE will receive Memory Full Event.
+>> 2) Once the user cleared some memory in the MSE device, MCE should be
+>> notified with Memory Available Event.
+>> As you mentioned earlier, these cannot be set as a status of a message. But
+>> MCE device needs to be get notified about this events.
+>>
+>> If the MCE receives Memory Full event, it will set the status as "delivery-
+>> failure".
+>> Once MSE device(server)  deletes some messages and send Memory
+>> Available event then MCE will push the pending message.
+>> Can it be done like this?
+>>
+>> Regards,
+>> Gowtham
+>
+> Just a reminder. With little bit clarity , If MCE pushes the message, the "Memory Full" event type is given by MSE. Then I think the status of that message will be empty. Instead we can set the status as a "sending-failure".
+> Whatever explained I added in the attached patch for your kind perusal.
 
-Champion,
-
-Thanks for the new driver. I pushed the new code to
-http://github.com/lwfinger/rtl8723au_bt/new. Using it, I was able to connect to
-a BT mouse using an RTL8723AE module.
-
-Your version had a few compilation warnings, some of which were due to using a
-64-bit system. A patch file to fix those is attached.
-
-One other problem is that the rar file contains a file named rlt8723a_fw. I am
-sure that you should rename that to rtl8723a_fw.
-
-Larry
+Im afraid this would not work because the event handle is not set it
+will fail trying to find the message object, it really needs to be a
+property of the session to be propagated.
 
 
-
---------------020409060200070909040802
-Content-Type: text/plain; charset=UTF-8;
- name="patch"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment;
- filename="patch"
-
-LS0tIGEvYnR1c2IuYwkyMDE0LTA5LTAzIDExOjA2OjQ2LjAwMDAwMDAwMCAtMDUwMAorKysg
-Yi9idHVzYi5jCTIwMTQtMDktMDQgMDk6NDY6NDkuNjM5MDk2Mjk5IC0wNTAwCkBAIC03MTgs
-NyArNzE4LDcgQEAgc3RhdGljIGludCBidHVzYl9vcGVuKHN0cnVjdCBoY2lfZGV2ICpoZAog
-CWlmICh0ZXN0X2FuZF9zZXRfYml0KEhDSV9SVU5OSU5HLCAmaGRldi0+ZmxhZ3MpKQogCQln
-b3RvIGRvbmU7CiAKLQlCVF9EQkcoIiAlcyB0ZXN0X2FuZF9zZXQgOmhkZXYtPmZsYWdzID0g
-MHgleCBcbiIsX19mdW5jX18saGRldi0+ZmxhZ3MpOworCUJUX0RCRygiICVzIHRlc3RfYW5k
-X3NldCA6aGRldi0+ZmxhZ3MgPSAweCV4IFxuIixfX2Z1bmNfXywgKGludCloZGV2LT5mbGFn
-cyk7CiAKIAlpZiAodGVzdF9hbmRfc2V0X2JpdChCVFVTQl9JTlRSX1JVTk5JTkcsICZkYXRh
-LT5mbGFncykpCiAJCWdvdG8gZG9uZTsKQEAgLTczNyw3ICs3MzcsNyBAQCBzdGF0aWMgaW50
-IGJ0dXNiX29wZW4oc3RydWN0IGhjaV9kZXYgKmhkCiAJYnR1c2Jfc3VibWl0X2J1bGtfdXJi
-KGhkZXYsIEdGUF9LRVJORUwpOwogCiBkb25lOgotCUJUX0RCRygiICVzIGRvbmUgOmhkZXYt
-PmZsYWdzID0gMHgleCBcbiIsX19mdW5jX18saGRldi0+ZmxhZ3MpOworCUJUX0RCRygiICVz
-IGRvbmUgOmhkZXYtPmZsYWdzID0gMHgleCBcbiIsX19mdW5jX18sIChpbnQpaGRldi0+Zmxh
-Z3MpOwogCXVzYl9hdXRvcG1fcHV0X2ludGVyZmFjZShkYXRhLT5pbnRmKTsKIAlyZXR1cm4g
-MDsKIApAQCAtODA2LDYgKzgwNiw3IEBAIHN0YXRpYyBpbnQgYnR1c2Jfc2VuZF9mcmFtZShz
-dHJ1Y3QgaGNpX2QKIAlzdHJ1Y3QgdXJiICp1cmI7CiAJdW5zaWduZWQgaW50IHBpcGU7CiAJ
-aW50IGVycjsKKwl1MTYgKm9wY29kZTsKIAogCS8vQlRfREJHKCIlcyIsIGhkZXYtPm5hbWUp
-OwogCS8vQlRfREJHKCIlcyBoZGV2LT5mbGFncz0weCV4IixfX2Z1bmNfXyxoZGV2LT5mbGFn
-cyk7CkBAIC04MzcsNyArODM4LDcgQEAgc3RhdGljIGludCBidHVzYl9zZW5kX2ZyYW1lKHN0
-cnVjdCBoY2lfZAogCiAJCXBpcGUgPSB1c2Jfc25kY3RybHBpcGUoZGF0YS0+dWRldiwgMHgw
-MCk7CiAKLQkJdTE2ICpvcGNvZGUgPSAodTE2Kikoc2tiLT5kYXRhKTsKKwkJb3Bjb2RlID0g
-KHUxNiopKHNrYi0+ZGF0YSk7CiAJLy8JQlRfREJHKCJkci0+d0xlbmd0aCA9JWQsb3Bjb2Rl
-PTB4JTA0eCIsZHItPndMZW5ndGgsKm9wY29kZSk7CiAJCXVzYl9maWxsX2NvbnRyb2xfdXJi
-KHVyYiwgZGF0YS0+dWRldiwgcGlwZSwgKHZvaWQgKikgZHIsCiAJCQkJc2tiLT5kYXRhLCBz
-a2ItPmxlbiwgYnR1c2JfdHhfY29tcGxldGUsIHNrYik7CkBAIC0xNDY2LDcgKzE0NjcsNyBA
-QCBzdGF0aWMgaW50IGJ0dXNiX3NldHVwX3J0bF9nZXRfb2xkZncoIGNvCiAJQlRfSU5GTygi
-JXMiLCBfX2Z1bmNfXyk7CQogCS8qY2hlY2sgZmlsZSBsZW5ndGgqLwogCWlmKGZ3LT5zaXpl
-PDgpewotCQlCVF9FUlIoIiVzOiBmaWxlIHNpemUgJWQgZXJyb3IiLCBfX2Z1bmNfXyxmdy0+
-c2l6ZSk7CisJCUJUX0VSUigiJXM6IGZpbGUgc2l6ZSAlZCBlcnJvciIsIF9fZnVuY19fLCAo
-aW50KWZ3LT5zaXplKTsKIAkJcmV0dXJuIC0xOwogCX0KIAkvKmNoZWNrIHNpZ25hdHVyZSov
-CkBAIC0xNTI3LDcgKzE1MjgsNyBAQCBzdGF0aWMgaW50IGJ0dXNiX3NldHVwX3J0bF9nZXRf
-bmV3ZncgKCBzCiAKIAlzdHJ1Y3Qgc2tfYnVmZiAqc2tiOwogCXVpbnQxNl90IHJvbV92ZXI7
-Ci0JdWludDhfdCAqdGVtcDsKKwljb25zdCB1aW50OF90ICp0ZW1wOwogCXVpbnQ4X3Qgb3Bj
-b2RlLGxlbjsKIAl1aW50OF90IGRhdGE7CQogCXN0cnVjdCBydGtfZXBhdGNoICpwYXRjaF9p
-bmZvID0gTlVMTDsKQEAgLTE1NjEsNyArMTU2Miw3IEBAIHN0YXRpYyBpbnQgYnR1c2Jfc2V0
-dXBfcnRsX2dldF9uZXdmdyAoIHMKIAkKIAkvKmNoZWNrIGZpbGUgbGVuZ3RoKi8KIAlpZihm
-dy0+c2l6ZTwyMCl7Ci0JCUJUX0VSUigiJXM6IGZpbGUgc2l6ZSAlZCBlcnJvciIsIF9fZnVu
-Y19fLGZ3LT5zaXplKTsKKwkJQlRfRVJSKCIlczogZmlsZSBzaXplICVkIGVycm9yIiwgX19m
-dW5jX18sIChpbnQpZnctPnNpemUpOwogCQlyZXR1cm4gLTE7CiAJfQkKIAkvKmNoZWNrIHNp
-Z25hdHVyZSovCkBAIC0xNjg2LDcgKzE2ODcsNyBAQCBzdGF0aWMgaW50IGJ0dXNiX3NldHVw
-X3J0bF9wYXRjaGluZyhzdHJ1CiAJCQlyZXR1cm4gLUVJTzsKIAkJfQogCi0JCWV2dF9wYXJh
-ID0gKHN0cnVjdCBoY2lfcnBfcmVhZF9sb2NhbF92ZXJzaW9uICopc2tiLT5kYXRhOworCQll
-dnRfcGFyYSA9IChzdHJ1Y3QgZG93bmxvYWRfcnAgKilza2ItPmRhdGE7CiAJCWlmIChldnRf
-cGFyYS0+c3RhdHVzKSB7CiAJCQlCVF9FUlIoIlJlYWx0ZWsgcGF0Y2ggZXZlbnQgZmFpbGVk
-ICglMDJ4KSIsZXZ0X3BhcmEtPnN0YXR1cyk7CiAJCQlrZnJlZV9za2Ioc2tiKTsKQEAgLTE3
-NjgsNyArMTc2OSw4IEBAIHN0YXRpYyBpbnQgYnR1c2Jfc2V0dXBfcnRsKHN0cnVjdCBoY2lf
-ZGUKIAkJICAgICAgIGZ3bmFtZSwgcmV0KTsJCQkKIAkJcmV0dXJuIHJldDsKIAl9Ci0JQlRf
-REJHKCIlcyBmdy0+ZGF0YT0lcCBmdy0+c2l6ZT0gJWQgIixfX2Z1bmNfXyxmdy0+ZGF0YSxm
-dy0+c2l6ZSk7CisJQlRfREJHKCIlcyBmdy0+ZGF0YT0lcCBmdy0+c2l6ZT0gJWQgIiwgX19m
-dW5jX18sIGZ3LT5kYXRhLAorCSAgICAgICAoaW50KWZ3LT5zaXplKTsKIAkKIAkvKkZvciA4
-NzIzYSwgdXNlIG9sZCBzdHlsZSBwYXRjaCovCiAJaWYgKGxtcF92ZXJzaW9uPT0gUk9NX0xN
-UF84NzIzQSkgCQkK
---------------020409060200070909040802--
+-- 
+Luiz Augusto von Dentz
