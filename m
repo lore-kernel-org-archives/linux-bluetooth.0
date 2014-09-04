@@ -1,41 +1,88 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: Sebastian Chlad <sebastian.chlad@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] android/pts: test IOPT TC_SDAS_BV_03_I against PTS 5.2
-Date: Thu, 04 Sep 2014 10:49:38 +0200
-Message-ID: <14389384.lSWq0pRX16@uw000953>
-In-Reply-To: <1409819238-19371-1-git-send-email-sebastian.chlad@tieto.com>
-References: <1409819238-19371-1-git-send-email-sebastian.chlad@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+From: Vikrampal Yadav <vikram.pal@samsung.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: luiz.dentz@gmail.com, d.kasatkin@samsung.com,
+	vikram.pal@samsung.com, cpgs@samsung.com
+Subject: [PATCH v4] monitor: Add AVRCP GetCurrentPlayerApplicationSettingValue
+ support
+Date: Thu, 04 Sep 2014 14:10:13 +0530
+Message-id: <1409820013-7468-1-git-send-email-vikram.pal@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Sebastian,
+Support for decoding AVRCP GetCurrentPlayerApplicationSettingValue
+added in Bluetooth monitor.
+---
+ monitor/avctp.c | 49 +++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 49 insertions(+)
 
-On Thursday 04 of September 2014 10:27:18 Sebastian Chlad wrote:
-> ---
->  android/pts-iopt.txt | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/android/pts-iopt.txt b/android/pts-iopt.txt
-> index 3065836..2ce572c 100644
-> --- a/android/pts-iopt.txt
-> +++ b/android/pts-iopt.txt
-> @@ -18,7 +18,7 @@ TC_COD_BV_02_I	N/A	Under PTS 5.1 test shall be disabled as there is
->  			matching test case in HFP test suit (test No. 15)
->  			PICS settings for HFP shall be disabled for IOPT
->  TC_SDSS_BV_02_I	PASS
-> -TC_SDSA_BV_03_I	FAIL	JIRA #BA-92
-> +TC_SDSA_BV_03_I	PASS
->  TC_SDR_BV_04_I	PASS	for every PTS bt profile:
->  			haltest: bluetooth get_remote_service_record <addr>
->  							<requred 128 sdp uuid>
-> 
-
-Applied. Thanks.
-
+diff --git a/monitor/avctp.c b/monitor/avctp.c
+index 64d4b58..c462381 100644
+--- a/monitor/avctp.c
++++ b/monitor/avctp.c
+@@ -609,6 +609,54 @@ response:
+ 	return true;
+ }
+ 
++static bool avrcp_get_current_player_value(struct l2cap_frame *frame,
++						uint8_t ctype, uint8_t len,
++						uint8_t indent)
++{
++	uint8_t num;
++
++	if (!l2cap_frame_get_u8(frame, &num))
++		return false;
++
++	if (ctype > AVC_CTYPE_GENERAL_INQUIRY)
++		goto response;
++
++	print_field("%*cAttributeCount: 0x%02x", (indent - 8), ' ', num);
++
++	for (; num > 0; num--) {
++		uint8_t attr;
++
++		if (!l2cap_frame_get_u8(frame, &attr))
++			return false;
++
++		print_field("%*cAttributeID: 0x%02x (%s)", (indent - 8),
++						' ', attr, attr2str(attr));
++	}
++
++	return true;
++
++response:
++	print_field("%*cValueCount: 0x%02x", (indent - 8), ' ', num);
++
++	for (; num > 0; num--) {
++		uint8_t attr, value;
++
++		if (!l2cap_frame_get_u8(frame, &attr))
++			return false;
++
++		print_field("%*cAttributeID: 0x%02x (%s)", (indent - 8),
++						' ', attr, attr2str(attr));
++
++		if (!l2cap_frame_get_u8(frame, &value))
++			return false;
++
++		print_field("%*cValueID: 0x%02x (%s)", (indent - 8),
++					' ', value, value2str(attr, value));
++	}
++
++	return true;
++}
++
+ struct avrcp_ctrl_pdu_data {
+ 	uint8_t pduid;
+ 	bool (*func) (struct l2cap_frame *frame, uint8_t ctype, uint8_t len,
+@@ -619,6 +667,7 @@ static const struct avrcp_ctrl_pdu_data avrcp_ctrl_pdu_table[] = {
+ 	{ 0x10, avrcp_get_capabilities			},
+ 	{ 0x11, avrcp_list_player_attributes		},
+ 	{ 0x12, avrcp_list_player_values		},
++	{ 0x13, avrcp_get_current_player_value		},
+ 	{ }
+ };
+ 
 -- 
-Best regards, 
-Szymon Janc
+1.9.1
+
