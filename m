@@ -1,88 +1,106 @@
 Return-Path: <cyrus@holtmann.org>
-From: =?utf-8?B?6ZmI6Imz6JCN?= <champion_chen@realsil.com.cn>
-To: Larry Finger <Larry.Finger@lwfinger.net>,
-        Daniel Drake
-	<drake@endlessm.com>
-CC: Marcel Holtmann <marcel@holtmann.org>,
-        "Gustavo F. Padovan"
-	<gustavo@padovan.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        "Linux
- Bluetooth mailing list" <linux-bluetooth@vger.kernel.org>,
-        =?utf-8?B?6K645Yev5Yev?= <kyle_xu@realsil.com.cn>
-Subject: =?utf-8?B?562U5aSNOiDnrZTlpI06IOetlOWkjTogW1BBVENIIHYyXSBCbHVldG9vdGg6?==?utf-8?Q?_btusb:_Add_Realtek_8723/8761_support?=
-Date: Fri, 5 Sep 2014 03:30:27 +0000
-Message-ID: <54F70642BAB21D4498E1AA3EFE3D519A460112CB@rsex2.realsil.com.cn>
-References: <1404218878-14218-1-git-send-email-drake@endlessm.com>
-	<16AC594D-6B3C-4CB6-B951-0763F3E4E27A@holtmann.org>
-	<CAD8Lp45HbA03MycDVu6akTfEET_ZzxrwGpH1TbiQrw5Z178aeA@mail.gmail.com>
-	<53B2D160.4010306@lwfinger.net>
-	<F9E90F3A-5FE4-407C-833A-5E852A260984@holtmann.org>
-	<54F70642BAB21D4498E1AA3EFE3D519A45FBED07@rsex2.realsil.com.cn>
-	<B6A2794A-32D2-4D66-9D61-A27D7DA247B1@holtmann.org>
-	<54F70642BAB21D4498E1AA3EFE3D519A45FBF299@rsex2.realsil.com.cn>
- <CAD8Lp44-=9RNWf2tfmCL14dWJRiZhGCtj042TprR7Q3m9hbNzA@mail.gmail.com>
- <54F70642BAB21D4498E1AA3EFE3D519A46010A1B@rsex2.realsil.com.cn>
- <54089665.1040302@lwfinger.net>
-In-Reply-To: <54089665.1040302@lwfinger.net>
-Content-Type: multipart/mixed;
-	boundary="_002_54F70642BAB21D4498E1AA3EFE3D519A460112CBrsex2realsilcom_"
+Sender: Larry Finger <larry.finger@gmail.com>
+Message-ID: <54089665.1040302@lwfinger.net>
+Date: Thu, 04 Sep 2014 11:42:13 -0500
+From: Larry Finger <Larry.Finger@lwfinger.net>
 MIME-Version: 1.0
+To: =?UTF-8?B?6ZmI6Imz6JCN?= <champion_chen@realsil.com.cn>,
+ Daniel Drake <drake@endlessm.com>
+CC: Marcel Holtmann <marcel@holtmann.org>,
+ "Gustavo F. Padovan" <gustavo@padovan.org>,
+ Johan Hedberg <johan.hedberg@gmail.com>,
+ Linux Bluetooth mailing list <linux-bluetooth@vger.kernel.org>,
+ =?UTF-8?B?6K645Yev5Yev?= <kyle_xu@realsil.com.cn>
+Subject: Re: =?UTF-8?B?562U5aSNOiDnrZTlpI06IFtQQVRDSCB2Ml0gQmx1ZXRvb3RoOiA=?=
+ =?UTF-8?B?YnR1c2I6IEFkZCBSZWFsdGVrIDg3MjMvODc2MSBzdXBwb3J0?=
+References: <1404218878-14218-1-git-send-email-drake@endlessm.com>	<16AC594D-6B3C-4CB6-B951-0763F3E4E27A@holtmann.org>	<CAD8Lp45HbA03MycDVu6akTfEET_ZzxrwGpH1TbiQrw5Z178aeA@mail.gmail.com>	<53B2D160.4010306@lwfinger.net>	<F9E90F3A-5FE4-407C-833A-5E852A260984@holtmann.org>	<54F70642BAB21D4498E1AA3EFE3D519A45FBED07@rsex2.realsil.com.cn>	<B6A2794A-32D2-4D66-9D61-A27D7DA247B1@holtmann.org>	<54F70642BAB21D4498E1AA3EFE3D519A45FBF299@rsex2.realsil.com.cn> <CAD8Lp44-=9RNWf2tfmCL14dWJRiZhGCtj042TprR7Q3m9hbNzA@mail.gmail.com> <54F70642BAB21D4498E1AA3EFE3D519A46010A1B@rsex2.realsil.com.cn>
+In-Reply-To: <54F70642BAB21D4498E1AA3EFE3D519A46010A1B@rsex2.realsil.com.cn>
+Content-Type: multipart/mixed;
+ boundary="------------020409060200070909040802"
 List-ID: <linux-bluetooth.vger.kernel.org>
 
---_002_54F70642BAB21D4498E1AA3EFE3D519A460112CBrsex2realsilcom_
-Content-Type: text/plain; charset="utf-8"
+This is a multi-part message in MIME format.
+--------------020409060200070909040802
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+On 09/03/2014 10:34 PM, 陈艳萍 wrote:
+> Hi Daniel,
+> 	Attached file is btusb driver add realtek Bluetooth support with firmware, we have tested under Ubuntu 14.04.
+
+Champion,
+
+Thanks for the new driver. I pushed the new code to
+http://github.com/lwfinger/rtl8723au_bt/new. Using it, I was able to connect to
+a BT mouse using an RTL8723AE module.
+
+Your version had a few compilation warnings, some of which were due to using a
+64-bit system. A patch file to fix those is attached.
+
+One other problem is that the rar file contains a file named rlt8723a_fw. I am
+sure that you should rename that to rtl8723a_fw.
+
+Larry
+
+
+
+--------------020409060200070909040802
+Content-Type: text/plain; charset=UTF-8;
+ name="patch"
 Content-Transfer-Encoding: base64
+Content-Disposition: attachment;
+ filename="patch"
 
-SGkgTGFycnnvvIwNCglXZSBmb3VuZCB0aGVyZSB3YXMgY2hhbmNlIHN1c3BlbmQgZmFpbGVkIGlu
-IHNvbWUgcGxhdGZvcm0uDQpUaGlzIGlzIGJlY2F1c2UgYnR1c2Jfc3VzcGVuZD09PiBidHVzYl9z
-dG9wX3RyYWZmaWMgPT0+IHVzYl9raWxsX2FuY2hvcmVkX3VyYnMsDQoNCmJ0dXNiX2J1bGtfY29t
-cGxldGUgc29tZXRpbWVzIHJldHVybnMgYmVmb3JlIHN5c3RlbSBzdXNwZW5kIGFuZCByZXN1Ym1p
-dCBhbiB1cmIsIHRoaXMgd2lsbCBhdm9pZCBzeXN0ZW0gZW50ZXIgc3VzcGVuZCBzdGF0ZS4NCkkg
-ZG9uJ3Qga25vdyB3aGV0aGVyIHRoaXMgaXMgdGhlIHBsYXRmb3JtIGlzc3VlLCB0aGVyZSBpcyBh
-IG1ldGhvZCB0byBmaXggdGhpcyBieSBhdHRhY2hlZCBmaWxlLiANCg0KDQpDaGFtcGlvbg0KRXh0
-OjYzMjUNCg0KLS0tLS3pgq7ku7bljp/ku7YtLS0tLQ0K5Y+R5Lu25Lq6OiBMYXJyeSBGaW5nZXIg
-W21haWx0bzpsYXJyeS5maW5nZXJAZ21haWwuY29tXSDku6PooaggTGFycnkgRmluZ2VyDQrlj5Hp
-gIHml7bpl7Q6IDIwMTTlubQ55pyINeaXpSAwOjQyDQrmlLbku7bkuro6IOmZiOiJs+iQjTsgRGFu
-aWVsIERyYWtlDQrmioTpgIE6IE1hcmNlbCBIb2x0bWFubjsgR3VzdGF2byBGLiBQYWRvdmFuOyBK
-b2hhbiBIZWRiZXJnOyBMaW51eCBCbHVldG9vdGggbWFpbGluZyBsaXN0OyDorrjlh6/lh68NCuS4
-u+mimDogUmU6IOetlOWkjTog562U5aSNOiBbUEFUQ0ggdjJdIEJsdWV0b290aDogYnR1c2I6IEFk
-ZCBSZWFsdGVrIDg3MjMvODc2MSBzdXBwb3J0DQoNCk9uIDA5LzAzLzIwMTQgMTA6MzQgUE0sIOmZ
-iOiJs+iQjSB3cm90ZToNCj4gSGkgRGFuaWVsLA0KPiAJQXR0YWNoZWQgZmlsZSBpcyBidHVzYiBk
-cml2ZXIgYWRkIHJlYWx0ZWsgQmx1ZXRvb3RoIHN1cHBvcnQgd2l0aCBmaXJtd2FyZSwgd2UgaGF2
-ZSB0ZXN0ZWQgdW5kZXIgVWJ1bnR1IDE0LjA0Lg0KDQpDaGFtcGlvbiwNCg0KVGhhbmtzIGZvciB0
-aGUgbmV3IGRyaXZlci4gSSBwdXNoZWQgdGhlIG5ldyBjb2RlIHRvIGh0dHA6Ly9naXRodWIuY29t
-L2x3ZmluZ2VyL3J0bDg3MjNhdV9idC9uZXcuIFVzaW5nIGl0LCBJIHdhcyBhYmxlIHRvIGNvbm5l
-Y3QgdG8gYSBCVCBtb3VzZSB1c2luZyBhbiBSVEw4NzIzQUUgbW9kdWxlLg0KDQpZb3VyIHZlcnNp
-b24gaGFkIGEgZmV3IGNvbXBpbGF0aW9uIHdhcm5pbmdzLCBzb21lIG9mIHdoaWNoIHdlcmUgZHVl
-IHRvIHVzaW5nIGEgNjQtYml0IHN5c3RlbS4gQSBwYXRjaCBmaWxlIHRvIGZpeCB0aG9zZSBpcyBh
-dHRhY2hlZC4NCg0KT25lIG90aGVyIHByb2JsZW0gaXMgdGhhdCB0aGUgcmFyIGZpbGUgY29udGFp
-bnMgYSBmaWxlIG5hbWVkIHJsdDg3MjNhX2Z3LiBJIGFtIHN1cmUgdGhhdCB5b3Ugc2hvdWxkIHJl
-bmFtZSB0aGF0IHRvIHJ0bDg3MjNhX2Z3Lg0KDQpMYXJyeQ0KDQoNCg==
-
---_002_54F70642BAB21D4498E1AA3EFE3D519A460112CBrsex2realsilcom_
-Content-Type: application/octet-stream; name="complete.patch"
-Content-Description: complete.patch
-Content-Disposition: attachment; filename="complete.patch"; size=865;
-	creation-date="Fri, 05 Sep 2014 02:23:50 GMT";
-	modification-date="Fri, 05 Sep 2014 02:23:08 GMT"
-Content-Transfer-Encoding: base64
-
-LS0tIGJ0dXNiLmMuYmFrCTIwMTQtMDktMDUgMDk6NTE6MjYuNjg4ODQyODAwICswODAwCisrKyBi
-dHVzYi5jCTIwMTQtMDktMDUgMTA6MTg6NDAuNDE4NDQyODAwICswODAwCkBAIC0zODAsNyArMzgw
-LDExIEBAIHN0YXRpYyB2b2lkIGJ0dXNiX2ludHJfY29tcGxldGUoc3RydWN0IHUKIAkJCWhkZXYt
-PnN0YXQuZXJyX3J4Kys7CiAJCX0KIAl9Ci0KKwkvKiBBdm9pZCBzdXNwZW5kIGZhaWxlZCB3aGVu
-IHVzYl9raWxsX3VyYiAqLworCWVsc2UgaWYodXJiLT5zdGF0dXMgPT0gLUVOT0VOVCkJeworCQly
-ZXR1cm47CisJfQorCQogCWlmICghdGVzdF9iaXQoQlRVU0JfSU5UUl9SVU5OSU5HLCAmZGF0YS0+
-ZmxhZ3MpKQogCQlyZXR1cm47CiAKQEAgLTQ2OCw3ICs0NzIsMTEgQEAgc3RhdGljIHZvaWQgYnR1
-c2JfYnVsa19jb21wbGV0ZShzdHJ1Y3QgdQogCQkJaGRldi0+c3RhdC5lcnJfcngrKzsKIAkJfQog
-CX0KLQorCS8qIEF2b2lkIHN1c3BlbmQgZmFpbGVkIHdoZW4gdXNiX2tpbGxfdXJiICovCisJZWxz
-ZSBpZih1cmItPnN0YXR1cyA9PSAtRU5PRU5UKQl7CisJCXJldHVybjsKKwl9CisJCiAJaWYgKCF0
-ZXN0X2JpdChCVFVTQl9CVUxLX1JVTk5JTkcsICZkYXRhLT5mbGFncykpCiAJCXJldHVybjsKIApA
-QCAtNTYyLDYgKzU3MCwxMCBAQCBzdGF0aWMgdm9pZCBidHVzYl9pc29jX2NvbXBsZXRlKHN0cnVj
-dCB1CiAJCQl9CiAJCX0KIAl9CisJLyogQXZvaWQgc3VzcGVuZCBmYWlsZWQgd2hlbiB1c2Jfa2ls
-bF91cmIgKi8KKwllbHNlIGlmKHVyYi0+c3RhdHVzID09IC1FTk9FTlQpCXsKKwkJcmV0dXJuOwor
-CX0KIAogCWlmICghdGVzdF9iaXQoQlRVU0JfSVNPQ19SVU5OSU5HLCAmZGF0YS0+ZmxhZ3MpKQog
-CQlyZXR1cm47Cg==
-
---_002_54F70642BAB21D4498E1AA3EFE3D519A460112CBrsex2realsilcom_--
+LS0tIGEvYnR1c2IuYwkyMDE0LTA5LTAzIDExOjA2OjQ2LjAwMDAwMDAwMCAtMDUwMAorKysg
+Yi9idHVzYi5jCTIwMTQtMDktMDQgMDk6NDY6NDkuNjM5MDk2Mjk5IC0wNTAwCkBAIC03MTgs
+NyArNzE4LDcgQEAgc3RhdGljIGludCBidHVzYl9vcGVuKHN0cnVjdCBoY2lfZGV2ICpoZAog
+CWlmICh0ZXN0X2FuZF9zZXRfYml0KEhDSV9SVU5OSU5HLCAmaGRldi0+ZmxhZ3MpKQogCQln
+b3RvIGRvbmU7CiAKLQlCVF9EQkcoIiAlcyB0ZXN0X2FuZF9zZXQgOmhkZXYtPmZsYWdzID0g
+MHgleCBcbiIsX19mdW5jX18saGRldi0+ZmxhZ3MpOworCUJUX0RCRygiICVzIHRlc3RfYW5k
+X3NldCA6aGRldi0+ZmxhZ3MgPSAweCV4IFxuIixfX2Z1bmNfXywgKGludCloZGV2LT5mbGFn
+cyk7CiAKIAlpZiAodGVzdF9hbmRfc2V0X2JpdChCVFVTQl9JTlRSX1JVTk5JTkcsICZkYXRh
+LT5mbGFncykpCiAJCWdvdG8gZG9uZTsKQEAgLTczNyw3ICs3MzcsNyBAQCBzdGF0aWMgaW50
+IGJ0dXNiX29wZW4oc3RydWN0IGhjaV9kZXYgKmhkCiAJYnR1c2Jfc3VibWl0X2J1bGtfdXJi
+KGhkZXYsIEdGUF9LRVJORUwpOwogCiBkb25lOgotCUJUX0RCRygiICVzIGRvbmUgOmhkZXYt
+PmZsYWdzID0gMHgleCBcbiIsX19mdW5jX18saGRldi0+ZmxhZ3MpOworCUJUX0RCRygiICVz
+IGRvbmUgOmhkZXYtPmZsYWdzID0gMHgleCBcbiIsX19mdW5jX18sIChpbnQpaGRldi0+Zmxh
+Z3MpOwogCXVzYl9hdXRvcG1fcHV0X2ludGVyZmFjZShkYXRhLT5pbnRmKTsKIAlyZXR1cm4g
+MDsKIApAQCAtODA2LDYgKzgwNiw3IEBAIHN0YXRpYyBpbnQgYnR1c2Jfc2VuZF9mcmFtZShz
+dHJ1Y3QgaGNpX2QKIAlzdHJ1Y3QgdXJiICp1cmI7CiAJdW5zaWduZWQgaW50IHBpcGU7CiAJ
+aW50IGVycjsKKwl1MTYgKm9wY29kZTsKIAogCS8vQlRfREJHKCIlcyIsIGhkZXYtPm5hbWUp
+OwogCS8vQlRfREJHKCIlcyBoZGV2LT5mbGFncz0weCV4IixfX2Z1bmNfXyxoZGV2LT5mbGFn
+cyk7CkBAIC04MzcsNyArODM4LDcgQEAgc3RhdGljIGludCBidHVzYl9zZW5kX2ZyYW1lKHN0
+cnVjdCBoY2lfZAogCiAJCXBpcGUgPSB1c2Jfc25kY3RybHBpcGUoZGF0YS0+dWRldiwgMHgw
+MCk7CiAKLQkJdTE2ICpvcGNvZGUgPSAodTE2Kikoc2tiLT5kYXRhKTsKKwkJb3Bjb2RlID0g
+KHUxNiopKHNrYi0+ZGF0YSk7CiAJLy8JQlRfREJHKCJkci0+d0xlbmd0aCA9JWQsb3Bjb2Rl
+PTB4JTA0eCIsZHItPndMZW5ndGgsKm9wY29kZSk7CiAJCXVzYl9maWxsX2NvbnRyb2xfdXJi
+KHVyYiwgZGF0YS0+dWRldiwgcGlwZSwgKHZvaWQgKikgZHIsCiAJCQkJc2tiLT5kYXRhLCBz
+a2ItPmxlbiwgYnR1c2JfdHhfY29tcGxldGUsIHNrYik7CkBAIC0xNDY2LDcgKzE0NjcsNyBA
+QCBzdGF0aWMgaW50IGJ0dXNiX3NldHVwX3J0bF9nZXRfb2xkZncoIGNvCiAJQlRfSU5GTygi
+JXMiLCBfX2Z1bmNfXyk7CQogCS8qY2hlY2sgZmlsZSBsZW5ndGgqLwogCWlmKGZ3LT5zaXpl
+PDgpewotCQlCVF9FUlIoIiVzOiBmaWxlIHNpemUgJWQgZXJyb3IiLCBfX2Z1bmNfXyxmdy0+
+c2l6ZSk7CisJCUJUX0VSUigiJXM6IGZpbGUgc2l6ZSAlZCBlcnJvciIsIF9fZnVuY19fLCAo
+aW50KWZ3LT5zaXplKTsKIAkJcmV0dXJuIC0xOwogCX0KIAkvKmNoZWNrIHNpZ25hdHVyZSov
+CkBAIC0xNTI3LDcgKzE1MjgsNyBAQCBzdGF0aWMgaW50IGJ0dXNiX3NldHVwX3J0bF9nZXRf
+bmV3ZncgKCBzCiAKIAlzdHJ1Y3Qgc2tfYnVmZiAqc2tiOwogCXVpbnQxNl90IHJvbV92ZXI7
+Ci0JdWludDhfdCAqdGVtcDsKKwljb25zdCB1aW50OF90ICp0ZW1wOwogCXVpbnQ4X3Qgb3Bj
+b2RlLGxlbjsKIAl1aW50OF90IGRhdGE7CQogCXN0cnVjdCBydGtfZXBhdGNoICpwYXRjaF9p
+bmZvID0gTlVMTDsKQEAgLTE1NjEsNyArMTU2Miw3IEBAIHN0YXRpYyBpbnQgYnR1c2Jfc2V0
+dXBfcnRsX2dldF9uZXdmdyAoIHMKIAkKIAkvKmNoZWNrIGZpbGUgbGVuZ3RoKi8KIAlpZihm
+dy0+c2l6ZTwyMCl7Ci0JCUJUX0VSUigiJXM6IGZpbGUgc2l6ZSAlZCBlcnJvciIsIF9fZnVu
+Y19fLGZ3LT5zaXplKTsKKwkJQlRfRVJSKCIlczogZmlsZSBzaXplICVkIGVycm9yIiwgX19m
+dW5jX18sIChpbnQpZnctPnNpemUpOwogCQlyZXR1cm4gLTE7CiAJfQkKIAkvKmNoZWNrIHNp
+Z25hdHVyZSovCkBAIC0xNjg2LDcgKzE2ODcsNyBAQCBzdGF0aWMgaW50IGJ0dXNiX3NldHVw
+X3J0bF9wYXRjaGluZyhzdHJ1CiAJCQlyZXR1cm4gLUVJTzsKIAkJfQogCi0JCWV2dF9wYXJh
+ID0gKHN0cnVjdCBoY2lfcnBfcmVhZF9sb2NhbF92ZXJzaW9uICopc2tiLT5kYXRhOworCQll
+dnRfcGFyYSA9IChzdHJ1Y3QgZG93bmxvYWRfcnAgKilza2ItPmRhdGE7CiAJCWlmIChldnRf
+cGFyYS0+c3RhdHVzKSB7CiAJCQlCVF9FUlIoIlJlYWx0ZWsgcGF0Y2ggZXZlbnQgZmFpbGVk
+ICglMDJ4KSIsZXZ0X3BhcmEtPnN0YXR1cyk7CiAJCQlrZnJlZV9za2Ioc2tiKTsKQEAgLTE3
+NjgsNyArMTc2OSw4IEBAIHN0YXRpYyBpbnQgYnR1c2Jfc2V0dXBfcnRsKHN0cnVjdCBoY2lf
+ZGUKIAkJICAgICAgIGZ3bmFtZSwgcmV0KTsJCQkKIAkJcmV0dXJuIHJldDsKIAl9Ci0JQlRf
+REJHKCIlcyBmdy0+ZGF0YT0lcCBmdy0+c2l6ZT0gJWQgIixfX2Z1bmNfXyxmdy0+ZGF0YSxm
+dy0+c2l6ZSk7CisJQlRfREJHKCIlcyBmdy0+ZGF0YT0lcCBmdy0+c2l6ZT0gJWQgIiwgX19m
+dW5jX18sIGZ3LT5kYXRhLAorCSAgICAgICAoaW50KWZ3LT5zaXplKTsKIAkKIAkvKkZvciA4
+NzIzYSwgdXNlIG9sZCBzdHlsZSBwYXRjaCovCiAJaWYgKGxtcF92ZXJzaW9uPT0gUk9NX0xN
+UF84NzIzQSkgCQkK
+--------------020409060200070909040802--
