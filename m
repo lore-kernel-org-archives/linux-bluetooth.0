@@ -2,379 +2,343 @@ Return-Path: <cyrus@holtmann.org>
 From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH v2 2/2] android/hf_client: Add Android hf_client header
-Date: Thu,  4 Sep 2014 15:49:46 +0200
-Message-Id: <1409838586-29049-2-git-send-email-lukasz.rymanowski@tieto.com>
-In-Reply-To: <1409838586-29049-1-git-send-email-lukasz.rymanowski@tieto.com>
-References: <1409838586-29049-1-git-send-email-lukasz.rymanowski@tieto.com>
+Subject: [PATCH v2 1/2] android/hal-ipc-api: Add Handsfree client IPC API
+Date: Thu,  4 Sep 2014 15:49:45 +0200
+Message-Id: <1409838586-29049-1-git-send-email-lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This header file has been taken from Codeaurora forum.
 ---
- android/hardware/bt_hf_client.h | 353 ++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 353 insertions(+)
- create mode 100644 android/hardware/bt_hf_client.h
+v2: Fix opcode issue and Battery level command name
 
-diff --git a/android/hardware/bt_hf_client.h b/android/hardware/bt_hf_client.h
-new file mode 100644
-index 0000000..b9c351c
---- /dev/null
-+++ b/android/hardware/bt_hf_client.h
-@@ -0,0 +1,353 @@
-+/*
-+ * Copyright (c) 2013, The Linux Foundation. All rights reserved.
-+ * Not a Contribution
-+ * Copyright (C) 2012 The Android Open Source Project
-+ *
-+ * Licensed under the Apache License, Version 2.0 (the "License");
-+ * you may not use this file except in compliance with the License.
-+ * You may obtain a copy of the License at
-+ *
-+ *      http://www.apache.org/licenses/LICENSE-2.0
-+ *
-+ * Unless required by applicable law or agreed to in writing, software
-+ * distributed under the License is distributed on an "AS IS" BASIS,
-+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-+ * See the License for the specific language governing permissions and
-+ * limitations under the License.
-+ */
-+
-+#ifndef ANDROID_INCLUDE_BT_HF_CLIENT_H
-+#define ANDROID_INCLUDE_BT_HF_CLIENT_H
-+
-+__BEGIN_DECLS
-+
-+typedef enum {
-+    BTHF_CLIENT_CONNECTION_STATE_DISCONNECTED = 0,
-+    BTHF_CLIENT_CONNECTION_STATE_CONNECTING,
-+    BTHF_CLIENT_CONNECTION_STATE_CONNECTED,
-+    BTHF_CLIENT_CONNECTION_STATE_SLC_CONNECTED,
-+    BTHF_CLIENT_CONNECTION_STATE_DISCONNECTING
-+} bthf_client_connection_state_t;
-+
-+typedef enum {
-+    BTHF_CLIENT_AUDIO_STATE_DISCONNECTED = 0,
-+    BTHF_CLIENT_AUDIO_STATE_CONNECTING,
-+    BTHF_CLIENT_AUDIO_STATE_CONNECTED,
-+    BTHF_CLIENT_AUDIO_STATE_CONNECTED_MSBC,
-+} bthf_client_audio_state_t;
-+
-+typedef enum {
-+    BTHF_CLIENT_VR_STATE_STOPPED = 0,
-+    BTHF_CLIENT_VR_STATE_STARTED
-+} bthf_client_vr_state_t;
-+
-+typedef enum {
-+    BTHF_CLIENT_VOLUME_TYPE_SPK = 0,
-+    BTHF_CLIENT_VOLUME_TYPE_MIC
-+} bthf_client_volume_type_t;
-+
-+typedef enum
-+{
-+    BTHF_CLIENT_NETWORK_STATE_NOT_AVAILABLE = 0,
-+    BTHF_CLIENT_NETWORK_STATE_AVAILABLE
-+} bthf_client_network_state_t;
-+
-+typedef enum
-+{
-+    BTHF_CLIENT_SERVICE_TYPE_HOME = 0,
-+    BTHF_CLIENT_SERVICE_TYPE_ROAMING
-+} bthf_client_service_type_t;
-+
-+typedef enum {
-+    BTHF_CLIENT_CALL_STATE_ACTIVE = 0,
-+    BTHF_CLIENT_CALL_STATE_HELD,
-+    BTHF_CLIENT_CALL_STATE_DIALING,
-+    BTHF_CLIENT_CALL_STATE_ALERTING,
-+    BTHF_CLIENT_CALL_STATE_INCOMING,
-+    BTHF_CLIENT_CALL_STATE_WAITING,
-+    BTHF_CLIENT_CALL_STATE_HELD_BY_RESP_HOLD,
-+} bthf_client_call_state_t;
-+
-+typedef enum {
-+    BTHF_CLIENT_CALL_NO_CALLS_IN_PROGRESS = 0,
-+    BTHF_CLIENT_CALL_CALLS_IN_PROGRESS
-+} bthf_client_call_t;
-+
-+typedef enum {
-+    BTHF_CLIENT_CALLSETUP_NONE = 0,
-+    BTHF_CLIENT_CALLSETUP_INCOMING,
-+    BTHF_CLIENT_CALLSETUP_OUTGOING,
-+    BTHF_CLIENT_CALLSETUP_ALERTING
-+
-+} bthf_client_callsetup_t;
-+
-+typedef enum {
-+    BTHF_CLIENT_CALLHELD_NONE = 0,
-+    BTHF_CLIENT_CALLHELD_HOLD_AND_ACTIVE,
-+    BTHF_CLIENT_CALLHELD_HOLD,
-+} bthf_client_callheld_t;
-+
-+typedef enum {
-+    BTHF_CLIENT_RESP_AND_HOLD_HELD = 0,
-+    BTRH_CLIENT_RESP_AND_HOLD_ACCEPT,
-+    BTRH_CLIENT_RESP_AND_HOLD_REJECT,
-+} bthf_client_resp_and_hold_t;
-+
-+typedef enum {
-+    BTHF_CLIENT_CALL_DIRECTION_OUTGOING = 0,
-+    BTHF_CLIENT_CALL_DIRECTION_INCOMING
-+} bthf_client_call_direction_t;
-+
-+typedef enum {
-+    BTHF_CLIENT_CALL_MPTY_TYPE_SINGLE = 0,
-+    BTHF_CLIENT_CALL_MPTY_TYPE_MULTI
-+} bthf_client_call_mpty_type_t;
-+
-+typedef enum {
-+    BTHF_CLIENT_CMD_COMPLETE_OK = 0,
-+    BTHF_CLIENT_CMD_COMPLETE_ERROR,
-+    BTHF_CLIENT_CMD_COMPLETE_ERROR_NO_CARRIER,
-+    BTHF_CLIENT_CMD_COMPLETE_ERROR_BUSY,
-+    BTHF_CLIENT_CMD_COMPLETE_ERROR_NO_ANSWER,
-+    BTHF_CLIENT_CMD_COMPLETE_ERROR_DELAYED,
-+    BTHF_CLIENT_CMD_COMPLETE_ERROR_BLACKLISTED,
-+    BTHF_CLIENT_CMD_COMPLETE_ERROR_CME
-+} bthf_client_cmd_complete_t;
-+
-+typedef enum {
-+    BTHF_CLIENT_CALL_ACTION_CHLD_0 = 0,
-+    BTHF_CLIENT_CALL_ACTION_CHLD_1,
-+    BTHF_CLIENT_CALL_ACTION_CHLD_2,
-+    BTHF_CLIENT_CALL_ACTION_CHLD_3,
-+    BTHF_CLIENT_CALL_ACTION_CHLD_4,
-+    BTHF_CLIENT_CALL_ACTION_CHLD_1x,
-+    BTHF_CLIENT_CALL_ACTION_CHLD_2x,
-+    BTHF_CLIENT_CALL_ACTION_ATA,
-+    BTHF_CLIENT_CALL_ACTION_CHUP,
-+    BTHF_CLIENT_CALL_ACTION_BTRH_0,
-+    BTHF_CLIENT_CALL_ACTION_BTRH_1,
-+    BTHF_CLIENT_CALL_ACTION_BTRH_2,
-+} bthf_client_call_action_t;
-+
-+typedef enum {
-+    BTHF_CLIENT_SERVICE_UNKNOWN = 0,
-+    BTHF_CLIENT_SERVICE_VOICE,
-+    BTHF_CLIENT_SERVICE_FAX
-+} bthf_client_subscriber_service_type_t;
-+
-+typedef enum {
-+    BTHF_CLIENT_IN_BAND_RINGTONE_NOT_PROVIDED = 0,
-+    BTHF_CLIENT_IN_BAND_RINGTONE_PROVIDED,
-+} bthf_client_in_band_ring_state_t;
-+
-+/* Peer features masks */
-+#define BTHF_CLIENT_PEER_FEAT_3WAY   0x00000001  /* Three-way calling */
-+#define BTHF_CLIENT_PEER_FEAT_ECNR   0x00000002  /* Echo cancellation and/or noise reduction */
-+#define BTHF_CLIENT_PEER_FEAT_VREC   0x00000004  /* Voice recognition */
-+#define BTHF_CLIENT_PEER_FEAT_INBAND 0x00000008  /* In-band ring tone */
-+#define BTHF_CLIENT_PEER_FEAT_VTAG   0x00000010  /* Attach a phone number to a voice tag */
-+#define BTHF_CLIENT_PEER_FEAT_REJECT 0x00000020  /* Ability to reject incoming call */
-+#define BTHF_CLIENT_PEER_FEAT_ECS    0x00000040  /* Enhanced Call Status */
-+#define BTHF_CLIENT_PEER_FEAT_ECC    0x00000080  /* Enhanced Call Control */
-+#define BTHF_CLIENT_PEER_FEAT_EXTERR 0x00000100  /* Extended error codes */
-+#define BTHF_CLIENT_PEER_FEAT_CODEC  0x00000200  /* Codec Negotiation */
-+
-+/* Peer call handling features masks */
-+#define BTHF_CLIENT_CHLD_FEAT_REL           0x00000001  /* 0  Release waiting call or held calls */
-+#define BTHF_CLIENT_CHLD_FEAT_REL_ACC       0x00000002  /* 1  Release active calls and accept other (waiting or held) cal */
-+#define BTHF_CLIENT_CHLD_FEAT_REL_X         0x00000004  /* 1x Release specified active call only */
-+#define BTHF_CLIENT_CHLD_FEAT_HOLD_ACC      0x00000008  /* 2  Active calls on hold and accept other (waiting or held) call */
-+#define BTHF_CLIENT_CHLD_FEAT_PRIV_X        0x00000010  /* 2x Request private mode with specified call (put the rest on hold) */
-+#define BTHF_CLIENT_CHLD_FEAT_MERGE         0x00000020  /* 3  Add held call to multiparty */
-+#define BTHF_CLIENT_CHLD_FEAT_MERGE_DETACH  0x00000040  /* 4  Connect two calls and leave (disconnect from) multiparty */
-+
-+/** Callback for connection state change.
-+ *  state will have one of the values from BtHfConnectionState
-+ *  peer/chld_features are valid only for BTHF_CLIENT_CONNECTION_STATE_SLC_CONNECTED state
-+ */
-+typedef void (* bthf_client_connection_state_callback)(bthf_client_connection_state_t state, unsigned int peer_feat, unsigned int chld_feat, bt_bdaddr_t *bd_addr);
-+
-+/** Callback for audio connection state change.
-+ *  state will have one of the values from BtHfAudioState
-+ */
-+typedef void (* bthf_client_audio_state_callback)(bthf_client_audio_state_t state, bt_bdaddr_t *bd_addr);
-+
-+/** Callback for VR connection state change.
-+ *  state will have one of the values from BtHfVRState
-+ */
-+typedef void (* bthf_client_vr_cmd_callback)(bthf_client_vr_state_t state);
-+
-+/** Callback for network state change
-+ */
-+typedef void (* bthf_client_network_state_callback) (bthf_client_network_state_t state);
-+
-+/** Callback for network roaming status change
-+ */
-+typedef void (* bthf_client_network_roaming_callback) (bthf_client_service_type_t type);
-+
-+/** Callback for signal strength indication
-+ */
-+typedef void (* bthf_client_network_signal_callback) (int signal_strength);
-+
-+/** Callback for battery level indication
-+ */
-+typedef void (* bthf_client_battery_level_callback) (int battery_level);
-+
-+/** Callback for current operator name
-+ */
-+typedef void (* bthf_client_current_operator_callback) (const char *name);
-+
-+/** Callback for call indicator
-+ */
-+typedef void (* bthf_client_call_callback) (bthf_client_call_t call);
-+
-+/** Callback for callsetup indicator
-+ */
-+typedef void (* bthf_client_callsetup_callback) (bthf_client_callsetup_t callsetup);
-+
-+/** Callback for callheld indicator
-+ */
-+typedef void (* bthf_client_callheld_callback) (bthf_client_callheld_t callheld);
-+
-+/** Callback for response and hold
-+ */
-+typedef void (* bthf_client_resp_and_hold_callback) (bthf_client_resp_and_hold_t resp_and_hold);
-+
-+/** Callback for Calling Line Identification notification
-+ *  Will be called only when there is an incoming call and number is provided.
-+ */
-+typedef void (* bthf_client_clip_callback) (const char *number);
-+
-+/**
-+ * Callback for Call Waiting notification
-+ */
-+typedef void (* bthf_client_call_waiting_callback) (const char *number);
-+
-+/**
-+ *  Callback for listing current calls. Can be called multiple time.
-+ *  If number is unknown NULL is passed.
-+ */
-+typedef void (*bthf_client_current_calls) (int index, bthf_client_call_direction_t dir,
-+                                           bthf_client_call_state_t state,
-+                                           bthf_client_call_mpty_type_t mpty,
-+                                           const char *number);
-+
-+/** Callback for audio volume change
-+ */
-+typedef void (*bthf_client_volume_change_callback) (bthf_client_volume_type_t type, int volume);
-+
-+/** Callback for command complete event
-+ *  cme is valid only for BTHF_CLIENT_CMD_COMPLETE_ERROR_CME type
-+ */
-+typedef void (*bthf_client_cmd_complete_callback) (bthf_client_cmd_complete_t type, int cme);
-+
-+/** Callback for subscriber information
-+ */
-+typedef void (* bthf_client_subscriber_info_callback) (const char *name, bthf_client_subscriber_service_type_t type);
-+
-+/** Callback for in-band ring tone settings
-+ */
-+typedef void (* bthf_client_in_band_ring_tone_callback) (bthf_client_in_band_ring_state_t state);
-+
-+/**
-+ * Callback for requested number from AG
-+ */
-+typedef void (* bthf_client_last_voice_tag_number_callback) (const char *number);
-+
-+/**
-+ * Callback for sending ring indication to app
-+ */
-+typedef void (* bthf_client_ring_indication_callback) (void);
-+
-+/** BT-HF callback structure. */
-+typedef struct {
-+    /** set to sizeof(BtHfClientCallbacks) */
-+    size_t      size;
-+    bthf_client_connection_state_callback  connection_state_cb;
-+    bthf_client_audio_state_callback       audio_state_cb;
-+    bthf_client_vr_cmd_callback            vr_cmd_cb;
-+    bthf_client_network_state_callback     network_state_cb;
-+    bthf_client_network_roaming_callback   network_roaming_cb;
-+    bthf_client_network_signal_callback    network_signal_cb;
-+    bthf_client_battery_level_callback     battery_level_cb;
-+    bthf_client_current_operator_callback  current_operator_cb;
-+    bthf_client_call_callback              call_cb;
-+    bthf_client_callsetup_callback         callsetup_cb;
-+    bthf_client_callheld_callback          callheld_cb;
-+    bthf_client_resp_and_hold_callback     resp_and_hold_cb;
-+    bthf_client_clip_callback              clip_cb;
-+    bthf_client_call_waiting_callback      call_waiting_cb;
-+    bthf_client_current_calls              current_calls_cb;
-+    bthf_client_volume_change_callback     volume_change_cb;
-+    bthf_client_cmd_complete_callback      cmd_complete_cb;
-+    bthf_client_subscriber_info_callback   subscriber_info_cb;
-+    bthf_client_in_band_ring_tone_callback in_band_ring_tone_cb;
-+    bthf_client_last_voice_tag_number_callback last_voice_tag_number_callback;
-+    bthf_client_ring_indication_callback   ring_indication_cb;
-+} bthf_client_callbacks_t;
-+
-+/** Represents the standard BT-HF interface. */
-+typedef struct {
-+
-+    /** set to sizeof(BtHfClientInterface) */
-+    size_t size;
-+    /**
-+     * Register the BtHf callbacks
-+     */
-+    bt_status_t (*init)(bthf_client_callbacks_t* callbacks);
-+
-+    /** connect to audio gateway */
-+    bt_status_t (*connect)(bt_bdaddr_t *bd_addr);
-+
-+    /** disconnect from audio gateway */
-+    bt_status_t (*disconnect)(bt_bdaddr_t *bd_addr);
-+
-+    /** create an audio connection */
-+    bt_status_t (*connect_audio)(bt_bdaddr_t *bd_addr);
-+
-+    /** close the audio connection */
-+    bt_status_t (*disconnect_audio)(bt_bdaddr_t *bd_addr);
-+
-+    /** start voice recognition */
-+    bt_status_t (*start_voice_recognition)(void);
-+
-+    /** stop voice recognition */
-+    bt_status_t (*stop_voice_recognition)(void);
-+
-+    /** volume control */
-+    bt_status_t (*volume_control) (bthf_client_volume_type_t type, int volume);
-+
-+    /** place a call with number a number
-+     * if number is NULL last called number is called (aka re-dial)*/
-+    bt_status_t (*dial) (const char *number);
-+
-+    /** place a call with number specified by location (speed dial) */
-+    bt_status_t (*dial_memory) (int location);
-+
-+    /** perform specified call related action
-+     * idx is limited only for enhanced call control related action
-+     */
-+    bt_status_t (*handle_call_action) (bthf_client_call_action_t action, int idx);
-+
-+    /** query list of current calls */
-+    bt_status_t (*query_current_calls) (void);
-+
-+    /** query name of current selected operator */
-+    bt_status_t (*query_current_operator_name) (void);
-+
-+    /** Retrieve subscriber information */
-+    bt_status_t (*retrieve_subscriber_info) (void);
-+
-+    /** Send DTMF code*/
-+    bt_status_t (*send_dtmf) (char code);
-+
-+    /** Request a phone number from AG corresponding to last voice tag recorded */
-+    bt_status_t (*request_last_voice_tag_number) (void);
-+
-+    /** Closes the interface. */
-+    void (*cleanup)(void);
-+} bthf_client_interface_t;
-+
-+__END_DECLS
-+
-+#endif /* ANDROID_INCLUDE_BT_HF_CLIENT_H */
+ android/hal-ipc-api.txt | 317 ++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 317 insertions(+)
+
+diff --git a/android/hal-ipc-api.txt b/android/hal-ipc-api.txt
+index ae62c10..ca41cff 100644
+--- a/android/hal-ipc-api.txt
++++ b/android/hal-ipc-api.txt
+@@ -2078,3 +2078,320 @@ Notifications:
+ 
+ 		Notification parameters: Status (4 octets)
+ 		                         Handle (4 octets)
++
++
++Bluetooth Handsfree Client HAL (ID 10)
++======================================
++
++Android HAL name: "hf_client" (BT_PROFILE_HF_CLIENT_ID)
++
++Commands and response:
++
++	Opcode 0x00 - Error response
++
++		Valid status values: 0x01 = Fail
++		                     0x02 = Not ready
++		                     0x03 = No memory
++		                     0x04 = Busy
++		                     0x05 = Done (already completed)
++		                     0x06 = Unsupported
++		                     0x07 = Parameter invalid
++		                     0x08 = Unhandled
++		                     0x09 = Authentication failure
++		                     0x0a = Remote device down
++
++	Opcode 0x01 - Connect command/respose
++
++		Command parameters: Remote address (6 octects)
++		Response parameters: <none>
++
++		 In case of an error, the error response will be returned.
++
++	Opcode 0x02 - Disonnect command/response
++
++		Command parameters: Remote address (6 octetcs)
++		Response parameters: <none>
++
++		 In case of an error, the error response will be returned.
++
++	Opcode 0x03 - Connect Audio command/response
++
++		Command parameters: Remote address (6 octets)
++		Response parameters: <none>
++
++		In case of an error, the error response will be returned.
++
++	Opcode 0x04 - Disconnect Audio command/response
++
++		Command parameters: Remote address (6 octets)
++		Response parameters: <none>
++
++		In case of an error, the error response will be returned.
++
++	Opcode 0x05 - Start Voice Recognition command/response
++
++		Command parameters: <none>
++		Response parameters: <none>
++
++		In case of an error, the error response will be returned.
++
++	Opcode 0x06 - Stop Voice Recognition command/response
++
++		Command parameters: <none>
++		Response parameters: <none>
++
++		In case of an error, the error response will be returned.
++
++	Opcode 0x07 - Volume Control command/response
++
++		Command parameters: Volume type (1 octet)
++		                    Volume (1 octet)
++		Response parameters: <none>
++
++		Valid volume types: 0x00 = Speaker
++		                    0x01 = Microphone
++
++		In case of an error, the error response will be returned.
++
++	Opcode 0x08 - Dial command/response
++
++		Command parameters: Number (string)
++		Response parameters: <none>
++
++		In case of an error, the error response will be returned.
++
++	Opcode 0x09 - Dial Memory command/response
++
++		Command parameters: Location (1 octet)
++		Response parameters: <none>
++
++		In case of an error, the error response will be returned.
++
++	Opcode 0x10 - Handle Call Action command/response
++
++		Command parameters: Action (1 octet)
++		                    Call Index (1 octet)
++		Response parameters: <none>
++
++		Valid actions: 0x00 = CHLD_0
++		               0x01 = CHLD_1
++		               0x02 = CHLD_2
++		               0x03 = CHLD_3
++		               0x04 = CHLD_4
++		               0x05 = CHLD_1x
++		               0x06 = CHLD_2x
++		               0x07 = ATA
++		               0x08 = CHUP
++		               0x09 = BTRH_0
++		               0x10 = BTRH_1
++		               0x11 = BTRH_2
++
++		In case of an error, the error response will be returned.
++
++	Opcode 0x11 - Query Current Calls commad/response
++
++		Command parameters: <none>
++		Response parameters: <none>
++
++		In case of an error, the error response will be returned.
++
++	Opcode 0x12 - Query Current Operator Name
++
++		Command parameters: <none>
++		Response parameters: <none>
++
++		In case of an error, the error response will be returned.
++
++	Opcode 0x13 - Retrieve Subscriber Info command/response
++
++		Command parameters: <none>
++		Response parameters: <none>
++
++		In case of an error, the error response will be returned.
++
++	Opcode 0x14 - Send DTMF Code command/response
++
++		Command parameters: Code (1 octet)
++		Response parameters: <none>
++
++		In case of an error, the error response will be returned.
++
++	Opcode 0x15 - Request Last Voice Tag Number command/response
++
++		Command parameters: <none>
++		Response parameters: <none>
++
++		In case of an error, the error response will be returned.
++
++Notifications:
++
++	Opcode 0x81 - Connection State Changed notification
++
++		Notification parameters: State (1 octet)
++		                         Peer Features (1 octet)
++		                         Address (6 octets)
++
++		Valid State values: 0x00 = Disconnected
++		                    0x01 = Connecting
++		                    0x02 = SLC Connected
++		                    0x03 = Disconnecting
++
++		Note: Peer Features is valid only in SCL Connected state
++
++	Opcode 0x82 - Audio State Changed notification
++
++		Notification parameters: State (1 octet)
++		                         Address (6 octets)
++
++		Valid State values: 0x00 = Disconnected
++		                    0x01 = Connecting
++		                    0x02 = Connected
++		                    0x03 = Connected mSBC
++
++	Opcode 0x83 - Voice Recognition State Changed notification
++
++		Notification parameters: State (1 octet)
++
++		Valid State values: 0x00 = VR Stopped
++		                    0x01 = VR Started
++
++	Opcode 0x84 - Network State Changed notification
++
++		Notification parameters: State (1 octet)
++
++		Valid State values: 0x00 = Network Not Available
++		                    0x01 = Network Available
++
++	Opcode 0x85 - Network Roaming Type Changed notification
++
++		Notification parameters: Type (1 octet)
++
++		Valid Type values: 0x00 = Home
++		                   0x01 = Roaming
++
++	Opcode 0x86 - Network Signal Strength notification
++
++		Notification parameters: Signal Strength (1 octet)
++
++	Opcode 0x87 - Battery Level notification
++
++		Notification parameters: Battery Level (1 octet)
++
++	Opcode 0x88 - Current Operator Name notification
++
++		Notification parameters: Name (string)
++
++	Opcode 0x89 - Call Indicatior notification
++
++		Notification parameters: Call (1 octet)
++
++		Valid Call values: 0x00 = No Call In Progress
++		                   0x01 = Call In Progress
++
++	Opcode 0x8a - Call Setup Indicator notification
++
++		Notification parameters: Call Setup (1 octet)
++
++		Valid Call Setup values: 0x00 = None
++		                         0x01 = Incoming
++		                         0x02 = Outgoing
++		                         0x03 = Alerting
++
++	Opcode 0x8b - Call Held Indicator notification
++
++		Notification parameters: Call Held (1 octet)
++
++		Valid Call Held values: 0x00 = None
++		                        0x01 = Hold and Active
++					0x02 = Hold
++
++	Opcode 0x8c - Resposne and Hold Status notification
++
++		Notification parameters: Status (1 octet)
++
++		Valid Status values: 0x00 = Held
++		                     0x01 = Accept
++		                     0x02 = Reject
++
++	Opcode 0x8d - Calling Line Identification notification
++
++		Notification parameters: Number (string)
++
++		Note: This will be called only on incoming call if number is
++		provided.
++
++	Opcode 0x8e - Call Waiting notification
++
++		Notification parameters: Nunmber (string)
++
++	Opcode 0x8f - Current Calls List notification
++
++		Notification parameters: Index (1 octet)
++		                         Direction (1 octet)
++		                         Call State (1 octet)
++		                         Multiparty (1 octet)
++		                         Number (string)
++
++		Valid Direction values: 0x00 = Outgoing
++		                        0x01 = Incoming
++
++		Valid Call Sate values: 0x00 = Active
++		                        0x01 = Held
++		                        0x02 = Dialing
++		                        0x03 = Alerting
++		                        0x04 = Incoming
++		                        0x05 = Waiting
++		                        0x06 = Call held by Response and Hold
++
++		Valid Multiparty values: 0x00 = Single Call
++		                         0x01 = Multiparty (conference) Call
++
++		Note: Number might be empty
++
++	Opcode 0x90 - Volume Changed notification
++
++		Notification parameters: Type (1 octet)
++		                         Volume (1 octet)
++
++		Valid Type values: 0x00 = Speaker
++		                   0x01 = Microphone
++
++	Opcode 0x91 - Command Complete Callback notification
++
++		Notification parameters: Type (1 octet)
++		                         CME (1 octet)
++
++		Valid Type values: 0x00 = OK
++		                   0x01 = Error
++		                   0x02 = Error no carrier
++		                   0x03 = Error busy
++		                   0x04 = Error no answer
++		                   0x05 = Error delayed
++		                   0x06 = Error blacklisted
++		                   0x07 = Error CME
++
++		Note: CME parameter is valid only for Error CME type
++
++	Opcode 0x92 - Subscriber Service Info Callback notification
++
++		Notification parameters: Name (string)
++		                         Type (1 octet)
++
++		Valid Type values: 0x00 = Service unknown
++		                   0x01 = Service voice
++		                   0x02 = Service fax
++
++	Opcode 0x93 - In Band Ring Settings Callback notification
++
++		Notification parameters: State (1 octet)
++
++		Valid State values: 0x00 = In band ringtone not provided
++		                    0x01 = In band ringtone provided
++
++	Opcode 0x94 - Last Voice Call Tag Number Callback notification
++
++		Notification parameters: Number (string)
++
++	Opcode 0x95 - Ring Indication notification
++
++		Notification parameters: <none>
 -- 
 1.8.4
 
