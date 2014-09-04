@@ -2,166 +2,75 @@ Return-Path: <cyrus@holtmann.org>
 From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
-Subject: [PATCHv2 6/6] android/tester: Add Hidhost rejecting connection case
-Date: Thu,  4 Sep 2014 14:55:01 +0200
-Message-Id: <1409835301-12092-7-git-send-email-jakub.tyszkowski@tieto.com>
+Subject: [PATCHv2 4/6] android/tester: Fix HIDHost cases sending fixed tid sdp responses
+Date: Thu,  4 Sep 2014 14:54:59 +0200
+Message-Id: <1409835301-12092-5-git-send-email-jakub.tyszkowski@tieto.com>
 In-Reply-To: <1409835301-12092-1-git-send-email-jakub.tyszkowski@tieto.com>
 References: <1409835301-12092-1-git-send-email-jakub.tyszkowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This test case checks if hidhost rejects connections from
-unknown devices.
+Multiple cases were affected because of hardcoded transaction id for
+emulated remote's SDP responses.
+
+This resulted in the following error in the daemon:
+	bluetoothd[13486]: sdp_process: Protocol error.
+
+To solve this, sdp response counter was added.
 ---
- android/tester-hidhost.c | 100 +++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 100 insertions(+)
+ android/tester-hidhost.c | 10 +++++++++-
+ android/tester-main.h    |  2 ++
+ 2 files changed, 11 insertions(+), 1 deletion(-)
 
 diff --git a/android/tester-hidhost.c b/android/tester-hidhost.c
-index 143b5a6..915c9a0 100644
+index 479be1e..143b5a6 100644
 --- a/android/tester-hidhost.c
 +++ b/android/tester-hidhost.c
-@@ -42,6 +42,9 @@
- #define HID_MODE_BREDR			0x01
- #define HID_MODE_LE			0x02
+@@ -21,6 +21,7 @@
+ #include "tester-main.h"
  
-+#define HID_MSG_CONTROL			0x10
-+#define HID_VIRTUAL_CABLE_UNPLUG	0x05
+ #include "android/utils.h"
++#include "src/shared/util.h"
+ 
+ #define HID_GET_REPORT_PROTOCOL		0x60
+ #define HID_GET_BOOT_PROTOCOL		0x61
+@@ -214,6 +215,7 @@ static void hid_sdp_cid_hook_cb(const void *data, uint16_t len, void *user_data)
+ 	struct bthost *bthost = hciemu_client_get_host(t_data->hciemu);
+ 	struct emu_cid_data *cid_data = user_data;
+ 	struct raw_dataset *sdp_data = cid_data->user_data;
++	uint8_t *sdp_buf;
+ 
+ 	if (!memcmp(did_req_pdu, data, len)) {
+ 		bthost_send_cid(bthost, cid_data->sdp_handle, cid_data->sdp_cid,
+@@ -221,8 +223,14 @@ static void hid_sdp_cid_hook_cb(const void *data, uint16_t len, void *user_data)
+ 		return;
+ 	}
+ 
++	/* Increment transaction id for each SDP response */
++	sdp_buf = g_memdup(sdp_data->pdu, sdp_data->len);
++	put_be16(++t_data->sdp_call_cnt, &sdp_buf[1]);
 +
- #define HID_EXPECTED_REPORT_SIZE	0x02
+ 	bthost_send_cid(bthost, cid_data->sdp_handle, cid_data->sdp_cid,
+-					sdp_data->pdu, sdp_data->len);
++							sdp_buf, sdp_data->len);
++
++	g_free(sdp_buf);
+ }
+ static void hid_sdp_search_cb(uint16_t handle, uint16_t cid, void *user_data)
+ {
+diff --git a/android/tester-main.h b/android/tester-main.h
+index cb8300d..5fa4649 100644
+--- a/android/tester-main.h
++++ b/android/tester-main.h
+@@ -332,6 +332,8 @@ struct test_data {
  
- static struct queue *list; /* List of hidhost test cases */
-@@ -209,6 +212,15 @@ static struct raw_dataset hid_keyboard_rsp_data = {
- 	.len = sizeof(hid_keyboard_rsp_pdu),
+ 	struct queue *pdus;
+ 	bool is_encrypted;
++
++	uint16_t sdp_call_cnt;
  };
  
-+static bt_scan_mode_t setprop_scan_mode_conn_val =
-+					BT_SCAN_MODE_CONNECTABLE;
-+
-+static bt_property_t prop_test_scan_mode_conn = {
-+	.type = BT_PROPERTY_ADAPTER_SCAN_MODE,
-+	.val = &setprop_scan_mode_conn_val,
-+	.len = sizeof(setprop_scan_mode_conn_val),
-+};
-+
- static void hid_sdp_cid_hook_cb(const void *data, uint16_t len, void *user_data)
- {
- 	struct test_data *t_data = tester_get_data();
-@@ -280,6 +292,7 @@ static void hid_ctrl_cid_hook_cb(const void *data, uint16_t len,
- 							void *user_data)
- {
- 	struct emu_cid_data *cid_data = user_data;
-+	struct test_data *t_data = tester_get_data();
- 	uint8_t header = ((uint8_t *) data)[0];
- 	struct step *step;
- 
-@@ -310,6 +323,14 @@ static void hid_ctrl_cid_hook_cb(const void *data, uint16_t len,
- 
- 		schedule_action_verification(step);
- 		break;
-+	case HID_MSG_CONTROL | HID_VIRTUAL_CABLE_UNPLUG:
-+		if (t_data->expect_rejection) {
-+			step = g_new0(struct step, 1);
-+
-+			step->action_status = BT_STATUS_SUCCESS;
-+			schedule_action_verification(step);
-+		}
-+		break;
- 	}
- }
- static void hid_ctrl_connect_cb(uint16_t handle, uint16_t cid, void *user_data)
-@@ -508,6 +529,68 @@ static void hidhost_send_data_action(void)
- 	}
- }
- 
-+static void client_l2cap_rsp(uint8_t code, const void *data, uint16_t len,
-+							void *user_data)
-+{
-+	static const uint8_t con_req[] = { 0x13, 0x00,		/* PSM */
-+						0x41, 0x00 };	/* Source CID */
-+	const uint16_t *psm = data;
-+	struct test_data *t_data = tester_get_data();
-+	struct bthost *bthost = hciemu_client_get_host(t_data->hciemu);
-+
-+	if (len < sizeof(*psm)) {
-+		tester_warn("Invalid l2cap response.");
-+		return;
-+	}
-+
-+	switch (*psm) {
-+	case 0x40:
-+		tester_print("Connected ctrl channel");
-+
-+		bthost_add_cid_hook(bthost, cid_data.ctrl_handle, 0x40,
-+					hid_ctrl_cid_hook_cb, &cid_data);
-+
-+		cid_data.intr_handle = cid_data.ctrl_handle;
-+
-+		bthost_l2cap_req(bthost, cid_data.intr_handle, 0x02,
-+					con_req, sizeof(con_req),
-+					client_l2cap_rsp, &cid_data);
-+		break;
-+	case 0x41:
-+		tester_print("Connected intr channel");
-+
-+		bthost_add_cid_hook(bthost, cid_data.intr_handle, 0x41,
-+					hid_intr_cid_hook_cb, &cid_data);
-+
-+		break;
-+	default:
-+		break;
-+	}
-+}
-+
-+static void hidhost_conn_cb(uint16_t handle, void *user_data)
-+{
-+	static const uint8_t con_req[] = { 0x11, 0x00,		/* PSM */
-+						0x40, 0x00 };	/* Source CID */
-+
-+	struct test_data *data = tester_get_data();
-+	struct bthost *bthost = hciemu_client_get_host(data->hciemu);
-+
-+	if (data->hciemu_type == HCIEMU_TYPE_BREDR) {
-+		tester_warn("Not handled device type.");
-+		return;
-+	}
-+
-+	cid_data.ctrl_cid = 0x40;
-+	cid_data.ctrl_handle = handle;
-+
-+	tester_print("Sending L2CAP Request from remote");
-+
-+	bthost_l2cap_req(bthost, handle, 0x02,
-+					con_req, sizeof(con_req),
-+					client_l2cap_rsp, &cid_data);
-+}
-+
- static struct test_case test_cases[] = {
- 	TEST_CASE_BREDRLE("HidHost Init",
- 		ACTION_SUCCESS(dummy_action, NULL),
-@@ -653,6 +736,23 @@ static struct test_case test_cases[] = {
- 						BTHH_CONN_STATE_CONNECTED),
- 		ACTION_SUCCESS(hidhost_send_data_action, NULL),
- 	),
-+	TEST_CASE_BREDRLE("HidHost Reject Unknown Remote Connection",
-+		ACTION_SUCCESS(bluetooth_enable_action, NULL),
-+		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_ON),
-+		ACTION_SUCCESS(bt_set_property_action,
-+						&prop_test_scan_mode_conn),
-+		CALLBACK_ADAPTER_PROPS(&prop_test_scan_mode_conn, 1),
-+		ACTION_SUCCESS(emu_setup_powered_remote_action, NULL),
-+		ACTION_SUCCESS(emu_add_l2cap_server_action,
-+						&l2cap_setup_keyboard_sdp_data),
-+		ACTION_SUCCESS(emu_add_l2cap_server_action,
-+							&l2cap_setup_cc_data),
-+		ACTION_SUCCESS(emu_add_l2cap_server_action,
-+							&l2cap_setup_ic_data),
-+		/* Trigger incoming connection */
-+		ACTION_SUCCESS(emu_set_connect_cb_action, hidhost_conn_cb),
-+		ACTION_SUCCESS(emu_remote_connect_hci_rejected_action, NULL),
-+	),
- 	TEST_CASE_BREDRLE("HidHost Encrypted Out. Conn. Success",
- 		ACTION_SUCCESS(bluetooth_enable_action, NULL),
- 		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_ON),
+ /*
 -- 
 1.9.1
 
