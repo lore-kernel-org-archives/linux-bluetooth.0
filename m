@@ -1,353 +1,242 @@
 Return-Path: <cyrus@holtmann.org>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH BlueZ 1/5] android/tester: Add AVRCP init - Success test case
+Date: Thu, 04 Sep 2014 14:58:06 +0200
+Message-ID: <2784279.RE4Yki9p2u@uw000953>
+In-Reply-To: <1409737684-16002-1-git-send-email-luiz.dentz@gmail.com>
+References: <1409737684-16002-1-git-send-email-luiz.dentz@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <1409824700-23052-1-git-send-email-lukasz.rymanowski@tieto.com>
-References: <1409824700-23052-1-git-send-email-lukasz.rymanowski@tieto.com>
-Date: Thu, 4 Sep 2014 15:33:25 +0200
-Message-ID: <CAMudyAtWqYCW12OfdKTBrPU22vDKzJ4Y0YX6cZvqAsmtqZze8A@mail.gmail.com>
-Subject: Re: [PATCH 1/2] android/hal-ipc-api: Add Handsfree client IPC API
-From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Cc: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Luiz,
 
-On 4 September 2014 11:58, Lukasz Rymanowski
-<lukasz.rymanowski@tieto.com> wrote:
+On Wednesday 03 of September 2014 12:47:59 Luiz Augusto von Dentz wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> 
 > ---
->  android/hal-ipc-api.txt | 317 ++++++++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 317 insertions(+)
->
-> diff --git a/android/hal-ipc-api.txt b/android/hal-ipc-api.txt
-> index ae62c10..6061ebb 100644
-> --- a/android/hal-ipc-api.txt
-> +++ b/android/hal-ipc-api.txt
-> @@ -2078,3 +2078,320 @@ Notifications:
->
->                 Notification parameters: Status (4 octets)
->                                          Handle (4 octets)
-> +
-> +
-> +Bluetooth Handsfree Client HAL (ID 10)
-> +======================================
-> +
-> +Android HAL name: "hf_client" (BT_PROFILE_HF_CLIENT_ID)
-> +
-> +Commands and response:
-> +
-> +       Opcode 0x00 - Error response
-> +
-> +               Valid status values: 0x01 = Fail
-> +                                    0x02 = Not ready
-> +                                    0x03 = No memory
-> +                                    0x04 = Busy
-> +                                    0x05 = Done (already completed)
-> +                                    0x06 = Unsupported
-> +                                    0x07 = Parameter invalid
-> +                                    0x08 = Unhandled
-> +                                    0x09 = Authentication failure
-> +                                    0x0a = Remote device down
-> +
-> +       Opcode 0x01 - Connect command/respose
-> +
-> +               Command parameters: Remote address (6 octects)
-> +               Response parameters: <none>
-> +
-> +                In case of an error, the error response will be returned.
-> +
-> +       Opcode 0x02 - Disonnect command/response
-> +
-> +               Command parameters: Remote address (6 octetcs)
-> +               Response parameters: <none>
-> +
-> +                In case of an error, the error response will be returned.
-> +
-> +       Opcode 0x03 - Connect Audio command/response
-> +
-> +               Command parameters: Remote address (6 octets)
-> +               Response parameters: <none>
-> +
-> +               In case of an error, the error response will be returned.
-> +
-> +       Opcode 0x04 - Disconnect Audio command/response
-> +
-> +               Command parameters: Remote address (6 octets)
-> +               Response parameters: <none>
-> +
-> +               In case of an error, the error response will be returned.
-> +
-> +       Opcode 0x05 - Start Voice Recognition command/response
-> +
-> +               Command parameters: <none>
-> +               Response parameters: <none>
-> +
-> +               In case of an error, the error response will be returned.
-> +
-> +       Opcode 0x06 - Stop Voice Recognition command/response
-> +
-> +               Command parameters: <none>
-> +               Response parameters: <none>
-> +
-> +               In case of an error, the error response will be returned.
-> +
-> +       Opcode 0x07 - Volume Control command/response
-> +
-> +               Command parameters: Volume type (1 octet)
-> +                                   Volume (1 octet)
-> +               Response parameters: <none>
-> +
-> +               Valid volume types: 0x00 = Speaker
-> +                                   0x01 = Microphone
-> +
-> +               In case of an error, the error response will be returned.
-> +
-> +       Opcode 0x08 - Dial command/response
-> +
-> +               Command parameters: Number (string)
-> +               Response parameters: <none>
-> +
-> +               In case of an error, the error response will be returned.
-> +
-> +       Opcode 0x09 - Dial Memory command/response
-> +
-> +               Command parameters: Location (1 octet)
-> +               Response parameters: <none>
-> +
-> +               In case of an error, the error response will be returned.
-> +
-> +       Opcode 0x10 - Handle Call Action command/response
-> +
-> +               Command parameters: Action (1 octet)
-> +                                   Call Index (1 octet)
-> +               Response parameters: <none>
-> +
-> +               Valid actions: 0x00 = CHLD_0
-> +                              0x01 = CHLD_1
-> +                              0x02 = CHLD_2
-> +                              0x03 = CHLD_3
-> +                              0x04 = CHLD_4
-> +                              0x05 = CHLD_1x
-> +                              0x06 = CHLD_2x
-> +                              0x07 = ATA
-> +                              0x08 = CHUP
-> +                              0x09 = BTRH_0
-> +                              0x10 = BTRH_1
-> +                              0x11 = BTRH_2
-> +
-> +               In case of an error, the error response will be returned.
-> +
-> +       Opcode 0x11 - Query Current Calls commad/response
-> +
-> +               Command parameters: <none>
-> +               Response parameters: <none>
-> +
-> +               In case of an error, the error response will be returned.
-> +
-> +       Opcode 0x12 - Query Current Operator Name
-> +
-> +               Command parameters: <none>
-> +               Response parameters: <none>
-> +
-> +               In case of an error, the error response will be returned.
-> +
-> +       Opcode 0x13 - Retrieve Subscriber Info command/response
-> +
-> +               Command parameters: <none>
-> +               Response parameters: <none>
-> +
-> +               In case of an error, the error response will be returned.
-> +
-> +       Opcode 0x14 - Send DTMF Code command/response
-> +
-> +               Command parameters: Code (1 octet)
-> +               Response parameters: <none>
-> +
-> +               In case of an error, the error response will be returned.
-> +
-> +       Opcode 0x15 - Request Last Voice Tag Number command/response
-> +
-> +               Command parameters: <none>
-> +               Response parameters: <none>
-> +
-> +               In case of an error, the error response will be returned.
-> +
-> +Notifications:
-> +
-> +       Opcode 0x81 - Connection State Changed notification
-> +
-> +               Notification parameters: State (1 octet)
-> +                                        Peer Features (1 octet)
-> +                                        Address (6 octets)
-> +
-> +               Valid State values: 0x00 = Disconnected
-> +                                   0x01 = Connecting
-> +                                   0x02 = SLC Connected
-> +                                   0x03 = Disconnecting
-> +
-> +               Note: Peer Features is valid only in SCL Connected state
-> +
-> +       Opcode 0x82 - Audio State Changed notification
-> +
-> +               Notification parameters: State (1 octet)
-> +                                        Address (6 octets)
-> +
-> +               Valid State values: 0x00 = Disconnected
-> +                                   0x01 = Connecting
-> +                                   0x02 = Connected
-> +                                   0x03 = Connected mSBC
-> +
-> +       Opcode 0x83 - Voice Recognition State Changed notification
-> +
-> +               Notification parameters: State (1 octet)
-> +
-> +               Valid State values: 0x00 = VR Stopped
-> +                                   0x01 = VR Started
-> +
-> +       Opcode 0x84 - Network State Changed notification
-> +
-> +               Notification parameters: State (1 octet)
-> +
-> +               Valid State values: 0x00 = Network Not Available
-> +                                   0x01 = Network Available
-> +
-> +       Opcode 0x85 - Network Roaming Type Changed notification
-> +
-> +               Notification parameters: Type (1 octet)
-> +
-> +               Valid Type values: 0x00 = Home
-> +                                  0x01 = Roaming
-> +
-> +       Opcode 0x86 - Network Signal Strength notification
-> +
-> +               Notification parameters: Signal Strength (1 octet)
-> +
-> +       Opcode 0x86 - Network Battery Level notification
+>  android/Makefile.am    |  1 +
+>  android/tester-avrcp.c | 50 +++++++++++++++++++++++++++++++++++
+>  android/tester-main.c  | 71 ++++++++++++++++++++++++++++++++++++++++++++++++++
+>  android/tester-main.h  |  4 +++
+>  4 files changed, 126 insertions(+)
+>  create mode 100644 android/tester-avrcp.c
+> 
+> diff --git a/android/Makefile.am b/android/Makefile.am
+> index 4b93c5b..b18a404 100644
+> --- a/android/Makefile.am
+> +++ b/android/Makefile.am
+> @@ -160,6 +160,7 @@ android_android_tester_SOURCES = emulator/btdev.h emulator/btdev.c \
+>  				android/tester-pan.c \
+>  				android/tester-hdp.c \
+>  				android/tester-a2dp.c \
+> +				android/tester-avrcp.c \
+>  				android/tester-gatt.c \
+>  				android/tester-main.h android/tester-main.c
+>  
+> diff --git a/android/tester-avrcp.c b/android/tester-avrcp.c
+> new file mode 100644
+> index 0000000..60a57b4
+> --- /dev/null
+> +++ b/android/tester-avrcp.c
+> @@ -0,0 +1,50 @@
+> +/*
+> + * Copyright (C) 2014 Intel Corporation
+> + *
+> + * Licensed under the Apache License, Version 2.0 (the "License");
+> + * you may not use this file except in compliance with the License.
+> + * You may obtain a copy of the License at
+> + *
+> + *      http://www.apache.org/licenses/LICENSE-2.0
+> + *
+> + * Unless required by applicable law or agreed to in writing, software
+> + * distributed under the License is distributed on an "AS IS" BASIS,
+> + * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+> + * See the License for the specific language governing permissions and
+> + * limitations under the License.
+> + *
+> + */
+> +
+> +#include <stdbool.h>
+> +
+> +#include "emulator/bthost.h"
+> +#include "src/shared/util.h"
+> +
+> +#include "tester-main.h"
+> +#include "android/utils.h"
+> +
+> +static struct queue *list;
+> +
+> +static struct test_case test_cases[] = {
+> +	TEST_CASE_BREDRLE("AVRCP Init",
+> +		ACTION_SUCCESS(dummy_action, NULL),
+> +	),
+> +};
+> +
+> +struct queue *get_avrcp_tests(void)
+> +{
+> +	uint16_t i = 0;
+> +
+> +	list = queue_new();
+> +
+> +	for (; i < sizeof(test_cases) / sizeof(test_cases[0]); ++i)
+> +		if (!queue_push_tail(list, &test_cases[i]))
+> +			return NULL;
+> +
+> +	return list;
+> +}
+> +
+> +void remove_avrcp_tests(void)
+> +{
+> +	queue_destroy(list, NULL);
+> +}
 
-there is no network battery level :) will fix.
+remove_avrcp_tests() should be called from tester_testcases_cleanup().
+
+> diff --git a/android/tester-main.c b/android/tester-main.c
+> index a001059..6817054 100644
+> --- a/android/tester-main.c
+> +++ b/android/tester-main.c
+> @@ -1125,6 +1125,10 @@ static btav_callbacks_t bta2dp_callbacks = {
+>  	.audio_state_cb = a2dp_audio_state_cb,
+>  };
+>  
+> +static btrc_callbacks_t btavrcp_callbacks = {
+> +	.size = sizeof(btavrcp_callbacks),
+> +};
 > +
-> +               Notification parameters: Battery Level (1 octet)
+>  static const btgatt_client_callbacks_t btgatt_client_callbacks = {
+>  	.register_client_cb = gattc_register_client_cb,
+>  	.scan_result_cb = gattc_scan_result_cb,
+> @@ -1435,6 +1439,60 @@ static void setup_a2dp(const void *test_data)
+>  	tester_setup_complete();
+>  }
+>  
+> +static void setup_avrcp(const void *test_data)
+> +{
+> +	struct test_data *data = tester_get_data();
+> +	const bt_interface_t *if_bt;
+> +	bt_status_t status;
+> +	const void *a2dp, *avrcp;
 > +
-> +       Opcode 0x87 - Current Operator Name notification
+> +	if (!setup_base(data)) {
+> +		tester_setup_failed();
+> +		return;
+> +	}
 > +
-> +               Notification parameters: Name (string)
+> +	if_bt = data->if_bluetooth;
 > +
-> +       Opcode 0x88 - Call Indicatior notification
+> +	status = if_bt->init(&bt_callbacks);
+> +	if (status != BT_STATUS_SUCCESS) {
+> +		data->if_bluetooth = NULL;
+> +		tester_setup_failed();
+> +		return;
+> +	}
 > +
-> +               Notification parameters: Call (1 octet)
+> +	a2dp = if_bt->get_profile_interface(BT_PROFILE_ADVANCED_AUDIO_ID);
+> +	if (!a2dp) {
+> +		tester_setup_failed();
+> +		return;
+> +	}
 > +
-> +               Valid Call values: 0x00 = No Call In Progress
-> +                                  0x01 = Call In Progress
+> +	data->if_a2dp = a2dp;
 > +
-> +       Opcode 0x89 - Call Setup Indicator notification
+> +	status = data->if_a2dp->init(&bta2dp_callbacks);
+> +	if (status != BT_STATUS_SUCCESS) {
+> +		data->if_a2dp = NULL;
+> +		tester_setup_failed();
+> +		return;
+> +	}
 > +
-> +               Notification parameters: Call Setup (1 octet)
+> +	avrcp = if_bt->get_profile_interface(BT_PROFILE_AV_RC_ID);
+> +	if (!a2dp) {
+> +		tester_setup_failed();
+> +		return;
+> +	}
 > +
-> +               Valid Call Setup values: 0x00 = None
-> +                                        0x01 = Incoming
-> +                                        0x02 = Outgoing
-> +                                        0x03 = Alerting
+> +	data->if_avrcp = avrcp;
 > +
-> +       Opcode 0x8a - Call Held Indicator notification
+> +	status = data->if_avrcp->init(&btavrcp_callbacks);
+> +	if (status != BT_STATUS_SUCCESS) {
+> +		data->if_avrcp = NULL;
+> +		tester_setup_failed();
+> +		return;
+> +	}
 > +
-> +               Notification parameters: Call Held (1 octet)
+> +	tester_setup_complete();
+> +}
 > +
-> +               Valid Call Held values: 0x00 = None
-> +                                       0x01 = Hold and Active
-> +                                       0x02 = Hold
+>  static void setup_gatt(const void *test_data)
+>  {
+>  	struct test_data *data = tester_get_data();
+> @@ -1509,6 +1567,11 @@ static void teardown(const void *test_data)
+>  		data->if_a2dp = NULL;
+>  	}
+>  
+> +	if (data->if_avrcp) {
+> +		data->if_avrcp->cleanup();
+> +		data->if_avrcp = NULL;
+> +	}
 > +
-> +       Opcode 0x8b - Resposne and Hold Status notification
+>  	if (data->if_bluetooth) {
+>  		data->if_bluetooth->cleanup();
+>  		data->if_bluetooth = NULL;
+> @@ -2050,6 +2113,13 @@ static void add_a2dp_tests(void *data, void *user_data)
+>  	test(tc, setup_a2dp, generic_test_function, teardown);
+>  }
+>  
+> +static void add_avrcp_tests(void *data, void *user_data)
+> +{
+> +	struct test_case *tc = data;
 > +
-> +               Notification parameters: Status (1 octet)
+> +	test(tc, setup_avrcp, generic_test_function, teardown);
+> +}
 > +
-> +               Valid Status values: 0x00 = Held
-> +                                    0x01 = Accept
-> +                                    0x02 = Reject
-> +
-> +       Opcode 0x8c - Calling Line Identification notification
-> +
-> +               Notification parameters: Number (string)
-> +
-> +               Note: This will be called only on incoming call if number is
-> +               provided.
-> +
-> +       Opcode 0x8d - Call Waiting notification
-> +
-> +               Notification parameters: Nunmber (string)
-> +
-> +       Opcode 0x8e - Current Calls List notification
-> +
-> +               Notification parameters: Index (1 octet)
-> +                                        Direction (1 octet)
-> +                                        Call State (1 octet)
-> +                                        Multiparty (1 octet)
-> +                                        Number (string)
-> +
-> +               Valid Direction values: 0x00 = Outgoing
-> +                                       0x01 = Incoming
-> +
-> +               Valid Call Sate values: 0x00 = Active
-> +                                       0x01 = Held
-> +                                       0x02 = Dialing
-> +                                       0x03 = Alerting
-> +                                       0x04 = Incoming
-> +                                       0x05 = Waiting
-> +                                       0x06 = Call held by Response and Hold
-> +
-> +               Valid Multiparty values: 0x00 = Single Call
-> +                                        0x01 = Multiparty (conference) Call
-> +
-> +               Note: Number might be empty
-> +
-> +       Opcode 0x8f - Volume Changed notification
-> +
-> +               Notification parameters: Type (1 octet)
-> +                                        Volume (1 octet)
-> +
-> +               Valid Type values: 0x00 = Speaker
-> +                                  0x01 = Microphone
-> +
-> +       Opcode 0x90 - Command Complete Callback notification
-> +
-> +               Notification parameters: Type (1 octet)
-> +                                        CME (1 octet)
-> +
-> +               Valid Type values: 0x00 = OK
-> +                                  0x01 = Error
-> +                                  0x02 = Error no carrier
-> +                                  0x03 = Error busy
-> +                                  0x04 = Error no answer
-> +                                  0x05 = Error delayed
-> +                                  0x06 = Error blacklisted
-> +                                  0x07 = Error CME
-> +
-> +               Note: CME parameter is valid only for Error CME type
-> +
-> +       Opcode 0x91 - Subscriber Service Info Callback notification
-> +
-> +               Notification parameters: Name (string)
-> +                                        Type (1 octet)
-> +
-> +               Valid Type values: 0x00 = Service unknown
-> +                                  0x01 = Service voice
-> +                                  0x02 = Service fax
-> +
-> +       Opcode 0x92 - In Band Ring Settings Callback notification
-> +
-> +               Notification parameters: State (1 octet)
-> +
-> +               Valid State values: 0x00 = In band ringtone not provided
-> +                                   0x01 = In band ringtone provided
-> +
-> +       Opcode 0x93 - Last Voice Call Tag Number Callback notification
-> +
-> +               Notification parameters: Number (string)
-> +
-> +       Opcode 0x94 - Ring Indication notification
-> +
-> +               Notification parameters: <none>
-> --
-> 1.8.4
->
-\Lukasz
+>  static void add_gatt_tests(void *data, void *user_data)
+>  {
+>  	struct test_case *tc = data;
+> @@ -2069,6 +2139,7 @@ int main(int argc, char *argv[])
+>  	queue_foreach(get_pan_tests(), add_pan_tests, NULL);
+>  	queue_foreach(get_hdp_tests(), add_hdp_tests, NULL);
+>  	queue_foreach(get_a2dp_tests(), add_a2dp_tests, NULL);
+> +	queue_foreach(get_avrcp_tests(), add_avrcp_tests, NULL);
+>  	queue_foreach(get_gatt_tests(), add_gatt_tests, NULL);
+>  
+>  	if (tester_run())
+> diff --git a/android/tester-main.h b/android/tester-main.h
+> index 77f7660..20ba920 100644
+> --- a/android/tester-main.h
+> +++ b/android/tester-main.h
+> @@ -50,6 +50,7 @@
+>  #include <hardware/bt_pan.h>
+>  #include <hardware/bt_hl.h>
+>  #include <hardware/bt_av.h>
+> +#include <hardware/bt_rc.h>
+>  #include <hardware/bt_gatt.h>
+>  #include <hardware/bt_gatt_client.h>
+>  #include <hardware/bt_gatt_server.h>
+> @@ -307,6 +308,7 @@ struct test_data {
+>  	const bthl_interface_t *if_hdp;
+>  	const btav_interface_t *if_a2dp;
+>  	struct audio_stream_out *if_stream;
+> +	const btrc_interface_t *if_avrcp;
+>  	const btgatt_interface_t *if_gatt;
+>  
+>  	const void *test_data;
+> @@ -424,6 +426,8 @@ struct queue *get_hdp_tests(void);
+>  void remove_hdp_tests(void);
+>  struct queue *get_a2dp_tests(void);
+>  void remove_a2dp_tests(void);
+> +struct queue *get_avrcp_tests(void);
+> +void remove_avrcp_tests(void);
+>  struct queue *get_gatt_tests(void);
+>  void remove_gatt_tests(void);
+>  
+> 
+
+-- 
+Best regards, 
+Szymon Janc
