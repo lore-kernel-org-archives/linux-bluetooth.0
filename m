@@ -1,96 +1,62 @@
 Return-Path: <cyrus@holtmann.org>
-From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH v4] android/hidhost: Remove reconnect logic
-Date: Fri,  5 Sep 2014 12:37:37 +0200
-Message-Id: <1409913457-28698-1-git-send-email-lukasz.rymanowski@tieto.com>
+MIME-Version: 1.0
+In-Reply-To: <1409826158-29266-1-git-send-email-vikram.pal@samsung.com>
+References: <1409826158-29266-1-git-send-email-vikram.pal@samsung.com>
+Date: Fri, 5 Sep 2014 13:32:21 +0300
+Message-ID: <CABBYNZ+75-eA4X1pTwA5AQMWBTbJMoaft8Gq1WLOtOM66EXvbA@mail.gmail.com>
+Subject: Re: [PATCH] monitor: Remove superfluous call to l2cap_frame_pull
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Vikrampal Yadav <vikram.pal@samsung.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	Dmitry Kasatkin <d.kasatkin@samsung.com>, cpgs@samsung.com
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-GATT can handle reconnect now, so lets remove that part of code from
-here
----
-v4 - rebase only 
+Hi,
 
- android/hidhost.c | 26 +++++++-------------------
- 1 file changed, 7 insertions(+), 19 deletions(-)
+On Thu, Sep 4, 2014 at 1:22 PM, Vikrampal Yadav <vikram.pal@samsung.com> wrote:
+> Removed superfluous call to l2cap_frame_pull.
+> ---
+>  monitor/avctp.c | 7 ++-----
+>  1 file changed, 2 insertions(+), 5 deletions(-)
+>
+> diff --git a/monitor/avctp.c b/monitor/avctp.c
+> index 64d4b58..98ffa22 100644
+> --- a/monitor/avctp.c
+> +++ b/monitor/avctp.c
+> @@ -546,16 +546,13 @@ static bool avrcp_list_player_attributes(struct l2cap_frame *frame,
+>                                                 uint8_t ctype, uint8_t len,
+>                                                 uint8_t indent)
+>  {
+> -       struct l2cap_frame avrcp_frame;
+>         uint8_t num;
+>         int i;
+>
+>         if (len == 0)
+>                 return true;
+>
+> -       l2cap_frame_pull(&avrcp_frame, frame, 0);
+> -
+> -       if (!l2cap_frame_get_u8(&avrcp_frame, &num))
+> +       if (!l2cap_frame_get_u8(frame, &num))
+>                 return false;
+>
+>         print_field("%*cAttributeCount: 0x%02x", (indent - 8), ' ', num);
+> @@ -563,7 +560,7 @@ static bool avrcp_list_player_attributes(struct l2cap_frame *frame,
+>         for (i = 0; num > 0; num--, i++) {
+>                 uint8_t attr;
+>
+> -               if (!l2cap_frame_get_u8(&avrcp_frame, &attr))
+> +               if (!l2cap_frame_get_u8(frame, &attr))
+>                         return false;
+>
+>                 print_field("%*cAttributeID: 0x%02x (%s)", (indent - 8), ' ',
+> --
+> 1.9.1
 
-diff --git a/android/hidhost.c b/android/hidhost.c
-index ebed56d..657fa8f 100644
---- a/android/hidhost.c
-+++ b/android/hidhost.c
-@@ -109,7 +109,6 @@ struct hid_device {
- 	struct bt_uhid	*uhid;
- 	uint8_t		last_hid_msg;
- 	struct bt_hog	*hog;
--	guint		reconnect_id;
- 	int		sec_level;
- };
- 
-@@ -125,9 +124,6 @@ static void hid_device_free(void *data)
- {
- 	struct hid_device *dev = data;
- 
--	if (dev->reconnect_id > 0)
--		g_source_remove(dev->reconnect_id);
--
- 	if (dev->ctrl_watch > 0)
- 		g_source_remove(dev->ctrl_watch);
- 
-@@ -768,19 +764,6 @@ fail:
- 	hid_device_remove(dev);
- }
- 
--static gboolean hog_reconnect(void *user_data)
--{
--	struct hid_device *dev = user_data;
--
--	DBG("");
--
--	dev->reconnect_id = 0;
--
--	bt_gatt_connect_app(hog_app, &dev->dst);
--
--	return FALSE;
--}
--
- static void hog_conn_cb(const bdaddr_t *addr, int err, void *attrib)
- {
- 	GSList *l;
-@@ -792,11 +775,10 @@ static void hog_conn_cb(const bdaddr_t *addr, int err, void *attrib)
- 	if (err < 0) {
- 		if (!dev)
- 			return;
--		if (dev->hog && !dev->reconnect_id) {
-+		if (dev->hog) {
- 			bt_hid_notify_state(dev,
- 						HAL_HIDHOST_STATE_DISCONNECTED);
- 			bt_hog_detach(dev->hog);
--			dev->reconnect_id = g_idle_add(hog_reconnect, dev);
- 			return;
- 		}
- 		goto fail;
-@@ -829,6 +811,9 @@ static void hog_conn_cb(const bdaddr_t *addr, int err, void *attrib)
- 
- 	bt_hid_notify_state(dev, HAL_HIDHOST_STATE_CONNECTED);
- 
-+	if (!bt_gatt_add_autoconnect(hog_app, &dev->dst))
-+		error("hidhost: Could not add to autoconnect list");
-+
- 	return;
- 
- fail:
-@@ -1497,6 +1482,9 @@ static void hid_unpaired_cb(const bdaddr_t *addr, uint8_t type)
- 	ba2str(addr, address);
- 	DBG("Unpaired device %s", address);
- 
-+	if (hog_app)
-+		bt_gatt_remove_autoconnect(hog_app, addr);
-+
- 	hid_device_remove(dev);
- }
- 
+Applied, thanks.
+
+
 -- 
-1.8.4
-
+Luiz Augusto von Dentz
