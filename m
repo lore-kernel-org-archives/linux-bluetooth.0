@@ -1,135 +1,446 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcin Kraglak <marcin.kraglak@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv3 2/2] android/tester: Init profiles in separate thread
-Date: Fri,  5 Sep 2014 15:00:02 +0200
-Message-Id: <1409922002-30751-2-git-send-email-marcin.kraglak@tieto.com>
-In-Reply-To: <1409922002-30751-1-git-send-email-marcin.kraglak@tieto.com>
-References: <1409922002-30751-1-git-send-email-marcin.kraglak@tieto.com>
+Subject: [PATCHv3 1/2] android/tester: Simplify setup procedure
+Date: Fri,  5 Sep 2014 15:00:01 +0200
+Message-Id: <1409922002-30751-1-git-send-email-marcin.kraglak@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This is needed to not block mainloop while initializing stack.
-In some cases, bluetooth->init blocks mainloop and bluetoothd
-cannot properly initialize controller, because HCI frames are
-not serviced in hciemu.
-Because pthread_join() is blocking, it is added to mainloop
-from thread right before pthread_exit() is called. Therefore
-this time is extremely short.
+Every profile test case must initialize bluetooth profile and start
+bluetoothd, and it is now done in setup_generic(). Additionally
+each profile can define its own init routine, which will be
+called after initializing stack.
 ---
- android/tester-main.c | 64 +++++++++++++++++++++++++++++++++++++++++++--------
- android/tester-main.h |  2 ++
- 2 files changed, 57 insertions(+), 9 deletions(-)
+ android/tester-main.c | 220 ++++++++++++--------------------------------------
+ android/tester-main.h |   1 +
+ 2 files changed, 53 insertions(+), 168 deletions(-)
 
 diff --git a/android/tester-main.c b/android/tester-main.c
-index 7e8621a..2e00f79 100644
+index 297aadb..7e8621a 100644
 --- a/android/tester-main.c
 +++ b/android/tester-main.c
-@@ -15,8 +15,10 @@
-  *
-  */
- #include <stdbool.h>
-+#include <pthread.h>
- 
- #include "emulator/bthost.h"
-+#include "src/shared/util.h"
- #include "tester-main.h"
- 
- #include "monitor/bt.h"
-@@ -1336,27 +1338,71 @@ static bool setup_base(struct test_data *data)
+@@ -1336,7 +1336,7 @@ static bool setup_base(struct test_data *data)
  	return true;
  }
  
--static void setup_generic(const void *test_data)
-+static gboolean join_init_thread(gpointer user_data)
+-static void setup(const void *test_data)
++static void setup_generic(const void *test_data)
  {
  	struct test_data *data = tester_get_data();
--	bt_status_t status;
-+	int (*init_func)(void) = user_data;
-+	int status;
-+	void *ret;
- 
--	if (!setup_base(data)) {
-+	/*
-+	 * Note that pthread_join is blocking mainloop,
-+	 * therefore thread we want to join must
-+	 * exit immediately. This is done in init_thread()
-+	 */
-+	status = pthread_join(data->thread, &ret);
-+	if (status != 0) {
-+		tester_warn("Failed to join init thread, status %d", status);
- 		tester_setup_failed();
--		return;
-+		return FALSE;
+ 	bt_status_t status;
+@@ -1353,210 +1353,117 @@ static void setup(const void *test_data)
+ 		return;
  	}
  
--	status = data->if_bluetooth->init(&bt_callbacks);
--	if (status != BT_STATUS_SUCCESS) {
--		data->if_bluetooth = NULL;
-+	if (PTR_TO_INT(ret) != BT_STATUS_SUCCESS) {
- 		tester_setup_failed();
--		return;
-+		return FALSE;
- 	}
- 
--	if (!data->init_routine || data->init_routine() == BT_STATUS_SUCCESS)
-+	if (!init_func || init_func() == BT_STATUS_SUCCESS)
- 		tester_setup_complete();
- 	else
- 		tester_setup_failed();
-+
-+	return FALSE;
-+}
-+
-+static void *init_thread(void *user_data)
-+{
-+	struct test_data *data = tester_get_data();
-+	int status;
-+
-+	status = data->if_bluetooth->init(&bt_callbacks);
-+
-+	g_idle_add(join_init_thread, user_data);
-+
-+	pthread_exit(INT_TO_PTR(status));
-+}
-+
-+static bool start_init_thread(int (*init)(void))
-+{
-+	struct test_data *data = tester_get_data();
-+
-+	if (pthread_create(&data->thread, NULL, init_thread, init) != 0)
-+		return false;
-+
-+	return true;
-+}
-+
-+static void setup_generic(const void *test_data)
-+{
-+	struct test_data *data = tester_get_data();
-+
-+	if (!setup_base(data)) {
-+		tester_setup_failed();
-+		return;
-+	}
-+
-+	if (!start_init_thread(data->init_routine))
+-	tester_setup_complete();
++	if (!data->init_routine || data->init_routine() == BT_STATUS_SUCCESS)
++		tester_setup_complete();
++	else
 +		tester_setup_failed();
  }
  
- static int init_socket(void)
+-static void setup_socket(const void *test_data)
++static int init_socket(void)
+ {
+ 	struct test_data *data = tester_get_data();
+-	bt_status_t status;
+ 	const void *sock;
+ 
+-	if (!setup_base(data)) {
+-		tester_setup_failed();
+-		return;
+-	}
+-
+-	status = data->if_bluetooth->init(&bt_callbacks);
+-	if (status != BT_STATUS_SUCCESS) {
+-		data->if_bluetooth = NULL;
+-		tester_setup_failed();
+-		return;
+-	}
+-
+ 	sock = data->if_bluetooth->get_profile_interface(BT_PROFILE_SOCKETS_ID);
+-	if (!sock) {
+-		tester_setup_failed();
+-		return;
+-	}
++	if (!sock)
++		return BT_STATUS_FAIL;
+ 
+ 	data->if_sock = sock;
+ 
+-	tester_setup_complete();
++	return BT_STATUS_SUCCESS;
+ }
+ 
+-static void setup_hidhost(const void *test_data)
++static int init_hidhost(void)
+ {
+ 	struct test_data *data = tester_get_data();
+ 	bt_status_t status;
+ 	const void *hid;
+ 
+-	if (!setup_base(data)) {
+-		tester_setup_failed();
+-		return;
+-	}
+-
+-	status = data->if_bluetooth->init(&bt_callbacks);
+-	if (status != BT_STATUS_SUCCESS) {
+-		data->if_bluetooth = NULL;
+-		tester_setup_failed();
+-		return;
+-	}
+-
+ 	hid = data->if_bluetooth->get_profile_interface(BT_PROFILE_HIDHOST_ID);
+-	if (!hid) {
+-		tester_setup_failed();
+-		return;
+-	}
++	if (!hid)
++		return BT_STATUS_FAIL;
+ 
+ 	data->if_hid = hid;
+ 
+ 	status = data->if_hid->init(&bthh_callbacks);
+-	if (status != BT_STATUS_SUCCESS) {
++	if (status != BT_STATUS_SUCCESS)
+ 		data->if_hid = NULL;
+-		tester_setup_failed();
+-		return;
+-	}
+ 
+-	tester_setup_complete();
++	return status;
+ }
+ 
+-static void setup_pan(const void *test_data)
++static int init_pan(void)
+ {
+ 	struct test_data *data = tester_get_data();
+ 	bt_status_t status;
+ 	const void *pan;
+ 
+-	if (!setup_base(data)) {
+-		tester_setup_failed();
+-		return;
+-	}
+-
+-	status = data->if_bluetooth->init(&bt_callbacks);
+-	if (status != BT_STATUS_SUCCESS) {
+-		data->if_bluetooth = NULL;
+-		tester_setup_failed();
+-		return;
+-	}
+-
+ 	pan = data->if_bluetooth->get_profile_interface(BT_PROFILE_PAN_ID);
+-	if (!pan) {
+-		tester_setup_failed();
+-		return;
+-	}
++	if (!pan)
++		return BT_STATUS_FAIL;
+ 
+ 	data->if_pan = pan;
+ 
+ 	status = data->if_pan->init(&btpan_callbacks);
+-	if (status != BT_STATUS_SUCCESS) {
++	if (status != BT_STATUS_SUCCESS)
+ 		data->if_pan = NULL;
+-		tester_setup_failed();
+-		return;
+-	}
+ 
+-	tester_setup_complete();
++	return status;
+ }
+ 
+-static void setup_hdp(const void *test_data)
++static int init_hdp(void)
+ {
+ 	struct test_data *data = tester_get_data();
+ 	bt_status_t status;
+ 	const void *hdp;
+ 
+-	if (!setup_base(data)) {
+-		tester_setup_failed();
+-		return;
+-	}
+-
+-	status = data->if_bluetooth->init(&bt_callbacks);
+-	if (status != BT_STATUS_SUCCESS) {
+-		data->if_bluetooth = NULL;
+-		tester_setup_failed();
+-		return;
+-	}
+-
+ 	hdp = data->if_bluetooth->get_profile_interface(BT_PROFILE_HEALTH_ID);
+-	if (!hdp) {
+-		tester_setup_failed();
+-		return;
+-	}
++	if (!hdp)
++		return BT_STATUS_FAIL;
+ 
+ 	data->if_hdp = hdp;
+ 
+ 	status = data->if_hdp->init(&bthl_callbacks);
+-	if (status != BT_STATUS_SUCCESS) {
++	if (status != BT_STATUS_SUCCESS)
+ 		data->if_hdp = NULL;
+-		tester_setup_failed();
+-		return;
+-	}
+ 
+-	tester_setup_complete();
++	return status;
+ }
+ 
+-static void setup_a2dp(const void *test_data)
++static int init_a2dp(void)
+ {
+ 	struct test_data *data = tester_get_data();
+ 	const bt_interface_t *if_bt;
+ 	bt_status_t status;
+ 	const void *a2dp;
+ 
+-	if (!setup_base(data)) {
+-		tester_setup_failed();
+-		return;
+-	}
+-
+ 	if_bt = data->if_bluetooth;
+ 
+-	status = if_bt->init(&bt_callbacks);
+-	if (status != BT_STATUS_SUCCESS) {
+-		data->if_bluetooth = NULL;
+-		tester_setup_failed();
+-		return;
+-	}
+-
+ 	a2dp = if_bt->get_profile_interface(BT_PROFILE_ADVANCED_AUDIO_ID);
+-	if (!a2dp) {
+-		tester_setup_failed();
+-		return;
+-	}
++	if (!a2dp)
++		return BT_STATUS_FAIL;
+ 
+ 	data->if_a2dp = a2dp;
+ 
+ 	status = data->if_a2dp->init(&bta2dp_callbacks);
+-	if (status != BT_STATUS_SUCCESS) {
++	if (status != BT_STATUS_SUCCESS)
+ 		data->if_a2dp = NULL;
+-		tester_setup_failed();
+-		return;
+-	}
+ 
+-	tester_setup_complete();
++	return status;
+ }
+ 
+-static void setup_avrcp(const void *test_data)
++static int init_avrcp(void)
+ {
+ 	struct test_data *data = tester_get_data();
+ 	const bt_interface_t *if_bt;
+ 	bt_status_t status;
+ 	const void *a2dp, *avrcp;
+ 
+-	if (!setup_base(data)) {
+-		tester_setup_failed();
+-		return;
+-	}
+-
+ 	if_bt = data->if_bluetooth;
+ 
+-	status = if_bt->init(&bt_callbacks);
+-	if (status != BT_STATUS_SUCCESS) {
+-		data->if_bluetooth = NULL;
+-		tester_setup_failed();
+-		return;
+-	}
+-
+ 	a2dp = if_bt->get_profile_interface(BT_PROFILE_ADVANCED_AUDIO_ID);
+ 	if (!a2dp) {
+-		tester_setup_failed();
+-		return;
++		return BT_STATUS_FAIL;
+ 	}
+ 
+ 	data->if_a2dp = a2dp;
+@@ -1564,63 +1471,39 @@ static void setup_avrcp(const void *test_data)
+ 	status = data->if_a2dp->init(&bta2dp_callbacks);
+ 	if (status != BT_STATUS_SUCCESS) {
+ 		data->if_a2dp = NULL;
+-		tester_setup_failed();
+-		return;
++		return status;
+ 	}
+ 
+ 	avrcp = if_bt->get_profile_interface(BT_PROFILE_AV_RC_ID);
+-	if (!a2dp) {
+-		tester_setup_failed();
+-		return;
+-	}
++	if (!a2dp)
++		return BT_STATUS_FAIL;
+ 
+ 	data->if_avrcp = avrcp;
+ 
+ 	status = data->if_avrcp->init(&btavrcp_callbacks);
+-	if (status != BT_STATUS_SUCCESS) {
++	if (status != BT_STATUS_SUCCESS)
+ 		data->if_avrcp = NULL;
+-		tester_setup_failed();
+-		return;
+-	}
+ 
+-	tester_setup_complete();
++	return status;
+ }
+ 
+-static void setup_gatt(const void *test_data)
++static int init_gatt(void)
+ {
+ 	struct test_data *data = tester_get_data();
+ 	bt_status_t status;
+ 	const void *gatt;
+ 
+-	if (!setup_base(data)) {
+-		tester_setup_failed();
+-		return;
+-	}
+-
+-	status = data->if_bluetooth->init(&bt_callbacks);
+-	if (status != BT_STATUS_SUCCESS) {
+-		data->if_bluetooth = NULL;
+-		tester_setup_failed();
+-		return;
+-	}
+-
+ 	gatt = data->if_bluetooth->get_profile_interface(BT_PROFILE_GATT_ID);
+-	if (!gatt) {
+-		tester_setup_failed();
+-		return;
+-	}
++	if (!gatt)
++		return BT_STATUS_FAIL;
+ 
+ 	data->if_gatt = gatt;
+ 
+ 	status = data->if_gatt->init(&btgatt_callbacks);
+-	if (status != BT_STATUS_SUCCESS) {
++	if (status != BT_STATUS_SUCCESS)
+ 		data->if_gatt = NULL;
+ 
+-		tester_setup_failed();
+-		return;
+-	}
+-
+-	tester_setup_complete();
++	return status;
+ }
+ 
+ static void teardown(const void *test_data)
+@@ -2174,7 +2057,7 @@ static void generic_test_function(const void *test_data)
+ 	first_step->action();
+ }
+ 
+-#define test(data, test_setup, test, test_teardown) \
++#define test(data, init, test, test_teardown) \
+ 	do { \
+ 		struct test_data *user; \
+ 		user = g_malloc0(sizeof(struct test_data)); \
+@@ -2182,8 +2065,9 @@ static void generic_test_function(const void *test_data)
+ 			break; \
+ 		user->hciemu_type = data->emu_type; \
+ 		user->test_data = data; \
++		user->init_routine = init; \
+ 		tester_add_full(data->title, data, test_pre_setup, \
+-					test_setup, test, test_teardown, \
++					setup_generic, test, test_teardown, \
+ 					test_post_teardown, 3, user, g_free); \
+ 	} while (0)
+ 
+@@ -2203,56 +2087,56 @@ static void add_bluetooth_tests(void *data, void *user_data)
+ {
+ 	struct test_case *tc = data;
+ 
+-	test(tc, setup, generic_test_function, teardown);
++	test(tc, NULL, generic_test_function, teardown);
+ }
+ 
+ static void add_socket_tests(void *data, void *user_data)
+ {
+ 	struct test_case *tc = data;
+ 
+-	test(tc, setup_socket, generic_test_function, teardown);
++	test(tc, init_socket, generic_test_function, teardown);
+ }
+ 
+ static void add_hidhost_tests(void *data, void *user_data)
+ {
+ 	struct test_case *tc = data;
+ 
+-	test(tc, setup_hidhost, generic_test_function, teardown);
++	test(tc, init_hidhost, generic_test_function, teardown);
+ }
+ 
+ static void add_pan_tests(void *data, void *user_data)
+ {
+ 	struct test_case *tc = data;
+ 
+-	test(tc, setup_pan, generic_test_function, teardown);
++	test(tc, init_pan, generic_test_function, teardown);
+ }
+ 
+ static void add_hdp_tests(void *data, void *user_data)
+ {
+ 	struct test_case *tc = data;
+ 
+-	test(tc, setup_hdp, generic_test_function, teardown);
++	test(tc, init_hdp, generic_test_function, teardown);
+ }
+ 
+ static void add_a2dp_tests(void *data, void *user_data)
+ {
+ 	struct test_case *tc = data;
+ 
+-	test(tc, setup_a2dp, generic_test_function, teardown);
++	test(tc, init_a2dp, generic_test_function, teardown);
+ }
+ 
+ static void add_avrcp_tests(void *data, void *user_data)
+ {
+ 	struct test_case *tc = data;
+ 
+-	test(tc, setup_avrcp, generic_test_function, teardown);
++	test(tc, init_avrcp, generic_test_function, teardown);
+ }
+ 
+ static void add_gatt_tests(void *data, void *user_data)
+ {
+ 	struct test_case *tc = data;
+ 
+-	test(tc, setup_gatt, generic_test_function, teardown);
++	test(tc, init_gatt, generic_test_function, teardown);
+ }
+ 
+ int main(int argc, char *argv[])
 diff --git a/android/tester-main.h b/android/tester-main.h
-index 8247c5a..f804f78 100644
+index 6cad803..8247c5a 100644
 --- a/android/tester-main.h
 +++ b/android/tester-main.h
-@@ -334,6 +334,8 @@ struct test_data {
- 	pid_t bluetoothd_pid;
+@@ -314,6 +314,7 @@ struct test_data {
+ 	struct hw_device_t *device;
+ 	struct hciemu *hciemu;
+ 	enum hciemu_type hciemu_type;
++	int (*init_routine)(void);
  
- 	struct queue *pdus;
-+
-+	pthread_t thread;
- };
- 
- /*
+ 	const bt_interface_t *if_bluetooth;
+ 	const btsock_interface_t *if_sock;
 -- 
 1.9.3
 
