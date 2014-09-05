@@ -3,37 +3,35 @@ From: gowtham babu <gowtham.ab@samsung.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: bharat.panda@samsung.com, p.sinha@samsung.com,
 	gowtham babu <gowtham.ab@samsung.com>
-Subject: [PATCH 1/3] tools/csr_usb : Fix Resource leak: file
-Date: Fri, 05 Sep 2014 20:05:44 +0530
-Message-id: <1409927744-6865-1-git-send-email-gowtham.ab@samsung.com>
+Subject: [PATCH 3/3] android/audio_utils/resampler : Fix the null pointer
+ dereference.
+Date: Fri, 05 Sep 2014 19:42:45 +0530
+Message-id: <1409926365-6436-1-git-send-email-gowtham.ab@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Handles resource leak.
-
-In the previous mail, I wrongly entered the PATCH subject prefix as [MAP]. This is the updated one. Sorry for the inconvenience caused if any.
+Checks for NULL.
 ---
- tools/csr_usb.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+ android/audio_utils/resampler.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
-diff --git a/tools/csr_usb.c b/tools/csr_usb.c
-index 5fb6bdc..a1d7324 100644
---- a/tools/csr_usb.c
-+++ b/tools/csr_usb.c
-@@ -80,9 +80,12 @@ static int read_value(const char *name, const char *attr, const char *format)
- 		return -1;
+diff --git a/android/audio_utils/resampler.c b/android/audio_utils/resampler.c
+index ce30375..f845e2c 100644
+--- a/android/audio_utils/resampler.c
++++ b/android/audio_utils/resampler.c
+@@ -50,8 +50,10 @@ static void resampler_reset(struct resampler_itfe *resampler)
+ {
+     struct resampler *rsmp = (struct resampler *)resampler;
  
- 	n = fscanf(file, format, &value);
--	if (n != 1)
-+	if (n != 1) {
-+		fclose(file);
- 		return -1;
-+	}
+-    rsmp->frames_in = 0;
+-    rsmp->frames_rq = 0;
++    if(rsmp != NULL) {
++	rsmp->frames_in = 0;
++	rsmp->frames_rq = 0;
++    }
  
-+	fclose(file);
- 	return value;
- }
- 
+     if (rsmp != NULL && rsmp->speex_resampler != NULL) {
+         speex_resampler_reset_mem(rsmp->speex_resampler);
 -- 
 1.9.1
 
