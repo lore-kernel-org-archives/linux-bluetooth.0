@@ -1,46 +1,87 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Gu, Chao Jie" <chao.jie.gu@intel.com>
-To: Arman Uguray <armansito@chromium.org>
-CC: Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz
-	<luiz.dentz@gmail.com>, "linux-bluetooth@vger.kernel.org"
-	<linux-bluetooth@vger.kernel.org>
-Subject: RE: [PATCH] gatt api V2
-Date: Fri, 5 Sep 2014 08:58:26 +0000
-Message-ID: <3D02B219753AD44CBDDDE484323B1774112F84B1@SHSMSX104.ccr.corp.intel.com>
-References: <1409295566-13583-1-git-send-email-chao.jie.gu@intel.com>
-	<CABBYNZLqDtSk8h0-+BruH6i_+YxRrmoR8srf+KsAhvLvEq51-w@mail.gmail.com>
-	<3D02B219753AD44CBDDDE484323B1774112F697D@SHSMSX104.ccr.corp.intel.com>
-	<CAHrH25ThNCf0wy29Me6Kh5e6YzMKLSiaNiUpU4qg_=HcwaHVCA@mail.gmail.com>
-	<3D02B219753AD44CBDDDE484323B1774112F6F57@SHSMSX104.ccr.corp.intel.com>
-	<7926AF24-265F-454D-A502-C3554072752E@holtmann.org>
-	<CAHrH25TvLZz+xS11UssE-xKx09UHX9w--Y7YoLdaOBx3LGHxaQ@mail.gmail.com>
-	<3D02B219753AD44CBDDDE484323B1774112F7F7A@SHSMSX104.ccr.corp.intel.com>
- <CAHrH25QHuLFhVcYFMnHfGH4g5SHRyW65-V6gZ5SyPYWGsELmMw@mail.gmail.com>
-In-Reply-To: <CAHrH25QHuLFhVcYFMnHfGH4g5SHRyW65-V6gZ5SyPYWGsELmMw@mail.gmail.com>
-Content-Type: text/plain; charset="utf-8"
+Date: Fri, 5 Sep 2014 11:44:53 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Bharat Panda <bharat.panda@samsung.com>
+Cc: linux-bluetooth@vger.kernel.org, cpgs@samsung.com
+Subject: Re: [PATCH ] GATT: Add support for Gatt multiple char write request
+Message-ID: <20140905084453.GA9598@t440s>
+References: <1408619604-26201-1-git-send-email-bharat.panda@samsung.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1408619604-26201-1-git-send-email-bharat.panda@samsung.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-SGkgYXJtYW4sDQoNCj4gTG9va3MgbGlrZSB0aGUgc3ViamVjdCB3YXM6ICJbUEFUQ0ggdjMgMS80
-XSBzcmMvc2hhcmVkL2F0dDogSW50cm9kdWNlIHN0cnVjdCBidF9hdHQuIg0KPiBXZSBiYXNpY2Fs
-bHkgdGFsa2VkIGFib3V0IHRoZSBuZWVkIGZvciBidF9hdHQgdG8gc29tZWhvdyBvYnRhaW4gdGhl
-IENTUksgKHRocm91Z2gNCj4gYnRfYXR0X25ldyBtYXliZT8pIGFuZCBpbnRlcm5hbGx5IGtlZXAg
-dGhlIGxvY2FsK3JlbW90ZSBzaWduIGNvdW50ZXJzIHRvIGJlIGFibGUNCj4gdG8gY2FsY3VsYXRl
-IHRoZSBhdXRoZW50aWNhdGlvbiBzaWduYXR1cmUuIEJhc2ljYWxseSwgdGhlIGF1dGhlbnRpY2F0
-aW9uIHNpZ25hdHVyZQ0KPiBzaG91bGQgZ2V0IGNhbGN1bGF0ZWQgYnkgYnRfYXR0IGdpdmVuIGFs
-bCB0aGUgZGF0YSB0aGF0IGl0IG5lZWRzLg0KDQpUaGUgMy1kYXlzIE1pZC1hdXR1bW4gZmVzdGl2
-YWwgaXMgcmlnaHQgYXJvdW5kIHRoZSBjb3JuZXIuIFNvIHRoZXJlIGlzIG5vIG11Y2ggdGltZSBs
-ZWZ0IHRvIGltcGxlbWVudCBpdC4NClNvIEkgaW52ZXN0aWdhdGUgdGhlIHNvdXJjZSBjb2RlLCB0
-aGVyZSBhcmUgc29tZSBkaWZmZXJlbmNlIGJldHdlZW4gb2xkIGF0dCBzdGFjayBhbmQgbmV3IHNo
-YXJlZC9hdHQgc3RhY2suDQpJbiB0aGUgb2xkIHN0YWNrLCBkb2luZyBlbmNvZGUvZGVjb2RlIFBE
-VSBzcGxpdCB3aXRoIHNlbmRpbmcgYXR0IHByb3RvY29sIGNvbW1hbmQgdG8gcmVtb3RlIGRldmlj
-ZS4gDQpIb3dldmVyLCBpbiB0aGUgbmV3IHN0YWNrICwgYnRfYXR0X3NlbmQgZG8gbW9yZSB0aGlu
-Z3MgdGhhbiBvbGQgZGlkIGluY2x1ZGluZyBlbmNvZGUgcGR1IHdpdGggb3Bjb2RlLiANCkJlY2F1
-c2UgQXR0IHBkdSBzaWduZWQgcHJvY2VzcyBpbmNsdWRlIHdob2xlIGRhdGEgcGR1LCBzbyBpbiBt
-eSBtaW5kLCBpZiB3ZSBrZWVwIGNvbnNpc3RlbnQgc3R5bGUgaW4gY29kZSwgDQp3ZSBoYXZlIHRv
-IGRvIHNpZ24gYXR0IHBkdSBpbiBidF9hdHRfc2VuZCBmdW5jdGlvbi4gV2UgaGF2ZSB0byBleHBh
-bmQgYnRfYXR0IHN0cnVjdCB0byBzdG9yZSBDU1JLIGFuZCANCnNvIG9uIHN0dWZmLiBTbyB0aGF0
-J3MgdGhlIG9ubHkgaW1wbGVtZW50YXRpb24gbWFrZSBzZW5zZSBmb3Igc2lnbmVkIHdyaXRlIGNv
-bW1hbmQuDQoNCkJUVywgY29tcGFyZWQgd2l0aCBzaWduaW5nIHRoZSBvdXRnb2luZywgdmVyaWZ5
-aW5nIGluY29taW5nIEFUVCBQRFVzIHdvdWxkIGJlIG1vcmUgY29tcGxleC4gSSBhbSBub3QNClN1
-cmUgd2hpY2ggZmlsZSB0byBpbXBsZW1lbnQgaXQuDQoNClRoYW5rcw0KQ2hhb2ppZQ0K
+Hi Bharat,
+
+On Thu, Aug 21, 2014, Bharat Panda wrote:
+> Changes made to handle gatt char multiple write request
+> 1. Changes made to handle gatt long char write request
+> 2. Cache/prepare and execute long char write request.
+> 3. Updates gatt attribute db using offset value.
+> 4. Proper offset and char length handling to fix below PTS test cases,
+> 
+> TP/GAW/SR/BV-06-C
+> TP/GAW/SR/BV-10-C
+> TP/GAW/SR/BV-09-C
+> TP/GAW/SR/BI-09-C
+> TP/GAW/SR/BI-14-C
+> TP/GAW/SR/BI-15-C
+> TP/GAW/SR/BV-05-C
+> TP/GAW/SR/BI-07-C
+> TP/GAW/SR/BV-07-C
+> TP/GAW/SR/BI-08-C
+> TP/GAW/SR/BI-25-C
+> TP/GAW/SR/BI-26-C
+> TP/GAW/SR/BI-27-C
+> ---
+>  src/attrib-server.c | 323 +++++++++++++++++++++++++++++++++++++++++++++++++++-
+>  src/attrib-server.h |   3 +
+>  2 files changed, 324 insertions(+), 2 deletions(-)
+
+First of all sorry for the delay in replying to this - you sent it just
+when I had started a two week vacation.
+
+> diff --git a/src/attrib-server.c b/src/attrib-server.c
+> index e65fff2..10a7923 100644
+> --- a/src/attrib-server.c
+> +++ b/src/attrib-server.c
+> @@ -85,6 +85,25 @@ struct group_elem {
+>  	uint16_t len;
+>  };
+>  
+> +struct local_db {
+> +	uint16_t handle;
+> +	uint8_t offset;
+> +	size_t len;
+> +	uint8_t *data;
+> +	struct local_db *next;
+> +};
+> +
+> +struct char_handle_len {
+> +	uint16_t handle;
+> +	size_t org_len;
+> +	struct char_handle_len *next;
+> +};
+> +
+> +struct char_handle_len *local_char_handle_len = NULL;
+> +struct char_handle_len *local_char_handle_len_head = NULL;
+> +struct local_db *local_prep_db = NULL;
+> +struct local_db *local_prep_db_head = NULL;
+
+Shouldn't these variables be part of gatt_channel instead of them being
+global like this? Otherwise we may have conflicts between multiple
+connections to different devices.
+
+Btw, what are your plans regarding our new ATT/GATT APIs in src/shared?
+Are you planning to provide patches to update these features to use the
+new API once we have the rest of the ATT server infrastructure in place?
+I'd like to avoid introducing too much new code for the old API since it
+will eventually need to be converted to the new one.
+
+In general, could you please read through the kernel CodingStyle
+document which is what we mostly follow. There are quite many violations
+in this patch. You'll also want to read the coding-style.txt and HACKING
+documents from Luiz that were just recently pushed to upstream bluez.git.
+
+Johan
