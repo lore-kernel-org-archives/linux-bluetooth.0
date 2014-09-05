@@ -1,28 +1,23 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 5 Sep 2014 23:31:46 +0300
+Date: Fri, 5 Sep 2014 23:22:30 +0300
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Marcin Kraglak <marcin.kraglak@tieto.com>
+To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] shared/tester: Change handling of tester_setup_failed
- event
-Message-ID: <20140905203146.GB31093@t440s.P-661HNU-F1>
-References: <1409650483-24403-1-git-send-email-marcin.kraglak@tieto.com>
+Subject: Re: [PATCH] tools/gatt: Fix accessing NULL cmd
+Message-ID: <20140905202230.GA31093@t440s.P-661HNU-F1>
+References: <1409925654-17136-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1409650483-24403-1-git-send-email-marcin.kraglak@tieto.com>
+In-Reply-To: <1409925654-17136-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcin,
+Hi Andrei,
 
-On Tue, Sep 02, 2014, Marcin Kraglak wrote:
-> If tester_setup_failed() was called, execute post_teardown() to clean
-> data created in pre_setup phase. In some cases android-tester
-> couldn't start daemon, and setup failed, but hciemu created in
-> pre_setup was not removed.
+On Fri, Sep 05, 2014, Andrei Emeltchenko wrote:
 > ---
->  src/shared/tester.c | 9 ++++++---
->  1 file changed, 6 insertions(+), 3 deletions(-)
+>  tools/btgatt-client.c | 4 ++++
+>  1 file changed, 4 insertions(+)
 
 Applied. Thanks.
 
