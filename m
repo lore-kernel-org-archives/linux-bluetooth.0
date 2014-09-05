@@ -1,295 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+From: Marcin Kraglak <marcin.kraglak@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 BlueZ 1/2] doc: Add initial documentation for coding style
-Date: Fri,  5 Sep 2014 11:24:12 +0300
-Message-Id: <1409905453-1555-1-git-send-email-luiz.dentz@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=y
+Subject: [PATCH 3/3] android/tester: Use default ssp handler in A2dp - Suspend test case
+Date: Fri,  5 Sep 2014 10:09:56 +0200
+Message-Id: <1409904596-10254-3-git-send-email-marcin.kraglak@tieto.com>
+In-Reply-To: <1409904596-10254-1-git-send-email-marcin.kraglak@tieto.com>
+References: <1409904596-10254-1-git-send-email-marcin.kraglak@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-
+Because ssp_handler was incorrectly overriden with default_ssp_req_cb
+in previous test case, this test case used it also. Now it is needed
+to define it for each test case where it should be used.
 ---
- doc/coding-style.txt | 268 +++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 268 insertions(+)
- create mode 100644 doc/coding-style.txt
+ android/tester-a2dp.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/doc/coding-style.txt b/doc/coding-style.txt
-new file mode 100644
-index 0000000..2ec98ee
---- /dev/null
-+++ b/doc/coding-style.txt
-@@ -0,0 +1,268 @@
-+﻿BlueZ coding style
-+******************
-+
-+Every project has its coding style, and BlueZ is not an exception. This
-+document describes the preferred coding style for BlueZ code, in order to keep
-+some level of consistency among developers so that code can be easily
-+understood and maintained.
-+
-+First of all, BlueZ coding style must follow every rule for Linux kernel
-+(http://www.kernel.org/doc/Documentation/CodingStyle). There also exists a tool
-+named checkpatch.pl to help you check the compliance with it. Just type
-+"checkpatch.pl --no-tree patch_name" to check your patch. In theory, you need
-+to clean up all the warnings and errors except this one: "ERROR: Missing
-+Signed-off-by: line(s)". BlueZ does not used Signed-Off lines, so including
-+them is actually an error.  In certain circumstances one can ignore the 80
-+character per line limit.  This is generally only allowed if the alternative
-+would make the code even less readable.
-+
-+Besides the kernel coding style above, BlueZ has special flavors for its own.
-+Some of them are mandatory (marked as 'M'), while some others are optional
-+(marked as 'O'), but generally preferred.
-+
-+M1: Blank line before and after an if/while/do/for statement
-+============================================================
-+
-+There should be a blank line before if statement unless the if is nested and
-+not preceded by an expression or variable declaration.
-+
-+Example:
-+1)
-+a = 1;
-+if (b) {  // wrong
-+
-+2)
-+a = 1
-+
-+if (b) {
-+}
-+a = 2;	// wrong
-+
-+3)
-+if (a) {
-+	if (b)  // correct
-+
-+4)
-+b = 2;
-+
-+if (a) {	// correct
-+
-+}
-+
-+b = 3;
-+
-+The only exception to this rule applies when a variable is being checked for
-+errors as such:
-+
-+err = stat(filename, &st);
-+if (err || !S_ISDIR(st.st_mode))
-+	return;
-+
-+M2: Multiple line comment
-+=========================
-+
-+If your comments have more then one line, please start it from the second line.
-+
-+Example:
-+/*
-+ * first line comment	// correct
-+ * ...
-+ * last line comment
-+ */
-+
-+
-+M3: Space before and after operator
-+===================================
-+
-+There should be a space before and after each operator.
-+
-+Example:
-+a + b;  // correct
-+
-+
-+M4: Wrap long lines
-+===================
-+
-+If your condition in if, while, for statement or a function declaration is too
-+long to fit in one line, the new line needs to be indented not aligned with the
-+body.
-+
-+Example:
-+1)
-+if ((adapter->supported_settings & MGMT_SETTING_SSP) &&
-+	!(adapter->current_settings & MGMT_SETTING_SSP)) // wrong
-+
-+2)
-+if ((adapter->supported_settings & MGMT_SETTING_SSP) &&
-+				!(adapter->current_settings & MGMT_SETTING_SSP))
-+
-+3)
-+void btd_adapter_register_pin_cb(struct btd_adapter *adapter,
-+				 btd_adapter_pin_cb_t cb) // wrong
-+
-+4)
-+void btd_adapter_register_pin_cb(struct btd_adapter *adapter,
-+							btd_adapter_pin_cb_t cb)
-+
-+The referred style for line wrapping is to indent as far as possible to the
-+right without hitting the 80 columns limit.
-+
-+M5: Space when doing type casting
-+=================================
-+
-+There should be a space between new type and variable.
-+
-+Example:
-+1)
-+a = (int *)b;  // wrong
-+2)
-+a = (int *) b;  // correct
-+
-+
-+M6: Don't initialize variable unnecessarily
-+===========================================
-+
-+When declaring a variable, try not to initialize it unless necessary.
-+
-+Example:
-+int i = 1;  // wrong
-+
-+for (i = 0; i < 3; i++) {
-+}
-+
-+M7: Follow the order of include header elements
-+===============================================
-+
-+When writing an include header the various elements should be in the following
-+order:
-+	- #includes
-+	- forward declarations
-+	- #defines
-+	- enums
-+	- typedefs
-+	- function declarations and inline function definitions
-+
-+M8: Internal headers must not use include guards
-+================================================
-+
-+Any time when creating a new header file with non-public API, that header
-+must not contain include guards.
-+
-+M9: Naming of enums
-+===================
-+
-+Enums must have a descriptive name.  The enum type should be small caps and
-+it should not be typedef-ed.  Enum contents should be in CAPITAL letters and
-+prefixed by the enum type name.
-+
-+Example:
-+
-+enum animal_type {
-+	ANIMAL_TYPE_FOUR_LEGS,
-+	ANIMAL_TYPE_EIGHT_LEGS,
-+	ANIMAL_TYPE_TWO_LEGS,
-+};
-+
-+If the enum contents have values (e.g. from specification) the formatting
-+should be as follows:
-+
-+enum animal_type {
-+	ANIMAL_TYPE_FOUR_LEGS =		4,
-+	ANIMAL_TYPE_EIGHT_LEGS =	8,
-+	ANIMAL_TYPE_TWO_LEGS =		2,
-+};
-+
-+M10: Enum as switch variable
-+============================
-+
-+If the variable of a switch is an enum, you must not include a default in
-+switch body. The reason for this is: If later on you modify the enum by adding
-+a new type, and forget to change the switch accordingly, the compiler will
-+complain the new added type hasn't been handled.
-+
-+Example:
-+
-+enum animal_type {
-+	ANIMAL_TYPE_FOUR_LEGS =		4,
-+	ANIMAL_TYPE_EIGHT_LEGS =	8,
-+	ANIMAL_TYPE_TWO_LEGS =		2,
-+};
-+
-+enum animal_type t;
-+
-+switch (t) {
-+case ANIMAL_TYPE_FOUR_LEGS:
-+	...
-+	break;
-+case ANIMAL_TYPE_EIGHT_LEGS:
-+	...
-+	break;
-+case ANIMAL_TYPE_TWO_LEGS:
-+	...
-+	break;
-+default:  // wrong
-+	break;
-+}
-+
-+However if the enum comes from an external header file outside BlueZ, such as
-+Android headers, we cannot make any assumption of how the enum is defined and
-+this rule might not apply.
-+
-+
-+M11: Always use parenthesis with sizeof
-+=======================================
-+
-+The expression argument to the sizeof operator should always be in
-+parenthesis, too.
-+
-+Example:
-+1)
-+memset(stuff, 0, sizeof(*stuff));
-+
-+2)
-+memset(stuff, 0, sizeof *stuff); // Wrong
-+
-+M12: Use void if function has no parameters
-+===========================================
-+
-+A function with no parameters must use void in the parameter list.
-+
-+Example:
-+1)
-+void foo(void)
-+{
-+}
-+
-+2)
-+void foo()	// Wrong
-+{
-+}
-+
-+O1: Try to avoid complex if body
-+================================
-+
-+It's better not to have a complicated statement for if. You may judge its
-+contrary condition and return | break | continue | goto ASAP.
-+
-+Example:
-+1)
-+if (device) {  // worse
-+	memset(&eir_data, 0, sizeof(eir_data));
-+	if (eir_len > 0)
-+		eir_parse(&eir_data, ev->eir, eir_len);
-+	...
-+} else {
-+	error("Unable to get device object for %s", addr);
-+	return;
-+}
-+
-+2)
-+if (!device) {
-+	error("Unable to get device object for %s", addr);
-+	return;
-+}
-+
-+memset(&eir_data, 0, sizeof(eir_data));
-+if (eir_len > 0)
-+	eir_parse(&eir_data, ev->eir, eir_len);
-+...
+diff --git a/android/tester-a2dp.c b/android/tester-a2dp.c
+index 6d4043b..1b2a8ce 100644
+--- a/android/tester-a2dp.c
++++ b/android/tester-a2dp.c
+@@ -243,6 +243,7 @@ static struct test_case test_cases[] = {
+ 		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_OFF),
+ 	),
+ 	TEST_CASE_BREDRLE("A2DP Suspend - Success",
++		ACTION_SUCCESS(set_default_ssp_request_handler, NULL),
+ 		ACTION_SUCCESS(bluetooth_enable_action, NULL),
+ 		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_ON),
+ 		ACTION_SUCCESS(emu_setup_powered_remote_action, NULL),
 -- 
-1.9.3
+1.9.0
 
