@@ -1,54 +1,88 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.6\))
-Subject: Re: [PATCH BlueZ 00/10] shared/gatt-client: Move GATT read/write functions.
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1409773571-28417-1-git-send-email-armansito@chromium.org>
-Date: Thu, 4 Sep 2014 20:39:57 -0700
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <6B3A313D-0C38-445D-82ED-4B75CB18DE76@holtmann.org>
-References: <1409773571-28417-1-git-send-email-armansito@chromium.org>
-To: Arman Uguray <armansito@chromium.org>
-Sender: linux-bluetooth-owner@vger.kernel.org
+From: =?utf-8?B?6ZmI6Imz6JCN?= <champion_chen@realsil.com.cn>
+To: Larry Finger <Larry.Finger@lwfinger.net>,
+        Daniel Drake
+	<drake@endlessm.com>
+CC: Marcel Holtmann <marcel@holtmann.org>,
+        "Gustavo F. Padovan"
+	<gustavo@padovan.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        "Linux
+ Bluetooth mailing list" <linux-bluetooth@vger.kernel.org>,
+        =?utf-8?B?6K645Yev5Yev?= <kyle_xu@realsil.com.cn>
+Subject: =?utf-8?B?562U5aSNOiDnrZTlpI06IOetlOWkjTogW1BBVENIIHYyXSBCbHVldG9vdGg6?==?utf-8?Q?_btusb:_Add_Realtek_8723/8761_support?=
+Date: Fri, 5 Sep 2014 03:30:27 +0000
+Message-ID: <54F70642BAB21D4498E1AA3EFE3D519A460112CB@rsex2.realsil.com.cn>
+References: <1404218878-14218-1-git-send-email-drake@endlessm.com>
+	<16AC594D-6B3C-4CB6-B951-0763F3E4E27A@holtmann.org>
+	<CAD8Lp45HbA03MycDVu6akTfEET_ZzxrwGpH1TbiQrw5Z178aeA@mail.gmail.com>
+	<53B2D160.4010306@lwfinger.net>
+	<F9E90F3A-5FE4-407C-833A-5E852A260984@holtmann.org>
+	<54F70642BAB21D4498E1AA3EFE3D519A45FBED07@rsex2.realsil.com.cn>
+	<B6A2794A-32D2-4D66-9D61-A27D7DA247B1@holtmann.org>
+	<54F70642BAB21D4498E1AA3EFE3D519A45FBF299@rsex2.realsil.com.cn>
+ <CAD8Lp44-=9RNWf2tfmCL14dWJRiZhGCtj042TprR7Q3m9hbNzA@mail.gmail.com>
+ <54F70642BAB21D4498E1AA3EFE3D519A46010A1B@rsex2.realsil.com.cn>
+ <54089665.1040302@lwfinger.net>
+In-Reply-To: <54089665.1040302@lwfinger.net>
+Content-Type: multipart/mixed;
+	boundary="_002_54F70642BAB21D4498E1AA3EFE3D519A460112CBrsex2realsilcom_"
+MIME-Version: 1.0
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Arman,
+--_002_54F70642BAB21D4498E1AA3EFE3D519A460112CBrsex2realsilcom_
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 
-> This patch set moves GATT read/write functions from shared/gatt-helpers to
-> shared/gatt-client. The following new functions are now available:
-> 
->  bt_gatt_client_read_value
->  bt_gatt_client_read_long_value
->  bt_gatt_client_write_without_response
->  bt_gatt_client_write_value
->  bt_gatt_client_write_long_value
-> 
-> This patch set also adds new commands to tools/btgatt-client which map to the
-> functions above.
-> 
-> Arman Uguray (10):
->  shared/gatt-client: Added bt_gatt_client_read_value.
->  shared/gatt-client: Added bt_gatt_client_read_long_value.
->  shared/gatt-client: Added simple write operations.
->  shared/gatt-client: Added bt_gatt_client_write_long_value.
->  TODO: GATT read/write functions moved to shared/gatt-client.
->  tools/btgatt-client: Added the "read-value" command.
->  tools/btgatt-client: Added the "read-long-value" command.
->  tools/btgatt-client: Added the "write-value" command.
->  tools/btgatt-client: Added the "write-long-value" command.
->  TODO: tools/btgatt-client introduced
-> 
-> TODO                      |  13 -
-> src/shared/gatt-client.c  | 774 ++++++++++++++++++++++++++++++++++++++++++++--
-> src/shared/gatt-client.h  |  36 +++
-> src/shared/gatt-helpers.c | 625 -------------------------------------
-> src/shared/gatt-helpers.h |  30 --
-> tools/btgatt-client.c     | 396 +++++++++++++++++++++++-
-> 6 files changed, 1160 insertions(+), 714 deletions(-)
+SGkgTGFycnnvvIwNCglXZSBmb3VuZCB0aGVyZSB3YXMgY2hhbmNlIHN1c3BlbmQgZmFpbGVkIGlu
+IHNvbWUgcGxhdGZvcm0uDQpUaGlzIGlzIGJlY2F1c2UgYnR1c2Jfc3VzcGVuZD09PiBidHVzYl9z
+dG9wX3RyYWZmaWMgPT0+IHVzYl9raWxsX2FuY2hvcmVkX3VyYnMsDQoNCmJ0dXNiX2J1bGtfY29t
+cGxldGUgc29tZXRpbWVzIHJldHVybnMgYmVmb3JlIHN5c3RlbSBzdXNwZW5kIGFuZCByZXN1Ym1p
+dCBhbiB1cmIsIHRoaXMgd2lsbCBhdm9pZCBzeXN0ZW0gZW50ZXIgc3VzcGVuZCBzdGF0ZS4NCkkg
+ZG9uJ3Qga25vdyB3aGV0aGVyIHRoaXMgaXMgdGhlIHBsYXRmb3JtIGlzc3VlLCB0aGVyZSBpcyBh
+IG1ldGhvZCB0byBmaXggdGhpcyBieSBhdHRhY2hlZCBmaWxlLiANCg0KDQpDaGFtcGlvbg0KRXh0
+OjYzMjUNCg0KLS0tLS3pgq7ku7bljp/ku7YtLS0tLQ0K5Y+R5Lu25Lq6OiBMYXJyeSBGaW5nZXIg
+W21haWx0bzpsYXJyeS5maW5nZXJAZ21haWwuY29tXSDku6PooaggTGFycnkgRmluZ2VyDQrlj5Hp
+gIHml7bpl7Q6IDIwMTTlubQ55pyINeaXpSAwOjQyDQrmlLbku7bkuro6IOmZiOiJs+iQjTsgRGFu
+aWVsIERyYWtlDQrmioTpgIE6IE1hcmNlbCBIb2x0bWFubjsgR3VzdGF2byBGLiBQYWRvdmFuOyBK
+b2hhbiBIZWRiZXJnOyBMaW51eCBCbHVldG9vdGggbWFpbGluZyBsaXN0OyDorrjlh6/lh68NCuS4
+u+mimDogUmU6IOetlOWkjTog562U5aSNOiBbUEFUQ0ggdjJdIEJsdWV0b290aDogYnR1c2I6IEFk
+ZCBSZWFsdGVrIDg3MjMvODc2MSBzdXBwb3J0DQoNCk9uIDA5LzAzLzIwMTQgMTA6MzQgUE0sIOmZ
+iOiJs+iQjSB3cm90ZToNCj4gSGkgRGFuaWVsLA0KPiAJQXR0YWNoZWQgZmlsZSBpcyBidHVzYiBk
+cml2ZXIgYWRkIHJlYWx0ZWsgQmx1ZXRvb3RoIHN1cHBvcnQgd2l0aCBmaXJtd2FyZSwgd2UgaGF2
+ZSB0ZXN0ZWQgdW5kZXIgVWJ1bnR1IDE0LjA0Lg0KDQpDaGFtcGlvbiwNCg0KVGhhbmtzIGZvciB0
+aGUgbmV3IGRyaXZlci4gSSBwdXNoZWQgdGhlIG5ldyBjb2RlIHRvIGh0dHA6Ly9naXRodWIuY29t
+L2x3ZmluZ2VyL3J0bDg3MjNhdV9idC9uZXcuIFVzaW5nIGl0LCBJIHdhcyBhYmxlIHRvIGNvbm5l
+Y3QgdG8gYSBCVCBtb3VzZSB1c2luZyBhbiBSVEw4NzIzQUUgbW9kdWxlLg0KDQpZb3VyIHZlcnNp
+b24gaGFkIGEgZmV3IGNvbXBpbGF0aW9uIHdhcm5pbmdzLCBzb21lIG9mIHdoaWNoIHdlcmUgZHVl
+IHRvIHVzaW5nIGEgNjQtYml0IHN5c3RlbS4gQSBwYXRjaCBmaWxlIHRvIGZpeCB0aG9zZSBpcyBh
+dHRhY2hlZC4NCg0KT25lIG90aGVyIHByb2JsZW0gaXMgdGhhdCB0aGUgcmFyIGZpbGUgY29udGFp
+bnMgYSBmaWxlIG5hbWVkIHJsdDg3MjNhX2Z3LiBJIGFtIHN1cmUgdGhhdCB5b3Ugc2hvdWxkIHJl
+bmFtZSB0aGF0IHRvIHJ0bDg3MjNhX2Z3Lg0KDQpMYXJyeQ0KDQoNCg==
 
-all 10 patches have been applied.
+--_002_54F70642BAB21D4498E1AA3EFE3D519A460112CBrsex2realsilcom_
+Content-Type: application/octet-stream; name="complete.patch"
+Content-Description: complete.patch
+Content-Disposition: attachment; filename="complete.patch"; size=865;
+	creation-date="Fri, 05 Sep 2014 02:23:50 GMT";
+	modification-date="Fri, 05 Sep 2014 02:23:08 GMT"
+Content-Transfer-Encoding: base64
 
-Regards
+LS0tIGJ0dXNiLmMuYmFrCTIwMTQtMDktMDUgMDk6NTE6MjYuNjg4ODQyODAwICswODAwCisrKyBi
+dHVzYi5jCTIwMTQtMDktMDUgMTA6MTg6NDAuNDE4NDQyODAwICswODAwCkBAIC0zODAsNyArMzgw
+LDExIEBAIHN0YXRpYyB2b2lkIGJ0dXNiX2ludHJfY29tcGxldGUoc3RydWN0IHUKIAkJCWhkZXYt
+PnN0YXQuZXJyX3J4Kys7CiAJCX0KIAl9Ci0KKwkvKiBBdm9pZCBzdXNwZW5kIGZhaWxlZCB3aGVu
+IHVzYl9raWxsX3VyYiAqLworCWVsc2UgaWYodXJiLT5zdGF0dXMgPT0gLUVOT0VOVCkJeworCQly
+ZXR1cm47CisJfQorCQogCWlmICghdGVzdF9iaXQoQlRVU0JfSU5UUl9SVU5OSU5HLCAmZGF0YS0+
+ZmxhZ3MpKQogCQlyZXR1cm47CiAKQEAgLTQ2OCw3ICs0NzIsMTEgQEAgc3RhdGljIHZvaWQgYnR1
+c2JfYnVsa19jb21wbGV0ZShzdHJ1Y3QgdQogCQkJaGRldi0+c3RhdC5lcnJfcngrKzsKIAkJfQog
+CX0KLQorCS8qIEF2b2lkIHN1c3BlbmQgZmFpbGVkIHdoZW4gdXNiX2tpbGxfdXJiICovCisJZWxz
+ZSBpZih1cmItPnN0YXR1cyA9PSAtRU5PRU5UKQl7CisJCXJldHVybjsKKwl9CisJCiAJaWYgKCF0
+ZXN0X2JpdChCVFVTQl9CVUxLX1JVTk5JTkcsICZkYXRhLT5mbGFncykpCiAJCXJldHVybjsKIApA
+QCAtNTYyLDYgKzU3MCwxMCBAQCBzdGF0aWMgdm9pZCBidHVzYl9pc29jX2NvbXBsZXRlKHN0cnVj
+dCB1CiAJCQl9CiAJCX0KIAl9CisJLyogQXZvaWQgc3VzcGVuZCBmYWlsZWQgd2hlbiB1c2Jfa2ls
+bF91cmIgKi8KKwllbHNlIGlmKHVyYi0+c3RhdHVzID09IC1FTk9FTlQpCXsKKwkJcmV0dXJuOwor
+CX0KIAogCWlmICghdGVzdF9iaXQoQlRVU0JfSVNPQ19SVU5OSU5HLCAmZGF0YS0+ZmxhZ3MpKQog
+CQlyZXR1cm47Cg==
 
-Marcel
-
+--_002_54F70642BAB21D4498E1AA3EFE3D519A460112CBrsex2realsilcom_--
