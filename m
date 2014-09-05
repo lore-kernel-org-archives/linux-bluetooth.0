@@ -1,438 +1,284 @@
 Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Marcin Kraglak <marcin.kraglak@tieto.com>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCH 1/3] android/tester: Init profiles in separate thread
-Date: Fri, 05 Sep 2014 13:30:02 +0200
-Message-ID: <3055306.0vU7R7HGBv@uw000953>
-In-Reply-To: <CABBYNZK6zPjV=ba19Ja6zJW0aNkqB9MAPivbtLJi7oOmPOqXVw@mail.gmail.com>
-References: <1409904596-10254-1-git-send-email-marcin.kraglak@tieto.com> <12480623.xF9C9qG3Tj@uw000953> <CABBYNZK6zPjV=ba19Ja6zJW0aNkqB9MAPivbtLJi7oOmPOqXVw@mail.gmail.com>
+To: johan.hedberg@gmail.com
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 5/7] Bluetooth: Fix locking of the SMP context
+Date: Fri, 05 Sep 2014 13:20:55 +0200
+Message-ID: <8600588.nst1WmC3R5@uw000953>
+In-Reply-To: <1409914266-21624-6-git-send-email-johan.hedberg@gmail.com>
+References: <1409914266-21624-1-git-send-email-johan.hedberg@gmail.com> <1409914266-21624-6-git-send-email-johan.hedberg@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+Hi Johan,
 
-On Friday 05 of September 2014 14:19:48 Luiz Augusto von Dentz wrote:
-> Hi Szymon,
+On Friday 05 of September 2014 13:51:04 johan.hedberg@gmail.com wrote:
+> From: Johan Hedberg <johan.hedberg@intel.com>
 > 
-> On Fri, Sep 5, 2014 at 12:50 PM, Szymon Janc <szymon.janc@tieto.com> wrote:
-> > Hi Marcin,
-> >
-> > On Friday 05 of September 2014 10:09:54 Marcin Kraglak wrote:
-> >> This is needed to not block mainloop while initializing stack.
-> >> In some cases, bluetooth->init blocks mainloop and bluetoothd
-> >> cannot properly initialize controller, because HCI frames are
-> >> not serviced in hciemu.
-> >> Because pthread_join() is blocking, it is added to mainloop
-> >> from thread right before pthread_exit() is called. Therefore
-> >> this time is extremely short.
-> >> ---
-> >>  android/tester-main.c | 230 +++++++++++++++++++++++++++-----------------------
-> >>  android/tester-main.h |   2 +
-> >>  2 files changed, 127 insertions(+), 105 deletions(-)
-> >>
-> >> diff --git a/android/tester-main.c b/android/tester-main.c
-> >> index f5f46fb..ce13bf7 100644
-> >> --- a/android/tester-main.c
-> >> +++ b/android/tester-main.c
-> >> @@ -15,8 +15,10 @@
-> >>   *
-> >>   */
-> >>  #include <stdbool.h>
-> >> +#include <pthread.h>
-> >>
-> >>  #include "emulator/bthost.h"
-> >> +#include "src/shared/util.h"
-> >>  #include "tester-main.h"
-> >>
-> >>  #include "monitor/bt.h"
-> >> @@ -1332,237 +1334,255 @@ static bool setup_base(struct test_data *data)
-> >>       return true;
-> >>  }
-> >>
-> >> -static void setup(const void *test_data)
-> >> +static int init_bluetooth(void)
-> >>  {
-> >>       struct test_data *data = tester_get_data();
-> >> -     bt_status_t status;
-> >> -
-> >> -     if (!setup_base(data)) {
-> >> -             tester_setup_failed();
-> >> -             return;
-> >> -     }
-> >> -
-> >> -     status = data->if_bluetooth->init(&bt_callbacks);
-> >> -     if (status != BT_STATUS_SUCCESS) {
-> >> -             data->if_bluetooth = NULL;
-> >> -             tester_setup_failed();
-> >> -             return;
-> >> -     }
-> >>
-> >> -     tester_setup_complete();
-> >> +     return data->if_bluetooth->init(&bt_callbacks);
-> >>  }
-> >>
-> >> -static void setup_socket(const void *test_data)
-> >> +static int init_socket(void)
-> >>  {
-> >>       struct test_data *data = tester_get_data();
-> >> -     bt_status_t status;
-> >>       const void *sock;
-> >> -
-> >> -     if (!setup_base(data)) {
-> >> -             tester_setup_failed();
-> >> -             return;
-> >> -     }
-> >> +     int status;
-> >>
-> >>       status = data->if_bluetooth->init(&bt_callbacks);
-> >>       if (status != BT_STATUS_SUCCESS) {
-> >>               data->if_bluetooth = NULL;
-> >> -             tester_setup_failed();
-> >> -             return;
-> >> +             return status;
-> >>       }
-> >>
-> >>       sock = data->if_bluetooth->get_profile_interface(BT_PROFILE_SOCKETS_ID);
-> >> -     if (!sock) {
-> >> -             tester_setup_failed();
-> >> -             return;
-> >> -     }
-> >> +     if (!sock)
-> >> +             return BT_STATUS_FAIL;
-> >>
-> >>       data->if_sock = sock;
-> >>
-> >> -     tester_setup_complete();
-> >> +     return BT_STATUS_SUCCESS;
-> >>  }
-> >>
-> >> -static void setup_hidhost(const void *test_data)
-> >> +static int init_hidhost(void)
-> >>  {
-> >>       struct test_data *data = tester_get_data();
-> >>       bt_status_t status;
-> >>       const void *hid;
-> >>
-> >> -     if (!setup_base(data)) {
-> >> -             tester_setup_failed();
-> >> -             return;
-> >> -     }
-> >> -
-> >>       status = data->if_bluetooth->init(&bt_callbacks);
-> >>       if (status != BT_STATUS_SUCCESS) {
-> >>               data->if_bluetooth = NULL;
-> >>               tester_setup_failed();
-> >> -             return;
-> >> +             return status;
-> >>       }
-> >>
-> >>       hid = data->if_bluetooth->get_profile_interface(BT_PROFILE_HIDHOST_ID);
-> >>       if (!hid) {
-> >>               tester_setup_failed();
-> >> -             return;
-> >> +             return BT_STATUS_FAIL;
-> >>       }
-> >>
-> >>       data->if_hid = hid;
-> >>
-> >>       status = data->if_hid->init(&bthh_callbacks);
-> >> -     if (status != BT_STATUS_SUCCESS) {
-> >> +     if (status != BT_STATUS_SUCCESS)
-> >>               data->if_hid = NULL;
-> >> -             tester_setup_failed();
-> >> -             return;
-> >> -     }
-> >>
-> >> -     tester_setup_complete();
-> >> +     return status;
-> >>  }
-> >>
-> >> -static void setup_pan(const void *test_data)
-> >> +static int init_pan(void)
-> >>  {
-> >>       struct test_data *data = tester_get_data();
-> >>       bt_status_t status;
-> >>       const void *pan;
-> >>
-> >> -     if (!setup_base(data)) {
-> >> -             tester_setup_failed();
-> >> -             return;
-> >> -     }
-> >> -
-> >>       status = data->if_bluetooth->init(&bt_callbacks);
-> >>       if (status != BT_STATUS_SUCCESS) {
-> >>               data->if_bluetooth = NULL;
-> >> -             tester_setup_failed();
-> >> -             return;
-> >> +             return status;
-> >>       }
-> >>
-> >>       pan = data->if_bluetooth->get_profile_interface(BT_PROFILE_PAN_ID);
-> >>       if (!pan) {
-> >> -             tester_setup_failed();
-> >> -             return;
-> >> +             return BT_STATUS_FAIL;
-> >>       }
-> >>
-> >>       data->if_pan = pan;
-> >>
-> >>       status = data->if_pan->init(&btpan_callbacks);
-> >> -     if (status != BT_STATUS_SUCCESS) {
-> >> +     if (status != BT_STATUS_SUCCESS)
-> >>               data->if_pan = NULL;
-> >> -             tester_setup_failed();
-> >> -             return;
-> >> -     }
-> >>
-> >> -     tester_setup_complete();
-> >> +     return status;
-> >>  }
-> >>
-> >> -static void setup_hdp(const void *test_data)
-> >> +static int init_hdp(void)
-> >>  {
-> >>       struct test_data *data = tester_get_data();
-> >>       bt_status_t status;
-> >>       const void *hdp;
-> >>
-> >> -     if (!setup_base(data)) {
-> >> -             tester_setup_failed();
-> >> -             return;
-> >> -     }
-> >> -
-> >>       status = data->if_bluetooth->init(&bt_callbacks);
-> >>       if (status != BT_STATUS_SUCCESS) {
-> >>               data->if_bluetooth = NULL;
-> >> -             tester_setup_failed();
-> >> -             return;
-> >> +             return status;
-> >>       }
-> >>
-> >>       hdp = data->if_bluetooth->get_profile_interface(BT_PROFILE_HEALTH_ID);
-> >> -     if (!hdp) {
-> >> -             tester_setup_failed();
-> >> -             return;
-> >> -     }
-> >> +     if (!hdp)
-> >> +             return BT_STATUS_FAIL;
-> >>
-> >>       data->if_hdp = hdp;
-> >>
-> >>       status = data->if_hdp->init(&bthl_callbacks);
-> >> -     if (status != BT_STATUS_SUCCESS) {
-> >> +     if (status != BT_STATUS_SUCCESS)
-> >>               data->if_hdp = NULL;
-> >> -             tester_setup_failed();
-> >> -             return;
-> >> -     }
-> >>
-> >> -     tester_setup_complete();
-> >> +     return status;
-> >>  }
-> >>
-> >> -static void setup_a2dp(const void *test_data)
-> >> +static int init_a2dp(void)
-> >>  {
-> >>       struct test_data *data = tester_get_data();
-> >>       const bt_interface_t *if_bt;
-> >>       bt_status_t status;
-> >>       const void *a2dp;
-> >>
-> >> -     if (!setup_base(data)) {
-> >> -             tester_setup_failed();
-> >> -             return;
-> >> -     }
-> >> -
-> >>       if_bt = data->if_bluetooth;
-> >>
-> >>       status = if_bt->init(&bt_callbacks);
-> >>       if (status != BT_STATUS_SUCCESS) {
-> >>               data->if_bluetooth = NULL;
-> >> -             tester_setup_failed();
-> >> -             return;
-> >> +             return status;
-> >>       }
-> >>
-> >>       a2dp = if_bt->get_profile_interface(BT_PROFILE_ADVANCED_AUDIO_ID);
-> >> -     if (!a2dp) {
-> >> -             tester_setup_failed();
-> >> -             return;
-> >> -     }
-> >> +     if (!a2dp)
-> >> +             return  BT_STATUS_FAIL;
-> >>
-> >>       data->if_a2dp = a2dp;
-> >>
-> >>       status = data->if_a2dp->init(&bta2dp_callbacks);
-> >> -     if (status != BT_STATUS_SUCCESS) {
-> >> +     if (status != BT_STATUS_SUCCESS)
-> >>               data->if_a2dp = NULL;
-> >> -             tester_setup_failed();
-> >> -             return;
-> >> -     }
-> >>
-> >> -     tester_setup_complete();
-> >> +     return status;
-> >>  }
-> >>
-> >> -static void setup_gatt(const void *test_data)
-> >> +static int init_gatt(void)
-> >>  {
-> >>       struct test_data *data = tester_get_data();
-> >>       bt_status_t status;
-> >>       const void *gatt;
-> >>
-> >> -     if (!setup_base(data)) {
-> >> -             tester_setup_failed();
-> >> -             return;
-> >> -     }
-> >> -
-> >>       status = data->if_bluetooth->init(&bt_callbacks);
-> >>       if (status != BT_STATUS_SUCCESS) {
-> >>               data->if_bluetooth = NULL;
-> >> -             tester_setup_failed();
-> >> -             return;
-> >> +             return status;
-> >>       }
-> >>
-> >>       gatt = data->if_bluetooth->get_profile_interface(BT_PROFILE_GATT_ID);
-> >> -     if (!gatt) {
-> >> -             tester_setup_failed();
-> >> -             return;
-> >> -     }
-> >> +     if (!gatt)
-> >> +             return BT_STATUS_FAIL;
-> >>
-> >>       data->if_gatt = gatt;
-> >>
-> >>       status = data->if_gatt->init(&btgatt_callbacks);
-> >> -     if (status != BT_STATUS_SUCCESS) {
-> >> +     if (status != BT_STATUS_SUCCESS)
-> >>               data->if_gatt = NULL;
-> >>
-> >> +     return status;
-> >> +}
-> >> +
-> >> +static gboolean join_init_thread(gpointer user_data)
-> >> +{
-> >> +     struct test_data *data = tester_get_data();
-> >> +     int status;
-> >> +
-> >> +     /* Note that pthread_join is blocking mainloop,
-> >> +      * therefore thread we want to join must
-> >> +      * exit imediatelly. This is done in init_thread()*/
-> >> +     status = pthread_join(data->thread, NULL);
-> >> +     if (status != 0)
-> >> +             tester_warn("Failed to join init thread, status %d", status);
-> >> +
-> >> +     if (PTR_TO_INT(user_data) == BT_STATUS_SUCCESS)
-> >> +             tester_setup_complete();
-> >> +     else
-> >> +             tester_setup_failed();
-> >> +
-> >> +     return FALSE;
-> >> +}
-> >> +
-> >> +static void *init_thread(void *user_data)
-> >> +{
-> >> +     int (*setup_func)(void) = user_data;
-> >> +     int status;
-> >> +
-> >> +     status = setup_func();
-> >> +
-> >> +     g_idle_add(join_init_thread, INT_TO_PTR(status));
-> >> +
-> >> +     pthread_exit(NULL);
-> >> +}
-> >> +
-> >> +static bool start_init_thread(int (*init)(void))
-> >> +{
-> >> +     struct test_data *data = tester_get_data();
-> >> +
-> >> +     if (pthread_create(&data->thread, NULL, init_thread, init) != 0)
-> >> +             return false;
-> >> +
-> >> +     return true;
-> >> +}
-> >> +
-> >> +static void setup_generic(int (*setup)(void))
-> >> +{
-> >> +     struct test_data *data = tester_get_data();
-> >> +
-> >> +     if (!setup_base(data)) {
-> >>               tester_setup_failed();
-> >>               return;
-> >>       }
-> >>
-> >> -     tester_setup_complete();
-> >> +     if (!start_init_thread(setup))
-> >> +             tester_setup_failed();
-> >> +}
-> >> +
-> >> +static void setup(const void *test_data)
-> >> +{
-> >> +     setup_generic(init_bluetooth);
-> >> +}
-> >> +
-> >> +static void setup_socket(const void *test_data)
-> >> +{
-> >> +
-> >> +     setup_generic(init_socket);
-> >> +}
-> >> +
-> >> +static void setup_hidhost(const void *test_data)
-> >> +{
-> >> +     setup_generic(init_hidhost);
-> >> +}
-> >> +
-> >> +static void setup_pan(const void *test_data)
-> >> +{
-> >> +     setup_generic(init_pan);
-> >> +}
-> >> +
-> >> +static void setup_hdp(const void *test_data)
-> >> +{
-> >> +     setup_generic(init_hdp);
-> >> +}
-> >> +
-> >> +static void setup_a2dp(const void *test_data)
-> >> +{
-> >> +     setup_generic(init_a2dp);
-> >> +}
-> >> +
-> >> +static void setup_gatt(const void *test_data)
-> >> +{
-> >> +     setup_generic(init_gatt);
-> >>  }
-> >>
-> >>  static void teardown(const void *test_data)
-> >> diff --git a/android/tester-main.h b/android/tester-main.h
-> >> index 46aacce..f90cf86 100644
-> >> --- a/android/tester-main.h
-> >> +++ b/android/tester-main.h
-> >> @@ -331,6 +331,8 @@ struct test_data {
-> >>       pid_t bluetoothd_pid;
-> >>
-> >>       struct queue *pdus;
-> >> +
-> >> +     pthread_t thread;
-> >>  };
-> >>
-> >>  /*
-> >>
-> >
-> > I've applied patches 2 and 3. Patch 1 needs to be modified as we discussed
-> > offline. Thanks.
+> Before the move the l2cap_chan the SMP context (smp_chan) didn't have
+> any kind of proper locking. The best there existed was the
+> HCI_CONN_LE_SMP_PEND flag which was used to enable mutual exclusion for
+> potential multiple creators of the SMP context.
 > 
-> We used to fork bluetoothd when bringing up the interface with ioctl,
-> so I guess we could for here as well just to initialize.
+> Now that SMP has been converted to use the l2cap_chan infrastructure and
+> since the SMP context is directly mapped to a corresponding l2cap_chan
+> we get the SMP context locking essentially for free through the
+> l2cap_chan lock. For all callbacks that l2cap_core.c makes for each
+> channel implementation (smp.c in the case of SMP) the l2cap_chan lock is
+> held through l2cap_chan_lock(chan).
+> 
+> Since the calls from l2cap_core.c to smp.c are covered the only missing
+> piece to have the locking implemented properly is to ensure that the
+> lock is held for any other call path that may access the SMP context.
+> This means user responses through mgmt.c, requests to elevate the
+> security of a connection through hci_conn.c, as well as any deferred
+> work through workqueues.
+> 
+> This patch adds the necessary locking to all these other code paths that
+> try to access the SMP context. Since mutual exclusion for the l2cap_chan
+> access is now covered from all directions the patch also removes
+> unnecessary HCI_CONN_LE_SMP_PEND flag (once we've acquired the chan lock
+> we can simply check whether chan->smp is set to know if there's an SMP
+> context).
+> 
+> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+> ---
+>  include/net/bluetooth/hci_core.h |  1 -
+>  net/bluetooth/smp.c              | 73 +++++++++++++++++++++++-----------------
+>  2 files changed, 43 insertions(+), 31 deletions(-)
+> 
+> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+> index 2b6e04d37593..045d9133d180 100644
+> --- a/include/net/bluetooth/hci_core.h
+> +++ b/include/net/bluetooth/hci_core.h
+> @@ -539,7 +539,6 @@ enum {
+>  	HCI_CONN_RSWITCH_PEND,
+>  	HCI_CONN_MODE_CHANGE_PEND,
+>  	HCI_CONN_SCO_SETUP_PEND,
+> -	HCI_CONN_LE_SMP_PEND,
+>  	HCI_CONN_MGMT_CONNECTED,
+>  	HCI_CONN_SSP_ENABLED,
+>  	HCI_CONN_SC_ENABLED,
+> diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
+> index 0b4403f3dce1..7bdc3166db97 100644
+> --- a/net/bluetooth/smp.c
+> +++ b/net/bluetooth/smp.c
+> @@ -409,7 +409,6 @@ static void smp_failure(struct l2cap_conn *conn, u8 reason)
+>  {
+>  	struct hci_conn *hcon = conn->hcon;
+>  	struct l2cap_chan *chan = conn->smp;
+> -	struct smp_chan *smp;
+>  
+>  	if (reason)
+>  		smp_send_cmd(conn, SMP_CMD_PAIRING_FAIL, sizeof(reason),
+> @@ -419,12 +418,7 @@ static void smp_failure(struct l2cap_conn *conn, u8 reason)
+>  	mgmt_auth_failed(hcon->hdev, &hcon->dst, hcon->type, hcon->dst_type,
+>  			 HCI_ERROR_AUTH_FAILURE);
+>  
+> -	if (!chan->data)
+> -		return;
+> -
+> -	smp = chan->data;
+> -
+> -	if (test_and_clear_bit(HCI_CONN_LE_SMP_PEND, &hcon->flags))
+> +	if (chan->data)
+>  		smp_chan_destroy(conn);
+>  }
+>  
+> @@ -706,9 +700,6 @@ static void smp_distribute_keys(struct smp_chan *smp)
+>  
+>  	BT_DBG("conn %p", conn);
+>  
+> -	if (!test_bit(HCI_CONN_LE_SMP_PEND, &hcon->flags))
+> -		return;
+> -
+>  	rsp = (void *) &smp->prsp[1];
+>  
+>  	/* The responder sends its keys first */
+> @@ -801,7 +792,6 @@ static void smp_distribute_keys(struct smp_chan *smp)
+>  	if ((smp->remote_key_dist & 0x07))
+>  		return;
+>  
+> -	clear_bit(HCI_CONN_LE_SMP_PEND, &hcon->flags);
+>  	set_bit(SMP_FLAG_COMPLETE, &smp->flags);
+>  	smp_notify_keys(conn);
+>  
+> @@ -825,16 +815,13 @@ static struct smp_chan *smp_chan_create(struct l2cap_conn *conn)
+>  	struct smp_chan *smp;
+>  
+>  	smp = kzalloc(sizeof(*smp), GFP_ATOMIC);
+> -	if (!smp) {
+> -		clear_bit(HCI_CONN_LE_SMP_PEND, &conn->hcon->flags);
+> +	if (!smp)
+>  		return NULL;
+> -	}
+>  
+>  	smp->tfm_aes = crypto_alloc_blkcipher("ecb(aes)", 0, CRYPTO_ALG_ASYNC);
+>  	if (IS_ERR(smp->tfm_aes)) {
+>  		BT_ERR("Unable to create ECB crypto context");
+>  		kfree(smp);
+> -		clear_bit(HCI_CONN_LE_SMP_PEND, &conn->hcon->flags);
+>  		return NULL;
+>  	}
+>  
+> @@ -854,16 +841,23 @@ int smp_user_confirm_reply(struct hci_conn *hcon, u16 mgmt_op, __le32 passkey)
+>  	struct l2cap_chan *chan;
+>  	struct smp_chan *smp;
+>  	u32 value;
+> +	int err;
+>  
+>  	BT_DBG("");
+>  
+> -	if (!conn || !test_bit(HCI_CONN_LE_SMP_PEND, &hcon->flags))
+> +	if (!conn)
+>  		return -ENOTCONN;
+>  
+>  	chan = conn->smp;
+>  	if (!chan)
+>  		return -ENOTCONN;
+>  
+> +	l2cap_chan_lock(chan);
+> +	if (!chan->data) {
+> +		err = -ENOTCONN;
+> +		goto unlock;
+> +	}
+> +
+>  	smp = chan->data;
+>  
+>  	switch (mgmt_op) {
+> @@ -879,12 +873,16 @@ int smp_user_confirm_reply(struct hci_conn *hcon, u16 mgmt_op, __le32 passkey)
+>  	case MGMT_OP_USER_PASSKEY_NEG_REPLY:
+>  	case MGMT_OP_USER_CONFIRM_NEG_REPLY:
+>  		smp_failure(conn, SMP_PASSKEY_ENTRY_FAILED);
+> -		return 0;
+> +		err = 0;
+> +		goto unlock;
+>  	default:
+>  		smp_failure(conn, SMP_PASSKEY_ENTRY_FAILED);
+> -		return -EOPNOTSUPP;
+> +		err = -EOPNOTSUPP;
+> +		goto unlock;
+>  	}
+>  
+> +	err = 0;
+> +
+>  	/* If it is our turn to send Pairing Confirm, do so now */
+>  	if (test_bit(SMP_FLAG_CFM_PENDING, &smp->flags)) {
+>  		u8 rsp = smp_confirm(smp);
+> @@ -892,12 +890,15 @@ int smp_user_confirm_reply(struct hci_conn *hcon, u16 mgmt_op, __le32 passkey)
+>  			smp_failure(conn, rsp);
+>  	}
+>  
+> -	return 0;
+> +unlock:
+> +	l2cap_chan_unlock(chan);
+> +	return err;
+>  }
+>  
+>  static u8 smp_cmd_pairing_req(struct l2cap_conn *conn, struct sk_buff *skb)
+>  {
+>  	struct smp_cmd_pairing rsp, *req = (void *) skb->data;
+> +	struct l2cap_chan *chan = conn->smp;
+>  	struct hci_dev *hdev = conn->hcon->hdev;
+>  	struct smp_chan *smp;
+>  	u8 key_size, auth, sec_level;
+> @@ -911,12 +912,10 @@ static u8 smp_cmd_pairing_req(struct l2cap_conn *conn, struct sk_buff *skb)
+>  	if (conn->hcon->role != HCI_ROLE_SLAVE)
+>  		return SMP_CMD_NOTSUPP;
+>  
+> -	if (!test_and_set_bit(HCI_CONN_LE_SMP_PEND, &conn->hcon->flags)) {
+> +	if (!chan->data)
+>  		smp = smp_chan_create(conn);
+> -	} else {
+> -		struct l2cap_chan *chan = conn->smp;
+> +	else
+>  		smp = chan->data;
+> -	}
+>  
+>  	if (!smp)
+>  		return SMP_UNSPECIFIED;
+> @@ -1122,6 +1121,7 @@ static u8 smp_cmd_security_req(struct l2cap_conn *conn, struct sk_buff *skb)
+>  	struct smp_cmd_security_req *rp = (void *) skb->data;
+>  	struct smp_cmd_pairing cp;
+>  	struct hci_conn *hcon = conn->hcon;
+> +	struct l2cap_chan *chan = conn->smp;
+>  	struct smp_chan *smp;
+>  	u8 sec_level;
+>  
+> @@ -1143,7 +1143,8 @@ static u8 smp_cmd_security_req(struct l2cap_conn *conn, struct sk_buff *skb)
+>  	if (smp_ltk_encrypt(conn, hcon->pending_sec_level))
+>  		return 0;
+>  
+> -	if (test_and_set_bit(HCI_CONN_LE_SMP_PEND, &hcon->flags))
+> +	/* If SMP is already in progress ignore this request */
+> +	if (chan->data)
+>  		return 0;
+>  
+>  	smp = smp_chan_create(conn);
+> @@ -1170,8 +1171,10 @@ static u8 smp_cmd_security_req(struct l2cap_conn *conn, struct sk_buff *skb)
+>  int smp_conn_security(struct hci_conn *hcon, __u8 sec_level)
+>  {
+>  	struct l2cap_conn *conn = hcon->l2cap_data;
+> +	struct l2cap_chan *chan = conn->smp;
+>  	struct smp_chan *smp;
+>  	__u8 authreq;
+> +	int ret;
+>  
+>  	BT_DBG("conn %p hcon %p level 0x%2.2x", conn, hcon, sec_level);
+>  
+> @@ -1192,12 +1195,19 @@ int smp_conn_security(struct hci_conn *hcon, __u8 sec_level)
+>  		if (smp_ltk_encrypt(conn, hcon->pending_sec_level))
+>  			return 0;
+>  
+> -	if (test_and_set_bit(HCI_CONN_LE_SMP_PEND, &hcon->flags))
+> -		return 0;
+> +	l2cap_chan_lock(chan);
+> +
+> +	/* If SMP is already in progress ignore this request */
+> +	if (chan->data) {
+> +		ret = 0;
+> +		goto unlock;
+> +	}
+>  
+>  	smp = smp_chan_create(conn);
+> -	if (!smp)
+> -		return 1;
+> +	if (!smp) {
+> +		ret = 1;
+> +		goto unlock;
+> +	}
+>  
+>  	authreq = seclevel_to_authreq(sec_level);
+>  
+> @@ -1223,8 +1233,11 @@ int smp_conn_security(struct hci_conn *hcon, __u8 sec_level)
+>  	}
+>  
+>  	set_bit(SMP_FLAG_INITIATOR, &smp->flags);
+> +	ret = 0;
+>  
+> -	return 0;
+> +unlock:
+> +	l2cap_chan_unlock(conn->smp);
 
-We can't use fork here since we would initialize HAL in child process, not
-parent.
+I know that this is same data but using chan variable instead of conn->smp will make code
+easier to follow since chan was used for locking.
+
+> +	return ret;
+>  }
+>  
+>  static int smp_cmd_encrypt_info(struct l2cap_conn *conn, struct sk_buff *skb)
+> @@ -1504,7 +1517,7 @@ static void smp_teardown_cb(struct l2cap_chan *chan, int err)
+>  
+>  	BT_DBG("chan %p", chan);
+>  
+> -	if (test_and_clear_bit(HCI_CONN_LE_SMP_PEND, &conn->hcon->flags))
+> +	if (chan->data)
+>  		smp_chan_destroy(conn);
+>  
+>  	conn->smp = NULL;
+> 
 
 -- 
 Best regards, 
