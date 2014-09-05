@@ -1,72 +1,46 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v3 1/6] android/gatt: Add API to remove autoconnect GATT based device
-Date: Fri, 05 Sep 2014 11:11:51 +0200
-Message-ID: <8060157.bhBlHtOcd8@uw000953>
-In-Reply-To: <1409755353-6027-1-git-send-email-lukasz.rymanowski@tieto.com>
-References: <1409755353-6027-1-git-send-email-lukasz.rymanowski@tieto.com>
-MIME-Version: 1.0
+From: "Gu, Chao Jie" <chao.jie.gu@intel.com>
+To: Arman Uguray <armansito@chromium.org>
+CC: Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz
+	<luiz.dentz@gmail.com>, "linux-bluetooth@vger.kernel.org"
+	<linux-bluetooth@vger.kernel.org>
+Subject: RE: [PATCH] gatt api V2
+Date: Fri, 5 Sep 2014 08:58:26 +0000
+Message-ID: <3D02B219753AD44CBDDDE484323B1774112F84B1@SHSMSX104.ccr.corp.intel.com>
+References: <1409295566-13583-1-git-send-email-chao.jie.gu@intel.com>
+	<CABBYNZLqDtSk8h0-+BruH6i_+YxRrmoR8srf+KsAhvLvEq51-w@mail.gmail.com>
+	<3D02B219753AD44CBDDDE484323B1774112F697D@SHSMSX104.ccr.corp.intel.com>
+	<CAHrH25ThNCf0wy29Me6Kh5e6YzMKLSiaNiUpU4qg_=HcwaHVCA@mail.gmail.com>
+	<3D02B219753AD44CBDDDE484323B1774112F6F57@SHSMSX104.ccr.corp.intel.com>
+	<7926AF24-265F-454D-A502-C3554072752E@holtmann.org>
+	<CAHrH25TvLZz+xS11UssE-xKx09UHX9w--Y7YoLdaOBx3LGHxaQ@mail.gmail.com>
+	<3D02B219753AD44CBDDDE484323B1774112F7F7A@SHSMSX104.ccr.corp.intel.com>
+ <CAHrH25QHuLFhVcYFMnHfGH4g5SHRyW65-V6gZ5SyPYWGsELmMw@mail.gmail.com>
+In-Reply-To: <CAHrH25QHuLFhVcYFMnHfGH4g5SHRyW65-V6gZ5SyPYWGsELmMw@mail.gmail.com>
 Content-Type: text/plain; charset="utf-8"
-Sender: linux-bluetooth-owner@vger.kernel.org
+MIME-Version: 1.0
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Łukasz,
-
-On Wednesday 03 of September 2014 16:42:28 Lukasz Rymanowski wrote:
-> ---
-> v2: Fixed issue found by Szymon
-> v3: Fixes according to Luiz comments
-> 
->  android/gatt.c | 24 ++++++++++++++++++++++++
->  android/gatt.h |  1 +
->  2 files changed, 25 insertions(+)
-> 
-> diff --git a/android/gatt.c b/android/gatt.c
-> index aff5dc5..a3486ca 100644
-> --- a/android/gatt.c
-> +++ b/android/gatt.c
-> @@ -6768,3 +6768,27 @@ bool bt_gatt_add_autoconnect(unsigned int id, const bdaddr_t *addr)
->  
->  	return true;
->  }
-> +
-> +void bt_gatt_remove_autoconnect(unsigned int id, const bdaddr_t *addr)
-> +{
-> +	struct gatt_device *dev;
-> +
-> +	DBG("");
-> +
-> +	dev = find_device_by_addr(addr);
-> +	if (!dev) {
-> +		error("gatt: Device not found");
-> +		return;
-> +	}
-> +
-> +	queue_remove(dev->autoconnect_apps, INT_TO_PTR(id));
-> +
-> +	if (queue_isempty(dev->autoconnect_apps)) {
-> +		bt_auto_connect_remove(addr);
-> +
-> +		if (dev->state == DEVICE_CONNECT_INIT)
-> +			device_set_state(dev, DEVICE_DISCONNECTED);
-> +
-> +		device_unref(dev);
-> +	}
-> +}
-> diff --git a/android/gatt.h b/android/gatt.h
-> index 40699b2..3382df9 100644
-> --- a/android/gatt.h
-> +++ b/android/gatt.h
-> @@ -40,3 +40,4 @@ bool bt_gatt_connect_app(unsigned int id, const bdaddr_t *addr);
->  bool bt_gatt_disconnect_app(unsigned int id, const bdaddr_t *addr);
->  bool bt_gatt_set_security(const bdaddr_t *bdaddr, int sec_level);
->  bool bt_gatt_add_autoconnect(unsigned int id, const bdaddr_t *addr);
-> +void bt_gatt_remove_autoconnect(unsigned int id, const bdaddr_t *addr);
-
-Patches 1-5 are now applied. 6th requires rebase, thanks. 
-
--- 
-Best regards, 
-Szymon Janc
+SGkgYXJtYW4sDQoNCj4gTG9va3MgbGlrZSB0aGUgc3ViamVjdCB3YXM6ICJbUEFUQ0ggdjMgMS80
+XSBzcmMvc2hhcmVkL2F0dDogSW50cm9kdWNlIHN0cnVjdCBidF9hdHQuIg0KPiBXZSBiYXNpY2Fs
+bHkgdGFsa2VkIGFib3V0IHRoZSBuZWVkIGZvciBidF9hdHQgdG8gc29tZWhvdyBvYnRhaW4gdGhl
+IENTUksgKHRocm91Z2gNCj4gYnRfYXR0X25ldyBtYXliZT8pIGFuZCBpbnRlcm5hbGx5IGtlZXAg
+dGhlIGxvY2FsK3JlbW90ZSBzaWduIGNvdW50ZXJzIHRvIGJlIGFibGUNCj4gdG8gY2FsY3VsYXRl
+IHRoZSBhdXRoZW50aWNhdGlvbiBzaWduYXR1cmUuIEJhc2ljYWxseSwgdGhlIGF1dGhlbnRpY2F0
+aW9uIHNpZ25hdHVyZQ0KPiBzaG91bGQgZ2V0IGNhbGN1bGF0ZWQgYnkgYnRfYXR0IGdpdmVuIGFs
+bCB0aGUgZGF0YSB0aGF0IGl0IG5lZWRzLg0KDQpUaGUgMy1kYXlzIE1pZC1hdXR1bW4gZmVzdGl2
+YWwgaXMgcmlnaHQgYXJvdW5kIHRoZSBjb3JuZXIuIFNvIHRoZXJlIGlzIG5vIG11Y2ggdGltZSBs
+ZWZ0IHRvIGltcGxlbWVudCBpdC4NClNvIEkgaW52ZXN0aWdhdGUgdGhlIHNvdXJjZSBjb2RlLCB0
+aGVyZSBhcmUgc29tZSBkaWZmZXJlbmNlIGJldHdlZW4gb2xkIGF0dCBzdGFjayBhbmQgbmV3IHNo
+YXJlZC9hdHQgc3RhY2suDQpJbiB0aGUgb2xkIHN0YWNrLCBkb2luZyBlbmNvZGUvZGVjb2RlIFBE
+VSBzcGxpdCB3aXRoIHNlbmRpbmcgYXR0IHByb3RvY29sIGNvbW1hbmQgdG8gcmVtb3RlIGRldmlj
+ZS4gDQpIb3dldmVyLCBpbiB0aGUgbmV3IHN0YWNrICwgYnRfYXR0X3NlbmQgZG8gbW9yZSB0aGlu
+Z3MgdGhhbiBvbGQgZGlkIGluY2x1ZGluZyBlbmNvZGUgcGR1IHdpdGggb3Bjb2RlLiANCkJlY2F1
+c2UgQXR0IHBkdSBzaWduZWQgcHJvY2VzcyBpbmNsdWRlIHdob2xlIGRhdGEgcGR1LCBzbyBpbiBt
+eSBtaW5kLCBpZiB3ZSBrZWVwIGNvbnNpc3RlbnQgc3R5bGUgaW4gY29kZSwgDQp3ZSBoYXZlIHRv
+IGRvIHNpZ24gYXR0IHBkdSBpbiBidF9hdHRfc2VuZCBmdW5jdGlvbi4gV2UgaGF2ZSB0byBleHBh
+bmQgYnRfYXR0IHN0cnVjdCB0byBzdG9yZSBDU1JLIGFuZCANCnNvIG9uIHN0dWZmLiBTbyB0aGF0
+J3MgdGhlIG9ubHkgaW1wbGVtZW50YXRpb24gbWFrZSBzZW5zZSBmb3Igc2lnbmVkIHdyaXRlIGNv
+bW1hbmQuDQoNCkJUVywgY29tcGFyZWQgd2l0aCBzaWduaW5nIHRoZSBvdXRnb2luZywgdmVyaWZ5
+aW5nIGluY29taW5nIEFUVCBQRFVzIHdvdWxkIGJlIG1vcmUgY29tcGxleC4gSSBhbSBub3QNClN1
+cmUgd2hpY2ggZmlsZSB0byBpbXBsZW1lbnQgaXQuDQoNClRoYW5rcw0KQ2hhb2ppZQ0K
