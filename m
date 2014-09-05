@@ -1,47 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
-From: johan.hedberg@gmail.com
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Fix dereferencing conn variable before NULL check
-Date: Sat,  6 Sep 2014 06:59:10 +0300
-Message-Id: <1409975950-6110-1-git-send-email-johan.hedberg@gmail.com>
+From: "Caleb Reinhold" <creinhold@lampreynetworks.com>
+To: <linux-bluetooth@vger.kernel.org>
+Subject: BLE Delayed encryption change using 
+Date: Fri, 5 Sep 2014 17:32:41 -0400
+Message-ID: <001301cfc950$ecd06240$c67126c0$@lampreynetworks.com>
+MIME-Version: 1.0
+Content-Type: text/plain;
+	charset="us-ascii"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@intel.com>
+Hello all,
 
-This patch fixes the following type of static analyzer warning (and
-probably a real bug as well as the NULL check should be there for a
-reason):
+Summary:
+I am attempting to reconnect to a BLE glucometer with gatttool after pairing
+with bluetoothctl. A quick connection update seems to cause a large delay
+(around a minute) in the transmission of the LL_ENC_REQ. 
 
-net/bluetooth/smp.c:1182 smp_conn_security() warn: variable dereferenced before check 'conn' (see line 1174)
+Description:
+Attempting to connect to an agent which after connecting immediately sends
+an L2CAP update connection parameters request with minimum connection
+interval set to 20 ms, and maximum connection interval set to 40 ms.
+Increasing both values by 100 ms causes the problem to stop being generated.
 
-Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
----
- net/bluetooth/smp.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+The problem happens only if the dongle using the Broadcom BCM20702 chipset
+is used, using a CSR8510 A10 dongle I cannot generate this issue. I am using
+BlueZ 5.22, using Linux kernel 3.10.17. The hardware platform is a Utilite.
 
-diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
-index 1201670afe38..560f78a9f960 100644
---- a/net/bluetooth/smp.c
-+++ b/net/bluetooth/smp.c
-@@ -1210,7 +1210,7 @@ static u8 smp_cmd_security_req(struct l2cap_conn *conn, struct sk_buff *skb)
- int smp_conn_security(struct hci_conn *hcon, __u8 sec_level)
- {
- 	struct l2cap_conn *conn = hcon->l2cap_data;
--	struct l2cap_chan *chan = conn->smp;
-+	struct l2cap_chan *chan;
- 	struct smp_chan *smp;
- 	__u8 authreq;
- 	int ret;
-@@ -1221,6 +1221,8 @@ int smp_conn_security(struct hci_conn *hcon, __u8 sec_level)
- 	if (!conn)
- 		return 1;
- 
-+	chan = conn->smp;
-+
- 	if (!test_bit(HCI_LE_ENABLED, &hcon->hdev->dev_flags))
- 		return 1;
- 
--- 
-1.9.3
+Caleb Reinhold
 
