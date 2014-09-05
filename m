@@ -1,87 +1,306 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 5 Sep 2014 11:44:53 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Bharat Panda <bharat.panda@samsung.com>
-Cc: linux-bluetooth@vger.kernel.org, cpgs@samsung.com
-Subject: Re: [PATCH ] GATT: Add support for Gatt multiple char write request
-Message-ID: <20140905084453.GA9598@t440s>
-References: <1408619604-26201-1-git-send-email-bharat.panda@samsung.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1408619604-26201-1-git-send-email-bharat.panda@samsung.com>
+In-Reply-To: <1409905453-1555-1-git-send-email-luiz.dentz@gmail.com>
+References: <1409905453-1555-1-git-send-email-luiz.dentz@gmail.com>
+Date: Fri, 5 Sep 2014 11:44:05 +0300
+Message-ID: <CABBYNZJ0m0AZ0e2Mzyc8=zGLFu1SH31sShZfQ-X57jtD=ubhjw@mail.gmail.com>
+Subject: Re: [PATCH v2 BlueZ 1/2] doc: Add initial documentation for coding style
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Bharat,
+Hi,
 
-On Thu, Aug 21, 2014, Bharat Panda wrote:
-> Changes made to handle gatt char multiple write request
-> 1. Changes made to handle gatt long char write request
-> 2. Cache/prepare and execute long char write request.
-> 3. Updates gatt attribute db using offset value.
-> 4. Proper offset and char length handling to fix below PTS test cases,
-> 
-> TP/GAW/SR/BV-06-C
-> TP/GAW/SR/BV-10-C
-> TP/GAW/SR/BV-09-C
-> TP/GAW/SR/BI-09-C
-> TP/GAW/SR/BI-14-C
-> TP/GAW/SR/BI-15-C
-> TP/GAW/SR/BV-05-C
-> TP/GAW/SR/BI-07-C
-> TP/GAW/SR/BV-07-C
-> TP/GAW/SR/BI-08-C
-> TP/GAW/SR/BI-25-C
-> TP/GAW/SR/BI-26-C
-> TP/GAW/SR/BI-27-C
+On Fri, Sep 5, 2014 at 11:24 AM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>
 > ---
->  src/attrib-server.c | 323 +++++++++++++++++++++++++++++++++++++++++++++++++++-
->  src/attrib-server.h |   3 +
->  2 files changed, 324 insertions(+), 2 deletions(-)
-
-First of all sorry for the delay in replying to this - you sent it just
-when I had started a two week vacation.
-
-> diff --git a/src/attrib-server.c b/src/attrib-server.c
-> index e65fff2..10a7923 100644
-> --- a/src/attrib-server.c
-> +++ b/src/attrib-server.c
-> @@ -85,6 +85,25 @@ struct group_elem {
->  	uint16_t len;
->  };
->  
-> +struct local_db {
-> +	uint16_t handle;
-> +	uint8_t offset;
-> +	size_t len;
-> +	uint8_t *data;
-> +	struct local_db *next;
+>  doc/coding-style.txt | 268 +++++++++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 268 insertions(+)
+>  create mode 100644 doc/coding-style.txt
+>
+> diff --git a/doc/coding-style.txt b/doc/coding-style.txt
+> new file mode 100644
+> index 0000000..2ec98ee
+> --- /dev/null
+> +++ b/doc/coding-style.txt
+> @@ -0,0 +1,268 @@
+> +﻿BlueZ coding style
+> +******************
+> +
+> +Every project has its coding style, and BlueZ is not an exception. This
+> +document describes the preferred coding style for BlueZ code, in order to keep
+> +some level of consistency among developers so that code can be easily
+> +understood and maintained.
+> +
+> +First of all, BlueZ coding style must follow every rule for Linux kernel
+> +(http://www.kernel.org/doc/Documentation/CodingStyle). There also exists a tool
+> +named checkpatch.pl to help you check the compliance with it. Just type
+> +"checkpatch.pl --no-tree patch_name" to check your patch. In theory, you need
+> +to clean up all the warnings and errors except this one: "ERROR: Missing
+> +Signed-off-by: line(s)". BlueZ does not used Signed-Off lines, so including
+> +them is actually an error.  In certain circumstances one can ignore the 80
+> +character per line limit.  This is generally only allowed if the alternative
+> +would make the code even less readable.
+> +
+> +Besides the kernel coding style above, BlueZ has special flavors for its own.
+> +Some of them are mandatory (marked as 'M'), while some others are optional
+> +(marked as 'O'), but generally preferred.
+> +
+> +M1: Blank line before and after an if/while/do/for statement
+> +============================================================
+> +
+> +There should be a blank line before if statement unless the if is nested and
+> +not preceded by an expression or variable declaration.
+> +
+> +Example:
+> +1)
+> +a = 1;
+> +if (b) {  // wrong
+> +
+> +2)
+> +a = 1
+> +
+> +if (b) {
+> +}
+> +a = 2; // wrong
+> +
+> +3)
+> +if (a) {
+> +       if (b)  // correct
+> +
+> +4)
+> +b = 2;
+> +
+> +if (a) {       // correct
+> +
+> +}
+> +
+> +b = 3;
+> +
+> +The only exception to this rule applies when a variable is being checked for
+> +errors as such:
+> +
+> +err = stat(filename, &st);
+> +if (err || !S_ISDIR(st.st_mode))
+> +       return;
+> +
+> +M2: Multiple line comment
+> +=========================
+> +
+> +If your comments have more then one line, please start it from the second line.
+> +
+> +Example:
+> +/*
+> + * first line comment  // correct
+> + * ...
+> + * last line comment
+> + */
+> +
+> +
+> +M3: Space before and after operator
+> +===================================
+> +
+> +There should be a space before and after each operator.
+> +
+> +Example:
+> +a + b;  // correct
+> +
+> +
+> +M4: Wrap long lines
+> +===================
+> +
+> +If your condition in if, while, for statement or a function declaration is too
+> +long to fit in one line, the new line needs to be indented not aligned with the
+> +body.
+> +
+> +Example:
+> +1)
+> +if ((adapter->supported_settings & MGMT_SETTING_SSP) &&
+> +       !(adapter->current_settings & MGMT_SETTING_SSP)) // wrong
+> +
+> +2)
+> +if ((adapter->supported_settings & MGMT_SETTING_SSP) &&
+> +                               !(adapter->current_settings & MGMT_SETTING_SSP))
+> +
+> +3)
+> +void btd_adapter_register_pin_cb(struct btd_adapter *adapter,
+> +                                btd_adapter_pin_cb_t cb) // wrong
+> +
+> +4)
+> +void btd_adapter_register_pin_cb(struct btd_adapter *adapter,
+> +                                                       btd_adapter_pin_cb_t cb)
+> +
+> +The referred style for line wrapping is to indent as far as possible to the
+> +right without hitting the 80 columns limit.
+> +
+> +M5: Space when doing type casting
+> +=================================
+> +
+> +There should be a space between new type and variable.
+> +
+> +Example:
+> +1)
+> +a = (int *)b;  // wrong
+> +2)
+> +a = (int *) b;  // correct
+> +
+> +
+> +M6: Don't initialize variable unnecessarily
+> +===========================================
+> +
+> +When declaring a variable, try not to initialize it unless necessary.
+> +
+> +Example:
+> +int i = 1;  // wrong
+> +
+> +for (i = 0; i < 3; i++) {
+> +}
+> +
+> +M7: Follow the order of include header elements
+> +===============================================
+> +
+> +When writing an include header the various elements should be in the following
+> +order:
+> +       - #includes
+> +       - forward declarations
+> +       - #defines
+> +       - enums
+> +       - typedefs
+> +       - function declarations and inline function definitions
+> +
+> +M8: Internal headers must not use include guards
+> +================================================
+> +
+> +Any time when creating a new header file with non-public API, that header
+> +must not contain include guards.
+> +
+> +M9: Naming of enums
+> +===================
+> +
+> +Enums must have a descriptive name.  The enum type should be small caps and
+> +it should not be typedef-ed.  Enum contents should be in CAPITAL letters and
+> +prefixed by the enum type name.
+> +
+> +Example:
+> +
+> +enum animal_type {
+> +       ANIMAL_TYPE_FOUR_LEGS,
+> +       ANIMAL_TYPE_EIGHT_LEGS,
+> +       ANIMAL_TYPE_TWO_LEGS,
 > +};
 > +
-> +struct char_handle_len {
-> +	uint16_t handle;
-> +	size_t org_len;
-> +	struct char_handle_len *next;
+> +If the enum contents have values (e.g. from specification) the formatting
+> +should be as follows:
+> +
+> +enum animal_type {
+> +       ANIMAL_TYPE_FOUR_LEGS =         4,
+> +       ANIMAL_TYPE_EIGHT_LEGS =        8,
+> +       ANIMAL_TYPE_TWO_LEGS =          2,
 > +};
 > +
-> +struct char_handle_len *local_char_handle_len = NULL;
-> +struct char_handle_len *local_char_handle_len_head = NULL;
-> +struct local_db *local_prep_db = NULL;
-> +struct local_db *local_prep_db_head = NULL;
+> +M10: Enum as switch variable
+> +============================
+> +
+> +If the variable of a switch is an enum, you must not include a default in
+> +switch body. The reason for this is: If later on you modify the enum by adding
+> +a new type, and forget to change the switch accordingly, the compiler will
+> +complain the new added type hasn't been handled.
+> +
+> +Example:
+> +
+> +enum animal_type {
+> +       ANIMAL_TYPE_FOUR_LEGS =         4,
+> +       ANIMAL_TYPE_EIGHT_LEGS =        8,
+> +       ANIMAL_TYPE_TWO_LEGS =          2,
+> +};
+> +
+> +enum animal_type t;
+> +
+> +switch (t) {
+> +case ANIMAL_TYPE_FOUR_LEGS:
+> +       ...
+> +       break;
+> +case ANIMAL_TYPE_EIGHT_LEGS:
+> +       ...
+> +       break;
+> +case ANIMAL_TYPE_TWO_LEGS:
+> +       ...
+> +       break;
+> +default:  // wrong
+> +       break;
+> +}
+> +
+> +However if the enum comes from an external header file outside BlueZ, such as
+> +Android headers, we cannot make any assumption of how the enum is defined and
+> +this rule might not apply.
+> +
+> +
+> +M11: Always use parenthesis with sizeof
+> +=======================================
+> +
+> +The expression argument to the sizeof operator should always be in
+> +parenthesis, too.
+> +
+> +Example:
+> +1)
+> +memset(stuff, 0, sizeof(*stuff));
+> +
+> +2)
+> +memset(stuff, 0, sizeof *stuff); // Wrong
+> +
+> +M12: Use void if function has no parameters
+> +===========================================
+> +
+> +A function with no parameters must use void in the parameter list.
+> +
+> +Example:
+> +1)
+> +void foo(void)
+> +{
+> +}
+> +
+> +2)
+> +void foo()     // Wrong
+> +{
+> +}
+> +
+> +O1: Try to avoid complex if body
+> +================================
+> +
+> +It's better not to have a complicated statement for if. You may judge its
+> +contrary condition and return | break | continue | goto ASAP.
+> +
+> +Example:
+> +1)
+> +if (device) {  // worse
+> +       memset(&eir_data, 0, sizeof(eir_data));
+> +       if (eir_len > 0)
+> +               eir_parse(&eir_data, ev->eir, eir_len);
+> +       ...
+> +} else {
+> +       error("Unable to get device object for %s", addr);
+> +       return;
+> +}
+> +
+> +2)
+> +if (!device) {
+> +       error("Unable to get device object for %s", addr);
+> +       return;
+> +}
+> +
+> +memset(&eir_data, 0, sizeof(eir_data));
+> +if (eir_len > 0)
+> +       eir_parse(&eir_data, ev->eir, eir_len);
+> +...
+> --
+> 1.9.3
 
-Shouldn't these variables be part of gatt_channel instead of them being
-global like this? Otherwise we may have conflicts between multiple
-connections to different devices.
+Pushed.
 
-Btw, what are your plans regarding our new ATT/GATT APIs in src/shared?
-Are you planning to provide patches to update these features to use the
-new API once we have the rest of the ATT server infrastructure in place?
-I'd like to avoid introducing too much new code for the old API since it
-will eventually need to be converted to the new one.
 
-In general, could you please read through the kernel CodingStyle
-document which is what we mostly follow. There are quite many violations
-in this patch. You'll also want to read the coding-style.txt and HACKING
-documents from Luiz that were just recently pushed to upstream bluez.git.
-
-Johan
+-- 
+Luiz Augusto von Dentz
