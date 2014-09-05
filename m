@@ -1,156 +1,295 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 BlueZ 2/2] build: Add initial HACKING
-Date: Fri,  5 Sep 2014 11:24:13 +0300
-Message-Id: <1409905453-1555-2-git-send-email-luiz.dentz@gmail.com>
-In-Reply-To: <1409905453-1555-1-git-send-email-luiz.dentz@gmail.com>
-References: <1409905453-1555-1-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH v2 BlueZ 1/2] doc: Add initial documentation for coding style
+Date: Fri,  5 Sep 2014 11:24:12 +0300
+Message-Id: <1409905453-1555-1-git-send-email-luiz.dentz@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=y
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
 ---
- HACKING | 129 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 129 insertions(+)
- create mode 100644 HACKING
+ doc/coding-style.txt | 268 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 268 insertions(+)
+ create mode 100644 doc/coding-style.txt
 
-diff --git a/HACKING b/HACKING
+diff --git a/doc/coding-style.txt b/doc/coding-style.txt
 new file mode 100644
-index 0000000..ffca598
+index 0000000..2ec98ee
 --- /dev/null
-+++ b/HACKING
-@@ -0,0 +1,129 @@
-+Hacking on BlueZ
-+****************
++++ b/doc/coding-style.txt
+@@ -0,0 +1,268 @@
++﻿BlueZ coding style
++******************
 +
-+Build tools requirements
-+========================
++Every project has its coding style, and BlueZ is not an exception. This
++document describes the preferred coding style for BlueZ code, in order to keep
++some level of consistency among developers so that code can be easily
++understood and maintained.
 +
-+When building and testing directly from the repository it is important to
-+have at least automake version 1.10 or later installed. All modern
-+distributions should default to the latest version, but it seems that
-+Debian's default is still an earlier version:
++First of all, BlueZ coding style must follow every rule for Linux kernel
++(http://www.kernel.org/doc/Documentation/CodingStyle). There also exists a tool
++named checkpatch.pl to help you check the compliance with it. Just type
++"checkpatch.pl --no-tree patch_name" to check your patch. In theory, you need
++to clean up all the warnings and errors except this one: "ERROR: Missing
++Signed-off-by: line(s)". BlueZ does not used Signed-Off lines, so including
++them is actually an error.  In certain circumstances one can ignore the 80
++character per line limit.  This is generally only allowed if the alternative
++would make the code even less readable.
 +
-+  Check version
-+    # dpkg -l '*automake*'
++Besides the kernel coding style above, BlueZ has special flavors for its own.
++Some of them are mandatory (marked as 'M'), while some others are optional
++(marked as 'O'), but generally preferred.
 +
-+  Install new version
-+    # apt-get install automake1.10
-+    # update-alternatives --config automake
++M1: Blank line before and after an if/while/do/for statement
++============================================================
++
++There should be a blank line before if statement unless the if is nested and
++not preceded by an expression or variable declaration.
++
++Example:
++1)
++a = 1;
++if (b) {  // wrong
++
++2)
++a = 1
++
++if (b) {
++}
++a = 2;	// wrong
++
++3)
++if (a) {
++	if (b)  // correct
++
++4)
++b = 2;
++
++if (a) {	// correct
++
++}
++
++b = 3;
++
++The only exception to this rule applies when a variable is being checked for
++errors as such:
++
++err = stat(filename, &st);
++if (err || !S_ISDIR(st.st_mode))
++	return;
++
++M2: Multiple line comment
++=========================
++
++If your comments have more then one line, please start it from the second line.
++
++Example:
++/*
++ * first line comment	// correct
++ * ...
++ * last line comment
++ */
 +
 +
-+Working with the source code repository
++M3: Space before and after operator
++===================================
++
++There should be a space before and after each operator.
++
++Example:
++a + b;  // correct
++
++
++M4: Wrap long lines
++===================
++
++If your condition in if, while, for statement or a function declaration is too
++long to fit in one line, the new line needs to be indented not aligned with the
++body.
++
++Example:
++1)
++if ((adapter->supported_settings & MGMT_SETTING_SSP) &&
++	!(adapter->current_settings & MGMT_SETTING_SSP)) // wrong
++
++2)
++if ((adapter->supported_settings & MGMT_SETTING_SSP) &&
++				!(adapter->current_settings & MGMT_SETTING_SSP))
++
++3)
++void btd_adapter_register_pin_cb(struct btd_adapter *adapter,
++				 btd_adapter_pin_cb_t cb) // wrong
++
++4)
++void btd_adapter_register_pin_cb(struct btd_adapter *adapter,
++							btd_adapter_pin_cb_t cb)
++
++The referred style for line wrapping is to indent as far as possible to the
++right without hitting the 80 columns limit.
++
++M5: Space when doing type casting
++=================================
++
++There should be a space between new type and variable.
++
++Example:
++1)
++a = (int *)b;  // wrong
++2)
++a = (int *) b;  // correct
++
++
++M6: Don't initialize variable unnecessarily
++===========================================
++
++When declaring a variable, try not to initialize it unless necessary.
++
++Example:
++int i = 1;  // wrong
++
++for (i = 0; i < 3; i++) {
++}
++
++M7: Follow the order of include header elements
++===============================================
++
++When writing an include header the various elements should be in the following
++order:
++	- #includes
++	- forward declarations
++	- #defines
++	- enums
++	- typedefs
++	- function declarations and inline function definitions
++
++M8: Internal headers must not use include guards
++================================================
++
++Any time when creating a new header file with non-public API, that header
++must not contain include guards.
++
++M9: Naming of enums
++===================
++
++Enums must have a descriptive name.  The enum type should be small caps and
++it should not be typedef-ed.  Enum contents should be in CAPITAL letters and
++prefixed by the enum type name.
++
++Example:
++
++enum animal_type {
++	ANIMAL_TYPE_FOUR_LEGS,
++	ANIMAL_TYPE_EIGHT_LEGS,
++	ANIMAL_TYPE_TWO_LEGS,
++};
++
++If the enum contents have values (e.g. from specification) the formatting
++should be as follows:
++
++enum animal_type {
++	ANIMAL_TYPE_FOUR_LEGS =		4,
++	ANIMAL_TYPE_EIGHT_LEGS =	8,
++	ANIMAL_TYPE_TWO_LEGS =		2,
++};
++
++M10: Enum as switch variable
++============================
++
++If the variable of a switch is an enum, you must not include a default in
++switch body. The reason for this is: If later on you modify the enum by adding
++a new type, and forget to change the switch accordingly, the compiler will
++complain the new added type hasn't been handled.
++
++Example:
++
++enum animal_type {
++	ANIMAL_TYPE_FOUR_LEGS =		4,
++	ANIMAL_TYPE_EIGHT_LEGS =	8,
++	ANIMAL_TYPE_TWO_LEGS =		2,
++};
++
++enum animal_type t;
++
++switch (t) {
++case ANIMAL_TYPE_FOUR_LEGS:
++	...
++	break;
++case ANIMAL_TYPE_EIGHT_LEGS:
++	...
++	break;
++case ANIMAL_TYPE_TWO_LEGS:
++	...
++	break;
++default:  // wrong
++	break;
++}
++
++However if the enum comes from an external header file outside BlueZ, such as
++Android headers, we cannot make any assumption of how the enum is defined and
++this rule might not apply.
++
++
++M11: Always use parenthesis with sizeof
 +=======================================
 +
-+The repository contains two extra scripts that accomplish the bootstrap
-+process. One is called "bootstrap" which is the basic scripts that uses the
-+autotools scripts to create the needed files for building and installing.
-+It makes sure to call the right programs depending on the usage of shared or
-+static libraries or translations etc.
++The expression argument to the sizeof operator should always be in
++parenthesis, too.
 +
-+The second program is called "bootstrap-configure". This program will make
-+sure to properly clean the repository, call the "bootstrap" script and then
-+call configure with proper settings for development. It will use the best
-+options and pass them over to configure. These options normally include
-+the enabling the maintainer mode and the debugging features.
++Example:
++1)
++memset(stuff, 0, sizeof(*stuff));
 +
-+So while in a normal source project the call "./configure ..." is used to
-+configure the project with its settings like prefix and extra options. In
-+case of bare repositories call "./bootstrap-configure" and it will bootstrap
-+the repository and calls configure with all the correct options to make
-+development easier.
++2)
++memset(stuff, 0, sizeof *stuff); // Wrong
 +
-+In case of preparing for a release with "make distcheck", don't use
-+bootstrap-configure since it could export development specific settings.
++M12: Use void if function has no parameters
++===========================================
 +
-+So the normal steps to checkout, build and install such a repository is
-+like this:
++A function with no parameters must use void in the parameter list.
 +
-+  Checkout repository
-+    # git clone git://git.kernel.org/pub/scm/bluetooth/bluez.git
-+    # cd bluez
++Example:
++1)
++void foo(void)
++{
++}
 +
-+  Configure and build
-+    # ./bootstrap-configure
-+    # make
++2)
++void foo()	// Wrong
++{
++}
 +
-+  Configure and build with cgcc (Sparse)
-+    # ./bootstrap-configure CC=cgcc
-+    # make
++O1: Try to avoid complex if body
++================================
 +
-+  Run unit tests
-+    # make check
++It's better not to have a complicated statement for if. You may judge its
++contrary condition and return | break | continue | goto ASAP.
 +
-+  Check installation
-+    # make install DESTDIR=$PWD/x
-+    # find x
-+    # rm -rf x
++Example:
++1)
++if (device) {  // worse
++	memset(&eir_data, 0, sizeof(eir_data));
++	if (eir_len > 0)
++		eir_parse(&eir_data, ev->eir, eir_len);
++	...
++} else {
++	error("Unable to get device object for %s", addr);
++	return;
++}
 +
-+  Check distribution
-+    # make distcheck
++2)
++if (!device) {
++	error("Unable to get device object for %s", addr);
++	return;
++}
 +
-+  Final installation
-+    # sudo make install
-+
-+  Remove autogenerated files
-+    # make maintainer-clean
-+
-+
-+Running from within the source code repository
-+==============================================
-+
-+When using "./configure --enable-maintainer-mode" the automake scripts will
-+use the plugins directly from within the repository. This removes the need
-+to use "make install" when testing "bluetoothd". The "bootstrap-configure"
-+automatically includes this option.
-+
-+  Copy configuration file which specifies the required security policies
-+    # sudo cp ./src/bluetooth.conf /etc/dbus-1/system.d/
-+
-+  Run daemon in foreground with debugging
-+    # sudo ./src/bluetoothd -n -d
-+
-+  Run daemon with valgrind
-+   # sudo valgrind --trace-children=yes --track-origins=yes --track-fds=yes
-+   --show-possibly-lost=no --leak-check=full ./src/bluetoothd -n -d
-+
-+For production installations or distribution packaging it is important that
-+the "--enable-maintainer-mode" option is NOT used.
-+
-+Note multiple arguments to -d can be specified, colon, comma or space
-+separated. The arguments are relative source code filenames for which
-+debugging output should be enabled; output shell-style globs are
-+accepted (e.g.: 'plugins/*:src/main.c').
-+
-+Submitting patches
-+==================
-+
-+If you fixed a bug or you want to add support for something, patches are
-+welcome! In order to ease the inclusion of your patch, it's important to follow
-+some rules, otherwise it will likely be rejected by maintainers.
-+
-+BlueZ rules for submitting patches follow most of the rules used by Linux kernel
-+(https://www.kernel.org/doc/Documentation/SubmittingPatches) with some remarks:
-+
-+1) Do *not* add "Signed-off-by" lines in your commit messages. BlueZ does not
-+use them, so including them is actually an error.
-+
-+2) Be sure to follow the coding style rules of BlueZ. They are listed in
-+doc/coding-style.txt.
-+
-+3) Split your patch according to the top-level directories. E.g.: if you added
-+a feature that touches files under 'include/', 'src/' and 'drivers/'
-+directories, split in three separated patches, taking care not to
-+break compilation.
-+
-+4) Bug fixes should be sent first as they take priority over new features.
-+
-+5) The commit message should follow 50/72 formatting which means the header
-+should be limited to 50 characters and the description should be wrapped at 72
-+characters except if it contains quoted information from debug tools like
-+backtraces, compiler errors, etc.
++memset(&eir_data, 0, sizeof(eir_data));
++if (eir_len > 0)
++	eir_parse(&eir_data, ev->eir, eir_len);
++...
 -- 
 1.9.3
 
