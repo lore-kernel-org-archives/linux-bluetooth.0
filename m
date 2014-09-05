@@ -1,45 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
 From: johan.hedberg@gmail.com
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v3 2/7] Bluetooth: Don't take any action in smp_resume_cb if not encrypted
-Date: Fri,  5 Sep 2014 20:50:47 +0300
-Message-Id: <1409939452-5928-3-git-send-email-johan.hedberg@gmail.com>
-In-Reply-To: <1409939452-5928-1-git-send-email-johan.hedberg@gmail.com>
-References: <1409939452-5928-1-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH v3 0/7] Bluetooth: SMP fixes/improvements
+Date: Fri,  5 Sep 2014 20:50:45 +0300
+Message-Id: <1409939452-5928-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@intel.com>
+Hi,
 
-When smp_resume_cb is called if we're not encrypted (i.e. the callback
-wasn't called because the connection became encrypted) we shouldn't take
-any action at all. This patch moves also the security_timer cancellation
-behind this condition.
+Here's v3 of the set which is essentially v2 + v2.1 of patch 5/7. Sent
+to make applying the patches easier in the right order.
 
-Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
----
- net/bluetooth/smp.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+Johan
 
-diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
-index b8ecc7bd3e3b..9accb4739488 100644
---- a/net/bluetooth/smp.c
-+++ b/net/bluetooth/smp.c
-@@ -1533,10 +1533,12 @@ static void smp_resume_cb(struct l2cap_chan *chan)
- 	if (!smp)
- 		return;
- 
-+	if (!test_bit(HCI_CONN_ENCRYPT, &hcon->flags))
-+		return;
-+
- 	cancel_delayed_work(&smp->security_timer);
- 
--	if (test_bit(HCI_CONN_ENCRYPT, &hcon->flags))
--		queue_work(hdev->workqueue, &smp->distribute_work);
-+	queue_work(hdev->workqueue, &smp->distribute_work);
- }
- 
- static void smp_ready_cb(struct l2cap_chan *chan)
--- 
-1.9.3
+----------------------------------------------------------------
+Johan Hedberg (7):
+      Bluetooth: Remove unnecessary checks after canceling SMP security timer
+      Bluetooth: Don't take any action in smp_resume_cb if not encrypted
+      Bluetooth: Move identity address update behind a workqueue
+      Bluetooth: Remove unnecessary deferred work for SMP key distribution
+      Bluetooth: Fix locking of the SMP context
+      Bluetooth: Fix calling smp_distribute_keys() when still waiting for keys
+      Bluetooth: Add strict checks for allowed SMP PDUs
+
+ include/net/bluetooth/hci_core.h |   1 -
+ include/net/bluetooth/l2cap.h    |   3 +-
+ net/bluetooth/l2cap_core.c       |  10 +-
+ net/bluetooth/smp.c              | 230 +++++++++++++++++++++--------------
+ net/bluetooth/smp.h              |   2 +
+ 5 files changed, 154 insertions(+), 92 deletions(-)
 
