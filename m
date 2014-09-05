@@ -1,51 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
-From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
+From: gowtham babu <gowtham.ab@samsung.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] android/client: Check if hex string is byte format
-Date: Fri,  5 Sep 2014 15:55:41 +0200
-Message-Id: <1409925341-32033-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+Cc: bharat.panda@samsung.com, p.sinha@samsung.com,
+	gowtham babu <gowtham.ab@samsung.com>
+Subject: [MAP] tools/csr_usb : Fix Resource leak: file
+Date: Fri, 05 Sep 2014 19:15:18 +0530
+Message-id: <1409924718-5395-1-git-send-email-gowtham.ab@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Data strings should be byte format.
+Handles resource leak.
 ---
- android/client/if-gatt.c | 12 +++++++++++-
- 1 file changed, 11 insertions(+), 1 deletion(-)
+ tools/csr_usb.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
-diff --git a/android/client/if-gatt.c b/android/client/if-gatt.c
-index c8352b5..0dee225 100644
---- a/android/client/if-gatt.c
-+++ b/android/client/if-gatt.c
-@@ -114,11 +114,17 @@ const btgatt_interface_t *if_gatt = NULL;
+diff --git a/tools/csr_usb.c b/tools/csr_usb.c
+index 5fb6bdc..a1d7324 100644
+--- a/tools/csr_usb.c
++++ b/tools/csr_usb.c
+@@ -80,9 +80,12 @@ static int read_value(const char *name, const char *attr, const char *format)
+ 		return -1;
  
- #define GET_VERIFY_HEX_STRING(n, v, l) \
- 	do { \
-+		int ll;\
- 		if (n[0] != '0' || (n[1] != 'X' && n[1] != 'x')) { \
- 			haltest_error("Value must be hex string\n"); \
- 			return; \
- 		} \
--		l = fill_buffer(n + 2, (uint8_t *) v, sizeof(v)); \
-+		ll = fill_buffer(n + 2, (uint8_t *) v, sizeof(v)); \
-+		if (ll < 0) { \
-+			haltest_error("Value must be byte hex string\n"); \
-+			return; \
-+		} \
-+		l = ll; \
- 	} while (0)
+ 	n = fscanf(file, format, &value);
+-	if (n != 1)
++	if (n != 1) {
++		fclose(file);
+ 		return -1;
++	}
  
- /* Gatt uses little endian uuid */
-@@ -803,6 +809,10 @@ static int fill_buffer(const char *str, uint8_t *out, int out_size)
- 
- 	str_len = strlen(str);
- 
-+	/* Hex string must be byte format */
-+	if (str_len%2 != 0)
-+		return -1;
-+
- 	for (i = 0, j = 0; i < out_size && j < str_len; i++, j++) {
- 		c = str[j];
++	fclose(file);
+ 	return value;
+ }
  
 -- 
-1.9.3
+1.9.1
 
