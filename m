@@ -1,250 +1,381 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1409840644-32200-1-git-send-email-luiz.dentz@gmail.com>
-References: <1409840644-32200-1-git-send-email-luiz.dentz@gmail.com>
-Date: Fri, 5 Sep 2014 15:45:44 +0300
-Message-ID: <CABBYNZKgjVHnFgRs6B1dXfY3RqL_XdoKJSFMnvmF7QRhMUe+WQ@mail.gmail.com>
-Subject: Re: [PATCH v2 1/5] android/tester: Add AVRCP init - Success test case
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+From: johan.hedberg@gmail.com
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH v2 7/7] Bluetooth: Add strict checks for allowed SMP PDUs
+Date: Fri,  5 Sep 2014 15:40:38 +0300
+Message-Id: <1409920838-30242-8-git-send-email-johan.hedberg@gmail.com>
+In-Reply-To: <1409920838-30242-1-git-send-email-johan.hedberg@gmail.com>
+References: <1409920838-30242-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+From: Johan Hedberg <johan.hedberg@intel.com>
 
-On Thu, Sep 4, 2014 at 5:24 PM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->
-> ---
->  android/Makefile.am    |  1 +
->  android/tester-avrcp.c | 50 +++++++++++++++++++++++++++++++++++
->  android/tester-main.c  | 72 ++++++++++++++++++++++++++++++++++++++++++++++++++
->  android/tester-main.h  |  4 +++
->  4 files changed, 127 insertions(+)
->  create mode 100644 android/tester-avrcp.c
->
-> diff --git a/android/Makefile.am b/android/Makefile.am
-> index e93a08b..49fbddc 100644
-> --- a/android/Makefile.am
-> +++ b/android/Makefile.am
-> @@ -171,6 +171,7 @@ android_android_tester_SOURCES = emulator/btdev.h emulator/btdev.c \
->                                 android/tester-pan.c \
->                                 android/tester-hdp.c \
->                                 android/tester-a2dp.c \
-> +                               android/tester-avrcp.c \
->                                 android/tester-gatt.c \
->                                 android/tester-main.h android/tester-main.c
->
-> diff --git a/android/tester-avrcp.c b/android/tester-avrcp.c
-> new file mode 100644
-> index 0000000..60a57b4
-> --- /dev/null
-> +++ b/android/tester-avrcp.c
-> @@ -0,0 +1,50 @@
-> +/*
-> + * Copyright (C) 2014 Intel Corporation
-> + *
-> + * Licensed under the Apache License, Version 2.0 (the "License");
-> + * you may not use this file except in compliance with the License.
-> + * You may obtain a copy of the License at
-> + *
-> + *      http://www.apache.org/licenses/LICENSE-2.0
-> + *
-> + * Unless required by applicable law or agreed to in writing, software
-> + * distributed under the License is distributed on an "AS IS" BASIS,
-> + * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-> + * See the License for the specific language governing permissions and
-> + * limitations under the License.
-> + *
-> + */
-> +
-> +#include <stdbool.h>
-> +
-> +#include "emulator/bthost.h"
-> +#include "src/shared/util.h"
-> +
-> +#include "tester-main.h"
-> +#include "android/utils.h"
-> +
-> +static struct queue *list;
-> +
-> +static struct test_case test_cases[] = {
-> +       TEST_CASE_BREDRLE("AVRCP Init",
-> +               ACTION_SUCCESS(dummy_action, NULL),
-> +       ),
-> +};
-> +
-> +struct queue *get_avrcp_tests(void)
-> +{
-> +       uint16_t i = 0;
-> +
-> +       list = queue_new();
-> +
-> +       for (; i < sizeof(test_cases) / sizeof(test_cases[0]); ++i)
-> +               if (!queue_push_tail(list, &test_cases[i]))
-> +                       return NULL;
-> +
-> +       return list;
-> +}
-> +
-> +void remove_avrcp_tests(void)
-> +{
-> +       queue_destroy(list, NULL);
-> +}
-> diff --git a/android/tester-main.c b/android/tester-main.c
-> index f5f46fb..37f3442 100644
-> --- a/android/tester-main.c
-> +++ b/android/tester-main.c
-> @@ -1212,6 +1212,10 @@ static btav_callbacks_t bta2dp_callbacks = {
->         .audio_state_cb = a2dp_audio_state_cb,
->  };
->
-> +static btrc_callbacks_t btavrcp_callbacks = {
-> +       .size = sizeof(btavrcp_callbacks),
-> +};
-> +
->  static const btgatt_client_callbacks_t btgatt_client_callbacks = {
->         .register_client_cb = gattc_register_client_cb,
->         .scan_result_cb = gattc_scan_result_cb,
-> @@ -1528,6 +1532,60 @@ static void setup_a2dp(const void *test_data)
->         tester_setup_complete();
->  }
->
-> +static void setup_avrcp(const void *test_data)
-> +{
-> +       struct test_data *data = tester_get_data();
-> +       const bt_interface_t *if_bt;
-> +       bt_status_t status;
-> +       const void *a2dp, *avrcp;
-> +
-> +       if (!setup_base(data)) {
-> +               tester_setup_failed();
-> +               return;
-> +       }
-> +
-> +       if_bt = data->if_bluetooth;
-> +
-> +       status = if_bt->init(&bt_callbacks);
-> +       if (status != BT_STATUS_SUCCESS) {
-> +               data->if_bluetooth = NULL;
-> +               tester_setup_failed();
-> +               return;
-> +       }
-> +
-> +       a2dp = if_bt->get_profile_interface(BT_PROFILE_ADVANCED_AUDIO_ID);
-> +       if (!a2dp) {
-> +               tester_setup_failed();
-> +               return;
-> +       }
-> +
-> +       data->if_a2dp = a2dp;
-> +
-> +       status = data->if_a2dp->init(&bta2dp_callbacks);
-> +       if (status != BT_STATUS_SUCCESS) {
-> +               data->if_a2dp = NULL;
-> +               tester_setup_failed();
-> +               return;
-> +       }
-> +
-> +       avrcp = if_bt->get_profile_interface(BT_PROFILE_AV_RC_ID);
-> +       if (!a2dp) {
-> +               tester_setup_failed();
-> +               return;
-> +       }
-> +
-> +       data->if_avrcp = avrcp;
-> +
-> +       status = data->if_avrcp->init(&btavrcp_callbacks);
-> +       if (status != BT_STATUS_SUCCESS) {
-> +               data->if_avrcp = NULL;
-> +               tester_setup_failed();
-> +               return;
-> +       }
-> +
-> +       tester_setup_complete();
-> +}
-> +
->  static void setup_gatt(const void *test_data)
->  {
->         struct test_data *data = tester_get_data();
-> @@ -1605,6 +1663,11 @@ static void teardown(const void *test_data)
->                 data->if_a2dp = NULL;
->         }
->
-> +       if (data->if_avrcp) {
-> +               data->if_avrcp->cleanup();
-> +               data->if_avrcp = NULL;
-> +       }
-> +
->         if (data->if_bluetooth) {
->                 data->if_bluetooth->cleanup();
->                 data->if_bluetooth = NULL;
-> @@ -2125,6 +2188,7 @@ static void tester_testcases_cleanup(void)
->         remove_hidhost_tests();
->         remove_gatt_tests();
->         remove_a2dp_tests();
-> +       remove_avrcp_tests();
->         remove_hdp_tests();
->         remove_pan_tests();
->  }
-> @@ -2171,6 +2235,13 @@ static void add_a2dp_tests(void *data, void *user_data)
->         test(tc, setup_a2dp, generic_test_function, teardown);
->  }
->
-> +static void add_avrcp_tests(void *data, void *user_data)
-> +{
-> +       struct test_case *tc = data;
-> +
-> +       test(tc, setup_avrcp, generic_test_function, teardown);
-> +}
-> +
->  static void add_gatt_tests(void *data, void *user_data)
->  {
->         struct test_case *tc = data;
-> @@ -2190,6 +2261,7 @@ int main(int argc, char *argv[])
->         queue_foreach(get_pan_tests(), add_pan_tests, NULL);
->         queue_foreach(get_hdp_tests(), add_hdp_tests, NULL);
->         queue_foreach(get_a2dp_tests(), add_a2dp_tests, NULL);
-> +       queue_foreach(get_avrcp_tests(), add_avrcp_tests, NULL);
->         queue_foreach(get_gatt_tests(), add_gatt_tests, NULL);
->
->         if (tester_run())
-> diff --git a/android/tester-main.h b/android/tester-main.h
-> index 46aacce..6cad803 100644
-> --- a/android/tester-main.h
-> +++ b/android/tester-main.h
-> @@ -50,6 +50,7 @@
->  #include <hardware/bt_pan.h>
->  #include <hardware/bt_hl.h>
->  #include <hardware/bt_av.h>
-> +#include <hardware/bt_rc.h>
->  #include <hardware/bt_gatt.h>
->  #include <hardware/bt_gatt_client.h>
->  #include <hardware/bt_gatt_server.h>
-> @@ -321,6 +322,7 @@ struct test_data {
->         const bthl_interface_t *if_hdp;
->         const btav_interface_t *if_a2dp;
->         struct audio_stream_out *if_stream;
-> +       const btrc_interface_t *if_avrcp;
->         const btgatt_interface_t *if_gatt;
->
->         const void *test_data;
-> @@ -443,6 +445,8 @@ struct queue *get_hdp_tests(void);
->  void remove_hdp_tests(void);
->  struct queue *get_a2dp_tests(void);
->  void remove_a2dp_tests(void);
-> +struct queue *get_avrcp_tests(void);
-> +void remove_avrcp_tests(void);
->  struct queue *get_gatt_tests(void);
->  void remove_gatt_tests(void);
->
-> --
-> 1.9.3
+SMP defines quite clearly when certain PDUs are to be expected/allowed
+and when not, but doesn't have any explicit request/response definition.
+So far the code has relied on each PDU handler to behave correctly if
+receiving PDUs at an unexpected moment, however this requires many
+different checks and is prone to errors.
 
-Pushed.
+This patch introduces a generic way to keep track of allowed PDUs and
+thereby reduces the responsibility & load on individual command
+handlers. The tracking is implemented using a simple bit-mask where each
+opcode maps to its own bit. If the bit is set the corresponding PDU is
+allow and if the bit is not set the PDU is not allowed.
 
+As a simple example, when we send the Pairing Request we'd set the bit
+for Pairing Response, and when we receive the Pairing Response we'd
+clear the bit for Pairing Response.
 
+Since the disallowed PDU rejection is now done in a single central place
+we need to be a bit careful of which action makes most sense to all
+cases. Previously some, such as Security Request, have been simply
+ignored whereas others have caused an explicit disconnect.
+
+The only PDU rejection action that keeps good interoperability and can
+be used for all the applicable use cases is to drop the data. This may
+raise some concerns of us now being more lenient for misbehaving (and
+potentially malicious) devices, but the policy of simply dropping data
+has been a successful one for many years e.g. in L2CAP (where this is
+the *only* policy for such cases - we never request disconnection in
+l2cap_core.c because of bad data). Furthermore, we cannot prevent
+connected devices from creating the SMP context (through a Security or
+Pairing Request), and once the context exists looking up the
+corresponding bit for the received opcode and deciding to reject it is
+essentially an equally lightweight operation as the kind of rejection
+that l2cap_core.c already successfully does.
+
+Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+---
+ net/bluetooth/smp.c | 126 +++++++++++++++++++++++++++++++++++++---------------
+ net/bluetooth/smp.h |   2 +
+ 2 files changed, 92 insertions(+), 36 deletions(-)
+
+diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
+index 3e59b2572f43..a3e57efe21b2 100644
+--- a/net/bluetooth/smp.c
++++ b/net/bluetooth/smp.c
+@@ -46,6 +46,7 @@ enum {
+ struct smp_chan {
+ 	struct l2cap_conn	*conn;
+ 	struct delayed_work	security_timer;
++	unsigned long           allow_cmd; /* Bitmask of allowed commands */
+ 
+ 	u8		preq[7]; /* SMP Pairing Request */
+ 	u8		prsp[7]; /* SMP Pairing Response */
+@@ -68,6 +69,24 @@ struct smp_chan {
+ 	struct crypto_blkcipher	*tfm_aes;
+ };
+ 
++static bool smp_cmd_allowed(struct smp_chan *smp, u8 code)
++{
++	if (code > SMP_CMD_MAX)
++		return false;
++
++	return test_bit(code, &smp->allow_cmd);
++}
++
++static void smp_allow_cmd(struct smp_chan *smp, u8 code)
++{
++	set_bit(code, &smp->allow_cmd);
++}
++
++static void smp_disallow_cmd(struct smp_chan *smp, u8 code)
++{
++	clear_bit(code, &smp->allow_cmd);
++}
++
+ static inline void swap_buf(const u8 *src, u8 *dst, size_t len)
+ {
+ 	size_t i;
+@@ -552,6 +571,11 @@ static u8 smp_confirm(struct smp_chan *smp)
+ 
+ 	smp_send_cmd(smp->conn, SMP_CMD_PAIRING_CONFIRM, sizeof(cp), &cp);
+ 
++	if (conn->hcon->out)
++		smp_allow_cmd(smp, SMP_CMD_PAIRING_CONFIRM);
++	else
++		smp_allow_cmd(smp, SMP_CMD_PAIRING_RANDOM);
++
+ 	return 0;
+ }
+ 
+@@ -690,6 +714,20 @@ static void smp_notify_keys(struct l2cap_conn *conn)
+ 	}
+ }
+ 
++static void smp_allow_key_dist(struct smp_chan *smp)
++{
++	/* Allow the first expected phase 3 PDU. The rest of the PDUs
++	 * will be allowed in each PDU handler to ensure we receive
++	 * them in the correct order.
++	 */
++	if (smp->remote_key_dist & SMP_DIST_ENC_KEY)
++		smp_allow_cmd(smp, SMP_CMD_ENCRYPT_INFO);
++	else if (smp->remote_key_dist & SMP_DIST_ID_KEY)
++		smp_allow_cmd(smp, SMP_CMD_IDENT_INFO);
++	else if (smp->remote_key_dist & SMP_DIST_SIGN)
++		smp_allow_cmd(smp, SMP_CMD_SIGN_INFO);
++}
++
+ static void smp_distribute_keys(struct smp_chan *smp)
+ {
+ 	struct smp_cmd_pairing *req, *rsp;
+@@ -703,8 +741,10 @@ static void smp_distribute_keys(struct smp_chan *smp)
+ 	rsp = (void *) &smp->prsp[1];
+ 
+ 	/* The responder sends its keys first */
+-	if (hcon->out && (smp->remote_key_dist & 0x07))
++	if (hcon->out && (smp->remote_key_dist & 0x07)) {
++		smp_allow_key_dist(smp);
+ 		return;
++	}
+ 
+ 	req = (void *) &smp->preq[1];
+ 
+@@ -789,8 +829,10 @@ static void smp_distribute_keys(struct smp_chan *smp)
+ 	}
+ 
+ 	/* If there are still keys to be received wait for them */
+-	if ((smp->remote_key_dist & 0x07))
++	if ((smp->remote_key_dist & 0x07)) {
++		smp_allow_key_dist(smp);
+ 		return;
++	}
+ 
+ 	set_bit(SMP_FLAG_COMPLETE, &smp->flags);
+ 	smp_notify_keys(conn);
+@@ -828,6 +870,8 @@ static struct smp_chan *smp_chan_create(struct l2cap_conn *conn)
+ 	smp->conn = conn;
+ 	chan->data = smp;
+ 
++	smp_allow_cmd(smp, SMP_CMD_PAIRING_FAIL);
++
+ 	INIT_DELAYED_WORK(&smp->security_timer, smp_timeout);
+ 
+ 	hci_conn_hold(conn->hcon);
+@@ -924,6 +968,8 @@ static u8 smp_cmd_pairing_req(struct l2cap_conn *conn, struct sk_buff *skb)
+ 	    (req->auth_req & SMP_AUTH_BONDING))
+ 		return SMP_PAIRING_NOTSUPP;
+ 
++	smp_disallow_cmd(smp, SMP_CMD_PAIRING_REQ);
++
+ 	smp->preq[0] = SMP_CMD_PAIRING_REQ;
+ 	memcpy(&smp->preq[1], req, sizeof(*req));
+ 	skb_pull(skb, sizeof(*req));
+@@ -957,6 +1003,7 @@ static u8 smp_cmd_pairing_req(struct l2cap_conn *conn, struct sk_buff *skb)
+ 	memcpy(&smp->prsp[1], &rsp, sizeof(rsp));
+ 
+ 	smp_send_cmd(conn, SMP_CMD_PAIRING_RSP, sizeof(rsp), &rsp);
++	smp_allow_cmd(smp, SMP_CMD_PAIRING_CONFIRM);
+ 
+ 	/* Request setup of TK */
+ 	ret = tk_request(conn, 0, auth, rsp.io_capability, req->io_capability);
+@@ -982,6 +1029,8 @@ static u8 smp_cmd_pairing_rsp(struct l2cap_conn *conn, struct sk_buff *skb)
+ 	if (conn->hcon->role != HCI_ROLE_MASTER)
+ 		return SMP_CMD_NOTSUPP;
+ 
++	smp_disallow_cmd(smp, SMP_CMD_PAIRING_RSP);
++
+ 	skb_pull(skb, sizeof(*rsp));
+ 
+ 	req = (void *) &smp->preq[1];
+@@ -1039,13 +1088,19 @@ static u8 smp_cmd_pairing_confirm(struct l2cap_conn *conn, struct sk_buff *skb)
+ 	if (skb->len < sizeof(smp->pcnf))
+ 		return SMP_INVALID_PARAMS;
+ 
++	smp_disallow_cmd(smp, SMP_CMD_PAIRING_CONFIRM);
++
+ 	memcpy(smp->pcnf, skb->data, sizeof(smp->pcnf));
+ 	skb_pull(skb, sizeof(smp->pcnf));
+ 
+-	if (conn->hcon->out)
++	if (conn->hcon->out) {
+ 		smp_send_cmd(conn, SMP_CMD_PAIRING_RANDOM, sizeof(smp->prnd),
+ 			     smp->prnd);
+-	else if (test_bit(SMP_FLAG_TK_VALID, &smp->flags))
++		smp_allow_cmd(smp, SMP_CMD_PAIRING_RANDOM);
++		return 0;
++	}
++
++	if (test_bit(SMP_FLAG_TK_VALID, &smp->flags))
+ 		return smp_confirm(smp);
+ 	else
+ 		set_bit(SMP_FLAG_CFM_PENDING, &smp->flags);
+@@ -1063,6 +1118,8 @@ static u8 smp_cmd_pairing_random(struct l2cap_conn *conn, struct sk_buff *skb)
+ 	if (skb->len < sizeof(smp->rrnd))
+ 		return SMP_INVALID_PARAMS;
+ 
++	smp_disallow_cmd(smp, SMP_CMD_PAIRING_RANDOM);
++
+ 	memcpy(smp->rrnd, skb->data, sizeof(smp->rrnd));
+ 	skb_pull(skb, sizeof(smp->rrnd));
+ 
+@@ -1121,7 +1178,6 @@ static u8 smp_cmd_security_req(struct l2cap_conn *conn, struct sk_buff *skb)
+ 	struct smp_cmd_security_req *rp = (void *) skb->data;
+ 	struct smp_cmd_pairing cp;
+ 	struct hci_conn *hcon = conn->hcon;
+-	struct l2cap_chan *chan = conn->smp;
+ 	struct smp_chan *smp;
+ 	u8 sec_level;
+ 
+@@ -1143,10 +1199,6 @@ static u8 smp_cmd_security_req(struct l2cap_conn *conn, struct sk_buff *skb)
+ 	if (smp_ltk_encrypt(conn, hcon->pending_sec_level))
+ 		return 0;
+ 
+-	/* If SMP is already in progress ignore this request */
+-	if (chan->data)
+-		return 0;
+-
+ 	smp = smp_chan_create(conn);
+ 	if (!smp)
+ 		return SMP_UNSPECIFIED;
+@@ -1164,6 +1216,7 @@ static u8 smp_cmd_security_req(struct l2cap_conn *conn, struct sk_buff *skb)
+ 	memcpy(&smp->preq[1], &cp, sizeof(cp));
+ 
+ 	smp_send_cmd(conn, SMP_CMD_PAIRING_REQ, sizeof(cp), &cp);
++	smp_allow_cmd(smp, SMP_CMD_PAIRING_RSP);
+ 
+ 	return 0;
+ }
+@@ -1226,10 +1279,12 @@ int smp_conn_security(struct hci_conn *hcon, __u8 sec_level)
+ 		memcpy(&smp->preq[1], &cp, sizeof(cp));
+ 
+ 		smp_send_cmd(conn, SMP_CMD_PAIRING_REQ, sizeof(cp), &cp);
++		smp_allow_cmd(smp, SMP_CMD_PAIRING_RSP);
+ 	} else {
+ 		struct smp_cmd_security_req cp;
+ 		cp.auth_req = authreq;
+ 		smp_send_cmd(conn, SMP_CMD_SECURITY_REQ, sizeof(cp), &cp);
++		smp_allow_cmd(smp, SMP_CMD_PAIRING_REQ);
+ 	}
+ 
+ 	set_bit(SMP_FLAG_INITIATOR, &smp->flags);
+@@ -1251,9 +1306,8 @@ static int smp_cmd_encrypt_info(struct l2cap_conn *conn, struct sk_buff *skb)
+ 	if (skb->len < sizeof(*rp))
+ 		return SMP_INVALID_PARAMS;
+ 
+-	/* Ignore this PDU if it wasn't requested */
+-	if (!(smp->remote_key_dist & SMP_DIST_ENC_KEY))
+-		return 0;
++	smp_disallow_cmd(smp, SMP_CMD_ENCRYPT_INFO);
++	smp_allow_cmd(smp, SMP_CMD_MASTER_IDENT);
+ 
+ 	skb_pull(skb, sizeof(*rp));
+ 
+@@ -1277,13 +1331,13 @@ static int smp_cmd_master_ident(struct l2cap_conn *conn, struct sk_buff *skb)
+ 	if (skb->len < sizeof(*rp))
+ 		return SMP_INVALID_PARAMS;
+ 
+-	/* Ignore this PDU if it wasn't requested */
+-	if (!(smp->remote_key_dist & SMP_DIST_ENC_KEY))
+-		return 0;
+-
+ 	/* Mark the information as received */
+ 	smp->remote_key_dist &= ~SMP_DIST_ENC_KEY;
+ 
++	smp_disallow_cmd(smp, SMP_CMD_MASTER_IDENT);
++	if (smp->remote_key_dist & SMP_DIST_ID_KEY)
++		smp_allow_cmd(smp, SMP_CMD_IDENT_INFO);
++
+ 	skb_pull(skb, sizeof(*rp));
+ 
+ 	hci_dev_lock(hdev);
+@@ -1310,9 +1364,8 @@ static int smp_cmd_ident_info(struct l2cap_conn *conn, struct sk_buff *skb)
+ 	if (skb->len < sizeof(*info))
+ 		return SMP_INVALID_PARAMS;
+ 
+-	/* Ignore this PDU if it wasn't requested */
+-	if (!(smp->remote_key_dist & SMP_DIST_ID_KEY))
+-		return 0;
++	smp_disallow_cmd(smp, SMP_CMD_IDENT_INFO);
++	smp_allow_cmd(smp, SMP_CMD_IDENT_ADDR_INFO);
+ 
+ 	skb_pull(skb, sizeof(*info));
+ 
+@@ -1335,13 +1388,13 @@ static int smp_cmd_ident_addr_info(struct l2cap_conn *conn,
+ 	if (skb->len < sizeof(*info))
+ 		return SMP_INVALID_PARAMS;
+ 
+-	/* Ignore this PDU if it wasn't requested */
+-	if (!(smp->remote_key_dist & SMP_DIST_ID_KEY))
+-		return 0;
+-
+ 	/* Mark the information as received */
+ 	smp->remote_key_dist &= ~SMP_DIST_ID_KEY;
+ 
++	smp_disallow_cmd(smp, SMP_CMD_IDENT_ADDR_INFO);
++	if (smp->remote_key_dist & SMP_DIST_SIGN)
++		smp_allow_cmd(smp, SMP_CMD_SIGN_INFO);
++
+ 	skb_pull(skb, sizeof(*info));
+ 
+ 	hci_dev_lock(hcon->hdev);
+@@ -1391,13 +1444,11 @@ static int smp_cmd_sign_info(struct l2cap_conn *conn, struct sk_buff *skb)
+ 	if (skb->len < sizeof(*rp))
+ 		return SMP_INVALID_PARAMS;
+ 
+-	/* Ignore this PDU if it wasn't requested */
+-	if (!(smp->remote_key_dist & SMP_DIST_SIGN))
+-		return 0;
+-
+ 	/* Mark the information as received */
+ 	smp->remote_key_dist &= ~SMP_DIST_SIGN;
+ 
++	smp_disallow_cmd(smp, SMP_CMD_SIGN_INFO);
++
+ 	skb_pull(skb, sizeof(*rp));
+ 
+ 	hci_dev_lock(hdev);
+@@ -1417,6 +1468,7 @@ static int smp_sig_channel(struct l2cap_chan *chan, struct sk_buff *skb)
+ {
+ 	struct l2cap_conn *conn = chan->conn;
+ 	struct hci_conn *hcon = conn->hcon;
++	struct smp_chan *smp;
+ 	__u8 code, reason;
+ 	int err = 0;
+ 
+@@ -1436,16 +1488,18 @@ static int smp_sig_channel(struct l2cap_chan *chan, struct sk_buff *skb)
+ 	code = skb->data[0];
+ 	skb_pull(skb, sizeof(code));
+ 
+-	/*
+-	 * The SMP context must be initialized for all other PDUs except
+-	 * pairing and security requests. If we get any other PDU when
+-	 * not initialized simply disconnect (done if this function
+-	 * returns an error).
++	smp = chan->data;
++
++	/* If we have an existing context only allow explicitly allowed
++	 * commands. If we don't have a context the only allowed
++	 * commands are pairing request and security request.
+ 	 */
+-	if (code != SMP_CMD_PAIRING_REQ && code != SMP_CMD_SECURITY_REQ &&
+-	    !chan->data) {
+-		BT_ERR("Unexpected SMP command 0x%02x. Disconnecting.", code);
+-		err = -EOPNOTSUPP;
++	if ((smp && !smp_cmd_allowed(smp, code)) ||
++	    (!smp && code != SMP_CMD_PAIRING_REQ &&
++	     code != SMP_CMD_SECURITY_REQ)) {
++		BT_ERR("%s unexpected SMP command 0x%02x from %pMR",
++		       hcon->hdev->name, code, &hcon->dst);
++		reason = 0;
+ 		goto done;
+ 	}
+ 
+diff --git a/net/bluetooth/smp.h b/net/bluetooth/smp.h
+index cf1094617c69..5240537efde3 100644
+--- a/net/bluetooth/smp.h
++++ b/net/bluetooth/smp.h
+@@ -102,6 +102,8 @@ struct smp_cmd_security_req {
+ 	__u8	auth_req;
+ } __packed;
+ 
++#define SMP_CMD_MAX		0x0b
++
+ #define SMP_PASSKEY_ENTRY_FAILED	0x01
+ #define SMP_OOB_NOT_AVAIL		0x02
+ #define SMP_AUTH_REQUIREMENTS		0x03
 -- 
-Luiz Augusto von Dentz
+1.9.3
+
