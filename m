@@ -1,31 +1,54 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Caleb Reinhold" <creinhold@lampreynetworks.com>
-To: <linux-bluetooth@vger.kernel.org>
-Subject: BLE Delayed encryption change using 
-Date: Fri, 5 Sep 2014 17:32:41 -0400
-Message-ID: <001301cfc950$ecd06240$c67126c0$@lampreynetworks.com>
-MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="us-ascii"
+Content-Type: text/plain; charset=iso-8859-1
+Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.6\))
+Subject: Re: [PATCH] bluetooth: LLVMLinux: Remove VLAIS from bluetooth/amp.c
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1409958214-5651-1-git-send-email-behanw@converseincode.com>
+Date: Fri, 5 Sep 2014 16:22:16 -0700
+Cc: "David S. Miller" <davem@davemloft.net>,
+	"Gustavo F. Padovan" <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	BlueZ development <linux-bluetooth@vger.kernel.org>,
+	kernel list <linux-kernel@vger.kernel.org>,
+	netdev@vger.kernel.org,
+	Linus Torvalds <torvalds@linux-foundation.org>,
+	Mark Charlebois <charlebm@gmail.com>,
+	=?iso-8859-1?Q?Jan-Simon_M=F6ller?= <dl9pf@gmx.de>
+Message-Id: <DBC61EBD-5FDE-48FE-8FD1-CA4F606C22F6@holtmann.org>
+References: <1409958214-5651-1-git-send-email-behanw@converseincode.com>
+To: behanw@converseincode.com
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello all,
+Hi Behan,
 
-Summary:
-I am attempting to reconnect to a BLE glucometer with gatttool after pairing
-with bluetoothctl. A quick connection update seems to cause a large delay
-(around a minute) in the transmission of the LL_ENC_REQ. 
+> Replaced the use of a Variable Length Array In Struct (VLAIS) with a C99
+> compliant equivalent. This patch allocates the appropriate amount of memory
+> using an char array.
+> 
+> The new code can be compiled with both gcc and clang.
+> 
+> struct shash_desc contains a flexible array member member ctx declared with
+> CRYPTO_MINALIGN_ATTR, so sizeof(struct shash_desc) aligns the beginning
+> of the array declared after struct shash_desc with long long.
+> 
+> No trailing padding is required because it is not a struct type that can
+> be used in an array.
+> 
+> The CRYPTO_MINALIGN_ATTR is required so that desc is aligned with long long
+> as would be the case for a struct containing a member with
+> CRYPTO_MINALIGN_ATTR.
+> 
+> Signed-off-by: Behan Webster <behanw@converseincode.com>
+> Signed-off-by: Mark Charlebois <charlebm@gmail.com>
+> Signed-off-by: Jan-Simon Möller <dl9pf@gmx.de>
+> ---
+> net/bluetooth/amp.c | 13 ++++++-------
+> 1 file changed, 6 insertions(+), 7 deletions(-)
 
-Description:
-Attempting to connect to an agent which after connecting immediately sends
-an L2CAP update connection parameters request with minimum connection
-interval set to 20 ms, and maximum connection interval set to 40 ms.
-Increasing both values by 100 ms causes the problem to stop being generated.
+patch has been applied to bluetooth-next tree.
 
-The problem happens only if the dongle using the Broadcom BCM20702 chipset
-is used, using a CSR8510 A10 dongle I cannot generate this issue. I am using
-BlueZ 5.22, using Linux kernel 3.10.17. The hardware platform is a Utilite.
+Regards
 
-Caleb Reinhold
+Marcel
 
