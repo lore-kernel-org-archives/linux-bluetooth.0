@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: johan.hedberg@gmail.com
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v3 4/7] Bluetooth: Remove unnecessary deferred work for SMP key distribution
-Date: Fri,  5 Sep 2014 20:50:49 +0300
-Message-Id: <1409939452-5928-5-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH v3 3/7] Bluetooth: Move identity address update behind a workqueue
+Date: Fri,  5 Sep 2014 20:50:48 +0300
+Message-Id: <1409939452-5928-4-git-send-email-johan.hedberg@gmail.com>
 In-Reply-To: <1409939452-5928-1-git-send-email-johan.hedberg@gmail.com>
 References: <1409939452-5928-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,105 +11,98 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-Now that the identity address update happens through its own deferred
-work there's no need to have smp_distribute_keys anymore behind a second
-deferred work. This patch removes this extra construction and makes the
-code do direct calls to smp_distribute_keys() again.
+The identity address update of all channels for an l2cap_conn needs to
+take the lock for each channel, i.e. it's safest to do this by a
+separate workqueue callback.
+
+Previously this was partially solved by moving the entire SMP key
+distribution behind a workqueue. However, if we want SMP context locking
+to be correct and safe we should always use the l2cap_chan lock when
+accessing it, meaning even smp_distribute_keys needs to take that lock
+which would once again create a dead lock when updating the identity
+address.
+
+The simplest way to solve this is to have l2cap_conn manage the deferred
+work which is what this patch does. A subsequent patch will remove the
+now unnecessary SMP key distribution work struct.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- net/bluetooth/smp.c | 21 +++++----------------
- 1 file changed, 5 insertions(+), 16 deletions(-)
+ include/net/bluetooth/l2cap.h |  3 ++-
+ net/bluetooth/l2cap_core.c    | 10 ++++++++--
+ net/bluetooth/smp.c           |  2 +-
+ 3 files changed, 11 insertions(+), 4 deletions(-)
 
+diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
+index be25eddea615..ead99f032f7a 100644
+--- a/include/net/bluetooth/l2cap.h
++++ b/include/net/bluetooth/l2cap.h
+@@ -633,6 +633,8 @@ struct l2cap_conn {
+ 	struct sk_buff_head	pending_rx;
+ 	struct work_struct	pending_rx_work;
+ 
++	struct work_struct	id_addr_update_work;
++
+ 	__u8			disc_reason;
+ 
+ 	struct l2cap_chan	*smp;
+@@ -937,7 +939,6 @@ int l2cap_ertm_init(struct l2cap_chan *chan);
+ void l2cap_chan_add(struct l2cap_conn *conn, struct l2cap_chan *chan);
+ void __l2cap_chan_add(struct l2cap_conn *conn, struct l2cap_chan *chan);
+ void l2cap_chan_del(struct l2cap_chan *chan, int err);
+-void l2cap_conn_update_id_addr(struct hci_conn *hcon);
+ void l2cap_send_conn_req(struct l2cap_chan *chan);
+ void l2cap_move_start(struct l2cap_chan *chan);
+ void l2cap_logical_cfm(struct l2cap_chan *chan, struct hci_chan *hchan,
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index ab405f0e53cb..b71430caab4a 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -631,9 +631,11 @@ void l2cap_chan_del(struct l2cap_chan *chan, int err)
+ }
+ EXPORT_SYMBOL_GPL(l2cap_chan_del);
+ 
+-void l2cap_conn_update_id_addr(struct hci_conn *hcon)
++static void l2cap_conn_update_id_addr(struct work_struct *work)
+ {
+-	struct l2cap_conn *conn = hcon->l2cap_data;
++	struct l2cap_conn *conn = container_of(work, struct l2cap_conn,
++					       id_addr_update_work);
++	struct hci_conn *hcon = conn->hcon;
+ 	struct l2cap_chan *chan;
+ 
+ 	mutex_lock(&conn->chan_lock);
+@@ -1635,6 +1637,9 @@ static void l2cap_conn_del(struct hci_conn *hcon, int err)
+ 	if (work_pending(&conn->pending_rx_work))
+ 		cancel_work_sync(&conn->pending_rx_work);
+ 
++	if (work_pending(&conn->id_addr_update_work))
++		cancel_work_sync(&conn->id_addr_update_work);
++
+ 	l2cap_unregister_all_users(conn);
+ 
+ 	/* Force the connection to be immediately dropped */
+@@ -6927,6 +6932,7 @@ static struct l2cap_conn *l2cap_conn_add(struct hci_conn *hcon)
+ 
+ 	skb_queue_head_init(&conn->pending_rx);
+ 	INIT_WORK(&conn->pending_rx_work, process_pending_rx);
++	INIT_WORK(&conn->id_addr_update_work, l2cap_conn_update_id_addr);
+ 
+ 	conn->disc_reason = HCI_ERROR_REMOTE_USER_TERM;
+ 
 diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
-index 795c603bed30..0b4403f3dce1 100644
+index 9accb4739488..795c603bed30 100644
 --- a/net/bluetooth/smp.c
 +++ b/net/bluetooth/smp.c
-@@ -46,7 +46,6 @@ enum {
- struct smp_chan {
- 	struct l2cap_conn	*conn;
- 	struct delayed_work	security_timer;
--	struct work_struct	distribute_work;
+@@ -654,7 +654,7 @@ static void smp_notify_keys(struct l2cap_conn *conn)
+ 		 */
+ 		bacpy(&hcon->dst, &smp->remote_irk->bdaddr);
+ 		hcon->dst_type = smp->remote_irk->addr_type;
+-		l2cap_conn_update_id_addr(hcon);
++		queue_work(hdev->workqueue, &conn->id_addr_update_work);
  
- 	u8		preq[7]; /* SMP Pairing Request */
- 	u8		prsp[7]; /* SMP Pairing Response */
-@@ -375,12 +374,6 @@ static void smp_chan_destroy(struct l2cap_conn *conn)
- 
- 	cancel_delayed_work_sync(&smp->security_timer);
- 
--	if (work_pending(&smp->distribute_work)) {
--		cancel_work_sync(&smp->distribute_work);
--		if (!chan->data)
--			return;
--	}
--
- 	complete = test_bit(SMP_FLAG_COMPLETE, &smp->flags);
- 	mgmt_smp_complete(conn->hcon, complete);
- 
-@@ -703,10 +696,8 @@ static void smp_notify_keys(struct l2cap_conn *conn)
- 	}
- }
- 
--static void smp_distribute_keys(struct work_struct *work)
-+static void smp_distribute_keys(struct smp_chan *smp)
- {
--	struct smp_chan *smp = container_of(work, struct smp_chan,
--					    distribute_work);
- 	struct smp_cmd_pairing *req, *rsp;
- 	struct l2cap_conn *conn = smp->conn;
- 	struct hci_conn *hcon = conn->hcon;
-@@ -850,7 +841,6 @@ static struct smp_chan *smp_chan_create(struct l2cap_conn *conn)
- 	smp->conn = conn;
- 	chan->data = smp;
- 
--	INIT_WORK(&smp->distribute_work, smp_distribute_keys);
- 	INIT_DELAYED_WORK(&smp->security_timer, smp_timeout);
- 
- 	hci_conn_hold(conn->hcon);
-@@ -1290,7 +1280,7 @@ static int smp_cmd_master_ident(struct l2cap_conn *conn, struct sk_buff *skb)
- 			  rp->ediv, rp->rand);
- 	smp->ltk = ltk;
- 	if (!(smp->remote_key_dist & SMP_DIST_ID_KEY))
--		queue_work(hdev->workqueue, &smp->distribute_work);
-+		smp_distribute_keys(smp);
- 	hci_dev_unlock(hdev);
- 
- 	return 0;
-@@ -1368,7 +1358,7 @@ static int smp_cmd_ident_addr_info(struct l2cap_conn *conn,
- 				      smp->id_addr_type, smp->irk, &rpa);
- 
- distribute:
--	queue_work(hdev->workqueue, &smp->distribute_work);
-+	smp_distribute_keys(smp);
- 
- 	hci_dev_unlock(hcon->hdev);
- 
-@@ -1404,7 +1394,7 @@ static int smp_cmd_sign_info(struct l2cap_conn *conn, struct sk_buff *skb)
- 		memcpy(csrk->val, rp->csrk, sizeof(csrk->val));
- 	}
- 	smp->csrk = csrk;
--	queue_work(hdev->workqueue, &smp->distribute_work);
-+	smp_distribute_keys(smp);
- 	hci_dev_unlock(hdev);
- 
- 	return 0;
-@@ -1526,7 +1516,6 @@ static void smp_resume_cb(struct l2cap_chan *chan)
- 	struct smp_chan *smp = chan->data;
- 	struct l2cap_conn *conn = chan->conn;
- 	struct hci_conn *hcon = conn->hcon;
--	struct hci_dev *hdev = hcon->hdev;
- 
- 	BT_DBG("chan %p", chan);
- 
-@@ -1538,7 +1527,7 @@ static void smp_resume_cb(struct l2cap_chan *chan)
- 
- 	cancel_delayed_work(&smp->security_timer);
- 
--	queue_work(hdev->workqueue, &smp->distribute_work);
-+	smp_distribute_keys(smp);
- }
- 
- static void smp_ready_cb(struct l2cap_chan *chan)
+ 		/* When receiving an indentity resolving key for
+ 		 * a remote device that does not use a resolvable
 -- 
 1.9.3
 
