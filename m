@@ -1,37 +1,45 @@
 Return-Path: <cyrus@holtmann.org>
-From: gowtham babu <gowtham.ab@samsung.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: bharat.panda@samsung.com, p.sinha@samsung.com,
-	gowtham babu <gowtham.ab@samsung.com>
-Subject: [MAP] tools/csr_usb : Fix Resource leak: file
-Date: Fri, 05 Sep 2014 19:15:18 +0530
-Message-id: <1409924718-5395-1-git-send-email-gowtham.ab@samsung.com>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 1/2] androd/client: Extend history line size and depth
+Date: Fri, 05 Sep 2014 15:29:46 +0200
+Message-ID: <1571863.mA3dO0Y7oz@uw000953>
+In-Reply-To: <1409921307-31445-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+References: <1409921307-31445-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Handles resource leak.
----
- tools/csr_usb.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+Hi Grzegorz,
 
-diff --git a/tools/csr_usb.c b/tools/csr_usb.c
-index 5fb6bdc..a1d7324 100644
---- a/tools/csr_usb.c
-+++ b/tools/csr_usb.c
-@@ -80,9 +80,12 @@ static int read_value(const char *name, const char *attr, const char *format)
- 		return -1;
- 
- 	n = fscanf(file, format, &value);
--	if (n != 1)
-+	if (n != 1) {
-+		fclose(file);
- 		return -1;
-+	}
- 
-+	fclose(file);
- 	return value;
- }
- 
+On Friday 05 of September 2014 14:48:26 Grzegorz Kolodziejczyk wrote:
+> For some commands current history line size isn't enough to store it
+> complete. For complex/long run, extended history depth can be helpful.
+> ---
+>  android/client/history.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/android/client/history.c b/android/client/history.c
+> index 3dae27a..ca4664c 100644
+> --- a/android/client/history.c
+> +++ b/android/client/history.c
+> @@ -24,8 +24,8 @@
+>  
+>  /* Very simple history storage for easy usage of tool */
+>  
+> -#define HISTORY_DEPTH 20
+> -#define LINE_SIZE 100
+> +#define HISTORY_DEPTH 40
+> +#define LINE_SIZE 200
+>  static char lines[HISTORY_DEPTH][LINE_SIZE];
+>  static int last_line = 0;
+>  static int history_size = 0;
+> 
+
+This patch is now applied. Thanks.
+
 -- 
-1.9.1
-
+Best regards, 
+Szymon Janc
