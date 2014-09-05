@@ -1,33 +1,56 @@
 Return-Path: <cyrus@holtmann.org>
-From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
+Date: Fri, 5 Sep 2014 15:47:40 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/2] androd/client: Extend history line size and depth
-Date: Fri,  5 Sep 2014 14:48:26 +0200
-Message-Id: <1409921307-31445-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+Subject: Re: [PATCH v2 5/7] Bluetooth: Fix locking of the SMP context
+Message-ID: <20140905124740.GA30842@t440s.lan>
+References: <1409920838-30242-1-git-send-email-johan.hedberg@gmail.com>
+ <1409920838-30242-6-git-send-email-johan.hedberg@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1409920838-30242-6-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-For some commands current history line size isn't enough to store it
-complete. For complex/long run, extended history depth can be helpful.
----
- android/client/history.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+Hi,
 
-diff --git a/android/client/history.c b/android/client/history.c
-index 3dae27a..ca4664c 100644
---- a/android/client/history.c
-+++ b/android/client/history.c
-@@ -24,8 +24,8 @@
- 
- /* Very simple history storage for easy usage of tool */
- 
--#define HISTORY_DEPTH 20
--#define LINE_SIZE 100
-+#define HISTORY_DEPTH 40
-+#define LINE_SIZE 200
- static char lines[HISTORY_DEPTH][LINE_SIZE];
- static int last_line = 0;
- static int history_size = 0;
--- 
-1.9.3
+On Fri, Sep 05, 2014, johan.hedberg@gmail.com wrote:
+> @@ -1192,12 +1195,19 @@ int smp_conn_security(struct hci_conn *hcon, __u8 sec_level)
+>  		if (smp_ltk_encrypt(conn, hcon->pending_sec_level))
+>  			return 0;
+>  
+> -	if (test_and_set_bit(HCI_CONN_LE_SMP_PEND, &hcon->flags))
+> -		return 0;
+> +	l2cap_chan_lock(chan);
+> +
+> +	/* If SMP is already in progress ignore this request */
+> +	if (chan->data) {
+> +		ret = 0;
+> +		goto unlock;
+> +	}
+>  
+>  	smp = smp_chan_create(conn);
+> -	if (!smp)
+> -		return 1;
+> +	if (!smp) {
+> +		ret = 1;
+> +		goto unlock;
+> +	}
+>  
+>  	authreq = seclevel_to_authreq(sec_level);
+>  
+> @@ -1223,8 +1233,11 @@ int smp_conn_security(struct hci_conn *hcon, __u8 sec_level)
+>  	}
+>  
+>  	set_bit(SMP_FLAG_INITIATOR, &smp->flags);
+> +	ret = 0;
+>  
+> -	return 0;
+> +unlock:
+> +	l2cap_chan_unlock(conn->smp);
+> +	return ret;
 
+Seems something didn't go quite right with my rebasing skills and this
+fix dropped out from the mix. I'll send another revision of this patch.
+
+Johan
