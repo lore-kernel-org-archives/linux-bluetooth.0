@@ -1,31 +1,74 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=US-ASCII
-Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.6\))
-Subject: Re: [PATCH] bluetooth: btusb: Fix issue with suspend
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <540B5B03.9070203@lwfinger.net>
-Date: Sat, 6 Sep 2014 12:12:44 -0700
-Cc: "Gustavo F. Padovan" <gustavo@padovan.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	BlueZ development <linux-bluetooth@vger.kernel.org>,
-	Network Development <netdev@vger.kernel.org>,
+Sender: Larry Finger <larry.finger@gmail.com>
+From: Larry Finger <Larry.Finger@lwfinger.net>
+To: Marcel Holtmann <marcel@holtmann.org>,
+	Gustavo Padovan <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	netdev@vger.kernel.org,
 	Champion Chen <champion_chen@realsil.com.cn>,
-	Stable <stable@vger.kernel.org>
-Message-Id: <9F1659DE-61C2-4CA9-8696-16F120273154@holtmann.org>
-References: <1409930194-6318-1-git-send-email-Larry.Finger@lwfinger.net> <6DF81E54-681F-4B18-95C7-F4684FF19786@holtmann.org> <540B4159.9000003@lwfinger.net> <D5B40282-A085-4B47-8F7B-27480CAB6B19@holtmann.org> <540B5B03.9070203@lwfinger.net>
-To: Larry Finger <Larry.Finger@lwfinger.net>
-Sender: linux-bluetooth-owner@vger.kernel.org
+	Larry Finger <Larry.Finger@lwfinger.net>
+Subject: [PATCH V2] bluetooth: btusb: Fix issue with suspend
+Date: Sat,  6 Sep 2014 14:06:08 -0500
+Message-Id: <1410030368-23289-1-git-send-email-Larry.Finger@lwfinger.net>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Larry,
+From: Champion Chen <champion_chen@realsil.com.cn>
 
->> one other thing. Please let maintainers decide when a patch is useful for stable and when not. Patches need to go upstream first anyway. People spamming stable@vger.kernel.org with patches that are not reviewed yet is pretty much a waste of time.
-> 
-> Sorry. In the wireless tree, the patch author suggests that the patch is suitable for stable. If the maintainer disagrees, he strips the Cc to stable. It seems that you do it the other way. In either case, I do not think the stable patches are picked up by the maintainers of stable versions until the patch hits mainline.
+Suspend could fail for some platforms because
+btusb_suspend==> btusb_stop_traffic ==> usb_kill_anchored_urbs,
 
-I have no idea what the stable@vger.kernel.org guys do with patches that are not yet upstream. However it is a waste of their time sending stuff to their mailing list that has not even seen a maintainer review. You can just mention it in the comment section that this might qualify for stable.
+When btusb_bulk_complete returns before system suspend and resubmits an urb,
+the system cannot enter suspend state.
 
-Regards
+Signed-off-by: Champion Chen <champion_chen@realsil.com.cn>
+Signed-off-by: Larry Finger <Larry.Finger@lwfinger.net>
+---
+V2 - Fix incorrect test as noted by Marcel.
 
-Marcel
+---
+Johan,
 
+To help Champion with the process, I have formatted the patch in
+the correct manner. I hope I understand the issue correctly and
+stated it in a coherent manner in the commit message.
+
+Larry
+---
+ drivers/bluetooth/btusb.c | 9 +++++++++
+ 1 file changed, 9 insertions(+)
+
+Index: linux-2.6/drivers/bluetooth/btusb.c
+===================================================================
+--- linux-2.6.orig/drivers/bluetooth/btusb.c
++++ linux-2.6/drivers/bluetooth/btusb.c
+@@ -330,6 +330,9 @@ static void btusb_intr_complete(struct u
+ 			BT_ERR("%s corrupted event packet", hdev->name);
+ 			hdev->stat.err_rx++;
+ 		}
++	} else if (urb->status == -ENOENT) {
++		/* Avoid suspend failed when usb_kill_urb */
++		return;
+ 	}
+ 
+ 	if (!test_bit(BTUSB_INTR_RUNNING, &data->flags))
+@@ -418,6 +421,9 @@ static void btusb_bulk_complete(struct u
+ 			BT_ERR("%s corrupted ACL packet", hdev->name);
+ 			hdev->stat.err_rx++;
+ 		}
++	} else if (urb->status == -ENOENT) {
++		/* Avoid suspend failed when usb_kill_urb */
++		return;
+ 	}
+ 
+ 	if (!test_bit(BTUSB_BULK_RUNNING, &data->flags))
+@@ -512,6 +518,9 @@ static void btusb_isoc_complete(struct u
+ 				hdev->stat.err_rx++;
+ 			}
+ 		}
++	} else if (urb->status == -ENOENT) {
++		/* Avoid suspend failed when usb_kill_urb */
++		return;
+ 	}
+ 
+ 	if (!test_bit(BTUSB_ISOC_RUNNING, &data->flags))
