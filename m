@@ -1,121 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
 From: Jukka Rissanen <jukka.rissanen@linux.intel.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 3/3] Bluetooth: 6lowpan: Route packets that are not meant to peer via correct device
-Date: Mon,  8 Sep 2014 12:11:45 +0300
-Message-Id: <1410167505-30889-4-git-send-email-jukka.rissanen@linux.intel.com>
-In-Reply-To: <1410167505-30889-1-git-send-email-jukka.rissanen@linux.intel.com>
-References: <1410167505-30889-1-git-send-email-jukka.rissanen@linux.intel.com>
+Subject: [PATCH 0/3] Misc Bluetooth 6lowpan fixes
+Date: Mon,  8 Sep 2014 12:11:42 +0300
+Message-Id: <1410167505-30889-1-git-send-email-jukka.rissanen@linux.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Packets that are supposed to be delivered via the peer device need to
-be checked and sent to correct device. This requires that user has set
-the routes properly so that the 6lowpan module can then figure out
-the destination gateway and the correct Bluetooth device.
+Hi,
 
-Signed-off-by: Jukka Rissanen <jukka.rissanen@linux.intel.com>
----
- net/bluetooth/6lowpan.c | 65 +++++++++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 63 insertions(+), 2 deletions(-)
+there are some issues in Bluetooth 6lowpan that are fixed by these
+patches. The patches are not related and can be applied in any order.
 
-diff --git a/net/bluetooth/6lowpan.c b/net/bluetooth/6lowpan.c
-index b229aed..0920cb6 100644
---- a/net/bluetooth/6lowpan.c
-+++ b/net/bluetooth/6lowpan.c
-@@ -39,6 +39,7 @@ static struct dentry *lowpan_control_debugfs;
- 
- struct skb_cb {
- 	struct in6_addr addr;
-+	struct in6_addr gw;
- 	struct l2cap_chan *chan;
- 	int status;
- };
-@@ -158,6 +159,54 @@ static inline struct lowpan_peer *peer_lookup_conn(struct lowpan_dev *dev,
- 	return NULL;
- }
- 
-+static inline struct lowpan_peer *peer_lookup_dst(struct lowpan_dev *dev,
-+						  struct in6_addr *daddr,
-+						  struct sk_buff *skb)
-+{
-+	struct lowpan_peer *peer, *tmp;
-+	struct in6_addr *nexthop;
-+	struct rt6_info *rt = (struct rt6_info *)skb_dst(skb);
-+	int count = atomic_read(&dev->peer_count);
-+
-+	BT_DBG("peers %d addr %pI6c rt %p", count, daddr, rt);
-+
-+	/* If we have multiple 6lowpan peers, then check where we should
-+	 * send the packet. If only one peer exists, then we can send the
-+	 * packet right away.
-+	 */
-+	if (count == 1)
-+		return list_first_entry(&dev->peers, struct lowpan_peer,
-+					list);
-+
-+	if (!rt) {
-+		nexthop = &lowpan_cb(skb)->gw;
-+
-+		if (ipv6_addr_any(nexthop))
-+			return NULL;
-+	} else {
-+		nexthop = rt6_nexthop(rt);
-+
-+		/* We need to remember the address because it is needed
-+		 * by bt_xmit() when sending the packet. In bt_xmit(), the
-+		 * destination routing info is not set.
-+		 */
-+		memcpy(&lowpan_cb(skb)->gw, nexthop, sizeof(struct in6_addr));
-+	}
-+
-+	BT_DBG("gw %pI6c", nexthop);
-+
-+	list_for_each_entry_safe(peer, tmp, &dev->peers, list) {
-+		BT_DBG("dst addr %pMR dst type %d ip %pI6c",
-+		       &peer->chan->dst, peer->chan->dst_type,
-+		       &peer->peer_addr);
-+
-+		if (!ipv6_addr_cmp(&peer->peer_addr, nexthop))
-+			return peer;
-+	}
-+
-+	return NULL;
-+}
-+
- static struct lowpan_peer *lookup_peer(struct l2cap_conn *conn)
- {
- 	struct lowpan_dev *entry, *tmp;
-@@ -415,8 +464,18 @@ static int header_create(struct sk_buff *skb, struct net_device *netdev,
- 		read_unlock_irqrestore(&devices_lock, flags);
- 
- 		if (!peer) {
--			BT_DBG("no such peer %pMR found", &addr);
--			return -ENOENT;
-+			/* The packet might be sent to 6lowpan interface
-+			 * because of routing (either via default route
-+			 * or user set route) so get peer according to
-+			 * the destination address.
-+			 */
-+			read_lock_irqsave(&devices_lock, flags);
-+			peer = peer_lookup_dst(dev, &hdr->daddr, skb);
-+			read_unlock_irqrestore(&devices_lock, flags);
-+			if (!peer) {
-+				BT_DBG("no such peer %pMR found", &addr);
-+				return -ENOENT;
-+			}
- 		}
- 
- 		daddr = peer->eui64_addr;
-@@ -520,6 +579,8 @@ static netdev_tx_t bt_xmit(struct sk_buff *skb, struct net_device *netdev)
- 
- 		read_lock_irqsave(&devices_lock, flags);
- 		peer = peer_lookup_ba(dev, &addr, addr_type);
-+		if (!peer)
-+			peer = peer_lookup_dst(dev, &lowpan_cb(skb)->addr, skb);
- 		read_unlock_irqrestore(&devices_lock, flags);
- 
- 		BT_DBG("xmit %s to %pMR type %d IP %pI6c peer %p",
+The current connection timeout value was too low so the patch 1
+will use the default connection timeout value instead.
+
+I noticed that the peer IPv6 address had wrong U/L bit set in EUI-64
+part of the address. This is now fixed by patch 2.
+
+If the 6lowpan node is part of a network, then it is expected that
+user is also able to send packets to other nodes behind the master
+node. This was not happening as we only checked the peer IPv6 address
+when deciding should we send the packet or not. The patch 3 now
+checks from the routing table where to send the packet.
+
+
+Cheers,
+Jukka
+
+
+Jukka Rissanen (3):
+  Bluetooth: 6lowpan: Increase the connection timeout value
+  Bluetooth: 6lowpan: Set the peer IPv6 address correctly
+  Bluetooth: 6lowpan: Route packets that are not meant to peer via
+    correct device
+
+ net/bluetooth/6lowpan.c | 80 +++++++++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 77 insertions(+), 3 deletions(-)
+
 -- 
 1.8.3.1
 
