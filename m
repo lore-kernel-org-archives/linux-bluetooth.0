@@ -1,60 +1,52 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 8 Sep 2014 12:40:10 +0200
-From: Alexander Aring <alex.aring@gmail.com>
-To: Martin Townsend <martin.townsend@xsilon.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>,
-	linux-zigbee-devel@lists.sourceforge.net,
-	linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org
-Subject: Re: [PATCH v2 bluetooth-next] Simplify lowpan receive path so skb is
- freed in lowpan_rcv when dropped.
-Message-ID: <20140908104008.GB6981@omega>
-References: <53DCE75C.2030305@xsilon.com>
- <20140821083945.GA29484@omega>
- <3DF0C18C-4A97-4A00-AB0F-9E01F72CE967@holtmann.org>
- <53FE446D.6040805@xsilon.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-In-Reply-To: <53FE446D.6040805@xsilon.com>
+From: Jukka Rissanen <jukka.rissanen@linux.intel.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH 2/3] Bluetooth: 6lowpan: Set the peer IPv6 address correctly
+Date: Mon,  8 Sep 2014 12:11:44 +0300
+Message-Id: <1410167505-30889-3-git-send-email-jukka.rissanen@linux.intel.com>
+In-Reply-To: <1410167505-30889-1-git-send-email-jukka.rissanen@linux.intel.com>
+References: <1410167505-30889-1-git-send-email-jukka.rissanen@linux.intel.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Martin,
+The peer IPv6 address contained wrong U/L bit in the EUI-64 part.
 
-On Wed, Aug 27, 2014 at 09:49:49PM +0100, Martin Townsend wrote:
-> On 21/08/14 14:24, Marcel Holtmann wrote:
-> >Hi Alex,
-> >
-> >>this patch wasn't able to apply and now it doesn't apply either (because
-> >>lot of other changes). I thought you will resend a v3 and then I will
-> >>care about reviewing. Then putting Acked-by, then Marcel will put it on
-> >>the right repositories.
-> >>
-> >>If you can, describe the changes in the commit msg (please note the 80
-> >>line width there).
-> >>
-> >>This patch is also something for bluetooth (not bluetooth-next), it's a
-> >>bug fix. But this depends how Marcel will dealing with this issue. It's
-> >>a bugfix with a huge change of lines. I would base it on bluetooth,
-> >>because it's a bug fix.
-> >simplifying something is not for -stable or a bug fix. If there is a memory leak, then fix that memory leak first in a separate patch. The rules are pretty clear here. Only bug fixes after the merge window has closed.
-> >
-> >Regards
-> >
-> >Marcel
-> >
-> >--
-> >To unsubscribe from this list: send the line "unsubscribe linux-wpan" in
-> >the body of a message to majordomo@vger.kernel.org
-> >More majordomo info at  http://vger.kernel.org/majordomo-info.html
-> 
-> Hi,
-> 
-> I'll respin and include the memory leak fix and this patch and a couple of
-> others I have and send as a series to bluetooth.  What bluetooth git
-> repository should I base the series on?
-> 
+Signed-off-by: Jukka Rissanen <jukka.rissanen@linux.intel.com>
+---
+ net/bluetooth/6lowpan.c | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
 
-What's the state about to fix this bad issue? :-)
+diff --git a/net/bluetooth/6lowpan.c b/net/bluetooth/6lowpan.c
+index 5532e6e..b229aed 100644
+--- a/net/bluetooth/6lowpan.c
++++ b/net/bluetooth/6lowpan.c
+@@ -671,6 +671,14 @@ static struct l2cap_chan *chan_open(struct l2cap_chan *pchan)
+ 	return chan;
+ }
+ 
++static void set_ip_addr_bits(u8 addr_type, u8 *addr)
++{
++	if (addr_type == BDADDR_LE_PUBLIC)
++		*addr |= 0x02;
++	else
++		*addr &= ~0x02;
++}
++
+ static struct l2cap_chan *add_peer_chan(struct l2cap_chan *chan,
+ 					struct lowpan_dev *dev)
+ {
+@@ -693,6 +701,11 @@ static struct l2cap_chan *add_peer_chan(struct l2cap_chan *chan,
+ 	memcpy(&peer->eui64_addr, (u8 *)&peer->peer_addr.s6_addr + 8,
+ 	       EUI64_ADDR_LEN);
+ 
++	/* IPv6 address needs to have the U/L bit set properly so toggle
++	 * it back here.
++	 */
++	set_ip_addr_bits(chan->dst_type, (u8 *)&peer->peer_addr.s6_addr + 8);
++
+ 	write_lock_irqsave(&devices_lock, flags);
+ 	INIT_LIST_HEAD(&peer->list);
+ 	peer_add(dev, peer);
+-- 
+1.8.3.1
 
-I didn't saw any new patches because of this.
-
-- Alex
