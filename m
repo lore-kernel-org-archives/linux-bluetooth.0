@@ -1,114 +1,84 @@
 Return-Path: <cyrus@holtmann.org>
-From: johan.hedberg@gmail.com
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Fix mgmt pairing failure when authentication fails
-Date: Mon,  8 Sep 2014 17:09:49 -0700
-Message-Id: <1410221389-15975-1-git-send-email-johan.hedberg@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+MIME-Version: 1.0
+In-Reply-To: <15262F73-F609-40F5-9294-9B35F5CB7C8C@holtmann.org>
+References: <CACUGKYNrsWu6k4q193FsLmCc-fMJ955j6TRdnx=LfqFqcQfrmg@mail.gmail.com>
+	<15262F73-F609-40F5-9294-9B35F5CB7C8C@holtmann.org>
+Date: Mon, 8 Sep 2014 13:47:08 -0700
+Message-ID: <CACUGKYNYg=XUXjDZVC9J74bczn+LJEUszH_HtD1Sea7EsWJfdQ@mail.gmail.com>
+Subject: Re: Bluetooth certification with bluez stack
+From: John Tobias <john.tobias.ph@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@intel.com>
+Hi Marcel,
 
-Whether through HCI with BR/EDR or SMP with LE when authentication fails
-we should also notify any pending Pair Device mgmt command. This patch
-updates the mgmt_auth_failed function to take the actual hci_conn object
-and makes sure that any pending pairing command is notified and cleaned
-up appropriately.
+I have a follow up question for you.
 
-Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
----
- include/net/bluetooth/hci_core.h |  3 +--
- net/bluetooth/hci_event.c        |  6 ++----
- net/bluetooth/mgmt.c             | 19 +++++++++++++------
- net/bluetooth/smp.c              |  3 +--
- 4 files changed, 17 insertions(+), 14 deletions(-)
+1. If I used the PTS tool and (assuming) all the test were passed.
+This means I do not have to go to the test house, I could use the PTS
+info against my device as evidence that my device comply with the
+bluetooth sig requirements and they will recognize it?.
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 045d9133d180..206b92bfeebb 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -1342,8 +1342,7 @@ int mgmt_user_passkey_neg_reply_complete(struct hci_dev *hdev, bdaddr_t *bdaddr,
- int mgmt_user_passkey_notify(struct hci_dev *hdev, bdaddr_t *bdaddr,
- 			     u8 link_type, u8 addr_type, u32 passkey,
- 			     u8 entered);
--void mgmt_auth_failed(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
--		      u8 addr_type, u8 status);
-+void mgmt_auth_failed(struct hci_conn *conn, u8 status);
- void mgmt_auth_enable_complete(struct hci_dev *hdev, u8 status);
- void mgmt_ssp_enable_complete(struct hci_dev *hdev, u8 enable, u8 status);
- void mgmt_sc_enable_complete(struct hci_dev *hdev, u8 enable, u8 status);
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index e6a496ae0318..3a8381ab992f 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -2320,8 +2320,7 @@ static void hci_auth_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
- 			conn->sec_level = conn->pending_sec_level;
- 		}
- 	} else {
--		mgmt_auth_failed(hdev, &conn->dst, conn->type, conn->dst_type,
--				 ev->status);
-+		mgmt_auth_failed(conn, ev->status);
- 	}
- 
- 	clear_bit(HCI_CONN_AUTH_PEND, &conn->flags);
-@@ -3900,8 +3899,7 @@ static void hci_simple_pair_complete_evt(struct hci_dev *hdev,
- 	 * event gets always produced as initiator and is also mapped to
- 	 * the mgmt_auth_failed event */
- 	if (!test_bit(HCI_CONN_AUTH_PEND, &conn->flags) && ev->status)
--		mgmt_auth_failed(hdev, &conn->dst, conn->type, conn->dst_type,
--				 ev->status);
-+		mgmt_auth_failed(conn, ev->status);
- 
- 	hci_conn_drop(conn);
- 
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index ab9521ae3c63..efb71b022ab6 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -6485,16 +6485,23 @@ int mgmt_user_passkey_notify(struct hci_dev *hdev, bdaddr_t *bdaddr,
- 	return mgmt_event(MGMT_EV_PASSKEY_NOTIFY, hdev, &ev, sizeof(ev), NULL);
- }
- 
--void mgmt_auth_failed(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
--		      u8 addr_type, u8 status)
-+void mgmt_auth_failed(struct hci_conn *conn, u8 hci_status)
- {
- 	struct mgmt_ev_auth_failed ev;
-+	struct pending_cmd *cmd;
-+	u8 status = mgmt_status(hci_status);
- 
--	bacpy(&ev.addr.bdaddr, bdaddr);
--	ev.addr.type = link_to_bdaddr(link_type, addr_type);
--	ev.status = mgmt_status(status);
-+	bacpy(&ev.addr.bdaddr, &conn->dst);
-+	ev.addr.type = link_to_bdaddr(conn->type, conn->dst_type);
-+	ev.status = status;
- 
--	mgmt_event(MGMT_EV_AUTH_FAILED, hdev, &ev, sizeof(ev), NULL);
-+	cmd = find_pairing(conn);
-+
-+	mgmt_event(MGMT_EV_AUTH_FAILED, conn->hdev, &ev, sizeof(ev),
-+		    cmd ? cmd->sk : NULL);
-+
-+	if (cmd)
-+		pairing_complete(cmd, status);
- }
- 
- void mgmt_auth_enable_complete(struct hci_dev *hdev, u8 status)
-diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
-index 560f78a9f960..25c9040e0b12 100644
---- a/net/bluetooth/smp.c
-+++ b/net/bluetooth/smp.c
-@@ -420,8 +420,7 @@ static void smp_failure(struct l2cap_conn *conn, u8 reason)
- 			     &reason);
- 
- 	clear_bit(HCI_CONN_ENCRYPT_PEND, &hcon->flags);
--	mgmt_auth_failed(hcon->hdev, &hcon->dst, hcon->type, hcon->dst_type,
--			 HCI_ERROR_AUTH_FAILURE);
-+	mgmt_auth_failed(hcon, HCI_ERROR_AUTH_FAILURE);
- 
- 	if (chan->data)
- 		smp_chan_destroy(conn);
--- 
-1.9.3
+2. Does PTS is enough to verify L2CAP, GAP, SDP, SPP, RFCOMM, AVCTP,
+AVDTP and ATT, GATT, SM protocols?.
 
+Regards,
+
+John
+
+On Mon, Sep 8, 2014 at 11:39 AM, Marcel Holtmann <marcel@holtmann.org> wrot=
+e:
+> Hi John,
+>
+>> We are planning to apply for bluetooth certification and we are using
+>> bluez stack. I am gathering more information regarding with the cost.
+>>
+>> According to my contact, since we are using an opensource bluetooth
+>> stack, they need to test all the layers for:
+>>
+>> 1. Classic BlueZ stack testing:
+>>    -> L2CAP, GAP, SDP, SPP, RFCOMM
+>>    -> AVCTP and AVDTP
+>>
+>> 2. LE BlueZ stack:
+>>    -> ATT, GATT, SM
+>>
+>> I would like to know if anyone have done the bluetooth certification
+>> using bluez stack and what did you do to lower the cost?.
+>
+> many companies have qualified BlueZ in different form and shapes. You can=
+ find an incomplete list here:
+>
+> http://www.bluez.org/qualification/
+>
+> The list is incomplete, because there are many more BlueZ based products =
+out there that we do not know enough details about to list them here.
+>
+> When it comes to qualification, there is no simple answer, however it is =
+safe to say that you need to qualify all used protocols and profiles one wa=
+y or another. That means either you qualify them all by yourself or you can=
+ reference an existing qualification record. However most companies have op=
+ted for doing the whole qualification by themselves so they are in control =
+of the qualification record.
+>
+> My advise is that whatever you can test with PTS tool from the Bluetooth =
+SIG, you test with it. That lowers your cost a lot since you do not need to=
+ go to a test house. If you use the self-listing process with the TPG, you =
+can also avoid test house costs. Or you do it the other way around and just=
+ contract the whole thing out to a test house.
+>
+> If you would be qualifying BlueZ for Android (a version of BlueZ running =
+on Android devices), then we have full documentation for every single proto=
+col and profile. Look at android/{pics,pixit,pts}-*.txt files in the source=
+ code. Most of these information will also apply to a generic BlueZ. Howeve=
+r we have not had time to unify this kind of qualification documentation.
+>
+> I bet these information will get you pretty far when it comes to qualific=
+ation. They are pretty extensive.
+>
+> Regards
+>
+> Marcel
+>
