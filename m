@@ -1,50 +1,106 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.6\))
-Subject: Re: Bluetooth certification with bluez stack
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <CACUGKYNrsWu6k4q193FsLmCc-fMJ955j6TRdnx=LfqFqcQfrmg@mail.gmail.com>
-Date: Mon, 8 Sep 2014 11:39:19 -0700
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <15262F73-F609-40F5-9294-9B35F5CB7C8C@holtmann.org>
-References: <CACUGKYNrsWu6k4q193FsLmCc-fMJ955j6TRdnx=LfqFqcQfrmg@mail.gmail.com>
-To: John Tobias <john.tobias.ph@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Mon, 8 Sep 2014 20:36:54 +0200
+From: Alexander Aring <alex.aring@gmail.com>
+To: Martin Townsend <martin.townsend@xsilon.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+	linux-zigbee-devel@lists.sourceforge.net,
+	linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org
+Subject: Re: [PATCH v2 bluetooth-next] Simplify lowpan receive path so skb is
+ freed in lowpan_rcv when dropped.
+Message-ID: <20140908183652.GA633@omega>
+References: <53DCE75C.2030305@xsilon.com>
+ <20140821083945.GA29484@omega>
+ <3DF0C18C-4A97-4A00-AB0F-9E01F72CE967@holtmann.org>
+ <53FE446D.6040805@xsilon.com>
+ <20140908104008.GB6981@omega>
+ <540DF1AE.2070709@xsilon.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+In-Reply-To: <540DF1AE.2070709@xsilon.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi John,
+Hi Martin,
 
-> We are planning to apply for bluetooth certification and we are using
-> bluez stack. I am gathering more information regarding with the cost.
+On Mon, Sep 08, 2014 at 07:13:02PM +0100, Martin Townsend wrote:
+...
+> >>Hi,
+> >>
+> >>I'll respin and include the memory leak fix and this patch and a couple of
+> >>others I have and send as a series to bluetooth.  What bluetooth git
+> >>repository should I base the series on?
+> >>
+> >What's the state about to fix this bad issue? :-)
+> >
+> >I didn't saw any new patches because of this.
+> >
+> >- Alex
+> >--
+> >To unsubscribe from this list: send the line "unsubscribe linux-wpan" in
+> >the body of a message to majordomo@vger.kernel.org
+> >More majordomo info at  http://vger.kernel.org/majordomo-info.html
 > 
-> According to my contact, since we are using an opensource bluetooth
-> stack, they need to test all the layers for:
+> Sorry for the delay, been on hols for a few days, I will create the patches
+> tomorrow if I get time.
 > 
-> 1. Classic BlueZ stack testing:
->    -> L2CAP, GAP, SDP, SPP, RFCOMM
->    -> AVCTP and AVDTP
+> I have also implemented Generic Header Compression[0] which is still in
+> draft at the moment but I can't imagine it will change much before being
+> released.  I'm going to integrate it into our linux repository this week.
+> Would you be interested in putting it in linux-wpan or linux-wpan-next or
+> would you prefer to wait until it gets it RFC status?
 > 
-> 2. LE BlueZ stack:
->    -> ATT, GATT, SM
-> 
-> I would like to know if anyone have done the bluetooth certification
-> using bluez stack and what did you do to lower the cost?.
 
-many companies have qualified BlueZ in different form and shapes. You can find an incomplete list here:
+no, for me it's okay to have this mainline. I heard that a draft becomes
+no RFC when nobody implements it.
 
-http://www.bluez.org/qualification/
+But another point, I want to avoid that everything is putted into the
+iphc file for next header compression. Did you saw the patches for the
+next header compression layer?
 
-The list is incomplete, because there are many more BlueZ based products out there that we do not know enough details about to list them here.
+This is a layer to separate next header implementation, like IPv6 it
+does for next header [0]. [0] shows the registration of the next header
+protocols.
 
-When it comes to qualification, there is no simple answer, however it is safe to say that you need to qualify all used protocols and profiles one way or another. That means either you qualify them all by yourself or you can reference an existing qualification record. However most companies have opted for doing the whole qualification by themselves so they are in control of the qualification record.
+We should have something similar and I post some months a RFC about
+that. I got some review notes and need to rework it, working branch is
+at [1].
 
-My advise is that whatever you can test with PTS tool from the Bluetooth SIG, you test with it. That lowers your cost a lot since you do not need to go to a test house. If you use the self-listing process with the TPG, you can also avoid test house costs. Or you do it the other way around and just contract the whole thing out to a test house.
+Also I added that we drop packets for IPv6 Header Extensions, described
+at [2]. We currently no support this kind of next header compression and
+if we don't check on it, we send garbage to IPv6 layer. (That's of
+course one more argument to implement draft next header compression
+formats).
 
-If you would be qualifying BlueZ for Android (a version of BlueZ running on Android devices), then we have full documentation for every single protocol and profile. Look at android/{pics,pixit,pts}-*.txt files in the source code. Most of these information will also apply to a generic BlueZ. However we have not had time to unify this kind of qualification documentation.
 
-I bet these information will get you pretty far when it comes to qualification. They are pretty extensive.
+For now, we should make it like this:
 
-Regards
+- First you send patches for the fixes.
+- Then I will send patches for the nhc layer.
+- You send patches to adding the your next header compression formats.
+  based on the nhc layer.
 
-Marcel
+Is that okay for you? It should easily for you to add your header compression
+formats. (Filling some struct with macro and implement some callbacks).
 
+
+This is all related stuff to the GENERIC 6LOWPAN branch, all which
+belongs to IPHC and IPHC contains next header compression. As
+conclusion this should be go to bluetooth/bluetooth-next.
+
+Bug fixes to bluetooth, new features to bluetooth-next.
+
+
+
+btw:
+I working on the 802.15.4 rework. I am sure you know that I want to make
+a rework of the 802.15.4 stack. Very busy at the moment, but this should
+not affect the net/6lowpan branch. Only the net/ieee802.15.4/6lowpan.
+
+I will take some time, so after you send fixes for this I will rebase/rework
+the nhc layer patches to try to bring it mainline. Then you can make your work
+on it.
+
+- Alex
+
+[0] https://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/tree/net/ipv6/af_inet6.c?id=refs/tags/v3.17-rc4#n822
+[1] https://github.com/linux-wpan/linux-wpan-next/tree/nhc_layer
+[2] http://tools.ietf.org/html/rfc6282#section-4.2
