@@ -1,127 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 9 Sep 2014 08:54:49 -0700
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: linville@tuxdriver.com
-Cc: linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: pull request: bluetooth-next 2014-09-09
-Message-ID: <20140909155449.GA7412@t440s>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="FCuugMFkClbJLl1L"
-Sender: linux-kernel-owner@vger.kernel.org
+Sender: armansito@google.com
+In-Reply-To: <B69C7DE3-C748-4553-A0F5-C8AB1E2B4150@holtmann.org>
+References: <1410224591-5402-1-git-send-email-armansito@chromium.org>
+	<1410224591-5402-3-git-send-email-armansito@chromium.org>
+	<9F464B28-533C-4677-8F8D-01A6199A1F36@holtmann.org>
+	<CAHrH25RbBpWLFJ=Sqz+tbgfoGv++RRNo-czsPTOe3kLdR9ob9Q@mail.gmail.com>
+	<B69C7DE3-C748-4553-A0F5-C8AB1E2B4150@holtmann.org>
+Date: Tue, 9 Sep 2014 08:52:11 -0700
+Message-ID: <CAHrH25Qd5XN9vFAQPoNMVz+7VB8-n2XUXnN3-r5f4XsC=jh=5w@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 2/7] shared/gatt-client: Implement bt_gatt_client_register_notify.
+From: Arman Uguray <armansito@chromium.org>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-
---FCuugMFkClbJLl1L
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-
-Hi John,
-
-This set of patches is intended for 3.18. Most of the patches are LE SMP
-(Security Manager Protocol) fixes/improvements, but there are also some
-6lowpan fixes as well as a fix for the btusb HCI driver.
-
-Please let me know if there are any issues pulling. Thanks.
-
-Johan
-
----
-The following changes since commit 61a3d4f9d52c00b2016bc27fc66b10a194043f76:
-
-  Merge branch 'master' of git://git.kernel.org/pub/scm/linux/kernel/git/linville/wireless (2014-09-08 11:14:56 -0400)
-
-are available in the git repository at:
+Hi Marcel,
 
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git for-upstream
+>> Without the cast the code will generate a compiler warning, since
+>> |descs| is declared as "const bt_descriptor_t *". I'd rather keep it
+>> as const since external code will access it but I need the cast to
+>> avoid the warning. I could cast it to void* if that makes it shorter.
+>
+> ouch. We should not be freeing const pointers. If we allocate the pointer, then it should not be const.
+>
 
-for you to fetch changes up to 39e90c77637b3892a39f2908aea57539e961c50e:
+Yeah, my idea here was that the pointer is allocated internally by
+bt_gatt_client and exposed externally as a const pointer. I put the
+const there mainly to make it explicit that individual
+bt_gatt_descriptor_t entries should not be modified and because I
+wanted to avoid yet another nested iterator.
 
-  Bluetooth: 6lowpan: Route packets that are not meant to peer via correct device (2014-09-09 15:51:47 +0200)
+Now that I think of it, I can work around this by keeping the pointer
+inside bt_gatt_characteristic_t const and have that point to an
+internal non-const parameter in struct chrc_data. This should be OK
+since the whole point of struct chrc_data here is to encapsulate
+internal variables that should not be accessed or modified externally.
 
-----------------------------------------------------------------
-Behan Webster (1):
-      Bluetooth: LLVMLinux: Remove VLAIS from bluetooth/amp.c
-
-Champion Chen (1):
-      Bluetooth: Fix issue with USB suspend in btusb driver
-
-Johan Hedberg (31):
-      Bluetooth: Fix incorrect LE CoC PDU length restriction based on HCI MTU
-      Bluetooth: Remove unnecessary l2cap_chan_unlock before l2cap_chan_add
-      Bluetooth: Fix hci_conn reference counting for fixed channels
-      Bluetooth: Set addr_type only when it's needed
-      Bluetooth: Optimize connection parameter lookup for LE connections
-      Bluetooth: Improve *_get() functions to return the object type
-      Bluetooth: Fix using hci_conn_get() for hci_conn pointers
-      Bluetooth: Refactor connection parameter freeing into its own function
-      Bluetooth: Use zero timeout for immediate scheduling
-      Bluetooth: Fix hci_conn reference counting with hci_chan
-      Bluetooth: Set disc_timeout to 0 when calling hci_chan_del
-      Bluetooth: Ignore incoming data after initiating disconnection
-      Bluetooth: Remove hci_conn_hold/drop from hci_chan
-      Bluetooth: Set discon_timeout to 0 in l2cap_conn_del
-      Bluetooth: Use hci_disconnect for immediate disconnection from SMP
-      Bluetooth: Remove unused l2cap_conn_shutdown API
-      Bluetooth: Fix SMP error and response to be mutually exclusive
-      Bluetooth: Update hci_disconnect() to return an error value
-      Bluetooth: Use hci_disconnect() for mgmt_disconnect_device()
-      Bluetooth: Move clock offset reading into hci_disconnect()
-      Bluetooth: Add clarifying comment for LE CoC result value
-      Bluetooth: Remove unnecessary checks after canceling SMP security timer
-      Bluetooth: Don't take any action in smp_resume_cb if not encrypted
-      Bluetooth: Move identity address update behind a workqueue
-      Bluetooth: Remove unnecessary deferred work for SMP key distribution
-      Bluetooth: Fix locking of the SMP context
-      Bluetooth: Add define for key distribution mask
-      Bluetooth: Fix calling smp_distribute_keys() when still waiting for keys
-      Bluetooth: Add strict checks for allowed SMP PDUs
-      Bluetooth: Fix dereferencing conn variable before NULL check
-      Bluetooth: Fix mgmt pairing failure when authentication fails
-
-Jukka Rissanen (3):
-      Bluetooth: 6lowpan: Increase the connection timeout value
-      Bluetooth: 6lowpan: Set the peer IPv6 address correctly
-      Bluetooth: 6lowpan: Route packets that are not meant to peer via correct device
-
- drivers/bluetooth/btusb.c        |   9 ++
- include/net/bluetooth/hci_core.h |  14 +--
- include/net/bluetooth/l2cap.h    |  10 +-
- net/bluetooth/6lowpan.c          |  80 +++++++++++-
- net/bluetooth/amp.c              |  13 +-
- net/bluetooth/hci_conn.c         |  49 ++++----
- net/bluetooth/hci_core.c         |  29 +++--
- net/bluetooth/hci_event.c        |  22 ++--
- net/bluetooth/hidp/core.c        |  10 +-
- net/bluetooth/l2cap_core.c       |  67 +++++-----
- net/bluetooth/l2cap_sock.c       |   8 ++
- net/bluetooth/mgmt.c             |  37 +++---
- net/bluetooth/smp.c              | 247 ++++++++++++++++++++++---------------
- net/bluetooth/smp.h              |   2 +
- 14 files changed, 366 insertions(+), 231 deletions(-)
-
-
---FCuugMFkClbJLl1L
-Content-Type: application/pgp-signature
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1
-
-iQIcBAEBAgAGBQJUDyLJAAoJECQj9vv5qNQSAn4P/2Puj1cQ7Refzwe4DZL3PSsL
-pUM8FiOuuqkagplfflxHVc1lrMfNPlxDqBJ7bNabmBimda4E45wIMV8eMPK1dtWw
-ExRtxG3nq0LSSYUVAPNMn3G/M8zXhv6Xo5bw8jHf2WWcdn2YQllwMAyJRjQb4dBy
-0YF2GbJ+4TKgELmzPN1upXhEiFoyJXxwwbTn6DIdeP0no6nFlhe5QDFa8DeiGrz2
-6NjhgpOK85rlkwgokR9CqQNJ9v1x2qjLpRYBsSa4gQYCQBhjzR5iGOSku4w3gV/L
-+LkcyffCbMM9ekx+2isfGhkcpBkXIeUipwJIPIjI5yfp4E/sFdxQOTw6c0X2WZrd
-NZQ8C0EnaRdZ6mWIXpaepgyN9cokgC8duAAuBpYymsnDxpbdGTAII7OYoNu95OV7
-5MN5xHUHD1lWBGXLKogUQ2XMDtp0DEALyY7ROXvuvlxdwK1rNnaEPIcDsPwpMC0V
-HvFv8UleMp/Hz0GSvTWudfLUo7FDeFfXstZFlmfalzijSn38QRoBG1nJyAzODJt8
-E2+xm+81RRPXhkAFXJtDSSxUxt2T2SYn+Hv4vAnlF7k4zWEudn5sX0F0xmflGUFQ
-oT2VN9/Q99IUOVLqYKW2mOAogrDcBEuFm0W4/zSk1wzeVHQp48ikN52zVj+3UIm7
-tl4aomQE5UXwoJkTWJiv
-=oUBr
------END PGP SIGNATURE-----
-
---FCuugMFkClbJLl1L--
+-Arman
