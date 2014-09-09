@@ -1,355 +1,76 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v2 1/2] android/hal-ipc-api: Add Handsfree client IPC API
-Date: Tue, 09 Sep 2014 13:26:13 +0200
-Message-ID: <4521994.sNOyZIxlvP@leonov>
-In-Reply-To: <1409838586-29049-1-git-send-email-lukasz.rymanowski@tieto.com>
-References: <1409838586-29049-1-git-send-email-lukasz.rymanowski@tieto.com>
+Message-ID: <540EE0F4.4090206@xsilon.com>
+Date: Tue, 09 Sep 2014 12:13:56 +0100
+From: Martin Townsend <martin.townsend@xsilon.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Sender: linux-bluetooth-owner@vger.kernel.org
+To: Alexander Aring <alex.aring@gmail.com>
+CC: Marcel Holtmann <marcel@holtmann.org>,
+ linux-zigbee-devel@lists.sourceforge.net,
+ linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org
+Subject: Re: [PATCH v2 bluetooth-next] Simplify lowpan receive path so skb
+ is freed in lowpan_rcv when dropped.
+References: <20140821083945.GA29484@omega> <3DF0C18C-4A97-4A00-AB0F-9E01F72CE967@holtmann.org> <53FE446D.6040805@xsilon.com> <20140908104008.GB6981@omega> <540DF1AE.2070709@xsilon.com> <20140908183652.GA633@omega> <20140908185519.GB633@omega> <540EC844.2040008@xsilon.com> <20140909094652.GC4545@omega> <540ED3AB.4000706@xsilon.com> <20140909104754.GA7284@omega>
+In-Reply-To: <20140909104754.GA7284@omega>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Łukasz,
+Hi Alex,
 
-On Thursday 04 of September 2014 15:49:45 Lukasz Rymanowski wrote:
-> ---
-> v2: Fix opcode issue and Battery level command name
-> 
->  android/hal-ipc-api.txt | 317
-> ++++++++++++++++++++++++++++++++++++++++++++++++ 1 file changed, 317
-> insertions(+)
-> 
-> diff --git a/android/hal-ipc-api.txt b/android/hal-ipc-api.txt
-> index ae62c10..ca41cff 100644
-> --- a/android/hal-ipc-api.txt
-> +++ b/android/hal-ipc-api.txt
-> @@ -2078,3 +2078,320 @@ Notifications:
-> 
->  		Notification parameters: Status (4 octets)
->  		                         Handle (4 octets)
-> +
-> +
-> +Bluetooth Handsfree Client HAL (ID 10)
-> +======================================
-> +
-> +Android HAL name: "hf_client" (BT_PROFILE_HF_CLIENT_ID)
-> +
-> +Commands and response:
-> +
-> +	Opcode 0x00 - Error response
-> +
-> +		Valid status values: 0x01 = Fail
-> +		                     0x02 = Not ready
-> +		                     0x03 = No memory
-> +		                     0x04 = Busy
-> +		                     0x05 = Done (already completed)
-> +		                     0x06 = Unsupported
-> +		                     0x07 = Parameter invalid
-> +		                     0x08 = Unhandled
-> +		                     0x09 = Authentication failure
-> +		                     0x0a = Remote device down
-> +
-> +	Opcode 0x01 - Connect command/respose
-> +
-> +		Command parameters: Remote address (6 octects)
-> +		Response parameters: <none>
-> +
-> +		 In case of an error, the error response will be returned.
-> +
-> +	Opcode 0x02 - Disonnect command/response
-> +
-> +		Command parameters: Remote address (6 octetcs)
-> +		Response parameters: <none>
-> +
-> +		 In case of an error, the error response will be returned.
-> +
-> +	Opcode 0x03 - Connect Audio command/response
-> +
-> +		Command parameters: Remote address (6 octets)
-> +		Response parameters: <none>
-> +
-> +		In case of an error, the error response will be returned.
-> +
-> +	Opcode 0x04 - Disconnect Audio command/response
-> +
-> +		Command parameters: Remote address (6 octets)
-> +		Response parameters: <none>
-> +
-> +		In case of an error, the error response will be returned.
-> +
-> +	Opcode 0x05 - Start Voice Recognition command/response
-> +
-> +		Command parameters: <none>
-> +		Response parameters: <none>
-> +
-> +		In case of an error, the error response will be returned.
-> +
-> +	Opcode 0x06 - Stop Voice Recognition command/response
-> +
-> +		Command parameters: <none>
-> +		Response parameters: <none>
-> +
-> +		In case of an error, the error response will be returned.
-> +
-> +	Opcode 0x07 - Volume Control command/response
-> +
-> +		Command parameters: Volume type (1 octet)
-> +		                    Volume (1 octet)
-> +		Response parameters: <none>
-> +
-> +		Valid volume types: 0x00 = Speaker
-> +		                    0x01 = Microphone
-> +
-> +		In case of an error, the error response will be returned.
-> +
-> +	Opcode 0x08 - Dial command/response
-> +
-> +		Command parameters: Number (string)
-> +		Response parameters: <none>
-> +
-> +		In case of an error, the error response will be returned.
-> +
-> +	Opcode 0x09 - Dial Memory command/response
-> +
-> +		Command parameters: Location (1 octet)
-> +		Response parameters: <none>
-> +
-> +		In case of an error, the error response will be returned.
-> +
-> +	Opcode 0x10 - Handle Call Action command/response
-> +
-> +		Command parameters: Action (1 octet)
-> +		                    Call Index (1 octet)
-> +		Response parameters: <none>
-> +
-> +		Valid actions: 0x00 = CHLD_0
-> +		               0x01 = CHLD_1
-> +		               0x02 = CHLD_2
-> +		               0x03 = CHLD_3
-> +		               0x04 = CHLD_4
-> +		               0x05 = CHLD_1x
-> +		               0x06 = CHLD_2x
-> +		               0x07 = ATA
-> +		               0x08 = CHUP
-> +		               0x09 = BTRH_0
-> +		               0x10 = BTRH_1
-> +		               0x11 = BTRH_2
-> +
-> +		In case of an error, the error response will be returned.
-> +
-> +	Opcode 0x11 - Query Current Calls commad/response
-> +
-> +		Command parameters: <none>
-> +		Response parameters: <none>
-> +
-> +		In case of an error, the error response will be returned.
-> +
-> +	Opcode 0x12 - Query Current Operator Name
-> +
-> +		Command parameters: <none>
-> +		Response parameters: <none>
-> +
-> +		In case of an error, the error response will be returned.
-> +
-> +	Opcode 0x13 - Retrieve Subscriber Info command/response
-> +
-> +		Command parameters: <none>
-> +		Response parameters: <none>
-> +
-> +		In case of an error, the error response will be returned.
-> +
-> +	Opcode 0x14 - Send DTMF Code command/response
-> +
-> +		Command parameters: Code (1 octet)
-> +		Response parameters: <none>
-> +
-> +		In case of an error, the error response will be returned.
-> +
-> +	Opcode 0x15 - Request Last Voice Tag Number command/response
-> +
-> +		Command parameters: <none>
-> +		Response parameters: <none>
-> +
-> +		In case of an error, the error response will be returned.
-> +
-> +Notifications:
-> +
-> +	Opcode 0x81 - Connection State Changed notification
-> +
-> +		Notification parameters: State (1 octet)
-> +		                         Peer Features (1 octet)
-> +		                         Address (6 octets)
-> +
-> +		Valid State values: 0x00 = Disconnected
-> +		                    0x01 = Connecting
-> +		                    0x02 = SLC Connected
-> +		                    0x03 = Disconnecting
-> +
-> +		Note: Peer Features is valid only in SCL Connected state
-> +
-> +	Opcode 0x82 - Audio State Changed notification
-> +
-> +		Notification parameters: State (1 octet)
-> +		                         Address (6 octets)
-> +
-> +		Valid State values: 0x00 = Disconnected
-> +		                    0x01 = Connecting
-> +		                    0x02 = Connected
-> +		                    0x03 = Connected mSBC
-> +
-> +	Opcode 0x83 - Voice Recognition State Changed notification
-> +
-> +		Notification parameters: State (1 octet)
-> +
-> +		Valid State values: 0x00 = VR Stopped
-> +		                    0x01 = VR Started
-> +
-> +	Opcode 0x84 - Network State Changed notification
-> +
-> +		Notification parameters: State (1 octet)
-> +
-> +		Valid State values: 0x00 = Network Not Available
-> +		                    0x01 = Network Available
-> +
-> +	Opcode 0x85 - Network Roaming Type Changed notification
-> +
-> +		Notification parameters: Type (1 octet)
-> +
-> +		Valid Type values: 0x00 = Home
-> +		                   0x01 = Roaming
-> +
-> +	Opcode 0x86 - Network Signal Strength notification
-> +
-> +		Notification parameters: Signal Strength (1 octet)
-> +
-> +	Opcode 0x87 - Battery Level notification
-> +
-> +		Notification parameters: Battery Level (1 octet)
-> +
-> +	Opcode 0x88 - Current Operator Name notification
-> +
-> +		Notification parameters: Name (string)
-> +
-> +	Opcode 0x89 - Call Indicatior notification
-> +
-> +		Notification parameters: Call (1 octet)
-> +
-> +		Valid Call values: 0x00 = No Call In Progress
-> +		                   0x01 = Call In Progress
-> +
-> +	Opcode 0x8a - Call Setup Indicator notification
-> +
-> +		Notification parameters: Call Setup (1 octet)
-> +
-> +		Valid Call Setup values: 0x00 = None
-> +		                         0x01 = Incoming
-> +		                         0x02 = Outgoing
-> +		                         0x03 = Alerting
-> +
-> +	Opcode 0x8b - Call Held Indicator notification
-> +
-> +		Notification parameters: Call Held (1 octet)
-> +
-> +		Valid Call Held values: 0x00 = None
-> +		                        0x01 = Hold and Active
-> +					0x02 = Hold
-> +
-> +	Opcode 0x8c - Resposne and Hold Status notification
-> +
-> +		Notification parameters: Status (1 octet)
-> +
-> +		Valid Status values: 0x00 = Held
-> +		                     0x01 = Accept
-> +		                     0x02 = Reject
-> +
-> +	Opcode 0x8d - Calling Line Identification notification
-> +
-> +		Notification parameters: Number (string)
-> +
-> +		Note: This will be called only on incoming call if number is
-> +		provided.
-> +
-> +	Opcode 0x8e - Call Waiting notification
-> +
-> +		Notification parameters: Nunmber (string)
-> +
-> +	Opcode 0x8f - Current Calls List notification
-> +
-> +		Notification parameters: Index (1 octet)
-> +		                         Direction (1 octet)
-> +		                         Call State (1 octet)
-> +		                         Multiparty (1 octet)
-> +		                         Number (string)
-> +
-> +		Valid Direction values: 0x00 = Outgoing
-> +		                        0x01 = Incoming
-> +
-> +		Valid Call Sate values: 0x00 = Active
-> +		                        0x01 = Held
-> +		                        0x02 = Dialing
-> +		                        0x03 = Alerting
-> +		                        0x04 = Incoming
-> +		                        0x05 = Waiting
-> +		                        0x06 = Call held by Response and Hold
-> +
-> +		Valid Multiparty values: 0x00 = Single Call
-> +		                         0x01 = Multiparty (conference) Call
-> +
-> +		Note: Number might be empty
-> +
-> +	Opcode 0x90 - Volume Changed notification
-> +
-> +		Notification parameters: Type (1 octet)
-> +		                         Volume (1 octet)
-> +
-> +		Valid Type values: 0x00 = Speaker
-> +		                   0x01 = Microphone
-> +
-> +	Opcode 0x91 - Command Complete Callback notification
-> +
-> +		Notification parameters: Type (1 octet)
-> +		                         CME (1 octet)
-> +
-> +		Valid Type values: 0x00 = OK
-> +		                   0x01 = Error
-> +		                   0x02 = Error no carrier
-> +		                   0x03 = Error busy
-> +		                   0x04 = Error no answer
-> +		                   0x05 = Error delayed
-> +		                   0x06 = Error blacklisted
-> +		                   0x07 = Error CME
-> +
-> +		Note: CME parameter is valid only for Error CME type
-> +
-> +	Opcode 0x92 - Subscriber Service Info Callback notification
-> +
-> +		Notification parameters: Name (string)
-> +		                         Type (1 octet)
-> +
-> +		Valid Type values: 0x00 = Service unknown
-> +		                   0x01 = Service voice
-> +		                   0x02 = Service fax
-> +
-> +	Opcode 0x93 - In Band Ring Settings Callback notification
-> +
-> +		Notification parameters: State (1 octet)
-> +
-> +		Valid State values: 0x00 = In band ringtone not provided
-> +		                    0x01 = In band ringtone provided
-> +
-> +	Opcode 0x94 - Last Voice Call Tag Number Callback notification
-> +
-> +		Notification parameters: Number (string)
-> +
-> +	Opcode 0x95 - Ring Indication notification
-> +
-> +		Notification parameters: <none>
+On 09/09/14 11:47, Alexander Aring wrote:
+> Hi Martin,
+>
+> On Tue, Sep 09, 2014 at 11:17:15AM +0100, Martin Townsend wrote:
+>> Hi Alex,
+>>
+>> On 09/09/14 10:46, Alexander Aring wrote:
+>>> Hi Martin,
+>>>
+>>> On Tue, Sep 09, 2014 at 10:28:36AM +0100, Martin Townsend wrote:
+>>> ...
+>>>>> I thought more about that, you mean the receiving part only? So the
+>>>>> uncompression. The point is that we don't have no interface for an user
+>>>>> that can decide if he like to use UDP compression like RFC 6282 or UDP
+>>>>> compression like GHC. This is only relevant for the transmit part. So
+>>>>> compression is optionally. (We should have some interface to make this
+>>>>> configurable by user -> adding this to the nhc layer, later).
+>>>> I've implemented compression and decompression. You are right in that we need a mechanism of configuring what gets compressed by what method.
+>>> ok. But how we deal with that currently with GHC UDP and UDP RFC6282
+>>> compression. We can't not support both compression methods. 
+>>>
+>>> btw. how we should call it now? Uncompression or decompression, I can
+>>> also name the callbacks to decompression. I am not a native speaker so
+>>> I will ask you which is better now. :-)
+>> As an English speaker I have to admit I don't know.  Here's one link I found on the subject
+>> http://english.stackexchange.com/questions/56480/difference-between-uncompress-and-decompress
+>> to confuse you even more :)
+>>
+>>>>> On the uncompression part, means the receiving part we can support both.
+>>>>> UDP RFC 6282 or UDP like GHC, the next header id value should be
+>>>>> different there. That means currently we can receive every packets but
+>>>>> transmit only RFC6282 compression formats.
+>>>>>
+>>>>> So for receiving this, it's okay. But for compression, since we don't
+>>>>> have some interface to make this configurable we should use RFC 6282.
+>>>> So I will ensure UDP is compressed by 6282.  Then I was going to start out by just compressing ICMPv6 with GHC and monitor how much data is saved by using GHC.  Later on we will implement a mechanism of configuring what gets compressed and by which compression method.
+>>> Okay, you mean that you will leave UDP compression by 6282 but insert a
+>>> receive handling (decompression) for UDP GHC?
+>>>
+>>> RFC6282 doesn't describe any compression/decompression(or uncompression)
+>>> format for ICMPv6, so we could handle there compression and
+>>> uncompression. I understand now you did it that way, or?
+>> For the moment I will assume all ICMPv6 traffic is compressed and decompressed with GHC as this will be the only Next Header Compression format.  In future we need something better.  We also need a method of knowing what compression formats a device supports.  I can see a list of compression formats which could also be a list by protocol.  Then when sending to a device you would select the highest ranking supported compression format for that device.
+> Is "what compression methods like a device to use" part of any RFC? Is there
+> something which I don't know? I mean, okay you can do that in any
+> application layer in userspace. But I don't see that we need something
+> like this in kernelspace. I know there is no suggestion that you want to
+> implement something like this in kernelspace, but I want to clarify this.
+>
+> Application layer in userspace means, use some own coap(or whatever) based
+> protocol and setup the right compressions via userspace by some application.
 
-Both patches applied, thanks.
+I don't know what would be implemented in user or kernel space it's just a general observation that we need some mechanism in the future, of knowing what capabilities a device we want to send to supports so we can select compression accordingly.
 
--- 
-BR
-Szymon Janc
+
+> - Alex
+
+- Martin.
