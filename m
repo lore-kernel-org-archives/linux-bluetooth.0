@@ -1,39 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <3865656.REaqt9iNVY@leonov>
-References: <1410260006-26553-1-git-send-email-lukasz.rymanowski@tieto.com>
-	<3865656.REaqt9iNVY@leonov>
-Date: Tue, 9 Sep 2014 21:13:36 +0200
-Message-ID: <CAN_7+YbAx4C30p66K9pOxv2vb5DyEihoJeP_KHzH6Ua9X8E0oQ@mail.gmail.com>
-Subject: Re: [PATCH v3 1/2] android/hal-ipc-api: Add Handsfree client IPC API
-From: Lukasz Rymanowski <lukasz.rymanowski@gmail.com>
-To: Szymon Janc <szymon.janc@tieto.com>
-Cc: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date: Tue, 9 Sep 2014 19:46:16 +0100
+Message-ID: <CAD9L4re8KghqVZYjZ3ZC_Jnh9V050kZrk5ySWsY9t3YVO2yt6g@mail.gmail.com>
+Subject: [PATCH BlueZ] Create FIFO in /run instead of /tmp
+From: Marcos Marado <mindboosternoori@gmail.com>
+To: linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Szymon,
+Hi there,
 
-On Tue, Sep 9, 2014 at 1:33 PM, Szymon Janc <szymon.janc@tieto.com> wrote:
-> Hi Łukasz,
->
-> On Tuesday 09 of September 2014 12:53:25 Lukasz Rymanowski wrote:
->> ---
->> v2: Fix opcode issue and Battery level command name
->> v3: Some small fixes in couple of commands (self review)
->
-> Since I've already applied V2, please send fixes in separate patch
+This patch changes BlueZ to create its test FIFO on /run instead of /tmp , to
+make SELinux happy.
 
-Alright, will send in next patch set with hf-client stuff.
+---
 
-\Lukasz
->
-> --
-> BR
-> Szymon Janc
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+diff --git a/profiles/input/suspend-dummy.c b/profiles/input/suspend-dummy.c
+index 542ae25..580213e 100644
+--- a/profiles/input/suspend-dummy.c
++++ b/profiles/input/suspend-dummy.c
+@@ -40,7 +40,7 @@
+ #include "src/log.h"
+ #include "suspend.h"
+
+-#define HOG_SUSPEND_FIFO       "/tmp/hogsuspend"
++#define HOG_SUSPEND_FIFO       "/run/hogsuspend"
+
+ static suspend_event suspend_cb = NULL;
+ static resume_event resume_cb = NULL;
+
+---
+
+Best regards,
+-- 
+Marcos Marado
