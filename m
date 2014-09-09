@@ -2,108 +2,103 @@ Return-Path: <cyrus@holtmann.org>
 From: Arman Uguray <armansito@chromium.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Arman Uguray <armansito@chromium.org>
-Subject: [PATCH BlueZ 5/7] tools/btgatt-client: Add the "register-notify" command.
-Date: Mon,  8 Sep 2014 18:03:09 -0700
-Message-Id: <1410224591-5402-6-git-send-email-armansito@chromium.org>
+Subject: [PATCH BlueZ 3/7] shared/gatt-client: Implement bt_gatt_client_unregister_notify.
+Date: Mon,  8 Sep 2014 18:03:07 -0700
+Message-Id: <1410224591-5402-4-git-send-email-armansito@chromium.org>
 In-Reply-To: <1410224591-5402-1-git-send-email-armansito@chromium.org>
 References: <1410224591-5402-1-git-send-email-armansito@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch adds the "register-notify" command, which registers a
-notification/indication handler for a given characteristic value handle.
+This patch implements bt_gatt_client_unregister_notify, which is used to remove
+a previous registered notification/indication handler. This function decreases
+the per-characteristic count of handlers, and if the count drops to 0, a write
+request is sent to the CCC descriptor to disable notifications/indications.
 ---
- tools/btgatt-client.c | 70 +++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 70 insertions(+)
+ src/shared/gatt-client.c | 52 +++++++++++++++++++++++++++++++++++++++++++++---
+ 1 file changed, 49 insertions(+), 3 deletions(-)
 
-diff --git a/tools/btgatt-client.c b/tools/btgatt-client.c
-index 8bde1ee..f95cc9c 100644
---- a/tools/btgatt-client.c
-+++ b/tools/btgatt-client.c
-@@ -702,6 +702,74 @@ static void cmd_write_long_value(struct client *cli, char *cmd_str)
- 	free(value);
+diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
+index d1b5c12..dfd37f8 100644
+--- a/src/shared/gatt-client.c
++++ b/src/shared/gatt-client.c
+@@ -1480,6 +1480,14 @@ static void notify_data_unref(void *data)
+ 	free(notd);
  }
  
-+static void register_notify_usage(void)
++static bool match_notify_data_id(const void *a, const void *b)
 +{
-+	printf("Usage: register-notify <chrc value handle>\n");
++	const struct notify_data *notd = a;
++	unsigned int id = PTR_TO_UINT(b);
++
++	return notd->id == id;
 +}
 +
-+static void notify_cb(uint16_t value_handle, const uint8_t *value,
-+					uint16_t length, void *user_data)
-+{
-+	int i;
+ static void complete_notify_request(void *data)
+ {
+ 	struct notify_data *notd = data;
+@@ -1541,13 +1549,27 @@ static void enable_ccc_callback(uint8_t opcode, const void *pdu,
+ static void disable_ccc_callback(uint8_t opcode, const void *pdu,
+ 					uint16_t length, void *user_data)
+ {
+-	/* TODO */
++	struct notify_data *notd = user_data;
 +
-+	printf("\n\tHandle Value Not/Ind: 0x%04x - ", value_handle);
++	assert(!notd->chrc->not_ref_count);
++	assert(notd->chrc->ccc_write_id);
 +
-+	if (length == 0) {
-+		PRLOG("(0 bytes)\n");
-+		return;
++	notd->chrc->ccc_write_id = 0;
++
++	/* This is a best effort procedure, so ignore errors and process any
++	 * queued requests.
++	 */
++	while ((notd = queue_pop_head(notd->chrc->register_not_queue))) {
++		if (notify_data_write_ccc(notd, true))
++			return;
 +	}
-+
-+	printf("(%u bytes): ", length);
-+
-+	for (i = 0; i < length; i++)
-+		printf("%02x ", value[i]);
-+
-+	PRLOG("\n");
-+}
-+
-+static void register_notify_cb(unsigned int id, uint16_t att_ecode,
-+								void *user_data)
-+{
-+	if (!id) {
-+		PRLOG("Failed to register notify handler "
-+					"- error code: 9x%02x\n", att_ecode);
-+		return;
-+	}
-+
-+	PRLOG("Registered notify handler with id: %u\n", id);
-+}
-+
-+static void cmd_register_notify(struct client *cli, char *cmd_str)
-+{
-+	char *argv[2];
-+	int argc = 0;
-+	uint16_t value_handle;
-+	char *endptr = NULL;
-+
-+	if (!bt_gatt_client_is_ready(cli->gatt)) {
-+		printf("GATT client not initialized\n");
-+		return;
-+	}
-+
-+	if (!parse_args(cmd_str, 1, argv, &argc) || argc != 1) {
-+		register_notify_usage();
-+		return;
-+	}
-+
-+	value_handle = strtol(argv[0], &endptr, 16);
-+	if (!endptr || *endptr != '\0' || !value_handle) {
-+		printf("Invalid value handle: %s\n", argv[0]);
-+		return;
-+	}
-+
-+	if (!bt_gatt_client_register_notify(cli->gatt, value_handle,
-+							register_notify_cb,
-+							notify_cb, NULL, NULL))
-+		printf("Failed to register notify handler\n");
-+
-+	printf("\n");
-+}
-+
- static void cmd_help(struct client *cli, char *cmd_str);
+ }
  
- typedef void (*command_func_t)(struct client *cli, char *cmd_str);
-@@ -721,6 +789,8 @@ static struct {
- 			"\tWrite a characteristic or descriptor value" },
- 	{ "write-long-value", cmd_write_long_value,
- 			"Write long characteristic or descriptor value" },
-+	{ "register-notify", cmd_register_notify,
-+			"\tSubscribe to not/ind from a characteristic" },
- 	{ }
- };
+ static bool notify_data_write_ccc(struct notify_data *notd, bool enable)
+ {
+ 	uint8_t pdu[4];
  
++	assert(notd->chrc->ccc_handle);
+ 	memset(pdu, 0, sizeof(pdu));
+ 	put_le16(notd->chrc->ccc_handle, pdu);
+ 
+@@ -1659,6 +1681,30 @@ bool bt_gatt_client_register_notify(struct bt_gatt_client *client,
+ bool bt_gatt_client_unregister_notify(struct bt_gatt_client *client,
+ 							unsigned int id)
+ {
+-	/* TODO */
+-	return false;
++	struct notify_data *notd;
++
++	if (!client || !id)
++		return false;
++
++	notd = queue_find(client->notify_list, match_notify_data_id,
++							UINT_TO_PTR(id));
++	if (!notd)
++		return false;
++
++	assert(notd->chrc->not_ref_count > 0);
++	assert(!notd->chrc->ccc_write_id);
++
++	/* TODO: Delay destruction/removal if we're in the middle of processing
++	 * a notification.
++	 */
++	queue_remove(client->notify_list, notd);
++
++	if (__sync_sub_and_fetch(&notd->chrc->not_ref_count, 1)) {
++		notify_data_unref(notd);
++		return true;
++	}
++
++	notify_data_write_ccc(notd, false);
++
++	return true;
+ }
 -- 
 2.1.0.rc2.206.gedb03e5
 
