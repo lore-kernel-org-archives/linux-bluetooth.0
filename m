@@ -1,460 +1,99 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Tue, 9 Sep 2014 11:59:59 +0200
+From: Alexander Aring <alex.aring@gmail.com>
+To: Martin Townsend <martin.townsend@xsilon.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+	linux-zigbee-devel@lists.sourceforge.net,
+	linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org
+Subject: Re: [PATCH v2 bluetooth-next] Simplify lowpan receive path so skb is
+ freed in lowpan_rcv when dropped.
+Message-ID: <20140909095958.GD4545@omega>
+References: <53DCE75C.2030305@xsilon.com>
+ <20140821083945.GA29484@omega>
+ <3DF0C18C-4A97-4A00-AB0F-9E01F72CE967@holtmann.org>
+ <53FE446D.6040805@xsilon.com>
+ <20140908104008.GB6981@omega>
+ <540DF1AE.2070709@xsilon.com>
+ <20140908183652.GA633@omega>
+ <20140908185519.GB633@omega>
+ <540EC844.2040008@xsilon.com>
+ <20140909094652.GC4545@omega>
 MIME-Version: 1.0
-In-Reply-To: <1409922002-30751-1-git-send-email-marcin.kraglak@tieto.com>
-References: <1409922002-30751-1-git-send-email-marcin.kraglak@tieto.com>
-Date: Tue, 9 Sep 2014 13:03:25 +0300
-Message-ID: <CABBYNZLGUqXOO9xyTMc=kzo2oiWPk_1GaC8B-dg6JFrh_6cMdA@mail.gmail.com>
-Subject: Re: [PATCHv3 1/2] android/tester: Simplify setup procedure
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Marcin Kraglak <marcin.kraglak@tieto.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20140909094652.GC4545@omega>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcin,
+On Tue, Sep 09, 2014 at 11:46:52AM +0200, Alexander Aring wrote:
+> Hi Martin,
+> 
+> On Tue, Sep 09, 2014 at 10:28:36AM +0100, Martin Townsend wrote:
+> ...
+> > > I thought more about that, you mean the receiving part only? So the
+> > > uncompression. The point is that we don't have no interface for an user
+> > > that can decide if he like to use UDP compression like RFC 6282 or UDP
+> > > compression like GHC. This is only relevant for the transmit part. So
+> > > compression is optionally. (We should have some interface to make this
+> > > configurable by user -> adding this to the nhc layer, later).
+> > I've implemented compression and decompression. You are right in that we need a mechanism of configuring what gets compressed by what method.
+> 
+> ok. But how we deal with that currently with GHC UDP and UDP RFC6282
+> compression. We can't not support both compression methods. 
+> 
+> btw. how we should call it now? Uncompression or decompression, I can
+> also name the callbacks to decompression. I am not a native speaker so
+> I will ask you which is better now. :-)
+> 
+> > > On the uncompression part, means the receiving part we can support both.
+> > > UDP RFC 6282 or UDP like GHC, the next header id value should be
+> > > different there. That means currently we can receive every packets but
+> > > transmit only RFC6282 compression formats.
+> > >
+> > > So for receiving this, it's okay. But for compression, since we don't
+> > > have some interface to make this configurable we should use RFC 6282.
+> > So I will ensure UDP is compressed by 6282.  Then I was going to start out by just compressing ICMPv6 with GHC and monitor how much data is saved by using GHC.  Later on we will implement a mechanism of configuring what gets compressed and by which compression method.
+> 
+> Okay, you mean that you will leave UDP compression by 6282 but insert a
+> receive handling (decompression) for UDP GHC?
+> 
+> RFC6282 doesn't describe any compression/decompression(or uncompression)
+> format for ICMPv6, so we could handle there compression and
+> uncompression. I understand now you did it that way, or?
+> 
+> About the mechanism by user:
+> 
+> There are several ways about to do it from userspace. I know now sysfs
+> or netlink. Do you have already some idea how you want to make this
+> configurable by user?
+> 
+> 
+> btw.
+> This reminds me a little bit like setting led trigger type, (blink,
+> heartbeat, mmc, net, etc...). This is done by sysfs. 
+> 
+> > 
+> > The GHC spec states that a device indicates it's GHC capability using a 6LoWPAN Capability Indication Option (6CIO), this is an ND option.  As far as I can see there is no type assigned yet by IANA so I was wondering if we should have this as an experimental configuration item in the kernel?
+> 
+> Yes, please make a bool into net/6lowpan/Kconfig and add support for
+> drafts only if selected. 
+> 
+> In code you simple need to use "if (IS_ENABLED(CONFIG_FOO))" to
+> registration the nhc format into the nhc framework/layer or not.
 
-On Fri, Sep 5, 2014 at 4:00 PM, Marcin Kraglak <marcin.kraglak@tieto.com> wrote:
-> Every profile test case must initialize bluetooth profile and start
-> bluetoothd, and it is now done in setup_generic(). Additionally
-> each profile can define its own init routine, which will be
-> called after initializing stack.
-> ---
->  android/tester-main.c | 220 ++++++++++++--------------------------------------
->  android/tester-main.h |   1 +
->  2 files changed, 53 insertions(+), 168 deletions(-)
->
-> diff --git a/android/tester-main.c b/android/tester-main.c
-> index 297aadb..7e8621a 100644
-> --- a/android/tester-main.c
-> +++ b/android/tester-main.c
-> @@ -1336,7 +1336,7 @@ static bool setup_base(struct test_data *data)
->         return true;
->  }
->
-> -static void setup(const void *test_data)
-> +static void setup_generic(const void *test_data)
->  {
->         struct test_data *data = tester_get_data();
->         bt_status_t status;
-> @@ -1353,210 +1353,117 @@ static void setup(const void *test_data)
->                 return;
->         }
->
-> -       tester_setup_complete();
-> +       if (!data->init_routine || data->init_routine() == BT_STATUS_SUCCESS)
-> +               tester_setup_complete();
-> +       else
-> +               tester_setup_failed();
->  }
->
-> -static void setup_socket(const void *test_data)
-> +static int init_socket(void)
->  {
->         struct test_data *data = tester_get_data();
-> -       bt_status_t status;
->         const void *sock;
->
-> -       if (!setup_base(data)) {
-> -               tester_setup_failed();
-> -               return;
-> -       }
-> -
-> -       status = data->if_bluetooth->init(&bt_callbacks);
-> -       if (status != BT_STATUS_SUCCESS) {
-> -               data->if_bluetooth = NULL;
-> -               tester_setup_failed();
-> -               return;
-> -       }
-> -
->         sock = data->if_bluetooth->get_profile_interface(BT_PROFILE_SOCKETS_ID);
-> -       if (!sock) {
-> -               tester_setup_failed();
-> -               return;
-> -       }
-> +       if (!sock)
-> +               return BT_STATUS_FAIL;
->
->         data->if_sock = sock;
->
-> -       tester_setup_complete();
-> +       return BT_STATUS_SUCCESS;
->  }
->
-> -static void setup_hidhost(const void *test_data)
-> +static int init_hidhost(void)
->  {
->         struct test_data *data = tester_get_data();
->         bt_status_t status;
->         const void *hid;
->
-> -       if (!setup_base(data)) {
-> -               tester_setup_failed();
-> -               return;
-> -       }
-> -
-> -       status = data->if_bluetooth->init(&bt_callbacks);
-> -       if (status != BT_STATUS_SUCCESS) {
-> -               data->if_bluetooth = NULL;
-> -               tester_setup_failed();
-> -               return;
-> -       }
-> -
->         hid = data->if_bluetooth->get_profile_interface(BT_PROFILE_HIDHOST_ID);
-> -       if (!hid) {
-> -               tester_setup_failed();
-> -               return;
-> -       }
-> +       if (!hid)
-> +               return BT_STATUS_FAIL;
->
->         data->if_hid = hid;
->
->         status = data->if_hid->init(&bthh_callbacks);
-> -       if (status != BT_STATUS_SUCCESS) {
-> +       if (status != BT_STATUS_SUCCESS)
->                 data->if_hid = NULL;
-> -               tester_setup_failed();
-> -               return;
-> -       }
->
-> -       tester_setup_complete();
-> +       return status;
->  }
->
-> -static void setup_pan(const void *test_data)
-> +static int init_pan(void)
->  {
->         struct test_data *data = tester_get_data();
->         bt_status_t status;
->         const void *pan;
->
-> -       if (!setup_base(data)) {
-> -               tester_setup_failed();
-> -               return;
-> -       }
-> -
-> -       status = data->if_bluetooth->init(&bt_callbacks);
-> -       if (status != BT_STATUS_SUCCESS) {
-> -               data->if_bluetooth = NULL;
-> -               tester_setup_failed();
-> -               return;
-> -       }
-> -
->         pan = data->if_bluetooth->get_profile_interface(BT_PROFILE_PAN_ID);
-> -       if (!pan) {
-> -               tester_setup_failed();
-> -               return;
-> -       }
-> +       if (!pan)
-> +               return BT_STATUS_FAIL;
->
->         data->if_pan = pan;
->
->         status = data->if_pan->init(&btpan_callbacks);
-> -       if (status != BT_STATUS_SUCCESS) {
-> +       if (status != BT_STATUS_SUCCESS)
->                 data->if_pan = NULL;
-> -               tester_setup_failed();
-> -               return;
-> -       }
->
-> -       tester_setup_complete();
-> +       return status;
->  }
->
-> -static void setup_hdp(const void *test_data)
-> +static int init_hdp(void)
->  {
->         struct test_data *data = tester_get_data();
->         bt_status_t status;
->         const void *hdp;
->
-> -       if (!setup_base(data)) {
-> -               tester_setup_failed();
-> -               return;
-> -       }
-> -
-> -       status = data->if_bluetooth->init(&bt_callbacks);
-> -       if (status != BT_STATUS_SUCCESS) {
-> -               data->if_bluetooth = NULL;
-> -               tester_setup_failed();
-> -               return;
-> -       }
-> -
->         hdp = data->if_bluetooth->get_profile_interface(BT_PROFILE_HEALTH_ID);
-> -       if (!hdp) {
-> -               tester_setup_failed();
-> -               return;
-> -       }
-> +       if (!hdp)
-> +               return BT_STATUS_FAIL;
->
->         data->if_hdp = hdp;
->
->         status = data->if_hdp->init(&bthl_callbacks);
-> -       if (status != BT_STATUS_SUCCESS) {
-> +       if (status != BT_STATUS_SUCCESS)
->                 data->if_hdp = NULL;
-> -               tester_setup_failed();
-> -               return;
-> -       }
->
-> -       tester_setup_complete();
-> +       return status;
->  }
->
-> -static void setup_a2dp(const void *test_data)
-> +static int init_a2dp(void)
->  {
->         struct test_data *data = tester_get_data();
->         const bt_interface_t *if_bt;
->         bt_status_t status;
->         const void *a2dp;
->
-> -       if (!setup_base(data)) {
-> -               tester_setup_failed();
-> -               return;
-> -       }
-> -
->         if_bt = data->if_bluetooth;
->
-> -       status = if_bt->init(&bt_callbacks);
-> -       if (status != BT_STATUS_SUCCESS) {
-> -               data->if_bluetooth = NULL;
-> -               tester_setup_failed();
-> -               return;
-> -       }
-> -
->         a2dp = if_bt->get_profile_interface(BT_PROFILE_ADVANCED_AUDIO_ID);
-> -       if (!a2dp) {
-> -               tester_setup_failed();
-> -               return;
-> -       }
-> +       if (!a2dp)
-> +               return BT_STATUS_FAIL;
->
->         data->if_a2dp = a2dp;
->
->         status = data->if_a2dp->init(&bta2dp_callbacks);
-> -       if (status != BT_STATUS_SUCCESS) {
-> +       if (status != BT_STATUS_SUCCESS)
->                 data->if_a2dp = NULL;
-> -               tester_setup_failed();
-> -               return;
-> -       }
->
-> -       tester_setup_complete();
-> +       return status;
->  }
->
-> -static void setup_avrcp(const void *test_data)
-> +static int init_avrcp(void)
->  {
->         struct test_data *data = tester_get_data();
->         const bt_interface_t *if_bt;
->         bt_status_t status;
->         const void *a2dp, *avrcp;
->
-> -       if (!setup_base(data)) {
-> -               tester_setup_failed();
-> -               return;
-> -       }
-> -
->         if_bt = data->if_bluetooth;
->
-> -       status = if_bt->init(&bt_callbacks);
-> -       if (status != BT_STATUS_SUCCESS) {
-> -               data->if_bluetooth = NULL;
-> -               tester_setup_failed();
-> -               return;
-> -       }
-> -
->         a2dp = if_bt->get_profile_interface(BT_PROFILE_ADVANCED_AUDIO_ID);
->         if (!a2dp) {
-> -               tester_setup_failed();
-> -               return;
-> +               return BT_STATUS_FAIL;
->         }
->
->         data->if_a2dp = a2dp;
-> @@ -1564,63 +1471,39 @@ static void setup_avrcp(const void *test_data)
->         status = data->if_a2dp->init(&bta2dp_callbacks);
->         if (status != BT_STATUS_SUCCESS) {
->                 data->if_a2dp = NULL;
-> -               tester_setup_failed();
-> -               return;
-> +               return status;
->         }
->
->         avrcp = if_bt->get_profile_interface(BT_PROFILE_AV_RC_ID);
-> -       if (!a2dp) {
-> -               tester_setup_failed();
-> -               return;
-> -       }
-> +       if (!a2dp)
-> +               return BT_STATUS_FAIL;
->
->         data->if_avrcp = avrcp;
->
->         status = data->if_avrcp->init(&btavrcp_callbacks);
-> -       if (status != BT_STATUS_SUCCESS) {
-> +       if (status != BT_STATUS_SUCCESS)
->                 data->if_avrcp = NULL;
-> -               tester_setup_failed();
-> -               return;
-> -       }
->
-> -       tester_setup_complete();
-> +       return status;
->  }
->
-> -static void setup_gatt(const void *test_data)
-> +static int init_gatt(void)
->  {
->         struct test_data *data = tester_get_data();
->         bt_status_t status;
->         const void *gatt;
->
-> -       if (!setup_base(data)) {
-> -               tester_setup_failed();
-> -               return;
-> -       }
-> -
-> -       status = data->if_bluetooth->init(&bt_callbacks);
-> -       if (status != BT_STATUS_SUCCESS) {
-> -               data->if_bluetooth = NULL;
-> -               tester_setup_failed();
-> -               return;
-> -       }
-> -
->         gatt = data->if_bluetooth->get_profile_interface(BT_PROFILE_GATT_ID);
-> -       if (!gatt) {
-> -               tester_setup_failed();
-> -               return;
-> -       }
-> +       if (!gatt)
-> +               return BT_STATUS_FAIL;
->
->         data->if_gatt = gatt;
->
->         status = data->if_gatt->init(&btgatt_callbacks);
-> -       if (status != BT_STATUS_SUCCESS) {
-> +       if (status != BT_STATUS_SUCCESS)
->                 data->if_gatt = NULL;
->
-> -               tester_setup_failed();
-> -               return;
-> -       }
-> -
-> -       tester_setup_complete();
-> +       return status;
->  }
->
->  static void teardown(const void *test_data)
-> @@ -2174,7 +2057,7 @@ static void generic_test_function(const void *test_data)
->         first_step->action();
->  }
->
-> -#define test(data, test_setup, test, test_teardown) \
-> +#define test(data, init, test, test_teardown) \
->         do { \
->                 struct test_data *user; \
->                 user = g_malloc0(sizeof(struct test_data)); \
-> @@ -2182,8 +2065,9 @@ static void generic_test_function(const void *test_data)
->                         break; \
->                 user->hciemu_type = data->emu_type; \
->                 user->test_data = data; \
-> +               user->init_routine = init; \
->                 tester_add_full(data->title, data, test_pre_setup, \
-> -                                       test_setup, test, test_teardown, \
-> +                                       setup_generic, test, test_teardown, \
->                                         test_post_teardown, 3, user, g_free); \
->         } while (0)
->
-> @@ -2203,56 +2087,56 @@ static void add_bluetooth_tests(void *data, void *user_data)
->  {
->         struct test_case *tc = data;
->
-> -       test(tc, setup, generic_test_function, teardown);
-> +       test(tc, NULL, generic_test_function, teardown);
->  }
->
->  static void add_socket_tests(void *data, void *user_data)
->  {
->         struct test_case *tc = data;
->
-> -       test(tc, setup_socket, generic_test_function, teardown);
-> +       test(tc, init_socket, generic_test_function, teardown);
->  }
->
->  static void add_hidhost_tests(void *data, void *user_data)
->  {
->         struct test_case *tc = data;
->
-> -       test(tc, setup_hidhost, generic_test_function, teardown);
-> +       test(tc, init_hidhost, generic_test_function, teardown);
->  }
->
->  static void add_pan_tests(void *data, void *user_data)
->  {
->         struct test_case *tc = data;
->
-> -       test(tc, setup_pan, generic_test_function, teardown);
-> +       test(tc, init_pan, generic_test_function, teardown);
->  }
->
->  static void add_hdp_tests(void *data, void *user_data)
->  {
->         struct test_case *tc = data;
->
-> -       test(tc, setup_hdp, generic_test_function, teardown);
-> +       test(tc, init_hdp, generic_test_function, teardown);
->  }
->
->  static void add_a2dp_tests(void *data, void *user_data)
->  {
->         struct test_case *tc = data;
->
-> -       test(tc, setup_a2dp, generic_test_function, teardown);
-> +       test(tc, init_a2dp, generic_test_function, teardown);
->  }
->
->  static void add_avrcp_tests(void *data, void *user_data)
->  {
->         struct test_case *tc = data;
->
-> -       test(tc, setup_avrcp, generic_test_function, teardown);
-> +       test(tc, init_avrcp, generic_test_function, teardown);
->  }
->
->  static void add_gatt_tests(void *data, void *user_data)
->  {
->         struct test_case *tc = data;
->
-> -       test(tc, setup_gatt, generic_test_function, teardown);
-> +       test(tc, init_gatt, generic_test_function, teardown);
->  }
->
->  int main(int argc, char *argv[])
-> diff --git a/android/tester-main.h b/android/tester-main.h
-> index 6cad803..8247c5a 100644
-> --- a/android/tester-main.h
-> +++ b/android/tester-main.h
-> @@ -314,6 +314,7 @@ struct test_data {
->         struct hw_device_t *device;
->         struct hciemu *hciemu;
->         enum hciemu_type hciemu_type;
-> +       int (*init_routine)(void);
->
->         const bt_interface_t *if_bluetooth;
->         const btsock_interface_t *if_sock;
-> --
-> 1.9.3
+Forget this one, I failed here. We should complete get out the draft
+implementations when it's not selected by buildsystem.
 
-I still think the initialization is not a valid end to end test it is
-a unit test since it does not communicate, therefore it does not
-belong here.
+We need something like this here. "Adding dummy functions with ifdefs".
 
--- 
-Luiz Augusto von Dentz
+#idef CONFIG_FOO
+/* real prototype */
+int lowpan_nhc_add_fancy_format(foo);
+...
+#else
+static inline int lowpan_nhc_add_fancy_format(foo) { }
+...
+#endif
+
+also according to Makefile that we don't build the files which
+implements "lowpan_nhc_add_fancy_format".
+
+- Alex
