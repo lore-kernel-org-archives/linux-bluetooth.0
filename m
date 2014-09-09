@@ -1,252 +1,108 @@
 Return-Path: <cyrus@holtmann.org>
-From: Vikrampal Yadav <vikram.pal@samsung.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: luiz.dentz@gmail.com, d.kasatkin@samsung.com,
-	vikram.pal@samsung.com, cpgs@samsung.com
-Subject: [PATCH v2] monitor: Add AVRCP GetElementAttributes
-Date: Tue, 09 Sep 2014 14:40:29 +0530
-Message-id: <1410253830-7866-1-git-send-email-vikram.pal@samsung.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Message-ID: <540EC162.7060604@xsilon.com>
+Date: Tue, 09 Sep 2014 09:59:14 +0100
+From: Martin Townsend <martin.townsend@xsilon.com>
+MIME-Version: 1.0
+To: Alexander Aring <alex.aring@gmail.com>
+CC: Marcel Holtmann <marcel@holtmann.org>,
+ linux-zigbee-devel@lists.sourceforge.net,
+ linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org
+Subject: Re: [PATCH v2 bluetooth-next] Simplify lowpan receive path so skb
+ is freed in lowpan_rcv when dropped.
+References: <53DCE75C.2030305@xsilon.com> <20140821083945.GA29484@omega> <3DF0C18C-4A97-4A00-AB0F-9E01F72CE967@holtmann.org> <53FE446D.6040805@xsilon.com> <20140908104008.GB6981@omega> <540DF1AE.2070709@xsilon.com> <20140908183652.GA633@omega>
+In-Reply-To: <20140908183652.GA633@omega>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Support for decoding AVRCP GetElementAttributes added in Bluetooth
-monitor.
----
- monitor/avctp.c | 158 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- monitor/l2cap.h |  16 +++---
- 2 files changed, 167 insertions(+), 7 deletions(-)
+Hi Alex,
 
-diff --git a/monitor/avctp.c b/monitor/avctp.c
-index c7e242b..89f0f9c 100644
---- a/monitor/avctp.c
-+++ b/monitor/avctp.c
-@@ -158,6 +158,21 @@
- #define AVRCP_ATTRIBUTE_SHUFFLE		0x03
- #define AVRCP_ATTRIBUTE_SCAN		0x04
- 
-+/* media attributes */
-+#define AVRCP_MEDIA_ATTRIBUTE_ILLEGAL	0x00
-+#define AVRCP_MEDIA_ATTRIBUTE_TITLE	0x01
-+#define AVRCP_MEDIA_ATTRIBUTE_ARTIST	0x02
-+#define AVRCP_MEDIA_ATTRIBUTE_ALBUM	0x03
-+#define AVRCP_MEDIA_ATTRIBUTE_TRACK	0x04
-+#define AVRCP_MEDIA_ATTRIBUTE_TOTAL	0x05
-+#define AVRCP_MEDIA_ATTRIBUTE_GENRE	0x06
-+#define AVRCP_MEDIA_ATTRIBUTE_DURATION	0x07
-+
-+static struct avrcp_continuing {
-+	uint16_t num;
-+	uint16_t size;
-+} avrcp_continuing;
-+
- static const char *ctype2str(uint8_t ctype)
- {
- 	switch (ctype & 0x0f) {
-@@ -517,6 +532,30 @@ static const char *charset2str(uint16_t charset)
- 	}
- }
- 
-+static const char *mediattr2str(uint32_t attr)
-+{
-+	switch (attr) {
-+	case AVRCP_MEDIA_ATTRIBUTE_ILLEGAL:
-+		return "Illegal";
-+	case AVRCP_MEDIA_ATTRIBUTE_TITLE:
-+		return "Title";
-+	case AVRCP_MEDIA_ATTRIBUTE_ARTIST:
-+		return "Artist";
-+	case AVRCP_MEDIA_ATTRIBUTE_ALBUM:
-+		return "Album";
-+	case AVRCP_MEDIA_ATTRIBUTE_TRACK:
-+		return "Track";
-+	case AVRCP_MEDIA_ATTRIBUTE_TOTAL:
-+		return "Track Total";
-+	case AVRCP_MEDIA_ATTRIBUTE_GENRE:
-+		return "Genre";
-+	case AVRCP_MEDIA_ATTRIBUTE_DURATION:
-+		return "Track duration";
-+	default:
-+		return "Reserved";
-+	}
-+}
-+
- static bool avrcp_passthrough_packet(struct l2cap_frame *frame)
- {
- 	packet_hexdump(frame->data, frame->size);
-@@ -884,6 +923,122 @@ static bool avrcp_displayable_charset(struct l2cap_frame *frame, uint8_t ctype,
- 	return true;
- }
- 
-+static bool avrcp_get_element_attributes(struct l2cap_frame *frame,
-+						uint8_t ctype, uint8_t len,
-+						uint8_t indent)
-+{
-+	uint64_t id;
-+	uint8_t num;
-+
-+	if (ctype > AVC_CTYPE_GENERAL_INQUIRY)
-+		goto response;
-+
-+	if (!l2cap_frame_get_be64(frame, &id))
-+		return false;
-+
-+	print_field("%*cIdentifier: 0x%jx (%s)", (indent - 8), ' ',
-+					id, id ? "Reserved" : "PLAYING");
-+
-+	if (!l2cap_frame_get_u8(frame, &num))
-+		return false;
-+
-+	print_field("%*cAttributeCount: 0x%02x", (indent - 8), ' ', num);
-+
-+	for (; num > 0; num--) {
-+		uint32_t attr;
-+
-+		if (!l2cap_frame_get_be32(frame, &attr))
-+			return false;
-+
-+		print_field("%*cAttribute: 0x%08x (%s)", (indent - 8),
-+					' ', attr, mediattr2str(attr));
-+	}
-+
-+	return true;
-+
-+response:
-+	if (frame->pkt_type == AVRCP_PACKET_TYPE_SINGLE
-+				|| frame->pkt_type == AVRCP_PACKET_TYPE_START) {
-+		if (!l2cap_frame_get_u8(frame, &num))
-+			return false;
-+
-+		avrcp_continuing.num = num;
-+		print_field("%*cAttributeCount: 0x%02x", (indent - 8),
-+								' ', num);
-+		len--;
-+	} else {
-+		num = avrcp_continuing.num;
-+
-+		if (avrcp_continuing.size > 0) {
-+			uint16_t size;
-+
-+			if (avrcp_continuing.size > len) {
-+				size = len;
-+				avrcp_continuing.size -= len;
-+			} else {
-+				size = avrcp_continuing.size;
-+				avrcp_continuing.size = 0;
-+			}
-+
-+			printf("ContinuingAttributeValue: ");
-+			for (; size > 0; size--) {
-+				uint8_t c;
-+
-+				if (!l2cap_frame_get_u8(frame, &c))
-+					return false;
-+
-+				printf("%1c", isprint(c) ? c : '.');
-+			}
-+			printf("\n");
-+
-+			len -= size;
-+		}
-+	}
-+
-+	while (num > 0 && len > 0) {
-+		uint32_t attr;
-+		uint16_t charset, attrlen;
-+
-+		if (!l2cap_frame_get_be32(frame, &attr))
-+			return false;
-+
-+		print_field("%*cAttribute: 0x%08x (%s)", (indent - 8),
-+						' ', attr, mediattr2str(attr));
-+
-+		if (!l2cap_frame_get_be16(frame, &charset))
-+			return false;
-+
-+		print_field("%*cCharsetID: 0x%04x (%s)", (indent - 8),
-+				' ', charset, charset2str(charset));
-+
-+		if (!l2cap_frame_get_be16(frame, &attrlen))
-+			return false;
-+
-+		print_field("%*cAttributeValueLength: 0x%04x",
-+						(indent - 8), ' ', attrlen);
-+
-+		len -= sizeof(attr) + sizeof(charset) + sizeof(attrlen);
-+		num--;
-+
-+		print_field("%*cAttributeValue: ", (indent - 8), ' ');
-+		for (; attrlen > 0 && len > 0; attrlen--, len--) {
-+			uint8_t c;
-+
-+			if (!l2cap_frame_get_u8(frame, &c))
-+				return false;
-+
-+			printf("%1c", isprint(c) ? c : '.');
-+		}
-+
-+		if (attrlen > 0)
-+			avrcp_continuing.size = attrlen;
-+	}
-+
-+	avrcp_continuing.num = num;
-+
-+	return true;
-+}
-+
- struct avrcp_ctrl_pdu_data {
- 	uint8_t pduid;
- 	bool (*func) (struct l2cap_frame *frame, uint8_t ctype, uint8_t len,
-@@ -899,6 +1054,7 @@ static const struct avrcp_ctrl_pdu_data avrcp_ctrl_pdu_table[] = {
- 	{ 0x15, avrcp_get_player_attribute_text		},
- 	{ 0x16, avrcp_get_player_value_text		},
- 	{ 0x17, avrcp_displayable_charset		},
-+	{ 0x20, avrcp_get_element_attributes		},
- 	{ }
- };
- 
-@@ -932,6 +1088,8 @@ static bool avrcp_pdu_packet(struct l2cap_frame *frame, uint8_t ctype,
- 	if (!l2cap_frame_get_be16(frame, &len))
- 		return false;
- 
-+	frame->pkt_type = pt;
-+
- 	print_indent(indent, COLOR_OFF, "AVRCP: ", pdu2str(pduid), COLOR_OFF,
- 					" pt %s len 0x%04x", pt2str(pt), len);
- 
-diff --git a/monitor/l2cap.h b/monitor/l2cap.h
-index 5faaea6..9ade06f 100644
---- a/monitor/l2cap.h
-+++ b/monitor/l2cap.h
-@@ -33,6 +33,7 @@ struct l2cap_frame {
- 	uint16_t psm;
- 	uint16_t chan;
- 	uint8_t mode;
-+	uint8_t pkt_type;
- 	const void *data;
- 	uint16_t size;
- };
-@@ -41,13 +42,14 @@ static inline void l2cap_frame_pull(struct l2cap_frame *frame,
- 				const struct l2cap_frame *source, uint16_t len)
- {
- 	if (frame != source) {
--		frame->index   = source->index;
--		frame->in      = source->in;
--		frame->handle  = source->handle;
--		frame->cid     = source->cid;
--		frame->psm     = source->psm;
--		frame->chan    = source->chan;
--		frame->mode    = source->mode;
-+		frame->index    = source->index;
-+		frame->in       = source->in;
-+		frame->handle   = source->handle;
-+		frame->cid      = source->cid;
-+		frame->psm      = source->psm;
-+		frame->chan     = source->chan;
-+		frame->mode     = source->mode;
-+		frame->pkt_type = source->pkt_type;
- 	}
- 
- 	frame->data = source->data + len;
--- 
-1.9.1
-
+On 08/09/14 19:36, Alexander Aring wrote:
+> Hi Martin,
+>
+> On Mon, Sep 08, 2014 at 07:13:02PM +0100, Martin Townsend wrote:
+> ...
+>>>> Hi,
+>>>>
+>>>> I'll respin and include the memory leak fix and this patch and a couple of
+>>>> others I have and send as a series to bluetooth.  What bluetooth git
+>>>> repository should I base the series on?
+>>>>
+>>> What's the state about to fix this bad issue? :-)
+>>>
+>>> I didn't saw any new patches because of this.
+>>>
+>>> - Alex
+>>> --
+>>> To unsubscribe from this list: send the line "unsubscribe linux-wpan" in
+>>> the body of a message to majordomo@vger.kernel.org
+>>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>> Sorry for the delay, been on hols for a few days, I will create the patches
+>> tomorrow if I get time.
+>>
+>> I have also implemented Generic Header Compression[0] which is still in
+>> draft at the moment but I can't imagine it will change much before being
+>> released.  I'm going to integrate it into our linux repository this week.
+>> Would you be interested in putting it in linux-wpan or linux-wpan-next or
+>> would you prefer to wait until it gets it RFC status?
+>>
+> no, for me it's okay to have this mainline. I heard that a draft becomes
+> no RFC when nobody implements it.
+>
+> But another point, I want to avoid that everything is putted into the
+> iphc file for next header compression. Did you saw the patches for the
+> next header compression layer?
+yes I did and would like to add GHC to this new framework so will wait until it's included.
+>
+> This is a layer to separate next header implementation, like IPv6 it
+> does for next header [0]. [0] shows the registration of the next header
+> protocols.
+>
+> We should have something similar and I post some months a RFC about
+> that. I got some review notes and need to rework it, working branch is
+> at [1].
+>
+> Also I added that we drop packets for IPv6 Header Extensions, described
+> at [2]. We currently no support this kind of next header compression and
+> if we don't check on it, we send garbage to IPv6 layer. (That's of
+> course one more argument to implement draft next header compression
+> formats).
+>
+>
+> For now, we should make it like this:
+>
+> - First you send patches for the fixes.
+> - Then I will send patches for the nhc layer.
+> - You send patches to adding the your next header compression formats.
+>   based on the nhc layer.
+>
+> Is that okay for you? It should easily for you to add your header compression
+> formats. (Filling some struct with macro and implement some callbacks).
+ok for me.
+>
+> This is all related stuff to the GENERIC 6LOWPAN branch, all which
+> belongs to IPHC and IPHC contains next header compression. As
+> conclusion this should be go to bluetooth/bluetooth-next.
+>
+> Bug fixes to bluetooth, new features to bluetooth-next.
+>
+ok.
+>
+> btw:
+> I working on the 802.15.4 rework. I am sure you know that I want to make
+> a rework of the 802.15.4 stack. Very busy at the moment, but this should
+> not affect the net/6lowpan branch. Only the net/ieee802.15.4/6lowpan.
+>
+> I will take some time, so after you send fixes for this I will rebase/rework
+> the nhc layer patches to try to bring it mainline. Then you can make your work
+> on it.
+ok.
+>
+> - Alex
+>
+> [0] https://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/tree/net/ipv6/af_inet6.c?id=refs/tags/v3.17-rc4#n822
+> [1] https://github.com/linux-wpan/linux-wpan-next/tree/nhc_layer
+> [2] http://tools.ietf.org/html/rfc6282#section-4.2
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-wpan" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
