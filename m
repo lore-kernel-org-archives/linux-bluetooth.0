@@ -1,45 +1,114 @@
 Return-Path: <cyrus@holtmann.org>
-From: Arman Uguray <armansito@chromium.org>
+From: johan.hedberg@gmail.com
 To: linux-bluetooth@vger.kernel.org
-Cc: Arman Uguray <armansito@chromium.org>
-Subject: [PATCH BlueZ 0/7] shared/gatt-client: Handle notifications.
-Date: Mon,  8 Sep 2014 18:03:04 -0700
-Message-Id: <1410224591-5402-1-git-send-email-armansito@chromium.org>
+Subject: [PATCH] Bluetooth: Fix mgmt pairing failure when authentication fails
+Date: Mon,  8 Sep 2014 17:09:49 -0700
+Message-Id: <1410221389-15975-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch set adds handle value notification/indication handling to
-shared/gatt-client. Introduced are bt_gatt_client_register_notify and
-bt_gatt_client_unregister_notify functions which register a user provided
-callback for a specific characteristic value handle to be invoked when a
-notification or indication is received from that characteristic.
+From: Johan Hedberg <johan.hedberg@intel.com>
 
-The functions automatically write to the Client Characteristic Configuration
-descriptor to enable or disable notifications/indications based on the
-characteristic's properties bit field. An internal per-characteristic count is
-kept, in which the CCC descriptor is only written to when the count transitions
-from 0 -> 1 or 1 -> 0.
+Whether through HCI with BR/EDR or SMP with LE when authentication fails
+we should also notify any pending Pair Device mgmt command. This patch
+updates the mgmt_auth_failed function to take the actual hci_conn object
+and makes sure that any pending pairing command is notified and cleaned
+up appropriately.
 
-Also added the "register-notify" and "unregister-notify" commands to
-tools/btgatt-client to test the above feature.
+Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+---
+ include/net/bluetooth/hci_core.h |  3 +--
+ net/bluetooth/hci_event.c        |  6 ++----
+ net/bluetooth/mgmt.c             | 19 +++++++++++++------
+ net/bluetooth/smp.c              |  3 +--
+ 4 files changed, 17 insertions(+), 14 deletions(-)
 
-Arman Uguray (7):
-  shared/gatt-client: Introduce struct bt_gatt_characteristic_iter.
-  shared/gatt-client: Implement bt_gatt_client_register_notify.
-  shared/gatt-client: Implement bt_gatt_client_unregister_notify.
-  shared/gatt-client: Handle incoming not/ind PDUs.
-  tools/btgatt-client: Add the "register-notify" command.
-  tools/btgatt-client: Add "unregister-notify" command.
-  TODO: Reference counted notify functions implemented
-
- TODO                      |  10 -
- src/shared/gatt-client.c  | 521 ++++++++++++++++++++++++++++++++++++++++++----
- src/shared/gatt-client.h  |  57 +++--
- src/shared/gatt-helpers.c |  67 ------
- src/shared/gatt-helpers.h |   9 -
- tools/btgatt-client.c     | 139 +++++++++++--
- 6 files changed, 657 insertions(+), 146 deletions(-)
-
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 045d9133d180..206b92bfeebb 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -1342,8 +1342,7 @@ int mgmt_user_passkey_neg_reply_complete(struct hci_dev *hdev, bdaddr_t *bdaddr,
+ int mgmt_user_passkey_notify(struct hci_dev *hdev, bdaddr_t *bdaddr,
+ 			     u8 link_type, u8 addr_type, u32 passkey,
+ 			     u8 entered);
+-void mgmt_auth_failed(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
+-		      u8 addr_type, u8 status);
++void mgmt_auth_failed(struct hci_conn *conn, u8 status);
+ void mgmt_auth_enable_complete(struct hci_dev *hdev, u8 status);
+ void mgmt_ssp_enable_complete(struct hci_dev *hdev, u8 enable, u8 status);
+ void mgmt_sc_enable_complete(struct hci_dev *hdev, u8 enable, u8 status);
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index e6a496ae0318..3a8381ab992f 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -2320,8 +2320,7 @@ static void hci_auth_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
+ 			conn->sec_level = conn->pending_sec_level;
+ 		}
+ 	} else {
+-		mgmt_auth_failed(hdev, &conn->dst, conn->type, conn->dst_type,
+-				 ev->status);
++		mgmt_auth_failed(conn, ev->status);
+ 	}
+ 
+ 	clear_bit(HCI_CONN_AUTH_PEND, &conn->flags);
+@@ -3900,8 +3899,7 @@ static void hci_simple_pair_complete_evt(struct hci_dev *hdev,
+ 	 * event gets always produced as initiator and is also mapped to
+ 	 * the mgmt_auth_failed event */
+ 	if (!test_bit(HCI_CONN_AUTH_PEND, &conn->flags) && ev->status)
+-		mgmt_auth_failed(hdev, &conn->dst, conn->type, conn->dst_type,
+-				 ev->status);
++		mgmt_auth_failed(conn, ev->status);
+ 
+ 	hci_conn_drop(conn);
+ 
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index ab9521ae3c63..efb71b022ab6 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -6485,16 +6485,23 @@ int mgmt_user_passkey_notify(struct hci_dev *hdev, bdaddr_t *bdaddr,
+ 	return mgmt_event(MGMT_EV_PASSKEY_NOTIFY, hdev, &ev, sizeof(ev), NULL);
+ }
+ 
+-void mgmt_auth_failed(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
+-		      u8 addr_type, u8 status)
++void mgmt_auth_failed(struct hci_conn *conn, u8 hci_status)
+ {
+ 	struct mgmt_ev_auth_failed ev;
++	struct pending_cmd *cmd;
++	u8 status = mgmt_status(hci_status);
+ 
+-	bacpy(&ev.addr.bdaddr, bdaddr);
+-	ev.addr.type = link_to_bdaddr(link_type, addr_type);
+-	ev.status = mgmt_status(status);
++	bacpy(&ev.addr.bdaddr, &conn->dst);
++	ev.addr.type = link_to_bdaddr(conn->type, conn->dst_type);
++	ev.status = status;
+ 
+-	mgmt_event(MGMT_EV_AUTH_FAILED, hdev, &ev, sizeof(ev), NULL);
++	cmd = find_pairing(conn);
++
++	mgmt_event(MGMT_EV_AUTH_FAILED, conn->hdev, &ev, sizeof(ev),
++		    cmd ? cmd->sk : NULL);
++
++	if (cmd)
++		pairing_complete(cmd, status);
+ }
+ 
+ void mgmt_auth_enable_complete(struct hci_dev *hdev, u8 status)
+diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
+index 560f78a9f960..25c9040e0b12 100644
+--- a/net/bluetooth/smp.c
++++ b/net/bluetooth/smp.c
+@@ -420,8 +420,7 @@ static void smp_failure(struct l2cap_conn *conn, u8 reason)
+ 			     &reason);
+ 
+ 	clear_bit(HCI_CONN_ENCRYPT_PEND, &hcon->flags);
+-	mgmt_auth_failed(hcon->hdev, &hcon->dst, hcon->type, hcon->dst_type,
+-			 HCI_ERROR_AUTH_FAILURE);
++	mgmt_auth_failed(hcon, HCI_ERROR_AUTH_FAILURE);
+ 
+ 	if (chan->data)
+ 		smp_chan_destroy(conn);
 -- 
-2.1.0.rc2.206.gedb03e5
+1.9.3
 
