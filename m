@@ -2,53 +2,34 @@ Return-Path: <cyrus@holtmann.org>
 From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH 39/39] android/readme: Add information about hf-client
-Date: Tue,  9 Sep 2014 21:57:24 +0200
-Message-Id: <1410292644-23497-40-git-send-email-lukasz.rymanowski@tieto.com>
+Subject: [PATCH 38/39] android/hf-client: Add hf-client to Android build
+Date: Tue,  9 Sep 2014 21:57:23 +0200
+Message-Id: <1410292644-23497-39-git-send-email-lukasz.rymanowski@tieto.com>
 In-Reply-To: <1410292644-23497-1-git-send-email-lukasz.rymanowski@tieto.com>
 References: <1410292644-23497-1-git-send-email-lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+HF-Client is build for Android only when BLUEZ_EXTENSION flag is set
 ---
- android/README | 10 ++++++++++
- 1 file changed, 10 insertions(+)
+ android/Android.mk | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/android/README b/android/README
-index 20b61a6..6b6a62e 100644
---- a/android/README
-+++ b/android/README
-@@ -37,6 +37,9 @@ features (currently epoll_create1 and ppoll calls for Android 4.4). Sample
- Bionic for Android 4.4 with all required features backported is available at
- https://code.google.com/p/aosp-bluez.platform-bionic/
+diff --git a/android/Android.mk b/android/Android.mk
+index b2b55f7..a75fe53 100644
+--- a/android/Android.mk
++++ b/android/Android.mk
+@@ -128,6 +128,10 @@ LOCAL_SRC_FILES := \
+ 	bluez/android/hal-utils.c \
+ 	bluez/android/hal-health.c \
  
-+- Some of the bluetooth HALs are available only when BLUEZ_EXTENSIONS flag is
-+set in BoardConfig.mk or similar. Please read below for detail which HALs needs
-+that.
- 
- Runtime requirements
- --------------------
-@@ -257,6 +260,7 @@ health        bt_hl.h            complete
- pan           bt_pan.h           complete
- avrcp         bt_rc.h            complete
- socket        bt_sock.h          complete
-+hf-client     bt_hf_client.h     initial
- 
- 
- Implementation shortcomings
-@@ -323,6 +327,12 @@ methods:
- client->set_adv_data               missing kernel support for vendor data
- client->connect                    is_direct parameter is ignored
- 
-+HAL HF Client
-+-------------
++ifeq ($(BLUEZ_EXTENSIONS), true)
++LOCAL_SRC_FILES += bluez/android/hal-hf-client.c
++endif
 +
-+Available on Android only when BLUEZ_EXTENSIONS flag set in BoardConfig.mk
-+
-+
- Audio SCO HAL
- =============
- 
+ LOCAL_C_INCLUDES += \
+ 	$(call include-path-for, system-core) \
+ 	$(call include-path-for, libhardware) \
 -- 
 1.8.4
 
