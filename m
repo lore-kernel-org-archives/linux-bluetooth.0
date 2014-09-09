@@ -1,37 +1,586 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.6\))
-Subject: Re: [PATCH v2 bluetooth-next] Simplify lowpan receive path so skb is freed in lowpan_rcv when dropped.
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20140909094652.GC4545@omega>
-Date: Tue, 9 Sep 2014 06:44:56 -0700
-Cc: Martin Townsend <martin.townsend@xsilon.com>,
-	linux-zigbee-devel@lists.sourceforge.net,
-	BlueZ development <linux-bluetooth@vger.kernel.org>,
-	linux-wpan@vger.kernel.org
-Message-Id: <D07925FA-E15D-4465-B20F-FFE52FDCB8CD@holtmann.org>
-References: <53DCE75C.2030305@xsilon.com> <20140821083945.GA29484@omega> <3DF0C18C-4A97-4A00-AB0F-9E01F72CE967@holtmann.org> <53FE446D.6040805@xsilon.com> <20140908104008.GB6981@omega> <540DF1AE.2070709@xsilon.com> <20140908183652.GA633@omega> <20140908185519.GB633@omega> <540EC844.2040008@xsilon.com> <20140909094652.GC4545@omega>
-To: Alexander Aring <alex.aring@gmail.com>
-Sender: linux-wpan-owner@vger.kernel.org
+From: Szymon Janc <szymon.janc@tieto.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: Marcin Kraglak <marcin.kraglak@tieto.com>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCHv3 1/2] android/tester: Simplify setup procedure
+Date: Tue, 09 Sep 2014 14:16:30 +0200
+Message-ID: <2497968.NSXm3y7leF@leonov>
+In-Reply-To: <CABBYNZLGUqXOO9xyTMc=kzo2oiWPk_1GaC8B-dg6JFrh_6cMdA@mail.gmail.com>
+References: <1409922002-30751-1-git-send-email-marcin.kraglak@tieto.com> <CABBYNZLGUqXOO9xyTMc=kzo2oiWPk_1GaC8B-dg6JFrh_6cMdA@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Alex,
+Hi Luiz, Marcin,
 
->> 
->> The GHC spec states that a device indicates it's GHC capability using a 6LoWPAN Capability Indication Option (6CIO), this is an ND option.  As far as I can see there is no type assigned yet by IANA so I was wondering if we should have this as an experimental configuration item in the kernel?
+On Tuesday 09 of September 2014 13:03:25 Luiz Augusto von Dentz wrote:
+> Hi Marcin,
 > 
-> Yes, please make a bool into net/6lowpan/Kconfig and add support for
-> drafts only if selected. 
+> On Fri, Sep 5, 2014 at 4:00 PM, Marcin Kraglak <marcin.kraglak@tieto.com> 
+wrote:
+> > Every profile test case must initialize bluetooth profile and start
+> > bluetoothd, and it is now done in setup_generic(). Additionally
+> > each profile can define its own init routine, which will be
+> > called after initializing stack.
+> > ---
+> > 
+> >  android/tester-main.c | 220
+> >  ++++++++++++-------------------------------------- android/tester-main.h
+> >  |   1 +
+> >  2 files changed, 53 insertions(+), 168 deletions(-)
+> > 
+> > diff --git a/android/tester-main.c b/android/tester-main.c
+> > index 297aadb..7e8621a 100644
+> > --- a/android/tester-main.c
+> > +++ b/android/tester-main.c
+> > @@ -1336,7 +1336,7 @@ static bool setup_base(struct test_data *data)
+> > 
+> >         return true;
+> >  
+> >  }
+> > 
+> > -static void setup(const void *test_data)
+> > +static void setup_generic(const void *test_data)
+> > 
+> >  {
+> >  
+> >         struct test_data *data = tester_get_data();
+> >         bt_status_t status;
+> > 
+> > @@ -1353,210 +1353,117 @@ static void setup(const void *test_data)
+> > 
+> >                 return;
+> >         
+> >         }
+> > 
+> > -       tester_setup_complete();
+> > +       if (!data->init_routine || data->init_routine() ==
+> > BT_STATUS_SUCCESS) +               tester_setup_complete();
+> > +       else
+> > +               tester_setup_failed();
+> > 
+> >  }
+> > 
+> > -static void setup_socket(const void *test_data)
+> > +static int init_socket(void)
+> > 
+> >  {
+> >  
+> >         struct test_data *data = tester_get_data();
+> > 
+> > -       bt_status_t status;
+> > 
+> >         const void *sock;
+> > 
+> > -       if (!setup_base(data)) {
+> > -               tester_setup_failed();
+> > -               return;
+> > -       }
+> > -
+> > -       status = data->if_bluetooth->init(&bt_callbacks);
+> > -       if (status != BT_STATUS_SUCCESS) {
+> > -               data->if_bluetooth = NULL;
+> > -               tester_setup_failed();
+> > -               return;
+> > -       }
+> > -
+> > 
+> >         sock =
+> >         data->if_bluetooth->get_profile_interface(BT_PROFILE_SOCKETS_ID);
+> > 
+> > -       if (!sock) {
+> > -               tester_setup_failed();
+> > -               return;
+> > -       }
+> > +       if (!sock)
+> > +               return BT_STATUS_FAIL;
+> > 
+> >         data->if_sock = sock;
+> > 
+> > -       tester_setup_complete();
+> > +       return BT_STATUS_SUCCESS;
+> > 
+> >  }
+> > 
+> > -static void setup_hidhost(const void *test_data)
+> > +static int init_hidhost(void)
+> > 
+> >  {
+> >  
+> >         struct test_data *data = tester_get_data();
+> >         bt_status_t status;
+> >         const void *hid;
+> > 
+> > -       if (!setup_base(data)) {
+> > -               tester_setup_failed();
+> > -               return;
+> > -       }
+> > -
+> > -       status = data->if_bluetooth->init(&bt_callbacks);
+> > -       if (status != BT_STATUS_SUCCESS) {
+> > -               data->if_bluetooth = NULL;
+> > -               tester_setup_failed();
+> > -               return;
+> > -       }
+> > -
+> > 
+> >         hid =
+> >         data->if_bluetooth->get_profile_interface(BT_PROFILE_HIDHOST_ID);
+> > 
+> > -       if (!hid) {
+> > -               tester_setup_failed();
+> > -               return;
+> > -       }
+> > +       if (!hid)
+> > +               return BT_STATUS_FAIL;
+> > 
+> >         data->if_hid = hid;
+> >         
+> >         status = data->if_hid->init(&bthh_callbacks);
+> > 
+> > -       if (status != BT_STATUS_SUCCESS) {
+> > +       if (status != BT_STATUS_SUCCESS)
+> > 
+> >                 data->if_hid = NULL;
+> > 
+> > -               tester_setup_failed();
+> > -               return;
+> > -       }
+> > 
+> > -       tester_setup_complete();
+> > +       return status;
+> > 
+> >  }
+> > 
+> > -static void setup_pan(const void *test_data)
+> > +static int init_pan(void)
+> > 
+> >  {
+> >  
+> >         struct test_data *data = tester_get_data();
+> >         bt_status_t status;
+> >         const void *pan;
+> > 
+> > -       if (!setup_base(data)) {
+> > -               tester_setup_failed();
+> > -               return;
+> > -       }
+> > -
+> > -       status = data->if_bluetooth->init(&bt_callbacks);
+> > -       if (status != BT_STATUS_SUCCESS) {
+> > -               data->if_bluetooth = NULL;
+> > -               tester_setup_failed();
+> > -               return;
+> > -       }
+> > -
+> > 
+> >         pan =
+> >         data->if_bluetooth->get_profile_interface(BT_PROFILE_PAN_ID);
+> > 
+> > -       if (!pan) {
+> > -               tester_setup_failed();
+> > -               return;
+> > -       }
+> > +       if (!pan)
+> > +               return BT_STATUS_FAIL;
+> > 
+> >         data->if_pan = pan;
+> >         
+> >         status = data->if_pan->init(&btpan_callbacks);
+> > 
+> > -       if (status != BT_STATUS_SUCCESS) {
+> > +       if (status != BT_STATUS_SUCCESS)
+> > 
+> >                 data->if_pan = NULL;
+> > 
+> > -               tester_setup_failed();
+> > -               return;
+> > -       }
+> > 
+> > -       tester_setup_complete();
+> > +       return status;
+> > 
+> >  }
+> > 
+> > -static void setup_hdp(const void *test_data)
+> > +static int init_hdp(void)
+> > 
+> >  {
+> >  
+> >         struct test_data *data = tester_get_data();
+> >         bt_status_t status;
+> >         const void *hdp;
+> > 
+> > -       if (!setup_base(data)) {
+> > -               tester_setup_failed();
+> > -               return;
+> > -       }
+> > -
+> > -       status = data->if_bluetooth->init(&bt_callbacks);
+> > -       if (status != BT_STATUS_SUCCESS) {
+> > -               data->if_bluetooth = NULL;
+> > -               tester_setup_failed();
+> > -               return;
+> > -       }
+> > -
+> > 
+> >         hdp =
+> >         data->if_bluetooth->get_profile_interface(BT_PROFILE_HEALTH_ID);
+> > 
+> > -       if (!hdp) {
+> > -               tester_setup_failed();
+> > -               return;
+> > -       }
+> > +       if (!hdp)
+> > +               return BT_STATUS_FAIL;
+> > 
+> >         data->if_hdp = hdp;
+> >         
+> >         status = data->if_hdp->init(&bthl_callbacks);
+> > 
+> > -       if (status != BT_STATUS_SUCCESS) {
+> > +       if (status != BT_STATUS_SUCCESS)
+> > 
+> >                 data->if_hdp = NULL;
+> > 
+> > -               tester_setup_failed();
+> > -               return;
+> > -       }
+> > 
+> > -       tester_setup_complete();
+> > +       return status;
+> > 
+> >  }
+> > 
+> > -static void setup_a2dp(const void *test_data)
+> > +static int init_a2dp(void)
+> > 
+> >  {
+> >  
+> >         struct test_data *data = tester_get_data();
+> >         const bt_interface_t *if_bt;
+> >         bt_status_t status;
+> >         const void *a2dp;
+> > 
+> > -       if (!setup_base(data)) {
+> > -               tester_setup_failed();
+> > -               return;
+> > -       }
+> > -
+> > 
+> >         if_bt = data->if_bluetooth;
+> > 
+> > -       status = if_bt->init(&bt_callbacks);
+> > -       if (status != BT_STATUS_SUCCESS) {
+> > -               data->if_bluetooth = NULL;
+> > -               tester_setup_failed();
+> > -               return;
+> > -       }
+> > -
+> > 
+> >         a2dp = if_bt->get_profile_interface(BT_PROFILE_ADVANCED_AUDIO_ID);
+> > 
+> > -       if (!a2dp) {
+> > -               tester_setup_failed();
+> > -               return;
+> > -       }
+> > +       if (!a2dp)
+> > +               return BT_STATUS_FAIL;
+> > 
+> >         data->if_a2dp = a2dp;
+> >         
+> >         status = data->if_a2dp->init(&bta2dp_callbacks);
+> > 
+> > -       if (status != BT_STATUS_SUCCESS) {
+> > +       if (status != BT_STATUS_SUCCESS)
+> > 
+> >                 data->if_a2dp = NULL;
+> > 
+> > -               tester_setup_failed();
+> > -               return;
+> > -       }
+> > 
+> > -       tester_setup_complete();
+> > +       return status;
+> > 
+> >  }
+> > 
+> > -static void setup_avrcp(const void *test_data)
+> > +static int init_avrcp(void)
+> > 
+> >  {
+> >  
+> >         struct test_data *data = tester_get_data();
+> >         const bt_interface_t *if_bt;
+> >         bt_status_t status;
+> >         const void *a2dp, *avrcp;
+> > 
+> > -       if (!setup_base(data)) {
+> > -               tester_setup_failed();
+> > -               return;
+> > -       }
+> > -
+> > 
+> >         if_bt = data->if_bluetooth;
+> > 
+> > -       status = if_bt->init(&bt_callbacks);
+> > -       if (status != BT_STATUS_SUCCESS) {
+> > -               data->if_bluetooth = NULL;
+> > -               tester_setup_failed();
+> > -               return;
+> > -       }
+> > -
+> > 
+> >         a2dp = if_bt->get_profile_interface(BT_PROFILE_ADVANCED_AUDIO_ID);
+> >         if (!a2dp) {
+> > 
+> > -               tester_setup_failed();
+> > -               return;
+> > +               return BT_STATUS_FAIL;
+> > 
+> >         }
+> >         
+> >         data->if_a2dp = a2dp;
+> > 
+> > @@ -1564,63 +1471,39 @@ static void setup_avrcp(const void *test_data)
+> > 
+> >         status = data->if_a2dp->init(&bta2dp_callbacks);
+> >         if (status != BT_STATUS_SUCCESS) {
+> >         
+> >                 data->if_a2dp = NULL;
+> > 
+> > -               tester_setup_failed();
+> > -               return;
+> > +               return status;
+> > 
+> >         }
+> >         
+> >         avrcp = if_bt->get_profile_interface(BT_PROFILE_AV_RC_ID);
+> > 
+> > -       if (!a2dp) {
+> > -               tester_setup_failed();
+> > -               return;
+> > -       }
+> > +       if (!a2dp)
+> > +               return BT_STATUS_FAIL;
+> > 
+> >         data->if_avrcp = avrcp;
+> >         
+> >         status = data->if_avrcp->init(&btavrcp_callbacks);
+> > 
+> > -       if (status != BT_STATUS_SUCCESS) {
+> > +       if (status != BT_STATUS_SUCCESS)
+> > 
+> >                 data->if_avrcp = NULL;
+> > 
+> > -               tester_setup_failed();
+> > -               return;
+> > -       }
+> > 
+> > -       tester_setup_complete();
+> > +       return status;
+> > 
+> >  }
+> > 
+> > -static void setup_gatt(const void *test_data)
+> > +static int init_gatt(void)
+> > 
+> >  {
+> >  
+> >         struct test_data *data = tester_get_data();
+> >         bt_status_t status;
+> >         const void *gatt;
+> > 
+> > -       if (!setup_base(data)) {
+> > -               tester_setup_failed();
+> > -               return;
+> > -       }
+> > -
+> > -       status = data->if_bluetooth->init(&bt_callbacks);
+> > -       if (status != BT_STATUS_SUCCESS) {
+> > -               data->if_bluetooth = NULL;
+> > -               tester_setup_failed();
+> > -               return;
+> > -       }
+> > -
+> > 
+> >         gatt =
+> >         data->if_bluetooth->get_profile_interface(BT_PROFILE_GATT_ID);
+> > 
+> > -       if (!gatt) {
+> > -               tester_setup_failed();
+> > -               return;
+> > -       }
+> > +       if (!gatt)
+> > +               return BT_STATUS_FAIL;
+> > 
+> >         data->if_gatt = gatt;
+> >         
+> >         status = data->if_gatt->init(&btgatt_callbacks);
+> > 
+> > -       if (status != BT_STATUS_SUCCESS) {
+> > +       if (status != BT_STATUS_SUCCESS)
+> > 
+> >                 data->if_gatt = NULL;
+> > 
+> > -               tester_setup_failed();
+> > -               return;
+> > -       }
+> > -
+> > -       tester_setup_complete();
+> > +       return status;
+> > 
+> >  }
+> >  
+> >  static void teardown(const void *test_data)
+> > 
+> > @@ -2174,7 +2057,7 @@ static void generic_test_function(const void
+> > *test_data)> 
+> >         first_step->action();
+> >  
+> >  }
+> > 
+> > -#define test(data, test_setup, test, test_teardown) \
+> > +#define test(data, init, test, test_teardown) \
+> > 
+> >         do { \
+> >         
+> >                 struct test_data *user; \
+> >                 user = g_malloc0(sizeof(struct test_data)); \
+> > 
+> > @@ -2182,8 +2065,9 @@ static void generic_test_function(const void
+> > *test_data)> 
+> >                         break; \
+> >                 
+> >                 user->hciemu_type = data->emu_type; \
+> >                 user->test_data = data; \
+> > 
+> > +               user->init_routine = init; \
+> > 
+> >                 tester_add_full(data->title, data, test_pre_setup, \
+> > 
+> > -                                       test_setup, test, test_teardown, \
+> > +                                       setup_generic, test,
+> > test_teardown, \> 
+> >                                         test_post_teardown, 3, user,
+> >                                         g_free); \
+> >         
+> >         } while (0)
+> > 
+> > @@ -2203,56 +2087,56 @@ static void add_bluetooth_tests(void *data, void
+> > *user_data)> 
+> >  {
+> >  
+> >         struct test_case *tc = data;
+> > 
+> > -       test(tc, setup, generic_test_function, teardown);
+> > +       test(tc, NULL, generic_test_function, teardown);
+> > 
+> >  }
+> >  
+> >  static void add_socket_tests(void *data, void *user_data)
+> >  {
+> >  
+> >         struct test_case *tc = data;
+> > 
+> > -       test(tc, setup_socket, generic_test_function, teardown);
+> > +       test(tc, init_socket, generic_test_function, teardown);
+> > 
+> >  }
+> >  
+> >  static void add_hidhost_tests(void *data, void *user_data)
+> >  {
+> >  
+> >         struct test_case *tc = data;
+> > 
+> > -       test(tc, setup_hidhost, generic_test_function, teardown);
+> > +       test(tc, init_hidhost, generic_test_function, teardown);
+> > 
+> >  }
+> >  
+> >  static void add_pan_tests(void *data, void *user_data)
+> >  {
+> >  
+> >         struct test_case *tc = data;
+> > 
+> > -       test(tc, setup_pan, generic_test_function, teardown);
+> > +       test(tc, init_pan, generic_test_function, teardown);
+> > 
+> >  }
+> >  
+> >  static void add_hdp_tests(void *data, void *user_data)
+> >  {
+> >  
+> >         struct test_case *tc = data;
+> > 
+> > -       test(tc, setup_hdp, generic_test_function, teardown);
+> > +       test(tc, init_hdp, generic_test_function, teardown);
+> > 
+> >  }
+> >  
+> >  static void add_a2dp_tests(void *data, void *user_data)
+> >  {
+> >  
+> >         struct test_case *tc = data;
+> > 
+> > -       test(tc, setup_a2dp, generic_test_function, teardown);
+> > +       test(tc, init_a2dp, generic_test_function, teardown);
+> > 
+> >  }
+> >  
+> >  static void add_avrcp_tests(void *data, void *user_data)
+> >  {
+> >  
+> >         struct test_case *tc = data;
+> > 
+> > -       test(tc, setup_avrcp, generic_test_function, teardown);
+> > +       test(tc, init_avrcp, generic_test_function, teardown);
+> > 
+> >  }
+> >  
+> >  static void add_gatt_tests(void *data, void *user_data)
+> >  {
+> >  
+> >         struct test_case *tc = data;
+> > 
+> > -       test(tc, setup_gatt, generic_test_function, teardown);
+> > +       test(tc, init_gatt, generic_test_function, teardown);
+> > 
+> >  }
+> >  
+> >  int main(int argc, char *argv[])
+> > 
+> > diff --git a/android/tester-main.h b/android/tester-main.h
+> > index 6cad803..8247c5a 100644
+> > --- a/android/tester-main.h
+> > +++ b/android/tester-main.h
+> > @@ -314,6 +314,7 @@ struct test_data {
+> > 
+> >         struct hw_device_t *device;
+> >         struct hciemu *hciemu;
+> >         enum hciemu_type hciemu_type;
+> > 
+> > +       int (*init_routine)(void);
+> > 
+> >         const bt_interface_t *if_bluetooth;
+> >         const btsock_interface_t *if_sock;
+> > 
+> > --
+> > 1.9.3
 > 
-> In code you simple need to use "if (IS_ENABLED(CONFIG_FOO))" to
-> registration the nhc format into the nhc framework/layer or not.
-> 
-> Replace FOO with a propber 6LOWPAN_NHC_DRAFTS or something else. You can
-> write in the help what exactly this means.
+> I still think the initialization is not a valid end to end test it is
+> a unit test since it does not communicate, therefore it does not
+> belong here.
 
-or you just create /sys/kernel/debug/6lowpan/foo and use debugfs to toggle experimental options on/off at runtime. Especially if you are dealing with not yet assigned types, you can also have an entry that allows you to define the type.
+I believe this was done for convenience of not having to wrap struct test_data 
+inside tester_main.c. We already have few other members there which are not
+used outside of main.
 
-Regards
+I don't mind leaving this as is.
 
-Marcel
 
+-- 
+BR
+Szymon Janc
