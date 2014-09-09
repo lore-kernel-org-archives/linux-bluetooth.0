@@ -2,83 +2,299 @@ Return-Path: <cyrus@holtmann.org>
 From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
-Subject: [PATCHv3 4/7] android/tester: Add encryption change verification mechanism
-Date: Tue,  9 Sep 2014 09:47:00 +0200
-Message-Id: <1410248823-8975-5-git-send-email-jakub.tyszkowski@tieto.com>
+Subject: [PATCHv3 2/7] android/tester: Rename and expose callback verification function
+Date: Tue,  9 Sep 2014 09:46:58 +0200
+Message-Id: <1410248823-8975-3-git-send-email-jakub.tyszkowski@tieto.com>
 In-Reply-To: <1410248823-8975-1-git-send-email-jakub.tyszkowski@tieto.com>
 References: <1410248823-8975-1-git-send-email-jakub.tyszkowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Use callback mechanism for encryption verification
+This is needed to verify action result on remotes side by using hciemu
+hooks for example. As hooks are test specific we need this to be exposed
+to other testers.
 ---
- android/tester-main.c | 25 +++++++++++++++++++++++++
- android/tester-main.h |  2 ++
- 2 files changed, 27 insertions(+)
+ android/tester-main.c | 58 +++++++++++++++++++++++++--------------------------
+ android/tester-main.h |  1 +
+ 2 files changed, 30 insertions(+), 29 deletions(-)
 
 diff --git a/android/tester-main.c b/android/tester-main.c
-index 0505a59..efe5bbb 100644
+index 297aadb..0505a59 100644
 --- a/android/tester-main.c
 +++ b/android/tester-main.c
-@@ -28,6 +28,8 @@ static gint scheduled_cbacks_num;
- #define EMULATOR_SIGNAL_TIMEOUT 2 /* in seconds */
- #define EMULATOR_SIGNAL "emulator_started"
- 
-+static const uint8_t hci_encr_change_hdr[] = { 0x04, 0x08, 0x04, 0x00 };
-+
- static gboolean check_callbacks_called(gpointer user_data)
- {
- 	/*
-@@ -213,6 +215,25 @@ static void mgmt_debug(const char *str, void *user_data)
- 	tester_print("%s%s", prefix, str);
+@@ -695,7 +695,7 @@ static gboolean verify_callback(gpointer user_data)
+ 	return FALSE;
  }
  
-+static bool hciemu_post_encr_hook(const void *data, uint16_t len,
-+							void *user_data)
-+{
-+	struct step *step = g_new0(struct step, 1);
-+
-+	/*
-+	 * Expected data: header (4 octets) + conn. handle (2 octets) +
-+	 * encryption flag (1 octet)
-+	 */
-+	if (len < sizeof(hci_encr_change_hdr) + 3)
-+		return true;
-+
-+	step->callback = ((uint8_t *)data)[6] ? CB_EMU_ENCRYPTION_ENABLED :
-+						CB_EMU_ENCRYPTION_DISABLED;
-+
+-static void schedule_callback_call(struct step *step)
++void schedule_callback_verification(struct step *step)
+ {
+ 	g_atomic_int_inc(&scheduled_cbacks_num);
+ 	g_idle_add(verify_callback, step);
+@@ -713,7 +713,7 @@ static void adapter_state_changed_cb(bt_state_t state)
+ 	step->callback_result.state = state;
+ 	step->callback = CB_BT_ADAPTER_STATE_CHANGED;
+ 
+-	schedule_callback_call(step);
 +	schedule_callback_verification(step);
-+	return true;
-+}
-+
- static void read_info_callback(uint8_t status, uint16_t length,
- 					const void *param, void *user_data)
- {
-@@ -250,6 +271,10 @@ static void read_info_callback(uint8_t status, uint16_t length,
- 		return;
- 	}
- 
-+	/* set hook for encryption change */
-+	hciemu_add_hook(data->hciemu, HCIEMU_HOOK_POST_EVT, 0x08,
-+						hciemu_post_encr_hook, NULL);
-+
- 	tester_pre_setup_complete();
  }
  
+ static bt_property_t *copy_properties(int num_properties,
+@@ -769,7 +769,7 @@ static void adapter_properties_cb(bt_status_t status, int num_properties,
+ 								properties);
+ 	step->callback = CB_BT_ADAPTER_PROPERTIES;
+ 
+-	schedule_callback_call(step);
++	schedule_callback_verification(step);
+ }
+ 
+ static void discovery_state_changed_cb(bt_discovery_state_t state)
+@@ -779,7 +779,7 @@ static void discovery_state_changed_cb(bt_discovery_state_t state)
+ 	step->callback = CB_BT_DISCOVERY_STATE_CHANGED;
+ 	step->callback_result.state = state;
+ 
+-	schedule_callback_call(step);
++	schedule_callback_verification(step);
+ }
+ 
+ static void device_found_cb(int num_properties, bt_property_t *properties)
+@@ -792,7 +792,7 @@ static void device_found_cb(int num_properties, bt_property_t *properties)
+ 
+ 	step->callback = CB_BT_DEVICE_FOUND;
+ 
+-	schedule_callback_call(step);
++	schedule_callback_verification(step);
+ }
+ 
+ static void remote_device_properties_cb(bt_status_t status,
+@@ -807,7 +807,7 @@ static void remote_device_properties_cb(bt_status_t status,
+ 
+ 	step->callback = CB_BT_REMOTE_DEVICE_PROPERTIES;
+ 
+-	schedule_callback_call(step);
++	schedule_callback_verification(step);
+ }
+ 
+ static void bond_state_changed_cb(bt_status_t status,
+@@ -827,7 +827,7 @@ static void bond_state_changed_cb(bt_status_t status,
+ 
+ 	step->callback = CB_BT_BOND_STATE_CHANGED;
+ 
+-	schedule_callback_call(step);
++	schedule_callback_verification(step);
+ }
+ 
+ static void pin_request_cb(bt_bdaddr_t *remote_bd_addr,
+@@ -856,7 +856,7 @@ static void pin_request_cb(bt_bdaddr_t *remote_bd_addr,
+ 	g_free(props[2]->val);
+ 	g_free(props[2]);
+ 
+-	schedule_callback_call(step);
++	schedule_callback_verification(step);
+ }
+ 
+ static void ssp_request_cb(bt_bdaddr_t *remote_bd_addr,
+@@ -887,7 +887,7 @@ static void ssp_request_cb(bt_bdaddr_t *remote_bd_addr,
+ 	g_free(props[2]->val);
+ 	g_free(props[2]);
+ 
+-	schedule_callback_call(step);
++	schedule_callback_verification(step);
+ }
+ 
+ static void acl_state_changed_cb(bt_status_t status,
+@@ -900,7 +900,7 @@ static void acl_state_changed_cb(bt_status_t status,
+ 	step->callback_result.status = status;
+ 	step->callback_result.state = state;
+ 
+-	schedule_callback_call(step);
++	schedule_callback_verification(step);
+ }
+ 
+ static bt_callbacks_t bt_callbacks = {
+@@ -927,7 +927,7 @@ static void hidhost_connection_state_cb(bt_bdaddr_t *bd_addr,
+ 	step->callback = CB_HH_CONNECTION_STATE;
+ 	step->callback_result.state = state;
+ 
+-	schedule_callback_call(step);
++	schedule_callback_verification(step);
+ }
+ 
+ static void hidhost_virual_unplug_cb(bt_bdaddr_t *bd_addr, bthh_status_t status)
+@@ -937,7 +937,7 @@ static void hidhost_virual_unplug_cb(bt_bdaddr_t *bd_addr, bthh_status_t status)
+ 	step->callback = CB_HH_VIRTUAL_UNPLUG;
+ 	step->callback_result.status = status;
+ 
+-	schedule_callback_call(step);
++	schedule_callback_verification(step);
+ }
+ 
+ static void hidhost_protocol_mode_cb(bt_bdaddr_t *bd_addr,
+@@ -952,7 +952,7 @@ static void hidhost_protocol_mode_cb(bt_bdaddr_t *bd_addr,
+ 
+ 	/* TODO: add bdaddr to verify? */
+ 
+-	schedule_callback_call(step);
++	schedule_callback_verification(step);
+ }
+ 
+ static void hidhost_hid_info_cb(bt_bdaddr_t *bd_addr, bthh_hid_info_t hid)
+@@ -961,7 +961,7 @@ static void hidhost_hid_info_cb(bt_bdaddr_t *bd_addr, bthh_hid_info_t hid)
+ 
+ 	step->callback = CB_HH_HID_INFO;
+ 
+-	schedule_callback_call(step);
++	schedule_callback_verification(step);
+ }
+ 
+ static void hidhost_get_report_cb(bt_bdaddr_t *bd_addr, bthh_status_t status,
+@@ -974,7 +974,7 @@ static void hidhost_get_report_cb(bt_bdaddr_t *bd_addr, bthh_status_t status,
+ 	step->callback_result.status = status;
+ 	step->callback_result.report_size = size;
+ 
+-	schedule_callback_call(step);
++	schedule_callback_verification(step);
+ }
+ 
+ static bthh_callbacks_t bthh_callbacks = {
+@@ -996,7 +996,7 @@ static void gattc_register_client_cb(int status, int client_if,
+ 
+ 	step->callback_result.status = status;
+ 
+-	schedule_callback_call(step);
++	schedule_callback_verification(step);
+ }
+ 
+ static void gattc_scan_result_cb(bt_bdaddr_t *bda, int rssi, uint8_t *adv_data)
+@@ -1020,7 +1020,7 @@ static void gattc_scan_result_cb(bt_bdaddr_t *bda, int rssi, uint8_t *adv_data)
+ 	g_free(props[1]->val);
+ 	g_free(props[1]);
+ 
+-	schedule_callback_call(step);
++	schedule_callback_verification(step);
+ }
+ 
+ static void gattc_connect_cb(int conn_id, int status, int client_if,
+@@ -1043,7 +1043,7 @@ static void gattc_connect_cb(int conn_id, int status, int client_if,
+ 	g_free(props[0]->val);
+ 	g_free(props[0]);
+ 
+-	schedule_callback_call(step);
++	schedule_callback_verification(step);
+ }
+ 
+ static void gattc_disconnect_cb(int conn_id, int status, int client_if,
+@@ -1066,7 +1066,7 @@ static void gattc_disconnect_cb(int conn_id, int status, int client_if,
+ 	g_free(props[0]->val);
+ 	g_free(props[0]);
+ 
+-	schedule_callback_call(step);
++	schedule_callback_verification(step);
+ }
+ 
+ static void gattc_listen_cb(int status, int server_if)
+@@ -1076,7 +1076,7 @@ static void gattc_listen_cb(int status, int server_if)
+ 	step->callback = CB_GATTC_LISTEN;
+ 	step->callback_result.status = status;
+ 
+-	schedule_callback_call(step);
++	schedule_callback_verification(step);
+ }
+ 
+ static void gattc_search_result_cb(int conn_id, btgatt_srvc_id_t *srvc_id)
+@@ -1087,7 +1087,7 @@ static void gattc_search_result_cb(int conn_id, btgatt_srvc_id_t *srvc_id)
+ 	step->callback_result.conn_id = conn_id;
+ 	step->callback_result.service = g_memdup(srvc_id, sizeof(*srvc_id));
+ 
+-	schedule_callback_call(step);
++	schedule_callback_verification(step);
+ }
+ 
+ static void gattc_search_complete_cb(int conn_id, int status)
+@@ -1097,7 +1097,7 @@ static void gattc_search_complete_cb(int conn_id, int status)
+ 	step->callback = CB_GATTC_SEARCH_COMPLETE;
+ 	step->callback_result.conn_id = conn_id;
+ 
+-	schedule_callback_call(step);
++	schedule_callback_verification(step);
+ }
+ 
+ static void gattc_get_characteristic_cb(int conn_id, int status,
+@@ -1114,7 +1114,7 @@ static void gattc_get_characteristic_cb(int conn_id, int status,
+ 							sizeof(*char_id));
+ 	step->callback_result.char_prop = char_prop;
+ 
+-	schedule_callback_call(step);
++	schedule_callback_verification(step);
+ }
+ 
+ static void pan_control_state_cb(btpan_control_state_t state,
+@@ -1128,7 +1128,7 @@ static void pan_control_state_cb(btpan_control_state_t state,
+ 	step->callback_result.ctrl_state = error;
+ 	step->callback_result.local_role = state;
+ 
+-	schedule_callback_call(step);
++	schedule_callback_verification(step);
+ }
+ 
+ static void pan_connection_state_cb(btpan_connection_state_t state,
+@@ -1144,7 +1144,7 @@ static void pan_connection_state_cb(btpan_connection_state_t state,
+ 	step->callback_result.local_role = local_role;
+ 	step->callback_result.remote_role = remote_role;
+ 
+-	schedule_callback_call(step);
++	schedule_callback_verification(step);
+ }
+ 
+ static btpan_callbacks_t btpan_callbacks = {
+@@ -1161,7 +1161,7 @@ static void hdp_app_reg_state_cb(int app_id, bthl_app_reg_state_t state)
+ 	step->callback_result.app_id = app_id;
+ 	step->callback_result.app_state = state;
+ 
+-	schedule_callback_call(step);
++	schedule_callback_verification(step);
+ }
+ 
+ static void hdp_channel_state_cb(int app_id, bt_bdaddr_t *bd_addr,
+@@ -1176,7 +1176,7 @@ static void hdp_channel_state_cb(int app_id, bt_bdaddr_t *bd_addr,
+ 	step->callback_result.mdep_cfg_index = mdep_cfg_index;
+ 	step->callback_result.channel_state = state;
+ 
+-	schedule_callback_call(step);
++	schedule_callback_verification(step);
+ }
+ 
+ static bthl_callbacks_t bthl_callbacks = {
+@@ -1193,7 +1193,7 @@ static void a2dp_connection_state_cb(btav_connection_state_t state,
+ 	step->callback = CB_A2DP_CONN_STATE;
+ 	step->callback_result.state = state;
+ 
+-	schedule_callback_call(step);
++	schedule_callback_verification(step);
+ }
+ 
+ static void a2dp_audio_state_cb(btav_audio_state_t state, bt_bdaddr_t *bd_addr)
+@@ -1203,7 +1203,7 @@ static void a2dp_audio_state_cb(btav_audio_state_t state, bt_bdaddr_t *bd_addr)
+ 	step->callback = CB_A2DP_AUDIO_STATE;
+ 	step->callback_result.state = state;
+ 
+-	schedule_callback_call(step);
++	schedule_callback_verification(step);
+ }
+ 
+ static btav_callbacks_t bta2dp_callbacks = {
 diff --git a/android/tester-main.h b/android/tester-main.h
-index 9e579fc..c6c76d9 100644
+index 6cad803..d40b995 100644
 --- a/android/tester-main.h
 +++ b/android/tester-main.h
-@@ -309,6 +309,8 @@ typedef enum {
+@@ -452,6 +452,7 @@ void remove_gatt_tests(void);
  
- 	/* Emulator callbacks */
- 	CB_EMU_CONFIRM_SEND_DATA,
-+	CB_EMU_ENCRYPTION_ENABLED,
-+	CB_EMU_ENCRYPTION_DISABLED,
- } expected_bt_callback_t;
+ /* Generic tester API */
+ void schedule_action_verification(struct step *step);
++void schedule_callback_verification(struct step *step);
  
- struct test_data {
+ /* Emulator actions */
+ void emu_setup_powered_remote_action(void);
 -- 
 1.9.1
 
