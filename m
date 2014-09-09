@@ -1,57 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1410244957.7977.59.camel@jrissane-mobl.ger.corp.intel.com>
-Subject: Re: [PATCH 0/3] Misc Bluetooth 6lowpan fixes
-From: Jukka Rissanen <jukka.rissanen@linux.intel.com>
+MIME-Version: 1.0
+In-Reply-To: <B9274DB4-C0B2-42C2-A858-A23C241F84EB@holtmann.org>
+References: <CACUGKYNrsWu6k4q193FsLmCc-fMJ955j6TRdnx=LfqFqcQfrmg@mail.gmail.com>
+	<15262F73-F609-40F5-9294-9B35F5CB7C8C@holtmann.org>
+	<CACUGKYNYg=XUXjDZVC9J74bczn+LJEUszH_HtD1Sea7EsWJfdQ@mail.gmail.com>
+	<B9274DB4-C0B2-42C2-A858-A23C241F84EB@holtmann.org>
+Date: Mon, 8 Sep 2014 19:00:51 -0700
+Message-ID: <CACUGKYP4-iGOh3BogPeXUMF4eihNW57SKwD_+Aot7w466yfojQ@mail.gmail.com>
+Subject: Re: Bluetooth certification with bluez stack
+From: John Tobias <john.tobias.ph@gmail.com>
 To: Marcel Holtmann <marcel@holtmann.org>
 Cc: linux-bluetooth@vger.kernel.org
-Date: Tue, 09 Sep 2014 09:42:37 +0300
-In-Reply-To: <DDA8F0E2-BC29-408F-9535-117EE75793C0@holtmann.org>
-References: 
-	<1410167505-30889-1-git-send-email-jukka.rissanen@linux.intel.com>
-	 <DDA8F0E2-BC29-408F-9535-117EE75793C0@holtmann.org>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Thanks for the info.
 
-On ma, 2014-09-08 at 18:28 -0700, Marcel Holtmann wrote:
-> Hi Jukka,
-> 
-> > there are some issues in Bluetooth 6lowpan that are fixed by these
-> > patches. The patches are not related and can be applied in any order.
-> > 
-> > The current connection timeout value was too low so the patch 1
-> > will use the default connection timeout value instead.
-> > 
-> > I noticed that the peer IPv6 address had wrong U/L bit set in EUI-64
-> > part of the address. This is now fixed by patch 2.
-> > 
-> > If the 6lowpan node is part of a network, then it is expected that
-> > user is also able to send packets to other nodes behind the master
-> > node. This was not happening as we only checked the peer IPv6 address
-> > when deciding should we send the packet or not. The patch 3 now
-> > checks from the routing table where to send the packet.
-> > 
-> > 
-> > Cheers,
-> > Jukka
-> > 
-> > 
-> > Jukka Rissanen (3):
-> >  Bluetooth: 6lowpan: Increase the connection timeout value
-> >  Bluetooth: 6lowpan: Set the peer IPv6 address correctly
-> >  Bluetooth: 6lowpan: Route packets that are not meant to peer via
-> >    correct device
-> > 
-> > net/bluetooth/6lowpan.c | 80 +++++++++++++++++++++++++++++++++++++++++++++++--
-> > 1 file changed, 77 insertions(+), 3 deletions(-)
-> 
-> I am planning to tag 1/3 and 2/3 for stable. Which kernel version do they still apply to?
+Regards,
 
-These are only meant for kernel that supports 6lowpan with Coc so that
-would be 3.17.
+John
 
-
-Cheers,
-Jukka
+On Mon, Sep 8, 2014 at 6:52 PM, Marcel Holtmann <marcel@holtmann.org> wrote:
+> Hi John,
+>
+> I would prefer if you do not top post on this mailing list.
+>
+>> I have a follow up question for you.
+>>
+>> 1. If I used the PTS tool and (assuming) all the test were passed.
+>> This means I do not have to go to the test house, I could use the PTS
+>> info against my device as evidence that my device comply with the
+>> bluetooth sig requirements and they will recognize it?.
+>>
+>> 2. Does PTS is enough to verify L2CAP, GAP, SDP, SPP, RFCOMM, AVCTP,
+>> AVDTP and ATT, GATT, SM protocols?.
+>
+> in theory it is possible to self-qualify just using PTS. I personally have not done it yet.
+>
+> Regards
+>
+> Marcel
+>
