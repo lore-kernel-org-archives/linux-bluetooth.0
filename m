@@ -1,37 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-Date: Tue, 9 Sep 2014 19:46:16 +0100
-Message-ID: <CAD9L4re8KghqVZYjZ3ZC_Jnh9V050kZrk5ySWsY9t3YVO2yt6g@mail.gmail.com>
-Subject: [PATCH BlueZ] Create FIFO in /run instead of /tmp
-From: Marcos Marado <mindboosternoori@gmail.com>
+From: Arman Uguray <armansito@chromium.org>
 To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
+Cc: Arman Uguray <armansito@chromium.org>
+Subject: [PATCH BlueZ v1 7/7] TODO: Reference counted notify functions implemented
+Date: Tue,  9 Sep 2014 10:04:09 -0700
+Message-Id: <1410282249-22004-8-git-send-email-armansito@chromium.org>
+In-Reply-To: <1410282249-22004-1-git-send-email-armansito@chromium.org>
+References: <1410282249-22004-1-git-send-email-armansito@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi there,
-
-This patch changes BlueZ to create its test FIFO on /run instead of /tmp , to
-make SELinux happy.
-
 ---
+ TODO | 10 ----------
+ 1 file changed, 10 deletions(-)
 
-diff --git a/profiles/input/suspend-dummy.c b/profiles/input/suspend-dummy.c
-index 542ae25..580213e 100644
---- a/profiles/input/suspend-dummy.c
-+++ b/profiles/input/suspend-dummy.c
-@@ -40,7 +40,7 @@
- #include "src/log.h"
- #include "suspend.h"
-
--#define HOG_SUSPEND_FIFO       "/tmp/hogsuspend"
-+#define HOG_SUSPEND_FIFO       "/run/hogsuspend"
-
- static suspend_event suspend_cb = NULL;
- static resume_event resume_cb = NULL;
-
----
-
-Best regards,
+diff --git a/TODO b/TODO
+index 5277e39..3530de4 100644
+--- a/TODO
++++ b/TODO
+@@ -152,16 +152,6 @@ ATT/GATT (new shared stack)
+   Priority: Medium
+   Complexity: C1
+ 
+-- Define API functions in shared/gatt-client for enabling/disabling
+-  characteristic handle-value notifications/indications on a reference counted
+-  basis. Code that is no longer interested in notifications from a
+-  characteristic should be able to unregister any callbacks without writing to
+-  the "Client Characteristic Configuration" descriptor if there are others who
+-  are still interested.
+-
+-  Priority: Medium
+-  Complexity: C2
+-
+ - Introduce a handler interface to shared/gatt-client which can be used by the
+   upper layer to determine when the link has been disconnected or an ATT
+   protocol request times out.
 -- 
-Marcos Marado
+2.1.0.rc2.206.gedb03e5
+
