@@ -1,45 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.6\))
-Subject: Re: [PATCH V2] bluetooth: btusb: Fix issue with suspend
+Subject: Re: [PATCH] Bluetooth: Fix mgmt pairing failure when authentication fails
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1410030368-23289-1-git-send-email-Larry.Finger@lwfinger.net>
-Date: Mon, 8 Sep 2014 18:25:27 -0700
-Cc: "Gustavo F. Padovan" <gustavo@padovan.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	BlueZ development <linux-bluetooth@vger.kernel.org>,
-	netdev@vger.kernel.org,
-	Champion Chen <champion_chen@realsil.com.cn>
-Message-Id: <EE5EAEAA-DA2E-4B0D-B961-8819F958E052@holtmann.org>
-References: <1410030368-23289-1-git-send-email-Larry.Finger@lwfinger.net>
-To: Larry Finger <Larry.Finger@lwfinger.net>
+In-Reply-To: <1410221389-15975-1-git-send-email-johan.hedberg@gmail.com>
+Date: Mon, 8 Sep 2014 18:13:56 -0700
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <B25E01FD-A6B3-4F25-AE0B-63A6D5214BCA@holtmann.org>
+References: <1410221389-15975-1-git-send-email-johan.hedberg@gmail.com>
+To: Johan Hedberg <johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Larry,
+Hi Johan,
 
-> Suspend could fail for some platforms because
-> btusb_suspend==> btusb_stop_traffic ==> usb_kill_anchored_urbs,
+> Whether through HCI with BR/EDR or SMP with LE when authentication fails
+> we should also notify any pending Pair Device mgmt command. This patch
+> updates the mgmt_auth_failed function to take the actual hci_conn object
+> and makes sure that any pending pairing command is notified and cleaned
+> up appropriately.
 > 
-> When btusb_bulk_complete returns before system suspend and resubmits an urb,
-> the system cannot enter suspend state.
-> 
-> Signed-off-by: Champion Chen <champion_chen@realsil.com.cn>
-> Signed-off-by: Larry Finger <Larry.Finger@lwfinger.net>
+> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 > ---
-> V2 - Fix incorrect test as noted by Marcel.
-> 
-> ---
-> Johan,
-> 
-> To help Champion with the process, I have formatted the patch in
-> the correct manner. I hope I understand the issue correctly and
-> stated it in a coherent manner in the commit message.
-> 
-> Larry
-> ---
-> drivers/bluetooth/btusb.c | 9 +++++++++
-> 1 file changed, 9 insertions(+)
+> include/net/bluetooth/hci_core.h |  3 +--
+> net/bluetooth/hci_event.c        |  6 ++----
+> net/bluetooth/mgmt.c             | 19 +++++++++++++------
+> net/bluetooth/smp.c              |  3 +--
+> 4 files changed, 17 insertions(+), 14 deletions(-)
 
 patch has been applied to bluetooth-next tree.
 
