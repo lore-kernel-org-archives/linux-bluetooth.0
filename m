@@ -1,49 +1,35 @@
 Return-Path: <cyrus@holtmann.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.6\))
-Subject: Re: [PATCH 0/3] Misc Bluetooth 6lowpan fixes
+Subject: Re: [PATCH v2 bluetooth-next] Simplify lowpan receive path so skb is freed in lowpan_rcv when dropped.
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1410167505-30889-1-git-send-email-jukka.rissanen@linux.intel.com>
-Date: Tue, 9 Sep 2014 06:52:58 -0700
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <88FBCACB-D0CA-428F-837B-41D37734F61E@holtmann.org>
-References: <1410167505-30889-1-git-send-email-jukka.rissanen@linux.intel.com>
-To: Jukka Rissanen <jukka.rissanen@linux.intel.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <20140909094652.GC4545@omega>
+Date: Tue, 9 Sep 2014 06:44:56 -0700
+Cc: Martin Townsend <martin.townsend@xsilon.com>,
+	linux-zigbee-devel@lists.sourceforge.net,
+	BlueZ development <linux-bluetooth@vger.kernel.org>,
+	linux-wpan@vger.kernel.org
+Message-Id: <D07925FA-E15D-4465-B20F-FFE52FDCB8CD@holtmann.org>
+References: <53DCE75C.2030305@xsilon.com> <20140821083945.GA29484@omega> <3DF0C18C-4A97-4A00-AB0F-9E01F72CE967@holtmann.org> <53FE446D.6040805@xsilon.com> <20140908104008.GB6981@omega> <540DF1AE.2070709@xsilon.com> <20140908183652.GA633@omega> <20140908185519.GB633@omega> <540EC844.2040008@xsilon.com> <20140909094652.GC4545@omega>
+To: Alexander Aring <alex.aring@gmail.com>
+Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jukka,
+Hi Alex,
 
-> there are some issues in Bluetooth 6lowpan that are fixed by these
-> patches. The patches are not related and can be applied in any order.
+>> 
+>> The GHC spec states that a device indicates it's GHC capability using a 6LoWPAN Capability Indication Option (6CIO), this is an ND option.  As far as I can see there is no type assigned yet by IANA so I was wondering if we should have this as an experimental configuration item in the kernel?
 > 
-> The current connection timeout value was too low so the patch 1
-> will use the default connection timeout value instead.
+> Yes, please make a bool into net/6lowpan/Kconfig and add support for
+> drafts only if selected. 
 > 
-> I noticed that the peer IPv6 address had wrong U/L bit set in EUI-64
-> part of the address. This is now fixed by patch 2.
+> In code you simple need to use "if (IS_ENABLED(CONFIG_FOO))" to
+> registration the nhc format into the nhc framework/layer or not.
 > 
-> If the 6lowpan node is part of a network, then it is expected that
-> user is also able to send packets to other nodes behind the master
-> node. This was not happening as we only checked the peer IPv6 address
-> when deciding should we send the packet or not. The patch 3 now
-> checks from the routing table where to send the packet.
-> 
-> 
-> Cheers,
-> Jukka
-> 
-> 
-> Jukka Rissanen (3):
->  Bluetooth: 6lowpan: Increase the connection timeout value
->  Bluetooth: 6lowpan: Set the peer IPv6 address correctly
->  Bluetooth: 6lowpan: Route packets that are not meant to peer via
->    correct device
-> 
-> net/bluetooth/6lowpan.c | 80 +++++++++++++++++++++++++++++++++++++++++++++++--
-> 1 file changed, 77 insertions(+), 3 deletions(-)
+> Replace FOO with a propber 6LOWPAN_NHC_DRAFTS or something else. You can
+> write in the help what exactly this means.
 
-all 3 patches have been applied to bluetooth-next tree.
+or you just create /sys/kernel/debug/6lowpan/foo and use debugfs to toggle experimental options on/off at runtime. Especially if you are dealing with not yet assigned types, you can also have an entry that allows you to define the type.
 
 Regards
 
