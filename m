@@ -1,34 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.6\))
-Subject: Re: Bluetooth certification with bluez stack
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <CACUGKYNYg=XUXjDZVC9J74bczn+LJEUszH_HtD1Sea7EsWJfdQ@mail.gmail.com>
-Date: Mon, 8 Sep 2014 18:52:11 -0700
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <B9274DB4-C0B2-42C2-A858-A23C241F84EB@holtmann.org>
-References: <CACUGKYNrsWu6k4q193FsLmCc-fMJ955j6TRdnx=LfqFqcQfrmg@mail.gmail.com> <15262F73-F609-40F5-9294-9B35F5CB7C8C@holtmann.org> <CACUGKYNYg=XUXjDZVC9J74bczn+LJEUszH_HtD1Sea7EsWJfdQ@mail.gmail.com>
-To: John Tobias <john.tobias.ph@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Sender: Larry Finger <larry.finger@gmail.com>
+Message-ID: <540E5A37.8020208@lwfinger.net>
+Date: Mon, 08 Sep 2014 20:39:03 -0500
+From: Larry Finger <Larry.Finger@lwfinger.net>
+MIME-Version: 1.0
+To: Marcel Holtmann <marcel@holtmann.org>
+CC: "Gustavo F. Padovan" <gustavo@padovan.org>,
+ Johan Hedberg <johan.hedberg@gmail.com>,
+ BlueZ development <linux-bluetooth@vger.kernel.org>,
+ netdev@vger.kernel.org, Champion Chen <champion_chen@realsil.com.cn>
+Subject: Re: [PATCH V2] bluetooth: btusb: Fix issue with suspend
+References: <1410030368-23289-1-git-send-email-Larry.Finger@lwfinger.net> <EE5EAEAA-DA2E-4B0D-B961-8819F958E052@holtmann.org>
+In-Reply-To: <EE5EAEAA-DA2E-4B0D-B961-8819F958E052@holtmann.org>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi John,
+On 09/08/2014 08:25 PM, Marcel Holtmann wrote:
+> Hi Larry,
+>
+>> Suspend could fail for some platforms because
+>> btusb_suspend==> btusb_stop_traffic ==> usb_kill_anchored_urbs,
+>>
+>> When btusb_bulk_complete returns before system suspend and resubmits an urb,
+>> the system cannot enter suspend state.
+>>
+>> Signed-off-by: Champion Chen <champion_chen@realsil.com.cn>
+>> Signed-off-by: Larry Finger <Larry.Finger@lwfinger.net>
+>> ---
+>> V2 - Fix incorrect test as noted by Marcel.
+>>
+>> ---
+>> Johan,
+>>
+>> To help Champion with the process, I have formatted the patch in
+>> the correct manner. I hope I understand the issue correctly and
+>> stated it in a coherent manner in the commit message.
+>>
+>> Larry
+>> ---
+>> drivers/bluetooth/btusb.c | 9 +++++++++
+>> 1 file changed, 9 insertions(+)
+>
+> patch has been applied to bluetooth-next tree.
 
-I would prefer if you do not top post on this mailing list.
+Thanks,
 
-> I have a follow up question for you.
-> 
-> 1. If I used the PTS tool and (assuming) all the test were passed.
-> This means I do not have to go to the test house, I could use the PTS
-> info against my device as evidence that my device comply with the
-> bluetooth sig requirements and they will recognize it?.
-> 
-> 2. Does PTS is enough to verify L2CAP, GAP, SDP, SPP, RFCOMM, AVCTP,
-> AVDTP and ATT, GATT, SM protocols?.
-
-in theory it is possible to self-qualify just using PTS. I personally have not done it yet.
-
-Regards
-
-Marcel
-
+Larry
