@@ -1,40 +1,57 @@
 Return-Path: <cyrus@holtmann.org>
-From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
-Subject: [PATCHv3 0/7] android/tester: Cases for HIDHost security checks
-Date: Tue,  9 Sep 2014 09:46:56 +0200
-Message-Id: <1410248823-8975-1-git-send-email-jakub.tyszkowski@tieto.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Message-ID: <1410244957.7977.59.camel@jrissane-mobl.ger.corp.intel.com>
+Subject: Re: [PATCH 0/3] Misc Bluetooth 6lowpan fixes
+From: Jukka Rissanen <jukka.rissanen@linux.intel.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org
+Date: Tue, 09 Sep 2014 09:42:37 +0300
+In-Reply-To: <DDA8F0E2-BC29-408F-9535-117EE75793C0@holtmann.org>
+References: 
+	<1410167505-30889-1-git-send-email-jukka.rissanen@linux.intel.com>
+	 <DDA8F0E2-BC29-408F-9535-117EE75793C0@holtmann.org>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This adds cases checking if Hidhost rejects connection from unknown HID Devices
-and if proper security level is used for devices which requires encryption.
+Hi Marcel,
 
-v3 changes:
-	* improved remote side event verification by defining emulator callbacks
-	* removed sdp call counter and use transaction id from the request frame
+On ma, 2014-09-08 at 18:28 -0700, Marcel Holtmann wrote:
+> Hi Jukka,
+> 
+> > there are some issues in Bluetooth 6lowpan that are fixed by these
+> > patches. The patches are not related and can be applied in any order.
+> > 
+> > The current connection timeout value was too low so the patch 1
+> > will use the default connection timeout value instead.
+> > 
+> > I noticed that the peer IPv6 address had wrong U/L bit set in EUI-64
+> > part of the address. This is now fixed by patch 2.
+> > 
+> > If the 6lowpan node is part of a network, then it is expected that
+> > user is also able to send packets to other nodes behind the master
+> > node. This was not happening as we only checked the peer IPv6 address
+> > when deciding should we send the packet or not. The patch 3 now
+> > checks from the routing table where to send the packet.
+> > 
+> > 
+> > Cheers,
+> > Jukka
+> > 
+> > 
+> > Jukka Rissanen (3):
+> >  Bluetooth: 6lowpan: Increase the connection timeout value
+> >  Bluetooth: 6lowpan: Set the peer IPv6 address correctly
+> >  Bluetooth: 6lowpan: Route packets that are not meant to peer via
+> >    correct device
+> > 
+> > net/bluetooth/6lowpan.c | 80 +++++++++++++++++++++++++++++++++++++++++++++++--
+> > 1 file changed, 77 insertions(+), 3 deletions(-)
+> 
+> I am planning to tag 1/3 and 2/3 for stable. Which kernel version do they still apply to?
 
-V2 changes:
-	* removed btdev hacks for which proper fix was already pushed
-	* smal function flow improvement for emu_remote_connect_hci_action()
-	* slightly reordered patch order
+These are only meant for kernel that supports 6lowpan with Coc so that
+would be 3.17.
 
 
-Jakub Tyszkowski (7):
-  android/tester: Allow HIDHost to use custom sdp response
-  android/tester: Rename and expose callback verification function
-  android/tester: Improve HIDHost data sending verification
-  android/tester: Add encryption change verification mechanism
-  android/tester: Add case verifying encryption on HIDHost
-  android/tester: Fix HIDHost cases sending fixed tid sdp responses
-  android/tester: Add Hidhost rejecting connection case
-
- android/tester-hidhost.c | 256 ++++++++++++++++++++++++++++++++++++++++++-----
- android/tester-main.c    |  83 +++++++++------
- android/tester-main.h    |   7 ++
- 3 files changed, 294 insertions(+), 52 deletions(-)
-
---
-1.9.1
-
+Cheers,
+Jukka
