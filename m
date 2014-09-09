@@ -2,68 +2,92 @@ Return-Path: <cyrus@holtmann.org>
 From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH 18/39] android/hf-client: Add Connection State event
-Date: Tue,  9 Sep 2014 21:57:03 +0200
-Message-Id: <1410292644-23497-19-git-send-email-lukasz.rymanowski@tieto.com>
+Subject: [PATCH 17/39] android/hf-client: Add Get Last Voice Tag Number command
+Date: Tue,  9 Sep 2014 21:57:02 +0200
+Message-Id: <1410292644-23497-18-git-send-email-lukasz.rymanowski@tieto.com>
 In-Reply-To: <1410292644-23497-1-git-send-email-lukasz.rymanowski@tieto.com>
 References: <1410292644-23497-1-git-send-email-lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- android/hal-hf-client.c | 12 ++++++++++++
- android/hal-msg.h       | 13 +++++++++++++
- 2 files changed, 25 insertions(+)
+ android/hal-hf-client.c | 13 +++++++++++++
+ android/hal-msg.h       |  2 ++
+ android/hf-client.c     | 10 ++++++++++
+ 3 files changed, 25 insertions(+)
 
 diff --git a/android/hal-hf-client.c b/android/hal-hf-client.c
-index 8ee77f2..a7d164f 100644
+index e7d9abe..8ee77f2 100644
 --- a/android/hal-hf-client.c
 +++ b/android/hal-hf-client.c
-@@ -35,11 +35,23 @@ static bool interface_ready(void)
- 	return cbs != NULL;
+@@ -291,6 +291,18 @@ static bt_status_t send_dtmf(char tone)
+ 					sizeof(cmd), &cmd, NULL, NULL, NULL);
  }
  
-+static void handle_conn_state(void *buf, uint16_t len, int fd)
++static bt_status_t request_last_voice_tag_number(void)
 +{
-+	struct hal_ev_hf_client_conn_state *ev = buf;
++	DBG("");
 +
-+	if (cbs->connection_state_cb)
-+		cbs->connection_state_cb(ev->state, ev->peer_feat,
-+				ev->chld_feat, (bt_bdaddr_t *) ev->bdaddr);
++	if (!interface_ready())
++		return BT_STATUS_NOT_READY;
++
++	return hal_ipc_cmd(HAL_SERVICE_ID_HF_CLIENT,
++					HAL_OP_HF_CLIENT_GET_LAST_VOICE_TAG_NUM,
++					0, NULL, NULL, NULL, NULL);
 +}
 +
- /*
-  * handlers will be called from notification thread context,
-  * index in table equals to 'opcode - HAL_MINIMUM_EVENT'
-  */
- static const struct hal_ipc_handler ev_handlers[] = {
-+	/* HAL_EV_HF_CLIENT_CONN_STATE */
-+	{ handle_conn_state, false,
-+				sizeof(struct hal_ev_hf_client_conn_state) },
+ static void cleanup(void)
+ {
+ 	struct hal_cmd_unregister_module cmd;
+@@ -327,6 +339,7 @@ static bthf_client_interface_t iface = {
+ 	.query_current_operator_name = query_operator_name,
+ 	.retrieve_subscriber_info = retrieve_subsr_info,
+ 	.send_dtmf = send_dtmf,
++	.request_last_voice_tag_number = request_last_voice_tag_number,
+ 	.cleanup = cleanup
  };
  
- static bt_status_t init(bthf_client_callbacks_t *callbacks)
 diff --git a/android/hal-msg.h b/android/hal-msg.h
-index 9445c66..e385f59 100644
+index b43f7d9..9445c66 100644
 --- a/android/hal-msg.h
 +++ b/android/hal-msg.h
-@@ -1691,3 +1691,16 @@ struct hal_ev_gatt_server_rsp_confirmation {
- #define HAL_GATT_AUTHENTICATION_NONE		0
- #define HAL_GATT_AUTHENTICATION_NO_MITM		1
- #define HAL_GATT_AUTHENTICATION_MITM		2
+@@ -1045,6 +1045,8 @@ struct hal_cmd_hf_client_send_dtmf {
+ 	uint8_t tone;
+ } __attribute__((packed));
+ 
++#define HAL_OP_HF_CLIENT_GET_LAST_VOICE_TAG_NUM	0x15
 +
-+#define HF_CLIENT_CONN_STATE_DISCONNECTED	0x00
-+#define HF_CLIENT_CONN_STATE_CONNECTING		0x01
-+#define HF_CLIENT_CONN_STATE_SLC_CONNECTED	0x02
-+#define HF_CLIENT_CONN_STATE_DISCONNECTING	0x03
+ /* Notifications and confirmations */
+ 
+ #define HAL_POWER_OFF			0x00
+diff --git a/android/hf-client.c b/android/hf-client.c
+index bcb2f51..1d03c46 100644
+--- a/android/hf-client.c
++++ b/android/hf-client.c
+@@ -151,6 +151,14 @@ static void handle_send_dtmf(const void *buf, uint16_t len)
+ 			HAL_OP_HF_CLIENT_SEND_DTMF, HAL_STATUS_UNSUPPORTED);
+ }
+ 
++static void handle_get_last_vc_tag_num(const void *buf, uint16_t len)
++{
++	DBG("Not Implemented");
++	ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_HF_CLIENT,
++					HAL_OP_HF_CLIENT_GET_LAST_VOICE_TAG_NUM,
++					HAL_STATUS_UNSUPPORTED);
++}
 +
-+#define HAL_EV_HF_CLIENT_CONN_STATE			0x81
-+struct hal_ev_hf_client_conn_state {
-+	uint8_t state;
-+	uint16_t peer_feat;
-+	uint16_t chld_feat;
-+	uint8_t bdaddr[6];
-+} __attribute__((packed));
+ static const struct ipc_handler cmd_handlers[] = {
+ 	/* HAL_OP_HF_CLIENT_CONNECT */
+ 	{ handle_connect, false,
+@@ -188,6 +196,8 @@ static const struct ipc_handler cmd_handlers[] = {
+ 	/* HAL_OP_HF_CLIENT_SEND_DTMF */
+ 	{ handle_send_dtmf, false,
+ 				sizeof(struct hal_cmd_hf_client_send_dtmf) },
++	/* HAL_OP_HF_CLIENT_GET_LAST_VOICE_TAG_NUM */
++	{ handle_get_last_vc_tag_num, false, 0 },
+ };
+ 
+ bool bt_hf_client_register(struct ipc *ipc, const bdaddr_t *addr)
 -- 
 1.8.4
 
