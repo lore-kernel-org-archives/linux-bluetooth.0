@@ -1,72 +1,89 @@
 Return-Path: <cyrus@holtmann.org>
-From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH 00/39] android: HF Client initial implementation
-Date: Tue,  9 Sep 2014 21:56:45 +0200
-Message-Id: <1410292644-23497-1-git-send-email-lukasz.rymanowski@tieto.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Tue, 9 Sep 2014 15:16:12 -0400
+From: "John W. Linville" <linville@tuxdriver.com>
+To: linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: pull request: bluetooth-next 2014-09-09
+Message-ID: <20140909191612.GM29412@tuxdriver.com>
+References: <20140909155449.GA7412@t440s>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20140909155449.GA7412@t440s>
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Following patches adds
-* HF client HAL
-* HF client daemon skeleton
-* ipc structs and defines for commands and events
-* small fixes in hal-ipc-api
+On Tue, Sep 09, 2014 at 08:54:49AM -0700, Johan Hedberg wrote:
+> Hi John,
+> 
+> This set of patches is intended for 3.18. Most of the patches are LE SMP
+> (Security Manager Protocol) fixes/improvements, but there are also some
+> 6lowpan fixes as well as a fix for the btusb HCI driver.
+> 
+> Please let me know if there are any issues pulling. Thanks.
+> 
+> Johan
+> 
+> ---
+> The following changes since commit 61a3d4f9d52c00b2016bc27fc66b10a194043f76:
+> 
+>   Merge branch 'master' of git://git.kernel.org/pub/scm/linux/kernel/git/linville/wireless (2014-09-08 11:14:56 -0400)
+> 
+> are available in the git repository at:
+> 
+> 
+>   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git for-upstream
+> 
+> for you to fetch changes up to 39e90c77637b3892a39f2908aea57539e961c50e:
+> 
+>   Bluetooth: 6lowpan: Route packets that are not meant to peer via correct device (2014-09-09 15:51:47 +0200)
+> 
+> ----------------------------------------------------------------
+> Behan Webster (1):
+>       Bluetooth: LLVMLinux: Remove VLAIS from bluetooth/amp.c
+> 
+> Champion Chen (1):
+>       Bluetooth: Fix issue with USB suspend in btusb driver
+> 
+> Johan Hedberg (31):
+>       Bluetooth: Fix incorrect LE CoC PDU length restriction based on HCI MTU
+>       Bluetooth: Remove unnecessary l2cap_chan_unlock before l2cap_chan_add
+>       Bluetooth: Fix hci_conn reference counting for fixed channels
+>       Bluetooth: Set addr_type only when it's needed
+>       Bluetooth: Optimize connection parameter lookup for LE connections
+>       Bluetooth: Improve *_get() functions to return the object type
+>       Bluetooth: Fix using hci_conn_get() for hci_conn pointers
+>       Bluetooth: Refactor connection parameter freeing into its own function
+>       Bluetooth: Use zero timeout for immediate scheduling
+>       Bluetooth: Fix hci_conn reference counting with hci_chan
+>       Bluetooth: Set disc_timeout to 0 when calling hci_chan_del
+>       Bluetooth: Ignore incoming data after initiating disconnection
+>       Bluetooth: Remove hci_conn_hold/drop from hci_chan
+>       Bluetooth: Set discon_timeout to 0 in l2cap_conn_del
+>       Bluetooth: Use hci_disconnect for immediate disconnection from SMP
+>       Bluetooth: Remove unused l2cap_conn_shutdown API
+>       Bluetooth: Fix SMP error and response to be mutually exclusive
+>       Bluetooth: Update hci_disconnect() to return an error value
+>       Bluetooth: Use hci_disconnect() for mgmt_disconnect_device()
+>       Bluetooth: Move clock offset reading into hci_disconnect()
+>       Bluetooth: Add clarifying comment for LE CoC result value
+>       Bluetooth: Remove unnecessary checks after canceling SMP security timer
+>       Bluetooth: Don't take any action in smp_resume_cb if not encrypted
+>       Bluetooth: Move identity address update behind a workqueue
+>       Bluetooth: Remove unnecessary deferred work for SMP key distribution
+>       Bluetooth: Fix locking of the SMP context
+>       Bluetooth: Add define for key distribution mask
+>       Bluetooth: Fix calling smp_distribute_keys() when still waiting for keys
+>       Bluetooth: Add strict checks for allowed SMP PDUs
+>       Bluetooth: Fix dereferencing conn variable before NULL check
+>       Bluetooth: Fix mgmt pairing failure when authentication fails
+> 
+> Jukka Rissanen (3):
+>       Bluetooth: 6lowpan: Increase the connection timeout value
+>       Bluetooth: 6lowpan: Set the peer IPv6 address correctly
+>       Bluetooth: 6lowpan: Route packets that are not meant to peer via correct device
 
-Lukasz Rymanowski (39):
-  android/hal-ipc-api: Use 2 bytes for location in dial memory
-  android/hal-ipc-api: Use Tone instead of Code DTMF
-  android/hal-ipc-api: Add missing peer features parameter
-  android/avrcp: Clean up command order
-  android/hf-client: Add hf-client ID
-  android/hf-client: Add hf-client daemon skeleton
-  android/hf-client: Add skeleton for HAL hf-client
-  android/hf-client: Add Connect/Disconnect commands
-  android/hf-client: Add Audio Connect/Disconnect commands
-  android/hf-client: Add Start/Stop Voice Recognition command
-  android/hf-client: Add Volume Control command
-  android/hf-client: Add Dial and Dial Memory command
-  android/hf-client: Add Command Action command
-  android/hf-client: Add Query Current Call and Operator Name command
-  android/hf-client: Add Retrieve Subscriber Info command
-  android/hf-client: Add Send DTMF command
-  android/hf-client: Add Get Last Voice Tag Number command
-  android/hf-client: Add Connection State event
-  android/hf-client: Add Audio Connection State event
-  android/hf-client: Add Voice Recognition State event
-  android/hf-client: Add Network State event
-  android/hf-client: Add Network Roaming State event
-  android/hf-client: Add Network Signal Strenght event
-  android/hf-client: Add Battery Level event
-  android/hf-client: Add Operator Name event
-  android/hf-client: Add Call Indicator event
-  android/hf-client: Add Call Setup Indicator event
-  android/hf-client: Add Call Held Indicator event
-  android/hf-client: Add Response and Hold Status event
-  android/hf-client: Add Call Waiting and Calling Line Ident. events
-  android/hf-client: Add Current Client Call event
-  android/hf-client: Add Volume Changed event
-  android/hf-client: Add Command Complete event
-  android/hf-client: Add Subscriber Info event
-  android/hf-client: Add In Band Ringtone event
-  android/hf-client: Add Last Voice Tag Number event
-  android/hf-client: Add RING notification event
-  android/hf-client: Add hf-client to Android build
-  android/readme: Add information about hf-client
-
- android/Android.mk      |   4 +
- android/Makefile.am     |   3 +
- android/README          |  10 +
- android/hal-hf-client.c | 644 ++++++++++++++++++++++++++++++++++++++++++++++++
- android/hal-ipc-api.txt |   9 +-
- android/hal-msg.h       | 463 ++++++++++++++++++++++++++--------
- android/hal.h           |   2 +
- android/hf-client.c     | 222 +++++++++++++++++
- 8 files changed, 1248 insertions(+), 109 deletions(-)
- create mode 100644 android/hal-hf-client.c
- create mode 100644 android/hf-client.c
+Pulling now...
 
 -- 
-1.8.4
-
+John W. Linville		Someday the world will need a hero, and you
+linville@tuxdriver.com			might be all we have.  Be ready.
