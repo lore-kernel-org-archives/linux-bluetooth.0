@@ -1,48 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-Sender: armansito@google.com
-In-Reply-To: <B3B84C22-937B-4880-B59F-0CFA680192D1@holtmann.org>
-References: <1410282249-22004-1-git-send-email-armansito@chromium.org>
-	<1410282249-22004-5-git-send-email-armansito@chromium.org>
-	<B3B84C22-937B-4880-B59F-0CFA680192D1@holtmann.org>
-Date: Tue, 9 Sep 2014 17:09:46 -0700
-Message-ID: <CAHrH25SVxPLYdjAGNHSwOKLx60wUOSRTzBTHDJfmvpFkiFhRPA@mail.gmail.com>
-Subject: Re: [PATCH BlueZ v1 4/7] shared/gatt-client: Handle incoming not/ind PDUs.
-From: Arman Uguray <armansito@chromium.org>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.6\))
+Subject: Re: [PATCH] Bluetooth: Fix allowing SMP Signing info PDU
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1410304906-20898-1-git-send-email-johan.hedberg@gmail.com>
+Date: Tue, 9 Sep 2014 16:46:08 -0700
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <98D4EFC0-E1FC-499A-A47A-D2CDE258A462@holtmann.org>
+References: <1410304906-20898-1-git-send-email-johan.hedberg@gmail.com>
+To: Johan Hedberg <johan.hedberg@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hi Johan,
 
+> If the remote side is not distributing its IRK but is distributing the
+> CSRK the next PDU after master identification is the Signing
+> Information. This patch fixes a missing SMP_ALLOW_CND() for this in the
+> smp_cmd_master_ident() function.
+> 
+> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+> ---
+> net/bluetooth/smp.c | 2 ++
+> 1 file changed, 2 insertions(+)
 
->> +     unsigned int notify_id, indic_id;
->
-> I have never seen indication shorted into indic. I have to say that I do not like it that much. However I do not have any good suggestion either.
->
+patch has been applied to bluetooth-next tree.
 
-Perhaps "indicn_id"? I could just spell out "indication_id" :P.
+Regards
 
+Marcel
 
->> +     assert(notify_data->chrc->ccc_handle);
->
-> You are going heavy on the asserts. I am not convinced that is always a good idea. If remote devices can exploit such an assert, we have a problem. Gracefully disconnect might be better in many cases.
->
-
-There are certain invariants that go with how the reference count is
-managed and I chose to add asserts in certain places to help catch
-potential bugs. I used them only for things that should never ever
-fail: i.e. if any of these assertions fails then there is a bug in the
-code and we should fix them. I don't mind removing them, but all the
-asserts that I added here (and in the previous patch that you
-responded to) try to capture the logical state and assumptions that
-are made in the code from which there isn't really a good way to
-recover if these assumptions do not hold.
-
-In short, these assertions should always succeed in non-buggy code.
-Does BlueZ have debug-mode-only assert macros? Maybe such a thing
-might be useful to make the code self document these assumptions.
-Otherwise, I can remove them and replace them with comments instead?
-
--Arman
