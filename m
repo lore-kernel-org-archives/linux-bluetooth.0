@@ -1,32 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.6\))
-Subject: Re: [PATCH] Bluetooth: Fix allowing SMP Signing info PDU
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1410304906-20898-1-git-send-email-johan.hedberg@gmail.com>
-Date: Tue, 9 Sep 2014 16:46:08 -0700
+Date: Tue, 9 Sep 2014 16:32:35 -0700
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <98D4EFC0-E1FC-499A-A47A-D2CDE258A462@holtmann.org>
-References: <1410304906-20898-1-git-send-email-johan.hedberg@gmail.com>
-To: Johan Hedberg <johan.hedberg@gmail.com>
+Subject: Re: [PATCH 0/3] Fix for sdp-client in reconnect scenario
+Message-ID: <20140909233235.GA21249@t440s>
+References: <1410253330-27768-1-git-send-email-lukasz.rymanowski@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1410253330-27768-1-git-send-email-lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+Hi Lukasz,
 
-> If the remote side is not distributing its IRK but is distributing the
-> CSRK the next PDU after master identification is the Signing
-> Information. This patch fixes a missing SMP_ALLOW_CND() for this in the
-> smp_cmd_master_ident() function.
+On Tue, Sep 09, 2014, Lukasz Rymanowski wrote:
+> This patch fixes following error scenario:
+> 1. Local device does sdp search and cache sdp session.
+> 2. Peer device disconnect and connect again
+> 3. Local device wants to do sdp search again on outdated sdp session
 > 
-> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
-> ---
-> net/bluetooth/smp.c | 2 ++
-> 1 file changed, 2 insertions(+)
+> If those 3 steps will happen withing 2 sec, we face the issue.
+> 
+> Those patch fixes that.
+> Automated test which easly triggers that will come from Jakub.
+> (Hid Host reconnect test)
+> 
+> Lukasz Rymanowski (3):
+>   sdp-client: Extract cleanup function for cached session
+>   sdp-client: Add disconnect watch for cached session
+>   sdp-client: Minor code style fix
+> 
+>  src/sdp-client.c | 39 +++++++++++++++++++++++++++++++++------
+>  1 file changed, 33 insertions(+), 6 deletions(-)
 
-patch has been applied to bluetooth-next tree.
+All three patches have been applied. Thanks.
 
-Regards
-
-Marcel
-
+Johan
