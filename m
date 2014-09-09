@@ -1,49 +1,77 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1409926365-6436-1-git-send-email-gowtham.ab@samsung.com>
-References: <1409926365-6436-1-git-send-email-gowtham.ab@samsung.com>
-Date: Tue, 9 Sep 2014 11:49:49 +0300
-Message-ID: <CABBYNZKQNjiep=A_6t-GGU5jEreYt4FVbSmsSvqQZ9xinq2QBQ@mail.gmail.com>
-Subject: Re: [PATCH 3/3] android/audio_utils/resampler : Fix the null pointer dereference.
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: gowtham babu <gowtham.ab@samsung.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	Bharat Panda <bharat.panda@samsung.com>, p.sinha@samsung.com
-Content-Type: text/plain; charset=UTF-8
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ] doc/obex-api: Add API for PBAP 1.2 features
+Date: Tue,  9 Sep 2014 10:44:18 +0200
+Message-Id: <1410252258-26093-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-On Fri, Sep 5, 2014 at 5:12 PM, gowtham babu <gowtham.ab@samsung.com> wrote:
-> Checks for NULL.
-> ---
->  android/audio_utils/resampler.c | 6 ++++--
->  1 file changed, 4 insertions(+), 2 deletions(-)
->
-> diff --git a/android/audio_utils/resampler.c b/android/audio_utils/resampler.c
-> index ce30375..f845e2c 100644
-> --- a/android/audio_utils/resampler.c
-> +++ b/android/audio_utils/resampler.c
-> @@ -50,8 +50,10 @@ static void resampler_reset(struct resampler_itfe *resampler)
->  {
->      struct resampler *rsmp = (struct resampler *)resampler;
->
-> -    rsmp->frames_in = 0;
-> -    rsmp->frames_rq = 0;
-> +    if(rsmp != NULL) {
-> +       rsmp->frames_in = 0;
-> +       rsmp->frames_rq = 0;
-> +    }
->
->      if (rsmp != NULL && rsmp->speex_resampler != NULL) {
->          speex_resampler_reset_mem(rsmp->speex_resampler);
-> --
-> 1.9.1
+These changes add support for PBAP 1.2 features, the idea is that upon
+connecting the stack will auto retrieve the DatabaseIdentifier which will
+very likely be used by applications to detect if anything should be done.
 
-Im afraid this was copied from Android so I would not bother with it
-except if you want to send the patch to Android itself.
+In case DatabaseIdentifier is present the user application can then
+request the folder version via GetVersion.
 
+Two new filter are added, Operator which should be used along with FilterBy
+and ResetNewMissedCalls the later can only be used in mch and cch folders.
+---
+ doc/obex-api.txt | 32 ++++++++++++++++++++++++++++++++
+ 1 file changed, 32 insertions(+)
 
+diff --git a/doc/obex-api.txt b/doc/obex-api.txt
+index 9542a30..f31d742 100644
+--- a/doc/obex-api.txt
++++ b/doc/obex-api.txt
+@@ -431,6 +431,14 @@ Methods		void Select(string location, string phonebook)
+ 			Possible errors: org.bluez.obex.Error.Forbidden
+ 					 org.bluez.obex.Error.Failed
+ 
++		uint16, uint16 GetVersion()
++
++			Return the primary and secondy folder version counters
++			for the selected phonebook.
++
++			Possible errors: org.bluez.obex.Error.Forbidden
++					 org.bluez.obex.Error.Failed
++
+ 		array{string} ListFilterFields()
+ 
+ 			Return All Available fields that can be used in Fields
+@@ -465,6 +473,30 @@ Filter:		string Format:
+ 
+ 			Possible values can be query with ListFilterFields.
+ 
++		array{string} FilterBy:
++
++			Filter items by fields. Default do not filter by
++			fields.
++
++			Possible values can be query with ListFilterFields
++			excluding the first item that must be either '&' or
++			'|' that apply AND or OR logic respectively.
++
++		bool ResetNewMissedCalls
++
++			Reset new the missed calls items, shall only be used
++			for folders mch and cch.
++
++Properties	string Folder [readonly]
++
++			Current folder.
++
++		string DatabaseIdentifier [readonly]
++
++			128 bits persistent identifier.
++
++			Value '0' shall be considered as not supported.
++
+ 
+ Synchronization hierarchy
+ =========================
 -- 
-Luiz Augusto von Dentz
+1.9.3
+
