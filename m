@@ -1,40 +1,79 @@
 Return-Path: <cyrus@holtmann.org>
-From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
-Subject: [PATCH] android/tester: Fix not handled ssp requests in AVRCP cases
-Date: Tue,  9 Sep 2014 12:51:58 +0200
-Message-Id: <1410259918-28023-1-git-send-email-jakub.tyszkowski@tieto.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Tue, 9 Sep 2014 12:47:56 +0200
+From: Alexander Aring <alex.aring@gmail.com>
+To: Martin Townsend <martin.townsend@xsilon.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+	linux-zigbee-devel@lists.sourceforge.net,
+	linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org
+Subject: Re: [PATCH v2 bluetooth-next] Simplify lowpan receive path so skb is
+ freed in lowpan_rcv when dropped.
+Message-ID: <20140909104754.GA7284@omega>
+References: <20140821083945.GA29484@omega>
+ <3DF0C18C-4A97-4A00-AB0F-9E01F72CE967@holtmann.org>
+ <53FE446D.6040805@xsilon.com>
+ <20140908104008.GB6981@omega>
+ <540DF1AE.2070709@xsilon.com>
+ <20140908183652.GA633@omega>
+ <20140908185519.GB633@omega>
+ <540EC844.2040008@xsilon.com>
+ <20140909094652.GC4545@omega>
+ <540ED3AB.4000706@xsilon.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+In-Reply-To: <540ED3AB.4000706@xsilon.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Those were previously passing because of ssp handler being not cleaned
-between test cases. This is now fixed in tester framework thus test cases
-needs to be updated.
----
- android/tester-avrcp.c | 2 ++
- 1 file changed, 2 insertions(+)
+Hi Martin,
 
-diff --git a/android/tester-avrcp.c b/android/tester-avrcp.c
-index 337a621..07b95f5 100644
---- a/android/tester-avrcp.c
-+++ b/android/tester-avrcp.c
-@@ -241,6 +241,7 @@ static struct test_case test_cases[] = {
- 		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_ON),
- 		ACTION_SUCCESS(emu_setup_powered_remote_action, NULL),
- 		ACTION_SUCCESS(emu_set_ssp_mode_action, NULL),
-+		ACTION_SUCCESS(set_default_ssp_request_handler, NULL),
- 		ACTION_SUCCESS(emu_add_l2cap_server_action, &sdp_setup_data),
- 		ACTION_SUCCESS(emu_add_l2cap_server_action, &a2dp_setup_data),
- 		ACTION_SUCCESS(emu_add_l2cap_server_action, &avrcp_setup_data),
-@@ -257,6 +258,7 @@ static struct test_case test_cases[] = {
- 		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_ON),
- 		ACTION_SUCCESS(emu_setup_powered_remote_action, NULL),
- 		ACTION_SUCCESS(emu_set_ssp_mode_action, NULL),
-+		ACTION_SUCCESS(set_default_ssp_request_handler, NULL),
- 		ACTION_SUCCESS(emu_add_l2cap_server_action, &sdp_setup_data),
- 		ACTION_SUCCESS(emu_add_l2cap_server_action, &a2dp_setup_data),
- 		ACTION_SUCCESS(emu_add_l2cap_server_action, &avrcp_setup_data),
--- 
-1.9.1
+On Tue, Sep 09, 2014 at 11:17:15AM +0100, Martin Townsend wrote:
+> Hi Alex,
+> 
+> On 09/09/14 10:46, Alexander Aring wrote:
+> > Hi Martin,
+> >
+> > On Tue, Sep 09, 2014 at 10:28:36AM +0100, Martin Townsend wrote:
+> > ...
+> >>> I thought more about that, you mean the receiving part only? So the
+> >>> uncompression. The point is that we don't have no interface for an user
+> >>> that can decide if he like to use UDP compression like RFC 6282 or UDP
+> >>> compression like GHC. This is only relevant for the transmit part. So
+> >>> compression is optionally. (We should have some interface to make this
+> >>> configurable by user -> adding this to the nhc layer, later).
+> >> I've implemented compression and decompression. You are right in that we need a mechanism of configuring what gets compressed by what method.
+> > ok. But how we deal with that currently with GHC UDP and UDP RFC6282
+> > compression. We can't not support both compression methods. 
+> >
+> > btw. how we should call it now? Uncompression or decompression, I can
+> > also name the callbacks to decompression. I am not a native speaker so
+> > I will ask you which is better now. :-)
+> As an English speaker I have to admit I don't know.  Here's one link I found on the subject
+> http://english.stackexchange.com/questions/56480/difference-between-uncompress-and-decompress
+> to confuse you even more :)
+> 
+> >
+> >>> On the uncompression part, means the receiving part we can support both.
+> >>> UDP RFC 6282 or UDP like GHC, the next header id value should be
+> >>> different there. That means currently we can receive every packets but
+> >>> transmit only RFC6282 compression formats.
+> >>>
+> >>> So for receiving this, it's okay. But for compression, since we don't
+> >>> have some interface to make this configurable we should use RFC 6282.
+> >> So I will ensure UDP is compressed by 6282.  Then I was going to start out by just compressing ICMPv6 with GHC and monitor how much data is saved by using GHC.  Later on we will implement a mechanism of configuring what gets compressed and by which compression method.
+> > Okay, you mean that you will leave UDP compression by 6282 but insert a
+> > receive handling (decompression) for UDP GHC?
+> >
+> > RFC6282 doesn't describe any compression/decompression(or uncompression)
+> > format for ICMPv6, so we could handle there compression and
+> > uncompression. I understand now you did it that way, or?
+> For the moment I will assume all ICMPv6 traffic is compressed and decompressed with GHC as this will be the only Next Header Compression format.  In future we need something better.  We also need a method of knowing what compression formats a device supports.  I can see a list of compression formats which could also be a list by protocol.  Then when sending to a device you would select the highest ranking supported compression format for that device.
 
+Is "what compression methods like a device to use" part of any RFC? Is there
+something which I don't know? I mean, okay you can do that in any
+application layer in userspace. But I don't see that we need something
+like this in kernelspace. I know there is no suggestion that you want to
+implement something like this in kernelspace, but I want to clarify this.
+
+Application layer in userspace means, use some own coap(or whatever) based
+protocol and setup the right compressions via userspace by some application.
+
+- Alex
