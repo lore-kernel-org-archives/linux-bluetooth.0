@@ -2,132 +2,129 @@ Return-Path: <cyrus@holtmann.org>
 From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH 12/39] android/hf-client: Add Dial and Dial Memory command
-Date: Tue,  9 Sep 2014 21:56:57 +0200
-Message-Id: <1410292644-23497-13-git-send-email-lukasz.rymanowski@tieto.com>
+Subject: [PATCH 08/39] android/hf-client: Add Connect/Disconnect commands
+Date: Tue,  9 Sep 2014 21:56:53 +0200
+Message-Id: <1410292644-23497-9-git-send-email-lukasz.rymanowski@tieto.com>
 In-Reply-To: <1410292644-23497-1-git-send-email-lukasz.rymanowski@tieto.com>
 References: <1410292644-23497-1-git-send-email-lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- android/hal-hf-client.c | 38 ++++++++++++++++++++++++++++++++++++++
- android/hal-msg.h       | 11 +++++++++++
- android/hf-client.c     | 19 +++++++++++++++++++
- 3 files changed, 68 insertions(+)
+ android/hal-hf-client.c | 40 ++++++++++++++++++++++++++++++++++++++++
+ android/hal-msg.h       | 10 ++++++++++
+ android/hf-client.c     | 21 +++++++++++++++++++++
+ 3 files changed, 71 insertions(+)
 
 diff --git a/android/hal-hf-client.c b/android/hal-hf-client.c
-index 52f3113..1f8c85f 100644
+index 40553ff..5a31563 100644
 --- a/android/hal-hf-client.c
 +++ b/android/hal-hf-client.c
-@@ -186,6 +186,42 @@ static bt_status_t volume_control(bthf_client_volume_type_t type,
- 					sizeof(cmd), &cmd, NULL, NULL, NULL);
+@@ -70,6 +70,44 @@ static bt_status_t init(bthf_client_callbacks_t *callbacks)
+ 	return ret;
  }
  
-+static bt_status_t dial(const char *number)
++static bt_status_t hf_client_connect(bt_bdaddr_t *bd_addr)
 +{
-+	char buf[IPC_MTU];
-+	struct hal_cmd_hf_client_dial *cmd = (void *) buf;
-+	size_t len;
++	struct hal_cmd_hf_client_connect cmd;
 +
 +	DBG("");
 +
 +	if (!interface_ready())
 +		return BT_STATUS_NOT_READY;
 +
-+	cmd->number_len = strlen(number);
-+	memcpy(cmd->number, number, cmd->number_len);
++	if (!bd_addr)
++		return BT_STATUS_PARM_INVALID;
 +
-+	len = sizeof(*cmd) + cmd->number_len;
++	memcpy(cmd.bdaddr, bd_addr, sizeof(cmd.bdaddr));
 +
-+	return hal_ipc_cmd(HAL_SERVICE_ID_HF_CLIENT, HAL_OP_HF_CLIENT_DIAL,
-+					len, cmd, NULL, NULL, NULL);
++	return hal_ipc_cmd(HAL_SERVICE_ID_HF_CLIENT, HAL_OP_HF_CLIENT_CONNECT,
++					sizeof(cmd), &cmd, NULL, NULL, NULL);
 +}
 +
-+static bt_status_t dial_memory(int location)
++static bt_status_t disconnect(bt_bdaddr_t *bd_addr)
 +{
-+	struct hal_cmd_hf_client_dial_memory cmd;
++	struct hal_cmd_hf_client_disconnect cmd;
 +
 +	DBG("");
 +
 +	if (!interface_ready())
 +		return BT_STATUS_NOT_READY;
 +
-+	cmd.location = location;
++	if (!bd_addr)
++		return BT_STATUS_PARM_INVALID;
++
++	memcpy(cmd.bdaddr, bd_addr, sizeof(cmd.bdaddr));
 +
 +	return hal_ipc_cmd(HAL_SERVICE_ID_HF_CLIENT,
-+				HAL_OP_HF_CLIENT_DIAL_MEMORY, sizeof(cmd),
-+				&cmd, NULL, NULL, NULL);
++						HAL_OP_HF_CLIENT_DISCONNECT,
++						sizeof(cmd), &cmd, NULL, NULL,
++						NULL);
 +}
 +
  static void cleanup(void)
  {
  	struct hal_cmd_unregister_module cmd;
-@@ -215,6 +251,8 @@ static bthf_client_interface_t iface = {
- 	.start_voice_recognition = start_voice_recognition,
- 	.stop_voice_recognition = stop_voice_recognition,
- 	.volume_control = volume_control,
-+	.dial = dial,
-+	.dial_memory = dial_memory,
+@@ -92,6 +130,8 @@ static void cleanup(void)
+ static bthf_client_interface_t iface = {
+ 	.size = sizeof(iface),
+ 	.init = init,
++	.connect = hf_client_connect,
++	.disconnect = disconnect,
  	.cleanup = cleanup
  };
  
 diff --git a/android/hal-msg.h b/android/hal-msg.h
-index 816fb45..5218b06 100644
+index 986f26b..fa8beb9 100644
 --- a/android/hal-msg.h
 +++ b/android/hal-msg.h
-@@ -1006,6 +1006,17 @@ struct hal_cmd_hf_client_volume_control {
- 	uint8_t volume;
+@@ -974,6 +974,16 @@ struct hal_cmd_avrcp_set_volume {
+ 	uint8_t value;
  } __attribute__((packed));
  
-+#define HAL_OP_HF_CLIENT_DIAL			0x08
-+struct hal_cmd_hf_client_dial {
-+	uint16_t number_len;
-+	uint8_t number[0];
++#define HAL_OP_HF_CLIENT_CONNECT		0x01
++struct hal_cmd_hf_client_connect {
++	uint8_t bdaddr[6];
 +} __attribute__((packed));
 +
-+#define HAL_OP_HF_CLIENT_DIAL_MEMORY		0x09
-+struct hal_cmd_hf_client_dial_memory {
-+	uint16_t location;
++#define HAL_OP_HF_CLIENT_DISCONNECT		0x02
++struct hal_cmd_hf_client_disconnect {
++	uint8_t bdaddr[6];
 +} __attribute__((packed));
 +
  /* Notifications and confirmations */
  
  #define HAL_POWER_OFF			0x00
 diff --git a/android/hf-client.c b/android/hf-client.c
-index 74f0181..e1cb88d 100644
+index f1566d0..d6c2ef6 100644
 --- a/android/hf-client.c
 +++ b/android/hf-client.c
-@@ -99,6 +99,20 @@ static void handle_volume_control(const void *buf, uint16_t len)
- 					HAL_STATUS_UNSUPPORTED);
- }
+@@ -44,7 +44,28 @@ static bdaddr_t adapter_addr;
  
-+static void handle_dial(const void *buf, uint16_t len)
+ static struct ipc *hal_ipc = NULL;
+ 
++static void handle_connect(const void *buf, uint16_t len)
 +{
 +	DBG("Not Implemented");
 +	ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_HF_CLIENT,
-+				HAL_OP_HF_CLIENT_DIAL, HAL_STATUS_UNSUPPORTED);
++			HAL_OP_HF_CLIENT_CONNECT, HAL_STATUS_UNSUPPORTED);
 +}
 +
-+static void handle_dial_memory(const void *buf, uint16_t len)
++static void handle_disconnect(const void *buf, uint16_t len)
 +{
 +	DBG("Not Implemented");
 +	ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_HF_CLIENT,
-+			HAL_OP_HF_CLIENT_DIAL_MEMORY, HAL_STATUS_UNSUPPORTED);
++						HAL_OP_HF_CLIENT_DISCONNECT,
++						HAL_STATUS_UNSUPPORTED);
 +}
 +
  static const struct ipc_handler cmd_handlers[] = {
- 	/* HAL_OP_HF_CLIENT_CONNECT */
- 	{ handle_connect, false,
-@@ -119,6 +133,11 @@ static const struct ipc_handler cmd_handlers[] = {
- 	/* HAL_OP_HF_CLIENT_VOLUME_CONTROL */
- 	{ handle_volume_control, false,
- 			sizeof(struct hal_cmd_hf_client_volume_control) },
-+	/* HAL_OP_HF_CLIENT_DIAL */
-+	{ handle_dial, true, sizeof(struct hal_cmd_hf_client_dial) },
-+	/* HAL_OP_HF_CLIENT_DIAL_MEMORY */
-+	{ handle_dial_memory, false,
-+				sizeof(struct hal_cmd_hf_client_dial_memory) },
++	/* HAL_OP_HF_CLIENT_CONNECT */
++	{ handle_connect, false,
++				sizeof(struct hal_cmd_hf_client_connect) },
++	/* HAL_OP_HF_CLIENT_DISCONNECT */
++	{ handle_disconnect, false,
++				sizeof(struct hal_cmd_hf_client_disconnect) },
  };
  
  bool bt_hf_client_register(struct ipc *ipc, const bdaddr_t *addr)
