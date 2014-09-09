@@ -1,76 +1,76 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <540EC844.2040008@xsilon.com>
-Date: Tue, 09 Sep 2014 10:28:36 +0100
-From: Martin Townsend <martin.townsend@xsilon.com>
 MIME-Version: 1.0
-To: Alexander Aring <alex.aring@gmail.com>
-CC: Marcel Holtmann <marcel@holtmann.org>,
- linux-zigbee-devel@lists.sourceforge.net,
- linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org
-Subject: Re: [PATCH v2 bluetooth-next] Simplify lowpan receive path so skb
- is freed in lowpan_rcv when dropped.
-References: <53DCE75C.2030305@xsilon.com> <20140821083945.GA29484@omega> <3DF0C18C-4A97-4A00-AB0F-9E01F72CE967@holtmann.org> <53FE446D.6040805@xsilon.com> <20140908104008.GB6981@omega> <540DF1AE.2070709@xsilon.com> <20140908183652.GA633@omega> <20140908185519.GB633@omega>
-In-Reply-To: <20140908185519.GB633@omega>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <1410248823-8975-7-git-send-email-jakub.tyszkowski@tieto.com>
+References: <1410248823-8975-1-git-send-email-jakub.tyszkowski@tieto.com>
+	<1410248823-8975-7-git-send-email-jakub.tyszkowski@tieto.com>
+Date: Tue, 9 Sep 2014 12:10:19 +0300
+Message-ID: <CABBYNZ+OVW+detLyTHRs5EO2zQ2k=LudEDVQyqXyJ=nOrGw8OA@mail.gmail.com>
+Subject: Re: [PATCHv3 6/7] android/tester: Fix HIDHost cases sending fixed tid
+ sdp responses
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Alex,
+Hi Jakub,
 
-On 08/09/14 19:55, Alexander Aring wrote:
-> Hi Martin,
+On Tue, Sep 9, 2014 at 10:47 AM, Jakub Tyszkowski
+<jakub.tyszkowski@tieto.com> wrote:
+> Multiple cases were affected because of hardcoded transaction id for
+> emulated remote's SDP responses.
 >
-> On Mon, Sep 08, 2014 at 08:36:52PM +0200, Alexander Aring wrote:
->> Hi Martin,
->>
->> On Mon, Sep 08, 2014 at 07:13:02PM +0100, Martin Townsend wrote:
->> ...
->>>>> Hi,
->>>>>
->>>>> I'll respin and include the memory leak fix and this patch and a couple of
->>>>> others I have and send as a series to bluetooth.  What bluetooth git
->>>>> repository should I base the series on?
->>>>>
->>>> What's the state about to fix this bad issue? :-)
->>>>
->>>> I didn't saw any new patches because of this.
->>>>
->>>> - Alex
->>>> --
->>>> To unsubscribe from this list: send the line "unsubscribe linux-wpan" in
->>>> the body of a message to majordomo@vger.kernel.org
->>>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->>> Sorry for the delay, been on hols for a few days, I will create the patches
->>> tomorrow if I get time.
->>>
->>> I have also implemented Generic Header Compression[0] which is still in
->>> draft at the moment but I can't imagine it will change much before being
->>> released.  I'm going to integrate it into our linux repository this week.
->>> Would you be interested in putting it in linux-wpan or linux-wpan-next or
->>> would you prefer to wait until it gets it RFC status?
->>>
->> no, for me it's okay to have this mainline. I heard that a draft becomes
->> no RFC when nobody implements it.
->>
-> I thought more about that, you mean the receiving part only? So the
-> uncompression. The point is that we don't have no interface for an user
-> that can decide if he like to use UDP compression like RFC 6282 or UDP
-> compression like GHC. This is only relevant for the transmit part. So
-> compression is optionally. (We should have some interface to make this
-> configurable by user -> adding this to the nhc layer, later).
-I've implemented compression and decompression. You are right in that we need a mechanism of configuring what gets compressed by what method.
-> On the uncompression part, means the receiving part we can support both.
-> UDP RFC 6282 or UDP like GHC, the next header id value should be
-> different there. That means currently we can receive every packets but
-> transmit only RFC6282 compression formats.
+> This resulted in the following error in the daemon:
+>         bluetoothd[13486]: sdp_process: Protocol error.
+> ---
+>  android/tester-hidhost.c | 14 ++++++++++++--
+>  1 file changed, 12 insertions(+), 2 deletions(-)
 >
-> So for receiving this, it's okay. But for compression, since we don't
-> have some interface to make this configurable we should use RFC 6282.
-So I will ensure UDP is compressed by 6282.  Then I was going to start out by just compressing ICMPv6 with GHC and monitor how much data is saved by using GHC.  Later on we will implement a mechanism of configuring what gets compressed and by which compression method.
+> diff --git a/android/tester-hidhost.c b/android/tester-hidhost.c
+> index abff837..d5741f9 100644
+> --- a/android/tester-hidhost.c
+> +++ b/android/tester-hidhost.c
+> @@ -21,6 +21,7 @@
+>  #include "tester-main.h"
+>
+>  #include "android/utils.h"
+> +#include "src/shared/util.h"
+>
+>  #define HID_GET_REPORT_PROTOCOL                0x60
+>  #define HID_GET_BOOT_PROTOCOL          0x61
+> @@ -214,15 +215,24 @@ static void hid_sdp_cid_hook_cb(const void *data, uint16_t len, void *user_data)
+>         struct bthost *bthost = hciemu_client_get_host(t_data->hciemu);
+>         struct emu_cid_data *cid_data = user_data;
+>         struct raw_dataset *sdp_data = cid_data->user_data;
+> +       const uint8_t *req_buf = data;
+> +       uint8_t *sdp_buf;
+>
+> -       if (!memcmp(did_req_pdu, data, len)) {
+> +       if (!memcmp(did_req_pdu, req_buf, len)) {
+>                 bthost_send_cid(bthost, cid_data->sdp_handle, cid_data->sdp_cid,
+>                                         did_rsp_pdu, sizeof(did_rsp_pdu));
+>                 return;
+>         }
+>
+> +       /* Get transaction ID from the request */
+> +       sdp_buf = g_memdup(sdp_data->pdu, sdp_data->len);
+> +       sdp_buf[1] = req_buf[1];
+> +       sdp_buf[2] = req_buf[2];
+> +
+>         bthost_send_cid(bthost, cid_data->sdp_handle, cid_data->sdp_cid,
+> -                                       sdp_data->pdu, sdp_data->len);
+> +                                                       sdp_buf, sdp_data->len);
+> +
+> +       g_free(sdp_buf);
+>  }
 
-The GHC spec states that a device indicates it's GHC capability using a 6LoWPAN Capability Indication Option (6CIO), this is an ND option.  As far as I can see there is no type assigned yet by IANA so I was wondering if we should have this as an experimental configuration item in the kernel?
->
-> Same opinion here? We can talk about that point.
->
-> - Alex
+Do we really need this copy? Wouldn't it be enough not to mark it as
+const and just change in place? Anyway this is also broke in AVRCP, I
+have been planning to handle this but perhaps we should unify this,
+btw in case of did we should also check tid.
 
-- Martin
+
+
+-- 
+Luiz Augusto von Dentz
