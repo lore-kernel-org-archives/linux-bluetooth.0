@@ -1,108 +1,106 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <540EC162.7060604@xsilon.com>
-Date: Tue, 09 Sep 2014 09:59:14 +0100
-From: Martin Townsend <martin.townsend@xsilon.com>
-MIME-Version: 1.0
-To: Alexander Aring <alex.aring@gmail.com>
-CC: Marcel Holtmann <marcel@holtmann.org>,
- linux-zigbee-devel@lists.sourceforge.net,
- linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org
-Subject: Re: [PATCH v2 bluetooth-next] Simplify lowpan receive path so skb
- is freed in lowpan_rcv when dropped.
-References: <53DCE75C.2030305@xsilon.com> <20140821083945.GA29484@omega> <3DF0C18C-4A97-4A00-AB0F-9E01F72CE967@holtmann.org> <53FE446D.6040805@xsilon.com> <20140908104008.GB6981@omega> <540DF1AE.2070709@xsilon.com> <20140908183652.GA633@omega>
-In-Reply-To: <20140908183652.GA633@omega>
-Content-Type: text/plain; charset=utf-8
+From: Bharat Bhusan Panda <bharat.panda@samsung.com>
+To: 'Johan Hedberg' <johan.hedberg@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org, cpgs@samsung.com
+References: <1408619604-26201-1-git-send-email-bharat.panda@samsung.com>
+ <20140905084453.GA9598@t440s>
+In-reply-to: <20140905084453.GA9598@t440s>
+Subject: RE: [PATCH ] GATT: Add support for Gatt multiple char write request
+Date: Tue, 09 Sep 2014 14:24:44 +0530
+Message-id: <021801cfcc0b$bdf350a0$39d9f1e0$@samsung.com>
+MIME-version: 1.0
+Content-type: text/plain; charset=us-ascii
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Alex,
+Hi Johan,
 
-On 08/09/14 19:36, Alexander Aring wrote:
-> Hi Martin,
->
-> On Mon, Sep 08, 2014 at 07:13:02PM +0100, Martin Townsend wrote:
-> ...
->>>> Hi,
->>>>
->>>> I'll respin and include the memory leak fix and this patch and a couple of
->>>> others I have and send as a series to bluetooth.  What bluetooth git
->>>> repository should I base the series on?
->>>>
->>> What's the state about to fix this bad issue? :-)
->>>
->>> I didn't saw any new patches because of this.
->>>
->>> - Alex
->>> --
->>> To unsubscribe from this list: send the line "unsubscribe linux-wpan" in
->>> the body of a message to majordomo@vger.kernel.org
->>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->> Sorry for the delay, been on hols for a few days, I will create the patches
->> tomorrow if I get time.
->>
->> I have also implemented Generic Header Compression[0] which is still in
->> draft at the moment but I can't imagine it will change much before being
->> released.  I'm going to integrate it into our linux repository this week.
->> Would you be interested in putting it in linux-wpan or linux-wpan-next or
->> would you prefer to wait until it gets it RFC status?
->>
-> no, for me it's okay to have this mainline. I heard that a draft becomes
-> no RFC when nobody implements it.
->
-> But another point, I want to avoid that everything is putted into the
-> iphc file for next header compression. Did you saw the patches for the
-> next header compression layer?
-yes I did and would like to add GHC to this new framework so will wait until it's included.
->
-> This is a layer to separate next header implementation, like IPv6 it
-> does for next header [0]. [0] shows the registration of the next header
-> protocols.
->
-> We should have something similar and I post some months a RFC about
-> that. I got some review notes and need to rework it, working branch is
-> at [1].
->
-> Also I added that we drop packets for IPv6 Header Extensions, described
-> at [2]. We currently no support this kind of next header compression and
-> if we don't check on it, we send garbage to IPv6 layer. (That's of
-> course one more argument to implement draft next header compression
-> formats).
->
->
-> For now, we should make it like this:
->
-> - First you send patches for the fixes.
-> - Then I will send patches for the nhc layer.
-> - You send patches to adding the your next header compression formats.
->   based on the nhc layer.
->
-> Is that okay for you? It should easily for you to add your header compression
-> formats. (Filling some struct with macro and implement some callbacks).
-ok for me.
->
-> This is all related stuff to the GENERIC 6LOWPAN branch, all which
-> belongs to IPHC and IPHC contains next header compression. As
-> conclusion this should be go to bluetooth/bluetooth-next.
->
-> Bug fixes to bluetooth, new features to bluetooth-next.
->
-ok.
->
-> btw:
-> I working on the 802.15.4 rework. I am sure you know that I want to make
-> a rework of the 802.15.4 stack. Very busy at the moment, but this should
-> not affect the net/6lowpan branch. Only the net/ieee802.15.4/6lowpan.
->
-> I will take some time, so after you send fixes for this I will rebase/rework
-> the nhc layer patches to try to bring it mainline. Then you can make your work
-> on it.
-ok.
->
-> - Alex
->
-> [0] https://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/tree/net/ipv6/af_inet6.c?id=refs/tags/v3.17-rc4#n822
-> [1] https://github.com/linux-wpan/linux-wpan-next/tree/nhc_layer
-> [2] http://tools.ietf.org/html/rfc6282#section-4.2
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-wpan" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> On Thu, Aug 21, 2014, Bharat Panda wrote:
+> > Changes made to handle gatt char multiple write request 1. Changes
+> > made to handle gatt long char write request 2. Cache/prepare and
+> > execute long char write request.
+> > 3. Updates gatt attribute db using offset value.
+> > 4. Proper offset and char length handling to fix below PTS test cases,
+> >
+> > TP/GAW/SR/BV-06-C
+> > TP/GAW/SR/BV-10-C
+> > TP/GAW/SR/BV-09-C
+> > TP/GAW/SR/BI-09-C
+> > TP/GAW/SR/BI-14-C
+> > TP/GAW/SR/BI-15-C
+> > TP/GAW/SR/BV-05-C
+> > TP/GAW/SR/BI-07-C
+> > TP/GAW/SR/BV-07-C
+> > TP/GAW/SR/BI-08-C
+> > TP/GAW/SR/BI-25-C
+> > TP/GAW/SR/BI-26-C
+> > TP/GAW/SR/BI-27-C
+> > ---
+> >  src/attrib-server.c | 323
+> +++++++++++++++++++++++++++++++++++++++++++++++++++-
+> >  src/attrib-server.h |   3 +
+> >  2 files changed, 324 insertions(+), 2 deletions(-)
+> 
+> First of all sorry for the delay in replying to this - you sent it just
+when I had
+> started a two week vacation.
+> 
+> > diff --git a/src/attrib-server.c b/src/attrib-server.c index
+> > e65fff2..10a7923 100644
+> > --- a/src/attrib-server.c
+> > +++ b/src/attrib-server.c
+> > @@ -85,6 +85,25 @@ struct group_elem {
+> >  	uint16_t len;
+> >  };
+> >
+> > +struct local_db {
+> > +	uint16_t handle;
+> > +	uint8_t offset;
+> > +	size_t len;
+> > +	uint8_t *data;
+> > +	struct local_db *next;
+> > +};
+> > +
+> > +struct char_handle_len {
+> > +	uint16_t handle;
+> > +	size_t org_len;
+> > +	struct char_handle_len *next;
+> > +};
+> > +
+> > +struct char_handle_len *local_char_handle_len = NULL; struct
+> > +char_handle_len *local_char_handle_len_head = NULL; struct local_db
+> > +*local_prep_db = NULL; struct local_db *local_prep_db_head = NULL;
+> 
+> Shouldn't these variables be part of gatt_channel instead of them being
+> global like this? Otherwise we may have conflicts between multiple
+> connections to different devices.
+
+Yes, True, it should be part of gatt_channel, as this is tested with single
+connection, I couldn't identify this issue.
+Thanks
+> 
+> Btw, what are your plans regarding our new ATT/GATT APIs in src/shared?
+> Are you planning to provide patches to update these features to use the
+> new API once we have the rest of the ATT server infrastructure in place?
+> I'd like to avoid introducing too much new code for the old API since it
+will
+> eventually need to be converted to the new one.
+Yes we are in plan to use the New ATT/GATT APIs and provide patches for the
+same, but as the complete infrastructure 
+Is not in place now, we can put TODO comments to add these specific changes
+after rest of the ATT server part is completed. If you suggest so. 
+> 
+> In general, could you please read through the kernel CodingStyle document
+> which is what we mostly follow. There are quite many violations in this
+patch.
+> You'll also want to read the coding-style.txt and HACKING documents from
+> Luiz that were just recently pushed to upstream bluez.git.
+
+Ok, I will go through recent patches from Luiz. I will submit a new patch
+with the fixes for coding style violations, If you agree on submitting this
+patch with the above TODO comments.
+
+Thanks
+Best Regards,
+Bharat
+
