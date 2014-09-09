@@ -2,60 +2,62 @@ Return-Path: <cyrus@holtmann.org>
 From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH 23/39] android/hf-client: Add Network Signal Strenght event
-Date: Tue,  9 Sep 2014 21:57:08 +0200
-Message-Id: <1410292644-23497-24-git-send-email-lukasz.rymanowski@tieto.com>
+Subject: [PATCH 20/39] android/hf-client: Add Voice Recognition State event
+Date: Tue,  9 Sep 2014 21:57:05 +0200
+Message-Id: <1410292644-23497-21-git-send-email-lukasz.rymanowski@tieto.com>
 In-Reply-To: <1410292644-23497-1-git-send-email-lukasz.rymanowski@tieto.com>
 References: <1410292644-23497-1-git-send-email-lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- android/hal-hf-client.c | 11 +++++++++++
- android/hal-msg.h       |  5 +++++
- 2 files changed, 16 insertions(+)
+ android/hal-hf-client.c | 10 ++++++++++
+ android/hal-msg.h       |  8 ++++++++
+ 2 files changed, 18 insertions(+)
 
 diff --git a/android/hal-hf-client.c b/android/hal-hf-client.c
-index 2ff9e9f..044e296 100644
+index c49666b..42908de 100644
 --- a/android/hal-hf-client.c
 +++ b/android/hal-hf-client.c
-@@ -76,6 +76,14 @@ static void handle_network_roaming(void *buf, uint16_t len, int fd)
- 		cbs->network_roaming_cb(ev->state);
+@@ -52,6 +52,14 @@ static void handle_audio_state(void *buf, uint16_t len, int fd)
+ 		cbs->audio_state_cb(ev->state, (bt_bdaddr_t *) (ev->bdaddr));
  }
  
-+static void handle_network_signal(void *buf, uint16_t len, int fd)
++static void handle_vr_state(void *buf, uint16_t len, int fd)
 +{
-+	struct hal_ev_hf_client_net_signal_strength *ev = buf;
++	struct hal_ev_hf_client_vr_state *ev = buf;
 +
-+	if (cbs->network_signal_cb)
-+		cbs->network_signal_cb(ev->signal_strength);
++	if (cbs->vr_cmd_cb)
++		cbs->vr_cmd_cb(ev->state);
 +}
 +
  /*
   * handlers will be called from notification thread context,
   * index in table equals to 'opcode - HAL_MINIMUM_EVENT'
-@@ -95,6 +103,9 @@ static const struct hal_ipc_handler ev_handlers[] = {
- 	/*HAL_EV_HF_CLIENT_NET_ROAMING_TYPE */
- 	{ handle_network_roaming, false,
- 			sizeof(struct hal_ev_hf_client_net_roaming_type) },
-+	/* HAL_EV_HF_CLIENT_NET_SIGNAL_STRENGTH */
-+	{ handle_network_signal, false,
-+			sizeof(struct hal_ev_hf_client_net_signal_strength) },
+@@ -63,6 +71,8 @@ static const struct hal_ipc_handler ev_handlers[] = {
+ 	/* HAL_EV_HF_CLIENT_AUDIO_STATE */
+ 	{ handle_audio_state, false,
+ 				sizeof(struct hal_ev_hf_client_audio_state) },
++	/* HAL_EV_HF_CLIENT_VR_STATE */
++	{ handle_vr_state, false, sizeof(struct hal_ev_hf_client_vr_state) },
  };
  
  static bt_status_t init(bthf_client_callbacks_t *callbacks)
 diff --git a/android/hal-msg.h b/android/hal-msg.h
-index 80aa244..a780e30 100644
+index a94606e..16b095b 100644
 --- a/android/hal-msg.h
 +++ b/android/hal-msg.h
-@@ -1739,3 +1739,8 @@ struct hal_ev_hf_client_net_state {
- struct hal_ev_hf_client_net_roaming_type {
+@@ -1715,3 +1715,11 @@ struct hal_ev_hf_client_audio_state {
  	uint8_t state;
+ 	uint8_t bdaddr[6];
  } __attribute__((packed));
 +
-+#define HAL_EV_HF_CLIENT_NET_SIGNAL_STRENGTH		0x86
-+struct hal_ev_hf_client_net_signal_strength {
-+	uint8_t signal_strength;
++#define HF_CLIENT_VR_STOPPED	0x00
++#define HF_CLIENT_VR_STARTED	0x01
++
++#define HAL_EV_HF_CLIENT_VR_STATE			0x83
++struct hal_ev_hf_client_vr_state {
++	uint8_t state;
 +} __attribute__((packed));
 -- 
 1.8.4
