@@ -2,168 +2,107 @@ Return-Path: <cyrus@holtmann.org>
 From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH 07/39] android/hf-client: Add skeleton for HAL hf-client
-Date: Tue,  9 Sep 2014 21:56:52 +0200
-Message-Id: <1410292644-23497-8-git-send-email-lukasz.rymanowski@tieto.com>
+Subject: [PATCH 06/39] android/hf-client: Add hf-client daemon skeleton
+Date: Tue,  9 Sep 2014 21:56:51 +0200
+Message-Id: <1410292644-23497-7-git-send-email-lukasz.rymanowski@tieto.com>
 In-Reply-To: <1410292644-23497-1-git-send-email-lukasz.rymanowski@tieto.com>
 References: <1410292644-23497-1-git-send-email-lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- android/Makefile.am     |   2 +
- android/hal-hf-client.c | 101 ++++++++++++++++++++++++++++++++++++++++++++++++
- android/hal.h           |   2 +
- 3 files changed, 105 insertions(+)
- create mode 100644 android/hal-hf-client.c
+ android/Makefile.am |  1 +
+ android/hf-client.c | 69 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 70 insertions(+)
+ create mode 100644 android/hf-client.c
 
 diff --git a/android/Makefile.am b/android/Makefile.am
-index e92ccf1..9464df7 100644
+index 49fbddc..e92ccf1 100644
 --- a/android/Makefile.am
 +++ b/android/Makefile.am
-@@ -75,6 +75,7 @@ android_bluetooth_default_la_SOURCES = android/hal.h android/hal-bluetooth.c \
- 					android/hal-a2dp.c \
- 					android/hal-avrcp.c \
- 					android/hal-handsfree.c \
-+					android/hal-hf-client.c \
- 					android/hal-gatt.c \
- 					android/hardware/bluetooth.h \
- 					android/hardware/bt_av.h \
-@@ -88,6 +89,7 @@ android_bluetooth_default_la_SOURCES = android/hal.h android/hal-bluetooth.c \
- 					android/hardware/bt_pan.h \
- 					android/hardware/bt_rc.h \
- 					android/hardware/bt_sock.h \
-+					android/hardware/bt_hf_client.h \
- 					android/hardware/hardware.h \
- 					android/cutils/properties.h \
- 					android/ipc-common.h \
-diff --git a/android/hal-hf-client.c b/android/hal-hf-client.c
+@@ -52,6 +52,7 @@ android_bluetoothd_SOURCES = android/main.c \
+ 				android/socket.h android/socket.c \
+ 				android/pan.h android/pan.c \
+ 				android/handsfree.h android/handsfree.c \
++				android/hf-client.c android/hf-client.h \
+ 				android/gatt.h android/gatt.c \
+ 				android/health.h android/health.c \
+ 				android/mcap-lib.h android/mcap-lib.c \
+diff --git a/android/hf-client.c b/android/hf-client.c
 new file mode 100644
-index 0000000..40553ff
+index 0000000..f1566d0
 --- /dev/null
-+++ b/android/hal-hf-client.c
-@@ -0,0 +1,101 @@
++++ b/android/hf-client.c
+@@ -0,0 +1,69 @@
 +/*
-+ * Copyright (C) 2014 Intel Corporation
 + *
-+ * Licensed under the Apache License, Version 2.0 (the "License");
-+ * you may not use this file except in compliance with the License.
-+ * You may obtain a copy of the License at
++ *  BlueZ - Bluetooth protocol stack for Linux
 + *
-+ *      http://www.apache.org/licenses/LICENSE-2.0
++ *  Copyright (C) 2014  Intel Corporation. All rights reserved.
 + *
-+ * Unless required by applicable law or agreed to in writing, software
-+ * distributed under the License is distributed on an "AS IS" BASIS,
-+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-+ * See the License for the specific language governing permissions and
-+ * limitations under the License.
++ *
++ *  This library is free software; you can redistribute it and/or
++ *  modify it under the terms of the GNU Lesser General Public
++ *  License as published by the Free Software Foundation; either
++ *  version 2.1 of the License, or (at your option) any later version.
++ *
++ *  This library is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ *  Lesser General Public License for more details.
++ *
++ *  You should have received a copy of the GNU Lesser General Public
++ *  License along with this library; if not, write to the Free Software
++ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 + *
 + */
 +
-+#include <stdbool.h>
-+#include <stddef.h>
-+#include <string.h>
++#ifdef HAVE_CONFIG_H
++#include <config.h>
++#endif
++
 +#include <stdlib.h>
++#include <stdbool.h>
++#include <errno.h>
++#include <unistd.h>
++#include <glib.h>
 +
-+#include <cutils/properties.h>
-+
-+#include "hal-log.h"
-+#include "hal.h"
-+#include "hal-msg.h"
++#include "lib/bluetooth.h"
++#include "ipc.h"
 +#include "ipc-common.h"
-+#include "hal-ipc.h"
++#include "src/log.h"
++#include "utils.h"
 +
-+static const bthf_client_callbacks_t *cbs = NULL;
++#include "hal-msg.h"
++#include "hf-client.h"
 +
-+static bool interface_ready(void)
-+{
-+	return cbs != NULL;
-+}
++static bdaddr_t adapter_addr;
 +
-+/*
-+ * handlers will be called from notification thread context,
-+ * index in table equals to 'opcode - HAL_MINIMUM_EVENT'
-+ */
-+static const struct hal_ipc_handler ev_handlers[] = {
++static struct ipc *hal_ipc = NULL;
++
++static const struct ipc_handler cmd_handlers[] = {
 +};
 +
-+static bt_status_t init(bthf_client_callbacks_t *callbacks)
++bool bt_hf_client_register(struct ipc *ipc, const bdaddr_t *addr)
 +{
-+	struct hal_cmd_register_module cmd;
-+	int ret;
-+
 +	DBG("");
 +
-+	if (interface_ready())
-+		return BT_STATUS_DONE;
++	bacpy(&adapter_addr, addr);
 +
-+	cbs = callbacks;
++	hal_ipc = ipc;
++	ipc_register(hal_ipc, HAL_SERVICE_ID_HF_CLIENT, cmd_handlers,
++						G_N_ELEMENTS(cmd_handlers));
 +
-+	hal_ipc_register(HAL_SERVICE_ID_HF_CLIENT, ev_handlers,
-+				sizeof(ev_handlers)/sizeof(ev_handlers[0]));
-+
-+	cmd.service_id = HAL_SERVICE_ID_HF_CLIENT;
-+
-+	ret = hal_ipc_cmd(HAL_SERVICE_ID_CORE, HAL_OP_REGISTER_MODULE,
-+					sizeof(cmd), &cmd, NULL, NULL, NULL);
-+
-+	if (ret != BT_STATUS_SUCCESS) {
-+		cbs = NULL;
-+		hal_ipc_unregister(HAL_SERVICE_ID_HF_CLIENT);
-+	}
-+
-+	return ret;
++	return true;
 +}
 +
-+static void cleanup(void)
++void bt_hf_client_unregister(void)
 +{
-+	struct hal_cmd_unregister_module cmd;
-+
 +	DBG("");
 +
-+	if (!interface_ready())
-+		return;
-+
-+	cbs = NULL;
-+
-+	cmd.service_id = HAL_SERVICE_ID_HF_CLIENT;
-+
-+	hal_ipc_cmd(HAL_SERVICE_ID_CORE, HAL_OP_UNREGISTER_MODULE,
-+					sizeof(cmd), &cmd, NULL, NULL, NULL);
-+
-+	hal_ipc_unregister(HAL_SERVICE_ID_HF_CLIENT);
++	ipc_unregister(hal_ipc, HAL_SERVICE_ID_HANDSFREE);
++	hal_ipc = NULL;
 +}
-+
-+static bthf_client_interface_t iface = {
-+	.size = sizeof(iface),
-+	.init = init,
-+	.cleanup = cleanup
-+};
-+
-+bthf_client_interface_t *bt_get_hf_client_interface(void)
-+{
-+	return &iface;
-+}
-diff --git a/android/hal.h b/android/hal.h
-index 6998e9a..be81ed9 100644
---- a/android/hal.h
-+++ b/android/hal.h
-@@ -26,6 +26,7 @@
- #include <hardware/bt_gatt_client.h>
- #include <hardware/bt_gatt_server.h>
- #include <hardware/bt_hl.h>
-+#include <hardware/bt_hf_client.h>
- 
- btsock_interface_t *bt_get_socket_interface(void);
- bthh_interface_t *bt_get_hidhost_interface(void);
-@@ -35,6 +36,7 @@ btrc_interface_t *bt_get_avrcp_interface(void);
- bthf_interface_t *bt_get_handsfree_interface(void);
- btgatt_interface_t *bt_get_gatt_interface(void);
- bthl_interface_t *bt_get_health_interface(void);
-+bthf_client_interface_t *bt_get_hf_client_interface(void);
- 
- void bt_thread_associate(void);
- void bt_thread_disassociate(void);
 -- 
 1.8.4
 
