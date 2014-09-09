@@ -1,39 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 9 Sep 2014 16:32:35 -0700
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 0/3] Fix for sdp-client in reconnect scenario
-Message-ID: <20140909233235.GA21249@t440s>
-References: <1410253330-27768-1-git-send-email-lukasz.rymanowski@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1410253330-27768-1-git-send-email-lukasz.rymanowski@tieto.com>
+From: johan.hedberg@gmail.com
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] Bluetooth: Fix allowing SMP Signing info PDU
+Date: Tue,  9 Sep 2014 16:21:46 -0700
+Message-Id: <1410304906-20898-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Lukasz,
+From: Johan Hedberg <johan.hedberg@intel.com>
 
-On Tue, Sep 09, 2014, Lukasz Rymanowski wrote:
-> This patch fixes following error scenario:
-> 1. Local device does sdp search and cache sdp session.
-> 2. Peer device disconnect and connect again
-> 3. Local device wants to do sdp search again on outdated sdp session
-> 
-> If those 3 steps will happen withing 2 sec, we face the issue.
-> 
-> Those patch fixes that.
-> Automated test which easly triggers that will come from Jakub.
-> (Hid Host reconnect test)
-> 
-> Lukasz Rymanowski (3):
->   sdp-client: Extract cleanup function for cached session
->   sdp-client: Add disconnect watch for cached session
->   sdp-client: Minor code style fix
-> 
->  src/sdp-client.c | 39 +++++++++++++++++++++++++++++++++------
->  1 file changed, 33 insertions(+), 6 deletions(-)
+If the remote side is not distributing its IRK but is distributing the
+CSRK the next PDU after master identification is the Signing
+Information. This patch fixes a missing SMP_ALLOW_CND() for this in the
+smp_cmd_master_ident() function.
 
-All three patches have been applied. Thanks.
+Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+---
+ net/bluetooth/smp.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-Johan
+diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
+index 25c9040e0b12..dc575aba2e65 100644
+--- a/net/bluetooth/smp.c
++++ b/net/bluetooth/smp.c
+@@ -1324,6 +1324,8 @@ static int smp_cmd_master_ident(struct l2cap_conn *conn, struct sk_buff *skb)
+ 	SMP_DISALLOW_CMD(smp, SMP_CMD_MASTER_IDENT);
+ 	if (smp->remote_key_dist & SMP_DIST_ID_KEY)
+ 		SMP_ALLOW_CMD(smp, SMP_CMD_IDENT_INFO);
++	else if (smp->remote_key_dist & SMP_DIST_SIGN)
++		SMP_ALLOW_CMD(smp, SMP_CMD_SIGN_INFO);
+ 
+ 	skb_pull(skb, sizeof(*rp));
+ 
+-- 
+1.9.3
+
