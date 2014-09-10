@@ -1,42 +1,94 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1410347494-22084-1-git-send-email-lukasz.rymanowski@tieto.com>
-References: <1410347494-22084-1-git-send-email-lukasz.rymanowski@tieto.com>
-Date: Wed, 10 Sep 2014 14:53:00 +0300
-Message-ID: <CABBYNZKk=-ZzWSSH=eAtAr-Y+oHmijrPdodZLp4PjU6MxZtSzw@mail.gmail.com>
-Subject: Re: [PATCH v2 0/4] android/hf-client: API fixes
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: luiz.dentz@gmail.com,
+	Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+Subject: [PATCH v2 16/16] android/hf-client: Add Get Last Voice Tag Number command
+Date: Wed, 10 Sep 2014 13:34:14 +0200
+Message-Id: <1410348854-26249-17-git-send-email-lukasz.rymanowski@tieto.com>
+In-Reply-To: <1410348854-26249-1-git-send-email-lukasz.rymanowski@tieto.com>
+References: <1410348854-26249-1-git-send-email-lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Lukasz,
+---
+ android/hal-hf-client.c | 13 +++++++++++++
+ android/hal-msg.h       |  2 ++
+ android/hf-client.c     | 10 ++++++++++
+ 3 files changed, 25 insertions(+)
 
-On Wed, Sep 10, 2014 at 2:11 PM, Lukasz Rymanowski
-<lukasz.rymanowski@tieto.com> wrote:
-> Couple of fixes to hf-client api.
->
-> Those patches previously where a part of bigger set
-> [PATCH 00/39] android: HF Client initial implementation
-> but on Luiz request I split it into smaller sets.
->
-> Lukasz Rymanowski (4):
->   android/hal-ipc-api: Use 2 bytes for location in dial memory
->   android/hal-ipc-api: Use Tone instead of Code DTMF
->   android/hal-ipc-api: Add missing peer features parameter
->   android/hal-ipc-api: Fix define for HF-Client
->
->  android/hal-ipc-api.txt | 11 ++++++-----
->  1 file changed, 6 insertions(+), 5 deletions(-)
->
-> --
-> 1.8.4
-
-First thanks for flooding my inbox, and second congrats for sending
-almost 60 emails to the list in one day.
-
-
+diff --git a/android/hal-hf-client.c b/android/hal-hf-client.c
+index 72f1b6d..a6f285b 100644
+--- a/android/hal-hf-client.c
++++ b/android/hal-hf-client.c
+@@ -295,6 +295,18 @@ static bt_status_t send_dtmf(char tone)
+ 					sizeof(cmd), &cmd, NULL, NULL, NULL);
+ }
+ 
++static bt_status_t request_last_voice_tag_number(void)
++{
++	DBG("");
++
++	if (!interface_ready())
++		return BT_STATUS_NOT_READY;
++
++	return hal_ipc_cmd(HAL_SERVICE_ID_HF_CLIENT,
++					HAL_OP_HF_CLIENT_GET_LAST_VOICE_TAG_NUM,
++					0, NULL, NULL, NULL, NULL);
++}
++
+ static void cleanup(void)
+ {
+ 	struct hal_cmd_unregister_module cmd;
+@@ -331,6 +343,7 @@ static bthf_client_interface_t iface = {
+ 	.query_current_operator_name = query_operator_name,
+ 	.retrieve_subscriber_info = retrieve_subsr_info,
+ 	.send_dtmf = send_dtmf,
++	.request_last_voice_tag_number = request_last_voice_tag_number,
+ 	.cleanup = cleanup
+ };
+ 
+diff --git a/android/hal-msg.h b/android/hal-msg.h
+index e84fa41..b6d5907 100644
+--- a/android/hal-msg.h
++++ b/android/hal-msg.h
+@@ -1049,6 +1049,8 @@ struct hal_cmd_hf_client_send_dtmf {
+ 	uint8_t tone;
+ } __attribute__((packed));
+ 
++#define HAL_OP_HF_CLIENT_GET_LAST_VOICE_TAG_NUM	0x15
++
+ /* Notifications and confirmations */
+ 
+ #define HAL_POWER_OFF			0x00
+diff --git a/android/hf-client.c b/android/hf-client.c
+index bcb2f51..1d03c46 100644
+--- a/android/hf-client.c
++++ b/android/hf-client.c
+@@ -151,6 +151,14 @@ static void handle_send_dtmf(const void *buf, uint16_t len)
+ 			HAL_OP_HF_CLIENT_SEND_DTMF, HAL_STATUS_UNSUPPORTED);
+ }
+ 
++static void handle_get_last_vc_tag_num(const void *buf, uint16_t len)
++{
++	DBG("Not Implemented");
++	ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_HF_CLIENT,
++					HAL_OP_HF_CLIENT_GET_LAST_VOICE_TAG_NUM,
++					HAL_STATUS_UNSUPPORTED);
++}
++
+ static const struct ipc_handler cmd_handlers[] = {
+ 	/* HAL_OP_HF_CLIENT_CONNECT */
+ 	{ handle_connect, false,
+@@ -188,6 +196,8 @@ static const struct ipc_handler cmd_handlers[] = {
+ 	/* HAL_OP_HF_CLIENT_SEND_DTMF */
+ 	{ handle_send_dtmf, false,
+ 				sizeof(struct hal_cmd_hf_client_send_dtmf) },
++	/* HAL_OP_HF_CLIENT_GET_LAST_VOICE_TAG_NUM */
++	{ handle_get_last_vc_tag_num, false, 0 },
+ };
+ 
+ bool bt_hf_client_register(struct ipc *ipc, const bdaddr_t *addr)
 -- 
-Luiz Augusto von Dentz
+1.8.4
+
