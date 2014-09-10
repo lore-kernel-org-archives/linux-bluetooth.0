@@ -7,10 +7,8 @@ Cc: marcel@holtmann.org,
 	alex.aring@gmail.com,
 	Martin Townsend <martin.townsend@xsilon.com>
 Subject: [PATCH][linux-bluetooth 0/3] Fix lowpan_rcv
-Date: Wed, 10 Sep 2014 15:06:05 +0100
-Message-Id: <1410357968-27051-2-git-send-email-martin.townsend@xsilon.com>
-In-Reply-To: <1410357968-27051-1-git-send-email-martin.townsend@xsilon.com>
-References: <1410357968-27051-1-git-send-email-martin.townsend@xsilon.com>
+Date: Wed, 10 Sep 2014 15:06:04 +0100
+Message-Id: <1410357968-27051-1-git-send-email-martin.townsend@xsilon.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 This series aims to cleanup the lowpan receive path and fix a few issues. 
@@ -24,6 +22,11 @@ Martin Townsend (3):
   6lowpan: skb freed locally from lowpan_rcv
   6lowpan: Move skb delivery from IPHC.
   6lowpan: Refactored lowpan_rcv so it's RFC compliant
+
+I have only compile tested the changes for bluetooth as I don't have any HW
+available so would be grateful for any testing from the Bluetooth developers.
+I have done some minimal testing for IEEE802.15.4
+
 
  include/net/6lowpan.h         | 22 ++++++++++-
  net/6lowpan/iphc.c            | 80 ++++++++++++++++----------------------
