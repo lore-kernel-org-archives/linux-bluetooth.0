@@ -1,38 +1,53 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 9 Sep 2014 17:29:54 -0700
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Arman Uguray <armansito@chromium.org>
-Cc: Marcel Holtmann <marcel@holtmann.org>,
-	BlueZ development <linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCH BlueZ v1 4/7] shared/gatt-client: Handle incoming not/ind
- PDUs.
-Message-ID: <20140910002954.GA7572@t440s>
-References: <1410282249-22004-1-git-send-email-armansito@chromium.org>
- <1410282249-22004-5-git-send-email-armansito@chromium.org>
- <B3B84C22-937B-4880-B59F-0CFA680192D1@holtmann.org>
- <CAHrH25SVxPLYdjAGNHSwOKLx60wUOSRTzBTHDJfmvpFkiFhRPA@mail.gmail.com>
+Date: Wed, 10 Sep 2014 02:18:58 +0200
+From: Alexander Aring <alex.aring@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: Martin Townsend <martin.townsend@xsilon.com>,
+	linux-zigbee-devel@lists.sourceforge.net,
+	BlueZ development <linux-bluetooth@vger.kernel.org>,
+	linux-wpan@vger.kernel.org
+Subject: Re: [PATCH v2 bluetooth-next] Simplify lowpan receive path so skb is
+ freed in lowpan_rcv when dropped.
+Message-ID: <20140910001855.GA12221@omega>
+References: <20140821083945.GA29484@omega>
+ <3DF0C18C-4A97-4A00-AB0F-9E01F72CE967@holtmann.org>
+ <53FE446D.6040805@xsilon.com>
+ <20140908104008.GB6981@omega>
+ <540DF1AE.2070709@xsilon.com>
+ <20140908183652.GA633@omega>
+ <20140908185519.GB633@omega>
+ <540EC844.2040008@xsilon.com>
+ <20140909094652.GC4545@omega>
+ <D07925FA-E15D-4465-B20F-FFE52FDCB8CD@holtmann.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <CAHrH25SVxPLYdjAGNHSwOKLx60wUOSRTzBTHDJfmvpFkiFhRPA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+In-Reply-To: <D07925FA-E15D-4465-B20F-FFE52FDCB8CD@holtmann.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Arman,
+Hi Marcel,
 
-On Tue, Sep 09, 2014, Arman Uguray wrote:
-> >> +     unsigned int notify_id, indic_id;
-> >
-> > I have never seen indication shorted into indic. I have to say that
-> > I do not like it that much. However I do not have any good
-> > suggestion either.
-> >
+On Tue, Sep 09, 2014 at 06:44:56AM -0700, Marcel Holtmann wrote:
+> Hi Alex,
 > 
-> Perhaps "indicn_id"? I could just spell out "indication_id" :P.
+> >> 
+> >> The GHC spec states that a device indicates it's GHC capability using a 6LoWPAN Capability Indication Option (6CIO), this is an ND option.  As far as I can see there is no type assigned yet by IANA so I was wondering if we should have this as an experimental configuration item in the kernel?
+> > 
+> > Yes, please make a bool into net/6lowpan/Kconfig and add support for
+> > drafts only if selected. 
+> > 
+> > In code you simple need to use "if (IS_ENABLED(CONFIG_FOO))" to
+> > registration the nhc format into the nhc framework/layer or not.
+> > 
+> > Replace FOO with a propber 6LOWPAN_NHC_DRAFTS or something else. You can
+> > write in the help what exactly this means.
+> 
+> or you just create /sys/kernel/debug/6lowpan/foo and use debugfs to toggle experimental options on/off at runtime. Especially if you are dealing with not yet assigned types, you can also have an entry that allows you to define the type.
+> 
 
-What's wrong with "ind"? It's used in many places in the tree as a
-shorthand for indication and even shared/att.c uses it. On the other
-hand if you want to match the grammatical form of notify_id you should
-use indicate_id (which feels much worse to me). Third option that comes
-to mind if we want short versions of both is "ind" and "nfy", but not
-sure how decipherable the latter is.
+yea, runtime changeable stuff is nice. I will try to add some debugfs
+entry registration with the nhc framework/layer. Then Martin can add
+an entry to enable/disable his experimental stuff.
 
-Johan
+Thanks.
+
+- Alex
