@@ -1,118 +1,138 @@
 Return-Path: <cyrus@holtmann.org>
-From: gowtham babu <gowtham.ab@samsung.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: d.kasatkin@samsung.com, bharat.panda@samsung.com, cpgs@samsung.com,
-	gowtham babu <gowtham.ab@samsung.com>
-Subject: [MAP 1/2] obexd/client : Handle the MAP Extended Event Report 1.1
-Date: Wed, 10 Sep 2014 20:07:41 +0530
-Message-id: <1410359861-9626-1-git-send-email-gowtham.ab@samsung.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+From: Martin Townsend <mtownsend1973@gmail.com>
+To: linux-zigbee-devel@lists.sourceforge.net,
+	linux-bluetooth@vger.kernel.org,
+	linux-wpan@vger.kernel.org
+Cc: marcel@holtmann.org,
+	alex.aring@gmail.com,
+	Martin Townsend <martin.townsend@xsilon.com>
+Subject: [PATCH][linux-bluetooth 3/3] 6lowpan: Refactored lowpan_rcv so it's RFC compliant
+Date: Wed, 10 Sep 2014 15:06:08 +0100
+Message-Id: <1410357968-27051-5-git-send-email-martin.townsend@xsilon.com>
+In-Reply-To: <1410357968-27051-1-git-send-email-martin.townsend@xsilon.com>
+References: <1410357968-27051-1-git-send-email-martin.townsend@xsilon.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Changes made to handle the Extended Event Report 1.1
+Currently we support uncompressed IPv6 headers after performing fragmentation.
 
-1) In SDP, the MAP supported featured bit is updated.
-2) In map-event, corresponding new event type and the new attribute introduced in Event report 1.1 is added.
-3) In mns corresponding handlers are added.
+Signed-off-by: Martin Townsend <martin.townsend@xsilon.com>
 ---
- lib/sdp.h                |  2 +-
- obexd/client/map-event.h |  7 ++++++-
- obexd/client/mns.c       | 30 ++++++++++++++++++++++++++++++
- 3 files changed, 37 insertions(+), 2 deletions(-)
+ include/net/6lowpan.h         | 17 ++++++++++++
+ net/ieee802154/6lowpan_rtnl.c | 63 +++++++++++++++++++++++--------------------
+ 2 files changed, 51 insertions(+), 29 deletions(-)
 
-diff --git a/lib/sdp.h b/lib/sdp.h
-index cc10e9f..76f61e1 100644
---- a/lib/sdp.h
-+++ b/lib/sdp.h
-@@ -306,7 +306,7 @@ extern "C" {
- #define SDP_ATTR_MAS_INSTANCE_ID		0x0315
- #define SDP_ATTR_SUPPORTED_MESSAGE_TYPES	0x0316
- #define SDP_ATTR_PBAP_SUPPORTED_FEATURES	0x0317
--#define SDP_ATTR_MAP_SUPPORTED_FEATURES		0x0317
-+#define SDP_ATTR_MAP_SUPPORTED_FEATURES		0x031f
+diff --git a/include/net/6lowpan.h b/include/net/6lowpan.h
+index d71c062..71b1bf0 100644
+--- a/include/net/6lowpan.h
++++ b/include/net/6lowpan.h
+@@ -126,11 +126,28 @@
+ 	 (((a)[6]) == 0xFF) &&	\
+ 	 (((a)[7]) == 0xFF))
  
- #define SDP_ATTR_SPECIFICATION_ID		0x0200
- #define SDP_ATTR_VENDOR_ID			0x0201
-diff --git a/obexd/client/map-event.h b/obexd/client/map-event.h
-index ba5d5d2..99cb0c2 100644
---- a/obexd/client/map-event.h
-+++ b/obexd/client/map-event.h
-@@ -32,7 +32,8 @@ enum map_event_type {
- 	MAP_ET_MEMORY_FULL,
- 	MAP_ET_MEMORY_AVAILABLE,
- 	MAP_ET_MESSAGE_DELETED,
--	MAP_ET_MESSAGE_SHIFT
-+	MAP_ET_MESSAGE_SHIFT,
-+	MAP_ET_READ_STATUS_CHANGED
- };
- 
- struct map_event {
-@@ -41,6 +42,10 @@ struct map_event {
- 	char *folder;
- 	char *old_folder;
- 	char *msg_type;
-+	char *datetime;
-+	char *subject;
-+	char *sender_name;
-+	char *priority;
- };
- 
- /* Handle notification in map client.
-diff --git a/obexd/client/mns.c b/obexd/client/mns.c
-index d638886..8087933 100644
---- a/obexd/client/mns.c
-+++ b/obexd/client/mns.c
-@@ -180,6 +180,8 @@ static void parse_event_report_type(struct map_event *event, const char *value)
- 		event->type = MAP_ET_MESSAGE_DELETED;
- 	else if (!g_ascii_strcasecmp(value, "MessageShift"))
- 		event->type = MAP_ET_MESSAGE_SHIFT;
-+	else if (!g_ascii_strcasecmp(value, "ReadStatusChanged"))
-+		event->type = MAP_ET_READ_STATUS_CHANGED;
- }
- 
- static void parse_event_report_handle(struct map_event *event,
-@@ -218,6 +220,30 @@ static void parse_event_report_msg_type(struct map_event *event,
- 	event->msg_type = g_strdup(value);
- }
- 
-+static void parse_event_report_date_time(struct map_event *event,
-+                                                        const char *value)
-+{
-+	event->datetime = g_strdup(value);
-+}
++#define lowpan_dispatch_is_nalp(a)	\
++	(((a) & LOWPAN_DISPATCH_MAJOR) == 0x00)
 +
-+static void parse_event_report_subject(struct map_event *event,
-+                                                        const char *value)
-+{
-+	event->subject = g_strdup(value);
-+}
++#define lowpan_dispatch_is_mesh(a)	\
++	(((a) & LOWPAN_DISPATCH_MAJOR) == 0x80)
 +
-+static void parse_event_report_sender_name(struct map_event *event,
-+                                                        const char *value)
-+{
-+	event->sender_name = g_strdup(value);
-+}
++#define lowpan_dispatch_is_broadcast(a)	\
++	((a) == LOWPAN_DISPATCH_BCAST)
 +
-+static void parse_event_report_priority(struct map_event *event,
-+                                                        const char *value)
-+{
-+	event->priority = g_strdup(value);
-+}
++#define lowpan_dispatch_is_frag(a)	\
++	(((a) & LOWPAN_DISPATCH_MASK) == LOWPAN_DISPATCH_FRAG1 || \
++	 ((a) & LOWPAN_DISPATCH_MASK) == LOWPAN_DISPATCH_FRAGN)
 +
- static struct map_event_report_parser {
- 	const char *name;
- 	void (*func) (struct map_event *event, const char *value);
-@@ -227,6 +253,10 @@ static struct map_event_report_parser {
- 		{ "folder", parse_event_report_folder },
- 		{ "old_folder", parse_event_report_old_folder },
- 		{ "msg_type", parse_event_report_msg_type },
-+		{ "datetime", parse_event_report_date_time },
-+		{ "subject", parse_event_report_subject },
-+		{ "sender_name", parse_event_report_sender_name },
-+		{ "priority", parse_event_report_priority },
- 		{ }
- };
++#define LOWPAN_DISPATCH_MAJOR	0xc0
++#define LOWPAN_DISPATCH_MINOR	0x3f
++
+ #define LOWPAN_DISPATCH_IPV6	0x41 /* 01000001 = 65 */
+ #define LOWPAN_DISPATCH_HC1	0x42 /* 01000010 = 66 */
+ #define LOWPAN_DISPATCH_IPHC	0x60 /* 011xxxxx = ... */
+ #define LOWPAN_DISPATCH_FRAG1	0xc0 /* 11000xxx */
+ #define LOWPAN_DISPATCH_FRAGN	0xe0 /* 11100xxx */
++#define LOWPAN_DISPATCH_BCAST	0x50 /* 01010000 */
+ 
+ #define LOWPAN_DISPATCH_MASK	0xf8 /* 11111000 */
+ 
+diff --git a/net/ieee802154/6lowpan_rtnl.c b/net/ieee802154/6lowpan_rtnl.c
+index 4f4b02d..1557ece 100644
+--- a/net/ieee802154/6lowpan_rtnl.c
++++ b/net/ieee802154/6lowpan_rtnl.c
+@@ -477,41 +477,46 @@ static int lowpan_rcv(struct sk_buff *skb, struct net_device *dev,
+ 	if (ieee802154_hdr_peek_addrs(skb, &hdr) < 0)
+ 		goto drop_skb;
+ 
+-	/* check that it's our buffer */
++	/* First off if frame is Not A LoWPAN Packet (NALP) then chuck away */
++	if (lowpan_dispatch_is_nalp(skb->data[0]))
++		goto drop_skb;
++
++	/* The 6LoWPAN header stack comprimises of the following (in order)
++	 *   Mesh
++	 *   Broadcast
++	 *   Fragmentation
++	 */
++	if (lowpan_dispatch_is_mesh(skb->data[0]))
++		/* Not supported */
++		goto drop_skb;
++
++	if (lowpan_dispatch_is_broadcast(skb->data[0]))
++		/* Not supported */
++		goto drop_skb;
++
++	if (lowpan_dispatch_is_frag(skb->data[0])) {
++		u8 frag_dispatch = skb->data[0] & 0xe0;
++
++		ret = lowpan_frag_rcv(skb, frag_dispatch);
++		if (ret != 1) {
++			/* more frags to process */
++			return NET_RX_SUCCESS;
++		}
++	}
++
++	/* We should now have an IPv6 Header (Compressed or Uncompressed) */
+ 	if (skb->data[0] == LOWPAN_DISPATCH_IPV6) {
+-		/* Pull off the 1-byte of 6lowpan header. */
++		/* Uncompressed, Pull off the dispatch byte */
+ 		skb_pull(skb, 1);
+-
+-		ret = NET_RX_SUCCESS;
+ 	} else {
+-		switch (skb->data[0] & 0xe0) {
+-		case LOWPAN_DISPATCH_IPHC:	/* ipv6 datagram */
++		if ((skb->data[0] & 0xe0) == LOWPAN_DISPATCH_IPHC) {
++			/* Compressed with IPHC - RFC 6282 */
+ 			ret = iphc_uncompress_hdr(&skb, &hdr);
+ 			if (ret < 0)
+ 				goto drop;
+-			break;
+-		case LOWPAN_DISPATCH_FRAG1:	/* first fragment header */
+-			ret = lowpan_frag_rcv(skb, LOWPAN_DISPATCH_FRAG1);
+-			if (ret == 1) {
+-				ret = iphc_uncompress_hdr(&skb, &hdr);
+-				if (ret < 0)
+-					goto drop;
+-			} else {
+-				return NET_RX_SUCCESS;
+-			}
+-			break;
+-		case LOWPAN_DISPATCH_FRAGN:	/* next fragments headers */
+-			ret = lowpan_frag_rcv(skb, LOWPAN_DISPATCH_FRAGN);
+-			if (ret == 1) {
+-				ret = iphc_uncompress_hdr(&skb, &hdr);
+-				if (ret < 0)
+-					goto drop;
+-			} else {
+-				return NET_RX_SUCCESS;
+-			}
+-			break;
+-		default:
+-			break;
++		} else {
++			/* TODO: other compression formats to follow */
++			goto drop_skb;
+ 		}
+ 	}
  
 -- 
 1.9.1
-
