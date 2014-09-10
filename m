@@ -1,45 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
+MIME-Version: 1.0
+Sender: armansito@google.com
+In-Reply-To: <91778176-68DD-4FE5-8A10-601BFEDE83C2@holtmann.org>
+References: <1410282249-22004-1-git-send-email-armansito@chromium.org>
+	<1410282249-22004-5-git-send-email-armansito@chromium.org>
+	<B3B84C22-937B-4880-B59F-0CFA680192D1@holtmann.org>
+	<CAHrH25SVxPLYdjAGNHSwOKLx60wUOSRTzBTHDJfmvpFkiFhRPA@mail.gmail.com>
+	<91778176-68DD-4FE5-8A10-601BFEDE83C2@holtmann.org>
+Date: Wed, 10 Sep 2014 09:24:33 -0700
+Message-ID: <CAHrH25S2zX9QtrFEuGOAMipv25hEpEOKq-h5nR-nuT0d0o-4JA@mail.gmail.com>
+Subject: Re: [PATCH BlueZ v1 4/7] shared/gatt-client: Handle incoming not/ind PDUs.
 From: Arman Uguray <armansito@chromium.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Arman Uguray <armansito@chromium.org>
-Subject: [PATCH BlueZ v2 0/7] shared/gatt-client: Handle notifications.
-Date: Wed, 10 Sep 2014 09:36:20 -0700
-Message-Id: <1410366987-8128-1-git-send-email-armansito@chromium.org>
-Sender: linux-bluetooth-owner@vger.kernel.org
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-*v2:
-   - Renames:
-     - not_id -> notify_id
-     - not_ref_count -> notify_count
-     - ind_id -> indic_id -> indication_id -> ind_id
+Hi Marcel,
 
-   - Fixed typo in tools/btgatt-client.
 
-*v1: Handled style comments:
-   - Renamed some variables to make them more meaningful.
-   - Moved functions around to avoid forward declarations as much as possible.
-   - Added an internal bt_gatt_descriptor_t pointer to struct chrc_data while
-     keeping the external const pointer in bt_gatt_descriptor_t, both of which
-     point to the same array of descriptors.
+> actually that is a good idea. We might should look into introducing some =
+nice and handy asserts helpers for exactly the case when you want it on dur=
+ing development and testing.
+>
+> For now, just keep the asserts in it. I just wanted to point it out since=
+ I have seen people going crazy with asserts and then they can be remotely =
+exploited. And that is something I want to avoid at all costs. A remote sid=
+e should never ever be able to trigger an assert.
+>
 
-Arman Uguray (7):
-  shared/gatt-client: Introduce struct bt_gatt_characteristic_iter.
-  shared/gatt-client: Implement bt_gatt_client_register_notify.
-  shared/gatt-client: Implement bt_gatt_client_unregister_notify.
-  shared/gatt-client: Handle incoming not/ind PDUs.
-  tools/btgatt-client: Add the "register-notify" command.
-  tools/btgatt-client: Add "unregister-notify" command.
-  TODO: Reference counted notify functions implemented
+Sounds good, leaving them in for now. In the future we can explore
+adding macros such as DASSERT or DCHECK that are defined as "assert"
+if compiled with --debug and nothing otherwise.
 
- TODO                      |  10 -
- src/shared/gatt-client.c  | 564 +++++++++++++++++++++++++++++++++++++++++-----
- src/shared/gatt-client.h  |  57 ++++-
- src/shared/gatt-helpers.c |  67 ------
- src/shared/gatt-helpers.h |   9 -
- tools/btgatt-client.c     | 139 ++++++++++--
- 6 files changed, 684 insertions(+), 162 deletions(-)
 
--- 
-2.1.0.rc2.206.gedb03e5
-
+-Arman
