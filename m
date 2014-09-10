@@ -1,38 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
+From: Arman Uguray <armansito@chromium.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH 1/2] core: Fix storing connection parameters without store hint set
-Date: Wed, 10 Sep 2014 22:13:06 +0200
-Message-Id: <1410379987-4265-1-git-send-email-szymon.janc@tieto.com>
+Cc: Arman Uguray <armansito@chromium.org>
+Subject: [PATCH BlueZ v2 7/7] TODO: Reference counted notify functions implemented
+Date: Wed, 10 Sep 2014 09:36:27 -0700
+Message-Id: <1410366987-8128-8-git-send-email-armansito@chromium.org>
+In-Reply-To: <1410366987-8128-1-git-send-email-armansito@chromium.org>
+References: <1410366987-8128-1-git-send-email-armansito@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-If store hint is not set those should not be stored persistently.
 ---
+ TODO | 10 ----------
+ 1 file changed, 10 deletions(-)
 
-I've decided to leave storing in adapter.c to keep it similar to new
-keys events. Memebers in device.c were used only for storing anyway.
-
- src/adapter.c | 4 +---
- 1 file changed, 1 insertion(+), 3 deletions(-)
-
-diff --git a/src/adapter.c b/src/adapter.c
-index 2192e90..92ee1a0 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -6308,10 +6308,8 @@ static void new_conn_param(uint16_t index, uint16_t length,
- 		return;
- 	}
+diff --git a/TODO b/TODO
+index 5277e39..3530de4 100644
+--- a/TODO
++++ b/TODO
+@@ -152,16 +152,6 @@ ATT/GATT (new shared stack)
+   Priority: Medium
+   Complexity: C1
  
--	if (!ev->store_hint) {
--		device_set_conn_param(dev, min, max, latency, timeout);
-+	if (!ev->store_hint)
- 		return;
--	}
- 
- 	store_conn_param(adapter, &ev->addr.bdaddr, ev->addr.type,
- 					ev->min_interval, ev->max_interval,
+-- Define API functions in shared/gatt-client for enabling/disabling
+-  characteristic handle-value notifications/indications on a reference counted
+-  basis. Code that is no longer interested in notifications from a
+-  characteristic should be able to unregister any callbacks without writing to
+-  the "Client Characteristic Configuration" descriptor if there are others who
+-  are still interested.
+-
+-  Priority: Medium
+-  Complexity: C2
+-
+ - Introduce a handler interface to shared/gatt-client which can be used by the
+   upper layer to determine when the link has been disconnected or an ATT
+   protocol request times out.
 -- 
-1.9.3
+2.1.0.rc2.206.gedb03e5
 
