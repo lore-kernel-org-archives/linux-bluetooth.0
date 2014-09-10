@@ -1,46 +1,59 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <54105D42.7040003@lampreynetworks.com>
-Date: Wed, 10 Sep 2014 10:16:34 -0400
-From: Tom Harada <tharada@lampreynetworks.com>
-MIME-Version: 1.0
+From: gowtham babu <gowtham.ab@samsung.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: Re: BLE Delayed encryption change using
-References: <001301cfc950$ecd06240$c67126c0$@lampreynetworks.com> <3A0E8851-3F10-40A4-A5E8-43BCC727D053@holtmann.org> <002a01cfcc7d$8d290dd0$a77b2970$@lampreynetworks.com> <ACE92FC1-A8DE-4A23-A72E-AD78C158C2E9@holtmann.org>
-In-Reply-To: <ACE92FC1-A8DE-4A23-A72E-AD78C158C2E9@holtmann.org>
-Content-Type: text/plain; charset=windows-1252; format=flowed
+Cc: d.kasatkin@samsung.com, bharat.panda@samsung.com, cpgs@samsung.com,
+	gowtham babu <gowtham.ab@samsung.com>
+Subject: [MAP 2/2] obexd/client/map : Handle MAP ReadStatusChanged event type
+Date: Wed, 10 Sep 2014 20:08:53 +0530
+Message-id: <1410359933-9677-1-git-send-email-gowtham.ab@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
->>>> I am attempting to reconnect to a BLE glucometer with gatttool after
->>>> pairing with bluetoothctl. A quick connection update seems to cause a
->>>> large delay (around a minute) in the transmission of the LL_ENC_REQ.
->>>>
->>>> Description:
->>>> Attempting to connect to an agent which after connecting immediately
->>>> sends an L2CAP update connection parameters request with minimum
->>>> connection interval set to 20 ms, and maximum connection interval set to
->> 40 ms.
->>>> Increasing both values by 100 ms causes the problem to stop being
->> generated.
->>>> The problem happens only if the dongle using the Broadcom BCM20702
->>>> chipset is used, using a CSR8510 A10 dongle I cannot generate this
->>>> issue. I am using BlueZ 5.22, using Linux kernel 3.10.17. The hardware
->> platform is a Utilite.
->>> try using a 3.17-rc3 kernel. We added storing of the connection parameters.
->> New connections
->>> will then use the previously requested connection parameters when
->> establishing the connection.
->>> Which means the peripheral does not have to request connection updates on
->> every connection.
->>
->> According to the HCI dump I am not using the saved parameters. I see the
->> updated parameters getting saved, but the outgoing connection appears to not
->> be using them.
-> if you run btmon, do you see a mgmt command that indicates that the parameters are actually send to userspace. I think at the moment, we only really store the parameters for devices that are a) in our device list or b) we have paired with.
->
-We do see this command in btmon, right after the connection update. The 
-parameters also appear to be written to /var/lib/bluetooth/.../.../info.
+Adds ReadStatusChanged MCE event type handling in map_handle_notification()
+---
+ obexd/client/map.c | 22 ++++++++++++++++++++++
+ 1 file changed, 22 insertions(+)
 
-Regards,
-Tom Harada
+diff --git a/obexd/client/map.c b/obexd/client/map.c
+index 520e492..a505707 100644
+--- a/obexd/client/map.c
++++ b/obexd/client/map.c
+@@ -1872,6 +1872,25 @@ static void map_handle_status_changed(struct map_data *map,
+ 								"Status");
+ }
+ 
++static void map_handle_read_status_changed(struct map_data *map,
++                                                        struct map_event *event)
++{
++	struct map_msg *msg;
++
++	msg = g_hash_table_lookup(map->messages, &event->handle);
++	if (msg == NULL)
++		return;
++
++	/* In MAP V 1.2 specification : ReadStatusChanged event didn't have  clear explaination.
++	So as of now it will set the message read status as "yes" if it was "no" already
++	and the other way round. This implementation may change once we get 'read' attribute in the event report. */
++
++	if(msg->flags & MAP_MSG_FLAG_READ)
++		parse_read(msg,"no");
++	else
++		parse_read(msg,"yes");
++}
++
+ static void map_handle_folder_changed(struct map_data *map,
+ 							struct map_event *event,
+ 							const char *folder)
+@@ -1927,6 +1946,9 @@ static void map_handle_notification(struct map_event *event, void *user_data)
+ 	case MAP_ET_MESSAGE_SHIFT:
+ 		map_handle_folder_changed(map, event, event->folder);
+ 		break;
++	case MAP_ET_READ_STATUS_CHANGED:
++		map_handle_read_status_changed(map, event);
++		break;
+ 	default:
+ 		break;
+ 	}
+-- 
+1.9.1
+
