@@ -1,37 +1,46 @@
 Return-Path: <cyrus@holtmann.org>
+Message-ID: <54105D42.7040003@lampreynetworks.com>
+Date: Wed, 10 Sep 2014 10:16:34 -0400
+From: Tom Harada <tharada@lampreynetworks.com>
 MIME-Version: 1.0
-Sender: armansito@google.com
-In-Reply-To: <91778176-68DD-4FE5-8A10-601BFEDE83C2@holtmann.org>
-References: <1410282249-22004-1-git-send-email-armansito@chromium.org>
-	<1410282249-22004-5-git-send-email-armansito@chromium.org>
-	<B3B84C22-937B-4880-B59F-0CFA680192D1@holtmann.org>
-	<CAHrH25SVxPLYdjAGNHSwOKLx60wUOSRTzBTHDJfmvpFkiFhRPA@mail.gmail.com>
-	<91778176-68DD-4FE5-8A10-601BFEDE83C2@holtmann.org>
-Date: Wed, 10 Sep 2014 09:24:33 -0700
-Message-ID: <CAHrH25S2zX9QtrFEuGOAMipv25hEpEOKq-h5nR-nuT0d0o-4JA@mail.gmail.com>
-Subject: Re: [PATCH BlueZ v1 4/7] shared/gatt-client: Handle incoming not/ind PDUs.
-From: Arman Uguray <armansito@chromium.org>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+To: linux-bluetooth@vger.kernel.org
+Subject: Re: BLE Delayed encryption change using
+References: <001301cfc950$ecd06240$c67126c0$@lampreynetworks.com> <3A0E8851-3F10-40A4-A5E8-43BCC727D053@holtmann.org> <002a01cfcc7d$8d290dd0$a77b2970$@lampreynetworks.com> <ACE92FC1-A8DE-4A23-A72E-AD78C158C2E9@holtmann.org>
+In-Reply-To: <ACE92FC1-A8DE-4A23-A72E-AD78C158C2E9@holtmann.org>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Marcel,
-
-
-> actually that is a good idea. We might should look into introducing some =
-nice and handy asserts helpers for exactly the case when you want it on dur=
-ing development and testing.
+>>>> I am attempting to reconnect to a BLE glucometer with gatttool after
+>>>> pairing with bluetoothctl. A quick connection update seems to cause a
+>>>> large delay (around a minute) in the transmission of the LL_ENC_REQ.
+>>>>
+>>>> Description:
+>>>> Attempting to connect to an agent which after connecting immediately
+>>>> sends an L2CAP update connection parameters request with minimum
+>>>> connection interval set to 20 ms, and maximum connection interval set to
+>> 40 ms.
+>>>> Increasing both values by 100 ms causes the problem to stop being
+>> generated.
+>>>> The problem happens only if the dongle using the Broadcom BCM20702
+>>>> chipset is used, using a CSR8510 A10 dongle I cannot generate this
+>>>> issue. I am using BlueZ 5.22, using Linux kernel 3.10.17. The hardware
+>> platform is a Utilite.
+>>> try using a 3.17-rc3 kernel. We added storing of the connection parameters.
+>> New connections
+>>> will then use the previously requested connection parameters when
+>> establishing the connection.
+>>> Which means the peripheral does not have to request connection updates on
+>> every connection.
+>>
+>> According to the HCI dump I am not using the saved parameters. I see the
+>> updated parameters getting saved, but the outgoing connection appears to not
+>> be using them.
+> if you run btmon, do you see a mgmt command that indicates that the parameters are actually send to userspace. I think at the moment, we only really store the parameters for devices that are a) in our device list or b) we have paired with.
 >
-> For now, just keep the asserts in it. I just wanted to point it out since=
- I have seen people going crazy with asserts and then they can be remotely =
-exploited. And that is something I want to avoid at all costs. A remote sid=
-e should never ever be able to trigger an assert.
->
+We do see this command in btmon, right after the connection update. The 
+parameters also appear to be written to /var/lib/bluetooth/.../.../info.
 
-Sounds good, leaving them in for now. In the future we can explore
-adding macros such as DASSERT or DCHECK that are defined as "assert"
-if compiled with --debug and nothing otherwise.
-
-
--Arman
+Regards,
+Tom Harada
