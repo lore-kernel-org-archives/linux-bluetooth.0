@@ -1,138 +1,279 @@
 Return-Path: <cyrus@holtmann.org>
 From: Martin Townsend <mtownsend1973@gmail.com>
 To: linux-zigbee-devel@lists.sourceforge.net,
-	linux-bluetooth@vger.kernel.org,
-	linux-wpan@vger.kernel.org
-Cc: marcel@holtmann.org,
-	alex.aring@gmail.com,
+	linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org
+Cc: marcel@holtmann.org, alex.aring@gmail.com,
 	Martin Townsend <martin.townsend@xsilon.com>
-Subject: [PATCH][linux-bluetooth 3/3] 6lowpan: Refactored lowpan_rcv so it's RFC compliant
-Date: Wed, 10 Sep 2014 15:06:08 +0100
-Message-Id: <1410357968-27051-5-git-send-email-martin.townsend@xsilon.com>
+Subject: [PATCH][linux-bluetooth 2/3] 6lowpan: Move skb delivery from IPHC.
+Date: Wed, 10 Sep 2014 15:06:07 +0100
+Message-Id: <1410357968-27051-4-git-send-email-martin.townsend@xsilon.com>
 In-Reply-To: <1410357968-27051-1-git-send-email-martin.townsend@xsilon.com>
 References: <1410357968-27051-1-git-send-email-martin.townsend@xsilon.com>
+Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Currently we support uncompressed IPv6 headers after performing fragmentation.
+Passing the skb from 6lowpan up to the higher layers is not a
+function of IPHC.  By moving it out of IPHC we also remove the
+need to support error code returns with NET_RX codes.
+It also makes the lowpan_rcv function more extendable as we
+can support more compression schemes.
 
 Signed-off-by: Martin Townsend <martin.townsend@xsilon.com>
 ---
- include/net/6lowpan.h         | 17 ++++++++++++
- net/ieee802154/6lowpan_rtnl.c | 63 +++++++++++++++++++++++--------------------
- 2 files changed, 51 insertions(+), 29 deletions(-)
+ include/net/6lowpan.h         |  5 ++--
+ net/6lowpan/iphc.c            | 63 +++++++++++++++++--------------------------
+ net/bluetooth/6lowpan.c       | 16 ++++++-----
+ net/ieee802154/6lowpan_rtnl.c | 43 +++++++++++++++++------------
+ 4 files changed, 63 insertions(+), 64 deletions(-)
 
 diff --git a/include/net/6lowpan.h b/include/net/6lowpan.h
-index d71c062..71b1bf0 100644
+index 883e7a2..d71c062 100644
 --- a/include/net/6lowpan.h
 +++ b/include/net/6lowpan.h
-@@ -126,11 +126,28 @@
- 	 (((a)[6]) == 0xFF) &&	\
- 	 (((a)[7]) == 0xFF))
+@@ -374,10 +374,11 @@ lowpan_uncompress_size(const struct sk_buff *skb, u16 *dgram_offset)
  
-+#define lowpan_dispatch_is_nalp(a)	\
-+	(((a) & LOWPAN_DISPATCH_MAJOR) == 0x00)
-+
-+#define lowpan_dispatch_is_mesh(a)	\
-+	(((a) & LOWPAN_DISPATCH_MAJOR) == 0x80)
-+
-+#define lowpan_dispatch_is_broadcast(a)	\
-+	((a) == LOWPAN_DISPATCH_BCAST)
-+
-+#define lowpan_dispatch_is_frag(a)	\
-+	(((a) & LOWPAN_DISPATCH_MASK) == LOWPAN_DISPATCH_FRAG1 || \
-+	 ((a) & LOWPAN_DISPATCH_MASK) == LOWPAN_DISPATCH_FRAGN)
-+
-+#define LOWPAN_DISPATCH_MAJOR	0xc0
-+#define LOWPAN_DISPATCH_MINOR	0x3f
-+
- #define LOWPAN_DISPATCH_IPV6	0x41 /* 01000001 = 65 */
- #define LOWPAN_DISPATCH_HC1	0x42 /* 01000010 = 66 */
- #define LOWPAN_DISPATCH_IPHC	0x60 /* 011xxxxx = ... */
- #define LOWPAN_DISPATCH_FRAG1	0xc0 /* 11000xxx */
- #define LOWPAN_DISPATCH_FRAGN	0xe0 /* 11100xxx */
-+#define LOWPAN_DISPATCH_BCAST	0x50 /* 01010000 */
+ typedef int (*skb_delivery_cb)(struct sk_buff *skb, struct net_device *dev);
  
- #define LOWPAN_DISPATCH_MASK	0xf8 /* 11111000 */
+-int lowpan_process_data(struct sk_buff **skb_inout, struct net_device *dev,
++int lowpan_iphc_header_uncompress(
++		struct sk_buff **skb_inout, struct net_device *dev,
+ 		const u8 *saddr, const u8 saddr_type, const u8 saddr_len,
+ 		const u8 *daddr, const u8 daddr_type, const u8 daddr_len,
+-		u8 iphc0, u8 iphc1, skb_delivery_cb skb_deliver);
++		u8 iphc0, u8 iphc1);
+ int lowpan_header_compress(struct sk_buff *skb, struct net_device *dev,
+ 			unsigned short type, const void *_daddr,
+ 			const void *_saddr, unsigned int len);
+diff --git a/net/6lowpan/iphc.c b/net/6lowpan/iphc.c
+index eca24bf..33985b9 100644
+--- a/net/6lowpan/iphc.c
++++ b/net/6lowpan/iphc.c
+@@ -171,39 +171,6 @@ static int uncompress_context_based_src_addr(struct sk_buff *skb,
+ 	return 0;
+ }
  
+-static int skb_deliver(struct sk_buff *skb, struct ipv6hdr *hdr,
+-		       struct net_device *dev, skb_delivery_cb deliver_skb)
+-{
+-	struct sk_buff *new;
+-	int stat;
+-
+-	new = skb_copy_expand(skb, sizeof(struct ipv6hdr), skb_tailroom(skb),
+-			      GFP_ATOMIC);
+-	if (!new)
+-		return -ENOMEM;
+-
+-	kfree_skb(skb);
+-
+-	skb_push(new, sizeof(struct ipv6hdr));
+-	skb_reset_network_header(new);
+-	skb_copy_to_linear_data(new, hdr, sizeof(struct ipv6hdr));
+-
+-	new->protocol = htons(ETH_P_IPV6);
+-	new->pkt_type = PACKET_HOST;
+-	new->dev = dev;
+-
+-	raw_dump_table(__func__, "raw skb data dump before receiving",
+-		       new->data, new->len);
+-
+-	stat = deliver_skb(new, dev);
+-	if (stat < 0)
+-		stat = NET_RX_DROP;
+-
+-	kfree_skb(new);
+-
+-	return stat;
+-}
+-
+ /* Uncompress function for multicast destination address,
+  * when M bit is set.
+  */
+@@ -334,10 +301,11 @@ err:
+ /* TTL uncompression values */
+ static const u8 lowpan_ttl_values[] = { 0, 1, 64, 255 };
+ 
+-int lowpan_process_data(struct sk_buff **skb_inout, struct net_device *dev,
+-			const u8 *saddr, const u8 saddr_type, const u8 saddr_len,
+-			const u8 *daddr, const u8 daddr_type, const u8 daddr_len,
+-			u8 iphc0, u8 iphc1, skb_delivery_cb deliver_skb)
++int lowpan_iphc_header_uncompress(struct sk_buff **skb_inout,
++				  struct net_device *dev, const u8 *saddr,
++				  const u8 saddr_type, const u8 saddr_len,
++				  const u8 *daddr, const u8 daddr_type,
++				  const u8 daddr_len, u8 iphc0, u8 iphc1)
+ {
+ 	struct ipv6hdr hdr = {};
+ 	u8 tmp, num_context = 0;
+@@ -503,12 +471,29 @@ int lowpan_process_data(struct sk_buff **skb_inout, struct net_device *dev,
+ 
+ 	raw_dump_table(__func__, "raw header dump", (u8 *)&hdr, sizeof(hdr));
+ 
+-	return skb_deliver(skb, &hdr, dev, deliver_skb);
++	/* Setup skb with new uncompressed IPv6 header. */
++	skb = skb_copy_expand(skb, sizeof(hdr), skb_tailroom(skb),
++			      GFP_ATOMIC);
++	if (!skb)
++		return -ENOMEM;
++
++	kfree_skb(*skb_inout);
++	*skb_inout = skb;
++
++	skb_push(skb, sizeof(hdr));
++	skb_reset_network_header(skb);
++	skb_copy_to_linear_data(skb, &hdr, sizeof(hdr));
++	skb->dev = dev;
++
++	raw_dump_table(__func__, "raw skb data dump before receiving",
++		       skb->data, skb->len);
++
++	return 0;
+ 
+ drop:
+ 	return err_ret;
+ }
+-EXPORT_SYMBOL_GPL(lowpan_process_data);
++EXPORT_SYMBOL_GPL(lowpan_iphc_header_uncompress);
+ 
+ static u8 lowpan_compress_addr_64(u8 **hc_ptr, u8 shift,
+ 				  const struct in6_addr *ipaddr,
+diff --git a/net/bluetooth/6lowpan.c b/net/bluetooth/6lowpan.c
+index f5f7ee0..6a76d44 100644
+--- a/net/bluetooth/6lowpan.c
++++ b/net/bluetooth/6lowpan.c
+@@ -246,10 +246,10 @@ static int process_data(struct sk_buff **skb_inout, struct net_device *netdev,
+ 	if (lowpan_fetch_skb_u8(skb, &iphc1))
+ 		goto drop;
+ 
+-	return lowpan_process_data(skb_inout, netdev,
++	return lowpan_iphc_header_uncompress(skb_inout, netdev,
+ 				   saddr, IEEE802154_ADDR_LONG, EUI64_ADDR_LEN,
+ 				   daddr, IEEE802154_ADDR_LONG, EUI64_ADDR_LEN,
+-				   iphc0, iphc1, give_skb_to_upper);
++				   iphc0, iphc1);
+ 
+ drop:
+ 	return -EINVAL;
+@@ -280,9 +280,6 @@ static int recv_pkt(struct sk_buff *skb, struct net_device *dev,
+ 		local_skb->protocol = htons(ETH_P_IPV6);
+ 		local_skb->pkt_type = PACKET_HOST;
+ 
+-		skb_reset_network_header(local_skb);
+-		skb_set_transport_header(local_skb, sizeof(struct ipv6hdr));
+-
+ 		if (give_skb_to_upper(local_skb, dev) != NET_RX_SUCCESS) {
+ 			kfree_skb(local_skb);
+ 			goto drop;
+@@ -305,8 +302,15 @@ static int recv_pkt(struct sk_buff *skb, struct net_device *dev,
+ 				kfree_skb(local_skb);
+ 				goto drop;
+ 			}
+-			if (ret != NET_RX_SUCCESS)
++
++			local_skb->protocol = htons(ETH_P_IPV6);
++			local_skb->pkt_type = PACKET_HOST;
++
++			if (give_skb_to_upper(local_skb, dev)
++							!= NET_RX_SUCCESS) {
++				kfree_skb(local_skb);
+ 				goto drop;
++			}
+ 
+ 			dev->stats.rx_bytes += skb->len;
+ 			dev->stats.rx_packets++;
 diff --git a/net/ieee802154/6lowpan_rtnl.c b/net/ieee802154/6lowpan_rtnl.c
-index 4f4b02d..1557ece 100644
+index fdb6c10..4f4b02d 100644
 --- a/net/ieee802154/6lowpan_rtnl.c
 +++ b/net/ieee802154/6lowpan_rtnl.c
-@@ -477,41 +477,46 @@ static int lowpan_rcv(struct sk_buff *skb, struct net_device *dev,
- 	if (ieee802154_hdr_peek_addrs(skb, &hdr) < 0)
- 		goto drop_skb;
+@@ -167,7 +167,8 @@ static int lowpan_give_skb_to_devices(struct sk_buff *skb,
+ 	return stat;
+ }
  
--	/* check that it's our buffer */
-+	/* First off if frame is Not A LoWPAN Packet (NALP) then chuck away */
-+	if (lowpan_dispatch_is_nalp(skb->data[0]))
-+		goto drop_skb;
-+
-+	/* The 6LoWPAN header stack comprimises of the following (in order)
-+	 *   Mesh
-+	 *   Broadcast
-+	 *   Fragmentation
-+	 */
-+	if (lowpan_dispatch_is_mesh(skb->data[0]))
-+		/* Not supported */
-+		goto drop_skb;
-+
-+	if (lowpan_dispatch_is_broadcast(skb->data[0]))
-+		/* Not supported */
-+		goto drop_skb;
-+
-+	if (lowpan_dispatch_is_frag(skb->data[0])) {
-+		u8 frag_dispatch = skb->data[0] & 0xe0;
-+
-+		ret = lowpan_frag_rcv(skb, frag_dispatch);
-+		if (ret != 1) {
-+			/* more frags to process */
-+			return NET_RX_SUCCESS;
-+		}
-+	}
-+
-+	/* We should now have an IPv6 Header (Compressed or Uncompressed) */
+-static int process_data(struct sk_buff **skb_inout, const struct ieee802154_hdr *hdr)
++static int iphc_uncompress_hdr(struct sk_buff **skb_inout,
++			       const struct ieee802154_hdr *hdr)
+ {
+ 	u8 iphc0, iphc1;
+ 	struct ieee802154_addr_sa sa, da;
+@@ -198,10 +199,10 @@ static int process_data(struct sk_buff **skb_inout, const struct ieee802154_hdr
+ 	else
+ 		dap = &da.hwaddr;
+ 
+-	return lowpan_process_data(skb_inout, skb->dev, sap, sa.addr_type,
++	return lowpan_iphc_header_uncompress(skb_inout, skb->dev,
++				   sap, sa.addr_type,
+ 				   IEEE802154_ADDR_LEN, dap, da.addr_type,
+-				   IEEE802154_ADDR_LEN, iphc0, iphc1,
+-				   lowpan_give_skb_to_devices);
++				   IEEE802154_ADDR_LEN, iphc0, iphc1);
+ 
+ drop:
+ 	return -EINVAL;
+@@ -478,36 +479,35 @@ static int lowpan_rcv(struct sk_buff *skb, struct net_device *dev,
+ 
+ 	/* check that it's our buffer */
  	if (skb->data[0] == LOWPAN_DISPATCH_IPV6) {
--		/* Pull off the 1-byte of 6lowpan header. */
-+		/* Uncompressed, Pull off the dispatch byte */
- 		skb_pull(skb, 1);
+-		skb->protocol = htons(ETH_P_IPV6);
+-		skb->pkt_type = PACKET_HOST;
 -
--		ret = NET_RX_SUCCESS;
+ 		/* Pull off the 1-byte of 6lowpan header. */
+ 		skb_pull(skb, 1);
+ 
+-		ret = lowpan_give_skb_to_devices(skb, NULL);
+-		if (ret == NET_RX_DROP)
+-			goto drop;
++		ret = NET_RX_SUCCESS;
  	} else {
--		switch (skb->data[0] & 0xe0) {
--		case LOWPAN_DISPATCH_IPHC:	/* ipv6 datagram */
-+		if ((skb->data[0] & 0xe0) == LOWPAN_DISPATCH_IPHC) {
-+			/* Compressed with IPHC - RFC 6282 */
- 			ret = iphc_uncompress_hdr(&skb, &hdr);
- 			if (ret < 0)
+ 		switch (skb->data[0] & 0xe0) {
+ 		case LOWPAN_DISPATCH_IPHC:	/* ipv6 datagram */
+-			ret = process_data(&skb, &hdr);
+-			if (ret == NET_RX_DROP)
++			ret = iphc_uncompress_hdr(&skb, &hdr);
++			if (ret < 0)
  				goto drop;
--			break;
--		case LOWPAN_DISPATCH_FRAG1:	/* first fragment header */
--			ret = lowpan_frag_rcv(skb, LOWPAN_DISPATCH_FRAG1);
--			if (ret == 1) {
--				ret = iphc_uncompress_hdr(&skb, &hdr);
--				if (ret < 0)
--					goto drop;
--			} else {
--				return NET_RX_SUCCESS;
--			}
--			break;
--		case LOWPAN_DISPATCH_FRAGN:	/* next fragments headers */
--			ret = lowpan_frag_rcv(skb, LOWPAN_DISPATCH_FRAGN);
--			if (ret == 1) {
--				ret = iphc_uncompress_hdr(&skb, &hdr);
--				if (ret < 0)
--					goto drop;
--			} else {
--				return NET_RX_SUCCESS;
--			}
--			break;
--		default:
--			break;
-+		} else {
-+			/* TODO: other compression formats to follow */
-+			goto drop_skb;
+ 			break;
+ 		case LOWPAN_DISPATCH_FRAG1:	/* first fragment header */
+ 			ret = lowpan_frag_rcv(skb, LOWPAN_DISPATCH_FRAG1);
+ 			if (ret == 1) {
+-				ret = process_data(&skb, &hdr);
+-				if (ret == NET_RX_DROP)
++				ret = iphc_uncompress_hdr(&skb, &hdr);
++				if (ret < 0)
+ 					goto drop;
++			} else {
++				return NET_RX_SUCCESS;
+ 			}
+ 			break;
+ 		case LOWPAN_DISPATCH_FRAGN:	/* next fragments headers */
+ 			ret = lowpan_frag_rcv(skb, LOWPAN_DISPATCH_FRAGN);
+ 			if (ret == 1) {
+-				ret = process_data(&skb, &hdr);
+-				if (ret == NET_RX_DROP)
++				ret = iphc_uncompress_hdr(&skb, &hdr);
++				if (ret < 0)
+ 					goto drop;
++			} else {
++				return NET_RX_SUCCESS;
+ 			}
+ 			break;
+ 		default:
+@@ -515,7 +515,16 @@ static int lowpan_rcv(struct sk_buff *skb, struct net_device *dev,
  		}
  	}
  
+-	return NET_RX_SUCCESS;
++	/* Pass IPv6 packet up to next layer */
++	skb->protocol = htons(ETH_P_IPV6);
++	skb->pkt_type = PACKET_HOST;
++	ret = lowpan_give_skb_to_devices(skb, NULL);
++	if (ret < 0)
++		goto drop_skb;
++
++	kfree_skb(skb);
++	return ret;
++
+ drop_skb:
+ 	kfree_skb(skb);
+ drop:
 -- 
 1.9.1
+
