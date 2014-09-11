@@ -1,44 +1,81 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: Re: [PATCH v2 01/16] android/hf-client: Add hf-client ID
-Date: Thu, 11 Sep 2014 13:43:53 +0200
-Message-ID: <5855798.7j4VXT9nGs@uw000953>
-In-Reply-To: <1410348854-26249-2-git-send-email-lukasz.rymanowski@tieto.com>
-References: <1410348854-26249-1-git-send-email-lukasz.rymanowski@tieto.com> <1410348854-26249-2-git-send-email-lukasz.rymanowski@tieto.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <000601cfcda9$86b83520$94289f60$@samsung.com>
+References: <1410352944-16586-1-git-send-email-gowtham.ab@samsung.com>
+	<3030038.LEiDkyyyur@uw000953>
+	<000601cfcda9$86b83520$94289f60$@samsung.com>
+Date: Thu, 11 Sep 2014 14:33:31 +0300
+Message-ID: <CABBYNZJw5Hsbn_Dn77UeBmOafFeLeZ-uMejJS7uWiM+c3oBPQg@mail.gmail.com>
+Subject: Re: [PATCH 3/3] android/hal-utils.c : Fix null pointer dereference
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Gowtham Anandha Babu <gowtham.ab@samsung.com>
+Cc: Szymon Janc <szymon.janc@tieto.com>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	Dmitry Kasatkin <d.kasatkin@samsung.com>,
+	Bharat Panda <bharat.panda@samsung.com>, cpgs@samsung.com
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Łukasz,
+Hi,
 
-On Wednesday 10 of September 2014 13:33:59 Lukasz Rymanowski wrote:
-> ---
->  android/hal-msg.h | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
-> 
-> diff --git a/android/hal-msg.h b/android/hal-msg.h
-> index 3d95e10..5781c09 100644
-> --- a/android/hal-msg.h
-> +++ b/android/hal-msg.h
-> @@ -35,8 +35,9 @@ static const char BLUEZ_HAL_SK_PATH[] = "\0bluez_hal_socket";
->  #define HAL_SERVICE_ID_HEALTH		7
->  #define HAL_SERVICE_ID_AVRCP		8
->  #define HAL_SERVICE_ID_GATT		9
-> +#define HAL_SERVICE_ID_HF_CLIENT	10
+On Thu, Sep 11, 2014 at 1:16 PM, Gowtham Anandha Babu
+<gowtham.ab@samsung.com> wrote:
+> Hi,
+>
+>> -----Original Message-----
+>> From: Szymon Janc [mailto:szymon.janc@tieto.com]
+>> Sent: Thursday, September 11, 2014 3:11 PM
+>> To: gowtham babu
+>> Cc: linux-bluetooth@vger.kernel.org; d.kasatkin@samsung.com;
+>> bharat.panda@samsung.com; cpgs@samsung.com
+>> Subject: Re: [PATCH 3/3] android/hal-utils.c : Fix null pointer dereference
+>>
+>> Hi,
+>>
+>> On Wednesday 10 of September 2014 18:12:24 gowtham babu wrote:
+>> > Handles the possible null pointer dereference: bd_addr by checking it
+>> against null.
+>> > ---
+>> >  android/hal-utils.c | 4 +++-
+>> >  1 file changed, 3 insertions(+), 1 deletion(-)
+>> >
+>> > diff --git a/android/hal-utils.c b/android/hal-utils.c index
+>> > ceefefc..64ab5a1 100644
+>> > --- a/android/hal-utils.c
+>> > +++ b/android/hal-utils.c
+>> > @@ -166,11 +166,13 @@ int int2str_findstr(const char *str, const struct
+>> int2str m[])
+>> >   */
+>> >  const char *bt_bdaddr_t2str(const bt_bdaddr_t *bd_addr, char *buf)  {
+>> > -   const uint8_t *p = bd_addr->address;
+>> > +   const uint8_t *p;
+>> >
+>> >     if (!bd_addr)
+>> >             return strcpy(buf, "NULL");
+>> >
+>> > +   p = bd_addr->address;
+>> > +
+>> >     snprintf(buf, MAX_ADDR_STR_LEN,
+>> "%02x:%02x:%02x:%02x:%02x:%02x",
+>> >                                     p[0], p[1], p[2], p[3], p[4], p[5]);
+>> >
+>>
+>> This patch looks OK to me, but I have one question before applying it.
+>>
+>> Do you really want your name to be visible in git history as it is in this email ie.
+>> without any capital letters?
+>>
+>> --
+>> Best regards,
+>> Szymon Janc
+>
+>
+> Sorry for the top posting. Regarding the git name, that’s  OK.
 
-To follow convention this should be named HAL_SERVICE_ID_HANDSFREE_CLIENT.
+Just be consistent, in this one you actually are using capital letter
+and a middle name.
 
->  
-> -#define HAL_SERVICE_ID_MAX HAL_SERVICE_ID_GATT
-> +#define HAL_SERVICE_ID_MAX HAL_SERVICE_ID_HF_CLIENT
->  
->  /* Core Service */
->  
-> 
 
 -- 
-Best regards, 
-Szymon Janc
+Luiz Augusto von Dentz
