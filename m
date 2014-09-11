@@ -1,41 +1,49 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: Marcin Kraglak <marcin.kraglak@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 01/14] android/tester: Fix characteristic instance ID
-Date: Thu, 11 Sep 2014 10:32:01 +0200
-Message-ID: <2695017.9mdRHVIbgt@uw000953>
-In-Reply-To: <1410415732-23212-1-git-send-email-marcin.kraglak@tieto.com>
-References: <1410415732-23212-1-git-send-email-marcin.kraglak@tieto.com>
+Message-ID: <54115C94.2050308@xsilon.com>
+Date: Thu, 11 Sep 2014 09:25:56 +0100
+From: Martin Townsend <martin.townsend@xsilon.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Sender: linux-bluetooth-owner@vger.kernel.org
+To: Alexander Aring <alex.aring@gmail.com>,
+ Martin Townsend <mtownsend1973@gmail.com>
+CC: linux-zigbee-devel@lists.sourceforge.net,
+ linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org,
+ marcel@holtmann.org
+Subject: Re: [PATCH][linux-bluetooth 2/3] 6lowpan: Move skb delivery from
+ IPHC.
+References: <1410357968-27051-1-git-send-email-martin.townsend@xsilon.com> <1410357968-27051-4-git-send-email-martin.townsend@xsilon.com> <20140911081808.GA19675@omega>
+In-Reply-To: <20140911081808.GA19675@omega>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcin,
+Hi Alex,
 
-On Thursday 11 of September 2014 08:08:39 Marcin Kraglak wrote:
-> Characteristics instance id starts from 1.
-> ---
->  android/tester-gatt.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/android/tester-gatt.c b/android/tester-gatt.c
-> index 2067ec3..1507803 100644
-> --- a/android/tester-gatt.c
-> +++ b/android/tester-gatt.c
-> @@ -148,7 +148,7 @@ static btgatt_srvc_id_t service_2 = {
->  };
->  
->  static btgatt_gatt_id_t characteristic_1 = {
-> -	.inst_id = 0,
-> +	.inst_id = 1,
->  	.uuid.uu = {0xfb, 0x34, 0x9b, 0x5f, 0x80, 0x00, 0x00, 0x80,
->  			0x00, 0x10, 0x00, 0x00,  0x19, 0x00, 0x00, 0x00}
->  };
+On 11/09/14 09:18, Alexander Aring wrote:
+> On Wed, Sep 10, 2014 at 03:06:07PM +0100, Martin Townsend wrote:
+>> Passing the skb from 6lowpan up to the higher layers is not a
+>> function of IPHC.  By moving it out of IPHC we also remove the
+>> need to support error code returns with NET_RX codes.
+>> It also makes the lowpan_rcv function more extendable as we
+>> can support more compression schemes.
+>>
+> I will ack this. But please sperate this patch in two. First renaming
+> the function namens and then removing deliver callback.
+ok, but should this not be the other way around
+moving delivery into receive and then by doing this processs_data naturally becomes IPHC decompress so it can be renamed.
+>
+> btw. The correct tag is bluetooth not linux-bluetooth, or bluetooth-next.
+>
+>
+>
+> Also this doesn't fix anything? Then this is for bluetooth-next. I know
+> this depends on the Patch 1/3. Marcel, do you have any a nice solution
+> about this, that we can deal with huge fixes in bluetooth and new features
+> for bluetooth-next. Or simple wait when it's merged?
+I disagree, this with the previous patch fixes error handling in lowpan_rcv.  By moving the skb delivery out of IPHC you automatically fix the nightmare which is returning a mixture of NET_RX codes with error codes.  IPHC now only returns error codes or success.  Delivery is done where is should be in the receive function and can deal with NET_RX codes.
+>
+> - Alex
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-wpan" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
-All patches applied, thanks. 
-
--- 
-Best regards, 
-Szymon Janc
+- Martin.
