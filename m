@@ -1,11 +1,12 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1410347494-22084-4-git-send-email-lukasz.rymanowski@tieto.com>
+In-Reply-To: <1410347494-22084-2-git-send-email-lukasz.rymanowski@tieto.com>
 References: <1410347494-22084-1-git-send-email-lukasz.rymanowski@tieto.com>
-	<1410347494-22084-4-git-send-email-lukasz.rymanowski@tieto.com>
-Date: Thu, 11 Sep 2014 15:14:25 +0300
-Message-ID: <CABBYNZJmMLnyOe682Oi7NuFtEiED3Y-epks-nJBBqMaNPS2KcA@mail.gmail.com>
-Subject: Re: [PATCH v2 3/4] android/hal-ipc-api: Add missing peer features parameter
+	<1410347494-22084-2-git-send-email-lukasz.rymanowski@tieto.com>
+Date: Thu, 11 Sep 2014 15:08:22 +0300
+Message-ID: <CABBYNZJz1xqmeZY39Zi7=iZ73_dm+f5K+00rqfTHgJmsqSao4A@mail.gmail.com>
+Subject: Re: [PATCH v2 1/4] android/hal-ipc-api: Use 2 bytes for location in
+ dial memory
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
@@ -18,27 +19,35 @@ Hi Lukasz,
 On Wed, Sep 10, 2014 at 2:11 PM, Lukasz Rymanowski
 <lukasz.rymanowski@tieto.com> wrote:
 > ---
->  android/hal-ipc-api.txt | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
+>  android/hal-ipc-api.txt | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 >
 > diff --git a/android/hal-ipc-api.txt b/android/hal-ipc-api.txt
-> index 326fa21..0948af2 100644
+> index ca41cff..26e777e 100644
 > --- a/android/hal-ipc-api.txt
 > +++ b/android/hal-ipc-api.txt
-> @@ -2228,7 +2228,8 @@ Notifications:
->         Opcode 0x81 - Connection State Changed notification
+> @@ -2162,7 +2162,7 @@ Commands and response:
 >
->                 Notification parameters: State (1 octet)
-> -                                        Peer Features (1 octet)
-> +                                        Peer Features (2 octets)
-> +                                        CHLD Features (2 octets)
->                                          Address (6 octets)
+>         Opcode 0x09 - Dial Memory command/response
 >
->                 Valid State values: 0x00 = Disconnected
+> -               Command parameters: Location (1 octet)
+> +               Command parameters: Location (2 octet)
+>                 Response parameters: <none>
+>
+>                 In case of an error, the error response will be returned.
 > --
 > 1.8.4
 
-You should probably document what are the possible values for CHLD.
+I guess we need a little bit more info here, does the spec limit this
+to 2 octets because it seems the callback actually takes an int:
+
+bt_status_t (*dial_memory) (int location);
+
+Btw, I guess this is subject to change since it does not take the
+address this would limit such callbacks to only one phone, in fact
+many callback have this limitation which is kind of weird as both
+connect/disconnect and connect_audio/disconnect_audio have the
+address.
 
 
 -- 
