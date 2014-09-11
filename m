@@ -1,43 +1,75 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.6\))
-Subject: Re: [PATCH 0/6] Bluetooth: SMP and some other fixes
-From: Marcel Holtmann <marcel@holtmann.org>
+From: johan.hedberg@gmail.com
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH 5/6] Bluetooth: Add smp_ltk_sec_level() helper function
+Date: Wed, 10 Sep 2014 17:37:45 -0700
+Message-Id: <1410395866-24301-6-git-send-email-johan.hedberg@gmail.com>
 In-Reply-To: <1410395866-24301-1-git-send-email-johan.hedberg@gmail.com>
-Date: Wed, 10 Sep 2014 17:47:26 -0700
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <B4EA1E10-94BE-46E3-B984-5036D2B868DB@holtmann.org>
 References: <1410395866-24301-1-git-send-email-johan.hedberg@gmail.com>
-To: Johan Hedberg <johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+From: Johan Hedberg <johan.hedberg@intel.com>
 
-> The first five patches from this set are various fixes to SMP. The sixth
-> one is a fix for properly notifying BR/EDR fixed channels, including on
-> setups when there are no registered connection-oriented BR/EDR channels.
-> 
-> Johan
-> 
-> ----------------------------------------------------------------
-> Johan Hedberg (6):
->      Bluetooth: Remove unnecessary early initialization of variable
->      Bluetooth: Fix ignoring unknown SMP authentication requirement bits
->      Bluetooth: Centralize disallowing SMP commands to a single place
->      Bluetooth: Fix SMP security level when we have no IO capabilities
->      Bluetooth: Add smp_ltk_sec_level() helper function
->      Bluetooth: Fix L2CAP information request handling for fixed channels
-> 
-> net/bluetooth/hci_event.c  |  5 +---
-> net/bluetooth/l2cap_core.c | 53 +++++++++++++++++++++++++---------------
-> net/bluetooth/smp.c        | 55 ++++++++++++++++++------------------------
-> net/bluetooth/smp.h        |  8 ++++++
-> 4 files changed, 66 insertions(+), 55 deletions(-)
+There are several places that need to determine the security level that
+an LTK can provide. This patch adds a convenience function for this to
+help make the code more readable.
 
-all 6 patches have been applied to bluetooth-next tree.
+Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+---
+ net/bluetooth/hci_event.c | 5 +----
+ net/bluetooth/smp.c       | 2 +-
+ net/bluetooth/smp.h       | 8 ++++++++
+ 3 files changed, 10 insertions(+), 5 deletions(-)
 
-Regards
-
-Marcel
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 3a8381ab992f..603a17cc52ac 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -4506,10 +4506,7 @@ static void hci_le_ltk_request_evt(struct hci_dev *hdev, struct sk_buff *skb)
+ 	memcpy(cp.ltk, ltk->val, sizeof(ltk->val));
+ 	cp.handle = cpu_to_le16(conn->handle);
+ 
+-	if (ltk->authenticated)
+-		conn->pending_sec_level = BT_SECURITY_HIGH;
+-	else
+-		conn->pending_sec_level = BT_SECURITY_MEDIUM;
++	conn->pending_sec_level = smp_ltk_sec_level(ltk);
+ 
+ 	conn->enc_key_size = ltk->enc_size;
+ 
+diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
+index a08b077cb725..3700dd8d9d0b 100644
+--- a/net/bluetooth/smp.c
++++ b/net/bluetooth/smp.c
+@@ -1114,7 +1114,7 @@ static bool smp_ltk_encrypt(struct l2cap_conn *conn, u8 sec_level)
+ 	if (!key)
+ 		return false;
+ 
+-	if (sec_level > BT_SECURITY_MEDIUM && !key->authenticated)
++	if (smp_ltk_sec_level(key) < sec_level)
+ 		return false;
+ 
+ 	if (test_and_set_bit(HCI_CONN_ENCRYPT_PEND, &hcon->flags))
+diff --git a/net/bluetooth/smp.h b/net/bluetooth/smp.h
+index 5240537efde3..86a683a8b491 100644
+--- a/net/bluetooth/smp.h
++++ b/net/bluetooth/smp.h
+@@ -125,6 +125,14 @@ enum {
+ 	SMP_LTK_SLAVE,
+ };
+ 
++static inline u8 smp_ltk_sec_level(struct smp_ltk *key)
++{
++	if (key->authenticated)
++		return BT_SECURITY_HIGH;
++
++	return BT_SECURITY_MEDIUM;
++}
++
+ /* SMP Commands */
+ bool smp_sufficient_security(struct hci_conn *hcon, u8 sec_level);
+ int smp_conn_security(struct hci_conn *hcon, __u8 sec_level);
+-- 
+1.9.3
 
