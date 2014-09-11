@@ -1,41 +1,52 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 11 Sep 2014 11:09:51 +0200
+Date: Thu, 11 Sep 2014 11:01:46 +0200
 From: Alexander Aring <alex.aring@gmail.com>
-To: Martin Townsend <mtownsend1973@gmail.com>
-Cc: linux-zigbee-devel@lists.sourceforge.net,
+To: Martin Townsend <martin.townsend@xsilon.com>
+Cc: Martin Townsend <mtownsend1973@gmail.com>,
+	linux-zigbee-devel@lists.sourceforge.net,
 	linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org,
-	marcel@holtmann.org, Martin Townsend <martin.townsend@xsilon.com>
-Subject: Re: [PATCH][linux-bluetooth 3/3] 6lowpan: Refactored lowpan_rcv so
- it's RFC compliant
-Message-ID: <20140911090950.GD19675@omega>
+	marcel@holtmann.org
+Subject: Re: [PATCH][linux-bluetooth 2/3] 6lowpan: Move skb delivery from
+ IPHC.
+Message-ID: <20140911090144.GC19675@omega>
 References: <1410357968-27051-1-git-send-email-martin.townsend@xsilon.com>
- <1410357968-27051-5-git-send-email-martin.townsend@xsilon.com>
- <20140911085353.GB19675@omega>
+ <1410357968-27051-4-git-send-email-martin.townsend@xsilon.com>
+ <20140911081808.GA19675@omega>
+ <54115C94.2050308@xsilon.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-In-Reply-To: <20140911085353.GB19675@omega>
+In-Reply-To: <54115C94.2050308@xsilon.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Martin,
 
-On Thu, Sep 11, 2014 at 10:53:53AM +0200, Alexander Aring wrote:
-...
+On Thu, Sep 11, 2014 at 09:25:56AM +0100, Martin Townsend wrote:
+> Hi Alex,
 > 
-> I know this issue and we should not do that in this way.
-> 
-> Why?
-> 
-> Because this works only for fragmentation with IPHC, for example if we
-> support mesh or Broadcast or HC1 compression. We should call after
-> successfully reassembled "means lowpan_frag_rcv returns 1" the lowpan_rcv again.
-> So this is a recursion and we don't should use recursion to much, but it
-> should only be one recursion, so I think that's okay. :-)
-> 
+> On 11/09/14 09:18, Alexander Aring wrote:
+> > On Wed, Sep 10, 2014 at 03:06:07PM +0100, Martin Townsend wrote:
+> >> Passing the skb from 6lowpan up to the higher layers is not a
+> >> function of IPHC.  By moving it out of IPHC we also remove the
+> >> need to support error code returns with NET_RX codes.
+> >> It also makes the lowpan_rcv function more extendable as we
+> >> can support more compression schemes.
+> >>
+> > I will ack this. But please sperate this patch in two. First renaming
+> > the function namens and then removing deliver callback.
+> ok, but should this not be the other way around
+> moving delivery into receive and then by doing this processs_data naturally becomes IPHC decompress so it can be renamed.
+> >
+> > btw. The correct tag is bluetooth not linux-bluetooth, or bluetooth-next.
+> >
+> >
+> >
+> > Also this doesn't fix anything? Then this is for bluetooth-next. I know
+> > this depends on the Patch 1/3. Marcel, do you have any a nice solution
+> > about this, that we can deal with huge fixes in bluetooth and new features
+> > for bluetooth-next. Or simple wait when it's merged?
+> I disagree, this with the previous patch fixes error handling in lowpan_rcv.  By moving the skb delivery out of IPHC you automatically fix the nightmare which is returning a mixture of NET_RX codes with error codes.  IPHC now only returns error codes or success.  Delivery is done where is should be in the receive function and can deal with NET_RX codes.
 
-I reconsider about that, this is not okay. A attacker can send data to
-occur this stack overflow...
-
-We need another solution for this. Maybe your current one, but handling
-fragmentation at the beginning and then evaulate dispatch values.
+ok. When this is a part of the fix and 1/3 "prepare" the fix, then put
+this handling into patch "1/3" to really fix the issue from patch 1/3.
 
 - Alex
