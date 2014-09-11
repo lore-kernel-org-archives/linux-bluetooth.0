@@ -1,59 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 11 Sep 2014 09:37:52 -0700
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Gowtham Anandha Babu <gowtham.ab@samsung.com>
-Cc: linux-bluetooth@vger.kernel.org, d.kasatkin@samsung.com,
-	bharat.panda@samsung.com, cpgs@samsung.com
-Subject: Re: [PATCH 1/7] obexd/client : Handle the MAP Extended Event Report
- 1.1
-Message-ID: <20140911163752.GA27789@t440s>
-References: <1410441607-9687-1-git-send-email-gowtham.ab@samsung.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1410441607-9687-1-git-send-email-gowtham.ab@samsung.com>
+In-Reply-To: <024801cfcd86$58382520$08a86f60$@samsung.com>
+References: <015d01cfc20a$c9160a00$5b421e00$@samsung.com>
+	<024801cfcd86$58382520$08a86f60$@samsung.com>
+Date: Thu, 11 Sep 2014 09:27:54 -0700
+Message-ID: <CAHrH25RUK3HWQeysAti+BHVxQ4RSVnFfL3M-BNB_4xc_x71Fuw@mail.gmail.com>
+Subject: Re: Query Regarding new Gatt server attribute database
+From: Arman Uguray <armansito@chromium.org>
+To: Bharat Bhusan Panda <bharat.panda@samsung.com>
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Bharat,
 
-On Thu, Sep 11, 2014, Gowtham Anandha Babu wrote:
->  struct map_event {
-> @@ -41,6 +42,10 @@ struct map_event {
->  	char *folder;
->  	char *old_folder;
->  	char *msg_type;
-> +	char *datetime;
-> +	char *subject;
-> +	char *sender_name;
-> +	char *priority;
->  };
-<snip>
-> +static void parse_event_report_date_time(struct map_event *event,
-> +                                                        const char *value)
-> +{
-> +	event->datetime = g_strdup(value);
-> +}
-> +
-> +static void parse_event_report_subject(struct map_event *event,
-> +                                                        const char *value)
-> +{
-> +	event->subject = g_strdup(value);
-> +}
-> +
-> +static void parse_event_report_sender_name(struct map_event *event,
-> +                                                        const char *value)
-> +{
-> +	event->sender_name = g_strdup(value);
-> +}
-> +
-> +static void parse_event_report_priority(struct map_event *event,
-> +                                                        const char *value)
-> +{
-> +	event->priority = g_strdup(value);
-> +}
+> Is there any plan to update, gatt-dbus.c, or all the functionalities are
+> moving to src/shared/ ??
+>
 
-Where are all these freed? Don't you need to update the map_event_free()
-function? If you're not yet doing so, please always test your code with
-"valgrind --leak-check=full".
+Others can comment more but I don't think there is (or there will be)
+any work to maintain/develop what's in src/gatt-dbus and src/gatt, at
+least not the way that they're currently built. The plan right now is
+to move all core functionality into src/shared and then (re)build most
+of the daemon's D-Bus bits using the new shared code.
 
-Johan
+I don't know how well the existing GATT D-Bus server stuff works at
+the moment but I was under the impression that none of that's
+feature-complete. Others can comment more.
+
+Cheers,
+Arman
