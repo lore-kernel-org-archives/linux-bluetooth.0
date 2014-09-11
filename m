@@ -1,55 +1,68 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcin Kraglak <marcin.kraglak@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 06/14] android/tester: Add GATT Get Descriptor 2 test case
-Date: Thu, 11 Sep 2014 08:08:44 +0200
-Message-Id: <1410415732-23212-6-git-send-email-marcin.kraglak@tieto.com>
+Subject: [PATCH 05/14] android/tester: Add GATT Get Descriptor 1 test case
+Date: Thu, 11 Sep 2014 08:08:43 +0200
+Message-Id: <1410415732-23212-5-git-send-email-marcin.kraglak@tieto.com>
 In-Reply-To: <1410415732-23212-1-git-send-email-marcin.kraglak@tieto.com>
 References: <1410415732-23212-1-git-send-email-marcin.kraglak@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-It tests searching muliple descriptors in characteristic.
+It tests searching for descriptors in characteristic.
 ---
- android/tester-gatt.c | 64 +++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 64 insertions(+)
+ android/tester-gatt.c | 83 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 83 insertions(+)
 
 diff --git a/android/tester-gatt.c b/android/tester-gatt.c
-index c52a632..db48a87 100644
+index b847c5f..c52a632 100644
 --- a/android/tester-gatt.c
 +++ b/android/tester-gatt.c
-@@ -166,6 +166,12 @@ static btgatt_gatt_id_t desc_1 = {
- 			0x00, 0x10, 0x00, 0x00,  0x00, 0x29, 0x00, 0x00}
+@@ -78,6 +78,13 @@ struct get_char_data {
+ 	btgatt_srvc_id_t *service;
  };
  
-+static btgatt_gatt_id_t desc_2 = {
-+	.inst_id = 2,
++struct get_desc_data {
++	const int conn_id;
++	btgatt_srvc_id_t *service;
++	btgatt_gatt_id_t *characteristic;
++	btgatt_gatt_id_t *desc;
++};
++
+ static bt_uuid_t client2_app_uuid = {
+ 	.uu = { 0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02,
+ 				0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02 },
+@@ -153,6 +160,12 @@ static btgatt_gatt_id_t characteristic_1 = {
+ 			0x00, 0x10, 0x00, 0x00,  0x19, 0x00, 0x00, 0x00}
+ };
+ 
++static btgatt_gatt_id_t desc_1 = {
++	.inst_id = 1,
 +	.uuid.uu = {0xfb, 0x34, 0x9b, 0x5f, 0x80, 0x00, 0x00, 0x80,
-+			0x00, 0x10, 0x00, 0x00,  0x01, 0x29, 0x00, 0x00}
++			0x00, 0x10, 0x00, 0x00,  0x00, 0x29, 0x00, 0x00}
 +};
 +
  static struct get_char_data get_char_data_1 = {
  	.conn_id = CONN1_ID,
  	.service = &service_1
-@@ -182,6 +188,13 @@ static struct get_desc_data get_desc_data_1 = {
- 	.characteristic = &characteristic_1,
+@@ -163,6 +176,12 @@ static struct get_char_data get_char_data_2 = {
+ 	.service = &service_2
  };
  
-+static struct get_desc_data get_desc_data_2 = {
++static struct get_desc_data get_desc_data_1 = {
 +	.conn_id = CONN1_ID,
 +	.service = &service_1,
 +	.characteristic = &characteristic_1,
-+	.desc = &desc_1,
 +};
 +
  static struct pdu search_service[] = {
  	raw_pdu(0x10, 0x01, 0x00, 0xff, 0xff, 0x00, 0x28),
  	raw_pdu(0x11, 0x06, 0x01, 0x00, 0x10, 0x00, 0x00, 0x18),
-@@ -234,6 +247,22 @@ static struct pdu get_descriptor_1[] = {
+@@ -199,6 +218,22 @@ static struct pdu get_characteristic_1[] = {
  	end_pdu
  };
  
-+static struct pdu get_descriptor_2[] = {
++static struct pdu get_descriptor_1[] = {
 +	raw_pdu(0x10, 0x01, 0x00, 0xff, 0xff, 0x00, 0x28),
 +	raw_pdu(0x11, 0x06, 0x01, 0x00, 0x10, 0x00, 0x00, 0x18),
 +	raw_pdu(0x10, 0x11, 0x00, 0xff, 0xff, 0x00, 0x28),
@@ -59,21 +72,45 @@ index c52a632..db48a87 100644
 +	raw_pdu(0x08, 0x03, 0x00, 0x10, 0x00, 0x03, 0x28),
 +	raw_pdu(0x01, 0x08, 0x03, 0x00, 0x0a),
 +	raw_pdu(0x04, 0x01, 0x00, 0x10, 0x00),
-+	raw_pdu(0x05, 0x01, 0x04, 0x00, 0x00, 0x29, 0x05, 0x00, 0x01, 0x29),
-+	raw_pdu(0x04, 0x06, 0x00, 0x10, 0x00),
-+	raw_pdu(0x01, 0x04, 0x06, 0x00, 0x0a),
++	raw_pdu(0x05, 0x01, 0x04, 0x00, 0x00, 0x29),
++	raw_pdu(0x04, 0x05, 0x00, 0x10, 0x00),
++	raw_pdu(0x01, 0x04, 0x05, 0x00, 0x0a),
 +	end_pdu
 +};
 +
  static void gatt_client_register_action(void)
  {
  	struct test_data *data = tester_get_data();
-@@ -833,6 +862,41 @@ static struct test_case test_cases[] = {
+@@ -326,6 +361,23 @@ static void gatt_client_get_characteristic_action(void)
+ 	schedule_action_verification(step);
+ }
+ 
++static void gatt_client_get_descriptor(void)
++{
++	struct test_data *data = tester_get_data();
++	struct step *current_data_step = queue_peek_head(data->steps);
++	struct get_desc_data *get_desc = current_data_step->set_data;
++	const btgatt_client_interface_t *client = data->if_gatt->client;
++	struct step *step = g_new0(struct step, 1);
++	int status;
++
++	status = client->get_descriptor(get_desc->conn_id, get_desc->service,
++						get_desc->characteristic,
++						get_desc->desc);
++	step->action_status = status;
++
++	schedule_action_verification(step);
++}
++
+ static void gatt_cid_hook_cb(const void *data, uint16_t len, void *user_data)
+ {
+ 	struct test_data *t_data = tester_get_data();
+@@ -750,6 +802,37 @@ static struct test_case test_cases[] = {
  		ACTION_SUCCESS(bluetooth_disable_action, NULL),
  		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_OFF),
  	),
-+	TEST_CASE_BREDRLE("Gatt Client - Get Descriptor 2",
-+		ACTION_SUCCESS(init_pdus, get_descriptor_2),
++	TEST_CASE_BREDRLE("Gatt Client - Get Descriptor 1",
++		ACTION_SUCCESS(init_pdus, get_descriptor_1),
 +		ACTION_SUCCESS(bluetooth_enable_action, NULL),
 +		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_ON),
 +		ACTION_SUCCESS(emu_setup_powered_remote_action, NULL),
@@ -81,7 +118,6 @@ index c52a632..db48a87 100644
 +		ACTION_SUCCESS(emu_set_connect_cb_action, gatt_conn_cb),
 +		ACTION_SUCCESS(gatt_client_register_action, &client_app_uuid),
 +		CALLBACK_STATUS(CB_GATTC_REGISTER_CLIENT, BT_STATUS_SUCCESS),
-+
 +		ACTION_SUCCESS(gatt_client_start_scan_action,
 +							INT_TO_PTR(CLIENT1_ID)),
 +		CLLBACK_GATTC_SCAN_RES(prop_emu_remotes_default_set, 1, TRUE),
@@ -101,9 +137,6 @@ index c52a632..db48a87 100644
 +		ACTION_SUCCESS(gatt_client_get_descriptor, &get_desc_data_1),
 +		CALLBACK_GATTC_GET_DESCRIPTOR(GATT_STATUS_SUCCESS, CONN1_ID,
 +				&service_1, &characteristic_1, &desc_1),
-+		ACTION_SUCCESS(gatt_client_get_descriptor, &get_desc_data_2),
-+		CALLBACK_GATTC_GET_DESCRIPTOR(GATT_STATUS_SUCCESS, CONN1_ID,
-+					&service_1, &characteristic_1, &desc_2),
 +		ACTION_SUCCESS(bluetooth_disable_action, NULL),
 +		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_OFF),
 +	),
