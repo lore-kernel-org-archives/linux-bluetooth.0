@@ -1,32 +1,30 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.6\))
-Subject: Re: [PATCH] Bluetooth: Expire RPA if encryption fails
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1410412595-12157-1-git-send-email-johan.hedberg@gmail.com>
-Date: Wed, 10 Sep 2014 22:34:04 -0700
+Date: Wed, 10 Sep 2014 22:27:42 -0700
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Szymon Janc <szymon.janc@tieto.com>
 Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <54D159C8-A048-422B-AC58-6EF5B64177B2@holtmann.org>
-References: <1410412595-12157-1-git-send-email-johan.hedberg@gmail.com>
-To: Johan Hedberg <johan.hedberg@gmail.com>
+Subject: Re: [PATCH 1/2] core: Fix storing connection parameters without
+ store hint set
+Message-ID: <20140911052742.GA14192@t440s>
+References: <1410379987-4265-1-git-send-email-szymon.janc@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1410379987-4265-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+Hi Szymon,
 
-> If encryption fails and we're using an RPA it may be because of a
-> conflict with another device. To avoid repeated failures the safest
-> action is to simply mark the RPA as expired so that a new one gets
-> generated as soon as the connection drops.
-> 
-> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+On Wed, Sep 10, 2014, Szymon Janc wrote:
+> If store hint is not set those should not be stored persistently.
 > ---
-> net/bluetooth/hci_event.c | 6 ++++++
-> 1 file changed, 6 insertions(+)
+> 
+> I've decided to leave storing in adapter.c to keep it similar to new
+> keys events. Memebers in device.c were used only for storing anyway.
+> 
+>  src/adapter.c | 4 +---
+>  1 file changed, 1 insertion(+), 3 deletions(-)
 
-patch has been applied to bluetooth-next tree.
+Both patches have been applied. Thanks.
 
-Regards
-
-Marcel
-
+Johan
