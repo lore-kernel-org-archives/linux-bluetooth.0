@@ -1,51 +1,56 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: gowtham babu <gowtham.ab@samsung.com>
-Cc: linux-bluetooth@vger.kernel.org, d.kasatkin@samsung.com,
-	bharat.panda@samsung.com, cpgs@samsung.com
-Subject: Re: [PATCH 3/3] android/hal-utils.c : Fix null pointer dereference
-Date: Thu, 11 Sep 2014 11:41:05 +0200
-Message-ID: <3030038.LEiDkyyyur@uw000953>
-In-Reply-To: <1410352944-16586-1-git-send-email-gowtham.ab@samsung.com>
-References: <1410352944-16586-1-git-send-email-gowtham.ab@samsung.com>
+Message-ID: <54116C6D.3090004@xsilon.com>
+Date: Thu, 11 Sep 2014 10:33:33 +0100
+From: Martin Townsend <martin.townsend@xsilon.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Sender: linux-bluetooth-owner@vger.kernel.org
+To: Alexander Aring <alex.aring@gmail.com>
+CC: Martin Townsend <mtownsend1973@gmail.com>,
+ linux-zigbee-devel@lists.sourceforge.net,
+ linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org,
+ marcel@holtmann.org
+Subject: Re: [PATCH][linux-bluetooth 2/3] 6lowpan: Move skb delivery from
+ IPHC.
+References: <1410357968-27051-1-git-send-email-martin.townsend@xsilon.com> <1410357968-27051-4-git-send-email-martin.townsend@xsilon.com> <20140911081808.GA19675@omega> <54115C94.2050308@xsilon.com> <20140911090144.GC19675@omega>
+In-Reply-To: <20140911090144.GC19675@omega>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Alex,
 
-On Wednesday 10 of September 2014 18:12:24 gowtham babu wrote:
-> Handles the possible null pointer dereference: bd_addr by checking it against null.
-> ---
->  android/hal-utils.c | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
-> 
-> diff --git a/android/hal-utils.c b/android/hal-utils.c
-> index ceefefc..64ab5a1 100644
-> --- a/android/hal-utils.c
-> +++ b/android/hal-utils.c
-> @@ -166,11 +166,13 @@ int int2str_findstr(const char *str, const struct int2str m[])
->   */
->  const char *bt_bdaddr_t2str(const bt_bdaddr_t *bd_addr, char *buf)
->  {
-> -	const uint8_t *p = bd_addr->address;
-> +	const uint8_t *p;
->  
->  	if (!bd_addr)
->  		return strcpy(buf, "NULL");
->  
-> +	p = bd_addr->address;
-> +
->  	snprintf(buf, MAX_ADDR_STR_LEN, "%02x:%02x:%02x:%02x:%02x:%02x",
->  					p[0], p[1], p[2], p[3], p[4], p[5]);
->  
+On 11/09/14 10:01, Alexander Aring wrote:
+> Hi Martin,
+>
+> On Thu, Sep 11, 2014 at 09:25:56AM +0100, Martin Townsend wrote:
+>> Hi Alex,
+>>
+>> On 11/09/14 09:18, Alexander Aring wrote:
+>>> On Wed, Sep 10, 2014 at 03:06:07PM +0100, Martin Townsend wrote:
+>>>> Passing the skb from 6lowpan up to the higher layers is not a
+>>>> function of IPHC.  By moving it out of IPHC we also remove the
+>>>> need to support error code returns with NET_RX codes.
+>>>> It also makes the lowpan_rcv function more extendable as we
+>>>> can support more compression schemes.
+>>>>
+>>> I will ack this. But please sperate this patch in two. First renaming
+>>> the function namens and then removing deliver callback.
+>> ok, but should this not be the other way around
+>> moving delivery into receive and then by doing this processs_data naturally becomes IPHC decompress so it can be renamed.
+>>> btw. The correct tag is bluetooth not linux-bluetooth, or bluetooth-next.
+>>>
+>>>
+>>>
+>>> Also this doesn't fix anything? Then this is for bluetooth-next. I know
+>>> this depends on the Patch 1/3. Marcel, do you have any a nice solution
+>>> about this, that we can deal with huge fixes in bluetooth and new features
+>>> for bluetooth-next. Or simple wait when it's merged?
+>> I disagree, this with the previous patch fixes error handling in lowpan_rcv.  By moving the skb delivery out of IPHC you automatically fix the nightmare which is returning a mixture of NET_RX codes with error codes.  IPHC now only returns error codes or success.  Delivery is done where is should be in the receive function and can deal with NET_RX codes.
+> ok. When this is a part of the fix and 1/3 "prepare" the fix, then put
+> this handling into patch "1/3" to really fix the issue from patch 1/3.
+I'm sorry I don't quite understand.  Are you saying that I should combine patches 1 and 2 into a single patch?
 
-This patch looks OK to me, but I have one question before applying it.
-
-Do you really want your name to be visible in git history as it is in this
-email ie. without any capital letters?
-
--- 
-Best regards, 
-Szymon Janc
+- Martin.
+> - Alex
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-wpan" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
