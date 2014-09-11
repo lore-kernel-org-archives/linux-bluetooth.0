@@ -1,283 +1,287 @@
 Return-Path: <cyrus@holtmann.org>
-From: Vikrampal <vikram.pal@samsung.com>
-To: 'Luiz Augusto von Dentz' <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	'Dmitry Kasatkin' <d.kasatkin@samsung.com>, cpgs@samsung.com
-References: <1410253830-7866-1-git-send-email-vikram.pal@samsung.com>
- <CABBYNZJEx64_jNtFzxZBxF0H467UEZD47yCsWcvQ0DFfSBUXWQ@mail.gmail.com>
- <00d001cfccdf$b86eb4b0$294c1e10$@samsung.com>
- <CABBYNZ+ohFnj_3SuFd-5Sa2CA38iv8XH-ExVcWZu18_4FExmGw@mail.gmail.com>
-In-reply-to: <CABBYNZ+ohFnj_3SuFd-5Sa2CA38iv8XH-ExVcWZu18_4FExmGw@mail.gmail.com>
-Subject: RE: [PATCH v2] monitor: Add AVRCP GetElementAttributes
-Date: Thu, 11 Sep 2014 14:06:31 +0530
-Message-id: <00dc01cfcd9b$7fb1afd0$7f150f70$@samsung.com>
-MIME-version: 1.0
-Content-type: text/plain; charset=utf-8
-Sender: linux-bluetooth-owner@vger.kernel.org
+Message-ID: <54115E14.8010005@xsilon.com>
+Date: Thu, 11 Sep 2014 09:32:20 +0100
+From: Martin Townsend <martin.townsend@xsilon.com>
+MIME-Version: 1.0
+To: Alexander Aring <alex.aring@gmail.com>,
+ Martin Townsend <mtownsend1973@gmail.com>
+CC: linux-zigbee-devel@lists.sourceforge.net,
+ linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org,
+ marcel@holtmann.org
+Subject: Re: [PATCH][linux-bluetooth 1/3] 6lowpan: skb freed locally from
+ lowpan_rcv
+References: <1410357968-27051-1-git-send-email-martin.townsend@xsilon.com> <1410357968-27051-3-git-send-email-martin.townsend@xsilon.com> <20140911075830.GA19178@omega>
+In-Reply-To: <20140911075830.GA19178@omega>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+Hi Alex,
 
-> -----Original Message-----
-> From: Luiz Augusto von Dentz [mailto:luiz.dentz@gmail.com]
-> Sent: Wednesday, September 10, 2014 6:19 PM
-> To: Vikrampal
-> Cc: linux-bluetooth@vger.kernel.org; Dmitry Kasatkin; cpgs@samsung.com
-> Subject: Re: [PATCH v2] monitor: Add AVRCP GetElementAttributes
-> 
-> Hi Vikram,
-> 
-> On Wed, Sep 10, 2014 at 1:12 PM, Vikrampal <vikram.pal@samsung.com>
-> wrote:
-> > Hi Luiz,
-> >
-> >> -----Original Message-----
-> >> From: Luiz Augusto von Dentz [mailto:luiz.dentz@gmail.com]
-> >> Sent: Wednesday, September 10, 2014 2:42 PM
-> >> To: Vikrampal Yadav
-> >> Cc: linux-bluetooth@vger.kernel.org; Dmitry Kasatkin;
-> >> cpgs@samsung.com
-> >> Subject: Re: [PATCH v2] monitor: Add AVRCP GetElementAttributes
-> >>
-> >> Hi Vikram,
-> >>
-> >> On Tue, Sep 9, 2014 at 12:10 PM, Vikrampal Yadav
-> >> <vikram.pal@samsung.com> wrote:
-> >> > Support for decoding AVRCP GetElementAttributes added in Bluetooth
-> >> > monitor.
-> >> > ---
-> >> >  monitor/avctp.c | 158
-> >> > ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-> >> >  monitor/l2cap.h |  16 +++---
-> >> >  2 files changed, 167 insertions(+), 7 deletions(-)
-> >> >
-> >> > diff --git a/monitor/avctp.c b/monitor/avctp.c index
-> >> > c7e242b..89f0f9c
-> >> > 100644
-> >> > --- a/monitor/avctp.c
-> >> > +++ b/monitor/avctp.c
-> >> > @@ -158,6 +158,21 @@
-> >> >  #define AVRCP_ATTRIBUTE_SHUFFLE                0x03
-> >> >  #define AVRCP_ATTRIBUTE_SCAN           0x04
-> >> >
-> >> > +/* media attributes */
-> >> > +#define AVRCP_MEDIA_ATTRIBUTE_ILLEGAL  0x00
-> >> > +#define AVRCP_MEDIA_ATTRIBUTE_TITLE    0x01
-> >> > +#define AVRCP_MEDIA_ATTRIBUTE_ARTIST   0x02
-> >> > +#define AVRCP_MEDIA_ATTRIBUTE_ALBUM    0x03
-> >> > +#define AVRCP_MEDIA_ATTRIBUTE_TRACK    0x04
-> >> > +#define AVRCP_MEDIA_ATTRIBUTE_TOTAL    0x05
-> >> > +#define AVRCP_MEDIA_ATTRIBUTE_GENRE    0x06
-> >> > +#define AVRCP_MEDIA_ATTRIBUTE_DURATION 0x07
-> >> > +
-> >> > +static struct avrcp_continuing {
-> >> > +       uint16_t num;
-> >> > +       uint16_t size;
-> >> > +} avrcp_continuing;
-> >> > +
-> >> >  static const char *ctype2str(uint8_t ctype)  {
-> >> >         switch (ctype & 0x0f) {
-> >> > @@ -517,6 +532,30 @@ static const char *charset2str(uint16_t charset)
-> >> >         }
-> >> >  }
-> >> >
-> >> > +static const char *mediattr2str(uint32_t attr) {
-> >> > +       switch (attr) {
-> >> > +       case AVRCP_MEDIA_ATTRIBUTE_ILLEGAL:
-> >> > +               return "Illegal";
-> >> > +       case AVRCP_MEDIA_ATTRIBUTE_TITLE:
-> >> > +               return "Title";
-> >> > +       case AVRCP_MEDIA_ATTRIBUTE_ARTIST:
-> >> > +               return "Artist";
-> >> > +       case AVRCP_MEDIA_ATTRIBUTE_ALBUM:
-> >> > +               return "Album";
-> >> > +       case AVRCP_MEDIA_ATTRIBUTE_TRACK:
-> >> > +               return "Track";
-> >> > +       case AVRCP_MEDIA_ATTRIBUTE_TOTAL:
-> >> > +               return "Track Total";
-> >> > +       case AVRCP_MEDIA_ATTRIBUTE_GENRE:
-> >> > +               return "Genre";
-> >> > +       case AVRCP_MEDIA_ATTRIBUTE_DURATION:
-> >> > +               return "Track duration";
-> >> > +       default:
-> >> > +               return "Reserved";
-> >> > +       }
-> >> > +}
-> >> > +
-> >> >  static bool avrcp_passthrough_packet(struct l2cap_frame *frame)  {
-> >> >         packet_hexdump(frame->data, frame->size); @@ -884,6
-> >> > +923,122 @@ static bool avrcp_displayable_charset(struct
-> >> > l2cap_frame *frame,
-> >> uint8_t ctype,
-> >> >         return true;
-> >> >  }
-> >> >
-> >> > +static bool avrcp_get_element_attributes(struct l2cap_frame *frame,
-> >> > +                                               uint8_t ctype, uint8_t len,
-> >> > +                                               uint8_t indent) {
-> >> > +       uint64_t id;
-> >> > +       uint8_t num;
-> >> > +
-> >> > +       if (ctype > AVC_CTYPE_GENERAL_INQUIRY)
-> >> > +               goto response;
-> >> > +
-> >> > +       if (!l2cap_frame_get_be64(frame, &id))
-> >> > +               return false;
-> >> > +
-> >> > +       print_field("%*cIdentifier: 0x%jx (%s)", (indent - 8), ' ',
-> >> > +                                       id, id ? "Reserved" :
-> >> > + "PLAYING");
-> >> > +
-> >> > +       if (!l2cap_frame_get_u8(frame, &num))
-> >> > +               return false;
-> >> > +
-> >> > +       print_field("%*cAttributeCount: 0x%02x", (indent - 8), ' ',
-> >> > + num);
-> >> > +
-> >> > +       for (; num > 0; num--) {
-> >> > +               uint32_t attr;
-> >> > +
-> >> > +               if (!l2cap_frame_get_be32(frame, &attr))
-> >> > +                       return false;
-> >> > +
-> >> > +               print_field("%*cAttribute: 0x%08x (%s)", (indent - 8),
-> >> > +                                       ' ', attr, mediattr2str(attr));
-> >> > +       }
-> >> > +
-> >> > +       return true;
-> >> > +
-> >> > +response:
-> >> > +       if (frame->pkt_type == AVRCP_PACKET_TYPE_SINGLE
-> >> > +                               || frame->pkt_type == AVRCP_PACKET_TYPE_START) {
-> >> > +               if (!l2cap_frame_get_u8(frame, &num))
-> >> > +                       return false;
-> >> > +
-> >> > +               avrcp_continuing.num = num;
-> >> > +               print_field("%*cAttributeCount: 0x%02x", (indent - 8),
-> >> > +                                                               ' ', num);
-> >> > +               len--;
-> >> > +       } else {
-> >> > +               num = avrcp_continuing.num;
-> >> > +
-> >> > +               if (avrcp_continuing.size > 0) {
-> >> > +                       uint16_t size;
-> >> > +
-> >> > +                       if (avrcp_continuing.size > len) {
-> >> > +                               size = len;
-> >> > +                               avrcp_continuing.size -= len;
-> >> > +                       } else {
-> >> > +                               size = avrcp_continuing.size;
-> >> > +                               avrcp_continuing.size = 0;
-> >> > +                       }
-> >> > +
-> >> > +                       printf("ContinuingAttributeValue: ");
-> >> > +                       for (; size > 0; size--) {
-> >> > +                               uint8_t c;
-> >> > +
-> >> > +                               if (!l2cap_frame_get_u8(frame, &c))
-> >> > +                                       return false;
-> >> > +
-> >> > +                               printf("%1c", isprint(c) ? c : '.');
-> >> > +                       }
-> >> > +                       printf("\n");
-> >> > +
-> >> > +                       len -= size;
-> >> > +               }
-> >> > +       }
-> >> > +
-> >> > +       while (num > 0 && len > 0) {
-> >> > +               uint32_t attr;
-> >> > +               uint16_t charset, attrlen;
-> >> > +
-> >> > +               if (!l2cap_frame_get_be32(frame, &attr))
-> >> > +                       return false;
-> >> > +
-> >> > +               print_field("%*cAttribute: 0x%08x (%s)", (indent - 8),
-> >> > +                                               ' ', attr,
-> >> > + mediattr2str(attr));
-> >> > +
-> >> > +               if (!l2cap_frame_get_be16(frame, &charset))
-> >> > +                       return false;
-> >> > +
-> >> > +               print_field("%*cCharsetID: 0x%04x (%s)", (indent - 8),
-> >> > +                               ' ', charset,
-> >> > + charset2str(charset));
-> >> > +
-> >> > +               if (!l2cap_frame_get_be16(frame, &attrlen))
-> >> > +                       return false;
-> >> > +
-> >> > +               print_field("%*cAttributeValueLength: 0x%04x",
-> >> > +                                               (indent - 8), ' ',
-> >> > + attrlen);
-> >> > +
-> >> > +               len -= sizeof(attr) + sizeof(charset) + sizeof(attrlen);
-> >> > +               num--;
-> >> > +
-> >> > +               print_field("%*cAttributeValue: ", (indent - 8), ' ');
-> >> > +               for (; attrlen > 0 && len > 0; attrlen--, len--) {
-> >> > +                       uint8_t c;
-> >> > +
-> >> > +                       if (!l2cap_frame_get_u8(frame, &c))
-> >> > +                               return false;
-> >> > +
-> >> > +                       printf("%1c", isprint(c) ? c : '.');
-> >> > +               }
-> >> > +
-> >> > +               if (attrlen > 0)
-> >> > +                       avrcp_continuing.size = attrlen;
-> >> > +       }
-> >> > +
-> >> > +       avrcp_continuing.num = num;
-> >> > +
-> >> > +       return true;
-> >> > +}
-> >> > +
-> >> >  struct avrcp_ctrl_pdu_data {
-> >> >         uint8_t pduid;
-> >> >         bool (*func) (struct l2cap_frame *frame, uint8_t ctype,
-> >> > uint8_t len, @@ -899,6 +1054,7 @@ static const struct
-> >> avrcp_ctrl_pdu_data avrcp_ctrl_pdu_table[] = {
-> >> >         { 0x15, avrcp_get_player_attribute_text         },
-> >> >         { 0x16, avrcp_get_player_value_text             },
-> >> >         { 0x17, avrcp_displayable_charset               },
-> >> > +       { 0x20, avrcp_get_element_attributes            },
-> >> >         { }
-> >> >  };
-> >> >
-> >> > @@ -932,6 +1088,8 @@ static bool avrcp_pdu_packet(struct
-> >> > l2cap_frame
-> >> *frame, uint8_t ctype,
-> >> >         if (!l2cap_frame_get_be16(frame, &len))
-> >> >                 return false;
-> >> >
-> >> > +       frame->pkt_type = pt;
-> >> > +
-> >>
-> >> This does not belong here, you should probably pass pt in the
-> >> callback not via frame, or even better have AVCTP frame
-> >> representation which points to the L2CAP frame that one can contain
-> things AVCTP specifics like pt.
-> >
-> > Currently, I see only this information to be saved. So, can we not
-> > declare a static variable pkt_type in avctp.c. Later on, if more
-> > information need to be saved then we can define a frame structure.
-> 
-> I would probably pass pt to avrcp_packet to be forward to the callback just as
-> you did with hdr, but I still think and AVCTP frame representation would be
-> better as it can grow without always having to change the callbacks in the
-> pdu table e.g.:
-> 
-> struct avctp_frame {
->     uint8_t hdr;
->     uint8_t pt;
->     struct l2cap_frame l2cap_frame;
-> };
-> 
-> --
-> Luiz Augusto von Dentz
+Thanks for reviewing,  this patch is part of the solution with the next patch, please take this into consideration.  Sorry I should have put this in the cover letter.
+The idea is to finally split skb delivery out of IPHC so the iphc decompress function(s) just return an error code at which point we can free skb and return from lowpan_rcv.  If IPHC is successful then skb delivery is done from receive function removing the need for all these mixed return codes.  I think this will make the code simpler, ... hopefully :)
 
-I agree with your suggestion. I'll make the necessary changes in design. Thanks!
+- Martin. 
 
-Regards,
-Vikram
-
+On 11/09/14 08:58, Alexander Aring wrote:
+> Hi Martin,
+>
+> On Wed, Sep 10, 2014 at 03:06:06PM +0100, Martin Townsend wrote:
+>> Currently there are a number of error paths in the lowpan_rcv function that
+>> free the skb before returning, this patch simplifies the receive path by
+>> ensuring that the skb is only freed from this function.
+>>
+>> Signed-off-by: Martin Townsend <martin.townsend@xsilon.com>
+>> ---
+>>  include/net/6lowpan.h         |  2 +-
+>>  net/6lowpan/iphc.c            | 27 +++++++++++++++------------
+>>  net/bluetooth/6lowpan.c       | 12 ++++++++----
+>>  net/ieee802154/6lowpan_rtnl.c | 12 ++++++------
+>>  4 files changed, 30 insertions(+), 23 deletions(-)
+>>
+>> diff --git a/include/net/6lowpan.h b/include/net/6lowpan.h
+>> index d184df1..883e7a2 100644
+>> --- a/include/net/6lowpan.h
+>> +++ b/include/net/6lowpan.h
+>> @@ -374,7 +374,7 @@ lowpan_uncompress_size(const struct sk_buff *skb, u16 *dgram_offset)
+>>  
+>>  typedef int (*skb_delivery_cb)(struct sk_buff *skb, struct net_device *dev);
+>>  
+>> -int lowpan_process_data(struct sk_buff *skb, struct net_device *dev,
+>> +int lowpan_process_data(struct sk_buff **skb_inout, struct net_device *dev,
+>>  		const u8 *saddr, const u8 saddr_type, const u8 saddr_len,
+>>  		const u8 *daddr, const u8 daddr_type, const u8 daddr_len,
+>>  		u8 iphc0, u8 iphc1, skb_delivery_cb skb_deliver);
+>> diff --git a/net/6lowpan/iphc.c b/net/6lowpan/iphc.c
+>> index 142eef5..eca24bf 100644
+>> --- a/net/6lowpan/iphc.c
+>> +++ b/net/6lowpan/iphc.c
+>> @@ -179,11 +179,11 @@ static int skb_deliver(struct sk_buff *skb, struct ipv6hdr *hdr,
+>>  
+>>  	new = skb_copy_expand(skb, sizeof(struct ipv6hdr), skb_tailroom(skb),
+>>  			      GFP_ATOMIC);
+>> -	kfree_skb(skb);
+>> -
+>>  	if (!new)
+>>  		return -ENOMEM;
+>>  
+>> +	kfree_skb(skb);
+>> +
+>>  	skb_push(new, sizeof(struct ipv6hdr));
+>>  	skb_reset_network_header(new);
+>>  	skb_copy_to_linear_data(new, hdr, sizeof(struct ipv6hdr));
+>> @@ -196,6 +196,8 @@ static int skb_deliver(struct sk_buff *skb, struct ipv6hdr *hdr,
+>>  		       new->data, new->len);
+>>  
+>>  	stat = deliver_skb(new, dev);
+>> +	if (stat < 0)
+>> +		stat = NET_RX_DROP;
+>>  
+> We should be ensure that "lowpan_process_data" return an errno not
+> NET_RX_DROP which is 1, so the usual check on error with if (err < 0)
+> doesn't work here.
+>
+> Now the skb_deliver function returns the return value of skb_deliver and
+> we should not returning NET_RX_DROP here.
+>
+> The deliver_skb variable is a callback, so please be sure that all existsing
+> functionpointer make a conversion from NET_RX_DROP to errno (maybe -EIO).
+> The thing is that netif_rx returns NET_RX_DROP and we should directly convert
+> it to an errno after calling.
+>
+>>  	kfree_skb(new);
+>>  
+>> @@ -332,7 +334,7 @@ err:
+>>  /* TTL uncompression values */
+>>  static const u8 lowpan_ttl_values[] = { 0, 1, 64, 255 };
+>>  
+>> -int lowpan_process_data(struct sk_buff *skb, struct net_device *dev,
+>> +int lowpan_process_data(struct sk_buff **skb_inout, struct net_device *dev,
+>>  			const u8 *saddr, const u8 saddr_type, const u8 saddr_len,
+>>  			const u8 *daddr, const u8 daddr_type, const u8 daddr_len,
+>>  			u8 iphc0, u8 iphc1, skb_delivery_cb deliver_skb)
+>> @@ -340,6 +342,8 @@ int lowpan_process_data(struct sk_buff *skb, struct net_device *dev,
+>>  	struct ipv6hdr hdr = {};
+>>  	u8 tmp, num_context = 0;
+>>  	int err;
+>> +	int err_ret = -EINVAL;
+> simple, use err here? No more variables to putting on the stack.
+ok.
+>
+>> +	struct sk_buff *skb = *skb_inout;
+>>  
+>>  	raw_dump_table(__func__, "raw skb data dump uncompressed",
+>>  		       skb->data, skb->len);
+>> @@ -460,7 +464,6 @@ int lowpan_process_data(struct sk_buff *skb, struct net_device *dev,
+>>  	/* UDP data uncompression */
+>>  	if (iphc0 & LOWPAN_IPHC_NH_C) {
+>>  		struct udphdr uh;
+>> -		struct sk_buff *new;
+>>  
+>>  		if (uncompress_udp_header(skb, &uh))
+>>  			goto drop;
+>> @@ -468,14 +471,15 @@ int lowpan_process_data(struct sk_buff *skb, struct net_device *dev,
+>>  		/* replace the compressed UDP head by the uncompressed UDP
+>>  		 * header
+>>  		 */
+>> -		new = skb_copy_expand(skb, sizeof(struct udphdr),
+>> +		skb = skb_copy_expand(skb, sizeof(struct udphdr),
+>>  				      skb_tailroom(skb), GFP_ATOMIC);
+>> -		kfree_skb(skb);
+>> -
+>> -		if (!new)
+>> -			return -ENOMEM;
+>> +		if (!skb) {
+>> +			err_ret = -ENOMEM;
+>> +			goto drop;
+>> +		}
+>>  
+>> -		skb = new;
+>> +		kfree_skb(*skb_inout);
+>> +		*skb_inout = skb;
+>>  
+>>  		skb_push(skb, sizeof(struct udphdr));
+>>  		skb_reset_transport_header(skb);
+>> @@ -502,8 +506,7 @@ int lowpan_process_data(struct sk_buff *skb, struct net_device *dev,
+>>  	return skb_deliver(skb, &hdr, dev, deliver_skb);
+>>  
+>>  drop:
+>> -	kfree_skb(skb);
+>> -	return -EINVAL;
+>> +	return err_ret;
+> return err; - when you remove the err_ret variable. Then we always
+> return the right indicator for the error. Sometimes useful for
+> debugging.
+>
+>>  }
+>>  EXPORT_SYMBOL_GPL(lowpan_process_data);
+>>  
+>> diff --git a/net/bluetooth/6lowpan.c b/net/bluetooth/6lowpan.c
+>> index 206b65c..f5f7ee0 100644
+>> --- a/net/bluetooth/6lowpan.c
+>> +++ b/net/bluetooth/6lowpan.c
+>> @@ -215,7 +215,7 @@ static int give_skb_to_upper(struct sk_buff *skb, struct net_device *dev)
+>>  	return ret;
+>>  }
+>>  
+>> -static int process_data(struct sk_buff *skb, struct net_device *netdev,
+>> +static int process_data(struct sk_buff **skb_inout, struct net_device *netdev,
+>>  			struct l2cap_chan *chan)
+>>  {
+>>  	const u8 *saddr, *daddr;
+>> @@ -223,6 +223,7 @@ static int process_data(struct sk_buff *skb, struct net_device *netdev,
+>>  	struct lowpan_dev *dev;
+>>  	struct lowpan_peer *peer;
+>>  	unsigned long flags;
+>> +	struct sk_buff *skb = *skb_inout;
+>>  
+>>  	dev = lowpan_dev(netdev);
+>>  
+>> @@ -245,13 +246,12 @@ static int process_data(struct sk_buff *skb, struct net_device *netdev,
+>>  	if (lowpan_fetch_skb_u8(skb, &iphc1))
+>>  		goto drop;
+>>  
+>> -	return lowpan_process_data(skb, netdev,
+>> +	return lowpan_process_data(skb_inout, netdev,
+>>  				   saddr, IEEE802154_ADDR_LONG, EUI64_ADDR_LEN,
+>>  				   daddr, IEEE802154_ADDR_LONG, EUI64_ADDR_LEN,
+>>  				   iphc0, iphc1, give_skb_to_upper);
+>>  
+>>  drop:
+>> -	kfree_skb(skb);
+>>  	return -EINVAL;
+>>  }
+>>  
+>> @@ -300,7 +300,11 @@ static int recv_pkt(struct sk_buff *skb, struct net_device *dev,
+>>  			if (!local_skb)
+>>  				goto drop;
+>>  
+>> -			ret = process_data(local_skb, dev, chan);
+>> +			ret = process_data(&local_skb, dev, chan);
+>> +			if (ret < 0) {
+>> +				kfree_skb(local_skb);
+>> +				goto drop;
+>> +			}
+>>  			if (ret != NET_RX_SUCCESS)
+>>  				goto drop;
+> remove checking on NET_RX_SUCCESS. Exactly at this place we should
+> convert the errno again to the NET_RX_DROP, because we are in the packet
+> layer receive function. You already did that in if (ret < 0), but ret !=
+> NET_RX_SUCCESS should never occur then.
+>
+>>  
+>> diff --git a/net/ieee802154/6lowpan_rtnl.c b/net/ieee802154/6lowpan_rtnl.c
+>> index 6591d27..fdb6c10 100644
+>> --- a/net/ieee802154/6lowpan_rtnl.c
+>> +++ b/net/ieee802154/6lowpan_rtnl.c
+>> @@ -167,11 +167,12 @@ static int lowpan_give_skb_to_devices(struct sk_buff *skb,
+>>  	return stat;
+>>  }
+>>  
+>> -static int process_data(struct sk_buff *skb, const struct ieee802154_hdr *hdr)
+>> +static int process_data(struct sk_buff **skb_inout, const struct ieee802154_hdr *hdr)
+>>  {
+>>  	u8 iphc0, iphc1;
+>>  	struct ieee802154_addr_sa sa, da;
+>>  	void *sap, *dap;
+>> +	struct sk_buff *skb = *skb_inout;
+>>  
+>>  	raw_dump_table(__func__, "raw skb data dump", skb->data, skb->len);
+>>  	/* at least two bytes will be used for the encoding */
+>> @@ -197,13 +198,12 @@ static int process_data(struct sk_buff *skb, const struct ieee802154_hdr *hdr)
+>>  	else
+>>  		dap = &da.hwaddr;
+>>  
+>> -	return lowpan_process_data(skb, skb->dev, sap, sa.addr_type,
+>> +	return lowpan_process_data(skb_inout, skb->dev, sap, sa.addr_type,
+>>  				   IEEE802154_ADDR_LEN, dap, da.addr_type,
+>>  				   IEEE802154_ADDR_LEN, iphc0, iphc1,
+>>  				   lowpan_give_skb_to_devices);
+>>  
+>>  drop:
+>> -	kfree_skb(skb);
+>>  	return -EINVAL;
+>>  }
+>>  
+>> @@ -490,14 +490,14 @@ static int lowpan_rcv(struct sk_buff *skb, struct net_device *dev,
+>>  	} else {
+>>  		switch (skb->data[0] & 0xe0) {
+>>  		case LOWPAN_DISPATCH_IPHC:	/* ipv6 datagram */
+>> -			ret = process_data(skb, &hdr);
+>> +			ret = process_data(&skb, &hdr);
+>>  			if (ret == NET_RX_DROP)
+>>  				goto drop;
+> the conversion from errno to NET_RX_DROP here.
+>
+> if (ret < 0)
+>         goto drop;
+>
+>>  			break;
+>>  		case LOWPAN_DISPATCH_FRAG1:	/* first fragment header */
+>>  			ret = lowpan_frag_rcv(skb, LOWPAN_DISPATCH_FRAG1);
+>>  			if (ret == 1) {
+>> -				ret = process_data(skb, &hdr);
+>> +				ret = process_data(&skb, &hdr);
+>>  				if (ret == NET_RX_DROP)
+>>  					goto drop;
+> same here.
+>
+>>  			}
+>> @@ -505,7 +505,7 @@ static int lowpan_rcv(struct sk_buff *skb, struct net_device *dev,
+>>  		case LOWPAN_DISPATCH_FRAGN:	/* next fragments headers */
+>>  			ret = lowpan_frag_rcv(skb, LOWPAN_DISPATCH_FRAGN);
+>>  			if (ret == 1) {
+>> -				ret = process_data(skb, &hdr);
+>> +				ret = process_data(&skb, &hdr);
+>>  				if (ret == NET_RX_DROP)
+>>  					goto drop;
+> same here.
+>
+> Frag handling for freeing skb's on error is different here... which
+> makes me lot of thinking currently. If we have a error in lowpan_frag_rcv,
+> the return value is -1 but skb already freed. We should return NET_RX_DROP
+> here. Need to think about that..., for now also check on else if (ret == -1)
+> and start conversion to NET_RX_DROP. Please make this as an new patch
+> after that. Also send it to bluetooth (simple because it's a bug and depends
+> on this then).
+>
+> - Alex
