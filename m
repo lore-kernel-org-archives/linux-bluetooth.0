@@ -2,11 +2,11 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 Cc: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: Re: [PATCH v2 03/16] android/hf-client: Add hf-client daemon skeleton
-Date: Thu, 11 Sep 2014 13:45:47 +0200
-Message-ID: <9866556.BU1bIVAFtI@uw000953>
-In-Reply-To: <1410348854-26249-4-git-send-email-lukasz.rymanowski@tieto.com>
-References: <1410348854-26249-1-git-send-email-lukasz.rymanowski@tieto.com> <1410348854-26249-4-git-send-email-lukasz.rymanowski@tieto.com>
+Subject: Re: [PATCH v2 01/16] android/hf-client: Add hf-client ID
+Date: Thu, 11 Sep 2014 13:43:53 +0200
+Message-ID: <5855798.7j4VXT9nGs@uw000953>
+In-Reply-To: <1410348854-26249-2-git-send-email-lukasz.rymanowski@tieto.com>
+References: <1410348854-26249-1-git-send-email-lukasz.rymanowski@tieto.com> <1410348854-26249-2-git-send-email-lukasz.rymanowski@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -14,164 +14,29 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Łukasz,
 
-On Wednesday 10 of September 2014 13:34:01 Lukasz Rymanowski wrote:
+On Wednesday 10 of September 2014 13:33:59 Lukasz Rymanowski wrote:
 > ---
->  android/Makefile.am |  1 +
->  android/hf-client.c | 69 +++++++++++++++++++++++++++++++++++++++++++++++++++++
->  android/hf-client.h | 25 +++++++++++++++++++
->  android/main.c      |  9 +++++++
->  4 files changed, 104 insertions(+)
->  create mode 100644 android/hf-client.c
->  create mode 100644 android/hf-client.h
+>  android/hal-msg.h | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
 > 
-> diff --git a/android/Makefile.am b/android/Makefile.am
-> index 49fbddc..e92ccf1 100644
-> --- a/android/Makefile.am
-> +++ b/android/Makefile.am
-> @@ -52,6 +52,7 @@ android_bluetoothd_SOURCES = android/main.c \
->  				android/socket.h android/socket.c \
->  				android/pan.h android/pan.c \
->  				android/handsfree.h android/handsfree.c \
-> +				android/hf-client.c android/hf-client.h \
+> diff --git a/android/hal-msg.h b/android/hal-msg.h
+> index 3d95e10..5781c09 100644
+> --- a/android/hal-msg.h
+> +++ b/android/hal-msg.h
+> @@ -35,8 +35,9 @@ static const char BLUEZ_HAL_SK_PATH[] = "\0bluez_hal_socket";
+>  #define HAL_SERVICE_ID_HEALTH		7
+>  #define HAL_SERVICE_ID_AVRCP		8
+>  #define HAL_SERVICE_ID_GATT		9
+> +#define HAL_SERVICE_ID_HF_CLIENT	10
 
-Should be named handsfree-client.{ch}.
+To follow convention this should be named HAL_SERVICE_ID_HANDSFREE_CLIENT.
 
->  				android/gatt.h android/gatt.c \
->  				android/health.h android/health.c \
->  				android/mcap-lib.h android/mcap-lib.c \
-> diff --git a/android/hf-client.c b/android/hf-client.c
-> new file mode 100644
-> index 0000000..f1566d0
-> --- /dev/null
-> +++ b/android/hf-client.c
-> @@ -0,0 +1,69 @@
-> +/*
-> + *
-> + *  BlueZ - Bluetooth protocol stack for Linux
-> + *
-> + *  Copyright (C) 2014  Intel Corporation. All rights reserved.
-> + *
-> + *
-> + *  This library is free software; you can redistribute it and/or
-> + *  modify it under the terms of the GNU Lesser General Public
-> + *  License as published by the Free Software Foundation; either
-> + *  version 2.1 of the License, or (at your option) any later version.
-> + *
-> + *  This library is distributed in the hope that it will be useful,
-> + *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-> + *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-> + *  Lesser General Public License for more details.
-> + *
-> + *  You should have received a copy of the GNU Lesser General Public
-> + *  License along with this library; if not, write to the Free Software
-> + *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-> + *
-> + */
-> +
-> +#ifdef HAVE_CONFIG_H
-> +#include <config.h>
-> +#endif
-> +
-> +#include <stdlib.h>
-> +#include <stdbool.h>
-> +#include <errno.h>
-> +#include <unistd.h>
-> +#include <glib.h>
-> +
-> +#include "lib/bluetooth.h"
-> +#include "ipc.h"
-> +#include "ipc-common.h"
-> +#include "src/log.h"
-> +#include "utils.h"
-> +
-> +#include "hal-msg.h"
-> +#include "hf-client.h"
-> +
-> +static bdaddr_t adapter_addr;
-> +
-> +static struct ipc *hal_ipc = NULL;
-> +
-> +static const struct ipc_handler cmd_handlers[] = {
-> +};
-> +
-> +bool bt_hf_client_register(struct ipc *ipc, const bdaddr_t *addr)
-> +{
-> +	DBG("");
-> +
-> +	bacpy(&adapter_addr, addr);
-> +
-> +	hal_ipc = ipc;
-> +	ipc_register(hal_ipc, HAL_SERVICE_ID_HF_CLIENT, cmd_handlers,
-> +						G_N_ELEMENTS(cmd_handlers));
-> +
-> +	return true;
-> +}
-> +
-> +void bt_hf_client_unregister(void)
-> +{
-> +	DBG("");
-> +
-> +	ipc_unregister(hal_ipc, HAL_SERVICE_ID_HANDSFREE);
-> +	hal_ipc = NULL;
-> +}
-> diff --git a/android/hf-client.h b/android/hf-client.h
-> new file mode 100644
-> index 0000000..1eb69ff
-> --- /dev/null
-> +++ b/android/hf-client.h
-> @@ -0,0 +1,25 @@
-> +/*
-> + *
-> + *  BlueZ - Bluetooth protocol stack for Linux
-> + *
-> + *  Copyright (C) 2014  Intel Corporation. All rights reserved.
-> + *
-> + *
-> + *  This library is free software; you can redistribute it and/or
-> + *  modify it under the terms of the GNU Lesser General Public
-> + *  License as published by the Free Software Foundation; either
-> + *  version 2.1 of the License, or (at your option) any later version.
-> + *
-> + *  This library is distributed in the hope that it will be useful,
-> + *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-> + *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-> + *  Lesser General Public License for more details.
-> + *
-> + *  You should have received a copy of the GNU Lesser General Public
-> + *  License along with this library; if not, write to the Free Software
-> + *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-> + *
-> + */
-> +
-> +bool bt_hf_client_register(struct ipc *ipc, const bdaddr_t *addr);
-> +void bt_hf_client_unregister(void);
-> diff --git a/android/main.c b/android/main.c
-> index b03a2df..49257d4 100644
-> --- a/android/main.c
-> +++ b/android/main.c
-> @@ -60,6 +60,7 @@
->  #include "handsfree.h"
->  #include "gatt.h"
->  #include "health.h"
-> +#include "hf-client.h"
 >  
->  #define STARTUP_GRACE_SECONDS 5
->  #define SHUTDOWN_GRACE_SECONDS 10
-> @@ -145,6 +146,14 @@ static void service_register(const void *buf, uint16_t len)
->  		}
+> -#define HAL_SERVICE_ID_MAX HAL_SERVICE_ID_GATT
+> +#define HAL_SERVICE_ID_MAX HAL_SERVICE_ID_HF_CLIENT
 >  
->  		break;
-> +	case HAL_SERVICE_ID_HF_CLIENT:
-> +		if (!bt_hf_client_register(hal_ipc, &adapter_bdaddr)) {
-> +			status = HAL_STATUS_FAILED;
-> +			goto failed;
-> +		}
-> +
-> +		break;
-> +
->  	default:
->  		DBG("service %u not supported", m->service_id);
->  		status = HAL_STATUS_FAILED;
+>  /* Core Service */
+>  
 > 
 
 -- 
