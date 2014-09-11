@@ -1,30 +1,41 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 10 Sep 2014 22:27:42 -0700
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Szymon Janc <szymon.janc@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/2] core: Fix storing connection parameters without
- store hint set
-Message-ID: <20140911052742.GA14192@t440s>
-References: <1410379987-4265-1-git-send-email-szymon.janc@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1410379987-4265-1-git-send-email-szymon.janc@tieto.com>
+From: johan.hedberg@gmail.com
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] Bluetooth: Expire RPA if encryption fails
+Date: Wed, 10 Sep 2014 22:16:35 -0700
+Message-Id: <1410412595-12157-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Szymon,
+From: Johan Hedberg <johan.hedberg@intel.com>
 
-On Wed, Sep 10, 2014, Szymon Janc wrote:
-> If store hint is not set those should not be stored persistently.
-> ---
-> 
-> I've decided to leave storing in adapter.c to keep it similar to new
-> keys events. Memebers in device.c were used only for storing anyway.
-> 
->  src/adapter.c | 4 +---
->  1 file changed, 1 insertion(+), 3 deletions(-)
+If encryption fails and we're using an RPA it may be because of a
+conflict with another device. To avoid repeated failures the safest
+action is to simply mark the RPA as expired so that a new one gets
+generated as soon as the connection drops.
 
-Both patches have been applied. Thanks.
+Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+---
+ net/bluetooth/hci_event.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-Johan
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 603a17cc52ac..edf05fda017e 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -2438,6 +2438,12 @@ static void hci_encrypt_change_evt(struct hci_dev *hdev, struct sk_buff *skb)
+ 		}
+ 	}
+ 
++	/* We should  disregard the current RPA and generate a new one
++	 * whenever the encryption procedure fails.
++	 */
++	if (ev->status && conn->type == LE_LINK)
++		set_bit(HCI_RPA_EXPIRED, &hdev->dev_flags);
++
+ 	clear_bit(HCI_CONN_ENCRYPT_PEND, &conn->flags);
+ 
+ 	if (ev->status && conn->state == BT_CONNECTED) {
+-- 
+1.9.3
+
