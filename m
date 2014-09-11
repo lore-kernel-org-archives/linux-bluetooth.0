@@ -1,38 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 11 Sep 2014 10:18:11 +0200
+Date: Thu, 11 Sep 2014 10:07:59 +0200
 From: Alexander Aring <alex.aring@gmail.com>
 To: Martin Townsend <mtownsend1973@gmail.com>
 Cc: linux-zigbee-devel@lists.sourceforge.net,
 	linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org,
 	marcel@holtmann.org, Martin Townsend <martin.townsend@xsilon.com>
-Subject: Re: [PATCH][linux-bluetooth 2/3] 6lowpan: Move skb delivery from
- IPHC.
-Message-ID: <20140911081808.GA19675@omega>
+Subject: Re: [PATCH][linux-bluetooth 1/3] 6lowpan: skb freed locally from
+ lowpan_rcv
+Message-ID: <20140911080758.GB19178@omega>
 References: <1410357968-27051-1-git-send-email-martin.townsend@xsilon.com>
- <1410357968-27051-4-git-send-email-martin.townsend@xsilon.com>
+ <1410357968-27051-3-git-send-email-martin.townsend@xsilon.com>
+ <20140911075830.GA19178@omega>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-In-Reply-To: <1410357968-27051-4-git-send-email-martin.townsend@xsilon.com>
+In-Reply-To: <20140911075830.GA19178@omega>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Wed, Sep 10, 2014 at 03:06:07PM +0100, Martin Townsend wrote:
-> Passing the skb from 6lowpan up to the higher layers is not a
-> function of IPHC.  By moving it out of IPHC we also remove the
-> need to support error code returns with NET_RX codes.
-> It also makes the lowpan_rcv function more extendable as we
-> can support more compression schemes.
+On Thu, Sep 11, 2014 at 09:58:30AM +0200, Alexander Aring wrote:
+...
+> >  
+> > @@ -490,14 +490,14 @@ static int lowpan_rcv(struct sk_buff *skb, struct net_device *dev,
+> >  	} else {
+> >  		switch (skb->data[0] & 0xe0) {
+> >  		case LOWPAN_DISPATCH_IPHC:	/* ipv6 datagram */
+> > -			ret = process_data(skb, &hdr);
+> > +			ret = process_data(&skb, &hdr);
+> >  			if (ret == NET_RX_DROP)
+> >  				goto drop;
+> 
+> the conversion from errno to NET_RX_DROP here.
+> 
+> if (ret < 0)
+>         goto drop;
 > 
 
-I will ack this. But please sperate this patch in two. First renaming
-the function namens and then removing deliver callback.
+should be more drop_skb here, since we removed the kfree_skb in
+process_data. ... I know the error handling is a mess, but was also
+before I start to working with it. :-)
 
-btw. The correct tag is bluetooth not linux-bluetooth, or bluetooth-next.
-
-
-
-Also this doesn't fix anything? Then this is for bluetooth-next. I know
-this depends on the Patch 1/3. Marcel, do you have any a nice solution
-about this, that we can deal with huge fixes in bluetooth and new features
-for bluetooth-next. Or simple wait when it's merged?
+Thanks, that you accept this challenge to fix it. ;-)
 
 - Alex
