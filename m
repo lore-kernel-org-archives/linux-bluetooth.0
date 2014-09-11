@@ -1,110 +1,70 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcin Kraglak <marcin.kraglak@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 03/14] android/gatt: Fix sending callback in get_characteristic
-Date: Thu, 11 Sep 2014 08:08:41 +0200
-Message-Id: <1410415732-23212-3-git-send-email-marcin.kraglak@tieto.com>
+Subject: [PATCH 02/14] android/tester: Add GATT Get Characteristic 2 test case
+Date: Thu, 11 Sep 2014 08:08:40 +0200
+Message-Id: <1410415732-23212-2-git-send-email-marcin.kraglak@tieto.com>
 In-Reply-To: <1410415732-23212-1-git-send-email-marcin.kraglak@tieto.com>
 References: <1410415732-23212-1-git-send-email-marcin.kraglak@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Notification should be send to client in case of error.
+It tests getting characteristics of non existing service.
 ---
- android/gatt.c | 50 +++++++++++++++++++++++++++++++++++++-------------
- 1 file changed, 37 insertions(+), 13 deletions(-)
+ android/tester-gatt.c | 33 +++++++++++++++++++++++++++++++++
+ 1 file changed, 33 insertions(+)
 
-diff --git a/android/gatt.c b/android/gatt.c
-index fb29339..f16d365 100644
---- a/android/gatt.c
-+++ b/android/gatt.c
-@@ -2517,28 +2517,49 @@ reply:
- 			HAL_OP_GATT_CLIENT_GET_INCLUDED_SERVICE, status);
- }
+diff --git a/android/tester-gatt.c b/android/tester-gatt.c
+index 1507803..b847c5f 100644
+--- a/android/tester-gatt.c
++++ b/android/tester-gatt.c
+@@ -158,6 +158,11 @@ static struct get_char_data get_char_data_1 = {
+ 	.service = &service_1
+ };
  
--static void send_client_char_notify(const struct characteristic *ch,
--					int32_t conn_id,
--					const struct service *service)
-+static void send_client_char_notify(const struct hal_gatt_srvc_id *service,
-+					const struct hal_gatt_gatt_id *charac,
-+					int32_t char_prop, int32_t conn_id)
- {
- 	struct hal_ev_gatt_client_get_characteristic ev;
- 
--	memset(&ev, 0, sizeof(ev));
--	ev.status = ch ? GATT_SUCCESS : GATT_FAILURE;
-+	ev.conn_id = conn_id;
- 
--	if (ch) {
--		ev.char_prop = ch->ch.properties;
--		element_id_to_hal_gatt_id(&ch->id, &ev.char_id);
-+	if (charac) {
-+		memcpy(&ev.char_id, charac, sizeof(struct hal_gatt_gatt_id));
-+		ev.char_prop = char_prop;
-+		ev.status = GATT_SUCCESS;
-+	} else {
-+		memset(&ev.char_id, 0, sizeof(struct hal_gatt_gatt_id));
-+		ev.char_prop = 0;
-+		ev.status = GATT_FAILURE;
- 	}
- 
--	ev.conn_id = conn_id;
--	element_id_to_hal_srvc_id(&service->id, service->primary, &ev.srvc_id);
-+	memcpy(&ev.srvc_id, service, sizeof(struct hal_gatt_srvc_id));
- 
- 	ipc_send_notif(hal_ipc, HAL_SERVICE_ID_GATT,
- 					HAL_EV_GATT_CLIENT_GET_CHARACTERISTIC,
- 					sizeof(ev), &ev);
- }
- 
-+static void convert_send_client_char_notify(const struct characteristic *ch,
-+					int32_t conn_id,
-+					const struct service *service)
-+{
-+	struct hal_gatt_srvc_id srvc;
-+	struct hal_gatt_gatt_id charac;
++static struct get_char_data get_char_data_2 = {
++	.conn_id = CONN1_ID,
++	.service = &service_2
++};
 +
-+	element_id_to_hal_srvc_id(&service->id, service->primary, &srvc);
-+
-+	if (ch) {
-+		element_id_to_hal_gatt_id(&ch->id, &charac);
-+		send_client_char_notify(&srvc, &charac, ch->ch.properties,
-+								conn_id);
-+	} else {
-+		send_client_char_notify(&srvc, NULL, 0, conn_id);
-+	}
-+}
-+
- static void cache_all_srvc_chars(struct service *srvc, GSList *characteristics)
- {
- 	uint16_t inst_id = 0;
-@@ -2604,8 +2625,8 @@ static void discover_char_cb(uint8_t status, GSList *characteristics,
- 	if (queue_isempty(srvc->chars))
- 		cache_all_srvc_chars(srvc, characteristics);
+ static struct pdu search_service[] = {
+ 	raw_pdu(0x10, 0x01, 0x00, 0xff, 0xff, 0x00, 0x28),
+ 	raw_pdu(0x11, 0x06, 0x01, 0x00, 0x10, 0x00, 0x00, 0x18),
+@@ -717,6 +722,34 @@ static struct test_case test_cases[] = {
+ 		ACTION_SUCCESS(bluetooth_disable_action, NULL),
+ 		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_OFF),
+ 	),
++	TEST_CASE_BREDRLE("Gatt Client - Get Characteristic 2",
++		ACTION_SUCCESS(init_pdus, get_characteristic_1),
++		ACTION_SUCCESS(bluetooth_enable_action, NULL),
++		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_ON),
++		ACTION_SUCCESS(emu_setup_powered_remote_action, NULL),
++		ACTION_SUCCESS(emu_set_ssp_mode_action, NULL),
++		ACTION_SUCCESS(emu_set_connect_cb_action, gatt_conn_cb),
++		ACTION_SUCCESS(gatt_client_register_action, &client_app_uuid),
++		CALLBACK_STATUS(CB_GATTC_REGISTER_CLIENT, BT_STATUS_SUCCESS),
++		ACTION_SUCCESS(gatt_client_start_scan_action,
++							INT_TO_PTR(CLIENT1_ID)),
++		CLLBACK_GATTC_SCAN_RES(prop_emu_remotes_default_set, 1, TRUE),
++		ACTION_SUCCESS(gatt_client_stop_scan_action,
++							INT_TO_PTR(CLIENT1_ID)),
++		ACTION_SUCCESS(gatt_client_connect_action,
++							&client1_conn_req),
++		CALLBACK_GATTC_CONNECT(GATT_STATUS_SUCCESS,
++						prop_emu_remotes_default_set,
++						CONN1_ID, CLIENT1_ID),
++		ACTION_SUCCESS(gatt_client_search_services, &search_services_1),
++		CALLBACK_GATTC_SEARCH_COMPLETE(GATT_STATUS_SUCCESS, CONN1_ID),
++		ACTION_FAIL(gatt_client_get_characteristic_action,
++							&get_char_data_2),
++		CALLBACK_GATTC_GET_CHARACTERISTIC_CB(GATT_STATUS_FAILURE,
++				CONN1_ID, &service_2, NULL, 0),
++		ACTION_SUCCESS(bluetooth_disable_action, NULL),
++		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_OFF),
++	),
+ };
  
--	send_client_char_notify(queue_peek_head(srvc->chars), data->conn_id,
--									srvc);
-+	convert_send_client_char_notify(queue_peek_head(srvc->chars),
-+							data->conn_id, srvc);
- 
- 	free(data);
- }
-@@ -2671,11 +2692,14 @@ static void handle_client_get_characteristic(const void *buf, uint16_t len)
- 	else
- 		ch = queue_peek_head(srvc->chars);
- 
--	send_client_char_notify(ch, conn->id, srvc);
-+	convert_send_client_char_notify(ch, conn->id, srvc);
- 
- 	status = HAL_STATUS_SUCCESS;
- 
- done:
-+	if (status != HAL_STATUS_SUCCESS)
-+		send_client_char_notify(&cmd->srvc_id, NULL, 0, cmd->conn_id);
-+
- 	ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_GATT,
- 				HAL_OP_GATT_CLIENT_GET_CHARACTERISTIC, status);
- }
+ struct queue *get_gatt_tests(void)
 -- 
 1.9.3
 
