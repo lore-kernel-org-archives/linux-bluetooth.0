@@ -1,202 +1,283 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 11 Sep 2014 10:53:54 +0200
-From: Alexander Aring <alex.aring@gmail.com>
-To: Martin Townsend <mtownsend1973@gmail.com>
-Cc: linux-zigbee-devel@lists.sourceforge.net,
-	linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org,
-	marcel@holtmann.org, Martin Townsend <martin.townsend@xsilon.com>
-Subject: Re: [PATCH][linux-bluetooth 3/3] 6lowpan: Refactored lowpan_rcv so
- it's RFC compliant
-Message-ID: <20140911085353.GB19675@omega>
-References: <1410357968-27051-1-git-send-email-martin.townsend@xsilon.com>
- <1410357968-27051-5-git-send-email-martin.townsend@xsilon.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-In-Reply-To: <1410357968-27051-5-git-send-email-martin.townsend@xsilon.com>
+From: Vikrampal <vikram.pal@samsung.com>
+To: 'Luiz Augusto von Dentz' <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	'Dmitry Kasatkin' <d.kasatkin@samsung.com>, cpgs@samsung.com
+References: <1410253830-7866-1-git-send-email-vikram.pal@samsung.com>
+ <CABBYNZJEx64_jNtFzxZBxF0H467UEZD47yCsWcvQ0DFfSBUXWQ@mail.gmail.com>
+ <00d001cfccdf$b86eb4b0$294c1e10$@samsung.com>
+ <CABBYNZ+ohFnj_3SuFd-5Sa2CA38iv8XH-ExVcWZu18_4FExmGw@mail.gmail.com>
+In-reply-to: <CABBYNZ+ohFnj_3SuFd-5Sa2CA38iv8XH-ExVcWZu18_4FExmGw@mail.gmail.com>
+Subject: RE: [PATCH v2] monitor: Add AVRCP GetElementAttributes
+Date: Thu, 11 Sep 2014 14:06:31 +0530
+Message-id: <00dc01cfcd9b$7fb1afd0$7f150f70$@samsung.com>
+MIME-version: 1.0
+Content-type: text/plain; charset=utf-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Martin,
+Hi Luiz,
 
-On Wed, Sep 10, 2014 at 03:06:08PM +0100, Martin Townsend wrote:
-> Currently we support uncompressed IPv6 headers after performing fragmentation.
+> -----Original Message-----
+> From: Luiz Augusto von Dentz [mailto:luiz.dentz@gmail.com]
+> Sent: Wednesday, September 10, 2014 6:19 PM
+> To: Vikrampal
+> Cc: linux-bluetooth@vger.kernel.org; Dmitry Kasatkin; cpgs@samsung.com
+> Subject: Re: [PATCH v2] monitor: Add AVRCP GetElementAttributes
 > 
-
-This patch is for wpan-next.
-
-> Signed-off-by: Martin Townsend <martin.townsend@xsilon.com>
-> ---
->  include/net/6lowpan.h         | 17 ++++++++++++
->  net/ieee802154/6lowpan_rtnl.c | 63 +++++++++++++++++++++++--------------------
->  2 files changed, 51 insertions(+), 29 deletions(-)
+> Hi Vikram,
 > 
-> diff --git a/include/net/6lowpan.h b/include/net/6lowpan.h
-> index d71c062..71b1bf0 100644
-> --- a/include/net/6lowpan.h
-> +++ b/include/net/6lowpan.h
-> @@ -126,11 +126,28 @@
->  	 (((a)[6]) == 0xFF) &&	\
->  	 (((a)[7]) == 0xFF))
->  
-> +#define lowpan_dispatch_is_nalp(a)	\
-> +	(((a) & LOWPAN_DISPATCH_MAJOR) == 0x00)
-> +
-> +#define lowpan_dispatch_is_mesh(a)	\
-> +	(((a) & LOWPAN_DISPATCH_MAJOR) == 0x80)
-> +
+> On Wed, Sep 10, 2014 at 1:12 PM, Vikrampal <vikram.pal@samsung.com>
+> wrote:
+> > Hi Luiz,
+> >
+> >> -----Original Message-----
+> >> From: Luiz Augusto von Dentz [mailto:luiz.dentz@gmail.com]
+> >> Sent: Wednesday, September 10, 2014 2:42 PM
+> >> To: Vikrampal Yadav
+> >> Cc: linux-bluetooth@vger.kernel.org; Dmitry Kasatkin;
+> >> cpgs@samsung.com
+> >> Subject: Re: [PATCH v2] monitor: Add AVRCP GetElementAttributes
+> >>
+> >> Hi Vikram,
+> >>
+> >> On Tue, Sep 9, 2014 at 12:10 PM, Vikrampal Yadav
+> >> <vikram.pal@samsung.com> wrote:
+> >> > Support for decoding AVRCP GetElementAttributes added in Bluetooth
+> >> > monitor.
+> >> > ---
+> >> >  monitor/avctp.c | 158
+> >> > ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+> >> >  monitor/l2cap.h |  16 +++---
+> >> >  2 files changed, 167 insertions(+), 7 deletions(-)
+> >> >
+> >> > diff --git a/monitor/avctp.c b/monitor/avctp.c index
+> >> > c7e242b..89f0f9c
+> >> > 100644
+> >> > --- a/monitor/avctp.c
+> >> > +++ b/monitor/avctp.c
+> >> > @@ -158,6 +158,21 @@
+> >> >  #define AVRCP_ATTRIBUTE_SHUFFLE                0x03
+> >> >  #define AVRCP_ATTRIBUTE_SCAN           0x04
+> >> >
+> >> > +/* media attributes */
+> >> > +#define AVRCP_MEDIA_ATTRIBUTE_ILLEGAL  0x00
+> >> > +#define AVRCP_MEDIA_ATTRIBUTE_TITLE    0x01
+> >> > +#define AVRCP_MEDIA_ATTRIBUTE_ARTIST   0x02
+> >> > +#define AVRCP_MEDIA_ATTRIBUTE_ALBUM    0x03
+> >> > +#define AVRCP_MEDIA_ATTRIBUTE_TRACK    0x04
+> >> > +#define AVRCP_MEDIA_ATTRIBUTE_TOTAL    0x05
+> >> > +#define AVRCP_MEDIA_ATTRIBUTE_GENRE    0x06
+> >> > +#define AVRCP_MEDIA_ATTRIBUTE_DURATION 0x07
+> >> > +
+> >> > +static struct avrcp_continuing {
+> >> > +       uint16_t num;
+> >> > +       uint16_t size;
+> >> > +} avrcp_continuing;
+> >> > +
+> >> >  static const char *ctype2str(uint8_t ctype)  {
+> >> >         switch (ctype & 0x0f) {
+> >> > @@ -517,6 +532,30 @@ static const char *charset2str(uint16_t charset)
+> >> >         }
+> >> >  }
+> >> >
+> >> > +static const char *mediattr2str(uint32_t attr) {
+> >> > +       switch (attr) {
+> >> > +       case AVRCP_MEDIA_ATTRIBUTE_ILLEGAL:
+> >> > +               return "Illegal";
+> >> > +       case AVRCP_MEDIA_ATTRIBUTE_TITLE:
+> >> > +               return "Title";
+> >> > +       case AVRCP_MEDIA_ATTRIBUTE_ARTIST:
+> >> > +               return "Artist";
+> >> > +       case AVRCP_MEDIA_ATTRIBUTE_ALBUM:
+> >> > +               return "Album";
+> >> > +       case AVRCP_MEDIA_ATTRIBUTE_TRACK:
+> >> > +               return "Track";
+> >> > +       case AVRCP_MEDIA_ATTRIBUTE_TOTAL:
+> >> > +               return "Track Total";
+> >> > +       case AVRCP_MEDIA_ATTRIBUTE_GENRE:
+> >> > +               return "Genre";
+> >> > +       case AVRCP_MEDIA_ATTRIBUTE_DURATION:
+> >> > +               return "Track duration";
+> >> > +       default:
+> >> > +               return "Reserved";
+> >> > +       }
+> >> > +}
+> >> > +
+> >> >  static bool avrcp_passthrough_packet(struct l2cap_frame *frame)  {
+> >> >         packet_hexdump(frame->data, frame->size); @@ -884,6
+> >> > +923,122 @@ static bool avrcp_displayable_charset(struct
+> >> > l2cap_frame *frame,
+> >> uint8_t ctype,
+> >> >         return true;
+> >> >  }
+> >> >
+> >> > +static bool avrcp_get_element_attributes(struct l2cap_frame *frame,
+> >> > +                                               uint8_t ctype, uint8_t len,
+> >> > +                                               uint8_t indent) {
+> >> > +       uint64_t id;
+> >> > +       uint8_t num;
+> >> > +
+> >> > +       if (ctype > AVC_CTYPE_GENERAL_INQUIRY)
+> >> > +               goto response;
+> >> > +
+> >> > +       if (!l2cap_frame_get_be64(frame, &id))
+> >> > +               return false;
+> >> > +
+> >> > +       print_field("%*cIdentifier: 0x%jx (%s)", (indent - 8), ' ',
+> >> > +                                       id, id ? "Reserved" :
+> >> > + "PLAYING");
+> >> > +
+> >> > +       if (!l2cap_frame_get_u8(frame, &num))
+> >> > +               return false;
+> >> > +
+> >> > +       print_field("%*cAttributeCount: 0x%02x", (indent - 8), ' ',
+> >> > + num);
+> >> > +
+> >> > +       for (; num > 0; num--) {
+> >> > +               uint32_t attr;
+> >> > +
+> >> > +               if (!l2cap_frame_get_be32(frame, &attr))
+> >> > +                       return false;
+> >> > +
+> >> > +               print_field("%*cAttribute: 0x%08x (%s)", (indent - 8),
+> >> > +                                       ' ', attr, mediattr2str(attr));
+> >> > +       }
+> >> > +
+> >> > +       return true;
+> >> > +
+> >> > +response:
+> >> > +       if (frame->pkt_type == AVRCP_PACKET_TYPE_SINGLE
+> >> > +                               || frame->pkt_type == AVRCP_PACKET_TYPE_START) {
+> >> > +               if (!l2cap_frame_get_u8(frame, &num))
+> >> > +                       return false;
+> >> > +
+> >> > +               avrcp_continuing.num = num;
+> >> > +               print_field("%*cAttributeCount: 0x%02x", (indent - 8),
+> >> > +                                                               ' ', num);
+> >> > +               len--;
+> >> > +       } else {
+> >> > +               num = avrcp_continuing.num;
+> >> > +
+> >> > +               if (avrcp_continuing.size > 0) {
+> >> > +                       uint16_t size;
+> >> > +
+> >> > +                       if (avrcp_continuing.size > len) {
+> >> > +                               size = len;
+> >> > +                               avrcp_continuing.size -= len;
+> >> > +                       } else {
+> >> > +                               size = avrcp_continuing.size;
+> >> > +                               avrcp_continuing.size = 0;
+> >> > +                       }
+> >> > +
+> >> > +                       printf("ContinuingAttributeValue: ");
+> >> > +                       for (; size > 0; size--) {
+> >> > +                               uint8_t c;
+> >> > +
+> >> > +                               if (!l2cap_frame_get_u8(frame, &c))
+> >> > +                                       return false;
+> >> > +
+> >> > +                               printf("%1c", isprint(c) ? c : '.');
+> >> > +                       }
+> >> > +                       printf("\n");
+> >> > +
+> >> > +                       len -= size;
+> >> > +               }
+> >> > +       }
+> >> > +
+> >> > +       while (num > 0 && len > 0) {
+> >> > +               uint32_t attr;
+> >> > +               uint16_t charset, attrlen;
+> >> > +
+> >> > +               if (!l2cap_frame_get_be32(frame, &attr))
+> >> > +                       return false;
+> >> > +
+> >> > +               print_field("%*cAttribute: 0x%08x (%s)", (indent - 8),
+> >> > +                                               ' ', attr,
+> >> > + mediattr2str(attr));
+> >> > +
+> >> > +               if (!l2cap_frame_get_be16(frame, &charset))
+> >> > +                       return false;
+> >> > +
+> >> > +               print_field("%*cCharsetID: 0x%04x (%s)", (indent - 8),
+> >> > +                               ' ', charset,
+> >> > + charset2str(charset));
+> >> > +
+> >> > +               if (!l2cap_frame_get_be16(frame, &attrlen))
+> >> > +                       return false;
+> >> > +
+> >> > +               print_field("%*cAttributeValueLength: 0x%04x",
+> >> > +                                               (indent - 8), ' ',
+> >> > + attrlen);
+> >> > +
+> >> > +               len -= sizeof(attr) + sizeof(charset) + sizeof(attrlen);
+> >> > +               num--;
+> >> > +
+> >> > +               print_field("%*cAttributeValue: ", (indent - 8), ' ');
+> >> > +               for (; attrlen > 0 && len > 0; attrlen--, len--) {
+> >> > +                       uint8_t c;
+> >> > +
+> >> > +                       if (!l2cap_frame_get_u8(frame, &c))
+> >> > +                               return false;
+> >> > +
+> >> > +                       printf("%1c", isprint(c) ? c : '.');
+> >> > +               }
+> >> > +
+> >> > +               if (attrlen > 0)
+> >> > +                       avrcp_continuing.size = attrlen;
+> >> > +       }
+> >> > +
+> >> > +       avrcp_continuing.num = num;
+> >> > +
+> >> > +       return true;
+> >> > +}
+> >> > +
+> >> >  struct avrcp_ctrl_pdu_data {
+> >> >         uint8_t pduid;
+> >> >         bool (*func) (struct l2cap_frame *frame, uint8_t ctype,
+> >> > uint8_t len, @@ -899,6 +1054,7 @@ static const struct
+> >> avrcp_ctrl_pdu_data avrcp_ctrl_pdu_table[] = {
+> >> >         { 0x15, avrcp_get_player_attribute_text         },
+> >> >         { 0x16, avrcp_get_player_value_text             },
+> >> >         { 0x17, avrcp_displayable_charset               },
+> >> > +       { 0x20, avrcp_get_element_attributes            },
+> >> >         { }
+> >> >  };
+> >> >
+> >> > @@ -932,6 +1088,8 @@ static bool avrcp_pdu_packet(struct
+> >> > l2cap_frame
+> >> *frame, uint8_t ctype,
+> >> >         if (!l2cap_frame_get_be16(frame, &len))
+> >> >                 return false;
+> >> >
+> >> > +       frame->pkt_type = pt;
+> >> > +
+> >>
+> >> This does not belong here, you should probably pass pt in the
+> >> callback not via frame, or even better have AVCTP frame
+> >> representation which points to the L2CAP frame that one can contain
+> things AVCTP specifics like pt.
+> >
+> > Currently, I see only this information to be saved. So, can we not
+> > declare a static variable pkt_type in avctp.c. Later on, if more
+> > information need to be saved then we can define a frame structure.
+> 
+> I would probably pass pt to avrcp_packet to be forward to the callback just as
+> you did with hdr, but I still think and AVCTP frame representation would be
+> better as it can grow without always having to change the callbacks in the
+> pdu table e.g.:
+> 
+> struct avctp_frame {
+>     uint8_t hdr;
+>     uint8_t pt;
+>     struct l2cap_frame l2cap_frame;
+> };
+> 
+> --
+> Luiz Augusto von Dentz
 
-don't use the MINOR MAJOR thing here, I can't see that this follow any
-structure at RFC4944.
+I agree with your suggestion. I'll make the necessary changes in design. Thanks!
 
-Simple add more mask and values like:
+Regards,
+Vikram
 
-#define lowpan_dispatch_is_mesh(a)	\
-	(((a) & LOWPAN_DISPATCH_MESH_MASK) == LOWPAN_DISPATCH_MESH)
-
-Please see the note below that we don't put this stuff into genetic 6lowpan.
-
-> +#define lowpan_dispatch_is_broadcast(a)	\
-> +	((a) == LOWPAN_DISPATCH_BCAST)
-> +
-> +#define lowpan_dispatch_is_frag(a)	\
-> +	(((a) & LOWPAN_DISPATCH_MASK) == LOWPAN_DISPATCH_FRAG1 || \
-> +	 ((a) & LOWPAN_DISPATCH_MASK) == LOWPAN_DISPATCH_FRAGN)
-> +
-> +#define LOWPAN_DISPATCH_MAJOR	0xc0
-> +#define LOWPAN_DISPATCH_MINOR	0x3f
-> +
->  #define LOWPAN_DISPATCH_IPV6	0x41 /* 01000001 = 65 */
->  #define LOWPAN_DISPATCH_HC1	0x42 /* 01000010 = 66 */
->  #define LOWPAN_DISPATCH_IPHC	0x60 /* 011xxxxx = ... */
->  #define LOWPAN_DISPATCH_FRAG1	0xc0 /* 11000xxx */
->  #define LOWPAN_DISPATCH_FRAGN	0xe0 /* 11100xxx */
-> +#define LOWPAN_DISPATCH_BCAST	0x50 /* 01010000 */
->  
-
-hehe... yea another big issue is also that much stoff from ieee802154
-foo is inside the include/net/6lowpan header. We should not make this
-problem bigger. Only IPHC stuff there, which is used by bluetooth and
-802154.
-
-For ieee802154 6lowpan, we don't need a global header file.
-
-Simple create one "net/ieee802154/6lowpan_i.h" - underscore means that's
-internal header. These defines are only related to 802.15.4, e.g.
-fragmentation on bluetooth is done at some mac mechanism (L2CAP, or
-something else, that's what 6lowpan bluetooth draft says). So 6lowpan
-fragmentation have nothing to do with bluetooth 6lowpan.
-
->  #define LOWPAN_DISPATCH_MASK	0xf8 /* 11111000 */
->  
-> diff --git a/net/ieee802154/6lowpan_rtnl.c b/net/ieee802154/6lowpan_rtnl.c
-> index 4f4b02d..1557ece 100644
-> --- a/net/ieee802154/6lowpan_rtnl.c
-> +++ b/net/ieee802154/6lowpan_rtnl.c
-> @@ -477,41 +477,46 @@ static int lowpan_rcv(struct sk_buff *skb, struct net_device *dev,
->  	if (ieee802154_hdr_peek_addrs(skb, &hdr) < 0)
->  		goto drop_skb;
->  
-> -	/* check that it's our buffer */
-> +	/* First off if frame is Not A LoWPAN Packet (NALP) then chuck away */
-> +	if (lowpan_dispatch_is_nalp(skb->data[0]))
-> +		goto drop_skb;
-> +
-> +	/* The 6LoWPAN header stack comprimises of the following (in order)
-> +	 *   Mesh
-> +	 *   Broadcast
-> +	 *   Fragmentation
-> +	 */
-> +	if (lowpan_dispatch_is_mesh(skb->data[0]))
-
-better is:
-
-lowpan_dispatch_is_mesh(*skb_network_header(skb))
-
-the network_header should be pointed to the beginng of 6LoWPAN header.
-
-> +		/* Not supported */
-> +		goto drop_skb;
-> +
-> +	if (lowpan_dispatch_is_broadcast(skb->data[0]))
-> +		/* Not supported */
-> +		goto drop_skb;
-> +
-> +	if (lowpan_dispatch_is_frag(skb->data[0])) {
-> +		u8 frag_dispatch = skb->data[0] & 0xe0;
-> +
-> +		ret = lowpan_frag_rcv(skb, frag_dispatch);
-> +		if (ret != 1) {
-> +			/* more frags to process */
-> +			return NET_RX_SUCCESS;
-> +		}
-> +	}
-
-I know this issue and we should not do that in this way.
-
-Why?
-
-Because this works only for fragmentation with IPHC, for example if we
-support mesh or Broadcast or HC1 compression. We should call after
-successfully reassembled "means lowpan_frag_rcv returns 1" the lowpan_rcv again.
-So this is a recursion and we don't should use recursion to much, but it
-should only be one recursion, so I think that's okay. :-)
-
-After successfully reassemble we simple evaluate the DISPATCH value
-again, this is also more a bug (because we don't handle LOWPAN_DISPATCH_IPV6
-with fragmentation, and this can happen... We already talk about the
-issue "don't use IPHC if compressed header size don't fit in a single
-frame" and this is handled if we simple calll lowpan_frag_rcv again
-after successful reassembling. But I don't will take this as bugfix,
-because new support of handling xy, so wpan-next should be okay.
-
-Please separate also this from the "introduce new handling of dispatch
-values".
-
-> +
-> +	/* We should now have an IPv6 Header (Compressed or Uncompressed) */
->  	if (skb->data[0] == LOWPAN_DISPATCH_IPV6) {
-> -		/* Pull off the 1-byte of 6lowpan header. */
-> +		/* Uncompressed, Pull off the dispatch byte */
->  		skb_pull(skb, 1);
-> -
-> -		ret = NET_RX_SUCCESS;
->  	} else {
-> -		switch (skb->data[0] & 0xe0) {
-> -		case LOWPAN_DISPATCH_IPHC:	/* ipv6 datagram */
-> +		if ((skb->data[0] & 0xe0) == LOWPAN_DISPATCH_IPHC) {
-> +			/* Compressed with IPHC - RFC 6282 */
->  			ret = iphc_uncompress_hdr(&skb, &hdr);
->  			if (ret < 0)
->  				goto drop;
-> -			break;
-> -		case LOWPAN_DISPATCH_FRAG1:	/* first fragment header */
-> -			ret = lowpan_frag_rcv(skb, LOWPAN_DISPATCH_FRAG1);
-> -			if (ret == 1) {
-> -				ret = iphc_uncompress_hdr(&skb, &hdr);
-> -				if (ret < 0)
-> -					goto drop;
-> -			} else {
-> -				return NET_RX_SUCCESS;
-> -			}
-> -			break;
-> -		case LOWPAN_DISPATCH_FRAGN:	/* next fragments headers */
-> -			ret = lowpan_frag_rcv(skb, LOWPAN_DISPATCH_FRAGN);
-> -			if (ret == 1) {
-> -				ret = iphc_uncompress_hdr(&skb, &hdr);
-> -				if (ret < 0)
-> -					goto drop;
-> -			} else {
-> -				return NET_RX_SUCCESS;
-> -			}
-> -			break;
-> -		default:
-> -			break;
-> +		} else {
-> +			/* TODO: other compression formats to follow */
-
-don't know why we check at first for some types which we don't support
-and drop it and then we have this here and drop also unknown types.
-
-I would like it to check on all RFC4944 types here. And then we know
-here that it was some invalid frame.
-
-- Alex
