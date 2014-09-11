@@ -1,74 +1,75 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 11 Sep 2014 12:33:23 +0200
-From: Alexander Aring <alex.aring@gmail.com>
-To: Martin Townsend <martin.townsend@xsilon.com>
-Cc: Martin Townsend <mtownsend1973@gmail.com>,
-	linux-zigbee-devel@lists.sourceforge.net,
-	linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org,
-	marcel@holtmann.org
-Subject: Re: [PATCH][linux-bluetooth 3/3] 6lowpan: Refactored lowpan_rcv so
- it's RFC compliant
-Message-ID: <20140911103321.GD20686@omega>
-References: <1410357968-27051-1-git-send-email-martin.townsend@xsilon.com>
- <1410357968-27051-5-git-send-email-martin.townsend@xsilon.com>
- <20140911085353.GB19675@omega>
- <54116BC6.2030609@xsilon.com>
- <20140911095052.GA20686@omega>
- <541174D6.7060200@xsilon.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-In-Reply-To: <541174D6.7060200@xsilon.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ] doc/media-api: Remove obsolete properties
+Date: Thu, 11 Sep 2014 12:32:15 +0200
+Message-Id: <1410431535-27232-1-git-send-email-luiz.dentz@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Thu, Sep 11, 2014 at 11:09:26AM +0100, Martin Townsend wrote:
-> Hi Alex,
-> 
-> Reposting to everyone this time :)
-> 
-ok
-...
-> >>> I know this issue and we should not do that in this way.
-> >>>
-> >>> Why?
-> >>>
-> >>> Because this works only for fragmentation with IPHC, for example if we
-> >>> support mesh or Broadcast or HC1 compression. We should call after
-> >>> successfully reassembled "means lowpan_frag_rcv returns 1" the lowpan_rcv again.
-> >>> So this is a recursion and we don't should use recursion to much, but it
-> >>> should only be one recursion, so I think that's okay. :-)
-> >> The spec says that the headers of the 6LoWPAN frame must fit in the first fragment.  You need to process these headers to get to the fragmentation header, this is why the code is this way.
-> > yes this is for IPHC dispatch values your code works, I don't want to
-> > say that it doesn't work. Because fragmentation is something to
-> > reconstruct the full payload, we should first evaluate the fragmentation
-> > dispatches and then all others. To be sure that we can use fragmentation
-> > on any dispatch value which is not the fragmentation dispatch values.
-> > :-)
-> >
-> > Simple move it before nalp check. Maybe somebody fragment something and
-> > the dispatch value after fragmentation is nalp. I know it should catch
-> > the default branch above, but it's a little bit cleaner. I hope you are
-> > in the same opinion.
-> 
-> I think it should stay where it is.
-> From RFC 4944
-> NALP: Specifies that the following bits are not a part of the LoWPAN
-> encapsulation, and any LoWPAN node that encounters a dispatch
-> value of 00xxxxxx shall discard the packet. Other non-LoWPAN
-> protocols that wish to coexist with LoWPAN nodes should include a
-> byte matching this pattern immediately following the 802.15.4.
-> header.
-> 
-> The last sentence implies that this NALP code is expected as the first byte following the MAC Header.  If a NALP is encountered after processing the 6LoWPAN header stack then it will be treated as an unknown compression type.
-> 
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-yes. But the issue is more a reassembled fragmentet 6LoWPAN packet have
-a dispatch value. This dispatch value should not NALP, but maybe
-somebody did it and then we should make the same code like what we do
-for NALP dispatches without fragmentation.
+Properties related to HFP/HSP are no longer available since BlueZ has
+no native support of those profiles.
+---
+ doc/media-api.txt | 40 ----------------------------------------
+ 1 file changed, 40 deletions(-)
 
-The same for all other dispatches. The current code makes this with IPHC
-and IPv6 dispatch. And I really don't know is that a MESH or BC0 can
-also be fragmented because we have some worst cases in mac header,
-etc... sizes.
+diff --git a/doc/media-api.txt b/doc/media-api.txt
+index ae49dfa..e9c4ba1 100644
+--- a/doc/media-api.txt
++++ b/doc/media-api.txt
+@@ -593,28 +593,6 @@ Properties	object Device [readonly]
+ 			property is only writeable when the transport was
+ 			acquired by the sender.
+ 
+-		boolean NREC [readwrite]
+-
+-			Optional and HFP specific (external to BlueZ).
+-			Indicates if echo cancelling and noise reduction
+-			functions are active in the transport, this
+-			property is only writeable when the transport
+-			was acquired by the sender.
+-
+-		boolean InbandRingtone [readwrite]
+-
+-			Optional and HFP specific (external to BlueZ).
+-			Indicates if the transport support sending
+-			ringtones, this property is only writeable when
+-			the transport was acquired by the sender.
+-
+-		string Routing [readonly]
+-
+-			Optional and HFP specific (external to BlueZ).
+-			Indicates where is the transport being routed.
+-
+-			Possible Values: "HCI" or "PCM"
+-
+ 		uint16 Volume [readwrite]
+ 
+ 			Optional. Indicates volume level of the transport,
+@@ -626,21 +604,3 @@ Properties	object Device [readonly]
+ 			used instead.
+ 
+ 			Possible Values: 0-127
+-
+-		byte MicrophoneGain [readwrite]
+-
+-			Optional. Indicates volume level of the transport's
+-			incoming audio stream for HSP/HFP transports. This
+-			property is only writeable when the transport was
+-			acquired by the sender.
+-
+-			Possible Values: 0-15
+-
+-		byte SpeakerGain [readwrite]
+-
+-			Optional. Indicates volume level of the transport's
+-			outgoing audio stream for HSP/HFP transports. This
+-			property is only writeable when the transport was
+-			acquired by the sender.
+-
+-			Possible Values: 0-15
+-- 
+1.9.3
 
-- Alex
