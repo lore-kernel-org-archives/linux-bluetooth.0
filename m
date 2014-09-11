@@ -1,125 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
 From: johan.hedberg@gmail.com
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 3/6] Bluetooth: Centralize disallowing SMP commands to a single place
-Date: Wed, 10 Sep 2014 17:37:43 -0700
-Message-Id: <1410395866-24301-4-git-send-email-johan.hedberg@gmail.com>
-In-Reply-To: <1410395866-24301-1-git-send-email-johan.hedberg@gmail.com>
-References: <1410395866-24301-1-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH 0/6] Bluetooth: SMP and some other fixes
+Date: Wed, 10 Sep 2014 17:37:40 -0700
+Message-Id: <1410395866-24301-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@intel.com>
+Hi,
 
-All the cases where we mark SMP commands as dissalowed are their
-respective command handlers. We can therefore simplify the code by
-always clearing the bit immediately after testing it. This patch
-converts the corresponding test_bit() call to a test_and_clear_bit()
-call and also removes the now unused SMP_DISALLOW_CMD macro.
+The first five patches from this set are various fixes to SMP. The sixth
+one is a fix for properly notifying BR/EDR fixed channels, including on
+setups when there are no registered connection-oriented BR/EDR channels.
 
-Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
----
- net/bluetooth/smp.c | 17 +----------------
- 1 file changed, 1 insertion(+), 16 deletions(-)
+Johan
 
-diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
-index ef8f96d2c059..be8371b4eb63 100644
---- a/net/bluetooth/smp.c
-+++ b/net/bluetooth/smp.c
-@@ -32,7 +32,6 @@
- #include "smp.h"
- 
- #define SMP_ALLOW_CMD(smp, code)	set_bit(code, &smp->allow_cmd)
--#define SMP_DISALLOW_CMD(smp, code)	clear_bit(code, &smp->allow_cmd)
- 
- #define SMP_TIMEOUT	msecs_to_jiffies(30000)
- 
-@@ -956,8 +955,6 @@ static u8 smp_cmd_pairing_req(struct l2cap_conn *conn, struct sk_buff *skb)
- 	    (auth & SMP_AUTH_BONDING))
- 		return SMP_PAIRING_NOTSUPP;
- 
--	SMP_DISALLOW_CMD(smp, SMP_CMD_PAIRING_REQ);
--
- 	smp->preq[0] = SMP_CMD_PAIRING_REQ;
- 	memcpy(&smp->preq[1], req, sizeof(*req));
- 	skb_pull(skb, sizeof(*req));
-@@ -1014,8 +1011,6 @@ static u8 smp_cmd_pairing_rsp(struct l2cap_conn *conn, struct sk_buff *skb)
- 	if (conn->hcon->role != HCI_ROLE_MASTER)
- 		return SMP_CMD_NOTSUPP;
- 
--	SMP_DISALLOW_CMD(smp, SMP_CMD_PAIRING_RSP);
--
- 	skb_pull(skb, sizeof(*rsp));
- 
- 	req = (void *) &smp->preq[1];
-@@ -1071,8 +1066,6 @@ static u8 smp_cmd_pairing_confirm(struct l2cap_conn *conn, struct sk_buff *skb)
- 	if (skb->len < sizeof(smp->pcnf))
- 		return SMP_INVALID_PARAMS;
- 
--	SMP_DISALLOW_CMD(smp, SMP_CMD_PAIRING_CONFIRM);
--
- 	memcpy(smp->pcnf, skb->data, sizeof(smp->pcnf));
- 	skb_pull(skb, sizeof(smp->pcnf));
- 
-@@ -1101,8 +1094,6 @@ static u8 smp_cmd_pairing_random(struct l2cap_conn *conn, struct sk_buff *skb)
- 	if (skb->len < sizeof(smp->rrnd))
- 		return SMP_INVALID_PARAMS;
- 
--	SMP_DISALLOW_CMD(smp, SMP_CMD_PAIRING_RANDOM);
--
- 	memcpy(smp->rrnd, skb->data, sizeof(smp->rrnd));
- 	skb_pull(skb, sizeof(smp->rrnd));
- 
-@@ -1293,7 +1284,6 @@ static int smp_cmd_encrypt_info(struct l2cap_conn *conn, struct sk_buff *skb)
- 	if (skb->len < sizeof(*rp))
- 		return SMP_INVALID_PARAMS;
- 
--	SMP_DISALLOW_CMD(smp, SMP_CMD_ENCRYPT_INFO);
- 	SMP_ALLOW_CMD(smp, SMP_CMD_MASTER_IDENT);
- 
- 	skb_pull(skb, sizeof(*rp));
-@@ -1321,7 +1311,6 @@ static int smp_cmd_master_ident(struct l2cap_conn *conn, struct sk_buff *skb)
- 	/* Mark the information as received */
- 	smp->remote_key_dist &= ~SMP_DIST_ENC_KEY;
- 
--	SMP_DISALLOW_CMD(smp, SMP_CMD_MASTER_IDENT);
- 	if (smp->remote_key_dist & SMP_DIST_ID_KEY)
- 		SMP_ALLOW_CMD(smp, SMP_CMD_IDENT_INFO);
- 	else if (smp->remote_key_dist & SMP_DIST_SIGN)
-@@ -1353,7 +1342,6 @@ static int smp_cmd_ident_info(struct l2cap_conn *conn, struct sk_buff *skb)
- 	if (skb->len < sizeof(*info))
- 		return SMP_INVALID_PARAMS;
- 
--	SMP_DISALLOW_CMD(smp, SMP_CMD_IDENT_INFO);
- 	SMP_ALLOW_CMD(smp, SMP_CMD_IDENT_ADDR_INFO);
- 
- 	skb_pull(skb, sizeof(*info));
-@@ -1380,7 +1368,6 @@ static int smp_cmd_ident_addr_info(struct l2cap_conn *conn,
- 	/* Mark the information as received */
- 	smp->remote_key_dist &= ~SMP_DIST_ID_KEY;
- 
--	SMP_DISALLOW_CMD(smp, SMP_CMD_IDENT_ADDR_INFO);
- 	if (smp->remote_key_dist & SMP_DIST_SIGN)
- 		SMP_ALLOW_CMD(smp, SMP_CMD_SIGN_INFO);
- 
-@@ -1436,8 +1423,6 @@ static int smp_cmd_sign_info(struct l2cap_conn *conn, struct sk_buff *skb)
- 	/* Mark the information as received */
- 	smp->remote_key_dist &= ~SMP_DIST_SIGN;
- 
--	SMP_DISALLOW_CMD(smp, SMP_CMD_SIGN_INFO);
--
- 	skb_pull(skb, sizeof(*rp));
- 
- 	hci_dev_lock(hdev);
-@@ -1482,7 +1467,7 @@ static int smp_sig_channel(struct l2cap_chan *chan, struct sk_buff *skb)
- 	if (code > SMP_CMD_MAX)
- 		goto drop;
- 
--	if (smp && !test_bit(code, &smp->allow_cmd))
-+	if (smp && !test_and_clear_bit(code, &smp->allow_cmd))
- 		goto drop;
- 
- 	/* If we don't have a context the only allowed commands are
--- 
-1.9.3
+----------------------------------------------------------------
+Johan Hedberg (6):
+      Bluetooth: Remove unnecessary early initialization of variable
+      Bluetooth: Fix ignoring unknown SMP authentication requirement bits
+      Bluetooth: Centralize disallowing SMP commands to a single place
+      Bluetooth: Fix SMP security level when we have no IO capabilities
+      Bluetooth: Add smp_ltk_sec_level() helper function
+      Bluetooth: Fix L2CAP information request handling for fixed channels
+
+ net/bluetooth/hci_event.c  |  5 +---
+ net/bluetooth/l2cap_core.c | 53 +++++++++++++++++++++++++---------------
+ net/bluetooth/smp.c        | 55 ++++++++++++++++++------------------------
+ net/bluetooth/smp.h        |  8 ++++++
+ 4 files changed, 66 insertions(+), 55 deletions(-)
 
