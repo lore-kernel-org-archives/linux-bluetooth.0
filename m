@@ -1,44 +1,51 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.6\))
-Subject: Re: [PATCH][linux-bluetooth 2/3] 6lowpan: Move skb delivery from IPHC.
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20140911081808.GA19675@omega>
-Date: Thu, 11 Sep 2014 07:11:31 -0700
-Cc: Martin Townsend <mtownsend1973@gmail.com>,
-	linux-zigbee-devel@lists.sourceforge.net,
-	linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org,
-	Martin Townsend <martin.townsend@xsilon.com>
-Message-Id: <1C268090-606B-45BF-8B47-7A3B35886F10@holtmann.org>
-References: <1410357968-27051-1-git-send-email-martin.townsend@xsilon.com> <1410357968-27051-4-git-send-email-martin.townsend@xsilon.com> <20140911081808.GA19675@omega>
-To: Alexander Aring <alex.aring@gmail.com>
-Sender: linux-wpan-owner@vger.kernel.org
+MIME-Version: 1.0
+In-Reply-To: <CABBYNZJmMLnyOe682Oi7NuFtEiED3Y-epks-nJBBqMaNPS2KcA@mail.gmail.com>
+References: <1410347494-22084-1-git-send-email-lukasz.rymanowski@tieto.com>
+	<1410347494-22084-4-git-send-email-lukasz.rymanowski@tieto.com>
+	<CABBYNZJmMLnyOe682Oi7NuFtEiED3Y-epks-nJBBqMaNPS2KcA@mail.gmail.com>
+Date: Thu, 11 Sep 2014 15:59:15 +0200
+Message-ID: <CAMudyAuaFA1gUVE3o7d5t1DROfVfZjTibcpAJKGF0p5W=UPXcg@mail.gmail.com>
+Subject: Re: [PATCH v2 3/4] android/hal-ipc-api: Add missing peer features parameter
+From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Alex,
+Hi Luiz,
 
->> Passing the skb from 6lowpan up to the higher layers is not a
->> function of IPHC.  By moving it out of IPHC we also remove the
->> need to support error code returns with NET_RX codes.
->> It also makes the lowpan_rcv function more extendable as we
->> can support more compression schemes.
->> 
-> 
-> I will ack this. But please sperate this patch in two. First renaming
-> the function namens and then removing deliver callback.
-> 
-> btw. The correct tag is bluetooth not linux-bluetooth, or bluetooth-next.
-> 
-> 
-> 
-> Also this doesn't fix anything? Then this is for bluetooth-next. I know
-> this depends on the Patch 1/3. Marcel, do you have any a nice solution
-> about this, that we can deal with huge fixes in bluetooth and new features
-> for bluetooth-next. Or simple wait when it's merged?
-
-we need to get it into wireless first and pulled by davem. After that I can ask John to pull wireless tree back into wireless-next.
-
-Regards
-
-Marcel
-
+On 11 September 2014 14:14, Luiz Augusto von Dentz <luiz.dentz@gmail.com> wrote:
+> Hi Lukasz,
+>
+> On Wed, Sep 10, 2014 at 2:11 PM, Lukasz Rymanowski
+> <lukasz.rymanowski@tieto.com> wrote:
+>> ---
+>>  android/hal-ipc-api.txt | 3 ++-
+>>  1 file changed, 2 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/android/hal-ipc-api.txt b/android/hal-ipc-api.txt
+>> index 326fa21..0948af2 100644
+>> --- a/android/hal-ipc-api.txt
+>> +++ b/android/hal-ipc-api.txt
+>> @@ -2228,7 +2228,8 @@ Notifications:
+>>         Opcode 0x81 - Connection State Changed notification
+>>
+>>                 Notification parameters: State (1 octet)
+>> -                                        Peer Features (1 octet)
+>> +                                        Peer Features (2 octets)
+>> +                                        CHLD Features (2 octets)
+>>                                          Address (6 octets)
+>>
+>>                 Valid State values: 0x00 = Disconnected
+>> --
+>> 1.8.4
+>
+> You should probably document what are the possible values for CHLD.
+>
+True, I missed that.
+\Łukasz
+>
+> --
+> Luiz Augusto von Dentz
