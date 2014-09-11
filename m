@@ -1,116 +1,50 @@
 Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCHv3 1/7] android/tester: Allow HIDHost to use custom sdp response
-Date: Thu, 11 Sep 2014 11:47:15 +0200
-Message-ID: <1581028.HVN6Ae4Nbt@uw000953>
-In-Reply-To: <CABBYNZJh_MqGguoqVFSOVfqCk-OLvq63=GZ-guVASbcJT0vYGQ@mail.gmail.com>
-References: <1410248823-8975-1-git-send-email-jakub.tyszkowski@tieto.com> <1410248823-8975-2-git-send-email-jakub.tyszkowski@tieto.com> <CABBYNZJh_MqGguoqVFSOVfqCk-OLvq63=GZ-guVASbcJT0vYGQ@mail.gmail.com>
+To: gowtham babu <gowtham.ab@samsung.com>
+Cc: linux-bluetooth@vger.kernel.org, d.kasatkin@samsung.com,
+	bharat.panda@samsung.com, cpgs@samsung.com
+Subject: Re: [PATCH 3/3] android/hal-utils.c : Fix null pointer dereference
+Date: Thu, 11 Sep 2014 11:41:05 +0200
+Message-ID: <3030038.LEiDkyyyur@uw000953>
+In-Reply-To: <1410352944-16586-1-git-send-email-gowtham.ab@samsung.com>
+References: <1410352944-16586-1-git-send-email-gowtham.ab@samsung.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz, Jakub,
+Hi,
 
-On Tuesday 09 of September 2014 12:02:26 Luiz Augusto von Dentz wrote:
-> Hi Jakub,
+On Wednesday 10 of September 2014 18:12:24 gowtham babu wrote:
+> Handles the possible null pointer dereference: bd_addr by checking it against null.
+> ---
+>  android/hal-utils.c | 4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
 > 
-> On Tue, Sep 9, 2014 at 10:46 AM, Jakub Tyszkowski
-> <jakub.tyszkowski@tieto.com> wrote:
-> > This is needed to test security levels for different devices. So far we
-> > had Mouse device but, we need to test security level elevation for
-> > keyboards.
-> > ---
-> >  android/tester-hidhost.c | 18 ++++++++++++++++--
-> >  1 file changed, 16 insertions(+), 2 deletions(-)
-> >
-> > diff --git a/android/tester-hidhost.c b/android/tester-hidhost.c
-> > index c7e3a67..b454db4 100644
-> > --- a/android/tester-hidhost.c
-> > +++ b/android/tester-hidhost.c
-> > @@ -55,10 +55,17 @@ struct emu_cid_data {
-> >         uint16_t ctrl_cid;
-> >         uint16_t intr_handle;
-> >         uint16_t intr_cid;
-> > +
-> > +       void *user_data;
-> >  };
-> >
-> >  static struct emu_cid_data cid_data;
-> >
-> > +struct raw_dataset {
-> > +       const void *pdu;
-> > +       int len;
-> > +};
-> > +
-> >  static const uint8_t did_req_pdu[] = { 0x06, /* PDU id */
-> >                         0x00, 0x00, /* Transaction id */
-> >                         0x00, 0x0f, /* Req length */
-> > @@ -128,11 +135,17 @@ static const uint8_t hid_rsp_pdu[] = { 0x07, /* PDU id */
-> >                         0x00, 0x09, 0x02, 0x0e, 0x28, 0x01,
-> >                         0x00 }; /* no continuation */
-> >
-> > +static struct raw_dataset hid_rsp_data = {
-> > +       .pdu = hid_rsp_pdu,
-> > +       .len = sizeof(hid_rsp_pdu),
-> > +};
-> > +
-> 
-> Maybe in the future we can create helper function for PDU matching,
-> perhaps in tester-main.c, so the profile just provide the PDU table
-> that way we don't have to reimplement this over and over again.
+> diff --git a/android/hal-utils.c b/android/hal-utils.c
+> index ceefefc..64ab5a1 100644
+> --- a/android/hal-utils.c
+> +++ b/android/hal-utils.c
+> @@ -166,11 +166,13 @@ int int2str_findstr(const char *str, const struct int2str m[])
+>   */
+>  const char *bt_bdaddr_t2str(const bt_bdaddr_t *bd_addr, char *buf)
+>  {
+> -	const uint8_t *p = bd_addr->address;
+> +	const uint8_t *p;
+>  
+>  	if (!bd_addr)
+>  		return strcpy(buf, "NULL");
+>  
+> +	p = bd_addr->address;
+> +
+>  	snprintf(buf, MAX_ADDR_STR_LEN, "%02x:%02x:%02x:%02x:%02x:%02x",
+>  					p[0], p[1], p[2], p[3], p[4], p[5]);
+>  
 
-I agree that this would be nice to have. Jakub, please have a look at this.
+This patch looks OK to me, but I have one question before applying it.
 
-> >  static void hid_sdp_cid_hook_cb(const void *data, uint16_t len, void *user_data)
-> >  {
-> >         struct test_data *t_data = tester_get_data();
-> >         struct bthost *bthost = hciemu_client_get_host(t_data->hciemu);
-> >         struct emu_cid_data *cid_data = user_data;
-> > +       struct raw_dataset *sdp_data = cid_data->user_data;
-> >
-> >         if (!memcmp(did_req_pdu, data, len)) {
-> >                 bthost_send_cid(bthost, cid_data->sdp_handle, cid_data->sdp_cid,
-> > @@ -141,7 +154,7 @@ static void hid_sdp_cid_hook_cb(const void *data, uint16_t len, void *user_data)
-> >         }
-> >
-> >         bthost_send_cid(bthost, cid_data->sdp_handle, cid_data->sdp_cid,
-> > -                                       hid_rsp_pdu, sizeof(hid_rsp_pdu));
-> > +                                       sdp_data->pdu, sdp_data->len);
-> >  }
-> >  static void hid_sdp_search_cb(uint16_t handle, uint16_t cid, void *user_data)
-> >  {
-> > @@ -150,6 +163,7 @@ static void hid_sdp_search_cb(uint16_t handle, uint16_t cid, void *user_data)
-> >
-> >         cid_data.sdp_handle = handle;
-> >         cid_data.sdp_cid = cid;
-> > +       cid_data.user_data = user_data;
-> >
-> >         bthost_add_cid_hook(bthost, handle, cid, hid_sdp_cid_hook_cb,
-> >                                                                 &cid_data);
-> > @@ -267,7 +281,7 @@ static void hid_intr_connect_cb(uint16_t handle, uint16_t cid, void *user_data)
-> >  static struct emu_set_l2cap_data l2cap_setup_sdp_data = {
-> >         .psm = 1,
-> >         .func = hid_sdp_search_cb,
-> > -       .user_data = NULL,
-> > +       .user_data = &hid_rsp_data,
-> >  };
-> >
-> >  /* Emulate Control Channel (PSM = 17) */
-> > --
-> > 1.9.1
-> >
-> > --
-> > To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> > the body of a message to majordomo@vger.kernel.org
-> > More majordomo info at  http://vger.kernel.org/majordomo-info.html
-> 
-> 
-> 
-> 
+Do you really want your name to be visible in git history as it is in this
+email ie. without any capital letters?
 
 -- 
 Best regards, 
