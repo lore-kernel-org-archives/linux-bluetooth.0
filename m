@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: johan.hedberg@gmail.com
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/6] Bluetooth: Remove unnecessary early initialization of variable
-Date: Wed, 10 Sep 2014 17:37:41 -0700
-Message-Id: <1410395866-24301-2-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH 3/6] Bluetooth: Centralize disallowing SMP commands to a single place
+Date: Wed, 10 Sep 2014 17:37:43 -0700
+Message-Id: <1410395866-24301-4-git-send-email-johan.hedberg@gmail.com>
 In-Reply-To: <1410395866-24301-1-git-send-email-johan.hedberg@gmail.com>
 References: <1410395866-24301-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,44 +11,115 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-We do nothing else with the auth variable in smp_cmd_pairing_rsp()
-besides passing it to tk_request() which in turn only cares about
-whether one of the sides had the MITM bit set. It is therefore
-unnecessary to assign a value to it until just before calling
-tk_request(), and this value can simply be the bit-wise or of the local
-and remote requirements.
+All the cases where we mark SMP commands as dissalowed are their
+respective command handlers. We can therefore simplify the code by
+always clearing the bit immediately after testing it. This patch
+converts the corresponding test_bit() call to a test_and_clear_bit()
+call and also removes the now unused SMP_DISALLOW_CMD macro.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- net/bluetooth/smp.c | 8 ++------
- 1 file changed, 2 insertions(+), 6 deletions(-)
+ net/bluetooth/smp.c | 17 +----------------
+ 1 file changed, 1 insertion(+), 16 deletions(-)
 
 diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
-index dc575aba2e65..dbd17a07dc2e 100644
+index ef8f96d2c059..be8371b4eb63 100644
 --- a/net/bluetooth/smp.c
 +++ b/net/bluetooth/smp.c
-@@ -1003,7 +1003,7 @@ static u8 smp_cmd_pairing_rsp(struct l2cap_conn *conn, struct sk_buff *skb)
- 	struct smp_cmd_pairing *req, *rsp = (void *) skb->data;
- 	struct l2cap_chan *chan = conn->smp;
- 	struct smp_chan *smp = chan->data;
--	u8 key_size, auth = SMP_AUTH_NONE;
-+	u8 key_size, auth;
- 	int ret;
+@@ -32,7 +32,6 @@
+ #include "smp.h"
  
- 	BT_DBG("conn %p", conn);
-@@ -1044,11 +1044,7 @@ static u8 smp_cmd_pairing_rsp(struct l2cap_conn *conn, struct sk_buff *skb)
- 	 */
- 	smp->remote_key_dist &= rsp->resp_key_dist;
+ #define SMP_ALLOW_CMD(smp, code)	set_bit(code, &smp->allow_cmd)
+-#define SMP_DISALLOW_CMD(smp, code)	clear_bit(code, &smp->allow_cmd)
  
--	if ((req->auth_req & SMP_AUTH_BONDING) &&
--	    (rsp->auth_req & SMP_AUTH_BONDING))
--		auth = SMP_AUTH_BONDING;
+ #define SMP_TIMEOUT	msecs_to_jiffies(30000)
+ 
+@@ -956,8 +955,6 @@ static u8 smp_cmd_pairing_req(struct l2cap_conn *conn, struct sk_buff *skb)
+ 	    (auth & SMP_AUTH_BONDING))
+ 		return SMP_PAIRING_NOTSUPP;
+ 
+-	SMP_DISALLOW_CMD(smp, SMP_CMD_PAIRING_REQ);
 -
--	auth |= (req->auth_req | rsp->auth_req) & SMP_AUTH_MITM;
-+	auth = (req->auth_req | rsp->auth_req);
+ 	smp->preq[0] = SMP_CMD_PAIRING_REQ;
+ 	memcpy(&smp->preq[1], req, sizeof(*req));
+ 	skb_pull(skb, sizeof(*req));
+@@ -1014,8 +1011,6 @@ static u8 smp_cmd_pairing_rsp(struct l2cap_conn *conn, struct sk_buff *skb)
+ 	if (conn->hcon->role != HCI_ROLE_MASTER)
+ 		return SMP_CMD_NOTSUPP;
  
- 	ret = tk_request(conn, 0, auth, req->io_capability, rsp->io_capability);
- 	if (ret)
+-	SMP_DISALLOW_CMD(smp, SMP_CMD_PAIRING_RSP);
+-
+ 	skb_pull(skb, sizeof(*rsp));
+ 
+ 	req = (void *) &smp->preq[1];
+@@ -1071,8 +1066,6 @@ static u8 smp_cmd_pairing_confirm(struct l2cap_conn *conn, struct sk_buff *skb)
+ 	if (skb->len < sizeof(smp->pcnf))
+ 		return SMP_INVALID_PARAMS;
+ 
+-	SMP_DISALLOW_CMD(smp, SMP_CMD_PAIRING_CONFIRM);
+-
+ 	memcpy(smp->pcnf, skb->data, sizeof(smp->pcnf));
+ 	skb_pull(skb, sizeof(smp->pcnf));
+ 
+@@ -1101,8 +1094,6 @@ static u8 smp_cmd_pairing_random(struct l2cap_conn *conn, struct sk_buff *skb)
+ 	if (skb->len < sizeof(smp->rrnd))
+ 		return SMP_INVALID_PARAMS;
+ 
+-	SMP_DISALLOW_CMD(smp, SMP_CMD_PAIRING_RANDOM);
+-
+ 	memcpy(smp->rrnd, skb->data, sizeof(smp->rrnd));
+ 	skb_pull(skb, sizeof(smp->rrnd));
+ 
+@@ -1293,7 +1284,6 @@ static int smp_cmd_encrypt_info(struct l2cap_conn *conn, struct sk_buff *skb)
+ 	if (skb->len < sizeof(*rp))
+ 		return SMP_INVALID_PARAMS;
+ 
+-	SMP_DISALLOW_CMD(smp, SMP_CMD_ENCRYPT_INFO);
+ 	SMP_ALLOW_CMD(smp, SMP_CMD_MASTER_IDENT);
+ 
+ 	skb_pull(skb, sizeof(*rp));
+@@ -1321,7 +1311,6 @@ static int smp_cmd_master_ident(struct l2cap_conn *conn, struct sk_buff *skb)
+ 	/* Mark the information as received */
+ 	smp->remote_key_dist &= ~SMP_DIST_ENC_KEY;
+ 
+-	SMP_DISALLOW_CMD(smp, SMP_CMD_MASTER_IDENT);
+ 	if (smp->remote_key_dist & SMP_DIST_ID_KEY)
+ 		SMP_ALLOW_CMD(smp, SMP_CMD_IDENT_INFO);
+ 	else if (smp->remote_key_dist & SMP_DIST_SIGN)
+@@ -1353,7 +1342,6 @@ static int smp_cmd_ident_info(struct l2cap_conn *conn, struct sk_buff *skb)
+ 	if (skb->len < sizeof(*info))
+ 		return SMP_INVALID_PARAMS;
+ 
+-	SMP_DISALLOW_CMD(smp, SMP_CMD_IDENT_INFO);
+ 	SMP_ALLOW_CMD(smp, SMP_CMD_IDENT_ADDR_INFO);
+ 
+ 	skb_pull(skb, sizeof(*info));
+@@ -1380,7 +1368,6 @@ static int smp_cmd_ident_addr_info(struct l2cap_conn *conn,
+ 	/* Mark the information as received */
+ 	smp->remote_key_dist &= ~SMP_DIST_ID_KEY;
+ 
+-	SMP_DISALLOW_CMD(smp, SMP_CMD_IDENT_ADDR_INFO);
+ 	if (smp->remote_key_dist & SMP_DIST_SIGN)
+ 		SMP_ALLOW_CMD(smp, SMP_CMD_SIGN_INFO);
+ 
+@@ -1436,8 +1423,6 @@ static int smp_cmd_sign_info(struct l2cap_conn *conn, struct sk_buff *skb)
+ 	/* Mark the information as received */
+ 	smp->remote_key_dist &= ~SMP_DIST_SIGN;
+ 
+-	SMP_DISALLOW_CMD(smp, SMP_CMD_SIGN_INFO);
+-
+ 	skb_pull(skb, sizeof(*rp));
+ 
+ 	hci_dev_lock(hdev);
+@@ -1482,7 +1467,7 @@ static int smp_sig_channel(struct l2cap_chan *chan, struct sk_buff *skb)
+ 	if (code > SMP_CMD_MAX)
+ 		goto drop;
+ 
+-	if (smp && !test_bit(code, &smp->allow_cmd))
++	if (smp && !test_and_clear_bit(code, &smp->allow_cmd))
+ 		goto drop;
+ 
+ 	/* If we don't have a context the only allowed commands are
 -- 
 1.9.3
 
