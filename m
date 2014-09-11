@@ -1,74 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
-From: Bharat Bhusan Panda <bharat.panda@samsung.com>
-To: linux-bluetooth@vger.kernel.org
-References: <015d01cfc20a$c9160a00$5b421e00$@samsung.com>
-In-reply-to: <015d01cfc20a$c9160a00$5b421e00$@samsung.com>
-Subject: RE: Query Regarding new Gatt server attribute database
-Date: Thu, 11 Sep 2014 11:34:57 +0530
-Message-id: <024801cfcd86$58382520$08a86f60$@samsung.com>
-MIME-version: 1.0
-Content-type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.6\))
+Subject: Re: [PATCH] Bluetooth: Expire RPA if encryption fails
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1410412595-12157-1-git-send-email-johan.hedberg@gmail.com>
+Date: Wed, 10 Sep 2014 22:34:04 -0700
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <54D159C8-A048-422B-AC58-6EF5B64177B2@holtmann.org>
+References: <1410412595-12157-1-git-send-email-johan.hedberg@gmail.com>
+To: Johan Hedberg <johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi All, 
+Hi Johan,
 
-Adding one more query to the same.
+> If encryption fails and we're using an RPA it may be because of a
+> conflict with another device. To avoid repeated failures the safest
+> action is to simply mark the RPA as expired so that a new one gets
+> generated as soon as the connection drops.
+> 
+> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+> ---
+> net/bluetooth/hci_event.c | 6 ++++++
+> 1 file changed, 6 insertions(+)
 
-As there is no update to attrib server db, from gatt-dbus.c, can we reuse
-the APIs here to add service, char and desc values to attrib server db?
+patch has been applied to bluetooth-next tree.
 
->From Gatt Application, if it changes its char/descriptor values, how blueZ
-will get to know the same, as there is no propertiesChanged watch set in
-bluez?
+Regards
 
-Is there any plan to update, gatt-dbus.c, or all the functionalities are
-moving to src/shared/ ??
-
-It will be helpful, if anyone can clear above doubts :)
-
-Thanks
-Best Regards,
-Bharat 
-> -----Original Message-----
-> From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-
-> owner@vger.kernel.org] On Behalf Of Bharat Bhusan Panda
-> Sent: Wednesday, August 27, 2014 8:53 PM
-> To: linux-bluetooth@vger.kernel.org
-> Cc: bharat.panda@samsung.com
-> Subject: Query Regarding new Gatt server attribute database
-> 
-> Hi All,
-> 
-> We are working on Gatt server implementation, for Tizen framework with
-> BlueZ
-> 5.20 as base.
-> 
-> We have few query on adding new service info to gatt attrib server
-database,
-> so that remote gatt client can discover the same.
-> 
-> On Calling "RegisterService" method to org.bluez.GattManager1, after
-> getting proper data from GattService1, GattCharacteristic1 and
-> GattDescriptor1 interface, It calls,
-> btd_gatt_add_service(),btd_gatt_add_char() and btd_gatt_add_desc
-> respectively and updates the local_attribute_db.
-> Which should be read and updated, when remote gatt client connects and
-> starts primary services discovery, but this does not happen, instead it
-reads
-> from attrib server db in attrib-server.c.
-> 
-> How can the local_attribute_db in gatt.c, be attached to ATT IO channel,
-as it
-> has been done for attrib-server db in src/attrib-server.c?
-> 
-> Thanks
-> Best Regards,
-> Bharat
-> 
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth"
-in
-> the body of a message to majordomo@vger.kernel.org More majordomo
-> info at  http://vger.kernel.org/majordomo-info.html
+Marcel
 
