@@ -1,81 +1,87 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Thu, 11 Sep 2014 13:00:21 +0200
+From: Alexander Aring <alex.aring@gmail.com>
+To: Martin Townsend <martin.townsend@xsilon.com>
+Cc: Martin Townsend <mtownsend1973@gmail.com>,
+	linux-zigbee-devel@lists.sourceforge.net,
+	linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org,
+	marcel@holtmann.org
+Subject: Re: [PATCH][linux-bluetooth 3/3] 6lowpan: Refactored lowpan_rcv so
+ it's RFC compliant
+Message-ID: <20140911110020.GF20686@omega>
+References: <1410357968-27051-1-git-send-email-martin.townsend@xsilon.com>
+ <1410357968-27051-5-git-send-email-martin.townsend@xsilon.com>
+ <20140911085353.GB19675@omega>
+ <54116BC6.2030609@xsilon.com>
+ <20140911095052.GA20686@omega>
+ <541174D6.7060200@xsilon.com>
+ <20140911103321.GD20686@omega>
+ <54117D66.3070102@xsilon.com>
+ <20140911105505.GE20686@omega>
 MIME-Version: 1.0
-In-Reply-To: <000601cfcda9$86b83520$94289f60$@samsung.com>
-References: <1410352944-16586-1-git-send-email-gowtham.ab@samsung.com>
-	<3030038.LEiDkyyyur@uw000953>
-	<000601cfcda9$86b83520$94289f60$@samsung.com>
-Date: Thu, 11 Sep 2014 14:33:31 +0300
-Message-ID: <CABBYNZJw5Hsbn_Dn77UeBmOafFeLeZ-uMejJS7uWiM+c3oBPQg@mail.gmail.com>
-Subject: Re: [PATCH 3/3] android/hal-utils.c : Fix null pointer dereference
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Gowtham Anandha Babu <gowtham.ab@samsung.com>
-Cc: Szymon Janc <szymon.janc@tieto.com>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	Dmitry Kasatkin <d.kasatkin@samsung.com>,
-	Bharat Panda <bharat.panda@samsung.com>, cpgs@samsung.com
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20140911105505.GE20686@omega>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Martin,
 
-On Thu, Sep 11, 2014 at 1:16 PM, Gowtham Anandha Babu
-<gowtham.ab@samsung.com> wrote:
-> Hi,
->
->> -----Original Message-----
->> From: Szymon Janc [mailto:szymon.janc@tieto.com]
->> Sent: Thursday, September 11, 2014 3:11 PM
->> To: gowtham babu
->> Cc: linux-bluetooth@vger.kernel.org; d.kasatkin@samsung.com;
->> bharat.panda@samsung.com; cpgs@samsung.com
->> Subject: Re: [PATCH 3/3] android/hal-utils.c : Fix null pointer dereference
->>
->> Hi,
->>
->> On Wednesday 10 of September 2014 18:12:24 gowtham babu wrote:
->> > Handles the possible null pointer dereference: bd_addr by checking it
->> against null.
->> > ---
->> >  android/hal-utils.c | 4 +++-
->> >  1 file changed, 3 insertions(+), 1 deletion(-)
->> >
->> > diff --git a/android/hal-utils.c b/android/hal-utils.c index
->> > ceefefc..64ab5a1 100644
->> > --- a/android/hal-utils.c
->> > +++ b/android/hal-utils.c
->> > @@ -166,11 +166,13 @@ int int2str_findstr(const char *str, const struct
->> int2str m[])
->> >   */
->> >  const char *bt_bdaddr_t2str(const bt_bdaddr_t *bd_addr, char *buf)  {
->> > -   const uint8_t *p = bd_addr->address;
->> > +   const uint8_t *p;
->> >
->> >     if (!bd_addr)
->> >             return strcpy(buf, "NULL");
->> >
->> > +   p = bd_addr->address;
->> > +
->> >     snprintf(buf, MAX_ADDR_STR_LEN,
->> "%02x:%02x:%02x:%02x:%02x:%02x",
->> >                                     p[0], p[1], p[2], p[3], p[4], p[5]);
->> >
->>
->> This patch looks OK to me, but I have one question before applying it.
->>
->> Do you really want your name to be visible in git history as it is in this email ie.
->> without any capital letters?
->>
->> --
->> Best regards,
->> Szymon Janc
->
->
-> Sorry for the top posting. Regarding the git name, that’s  OK.
+On Thu, Sep 11, 2014 at 12:55:05PM +0200, Alexander Aring wrote:
+> On Thu, Sep 11, 2014 at 11:45:58AM +0100, Martin Townsend wrote:
+> > Hi Alex,
+> > 
+> > On 11/09/14 11:33, Alexander Aring wrote:
+> > > On Thu, Sep 11, 2014 at 11:09:26AM +0100, Martin Townsend wrote:
+> > >> Hi Alex,
+> > >>
+> > >> Reposting to everyone this time :)
+> > >>
+> > > ok
+> > > ...
+> > >>>>> I know this issue and we should not do that in this way.
+> > >>>>>
+> > >>>>> Why?
+> > >>>>>
+> > >>>>> Because this works only for fragmentation with IPHC, for example if we
+> > >>>>> support mesh or Broadcast or HC1 compression. We should call after
+> > >>>>> successfully reassembled "means lowpan_frag_rcv returns 1" the lowpan_rcv again.
+> > >>>>> So this is a recursion and we don't should use recursion to much, but it
+> > >>>>> should only be one recursion, so I think that's okay. :-)
+> > >>>> The spec says that the headers of the 6LoWPAN frame must fit in the first fragment.  You need to process these headers to get to the fragmentation header, this is why the code is this way.
+> > >>> yes this is for IPHC dispatch values your code works, I don't want to
+> > >>> say that it doesn't work. Because fragmentation is something to
+> > >>> reconstruct the full payload, we should first evaluate the fragmentation
+> > >>> dispatches and then all others. To be sure that we can use fragmentation
+> > >>> on any dispatch value which is not the fragmentation dispatch values.
+> > >>> :-)
+> > >>>
+> > >>> Simple move it before nalp check. Maybe somebody fragment something and
+> > >>> the dispatch value after fragmentation is nalp. I know it should catch
+> > >>> the default branch above, but it's a little bit cleaner. I hope you are
+> > >>> in the same opinion.
+> > >> I think it should stay where it is.
+> > >> From RFC 4944
+> > >> NALP: Specifies that the following bits are not a part of the LoWPAN
+> > >> encapsulation, and any LoWPAN node that encounters a dispatch
+> > >> value of 00xxxxxx shall discard the packet. Other non-LoWPAN
+> > >> protocols that wish to coexist with LoWPAN nodes should include a
+> > >> byte matching this pattern immediately following the 802.15.4.
+> > >> header.
+> > >>
+> > >> The last sentence implies that this NALP code is expected as the first byte following the MAC Header.  If a NALP is encountered after processing the 6LoWPAN header stack then it will be treated as an unknown compression type.
+> > >>
+> > > yes. But the issue is more a reassembled fragmentet 6LoWPAN packet have
+> > > a dispatch value. This dispatch value should not NALP, but maybe
+> > > somebody did it and then we should make the same code like what we do
+> > > for NALP dispatches without fragmentation.
+> > A NALP dispatch byte should be the first byte in the MAC payload that allows other protocols to co-exist with 6LoWPAN.  I think Jennet use this to insert their own protocol between 802.15.4 and 6LoWPAN.  So we have to check for this before we do anything.  Having a NALP byte after re-assembly isn't valid and should be treated as an unknown compression type in my opinion.
+> > 
+> 
+> Okay, I agree with you with the NALP dispatch. What's about the others.
+> 
+ok. This is out of interest because we don't support all others than
+IPV6 and IPHC. The important thing is, if we don't know the dispatch
+after fragmentation -> drop it.
 
-Just be consistent, in this one you actually are using capital letter
-and a middle name.
+We will think about that issue, if somebody implements that.
 
-
--- 
-Luiz Augusto von Dentz
+- Alex
