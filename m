@@ -1,244 +1,326 @@
 Return-Path: <cyrus@holtmann.org>
-From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] android/tester-gatt: Minor coding style fix
-Date: Fri, 12 Sep 2014 12:13:20 +0200
-Message-Id: <1410516800-1984-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+MIME-Version: 1.0
+In-Reply-To: <1410438912-14213-1-git-send-email-vikram.pal@samsung.com>
+References: <1410438912-14213-1-git-send-email-vikram.pal@samsung.com>
+Date: Fri, 12 Sep 2014 13:07:03 +0300
+Message-ID: <CABBYNZKckUXadzuxjoiSfbGYmt9nPLSLp1fHDafBqOtVSyZaOg@mail.gmail.com>
+Subject: Re: [PATCH 1/2] Monitor: Modify design of AVRCP callback functions
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Vikrampal Yadav <vikram.pal@samsung.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	Dmitry Kasatkin <d.kasatkin@samsung.com>, cpgs@samsung.com
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- android/tester-gatt.c | 69 ++++++++++++++++++++-------------------------------
- 1 file changed, 27 insertions(+), 42 deletions(-)
+Hi Vikram,
 
-diff --git a/android/tester-gatt.c b/android/tester-gatt.c
-index f22cdae..2292f87 100644
---- a/android/tester-gatt.c
-+++ b/android/tester-gatt.c
-@@ -21,8 +21,8 @@
- #include "tester-main.h"
- #include "src/shared/util.h"
- 
--#define L2CAP_ATT_EXCHANGE_MTU_REQ		0x02
--#define L2CAP_ATT_EXCHANGE_MTU_RSP		0x03
-+#define L2CAP_ATT_EXCHANGE_MTU_REQ	0x02
-+#define L2CAP_ATT_EXCHANGE_MTU_RSP	0x03
- 
- #define GATT_STATUS_SUCCESS	0x00000000
- #define GATT_STATUS_FAILURE	0x00000101
-@@ -35,10 +35,9 @@
- 
- #define data(args...) ((const unsigned char[]) { args })
- 
--#define raw_pdu(args...)					\
--	{							\
--		.data = data(args),				\
--		.size = sizeof(data(args)),			\
-+#define raw_pdu(args...) { \
-+		.data = data(args), \
-+		.size = sizeof(data(args)), \
- 	}
- 
- #define end_pdu { .data = NULL }
-@@ -652,8 +651,7 @@ static struct test_case test_cases[] = {
- 		CLLBACK_GATTC_SCAN_RES(prop_emu_remotes_default_set, 1, TRUE),
- 		ACTION_SUCCESS(gatt_client_stop_scan_action,
- 							INT_TO_PTR(CLIENT1_ID)),
--		ACTION_SUCCESS(gatt_client_connect_action,
--							&client1_conn_req),
-+		ACTION_SUCCESS(gatt_client_connect_action, &client1_conn_req),
- 		CALLBACK_GATTC_CONNECT(GATT_STATUS_SUCCESS,
- 						prop_emu_remotes_default_set,
- 						CONN1_ID, CLIENT1_ID),
-@@ -673,8 +671,7 @@ static struct test_case test_cases[] = {
- 		CLLBACK_GATTC_SCAN_RES(prop_emu_remotes_default_set, 1, TRUE),
- 		ACTION_SUCCESS(gatt_client_stop_scan_action,
- 							INT_TO_PTR(CLIENT1_ID)),
--		ACTION_SUCCESS(gatt_client_connect_action,
--							&client1_conn_req),
-+		ACTION_SUCCESS(gatt_client_connect_action, &client1_conn_req),
- 		CALLBACK_GATTC_CONNECT(GATT_STATUS_SUCCESS,
- 						prop_emu_remotes_default_set,
- 						CONN1_ID, CLIENT1_ID),
-@@ -811,8 +808,7 @@ static struct test_case test_cases[] = {
- 		CLLBACK_GATTC_SCAN_RES(prop_emu_remotes_default_set, 1, TRUE),
- 		ACTION_SUCCESS(gatt_client_stop_scan_action,
- 							INT_TO_PTR(CLIENT1_ID)),
--		ACTION_SUCCESS(gatt_client_connect_action,
--							&client1_conn_req),
-+		ACTION_SUCCESS(gatt_client_connect_action, &client1_conn_req),
- 		CALLBACK_GATTC_CONNECT(GATT_STATUS_SUCCESS,
- 						prop_emu_remotes_default_set,
- 						CONN1_ID, CLIENT1_ID),
-@@ -836,8 +832,7 @@ static struct test_case test_cases[] = {
- 		CLLBACK_GATTC_SCAN_RES(prop_emu_remotes_default_set, 1, TRUE),
- 		ACTION_SUCCESS(gatt_client_stop_scan_action,
- 							INT_TO_PTR(CLIENT1_ID)),
--		ACTION_SUCCESS(gatt_client_connect_action,
--							&client1_conn_req),
-+		ACTION_SUCCESS(gatt_client_connect_action, &client1_conn_req),
- 		CALLBACK_GATTC_CONNECT(GATT_STATUS_SUCCESS,
- 						prop_emu_remotes_default_set,
- 						CONN1_ID, CLIENT1_ID),
-@@ -862,8 +857,7 @@ static struct test_case test_cases[] = {
- 		CLLBACK_GATTC_SCAN_RES(prop_emu_remotes_default_set, 1, TRUE),
- 		ACTION_SUCCESS(gatt_client_stop_scan_action,
- 							INT_TO_PTR(CLIENT1_ID)),
--		ACTION_SUCCESS(gatt_client_connect_action,
--							&client1_conn_req),
-+		ACTION_SUCCESS(gatt_client_connect_action, &client1_conn_req),
- 		CALLBACK_GATTC_CONNECT(GATT_STATUS_SUCCESS,
- 						prop_emu_remotes_default_set,
- 						CONN1_ID, CLIENT1_ID),
-@@ -886,8 +880,7 @@ static struct test_case test_cases[] = {
- 		CLLBACK_GATTC_SCAN_RES(prop_emu_remotes_default_set, 1, TRUE),
- 		ACTION_SUCCESS(gatt_client_stop_scan_action,
- 							INT_TO_PTR(CLIENT1_ID)),
--		ACTION_SUCCESS(gatt_client_connect_action,
--							&client1_conn_req),
-+		ACTION_SUCCESS(gatt_client_connect_action, &client1_conn_req),
- 		CALLBACK_GATTC_CONNECT(GATT_STATUS_SUCCESS,
- 						prop_emu_remotes_default_set,
- 						CONN1_ID, CLIENT1_ID),
-@@ -914,8 +907,7 @@ static struct test_case test_cases[] = {
- 		CLLBACK_GATTC_SCAN_RES(prop_emu_remotes_default_set, 1, TRUE),
- 		ACTION_SUCCESS(gatt_client_stop_scan_action,
- 							INT_TO_PTR(CLIENT1_ID)),
--		ACTION_SUCCESS(gatt_client_connect_action,
--							&client1_conn_req),
-+		ACTION_SUCCESS(gatt_client_connect_action, &client1_conn_req),
- 		CALLBACK_GATTC_CONNECT(GATT_STATUS_SUCCESS,
- 						prop_emu_remotes_default_set,
- 						CONN1_ID, CLIENT1_ID),
-@@ -924,7 +916,8 @@ static struct test_case test_cases[] = {
- 		ACTION_FAIL(gatt_client_get_characteristic_action,
- 							&get_char_data_2),
- 		CALLBACK_GATTC_GET_CHARACTERISTIC_CB(GATT_STATUS_FAILURE,
--				CONN1_ID, &service_2, NULL, 0),
-+							CONN1_ID, &service_2,
-+							NULL, 0),
- 		ACTION_SUCCESS(bluetooth_disable_action, NULL),
- 		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_OFF),
- 	),
-@@ -942,8 +935,7 @@ static struct test_case test_cases[] = {
- 		CLLBACK_GATTC_SCAN_RES(prop_emu_remotes_default_set, 1, TRUE),
- 		ACTION_SUCCESS(gatt_client_stop_scan_action,
- 							INT_TO_PTR(CLIENT1_ID)),
--		ACTION_SUCCESS(gatt_client_connect_action,
--							&client1_conn_req),
-+		ACTION_SUCCESS(gatt_client_connect_action, &client1_conn_req),
- 		CALLBACK_GATTC_CONNECT(GATT_STATUS_SUCCESS,
- 						prop_emu_remotes_default_set,
- 						CONN1_ID, CLIENT1_ID),
-@@ -968,14 +960,12 @@ static struct test_case test_cases[] = {
- 		ACTION_SUCCESS(emu_set_connect_cb_action, gatt_conn_cb),
- 		ACTION_SUCCESS(gatt_client_register_action, &client_app_uuid),
- 		CALLBACK_STATUS(CB_GATTC_REGISTER_CLIENT, BT_STATUS_SUCCESS),
--
- 		ACTION_SUCCESS(gatt_client_start_scan_action,
- 							INT_TO_PTR(CLIENT1_ID)),
- 		CLLBACK_GATTC_SCAN_RES(prop_emu_remotes_default_set, 1, TRUE),
- 		ACTION_SUCCESS(gatt_client_stop_scan_action,
- 							INT_TO_PTR(CLIENT1_ID)),
--		ACTION_SUCCESS(gatt_client_connect_action,
--							&client1_conn_req),
-+		ACTION_SUCCESS(gatt_client_connect_action, &client1_conn_req),
- 		CALLBACK_GATTC_CONNECT(GATT_STATUS_SUCCESS,
- 						prop_emu_remotes_default_set,
- 						CONN1_ID, CLIENT1_ID),
-@@ -984,13 +974,16 @@ static struct test_case test_cases[] = {
- 		ACTION_SUCCESS(gatt_client_get_characteristic_action,
- 							&get_char_data_1),
- 		CALLBACK_GATTC_GET_CHARACTERISTIC_CB(GATT_STATUS_SUCCESS,
--				CONN1_ID, &service_1, &characteristic_1, 4),
-+							CONN1_ID, &service_1,
-+							&characteristic_1, 4),
- 		ACTION_SUCCESS(gatt_client_get_descriptor, &get_desc_data_1),
- 		CALLBACK_GATTC_GET_DESCRIPTOR(GATT_STATUS_SUCCESS, CONN1_ID,
--				&service_1, &characteristic_1, &desc_1),
-+						&service_1, &characteristic_1,
-+						&desc_1),
- 		ACTION_SUCCESS(gatt_client_get_descriptor, &get_desc_data_2),
- 		CALLBACK_GATTC_GET_DESCRIPTOR(GATT_STATUS_SUCCESS, CONN1_ID,
--					&service_1, &characteristic_1, &desc_2),
-+						&service_1, &characteristic_1,
-+						&desc_2),
- 		ACTION_SUCCESS(bluetooth_disable_action, NULL),
- 		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_OFF),
- 	),
-@@ -1003,14 +996,12 @@ static struct test_case test_cases[] = {
- 		ACTION_SUCCESS(emu_set_connect_cb_action, gatt_conn_cb),
- 		ACTION_SUCCESS(gatt_client_register_action, &client_app_uuid),
- 		CALLBACK_STATUS(CB_GATTC_REGISTER_CLIENT, BT_STATUS_SUCCESS),
--
- 		ACTION_SUCCESS(gatt_client_start_scan_action,
- 							INT_TO_PTR(CLIENT1_ID)),
- 		CLLBACK_GATTC_SCAN_RES(prop_emu_remotes_default_set, 1, TRUE),
- 		ACTION_SUCCESS(gatt_client_stop_scan_action,
- 							INT_TO_PTR(CLIENT1_ID)),
--		ACTION_SUCCESS(gatt_client_connect_action,
--							&client1_conn_req),
-+		ACTION_SUCCESS(gatt_client_connect_action, &client1_conn_req),
- 		CALLBACK_GATTC_CONNECT(GATT_STATUS_SUCCESS,
- 						prop_emu_remotes_default_set,
- 						CONN1_ID, CLIENT1_ID),
-@@ -1035,14 +1026,12 @@ static struct test_case test_cases[] = {
- 		ACTION_SUCCESS(emu_set_connect_cb_action, gatt_conn_cb),
- 		ACTION_SUCCESS(gatt_client_register_action, &client_app_uuid),
- 		CALLBACK_STATUS(CB_GATTC_REGISTER_CLIENT, BT_STATUS_SUCCESS),
--
- 		ACTION_SUCCESS(gatt_client_start_scan_action,
- 							INT_TO_PTR(CLIENT1_ID)),
- 		CLLBACK_GATTC_SCAN_RES(prop_emu_remotes_default_set, 1, TRUE),
- 		ACTION_SUCCESS(gatt_client_stop_scan_action,
- 							INT_TO_PTR(CLIENT1_ID)),
--		ACTION_SUCCESS(gatt_client_connect_action,
--							&client1_conn_req),
-+		ACTION_SUCCESS(gatt_client_connect_action, &client1_conn_req),
- 		CALLBACK_GATTC_CONNECT(GATT_STATUS_SUCCESS,
- 						prop_emu_remotes_default_set,
- 						CONN1_ID, CLIENT1_ID),
-@@ -1063,14 +1052,12 @@ static struct test_case test_cases[] = {
- 		ACTION_SUCCESS(emu_set_connect_cb_action, gatt_conn_cb),
- 		ACTION_SUCCESS(gatt_client_register_action, &client_app_uuid),
- 		CALLBACK_STATUS(CB_GATTC_REGISTER_CLIENT, BT_STATUS_SUCCESS),
--
- 		ACTION_SUCCESS(gatt_client_start_scan_action,
- 							INT_TO_PTR(CLIENT1_ID)),
- 		CLLBACK_GATTC_SCAN_RES(prop_emu_remotes_default_set, 1, TRUE),
- 		ACTION_SUCCESS(gatt_client_stop_scan_action,
- 							INT_TO_PTR(CLIENT1_ID)),
--		ACTION_SUCCESS(gatt_client_connect_action,
--							&client1_conn_req),
-+		ACTION_SUCCESS(gatt_client_connect_action, &client1_conn_req),
- 		CALLBACK_GATTC_CONNECT(GATT_STATUS_SUCCESS,
- 						prop_emu_remotes_default_set,
- 						CONN1_ID, CLIENT1_ID),
-@@ -1091,14 +1078,12 @@ static struct test_case test_cases[] = {
- 		ACTION_SUCCESS(emu_set_connect_cb_action, gatt_conn_cb),
- 		ACTION_SUCCESS(gatt_client_register_action, &client_app_uuid),
- 		CALLBACK_STATUS(CB_GATTC_REGISTER_CLIENT, BT_STATUS_SUCCESS),
--
- 		ACTION_SUCCESS(gatt_client_start_scan_action,
- 							INT_TO_PTR(CLIENT1_ID)),
- 		CLLBACK_GATTC_SCAN_RES(prop_emu_remotes_default_set, 1, TRUE),
- 		ACTION_SUCCESS(gatt_client_stop_scan_action,
- 							INT_TO_PTR(CLIENT1_ID)),
--		ACTION_SUCCESS(gatt_client_connect_action,
--							&client1_conn_req),
-+		ACTION_SUCCESS(gatt_client_connect_action, &client1_conn_req),
- 		CALLBACK_GATTC_CONNECT(GATT_STATUS_SUCCESS,
- 						prop_emu_remotes_default_set,
- 						CONN1_ID, CLIENT1_ID),
-@@ -1106,7 +1091,7 @@ static struct test_case test_cases[] = {
- 		CALLBACK_GATTC_SEARCH_COMPLETE(GATT_STATUS_SUCCESS, CONN1_ID),
- 		ACTION_SUCCESS(gatt_client_get_included, &get_incl_data_1),
- 		CALLBACK_GATTC_GET_INCLUDED(GATT_STATUS_FAILURE, CONN1_ID,
--						&service_1, NULL),
-+							&service_1, NULL),
- 		ACTION_SUCCESS(bluetooth_disable_action, NULL),
- 		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_OFF),
- 	),
+On Thu, Sep 11, 2014 at 3:35 PM, Vikrampal Yadav <vikram.pal@samsung.com> wrote:
+> Modified the design of AVRCP callback functions.
+> ---
+>  monitor/avctp.c | 94 +++++++++++++++++++++++++++++++++++++++------------------
+>  1 file changed, 65 insertions(+), 29 deletions(-)
+>
+> diff --git a/monitor/avctp.c b/monitor/avctp.c
+> index c7e242b..41b6380 100644
+> --- a/monitor/avctp.c
+> +++ b/monitor/avctp.c
+> @@ -158,6 +158,12 @@
+>  #define AVRCP_ATTRIBUTE_SHUFFLE                0x03
+>  #define AVRCP_ATTRIBUTE_SCAN           0x04
+>
+> +struct avctp_frame {
+> +       uint8_t hdr;
+> +       uint8_t pt;
+> +       struct l2cap_frame *l2cap_frame;
+> +};
+> +
+>  static const char *ctype2str(uint8_t ctype)
+>  {
+>         switch (ctype & 0x0f) {
+> @@ -517,15 +523,19 @@ static const char *charset2str(uint16_t charset)
+>         }
+>  }
+>
+> -static bool avrcp_passthrough_packet(struct l2cap_frame *frame)
+> +static bool avrcp_passthrough_packet(struct avctp_frame *avctp_frame)
+>  {
+> +       struct l2cap_frame *frame = avctp_frame->l2cap_frame;
+> +
+>         packet_hexdump(frame->data, frame->size);
+>         return true;
+>  }
+>
+> -static bool avrcp_get_capabilities(struct l2cap_frame *frame, uint8_t ctype,
+> -                                               uint8_t len, uint8_t indent)
+> +static bool avrcp_get_capabilities(struct avctp_frame *avctp_frame,
+> +                                       uint8_t ctype, uint8_t len,
+> +                                       uint8_t indent)
+>  {
+> +       struct l2cap_frame *frame = avctp_frame->l2cap_frame;
+>         uint8_t cap, count;
+>         int i;
+>
+> @@ -576,10 +586,11 @@ static bool avrcp_get_capabilities(struct l2cap_frame *frame, uint8_t ctype,
+>         return true;
+>  }
+>
+> -static bool avrcp_list_player_attributes(struct l2cap_frame *frame,
+> +static bool avrcp_list_player_attributes(struct avctp_frame *avctp_frame,
+>                                                 uint8_t ctype, uint8_t len,
+>                                                 uint8_t indent)
+>  {
+> +       struct l2cap_frame *frame = avctp_frame->l2cap_frame;
+>         uint8_t num;
+>         int i;
+>
+> @@ -604,9 +615,11 @@ static bool avrcp_list_player_attributes(struct l2cap_frame *frame,
+>         return true;
+>  }
+>
+> -static bool avrcp_list_player_values(struct l2cap_frame *frame, uint8_t ctype,
+> -                                               uint8_t len, uint8_t indent)
+> +static bool avrcp_list_player_values(struct avctp_frame *avctp_frame,
+> +                                       uint8_t ctype, uint8_t len,
+> +                                       uint8_t indent)
+>  {
+> +       struct l2cap_frame *frame = avctp_frame->l2cap_frame;
+>         static uint8_t attr = 0;
+>         uint8_t num;
+>
+> @@ -640,10 +653,11 @@ response:
+>         return true;
+>  }
+>
+> -static bool avrcp_get_current_player_value(struct l2cap_frame *frame,
+> +static bool avrcp_get_current_player_value(struct avctp_frame *avctp_frame,
+>                                                 uint8_t ctype, uint8_t len,
+>                                                 uint8_t indent)
+>  {
+> +       struct l2cap_frame *frame = avctp_frame->l2cap_frame;
+>         uint8_t num;
+>
+>         if (!l2cap_frame_get_u8(frame, &num))
+> @@ -688,9 +702,11 @@ response:
+>         return true;
+>  }
+>
+> -static bool avrcp_set_player_value(struct l2cap_frame *frame, uint8_t ctype,
+> -                                       uint8_t len, uint8_t indent)
+> +static bool avrcp_set_player_value(struct avctp_frame *avctp_frame,
+> +                                       uint8_t ctype, uint8_t len,
+> +                                       uint8_t indent)
+>  {
+> +       struct l2cap_frame *frame = avctp_frame->l2cap_frame;
+>         uint8_t num;
+>
+>         if (ctype > AVC_CTYPE_GENERAL_INQUIRY)
+> @@ -720,10 +736,11 @@ static bool avrcp_set_player_value(struct l2cap_frame *frame, uint8_t ctype,
+>         return true;
+>  }
+>
+> -static bool avrcp_get_player_attribute_text(struct l2cap_frame *frame,
+> +static bool avrcp_get_player_attribute_text(struct avctp_frame *avctp_frame,
+>                                                 uint8_t ctype, uint8_t len,
+>                                                 uint8_t indent)
+>  {
+> +       struct l2cap_frame *frame = avctp_frame->l2cap_frame;
+>         uint8_t num;
+>
+>         if (!l2cap_frame_get_u8(frame, &num))
+> @@ -783,10 +800,11 @@ response:
+>         return true;
+>  }
+>
+> -static bool avrcp_get_player_value_text(struct l2cap_frame *frame,
+> +static bool avrcp_get_player_value_text(struct avctp_frame *avctp_frame,
+>                                         uint8_t ctype, uint8_t len,
+>                                         uint8_t indent)
+>  {
+> +       struct l2cap_frame *frame = avctp_frame->l2cap_frame;
+>         static uint8_t attr = 0;
+>         uint8_t num;
+>
+> @@ -858,9 +876,11 @@ response:
+>         return true;
+>  }
+>
+> -static bool avrcp_displayable_charset(struct l2cap_frame *frame, uint8_t ctype,
+> -                                       uint8_t len, uint8_t indent)
+> +static bool avrcp_displayable_charset(struct avctp_frame *avctp_frame,
+> +                                       uint8_t ctype, uint8_t len,
+> +                                       uint8_t indent)
+>  {
+> +       struct l2cap_frame *frame = avctp_frame->l2cap_frame;
+>         uint8_t num;
+>
+>         if (ctype > AVC_CTYPE_GENERAL_INQUIRY)
+> @@ -886,8 +906,8 @@ static bool avrcp_displayable_charset(struct l2cap_frame *frame, uint8_t ctype,
+>
+>  struct avrcp_ctrl_pdu_data {
+>         uint8_t pduid;
+> -       bool (*func) (struct l2cap_frame *frame, uint8_t ctype, uint8_t len,
+> -                                                       uint8_t indent);
+> +       bool (*func) (struct avctp_frame *avctp_frame, uint8_t ctype,
+> +                                               uint8_t len, uint8_t indent);
+>  };
+>
+>  static const struct avrcp_ctrl_pdu_data avrcp_ctrl_pdu_table[] = {
+> @@ -915,9 +935,10 @@ static bool avrcp_rejected_packet(struct l2cap_frame *frame, uint8_t indent)
+>         return true;
+>  }
+>
+> -static bool avrcp_pdu_packet(struct l2cap_frame *frame, uint8_t ctype,
+> +static bool avrcp_pdu_packet(struct avctp_frame *avctp_frame, uint8_t ctype,
+>                                                                 uint8_t indent)
+>  {
+> +       struct l2cap_frame *frame = avctp_frame->l2cap_frame;
+>         uint8_t pduid, pt;
+>         uint16_t len;
+>         int i;
+> @@ -929,6 +950,9 @@ static bool avrcp_pdu_packet(struct l2cap_frame *frame, uint8_t ctype,
+>         if (!l2cap_frame_get_u8(frame, &pt))
+>                 return false;
+>
+> +       /* For further use */
+> +       avctp_frame->pt = pt;
+> +
+>         if (!l2cap_frame_get_be16(frame, &len))
+>                 return false;
+>
+> @@ -953,11 +977,13 @@ static bool avrcp_pdu_packet(struct l2cap_frame *frame, uint8_t ctype,
+>                 return true;
+>         }
+>
+> -       return ctrl_pdu_data->func(frame, ctype, len, indent + 2);
+> +       return ctrl_pdu_data->func(avctp_frame, ctype, len, indent + 2);
+>  }
+>
+> -static bool avrcp_control_packet(struct l2cap_frame *frame)
+> +static bool avrcp_control_packet(struct avctp_frame *avctp_frame)
+>  {
+> +       struct l2cap_frame *frame = avctp_frame->l2cap_frame;
+> +
+>         uint8_t ctype, address, subunit, opcode, company[3], indent = 2;
+>
+>         if (!l2cap_frame_get_u8(frame, &ctype) ||
+> @@ -988,7 +1014,7 @@ static bool avrcp_control_packet(struct l2cap_frame *frame)
+>
+>         switch (opcode) {
+>         case 0x7c:
+> -               return avrcp_passthrough_packet(frame);
+> +               return avrcp_passthrough_packet(avctp_frame);
+>         case 0x00:
+>                 if (!l2cap_frame_get_u8(frame, &company[0]) ||
+>                                 !l2cap_frame_get_u8(frame, &company[1]) ||
+> @@ -998,29 +1024,32 @@ static bool avrcp_control_packet(struct l2cap_frame *frame)
+>                 print_field("%*cCompany ID: 0x%02x%02x%02x", indent, ' ',
+>                                         company[0], company[1], company[2]);
+>
+> -               return avrcp_pdu_packet(frame, ctype, 10);
+> +               return avrcp_pdu_packet(avctp_frame, ctype, 10);
+>         default:
+>                 packet_hexdump(frame->data, frame->size);
+>                 return true;
+>         }
+>  }
+>
+> -static bool avrcp_browsing_packet(struct l2cap_frame *frame, uint8_t hdr)
+> +static bool avrcp_browsing_packet(struct avctp_frame *avctp_frame)
+>  {
+> +       struct l2cap_frame *frame = avctp_frame->l2cap_frame;
+> +
+>         packet_hexdump(frame->data, frame->size);
+>         return true;
+>  }
+>
+> -static void avrcp_packet(struct l2cap_frame *frame, uint8_t hdr)
+> +static void avrcp_packet(struct avctp_frame *avctp_frame)
+>  {
+> +       struct l2cap_frame *frame = avctp_frame->l2cap_frame;
+>         bool ret;
+>
+>         switch (frame->psm) {
+>         case 0x17:
+> -               ret = avrcp_control_packet(frame);
+> +               ret = avrcp_control_packet(avctp_frame);
+>                 break;
+>         case 0x1B:
+> -               ret = avrcp_browsing_packet(frame, hdr);
+> +               ret = avrcp_browsing_packet(avctp_frame);
+>                 break;
+>         default:
+>                 packet_hexdump(frame->data, frame->size);
+> @@ -1037,18 +1066,25 @@ void avctp_packet(const struct l2cap_frame *frame)
+>  {
+>         uint8_t hdr;
+>         uint16_t pid;
+> -       struct l2cap_frame avctp_frame;
+> +       struct l2cap_frame l2cap_frame;
+> +       struct avctp_frame avctp_frame;
+>         const char *pdu_color;
+>
+> -       l2cap_frame_pull(&avctp_frame, frame, 0);
+> +       l2cap_frame_pull(&l2cap_frame, frame, 0);
+
+I think it better to use only one variable, avctp_frame, and change
+the struct to actually have the data inline instead of a pointer:
+
+struct avctp_frame {
+   uint8_t hdr;
+   uint8_t pt;
+   struct l2cap_frame l2cap_frame; /* note that is not a pointer */
+}
+
+>
+> -       if (!l2cap_frame_get_u8(&avctp_frame, &hdr) ||
+> -                               !l2cap_frame_get_be16(&avctp_frame, &pid)) {
+> +       /* For further use */
+> +       avctp_frame.l2cap_frame = &l2cap_frame;
+> +
+> +       if (!l2cap_frame_get_u8(&l2cap_frame, &hdr) ||
+> +                       !l2cap_frame_get_be16(&l2cap_frame, &pid)) {
+>                 print_text(COLOR_ERROR, "frame too short");
+>                 packet_hexdump(frame->data, frame->size);
+>                 return;
+>         }
+
+You should be able to use the fields from the struct directly and
+eliminate the user of extra variable here.
+
+> +       /* For further use */
+> +       avctp_frame.hdr = hdr;
+> +
+>         if (frame->in)
+>                 pdu_color = COLOR_MAGENTA;
+>         else
+> @@ -1061,7 +1097,7 @@ void avctp_packet(const struct l2cap_frame *frame)
+>                                 hdr & 0x0c, hdr >> 4, pid);
+>
+>         if (pid == 0x110e || pid == 0x110c)
+> -               avrcp_packet(&avctp_frame, hdr);
+> +               avrcp_packet(&avctp_frame);
+>         else
+>                 packet_hexdump(frame->data, frame->size);
+
+pid should probably be part of the avctp_frame as well.
+
+>  }
+> --
+> 1.9.1
+
+Btw, this patch does not apply when checking with check patch:
+
+Applying: Monitor: Modify design of AVRCP callback functions
+bluez/.git/rebase-apply/patch:132: trailing whitespace.
+uint8_t ctype, uint8_t len,
+fatal: 1 line adds whitespace errors.
+
+Please add a hook to check patch, for example what I use is:
+
+exec git diff --cached | checkpatch.pl -q --no-signoff --ignore
+CAMELCASE,NEW_TYPEDEFS,INITIALISED_STATIC,GLOBAL_INITIALISERS,PREFER_PACKED,SPACING,FSF_MAILING_ADDRESS,TRAILING_STATEMENTS,RETURN_VOID,FILE_PATH_CHANGES
+ --show-types -
+
 -- 
-1.9.3
-
+Luiz Augusto von Dentz
