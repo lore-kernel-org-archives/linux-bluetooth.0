@@ -1,33 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.6\))
-Subject: Re: [PATCH] Bluetooth: Fix re-setting RPA as expired when deferring update
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1410539512-3473-1-git-send-email-johan.hedberg@gmail.com>
-Date: Fri, 12 Sep 2014 09:36:11 -0700
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <2963E6DE-8EE4-4411-8AEB-F4A9A8EF6108@holtmann.org>
-References: <1410539512-3473-1-git-send-email-johan.hedberg@gmail.com>
-To: Johan Hedberg <johan.hedberg@gmail.com>
+From: johan.hedberg@gmail.com
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] Bluetooth: Fix re-setting RPA as expired when deferring update
+Date: Fri, 12 Sep 2014 09:31:52 -0700
+Message-Id: <1410539512-3473-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+From: Johan Hedberg <johan.hedberg@intel.com>
 
-> The hci_update_random_address will clear the RPA_EXPIRED flag and
-> proceed with setting a new one if the flag was set. However, the
-> set_random_addr() function that is called may choose to defer the update
-> to a later moment. In such a case the flag would incorrectly remain
-> unset unless set_random_addr() re-sets it. This patch fixes the issue.
-> 
-> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
-> ---
-> net/bluetooth/hci_core.c | 1 +
-> 1 file changed, 1 insertion(+)
+The hci_update_random_address will clear the RPA_EXPIRED flag and
+proceed with setting a new one if the flag was set. However, the
+set_random_addr() function that is called may choose to defer the update
+to a later moment. In such a case the flag would incorrectly remain
+unset unless set_random_addr() re-sets it. This patch fixes the issue.
 
-patch has been applied to bluetooth-next tree.
+Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+---
+ net/bluetooth/hci_core.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-Regards
-
-Marcel
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index 0d3782ad9a5b..067526d9680d 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -3872,6 +3872,7 @@ static void set_random_addr(struct hci_request *req, bdaddr_t *rpa)
+ 	if (test_bit(HCI_LE_ADV, &hdev->dev_flags) ||
+ 	    hci_conn_hash_lookup_state(hdev, LE_LINK, BT_CONNECT)) {
+ 		BT_DBG("Deferring random address update");
++		set_bit(HCI_RPA_EXPIRED, &hdev->dev_flags);
+ 		return;
+ 	}
+ 
+-- 
+1.9.3
 
