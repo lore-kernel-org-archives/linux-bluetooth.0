@@ -1,48 +1,80 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH] core: Fix missing channel unref on cached session watch
-Date: Fri, 12 Sep 2014 10:54:07 +0200
-Message-Id: <1410512047-15547-1-git-send-email-szymon.janc@tieto.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+From: "Gu, Chao Jie" <chao.jie.gu@intel.com>
+To: Arman Uguray <armansito@chromium.org>
+CC: BlueZ development <linux-bluetooth@vger.kernel.org>, Marcel Holtmann
+	<marcel@holtmann.org>
+Subject: RE: [PATCH] ATT signed write command
+Date: Fri, 12 Sep 2014 07:43:55 +0000
+Message-ID: <3D02B219753AD44CBDDDE484323B1774113086F7@SHSMSX104.ccr.corp.intel.com>
+References: <1410426586-9075-1-git-send-email-chao.jie.gu@intel.com>
+ <CAHrH25RxdmTDMxEYmUm75fJOt-oU5cLibNOhE3UASPhdHoO24A@mail.gmail.com>
+In-Reply-To: <CAHrH25RxdmTDMxEYmUm75fJOt-oU5cLibNOhE3UASPhdHoO24A@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-g_io_add_watch function takes own reference so local one needs to
-be dropped. Fix following Valgrind report:
-
-126 (120 direct, 6 indirect) bytes in 1 blocks are definitely lost in
-    loss record 146 of 158
-at 0x4C2745D: malloc (in /usr/lib64/valgrind/
-   vgpreload_memcheck-amd64-linux.so)
-by 0x4E7FE6E: g_malloc (in /usr/lib64/libglib-2.0.so.0.3800.2)
-by 0x4EBC5B7: g_io_channel_unix_new (in /usr/lib64/
-   libglib-2.0.so.0.3800.2)
-by 0x4496B4: search_completed_cb (sdp-client.c:129)
-by 0x45217B: sdp_process (sdp.c:4350)
-by 0x449814: search_process_cb (sdp-client.c:228)
-by 0x4E7A2A5: g_main_context_dispatch (in /usr/
-   lib64/libglib-2.0.so.0.3800.2)
-by 0x4E7A627: ??? (in /usr/lib64/libglib-2.0.so.0.3800.2)
-by 0x4E7AA39: g_main_loop_run (in /usr/lib64/libglib-2.0.so.0.3800.2)
-by 0x404372: main (main.c:550)
----
- src/sdp-client.c | 2 ++
- 1 file changed, 2 insertions(+)
-
-diff --git a/src/sdp-client.c b/src/sdp-client.c
-index fbe266e..bca2496 100644
---- a/src/sdp-client.c
-+++ b/src/sdp-client.c
-@@ -130,6 +130,8 @@ static void cache_sdp_session(bdaddr_t *src, bdaddr_t *dst,
- 
- 	cached->io_id = g_io_add_watch(chan, G_IO_HUP | G_IO_ERR | G_IO_NVAL,
- 						disconnect_watch, cached);
-+
-+	g_io_channel_unref(chan);
- }
- 
- struct search_context {
--- 
-1.9.1
-
+SGksIGFybWFuLA0KDQo+ID4gVGhpcyBwYXRjaCBmb3Igc2lnbmluZyBvdXRnb2luZywgY3NyayBh
+bmQgY3J5dG8gc3RvcmVkIGluIGJ0X2F0dC4NCj4gPiB0aGUgdmVyaWZ5aW5nIGluY29taW5nIEFU
+VCBQRFUgaW1wbGVtZW50YXRpb24gaW50cm9kdWNlIHRoZQ0KPiA+IHNoYXJlZC9nYXR0LXNlcnZl
+ciB3aGljaCBjb21iaW5lZCB3aXRoIHNoYXJlZC9nYXR0LWRiLmMsIHNvIG5lZWQgbW9yZQ0KPiA+
+IGRpc2NjdXNzaW9uLg0KPiA+DQo+ID4gU2lnbmVkLW9mZi1ieTogR3UgQ2hhb2ppZSA8Y2hhby5q
+aWUuZ3VAaW50ZWwuY29tPg0KPiANCj4gSSBkb24ndCB0aGluayBpbmNsdWRlICJTaWduZWQtb2Zm
+LWJ5IiBpbiBjb21taXQgbWVzc2FnZXMgaW4gQmx1ZVouDQo+IA0KDQogSSB3aWxsIGZvbGxvdyBi
+bHVleiBydWxlcy4NCg0KPiA+ICsvKiBMZW4gb2Ygc2lnbmF0dXJlIGluIHdyaXRlIHNpZ25lZCBw
+YWNrZXQgKi8NCj4gPiArI2RlZmluZSBCVF9BVFRfU0lHTkFUVVJFX0xFTiAgICAgICAgICAgMTIN
+Cj4gDQo+IENhbiB5b3Ugc3BlbGwgb3V0ICJMZW5ndGggb2Ygc2lnbmF0dXJlIiBpbiB0aGUgY29t
+bWVudCBpbnN0ZWFkIG9mIGp1c3QgIkxlbiI/DQoNCk5vIHByb2JsZW0uDQoNCj4gDQo+ID4gKyAg
+ICAgICBib29sIHZhbGlkX3JlbW90ZV9jc3JrOw0KPiA+ICsgICAgICAgdWludDhfdCByZW1vdGVf
+Y3Nya1sxNl07DQo+ID4gKyAgICAgICB1aW50MzJfdCByZW1vdGVfc2lnbl9jbnQ7DQo+IENhbiB3
+ZSBhZGQgdGhlc2UgbGF0ZXIgaWYgdGhleSBhcmVuJ3QgYmVpbmcgdXNlZCB5ZXQ/DQo+IA0KSSBh
+Z3JlZSB3aXRoIHRoYXQuDQoNCj4gPiArICAgICAgIHN0cnVjdCBidF9hdHQgKmF0dCA9IE5VTEw7
+DQo+ID4gKw0KPiA+ICsgICAgICAgaWYgKG9wLT5vcGNvZGUgPT0gQlRfQVRUX09QX1NJR05FRF9X
+UklURV9DTUQpIHsNCj4gDQo+IEFjdHVhbGx5LCBpbnN0ZWFkIG9mIGNoZWNraW5nIGV4cGxpY2l0
+bHkgZm9yIEJUX0FUVF9PUF9TSUdORURfV1JJVEVfQ01ELCBpdA0KPiBtaWdodCBiZSBiZXR0ZXIg
+dG8gY2hlY2sgaWYgdGhlIG9wY29kZSBoYXMgdGhlICJzaWduZWQiIGJpdCBzZXQgaW4gZ2VuZXJh
+bC4gKFlvdSBjYW4NCj4gdXNlIEFUVF9PUF9TSUdORURfTUFTSywgd2hpY2ggaXMgZGVmaW5lZCBp
+biB0aGlzIGZpbGUpLg0KPiANCj4gDQo+ID4gKyAgICAgICAgICAgICAgIHBkdV9sZW4gKz0gQlRf
+QVRUX1NJR05BVFVSRV9MRU47DQo+ID4gKyAgICAgICAgICAgICAgIGF0dCA9IG9wLT51c2VyX2Rh
+dGE7DQo+IA0KPiBJIGRvbid0IHRoaW5rIHRoYXQgdGhpcyBjb2RlIGhlcmUgd29ya3MuIG9wLT51
+c2VyX2RhdGEgcmVmZXJzIHRvIHVzZXIgZGF0YSBwcm92aWRlZCBpbg0KPiBidF9hdHRfc2VuZCBh
+bmQgbm90IHRoZSBidF9hdHQgc3RydWN0dXJlLiBJbnN0ZWFkLCBJIHdvdWxkIGp1c3QgYWRkIGEg
+InN0cnVjdCBidF9hdHQNCj4gKmF0dCIgZmllbGQgdG8gc3RydWN0IGF0dF9zZW5kX29wIGFuZCBy
+ZW1vdmUgdGhlIGxvY2FsIHZhcmlhYmxlICJhdHQiLg0KDQpJbiBteSBpbXBsZW1lbnRhdGlvbiAs
+IG9wLT51c2VyX2RhdGEgaW4gdGhlIHNpZ25lZCB3cml0ZSBjb21tYW5kIGNvZGUgcGF0aCByZWZl
+ciB0bw0KdGhlIGJ0X2F0dCBzdHJ1Y3R1cmUgYmVjYXVzZSBzdHJ1Y3QgYnRfYXR0IHByb3ZpZGVk
+IGluIGJ0X2F0dF9zZW5kIHBhcmFtZXRlciB1c2VyX2RhdGEuDQpTbyBpdCBjb3VsZCBiZSB3b3Jr
+LiANCkJ1dCB5b3VyIHByb3Bvc2FsIG1ha2UgbW9yZSBzZW5zZSBpZiBleHRlbmQgdGhlIGF0dF9z
+ZW5kX29wIHN0cnVjdCB0byBzdG9yZSBzdHJ1Y3QgYnRfYXR0ICphdHQgDQpCZWNhdXNlIHVzZXJf
+ZGF0YSBzaG91bGQgYmUgcHJvdmlkZWQgZm9yIGNhbGxiYWNrICwgY3VycmVudCBpbXBsZW1lbnRh
+dGlvbiBzdHlsZSBpcyB1Z2x5IGluZGVlZC4gDQoNCj4gPiArICAgICAgIH0NCj4gPg0KPiA+ICAg
+ICAgICAgaWYgKGxlbmd0aCAmJiBwZHUpDQo+ID4gICAgICAgICAgICAgICAgIHBkdV9sZW4gKz0g
+bGVuZ3RoOw0KPiA+IEBAIC0yOTMsNiArMzEwLDE2IEBAIHN0YXRpYyBib29sIGVuY29kZV9wZHUo
+c3RydWN0IGF0dF9zZW5kX29wICpvcCwgY29uc3QNCj4gdm9pZCAqcGR1LA0KPiA+ICAgICAgICAg
+aWYgKHBkdV9sZW4gPiAxKQ0KPiA+ICAgICAgICAgICAgICAgICBtZW1jcHkob3AtPnBkdSArIDEs
+IHBkdSwgbGVuZ3RoKTsNCj4gPg0KPiA+ICsgICAgICAgaWYgKGF0dCkgew0KPiA+ICsgICAgICAg
+ICAgICAgICBpZiAoIWJ0X2NyeXB0b19zaWduX2F0dChhdHQtPmNyeXB0bywNCj4gPiArICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgYXR0LT5sb2NhbF9jc3JrLA0KPiA+ICsg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBvcC0+cGR1LA0KPiA+ICsgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAxICsgbGVuZ3RoLA0KPiA+ICsgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBhdHQtPmxvY2FsX3NpZ25fY250LA0K
+PiA+ICsgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAmKCh1aW50OF90ICop
+IG9wLT5wZHUpWzEgKw0KPiBsZW5ndGhdKSkNCj4gPiArICAgICAgICAgICAgICAgcmV0dXJuIGZh
+bHNlOw0KPiA+ICsgICAgICAgfQ0KPiANCj4gWW91IHNob3VsZG4ndCBoYXZlIHRvIGNoZWNrIGlm
+ICJhdHQiIGlzIE5VTEwuICJhdHQiIHNob3VsZCBhbHdheXMgYmUgcHJlc2VudCBpZiBzdHJ1Y3QN
+Cj4gYXR0X3NlbmRfb3AgaGFzIGEgZmllbGQgZm9yIGl0Lg0KDQpUaGlzIHByb2JsZW0gd291bGQg
+YmUgZml4ZWQgYnkgZXh0ZW5kaW5nIHN0cnVjdCBhdHRfc2VuZF9vcC4NCg0KPiBJIHdvdWxkIGFs
+c28gcmVtb3ZlIHRoZSBuZXN0ZWQgaWYgc3RhdGVtZW50IGFuZCBqdXN0IHJldHVybiB0aGUgcmV0
+dXJuIHZhbHVlIG9mDQo+IGJ0X2NyeXB0b19zaWduX2F0dCBpbmxpbmUuDQo+IA0KPiBPdGhlciB0
+aGFuIHRoYXQsIEkgZG9uJ3Qgc2VlIGhvdyB0aGUgQ1NSSyBpcyBiZWluZyBwcm92aWRlZCB0byB0
+aGUgYnRfYXR0IHN0cnVjdHVyZS4NCj4gU2hvdWxkbid0IHRoZXJlIGJlIGEgYnRfYXR0X3NldF9j
+c3JrIG9mIHNvcnRzPw0KPiANClRoaXMgcG9pbnQgaXMgbXkgbWFqb3IgcHVycG9zZSBmb3IgdGhp
+cyBwYXRjaCBkaXNjdXNzaW9uLiBXZSBjYW4gc2VlIGluIGFuZHJvaWQvZ2F0dC5jLA0KQ3NyayBh
+bmQgc2lnbiBjb3VudGVyIGdldCBmcm9tIHN0cnVjdCBkZXZpY2UgaW4gbmV3X2NzcmtfY2FsbGJh
+Y2sgYnkgbWdtdF9yZWdpc3Rlcg0KZXZlbnQgZnJvbSBrZXJuZWwuIEFuZCB3ZSBjYW4gZ2V0IGF0
+dC0+Y3NyayBmcm9tIHN0cnVjdCBkZXZpY2UuIEhvd2V2ZXIsIGluIA0KYnRnYXR0LWNsaWVudCB0
+b29sLCB0aGVyZSBpcyBubyBzdHJ1Y3QgZGV2aWNlIGFuZCBubyBldmVudCBub3RpZmljYXRpb24g
+aGFuZGxlci4NClNvIGlmIHdlIGhhdmUgdG8gaW1wbGVtZXRudCBidF9hdHRfc2V0X2NzcmssIGhv
+dyBjYW4gd2UgZ2V0IGNzcmsgPw0KDQpBbmQgZm9yIHRoZSBsaWZlY3ljbGUgb2Ygc2lnbl9jb3Vu
+dGVyLCBpdCBzaG91bGQgYmUgdXBkYXRlZCB0byBzdG9yZSBpbiBmaWxlcyBhZnRlciBzaWduZWQg
+d3JpdGUuIA0KQnRnYXR0LWNsaWVudCBuZWVkIHRvIGNyZWF0ZSBzcGVjaWFsIGZpbGUgdG8gZG8g
+dGhhdD8gDQoNCkJlc3QgUmVnYXJkcw0KQ2hhb2ppZSBHdQ0K
