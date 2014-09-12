@@ -1,138 +1,218 @@
 Return-Path: <cyrus@holtmann.org>
-From: Gowtham Anandha Babu <gowtham.ab@samsung.com>
-To: 'Luiz Augusto von Dentz' <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	'Dmitry Kasatkin' <d.kasatkin@samsung.com>,
-	'Bharat Panda' <bharat.panda@samsung.com>, cpgs@samsung.com
-References: <1410441607-9687-1-git-send-email-gowtham.ab@samsung.com>
- <1410441607-9687-2-git-send-email-gowtham.ab@samsung.com>
- <CABBYNZKURNPgJ+MYv+yFrtYTo7b+OFejWY2LqgsT9zgEk5a3zw@mail.gmail.com>
-In-reply-to: <CABBYNZKURNPgJ+MYv+yFrtYTo7b+OFejWY2LqgsT9zgEk5a3zw@mail.gmail.com>
-Subject: RE: [PATCH 2/7] obexd/client/map : Handle MAP ReadStatusChanged event
- type
-Date: Fri, 12 Sep 2014 19:13:37 +0530
-Message-id: <000401cfce8f$a3392470$e9ab6d50$@samsung.com>
-MIME-version: 1.0
-Content-type: text/plain; charset=utf-8
+From: Vikrampal Yadav <vikram.pal@samsung.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: luiz.dentz@gmail.com, d.kasatkin@samsung.com,
+	vikram.pal@samsung.com, cpgs@samsung.com
+Subject: [PATCH v2 2/2] Monitor: Add AVRCP GetElementAttributes support
+Date: Fri, 12 Sep 2014 18:46:57 +0530
+Message-id: <1410527817-17666-2-git-send-email-vikram.pal@samsung.com>
+In-reply-to: <1410527817-17666-1-git-send-email-vikram.pal@samsung.com>
+References: <1410527817-17666-1-git-send-email-vikram.pal@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Support for decoding AVRCP GetElementAttributes added in Bluetooth
+monitor.
+---
+ monitor/avctp.c | 157 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 157 insertions(+)
 
-> -----Original Message-----
-> From: Luiz Augusto von Dentz [mailto:luiz.dentz@gmail.com]
-> Sent: Friday, September 12, 2014 2:30 AM
-> To: Gowtham Anandha Babu
-> Cc: linux-bluetooth@vger.kernel.org; Dmitry Kasatkin; Bharat Panda;
-> cpgs@samsung.com
-> Subject: Re: [PATCH 2/7] obexd/client/map : Handle MAP
-> ReadStatusChanged event type
-> 
-> Hi,
-> 
-> On Thu, Sep 11, 2014 at 4:20 PM, Gowtham Anandha Babu
-> <gowtham.ab@samsung.com> wrote:
-> > Adds ReadStatusChanged MCE event type handling in
-> > map_handle_notification()
-> > ---
-> >  obexd/client/map.c | 22 ++++++++++++++++++++++
-> >  1 file changed, 22 insertions(+)
-> >
-> > diff --git a/obexd/client/map.c b/obexd/client/map.c index
-> > 520e492..a505707 100644
-> > --- a/obexd/client/map.c
-> > +++ b/obexd/client/map.c
-> > @@ -1872,6 +1872,25 @@ static void map_handle_status_changed(struct
-> map_data *map,
-> >
-> > "Status");  }
-> >
-> > +static void map_handle_read_status_changed(struct map_data *map,
-> > +                                                        struct
-> > +map_event *event) {
-> > +       struct map_msg *msg;
-> > +
-> > +       msg = g_hash_table_lookup(map->messages, &event->handle);
-> > +       if (msg == NULL)
-> > +               return;
-> > +
-> > +       /* In MAP V 1.2 specification : ReadStatusChanged event didn't have
-> clear explaination.
-> > +       So as of now it will set the message read status as "yes" if it was "no"
-> already
-> > +       and the other way round. This implementation may change once
-> > + we get 'read' attribute in the event report. */
-> 
-> The coding style for multi-line comment is wrong, please check our coding
-> style there is a specific chapter for it, and to be honest I did not get it why we
-> are toggling the value if it is not clearly explained, btw there is a typo there,
-> perhaps you should check against the test specification if there is any test
-> regarding that or any errata documenting the behavior.
-> 
-> > +       if(msg->flags & MAP_MSG_FLAG_READ)
-> > +               parse_read(msg,"no");
-> > +       else
-> > +               parse_read(msg,"yes"); }
-> > +
-> >  static void map_handle_folder_changed(struct map_data *map,
-> >                                                         struct map_event *event,
-> >                                                         const char
-> > *folder) @@ -1927,6 +1946,9 @@ static void
-> map_handle_notification(struct map_event *event, void *user_data)
-> >         case MAP_ET_MESSAGE_SHIFT:
-> >                 map_handle_folder_changed(map, event, event->folder);
-> >                 break;
-> > +       case MAP_ET_READ_STATUS_CHANGED:
-> > +               map_handle_read_status_changed(map, event);
-> > +               break;
-> >         default:
-> >                 break;
-> >         }
-> > --
-> > 1.9.1
-> >
-> > --
-> > To unsubscribe from this list: send the line "unsubscribe
-> > linux-bluetooth" in the body of a message to majordomo@vger.kernel.org
-> > More majordomo info at  http://vger.kernel.org/majordomo-info.html
-> 
-> 
-> 
-> --
-> Luiz Augusto von Dentz
-
-I will send the updated patch with proper multi-line comment following the coding style and with modification(if any).
-
-Btw,
-As per the specification: Pg.no : 35 on MAP 1.2 spec
-"ReadStatusChanged: indicates that the 'read' status of a message (see 3.1.6) has
-been changed on the MSE. " 
-
-But the actual Event Report which was provided as test case in PTS tool was:
-
-<MAP-event-report version = "1.1">
-<event type = "ReadStatusChanged" handle = "12345678" folder =
-"TELECOM/MSG/INBOX" msg_type = "SMS_CDMA" subject = "Hello" datetime =
-"20110221T130510" sender_name = "Jamie" priority = "yes" />
-</MAP-event-report>
-
->From the above event report 1.1, we cannot retrieve the read status of a message. 
-
-ReadStatusChanged event is received by the MCE only if the previous read status has been changed in the MSE device. 
-
-There are two approaches we may follow:
-
-1) We have to toggle the read status whenever we get the ReadstatusChanged event.
-2) Or simply we can call parse_read() function without toggling as show below, because the only way read status can change is from unread to read. 
-
-Instead of if else , we can have a single line implementation : 
-
-parse_read(msg,"yes");
-
-What do you think?
-
-Regards,
-Gowtham Anandha Babu
-
-
+diff --git a/monitor/avctp.c b/monitor/avctp.c
+index f366b87..89997d0 100644
+--- a/monitor/avctp.c
++++ b/monitor/avctp.c
+@@ -158,6 +158,16 @@
+ #define AVRCP_ATTRIBUTE_SHUFFLE		0x03
+ #define AVRCP_ATTRIBUTE_SCAN		0x04
+ 
++/* media attributes */
++#define AVRCP_MEDIA_ATTRIBUTE_ILLEGAL	0x00
++#define AVRCP_MEDIA_ATTRIBUTE_TITLE	0x01
++#define AVRCP_MEDIA_ATTRIBUTE_ARTIST	0x02
++#define AVRCP_MEDIA_ATTRIBUTE_ALBUM	0x03
++#define AVRCP_MEDIA_ATTRIBUTE_TRACK	0x04
++#define AVRCP_MEDIA_ATTRIBUTE_TOTAL	0x05
++#define AVRCP_MEDIA_ATTRIBUTE_GENRE	0x06
++#define AVRCP_MEDIA_ATTRIBUTE_DURATION	0x07
++
+ struct avctp_frame {
+ 	uint8_t hdr;
+ 	uint8_t pt;
+@@ -165,6 +175,11 @@ struct avctp_frame {
+ 	struct l2cap_frame l2cap_frame;
+ };
+ 
++static struct avrcp_continuing {
++	uint16_t num;
++	uint16_t size;
++} avrcp_continuing;
++
+ static const char *ctype2str(uint8_t ctype)
+ {
+ 	switch (ctype & 0x0f) {
+@@ -524,6 +539,30 @@ static const char *charset2str(uint16_t charset)
+ 	}
+ }
+ 
++static const char *mediattr2str(uint32_t attr)
++{
++	switch (attr) {
++	case AVRCP_MEDIA_ATTRIBUTE_ILLEGAL:
++		return "Illegal";
++	case AVRCP_MEDIA_ATTRIBUTE_TITLE:
++		return "Title";
++	case AVRCP_MEDIA_ATTRIBUTE_ARTIST:
++		return "Artist";
++	case AVRCP_MEDIA_ATTRIBUTE_ALBUM:
++		return "Album";
++	case AVRCP_MEDIA_ATTRIBUTE_TRACK:
++		return "Track";
++	case AVRCP_MEDIA_ATTRIBUTE_TOTAL:
++		return "Track Total";
++	case AVRCP_MEDIA_ATTRIBUTE_GENRE:
++		return "Genre";
++	case AVRCP_MEDIA_ATTRIBUTE_DURATION:
++		return "Track duration";
++	default:
++		return "Reserved";
++	}
++}
++
+ static bool avrcp_passthrough_packet(struct avctp_frame *avctp_frame)
+ {
+ 	struct l2cap_frame *frame = &avctp_frame->l2cap_frame;
+@@ -905,6 +944,123 @@ static bool avrcp_displayable_charset(struct avctp_frame *avctp_frame,
+ 	return true;
+ }
+ 
++static bool avrcp_get_element_attributes(struct avctp_frame *avctp_frame,
++						uint8_t ctype, uint8_t len,
++						uint8_t indent)
++{
++	struct l2cap_frame *frame = &avctp_frame->l2cap_frame;
++	uint64_t id;
++	uint8_t num;
++
++	if (ctype > AVC_CTYPE_GENERAL_INQUIRY)
++		goto response;
++
++	if (!l2cap_frame_get_be64(frame, &id))
++		return false;
++
++	print_field("%*cIdentifier: 0x%jx (%s)", (indent - 8), ' ',
++					id, id ? "Reserved" : "PLAYING");
++
++	if (!l2cap_frame_get_u8(frame, &num))
++		return false;
++
++	print_field("%*cAttributeCount: 0x%02x", (indent - 8), ' ', num);
++
++	for (; num > 0; num--) {
++		uint32_t attr;
++
++		if (!l2cap_frame_get_be32(frame, &attr))
++			return false;
++
++		print_field("%*cAttribute: 0x%08x (%s)", (indent - 8),
++					' ', attr, mediattr2str(attr));
++	}
++
++	return true;
++
++response:
++	if (avctp_frame->pt == AVRCP_PACKET_TYPE_SINGLE
++				|| avctp_frame->pt == AVRCP_PACKET_TYPE_START) {
++		if (!l2cap_frame_get_u8(frame, &num))
++			return false;
++
++		avrcp_continuing.num = num;
++		print_field("%*cAttributeCount: 0x%02x", (indent - 8),
++								' ', num);
++		len--;
++	} else {
++		num = avrcp_continuing.num;
++
++		if (avrcp_continuing.size > 0) {
++			uint16_t size;
++
++			if (avrcp_continuing.size > len) {
++				size = len;
++				avrcp_continuing.size -= len;
++			} else {
++				size = avrcp_continuing.size;
++				avrcp_continuing.size = 0;
++			}
++
++			printf("ContinuingAttributeValue: ");
++			for (; size > 0; size--) {
++				uint8_t c;
++
++				if (!l2cap_frame_get_u8(frame, &c))
++					return false;
++
++				printf("%1c", isprint(c) ? c : '.');
++			}
++			printf("\n");
++
++			len -= size;
++		}
++	}
++
++	while (num > 0 && len > 0) {
++		uint32_t attr;
++		uint16_t charset, attrlen;
++
++		if (!l2cap_frame_get_be32(frame, &attr))
++			return false;
++
++		print_field("%*cAttribute: 0x%08x (%s)", (indent - 8),
++						' ', attr, mediattr2str(attr));
++
++		if (!l2cap_frame_get_be16(frame, &charset))
++			return false;
++
++		print_field("%*cCharsetID: 0x%04x (%s)", (indent - 8),
++				' ', charset, charset2str(charset));
++
++		if (!l2cap_frame_get_be16(frame, &attrlen))
++			return false;
++
++		print_field("%*cAttributeValueLength: 0x%04x",
++						(indent - 8), ' ', attrlen);
++
++		len -= sizeof(attr) + sizeof(charset) + sizeof(attrlen);
++		num--;
++
++		print_field("%*cAttributeValue: ", (indent - 8), ' ');
++		for (; attrlen > 0 && len > 0; attrlen--, len--) {
++			uint8_t c;
++
++			if (!l2cap_frame_get_u8(frame, &c))
++				return false;
++
++			printf("%1c", isprint(c) ? c : '.');
++		}
++
++		if (attrlen > 0)
++			avrcp_continuing.size = attrlen;
++	}
++
++	avrcp_continuing.num = num;
++
++	return true;
++}
++
+ struct avrcp_ctrl_pdu_data {
+ 	uint8_t pduid;
+ 	bool (*func) (struct avctp_frame *avctp_frame, uint8_t ctype,
+@@ -920,6 +1076,7 @@ static const struct avrcp_ctrl_pdu_data avrcp_ctrl_pdu_table[] = {
+ 	{ 0x15, avrcp_get_player_attribute_text		},
+ 	{ 0x16, avrcp_get_player_value_text		},
+ 	{ 0x17, avrcp_displayable_charset		},
++	{ 0x20, avrcp_get_element_attributes		},
+ 	{ }
+ };
+ 
+-- 
+1.9.1
 
