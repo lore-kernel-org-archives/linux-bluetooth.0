@@ -1,63 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
-From: roylee17@gmail.com
-To: linux-bluetooth@vger.kernel.org
-Cc: Tzu-Jung Lee <roylee17@gmail.com>
-Subject: [PATCH 2/3] tools: Use specified uart speed to load firmware for bcm43xx
-Date: Mon,  8 Sep 2014 14:21:59 -0700
-Message-Id: <1410211320-16111-2-git-send-email-roylee@paypal.com>
-In-Reply-To: <1410211320-16111-1-git-send-email-roylee@paypal.com>
-References: <1410211320-16111-1-git-send-email-roylee@paypal.com>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.6\))
+Subject: Re: [PATCH] tools/seq2bseq : Fix the same expression issue in if condition
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20140912165730.GC3671@t440s>
+Date: Fri, 12 Sep 2014 10:05:12 -0700
+Cc: gowtham babu <gowtham.ab@samsung.com>,
+	linux-bluetooth@vger.kernel.org, d.kasatkin@samsung.com,
+	bharat.panda@samsung.com, cpgs@samsung.com
+Message-Id: <705AF308-550F-47C4-ADD3-9276158CA280@holtmann.org>
+References: <1410331363-3548-1-git-send-email-gowtham.ab@samsung.com> <20140912165730.GC3671@t440s>
+To: Johan Hedberg <johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Tzu-Jung Lee <roylee17@gmail.com>
+Hi Johan,
 
----
- tools/hciattach_bcm43xx.c | 22 ++++++++++++++++++++++
- 1 file changed, 22 insertions(+)
+>> Below are the list of similar patches under 'tools' which are not yet reviewed
+>> 
+>> 1) tools/csr_usb : Fix Resource leak: file
+>> 2) tools/hciattach : Fix syntax error
+>> 3) tools/btsnoop : Fix variable reassigning issue
+> 
+> This kind of stuff does not belong in a commit message.
+> 
+>> diff --git a/tools/seq2bseq.c b/tools/seq2bseq.c
+>> index 7657a57..521d20e 100644
+>> --- a/tools/seq2bseq.c
+>> +++ b/tools/seq2bseq.c
+>> @@ -40,7 +40,7 @@ static int convert_line(int fd, const char *line)
+>> 	char str[3];
+>> 	unsigned char val;
+>> 
+>> -	if (line[0] == '*' || line[0] == '\r' || line[0] == '\r')
+>> +	if (line[0] == '*' || line[0] == '\r')
+>> 		return 0;
+>> 
+>> 	while (1) {
+> 
+> Are you sure the code wasn't intending to check for '\n'?
 
-diff --git a/tools/hciattach_bcm43xx.c b/tools/hciattach_bcm43xx.c
-index cb4bfb9..630220e 100644
---- a/tools/hciattach_bcm43xx.c
-+++ b/tools/hciattach_bcm43xx.c
-@@ -359,9 +359,27 @@ int bcm43xx_init(int fd, int speed, struct termios *ti, const char *bdaddr)
- 	if (bcm43xx_locate_patch(FIRMWARE_DIR, chip_name, fw_path)) {
- 		fprintf(stderr, "Patch not found, continue anyway\n");
- 	} else {
-+		/* Speed up firmware loading */
-+		if (speed > 3000000 && bcm43xx_set_clock(fd, BCM43XX_CLOCK_48))
-+			return -1;
-+
-+		if (bcm43xx_set_speed(fd, speed))
-+			return -1;
-+
-+		if (set_speed(fd, ti, speed))
-+			return -1;
-+
- 		if (bcm43xx_load_firmware(fd, fw_path))
- 			return -1;
- 
-+		/*
-+		 * The controller reset the uart speed to 115200 after
-+		 * firmware loading, so we have to reset the terminal
-+		 * correspondingly
-+		 */
-+		if (set_speed(fd, ti, 115200))
-+			return -1;
-+
- 		if (bcm43xx_reset(fd))
- 			return -1;
- 	}
-@@ -375,5 +393,9 @@ int bcm43xx_init(int fd, int speed, struct termios *ti, const char *bdaddr)
- 	if (bcm43xx_set_speed(fd, speed))
- 		return -1;
- 
-+	if (set_speed(fd, ti, speed))
-+		return -1;
-+
-+
- 	return 0;
- }
--- 
-2.0.4
+yes, it was intended to check for \r and \n. This is my mistake here.
+
+Regards
+
+Marcel
 
