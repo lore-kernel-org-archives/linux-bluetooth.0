@@ -7,10 +7,8 @@ Cc: marcel@holtmann.org,
 	alex.aring@gmail.com,
 	Martin Townsend <martin.townsend@xsilon.com>
 Subject: [PATCH v2 bluetooth] Fix lowpan_rcv
-Date: Fri, 12 Sep 2014 10:34:39 +0100
-Message-Id: <1410514480-9070-2-git-send-email-martin.townsend@xsilon.com>
-In-Reply-To: <1410514480-9070-1-git-send-email-martin.townsend@xsilon.com>
-References: <1410514480-9070-1-git-send-email-martin.townsend@xsilon.com>
+Date: Fri, 12 Sep 2014 10:34:38 +0100
+Message-Id: <1410514480-9070-1-git-send-email-martin.townsend@xsilon.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 This series aims to fix incorrect return values in lowpan_rcv
@@ -23,6 +21,7 @@ available so would be grateful for any testing from the Bluetooth developers.
 I have done some minimal testing for IEEE802.15.4
 
 Signed-off-by: Martin Townsend <martin.townsend@xsilon.com>
+---
 
 v1 -> v2:
 * combined first two patches into one.
@@ -30,8 +29,6 @@ v1 -> v2:
 * re-use err in lowpan_process_data and remove err_ret local variable.
 * removed third patch as applies to linux-wpan
 
-
-*** BLURB HERE ***
 
 Martin Townsend (1):
   6lowpan: fix incorrect return values in lowpan_rcv
