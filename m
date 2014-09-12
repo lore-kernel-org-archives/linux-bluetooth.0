@@ -1,132 +1,138 @@
 Return-Path: <cyrus@holtmann.org>
 From: Gowtham Anandha Babu <gowtham.ab@samsung.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: luiz.dentz@gmail.com, johan.hedberg@gmail.com,
-	d.kasatkin@samsung.com, bharat.panda@samsung.com, cpgs@samsung.com,
-	Gowtham Anandha Babu <gowtham.ab@samsung.com>
-Subject: [MAP v2] obexd/client : Handle the MAP Extended Event Report 1.1
-Date: Fri, 12 Sep 2014 19:14:22 +0530
-Message-id: <1410529462-28220-1-git-send-email-gowtham.ab@samsung.com>
+To: 'Luiz Augusto von Dentz' <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	'Dmitry Kasatkin' <d.kasatkin@samsung.com>,
+	'Bharat Panda' <bharat.panda@samsung.com>, cpgs@samsung.com
+References: <1410441607-9687-1-git-send-email-gowtham.ab@samsung.com>
+ <1410441607-9687-2-git-send-email-gowtham.ab@samsung.com>
+ <CABBYNZKURNPgJ+MYv+yFrtYTo7b+OFejWY2LqgsT9zgEk5a3zw@mail.gmail.com>
+In-reply-to: <CABBYNZKURNPgJ+MYv+yFrtYTo7b+OFejWY2LqgsT9zgEk5a3zw@mail.gmail.com>
+Subject: RE: [PATCH 2/7] obexd/client/map : Handle MAP ReadStatusChanged event
+ type
+Date: Fri, 12 Sep 2014 19:13:37 +0530
+Message-id: <000401cfce8f$a3392470$e9ab6d50$@samsung.com>
+MIME-version: 1.0
+Content-type: text/plain; charset=utf-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Changes made to handle the Extended Event Report 1.1
+Hi,
 
-1) In SDP, the MAP supported featured bit is updated.
-2) In map-event, corresponding new event type and the new attribute introduced in Event report 1.1 is added.
-3) In mns corresponding handlers are added.
+> -----Original Message-----
+> From: Luiz Augusto von Dentz [mailto:luiz.dentz@gmail.com]
+> Sent: Friday, September 12, 2014 2:30 AM
+> To: Gowtham Anandha Babu
+> Cc: linux-bluetooth@vger.kernel.org; Dmitry Kasatkin; Bharat Panda;
+> cpgs@samsung.com
+> Subject: Re: [PATCH 2/7] obexd/client/map : Handle MAP
+> ReadStatusChanged event type
+> 
+> Hi,
+> 
+> On Thu, Sep 11, 2014 at 4:20 PM, Gowtham Anandha Babu
+> <gowtham.ab@samsung.com> wrote:
+> > Adds ReadStatusChanged MCE event type handling in
+> > map_handle_notification()
+> > ---
+> >  obexd/client/map.c | 22 ++++++++++++++++++++++
+> >  1 file changed, 22 insertions(+)
+> >
+> > diff --git a/obexd/client/map.c b/obexd/client/map.c index
+> > 520e492..a505707 100644
+> > --- a/obexd/client/map.c
+> > +++ b/obexd/client/map.c
+> > @@ -1872,6 +1872,25 @@ static void map_handle_status_changed(struct
+> map_data *map,
+> >
+> > "Status");  }
+> >
+> > +static void map_handle_read_status_changed(struct map_data *map,
+> > +                                                        struct
+> > +map_event *event) {
+> > +       struct map_msg *msg;
+> > +
+> > +       msg = g_hash_table_lookup(map->messages, &event->handle);
+> > +       if (msg == NULL)
+> > +               return;
+> > +
+> > +       /* In MAP V 1.2 specification : ReadStatusChanged event didn't have
+> clear explaination.
+> > +       So as of now it will set the message read status as "yes" if it was "no"
+> already
+> > +       and the other way round. This implementation may change once
+> > + we get 'read' attribute in the event report. */
+> 
+> The coding style for multi-line comment is wrong, please check our coding
+> style there is a specific chapter for it, and to be honest I did not get it why we
+> are toggling the value if it is not clearly explained, btw there is a typo there,
+> perhaps you should check against the test specification if there is any test
+> regarding that or any errata documenting the behavior.
+> 
+> > +       if(msg->flags & MAP_MSG_FLAG_READ)
+> > +               parse_read(msg,"no");
+> > +       else
+> > +               parse_read(msg,"yes"); }
+> > +
+> >  static void map_handle_folder_changed(struct map_data *map,
+> >                                                         struct map_event *event,
+> >                                                         const char
+> > *folder) @@ -1927,6 +1946,9 @@ static void
+> map_handle_notification(struct map_event *event, void *user_data)
+> >         case MAP_ET_MESSAGE_SHIFT:
+> >                 map_handle_folder_changed(map, event, event->folder);
+> >                 break;
+> > +       case MAP_ET_READ_STATUS_CHANGED:
+> > +               map_handle_read_status_changed(map, event);
+> > +               break;
+> >         default:
+> >                 break;
+> >         }
+> > --
+> > 1.9.1
+> >
+> > --
+> > To unsubscribe from this list: send the line "unsubscribe
+> > linux-bluetooth" in the body of a message to majordomo@vger.kernel.org
+> > More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> 
+> 
+> 
+> --
+> Luiz Augusto von Dentz
 
-Freed all the event attibutes inside map_event_free() function.
----
- lib/sdp.h                |  2 +-
- obexd/client/map-event.h |  7 ++++++-
- obexd/client/mns.c       | 34 ++++++++++++++++++++++++++++++++++
- 3 files changed, 41 insertions(+), 2 deletions(-)
+I will send the updated patch with proper multi-line comment following the coding style and with modification(if any).
 
-diff --git a/lib/sdp.h b/lib/sdp.h
-index cc10e9f..76f61e1 100644
---- a/lib/sdp.h
-+++ b/lib/sdp.h
-@@ -306,7 +306,7 @@ extern "C" {
- #define SDP_ATTR_MAS_INSTANCE_ID		0x0315
- #define SDP_ATTR_SUPPORTED_MESSAGE_TYPES	0x0316
- #define SDP_ATTR_PBAP_SUPPORTED_FEATURES	0x0317
--#define SDP_ATTR_MAP_SUPPORTED_FEATURES		0x0317
-+#define SDP_ATTR_MAP_SUPPORTED_FEATURES		0x031f
- 
- #define SDP_ATTR_SPECIFICATION_ID		0x0200
- #define SDP_ATTR_VENDOR_ID			0x0201
-diff --git a/obexd/client/map-event.h b/obexd/client/map-event.h
-index ba5d5d2..99cb0c2 100644
---- a/obexd/client/map-event.h
-+++ b/obexd/client/map-event.h
-@@ -32,7 +32,8 @@ enum map_event_type {
- 	MAP_ET_MEMORY_FULL,
- 	MAP_ET_MEMORY_AVAILABLE,
- 	MAP_ET_MESSAGE_DELETED,
--	MAP_ET_MESSAGE_SHIFT
-+	MAP_ET_MESSAGE_SHIFT,
-+	MAP_ET_READ_STATUS_CHANGED
- };
- 
- struct map_event {
-@@ -41,6 +42,10 @@ struct map_event {
- 	char *folder;
- 	char *old_folder;
- 	char *msg_type;
-+	char *datetime;
-+	char *subject;
-+	char *sender_name;
-+	char *priority;
- };
- 
- /* Handle notification in map client.
-diff --git a/obexd/client/mns.c b/obexd/client/mns.c
-index d638886..49ccaab 100644
---- a/obexd/client/mns.c
-+++ b/obexd/client/mns.c
-@@ -180,6 +180,8 @@ static void parse_event_report_type(struct map_event *event, const char *value)
- 		event->type = MAP_ET_MESSAGE_DELETED;
- 	else if (!g_ascii_strcasecmp(value, "MessageShift"))
- 		event->type = MAP_ET_MESSAGE_SHIFT;
-+	else if (!g_ascii_strcasecmp(value, "ReadStatusChanged"))
-+		event->type = MAP_ET_READ_STATUS_CHANGED;
- }
- 
- static void parse_event_report_handle(struct map_event *event,
-@@ -218,6 +220,30 @@ static void parse_event_report_msg_type(struct map_event *event,
- 	event->msg_type = g_strdup(value);
- }
- 
-+static void parse_event_report_date_time(struct map_event *event,
-+                                                        const char *value)
-+{
-+	event->datetime = g_strdup(value);
-+}
-+
-+static void parse_event_report_subject(struct map_event *event,
-+                                                        const char *value)
-+{
-+	event->subject = g_strdup(value);
-+}
-+
-+static void parse_event_report_sender_name(struct map_event *event,
-+                                                        const char *value)
-+{
-+	event->sender_name = g_strdup(value);
-+}
-+
-+static void parse_event_report_priority(struct map_event *event,
-+                                                        const char *value)
-+{
-+	event->priority = g_strdup(value);
-+}
-+
- static struct map_event_report_parser {
- 	const char *name;
- 	void (*func) (struct map_event *event, const char *value);
-@@ -227,6 +253,10 @@ static struct map_event_report_parser {
- 		{ "folder", parse_event_report_folder },
- 		{ "old_folder", parse_event_report_old_folder },
- 		{ "msg_type", parse_event_report_msg_type },
-+		{ "datetime", parse_event_report_date_time },
-+		{ "subject", parse_event_report_subject },
-+		{ "sender_name", parse_event_report_sender_name },
-+		{ "priority", parse_event_report_priority },
- 		{ }
- };
- 
-@@ -268,6 +298,10 @@ static void map_event_free(struct map_event *event)
- 	g_free(event->folder);
- 	g_free(event->old_folder);
- 	g_free(event->msg_type);
-+	g_free(event->datetime);
-+	g_free(event->subject);
-+	g_free(event->sender_name);
-+	g_free(event->priority);
- 	g_free(event);
- }
- 
--- 
-1.9.1
+Btw,
+As per the specification: Pg.no : 35 on MAP 1.2 spec
+"ReadStatusChanged: indicates that the 'read' status of a message (see 3.1.6) has
+been changed on the MSE. " 
+
+But the actual Event Report which was provided as test case in PTS tool was:
+
+<MAP-event-report version = "1.1">
+<event type = "ReadStatusChanged" handle = "12345678" folder =
+"TELECOM/MSG/INBOX" msg_type = "SMS_CDMA" subject = "Hello" datetime =
+"20110221T130510" sender_name = "Jamie" priority = "yes" />
+</MAP-event-report>
+
+>From the above event report 1.1, we cannot retrieve the read status of a message. 
+
+ReadStatusChanged event is received by the MCE only if the previous read status has been changed in the MSE device. 
+
+There are two approaches we may follow:
+
+1) We have to toggle the read status whenever we get the ReadstatusChanged event.
+2) Or simply we can call parse_read() function without toggling as show below, because the only way read status can change is from unread to read. 
+
+Instead of if else , we can have a single line implementation : 
+
+parse_read(msg,"yes");
+
+What do you think?
+
+Regards,
+Gowtham Anandha Babu
+
+
 
