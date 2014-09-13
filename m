@@ -1,40 +1,67 @@
 Return-Path: <cyrus@holtmann.org>
-From: David Herrmann <dh.herrmann@gmail.com>
+Message-ID: <541401B9.5070807@chimrod.com>
+Date: Sat, 13 Sep 2014 10:35:05 +0200
+From: =?ISO-8859-1?Q?S=E9bastien_Dailly?= <sebastien@chimrod.com>
+MIME-Version: 1.0
 To: linux-bluetooth@vger.kernel.org
-Cc: Johan Hedberg <johan.hedberg@gmail.com>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Michael Biebl <mbiebl@gmail.com>,
-	David Herrmann <dh.herrmann@gmail.com>
-Subject: [PATCH] core: fix unbound watchdog-notify for timeouts <2s
-Date: Sat, 13 Sep 2014 15:21:23 +0200
-Message-Id: <1410614483-8462-1-git-send-email-dh.herrmann@gmail.com>
+Subject: Help to pairing a bluetooth headset
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-If the watchdog timeout is below 2s, we end up with a timeout of 0s as
-glib event source. This causes unbound watchdog notifications. Avoid this
-by never using event-timeouts below 1s.
+Hello,
 
-Reported by Michael Biebl.
+I'm trying to pair my linux sound server (X is not installed) with a 
+bluetooth headset.
 
----
- src/main.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+The bluetooth headset is correctly recognized by bluez :
 
-diff --git a/src/main.c b/src/main.c
-index e6bac6e..da0bd12 100644
---- a/src/main.c
-+++ b/src/main.c
-@@ -596,9 +596,10 @@ int main(int argc, char *argv[])
- 
- 		seconds = atoi(watchdog_usec) / (1000 * 1000);
- 		info("Watchdog timeout is %d seconds", seconds);
-+		seconds = (seconds < 4) ? 1 : seconds / 2;
- 
- 		watchdog = g_timeout_add_seconds_full(G_PRIORITY_HIGH,
--							seconds / 2,
-+							seconds,
- 							watchdog_callback,
- 							NULL, NULL);
- 	} else
+> $ hcitool scan
+> Scanning ...
+>         0C:A6:94:37:F5:1D       PhilipsBT
+
+But the connection fail :
+
+> # hcitool cc 0C:A6:94:37:F5:1D
+> $ hcitool con
+> Connections:
+
+Here is a dump from hcidump :
+
+> $ hcidump -X
+> HCI sniffer - Bluetooth packet analyzer ver 5.21
+> device: hci0 snap_len: 1500 filter: 0xffffffffffffffff
+>> HCI Event: Command Status (0x0f) plen 4
+>     Create Connection (0x01|0x0005) status 0x00 ncmd 1
+>> HCI Event: Connect Complete (0x03) plen 11
+>     status 0x00 handle 1 bdaddr 0C:A6:94:37:F5:1D type ACL encrypt 0x00
+>> HCI Event: Command Status (0x0f) plen 4
+>     Read Remote Supported Features (0x01|0x001b) status 0x00 ncmd 1
+>> HCI Event: Read Remote Supported Features (0x0b) plen 11
+>     status 0x00 handle 1
+>     Features: 0xff 0xfe 0x0f 0xc6 0x8b 0xef 0x59 0x83
+>> HCI Event: Command Status (0x0f) plen 4
+>     Remote Name Request (0x01|0x0019) status 0x00 ncmd 1
+>> HCI Event: Remote Name Req Complete (0x07) plen 255
+>     status 0x00 bdaddr 0C:A6:94:37:F5:1D name 'PhilipsBT'
+>> HCI Event: Command Status (0x0f) plen 4
+>     Disconnect (0x01|0x0006) status 0x00 ncmd 1
+>> HCI Event: Disconn Complete (0x05) plen 4
+>     status 0x00 handle 1 reason 0x16
+>     Reason: Connection Terminated by Local Host
+
+
+Here is what I get with bt-device connection :
+
+> # bt-device -c 0C:A6:94:37:F5:1D
+> Connecting to: 0C:A6:94:37:F5:1D
+> Error: Device not found.
+
+What can I do to manage the connection ?
+
+(I'm not registered to the ml, please cc me in the answer).
+
+Thanks !
+
 -- 
-2.1.0
+Sébastien Dailly
