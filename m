@@ -1,38 +1,29 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <CANq1E4ShytEnUq-U+cK9i+qjHoyMUK0DChEb9FExGdDEOpX1SA@mail.gmail.com>
-References: <1410614483-8462-1-git-send-email-dh.herrmann@gmail.com>
-	<25587ECB-CBF8-4E5C-9E86-63CACCFD1A0D@holtmann.org>
-	<CANq1E4ShytEnUq-U+cK9i+qjHoyMUK0DChEb9FExGdDEOpX1SA@mail.gmail.com>
-Date: Sun, 14 Sep 2014 19:41:50 +0200
-Message-ID: <CANq1E4QdKVCVVk6o=dP9vqsVP7fAe6ROhoMcw_y0Pp+oi5O0zA@mail.gmail.com>
-Subject: Re: [PATCH] core: fix unbound watchdog-notify for timeouts <2s
-From: David Herrmann <dh.herrmann@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	Michael Biebl <mbiebl@gmail.com>
-Content-Type: text/plain; charset=UTF-8
+Message-ID: <1410689236.29532.12.camel@gentoo.org>
+Subject: Regarding why some tools are not installed
+From: Pacho Ramos <pacho@gentoo.org>
+To: BlueZ development <linux-bluetooth@vger.kernel.org>
+Date: Sun, 14 Sep 2014 12:07:16 +0200
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi
+Hello
 
-On Sat, Sep 13, 2014 at 9:11 PM, David Herrmann <dh.herrmann@gmail.com> wrote:
->> I get the feeling that if > 2s, then we should use g_timeout_add_seconds to get the advantage of being woken up with all other timeouts in our daemon. And when it is <= 2s, then we better use a high precision g_timeout_add.
->
-> This sounds actually good. I will do that in v2.
+Recently a user told me that he needed to use hex2hcd to get his
+Broadcom firmware loaded by his bluetooth adaptor. We wonder about why
+it's not installed by default when we build with "experimental"
+configure option:
+if EXPERIMENTAL
+noinst_PROGRAMS += tools/bdaddr tools/avinfo tools/avtest \
+                        tools/scotest tools/amptest tools/hwdb \
+                        tools/hcieventmask tools/hcisecfilter \
+                        tools/btmgmt tools/btinfo tools/btattach \
+                        tools/btsnoop tools/btproxy tools/btiotest \
+                        tools/cltest tools/seq2bseq tools/hex2hcd \
+                        tools/ibeacon tools/btgatt-client
+(in Makefile.tools)
 
-Ok, glib only supports millisecond precision, so whatever we do, there
-will be a WATCHDOG_USEC range that we cannot react to properly. Ok, to
-be honest, if WATCHDOG_USEC is below 1ms, we're screwed anyway, so
-maybe we should just keep our current behavior.. I mean there is
-nothing sane to do for use if users specify such low watchdog ranges.
-At some point, we have to resort to either run watchdogs without a
-timeout or bail out and tells users to stop using such low values.
-Whether this is at 1s or at 1ms doesn't matter much, does it?
+Thanks a lot for the info
 
-So I think we can just keep the current behavior.
-
-Thanks
-David
