@@ -1,69 +1,75 @@
 Return-Path: <cyrus@holtmann.org>
-From: johan.hedberg@gmail.com
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: btusb: Use GFP_KERNEL in btusb_send_frame()
-Date: Sun, 14 Sep 2014 08:49:34 +0300
-Message-Id: <1410673774-10957-1-git-send-email-johan.hedberg@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Sun, 14 Sep 2014 07:24:27 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: linville@tuxdriver.com, linux-wireless@vger.kernel.org,
+	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: pull request: bluetooth-next 2014-09-14
+Message-ID: <20140914042427.GA1926@t440s.P-661HNU-F1>
+References: <20140914041912.GA1623@t440s.P-661HNU-F1>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="BOKacYhQ+x31HxR3"
+In-Reply-To: <20140914041912.GA1623@t440s.P-661HNU-F1>
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@intel.com>
 
-All hdev->send() calls are these days done through a work queue. For the
-btusb driver this means the btusb_send_frame() function. Because of this
-we can safely use GFP_KERNEL for all memory allocations in this code
-path.
+--BOKacYhQ+x31HxR3
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
----
- drivers/bluetooth/btusb.c | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
+Hi John,
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index a79d657c0845..d696e68f326a 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -769,11 +769,11 @@ static int btusb_send_frame(struct hci_dev *hdev, struct sk_buff *skb)
- 
- 	switch (bt_cb(skb)->pkt_type) {
- 	case HCI_COMMAND_PKT:
--		urb = usb_alloc_urb(0, GFP_ATOMIC);
-+		urb = usb_alloc_urb(0, GFP_KERNEL);
- 		if (!urb)
- 			return -ENOMEM;
- 
--		dr = kmalloc(sizeof(*dr), GFP_ATOMIC);
-+		dr = kmalloc(sizeof(*dr), GFP_KERNEL);
- 		if (!dr) {
- 			usb_free_urb(urb);
- 			return -ENOMEM;
-@@ -797,7 +797,7 @@ static int btusb_send_frame(struct hci_dev *hdev, struct sk_buff *skb)
- 		if (!data->bulk_tx_ep)
- 			return -ENODEV;
- 
--		urb = usb_alloc_urb(0, GFP_ATOMIC);
-+		urb = usb_alloc_urb(0, GFP_KERNEL);
- 		if (!urb)
- 			return -ENOMEM;
- 
-@@ -814,7 +814,7 @@ static int btusb_send_frame(struct hci_dev *hdev, struct sk_buff *skb)
- 		if (!data->isoc_tx_ep || hci_conn_num(hdev, SCO_LINK) < 1)
- 			return -ENODEV;
- 
--		urb = usb_alloc_urb(BTUSB_MAX_ISOC_FRAMES, GFP_ATOMIC);
-+		urb = usb_alloc_urb(BTUSB_MAX_ISOC_FRAMES, GFP_KERNEL);
- 		if (!urb)
- 			return -ENOMEM;
- 
-@@ -848,7 +848,7 @@ static int btusb_send_frame(struct hci_dev *hdev, struct sk_buff *skb)
- skip_waking:
- 	usb_anchor_urb(urb, &data->tx_anchor);
- 
--	err = usb_submit_urb(urb, GFP_ATOMIC);
-+	err = usb_submit_urb(urb, GFP_KERNEL);
- 	if (err < 0) {
- 		if (err != -EPERM && err != -ENODEV)
- 			BT_ERR("%s urb %p submission failed (%d)",
--- 
-1.9.3
+On Sun, Sep 14, 2014, Johan Hedberg wrote:
+> Here are some more patches intended for 3.18. Most of them are cleanups
+> or fixes for SMP. The only exception is a fix for BR/EDR L2CAP fixed
+> channels which should now work better together with the L2CAP
+> information request procedure.
+>=20
+> Let me know if there are any issues pulling. Thanks.
+>=20
+> Johan
+>=20
+> ---
+> The following changes since commit 39e90c77637b3892a39f2908aea57539e961c5=
+0e:
+>=20
+>   Bluetooth: 6lowpan: Route packets that are not meant to peer via correc=
+t device (2014-09-09 15:51:47 +0200)
+>=20
+> are available in the git repository at:
+>=20
+>   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.=
+git master
 
+This was supposed to be a reference to the for-upstream branch instead
+of master. Both point to the same commit at this moment but it'd be more
+convenient if you pull from for-upstream so that the master branch can
+continue living on without waiting for the pull to happen. Sorry for the
+extra hassle.
+
+Johan
+
+--BOKacYhQ+x31HxR3
+Content-Type: application/pgp-signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQIcBAEBAgAGBQJUFRh7AAoJECQj9vv5qNQSzywP/3WE/WVtytzT+kURz02i/d+/
+xe8bFszWhbaLk2Aoiqv634UCaq2MiP9vhd1aPXl0eHI5dbV6/k1OMPmrszBzbJ7v
+qs3gbnbRfrGuW0udrQJTqt/WMXH0JmkGcL48i4V0fjf271e37aJAcvo/Rq67i+/o
+9LdaV1gLXfSs2bqtVUKvsXlBdF4HBNcUnPURjtWFDkytT7z4heci/7KdYpKcNDYk
+saksJbgalJ7wy3E/Uz3pkufMNTnxrmDJOLxRihZ3JDzRTPCNtkTyKOPvkjhl7nJp
+mA12NMOjC+V2vrJ9euFLnX17lJqwPZUkij51B4H/h0VaAwWdQHNM5OLhvsWqTDRa
+MBELzAWWGN4HHEn8JCQpHy8tCZKrOd33KmzTzY4u7kTc5zjK2Z+BQfP1PkXMxUFc
+ZupfUxMKj5HzV3t4qsMAy+e7Qj36HcYl93p6Aabb/27k8mS+6m3V1dFJ3Qal6aFb
+dY1nAzOx3CWO+xiuwZGCVObPl7s5LDgAeTVl3MBCodC9Z9oXbWdCmosIZrQuD8uQ
+QqQp+tvKjSSUF81s73gR73YIwmQpN/SVUaeUBOyySEUPIyki4Xp8DJvARnCj83PE
+svEUOySIzvak6Sz5H9XqZNUaTocmEP5i0qjTmngC5VNal0Bo4kxGfteBcTpA+mnH
+uHcMMTA5ONV1gYVg9NYn
+=hNjp
+-----END PGP SIGNATURE-----
+
+--BOKacYhQ+x31HxR3--
