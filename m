@@ -1,63 +1,69 @@
 Return-Path: <cyrus@holtmann.org>
 From: Gowtham Anandha Babu <gowtham.ab@samsung.com>
-To: 'Johan Hedberg' <johan.hedberg@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org, bharat.panda@samsung.com,
-	cpgs@samsung.com
-References: <1410330944-3492-1-git-send-email-gowtham.ab@samsung.com>
- <20140912165155.GB3671@t440s>
-In-reply-to: <20140912165155.GB3671@t440s>
-Subject: RE: [PATCH 1/2] tools/btsnoop : Fix variable reassigning issue
-Date: Mon, 15 Sep 2014 11:45:07 +0530
-Message-id: <000c01cfd0ac$68ce5a20$3a6b0e60$@samsung.com>
+To: 'Marcel Holtmann' <marcel@holtmann.org>,
+	'Johan Hedberg' <johan.hedberg@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org, d.kasatkin@samsung.com,
+	bharat.panda@samsung.com, cpgs@samsung.com
+References: <1410331363-3548-1-git-send-email-gowtham.ab@samsung.com>
+ <20140912165730.GC3671@t440s>
+ <705AF308-550F-47C4-ADD3-9276158CA280@holtmann.org>
+In-reply-to: <705AF308-550F-47C4-ADD3-9276158CA280@holtmann.org>
+Subject: RE: [PATCH] tools/seq2bseq : Fix the same expression issue in if
+ condition
+Date: Mon, 15 Sep 2014 11:44:55 +0530
+Message-id: <000b01cfd0ac$62bf72e0$283e58a0$@samsung.com>
 MIME-version: 1.0
 Content-type: text/plain; charset=us-ascii
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi ,
 
 > -----Original Message-----
-> From: Johan Hedberg [mailto:johan.hedberg@gmail.com]
-> Sent: Friday, September 12, 2014 10:22 PM
-> To: gowtham babu
-> Cc: linux-bluetooth@vger.kernel.org; bharat.panda@samsung.com;
+> From: Marcel Holtmann [mailto:marcel@holtmann.org]
+> Sent: Friday, September 12, 2014 10:35 PM
+> To: Johan Hedberg
+> Cc: gowtham babu; linux-bluetooth@vger.kernel.org;
+> d.kasatkin@samsung.com; bharat.panda@samsung.com;
 > cpgs@samsung.com
-> Subject: Re: [PATCH 1/2] tools/btsnoop : Fix variable reassigning issue
+> Subject: Re: [PATCH] tools/seq2bseq : Fix the same expression issue in if
+> condition
 > 
-> Hi,
+> Hi Johan,
 > 
-> On Wed, Sep 10, 2014, gowtham babu wrote:
-> > The Variable 'written' is reassigned a value before the old one has been
-> used.
-> > The below on fix the same.
-> > ---
-> >  tools/btsnoop.c | 2 +-
-> >  1 file changed, 1 insertion(+), 1 deletion(-)
+> >> Below are the list of similar patches under 'tools' which are not yet
+> >> reviewed
+> >>
+> >> 1) tools/csr_usb : Fix Resource leak: file
+> >> 2) tools/hciattach : Fix syntax error
+> >> 3) tools/btsnoop : Fix variable reassigning issue
 > >
-> > diff --git a/tools/btsnoop.c b/tools/btsnoop.c index 6ca62d2..86f4691
-> > 100644
-> > --- a/tools/btsnoop.c
-> > +++ b/tools/btsnoop.c
-> > @@ -211,7 +211,7 @@ next_packet:
-> >  		goto next_packet;
-> >  	}
+> > This kind of stuff does not belong in a commit message.
 > >
-> > -	written = input_pkt[select_input].size = htobe32(toread - 1);
-> > +	input_pkt[select_input].size = htobe32(toread - 1);
-> >  	written = input_pkt[select_input].len = htobe32(toread - 1);
+> >> diff --git a/tools/seq2bseq.c b/tools/seq2bseq.c index
+> >> 7657a57..521d20e 100644
+> >> --- a/tools/seq2bseq.c
+> >> +++ b/tools/seq2bseq.c
+> >> @@ -40,7 +40,7 @@ static int convert_line(int fd, const char *line)
+> >> 	char str[3];
+> >> 	unsigned char val;
+> >>
+> >> -	if (line[0] == '*' || line[0] == '\r' || line[0] == '\r')
+> >> +	if (line[0] == '*' || line[0] == '\r')
+> >> 		return 0;
+> >>
+> >> 	while (1) {
+> >
+> > Are you sure the code wasn't intending to check for '\n'?
 > 
-> Why is there a need to evaluate htobe32(toread - 1) twice here? Why not
-> avoid that by something like:
+> yes, it was intended to check for \r and \n. This is my mistake here.
 > 
-> 	written = htobe32(toread - 1);
-> 	input_pkt[select_input].size = written;
-> 	input_pkt[select_input].len  = written;
+> Regards
 > 
-> Johan
+> Marcel
 
-
-I had fixed this and sent the revised patch. Please have a look at it.
+I had fixed this and sent the revised patch. Please have a look at it. 
 
 Regards,
-Gowtham
+Gowtham 
 
