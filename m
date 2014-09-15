@@ -2,33 +2,55 @@ Return-Path: <cyrus@holtmann.org>
 From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH v3 01/15] android/handsfree-client: Add handsfree-client ID
-Date: Mon, 15 Sep 2014 13:51:14 +0200
-Message-Id: <1410781888-1952-2-git-send-email-lukasz.rymanowski@tieto.com>
-In-Reply-To: <1410781888-1952-1-git-send-email-lukasz.rymanowski@tieto.com>
-References: <1410781888-1952-1-git-send-email-lukasz.rymanowski@tieto.com>
+Subject: [PATCH v3 00/15] android: HF Client initial implementation part 1
+Date: Mon, 15 Sep 2014 13:51:13 +0200
+Message-Id: <1410781888-1952-1-git-send-email-lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- android/hal-msg.h | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+Following patches adds HF Client commands skeleton
 
-diff --git a/android/hal-msg.h b/android/hal-msg.h
-index 3d95e10..8b1e292 100644
---- a/android/hal-msg.h
-+++ b/android/hal-msg.h
-@@ -35,8 +35,9 @@ static const char BLUEZ_HAL_SK_PATH[] = "\0bluez_hal_socket";
- #define HAL_SERVICE_ID_HEALTH		7
- #define HAL_SERVICE_ID_AVRCP		8
- #define HAL_SERVICE_ID_GATT		9
-+#define HAL_SERVICE_ID_HANDSFREE_CLIENT	10
- 
--#define HAL_SERVICE_ID_MAX HAL_SERVICE_ID_GATT
-+#define HAL_SERVICE_ID_MAX HAL_SERVICE_ID_HANDSFREE_CLIENT
- 
- /* Core Service */
- 
+v2:
+* Szymon comment from IRC handled
+* Splited patch set to smaller sets on Luiz request.
+
+v3:
+* Changed name to handsfree-client
+* Fix compilation issues with BLUEZ_EXTENSIONS flag
+
+Lukasz Rymanowski (15):
+  android/handsfree-client: Add handsfree-client ID
+  android/hardware: Add HFP Client Interface ID.
+  android/handsfree-client: Add handsfree-client daemon skeleton
+  android/handsfree-client: Add handsfree-client HAL skeleton
+  android/readme: Add information about handsfree-client
+  android/handsfree-client: Add Connect/Disconnect commands
+  android/handsfree-client: Add Audio Connect/Disconnect commands
+  android/handsfree-client: Add Start/Stop Voice Recognition command
+  android/handsfree-client: Add Volume Control command
+  android/handsfree-client: Add Dial and Dial Memory command
+  android/handsfree-client: Add Call Action command
+  android/handsfree-client: Add Query Current Call and Operator Name cmd
+  android/handsfree-client: Add Retrieve Subscriber Info command
+  android/handsfree-client: Add Send DTMF command
+  android/handsfree-client: Add Get Last Voice Tag Number command
+
+ android/Android.mk             |   9 ++
+ android/Makefile.am            |   5 +-
+ android/README                 |  10 ++
+ android/hal-bluetooth.c        |   5 +
+ android/hal-handsfree-client.c | 356 +++++++++++++++++++++++++++++++++++++++++
+ android/hal-msg.h              |  78 ++++++++-
+ android/hal.h                  |   8 +
+ android/handsfree-client.c     | 218 +++++++++++++++++++++++++
+ android/handsfree-client.h     |  25 +++
+ android/hardware/bluetooth.h   |   1 +
+ android/main.c                 |  11 ++
+ 11 files changed, 724 insertions(+), 2 deletions(-)
+ create mode 100644 android/hal-handsfree-client.c
+ create mode 100644 android/handsfree-client.c
+ create mode 100644 android/handsfree-client.h
+
 -- 
 1.8.4
 
