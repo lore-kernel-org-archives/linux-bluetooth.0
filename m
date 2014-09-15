@@ -2,78 +2,46 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH 04/11] android: Add functions for getting configuration options
-Date: Mon, 15 Sep 2014 16:49:08 +0200
-Message-Id: <1410792555-24765-5-git-send-email-szymon.janc@tieto.com>
+Subject: [PATCH 02/11] android/hal-msg: Add configuration command
+Date: Mon, 15 Sep 2014 16:49:06 +0200
+Message-Id: <1410792555-24765-3-git-send-email-szymon.janc@tieto.com>
 In-Reply-To: <1410792555-24765-1-git-send-email-szymon.janc@tieto.com>
 References: <1410792555-24765-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- android/main.c  | 29 +++++++++++++++++++++++++++++
- android/utils.h |  4 ++++
- 2 files changed, 33 insertions(+)
+ android/hal-msg.h | 17 +++++++++++++++++
+ 1 file changed, 17 insertions(+)
 
-diff --git a/android/main.c b/android/main.c
-index 005f24b..b0df011 100644
---- a/android/main.c
-+++ b/android/main.c
-@@ -61,6 +61,11 @@
- #include "handsfree.h"
- #include "gatt.h"
- #include "health.h"
-+#include "utils.h"
-+
-+#define DEFAULT_VENDOR "BlueZ"
-+#define DEFAULT_MODEL "BlueZ for Android"
-+#define DEFAULT_NAME "BlueZ for Android"
+diff --git a/android/hal-msg.h b/android/hal-msg.h
+index 3d95e10..48d3186 100644
+--- a/android/hal-msg.h
++++ b/android/hal-msg.h
+@@ -69,6 +69,23 @@ struct hal_cmd_unregister_module {
+ 	uint8_t service_id;
+ } __attribute__((packed));
  
- #define STARTUP_GRACE_SECONDS 5
- #define SHUTDOWN_GRACE_SECONDS 10
-@@ -79,6 +84,30 @@ static struct ipc *hal_ipc = NULL;
++#define HAL_CONFIG_VENDOR		0x00
++#define HAL_CONFIG_MODEL		0x01
++#define HAL_CONFIG_NAME			0x02
++
++#define HAL_CONFIG_MAX_LEN		92
++
++struct hal_config_prop {
++	uint8_t type;
++	uint8_t val[HAL_CONFIG_MAX_LEN];
++} __attribute__((packed));
++
++#define HAL_OP_CONFIGURATION		0x03
++struct hal_cmd_configuration {
++	uint8_t num;
++	struct hal_config_prop props[0];
++} __attribute__((packed));
++
+ /* Bluetooth Core HAL API */
  
- static bool services[HAL_SERVICE_ID_MAX + 1] = { false };
- 
-+const char *bt_config_get_vendor(void)
-+{
-+	if (config_vendor)
-+		return config_vendor;
-+
-+	return DEFAULT_VENDOR;
-+}
-+
-+const char *bt_config_get_name(void)
-+{
-+	if (config_name)
-+		return config_name;
-+
-+	return DEFAULT_NAME;
-+}
-+
-+const char *bt_config_get_model(void)
-+{
-+	if (config_model)
-+		return config_model;
-+
-+	return DEFAULT_MODEL;
-+}
-+
- static void service_register(const void *buf, uint16_t len)
- {
- 	const struct hal_cmd_register_module *m = buf;
-diff --git a/android/utils.h b/android/utils.h
-index 560e991..c70f8cb 100644
---- a/android/utils.h
-+++ b/android/utils.h
-@@ -30,3 +30,7 @@ static inline void bdaddr2android(const bdaddr_t *src, void *buf)
- {
- 	baswap(buf, src);
- }
-+
-+const char *bt_config_get_vendor(void);
-+const char *bt_config_get_model(void);
-+const char *bt_config_get_name(void);
+ #define HAL_OP_ENABLE			0x01
 -- 
 1.9.3
 
