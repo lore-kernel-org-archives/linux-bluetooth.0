@@ -1,45 +1,63 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1410211320-16111-1-git-send-email-roylee@paypal.com>
-References: <1410211320-16111-1-git-send-email-roylee@paypal.com>
-Date: Mon, 15 Sep 2014 10:00:34 +0300
-Message-ID: <CABBYNZ+d0B1ecR1P328=X6+PVOHGuMQFV9Es82_-uDBP=b1TMw@mail.gmail.com>
-Subject: Re: [PATCH 1/3] tools: Fix usage for hciattach command
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: roylee17@gmail.com
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+From: Gowtham Anandha Babu <gowtham.ab@samsung.com>
+To: 'Johan Hedberg' <johan.hedberg@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org, bharat.panda@samsung.com,
+	cpgs@samsung.com
+References: <1410330944-3492-1-git-send-email-gowtham.ab@samsung.com>
+ <20140912165155.GB3671@t440s>
+In-reply-to: <20140912165155.GB3671@t440s>
+Subject: RE: [PATCH 1/2] tools/btsnoop : Fix variable reassigning issue
+Date: Mon, 15 Sep 2014 11:45:07 +0530
+Message-id: <000c01cfd0ac$68ce5a20$3a6b0e60$@samsung.com>
+MIME-version: 1.0
+Content-type: text/plain; charset=us-ascii
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi,
 
-On Tue, Sep 9, 2014 at 12:21 AM,  <roylee17@gmail.com> wrote:
-> From: Tzu-Jung Lee <roylee17@gmail.com>
->
-> ---
->  tools/hciattach.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/tools/hciattach.c b/tools/hciattach.c
-> index 1904ac5..542b5b3 100644
-> --- a/tools/hciattach.c
-> +++ b/tools/hciattach.c
-> @@ -1276,7 +1276,7 @@ static void usage(void)
->  {
->         printf("hciattach - HCI UART driver initialization utility\n");
->         printf("Usage:\n");
-> -       printf("\thciattach [-n] [-p] [-b] [-r] [-t timeout] [-s initial_speed] <tty> <type | id> [speed] [flow|noflow] [bdaddr]\n");
-> +       printf("\thciattach [-n] [-p] [-b] [-r] [-t timeout] [-s initial_speed] <tty> <type | id> [speed] [flow|noflow] [sleep|nosleep] [bdaddr]\n");
->         printf("\thciattach -l\n");
->  }
->
-> --
-> 2.0.4
+> -----Original Message-----
+> From: Johan Hedberg [mailto:johan.hedberg@gmail.com]
+> Sent: Friday, September 12, 2014 10:22 PM
+> To: gowtham babu
+> Cc: linux-bluetooth@vger.kernel.org; bharat.panda@samsung.com;
+> cpgs@samsung.com
+> Subject: Re: [PATCH 1/2] tools/btsnoop : Fix variable reassigning issue
+> 
+> Hi,
+> 
+> On Wed, Sep 10, 2014, gowtham babu wrote:
+> > The Variable 'written' is reassigned a value before the old one has been
+> used.
+> > The below on fix the same.
+> > ---
+> >  tools/btsnoop.c | 2 +-
+> >  1 file changed, 1 insertion(+), 1 deletion(-)
+> >
+> > diff --git a/tools/btsnoop.c b/tools/btsnoop.c index 6ca62d2..86f4691
+> > 100644
+> > --- a/tools/btsnoop.c
+> > +++ b/tools/btsnoop.c
+> > @@ -211,7 +211,7 @@ next_packet:
+> >  		goto next_packet;
+> >  	}
+> >
+> > -	written = input_pkt[select_input].size = htobe32(toread - 1);
+> > +	input_pkt[select_input].size = htobe32(toread - 1);
+> >  	written = input_pkt[select_input].len = htobe32(toread - 1);
+> 
+> Why is there a need to evaluate htobe32(toread - 1) twice here? Why not
+> avoid that by something like:
+> 
+> 	written = htobe32(toread - 1);
+> 	input_pkt[select_input].size = written;
+> 	input_pkt[select_input].len  = written;
+> 
+> Johan
 
-It doesn't look like you are doing anything with sleep|nosleep here,
-also you should probably a add more information regarding what it is
-fixing.
 
--- 
-Luiz Augusto von Dentz
+I had fixed this and sent the revised patch. Please have a look at it.
+
+Regards,
+Gowtham
+
