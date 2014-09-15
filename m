@@ -1,159 +1,397 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Mon, 15 Sep 2014 12:13:34 +0200
+From: Alexander Aring <alex.aring@gmail.com>
+To: Martin Townsend <mtownsend1973@gmail.com>
+Cc: linux-zigbee-devel@lists.sourceforge.net,
+	linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org,
+	marcel@holtmann.org, Martin Townsend <martin.townsend@xsilon.com>
+Subject: Re: [PATCH v2 bluetooth] 6lowpan: fix incorrect return values in
+ lowpan_rcv
+Message-ID: <20140915101331.GA10580@omega>
+References: <1410514480-9070-1-git-send-email-martin.townsend@xsilon.com>
+ <1410514480-9070-3-git-send-email-martin.townsend@xsilon.com>
 MIME-Version: 1.0
-In-Reply-To: <1410529462-28220-1-git-send-email-gowtham.ab@samsung.com>
-References: <1410529462-28220-1-git-send-email-gowtham.ab@samsung.com>
-Date: Mon, 15 Sep 2014 13:22:25 +0300
-Message-ID: <CABBYNZKqe1o8-b2k=aLKY4vzaWjM_tRAZfwq4MdnN_fijW4cow@mail.gmail.com>
-Subject: Re: [MAP v2] obexd/client : Handle the MAP Extended Event Report 1.1
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Gowtham Anandha Babu <gowtham.ab@samsung.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	Dmitry Kasatkin <d.kasatkin@samsung.com>,
-	Bharat Panda <bharat.panda@samsung.com>, cpgs@samsung.com
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=utf-8
+In-Reply-To: <1410514480-9070-3-git-send-email-martin.townsend@xsilon.com>
+Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Martin,
 
-On Fri, Sep 12, 2014 at 4:44 PM, Gowtham Anandha Babu
-<gowtham.ab@samsung.com> wrote:
-> Changes made to handle the Extended Event Report 1.1
->
-> 1) In SDP, the MAP supported featured bit is updated.
-> 2) In map-event, corresponding new event type and the new attribute introduced in Event report 1.1 is added.
-> 3) In mns corresponding handlers are added.
->
-> Freed all the event attibutes inside map_event_free() function.
+something is wrong with you mail client. I received the cover letter
+twice one has some wrong reply-to id. Please check this.
 
-For comments regarding the patch version you should put bellow after
---- so it does not became part of patch description. Also more
-important than what changes are you proposing is why should we take
-this changes, like why extended event should be supported this should
-be in the description.
+Do you use git send-email? How, maybe we can help you there.
 
+On Fri, Sep 12, 2014 at 10:34:40AM +0100, Martin Townsend wrote:
+> Currently there are a number of error paths in the lowpan_rcv function that
+> free the skb before returning, the patch simplifies the receive path by
+> ensuring that the skb is only freed from this function.
+> 
+> Passing the skb from 6lowpan up to the higher layers is not a
+> function of IPHC.  By moving it out of IPHC we also remove the
+> need to support error code returns with NET_RX codes.
+> It also makes the lowpan_rcv function more extendable as we
+> can support more compression schemes.
+> 
+> With the above 2 lowpan_rcv is refacored so eliminate incorrect return values.
+> 
+> Signed-off-by: Martin Townsend <martin.townsend@xsilon.com>
 > ---
->  lib/sdp.h                |  2 +-
->  obexd/client/map-event.h |  7 ++++++-
->  obexd/client/mns.c       | 34 ++++++++++++++++++++++++++++++++++
->  3 files changed, 41 insertions(+), 2 deletions(-)
->
-> diff --git a/lib/sdp.h b/lib/sdp.h
-> index cc10e9f..76f61e1 100644
-> --- a/lib/sdp.h
-> +++ b/lib/sdp.h
-> @@ -306,7 +306,7 @@ extern "C" {
->  #define SDP_ATTR_MAS_INSTANCE_ID               0x0315
->  #define SDP_ATTR_SUPPORTED_MESSAGE_TYPES       0x0316
->  #define SDP_ATTR_PBAP_SUPPORTED_FEATURES       0x0317
-> -#define SDP_ATTR_MAP_SUPPORTED_FEATURES                0x0317
-> +#define SDP_ATTR_MAP_SUPPORTED_FEATURES                0x031f
->
->  #define SDP_ATTR_SPECIFICATION_ID              0x0200
->  #define SDP_ATTR_VENDOR_ID                     0x0201
-> diff --git a/obexd/client/map-event.h b/obexd/client/map-event.h
-> index ba5d5d2..99cb0c2 100644
-> --- a/obexd/client/map-event.h
-> +++ b/obexd/client/map-event.h
-> @@ -32,7 +32,8 @@ enum map_event_type {
->         MAP_ET_MEMORY_FULL,
->         MAP_ET_MEMORY_AVAILABLE,
->         MAP_ET_MESSAGE_DELETED,
-> -       MAP_ET_MESSAGE_SHIFT
-> +       MAP_ET_MESSAGE_SHIFT,
-> +       MAP_ET_READ_STATUS_CHANGED
->  };
->
->  struct map_event {
-> @@ -41,6 +42,10 @@ struct map_event {
->         char *folder;
->         char *old_folder;
->         char *msg_type;
-> +       char *datetime;
-> +       char *subject;
-> +       char *sender_name;
-> +       char *priority;
->  };
->
->  /* Handle notification in map client.
-> diff --git a/obexd/client/mns.c b/obexd/client/mns.c
-> index d638886..49ccaab 100644
-> --- a/obexd/client/mns.c
-> +++ b/obexd/client/mns.c
-> @@ -180,6 +180,8 @@ static void parse_event_report_type(struct map_event *event, const char *value)
->                 event->type = MAP_ET_MESSAGE_DELETED;
->         else if (!g_ascii_strcasecmp(value, "MessageShift"))
->                 event->type = MAP_ET_MESSAGE_SHIFT;
-> +       else if (!g_ascii_strcasecmp(value, "ReadStatusChanged"))
-> +               event->type = MAP_ET_READ_STATUS_CHANGED;
+>  include/net/6lowpan.h         |  4 +--
+>  net/6lowpan/iphc.c            | 73 ++++++++++++++++++-------------------------
+>  net/bluetooth/6lowpan.c       | 26 +++++++++------
+>  net/ieee802154/6lowpan_rtnl.c | 44 +++++++++++++++-----------
+>  4 files changed, 75 insertions(+), 72 deletions(-)
+> 
+> diff --git a/include/net/6lowpan.h b/include/net/6lowpan.h
+> index d184df1..450eaaf 100644
+> --- a/include/net/6lowpan.h
+> +++ b/include/net/6lowpan.h
+> @@ -374,10 +374,10 @@ lowpan_uncompress_size(const struct sk_buff *skb, u16 *dgram_offset)
+>  
+>  typedef int (*skb_delivery_cb)(struct sk_buff *skb, struct net_device *dev);
+>  
+> -int lowpan_process_data(struct sk_buff *skb, struct net_device *dev,
+> +int lowpan_process_data(struct sk_buff **skb_inout, struct net_device *dev,
+>  		const u8 *saddr, const u8 saddr_type, const u8 saddr_len,
+>  		const u8 *daddr, const u8 daddr_type, const u8 daddr_len,
+> -		u8 iphc0, u8 iphc1, skb_delivery_cb skb_deliver);
+> +		u8 iphc0, u8 iphc1);
+
+check checkpatch here.
+
+CHECK: Alignment should match open parenthesis
+#37: FILE: include/net/6lowpan.h:378:
++int lowpan_process_data(struct sk_buff **skb_inout, struct net_device *dev,
+ 		const u8 *saddr, const u8 saddr_type, const u8 saddr_len,
+
+>  int lowpan_header_compress(struct sk_buff *skb, struct net_device *dev,
+>  			unsigned short type, const void *_daddr,
+>  			const void *_saddr, unsigned int len);
+> diff --git a/net/6lowpan/iphc.c b/net/6lowpan/iphc.c
+> index 142eef5..43ed1b4 100644
+> --- a/net/6lowpan/iphc.c
+> +++ b/net/6lowpan/iphc.c
+> @@ -171,37 +171,6 @@ static int uncompress_context_based_src_addr(struct sk_buff *skb,
+>  	return 0;
 >  }
->
->  static void parse_event_report_handle(struct map_event *event,
-> @@ -218,6 +220,30 @@ static void parse_event_report_msg_type(struct map_event *event,
->         event->msg_type = g_strdup(value);
+>  
+> -static int skb_deliver(struct sk_buff *skb, struct ipv6hdr *hdr,
+> -		       struct net_device *dev, skb_delivery_cb deliver_skb)
+> -{
+> -	struct sk_buff *new;
+> -	int stat;
+> -
+> -	new = skb_copy_expand(skb, sizeof(struct ipv6hdr), skb_tailroom(skb),
+> -			      GFP_ATOMIC);
+> -	kfree_skb(skb);
+> -
+> -	if (!new)
+> -		return -ENOMEM;
+> -
+> -	skb_push(new, sizeof(struct ipv6hdr));
+> -	skb_reset_network_header(new);
+> -	skb_copy_to_linear_data(new, hdr, sizeof(struct ipv6hdr));
+> -
+> -	new->protocol = htons(ETH_P_IPV6);
+> -	new->pkt_type = PACKET_HOST;
+> -	new->dev = dev;
+> -
+> -	raw_dump_table(__func__, "raw skb data dump before receiving",
+> -		       new->data, new->len);
+> -
+> -	stat = deliver_skb(new, dev);
+> -
+> -	kfree_skb(new);
+> -
+> -	return stat;
+> -}
+> -
+>  /* Uncompress function for multicast destination address,
+>   * when M bit is set.
+>   */
+> @@ -332,14 +301,16 @@ err:
+>  /* TTL uncompression values */
+>  static const u8 lowpan_ttl_values[] = { 0, 1, 64, 255 };
+>  
+> -int lowpan_process_data(struct sk_buff *skb, struct net_device *dev,
+> +int lowpan_process_data(struct sk_buff **skb_inout, struct net_device *dev,
+>  			const u8 *saddr, const u8 saddr_type, const u8 saddr_len,
+>  			const u8 *daddr, const u8 daddr_type, const u8 daddr_len,
+> -			u8 iphc0, u8 iphc1, skb_delivery_cb deliver_skb)
+> +			u8 iphc0, u8 iphc1)
+>  {
+>  	struct ipv6hdr hdr = {};
+>  	u8 tmp, num_context = 0;
+>  	int err;
+> +	int err_ret = -EINVAL;
+
+use err here, I saw this in your cover-letter as change but it's not
+really changed.
+
+> +	struct sk_buff *skb = *skb_inout;
+>  
+>  	raw_dump_table(__func__, "raw skb data dump uncompressed",
+>  		       skb->data, skb->len);
+> @@ -460,7 +431,6 @@ int lowpan_process_data(struct sk_buff *skb, struct net_device *dev,
+>  	/* UDP data uncompression */
+>  	if (iphc0 & LOWPAN_IPHC_NH_C) {
+>  		struct udphdr uh;
+> -		struct sk_buff *new;
+>  
+>  		if (uncompress_udp_header(skb, &uh))
+>  			goto drop;
+> @@ -468,14 +438,15 @@ int lowpan_process_data(struct sk_buff *skb, struct net_device *dev,
+>  		/* replace the compressed UDP head by the uncompressed UDP
+>  		 * header
+>  		 */
+> -		new = skb_copy_expand(skb, sizeof(struct udphdr),
+> +		skb = skb_copy_expand(skb, sizeof(struct udphdr),
+>  				      skb_tailroom(skb), GFP_ATOMIC);
+> -		kfree_skb(skb);
+> -
+> -		if (!new)
+> -			return -ENOMEM;
+> +		if (!skb) {
+> +			err_ret = -ENOMEM;
+> +			goto drop;
+> +		}
+>  
+> -		skb = new;
+> +		kfree_skb(*skb_inout);
+> +		*skb_inout = skb;
+>  
+>  		skb_push(skb, sizeof(struct udphdr));
+>  		skb_reset_transport_header(skb);
+> @@ -499,11 +470,27 @@ int lowpan_process_data(struct sk_buff *skb, struct net_device *dev,
+>  
+>  	raw_dump_table(__func__, "raw header dump", (u8 *)&hdr, sizeof(hdr));
+>  
+> -	return skb_deliver(skb, &hdr, dev, deliver_skb);
+> +	/* Setup skb with new uncompressed IPv6 header. */
+> +	skb = skb_copy_expand(skb, sizeof(hdr), skb_tailroom(skb),
+> +			      GFP_ATOMIC);
+> +	if (!skb)
+> +		return -ENOMEM;
+> +
+> +	kfree_skb(*skb_inout);
+> +	*skb_inout = skb;
+> +
+> +	skb_push(skb, sizeof(hdr));
+> +	skb_reset_network_header(skb);
+> +	skb_copy_to_linear_data(skb, &hdr, sizeof(hdr));
+> +	skb->dev = dev;
+> +
+> +	raw_dump_table(__func__, "raw skb data dump before receiving",
+> +		       skb->data, skb->len);
+> +
+> +	return 0;
+>  
+>  drop:
+> -	kfree_skb(skb);
+> -	return -EINVAL;
+> +	return err_ret;
 >  }
->
-> +static void parse_event_report_date_time(struct map_event *event,
-> +                                                        const char *value)
-> +{
-> +       event->datetime = g_strdup(value);
-> +}
-> +
-> +static void parse_event_report_subject(struct map_event *event,
-> +                                                        const char *value)
-> +{
-> +       event->subject = g_strdup(value);
-> +}
-> +
-> +static void parse_event_report_sender_name(struct map_event *event,
-> +                                                        const char *value)
-> +{
-> +       event->sender_name = g_strdup(value);
-> +}
-> +
-> +static void parse_event_report_priority(struct map_event *event,
-> +                                                        const char *value)
-> +{
-> +       event->priority = g_strdup(value);
-> +}
-> +
-
-You should check if the value is NULL in the parser, also it is
-probably safer to g_free the field before you assign anything
-otherwise it can still leak if the remote device misbehave and send
-the event more than once.
-
->  static struct map_event_report_parser {
->         const char *name;
->         void (*func) (struct map_event *event, const char *value);
-> @@ -227,6 +253,10 @@ static struct map_event_report_parser {
->                 { "folder", parse_event_report_folder },
->                 { "old_folder", parse_event_report_old_folder },
->                 { "msg_type", parse_event_report_msg_type },
-> +               { "datetime", parse_event_report_date_time },
-> +               { "subject", parse_event_report_subject },
-> +               { "sender_name", parse_event_report_sender_name },
-> +               { "priority", parse_event_report_priority },
->                 { }
->  };
->
-> @@ -268,6 +298,10 @@ static void map_event_free(struct map_event *event)
->         g_free(event->folder);
->         g_free(event->old_folder);
->         g_free(event->msg_type);
-> +       g_free(event->datetime);
-> +       g_free(event->subject);
-> +       g_free(event->sender_name);
-> +       g_free(event->priority);
->         g_free(event);
+>  EXPORT_SYMBOL_GPL(lowpan_process_data);
+>  
+> diff --git a/net/bluetooth/6lowpan.c b/net/bluetooth/6lowpan.c
+> index 206b65c..a4e340e 100644
+> --- a/net/bluetooth/6lowpan.c
+> +++ b/net/bluetooth/6lowpan.c
+> @@ -215,7 +215,7 @@ static int give_skb_to_upper(struct sk_buff *skb, struct net_device *dev)
+>  	return ret;
 >  }
->
-> --
-> 1.9.1
->
+>  
+> -static int process_data(struct sk_buff *skb, struct net_device *netdev,
+> +static int process_data(struct sk_buff **skb_inout, struct net_device *netdev,
+>  			struct l2cap_chan *chan)
+>  {
+>  	const u8 *saddr, *daddr;
+> @@ -223,6 +223,7 @@ static int process_data(struct sk_buff *skb, struct net_device *netdev,
+>  	struct lowpan_dev *dev;
+>  	struct lowpan_peer *peer;
+>  	unsigned long flags;
+> +	struct sk_buff *skb = *skb_inout;
+>  
+>  	dev = lowpan_dev(netdev);
+>  
+> @@ -245,13 +246,12 @@ static int process_data(struct sk_buff *skb, struct net_device *netdev,
+>  	if (lowpan_fetch_skb_u8(skb, &iphc1))
+>  		goto drop;
+>  
+> -	return lowpan_process_data(skb, netdev,
+> +	return lowpan_process_data(skb_inout, netdev,
+>  				   saddr, IEEE802154_ADDR_LONG, EUI64_ADDR_LEN,
+>  				   daddr, IEEE802154_ADDR_LONG, EUI64_ADDR_LEN,
+> -				   iphc0, iphc1, give_skb_to_upper);
+> +				   iphc0, iphc1);
+>  
+>  drop:
+> -	kfree_skb(skb);
+>  	return -EINVAL;
+>  }
+>  
+> @@ -280,9 +280,6 @@ static int recv_pkt(struct sk_buff *skb, struct net_device *dev,
+>  		local_skb->protocol = htons(ETH_P_IPV6);
+>  		local_skb->pkt_type = PACKET_HOST;
+>  
+> -		skb_reset_network_header(local_skb);
+> -		skb_set_transport_header(local_skb, sizeof(struct ipv6hdr));
+> -
+>  		if (give_skb_to_upper(local_skb, dev) != NET_RX_SUCCESS) {
+>  			kfree_skb(local_skb);
+>  			goto drop;
+> @@ -300,9 +297,20 @@ static int recv_pkt(struct sk_buff *skb, struct net_device *dev,
+>  			if (!local_skb)
+>  				goto drop;
+>  
+> -			ret = process_data(local_skb, dev, chan);
+> -			if (ret != NET_RX_SUCCESS)
+> +			ret = process_data(&local_skb, dev, chan);
+> +			if (ret < 0) {
+> +				kfree_skb(local_skb);
+>  				goto drop;
+> +			}
+> +
+> +			local_skb->protocol = htons(ETH_P_IPV6);
+> +			local_skb->pkt_type = PACKET_HOST;
+> +
+> +			if (give_skb_to_upper(local_skb, dev)
+> +							!= NET_RX_SUCCESS) {
+> +				kfree_skb(local_skb);
+> +				goto drop;
+> +			}
+>  
+>  			dev->stats.rx_bytes += skb->len;
+>  			dev->stats.rx_packets++;
+> diff --git a/net/ieee802154/6lowpan_rtnl.c b/net/ieee802154/6lowpan_rtnl.c
+> index 6591d27..d5bdeba 100644
+> --- a/net/ieee802154/6lowpan_rtnl.c
+> +++ b/net/ieee802154/6lowpan_rtnl.c
+> @@ -167,11 +167,13 @@ static int lowpan_give_skb_to_devices(struct sk_buff *skb,
+>  	return stat;
+>  }
+>  
+> -static int process_data(struct sk_buff *skb, const struct ieee802154_hdr *hdr)
+> +static int process_data(struct sk_buff **skb_inout,
+> +			const struct ieee802154_hdr *hdr)
+>  {
+>  	u8 iphc0, iphc1;
+>  	struct ieee802154_addr_sa sa, da;
+>  	void *sap, *dap;
+> +	struct sk_buff *skb = *skb_inout;
+>  
+>  	raw_dump_table(__func__, "raw skb data dump", skb->data, skb->len);
+>  	/* at least two bytes will be used for the encoding */
+> @@ -197,13 +199,11 @@ static int process_data(struct sk_buff *skb, const struct ieee802154_hdr *hdr)
+>  	else
+>  		dap = &da.hwaddr;
+>  
+> -	return lowpan_process_data(skb, skb->dev, sap, sa.addr_type,
+> +	return lowpan_process_data(skb_inout, skb->dev, sap, sa.addr_type,
+>  				   IEEE802154_ADDR_LEN, dap, da.addr_type,
+> -				   IEEE802154_ADDR_LEN, iphc0, iphc1,
+> -				   lowpan_give_skb_to_devices);
+> +				   IEEE802154_ADDR_LEN, iphc0, iphc1);
+>  
+>  drop:
+> -	kfree_skb(skb);
+>  	return -EINVAL;
+>  }
+>  
+> @@ -478,36 +478,35 @@ static int lowpan_rcv(struct sk_buff *skb, struct net_device *dev,
+>  
+>  	/* check that it's our buffer */
+>  	if (skb->data[0] == LOWPAN_DISPATCH_IPV6) {
+> -		skb->protocol = htons(ETH_P_IPV6);
+> -		skb->pkt_type = PACKET_HOST;
+> -
+>  		/* Pull off the 1-byte of 6lowpan header. */
+>  		skb_pull(skb, 1);
+>  
+> -		ret = lowpan_give_skb_to_devices(skb, NULL);
+> -		if (ret == NET_RX_DROP)
+> -			goto drop;
+> +		ret = NET_RX_SUCCESS;
+>  	} else {
+>  		switch (skb->data[0] & 0xe0) {
+>  		case LOWPAN_DISPATCH_IPHC:	/* ipv6 datagram */
+> -			ret = process_data(skb, &hdr);
+> -			if (ret == NET_RX_DROP)
+> +			ret = process_data(&skb, &hdr);
+> +			if (ret < 0)
+>  				goto drop;
+>  			break;
+>  		case LOWPAN_DISPATCH_FRAG1:	/* first fragment header */
+>  			ret = lowpan_frag_rcv(skb, LOWPAN_DISPATCH_FRAG1);
 
+can also return "-1" for error but in this case the skb is already freed.
+so some else if with NET_RX_DROP. I know it was not handled before but we
+should handle this right now, when we care about the error handling.
 
+>  			if (ret == 1) {
+> -				ret = process_data(skb, &hdr);
+> -				if (ret == NET_RX_DROP)
+> +				ret = process_data(&skb, &hdr);
+> +				if (ret < 0)
+>  					goto drop;
+this function returning an errno, you can't return the errno here. goto
+drop returns the ret variable. Maybe just make a return NET_RX_DROP at
+drop. We should never return a different variable.
 
--- 
-Luiz Augusto von Dentz
+Also this need to be drop_skb at several places in this code, we don't
+have a kfree_skb at process_data anymore. This leaks memory.
+
+> +			} else {
+> +				return NET_RX_SUCCESS;
+>  			}
+>  			break;
+>  		case LOWPAN_DISPATCH_FRAGN:	/* next fragments headers */
+>  			ret = lowpan_frag_rcv(skb, LOWPAN_DISPATCH_FRAGN);
+
+same here.
+>  			if (ret == 1) {
+> -				ret = process_data(skb, &hdr);
+> -				if (ret == NET_RX_DROP)
+> +				ret = process_data(&skb, &hdr);
+> +				if (ret < 0)
+>  					goto drop;
+
+same here.
+
+> +			} else {
+> +				return NET_RX_SUCCESS;
+>  			}
+>  			break;
+>  		default:
+> @@ -515,7 +514,16 @@ static int lowpan_rcv(struct sk_buff *skb, struct net_device *dev,
+>  		}
+>  	}
+>  
+> -	return NET_RX_SUCCESS;
+> +	/* Pass IPv6 packet up to next layer */
+> +	skb->protocol = htons(ETH_P_IPV6);
+> +	skb->pkt_type = PACKET_HOST;
+> +	ret = lowpan_give_skb_to_devices(skb, NULL);
+
+grml, see possible merge conflicts here. In next should be no dev
+parameter anymore. Nevertheless should easy to fix it.
+
+> +	if (ret < 0)
+> +		goto drop_skb;
+> +
+
+Also here that's too broken here. In lowpan_give_skb_to_devices we have
+mixed errno and  NET_RX_SUCCESS for the return variable, we need to
+clean this up. Maybe just return the NET_RX_SUCCESS|NET_RX_DROP return
+value from netif_rx call.
+
+> +	kfree_skb(skb);
+
+consume_skb here.
+
+Simple on error kfree_skb, not a error consume_skb or dev_kfree_skb. I
+prefer consume_skb.
+
+- Alex
