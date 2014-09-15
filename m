@@ -1,34 +1,45 @@
 Return-Path: <cyrus@holtmann.org>
-From: Jukka Rissanen <jukka.rissanen@linux.intel.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: alex.aring@gmail.com,
-	Jukka Rissanen <jukka.rissanen@linux.intel.com>
-Subject: [PATCH] MAINTAINERS: add maintainer for generic 6LoWPAN
-Date: Mon, 15 Sep 2014 11:03:36 +0300
-Message-Id: <1410768216-12414-1-git-send-email-jukka.rissanen@linux.intel.com>
+MIME-Version: 1.0
+In-Reply-To: <1410211320-16111-1-git-send-email-roylee@paypal.com>
+References: <1410211320-16111-1-git-send-email-roylee@paypal.com>
+Date: Mon, 15 Sep 2014 10:00:34 +0300
+Message-ID: <CABBYNZ+d0B1ecR1P328=X6+PVOHGuMQFV9Es82_-uDBP=b1TMw@mail.gmail.com>
+Subject: Re: [PATCH 1/3] tools: Fix usage for hciattach command
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: roylee17@gmail.com
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Add Jukka to 6LoWPAN maintainer list. He will concentrate on
-generic and bluetooth part of 6LoWPAN stack.
+Hi,
 
-Signed-off-by: Jukka Rissanen <jukka.rissanen@linux.intel.com>
----
- MAINTAINERS | 1 +
- 1 file changed, 1 insertion(+)
+On Tue, Sep 9, 2014 at 12:21 AM,  <roylee17@gmail.com> wrote:
+> From: Tzu-Jung Lee <roylee17@gmail.com>
+>
+> ---
+>  tools/hciattach.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/tools/hciattach.c b/tools/hciattach.c
+> index 1904ac5..542b5b3 100644
+> --- a/tools/hciattach.c
+> +++ b/tools/hciattach.c
+> @@ -1276,7 +1276,7 @@ static void usage(void)
+>  {
+>         printf("hciattach - HCI UART driver initialization utility\n");
+>         printf("Usage:\n");
+> -       printf("\thciattach [-n] [-p] [-b] [-r] [-t timeout] [-s initial_speed] <tty> <type | id> [speed] [flow|noflow] [bdaddr]\n");
+> +       printf("\thciattach [-n] [-p] [-b] [-r] [-t timeout] [-s initial_speed] <tty> <type | id> [speed] [flow|noflow] [sleep|nosleep] [bdaddr]\n");
+>         printf("\thciattach -l\n");
+>  }
+>
+> --
+> 2.0.4
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 0b7007a..94ad1ba 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -152,6 +152,7 @@ F:	drivers/scsi/53c700*
- 
- 6LOWPAN GENERIC (BTLE/IEEE 802.15.4)
- M:	Alexander Aring <alex.aring@gmail.com>
-+M:	Jukka Rissanen <jukka.rissanen@linux.intel.com>
- L:	linux-bluetooth@vger.kernel.org
- L:	linux-wpan@vger.kernel.org
- S:	Maintained
+It doesn't look like you are doing anything with sleep|nosleep here,
+also you should probably a add more information regarding what it is
+fixing.
+
 -- 
-1.8.3.1
-
+Luiz Augusto von Dentz
