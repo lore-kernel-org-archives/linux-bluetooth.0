@@ -2,119 +2,78 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH 03/11] android: Add support for configuration command
-Date: Mon, 15 Sep 2014 16:49:07 +0200
-Message-Id: <1410792555-24765-4-git-send-email-szymon.janc@tieto.com>
+Subject: [PATCH 04/11] android: Add functions for getting configuration options
+Date: Mon, 15 Sep 2014 16:49:08 +0200
+Message-Id: <1410792555-24765-5-git-send-email-szymon.janc@tieto.com>
 In-Reply-To: <1410792555-24765-1-git-send-email-szymon.janc@tieto.com>
 References: <1410792555-24765-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- android/main.c | 65 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 65 insertions(+)
+ android/main.c  | 29 +++++++++++++++++++++++++++++
+ android/utils.h |  4 ++++
+ 2 files changed, 33 insertions(+)
 
 diff --git a/android/main.c b/android/main.c
-index b03a2df..005f24b 100644
+index 005f24b..b0df011 100644
 --- a/android/main.c
 +++ b/android/main.c
-@@ -45,6 +45,7 @@
+@@ -61,6 +61,11 @@
+ #include "handsfree.h"
+ #include "gatt.h"
+ #include "health.h"
++#include "utils.h"
++
++#define DEFAULT_VENDOR "BlueZ"
++#define DEFAULT_MODEL "BlueZ for Android"
++#define DEFAULT_NAME "BlueZ for Android"
  
- #include "src/log.h"
- #include "src/sdpd.h"
-+#include "src/shared/util.h"
- 
- #include "lib/bluetooth.h"
- 
-@@ -64,6 +65,10 @@
  #define STARTUP_GRACE_SECONDS 5
  #define SHUTDOWN_GRACE_SECONDS 10
+@@ -79,6 +84,30 @@ static struct ipc *hal_ipc = NULL;
  
-+static char *config_vendor = NULL;
-+static char *config_model = NULL;
-+static char *config_name = NULL;
-+
- static guint bluetooth_start_timeout = 0;
+ static bool services[HAL_SERVICE_ID_MAX + 1] = { false };
  
- static bdaddr_t adapter_bdaddr;
-@@ -221,11 +226,67 @@ failed:
- 								status);
- }
- 
-+static char *get_prop(char *prop, uint16_t len, const uint8_t *val)
++const char *bt_config_get_vendor(void)
 +{
-+	/* TODO should fail if set more than once ? */
-+	free(prop);
++	if (config_vendor)
++		return config_vendor;
 +
-+	prop = malloc0(len);
-+	if (!prop)
-+		return NULL;
-+
-+	memcpy(prop, val, len);
-+	prop[len - 1] = '\0';
-+
-+	return prop;
++	return DEFAULT_VENDOR;
 +}
 +
-+static void configuration(const void *buf, uint16_t len)
++const char *bt_config_get_name(void)
 +{
-+	const struct hal_cmd_configuration *cmd = buf;
-+	unsigned int i;
++	if (config_name)
++		return config_name;
 +
-+	if (len != sizeof(*cmd) + cmd->num * sizeof(cmd->props[0])) {
-+		error("Invalid configuration command, terminating");
-+		raise(SIGTERM);
-+		return;
-+	}
-+
-+	for (i = 0; i < cmd->num; i++) {
-+		switch (cmd->props[i].type) {
-+		case HAL_CONFIG_VENDOR:
-+			config_vendor = get_prop(config_vendor,
-+							HAL_CONFIG_MAX_LEN,
-+							cmd->props[i].val);
-+			break;
-+		case HAL_CONFIG_NAME:
-+			config_name = get_prop(config_name, HAL_CONFIG_MAX_LEN,
-+							cmd->props[i].val);
-+			break;
-+		case HAL_CONFIG_MODEL:
-+			config_model = get_prop(config_model,
-+							HAL_CONFIG_MAX_LEN,
-+							cmd->props[i].val);
-+			break;
-+		default:
-+			error("Invalid configuration option (%u), terminating",
-+							cmd->props[i].type);
-+			raise(SIGTERM);
-+			return;
-+		}
-+	}
-+
-+	ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_CORE, HAL_OP_CONFIGURATION,
-+							HAL_STATUS_SUCCESS);
++	return DEFAULT_NAME;
 +}
 +
- static const struct ipc_handler cmd_handlers[] = {
- 	/* HAL_OP_REGISTER_MODULE */
- 	{ service_register, false, sizeof(struct hal_cmd_register_module) },
- 	/* HAL_OP_UNREGISTER_MODULE */
- 	{ service_unregister, false, sizeof(struct hal_cmd_unregister_module) },
-+	/* HAL_OP_CONFIGURATION */
-+	{ configuration, true, sizeof(struct hal_cmd_configuration) },
- };
- 
- static void bluetooth_stopped(void)
-@@ -558,5 +619,9 @@ int main(int argc, char *argv[])
- 
- 	__btd_log_cleanup();
- 
-+	free(config_vendor);
-+	free(config_model);
-+	free(config_name);
++const char *bt_config_get_model(void)
++{
++	if (config_model)
++		return config_model;
 +
- 	return EXIT_SUCCESS;
++	return DEFAULT_MODEL;
++}
++
+ static void service_register(const void *buf, uint16_t len)
+ {
+ 	const struct hal_cmd_register_module *m = buf;
+diff --git a/android/utils.h b/android/utils.h
+index 560e991..c70f8cb 100644
+--- a/android/utils.h
++++ b/android/utils.h
+@@ -30,3 +30,7 @@ static inline void bdaddr2android(const bdaddr_t *src, void *buf)
+ {
+ 	baswap(buf, src);
  }
++
++const char *bt_config_get_vendor(void);
++const char *bt_config_get_model(void);
++const char *bt_config_get_name(void);
 -- 
 1.9.3
 
