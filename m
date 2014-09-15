@@ -1,70 +1,159 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 15 Sep 2014 12:24:58 +0200
-From: Alexander Aring <alex.aring@gmail.com>
-To: Martin Townsend <mtownsend1973@gmail.com>
-Cc: linux-zigbee-devel@lists.sourceforge.net,
-	linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org,
-	marcel@holtmann.org, Martin Townsend <martin.townsend@xsilon.com>
-Subject: Re: [PATCH v2 bluetooth] 6lowpan: fix incorrect return values in
- lowpan_rcv
-Message-ID: <20140915102457.GB10580@omega>
-References: <1410514480-9070-1-git-send-email-martin.townsend@xsilon.com>
- <1410514480-9070-3-git-send-email-martin.townsend@xsilon.com>
- <20140915101331.GA10580@omega>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-In-Reply-To: <20140915101331.GA10580@omega>
-Sender: linux-wpan-owner@vger.kernel.org
+In-Reply-To: <1410529462-28220-1-git-send-email-gowtham.ab@samsung.com>
+References: <1410529462-28220-1-git-send-email-gowtham.ab@samsung.com>
+Date: Mon, 15 Sep 2014 13:22:25 +0300
+Message-ID: <CABBYNZKqe1o8-b2k=aLKY4vzaWjM_tRAZfwq4MdnN_fijW4cow@mail.gmail.com>
+Subject: Re: [MAP v2] obexd/client : Handle the MAP Extended Event Report 1.1
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Gowtham Anandha Babu <gowtham.ab@samsung.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	Dmitry Kasatkin <d.kasatkin@samsung.com>,
+	Bharat Panda <bharat.panda@samsung.com>, cpgs@samsung.com
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Mon, Sep 15, 2014 at 12:13:31PM +0200, Alexander Aring wrote:
-...
-> 
-> >  			if (ret == 1) {
-> > -				ret = process_data(skb, &hdr);
-> > -				if (ret == NET_RX_DROP)
-> > +				ret = process_data(&skb, &hdr);
-> > +				if (ret < 0)
-> >  					goto drop;
-> this function returning an errno, you can't return the errno here. goto
-> drop returns the ret variable. Maybe just make a return NET_RX_DROP at
-> drop. We should never return a different variable.
-Oops, I looked at the wong please I mean before drop, when all things
-are fine.
+Hi,
 
-> 
-> Also this need to be drop_skb at several places in this code, we don't
-> have a kfree_skb at process_data anymore. This leaks memory.
-> 
-> > +			} else {
-> > +				return NET_RX_SUCCESS;
-> >  			}
-> >  			break;
-> >  		case LOWPAN_DISPATCH_FRAGN:	/* next fragments headers */
-> >  			ret = lowpan_frag_rcv(skb, LOWPAN_DISPATCH_FRAGN);
-> 
-> same here.
-> >  			if (ret == 1) {
-> > -				ret = process_data(skb, &hdr);
-> > -				if (ret == NET_RX_DROP)
-> > +				ret = process_data(&skb, &hdr);
-> > +				if (ret < 0)
-> >  					goto drop;
-> 
-> same here.
-> 
-> > +			} else {
-> > +				return NET_RX_SUCCESS;
-> >  			}
-> >  			break;
-> >  		default:
-> > @@ -515,7 +514,16 @@ static int lowpan_rcv(struct sk_buff *skb, struct net_device *dev,
-> >  		}
-> >  	}
-> >  
+On Fri, Sep 12, 2014 at 4:44 PM, Gowtham Anandha Babu
+<gowtham.ab@samsung.com> wrote:
+> Changes made to handle the Extended Event Report 1.1
+>
+> 1) In SDP, the MAP supported featured bit is updated.
+> 2) In map-event, corresponding new event type and the new attribute introduced in Event report 1.1 is added.
+> 3) In mns corresponding handlers are added.
+>
+> Freed all the event attibutes inside map_event_free() function.
 
-If all things are fine, there is somewhere a return ret;
+For comments regarding the patch version you should put bellow after
+--- so it does not became part of patch description. Also more
+important than what changes are you proposing is why should we take
+this changes, like why extended event should be supported this should
+be in the description.
 
-We should change it to return NET_RX_SUCCESS.
+> ---
+>  lib/sdp.h                |  2 +-
+>  obexd/client/map-event.h |  7 ++++++-
+>  obexd/client/mns.c       | 34 ++++++++++++++++++++++++++++++++++
+>  3 files changed, 41 insertions(+), 2 deletions(-)
+>
+> diff --git a/lib/sdp.h b/lib/sdp.h
+> index cc10e9f..76f61e1 100644
+> --- a/lib/sdp.h
+> +++ b/lib/sdp.h
+> @@ -306,7 +306,7 @@ extern "C" {
+>  #define SDP_ATTR_MAS_INSTANCE_ID               0x0315
+>  #define SDP_ATTR_SUPPORTED_MESSAGE_TYPES       0x0316
+>  #define SDP_ATTR_PBAP_SUPPORTED_FEATURES       0x0317
+> -#define SDP_ATTR_MAP_SUPPORTED_FEATURES                0x0317
+> +#define SDP_ATTR_MAP_SUPPORTED_FEATURES                0x031f
+>
+>  #define SDP_ATTR_SPECIFICATION_ID              0x0200
+>  #define SDP_ATTR_VENDOR_ID                     0x0201
+> diff --git a/obexd/client/map-event.h b/obexd/client/map-event.h
+> index ba5d5d2..99cb0c2 100644
+> --- a/obexd/client/map-event.h
+> +++ b/obexd/client/map-event.h
+> @@ -32,7 +32,8 @@ enum map_event_type {
+>         MAP_ET_MEMORY_FULL,
+>         MAP_ET_MEMORY_AVAILABLE,
+>         MAP_ET_MESSAGE_DELETED,
+> -       MAP_ET_MESSAGE_SHIFT
+> +       MAP_ET_MESSAGE_SHIFT,
+> +       MAP_ET_READ_STATUS_CHANGED
+>  };
+>
+>  struct map_event {
+> @@ -41,6 +42,10 @@ struct map_event {
+>         char *folder;
+>         char *old_folder;
+>         char *msg_type;
+> +       char *datetime;
+> +       char *subject;
+> +       char *sender_name;
+> +       char *priority;
+>  };
+>
+>  /* Handle notification in map client.
+> diff --git a/obexd/client/mns.c b/obexd/client/mns.c
+> index d638886..49ccaab 100644
+> --- a/obexd/client/mns.c
+> +++ b/obexd/client/mns.c
+> @@ -180,6 +180,8 @@ static void parse_event_report_type(struct map_event *event, const char *value)
+>                 event->type = MAP_ET_MESSAGE_DELETED;
+>         else if (!g_ascii_strcasecmp(value, "MessageShift"))
+>                 event->type = MAP_ET_MESSAGE_SHIFT;
+> +       else if (!g_ascii_strcasecmp(value, "ReadStatusChanged"))
+> +               event->type = MAP_ET_READ_STATUS_CHANGED;
+>  }
+>
+>  static void parse_event_report_handle(struct map_event *event,
+> @@ -218,6 +220,30 @@ static void parse_event_report_msg_type(struct map_event *event,
+>         event->msg_type = g_strdup(value);
+>  }
+>
+> +static void parse_event_report_date_time(struct map_event *event,
+> +                                                        const char *value)
+> +{
+> +       event->datetime = g_strdup(value);
+> +}
+> +
+> +static void parse_event_report_subject(struct map_event *event,
+> +                                                        const char *value)
+> +{
+> +       event->subject = g_strdup(value);
+> +}
+> +
+> +static void parse_event_report_sender_name(struct map_event *event,
+> +                                                        const char *value)
+> +{
+> +       event->sender_name = g_strdup(value);
+> +}
+> +
+> +static void parse_event_report_priority(struct map_event *event,
+> +                                                        const char *value)
+> +{
+> +       event->priority = g_strdup(value);
+> +}
+> +
 
-- Alex
+You should check if the value is NULL in the parser, also it is
+probably safer to g_free the field before you assign anything
+otherwise it can still leak if the remote device misbehave and send
+the event more than once.
+
+>  static struct map_event_report_parser {
+>         const char *name;
+>         void (*func) (struct map_event *event, const char *value);
+> @@ -227,6 +253,10 @@ static struct map_event_report_parser {
+>                 { "folder", parse_event_report_folder },
+>                 { "old_folder", parse_event_report_old_folder },
+>                 { "msg_type", parse_event_report_msg_type },
+> +               { "datetime", parse_event_report_date_time },
+> +               { "subject", parse_event_report_subject },
+> +               { "sender_name", parse_event_report_sender_name },
+> +               { "priority", parse_event_report_priority },
+>                 { }
+>  };
+>
+> @@ -268,6 +298,10 @@ static void map_event_free(struct map_event *event)
+>         g_free(event->folder);
+>         g_free(event->old_folder);
+>         g_free(event->msg_type);
+> +       g_free(event->datetime);
+> +       g_free(event->subject);
+> +       g_free(event->sender_name);
+> +       g_free(event->priority);
+>         g_free(event);
+>  }
+>
+> --
+> 1.9.1
+>
+
+
+
+-- 
+Luiz Augusto von Dentz
