@@ -1,233 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1410527817-17666-2-git-send-email-vikram.pal@samsung.com>
-References: <1410527817-17666-1-git-send-email-vikram.pal@samsung.com>
-	<1410527817-17666-2-git-send-email-vikram.pal@samsung.com>
-Date: Mon, 15 Sep 2014 11:30:32 +0300
-Message-ID: <CABBYNZ+yAdEkoY6_riEN6oDu4rBHD_HrX80tr+vxVG=8XybKQg@mail.gmail.com>
-Subject: Re: [PATCH v2 2/2] Monitor: Add AVRCP GetElementAttributes support
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Vikrampal Yadav <vikram.pal@samsung.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	Dmitry Kasatkin <d.kasatkin@samsung.com>, cpgs@samsung.com
-Content-Type: text/plain; charset=UTF-8
+From: Jukka Rissanen <jukka.rissanen@linux.intel.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: alex.aring@gmail.com,
+	Jukka Rissanen <jukka.rissanen@linux.intel.com>
+Subject: [PATCH] MAINTAINERS: add maintainer for generic 6LoWPAN
+Date: Mon, 15 Sep 2014 11:03:36 +0300
+Message-Id: <1410768216-12414-1-git-send-email-jukka.rissanen@linux.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Vikram,
+Add Jukka to 6LoWPAN maintainer list. He will concentrate on
+generic and bluetooth part of 6LoWPAN stack.
 
-On Fri, Sep 12, 2014 at 4:16 PM, Vikrampal Yadav <vikram.pal@samsung.com> wrote:
-> Support for decoding AVRCP GetElementAttributes added in Bluetooth
-> monitor.
-> ---
->  monitor/avctp.c | 157 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 157 insertions(+)
->
-> diff --git a/monitor/avctp.c b/monitor/avctp.c
-> index f366b87..89997d0 100644
-> --- a/monitor/avctp.c
-> +++ b/monitor/avctp.c
-> @@ -158,6 +158,16 @@
->  #define AVRCP_ATTRIBUTE_SHUFFLE                0x03
->  #define AVRCP_ATTRIBUTE_SCAN           0x04
->
-> +/* media attributes */
-> +#define AVRCP_MEDIA_ATTRIBUTE_ILLEGAL  0x00
-> +#define AVRCP_MEDIA_ATTRIBUTE_TITLE    0x01
-> +#define AVRCP_MEDIA_ATTRIBUTE_ARTIST   0x02
-> +#define AVRCP_MEDIA_ATTRIBUTE_ALBUM    0x03
-> +#define AVRCP_MEDIA_ATTRIBUTE_TRACK    0x04
-> +#define AVRCP_MEDIA_ATTRIBUTE_TOTAL    0x05
-> +#define AVRCP_MEDIA_ATTRIBUTE_GENRE    0x06
-> +#define AVRCP_MEDIA_ATTRIBUTE_DURATION 0x07
-> +
->  struct avctp_frame {
->         uint8_t hdr;
->         uint8_t pt;
-> @@ -165,6 +175,11 @@ struct avctp_frame {
->         struct l2cap_frame l2cap_frame;
->  };
->
-> +static struct avrcp_continuing {
-> +       uint16_t num;
-> +       uint16_t size;
-> +} avrcp_continuing;
-> +
->  static const char *ctype2str(uint8_t ctype)
->  {
->         switch (ctype & 0x0f) {
-> @@ -524,6 +539,30 @@ static const char *charset2str(uint16_t charset)
->         }
->  }
->
-> +static const char *mediattr2str(uint32_t attr)
-> +{
-> +       switch (attr) {
-> +       case AVRCP_MEDIA_ATTRIBUTE_ILLEGAL:
-> +               return "Illegal";
-> +       case AVRCP_MEDIA_ATTRIBUTE_TITLE:
-> +               return "Title";
-> +       case AVRCP_MEDIA_ATTRIBUTE_ARTIST:
-> +               return "Artist";
-> +       case AVRCP_MEDIA_ATTRIBUTE_ALBUM:
-> +               return "Album";
-> +       case AVRCP_MEDIA_ATTRIBUTE_TRACK:
-> +               return "Track";
-> +       case AVRCP_MEDIA_ATTRIBUTE_TOTAL:
-> +               return "Track Total";
-> +       case AVRCP_MEDIA_ATTRIBUTE_GENRE:
-> +               return "Genre";
-> +       case AVRCP_MEDIA_ATTRIBUTE_DURATION:
-> +               return "Track duration";
-> +       default:
-> +               return "Reserved";
-> +       }
-> +}
-> +
->  static bool avrcp_passthrough_packet(struct avctp_frame *avctp_frame)
->  {
->         struct l2cap_frame *frame = &avctp_frame->l2cap_frame;
-> @@ -905,6 +944,123 @@ static bool avrcp_displayable_charset(struct avctp_frame *avctp_frame,
->         return true;
->  }
->
-> +static bool avrcp_get_element_attributes(struct avctp_frame *avctp_frame,
-> +                                               uint8_t ctype, uint8_t len,
-> +                                               uint8_t indent)
-> +{
-> +       struct l2cap_frame *frame = &avctp_frame->l2cap_frame;
-> +       uint64_t id;
-> +       uint8_t num;
-> +
-> +       if (ctype > AVC_CTYPE_GENERAL_INQUIRY)
-> +               goto response;
-> +
-> +       if (!l2cap_frame_get_be64(frame, &id))
-> +               return false;
-> +
-> +       print_field("%*cIdentifier: 0x%jx (%s)", (indent - 8), ' ',
-> +                                       id, id ? "Reserved" : "PLAYING");
-> +
-> +       if (!l2cap_frame_get_u8(frame, &num))
-> +               return false;
-> +
-> +       print_field("%*cAttributeCount: 0x%02x", (indent - 8), ' ', num);
-> +
-> +       for (; num > 0; num--) {
-> +               uint32_t attr;
-> +
-> +               if (!l2cap_frame_get_be32(frame, &attr))
-> +                       return false;
-> +
-> +               print_field("%*cAttribute: 0x%08x (%s)", (indent - 8),
-> +                                       ' ', attr, mediattr2str(attr));
-> +       }
-> +
-> +       return true;
-> +
-> +response:
-> +       if (avctp_frame->pt == AVRCP_PACKET_TYPE_SINGLE
-> +                               || avctp_frame->pt == AVRCP_PACKET_TYPE_START) {
-> +               if (!l2cap_frame_get_u8(frame, &num))
-> +                       return false;
-> +
-> +               avrcp_continuing.num = num;
-> +               print_field("%*cAttributeCount: 0x%02x", (indent - 8),
-> +                                                               ' ', num);
-> +               len--;
-> +       } else {
-> +               num = avrcp_continuing.num;
-> +
-> +               if (avrcp_continuing.size > 0) {
-> +                       uint16_t size;
-> +
-> +                       if (avrcp_continuing.size > len) {
-> +                               size = len;
-> +                               avrcp_continuing.size -= len;
-> +                       } else {
-> +                               size = avrcp_continuing.size;
-> +                               avrcp_continuing.size = 0;
-> +                       }
-> +
-> +                       printf("ContinuingAttributeValue: ");
-> +                       for (; size > 0; size--) {
-> +                               uint8_t c;
-> +
-> +                               if (!l2cap_frame_get_u8(frame, &c))
-> +                                       return false;
-> +
-> +                               printf("%1c", isprint(c) ? c : '.');
-> +                       }
-> +                       printf("\n");
-> +
-> +                       len -= size;
-> +               }
-> +       }
+Signed-off-by: Jukka Rissanen <jukka.rissanen@linux.intel.com>
+---
+ MAINTAINERS | 1 +
+ 1 file changed, 1 insertion(+)
 
-I would handle this with a switch and I need to double check but I
-don't think it is valid to fragment on attribute level.
-
-
-> +       while (num > 0 && len > 0) {
-> +               uint32_t attr;
-> +               uint16_t charset, attrlen;
-> +
-> +               if (!l2cap_frame_get_be32(frame, &attr))
-> +                       return false;
-> +
-> +               print_field("%*cAttribute: 0x%08x (%s)", (indent - 8),
-> +                                               ' ', attr, mediattr2str(attr));
-> +
-> +               if (!l2cap_frame_get_be16(frame, &charset))
-> +                       return false;
-> +
-> +               print_field("%*cCharsetID: 0x%04x (%s)", (indent - 8),
-> +                               ' ', charset, charset2str(charset));
-> +
-> +               if (!l2cap_frame_get_be16(frame, &attrlen))
-> +                       return false;
-> +
-> +               print_field("%*cAttributeValueLength: 0x%04x",
-> +                                               (indent - 8), ' ', attrlen);
-> +
-> +               len -= sizeof(attr) + sizeof(charset) + sizeof(attrlen);
-> +               num--;
-> +
-> +               print_field("%*cAttributeValue: ", (indent - 8), ' ');
-> +               for (; attrlen > 0 && len > 0; attrlen--, len--) {
-> +                       uint8_t c;
-> +
-> +                       if (!l2cap_frame_get_u8(frame, &c))
-> +                               return false;
-> +
-> +                       printf("%1c", isprint(c) ? c : '.');
-> +               }
-> +
-> +               if (attrlen > 0)
-> +                       avrcp_continuing.size = attrlen;
-> +       }
-> +
-> +       avrcp_continuing.num = num;
-> +
-> +       return true;
-> +}
-> +
->  struct avrcp_ctrl_pdu_data {
->         uint8_t pduid;
->         bool (*func) (struct avctp_frame *avctp_frame, uint8_t ctype,
-> @@ -920,6 +1076,7 @@ static const struct avrcp_ctrl_pdu_data avrcp_ctrl_pdu_table[] = {
->         { 0x15, avrcp_get_player_attribute_text         },
->         { 0x16, avrcp_get_player_value_text             },
->         { 0x17, avrcp_displayable_charset               },
-> +       { 0x20, avrcp_get_element_attributes            },
->         { }
->  };
->
-> --
-> 1.9.1
->
-
-
-
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 0b7007a..94ad1ba 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -152,6 +152,7 @@ F:	drivers/scsi/53c700*
+ 
+ 6LOWPAN GENERIC (BTLE/IEEE 802.15.4)
+ M:	Alexander Aring <alex.aring@gmail.com>
++M:	Jukka Rissanen <jukka.rissanen@linux.intel.com>
+ L:	linux-bluetooth@vger.kernel.org
+ L:	linux-wpan@vger.kernel.org
+ S:	Maintained
 -- 
-Luiz Augusto von Dentz
+1.8.3.1
+
