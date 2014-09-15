@@ -1,49 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
-From: Martin Townsend <mtownsend1973@gmail.com>
-To: linux-zigbee-devel@lists.sourceforge.net,
-	linux-bluetooth@vger.kernel.org,
-	linux-wpan@vger.kernel.org
-Cc: marcel@holtmann.org,
-	alex.aring@gmail.com,
-	Martin Townsend <martin.townsend@xsilon.com>
-Subject: [PATCH v2 bluetooth] Fix lowpan_rcv
-Date: Mon, 15 Sep 2014 15:08:05 +0100
-Message-Id: <1410790086-17427-1-git-send-email-martin.townsend@xsilon.com>
+MIME-Version: 1.0
+In-Reply-To: 
+References: 
+Subject: Wrong selection of audio source during handsfree call
+From: Vinod Rayapudi <vinod.rayapudi@tcs.com>
+To: linux-bluetooth-owner@vger.kernel.org, autoanswer@vger.kernel.org,
+	linux-bluetooth@vger.kernel.org
+Message-ID: <OF5483DA9E.1F5616FD-ON65257D54.0049847E-65257D54.00498481@tcs.com>
+Date: Mon, 15 Sep 2014 18:53:00 +0530
+Content-Type: text/plain; charset=US-ASCII
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This series aims to fix incorrect return values in lowpan_rcv
-To achieve this it also refactors the receive path to
-  1) free skb only from lowpan_rcv and not functions that it calls
-  2) move skb delivery from IPHC
+Hi,
 
-I have only compile tested the changes for bluetooth as I don't have any HW
-available so would be grateful for any testing from the Bluetooth developers.
-I have done some minimal testing for IEEE802.15.4
+I have connected my iPhone with both A2DP and Handsfree profiles.
+Whenever there is a, I can't hear audio on speakers.
+When I check, pulse audio sources (pacmd list-sources), I can see there is wrong selection audio source.
 
-Signed-off-by: Martin Townsend <martin.townsend@xsilon.com>
----
+If both A2DP and HFP profiles are connected, during call always I can see audio streaming parameters instead of SCO related parameters.
 
-v1 -> v2:
-* combined first two patches into one.
-* split out renaming of process_data into a new patch
-* re-use err in lowpan_process_data and remove err_ret local variable.
-* removed third patch as applies to linux-wpan
+I am using Ubuntu 12.04 and OFono 1.0.
 
-v2 -> v3: (Updated from Alexander Aring's Review) 
-* re-use err hadn't been included in patch.
-* fixed some 'goto drop' cases in lowpan_rcv that should be 'goto drop skb'
-* handle error codes when returning from lowpan_frag_rcv.
-* Refactored lowpan_give_skb_to_devices so it consumes or free's skb and then
-  only returns NET_RX status codes.
+Can anyone help me on this ?
+Is this an issue with Bluez or OFono ?
 
-Martin Townsend (1):
-  6lowpan: fix incorrect return values in lowpan_rcv
+Thanks & Regards,
+Vinod.
+=====-----=====-----=====
+Notice: The information contained in this e-mail
+message and/or attachments to it may contain 
+confidential or privileged information. If you are 
+not the intended recipient, any dissemination, use, 
+review, distribution, printing or copying of the 
+information contained in this e-mail message 
+and/or attachments to it are strictly prohibited. If 
+you have received this communication in error, 
+please notify us by reply e-mail or telephone and 
+immediately and permanently delete the message 
+and any attachments. Thank you
 
- include/net/6lowpan.h         |  4 +--
- net/6lowpan/iphc.c            | 73 ++++++++++++++++++-------------------------
- net/bluetooth/6lowpan.c       | 26 +++++++++------
- net/ieee802154/6lowpan_rtnl.c | 44 +++++++++++++++-----------
- 4 files changed, 75 insertions(+), 72 deletions(-)
 
--- 
-1.9.1
+
