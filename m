@@ -1,36 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
-From: Gowtham Anandha Babu <gowtham.ab@samsung.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: marcel@holtmann.org, johan.hedberg@gmail.com,
-	d.kasatkin@samsung.com, bharat.panda@samsung.com, cpgs@samsung.com,
-	Gowtham Anandha Babu <gowtham.ab@samsung.com>
-Subject: [PATCH v2 2/3] tools/btsnoop : Fix variable reassigning issue
-Date: Mon, 15 Sep 2014 11:40:04 +0530
-Message-id: <1410761405-4525-1-git-send-email-gowtham.ab@samsung.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Mon, 15 Sep 2014 07:17:28 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth: Provide HCI command opcode information to
+ driver
+Message-ID: <20140915041728.GB722@t440s.P-661HNU-F1>
+References: <1410728788-5170-1-git-send-email-marcel@holtmann.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1410728788-5170-1-git-send-email-marcel@holtmann.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The Variable 'written' is reassigned a value before the old one has been used.
----
- tools/btsnoop.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+Hi Marcel,
 
-diff --git a/tools/btsnoop.c b/tools/btsnoop.c
-index 6ca62d2..1fdd391 100644
---- a/tools/btsnoop.c
-+++ b/tools/btsnoop.c
-@@ -211,8 +211,9 @@ next_packet:
- 		goto next_packet;
- 	}
- 
--	written = input_pkt[select_input].size = htobe32(toread - 1);
--	written = input_pkt[select_input].len = htobe32(toread - 1);
-+	written = htobe32(toread-1);
-+	input_pkt[select_input].size = written;
-+	input_pkt[select_input].len = written;
- 
- 	switch (buf[0]) {
- 	case 0x01:
--- 
-1.9.1
+On Sun, Sep 14, 2014, Marcel Holtmann wrote:
+> The Bluetooth core already does processing of the HCI command header
+> and puts it together before sending it to the driver. It is not really
+> efficient for the driver to look at the HCI command header again in
+> case it has to make certain decisions about certain commands. To make
+> this easier, just provide the opcode as part of the SKB control buffer
+> information. The extra information about the opcode is optional and
+> only provided for HCI commands.
+> 
+> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+> ---
+>  include/net/bluetooth/bluetooth.h | 1 +
+>  net/bluetooth/hci_core.c          | 1 +
+>  2 files changed, 2 insertions(+)
 
+Applied to bluetooth-next. Thanks.
+
+Johan
