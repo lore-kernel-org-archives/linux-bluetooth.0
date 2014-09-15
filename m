@@ -1,397 +1,311 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 15 Sep 2014 12:13:34 +0200
-From: Alexander Aring <alex.aring@gmail.com>
-To: Martin Townsend <mtownsend1973@gmail.com>
-Cc: linux-zigbee-devel@lists.sourceforge.net,
-	linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org,
-	marcel@holtmann.org, Martin Townsend <martin.townsend@xsilon.com>
-Subject: Re: [PATCH v2 bluetooth] 6lowpan: fix incorrect return values in
- lowpan_rcv
-Message-ID: <20140915101331.GA10580@omega>
-References: <1410514480-9070-1-git-send-email-martin.townsend@xsilon.com>
- <1410514480-9070-3-git-send-email-martin.townsend@xsilon.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-In-Reply-To: <1410514480-9070-3-git-send-email-martin.townsend@xsilon.com>
-Sender: linux-wpan-owner@vger.kernel.org
+In-Reply-To: <1410527817-17666-1-git-send-email-vikram.pal@samsung.com>
+References: <1410527817-17666-1-git-send-email-vikram.pal@samsung.com>
+Date: Mon, 15 Sep 2014 11:51:23 +0300
+Message-ID: <CABBYNZKv-OGaBs-0h6DX_sncOmYv_Mv1Oda88ac99pMV1Js0Jg@mail.gmail.com>
+Subject: Re: [PATCH v2 1/2] Monitor: Modify design of AVRCP callback functions
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Vikrampal Yadav <vikram.pal@samsung.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	Dmitry Kasatkin <d.kasatkin@samsung.com>, cpgs@samsung.com
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Martin,
+Hi,
 
-something is wrong with you mail client. I received the cover letter
-twice one has some wrong reply-to id. Please check this.
-
-Do you use git send-email? How, maybe we can help you there.
-
-On Fri, Sep 12, 2014 at 10:34:40AM +0100, Martin Townsend wrote:
-> Currently there are a number of error paths in the lowpan_rcv function that
-> free the skb before returning, the patch simplifies the receive path by
-> ensuring that the skb is only freed from this function.
-> 
-> Passing the skb from 6lowpan up to the higher layers is not a
-> function of IPHC.  By moving it out of IPHC we also remove the
-> need to support error code returns with NET_RX codes.
-> It also makes the lowpan_rcv function more extendable as we
-> can support more compression schemes.
-> 
-> With the above 2 lowpan_rcv is refacored so eliminate incorrect return values.
-> 
-> Signed-off-by: Martin Townsend <martin.townsend@xsilon.com>
+On Fri, Sep 12, 2014 at 4:16 PM, Vikrampal Yadav <vikram.pal@samsung.com> wrote:
+> Modified the design of AVRCP callback functions.
 > ---
->  include/net/6lowpan.h         |  4 +--
->  net/6lowpan/iphc.c            | 73 ++++++++++++++++++-------------------------
->  net/bluetooth/6lowpan.c       | 26 +++++++++------
->  net/ieee802154/6lowpan_rtnl.c | 44 +++++++++++++++-----------
->  4 files changed, 75 insertions(+), 72 deletions(-)
-> 
-> diff --git a/include/net/6lowpan.h b/include/net/6lowpan.h
-> index d184df1..450eaaf 100644
-> --- a/include/net/6lowpan.h
-> +++ b/include/net/6lowpan.h
-> @@ -374,10 +374,10 @@ lowpan_uncompress_size(const struct sk_buff *skb, u16 *dgram_offset)
->  
->  typedef int (*skb_delivery_cb)(struct sk_buff *skb, struct net_device *dev);
->  
-> -int lowpan_process_data(struct sk_buff *skb, struct net_device *dev,
-> +int lowpan_process_data(struct sk_buff **skb_inout, struct net_device *dev,
->  		const u8 *saddr, const u8 saddr_type, const u8 saddr_len,
->  		const u8 *daddr, const u8 daddr_type, const u8 daddr_len,
-> -		u8 iphc0, u8 iphc1, skb_delivery_cb skb_deliver);
-> +		u8 iphc0, u8 iphc1);
-
-check checkpatch here.
-
-CHECK: Alignment should match open parenthesis
-#37: FILE: include/net/6lowpan.h:378:
-+int lowpan_process_data(struct sk_buff **skb_inout, struct net_device *dev,
- 		const u8 *saddr, const u8 saddr_type, const u8 saddr_len,
-
->  int lowpan_header_compress(struct sk_buff *skb, struct net_device *dev,
->  			unsigned short type, const void *_daddr,
->  			const void *_saddr, unsigned int len);
-> diff --git a/net/6lowpan/iphc.c b/net/6lowpan/iphc.c
-> index 142eef5..43ed1b4 100644
-> --- a/net/6lowpan/iphc.c
-> +++ b/net/6lowpan/iphc.c
-> @@ -171,37 +171,6 @@ static int uncompress_context_based_src_addr(struct sk_buff *skb,
->  	return 0;
->  }
->  
-> -static int skb_deliver(struct sk_buff *skb, struct ipv6hdr *hdr,
-> -		       struct net_device *dev, skb_delivery_cb deliver_skb)
-> -{
-> -	struct sk_buff *new;
-> -	int stat;
-> -
-> -	new = skb_copy_expand(skb, sizeof(struct ipv6hdr), skb_tailroom(skb),
-> -			      GFP_ATOMIC);
-> -	kfree_skb(skb);
-> -
-> -	if (!new)
-> -		return -ENOMEM;
-> -
-> -	skb_push(new, sizeof(struct ipv6hdr));
-> -	skb_reset_network_header(new);
-> -	skb_copy_to_linear_data(new, hdr, sizeof(struct ipv6hdr));
-> -
-> -	new->protocol = htons(ETH_P_IPV6);
-> -	new->pkt_type = PACKET_HOST;
-> -	new->dev = dev;
-> -
-> -	raw_dump_table(__func__, "raw skb data dump before receiving",
-> -		       new->data, new->len);
-> -
-> -	stat = deliver_skb(new, dev);
-> -
-> -	kfree_skb(new);
-> -
-> -	return stat;
-> -}
-> -
->  /* Uncompress function for multicast destination address,
->   * when M bit is set.
->   */
-> @@ -332,14 +301,16 @@ err:
->  /* TTL uncompression values */
->  static const u8 lowpan_ttl_values[] = { 0, 1, 64, 255 };
->  
-> -int lowpan_process_data(struct sk_buff *skb, struct net_device *dev,
-> +int lowpan_process_data(struct sk_buff **skb_inout, struct net_device *dev,
->  			const u8 *saddr, const u8 saddr_type, const u8 saddr_len,
->  			const u8 *daddr, const u8 daddr_type, const u8 daddr_len,
-> -			u8 iphc0, u8 iphc1, skb_delivery_cb deliver_skb)
-> +			u8 iphc0, u8 iphc1)
+>  monitor/avctp.c | 103 ++++++++++++++++++++++++++++++++++++--------------------
+>  1 file changed, 66 insertions(+), 37 deletions(-)
+>
+> diff --git a/monitor/avctp.c b/monitor/avctp.c
+> index c7e242b..f366b87 100644
+> --- a/monitor/avctp.c
+> +++ b/monitor/avctp.c
+> @@ -158,6 +158,13 @@
+>  #define AVRCP_ATTRIBUTE_SHUFFLE                0x03
+>  #define AVRCP_ATTRIBUTE_SCAN           0x04
+>
+> +struct avctp_frame {
+> +       uint8_t hdr;
+> +       uint8_t pt;
+> +       uint16_t pid;
+> +       struct l2cap_frame l2cap_frame;
+> +};
+> +
+>  static const char *ctype2str(uint8_t ctype)
 >  {
->  	struct ipv6hdr hdr = {};
->  	u8 tmp, num_context = 0;
->  	int err;
-> +	int err_ret = -EINVAL;
-
-use err here, I saw this in your cover-letter as change but it's not
-really changed.
-
-> +	struct sk_buff *skb = *skb_inout;
->  
->  	raw_dump_table(__func__, "raw skb data dump uncompressed",
->  		       skb->data, skb->len);
-> @@ -460,7 +431,6 @@ int lowpan_process_data(struct sk_buff *skb, struct net_device *dev,
->  	/* UDP data uncompression */
->  	if (iphc0 & LOWPAN_IPHC_NH_C) {
->  		struct udphdr uh;
-> -		struct sk_buff *new;
->  
->  		if (uncompress_udp_header(skb, &uh))
->  			goto drop;
-> @@ -468,14 +438,15 @@ int lowpan_process_data(struct sk_buff *skb, struct net_device *dev,
->  		/* replace the compressed UDP head by the uncompressed UDP
->  		 * header
->  		 */
-> -		new = skb_copy_expand(skb, sizeof(struct udphdr),
-> +		skb = skb_copy_expand(skb, sizeof(struct udphdr),
->  				      skb_tailroom(skb), GFP_ATOMIC);
-> -		kfree_skb(skb);
-> -
-> -		if (!new)
-> -			return -ENOMEM;
-> +		if (!skb) {
-> +			err_ret = -ENOMEM;
-> +			goto drop;
-> +		}
->  
-> -		skb = new;
-> +		kfree_skb(*skb_inout);
-> +		*skb_inout = skb;
->  
->  		skb_push(skb, sizeof(struct udphdr));
->  		skb_reset_transport_header(skb);
-> @@ -499,11 +470,27 @@ int lowpan_process_data(struct sk_buff *skb, struct net_device *dev,
->  
->  	raw_dump_table(__func__, "raw header dump", (u8 *)&hdr, sizeof(hdr));
->  
-> -	return skb_deliver(skb, &hdr, dev, deliver_skb);
-> +	/* Setup skb with new uncompressed IPv6 header. */
-> +	skb = skb_copy_expand(skb, sizeof(hdr), skb_tailroom(skb),
-> +			      GFP_ATOMIC);
-> +	if (!skb)
-> +		return -ENOMEM;
-> +
-> +	kfree_skb(*skb_inout);
-> +	*skb_inout = skb;
-> +
-> +	skb_push(skb, sizeof(hdr));
-> +	skb_reset_network_header(skb);
-> +	skb_copy_to_linear_data(skb, &hdr, sizeof(hdr));
-> +	skb->dev = dev;
-> +
-> +	raw_dump_table(__func__, "raw skb data dump before receiving",
-> +		       skb->data, skb->len);
-> +
-> +	return 0;
->  
->  drop:
-> -	kfree_skb(skb);
-> -	return -EINVAL;
-> +	return err_ret;
+>         switch (ctype & 0x0f) {
+> @@ -517,15 +524,19 @@ static const char *charset2str(uint16_t charset)
+>         }
 >  }
->  EXPORT_SYMBOL_GPL(lowpan_process_data);
->  
-> diff --git a/net/bluetooth/6lowpan.c b/net/bluetooth/6lowpan.c
-> index 206b65c..a4e340e 100644
-> --- a/net/bluetooth/6lowpan.c
-> +++ b/net/bluetooth/6lowpan.c
-> @@ -215,7 +215,7 @@ static int give_skb_to_upper(struct sk_buff *skb, struct net_device *dev)
->  	return ret;
->  }
->  
-> -static int process_data(struct sk_buff *skb, struct net_device *netdev,
-> +static int process_data(struct sk_buff **skb_inout, struct net_device *netdev,
->  			struct l2cap_chan *chan)
+>
+> -static bool avrcp_passthrough_packet(struct l2cap_frame *frame)
+> +static bool avrcp_passthrough_packet(struct avctp_frame *avctp_frame)
 >  {
->  	const u8 *saddr, *daddr;
-> @@ -223,6 +223,7 @@ static int process_data(struct sk_buff *skb, struct net_device *netdev,
->  	struct lowpan_dev *dev;
->  	struct lowpan_peer *peer;
->  	unsigned long flags;
-> +	struct sk_buff *skb = *skb_inout;
->  
->  	dev = lowpan_dev(netdev);
->  
-> @@ -245,13 +246,12 @@ static int process_data(struct sk_buff *skb, struct net_device *netdev,
->  	if (lowpan_fetch_skb_u8(skb, &iphc1))
->  		goto drop;
->  
-> -	return lowpan_process_data(skb, netdev,
-> +	return lowpan_process_data(skb_inout, netdev,
->  				   saddr, IEEE802154_ADDR_LONG, EUI64_ADDR_LEN,
->  				   daddr, IEEE802154_ADDR_LONG, EUI64_ADDR_LEN,
-> -				   iphc0, iphc1, give_skb_to_upper);
-> +				   iphc0, iphc1);
->  
->  drop:
-> -	kfree_skb(skb);
->  	return -EINVAL;
->  }
->  
-> @@ -280,9 +280,6 @@ static int recv_pkt(struct sk_buff *skb, struct net_device *dev,
->  		local_skb->protocol = htons(ETH_P_IPV6);
->  		local_skb->pkt_type = PACKET_HOST;
->  
-> -		skb_reset_network_header(local_skb);
-> -		skb_set_transport_header(local_skb, sizeof(struct ipv6hdr));
-> -
->  		if (give_skb_to_upper(local_skb, dev) != NET_RX_SUCCESS) {
->  			kfree_skb(local_skb);
->  			goto drop;
-> @@ -300,9 +297,20 @@ static int recv_pkt(struct sk_buff *skb, struct net_device *dev,
->  			if (!local_skb)
->  				goto drop;
->  
-> -			ret = process_data(local_skb, dev, chan);
-> -			if (ret != NET_RX_SUCCESS)
-> +			ret = process_data(&local_skb, dev, chan);
-> +			if (ret < 0) {
-> +				kfree_skb(local_skb);
->  				goto drop;
-> +			}
+> +       struct l2cap_frame *frame = &avctp_frame->l2cap_frame;
 > +
-> +			local_skb->protocol = htons(ETH_P_IPV6);
-> +			local_skb->pkt_type = PACKET_HOST;
-> +
-> +			if (give_skb_to_upper(local_skb, dev)
-> +							!= NET_RX_SUCCESS) {
-> +				kfree_skb(local_skb);
-> +				goto drop;
-> +			}
->  
->  			dev->stats.rx_bytes += skb->len;
->  			dev->stats.rx_packets++;
-> diff --git a/net/ieee802154/6lowpan_rtnl.c b/net/ieee802154/6lowpan_rtnl.c
-> index 6591d27..d5bdeba 100644
-> --- a/net/ieee802154/6lowpan_rtnl.c
-> +++ b/net/ieee802154/6lowpan_rtnl.c
-> @@ -167,11 +167,13 @@ static int lowpan_give_skb_to_devices(struct sk_buff *skb,
->  	return stat;
+>         packet_hexdump(frame->data, frame->size);
+>         return true;
 >  }
->  
-> -static int process_data(struct sk_buff *skb, const struct ieee802154_hdr *hdr)
-> +static int process_data(struct sk_buff **skb_inout,
-> +			const struct ieee802154_hdr *hdr)
+>
+> -static bool avrcp_get_capabilities(struct l2cap_frame *frame, uint8_t ctype,
+> -                                               uint8_t len, uint8_t indent)
+> +static bool avrcp_get_capabilities(struct avctp_frame *avctp_frame,
+> +                                       uint8_t ctype, uint8_t len,
+> +                                       uint8_t indent)
 >  {
->  	u8 iphc0, iphc1;
->  	struct ieee802154_addr_sa sa, da;
->  	void *sap, *dap;
-> +	struct sk_buff *skb = *skb_inout;
->  
->  	raw_dump_table(__func__, "raw skb data dump", skb->data, skb->len);
->  	/* at least two bytes will be used for the encoding */
-> @@ -197,13 +199,11 @@ static int process_data(struct sk_buff *skb, const struct ieee802154_hdr *hdr)
->  	else
->  		dap = &da.hwaddr;
->  
-> -	return lowpan_process_data(skb, skb->dev, sap, sa.addr_type,
-> +	return lowpan_process_data(skb_inout, skb->dev, sap, sa.addr_type,
->  				   IEEE802154_ADDR_LEN, dap, da.addr_type,
-> -				   IEEE802154_ADDR_LEN, iphc0, iphc1,
-> -				   lowpan_give_skb_to_devices);
-> +				   IEEE802154_ADDR_LEN, iphc0, iphc1);
->  
->  drop:
-> -	kfree_skb(skb);
->  	return -EINVAL;
+> +       struct l2cap_frame *frame = &avctp_frame->l2cap_frame;
+>         uint8_t cap, count;
+>         int i;
+>
+> @@ -576,10 +587,11 @@ static bool avrcp_get_capabilities(struct l2cap_frame *frame, uint8_t ctype,
+>         return true;
 >  }
->  
-> @@ -478,36 +478,35 @@ static int lowpan_rcv(struct sk_buff *skb, struct net_device *dev,
->  
->  	/* check that it's our buffer */
->  	if (skb->data[0] == LOWPAN_DISPATCH_IPV6) {
-> -		skb->protocol = htons(ETH_P_IPV6);
-> -		skb->pkt_type = PACKET_HOST;
-> -
->  		/* Pull off the 1-byte of 6lowpan header. */
->  		skb_pull(skb, 1);
->  
-> -		ret = lowpan_give_skb_to_devices(skb, NULL);
-> -		if (ret == NET_RX_DROP)
-> -			goto drop;
-> +		ret = NET_RX_SUCCESS;
->  	} else {
->  		switch (skb->data[0] & 0xe0) {
->  		case LOWPAN_DISPATCH_IPHC:	/* ipv6 datagram */
-> -			ret = process_data(skb, &hdr);
-> -			if (ret == NET_RX_DROP)
-> +			ret = process_data(&skb, &hdr);
-> +			if (ret < 0)
->  				goto drop;
->  			break;
->  		case LOWPAN_DISPATCH_FRAG1:	/* first fragment header */
->  			ret = lowpan_frag_rcv(skb, LOWPAN_DISPATCH_FRAG1);
-
-can also return "-1" for error but in this case the skb is already freed.
-so some else if with NET_RX_DROP. I know it was not handled before but we
-should handle this right now, when we care about the error handling.
-
->  			if (ret == 1) {
-> -				ret = process_data(skb, &hdr);
-> -				if (ret == NET_RX_DROP)
-> +				ret = process_data(&skb, &hdr);
-> +				if (ret < 0)
->  					goto drop;
-this function returning an errno, you can't return the errno here. goto
-drop returns the ret variable. Maybe just make a return NET_RX_DROP at
-drop. We should never return a different variable.
-
-Also this need to be drop_skb at several places in this code, we don't
-have a kfree_skb at process_data anymore. This leaks memory.
-
-> +			} else {
-> +				return NET_RX_SUCCESS;
->  			}
->  			break;
->  		case LOWPAN_DISPATCH_FRAGN:	/* next fragments headers */
->  			ret = lowpan_frag_rcv(skb, LOWPAN_DISPATCH_FRAGN);
-
-same here.
->  			if (ret == 1) {
-> -				ret = process_data(skb, &hdr);
-> -				if (ret == NET_RX_DROP)
-> +				ret = process_data(&skb, &hdr);
-> +				if (ret < 0)
->  					goto drop;
-
-same here.
-
-> +			} else {
-> +				return NET_RX_SUCCESS;
->  			}
->  			break;
->  		default:
-> @@ -515,7 +514,16 @@ static int lowpan_rcv(struct sk_buff *skb, struct net_device *dev,
->  		}
->  	}
->  
-> -	return NET_RX_SUCCESS;
-> +	/* Pass IPv6 packet up to next layer */
-> +	skb->protocol = htons(ETH_P_IPV6);
-> +	skb->pkt_type = PACKET_HOST;
-> +	ret = lowpan_give_skb_to_devices(skb, NULL);
-
-grml, see possible merge conflicts here. In next should be no dev
-parameter anymore. Nevertheless should easy to fix it.
-
-> +	if (ret < 0)
-> +		goto drop_skb;
+>
+> -static bool avrcp_list_player_attributes(struct l2cap_frame *frame,
+> +static bool avrcp_list_player_attributes(struct avctp_frame *avctp_frame,
+>                                                 uint8_t ctype, uint8_t len,
+>                                                 uint8_t indent)
+>  {
+> +       struct l2cap_frame *frame = &avctp_frame->l2cap_frame;
+>         uint8_t num;
+>         int i;
+>
+> @@ -604,9 +616,11 @@ static bool avrcp_list_player_attributes(struct l2cap_frame *frame,
+>         return true;
+>  }
+>
+> -static bool avrcp_list_player_values(struct l2cap_frame *frame, uint8_t ctype,
+> -                                               uint8_t len, uint8_t indent)
+> +static bool avrcp_list_player_values(struct avctp_frame *avctp_frame,
+> +                                       uint8_t ctype, uint8_t len,
+> +                                       uint8_t indent)
+>  {
+> +       struct l2cap_frame *frame = &avctp_frame->l2cap_frame;
+>         static uint8_t attr = 0;
+>         uint8_t num;
+>
+> @@ -640,10 +654,11 @@ response:
+>         return true;
+>  }
+>
+> -static bool avrcp_get_current_player_value(struct l2cap_frame *frame,
+> +static bool avrcp_get_current_player_value(struct avctp_frame *avctp_frame,
+>                                                 uint8_t ctype, uint8_t len,
+>                                                 uint8_t indent)
+>  {
+> +       struct l2cap_frame *frame = &avctp_frame->l2cap_frame;
+>         uint8_t num;
+>
+>         if (!l2cap_frame_get_u8(frame, &num))
+> @@ -688,9 +703,11 @@ response:
+>         return true;
+>  }
+>
+> -static bool avrcp_set_player_value(struct l2cap_frame *frame, uint8_t ctype,
+> -                                       uint8_t len, uint8_t indent)
+> +static bool avrcp_set_player_value(struct avctp_frame *avctp_frame,
+> +                                       uint8_t ctype, uint8_t len,
+> +                                       uint8_t indent)
+>  {
+> +       struct l2cap_frame *frame = &avctp_frame->l2cap_frame;
+>         uint8_t num;
+>
+>         if (ctype > AVC_CTYPE_GENERAL_INQUIRY)
+> @@ -720,10 +737,11 @@ static bool avrcp_set_player_value(struct l2cap_frame *frame, uint8_t ctype,
+>         return true;
+>  }
+>
+> -static bool avrcp_get_player_attribute_text(struct l2cap_frame *frame,
+> +static bool avrcp_get_player_attribute_text(struct avctp_frame *avctp_frame,
+>                                                 uint8_t ctype, uint8_t len,
+>                                                 uint8_t indent)
+>  {
+> +       struct l2cap_frame *frame = &avctp_frame->l2cap_frame;
+>         uint8_t num;
+>
+>         if (!l2cap_frame_get_u8(frame, &num))
+> @@ -783,10 +801,11 @@ response:
+>         return true;
+>  }
+>
+> -static bool avrcp_get_player_value_text(struct l2cap_frame *frame,
+> +static bool avrcp_get_player_value_text(struct avctp_frame *avctp_frame,
+>                                         uint8_t ctype, uint8_t len,
+>                                         uint8_t indent)
+>  {
+> +       struct l2cap_frame *frame = &avctp_frame->l2cap_frame;
+>         static uint8_t attr = 0;
+>         uint8_t num;
+>
+> @@ -858,9 +877,11 @@ response:
+>         return true;
+>  }
+>
+> -static bool avrcp_displayable_charset(struct l2cap_frame *frame, uint8_t ctype,
+> -                                       uint8_t len, uint8_t indent)
+> +static bool avrcp_displayable_charset(struct avctp_frame *avctp_frame,
+> +                                       uint8_t ctype, uint8_t len,
+> +                                       uint8_t indent)
+>  {
+> +       struct l2cap_frame *frame = &avctp_frame->l2cap_frame;
+>         uint8_t num;
+>
+>         if (ctype > AVC_CTYPE_GENERAL_INQUIRY)
+> @@ -886,8 +907,8 @@ static bool avrcp_displayable_charset(struct l2cap_frame *frame, uint8_t ctype,
+>
+>  struct avrcp_ctrl_pdu_data {
+>         uint8_t pduid;
+> -       bool (*func) (struct l2cap_frame *frame, uint8_t ctype, uint8_t len,
+> -                                                       uint8_t indent);
+> +       bool (*func) (struct avctp_frame *avctp_frame, uint8_t ctype,
+> +                                               uint8_t len, uint8_t indent);
+>  };
+>
+>  static const struct avrcp_ctrl_pdu_data avrcp_ctrl_pdu_table[] = {
+> @@ -915,10 +936,11 @@ static bool avrcp_rejected_packet(struct l2cap_frame *frame, uint8_t indent)
+>         return true;
+>  }
+>
+> -static bool avrcp_pdu_packet(struct l2cap_frame *frame, uint8_t ctype,
+> +static bool avrcp_pdu_packet(struct avctp_frame *avctp_frame, uint8_t ctype,
+>                                                                 uint8_t indent)
+>  {
+> -       uint8_t pduid, pt;
+> +       struct l2cap_frame *frame = &avctp_frame->l2cap_frame;
+> +       uint8_t pduid;
+>         uint16_t len;
+>         int i;
+>         const struct avrcp_ctrl_pdu_data *ctrl_pdu_data = NULL;
+> @@ -926,14 +948,14 @@ static bool avrcp_pdu_packet(struct l2cap_frame *frame, uint8_t ctype,
+>         if (!l2cap_frame_get_u8(frame, &pduid))
+>                 return false;
+>
+> -       if (!l2cap_frame_get_u8(frame, &pt))
+> +       if (!l2cap_frame_get_u8(frame, &avctp_frame->pt))
+>                 return false;
+>
+>         if (!l2cap_frame_get_be16(frame, &len))
+>                 return false;
+>
+>         print_indent(indent, COLOR_OFF, "AVRCP: ", pdu2str(pduid), COLOR_OFF,
+> -                                       " pt %s len 0x%04x", pt2str(pt), len);
+> +                       " pt %s len 0x%04x", pt2str(avctp_frame->pt), len);
+>
+>         if (frame->size != len)
+>                 return false;
+> @@ -953,11 +975,13 @@ static bool avrcp_pdu_packet(struct l2cap_frame *frame, uint8_t ctype,
+>                 return true;
+>         }
+>
+> -       return ctrl_pdu_data->func(frame, ctype, len, indent + 2);
+> +       return ctrl_pdu_data->func(avctp_frame, ctype, len, indent + 2);
+>  }
+>
+> -static bool avrcp_control_packet(struct l2cap_frame *frame)
+> +static bool avrcp_control_packet(struct avctp_frame *avctp_frame)
+>  {
+> +       struct l2cap_frame *frame = &avctp_frame->l2cap_frame;
 > +
+>         uint8_t ctype, address, subunit, opcode, company[3], indent = 2;
+>
+>         if (!l2cap_frame_get_u8(frame, &ctype) ||
+> @@ -988,7 +1012,7 @@ static bool avrcp_control_packet(struct l2cap_frame *frame)
+>
+>         switch (opcode) {
+>         case 0x7c:
+> -               return avrcp_passthrough_packet(frame);
+> +               return avrcp_passthrough_packet(avctp_frame);
+>         case 0x00:
+>                 if (!l2cap_frame_get_u8(frame, &company[0]) ||
+>                                 !l2cap_frame_get_u8(frame, &company[1]) ||
+> @@ -998,29 +1022,32 @@ static bool avrcp_control_packet(struct l2cap_frame *frame)
+>                 print_field("%*cCompany ID: 0x%02x%02x%02x", indent, ' ',
+>                                         company[0], company[1], company[2]);
+>
+> -               return avrcp_pdu_packet(frame, ctype, 10);
+> +               return avrcp_pdu_packet(avctp_frame, ctype, 10);
+>         default:
+>                 packet_hexdump(frame->data, frame->size);
+>                 return true;
+>         }
+>  }
+>
+> -static bool avrcp_browsing_packet(struct l2cap_frame *frame, uint8_t hdr)
+> +static bool avrcp_browsing_packet(struct avctp_frame *avctp_frame)
+>  {
+> +       struct l2cap_frame *frame = &avctp_frame->l2cap_frame;
+> +
+>         packet_hexdump(frame->data, frame->size);
+>         return true;
+>  }
+>
+> -static void avrcp_packet(struct l2cap_frame *frame, uint8_t hdr)
+> +static void avrcp_packet(struct avctp_frame *avctp_frame)
+>  {
+> +       struct l2cap_frame *frame = &avctp_frame->l2cap_frame;
+>         bool ret;
+>
+>         switch (frame->psm) {
+>         case 0x17:
+> -               ret = avrcp_control_packet(frame);
+> +               ret = avrcp_control_packet(avctp_frame);
+>                 break;
+>         case 0x1B:
+> -               ret = avrcp_browsing_packet(frame, hdr);
+> +               ret = avrcp_browsing_packet(avctp_frame);
+>                 break;
+>         default:
+>                 packet_hexdump(frame->data, frame->size);
+> @@ -1035,15 +1062,16 @@ static void avrcp_packet(struct l2cap_frame *frame, uint8_t hdr)
+>
+>  void avctp_packet(const struct l2cap_frame *frame)
+>  {
+> -       uint8_t hdr;
+> -       uint16_t pid;
+> -       struct l2cap_frame avctp_frame;
+> +       struct l2cap_frame *l2cap_frame;
+> +       struct avctp_frame avctp_frame;
+>         const char *pdu_color;
+>
+> -       l2cap_frame_pull(&avctp_frame, frame, 0);
+> +       l2cap_frame_pull(&avctp_frame.l2cap_frame, frame, 0);
+> +
+> +       l2cap_frame = &avctp_frame.l2cap_frame;
+>
+> -       if (!l2cap_frame_get_u8(&avctp_frame, &hdr) ||
+> -                               !l2cap_frame_get_be16(&avctp_frame, &pid)) {
+> +       if (!l2cap_frame_get_u8(l2cap_frame, &avctp_frame.hdr) ||
+> +                       !l2cap_frame_get_be16(l2cap_frame, &avctp_frame.pid)) {
+>                 print_text(COLOR_ERROR, "frame too short");
+>                 packet_hexdump(frame->data, frame->size);
+>                 return;
+> @@ -1057,11 +1085,12 @@ void avctp_packet(const struct l2cap_frame *frame)
+>         print_indent(6, pdu_color, "AVCTP", "", COLOR_OFF,
+>                                 " %s: %s: type 0x%02x label %d PID 0x%04x",
+>                                 frame->psm == 23 ? "Control" : "Browsing",
+> -                               hdr & 0x02 ? "Response" : "Command",
+> -                               hdr & 0x0c, hdr >> 4, pid);
+> +                               avctp_frame.hdr & 0x02 ? "Response" : "Command",
+> +                               avctp_frame.hdr & 0x0c, avctp_frame.hdr >> 4,
+> +                               avctp_frame.pid);
+>
+> -       if (pid == 0x110e || pid == 0x110c)
+> -               avrcp_packet(&avctp_frame, hdr);
+> +       if (avctp_frame.pid == 0x110e || avctp_frame.pid == 0x110c)
+> +               avrcp_packet(&avctp_frame);
+>         else
+>                 packet_hexdump(frame->data, frame->size);
+>  }
+> --
+> 1.9.1
 
-Also here that's too broken here. In lowpan_give_skb_to_devices we have
-mixed errno and  NET_RX_SUCCESS for the return variable, we need to
-clean this up. Maybe just return the NET_RX_SUCCESS|NET_RX_DROP return
-value from netif_rx call.
+Pushed, thanks.
 
-> +	kfree_skb(skb);
 
-consume_skb here.
-
-Simple on error kfree_skb, not a error consume_skb or dev_kfree_skb. I
-prefer consume_skb.
-
-- Alex
+-- 
+Luiz Augusto von Dentz
