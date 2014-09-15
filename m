@@ -1,26 +1,70 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 15 Sep 2014 12:28:17 +0200
+Date: Mon, 15 Sep 2014 12:24:58 +0200
 From: Alexander Aring <alex.aring@gmail.com>
-To: Jukka Rissanen <jukka.rissanen@linux.intel.com>
-Cc: linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org
-Subject: Re: [PATCH] MAINTAINERS: add maintainer for generic 6LoWPAN
-Message-ID: <20140915102815.GA13603@omega>
-References: <1410768216-12414-1-git-send-email-jukka.rissanen@linux.intel.com>
+To: Martin Townsend <mtownsend1973@gmail.com>
+Cc: linux-zigbee-devel@lists.sourceforge.net,
+	linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org,
+	marcel@holtmann.org, Martin Townsend <martin.townsend@xsilon.com>
+Subject: Re: [PATCH v2 bluetooth] 6lowpan: fix incorrect return values in
+ lowpan_rcv
+Message-ID: <20140915102457.GB10580@omega>
+References: <1410514480-9070-1-git-send-email-martin.townsend@xsilon.com>
+ <1410514480-9070-3-git-send-email-martin.townsend@xsilon.com>
+ <20140915101331.GA10580@omega>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-In-Reply-To: <1410768216-12414-1-git-send-email-jukka.rissanen@linux.intel.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <20140915101331.GA10580@omega>
+Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Mon, Sep 15, 2014 at 11:03:36AM +0300, Jukka Rissanen wrote:
-> Add Jukka to 6LoWPAN maintainer list. He will concentrate on
-> generic and bluetooth part of 6LoWPAN stack.
+On Mon, Sep 15, 2014 at 12:13:31PM +0200, Alexander Aring wrote:
+...
 > 
-> Signed-off-by: Jukka Rissanen <jukka.rissanen@linux.intel.com>
+> >  			if (ret == 1) {
+> > -				ret = process_data(skb, &hdr);
+> > -				if (ret == NET_RX_DROP)
+> > +				ret = process_data(&skb, &hdr);
+> > +				if (ret < 0)
+> >  					goto drop;
+> this function returning an errno, you can't return the errno here. goto
+> drop returns the ret variable. Maybe just make a return NET_RX_DROP at
+> drop. We should never return a different variable.
+Oops, I looked at the wong please I mean before drop, when all things
+are fine.
 
-Acked-by: Alexander Aring <alex.aring@gmail.com>
+> 
+> Also this need to be drop_skb at several places in this code, we don't
+> have a kfree_skb at process_data anymore. This leaks memory.
+> 
+> > +			} else {
+> > +				return NET_RX_SUCCESS;
+> >  			}
+> >  			break;
+> >  		case LOWPAN_DISPATCH_FRAGN:	/* next fragments headers */
+> >  			ret = lowpan_frag_rcv(skb, LOWPAN_DISPATCH_FRAGN);
+> 
+> same here.
+> >  			if (ret == 1) {
+> > -				ret = process_data(skb, &hdr);
+> > -				if (ret == NET_RX_DROP)
+> > +				ret = process_data(&skb, &hdr);
+> > +				if (ret < 0)
+> >  					goto drop;
+> 
+> same here.
+> 
+> > +			} else {
+> > +				return NET_RX_SUCCESS;
+> >  			}
+> >  			break;
+> >  		default:
+> > @@ -515,7 +514,16 @@ static int lowpan_rcv(struct sk_buff *skb, struct net_device *dev,
+> >  		}
+> >  	}
+> >  
 
-next time also cc linux-wpan for generic 6lowpan foo, please.
-And I see no tag, please Marcel queue it into the right branch for you.
+If all things are fine, there is somewhere a return ret;
+
+We should change it to return NET_RX_SUCCESS.
 
 - Alex
