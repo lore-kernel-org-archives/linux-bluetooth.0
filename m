@@ -1,44 +1,47 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: 
-References: 
-Subject: Wrong selection of audio source during handsfree call
-From: Vinod Rayapudi <vinod.rayapudi@tcs.com>
-To: linux-bluetooth-owner@vger.kernel.org, autoanswer@vger.kernel.org,
-	linux-bluetooth@vger.kernel.org
-Message-ID: <OF5483DA9E.1F5616FD-ON65257D54.0049847E-65257D54.00498481@tcs.com>
-Date: Mon, 15 Sep 2014 18:53:00 +0530
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <1410785956-6887-1-git-send-email-gowtham.ab@samsung.com>
+References: <1410785956-6887-1-git-send-email-gowtham.ab@samsung.com>
+Date: Mon, 15 Sep 2014 16:03:49 +0300
+Message-ID: <CABBYNZL0NCd3o0_oXmW=TQw1MGoRkSJ9zBQRwULSD1zn7G-XCA@mail.gmail.com>
+Subject: Re: [PATCH] obexd/client/map: Check msg value is valid
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Gowtham Anandha Babu <gowtham.ab@samsung.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	Dmitry Kasatkin <d.kasatkin@samsung.com>,
+	Bharat Panda <bharat.panda@samsung.com>, cpgs@samsung.com
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi,
 
-I have connected my iPhone with both A2DP and Handsfree profiles.
-Whenever there is a, I can't hear audio on speakers.
-When I check, pulse audio sources (pacmd list-sources), I can see there is wrong selection audio source.
+On Mon, Sep 15, 2014 at 3:59 PM, Gowtham Anandha Babu
+<gowtham.ab@samsung.com> wrote:
+> Checks for the NULL msg-value, before passing it to the callback.
+> ---
+>  obexd/client/map.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+>
+> diff --git a/obexd/client/map.c b/obexd/client/map.c
+> index 520e492..fb8ebd8 100644
+> --- a/obexd/client/map.c
+> +++ b/obexd/client/map.c
+> @@ -1132,7 +1132,8 @@ static void msg_element(GMarkupParseContext *ctxt, const char *element,
+>
+>                 for (parser = msg_parsers; parser && parser->name; parser++) {
+>                         if (strcasecmp(key, parser->name) == 0) {
+> -                               parser->func(msg, values[i]);
+> +                               if(values[i])
+> +                                       parser->func(msg, values[i]);
+>                                 break;
+>                         }
+>                 }
+> --
+> 1.9.1
 
-If both A2DP and HFP profiles are connected, during call always I can see audio streaming parameters instead of SCO related parameters.
-
-I am using Ubuntu 12.04 and OFono 1.0.
-
-Can anyone help me on this ?
-Is this an issue with Bluez or OFono ?
-
-Thanks & Regards,
-Vinod.
-=====-----=====-----=====
-Notice: The information contained in this e-mail
-message and/or attachments to it may contain 
-confidential or privileged information. If you are 
-not the intended recipient, any dissemination, use, 
-review, distribution, printing or copying of the 
-information contained in this e-mail message 
-and/or attachments to it are strictly prohibited. If 
-you have received this communication in error, 
-please notify us by reply e-mail or telephone and 
-immediately and permanently delete the message 
-and any attachments. Thank you
+Ive just pushed a similar patch, but thanks anyway.
 
 
-
+-- 
+Luiz Augusto von Dentz
