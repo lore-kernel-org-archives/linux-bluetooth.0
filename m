@@ -4,33 +4,33 @@ To: linux-bluetooth@vger.kernel.org
 Cc: marcel@holtmann.org, johan.hedberg@gmail.com,
 	d.kasatkin@samsung.com, bharat.panda@samsung.com, cpgs@samsung.com,
 	Gowtham Anandha Babu <gowtham.ab@samsung.com>
-Subject: [PATCH v2 3/3] tools/seq2bseq : Fix the same expression issue in if
- condition
-Date: Mon, 15 Sep 2014 11:40:05 +0530
-Message-id: <1410761405-4525-2-git-send-email-gowtham.ab@samsung.com>
-In-reply-to: <1410761405-4525-1-git-send-email-gowtham.ab@samsung.com>
-References: <1410761405-4525-1-git-send-email-gowtham.ab@samsung.com>
+Subject: [PATCH v2 2/3] tools/btsnoop : Fix variable reassigning issue
+Date: Mon, 15 Sep 2014 11:40:04 +0530
+Message-id: <1410761405-4525-1-git-send-email-gowtham.ab@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Fix the usage of same expression on both sides of '||' in if
+The Variable 'written' is reassigned a value before the old one has been used.
 ---
- tools/seq2bseq.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ tools/btsnoop.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-diff --git a/tools/seq2bseq.c b/tools/seq2bseq.c
-index 7657a57..23f6c9e 100644
---- a/tools/seq2bseq.c
-+++ b/tools/seq2bseq.c
-@@ -40,7 +40,7 @@ static int convert_line(int fd, const char *line)
- 	char str[3];
- 	unsigned char val;
+diff --git a/tools/btsnoop.c b/tools/btsnoop.c
+index 6ca62d2..1fdd391 100644
+--- a/tools/btsnoop.c
++++ b/tools/btsnoop.c
+@@ -211,8 +211,9 @@ next_packet:
+ 		goto next_packet;
+ 	}
  
--	if (line[0] == '*' || line[0] == '\r' || line[0] == '\r')
-+	if (line[0] == '*' || line[0] == '\r' || line[0] == '\n')
- 		return 0;
+-	written = input_pkt[select_input].size = htobe32(toread - 1);
+-	written = input_pkt[select_input].len = htobe32(toread - 1);
++	written = htobe32(toread-1);
++	input_pkt[select_input].size = written;
++	input_pkt[select_input].len = written;
  
- 	while (1) {
+ 	switch (buf[0]) {
+ 	case 0x01:
 -- 
 1.9.1
 
