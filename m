@@ -2,158 +2,62 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH 06/11] android/gatt: Use configuration data for device information profile
-Date: Mon, 15 Sep 2014 16:49:10 +0200
-Message-Id: <1410792555-24765-7-git-send-email-szymon.janc@tieto.com>
-In-Reply-To: <1410792555-24765-1-git-send-email-szymon.janc@tieto.com>
-References: <1410792555-24765-1-git-send-email-szymon.janc@tieto.com>
+Subject: [PATCH 00/11] android: Configuration command
+Date: Mon, 15 Sep 2014 16:49:04 +0200
+Message-Id: <1410792555-24765-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- android/gatt.c | 115 +++++++++++++++++++++++++++++++--------------------------
- 1 file changed, 63 insertions(+), 52 deletions(-)
+Hi,
 
-diff --git a/android/gatt.c b/android/gatt.c
-index 5a1d215..b008a1d 100644
---- a/android/gatt.c
-+++ b/android/gatt.c
-@@ -6386,23 +6386,6 @@ static void register_gap_service(void)
- 		error("gatt: Failed to register GAP SDP record");
- }
- 
--/* TODO: Get those data from device possible via androig/bluetooth.c */
--static struct device_info {
--	const char *manufacturer_name;
--	const char *model_number;
--	const char *serial_number;
--	const char *firmware_rev;
--	const char *hardware_rev;
--	const char *software_rev;
--} device_info = {
--	.manufacturer_name =	"BlueZ for Android",
--	.model_number =		"model no",
--	.serial_number =	"serial no",
--	.firmware_rev =		"firmware rev",
--	.hardware_rev =		"hardware rev",
--	.software_rev =		"software rev",
--};
--
- static void device_info_read_cb(uint16_t handle, uint16_t offset,
- 					uint8_t att_opcode, bdaddr_t *bdaddr,
- 					void *user_data)
-@@ -6440,6 +6423,7 @@ static void register_device_info_service(void)
- {
- 	bt_uuid_t uuid;
- 	uint16_t srvc_handle, end_handle;
-+	const char *data;
- 
- 	DBG("");
- 
-@@ -6448,41 +6432,68 @@ static void register_device_info_service(void)
- 	srvc_handle = gatt_db_add_service(gatt_db, &uuid, true, 15);
- 
- 	/* User data are not const hence (void *) cast is used */
--	bt_uuid16_create(&uuid, GATT_CHARAC_MODEL_NUMBER_STRING);
--	gatt_db_add_characteristic(gatt_db, srvc_handle, &uuid, GATT_PERM_READ,
--					GATT_CHR_PROP_READ,
--					device_info_read_cb, NULL,
--					(void *) device_info.model_number);
--
--	bt_uuid16_create(&uuid, GATT_CHARAC_SERIAL_NUMBER_STRING);
--	gatt_db_add_characteristic(gatt_db, srvc_handle, &uuid, GATT_PERM_READ,
--					GATT_CHR_PROP_READ,
--					device_info_read_cb, NULL,
--					(void *) device_info.serial_number);
--
--	bt_uuid16_create(&uuid, GATT_CHARAC_FIRMWARE_REVISION_STRING);
--	gatt_db_add_characteristic(gatt_db, srvc_handle, &uuid, GATT_PERM_READ,
--					GATT_CHR_PROP_READ,
--					device_info_read_cb, NULL,
--					(void *) device_info.firmware_rev);
--
--	bt_uuid16_create(&uuid, GATT_CHARAC_HARDWARE_REVISION_STRING);
--	gatt_db_add_characteristic(gatt_db, srvc_handle, &uuid, GATT_PERM_READ,
--					GATT_CHR_PROP_READ,
--					device_info_read_cb, NULL,
--					(void *) device_info.hardware_rev);
--
--	bt_uuid16_create(&uuid, GATT_CHARAC_SOFTWARE_REVISION_STRING);
--	gatt_db_add_characteristic(gatt_db, srvc_handle, &uuid, GATT_PERM_READ,
--					GATT_CHR_PROP_READ,
--					device_info_read_cb, NULL,
--					(void *) device_info.software_rev);
--
--	bt_uuid16_create(&uuid, GATT_CHARAC_MANUFACTURER_NAME_STRING);
--	gatt_db_add_characteristic(gatt_db, srvc_handle, &uuid, GATT_PERM_READ,
--					GATT_CHR_PROP_READ,
--					device_info_read_cb, NULL,
--					(void *) device_info.manufacturer_name);
-+	data = bt_config_get_name();
-+	if (data) {
-+		bt_uuid16_create(&uuid, GATT_CHARAC_MODEL_NUMBER_STRING);
-+		gatt_db_add_characteristic(gatt_db, srvc_handle, &uuid,
-+						GATT_PERM_READ,
-+						GATT_CHR_PROP_READ,
-+						device_info_read_cb, NULL,
-+						(void *) data);
-+	}
-+
-+	/* TODO */
-+	if (data) {
-+		bt_uuid16_create(&uuid, GATT_CHARAC_SERIAL_NUMBER_STRING);
-+		gatt_db_add_characteristic(gatt_db, srvc_handle, &uuid,
-+						GATT_PERM_READ,
-+						GATT_CHR_PROP_READ,
-+						device_info_read_cb, NULL,
-+						(void *) data);
-+	}
-+
-+	/* TODO */
-+	data = NULL;
-+	if (data) {
-+		bt_uuid16_create(&uuid, GATT_CHARAC_FIRMWARE_REVISION_STRING);
-+		gatt_db_add_characteristic(gatt_db, srvc_handle, &uuid,
-+						GATT_PERM_READ,
-+						GATT_CHR_PROP_READ,
-+						device_info_read_cb, NULL,
-+						(void *) data);
-+	}
-+
-+	/* TODO */
-+	data = NULL;
-+	if (data) {
-+		bt_uuid16_create(&uuid, GATT_CHARAC_HARDWARE_REVISION_STRING);
-+		gatt_db_add_characteristic(gatt_db, srvc_handle, &uuid,
-+						GATT_PERM_READ,
-+						GATT_CHR_PROP_READ,
-+						device_info_read_cb, NULL,
-+						(void *) data);
-+	}
-+
-+	/* TODO */
-+	data = NULL;
-+	if (data) {
-+		bt_uuid16_create(&uuid, GATT_CHARAC_SOFTWARE_REVISION_STRING);
-+		gatt_db_add_characteristic(gatt_db, srvc_handle, &uuid,
-+						GATT_PERM_READ,
-+						GATT_CHR_PROP_READ,
-+						device_info_read_cb, NULL,
-+						(void *) data);
-+	}
-+
-+	data = bt_config_get_vendor();
-+	if (data) {
-+		bt_uuid16_create(&uuid, GATT_CHARAC_MANUFACTURER_NAME_STRING);
-+		gatt_db_add_characteristic(gatt_db, srvc_handle, &uuid,
-+						GATT_PERM_READ,
-+						GATT_CHR_PROP_READ,
-+						device_info_read_cb, NULL,
-+						(void *) data);
-+	}
- 
- 	gatt_db_service_set_active(gatt_db, srvc_handle, true);
- 
+This is a respin of serie that was send some time ago as RFC [1]
+
+This will allow to pass Android properties over IPC and use them
+in daemon for customization eg. Device Information or default adapter name.
+
+Comments from RFC was taken into account. So now "ro.bluetooth.*"
+and "sys.persist.bluetooth.*" are taken into account (former takes
+precedence if both are present). Some configs also fallback to
+generic properties if no bluetooth ones are present.
+
+Comments are welcome.
+
+BR
+Szymon Janc
+
+[1] "[RFC 0/6] android: Configuration command"
+
+
+Szymon Janc (11):
+  android/hal-ipc-api: Add Configuration command
+  android/hal-msg: Add configuration command
+  android: Add support for configuration command
+  android: Add functions for getting configuration options
+  android/bluetooth: Use model name for default adapter name
+  android/gatt: Use configuration data for device information profile
+  android/hal-bluetooth: Add support for sending configuration
+  android/hal: Add helper for quering config from Android properties
+  android: Use helper for accesing Android properties
+  android/bluetoothd-wrapper: Fix indentation
+  android/README: Update customization section
+
+ android/Android.mk           |   3 +-
+ android/README               |  14 ++++--
+ android/bluetooth.c          |  17 +++++--
+ android/bluetoothd-wrapper.c |  19 +++----
+ android/client/if-gatt.c     |   2 +
+ android/cutils/properties.h  |   1 +
+ android/gatt.c               | 115 ++++++++++++++++++++++++-------------------
+ android/hal-bluetooth.c      |  51 ++++++++++++++++---
+ android/hal-handsfree.c      |  15 +++---
+ android/hal-ipc-api.txt      |  16 ++++++
+ android/hal-msg.h            |  17 +++++++
+ android/hal-utils.c          |  32 ++++++++++++
+ android/hal-utils.h          |   2 +
+ android/main.c               |  94 +++++++++++++++++++++++++++++++++++
+ android/utils.h              |   4 ++
+ 15 files changed, 314 insertions(+), 88 deletions(-)
+
 -- 
 1.9.3
 
