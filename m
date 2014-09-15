@@ -2,46 +2,52 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH 02/11] android/hal-msg: Add configuration command
-Date: Mon, 15 Sep 2014 16:49:06 +0200
-Message-Id: <1410792555-24765-3-git-send-email-szymon.janc@tieto.com>
+Subject: [PATCH 01/11] android/hal-ipc-api: Add Configuration command
+Date: Mon, 15 Sep 2014 16:49:05 +0200
+Message-Id: <1410792555-24765-2-git-send-email-szymon.janc@tieto.com>
 In-Reply-To: <1410792555-24765-1-git-send-email-szymon.janc@tieto.com>
 References: <1410792555-24765-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- android/hal-msg.h | 17 +++++++++++++++++
- 1 file changed, 17 insertions(+)
+ android/hal-ipc-api.txt | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
 
-diff --git a/android/hal-msg.h b/android/hal-msg.h
-index 3d95e10..48d3186 100644
---- a/android/hal-msg.h
-+++ b/android/hal-msg.h
-@@ -69,6 +69,23 @@ struct hal_cmd_unregister_module {
- 	uint8_t service_id;
- } __attribute__((packed));
+diff --git a/android/hal-ipc-api.txt b/android/hal-ipc-api.txt
+index f6e1680..e7dab3b 100644
+--- a/android/hal-ipc-api.txt
++++ b/android/hal-ipc-api.txt
+@@ -90,6 +90,9 @@ the socket and register both "bluetooth" and "socket" service modules. It is
+ required to register "socket" service at the same time since the HAL module
+ does not have its own init() function.
  
-+#define HAL_CONFIG_VENDOR		0x00
-+#define HAL_CONFIG_MODEL		0x01
-+#define HAL_CONFIG_NAME			0x02
++It is possible to send Configure command before registering any services to
++customize stack. This step is optional.
 +
-+#define HAL_CONFIG_MAX_LEN		92
-+
-+struct hal_config_prop {
-+	uint8_t type;
-+	uint8_t val[HAL_CONFIG_MAX_LEN];
-+} __attribute__((packed));
-+
-+#define HAL_OP_CONFIGURATION		0x03
-+struct hal_cmd_configuration {
-+	uint8_t num;
-+	struct hal_config_prop props[0];
-+} __attribute__((packed));
-+
- /* Bluetooth Core HAL API */
+ When new profiles are initiated, the get_profile_interface() callback
+ will load the profile and during init() of the profile, it should register the
+ specific service.
+@@ -143,6 +146,19 @@ Core Service (ID 0)
  
- #define HAL_OP_ENABLE			0x01
+ 		In case of an error, the error response will be returned.
+ 
++	Opcode 0x03 - Configuration
++
++		Command parameters: Num options (1 octet)
++		                    Type # (1 octet)
++		                    Value # (92 octets)
++
++		Response parameters: <none>
++
++		Valid configure option types: 0x00 = Vendor
++		                              0x01 = Model
++		                              0x02 = Name
++
++		In case of an error, the error response will be returned.
+ 
+ Bluetooth Core HAL (ID 1)
+ =========================
 -- 
 1.9.3
 
