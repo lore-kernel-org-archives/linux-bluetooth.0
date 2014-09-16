@@ -1,65 +1,72 @@
 Return-Path: <cyrus@holtmann.org>
-From: Gowtham Anandha Babu <gowtham.ab@samsung.com>
-To: 'Luiz Augusto von Dentz' <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	'Dmitry Kasatkin' <d.kasatkin@samsung.com>,
-	'Bharat Panda' <bharat.panda@samsung.com>, cpgs@samsung.com
-References: <1410785956-6887-1-git-send-email-gowtham.ab@samsung.com>
- <CABBYNZL0NCd3o0_oXmW=TQw1MGoRkSJ9zBQRwULSD1zn7G-XCA@mail.gmail.com>
-In-reply-to: <CABBYNZL0NCd3o0_oXmW=TQw1MGoRkSJ9zBQRwULSD1zn7G-XCA@mail.gmail.com>
-Subject: RE: [PATCH] obexd/client/map: Check msg value is valid
-Date: Tue, 16 Sep 2014 10:43:08 +0530
-Message-id: <000001cfd16c$e8694540$b93bcfc0$@samsung.com>
-MIME-version: 1.0
-Content-type: text/plain; charset=UTF-8
-Sender: linux-bluetooth-owner@vger.kernel.org
+From: Varka Bhadram <varkabhadram@gmail.com>
+To: linux-wpan@vger.kernel.org, linux-bluetooth@vger.kernel.org
+Cc: alan@signal11.us, Varka Bhadram <varkab@cdac.in>
+Subject: [PATCH bluetooth-next 3/3] ieee802154: mrf24j40: use pr_* / dev_*
+Date: Tue, 16 Sep 2014 10:18:42 +0530
+Message-Id: <1410842922-10564-4-git-send-email-varkab@cdac.in>
+In-Reply-To: <1410842922-10564-1-git-send-email-varkab@cdac.in>
+References: <1410842922-10564-1-git-send-email-varkab@cdac.in>
+Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+This patch replace printk() with dev_* if dev is available
+or replace with pr_*
 
-> -----Original Message-----
-> From: Luiz Augusto von Dentz [mailto:luiz.dentz@gmail.com]
-> Sent: Monday, September 15, 2014 6:34 PM
-> To: Gowtham Anandha Babu
-> Cc: linux-bluetooth@vger.kernel.org; Dmitry Kasatkin; Bharat Panda;
-> cpgs@samsung.com
-> Subject: Re: [PATCH] obexd/client/map: Check msg value is valid
-> 
-> Hi,
-> 
-> On Mon, Sep 15, 2014 at 3:59 PM, Gowtham Anandha Babu
-> <gowtham.ab@samsung.com> wrote:
-> > Checks for the NULL msg-value, before passing it to the callback.
-> > ---
-> >  obexd/client/map.c | 3 ++-
-> >  1 file changed, 2 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/obexd/client/map.c b/obexd/client/map.c index
-> > 520e492..fb8ebd8 100644
-> > --- a/obexd/client/map.c
-> > +++ b/obexd/client/map.c
-> > @@ -1132,7 +1132,8 @@ static void msg_element(GMarkupParseContext
-> > *ctxt, const char *element,
-> >
-> >                 for (parser = msg_parsers; parser && parser->name; parser++) {
-> >                         if (strcasecmp(key, parser->name) == 0) {
-> > -                               parser->func(msg, values[i]);
-> > +                               if(values[i])
-> > +                                       parser->func(msg, values[i]);
-> >                                 break;
-> >                         }
-> >                 }
-> > --
-> > 1.9.1
-> 
-> Ive just pushed a similar patch, but thanks anyway.
-> 
-> 
-> --
-> Luiz Augusto von Dentz
+Signed-off-by: Varka Bhadram <varkab@cdac.in>
+---
+ drivers/net/ieee802154/mrf24j40.c |   16 +++++++---------
+ 1 file changed, 7 insertions(+), 9 deletions(-)
 
-Sorry If I am wrong, This patch is under obexd/client/map. The patch which you pushed recently is under obexd/client/mns. 
-
-Regards,
-Gowtham
+diff --git a/drivers/net/ieee802154/mrf24j40.c b/drivers/net/ieee802154/mrf24j40.c
+index 2c617e3..80b6adf 100644
+--- a/drivers/net/ieee802154/mrf24j40.c
++++ b/drivers/net/ieee802154/mrf24j40.c
+@@ -323,8 +323,8 @@ static int mrf24j40_read_rx_buf(struct mrf24j40 *devrec,
+ #ifdef DEBUG
+ 	print_hex_dump(KERN_DEBUG, "mrf24j40 rx: ",
+ 		DUMP_PREFIX_OFFSET, 16, 1, data, *len, 0);
+-	printk(KERN_DEBUG "mrf24j40 rx: lqi: %02hhx rssi: %02hhx\n",
+-		lqi_rssi[0], lqi_rssi[1]);
++	pr_debug("mrf24j40 rx: lqi: %02hhx rssi: %02hhx\n",
++		 lqi_rssi[0], lqi_rssi[1]);
+ #endif
+ 
+ out:
+@@ -385,7 +385,7 @@ err:
+ static int mrf24j40_ed(struct ieee802154_dev *dev, u8 *level)
+ {
+ 	/* TODO: */
+-	printk(KERN_WARNING "mrf24j40: ed not implemented\n");
++	pr_warn("mrf24j40: ed not implemented\n");
+ 	*level = 0;
+ 	return 0;
+ }
+@@ -482,12 +482,10 @@ static int mrf24j40_filter(struct ieee802154_dev *dev,
+ 		for (i = 0; i < 8; i++)
+ 			write_short_reg(devrec, REG_EADR0 + i, addr[i]);
+ 
+-#ifdef DEBUG
+-		printk(KERN_DEBUG "Set long addr to: ");
++		pr_debug("Set long addr to: ");
+ 		for (i = 0; i < 8; i++)
+-			printk("%02hhx ", addr[7 - i]);
+-		printk(KERN_DEBUG "\n");
+-#endif
++			pr_debug("%02hhx ", addr[7 - i]);
++		pr_debug("\n");
+ 	}
+ 
+ 	if (changed & IEEE802515_AFILT_PANID_CHANGED) {
+@@ -702,7 +700,7 @@ static int mrf24j40_probe(struct spi_device *spi)
+ 	int ret = -ENOMEM;
+ 	struct mrf24j40 *devrec;
+ 
+-	printk(KERN_INFO "mrf24j40: probe(). IRQ: %d\n", spi->irq);
++	dev_info(&spi->dev, "probe(). IRQ: %d\n", spi->irq);
+ 
+ 	devrec = devm_kzalloc(&spi->dev, sizeof(struct mrf24j40), GFP_KERNEL);
+ 	if (!devrec)
+-- 
+1.7.9.5
 
