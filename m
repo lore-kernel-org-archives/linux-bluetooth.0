@@ -1,31 +1,27 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] android: Fix wrong check
-Date: Tue, 16 Sep 2014 11:10:47 +0300
-Message-Id: <1410855047-13147-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Tue, 16 Sep 2014 10:44:52 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Gowtham Anandha Babu <gowtham.ab@samsung.com>
+Cc: linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
+	d.kasatkin@samsung.com, bharat.panda@samsung.com, cpgs@samsung.com
+Subject: Re: [PATCH v2 3/3] tools/seq2bseq : Fix the same expression issue in
+ if condition
+Message-ID: <20140916074452.GB738@t440s.lan>
+References: <1410761405-4525-1-git-send-email-gowtham.ab@samsung.com>
+ <1410761405-4525-2-git-send-email-gowtham.ab@samsung.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1410761405-4525-2-git-send-email-gowtham.ab@samsung.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Hi Gowtham,
 
----
- android/tester-main.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+On Mon, Sep 15, 2014, Gowtham Anandha Babu wrote:
+> Fix the usage of same expression on both sides of '||' in if
+> ---
+>  tools/seq2bseq.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/android/tester-main.c b/android/tester-main.c
-index 385c00d..5f0563d 100644
---- a/android/tester-main.c
-+++ b/android/tester-main.c
-@@ -1631,7 +1631,7 @@ static void setup_avrcp(const void *test_data)
- 	}
- 
- 	avrcp = if_bt->get_profile_interface(BT_PROFILE_AV_RC_ID);
--	if (!a2dp) {
-+	if (!avrcp) {
- 		tester_setup_failed();
- 		return;
- 	}
--- 
-1.9.1
+Applied. Thanks.
 
+Johan
