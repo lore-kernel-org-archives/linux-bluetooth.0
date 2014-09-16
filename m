@@ -1,55 +1,81 @@
 Return-Path: <cyrus@holtmann.org>
-From: Martin Townsend <mtownsend1973@gmail.com>
-To: linux-zigbee-devel@lists.sourceforge.net,
-	linux-bluetooth@vger.kernel.org,
-	linux-wpan@vger.kernel.org
-Cc: marcel@holtmann.org,
-	alex.aring@gmail.com,
-	Martin Townsend <martin.townsend@xsilon.com>
-Subject: [PATCH v4 bluetooth] Fix lowpan_rcv
-Date: Tue, 16 Sep 2014 12:01:58 +0100
-Message-Id: <1410865319-16310-1-git-send-email-martin.townsend@xsilon.com>
+Date: Tue, 16 Sep 2014 12:39:25 +0200
+From: Alexander Aring <alex.aring@gmail.com>
+To: Martin Townsend <martin.townsend@xsilon.com>
+Cc: Martin Townsend <mtownsend1973@gmail.com>,
+	linux-zigbee-devel@lists.sourceforge.net,
+	linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org,
+	marcel@holtmann.org
+Subject: Re: [PATCH v3 bluetooth] 6lowpan: fix incorrect return values in
+ lowpan_rcv
+Message-ID: <20140916103923.GB4969@omega>
+References: <1410790194-17502-1-git-send-email-martin.townsend@xsilon.com>
+ <1410790194-17502-2-git-send-email-martin.townsend@xsilon.com>
+ <20140916065703.GA1244@omega>
+ <54180B1D.7090602@xsilon.com>
+ <20140916101747.GA4969@omega>
+ <541810B6.3010508@xsilon.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+In-Reply-To: <541810B6.3010508@xsilon.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This series aims to fix incorrect return values in lowpan_rcv
-To achieve this it also refactors the receive path to
-  1) free skb only from lowpan_rcv and not functions that it calls
-  2) move skb delivery from IPHC
+On Tue, Sep 16, 2014 at 11:28:06AM +0100, Martin Townsend wrote:
+> 
+> On 16/09/14 11:17, Alexander Aring wrote:
+> > On Tue, Sep 16, 2014 at 11:04:13AM +0100, Martin Townsend wrote:
+> >> Hi Alex,
+> >>
+> >> On the lowpan_give_skb_to_devices change.
+> >>
+> >> As we are iterating over a list of lowpan_devices and could potentially copy the skb more than once, what happens if the first device returns NET_RX_DROP and then the second time it return NET_RX_SUCCESS?  The stat variable is overwritten so stat only ever reflects the return value of netif_rx for the last device?
+> >>
+> >> Maybe it's better to completely remove the if else at the end and always consume the skb?  For the case whereskb_copy fails then we should kfree_skb,
+> >> e.g.
+> >>
+> >> static int lowpan_give_skb_to_devices(struct sk_buff *skb,
+> >> 				      struct net_device *dev)
+> >> {
+> >> 	struct lowpan_dev_record *entry;
+> >> 	struct sk_buff *skb_cp;
+> >> 	int stat = NET_RX_SUCCESS;
+> >>
+> >> 	rcu_read_lock();
+> >> 	list_for_each_entry_rcu(entry, &lowpan_devices, list)
+> >> 		if (lowpan_dev_info(entry->ldev)->real_dev == skb->dev) {
+> >> 			skb_cp = skb_copy(skb, GFP_ATOMIC);
+> >> 			if (!skb_cp) {
+> >> 				kfree_skb(skb);
+> >> 				rcu_read_unlock();
+> >> 				return NET_RX_DROP;
+> >> 			}
+> >>
+> >> 			skb_cp->dev = entry->ldev;
+> >> 			stat = netif_rx(skb_cp);
+> > here we should do a:
+> >
+> > if (stat == NET_RX_DROP)
+> > 	kfree_skb(skb_cp);
+> >
+> > or? It doesn't deliver and then we "could" lost the pointer.
+> Doesn't netif_rx always free the buffer?
 
-I have only compile tested the changes for bluetooth as I don't have any HW
-available so would be grateful for any testing from the Bluetooth developers.
-I have done some minimal testing for IEEE802.15.4
+yes, you are right. [0] Now other things makes more sense for me.
+Thanks.
 
-Signed-off-by: Martin Townsend <martin.townsend@xsilon.com>
----
+I mean there is another deliver function netif_receive_skb and on
+comment always stand "Return values (usually ignored)", depends on
+context what you need. But netif_rx in this context is right.
 
-v1 -> v2:
-* combined first two patches into one.
-* split out renaming of process_data into a new patch
-* re-use err in lowpan_process_data and remove err_ret local variable.
-* removed third patch as applies to linux-wpan
+Here we should not ignore the return value, because we already are in
+the packet layer (the packet layer func callback). The netif_receive_skb 
+function we need for putting frames from the driver (some tasklet context)
+into the packet layer.
 
-v2 -> v3: (Updated from Alexander Aring's Review) 
-* re-use err hadn't been included in patch.
-* fixed some 'goto drop' cases in lowpan_rcv that should be 'goto drop skb'
-* handle error codes when returning from lowpan_frag_rcv.
-* Refactored lowpan_give_skb_to_devices so it consumes or free's skb and then
-  only returns NET_RX status codes.
 
-v3 -> v4: (Updated from Jukka Rissanen and Alexander Aring's Reviews)
-* lowpan_process_data and process_data return skb or ERR_PTR, no need for 
-  skb_inout
-* prefer consume_skb on non error conditions.
-* removed spurious setting of ret in lowpan_rcv
+[0] is some function which is called mainly after "netif_rx" function,
+"netif_receive_skb" will call this function, too.
 
-Martin Townsend (1):
-  6lowpan: fix incorrect return values in lowpan_rcv
+- Alex
 
- include/net/6lowpan.h         |  4 +--
- net/6lowpan/iphc.c            | 73 ++++++++++++++++++-------------------------
- net/bluetooth/6lowpan.c       | 26 +++++++++------
- net/ieee802154/6lowpan_rtnl.c | 44 +++++++++++++++-----------
- 4 files changed, 75 insertions(+), 72 deletions(-)
-
--- 
-1.9.1
+[0] http://lxr.free-electrons.com/source/net/core/dev.c#L3280
