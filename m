@@ -1,34 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
-From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
-Subject: [PATCH 0/8] android/tester: Unifying the way PDU is handled
-Date: Tue, 16 Sep 2014 10:49:29 +0200
-Message-Id: <1410857377-3162-1-git-send-email-jakub.tyszkowski@tieto.com>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] android: Fix wrong check
+Date: Tue, 16 Sep 2014 10:46:59 +0200
+Message-ID: <42755799.4GjsktgIel@leonov>
+In-Reply-To: <1410855047-13147-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1410855047-13147-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patchset makes all testers use common struct for using raw data (PDUs).
-Also some helpers were added for pdu matching.
+Hi Andrei,
 
-Jakub Tyszkowski (8):
-  android/tester: Expose gatt-tester's pdu definition to other testers
-  android/tester: Make AVRCP tests use generic pdu struct
-  android/tester: Make A2DP tests use generic pdu struct
-  android/tester: Make GATT tests use generic pdu struct
-  android/tester: Make HidHost tests use generic pdu struct
-  android/tester: Add helper functions for sending sdp responses
-  android/tester: Make avrcp use sdp pdu sending helper
-  android/tester: Expose pdu set and matching function to be reused
+On Tuesday 16 of September 2014 11:10:47 Andrei Emeltchenko wrote:
+> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> 
+> ---
+>  android/tester-main.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/android/tester-main.c b/android/tester-main.c
+> index 385c00d..5f0563d 100644
+> --- a/android/tester-main.c
+> +++ b/android/tester-main.c
+> @@ -1631,7 +1631,7 @@ static void setup_avrcp(const void *test_data)
+>  	}
+> 
+>  	avrcp = if_bt->get_profile_interface(BT_PROFILE_AV_RC_ID);
+> -	if (!a2dp) {
+> +	if (!avrcp) {
+>  		tester_setup_failed();
+>  		return;
+>  	}
 
- android/tester-a2dp.c    | 74 ++++++++++++++++--------------------------
- android/tester-avrcp.c   | 84 ++++++++++++++++++++----------------------------
- android/tester-gatt.c    | 26 +++------------
- android/tester-hidhost.c | 40 +++++++++--------------
- android/tester-main.c    | 50 ++++++++++++++++++++++++++++
- android/tester-main.h    | 30 +++++++++++++++++
- 6 files changed, 163 insertions(+), 141 deletions(-)
+Applied, thanks.
 
 -- 
-1.9.3
-
+BR
+Szymon Janc
