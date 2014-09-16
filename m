@@ -1,145 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
-From: Gowtham Anandha Babu <gowtham.ab@samsung.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: luiz.dentz@gmail.com, d.kasatkin@samsung.com,
-	bharat.panda@samsung.com, cpgs@samsung.com,
-	Gowtham Anandha Babu <gowtham.ab@samsung.com>
-Subject: [MAP v3] obexd/client : Handle the MAP Event Report 1.1
-Date: Tue, 16 Sep 2014 12:35:52 +0530
-Message-id: <1410851152-15572-1-git-send-email-gowtham.ab@samsung.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Message-ID: <1410851097.4860.6.camel@jrissane-mobl.ger.corp.intel.com>
+Subject: Re: [PATCH v3 bluetooth] 6lowpan: fix incorrect return values in
+ lowpan_rcv
+From: Jukka Rissanen <jukka.rissanen@linux.intel.com>
+To: Martin Townsend <mtownsend1973@gmail.com>
+Cc: linux-zigbee-devel@lists.sourceforge.net,
+ linux-bluetooth@vger.kernel.org,  linux-wpan@vger.kernel.org,
+ marcel@holtmann.org, alex.aring@gmail.com, Martin Townsend
+ <martin.townsend@xsilon.com>
+Date: Tue, 16 Sep 2014 10:04:57 +0300
+In-Reply-To: <1410790194-17502-2-git-send-email-martin.townsend@xsilon.com>
+References: <1410790194-17502-1-git-send-email-martin.townsend@xsilon.com>
+	 <1410790194-17502-2-git-send-email-martin.townsend@xsilon.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Currently blueZ supports MAP Event Report 1.0. 
-Below is the description of MAP Event Report 1.1 and the implementation.
+Hi Martin,
 
-MAP Event Reprot 1.0 has only few attributes listed below:
-type, handle, folder, old_folder, msg_type.
+On ma, 2014-09-15 at 15:09 +0100, Martin Townsend wrote:
+> Currently there are a number of error paths in the lowpan_rcv function that
+> free the skb before returning, the patch simplifies the receive path by
+> ensuring that the skb is only freed from this function.
+> 
+> Passing the skb from 6lowpan up to the higher layers is not a
+> function of IPHC.  By moving it out of IPHC we also remove the
+> need to support error code returns with NET_RX codes.
+> It also makes the lowpan_rcv function more extendable as we
+> can support more compression schemes.
+> 
+> With the above 2 lowpan_rcv is refacored so eliminate incorrect return values.
 
-But the MAP Event report 1.1 has some extra attributes listed below:
-type, handle, folder, old_folder, msg_type, subject, datetime, sender_name, priority.
+I like the idea that we get rid of the callback function.
 
-Event Report 1.1 will give more useful information to MCE about a message than Event Report 1.0.
-In addition to that a new event type READ_STATUS_CHANGED is introduced in 1.1, which will help MCE to keep track of message read status.
+We could probably refactor the patch a bit further thou as the
+lowpan_process_data() could return the skb directly instead of being
+passed as a parameter. In the caller we could use the IS_ERR() macro to
+check if the returned value is an error or a real pointer.
 
-1) In SDP_ATTR_MAP_SUPPORTED_FEATURES, the 'Extended Event Reports 1.1' bit is set.
-2) The additional attributes in 1.1 (subject, datetime, sender_name, priority) are defined in the map_event.
-3) New event type MAP_ET_READ_STATUS_CHANGED is also added in map_event.
-4) The corresponding handlers for (subject, datetime, sender_name, priority) are added in mns
----
- lib/sdp.h                |  2 +-
- obexd/client/map-event.h |  7 ++++++-
- obexd/client/mns.c       | 38 ++++++++++++++++++++++++++++++++++++++
- 3 files changed, 45 insertions(+), 2 deletions(-)
 
-diff --git a/lib/sdp.h b/lib/sdp.h
-index cc10e9f..76f61e1 100644
---- a/lib/sdp.h
-+++ b/lib/sdp.h
-@@ -306,7 +306,7 @@ extern "C" {
- #define SDP_ATTR_MAS_INSTANCE_ID		0x0315
- #define SDP_ATTR_SUPPORTED_MESSAGE_TYPES	0x0316
- #define SDP_ATTR_PBAP_SUPPORTED_FEATURES	0x0317
--#define SDP_ATTR_MAP_SUPPORTED_FEATURES		0x0317
-+#define SDP_ATTR_MAP_SUPPORTED_FEATURES		0x031f
- 
- #define SDP_ATTR_SPECIFICATION_ID		0x0200
- #define SDP_ATTR_VENDOR_ID			0x0201
-diff --git a/obexd/client/map-event.h b/obexd/client/map-event.h
-index ba5d5d2..99cb0c2 100644
---- a/obexd/client/map-event.h
-+++ b/obexd/client/map-event.h
-@@ -32,7 +32,8 @@ enum map_event_type {
- 	MAP_ET_MEMORY_FULL,
- 	MAP_ET_MEMORY_AVAILABLE,
- 	MAP_ET_MESSAGE_DELETED,
--	MAP_ET_MESSAGE_SHIFT
-+	MAP_ET_MESSAGE_SHIFT,
-+	MAP_ET_READ_STATUS_CHANGED
- };
- 
- struct map_event {
-@@ -41,6 +42,10 @@ struct map_event {
- 	char *folder;
- 	char *old_folder;
- 	char *msg_type;
-+	char *datetime;
-+	char *subject;
-+	char *sender_name;
-+	char *priority;
- };
- 
- /* Handle notification in map client.
-diff --git a/obexd/client/mns.c b/obexd/client/mns.c
-index 76b7d1c..24392c6 100644
---- a/obexd/client/mns.c
-+++ b/obexd/client/mns.c
-@@ -180,6 +180,8 @@ static void parse_event_report_type(struct map_event *event, const char *value)
- 		event->type = MAP_ET_MESSAGE_DELETED;
- 	else if (!g_ascii_strcasecmp(value, "MessageShift"))
- 		event->type = MAP_ET_MESSAGE_SHIFT;
-+	else if (!g_ascii_strcasecmp(value, "ReadStatusChanged"))
-+		event->type = MAP_ET_READ_STATUS_CHANGED;
- }
- 
- static void parse_event_report_handle(struct map_event *event,
-@@ -217,6 +219,34 @@ static void parse_event_report_msg_type(struct map_event *event,
- 	event->msg_type = g_strdup(value);
- }
- 
-+static void parse_event_report_date_time(struct map_event *event,
-+                                                        const char *value)
-+{
-+	g_free(event->datetime);
-+	event->datetime = g_strdup(value);
-+}
-+
-+static void parse_event_report_subject(struct map_event *event,
-+                                                        const char *value)
-+{
-+	g_free(event->subject);
-+	event->subject = g_strdup(value);
-+}
-+
-+static void parse_event_report_sender_name(struct map_event *event,
-+                                                        const char *value)
-+{
-+	g_free(event->sender_name);
-+	event->sender_name = g_strdup(value);
-+}
-+
-+static void parse_event_report_priority(struct map_event *event,
-+                                                        const char *value)
-+{
-+	g_free(event->priority);
-+	event->priority = g_strdup(value);
-+}
-+
- static struct map_event_report_parser {
- 	const char *name;
- 	void (*func) (struct map_event *event, const char *value);
-@@ -226,6 +256,10 @@ static struct map_event_report_parser {
- 		{ "folder", parse_event_report_folder },
- 		{ "old_folder", parse_event_report_old_folder },
- 		{ "msg_type", parse_event_report_msg_type },
-+		{ "datetime", parse_event_report_date_time },
-+		{ "subject", parse_event_report_subject },
-+		{ "sender_name", parse_event_report_sender_name },
-+		{ "priority", parse_event_report_priority },
- 		{ }
- };
- 
-@@ -268,6 +302,10 @@ static void map_event_free(struct map_event *event)
- 	g_free(event->folder);
- 	g_free(event->old_folder);
- 	g_free(event->msg_type);
-+	g_free(event->datetime);
-+	g_free(event->subject);
-+	g_free(event->sender_name);
-+	g_free(event->priority);
- 	g_free(event);
- }
- 
--- 
-1.9.1
-
+Cheers,
+Jukka
