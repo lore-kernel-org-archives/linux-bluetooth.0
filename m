@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2] Bluetooth: btusb: Split fragement receiption into separate functions
-Date: Tue, 16 Sep 2014 05:33:33 +0200
-Message-Id: <1410838413-16122-1-git-send-email-marcel@holtmann.org>
+Subject: [PATCH] Bluetooth: btusb: Split fragement receiption into separate functions
+Date: Tue, 16 Sep 2014 05:00:28 +0200
+Message-Id: <1410836428-5219-1-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
@@ -17,26 +17,26 @@ Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
  1 file changed, 21 insertions(+), 9 deletions(-)
 
 diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index cf07fef65fd5..df585ab064fa 100644
+index cf07fef65fd5..73a19a02488c 100644
 --- a/drivers/bluetooth/btusb.c
 +++ b/drivers/bluetooth/btusb.c
 @@ -296,6 +296,21 @@ struct btusb_data {
  	int suspend_count;
  };
  
-+static int btusb_recv_intr(struct btusb_data *data, void *buffer, int count)
++static int btusb_recv_intr(struct btusb_data *data, void *buffer, int length)
 +{
-+	return hci_recv_fragment(data->hdev, HCI_EVENT_PKT, buffer, count);
++	return hci_recv_fragment(data->hdev, HCI_EVENT_PKT, buffer, length);
 +}
 +
-+static int btusb_recv_bulk(struct btusb_data *data, void *buffer, int count)
++static int btusb_recv_bulk(struct btusb_data *data, void *buffer, int length)
 +{
-+	return hci_recv_fragment(data->hdev, HCI_ACLDATA_PKT, buffer, count);
++	return hci_recv_fragment(data->hdev, HCI_ACLDATA_PKT, buffer, length);
 +}
 +
-+static int btusb_recv_isoc(struct btusb_data *data, void *buffer, int count)
++static int btusb_recv_isoc(struct btusb_data *data, void *buffer, int length)
 +{
-+	return hci_recv_fragment(data->hdev, HCI_SCODATA_PKT, buffer, count);
++	return hci_recv_fragment(data->hdev, HCI_SCODATA_PKT, buffer, length);
 +}
 +
  static void btusb_intr_complete(struct urb *urb)
