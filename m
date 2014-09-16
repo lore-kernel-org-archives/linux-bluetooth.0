@@ -1,85 +1,126 @@
 Return-Path: <cyrus@holtmann.org>
+Message-ID: <54180B1D.7090602@xsilon.com>
+Date: Tue, 16 Sep 2014 11:04:13 +0100
+From: Martin Townsend <martin.townsend@xsilon.com>
 MIME-Version: 1.0
-In-Reply-To: <1410857377-3162-1-git-send-email-jakub.tyszkowski@tieto.com>
-References: <1410857377-3162-1-git-send-email-jakub.tyszkowski@tieto.com>
-Date: Tue, 16 Sep 2014 13:12:16 +0300
-Message-ID: <CABBYNZJkTTHn=F81W+=Z+CU0zacMVjtcCBZpaifkEoUTAv1qNQ@mail.gmail.com>
-Subject: Re: [PATCH 0/8] android/tester: Unifying the way PDU is handled
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-bluetooth-owner@vger.kernel.org
+To: Alexander Aring <alex.aring@gmail.com>,
+ Martin Townsend <mtownsend1973@gmail.com>
+CC: linux-zigbee-devel@lists.sourceforge.net,
+ linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org,
+ marcel@holtmann.org
+Subject: Re: [PATCH v3 bluetooth] 6lowpan: fix incorrect return values in
+ lowpan_rcv
+References: <1410790194-17502-1-git-send-email-martin.townsend@xsilon.com> <1410790194-17502-2-git-send-email-martin.townsend@xsilon.com> <20140916065703.GA1244@omega>
+In-Reply-To: <20140916065703.GA1244@omega>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jakub,
+Hi Alex,
 
-On Tue, Sep 16, 2014 at 11:49 AM, Jakub Tyszkowski
-<jakub.tyszkowski@tieto.com> wrote:
-> This patchset makes all testers use common struct for using raw data (PDUs).
-> Also some helpers were added for pdu matching.
+On the lowpan_give_skb_to_devices change.
+
+As we are iterating over a list of lowpan_devices and could potentially copy the skb more than once, what happens if the first device returns NET_RX_DROP and then the second time it return NET_RX_SUCCESS?  The stat variable is overwritten so stat only ever reflects the return value of netif_rx for the last device?
+
+Maybe it's better to completely remove the if else at the end and always consume the skb?  For the case whereskb_copy fails then we should kfree_skb,
+e.g.
+
+static int lowpan_give_skb_to_devices(struct sk_buff *skb,
+				      struct net_device *dev)
+{
+	struct lowpan_dev_record *entry;
+	struct sk_buff *skb_cp;
+	int stat = NET_RX_SUCCESS;
+
+	rcu_read_lock();
+	list_for_each_entry_rcu(entry, &lowpan_devices, list)
+		if (lowpan_dev_info(entry->ldev)->real_dev == skb->dev) {
+			skb_cp = skb_copy(skb, GFP_ATOMIC);
+			if (!skb_cp) {
+				kfree_skb(skb);
+				rcu_read_unlock();
+				return NET_RX_DROP;
+			}
+
+			skb_cp->dev = entry->ldev;
+			stat = netif_rx(skb_cp);
+		}
+	rcu_read_unlock();
+
+	consume_skb(skb);
+
+	return stat;
+}
+
+
+ what are your thoughts?
+
+-Martin.
+
+
+On 16/09/14 07:57, Alexander Aring wrote:
 >
-> Jakub Tyszkowski (8):
->   android/tester: Expose gatt-tester's pdu definition to other testers
->   android/tester: Make AVRCP tests use generic pdu struct
->   android/tester: Make A2DP tests use generic pdu struct
->   android/tester: Make GATT tests use generic pdu struct
->   android/tester: Make HidHost tests use generic pdu struct
->   android/tester: Add helper functions for sending sdp responses
->   android/tester: Make avrcp use sdp pdu sending helper
->   android/tester: Expose pdu set and matching function to be reused
+> --- snap
 >
->  android/tester-a2dp.c    | 74 ++++++++++++++++--------------------------
->  android/tester-avrcp.c   | 84 ++++++++++++++++++++----------------------------
->  android/tester-gatt.c    | 26 +++------------
->  android/tester-hidhost.c | 40 +++++++++--------------
->  android/tester-main.c    | 50 ++++++++++++++++++++++++++++
->  android/tester-main.h    | 30 +++++++++++++++++
->  6 files changed, 163 insertions(+), 141 deletions(-)
+> Ignore the below one, I will only note about this... that we don't
+> forget that.
 >
-> --
-> 1.9.3
-
-
-I think this PDU matching is so common that we should have it in
-bthost to begin with, so Im planning to implement something like this:
-
-diff --git a/emulator/bthost.h b/emulator/bthost.h
-index 49a8649..c73ae6f 100644
---- a/emulator/bthost.h
-+++ b/emulator/bthost.h
-@@ -29,6 +29,17 @@ typedef void (*bthost_send_func) (const void *data,
-uint16_t len,
-
- struct bthost;
-
-+struct bthost_pdu {
-+       const uint8_t *data;
-+       size_t len;
-+       size_t offset;
-+};
-+
-+struct bthost_pdu_set {
-+       const struct bthost_pdu *req;
-+       const struct bthost_pdu *rsp;
-+};
-+
- struct bthost *bthost_create(void);
- void bthost_destroy(struct bthost *bthost);
-
-@@ -64,6 +75,9 @@ void bthost_add_cid_hook(struct bthost *bthost,
-uint16_t handle, uint16_t cid,
- void bthost_send_cid(struct bthost *bthost, uint16_t handle, uint16_t cid,
-                                        const void *data, uint16_t len);
-
-+void bthost_add_cid_pdu(struct bthost *bthost, uint16_t handle, uint16_t cid,
-+                                       const struct bthost_pdu_set *pdus);
-+
- typedef void (*bthost_l2cap_rsp_cb) (uint8_t code, const void *data,
-                                                uint16_t len, void *user_data);
-
-With this I think we would be able to match intervals of a PDU and be
-able to respond keeping the original data for the offsets.
-
--- 
-Luiz Augusto von Dentz
+> This code should be a generic function for increasing headroom for
+> decompressing headers (IPv6, next hdr's). Still issues with
+> consume_skb/kfree_skb here.
+>
+>
+> +	if (stat < 0) {
+> +		kfree_skb(skb);
+> +		stat = NET_RX_DROP;
+> +	} else {
+> +		consume_skb(skb);
+> +	}
+> This basically works now, but it confuse developers.
+>
+> Look how stat is initzialed.
+> There is mixed errno and NET_RX_FOO handling here. Which is part of the
+> complete error handling mess. And correct freeing of skb's required a
+> correct error handling.
+>
+> The function looks now like this:
+>
+>         struct lowpan_dev_record *entry;
+>         struct sk_buff *skb_cp;
+>         int stat = NET_RX_SUCCESS;
+>
+>         rcu_read_lock();
+>         list_for_each_entry_rcu(entry, &lowpan_devices, list)
+>                 if (lowpan_dev_info(entry->ldev)->real_dev == skb->dev) {
+>                         skb_cp = skb_copy(skb, GFP_ATOMIC);
+>                         if (!skb_cp) {
+>                                 stat = -ENOMEM;
+> Simple assign stat = NET_RX_DROP.
+>                                 break;
+>                         }
+>
+>                         skb_cp->dev = entry->ldev;
+>                         stat = netif_rx(skb_cp);
+>                 }
+>         rcu_read_unlock();          
+>         
+>         if (stat < 0) {
+> remove brackets and check on NET_RX_DROP. or vice versa.
+>                 kfree_skb(skb);
+>                 stat = NET_RX_DROP;
+>         } else {                
+>                 consume_skb(skb);
+>         }
+>         return stat;
+>
+> Now if the list is empty we check if (stat < 0) with a NET_RX_FOO stuff,
+> we should avoid that. I mean the current situation is because somebody
+> mixed this stuff and that's why we have this now.
+>
+> Another developers look of some code (that's what I did) and see, aaah
+> returning NET_RX_FOO so we can check on it, but at this situation he
+> need to think a little bit more what it is the correct handline because
+> there is still some errno conversion.
+>
+>>  	return stat;
+>>  }
+>>  
