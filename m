@@ -1,47 +1,65 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 16 Sep 2014 16:05:01 +0200
-From: Alexander Aring <alex.aring@gmail.com>
-To: Jukka Rissanen <jukka.rissanen@linux.intel.com>
-Cc: Martin Townsend <martin.townsend@xsilon.com>,
-	Martin Townsend <mtownsend1973@gmail.com>,
-	linux-zigbee-devel@lists.sourceforge.net,
-	linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org,
-	marcel@holtmann.org
-Subject: Re: [PATCH v4 bluetooth] 6lowpan: fix incorrect return values in
- lowpan_rcv
-Message-ID: <20140916140459.GB6104@omega>
-References: <20140916115357.GE4969@omega>
- <20140916120247.GA5217@omega>
- <20140916121844.GA5349@omega>
- <54182C6B.6090801@xsilon.com>
- <20140916123421.GA5576@omega>
- <54182FB8.4080103@xsilon.com>
- <20140916124832.GB5576@omega>
- <1410873619.4860.20.camel@jrissane-mobl.ger.corp.intel.com>
- <20140916133206.GA6104@omega>
- <1410875570.4860.23.camel@jrissane-mobl.ger.corp.intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-In-Reply-To: <1410875570.4860.23.camel@jrissane-mobl.ger.corp.intel.com>
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] tools: Fix memory leak
+Date: Tue, 16 Sep 2014 17:03:50 +0300
+Message-Id: <1410876230-10175-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jukka and Martin,
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-On Tue, Sep 16, 2014 at 04:52:50PM +0300, Jukka Rissanen wrote:
-...
-> Great, your example clarified the issue nicely :)
-> 
-> I would vote for option 2) but if it makes the code too ugly then 1) is
-> ok too.
-> 
-I begin to have the feeling like there is a reason because there are
-different indicators for consume_skb, kfree_skb. Error or not error,
-because it's hard to implement it in some way to make a correct handling
-without using a pointer of pointer. A pointer of pointer always means also
-a unnecessary dereferencing (netdev people doesn't like unnecessary
-dereferencing stuff, takes too much time).
+Simplify code and fix memory leaks
+---
+ tools/btgatt-client.c | 11 +++++------
+ 1 file changed, 5 insertions(+), 6 deletions(-)
 
-That's why I vote also for option 2)... but we can also clarify this on
-the netdev mailinglist and ask other networking kernel hackers.
+diff --git a/tools/btgatt-client.c b/tools/btgatt-client.c
+index f628bbb..41b85ad 100644
+--- a/tools/btgatt-client.c
++++ b/tools/btgatt-client.c
+@@ -539,8 +539,7 @@ static void cmd_write_value(struct client *cli, char *cmd_str)
+ 			if (strlen(argv[i]) != 2) {
+ 				printf("Invalid value byte: %s\n",
+ 								argv[i]);
+-				free(value);
+-				return;
++				goto done;
+ 			}
+ 
+ 			value[i-1] = strtol(argv[i], &endptr, 16);
+@@ -548,8 +547,7 @@ static void cmd_write_value(struct client *cli, char *cmd_str)
+ 							|| errno == ERANGE) {
+ 				printf("Invalid value byte: %s\n",
+ 								argv[i]);
+-				free(value);
+-				return;
++				goto done;
+ 			}
+ 		}
+ 	}
+@@ -559,11 +557,11 @@ static void cmd_write_value(struct client *cli, char *cmd_str)
+ 							false, value, length)) {
+ 			printf("Failed to initiate write without response "
+ 								"procedure\n");
+-			return;
++			goto done;
+ 		}
+ 
+ 		printf("Write command sent\n");
+-		return;
++		goto done;
+ 	}
+ 
+ 	if (!bt_gatt_client_write_value(cli->gatt, handle, value, length,
+@@ -571,6 +569,7 @@ static void cmd_write_value(struct client *cli, char *cmd_str)
+ 								NULL, NULL))
+ 		printf("Failed to initiate write procedure\n");
+ 
++done:
+ 	free(value);
+ }
+ 
+-- 
+1.9.1
 
-- Alex
