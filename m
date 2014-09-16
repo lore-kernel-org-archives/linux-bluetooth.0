@@ -1,55 +1,66 @@
 Return-Path: <cyrus@holtmann.org>
+Message-ID: <54184CDB.9050200@xsilon.com>
+Date: Tue, 16 Sep 2014 15:44:43 +0100
+From: Martin Townsend <martin.townsend@xsilon.com>
 MIME-Version: 1.0
-In-Reply-To: <025c01cfce7a$c9e78900$5db69b00$@samsung.com>
-References: <015d01cfc20a$c9160a00$5b421e00$@samsung.com>
-	<024801cfcd86$58382520$08a86f60$@samsung.com>
-	<CAHrH25RUK3HWQeysAti+BHVxQ4RSVnFfL3M-BNB_4xc_x71Fuw@mail.gmail.com>
-	<025c01cfce7a$c9e78900$5db69b00$@samsung.com>
-Date: Tue, 16 Sep 2014 08:11:29 -0700
-Message-ID: <CAHrH25QJ0iAvpyAG_avN10caxH_WH3cqJ5ZN6cGdVHc34tvvYw@mail.gmail.com>
-Subject: Re: Query Regarding new Gatt server attribute database
-From: Arman Uguray <armansito@chromium.org>
-To: Bharat Bhusan Panda <bharat.panda@samsung.com>
-Cc: Arman Uguray <armansito@chromium.org>,
-	BlueZ development <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+To: Alexander Aring <alex.aring@gmail.com>,
+	Jukka Rissanen <jukka.rissanen@linux.intel.com>
+CC: Martin Townsend <mtownsend1973@gmail.com>,
+	linux-zigbee-devel@lists.sourceforge.net,
+	linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org,
+	marcel@holtmann.org
+Subject: Re: [PATCH v4 bluetooth] 6lowpan: fix incorrect return values in
+ lowpan_rcv
+References: <20140916115357.GE4969@omega> <20140916120247.GA5217@omega> <20140916121844.GA5349@omega> <54182C6B.6090801@xsilon.com> <20140916123421.GA5576@omega> <54182FB8.4080103@xsilon.com> <20140916124832.GB5576@omega> <1410873619.4860.20.camel@jrissane-mobl.ger.corp.intel.com> <20140916133206.GA6104@omega> <1410875570.4860.23.camel@jrissane-mobl.ger.corp.intel.com> <20140916140459.GB6104@omega>
+In-Reply-To: <20140916140459.GB6104@omega>
+Content-Type: text/plain; charset=utf-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Bharat,
+I would like to keep freeing skb's out of process_data as process_data will become something like iphc_decompress_hdr and it would be good if that's all it did.  Otherwise I feel we are going to put a constraint on all future header decompression routines in that they must free the skb on error.  I think it would be better to defer this so on error you might want to try something else with the skb, maybe not but at least the option is there.
+So how about
 
-> One more thing to ask,The Gatt methods listed in gatt-api.txt "RegisterService" and "UnregisterService" and other GATT service interfaces, these are currently handled in gatt-dbus.c.
-> Is there any plan to move this to src/share and, what would be the design then?
-> Currently in att/share there are only gatt client code placed. If there is a plan to move server functionalities to src/share, Can I continue and implement the same?
+        struct sk_buff * ret_skb;
+        switch (skb->data[0] & 0xe0) {
+        case LOWPAN_DISPATCH_IPHC:    /* ipv6 datagram */
+            ret_skb = process_data(skb, &hdr);
+            if (IS_ERR(ret_skb))
+                goto drop_skb;
+            else
+                skb = ret_skb;
+            break;
 
-Yes, the current plan is to implement a shared/gatt-server (just like
-we have a shared/gatt-client) and implement the server code using
-that. The actual structure of the code needs some discussion and
-design which I'm planning to get going in the next couple of weeks.
+I know we currently have 3 calls to process_data so it will look fairly ugly in this patch but in my next patch to fix lowpan_rcv to handle uncompressed IPv6 packets that are fragmented there will only be one call to process_data so it won't look so bad.  You could even wrap it in a macro but I'm not a fan of this as they can obfuscate the code a bit.
 
-shared/gatt-server will act as the attribute database and handle
-everything regarding ATT protocol translation so most of the data
-structures internal to gatt-dbus will likely go away. We might
-actually end up changing the way the D-Bus API code itself is
-structured (maybe splitting it into src/gatt-client and
-src/gatt-server) but that needs some design and discussion as well.
-All of this will happen in the following months and I prefer not to
-rush any of it so that we get all of this right.
+Thoughts?
+
+- Martin.
 
 
->> I don't know how well the existing GATT D-Bus server stuff works at the
->> moment but I was under the impression that none of that's feature-
->> complete. Others can comment more.
+
+On 16/09/14 15:05, Alexander Aring wrote:
+> Hi Jukka and Martin,
 >
-> Yes, this is not working currently, as the current code does not update the core attrib server db, it's storing in a local service list.
+> On Tue, Sep 16, 2014 at 04:52:50PM +0300, Jukka Rissanen wrote:
+> ...
+>> Great, your example clarified the issue nicely :)
+>>
+>> I would vote for option 2) but if it makes the code too ugly then 1) is
+>> ok too.
+>>
+> I begin to have the feeling like there is a reason because there are
+> different indicators for consume_skb, kfree_skb. Error or not error,
+> because it's hard to implement it in some way to make a correct handling
+> without using a pointer of pointer. A pointer of pointer always means also
+> a unnecessary dereferencing (netdev people doesn't like unnecessary
+> dereferencing stuff, takes too much time).
 >
+> That's why I vote also for option 2)... but we can also clarify this on
+> the netdev mailinglist and ask other networking kernel hackers.
+>
+> - Alex
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-wpan" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
-I'm not super familiar with the GATT server D-Bus code the way it
-currently is. As I said, I don't want to rush the shared code
-implementation though I understand that you may not want to be blocked
-on our progress/plans. Once we've got the design of shared/gatt-server
-down, I will come up with a set of TODOs for server which you can help
-with. The more people we have on board the faster this'll get done.
-
-Cheers,
-Arman
