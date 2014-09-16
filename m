@@ -1,72 +1,46 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Tue, 16 Sep 2014 09:10:32 +0200
+From: Alexander Aring <alex.aring@gmail.com>
+To: Jukka Rissanen <jukka.rissanen@linux.intel.com>
+Cc: Martin Townsend <mtownsend1973@gmail.com>,
+	linux-zigbee-devel@lists.sourceforge.net,
+	linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org,
+	marcel@holtmann.org, Martin Townsend <martin.townsend@xsilon.com>
+Subject: Re: [PATCH v3 bluetooth] 6lowpan: fix incorrect return values in
+ lowpan_rcv
+Message-ID: <20140916071030.GC1244@omega>
+References: <1410790194-17502-1-git-send-email-martin.townsend@xsilon.com>
+ <1410790194-17502-2-git-send-email-martin.townsend@xsilon.com>
+ <1410851097.4860.6.camel@jrissane-mobl.ger.corp.intel.com>
 MIME-Version: 1.0
-In-Reply-To: <000001cfd16c$e8694540$b93bcfc0$@samsung.com>
-References: <1410785956-6887-1-git-send-email-gowtham.ab@samsung.com>
-	<CABBYNZL0NCd3o0_oXmW=TQw1MGoRkSJ9zBQRwULSD1zn7G-XCA@mail.gmail.com>
-	<000001cfd16c$e8694540$b93bcfc0$@samsung.com>
-Date: Tue, 16 Sep 2014 10:21:37 +0300
-Message-ID: <CABBYNZK4XCNDSgU40JXEFzRXVmBa1PG52Yu+EBVa5nCu6ex_Ew@mail.gmail.com>
-Subject: Re: [PATCH] obexd/client/map: Check msg value is valid
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Gowtham Anandha Babu <gowtham.ab@samsung.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	Dmitry Kasatkin <d.kasatkin@samsung.com>,
-	Bharat Panda <bharat.panda@samsung.com>, cpgs@samsung.com
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=utf-8
+In-Reply-To: <1410851097.4860.6.camel@jrissane-mobl.ger.corp.intel.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+On Tue, Sep 16, 2014 at 10:04:57AM +0300, Jukka Rissanen wrote:
+> Hi Martin,
+> 
+> On ma, 2014-09-15 at 15:09 +0100, Martin Townsend wrote:
+> > Currently there are a number of error paths in the lowpan_rcv function that
+> > free the skb before returning, the patch simplifies the receive path by
+> > ensuring that the skb is only freed from this function.
+> > 
+> > Passing the skb from 6lowpan up to the higher layers is not a
+> > function of IPHC.  By moving it out of IPHC we also remove the
+> > need to support error code returns with NET_RX codes.
+> > It also makes the lowpan_rcv function more extendable as we
+> > can support more compression schemes.
+> > 
+> > With the above 2 lowpan_rcv is refacored so eliminate incorrect return values.
+> 
+> I like the idea that we get rid of the callback function.
+> 
+> We could probably refactor the patch a bit further thou as the
+> lowpan_process_data() could return the skb directly instead of being
+> passed as a parameter. In the caller we could use the IS_ERR() macro to
+> check if the returned value is an error or a real pointer.
+> 
+> 
+ack, then we can also drop the **inout_skb thing.
 
-On Tue, Sep 16, 2014 at 8:13 AM, Gowtham Anandha Babu
-<gowtham.ab@samsung.com> wrote:
-> Hi Luiz,
->
->> -----Original Message-----
->> From: Luiz Augusto von Dentz [mailto:luiz.dentz@gmail.com]
->> Sent: Monday, September 15, 2014 6:34 PM
->> To: Gowtham Anandha Babu
->> Cc: linux-bluetooth@vger.kernel.org; Dmitry Kasatkin; Bharat Panda;
->> cpgs@samsung.com
->> Subject: Re: [PATCH] obexd/client/map: Check msg value is valid
->>
->> Hi,
->>
->> On Mon, Sep 15, 2014 at 3:59 PM, Gowtham Anandha Babu
->> <gowtham.ab@samsung.com> wrote:
->> > Checks for the NULL msg-value, before passing it to the callback.
->> > ---
->> >  obexd/client/map.c | 3 ++-
->> >  1 file changed, 2 insertions(+), 1 deletion(-)
->> >
->> > diff --git a/obexd/client/map.c b/obexd/client/map.c index
->> > 520e492..fb8ebd8 100644
->> > --- a/obexd/client/map.c
->> > +++ b/obexd/client/map.c
->> > @@ -1132,7 +1132,8 @@ static void msg_element(GMarkupParseContext
->> > *ctxt, const char *element,
->> >
->> >                 for (parser = msg_parsers; parser && parser->name; parser++) {
->> >                         if (strcasecmp(key, parser->name) == 0) {
->> > -                               parser->func(msg, values[i]);
->> > +                               if(values[i])
->> > +                                       parser->func(msg, values[i]);
->> >                                 break;
->> >                         }
->> >                 }
->> > --
->> > 1.9.1
->>
->> Ive just pushed a similar patch, but thanks anyway.
->>
->>
->> --
->> Luiz Augusto von Dentz
->
-> Sorry If I am wrong, This patch is under obexd/client/map. The patch which you pushed recently is under obexd/client/mns.
-
-Ive pushed this after fixing the coding style and the commit message, thanks.
-
-
--- 
-Luiz Augusto von Dentz
+- Alex
