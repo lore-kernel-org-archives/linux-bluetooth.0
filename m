@@ -2,35 +2,21 @@ Return-Path: <cyrus@holtmann.org>
 From: Varka Bhadram <varkabhadram@gmail.com>
 To: linux-wpan@vger.kernel.org, linux-bluetooth@vger.kernel.org
 Cc: alan@signal11.us, Varka Bhadram <varkab@cdac.in>
-Subject: [PATCH bluetooth-next 2/3] ieee802154: mrf24j40: remove return statement
-Date: Tue, 16 Sep 2014 10:18:41 +0530
-Message-Id: <1410842922-10564-3-git-send-email-varkab@cdac.in>
-In-Reply-To: <1410842922-10564-1-git-send-email-varkab@cdac.in>
-References: <1410842922-10564-1-git-send-email-varkab@cdac.in>
+Subject: [PATCH bluetooth-next 0/3] ieee802154: cleanup for mrf24j40
+Date: Tue, 16 Sep 2014 10:18:39 +0530
+Message-Id: <1410842922-10564-1-git-send-email-varkab@cdac.in>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch remove the return statement for void function.
-void function return statements are not generally useful.
 
-Signed-off-by: Varka Bhadram <varkab@cdac.in>
----
- drivers/net/ieee802154/mrf24j40.c |    2 --
- 1 file changed, 2 deletions(-)
+Varka Bhadram (3):
+  ieee802154: mrf24j40: fix Missing a blank line after declarations
+  ieee802154: mrf24j40: remove return statement
+  ieee802154: mrf24j40: use pr_* / dev_*
 
-diff --git a/drivers/net/ieee802154/mrf24j40.c b/drivers/net/ieee802154/mrf24j40.c
-index 466da57..2c617e3 100644
---- a/drivers/net/ieee802154/mrf24j40.c
-+++ b/drivers/net/ieee802154/mrf24j40.c
-@@ -420,8 +420,6 @@ static void mrf24j40_stop(struct ieee802154_dev *dev)
- 		return;
- 	val |= 0x1|0x8; /* Set TXNIE and RXIE. Disable Interrupts */
- 	write_short_reg(devrec, REG_INTCON, val);
--
--	return;
- }
- 
- static int mrf24j40_set_channel(struct ieee802154_dev *dev,
+ drivers/net/ieee802154/mrf24j40.c |   21 ++++++++++-----------
+ 1 file changed, 10 insertions(+), 11 deletions(-)
+
 -- 
 1.7.9.5
 
