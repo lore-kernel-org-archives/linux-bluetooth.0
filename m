@@ -1,127 +1,65 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 16 Sep 2014 21:37:25 +0200
-From: Alexander Aring <alex.aring@gmail.com>
-To: Martin Townsend <martin.townsend@xsilon.com>
-Cc: Jukka Rissanen <jukka.rissanen@linux.intel.com>,
-	Martin Townsend <mtownsend1973@gmail.com>,
-	linux-zigbee-devel@lists.sourceforge.net,
-	linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org,
-	marcel@holtmann.org
-Subject: Re: [PATCH v4 bluetooth] 6lowpan: fix incorrect return values in
- lowpan_rcv
-Message-ID: <20140916193723.GD6104@omega>
-References: <20140916123421.GA5576@omega>
- <54182FB8.4080103@xsilon.com>
- <20140916124832.GB5576@omega>
- <1410873619.4860.20.camel@jrissane-mobl.ger.corp.intel.com>
- <20140916133206.GA6104@omega>
- <1410875570.4860.23.camel@jrissane-mobl.ger.corp.intel.com>
- <20140916140459.GB6104@omega>
- <54184CDB.9050200@xsilon.com>
- <20140916173806.GC6104@omega>
- <54188817.80707@xsilon.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-In-Reply-To: <54188817.80707@xsilon.com>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] Bluetooth: Remove exported hci_recv_fragment function
+Date: Tue, 16 Sep 2014 21:36:09 +0200
+Message-Id: <1410896169-28726-1-git-send-email-marcel@holtmann.org>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Tue, Sep 16, 2014 at 07:57:27PM +0100, Martin Townsend wrote:
-> Hi Alex,
-> 
-> On 16/09/14 18:38, Alexander Aring wrote:
-> >Hi Martin,
-> >
-> >On Tue, Sep 16, 2014 at 03:44:43PM +0100, Martin Townsend wrote:
-> >>I would like to keep freeing skb's out of process_data as process_data will become something like iphc_decompress_hdr and it would be good if that's all it did.  Otherwise I feel we are going to put a constraint on all future header decompression routines in that they must free the skb on error.  I think it would be better to defer this so on error you might want to try something else with the skb, maybe not but at least the option is there.
-> >>So how about
-> >>
-> >>         struct sk_buff * ret_skb;
-> >>         switch (skb->data[0] & 0xe0) {
-> >>         case LOWPAN_DISPATCH_IPHC:    /* ipv6 datagram */
-> >>             ret_skb = process_data(skb, &hdr);
-> >>             if (IS_ERR(ret_skb))
-> >>                 goto drop_skb;
-> >>             else
-> >>                 skb = ret_skb;
-> >>             break;
-> >>
-> >>I know we currently have 3 calls to process_data so it will look fairly ugly in this patch but in my next patch to fix lowpan_rcv to handle uncompressed IPv6 packets that are fragmented there will only be one call to process_data so it won't look so bad.  You could even wrap it in a macro but I'm not a fan of this as they can obfuscate the code a bit.
-> >>
-> >>Thoughts?
-> >>
-> >sorry, I can't follow how this solve the issue if the "parameter skb" is
-> >already consumed or not. If process_data returns a error before
-> >parameter consume, then we should run kfree_skb(parameter_skb), if it's
-> >afterwards we should do nothing. Point is we don't know that there. I
-> >suppose if we do consume_skb and refcount reach 0 the parameter_skb
-> >becomes a dangling pointer.
-> >
-> >- Alex
-> 
-> process_data never consumes the skb, it may copy_expand and then consume the
-> old one so it will either return an error or an skb that contains the
-> uncompressed ipv6 header.  By calling process_data using a different sk_buff
-> pointer (ret_skb) that the parameter we can check this for an error and if
-> so goto drop_skb which will kfree_skb(skb) which is fine as skb is still
+The hci_recv_fragment function is no longer used by any driver and thus
+do not export it. In fact it is not even needed by the core and it can
+be removed altogether.
 
-are you sure it's still valid? I don't get it. :-(
+Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+---
+ include/net/bluetooth/hci_core.h |  1 -
+ net/bluetooth/hci_core.c         | 20 --------------------
+ 2 files changed, 21 deletions(-)
 
-> valid.   if ret_skb is good and we assign to skb and carry on to the
-> function that  passes the skb up the stack, lowpan_give_skb_to_devices,
-> which deals with either consuming or kfreeing.
-> 
-> Or am I missing something?
-> 
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 206b92bfeebb..37ff1aef0845 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -926,7 +926,6 @@ int hci_remove_remote_oob_data(struct hci_dev *hdev, bdaddr_t *bdaddr);
+ void hci_event_packet(struct hci_dev *hdev, struct sk_buff *skb);
+ 
+ int hci_recv_frame(struct hci_dev *hdev, struct sk_buff *skb);
+-int hci_recv_fragment(struct hci_dev *hdev, int type, void *data, int count);
+ int hci_recv_stream_fragment(struct hci_dev *hdev, void *data, int count);
+ 
+ void hci_init_sysfs(struct hci_dev *hdev);
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index 41948678f514..cb05d7f16a34 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -4374,26 +4374,6 @@ static int hci_reassembly(struct hci_dev *hdev, int type, void *data,
+ 	return remain;
+ }
+ 
+-int hci_recv_fragment(struct hci_dev *hdev, int type, void *data, int count)
+-{
+-	int rem = 0;
+-
+-	if (type < HCI_ACLDATA_PKT || type > HCI_EVENT_PKT)
+-		return -EILSEQ;
+-
+-	while (count) {
+-		rem = hci_reassembly(hdev, type, data, count, type - 1);
+-		if (rem < 0)
+-			return rem;
+-
+-		data += (count - rem);
+-		count = rem;
+-	}
+-
+-	return rem;
+-}
+-EXPORT_SYMBOL(hci_recv_fragment);
+-
+ #define STREAM_REASSEMBLY 0
+ 
+ int hci_recv_stream_fragment(struct hci_dev *hdev, void *data, int count)
+-- 
+1.9.3
 
-I make another c example, hopeful more correct than the last one:
-
-char *foo(char *skb)
-{
-        char *new;
-
-        if (some_error_before_consume)
-                return ERR_PTR(-EINVAL); /* here we need to do a free(skb) */
-
-        /* UDP expand */
-        new = expand(skb, 16);
-        if (!new)
-                return ERR_PTR(-ENOMEM);
-        consume(skb); /* parameter skb becomes dangling pointer */
-        skb = new; /* doesn't rescue it, it is different than skb from caller function
-                      at this point, the skb_inout had rescue it, because it was a pointer
-                      of pointer */
-
-        /* IPv6 expand */
-        new = expand(skb, 40);
-        if (!new) /* some error after a consume(skb), will crash at drop_skb label */
-                return ERR_PTR(-ENOMEM);
-        consume(skb);
-        skb = new;
-
-        return skb;
-}
-
-int main(int argc, const char *argv[])
-{
-        char *local_buf = malloc(42);
-        char *skb;
-
-        local_skb = foo(skb);
-        if (IS_ERR(local_skb))
-                goto drop_skb;
-        else
-                skb = local_skb; /* ??? */
-
-        return NET_RX_SUCCESS;
-
-drop_skb:
-        free(skb); /* dangling pointer will be freed if foo called consume(skb)
-                      it's correct when foo returned on some_error_before_consume
-                      condition. */
-drop:
-        return NET_RX_DROP;
-}
-
-I don't know what "skb = local_skb" did now there.
-
-- Alex
