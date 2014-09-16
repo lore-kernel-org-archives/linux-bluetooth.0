@@ -2,47 +2,133 @@ Return-Path: <cyrus@holtmann.org>
 From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
-Subject: [PATCH 4/8] android/tester: Make GATT tests use generic pdu struct
-Date: Tue, 16 Sep 2014 10:49:33 +0200
-Message-Id: <1410857377-3162-5-git-send-email-jakub.tyszkowski@tieto.com>
+Subject: [PATCH 2/8] android/tester: Make AVRCP tests use generic pdu struct
+Date: Tue, 16 Sep 2014 10:49:31 +0200
+Message-Id: <1410857377-3162-3-git-send-email-jakub.tyszkowski@tieto.com>
 In-Reply-To: <1410857377-3162-1-git-send-email-jakub.tyszkowski@tieto.com>
 References: <1410857377-3162-1-git-send-email-jakub.tyszkowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- android/tester-gatt.c | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
+ android/tester-avrcp.c | 74 +++++++++++++++++++++++++-------------------------
+ 1 file changed, 37 insertions(+), 37 deletions(-)
 
-diff --git a/android/tester-gatt.c b/android/tester-gatt.c
-index 3b7297c..5defce0 100644
---- a/android/tester-gatt.c
-+++ b/android/tester-gatt.c
-@@ -120,8 +120,8 @@ static struct gatt_search_service_data search_services_1 = {
- 	.filter_uuid = NULL,
+diff --git a/android/tester-avrcp.c b/android/tester-avrcp.c
+index b539e0e..46c92e3 100644
+--- a/android/tester-avrcp.c
++++ b/android/tester-avrcp.c
+@@ -34,7 +34,8 @@ static struct emu_cid_data sdp_data;
+ static struct emu_cid_data a2dp_data;
+ static struct emu_cid_data avrcp_data;
+ 
+-static const uint8_t sdp_rsp_pdu[] = { 0x07, /* PDU id */
++static struct pdu sdp_rsp_pdu = raw_pdu(
++			0x07, /* PDU id */
+ 			0x00, 0x00, /* Transaction id */
+ 			0x00, 0x7f, /* Response length */
+ 			0x00, 0x7c, /* Attributes length */
+@@ -52,38 +53,37 @@ static const uint8_t sdp_rsp_pdu[] = { 0x07, /* PDU id */
+ 			0x19, 0x00, 0x17, 0x09, 0x01, 0x03, 0x09, 0x00, 0x09,
+ 			0x35, 0x08, 0x35, 0x06, 0x19, 0x11, 0x0e, 0x09, 0x01,
+ 			0x04, 0x09, 0x03, 0x11, 0x09, 0x00, 0x02,
+-			0x00}; /* no continuation */
+-static const uint8_t req_dsc[] = { 0x00, 0x01 };
+-static const uint8_t rsp_dsc[] = { 0x02, 0x01, 0x04, 0x08 };
+-static const uint8_t req_get[] = { 0x10, 0x02, 0x04 };
+-static const uint8_t rsp_get[] = { 0x12, 0x02, 0x01, 0x00, 0x07, 0x06, 0x00,
+-						0x00, 0xff, 0xff, 0x02, 0x40 };
+-static const uint8_t req_cfg[] = { 0x20, 0x03, 0x04, 0x04, 0x01, 0x00, 0x07,
+-					0x06, 0x00, 0x00, 0x21, 0x15, 0x02,
+-					0x40 };
+-static const uint8_t rsp_cfg[] = { 0x22, 0x03 };
+-static const uint8_t req_open[] = { 0x30, 0x06, 0x04 };
+-static const uint8_t rsp_open[] = { 0x32, 0x06 };
+-static const uint8_t req_close[] = { 0x40, 0x08, 0x04 };
+-static const uint8_t rsp_close[] = { 0x42, 0x08 };
+-static const uint8_t req_start[] = { 0x40, 0x07, 0x04 };
+-static const uint8_t rsp_start[] = { 0x42, 0x07 };
+-static const uint8_t req_suspend[] = { 0x50, 0x09, 0x04 };
+-static const uint8_t rsp_suspend[] = { 0x52, 0x09 };
++			0x00); /* no continuation */
++
++#define req_dsc 0x00, 0x01
++#define rsp_dsc 0x02, 0x01, 0x04, 0x08
++#define req_get 0x10, 0x02, 0x04
++#define rsp_get 0x12, 0x02, 0x01, 0x00, 0x07, 0x06, 0x00, \
++						0x00, 0xff, 0xff, 0x02, 0x40
++#define req_cfg 0x20, 0x03, 0x04, 0x04, 0x01, 0x00, 0x07, \
++					0x06, 0x00, 0x00, 0x21, 0x15, 0x02, \
++					0x40
++#define rsp_cfg 0x22, 0x03
++#define req_open 0x30, 0x06, 0x04
++#define rsp_open 0x32, 0x06
++#define req_close 0x40, 0x08, 0x04
++#define rsp_close 0x42, 0x08
++#define req_start 0x40, 0x07, 0x04
++#define rsp_start 0x42, 0x07
++#define req_suspend 0x50, 0x09, 0x04
++#define rsp_suspend 0x52, 0x09
+ 
+ static const struct pdu_set {
+-	const uint8_t *req;
+-	size_t req_len;
+-	const uint8_t *rsp;
+-	size_t rsp_len;
++	const struct pdu req;
++	const struct pdu rsp;
+ } pdus[] = {
+-	{ req_dsc, sizeof(req_dsc), rsp_dsc, sizeof(rsp_dsc) },
+-	{ req_get, sizeof(req_get), rsp_get, sizeof(rsp_get) },
+-	{ req_cfg, sizeof(req_cfg), rsp_cfg, sizeof(rsp_cfg) },
+-	{ req_open, sizeof(req_open), rsp_open, sizeof(rsp_open) },
+-	{ req_close, sizeof(req_close), rsp_close, sizeof(rsp_close) },
+-	{ req_start, sizeof(req_start), rsp_start, sizeof(rsp_start) },
+-	{ req_suspend, sizeof(req_suspend), rsp_suspend, sizeof(rsp_start) },
++	{ raw_pdu(req_dsc), raw_pdu(rsp_dsc)},
++	{ raw_pdu(req_get), raw_pdu(rsp_get)},
++	{ raw_pdu(req_cfg), raw_pdu(rsp_cfg)},
++	{ raw_pdu(req_open), raw_pdu(rsp_open)},
++	{ raw_pdu(req_close), raw_pdu(rsp_close)},
++	{ raw_pdu(req_start), raw_pdu(rsp_start)},
++	{ raw_pdu(req_suspend), raw_pdu(rsp_suspend)},
+ 	{ },
  };
  
--static const uint8_t exchange_mtu_req_pdu[] = { 0x02, 0xa0, 0x02 };
--static const uint8_t exchange_mtu_resp_pdu[] = { 0x03, 0xa0, 0x02 };
-+static const struct pdu exchange_mtu_req_pdu = raw_pdu(0x02, 0xa0, 0x02);
-+static const struct pdu exchange_mtu_resp_pdu = raw_pdu(0x03, 0xa0, 0x02);
+@@ -130,18 +130,18 @@ static void a2dp_cid_hook_cb(const void *data, uint16_t len, void *user_data)
  
- static struct bt_action_data bearer_type = {
- 	.bearer_type = BDADDR_LE_PUBLIC,
-@@ -501,10 +501,10 @@ static void gatt_cid_hook_cb(const void *data, uint16_t len, void *user_data)
- 	case L2CAP_ATT_EXCHANGE_MTU_REQ:
- 		tester_print("Exchange MTU request received.");
+ 	util_hexdump('>', data, len, print_a2dp, NULL);
  
--		if (!memcmp(exchange_mtu_req_pdu, pdu, len))
-+		if (!memcmp(exchange_mtu_req_pdu.data, pdu, len))
- 			bthost_send_cid(bthost, cid_data->handle, cid_data->cid,
--						exchange_mtu_resp_pdu,
--						sizeof(exchange_mtu_resp_pdu));
-+						exchange_mtu_resp_pdu.data,
-+						exchange_mtu_resp_pdu.size);
+-	for (i = 0; pdus[i].req; i++) {
+-		if (pdus[i].req_len != len)
++	for (i = 0; pdus[i].req.data; i++) {
++		if (pdus[i].req.size != len)
+ 			continue;
  
- 		break;
- 	case L2CAP_ATT_EXCHANGE_MTU_RSP:
+-		if (memcmp(pdus[i].req, data, len))
++		if (memcmp(pdus[i].req.data, data, len))
+ 			continue;
+ 
+-		util_hexdump('<', pdus[i].rsp, pdus[i].rsp_len, print_a2dp,
+-									NULL);
++		util_hexdump('<', pdus[i].rsp.data, pdus[i].rsp.size,
++							print_a2dp, NULL);
+ 
+ 		bthost_send_cid(bthost, cid_data->handle, cid_data->cid,
+-						pdus[i].rsp, pdus[i].rsp_len);
++					pdus[i].rsp.data, pdus[i].rsp.size);
+ 	}
+ }
+ 
+@@ -174,7 +174,7 @@ static void sdp_cid_hook_cb(const void *data, uint16_t len, void *user_data)
+ 	struct emu_cid_data *cid_data = user_data;
+ 
+ 	bthost_send_cid(bthost, cid_data->handle, cid_data->cid,
+-					sdp_rsp_pdu, sizeof(sdp_rsp_pdu));
++					sdp_rsp_pdu.data, sdp_rsp_pdu.size);
+ }
+ static void sdp_connect_request_cb(uint16_t handle, uint16_t cid,
+ 							void *user_data)
 -- 
 1.9.3
 
