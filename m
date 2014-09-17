@@ -1,35 +1,116 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-Date: Wed, 17 Sep 2014 20:10:24 +0530
-Message-ID: <CABL=VJNsGRmz1wvhFxn79_zesYjo3oD5tdrXEy_9vqB9Q7Bd_g@mail.gmail.com>
-Subject: Missing of SCO packet indications
-From: Vinod Rayapudi <vinodrayapudi@gmail.com>
-To: linux-bluetooth@vger.kernel.org, autoanswer@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.6\))
+Subject: Re: [RFC] need for new scan api for bluetooth low energy.
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <CAD0=r8z9g+F7Z9X_8PE4jk3JbA+oLj9Of33RSqxiRd0dn9AnXQ@mail.gmail.com>
+Date: Wed, 17 Sep 2014 07:03:47 -0700
+Cc: Arman Uguray <armansito@chromium.org>,
+	BlueZ development <linux-bluetooth@vger.kernel.org>,
+	Scott James Remnant <keybuk@google.com>
+Message-Id: <8868B74C-0DDD-43C1-BCBF-2578A700EF72@holtmann.org>
+References: <CAD0=r8yozB8eMdJOuffUeQZVFVf5xEXnP5tCt+k3m0e9wzMxiA@mail.gmail.com> <735FD32E-BD15-4CE1-8D9C-44B8EC56DF7A@holtmann.org> <CAHrH25Q6XqsLjGyfoXwimrap9=kKHOQn-G=k4Fz6HXmEPJ7EtQ@mail.gmail.com> <20140917051457.GA4671@t440s.P-661HNU-F1> <CAD0=r8x-=O7XAqQF_wBHQEqSkfifzgWW2AagW2EvsDUtM-E_ow@mail.gmail.com> <20140917065252.GA5554@t440s.lan> <CAD0=r8z9g+F7Z9X_8PE4jk3JbA+oLj9Of33RSqxiRd0dn9AnXQ@mail.gmail.com>
+To: Jakub Pawlowski <jpawlowski@google.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi All,
+Hi Jakub,
 
-I have an Issue w.r.t SCO packets.
+>>>>>> have you looked at the the Add Device management command with the
+>>>>>> 0x00 Action. That will just send out Device Found events for devices
+>>>>>> in range and uses passive scanning.
+>>>>>> 
+>>>>>> In addition if you are paired with a device and actually want to
+>>>>>> connect to it, you can use Action 0x02 to allow for background
+>>>>>> connection. This is currently in use for LE HID devices.
+>>>>> 
+>>>>> This still only sends one Device Found event though right? In Jakub's
+>>>>> case, a mgmt event is desired to let the userspace know every time a
+>>>>> new advertisement packet is received, with the updated RSSI and
+>>>>> TxPower and so on.
+>>>> 
+>>>> It should send as many Device Found events as there are advertising
+>>>> reports from the controller. We're enabling duplicate filtering in the
+>>>> hci_req_add_le_passive_scan() function in hci_core.c so maybe that's
+>>>> your issue? Some HW (like Broadcom) tend to be more conservative in how
+>>>> many events they send when filtering is enabled whereas others (like
+>>>> CSR) will give you many more of them (at least one whenever RSSI
+>>>> changes).
+>>> 
+>>> Why is duplicate filtering being enabled ? Does it filter packets that
+>>> have different advertisement content ? Can I turn it off ?
+>> 
+>> At least in the HCI section of the core spec this parameter is quite
+>> vaguely defined. We've enabled it to save power by avoiding the
+>> controller waking up the host too often. With auto-connections it makes
+>> sense to have it enabled since we're really only interested in the first
+>> event which acts as a trigger to connect. Same goes for device discovery
+>> when you're interested in setting up a new device for use.
+>> 
+>> Right now the filtering is hard-coded but we could consider making it
+>> conditional to whether there are any entries with action 0x00 ("scan but
+>> don't connect") and disable the filtering in that case.
+>> 
+>>>>> I think this ties in with some of the previous conversations on the
+>>>>> list about adding a device scan API that is geared towards
+>>>>> applications (rather than OS UI). That is, not only a mgmt API that
+>>>>> enables these kinds of use cases but also (probably) a high-level API
+>>>>> exposed from bluetoothd that allows applications to scan for devices
+>>>>> filtered by service UUIDs, contents of the manufacturer data field,
+>>>>> and so on.
+>>>>> 
+>>>>> As for the Add Device command, does bluetoothd currently use this somehow?
+>>>> 
+>>>> Yes, this feature (action 0x02 for Add Device) takes over the entire LE
+>>>> background scanning and auto-connection mechanism from 3.17 kernel
+>>>> onwards since BlueZ 5.22 (which was mentioned in our release notes btw).
+>>>> This is much better than the active scanning based auto-connections that
+>>>> have until now been done using Start/Stop Discovery.
+>>> 
+>>> Thanks for pointing that!
+>>> The release note says that:
+>>> "The kernel will even use the controller-side whitelist during
+>>> scanning (if no Resolvable Private Addresses are present), saving even
+>>> more power."
+>>> If I understand well, that mean that my peripheral device need to be
+>>> whitelisted in order for me to get advertisements ?
+>> 
+>> The controller-side whitelist just means that the controller only wakes
+>> us up and gives us advertisements for entries in the whitelist. When not
+>> using the whitelist the kernel gets woken up and needs to do itself the
+>> filtering out of unknown devices. The kernel uses the controller-side
+>> whitelist whenever possible, but e.g. when we have resolvable private
+>> addresses in the list we can't use it as we can't know the address the
+>> remote device will use in advance.
+>> 
+>>> My use case include scanning for non-paired, non-connected devices,
+>>> checking RSSI value and deciding about connection based on
+>>> advertisement content, so that won't work. Am I right ?
+>> 
+>> If you know the bdaddr that you're interested in in advance we should be
+>> able to tweak the Add Device command to do what you want (e.g. disable
+>> duplicate filtering in the case of Action=0x00 entries). However, if
+>> what you need is general scanning for any devices (also previously
+>> unknown ones) then Add Device doesn't really fit in (since it takes a
+>> known bdaddr). For that we'd either need to consider allowing BDADDR_ANY
+>> as an accepted parameter or then we'd need to define a new mgmt command.
+>> 
+> 
+> Unfortunately my case include previously unknown devices. I decide
+> wether I should connect (without pairing) based on advertised service
+> and RSSI power only. BDADDR_ANY seems good solution. Or maybe we can
+> add some parameter that will force not using controller-side whitelist
+> for scan?
 
-I have connected a phone which support both A2DP and Handsfree profiles.
-During call, I don't see any sco packet indication.
+actually BDADDR_ANY does not really look like a good solution. What we really want is to be able to define a list of UUIDs and maybe an RSSI range or threshold for this.
 
-I have added logs in Bluez- 'unix.c' file.
+The real problem is that controllers behave so different when you talk about advertising event report. So even if you have duplicate filtering on or off they have different behaviors. And that is where the real challenge comes into play here. What works on one controller just fine, might turn into a huge battery drain on the other.
 
->From the logs I understood that, all SCO packet indications and
-initiations like BT_GET_CAPABILITIES ,BT_OPEN ,BT_SET_CONFIGURATION
-and BT_START_STREAM etc are triggered from client_cb() callback
-function.
-In this case, I don't see any such kind of packet transmission.
-How to correct this behavior ?
+Get a few different controllers, Marvell, Intel, CSR and Broadcom and play with hcitool lescan to see the different behavior they provide. You can also write your own small little HCI program using the HCI User Channel feature we added in 3.13 and use src/shared/hci.c as helper for handling HCI commands. You really need to understand what you are getting yourself into here.
 
-If the phone has both active A2DP and Handsfree connections, then this
-issue occurs.
+My main concern is battery drain. Once we figured out on how to avoid that, we can easily design a new mgmt command that allows you to do exactly what you want to do.
 
-Can anyone help me, how to correct this issue.
+Regards
 
+Marcel
 
-Thanks & Regards,
-Vinod.
