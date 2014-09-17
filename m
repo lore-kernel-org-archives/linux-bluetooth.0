@@ -1,385 +1,243 @@
 Return-Path: <cyrus@holtmann.org>
-From: Gu Chaojie <chao.jie.gu@intel.com>
-To: linux-bluetooth@vger.kernel.org,
-	marcel@holtmann.org,
-	armansito@chromium.org
-Cc: Gu Chaojie <chao.jie.gu@intel.com>
-Subject: [PATCH] Add signed write command
-Date: Wed, 17 Sep 2014 20:53:15 +0800
-Message-Id: <1410958395-7174-1-git-send-email-chao.jie.gu@intel.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ 2/2] emulator/bthost: Add iovec support
+Date: Wed, 17 Sep 2014 15:49:45 +0300
+Message-Id: <1410958185-3878-2-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <1410958185-3878-1-git-send-email-luiz.dentz@gmail.com>
+References: <1410958185-3878-1-git-send-email-luiz.dentz@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Add bt_att_set_csrk for btgatt-client tool. However this patch hook into
-shared/mgmt, so btgatt-client now should be running by the root user.
----
- src/shared/att-types.h   |    3 ++
- src/shared/att.c         |   49 ++++++++++++++++--
- src/shared/att.h         |    2 +
- src/shared/gatt-client.c |   11 ++--
- tools/btgatt-client.c    |  129 ++++++++++++++++++++++++++++++++++++++++++++++
- 5 files changed, 186 insertions(+), 8 deletions(-)
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-diff --git a/src/shared/att-types.h b/src/shared/att-types.h
-index b85c969..da8b6ae 100644
---- a/src/shared/att-types.h
-+++ b/src/shared/att-types.h
-@@ -25,6 +25,9 @@
+This convert bthost_set_send_handler to take struct iovec for doing
+scatter io.
+---
+ emulator/bthost.c   | 96 ++++++++++++++++++++++++++++-------------------------
+ emulator/bthost.h   |  3 +-
+ src/shared/hciemu.c | 15 +--------
+ 3 files changed, 54 insertions(+), 60 deletions(-)
+
+diff --git a/emulator/bthost.c b/emulator/bthost.c
+index 1fae580..766f14c 100644
+--- a/emulator/bthost.c
++++ b/emulator/bthost.c
+@@ -448,11 +448,12 @@ void bthost_set_send_handler(struct bthost *bthost, bthost_send_func handler,
+ 	bthost->send_data = user_data;
+ }
  
- #define BT_ATT_DEFAULT_LE_MTU 23
- 
-+/* Length of signature in write signed packet */
-+#define BT_ATT_SIGNATURE_LEN		12
-+
- /* ATT protocol opcodes */
- #define BT_ATT_OP_ERROR_RSP	      		0x01
- #define BT_ATT_OP_MTU_REQ			0x02
-diff --git a/src/shared/att.c b/src/shared/att.c
-index a5cab45..aadef9e 100644
---- a/src/shared/att.c
-+++ b/src/shared/att.c
-@@ -36,6 +36,7 @@
- #include "lib/uuid.h"
- #include "src/shared/att.h"
- #include "src/shared/att-types.h"
-+#include "src/shared/crypto.h"
- 
- #define ATT_MIN_PDU_LEN			1  /* At least 1 byte for the opcode. */
- #define ATT_OP_CMD_MASK			0x40
-@@ -77,6 +78,11 @@ struct bt_att {
- 	bt_att_debug_func_t debug_callback;
- 	bt_att_destroy_func_t debug_destroy;
- 	void *debug_data;
-+
-+	struct bt_crypto *crypto;
-+
-+	uint8_t local_csrk[16];
-+	uint32_t local_sign_cnt;
- };
- 
- enum att_op_type {
-@@ -176,6 +182,8 @@ struct att_send_op {
- 	bt_att_response_func_t callback;
- 	bt_att_destroy_func_t destroy;
- 	void *user_data;
-+
-+	struct bt_att *att;
- };
- 
- static void destroy_att_send_op(void *data)
-@@ -277,6 +285,10 @@ static bool encode_pdu(struct att_send_op *op, const void *pdu,
- 						uint16_t length, uint16_t mtu)
+-static void queue_command(struct bthost *bthost, const void *data,
+-								uint16_t len)
++static void queue_command(struct bthost *bthost, const struct iovec *iov,
++								int iovlen)
  {
- 	uint16_t pdu_len = 1;
-+	struct bt_att *att = op->att;
-+
-+	if (op->opcode & ATT_OP_SIGNED_MASK)
-+		pdu_len += BT_ATT_SIGNATURE_LEN;
+ 	struct cmd_queue *cmd_q = &bthost->cmd_q;
+ 	struct cmd *cmd;
++	int i;
  
- 	if (length && pdu)
- 		pdu_len += length;
-@@ -293,17 +305,32 @@ static bool encode_pdu(struct att_send_op *op, const void *pdu,
- 	if (pdu_len > 1)
- 		memcpy(op->pdu + 1, pdu, length);
+ 	cmd = malloc(sizeof(*cmd));
+ 	if (!cmd)
+@@ -460,8 +461,10 @@ static void queue_command(struct bthost *bthost, const void *data,
  
-+	if (op->opcode & ATT_OP_SIGNED_MASK) {
-+		if (bt_crypto_sign_att(att->crypto,
-+					att->local_csrk,
-+					op->pdu,
-+					1 + length,
-+					att->local_sign_cnt,
-+					&((uint8_t *) op->pdu)[1 + length]))
-+			att->local_sign_cnt++;
-+		else
-+			return false;
+ 	memset(cmd, 0, sizeof(*cmd));
+ 
+-	memcpy(cmd->data, data, len);
+-	cmd->len = len;
++	for (i = 0; i < iovlen; i++) {
++		memcpy(cmd->data + cmd->len, iov[i].iov_base, iov[i].iov_len);
++		cmd->len += iov[i].iov_len;
 +	}
-+
- 	return true;
+ 
+ 	if (cmd_q->tail)
+ 		cmd_q->tail->next = cmd;
+@@ -472,45 +475,47 @@ static void queue_command(struct bthost *bthost, const void *data,
+ 	cmd_q->tail = cmd;
  }
  
--static struct att_send_op *create_att_send_op(uint8_t opcode, const void *pdu,
--						uint16_t length, uint16_t mtu,
-+static struct att_send_op *create_att_send_op(uint8_t opcode,
-+						const void *pdu,
-+						uint16_t length,
-+						struct bt_att *att,
- 						bt_att_response_func_t callback,
- 						void *user_data,
- 						bt_att_destroy_func_t destroy)
+-static void send_packet(struct bthost *bthost, const void *data, uint16_t len)
++static void send_packet(struct bthost *bthost, const struct iovec *iov,
++								int iovlen)
  {
- 	struct att_send_op *op;
- 	enum att_op_type op_type;
-+	uint16_t mtu = att->mtu;
+ 	if (!bthost->send_handler)
+ 		return;
  
- 	if (length && !pdu)
- 		return NULL;
-@@ -334,6 +361,7 @@ static struct att_send_op *create_att_send_op(uint8_t opcode, const void *pdu,
- 	op->callback = callback;
- 	op->destroy = destroy;
- 	op->user_data = user_data;
-+	op->att = att;
- 
- 	if (!encode_pdu(op, pdu, length, mtu)) {
- 		free(op);
-@@ -707,6 +735,10 @@ struct bt_att *bt_att_new(int fd)
- 	if (!att->io)
- 		goto fail;
- 
-+	att->crypto = bt_crypto_new();
-+	if (!att->crypto)
-+		goto fail;
-+
- 	att->req_queue = queue_new();
- 	if (!att->req_queue)
- 		goto fail;
-@@ -741,6 +773,7 @@ fail:
- 	queue_destroy(att->write_queue, NULL);
- 	queue_destroy(att->notify_list, NULL);
- 	queue_destroy(att->disconn_list, NULL);
-+	bt_crypto_unref(att->crypto);
- 	io_destroy(att->io);
- 	free(att->buf);
- 	free(att);
-@@ -931,7 +964,7 @@ unsigned int bt_att_send(struct bt_att *att, uint8_t opcode,
- 	if (!att || !att->io)
- 		return 0;
- 
--	op = create_att_send_op(opcode, pdu, length, att->mtu, callback,
-+	op = create_att_send_op(opcode, pdu, length, att, callback,
- 							user_data, destroy);
- 	if (!op)
- 		return 0;
-@@ -1116,3 +1149,13 @@ bool bt_att_unregister_all(struct bt_att *att)
- 
- 	return true;
+-	bthost->send_handler(data, len, bthost->send_data);
++	bthost->send_handler(iov, iovlen, bthost->send_data);
  }
-+
-+void bt_att_set_csrk(struct bt_att *att,
-+			const uint8_t *val,
-+			uint32_t local_sign_cnt)
-+{
-+	memcpy(att->local_csrk, val, 16);
-+	att->local_sign_cnt = local_sign_cnt;
-+}
-+
-+
-diff --git a/src/shared/att.h b/src/shared/att.h
-index 1063021..b76e5f5 100644
---- a/src/shared/att.h
-+++ b/src/shared/att.h
-@@ -76,3 +76,5 @@ unsigned int bt_att_register_disconnect(struct bt_att *att,
- bool bt_att_unregister_disconnect(struct bt_att *att, unsigned int id);
  
- bool bt_att_unregister_all(struct bt_att *att);
-+
-+void bt_att_set_csrk(struct bt_att *att, const uint8_t *val, uint32_t local_sign_cnt);
-diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
-index 1a157ec..b1619c6 100644
---- a/src/shared/gatt-client.c
-+++ b/src/shared/gatt-client.c
-@@ -973,19 +973,20 @@ bool bt_gatt_client_read_long_value(struct bt_gatt_client *client,
- bool bt_gatt_client_write_without_response(struct bt_gatt_client *client,
- 					uint16_t value_handle,
- 					bool signed_write,
--					uint8_t *value, uint16_t length) {
-+					uint8_t *value, uint16_t length)
-+{
- 	uint8_t pdu[2 + length];
+ static void send_acl(struct bthost *bthost, uint16_t handle, uint16_t cid,
+ 						const void *data, uint16_t len)
+ {
+-	struct bt_hci_acl_hdr *acl_hdr;
+-	struct bt_l2cap_hdr *l2_hdr;
+-	uint16_t pkt_len;
+-	void *pkt_data;
++	struct bt_hci_acl_hdr acl_hdr;
++	struct bt_l2cap_hdr l2_hdr;
++	uint8_t pkt = BT_H4_ACL_PKT;
++	struct iovec iov[4];
  
- 	if (!client)
- 		return 0;
+-	pkt_len = 1 + sizeof(*acl_hdr) + sizeof(*l2_hdr) + len;
++	iov[0].iov_base = &pkt;
++	iov[0].iov_len = sizeof(pkt);
  
--	/* TODO: Support this once bt_att_send supports signed writes. */
--	if (signed_write)
--		return 0;
+-	pkt_data = malloc(pkt_len);
+-	if (!pkt_data)
+-		return;
++	acl_hdr.handle = acl_handle_pack(handle, 0);
++	acl_hdr.dlen = cpu_to_le16(len + sizeof(l2_hdr));
+ 
+-	((uint8_t *) pkt_data)[0] = BT_H4_ACL_PKT;
++	iov[1].iov_base = &acl_hdr;
++	iov[1].iov_len = sizeof(acl_hdr);
+ 
+-	acl_hdr = pkt_data + 1;
+-	acl_hdr->handle = acl_handle_pack(handle, 0);
+-	acl_hdr->dlen = cpu_to_le16(len + sizeof(*l2_hdr));
++	l2_hdr.cid = cpu_to_le16(cid);
++	l2_hdr.len = cpu_to_le16(len);
+ 
+-	l2_hdr = pkt_data + 1 + sizeof(*acl_hdr);
+-	l2_hdr->cid = cpu_to_le16(cid);
+-	l2_hdr->len = cpu_to_le16(len);
++	iov[2].iov_base = &l2_hdr;
++	iov[2].iov_len = sizeof(l2_hdr);
+ 
+-	if (len > 0)
+-		memcpy(pkt_data + 1 + sizeof(*acl_hdr) + sizeof(*l2_hdr),
+-								data, len);
++	if (len == 0) {
++		send_packet(bthost, iov, 3);
++		return;
++	}
+ 
+-	send_packet(bthost, pkt_data, pkt_len);
++	iov[3].iov_base = (void *) data;
++	iov[3].iov_len = len;
+ 
+-	free(pkt_data);
++	send_packet(bthost, iov, 4);
+ }
+ 
+ static uint8_t l2cap_sig_send(struct bthost *bthost, struct btconn *conn,
+@@ -636,33 +641,30 @@ bool bthost_l2cap_req(struct bthost *bthost, uint16_t handle, uint8_t code,
+ static void send_command(struct bthost *bthost, uint16_t opcode,
+ 						const void *data, uint8_t len)
+ {
+-	struct bt_hci_cmd_hdr *hdr;
+-	uint16_t pkt_len;
+-	void *pkt_data;
++	struct bt_hci_cmd_hdr hdr;
++	uint8_t pkt = BT_H4_CMD_PKT;
++	struct iovec iov[3];
+ 
+-	pkt_len = 1 + sizeof(*hdr) + len;
++	iov[0].iov_base = &pkt;
++	iov[0].iov_len = sizeof(pkt);
+ 
+-	pkt_data = malloc(pkt_len);
+-	if (!pkt_data)
+-		return;
++	hdr.opcode = cpu_to_le16(opcode);
++	hdr.plen = len;
+ 
+-	((uint8_t *) pkt_data)[0] = BT_H4_CMD_PKT;
++	iov[1].iov_base = &hdr;
++	iov[1].iov_len = sizeof(hdr);
+ 
+-	hdr = pkt_data + 1;
+-	hdr->opcode = cpu_to_le16(opcode);
+-	hdr->plen = len;
 -
- 	put_le16(value_handle, pdu);
- 	memcpy(pdu + 2, value, length);
- 
-+	if (signed_write)
-+		return bt_att_send(client->att, BT_ATT_OP_SIGNED_WRITE_CMD,
-+					pdu, sizeof(pdu), NULL, NULL, NULL);
-+
- 	return bt_att_send(client->att, BT_ATT_OP_WRITE_CMD, pdu, sizeof(pdu),
- 							NULL, NULL, NULL);
- }
-diff --git a/tools/btgatt-client.c b/tools/btgatt-client.c
-index d1395b2..fdf8485 100644
---- a/tools/btgatt-client.c
-+++ b/tools/btgatt-client.c
-@@ -38,11 +38,14 @@
- #include <bluetooth/hci_lib.h>
- #include <bluetooth/l2cap.h>
- #include "lib/uuid.h"
-+#include "lib/bluetooth.h"
-+#include "lib/mgmt.h"
- 
- #include "monitor/mainloop.h"
- #include "src/shared/util.h"
- #include "src/shared/att.h"
- #include "src/shared/gatt-client.h"
-+#include "src/shared/mgmt.h"
- 
- #define ATT_CID 4
- 
-@@ -59,6 +62,8 @@
- #define COLOR_BOLDWHITE	"\x1B[1;37m"
- 
- static bool verbose = false;
-+static struct mgmt *mgmt_if = NULL;
-+static uint16_t adapter_index = MGMT_INDEX_NONE;
- 
- struct client {
- 	int fd;
-@@ -92,6 +97,115 @@ static void gatt_debug_cb(const char *str, void *user_data)
- 	PRLOG(COLOR_GREEN "%s%s\n" COLOR_OFF, prefix, str);
- }
- 
-+static void new_csrk_callback(uint16_t index, uint16_t length,
-+					const void *param, void *user_data)
-+{
-+	const struct mgmt_ev_new_csrk *ev = param;
-+	struct bt_att *att = user_data;
-+
-+	if (length < sizeof(*ev)) {
-+		fprintf(stderr, "Too small csrk event (%u bytes)\n", length);
-+		return;
+-	if (len > 0)
+-		memcpy(pkt_data + 1 + sizeof(*hdr), data, len);
++	if (len > 0) {
++		iov[2].iov_base = (void *) data;
++		iov[2].iov_len = len;
 +	}
-+
-+	switch (ev->key.master) {
-+	case 0x00:
-+		bt_att_set_csrk(att, ev->key.val, 0);
-+		break;
-+	case 0x01:
-+		break;
-+	default:
-+		fprintf(stderr,
-+			"Unknown CSRK key type 02%02x\n", ev->key.master);
-+		return;
-+	}
-+}
-+
-+static void mgmt_index_added_event(uint16_t index, uint16_t length,
-+					const void *param, void *user_data)
-+{
-+	struct bt_att *att = user_data;
-+
-+	printf("index %u\n", index);
-+
-+	if (adapter_index != MGMT_INDEX_NONE) {
-+		fprintf(stderr, "skip event for index %u\n", index);
-+		return;
-+	}
-+
-+	adapter_index = index;
-+
-+	mgmt_register(mgmt_if, MGMT_EV_NEW_CSRK, adapter_index,
-+						new_csrk_callback, att, NULL);
-+}
-+
-+static void mgmt_index_removed_event(uint16_t index, uint16_t length,
-+					const void *param, void *user_data)
-+{
-+	if (index != adapter_index)
-+		return;
-+
-+	perror("Adapter was removed. Exiting.\n");
-+	raise(SIGTERM);
-+}
-+
-+static void read_version_complete(uint8_t status, uint16_t length,
-+					const void *param, void *user_data)
-+{
-+	const struct mgmt_rp_read_version *rp = param;
-+	uint8_t mgmt_version, mgmt_revision;
-+	struct bt_att *att = user_data;
-+
-+	if (status) {
-+		fprintf(stderr,
-+			"Failed to read version information: %s (0x%02x)\n",
-+						mgmt_errstr(status), status);
-+		return;
-+	}
-+
-+	if (length < sizeof(*rp)) {
-+		perror("Wrong size response\n");
-+		return;
-+	}
-+
-+	mgmt_version = rp->version;
-+	mgmt_revision = btohs(rp->revision);
-+
-+	printf("Bluetooth management interface %u.%u initialized\n",
-+						mgmt_version, mgmt_revision);
-+
-+	if (MGMT_VERSION(mgmt_version, mgmt_revision) < MGMT_VERSION(1, 3)) {
-+		perror("Version 1.3 later of management interface required\n");
-+		return;
-+	}
-+
-+	mgmt_register(mgmt_if, MGMT_EV_INDEX_ADDED, MGMT_INDEX_NONE,
-+					mgmt_index_added_event, att, NULL);
-+	mgmt_register(mgmt_if, MGMT_EV_INDEX_REMOVED, MGMT_INDEX_NONE,
-+					mgmt_index_removed_event, NULL, NULL);
-+}
-+
-+static bool mgmt_create(struct bt_att *att)
-+{
-+	mgmt_if = mgmt_new_default();
-+	if (!mgmt_if) {
-+		perror("Failed to access management interface\n");
-+		return false;
-+	}
-+
-+	if (mgmt_send(mgmt_if, MGMT_OP_READ_VERSION, MGMT_INDEX_NONE, 0, NULL,
-+				read_version_complete, att, NULL) == 0) {
-+		perror("Error sending READ_VERSION mgmt command\n");
-+
-+		mgmt_unref(mgmt_if);
-+		mgmt_if = NULL;
-+
-+		return false;
-+	}
-+
-+	return true;
-+}
-+
- static void ready_cb(bool success, uint8_t att_ecode, void *user_data);
  
- static struct client *client_create(int fd, uint16_t mtu)
-@@ -136,6 +250,13 @@ static struct client *client_create(int fd, uint16_t mtu)
- 		return NULL;
+ 	if (bthost->ncmd) {
+-		send_packet(bthost, pkt_data, pkt_len);
++		send_packet(bthost, iov, len > 0 ? 3 : 2);
+ 		bthost->ncmd--;
+ 	} else {
+-		queue_command(bthost, pkt_data, pkt_len);
++		queue_command(bthost, iov, len > 0 ? 3 : 2);
  	}
- 
-+	if (!mgmt_create(att)) {
-+		fprintf(stderr, "Failed to create management interface\n");
-+		bt_att_unref(att);
-+		free(cli);
-+		return NULL;
-+	}
-+
- 	if (verbose) {
- 		bt_att_set_debug(att, att_debug_cb, "att: ", NULL);
- 		bt_gatt_client_set_debug(cli->gatt, gatt_debug_cb, "gatt: ",
-@@ -155,6 +276,12 @@ static void client_destroy(struct client *cli)
- 	bt_gatt_client_unref(cli->gatt);
+-
+-	free(pkt_data);
  }
  
-+static void mgmt_destroy(struct mgmt *mgmt_if)
-+{
-+	mgmt_unref(mgmt_if);
-+	mgmt_if = NULL;
-+}
+ static void next_cmd(struct bthost *bthost)
+@@ -670,6 +672,7 @@ static void next_cmd(struct bthost *bthost)
+ 	struct cmd_queue *cmd_q = &bthost->cmd_q;
+ 	struct cmd *cmd = cmd_q->head;
+ 	struct cmd *next;
++	struct iovec iov;
+ 
+ 	if (!cmd)
+ 		return;
+@@ -679,7 +682,10 @@ static void next_cmd(struct bthost *bthost)
+ 	if (!bthost->ncmd)
+ 		return;
+ 
+-	send_packet(bthost, cmd->data, cmd->len);
++	iov.iov_base = cmd->data;
++	iov.iov_len = cmd->len;
 +
- static void print_uuid(const uint8_t uuid[16])
++	send_packet(bthost, &iov, 1);
+ 	bthost->ncmd--;
+ 
+ 	if (next)
+diff --git a/emulator/bthost.h b/emulator/bthost.h
+index 042f1cd..042d35f 100644
+--- a/emulator/bthost.h
++++ b/emulator/bthost.h
+@@ -23,8 +23,9 @@
+  */
+ 
+ #include <stdint.h>
++#include <sys/uio.h>
+ 
+-typedef void (*bthost_send_func) (const void *data, uint16_t len,
++typedef void (*bthost_send_func) (const struct iovec *iov, int iovlen,
+ 							void *user_data);
+ 
+ struct bthost;
+diff --git a/src/shared/hciemu.c b/src/shared/hciemu.c
+index 4e354a0..3892fea 100644
+--- a/src/shared/hciemu.c
++++ b/src/shared/hciemu.c
+@@ -107,19 +107,6 @@ static void client_command_callback(uint16_t opcode,
+ 	btdev_command_default(callback);
+ }
+ 
+-static void write_callback(const void *data, uint16_t len, void *user_data)
+-{
+-	GIOChannel *channel = user_data;
+-	ssize_t written;
+-	int fd;
+-
+-	fd = g_io_channel_unix_get_fd(channel);
+-
+-	written = write(fd, data, len);
+-	if (written < 0)
+-		return;
+-}
+-
+ static void writev_callback(const struct iovec *iov, int iovlen,
+ 								void *user_data)
  {
- 	char uuid_str[MAX_LEN_UUID_STR];
-@@ -1029,5 +1156,7 @@ int main(int argc, char *argv[])
+@@ -167,7 +154,7 @@ static guint create_source_bthost(int fd, struct bthost *bthost)
+ 	g_io_channel_set_encoding(channel, NULL, NULL);
+ 	g_io_channel_set_buffered(channel, FALSE);
  
- 	client_destroy(cli);
+-	bthost_set_send_handler(bthost, write_callback, channel);
++	bthost_set_send_handler(bthost, writev_callback, channel);
  
-+	mgmt_destroy(mgmt_if);
-+
- 	return EXIT_SUCCESS;
- }
+ 	source = g_io_add_watch_full(channel, G_PRIORITY_DEFAULT,
+ 				G_IO_IN | G_IO_HUP | G_IO_ERR | G_IO_NVAL,
 -- 
-1.7.10.4
+1.9.3
+
