@@ -1,86 +1,66 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.6\))
-Subject: Re: [PATCH 1/1] bluetooth: Check for SCO type before setting  retransmission effort
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1410938010-6181-1-git-send-email-bernhard.thaler@r-it.at>
-Date: Wed, 17 Sep 2014 06:55:26 -0700
-Cc: "Gustavo F. Padovan" <gustavo@padovan.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	BlueZ development <linux-bluetooth@vger.kernel.org>,
-	Network Development <netdev@vger.kernel.org>,
-	linux-kernel@vger.kernel.org
-Message-Id: <8B07B86E-19D4-49E2-B471-DAF31C8D4F34@holtmann.org>
-References: <1410938010-6181-1-git-send-email-bernhard.thaler@r-it.at>
-To: Bernhard Thaler <bernhard.thaler@r-it.at>
-Sender: linux-kernel-owner@vger.kernel.org
+MIME-Version: 1.0
+In-Reply-To: <001101cfd264$1c5a3470$550e9d50$@samsung.com>
+References: <1410871803-31373-1-git-send-email-gowtham.ab@samsung.com>
+	<CABBYNZLNfm+z_GyPnHvxiUG+pZmpY6QoBrm62LFYENiKx9B=Sg@mail.gmail.com>
+	<001101cfd264$1c5a3470$550e9d50$@samsung.com>
+Date: Wed, 17 Sep 2014 16:28:23 +0300
+Message-ID: <CABBYNZKTGtxy8nzWU6xWiggpmymBNURyRJ+KXUjqey9Aw3O8Mw@mail.gmail.com>
+Subject: Re: [MAP v4] obexd/client : Handle the MAP Event Report 1.1
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Gowtham Anandha Babu <gowtham.ab@samsung.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	Dmitry Kasatkin <d.kasatkin@samsung.com>,
+	Bharat Panda <bharat.panda@samsung.com>, cpgs@samsung.com
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Bernhard,
+Hi,
 
-> SCO connection cannot be setup to devices that do not support retransmission.
-> Patch based on http://permalink.gmane.org/gmane.linux.bluez.kernel/7779 and
-> adapted for this kernel version.
-> Code changed to check SCO/eSCO type before setting retransmission effort 
-> and max. latency. The purpose of the patch is to support older devices not
-> capable of eSCO.
-> 
-> Tested on Blackberry 655+ headset which does not support retransmission.
-> Credits go to Alexander Sommerhuber.
-> 
-> Signed-off-by: Bernhard Thaler <bernhard.thaler@r-it.at>
-> ---
-> net/bluetooth/hci_conn.c |   39 ++++++++++++++++++++++-----------------
-> 1 file changed, 22 insertions(+), 17 deletions(-)
-> 
-> diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-> index faff624..093abcc 100644
-> --- a/net/bluetooth/hci_conn.c
-> +++ b/net/bluetooth/hci_conn.c
-> @@ -186,26 +186,31 @@ bool hci_setup_sync(struct hci_conn *conn, __u16 handle)
-> 	cp.rx_bandwidth   = cpu_to_le32(0x00001f40);
-> 	cp.voice_setting  = cpu_to_le16(conn->setting);
-> 
-> -	switch (conn->setting & SCO_AIRMODE_MASK) {
-> -	case SCO_AIRMODE_TRANSP:
-> -		if (conn->attempt > ARRAY_SIZE(sco_param_wideband))
-> -			return false;
-> -		cp.retrans_effort = 0x02;
-> -		param = &sco_param_wideband[conn->attempt - 1];
-> -		break;
-> -	case SCO_AIRMODE_CVSD:
-> -		if (conn->attempt > ARRAY_SIZE(sco_param_cvsd))
-> +	if (!(conn->link->features[0][3] & LMP_ESCO)) {
+On Wed, Sep 17, 2014 at 1:42 PM, Gowtham Anandha Babu
+<gowtham.ab@samsung.com> wrote:
+> Regarding the implementation of the ReadStatusChanged event:
+>
+> As per the specification: Pg.no : 35 on MAP 1.2 spec
+> "ReadStatusChanged: indicates that the 'read' status of a message (see 3.1.6) has been changed on the MSE. "
+>
+> But the actual Event Report which was provided as test case in PTS tool was:
+>
+> <MAP-event-report version = "1.1">
+> <event type = "ReadStatusChanged" handle = "12345678" folder = "TELECOM/MSG/INBOX" msg_type = "SMS_CDMA" subject = "Hello" datetime = "20110221T130510" sender_name = "Jamie" priority = "yes" />
+> </MAP-event-report>
+>
+> From the above event report 1.1, we cannot retrieve the read status of a message. But we need update the read status in MCE.
+>
+> For SMS,MMS - Only way the read status can change is from unread to read.
+> For Email - Here the read status can change from read to unread and vice versa.
+> So, we need to  toggle the read status, whenever we get the ReadstatusChanged event.
+> Implementation of the ReadStatusChanged event handler in "obexd/client/map" is shown below:
+>
+> static void map_handle_read_status_changed(struct map_data *map, struct  map_event *event)
+>  {
+>         struct map_msg *msg;
+>         msg = g_hash_table_lookup(map->messages, &event->handle);
+>         if (msg == NULL)
+>                 return;
+>         if(msg->flags & MAP_MSG_FLAG_READ)
+>                 parse_read(msg,"no");
+>         else
+>                 parse_read(msg,"yes");
+>  }
+>
+> What is your suggestion?
 
-so we have something that is called lmp_esco_capable.
+I think this is the case of filing an issue to PTS to get the
+information, if the read status can change back and forth the event
+should contain the current value or they should clarify in the spec
+that this event works by toggling, in fact none of the attributes it
+is sending would change but the one that is actually changing is
+omitted so perhaps that is not really the intention.
 
-> +		cp.retrans_effort = 0xff;
-> +		cp.pkt_type = __cpu_to_le16(conn->pkt_type);
-> +		cp.max_latency = __cpu_to_le16(0xffff);
+You can file the issue here (requires login):
+https://www.bluetooth.org/pts/issues/add_issue.cfm
 
-Anyway, I do not thing this is the right approach. I think what we should do is just reject a connection attempt for transparent eSCO connections (since we only use them for wideband speech anyway) when connecting to a device that has no eSCO support.
-
-> +	} else {
-> +		switch (conn->setting & SCO_AIRMODE_MASK) {
-> +		case SCO_AIRMODE_TRANSP:
-> +			if (conn->attempt > ARRAY_SIZE(sco_param_wideband))
-> +				return false;
-> +			cp.retrans_effort = 0x02;
-> +			param = &sco_param_wideband[conn->attempt - 1];
-> +			break;
-> +		case SCO_AIRMODE_CVSD:
-> +			if (conn->attempt > ARRAY_SIZE(sco_param_cvsd))
-> +				return false;
-> +			cp.retrans_effort = 0x01;
-> +			param = &sco_param_cvsd[conn->attempt - 1];
-> +			break;
-
-For CVSD based attempts, we should start with non eSCO parameter settings if we know that the remote side can not support eSCO.
-
-The reason is that you still need to follow through with defined parameter sets from the HFP profile.
-
-Regards
-
-Marcel
-
+-- 
+Luiz Augusto von Dentz
