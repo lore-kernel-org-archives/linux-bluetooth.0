@@ -1,61 +1,54 @@
 Return-Path: <cyrus@holtmann.org>
-From: Bernhard Thaler <bernhard.thaler@r-it.at>
-To: marcel@holtmann.org,
-	gustavo@padovan.org,
-	johan.hedberg@gmail.com,
-	davem@davemloft.net
-Cc: linux-bluetooth@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Bernhard Thaler <bernhard.thaler@r-it.at>
-Subject: [PATCHv2 1/1] bluetooth: Check for SCO type before setting retransmission effort
-Date: Thu, 18 Sep 2014 12:15:21 +0200
-Message-Id: <1411035321-10215-1-git-send-email-bernhard.thaler@r-it.at>
-In-Reply-To: <8B07B86E-19D4-49E2-B471-DAF31C8D4F34@holtmann.org>
-References: <8B07B86E-19D4-49E2-B471-DAF31C8D4F34@holtmann.org>
+MIME-Version: 1.0
+In-Reply-To: <20140918091224.GB3505@aemeltch-MOBL1>
+References: <1410958185-3878-1-git-send-email-luiz.dentz@gmail.com>
+	<20140918091224.GB3505@aemeltch-MOBL1>
+Date: Thu, 18 Sep 2014 13:13:12 +0300
+Message-ID: <CABBYNZKNyqmXPgbK4yfGWBj17dN4mhN6vHkg4S0t_7mXeny6+Q@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 1/2] emulator/btdev: Add iovec support
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-SCO connection cannot be setup to devices that do not support retransmission.
-Patch based on http://permalink.gmane.org/gmane.linux.bluez.kernel/7779 and
-adapted for this kernel version.
-Code changed to check SCO/eSCO type before setting retransmission effort
-and max. latency. The purpose of the patch is to support older devices not
- capable of eSCO.
+Hi Andrei,
 
-Tested on Blackberry 655+ headset which does not support retransmission.
-Credits go to Alexander Sommerhuber.
+On Thu, Sep 18, 2014 at 12:12 PM, Andrei Emeltchenko
+<andrei.emeltchenko.news@gmail.com> wrote:
+> Hi Luiz,
+>
+> On Wed, Sep 17, 2014 at 03:49:44PM +0300, Luiz Augusto von Dentz wrote:
+>> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>>
+>> This convert btdev_set_send_handler to take struct iovec for doing
+>> scatter io.
+>
+> ...
+>
+>> --- + iov2[1].iov_base = &hdr;
+>> +     iov2[1].iov_len = sizeof(hdr);
+>>
+>> -     if (run_hooks(btdev, BTDEV_HOOK_POST_CMD, opcode, pkt_data, pkt_len))
+>> -             send_packet(btdev, pkt_data, pkt_len);
+>> +     for (i = 0; i < iovlen; i++) {
+>> +             hdr.plen += iov[i].iov_len;
+>> +             iov2[2 + i].iov_base = iov[i].iov_base;
+>> +             iov2[2 + i].iov_len = iov[i].iov_len;
+>> +     }
+>>
+>> -     free(pkt_data);
+>> +     if (run_hooks(btdev, BTDEV_HOOK_POST_CMD, opcode, iov[i].iov_base,
+>> +
+>> iov[i].iov_len))
+>
+> This is wrong memory access. i == iovlen here.
 
-Signed-off-by: Bernhard Thaler <bernhard.thaler@r-it.at>
----
- net/bluetooth/hci_conn.c |   16 ++++++++++++----
- 1 file changed, 12 insertions(+), 4 deletions(-)
+Yep, but it looks there is nothing using the hooks, anyway I will fix
+it in a minute.
 
-diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index faff624..f6e3183 100644
---- a/net/bluetooth/hci_conn.c
-+++ b/net/bluetooth/hci_conn.c
-@@ -194,10 +194,18 @@ bool hci_setup_sync(struct hci_conn *conn, __u16 handle)
- 		param = &sco_param_wideband[conn->attempt - 1];
- 		break;
- 	case SCO_AIRMODE_CVSD:
--		if (conn->attempt > ARRAY_SIZE(sco_param_cvsd))
--			return false;
--		cp.retrans_effort = 0x01;
--		param = &sco_param_cvsd[conn->attempt - 1];
-+		if (!lmp_esco_capable(conn->link)) {
-+			/* sco_param_cvsd contains SCO in last two elements */
-+			if ((conn->attempt + 3) > ARRAY_SIZE(sco_param_cvsd))
-+				return false;
-+			cp.retrans_effort = 0xff;
-+			param = &sco_param_cvsd[(conn->attempt + 2)];
-+		} else {
-+			if (conn->attempt > ARRAY_SIZE(sco_param_cvsd))
-+				return false;
-+			cp.retrans_effort = 0x01;
-+			param = &sco_param_cvsd[conn->attempt - 1];
-+		}
- 		break;
- 	default:
- 		return false;
+
 -- 
-1.7.10.4
+Luiz Augusto von Dentz
