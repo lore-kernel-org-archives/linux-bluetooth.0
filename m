@@ -1,40 +1,29 @@
 Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH] mgmt-tester: Use proper type specifier for printing size_t
-Date: Thu, 18 Sep 2014 12:33:51 +0200
-Message-Id: <1411036431-21458-1-git-send-email-szymon.janc@tieto.com>
+To: John Tobias <john.tobias.ph@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: Create an AVDTP signaling channel
+Date: Thu, 18 Sep 2014 12:21:22 +0200
+Message-ID: <1643289.HYNdMFzCoG@leonov>
+In-Reply-To: <CACUGKYPQJjY+p215wqp6Gp1qtKC_WghsHYoQk5+BvifdOF++=w@mail.gmail.com>
+References: <CACUGKYPaqcyKxv9zmiRraDsV1=ErsTCP5rUqguEdh6aEZshZKA@mail.gmail.com> <CACUGKYN0S8aBPL4Q81sFabcJQk8FgdPwMsPEK089QgM3oV_KjQ@mail.gmail.com> <CACUGKYPQJjY+p215wqp6Gp1qtKC_WghsHYoQk5+BvifdOF++=w@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="us-ascii"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Fix following error:
+On Wednesday 17 of September 2014 17:38:26 John Tobias wrote:
+> I really apologize for a bit confusion... after running the bluetooth
+> daemon without the -EC, I am still seeing bluetoothd got SEGV.
+> 
+> The pts seems get stuck.... a2dp-sink profile connect failed for
+> 00:1B:DC:07:32:D3: Device or resource busy
+> 
+> Any idea?.
 
-tools/mgmt-tester.c: In function ‘verify_ltk’:
-tools/mgmt-tester.c:2633:19: error: format ‘%u’ expects argument of
-    type ‘unsigned int’, but argument 3 has type
-    ‘long unsigned int’ [-Werror=format=]
-     sizeof(struct mgmt_ev_new_long_term_key));
-                   ^
----
- tools/mgmt-tester.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Please run it under valgrind and send results here. That should make debugging 
+easier.
 
-diff --git a/tools/mgmt-tester.c b/tools/mgmt-tester.c
-index 805bcbe..177b51b 100644
---- a/tools/mgmt-tester.c
-+++ b/tools/mgmt-tester.c
-@@ -2629,7 +2629,7 @@ static bool verify_ltk(const void *param, uint16_t length)
- 	const struct mgmt_ev_new_long_term_key *ev = param;
- 
- 	if (length != sizeof(struct mgmt_ev_new_long_term_key)) {
--		tester_warn("Invalid new ltk length %u != %u", length,
-+		tester_warn("Invalid new ltk length %u != %zu", length,
- 				sizeof(struct mgmt_ev_new_long_term_key));
- 		return false;
- 	}
 -- 
-1.9.3
-
+BR
+Szymon Janc
