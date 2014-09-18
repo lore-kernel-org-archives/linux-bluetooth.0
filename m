@@ -1,54 +1,73 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <541B6292.2020902@signal11.us>
-Date: Thu, 18 Sep 2014 18:54:10 -0400
-From: Alan Ott <alan@signal11.us>
-MIME-Version: 1.0
-To: Varka Bhadram <varkabhadram@gmail.com>, linux-wpan@vger.kernel.org,
-	linux-bluetooth@vger.kernel.org
-CC: Varka Bhadram <varkab@cdac.in>
-Subject: Re: [PATCH bluetooth-next 1/3] ieee802154: mrf24j40: fix Missing
- a blank line after declarations
-References: <1410842922-10564-1-git-send-email-varkab@cdac.in> <1410842922-10564-2-git-send-email-varkab@cdac.in>
-In-Reply-To: <1410842922-10564-2-git-send-email-varkab@cdac.in>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Sender: linux-wpan-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.6\))
+Subject: Re: [PATCHv2 1/1] bluetooth: Check for SCO type before setting retransmission effort
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1411035321-10215-1-git-send-email-bernhard.thaler@r-it.at>
+Date: Thu, 18 Sep 2014 08:48:48 -0700
+Cc: "Gustavo F. Padovan" <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	BlueZ development <linux-bluetooth@vger.kernel.org>,
+	Network Development <netdev@vger.kernel.org>,
+	linux-kernel@vger.kernel.org
+Message-Id: <A8855298-3814-4E46-B106-167C05366E2B@holtmann.org>
+References: <8B07B86E-19D4-49E2-B471-DAF31C8D4F34@holtmann.org> <1411035321-10215-1-git-send-email-bernhard.thaler@r-it.at>
+To: Bernhard Thaler <bernhard.thaler@r-it.at>
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Make the first line of the commit message:
-     mrf24j40: fix Missing a blank line after declarations
+Hi Bernhard,
 
-On 09/16/2014 12:48 AM, Varka Bhadram wrote:
-> Signed-off-by: Varka Bhadram <varkab@cdac.in>
+> SCO connection cannot be setup to devices that do not support retransmission.
+> Patch based on http://permalink.gmane.org/gmane.linux.bluez.kernel/7779 and
+> adapted for this kernel version.
+> Code changed to check SCO/eSCO type before setting retransmission effort
+> and max. latency. The purpose of the patch is to support older devices not
+> capable of eSCO.
+> 
+> Tested on Blackberry 655+ headset which does not support retransmission.
+> Credits go to Alexander Sommerhuber.
+> 
+> Signed-off-by: Bernhard Thaler <bernhard.thaler@r-it.at>
 > ---
->   drivers/net/ieee802154/mrf24j40.c |    3 +++
->   1 file changed, 3 insertions(+)
->
-> diff --git a/drivers/net/ieee802154/mrf24j40.c b/drivers/net/ieee802154/mrf24j40.c
-> index 9e6a124..466da57 100644
-> --- a/drivers/net/ieee802154/mrf24j40.c
-> +++ b/drivers/net/ieee802154/mrf24j40.c
-> @@ -412,6 +412,7 @@ static void mrf24j40_stop(struct ieee802154_dev *dev)
->   	struct mrf24j40 *devrec = dev->priv;
->   	u8 val;
->   	int ret;
-> +
->   	dev_dbg(printdev(devrec), "stop\n");
->   
->   	ret = read_short_reg(devrec, REG_INTCON, &val);
-> @@ -465,6 +466,7 @@ static int mrf24j40_filter(struct ieee802154_dev *dev,
->   	if (changed & IEEE802515_AFILT_SADDR_CHANGED) {
->   		/* Short Addr */
->   		u8 addrh, addrl;
-> +
->   		addrh = le16_to_cpu(filt->short_addr) >> 8 & 0xff;
->   		addrl = le16_to_cpu(filt->short_addr) & 0xff;
->   
-> @@ -493,6 +495,7 @@ static int mrf24j40_filter(struct ieee802154_dev *dev,
->   	if (changed & IEEE802515_AFILT_PANID_CHANGED) {
->   		/* PAN ID */
->   		u8 panidl, panidh;
-> +
->   		panidh = le16_to_cpu(filt->pan_id) >> 8 & 0xff;
->   		panidl = le16_to_cpu(filt->pan_id) & 0xff;
->   		write_short_reg(devrec, REG_PANIDH, panidh);
+> net/bluetooth/hci_conn.c |   16 ++++++++++++----
+> 1 file changed, 12 insertions(+), 4 deletions(-)
+> 
+> diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+> index faff624..f6e3183 100644
+> --- a/net/bluetooth/hci_conn.c
+> +++ b/net/bluetooth/hci_conn.c
+> @@ -194,10 +194,18 @@ bool hci_setup_sync(struct hci_conn *conn, __u16 handle)
+> 		param = &sco_param_wideband[conn->attempt - 1];
+> 		break;
+> 	case SCO_AIRMODE_CVSD:
+> -		if (conn->attempt > ARRAY_SIZE(sco_param_cvsd))
+> -			return false;
+> -		cp.retrans_effort = 0x01;
+> -		param = &sco_param_cvsd[conn->attempt - 1];
+> +		if (!lmp_esco_capable(conn->link)) {
+> +			/* sco_param_cvsd contains SCO in last two elements */
+> +			if ((conn->attempt + 3) > ARRAY_SIZE(sco_param_cvsd))
+> +				return false;
+> +			cp.retrans_effort = 0xff;
+> +			param = &sco_param_cvsd[(conn->attempt + 2)];
+
+so if anybody creates a new mode and forgets to update this code, we are hitting a nice crash and/or wrong behavior.
+
+I would prefer that we create separate parameter arrays here. It might means that we have to rename the current ones to esco_param_* and the introduce sco_param_cvsd.
+
+> +		} else {
+> +			if (conn->attempt > ARRAY_SIZE(sco_param_cvsd))
+> +				return false;
+> +			cp.retrans_effort = 0x01;
+> +			param = &sco_param_cvsd[conn->attempt - 1];
+> +		}
+> 		break;
+> 	default:
+> 		return false;
+
+Regards
+
+Marcel
 
