@@ -1,29 +1,61 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: John Tobias <john.tobias.ph@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: Create an AVDTP signaling channel
-Date: Thu, 18 Sep 2014 12:21:22 +0200
-Message-ID: <1643289.HYNdMFzCoG@leonov>
-In-Reply-To: <CACUGKYPQJjY+p215wqp6Gp1qtKC_WghsHYoQk5+BvifdOF++=w@mail.gmail.com>
-References: <CACUGKYPaqcyKxv9zmiRraDsV1=ErsTCP5rUqguEdh6aEZshZKA@mail.gmail.com> <CACUGKYN0S8aBPL4Q81sFabcJQk8FgdPwMsPEK089QgM3oV_KjQ@mail.gmail.com> <CACUGKYPQJjY+p215wqp6Gp1qtKC_WghsHYoQk5+BvifdOF++=w@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Sender: linux-bluetooth-owner@vger.kernel.org
+From: Bernhard Thaler <bernhard.thaler@r-it.at>
+To: marcel@holtmann.org,
+	gustavo@padovan.org,
+	johan.hedberg@gmail.com,
+	davem@davemloft.net
+Cc: linux-bluetooth@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Bernhard Thaler <bernhard.thaler@r-it.at>
+Subject: [PATCHv2 1/1] bluetooth: Check for SCO type before setting retransmission effort
+Date: Thu, 18 Sep 2014 12:15:21 +0200
+Message-Id: <1411035321-10215-1-git-send-email-bernhard.thaler@r-it.at>
+In-Reply-To: <8B07B86E-19D4-49E2-B471-DAF31C8D4F34@holtmann.org>
+References: <8B07B86E-19D4-49E2-B471-DAF31C8D4F34@holtmann.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Wednesday 17 of September 2014 17:38:26 John Tobias wrote:
-> I really apologize for a bit confusion... after running the bluetooth
-> daemon without the -EC, I am still seeing bluetoothd got SEGV.
-> 
-> The pts seems get stuck.... a2dp-sink profile connect failed for
-> 00:1B:DC:07:32:D3: Device or resource busy
-> 
-> Any idea?.
+SCO connection cannot be setup to devices that do not support retransmission.
+Patch based on http://permalink.gmane.org/gmane.linux.bluez.kernel/7779 and
+adapted for this kernel version.
+Code changed to check SCO/eSCO type before setting retransmission effort
+and max. latency. The purpose of the patch is to support older devices not
+ capable of eSCO.
 
-Please run it under valgrind and send results here. That should make debugging 
-easier.
+Tested on Blackberry 655+ headset which does not support retransmission.
+Credits go to Alexander Sommerhuber.
 
+Signed-off-by: Bernhard Thaler <bernhard.thaler@r-it.at>
+---
+ net/bluetooth/hci_conn.c |   16 ++++++++++++----
+ 1 file changed, 12 insertions(+), 4 deletions(-)
+
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+index faff624..f6e3183 100644
+--- a/net/bluetooth/hci_conn.c
++++ b/net/bluetooth/hci_conn.c
+@@ -194,10 +194,18 @@ bool hci_setup_sync(struct hci_conn *conn, __u16 handle)
+ 		param = &sco_param_wideband[conn->attempt - 1];
+ 		break;
+ 	case SCO_AIRMODE_CVSD:
+-		if (conn->attempt > ARRAY_SIZE(sco_param_cvsd))
+-			return false;
+-		cp.retrans_effort = 0x01;
+-		param = &sco_param_cvsd[conn->attempt - 1];
++		if (!lmp_esco_capable(conn->link)) {
++			/* sco_param_cvsd contains SCO in last two elements */
++			if ((conn->attempt + 3) > ARRAY_SIZE(sco_param_cvsd))
++				return false;
++			cp.retrans_effort = 0xff;
++			param = &sco_param_cvsd[(conn->attempt + 2)];
++		} else {
++			if (conn->attempt > ARRAY_SIZE(sco_param_cvsd))
++				return false;
++			cp.retrans_effort = 0x01;
++			param = &sco_param_cvsd[conn->attempt - 1];
++		}
+ 		break;
+ 	default:
+ 		return false;
 -- 
-BR
-Szymon Janc
+1.7.10.4
