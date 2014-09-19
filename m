@@ -1,258 +1,71 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] android/tester-gatt: Minor coding style fix
-Date: Fri, 19 Sep 2014 09:03:24 +0200
-Message-ID: <1825689.LkuCrmbBbM@leonov>
-In-Reply-To: <1410516800-1984-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
-References: <1410516800-1984-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+From: Varka Bhadram <varkabhadram@gmail.com>
+To: linux-wpan@vger.kernel.org, linux-bluetooth@vger.kernel.org
+Cc: alan@signal11.us, Varka Bhadram <varkab@cdac.in>
+Subject: [PATCH bluetooth-next v2 3/3] mrf24j40: use pr_* / dev_* instead of printk()
+Date: Fri, 19 Sep 2014 10:15:10 +0530
+Message-Id: <1411101911-12462-4-git-send-email-varkab@cdac.in>
+In-Reply-To: <1411101911-12462-1-git-send-email-varkab@cdac.in>
+References: <1411101911-12462-1-git-send-email-varkab@cdac.in>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Grzegorz,
+Replace printk() with dev_*() pr_*()
 
-On Friday 12 of September 2014 12:13:20 Grzegorz Kolodziejczyk wrote:
-> ---
->  android/tester-gatt.c | 69
-> ++++++++++++++++++++------------------------------- 1 file changed, 27
-> insertions(+), 42 deletions(-)
-> 
-> diff --git a/android/tester-gatt.c b/android/tester-gatt.c
-> index f22cdae..2292f87 100644
-> --- a/android/tester-gatt.c
-> +++ b/android/tester-gatt.c
-> @@ -21,8 +21,8 @@
->  #include "tester-main.h"
->  #include "src/shared/util.h"
-> 
-> -#define L2CAP_ATT_EXCHANGE_MTU_REQ		0x02
-> -#define L2CAP_ATT_EXCHANGE_MTU_RSP		0x03
-> +#define L2CAP_ATT_EXCHANGE_MTU_REQ	0x02
-> +#define L2CAP_ATT_EXCHANGE_MTU_RSP	0x03
-> 
->  #define GATT_STATUS_SUCCESS	0x00000000
->  #define GATT_STATUS_FAILURE	0x00000101
-> @@ -35,10 +35,9 @@
-> 
->  #define data(args...) ((const unsigned char[]) { args })
-> 
-> -#define raw_pdu(args...)					\
-> -	{							\
-> -		.data = data(args),				\
-> -		.size = sizeof(data(args)),			\
-> +#define raw_pdu(args...) { \
-> +		.data = data(args), \
-> +		.size = sizeof(data(args)), \
->  	}
+Signed-off-by: Varka Bhadram <varkab@cdac.in>
+---
+ drivers/net/ieee802154/mrf24j40.c |   15 +++++++--------
+ 1 file changed, 7 insertions(+), 8 deletions(-)
 
-I've removed this raw_pdu chunk (since I find original code more readable) and 
-pushed the patch. Thanks.
-
-
->  #define end_pdu { .data = NULL }
-> @@ -652,8 +651,7 @@ static struct test_case test_cases[] = {
->  		CLLBACK_GATTC_SCAN_RES(prop_emu_remotes_default_set, 1, TRUE),
->  		ACTION_SUCCESS(gatt_client_stop_scan_action,
->  							INT_TO_PTR(CLIENT1_ID)),
-> -		ACTION_SUCCESS(gatt_client_connect_action,
-> -							&client1_conn_req),
-> +		ACTION_SUCCESS(gatt_client_connect_action, &client1_conn_req),
->  		CALLBACK_GATTC_CONNECT(GATT_STATUS_SUCCESS,
->  						prop_emu_remotes_default_set,
->  						CONN1_ID, CLIENT1_ID),
-> @@ -673,8 +671,7 @@ static struct test_case test_cases[] = {
->  		CLLBACK_GATTC_SCAN_RES(prop_emu_remotes_default_set, 1, TRUE),
->  		ACTION_SUCCESS(gatt_client_stop_scan_action,
->  							INT_TO_PTR(CLIENT1_ID)),
-> -		ACTION_SUCCESS(gatt_client_connect_action,
-> -							&client1_conn_req),
-> +		ACTION_SUCCESS(gatt_client_connect_action, &client1_conn_req),
->  		CALLBACK_GATTC_CONNECT(GATT_STATUS_SUCCESS,
->  						prop_emu_remotes_default_set,
->  						CONN1_ID, CLIENT1_ID),
-> @@ -811,8 +808,7 @@ static struct test_case test_cases[] = {
->  		CLLBACK_GATTC_SCAN_RES(prop_emu_remotes_default_set, 1, TRUE),
->  		ACTION_SUCCESS(gatt_client_stop_scan_action,
->  							INT_TO_PTR(CLIENT1_ID)),
-> -		ACTION_SUCCESS(gatt_client_connect_action,
-> -							&client1_conn_req),
-> +		ACTION_SUCCESS(gatt_client_connect_action, &client1_conn_req),
->  		CALLBACK_GATTC_CONNECT(GATT_STATUS_SUCCESS,
->  						prop_emu_remotes_default_set,
->  						CONN1_ID, CLIENT1_ID),
-> @@ -836,8 +832,7 @@ static struct test_case test_cases[] = {
->  		CLLBACK_GATTC_SCAN_RES(prop_emu_remotes_default_set, 1, TRUE),
->  		ACTION_SUCCESS(gatt_client_stop_scan_action,
->  							INT_TO_PTR(CLIENT1_ID)),
-> -		ACTION_SUCCESS(gatt_client_connect_action,
-> -							&client1_conn_req),
-> +		ACTION_SUCCESS(gatt_client_connect_action, &client1_conn_req),
->  		CALLBACK_GATTC_CONNECT(GATT_STATUS_SUCCESS,
->  						prop_emu_remotes_default_set,
->  						CONN1_ID, CLIENT1_ID),
-> @@ -862,8 +857,7 @@ static struct test_case test_cases[] = {
->  		CLLBACK_GATTC_SCAN_RES(prop_emu_remotes_default_set, 1, TRUE),
->  		ACTION_SUCCESS(gatt_client_stop_scan_action,
->  							INT_TO_PTR(CLIENT1_ID)),
-> -		ACTION_SUCCESS(gatt_client_connect_action,
-> -							&client1_conn_req),
-> +		ACTION_SUCCESS(gatt_client_connect_action, &client1_conn_req),
->  		CALLBACK_GATTC_CONNECT(GATT_STATUS_SUCCESS,
->  						prop_emu_remotes_default_set,
->  						CONN1_ID, CLIENT1_ID),
-> @@ -886,8 +880,7 @@ static struct test_case test_cases[] = {
->  		CLLBACK_GATTC_SCAN_RES(prop_emu_remotes_default_set, 1, TRUE),
->  		ACTION_SUCCESS(gatt_client_stop_scan_action,
->  							INT_TO_PTR(CLIENT1_ID)),
-> -		ACTION_SUCCESS(gatt_client_connect_action,
-> -							&client1_conn_req),
-> +		ACTION_SUCCESS(gatt_client_connect_action, &client1_conn_req),
->  		CALLBACK_GATTC_CONNECT(GATT_STATUS_SUCCESS,
->  						prop_emu_remotes_default_set,
->  						CONN1_ID, CLIENT1_ID),
-> @@ -914,8 +907,7 @@ static struct test_case test_cases[] = {
->  		CLLBACK_GATTC_SCAN_RES(prop_emu_remotes_default_set, 1, TRUE),
->  		ACTION_SUCCESS(gatt_client_stop_scan_action,
->  							INT_TO_PTR(CLIENT1_ID)),
-> -		ACTION_SUCCESS(gatt_client_connect_action,
-> -							&client1_conn_req),
-> +		ACTION_SUCCESS(gatt_client_connect_action, &client1_conn_req),
->  		CALLBACK_GATTC_CONNECT(GATT_STATUS_SUCCESS,
->  						prop_emu_remotes_default_set,
->  						CONN1_ID, CLIENT1_ID),
-> @@ -924,7 +916,8 @@ static struct test_case test_cases[] = {
->  		ACTION_FAIL(gatt_client_get_characteristic_action,
->  							&get_char_data_2),
->  		CALLBACK_GATTC_GET_CHARACTERISTIC_CB(GATT_STATUS_FAILURE,
-> -				CONN1_ID, &service_2, NULL, 0),
-> +							CONN1_ID, &service_2,
-> +							NULL, 0),
->  		ACTION_SUCCESS(bluetooth_disable_action, NULL),
->  		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_OFF),
->  	),
-> @@ -942,8 +935,7 @@ static struct test_case test_cases[] = {
->  		CLLBACK_GATTC_SCAN_RES(prop_emu_remotes_default_set, 1, TRUE),
->  		ACTION_SUCCESS(gatt_client_stop_scan_action,
->  							INT_TO_PTR(CLIENT1_ID)),
-> -		ACTION_SUCCESS(gatt_client_connect_action,
-> -							&client1_conn_req),
-> +		ACTION_SUCCESS(gatt_client_connect_action, &client1_conn_req),
->  		CALLBACK_GATTC_CONNECT(GATT_STATUS_SUCCESS,
->  						prop_emu_remotes_default_set,
->  						CONN1_ID, CLIENT1_ID),
-> @@ -968,14 +960,12 @@ static struct test_case test_cases[] = {
->  		ACTION_SUCCESS(emu_set_connect_cb_action, gatt_conn_cb),
->  		ACTION_SUCCESS(gatt_client_register_action, &client_app_uuid),
->  		CALLBACK_STATUS(CB_GATTC_REGISTER_CLIENT, BT_STATUS_SUCCESS),
-> -
->  		ACTION_SUCCESS(gatt_client_start_scan_action,
->  							INT_TO_PTR(CLIENT1_ID)),
->  		CLLBACK_GATTC_SCAN_RES(prop_emu_remotes_default_set, 1, TRUE),
->  		ACTION_SUCCESS(gatt_client_stop_scan_action,
->  							INT_TO_PTR(CLIENT1_ID)),
-> -		ACTION_SUCCESS(gatt_client_connect_action,
-> -							&client1_conn_req),
-> +		ACTION_SUCCESS(gatt_client_connect_action, &client1_conn_req),
->  		CALLBACK_GATTC_CONNECT(GATT_STATUS_SUCCESS,
->  						prop_emu_remotes_default_set,
->  						CONN1_ID, CLIENT1_ID),
-> @@ -984,13 +974,16 @@ static struct test_case test_cases[] = {
->  		ACTION_SUCCESS(gatt_client_get_characteristic_action,
->  							&get_char_data_1),
->  		CALLBACK_GATTC_GET_CHARACTERISTIC_CB(GATT_STATUS_SUCCESS,
-> -				CONN1_ID, &service_1, &characteristic_1, 4),
-> +							CONN1_ID, &service_1,
-> +							&characteristic_1, 4),
->  		ACTION_SUCCESS(gatt_client_get_descriptor, &get_desc_data_1),
->  		CALLBACK_GATTC_GET_DESCRIPTOR(GATT_STATUS_SUCCESS, CONN1_ID,
-> -				&service_1, &characteristic_1, &desc_1),
-> +						&service_1, &characteristic_1,
-> +						&desc_1),
->  		ACTION_SUCCESS(gatt_client_get_descriptor, &get_desc_data_2),
->  		CALLBACK_GATTC_GET_DESCRIPTOR(GATT_STATUS_SUCCESS, CONN1_ID,
-> -					&service_1, &characteristic_1, &desc_2),
-> +						&service_1, &characteristic_1,
-> +						&desc_2),
->  		ACTION_SUCCESS(bluetooth_disable_action, NULL),
->  		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_OFF),
->  	),
-> @@ -1003,14 +996,12 @@ static struct test_case test_cases[] = {
->  		ACTION_SUCCESS(emu_set_connect_cb_action, gatt_conn_cb),
->  		ACTION_SUCCESS(gatt_client_register_action, &client_app_uuid),
->  		CALLBACK_STATUS(CB_GATTC_REGISTER_CLIENT, BT_STATUS_SUCCESS),
-> -
->  		ACTION_SUCCESS(gatt_client_start_scan_action,
->  							INT_TO_PTR(CLIENT1_ID)),
->  		CLLBACK_GATTC_SCAN_RES(prop_emu_remotes_default_set, 1, TRUE),
->  		ACTION_SUCCESS(gatt_client_stop_scan_action,
->  							INT_TO_PTR(CLIENT1_ID)),
-> -		ACTION_SUCCESS(gatt_client_connect_action,
-> -							&client1_conn_req),
-> +		ACTION_SUCCESS(gatt_client_connect_action, &client1_conn_req),
->  		CALLBACK_GATTC_CONNECT(GATT_STATUS_SUCCESS,
->  						prop_emu_remotes_default_set,
->  						CONN1_ID, CLIENT1_ID),
-> @@ -1035,14 +1026,12 @@ static struct test_case test_cases[] = {
->  		ACTION_SUCCESS(emu_set_connect_cb_action, gatt_conn_cb),
->  		ACTION_SUCCESS(gatt_client_register_action, &client_app_uuid),
->  		CALLBACK_STATUS(CB_GATTC_REGISTER_CLIENT, BT_STATUS_SUCCESS),
-> -
->  		ACTION_SUCCESS(gatt_client_start_scan_action,
->  							INT_TO_PTR(CLIENT1_ID)),
->  		CLLBACK_GATTC_SCAN_RES(prop_emu_remotes_default_set, 1, TRUE),
->  		ACTION_SUCCESS(gatt_client_stop_scan_action,
->  							INT_TO_PTR(CLIENT1_ID)),
-> -		ACTION_SUCCESS(gatt_client_connect_action,
-> -							&client1_conn_req),
-> +		ACTION_SUCCESS(gatt_client_connect_action, &client1_conn_req),
->  		CALLBACK_GATTC_CONNECT(GATT_STATUS_SUCCESS,
->  						prop_emu_remotes_default_set,
->  						CONN1_ID, CLIENT1_ID),
-> @@ -1063,14 +1052,12 @@ static struct test_case test_cases[] = {
->  		ACTION_SUCCESS(emu_set_connect_cb_action, gatt_conn_cb),
->  		ACTION_SUCCESS(gatt_client_register_action, &client_app_uuid),
->  		CALLBACK_STATUS(CB_GATTC_REGISTER_CLIENT, BT_STATUS_SUCCESS),
-> -
->  		ACTION_SUCCESS(gatt_client_start_scan_action,
->  							INT_TO_PTR(CLIENT1_ID)),
->  		CLLBACK_GATTC_SCAN_RES(prop_emu_remotes_default_set, 1, TRUE),
->  		ACTION_SUCCESS(gatt_client_stop_scan_action,
->  							INT_TO_PTR(CLIENT1_ID)),
-> -		ACTION_SUCCESS(gatt_client_connect_action,
-> -							&client1_conn_req),
-> +		ACTION_SUCCESS(gatt_client_connect_action, &client1_conn_req),
->  		CALLBACK_GATTC_CONNECT(GATT_STATUS_SUCCESS,
->  						prop_emu_remotes_default_set,
->  						CONN1_ID, CLIENT1_ID),
-> @@ -1091,14 +1078,12 @@ static struct test_case test_cases[] = {
->  		ACTION_SUCCESS(emu_set_connect_cb_action, gatt_conn_cb),
->  		ACTION_SUCCESS(gatt_client_register_action, &client_app_uuid),
->  		CALLBACK_STATUS(CB_GATTC_REGISTER_CLIENT, BT_STATUS_SUCCESS),
-> -
->  		ACTION_SUCCESS(gatt_client_start_scan_action,
->  							INT_TO_PTR(CLIENT1_ID)),
->  		CLLBACK_GATTC_SCAN_RES(prop_emu_remotes_default_set, 1, TRUE),
->  		ACTION_SUCCESS(gatt_client_stop_scan_action,
->  							INT_TO_PTR(CLIENT1_ID)),
-> -		ACTION_SUCCESS(gatt_client_connect_action,
-> -							&client1_conn_req),
-> +		ACTION_SUCCESS(gatt_client_connect_action, &client1_conn_req),
->  		CALLBACK_GATTC_CONNECT(GATT_STATUS_SUCCESS,
->  						prop_emu_remotes_default_set,
->  						CONN1_ID, CLIENT1_ID),
-> @@ -1106,7 +1091,7 @@ static struct test_case test_cases[] = {
->  		CALLBACK_GATTC_SEARCH_COMPLETE(GATT_STATUS_SUCCESS, CONN1_ID),
->  		ACTION_SUCCESS(gatt_client_get_included, &get_incl_data_1),
->  		CALLBACK_GATTC_GET_INCLUDED(GATT_STATUS_FAILURE, CONN1_ID,
-> -						&service_1, NULL),
-> +							&service_1, NULL),
->  		ACTION_SUCCESS(bluetooth_disable_action, NULL),
->  		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_OFF),
->  	),
-
+diff --git a/drivers/net/ieee802154/mrf24j40.c b/drivers/net/ieee802154/mrf24j40.c
+index 2c617e3..c7f638c 100644
+--- a/drivers/net/ieee802154/mrf24j40.c
++++ b/drivers/net/ieee802154/mrf24j40.c
+@@ -323,8 +323,8 @@ static int mrf24j40_read_rx_buf(struct mrf24j40 *devrec,
+ #ifdef DEBUG
+ 	print_hex_dump(KERN_DEBUG, "mrf24j40 rx: ",
+ 		DUMP_PREFIX_OFFSET, 16, 1, data, *len, 0);
+-	printk(KERN_DEBUG "mrf24j40 rx: lqi: %02hhx rssi: %02hhx\n",
+-		lqi_rssi[0], lqi_rssi[1]);
++	pr_debug("mrf24j40 rx: lqi: %02hhx rssi: %02hhx\n",
++		 lqi_rssi[0], lqi_rssi[1]);
+ #endif
+ 
+ out:
+@@ -385,7 +385,7 @@ err:
+ static int mrf24j40_ed(struct ieee802154_dev *dev, u8 *level)
+ {
+ 	/* TODO: */
+-	printk(KERN_WARNING "mrf24j40: ed not implemented\n");
++	pr_warn("mrf24j40: ed not implemented\n");
+ 	*level = 0;
+ 	return 0;
+ }
+@@ -481,12 +481,11 @@ static int mrf24j40_filter(struct ieee802154_dev *dev,
+ 		memcpy(addr, &filt->ieee_addr, 8);
+ 		for (i = 0; i < 8; i++)
+ 			write_short_reg(devrec, REG_EADR0 + i, addr[i]);
+-
+ #ifdef DEBUG
+-		printk(KERN_DEBUG "Set long addr to: ");
++		pr_debug("Set long addr to: ");
+ 		for (i = 0; i < 8; i++)
+-			printk("%02hhx ", addr[7 - i]);
+-		printk(KERN_DEBUG "\n");
++			pr_debug("%02hhx ", addr[7 - i]);
++		pr_debug("\n");
+ #endif
+ 	}
+ 
+@@ -702,7 +701,7 @@ static int mrf24j40_probe(struct spi_device *spi)
+ 	int ret = -ENOMEM;
+ 	struct mrf24j40 *devrec;
+ 
+-	printk(KERN_INFO "mrf24j40: probe(). IRQ: %d\n", spi->irq);
++	dev_info(&spi->dev, "probe(). IRQ: %d\n", spi->irq);
+ 
+ 	devrec = devm_kzalloc(&spi->dev, sizeof(struct mrf24j40), GFP_KERNEL);
+ 	if (!devrec)
 -- 
-BR
-Szymon Janc
+1.7.9.5
+
