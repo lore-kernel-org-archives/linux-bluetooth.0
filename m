@@ -2,130 +2,148 @@ Return-Path: <cyrus@holtmann.org>
 From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH 3/6] android/handsfree-client: Implement hf client events
-Date: Fri, 19 Sep 2014 16:30:48 +0200
-Message-Id: <1411137051-28904-4-git-send-email-lukasz.rymanowski@tieto.com>
+Subject: [PATCH 4/6] android/handsfree-client: Implement hf client events
+Date: Fri, 19 Sep 2014 16:30:49 +0200
+Message-Id: <1411137051-28904-5-git-send-email-lukasz.rymanowski@tieto.com>
 In-Reply-To: <1411137051-28904-1-git-send-email-lukasz.rymanowski@tieto.com>
 References: <1411137051-28904-1-git-send-email-lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 This patch implements skeleton for following events:
-1. Connection State event
-2. Audio Connection State event
-3. Voice Recognition State event
+1. Network State event
+2. Network Roaming State event
+3. Network Signal Strenght event
+4. Battery Level event
+5. Operator Name event
 ---
- android/hal-handsfree-client.c | 33 +++++++++++++++++++++++++++
- android/hal-msg.h              | 51 ++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 84 insertions(+)
+ android/hal-handsfree-client.c | 66 ++++++++++++++++++++++++++++++++++++++++++
+ android/hal-msg.h              | 32 ++++++++++++++++++++
+ 2 files changed, 98 insertions(+)
 
 diff --git a/android/hal-handsfree-client.c b/android/hal-handsfree-client.c
-index 98b6cb6..f788f68 100644
+index f788f68..c33f7bc 100644
 --- a/android/hal-handsfree-client.c
 +++ b/android/hal-handsfree-client.c
-@@ -35,11 +35,44 @@ static bool interface_ready(void)
- 	return cbs != NULL;
+@@ -60,6 +60,57 @@ static void handle_vr_state(void *buf, uint16_t len, int fd)
+ 		cbs->vr_cmd_cb(ev->state);
  }
  
-+static void handle_conn_state(void *buf, uint16_t len, int fd)
++static void handle_network_state(void *buf, uint16_t len, int fd)
 +{
-+	struct hal_ev_hf_client_conn_state *ev = buf;
++	struct hal_ev_hf_client_net_state *ev = buf;
 +
-+	if (cbs->connection_state_cb)
-+		cbs->connection_state_cb(ev->state, ev->peer_feat,
-+				ev->chld_feat, (bt_bdaddr_t *) ev->bdaddr);
++	if (cbs->network_state_cb)
++		cbs->network_state_cb(ev->state);
 +}
 +
-+static void handle_audio_state(void *buf, uint16_t len, int fd)
++static void handle_network_roaming(void *buf, uint16_t len, int fd)
 +{
-+	struct hal_ev_hf_client_audio_state *ev = buf;
++	struct hal_ev_hf_client_net_roaming_type *ev = buf;
 +
-+	if (cbs->audio_state_cb)
-+		cbs->audio_state_cb(ev->state, (bt_bdaddr_t *) (ev->bdaddr));
++	if (cbs->network_roaming_cb)
++		cbs->network_roaming_cb(ev->state);
 +}
 +
-+static void handle_vr_state(void *buf, uint16_t len, int fd)
++static void handle_network_signal(void *buf, uint16_t len, int fd)
 +{
-+	struct hal_ev_hf_client_vr_state *ev = buf;
++	struct hal_ev_hf_client_net_signal_strength *ev = buf;
 +
-+	if (cbs->vr_cmd_cb)
-+		cbs->vr_cmd_cb(ev->state);
++	if (cbs->network_signal_cb)
++		cbs->network_signal_cb(ev->signal_strength);
++}
++
++static void handle_battery_level(void *buf, uint16_t len, int fd)
++{
++	struct hal_ev_hf_client_battery_level *ev = buf;
++
++	if (cbs->battery_level_cb)
++		cbs->battery_level_cb(ev->battery_level);
++}
++
++static void handle_operator_name(void *buf, uint16_t len, int fd)
++{
++	struct hal_ev_hf_client_operator_name *ev = buf;
++	uint16_t name_len = ev->name_len;
++	char *name = NULL;
++
++	if (len != sizeof(*ev) + name_len ||
++		(name_len != 0 && ev->name[name_len - 1] != '\0')) {
++		error("invalid  clip, aborting");
++		exit(EXIT_FAILURE);
++	}
++
++	if (name_len)
++		name = (char *) ev->name;
++
++	if (cbs->current_operator_cb)
++		cbs->current_operator_cb(name);
 +}
 +
  /*
   * handlers will be called from notification thread context,
   * index in table equals to 'opcode - HAL_MINIMUM_EVENT'
-  */
- static const struct hal_ipc_handler ev_handlers[] = {
-+	/* HAL_EV_HF_CLIENT_CONN_STATE */
-+	{ handle_conn_state, false,
-+				sizeof(struct hal_ev_hf_client_conn_state) },
-+	/* HAL_EV_HF_CLIENT_AUDIO_STATE */
-+	{ handle_audio_state, false,
-+				sizeof(struct hal_ev_hf_client_audio_state) },
-+	/* HAL_EV_HF_CLIENT_VR_STATE */
-+	{ handle_vr_state, false, sizeof(struct hal_ev_hf_client_vr_state) },
+@@ -73,6 +124,21 @@ static const struct hal_ipc_handler ev_handlers[] = {
+ 				sizeof(struct hal_ev_hf_client_audio_state) },
+ 	/* HAL_EV_HF_CLIENT_VR_STATE */
+ 	{ handle_vr_state, false, sizeof(struct hal_ev_hf_client_vr_state) },
++	/*HAL_EV_HF_CLIENT_NET_STATE */
++	{ handle_network_state, false,
++				sizeof(struct hal_ev_hf_client_net_state)},
++	/*HAL_EV_HF_CLIENT_NET_ROAMING_TYPE */
++	{ handle_network_roaming, false,
++			sizeof(struct hal_ev_hf_client_net_roaming_type) },
++	/* HAL_EV_HF_CLIENT_NET_SIGNAL_STRENGTH */
++	{ handle_network_signal, false,
++			sizeof(struct hal_ev_hf_client_net_signal_strength) },
++	/* HAL_EV_HF_CLIENT_BATTERY_LEVEL */
++	{ handle_battery_level, false,
++			sizeof(struct hal_ev_hf_client_battery_level) },
++	/* HAL_EV_HF_CLIENT_OPERATOR_NAME */
++	{ handle_operator_name, true,
++			sizeof(struct hal_ev_hf_client_operator_name) },
  };
  
  static bt_status_t init(bthf_client_callbacks_t *callbacks)
 diff --git a/android/hal-msg.h b/android/hal-msg.h
-index eba47df..295bf58 100644
+index 295bf58..53f3f51 100644
 --- a/android/hal-msg.h
 +++ b/android/hal-msg.h
-@@ -1695,3 +1695,54 @@ struct hal_ev_gatt_server_rsp_confirmation {
- #define HAL_GATT_AUTHENTICATION_NONE		0
- #define HAL_GATT_AUTHENTICATION_NO_MITM		1
- #define HAL_GATT_AUTHENTICATION_MITM		2
+@@ -1746,3 +1746,35 @@ struct hal_ev_hf_client_audio_state {
+ struct hal_ev_hf_client_vr_state {
+ 	uint8_t state;
+ } __attribute__((packed));
 +
-+#define HAL_HF_CLIENT_CONN_STATE_DISCONNECTED		0x00
-+#define HAL_HF_CLIENT_CONN_STATE_CONNECTING		0x01
-+#define HAL_HF_CLIENT_CONN_STATE_SLC_CONNECTED		0x02
-+#define HAL_HF_CLIENT_CONN_STATE_DISCONNECTING		0x03
++#define HAL_HF_CLIENT_NET_NOT_AVAILABLE		0x00
++#define HAL_HF_CLIENT_NET_AVAILABLE		0x01
 +
-+#define HAL_HF_CLIENT_PEER_FEAT_3WAY		0x00000001
-+#define HAL_HF_CLIENT_PEER_FEAT_ECNR		0x00000002
-+#define HAL_HF_CLIENT_PEER_FEAT_VREC		0x00000004
-+#define HAL_HF_CLIENT_PEER_FEAT_INBAND		0x00000008
-+#define HAL_HF_CLIENT_PEER_FEAT_VTAG		0x00000010
-+#define HAL_HF_CLIENT_PEER_FEAT_REJECT		0x00000020
-+#define HAL_HF_CLIENT_PEER_FEAT_ECS		0x00000040
-+#define HAL_HF_CLIENT_PEER_FEAT_ECC		0x00000080
-+#define HAL_HF_CLIENT_PEER_FEAT_EXTERR		0x00000100
-+#define HAL_HF_CLIENT_PEER_FEAT_CODEC		0x00000200
-+
-+#define HAL_HF_CLIENT_CHLD_FEAT_REL		0x00000001
-+#define HAL_HF_CLIENT_CHLD_FEAT_REL_ACC		0x00000002
-+#define HAL_HF_CLIENT_CHLD_FEAT_REL_X		0x00000004
-+#define HAL_HF_CLIENT_CHLD_FEAT_HOLD_ACC	0x00000008
-+#define HAL_HF_CLIENT_CHLD_FEAT_PRIV_X		0x00000010
-+#define HAL_HF_CLIENT_CHLD_FEAT_MERGE		0x00000020
-+#define HAL_HF_CLIENT_CHLD_FEAT_MERGE_DETACH	0x00000040
-+
-+#define HAL_EV_HF_CLIENT_CONN_STATE			0x81
-+struct hal_ev_hf_client_conn_state {
++#define HAL_EV_HF_CLIENT_NET_STATE			0x84
++struct hal_ev_hf_client_net_state {
 +	uint8_t state;
-+	uint32_t peer_feat;
-+	uint32_t chld_feat;
-+	uint8_t bdaddr[6];
 +} __attribute__((packed));
 +
-+#define HAL_HF_CLIENT_AUDIO_STATE_DISCONNECTED		0x00
-+#define HAL_HF_CLIENT_AUDIO_STATE_CONNECTING		0x01
-+#define HAL_HF_CLIENT_AUDIO_STATE_CONNECTED		0x02
-+#define HAL_HF_CLIENT_AUDIO_STATE_CONNECTED_MSBC	0x03
++#define HAL_HF_CLIENT_NET_ROAMING_TYPE_HOME		0x00
++#define HAL_HF_CLIENT_NET_ROAMING_TYPE_ROAMING		0x01
 +
-+#define HAL_EV_HF_CLIENT_AUDIO_STATE			0x82
-+struct hal_ev_hf_client_audio_state {
++#define HAL_EV_HF_CLIENT_NET_ROAMING_TYPE		0x85
++struct hal_ev_hf_client_net_roaming_type {
 +	uint8_t state;
-+	uint8_t bdaddr[6];
 +} __attribute__((packed));
 +
-+#define HAL_HF_CLIENT_VR_STOPPED	0x00
-+#define HAL_HF_CLIENT_VR_STARTED	0x01
++#define HAL_EV_HF_CLIENT_NET_SIGNAL_STRENGTH		0x86
++struct hal_ev_hf_client_net_signal_strength {
++	uint8_t signal_strength;
++} __attribute__((packed));
 +
-+#define HAL_EV_HF_CLIENT_VR_STATE			0x83
-+struct hal_ev_hf_client_vr_state {
-+	uint8_t state;
++#define HAL_EV_HF_CLIENT_BATTERY_LEVEL			0x87
++struct hal_ev_hf_client_battery_level {
++	uint8_t battery_level;
++} __attribute__((packed));
++
++#define HAL_EV_HF_CLIENT_OPERATOR_NAME			0x88
++struct hal_ev_hf_client_operator_name {
++	uint16_t name_len;
++	uint8_t name[0];
 +} __attribute__((packed));
 -- 
 1.8.4
