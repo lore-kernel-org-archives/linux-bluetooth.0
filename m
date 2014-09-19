@@ -2,48 +2,195 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH 03/13] android/hal-audio: Fix compilation errors with musl
-Date: Fri, 19 Sep 2014 16:10:06 +0200
-Message-Id: <1411135816-18966-4-git-send-email-szymon.janc@tieto.com>
+Subject: [PATCH 04/13] tools: Fix compilation errors  with musl
+Date: Fri, 19 Sep 2014 16:10:07 +0200
+Message-Id: <1411135816-18966-5-git-send-email-szymon.janc@tieto.com>
 In-Reply-To: <1411135816-18966-1-git-send-email-szymon.janc@tieto.com>
 References: <1411135816-18966-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-  CC       android/android_audio_a2dp_default_la-hal-audio-sbc.lo
-android/hal-audio-sbc.c: In function 'sbc_codec_init':
-android/hal-audio-sbc.c:269:2: error: implicit declaration of function
-    'calloc' [-Werror=implicit-function-declaration]
-  sbc_data = calloc(sizeof(struct sbc_data), 1);
-  ^
-android/hal-audio-sbc.c:269:13: error: incompatible implicit
-    declaration of built-in function 'calloc' [-Werror]
-  sbc_data = calloc(sizeof(struct sbc_data), 1);
-             ^
-android/hal-audio-sbc.c: In function 'sbc_cleanup':
-android/hal-audio-sbc.c:291:2: error: implicit declaration of function
-   'free' [-Werror=implicit-function-declaration]
-  free(codec_data);
-  ^
-android/hal-audio-sbc.c:291:2: error: incompatible implicit declaration
-    of built-in function 'free' [-Werror]
-cc1: all warnings being treated as errors
----
- android/hal-audio-sbc.c | 1 +
- 1 file changed, 1 insertion(+)
+This fix number of includes for <sys/poll.h> instead of <poll.h>
 
-diff --git a/android/hal-audio-sbc.c b/android/hal-audio-sbc.c
-index 0c31035..7ad3a6a 100644
---- a/android/hal-audio-sbc.c
-+++ b/android/hal-audio-sbc.c
-@@ -18,6 +18,7 @@
+  CC       tools/hciattach.o
+In file included from tools/hciattach.c:41:0:
+/usr/include/sys/poll.h:1:2: error: #warning redirecting incorrect
+   #include <sys/poll.h> to <poll.h> [-Werror=cpp]
+ #warning redirecting incorrect #include <sys/poll.h> to <poll.h>
+  ^
+---
+ tools/amptest.c            | 2 +-
+ tools/btattach.c           | 2 +-
+ tools/btsnoop.c            | 1 +
+ tools/ciptool.c            | 2 +-
+ tools/cltest.c             | 2 +-
+ tools/hciattach.c          | 2 +-
+ tools/hciattach_qualcomm.c | 2 +-
+ tools/hciattach_tialt.c    | 2 +-
+ tools/hcidump.c            | 2 +-
+ tools/l2ping.c             | 2 +-
+ tools/l2test.c             | 2 +-
+ tools/rfcomm.c             | 2 +-
+ 12 files changed, 12 insertions(+), 11 deletions(-)
+
+diff --git a/tools/amptest.c b/tools/amptest.c
+index 6192f7e..bba0a9a 100644
+--- a/tools/amptest.c
++++ b/tools/amptest.c
+@@ -32,7 +32,7 @@
+ #include <alloca.h>
+ #include <stdlib.h>
+ #include <stdbool.h>
+-#include <sys/poll.h>
++#include <poll.h>
+ #include <sys/ioctl.h>
+ #include <sys/socket.h>
+ 
+diff --git a/tools/btattach.c b/tools/btattach.c
+index 9458fd7..bdbbe16 100644
+--- a/tools/btattach.c
++++ b/tools/btattach.c
+@@ -35,7 +35,7 @@
+ #include <getopt.h>
+ #include <termios.h>
+ #include <sys/ioctl.h>
+-#include <sys/poll.h>
++#include <poll.h>
+ 
+ #include <bluetooth/bluetooth.h>
+ #include <bluetooth/hci.h>
+diff --git a/tools/btsnoop.c b/tools/btsnoop.c
+index 14581f2..71191eb 100644
+--- a/tools/btsnoop.c
++++ b/tools/btsnoop.c
+@@ -35,6 +35,7 @@
  #include <stdbool.h>
  #include <string.h>
- #include <malloc.h>
-+#include <stdlib.h>
+ #include <getopt.h>
++#include <endian.h>
+ #include <arpa/inet.h>
+ #include <sys/stat.h>
  
- #include <sbc/sbc.h>
- #include "audio-msg.h"
+diff --git a/tools/ciptool.c b/tools/ciptool.c
+index 72338dc..3ff9fb1 100644
+--- a/tools/ciptool.c
++++ b/tools/ciptool.c
+@@ -32,7 +32,7 @@
+ #include <string.h>
+ #include <getopt.h>
+ #include <signal.h>
+-#include <sys/poll.h>
++#include <poll.h>
+ #include <sys/ioctl.h>
+ #include <sys/socket.h>
+ 
+diff --git a/tools/cltest.c b/tools/cltest.c
+index 4ddb98a..0231805 100644
+--- a/tools/cltest.c
++++ b/tools/cltest.c
+@@ -32,7 +32,7 @@
+ #include <alloca.h>
+ #include <stdlib.h>
+ #include <stdbool.h>
+-#include <sys/poll.h>
++#include <poll.h>
+ #include <sys/ioctl.h>
+ #include <sys/socket.h>
+ 
+diff --git a/tools/hciattach.c b/tools/hciattach.c
+index 1904ac5..d8ef7e7 100644
+--- a/tools/hciattach.c
++++ b/tools/hciattach.c
+@@ -37,8 +37,8 @@
+ #include <syslog.h>
+ #include <termios.h>
+ #include <time.h>
++#include <poll.h>
+ #include <sys/time.h>
+-#include <sys/poll.h>
+ #include <sys/param.h>
+ #include <sys/ioctl.h>
+ 
+diff --git a/tools/hciattach_qualcomm.c b/tools/hciattach_qualcomm.c
+index eb72a0f..0e25905 100644
+--- a/tools/hciattach_qualcomm.c
++++ b/tools/hciattach_qualcomm.c
+@@ -36,8 +36,8 @@
+ #include <syslog.h>
+ #include <termios.h>
+ #include <time.h>
++#include <poll.h>
+ #include <sys/time.h>
+-#include <sys/poll.h>
+ #include <sys/param.h>
+ #include <sys/ioctl.h>
+ #include <sys/uio.h>
+diff --git a/tools/hciattach_tialt.c b/tools/hciattach_tialt.c
+index 5c7f3a5..a7c1706 100644
+--- a/tools/hciattach_tialt.c
++++ b/tools/hciattach_tialt.c
+@@ -35,8 +35,8 @@
+ #include <syslog.h>
+ #include <termios.h>
+ #include <time.h>
++#include <poll.h>
+ #include <sys/time.h>
+-#include <sys/poll.h>
+ #include <sys/param.h>
+ #include <sys/ioctl.h>
+ #include <sys/uio.h>
+diff --git a/tools/hcidump.c b/tools/hcidump.c
+index 37a9f00..8839eb0 100644
+--- a/tools/hcidump.c
++++ b/tools/hcidump.c
+@@ -33,7 +33,7 @@
+ #include <stdlib.h>
+ #include <string.h>
+ #include <getopt.h>
+-#include <sys/poll.h>
++#include <poll.h>
+ #include <sys/stat.h>
+ #include <sys/types.h>
+ #include <sys/ioctl.h>
+diff --git a/tools/l2ping.c b/tools/l2ping.c
+index 29fb3d0..3dd437e 100644
+--- a/tools/l2ping.c
++++ b/tools/l2ping.c
+@@ -35,7 +35,7 @@
+ #include <getopt.h>
+ #include <signal.h>
+ #include <sys/time.h>
+-#include <sys/poll.h>
++#include <poll.h>
+ #include <sys/socket.h>
+ 
+ #include <bluetooth/bluetooth.h>
+diff --git a/tools/l2test.c b/tools/l2test.c
+index 67ca70a..71ad109 100644
+--- a/tools/l2test.c
++++ b/tools/l2test.c
+@@ -38,7 +38,7 @@
+ #include <syslog.h>
+ #include <signal.h>
+ #include <sys/time.h>
+-#include <sys/poll.h>
++#include <poll.h>
+ #include <sys/ioctl.h>
+ #include <sys/socket.h>
+ 
+diff --git a/tools/rfcomm.c b/tools/rfcomm.c
+index b5bea38..659bbec 100644
+--- a/tools/rfcomm.c
++++ b/tools/rfcomm.c
+@@ -34,7 +34,7 @@
+ #include <getopt.h>
+ #include <signal.h>
+ #include <termios.h>
+-#include <sys/poll.h>
++#include <poll.h>
+ #include <sys/param.h>
+ #include <sys/ioctl.h>
+ #include <sys/socket.h>
 -- 
 1.9.3
 
