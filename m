@@ -1,6 +1,6 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <541C95E5.5020202@mlsw.biz>
-Date: Fri, 19 Sep 2014 16:45:25 -0400
+Message-ID: <541CA1EE.6070903@mlsw.biz>
+Date: Fri, 19 Sep 2014 17:36:46 -0400
 From: Nathan Jozwiak <njozwiak@mlsw.biz>
 MIME-Version: 1.0
 To: linux-bluetooth@vger.kernel.org
@@ -26,7 +26,7 @@ service for my specific application development.
 Running the gatt-service application appears to successfully register 
 the descriptor with the service:
 
-njozwiak@ubuntu:~/bluez-5.23/tools$ sudo ./gatt-service
+ubuntu:~/bluez-5.23/tools$ sudo ./gatt-service
 gatt-service unique name: :1.655
 Registered service: /service1
 Get UUID: 00001802-0000-1000-8000-00805f9b34fb
@@ -64,32 +64,32 @@ see one descriptor... the Alert Level (0x2A06).
 
 [CON][00:02:72:C9:5E:0F][LE]> primary
 attr handle: 0x0001, end grp handle: 0x0008 uuid:
-	00001800-0000-1000-8000-00805f9b34fb
+     00001800-0000-1000-8000-00805f9b34fb
 attr handle: 0x0009, end grp handle: 0x000c uuid:
-	0000a002-0000-1000-8000-00805f9b34fb
+     0000a002-0000-1000-8000-00805f9b34fb
 attr handle: 0x0010, end grp handle: 0x0010 uuid:
-	00001801-0000-1000-8000-00805f9b34fb
+     00001801-0000-1000-8000-00805f9b34fb
 attr handle: 0x001b, end grp handle: 0x0025 uuid:
-	0000a004-0000-1000-8000-00805f9b34fb
+     0000a004-0000-1000-8000-00805f9b34fb
 attr handle: 0x0026, end grp handle: 0x0028 uuid:
-	00001803-0000-1000-8000-00805f9b34fb
+     00001803-0000-1000-8000-00805f9b34fb
 attr handle: 0x0029, end grp handle: 0x002c uuid:
-	00001804-0000-1000-8000-00805f9b34fb
+     00001804-0000-1000-8000-00805f9b34fb
 attr handle: 0x002d, end grp handle: 0x002f uuid:
-	00001802-0000-1000-8000-00805f9b34fb
+     00001802-0000-1000-8000-00805f9b34fb
 attr handle: 0x0030, end grp handle: 0x0035 uuid:
-	00001805-0000-1000-8000-00805f9b34fb
+     00001805-0000-1000-8000-00805f9b34fb
 attr handle: 0x0036, end grp handle: 0x003a uuid:
-	00001806-0000-1000-8000-00805f9b34fb
+     00001806-0000-1000-8000-00805f9b34fb
 attr handle: 0x003b, end grp handle: 0x0043 uuid:
-	0000180e-0000-1000-8000-00805f9b34fb
-attr handle: 0x0044, end grp handle: 0x0050 uuid: 	
-	00001811-0000-1000-8000-00805f9b34fb
+     0000180e-0000-1000-8000-00805f9b34fb
+attr handle: 0x0044, end grp handle: 0x0050 uuid:
+     00001811-0000-1000-8000-00805f9b34fb
 attr handle: 0xfffa, end grp handle: 0xfffe uuid:
-	feee74dc-a8de-3196-1149-d43596c00a4f
+     feee74dc-a8de-3196-1149-d43596c00a4f
 [CON][00:02:72:C9:5E:0F][LE]> characteristics 0x002d 0x002f
 handle: 0x002e, char properties: 0x04, char value handle: 0x002f, uuid:
-	00002a06-0000-1000-8000-00805f9b34fb
+     00002a06-0000-1000-8000-00805f9b34fb
 [CON][00:02:72:C9:5E:0F][LE]> char-desc 0x002e 0x002f
 handle: 0x002e, uuid: 2803
 handle: 0x002f, uuid: 2a06
