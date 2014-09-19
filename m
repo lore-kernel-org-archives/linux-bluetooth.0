@@ -1,120 +1,115 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <CAEvN+1h=p3Jy0sH+8=i1z=DHF7_5OHpww2gHWwTOuTCfUpSESw@mail.gmail.com>
-References: <1410211320-16111-1-git-send-email-roylee@paypal.com>
-	<CABBYNZ+d0B1ecR1P328=X6+PVOHGuMQFV9Es82_-uDBP=b1TMw@mail.gmail.com>
-	<CAEvN+1h=p3Jy0sH+8=i1z=DHF7_5OHpww2gHWwTOuTCfUpSESw@mail.gmail.com>
-Date: Fri, 19 Sep 2014 10:41:56 -0700
-Message-ID: <CAEvN+1it1XmqUSv2dCuM_Dd4nroN+49y1EBSbCF_ppR0=iMh0g@mail.gmail.com>
-Subject: Re: [PATCH 1/3] tools: Fix usage for hciattach command
-From: Tzu-Jung Lee <roylee17@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+In-Reply-To: <CAD0=r8w035mLnWTKtEfxZ7agzwTFRO9dsv+6qdafcBG7RYzYDQ@mail.gmail.com>
+References: <CAD0=r8yozB8eMdJOuffUeQZVFVf5xEXnP5tCt+k3m0e9wzMxiA@mail.gmail.com>
+	<735FD32E-BD15-4CE1-8D9C-44B8EC56DF7A@holtmann.org>
+	<CAHrH25Q6XqsLjGyfoXwimrap9=kKHOQn-G=k4Fz6HXmEPJ7EtQ@mail.gmail.com>
+	<20140917051457.GA4671@t440s.P-661HNU-F1>
+	<CAD0=r8x-=O7XAqQF_wBHQEqSkfifzgWW2AagW2EvsDUtM-E_ow@mail.gmail.com>
+	<20140917065252.GA5554@t440s.lan>
+	<CAD0=r8z9g+F7Z9X_8PE4jk3JbA+oLj9Of33RSqxiRd0dn9AnXQ@mail.gmail.com>
+	<8868B74C-0DDD-43C1-BCBF-2578A700EF72@holtmann.org>
+	<CAD0=r8xQzhizXo4umQ_mG_WMH7Akp4bji-9PNRGzqj-7HWnyNA@mail.gmail.com>
+	<0EA633E6-A0F5-4F67-B421-9857466C1175@holtmann.org>
+	<CAD0=r8w035mLnWTKtEfxZ7agzwTFRO9dsv+6qdafcBG7RYzYDQ@mail.gmail.com>
+Date: Fri, 19 Sep 2014 09:44:37 -0700
+Message-ID: <CAD0=r8zXV-b0D6dxY2ifAx-FCa9K0SP0jwr2Bq292gbHAmHWaA@mail.gmail.com>
+Subject: Re: [RFC] need for new scan api for bluetooth low energy.
+From: Jakub Pawlowski <jpawlowski@google.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: Arman Uguray <armansito@chromium.org>,
+	BlueZ development <linux-bluetooth@vger.kernel.org>, Scott James Remnant <keybuk@google.com>
 Content-Type: text/plain; charset=UTF-8
-Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+I will be very happy with mgmt api method that will filter by serice
+uuid and RSSI value, and that's enough for me. From my use case it
+looks like the user is going to be in this scan state for short time -
+few seconds, maximum minute.
 
-Any comment for the patch 2/3 ?
+If it would be possible to also add general le scan method that would
+return all advertisements, marked as "only for development", and "not
+for use in production", and "behaves differently for different
+controllers" and maybe somehow disabled by default and you need to set
+some special flag to enable it on your developer machine then it would
+be awsome for developers that want to play with it, but it's not my
+requirement.
 
-Thanks.
-Roy
+>
+>
+> >>
+> >> The real problem is that controllers behave so different when you talk=
+ about advertising event report. So even if you have duplicate filtering on=
+ or off they have different behaviors. And that is where the real challenge=
+ comes into play here. What works on one controller just fine, might turn i=
+nto a huge battery drain on the other.
+> >>
+> >
+> > Thanks for pointing that out, I've already heard that argument from
+> > Scott before, and it'll require more investigation.
+> >
+> >> Get a few different controllers, Marvell, Intel, CSR and Broadcom and =
+play with hcitool lescan to see the different behavior they provide. You ca=
+n also write your own small little HCI program using the HCI User Channel f=
+eature we added in 3.13 and use src/shared/hci.c as helper for handling HCI=
+ commands. You really need to understand what you are getting yourself into=
+ here.
+> >
+> > I've already implemented my functionality first using BLED112 dongle,
+> > and then on linux using HCI api and tested it on two controllers, but
+> > from what I understood MGMT is the  API of future. Also I want to make
+> > it work for all controllers, not only those three.
+>
+> This is not for an official API. You can not use HCI User Channel and mgm=
+t at the time. They are mutually exclusive. Actually when opening a HCI Use=
+r Channel you will see that the controller index disappears from the mgmt i=
+nterface.
 
-On Mon, Sep 15, 2014 at 11:23 AM, Tzu-Jung Lee <roylee17@gmail.com> wrote:
-> Hi Luiz,
->
-> On Mon, Sep 15, 2014 at 12:00 AM, Luiz Augusto von Dentz
-> <luiz.dentz@gmail.com> wrote:
->> Hi,
->>
->> On Tue, Sep 9, 2014 at 12:21 AM,  <roylee17@gmail.com> wrote:
->>> From: Tzu-Jung Lee <roylee17@gmail.com>
->>>
->>> ---
->>>  tools/hciattach.c | 2 +-
->>>  1 file changed, 1 insertion(+), 1 deletion(-)
->>>
->>> diff --git a/tools/hciattach.c b/tools/hciattach.c
->>> index 1904ac5..542b5b3 100644
->>> --- a/tools/hciattach.c
->>> +++ b/tools/hciattach.c
->>> @@ -1276,7 +1276,7 @@ static void usage(void)
->>>  {
->>>         printf("hciattach - HCI UART driver initialization utility\n");
->>>         printf("Usage:\n");
->>> -       printf("\thciattach [-n] [-p] [-b] [-r] [-t timeout] [-s initial_speed] <tty> <type | id> [speed] [flow|noflow] [bdaddr]\n");
->>> +       printf("\thciattach [-n] [-p] [-b] [-r] [-t timeout] [-s initial_speed] <tty> <type | id> [speed] [flow|noflow] [sleep|nosleep] [bdaddr]\n");
->>>         printf("\thciattach -l\n");
->>>  }
->>>
->>> --
->>> 2.0.4
->>
->> It doesn't look like you are doing anything with sleep|nosleep here,
->> also you should probably a add more information regarding what it is
->> fixing.
->>
->
-> I probably should have separated these 3 patches to 2 different sets
-> though they are all trivial fixes.
+
+I was forced to use HCI, because mgmt didn't exposed required
+functionality (the scan I want to add). And I want my code to work in
+the future without causing the controller to disapear from mgmt.
+
 >
 >
-> The first one attempts to reveal the missing [speed | nospeed] to the user:
->
-> Currently, the argument parsing code in the hciattach.c expect very
-> specific order of the arguments:
->
->     hciattach [-n] [-p] [-b] [-r] [-t timeout] [-s initial_speed]
-> <tty> <type | id> [speed] [flow|noflow] [bdaddr]
->
-> For example, if an user would like to specify the BDADDR, none of the
-> following works:
->
->     hciattach TTY any BDADDR
->     hciattach TTY any SPEED BDADDR
->     hciattach TTY any SPEED NOFLOW BDADDR
->
-> The user has to put the BDADDR exactly in the 4th argument after <type
-> | id>, ex:
->
->     hciattach TTY any SPEED NOFLOW NOSLEEP BDADDR
->
-> And this is impossible to figure out without looking at the source code.
-> The patch only helps a little (hope so) by revealing the missing
-> argument to the user.
->
->     hciattach [-n] [-p] [-b] [-r] [-t timeout] [-s initial_speed]
-> <tty> <type | id> [speed] [flow|noflow] [sleep|nosleep] [bdaddr]
->
-> Though I do agree the information is still too little, and we probably
-> should rewrite the argument parsing code to remove the enforcement of
-> order.
-> Otherwise, the precise usage syntax for the current logic should be:
->
->    hciattach [-n] [-p] [-b] [-r] [-t timeout] [-s initial_speed] <tty>
-> <type | id> [speed]
->    hciattach [-n] [-p] [-b] [-r] [-t timeout] [-s initial_speed] <tty>
-> <type | id> [speed flow|noflow]
->    hciattach [-n] [-p] [-b] [-r] [-t timeout] [-s initial_speed] <tty>
-> <type | id> [speed flow|noflow] sleep|nosleep]
->    hciattach [-n] [-p] [-b] [-r] [-t timeout] [-s initial_speed] <tty>
-> <type | id> [speed flow|noflow sleep|nosleep bdaddr]
->
-> Even though, user still need to figure out what suppose to be put in
-> the flow/sleep if he only wants to change the bdaddr without changing
-> other default settings.
+> What I am saying is that you need to get yourself some understanding on h=
+ow certain controllers from certain manufactures behave if you for example =
+turn on/off the duplicate filtering. And then also have a rather busy LE en=
+vironment with a bunch of devices advertising. Get a few beacons that are c=
+onstant advertising and get a feel on what is going on on HCI. You will qui=
+ckly see that we have to be smarter than just keep scanning. And for kicks,=
+ try to use BR/EDR for say A2DP at the same time. See how that goes.
+
+
 >
 >
-> The second patch speed up the firmware loading speed by raising the
-> UART baudrate before (and after) loading firmware.
-> This helps our project reduce the hciattach from 7+ seconds, to 750 ms.
-> The tricky part for the controller is that it drops the UART back to
-> 115200 after firmware loading.
-> So we still need to update the baudrate again after firmware is loaded.
+> >>
+> >> My main concern is battery drain. Once we figured out on how to avoid =
+that, we can easily design a new mgmt command that allows you to do exactly=
+ what you want to do.
+> >
+> > From what I understand as long as controllers don't support
+> > sophisticated filtering, that would be energy conuming. I would also
+> > preffer to find a energy-friendly way, but is it better not to have
+> > this functionality rather than have it in non-energy consuming way ?
 >
-> Thanks.
-> Roy
+> Even if we consume extra energy on older Bluetooth chips or certain manuf=
+actures, we want to try to not waste it. If it drains your battery, people =
+will just disable Bluetooth and then you have not won anything.
 >
->> --
->> Luiz Augusto von Dentz
+> Maybe what this really needs is that we go into the Bluetooth SIG and pro=
+pose controller based filtering with standard HCI commands.
+
+
+Controller based filtering would be awsome, but it would probably take
+2-3 years to get first controller that do it, and I hope to be able to
+ship my functionality in maybe 2-3 months.
+
+>From current discussion it seems that it's achievable to implement it
+in kernel right now, and eventually talk with manufacturers to make it
+standard in future.
+
+>
+> Regards
+>
+> Marcel
