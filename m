@@ -2,75 +2,43 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH 00/13] Compilation with musl C library
-Date: Fri, 19 Sep 2014 16:10:03 +0200
-Message-Id: <1411135816-18966-1-git-send-email-szymon.janc@tieto.com>
+Subject: [PATCH 01/13] sap: Fix compilation errors with musl
+Date: Fri, 19 Sep 2014 16:10:04 +0200
+Message-Id: <1411135816-18966-2-git-send-email-szymon.janc@tieto.com>
+In-Reply-To: <1411135816-18966-1-git-send-email-szymon.janc@tieto.com>
+References: <1411135816-18966-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Fix multiple errors similar to:
 
-This patchset constains set of rather trivial fixes for compiling BlueZ
-with musl C library. Musl is quite strict WRT to includes and standard
-compliance.
+profiles/sap/sap-u8500.c: In function 'send_request':
+profiles/sap/sap-u8500.c:288:3: error: implicit declaration of
+    function 'strerror' [-Werror=implicit-function-declaration]
+   sap_error("sending request failed: %s", strerror(ENOMEM));
+   ^
+profiles/sap/sap-u8500.c:288:3: error: format '%s' expects argument
+    of type 'char *', but argument 2 has type 'int' [-Werror=format=]
+profiles/sap/sap-u8500.c:297:3: error: implicit declaration of function
+    'memcpy' [-Werror=implicit-function-declaration]
+   memcpy(msg->payload, param->val, param->len);
+   ^
+---
+ profiles/sap/sap-u8500.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-All patches except last 3 are missing includes fixes. Last 2 also remove
-glibc extensions.
-
-BR
-Szymon Janc
-
-
-Szymon Janc (13):
-  sap: Fix compilation errors with musl
-  lib: Fix compilation error with musl
-  android/hal-audio: Fix compilation errors with musl
-  tools: Fix compilation errors  with musl
-  shared: Fix compilation errors  with musl
-  alert: Fix compilation error with musl
-  core: Fix compilation error with musl
-  obexd: Fix compilation error with musl
-  android/pan: Fix compilation error with musl
-  android/client: Fix compilation errors with musl
-  health: Use proper type for tid
-  emulator: Fix compilation error with musl
-  android/emulator: Fix compilation error with musl
-
- android/client/if-bt.c         | 2 ++
- android/client/if-gatt.c       | 2 ++
- android/client/if-hh.c         | 1 +
- android/client/if-hl.c         | 1 +
- android/client/if-pan.c        | 2 --
- android/client/if-rc.c         | 1 +
- android/client/if-sock.c       | 1 +
- android/client/tabcompletion.c | 1 +
- android/hal-audio-sbc.c        | 1 +
- android/pan.c                  | 1 +
- android/system-emulator.c      | 4 ++--
- emulator/hfp.c                 | 1 +
- emulator/le.c                  | 1 +
- emulator/serial.c              | 3 ++-
- lib/hci.c                      | 2 +-
- obexd/plugins/filesystem.c     | 2 +-
- profiles/alert/server.c        | 3 +++
- profiles/health/hdp.c          | 2 +-
- profiles/sap/sap-u8500.c       | 1 +
- src/shared/hci.c               | 1 +
- src/systemd.c                  | 1 +
- tools/amptest.c                | 2 +-
- tools/btattach.c               | 2 +-
- tools/btsnoop.c                | 1 +
- tools/ciptool.c                | 2 +-
- tools/cltest.c                 | 2 +-
- tools/hciattach.c              | 2 +-
- tools/hciattach_qualcomm.c     | 2 +-
- tools/hciattach_tialt.c        | 2 +-
- tools/hcidump.c                | 2 +-
- tools/l2ping.c                 | 2 +-
- tools/l2test.c                 | 2 +-
- tools/rfcomm.c                 | 2 +-
- 33 files changed, 38 insertions(+), 19 deletions(-)
-
+diff --git a/profiles/sap/sap-u8500.c b/profiles/sap/sap-u8500.c
+index d043029..5417d59 100644
+--- a/profiles/sap/sap-u8500.c
++++ b/profiles/sap/sap-u8500.c
+@@ -32,6 +32,7 @@
+ #include <unistd.h>
+ #include <errno.h>
+ #include <glib.h>
++#include <string.h>
+ 
+ #include <sys/socket.h>
+ #include <sys/un.h>
 -- 
 1.9.3
 
