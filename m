@@ -2,40 +2,84 @@ Return-Path: <cyrus@holtmann.org>
 From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH 2/6] android/handsfree-client: Fix defines for action command
-Date: Fri, 19 Sep 2014 16:30:47 +0200
-Message-Id: <1411137051-28904-3-git-send-email-lukasz.rymanowski@tieto.com>
+Subject: [PATCH 1/6] android/hal-ipc-api: Fix location size and add missing feature list
+Date: Fri, 19 Sep 2014 16:30:46 +0200
+Message-Id: <1411137051-28904-2-git-send-email-lukasz.rymanowski@tieto.com>
 In-Reply-To: <1411137051-28904-1-git-send-email-lukasz.rymanowski@tieto.com>
 References: <1411137051-28904-1-git-send-email-lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- android/hal-msg.h | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+This patch changes location size of Dial Memory command to 4 bytes in
+order to be consistent with HAL API
 
-diff --git a/android/hal-msg.h b/android/hal-msg.h
-index ba213b7..eba47df 100644
---- a/android/hal-msg.h
-+++ b/android/hal-msg.h
-@@ -1026,13 +1026,13 @@ struct hal_cmd_hf_client_dial_memory {
- #define HAL_HF_CLIENT_ACTION_CHLD_2		0x02
- #define HAL_HF_CLIENT_ACTION_CHLD_3		0x03
- #define HAL_HF_CLIENT_ACTION_CHLD_4		0x04
--#define HAL_HF_CLIENT_ACTION_CHLD_1x	0x05
--#define HAL_HF_CLIENT_ACTION_CHLD_2x	0x06
-+#define HAL_HF_CLIENT_ACTION_CHLD_1x		0x05
-+#define HAL_HF_CLIENT_ACTION_CHLD_2x		0x06
- #define HAL_HF_CLIENT_ACTION_ATA		0x07
- #define HAL_HF_CLIENT_ACTION_CHUP		0x08
- #define HAL_HF_CLIENT_ACTION_BRTH_0		0x09
--#define HAL_HF_CLIENT_ACTION_BRTH_1		0x10
--#define HAL_HF_CLIENT_ACTION_BRTH_02	0x11
-+#define HAL_HF_CLIENT_ACTION_BRTH_1		0x0a
-+#define HAL_HF_CLIENT_ACTION_BRTH_02		0x0b
+It also adds missing peer and chld features values. Size of those
+features also has been changed to be consisten with HAL API.
+---
+ android/hal-ipc-api.txt | 36 ++++++++++++++++++++++++++++++++----
+ 1 file changed, 32 insertions(+), 4 deletions(-)
+
+diff --git a/android/hal-ipc-api.txt b/android/hal-ipc-api.txt
+index f6e1680..853d27f 100644
+--- a/android/hal-ipc-api.txt
++++ b/android/hal-ipc-api.txt
+@@ -2162,7 +2162,7 @@ Commands and response:
  
- #define HAL_OP_HF_CLIENT_CALL_ACTION		0x0a
- struct hal_cmd_hf_client_call_action {
+ 	Opcode 0x09 - Dial Memory command/response
+ 
+-		Command parameters: Location (2 octet)
++		Command parameters: Location (4 octet)
+ 		Response parameters: <none>
+ 
+ 		In case of an error, the error response will be returned.
+@@ -2228,8 +2228,8 @@ Notifications:
+ 	Opcode 0x81 - Connection State Changed notification
+ 
+ 		Notification parameters: State (1 octet)
+-		                         Peer Features (2 octets)
+-		                         CHLD Features (2 octets)
++		                         Peer Features (4 octets)
++		                         CHLD Features (4 octets)
+ 		                         Address (6 octets)
+ 
+ 		Valid State values: 0x00 = Disconnected
+@@ -2237,7 +2237,35 @@ Notifications:
+ 		                    0x02 = SLC Connected
+ 		                    0x03 = Disconnecting
+ 
+-		Note: Peer Features is valid only in SCL Connected state
++		Peer Features is a bitmask of the supported features. Currently
++		available bits:
++
++			0	Three way calling
++			1	Echo cancellation and/or noise reduction
++			2	Voice recognition
++			3	In band ring tone
++			4	Attach a number to a voice tag
++			5	Ability to reject a call
++			6	Enhanced call status
++			7	Enhanced call control
++			8	Extended Error Result Codes
++			9	Codec negotiations
++			10-31	Reserved for future use
++
++		CHLD Features is a bitmask of the supported features. Currently
++		available bits:
++
++			0	Release waiting call or held calls
++			1	Release active calls and accept other call
++			2	Release specified active call only
++			3	Place all active calls on hold and accept other call
++			4	Request private mode with secified call
++			5	Add a held call to the multiparty
++			6	Connect two calls and leave multiparty
++			7-31	Reserved for future use
++
++		Note: Peer and CHLD Features are valid only in SCL Connected state
++
+ 
+ 	Opcode 0x82 - Audio State Changed notification
+ 
 -- 
 1.8.4
 
