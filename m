@@ -1,54 +1,49 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <541C04DA.5030707@gmail.com>
-Date: Fri, 19 Sep 2014 15:56:34 +0530
-From: Varka Bhadram <varkabhadram@gmail.com>
-MIME-Version: 1.0
-To: Alexander Aring <alex.aring@gmail.com>
-CC: linux-wpan@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-	alan@signal11.us, Varka Bhadram <varkab@cdac.in>
-Subject: Re: [PATCH bluetooth-next v2 0/3] cleanup for mrf24j40 driver
-References: <1411101911-12462-1-git-send-email-varkab@cdac.in> <20140919090611.GA17051@omega> <541BF7F4.4020508@gmail.com> <20140919094052.GA19085@omega> <541BFAEB.5050102@gmail.com> <20140919094830.GB19085@omega>
-In-Reply-To: <20140919094830.GB19085@omega>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Sender: linux-wpan-owner@vger.kernel.org
+From: johan.hedberg@gmail.com
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH 2/2] Bluetooth: Add S4 configuration parameter set for CVSD
+Date: Fri, 19 Sep 2014 13:25:25 +0300
+Message-Id: <1411122325-22959-2-git-send-email-johan.hedberg@gmail.com>
+In-Reply-To: <1411122325-22959-1-git-send-email-johan.hedberg@gmail.com>
+References: <1411122325-22959-1-git-send-email-johan.hedberg@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On 09/19/2014 03:18 PM, Alexander Aring wrote:
-> On Fri, Sep 19, 2014 at 03:14:11PM +0530, Varka Bhadram wrote:
->> On 09/19/2014 03:11 PM, Alexander Aring wrote:
->>> On Fri, Sep 19, 2014 at 03:01:32PM +0530, Varka Bhadram wrote:
->>>> Hi Alex,
->>>>
->>>> On 09/19/2014 02:36 PM, Alexander Aring wrote:
->>>>> Hi Varka,
->>>>>
->>>>> nice to read you again. :-) I already thought that I was maybe a little
->>>>> bit too harsh to you for explaining changing dev->add_len during runtime
->>>>> will occur in unexcept behaviour. Sorry.
->>>> For dev->addr_len, i think David asked a question.. Isn't it..?
->>>>
->>> yes, I didn't answer. I decide now to put this issue at the last item of
->>> my todo queue. If you like you can try it. I will answer him that I do
->>> other things right now and this issue is more complex.
->>>
->>>
->>> Also you did the cc2520 driver, you can add you as maintainer for this
->>> driver. I have such devices here but on contiki nodes.
->>>
->> You mean to say that i need to add an entry in MAINTAINER file or ..?
->>
-> not need, only if you like. I have no idea about the cc2520 driver.
->
-> If there cames patches in, I can only look for syntax and according
-> interaction with mac802154 stack.
+From: Johan Hedberg <johan.hedberg@intel.com>
 
-Ya.. I can be maintainer for CC2520 driver.
+The HFP 1.7 specification recommends a new S4 parameter set for CVSD SCO
+connections over BR/EDR Secure Connections based links. This patch adds
+this set to the sco_param_cvsd table and ensures that it is skipped for
+any link that's not using BR/EDR Secure Connections.
 
-I will look into the cc2520 driver patches.
+Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+---
+ net/bluetooth/hci_conn.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-Thanks
-
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+index 2c3d11bbb4f7..2e955ea0d3ef 100644
+--- a/net/bluetooth/hci_conn.c
++++ b/net/bluetooth/hci_conn.c
+@@ -40,6 +40,7 @@ struct sco_param {
+ };
+ 
+ static const struct sco_param sco_param_cvsd[] = {
++	{ EDR_ESCO_MASK & ~ESCO_2EV3, 0x000c,	0x02 }, /* S4 */
+ 	{ EDR_ESCO_MASK & ~ESCO_2EV3, 0x000a,	0x01 }, /* S3 */
+ 	{ EDR_ESCO_MASK & ~ESCO_2EV3, 0x0007,	0x01 }, /* S2 */
+ 	{ EDR_ESCO_MASK | ESCO_EV3,   0x0007,	0x01 }, /* S1 */
+@@ -209,6 +210,10 @@ bool hci_setup_sync(struct hci_conn *conn, __u16 handle)
+ 	case SCO_AIRMODE_CVSD:
+ 		if (conn->attempt > ARRAY_SIZE(sco_param_cvsd))
+ 			return false;
++		/* Skip S4 for non-SC connections */
++		if (conn->attempt == 1 && !test_bit(HCI_CONN_FIPS,
++						    &conn->link->flags))
++			conn->attempt++;
+ 		param = &sco_param_cvsd[conn->attempt - 1];
+ 		break;
+ 	default:
 -- 
-Regards,
-Varka Bhadram.
+1.9.3
 
