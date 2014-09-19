@@ -2,48 +2,23 @@ Return-Path: <cyrus@holtmann.org>
 From: Varka Bhadram <varkabhadram@gmail.com>
 To: linux-wpan@vger.kernel.org, linux-bluetooth@vger.kernel.org
 Cc: alan@signal11.us, Varka Bhadram <varkab@cdac.in>
-Subject: [PATCH bluetooth-next v2 1/3] mrf24j40: fix Missing a blank line after declarations
-Date: Fri, 19 Sep 2014 10:15:08 +0530
-Message-Id: <1411101911-12462-2-git-send-email-varkab@cdac.in>
-In-Reply-To: <1411101911-12462-1-git-send-email-varkab@cdac.in>
-References: <1411101911-12462-1-git-send-email-varkab@cdac.in>
+Subject: [PATCH bluetooth-next v2 0/3] cleanup for mrf24j40 driver
+Date: Fri, 19 Sep 2014 10:15:07 +0530
+Message-Id: <1411101911-12462-1-git-send-email-varkab@cdac.in>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+changes since v1:
+ - changes in commit messages and descriptions suggested by Alan Ott
 
-Signed-off-by: Varka Bhadram <varkab@cdac.in>
----
- drivers/net/ieee802154/mrf24j40.c |    3 +++
- 1 file changed, 3 insertions(+)
+Varka Bhadram (3):
+  mrf24j40: fix Missing a blank line after declarations
+  mrf24j40: remove unnecessary return statement
+  mrf24j40: use pr_* / dev_* instead of printk()
 
-diff --git a/drivers/net/ieee802154/mrf24j40.c b/drivers/net/ieee802154/mrf24j40.c
-index 9e6a124..466da57 100644
---- a/drivers/net/ieee802154/mrf24j40.c
-+++ b/drivers/net/ieee802154/mrf24j40.c
-@@ -412,6 +412,7 @@ static void mrf24j40_stop(struct ieee802154_dev *dev)
- 	struct mrf24j40 *devrec = dev->priv;
- 	u8 val;
- 	int ret;
-+
- 	dev_dbg(printdev(devrec), "stop\n");
- 
- 	ret = read_short_reg(devrec, REG_INTCON, &val);
-@@ -465,6 +466,7 @@ static int mrf24j40_filter(struct ieee802154_dev *dev,
- 	if (changed & IEEE802515_AFILT_SADDR_CHANGED) {
- 		/* Short Addr */
- 		u8 addrh, addrl;
-+
- 		addrh = le16_to_cpu(filt->short_addr) >> 8 & 0xff;
- 		addrl = le16_to_cpu(filt->short_addr) & 0xff;
- 
-@@ -493,6 +495,7 @@ static int mrf24j40_filter(struct ieee802154_dev *dev,
- 	if (changed & IEEE802515_AFILT_PANID_CHANGED) {
- 		/* PAN ID */
- 		u8 panidl, panidh;
-+
- 		panidh = le16_to_cpu(filt->pan_id) >> 8 & 0xff;
- 		panidl = le16_to_cpu(filt->pan_id) & 0xff;
- 		write_short_reg(devrec, REG_PANIDH, panidh);
+ drivers/net/ieee802154/mrf24j40.c |   20 ++++++++++----------
+ 1 file changed, 10 insertions(+), 10 deletions(-)
+
 -- 
 1.7.9.5
 
