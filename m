@@ -1,44 +1,59 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH 01/13] sap: Fix compilation errors with musl
-Date: Fri, 19 Sep 2014 16:10:04 +0200
-Message-Id: <1411135816-18966-2-git-send-email-szymon.janc@tieto.com>
-In-Reply-To: <1411135816-18966-1-git-send-email-szymon.janc@tieto.com>
-References: <1411135816-18966-1-git-send-email-szymon.janc@tieto.com>
+MIME-Version: 1.0
+In-Reply-To: <1411130719-15832-1-git-send-email-gowtham.ab@samsung.com>
+References: <1411130719-15832-1-git-send-email-gowtham.ab@samsung.com>
+Date: Fri, 19 Sep 2014 16:01:18 +0300
+Message-ID: <CABBYNZJ++9RgUU8VrZQbUW75m==akdOX7Ceo6WfVF8zPcV9dEg@mail.gmail.com>
+Subject: Re: [PATCH] obexd/src/manager: Fix the double check for agent
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Gowtham Anandha Babu <gowtham.ab@samsung.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	Dmitry Kasatkin <d.kasatkin@samsung.com>,
+	Bharat Panda <bharat.panda@samsung.com>, cpgs@samsung.com
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Fix multiple errors similar to:
+Hi,
 
-profiles/sap/sap-u8500.c: In function 'send_request':
-profiles/sap/sap-u8500.c:288:3: error: implicit declaration of
-    function 'strerror' [-Werror=implicit-function-declaration]
-   sap_error("sending request failed: %s", strerror(ENOMEM));
-   ^
-profiles/sap/sap-u8500.c:288:3: error: format '%s' expects argument
-    of type 'char *', but argument 2 has type 'int' [-Werror=format=]
-profiles/sap/sap-u8500.c:297:3: error: implicit declaration of function
-    'memcpy' [-Werror=implicit-function-declaration]
-   memcpy(msg->payload, param->val, param->len);
-   ^
----
- profiles/sap/sap-u8500.c | 1 +
- 1 file changed, 1 insertion(+)
+On Fri, Sep 19, 2014 at 3:45 PM, Gowtham Anandha Babu
+<gowtham.ab@samsung.com> wrote:
+> Removes the check for NULL agent and fix the
+> coding style for enum.
+> ---
+> agent_free() function contains the NULL check already.
+> ---
+>  obexd/src/manager.c | 5 ++---
+>  1 file changed, 2 insertions(+), 3 deletions(-)
+>
+> diff --git a/obexd/src/manager.c b/obexd/src/manager.c
+> index 326e56f..9c6623e 100644
+> --- a/obexd/src/manager.c
+> +++ b/obexd/src/manager.c
+> @@ -64,7 +64,7 @@ struct agent {
+>  };
+>
+>  enum {
+> -       TRANSFER_STATUS_QUEUED = 0,
+> +       TRANSFER_STATUS_QUEUED =        0,
+>         TRANSFER_STATUS_ACTIVE,
+>         TRANSFER_STATUS_COMPLETE,
+>         TRANSFER_STATUS_ERROR
+> @@ -521,8 +521,7 @@ void manager_cleanup(void)
+>
+>         /* FIXME: Release agent? */
+>
+> -       if (agent)
+> -               agent_free(agent);
+> +       agent_free(agent);
+>
+>         g_dbus_detach_object_manager(connection);
+>
+> --
+> 1.9.1
 
-diff --git a/profiles/sap/sap-u8500.c b/profiles/sap/sap-u8500.c
-index d043029..5417d59 100644
---- a/profiles/sap/sap-u8500.c
-+++ b/profiles/sap/sap-u8500.c
-@@ -32,6 +32,7 @@
- #include <unistd.h>
- #include <errno.h>
- #include <glib.h>
-+#include <string.h>
- 
- #include <sys/socket.h>
- #include <sys/un.h>
+Please split the coding style fix.
+
+
 -- 
-1.9.3
-
+Luiz Augusto von Dentz
