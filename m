@@ -1,32 +1,56 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 19 Sep 2014 11:06:13 +0200
-From: Alexander Aring <alex.aring@gmail.com>
-To: Varka Bhadram <varkabhadram@gmail.com>
-Cc: linux-wpan@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-	alan@signal11.us, Varka Bhadram <varkab@cdac.in>
-Subject: Re: [PATCH bluetooth-next v2 0/3] cleanup for mrf24j40 driver
-Message-ID: <20140919090611.GA17051@omega>
-References: <1411101911-12462-1-git-send-email-varkab@cdac.in>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: Gowtham Anandha Babu <gowtham.ab@samsung.com>
+Cc: linux-bluetooth@vger.kernel.org, d.kasatkin@samsung.com,
+	bharat.panda@samsung.com, cpgs@samsung.com
+Subject: Re: [PATCH 7/7] android/hal-utils.c : Fix null pointer dereference
+Date: Fri, 19 Sep 2014 09:08:21 +0200
+Message-ID: <5931585.p2k8yBDPcD@leonov>
+In-Reply-To: <1410441607-9687-7-git-send-email-gowtham.ab@samsung.com>
+References: <1410441607-9687-1-git-send-email-gowtham.ab@samsung.com> <1410441607-9687-7-git-send-email-gowtham.ab@samsung.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-In-Reply-To: <1411101911-12462-1-git-send-email-varkab@cdac.in>
-Sender: linux-wpan-owner@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Varka,
+Hi Gowtham,
 
-nice to read you again. :-) I already thought that I was maybe a little
-bit too harsh to you for explaining changing dev->add_len during runtime
-will occur in unexcept behaviour. Sorry.
+On Thursday 11 of September 2014 18:50:07 Gowtham Anandha Babu wrote:
 
-Nevertheless welcome back. I want to apply it when Alan finally sends a
-"Acked-by: ...", but why is this tagged with bluetooth-next?
+Commit header should be like:
+android/hal-utils: Fix null pointer dereference
 
-There are other mrf24j40 patches around and it's better to send this in
-a whole patch series when all patches are on wpan-next/testing. Then I
-will send these patches to bluetooth-next. When applied I will rebase
-the wpan-next/master to bluetooth-next/master.
+> Handles the possible null pointer dereference: bd_addr by checking it
+> against null. ---
 
-Only 6LOWPAN GENERIC patches should be send to bluetooth-next.
+Commit body should be limited to 72 characters. 
 
-- Alex
+>  android/hal-utils.c | 4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
+> 
+> diff --git a/android/hal-utils.c b/android/hal-utils.c
+> index ceefefc..64ab5a1 100644
+> --- a/android/hal-utils.c
+> +++ b/android/hal-utils.c
+> @@ -166,11 +166,13 @@ int int2str_findstr(const char *str, const struct
+> int2str m[]) */
+>  const char *bt_bdaddr_t2str(const bt_bdaddr_t *bd_addr, char *buf)
+>  {
+> -	const uint8_t *p = bd_addr->address;
+> +	const uint8_t *p;
+> 
+>  	if (!bd_addr)
+>  		return strcpy(buf, "NULL");
+> 
+> +	p = bd_addr->address;
+> +
+>  	snprintf(buf, MAX_ADDR_STR_LEN, "%02x:%02x:%02x:%02x:%02x:%02x",
+>  					p[0], p[1], p[2], p[3], p[4], p[5]);
+
+I've fixed those minors myself and pushed the patch, but please keep it in 
+mind for any future submissions. Thanks.
+
+
+-- 
+BR
+Szymon Janc
