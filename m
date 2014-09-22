@@ -1,75 +1,61 @@
 Return-Path: <cyrus@holtmann.org>
-From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
+From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/6] android/hal-ipc-api: Add MCE HAL
-Date: Mon, 22 Sep 2014 13:01:43 +0200
-Message-Id: <1411383708-28621-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+Cc: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+Subject: [RFC 2/2] android/gatt: Fix handling sing counter
+Date: Mon, 22 Sep 2014 12:54:07 +0200
+Message-Id: <1411383247-11461-2-git-send-email-lukasz.rymanowski@tieto.com>
+In-Reply-To: <1411383247-11461-1-git-send-email-lukasz.rymanowski@tieto.com>
+References: <1411383247-11461-1-git-send-email-lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- android/hal-ipc-api.txt | 51 +++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 51 insertions(+)
+According to BT spec 4.1, Part H, 2.4.5 Signing Algorithm, sign
+counter shall increment on each message however there is not specific
+requirement that it should increment by 1. In fact in case of lost
+package we would unsync with remote and would be no able to recover
+in other way then re-pair.
 
-diff --git a/android/hal-ipc-api.txt b/android/hal-ipc-api.txt
-index f6e1680..38f75e6 100644
---- a/android/hal-ipc-api.txt
-+++ b/android/hal-ipc-api.txt
-@@ -2396,3 +2396,54 @@ Notifications:
- 	Opcode 0x95 - Ring Indication notification
+This patch reject write sign commands if remote sign counter is less
+or equal to previous one.
+---
+ android/gatt.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/android/gatt.c b/android/gatt.c
+index e06ad1f..8127fc1 100644
+--- a/android/gatt.c
++++ b/android/gatt.c
+@@ -5921,16 +5921,16 @@ static void write_signed_cmd_request(const uint8_t *cmd, uint16_t cmd_len,
+ 		uint8_t t[ATT_SIGNATURE_LEN];
+ 		uint32_t r_sign_cnt = get_le32(s);
  
- 		Notification parameters: <none>
-+
-+
-+Bluetooth MCE HAL (ID 11)
-+=========================
-+
-+Android HAL name: "map_client" (BT_PROFILE_MAP_CLIENT_ID)
-+
-+Structures:
-+
-+	MAS instance: Instance ID (1 octet)
-+	              Channel (1 octet)
-+	              Message type (1 octet)
-+	              Name (string)
-+
-+	Valid Message type: 0x01 = EMAIL
-+	                    0x02 = SMS_GSM
-+	                    0x04 = SMS_CDMA
-+	                    0x08 = MMS
-+
-+Commands and responses:
-+
-+	Opcode 0x00 - Error response
-+
-+		Response parameters: Status (1 octet)
-+
-+		Valid status values: 0x01 = Fail
-+		                     0x02 = Not ready
-+		                     0x03 = No memory
-+		                     0x04 = Busy
-+		                     0x05 = Done (already completed)
-+		                     0x06 = Unsupported
-+		                     0x07 = Parameter invalid
-+		                     0x08 = Unhandled
-+		                     0x09 = Authentication failure
-+		                     0x0a = Remote device down
-+
-+	Opcode 0x01 - Get Remote MAS Instances
-+
-+		Command parameters: Remote address (6 octets)
-+		Response parameters: <none>
-+
-+		In case of an error, the error response will be returned.
-+
-+Notifications:
-+
-+	Opcode 0x81 - Remote MAS Instances notification
-+
-+		Notification parameters: Status (1 octet)
-+		                         Remote address (6 octets)
-+		                         Number of instances (1 octet)
-+		                         MAS instance (variable)
+-		if (r_sign_cnt != sign_cnt) {
+-			error("gatt: sign_cnt does not match (%d!=%d)",
+-							sign_cnt, r_sign_cnt);
++		if (r_sign_cnt <= sign_cnt) {
++			error("gatt: Invalid sign_cnt (%d<=%d)?",
++							r_sign_cnt, sign_cnt);
+ 			return;
+ 		}
+ 
+ 		/* Generate signature and verify it */
+ 		if (!bt_crypto_sign_att(crypto, csrk, cmd,
+ 						cmd_len - ATT_SIGNATURE_LEN,
+-						sign_cnt, t)) {
++						r_sign_cnt, t)) {
+ 			error("gatt: Error when generating att signature");
+ 			return;
+ 		}
+@@ -5940,7 +5940,7 @@ static void write_signed_cmd_request(const uint8_t *cmd, uint16_t cmd_len,
+ 			return;
+ 		}
+ 		/* Signature OK, proceed with write */
+-		bt_update_sign_counter(&dev->bdaddr, REMOTE_CSRK, sign_cnt++);
++		bt_update_sign_counter(&dev->bdaddr, REMOTE_CSRK, r_sign_cnt);
+ 		gatt_db_write(gatt_db, handle, 0, value, vlen, cmd[0],
+ 								&dev->bdaddr);
+ 	}
 -- 
-1.9.3
+1.8.4
 
