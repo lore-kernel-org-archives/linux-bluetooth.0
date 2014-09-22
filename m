@@ -1,50 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1410866009-2417-1-git-send-email-luiz.dentz@gmail.com>
-References: <1410866009-2417-1-git-send-email-luiz.dentz@gmail.com>
-Date: Mon, 22 Sep 2014 19:16:41 +0300
-Message-ID: <CABBYNZLmY1GbqYekRpg-EgUo2fcRA1ka74fLZv=-+_-wmQ86kg@mail.gmail.com>
-Subject: Re: [PATCH BlueZ] doc/obex-api: Mark DatabaseIdentifier as optional
+In-Reply-To: <1411369928-14307-1-git-send-email-gowtham.ab@samsung.com>
+References: <1411369928-14307-1-git-send-email-gowtham.ab@samsung.com>
+Date: Mon, 22 Sep 2014 19:08:27 +0300
+Message-ID: <CABBYNZJQhX7xo286JDysjeKFWOsTXpZD9ACgtxWjQXEp+1vp8w@mail.gmail.com>
+Subject: Re: [PATCH v3] obexd/src/manager: Fix the double check for agent
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+To: Gowtham Anandha Babu <gowtham.ab@samsung.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	Dmitry Kasatkin <d.kasatkin@samsung.com>,
+	Bharat Panda <bharat.panda@samsung.com>, cpgs@samsung.com
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi,
 
-On Tue, Sep 16, 2014 at 2:13 PM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->
-> There is no need to declare DatabaseIdentifier in case it is invalid
-> since by omitting it should indicate GetVersion is not supported.
+On Mon, Sep 22, 2014 at 10:12 AM, Gowtham Anandha Babu
+<gowtham.ab@samsung.com> wrote:
+> Removes the check for NULL agent.
 > ---
->  doc/obex-api.txt | 4 +---
->  1 file changed, 1 insertion(+), 3 deletions(-)
+> agent_free() function contains the NULL check already.
+> ---
+>  obexd/src/manager.c | 3 +--
+>  1 file changed, 1 insertion(+), 2 deletions(-)
 >
-> diff --git a/doc/obex-api.txt b/doc/obex-api.txt
-> index 31afc74..f80ef39 100644
-> --- a/doc/obex-api.txt
-> +++ b/doc/obex-api.txt
-> @@ -491,12 +491,10 @@ Properties        string Folder [readonly]
+> diff --git a/obexd/src/manager.c b/obexd/src/manager.c
+> index 326e56f..97ae278 100644
+> --- a/obexd/src/manager.c
+> +++ b/obexd/src/manager.c
+> @@ -521,8 +521,7 @@ void manager_cleanup(void)
 >
->                         Current folder.
+>         /* FIXME: Release agent? */
 >
-> -               string DatabaseIdentifier [readonly]
-> +               string DatabaseIdentifier [readonly, optional]
+> -       if (agent)
+> -               agent_free(agent);
+> +       agent_free(agent);
 >
->                         128 bits persistent identifier.
+>         g_dbus_detach_object_manager(connection);
 >
-> -                       Value '0' shall be considered as not supported.
-> -
->
->  Synchronization hierarchy
->  =========================
 > --
-> 1.9.3
+> 1.9.1
 
-Pushed.
+Pushed, thanks.
 
 
 -- 
