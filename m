@@ -1,29 +1,96 @@
 Return-Path: <cyrus@holtmann.org>
-From: Gowtham Anandha Babu <gowtham.ab@samsung.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: luiz.dentz@gmail.com, d.kasatkin@samsung.com,
-	bharat.panda@samsung.com, cpgs@samsung.com,
-	Gowtham Anandha Babu <gowtham.ab@samsung.com>
-Subject: [PATCH v2] obexd/src/manager: Fix the double check for agent
-Date: Mon, 22 Sep 2014 12:28:44 +0530
-Message-id: <1411369124-14122-1-git-send-email-gowtham.ab@samsung.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Mon, 22 Sep 2014 08:48:56 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: linville@tuxdriver.com
+Cc: linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: pull request: bluetooth-next 2014-09-22
+Message-ID: <20140922054856.GA15688@t440s.P-661HNU-F1>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="WIyZ46R2i8wDzkSu"
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-diff --git a/obexd/src/manager.c b/obexd/src/manager.c
-index 326e56f..97ae278 100644
---- a/obexd/src/manager.c
-+++ b/obexd/src/manager.c
-@@ -521,8 +521,7 @@ void manager_cleanup(void)
- 
- 	/* FIXME: Release agent? */
- 
--	if (agent)
--		agent_free(agent);
-+	agent_free(agent);
- 
- 	g_dbus_detach_object_manager(connection);
- 
--- 
-1.9.1
 
+--WIyZ46R2i8wDzkSu
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+
+Hi John,
+
+Here are some more patches for 3.18. They include various fixes to the
+btusb HCI driver, a fix for LE SMP, as well as adding Jukka to the
+MAINTAINERS file for generic 6LoWPAN (as requested by Alexander Aring).
+
+I've held on to this pull request a bit since we were waiting for a SCO
+related fix to get sorted out first. However, since the merge window is
+getting closer I decided not to wait for it. If we do get the fix sorted
+out there'll probably be a second small pull request later this week.
+
+Let me know if there are any issues pulling. Thanks.
+
+Johan
+
+---
+The following changes since commit 9a783a139c32a905825ee0aa9597f485ea461f76:
+
+  Bluetooth: Fix re-setting RPA as expired when deferring update (2014-09-12 18:34:25 +0200)
+
+are available in the git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git for-upstream
+
+for you to fetch changes up to 5eb596f55cacc2389554a8d7572d90d5e9d4269d:
+
+  Bluetooth: Fix setting correct security level when initiating SMP (2014-09-18 17:39:37 +0200)
+
+----------------------------------------------------------------
+Johan Hedberg (2):
+      Bluetooth: btusb: Use GFP_KERNEL in btusb_send_frame()
+      Bluetooth: Fix setting correct security level when initiating SMP
+
+Jukka Rissanen (1):
+      MAINTAINERS: add maintainer for generic 6LoWPAN
+
+Marcel Holtmann (7):
+      Bluetooth: btusb: Separate TX URB allocation and submission
+      Bluetooth: Add BUILD_BUG_ON check for SKB control buffer size
+      Bluetooth: Provide HCI command opcode information to driver
+      Bluetooth: btusb: Fix old coding style issues
+      Bluetooth: btusb: Split fragement receiption into separate functions
+      Bluetooth: btusb: Implement driver internal packet reassembly
+      Bluetooth: Remove exported hci_recv_fragment function
+
+ MAINTAINERS                       |   1 +
+ drivers/bluetooth/btusb.c         | 511 +++++++++++++++++++++++++---------
+ include/net/bluetooth/bluetooth.h |   1 +
+ include/net/bluetooth/hci_core.h  |   1 -
+ net/bluetooth/af_bluetooth.c      |   3 +
+ net/bluetooth/hci_core.c          |  21 +-
+ net/bluetooth/smp.c               |   5 +-
+ 7 files changed, 385 insertions(+), 158 deletions(-)
+
+
+--WIyZ46R2i8wDzkSu
+Content-Type: application/pgp-signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQIcBAEBAgAGBQJUH7hIAAoJECQj9vv5qNQSA0AP/0XdUG9WvH2n9arYXopMOIY3
+3xD0xwP7EpH6j2f9QigDZvTBrxlE1wehKn8lhKYWbRosQFNodQK8N0LX3vcYR8mb
+TTM4vb8pAYvkOv6oyvJNCsi9gpaZMz9M1OfGIinH4yy2iSoEQi3G4mzvqtnWPtbA
+dB2rirb3XcZkgkQxiCfDQz/mjdyig1U6npaVwcKbZIdRTPuRVbJzcK4ghjztHgWg
+j2FHvMZCdyrTzqMn9NwAOb4r/E9qABuu3CbiUZTv6Gxv8SrHFh/6EUVP2RcG14rq
+Yqlr8EtqI1PNL4JpNq8IgVNLGQWm3cUilZnkoZOnfp0t/W16NMCZiXZN1UWbw6gR
+5nImAxu57wYLXwxrjA5y3W2of5l5XsI2TaZkeCbzMncA5bKcTW1lFQlfXpu15H8R
+yKmn9FU8kHMqlD1B5H7Sn+BiqmxJwh0HuSyftMVl8AHsDnMwSYVN1UX4y/cJ2XL2
+2haqBoTWFArT2D5ussl3n+UQmJOB1Vw71E97tEYbuBNEWnHANuhQRuGrxg3Q8a1i
+3ki1WHvWtFwucHDJwC8JSfPNtvgmvQos6AdNarEP7Gkt2vkV3N0XaFsWC50MQXF0
++l9aB30mORONtZeN681RsyCCnueNOWDqdki2g7YFoyxNMunVkWtCAAJJ4cdF9Fnl
+hK9KwaUsc5rjVBOK4fjS
+=L3A7
+-----END PGP SIGNATURE-----
+
+--WIyZ46R2i8wDzkSu--
