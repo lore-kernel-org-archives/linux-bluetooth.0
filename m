@@ -1,55 +1,109 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Gu, Chao Jie" <chao.jie.gu@intel.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-CC: Szymon Janc <szymon.janc@tieto.com>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	"armansito@chromium.org" <armansito@chromium.org>
-Subject: RE: [PATCH] Add signed write command
-Date: Mon, 22 Sep 2014 12:48:50 +0000
-Message-ID: <3D02B219753AD44CBDDDE484323B17741130A119@SHSMSX104.ccr.corp.intel.com>
-References: <1410958395-7174-1-git-send-email-chao.jie.gu@intel.com>
- <12273172.GZIjs3WGW2@leonov>
- <3D02B219753AD44CBDDDE484323B17741130A080@SHSMSX104.ccr.corp.intel.com>
- <CD6FEB99-0D29-4AA7-8794-D5B5DFA28C37@holtmann.org>
-In-Reply-To: <CD6FEB99-0D29-4AA7-8794-D5B5DFA28C37@holtmann.org>
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH v2 BlueZ] build: Add coverage support
+Date: Mon, 22 Sep 2014 15:41:22 +0300
+Message-Id: <1411389682-8066-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-> >>> Add bt_att_set_csrk for btgatt-client tool. However this patch hook
-> >>> into shared/mgmt, so btgatt-client now should be running by the root user.
-> >>
-> >> I guess this could be made optional.
-> >
-> > You said this could be made optional , what's you point ? I am not
-> > very clear about That.
-> 
-> just provide a command line option to btgatt-client to provide the CSRK to be used.
-> There is no need to attach to mgmt since that is only seeing keys during pairing
-> anyway.
+Coverage is enabled with --enable-maintainer-mode, 2 new targets are
+added 'coverage' and 'clean-coverage', the first generate the reports
+using lcov and depend on the second to cleanup previous generated
+reports and .gcda files.
+---
+v2: Fix lcov check to be optional and only enable coverage target if
+lcov is found.
 
-You means that let user get CSRK from DEVICE_FILE which stored CSRK value
-when pairing, and put this CSRK into command line option by himself , right?
+ .gitignore   |  4 ++++
+ Makefile.am  | 17 +++++++++++++++++
+ acinclude.m4 |  4 ++++
+ configure.ac |  5 +++++
+ 4 files changed, 30 insertions(+)
+
+diff --git a/.gitignore b/.gitignore
+index e22274f..ecd4a3b 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -3,6 +3,8 @@
+ *.lo
+ *.la
+ *.so
++*.gcno
++*.gcda
+ .deps
+ .libs
+ .dirstamp
+@@ -27,7 +29,9 @@ stamp-h1
+ autom4te.cache
+ test-driver
+ test-suite.log
++coverage.info
  
-> >>> +
-> >>> +void bt_att_set_csrk(struct bt_att *att,
-> >>> +			const uint8_t *val,
-> >>> +			uint32_t local_sign_cnt)
-> >>
-> >> This should allow to set local and/or remote csrk. Either we have two
-> >> functions or flag identifying which key is provided.
-> >
-> > This is good idea. But this patch for client side, there is no need to
-> > use remote_csrk, So would it be better to add remote csrk part when we need
-> this?
-> 
-> I want to function. One to set the local CSRK and one for setting the remote CSRK.
-> However I have no idea why we are bothering with the sign counter. Just reset it
-> when creating bt_att.
-> 
-That's fine . I will implement it.
++coverage
+ lib/bluez.pc
+ lib/bluetooth
+ src/builtin.h
+diff --git a/Makefile.am b/Makefile.am
+index 14b4f55..61788ff 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -409,5 +409,22 @@ lib/bluetooth/%.h: lib/%.h
+ 	$(AM_V_at)$(MKDIR_P) lib/bluetooth
+ 	$(AM_V_GEN)$(LN_S) -f "$(abs_top_builddir)"/$< $@
+ 
++if COVERAGE
++clean-coverage:
++	-find $(top_builddir) -name "*.gcno" -delete
++	-find $(top_builddir) -name "*.gcda" -delete
++	@lcov --directory $(top_builddir) --zerocounters
++	$(RM) -r coverage $(top_builddir)/coverage.info
++
++coverage: check
++	@lcov --compat-libtool --directory $(top_builddir) --capture \
++				--output-file $(top_builddir)/coverage.info
++	$(AM_V_at)$(MKDIR_P) coverage
++	@genhtml -o coverage/ $(top_builddir)/coverage.info
++
++clean-local: clean-coverage
++	$(RM) -r lib/bluetooth
++else
+ clean-local:
+ 	$(RM) -r lib/bluetooth
++endif
+diff --git a/acinclude.m4 b/acinclude.m4
+index 2065852..7efc382 100644
+--- a/acinclude.m4
++++ b/acinclude.m4
+@@ -51,6 +51,10 @@ AC_DEFUN([MISC_FLAGS], [
+ 			misc_ldflags="$misc_ldflags -pie"
+ 		fi
+ 	])
++	if (test "$LCOV" = "yes"); then
++		misc_cflags="$misc_cflags --coverage"
++		misc_ldflags="$misc_ldflags --coverage"
++	fi
+ 	AC_SUBST([MISC_CFLAGS], $misc_cflags)
+ 	AC_SUBST([MISC_LDFLAGS], $misc_ldflags)
+ ])
+diff --git a/configure.ac b/configure.ac
+index 9bdd239..bc1de01 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -32,6 +32,11 @@ m4_ifdef([AC_LIBTOOL_TAGS], [AC_LIBTOOL_TAGS([])])
+ AC_DISABLE_STATIC
+ AC_PROG_LIBTOOL
+ 
++if (test "$USE_MAINTAINER_MODE" = "yes"); then
++	AC_CHECK_PROG([LCOV], [lcov], [yes], [no])
++	AM_CONDITIONAL(COVERAGE, test "${LCOV}" = "yes")
++fi
++
+ MISC_FLAGS
+ 
+ AC_ARG_ENABLE(threads, AC_HELP_STRING([--enable-threads],
+-- 
+1.9.3
 
-Best Regards
-Chaojie Gu
