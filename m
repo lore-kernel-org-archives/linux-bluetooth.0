@@ -2,57 +2,79 @@ Return-Path: <cyrus@holtmann.org>
 From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [RFC 2/2] android/gatt: Fix handling sing counter
-Date: Mon, 22 Sep 2014 12:54:07 +0200
-Message-Id: <1411383247-11461-2-git-send-email-lukasz.rymanowski@tieto.com>
-In-Reply-To: <1411383247-11461-1-git-send-email-lukasz.rymanowski@tieto.com>
-References: <1411383247-11461-1-git-send-email-lukasz.rymanowski@tieto.com>
+Subject: [RFC 1/2] android/bluetooth: Extend bt_update_sign_counter function with val
+Date: Mon, 22 Sep 2014 12:54:06 +0200
+Message-Id: <1411383247-11461-1-git-send-email-lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-According to BT spec 4.1, Part H, 2.4.5 Signing Algorithm, sign
-counter shall increment on each message however there is not specific
-requirement that it should increment by 1. In fact in case of lost
-package we would unsync with remote and would be no able to recover
-in other way then re-pair.
-
-This patch reject write sign commands if remote sign counter is less
-or equal to previous one.
+With this patch, gatt can set any value to each local/remote signed
+counter. It is need by next patch
 ---
- android/gatt.c | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
+ android/bluetooth.c | 7 ++++---
+ android/bluetooth.h | 3 ++-
+ android/gatt.c      | 4 ++--
+ 3 files changed, 8 insertions(+), 6 deletions(-)
 
+diff --git a/android/bluetooth.c b/android/bluetooth.c
+index 4646a6c..237c221 100644
+--- a/android/bluetooth.c
++++ b/android/bluetooth.c
+@@ -4153,7 +4153,8 @@ static void store_sign_counter(struct device *dev, enum bt_csrk_type type)
+ 	g_key_file_free(key_file);
+ }
+ 
+-void bt_update_sign_counter(const bdaddr_t *addr, enum bt_csrk_type type)
++void bt_update_sign_counter(const bdaddr_t *addr, enum bt_csrk_type type,
++								uint32_t val)
+ {
+ 	struct device *dev;
+ 
+@@ -4162,9 +4163,9 @@ void bt_update_sign_counter(const bdaddr_t *addr, enum bt_csrk_type type)
+ 		return;
+ 
+ 	if (type == LOCAL_CSRK)
+-		dev->local_sign_cnt++;
++		dev->local_sign_cnt = val;
+ 	else
+-		dev->remote_sign_cnt++;
++		dev->remote_sign_cnt = val;
+ 
+ 	store_sign_counter(dev, type);
+ }
+diff --git a/android/bluetooth.h b/android/bluetooth.h
+index fffb3cc..8970559 100644
+--- a/android/bluetooth.h
++++ b/android/bluetooth.h
+@@ -72,7 +72,8 @@ bool bt_read_device_rssi(const bdaddr_t *addr, bt_read_device_rssi_done cb,
+ bool bt_get_csrk(const bdaddr_t *addr, enum bt_csrk_type type,
+ 					uint8_t key[16], uint32_t *sign_cnt);
+ 
+-void bt_update_sign_counter(const bdaddr_t *addr, enum bt_csrk_type type);
++void bt_update_sign_counter(const bdaddr_t *addr, enum bt_csrk_type type,
++								uint32_t val);
+ 
+ void bt_store_gatt_ccc(const bdaddr_t *addr, uint16_t value);
+ 
 diff --git a/android/gatt.c b/android/gatt.c
-index e06ad1f..8127fc1 100644
+index 83d199f..e06ad1f 100644
 --- a/android/gatt.c
 +++ b/android/gatt.c
-@@ -5921,16 +5921,16 @@ static void write_signed_cmd_request(const uint8_t *cmd, uint16_t cmd_len,
- 		uint8_t t[ATT_SIGNATURE_LEN];
- 		uint32_t r_sign_cnt = get_le32(s);
+@@ -3168,7 +3168,7 @@ static guint signed_write_cmd(struct gatt_device *dev, uint16_t handle,
+ 		return 0;
+ 	}
  
--		if (r_sign_cnt != sign_cnt) {
--			error("gatt: sign_cnt does not match (%d!=%d)",
--							sign_cnt, r_sign_cnt);
-+		if (r_sign_cnt <= sign_cnt) {
-+			error("gatt: Invalid sign_cnt (%d<=%d)?",
-+							r_sign_cnt, sign_cnt);
- 			return;
- 		}
+-	bt_update_sign_counter(&dev->bdaddr, LOCAL_CSRK);
++	bt_update_sign_counter(&dev->bdaddr, LOCAL_CSRK, sign_cnt++);
  
- 		/* Generate signature and verify it */
- 		if (!bt_crypto_sign_att(crypto, csrk, cmd,
- 						cmd_len - ATT_SIGNATURE_LEN,
--						sign_cnt, t)) {
-+						r_sign_cnt, t)) {
- 			error("gatt: Error when generating att signature");
- 			return;
- 		}
+ 	return res;
+ }
 @@ -5940,7 +5940,7 @@ static void write_signed_cmd_request(const uint8_t *cmd, uint16_t cmd_len,
  			return;
  		}
  		/* Signature OK, proceed with write */
--		bt_update_sign_counter(&dev->bdaddr, REMOTE_CSRK, sign_cnt++);
-+		bt_update_sign_counter(&dev->bdaddr, REMOTE_CSRK, r_sign_cnt);
+-		bt_update_sign_counter(&dev->bdaddr, REMOTE_CSRK);
++		bt_update_sign_counter(&dev->bdaddr, REMOTE_CSRK, sign_cnt++);
  		gatt_db_write(gatt_db, handle, 0, value, vlen, cmd[0],
  								&dev->bdaddr);
  	}
