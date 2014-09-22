@@ -1,92 +1,51 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1411409861.2952.57.camel@joe-AO725>
-Subject: [PATCH net-next] bluetooth: Convert bt_<level> logging functions to
- return void
-From: Joe Perches <joe@perches.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: Gustavo Padovan <gustavo@padovan.org>, Johan Hedberg
-	 <johan.hedberg@gmail.com>, "David S. Miller" <davem@davemloft.net>,
-	linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Date: Mon, 22 Sep 2014 11:17:41 -0700
-Content-Type: text/plain; charset="ISO-8859-1"
-Mime-Version: 1.0
+MIME-Version: 1.0
+In-Reply-To: <1410866009-2417-1-git-send-email-luiz.dentz@gmail.com>
+References: <1410866009-2417-1-git-send-email-luiz.dentz@gmail.com>
+Date: Mon, 22 Sep 2014 19:16:41 +0300
+Message-ID: <CABBYNZLmY1GbqYekRpg-EgUo2fcRA1ka74fLZv=-+_-wmQ86kg@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] doc/obex-api: Mark DatabaseIdentifier as optional
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-No caller or macro uses the return value so make all
-the functions return void.
+Hi,
 
-Signed-off-by: Joe Perches <joe@perches.com>
----
-This change is associated to a desire to eventually
-change printk to return void.
+On Tue, Sep 16, 2014 at 2:13 PM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>
+> There is no need to declare DatabaseIdentifier in case it is invalid
+> since by omitting it should indicate GetVersion is not supported.
+> ---
+>  doc/obex-api.txt | 4 +---
+>  1 file changed, 1 insertion(+), 3 deletions(-)
+>
+> diff --git a/doc/obex-api.txt b/doc/obex-api.txt
+> index 31afc74..f80ef39 100644
+> --- a/doc/obex-api.txt
+> +++ b/doc/obex-api.txt
+> @@ -491,12 +491,10 @@ Properties        string Folder [readonly]
+>
+>                         Current folder.
+>
+> -               string DatabaseIdentifier [readonly]
+> +               string DatabaseIdentifier [readonly, optional]
+>
+>                         128 bits persistent identifier.
+>
+> -                       Value '0' shall be considered as not supported.
+> -
+>
+>  Synchronization hierarchy
+>  =========================
+> --
+> 1.9.3
 
- include/net/bluetooth/bluetooth.h |  4 ++--
- net/bluetooth/lib.c               | 14 ++++----------
- 2 files changed, 6 insertions(+), 12 deletions(-)
+Pushed.
 
-diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
-index 7e666d0..58695ff 100644
---- a/include/net/bluetooth/bluetooth.h
-+++ b/include/net/bluetooth/bluetooth.h
-@@ -120,9 +120,9 @@ struct bt_voice {
- #define BT_RCVMTU		13
- 
- __printf(1, 2)
--int bt_info(const char *fmt, ...);
-+void bt_info(const char *fmt, ...);
- __printf(1, 2)
--int bt_err(const char *fmt, ...);
-+void bt_err(const char *fmt, ...);
- 
- #define BT_INFO(fmt, ...)	bt_info(fmt "\n", ##__VA_ARGS__)
- #define BT_ERR(fmt, ...)	bt_err(fmt "\n", ##__VA_ARGS__)
-diff --git a/net/bluetooth/lib.c b/net/bluetooth/lib.c
-index 941ad75..b36bc04 100644
---- a/net/bluetooth/lib.c
-+++ b/net/bluetooth/lib.c
-@@ -135,40 +135,34 @@ int bt_to_errno(__u16 code)
- }
- EXPORT_SYMBOL(bt_to_errno);
- 
--int bt_info(const char *format, ...)
-+void bt_info(const char *format, ...)
- {
- 	struct va_format vaf;
- 	va_list args;
--	int r;
- 
- 	va_start(args, format);
- 
- 	vaf.fmt = format;
- 	vaf.va = &args;
- 
--	r = pr_info("%pV", &vaf);
-+	pr_info("%pV", &vaf);
- 
- 	va_end(args);
--
--	return r;
- }
- EXPORT_SYMBOL(bt_info);
- 
--int bt_err(const char *format, ...)
-+void bt_err(const char *format, ...)
- {
- 	struct va_format vaf;
- 	va_list args;
--	int r;
- 
- 	va_start(args, format);
- 
- 	vaf.fmt = format;
- 	vaf.va = &args;
- 
--	r = pr_err("%pV", &vaf);
-+	pr_err("%pV", &vaf);
- 
- 	va_end(args);
--
--	return r;
- }
- EXPORT_SYMBOL(bt_err);
+
+-- 
+Luiz Augusto von Dentz
