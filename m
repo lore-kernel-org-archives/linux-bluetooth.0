@@ -1,86 +1,56 @@
 Return-Path: <cyrus@holtmann.org>
 From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 5/6] android/hal-mce: Add event handler
-Date: Mon, 22 Sep 2014 13:01:47 +0200
-Message-Id: <1411383708-28621-5-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+Subject: [PATCH 2/6] android/hal-mce-api: Add get remote MAS instance command and event
+Date: Mon, 22 Sep 2014 13:01:44 +0200
+Message-Id: <1411383708-28621-2-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 In-Reply-To: <1411383708-28621-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 References: <1411383708-28621-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- android/hal-map-client.c | 47 +++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 47 insertions(+)
+ android/hal-msg.h | 23 +++++++++++++++++++++++
+ 1 file changed, 23 insertions(+)
 
-diff --git a/android/hal-map-client.c b/android/hal-map-client.c
-index 7fb3011..7538958 100644
---- a/android/hal-map-client.c
-+++ b/android/hal-map-client.c
-@@ -15,6 +15,7 @@
-  *
-  */
+diff --git a/android/hal-msg.h b/android/hal-msg.h
+index ba213b7..ca5f5a1 100644
+--- a/android/hal-msg.h
++++ b/android/hal-msg.h
+@@ -1051,6 +1051,13 @@ struct hal_cmd_hf_client_send_dtmf {
  
-+#include <stdlib.h>
- #include <stdbool.h>
+ #define HAL_OP_HF_CLIENT_GET_LAST_VOICE_TAG_NUM	0x0f
  
- #include "hal-log.h"
-@@ -31,9 +32,55 @@ static bool interface_ready(void)
++/* MAP CLIENT HAL API */
++
++#define HAL_OP_MAP_CLIENT_GET_INSTANCES	0x01
++struct hal_cmd_map_client_get_instances {
++	uint8_t bdaddr[6];
++} __attribute__((packed));
++
+ /* Notifications and confirmations */
  
- /* Event Handlers */
- 
-+static void remote_mas_instances_to_hal(btmce_mas_instance_t *send_instance,
-+				struct hal_map_client_mas_instance *instance,
-+				uint8_t num_instances, uint16_t len)
-+{
-+	void *buf = instance;
-+	uint8_t i;
+ #define HAL_POWER_OFF			0x00
+@@ -1695,3 +1702,19 @@ struct hal_ev_gatt_server_rsp_confirmation {
+ #define HAL_GATT_AUTHENTICATION_NONE		0
+ #define HAL_GATT_AUTHENTICATION_NO_MITM		1
+ #define HAL_GATT_AUTHENTICATION_MITM		2
 +
-+	DBG("");
++#define HAL_EV_MAP_CLIENT_REMOTE_MAS_INSTANCES	0x81
++struct hal_map_client_mas_instance {
++	uint8_t  id;
++	uint8_t  scn;
++	uint8_t  msg_types;
++	uint16_t name_len;
++	uint8_t  name[0];
++} __attribute__((packed));
 +
-+	for (i = 0; i < num_instances; i++) {
-+		if (sizeof(*instance) + instance->name_len > len) {
-+			error("invalid remote mas instances (%zu > %u),"
-+				"aborting",
-+				sizeof(*instance) + instance->name_len, len);
-+			exit(EXIT_FAILURE);
-+		}
-+
-+		send_instance[i].id = instance->id;
-+		send_instance[i].msg_types = instance->msg_types;
-+		send_instance[i].scn = instance->scn;
-+		send_instance[i].p_name = (char *) instance->name;
-+
-+		len -= sizeof(*instance) + instance->name_len;
-+		buf += sizeof(*instance) + instance->name_len;
-+		instance = buf;
-+	}
-+
-+	if (!len)
-+		return;
-+
-+	error("invalid remote mas instances (%u bytes left), aborting", len);
-+	exit(EXIT_FAILURE);
-+}
-+
- static void handle_remote_mas_instances(void *buf, uint16_t len, int fd)
- {
-+	struct hal_ev_map_client_remote_mas_instances *ev = buf;
-+	btmce_mas_instance_t instances[ev->num_instances];
-+
-+	DBG("");
-+
-+	len -= sizeof(*ev);
-+	remote_mas_instances_to_hal(instances, ev->instances, ev->num_instances,
-+									len);
- 
-+	if (cbs->remote_mas_instances_cb)
-+		cbs->remote_mas_instances_cb(ev->status,
-+						(bt_bdaddr_t *) ev->bdaddr,
-+						ev->num_instances, instances);
- }
- 
- /* handlers will be called from notification thread context,
++struct hal_ev_map_client_remote_mas_instances {
++	int32_t status;
++	uint8_t bdaddr[6];
++	int32_t num_instances;
++	struct hal_map_client_mas_instance instances[0];
++} __attribute__((packed));
 -- 
 1.9.3
 
