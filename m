@@ -1,43 +1,74 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcin Kraglak <marcin.kraglak@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 6/7] android/tester: Add GATT Descriptor Read negative test case
-Date: Mon, 22 Sep 2014 13:29:46 +0200
-Message-Id: <1411385387-2811-6-git-send-email-marcin.kraglak@tieto.com>
+Subject: [PATCH 5/7] android/tester: Add GATT Descriptor Read test case
+Date: Mon, 22 Sep 2014 13:29:45 +0200
+Message-Id: <1411385387-2811-5-git-send-email-marcin.kraglak@tieto.com>
 In-Reply-To: <1411385387-2811-1-git-send-email-marcin.kraglak@tieto.com>
 References: <1411385387-2811-1-git-send-email-marcin.kraglak@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Read will return Insufficient Authorization error.
+It will test reading descriptor's value
 ---
- android/tester-gatt.c | 61 +++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 61 insertions(+)
+ android/tester-gatt.c | 97 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 97 insertions(+)
 
 diff --git a/android/tester-gatt.c b/android/tester-gatt.c
-index 314db55..1d2c18f 100644
+index 17bf07b..314db55 100644
 --- a/android/tester-gatt.c
 +++ b/android/tester-gatt.c
-@@ -307,6 +307,14 @@ static struct set_read_params set_read_param_4 = {
- 	.status = BT_STATUS_SUCCESS
+@@ -99,6 +99,14 @@ struct read_char_data {
+ 	int auth_req;
  };
  
-+static struct set_read_params set_read_param_5 = {
++struct read_desc_data {
++	const int conn_id;
++	btgatt_srvc_id_t *service;
++	btgatt_gatt_id_t *characteristic;
++	btgatt_gatt_id_t *descriptor;
++	int auth_req;
++};
++
+ static bt_uuid_t client2_app_uuid = {
+ 	.uu = { 0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02,
+ 				0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02 },
+@@ -241,6 +249,13 @@ static struct read_char_data read_char_data_2 = {
+ 	.characteristic = &characteristic_1,
+ };
+ 
++struct read_desc_data read_desc_data_1 = {
++	.conn_id = CONN1_ID,
++	.service = &service_1,
++	.characteristic = &characteristic_1,
++	.descriptor = &desc_1,
++};
++
+ struct get_incl_data get_incl_data_1 = {
+ 	.conn_id = CONN1_ID,
+ 	.service = &service_1
+@@ -282,6 +297,16 @@ static struct set_read_params set_read_param_3 = {
+ 	.status = 0x01,
+ };
+ 
++static struct set_read_params set_read_param_4 = {
 +	.params = &read_params_1,
 +	.srvc_id = &service_1,
 +	.char_id = &characteristic_1,
 +	.descr_id = &desc_1,
-+	.status = GATT_STATUS_INS_AUTH
++	.value = value_1,
++	.len = 1,
++	.status = BT_STATUS_SUCCESS
 +};
 +
  static struct pdu search_service[] = {
  	raw_pdu(0x10, 0x01, 0x00, 0xff, 0xff, 0x00, 0x28),
  	raw_pdu(0x11, 0x06, 0x01, 0x00, 0x10, 0x00, 0x00, 0x18),
-@@ -472,6 +480,24 @@ static struct pdu read_descriptor_1[] = {
+@@ -429,6 +454,24 @@ static struct pdu read_characteristic_2[] = {
  	end_pdu
  };
  
-+static struct pdu read_descriptor_2[] = {
++static struct pdu read_descriptor_1[] = {
 +	raw_pdu(0x10, 0x01, 0x00, 0xff, 0xff, 0x00, 0x28),
 +	raw_pdu(0x11, 0x06, 0x01, 0x00, 0x10, 0x00, 0x00, 0x18),
 +	raw_pdu(0x10, 0x11, 0x00, 0xff, 0xff, 0x00, 0x28),
@@ -51,20 +82,46 @@ index 314db55..1d2c18f 100644
 +	raw_pdu(0x04, 0x05, 0x00, 0x10, 0x00),
 +	raw_pdu(0x01, 0x04, 0x05, 0x00, 0x0a),
 +	raw_pdu(0x0a, 0x04, 0x00),
-+	raw_pdu(0x01, 0x0a, 0x04, 0x00, 0x08),
++	raw_pdu(0x0b, 0x01),
 +	end_pdu
 +};
 +
  static void gatt_client_register_action(void)
  {
  	struct test_data *data = tester_get_data();
-@@ -1428,6 +1454,41 @@ static struct test_case test_cases[] = {
+@@ -608,6 +651,25 @@ static void gatt_client_read_characteristic_action(void)
+ 	schedule_action_verification(step);
+ }
+ 
++static void gatt_client_read_descriptor_action(void)
++{
++	struct test_data *data = tester_get_data();
++	struct step *current_data_step = queue_peek_head(data->steps);
++	struct read_desc_data *read_desc_data = current_data_step->set_data;
++	const btgatt_client_interface_t *client = data->if_gatt->client;
++	struct step *step = g_new0(struct step, 1);
++	int status;
++
++	status = client->read_descriptor(read_desc_data->conn_id,
++			read_desc_data->service, read_desc_data->characteristic,
++			read_desc_data->descriptor,
++			read_desc_data->auth_req);
++
++	step->action_status = status;
++
++	schedule_action_verification(step);
++}
++
+ static void gatt_cid_hook_cb(const void *data, uint16_t len, void *user_data)
+ {
+ 	struct test_data *t_data = tester_get_data();
+@@ -1331,6 +1393,41 @@ static struct test_case test_cases[] = {
  		ACTION_SUCCESS(bluetooth_disable_action, NULL),
  		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_OFF),
  	),
-+	TEST_CASE_BREDRLE("Gatt Client - Read Descriptor - Ins. Author.",
-+		ACTION_SUCCESS(init_pdus, read_descriptor_2),
-+		ACTION_SUCCESS(init_read_params_action, &set_read_param_5),
++	TEST_CASE_BREDRLE("Gatt Client - Read Descriptor - Success",
++		ACTION_SUCCESS(init_pdus, read_descriptor_1),
++		ACTION_SUCCESS(init_read_params_action, &set_read_param_4),
 +		ACTION_SUCCESS(bluetooth_enable_action, NULL),
 +		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_ON),
 +		ACTION_SUCCESS(emu_setup_powered_remote_action, NULL),
@@ -92,7 +149,7 @@ index 314db55..1d2c18f 100644
 +				&service_1, &characteristic_1, &desc_1),
 +		ACTION_SUCCESS(gatt_client_read_descriptor_action,
 +							&read_desc_data_1),
-+		CALLBACK_GATTC_READ_DESCRIPTOR(GATT_STATUS_INS_AUTH,
++		CALLBACK_GATTC_READ_DESCRIPTOR(GATT_STATUS_SUCCESS,
 +						CONN1_ID, &read_params_1),
 +		ACTION_SUCCESS(bluetooth_disable_action, NULL),
 +		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_OFF),
