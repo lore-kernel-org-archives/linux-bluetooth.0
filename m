@@ -1,71 +1,62 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 00/11] android: Configuration command
-Date: Mon, 22 Sep 2014 16:44:51 +0200
-Message-ID: <3098623.7vBXzcgNBe@uw000953>
-In-Reply-To: <1410792555-24765-1-git-send-email-szymon.janc@tieto.com>
-References: <1410792555-24765-1-git-send-email-szymon.janc@tieto.com>
+From: "Gu, Chao Jie" <chao.jie.gu@intel.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+CC: Szymon Janc <szymon.janc@tieto.com>, "linux-bluetooth@vger.kernel.org"
+	<linux-bluetooth@vger.kernel.org>, "armansito@chromium.org"
+	<armansito@chromium.org>
+Subject: RE: [PATCH] Add signed write command
+Date: Mon, 22 Sep 2014 12:51:49 +0000
+Message-ID: <3D02B219753AD44CBDDDE484323B17741130A12E@SHSMSX104.ccr.corp.intel.com>
+References: <1410958395-7174-1-git-send-email-chao.jie.gu@intel.com>
+ <12273172.GZIjs3WGW2@leonov>
+ <3D02B219753AD44CBDDDE484323B17741130A080@SHSMSX104.ccr.corp.intel.com>
+ <CD6FEB99-0D29-4AA7-8794-D5B5DFA28C37@holtmann.org>
+In-Reply-To: <CD6FEB99-0D29-4AA7-8794-D5B5DFA28C37@holtmann.org>
+Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Monday 15 of September 2014 16:49:04 Szymon Janc wrote:
-> Hi,
-> 
-> This is a respin of serie that was send some time ago as RFC [1]
-> 
-> This will allow to pass Android properties over IPC and use them
-> in daemon for customization eg. Device Information or default adapter name.
-> 
-> Comments from RFC was taken into account. So now "ro.bluetooth.*"
-> and "sys.persist.bluetooth.*" are taken into account (former takes
-> precedence if both are present). Some configs also fallback to
-> generic properties if no bluetooth ones are present.
-> 
-> Comments are welcome.
-> 
-> BR
-> Szymon Janc
-> 
-> [1] "[RFC 0/6] android: Configuration command"
-> 
-> 
-> Szymon Janc (11):
->   android/hal-ipc-api: Add Configuration command
->   android/hal-msg: Add configuration command
->   android: Add support for configuration command
->   android: Add functions for getting configuration options
->   android/bluetooth: Use model name for default adapter name
->   android/gatt: Use configuration data for device information profile
->   android/hal-bluetooth: Add support for sending configuration
->   android/hal: Add helper for quering config from Android properties
->   android: Use helper for accesing Android properties
->   android/bluetoothd-wrapper: Fix indentation
->   android/README: Update customization section
-> 
->  android/Android.mk           |   3 +-
->  android/README               |  14 ++++--
->  android/bluetooth.c          |  17 +++++--
->  android/bluetoothd-wrapper.c |  19 +++----
->  android/client/if-gatt.c     |   2 +
->  android/cutils/properties.h  |   1 +
->  android/gatt.c               | 115 ++++++++++++++++++++++++-------------------
->  android/hal-bluetooth.c      |  51 ++++++++++++++++---
->  android/hal-handsfree.c      |  15 +++---
->  android/hal-ipc-api.txt      |  16 ++++++
->  android/hal-msg.h            |  17 +++++++
->  android/hal-utils.c          |  32 ++++++++++++
->  android/hal-utils.h          |   2 +
->  android/main.c               |  94 +++++++++++++++++++++++++++++++++++
->  android/utils.h              |   4 ++
->  15 files changed, 314 insertions(+), 88 deletions(-)
-> 
+Hi Marcel,
 
-Applied with some changes to make configure options TLV instead of fixed size
-arrays.
+> >>> Add bt_att_set_csrk for btgatt-client tool. However this patch hook
+> >>> into shared/mgmt, so btgatt-client now should be running by the root =
+user.
+> >>
+> >> I guess this could be made optional.
+> >
+> > You said this could be made optional , what's you point ? I am not
+> > very clear about That.
+>=20
+> just provide a command line option to btgatt-client to provide the CSRK t=
+o be used.
+> There is no need to attach to mgmt since that is only seeing keys during =
+pairing
+> anyway.
+>
 
--- 
-Best regards, 
-Szymon Janc
+You means that let user get CSRK from DEVICE_FILE which stored CSRK value w=
+hen pairing,
+and put this CSRK into command line option by himself , right?
+=20
+> >>> +void bt_att_set_csrk(struct bt_att *att,
+> >>> +			const uint8_t *val,
+> >>> +			uint32_t local_sign_cnt)
+> >>
+> >> This should allow to set local and/or remote csrk. Either we have two
+> >> functions or flag identifying which key is provided.
+> >
+> > This is good idea. But this patch for client side, there is no need to
+> > use remote_csrk, So would it be better to add remote csrk part when we =
+need
+> this?
+>=20
+> I want to function. One to set the local CSRK and one for setting the rem=
+ote CSRK.
+> However I have no idea why we are bothering with the sign counter. Just r=
+eset it
+> when creating bt_att.
+>=20
+That's fine . I will implement it.
+
+Best Regards
+Chaojie Gu
