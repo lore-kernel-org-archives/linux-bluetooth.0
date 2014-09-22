@@ -1,49 +1,71 @@
 Return-Path: <cyrus@holtmann.org>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 00/11] android: Configuration command
+Date: Mon, 22 Sep 2014 16:44:51 +0200
+Message-ID: <3098623.7vBXzcgNBe@uw000953>
+In-Reply-To: <1410792555-24765-1-git-send-email-szymon.janc@tieto.com>
+References: <1410792555-24765-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
-In-Reply-To: <1411369928-14307-1-git-send-email-gowtham.ab@samsung.com>
-References: <1411369928-14307-1-git-send-email-gowtham.ab@samsung.com>
-Date: Mon, 22 Sep 2014 19:08:27 +0300
-Message-ID: <CABBYNZJQhX7xo286JDysjeKFWOsTXpZD9ACgtxWjQXEp+1vp8w@mail.gmail.com>
-Subject: Re: [PATCH v3] obexd/src/manager: Fix the double check for agent
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Gowtham Anandha Babu <gowtham.ab@samsung.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	Dmitry Kasatkin <d.kasatkin@samsung.com>,
-	Bharat Panda <bharat.panda@samsung.com>, cpgs@samsung.com
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+On Monday 15 of September 2014 16:49:04 Szymon Janc wrote:
+> Hi,
+> 
+> This is a respin of serie that was send some time ago as RFC [1]
+> 
+> This will allow to pass Android properties over IPC and use them
+> in daemon for customization eg. Device Information or default adapter name.
+> 
+> Comments from RFC was taken into account. So now "ro.bluetooth.*"
+> and "sys.persist.bluetooth.*" are taken into account (former takes
+> precedence if both are present). Some configs also fallback to
+> generic properties if no bluetooth ones are present.
+> 
+> Comments are welcome.
+> 
+> BR
+> Szymon Janc
+> 
+> [1] "[RFC 0/6] android: Configuration command"
+> 
+> 
+> Szymon Janc (11):
+>   android/hal-ipc-api: Add Configuration command
+>   android/hal-msg: Add configuration command
+>   android: Add support for configuration command
+>   android: Add functions for getting configuration options
+>   android/bluetooth: Use model name for default adapter name
+>   android/gatt: Use configuration data for device information profile
+>   android/hal-bluetooth: Add support for sending configuration
+>   android/hal: Add helper for quering config from Android properties
+>   android: Use helper for accesing Android properties
+>   android/bluetoothd-wrapper: Fix indentation
+>   android/README: Update customization section
+> 
+>  android/Android.mk           |   3 +-
+>  android/README               |  14 ++++--
+>  android/bluetooth.c          |  17 +++++--
+>  android/bluetoothd-wrapper.c |  19 +++----
+>  android/client/if-gatt.c     |   2 +
+>  android/cutils/properties.h  |   1 +
+>  android/gatt.c               | 115 ++++++++++++++++++++++++-------------------
+>  android/hal-bluetooth.c      |  51 ++++++++++++++++---
+>  android/hal-handsfree.c      |  15 +++---
+>  android/hal-ipc-api.txt      |  16 ++++++
+>  android/hal-msg.h            |  17 +++++++
+>  android/hal-utils.c          |  32 ++++++++++++
+>  android/hal-utils.h          |   2 +
+>  android/main.c               |  94 +++++++++++++++++++++++++++++++++++
+>  android/utils.h              |   4 ++
+>  15 files changed, 314 insertions(+), 88 deletions(-)
+> 
 
-On Mon, Sep 22, 2014 at 10:12 AM, Gowtham Anandha Babu
-<gowtham.ab@samsung.com> wrote:
-> Removes the check for NULL agent.
-> ---
-> agent_free() function contains the NULL check already.
-> ---
->  obexd/src/manager.c | 3 +--
->  1 file changed, 1 insertion(+), 2 deletions(-)
->
-> diff --git a/obexd/src/manager.c b/obexd/src/manager.c
-> index 326e56f..97ae278 100644
-> --- a/obexd/src/manager.c
-> +++ b/obexd/src/manager.c
-> @@ -521,8 +521,7 @@ void manager_cleanup(void)
->
->         /* FIXME: Release agent? */
->
-> -       if (agent)
-> -               agent_free(agent);
-> +       agent_free(agent);
->
->         g_dbus_detach_object_manager(connection);
->
-> --
-> 1.9.1
-
-Pushed, thanks.
-
+Applied with some changes to make configure options TLV instead of fixed size
+arrays.
 
 -- 
-Luiz Augusto von Dentz
+Best regards, 
+Szymon Janc
