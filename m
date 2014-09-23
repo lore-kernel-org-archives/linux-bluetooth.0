@@ -2,250 +2,276 @@ Return-Path: <cyrus@holtmann.org>
 From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
-Subject: [PATCH] android/ipc-tester: Add cases for the handsfree client interface
-Date: Tue, 23 Sep 2014 08:52:16 +0200
-Message-Id: <1411455136-28194-1-git-send-email-jakub.tyszkowski@tieto.com>
+Subject: [PATCH 5/5] android/client: Add handsfree client api calls
+Date: Tue, 23 Sep 2014 08:49:40 +0200
+Message-Id: <1411454980-27225-5-git-send-email-jakub.tyszkowski@tieto.com>
+In-Reply-To: <1411454980-27225-1-git-send-email-jakub.tyszkowski@tieto.com>
+References: <1411454980-27225-1-git-send-email-jakub.tyszkowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- android/ipc-tester.c | 210 +++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 210 insertions(+)
+ android/client/if-hf-client.c | 141 ++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 141 insertions(+)
 
-diff --git a/android/ipc-tester.c b/android/ipc-tester.c
-index 5ca236a..66632f8 100644
---- a/android/ipc-tester.c
-+++ b/android/ipc-tester.c
-@@ -834,6 +834,36 @@ static struct hidhost_send_data_data hidhost_send_data_unders = {
- 	.buf = send_data_data,
- };
+diff --git a/android/client/if-hf-client.c b/android/client/if-hf-client.c
+index 12bc24c..07c09cd 100644
+--- a/android/client/if-hf-client.c
++++ b/android/client/if-hf-client.c
+@@ -123,6 +123,21 @@ SINTMAP(bthf_client_in_band_ring_state_t, -1, "(unknown)")
+ 	DELEMENT(BTHF_CLIENT_IN_BAND_RINGTONE_PROVIDED),
+ ENDMAP
  
-+#define hfp_number "#1234567890"
++SINTMAP(bthf_client_call_action_t, -1, "(unknown)")
++	DELEMENT(BTHF_CLIENT_CALL_ACTION_CHLD_0),
++	DELEMENT(BTHF_CLIENT_CALL_ACTION_CHLD_1),
++	DELEMENT(BTHF_CLIENT_CALL_ACTION_CHLD_2),
++	DELEMENT(BTHF_CLIENT_CALL_ACTION_CHLD_3),
++	DELEMENT(BTHF_CLIENT_CALL_ACTION_CHLD_4),
++	DELEMENT(BTHF_CLIENT_CALL_ACTION_CHLD_1x),
++	DELEMENT(BTHF_CLIENT_CALL_ACTION_CHLD_2x),
++	DELEMENT(BTHF_CLIENT_CALL_ACTION_ATA),
++	DELEMENT(BTHF_CLIENT_CALL_ACTION_CHUP),
++	DELEMENT(BTHF_CLIENT_CALL_ACTION_BTRH_0),
++	DELEMENT(BTHF_CLIENT_CALL_ACTION_BTRH_1),
++	DELEMENT(BTHF_CLIENT_CALL_ACTION_BTRH_2),
++ENDMAP
 +
-+struct hfp_dial_data {
-+	struct ipc_hdr hdr;
-+	struct hal_cmd_hf_client_dial data;
-+
-+	uint8_t buf[IPC_MTU - sizeof(struct ipc_hdr) -
-+				sizeof(struct hal_cmd_hf_client_dial)];
-+} __attribute__((packed));
-+
-+static struct hfp_dial_data hfp_dial_overs = {
-+	.hdr.service_id = HAL_SERVICE_ID_HANDSFREE_CLIENT,
-+	.hdr.opcode = HAL_OP_HF_CLIENT_DIAL,
-+	.hdr.len = sizeof(struct hal_cmd_hf_client_dial) +
-+							sizeof(hfp_number),
-+
-+	.data.number_len = sizeof(hfp_number) + 1,
-+	.buf = hfp_number,
-+};
-+
-+static struct hfp_dial_data hfp_dial_unders = {
-+	.hdr.service_id = HAL_SERVICE_ID_HANDSFREE_CLIENT,
-+	.hdr.opcode = HAL_OP_HF_CLIENT_DIAL,
-+	.hdr.len = sizeof(struct hal_cmd_hf_client_dial) +
-+							sizeof(hfp_number),
-+
-+	.data.number_len = sizeof(hfp_number) - 1,
-+	.buf = hfp_number,
-+};
-+
- int main(int argc, char *argv[])
+ /* Callbacks */
+ 
+ static char features_str[512];
+@@ -376,11 +391,21 @@ static void init_p(int argc, const char **argv)
+ static void connect_c(int argc, const char **argv, enum_func *enum_func,
+ 								void **user)
  {
- 	snprintf(exec_dir, sizeof(exec_dir), "%s", dirname(argv[0]));
-@@ -892,6 +922,10 @@ int main(int argc, char *argv[])
- 	test_opcode_valid("A2DP", HAL_SERVICE_ID_A2DP, 0x03, 0,
- 			HAL_SERVICE_ID_BLUETOOTH, HAL_SERVICE_ID_A2DP);
- 
-+	test_opcode_valid("HF_CLIENT", HAL_SERVICE_ID_HANDSFREE_CLIENT, 0x10, 0,
-+			HAL_SERVICE_ID_BLUETOOTH,
-+			HAL_SERVICE_ID_HANDSFREE_CLIENT);
-+
- 	/* check for valid data size */
- 	test_datasize_valid("CORE Register+", HAL_SERVICE_ID_CORE,
- 			HAL_OP_REGISTER_MODULE,
-@@ -1258,5 +1292,181 @@ int main(int argc, char *argv[])
- 			sizeof(struct hal_cmd_a2dp_disconnect), -1,
- 			HAL_SERVICE_ID_BLUETOOTH, HAL_SERVICE_ID_A2DP);
- 
-+	/* Check for valid data size for Handsfree Client */
-+	test_datasize_valid("HF_CLIENT Connect+",
-+			HAL_SERVICE_ID_HANDSFREE_CLIENT,
-+			HAL_OP_HF_CLIENT_CONNECT,
-+			sizeof(struct hal_cmd_hf_client_connect), 1,
-+			HAL_SERVICE_ID_BLUETOOTH,
-+			HAL_SERVICE_ID_HANDSFREE_CLIENT);
-+	test_datasize_valid("HF_CLIENT Connect-",
-+			HAL_SERVICE_ID_HANDSFREE_CLIENT,
-+			HAL_OP_HF_CLIENT_CONNECT,
-+			sizeof(struct hal_cmd_hf_client_connect), -1,
-+			HAL_SERVICE_ID_BLUETOOTH,
-+			HAL_SERVICE_ID_HANDSFREE_CLIENT);
-+	test_datasize_valid("HF_CLIENT Disconnect+",
-+			HAL_SERVICE_ID_HANDSFREE_CLIENT,
-+			HAL_OP_HF_CLIENT_DISCONNECT,
-+			sizeof(struct hal_cmd_hf_client_disconnect), 1,
-+			HAL_SERVICE_ID_BLUETOOTH,
-+			HAL_SERVICE_ID_HANDSFREE_CLIENT);
-+	test_datasize_valid("HF_CLIENT Disconnect-",
-+			HAL_SERVICE_ID_HANDSFREE_CLIENT,
-+			HAL_OP_HF_CLIENT_DISCONNECT,
-+			sizeof(struct hal_cmd_hf_client_disconnect), -1,
-+			HAL_SERVICE_ID_BLUETOOTH,
-+			HAL_SERVICE_ID_HANDSFREE_CLIENT);
-+	test_datasize_valid("HF_CLIENT Connect Audio+",
-+			HAL_SERVICE_ID_HANDSFREE_CLIENT,
-+			HAL_OP_HF_CLIENT_CONNECT_AUDIO,
-+			sizeof(struct hal_cmd_hf_client_connect_audio), 1,
-+			HAL_SERVICE_ID_BLUETOOTH,
-+			HAL_SERVICE_ID_HANDSFREE_CLIENT);
-+	test_datasize_valid("HF_CLIENT Connect Audio-",
-+			HAL_SERVICE_ID_HANDSFREE_CLIENT,
-+			HAL_OP_HF_CLIENT_CONNECT_AUDIO,
-+			sizeof(struct hal_cmd_hf_client_connect_audio), -1,
-+			HAL_SERVICE_ID_BLUETOOTH,
-+			HAL_SERVICE_ID_HANDSFREE_CLIENT);
-+	test_datasize_valid("HF_CLIENT Disconnect Audio+",
-+			HAL_SERVICE_ID_HANDSFREE_CLIENT,
-+			HAL_OP_HF_CLIENT_DISCONNECT_AUDIO,
-+			sizeof(struct hal_cmd_hf_client_disconnect_audio), 1,
-+			HAL_SERVICE_ID_BLUETOOTH,
-+			HAL_SERVICE_ID_HANDSFREE_CLIENT);
-+	test_datasize_valid("HF_CLIENT Disconnect Audio-",
-+			HAL_SERVICE_ID_HANDSFREE_CLIENT,
-+			HAL_OP_HF_CLIENT_DISCONNECT_AUDIO,
-+			sizeof(struct hal_cmd_hf_client_disconnect_audio), -1,
-+			HAL_SERVICE_ID_BLUETOOTH,
-+			HAL_SERVICE_ID_HANDSFREE_CLIENT);
-+	test_datasize_valid("HF_CLIENT Start VR+", HAL_SERVICE_ID_BLUETOOTH,
-+			HAL_OP_HF_CLIENT_START_VR,
-+			0, 1,
-+			HAL_SERVICE_ID_BLUETOOTH,
-+			HAL_SERVICE_ID_HANDSFREE_CLIENT);
-+	test_datasize_valid("HF_CLIENT Start VR-", HAL_SERVICE_ID_BLUETOOTH,
-+			HAL_OP_HF_CLIENT_START_VR,
-+			0, -1,
-+			HAL_SERVICE_ID_BLUETOOTH,
-+			HAL_SERVICE_ID_HANDSFREE_CLIENT);
-+	test_datasize_valid("HF_CLIENT Stop VR+", HAL_SERVICE_ID_BLUETOOTH,
-+			HAL_OP_HF_CLIENT_STOP_VR,
-+			0, 1,
-+			HAL_SERVICE_ID_BLUETOOTH,
-+			HAL_SERVICE_ID_HANDSFREE_CLIENT);
-+	test_datasize_valid("HF_CLIENT Stop VR-", HAL_SERVICE_ID_BLUETOOTH,
-+			HAL_OP_HF_CLIENT_STOP_VR,
-+			0, -1,
-+			HAL_SERVICE_ID_BLUETOOTH,
-+			HAL_SERVICE_ID_HANDSFREE_CLIENT);
-+	test_datasize_valid("HF_CLIENT Vol Contr.+", HAL_SERVICE_ID_BLUETOOTH,
-+			HAL_OP_HF_CLIENT_VOLUME_CONTROL,
-+			sizeof(struct hal_cmd_hf_client_volume_control), 1,
-+			HAL_SERVICE_ID_BLUETOOTH,
-+			HAL_SERVICE_ID_HANDSFREE_CLIENT);
-+	test_datasize_valid("HF_CLIENT Vol Contr.-", HAL_SERVICE_ID_BLUETOOTH,
-+			HAL_OP_HF_CLIENT_VOLUME_CONTROL,
-+			sizeof(struct hal_cmd_hf_client_volume_control), -1,
-+			HAL_SERVICE_ID_BLUETOOTH,
-+			HAL_SERVICE_ID_HANDSFREE_CLIENT);
-+	test_generic("Data size HF_CLIENT Dial Vardata+",
-+			ipc_send_tc, setup, teardown,
-+			&hfp_dial_overs,
-+			(sizeof(struct ipc_hdr) +
-+				sizeof(struct hal_cmd_hf_client_dial) +
-+				sizeof(hfp_number)),
-+			HAL_SERVICE_ID_BLUETOOTH,
-+			HAL_SERVICE_ID_HANDSFREE_CLIENT);
-+	test_generic("Data size HF_CLIENT Dial Vardata-",
-+			ipc_send_tc, setup, teardown,
-+			&hfp_dial_unders,
-+			(sizeof(struct ipc_hdr) +
-+				sizeof(struct hal_cmd_hf_client_dial) +
-+				sizeof(hfp_number)),
-+			HAL_SERVICE_ID_BLUETOOTH,
-+			HAL_SERVICE_ID_HANDSFREE_CLIENT);
-+	test_datasize_valid("HF_CLIENT Dial Memory+", HAL_SERVICE_ID_BLUETOOTH,
-+			HAL_OP_HF_CLIENT_DIAL_MEMORY,
-+			sizeof(struct hal_cmd_hf_client_dial_memory), 1,
-+			HAL_SERVICE_ID_BLUETOOTH,
-+			HAL_SERVICE_ID_HANDSFREE_CLIENT);
-+	test_datasize_valid("HF_CLIENT Dial Memory-", HAL_SERVICE_ID_BLUETOOTH,
-+			HAL_OP_HF_CLIENT_DIAL_MEMORY,
-+			sizeof(struct hal_cmd_hf_client_dial_memory), -1,
-+			HAL_SERVICE_ID_BLUETOOTH,
-+			HAL_SERVICE_ID_HANDSFREE_CLIENT);
-+	test_datasize_valid("HF_CLIENT Call Action+", HAL_SERVICE_ID_BLUETOOTH,
-+			HAL_OP_HF_CLIENT_CALL_ACTION,
-+			sizeof(struct hal_cmd_hf_client_call_action), 1,
-+			HAL_SERVICE_ID_BLUETOOTH,
-+			HAL_SERVICE_ID_HANDSFREE_CLIENT);
-+	test_datasize_valid("HF_CLIENT Call Action-", HAL_SERVICE_ID_BLUETOOTH,
-+			HAL_OP_HF_CLIENT_CALL_ACTION,
-+			sizeof(struct hal_cmd_hf_client_call_action), -1,
-+			HAL_SERVICE_ID_BLUETOOTH,
-+			HAL_SERVICE_ID_HANDSFREE_CLIENT);
-+	test_datasize_valid("HF_CLIENT Query Current Calls+",
-+			HAL_SERVICE_ID_BLUETOOTH,
-+			HAL_OP_HF_CLIENT_QUERY_CURRENT_CALLS,
-+			0, 1,
-+			HAL_SERVICE_ID_BLUETOOTH,
-+			HAL_SERVICE_ID_HANDSFREE_CLIENT);
-+	test_datasize_valid("HF_CLIENT Query Current Calls-",
-+			HAL_SERVICE_ID_BLUETOOTH,
-+			HAL_OP_HF_CLIENT_QUERY_CURRENT_CALLS,
-+			0, -1,
-+			HAL_SERVICE_ID_BLUETOOTH,
-+			HAL_SERVICE_ID_HANDSFREE_CLIENT);
-+	test_datasize_valid("HF_CLIENT Query Operator Name+",
-+			HAL_SERVICE_ID_BLUETOOTH,
-+			HAL_OP_HF_CLIENT_QUERY_OPERATOR_NAME,
-+			0, 1,
-+			HAL_SERVICE_ID_BLUETOOTH,
-+			HAL_SERVICE_ID_HANDSFREE_CLIENT);
-+	test_datasize_valid("HF_CLIENT Query Operator Name-",
-+			HAL_SERVICE_ID_BLUETOOTH,
-+			HAL_OP_HF_CLIENT_QUERY_OPERATOR_NAME,
-+			0, -1,
-+			HAL_SERVICE_ID_BLUETOOTH,
-+			HAL_SERVICE_ID_HANDSFREE_CLIENT);
-+	test_datasize_valid("HF_CLIENT Retrieve Subscrb. Info+",
-+			HAL_SERVICE_ID_BLUETOOTH,
-+			HAL_OP_HF_CLIENT_RETRIEVE_SUBSCR_INFO,
-+			0, 1,
-+			HAL_SERVICE_ID_BLUETOOTH,
-+			HAL_SERVICE_ID_HANDSFREE_CLIENT);
-+	test_datasize_valid("HF_CLIENT Retrieve Subscrb. Info-",
-+			HAL_SERVICE_ID_BLUETOOTH,
-+			HAL_OP_HF_CLIENT_RETRIEVE_SUBSCR_INFO,
-+			0, -1,
-+			HAL_SERVICE_ID_BLUETOOTH,
-+			HAL_SERVICE_ID_HANDSFREE_CLIENT);
-+	test_datasize_valid("HF_CLIENT Send DTMF+",
-+			HAL_SERVICE_ID_BLUETOOTH,
-+			HAL_OP_HF_CLIENT_SEND_DTMF,
-+			sizeof(struct hal_cmd_hf_client_send_dtmf), 1,
-+			HAL_SERVICE_ID_BLUETOOTH,
-+			HAL_SERVICE_ID_HANDSFREE_CLIENT);
-+	test_datasize_valid("HF_CLIENT Send DTMF-",
-+			HAL_SERVICE_ID_BLUETOOTH,
-+			HAL_OP_HF_CLIENT_SEND_DTMF,
-+			sizeof(struct hal_cmd_hf_client_send_dtmf), -1,
-+			HAL_SERVICE_ID_BLUETOOTH,
-+			HAL_SERVICE_ID_HANDSFREE_CLIENT);
-+	test_datasize_valid("HF_CLIENT Get Last Voice Tag+",
-+			HAL_SERVICE_ID_BLUETOOTH,
-+			HAL_OP_HF_CLIENT_GET_LAST_VOICE_TAG_NUM,
-+			0, 1,
-+			HAL_SERVICE_ID_BLUETOOTH,
-+			HAL_SERVICE_ID_HANDSFREE_CLIENT);
-+	test_datasize_valid("HF_CLIENT Get Last Voice Tag-",
-+			HAL_SERVICE_ID_BLUETOOTH,
-+			HAL_OP_HF_CLIENT_GET_LAST_VOICE_TAG_NUM,
-+			0, -1,
-+			HAL_SERVICE_ID_BLUETOOTH,
-+			HAL_SERVICE_ID_HANDSFREE_CLIENT);
-+
- 	return tester_run();
++	if (argc == 3) {
++		*user = NULL;
++		*enum_func = enum_devices;
++	}
  }
+ 
+ /* connect to audio gateway */
+ static void connect_p(int argc, const char **argv)
+ {
++	bt_bdaddr_t addr;
++
++	RETURN_IF_NULL(if_hf_client);
++	VERIFY_ADDR_ARG(2, &addr);
++
++	EXEC(if_hf_client->connect, &addr);
+ }
+ 
+ /*
+@@ -402,16 +427,32 @@ static void connected_addr_c(int argc, const char **argv, enum_func *enum_func,
+ /* disconnect from audio gateway */
+ static void disconnect_p(int argc, const char **argv)
+ {
++	bt_bdaddr_t addr;
++
++	RETURN_IF_NULL(if_hf_client);
++	VERIFY_ADDR_ARG(2, &addr);
++
++	EXEC(if_hf_client->disconnect, &addr);
+ }
+ 
+ static void connect_audio_c(int argc, const char **argv, enum_func *enum_func,
+ 								void **user)
+ {
++	if (argc == 3) {
++		*user = NULL;
++		*enum_func = enum_devices;
++	}
+ }
+ 
+ /* create an audio connection */
+ static void connect_audio_p(int argc, const char **argv)
+ {
++	bt_bdaddr_t addr;
++
++	RETURN_IF_NULL(if_hf_client);
++	VERIFY_ADDR_ARG(2, &addr);
++
++	EXEC(if_hf_client->connect_audio, &addr);
+ }
+ 
+ /* Map completion to connected_addr_c */
+@@ -420,76 +461,176 @@ static void connect_audio_p(int argc, const char **argv)
+ /* close the audio connection */
+ static void disconnect_audio_p(int argc, const char **argv)
+ {
++	bt_bdaddr_t addr;
++
++	RETURN_IF_NULL(if_hf_client);
++	VERIFY_ADDR_ARG(2, &addr);
++
++	EXEC(if_hf_client->disconnect_audio, &addr);
+ }
+ 
+ /* start voice recognition */
+ static void start_voice_recognition_p(int argc, const char **argv)
+ {
++	RETURN_IF_NULL(if_hf_client);
++
++	EXEC(if_hf_client->start_voice_recognition);
+ }
+ 
+ /* stop voice recognition */
+ static void stop_voice_recognition_p(int argc, const char **argv)
+ {
++	RETURN_IF_NULL(if_hf_client);
++
++	EXEC(if_hf_client->start_voice_recognition);
+ }
+ 
+ static void volume_control_c(int argc, const char **argv, enum_func *enum_func,
+ 								void **user)
+ {
++	if (argc == 3) {
++		*user = TYPE_ENUM(bthf_client_volume_type_t);
++		*enum_func = enum_defines;
++	}
+ }
+ 
+ /* volume control */
+ static void volume_control_p(int argc, const char **argv)
+ {
++	bthf_client_volume_type_t type;
++	int volume;
++
++	RETURN_IF_NULL(if_hf_client);
++
++	/* volume type */
++	if (argc <= 2) {
++		haltest_error("No volume type specified\n");
++		return;
++	}
++	type = str2bthf_client_volume_type_t(argv[2]);
++
++	/* volume */
++	if (argc <= 3) {
++		haltest_error("No volume specified\n");
++		return;
++	}
++	volume = atoi(argv[3]);
++
++	EXEC(if_hf_client->volume_control, type, volume);
+ }
+ 
+ /* place a call with number a number */
+ static void dial_p(int argc, const char **argv)
+ {
++	RETURN_IF_NULL(if_hf_client);
++
++	/* number string */
++	if (argc <= 2) {
++		haltest_error("No number specified\n");
++		return;
++	}
++
++	EXEC(if_hf_client->dial, argv[2]);
+ }
+ 
+ /* place a call with number specified by location (speed dial) */
+ static void dial_memory_p(int argc, const char **argv)
+ {
++	RETURN_IF_NULL(if_hf_client);
++
++	/* memory index */
++	if (argc <= 2) {
++		haltest_error("No memory index specified\n");
++		return;
++	}
++
++	EXEC(if_hf_client->dial_memory, atoi(argv[2]));
+ }
+ 
+ static void handle_call_action_c(int argc, const char **argv,
+ 					enum_func *enum_func, void **user)
+ {
++	if (argc == 3) {
++		*user = TYPE_ENUM(bthf_client_call_action_t);
++		*enum_func = enum_defines;
++	}
+ }
+ 
+ /* perform specified call related action */
+ static void handle_call_action_p(int argc, const char **argv)
+ {
++	bthf_client_call_action_t action;
++	int index = 0;
++
++	RETURN_IF_NULL(if_hf_client);
++
++	/* action */
++	if (argc <= 2) {
++		haltest_error("No action specified\n");
++		return;
++	}
++	action = str2bthf_client_call_action_t(argv[2]);
++
++	/* call index */
++	if (action == BTHF_CLIENT_CALL_ACTION_CHLD_1x ||
++				action == BTHF_CLIENT_CALL_ACTION_CHLD_2x) {
++		if (argc <= 3) {
++			haltest_error("No call index specified\n");
++			return;
++		}
++		index = atoi(argv[3]);
++	}
++
++	EXEC(if_hf_client->handle_call_action, action, index);
+ }
+ 
+ /* query list of current calls */
+ static void query_current_calls_p(int argc, const char **argv)
+ {
++	RETURN_IF_NULL(if_hf_client);
++
++	EXEC(if_hf_client->query_current_calls);
+ }
+ 
+ /* query name of current selected operator */
+ static void query_current_operator_name_p(int argc, const char **argv)
+ {
++	RETURN_IF_NULL(if_hf_client);
++
++	EXEC(if_hf_client->query_current_operator_name);
+ }
+ 
+ /* Retrieve subscriber information */
+ static void retrieve_subscriber_info_p(int argc, const char **argv)
+ {
++	RETURN_IF_NULL(if_hf_client);
++
++	EXEC(if_hf_client->retrieve_subscriber_info);
+ }
+ 
+ /* Send DTMF code*/
+ static void send_dtmf_p(int argc, const char **argv)
+ {
++	RETURN_IF_NULL(if_hf_client);
++
++	EXEC(if_hf_client->send_dtmf, *argv[2]);
+ }
+ 
+ /* Request a phone number from AG corresponding to last voice tag recorded */
+ static void request_last_voice_tag_number_p(int argc, const char **argv)
+ {
++	RETURN_IF_NULL(if_hf_client);
++
++	EXEC(if_hf_client->request_last_voice_tag_number);
+ }
+ 
+ /* Closes the interface. */
+ static void cleanup_p(int argc, const char **argv)
+ {
++	RETURN_IF_NULL(if_hf_client);
++
++	EXECV(if_hf_client->cleanup);
++	if_hf_client = NULL;
+ }
+ 
+ static struct method methods[] = {
 -- 
 1.9.1
 
