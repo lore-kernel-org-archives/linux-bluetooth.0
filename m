@@ -1,42 +1,81 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.6\))
-Subject: Re: [PATCHv4 1/1] bluetooth: Check for SCO type before setting retransmission effort
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1411462867-4010-1-git-send-email-bernhard.thaler@r-it.at>
-Date: Tue, 23 Sep 2014 11:32:01 +0200
-Cc: "Gustavo F. Padovan" <gustavo@padovan.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	BlueZ development <linux-bluetooth@vger.kernel.org>,
-	Network Development <netdev@vger.kernel.org>,
-	linux-kernel@vger.kernel.org
-Message-Id: <D6DCEC0F-76A0-4D5A-8B8A-D51F7F4449C7@holtmann.org>
-References: <1411035321-10215-1-git-send-email-bernhard.thaler@r-it.at> <1411462867-4010-1-git-send-email-bernhard.thaler@r-it.at>
-To: Bernhard Thaler <bernhard.thaler@r-it.at>
-Sender: linux-kernel-owner@vger.kernel.org
+From: Bernhard Thaler <bernhard.thaler@r-it.at>
+To: marcel@holtmann.org,
+	gustavo@padovan.org,
+	johan.hedberg@gmail.com,
+	davem@davemloft.net
+Cc: linux-bluetooth@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Bernhard Thaler <bernhard.thaler@r-it.at>
+Subject: [PATCHv4 1/1] bluetooth: Check for SCO type before setting retransmission effort
+Date: Tue, 23 Sep 2014 11:01:07 +0200
+Message-Id: <1411462867-4010-1-git-send-email-bernhard.thaler@r-it.at>
+In-Reply-To: <1411035321-10215-1-git-send-email-bernhard.thaler@r-it.at>
+References: <1411035321-10215-1-git-send-email-bernhard.thaler@r-it.at>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Bernhard,
+SCO connection cannot be setup to devices that do not support retransmission.
+Patch based on http://permalink.gmane.org/gmane.linux.bluez.kernel/7779 and
+adapted for this kernel version.
+Code changed to check SCO/eSCO type before setting retransmission effort
+and max. latency. The purpose of the patch is to support older devices not
+ capable of eSCO.
 
-> SCO connection cannot be setup to devices that do not support retransmission.
-> Patch based on http://permalink.gmane.org/gmane.linux.bluez.kernel/7779 and
-> adapted for this kernel version.
-> Code changed to check SCO/eSCO type before setting retransmission effort
-> and max. latency. The purpose of the patch is to support older devices not
-> capable of eSCO.
-> 
-> Tested on Blackberry 655+ headset which does not support retransmission.
-> Credits go to Alexander Sommerhuber.
-> 
-> Signed-off-by: Bernhard Thaler <bernhard.thaler@r-it.at>
-> ---
-> net/bluetooth/hci_conn.c |   22 +++++++++++++++++-----
-> 1 file changed, 17 insertions(+), 5 deletions(-)
+Tested on Blackberry 655+ headset which does not support retransmission.
+Credits go to Alexander Sommerhuber.
 
-patch has been applied to bluetooth-next tree.
+Signed-off-by: Bernhard Thaler <bernhard.thaler@r-it.at>
+---
+ net/bluetooth/hci_conn.c |   22 +++++++++++++++++-----
+ 1 file changed, 17 insertions(+), 5 deletions(-)
 
-Regards
-
-Marcel
-
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+index faff624..afa325b 100644
+--- a/net/bluetooth/hci_conn.c
++++ b/net/bluetooth/hci_conn.c
+@@ -38,7 +38,7 @@ struct sco_param {
+ 	u16 max_latency;
+ };
+ 
+-static const struct sco_param sco_param_cvsd[] = {
++static const struct sco_param esco_param_cvsd[] = {
+ 	{ EDR_ESCO_MASK & ~ESCO_2EV3, 0x000a }, /* S3 */
+ 	{ EDR_ESCO_MASK & ~ESCO_2EV3, 0x0007 }, /* S2 */
+ 	{ EDR_ESCO_MASK | ESCO_EV3,   0x0007 }, /* S1 */
+@@ -46,6 +46,11 @@ static const struct sco_param sco_param_cvsd[] = {
+ 	{ EDR_ESCO_MASK | ESCO_HV1,   0xffff }, /* D0 */
+ };
+ 
++static const struct sco_param sco_param_cvsd[] = {
++	{ EDR_ESCO_MASK | ESCO_HV3,   0xffff }, /* D1 */
++	{ EDR_ESCO_MASK | ESCO_HV1,   0xffff }, /* D0 */
++};
++
+ static const struct sco_param sco_param_wideband[] = {
+ 	{ EDR_ESCO_MASK & ~ESCO_2EV3, 0x000d }, /* T2 */
+ 	{ EDR_ESCO_MASK | ESCO_EV3,   0x0008 }, /* T1 */
+@@ -194,10 +199,17 @@ bool hci_setup_sync(struct hci_conn *conn, __u16 handle)
+ 		param = &sco_param_wideband[conn->attempt - 1];
+ 		break;
+ 	case SCO_AIRMODE_CVSD:
+-		if (conn->attempt > ARRAY_SIZE(sco_param_cvsd))
+-			return false;
+-		cp.retrans_effort = 0x01;
+-		param = &sco_param_cvsd[conn->attempt - 1];
++		if (lmp_esco_capable(conn->link)) {
++			if (conn->attempt > ARRAY_SIZE(esco_param_cvsd))
++				return false;
++			cp.retrans_effort = 0x01;
++			param = &esco_param_cvsd[conn->attempt - 1];
++		} else {
++			if (conn->attempt > ARRAY_SIZE(sco_param_cvsd))
++				return false;
++			cp.retrans_effort = 0xff;
++			param = &sco_param_cvsd[conn->attempt - 1];
++		}
+ 		break;
+ 	default:
+ 		return false;
+-- 
+1.7.10.4
