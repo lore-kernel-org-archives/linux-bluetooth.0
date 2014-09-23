@@ -2,136 +2,167 @@ Return-Path: <cyrus@holtmann.org>
 From: Arman Uguray <armansito@chromium.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Arman Uguray <armansito@chromium.org>
-Subject: [PATCH BlueZ 7/9] shared/gatt-client: Add bt_gatt_client_set_service_changed.
-Date: Tue, 23 Sep 2014 13:47:15 -0700
-Message-Id: <1411505237-10932-8-git-send-email-armansito@chromium.org>
+Subject: [PATCH BlueZ 5/9] shared/gatt-client: Rediscover services within changed range.
+Date: Tue, 23 Sep 2014 13:47:13 -0700
+Message-Id: <1411505237-10932-6-git-send-email-armansito@chromium.org>
 In-Reply-To: <1411505237-10932-1-git-send-email-armansito@chromium.org>
 References: <1411505237-10932-1-git-send-email-armansito@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch introduces the bt_gatt_client_set_service_changed function which
-allows upper layers to register a callback with gatt-client for
-"Service Changed" events. The callback gets invoked for each indication from the
-Service Changed characteristic after service discovery within the changed range
-has completed and gatt-client's service cache has been updated.
+This patch adds the discovery step of handling "Service Changed". A primary
+service discovery is performed within the affected handle range and results are
+inserted into the service list as a contiguous block of services, sorted by
+handle.
 ---
- src/shared/gatt-client.c | 41 ++++++++++++++++++++++++++++++++++++-----
- src/shared/gatt-client.h |  7 +++++++
- 2 files changed, 43 insertions(+), 5 deletions(-)
+ src/shared/gatt-client.c | 111 ++++++++++++++++++++++++++++++++++++++++++++---
+ 1 file changed, 106 insertions(+), 5 deletions(-)
 
 diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
-index e98a164..6dc8e95 100644
+index cc0a894..3f092ac 100644
 --- a/src/shared/gatt-client.c
 +++ b/src/shared/gatt-client.c
-@@ -80,6 +80,10 @@ struct bt_gatt_client {
- 	bt_gatt_client_destroy_func_t ready_destroy;
- 	void *ready_data;
- 
-+	bt_gatt_client_service_changed_callback_t svc_chngd_callback;
-+	bt_gatt_client_destroy_func_t svc_chngd_destroy;
-+	void *svc_chngd_data;
-+
- 	bt_gatt_client_debug_func_t debug_callback;
- 	bt_gatt_client_destroy_func_t debug_destroy;
- 	void *debug_data;
-@@ -773,7 +777,7 @@ static void service_changed_complete(struct discovery_op *op, bool success,
- {
- 	struct bt_gatt_client *client = op->client;
- 	struct service_changed_op *next_sc_op;
--	bt_gatt_service_t *head, *tail;
-+	uint16_t start_handle, end_handle;
- 
- 	client->in_svc_chngd = false;
- 
-@@ -788,11 +792,19 @@ static void service_changed_complete(struct discovery_op *op, bool success,
- 	if (!op->result_head || !op->result_tail)
- 		return;
- 
-+	start_handle = op->result_head->service.start_handle;
-+	end_handle = op->result_tail->service.end_handle;
-+
- 	/* Insert all newly discovered services in their correct place as a
- 	 * contiguous chunk */
- 	service_list_insert_services(&client->svc_head, &client->svc_tail,
- 					op->result_head, op->result_tail);
- 
-+	/* Notify the upper layer of changed services */
-+	if (client->svc_chngd_callback)
-+		client->svc_chngd_callback(start_handle, end_handle,
-+							client->svc_chngd_data);
-+
- 	/* Process any queued events */
- 	next_sc_op = queue_pop_head(client->svc_chngd_queue);
- 	if (next_sc_op) {
-@@ -803,13 +815,14 @@ static void service_changed_complete(struct discovery_op *op, bool success,
+@@ -289,6 +289,43 @@ static void service_list_clear_range(struct service_list **head,
  	}
- 
- 	/* Check if the GATT service is not present or has remained unchanged */
--	head = &op->result_head->service;
--	tail = &op->result_tail->service;
- 	if (!client->svc_chngd_val_handle ||
--			client->svc_chngd_val_handle < head->start_handle ||
--			client->svc_chngd_val_handle > tail->end_handle)
-+				client->svc_chngd_val_handle < start_handle ||
-+				client->svc_chngd_val_handle > end_handle)
- 		return;
- 
-+	/* The GATT service was modified. Re-register the handler for
-+	 * indications from the "Service Changed" characteristic.
-+	 */
- 	if (bt_gatt_client_register_notify(client,
- 						client->svc_chngd_val_handle,
- 						service_changed_reregister_cb,
-@@ -1320,6 +1333,24 @@ bool bt_gatt_client_set_ready_handler(struct bt_gatt_client *client,
- 	return true;
  }
  
-+bool bt_gatt_client_set_service_changed(struct bt_gatt_client *client,
-+			bt_gatt_client_service_changed_callback_t callback,
-+			void *user_data,
-+			bt_gatt_client_destroy_func_t destroy)
++static void service_list_insert_services(struct service_list **head,
++						struct service_list **tail,
++						struct service_list *svc_head,
++						struct service_list *svc_tail)
 +{
-+	if (!client)
-+		return false;
++	struct service_list *cur, *prev;
 +
-+	if (client->svc_chngd_destroy)
-+		client->svc_chngd_destroy(client->svc_chngd_data);
++	if (!(*head) || !(*tail)) {
++		*head = svc_head;
++		*tail = svc_tail;
++		return;
++	}
 +
-+	client->svc_chngd_callback = callback;
-+	client->svc_chngd_destroy = destroy;
-+	client->svc_chngd_data = user_data;
++	prev = NULL;
++	cur = *head;
++	while (cur) {
++		if (svc_tail->service.end_handle < cur->service.start_handle) {
++			if (!prev)
++				*head = svc_head;
++			else
++				prev->next = svc_head;
 +
-+	return true;
++			svc_tail->next = cur;
++			return;
++		}
++
++		prev = cur;
++		cur = cur->next;
++	}
++
++	if (prev != *tail)
++		return;
++
++	prev->next = svc_head;
++	*tail = svc_tail;
 +}
 +
- bool bt_gatt_client_set_debug(struct bt_gatt_client *client,
- 					bt_gatt_client_debug_func_t callback,
- 					void *user_data,
-diff --git a/src/shared/gatt-client.h b/src/shared/gatt-client.h
-index 7612a6e..1c28a82 100644
---- a/src/shared/gatt-client.h
-+++ b/src/shared/gatt-client.h
-@@ -57,12 +57,19 @@ typedef void (*bt_gatt_client_notify_callback_t)(uint16_t value_handle,
- typedef void (*bt_gatt_client_notify_id_callback_t)(unsigned int id,
- 							uint16_t att_ecode,
- 							void *user_data);
-+typedef void (*bt_gatt_client_service_changed_callback_t)(uint16_t start_handle,
-+							uint16_t end_handle,
-+							void *user_data);
+ static void gatt_client_remove_all_notify_in_range(
+ 				struct bt_gatt_client *client,
+ 				uint16_t start_handle, uint16_t end_handle)
+@@ -709,8 +746,52 @@ struct service_changed_op {
  
- bool bt_gatt_client_is_ready(struct bt_gatt_client *client);
- bool bt_gatt_client_set_ready_handler(struct bt_gatt_client *client,
- 					bt_gatt_client_callback_t callback,
- 					void *user_data,
- 					bt_gatt_client_destroy_func_t destroy);
-+bool bt_gatt_client_set_service_changed(struct bt_gatt_client *client,
-+			bt_gatt_client_service_changed_callback_t callback,
-+			void *user_data,
-+			bt_gatt_client_destroy_func_t destroy);
- bool bt_gatt_client_set_debug(struct bt_gatt_client *client,
- 					bt_gatt_client_debug_func_t callback,
- 					void *user_data,
+ static void process_service_changed(struct bt_gatt_client *client,
+ 							uint16_t start_handle,
++							uint16_t end_handle);
++
++static void service_changed_complete(struct discovery_op *op, bool success,
++							uint8_t att_ecode)
++{
++	struct bt_gatt_client *client = op->client;
++	struct service_changed_op *next_sc_op;
++
++	client->in_svc_chngd = false;
++
++	if (!success) {
++		util_debug(client->debug_callback, client->debug_data,
++			"Failed to discover services within changed range - "
++			"error: 0x%02x", att_ecode);
++		return;
++	}
++
++	/* No new services in the modified range */
++	if (!op->result_head || !op->result_tail)
++		return;
++
++	/* Insert all newly discovered services in their correct place as a
++	 * contiguous chunk */
++	service_list_insert_services(&client->svc_head, &client->svc_tail,
++					op->result_head, op->result_tail);
++
++	/* Process any queued events */
++	next_sc_op = queue_pop_head(client->svc_chngd_queue);
++	if (next_sc_op) {
++		process_service_changed(client, next_sc_op->start_handle,
++							next_sc_op->end_handle);
++		free(next_sc_op);
++		return;
++	}
++
++	/* TODO: if the GATT service has changed then register a handler
++	 * for "Service Changed".
++	 */
++}
++
++static void process_service_changed(struct bt_gatt_client *client,
++							uint16_t start_handle,
+ 							uint16_t end_handle)
+ {
++	struct discovery_op *op;
++
+ 	/* Invalidate and remove all effected notify callbacks */
+ 	gatt_client_remove_all_notify_in_range(client, start_handle,
+ 								end_handle);
+@@ -721,10 +802,30 @@ static void process_service_changed(struct bt_gatt_client *client,
+ 	service_list_clear_range(&client->svc_head, &client->svc_tail,
+ 						start_handle, end_handle);
+ 
+-	/* TODO Rediscover all services within the modified service range. If
+-	 * the GATT service was effected, then register a new handler for
+-	 * "Service Changed"
+-	 */
++	op = new0(struct discovery_op, 1);
++	if (!op) {
++		util_debug(client->debug_callback, client->debug_data,
++				"Failed to initiate primary service discovery"
++				" after Service Changed");
++		return;
++	}
++
++	op->client = client;
++	op->complete_func = service_changed_complete;
++
++	if (!bt_gatt_discover_primary_services(client->att, NULL,
++						start_handle, end_handle,
++						discover_primary_cb,
++						discovery_op_ref(op),
++						discovery_op_unref)) {
++		util_debug(client->debug_callback, client->debug_data,
++				"Failed to initiate primary service discovery"
++				" after Service Changed");
++		free(op);
++		return;
++	}
++
++	client->in_svc_chngd = true;
+ }
+ 
+ static void service_changed_cb(uint16_t value_handle, const uint8_t *value,
+@@ -1980,7 +2081,7 @@ bool bt_gatt_client_register_notify(struct bt_gatt_client *client,
+ 	if (!client || !chrc_value_handle || !callback)
+ 		return false;
+ 
+-	if (!bt_gatt_client_is_ready(client))
++	if (!bt_gatt_client_is_ready(client) || client->in_svc_chngd)
+ 		return false;
+ 
+ 	/* Check that chrc_value_handle belongs to a known characteristic */
 -- 
 2.1.0.rc2.206.gedb03e5
 
