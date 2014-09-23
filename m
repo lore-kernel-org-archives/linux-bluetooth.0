@@ -2,276 +2,265 @@ Return-Path: <cyrus@holtmann.org>
 From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
-Subject: [PATCH 5/5] android/client: Add handsfree client api calls
-Date: Tue, 23 Sep 2014 08:49:40 +0200
-Message-Id: <1411454980-27225-5-git-send-email-jakub.tyszkowski@tieto.com>
+Subject: [PATCH 4/5] android/client: Handle more callbacks for the handsfree client
+Date: Tue, 23 Sep 2014 08:49:39 +0200
+Message-Id: <1411454980-27225-4-git-send-email-jakub.tyszkowski@tieto.com>
 In-Reply-To: <1411454980-27225-1-git-send-email-jakub.tyszkowski@tieto.com>
 References: <1411454980-27225-1-git-send-email-jakub.tyszkowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- android/client/if-hf-client.c | 141 ++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 141 insertions(+)
+ android/client/if-hf-client.c | 137 ++++++++++++++++++++++++++++++++++++------
+ 1 file changed, 119 insertions(+), 18 deletions(-)
 
 diff --git a/android/client/if-hf-client.c b/android/client/if-hf-client.c
-index 12bc24c..07c09cd 100644
+index df40112..12bc24c 100644
 --- a/android/client/if-hf-client.c
 +++ b/android/client/if-hf-client.c
-@@ -123,6 +123,21 @@ SINTMAP(bthf_client_in_band_ring_state_t, -1, "(unknown)")
- 	DELEMENT(BTHF_CLIENT_IN_BAND_RINGTONE_PROVIDED),
+@@ -37,6 +37,92 @@ SINTMAP(bthf_client_audio_state_t, -1, "(unknown)")
+ 	DELEMENT(BTHF_CLIENT_AUDIO_STATE_CONNECTED_MSBC),
  ENDMAP
  
-+SINTMAP(bthf_client_call_action_t, -1, "(unknown)")
-+	DELEMENT(BTHF_CLIENT_CALL_ACTION_CHLD_0),
-+	DELEMENT(BTHF_CLIENT_CALL_ACTION_CHLD_1),
-+	DELEMENT(BTHF_CLIENT_CALL_ACTION_CHLD_2),
-+	DELEMENT(BTHF_CLIENT_CALL_ACTION_CHLD_3),
-+	DELEMENT(BTHF_CLIENT_CALL_ACTION_CHLD_4),
-+	DELEMENT(BTHF_CLIENT_CALL_ACTION_CHLD_1x),
-+	DELEMENT(BTHF_CLIENT_CALL_ACTION_CHLD_2x),
-+	DELEMENT(BTHF_CLIENT_CALL_ACTION_ATA),
-+	DELEMENT(BTHF_CLIENT_CALL_ACTION_CHUP),
-+	DELEMENT(BTHF_CLIENT_CALL_ACTION_BTRH_0),
-+	DELEMENT(BTHF_CLIENT_CALL_ACTION_BTRH_1),
-+	DELEMENT(BTHF_CLIENT_CALL_ACTION_BTRH_2),
++SINTMAP(bthf_client_vr_state_t, -1, "(unknown)")
++	DELEMENT(BTHF_CLIENT_VR_STATE_STOPPED),
++	DELEMENT(BTHF_CLIENT_VR_STATE_STARTED),
++ENDMAP
++
++SINTMAP(bthf_client_network_state_t, -1, "(unknown)")
++	DELEMENT(BTHF_CLIENT_NETWORK_STATE_NOT_AVAILABLE),
++	DELEMENT(BTHF_CLIENT_NETWORK_STATE_AVAILABLE),
++ENDMAP
++
++SINTMAP(bthf_client_service_type_t, -1, "(unknown)")
++	DELEMENT(BTHF_CLIENT_SERVICE_TYPE_HOME),
++	DELEMENT(BTHF_CLIENT_SERVICE_TYPE_ROAMING),
++ENDMAP
++
++SINTMAP(bthf_client_call_t, -1, "(unknown)")
++	DELEMENT(BTHF_CLIENT_CALL_NO_CALLS_IN_PROGRESS),
++	DELEMENT(BTHF_CLIENT_CALL_CALLS_IN_PROGRESS),
++ENDMAP
++
++SINTMAP(bthf_client_callsetup_t, -1, "(unknown)")
++	DELEMENT(BTHF_CLIENT_CALLSETUP_NONE),
++	DELEMENT(BTHF_CLIENT_CALLSETUP_INCOMING),
++	DELEMENT(BTHF_CLIENT_CALLSETUP_OUTGOING),
++	DELEMENT(BTHF_CLIENT_CALLSETUP_ALERTING),
++ENDMAP
++
++SINTMAP(bthf_client_callheld_t, -1, "(unknown)")
++	DELEMENT(BTHF_CLIENT_CALLHELD_NONE),
++	DELEMENT(BTHF_CLIENT_CALLHELD_HOLD_AND_ACTIVE),
++	DELEMENT(BTHF_CLIENT_CALLHELD_HOLD),
++ENDMAP
++
++SINTMAP(bthf_client_resp_and_hold_t, -1, "(unknown)")
++	DELEMENT(BTHF_CLIENT_RESP_AND_HOLD_HELD),
++	DELEMENT(BTRH_CLIENT_RESP_AND_HOLD_ACCEPT),
++	DELEMENT(BTRH_CLIENT_RESP_AND_HOLD_REJECT),
++ENDMAP
++
++SINTMAP(bthf_client_call_direction_t, -1, "(unknown)")
++	DELEMENT(BTHF_CLIENT_CALL_DIRECTION_OUTGOING),
++	DELEMENT(BTHF_CLIENT_CALL_DIRECTION_INCOMING),
++ENDMAP
++
++SINTMAP(bthf_client_call_state_t, -1, "(unknown)")
++	DELEMENT(BTHF_CLIENT_CALL_STATE_ACTIVE),
++	DELEMENT(BTHF_CLIENT_CALL_STATE_HELD),
++	DELEMENT(BTHF_CLIENT_CALL_STATE_DIALING),
++	DELEMENT(BTHF_CLIENT_CALL_STATE_ALERTING),
++	DELEMENT(BTHF_CLIENT_CALL_STATE_INCOMING),
++	DELEMENT(BTHF_CLIENT_CALL_STATE_WAITING),
++	DELEMENT(BTHF_CLIENT_CALL_STATE_HELD_BY_RESP_HOLD),
++ENDMAP
++
++SINTMAP(bthf_client_call_mpty_type_t, -1, "(unknown)")
++	DELEMENT(BTHF_CLIENT_CALL_MPTY_TYPE_SINGLE),
++	DELEMENT(BTHF_CLIENT_CALL_MPTY_TYPE_MULTI),
++ENDMAP
++
++SINTMAP(bthf_client_volume_type_t, -1, "(unknown)")
++	DELEMENT(BTHF_CLIENT_VOLUME_TYPE_SPK),
++	DELEMENT(BTHF_CLIENT_VOLUME_TYPE_MIC),
++ENDMAP
++
++SINTMAP(bthf_client_cmd_complete_t, -1, "(unknown)")
++	DELEMENT(BTHF_CLIENT_CMD_COMPLETE_OK),
++	DELEMENT(BTHF_CLIENT_CMD_COMPLETE_ERROR),
++	DELEMENT(BTHF_CLIENT_CMD_COMPLETE_ERROR_NO_CARRIER),
++	DELEMENT(BTHF_CLIENT_CMD_COMPLETE_ERROR_BUSY),
++	DELEMENT(BTHF_CLIENT_CMD_COMPLETE_ERROR_NO_ANSWER),
++	DELEMENT(BTHF_CLIENT_CMD_COMPLETE_ERROR_DELAYED),
++	DELEMENT(BTHF_CLIENT_CMD_COMPLETE_ERROR_BLACKLISTED),
++	DELEMENT(BTHF_CLIENT_CMD_COMPLETE_ERROR_CME),
++ENDMAP
++
++SINTMAP(bthf_client_subscriber_service_type_t, -1, "(unknown)")
++	DELEMENT(BTHF_CLIENT_SERVICE_UNKNOWN),
++	DELEMENT(BTHF_CLIENT_SERVICE_VOICE),
++	DELEMENT(BTHF_CLIENT_SERVICE_FAX),
++ENDMAP
++
++SINTMAP(bthf_client_in_band_ring_state_t, -1, "(unknown)")
++	DELEMENT(BTHF_CLIENT_IN_BAND_RINGTONE_NOT_PROVIDED),
++	DELEMENT(BTHF_CLIENT_IN_BAND_RINGTONE_PROVIDED),
 +ENDMAP
 +
  /* Callbacks */
  
  static char features_str[512];
-@@ -376,11 +391,21 @@ static void init_p(int argc, const char **argv)
- static void connect_c(int argc, const char **argv, enum_func *enum_func,
- 								void **user)
+@@ -118,74 +204,81 @@ static void hf_client_audio_state_callback(bthf_client_audio_state_t state,
+ /* Callback for VR connection state change. */
+ static void hf_client_vr_cmd_callback(bthf_client_vr_state_t state)
  {
-+	if (argc == 3) {
-+		*user = NULL;
-+		*enum_func = enum_devices;
-+	}
+-	haltest_info("%s\n", __func__);
++	haltest_info("%s: vr_state=%s\n", __func__,
++					bthf_client_vr_state_t2str(state));
  }
  
- /* connect to audio gateway */
- static void connect_p(int argc, const char **argv)
+ /* Callback for network state change */
+ static void hf_client_network_state_callback(bthf_client_network_state_t state)
  {
-+	bt_bdaddr_t addr;
-+
-+	RETURN_IF_NULL(if_hf_client);
-+	VERIFY_ADDR_ARG(2, &addr);
-+
-+	EXEC(if_hf_client->connect, &addr);
+-	haltest_info("%s\n", __func__);
++	haltest_info("%s: network_state=%s\n", __func__,
++					bthf_client_network_state_t2str(state));
  }
  
- /*
-@@ -402,16 +427,32 @@ static void connected_addr_c(int argc, const char **argv, enum_func *enum_func,
- /* disconnect from audio gateway */
- static void disconnect_p(int argc, const char **argv)
+ /* Callback for network roaming status change */
+ static void hf_client_network_roaming_callback(bthf_client_service_type_t type)
  {
-+	bt_bdaddr_t addr;
-+
-+	RETURN_IF_NULL(if_hf_client);
-+	VERIFY_ADDR_ARG(2, &addr);
-+
-+	EXEC(if_hf_client->disconnect, &addr);
+-	haltest_info("%s\n", __func__);
++	haltest_info("%s: service_type=%s\n", __func__,
++					bthf_client_service_type_t2str(type));
  }
  
- static void connect_audio_c(int argc, const char **argv, enum_func *enum_func,
- 								void **user)
+ /* Callback for signal strength indication */
+ static void hf_client_network_signal_callback(int signal_strength)
  {
-+	if (argc == 3) {
-+		*user = NULL;
-+		*enum_func = enum_devices;
-+	}
+-	haltest_info("%s\n", __func__);
++	haltest_info("%s: signal strength=%d\n", __func__, signal_strength);
  }
  
- /* create an audio connection */
- static void connect_audio_p(int argc, const char **argv)
+ /* Callback for battery level indication */
+ static void hf_client_battery_level_callback(int battery_level)
  {
-+	bt_bdaddr_t addr;
-+
-+	RETURN_IF_NULL(if_hf_client);
-+	VERIFY_ADDR_ARG(2, &addr);
-+
-+	EXEC(if_hf_client->connect_audio, &addr);
+-	haltest_info("%s\n", __func__);
++	haltest_info("%s: battery_lvl=%d\n", __func__, battery_level);
  }
  
- /* Map completion to connected_addr_c */
-@@ -420,76 +461,176 @@ static void connect_audio_p(int argc, const char **argv)
- /* close the audio connection */
- static void disconnect_audio_p(int argc, const char **argv)
+ /* Callback for current operator name */
+ static void hf_client_current_operator_callback(const char *name)
  {
-+	bt_bdaddr_t addr;
-+
-+	RETURN_IF_NULL(if_hf_client);
-+	VERIFY_ADDR_ARG(2, &addr);
-+
-+	EXEC(if_hf_client->disconnect_audio, &addr);
+-	haltest_info("%s\n", __func__);
++	haltest_info("%s: operator_name=%s\n", __func__, name);
  }
  
- /* start voice recognition */
- static void start_voice_recognition_p(int argc, const char **argv)
+ /* Callback for call indicator */
+ static void hf_client_call_callback(bthf_client_call_t call)
  {
-+	RETURN_IF_NULL(if_hf_client);
-+
-+	EXEC(if_hf_client->start_voice_recognition);
+-	haltest_info("%s\n", __func__);
++	haltest_info("%s: call_state=%s\n", __func__,
++						bthf_client_call_t2str(call));
  }
  
- /* stop voice recognition */
- static void stop_voice_recognition_p(int argc, const char **argv)
+ /* Callback for callsetup indicator */
+ static void hf_client_callsetup_callback(bthf_client_callsetup_t callsetup)
  {
-+	RETURN_IF_NULL(if_hf_client);
-+
-+	EXEC(if_hf_client->start_voice_recognition);
+-	haltest_info("%s\n", __func__);
++	haltest_info("%s: callsetup=%s\n", __func__,
++					bthf_client_callsetup_t2str(callsetup));
  }
  
- static void volume_control_c(int argc, const char **argv, enum_func *enum_func,
- 								void **user)
+ /* Callback for callheld indicator */
+ static void hf_client_callheld_callback(bthf_client_callheld_t callheld)
  {
-+	if (argc == 3) {
-+		*user = TYPE_ENUM(bthf_client_volume_type_t);
-+		*enum_func = enum_defines;
-+	}
+-	haltest_info("%s\n", __func__);
++	haltest_info("%s: callheld=%s\n", __func__,
++					bthf_client_callheld_t2str(callheld));
  }
  
- /* volume control */
- static void volume_control_p(int argc, const char **argv)
+ /* Callback for response and hold */
+ static void hf_client_resp_and_hold_callback(
+ 				bthf_client_resp_and_hold_t resp_and_hold)
  {
-+	bthf_client_volume_type_t type;
-+	int volume;
-+
-+	RETURN_IF_NULL(if_hf_client);
-+
-+	/* volume type */
-+	if (argc <= 2) {
-+		haltest_error("No volume type specified\n");
-+		return;
-+	}
-+	type = str2bthf_client_volume_type_t(argv[2]);
-+
-+	/* volume */
-+	if (argc <= 3) {
-+		haltest_error("No volume specified\n");
-+		return;
-+	}
-+	volume = atoi(argv[3]);
-+
-+	EXEC(if_hf_client->volume_control, type, volume);
+-	haltest_info("%s\n", __func__);
++	haltest_info("%s: resp_and_hold=%s\n", __func__,
++				bthf_client_resp_and_hold_t2str(resp_and_hold));
  }
  
- /* place a call with number a number */
- static void dial_p(int argc, const char **argv)
+ /* Callback for Calling Line Identification notification */
+ static void hf_client_clip_callback(const char *number)
  {
-+	RETURN_IF_NULL(if_hf_client);
-+
-+	/* number string */
-+	if (argc <= 2) {
-+		haltest_error("No number specified\n");
-+		return;
-+	}
-+
-+	EXEC(if_hf_client->dial, argv[2]);
+-	haltest_info("%s\n", __func__);
++	haltest_info("%s: number=%s\n", __func__, number);
  }
  
- /* place a call with number specified by location (speed dial) */
- static void dial_memory_p(int argc, const char **argv)
+ /* Callback for Call Waiting notification */
+ static void hf_client_call_waiting_callback(const char *number)
  {
-+	RETURN_IF_NULL(if_hf_client);
-+
-+	/* memory index */
-+	if (argc <= 2) {
-+		haltest_error("No memory index specified\n");
-+		return;
-+	}
-+
-+	EXEC(if_hf_client->dial_memory, atoi(argv[2]));
+-	haltest_info("%s\n", __func__);
++	haltest_info("%s: number=%s\n", __func__, number);
  }
  
- static void handle_call_action_c(int argc, const char **argv,
- 					enum_func *enum_func, void **user)
+ /* Callback for listing current calls. Can be called multiple time. */
+@@ -195,41 +288,49 @@ static void hf_client_current_calls_callback(int index,
+ 					bthf_client_call_mpty_type_t mpty,
+ 					const char *number)
  {
-+	if (argc == 3) {
-+		*user = TYPE_ENUM(bthf_client_call_action_t);
-+		*enum_func = enum_defines;
-+	}
+-	haltest_info("%s\n", __func__);
++	haltest_info("%s: index=%d, direction=%s, state=%s, m_party=%s\n",
++					__func__, index,
++					bthf_client_call_direction_t2str(dir),
++					bthf_client_call_state_t2str(state),
++					bthf_client_call_mpty_type_t2str(mpty));
  }
  
- /* perform specified call related action */
- static void handle_call_action_p(int argc, const char **argv)
+ /* Callback for audio volume change */
+ static void hf_client_volume_change_callback(bthf_client_volume_type_t type,
+ 								int volume)
  {
-+	bthf_client_call_action_t action;
-+	int index = 0;
-+
-+	RETURN_IF_NULL(if_hf_client);
-+
-+	/* action */
-+	if (argc <= 2) {
-+		haltest_error("No action specified\n");
-+		return;
-+	}
-+	action = str2bthf_client_call_action_t(argv[2]);
-+
-+	/* call index */
-+	if (action == BTHF_CLIENT_CALL_ACTION_CHLD_1x ||
-+				action == BTHF_CLIENT_CALL_ACTION_CHLD_2x) {
-+		if (argc <= 3) {
-+			haltest_error("No call index specified\n");
-+			return;
-+		}
-+		index = atoi(argv[3]);
-+	}
-+
-+	EXEC(if_hf_client->handle_call_action, action, index);
+-	haltest_info("%s\n", __func__);
++	haltest_info("%s: vol_type=%s, value=%d\n", __func__,
++				bthf_client_volume_type_t2str(type), volume);
  }
  
- /* query list of current calls */
- static void query_current_calls_p(int argc, const char **argv)
+ /* Callback for command complete event */
+ static void hf_client_cmd_complete_callback(bthf_client_cmd_complete_t type,
+ 									int cme)
  {
-+	RETURN_IF_NULL(if_hf_client);
-+
-+	EXEC(if_hf_client->query_current_calls);
+-	haltest_info("%s\n", __func__);
++	haltest_info("%s: type=%s, cme=%d\n", __func__,
++				bthf_client_cmd_complete_t2str(type), cme);
  }
  
- /* query name of current selected operator */
- static void query_current_operator_name_p(int argc, const char **argv)
+ /* Callback for subscriber information */
+ static void hf_client_subscriber_info_callback(const char *name,
+ 				bthf_client_subscriber_service_type_t type)
  {
-+	RETURN_IF_NULL(if_hf_client);
-+
-+	EXEC(if_hf_client->query_current_operator_name);
+-	haltest_info("%s\n", __func__);
++	haltest_info("%s: name=%s, type=%s\n", __func__, name,
++			bthf_client_subscriber_service_type_t2str(type));
  }
  
- /* Retrieve subscriber information */
- static void retrieve_subscriber_info_p(int argc, const char **argv)
+ /* Callback for in-band ring tone settings */
+ static void hf_client_in_band_ring_tone_callback(
+ 				bthf_client_in_band_ring_state_t state)
  {
-+	RETURN_IF_NULL(if_hf_client);
-+
-+	EXEC(if_hf_client->retrieve_subscriber_info);
+-	haltest_info("%s\n", __func__);
++	haltest_info("%s: state=%s\n", __func__,
++				bthf_client_in_band_ring_state_t2str(state));
  }
  
- /* Send DTMF code*/
- static void send_dtmf_p(int argc, const char **argv)
+ /* Callback for requested number from AG */
+ static void hf_client_last_voice_tag_number_callback(const char *number)
  {
-+	RETURN_IF_NULL(if_hf_client);
-+
-+	EXEC(if_hf_client->send_dtmf, *argv[2]);
+-	haltest_info("%s\n", __func__);
++	haltest_info("%s: number=%s\n", __func__, number);
  }
  
- /* Request a phone number from AG corresponding to last voice tag recorded */
- static void request_last_voice_tag_number_p(int argc, const char **argv)
- {
-+	RETURN_IF_NULL(if_hf_client);
-+
-+	EXEC(if_hf_client->request_last_voice_tag_number);
- }
- 
- /* Closes the interface. */
- static void cleanup_p(int argc, const char **argv)
- {
-+	RETURN_IF_NULL(if_hf_client);
-+
-+	EXECV(if_hf_client->cleanup);
-+	if_hf_client = NULL;
- }
- 
- static struct method methods[] = {
+ /* Callback for sending ring indication to app */
 -- 
 1.9.1
 
