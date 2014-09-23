@@ -2,174 +2,79 @@ Return-Path: <cyrus@holtmann.org>
 From: Arman Uguray <armansito@chromium.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Arman Uguray <armansito@chromium.org>
-Subject: [PATCH BlueZ 3/9] shared/gatt-client: Register "Service Changed" handler as part of init.
-Date: Tue, 23 Sep 2014 13:47:11 -0700
-Message-Id: <1411505237-10932-4-git-send-email-armansito@chromium.org>
+Subject: [PATCH BlueZ 8/9] tools/btgatt-client: Set service changed handler.
+Date: Tue, 23 Sep 2014 13:47:16 -0700
+Message-Id: <1411505237-10932-9-git-send-email-armansito@chromium.org>
 In-Reply-To: <1411505237-10932-1-git-send-email-armansito@chromium.org>
 References: <1411505237-10932-1-git-send-email-armansito@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch changes shared/gatt-client so that a struct bt_gatt_client
-registers a handler for indications from the "Service Changed" characteristic
-at the end of its init sequence if the characteristic was discovered. The
-handles for the Service Changed characteristic value and the GATT service are
-stored during discovery.
+btgatt-client now sets a service changed handler by calling
+bt_gatt_client_set_service_changed.
 ---
- src/shared/gatt-client.c | 103 ++++++++++++++++++++++++++++++++++++++++++++---
- 1 file changed, 98 insertions(+), 5 deletions(-)
+ tools/btgatt-client.c | 34 ++++++++++++++++++++++++++++++++++
+ 1 file changed, 34 insertions(+)
 
-diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
-index d0c12df..1a6fd86 100644
---- a/src/shared/gatt-client.c
-+++ b/src/shared/gatt-client.c
-@@ -41,6 +41,9 @@
- 
- #define UUID_BYTES (BT_GATT_UUID_SIZE * sizeof(uint8_t))
- 
-+#define GATT_SVC_UUID	0x1801
-+#define SVC_CHNGD_UUID	0x2a05
-+
- struct chrc_data {
- 	/* The public characteristic entry. */
- 	bt_gatt_characteristic_t chrc_external;
-@@ -100,6 +103,14 @@ struct bt_gatt_client {
- 	unsigned int notify_id, ind_id;
- 	bool in_notify;
- 	bool need_notify_cleanup;
-+
-+	/* Handles of the GATT Service and the Service Changed characteristic
-+	 * value handle. These will have the value 0 if they are not present on
-+	 * the remote peripheral.
-+	 */
-+	uint16_t gatt_svc_handle;
-+	uint16_t svc_chngd_val_handle;
-+	unsigned int svc_chngd_ind_id;
- };
- 
- static bool service_list_add_service(struct service_list **head,
-@@ -387,6 +398,10 @@ static void discover_chrcs_cb(bool success, uint8_t att_ecode,
- 			goto done;
- 		}
- 
-+		if (uuid_cmp(chrcs[i].chrc_external.uuid, SVC_CHNGD_UUID) == 0)
-+			client->svc_chngd_val_handle =
-+					chrcs[i].chrc_external.value_handle;
-+
- 		i++;
- 	}
- 
-@@ -479,6 +494,9 @@ static void discover_primary_cb(bool success, uint8_t att_ecode,
- 			success = false;
- 			goto done;
- 		}
-+
-+		if (uuid_cmp(uuid, GATT_SVC_UUID) == 0)
-+			client->gatt_svc_handle = start;
- 	}
- 
- 	/* Complete the process if the service list is empty */
-@@ -544,20 +562,95 @@ static void exchange_mtu_cb(bool success, uint8_t att_ecode, void *user_data)
- 	discovery_op_unref(op);
+diff --git a/tools/btgatt-client.c b/tools/btgatt-client.c
+index 41b85ad..d900e08 100644
+--- a/tools/btgatt-client.c
++++ b/tools/btgatt-client.c
+@@ -93,6 +93,8 @@ static void gatt_debug_cb(const char *str, void *user_data)
  }
  
-+static void service_changed_cb(uint16_t value_handle, const uint8_t *value,
-+					uint16_t length, void *user_data)
-+{
-+	struct bt_gatt_client *client = user_data;
-+	uint16_t start, end;
-+
-+	if (value_handle != client->svc_chngd_val_handle || length != 4)
-+		return;
-+
-+	start = get_le16(value);
-+	end = get_le16(value + 2);
-+
-+	util_debug(client->debug_callback, client->debug_data,
-+			"Service Changed received - start: 0x%04x end: 0x%04x",
-+			start, end);
-+
-+	/* TODO: Process changed services */
-+}
-+
-+static void service_changed_register_cb(unsigned int id, uint16_t att_ecode,
+ static void ready_cb(bool success, uint8_t att_ecode, void *user_data);
++static void service_changed_cb(uint16_t start_handle, uint16_t end_handle,
++							void *user_data);
+ 
+ static struct client *client_create(int fd, uint16_t mtu)
+ {
+@@ -143,6 +145,8 @@ static struct client *client_create(int fd, uint16_t mtu)
+ 	}
+ 
+ 	bt_gatt_client_set_ready_handler(cli->gatt, ready_cb, cli, NULL);
++	bt_gatt_client_set_service_changed(cli->gatt, service_changed_cb, cli,
++									NULL);
+ 
+ 	/* bt_gatt_client already holds a reference */
+ 	bt_att_unref(att);
+@@ -269,6 +273,36 @@ static void ready_cb(bool success, uint8_t att_ecode, void *user_data)
+ 	print_prompt();
+ }
+ 
++static void service_changed_cb(uint16_t start_handle, uint16_t end_handle,
 +								void *user_data)
 +{
-+	bool success;
-+	struct bt_gatt_client *client = user_data;
++	struct client *cli = user_data;
++	struct bt_gatt_service_iter iter;
++	const bt_gatt_service_t *service;
 +
-+	if (!id || att_ecode) {
-+		util_debug(client->debug_callback, client->debug_data,
-+			"Failed to register handler for \"Service Changed\"");
-+		success = false;
-+		goto done;
++	if (!bt_gatt_service_iter_init(&iter, cli->gatt)) {
++		PRLOG("Failed to initialize service iterator\n");
++		return;
 +	}
 +
-+	client->svc_chngd_ind_id = id;
-+	client->ready = true;
-+	success = true;
-+	util_debug(client->debug_callback, client->debug_data,
-+			"Registered handler for \"Service Changed\": %u", id);
++	printf("\nService Changed handled - start: 0x%04x end: 0x%04x\n",
++						start_handle, end_handle);
 +
-+done:
-+	if (client->ready_callback)
-+		client->ready_callback(success, att_ecode, client->ready_data);
++	if (!bt_gatt_service_iter_next_by_handle(&iter, start_handle, &service))
++		return;
++
++	print_service(service);
++
++	while (bt_gatt_service_iter_next(&iter, &service)) {
++		if (service->start_handle >= end_handle)
++			break;
++
++		print_service(service);
++	}
++
++	print_prompt();
 +}
 +
- static void init_complete(struct discovery_op *op, bool success,
- 							uint8_t att_ecode)
+ static void services_usage(void)
  {
- 	struct bt_gatt_client *client = op->client;
-+	bool registered;
- 
- 	client->in_init = false;
- 
--	if (success) {
--		client->svc_head = op->result_head;
--		client->svc_tail = op->result_tail;
-+	if (!success)
-+		goto fail;
-+
-+	client->svc_head = op->result_head;
-+	client->svc_tail = op->result_tail;
-+
-+	if (!client->svc_chngd_val_handle) {
- 		client->ready = true;
--	} else
--		service_list_clear(&op->result_head, &op->result_tail);
-+		goto done;
-+	}
-+
-+	/* Register an indication handler for the "Service Changed"
-+	 * characteristic and report ready only if the handler is registered
-+	 * successfully. Temporarily set "ready" to true so that we can register
-+	 * the handler using the existing framework.
-+	 */
-+	client->ready = true;
-+	registered = bt_gatt_client_register_notify(client,
-+						client->svc_chngd_val_handle,
-+						service_changed_register_cb,
-+						service_changed_cb,
-+						client, NULL);
-+	client->ready = false;
-+
-+	if (registered)
-+		return;
- 
-+	util_debug(client->debug_callback, client->debug_data,
-+			"Failed to register handler for \"Service Changed\"");
-+
-+	client->svc_head = client->svc_tail = NULL;
-+
-+fail:
-+	util_debug(client->debug_callback, client->debug_data,
-+			"Failed to initialize gatt-client");
-+	service_list_clear(&op->result_head, &op->result_tail);
-+
-+done:
- 	if (client->ready_callback)
- 		client->ready_callback(success, att_ecode, client->ready_data);
- }
+ 	printf("Usage: services [options]\nOptions:\n"
 -- 
 2.1.0.rc2.206.gedb03e5
 
