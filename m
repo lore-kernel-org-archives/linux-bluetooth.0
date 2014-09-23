@@ -1,50 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ] doc/obex-api: Split FilterBy into FilterAll and FilterAny
-Date: Tue, 23 Sep 2014 13:17:54 +0300
-Message-Id: <1411467474-22288-1-git-send-email-luiz.dentz@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.6\))
+Subject: Re: [PATCHv4 1/1] bluetooth: Check for SCO type before setting retransmission effort
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1411462867-4010-1-git-send-email-bernhard.thaler@r-it.at>
+Date: Tue, 23 Sep 2014 11:32:01 +0200
+Cc: "Gustavo F. Padovan" <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	BlueZ development <linux-bluetooth@vger.kernel.org>,
+	Network Development <netdev@vger.kernel.org>,
+	linux-kernel@vger.kernel.org
+Message-Id: <D6DCEC0F-76A0-4D5A-8B8A-D51F7F4449C7@holtmann.org>
+References: <1411035321-10215-1-git-send-email-bernhard.thaler@r-it.at> <1411462867-4010-1-git-send-email-bernhard.thaler@r-it.at>
+To: Bernhard Thaler <bernhard.thaler@r-it.at>
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Bernhard,
 
-This makes a simpler API and document the fact that they cannot be used
-together.
----
- doc/obex-api.txt | 17 +++++++++++------
- 1 file changed, 11 insertions(+), 6 deletions(-)
+> SCO connection cannot be setup to devices that do not support retransmission.
+> Patch based on http://permalink.gmane.org/gmane.linux.bluez.kernel/7779 and
+> adapted for this kernel version.
+> Code changed to check SCO/eSCO type before setting retransmission effort
+> and max. latency. The purpose of the patch is to support older devices not
+> capable of eSCO.
+> 
+> Tested on Blackberry 655+ headset which does not support retransmission.
+> Credits go to Alexander Sommerhuber.
+> 
+> Signed-off-by: Bernhard Thaler <bernhard.thaler@r-it.at>
+> ---
+> net/bluetooth/hci_conn.c |   22 +++++++++++++++++-----
+> 1 file changed, 17 insertions(+), 5 deletions(-)
 
-diff --git a/doc/obex-api.txt b/doc/obex-api.txt
-index f80ef39..a39abc0 100644
---- a/doc/obex-api.txt
-+++ b/doc/obex-api.txt
-@@ -473,14 +473,19 @@ Filter:		string Format:
- 
- 			Possible values can be query with ListFilterFields.
- 
--		array{string} FilterBy:
-+		array{string} FilterAll:
- 
--			Filter items by fields. Default do not filter by
--			fields.
-+			Filter items by fields using AND logic, cannot be used
-+			together with FilterAny.
- 
--			Possible values can be query with ListFilterFields
--			excluding the first item that must be either '&' or
--			'|' that apply AND or OR logic respectively.
-+			Possible values can be query with ListFilterFields.
-+
-+		array{string} FilterAny:
-+
-+			Filter items by fields using OR logic, cannot be used
-+			together with FilterAll.
-+
-+			Possible values can be query with ListFilterFields.
- 
- 		bool ResetNewMissedCalls
- 
--- 
-1.9.3
+patch has been applied to bluetooth-next tree.
+
+Regards
+
+Marcel
 
