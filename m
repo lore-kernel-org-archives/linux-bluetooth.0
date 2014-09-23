@@ -1,37 +1,50 @@
 Return-Path: <cyrus@holtmann.org>
-From: Bharat Panda <bharat.panda@samsung.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: cpgs@samsung.com, Bharat Panda <bharat.panda@samsung.com>
-Subject: [PATCH ] attrib: Fix condition check for attr delete
-Date: Tue, 23 Sep 2014 17:49:17 +0530
-Message-id: <1411474757-22719-1-git-send-email-bharat.panda@samsung.com>
+Subject: [PATCH BlueZ] doc/obex-api: Split FilterBy into FilterAll and FilterAny
+Date: Tue, 23 Sep 2014 13:17:54 +0300
+Message-Id: <1411467474-22288-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Checks handle value for non-zero as well as >= 0xffff, to avoid
-infinite loop and deletion of unspecified attrib handles.
----
- attrib/gatt-service.c | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-diff --git a/attrib/gatt-service.c b/attrib/gatt-service.c
-index 874552b..bcf360e 100644
---- a/attrib/gatt-service.c
-+++ b/attrib/gatt-service.c
-@@ -295,7 +295,12 @@ static void service_attr_del(struct btd_adapter *adapter, uint16_t start_handle,
- {
- 	uint16_t handle;
+This makes a simpler API and document the fact that they cannot be used
+together.
+---
+ doc/obex-api.txt | 17 +++++++++++------
+ 1 file changed, 11 insertions(+), 6 deletions(-)
+
+diff --git a/doc/obex-api.txt b/doc/obex-api.txt
+index f80ef39..a39abc0 100644
+--- a/doc/obex-api.txt
++++ b/doc/obex-api.txt
+@@ -473,14 +473,19 @@ Filter:		string Format:
  
--	for (handle = start_handle; handle <= end_handle; handle++)
-+	/* For a 128-bit category primary service below handle should be checked
-+	 * for both non-zero as well as >= 0xffff. As on last iteration the handle
-+	 * will turn to 0 from 0xffff and loop will be infinite.
-+	 */
+ 			Possible values can be query with ListFilterFields.
+ 
+-		array{string} FilterBy:
++		array{string} FilterAll:
+ 
+-			Filter items by fields. Default do not filter by
+-			fields.
++			Filter items by fields using AND logic, cannot be used
++			together with FilterAny.
+ 
+-			Possible values can be query with ListFilterFields
+-			excluding the first item that must be either '&' or
+-			'|' that apply AND or OR logic respectively.
++			Possible values can be query with ListFilterFields.
 +
-+	for (handle = start_handle; (handle != 0 && handle <= end_handle); handle++)
- 		if (attrib_db_del(adapter, handle) < 0)
- 			error("Can't delete handle 0x%04x", handle);
- }
++		array{string} FilterAny:
++
++			Filter items by fields using OR logic, cannot be used
++			together with FilterAll.
++
++			Possible values can be query with ListFilterFields.
+ 
+ 		bool ResetNewMissedCalls
+ 
 -- 
-1.9.1
+1.9.3
 
