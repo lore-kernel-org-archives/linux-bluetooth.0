@@ -1,43 +1,83 @@
 Return-Path: <cyrus@holtmann.org>
-From: Marcin Kraglak <marcin.kraglak@tieto.com>
+From: Vikrampal Yadav <vikram.pal@samsung.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv2 00/15] android/tester: GATT Client test cases
-Date: Wed, 24 Sep 2014 13:37:45 +0200
-Message-Id: <1411558680-26856-1-git-send-email-marcin.kraglak@tieto.com>
+Cc: luiz.dentz@gmail.com, d.kasatkin@samsung.com,
+	vikram.pal@samsung.com, cpgs@samsung.com
+Subject: [PATCH 6/6] Monitor: Add AVRCP AddToNowPlaying support
+Date: Wed, 24 Sep 2014 17:10:32 +0530
+Message-id: <1411558832-15458-6-git-send-email-vikram.pal@samsung.com>
+In-reply-to: <1411558832-15458-1-git-send-email-vikram.pal@samsung.com>
+References: <1411558832-15458-1-git-send-email-vikram.pal@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch set contains test cases for reading/writing characteristics
-and descriptors. There are also minor fixes for android-tester
-and android/gatt.
-Few test cases were already send to ML, and now they are rebased.
+Support for decoding AVRCP AddToNowPlaying added in Bluetooth
+monitor.
+---
+ monitor/avctp.c | 43 +++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 43 insertions(+)
 
-BR
-Marcin
-
-Marcin Kraglak (15):
-  android/tester: Fix condition check
-  android/tester: Change function names
-  android/tester: Make local variable static
-  android/tester: Add support for GATT Client Read/Write callbacks
-  android/tester: Add GATT Characteristic Read Success
-  android/tester: Add GATT Characteristic Read Ins. Auth.
-  android/tester: Add GATT Characteristic Read Wrong Params
-  android/tester: Add GATT Descriptor Read Success
-  android/tester: Add GATT Descriptor Read Ins. Auth.
-  android/tester: Add GATT Descriptor Read Wrong params
-  android/tester: Add GATT Characteristic Write Cmd Success
-  android/tester: Add GATT Characteristic Write Req Success
-  android/tester: Add GATT Write Characteristic Ins. Auth.
-  android/gatt: Set proper status of write_data
-  android/tester: Add GATT Write Characteristic Wrong params
-
- android/gatt.c        |   1 +
- android/tester-gatt.c | 747 +++++++++++++++++++++++++++++++++++++++++++++++++-
- android/tester-main.c |  84 +++++-
- android/tester-main.h |  31 +++
- 4 files changed, 848 insertions(+), 15 deletions(-)
-
+diff --git a/monitor/avctp.c b/monitor/avctp.c
+index 00f84cd..88f531b 100644
+--- a/monitor/avctp.c
++++ b/monitor/avctp.c
+@@ -1233,6 +1233,48 @@ response:
+ 	return true;
+ }
+ 
++static bool avrcp_add_to_now_playing(struct avctp_frame *avctp_frame,
++						uint8_t ctype, uint8_t len,
++						uint8_t indent)
++{
++	struct l2cap_frame *frame = &avctp_frame->l2cap_frame;
++	uint64_t uid;
++	uint16_t uidcounter;
++	uint8_t scope, status;
++
++	if (ctype > AVC_CTYPE_GENERAL_INQUIRY)
++		goto response;
++
++	if (!l2cap_frame_get_u8(frame, &scope))
++		return false;
++
++	print_field("%*cScope: 0x%02x (%s)", (indent - 8), ' ',
++						scope, scope2str(scope));
++
++	if (!l2cap_frame_get_be64(frame, &uid))
++		return false;
++
++	print_field("%*cUID: 0x%16" PRIx64 " (%" PRIu64 ")", (indent - 8),
++								' ', uid, uid);
++
++	if (!l2cap_frame_get_be16(frame, &uidcounter))
++		return false;
++
++	print_field("%*cUIDCounter: 0x%04x (%u)", (indent - 8), ' ',
++							uidcounter, uidcounter);
++
++	return true;
++
++response:
++	if (!l2cap_frame_get_u8(frame, &status))
++		return false;
++
++	print_field("%*cStatus: 0x%02x (%s)", (indent - 8), ' ', status,
++							error2str(status));
++
++	return true;
++}
++
+ struct avrcp_ctrl_pdu_data {
+ 	uint8_t pduid;
+ 	bool (*func) (struct avctp_frame *avctp_frame, uint8_t ctype,
+@@ -1253,6 +1295,7 @@ static const struct avrcp_ctrl_pdu_data avrcp_ctrl_pdu_table[] = {
+ 	{ 0x50, avrcp_set_absolute_volume		},
+ 	{ 0x60, avrcp_set_addressed_player		},
+ 	{ 0x74, avrcp_play_item				},
++	{ 0x90, avrcp_add_to_now_playing		},
+ 	{ }
+ };
+ 
 -- 
-1.9.3
+1.9.1
 
