@@ -1,40 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.6\))
-Subject: Re: [PATCH bluetooth-next 0/4] ieee802154: mrf24j40 cleanups and 6lowpan fix
+Subject: Re: [PATCH] Bluetooth: Fix reason code used for rejecting SCO connections
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1411554093-14976-1-git-send-email-alex.aring@gmail.com>
-Date: Wed, 24 Sep 2014 14:17:13 +0200
-Cc: linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org,
-	kernel@pengutronix.de
-Message-Id: <A7357AD1-583F-4FB3-AF7E-4BDD1F824578@holtmann.org>
-References: <1411554093-14976-1-git-send-email-alex.aring@gmail.com>
-To: Alexander Aring <alex.aring@gmail.com>
-Sender: linux-wpan-owner@vger.kernel.org
+In-Reply-To: <1411553686-3815-1-git-send-email-johan.hedberg@gmail.com>
+Date: Wed, 24 Sep 2014 14:05:09 +0200
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <38625A1E-E16F-4115-A837-FB0658CC712F@holtmann.org>
+References: <1411553686-3815-1-git-send-email-johan.hedberg@gmail.com>
+To: Johan Hedberg <johan.hedberg@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Alex,
+Hi Johan,
 
-> this patches series contains cleanups for the mrf24j40 driver of the 802.15.4 subsystem.
-> Also one patch to fix a 802.15.4 6LoWPAN bug if we replace the IPv6 header with 6LoWPAN
-> header on a shared skb data buffer.
+> The core specification defines valid values for the
+> HCI_Reject_Synchronous_Connection_Request command to be 0x0D-0x0F. So
+> far the code has been using HCI_ERROR_REMOTE_USER_TERM (0x13) which is
+> not a valid value and is therefore being rejected by some controllers:
 > 
-> - Alex
+>> HCI Event: Connect Request (0x04) plen 10
+> 	bdaddr 40:6F:2A:6A:E5:E0 class 0x000000 type eSCO
+> < HCI Command: Reject Synchronous Connection (0x01|0x002a) plen 7
+> 	bdaddr 40:6F:2A:6A:E5:E0 reason 0x13
+> 	Reason: Remote User Terminated Connection
+>> HCI Event: Command Status (0x0f) plen 4
+> 	Reject Synchronous Connection (0x01|0x002a) status 0x12 ncmd 1
+> 	Error: Invalid HCI Command Parameters
 > 
-> Simon Vincent (1):
->  ieee802154: 6lowpan: ensure header compression does not corrupt ipv6
->    header
+> This patch introduces a new define for a value from the valid range
+> (0x0d == Connection Rejected Due To Limited Resources) and uses it
+> instead for rejecting incoming connections.
 > 
-> Varka Bhadram (3):
->  mrf24j40: fix Missing a blank line after declarations
->  mrf24j40: remove unnecessary return statement
->  mrf24j40: use pr_* / dev_* instead of printk()
-> 
-> drivers/net/ieee802154/mrf24j40.c |  19 +++---
-> net/ieee802154/6lowpan_rtnl.c     | 125 +++++++++++++++++++++++++++-----------
-> 2 files changed, 99 insertions(+), 45 deletions(-)
+> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+> ---
+> include/net/bluetooth/hci.h | 1 +
+> net/bluetooth/hci_conn.c    | 2 +-
+> 2 files changed, 2 insertions(+), 1 deletion(-)
 
-all 4 patches have been applied to bluetooth-next tree.
+patch has been applied to bluetooth-next tree.
 
 Regards
 
