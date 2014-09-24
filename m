@@ -1,84 +1,82 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@gmail.com>
-To: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
+Date: Wed, 24 Sep 2014 21:33:20 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Szymon Janc <szymon.janc@tieto.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] android/tester: Explicit set of io capabilities for SSP pairing tests
-Date: Wed, 24 Sep 2014 21:40:28 +0200
-Message-ID: <3868693.LsqkFdMOh4@athlon>
-In-Reply-To: <1411547961-30827-1-git-send-email-jakub.tyszkowski@tieto.com>
-References: <1411547961-30827-1-git-send-email-jakub.tyszkowski@tieto.com>
+Subject: Re: [PATCH 00/13] Compilation with musl C library
+Message-ID: <20140924183320.GA22729@t440s.P-661HNU-F1>
+References: <1411135816-18966-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1411135816-18966-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jakub,
+Hi Szymon,
 
-On Wednesday 24 September 2014 10:39:21 Jakub Tyszkowski wrote:
-> Those tests are periodically broken every time default io capabalities
-> are changed. This patch sets them explicitely to avoid this breakage.
-> ---
->  android/tester-bluetooth.c | 9 +++++++++
->  1 file changed, 9 insertions(+)
+On Fri, Sep 19, 2014, Szymon Janc wrote:
+> This patchset constains set of rather trivial fixes for compiling BlueZ
+> with musl C library. Musl is quite strict WRT to includes and standard
+> compliance.
 > 
-> diff --git a/android/tester-bluetooth.c b/android/tester-bluetooth.c
-> index a97e28e..2be824d 100644
-> --- a/android/tester-bluetooth.c
-> +++ b/android/tester-bluetooth.c
-> @@ -448,6 +448,10 @@ static  struct bt_action_data no_input_no_output_io_cap
-> = { .io_cap = 0x03,
->  };
+> All patches except last 3 are missing includes fixes. Last 2 also remove
+> glibc extensions.
 > 
-> +static  struct bt_action_data display_yes_no_io_cap = {
-> +	.io_cap = 0x01,
-> +};
-> +
->  static uint16_t test_conn_handle = 0;
+> BR
+> Szymon Janc
 > 
->  static void conn_cb(uint16_t handle, void *user_data)
-> @@ -1034,6 +1038,7 @@ static struct test_case test_cases[] = {
->  		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_ON),
->  		ACTION_SUCCESS(emu_setup_powered_remote_action, NULL),
->  		ACTION_SUCCESS(emu_set_ssp_mode_action, NULL),
-> +		ACTION_SUCCESS(emu_set_io_cap, &display_yes_no_io_cap),
->  		ACTION_SUCCESS(bt_start_discovery_action, NULL),
->  		CALLBACK_STATE(CB_BT_DISCOVERY_STATE_CHANGED,
->  							BT_DISCOVERY_STARTED),
-> @@ -1057,6 +1062,7 @@ static struct test_case test_cases[] = {
->  		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_ON),
->  		ACTION_SUCCESS(emu_setup_powered_remote_action, NULL),
->  		ACTION_SUCCESS(emu_set_ssp_mode_action, NULL),
-> +		ACTION_SUCCESS(emu_set_io_cap, &display_yes_no_io_cap),
->  		ACTION_SUCCESS(bt_start_discovery_action, NULL),
->  		CALLBACK_STATE(CB_BT_DISCOVERY_STATE_CHANGED,
->  							BT_DISCOVERY_STARTED),
-> @@ -1081,6 +1087,7 @@ static struct test_case test_cases[] = {
->  		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_ON),
->  		ACTION_SUCCESS(emu_setup_powered_remote_action, NULL),
->  		ACTION_SUCCESS(emu_set_ssp_mode_action, NULL),
-> +		ACTION_SUCCESS(emu_set_io_cap, &display_yes_no_io_cap),
->  		ACTION_SUCCESS(bt_create_bond_action,
->  					&prop_test_remote_ble_bdaddr_req),
->  		CALLBACK_BOND_STATE(BT_BOND_STATE_BONDING,
-> @@ -1113,6 +1120,7 @@ static struct test_case test_cases[] = {
->  		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_ON),
->  		ACTION_SUCCESS(emu_setup_powered_remote_action, NULL),
->  		ACTION_SUCCESS(emu_set_ssp_mode_action, NULL),
-> +		ACTION_SUCCESS(emu_set_io_cap, &display_yes_no_io_cap),
->  		ACTION_SUCCESS(bt_start_discovery_action, NULL),
->  		CALLBACK_STATE(CB_BT_DISCOVERY_STATE_CHANGED,
->  							BT_DISCOVERY_STARTED),
-> @@ -1138,6 +1146,7 @@ static struct test_case test_cases[] = {
->  		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_ON),
->  		ACTION_SUCCESS(emu_setup_powered_remote_action, NULL),
->  		ACTION_SUCCESS(emu_set_ssp_mode_action, NULL),
-> +		ACTION_SUCCESS(emu_set_io_cap, &display_yes_no_io_cap),
->  		ACTION_SUCCESS(bt_start_discovery_action, NULL),
->  		CALLBACK_STATE(CB_BT_DISCOVERY_STATE_CHANGED,
->  							BT_DISCOVERY_STARTED),
+> 
+> Szymon Janc (13):
+>   sap: Fix compilation errors with musl
+>   lib: Fix compilation error with musl
+>   android/hal-audio: Fix compilation errors with musl
+>   tools: Fix compilation errors  with musl
+>   shared: Fix compilation errors  with musl
+>   alert: Fix compilation error with musl
+>   core: Fix compilation error with musl
+>   obexd: Fix compilation error with musl
+>   android/pan: Fix compilation error with musl
+>   android/client: Fix compilation errors with musl
+>   health: Use proper type for tid
+>   emulator: Fix compilation error with musl
+>   android/emulator: Fix compilation error with musl
+> 
+>  android/client/if-bt.c         | 2 ++
+>  android/client/if-gatt.c       | 2 ++
+>  android/client/if-hh.c         | 1 +
+>  android/client/if-hl.c         | 1 +
+>  android/client/if-pan.c        | 2 --
+>  android/client/if-rc.c         | 1 +
+>  android/client/if-sock.c       | 1 +
+>  android/client/tabcompletion.c | 1 +
+>  android/hal-audio-sbc.c        | 1 +
+>  android/pan.c                  | 1 +
+>  android/system-emulator.c      | 4 ++--
+>  emulator/hfp.c                 | 1 +
+>  emulator/le.c                  | 1 +
+>  emulator/serial.c              | 3 ++-
+>  lib/hci.c                      | 2 +-
+>  obexd/plugins/filesystem.c     | 2 +-
+>  profiles/alert/server.c        | 3 +++
+>  profiles/health/hdp.c          | 2 +-
+>  profiles/sap/sap-u8500.c       | 1 +
+>  src/shared/hci.c               | 1 +
+>  src/systemd.c                  | 1 +
+>  tools/amptest.c                | 2 +-
+>  tools/btattach.c               | 2 +-
+>  tools/btsnoop.c                | 1 +
+>  tools/ciptool.c                | 2 +-
+>  tools/cltest.c                 | 2 +-
+>  tools/hciattach.c              | 2 +-
+>  tools/hciattach_qualcomm.c     | 2 +-
+>  tools/hciattach_tialt.c        | 2 +-
+>  tools/hcidump.c                | 2 +-
+>  tools/l2ping.c                 | 2 +-
+>  tools/l2test.c                 | 2 +-
+>  tools/rfcomm.c                 | 2 +-
+>  33 files changed, 38 insertions(+), 19 deletions(-)
 
-Applied, thanks.
+I've applied patches 1-11 from this set. The last two require some more
+discussion.
 
--- 
-Szymon K. Janc
-szymon.janc@gmail.com
+Johan
