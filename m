@@ -2,14 +2,12 @@ Return-Path: <cyrus@holtmann.org>
 From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH v2] shared/hfp: Remove not used permissive_syntax value
-Date: Wed, 24 Sep 2014 09:35:29 +0200
-Message-Id: <1411544129-24515-1-git-send-email-lukasz.rymanowski@tieto.com>
+Subject: [PATCH] shared/hfp: Remove not used permissive_syntax value
+Date: Wed, 24 Sep 2014 07:57:50 +0200
+Message-Id: <1411538270-20722-1-git-send-email-lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-It was planned to be used in case of some un specified commands, but in
-the end we did not have to use it
 ---
  src/shared/hfp.c | 12 ------------
  1 file changed, 12 deletions(-)
