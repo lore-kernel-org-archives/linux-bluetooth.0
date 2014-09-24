@@ -1,26 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 24 Sep 2014 10:53:37 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v2] shared/hfp: Remove not used permissive_syntax value
-Message-ID: <20140924075337.GA14486@t440s.ger.corp.intel.com>
-References: <1411544129-24515-1-git-send-email-lukasz.rymanowski@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1411544129-24515-1-git-send-email-lukasz.rymanowski@tieto.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=iso-8859-1
+Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.6\))
+Subject: Re: [PATCH net-next] bluetooth: Convert bt_<level> logging functions to return void
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1411409861.2952.57.camel@joe-AO725>
+Date: Wed, 24 Sep 2014 09:40:51 +0200
+Cc: "Gustavo F. Padovan" <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	BlueZ development <linux-bluetooth@vger.kernel.org>,
+	Network Development <netdev@vger.kernel.org>,
+	linux-kernel@vger.kernel.org
+Message-Id: <54204FE6-FE0E-4826-93DC-4A6BF6A4F03D@holtmann.org>
+References: <1411409861.2952.57.camel@joe-AO725>
+To: Joe Perches <joe@perches.com>
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Lukasz,
+Hi Joe,
 
-On Wed, Sep 24, 2014, Lukasz Rymanowski wrote:
-> It was planned to be used in case of some un specified commands, but in
-> the end we did not have to use it
+> No caller or macro uses the return value so make all
+> the functions return void.
+> 
+> Signed-off-by: Joe Perches <joe@perches.com>
 > ---
->  src/shared/hfp.c | 12 ------------
->  1 file changed, 12 deletions(-)
+> This change is associated to a desire to eventually
+> change printk to return void.
+> 
+> include/net/bluetooth/bluetooth.h |  4 ++--
+> net/bluetooth/lib.c               | 14 ++++----------
+> 2 files changed, 6 insertions(+), 12 deletions(-)
 
-Applied. Thanks.
+patch has been applied to bluetooth-next tree.
 
-Johan
+Regards
+
+Marcel
+
