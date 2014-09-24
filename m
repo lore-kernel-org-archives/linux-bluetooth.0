@@ -1,39 +1,56 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=iso-8859-1
-Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.6\))
-Subject: Re: [PATCH net-next] bluetooth: Convert bt_<level> logging functions to return void
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1411409861.2952.57.camel@joe-AO725>
-Date: Wed, 24 Sep 2014 09:40:51 +0200
-Cc: "Gustavo F. Padovan" <gustavo@padovan.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	BlueZ development <linux-bluetooth@vger.kernel.org>,
-	Network Development <netdev@vger.kernel.org>,
-	linux-kernel@vger.kernel.org
-Message-Id: <54204FE6-FE0E-4826-93DC-4A6BF6A4F03D@holtmann.org>
-References: <1411409861.2952.57.camel@joe-AO725>
-To: Joe Perches <joe@perches.com>
-Sender: linux-kernel-owner@vger.kernel.org
+From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+Subject: [PATCH v2] shared/hfp: Remove not used permissive_syntax value
+Date: Wed, 24 Sep 2014 09:35:29 +0200
+Message-Id: <1411544129-24515-1-git-send-email-lukasz.rymanowski@tieto.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Joe,
+It was planned to be used in case of some un specified commands, but in
+the end we did not have to use it
+---
+ src/shared/hfp.c | 12 ------------
+ 1 file changed, 12 deletions(-)
 
-> No caller or macro uses the return value so make all
-> the functions return void.
-> 
-> Signed-off-by: Joe Perches <joe@perches.com>
-> ---
-> This change is associated to a desire to eventually
-> change printk to return void.
-> 
-> include/net/bluetooth/bluetooth.h |  4 ++--
-> net/bluetooth/lib.c               | 14 ++++----------
-> 2 files changed, 6 insertions(+), 12 deletions(-)
-
-patch has been applied to bluetooth-next tree.
-
-Regards
-
-Marcel
+diff --git a/src/shared/hfp.c b/src/shared/hfp.c
+index 196e777..efc981f 100644
+--- a/src/shared/hfp.c
++++ b/src/shared/hfp.c
+@@ -46,7 +46,6 @@ struct hfp_gw {
+ 	struct ringbuf *write_buf;
+ 	struct queue *cmd_handlers;
+ 	bool writer_active;
+-	bool permissive_syntax;
+ 	bool result_pending;
+ 	hfp_command_func_t command_callback;
+ 	hfp_destroy_func_t command_destroy;
+@@ -507,7 +506,6 @@ struct hfp_gw *hfp_gw_new(int fd)
+ 	}
+ 
+ 	hfp->writer_active = false;
+-	hfp->permissive_syntax = false;
+ 	hfp->result_pending = false;
+ 
+ 	return hfp_gw_ref(hfp);
+@@ -610,16 +608,6 @@ bool hfp_gw_set_close_on_unref(struct hfp_gw *hfp, bool do_close)
+ 	return true;
+ }
+ 
+-bool hfp_gw_set_permissive_syntax(struct hfp_gw *hfp, bool permissive)
+-{
+-	if (!hfp)
+-		return false;
+-
+-	hfp->permissive_syntax = permissive;
+-
+-	return true;
+-}
+-
+ bool hfp_gw_send_result(struct hfp_gw *hfp, enum hfp_result result)
+ {
+ 	const char *str;
+-- 
+1.8.4
 
