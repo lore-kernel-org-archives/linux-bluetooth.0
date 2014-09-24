@@ -1,63 +1,226 @@
 Return-Path: <cyrus@holtmann.org>
-From: johan.hedberg@gmail.com
+From: Vikrampal Yadav <vikram.pal@samsung.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Fix reason code used for rejecting SCO connections
-Date: Wed, 24 Sep 2014 13:14:46 +0300
-Message-Id: <1411553686-3815-1-git-send-email-johan.hedberg@gmail.com>
+Cc: luiz.dentz@gmail.com, d.kasatkin@samsung.com,
+	vikram.pal@samsung.com, cpgs@samsung.com
+Subject: [PATCH v3] Monitor: Add AVRCP GetElementAttributes support
+Date: Wed, 24 Sep 2014 14:43:29 +0530
+Message-id: <1411550009-4338-1-git-send-email-vikram.pal@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@intel.com>
-
-The core specification defines valid values for the
-HCI_Reject_Synchronous_Connection_Request command to be 0x0D-0x0F. So
-far the code has been using HCI_ERROR_REMOTE_USER_TERM (0x13) which is
-not a valid value and is therefore being rejected by some controllers:
-
- > HCI Event: Connect Request (0x04) plen 10
-	bdaddr 40:6F:2A:6A:E5:E0 class 0x000000 type eSCO
- < HCI Command: Reject Synchronous Connection (0x01|0x002a) plen 7
-	bdaddr 40:6F:2A:6A:E5:E0 reason 0x13
-	Reason: Remote User Terminated Connection
- > HCI Event: Command Status (0x0f) plen 4
-	Reject Synchronous Connection (0x01|0x002a) status 0x12 ncmd 1
-	Error: Invalid HCI Command Parameters
-
-This patch introduces a new define for a value from the valid range
-(0x0d == Connection Rejected Due To Limited Resources) and uses it
-instead for rejecting incoming connections.
-
-Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+Support for decoding AVRCP GetElementAttributes added in
+Bluetooth monitor.
 ---
- include/net/bluetooth/hci.h | 1 +
- net/bluetooth/hci_conn.c    | 2 +-
- 2 files changed, 2 insertions(+), 1 deletion(-)
+ monitor/avctp.c | 167 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 167 insertions(+)
 
-diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index 3f8547f1c6f8..6e8f24967308 100644
---- a/include/net/bluetooth/hci.h
-+++ b/include/net/bluetooth/hci.h
-@@ -385,6 +385,7 @@ enum {
- #define HCI_ERROR_AUTH_FAILURE		0x05
- #define HCI_ERROR_MEMORY_EXCEEDED	0x07
- #define HCI_ERROR_CONNECTION_TIMEOUT	0x08
-+#define HCI_ERROR_REJ_LIMITED_RESOURCES	0x0d
- #define HCI_ERROR_REJ_BAD_ADDR		0x0f
- #define HCI_ERROR_REMOTE_USER_TERM	0x13
- #define HCI_ERROR_REMOTE_LOW_RESOURCES	0x14
-diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index 22b253750f78..445829cd363c 100644
---- a/net/bluetooth/hci_conn.c
-+++ b/net/bluetooth/hci_conn.c
-@@ -121,7 +121,7 @@ static void hci_reject_sco(struct hci_conn *conn)
+diff --git a/monitor/avctp.c b/monitor/avctp.c
+index f366b87..c331a66 100644
+--- a/monitor/avctp.c
++++ b/monitor/avctp.c
+@@ -158,6 +158,16 @@
+ #define AVRCP_ATTRIBUTE_SHUFFLE		0x03
+ #define AVRCP_ATTRIBUTE_SCAN		0x04
+ 
++/* media attributes */
++#define AVRCP_MEDIA_ATTRIBUTE_ILLEGAL	0x00
++#define AVRCP_MEDIA_ATTRIBUTE_TITLE	0x01
++#define AVRCP_MEDIA_ATTRIBUTE_ARTIST	0x02
++#define AVRCP_MEDIA_ATTRIBUTE_ALBUM	0x03
++#define AVRCP_MEDIA_ATTRIBUTE_TRACK	0x04
++#define AVRCP_MEDIA_ATTRIBUTE_TOTAL	0x05
++#define AVRCP_MEDIA_ATTRIBUTE_GENRE	0x06
++#define AVRCP_MEDIA_ATTRIBUTE_DURATION	0x07
++
+ struct avctp_frame {
+ 	uint8_t hdr;
+ 	uint8_t pt;
+@@ -165,6 +175,11 @@ struct avctp_frame {
+ 	struct l2cap_frame l2cap_frame;
+ };
+ 
++static struct avrcp_continuing {
++	uint16_t num;
++	uint16_t size;
++} avrcp_continuing;
++
+ static const char *ctype2str(uint8_t ctype)
  {
- 	struct hci_cp_reject_sync_conn_req cp;
+ 	switch (ctype & 0x0f) {
+@@ -524,6 +539,30 @@ static const char *charset2str(uint16_t charset)
+ 	}
+ }
  
--	cp.reason = HCI_ERROR_REMOTE_USER_TERM;
-+	cp.reason = HCI_ERROR_REJ_LIMITED_RESOURCES;
- 	bacpy(&cp.bdaddr, &conn->dst);
++static const char *mediattr2str(uint32_t attr)
++{
++	switch (attr) {
++	case AVRCP_MEDIA_ATTRIBUTE_ILLEGAL:
++		return "Illegal";
++	case AVRCP_MEDIA_ATTRIBUTE_TITLE:
++		return "Title";
++	case AVRCP_MEDIA_ATTRIBUTE_ARTIST:
++		return "Artist";
++	case AVRCP_MEDIA_ATTRIBUTE_ALBUM:
++		return "Album";
++	case AVRCP_MEDIA_ATTRIBUTE_TRACK:
++		return "Track";
++	case AVRCP_MEDIA_ATTRIBUTE_TOTAL:
++		return "Track Total";
++	case AVRCP_MEDIA_ATTRIBUTE_GENRE:
++		return "Genre";
++	case AVRCP_MEDIA_ATTRIBUTE_DURATION:
++		return "Track duration";
++	default:
++		return "Reserved";
++	}
++}
++
+ static bool avrcp_passthrough_packet(struct avctp_frame *avctp_frame)
+ {
+ 	struct l2cap_frame *frame = &avctp_frame->l2cap_frame;
+@@ -905,6 +944,133 @@ static bool avrcp_displayable_charset(struct avctp_frame *avctp_frame,
+ 	return true;
+ }
  
- 	hci_send_cmd(conn->hdev, HCI_OP_REJECT_SYNC_CONN_REQ, sizeof(cp), &cp);
++static bool avrcp_get_element_attributes(struct avctp_frame *avctp_frame,
++						uint8_t ctype, uint8_t len,
++						uint8_t indent)
++{
++	struct l2cap_frame *frame = &avctp_frame->l2cap_frame;
++	uint64_t id;
++	uint8_t num;
++
++	if (ctype > AVC_CTYPE_GENERAL_INQUIRY)
++		goto response;
++
++	if (!l2cap_frame_get_be64(frame, &id))
++		return false;
++
++	print_field("%*cIdentifier: 0x%jx (%s)", (indent - 8), ' ',
++					id, id ? "Reserved" : "PLAYING");
++
++	if (!l2cap_frame_get_u8(frame, &num))
++		return false;
++
++	print_field("%*cAttributeCount: 0x%02x", (indent - 8), ' ', num);
++
++	for (; num > 0; num--) {
++		uint32_t attr;
++
++		if (!l2cap_frame_get_be32(frame, &attr))
++			return false;
++
++		print_field("%*cAttribute: 0x%08x (%s)", (indent - 8),
++					' ', attr, mediattr2str(attr));
++	}
++
++	return true;
++
++response:
++	switch (avctp_frame->pt) {
++	case AVRCP_PACKET_TYPE_SINGLE:
++	case AVRCP_PACKET_TYPE_START:
++		if (!l2cap_frame_get_u8(frame, &num))
++			return false;
++
++		avrcp_continuing.num = num;
++		print_field("%*cAttributeCount: 0x%02x", (indent - 8),
++								' ', num);
++		len--;
++		break;
++	case AVRCP_PACKET_TYPE_CONTINUING:
++	case AVRCP_PACKET_TYPE_END:
++		num = avrcp_continuing.num;
++
++		if (avrcp_continuing.size > 0) {
++			uint16_t size;
++
++			if (avrcp_continuing.size > len) {
++				size = len;
++				avrcp_continuing.size -= len;
++			} else {
++				size = avrcp_continuing.size;
++				avrcp_continuing.size = 0;
++			}
++
++			printf("ContinuingAttributeValue: ");
++			for (; size > 0; size--) {
++				uint8_t c;
++
++				if (!l2cap_frame_get_u8(frame, &c))
++					goto failed;
++
++				printf("%1c", isprint(c) ? c : '.');
++			}
++			printf("\n");
++
++			len -= size;
++		}
++		break;
++	default:
++		goto failed;
++	}
++
++	while (num > 0 && len > 0) {
++		uint32_t attr;
++		uint16_t charset, attrlen;
++
++		if (!l2cap_frame_get_be32(frame, &attr))
++			goto failed;
++
++		print_field("%*cAttribute: 0x%08x (%s)", (indent - 8),
++						' ', attr, mediattr2str(attr));
++
++		if (!l2cap_frame_get_be16(frame, &charset))
++			goto failed;
++
++		print_field("%*cCharsetID: 0x%04x (%s)", (indent - 8),
++				' ', charset, charset2str(charset));
++
++		if (!l2cap_frame_get_be16(frame, &attrlen))
++			goto failed;
++
++		print_field("%*cAttributeValueLength: 0x%04x",
++						(indent - 8), ' ', attrlen);
++
++		len -= sizeof(attr) + sizeof(charset) + sizeof(attrlen);
++		num--;
++
++		print_field("%*cAttributeValue: ", (indent - 8), ' ');
++		for (; attrlen > 0 && len > 0; attrlen--, len--) {
++			uint8_t c;
++
++			if (!l2cap_frame_get_u8(frame, &c))
++				goto failed;
++
++			printf("%1c", isprint(c) ? c : '.');
++		}
++
++		if (attrlen > 0)
++			avrcp_continuing.size = attrlen;
++	}
++
++	avrcp_continuing.num = num;
++	return true;
++
++failed:
++	avrcp_continuing.num = 0;
++	avrcp_continuing.size = 0;
++	return false;
++}
++
+ struct avrcp_ctrl_pdu_data {
+ 	uint8_t pduid;
+ 	bool (*func) (struct avctp_frame *avctp_frame, uint8_t ctype,
+@@ -920,6 +1086,7 @@ static const struct avrcp_ctrl_pdu_data avrcp_ctrl_pdu_table[] = {
+ 	{ 0x15, avrcp_get_player_attribute_text		},
+ 	{ 0x16, avrcp_get_player_value_text		},
+ 	{ 0x17, avrcp_displayable_charset		},
++	{ 0x20, avrcp_get_element_attributes		},
+ 	{ }
+ };
+ 
 -- 
-1.9.3
+1.9.1
 
