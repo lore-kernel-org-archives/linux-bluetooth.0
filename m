@@ -1,106 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcin Kraglak <marcin.kraglak@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv2 06/15] android/tester: Add GATT Characteristic Read Ins. Auth.
-Date: Wed, 24 Sep 2014 13:37:51 +0200
-Message-Id: <1411558680-26856-7-git-send-email-marcin.kraglak@tieto.com>
-In-Reply-To: <1411558680-26856-1-git-send-email-marcin.kraglak@tieto.com>
-References: <1411558680-26856-1-git-send-email-marcin.kraglak@tieto.com>
+Subject: [PATCHv2 00/15] android/tester: GATT Client test cases
+Date: Wed, 24 Sep 2014 13:37:45 +0200
+Message-Id: <1411558680-26856-1-git-send-email-marcin.kraglak@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Test reading Characteristing while Insufficient Authorization
-is returned.
----
- android/tester-gatt.c | 54 +++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 54 insertions(+)
+This patch set contains test cases for reading/writing characteristics
+and descriptors. There are also minor fixes for android-tester
+and android/gatt.
+Few test cases were already send to ML, and now they are rebased.
 
-diff --git a/android/tester-gatt.c b/android/tester-gatt.c
-index 7f761c2..6cf1e90 100644
---- a/android/tester-gatt.c
-+++ b/android/tester-gatt.c
-@@ -26,6 +26,7 @@
- 
- #define GATT_STATUS_SUCCESS	0x00000000
- #define GATT_STATUS_FAILURE	0x00000101
-+#define GATT_STATUS_INS_AUTH	0x08
- 
- #define CLIENT1_ID	1
- #define CLIENT2_ID	2
-@@ -261,6 +262,13 @@ static struct set_read_params set_read_param_1 = {
- 	.status = BT_STATUS_SUCCESS
- };
- 
-+static struct set_read_params set_read_param_2 = {
-+	.params = &read_params_1,
-+	.srvc_id = &service_1,
-+	.char_id = &characteristic_1,
-+	.status = GATT_STATUS_INS_AUTH
-+};
-+
- static struct pdu search_service[] = {
- 	raw_pdu(0x10, 0x01, 0x00, 0xff, 0xff, 0x00, 0x28),
- 	raw_pdu(0x11, 0x06, 0x01, 0x00, 0x10, 0x00, 0x00, 0x18),
-@@ -394,6 +402,20 @@ static struct pdu read_characteristic_1[] = {
- 	end_pdu
- };
- 
-+static struct pdu read_characteristic_2[] = {
-+	raw_pdu(0x10, 0x01, 0x00, 0xff, 0xff, 0x00, 0x28),
-+	raw_pdu(0x11, 0x06, 0x01, 0x00, 0x10, 0x00, 0x00, 0x18),
-+	raw_pdu(0x10, 0x11, 0x00, 0xff, 0xff, 0x00, 0x28),
-+	raw_pdu(0x01, 0x11, 0x11, 0x00, 0x0a),
-+	raw_pdu(0x08, 0x01, 0x00, 0x10, 0x00, 0x03, 0x28),
-+	raw_pdu(0x09, 0x07, 0x02, 0x00, 0x04, 0x03, 0x00, 0x19, 0x00),
-+	raw_pdu(0x08, 0x03, 0x00, 0x10, 0x00, 0x03, 0x28),
-+	raw_pdu(0x01, 0x08, 0x03, 0x00, 0x0a),
-+	raw_pdu(0x0a, 0x03, 0x00),
-+	raw_pdu(0x01, 0x0a, 0x03, 0x00, 0x08),
-+	end_pdu
-+};
-+
- static void gatt_client_register_action(void)
- {
- 	struct test_data *data = tester_get_data();
-@@ -1239,6 +1261,38 @@ static struct test_case test_cases[] = {
- 		ACTION_SUCCESS(bluetooth_disable_action, NULL),
- 		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_OFF),
- 	),
-+	TEST_CASE_BREDRLE("Gatt Client - Read Characteristic - Ins. Author.",
-+		ACTION_SUCCESS(init_pdus, read_characteristic_2),
-+		ACTION_SUCCESS(bluetooth_enable_action, NULL),
-+		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_ON),
-+		ACTION_SUCCESS(init_read_params_action, &set_read_param_2),
-+		ACTION_SUCCESS(emu_setup_powered_remote_action, NULL),
-+		ACTION_SUCCESS(emu_set_ssp_mode_action, NULL),
-+		ACTION_SUCCESS(emu_set_connect_cb_action, gatt_conn_cb),
-+		ACTION_SUCCESS(gatt_client_register_action, &client_app_uuid),
-+		CALLBACK_STATUS(CB_GATTC_REGISTER_CLIENT, BT_STATUS_SUCCESS),
-+		ACTION_SUCCESS(gatt_client_start_scan_action,
-+							INT_TO_PTR(CLIENT1_ID)),
-+		CLLBACK_GATTC_SCAN_RES(prop_emu_remotes_default_set, 1, TRUE),
-+		ACTION_SUCCESS(gatt_client_stop_scan_action,
-+							INT_TO_PTR(CLIENT1_ID)),
-+		ACTION_SUCCESS(gatt_client_connect_action, &client1_conn_req),
-+		CALLBACK_GATTC_CONNECT(GATT_STATUS_SUCCESS,
-+						prop_emu_remotes_default_set,
-+						CONN1_ID, CLIENT1_ID),
-+		ACTION_SUCCESS(gatt_client_search_services, &search_services_1),
-+		CALLBACK_GATTC_SEARCH_COMPLETE(GATT_STATUS_SUCCESS, CONN1_ID),
-+		ACTION_SUCCESS(gatt_client_get_characteristic_action,
-+							&get_char_data_1),
-+		CALLBACK_GATTC_GET_CHARACTERISTIC_CB(GATT_STATUS_SUCCESS,
-+				CONN1_ID, &service_1, &characteristic_1, 4),
-+		ACTION_SUCCESS(gatt_client_read_characteristic_action,
-+							&read_char_data_1),
-+		CALLBACK_GATTC_READ_CHARACTERISTIC(GATT_STATUS_INS_AUTH,
-+						CONN1_ID, &read_params_1),
-+		ACTION_SUCCESS(bluetooth_disable_action, NULL),
-+		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_OFF),
-+	),
- };
- 
- struct queue *get_gatt_tests(void)
+BR
+Marcin
+
+Marcin Kraglak (15):
+  android/tester: Fix condition check
+  android/tester: Change function names
+  android/tester: Make local variable static
+  android/tester: Add support for GATT Client Read/Write callbacks
+  android/tester: Add GATT Characteristic Read Success
+  android/tester: Add GATT Characteristic Read Ins. Auth.
+  android/tester: Add GATT Characteristic Read Wrong Params
+  android/tester: Add GATT Descriptor Read Success
+  android/tester: Add GATT Descriptor Read Ins. Auth.
+  android/tester: Add GATT Descriptor Read Wrong params
+  android/tester: Add GATT Characteristic Write Cmd Success
+  android/tester: Add GATT Characteristic Write Req Success
+  android/tester: Add GATT Write Characteristic Ins. Auth.
+  android/gatt: Set proper status of write_data
+  android/tester: Add GATT Write Characteristic Wrong params
+
+ android/gatt.c        |   1 +
+ android/tester-gatt.c | 747 +++++++++++++++++++++++++++++++++++++++++++++++++-
+ android/tester-main.c |  84 +++++-
+ android/tester-main.h |  31 +++
+ 4 files changed, 848 insertions(+), 15 deletions(-)
+
 -- 
 1.9.3
 
