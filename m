@@ -1,42 +1,45 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcin Kraglak <marcin.kraglak@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv2 13/15] android/tester: Add GATT Write Characteristic Ins. Auth.
-Date: Wed, 24 Sep 2014 13:37:58 +0200
-Message-Id: <1411558680-26856-14-git-send-email-marcin.kraglak@tieto.com>
+Subject: [PATCHv2 12/15] android/tester: Add GATT Characteristic Write Req Success
+Date: Wed, 24 Sep 2014 13:37:57 +0200
+Message-Id: <1411558680-26856-13-git-send-email-marcin.kraglak@tieto.com>
 In-Reply-To: <1411558680-26856-1-git-send-email-marcin.kraglak@tieto.com>
 References: <1411558680-26856-1-git-send-email-marcin.kraglak@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Test write characteristic with Insufficient Authorization error.
+Test Characteristic write request.
 ---
- android/tester-gatt.c | 53 +++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 53 insertions(+)
+ android/tester-gatt.c | 56 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 56 insertions(+)
 
 diff --git a/android/tester-gatt.c b/android/tester-gatt.c
-index d0046b6..b0aee0d 100644
+index 747b545..d0046b6 100644
 --- a/android/tester-gatt.c
 +++ b/android/tester-gatt.c
-@@ -378,6 +378,13 @@ static struct set_write_params set_write_param_1 = {
- 	.status = BT_STATUS_SUCCESS
+@@ -291,6 +291,16 @@ static struct write_char_data write_char_data_1 = {
+ 	.auth_req = 0
  };
  
-+static struct set_write_params set_write_param_2 = {
-+	.params = &write_params_1,
-+	.srvc_id = &service_1,
-+	.char_id = &characteristic_1,
-+	.status = GATT_STATUS_INS_AUTH
++static struct write_char_data write_char_data_2 = {
++	.conn_id = CONN1_ID,
++	.service = &service_1,
++	.characteristic = &characteristic_1,
++	.write_type = 2,
++	.len = sizeof(value_2),
++	.p_value = value_2,
++	.auth_req = 0
 +};
 +
- static struct pdu search_service[] = {
- 	raw_pdu(0x10, 0x01, 0x00, 0xff, 0xff, 0x00, 0x28),
- 	raw_pdu(0x11, 0x06, 0x01, 0x00, 0x10, 0x00, 0x00, 0x18),
-@@ -588,6 +595,20 @@ static struct pdu write_characteristic_2[] = {
+ struct set_read_params {
+ 	btgatt_read_params_t *params;
+ 	btgatt_srvc_id_t *srvc_id;
+@@ -564,6 +574,20 @@ static struct pdu write_characteristic_1[] = {
  	end_pdu
  };
  
-+static struct pdu write_characteristic_3[] = {
++static struct pdu write_characteristic_2[] = {
 +	raw_pdu(0x10, 0x01, 0x00, 0xff, 0xff, 0x00, 0x28),
 +	raw_pdu(0x11, 0x06, 0x01, 0x00, 0x10, 0x00, 0x00, 0x18),
 +	raw_pdu(0x10, 0x11, 0x00, 0xff, 0xff, 0x00, 0x28),
@@ -46,22 +49,22 @@ index d0046b6..b0aee0d 100644
 +	raw_pdu(0x08, 0x03, 0x00, 0x10, 0x00, 0x03, 0x28),
 +	raw_pdu(0x01, 0x08, 0x03, 0x00, 0x0a),
 +	raw_pdu(0x12, 0x03, 0x00, 0x00, 0x01, 0x02, 0x03),
-+	raw_pdu(0x01, 0x12, 0x03, 0x00, 0x08),
++	raw_pdu(0x13),
 +	end_pdu
 +};
 +
  static void gatt_client_register_action(void)
  {
  	struct test_data *data = tester_get_data();
-@@ -1739,6 +1760,38 @@ static struct test_case test_cases[] = {
+@@ -1683,6 +1707,38 @@ static struct test_case test_cases[] = {
  		ACTION_SUCCESS(bluetooth_disable_action, NULL),
  		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_OFF),
  	),
-+	TEST_CASE_BREDRLE("Gatt Client - Write Characteristic - Ins. Author.",
-+		ACTION_SUCCESS(init_pdus, write_characteristic_3),
++	TEST_CASE_BREDRLE("Gatt Client - Write Characteristic Req - Success",
++		ACTION_SUCCESS(init_pdus, write_characteristic_2),
 +		ACTION_SUCCESS(bluetooth_enable_action, NULL),
 +		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_ON),
-+		ACTION_SUCCESS(init_write_params_action, &set_write_param_2),
++		ACTION_SUCCESS(init_write_params_action, &set_write_param_1),
 +		ACTION_SUCCESS(emu_setup_powered_remote_action, NULL),
 +		ACTION_SUCCESS(emu_set_ssp_mode_action, NULL),
 +		ACTION_SUCCESS(emu_set_connect_cb_action, gatt_conn_cb),
@@ -84,7 +87,7 @@ index d0046b6..b0aee0d 100644
 +				CONN1_ID, &service_1, &characteristic_1, 4),
 +		ACTION_SUCCESS(gatt_client_write_characteristic_action,
 +							&write_char_data_2),
-+		CALLBACK_GATTC_WRITE_CHARACTERISTIC(GATT_STATUS_INS_AUTH,
++		CALLBACK_GATTC_WRITE_CHARACTERISTIC(GATT_STATUS_SUCCESS,
 +						CONN1_ID, &write_params_1),
 +		ACTION_SUCCESS(bluetooth_disable_action, NULL),
 +		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_OFF),
