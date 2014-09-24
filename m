@@ -1,35 +1,63 @@
 Return-Path: <cyrus@holtmann.org>
-From: Alexander Aring <alex.aring@gmail.com>
+From: johan.hedberg@gmail.com
 To: linux-bluetooth@vger.kernel.org
-Cc: marcel@holtmann.org,
-	linux-wpan@vger.kernel.org,
-	kernel@pengutronix.de,
-	Alexander Aring <alex.aring@gmail.com>
-Subject: [PATCH bluetooth-next 0/4] ieee802154: mrf24j40 cleanups and 6lowpan fix
-Date: Wed, 24 Sep 2014 12:21:29 +0200
-Message-Id: <1411554093-14976-1-git-send-email-alex.aring@gmail.com>
+Subject: [PATCH] Bluetooth: Fix reason code used for rejecting SCO connections
+Date: Wed, 24 Sep 2014 13:14:46 +0300
+Message-Id: <1411553686-3815-1-git-send-email-johan.hedberg@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+From: Johan Hedberg <johan.hedberg@intel.com>
 
-this patches series contains cleanups for the mrf24j40 driver of the 802.15.4 subsystem.
-Also one patch to fix a 802.15.4 6LoWPAN bug if we replace the IPv6 header with 6LoWPAN
-header on a shared skb data buffer.
+The core specification defines valid values for the
+HCI_Reject_Synchronous_Connection_Request command to be 0x0D-0x0F. So
+far the code has been using HCI_ERROR_REMOTE_USER_TERM (0x13) which is
+not a valid value and is therefore being rejected by some controllers:
 
-- Alex
+ > HCI Event: Connect Request (0x04) plen 10
+	bdaddr 40:6F:2A:6A:E5:E0 class 0x000000 type eSCO
+ < HCI Command: Reject Synchronous Connection (0x01|0x002a) plen 7
+	bdaddr 40:6F:2A:6A:E5:E0 reason 0x13
+	Reason: Remote User Terminated Connection
+ > HCI Event: Command Status (0x0f) plen 4
+	Reject Synchronous Connection (0x01|0x002a) status 0x12 ncmd 1
+	Error: Invalid HCI Command Parameters
 
-Simon Vincent (1):
-  ieee802154: 6lowpan: ensure header compression does not corrupt ipv6
-    header
+This patch introduces a new define for a value from the valid range
+(0x0d == Connection Rejected Due To Limited Resources) and uses it
+instead for rejecting incoming connections.
 
-Varka Bhadram (3):
-  mrf24j40: fix Missing a blank line after declarations
-  mrf24j40: remove unnecessary return statement
-  mrf24j40: use pr_* / dev_* instead of printk()
+Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+---
+ include/net/bluetooth/hci.h | 1 +
+ net/bluetooth/hci_conn.c    | 2 +-
+ 2 files changed, 2 insertions(+), 1 deletion(-)
 
- drivers/net/ieee802154/mrf24j40.c |  19 +++---
- net/ieee802154/6lowpan_rtnl.c     | 125 +++++++++++++++++++++++++++-----------
- 2 files changed, 99 insertions(+), 45 deletions(-)
-
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+index 3f8547f1c6f8..6e8f24967308 100644
+--- a/include/net/bluetooth/hci.h
++++ b/include/net/bluetooth/hci.h
+@@ -385,6 +385,7 @@ enum {
+ #define HCI_ERROR_AUTH_FAILURE		0x05
+ #define HCI_ERROR_MEMORY_EXCEEDED	0x07
+ #define HCI_ERROR_CONNECTION_TIMEOUT	0x08
++#define HCI_ERROR_REJ_LIMITED_RESOURCES	0x0d
+ #define HCI_ERROR_REJ_BAD_ADDR		0x0f
+ #define HCI_ERROR_REMOTE_USER_TERM	0x13
+ #define HCI_ERROR_REMOTE_LOW_RESOURCES	0x14
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+index 22b253750f78..445829cd363c 100644
+--- a/net/bluetooth/hci_conn.c
++++ b/net/bluetooth/hci_conn.c
+@@ -121,7 +121,7 @@ static void hci_reject_sco(struct hci_conn *conn)
+ {
+ 	struct hci_cp_reject_sync_conn_req cp;
+ 
+-	cp.reason = HCI_ERROR_REMOTE_USER_TERM;
++	cp.reason = HCI_ERROR_REJ_LIMITED_RESOURCES;
+ 	bacpy(&cp.bdaddr, &conn->dst);
+ 
+ 	hci_send_cmd(conn->hdev, HCI_OP_REJECT_SYNC_CONN_REQ, sizeof(cp), &cp);
 -- 
-2.1.0
+1.9.3
+
