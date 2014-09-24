@@ -1,74 +1,25 @@
 Return-Path: <cyrus@holtmann.org>
-From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
-Subject: [PATCH] android/tester: Explicit set of io capabilities for SSP pairing tests
-Date: Wed, 24 Sep 2014 10:39:21 +0200
-Message-Id: <1411547961-30827-1-git-send-email-jakub.tyszkowski@tieto.com>
+Date: Wed, 24 Sep 2014 11:08:24 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Arman Uguray <armansito@chromium.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] shared/gatt-client: Remove stray line.
+Message-ID: <20140924080824.GC14486@t440s.ger.corp.intel.com>
+References: <1411506140-12207-1-git-send-email-armansito@chromium.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1411506140-12207-1-git-send-email-armansito@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Those tests are periodically broken every time default io capabalities
-are changed. This patch sets them explicitely to avoid this breakage.
----
- android/tester-bluetooth.c | 9 +++++++++
- 1 file changed, 9 insertions(+)
+Hi Arman,
 
-diff --git a/android/tester-bluetooth.c b/android/tester-bluetooth.c
-index a97e28e..2be824d 100644
---- a/android/tester-bluetooth.c
-+++ b/android/tester-bluetooth.c
-@@ -448,6 +448,10 @@ static  struct bt_action_data no_input_no_output_io_cap = {
- 	.io_cap = 0x03,
- };
- 
-+static  struct bt_action_data display_yes_no_io_cap = {
-+	.io_cap = 0x01,
-+};
-+
- static uint16_t test_conn_handle = 0;
- 
- static void conn_cb(uint16_t handle, void *user_data)
-@@ -1034,6 +1038,7 @@ static struct test_case test_cases[] = {
- 		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_ON),
- 		ACTION_SUCCESS(emu_setup_powered_remote_action, NULL),
- 		ACTION_SUCCESS(emu_set_ssp_mode_action, NULL),
-+		ACTION_SUCCESS(emu_set_io_cap, &display_yes_no_io_cap),
- 		ACTION_SUCCESS(bt_start_discovery_action, NULL),
- 		CALLBACK_STATE(CB_BT_DISCOVERY_STATE_CHANGED,
- 							BT_DISCOVERY_STARTED),
-@@ -1057,6 +1062,7 @@ static struct test_case test_cases[] = {
- 		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_ON),
- 		ACTION_SUCCESS(emu_setup_powered_remote_action, NULL),
- 		ACTION_SUCCESS(emu_set_ssp_mode_action, NULL),
-+		ACTION_SUCCESS(emu_set_io_cap, &display_yes_no_io_cap),
- 		ACTION_SUCCESS(bt_start_discovery_action, NULL),
- 		CALLBACK_STATE(CB_BT_DISCOVERY_STATE_CHANGED,
- 							BT_DISCOVERY_STARTED),
-@@ -1081,6 +1087,7 @@ static struct test_case test_cases[] = {
- 		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_ON),
- 		ACTION_SUCCESS(emu_setup_powered_remote_action, NULL),
- 		ACTION_SUCCESS(emu_set_ssp_mode_action, NULL),
-+		ACTION_SUCCESS(emu_set_io_cap, &display_yes_no_io_cap),
- 		ACTION_SUCCESS(bt_create_bond_action,
- 					&prop_test_remote_ble_bdaddr_req),
- 		CALLBACK_BOND_STATE(BT_BOND_STATE_BONDING,
-@@ -1113,6 +1120,7 @@ static struct test_case test_cases[] = {
- 		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_ON),
- 		ACTION_SUCCESS(emu_setup_powered_remote_action, NULL),
- 		ACTION_SUCCESS(emu_set_ssp_mode_action, NULL),
-+		ACTION_SUCCESS(emu_set_io_cap, &display_yes_no_io_cap),
- 		ACTION_SUCCESS(bt_start_discovery_action, NULL),
- 		CALLBACK_STATE(CB_BT_DISCOVERY_STATE_CHANGED,
- 							BT_DISCOVERY_STARTED),
-@@ -1138,6 +1146,7 @@ static struct test_case test_cases[] = {
- 		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_ON),
- 		ACTION_SUCCESS(emu_setup_powered_remote_action, NULL),
- 		ACTION_SUCCESS(emu_set_ssp_mode_action, NULL),
-+		ACTION_SUCCESS(emu_set_io_cap, &display_yes_no_io_cap),
- 		ACTION_SUCCESS(bt_start_discovery_action, NULL),
- 		CALLBACK_STATE(CB_BT_DISCOVERY_STATE_CHANGED,
- 							BT_DISCOVERY_STARTED),
--- 
-1.9.1
+On Tue, Sep 23, 2014, Arman Uguray wrote:
+> Remove copy-paste artifact.
+> ---
+>  src/shared/gatt-client.h | 1 -
+>  1 file changed, 1 deletion(-)
 
+Applied. Thanks.
+
+Johan
