@@ -1,88 +1,49 @@
 Return-Path: <cyrus@holtmann.org>
-From: Gu Chaojie <chao.jie.gu@intel.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Gu Chaojie <chao.jie.gu@intel.com>
-Subject: [PATCH v2 2/3] shared/gatt-client: Add CSRK part to support signed write
-Date: Thu, 25 Sep 2014 16:28:57 +0800
-Message-Id: <1411633738-19108-3-git-send-email-chao.jie.gu@intel.com>
-In-Reply-To: <1411633738-19108-1-git-send-email-chao.jie.gu@intel.com>
-References: <1411633738-19108-1-git-send-email-chao.jie.gu@intel.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Thu, 25 Sep 2014 09:39:36 +0200
+From: Alexander Aring <alex.aring@gmail.com>
+To: Martin Townsend <martin.townsend@xsilon.com>
+Cc: Jukka Rissanen <jukka.rissanen@linux.intel.com>,
+	Martin Townsend <mtownsend1973@gmail.com>,
+	linux-zigbee-devel@lists.sourceforge.net,
+	linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org,
+	marcel@holtmann.org
+Subject: Re: [PATCH v4 bluetooth] 6lowpan: fix incorrect return values in
+ lowpan_rcv
+Message-ID: <20140925073936.GB25208@omega>
+References: <20140916173806.GC6104@omega>
+ <54188817.80707@xsilon.com>
+ <20140916193723.GD6104@omega>
+ <54189522.9090405@xsilon.com>
+ <20140916200754.GE6104@omega>
+ <54189B6E.5080905@xsilon.com>
+ <20140916203032.GG6104@omega>
+ <20140925055504.GA24765@omega>
+ <5423C36D.20606@xsilon.com>
+ <20140925073143.GA25208@omega>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20140925073143.GA25208@omega>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch Add set CSRK function for btgatt-client tool and
-check CSRK valid before bt_att_send signed write command to
-remote side.
+Martin,
 
----
- src/shared/gatt-client.c |   28 +++++++++++++++++++++++-----
- src/shared/gatt-client.h |    5 +++++
- 2 files changed, 28 insertions(+), 5 deletions(-)
+On Thu, Sep 25, 2014 at 09:31:43AM +0200, Alexander Aring wrote:
+> On Thu, Sep 25, 2014 at 08:25:33AM +0100, Martin Townsend wrote:
+> > Hi Alex,
+> > 
+> > I'm not keen on handling kfree_skb inside of lowpan_process_data for reasons already stated in a previous email.  I'll have a rethink to see if there's another way of handling this.  One idea I'm investigating is pskb_expand_head, this doesn't create a new sk_buff but adds room to the head and/or tail which seems perfect for decompression.  There must only be a reference count of 1, so we would need to make a copy if this is the case before passing to decompression, I can't think why there would be more than 1 reference as the packet will only have passed through the 802.15.4 layer and only 6LoWPAN can decompress it.   If it's cloned for monitoring then this would be a problem.
+> > Any thoughts on this?
+> > 
+> 
+> For me it doesn't matter if kfree_skb is inside of lowpan_process_data
+> or not. Go ahead and send fixes for this, I will only review if there
+> are still issues which are not solved by your patch.
+> 
+> Don't know what you exactly mean with "monitoring" now.
+> 
+For me it's only important to know that you still working on this issue.
+If you still working on it, all seems to be fine.
 
-diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
-index 6dc8e95..d5ff994 100644
---- a/src/shared/gatt-client.c
-+++ b/src/shared/gatt-client.c
-@@ -1753,19 +1753,26 @@ bool bt_gatt_client_read_long_value(struct bt_gatt_client *client,
- bool bt_gatt_client_write_without_response(struct bt_gatt_client *client,
- 					uint16_t value_handle,
- 					bool signed_write,
--					uint8_t *value, uint16_t length) {
-+					uint8_t *value, uint16_t length)
-+{
- 	uint8_t pdu[2 + length];
- 
- 	if (!client)
- 		return 0;
- 
--	/* TODO: Support this once bt_att_send supports signed writes. */
--	if (signed_write)
--		return 0;
--
- 	put_le16(value_handle, pdu);
- 	memcpy(pdu + 2, value, length);
- 
-+	if (signed_write) {
-+		if (bt_att_csrk_is_valid(client->att, LOCAL_CSRK))
-+			return bt_att_send(client->att,
-+					BT_ATT_OP_SIGNED_WRITE_CMD,
-+					pdu, sizeof(pdu), NULL, NULL, NULL);
-+		else
-+			return 0;
-+
-+	}
-+
- 	return bt_att_send(client->att, BT_ATT_OP_WRITE_CMD, pdu, sizeof(pdu),
- 							NULL, NULL, NULL);
- }
-@@ -2246,3 +2253,14 @@ bool bt_gatt_client_unregister_notify(struct bt_gatt_client *client,
- 	client->need_notify_cleanup = true;
- 	return true;
- }
-+
-+bool bt_gatt_client_set_csrk(struct bt_gatt_client *client,
-+				enum bt_csrk_type type,
-+				bool valid_csrk,
-+				uint8_t key[16])
-+{
-+	if (!client)
-+		return false;
-+
-+	return bt_att_set_csrk(client->att, type, valid_csrk, key);
-+}
-diff --git a/src/shared/gatt-client.h b/src/shared/gatt-client.h
-index 6807f6b..f05ecd9 100644
---- a/src/shared/gatt-client.h
-+++ b/src/shared/gatt-client.h
-@@ -162,3 +162,8 @@ bool bt_gatt_client_register_notify(struct bt_gatt_client *client,
- 				bt_gatt_client_destroy_func_t destroy);
- bool bt_gatt_client_unregister_notify(struct bt_gatt_client *client,
- 							unsigned int id);
-+
-+bool bt_gatt_client_set_csrk(struct bt_gatt_client *client,
-+				enum bt_csrk_type type,
-+				bool valid_csrk,
-+				uint8_t key[16]);
--- 
-1.7.10.4
+Thanks, for your effort.
 
+- Alex
