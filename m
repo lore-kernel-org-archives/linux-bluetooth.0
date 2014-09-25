@@ -1,47 +1,46 @@
 Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
-To: Marcin Kraglak <marcin.kraglak@tieto.com>
+To: Gu Chaojie <chao.jie.gu@intel.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCHv2 01/15] android/tester: Fix condition check
-Date: Thu, 25 Sep 2014 11:11:10 +0200
-Message-ID: <8024219.b1VH3u4MZQ@uw000953>
-In-Reply-To: <1411558680-26856-2-git-send-email-marcin.kraglak@tieto.com>
-References: <1411558680-26856-1-git-send-email-marcin.kraglak@tieto.com> <1411558680-26856-2-git-send-email-marcin.kraglak@tieto.com>
+Subject: Re: [PATCH v2 0/3] support signed write command
+Date: Thu, 25 Sep 2014 10:54:57 +0200
+Message-ID: <1457354.2RSuMrT851@uw000953>
+In-Reply-To: <1411633738-19108-1-git-send-email-chao.jie.gu@intel.com>
+References: <1411633738-19108-1-git-send-email-chao.jie.gu@intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcin,
+Hi Gu Chaojie,
 
-On Wednesday 24 of September 2014 13:37:46 Marcin Kraglak wrote:
-> It may cause NULL pointer dereference.
-> ---
->  android/tester-gatt.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+On Thursday 25 of September 2014 16:28:55 Gu Chaojie wrote:
+> This patch set adds signed write command outgoing.
+> Patch set v1 cannot apply on latest source code
+> because it conflict with Arman's newest patch.
 > 
-> diff --git a/android/tester-gatt.c b/android/tester-gatt.c
-> index 42f3733..f30d0eb 100644
-> --- a/android/tester-gatt.c
-> +++ b/android/tester-gatt.c
-> @@ -545,7 +545,7 @@ static void gatt_cid_hook_cb(const void *data, uint16_t len, void *user_data)
->  		}
->  		queue_pop_head(t_data->pdus);
->  		gatt_pdu = queue_pop_head(t_data->pdus);
-> -		if (!gatt_pdu->data)
-> +		if (!gatt_pdu)
-
-Shouldn't this be:
-
-if (!gatt_pdu || !gatt_pdu->data)
-
-?
-
-
->  			break;
->  
->  		bthost_send_cid(bthost, cid_data->handle, cid_data->cid,
+> Gu Chaojie (3):
+>   shared/att.c: Add signed command outgoing and related CSRK function
+>   shared/gatt-client: Add CSRK part to support signed write
+>   tools/btgatt-client: Add signed write CSRK option
 > 
+>  src/shared/att-types.h   |    3 ++
+>  src/shared/att.c         |  101 ++++++++++++++++++++++++++++++++++++++++++++--
+>  src/shared/att.h         |   13 ++++++
+>  src/shared/gatt-client.c |   28 ++++++++++---
+>  src/shared/gatt-client.h |    5 +++
+>  tools/btgatt-client.c    |   35 +++++++++++++++-
+>  6 files changed, 175 insertions(+), 10 deletions(-)
+> 
+
+This doesn't link:
+
+  CCLD     tools/btgatt-client
+src/shared/att.o: In function `bt_att_new':
+bluez/src/shared/att.c:745: undefined reference to `bt_crypto_new'
+bluez/src/shared/att.c:783: undefined reference to `bt_crypto_unref'
+src/shared/att.o: In function `encode_pdu':
+bluez/src/shared/att.c:314: undefined reference to `bt_crypto_sign_att'
 
 -- 
 Best regards, 
