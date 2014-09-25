@@ -2,106 +2,29 @@ Return-Path: <cyrus@holtmann.org>
 From: Gu Chaojie <chao.jie.gu@intel.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Gu Chaojie <chao.jie.gu@intel.com>
-Subject: [PATCH v2 3/3] tools/btgatt-client: Add signed write CSRK option
-Date: Thu, 25 Sep 2014 16:28:58 +0800
-Message-Id: <1411633738-19108-4-git-send-email-chao.jie.gu@intel.com>
-In-Reply-To: <1411633738-19108-1-git-send-email-chao.jie.gu@intel.com>
-References: <1411633738-19108-1-git-send-email-chao.jie.gu@intel.com>
+Subject: [PATCH v2 0/3] support signed write command
+Date: Thu, 25 Sep 2014 16:28:55 +0800
+Message-Id: <1411633738-19108-1-git-send-email-chao.jie.gu@intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch add CSRK option, use -c <key> to set CSRK for signed
-write command. This key from pairing to store 32 byte key string
-under group "LocalSignatureKey" in the info file.
+This patch set adds signed write command outgoing.
+Patch set v1 cannot apply on latest source code
+because it conflict with Arman's newest patch.
 
----
- tools/btgatt-client.c |   35 +++++++++++++++++++++++++++++++++--
- 1 file changed, 33 insertions(+), 2 deletions(-)
+Gu Chaojie (3):
+  shared/att.c: Add signed command outgoing and related CSRK function
+  shared/gatt-client: Add CSRK part to support signed write
+  tools/btgatt-client: Add signed write CSRK option
 
-diff --git a/tools/btgatt-client.c b/tools/btgatt-client.c
-index d900e08..585997e 100644
---- a/tools/btgatt-client.c
-+++ b/tools/btgatt-client.c
-@@ -486,11 +486,13 @@ static void write_value_usage(void)
- 	printf("Usage: write-value [options] <value_handle> <value>\n"
- 		"Options:\n"
- 		"\t-w, --without-response\tWrite without response\n"
-+		"\t-c, --csrk <key>\tCSRK for signed write command\n"
- 		"e.g.:\n"
- 		"\twrite-value 0x0001 00 01 00\n");
- }
- 
- static struct option write_value_options[] = {
-+	{ "csrk",		1, 0, 'c' },
- 	{ "without-response",	0, 0, 'w' },
- 	{ }
- };
-@@ -504,6 +506,24 @@ static void write_cb(bool success, uint8_t att_ecode, void *user_data)
- 	}
- }
- 
-+static bool convert_csrk_key(char *optarg, uint8_t csrk[16])
-+{
-+	int i;
-+	char value[2];
-+
-+	if (strlen(optarg) != 32) {
-+		printf("csrk length is invalid\n");
-+		return false;
-+	} else {
-+		for (i = 0; i < 16; i++) {
-+			strncpy(value, optarg + (i * 2), 2);
-+			csrk[i] = strtol(value, NULL, 16);
-+		}
-+	}
-+
-+	return true;
-+}
-+
- static void cmd_write_value(struct client *cli, char *cmd_str)
- {
- 	int opt, i;
-@@ -515,6 +535,11 @@ static void cmd_write_value(struct client *cli, char *cmd_str)
- 	int length;
- 	uint8_t *value = NULL;
- 	bool without_response = false;
-+	bool signed_write = false;
-+	bool valid_csrk = false;
-+	uint8_t csrk[16];
-+
-+	memset(csrk, 0, 16);
- 
- 	if (!bt_gatt_client_is_ready(cli->gatt)) {
- 		printf("GATT client not initialized\n");
-@@ -529,12 +554,18 @@ static void cmd_write_value(struct client *cli, char *cmd_str)
- 
- 	optind = 0;
- 	argv[0] = "write-value";
--	while ((opt = getopt_long(argc, argv, "+w", write_value_options,
-+	while ((opt = getopt_long(argc, argv, "+wc:", write_value_options,
- 								NULL)) != -1) {
- 		switch (opt) {
- 		case 'w':
- 			without_response = true;
- 			break;
-+		case 'c':
-+			signed_write = true;
-+			valid_csrk = convert_csrk_key(optarg, csrk);
-+			bt_gatt_client_set_csrk(cli->gatt, LOCAL_CSRK,
-+						valid_csrk, csrk);
-+			break;
- 		default:
- 			write_value_usage();
- 			return;
-@@ -588,7 +619,7 @@ static void cmd_write_value(struct client *cli, char *cmd_str)
- 
- 	if (without_response) {
- 		if (!bt_gatt_client_write_without_response(cli->gatt, handle,
--							false, value, length)) {
-+						signed_write, value, length)) {
- 			printf("Failed to initiate write without response "
- 								"procedure\n");
- 			goto done;
+ src/shared/att-types.h   |    3 ++
+ src/shared/att.c         |  101 ++++++++++++++++++++++++++++++++++++++++++++--
+ src/shared/att.h         |   13 ++++++
+ src/shared/gatt-client.c |   28 ++++++++++---
+ src/shared/gatt-client.h |    5 +++
+ tools/btgatt-client.c    |   35 +++++++++++++++-
+ 6 files changed, 175 insertions(+), 10 deletions(-)
+
 -- 
 1.7.10.4
 
