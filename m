@@ -1,40 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH v2] shared/hciemu: Fix not handling failed read correctly
-Date: Thu, 25 Sep 2014 15:12:13 +0200
-Message-Id: <1411650733-26225-1-git-send-email-szymon.janc@tieto.com>
+From: "Gu, Chao Jie" <chao.jie.gu@intel.com>
+To: Szymon Janc <szymon.janc@tieto.com>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: RE: [PATCH v2 0/3] support signed write command
+Date: Thu, 25 Sep 2014 13:03:22 +0000
+Message-ID: <3D02B219753AD44CBDDDE484323B17741130AA51@SHSMSX104.ccr.corp.intel.com>
+References: <1411633738-19108-1-git-send-email-chao.jie.gu@intel.com>
+ <1457354.2RSuMrT851@uw000953>
+In-Reply-To: <1457354.2RSuMrT851@uw000953>
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-If read failed due to signal or blocking watch was removed resulting
-in closing /dev/vhci and emulated adapter being removed.
-
-This was affecting android-tester since premature removal of adapter
-is considered error on android daemon.
----
- src/shared/hciemu.c | 7 +++++++
- 1 file changed, 7 insertions(+)
-
-diff --git a/src/shared/hciemu.c b/src/shared/hciemu.c
-index 3892fea..872d083 100644
---- a/src/shared/hciemu.c
-+++ b/src/shared/hciemu.c
-@@ -179,6 +179,13 @@ static gboolean receive_btdev(GIOChannel *channel, GIOCondition condition,
- 	fd = g_io_channel_unix_get_fd(channel);
- 
- 	len = read(fd, buf, sizeof(buf));
-+	if (len < 0) {
-+		if (errno == EAGAIN || errno == EINTR)
-+			return TRUE;
-+
-+		return FALSE;
-+	}
-+
- 	if (len < 1)
- 		return FALSE;
- 
--- 
-1.9.1
-
+SGksIFN6eW1vbiwNCiANCj4gT24gVGh1cnNkYXkgMjUgb2YgU2VwdGVtYmVyIDIwMTQgMTY6Mjg6
+NTUgR3UgQ2hhb2ppZSB3cm90ZToNCj4gPiBUaGlzIHBhdGNoIHNldCBhZGRzIHNpZ25lZCB3cml0
+ZSBjb21tYW5kIG91dGdvaW5nLg0KPiA+IFBhdGNoIHNldCB2MSBjYW5ub3QgYXBwbHkgb24gbGF0
+ZXN0IHNvdXJjZSBjb2RlIGJlY2F1c2UgaXQgY29uZmxpY3QNCj4gPiB3aXRoIEFybWFuJ3MgbmV3
+ZXN0IHBhdGNoLg0KPiA+DQo+ID4gR3UgQ2hhb2ppZSAoMyk6DQo+ID4gICBzaGFyZWQvYXR0LmM6
+IEFkZCBzaWduZWQgY29tbWFuZCBvdXRnb2luZyBhbmQgcmVsYXRlZCBDU1JLIGZ1bmN0aW9uDQo+
+ID4gICBzaGFyZWQvZ2F0dC1jbGllbnQ6IEFkZCBDU1JLIHBhcnQgdG8gc3VwcG9ydCBzaWduZWQg
+d3JpdGUNCj4gPiAgIHRvb2xzL2J0Z2F0dC1jbGllbnQ6IEFkZCBzaWduZWQgd3JpdGUgQ1NSSyBv
+cHRpb24NCj4gPg0KPiA+ICBzcmMvc2hhcmVkL2F0dC10eXBlcy5oICAgfCAgICAzICsrDQo+ID4g
+IHNyYy9zaGFyZWQvYXR0LmMgICAgICAgICB8ICAxMDENCj4gKysrKysrKysrKysrKysrKysrKysr
+KysrKysrKysrKysrKysrKysrKysrKystLQ0KPiA+ICBzcmMvc2hhcmVkL2F0dC5oICAgICAgICAg
+fCAgIDEzICsrKysrKw0KPiA+ICBzcmMvc2hhcmVkL2dhdHQtY2xpZW50LmMgfCAgIDI4ICsrKysr
+KysrKystLS0NCj4gPiAgc3JjL3NoYXJlZC9nYXR0LWNsaWVudC5oIHwgICAgNSArKysNCj4gPiAg
+dG9vbHMvYnRnYXR0LWNsaWVudC5jICAgIHwgICAzNSArKysrKysrKysrKysrKystDQo+ID4gIDYg
+ZmlsZXMgY2hhbmdlZCwgMTc1IGluc2VydGlvbnMoKyksIDEwIGRlbGV0aW9ucygtKQ0KPiA+DQo+
+IA0KPiBUaGlzIGRvZXNuJ3QgbGluazoNCj4gDQo+ICAgQ0NMRCAgICAgdG9vbHMvYnRnYXR0LWNs
+aWVudA0KPiBzcmMvc2hhcmVkL2F0dC5vOiBJbiBmdW5jdGlvbiBgYnRfYXR0X25ldyc6DQo+IGJs
+dWV6L3NyYy9zaGFyZWQvYXR0LmM6NzQ1OiB1bmRlZmluZWQgcmVmZXJlbmNlIHRvIGBidF9jcnlw
+dG9fbmV3Jw0KPiBibHVlei9zcmMvc2hhcmVkL2F0dC5jOjc4MzogdW5kZWZpbmVkIHJlZmVyZW5j
+ZSB0byBgYnRfY3J5cHRvX3VucmVmJw0KPiBzcmMvc2hhcmVkL2F0dC5vOiBJbiBmdW5jdGlvbiBg
+ZW5jb2RlX3BkdSc6DQo+IGJsdWV6L3NyYy9zaGFyZWQvYXR0LmM6MzE0OiB1bmRlZmluZWQgcmVm
+ZXJlbmNlIHRvIGBidF9jcnlwdG9fc2lnbl9hdHQnDQo+IA0KDQpZb3UgaGF2ZSB0byBtb2RpZnkg
+TWFrZUZpbGUgdG8gYWRkIHNoYXJlZC9jcnlwdG8gbW9kdWxlICwgaG93ZXZlciwgTWFrZWZpbGUg
+aW4NCnRoZSAuZ2l0aWdub3JlIGZpbGUgLCBzbyB0aGlzIHBhdGNoIHNldCBkb2VzIG5vdCBpbmNs
+dWRlIHRoaXMgY2hhbmdlLg0KDQpUaGFua3MNCkNoYW9qaWUgR3UNCg==
