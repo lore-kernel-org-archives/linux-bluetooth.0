@@ -1,47 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: Gu Chaojie <chao.jie.gu@intel.com>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.6\))
+Subject: Re: [PATCH] Bluetooth: Rename sco_param_wideband table to esco_param_msbc
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1411627681-540-1-git-send-email-johan.hedberg@gmail.com>
+Date: Thu, 25 Sep 2014 10:38:24 +0200
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v2 0/3] support signed write command
-Date: Thu, 25 Sep 2014 10:54:57 +0200
-Message-ID: <1457354.2RSuMrT851@uw000953>
-In-Reply-To: <1411633738-19108-1-git-send-email-chao.jie.gu@intel.com>
-References: <1411633738-19108-1-git-send-email-chao.jie.gu@intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Message-Id: <3D75964E-7786-4DA1-88F9-9E4E896DE4D3@holtmann.org>
+References: <1411627681-540-1-git-send-email-johan.hedberg@gmail.com>
+To: Johan Hedberg <johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Gu Chaojie,
+Hi Johan,
 
-On Thursday 25 of September 2014 16:28:55 Gu Chaojie wrote:
-> This patch set adds signed write command outgoing.
-> Patch set v1 cannot apply on latest source code
-> because it conflict with Arman's newest patch.
+> The sco_param_wideband table represents the eSCO parameters for
+> specifically mSBC encoding. This patch renames the table to the more
+> descriptive esco_param_msbc name.
 > 
-> Gu Chaojie (3):
->   shared/att.c: Add signed command outgoing and related CSRK function
->   shared/gatt-client: Add CSRK part to support signed write
->   tools/btgatt-client: Add signed write CSRK option
-> 
->  src/shared/att-types.h   |    3 ++
->  src/shared/att.c         |  101 ++++++++++++++++++++++++++++++++++++++++++++--
->  src/shared/att.h         |   13 ++++++
->  src/shared/gatt-client.c |   28 ++++++++++---
->  src/shared/gatt-client.h |    5 +++
->  tools/btgatt-client.c    |   35 +++++++++++++++-
->  6 files changed, 175 insertions(+), 10 deletions(-)
-> 
+> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+> ---
+> net/bluetooth/hci_conn.c | 6 +++---
+> 1 file changed, 3 insertions(+), 3 deletions(-)
 
-This doesn't link:
+patch has been applied to bluetooth-next tree.
 
-  CCLD     tools/btgatt-client
-src/shared/att.o: In function `bt_att_new':
-bluez/src/shared/att.c:745: undefined reference to `bt_crypto_new'
-bluez/src/shared/att.c:783: undefined reference to `bt_crypto_unref'
-src/shared/att.o: In function `encode_pdu':
-bluez/src/shared/att.c:314: undefined reference to `bt_crypto_sign_att'
+Regards
 
--- 
-Best regards, 
-Szymon Janc
+Marcel
+
