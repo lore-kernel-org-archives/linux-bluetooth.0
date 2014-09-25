@@ -1,40 +1,138 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Gu, Chao Jie" <chao.jie.gu@intel.com>
-To: Szymon Janc <szymon.janc@tieto.com>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: RE: [PATCH v2 0/3] support signed write command
-Date: Thu, 25 Sep 2014 13:03:22 +0000
-Message-ID: <3D02B219753AD44CBDDDE484323B17741130AA51@SHSMSX104.ccr.corp.intel.com>
-References: <1411633738-19108-1-git-send-email-chao.jie.gu@intel.com>
- <1457354.2RSuMrT851@uw000953>
-In-Reply-To: <1457354.2RSuMrT851@uw000953>
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
+From: Gowtham Anandha Babu <gowtham.ab@samsung.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: d.kasatkin@samsung.com, bharat.panda@samsung.com, cpgs@samsung.com,
+	Gowtham Anandha Babu <gowtham.ab@samsung.com>
+Subject: [PATCH] Fix enum coding-style
+Date: Thu, 25 Sep 2014 18:31:22 +0530
+Message-id: <1411650082-8446-1-git-send-email-gowtham.ab@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-SGksIFN6eW1vbiwNCiANCj4gT24gVGh1cnNkYXkgMjUgb2YgU2VwdGVtYmVyIDIwMTQgMTY6Mjg6
-NTUgR3UgQ2hhb2ppZSB3cm90ZToNCj4gPiBUaGlzIHBhdGNoIHNldCBhZGRzIHNpZ25lZCB3cml0
-ZSBjb21tYW5kIG91dGdvaW5nLg0KPiA+IFBhdGNoIHNldCB2MSBjYW5ub3QgYXBwbHkgb24gbGF0
-ZXN0IHNvdXJjZSBjb2RlIGJlY2F1c2UgaXQgY29uZmxpY3QNCj4gPiB3aXRoIEFybWFuJ3MgbmV3
-ZXN0IHBhdGNoLg0KPiA+DQo+ID4gR3UgQ2hhb2ppZSAoMyk6DQo+ID4gICBzaGFyZWQvYXR0LmM6
-IEFkZCBzaWduZWQgY29tbWFuZCBvdXRnb2luZyBhbmQgcmVsYXRlZCBDU1JLIGZ1bmN0aW9uDQo+
-ID4gICBzaGFyZWQvZ2F0dC1jbGllbnQ6IEFkZCBDU1JLIHBhcnQgdG8gc3VwcG9ydCBzaWduZWQg
-d3JpdGUNCj4gPiAgIHRvb2xzL2J0Z2F0dC1jbGllbnQ6IEFkZCBzaWduZWQgd3JpdGUgQ1NSSyBv
-cHRpb24NCj4gPg0KPiA+ICBzcmMvc2hhcmVkL2F0dC10eXBlcy5oICAgfCAgICAzICsrDQo+ID4g
-IHNyYy9zaGFyZWQvYXR0LmMgICAgICAgICB8ICAxMDENCj4gKysrKysrKysrKysrKysrKysrKysr
-KysrKysrKysrKysrKysrKysrKysrKystLQ0KPiA+ICBzcmMvc2hhcmVkL2F0dC5oICAgICAgICAg
-fCAgIDEzICsrKysrKw0KPiA+ICBzcmMvc2hhcmVkL2dhdHQtY2xpZW50LmMgfCAgIDI4ICsrKysr
-KysrKystLS0NCj4gPiAgc3JjL3NoYXJlZC9nYXR0LWNsaWVudC5oIHwgICAgNSArKysNCj4gPiAg
-dG9vbHMvYnRnYXR0LWNsaWVudC5jICAgIHwgICAzNSArKysrKysrKysrKysrKystDQo+ID4gIDYg
-ZmlsZXMgY2hhbmdlZCwgMTc1IGluc2VydGlvbnMoKyksIDEwIGRlbGV0aW9ucygtKQ0KPiA+DQo+
-IA0KPiBUaGlzIGRvZXNuJ3QgbGluazoNCj4gDQo+ICAgQ0NMRCAgICAgdG9vbHMvYnRnYXR0LWNs
-aWVudA0KPiBzcmMvc2hhcmVkL2F0dC5vOiBJbiBmdW5jdGlvbiBgYnRfYXR0X25ldyc6DQo+IGJs
-dWV6L3NyYy9zaGFyZWQvYXR0LmM6NzQ1OiB1bmRlZmluZWQgcmVmZXJlbmNlIHRvIGBidF9jcnlw
-dG9fbmV3Jw0KPiBibHVlei9zcmMvc2hhcmVkL2F0dC5jOjc4MzogdW5kZWZpbmVkIHJlZmVyZW5j
-ZSB0byBgYnRfY3J5cHRvX3VucmVmJw0KPiBzcmMvc2hhcmVkL2F0dC5vOiBJbiBmdW5jdGlvbiBg
-ZW5jb2RlX3BkdSc6DQo+IGJsdWV6L3NyYy9zaGFyZWQvYXR0LmM6MzE0OiB1bmRlZmluZWQgcmVm
-ZXJlbmNlIHRvIGBidF9jcnlwdG9fc2lnbl9hdHQnDQo+IA0KDQpZb3UgaGF2ZSB0byBtb2RpZnkg
-TWFrZUZpbGUgdG8gYWRkIHNoYXJlZC9jcnlwdG8gbW9kdWxlICwgaG93ZXZlciwgTWFrZWZpbGUg
-aW4NCnRoZSAuZ2l0aWdub3JlIGZpbGUgLCBzbyB0aGlzIHBhdGNoIHNldCBkb2VzIG5vdCBpbmNs
-dWRlIHRoaXMgY2hhbmdlLg0KDQpUaGFua3MNCkNoYW9qaWUgR3UNCg==
+Fix the coding-style for enum.
+---
+ lib/uuid.h                    |  8 ++++----
+ profiles/cups/cups.h          | 16 ++++++++--------
+ profiles/health/hdp_types.h   |  4 ++--
+ profiles/proximity/reporter.h |  6 +++---
+ profiles/time/server.c        | 20 ++++++++++----------
+ 5 files changed, 27 insertions(+), 27 deletions(-)
+
+diff --git a/lib/uuid.h b/lib/uuid.h
+index 7901d34..5d2b79e 100644
+--- a/lib/uuid.h
++++ b/lib/uuid.h
+@@ -141,10 +141,10 @@ extern "C" {
+ 
+ typedef struct {
+ 	enum {
+-		BT_UUID_UNSPEC = 0,
+-		BT_UUID16 = 16,
+-		BT_UUID32 = 32,
+-		BT_UUID128 = 128,
++		BT_UUID_UNSPEC =	0,
++		BT_UUID16 =		16,
++		BT_UUID32 =		32,
++		BT_UUID128 =		128,
+ 	} type;
+ 	union {
+ 		uint16_t  u16;
+diff --git a/profiles/cups/cups.h b/profiles/cups/cups.h
+index f4e0c01..dbea1bf 100644
+--- a/profiles/cups/cups.h
++++ b/profiles/cups/cups.h
+@@ -21,14 +21,14 @@
+  *
+  */
+ 
+-enum {					/**** Backend exit codes ****/
+-	CUPS_BACKEND_OK = 0,		/* Job completed successfully */
+-	CUPS_BACKEND_FAILED = 1,	/* Job failed, use error-policy */
+-	CUPS_BACKEND_AUTH_REQUIRED = 2,	/* Job failed, authentication required */
+-	CUPS_BACKEND_HOLD = 3,		/* Job failed, hold job */
+-	CUPS_BACKEND_STOP = 4,		/* Job failed, stop queue */
+-	CUPS_BACKEND_CANCEL = 5,	/* Job failed, cancel job */
+-	CUPS_BACKEND_RETRY = 6,		/* Failure requires us to retry (BlueZ specific) */
++enum {						/**** Backend exit codes ****/
++	CUPS_BACKEND_OK =		0,	/* Job completed successfully */
++	CUPS_BACKEND_FAILED =		1,	/* Job failed, use error-policy */
++	CUPS_BACKEND_AUTH_REQUIRED =	2,	/* Job failed, authentication required */
++	CUPS_BACKEND_HOLD =		3,	/* Job failed, hold job */
++	CUPS_BACKEND_STOP =		4,	/* Job failed, stop queue */
++	CUPS_BACKEND_CANCEL =		5,	/* Job failed, cancel job */
++	CUPS_BACKEND_RETRY =		6,	/* Failure requires us to retry (BlueZ specific) */
+ };
+ 
+ int sdp_search_spp(sdp_session_t *sdp, uint8_t *channel);
+diff --git a/profiles/health/hdp_types.h b/profiles/health/hdp_types.h
+index b34b5e0..92f461a 100644
+--- a/profiles/health/hdp_types.h
++++ b/profiles/health/hdp_types.h
+@@ -49,8 +49,8 @@
+ #define HDP_SOURCE_ROLE_AS_STRING	"source"
+ 
+ typedef enum {
+-	HDP_SOURCE = 0x00,
+-	HDP_SINK = 0x01
++	HDP_SOURCE =	0x00,
++	HDP_SINK =	0x01
+ } HdpRole;
+ 
+ typedef enum {
+diff --git a/profiles/proximity/reporter.h b/profiles/proximity/reporter.h
+index a8e1aac..243db26 100644
+--- a/profiles/proximity/reporter.h
++++ b/profiles/proximity/reporter.h
+@@ -31,9 +31,9 @@
+ #define POWER_LEVEL_CHR_UUID		0x2A07
+ 
+ enum {
+-	NO_ALERT = 0x00,
+-	MILD_ALERT = 0x01,
+-	HIGH_ALERT = 0x02,
++	NO_ALERT =	0x00,
++	MILD_ALERT =	0x01,
++	HIGH_ALERT =	0x02,
+ };
+ 
+ void reporter_device_remove(struct btd_service *service);
+diff --git a/profiles/time/server.c b/profiles/time/server.c
+index 1716a5e..0b6f70b 100644
+--- a/profiles/time/server.c
++++ b/profiles/time/server.c
+@@ -55,22 +55,22 @@
+ #define CT_TIME_CHR_UUID		0x2A2B
+ 
+ enum {
+-	UPDATE_RESULT_SUCCESSFUL = 0,
+-	UPDATE_RESULT_CANCELED = 1,
+-	UPDATE_RESULT_NO_CONN = 2,
+-	UPDATE_RESULT_ERROR = 3,
+-	UPDATE_RESULT_TIMEOUT = 4,
+-	UPDATE_RESULT_NOT_ATTEMPTED = 5,
++	UPDATE_RESULT_SUCCESSFUL =	0,
++	UPDATE_RESULT_CANCELED =	1,
++	UPDATE_RESULT_NO_CONN =		2,
++	UPDATE_RESULT_ERROR =		3,
++	UPDATE_RESULT_TIMEOUT =		4,
++	UPDATE_RESULT_NOT_ATTEMPTED =	5,
+ };
+ 
+ enum {
+-	UPDATE_STATE_IDLE = 0,
+-	UPDATE_STATE_PENDING = 1,
++	UPDATE_STATE_IDLE =	0,
++	UPDATE_STATE_PENDING =	1,
+ };
+ 
+ enum {
+-	GET_REFERENCE_UPDATE = 1,
+-	CANCEL_REFERENCE_UPDATE = 2,
++	GET_REFERENCE_UPDATE =		1,
++	CANCEL_REFERENCE_UPDATE =	2,
+ };
+ 
+ static int encode_current_time(uint8_t value[10])
+-- 
+1.9.1
+
