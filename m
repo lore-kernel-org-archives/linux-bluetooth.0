@@ -1,80 +1,86 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-From: Alfonso Acosta <fons@spotify.com>
-Date: Fri, 26 Sep 2014 16:50:07 +0200
-Message-ID: <CAHF=Y4o84_KVO2rr81h1wnBsFfsJ9nj=QNCEUC1E2=3cTYPZfw@mail.gmail.com>
-Subject: [PATCH] Bluetooth: Fix sending redundant "LE Set Scan Enable
- (disable)" commands
+From: Ruslan Mstoi <ruslan.mstoi@intel.com>
 To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
+Cc: Ruslan Mstoi <ruslan.mstoi@intel.com>
+Subject: [PATCH] android/pts: Updated OPP PICS and PIXITs for PTS 5.3
+Date: Fri, 26 Sep 2014 16:50:22 +0300
+Message-Id: <1411739422-25163-1-git-send-email-ruslan.mstoi@intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Checking the LE scanning state (HCI_LE_SCAN) before queuing a new "LE
-Set Scan Enable (disable)" command is not enough to avoid sending
-extra redundant commands. Since HCI_LE_SCAN is only updated upon
-"Command Complete" confirmation, multiple "LE Set Scan Enable
-(disable)" can get queued before the first one gets delivered.
-
-I encountered this issue when unpairing (MGMT_OP_UNPAIR_DEVICE) and
-immediately pairing (MGMT_OP_PAIR_DEVICE) the only auto-connected
-device. MGMT_OP_UNPAIR_DEVICE stopped scanning since there were no
-more auto-connected devices and MGMT_OP_PAIR_DEVICE also stopped
-scanning because some controllers cannot scan while connecting.
-
-I added a dedicated flag (le_scan_disable_queued) in hci_dev for this
-purpose since dev_flags is already full.
-
-Signed-off-by: Alfonso Acosta <fons@spotify.com>
 ---
- include/net/bluetooth/hci_core.h | 1 +
- net/bluetooth/hci_core.c         | 4 +++-
- net/bluetooth/hci_event.c        | 2 +-
- 3 files changed, 5 insertions(+), 2 deletions(-)
+ android/pics-opp.txt  | 6 +++---
+ android/pixit-opp.txt | 2 +-
+ android/pts-opp.txt   | 4 ++--
+ 3 files changed, 6 insertions(+), 6 deletions(-)
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 37ff1ae..04c2f2f 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -292,6 +292,7 @@ struct hci_dev {
-  struct sk_buff_head rx_q;
-  struct sk_buff_head raw_q;
-  struct sk_buff_head cmd_q;
-+ int le_scan_disable_queued;
-
-  struct sk_buff *recv_evt;
-  struct sk_buff *sent_cmd;
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index cb05d7f..d0d27e7 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -5441,10 +5441,12 @@ static void hci_cmd_work(struct work_struct *work)
- void hci_req_add_le_scan_disable(struct hci_request *req)
- {
-  struct hci_cp_le_set_scan_enable cp;
--
-+ if(req->hdev->le_scan_disable_queued)
-+  return;
-  memset(&cp, 0, sizeof(cp));
-  cp.enable = LE_SCAN_DISABLE;
-  hci_req_add(req, HCI_OP_LE_SET_SCAN_ENABLE, sizeof(cp), &cp);
-+ req->hdev->le_scan_disable_queued = 1;
- }
-
- static void add_to_white_list(struct hci_request *req,
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 8b0a2a6..ad81335 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -1122,7 +1122,7 @@ static void hci_cc_le_set_scan_enable(struct
-hci_dev *hdev,
-  __u8 status = *((__u8 *) skb->data);
-
-  BT_DBG("%s status 0x%2.2x", hdev->name, status);
--
-+ hdev->le_scan_disable_queued = 0;
-  if (status)
-  return;
-
+diff --git a/android/pics-opp.txt b/android/pics-opp.txt
+index d01865b..b2cf16f 100644
+--- a/android/pics-opp.txt
++++ b/android/pics-opp.txt
+@@ -1,6 +1,6 @@
+ OPP PICS for the PTS tool.
+ 
+-PTS version: 5.2
++PTS version: 5.3
+ 
+ * - different than PTS defaults
+ # - not yet implemented/supported
+@@ -23,7 +23,7 @@ C.1: Mandatory to support at least one of the defined roles.
+ -------------------------------------------------------------------------------
+ Parameter Name	Selected	Description
+ -------------------------------------------------------------------------------
+-TSPC_OPP_1b_1	True		Client supports OPP version 1.1. (C.1)
++TSPC_OPP_1b_1	True (*)	Client supports OPP version 1.1. (C.1)
+ TSPC_OPP_1b_2	False		Client supports OPP version 1.2. (C.1)
+ -------------------------------------------------------------------------------
+ C.1: It is mandatory to support at least one of the profile versions.
+@@ -107,7 +107,7 @@ C.11: Mandatory if TSPC_OPP_17 and TSPC_OPP_21 supported else excluded.
+ -------------------------------------------------------------------------------
+ Parameter Name	Selected	Description
+ -------------------------------------------------------------------------------
+-TSPC_OPP_2b_1	True		Server supports OPP version 1.1.
++TSPC_OPP_2b_1	True (*)	Server supports OPP version 1.1.
+ TSPC_OPP_2b_2	False		Server supports OPP version 1.2.
+ -------------------------------------------------------------------------------
+ C.1: It is mandatory to support at least one of the profile versions.
+diff --git a/android/pixit-opp.txt b/android/pixit-opp.txt
+index 6d7a76b..9cd4bb1 100644
+--- a/android/pixit-opp.txt
++++ b/android/pixit-opp.txt
+@@ -1,6 +1,6 @@
+ OPP PIXIT for the PTS tool.
+ 
+-PTS version: 5.2
++PTS version: 5.3
+ 
+ * - different than PTS defaults
+ & - should be set to IUT Bluetooth address
+diff --git a/android/pts-opp.txt b/android/pts-opp.txt
+index 8bf89e2..c820885 100644
+--- a/android/pts-opp.txt
++++ b/android/pts-opp.txt
+@@ -1,7 +1,7 @@
+ PTS test results for OPP
+ 
+-PTS version: 5.2
+-Tested: 05-August-2014
++PTS version: 5.3
++Tested: 26-September-2014
+ Android version: 4.4.4
+ 
+ Results:
 -- 
 1.9.1
+
+---------------------------------------------------------------------
+Intel Finland Oy
+Registered Address: PL 281, 00181 Helsinki 
+Business Identity Code: 0357606 - 4 
+Domiciled in Helsinki 
+
+This e-mail and any attachments may contain confidential material for
+the sole use of the intended recipient(s). Any review or distribution
+by others is strictly prohibited. If you are not the intended
+recipient, please contact the sender and delete all copies.
+
