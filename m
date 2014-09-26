@@ -2,70 +2,56 @@ Return-Path: <cyrus@holtmann.org>
 From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
-Subject: [PATCHv2 08/16] android/tester: Expose pdu_set structure so it can be reused
-Date: Fri, 26 Sep 2014 08:31:09 +0200
-Message-Id: <1411713077-19757-9-git-send-email-jakub.tyszkowski@tieto.com>
+Subject: [PATCHv2 07/16] android/tester: Make HDP tests use generic pdu struct
+Date: Fri, 26 Sep 2014 08:31:08 +0200
+Message-Id: <1411713077-19757-8-git-send-email-jakub.tyszkowski@tieto.com>
 In-Reply-To: <1411713077-19757-1-git-send-email-jakub.tyszkowski@tieto.com>
 References: <1411713077-19757-1-git-send-email-jakub.tyszkowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-More tester will reuse this structure when we move to generic pdu
-exchange mechanism.
 ---
- android/tester-a2dp.c  | 5 +----
- android/tester-avrcp.c | 5 +----
- android/tester-main.h  | 5 +++++
- 3 files changed, 7 insertions(+), 8 deletions(-)
+ android/tester-hdp.c | 11 ++++++-----
+ 1 file changed, 6 insertions(+), 5 deletions(-)
 
-diff --git a/android/tester-a2dp.c b/android/tester-a2dp.c
-index 047822e..e12844e 100644
---- a/android/tester-a2dp.c
-+++ b/android/tester-a2dp.c
-@@ -50,10 +50,7 @@ static struct emu_cid_data cid_data;
- #define req_suspend	0x50, 0x09, 0x04
- #define rsp_suspend	0x52, 0x09
+diff --git a/android/tester-hdp.c b/android/tester-hdp.c
+index 9ecef21..73ce774 100644
+--- a/android/tester-hdp.c
++++ b/android/tester-hdp.c
+@@ -184,7 +184,8 @@ static void hdp_unregister_app_action(void)
+ 	schedule_action_verification(step);
+ }
  
--const struct pdu_set {
--	struct pdu req;
--	struct pdu rsp;
--} pdus[] = {
-+static struct pdu_set pdus[] = {
- 	{ raw_pdu(req_dsc), raw_pdu(rsp_dsc) },
- 	{ raw_pdu(req_get), raw_pdu(rsp_get) },
- 	{ raw_pdu(req_cfg), raw_pdu(rsp_cfg) },
-diff --git a/android/tester-avrcp.c b/android/tester-avrcp.c
-index fab6dfc..13ffd74 100644
---- a/android/tester-avrcp.c
-+++ b/android/tester-avrcp.c
-@@ -73,10 +73,7 @@ static struct pdu sdp_rsp_pdu = raw_pdu(
- #define req_suspend 0x50, 0x09, 0x04
- #define rsp_suspend 0x52, 0x09
+-static uint8_t hdp_rsp_pdu[] = { 0x07, /* PDU id */
++static struct pdu hdp_rsp_pdu = raw_pdu(
++			0x07, /* PDU id */
+ 			0x00, 0x00, /* Transaction id */
+ 			0x01, 0xc8, /* Response length */
+ 			0x01, 0xc5, /* Attributes length */
+@@ -239,7 +240,7 @@ static uint8_t hdp_rsp_pdu[] = { 0x07, /* PDU id */
+ 			0x63, 0x6f, 0x73, 0x65, 0x20, 0x4d, 0x65, 0x74, 0x65,
+ 			0x72, 0x0d, 0x09, 0x03, 0x01, 0x08, 0x01, 0x09, 0x03,
+ 			0x02, 0x08, 0x00,
+-			0x00 };
++			0x00);
  
--static const struct pdu_set {
--	const struct pdu req;
--	const struct pdu rsp;
--} pdus[] = {
-+static struct pdu_set pdus[] = {
- 	{ raw_pdu(req_dsc), raw_pdu(rsp_dsc) },
- 	{ raw_pdu(req_get), raw_pdu(rsp_get) },
- 	{ raw_pdu(req_cfg), raw_pdu(rsp_cfg) },
-diff --git a/android/tester-main.h b/android/tester-main.h
-index 4cbc83f..034290a 100644
---- a/android/tester-main.h
-+++ b/android/tester-main.h
-@@ -60,6 +60,11 @@ struct pdu {
- 	uint16_t size;
- };
+ static void hdp_sdp_cid_hook_cb(const void *data, uint16_t len, void *user_data)
+ {
+@@ -247,11 +248,11 @@ static void hdp_sdp_cid_hook_cb(const void *data, uint16_t len, void *user_data)
+ 	struct bthost *bthost = hciemu_client_get_host(t_data->hciemu);
+ 	struct emu_cid_data *cid_data = user_data;
  
-+struct pdu_set {
-+	struct pdu req;
-+	struct pdu rsp;
-+};
-+
- #define raw_data(args...) ((unsigned char[]) { args })
+-	hdp_rsp_pdu[1] = ((uint8_t *) data)[1];
+-	hdp_rsp_pdu[2] = ((uint8_t *) data)[2];
++	hdp_rsp_pdu.data[1] = ((uint8_t *) data)[1];
++	hdp_rsp_pdu.data[2] = ((uint8_t *) data)[2];
  
- #define raw_pdu(args...)					\
+ 	bthost_send_cid(bthost, cid_data->sdp_handle, cid_data->sdp_cid,
+-					hdp_rsp_pdu, sizeof(hdp_rsp_pdu));
++					hdp_rsp_pdu.data, hdp_rsp_pdu.size);
+ }
+ 
+ static void hdp_sdp_search_cb(uint16_t handle, uint16_t cid, void *user_data)
 -- 
 1.9.1
 
