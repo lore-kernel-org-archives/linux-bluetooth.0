@@ -2,45 +2,55 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH 5/5] android/hal-audio: Use hal-utils helpers for unaligned access
-Date: Fri, 26 Sep 2014 15:42:18 +0200
-Message-Id: <1411738938-29524-5-git-send-email-szymon.janc@tieto.com>
+Subject: [PATCH 3/5] android/hal: Add simple helpers for unaligned memory access
+Date: Fri, 26 Sep 2014 15:42:16 +0200
+Message-Id: <1411738938-29524-3-git-send-email-szymon.janc@tieto.com>
 In-Reply-To: <1411738938-29524-1-git-send-email-szymon.janc@tieto.com>
 References: <1411738938-29524-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+In HALs we usually don't operate on unaligned memory. Only exception
+are PCM stereo<->mono mixing scenarios in sco and audio HALs.
 ---
- android/hal-audio.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ android/hal-utils.h | 20 ++++++++++++++++++++
+ 1 file changed, 20 insertions(+)
 
-diff --git a/android/hal-audio.c b/android/hal-audio.c
-index 1bbc073..e70351e 100644
---- a/android/hal-audio.c
-+++ b/android/hal-audio.c
-@@ -35,7 +35,7 @@
- #include "hal-log.h"
- #include "hal-msg.h"
- #include "hal-audio.h"
--#include "src/shared/util.h"
-+#include "hal-utils.h"
+diff --git a/android/hal-utils.h b/android/hal-utils.h
+index a2ae0f4..ee0320c 100644
+--- a/android/hal-utils.h
++++ b/android/hal-utils.h
+@@ -15,6 +15,8 @@
+  *
+  */
  
- #define FIXED_A2DP_PLAYBACK_LATENCY_MS 25
++#include <endian.h>
++
+ #include <hardware/bluetooth.h>
  
-@@ -588,10 +588,10 @@ static void downmix_to_mono(struct a2dp_stream_out *out, const uint8_t *buffer,
- 	frames = bytes / (2 * sizeof(int16_t));
- 
- 	for (i = 0; i < frames; i++) {
--		int16_t l = le16_to_cpu(get_unaligned(&input[i * 2]));
--		int16_t r = le16_to_cpu(get_unaligned(&input[i * 2 + 1]));
-+		int16_t l = get_le16(&input[i * 2]);
-+		int16_t r = get_le16(&input[i * 2 + 1]);
- 
--		put_unaligned(cpu_to_le16((l + r) / 2), &output[i]);
-+		put_le16((l + r) / 2, &output[i]);
- 	}
- }
- 
+ #define PLATFORM_VER(a,b,c) ((a << 16) | ( b << 8) | (c))
+@@ -132,3 +134,21 @@ DECINTMAP(bt_bond_state_t);
+ DECINTMAP(bt_ssp_variant_t);
+ DECINTMAP(bt_property_type_t);
+ DECINTMAP(bt_cb_thread_evt);
++
++static inline uint16_t get_le16(const void *src)
++{
++	const struct __attribute__((packed)) {
++		uint16_t le16;
++	} *p = src;
++
++	return le16toh(p->le16);
++}
++
++static inline void put_le16(uint16_t val, void *dst)
++{
++	struct __attribute__((packed)) {
++		uint16_t le16;
++	} *p = dst;
++
++	p->le16 = htole16(val);
++}
 -- 
 1.9.1
 
