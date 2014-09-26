@@ -2,34 +2,84 @@ Return-Path: <cyrus@holtmann.org>
 From: Gu Chaojie <chao.jie.gu@intel.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Gu Chaojie <chao.jie.gu@intel.com>
-Subject: [PATCH v3 4/4] Modify Makefile.tool to link
-Date: Fri, 26 Sep 2014 15:48:48 +0800
-Message-Id: <1411717728-15415-5-git-send-email-chao.jie.gu@intel.com>
+Subject: [PATCH v3 2/4] shared/gatt-client: Add CSRK part to support signed write
+Date: Fri, 26 Sep 2014 15:48:46 +0800
+Message-Id: <1411717728-15415-3-git-send-email-chao.jie.gu@intel.com>
 In-Reply-To: <1411717728-15415-1-git-send-email-chao.jie.gu@intel.com>
 References: <1411717728-15415-1-git-send-email-chao.jie.gu@intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Fix patch set v2 link issue when compiling.
+Compared with patch v2, remove type enum in CSRK funciton for btgatt-client
+tool to easy use this API.
 
 ---
- Makefile.tools |    3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ src/shared/gatt-client.c |   27 ++++++++++++++++++++++-----
+ src/shared/gatt-client.h |    4 ++++
+ 2 files changed, 26 insertions(+), 5 deletions(-)
 
-diff --git a/Makefile.tools b/Makefile.tools
-index 4807813..8823fc0 100644
---- a/Makefile.tools
-+++ b/Makefile.tools
-@@ -365,7 +365,8 @@ tools_btgatt_client_SOURCES = tools/btgatt-client.c src/uuid-helper.c \
- 				src/shared/timeout.h src/shared/timeout-mainloop.c \
- 				src/shared/att-types.h src/shared/att.h src/shared/att.c \
- 				src/shared/gatt-helpers.h src/shared/gatt-helpers.c \
--				src/shared/gatt-client.h src/shared/gatt-client.c
-+				src/shared/gatt-client.h src/shared/gatt-client.c \
-+				src/shared/crypto.h src/shared/crypto.c
- tools_btgatt_client_LDADD = lib/libbluetooth-internal.la
+diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
+index 6dc8e95..aee3969 100644
+--- a/src/shared/gatt-client.c
++++ b/src/shared/gatt-client.c
+@@ -1753,19 +1753,26 @@ bool bt_gatt_client_read_long_value(struct bt_gatt_client *client,
+ bool bt_gatt_client_write_without_response(struct bt_gatt_client *client,
+ 					uint16_t value_handle,
+ 					bool signed_write,
+-					uint8_t *value, uint16_t length) {
++					uint8_t *value, uint16_t length)
++{
+ 	uint8_t pdu[2 + length];
  
- EXTRA_DIST += tools/bdaddr.1
+ 	if (!client)
+ 		return 0;
+ 
+-	/* TODO: Support this once bt_att_send supports signed writes. */
+-	if (signed_write)
+-		return 0;
+-
+ 	put_le16(value_handle, pdu);
+ 	memcpy(pdu + 2, value, length);
+ 
++	if (signed_write) {
++		if (bt_att_local_csrk_is_valid(client->att))
++			return bt_att_send(client->att,
++					BT_ATT_OP_SIGNED_WRITE_CMD,
++					pdu, sizeof(pdu), NULL, NULL, NULL);
++		else
++			return 0;
++
++	}
++
+ 	return bt_att_send(client->att, BT_ATT_OP_WRITE_CMD, pdu, sizeof(pdu),
+ 							NULL, NULL, NULL);
+ }
+@@ -2246,3 +2253,13 @@ bool bt_gatt_client_unregister_notify(struct bt_gatt_client *client,
+ 	client->need_notify_cleanup = true;
+ 	return true;
+ }
++
++bool bt_gatt_client_set_local_csrk(struct bt_gatt_client *client,
++				bool valid_local_csrk,
++				uint8_t key[16])
++{
++	if (!client)
++		return false;
++
++	return bt_att_set_local_csrk(client->att, valid_local_csrk, key);
++}
+diff --git a/src/shared/gatt-client.h b/src/shared/gatt-client.h
+index 6807f6b..0684f30 100644
+--- a/src/shared/gatt-client.h
++++ b/src/shared/gatt-client.h
+@@ -162,3 +162,7 @@ bool bt_gatt_client_register_notify(struct bt_gatt_client *client,
+ 				bt_gatt_client_destroy_func_t destroy);
+ bool bt_gatt_client_unregister_notify(struct bt_gatt_client *client,
+ 							unsigned int id);
++
++bool bt_gatt_client_set_local_csrk(struct bt_gatt_client *client,
++				bool valid_local_csrk,
++				uint8_t key[16]);
 -- 
 1.7.10.4
 
