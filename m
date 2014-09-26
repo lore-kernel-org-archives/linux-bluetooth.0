@@ -1,12 +1,11 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1411717728-15415-3-git-send-email-chao.jie.gu@intel.com>
+In-Reply-To: <1411717728-15415-2-git-send-email-chao.jie.gu@intel.com>
 References: <1411717728-15415-1-git-send-email-chao.jie.gu@intel.com>
-	<1411717728-15415-3-git-send-email-chao.jie.gu@intel.com>
-Date: Sat, 27 Sep 2014 00:35:37 +0200
-Message-ID: <CAN_7+YbQFq0=mvwhsHmduguDu-b0ji8L0+HqW-iDaHB_xO-3+g@mail.gmail.com>
-Subject: Re: [PATCH v3 2/4] shared/gatt-client: Add CSRK part to support
- signed write
+	<1411717728-15415-2-git-send-email-chao.jie.gu@intel.com>
+Date: Sat, 27 Sep 2014 00:30:11 +0200
+Message-ID: <CAN_7+YYE4C-d-dnkS4GQqR9GoB44hqbpui9zCk9=GtmJHzyefg@mail.gmail.com>
+Subject: Re: [PATCH v3 1/4] shared/att.c: Add signed command outgoing and CSRK function
 From: Lukasz Rymanowski <lukasz.rymanowski@gmail.com>
 To: Gu Chaojie <chao.jie.gu@intel.com>
 Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
@@ -17,83 +16,276 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 Hi Chaojie,
 
 On Fri, Sep 26, 2014 at 9:48 AM, Gu Chaojie <chao.jie.gu@intel.com> wrote:
-> Compared with patch v2, remove type enum in CSRK funciton for btgatt-client
-> tool to easy use this API.
+>
+> Compared with patch v2, remove type enum in all CSRK related funciton to
+> make these API more clear.
 >
 > ---
->  src/shared/gatt-client.c |   27 ++++++++++++++++++++++-----
->  src/shared/gatt-client.h |    4 ++++
->  2 files changed, 26 insertions(+), 5 deletions(-)
+>  src/shared/att-types.h |    3 ++
+>  src/shared/att.c       |  120 ++++++++++++++++++++++++++++++++++++++++++++++--
+>  src/shared/att.h       |   16 +++++++
+>  3 files changed, 136 insertions(+), 3 deletions(-)
 >
-> diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
-> index 6dc8e95..aee3969 100644
-> --- a/src/shared/gatt-client.c
-> +++ b/src/shared/gatt-client.c
-> @@ -1753,19 +1753,26 @@ bool bt_gatt_client_read_long_value(struct bt_gatt_client *client,
->  bool bt_gatt_client_write_without_response(struct bt_gatt_client *client,
->                                         uint16_t value_handle,
->                                         bool signed_write,
-> -                                       uint8_t *value, uint16_t length) {
-> +                                       uint8_t *value, uint16_t length)
-> +{
->         uint8_t pdu[2 + length];
+> diff --git a/src/shared/att-types.h b/src/shared/att-types.h
+> index b85c969..da8b6ae 100644
+> --- a/src/shared/att-types.h
+> +++ b/src/shared/att-types.h
+> @@ -25,6 +25,9 @@
 >
->         if (!client)
->                 return 0;
+>  #define BT_ATT_DEFAULT_LE_MTU 23
 >
-> -       /* TODO: Support this once bt_att_send supports signed writes. */
-> -       if (signed_write)
-> -               return 0;
-> -
->         put_le16(value_handle, pdu);
->         memcpy(pdu + 2, value, length);
->
-> +       if (signed_write) {
-> +               if (bt_att_local_csrk_is_valid(client->att))
-
-In my opinion bt_att_local_csrk_is_valid API seems to be unnecessary
-as CSRK can be checked inside bt_att_send function directly.
-
-BR
-\Łukasz
-
-> +                       return bt_att_send(client->att,
-> +                                       BT_ATT_OP_SIGNED_WRITE_CMD,
-> +                                       pdu, sizeof(pdu), NULL, NULL, NULL);
-> +               else
-> +                       return 0;
+> +/* Length of signature in write signed packet */
+> +#define BT_ATT_SIGNATURE_LEN           12
 > +
+>  /* ATT protocol opcodes */
+>  #define BT_ATT_OP_ERROR_RSP                    0x01
+>  #define BT_ATT_OP_MTU_REQ                      0x02
+> diff --git a/src/shared/att.c b/src/shared/att.c
+> index a5cab45..4562a8c 100644
+> --- a/src/shared/att.c
+> +++ b/src/shared/att.c
+> @@ -36,6 +36,7 @@
+>  #include "lib/uuid.h"
+>  #include "src/shared/att.h"
+>  #include "src/shared/att-types.h"
+> +#include "src/shared/crypto.h"
+>
+>  #define ATT_MIN_PDU_LEN                        1  /* At least 1 byte for the opcode. */
+>  #define ATT_OP_CMD_MASK                        0x40
+> @@ -77,6 +78,16 @@ struct bt_att {
+>         bt_att_debug_func_t debug_callback;
+>         bt_att_destroy_func_t debug_destroy;
+>         void *debug_data;
+> +
+> +       struct bt_crypto *crypto;
+> +
+> +       bool valid_local_csrk;
+> +       uint8_t local_csrk[16];
+> +       uint32_t local_sign_cnt;
+> +
+> +       bool valid_remote_csrk;
+> +       uint8_t remote_csrk[16];
+> +       uint32_t remote_sign_cnt;
+>  };
+>
+>  enum att_op_type {
+> @@ -176,6 +187,8 @@ struct att_send_op {
+>         bt_att_response_func_t callback;
+>         bt_att_destroy_func_t destroy;
+>         void *user_data;
+> +
+> +       struct bt_att *att;
+>  };
+>
+>  static void destroy_att_send_op(void *data)
+> @@ -277,6 +290,10 @@ static bool encode_pdu(struct att_send_op *op, const void *pdu,
+>                                                 uint16_t length, uint16_t mtu)
+>  {
+>         uint16_t pdu_len = 1;
+> +       struct bt_att *att = op->att;
+> +
+> +       if (op->opcode & ATT_OP_SIGNED_MASK)
+> +               pdu_len += BT_ATT_SIGNATURE_LEN;
+>
+>         if (length && pdu)
+>                 pdu_len += length;
+> @@ -293,17 +310,32 @@ static bool encode_pdu(struct att_send_op *op, const void *pdu,
+>         if (pdu_len > 1)
+>                 memcpy(op->pdu + 1, pdu, length);
+>
+> +       if (op->opcode & ATT_OP_SIGNED_MASK) {
+> +               if (bt_crypto_sign_att(att->crypto,
+> +                                       att->local_csrk,
+> +                                       op->pdu,
+> +                                       1 + length,
+> +                                       att->local_sign_cnt,
+> +                                       &((uint8_t *) op->pdu)[1 + length]))
+> +                       att->local_sign_cnt++;
+> +               else
+> +                       return false;
 > +       }
 > +
->         return bt_att_send(client->att, BT_ATT_OP_WRITE_CMD, pdu, sizeof(pdu),
->                                                         NULL, NULL, NULL);
+>         return true;
 >  }
-> @@ -2246,3 +2253,13 @@ bool bt_gatt_client_unregister_notify(struct bt_gatt_client *client,
->         client->need_notify_cleanup = true;
+>
+> -static struct att_send_op *create_att_send_op(uint8_t opcode, const void *pdu,
+> -                                               uint16_t length, uint16_t mtu,
+> +static struct att_send_op *create_att_send_op(uint8_t opcode,
+> +                                               const void *pdu,
+> +                                               uint16_t length,
+> +                                               struct bt_att *att,
+>                                                 bt_att_response_func_t callback,
+>                                                 void *user_data,
+>                                                 bt_att_destroy_func_t destroy)
+>  {
+>         struct att_send_op *op;
+>         enum att_op_type op_type;
+> +       uint16_t mtu = att->mtu;
+>
+>         if (length && !pdu)
+>                 return NULL;
+> @@ -334,6 +366,7 @@ static struct att_send_op *create_att_send_op(uint8_t opcode, const void *pdu,
+>         op->callback = callback;
+>         op->destroy = destroy;
+>         op->user_data = user_data;
+> +       op->att = att;
+>
+>         if (!encode_pdu(op, pdu, length, mtu)) {
+>                 free(op);
+> @@ -698,6 +731,8 @@ struct bt_att *bt_att_new(int fd)
+>
+>         att->fd = fd;
+>
+> +       att->local_sign_cnt = 0;
+> +       att->remote_sign_cnt = 0;
+>         att->mtu = BT_ATT_DEFAULT_LE_MTU;
+>         att->buf = malloc(att->mtu);
+>         if (!att->buf)
+> @@ -707,6 +742,10 @@ struct bt_att *bt_att_new(int fd)
+>         if (!att->io)
+>                 goto fail;
+>
+> +       att->crypto = bt_crypto_new();
+> +       if (!att->crypto)
+> +               goto fail;
+> +
+>         att->req_queue = queue_new();
+>         if (!att->req_queue)
+>                 goto fail;
+> @@ -741,6 +780,7 @@ fail:
+>         queue_destroy(att->write_queue, NULL);
+>         queue_destroy(att->notify_list, NULL);
+>         queue_destroy(att->disconn_list, NULL);
+> +       bt_crypto_unref(att->crypto);
+>         io_destroy(att->io);
+>         free(att->buf);
+>         free(att);
+> @@ -931,7 +971,7 @@ unsigned int bt_att_send(struct bt_att *att, uint8_t opcode,
+>         if (!att || !att->io)
+>                 return 0;
+>
+> -       op = create_att_send_op(opcode, pdu, length, att->mtu, callback,
+> +       op = create_att_send_op(opcode, pdu, length, att, callback,
+>                                                         user_data, destroy);
+>         if (!op)
+>                 return 0;
+> @@ -1116,3 +1156,77 @@ bool bt_att_unregister_all(struct bt_att *att)
+>
 >         return true;
 >  }
 > +
-> +bool bt_gatt_client_set_local_csrk(struct bt_gatt_client *client,
-> +                               bool valid_local_csrk,
-> +                               uint8_t key[16])
+> +bool bt_att_set_local_csrk(struct bt_att *att, bool valid_local_csrk,
+> +                                               uint8_t key[16])
 > +{
-> +       if (!client)
+> +       if (!att)
 > +               return false;
 > +
-> +       return bt_att_set_local_csrk(client->att, valid_local_csrk, key);
-> +}
-> diff --git a/src/shared/gatt-client.h b/src/shared/gatt-client.h
-> index 6807f6b..0684f30 100644
-> --- a/src/shared/gatt-client.h
-> +++ b/src/shared/gatt-client.h
-> @@ -162,3 +162,7 @@ bool bt_gatt_client_register_notify(struct bt_gatt_client *client,
->                                 bt_gatt_client_destroy_func_t destroy);
->  bool bt_gatt_client_unregister_notify(struct bt_gatt_client *client,
->                                                         unsigned int id);
+> +       att->valid_local_csrk = valid_local_csrk;
+> +       memcpy(att->local_csrk, key, 16);
 > +
-> +bool bt_gatt_client_set_local_csrk(struct bt_gatt_client *client,
-> +                               bool valid_local_csrk,
-> +                               uint8_t key[16]);
+> +       return true;
+> +}
+> +
+> +bool bt_att_set_remote_csrk(struct bt_att *att, bool valid_remote_csrk,
+> +                                               uint8_t key[16])
+> +{
+> +       if (!att)
+> +               return false;
+> +
+> +       att->valid_remote_csrk = valid_remote_csrk;
+> +       memcpy(att->remote_csrk, key, 16);
+> +
+> +       return true;
+> +
+> +}
+> +
+> +bool bt_att_get_local_csrk(struct bt_att *att, uint8_t key[16],
+> +                                       uint32_t *local_sign_cnt)
+
+
+Why we need that get function ? If we assume that signing is done in
+bt_att then there is need only to feed bt_att with the CSRK.
+ BTW. There should be a way to set sign_cnt as well as this shall be
+in same storage as CSRK
+
+I can guess that idea behind this bt_att_get_ is that client of bt_att
+should have possibility to update its sign_cnt after each transaction.
+It is in order to update storage. If so  I would propose to have some
+callback registered in bt_att for this purpose.
+
+BR
+Lukasz
+>
+> +{
+> +       if (!att)
+> +               return false;
+> +
+> +       if (att->valid_local_csrk) {
+> +               memcpy(key, att->local_csrk, 16);
+> +               *local_sign_cnt = att->local_sign_cnt;
+> +       } else {
+> +               return false;
+> +       }
+> +
+> +       return true;
+> +}
+> +
+> +bool bt_att_get_remote_csrk(struct bt_att *att, uint8_t key[16],
+> +                                       uint32_t *remote_sign_cnt)
+> +{
+> +       if (!att)
+> +               return false;
+> +
+> +       if (att->valid_remote_csrk) {
+> +               memcpy(key, att->remote_csrk, 16);
+> +               *remote_sign_cnt = att->remote_sign_cnt;
+> +       } else {
+> +               return false;
+> +       }
+> +
+> +       return true;
+> +}
+> +
+> +bool bt_att_local_csrk_is_valid(struct bt_att *att)
+> +{
+> +       if (!att)
+> +               return false;
+> +
+> +       return att->valid_local_csrk;
+> +}
+> +
+> +bool bt_att_remote_csrk_is_valid(struct bt_att *att)
+> +{
+> +       if (!att)
+> +               return false;
+> +
+> +       return att->valid_remote_csrk;
+> +
+> +}
+> diff --git a/src/shared/att.h b/src/shared/att.h
+> index 1063021..306d44c 100644
+> --- a/src/shared/att.h
+> +++ b/src/shared/att.h
+> @@ -76,3 +76,19 @@ unsigned int bt_att_register_disconnect(struct bt_att *att,
+>  bool bt_att_unregister_disconnect(struct bt_att *att, unsigned int id);
+>
+>  bool bt_att_unregister_all(struct bt_att *att);
+> +
+> +bool bt_att_set_local_csrk(struct bt_att *att, bool valid_local_csrk,
+> +                                               uint8_t key[16]);
+> +
+> +bool bt_att_set_remote_csrk(struct bt_att *att, bool valid_remote_csrk,
+> +                                               uint8_t key[16]);
+> +
+> +bool bt_att_get_local_csrk(struct bt_att *att, uint8_t key[16],
+> +                                       uint32_t *local_sign_cnt);
+> +
+> +bool bt_att_get_remote_csrk(struct bt_att *att, uint8_t key[16],
+> +                                       uint32_t *remote_sign_cnt);
+> +
+> +bool bt_att_local_csrk_is_valid(struct bt_att *att);
+> +
+> +bool bt_att_remote_csrk_is_valid(struct bt_att *att);
 > --
 > 1.7.10.4
 >
