@@ -1,67 +1,54 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcin Kraglak <marcin.kraglak@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 5/5] android/tester: Add GATT Notification test - Notify
-Date: Fri, 26 Sep 2014 10:06:03 +0200
-Message-Id: <1411718763-10015-5-git-send-email-marcin.kraglak@tieto.com>
+Subject: [PATCH 3/5] android/tester: Add GATT Deregister For Notification Success
+Date: Fri, 26 Sep 2014 10:06:01 +0200
+Message-Id: <1411718763-10015-3-git-send-email-marcin.kraglak@tieto.com>
 In-Reply-To: <1411718763-10015-1-git-send-email-marcin.kraglak@tieto.com>
 References: <1411718763-10015-1-git-send-email-marcin.kraglak@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Test receiving notifications in GATT Client.
+Test GATT Client deregister for notification command.
 ---
- android/tester-gatt.c | 58 +++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 58 insertions(+)
+ android/tester-gatt.c | 55 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 55 insertions(+)
 
 diff --git a/android/tester-gatt.c b/android/tester-gatt.c
-index 794be4f..3b3118d 100644
+index 68c702b..9b083c9 100644
 --- a/android/tester-gatt.c
 +++ b/android/tester-gatt.c
-@@ -427,6 +427,16 @@ static struct set_notify_params set_notify_param_1 = {
- 	.bdaddr = &emu_remote_bdaddr_val
- };
+@@ -880,6 +880,24 @@ static void gatt_client_register_for_notification_action(void)
+ 	schedule_action_verification(step);
+ }
  
-+static struct set_notify_params set_notify_param_2 = {
-+	.params = &notify_params_1,
-+	.value = value_1,
-+	.len = sizeof(value_1),
-+	.is_notify = 1,
-+	.srvc_id = &service_1,
-+	.char_id = &characteristic_1,
-+	.bdaddr = &emu_remote_bdaddr_val
-+};
++static void gatt_client_deregister_for_notification_action(void)
++{
++	struct test_data *data = tester_get_data();
++	struct step *current_data_step = queue_peek_head(data->steps);
++	struct notif_data *notif_data = current_data_step->set_data;
++	const btgatt_client_interface_t *client = data->if_gatt->client;
++	struct step *step = g_new0(struct step, 1);
++	int status;
 +
- static struct pdu search_service[] = {
- 	raw_pdu(0x10, 0x01, 0x00, 0xff, 0xff, 0x00, 0x28),
- 	raw_pdu(0x11, 0x06, 0x01, 0x00, 0x10, 0x00, 0x00, 0x18),
-@@ -677,6 +687,19 @@ static struct pdu notification_2[] = {
- 	end_pdu
- };
- 
-+static struct pdu notification_3[] = {
-+	raw_pdu(0x10, 0x01, 0x00, 0xff, 0xff, 0x00, 0x28),
-+	raw_pdu(0x11, 0x06, 0x01, 0x00, 0x10, 0x00, 0x00, 0x18),
-+	raw_pdu(0x10, 0x11, 0x00, 0xff, 0xff, 0x00, 0x28),
-+	raw_pdu(0x01, 0x11, 0x11, 0x00, 0x0a),
-+	raw_pdu(0x08, 0x01, 0x00, 0x10, 0x00, 0x03, 0x28),
-+	raw_pdu(0x09, 0x07, 0x02, 0x00, 0x04, 0x00, 0x00, 0x19, 0x00),
-+	raw_pdu(0x08, 0x03, 0x00, 0x10, 0x00, 0x03, 0x28),
-+	raw_pdu(0x01, 0x08, 0x03, 0x00, 0x0a),
-+	raw_pdu(0x1b, 0x03, 0x00, 0x01),
-+	end_pdu
-+};
++	status = client->deregister_for_notification(notif_data->conn_id,
++							notif_data->bdaddr,
++							notif_data->service,
++							notif_data->charac);
++	step->action_status = status;
 +
- static void gatt_client_register_action(void)
++	schedule_action_verification(step);
++}
++
+ static void gatt_cid_hook_cb(const void *data, uint16_t len, void *user_data)
  {
- 	struct test_data *data = tester_get_data();
-@@ -2072,6 +2095,41 @@ static struct test_case test_cases[] = {
+ 	struct test_data *t_data = tester_get_data();
+@@ -1898,6 +1916,43 @@ static struct test_case test_cases[] = {
  		ACTION_SUCCESS(bluetooth_disable_action, NULL),
  		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_OFF),
  	),
-+	TEST_CASE_BREDRLE("Gatt Client - Register For Notification - Notify",
-+		ACTION_SUCCESS(init_pdus, notification_3),
-+		ACTION_SUCCESS(init_notify_params_action, &set_notify_param_2),
++	TEST_CASE_BREDRLE("Gatt Client - Deregister For Notification - Success",
++		ACTION_SUCCESS(init_pdus, notification_1),
 +		ACTION_SUCCESS(bluetooth_enable_action, NULL),
 +		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_ON),
 +		ACTION_SUCCESS(emu_setup_powered_remote_action, NULL),
@@ -89,8 +76,11 @@ index 794be4f..3b3118d 100644
 +		CALLBACK_GATTC_REGISTER_FOR_NOTIF(GATT_STATUS_SUCCESS, CONN1_ID,
 +							&characteristic_1,
 +							&service_1, 1),
-+		ACTION_SUCCESS(gatt_remote_send_frame_action, NULL),
-+		CALLBACK_GATTC_NOTIFY(CONN1_ID, &notify_params_1),
++		ACTION_SUCCESS(gatt_client_deregister_for_notification_action,
++								&notif_data_1),
++		CALLBACK_GATTC_REGISTER_FOR_NOTIF(GATT_STATUS_SUCCESS, CONN1_ID,
++							&characteristic_1,
++							&service_1, 0),
 +		ACTION_SUCCESS(bluetooth_disable_action, NULL),
 +		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_OFF),
 +	),
