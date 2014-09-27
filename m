@@ -1,64 +1,52 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 29 Sep 2014 10:32:26 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Alfonso Acosta <fons@spotify.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v3] Bluetooth: Fix sending redundant "LE Set Scan Enable
- (disable)" commands
-Message-ID: <20140929073226.GA4163@t440s.lan>
-References: <1411746838-9879-1-git-send-email-fons@spotify.com>
+From: "Gu, Chao Jie" <chao.jie.gu@intel.com>
+To: Lukasz Rymanowski <lukasz.rymanowski@gmail.com>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: RE: [PATCH v3 2/4] shared/gatt-client: Add CSRK part to support
+ signed write
+Date: Sat, 27 Sep 2014 09:36:00 +0000
+Message-ID: <3D02B219753AD44CBDDDE484323B17741130B43C@SHSMSX104.ccr.corp.intel.com>
+References: <1411717728-15415-1-git-send-email-chao.jie.gu@intel.com>
+	<1411717728-15415-3-git-send-email-chao.jie.gu@intel.com>
+ <CAN_7+YbQFq0=mvwhsHmduguDu-b0ji8L0+HqW-iDaHB_xO-3+g@mail.gmail.com>
+In-Reply-To: <CAN_7+YbQFq0=mvwhsHmduguDu-b0ji8L0+HqW-iDaHB_xO-3+g@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1411746838-9879-1-git-send-email-fons@spotify.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Alfonso,
-
-On Fri, Sep 26, 2014, Alfonso Acosta wrote:
-> Checking the LE scanning state (HCI_LE_SCAN) before queuing a new "LE
-> Set Scan Enable (disable)" command is not enough to avoid sending
-> extra redundant commands. Since HCI_LE_SCAN is only updated upon
-> "Command Complete" confirmation, multiple "LE Set Scan Enable
-> (disable)" can get queued before the first one gets delivered.
-
-I can see the need for having some sort of fix for this. However, we
-already have several use cases where we'd need to check for pending HCI
-commands and adding a new variable to hci_dev for each case is not
-really a good way to solve it. If we really would want to do it and
-we're out of available hdev->dev_flags I'd consider making the hdev
-variable "unsigned long dev_flags[2]" which both test_bit and set_bit
-should be able to handle fine (and existing code wouldn't need
-changing). You also have the issue that your code only covers the HCI
-commands sent through hci_req_add_le_scan_disable() but not any other
-code paths that might send the same command (either from the kernel or
-from user space using a raw HCI socket, e.g. hcitool).
-
-So far we've been able to cover other similar cases adequately by
-looking into the mgmt pending command queue and so the HCI command queue
-hasn't required any special look-ups. Now it might be the time to
-consider something like that. I.e. if we really do need to check for a
-not-yet sent HCI command a helper to look-up pending commands in
-hdev->cmd_q should be added. OTOH, we'd still have a race when the HCI
-command has already been sent but not yet completed, in which case the
-helper might need to look at hdev->sent_cmd as well. Either way, solving
-this in a generic manner doesn't seem to be a completely trivial task.
-
-> I encountered this issue when unpairing (MGMT_OP_UNPAIR_DEVICE) and
-> immediately pairing (MGMT_OP_PAIR_DEVICE) the only auto-connected
-> device. MGMT_OP_UNPAIR_DEVICE stopped scanning since there were no
-> more auto-connected devices and MGMT_OP_PAIR_DEVICE also stopped
-> scanning because some controllers cannot scan while connecting.
-> 
-> I added a dedicated flag (le_scan_disable_queued) in hci_dev for this
-> purpose since dev_flags is already full.
-
-If I've understood correctly the background for this (which it really
-wouldn't hurt to mention in the commit message) is a paired device that
-looses its pairing information because if a reset and we want to repair
-with it? I think to make this less complex for user space we should
-consider simply making mgmt_pair_device() calls valid for already paired
-devices, in which case it'd simply trigger a re-pairing. That way you
-wouldn't need the initial mgmt_unpair_device() call. Thoughts?
-
-Johan
+SGkgTHVrYXN6LA0KPiA+IC0tLQ0KPiA+ICBzcmMvc2hhcmVkL2dhdHQtY2xpZW50LmMgfCAgIDI3
+ICsrKysrKysrKysrKysrKysrKysrKystLS0tLQ0KPiA+ICBzcmMvc2hhcmVkL2dhdHQtY2xpZW50
+LmggfCAgICA0ICsrKysNCj4gPiAgMiBmaWxlcyBjaGFuZ2VkLCAyNiBpbnNlcnRpb25zKCspLCA1
+IGRlbGV0aW9ucygtKQ0KPiA+DQo+ID4gZGlmZiAtLWdpdCBhL3NyYy9zaGFyZWQvZ2F0dC1jbGll
+bnQuYyBiL3NyYy9zaGFyZWQvZ2F0dC1jbGllbnQuYyBpbmRleA0KPiA+IDZkYzhlOTUuLmFlZTM5
+NjkgMTAwNjQ0DQo+ID4gLS0tIGEvc3JjL3NoYXJlZC9nYXR0LWNsaWVudC5jDQo+ID4gKysrIGIv
+c3JjL3NoYXJlZC9nYXR0LWNsaWVudC5jDQo+ID4gQEAgLTE3NTMsMTkgKzE3NTMsMjYgQEAgYm9v
+bCBidF9nYXR0X2NsaWVudF9yZWFkX2xvbmdfdmFsdWUoc3RydWN0DQo+ID4gYnRfZ2F0dF9jbGll
+bnQgKmNsaWVudCwgIGJvb2wgYnRfZ2F0dF9jbGllbnRfd3JpdGVfd2l0aG91dF9yZXNwb25zZShz
+dHJ1Y3QNCj4gYnRfZ2F0dF9jbGllbnQgKmNsaWVudCwNCj4gPiAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgdWludDE2X3QgdmFsdWVfaGFuZGxlLA0KPiA+ICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBib29sIHNpZ25lZF93cml0ZSwNCj4gPiAt
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgdWludDhfdCAqdmFsdWUsIHVp
+bnQxNl90IGxlbmd0aCkgew0KPiA+ICsgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICB1aW50OF90ICp2YWx1ZSwgdWludDE2X3QNCj4gPiArbGVuZ3RoKSB7DQo+ID4gICAgICAg
+ICB1aW50OF90IHBkdVsyICsgbGVuZ3RoXTsNCj4gPg0KPiA+ICAgICAgICAgaWYgKCFjbGllbnQp
+DQo+ID4gICAgICAgICAgICAgICAgIHJldHVybiAwOw0KPiA+DQo+ID4gLSAgICAgICAvKiBUT0RP
+OiBTdXBwb3J0IHRoaXMgb25jZSBidF9hdHRfc2VuZCBzdXBwb3J0cyBzaWduZWQgd3JpdGVzLiAq
+Lw0KPiA+IC0gICAgICAgaWYgKHNpZ25lZF93cml0ZSkNCj4gPiAtICAgICAgICAgICAgICAgcmV0
+dXJuIDA7DQo+ID4gLQ0KPiA+ICAgICAgICAgcHV0X2xlMTYodmFsdWVfaGFuZGxlLCBwZHUpOw0K
+PiA+ICAgICAgICAgbWVtY3B5KHBkdSArIDIsIHZhbHVlLCBsZW5ndGgpOw0KPiA+DQo+ID4gKyAg
+ICAgICBpZiAoc2lnbmVkX3dyaXRlKSB7DQo+ID4gKyAgICAgICAgICAgICAgIGlmIChidF9hdHRf
+bG9jYWxfY3Nya19pc192YWxpZChjbGllbnQtPmF0dCkpDQo+IA0KPiBJbiBteSBvcGluaW9uIGJ0
+X2F0dF9sb2NhbF9jc3JrX2lzX3ZhbGlkIEFQSSBzZWVtcyB0byBiZSB1bm5lY2Vzc2FyeSBhcyBD
+U1JLIGNhbg0KPiBiZSBjaGVja2VkIGluc2lkZSBidF9hdHRfc2VuZCBmdW5jdGlvbiBkaXJlY3Rs
+eS4NCj4gDQoNCkkgYWdyZWUgd2l0aCB5b3UgdGhhdCBpdCBpcyBhbHNvIG9rIHRvIGJlIGNoZWNr
+ZWQgaW5zaWRlIGJ0X2F0dF9zZW5kIGZ1bmN0aW9uIGFuZCBoYXZlIHRob3VnaHQNCmFib3V0IHRo
+aXMgcHJvYmxlbSBiZWZvcmUuIA0KQW5kIEkgdGhpbmsgdGhlcmUgYXJlIHR3byBhZHZhbnRhZ2Vz
+IG9mIGNoZWNraW5nIHZhbGlkIG91dHNpZGUgYnRfYXR0X3NlbmQgZnVuY3Rpb24NCg0KMS4gcHJv
+dmlkZSBBUEkgdG8gdXNlciB0byBjaGVjayBDU1JLIHN0YXR1cyBpZiB0aGV5IHdhbnQuDQoyLiBp
+ZiB0aGUgQ1NSSyBpcyBpbnZhbGlkICwgd2UgY2FuIGp1c3QgcmV0dXJuIGZhbHNlIHF1aWNrbHkg
+LCB0aGVyZSBpcyBubyBuZWVkIHRvIGdvIG9uIGNhbGxpbmcNCmRvd24gYnRfYXR0X3NlbmQgdGhl
+biByZXR1cm4gZmFsc2UgYmFjay4gSXQgd2lsbCBiZSBtb3JlIGVmZmljaWVudCBJIHRoaW5rLg0K
+DQpXaGF0J3MgeW91ciBwb2ludCBhYm91dCB0aGlzID8NCg0KQmVzdCBSZWdhcmRzDQpDaGFvamll
+IEd1DQoNCg==
