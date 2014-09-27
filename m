@@ -1,41 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Gu, Chao Jie" <chao.jie.gu@intel.com>
-To: Lukasz Rymanowski <lukasz.rymanowski@gmail.com>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: RE: [PATCH v3 1/4] shared/att.c: Add signed command outgoing and
- CSRK function
-Date: Sat, 27 Sep 2014 09:26:03 +0000
-Message-ID: <3D02B219753AD44CBDDDE484323B17741130B41E@SHSMSX104.ccr.corp.intel.com>
-References: <1411717728-15415-1-git-send-email-chao.jie.gu@intel.com>
-	<1411717728-15415-2-git-send-email-chao.jie.gu@intel.com>
- <CAN_7+YYE4C-d-dnkS4GQqR9GoB44hqbpui9zCk9=GtmJHzyefg@mail.gmail.com>
-In-Reply-To: <CAN_7+YYE4C-d-dnkS4GQqR9GoB44hqbpui9zCk9=GtmJHzyefg@mail.gmail.com>
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.6\))
+Subject: Re: [PATCH v3 2/4] shared/gatt-client: Add CSRK part to support signed write
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <3D02B219753AD44CBDDDE484323B17741130B3FA@SHSMSX104.ccr.corp.intel.com>
+Date: Sat, 27 Sep 2014 10:51:21 +0200
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Message-Id: <BCAE391F-397F-402C-8179-675E53BD4F1A@holtmann.org>
+References: <1411717728-15415-1-git-send-email-chao.jie.gu@intel.com> <1411717728-15415-3-git-send-email-chao.jie.gu@intel.com> <9AF598FF-82F3-499C-8739-72947EDA695A@holtmann.org> <3D02B219753AD44CBDDDE484323B17741130B3FA@SHSMSX104.ccr.corp.intel.com>
+To: "Gu, Chao Jie" <chao.jie.gu@intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-SGkgTHVrYXN6LA0KDQo+ID4gKw0KPiA+ICtib29sIGJ0X2F0dF9nZXRfbG9jYWxfY3NyayhzdHJ1
-Y3QgYnRfYXR0ICphdHQsIHVpbnQ4X3Qga2V5WzE2XSwNCj4gPiArICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgdWludDMyX3QgKmxvY2FsX3NpZ25fY250KQ0KPiANCj4gDQo+
-IFdoeSB3ZSBuZWVkIHRoYXQgZ2V0IGZ1bmN0aW9uID8gSWYgd2UgYXNzdW1lIHRoYXQgc2lnbmlu
-ZyBpcyBkb25lIGluIGJ0X2F0dCB0aGVuDQo+IHRoZXJlIGlzIG5lZWQgb25seSB0byBmZWVkIGJ0
-X2F0dCB3aXRoIHRoZSBDU1JLLg0KPiAgQlRXLiBUaGVyZSBzaG91bGQgYmUgYSB3YXkgdG8gc2V0
-IHNpZ25fY250IGFzIHdlbGwgYXMgdGhpcyBzaGFsbCBiZSBpbiBzYW1lDQo+IHN0b3JhZ2UgYXMg
-Q1NSSw0KPiANCj4gSSBjYW4gZ3Vlc3MgdGhhdCBpZGVhIGJlaGluZCB0aGlzIGJ0X2F0dF9nZXRf
-IGlzIHRoYXQgY2xpZW50IG9mIGJ0X2F0dCBzaG91bGQgaGF2ZQ0KPiBwb3NzaWJpbGl0eSB0byB1
-cGRhdGUgaXRzIHNpZ25fY250IGFmdGVyIGVhY2ggdHJhbnNhY3Rpb24uDQo+IEl0IGlzIGluIG9y
-ZGVyIHRvIHVwZGF0ZSBzdG9yYWdlLiBJZiBzbyAgSSB3b3VsZCBwcm9wb3NlIHRvIGhhdmUgc29t
-ZSBjYWxsYmFjaw0KPiByZWdpc3RlcmVkIGluIGJ0X2F0dCBmb3IgdGhpcyBwdXJwb3NlLg0KPg0K
-QWNjb3JkaW5nIHRvIHlvdXIgcHJvcG9zYWwsIEkgYW0gbm90IGNsZWFyIHdoZXJlIGFuZCB3aGVu
-IHlvdSB3YW50IHRvIHJlZ2lzdGVyDQpjYWxsYmFjayB0byBnZXQgc2lnbl9jbnQsIGFuZCBJIHRo
-aW5rIHJlZ2lzdGVyIG5ldyBjYWxsYmFjayBmb3Igb25seSBvbmUgc2lnbmVkX2NudA0KUGFyYW1l
-dGVyLCBpdCBtYWtlIHNlbnNlID8NCg0KSW4gbXkgdGhvdWdodCAsIHRoaXMgbWV0aG9kIHVzZXIg
-YWxzbyBjYW4gZ2V0IHNpZ25kX2NudCBhZnRlciBzaWduZWRfd3JpdGVfY21kLg0KSW4gZW5jb2Rl
-X3BkdSBmdW5jdGlvbiwgYWZ0ZXIgd2UgZW5jb2RlIHBkdSB3aXRoIENTUkssIHRoZW4gaXQgd2ls
-bCB1cGRhdGUgc2lnbl9jbnQNCmluIHRoZSBidF9hdHQgc3RydWN0dXJlIGZvciBuZXh0IHNpZ25l
-ZCB3cml0ZSBjb21tYW5kLg0KDQpJZiBjbGllbnQgb2YgYnRfYXR0IG5lZWQgdG8gdXBkYXRlIGl0
-cyBzaWduX2NudCBpbiB0aGUgc3RvcmFnZSwgd2hlbiBidF9hdHRfc2VuZCBmb3INClNJR05FRF9X
-UklURV9DT01NQU5EIHJldHVybiB0dXJlLCB1c2VyIGNhbiBjYWxsIGJ0X2F0dF9nZXRfbG9jYWxf
-Y3NyayB0byANCmdldCBuZXdlc3Qgc2lnbl9jbnQgYW5kIHN0b3JlIGl0Lg0KDQpCZXN0IFJlZ2Fy
-ZHMNCkNoYW9qaWUgR3UNCg==
+Hi Chao Jie,
+
+>>> +bool bt_gatt_client_set_local_csrk(struct bt_gatt_client *client,
+>>> +				bool valid_local_csrk,
+>>> +				uint8_t key[16]);
+>> 
+>> why do we have the parameter valid_local_csrk. I find that highly confusing. If you
+>> do not have a valid CSRK, then do not call this function. It should be that simple.
+>> 
+> 
+> My initial purpose to set this parameter valid_local_csrk here, user can call one API
+> to set flag valid_local_csrk ture/false and CSRK key in one time.
+> According to your proposal, I think it really result in confusion for user.
+> 
+> So for more clear to call API , I think we should split two API for upper layer:
+> 1. When we need to set CSRK , check the CSRK is valid , then call bt_gatt_client_set_local_csrk
+>  Just to pass one parameter key to function and in the function to set flag valid_local_csrk is true.
+> 
+> 2 When two device dispair each other, we should give user possibility to unset flag and CSRK.
+>  So in this condition , we have to create bt_gatt_client_unset_local_csrk(struct bt_gatt_client *client)
+>  to clear CSRK and set flag valid_local_csrk to false.
+> 
+> Do you think this thought would be ok for you?
+
+I am not really worried about these details anyway. If you remove the bond between two devices, then the connection will be terminated. Which means that next time around you get a new bt_att object. If you do not have any CSRK the next time, you just not set them in the first place.
+
+Regards
+
+Marcel
+
