@@ -1,45 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Gu, Chao Jie" <chao.jie.gu@intel.com>
-To: Lukasz Rymanowski <lukasz.rymanowski@gmail.com>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: RE: [PATCH v3 1/4] shared/att.c: Add signed command outgoing and
- CSRK function
-Date: Mon, 29 Sep 2014 08:48:01 +0000
-Message-ID: <3D02B219753AD44CBDDDE484323B17741130B907@SHSMSX104.ccr.corp.intel.com>
-References: <1411717728-15415-1-git-send-email-chao.jie.gu@intel.com>
-	<1411717728-15415-2-git-send-email-chao.jie.gu@intel.com>
-	<CAN_7+YYE4C-d-dnkS4GQqR9GoB44hqbpui9zCk9=GtmJHzyefg@mail.gmail.com>
-	<3D02B219753AD44CBDDDE484323B17741130B41E@SHSMSX104.ccr.corp.intel.com>
- <CAN_7+YbmO_88_cyCq2Ysec-_WZFtREFNQkx4Pt6OGwUDzZo0Ew@mail.gmail.com>
-In-Reply-To: <CAN_7+YbmO_88_cyCq2Ysec-_WZFtREFNQkx4Pt6OGwUDzZo0Ew@mail.gmail.com>
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.6\))
+Subject: Re: [PATCH] Bluetooth: 6lowpan: Make sure skb exists before accessing it
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1411977346-10219-1-git-send-email-jukka.rissanen@linux.intel.com>
+Date: Mon, 29 Sep 2014 10:37:51 +0200
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <5E3C4608-1AAC-4745-8AEE-2B8152816531@holtmann.org>
+References: <1411977346-10219-1-git-send-email-jukka.rissanen@linux.intel.com>
+To: Jukka Rissanen <jukka.rissanen@linux.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-SGkgTHVrYXN6LA0KIA0KPiA+DQo+ID4gSW4gbXkgdGhvdWdodCAsIHRoaXMgbWV0aG9kIHVzZXIg
-YWxzbyBjYW4gZ2V0IHNpZ25kX2NudCBhZnRlciBzaWduZWRfd3JpdGVfY21kLg0KPiA+IEluIGVu
-Y29kZV9wZHUgZnVuY3Rpb24sIGFmdGVyIHdlIGVuY29kZSBwZHUgd2l0aCBDU1JLLCB0aGVuIGl0
-IHdpbGwNCj4gPiB1cGRhdGUgc2lnbl9jbnQgaW4gdGhlIGJ0X2F0dCBzdHJ1Y3R1cmUgZm9yIG5l
-eHQgc2lnbmVkIHdyaXRlIGNvbW1hbmQuDQo+ID4NCj4gPiBJZiBjbGllbnQgb2YgYnRfYXR0IG5l
-ZWQgdG8gdXBkYXRlIGl0cyBzaWduX2NudCBpbiB0aGUgc3RvcmFnZSwgd2hlbg0KPiA+IGJ0X2F0
-dF9zZW5kIGZvciBTSUdORURfV1JJVEVfQ09NTUFORCByZXR1cm4gdHVyZSwgdXNlciBjYW4gY2Fs
-bA0KPiA+IGJ0X2F0dF9nZXRfbG9jYWxfY3NyayB0byBnZXQgbmV3ZXN0IHNpZ25fY250IGFuZCBz
-dG9yZSBpdC4NCj4gDQo+IFRoZSB0aGluZyBpcyB0aGF0IGl0IGlzIG5vdCAiaWYiLiAgV2UgbmVl
-ZCB0byBtYWtlIHN1cmUgdGhhdCBzaWduIGNvdW50ZXIgaXMgdXBkYXRlZA0KPiBpbiB0aGUgZGF0
-YWJhc2UgYW5kIEkgdGhpbmsgdGhhdCBoYXZpbmcgY2FsbGJhY2sgaXMgY29udmVuaWVudCBmb3Ig
-dGhhdC4gT2YgY291cnNlIHlvdQ0KPiBjYW4gaGF2ZSBzb21lIGhlbHBlciB3aGljaCByZXRyaWV2
-ZXMgc2lnbiBjb3VudGVyIGFmdGVyIGVhY2ggYXR0IHRyYW5zYWN0aW9uIGFuZA0KPiB0aGVuIHN0
-b3JlIGl0Lg0KPiANCj4gV2UgbmVlZCB0byByZW1lbWJlciAgdGhhdCBsb2NhbCBzaWduIGNvdW50
-ZXIgaXMgdmFsaWQgYXMgbG9uZyBhcyBDU1JLIGlzLCBzbyBpbg0KPiBvcmRlciB0byBkbyBhbnkg
-c2lnbiB3cml0ZSBhZnRlciByZWNvbm5lY3Qgd2UgbmVlZCB0byBoYXZlIHVwZGF0ZWQgc2luZyBj
-b3VudGVyLA0KPiBvdGhlcndpc2UgcmVtb3RlIHdpbGwgcmVqZWN0IHdyaXRlIGNvbW1hbmQuDQo+
-IA0KDQpXZSBjYW4gc2VlIGFuZHJvaWQvZ2F0dC5jICwgd2hlbiBnYXR0X3NpZ25lZF93cml0ZV9j
-bWQgZG9uZSwNCkNhbGwgYnRfdXBkYXRlX3NpZ25fY291bnQgdG8gdXBhdGUgYW5kIHN0b3JlIHRo
-ZSBzaWduZWRfY250Lg0KDQpUaGVyZSBpcyB0aGUgc2FtZSBjb25kaXRpb24gaGVyZS4gWW91IGNh
-biBjYWxsIGJ0X2F0dF9nZXRfbG9jYWxfY3NyayB0byB1cGRhdGUgYW5kIA0KU3RvcmUgaXQgYWZ0
-ZXIgc2lnbmVkIHdyaXRlIGNvbW1hbmQsIGl0IGlzIG1vcmUgZWFzeSB0aGFuIHRvIHJlZ2lzdGVy
-IGNhbGxiYWNrIHRvIA0KbGlzdGVuIHRoZSBTaWduZWRfY250IGNoYW5nZS4gQW5kIEkgZG9uJ3Qg
-c2VlIGFueSBjYWxsYmFjayB0cmlnZ2VyIGNvbmRpdGlvbiBmb3IgdGhpcyANCnNpZ25lZF9jbnQg
-cGFyYW1ldGVyIGluIHRoZSBidF9hdHRfc2VuZCBmdW5jdGlvbi4NCiANCkJlc3QgUmVnYXJkcw0K
-Q2hhb2ppZSBHdQ0K
+Hi Jukka,
+
+> We need to make sure that the saved skb exists when
+> resuming or suspending a CoC channel. This can happen if
+> initial credits is 0 when channel is connected.
+> 
+> Signed-off-by: Jukka Rissanen <jukka.rissanen@linux.intel.com>
+> ---
+> net/bluetooth/6lowpan.c | 6 ++++++
+> 1 file changed, 6 insertions(+)
+
+patch has been applied to bluetooth-next tree.
+
+Regards
+
+Marcel
+
