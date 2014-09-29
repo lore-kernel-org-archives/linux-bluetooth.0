@@ -1,64 +1,101 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 1/6] shared/io: Do not return -1
-Date: Mon, 29 Sep 2014 17:57:39 +0300
-Message-Id: <1412002664-28253-1-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 2/6] shared/io: Add io_send
+Date: Mon, 29 Sep 2014 17:57:40 +0300
+Message-Id: <1412002664-28253-2-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <1412002664-28253-1-git-send-email-luiz.dentz@gmail.com>
+References: <1412002664-28253-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Returning -1 normally is used when errno is set which is not case so
-instead return -ENOTCONN.
 ---
- src/shared/io-glib.c     | 4 +++-
- src/shared/io-mainloop.c | 3 ++-
- 2 files changed, 5 insertions(+), 2 deletions(-)
+ src/shared/io-glib.c     | 20 ++++++++++++++++++++
+ src/shared/io-mainloop.c | 17 +++++++++++++++++
+ src/shared/io.h          |  2 ++
+ 3 files changed, 39 insertions(+)
 
 diff --git a/src/shared/io-glib.c b/src/shared/io-glib.c
-index 6316037..882ebd6 100644
+index 882ebd6..a2ada66 100644
 --- a/src/shared/io-glib.c
 +++ b/src/shared/io-glib.c
-@@ -25,6 +25,8 @@
- #include <config.h>
- #endif
- 
-+#include <errno.h>
-+
- #include <glib.h>
- 
- #include "src/shared/io.h"
-@@ -122,7 +124,7 @@ void io_destroy(struct io *io)
- int io_get_fd(struct io *io)
- {
- 	if (!io)
--		return -1;
-+		return -ENOTCONN;
- 
- 	return g_io_channel_unix_get_fd(io->channel);
+@@ -326,6 +326,26 @@ done:
+ 	return true;
  }
+ 
++ssize_t io_send(struct io *io, const struct iovec *iov, int iovcnt)
++{
++	int fd;
++	ssize_t ret;
++
++	if (!io || !io->channel)
++		return -ENOTCONN;
++
++	fd = io_get_fd(io);
++
++	do {
++		ret = writev(fd, iov, iovcnt);
++	} while (ret < 0 && errno == EINTR);
++
++	if (ret < 0)
++		return -errno;
++
++	return ret;
++}
++
+ bool io_shutdown(struct io *io)
+ {
+ 	if (!io || !io->channel)
 diff --git a/src/shared/io-mainloop.c b/src/shared/io-mainloop.c
-index 1563ce5..b7e0f5f 100644
+index b7e0f5f..7f80d8f 100644
 --- a/src/shared/io-mainloop.c
 +++ b/src/shared/io-mainloop.c
-@@ -26,6 +26,7 @@
- #endif
- 
- #include <unistd.h>
-+#include <errno.h>
- #include <sys/socket.h>
- 
- #include "monitor/mainloop.h"
-@@ -192,7 +193,7 @@ void io_destroy(struct io *io)
- int io_get_fd(struct io *io)
- {
- 	if (!io)
--		return -1;
-+		return -ENOTCONN;
- 
- 	return io->fd;
+@@ -301,6 +301,23 @@ bool io_set_disconnect_handler(struct io *io, io_callback_func_t callback,
+ 	return true;
  }
+ 
++ssize_t io_send(struct io *io, const struct iovec *iov, int iovcnt)
++{
++	ssize_t ret;
++
++	if (!io || io->fd < 0)
++		return -ENOTCONN;
++
++	do {
++		ret = writev(io->fd, iov, iovcnt);
++	} while (ret < 0 && errno == EINTR);
++
++	if (ret < 0)
++		return -errno;
++
++	return ret;
++}
++
+ bool io_shutdown(struct io *io)
+ {
+ 	if (!io || io->fd < 0)
+diff --git a/src/shared/io.h b/src/shared/io.h
+index 8897964..8bc1111 100644
+--- a/src/shared/io.h
++++ b/src/shared/io.h
+@@ -22,6 +22,7 @@
+  */
+ 
+ #include <stdbool.h>
++#include <sys/uio.h>
+ 
+ typedef void (*io_destroy_func_t)(void *data);
+ 
+@@ -33,6 +34,7 @@ void io_destroy(struct io *io);
+ int io_get_fd(struct io *io);
+ bool io_set_close_on_destroy(struct io *io, bool do_close);
+ 
++ssize_t io_send(struct io *io, const struct iovec *iov, int iovcnt);
+ bool io_shutdown(struct io *io);
+ 
+ typedef bool (*io_callback_func_t)(struct io *io, void *user_data);
 -- 
 1.9.3
 
