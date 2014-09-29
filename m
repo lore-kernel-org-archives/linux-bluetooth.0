@@ -1,40 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.6\))
-Subject: Re: [PATCH v3] Bluetooth: Add HCI_AUTO_CONN_DIRECT_REPORT_IND
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1411746855-9936-1-git-send-email-fons@spotify.com>
-Date: Mon, 29 Sep 2014 10:37:19 +0200
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <24D2CD11-D43B-4F53-8A7C-175934A54C87@holtmann.org>
-References: <1411746855-9936-1-git-send-email-fons@spotify.com>
-To: Alfonso Acosta <fons@spotify.com>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH v3] emulator/hciemu: Fix not handling failed read correctly
+Date: Mon, 29 Sep 2014 10:27:37 +0200
+Message-ID: <1560201.dnxDJYBh5A@uw000953>
+In-Reply-To: <1411655558-18167-1-git-send-email-szymon.janc@tieto.com>
+References: <1411655558-18167-1-git-send-email-szymon.janc@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Alfonso,
-
-> HCI_AUTO_CONN_DIRECT_REPORT_IND (associated to a new autoconnect
-> action, 0x03) treats advertising reports like a combination of
-> HCI_AUTO_CONN_DIRECT and HCI_AUTO_CONN_REPORT:
+On Thursday 25 of September 2014 16:32:38 Szymon Janc wrote:
+> If read failed due to signal or blocking watch was removed resulting
+> in closing /dev/vhci and emulated adapter being removed.
 > 
-> * Autoconnects on ADV_DIRECT_IND reports.
-> * Notifies userland (MGMT_EV_DEVICE_FOUND) about ADV_IND reports.
+> This was affecting android-tester since premature removal of adapter
+> is considered error on android daemon.
+> ---
+>  emulator/hciemu.c | 7 +++++++
+>  1 file changed, 7 insertions(+)
 > 
-> This is useful to communicate with autoconnectable devices which
-> advertise meaningful ADV_IND reports.
+> diff --git a/emulator/hciemu.c b/emulator/hciemu.c
+> index 50285e4..fcaeb70 100644
+> --- a/emulator/hciemu.c
+> +++ b/emulator/hciemu.c
+> @@ -179,6 +179,13 @@ static gboolean receive_btdev(GIOChannel *channel, GIOCondition condition,
+>  	fd = g_io_channel_unix_get_fd(channel);
+>  
+>  	len = read(fd, buf, sizeof(buf));
+> +	if (len < 0) {
+> +		if (errno == EAGAIN || errno == EINTR)
+> +			return TRUE;
+> +
+> +		return FALSE;
+> +	}
+> +
+>  	if (len < 1)
+>  		return FALSE;
+>  
 > 
-> HCI_AUTO_CONN_DIRECT_REPORT_IND requires being able to simultaneously
-> have a pending report and connection action. I merged pend_le_reports
-> and pend_le_conns into the new pend_le_actions in order to make that
-> possible while maintaining a unique list_head in hci_conn_parameters
-> (action). This results in simpler handling of pending actions.
 
-I am not really convinced that this is a good idea. In general either you really want Action 0x01 and only accept incoming connection or you want Action 0x02 and connect to the device no matter what.
+Applied.
 
-Originally I had the idea that the advertising data that you receive from ADV_IND when Action 0x02 is in play gets also included in Device Connected event. My thinking there was that the Service Data might have changed and it would be useful to know ahead of time before starting any GATT procedures. However then it seems that was not really useful after all and I stopped considering it. Maybe this idea needs to be picked up again.
-
-Regards
-
-Marcel
-
+-- 
+Best regards, 
+Szymon Janc
