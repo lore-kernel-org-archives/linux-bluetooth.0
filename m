@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH 1/6] shared/hfp: Extract struct hfp out of struct hfp_gw
-Date: Mon, 29 Sep 2014 15:47:13 +0200
-Message-Id: <1411998438-26914-3-git-send-email-lukasz.rymanowski@tieto.com>
+Subject: [PATCH 1/6] shared/hfp: Extract common struct hfp struct out of struct hfp_gw
+Date: Mon, 29 Sep 2014 15:47:12 +0200
+Message-Id: <1411998438-26914-2-git-send-email-lukasz.rymanowski@tieto.com>
 In-Reply-To: <1411998438-26914-1-git-send-email-lukasz.rymanowski@tieto.com>
 References: <1411998438-26914-1-git-send-email-lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
