@@ -2,112 +2,126 @@ Return-Path: <cyrus@holtmann.org>
 From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH 5/6] shared/hfp: Add helper to set disconnect handler
-Date: Mon, 29 Sep 2014 15:47:17 +0200
-Message-Id: <1411998438-26914-7-git-send-email-lukasz.rymanowski@tieto.com>
+Subject: [PATCH 3/6] shared/hfp: Add set_debug helper which takes struct hfp as parameter
+Date: Mon, 29 Sep 2014 15:47:15 +0200
+Message-Id: <1411998438-26914-5-git-send-email-lukasz.rymanowski@tieto.com>
 In-Reply-To: <1411998438-26914-1-git-send-email-lukasz.rymanowski@tieto.com>
 References: <1411998438-26914-1-git-send-email-lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch adds helper to set disconnect handler which takes struct hfp
-as the parameter. This helper will be used also by future hfp_hf.
+This patch build wrapper for set_debug as same function will be used
+later by hfp_hf.
+
+It also moves function in the file so it builds without any issues
 ---
- src/shared/hfp.c | 59 ++++++++++++++++++++++++++++++++------------------------
- 1 file changed, 34 insertions(+), 25 deletions(-)
+ src/shared/hfp.c | 76 +++++++++++++++++++++++++++++---------------------------
+ 1 file changed, 40 insertions(+), 36 deletions(-)
 
 diff --git a/src/shared/hfp.c b/src/shared/hfp.c
-index 5d1f007..a1af841 100644
+index 16feaf2..20ddbd3 100644
 --- a/src/shared/hfp.c
 +++ b/src/shared/hfp.c
-@@ -777,53 +777,62 @@ bool hfp_gw_unregister(struct hfp_gw *hfp, const char *prefix)
- 
- static void disconnect_watch_destroy(void *user_data)
- {
--	struct hfp_gw *hfp = user_data;
-+	struct hfp *hfp = user_data;
- 
--	if (hfp->hfp.disconnect_destroy)
--		hfp->hfp.disconnect_destroy(hfp->hfp.disconnect_data);
-+	if (hfp->disconnect_destroy)
-+		hfp->disconnect_destroy(hfp->disconnect_data);
- 
--	if (hfp->hfp.destroyed)
-+	if (hfp->destroyed)
- 		free(hfp);
+@@ -533,6 +533,44 @@ struct hfp_gw *hfp_gw_ref(struct hfp_gw *hfp)
+ 	return hfp;
  }
  
- static bool io_disconnected(struct io *io, void *user_data)
- {
--	struct hfp_gw *hfp = user_data;
++static void read_tracing(const void *buf, size_t count, void *user_data)
++{
 +	struct hfp *hfp = user_data;
- 
--	hfp->hfp.in_disconnect = true;
-+	hfp->in_disconnect = true;
- 
--	if (hfp->hfp.disconnect_callback)
--		hfp->hfp.disconnect_callback(hfp->hfp.disconnect_data);
-+	if (hfp->disconnect_callback)
-+		hfp->disconnect_callback(hfp->disconnect_data);
- 
--	hfp->hfp.in_disconnect = false;
-+	hfp->in_disconnect = false;
- 
- 	return false;
- }
- 
--bool hfp_gw_set_disconnect_handler(struct hfp_gw *hfp,
--					hfp_disconnect_func_t callback,
--					void *user_data,
--					hfp_destroy_func_t destroy)
-+static bool set_disconnect_handler(struct hfp *hfp,
-+						hfp_disconnect_func_t callback,
-+						void *user_data,
-+						hfp_destroy_func_t destroy)
- {
--	if (!hfp)
--		return false;
-+	if (hfp->disconnect_destroy)
-+		hfp->disconnect_destroy(hfp->disconnect_data);
- 
--	if (hfp->hfp.disconnect_destroy)
--		hfp->hfp.disconnect_destroy(hfp->hfp.disconnect_data);
--
--	if (!io_set_disconnect_handler(hfp->hfp.io, io_disconnected, hfp,
-+	if (!io_set_disconnect_handler(hfp->io, io_disconnected, hfp,
- 						disconnect_watch_destroy)) {
--		hfp->hfp.disconnect_callback = NULL;
--		hfp->hfp.disconnect_destroy = NULL;
--		hfp->hfp.disconnect_data = NULL;
-+		hfp->disconnect_callback = NULL;
-+		hfp->disconnect_destroy = NULL;
-+		hfp->disconnect_data = NULL;
- 		return false;
- 	}
- 
--	hfp->hfp.disconnect_callback = callback;
--	hfp->hfp.disconnect_destroy = destroy;
--	hfp->hfp.disconnect_data = user_data;
-+	hfp->disconnect_callback = callback;
-+	hfp->disconnect_destroy = destroy;
-+	hfp->disconnect_data = user_data;
- 
- 	return true;
 +
++	util_hexdump('>', buf, count, hfp->debug_callback, hfp->debug_data);
 +}
 +
-+bool hfp_gw_set_disconnect_handler(struct hfp_gw *hfp,
-+					hfp_disconnect_func_t callback,
-+					void *user_data,
-+					hfp_destroy_func_t destroy)
++static void write_tracing(const void *buf, size_t count, void *user_data)
++{
++	struct hfp *hfp = user_data;
++
++	util_hexdump('<', buf, count, hfp->debug_callback, hfp->debug_data);
++}
++
++static bool set_debug(struct hfp *hfp, hfp_debug_func_t callback,
++				void *user_data, hfp_destroy_func_t destroy)
 +{
 +	if (!hfp)
 +		return false;
 +
-+	return set_disconnect_handler(&hfp->hfp, callback, user_data, destroy);
++	if (hfp->debug_destroy)
++		hfp->debug_destroy(hfp->debug_data);
++
++	hfp->debug_callback = callback;
++	hfp->debug_destroy = destroy;
++	hfp->debug_data = user_data;
++
++	if (hfp->debug_callback) {
++		ringbuf_set_input_tracing(hfp->read_buf, read_tracing, hfp);
++		ringbuf_set_input_tracing(hfp->write_buf, write_tracing, hfp);
++	} else {
++		ringbuf_set_input_tracing(hfp->read_buf, NULL, NULL);
++		ringbuf_set_input_tracing(hfp->write_buf, NULL, NULL);
++	}
++
++	return true;
++}
++
+ void hfp_gw_unref(struct hfp_gw *hfp)
+ {
+ 	if (!hfp)
+@@ -553,7 +591,7 @@ void hfp_gw_unref(struct hfp_gw *hfp)
+ 	if (hfp->hfp.close_on_unref)
+ 		close(hfp->hfp.fd);
+ 
+-	hfp_gw_set_debug(hfp, NULL, NULL, NULL);
++	set_debug(&hfp->hfp, NULL, NULL, NULL);
+ 
+ 	ringbuf_free(hfp->hfp.read_buf);
+ 	hfp->hfp.read_buf = NULL;
+@@ -572,44 +610,10 @@ void hfp_gw_unref(struct hfp_gw *hfp)
+ 	hfp->hfp.destroyed = true;
  }
  
- bool hfp_gw_disconnect(struct hfp_gw *hfp)
+-static void read_tracing(const void *buf, size_t count, void *user_data)
+-{
+-	struct hfp_gw *hfp = user_data;
+-
+-	util_hexdump('>', buf, count, hfp->hfp.debug_callback,
+-							hfp->hfp.debug_data);
+-}
+-
+-static void write_tracing(const void *buf, size_t count, void *user_data)
+-{
+-	struct hfp_gw *hfp = user_data;
+-
+-	util_hexdump('<', buf, count, hfp->hfp.debug_callback,
+-							hfp->hfp.debug_data);
+-}
+-
+ bool hfp_gw_set_debug(struct hfp_gw *hfp, hfp_debug_func_t callback,
+ 				void *user_data, hfp_destroy_func_t destroy)
+ {
+-	if (!hfp)
+-		return false;
+-
+-	if (hfp->hfp.debug_destroy)
+-		hfp->hfp.debug_destroy(hfp->hfp.debug_data);
+-
+-	hfp->hfp.debug_callback = callback;
+-	hfp->hfp.debug_destroy = destroy;
+-	hfp->hfp.debug_data = user_data;
+-
+-	if (hfp->hfp.debug_callback) {
+-		ringbuf_set_input_tracing(hfp->hfp.read_buf, read_tracing, hfp);
+-		ringbuf_set_input_tracing(hfp->hfp.write_buf, write_tracing, hfp);
+-	} else {
+-		ringbuf_set_input_tracing(hfp->hfp.read_buf, NULL, NULL);
+-		ringbuf_set_input_tracing(hfp->hfp.write_buf, NULL, NULL);
+-	}
+-
+-	return true;
++	return set_debug(&hfp->hfp, callback, user_data, destroy);
+ }
+ 
+ bool hfp_gw_set_close_on_unref(struct hfp_gw *hfp, bool do_close)
 -- 
 1.8.4
 
