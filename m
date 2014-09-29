@@ -1,51 +1,87 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Mon, 29 Sep 2014 09:13:06 -0700 (PDT)
+From: Szymon Janc <szymon.janc@gmail.com>
+To: Szymon Janc <szymon.janc@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 1/5] android/client: Simplify PCM handling function in SCO HAL
+Message-ID: <1570207.ebdzAWXeKY@athlon>
+In-Reply-To: <1411738938-29524-1-git-send-email-szymon.janc@tieto.com>
+References: <1411738938-29524-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
-In-Reply-To: <1411724807-4842-1-git-send-email-jakub.tyszkowski@tieto.com>
-References: <1411724807-4842-1-git-send-email-jakub.tyszkowski@tieto.com>
-Date: Mon, 29 Sep 2014 12:48:31 -0700
-Message-ID: <CAHrH25TONDoORUAsNizLUJvMUg0FXC4XKvyC9SvQvYg-GQA-YA@mail.gmail.com>
-Subject: Re: [RFC 0/2] shared/gatt-client: ATT invalidation handler interface
-From: Arman Uguray <armansito@chromium.org>
-To: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="us-ascii"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jakub,
+On Friday 26 September 2014 15:42:14 Szymon Janc wrote:
+> Those functions operates on aligned buffers so there is no need for
+> unaligned memory access helpers.
+> ---
+>  android/client/if-sco.c | 21 +++++++--------------
+>  1 file changed, 7 insertions(+), 14 deletions(-)
+> 
+> diff --git a/android/client/if-sco.c b/android/client/if-sco.c
+> index 7a89692..e7197b2 100644
+> --- a/android/client/if-sco.c
+> +++ b/android/client/if-sco.c
+> @@ -19,7 +19,6 @@
+>  #include <unistd.h>
+>  #include <math.h>
+> 
+> -#include "../src/shared/util.h"
+>  #include "if-main.h"
+>  #include "../hal-utils.h"
+> 
+> @@ -176,14 +175,11 @@ static void prepare_sample(void)
+> 
+>  static void mono_to_stereo_pcm16(const int16_t *in, int16_t *out, size_t
+> samples) {
+> -	int16_t mono;
+>  	size_t i;
+> 
+>  	for (i = 0; i < samples; i++) {
+> -		mono = get_unaligned(&in[i]);
+> -
+> -		put_unaligned(mono, &out[2 * i]);
+> -		put_unaligned(mono, &out[2 * i + 1]);
+> +		out[2 * i] = in[i];
+> +		out[2 * i + 1] = in[i];
+>  	}
+>  }
+> 
+> @@ -267,17 +263,14 @@ static void *playback_thread(void *data)
+>  	return NULL;
+>  }
+> 
+> -static void write_stereo_pcm16(char *buffer, size_t len, FILE *out)
+> +static void write_stereo_pcm16(const short *input, size_t len, FILE *out)
+>  {
+> -	const int16_t *input = (const void *) buffer;
+> -	int16_t sample[2];
+> +	short sample[2];
+>  	size_t i;
+> 
+>  	for (i = 0; i < len / 2; i++) {
+> -		int16_t mono = get_unaligned(&input[i]);
+> -
+> -		put_unaligned(mono, &sample[0]);
+> -		put_unaligned(mono, &sample[1]);
+> +		sample[0] = input[i];
+> +		sample[1] = input[i];
+> 
+>  		fwrite(sample, sizeof(sample), 1, out);
+>  	}
+> @@ -319,7 +312,7 @@ static void *read_thread(void *data)
+>  		haltest_info("Read %zd bytes\n", len);
+> 
+>  		if (out) {
+> -			write_stereo_pcm16((char *) buffer, len, out);
+> +			write_stereo_pcm16(buffer, len, out);
+>  			haltest_info("Written %zd bytes\n", len * 2);
+>  		}
+>  	} while (len);
 
+Pushed.
 
-> Even though the following patches propose the solution for this TODO entry if I
-> understood it correctly, I'm not sure if it is really needed to have this
-> in shared/gatt-client, as this would only be wrapping the shared/att code.
-> As shared/gatt-client is not directly handling the connection, nor is
-> initialising the shared/att, its up to user, which does that
-> (tools/btgatt-client for now) to handle this events, as it is using the
-> shared/att API directly anyway. And btw. 'bt_att_register_disconnect()' was
-> designed to be 'user ready/user friendly' as it can handle multiple
-> users/callbacks. If we realy need this multiple user notifications we could
-> extend the 'bt_att_set_timeout_cb()' to work in similar way.
->
-> Is there a good reason to have this functionality on shared/gatt-client level?
-> If we really want this, then what about the gatt-server? We duplicate the
-> wrapping we have in gatt-client?
-
-I guess you're right in that it might be unnecessary to add an extra
-layer of abstraction for something that is already pretty simple to
-use. So let's not add a callback mechanism into shared/gatt-client.
-
-That being said, shared/gatt-client still needs to properly handle
-disconnections. So, at least internally, gatt-client should probably
-clear its service cache and make sure that all registered notify
-handlers have been unregistered. This is assuming that the same
-instance of gatt-client will be used across multiple connections. I
-guess we should discuss whether we expect users to create a new
-gatt-client for each connection or whether to extend gatt-client to
-allow a new bt_att structure to be assigned to it.
-
-As for timeouts, bt_att automatically destroys the underlying io,
-which should close the connection. So it maybe enough for the
-upper-layer to just call bt_att_register_disconnect.
-
-Cheers,
-Arman
+-- 
+Szymon K. Janc
+szymon.janc@gmail.com
