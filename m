@@ -1,73 +1,61 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <3D02B219753AD44CBDDDE484323B17741130B41E@SHSMSX104.ccr.corp.intel.com>
-References: <1411717728-15415-1-git-send-email-chao.jie.gu@intel.com>
-	<1411717728-15415-2-git-send-email-chao.jie.gu@intel.com>
-	<CAN_7+YYE4C-d-dnkS4GQqR9GoB44hqbpui9zCk9=GtmJHzyefg@mail.gmail.com>
-	<3D02B219753AD44CBDDDE484323B17741130B41E@SHSMSX104.ccr.corp.intel.com>
-Date: Mon, 29 Sep 2014 10:08:50 +0200
-Message-ID: <CAN_7+YbmO_88_cyCq2Ysec-_WZFtREFNQkx4Pt6OGwUDzZo0Ew@mail.gmail.com>
-Subject: Re: [PATCH v3 1/4] shared/att.c: Add signed command outgoing and CSRK function
-From: Lukasz Rymanowski <lukasz.rymanowski@gmail.com>
-To: "Gu, Chao Jie" <chao.jie.gu@intel.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+From: Sebastian Chlad <sebastian.chlad@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Sebastian Chlad <sebastian.chlad@tieto.com>
+Subject: [PATCH 2/2] android/pts: Update PTS files for A2DP
+Date: Mon, 29 Sep 2014 10:07:17 +0200
+Message-Id: <1411978037-4561-2-git-send-email-sebastian.chlad@tieto.com>
+In-Reply-To: <1411978037-4561-1-git-send-email-sebastian.chlad@tieto.com>
+References: <1411978037-4561-1-git-send-email-sebastian.chlad@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Chaojie,
+Updated PICS, PIXITs and PTS tests results for A2DP.
+PTS version 5.3. Android version 4.4.4
+---
+ android/pics-a2dp.txt  | 2 +-
+ android/pixit-a2dp.txt | 2 +-
+ android/pts-a2dp.txt   | 4 ++--
+ 3 files changed, 4 insertions(+), 4 deletions(-)
 
-On Sat, Sep 27, 2014 at 11:26 AM, Gu, Chao Jie <chao.jie.gu@intel.com> wrote:
-> Hi Lukasz,
->
->> > +
->> > +bool bt_att_get_local_csrk(struct bt_att *att, uint8_t key[16],
->> > +                                       uint32_t *local_sign_cnt)
->>
->>
->> Why we need that get function ? If we assume that signing is done in bt_att then
->> there is need only to feed bt_att with the CSRK.
->>  BTW. There should be a way to set sign_cnt as well as this shall be in same
->> storage as CSRK
->>
->> I can guess that idea behind this bt_att_get_ is that client of bt_att should have
->> possibility to update its sign_cnt after each transaction.
->> It is in order to update storage. If so  I would propose to have some callback
->> registered in bt_att for this purpose.
->>
-> According to your proposal, I am not clear where and when you want to register
-> callback to get sign_cnt,
+diff --git a/android/pics-a2dp.txt b/android/pics-a2dp.txt
+index 782132c..adac664 100644
+--- a/android/pics-a2dp.txt
++++ b/android/pics-a2dp.txt
+@@ -1,6 +1,6 @@
+ A2DP PICS for the PTS tool.
+ 
+-PTS version: 5.2
++PTS version: 5.3
+ 
+ * - different than PTS defaults
+ # - not yet implemented/supported
+diff --git a/android/pixit-a2dp.txt b/android/pixit-a2dp.txt
+index b9984d3..3e26eac 100644
+--- a/android/pixit-a2dp.txt
++++ b/android/pixit-a2dp.txt
+@@ -1,6 +1,6 @@
+ A2DP PIXIT for the PTS tool.
+ 
+-PTS version: 5.2
++PTS version: 5.3
+ 
+ * - different than PTS defaults
+ & - should be set to IUT Bluetooth address
+diff --git a/android/pts-a2dp.txt b/android/pts-a2dp.txt
+index 8d61839..c3d04b2 100644
+--- a/android/pts-a2dp.txt
++++ b/android/pts-a2dp.txt
+@@ -1,7 +1,7 @@
+ PTS test results for A2DP
+ 
+-PTS version: 5.2
+-Tested: 02-September-2014
++PTS version: 5.3
++Tested: 26-September-2014
+ Android version: 4.4.4
+ 
+ Results:
+-- 
+1.8.5.3
 
-At the same time and from the same place where CSRK is provided to bt_att.
-I guess that both values (key and counter) will be stored in same database.
-
-> and I think register new callback for only one signed_cnt
-> Parameter, it make sense ?
-
-Why not? :)
-
->
-> In my thought , this method user also can get signd_cnt after signed_write_cmd.
-> In encode_pdu function, after we encode pdu with CSRK, then it will update sign_cnt
-> in the bt_att structure for next signed write command.
->
-> If client of bt_att need to update its sign_cnt in the storage, when bt_att_send for
-> SIGNED_WRITE_COMMAND return ture, user can call bt_att_get_local_csrk to
-> get newest sign_cnt and store it.
-
-The thing is that it is not "if".  We need to make sure that sign
-counter is updated in the database
-and I think that having callback is convenient for that. Of course you
-can have some helper which
-retrieves sign counter after each att transaction and then store it.
-
-We need to remember  that local sign counter is valid as long as CSRK
-is, so in order to do any sign write after
-reconnect we need to have updated sing counter, otherwise remote will
-reject write command.
-
-BR
-Lukasz
->
-> Best Regards
-> Chaojie Gu
