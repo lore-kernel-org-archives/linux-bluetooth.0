@@ -2,102 +2,112 @@ Return-Path: <cyrus@holtmann.org>
 From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH 6/6] shared/hfp: Wakeup writer and similar can use struct hfp now
-Date: Mon, 29 Sep 2014 15:47:18 +0200
-Message-Id: <1411998438-26914-8-git-send-email-lukasz.rymanowski@tieto.com>
+Subject: [PATCH 5/6] shared/hfp: Add helper to set disconnect handler
+Date: Mon, 29 Sep 2014 15:47:17 +0200
+Message-Id: <1411998438-26914-7-git-send-email-lukasz.rymanowski@tieto.com>
 In-Reply-To: <1411998438-26914-1-git-send-email-lukasz.rymanowski@tieto.com>
 References: <1411998438-26914-1-git-send-email-lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This is yet another patch of hfp cleanup as a preparation for hfp_hf
-role. Basically handling write can be done using struct hfp.
+This patch adds helper to set disconnect handler which takes struct hfp
+as the parameter. This helper will be used also by future hfp_hf.
 ---
- src/shared/hfp.c | 28 ++++++++++++++--------------
- 1 file changed, 14 insertions(+), 14 deletions(-)
+ src/shared/hfp.c | 59 ++++++++++++++++++++++++++++++++------------------------
+ 1 file changed, 34 insertions(+), 25 deletions(-)
 
 diff --git a/src/shared/hfp.c b/src/shared/hfp.c
-index a1af841..d467c52 100644
+index 5d1f007..a1af841 100644
 --- a/src/shared/hfp.c
 +++ b/src/shared/hfp.c
-@@ -107,39 +107,39 @@ static bool match_handler_prefix(const void *a, const void *b)
+@@ -777,53 +777,62 @@ bool hfp_gw_unregister(struct hfp_gw *hfp, const char *prefix)
  
- static void write_watch_destroy(void *user_data)
+ static void disconnect_watch_destroy(void *user_data)
  {
 -	struct hfp_gw *hfp = user_data;
 +	struct hfp *hfp = user_data;
  
--	hfp->hfp.writer_active = false;
-+	hfp->writer_active = false;
+-	if (hfp->hfp.disconnect_destroy)
+-		hfp->hfp.disconnect_destroy(hfp->hfp.disconnect_data);
++	if (hfp->disconnect_destroy)
++		hfp->disconnect_destroy(hfp->disconnect_data);
+ 
+-	if (hfp->hfp.destroyed)
++	if (hfp->destroyed)
+ 		free(hfp);
  }
  
- static bool can_write_data(struct io *io, void *user_data)
+ static bool io_disconnected(struct io *io, void *user_data)
  {
 -	struct hfp_gw *hfp = user_data;
 +	struct hfp *hfp = user_data;
- 	ssize_t bytes_written;
  
--	bytes_written = ringbuf_write(hfp->hfp.write_buf, hfp->hfp.fd);
-+	bytes_written = ringbuf_write(hfp->write_buf, hfp->fd);
- 	if (bytes_written < 0)
- 		return false;
+-	hfp->hfp.in_disconnect = true;
++	hfp->in_disconnect = true;
  
--	if (ringbuf_len(hfp->hfp.write_buf) > 0)
-+	if (ringbuf_len(hfp->write_buf) > 0)
- 		return true;
+-	if (hfp->hfp.disconnect_callback)
+-		hfp->hfp.disconnect_callback(hfp->hfp.disconnect_data);
++	if (hfp->disconnect_callback)
++		hfp->disconnect_callback(hfp->disconnect_data);
+ 
+-	hfp->hfp.in_disconnect = false;
++	hfp->in_disconnect = false;
  
  	return false;
  }
  
--static void wakeup_writer(struct hfp_gw *hfp)
-+static void wakeup_writer(struct hfp *hfp)
+-bool hfp_gw_set_disconnect_handler(struct hfp_gw *hfp,
+-					hfp_disconnect_func_t callback,
+-					void *user_data,
+-					hfp_destroy_func_t destroy)
++static bool set_disconnect_handler(struct hfp *hfp,
++						hfp_disconnect_func_t callback,
++						void *user_data,
++						hfp_destroy_func_t destroy)
  {
--	if (hfp->hfp.writer_active)
-+	if (hfp->writer_active)
- 		return;
+-	if (!hfp)
+-		return false;
++	if (hfp->disconnect_destroy)
++		hfp->disconnect_destroy(hfp->disconnect_data);
  
--	if (!ringbuf_len(hfp->hfp.write_buf))
-+	if (!ringbuf_len(hfp->write_buf))
- 		return;
- 
--	if (!io_set_write_handler(hfp->hfp.io, can_write_data,
--					hfp, write_watch_destroy))
-+	if (!io_set_write_handler(hfp->io, can_write_data,
-+						hfp, write_watch_destroy))
- 		return;
- 
--	hfp->hfp.writer_active = true;
-+	hfp->writer_active = true;
- }
- 
- static void skip_whitespace(struct hfp_gw_result *result)
-@@ -655,7 +655,7 @@ bool hfp_gw_send_result(struct hfp_gw *hfp, enum hfp_result result)
- 	if (ringbuf_printf(hfp->hfp.write_buf, "\r\n%s\r\n", str) < 0)
+-	if (hfp->hfp.disconnect_destroy)
+-		hfp->hfp.disconnect_destroy(hfp->hfp.disconnect_data);
+-
+-	if (!io_set_disconnect_handler(hfp->hfp.io, io_disconnected, hfp,
++	if (!io_set_disconnect_handler(hfp->io, io_disconnected, hfp,
+ 						disconnect_watch_destroy)) {
+-		hfp->hfp.disconnect_callback = NULL;
+-		hfp->hfp.disconnect_destroy = NULL;
+-		hfp->hfp.disconnect_data = NULL;
++		hfp->disconnect_callback = NULL;
++		hfp->disconnect_destroy = NULL;
++		hfp->disconnect_data = NULL;
  		return false;
+ 	}
  
--	wakeup_writer(hfp);
-+	wakeup_writer(&hfp->hfp);
- 
- 	hfp->result_pending = false;
- 
-@@ -670,7 +670,7 @@ bool hfp_gw_send_error(struct hfp_gw *hfp, enum hfp_error error)
- 	if (ringbuf_printf(hfp->hfp.write_buf, "\r\n+CME ERROR: %u\r\n", error) < 0)
- 		return false;
- 
--	wakeup_writer(hfp);
-+	wakeup_writer(&hfp->hfp);
- 
- 	hfp->result_pending = false;
- 
-@@ -701,7 +701,7 @@ bool hfp_gw_send_info(struct hfp_gw *hfp, const char *format, ...)
- 	if (hfp->result_pending)
- 		return true;
- 
--	wakeup_writer(hfp);
-+	wakeup_writer(&hfp->hfp);
+-	hfp->hfp.disconnect_callback = callback;
+-	hfp->hfp.disconnect_destroy = destroy;
+-	hfp->hfp.disconnect_data = user_data;
++	hfp->disconnect_callback = callback;
++	hfp->disconnect_destroy = destroy;
++	hfp->disconnect_data = user_data;
  
  	return true;
++
++}
++
++bool hfp_gw_set_disconnect_handler(struct hfp_gw *hfp,
++					hfp_disconnect_func_t callback,
++					void *user_data,
++					hfp_destroy_func_t destroy)
++{
++	if (!hfp)
++		return false;
++
++	return set_disconnect_handler(&hfp->hfp, callback, user_data, destroy);
  }
+ 
+ bool hfp_gw_disconnect(struct hfp_gw *hfp)
 -- 
 1.8.4
 
