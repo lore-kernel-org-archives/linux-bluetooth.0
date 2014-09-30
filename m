@@ -1,83 +1,141 @@
 Return-Path: <cyrus@holtmann.org>
+Message-ID: <542A9B83.9040709@tieto.com>
+Date: Tue, 30 Sep 2014 14:01:07 +0200
+From: Tyszkowski Jakub <jakub.tyszkowski@tieto.com>
 MIME-Version: 1.0
-In-Reply-To: <542A9706.6000504@tieto.com>
-References: <1411713077-19757-1-git-send-email-jakub.tyszkowski@tieto.com>
-	<1411713077-19757-2-git-send-email-jakub.tyszkowski@tieto.com>
-	<CABBYNZJwTo-hQ4LuaxbmQt8WGoPCrM-a_W1NQdf8AvJboNyu2w@mail.gmail.com>
-	<542A9706.6000504@tieto.com>
-Date: Tue, 30 Sep 2014 15:10:30 +0300
-Message-ID: <CABBYNZKQRr8JCcq_Qgp8rrALiN1sHNNDv9ukvBsaMYsGOyM3Vw@mail.gmail.com>
-Subject: Re: [PATCHv2 01/16] android/tester: Expose gatt-tester's pdu
- definition to other testers
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Tyszkowski Jakub <jakub.tyszkowski@tieto.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+To: Szymon Janc <szymon.janc@tieto.com>
+CC: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCHv2 05/16] android/tester: Make HidHost tests use generic
+ pdu struct
+References: <1411713077-19757-1-git-send-email-jakub.tyszkowski@tieto.com> <1411713077-19757-6-git-send-email-jakub.tyszkowski@tieto.com> <8408756.jLWkblRn5T@uw000953>
+In-Reply-To: <8408756.jLWkblRn5T@uw000953>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jakub,
+Hi Szymon,
 
-On Tue, Sep 30, 2014 at 2:41 PM, Tyszkowski Jakub
-<jakub.tyszkowski@tieto.com> wrote:
->>> +struct pdu {
->>> +       uint8_t *data;
->>> +       uint16_t size;
->>
->>
->> The size should probably be size_t, or even better use struct iovec
->> directly here since it is about the same.
+On 09/30/2014 11:40 AM, Szymon Janc wrote:
+> Hi Jakub,
 >
->
-> I wouldn't go that far and use iovec's here.
->
-> I actually had one patch on top of this set which replaces this struct with
-> iovec but in the end the only benefit was one struct definition less as
-> bthost API does not take iovecs:
-
-Im working on it already, internally bthost already uses iovec so it
-makes sense to expose it if we can benefit from it.
-
-> void bthost_send_cid(struct bthost *bthost, uint16_t handle,
->                         uint16_t cid, const void *data, uint16_t len)
->
-> And this function is also a reason for 'size' being uint16_t.
->
-> BTW I think 'pdu.data' looks better than 'pdu.iov_base' and we shouldn't
-> make it look more complicated than it is without the real benefit.
-
-Well this is not exactly the point, it might look better but struct
-iovec is a standard interface so it only make sense to introduce
-another design if the standard does not attend our needs which does
-not seems to be the case here.
-
+> On Friday 26 of September 2014 08:31:06 Jakub Tyszkowski wrote:
+>> ---
+>>   android/tester-hidhost.c | 41 +++++++++++++++++------------------------
+>>   1 file changed, 17 insertions(+), 24 deletions(-)
 >>
->>> +};
->>> +
->>> +#define raw_data(args...) ((unsigned char[]) { args })
->>> +
->>> +#define raw_pdu(args...)                                       \
->>> +       {                                                       \
->>> +               .data = raw_data(args),                         \
->>> +               .size = sizeof(raw_data(args)),                 \
->>> +       }
->>> +
->>> +#define null_pdu { .data = NULL }
->>> +
->>>   #define TEST_CASE_BREDR(text, ...) { \
->>>                  HCIEMU_TYPE_BREDR, \
->>>                  text, \
->>> --
->>> 1.9.1
+>> diff --git a/android/tester-hidhost.c b/android/tester-hidhost.c
+>> index c7e3a67..0fe9c0a 100644
+>> --- a/android/tester-hidhost.c
+>> +++ b/android/tester-hidhost.c
+>> @@ -21,6 +21,7 @@
+>>   #include "tester-main.h"
 >>
+>>   #include "android/utils.h"
+>> +#include "src/shared/util.h"
+>
+> Is this needed?
+>
+
+Not really. Ill fix that.
+
+>>   #define HID_GET_REPORT_PROTOCOL		0x60
+>>   #define HID_GET_BOOT_PROTOCOL		0x61
+>> @@ -59,14 +60,16 @@ struct emu_cid_data {
 >>
+>>   static struct emu_cid_data cid_data;
 >>
+>> -static const uint8_t did_req_pdu[] = { 0x06, /* PDU id */
+>> +static struct pdu did_req_pdu = raw_pdu(
+>> +			0x06, /* PDU id */
+>>   			0x00, 0x00, /* Transaction id */
+>>   			0x00, 0x0f, /* Req length */
+>>   			0x35, 0x03, /* Attributes length */
+>>   			0x19, 0x12, 0x00, 0xff, 0xff, 0x35, 0x05, 0x0a, 0x00,
+>> -			0x00, 0xff, 0xff, 0x00 }; /* no continuation */
+>> +			0x00, 0xff, 0xff, 0x00); /* no continuation */
+>>
+>> -static const uint8_t did_rsp_pdu[] = { 0x07, /* PDU id */
+>> +static struct pdu did_rsp_pdu = raw_pdu(
+>> +			0x07, /* PDU id */
+>>   			0x00, 0x00, /* Transaction id */
+>>   			0x00, 0x4f, /* Response length */
+>>   			0x00, 0x4c, /* Attributes length */
+>> @@ -79,9 +82,10 @@ static const uint8_t did_rsp_pdu[] = { 0x07, /* PDU id */
+>>   			0x02, 0x02, 0x09, 0x02, 0x46, 0x09, 0x02, 0x03, 0x09,
+>>   			0x05, 0x0e, 0x09, 0x02, 0x04, 0x28, 0x01, 0x09, 0x02,
+>>   			0x05, 0x09, 0x00, 0x02,
+>> -			0x00 }; /* no continuation */
+>> +			0x00); /* no continuation */
+>>
+>> -static const uint8_t hid_rsp_pdu[] = { 0x07, /* PDU id */
+>> +static struct pdu hid_rsp_pdu = raw_pdu(
+>> +			0x07, /* PDU id */
+>>   			0x00, 0x01, /* Transaction id */
+>>   			0x01, 0x71, /* Response length */
+>>   			0x01, 0x6E, /* Attributes length */
+>> @@ -126,7 +130,7 @@ static const uint8_t hid_rsp_pdu[] = { 0x07, /* PDU id */
+>>   			0x28, 0x01, 0x09, 0x02, 0x0b, 0x09, 0x01, 0x00, 0x09,
+>>   			0x02, 0x0c, 0x09, 0x0c, 0x80, 0x09, 0x02, 0x0d, 0x28,
+>>   			0x00, 0x09, 0x02, 0x0e, 0x28, 0x01,
+>> -			0x00 }; /* no continuation */
+>> +			0x00); /* no continuation */
+>>
+>>   static void hid_sdp_cid_hook_cb(const void *data, uint16_t len, void *user_data)
+>>   {
+>> @@ -134,14 +138,14 @@ static void hid_sdp_cid_hook_cb(const void *data, uint16_t len, void *user_data)
+>>   	struct bthost *bthost = hciemu_client_get_host(t_data->hciemu);
+>>   	struct emu_cid_data *cid_data = user_data;
+>>
+>> -	if (!memcmp(did_req_pdu, data, len)) {
+>> +	if (!memcmp(did_req_pdu.data, data, len)) {
+>>   		bthost_send_cid(bthost, cid_data->sdp_handle, cid_data->sdp_cid,
+>> -					did_rsp_pdu, sizeof(did_rsp_pdu));
+>> +					did_rsp_pdu.data, did_rsp_pdu.size);
+>>   		return;
+>>   	}
+>>
+>>   	bthost_send_cid(bthost, cid_data->sdp_handle, cid_data->sdp_cid,
+>> -					hid_rsp_pdu, sizeof(hid_rsp_pdu));
+>> +					hid_rsp_pdu.data, hid_rsp_pdu.size);
+>>   }
+>>   static void hid_sdp_search_cb(uint16_t handle, uint16_t cid, void *user_data)
+>>   {
+>> @@ -159,31 +163,20 @@ static void hid_prepare_reply_protocol_mode(struct emu_cid_data *cid_data)
+>>   {
+>>   	struct test_data *t_data = tester_get_data();
+>>   	struct bthost *bthost = hciemu_client_get_host(t_data->hciemu);
+>> -	uint8_t pdu[2] = { 0, 0 };
+>> -	uint16_t pdu_len = 0;
+>> -
+>> -	pdu_len = 2;
+>> -	pdu[0] = 0xa0;
+>> -	pdu[1] = 0x00;
+>> +	const struct pdu pdu = raw_pdu(0xa0, 0x00);
+>>
+>>   	bthost_send_cid(bthost, cid_data->ctrl_handle, cid_data->ctrl_cid,
+>> -							(void *)pdu, pdu_len);
+>> +							pdu.data, pdu.size);
+>>   }
+>>
+>>   static void hid_prepare_reply_report(struct emu_cid_data *cid_data)
+>>   {
+>>   	struct test_data *t_data = tester_get_data();
+>>   	struct bthost *bthost = hciemu_client_get_host(t_data->hciemu);
+>> -	uint8_t pdu[3] = { 0, 0, 0 };
+>> -	uint16_t pdu_len = 0;
+>> -
+>> -	pdu_len = 3;
+>> -	pdu[0] = 0xa2;
+>> -	pdu[1] = 0x01;
+>> -	pdu[2] = 0x00;
+>> +	const struct pdu pdu = raw_pdu(0xa2, 0x01, 0x00);
+>>
+>>   	bthost_send_cid(bthost, cid_data->ctrl_handle, cid_data->ctrl_cid,
+>> -							(void *)pdu, pdu_len);
+>> +							pdu.data, pdu.size);
+>>   }
+>>
+>>   static void hid_ctrl_cid_hook_cb(const void *data, uint16_t len,
 >>
 >
-> Regards,
-> Jakub
 
-
-
--- 
-Luiz Augusto von Dentz
