@@ -1,195 +1,143 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 2/3] emulator/bthost: Refactor code using RFCOMM_UIH
-Date: Tue, 30 Sep 2014 17:19:54 +0300
-Message-Id: <1412086795-25000-2-git-send-email-luiz.dentz@gmail.com>
-In-Reply-To: <1412086795-25000-1-git-send-email-luiz.dentz@gmail.com>
-References: <1412086795-25000-1-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 1/3] emulator/bthost: Avoid coping in l2cap_sig_send
+Date: Tue, 30 Sep 2014 17:19:53 +0300
+Message-Id: <1412086795-25000-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This refactor code that was using RFCOMM_UIH so it can be reused.
+This uses scatter io to avoid extra copies inside l2cap_sig_send
 ---
- emulator/bthost.c | 125 +++++++++++++++++++++++++-----------------------------
- 1 file changed, 57 insertions(+), 68 deletions(-)
+ emulator/bthost.c | 75 +++++++++++++++++++++++++++++++------------------------
+ 1 file changed, 42 insertions(+), 33 deletions(-)
 
 diff --git a/emulator/bthost.c b/emulator/bthost.c
-index 8d06de9..30a612e 100644
+index 22bdca5..8d06de9 100644
 --- a/emulator/bthost.c
 +++ b/emulator/bthost.c
-@@ -1726,6 +1726,39 @@ static void rfcomm_disc_recv(struct bthost *bthost, struct btconn *conn,
- 	rfcomm_ua_send(bthost, conn, l2conn, 0, dlci);
+@@ -484,38 +484,48 @@ static void send_packet(struct bthost *bthost, const struct iovec *iov,
+ 	bthost->send_handler(iov, iovlen, bthost->send_data);
  }
  
-+static void rfcomm_uih_send(struct bthost *bthost, struct btconn *conn,
-+				struct l2conn *l2conn, uint8_t address,
-+				uint8_t type, const void *data, uint16_t len)
-+{
-+	struct rfcomm_hdr hdr;
-+	struct rfcomm_mcc mcc;
-+	uint8_t fcs;
-+	struct iovec iov[4];
+-static void send_acl(struct bthost *bthost, uint16_t handle, uint16_t cid,
+-						const void *data, uint16_t len)
++static void send_iov(struct bthost *bthost, uint16_t handle, uint16_t cid,
++					const struct iovec *iov, int iovcnt)
+ {
+ 	struct bt_hci_acl_hdr acl_hdr;
+ 	struct bt_l2cap_hdr l2_hdr;
+ 	uint8_t pkt = BT_H4_ACL_PKT;
+-	struct iovec iov[4];
++	struct iovec pdu[3 + iovcnt];
++	int i, len = 0;
+ 
+-	iov[0].iov_base = &pkt;
+-	iov[0].iov_len = sizeof(pkt);
++	for (i = 0; i < iovcnt; i++) {
++		pdu[3 + i].iov_base = iov[i].iov_base;
++		pdu[3 + i].iov_len = iov[i].iov_len;
++		len += iov[i].iov_len;
++	}
 +
-+	hdr.address = address;
-+	hdr.control = RFCOMM_CTRL(RFCOMM_UIH, 0);
-+	hdr.length  = RFCOMM_LEN8(sizeof(mcc) + len);
-+
-+	iov[0].iov_base = &hdr;
-+	iov[0].iov_len = sizeof(hdr);
-+
-+	mcc.type = type;
-+	mcc.length = RFCOMM_LEN8(len);
-+
-+	iov[1].iov_base = &mcc;
-+	iov[1].iov_len = sizeof(mcc);
-+
-+	iov[2].iov_base = (void *) data;
-+	iov[2].iov_len = len;
-+
-+	fcs = rfcomm_fcs((uint8_t *) &hdr);
-+
-+	iov[3].iov_base = &fcs;
-+	iov[3].iov_len = sizeof(fcs);
-+
-+	send_iov(bthost, conn->handle, l2conn->dcid, iov, 4);
++	pdu[0].iov_base = &pkt;
++	pdu[0].iov_len = sizeof(pkt);
+ 
+ 	acl_hdr.handle = acl_handle_pack(handle, 0);
+ 	acl_hdr.dlen = cpu_to_le16(len + sizeof(l2_hdr));
+ 
+-	iov[1].iov_base = &acl_hdr;
+-	iov[1].iov_len = sizeof(acl_hdr);
++	pdu[1].iov_base = &acl_hdr;
++	pdu[1].iov_len = sizeof(acl_hdr);
+ 
+ 	l2_hdr.cid = cpu_to_le16(cid);
+ 	l2_hdr.len = cpu_to_le16(len);
+ 
+-	iov[2].iov_base = &l2_hdr;
+-	iov[2].iov_len = sizeof(l2_hdr);
++	pdu[2].iov_base = &l2_hdr;
++	pdu[2].iov_len = sizeof(l2_hdr);
+ 
+-	if (len == 0) {
+-		send_packet(bthost, iov, 3);
+-		return;
+-	}
++	send_packet(bthost, pdu, 3 + iovcnt);
 +}
+ 
+-	iov[3].iov_base = (void *) data;
+-	iov[3].iov_len = len;
++static void send_acl(struct bthost *bthost, uint16_t handle, uint16_t cid,
++						const void *data, uint16_t len)
++{
++	struct iovec iov;
+ 
+-	send_packet(bthost, iov, 4);
++	iov.iov_base = (void *) data;
++	iov.iov_len = len;
 +
- static void rfcomm_ua_recv(struct bthost *bthost, struct btconn *conn,
- 				struct l2conn *l2conn, const void *data,
- 				uint16_t len)
-@@ -1734,10 +1767,7 @@ static void rfcomm_ua_recv(struct bthost *bthost, struct btconn *conn,
- 	uint8_t channel;
- 	struct rfcomm_connection_data *conn_data = bthost->rfcomm_conn_data;
- 	uint8_t type;
--	uint8_t buf[14];
--	struct rfcomm_hdr *hdr;
--	struct rfcomm_mcc *mcc;
--	struct rfcomm_pn *pn_cmd;
-+	struct rfcomm_pn pn_cmd;
- 
- 	if (len < sizeof(*ua_hdr))
- 		return;
-@@ -1760,29 +1790,15 @@ static void rfcomm_ua_recv(struct bthost *bthost, struct btconn *conn,
- 
- 	bthost_add_rfcomm_conn(bthost, conn, l2conn, channel);
- 
--	memset(buf, 0, sizeof(buf));
--
--	hdr = (struct rfcomm_hdr *) buf;
--	mcc = (struct rfcomm_mcc *) (buf + sizeof(*hdr));
--	pn_cmd = (struct rfcomm_pn *) (buf + sizeof(*hdr) + sizeof(*mcc));
-+	pn_cmd.dlci = conn_data->channel * 2;
-+	pn_cmd.priority = 7;
-+	pn_cmd.ack_timer = 0;
-+	pn_cmd.max_retrans = 0;
-+	pn_cmd.mtu = 667;
-+	pn_cmd.credits = 7;
- 
--	hdr->address = RFCOMM_ADDR(1, 0);
--	hdr->control = RFCOMM_CTRL(RFCOMM_UIH, 0);
--	hdr->length  = RFCOMM_LEN8(sizeof(*mcc) + sizeof(*pn_cmd));
--
--	mcc->type = RFCOMM_MCC_TYPE(1, RFCOMM_PN);
--	mcc->length = RFCOMM_LEN8(sizeof(*pn_cmd));
--
--	pn_cmd->dlci = conn_data->channel * 2;
--	pn_cmd->priority = 7;
--	pn_cmd->ack_timer = 0;
--	pn_cmd->max_retrans = 0;
--	pn_cmd->mtu = 667;
--	pn_cmd->credits = 7;
--
--	buf[sizeof(*hdr) + sizeof(*mcc) + sizeof(*pn_cmd)] = rfcomm_fcs(buf);
--
--	send_acl(bthost, conn->handle, l2conn->dcid, buf, sizeof(buf));
-+	rfcomm_uih_send(bthost, conn, l2conn, RFCOMM_ADDR(1, 0),
-+			RFCOMM_MCC_TYPE(1, RFCOMM_PN), &pn_cmd, sizeof(pn_cmd));
++	send_iov(bthost, handle, cid, &iov, 1);
  }
  
- static void rfcomm_dm_recv(struct bthost *bthost, struct btconn *conn,
-@@ -1811,34 +1827,21 @@ static void rfcomm_msc_recv(struct bthost *bthost, struct btconn *conn,
- 					struct l2conn *l2conn, uint8_t cr,
- 					const struct rfcomm_msc *msc)
+ static uint8_t l2cap_sig_send(struct bthost *bthost, struct btconn *conn,
+@@ -523,15 +533,9 @@ static uint8_t l2cap_sig_send(struct bthost *bthost, struct btconn *conn,
+ 					const void *data, uint16_t len)
  {
--	uint8_t buf[8];
--	struct rfcomm_hdr *hdr = (struct rfcomm_hdr *) buf;
--	struct rfcomm_mcc *mcc = (struct rfcomm_mcc *) (buf + sizeof(*hdr));
--	struct rfcomm_msc *msc_cmd = (struct rfcomm_msc *) (buf +
--								sizeof(*hdr) +
--								sizeof(*mcc));
+ 	static uint8_t next_ident = 1;
+-	struct bt_l2cap_hdr_sig *hdr;
+-	uint16_t pkt_len, cid;
+-	void *pkt_data;
 -
--	hdr->address = RFCOMM_ADDR(0, 0);
--	hdr->control = RFCOMM_CTRL(RFCOMM_UIH, 0);
--	hdr->length  = RFCOMM_LEN8(sizeof(*mcc) + sizeof(*msc));
--	mcc->type = RFCOMM_MCC_TYPE(cr, RFCOMM_MSC);
--	mcc->length = RFCOMM_LEN8(sizeof(*msc));
-+	struct rfcomm_msc msc_cmd;
+-	pkt_len = sizeof(*hdr) + len;
+-
+-	pkt_data = malloc(pkt_len);
+-	if (!pkt_data)
+-		return 0;
++	struct bt_l2cap_hdr_sig hdr;
++	uint16_t cid;
++	struct iovec iov[2];
  
--	msc_cmd->dlci = msc->dlci;
--	msc_cmd->v24_sig = msc->v24_sig;
--	buf[sizeof(*hdr) + sizeof(*mcc) + sizeof(*msc_cmd)] = rfcomm_fcs(buf);
-+	msc_cmd.dlci = msc->dlci;
-+	msc_cmd.v24_sig = msc->v24_sig;
- 
--	send_acl(bthost, conn->handle, l2conn->dcid, buf, sizeof(buf));
-+	rfcomm_uih_send(bthost, conn, l2conn, RFCOMM_ADDR(0, 0),
-+				RFCOMM_MCC_TYPE(cr, RFCOMM_MSC), &msc_cmd,
-+				sizeof(msc_cmd));
- }
- 
- static void rfcomm_pn_recv(struct bthost *bthost, struct btconn *conn,
- 					struct l2conn *l2conn, uint8_t cr,
- 					const struct rfcomm_pn *pn)
- {
--	uint8_t buf[14];
--	struct rfcomm_hdr *hdr;
--	struct rfcomm_mcc *mcc;
--	struct rfcomm_pn *pn_cmd;
-+	struct rfcomm_pn pn_cmd;
- 
- 	if (!cr) {
- 		rfcomm_sabm_send(bthost, conn, l2conn, 1,
-@@ -1846,29 +1849,15 @@ static void rfcomm_pn_recv(struct bthost *bthost, struct btconn *conn,
- 		return;
+ 	if (!ident) {
+ 		ident = next_ident++;
+@@ -539,22 +543,27 @@ static uint8_t l2cap_sig_send(struct bthost *bthost, struct btconn *conn,
+ 			ident = next_ident++;
  	}
  
--	hdr = (struct rfcomm_hdr *) buf;
--	mcc = (struct rfcomm_mcc *) (buf + sizeof(*hdr));
--	pn_cmd = (struct rfcomm_pn *) (buf + sizeof(*hdr) + sizeof(*mcc));
--
--	memset(buf, 0, sizeof(buf));
--
--	hdr->address = RFCOMM_ADDR(1, 0);
--	hdr->control = RFCOMM_CTRL(RFCOMM_UIH, 0);
--	hdr->length  = RFCOMM_LEN8(sizeof(*mcc) + sizeof(*pn_cmd));
--
--	mcc->type = RFCOMM_MCC_TYPE(0, RFCOMM_PN);
--	mcc->length = RFCOMM_LEN8(sizeof(*pn_cmd));
--
--	pn_cmd->dlci = pn->dlci;
--	pn_cmd->priority = pn->priority;
--	pn_cmd->ack_timer = pn->ack_timer;
--	pn_cmd->max_retrans = pn->max_retrans;
--	pn_cmd->mtu = pn->mtu;
--	pn_cmd->credits = pn->credits;
--
--	buf[sizeof(*hdr) + sizeof(*mcc) + sizeof(*pn_cmd)] = rfcomm_fcs(buf);
-+	pn_cmd.dlci = pn->dlci;
-+	pn_cmd.priority = pn->priority;
-+	pn_cmd.ack_timer = pn->ack_timer;
-+	pn_cmd.max_retrans = pn->max_retrans;
-+	pn_cmd.mtu = pn->mtu;
-+	pn_cmd.credits = pn->credits;
+-	hdr = pkt_data;
+-	hdr->code  = code;
+-	hdr->ident = ident;
+-	hdr->len   = cpu_to_le16(len);
++	hdr.code  = code;
++	hdr.ident = ident;
++	hdr.len   = cpu_to_le16(len);
  
--	send_acl(bthost, conn->handle, l2conn->dcid, buf, sizeof(buf));
-+	rfcomm_uih_send(bthost, conn, l2conn, RFCOMM_ADDR(1, 0),
-+			RFCOMM_MCC_TYPE(0, RFCOMM_PN), &pn_cmd, sizeof(pn_cmd));
+-	if (len > 0)
+-		memcpy(pkt_data + sizeof(*hdr), data, len);
++	iov[0].iov_base = &hdr;
++	iov[0].iov_len = sizeof(hdr);
+ 
+ 	if (conn->addr_type == BDADDR_BREDR)
+ 		cid = 0x0001;
+ 	else
+ 		cid = 0x0005;
+ 
+-	send_acl(bthost, conn->handle, cid, pkt_data, pkt_len);
++	if (len == 0) {
++		send_iov(bthost, conn->handle, cid, iov, 1);
++		return ident;
++	}
++
++	iov[1].iov_base = (void *) data;
++	iov[1].iov_len = len;
+ 
+-	free(pkt_data);
++	send_iov(bthost, conn->handle, cid, iov, 2);
+ 
+ 	return ident;
  }
- 
- static void rfcomm_mcc_recv(struct bthost *bthost, struct btconn *conn,
 -- 
 1.9.3
 
