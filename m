@@ -1,296 +1,77 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <542A9706.6000504@tieto.com>
-Date: Tue, 30 Sep 2014 13:41:58 +0200
-From: Tyszkowski Jakub <jakub.tyszkowski@tieto.com>
-MIME-Version: 1.0
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCHv2 01/16] android/tester: Expose gatt-tester's pdu definition
- to other testers
-References: <1411713077-19757-1-git-send-email-jakub.tyszkowski@tieto.com>	<1411713077-19757-2-git-send-email-jakub.tyszkowski@tieto.com> <CABBYNZJwTo-hQ4LuaxbmQt8WGoPCrM-a_W1NQdf8AvJboNyu2w@mail.gmail.com>
-In-Reply-To: <CABBYNZJwTo-hQ4LuaxbmQt8WGoPCrM-a_W1NQdf8AvJboNyu2w@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH 5/6] android/tester: Add GATT server disconnect successful test case
+Date: Tue, 30 Sep 2014 13:23:46 +0200
+Message-Id: <1412076227-32664-5-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+In-Reply-To: <1412076227-32664-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+References: <1412076227-32664-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+It will connect to powered on and visible device then disconnect.
+---
+ android/tester-gatt.c | 40 ++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 40 insertions(+)
 
-On 09/30/2014 12:08 PM, Luiz Augusto von Dentz wrote:
-> Hi Jakub,
->
-> On Fri, Sep 26, 2014 at 9:31 AM, Jakub Tyszkowski
-> <jakub.tyszkowski@tieto.com> wrote:
->> This is not to reinvent this mechanism again for every tester that needs
->> to send raw pdu data.
->>
->> 'end_pdu' was renamed to 'null_pdu' to better fit also as request pdu in
->> 'pdu_set' structure while setting the response not null.
->>
->> This mechanism can be used later to send response regardles of data that
->> came with request on this specific CID. This will siplify responding to
->> sdp request without defining request pdus.
->> ---
->>   android/tester-a2dp.c  |  2 +-
->>   android/tester-avrcp.c |  2 +-
->>   android/tester-gatt.c  | 49 +++++++++++++++++--------------------------------
->>   android/tester-main.h  | 15 +++++++++++++++
->>   4 files changed, 34 insertions(+), 34 deletions(-)
->>
->> diff --git a/android/tester-a2dp.c b/android/tester-a2dp.c
->> index 1b2a8ce..ab3936e 100644
->> --- a/android/tester-a2dp.c
->> +++ b/android/tester-a2dp.c
->> @@ -50,7 +50,7 @@ static const uint8_t rsp_start[] = { 0x42, 0x07 };
->>   static const uint8_t req_suspend[] = { 0x50, 0x09, 0x04 };
->>   static const uint8_t rsp_suspend[] = { 0x52, 0x09 };
->>
->> -const struct pdu {
->> +const struct pdu_set {
->>          const uint8_t *req;
->>          size_t req_len;
->>          const uint8_t *rsp;
->> diff --git a/android/tester-avrcp.c b/android/tester-avrcp.c
->> index 07b95f5..b539e0e 100644
->> --- a/android/tester-avrcp.c
->> +++ b/android/tester-avrcp.c
->> @@ -71,7 +71,7 @@ static const uint8_t rsp_start[] = { 0x42, 0x07 };
->>   static const uint8_t req_suspend[] = { 0x50, 0x09, 0x04 };
->>   static const uint8_t rsp_suspend[] = { 0x52, 0x09 };
->>
->> -static const struct pdu {
->> +static const struct pdu_set {
->>          const uint8_t *req;
->>          size_t req_len;
->>          const uint8_t *rsp;
->> diff --git a/android/tester-gatt.c b/android/tester-gatt.c
->> index 5d18bf0..ccc8e24 100644
->> --- a/android/tester-gatt.c
->> +++ b/android/tester-gatt.c
->> @@ -34,23 +34,8 @@
->>   #define CONN1_ID       1
->>   #define CONN2_ID       2
->>
->> -#define data(args...) ((const unsigned char[]) { args })
->> -
->> -#define raw_pdu(args...)                                       \
->> -       {                                                       \
->> -               .data = data(args),                             \
->> -               .size = sizeof(data(args)),                     \
->> -       }
->> -
->> -#define end_pdu { .data = NULL }
->> -
->>   static struct queue *list; /* List of gatt test cases */
->>
->> -struct pdu {
->> -       const uint8_t *data;
->> -       uint16_t size;
->> -};
->> -
->>   static bt_uuid_t client_app_uuid = {
->>          .uu = { 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01,
->>                                  0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01 },
->> @@ -397,7 +382,7 @@ static struct pdu search_service[] = {
->>          raw_pdu(0x11, 0x06, 0x01, 0x00, 0x10, 0x00, 0x00, 0x18),
->>          raw_pdu(0x10, 0x11, 0x00, 0xff, 0xff, 0x00, 0x28),
->>          raw_pdu(0x01, 0x10, 0x11, 0x00, 0x0a),
->> -       end_pdu
->> +       null_pdu
->>   };
->>
->>   static struct pdu search_service_2[] = {
->> @@ -407,13 +392,13 @@ static struct pdu search_service_2[] = {
->>          raw_pdu(0x11, 0x06, 0x11, 0x00, 0x20, 0x00, 0x01, 0x18),
->>          raw_pdu(0x10, 0x21, 0x00, 0xff, 0xff, 0x00, 0x28),
->>          raw_pdu(0x01, 0x10, 0x21, 0x00, 0x0a),
->> -       end_pdu
->> +       null_pdu
->>   };
->>
->>   static struct pdu search_service_3[] = {
->>          raw_pdu(0x10, 0x01, 0x00, 0xff, 0xff, 0x00, 0x28),
->>          raw_pdu(0x01, 0x08, 0x01, 0x00, 0x0a),
->> -       end_pdu
->> +       null_pdu
->>   };
->>
->>   static struct pdu get_characteristic_1[] = {
->> @@ -425,7 +410,7 @@ static struct pdu get_characteristic_1[] = {
->>          raw_pdu(0x09, 0x07, 0x02, 0x00, 0x04, 0x00, 0x00, 0x19, 0x00),
->>          raw_pdu(0x08, 0x03, 0x00, 0x10, 0x00, 0x03, 0x28),
->>          raw_pdu(0x01, 0x08, 0x03, 0x00, 0x0a),
->> -       end_pdu
->> +       null_pdu
->>   };
->>
->>   static struct pdu get_descriptor_1[] = {
->> @@ -441,7 +426,7 @@ static struct pdu get_descriptor_1[] = {
->>          raw_pdu(0x05, 0x01, 0x04, 0x00, 0x00, 0x29),
->>          raw_pdu(0x04, 0x05, 0x00, 0x10, 0x00),
->>          raw_pdu(0x01, 0x04, 0x05, 0x00, 0x0a),
->> -       end_pdu
->> +       null_pdu
->>   };
->>
->>   static struct pdu get_descriptor_2[] = {
->> @@ -457,7 +442,7 @@ static struct pdu get_descriptor_2[] = {
->>          raw_pdu(0x05, 0x01, 0x04, 0x00, 0x00, 0x29, 0x05, 0x00, 0x01, 0x29),
->>          raw_pdu(0x04, 0x06, 0x00, 0x10, 0x00),
->>          raw_pdu(0x01, 0x04, 0x06, 0x00, 0x0a),
->> -       end_pdu
->> +       null_pdu
->>   };
->>
->>   static struct pdu get_descriptor_3[] = {
->> @@ -471,7 +456,7 @@ static struct pdu get_descriptor_3[] = {
->>          raw_pdu(0x01, 0x08, 0x03, 0x00, 0x0a),
->>          raw_pdu(0x04, 0x01, 0x00, 0x10, 0x00),
->>          raw_pdu(0x01, 0x04, 0x01, 0x00, 0x0a),
->> -       end_pdu
->> +       null_pdu
->>   };
->>
->>   static struct pdu get_included_1[] = {
->> @@ -483,7 +468,7 @@ static struct pdu get_included_1[] = {
->>          raw_pdu(0x09, 0x08, 0x02, 0x00, 0x15, 0x00, 0x19, 0x00, 0xff, 0xfe),
->>          raw_pdu(0x08, 0x03, 0x00, 0x10, 0x00, 0x02, 0x28),
->>          raw_pdu(0x01, 0x08, 0x03, 0x00, 0x0a),
->> -       end_pdu
->> +       null_pdu
->>   };
->>
->>   static struct pdu get_included_2[] = {
->> @@ -498,7 +483,7 @@ static struct pdu get_included_2[] = {
->>                                  0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f, 0x10),
->>          raw_pdu(0x08, 0x03, 0x00, 0x10, 0x00, 0x02, 0x28),
->>          raw_pdu(0x01, 0x08, 0x03, 0x00, 0x0a),
->> -       end_pdu
->> +       null_pdu
->>   };
->>
->>   static struct pdu get_included_3[] = {
->> @@ -508,7 +493,7 @@ static struct pdu get_included_3[] = {
->>          raw_pdu(0x01, 0x11, 0x11, 0x00, 0x0a),
->>          raw_pdu(0x08, 0x01, 0x00, 0x10, 0x00, 0x02, 0x28),
->>          raw_pdu(0x01, 0x08, 0x01, 0x00, 0x0a),
->> -       end_pdu
->> +       null_pdu
->>   };
->>
->>   static struct pdu read_characteristic_1[] = {
->> @@ -522,7 +507,7 @@ static struct pdu read_characteristic_1[] = {
->>          raw_pdu(0x01, 0x08, 0x03, 0x00, 0x0a),
->>          raw_pdu(0x0a, 0x03, 0x00),
->>          raw_pdu(0x0b, 0x01),
->> -       end_pdu
->> +       null_pdu
->>   };
->>
->>   static struct pdu read_characteristic_2[] = {
->> @@ -536,7 +521,7 @@ static struct pdu read_characteristic_2[] = {
->>          raw_pdu(0x01, 0x08, 0x03, 0x00, 0x0a),
->>          raw_pdu(0x0a, 0x03, 0x00),
->>          raw_pdu(0x01, 0x0a, 0x03, 0x00, 0x08),
->> -       end_pdu
->> +       null_pdu
->>   };
->>
->>   static struct pdu read_descriptor_1[] = {
->> @@ -554,7 +539,7 @@ static struct pdu read_descriptor_1[] = {
->>          raw_pdu(0x01, 0x04, 0x05, 0x00, 0x0a),
->>          raw_pdu(0x0a, 0x04, 0x00),
->>          raw_pdu(0x0b, 0x01),
->> -       end_pdu
->> +       null_pdu
->>   };
->>
->>   static struct pdu read_descriptor_2[] = {
->> @@ -572,7 +557,7 @@ static struct pdu read_descriptor_2[] = {
->>          raw_pdu(0x01, 0x04, 0x05, 0x00, 0x0a),
->>          raw_pdu(0x0a, 0x04, 0x00),
->>          raw_pdu(0x01, 0x0a, 0x04, 0x00, 0x08),
->> -       end_pdu
->> +       null_pdu
->>   };
->>
->>   static struct pdu write_characteristic_1[] = {
->> @@ -585,7 +570,7 @@ static struct pdu write_characteristic_1[] = {
->>          raw_pdu(0x08, 0x03, 0x00, 0x10, 0x00, 0x03, 0x28),
->>          raw_pdu(0x01, 0x08, 0x03, 0x00, 0x0a),
->>          raw_pdu(0x52, 0x03, 0x00, 0x00, 0x01, 0x02, 0x03),
->> -       end_pdu
->> +       null_pdu
->>   };
->>
->>   static struct pdu write_characteristic_2[] = {
->> @@ -599,7 +584,7 @@ static struct pdu write_characteristic_2[] = {
->>          raw_pdu(0x01, 0x08, 0x03, 0x00, 0x0a),
->>          raw_pdu(0x12, 0x03, 0x00, 0x00, 0x01, 0x02, 0x03),
->>          raw_pdu(0x13),
->> -       end_pdu
->> +       null_pdu
->>   };
->>
->>   static struct pdu write_characteristic_3[] = {
->> @@ -613,7 +598,7 @@ static struct pdu write_characteristic_3[] = {
->>          raw_pdu(0x01, 0x08, 0x03, 0x00, 0x0a),
->>          raw_pdu(0x12, 0x03, 0x00, 0x00, 0x01, 0x02, 0x03),
->>          raw_pdu(0x01, 0x12, 0x03, 0x00, 0x08),
->> -       end_pdu
->> +       null_pdu
->>   };
->>
->>   static void gatt_client_register_action(void)
->> diff --git a/android/tester-main.h b/android/tester-main.h
->> index 6afc553..4cbc83f 100644
->> --- a/android/tester-main.h
->> +++ b/android/tester-main.h
->> @@ -55,6 +55,21 @@
->>   #include <hardware/bt_gatt_client.h>
->>   #include <hardware/bt_gatt_server.h>
->>
->> +struct pdu {
->> +       uint8_t *data;
->> +       uint16_t size;
->
-> The size should probably be size_t, or even better use struct iovec
-> directly here since it is about the same.
+diff --git a/android/tester-gatt.c b/android/tester-gatt.c
+index a8b62c5..75cab85 100644
+--- a/android/tester-gatt.c
++++ b/android/tester-gatt.c
+@@ -891,6 +891,21 @@ static void gatt_server_connect_action(void)
+ 	schedule_action_verification(step);
+ }
+ 
++static void gatt_server_disconnect_action(void)
++{
++	struct test_data *data = tester_get_data();
++	struct step *current_data_step = queue_peek_head(data->steps);
++	struct gatt_connect_data *conn_data = current_data_step->set_data;
++	struct step *step = g_new0(struct step, 1);
++
++	step->action_status = data->if_gatt->server->disconnect(
++							conn_data->app_id,
++							&emu_remote_bdaddr_val,
++							conn_data->conn_id);
++
++	schedule_action_verification(step);
++}
++
+ static void gatt_cid_hook_cb(const void *data, uint16_t len, void *user_data)
+ {
+ 	struct test_data *t_data = tester_get_data();
+@@ -1913,6 +1928,31 @@ static struct test_case test_cases[] = {
+ 		ACTION_SUCCESS(bluetooth_disable_action, NULL),
+ 		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_OFF),
+ 	),
++	TEST_CASE_BREDRLE("Gatt Server - LE Disconnect",
++		ACTION_SUCCESS(bluetooth_enable_action, NULL),
++		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_ON),
++		ACTION_SUCCESS(emu_setup_powered_remote_action, NULL),
++		ACTION_SUCCESS(emu_set_ssp_mode_action, NULL),
++		ACTION_SUCCESS(emu_set_connect_cb_action, gatt_conn_cb),
++		ACTION_SUCCESS(gatt_server_register_action, &app1_uuid),
++		CALLBACK_STATUS(CB_GATTS_REGISTER_SERVER, BT_STATUS_SUCCESS),
++		ACTION_SUCCESS(bt_start_discovery_action, NULL),
++		CALLBACK_STATE(CB_BT_DISCOVERY_STATE_CHANGED,
++							BT_DISCOVERY_STARTED),
++		CALLBACK_DEVICE_FOUND(prop_emu_remotes_default_le_set, 2),
++		ACTION_SUCCESS(bt_cancel_discovery_action, NULL),
++		ACTION_SUCCESS(gatt_server_connect_action, &app1_conn_req),
++		CALLBACK_GATTS_CONNECTION(GATT_SERVER_CONNECTED,
++						prop_emu_remotes_default_set,
++						CONN1_ID, APP1_ID),
++		ACTION_SUCCESS(gatt_server_disconnect_action,
++							&app1_conn_req),
++		CALLBACK_GATTS_CONNECTION(GATT_SERVER_DISCONNECTED,
++						prop_emu_remotes_default_set,
++						CONN1_ID, APP1_ID),
++		ACTION_SUCCESS(bluetooth_disable_action, NULL),
++		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_OFF),
++	),
+ };
+ 
+ struct queue *get_gatt_tests(void)
+-- 
+1.9.3
 
-I wouldn't go that far and use iovec's here.
-
-I actually had one patch on top of this set which replaces this struct 
-with iovec but in the end the only benefit was one struct definition 
-less as bthost API does not take iovecs:
-
-void bthost_send_cid(struct bthost *bthost, uint16_t handle,
-			uint16_t cid, const void *data, uint16_t len)
-
-And this function is also a reason for 'size' being uint16_t.
-
-BTW I think 'pdu.data' looks better than 'pdu.iov_base' and we shouldn't 
-make it look more complicated than it is without the real benefit.
-
->
->> +};
->> +
->> +#define raw_data(args...) ((unsigned char[]) { args })
->> +
->> +#define raw_pdu(args...)                                       \
->> +       {                                                       \
->> +               .data = raw_data(args),                         \
->> +               .size = sizeof(raw_data(args)),                 \
->> +       }
->> +
->> +#define null_pdu { .data = NULL }
->> +
->>   #define TEST_CASE_BREDR(text, ...) { \
->>                  HCIEMU_TYPE_BREDR, \
->>                  text, \
->> --
->> 1.9.1
->
->
->
-
-Regards,
-Jakub
