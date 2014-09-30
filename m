@@ -1,314 +1,170 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Tue, 30 Sep 2014 11:43:01 -0400
+From: Kyle McMartin <kyle@infradead.org>
+To: Tedd Ho-Jeong An <tedd.an@intel.com>
+Cc: linux-firmware@kernel.org, linux-bluetooth@vger.kernel.org
+Subject: Re: linux-firmware: Add firmware patch for Intel Bluetooth 7265
+ ROM-spin(D0)
+Message-ID: <20140930154300.GA5510@merlin.infradead.org>
+References: <5425F927.8020408@intel.com>
 MIME-Version: 1.0
-In-Reply-To: <CAD0=r8xMcGP-Hjt8uCSY9Qx9VJLov5scSwRTvFr3PAaOXXbyzQ@mail.gmail.com>
-References: <CAD0=r8yozB8eMdJOuffUeQZVFVf5xEXnP5tCt+k3m0e9wzMxiA@mail.gmail.com>
-	<735FD32E-BD15-4CE1-8D9C-44B8EC56DF7A@holtmann.org>
-	<CAHrH25Q6XqsLjGyfoXwimrap9=kKHOQn-G=k4Fz6HXmEPJ7EtQ@mail.gmail.com>
-	<20140917051457.GA4671@t440s.P-661HNU-F1>
-	<CAD0=r8x-=O7XAqQF_wBHQEqSkfifzgWW2AagW2EvsDUtM-E_ow@mail.gmail.com>
-	<20140917065252.GA5554@t440s.lan>
-	<CAD0=r8z9g+F7Z9X_8PE4jk3JbA+oLj9Of33RSqxiRd0dn9AnXQ@mail.gmail.com>
-	<8868B74C-0DDD-43C1-BCBF-2578A700EF72@holtmann.org>
-	<CAD0=r8xQzhizXo4umQ_mG_WMH7Akp4bji-9PNRGzqj-7HWnyNA@mail.gmail.com>
-	<0EA633E6-A0F5-4F67-B421-9857466C1175@holtmann.org>
-	<CAD0=r8w035mLnWTKtEfxZ7agzwTFRO9dsv+6qdafcBG7RYzYDQ@mail.gmail.com>
-	<F673E928-258E-47F7-B71A-F32410974538@holtmann.org>
-	<CAD0=r8xMcGP-Hjt8uCSY9Qx9VJLov5scSwRTvFr3PAaOXXbyzQ@mail.gmail.com>
-Date: Tue, 30 Sep 2014 09:44:05 -0700
-Message-ID: <CAD0=r8zcPCWKyTQLQeG68uA21_sEv+5wDKNB-GJzgS1+BcD+bQ@mail.gmail.com>
-Subject: Re: [RFC] need for new scan api for bluetooth low energy.
-From: Jakub Pawlowski <jpawlowski@google.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: Arman Uguray <armansito@chromium.org>,
-	BlueZ development <linux-bluetooth@vger.kernel.org>, Scott James Remnant <keybuk@google.com>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <5425F927.8020408@intel.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- doc/mgmt-api.txt | 69 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 69 insertions(+)
+On Fri, Sep 26, 2014 at 04:39:19PM -0700, Tedd Ho-Jeong An wrote:
+> From: Tedd Ho-Jeong An <tedd.an@intel.com>
+> 
+> This patch adds new firmware patch file for
+> - Intel Wireless 7265 Bluetooth ROM-spin SKU, also known as StP2 D0
+> 
+> Signed-off-by: Tedd Ho-Jeong An <tedd.an@intel.com>
 
-diff --git a/doc/mgmt-api.txt b/doc/mgmt-api.txt
-index 11e2490..1c78f1c 100644
---- a/doc/mgmt-api.txt
-+++ b/doc/mgmt-api.txt
-@@ -2135,6 +2135,34 @@ Set Public Address Command
-  Invalid Index
+applied.
 
+thanks tedd!
 
-+Start LE Filtered Device Scan
-+=======================
-+
-+ Command Code: 0x003A
-+ Controller Index: <controller id>
-+ Command Parameters: UUID (16 Octets)
-+             max_pathloss (1 octet)
-+             is_active (1 octet)
-+
-+ Return Parameters:
-+
-+ This command starts LE scan, and filter received advertisements: if
-AD contains both TX power level and Service Solicitation, and UUID is
-contained in Service Solicitation and computed pathloss is smaller
-than max_pathloss parameter, then a Advertisement Received event will
-be sent.
-+
-+ Possible values for the is_active parameter:
-+ 0 Start passive scan
-+ 1 Start active scan
-+
-+ This command can only be used when the controller is powered.
-+
-+ This command generates a Command Complete event on success or failure.
-+
-+ Possible errors: Busy
-+ Not Supported
-+ Invalid Parameters
-+ Not Powered
-+ Invalid Index
-+
-+
- Command Complete Event
- ======================
+fwiw, the patch seems a bit munged, but i fixed it (the context in
+WHENCE had extra space.)
 
-@@ -2851,3 +2879,44 @@ New Configuration Options Event
+regards, Kyle
 
-  This event indicates that one or more of the options for the
-  controller configuration has changed.
-+
-+
-+Advertisement Received Event
-+==============================
-+
-+ Event Code: 0x0020
-+ Controller Index: <controller id>
-+ Event Parameters: Address (6 Octets)
-+ Address_Type (1 Octet)
-+ RSSI (1 Octet)
-+ Flags (4 Octets)
-+ AD_Data_Length (2 Octets)
-+ AD_Data (0-65535 Octets)
-+
-+
-+ This event indicates that we received event during LE Filtered Device Scan
-+
-+ Possible values for the Address_Type parameter:
-+ 0 Reserved (not in use)
-+ 1 LE Public
-+ 2 LE Random
-+
-+ The following bits are defined for the Flags parameter:
-+ 0 Reserved (not in use)
-+ 1 Legacy Pairing
-+ 2 Not Connectable
-+
-+ AD_Data contains AD if we're in passive scan mode, or EIR if we're
-in active scan mode.
-+
-+ The Legacy Pairing flag indicates that Legacy Pairing is likely
-+ to occur when pairing with this device. An application could use
-+ this information to optimize the pairing process by locally
-+ pre-generating a PIN code and thereby eliminate the risk of
-+ local input timeout when pairing. Note that there is a risk of
-+ false-positives for this flag so user space should be able to
-+ handle getting something else as a PIN Request when pairing.
-+
-+ The Not Connectable flag indicates that the device will not
-+ accept any connections. This can be indicated by Low Energy
-+ devices that are in broadcaster role.
-+
--- 
-2.1.0.rc2.206.gedb03e5
-
-
-On Fri, Sep 19, 2014 at 9:29 PM, Jakub Pawlowski <jpawlowski@google.com> wrote:
-> On Fri, Sep 19, 2014 at 5:35 PM, Marcel Holtmann <marcel@holtmann.org> wrote:
->> Hi Jakub,
->>
->>> >>>>>>>> have you looked at the the Add Device management command with the
->>> >>>>>>>> 0x00 Action. That will just send out Device Found events for
->>> >>>>>>>> devices
->>> >>>>>>>> in range and uses passive scanning.
->>> >>>>>>>>
->>> >>>>>>>> In addition if you are paired with a device and actually want to
->>> >>>>>>>> connect to it, you can use Action 0x02 to allow for background
->>> >>>>>>>> connection. This is currently in use for LE HID devices.
->>> >>>>>>>
->>> >>>>>>> This still only sends one Device Found event though right? In
->>> >>>>>>> Jakub's
->>> >>>>>>> case, a mgmt event is desired to let the userspace know every time
->>> >>>>>>> a
->>> >>>>>>> new advertisement packet is received, with the updated RSSI and
->>> >>>>>>> TxPower and so on.
->>> >>>>>>
->>> >>>>>> It should send as many Device Found events as there are advertising
->>> >>>>>> reports from the controller. We're enabling duplicate filtering in
->>> >>>>>> the
->>> >>>>>> hci_req_add_le_passive_scan() function in hci_core.c so maybe
->>> >>>>>> that's
->>> >>>>>> your issue? Some HW (like Broadcom) tend to be more conservative in
->>> >>>>>> how
->>> >>>>>> many events they send when filtering is enabled whereas others
->>> >>>>>> (like
->>> >>>>>> CSR) will give you many more of them (at least one whenever RSSI
->>> >>>>>> changes).
->>> >>>>>
->>> >>>>> Why is duplicate filtering being enabled ? Does it filter packets
->>> >>>>> that
->>> >>>>> have different advertisement content ? Can I turn it off ?
->>> >>>>
->>> >>>> At least in the HCI section of the core spec this parameter is quite
->>> >>>> vaguely defined. We've enabled it to save power by avoiding the
->>> >>>> controller waking up the host too often. With auto-connections it
->>> >>>> makes
->>> >>>> sense to have it enabled since we're really only interested in the
->>> >>>> first
->>> >>>> event which acts as a trigger to connect. Same goes for device
->>> >>>> discovery
->>> >>>> when you're interested in setting up a new device for use.
->>> >>>>
->>> >>>> Right now the filtering is hard-coded but we could consider making it
->>> >>>> conditional to whether there are any entries with action 0x00 ("scan
->>> >>>> but
->>> >>>> don't connect") and disable the filtering in that case.
->>> >>>>
->>> >>>>>>> I think this ties in with some of the previous conversations on
->>> >>>>>>> the
->>> >>>>>>> list about adding a device scan API that is geared towards
->>> >>>>>>> applications (rather than OS UI). That is, not only a mgmt API
->>> >>>>>>> that
->>> >>>>>>> enables these kinds of use cases but also (probably) a high-level
->>> >>>>>>> API
->>> >>>>>>> exposed from bluetoothd that allows applications to scan for
->>> >>>>>>> devices
->>> >>>>>>> filtered by service UUIDs, contents of the manufacturer data
->>> >>>>>>> field,
->>> >>>>>>> and so on.
->>> >>>>>>>
->>> >>>>>>> As for the Add Device command, does bluetoothd currently use this
->>> >>>>>>> somehow?
->>> >>>>>>
->>> >>>>>> Yes, this feature (action 0x02 for Add Device) takes over the
->>> >>>>>> entire LE
->>> >>>>>> background scanning and auto-connection mechanism from 3.17 kernel
->>> >>>>>> onwards since BlueZ 5.22 (which was mentioned in our release notes
->>> >>>>>> btw).
->>> >>>>>> This is much better than the active scanning based auto-connections
->>> >>>>>> that
->>> >>>>>> have until now been done using Start/Stop Discovery.
->>> >>>>>
->>> >>>>> Thanks for pointing that!
->>> >>>>> The release note says that:
->>> >>>>> "The kernel will even use the controller-side whitelist during
->>> >>>>> scanning (if no Resolvable Private Addresses are present), saving
->>> >>>>> even
->>> >>>>> more power."
->>> >>>>> If I understand well, that mean that my peripheral device need to be
->>> >>>>> whitelisted in order for me to get advertisements ?
->>> >>>>
->>> >>>> The controller-side whitelist just means that the controller only
->>> >>>> wakes
->>> >>>> us up and gives us advertisements for entries in the whitelist. When
->>> >>>> not
->>> >>>> using the whitelist the kernel gets woken up and needs to do itself
->>> >>>> the
->>> >>>> filtering out of unknown devices. The kernel uses the controller-side
->>> >>>> whitelist whenever possible, but e.g. when we have resolvable private
->>> >>>> addresses in the list we can't use it as we can't know the address
->>> >>>> the
->>> >>>> remote device will use in advance.
->>> >>>>
->>> >>>>> My use case include scanning for non-paired, non-connected devices,
->>> >>>>> checking RSSI value and deciding about connection based on
->>> >>>>> advertisement content, so that won't work. Am I right ?
->>> >>>>
->>> >>>> If you know the bdaddr that you're interested in in advance we should
->>> >>>> be
->>> >>>> able to tweak the Add Device command to do what you want (e.g.
->>> >>>> disable
->>> >>>> duplicate filtering in the case of Action=0x00 entries). However, if
->>> >>>> what you need is general scanning for any devices (also previously
->>> >>>> unknown ones) then Add Device doesn't really fit in (since it takes a
->>> >>>> known bdaddr). For that we'd either need to consider allowing
->>> >>>> BDADDR_ANY
->>> >>>> as an accepted parameter or then we'd need to define a new mgmt
->>> >>>> command.
->>> >>>>
->>> >>>
->>> >>> Unfortunately my case include previously unknown devices. I decide
->>> >>> wether I should connect (without pairing) based on advertised service
->>> >>> and RSSI power only. BDADDR_ANY seems good solution. Or maybe we can
->>> >>> add some parameter that will force not using controller-side whitelist
->>> >>> for scan?
->>> >>
->>> >> actually BDADDR_ANY does not really look like a good solution. What we
->>> >> really want is to be able to define a list of UUIDs and maybe an RSSI range
->>> >> or threshold for this.
->>> >
->>> > I think there should be option in mgmt api to capture all
->>> > advertisement packets, and later on application level decide what
->>> > property to filter on. I understand that this might be not energy
->>> > efficient, and that's why there is whitelisting and controller level
->>> > filtering.
->>> > Specifying list of UUIDs or RSSI value as parameter will be nice, but
->>> > controllers doesn't support this kind of complex filtering right now
->>> > anyway.
->>> > If you decide to allow UUID and RSSI filtering, maybe in a while
->>> > someone will come up with need to filter by something in advertisement
->>> > ? Maybe it would be good to have this 'look for advertisements' API
->>> > very general.
->>>
->>> we can always extend the mgmt API with a new command for filtering
->>> something new. And yes, the Bluetooth SIG will define a new AD element type
->>> and then it is not supported. There are also many new Bluetooth
->>> specifications in progress and also planned (which I will not iterate here
->>> since they are Buetooth SIG confidential) which extend LE advertising in
->>> various form and shapes.
->>>
->>> For me it is important that we can do certain things in the kernel so that
->>> userspace can keep sleeping. And we really can just add extra mgmt commands
->>> to allow for this. Remember that kernel will have to disable certain
->>> "background" behavior anymore. An active discovery always comes first. An
->>> active connection establishment from a socket comes first. Pairing a device
->>> comes first. So all these major events that are driven by an user action
->>> will be prioritized. We have to do that since otherwise you end up with bad
->>> user experience. But then again, draining the battery is also bad user
->>> experience. So we need to find a balance here.
->>
->>
->> I will be very happy with mgmt api method that will filter by serice uuid
->> and RSSI value, and that's enough for me. From my use case it looks like the
->> user is going to be in this scan state for short time - few seconds, maximum
->> minute.
->>
->>
->> that is then something different. That is more like "scan for this UUID
->> within this RSSI range for x amount of seconds, if any results, report them,
->> and otherwise go back to idle".
->>
->> We can talk about this one-shot kind of API. I would need to think about it
->> a little bit more. However one thing that you might want to consider is
->> using pathloss instead of RSSI. Especially if the advertisement contains the
->> TX power. That way you get a way better idea of how close or far the device
->> is.
->>
->
-> Yay! Thanks!
-> Yes, pathloss will be much better, I was using it before.
->
->> If it would be possible to also add general le scan method that would return
->> all advertisements, marked as "only for development", and "not for use in
->> production", and "behaves differently for different controllers" and maybe
->> somehow disabled by default and you need to set some special flag to enable
->> it on your developer machine then it would be awsome for developers that
->> want to play with it, but it's not my requirement.
->>
->>
->> The mgmt API will never contain any development methods. It is an official
->> API and we are committed to stable API promise here. Any kind of testing API
->> has to go via debugfs.
->>
->> Regards
->>
->> Marcel
->>
+> ---
+>  WHENCE                                   |   2 ++
+>  intel/ibt-hw-37.8.10-fw-1.10.3.11.e.bseq | Bin 0 -> 8441 bytes
+>  2 files changed, 2 insertions(+)
+>  create mode 100644 intel/ibt-hw-37.8.10-fw-1.10.3.11.e.bseq
+> 
+> diff --git a/WHENCE b/WHENCE
+> index 5424b0f..27d24d2 100644
+> --- a/WHENCE
+> +++ b/WHENCE
+> @@ -2393,6 +2393,8 @@ File: intel/ibt-hw-37.8.bseq
+>  Version: 1339_02.00
+>  File: intel/ibt-hw-37.8.10-fw-1.10.2.27.d.bseq
+>  Version: STP2_C0_1339_02_patch_31.1
+> +File: intel/ibt-hw-37.8.10-fw-1.10.3.11.e.bseq
+> +Version: STP2_D0_1417_04_patch_04.1
+> 
+>  Licence: Redistributable. See LICENCE.ibt_firmware for details
+> 
+> diff --git a/intel/ibt-hw-37.8.10-fw-1.10.3.11.e.bseq
+> b/intel/ibt-hw-37.8.10-fw-1.10.3.11.e.bseq
+> new file mode 100644
+> index 0000000000000000000000000000000000000000..95a32a96d863a19726fa0d6faad5b0917cb6adcb
+> GIT binary patch
+> literal 8441
+> zcmbVS4OCNCw%+&VCfp>%+(3{Y5l?^+P&>rG8FXxWMMfQlw*Jj}E~o87>zlz@<20yf
+> zC?GeKBBDebb*6RtEVQ-@T1DE|&cr^a4OneqToO=hunMuA+R&-bi0D{H<?WM8ApX3!
+> z-g;r3oO|}(=bU}Mz4tl$p1?S7Yk&bBIE7&x$ByF|=WW1p3jj<o)a7pdwDp9qy!E)x
+> zP8I>|^l&vC){2@R>gv<tnx-f-hoAE(YIvlv0#`$bqzAr@IsC>yHwF8R^o~S6K!HQ%
+> zpJi+d7o@c5kGmW;uuj&qM`ZdS<124)3n+W>#Kli<C-Uz%xP5kGSes4#<xW}lF&1DE
+> z!!o4mQMCZs4Xi81ZnPhW1Evv6BKB#)+KM%aeR)Ge>zu-W>8ebB3&)#@G;#c8{u;w?
+> zPPMC>*F}iqvw}3@sh$3wb_|5oLllIk3EO1bZfhz$q0Wy<M?r{rqxDbxVSjG2ND2yb
+> z?wsZYn2Pj*!g+Vz8}!7+1g3c7u$`@a{uW@(Nj`guhm*2gzH&I{v!^0WR5iA4?}{^w
+> zP4+AS_#LcBQvvLc1b7F_uO<L=Cj#_N1o#Teqe-}`NdVK60n`?N<rx4=X9Jv?18@OL
+> z^rHaJVEF>e_fG-1R|5PE%WyebC(N|e-a}VDI@E`2f$S?EWg964KPOq>SKxCc78jNR
+> z1=3Z(YmlCbr2tF18hBqM@CWdDC<^#QBk*}Kz#r<nc$Wd6y}><^H!3wIbOiFZ_MHYs
+> z726av8S%Gw+5pzxj_Q@$bJ`o+r0Pco2TW9B4~sMjh^yndSpE3!iL4;YeAGev<loyT
+> z=wv?j#9vgV3OztM{G^OZGsOO<S;f=o%vRe%Rf^0z;gWgv7iJZQfiOguJQNbHN^aGM
+> z1Q+#*sfp7dh9Sw@l5tp$oX@30aKts-;6|@}H#b#;gXmqHk()_5EXms&uYH!m(K4x5
+> z(q1g7Ui!<OI_-W&mROJ?*H5N2xHGDAt5?^>XeY61^%9t<Sqy6RE{M_8L7oX5KH@;=
+> zHm=rbx`FlqQn6aDovRz%2#2+=prDY>p&;&V$w%cCq^fU)#T`fG6y)dy1eW&Xy{vDG
+> zublDF;J$b~$wLGM9|nRSZ3siD0>cx5<*mhwH*_SQf=~WIDc0gx4^+pVkpt`H{C}&P
+> zRa{g;|5SBFC9{g@-<;L<eC3xcaYzY}0=gbHSpl)S<HD!5LJUu&gCd~QWeZyM1^_SP
+> zl{XS}w4)hlqm~6=-C35!gp}Q=@NH>mz3Qe*Q<0OU4XwLAua0Hn>SG};HwDNESLMLt
+> z{2o~272VLPUMsrq4p3Q!d~$9p>bms|+Z$tlIUnNMI8&o+goAl<4Nr730J3zYv$Q7+
+> zg!9zNhuU3bU1Dw7+2zIX?tIrW;+CMfgS4f_4=KEIx9Z~wHmEH+GqWIm)xK5rs2C)$
+> z-1;*y_7g|;<&(E%sZY+y6S~U4Nouvchk<jtz^}X4uPrLsSh9NcGcUA$ctx{I(s`ko
+> zIX7qhn(iOIkXj>Md~;|`uh<H08NU`=?|i#5mQAWjjwD>NgPWJZRG0?M>cvoT@ucZX
+> zX~NJ`gkdu6q<KLslT>9IR-_(DL9Qa8^oMkS+C`|B4280{;_7R@??4Bl#j#<ANdrcc
+> zgN5Q*>%u_ra1?}ff)E!M_lQ6%L0E?$VI4jN$$}sczWkL(yB_tB`lkYqcKsM@nR@>G
+> zPW2KJ;a!O;K{IEPxO7)J-vzO_%pV74bWIDBoDr~gfdP2t3&scW1fbS*CWbJ;y7sL~
+> z?V{T_teR+Vb>+XU=XV8d#u9O}G9Uwcbi|?u^PqN8m+YOQlV7DNO#RUPp)Aw#ZiAaY
+> zPeVXOCYPzgV2K!og;8A@=6ZehFc3abQV^(nPDc0qY#~_ZV*L!3Gx*$rg}Q7V*4#G?
+> z$wPYew+!)JVn{wdUqW8Ul_OR6yYjx+=uOaH9nGZIM??A_JS%O!#;kz{UAg+^t{$k}
+> zHR8&?#*iatJs~d*M(XtSP`hnp`7&Iw{NfR?vPxv5xNmj`L1PH_`KghoN@wxec2`NP
+> zVUy@A=`orr2)sAn6$XL}_j?!$2Ed_{WVM7rkP;mh1jLzOTYtv5HY<N$J`DhQs_L7v
+> zdag3!95RVy8Tm+x7+QNKYAtocCDl(hLhS^;i^;zy5VV?IfPru*e<TQM!-C-Mw=1KW
+> zA5@vH>1hBY4_Zb8ATbmGhZY1SXaLagPzEF))mS+g(g~dNgZB0{Dtp%jj`1=4y&)h7
+> zE9TD5$;nwVmsVjQ9E_kK%$>agKeJcl<jh_%8wF<1{;}-1LAR9`9I{KuEz{SJ&_`_m
+> z&L4!_wDx{CH3pb-kWfKng_pl#?lNPb@BwpI%4opc{71Mm4@6uUPU?Dap}I3%aP#}$
+> zJVvSN9H!n~fZiJNaO%<FULFQQJx@U>KzFAuA9C@;yRz&18J66<!;sK^?JM>4@GsT)
+> zJ3SytM6IGrQjt=H>ZNUd*30zLHjwn0sy9D9OR6djpi=tt@q4FV;e}DISS1oBvN9nK
+> z{+h4?*f-@EUR*}=3i(KzsrGFN&3Ur4vGx5f&JYFfcM*q}8a<=hfZP0qL*4n+?uzG*
+> zF+wFo8U)ZKveUk*<_!i&uI4}fe$}|d9P8KBndU{n30pzTR7FAB2_`eGnh_E!r+rf$
+> z2ErapcVH+xwUSX`*PHo*{V$OpFj0w|RkTEGyl&wbqa^~*csHYhrSKW-ftAb|$bN)n
+> zSAFRGvV*0&u42RWlnPj00wsD#gIsuqd4>@|4A%5n{+kXzCAAzLWRlij)zxlm3VM=?
+> zK*?4-Okcc*vH>aY_NvJfu;m{5FOa?op@<wP?)oXwDZ)p29C<aws-%Wcl0ARRWC_%m
+> zhhvwSS|#1kZ@cQZsm(fJtVb9K)fx%{s*giV!jz@p0bwY)hQLq4G-mZfc%LKh6?K>N
+> z^h0<T0%cl*Bzwzkmgz4VZnDX~0x6S&PfD`!79M#Kp_cuY<{o;eWxw?k&p0D9jkM%=
+> z>g&gfuQA8tYitVaNMWVw>vKI&2hCAN-8AXzxr`eAJ>d9i3sNV4PFi4Vr2s0)w|nq;
+> zod8*$x84f_p;SvjXez94{E<g44fLs=t55{bd?op=2DUa8N<^!Xm-8wITbW*oM6hG+
+> z5EmEqJ!}o}XiFK)GnAz9&M$&{wUSJ2Cg=@MCAX$=L4cIRek&w({?1PWM>(+iqrmD)
+> z1pYkM0W8*b6-mUBgN5r*k;cEONII>tq~r5hl!=T6tANFbB_2y07BA9^BEh;5ODPsR
+> z79Y|YzB-u}27(PUe;8_zI?Rk<7=&nv>>%0Fd1c$MCl&&#Xq^e_w7T^ICN~!z*F_1c
+> zXfT;{3gI`%1u0!>vQ0nIaYTlrrHtuU3_w44+Y8&*H*HvE;RMQ266@V2TVpWZQR%SQ
+> z|1NSY_Fbinw?2_?akz(j)j<QONJ~k%7h~O8>3%A>qo{}^sV;B<=Ig^{@w#QvvS%qs
+> zW%pHniIi&*2^Yw<Kydp7vg1-N5v`K1jYR&?aXilg^(Tp`<#h!*Z{Me}VIZv0Q4oxq
+> z#MIMfZJ^24UI;-26l8f1bE$Jn=cNxp1C-8;(!mI(pYchske|dJ`Fu&NR5#H-V5=a<
+> zl<gzAywr1q_el5Cw#!nQkd(W7kw2FJ`6GY2K}_FChRPwuof6{i=_$f7UiXCBQqLa$
+> zy?lqSgUnNOm>i0Z<W=xx@ZDi~k4P4iOcIgWbM<$z<2N<gItnXH^Lc6v1$n=R>Tc$r
+> z#n<345LS$%AgoAhO%I95-6|l|rrj>Nx`?S_$`JG!5vYN%*OoCgOrvTHZ0fx9^BWg`
+> zd!@Wbzqsz&xTSTcF8%06c)u(DjNfJ!H`&f#9ku0YelwkEEx(`LF<z=)#UE2R$2;q5
+> z$M35Dx%$Nv5}2i4O0rGz0-J1_Q5`gX+8Q(6s*kUfXPcIgOw+<tI?@upO`%pVBd0Dc
+> zxIx=T__h~w%|OCHz#I@k&?JjyWk59loMf68n)A$J{p+}~EYTUr6<%neT{8(wLJGH>
+> zo?~P26(%Ea>eBlW9mCXPsISPdxw{vmTHzi=)jDzY4ZTpmV|-nGXp~AE1>7`27L%8f
+> z%;c@9FRB#>ayRJ$jJMhksg4=eZICL>c=3p}5!^|?q+YoPy|M#+ZazOY8y_Ysq3nt@
+> zclsDt9maJam-emz$`1oU6etMt>u7j~3OaSaE)ey+(Y|_gfqQy3po=o!Tq*y%zIzvV
+> z-@EFw=l=@xi?v|gRsdFN%WeJozG!qfCqh>{-cc_Uc38GYPt*4qC^rK`2#hK#mv$`r
+> z`4Taeo7rTWT&P*EF^ftkPXKQcxH&e9T9NucNu{YnQis*a2QF-xa<$}aQ=#UZm?p+h
+> zGpI;hsn$<hj#kac-U20By@5a<8({iEMhF98Cce<X5ce9*%#vFagN~0nx3t?_BbylD
+> zCKgIsj+XATrEmIheZmG!8kjUGq6sfcOs}Zl08O&n#K*=46tSIz`Q~zYZjmC8Ty(gs
+> z^Xme%Tn%19g?!|?e|nmj!V%!U;+e`NXN>D!&SzsQNLux2b%n%^9H%X1$MkF+?Kid$
+> z#cLOnc&&j*U!OE5|NhDIC(Z0`Zjk!mAI4?xWxg?tdoJd3`POmAt_=_07;d-82^fE$
+> z{t1N_+vaT0SWtg+7zpWj9|S|Vpk&G9-~8l-yfjHVX<k*|VRqoP)f2EY7H&WtwQPoG
+> zobY?l3A;h3tuVh(bgqaC{8RmGJ!^Kvu(+Wa`1!z^C8OTnw23c@2!Mq?4{YK$*Nl3S
+> zyL-QXx<x`5L~a^CkE5Khh3XcQi5P;?rITsFg{HB)RfD08POWb<YRAn_0rxJRt=HJ(
+> z>{3POLi5oJ@j}z;!#b38LiE_lbEb6u=lmw4Jz;%J8Y_&q)C&7!!azuj4u*p;r?8;#
+> zC4bUhE&m!sdeZ_rzK`*{61>TS%gy2hVbrZ&oyZxHk}$cDAEkjeW2c@-3T?4!@R4p(
+> zW46QF%0Lu4ce@R|vQ4teLLTKUP3hq`scZ50BE~dFH0`NA6q6<j<I9rvHneWv{3zeg
+> zwg;0Yyd8S|)fm<=U|VjUm$2MCKWVu+XX1!o9fj6*o1D!k$etq_TU20&E9rv)n<jXi
+> zD#)6@+$*8<?#HV-#w)`V27-XMf-s~aV%gDHu(~lp2_czo97EDuy45EzlY!sdf7WPe
+> zjgGOP%4s^`vArhset;^!3*SERuu5h+lC$xYz#BcX@my4(h8)YBsQy=&;EdNZ!hntI
+> zm0!CkcR~_t92i;Z)K7-Jxu{^$US;oFxR55BL@I)BtTZ#Atv01{G*d|0D_WT7H(VU<
+> z0C<}_ob&-y2}A^V%jKE$fjE&9vauxXeKQD&3|XE#Y41DOh9D40dk==cN^^KE3PTh>
+> zS@_kD-{}Ugp12jHCd$qgleZt+%bD=D4~F+Y_CcDHD^6>+;J2kY9lz6?Go18(TDG=W
+> z76NcZ%ou>4(wFh#tD#l$^|8tL;<M|l%4zaP1)yK$)LWj4)|OMB;0KMt+!Ba=R<)nO
+> zWay#}x84gnJd(%vMvvqu{BD&~Q*_C$Y95oW@Kv!|sJRSP2L9RLy{3YszQz~5qB96n
+> zoO|)+9r`l@M$0iYT`QU{TX^hu+ieS?!aU(-5CoQ4ViGHu-Zs-bkS;R4?qV4dJG$I}
+> zEp!I&ITGod;+$Nh#EmVoS!H6lDb4hx$kd-U(4<FCJSkceROXsQa{ZdxsU=W(_4=5)
+> z+xgwnFuqN)BTL$IWG^bJckaR)dg!;HqHU<C0~MVwh|wIg-Ig7#WEMrMnCZ^k-<R)}
+> zb>i>SNf^;cXx2ONb&S(Ls1xcT>y+W7`pG(lf$-h<;GTf)YoE3A0VV%*Il?*95B-V&
+> zUF@px#p1yKxF!#J?Yhz8M)es~e~B>H04Ao_>{?2qAmm?*{xib4ELlgWk`c{+)+E)>
+> zH83W%^Ti``<8ufFRo%Sr@*-#4x8TLOe0qBZf0}`Qy+tql{e|ywp1&7gzb=DNzxyRW
+> z@4RH^F_HiC<+xbE27*Lppq7yV8q&jflR(3Iz5%RM>z`4rO+cuW-qe+%C1T|enkWne
+> zUn~WIG6J|1Iof9w#Cy{7{g~v^X@QrbHD;*uU8BR`?!iGEOa6G-KyRY`(1%LnL1h_t
+> z+CaBCy1~sTP-Fk={`Qd&d-~(&{mg~$F*}sQMMbQ*qpyquYYr-U@pz|AMK&HJ67vOp
+> zvL8&3_kk$Ym<>^#HVKHBpOCL8NFdN@O9e>%4L+^$k^~<l;uGhM!*B4W(>qJ=E|()d
+> z3*;N^&O$mCaU>!KFWl{+cHBri41_ar6oilf7wQmH3nb`GkITm)WHmuzLhaxLqGM4M
+> zUe(v<;kU0mwUOo&7mxEr@=`!rjEPuq^ODdwZz^i5$Q^xl`d!DkL8uMFOY-Kyp(Yt>
+> z@|$_8K&S0c-<6MG<eFtgSxB!e1D!`vO-JyRFLd2I&(r^}dBQ;WES`e!u!(c-n>e(z
+> zdx0PhavyLqKP1ieazPl;5*y()0M2E!;}tz-Cuw$qHbj8K=rn6dv!_3lt}ISZ2pXi2
+> zj)OtR?{Lk<xy9g<7}TP3lvnF=j&cvVnq4FOu(`rOIGR8~um&f$J}^0@D~ql2<Y5C$
+> z4a!e_K%UZ-#ZyO>of=%U)dZ5fSh>9quWadZ?gb_*IA+!ZW6liHXFim!ES~v*Zgd=F
+> zan`5~srTs+GDH{%EfXjR)H2Fq^6-wM=>CL=ObB}^h%L3k>mig!<tj&QaNq&nfgn$g
+> z(U3)}M&;jnK>n?V$U9v-M|(884u|@nk#LU)dfLN4&I^K>Hwxw$2x$j!AH|(>q%##%
+> z7Uu=QfUwV42Mtoi;4k)JKkGj9XM9Z_UJ(Ij#2-7yx~qfT75JNAh?aSK@#sX4Ok;-c
+> z>hFFrT(XrBZzT{7ui}*v5fNB(D$N1)NuP!T#;rB-n9wJIOS>liv%`(6JP{mdS5{SV
+> z^Z%n1ZwZ0bqg3W?c9@L^#&8=+bTR|}b3y*?QifrMo&D#Yq?5k$@h9!4PJ1tW`OSA%
+> zZ(#es0)s<0Zr-|m7g$ck8$sdH!c=CuF@Zsd>KIS}{!)bhfiTumVhdM@sQh0lsz&~8
+> F_-~X>mv8_8
+> 
+> literal 0
+> HcmV?d00001
+> 
+> -- 
+> 1.9.1
+> 
+> 
