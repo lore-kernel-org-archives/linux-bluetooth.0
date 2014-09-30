@@ -1,263 +1,137 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
+From: Marcin Kraglak <marcin.kraglak@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH 01/12] android: Add support for more configuration options
-Date: Tue, 30 Sep 2014 13:06:16 +0200
-Message-Id: <1412075187-5518-2-git-send-email-szymon.janc@tieto.com>
-In-Reply-To: <1412075187-5518-1-git-send-email-szymon.janc@tieto.com>
-References: <1412075187-5518-1-git-send-email-szymon.janc@tieto.com>
+Subject: [PATCHv2 1/5] android/tester: Add support for GATT Notification in tester
+Date: Tue, 30 Sep 2014 13:03:02 +0200
+Message-Id: <1412074986-21285-1-git-send-email-marcin.kraglak@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This adds support for system ID, serial number and PnP ID options.
+Service register_for_notification and notification callbacks.
 ---
- android/hal-bluetooth.c |  15 ++++++
- android/hal-ipc-api.txt |   3 ++
- android/hal-msg.h       |   3 ++
- android/main.c          | 119 ++++++++++++++++++++++++++++++++++++++++++++++++
- android/utils.h         |   6 +++
- 5 files changed, 146 insertions(+)
+ android/tester-main.c | 51 +++++++++++++++++++++++++++++++++++++++++++++++++--
+ android/tester-main.h | 18 ++++++++++++++++++
+ 2 files changed, 67 insertions(+), 2 deletions(-)
 
-diff --git a/android/hal-bluetooth.c b/android/hal-bluetooth.c
-index 07e86b0..f7db416 100644
---- a/android/hal-bluetooth.c
-+++ b/android/hal-bluetooth.c
-@@ -438,6 +438,21 @@ static int send_configuration(void)
- 		cmd->num++;
+diff --git a/android/tester-main.c b/android/tester-main.c
+index 5bf9096..2b9b410 100644
+--- a/android/tester-main.c
++++ b/android/tester-main.c
+@@ -717,6 +717,21 @@ static bool match_data(struct step *step)
+ 			tester_debug("Gatt write_param doesn't match");
+ 			return false;
+ 		}
++
++		if (exp->callback_result.notification_registered !=
++				step->callback_result.notification_registered) {
++			tester_debug("Gatt registered flag mismatch");
++			return false;
++		}
++
++		if (exp->callback_result.notify_params) {
++			if (memcmp(step->callback_result.notify_params,
++					exp->callback_result.notify_params,
++					sizeof(btgatt_notify_params_t))) {
++				tester_debug("Gatt notify_param doesn't match");
++				return false;
++			}
++		}
  	}
  
-+	if (get_config("serialno", prop, "ro.serialno") > 0) {
-+		len += add_prop(prop, HAL_CONFIG_SERIAL_NUMBER, buf + len);
-+		cmd->num++;
-+	}
-+
-+	if (get_config("systemid", prop, NULL) > 0) {
-+		len += add_prop(prop, HAL_CONFIG_SYSTEM_ID, buf + len);
-+		cmd->num++;
-+	}
-+
-+	if (get_config("pnpid", prop, NULL) > 0) {
-+		len += add_prop(prop, HAL_CONFIG_PNP_ID, buf + len);
-+		cmd->num++;
-+	}
-+
- 	return hal_ipc_cmd(HAL_SERVICE_ID_CORE, HAL_OP_CONFIGURATION, len, cmd,
- 							NULL, NULL, NULL);
- }
-diff --git a/android/hal-ipc-api.txt b/android/hal-ipc-api.txt
-index 81aab50..82067f2 100644
---- a/android/hal-ipc-api.txt
-+++ b/android/hal-ipc-api.txt
-@@ -158,6 +158,9 @@ Core Service (ID 0)
- 		Valid configure option types: 0x00 = Vendor
- 		                              0x01 = Model
- 		                              0x02 = Name
-+		                              0x03 = Serial Number
-+		                              0x04 = System ID
-+		                              0x05 = PnP ID
- 
- 		In case of an error, the error response will be returned.
- 
-diff --git a/android/hal-msg.h b/android/hal-msg.h
-index bb6b1e0..9ae8c24 100644
---- a/android/hal-msg.h
-+++ b/android/hal-msg.h
-@@ -73,6 +73,9 @@ struct hal_cmd_unregister_module {
- #define HAL_CONFIG_VENDOR		0x00
- #define HAL_CONFIG_MODEL		0x01
- #define HAL_CONFIG_NAME			0x02
-+#define HAL_CONFIG_SERIAL_NUMBER	0x03
-+#define HAL_CONFIG_SYSTEM_ID		0x04
-+#define HAL_CONFIG_PNP_ID		0x05
- 
- struct hal_config_prop {
- 	uint8_t type;
-diff --git a/android/main.c b/android/main.c
-index 27f5c48..9ee9960 100644
---- a/android/main.c
-+++ b/android/main.c
-@@ -74,6 +74,12 @@
- static char *config_vendor = NULL;
- static char *config_model = NULL;
- static char *config_name = NULL;
-+static char *config_serial = NULL;
-+static uint64_t config_system_id = 0;
-+static uint16_t config_pnp_source = 0x0002;	/* USB */
-+static uint16_t config_pnp_vendor = 0x1d6b;	/* Linux Foundation */
-+static uint16_t config_pnp_product = 0x0247;	/* BlueZ for Android */
-+static uint16_t config_pnp_version = 0x0000;
- 
- static guint quit_timeout = 0;
- 
-@@ -109,6 +115,36 @@ const char *bt_config_get_model(void)
- 	return DEFAULT_MODEL;
- }
- 
-+const char *bt_config_get_serial(void)
-+{
-+	return config_serial;
-+}
-+
-+uint64_t bt_config_get_system_id(void)
-+{
-+	return config_system_id;
-+}
-+
-+uint16_t bt_config_get_pnp_source(void)
-+{
-+	return config_pnp_source;
-+}
-+
-+uint16_t bt_config_get_pnp_vendor(void)
-+{
-+	return config_pnp_vendor;
-+}
-+
-+uint16_t bt_config_get_pnp_product(void)
-+{
-+	return config_pnp_product;
-+}
-+
-+uint16_t bt_config_get_pnp_version(void)
-+{
-+	return config_pnp_version;
-+}
-+
- static void service_register(const void *buf, uint16_t len)
- {
- 	const struct hal_cmd_register_module *m = buf;
-@@ -284,6 +320,61 @@ static char *get_prop(char *prop, uint16_t len, const uint8_t *val)
- 	return prop;
- }
- 
-+static void parse_pnp_id(uint16_t len, const uint8_t *val)
-+{
-+	int result;
-+	uint16_t vendor, product, version , source;
-+	char *pnp;
-+
-+	/* version is optional */
-+	version = config_pnp_version;
-+
-+	pnp = get_prop(NULL, len, val);
-+	if (!pnp)
-+		return;
-+
-+	DBG("pnp_id %s", pnp);
-+
-+	result = sscanf(pnp, "bluetooth:%4hx:%4hx:%4hx",
-+						&vendor, &product, &version);
-+	if (result != EOF && result >= 2) {
-+		source = 0x0001;
-+		goto done;
-+	}
-+
-+	result = sscanf(pnp, "usb:%4hx:%4hx:%4hx", &vendor, &product, &version);
-+	if (result != EOF && result >= 2) {
-+		source = 0x0002;
-+		goto done;
-+	}
-+
-+	free(pnp);
-+	return;
-+done:
-+	free(pnp);
-+
-+	config_pnp_source = source;
-+	config_pnp_vendor = vendor;
-+	config_pnp_product = product;
-+	config_pnp_version = version;
-+}
-+
-+static void parse_system_id(uint16_t len, const uint8_t *val)
-+{
-+	uint64_t res;
-+	char *id;
-+
-+	id = get_prop(NULL, len, val);
-+	if (!id)
-+		return;
-+
-+	res = strtoull(id, NULL, 16);
-+	if (res == ULLONG_MAX && errno == ERANGE)
-+		return;
-+
-+	config_system_id = res;
-+}
-+
- static void configuration(const void *buf, uint16_t len)
- {
- 	const struct hal_cmd_configuration *cmd = buf;
-@@ -324,6 +415,21 @@ static void configuration(const void *buf, uint16_t len)
- 			DBG("model %s", config_model);
- 
- 			break;
-+		case HAL_CONFIG_SERIAL_NUMBER:
-+			config_serial = get_prop(config_serial, prop->len,
-+								prop->val);
-+
-+			DBG("serial %s", config_serial);
-+
-+			break;
-+		case HAL_CONFIG_SYSTEM_ID:
-+			parse_system_id(prop->len, prop->val);
-+
-+			break;
-+		case HAL_CONFIG_PNP_ID:
-+			parse_pnp_id(prop->len, prop->val);
-+
-+			break;
- 		default:
- 			error("Invalid configuration option (%u), terminating",
- 								prop->type);
-@@ -561,12 +667,24 @@ static bool set_capabilities(void)
  	return true;
+@@ -819,6 +834,9 @@ static void destroy_callback_step(void *data)
+ 	if (step->callback_result.write_params)
+ 		free(step->callback_result.write_params);
+ 
++	if (step->callback_result.notify_params)
++		free(step->callback_result.notify_params);
++
+ 	g_free(step);
+ 	g_atomic_int_dec_and_test(&scheduled_cbacks_num);
+ }
+@@ -1359,6 +1377,35 @@ static void gattc_write_descriptor_cb(int conn_id, int status,
+ 	schedule_callback_call(step);
  }
  
-+static void set_version(void)
++static void gattc_register_for_notification_cb(int conn_id, int registered,
++						int status,
++						btgatt_srvc_id_t *srvc_id,
++						btgatt_gatt_id_t *char_id)
 +{
-+	uint8_t major, minor;
++	struct step *step = g_new0(struct step, 1);
 +
-+	if (sscanf(VERSION, "%hhu.%hhu", &major, &minor) != 2)
-+		return;
++	step->callback = CB_GATTC_REGISTER_FOR_NOTIFICATION;
++	step->callback_result.status = status;
++	step->callback_result.conn_id = conn_id;
++	step->callback_result.service = g_memdup(srvc_id, sizeof(*srvc_id));
++	step->callback_result.characteristic = g_memdup(char_id,
++							sizeof(*char_id));
++	step->callback_result.notification_registered = registered;
 +
-+	config_pnp_version = major << 8 | minor;
++	schedule_callback_call(step);
 +}
 +
- int main(int argc, char *argv[])
- {
- 	GOptionContext *context;
- 	GError *err = NULL;
- 	guint signal;
- 
-+	set_version();
++static void gattc_notif_cb(int conn_id, btgatt_notify_params_t *p_data)
++{
++	struct step *step = g_new0(struct step, 1);
 +
- 	context = g_option_context_new(NULL);
- 	g_option_context_add_main_entries(context, options, NULL);
++	step->callback = CB_GATTC_NOTIFY;
++	step->callback_result.conn_id = conn_id;
++	step->callback_result.notify_params = g_memdup(p_data, sizeof(*p_data));
++
++	schedule_callback_call(step);
++}
++
+ static void gatts_register_server_cb(int status, int server_if,
+ 							bt_uuid_t *app_uuid)
+ {
+@@ -1480,8 +1527,8 @@ static const btgatt_client_callbacks_t btgatt_client_callbacks = {
+ 	.get_characteristic_cb = gattc_get_characteristic_cb,
+ 	.get_descriptor_cb = gattc_get_descriptor_cb,
+ 	.get_included_service_cb = gattc_get_included_service_cb,
+-	.register_for_notification_cb = NULL,
+-	.notify_cb = NULL,
++	.register_for_notification_cb = gattc_register_for_notification_cb,
++	.notify_cb = gattc_notif_cb,
+ 	.read_characteristic_cb = gattc_read_characteristic_cb,
+ 	.write_characteristic_cb = gattc_write_characteristic_cb,
+ 	.read_descriptor_cb = gattc_read_descriptor_cb,
+diff --git a/android/tester-main.h b/android/tester-main.h
+index e152ff3..218bb2d 100644
+--- a/android/tester-main.h
++++ b/android/tester-main.h
+@@ -203,6 +203,22 @@
+ 		.callback_result.write_params = cb_write_data, \
+ 	}
  
-@@ -651,6 +769,7 @@ int main(int argc, char *argv[])
- 	free(config_vendor);
- 	free(config_model);
- 	free(config_name);
-+	free(config_serial);
++#define CALLBACK_GATTC_REGISTER_FOR_NOTIF(cb_res, cb_conn_id, cb_char,\
++						cb_service, cb_registered) { \
++		.callback = CB_GATTC_REGISTER_FOR_NOTIFICATION, \
++		.callback_result.conn_id = cb_conn_id, \
++		.callback_result.status = cb_res, \
++		.callback_result.service = cb_service, \
++		.callback_result.characteristic = cb_char, \
++		.callback_result.notification_registered = cb_registered \
++	}
++
++#define CALLBACK_GATTC_NOTIFY(cb_conn_id, cb_notify) { \
++		.callback = CB_GATTC_NOTIFY, \
++		.callback_result.conn_id = cb_conn_id, \
++		.callback_result.notify_params = cb_notify \
++	}
++
+ #define CALLBACK_GATTC_DISCONNECT(cb_res, cb_prop, cb_conn_id, cb_client_id) { \
+ 		.callback = CB_GATTC_CLOSE, \
+ 		.callback_result.status = cb_res, \
+@@ -450,6 +466,8 @@ struct bt_callback_data {
+ 	btgatt_srvc_id_t *included;
+ 	btgatt_read_params_t *read_params;
+ 	btgatt_write_params_t *write_params;
++	btgatt_notify_params_t *notify_params;
++	int notification_registered;
+ 	int char_prop;
  
- 	return EXIT_SUCCESS;
- }
-diff --git a/android/utils.h b/android/utils.h
-index c70f8cb..9bf2195 100644
---- a/android/utils.h
-+++ b/android/utils.h
-@@ -34,3 +34,9 @@ static inline void bdaddr2android(const bdaddr_t *src, void *buf)
- const char *bt_config_get_vendor(void);
- const char *bt_config_get_model(void);
- const char *bt_config_get_name(void);
-+const char *bt_config_get_serial(void);
-+uint64_t bt_config_get_system_id(void);
-+uint16_t bt_config_get_pnp_source(void);
-+uint16_t bt_config_get_pnp_vendor(void);
-+uint16_t bt_config_get_pnp_product(void);
-+uint16_t bt_config_get_pnp_version(void);
+ 	btpan_control_state_t ctrl_state;
 -- 
-1.9.1
+1.9.3
 
