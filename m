@@ -2,68 +2,82 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH 05/12] android/bluetooth: Use configured values for DID
-Date: Tue, 30 Sep 2014 13:06:20 +0200
-Message-Id: <1412075187-5518-6-git-send-email-szymon.janc@tieto.com>
+Subject: [PATCH 07/12] android/gatt: Add support for PnP ID in DIS
+Date: Tue, 30 Sep 2014 13:06:22 +0200
+Message-Id: <1412075187-5518-8-git-send-email-szymon.janc@tieto.com>
 In-Reply-To: <1412075187-5518-1-git-send-email-szymon.janc@tieto.com>
 References: <1412075187-5518-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- android/bluetooth.c | 25 ++++++++-----------------
- 1 file changed, 8 insertions(+), 17 deletions(-)
+ android/gatt.c | 46 ++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 46 insertions(+)
 
-diff --git a/android/bluetooth.c b/android/bluetooth.c
-index c7ccf9d..3016ea4 100644
---- a/android/bluetooth.c
-+++ b/android/bluetooth.c
-@@ -94,10 +94,6 @@
- #define DEVICES_FILE ANDROID_STORAGEDIR"/devices"
- #define CACHE_FILE ANDROID_STORAGEDIR"/cache"
- 
--#define DEVICE_ID_SOURCE	0x0002	/* USB */
--#define DEVICE_ID_VENDOR	0x1d6b	/* Linux Foundation */
--#define DEVICE_ID_PRODUCT	0x0247	/* BlueZ for Android */
--
- #define ADAPTER_MAJOR_CLASS 0x02 /* Phone */
- #define ADAPTER_MINOR_CLASS 0x03 /* Smartphone */
- 
-@@ -2827,26 +2823,21 @@ static void set_io_capability(void)
- static void set_device_id(void)
- {
- 	struct mgmt_cp_set_device_id cp;
--	uint8_t major, minor;
--	uint16_t version;
--
--	if (sscanf(VERSION, "%hhu.%hhu", &major, &minor) != 2)
--		return;
--
--	version = major << 8 | minor;
- 
- 	memset(&cp, 0, sizeof(cp));
--	cp.source = htobs(DEVICE_ID_SOURCE);
--	cp.vendor = htobs(DEVICE_ID_VENDOR);
--	cp.product = htobs(DEVICE_ID_PRODUCT);
--	cp.version = htobs(version);
-+	cp.source = htobs(bt_config_get_pnp_source());
-+	cp.vendor = htobs(bt_config_get_pnp_vendor());
-+	cp.product = htobs(bt_config_get_pnp_product());
-+	cp.version = htobs(bt_config_get_pnp_version());
- 
- 	if (mgmt_send(mgmt_if, MGMT_OP_SET_DEVICE_ID, adapter.index,
- 				sizeof(cp), &cp, NULL, NULL, NULL) == 0)
- 		error("Failed to set device id");
- 
--	register_device_id(DEVICE_ID_SOURCE, DEVICE_ID_VENDOR,
--						DEVICE_ID_PRODUCT, version);
-+	register_device_id(bt_config_get_pnp_source(),
-+						bt_config_get_pnp_vendor(),
-+						bt_config_get_pnp_product(),
-+						bt_config_get_pnp_version());
- 
- 	bt_adapter_add_record(sdp_record_find(0x10000), 0x00);
+diff --git a/android/gatt.c b/android/gatt.c
+index c00265a..7346d98 100644
+--- a/android/gatt.c
++++ b/android/gatt.c
+@@ -6446,6 +6446,43 @@ done:
+ 	entry->state = REQUEST_DONE;
  }
+ 
++static void device_info_read_pnp_id_cb(uint16_t handle, uint16_t offset,
++					uint8_t att_opcode, bdaddr_t *bdaddr,
++					void *user_data)
++{
++	struct pending_request *entry;
++	struct gatt_device *dev;
++
++	dev = find_device_by_addr(bdaddr);
++	if (!dev) {
++		error("gatt: Could not find device ?!");
++		return;
++	}
++
++	entry = queue_find(dev->pending_requests, match_dev_request_by_handle,
++							UINT_TO_PTR(handle));
++	if (!entry)
++		return;
++
++	entry->value = malloc0(sizeof(uint8_t) + 3 * sizeof(uint16_t));
++	if (!entry->value) {
++		entry->error = ATT_ECODE_UNLIKELY;
++		goto done;
++	}
++
++	entry->length = sizeof(uint8_t) + 3 * sizeof(uint16_t);
++
++	entry->value[0] = bt_config_get_pnp_source();
++	put_le16(bt_config_get_pnp_vendor(), entry->value + 1);
++	put_le16(bt_config_get_pnp_product(), entry->value + 3);
++	put_le16(bt_config_get_pnp_version(), entry->value + 5);
++
++	entry->offset = offset;
++
++done:
++	entry->state = REQUEST_DONE;
++}
++
+ static void register_device_info_service(void)
+ {
+ 	bt_uuid_t uuid;
+@@ -6530,6 +6567,15 @@ static void register_device_info_service(void)
+ 						(void *) data);
+ 	}
+ 
++	if (bt_config_get_pnp_source()) {
++		bt_uuid16_create(&uuid, GATT_CHARAC_PNP_ID);
++		gatt_db_add_characteristic(gatt_db, srvc_handle, &uuid,
++						GATT_PERM_READ,
++						GATT_CHR_PROP_READ,
++						device_info_read_pnp_id_cb,
++						NULL, NULL);
++	}
++
+ 	gatt_db_service_set_active(gatt_db, srvc_handle, true);
+ 
+ 	/* SDP */
 -- 
 1.9.1
 
