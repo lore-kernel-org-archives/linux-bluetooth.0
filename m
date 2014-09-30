@@ -1,78 +1,57 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1412002664-28253-1-git-send-email-luiz.dentz@gmail.com>
-References: <1412002664-28253-1-git-send-email-luiz.dentz@gmail.com>
-Date: Tue, 30 Sep 2014 17:29:05 +0300
-Message-ID: <CABBYNZ++g+N6cD0MV3DEEFfdjCyBq37RD7rp5S0RO0mq3BRN9w@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 1/6] shared/io: Do not return -1
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ 3/3] emulator/bthost: Add bthost_send_cid_v
+Date: Tue, 30 Sep 2014 17:19:55 +0300
+Message-Id: <1412086795-25000-3-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <1412086795-25000-1-git-send-email-luiz.dentz@gmail.com>
+References: <1412086795-25000-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-On Mon, Sep 29, 2014 at 5:57 PM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->
-> Returning -1 normally is used when errno is set which is not case so
-> instead return -ENOTCONN.
-> ---
->  src/shared/io-glib.c     | 4 +++-
->  src/shared/io-mainloop.c | 3 ++-
->  2 files changed, 5 insertions(+), 2 deletions(-)
->
-> diff --git a/src/shared/io-glib.c b/src/shared/io-glib.c
-> index 6316037..882ebd6 100644
-> --- a/src/shared/io-glib.c
-> +++ b/src/shared/io-glib.c
-> @@ -25,6 +25,8 @@
->  #include <config.h>
->  #endif
->
-> +#include <errno.h>
-> +
->  #include <glib.h>
->
->  #include "src/shared/io.h"
-> @@ -122,7 +124,7 @@ void io_destroy(struct io *io)
->  int io_get_fd(struct io *io)
->  {
->         if (!io)
-> -               return -1;
-> +               return -ENOTCONN;
->
->         return g_io_channel_unix_get_fd(io->channel);
->  }
-> diff --git a/src/shared/io-mainloop.c b/src/shared/io-mainloop.c
-> index 1563ce5..b7e0f5f 100644
-> --- a/src/shared/io-mainloop.c
-> +++ b/src/shared/io-mainloop.c
-> @@ -26,6 +26,7 @@
->  #endif
->
->  #include <unistd.h>
-> +#include <errno.h>
->  #include <sys/socket.h>
->
->  #include "monitor/mainloop.h"
-> @@ -192,7 +193,7 @@ void io_destroy(struct io *io)
->  int io_get_fd(struct io *io)
->  {
->         if (!io)
-> -               return -1;
-> +               return -ENOTCONN;
->
->         return io->fd;
->  }
-> --
-> 1.9.3
+---
+ emulator/bthost.c | 12 ++++++++++++
+ emulator/bthost.h |  2 ++
+ 2 files changed, 14 insertions(+)
 
-Pushed.
-
-
-
+diff --git a/emulator/bthost.c b/emulator/bthost.c
+index 30a612e..59dde1e 100644
+--- a/emulator/bthost.c
++++ b/emulator/bthost.c
+@@ -604,6 +604,18 @@ void bthost_send_cid(struct bthost *bthost, uint16_t handle, uint16_t cid,
+ 	send_acl(bthost, handle, cid, data, len);
+ }
+ 
++void bthost_send_cid_v(struct bthost *bthost, uint16_t handle, uint16_t cid,
++					const struct iovec *iov, int iovcnt)
++{
++	struct btconn *conn;
++
++	conn = bthost_find_conn(bthost, handle);
++	if (!conn)
++		return;
++
++	send_iov(bthost, handle, cid, iov, iovcnt);
++}
++
+ bool bthost_l2cap_req(struct bthost *bthost, uint16_t handle, uint8_t code,
+ 				const void *data, uint16_t len,
+ 				bthost_l2cap_rsp_cb cb, void *user_data)
+diff --git a/emulator/bthost.h b/emulator/bthost.h
+index 9d75e2c..62d415c 100644
+--- a/emulator/bthost.h
++++ b/emulator/bthost.h
+@@ -64,6 +64,8 @@ void bthost_add_cid_hook(struct bthost *bthost, uint16_t handle, uint16_t cid,
+ 
+ void bthost_send_cid(struct bthost *bthost, uint16_t handle, uint16_t cid,
+ 					const void *data, uint16_t len);
++void bthost_send_cid_v(struct bthost *bthost, uint16_t handle, uint16_t cid,
++					const struct iovec *iov, int iovcnt);
+ 
+ typedef void (*bthost_l2cap_rsp_cb) (uint8_t code, const void *data,
+ 						uint16_t len, void *user_data);
 -- 
-Luiz Augusto von Dentz
+1.9.3
+
