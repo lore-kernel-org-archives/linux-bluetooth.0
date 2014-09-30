@@ -1,47 +1,54 @@
 Return-Path: <cyrus@holtmann.org>
 From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 2/6] android/tester: Fix debug callback logs
-Date: Tue, 30 Sep 2014 13:23:43 +0200
-Message-Id: <1412076227-32664-2-git-send-email-grzegorz.kolodziejczyk@tieto.com>
-In-Reply-To: <1412076227-32664-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
-References: <1412076227-32664-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+Subject: [PATCH 1/6] android/tester: Make client2 app uuid value name consistent
+Date: Tue, 30 Sep 2014 13:23:42 +0200
+Message-Id: <1412076227-32664-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Debug logs for callback should also print logs if callback is not
-expected. Additional value in callback enum is added (BT_CB_NONE).
+Application uudis for tester should be name unified and consistent.
 ---
- android/tester-main.c | 1 +
- android/tester-main.h | 3 ++-
- 2 files changed, 3 insertions(+), 1 deletion(-)
+ android/tester-gatt.c | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
 
-diff --git a/android/tester-main.c b/android/tester-main.c
-index 5bf9096..eaf5d34 100644
---- a/android/tester-main.c
-+++ b/android/tester-main.c
-@@ -32,6 +32,7 @@ static struct {
- 	uint16_t cb_num;
- 	const char *str;
- } cb_table[] = {
-+	DBG_CB(CB_BT_NONE),
- 	DBG_CB(CB_BT_ADAPTER_STATE_CHANGED),
- 	DBG_CB(CB_BT_ADAPTER_PROPERTIES),
- 	DBG_CB(CB_BT_REMOTE_DEVICE_PROPERTIES),
-diff --git a/android/tester-main.h b/android/tester-main.h
-index e152ff3..7c55ca5 100644
---- a/android/tester-main.h
-+++ b/android/tester-main.h
-@@ -289,7 +289,8 @@
-  * updated while adding new HAL to tester.
-  */
- typedef enum {
--	CB_BT_ADAPTER_STATE_CHANGED = 1,
-+	CB_BT_NONE,
-+	CB_BT_ADAPTER_STATE_CHANGED,
- 	CB_BT_ADAPTER_PROPERTIES,
- 	CB_BT_REMOTE_DEVICE_PROPERTIES,
- 	CB_BT_DEVICE_FOUND,
+diff --git a/android/tester-gatt.c b/android/tester-gatt.c
+index 693a8a3..b1c6ece 100644
+--- a/android/tester-gatt.c
++++ b/android/tester-gatt.c
+@@ -56,6 +56,11 @@ static bt_uuid_t app1_uuid = {
+ 				0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01 },
+ };
+ 
++static bt_uuid_t app2_uuid = {
++	.uu = { 0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02,
++				0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02 },
++};
++
+ struct emu_cid_data {
+ 	const int pdu_len;
+ 	const void *pdu;
+@@ -117,11 +122,6 @@ struct write_char_data {
+ 	char *p_value;
+ };
+ 
+-static bt_uuid_t client2_app_uuid = {
+-	.uu = { 0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02,
+-				0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02 },
+-};
+-
+ static bt_bdaddr_t emu_remote_bdaddr_val = {
+ 	.address = { 0x00, 0xaa, 0x01, 0x01, 0x00, 0x00 },
+ };
+@@ -1117,7 +1117,7 @@ static struct test_case test_cases[] = {
+ 		ACTION_SUCCESS(emu_set_connect_cb_action, gatt_conn_cb),
+ 		ACTION_SUCCESS(gatt_client_register_action, &app1_uuid),
+ 		CALLBACK_STATUS(CB_GATTC_REGISTER_CLIENT, BT_STATUS_SUCCESS),
+-		ACTION_SUCCESS(gatt_client_register_action, &client2_app_uuid),
++		ACTION_SUCCESS(gatt_client_register_action, &app2_uuid),
+ 		CALLBACK_STATUS(CB_GATTC_REGISTER_CLIENT, BT_STATUS_SUCCESS),
+ 		ACTION_SUCCESS(gatt_client_start_scan_action,
+ 							INT_TO_PTR(APP1_ID)),
 -- 
 1.9.3
 
