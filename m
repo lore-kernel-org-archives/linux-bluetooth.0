@@ -1,169 +1,111 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1221746A-2746-4D8B-A75F-CA27254F0328@holtmann.org>
-References: <CAD0=r8yozB8eMdJOuffUeQZVFVf5xEXnP5tCt+k3m0e9wzMxiA@mail.gmail.com>
-	<735FD32E-BD15-4CE1-8D9C-44B8EC56DF7A@holtmann.org>
-	<CAHrH25Q6XqsLjGyfoXwimrap9=kKHOQn-G=k4Fz6HXmEPJ7EtQ@mail.gmail.com>
-	<20140917051457.GA4671@t440s.P-661HNU-F1>
-	<CAD0=r8x-=O7XAqQF_wBHQEqSkfifzgWW2AagW2EvsDUtM-E_ow@mail.gmail.com>
-	<20140917065252.GA5554@t440s.lan>
-	<CAD0=r8z9g+F7Z9X_8PE4jk3JbA+oLj9Of33RSqxiRd0dn9AnXQ@mail.gmail.com>
-	<8868B74C-0DDD-43C1-BCBF-2578A700EF72@holtmann.org>
-	<CAD0=r8xQzhizXo4umQ_mG_WMH7Akp4bji-9PNRGzqj-7HWnyNA@mail.gmail.com>
-	<0EA633E6-A0F5-4F67-B421-9857466C1175@holtmann.org>
-	<CAD0=r8w035mLnWTKtEfxZ7agzwTFRO9dsv+6qdafcBG7RYzYDQ@mail.gmail.com>
-	<F673E928-258E-47F7-B71A-F32410974538@holtmann.org>
-	<CAD0=r8xMcGP-Hjt8uCSY9Qx9VJLov5scSwRTvFr3PAaOXXbyzQ@mail.gmail.com>
-	<CAD0=r8zcPCWKyTQLQeG68uA21_sEv+5wDKNB-GJzgS1+BcD+bQ@mail.gmail.com>
-	<372D8399-BFC6-413F-924F-44CE79030516@holtmann.org>
-	<CAD0=r8x2bub9E+ohicwfxK0AAykRTUSrrTjAD-tFv-aj7xGoww@mail.gmail.com>
-	<1221746A-2746-4D8B-A75F-CA27254F0328@holtmann.org>
-Date: Tue, 30 Sep 2014 11:29:44 -0700
-Message-ID: <CAD0=r8xYGQgGf+DKewk9hwFBSwUwnUuaNuBTe3A3vY0FkeiB1g@mail.gmail.com>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.6\))
 Subject: Re: [RFC] need for new scan api for bluetooth low energy.
-From: Jakub Pawlowski <jpawlowski@google.com>
-To: Marcel Holtmann <marcel@holtmann.org>
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <CAD0=r8x2bub9E+ohicwfxK0AAykRTUSrrTjAD-tFv-aj7xGoww@mail.gmail.com>
+Date: Tue, 30 Sep 2014 19:31:48 +0200
 Cc: Arman Uguray <armansito@chromium.org>,
-	BlueZ development <linux-bluetooth@vger.kernel.org>, Scott James Remnant <keybuk@google.com>
-Content-Type: text/plain; charset=UTF-8
+	BlueZ development <linux-bluetooth@vger.kernel.org>,
+	Scott James Remnant <keybuk@google.com>
+Message-Id: <1221746A-2746-4D8B-A75F-CA27254F0328@holtmann.org>
+References: <CAD0=r8yozB8eMdJOuffUeQZVFVf5xEXnP5tCt+k3m0e9wzMxiA@mail.gmail.com> <735FD32E-BD15-4CE1-8D9C-44B8EC56DF7A@holtmann.org> <CAHrH25Q6XqsLjGyfoXwimrap9=kKHOQn-G=k4Fz6HXmEPJ7EtQ@mail.gmail.com> <20140917051457.GA4671@t440s.P-661HNU-F1> <CAD0=r8x-=O7XAqQF_wBHQEqSkfifzgWW2AagW2EvsDUtM-E_ow@mail.gmail.com> <20140917065252.GA5554@t440s.lan> <CAD0=r8z9g+F7Z9X_8PE4jk3JbA+oLj9Of33RSqxiRd0dn9AnXQ@mail.gmail.com> <8868B74C-0DDD-43C1-BCBF-2578A700EF72@holtmann.org> <CAD0=r8xQzhizXo4umQ_mG_WMH7Akp4bji-9PNRGzqj-7HWnyNA@mail.gmail.com> <0EA633E6-A0F5-4F67-B421-9857466C1175@holtmann.org> <CAD0=r8w035mLnWTKtEfxZ7agzwTFRO9dsv+6qdafcBG7RYzYDQ@mail.gmail.com> <F673E928-258E-47F7-B71A-F32410974538@holtmann.org> <CAD0=r8xMcGP-Hjt8uCSY9Qx9VJLov5scSwRTvFr3PAaOXXbyzQ@mail.gmail.com> <CAD0=r8zcPCWKyTQLQeG68uA21_sEv+5wDKNB-GJzgS1+BcD+bQ@mail.gmail.com> <372D8399-BFC6-413F-924F-44CE79030516@holtmann.org> <CAD0=r8x2bub9E+ohicwfxK0AAykRTUSrrTjAD-tFv-aj7xGoww@mail.gmail.com>
+To: Jakub Pawlowski <jpawlowski@google.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Ok, new updated version - we do only passive scan, and we send Device
-found event:
+Hi Jakub,
 
+>>> ---
+>>> doc/mgmt-api.txt | 69 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+>>> 1 file changed, 69 insertions(+)
+>>> 
+>>> diff --git a/doc/mgmt-api.txt b/doc/mgmt-api.txt
+>>> index 11e2490..1c78f1c 100644
+>>> --- a/doc/mgmt-api.txt
+>>> +++ b/doc/mgmt-api.txt
+>>> @@ -2135,6 +2135,34 @@ Set Public Address Command
+>>> Invalid Index
+>>> 
+>>> 
+>>> +Start LE Filtered Device Scan
+>>> +=======================
+>>> +
+>>> + Command Code: 0x003A
+>>> + Controller Index: <controller id>
+>>> + Command Parameters: UUID (16 Octets)
+>>> +             max_pathloss (1 octet)
+>>> +             is_active (1 octet)
+>>> +
+>>> + Return Parameters:
+>>> +
+>>> + This command starts LE scan, and filter received advertisements: if
+>>> AD contains both TX power level and Service Solicitation, and UUID is
+>>> contained in Service Solicitation and computed pathloss is smaller
+>>> than max_pathloss parameter, then a Advertisement Received event will
+>>> be sent.
+>>> +
+>>> + Possible values for the is_active parameter:
+>>> + 0 Start passive scan
+>>> + 1 Start active scan
+>> 
+>> is really like a one-shot scan? Or is this something you would be running all the time in the background?
+>> 
+>> Fundamentally if it is one-shot thing then you always want to do active scan, but if it runs in the background then you only want to do passive scanning.
+> 
+> I'm working on two projects, one require scanning up to 2 minutes,
+> second requires long term scanning in background.
+> I'd preffer to have scan type as argument, but having only passive
+> scan is also good option for me.
 
-diff --git a/doc/mgmt-api.txt b/doc/mgmt-api.txt
-index 11e2490..3d03617 100644
---- a/doc/mgmt-api.txt
-+++ b/doc/mgmt-api.txt
-@@ -2135,6 +2135,29 @@ Set Public Address Command
-                                Invalid Index
+I prefer to have these as separate commands. So one is actually a specialized active scanning to find a specific set of devices. Similar to Start Discovery. The other is to add an additional filter for our background scanning.
 
+Remember that this has to work in sync with the auto-connection logic that the kernel is running. If you are messing that up, then you might find the device you are looking for, but the HID mouse will not re-connect.
 
-+Start Passive LE Filtered Device Scan
-+=======================
-+
-+       Command Code:           0x003A
-+       Controller Index:       <controller id>
-+       Command Parameters:     UUID (16 Octets)
-+                    max_pathloss (1 octet)
-+
-+       Return Parameters:
-+
-+       This command starts passive LE scan, and filter received
-advertisements: if AD contains both TX power level and Service
-Solicitation, and UUID is contained in Service Solicitation and
-computed pathloss is smaller than max_pathloss parameter, then a
-Device Found event will be sent.
-+
-+       This command can only be used when the controller is powered.
-+
-+       This command generates a Command Complete event on success or failure.
-+
-+       Possible errors:        Busy
-+                               Not Supported
-+                               Invalid Parameters
-+                               Not Powered
-+                               Invalid Index
-+
-+
- Command Complete Event
- ======================
+>>> +
+>>> + This command can only be used when the controller is powered.
+>>> +
+>>> + This command generates a Command Complete event on success or failure.
+>>> +
+>>> + Possible errors: Busy
+>>> + Not Supported
+>>> + Invalid Parameters
+>>> + Not Powered
+>>> + Invalid Index
+>>> +
+>>> +
+>>> Command Complete Event
+>>> ======================
+>>> 
+>>> @@ -2851,3 +2879,44 @@ New Configuration Options Event
+>>> 
+>>> This event indicates that one or more of the options for the
+>>> controller configuration has changed.
+>>> +
+>>> +
+>>> +Advertisement Received Event
+>>> +==============================
+>>> +
+>>> + Event Code: 0x0020
+>>> + Controller Index: <controller id>
+>>> + Event Parameters: Address (6 Octets)
+>>> + Address_Type (1 Octet)
+>>> + RSSI (1 Octet)
+>>> + Flags (4 Octets)
+>>> + AD_Data_Length (2 Octets)
+>>> + AD_Data (0-65535 Octets)
+>> 
+>> Device Found event not good enough here? Why would you need a new event with exactly the same parameters?
+> 
+> Because Device Found event always contains EIR data, and mine would
+> sometimes contain only AD data.
+> Also this will be send for each advertisement received, not for first one only.
 
+Do not get confused because Device Found says EIR_Data. It will return EIR_Data for BR/EDR devices and AD_Data for LE devices. We just never bothered to find a more common name.
 
-On Tue, Sep 30, 2014 at 10:31 AM, Marcel Holtmann <marcel@holtmann.org> wrote:
-> Hi Jakub,
->
->>>> ---
->>>> doc/mgmt-api.txt | 69 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
->>>> 1 file changed, 69 insertions(+)
->>>>
->>>> diff --git a/doc/mgmt-api.txt b/doc/mgmt-api.txt
->>>> index 11e2490..1c78f1c 100644
->>>> --- a/doc/mgmt-api.txt
->>>> +++ b/doc/mgmt-api.txt
->>>> @@ -2135,6 +2135,34 @@ Set Public Address Command
->>>> Invalid Index
->>>>
->>>>
->>>> +Start LE Filtered Device Scan
->>>> +=======================
->>>> +
->>>> + Command Code: 0x003A
->>>> + Controller Index: <controller id>
->>>> + Command Parameters: UUID (16 Octets)
->>>> +             max_pathloss (1 octet)
->>>> +             is_active (1 octet)
->>>> +
->>>> + Return Parameters:
->>>> +
->>>> + This command starts LE scan, and filter received advertisements: if
->>>> AD contains both TX power level and Service Solicitation, and UUID is
->>>> contained in Service Solicitation and computed pathloss is smaller
->>>> than max_pathloss parameter, then a Advertisement Received event will
->>>> be sent.
->>>> +
->>>> + Possible values for the is_active parameter:
->>>> + 0 Start passive scan
->>>> + 1 Start active scan
->>>
->>> is really like a one-shot scan? Or is this something you would be running all the time in the background?
->>>
->>> Fundamentally if it is one-shot thing then you always want to do active scan, but if it runs in the background then you only want to do passive scanning.
->>
->> I'm working on two projects, one require scanning up to 2 minutes,
->> second requires long term scanning in background.
->> I'd preffer to have scan type as argument, but having only passive
->> scan is also good option for me.
->
-> I prefer to have these as separate commands. So one is actually a specialized active scanning to find a specific set of devices. Similar to Start Discovery. The other is to add an additional filter for our background scanning.
->
-> Remember that this has to work in sync with the auto-connection logic that the kernel is running. If you are messing that up, then you might find the device you are looking for, but the HID mouse will not re-connect.
->
->>>> +
->>>> + This command can only be used when the controller is powered.
->>>> +
->>>> + This command generates a Command Complete event on success or failure.
->>>> +
->>>> + Possible errors: Busy
->>>> + Not Supported
->>>> + Invalid Parameters
->>>> + Not Powered
->>>> + Invalid Index
->>>> +
->>>> +
->>>> Command Complete Event
->>>> ======================
->>>>
->>>> @@ -2851,3 +2879,44 @@ New Configuration Options Event
->>>>
->>>> This event indicates that one or more of the options for the
->>>> controller configuration has changed.
->>>> +
->>>> +
->>>> +Advertisement Received Event
->>>> +==============================
->>>> +
->>>> + Event Code: 0x0020
->>>> + Controller Index: <controller id>
->>>> + Event Parameters: Address (6 Octets)
->>>> + Address_Type (1 Octet)
->>>> + RSSI (1 Octet)
->>>> + Flags (4 Octets)
->>>> + AD_Data_Length (2 Octets)
->>>> + AD_Data (0-65535 Octets)
->>>
->>> Device Found event not good enough here? Why would you need a new event with exactly the same parameters?
->>
->> Because Device Found event always contains EIR data, and mine would
->> sometimes contain only AD data.
->> Also this will be send for each advertisement received, not for first one only.
->
-> Do not get confused because Device Found says EIR_Data. It will return EIR_Data for BR/EDR devices and AD_Data for LE devices. We just never bothered to find a more common name.
->
-> We could easily send multiple Device Found events. Besides Start Discovery, we also have Add Device with Action 0x00 sending out Device Found events. So that would not be a problem. We just need to define the context properly.
->
-> Regards
->
-> Marcel
->
+We could easily send multiple Device Found events. Besides Start Discovery, we also have Add Device with Action 0x00 sending out Device Found events. So that would not be a problem. We just need to define the context properly.
+
+Regards
+
+Marcel
+
