@@ -1,38 +1,57 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-Sender: armansito@google.com
-In-Reply-To: <E68A0F43-AD5C-4ED5-8724-3E43D064F5BA@holtmann.org>
-References: <1412028964-5298-1-git-send-email-armansito@chromium.org>
-	<12072518.xz8sZz3RZr@uw000953>
-	<CAHrH25SU4CMDJGukOpAzP7ZSgV3qLWBWx7+3+e7wHzX=EoL=ZA@mail.gmail.com>
-	<E68A0F43-AD5C-4ED5-8724-3E43D064F5BA@holtmann.org>
-Date: Tue, 30 Sep 2014 10:21:17 -0700
-Message-ID: <CAHrH25TT+jSUKy_r4Pmfo5EHqQBi1hB1Hu7Qq2DQm32Y99z_FA@mail.gmail.com>
-Subject: Re: [PATCH BlueZ] core: Reduce RSSI delta threshold for RSSI property
- updates on Device1.
+In-Reply-To: <372D8399-BFC6-413F-924F-44CE79030516@holtmann.org>
+References: <CAD0=r8yozB8eMdJOuffUeQZVFVf5xEXnP5tCt+k3m0e9wzMxiA@mail.gmail.com>
+	<735FD32E-BD15-4CE1-8D9C-44B8EC56DF7A@holtmann.org>
+	<CAHrH25Q6XqsLjGyfoXwimrap9=kKHOQn-G=k4Fz6HXmEPJ7EtQ@mail.gmail.com>
+	<20140917051457.GA4671@t440s.P-661HNU-F1>
+	<CAD0=r8x-=O7XAqQF_wBHQEqSkfifzgWW2AagW2EvsDUtM-E_ow@mail.gmail.com>
+	<20140917065252.GA5554@t440s.lan>
+	<CAD0=r8z9g+F7Z9X_8PE4jk3JbA+oLj9Of33RSqxiRd0dn9AnXQ@mail.gmail.com>
+	<8868B74C-0DDD-43C1-BCBF-2578A700EF72@holtmann.org>
+	<CAD0=r8xQzhizXo4umQ_mG_WMH7Akp4bji-9PNRGzqj-7HWnyNA@mail.gmail.com>
+	<0EA633E6-A0F5-4F67-B421-9857466C1175@holtmann.org>
+	<CAD0=r8w035mLnWTKtEfxZ7agzwTFRO9dsv+6qdafcBG7RYzYDQ@mail.gmail.com>
+	<F673E928-258E-47F7-B71A-F32410974538@holtmann.org>
+	<CAD0=r8xMcGP-Hjt8uCSY9Qx9VJLov5scSwRTvFr3PAaOXXbyzQ@mail.gmail.com>
+	<CAD0=r8zcPCWKyTQLQeG68uA21_sEv+5wDKNB-GJzgS1+BcD+bQ@mail.gmail.com>
+	<372D8399-BFC6-413F-924F-44CE79030516@holtmann.org>
+Date: Tue, 30 Sep 2014 10:15:36 -0700
+Message-ID: <CAHrH25QZeN+biT4GBCTpPTSLfP2ABx5DVOYeyPMwCQg=iT9jjA@mail.gmail.com>
+Subject: Re: [RFC] need for new scan api for bluetooth low energy.
 From: Arman Uguray <armansito@chromium.org>
 To: Marcel Holtmann <marcel@holtmann.org>
-Cc: Szymon Janc <szymon.janc@tieto.com>,
-	BlueZ development <linux-bluetooth@vger.kernel.org>
+Cc: Jakub Pawlowski <jpawlowski@google.com>,
+	BlueZ development <linux-bluetooth@vger.kernel.org>,
+	Scott James Remnant <keybuk@google.com>
 Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Marcel,
 
 
-> the reason why this threshold exists in the first place is that when you =
-show the pairing list in your basic UI that the entries not keep jumping ar=
-ound like crazy. When we added this code 8 dBm made sense for that. That al=
-lows that you select an entry in the devices list successfully by touch or =
-mouse. Since sorting close by devices at the top makes more sense than doin=
-g things alphabetical.
+>> +Advertisement Received Event
+>> +==============================
+>> +
+>> + Event Code: 0x0020
+>> + Controller Index: <controller id>
+>> + Event Parameters: Address (6 Octets)
+>> + Address_Type (1 Octet)
+>> + RSSI (1 Octet)
+>> + Flags (4 Octets)
+>> + AD_Data_Length (2 Octets)
+>> + AD_Data (0-65535 Octets)
+>
+> Device Found event not good enough here? Why would you need a new event with exactly the same parameters?
 >
 
-Looks like we order them according to the order in which they were
-discovered in Chrome OS :P Aside from that though, isn't it a bit
-strange to set this threshold based on UI a use case? If I'm building
-a UI around this and entries are jumping around like crazy, then this
-seems like a UI problem and not a bluetooth daemon problem and I can
-go and set a new threshold myself in the UI code.
+I guess the idea with this one is that it won't have duplicate
+filtering, right? And all AD_IND types will be propagated instead of
+just connectable ones, which is how this one differs from Device
+Found. And I'm guessing AD_Data here is the data in the advertisement
+packet in general as opposed to only being limited to EIR data.
+Though, correct me if I'm wrong.
 
--Arman
+Cheers,
+Arman
