@@ -1,56 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
 From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 5/6] android/tester: Add GATT server disconnect successful test case
-Date: Tue, 30 Sep 2014 13:23:46 +0200
-Message-Id: <1412076227-32664-5-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+Subject: [PATCH 6/6] android/tester: Add GATT server multiple connect succesful test case
+Date: Tue, 30 Sep 2014 13:23:47 +0200
+Message-Id: <1412076227-32664-6-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 In-Reply-To: <1412076227-32664-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 References: <1412076227-32664-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-It will connect to powered on and visible device then disconnect.
+It will connect to powered on and visible device multiple time then
+disconnects.
 ---
- android/tester-gatt.c | 40 ++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 40 insertions(+)
+ android/tester-gatt.c | 34 ++++++++++++++++++++++++++++++++++
+ 1 file changed, 34 insertions(+)
 
 diff --git a/android/tester-gatt.c b/android/tester-gatt.c
-index a8b62c5..75cab85 100644
+index 75cab85..1b86e33 100644
 --- a/android/tester-gatt.c
 +++ b/android/tester-gatt.c
-@@ -891,6 +891,21 @@ static void gatt_server_connect_action(void)
- 	schedule_action_verification(step);
- }
- 
-+static void gatt_server_disconnect_action(void)
-+{
-+	struct test_data *data = tester_get_data();
-+	struct step *current_data_step = queue_peek_head(data->steps);
-+	struct gatt_connect_data *conn_data = current_data_step->set_data;
-+	struct step *step = g_new0(struct step, 1);
-+
-+	step->action_status = data->if_gatt->server->disconnect(
-+							conn_data->app_id,
-+							&emu_remote_bdaddr_val,
-+							conn_data->conn_id);
-+
-+	schedule_action_verification(step);
-+}
-+
- static void gatt_cid_hook_cb(const void *data, uint16_t len, void *user_data)
- {
- 	struct test_data *t_data = tester_get_data();
-@@ -1913,6 +1928,31 @@ static struct test_case test_cases[] = {
+@@ -1953,6 +1953,40 @@ static struct test_case test_cases[] = {
  		ACTION_SUCCESS(bluetooth_disable_action, NULL),
  		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_OFF),
  	),
-+	TEST_CASE_BREDRLE("Gatt Server - LE Disconnect",
++	TEST_CASE_BREDRLE("Gatt Server - LE Multiple Server Conn./Disc",
 +		ACTION_SUCCESS(bluetooth_enable_action, NULL),
 +		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_ON),
 +		ACTION_SUCCESS(emu_setup_powered_remote_action, NULL),
 +		ACTION_SUCCESS(emu_set_ssp_mode_action, NULL),
 +		ACTION_SUCCESS(emu_set_connect_cb_action, gatt_conn_cb),
 +		ACTION_SUCCESS(gatt_server_register_action, &app1_uuid),
++		CALLBACK_STATUS(CB_GATTS_REGISTER_SERVER, BT_STATUS_SUCCESS),
++		ACTION_SUCCESS(gatt_server_register_action, &app2_uuid),
 +		CALLBACK_STATUS(CB_GATTS_REGISTER_SERVER, BT_STATUS_SUCCESS),
 +		ACTION_SUCCESS(bt_start_discovery_action, NULL),
 +		CALLBACK_STATE(CB_BT_DISCOVERY_STATE_CHANGED,
@@ -61,8 +42,15 @@ index a8b62c5..75cab85 100644
 +		CALLBACK_GATTS_CONNECTION(GATT_SERVER_CONNECTED,
 +						prop_emu_remotes_default_set,
 +						CONN1_ID, APP1_ID),
-+		ACTION_SUCCESS(gatt_server_disconnect_action,
-+							&app1_conn_req),
++		ACTION_SUCCESS(gatt_server_connect_action, &app2_conn_req),
++		CALLBACK_GATTS_CONNECTION(GATT_SERVER_CONNECTED,
++						prop_emu_remotes_default_set,
++						CONN2_ID, APP2_ID),
++		ACTION_SUCCESS(gatt_server_disconnect_action, &app2_conn_req),
++		CALLBACK_GATTS_CONNECTION(GATT_SERVER_DISCONNECTED,
++						prop_emu_remotes_default_set,
++						CONN2_ID, APP2_ID),
++		ACTION_SUCCESS(gatt_server_disconnect_action, &app1_conn_req),
 +		CALLBACK_GATTS_CONNECTION(GATT_SERVER_DISCONNECTED,
 +						prop_emu_remotes_default_set,
 +						CONN1_ID, APP1_ID),
