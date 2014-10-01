@@ -1,165 +1,63 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: Gowtham Anandha Babu <gowtham.ab@samsung.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	'Dmitry Kasatkin' <d.kasatkin@samsung.com>,
-	'Bharat Panda' <bharat.panda@samsung.com>
-Subject: Re: [PATCH] obexd/src/main: Fix memory leak on obex server
-Date: Wed, 01 Oct 2014 15:22:29 +0200
-Message-ID: <2580394.BL666j3vo2@uw000953>
-In-Reply-To: <000e01cfdd66$18e1fd20$4aa5f760$@samsung.com>
-References: <1412145103-4824-1-git-send-email-gowtham.ab@samsung.com> <5138547.7BEzpM8uY4@uw000953> <000e01cfdd66$18e1fd20$4aa5f760$@samsung.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ v2 3/3] shared/gatt-client: Fix crash on bt_gatt_client_unref
+Date: Wed,  1 Oct 2014 16:17:24 +0300
+Message-Id: <1412169444-30509-3-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <1412169444-30509-1-git-send-email-luiz.dentz@gmail.com>
+References: <1412169444-30509-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Gowtham,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-On Wednesday 01 of October 2014 16:24:27 Gowtham Anandha Babu wrote:
-> Hi Szymon,
-> 
-> > -----Original Message-----
-> > From: Szymon Janc [mailto:szymon.janc@tieto.com]
-> > Sent: Wednesday, October 01, 2014 2:31 PM
-> > To: Gowtham Anandha Babu
-> > Cc: linux-bluetooth@vger.kernel.org; 'Dmitry Kasatkin'; 'Bharat Panda'
-> > Subject: Re: [PATCH] obexd/src/main: Fix memory leak on obex server
-> > 
-> > Hi Gowtham,
-> > 
-> > On Wednesday 01 of October 2014 14:21:22 Gowtham Anandha Babu wrote:
-> > > Hi Szymon,
-> > >
-> > > > -----Original Message-----
-> > > > From: Szymon Janc [mailto:szymon.janc@tieto.com]
-> > > > Sent: Wednesday, October 01, 2014 12:28 PM
-> > > > To: Gowtham Anandha Babu
-> > > > Cc: linux-bluetooth@vger.kernel.org; d.kasatkin@samsung.com;
-> > > > bharat.panda@samsung.com; cpgs@samsung.com
-> > > > Subject: Re: [PATCH] obexd/src/main: Fix memory leak on obex server
-> > > >
-> > > > Hi Gowtham,
-> > > >
-> > > >  On Wednesday 01 of October 2014 12:01:43 Gowtham Anandha Babu
-> > wrote:
-> > > > > Freeing the variables at appropriate place.
-> > > > > ---
-> > > > >  obexd/src/main.c | 3 ++-
-> > > > >  1 file changed, 2 insertions(+), 1 deletion(-)
-> > > > >
-> > > > > diff --git a/obexd/src/main.c b/obexd/src/main.c index
-> > > > > 80645f8..7a1ab98 100644
-> > > > > --- a/obexd/src/main.c
-> > > > > +++ b/obexd/src/main.c
-> > > > > @@ -293,8 +293,9 @@ int main(int argc, char *argv[])
-> > > > >  		char *old_root = option_root, *home = getenv("HOME");
-> > > > >  		if (home) {
-> > > > >  			option_root = g_strdup_printf("%s/%s", home,
-> > > > old_root);
-> > > > > -			g_free(old_root);
-> > > > > +			g_free(home);
-> > > > >  		}
-> > > > > +		g_free(old_root);
-> > > > >  	}
-> > > > >
-> > > > >  	if (option_capability == NULL)
-> > > > >
-> > > >
-> > > > This patch is incorrect in multiple ways:
-> > > > - freeing old_root without altering option_root would result in use-after-
-> > free
-> > > >   few lines later in root_folder_setup() or (if program didn't crash already)
-> > > >   double free on exit.
-> > > > - freeing home pointer would result in crash or undefined behavior:
-> > > >   from getenv manual: "As typically implemented, getenv() returns a
-> > > > pointer to
-> > > >   a string within the environment list.  The caller must take care not to
-> > > >   modify this string, since that would change the environment of the
-> > process.
-> > > >   ...The string pointed to by the return value of getenv() may be statically
-> > > >   allocated,"
-> > > >
-> > > > But I agree that original code is a bit confusing. Maybe something
-> > > > like this would make it more readable?
-> > > >
-> > > > --- a/obexd/src/main.c
-> > > > +++ b/obexd/src/main.c
-> > > > @@ -290,8 +290,9 @@ int main(int argc, char *argv[])
-> > > >         }
-> > > >
-> > > >         if (option_root[0] != '/') {
-> > > > -               char *old_root = option_root, *home = getenv("HOME");
-> > > > +               const char *home = getenv("HOME");
-> > > >                 if (home) {
-> > > > +                       char *old_root = option_root;
-> > > >                         option_root = g_strdup_printf("%s/%s", home, old_root);
-> > > >                         g_free(old_root);
-> > > >                 }
-> > > >
-> > > >
-> > > > --
-> > > > Best regards,
-> > > > Szymon Janc
-> > >
-> > > I agree with you.
-> > > But why can't it be like this
-> > >
-> > > 	if (option_root[0] != '/') {
-> > > 		const char *home = getenv("HOME");
-> > > 		if (home) {
-> > > 			option_root = g_strdup_printf("%s/%s", home,
-> > option_root);
-> > > 		}
-> > > 	}
-> > > ---
-> > > (checked, it's not crashing)
-> > 
-> > 
-> > In that case you are leaking option_root. That is why temporary old_root is
-> > needed so that original option_root can be freed.
-> > 
-> > --
-> > Best regards,
-> > Szymon Janc
-> 
-> Sorry If I am wrong, at the end option_root was freed after g_mail_loop_unref(main_loop). Is that enough ? 
-> Or Do we need to free that intermediate option_root inside g_strdup_printf() ?
+Calling gatt_client_clear_services after notify_list is destroyed cause
+the following backtrace:
 
-Memory pointed by old option_root needs to be freed since pointer is
-overwritten. I suggest exploring valgrind for tracking memory leaks
-(see HACKING for guideline).
+Invalid read of size 8
+   at 0x404CC9: queue_remove_all (queue.c:312)
+   by 0x401FC6: gatt_client_remove_all_notify_in_range (gatt-client.c:350)
+   by 0x403170: bt_gatt_client_free (gatt-client.c:357)
+   by 0x401A93: test_client (test-gatt.c:224)
+   by 0x4E9E5E0: ??? (in /usr/lib64/libglib-2.0.so.0.3800.2)
+   by 0x4E9E7A5: ??? (in /usr/lib64/libglib-2.0.so.0.3800.2)
+   by 0x4E9E7A5: ??? (in /usr/lib64/libglib-2.0.so.0.3800.2)
+   by 0x4E9E7A5: ??? (in /usr/lib64/libglib-2.0.so.0.3800.2)
+   by 0x4E9EB1A: g_test_run_suite (in /usr/lib64/libglib-2.0.so.0.3800.2)
+   by 0x4015EE: main (test-gatt.c:259)
+ Address 0x5752718 is 8 bytes inside a block of size 32 free'd
+   at 0x4C28577: free (in /usr/lib64/valgrind/vgpreload_memcheck-amd64-linux.so)
+   by 0x40315E: bt_gatt_client_free (gatt-client.c:1233)
+   by 0x401A93: test_client (test-gatt.c:224)
+   by 0x4E9E5E0: ??? (in /usr/lib64/libglib-2.0.so.0.3800.2)
+   by 0x4E9E7A5: ??? (in /usr/lib64/libglib-2.0.so.0.3800.2)
+   by 0x4E9E7A5: ??? (in /usr/lib64/libglib-2.0.so.0.3800.2)
+   by 0x4E9E7A5: ??? (in /usr/lib64/libglib-2.0.so.0.3800.2)
+   by 0x4E9EB1A: g_test_run_suite (in /usr/lib64/libglib-2.0.so.0.3800.2)
+   by 0x4015EE: main (test-gatt.c:259)
+---
+ src/shared/gatt-client.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-> One more clarification:
-> 
-> static gboolean parse_debug(const char *key, const char *value,
-> 				gpointer user_data, GError **error)
-> {
-> 	if (value)
-> 		option_debug = g_strdup(value);
-> 	else
-> 		option_debug = g_strdup("*");
-> 
-> 	return TRUE;
-> }
-> 
-> 
-> In the above function, option_debug needs be freed right? As Like below:
-> 
-> static gboolean parse_debug(const char *key, const char *value,
-> 				gpointer user_data, GError **error)
-> {
-> 	g_free(option_debug);
-> 	if (value)
-> 		option_debug = g_strdup(value);
-> 	else
-> 		option_debug = g_strdup("*");
-> 
-> 	return TRUE;
-> }
-
-There is no need to free that since option_debug is initially NULL.
-
+diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
+index 782e6b3..ddedaf0 100644
+--- a/src/shared/gatt-client.c
++++ b/src/shared/gatt-client.c
+@@ -1224,12 +1224,12 @@ static void bt_gatt_client_free(struct bt_gatt_client *client)
+ 	bt_att_unregister(client->att, client->notify_id);
+ 	bt_att_unregister(client->att, client->ind_id);
+ 
++	gatt_client_clear_services(client);
++
+ 	queue_destroy(client->svc_chngd_queue, free);
+ 	queue_destroy(client->long_write_queue, long_write_op_unref);
+ 	queue_destroy(client->notify_list, notify_data_unref);
+ 
+-	gatt_client_clear_services(client);
+-
+ 	bt_att_unref(client->att);
+ 	free(client);
+ }
 -- 
-Best regards, 
-Szymon Janc
+1.9.3
+
