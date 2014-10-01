@@ -1,34 +1,58 @@
 Return-Path: <cyrus@holtmann.org>
-From: Jukka Rissanen <jukka.rissanen@linux.intel.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: 6lowpan: Memory leak as the skb is not freed
-Date: Wed,  1 Oct 2014 11:30:26 +0300
-Message-Id: <1412152226-22272-1-git-send-email-jukka.rissanen@linux.intel.com>
+Message-ID: <542BB93C.7080208@tieto.com>
+Date: Wed, 01 Oct 2014 10:20:12 +0200
+From: Tyszkowski Jakub <jakub.tyszkowski@tieto.com>
+MIME-Version: 1.0
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCHv2 01/16] android/tester: Expose gatt-tester's pdu definition
+ to other testers
+References: <1411713077-19757-1-git-send-email-jakub.tyszkowski@tieto.com>	<1411713077-19757-2-git-send-email-jakub.tyszkowski@tieto.com>	<CABBYNZJwTo-hQ4LuaxbmQt8WGoPCrM-a_W1NQdf8AvJboNyu2w@mail.gmail.com>	<542A9706.6000504@tieto.com> <CABBYNZKQRr8JCcq_Qgp8rrALiN1sHNNDv9ukvBsaMYsGOyM3Vw@mail.gmail.com>
+In-Reply-To: <CABBYNZKQRr8JCcq_Qgp8rrALiN1sHNNDv9ukvBsaMYsGOyM3Vw@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The earlier multicast commit 36b3dd250dde ("Bluetooth: 6lowpan:
-Ensure header compression does not corrupt IPv6 header") lost one
-skb free which then caused memory leak.
+Hi Luiz,
 
-Signed-off-by: Jukka Rissanen <jukka.rissanen@linux.intel.com>
----
- net/bluetooth/6lowpan.c | 2 ++
- 1 file changed, 2 insertions(+)
+On 09/30/2014 02:10 PM, Luiz Augusto von Dentz wrote:
+> Hi Jakub,
+>
+> On Tue, Sep 30, 2014 at 2:41 PM, Tyszkowski Jakub
+> <jakub.tyszkowski@tieto.com> wrote:
+>>>> +struct pdu {
+>>>> +       uint8_t *data;
+>>>> +       uint16_t size;
+>>>
+>>>
+>>> The size should probably be size_t, or even better use struct iovec
+>>> directly here since it is about the same.
+>>
+>>
+>> I wouldn't go that far and use iovec's here.
+>>
+>> I actually had one patch on top of this set which replaces this struct with
+>> iovec but in the end the only benefit was one struct definition less as
+>> bthost API does not take iovecs:
+>
+> Im working on it already, internally bthost already uses iovec so it
+> makes sense to expose it if we can benefit from it.
+>
+>> void bthost_send_cid(struct bthost *bthost, uint16_t handle,
+>>                          uint16_t cid, const void *data, uint16_t len)
+>>
+>> And this function is also a reason for 'size' being uint16_t.
+>>
+>> BTW I think 'pdu.data' looks better than 'pdu.iov_base' and we shouldn't
+>> make it look more complicated than it is without the real benefit.
+>
+> Well this is not exactly the point, it might look better but struct
+> iovec is a standard interface so it only make sense to introduce
+> another design if the standard does not attend our needs which does
+> not seems to be the case here.
 
-diff --git a/net/bluetooth/6lowpan.c b/net/bluetooth/6lowpan.c
-index f0432ae..add2b58 100644
---- a/net/bluetooth/6lowpan.c
-+++ b/net/bluetooth/6lowpan.c
-@@ -625,6 +625,8 @@ static netdev_tx_t bt_xmit(struct sk_buff *skb, struct net_device *netdev)
- 		send_mcast_pkt(skb, netdev);
- 	}
- 
-+	dev_kfree_skb(skb);
-+
- 	if (err)
- 		BT_DBG("ERROR: xmit failed (%d)", err);
- 
--- 
-1.8.3.1
+I'll resend this set with one more patch on top, which replaces pdu 
+struct with iovec and bthost_send_cid() with bthost_send_cid_v().
 
+Regards,
+Jakub
