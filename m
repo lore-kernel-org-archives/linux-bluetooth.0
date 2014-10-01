@@ -1,103 +1,124 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <CABBYNZLK6JfiQWp+pNK8+Pg-YOcShrm4TcbwHdnAKtbfhOcJmg@mail.gmail.com>
-References: <1412163494-20283-1-git-send-email-luiz.dentz@gmail.com>
-	<1412163494-20283-2-git-send-email-luiz.dentz@gmail.com>
-	<20141001123408.GA26432@t440s.lan>
-	<CABBYNZLK6JfiQWp+pNK8+Pg-YOcShrm4TcbwHdnAKtbfhOcJmg@mail.gmail.com>
-Date: Wed, 1 Oct 2014 09:17:45 -0700
-Message-ID: <CAHrH25T1FqMi7zho+gYCbuhmdQpsVoqV5ee3H+UbZwwhqeNC9A@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 2/4] shared/gatt-client: Take fd in bt_gatt_client_new
-From: Arman Uguray <armansito@chromium.org>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+From: Alex Gal <a.gal@miip.ca>
+Date: Wed, 1 Oct 2014 12:02:10 -0400
+Message-ID: <CAEa95a=_KJNtZa_BDwMJqd7T_R8DBfdThKNygg-HVKNWcNTFqQ@mail.gmail.com>
+Subject: sixaxis & sony/snakebyte ps3 navigation move controller issues
+To: linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz & Johan,
+Hello,
+
+I am using the latest bluez (from git).
+
+## Problem 1: Sony Move Navigation Controller not recognized
+
+This was easily fixed by adding a new device in the devices contained
+in plugins/sixaxis.c.
+I will post a patch later today.
+
+## Problem 2: Sony Move Navigation Controller connection procedure issues
+
+After plugging-in the controller to the usb cable for the master
+reset, a device is created (with no services).
+
+in bluetoothctl:
+power on
+agent on
+default-agent
+trust 00:07:04:B9:CC:64
+
+Pressing the sony button on the controller (00:07:04:B9:CC:64 ), the
+controller tries to connect to the master a couple of times, but fails
+every time this is error:
+
+bluetoothd[2740]: src/adapter.c:connected_callback() hci0 device
+00:07:04:B9:CC:64 connected eir_len 5
+bluetoothd[2740]: src/device.c:device_set_class()
+/org/bluez/hci0/dev_00_07_04_B9_CC_64 0x000508
+bluetoothd[2740]: profiles/input/server.c:connect_event_cb() Incoming
+connection from 00:07:04:B9:CC:64 on PSM 17
+bluetoothd[2740]: profiles/input/device.c:input_device_set_channel()
+idev (nil) psm 17
+bluetoothd[2740]: Refusing input device connect: No such file or directory (2)
+bluetoothd[2740]: profiles/input/server.c:confirm_event_cb()
+bluetoothd[2740]: Refusing connection from 00:07:04:B9:CC:64: unknown device
+bluetoothd[2740]: src/adapter.c:dev_disconnected() Device
+00:07:04:B9:CC:64 disconnected, reason 3
+bluetoothd[2740]: src/adapter.c:adapter_remove_connection()
+bluetoothd[2740]: plugins/policy.c:disconnect_cb() reason 3
+bluetoothd[2740]: src/adapter.c:bonding_attempt_complete() hci0 bdaddr
+00:07:04:B9:CC:64 type 0 status 0xe
+bluetoothd[2740]: src/device.c:device_bonding_complete() bonding (nil)
+status 0x0e
+bluetoothd[2740]: src/device.c:device_bonding_failed() status 14
+bluetoothd[2740]: src/adapter.c:resume_discovery()
+
+[bluetooth]# info 00:07:04:B9:CC:64
+Device 00:07:04:B9:CC:64
+        Name: PLAYSTATION(R)3 Controller
+        Alias: PLAYSTATION(R)3 Controller
+        Class: 0x000508
+        Icon: input-gaming
+        Paired: no
+        Trusted: yes
+        Blocked: no
+        Connected: no
+        LegacyPairing: no
+        Modalias: usb:v054Cp042Fd0000
+
+Since there are no services associated with the device, I assume bluez
+does not know what do to with it.
+
+However, if I try to connect to it while the controller is connecting,
+at some point it will retrieve the services and, eventually, connect
+(and create the appropriate /dev/input/jsX).
+
+[bluetooth]# connect 00:07:04:B9:CC:64
+Attempting to connect to 00:07:04:B9:CC:64
+[CHG] Device 00:07:04:B9:CC:64 Modalias: usb:v054Cp0268d0100
+[CHG] Device 00:07:04:B9:CC:64 UUIDs:
+        00001124-0000-1000-8000-00805f9b34fb
+        00001200-0000-1000-8000-00805f9b34fb
+
+Would it be possible to "hardcode" these services for this device or
+would that be a nasty hack ?
 
 
->> The above is fine except I don't really see the point in having separate
->> client and server objects to begin with. I might have missed the
->> reasoning behind it (in which case please enlighten me), but why don't
->> we hide both roles behind the same object, since they're anyway tied to
->> the same connection?
->>
+## Problem 3: SnakeByte PS3 clone Navigation Move master reset
 
-I think eventually this is may be what we want but it seems more
-natural to me for client and server roles to be in different objects,
-at least internally. There's never an "overlap" between server and
-client roles that I know of and these should be pretty much
-orthogonal. I think eventually we can have a more global object that
-owns the fd & att structure and owns the server and the client, but
-it's more intuitive IMO if the server & client procedures are grouped
-in their own modules. Apart from the transport, there's really nothing
-that they'll share (afaik).
+The sixaxis plugin recognizes the controller and resets the master,
+however the device address is buggy:
 
+bluetoothd[1762]: plugins/sixaxis.c:get_supported_device() pid is: 268
+bluetoothd[1762]: sixaxis: compatible device connected:
+PLAYSTATION(R)3 Controller (054C:0268)
+bluetoothd[1762]: plugins/sixaxis.c:setup_device() remote
+00:32:00:45:00:A1 old_master 20:36:00:32:00:45 new_master
+00:02:72:C8:CF:71
+bluetoothd[1762]: src/device.c:device_create() dst 00:32:00:45:00:A1
+bluetoothd[1762]: src/device.c:device_new() address 00:32:00:45:00:A1
+bluetoothd[1762]: src/device.c:device_new() Creating device
+/org/bluez/hci0/dev_00_32_00_45_00_A1
+bluetoothd[1762]: sixaxis: setting up new device
+bluetoothd[1762]: src/device.c:btd_device_device_set_name()
+/org/bluez/hci0/dev_00_32_00_45_00_A1 PLAYSTATION(R)3 Controller
+bluetoothd[1762]: src/device.c:btd_device_set_temporary() temporary 0
+bluetoothd[1762]: plugins/sixaxis.c:get_leds_data() number 1
 
->> I have no objections to having clearly name-spaced functions for client
->> and server side behavior, and even keeping these in separate c-files,
->> but having independent objects for them seems a bit pointless. So why
->> couldn't we have server_foo(att) and client_foo(att) while keeping just
->> this one "att" context?
+I will get this even if I replug the usb cable again; the old_master
+never changes.
 
-Having independent objects made sense initially, since the kind of
-state they keep is mostly different. bt_gatt_server will mostly only
-interact with gatt_db and bt_att, while bt_gatt_client stores a high
-level client cache. And this isn't too bad from an implementation
-stand-point (in fact it makes sense from an OO perspective) and it
-would be quite ok for a higher-level bt_gatt object to create and own
-these two.
+## Problem 4: SnakeByte PS3 clone Navigation Move pairing failure
 
-In any case, these could in fact be unified eventually but for now
-let's keep them separate and see how the server turns out without
-overthinking it. I'm going to start sending out patches for the server
-code soon, and once that starts taking shape, I think we can decide if
-they should be unified or not.
+If I repeat the same procedure that worked with the realy Sony
+controller but it won't work at all; there are no services associated
+with that device at all.
 
+Any ideas would be welcome.
 
-> So I do agree that it seems much simpler API to unify client and
-> server and let it self manage the ATT connection, we could even notify
-> disconnects via ready callback, well if we fix it because right now if
-> the remote does not respond or respond with something invalid it
-> doesn't seems to be called.
+Thank you,
 
-Yeah this is actually a bug in the code. If the remote end doesn't
-respond, then att.c:timeout_cb will be called eventually, which will
-destroy the connection by destroying the io. It notifies this via a
-timeout_callback to the upper layer but the disconnect_callback
-doesn't automatically get called, since io simply closes the fd
-instead of receiving an event (which is how the regular
-disconnect_callback is currently invoked). I suppose this can be fixed
-by calling all registered disconnect callbacks in att.c:timeout_cb.
-I've been aware of this bug though never got around to fixing it :)
-
-If the remote responds with something invalid, bt_att doesn't do
-anything currently. If the opcode is bad, it simply drops it. We'll
-have to figure out a way to correctly handle this, either at the
-bt_att level or at the gatt level.
-
-
-> ... For the server side it seems to be just a
-> matter of attaching the db, which could perhaps be passed in
-> bt_gatt_new or having dedicated bt_gatt_attach_db/bt_gatt_detach_cb.
-
-So, the current idea is this:
-
-   db = gatt_db_new();
-   ... /* Populate DB */
-   att = bt_att_new(fd);
-   client = bt_gatt_client_new(att, mtu);
-   server = bt_gatt_server_new(db, att, mtu);
-
-All of this could be done by a higher-level bt_gatt object that puts
-everything together but for now, let's not create bt_att inside
-bt_gatt_client. I think Marcel's longer term idea is to put these all
-inside an even higher-level bt_gap that basically puts SDP and GATT
-together. (I saw some patches fly by for shared/gap).
-
-I hope this all makes sense.
-
-Cheers,
-Arman
+Alex
