@@ -2,200 +2,378 @@ Return-Path: <cyrus@holtmann.org>
 From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
-Subject: [PATCHv3 16/17] android/tester: Use generic connect callback for simple cases
-Date: Wed,  1 Oct 2014 11:01:38 +0200
-Message-Id: <1412154099-28014-17-git-send-email-jakub.tyszkowski@tieto.com>
+Subject: [PATCHv3 17/17] android/tester: Replace pdu struct with iovec
+Date: Wed,  1 Oct 2014 11:01:39 +0200
+Message-Id: <1412154099-28014-18-git-send-email-jakub.tyszkowski@tieto.com>
 In-Reply-To: <1412154099-28014-1-git-send-email-jakub.tyszkowski@tieto.com>
 References: <1412154099-28014-1-git-send-email-jakub.tyszkowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This is usefull when no custom behavior and just simple pdu exchange
-is needed.
+I/O vectors are now supported on bthost API.
 ---
- android/tester-avrcp.c   | 13 +------------
- android/tester-hdp.c     | 32 ++------------------------------
- android/tester-hidhost.c | 12 +-----------
- android/tester-main.c    | 10 ++++++++++
- android/tester-main.h    |  1 +
- android/tester-pan.c     | 13 +------------
- 6 files changed, 16 insertions(+), 65 deletions(-)
+ android/tester-gatt.c    | 68 ++++++++++++++++++++++++------------------------
+ android/tester-hidhost.c | 10 +++----
+ android/tester-main.c    | 25 ++++++++++--------
+ android/tester-main.h    | 16 +++++-------
+ 4 files changed, 58 insertions(+), 61 deletions(-)
 
-diff --git a/android/tester-avrcp.c b/android/tester-avrcp.c
-index 4a49bb0..a2ceff6 100644
---- a/android/tester-avrcp.c
-+++ b/android/tester-avrcp.c
-@@ -138,20 +138,9 @@ static struct emu_set_l2cap_data a2dp_setup_data = {
- 	.user_data = &a2dp_data,
+diff --git a/android/tester-gatt.c b/android/tester-gatt.c
+index 1460329..81ae257 100644
+--- a/android/tester-gatt.c
++++ b/android/tester-gatt.c
+@@ -137,8 +137,8 @@ static struct gatt_search_service_data search_services_1 = {
+ 	.filter_uuid = NULL,
  };
  
--static void sdp_connect_request_cb(uint16_t handle, uint16_t cid,
--							void *user_data)
--{
--	struct emu_l2cap_cid_data *cid_data = user_data;
--
--	cid_data->handle = handle;
--	cid_data->cid = cid;
--
--	tester_handle_l2cap_data_exchange(cid_data);
--}
--
- static struct emu_set_l2cap_data sdp_setup_data = {
- 	.psm = 1,
--	.func = sdp_connect_request_cb,
-+	.func = tester_generic_connect_cb,
- 	.user_data = &sdp_data,
+-static const struct pdu exchange_mtu_req_pdu = raw_pdu(0x02, 0xa0, 0x02);
+-static const struct pdu exchange_mtu_resp_pdu = raw_pdu(0x03, 0xa0, 0x02);
++static const struct iovec exchange_mtu_req_pdu = raw_pdu(0x02, 0xa0, 0x02);
++static const struct iovec exchange_mtu_resp_pdu = raw_pdu(0x03, 0xa0, 0x02);
+ 
+ static struct bt_action_data bearer_type = {
+ 	.bearer_type = BDADDR_LE_PUBLIC,
+@@ -368,7 +368,7 @@ static struct set_write_params set_write_param_3 = {
+ 	.status = 0x01
  };
  
-diff --git a/android/tester-hdp.c b/android/tester-hdp.c
-index f021943..c9c5a78 100644
---- a/android/tester-hdp.c
-+++ b/android/tester-hdp.c
-@@ -243,16 +243,6 @@ static void hdp_unregister_app_action(void)
- 	schedule_action_verification(step);
- }
- 
--static void hdp_sdp_search_cb(uint16_t handle, uint16_t cid, void *user_data)
--{
--	struct emu_l2cap_cid_data *cid_data = user_data;
--
--	cid_data->handle = handle;
--	cid_data->cid = cid;
--
--	tester_handle_l2cap_data_exchange(cid_data);
--}
--
- static void mcap_ctrl_cid_hook_cb(const void *data, uint16_t len,
- 							void *user_data)
- {
-@@ -315,28 +305,10 @@ static void mcap_ctrl_connect_cb(uint16_t handle, uint16_t cid, void *user_data)
- 								cid_data);
- }
- 
--static void mcap_data_cid_hook_cb(const void *data, uint16_t len,
--							void *user_data)
--{
--}
--
--static void mcap_data_connect_cb(uint16_t handle, uint16_t cid, void *user_data)
--{
--	struct test_data *data = tester_get_data();
--	struct bthost *bthost = hciemu_client_get_host(data->hciemu);
--	struct emu_l2cap_cid_data *cid_data = user_data;
--
--	cid_data->handle = handle;
--	cid_data->cid = cid;
--
--	bthost_add_cid_hook(bthost, handle, cid, mcap_data_cid_hook_cb,
--								cid_data);
--}
--
- /* Emulate SDP (PSM = 1) */
- static struct emu_set_l2cap_data l2cap_setup_sdp_data = {
- 	.psm = 1,
--	.func = hdp_sdp_search_cb,
-+	.func = tester_generic_connect_cb,
- 	.user_data = &sdp_cid_data,
+-static struct pdu search_service[] = {
++static struct iovec search_service[] = {
+ 	raw_pdu(0x10, 0x01, 0x00, 0xff, 0xff, 0x00, 0x28),
+ 	raw_pdu(0x11, 0x06, 0x01, 0x00, 0x10, 0x00, 0x00, 0x18),
+ 	raw_pdu(0x10, 0x11, 0x00, 0xff, 0xff, 0x00, 0x28),
+@@ -376,7 +376,7 @@ static struct pdu search_service[] = {
+ 	null_pdu
  };
  
-@@ -350,7 +322,7 @@ static struct emu_set_l2cap_data l2cap_setup_cc_data = {
- /* Emulate Data Channel (PSM = 0x1003) */
- static struct emu_set_l2cap_data l2cap_setup_dc_data = {
- 	.psm = 0x1003,
--	.func = mcap_data_connect_cb,
-+	.func = tester_generic_connect_cb,
- 	.user_data = &data_cid_data,
+-static struct pdu search_service_2[] = {
++static struct iovec search_service_2[] = {
+ 	raw_pdu(0x10, 0x01, 0x00, 0xff, 0xff, 0x00, 0x28),
+ 	raw_pdu(0x11, 0x06, 0x01, 0x00, 0x10, 0x00, 0x00, 0x18),
+ 	raw_pdu(0x10, 0x11, 0x00, 0xff, 0xff, 0x00, 0x28),
+@@ -386,13 +386,13 @@ static struct pdu search_service_2[] = {
+ 	null_pdu
  };
  
+-static struct pdu search_service_3[] = {
++static struct iovec search_service_3[] = {
+ 	raw_pdu(0x10, 0x01, 0x00, 0xff, 0xff, 0x00, 0x28),
+ 	raw_pdu(0x01, 0x08, 0x01, 0x00, 0x0a),
+ 	null_pdu
+ };
+ 
+-static struct pdu get_characteristic_1[] = {
++static struct iovec get_characteristic_1[] = {
+ 	raw_pdu(0x10, 0x01, 0x00, 0xff, 0xff, 0x00, 0x28),
+ 	raw_pdu(0x11, 0x06, 0x01, 0x00, 0x10, 0x00, 0x00, 0x18),
+ 	raw_pdu(0x10, 0x11, 0x00, 0xff, 0xff, 0x00, 0x28),
+@@ -404,7 +404,7 @@ static struct pdu get_characteristic_1[] = {
+ 	null_pdu
+ };
+ 
+-static struct pdu get_descriptor_1[] = {
++static struct iovec get_descriptor_1[] = {
+ 	raw_pdu(0x10, 0x01, 0x00, 0xff, 0xff, 0x00, 0x28),
+ 	raw_pdu(0x11, 0x06, 0x01, 0x00, 0x10, 0x00, 0x00, 0x18),
+ 	raw_pdu(0x10, 0x11, 0x00, 0xff, 0xff, 0x00, 0x28),
+@@ -420,7 +420,7 @@ static struct pdu get_descriptor_1[] = {
+ 	null_pdu
+ };
+ 
+-static struct pdu get_descriptor_2[] = {
++static struct iovec get_descriptor_2[] = {
+ 	raw_pdu(0x10, 0x01, 0x00, 0xff, 0xff, 0x00, 0x28),
+ 	raw_pdu(0x11, 0x06, 0x01, 0x00, 0x10, 0x00, 0x00, 0x18),
+ 	raw_pdu(0x10, 0x11, 0x00, 0xff, 0xff, 0x00, 0x28),
+@@ -436,7 +436,7 @@ static struct pdu get_descriptor_2[] = {
+ 	null_pdu
+ };
+ 
+-static struct pdu get_descriptor_3[] = {
++static struct iovec get_descriptor_3[] = {
+ 	raw_pdu(0x10, 0x01, 0x00, 0xff, 0xff, 0x00, 0x28),
+ 	raw_pdu(0x11, 0x06, 0x01, 0x00, 0x10, 0x00, 0x00, 0x18),
+ 	raw_pdu(0x10, 0x11, 0x00, 0xff, 0xff, 0x00, 0x28),
+@@ -450,7 +450,7 @@ static struct pdu get_descriptor_3[] = {
+ 	null_pdu
+ };
+ 
+-static struct pdu get_included_1[] = {
++static struct iovec get_included_1[] = {
+ 	raw_pdu(0x10, 0x01, 0x00, 0xff, 0xff, 0x00, 0x28),
+ 	raw_pdu(0x11, 0x06, 0x01, 0x00, 0x10, 0x00, 0x00, 0x18),
+ 	raw_pdu(0x10, 0x11, 0x00, 0xff, 0xff, 0x00, 0x28),
+@@ -462,7 +462,7 @@ static struct pdu get_included_1[] = {
+ 	null_pdu
+ };
+ 
+-static struct pdu get_included_2[] = {
++static struct iovec get_included_2[] = {
+ 	raw_pdu(0x10, 0x01, 0x00, 0xff, 0xff, 0x00, 0x28),
+ 	raw_pdu(0x11, 0x06, 0x01, 0x00, 0x10, 0x00, 0x00, 0x18),
+ 	raw_pdu(0x10, 0x11, 0x00, 0xff, 0xff, 0x00, 0x28),
+@@ -477,7 +477,7 @@ static struct pdu get_included_2[] = {
+ 	null_pdu
+ };
+ 
+-static struct pdu get_included_3[] = {
++static struct iovec get_included_3[] = {
+ 	raw_pdu(0x10, 0x01, 0x00, 0xff, 0xff, 0x00, 0x28),
+ 	raw_pdu(0x11, 0x06, 0x01, 0x00, 0x10, 0x00, 0x00, 0x18),
+ 	raw_pdu(0x10, 0x11, 0x00, 0xff, 0xff, 0x00, 0x28),
+@@ -487,7 +487,7 @@ static struct pdu get_included_3[] = {
+ 	null_pdu
+ };
+ 
+-static struct pdu read_characteristic_1[] = {
++static struct iovec read_characteristic_1[] = {
+ 	raw_pdu(0x10, 0x01, 0x00, 0xff, 0xff, 0x00, 0x28),
+ 	raw_pdu(0x11, 0x06, 0x01, 0x00, 0x10, 0x00, 0x00, 0x18),
+ 	raw_pdu(0x10, 0x11, 0x00, 0xff, 0xff, 0x00, 0x28),
+@@ -501,7 +501,7 @@ static struct pdu read_characteristic_1[] = {
+ 	null_pdu
+ };
+ 
+-static struct pdu read_characteristic_2[] = {
++static struct iovec read_characteristic_2[] = {
+ 	raw_pdu(0x10, 0x01, 0x00, 0xff, 0xff, 0x00, 0x28),
+ 	raw_pdu(0x11, 0x06, 0x01, 0x00, 0x10, 0x00, 0x00, 0x18),
+ 	raw_pdu(0x10, 0x11, 0x00, 0xff, 0xff, 0x00, 0x28),
+@@ -515,7 +515,7 @@ static struct pdu read_characteristic_2[] = {
+ 	null_pdu
+ };
+ 
+-static struct pdu read_descriptor_1[] = {
++static struct iovec read_descriptor_1[] = {
+ 	raw_pdu(0x10, 0x01, 0x00, 0xff, 0xff, 0x00, 0x28),
+ 	raw_pdu(0x11, 0x06, 0x01, 0x00, 0x10, 0x00, 0x00, 0x18),
+ 	raw_pdu(0x10, 0x11, 0x00, 0xff, 0xff, 0x00, 0x28),
+@@ -533,7 +533,7 @@ static struct pdu read_descriptor_1[] = {
+ 	null_pdu
+ };
+ 
+-static struct pdu read_descriptor_2[] = {
++static struct iovec read_descriptor_2[] = {
+ 	raw_pdu(0x10, 0x01, 0x00, 0xff, 0xff, 0x00, 0x28),
+ 	raw_pdu(0x11, 0x06, 0x01, 0x00, 0x10, 0x00, 0x00, 0x18),
+ 	raw_pdu(0x10, 0x11, 0x00, 0xff, 0xff, 0x00, 0x28),
+@@ -551,7 +551,7 @@ static struct pdu read_descriptor_2[] = {
+ 	null_pdu
+ };
+ 
+-static struct pdu write_characteristic_1[] = {
++static struct iovec write_characteristic_1[] = {
+ 	raw_pdu(0x10, 0x01, 0x00, 0xff, 0xff, 0x00, 0x28),
+ 	raw_pdu(0x11, 0x06, 0x01, 0x00, 0x10, 0x00, 0x00, 0x18),
+ 	raw_pdu(0x10, 0x11, 0x00, 0xff, 0xff, 0x00, 0x28),
+@@ -564,7 +564,7 @@ static struct pdu write_characteristic_1[] = {
+ 	null_pdu
+ };
+ 
+-static struct pdu write_characteristic_2[] = {
++static struct iovec write_characteristic_2[] = {
+ 	raw_pdu(0x10, 0x01, 0x00, 0xff, 0xff, 0x00, 0x28),
+ 	raw_pdu(0x11, 0x06, 0x01, 0x00, 0x10, 0x00, 0x00, 0x18),
+ 	raw_pdu(0x10, 0x11, 0x00, 0xff, 0xff, 0x00, 0x28),
+@@ -578,7 +578,7 @@ static struct pdu write_characteristic_2[] = {
+ 	null_pdu
+ };
+ 
+-static struct pdu write_characteristic_3[] = {
++static struct iovec write_characteristic_3[] = {
+ 	raw_pdu(0x10, 0x01, 0x00, 0xff, 0xff, 0x00, 0x28),
+ 	raw_pdu(0x11, 0x06, 0x01, 0x00, 0x10, 0x00, 0x00, 0x18),
+ 	raw_pdu(0x10, 0x11, 0x00, 0xff, 0xff, 0x00, 0x28),
+@@ -847,16 +847,16 @@ static void gatt_cid_hook_cb(const void *data, uint16_t len, void *user_data)
+ 	struct bthost *bthost = hciemu_client_get_host(t_data->hciemu);
+ 	struct emu_l2cap_cid_data *cid_data = user_data;
+ 	const uint8_t *pdu = data;
+-	struct pdu *gatt_pdu = queue_peek_head(t_data->pdus);
++	struct iovec *gatt_pdu = queue_peek_head(t_data->pdus);
+ 
+ 	switch (pdu[0]) {
+ 	case L2CAP_ATT_EXCHANGE_MTU_REQ:
+ 		tester_print("Exchange MTU request received.");
+ 
+-		if (!memcmp(exchange_mtu_req_pdu.data, pdu, len))
+-			bthost_send_cid(bthost, cid_data->handle, cid_data->cid,
+-						exchange_mtu_resp_pdu.data,
+-						exchange_mtu_resp_pdu.size);
++		if (!memcmp(exchange_mtu_req_pdu.iov_base, pdu, len))
++			bthost_send_cid_v(bthost, cid_data->handle,
++						cid_data->cid,
++						&exchange_mtu_resp_pdu, 1);
+ 
+ 		break;
+ 	case L2CAP_ATT_EXCHANGE_MTU_RSP:
+@@ -864,29 +864,29 @@ static void gatt_cid_hook_cb(const void *data, uint16_t len, void *user_data)
+ 
+ 		break;
+ 	default:
+-		if (!gatt_pdu || !gatt_pdu->data) {
++		if (!gatt_pdu || !gatt_pdu->iov_base) {
+ 			tester_print("Unknown ATT packet.");
+ 			break;
+ 		}
+ 
+-		if (gatt_pdu->size != len) {
++		if (gatt_pdu->iov_len != len) {
+ 			tester_print("Size of incoming frame is not valid");
+-			tester_print("Expected size = %d incoming size = %d",
+-							gatt_pdu->size, len);
++			tester_print("Expected size = %zd incoming size = %d",
++							gatt_pdu->iov_len, len);
+ 			break;
+ 		}
+ 
+-		if (memcmp(gatt_pdu->data, data, len)) {
++		if (memcmp(gatt_pdu->iov_base, data, len)) {
+ 			tester_print("Incoming data mismatch");
+ 			break;
+ 		}
+ 		queue_pop_head(t_data->pdus);
+ 		gatt_pdu = queue_pop_head(t_data->pdus);
+-		if (!gatt_pdu || !gatt_pdu->data)
++		if (!gatt_pdu || !gatt_pdu->iov_base)
+ 			break;
+ 
+-		bthost_send_cid(bthost, cid_data->handle, cid_data->cid,
+-						gatt_pdu->data, gatt_pdu->size);
++		bthost_send_cid_v(bthost, cid_data->handle, cid_data->cid,
++								gatt_pdu, 1);
+ 
+ 		break;
+ 	}
+@@ -933,9 +933,9 @@ static void init_pdus(void)
+ 	struct test_data *data = tester_get_data();
+ 	struct step *current_data_step = queue_peek_head(data->steps);
+ 	struct step *step = g_new0(struct step, 1);
+-	struct pdu *pdu = current_data_step->set_data;
++	struct iovec *pdu = current_data_step->set_data;
+ 
+-	while (pdu->data) {
++	while (pdu->iov_base) {
+ 		queue_push_tail(data->pdus, pdu);
+ 		pdu++;
+ 	}
 diff --git a/android/tester-hidhost.c b/android/tester-hidhost.c
-index 9ee026a..4c8b4c6 100644
+index 4c8b4c6..a9d7bd9 100644
 --- a/android/tester-hidhost.c
 +++ b/android/tester-hidhost.c
-@@ -135,16 +135,6 @@ static struct emu_l2cap_cid_data sdp_cid_data = {
- static struct emu_l2cap_cid_data ctrl_cid_data;
- static struct emu_l2cap_cid_data intr_cid_data;
- 
--static void hid_sdp_search_cb(uint16_t handle, uint16_t cid, void *user_data)
--{
--	struct emu_l2cap_cid_data *cid_data = user_data;
--
--	cid_data->handle = handle;
--	cid_data->cid = cid;
--
--	tester_handle_l2cap_data_exchange(cid_data);
--}
--
- static void hid_prepare_reply_protocol_mode(struct emu_l2cap_cid_data *cid_data)
+@@ -139,20 +139,18 @@ static void hid_prepare_reply_protocol_mode(struct emu_l2cap_cid_data *cid_data)
  {
  	struct test_data *t_data = tester_get_data();
-@@ -247,7 +237,7 @@ static void hid_intr_connect_cb(uint16_t handle, uint16_t cid, void *user_data)
- /* Emulate SDP (PSM = 1) */
- static struct emu_set_l2cap_data l2cap_setup_sdp_data = {
- 	.psm = 1,
--	.func = hid_sdp_search_cb,
-+	.func = tester_generic_connect_cb,
- 	.user_data = &sdp_cid_data,
- };
+ 	struct bthost *bthost = hciemu_client_get_host(t_data->hciemu);
+-	const struct pdu pdu = raw_pdu(0xa0, 0x00);
++	const struct iovec pdu = raw_pdu(0xa0, 0x00);
  
-diff --git a/android/tester-main.c b/android/tester-main.c
-index 0152374..c728f05 100644
---- a/android/tester-main.c
-+++ b/android/tester-main.c
-@@ -2175,6 +2175,16 @@ void tester_handle_l2cap_data_exchange(struct emu_l2cap_cid_data *cid_data)
- 					emu_generic_cid_hook_cb, cid_data);
+-	bthost_send_cid(bthost, cid_data->handle, cid_data->cid, pdu.data,
+-								pdu.size);
++	bthost_send_cid_v(bthost, cid_data->handle, cid_data->cid, &pdu, 1);
  }
  
-+void tester_generic_connect_cb(uint16_t handle, uint16_t cid, void *user_data)
-+{
-+	struct emu_l2cap_cid_data *cid_data = user_data;
-+
-+	cid_data->handle = handle;
-+	cid_data->cid = cid;
-+
-+	tester_handle_l2cap_data_exchange(cid_data);
-+}
-+
- static void rfcomm_connect_cb(uint16_t handle, uint16_t cid, void *user_data,
- 								bool status)
+ static void hid_prepare_reply_report(struct emu_l2cap_cid_data *cid_data)
  {
+ 	struct test_data *t_data = tester_get_data();
+ 	struct bthost *bthost = hciemu_client_get_host(t_data->hciemu);
+-	const struct pdu pdu = raw_pdu(0xa2, 0x01, 0x00);
++	const struct iovec pdu = raw_pdu(0xa2, 0x01, 0x00);
+ 
+-	bthost_send_cid(bthost, cid_data->handle, cid_data->cid, pdu.data,
+-								pdu.size);
++	bthost_send_cid_v(bthost, cid_data->handle, cid_data->cid, &pdu, 1);
+ }
+ 
+ static void hid_ctrl_cid_hook_cb(const void *data, uint16_t len,
+diff --git a/android/tester-main.c b/android/tester-main.c
+index c728f05..41abf6d 100644
+--- a/android/tester-main.c
++++ b/android/tester-main.c
+@@ -2141,27 +2141,30 @@ static void emu_generic_cid_hook_cb(const void *data, uint16_t len,
+ 	struct bthost *bthost = hciemu_client_get_host(t_data->hciemu);
+ 	int i;
+ 
+-	for (i = 0; pdus[i].rsp.data; i++) {
+-		if (pdus[i].req.data) {
+-			if (pdus[i].req.size != len)
++	for (i = 0; pdus[i].rsp.iov_base; i++) {
++		if (pdus[i].req.iov_base) {
++			if (pdus[i].req.iov_len != len)
+ 				continue;
+ 
+-			if (memcmp(pdus[i].req.data, data, len))
++			if (memcmp(pdus[i].req.iov_base, data, len))
+ 				continue;
+ 		}
+ 
+-		if (pdus[i].rsp.data) {
++		if (pdus[i].rsp.iov_base) {
+ 			/* overwrite transaction id if its sdp pdu */
+ 			if (cid_data->is_sdp) {
+-				pdus[i].rsp.data[1] = ((uint8_t *) data)[1];
+-				pdus[i].rsp.data[2] = ((uint8_t *) data)[2];
++				((uint8_t *) pdus[i].rsp.iov_base)[1] =
++							((uint8_t *) data)[1];
++				((uint8_t *) pdus[i].rsp.iov_base)[2] =
++							((uint8_t *) data)[2];
+ 			}
+ 
+-			util_hexdump('>', pdus[i].rsp.data, pdus[i].rsp.size,
+-							print_data, NULL);
++			util_hexdump('>', pdus[i].rsp.iov_base,
++					pdus[i].rsp.iov_len, print_data, NULL);
++
++			bthost_send_cid_v(bthost, cid_data->handle,
++						cid_data->cid, &pdus[i].rsp, 1);
+ 
+-			bthost_send_cid(bthost, cid_data->handle, cid_data->cid,
+-					pdus[i].rsp.data, pdus[i].rsp.size);
+ 		}
+ 	}
+ }
 diff --git a/android/tester-main.h b/android/tester-main.h
-index 8c619da..560277a 100644
+index 560277a..1b679d6 100644
 --- a/android/tester-main.h
 +++ b/android/tester-main.h
-@@ -516,6 +516,7 @@ struct test_case {
+@@ -33,6 +33,7 @@
+ #include <sys/wait.h>
+ #include <libgen.h>
+ #include <sys/signalfd.h>
++#include <sys/uio.h>
+ 
+ #include "lib/bluetooth.h"
+ #include "lib/mgmt.h"
+@@ -56,25 +57,20 @@
+ #include <hardware/bt_gatt_client.h>
+ #include <hardware/bt_gatt_server.h>
+ 
+-struct pdu {
+-	uint8_t *data;
+-	uint16_t size;
+-};
+-
+ struct pdu_set {
+-	struct pdu req;
+-	struct pdu rsp;
++	struct iovec req;
++	struct iovec rsp;
  };
  
- void tester_handle_l2cap_data_exchange(struct emu_l2cap_cid_data *cid_data);
-+void tester_generic_connect_cb(uint16_t handle, uint16_t cid, void *user_data);
+ #define raw_data(args...) ((unsigned char[]) { args })
  
- /* Get, remove test cases API */
- struct queue *get_bluetooth_tests(void);
-diff --git a/android/tester-pan.c b/android/tester-pan.c
-index 503b9ed..4c9354a 100644
---- a/android/tester-pan.c
-+++ b/android/tester-pan.c
-@@ -35,20 +35,9 @@ static struct emu_l2cap_cid_data cid_data = {
- 	.pdu = pdus,
- };
+ #define raw_pdu(args...)					\
+ 	{							\
+-		.data = raw_data(args),				\
+-		.size = sizeof(raw_data(args)),			\
++		.iov_base = raw_data(args),			\
++		.iov_len = sizeof(raw_data(args)),		\
+ 	}
  
--static void pan_connect_request_cb(uint16_t handle, uint16_t cid,
--							void *user_data)
--{
--	struct emu_l2cap_cid_data *cid_data = user_data;
--
--	cid_data->handle = handle;
--	cid_data->cid = cid;
--
--	tester_handle_l2cap_data_exchange(cid_data);
--}
--
- static struct emu_set_l2cap_data l2cap_setup_data = {
- 	.psm = 15,
--	.func = pan_connect_request_cb,
-+	.func = tester_generic_connect_cb,
- 	.user_data = &cid_data,
- };
+-#define null_pdu { .data = NULL }
++#define null_pdu { .iov_base = NULL }
  
+ #define TEST_CASE_BREDR(text, ...) { \
+ 		HCIEMU_TYPE_BREDR, \
 -- 
 1.9.1
 
