@@ -1,99 +1,63 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 1 Oct 2014 15:09:44 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Jukka Rissanen <jukka.rissanen@linux.intel.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v2] Bluetooth: Fix locking issue when creating l2cap
- connection
-Message-ID: <20141001120944.GA25046@t440s.lan>
-References: <1412158707-26604-1-git-send-email-jukka.rissanen@linux.intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1412158707-26604-1-git-send-email-jukka.rissanen@linux.intel.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ 4/4] shared/gatt-client: Fix crash on bt_gatt_client_unref
+Date: Wed,  1 Oct 2014 14:38:14 +0300
+Message-Id: <1412163494-20283-4-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <1412163494-20283-1-git-send-email-luiz.dentz@gmail.com>
+References: <1412163494-20283-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jukka,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-On Wed, Oct 01, 2014, Jukka Rissanen wrote:
-> l2cap_chan_connect() was taking locks in different order than
-> other connection functions like l2cap_connect(). This makes
-> it possible to have a deadlock when conn->chan_lock (used to
-> protect the channel list) and chan->lock (used to protect
-> individual channel) are used in different order in different
-> kernel threads.
-> 
-> The issue was easily seen when creating a 6LoWPAN connection.
-> 
-> Excerpt from the lockdep report:
-> 
-> -> #1 (&conn->chan_lock){+.+...}:
->        [<c109324d>] lock_acquire+0x9d/0x140
->        [<c188459c>] mutex_lock_nested+0x6c/0x420
->        [<d0aab48e>] l2cap_chan_add+0x1e/0x40 [bluetooth]
->        [<d0aac618>] l2cap_chan_connect+0x348/0x8f0 [bluetooth]
->        [<d0cc9a91>] lowpan_control_write+0x221/0x2d0 [bluetooth_6lowpan]
-> -> #0 (&chan->lock){+.+.+.}:
->        [<c10928d8>] __lock_acquire+0x1a18/0x1d20
->        [<c109324d>] lock_acquire+0x9d/0x140
->        [<c188459c>] mutex_lock_nested+0x6c/0x420
->        [<d0ab05fd>] l2cap_connect_cfm+0x1dd/0x3f0 [bluetooth]
->        [<d0a909c4>] hci_le_meta_evt+0x11a4/0x1260 [bluetooth]
->        [<d0a910eb>] hci_event_packet+0x3ab/0x3120 [bluetooth]
->        [<d0a7cb08>] hci_rx_work+0x208/0x4a0 [bluetooth]
-> 
->        CPU0                    CPU1
->        ----                    ----
->   lock(&conn->chan_lock);
->                                lock(&chan->lock);
->                                lock(&conn->chan_lock);
->   lock(&chan->lock);
-> 
-> Signed-off-by: Jukka Rissanen <jukka.rissanen@linux.intel.com>
-> ---
-> Hi,
-> 
-> this is version 2 of the fix for the locking issue I was seeing
-> when 6lowpan connection was created.
-> The patch is now much simpler thanks to Johan's help.
-<snip>
-> +	l2cap_chan_unlock(chan);
-> +	mutex_lock(&conn->chan_lock);
-> +	l2cap_chan_lock(chan);
+Calling gatt_client_clear_services after notify_list is destroyed cause
+the following backtrace:
 
-As Szymon pointed out on IRC this version is also problematic in that
-the check for chan->state is not inside the same atomic section as where
-we change to a new state.
+Invalid read of size 8
+   at 0x404CC9: queue_remove_all (queue.c:312)
+   by 0x401FC6: gatt_client_remove_all_notify_in_range (gatt-client.c:350)
+   by 0x403170: bt_gatt_client_free (gatt-client.c:357)
+   by 0x401A93: test_client (test-gatt.c:224)
+   by 0x4E9E5E0: ??? (in /usr/lib64/libglib-2.0.so.0.3800.2)
+   by 0x4E9E7A5: ??? (in /usr/lib64/libglib-2.0.so.0.3800.2)
+   by 0x4E9E7A5: ??? (in /usr/lib64/libglib-2.0.so.0.3800.2)
+   by 0x4E9E7A5: ??? (in /usr/lib64/libglib-2.0.so.0.3800.2)
+   by 0x4E9EB1A: g_test_run_suite (in /usr/lib64/libglib-2.0.so.0.3800.2)
+   by 0x4015EE: main (test-gatt.c:259)
+ Address 0x5752718 is 8 bytes inside a block of size 32 free'd
+   at 0x4C28577: free (in /usr/lib64/valgrind/vgpreload_memcheck-amd64-linux.so)
+   by 0x40315E: bt_gatt_client_free (gatt-client.c:1233)
+   by 0x401A93: test_client (test-gatt.c:224)
+   by 0x4E9E5E0: ??? (in /usr/lib64/libglib-2.0.so.0.3800.2)
+   by 0x4E9E7A5: ??? (in /usr/lib64/libglib-2.0.so.0.3800.2)
+   by 0x4E9E7A5: ??? (in /usr/lib64/libglib-2.0.so.0.3800.2)
+   by 0x4E9E7A5: ??? (in /usr/lib64/libglib-2.0.so.0.3800.2)
+   by 0x4E9EB1A: g_test_run_suite (in /usr/lib64/libglib-2.0.so.0.3800.2)
+   by 0x4015EE: main (test-gatt.c:259)
+---
+ src/shared/gatt-client.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-After some further analysis it seems like this lockdep warning is a
-false-positive because of the way that all other places besides
-l2cap_chan_connect() treat the locks. Most of these depend on the chan
-being available in conn->chan_l:
+diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
+index d884185..832b09b 100644
+--- a/src/shared/gatt-client.c
++++ b/src/shared/gatt-client.c
+@@ -1228,12 +1228,12 @@ static void bt_gatt_client_free(struct bt_gatt_client *client)
+ 		bt_att_unref(client->att);
+ 	}
+ 
++	gatt_client_clear_services(client);
++
+ 	queue_destroy(client->svc_chngd_queue, free);
+ 	queue_destroy(client->long_write_queue, long_write_op_unref);
+ 	queue_destroy(client->notify_list, notify_data_unref);
+ 
+-	gatt_client_clear_services(client);
+-
+ 	free(client);
+ }
+ 
+-- 
+1.9.3
 
-	lock(conn->chan_lock);
-	for_each(chan, conn->chan_l) {
-		lock(chan->lock);
-		...
-		unlock(chan->lock);
-	}
-	unlock(conn->chan_lock);
-
-Because the l2cap_chan_connect() code (or l2cap_chan_add actually) takes
-conn->chan_lock before attempting to add to conn->chan_l it makes the
-loop described above unable to reach the chan and therefore the deadlock
-is not possible.
-
-There are at three exceptions I could find that don't follow exactly the
-above pattern (by depending on conn->chan_l content), and should
-therefore be considered separately:
-
-	l2cap_connect()
-	l2cap_le_connect_req()
-	l2cap_chan_timeout()
-
-All three of these require the channel to be in a state that will make
-l2cap_chan_connect() return early failure before getting anywhere close
-to the risky l2cap_chan_add() call, so I would conclude that these are
-also safe from the deadlock.
-
-Johan
