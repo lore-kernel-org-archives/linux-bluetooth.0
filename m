@@ -1,95 +1,114 @@
 Return-Path: <cyrus@holtmann.org>
-From: Jukka Rissanen <jukka.rissanen@linux.intel.com>
+From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2] Bluetooth: Fix locking issue when creating l2cap connection
-Date: Wed,  1 Oct 2014 13:18:27 +0300
-Message-Id: <1412158707-26604-1-git-send-email-jukka.rissanen@linux.intel.com>
+Cc: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
+Subject: [PATCHv3 03/17] android/tester: Make A2DP tests use generic pdu struct
+Date: Wed,  1 Oct 2014 11:01:25 +0200
+Message-Id: <1412154099-28014-4-git-send-email-jakub.tyszkowski@tieto.com>
+In-Reply-To: <1412154099-28014-1-git-send-email-jakub.tyszkowski@tieto.com>
+References: <1412154099-28014-1-git-send-email-jakub.tyszkowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-l2cap_chan_connect() was taking locks in different order than
-other connection functions like l2cap_connect(). This makes
-it possible to have a deadlock when conn->chan_lock (used to
-protect the channel list) and chan->lock (used to protect
-individual channel) are used in different order in different
-kernel threads.
-
-The issue was easily seen when creating a 6LoWPAN connection.
-
-Excerpt from the lockdep report:
-
--> #1 (&conn->chan_lock){+.+...}:
-       [<c109324d>] lock_acquire+0x9d/0x140
-       [<c188459c>] mutex_lock_nested+0x6c/0x420
-       [<d0aab48e>] l2cap_chan_add+0x1e/0x40 [bluetooth]
-       [<d0aac618>] l2cap_chan_connect+0x348/0x8f0 [bluetooth]
-       [<d0cc9a91>] lowpan_control_write+0x221/0x2d0 [bluetooth_6lowpan]
--> #0 (&chan->lock){+.+.+.}:
-       [<c10928d8>] __lock_acquire+0x1a18/0x1d20
-       [<c109324d>] lock_acquire+0x9d/0x140
-       [<c188459c>] mutex_lock_nested+0x6c/0x420
-       [<d0ab05fd>] l2cap_connect_cfm+0x1dd/0x3f0 [bluetooth]
-       [<d0a909c4>] hci_le_meta_evt+0x11a4/0x1260 [bluetooth]
-       [<d0a910eb>] hci_event_packet+0x3ab/0x3120 [bluetooth]
-       [<d0a7cb08>] hci_rx_work+0x208/0x4a0 [bluetooth]
-
-       CPU0                    CPU1
-       ----                    ----
-  lock(&conn->chan_lock);
-                               lock(&chan->lock);
-                               lock(&conn->chan_lock);
-  lock(&chan->lock);
-
-Signed-off-by: Jukka Rissanen <jukka.rissanen@linux.intel.com>
 ---
-Hi,
+ android/tester-a2dp.c | 68 +++++++++++++++++++++++++--------------------------
+ 1 file changed, 33 insertions(+), 35 deletions(-)
 
-this is version 2 of the fix for the locking issue I was seeing
-when 6lowpan connection was created.
-The patch is now much simpler thanks to Johan's help.
-
-Cheers,
-Jukka
-
- net/bluetooth/l2cap_core.c | 15 ++++++++++++++-
- 1 file changed, 14 insertions(+), 1 deletion(-)
-
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 8d53fc5..2f0415a 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -7088,7 +7088,16 @@ int l2cap_chan_connect(struct l2cap_chan *chan, __le16 psm, u16 cid,
- 	bacpy(&chan->src, &hcon->src);
- 	chan->src_type = bdaddr_type(hcon, hcon->src_type);
+diff --git a/android/tester-a2dp.c b/android/tester-a2dp.c
+index ab3936e..047822e 100644
+--- a/android/tester-a2dp.c
++++ b/android/tester-a2dp.c
+@@ -32,38 +32,36 @@ struct emu_cid_data {
  
--	l2cap_chan_add(conn, chan);
-+	/* The the conn->chan_lock must always be acquired before any
-+	 * channel locks to avoid potential deadlocks. Therefore,
-+	 * release the chan lock and (re)acquire the locks in the right
-+	 * order.
-+	 */
-+	l2cap_chan_unlock(chan);
-+	mutex_lock(&conn->chan_lock);
-+	l2cap_chan_lock(chan);
-+
-+	__l2cap_chan_add(conn, chan);
+ static struct emu_cid_data cid_data;
  
- 	/* l2cap_chan_add takes its own ref so we can drop this one */
- 	hci_conn_drop(hcon);
-@@ -7113,9 +7122,13 @@ int l2cap_chan_connect(struct l2cap_chan *chan, __le16 psm, u16 cid,
+-static const uint8_t req_dsc[] = { 0x00, 0x01 };
+-static const uint8_t rsp_dsc[] = { 0x02, 0x01, 0x04, 0x08 };
+-static const uint8_t req_get[] = { 0x10, 0x02, 0x04 };
+-static const uint8_t rsp_get[] = { 0x12, 0x02, 0x01, 0x00, 0x07, 0x06, 0x00,
+-						0x00, 0xff, 0xff, 0x02, 0x40 };
+-static const uint8_t req_cfg[] = { 0x20, 0x03, 0x04, 0x04, 0x01, 0x00, 0x07,
+-					0x06, 0x00, 0x00, 0x21, 0x15, 0x02,
+-					0x40 };
+-static const uint8_t rsp_cfg[] = { 0x22, 0x03 };
+-static const uint8_t req_open[] = { 0x30, 0x06, 0x04 };
+-static const uint8_t rsp_open[] = { 0x32, 0x06 };
+-static const uint8_t req_close[] = { 0x40, 0x08, 0x04 };
+-static const uint8_t rsp_close[] = { 0x42, 0x08 };
+-static const uint8_t req_start[] = { 0x40, 0x07, 0x04 };
+-static const uint8_t rsp_start[] = { 0x42, 0x07 };
+-static const uint8_t req_suspend[] = { 0x50, 0x09, 0x04 };
+-static const uint8_t rsp_suspend[] = { 0x52, 0x09 };
++#define req_dsc		0x00, 0x01
++#define rsp_dsc		0x02, 0x01, 0x04, 0x08
++#define req_get		0x10, 0x02, 0x04
++#define rsp_get		0x12, 0x02, 0x01, 0x00, 0x07, 0x06, 0x00, \
++						0x00, 0xff, 0xff, 0x02, 0x40
++#define req_cfg		0x20, 0x03, 0x04, 0x04, 0x01, 0x00, 0x07, \
++					0x06, 0x00, 0x00, 0x21, 0x15, 0x02, \
++					0x40
++#define rsp_cfg		0x22, 0x03
++#define req_open	0x30, 0x06, 0x04
++#define rsp_open	0x32, 0x06
++#define req_close	0x40, 0x08, 0x04
++#define rsp_close	0x42, 0x08
++#define req_start	0x40, 0x07, 0x04
++#define rsp_start	0x42, 0x07
++#define req_suspend	0x50, 0x09, 0x04
++#define rsp_suspend	0x52, 0x09
+ 
+ const struct pdu_set {
+-	const uint8_t *req;
+-	size_t req_len;
+-	const uint8_t *rsp;
+-	size_t rsp_len;
++	struct pdu req;
++	struct pdu rsp;
+ } pdus[] = {
+-	{ req_dsc, sizeof(req_dsc), rsp_dsc, sizeof(rsp_dsc) },
+-	{ req_get, sizeof(req_get), rsp_get, sizeof(rsp_get) },
+-	{ req_cfg, sizeof(req_cfg), rsp_cfg, sizeof(rsp_cfg) },
+-	{ req_open, sizeof(req_open), rsp_open, sizeof(rsp_open) },
+-	{ req_close, sizeof(req_close), rsp_close, sizeof(rsp_close) },
+-	{ req_start, sizeof(req_start), rsp_start, sizeof(rsp_start) },
+-	{ req_suspend, sizeof(req_suspend), rsp_suspend, sizeof(rsp_start) },
+-	{ },
++	{ raw_pdu(req_dsc), raw_pdu(rsp_dsc) },
++	{ raw_pdu(req_get), raw_pdu(rsp_get) },
++	{ raw_pdu(req_cfg), raw_pdu(rsp_cfg) },
++	{ raw_pdu(req_open), raw_pdu(rsp_open) },
++	{ raw_pdu(req_close), raw_pdu(rsp_close) },
++	{ raw_pdu(req_start), raw_pdu(rsp_start) },
++	{ raw_pdu(req_suspend), raw_pdu(rsp_suspend) },
++	{ null_pdu, null_pdu },
+ };
+ 
+ static void print_data(const char *str, void *user_data)
+@@ -80,18 +78,18 @@ static void a2dp_cid_hook_cb(const void *data, uint16_t len, void *user_data)
+ 
+ 	util_hexdump('>', data, len, print_data, NULL);
+ 
+-	for (i = 0; pdus[i].req; i++) {
+-		if (pdus[i].req_len != len)
++	for (i = 0; pdus[i].req.data; i++) {
++		if (pdus[i].req.size != len)
+ 			continue;
+ 
+-		if (memcmp(pdus[i].req, data, len))
++		if (memcmp(pdus[i].req.data, data, len))
+ 			continue;
+ 
+-		util_hexdump('<', pdus[i].rsp, pdus[i].rsp_len, print_data,
+-									NULL);
++		util_hexdump('<', pdus[i].rsp.data, pdus[i].rsp.size,
++							print_data, NULL);
+ 
+ 		bthost_send_cid(bthost, cid_data->handle, cid_data->cid,
+-						pdus[i].rsp, pdus[i].rsp_len);
++					pdus[i].rsp.data, pdus[i].rsp.size);
  	}
+ }
  
- 	err = 0;
-+	l2cap_chan_unlock(chan);
-+	mutex_unlock(&conn->chan_lock);
-+	goto unlock_hdev;
- 
- done:
- 	l2cap_chan_unlock(chan);
-+unlock_hdev:
- 	hci_dev_unlock(hdev);
- 	hci_dev_put(hdev);
- 	return err;
 -- 
-1.8.3.1
+1.9.1
 
