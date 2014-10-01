@@ -1,155 +1,60 @@
 Return-Path: <cyrus@holtmann.org>
+MIME-Version: 1.0
+In-Reply-To: <1412152303-14849-1-git-send-email-jakub.tyszkowski@tieto.com>
+References: <1412152303-14849-1-git-send-email-jakub.tyszkowski@tieto.com>
+Date: Wed, 1 Oct 2014 16:01:06 +0300
+Message-ID: <CABBYNZ+MRzqOUXsF4vVwNdCX0D5HV+96zjRr3L_py_P9SgUu-w@mail.gmail.com>
+Subject: Re: [PATCH] emulator/bthost: Add missing flow_ctrl assignment
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v2 1/3] shared/gatt-client: Simplify bt_gatt_client_new
-Date: Wed,  1 Oct 2014 16:17:22 +0300
-Message-Id: <1412169444-30509-1-git-send-email-luiz.dentz@gmail.com>
+To: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Jakub,
 
-This split bt_gatt_client_unref into bt_gatt_client_free so it can be
-used within bt_gatt_client_new when freeing the data.
----
- src/shared/gatt-client.c | 87 +++++++++++++++++++++---------------------------
- 1 file changed, 38 insertions(+), 49 deletions(-)
+On Wed, Oct 1, 2014 at 11:31 AM, Jakub Tyszkowski
+<jakub.tyszkowski@tieto.com> wrote:
+> This fixes following valgrind report:
+> ==3093== Syscall param writev(vector[...]) points to uninitialised
+> byte(s)
+> ==3093==    at 0x5652FA0: writev (writev.c:54)
+> ==3093==    by 0x408029: send_iov (bthost.c:484)
+> ==3093==    by 0x402530: rfcomm_uih_send.isra.25 (bthost.c:1771)
+> ==3093==    by 0x4095BE: bthost_receive_h4 (bthost.c:1872)
+> ==3093==    by 0x4029E6: receive_bthost.part.1 (hciemu.c:141)
+> ==3093==    by 0x5083CE4: g_main_context_dispatch (in
+> /lib/x86_64-linux-gnu/libglib-2.0.so.0.4002.0)
+> ==3093==    by 0x5084047: ??? (in
+> /lib/x86_64-linux-gnu/libglib-2.0.so.0.4002.0)
+> ==3093==    by 0x5084309: g_main_loop_run (in
+> /lib/x86_64-linux-gnu/libglib-2.0.so.0.4002.0)
+> ==3093==    by 0x415920: tester_run (tester.c:815)
+> ==3093==    by 0x40263E: main (tester-main.c:2588)
+> ==3093==  Address 0xffefff0b1 is on thread 1's stack
+> ==3093==
+> ---
+>  emulator/bthost.c | 1 +
+>  1 file changed, 1 insertion(+)
+>
+> diff --git a/emulator/bthost.c b/emulator/bthost.c
+> index 59dde1e..f859dd1 100644
+> --- a/emulator/bthost.c
+> +++ b/emulator/bthost.c
+> @@ -1862,6 +1862,7 @@ static void rfcomm_pn_recv(struct bthost *bthost, struct btconn *conn,
+>         }
+>
+>         pn_cmd.dlci = pn->dlci;
+> +       pn_cmd.flow_ctrl = pn->flow_ctrl;
+>         pn_cmd.priority = pn->priority;
+>         pn_cmd.ack_timer = pn->ack_timer;
+>         pn_cmd.max_retrans = pn->max_retrans;
+> --
+> 1.9.1
 
-diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
-index 6dc8e95..782e6b3 100644
---- a/src/shared/gatt-client.c
-+++ b/src/shared/gatt-client.c
-@@ -1211,6 +1211,29 @@ static void notify_cb(uint8_t opcode, const void *pdu, uint16_t length,
- 	bt_gatt_client_unref(client);
- }
- 
-+static void long_write_op_unref(void *data);
-+
-+static void bt_gatt_client_free(struct bt_gatt_client *client)
-+{
-+	if (client->ready_destroy)
-+		client->ready_destroy(client->ready_data);
-+
-+	if (client->debug_destroy)
-+		client->debug_destroy(client->debug_data);
-+
-+	bt_att_unregister(client->att, client->notify_id);
-+	bt_att_unregister(client->att, client->ind_id);
-+
-+	queue_destroy(client->svc_chngd_queue, free);
-+	queue_destroy(client->long_write_queue, long_write_op_unref);
-+	queue_destroy(client->notify_list, notify_data_unref);
-+
-+	gatt_client_clear_services(client);
-+
-+	bt_att_unref(client->att);
-+	free(client);
-+}
-+
- struct bt_gatt_client *bt_gatt_client_new(struct bt_att *att, uint16_t mtu)
- {
- 	struct bt_gatt_client *client;
-@@ -1223,52 +1246,36 @@ struct bt_gatt_client *bt_gatt_client_new(struct bt_att *att, uint16_t mtu)
- 		return NULL;
- 
- 	client->long_write_queue = queue_new();
--	if (!client->long_write_queue) {
--		free(client);
--		return NULL;
--	}
-+	if (!client->long_write_queue)
-+		goto fail;
- 
- 	client->svc_chngd_queue = queue_new();
--	if (!client->svc_chngd_queue) {
--		queue_destroy(client->long_write_queue, NULL);
--		free(client);
--		return NULL;
--	}
-+	if (!client->svc_chngd_queue)
-+		goto fail;
- 
- 	client->notify_list = queue_new();
--	if (!client->notify_list) {
--		queue_destroy(client->svc_chngd_queue, NULL);
--		queue_destroy(client->long_write_queue, NULL);
--		free(client);
--		return NULL;
--	}
-+	if (!client->notify_list)
-+		goto fail;
- 
- 	client->notify_id = bt_att_register(att, BT_ATT_OP_HANDLE_VAL_NOT,
- 						notify_cb, client, NULL);
--	if (!client->notify_id) {
--		queue_destroy(client->notify_list, NULL);
--		queue_destroy(client->svc_chngd_queue, NULL);
--		queue_destroy(client->long_write_queue, NULL);
--		free(client);
--		return NULL;
--	}
-+	if (!client->notify_id)
-+		goto fail;
- 
- 	client->ind_id = bt_att_register(att, BT_ATT_OP_HANDLE_VAL_IND,
- 						notify_cb, client, NULL);
--	if (!client->ind_id) {
--		bt_att_unregister(att, client->notify_id);
--		queue_destroy(client->notify_list, NULL);
--		queue_destroy(client->svc_chngd_queue, NULL);
--		queue_destroy(client->long_write_queue, NULL);
--		free(client);
--		return NULL;
--	}
-+	if (!client->ind_id)
-+		goto fail;
- 
- 	client->att = bt_att_ref(att);
- 
- 	gatt_client_init(client, mtu);
- 
- 	return bt_gatt_client_ref(client);
-+
-+fail:
-+	bt_gatt_client_free(client);
-+	return NULL;
- }
- 
- struct bt_gatt_client *bt_gatt_client_ref(struct bt_gatt_client *client)
-@@ -1281,8 +1288,6 @@ struct bt_gatt_client *bt_gatt_client_ref(struct bt_gatt_client *client)
- 	return client;
- }
- 
--static void long_write_op_unref(void *data);
--
- void bt_gatt_client_unref(struct bt_gatt_client *client)
- {
- 	if (!client)
-@@ -1291,23 +1296,7 @@ void bt_gatt_client_unref(struct bt_gatt_client *client)
- 	if (__sync_sub_and_fetch(&client->ref_count, 1))
- 		return;
- 
--	if (client->ready_destroy)
--		client->ready_destroy(client->ready_data);
--
--	if (client->debug_destroy)
--		client->debug_destroy(client->debug_data);
--
--	bt_att_unregister(client->att, client->notify_id);
--	bt_att_unregister(client->att, client->ind_id);
--
--	queue_destroy(client->svc_chngd_queue, free);
--	queue_destroy(client->long_write_queue, long_write_op_unref);
--	queue_destroy(client->notify_list, notify_data_unref);
--
--	gatt_client_clear_services(client);
--
--	bt_att_unref(client->att);
--	free(client);
-+	bt_gatt_client_free(client);
- }
- 
- bool bt_gatt_client_is_ready(struct bt_gatt_client *client)
+Pushed, thanks.
+
+
 -- 
-1.9.3
-
+Luiz Augusto von Dentz
