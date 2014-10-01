@@ -1,83 +1,103 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 2 Oct 2014 10:00:10 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Peter Hurley <peter@hurleysoftware.com>
-Cc: Jukka Rissanen <jukka.rissanen@linux.intel.com>,
-	linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v2] Bluetooth: Fix locking issue when creating l2cap
- connection
-Message-ID: <20141002070010.GA11550@t440s.lan>
-References: <1412158707-26604-1-git-send-email-jukka.rissanen@linux.intel.com>
- <20141001120944.GA25046@t440s.lan>
- <542C09D5.9050405@hurleysoftware.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <542C09D5.9050405@hurleysoftware.com>
+In-Reply-To: <CABBYNZLK6JfiQWp+pNK8+Pg-YOcShrm4TcbwHdnAKtbfhOcJmg@mail.gmail.com>
+References: <1412163494-20283-1-git-send-email-luiz.dentz@gmail.com>
+	<1412163494-20283-2-git-send-email-luiz.dentz@gmail.com>
+	<20141001123408.GA26432@t440s.lan>
+	<CABBYNZLK6JfiQWp+pNK8+Pg-YOcShrm4TcbwHdnAKtbfhOcJmg@mail.gmail.com>
+Date: Wed, 1 Oct 2014 09:17:45 -0700
+Message-ID: <CAHrH25T1FqMi7zho+gYCbuhmdQpsVoqV5ee3H+UbZwwhqeNC9A@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 2/4] shared/gatt-client: Take fd in bt_gatt_client_new
+From: Arman Uguray <armansito@chromium.org>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Peter,
+Hi Luiz & Johan,
 
-On Wed, Oct 01, 2014, Peter Hurley wrote:
-> > As Szymon pointed out on IRC this version is also problematic in that
-> > the check for chan->state is not inside the same atomic section as where
-> > we change to a new state.
-> > 
-> > After some further analysis it seems like this lockdep warning is a
-> > false-positive because of the way that all other places besides
-> > l2cap_chan_connect() treat the locks. Most of these depend on the chan
-> > being available in conn->chan_l:
-> > 
-> > 	lock(conn->chan_lock);
-> > 	for_each(chan, conn->chan_l) {
-> > 		lock(chan->lock);
-> > 		...
-> > 		unlock(chan->lock);
-> > 	}
-> > 	unlock(conn->chan_lock);
-> > 
-> > Because the l2cap_chan_connect() code (or l2cap_chan_add actually) takes
-> > conn->chan_lock before attempting to add to conn->chan_l it makes the
-> > loop described above unable to reach the chan and therefore the deadlock
-> > is not possible.
-> > 
-> > There are at three exceptions I could find that don't follow exactly the
-> > above pattern (by depending on conn->chan_l content), and should
-> > therefore be considered separately:
-> > 
-> > 	l2cap_connect()
-> > 	l2cap_le_connect_req()
-> > 	l2cap_chan_timeout()
-> > 
-> > All three of these require the channel to be in a state that will make
-> > l2cap_chan_connect() return early failure before getting anywhere close
-> > to the risky l2cap_chan_add() call, so I would conclude that these are
-> > also safe from the deadlock.
-> 
-> Ok, but a lockdep report disables lockdep, which means that
-> 
-> 1. There could be other lockdep errors after this one
-> 2. Lockdep gets disabled for all subsystems so this can be masking
-> problems in other places.
-> 
-> So still worth fixing this lock inversion.
 
-Agreed.
+>> The above is fine except I don't really see the point in having separate
+>> client and server objects to begin with. I might have missed the
+>> reasoning behind it (in which case please enlighten me), but why don't
+>> we hide both roles behind the same object, since they're anyway tied to
+>> the same connection?
+>>
 
-> Why does chan->lock need to be held when adding the channel to the
-> conn->chan_l if the chan is not retrievable until it's found on the
-> list?
+I think eventually this is may be what we want but it seems more
+natural to me for client and server roles to be in different objects,
+at least internally. There's never an "overlap" between server and
+client roles that I know of and these should be pretty much
+orthogonal. I think eventually we can have a more global object that
+owns the fd & att structure and owns the server and the client, but
+it's more intuitive IMO if the server & client procedures are grouped
+in their own modules. Apart from the transport, there's really nothing
+that they'll share (afaik).
 
-That's a good point. As long as the L2CAP user (e.g. l2cap_sock.c)
-hasn't taken action to associate a chan object with a connection we
-could assume that it needs to itself take care of mutual exclusion.
-Looking at l2cap_sock.c this already seems to be a long-time assumption:
-there are plenty of places where the code reads and writes chan members
-without taking the chan->lock.
 
-The chan->lock still needs to be held when adding to the list since we
-want to make sure no other code touches it until l2cap_chan_connect
-returns, but by moving the lock taking later we can ensure that we take
-the conn->chan_lock first. I'll send a patch proposal for this soon.
+>> I have no objections to having clearly name-spaced functions for client
+>> and server side behavior, and even keeping these in separate c-files,
+>> but having independent objects for them seems a bit pointless. So why
+>> couldn't we have server_foo(att) and client_foo(att) while keeping just
+>> this one "att" context?
 
-Johan
+Having independent objects made sense initially, since the kind of
+state they keep is mostly different. bt_gatt_server will mostly only
+interact with gatt_db and bt_att, while bt_gatt_client stores a high
+level client cache. And this isn't too bad from an implementation
+stand-point (in fact it makes sense from an OO perspective) and it
+would be quite ok for a higher-level bt_gatt object to create and own
+these two.
+
+In any case, these could in fact be unified eventually but for now
+let's keep them separate and see how the server turns out without
+overthinking it. I'm going to start sending out patches for the server
+code soon, and once that starts taking shape, I think we can decide if
+they should be unified or not.
+
+
+> So I do agree that it seems much simpler API to unify client and
+> server and let it self manage the ATT connection, we could even notify
+> disconnects via ready callback, well if we fix it because right now if
+> the remote does not respond or respond with something invalid it
+> doesn't seems to be called.
+
+Yeah this is actually a bug in the code. If the remote end doesn't
+respond, then att.c:timeout_cb will be called eventually, which will
+destroy the connection by destroying the io. It notifies this via a
+timeout_callback to the upper layer but the disconnect_callback
+doesn't automatically get called, since io simply closes the fd
+instead of receiving an event (which is how the regular
+disconnect_callback is currently invoked). I suppose this can be fixed
+by calling all registered disconnect callbacks in att.c:timeout_cb.
+I've been aware of this bug though never got around to fixing it :)
+
+If the remote responds with something invalid, bt_att doesn't do
+anything currently. If the opcode is bad, it simply drops it. We'll
+have to figure out a way to correctly handle this, either at the
+bt_att level or at the gatt level.
+
+
+> ... For the server side it seems to be just a
+> matter of attaching the db, which could perhaps be passed in
+> bt_gatt_new or having dedicated bt_gatt_attach_db/bt_gatt_detach_cb.
+
+So, the current idea is this:
+
+   db = gatt_db_new();
+   ... /* Populate DB */
+   att = bt_att_new(fd);
+   client = bt_gatt_client_new(att, mtu);
+   server = bt_gatt_server_new(db, att, mtu);
+
+All of this could be done by a higher-level bt_gatt object that puts
+everything together but for now, let's not create bt_att inside
+bt_gatt_client. I think Marcel's longer term idea is to put these all
+inside an even higher-level bt_gap that basically puts SDP and GATT
+together. (I saw some patches fly by for shared/gap).
+
+I hope this all makes sense.
+
+Cheers,
+Arman
