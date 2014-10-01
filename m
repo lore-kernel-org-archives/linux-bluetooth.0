@@ -1,56 +1,99 @@
 Return-Path: <cyrus@holtmann.org>
-From: Martin Townsend <mtownsend1973@gmail.com>
-To: linux-zigbee-devel@lists.sourceforge.net,
-	linux-bluetooth@vger.kernel.org,
-	linux-wpan@vger.kernel.org
-Cc: marcel@holtmann.org,
-	alex.aring@gmail.com,
-	Martin Townsend <martin.townsend@xsilon.com>
-Subject: [PATCH v4 bluetooth] Fix lowpan_rcv
-Date: Wed,  1 Oct 2014 13:10:21 +0100
-Message-Id: <1412165422-31063-1-git-send-email-martin.townsend@xsilon.com>
+Date: Wed, 1 Oct 2014 15:09:44 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Jukka Rissanen <jukka.rissanen@linux.intel.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH v2] Bluetooth: Fix locking issue when creating l2cap
+ connection
+Message-ID: <20141001120944.GA25046@t440s.lan>
+References: <1412158707-26604-1-git-send-email-jukka.rissanen@linux.intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1412158707-26604-1-git-send-email-jukka.rissanen@linux.intel.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This series aims to fix incorrect return values in lowpan_rcv
-To achieve this it also refactors the receive path to
-  1) free skb only from lowpan_rcv and not functions that it calls
-  2) move skb delivery from IPHC
+Hi Jukka,
 
-I have only compile tested the changes for bluetooth as I don't have any HW
-available so would be grateful for any testing from the Bluetooth developers.
-I have done some minimal testing for IEEE802.15.4
+On Wed, Oct 01, 2014, Jukka Rissanen wrote:
+> l2cap_chan_connect() was taking locks in different order than
+> other connection functions like l2cap_connect(). This makes
+> it possible to have a deadlock when conn->chan_lock (used to
+> protect the channel list) and chan->lock (used to protect
+> individual channel) are used in different order in different
+> kernel threads.
+> 
+> The issue was easily seen when creating a 6LoWPAN connection.
+> 
+> Excerpt from the lockdep report:
+> 
+> -> #1 (&conn->chan_lock){+.+...}:
+>        [<c109324d>] lock_acquire+0x9d/0x140
+>        [<c188459c>] mutex_lock_nested+0x6c/0x420
+>        [<d0aab48e>] l2cap_chan_add+0x1e/0x40 [bluetooth]
+>        [<d0aac618>] l2cap_chan_connect+0x348/0x8f0 [bluetooth]
+>        [<d0cc9a91>] lowpan_control_write+0x221/0x2d0 [bluetooth_6lowpan]
+> -> #0 (&chan->lock){+.+.+.}:
+>        [<c10928d8>] __lock_acquire+0x1a18/0x1d20
+>        [<c109324d>] lock_acquire+0x9d/0x140
+>        [<c188459c>] mutex_lock_nested+0x6c/0x420
+>        [<d0ab05fd>] l2cap_connect_cfm+0x1dd/0x3f0 [bluetooth]
+>        [<d0a909c4>] hci_le_meta_evt+0x11a4/0x1260 [bluetooth]
+>        [<d0a910eb>] hci_event_packet+0x3ab/0x3120 [bluetooth]
+>        [<d0a7cb08>] hci_rx_work+0x208/0x4a0 [bluetooth]
+> 
+>        CPU0                    CPU1
+>        ----                    ----
+>   lock(&conn->chan_lock);
+>                                lock(&chan->lock);
+>                                lock(&conn->chan_lock);
+>   lock(&chan->lock);
+> 
+> Signed-off-by: Jukka Rissanen <jukka.rissanen@linux.intel.com>
+> ---
+> Hi,
+> 
+> this is version 2 of the fix for the locking issue I was seeing
+> when 6lowpan connection was created.
+> The patch is now much simpler thanks to Johan's help.
+<snip>
+> +	l2cap_chan_unlock(chan);
+> +	mutex_lock(&conn->chan_lock);
+> +	l2cap_chan_lock(chan);
 
-Signed-off-by: Martin Townsend <martin.townsend@xsilon.com>
----
+As Szymon pointed out on IRC this version is also problematic in that
+the check for chan->state is not inside the same atomic section as where
+we change to a new state.
 
-v1 -> v2:
-* combined first two patches into one.
-* split out renaming of process_data into a new patch
-* re-use err in lowpan_process_data and remove err_ret local variable.
-* removed third patch as applies to linux-wpan
+After some further analysis it seems like this lockdep warning is a
+false-positive because of the way that all other places besides
+l2cap_chan_connect() treat the locks. Most of these depend on the chan
+being available in conn->chan_l:
 
-v2 -> v3: (Updated from Alexander Aring's Review) 
-* re-use err hadn't been included in patch.
-* fixed some 'goto drop' cases in lowpan_rcv that should be 'goto drop skb'
-* handle error codes when returning from lowpan_frag_rcv.
-* Refactored lowpan_give_skb_to_devices so it consumes or free's skb and then
-  only returns NET_RX status codes.
+	lock(conn->chan_lock);
+	for_each(chan, conn->chan_l) {
+		lock(chan->lock);
+		...
+		unlock(chan->lock);
+	}
+	unlock(conn->chan_lock);
 
-v3 -> v4: (Updated from Jukka Rissanen and Alexander Aring's Reviews)
-* Removed use of double skb pointer in decompress routines in favour of using
-  pskb_expand_head to obtain more headroom.  Requires an uncloned skb so the
-  calling functions now ensure this.
-* prefer consume_skb on non error conditions.
-* removed spurious setting of ret in lowpan_rcv
+Because the l2cap_chan_connect() code (or l2cap_chan_add actually) takes
+conn->chan_lock before attempting to add to conn->chan_l it makes the
+loop described above unable to reach the chan and therefore the deadlock
+is not possible.
 
-Martin Townsend (1):
-  6lowpan: fix incorrect return values in lowpan_rcv
+There are at three exceptions I could find that don't follow exactly the
+above pattern (by depending on conn->chan_l content), and should
+therefore be considered separately:
 
- include/net/6lowpan.h         |  9 +++--
- net/6lowpan/iphc.c            | 92 ++++++++++++++++---------------------------
- net/bluetooth/6lowpan.c       | 52 ++++++++++++++++--------
- net/ieee802154/6lowpan_rtnl.c | 66 ++++++++++++++++++++-----------
- 4 files changed, 117 insertions(+), 102 deletions(-)
+	l2cap_connect()
+	l2cap_le_connect_req()
+	l2cap_chan_timeout()
 
--- 
-1.9.1
+All three of these require the channel to be in a state that will make
+l2cap_chan_connect() return early failure before getting anywhere close
+to the risky l2cap_chan_add() call, so I would conclude that these are
+also safe from the deadlock.
+
+Johan
