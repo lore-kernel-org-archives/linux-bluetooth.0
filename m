@@ -2,47 +2,120 @@ Return-Path: <cyrus@holtmann.org>
 From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
-Subject: [PATCHv3 04/17] android/tester: Make GATT tests use generic pdu struct
-Date: Wed,  1 Oct 2014 11:01:26 +0200
-Message-Id: <1412154099-28014-5-git-send-email-jakub.tyszkowski@tieto.com>
+Subject: [PATCHv3 05/17] android/tester: Make HidHost tests use generic pdu struct
+Date: Wed,  1 Oct 2014 11:01:27 +0200
+Message-Id: <1412154099-28014-6-git-send-email-jakub.tyszkowski@tieto.com>
 In-Reply-To: <1412154099-28014-1-git-send-email-jakub.tyszkowski@tieto.com>
 References: <1412154099-28014-1-git-send-email-jakub.tyszkowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+SDP pdus are made non const so that transaction ID can be replaced
+in-place just before response to SDP request is sent.
 ---
- android/tester-gatt.c | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
+ android/tester-hidhost.c | 40 ++++++++++++++++------------------------
+ 1 file changed, 16 insertions(+), 24 deletions(-)
 
-diff --git a/android/tester-gatt.c b/android/tester-gatt.c
-index 654ccd7..f182c56 100644
---- a/android/tester-gatt.c
-+++ b/android/tester-gatt.c
-@@ -146,8 +146,8 @@ static struct gatt_search_service_data search_services_1 = {
- 	.filter_uuid = NULL,
- };
+diff --git a/android/tester-hidhost.c b/android/tester-hidhost.c
+index c7e3a67..6f524f2 100644
+--- a/android/tester-hidhost.c
++++ b/android/tester-hidhost.c
+@@ -59,14 +59,16 @@ struct emu_cid_data {
  
--static const uint8_t exchange_mtu_req_pdu[] = { 0x02, 0xa0, 0x02 };
--static const uint8_t exchange_mtu_resp_pdu[] = { 0x03, 0xa0, 0x02 };
-+static const struct pdu exchange_mtu_req_pdu = raw_pdu(0x02, 0xa0, 0x02);
-+static const struct pdu exchange_mtu_resp_pdu = raw_pdu(0x03, 0xa0, 0x02);
+ static struct emu_cid_data cid_data;
  
- static struct bt_action_data bearer_type = {
- 	.bearer_type = BDADDR_LE_PUBLIC,
-@@ -862,10 +862,10 @@ static void gatt_cid_hook_cb(const void *data, uint16_t len, void *user_data)
- 	case L2CAP_ATT_EXCHANGE_MTU_REQ:
- 		tester_print("Exchange MTU request received.");
+-static const uint8_t did_req_pdu[] = { 0x06, /* PDU id */
++static struct pdu did_req_pdu = raw_pdu(
++			0x06, /* PDU id */
+ 			0x00, 0x00, /* Transaction id */
+ 			0x00, 0x0f, /* Req length */
+ 			0x35, 0x03, /* Attributes length */
+ 			0x19, 0x12, 0x00, 0xff, 0xff, 0x35, 0x05, 0x0a, 0x00,
+-			0x00, 0xff, 0xff, 0x00 }; /* no continuation */
++			0x00, 0xff, 0xff, 0x00); /* no continuation */
  
--		if (!memcmp(exchange_mtu_req_pdu, pdu, len))
-+		if (!memcmp(exchange_mtu_req_pdu.data, pdu, len))
- 			bthost_send_cid(bthost, cid_data->handle, cid_data->cid,
--						exchange_mtu_resp_pdu,
--						sizeof(exchange_mtu_resp_pdu));
-+						exchange_mtu_resp_pdu.data,
-+						exchange_mtu_resp_pdu.size);
+-static const uint8_t did_rsp_pdu[] = { 0x07, /* PDU id */
++static struct pdu did_rsp_pdu = raw_pdu(
++			0x07, /* PDU id */
+ 			0x00, 0x00, /* Transaction id */
+ 			0x00, 0x4f, /* Response length */
+ 			0x00, 0x4c, /* Attributes length */
+@@ -79,9 +81,10 @@ static const uint8_t did_rsp_pdu[] = { 0x07, /* PDU id */
+ 			0x02, 0x02, 0x09, 0x02, 0x46, 0x09, 0x02, 0x03, 0x09,
+ 			0x05, 0x0e, 0x09, 0x02, 0x04, 0x28, 0x01, 0x09, 0x02,
+ 			0x05, 0x09, 0x00, 0x02,
+-			0x00 }; /* no continuation */
++			0x00); /* no continuation */
  
- 		break;
- 	case L2CAP_ATT_EXCHANGE_MTU_RSP:
+-static const uint8_t hid_rsp_pdu[] = { 0x07, /* PDU id */
++static struct pdu hid_rsp_pdu = raw_pdu(
++			0x07, /* PDU id */
+ 			0x00, 0x01, /* Transaction id */
+ 			0x01, 0x71, /* Response length */
+ 			0x01, 0x6E, /* Attributes length */
+@@ -126,7 +129,7 @@ static const uint8_t hid_rsp_pdu[] = { 0x07, /* PDU id */
+ 			0x28, 0x01, 0x09, 0x02, 0x0b, 0x09, 0x01, 0x00, 0x09,
+ 			0x02, 0x0c, 0x09, 0x0c, 0x80, 0x09, 0x02, 0x0d, 0x28,
+ 			0x00, 0x09, 0x02, 0x0e, 0x28, 0x01,
+-			0x00 }; /* no continuation */
++			0x00); /* no continuation */
+ 
+ static void hid_sdp_cid_hook_cb(const void *data, uint16_t len, void *user_data)
+ {
+@@ -134,14 +137,14 @@ static void hid_sdp_cid_hook_cb(const void *data, uint16_t len, void *user_data)
+ 	struct bthost *bthost = hciemu_client_get_host(t_data->hciemu);
+ 	struct emu_cid_data *cid_data = user_data;
+ 
+-	if (!memcmp(did_req_pdu, data, len)) {
++	if (!memcmp(did_req_pdu.data, data, len)) {
+ 		bthost_send_cid(bthost, cid_data->sdp_handle, cid_data->sdp_cid,
+-					did_rsp_pdu, sizeof(did_rsp_pdu));
++					did_rsp_pdu.data, did_rsp_pdu.size);
+ 		return;
+ 	}
+ 
+ 	bthost_send_cid(bthost, cid_data->sdp_handle, cid_data->sdp_cid,
+-					hid_rsp_pdu, sizeof(hid_rsp_pdu));
++					hid_rsp_pdu.data, hid_rsp_pdu.size);
+ }
+ static void hid_sdp_search_cb(uint16_t handle, uint16_t cid, void *user_data)
+ {
+@@ -159,31 +162,20 @@ static void hid_prepare_reply_protocol_mode(struct emu_cid_data *cid_data)
+ {
+ 	struct test_data *t_data = tester_get_data();
+ 	struct bthost *bthost = hciemu_client_get_host(t_data->hciemu);
+-	uint8_t pdu[2] = { 0, 0 };
+-	uint16_t pdu_len = 0;
+-
+-	pdu_len = 2;
+-	pdu[0] = 0xa0;
+-	pdu[1] = 0x00;
++	const struct pdu pdu = raw_pdu(0xa0, 0x00);
+ 
+ 	bthost_send_cid(bthost, cid_data->ctrl_handle, cid_data->ctrl_cid,
+-							(void *)pdu, pdu_len);
++							pdu.data, pdu.size);
+ }
+ 
+ static void hid_prepare_reply_report(struct emu_cid_data *cid_data)
+ {
+ 	struct test_data *t_data = tester_get_data();
+ 	struct bthost *bthost = hciemu_client_get_host(t_data->hciemu);
+-	uint8_t pdu[3] = { 0, 0, 0 };
+-	uint16_t pdu_len = 0;
+-
+-	pdu_len = 3;
+-	pdu[0] = 0xa2;
+-	pdu[1] = 0x01;
+-	pdu[2] = 0x00;
++	const struct pdu pdu = raw_pdu(0xa2, 0x01, 0x00);
+ 
+ 	bthost_send_cid(bthost, cid_data->ctrl_handle, cid_data->ctrl_cid,
+-							(void *)pdu, pdu_len);
++							pdu.data, pdu.size);
+ }
+ 
+ static void hid_ctrl_cid_hook_cb(const void *data, uint16_t len,
 -- 
 1.9.1
 
