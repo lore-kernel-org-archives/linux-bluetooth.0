@@ -1,44 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
 From: Jukka Rissanen <jukka.rissanen@linux.intel.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: 6lowpan: Avoid memory leak if memory allocation fails
-Date: Wed,  1 Oct 2014 11:30:57 +0300
-Message-Id: <1412152257-22316-1-git-send-email-jukka.rissanen@linux.intel.com>
+Subject: [PATCH] Bluetooth: 6lowpan: Memory leak as the skb is not freed
+Date: Wed,  1 Oct 2014 11:30:26 +0300
+Message-Id: <1412152226-22272-1-git-send-email-jukka.rissanen@linux.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-If skb_unshare() returns NULL, then we leak the original skb.
-Solution is to use temp variable to hold the new skb.
+The earlier multicast commit 36b3dd250dde ("Bluetooth: 6lowpan:
+Ensure header compression does not corrupt IPv6 header") lost one
+skb free which then caused memory leak.
 
 Signed-off-by: Jukka Rissanen <jukka.rissanen@linux.intel.com>
 ---
- net/bluetooth/6lowpan.c | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
+ net/bluetooth/6lowpan.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
 diff --git a/net/bluetooth/6lowpan.c b/net/bluetooth/6lowpan.c
-index add2b58..44eaad7 100644
+index f0432ae..add2b58 100644
 --- a/net/bluetooth/6lowpan.c
 +++ b/net/bluetooth/6lowpan.c
-@@ -589,13 +589,17 @@ static netdev_tx_t bt_xmit(struct sk_buff *skb, struct net_device *netdev)
- 	int err = 0;
- 	bdaddr_t addr;
- 	u8 addr_type;
-+	struct sk_buff *tmpskb;
+@@ -625,6 +625,8 @@ static netdev_tx_t bt_xmit(struct sk_buff *skb, struct net_device *netdev)
+ 		send_mcast_pkt(skb, netdev);
+ 	}
  
- 	/* We must take a copy of the skb before we modify/replace the ipv6
- 	 * header as the header could be used elsewhere
- 	 */
--	skb = skb_unshare(skb, GFP_ATOMIC);
--	if (!skb)
-+	tmpskb = skb_unshare(skb, GFP_ATOMIC);
-+	if (!tmpskb) {
-+		kfree_skb(skb);
- 		return NET_XMIT_DROP;
-+	}
-+	skb = tmpskb;
++	dev_kfree_skb(skb);
++
+ 	if (err)
+ 		BT_DBG("ERROR: xmit failed (%d)", err);
  
- 	/* Return values from setup_header()
- 	 *  <0 - error, packet is dropped
 -- 
 1.8.3.1
 
