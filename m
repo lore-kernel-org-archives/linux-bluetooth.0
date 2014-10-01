@@ -1,70 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Wed, 1 Oct 2014 14:42:25 +0200
+From: Alexander Aring <alex.aring@gmail.com>
+To: Martin Townsend <mtownsend1973@gmail.com>
+Cc: linux-zigbee-devel@lists.sourceforge.net,
+	linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org,
+	marcel@holtmann.org, Martin Townsend <martin.townsend@xsilon.com>
+Subject: Re: [PATCH v4 bluetooth] 6lowpan: fix incorrect return values in
+ lowpan_rcv
+Message-ID: <20141001124223.GB25269@omega>
+References: <1412165422-31063-1-git-send-email-martin.townsend@xsilon.com>
+ <1412165422-31063-2-git-send-email-martin.townsend@xsilon.com>
 MIME-Version: 1.0
-In-Reply-To: <20141001123408.GA26432@t440s.lan>
-References: <1412163494-20283-1-git-send-email-luiz.dentz@gmail.com>
-	<1412163494-20283-2-git-send-email-luiz.dentz@gmail.com>
-	<20141001123408.GA26432@t440s.lan>
-Date: Wed, 1 Oct 2014 15:50:35 +0300
-Message-ID: <CABBYNZLK6JfiQWp+pNK8+Pg-YOcShrm4TcbwHdnAKtbfhOcJmg@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 2/4] shared/gatt-client: Take fd in bt_gatt_client_new
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=utf-8
+In-Reply-To: <1412165422-31063-2-git-send-email-martin.townsend@xsilon.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+Hi Martin,
 
-On Wed, Oct 1, 2014 at 3:34 PM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
-> Hi Luiz,
->
-> On Wed, Oct 01, 2014, Luiz Augusto von Dentz wrote:
->> -struct bt_gatt_client *bt_gatt_client_new(struct bt_att *att, uint16_t mtu)
->> +struct bt_gatt_client *bt_gatt_client_new(int fd, uint16_t mtu)
->
-> This becomes a bit cumbersome since pretty much any time you have a
-> connected ATT socket you must be able to be both client and server in
-> order not to exhibit broken behavior.
->
-> With the above change you'd need something like the following since the
-> fd should really only be processed in one place (bt_att).
->
->         client = client_new(fd);
->         att = client_get_att(client);
->         server = server_new(att);
->
-> Without your change I assume the code has been something like:
->
->         att = att_new(fd);
->         client = client_new(att);
->         server = server_new(att);
->
-> The above is fine except I don't really see the point in having separate
-> client and server objects to begin with. I might have missed the
-> reasoning behind it (in which case please enlighten me), but why don't
-> we hide both roles behind the same object, since they're anyway tied to
-> the same connection?
->
-> I have no objections to having clearly name-spaced functions for client
-> and server side behavior, and even keeping these in separate c-files,
-> but having independent objects for them seems a bit pointless. So why
-> couldn't we have server_foo(att) and client_foo(att) while keeping just
-> this one "att" context?
+On Wed, Oct 01, 2014 at 01:10:22PM +0100, Martin Townsend wrote:
+> Currently there are a number of error paths in the lowpan_rcv function that
+> free the skb before returning, the patch simplifies the receive path by
+> ensuring that the skb is only freed from this function.
+> 
+> Passing the skb from 6lowpan up to the higher layers is not a
+> function of IPHC.  By moving it out of IPHC we also remove the
+> need to support error code returns with NET_RX codes.
+> It also makes the lowpan_rcv function more extendable as we
+> can support more compression schemes.
+> 
+> With the above 2 lowpan_rcv is refactored so eliminate incorrect return values.
 
-I was thinking something similar, anyway I got to this point while
-doing the unit tester based on the testing spec, which btw has both
-client and server tests, then I realize I would have to managed bt_att
-along with bt_gatt_client for no apparent reason.
+I notice this patch and I need some time to take review of this. Also
+Jukka should ack these changes, so we don't break anything of 6lowpan bluetooth branch.
 
-So I do agree that it seems much simpler API to unify client and
-server and let it self manage the ATT connection, we could even notify
-disconnects via ready callback, well if we fix it because right now if
-the remote does not respond or respond with something invalid it
-doesn't seems to be called. For the server side it seems to be just a
-matter of attaching the db, which could perhaps be passed in
-bt_gatt_new or having dedicated bt_gatt_attach_db/bt_gatt_detach_cb.
+Thanks for your work Martin.
 
 
--- 
-Luiz Augusto von Dentz
+Marcel, please wait until this patch will get Acked-by you, Jukka, others who like to give
+review notes and me.
+
+It's a terrible issue and we need a longer audit for this one.
+
+- Alex
