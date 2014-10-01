@@ -1,159 +1,95 @@
 Return-Path: <cyrus@holtmann.org>
-From: Gowtham Anandha Babu <gowtham.ab@samsung.com>
-To: 'Szymon Janc' <szymon.janc@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	'Dmitry Kasatkin' <d.kasatkin@samsung.com>,
-	'Bharat Panda' <bharat.panda@samsung.com>
-References: <1412145103-4824-1-git-send-email-gowtham.ab@samsung.com>
- <2277430.L2Jfa8OnXe@uw000953> <000d01cfdd54$e147bc80$a3d73580$@samsung.com>
- <5138547.7BEzpM8uY4@uw000953>
-In-reply-to: <5138547.7BEzpM8uY4@uw000953>
-Subject: RE: [PATCH] obexd/src/main: Fix memory leak on obex server
-Date: Wed, 01 Oct 2014 16:24:27 +0530
-Message-id: <000e01cfdd66$18e1fd20$4aa5f760$@samsung.com>
-MIME-version: 1.0
-Content-type: text/plain; charset=utf-8
+From: Jukka Rissanen <jukka.rissanen@linux.intel.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH v2] Bluetooth: Fix locking issue when creating l2cap connection
+Date: Wed,  1 Oct 2014 13:18:27 +0300
+Message-Id: <1412158707-26604-1-git-send-email-jukka.rissanen@linux.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Szymon,
+l2cap_chan_connect() was taking locks in different order than
+other connection functions like l2cap_connect(). This makes
+it possible to have a deadlock when conn->chan_lock (used to
+protect the channel list) and chan->lock (used to protect
+individual channel) are used in different order in different
+kernel threads.
 
-> -----Original Message-----
-> From: Szymon Janc [mailto:szymon.janc@tieto.com]
-> Sent: Wednesday, October 01, 2014 2:31 PM
-> To: Gowtham Anandha Babu
-> Cc: linux-bluetooth@vger.kernel.org; 'Dmitry Kasatkin'; 'Bharat Panda'
-> Subject: Re: [PATCH] obexd/src/main: Fix memory leak on obex server
-> 
-> Hi Gowtham,
-> 
-> On Wednesday 01 of October 2014 14:21:22 Gowtham Anandha Babu wrote:
-> > Hi Szymon,
-> >
-> > > -----Original Message-----
-> > > From: Szymon Janc [mailto:szymon.janc@tieto.com]
-> > > Sent: Wednesday, October 01, 2014 12:28 PM
-> > > To: Gowtham Anandha Babu
-> > > Cc: linux-bluetooth@vger.kernel.org; d.kasatkin@samsung.com;
-> > > bharat.panda@samsung.com; cpgs@samsung.com
-> > > Subject: Re: [PATCH] obexd/src/main: Fix memory leak on obex server
-> > >
-> > > Hi Gowtham,
-> > >
-> > >  On Wednesday 01 of October 2014 12:01:43 Gowtham Anandha Babu
-> wrote:
-> > > > Freeing the variables at appropriate place.
-> > > > ---
-> > > >  obexd/src/main.c | 3 ++-
-> > > >  1 file changed, 2 insertions(+), 1 deletion(-)
-> > > >
-> > > > diff --git a/obexd/src/main.c b/obexd/src/main.c index
-> > > > 80645f8..7a1ab98 100644
-> > > > --- a/obexd/src/main.c
-> > > > +++ b/obexd/src/main.c
-> > > > @@ -293,8 +293,9 @@ int main(int argc, char *argv[])
-> > > >  		char *old_root = option_root, *home = getenv("HOME");
-> > > >  		if (home) {
-> > > >  			option_root = g_strdup_printf("%s/%s", home,
-> > > old_root);
-> > > > -			g_free(old_root);
-> > > > +			g_free(home);
-> > > >  		}
-> > > > +		g_free(old_root);
-> > > >  	}
-> > > >
-> > > >  	if (option_capability == NULL)
-> > > >
-> > >
-> > > This patch is incorrect in multiple ways:
-> > > - freeing old_root without altering option_root would result in use-after-
-> free
-> > >   few lines later in root_folder_setup() or (if program didn't crash already)
-> > >   double free on exit.
-> > > - freeing home pointer would result in crash or undefined behavior:
-> > >   from getenv manual: "As typically implemented, getenv() returns a
-> > > pointer to
-> > >   a string within the environment list.  The caller must take care not to
-> > >   modify this string, since that would change the environment of the
-> process.
-> > >   ...The string pointed to by the return value of getenv() may be statically
-> > >   allocated,"
-> > >
-> > > But I agree that original code is a bit confusing. Maybe something
-> > > like this would make it more readable?
-> > >
-> > > --- a/obexd/src/main.c
-> > > +++ b/obexd/src/main.c
-> > > @@ -290,8 +290,9 @@ int main(int argc, char *argv[])
-> > >         }
-> > >
-> > >         if (option_root[0] != '/') {
-> > > -               char *old_root = option_root, *home = getenv("HOME");
-> > > +               const char *home = getenv("HOME");
-> > >                 if (home) {
-> > > +                       char *old_root = option_root;
-> > >                         option_root = g_strdup_printf("%s/%s", home, old_root);
-> > >                         g_free(old_root);
-> > >                 }
-> > >
-> > >
-> > > --
-> > > Best regards,
-> > > Szymon Janc
-> >
-> > I agree with you.
-> > But why can't it be like this
-> >
-> > 	if (option_root[0] != '/') {
-> > 		const char *home = getenv("HOME");
-> > 		if (home) {
-> > 			option_root = g_strdup_printf("%s/%s", home,
-> option_root);
-> > 		}
-> > 	}
-> > ---
-> > (checked, it's not crashing)
-> 
-> 
-> In that case you are leaking option_root. That is why temporary old_root is
-> needed so that original option_root can be freed.
-> 
-> --
-> Best regards,
-> Szymon Janc
+The issue was easily seen when creating a 6LoWPAN connection.
 
-Sorry If I am wrong, at the end option_root was freed after g_mail_loop_unref(main_loop). Is that enough ? 
-Or Do we need to free that intermediate option_root inside g_strdup_printf() ?
+Excerpt from the lockdep report:
 
-One more clarification:
+-> #1 (&conn->chan_lock){+.+...}:
+       [<c109324d>] lock_acquire+0x9d/0x140
+       [<c188459c>] mutex_lock_nested+0x6c/0x420
+       [<d0aab48e>] l2cap_chan_add+0x1e/0x40 [bluetooth]
+       [<d0aac618>] l2cap_chan_connect+0x348/0x8f0 [bluetooth]
+       [<d0cc9a91>] lowpan_control_write+0x221/0x2d0 [bluetooth_6lowpan]
+-> #0 (&chan->lock){+.+.+.}:
+       [<c10928d8>] __lock_acquire+0x1a18/0x1d20
+       [<c109324d>] lock_acquire+0x9d/0x140
+       [<c188459c>] mutex_lock_nested+0x6c/0x420
+       [<d0ab05fd>] l2cap_connect_cfm+0x1dd/0x3f0 [bluetooth]
+       [<d0a909c4>] hci_le_meta_evt+0x11a4/0x1260 [bluetooth]
+       [<d0a910eb>] hci_event_packet+0x3ab/0x3120 [bluetooth]
+       [<d0a7cb08>] hci_rx_work+0x208/0x4a0 [bluetooth]
 
-static gboolean parse_debug(const char *key, const char *value,
-				gpointer user_data, GError **error)
-{
-	if (value)
-		option_debug = g_strdup(value);
-	else
-		option_debug = g_strdup("*");
+       CPU0                    CPU1
+       ----                    ----
+  lock(&conn->chan_lock);
+                               lock(&chan->lock);
+                               lock(&conn->chan_lock);
+  lock(&chan->lock);
 
-	return TRUE;
-}
+Signed-off-by: Jukka Rissanen <jukka.rissanen@linux.intel.com>
+---
+Hi,
 
+this is version 2 of the fix for the locking issue I was seeing
+when 6lowpan connection was created.
+The patch is now much simpler thanks to Johan's help.
 
-In the above function, option_debug needs be freed right? As Like below:
+Cheers,
+Jukka
 
-static gboolean parse_debug(const char *key, const char *value,
-				gpointer user_data, GError **error)
-{
-	g_free(option_debug);
-	if (value)
-		option_debug = g_strdup(value);
-	else
-		option_debug = g_strdup("*");
+ net/bluetooth/l2cap_core.c | 15 ++++++++++++++-
+ 1 file changed, 14 insertions(+), 1 deletion(-)
 
-	return TRUE;
-}
-
-
-Regards,
-Gowtham
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index 8d53fc5..2f0415a 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -7088,7 +7088,16 @@ int l2cap_chan_connect(struct l2cap_chan *chan, __le16 psm, u16 cid,
+ 	bacpy(&chan->src, &hcon->src);
+ 	chan->src_type = bdaddr_type(hcon, hcon->src_type);
+ 
+-	l2cap_chan_add(conn, chan);
++	/* The the conn->chan_lock must always be acquired before any
++	 * channel locks to avoid potential deadlocks. Therefore,
++	 * release the chan lock and (re)acquire the locks in the right
++	 * order.
++	 */
++	l2cap_chan_unlock(chan);
++	mutex_lock(&conn->chan_lock);
++	l2cap_chan_lock(chan);
++
++	__l2cap_chan_add(conn, chan);
+ 
+ 	/* l2cap_chan_add takes its own ref so we can drop this one */
+ 	hci_conn_drop(hcon);
+@@ -7113,9 +7122,13 @@ int l2cap_chan_connect(struct l2cap_chan *chan, __le16 psm, u16 cid,
+ 	}
+ 
+ 	err = 0;
++	l2cap_chan_unlock(chan);
++	mutex_unlock(&conn->chan_lock);
++	goto unlock_hdev;
+ 
+ done:
+ 	l2cap_chan_unlock(chan);
++unlock_hdev:
+ 	hci_dev_unlock(hdev);
+ 	hci_dev_put(hdev);
+ 	return err;
+-- 
+1.8.3.1
 
