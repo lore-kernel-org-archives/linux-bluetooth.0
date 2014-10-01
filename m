@@ -1,21 +1,19 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1412149892.4860.137.camel@jrissane-mobl.ger.corp.intel.com>
-Subject: Re: [PATCH] Bluetooth: 6lowpan: Memory leak as the skb is not freed
-From: Jukka Rissanen <jukka.rissanen@linux.intel.com>
-To: Alexander Aring <alex.aring@gmail.com>
+Date: Wed, 1 Oct 2014 09:21:40 +0200
+From: Alexander Aring <alex.aring@gmail.com>
+To: Jukka Rissanen <jukka.rissanen@linux.intel.com>
 Cc: linux-bluetooth@vger.kernel.org
-Date: Wed, 01 Oct 2014 10:51:32 +0300
-In-Reply-To: <20141001070852.GD23043@omega>
+Subject: Re: [PATCH] Bluetooth: 6lowpan: Memory leak as the skb is not freed
+Message-ID: <20141001072139.GE23043@omega>
 References: <1412146853-1968-1-git-send-email-jukka.rissanen@linux.intel.com>
-	 <20141001070852.GD23043@omega>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+ <20141001070852.GD23043@omega>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20141001070852.GD23043@omega>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Alex,
-
-On ke, 2014-10-01 at 09:08 +0200, Alexander Aring wrote:
+On Wed, Oct 01, 2014 at 09:08:52AM +0200, Alexander Aring wrote:
 > Hi Jukka,
 > 
 > On Wed, Oct 01, 2014 at 10:00:53AM +0300, Jukka Rissanen wrote:
@@ -41,9 +39,6 @@ On ke, 2014-10-01 at 09:08 +0200, Alexander Aring wrote:
 > 
 > not dropping afterwards? Then this should be consume_skb or
 > dev_kfree_skb.
-
-Ok, will change that.
-
 > 
 > Also I detected we can't make:
 > 
@@ -61,13 +56,8 @@ Ok, will change that.
 > 	skb = tmpskb;
 > 
 
-Sure, thanks for the info.
+I mean it depends, I don't see that skb_unshare free the skb when
+allocation failed and then we lost the reference to the skb which
+should be unshared.
 
-> 
-> - Alex
-
-
-Cheers,
-Jukka
-
-
+- Alex
