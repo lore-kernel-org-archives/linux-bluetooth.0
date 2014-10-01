@@ -1,155 +1,159 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 1/4] shared/gatt-client: Simplify bt_gatt_client_new
-Date: Wed,  1 Oct 2014 14:38:11 +0300
-Message-Id: <1412163494-20283-1-git-send-email-luiz.dentz@gmail.com>
+From: Gowtham Anandha Babu <gowtham.ab@samsung.com>
+To: 'Szymon Janc' <szymon.janc@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	'Dmitry Kasatkin' <d.kasatkin@samsung.com>,
+	'Bharat Panda' <bharat.panda@samsung.com>
+References: <1412145103-4824-1-git-send-email-gowtham.ab@samsung.com>
+ <2277430.L2Jfa8OnXe@uw000953> <000d01cfdd54$e147bc80$a3d73580$@samsung.com>
+ <5138547.7BEzpM8uY4@uw000953>
+In-reply-to: <5138547.7BEzpM8uY4@uw000953>
+Subject: RE: [PATCH] obexd/src/main: Fix memory leak on obex server
+Date: Wed, 01 Oct 2014 16:24:27 +0530
+Message-id: <000e01cfdd66$18e1fd20$4aa5f760$@samsung.com>
+MIME-version: 1.0
+Content-type: text/plain; charset=utf-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Szymon,
 
-This split bt_gatt_client_unref into bt_gatt_client_free so it can be
-used within bt_gatt_client_new when freeing the data.
----
- src/shared/gatt-client.c | 87 +++++++++++++++++++++---------------------------
- 1 file changed, 38 insertions(+), 49 deletions(-)
+> -----Original Message-----
+> From: Szymon Janc [mailto:szymon.janc@tieto.com]
+> Sent: Wednesday, October 01, 2014 2:31 PM
+> To: Gowtham Anandha Babu
+> Cc: linux-bluetooth@vger.kernel.org; 'Dmitry Kasatkin'; 'Bharat Panda'
+> Subject: Re: [PATCH] obexd/src/main: Fix memory leak on obex server
+> 
+> Hi Gowtham,
+> 
+> On Wednesday 01 of October 2014 14:21:22 Gowtham Anandha Babu wrote:
+> > Hi Szymon,
+> >
+> > > -----Original Message-----
+> > > From: Szymon Janc [mailto:szymon.janc@tieto.com]
+> > > Sent: Wednesday, October 01, 2014 12:28 PM
+> > > To: Gowtham Anandha Babu
+> > > Cc: linux-bluetooth@vger.kernel.org; d.kasatkin@samsung.com;
+> > > bharat.panda@samsung.com; cpgs@samsung.com
+> > > Subject: Re: [PATCH] obexd/src/main: Fix memory leak on obex server
+> > >
+> > > Hi Gowtham,
+> > >
+> > >  On Wednesday 01 of October 2014 12:01:43 Gowtham Anandha Babu
+> wrote:
+> > > > Freeing the variables at appropriate place.
+> > > > ---
+> > > >  obexd/src/main.c | 3 ++-
+> > > >  1 file changed, 2 insertions(+), 1 deletion(-)
+> > > >
+> > > > diff --git a/obexd/src/main.c b/obexd/src/main.c index
+> > > > 80645f8..7a1ab98 100644
+> > > > --- a/obexd/src/main.c
+> > > > +++ b/obexd/src/main.c
+> > > > @@ -293,8 +293,9 @@ int main(int argc, char *argv[])
+> > > >  		char *old_root = option_root, *home = getenv("HOME");
+> > > >  		if (home) {
+> > > >  			option_root = g_strdup_printf("%s/%s", home,
+> > > old_root);
+> > > > -			g_free(old_root);
+> > > > +			g_free(home);
+> > > >  		}
+> > > > +		g_free(old_root);
+> > > >  	}
+> > > >
+> > > >  	if (option_capability == NULL)
+> > > >
+> > >
+> > > This patch is incorrect in multiple ways:
+> > > - freeing old_root without altering option_root would result in use-after-
+> free
+> > >   few lines later in root_folder_setup() or (if program didn't crash already)
+> > >   double free on exit.
+> > > - freeing home pointer would result in crash or undefined behavior:
+> > >   from getenv manual: "As typically implemented, getenv() returns a
+> > > pointer to
+> > >   a string within the environment list.  The caller must take care not to
+> > >   modify this string, since that would change the environment of the
+> process.
+> > >   ...The string pointed to by the return value of getenv() may be statically
+> > >   allocated,"
+> > >
+> > > But I agree that original code is a bit confusing. Maybe something
+> > > like this would make it more readable?
+> > >
+> > > --- a/obexd/src/main.c
+> > > +++ b/obexd/src/main.c
+> > > @@ -290,8 +290,9 @@ int main(int argc, char *argv[])
+> > >         }
+> > >
+> > >         if (option_root[0] != '/') {
+> > > -               char *old_root = option_root, *home = getenv("HOME");
+> > > +               const char *home = getenv("HOME");
+> > >                 if (home) {
+> > > +                       char *old_root = option_root;
+> > >                         option_root = g_strdup_printf("%s/%s", home, old_root);
+> > >                         g_free(old_root);
+> > >                 }
+> > >
+> > >
+> > > --
+> > > Best regards,
+> > > Szymon Janc
+> >
+> > I agree with you.
+> > But why can't it be like this
+> >
+> > 	if (option_root[0] != '/') {
+> > 		const char *home = getenv("HOME");
+> > 		if (home) {
+> > 			option_root = g_strdup_printf("%s/%s", home,
+> option_root);
+> > 		}
+> > 	}
+> > ---
+> > (checked, it's not crashing)
+> 
+> 
+> In that case you are leaking option_root. That is why temporary old_root is
+> needed so that original option_root can be freed.
+> 
+> --
+> Best regards,
+> Szymon Janc
 
-diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
-index 6dc8e95..782e6b3 100644
---- a/src/shared/gatt-client.c
-+++ b/src/shared/gatt-client.c
-@@ -1211,6 +1211,29 @@ static void notify_cb(uint8_t opcode, const void *pdu, uint16_t length,
- 	bt_gatt_client_unref(client);
- }
- 
-+static void long_write_op_unref(void *data);
-+
-+static void bt_gatt_client_free(struct bt_gatt_client *client)
-+{
-+	if (client->ready_destroy)
-+		client->ready_destroy(client->ready_data);
-+
-+	if (client->debug_destroy)
-+		client->debug_destroy(client->debug_data);
-+
-+	bt_att_unregister(client->att, client->notify_id);
-+	bt_att_unregister(client->att, client->ind_id);
-+
-+	queue_destroy(client->svc_chngd_queue, free);
-+	queue_destroy(client->long_write_queue, long_write_op_unref);
-+	queue_destroy(client->notify_list, notify_data_unref);
-+
-+	gatt_client_clear_services(client);
-+
-+	bt_att_unref(client->att);
-+	free(client);
-+}
-+
- struct bt_gatt_client *bt_gatt_client_new(struct bt_att *att, uint16_t mtu)
- {
- 	struct bt_gatt_client *client;
-@@ -1223,52 +1246,36 @@ struct bt_gatt_client *bt_gatt_client_new(struct bt_att *att, uint16_t mtu)
- 		return NULL;
- 
- 	client->long_write_queue = queue_new();
--	if (!client->long_write_queue) {
--		free(client);
--		return NULL;
--	}
-+	if (!client->long_write_queue)
-+		goto fail;
- 
- 	client->svc_chngd_queue = queue_new();
--	if (!client->svc_chngd_queue) {
--		queue_destroy(client->long_write_queue, NULL);
--		free(client);
--		return NULL;
--	}
-+	if (!client->svc_chngd_queue)
-+		goto fail;
- 
- 	client->notify_list = queue_new();
--	if (!client->notify_list) {
--		queue_destroy(client->svc_chngd_queue, NULL);
--		queue_destroy(client->long_write_queue, NULL);
--		free(client);
--		return NULL;
--	}
-+	if (!client->notify_list)
-+		goto fail;
- 
- 	client->notify_id = bt_att_register(att, BT_ATT_OP_HANDLE_VAL_NOT,
- 						notify_cb, client, NULL);
--	if (!client->notify_id) {
--		queue_destroy(client->notify_list, NULL);
--		queue_destroy(client->svc_chngd_queue, NULL);
--		queue_destroy(client->long_write_queue, NULL);
--		free(client);
--		return NULL;
--	}
-+	if (!client->notify_id)
-+		goto fail;
- 
- 	client->ind_id = bt_att_register(att, BT_ATT_OP_HANDLE_VAL_IND,
- 						notify_cb, client, NULL);
--	if (!client->ind_id) {
--		bt_att_unregister(att, client->notify_id);
--		queue_destroy(client->notify_list, NULL);
--		queue_destroy(client->svc_chngd_queue, NULL);
--		queue_destroy(client->long_write_queue, NULL);
--		free(client);
--		return NULL;
--	}
-+	if (!client->ind_id)
-+		goto fail;
- 
- 	client->att = bt_att_ref(att);
- 
- 	gatt_client_init(client, mtu);
- 
- 	return bt_gatt_client_ref(client);
-+
-+fail:
-+	bt_gatt_client_free(client);
-+	return NULL;
- }
- 
- struct bt_gatt_client *bt_gatt_client_ref(struct bt_gatt_client *client)
-@@ -1281,8 +1288,6 @@ struct bt_gatt_client *bt_gatt_client_ref(struct bt_gatt_client *client)
- 	return client;
- }
- 
--static void long_write_op_unref(void *data);
--
- void bt_gatt_client_unref(struct bt_gatt_client *client)
- {
- 	if (!client)
-@@ -1291,23 +1296,7 @@ void bt_gatt_client_unref(struct bt_gatt_client *client)
- 	if (__sync_sub_and_fetch(&client->ref_count, 1))
- 		return;
- 
--	if (client->ready_destroy)
--		client->ready_destroy(client->ready_data);
--
--	if (client->debug_destroy)
--		client->debug_destroy(client->debug_data);
--
--	bt_att_unregister(client->att, client->notify_id);
--	bt_att_unregister(client->att, client->ind_id);
--
--	queue_destroy(client->svc_chngd_queue, free);
--	queue_destroy(client->long_write_queue, long_write_op_unref);
--	queue_destroy(client->notify_list, notify_data_unref);
--
--	gatt_client_clear_services(client);
--
--	bt_att_unref(client->att);
--	free(client);
-+	bt_gatt_client_free(client);
- }
- 
- bool bt_gatt_client_is_ready(struct bt_gatt_client *client)
--- 
-1.9.3
+Sorry If I am wrong, at the end option_root was freed after g_mail_loop_unref(main_loop). Is that enough ? 
+Or Do we need to free that intermediate option_root inside g_strdup_printf() ?
+
+One more clarification:
+
+static gboolean parse_debug(const char *key, const char *value,
+				gpointer user_data, GError **error)
+{
+	if (value)
+		option_debug = g_strdup(value);
+	else
+		option_debug = g_strdup("*");
+
+	return TRUE;
+}
+
+
+In the above function, option_debug needs be freed right? As Like below:
+
+static gboolean parse_debug(const char *key, const char *value,
+				gpointer user_data, GError **error)
+{
+	g_free(option_debug);
+	if (value)
+		option_debug = g_strdup(value);
+	else
+		option_debug = g_strdup("*");
+
+	return TRUE;
+}
+
+
+Regards,
+Gowtham
 
