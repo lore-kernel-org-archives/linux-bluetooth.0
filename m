@@ -1,102 +1,47 @@
 Return-Path: <cyrus@holtmann.org>
-From: Gowtham Anandha Babu <gowtham.ab@samsung.com>
-To: 'Szymon Janc' <szymon.janc@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	'Dmitry Kasatkin' <d.kasatkin@samsung.com>,
-	'Bharat Panda' <bharat.panda@samsung.com>
-References: <1412145103-4824-1-git-send-email-gowtham.ab@samsung.com>
- <2277430.L2Jfa8OnXe@uw000953>
-In-reply-to: <2277430.L2Jfa8OnXe@uw000953>
-Subject: RE: [PATCH] obexd/src/main: Fix memory leak on obex server
-Date: Wed, 01 Oct 2014 14:21:22 +0530
-Message-id: <000d01cfdd54$e147bc80$a3d73580$@samsung.com>
-MIME-version: 1.0
-Content-type: text/plain; charset=utf-8
+From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
+Subject: [PATCH] emulator/bthost: Add missing flow_ctrl assignment
+Date: Wed,  1 Oct 2014 10:31:43 +0200
+Message-Id: <1412152303-14849-1-git-send-email-jakub.tyszkowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Szymon,
-
-> -----Original Message-----
-> From: Szymon Janc [mailto:szymon.janc@tieto.com]
-> Sent: Wednesday, October 01, 2014 12:28 PM
-> To: Gowtham Anandha Babu
-> Cc: linux-bluetooth@vger.kernel.org; d.kasatkin@samsung.com;
-> bharat.panda@samsung.com; cpgs@samsung.com
-> Subject: Re: [PATCH] obexd/src/main: Fix memory leak on obex server
-> 
-> Hi Gowtham,
-> 
->  On Wednesday 01 of October 2014 12:01:43 Gowtham Anandha Babu wrote:
-> > Freeing the variables at appropriate place.
-> > ---
-> >  obexd/src/main.c | 3 ++-
-> >  1 file changed, 2 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/obexd/src/main.c b/obexd/src/main.c index
-> > 80645f8..7a1ab98 100644
-> > --- a/obexd/src/main.c
-> > +++ b/obexd/src/main.c
-> > @@ -293,8 +293,9 @@ int main(int argc, char *argv[])
-> >  		char *old_root = option_root, *home = getenv("HOME");
-> >  		if (home) {
-> >  			option_root = g_strdup_printf("%s/%s", home,
-> old_root);
-> > -			g_free(old_root);
-> > +			g_free(home);
-> >  		}
-> > +		g_free(old_root);
-> >  	}
-> >
-> >  	if (option_capability == NULL)
-> >
-> 
-> This patch is incorrect in multiple ways:
-> - freeing old_root without altering option_root would result in use-after-free
->   few lines later in root_folder_setup() or (if program didn't crash already)
->   double free on exit.
-> - freeing home pointer would result in crash or undefined behavior:
->   from getenv manual: "As typically implemented, getenv() returns a pointer
-> to
->   a string within the environment list.  The caller must take care not to
->   modify this string, since that would change the environment of the process.
->   ...The string pointed to by the return value of getenv() may be statically
->   allocated,"
-> 
-> But I agree that original code is a bit confusing. Maybe something like this
-> would make it more readable?
-> 
-> --- a/obexd/src/main.c
-> +++ b/obexd/src/main.c
-> @@ -290,8 +290,9 @@ int main(int argc, char *argv[])
->         }
-> 
->         if (option_root[0] != '/') {
-> -               char *old_root = option_root, *home = getenv("HOME");
-> +               const char *home = getenv("HOME");
->                 if (home) {
-> +                       char *old_root = option_root;
->                         option_root = g_strdup_printf("%s/%s", home, old_root);
->                         g_free(old_root);
->                 }
-> 
-> 
-> --
-> Best regards,
-> Szymon Janc
-
-I agree with you.
-But why can't it be like this
-
-	if (option_root[0] != '/') {
-		const char *home = getenv("HOME");
-		if (home) {
-			option_root = g_strdup_printf("%s/%s", home, option_root);
-		}
-	}
+This fixes following valgrind report:
+==3093== Syscall param writev(vector[...]) points to uninitialised
+byte(s)
+==3093==    at 0x5652FA0: writev (writev.c:54)
+==3093==    by 0x408029: send_iov (bthost.c:484)
+==3093==    by 0x402530: rfcomm_uih_send.isra.25 (bthost.c:1771)
+==3093==    by 0x4095BE: bthost_receive_h4 (bthost.c:1872)
+==3093==    by 0x4029E6: receive_bthost.part.1 (hciemu.c:141)
+==3093==    by 0x5083CE4: g_main_context_dispatch (in
+/lib/x86_64-linux-gnu/libglib-2.0.so.0.4002.0)
+==3093==    by 0x5084047: ??? (in
+/lib/x86_64-linux-gnu/libglib-2.0.so.0.4002.0)
+==3093==    by 0x5084309: g_main_loop_run (in
+/lib/x86_64-linux-gnu/libglib-2.0.so.0.4002.0)
+==3093==    by 0x415920: tester_run (tester.c:815)
+==3093==    by 0x40263E: main (tester-main.c:2588)
+==3093==  Address 0xffefff0b1 is on thread 1's stack
+==3093==
 ---
-(checked, it's not crashing)
+ emulator/bthost.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-Regards,
-Gowtham
+diff --git a/emulator/bthost.c b/emulator/bthost.c
+index 59dde1e..f859dd1 100644
+--- a/emulator/bthost.c
++++ b/emulator/bthost.c
+@@ -1862,6 +1862,7 @@ static void rfcomm_pn_recv(struct bthost *bthost, struct btconn *conn,
+ 	}
+ 
+ 	pn_cmd.dlci = pn->dlci;
++	pn_cmd.flow_ctrl = pn->flow_ctrl;
+ 	pn_cmd.priority = pn->priority;
+ 	pn_cmd.ack_timer = pn->ack_timer;
+ 	pn_cmd.max_retrans = pn->max_retrans;
+-- 
+1.9.1
 
