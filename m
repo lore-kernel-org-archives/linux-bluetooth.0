@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v3 4/5] shared/gatt-client: Fix gatt_client_init
-Date: Thu,  2 Oct 2014 12:51:40 +0300
-Message-Id: <1412243501-1755-4-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v3 3/5] shared/gatt-client: Fix crash on bt_gatt_client_unref
+Date: Thu,  2 Oct 2014 12:51:39 +0300
+Message-Id: <1412243501-1755-3-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1412243501-1755-1-git-send-email-luiz.dentz@gmail.com>
 References: <1412243501-1755-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,39 +11,53 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This function is only called within bt_gatt_client_new therefore it is
-not possible to have a ready callback and should return false if
-bt_gatt_exchange_mtu fails.
+Calling gatt_client_clear_services after notify_list is destroyed cause
+the following backtrace:
+
+Invalid read of size 8
+   at 0x404CC9: queue_remove_all (queue.c:312)
+   by 0x401FC6: gatt_client_remove_all_notify_in_range (gatt-client.c:350)
+   by 0x403170: bt_gatt_client_free (gatt-client.c:357)
+   by 0x401A93: test_client (test-gatt.c:224)
+   by 0x4E9E5E0: ??? (in /usr/lib64/libglib-2.0.so.0.3800.2)
+   by 0x4E9E7A5: ??? (in /usr/lib64/libglib-2.0.so.0.3800.2)
+   by 0x4E9E7A5: ??? (in /usr/lib64/libglib-2.0.so.0.3800.2)
+   by 0x4E9E7A5: ??? (in /usr/lib64/libglib-2.0.so.0.3800.2)
+   by 0x4E9EB1A: g_test_run_suite (in /usr/lib64/libglib-2.0.so.0.3800.2)
+   by 0x4015EE: main (test-gatt.c:259)
+ Address 0x5752718 is 8 bytes inside a block of size 32 free'd
+   at 0x4C28577: free (in /usr/lib64/valgrind/vgpreload_memcheck-amd64-linux.so)
+   by 0x40315E: bt_gatt_client_free (gatt-client.c:1233)
+   by 0x401A93: test_client (test-gatt.c:224)
+   by 0x4E9E5E0: ??? (in /usr/lib64/libglib-2.0.so.0.3800.2)
+   by 0x4E9E7A5: ??? (in /usr/lib64/libglib-2.0.so.0.3800.2)
+   by 0x4E9E7A5: ??? (in /usr/lib64/libglib-2.0.so.0.3800.2)
+   by 0x4E9E7A5: ??? (in /usr/lib64/libglib-2.0.so.0.3800.2)
+   by 0x4E9EB1A: g_test_run_suite (in /usr/lib64/libglib-2.0.so.0.3800.2)
+   by 0x4015EE: main (test-gatt.c:259)
 ---
- src/shared/gatt-client.c | 7 +++----
- 1 file changed, 3 insertions(+), 4 deletions(-)
+ src/shared/gatt-client.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
-index ddedaf0..5833e7a 100644
+index 782e6b3..ddedaf0 100644
 --- a/src/shared/gatt-client.c
 +++ b/src/shared/gatt-client.c
-@@ -1005,10 +1005,8 @@ static bool gatt_client_init(struct bt_gatt_client *client, uint16_t mtu)
- 							exchange_mtu_cb,
- 							discovery_op_ref(op),
- 							discovery_op_unref)) {
--		if (client->ready_callback)
--			client->ready_callback(false, 0, client->ready_data);
+@@ -1224,12 +1224,12 @@ static void bt_gatt_client_free(struct bt_gatt_client *client)
+ 	bt_att_unregister(client->att, client->notify_id);
+ 	bt_att_unregister(client->att, client->ind_id);
+ 
++	gatt_client_clear_services(client);
++
+ 	queue_destroy(client->svc_chngd_queue, free);
+ 	queue_destroy(client->long_write_queue, long_write_op_unref);
+ 	queue_destroy(client->notify_list, notify_data_unref);
+ 
+-	gatt_client_clear_services(client);
 -
- 		free(op);
-+		return false;
- 	}
- 
- 	client->in_init = true;
-@@ -1269,7 +1267,8 @@ struct bt_gatt_client *bt_gatt_client_new(struct bt_att *att, uint16_t mtu)
- 
- 	client->att = bt_att_ref(att);
- 
--	gatt_client_init(client, mtu);
-+	if (!gatt_client_init(client, mtu))
-+		goto fail;
- 
- 	return bt_gatt_client_ref(client);
- 
+ 	bt_att_unref(client->att);
+ 	free(client);
+ }
 -- 
 1.9.3
 
