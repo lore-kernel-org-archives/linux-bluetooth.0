@@ -1,114 +1,81 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <542DAB0B.2080107@xsilon.com>
-Date: Thu, 02 Oct 2014 20:44:11 +0100
-From: Martin Townsend <martin.townsend@xsilon.com>
-MIME-Version: 1.0
-To: Jukka Rissanen <jukka.rissanen@linux.intel.com>
-CC: Martin Townsend <mtownsend1973@gmail.com>,
- linux-zigbee-devel@lists.sourceforge.net,
- linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org,
- marcel@holtmann.org, alex.aring@gmail.com
-Subject: Re: [PATCH v4 bluetooth] Fix lowpan_rcv
-References: <1412165422-31063-1-git-send-email-martin.townsend@xsilon.com>		 <1412174827.4860.144.camel@jrissane-mobl.ger.corp.intel.com>		 <542C1C96.80605@xsilon.com>	 <1412249319.13121.26.camel@jrissane-mobl.ger.corp.intel.com>	 <542D4232.2070303@xsilon.com> <1412258111.13121.35.camel@jrissane-mobl.ger.corp.intel.com>
-In-Reply-To: <1412258111.13121.35.camel@jrissane-mobl.ger.corp.intel.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+Subject: [PATCH 11/11] unit/test-hfp: Add some robustness tests for HFP HF
+Date: Thu,  2 Oct 2014 21:29:59 +0200
+Message-Id: <1412278199-5761-12-git-send-email-lukasz.rymanowski@tieto.com>
+In-Reply-To: <1412278199-5761-1-git-send-email-lukasz.rymanowski@tieto.com>
+References: <1412278199-5761-1-git-send-email-lukasz.rymanowski@tieto.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jukka,
+This patch adds folowing tests:
+/hfp/test_hf_corrupted_1
+/hfp/test_hf_corrupted_2
+/hfp/test_hf_empty
+/hfp/test_hf_unknown
+---
+ unit/test-hfp.c | 40 ++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 40 insertions(+)
 
-Very bizarre that the patch causes a locking issue in the Tx path.  Is 
-it a side effect from not cloning the skb before calling process_data.  
-I couldn't see why a clone was being made so maybe I'm missing something 
-here.
+diff --git a/unit/test-hfp.c b/unit/test-hfp.c
+index 4d552fd..1702cb6 100644
+--- a/unit/test-hfp.c
++++ b/unit/test-hfp.c
+@@ -555,6 +555,25 @@ static void test_hf_unsolicited(gconstpointer data)
+ 	execute_context(context);
+ }
+ 
++static void test_hf_robustness(gconstpointer data)
++{
++	struct context *context = create_context(data);
++	bool ret;
++
++	context->hfp_hf = hfp_hf_new(context->fd_client);
++	g_assert(context->hfp_hf);
++
++	ret = hfp_hf_set_close_on_unref(context->hfp_hf, true);
++	g_assert(ret);
++
++	send_pdu(context);
++
++	hfp_hf_unref(context->hfp_hf);
++	context->hfp_hf = NULL;
++
++	execute_context(context);
++}
++
+ int main(int argc, char *argv[])
+ {
+ 	g_test_init(&argc, &argv, NULL);
+@@ -663,5 +682,26 @@ int main(int argc, char *argv[])
+ 			frg_pdu('\r'), frg_pdu('\n'),
+ 			data_end());
+ 
++	define_hf_test("/hfp/test_hf_corrupted_1", test_hf_unsolicited,
++			hf_result_handler, NULL,
++			raw_pdu('+', 'C', 'L', 'C', 'C', '\0'),
++			frg_pdu('\r', 'X', '\r', '\n'),
++			frg_pdu('+', 'C', 'L', 'C', 'C', ':', '1', '3', '0',
++								'\r', '\n'),
++			data_end());
++
++	define_hf_test("/hfp/test_hf_corrupted_2", test_hf_unsolicited,
++			hf_result_handler, NULL,
++			raw_pdu('+', 'C', 'L', 'C', 'C', '\0'),
++			raw_pdu('+', 'C', 'L', 'C', 'C', '\r', '\n'),
++			data_end());
++
++	define_hf_test("/hfp/test_hf_empty", test_hf_robustness, NULL, NULL,
++			raw_pdu('\r'), data_end());
++
++	define_hf_test("/hfp/test_hf_unknown", test_hf_robustness, NULL, NULL,
++			raw_pdu('\r', '\n', 'B', 'R', '\r', '\n'),
++			data_end());
++
+ 	return g_test_run();
+ }
+-- 
+1.8.4
 
-- Martin.
-
-
-On 02/10/14 14:55, Jukka Rissanen wrote:
-> Hi Martin,
->
-> On to, 2014-10-02 at 13:16 +0100, Martin Townsend wrote:
->> Hi Jukka,
->>
->> Thanks for investigating this.
->>
->> If you set the dev in your receive function does the oops go away,  BTW this is where the pkt_type is set to PACKET_HOST, for us this was causing problems, I don't know if this is the same for you guys.
->>
->> Here's the code:
->>
->>              local_skb->protocol = htons(ETH_P_IPV6);
->>>>>      local_skb->dev = dev;
->>              local_skb->pkt_type = PACKET_HOST;
->>
->>              if (give_skb_to_upper(local_skb, dev)
->>                              != NET_RX_SUCCESS) {
->>                  kfree_skb(local_skb);
->>
->> - Martin.
-> So I applied this patch
->
-> diff --git a/net/bluetooth/6lowpan.c b/net/bluetooth/6lowpan.c
-> index e4f5ce5..aa64f91 100644
-> --- a/net/bluetooth/6lowpan.c
-> +++ b/net/bluetooth/6lowpan.c
-> @@ -323,6 +323,7 @@ static int recv_pkt(struct sk_buff *skb, struct
-> net_device *dev,
->   
->                  local_skb->protocol = htons(ETH_P_IPV6);
->                  local_skb->pkt_type = PACKET_HOST;
-> +               local_skb->dev = dev;
->   
->                  if (give_skb_to_upper(local_skb, dev) != NET_RX_SUCCESS)
-> {
->                          goto drop_local_skb;
-> @@ -362,6 +363,7 @@ static int recv_pkt(struct sk_buff *skb, struct
-> net_device *dev,
->   
->                          local_skb->protocol = htons(ETH_P_IPV6);
->                          local_skb->pkt_type = PACKET_HOST;
-> +                       local_skb->dev = dev;
->   
->                          if (give_skb_to_upper(local_skb, dev)
->                                                          !=
-> NET_RX_SUCCESS) {
->
->
-> and I do not see the earlier null pointer oops any more.
->
->
-> Unfortunately a new error is seen:
->
-> [  340.676353] inconsistent {IN-SOFTIRQ-W} -> {SOFTIRQ-ON-W} usage.
-> [  340.676353] kworker/u3:1/370 [HC0[0]:SC0[0]:HE1:SE1] takes:
-> [  340.676353]  (&(&list->lock)->rlock#6){+.?...}, at: [<f8319d4c>]
-> hci_send_acl+0xac/0x290 [bluetooth]
-> [  340.676353] {IN-SOFTIRQ-W} state was registered at:
-> [  340.676353]   [<c10915a3>] __lock_acquire+0x6d3/0x1d20
-> [  340.676353]   [<c109325d>] lock_acquire+0x9d/0x140
-> [  340.676353]   [<c1889c25>] _raw_spin_lock+0x45/0x80
-> [  340.676353]   [<f8319d4c>] hci_send_acl+0xac/0x290 [bluetooth]
-> [  340.676353]   [<f833abf0>] l2cap_do_send+0x60/0x100 [bluetooth]
-> [  340.676353]   [<f833e7c0>] l2cap_chan_send+0x7f0/0x10e0 [bluetooth]
-> [  340.676353]   [<f850691e>] send_pkt+0x4e/0xa0 [bluetooth_6lowpan]
-> [  340.676353]   [<f8506d20>] bt_xmit+0x3b0/0x770 [bluetooth_6lowpan]
-> [  340.676353]   [<c17742f4>] dev_hard_start_xmit+0x344/0x670
-> [  340.676353]   [<c17749ad>] __dev_queue_xmit+0x38d/0x680
-> [  340.676353]   [<c1774caf>] dev_queue_xmit+0xf/0x20
-> [  340.676353]   [<c177b8b0>] neigh_connected_output+0x130/0x1a0
-> [  340.676353]   [<c1812a63>] ip6_finish_output2+0x173/0x8c0
-> [  340.676353]   [<c18182db>] ip6_finish_output+0x7b/0x1b0
-> [  340.676353]   [<c18184a7>] ip6_output+0x97/0x2a0
-> ...
->
-> I have to investigate this more what your new code is doing as I did not
-> see this error earlier before your patch.
->
-> So I have very latest bluetooth-next (commit b57d4471fd18) + your v4
-> patch + above patch that sets the dev pointer, and this combination
-> triggers the above inconsistent softirq usage error.
->
->
-> Cheers,
-> Jukka
->
->
