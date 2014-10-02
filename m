@@ -1,125 +1,65 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <CAHrH25T1FqMi7zho+gYCbuhmdQpsVoqV5ee3H+UbZwwhqeNC9A@mail.gmail.com>
-References: <1412163494-20283-1-git-send-email-luiz.dentz@gmail.com>
-	<1412163494-20283-2-git-send-email-luiz.dentz@gmail.com>
-	<20141001123408.GA26432@t440s.lan>
-	<CABBYNZLK6JfiQWp+pNK8+Pg-YOcShrm4TcbwHdnAKtbfhOcJmg@mail.gmail.com>
-	<CAHrH25T1FqMi7zho+gYCbuhmdQpsVoqV5ee3H+UbZwwhqeNC9A@mail.gmail.com>
-Date: Thu, 2 Oct 2014 11:36:03 +0300
-Message-ID: <CABBYNZLBVPswz2C7xQMN4XCk4Dw+V4mZ08v65iQ+jfH7WmDpLQ@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 2/4] shared/gatt-client: Take fd in bt_gatt_client_new
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.6\))
+Subject: Re: [PATCH BlueZ] core: Reduce RSSI delta threshold for RSSI property updates on Device1.
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <CAHrH25RRDgorEmBUH0yfTaL8VgLoe2v6E2Vm7W-6Sqgrcgo3zw@mail.gmail.com>
+Date: Thu, 2 Oct 2014 10:34:34 +0200
+Cc: Szymon Janc <szymon.janc@tieto.com>,
+	BlueZ development <linux-bluetooth@vger.kernel.org>
+Message-Id: <4B0E0390-0BB8-4B2C-A2BA-078203AE7D4F@holtmann.org>
+References: <1412028964-5298-1-git-send-email-armansito@chromium.org> <12072518.xz8sZz3RZr@uw000953> <CAHrH25SU4CMDJGukOpAzP7ZSgV3qLWBWx7+3+e7wHzX=EoL=ZA@mail.gmail.com> <E68A0F43-AD5C-4ED5-8724-3E43D064F5BA@holtmann.org> <CAHrH25TT+jSUKy_r4Pmfo5EHqQBi1hB1Hu7Qq2DQm32Y99z_FA@mail.gmail.com> <3E482A6F-C48C-4297-A203-6D3E26AFFDA7@holtmann.org> <CAHrH25RRDgorEmBUH0yfTaL8VgLoe2v6E2Vm7W-6Sqgrcgo3zw@mail.gmail.com>
 To: Arman Uguray <armansito@chromium.org>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Arman,
 
-On Wed, Oct 1, 2014 at 7:17 PM, Arman Uguray <armansito@chromium.org> wrote:
-> Hi Luiz & Johan,
->
->
->>> The above is fine except I don't really see the point in having separate
->>> client and server objects to begin with. I might have missed the
->>> reasoning behind it (in which case please enlighten me), but why don't
->>> we hide both roles behind the same object, since they're anyway tied to
->>> the same connection?
->>>
->
-> I think eventually this is may be what we want but it seems more
-> natural to me for client and server roles to be in different objects,
-> at least internally. There's never an "overlap" between server and
-> client roles that I know of and these should be pretty much
-> orthogonal. I think eventually we can have a more global object that
-> owns the fd & att structure and owns the server and the client, but
-> it's more intuitive IMO if the server & client procedures are grouped
-> in their own modules. Apart from the transport, there's really nothing
-> that they'll share (afaik).
+>> the D-Bus API have all been designed with user interaction in mind. So it makes sense to impose this kind of extra thresholds. That is why you can map D-Bus things 1:1 to your UI and it will all nicely work.
+>> 
+> 
+> I guess this falls into the overall question of designing an
+> application API vs an API for system UI. I always look at the D-Bus
+> API as an application API where system UI is one specific application.
+> In the end, we should be able to build use cases that require more
+> fine-tuned RSSI updates.
 
-Right, it might make the code more modular but also allow mistakes
-such as creating 2 different instances of bt_att for handling client
-and server separately.
+the current API was designed for UI frameworks to have an easy and dirt simple way of displaying the core Bluetooth functionality to the user. So this mainly relates to pairing your device and getting extra information about the device. The RSSI property is also only valid if you start a discovery. Which we clearly expected to map 1:1 to someone wanting to display a list of devices and then be able to sort them by approximate distance.
 
->
->>> I have no objections to having clearly name-spaced functions for client
->>> and server side behavior, and even keeping these in separate c-files,
->>> but having independent objects for them seems a bit pointless. So why
->>> couldn't we have server_foo(att) and client_foo(att) while keeping just
->>> this one "att" context?
->
-> Having independent objects made sense initially, since the kind of
-> state they keep is mostly different. bt_gatt_server will mostly only
-> interact with gatt_db and bt_att, while bt_gatt_client stores a high
-> level client cache. And this isn't too bad from an implementation
-> stand-point (in fact it makes sense from an OO perspective) and it
-> would be quite ok for a higher-level bt_gatt object to create and own
-> these two.
->
-> In any case, these could in fact be unified eventually but for now
-> let's keep them separate and see how the server turns out without
-> overthinking it. I'm going to start sending out patches for the server
-> code soon, and once that starts taking shape, I think we can decide if
-> they should be unified or not.
->
->
->> So I do agree that it seems much simpler API to unify client and
->> server and let it self manage the ATT connection, we could even notify
->> disconnects via ready callback, well if we fix it because right now if
->> the remote does not respond or respond with something invalid it
->> doesn't seems to be called.
->
-> Yeah this is actually a bug in the code. If the remote end doesn't
-> respond, then att.c:timeout_cb will be called eventually, which will
-> destroy the connection by destroying the io. It notifies this via a
-> timeout_callback to the upper layer but the disconnect_callback
-> doesn't automatically get called, since io simply closes the fd
-> instead of receiving an event (which is how the regular
-> disconnect_callback is currently invoked). I suppose this can be fixed
-> by calling all registered disconnect callbacks in att.c:timeout_cb.
-> I've been aware of this bug though never got around to fixing it :)
+That said, I agree that we should enable applications that want to monitor in range devices. And realistically that is only really possible since Bluetooth LE came into play. With BR/EDR that was extremely power hungry operation even if you used Periodic Inquiry.
 
-Actually we should probably notify a error response otherwise it may
-call destroy which gives no hint what happened with the call itself,
-but now I figure you actually have a timeout callback which can be
-used but it is not per operation and I can only register one at time
-so I cannot register one in gatt-client.c otherwise it may get
-overwritten, perhaps we should add a timeout callback to bt_att_send
-or just remove since disconnect callback should be called anyway and
-that can be registered by gatt-client.c.
+> I don't know if the RSSI property of Device1 is the right thing to use
+> for this, though I still find it strange that it's hardwired to serve
+> system UI only.
 
-> If the remote responds with something invalid, bt_att doesn't do
-> anything currently. If the opcode is bad, it simply drops it. We'll
-> have to figure out a way to correctly handle this, either at the
-> bt_att level or at the gatt level.
->
->
->> ... For the server side it seems to be just a
->> matter of attaching the db, which could perhaps be passed in
->> bt_gatt_new or having dedicated bt_gatt_attach_db/bt_gatt_detach_cb.
->
-> So, the current idea is this:
->
->    db = gatt_db_new();
->    ... /* Populate DB */
->    att = bt_att_new(fd);
->    client = bt_gatt_client_new(att, mtu);
->    server = bt_gatt_server_new(db, att, mtu);
->
-> All of this could be done by a higher-level bt_gatt object that puts
-> everything together but for now, let's not create bt_att inside
-> bt_gatt_client. I think Marcel's longer term idea is to put these all
-> inside an even higher-level bt_gap that basically puts SDP and GATT
-> together. (I saw some patches fly by for shared/gap).
+Actually on the D-Bus level exposing RSSI is most likely a really bad idea since it has too many controller specific factors. Using pathloss is something that allows for a way better estimation of distance. Just finding devices that include the extra TX Power information on BR/EDR is almost zero. Especially since there are still some devices around that are 2.0 only and these are mainly keyboards and mice. So we opted for RSSI since that is better than nothing. And I am big believer that you should show the most closes devices in the top of your list.
 
-Hmm, didn't know about this, anyway going all the way up to GAP seems
-a little bit overkill but lets see what Marcel had in mind.
+> In any case, I'm open to suggestions. Could we perhaps introduce a new
+> API for RSSI updates? Or a new property maybe? Perhaps we could expose
+> a property that sets the RSSI update threshold? Something like:
+> 
+>   int16 RSSIUpdateThreshold  [readwrite]
+> 
+>        Defines the minimum amount of change required (in dBm) for the
+> RSSI property of a device
+>        to be updated. Set to 8 dBm by default.
+> 
+> And this would be a property on Adapter1. I'm mostly thinking out loud
+> here though, so this may not be the best answer.
 
-Btw, I resend the patches skipping this one, please check if they are
-no breaking anything for you.
+Or we can start smaller and make this a main.conf configurable option.
 
+In addition we really need specific APIs for certain discovery tasks. In a lot of cases you are looking for a specific set of devices. I think that I mentioned this to Scott before. Just tell the daemon what you are looking for and it will scan for you.
 
--- 
-Luiz Augusto von Dentz
+The Start Discovery D-Bus API is also the big hammer. It means that it takes over every other operation since it feeds into the Start Discovery mgmt API. If you use it, you block everything else that might be ongoing. That is why I am saying it is tied to UI. Since when you use it, then you expect something visible for the user to happen right away. For this means we have to abort everything else we are doing.
+
+If we say for example an application wants to be notified about xyz devices in range, then it should not block the attempt of a HID device connecting. However the Start Discovery hammer will do exactly that. You should only bring the big tools if you expect immediate feedback to the user.
+
+This goes along the saying, if you only have a hammer, then everything is a nail. That is pretty dangerous approach and will lead down the wrong path. So instead of forcing existing APIs into a new usage model or hacking them to make fit, I prefer that we introduce the appropriate APIs.
+
+On the D-Bus level we are extremely flexible. We can extend the current Adapter1 interface with new methods and signals or we just introduce a new interface.
+
+Regards
+
+Marcel
+
