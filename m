@@ -1,154 +1,77 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: Alex Gal <a.gal@miip.ca>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.6\))
+Subject: Re: [PATCH] Bluetooth: Fix lockdep warning with l2cap_chan_connect
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1412234182-13370-1-git-send-email-johan.hedberg@gmail.com>
+Date: Thu, 2 Oct 2014 12:10:55 +0200
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: sixaxis & sony/snakebyte ps3 navigation move controller issues
-Date: Thu, 02 Oct 2014 12:25:38 +0200
-Message-ID: <2623563.WveX5yZXYh@uw000953>
-In-Reply-To: <CAEa95a=_KJNtZa_BDwMJqd7T_R8DBfdThKNygg-HVKNWcNTFqQ@mail.gmail.com>
-References: <CAEa95a=_KJNtZa_BDwMJqd7T_R8DBfdThKNygg-HVKNWcNTFqQ@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Message-Id: <A8B53706-9D91-4D3F-9B90-B00CDCF43E71@holtmann.org>
+References: <1412234182-13370-1-git-send-email-johan.hedberg@gmail.com>
+To: Johan Hedberg <johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Alex,
+Hi Johan,
 
-On Wednesday 01 of October 2014 12:02:10 Alex Gal wrote:
-> Hello,
+> The L2CAP connection's channel list lock (conn->chan_lock) must never be
+> taken while already holding a channel lock (chan->lock) in order to
+> avoid lock-inversion and lockdep warnings. So far the l2cap_chan_connect
+> function has acquired the chan->lock early in the function and then
+> later called l2cap_chan_add(conn, chan) which will try to take the
+> conn->chan_lock. This violates the correct order of taking the locks and
+> may lead to the following type of lockdep warnings:
 > 
-> I am using the latest bluez (from git).
+> -> #1 (&conn->chan_lock){+.+...}:
+>       [<c109324d>] lock_acquire+0x9d/0x140
+>       [<c188459c>] mutex_lock_nested+0x6c/0x420
+>       [<d0aab48e>] l2cap_chan_add+0x1e/0x40 [bluetooth]
+>       [<d0aac618>] l2cap_chan_connect+0x348/0x8f0 [bluetooth]
+>       [<d0cc9a91>] lowpan_control_write+0x221/0x2d0 [bluetooth_6lowpan]
+> -> #0 (&chan->lock){+.+.+.}:
+>       [<c10928d8>] __lock_acquire+0x1a18/0x1d20
+>       [<c109324d>] lock_acquire+0x9d/0x140
+>       [<c188459c>] mutex_lock_nested+0x6c/0x420
+>       [<d0ab05fd>] l2cap_connect_cfm+0x1dd/0x3f0 [bluetooth]
+>       [<d0a909c4>] hci_le_meta_evt+0x11a4/0x1260 [bluetooth]
+>       [<d0a910eb>] hci_event_packet+0x3ab/0x3120 [bluetooth]
+>       [<d0a7cb08>] hci_rx_work+0x208/0x4a0 [bluetooth]
 > 
-> ## Problem 1: Sony Move Navigation Controller not recognized
+>       CPU0                    CPU1
+>       ----                    ----
+>  lock(&conn->chan_lock);
+>                               lock(&chan->lock);
+>                               lock(&conn->chan_lock);
+>  lock(&chan->lock);
 > 
-> This was easily fixed by adding a new device in the devices contained
-> in plugins/sixaxis.c.
-> I will post a patch later today.
+> Before calling l2cap_chan_add() the channel is not part of the
+> conn->chan_l list, and can therefore only be accessed by the L2CAP user
+> (such as l2cap_sock.c). We can therefore assume that it is the
+> responsibility of the user to handle mutual exclusion until this point
+> (which we can see is already true in l2cap_sock.c by it in many places
+> touching chan members without holding chan->lock).
 > 
-> ## Problem 2: Sony Move Navigation Controller connection procedure issues
+> Since the hci_conn and by exctension l2cap_conn creation in the
+> l2cap_chan_connect() function depend on chan details we cannot simply
+> add a mutex_lock(&conn->chan_lock) in the beginning of the function
+> (since the conn object doesn't yet exist there). What we can do however
+> is move the chan->lock taking later into the function where we already
+> have the conn object and can that way take conn->chan_lock first.
 > 
-> After plugging-in the controller to the usb cable for the master
-> reset, a device is created (with no services).
+> This patch implements the above strategy and does some other necessary
+> changes such as using __l2cap_chan_add() which assumes conn->chan_lock
+> is held, as well as adding a second needed label so the unlocking
+> happens as it should.
 > 
-> in bluetoothctl:
-> power on
-> agent on
-> default-agent
-> trust 00:07:04:B9:CC:64
-> 
-> Pressing the sony button on the controller (00:07:04:B9:CC:64 ), the
-> controller tries to connect to the master a couple of times, but fails
-> every time this is error:
-> 
-> bluetoothd[2740]: src/adapter.c:connected_callback() hci0 device
-> 00:07:04:B9:CC:64 connected eir_len 5
-> bluetoothd[2740]: src/device.c:device_set_class()
-> /org/bluez/hci0/dev_00_07_04_B9_CC_64 0x000508
-> bluetoothd[2740]: profiles/input/server.c:connect_event_cb() Incoming
-> connection from 00:07:04:B9:CC:64 on PSM 17
-> bluetoothd[2740]: profiles/input/device.c:input_device_set_channel()
-> idev (nil) psm 17
-> bluetoothd[2740]: Refusing input device connect: No such file or directory (2)
-> bluetoothd[2740]: profiles/input/server.c:confirm_event_cb()
-> bluetoothd[2740]: Refusing connection from 00:07:04:B9:CC:64: unknown device
-> bluetoothd[2740]: src/adapter.c:dev_disconnected() Device
-> 00:07:04:B9:CC:64 disconnected, reason 3
-> bluetoothd[2740]: src/adapter.c:adapter_remove_connection()
-> bluetoothd[2740]: plugins/policy.c:disconnect_cb() reason 3
-> bluetoothd[2740]: src/adapter.c:bonding_attempt_complete() hci0 bdaddr
-> 00:07:04:B9:CC:64 type 0 status 0xe
-> bluetoothd[2740]: src/device.c:device_bonding_complete() bonding (nil)
-> status 0x0e
-> bluetoothd[2740]: src/device.c:device_bonding_failed() status 14
-> bluetoothd[2740]: src/adapter.c:resume_discovery()
-> 
-> [bluetooth]# info 00:07:04:B9:CC:64
-> Device 00:07:04:B9:CC:64
->         Name: PLAYSTATION(R)3 Controller
->         Alias: PLAYSTATION(R)3 Controller
->         Class: 0x000508
->         Icon: input-gaming
->         Paired: no
->         Trusted: yes
->         Blocked: no
->         Connected: no
->         LegacyPairing: no
->         Modalias: usb:v054Cp042Fd0000
-> 
-> Since there are no services associated with the device, I assume bluez
-> does not know what do to with it.
-> 
-> However, if I try to connect to it while the controller is connecting,
-> at some point it will retrieve the services and, eventually, connect
-> (and create the appropriate /dev/input/jsX).
-> 
-> [bluetooth]# connect 00:07:04:B9:CC:64
-> Attempting to connect to 00:07:04:B9:CC:64
-> [CHG] Device 00:07:04:B9:CC:64 Modalias: usb:v054Cp0268d0100
-> [CHG] Device 00:07:04:B9:CC:64 UUIDs:
->         00001124-0000-1000-8000-00805f9b34fb
->         00001200-0000-1000-8000-00805f9b34fb
-> 
-> Would it be possible to "hardcode" these services for this device or
-> would that be a nasty hack ?
+> Reported-by: Jukka Rissanen <jukka.rissanen@linux.intel.com>
+> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+> ---
+> net/bluetooth/l2cap_core.c | 13 ++++++++-----
+> 1 file changed, 8 insertions(+), 5 deletions(-)
 
-This is due to bluetoothd rejects connections from unknown input devices.
-Since DS3 tries to connect before we are able to query its SDP, connection is
-rejected. There is a hole punched for that to delay reject/accept until SDP
-is done. Check dev_is_sixaxis() in profiles/input/server.c. If you added
-additional pid/vid to sixaxis plugin you probably need to add it to
-dev_is_sixaxis() as well.
- 
-> 
-> ## Problem 3: SnakeByte PS3 clone Navigation Move master reset
-> 
-> The sixaxis plugin recognizes the controller and resets the master,
-> however the device address is buggy:
-> 
-> bluetoothd[1762]: plugins/sixaxis.c:get_supported_device() pid is: 268
-> bluetoothd[1762]: sixaxis: compatible device connected:
-> PLAYSTATION(R)3 Controller (054C:0268)
-> bluetoothd[1762]: plugins/sixaxis.c:setup_device() remote
-> 00:32:00:45:00:A1 old_master 20:36:00:32:00:45 new_master
-> 00:02:72:C8:CF:71
-> bluetoothd[1762]: src/device.c:device_create() dst 00:32:00:45:00:A1
-> bluetoothd[1762]: src/device.c:device_new() address 00:32:00:45:00:A1
-> bluetoothd[1762]: src/device.c:device_new() Creating device
-> /org/bluez/hci0/dev_00_32_00_45_00_A1
-> bluetoothd[1762]: sixaxis: setting up new device
-> bluetoothd[1762]: src/device.c:btd_device_device_set_name()
-> /org/bluez/hci0/dev_00_32_00_45_00_A1 PLAYSTATION(R)3 Controller
-> bluetoothd[1762]: src/device.c:btd_device_set_temporary() temporary 0
-> bluetoothd[1762]: plugins/sixaxis.c:get_leds_data() number 1
-> 
-> I will get this even if I replug the usb cable again; the old_master
-> never changes.
+patch has been applied to bluetooth-next tree.
 
-That shouldn't be a problem as long as device is connecting using address
-it advertised over USB. (There were reports on IRC that some clones connect
-with different address...)
+Regards
 
-If device is not trying to connect then maybe it requires different
-configuration over USB to set master address, but that would probably require
-some extra work to figure it out.
+Marcel
 
-> 
-> ## Problem 4: SnakeByte PS3 clone Navigation Move pairing failure
-> 
-> If I repeat the same procedure that worked with the realy Sony
-> controller but it won't work at all; there are no services associated
-> with that device at all.
-> 
-> Any ideas would be welcome.
-> 
-> Thank you,
-> 
-> Alex
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-
--- 
-Best regards, 
-Szymon Janc
