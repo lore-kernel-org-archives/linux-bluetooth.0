@@ -1,105 +1,62 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1412258111.13121.35.camel@jrissane-mobl.ger.corp.intel.com>
-Subject: Re: [PATCH v4 bluetooth] Fix lowpan_rcv
-From: Jukka Rissanen <jukka.rissanen@linux.intel.com>
-To: Martin Townsend <martin.townsend@xsilon.com>
-Cc: Martin Townsend <mtownsend1973@gmail.com>,
-	linux-zigbee-devel@lists.sourceforge.net, linux-bluetooth@vger.kernel.org,
-	linux-wpan@vger.kernel.org, marcel@holtmann.org, alex.aring@gmail.com
-Date: Thu, 02 Oct 2014 16:55:11 +0300
-In-Reply-To: <542D4232.2070303@xsilon.com>
-References: <1412165422-31063-1-git-send-email-martin.townsend@xsilon.com>
-		 <1412174827.4860.144.camel@jrissane-mobl.ger.corp.intel.com>
-		 <542C1C96.80605@xsilon.com>
-	 <1412249319.13121.26.camel@jrissane-mobl.ger.corp.intel.com>
-	 <542D4232.2070303@xsilon.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+From: Szymon Janc <szymon.janc@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 00/12] More customization options
+Date: Thu, 02 Oct 2014 15:50:56 +0200
+Message-ID: <5675160.3siPla3NPT@uw000953>
+In-Reply-To: <1412075187-5518-1-git-send-email-szymon.janc@tieto.com>
+References: <1412075187-5518-1-git-send-email-szymon.janc@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Martin,
-
-On to, 2014-10-02 at 13:16 +0100, Martin Townsend wrote:
-> Hi Jukka,
+On Tuesday 30 of September 2014 13:06:15 Szymon Janc wrote:
+> Hi,
 > 
-> Thanks for investigating this. 
+> Following patches extend configuration with more options required by DIS and
+> DID profiles.
 > 
-> If you set the dev in your receive function does the oops go away,  BTW this is where the pkt_type is set to PACKET_HOST, for us this was causing problems, I don't know if this is the same for you guys.
+> Characteristics in DIS that would allow device tracking (serial and system id)
+> now require pairing before reading.
 > 
-> Here's the code:
+> Proposed Android properties and fallbacks are described in last patch.
 > 
->             local_skb->protocol = htons(ETH_P_IPV6);
-> >>>     local_skb->dev = dev;
->             local_skb->pkt_type = PACKET_HOST;
+> Comments are welcome.
+> Szymon Janc
 > 
->             if (give_skb_to_upper(local_skb, dev)
->                             != NET_RX_SUCCESS) {
->                 kfree_skb(local_skb);
+> Szymon Janc (12):
+>   android: Add support for more configuration options
+>   android/gatt: Bring back System ID in DIS
+>   android/gatt: Fix serial number in DIS
+>   android/gatt: Require encryption for Serial and System ID in DIS
+>   android/bluetooth: Use configured values for DID
+>   lib/uuid: Add define for GATT PnP ID UUID
+>   android/gatt: Add support for PnP ID in DIS
+>   android/gatt: Use release version for software revision in DIS
+>   android: Remove few not needed blank lines
+>   android: Add support for FW and HW revision config options
+>   android/pts: Update PTS settings and results for DIS
+>   android/README: Update with new configuration options
 > 
-> - Martin.
+>  android/README          |  12 ++++
+>  android/bluetooth.c     |  25 +++------
+>  android/gatt.c          | 108 +++++++++++++++++++++++++++++++-----
+>  android/hal-bluetooth.c |  25 +++++++++
+>  android/hal-ipc-api.txt |   5 ++
+>  android/hal-msg.h       |   5 ++
+>  android/main.c          | 145 ++++++++++++++++++++++++++++++++++++++++++++++--
+>  android/pics-dis.txt    |   4 +-
+>  android/pixit-dis.txt   |   2 +-
+>  android/pts-dis.txt     |   8 +--
+>  android/utils.h         |   8 +++
+>  lib/uuid.h              |   1 +
+>  12 files changed, 303 insertions(+), 45 deletions(-)
+> 
+> 
 
-So I applied this patch
+Applied.
 
-diff --git a/net/bluetooth/6lowpan.c b/net/bluetooth/6lowpan.c
-index e4f5ce5..aa64f91 100644
---- a/net/bluetooth/6lowpan.c
-+++ b/net/bluetooth/6lowpan.c
-@@ -323,6 +323,7 @@ static int recv_pkt(struct sk_buff *skb, struct
-net_device *dev,
- 
-                local_skb->protocol = htons(ETH_P_IPV6);
-                local_skb->pkt_type = PACKET_HOST;
-+               local_skb->dev = dev;
- 
-                if (give_skb_to_upper(local_skb, dev) != NET_RX_SUCCESS)
-{
-                        goto drop_local_skb;
-@@ -362,6 +363,7 @@ static int recv_pkt(struct sk_buff *skb, struct
-net_device *dev,
- 
-                        local_skb->protocol = htons(ETH_P_IPV6);
-                        local_skb->pkt_type = PACKET_HOST;
-+                       local_skb->dev = dev;
- 
-                        if (give_skb_to_upper(local_skb, dev)
-                                                        !=
-NET_RX_SUCCESS) {
-
-
-and I do not see the earlier null pointer oops any more.
-
-
-Unfortunately a new error is seen:
-
-[  340.676353] inconsistent {IN-SOFTIRQ-W} -> {SOFTIRQ-ON-W} usage.
-[  340.676353] kworker/u3:1/370 [HC0[0]:SC0[0]:HE1:SE1] takes:
-[  340.676353]  (&(&list->lock)->rlock#6){+.?...}, at: [<f8319d4c>]
-hci_send_acl+0xac/0x290 [bluetooth]
-[  340.676353] {IN-SOFTIRQ-W} state was registered at:
-[  340.676353]   [<c10915a3>] __lock_acquire+0x6d3/0x1d20
-[  340.676353]   [<c109325d>] lock_acquire+0x9d/0x140
-[  340.676353]   [<c1889c25>] _raw_spin_lock+0x45/0x80
-[  340.676353]   [<f8319d4c>] hci_send_acl+0xac/0x290 [bluetooth]
-[  340.676353]   [<f833abf0>] l2cap_do_send+0x60/0x100 [bluetooth]
-[  340.676353]   [<f833e7c0>] l2cap_chan_send+0x7f0/0x10e0 [bluetooth]
-[  340.676353]   [<f850691e>] send_pkt+0x4e/0xa0 [bluetooth_6lowpan]
-[  340.676353]   [<f8506d20>] bt_xmit+0x3b0/0x770 [bluetooth_6lowpan]
-[  340.676353]   [<c17742f4>] dev_hard_start_xmit+0x344/0x670
-[  340.676353]   [<c17749ad>] __dev_queue_xmit+0x38d/0x680
-[  340.676353]   [<c1774caf>] dev_queue_xmit+0xf/0x20
-[  340.676353]   [<c177b8b0>] neigh_connected_output+0x130/0x1a0
-[  340.676353]   [<c1812a63>] ip6_finish_output2+0x173/0x8c0
-[  340.676353]   [<c18182db>] ip6_finish_output+0x7b/0x1b0
-[  340.676353]   [<c18184a7>] ip6_output+0x97/0x2a0
-...
-
-I have to investigate this more what your new code is doing as I did not
-see this error earlier before your patch.
-
-So I have very latest bluetooth-next (commit b57d4471fd18) + your v4
-patch + above patch that sets the dev pointer, and this combination
-triggers the above inconsistent softirq usage error.
-
-
-Cheers,
-Jukka
+-- 
+Best regards, 
+Szymon Janc
