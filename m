@@ -1,405 +1,117 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <542CFC2F.4010503@tieto.com>
-Date: Thu, 02 Oct 2014 09:18:07 +0200
-From: Tyszkowski Jakub <jakub.tyszkowski@tieto.com>
-MIME-Version: 1.0
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCHv3 17/17] android/tester: Replace pdu struct with iovec
-References: <1412154099-28014-1-git-send-email-jakub.tyszkowski@tieto.com>	<1412154099-28014-18-git-send-email-jakub.tyszkowski@tieto.com> <CABBYNZJ-AJ7XUQrC_xYSaic08d8EGs_KErJTLAgZAAOepdBFYQ@mail.gmail.com>
-In-Reply-To: <CABBYNZJ-AJ7XUQrC_xYSaic08d8EGs_KErJTLAgZAAOepdBFYQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+From: johan.hedberg@gmail.com
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] Bluetooth: Fix lockdep warning with l2cap_chan_connect
+Date: Thu,  2 Oct 2014 10:16:22 +0300
+Message-Id: <1412234182-13370-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+From: Johan Hedberg <johan.hedberg@intel.com>
 
-On 10/01/2014 02:37 PM, Luiz Augusto von Dentz wrote:
-> Hi Jakub,
->
-> On Wed, Oct 1, 2014 at 12:01 PM, Jakub Tyszkowski
-> <jakub.tyszkowski@tieto.com> wrote:
->> I/O vectors are now supported on bthost API.
->> ---
->>   android/tester-gatt.c    | 68 ++++++++++++++++++++++++------------------------
->>   android/tester-hidhost.c | 10 +++----
->>   android/tester-main.c    | 25 ++++++++++--------
->>   android/tester-main.h    | 16 +++++-------
->>   4 files changed, 58 insertions(+), 61 deletions(-)
->>
->> diff --git a/android/tester-gatt.c b/android/tester-gatt.c
->> index 1460329..81ae257 100644
->> --- a/android/tester-gatt.c
->> +++ b/android/tester-gatt.c
->> @@ -137,8 +137,8 @@ static struct gatt_search_service_data search_services_1 = {
->>          .filter_uuid = NULL,
->>   };
->>
->> -static const struct pdu exchange_mtu_req_pdu = raw_pdu(0x02, 0xa0, 0x02);
->> -static const struct pdu exchange_mtu_resp_pdu = raw_pdu(0x03, 0xa0, 0x02);
->> +static const struct iovec exchange_mtu_req_pdu = raw_pdu(0x02, 0xa0, 0x02);
->> +static const struct iovec exchange_mtu_resp_pdu = raw_pdu(0x03, 0xa0, 0x02);
->>
->>   static struct bt_action_data bearer_type = {
->>          .bearer_type = BDADDR_LE_PUBLIC,
->> @@ -368,7 +368,7 @@ static struct set_write_params set_write_param_3 = {
->>          .status = 0x01
->>   };
->>
->> -static struct pdu search_service[] = {
->> +static struct iovec search_service[] = {
->>          raw_pdu(0x10, 0x01, 0x00, 0xff, 0xff, 0x00, 0x28),
->>          raw_pdu(0x11, 0x06, 0x01, 0x00, 0x10, 0x00, 0x00, 0x18),
->>          raw_pdu(0x10, 0x11, 0x00, 0xff, 0xff, 0x00, 0x28),
->> @@ -376,7 +376,7 @@ static struct pdu search_service[] = {
->>          null_pdu
->>   };
->>
->> -static struct pdu search_service_2[] = {
->> +static struct iovec search_service_2[] = {
->>          raw_pdu(0x10, 0x01, 0x00, 0xff, 0xff, 0x00, 0x28),
->>          raw_pdu(0x11, 0x06, 0x01, 0x00, 0x10, 0x00, 0x00, 0x18),
->>          raw_pdu(0x10, 0x11, 0x00, 0xff, 0xff, 0x00, 0x28),
->> @@ -386,13 +386,13 @@ static struct pdu search_service_2[] = {
->>          null_pdu
->>   };
->>
->> -static struct pdu search_service_3[] = {
->> +static struct iovec search_service_3[] = {
->>          raw_pdu(0x10, 0x01, 0x00, 0xff, 0xff, 0x00, 0x28),
->>          raw_pdu(0x01, 0x08, 0x01, 0x00, 0x0a),
->>          null_pdu
->>   };
->>
->> -static struct pdu get_characteristic_1[] = {
->> +static struct iovec get_characteristic_1[] = {
->>          raw_pdu(0x10, 0x01, 0x00, 0xff, 0xff, 0x00, 0x28),
->>          raw_pdu(0x11, 0x06, 0x01, 0x00, 0x10, 0x00, 0x00, 0x18),
->>          raw_pdu(0x10, 0x11, 0x00, 0xff, 0xff, 0x00, 0x28),
->> @@ -404,7 +404,7 @@ static struct pdu get_characteristic_1[] = {
->>          null_pdu
->>   };
->>
->> -static struct pdu get_descriptor_1[] = {
->> +static struct iovec get_descriptor_1[] = {
->>          raw_pdu(0x10, 0x01, 0x00, 0xff, 0xff, 0x00, 0x28),
->>          raw_pdu(0x11, 0x06, 0x01, 0x00, 0x10, 0x00, 0x00, 0x18),
->>          raw_pdu(0x10, 0x11, 0x00, 0xff, 0xff, 0x00, 0x28),
->> @@ -420,7 +420,7 @@ static struct pdu get_descriptor_1[] = {
->>          null_pdu
->>   };
->>
->> -static struct pdu get_descriptor_2[] = {
->> +static struct iovec get_descriptor_2[] = {
->>          raw_pdu(0x10, 0x01, 0x00, 0xff, 0xff, 0x00, 0x28),
->>          raw_pdu(0x11, 0x06, 0x01, 0x00, 0x10, 0x00, 0x00, 0x18),
->>          raw_pdu(0x10, 0x11, 0x00, 0xff, 0xff, 0x00, 0x28),
->> @@ -436,7 +436,7 @@ static struct pdu get_descriptor_2[] = {
->>          null_pdu
->>   };
->>
->> -static struct pdu get_descriptor_3[] = {
->> +static struct iovec get_descriptor_3[] = {
->>          raw_pdu(0x10, 0x01, 0x00, 0xff, 0xff, 0x00, 0x28),
->>          raw_pdu(0x11, 0x06, 0x01, 0x00, 0x10, 0x00, 0x00, 0x18),
->>          raw_pdu(0x10, 0x11, 0x00, 0xff, 0xff, 0x00, 0x28),
->> @@ -450,7 +450,7 @@ static struct pdu get_descriptor_3[] = {
->>          null_pdu
->>   };
->>
->> -static struct pdu get_included_1[] = {
->> +static struct iovec get_included_1[] = {
->>          raw_pdu(0x10, 0x01, 0x00, 0xff, 0xff, 0x00, 0x28),
->>          raw_pdu(0x11, 0x06, 0x01, 0x00, 0x10, 0x00, 0x00, 0x18),
->>          raw_pdu(0x10, 0x11, 0x00, 0xff, 0xff, 0x00, 0x28),
->> @@ -462,7 +462,7 @@ static struct pdu get_included_1[] = {
->>          null_pdu
->>   };
->>
->> -static struct pdu get_included_2[] = {
->> +static struct iovec get_included_2[] = {
->>          raw_pdu(0x10, 0x01, 0x00, 0xff, 0xff, 0x00, 0x28),
->>          raw_pdu(0x11, 0x06, 0x01, 0x00, 0x10, 0x00, 0x00, 0x18),
->>          raw_pdu(0x10, 0x11, 0x00, 0xff, 0xff, 0x00, 0x28),
->> @@ -477,7 +477,7 @@ static struct pdu get_included_2[] = {
->>          null_pdu
->>   };
->>
->> -static struct pdu get_included_3[] = {
->> +static struct iovec get_included_3[] = {
->>          raw_pdu(0x10, 0x01, 0x00, 0xff, 0xff, 0x00, 0x28),
->>          raw_pdu(0x11, 0x06, 0x01, 0x00, 0x10, 0x00, 0x00, 0x18),
->>          raw_pdu(0x10, 0x11, 0x00, 0xff, 0xff, 0x00, 0x28),
->> @@ -487,7 +487,7 @@ static struct pdu get_included_3[] = {
->>          null_pdu
->>   };
->>
->> -static struct pdu read_characteristic_1[] = {
->> +static struct iovec read_characteristic_1[] = {
->>          raw_pdu(0x10, 0x01, 0x00, 0xff, 0xff, 0x00, 0x28),
->>          raw_pdu(0x11, 0x06, 0x01, 0x00, 0x10, 0x00, 0x00, 0x18),
->>          raw_pdu(0x10, 0x11, 0x00, 0xff, 0xff, 0x00, 0x28),
->> @@ -501,7 +501,7 @@ static struct pdu read_characteristic_1[] = {
->>          null_pdu
->>   };
->>
->> -static struct pdu read_characteristic_2[] = {
->> +static struct iovec read_characteristic_2[] = {
->>          raw_pdu(0x10, 0x01, 0x00, 0xff, 0xff, 0x00, 0x28),
->>          raw_pdu(0x11, 0x06, 0x01, 0x00, 0x10, 0x00, 0x00, 0x18),
->>          raw_pdu(0x10, 0x11, 0x00, 0xff, 0xff, 0x00, 0x28),
->> @@ -515,7 +515,7 @@ static struct pdu read_characteristic_2[] = {
->>          null_pdu
->>   };
->>
->> -static struct pdu read_descriptor_1[] = {
->> +static struct iovec read_descriptor_1[] = {
->>          raw_pdu(0x10, 0x01, 0x00, 0xff, 0xff, 0x00, 0x28),
->>          raw_pdu(0x11, 0x06, 0x01, 0x00, 0x10, 0x00, 0x00, 0x18),
->>          raw_pdu(0x10, 0x11, 0x00, 0xff, 0xff, 0x00, 0x28),
->> @@ -533,7 +533,7 @@ static struct pdu read_descriptor_1[] = {
->>          null_pdu
->>   };
->>
->> -static struct pdu read_descriptor_2[] = {
->> +static struct iovec read_descriptor_2[] = {
->>          raw_pdu(0x10, 0x01, 0x00, 0xff, 0xff, 0x00, 0x28),
->>          raw_pdu(0x11, 0x06, 0x01, 0x00, 0x10, 0x00, 0x00, 0x18),
->>          raw_pdu(0x10, 0x11, 0x00, 0xff, 0xff, 0x00, 0x28),
->> @@ -551,7 +551,7 @@ static struct pdu read_descriptor_2[] = {
->>          null_pdu
->>   };
->>
->> -static struct pdu write_characteristic_1[] = {
->> +static struct iovec write_characteristic_1[] = {
->>          raw_pdu(0x10, 0x01, 0x00, 0xff, 0xff, 0x00, 0x28),
->>          raw_pdu(0x11, 0x06, 0x01, 0x00, 0x10, 0x00, 0x00, 0x18),
->>          raw_pdu(0x10, 0x11, 0x00, 0xff, 0xff, 0x00, 0x28),
->> @@ -564,7 +564,7 @@ static struct pdu write_characteristic_1[] = {
->>          null_pdu
->>   };
->>
->> -static struct pdu write_characteristic_2[] = {
->> +static struct iovec write_characteristic_2[] = {
->>          raw_pdu(0x10, 0x01, 0x00, 0xff, 0xff, 0x00, 0x28),
->>          raw_pdu(0x11, 0x06, 0x01, 0x00, 0x10, 0x00, 0x00, 0x18),
->>          raw_pdu(0x10, 0x11, 0x00, 0xff, 0xff, 0x00, 0x28),
->> @@ -578,7 +578,7 @@ static struct pdu write_characteristic_2[] = {
->>          null_pdu
->>   };
->>
->> -static struct pdu write_characteristic_3[] = {
->> +static struct iovec write_characteristic_3[] = {
->>          raw_pdu(0x10, 0x01, 0x00, 0xff, 0xff, 0x00, 0x28),
->>          raw_pdu(0x11, 0x06, 0x01, 0x00, 0x10, 0x00, 0x00, 0x18),
->>          raw_pdu(0x10, 0x11, 0x00, 0xff, 0xff, 0x00, 0x28),
->> @@ -847,16 +847,16 @@ static void gatt_cid_hook_cb(const void *data, uint16_t len, void *user_data)
->>          struct bthost *bthost = hciemu_client_get_host(t_data->hciemu);
->>          struct emu_l2cap_cid_data *cid_data = user_data;
->>          const uint8_t *pdu = data;
->> -       struct pdu *gatt_pdu = queue_peek_head(t_data->pdus);
->> +       struct iovec *gatt_pdu = queue_peek_head(t_data->pdus);
->>
->>          switch (pdu[0]) {
->>          case L2CAP_ATT_EXCHANGE_MTU_REQ:
->>                  tester_print("Exchange MTU request received.");
->>
->> -               if (!memcmp(exchange_mtu_req_pdu.data, pdu, len))
->> -                       bthost_send_cid(bthost, cid_data->handle, cid_data->cid,
->> -                                               exchange_mtu_resp_pdu.data,
->> -                                               exchange_mtu_resp_pdu.size);
->> +               if (!memcmp(exchange_mtu_req_pdu.iov_base, pdu, len))
->> +                       bthost_send_cid_v(bthost, cid_data->handle,
->> +                                               cid_data->cid,
->> +                                               &exchange_mtu_resp_pdu, 1);
->>
->>                  break;
->>          case L2CAP_ATT_EXCHANGE_MTU_RSP:
->> @@ -864,29 +864,29 @@ static void gatt_cid_hook_cb(const void *data, uint16_t len, void *user_data)
->>
->>                  break;
->>          default:
->> -               if (!gatt_pdu || !gatt_pdu->data) {
->> +               if (!gatt_pdu || !gatt_pdu->iov_base) {
->>                          tester_print("Unknown ATT packet.");
->>                          break;
->>                  }
->>
->> -               if (gatt_pdu->size != len) {
->> +               if (gatt_pdu->iov_len != len) {
->>                          tester_print("Size of incoming frame is not valid");
->> -                       tester_print("Expected size = %d incoming size = %d",
->> -                                                       gatt_pdu->size, len);
->> +                       tester_print("Expected size = %zd incoming size = %d",
->> +                                                       gatt_pdu->iov_len, len);
->>                          break;
->>                  }
->>
->> -               if (memcmp(gatt_pdu->data, data, len)) {
->> +               if (memcmp(gatt_pdu->iov_base, data, len)) {
->>                          tester_print("Incoming data mismatch");
->>                          break;
->>                  }
->>                  queue_pop_head(t_data->pdus);
->>                  gatt_pdu = queue_pop_head(t_data->pdus);
->> -               if (!gatt_pdu || !gatt_pdu->data)
->> +               if (!gatt_pdu || !gatt_pdu->iov_base)
->>                          break;
->>
->> -               bthost_send_cid(bthost, cid_data->handle, cid_data->cid,
->> -                                               gatt_pdu->data, gatt_pdu->size);
->> +               bthost_send_cid_v(bthost, cid_data->handle, cid_data->cid,
->> +                                                               gatt_pdu, 1);
->>
->>                  break;
->>          }
->> @@ -933,9 +933,9 @@ static void init_pdus(void)
->>          struct test_data *data = tester_get_data();
->>          struct step *current_data_step = queue_peek_head(data->steps);
->>          struct step *step = g_new0(struct step, 1);
->> -       struct pdu *pdu = current_data_step->set_data;
->> +       struct iovec *pdu = current_data_step->set_data;
->>
->> -       while (pdu->data) {
->> +       while (pdu->iov_base) {
->>                  queue_push_tail(data->pdus, pdu);
->>                  pdu++;
->>          }
->> diff --git a/android/tester-hidhost.c b/android/tester-hidhost.c
->> index 4c8b4c6..a9d7bd9 100644
->> --- a/android/tester-hidhost.c
->> +++ b/android/tester-hidhost.c
->> @@ -139,20 +139,18 @@ static void hid_prepare_reply_protocol_mode(struct emu_l2cap_cid_data *cid_data)
->>   {
->>          struct test_data *t_data = tester_get_data();
->>          struct bthost *bthost = hciemu_client_get_host(t_data->hciemu);
->> -       const struct pdu pdu = raw_pdu(0xa0, 0x00);
->> +       const struct iovec pdu = raw_pdu(0xa0, 0x00);
->>
->> -       bthost_send_cid(bthost, cid_data->handle, cid_data->cid, pdu.data,
->> -                                                               pdu.size);
->> +       bthost_send_cid_v(bthost, cid_data->handle, cid_data->cid, &pdu, 1);
->>   }
->>
->>   static void hid_prepare_reply_report(struct emu_l2cap_cid_data *cid_data)
->>   {
->>          struct test_data *t_data = tester_get_data();
->>          struct bthost *bthost = hciemu_client_get_host(t_data->hciemu);
->> -       const struct pdu pdu = raw_pdu(0xa2, 0x01, 0x00);
->> +       const struct iovec pdu = raw_pdu(0xa2, 0x01, 0x00);
->>
->> -       bthost_send_cid(bthost, cid_data->handle, cid_data->cid, pdu.data,
->> -                                                               pdu.size);
->> +       bthost_send_cid_v(bthost, cid_data->handle, cid_data->cid, &pdu, 1);
->>   }
->>
->>   static void hid_ctrl_cid_hook_cb(const void *data, uint16_t len,
->> diff --git a/android/tester-main.c b/android/tester-main.c
->> index c728f05..41abf6d 100644
->> --- a/android/tester-main.c
->> +++ b/android/tester-main.c
->> @@ -2141,27 +2141,30 @@ static void emu_generic_cid_hook_cb(const void *data, uint16_t len,
->>          struct bthost *bthost = hciemu_client_get_host(t_data->hciemu);
->>          int i;
->>
->> -       for (i = 0; pdus[i].rsp.data; i++) {
->> -               if (pdus[i].req.data) {
->> -                       if (pdus[i].req.size != len)
->> +       for (i = 0; pdus[i].rsp.iov_base; i++) {
->> +               if (pdus[i].req.iov_base) {
->> +                       if (pdus[i].req.iov_len != len)
->>                                  continue;
->>
->> -                       if (memcmp(pdus[i].req.data, data, len))
->> +                       if (memcmp(pdus[i].req.iov_base, data, len))
->>                                  continue;
->>                  }
->>
->> -               if (pdus[i].rsp.data) {
->> +               if (pdus[i].rsp.iov_base) {
->>                          /* overwrite transaction id if its sdp pdu */
->>                          if (cid_data->is_sdp) {
->> -                               pdus[i].rsp.data[1] = ((uint8_t *) data)[1];
->> -                               pdus[i].rsp.data[2] = ((uint8_t *) data)[2];
->> +                               ((uint8_t *) pdus[i].rsp.iov_base)[1] =
->> +                                                       ((uint8_t *) data)[1];
->> +                               ((uint8_t *) pdus[i].rsp.iov_base)[2] =
->> +                                                       ((uint8_t *) data)[2];
->>                          }
->>
->> -                       util_hexdump('>', pdus[i].rsp.data, pdus[i].rsp.size,
->> -                                                       print_data, NULL);
->> +                       util_hexdump('>', pdus[i].rsp.iov_base,
->> +                                       pdus[i].rsp.iov_len, print_data, NULL);
->> +
->> +                       bthost_send_cid_v(bthost, cid_data->handle,
->> +                                               cid_data->cid, &pdus[i].rsp, 1);
->>
->> -                       bthost_send_cid(bthost, cid_data->handle, cid_data->cid,
->> -                                       pdus[i].rsp.data, pdus[i].rsp.size);
->>                  }
->>          }
->>   }
->> diff --git a/android/tester-main.h b/android/tester-main.h
->> index 560277a..1b679d6 100644
->> --- a/android/tester-main.h
->> +++ b/android/tester-main.h
->> @@ -33,6 +33,7 @@
->>   #include <sys/wait.h>
->>   #include <libgen.h>
->>   #include <sys/signalfd.h>
->> +#include <sys/uio.h>
->>
->>   #include "lib/bluetooth.h"
->>   #include "lib/mgmt.h"
->> @@ -56,25 +57,20 @@
->>   #include <hardware/bt_gatt_client.h>
->>   #include <hardware/bt_gatt_server.h>
->>
->> -struct pdu {
->> -       uint8_t *data;
->> -       uint16_t size;
->> -};
->> -
->>   struct pdu_set {
->> -       struct pdu req;
->> -       struct pdu rsp;
->> +       struct iovec req;
->> +       struct iovec rsp;
->>   };
->>
->>   #define raw_data(args...) ((unsigned char[]) { args })
->>
->>   #define raw_pdu(args...)                                       \
->>          {                                                       \
->> -               .data = raw_data(args),                         \
->> -               .size = sizeof(raw_data(args)),                 \
->> +               .iov_base = raw_data(args),                     \
->> +               .iov_len = sizeof(raw_data(args)),              \
->>          }
->>
->> -#define null_pdu { .data = NULL }
->> +#define null_pdu { .iov_base = NULL }
->>
->>   #define TEST_CASE_BREDR(text, ...) { \
->>                  HCIEMU_TYPE_BREDR, \
->> --
->> 1.9.1
->
-> I guess it would be beneficial to use bthost_send_cid_v since the
-> beginning here, perhaps you didn't want to rebase the changes or found
-> some problem while doing it. Normally what I would do is to rebase -i
-> --exec make, then mark the patch to edit and let make catch the
-> errors, it should really not take more than 30 min to rebase these.
+The L2CAP connection's channel list lock (conn->chan_lock) must never be
+taken while already holding a channel lock (chan->lock) in order to
+avoid lock-inversion and lockdep warnings. So far the l2cap_chan_connect
+function has acquired the chan->lock early in the function and then
+later called l2cap_chan_add(conn, chan) which will try to take the
+conn->chan_lock. This violates the correct order of taking the locks and
+may lead to the following type of lockdep warnings:
 
-I thought about it more like the one last step of simplification. And 
-yes, it was also a simpler way to achieve the same result.
+-> #1 (&conn->chan_lock){+.+...}:
+       [<c109324d>] lock_acquire+0x9d/0x140
+       [<c188459c>] mutex_lock_nested+0x6c/0x420
+       [<d0aab48e>] l2cap_chan_add+0x1e/0x40 [bluetooth]
+       [<d0aac618>] l2cap_chan_connect+0x348/0x8f0 [bluetooth]
+       [<d0cc9a91>] lowpan_control_write+0x221/0x2d0 [bluetooth_6lowpan]
+-> #0 (&chan->lock){+.+.+.}:
+       [<c10928d8>] __lock_acquire+0x1a18/0x1d20
+       [<c109324d>] lock_acquire+0x9d/0x140
+       [<c188459c>] mutex_lock_nested+0x6c/0x420
+       [<d0ab05fd>] l2cap_connect_cfm+0x1dd/0x3f0 [bluetooth]
+       [<d0a909c4>] hci_le_meta_evt+0x11a4/0x1260 [bluetooth]
+       [<d0a910eb>] hci_event_packet+0x3ab/0x3120 [bluetooth]
+       [<d0a7cb08>] hci_rx_work+0x208/0x4a0 [bluetooth]
 
-I'll send V4 redone with iovecs from the start (and with const pdus).
-And btw it took a bit more than 30 min. :)
+       CPU0                    CPU1
+       ----                    ----
+  lock(&conn->chan_lock);
+                               lock(&chan->lock);
+                               lock(&conn->chan_lock);
+  lock(&chan->lock);
 
->
->
+Before calling l2cap_chan_add() the channel is not part of the
+conn->chan_l list, and can therefore only be accessed by the L2CAP user
+(such as l2cap_sock.c). We can therefore assume that it is the
+responsibility of the user to handle mutual exclusion until this point
+(which we can see is already true in l2cap_sock.c by it in many places
+touching chan members without holding chan->lock).
 
-Regards
+Since the hci_conn and by exctension l2cap_conn creation in the
+l2cap_chan_connect() function depend on chan details we cannot simply
+add a mutex_lock(&conn->chan_lock) in the beginning of the function
+(since the conn object doesn't yet exist there). What we can do however
+is move the chan->lock taking later into the function where we already
+have the conn object and can that way take conn->chan_lock first.
+
+This patch implements the above strategy and does some other necessary
+changes such as using __l2cap_chan_add() which assumes conn->chan_lock
+is held, as well as adding a second needed label so the unlocking
+happens as it should.
+
+Reported-by: Jukka Rissanen <jukka.rissanen@linux.intel.com>
+Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+---
+ net/bluetooth/l2cap_core.c | 13 ++++++++-----
+ 1 file changed, 8 insertions(+), 5 deletions(-)
+
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index 8d53fc57faba..b6f9777e057d 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -6980,8 +6980,6 @@ int l2cap_chan_connect(struct l2cap_chan *chan, __le16 psm, u16 cid,
+ 
+ 	hci_dev_lock(hdev);
+ 
+-	l2cap_chan_lock(chan);
+-
+ 	if (!is_valid_psm(__le16_to_cpu(psm), dst_type) && !cid &&
+ 	    chan->chan_type != L2CAP_CHAN_RAW) {
+ 		err = -EINVAL;
+@@ -7078,17 +7076,20 @@ int l2cap_chan_connect(struct l2cap_chan *chan, __le16 psm, u16 cid,
+ 		goto done;
+ 	}
+ 
++	mutex_lock(&conn->chan_lock);
++	l2cap_chan_lock(chan);
++
+ 	if (cid && __l2cap_get_chan_by_dcid(conn, cid)) {
+ 		hci_conn_drop(hcon);
+ 		err = -EBUSY;
+-		goto done;
++		goto chan_unlock;
+ 	}
+ 
+ 	/* Update source addr of the socket */
+ 	bacpy(&chan->src, &hcon->src);
+ 	chan->src_type = bdaddr_type(hcon, hcon->src_type);
+ 
+-	l2cap_chan_add(conn, chan);
++	__l2cap_chan_add(conn, chan);
+ 
+ 	/* l2cap_chan_add takes its own ref so we can drop this one */
+ 	hci_conn_drop(hcon);
+@@ -7114,8 +7115,10 @@ int l2cap_chan_connect(struct l2cap_chan *chan, __le16 psm, u16 cid,
+ 
+ 	err = 0;
+ 
+-done:
++chan_unlock:
+ 	l2cap_chan_unlock(chan);
++	mutex_unlock(&conn->chan_lock);
++done:
+ 	hci_dev_unlock(hdev);
+ 	hci_dev_put(hdev);
+ 	return err;
+-- 
+1.9.3
 
