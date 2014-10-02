@@ -1,134 +1,107 @@
 Return-Path: <cyrus@holtmann.org>
-From: Marcin Kraglak <marcin.kraglak@tieto.com>
+From: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv3 2/5] android/tester: Add GATT Register For Notification Success
-Date: Thu,  2 Oct 2014 14:34:08 +0200
-Message-Id: <1412253251-7258-2-git-send-email-marcin.kraglak@tieto.com>
-In-Reply-To: <1412253251-7258-1-git-send-email-marcin.kraglak@tieto.com>
-References: <1412253251-7258-1-git-send-email-marcin.kraglak@tieto.com>
+Cc: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
+Subject: [PATCH 2/2] mcaptest: Move it from android to tools
+Date: Thu,  2 Oct 2014 15:25:17 +0300
+Message-Id: <1412252717-11671-2-git-send-email-ravikumar.veeramally@linux.intel.com>
+In-Reply-To: <1412252717-11671-1-git-send-email-ravikumar.veeramally@linux.intel.com>
+References: <1412252717-11671-1-git-send-email-ravikumar.veeramally@linux.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Test GATT register for notification command.
 ---
- android/tester-gatt.c | 76 +++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 76 insertions(+)
+ .gitignore                    | 2 +-
+ Makefile.tools                | 8 +++++++-
+ android/Android.mk            | 2 +-
+ android/Makefile.am           | 9 ---------
+ {android => tools}/mcaptest.c | 0
+ 5 files changed, 9 insertions(+), 12 deletions(-)
+ rename {android => tools}/mcaptest.c (100%)
 
-diff --git a/android/tester-gatt.c b/android/tester-gatt.c
-index acad195..efef04f 100644
---- a/android/tester-gatt.c
-+++ b/android/tester-gatt.c
-@@ -94,6 +94,13 @@ struct write_char_data {
- 	char *p_value;
- };
+diff --git a/.gitignore b/.gitignore
+index e22274f..65d77a5 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -75,6 +75,7 @@ tools/3dsp
+ tools/obexctl
+ tools/gatt-service
+ tools/btgatt-client
++tools/mcaptest
+ test/sap_client.pyc
+ test/bluezutils.pyc
+ unit/test-ringbuf
+@@ -127,7 +128,6 @@ doc/btmon.1
+ android/system-emulator
+ android/bluetoothd
+ android/avdtptest
+-android/mcaptest
+ android/haltest
+ android/android-tester
+ android/ipc-tester
+diff --git a/Makefile.tools b/Makefile.tools
+index d901284..42cccc6 100644
+--- a/Makefile.tools
++++ b/Makefile.tools
+@@ -119,7 +119,7 @@ if TOOLS
+ bin_PROGRAMS += tools/hciattach tools/hciconfig tools/hcitool tools/hcidump \
+ 			tools/rfcomm tools/rctest tools/l2test tools/l2ping \
+ 			tools/sdptool tools/ciptool tools/bccmd \
+-			tools/bluemoon tools/mpris-proxy
++			tools/bluemoon tools/mpris-proxy tools/mcaptest
  
-+struct notif_data {
-+	int conn_id;
-+	const bt_bdaddr_t *bdaddr;
-+	btgatt_srvc_id_t *service;
-+	btgatt_gatt_id_t *charac;
-+};
-+
- static bt_uuid_t client2_app_uuid = {
- 	.uu = { 0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02,
- 				0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02 },
-@@ -278,6 +285,13 @@ static struct write_char_data write_char_data_2 = {
- 	.auth_req = 0
- };
+ tools_hciattach_SOURCES = tools/hciattach.c tools/hciattach.h \
+ 						tools/hciattach_st.c \
+@@ -189,6 +189,12 @@ tools_bluemoon_LDADD = src/libshared-mainloop.la
+ tools_mpris_proxy_SOURCES = tools/mpris-proxy.c
+ tools_mpris_proxy_LDADD = gdbus/libgdbus-internal.la @GLIB_LIBS@ @DBUS_LIBS@
  
-+static struct notif_data notif_data_1 = {
-+	.conn_id = CONN1_ID,
-+	.service = &service_1,
-+	.charac = &characteristic_1,
-+	.bdaddr = &emu_remote_bdaddr_val,
-+};
++tools_mcaptest_SOURCES = tools/mcaptest.c \
++				btio/btio.h btio/btio.c \
++				src/log.c src/log.h \
++				profiles/health/mcap.h profiles/health/mcap.c
++tools_mcaptest_LDADD = lib/libbluetooth-internal.la @GLIB_LIBS@
 +
- struct set_read_params {
- 	btgatt_read_params_t *params;
- 	btgatt_srvc_id_t *srvc_id;
-@@ -593,6 +607,18 @@ static struct iovec write_characteristic_3[] = {
- 	end_pdu
- };
+ dist_man_MANS += tools/hciattach.1 tools/hciconfig.1 \
+ 			tools/hcitool.1 tools/hcidump.1 \
+ 			tools/rfcomm.1 tools/rctest.1 tools/l2ping.1 \
+diff --git a/android/Android.mk b/android/Android.mk
+index eb67690..3daa260 100644
+--- a/android/Android.mk
++++ b/android/Android.mk
+@@ -212,7 +212,7 @@ LOCAL_SRC_FILES := \
+ 	bluez/lib/bluetooth.c \
+ 	bluez/lib/hci.c \
+ 	bluez/profiles/health/mcap.c \
+-	bluez/android/mcaptest.c \
++	bluez/tools/mcaptest.c \
  
-+static struct iovec notification_1[] = {
-+	raw_pdu(0x10, 0x01, 0x00, 0xff, 0xff, 0x00, 0x28),
-+	raw_pdu(0x11, 0x06, 0x01, 0x00, 0x10, 0x00, 0x00, 0x18),
-+	raw_pdu(0x10, 0x11, 0x00, 0xff, 0xff, 0x00, 0x28),
-+	raw_pdu(0x01, 0x11, 0x11, 0x00, 0x0a),
-+	raw_pdu(0x08, 0x01, 0x00, 0x10, 0x00, 0x03, 0x28),
-+	raw_pdu(0x09, 0x07, 0x02, 0x00, 0x04, 0x00, 0x00, 0x19, 0x00),
-+	raw_pdu(0x08, 0x03, 0x00, 0x10, 0x00, 0x03, 0x28),
-+	raw_pdu(0x01, 0x08, 0x03, 0x00, 0x0a),
-+	end_pdu
-+};
-+
- static void gatt_client_register_action(void)
- {
- 	struct test_data *data = tester_get_data();
-@@ -813,6 +839,24 @@ static void gatt_client_write_characteristic_action(void)
- 	schedule_action_verification(step);
- }
+ LOCAL_C_INCLUDES := \
+ 	$(call include-path-for, glib) \
+diff --git a/android/Makefile.am b/android/Makefile.am
+index 75802dd..7ae2c76 100644
+--- a/android/Makefile.am
++++ b/android/Makefile.am
+@@ -90,15 +90,6 @@ android_bluetooth_default_la_CFLAGS = $(AM_CFLAGS) -I$(srcdir)/android
+ android_bluetooth_default_la_LDFLAGS = $(AM_LDFLAGS) -module -avoid-version \
+ 					-no-undefined
  
-+static void gatt_client_register_for_notification_action(void)
-+{
-+	struct test_data *data = tester_get_data();
-+	struct step *current_data_step = queue_peek_head(data->steps);
-+	struct notif_data *notif_data = current_data_step->set_data;
-+	const btgatt_client_interface_t *client = data->if_gatt->client;
-+	struct step *step = g_new0(struct step, 1);
-+	int status;
-+
-+	status = client->register_for_notification(notif_data->conn_id,
-+							notif_data->bdaddr,
-+							notif_data->service,
-+							notif_data->charac);
-+	step->action_status = status;
-+
-+	schedule_action_verification(step);
-+}
-+
- static void gatt_server_register_action(void)
- {
- 	struct test_data *data = tester_get_data();
-@@ -1828,6 +1872,38 @@ static struct test_case test_cases[] = {
- 		ACTION_SUCCESS(bluetooth_disable_action, NULL),
- 		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_OFF),
- 	),
-+	TEST_CASE_BREDRLE("Gatt Client - Register For Notification - Success",
-+		ACTION_SUCCESS(init_pdus, notification_1),
-+		ACTION_SUCCESS(bluetooth_enable_action, NULL),
-+		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_ON),
-+		ACTION_SUCCESS(emu_setup_powered_remote_action, NULL),
-+		ACTION_SUCCESS(emu_set_ssp_mode_action, NULL),
-+		ACTION_SUCCESS(emu_set_connect_cb_action, gatt_conn_cb),
-+		ACTION_SUCCESS(gatt_client_register_action, &app1_uuid),
-+		CALLBACK_STATUS(CB_GATTC_REGISTER_CLIENT, BT_STATUS_SUCCESS),
-+		ACTION_SUCCESS(gatt_client_start_scan_action,
-+							INT_TO_PTR(APP1_ID)),
-+		CLLBACK_GATTC_SCAN_RES(prop_emu_remotes_default_set, 1, TRUE),
-+		ACTION_SUCCESS(gatt_client_stop_scan_action,
-+							INT_TO_PTR(APP1_ID)),
-+		ACTION_SUCCESS(gatt_client_connect_action, &app1_conn_req),
-+		CALLBACK_GATTC_CONNECT(GATT_STATUS_SUCCESS,
-+						prop_emu_remotes_default_set,
-+						CONN1_ID, APP1_ID),
-+		ACTION_SUCCESS(gatt_client_search_services, &search_services_1),
-+		CALLBACK_GATTC_SEARCH_COMPLETE(GATT_STATUS_SUCCESS, CONN1_ID),
-+		ACTION_SUCCESS(gatt_client_get_characteristic_action,
-+							&get_char_data_1),
-+		CALLBACK_GATTC_GET_CHARACTERISTIC_CB(GATT_STATUS_SUCCESS,
-+				CONN1_ID, &service_1, &characteristic_1, 4),
-+		ACTION_SUCCESS(gatt_client_register_for_notification_action,
-+								&notif_data_1),
-+		CALLBACK_GATTC_REGISTER_FOR_NOTIF(GATT_STATUS_SUCCESS, CONN1_ID,
-+							&characteristic_1,
-+							&service_1, 1),
-+		ACTION_SUCCESS(bluetooth_disable_action, NULL),
-+		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_OFF),
-+	),
+-noinst_PROGRAMS += android/mcaptest
+-
+-android_mcaptest_SOURCES = android/mcaptest.c \
+-				src/log.h src/log.c \
+-				btio/btio.h btio/btio.c \
+-				profiles/health/mcap.h profiles/health/mcap.c
+-android_mcaptest_CFLAGS = $(AM_CFLAGS)
+-android_mcaptest_LDADD = lib/libbluetooth-internal.la @GLIB_LIBS@
+-
+ noinst_PROGRAMS += android/avdtptest
  
- 	TEST_CASE_BREDRLE("Gatt Server - Register",
- 		ACTION_SUCCESS(gatt_server_register_action, &app1_uuid),
+ android_avdtptest_SOURCES = android/avdtptest.c \
+diff --git a/android/mcaptest.c b/tools/mcaptest.c
+similarity index 100%
+rename from android/mcaptest.c
+rename to tools/mcaptest.c
 -- 
-1.9.3
+1.9.1
 
