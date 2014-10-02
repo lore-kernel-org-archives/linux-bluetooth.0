@@ -1,102 +1,45 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcin Kraglak <marcin.kraglak@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 3/4] shared/gatt: Add included service iterator
-Date: Thu,  2 Oct 2014 10:25:36 +0200
-Message-Id: <1412238337-23289-3-git-send-email-marcin.kraglak@tieto.com>
+Subject: [PATCH 4/4] shared/gatt: Remove not needed function parameter
+Date: Thu,  2 Oct 2014 10:25:37 +0200
+Message-Id: <1412238337-23289-4-git-send-email-marcin.kraglak@tieto.com>
 In-Reply-To: <1412238337-23289-1-git-send-email-marcin.kraglak@tieto.com>
 References: <1412238337-23289-1-git-send-email-marcin.kraglak@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+According to SPEC 4.1 4.5.1 "Find Included Services" there is no need
+to pass UUID to discover_included_services() function.
 ---
- src/shared/gatt-helpers.c | 58 +++++++++++++++++++++++++++++++++++++++++++++++
- src/shared/gatt-helpers.h |  3 +++
- 2 files changed, 61 insertions(+)
+ src/shared/gatt-helpers.c | 1 -
+ src/shared/gatt-helpers.h | 1 -
+ 2 files changed, 2 deletions(-)
 
 diff --git a/src/shared/gatt-helpers.c b/src/shared/gatt-helpers.c
-index 12930a0..ee96011 100644
+index ee96011..acb8e39 100644
 --- a/src/shared/gatt-helpers.c
 +++ b/src/shared/gatt-helpers.c
-@@ -182,6 +182,64 @@ struct discovery_op {
- 	bt_gatt_destroy_func_t destroy;
- };
+@@ -972,7 +972,6 @@ done:
  
-+bool bt_gatt_iter_next_included_service(struct bt_gatt_iter *iter,
-+				uint16_t *handle, uint16_t *start_handle,
-+				uint16_t *end_handle, uint8_t uuid[16])
-+{
-+	struct bt_gatt_result *read_result;
-+	const void *pdu_ptr;
-+	int i = 0;
-+
-+	if (!iter || !iter->result || !handle || !start_handle || !end_handle
-+								|| !uuid)
-+		return false;
-+
-+	if (iter->result->opcode != BT_ATT_OP_READ_BY_TYPE_RSP)
-+		return false;
-+
-+	if (iter->result->data_len != 8 && iter->result->data_len != 6)
-+		return false;
-+
-+	pdu_ptr = iter->result->pdu + iter->pos;
-+
-+	if (iter->result->data_len == 8) {
-+		*handle = get_le16(pdu_ptr);
-+		*start_handle = get_le16(pdu_ptr + 2);
-+		*end_handle = get_le16(pdu_ptr + 4);
-+		convert_uuid_le(pdu_ptr + 6, 2, uuid);
-+
-+		iter->pos += iter->result->data_len;
-+
-+		if (iter->pos == iter->result->pdu_len) {
-+			iter->result = iter->result->next;
-+			iter->pos = 0;
-+		}
-+
-+		return true;
-+	}
-+
-+	*handle = get_le16(pdu_ptr);
-+	*start_handle = get_le16(pdu_ptr + 2);
-+	*end_handle = get_le16(pdu_ptr + 4);
-+	read_result = iter->result;
-+
-+	do {
-+		read_result = read_result->next;
-+	} while (read_result && i++ < (iter->pos / iter->result->data_len));
-+
-+	if (!read_result)
-+		return false;
-+
-+	convert_uuid_le(read_result->pdu, read_result->data_len, uuid);
-+	iter->pos += iter->result->data_len;
-+	if (iter->pos == iter->result->pdu_len) {
-+		iter->result = read_result->next;
-+		iter->pos = 0;
-+	}
-+
-+	return true;
-+}
-+
- bool bt_gatt_iter_next_service(struct bt_gatt_iter *iter,
- 				uint16_t *start_handle, uint16_t *end_handle,
- 				uint8_t uuid[16])
+ bool bt_gatt_discover_included_services(struct bt_att *att,
+ 					uint16_t start, uint16_t end,
+-					bt_uuid_t *uuid,
+ 					bt_gatt_discovery_callback_t callback,
+ 					void *user_data,
+ 					bt_gatt_destroy_func_t destroy)
 diff --git a/src/shared/gatt-helpers.h b/src/shared/gatt-helpers.h
-index f6f4b62..da409fa 100644
+index da409fa..abd218c 100644
 --- a/src/shared/gatt-helpers.h
 +++ b/src/shared/gatt-helpers.h
-@@ -49,6 +49,9 @@ bool bt_gatt_iter_next_characteristic(struct bt_gatt_iter *iter,
- 				uint8_t uuid[16]);
- bool bt_gatt_iter_next_descriptor(struct bt_gatt_iter *iter, uint16_t *handle,
- 							uint8_t uuid[16]);
-+bool bt_gatt_iter_next_included_service(struct bt_gatt_iter *iter,
-+				uint16_t *handle, uint16_t *start_handle,
-+				uint16_t *end_handle, uint8_t uuid[16]);
- 
- typedef void (*bt_gatt_destroy_func_t)(void *user_data);
- 
+@@ -77,7 +77,6 @@ bool bt_gatt_discover_primary_services(struct bt_att *att, bt_uuid_t *uuid,
+ 					bt_gatt_destroy_func_t destroy);
+ bool bt_gatt_discover_included_services(struct bt_att *att,
+ 					uint16_t start, uint16_t end,
+-					bt_uuid_t *uuid,
+ 					bt_gatt_discovery_callback_t callback,
+ 					void *user_data,
+ 					bt_gatt_destroy_func_t destroy);
 -- 
 1.9.3
 
