@@ -1,95 +1,114 @@
 Return-Path: <cyrus@holtmann.org>
+Message-ID: <542DAB0B.2080107@xsilon.com>
+Date: Thu, 02 Oct 2014 20:44:11 +0100
+From: Martin Townsend <martin.townsend@xsilon.com>
 MIME-Version: 1.0
-In-Reply-To: <1411383708-28621-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
-References: <1411383708-28621-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
-Date: Thu, 2 Oct 2014 22:49:13 +0200
-Message-ID: <CAN_7+YamDRmKV4-cOus2emQSHvr3D+Q4AhWEPHQvPShnOoSU7g@mail.gmail.com>
-Subject: Re: [PATCH 1/6] android/hal-ipc-api: Add MCE HAL
-From: Lukasz Rymanowski <lukasz.rymanowski@gmail.com>
-To: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>,
-	Szymon Janc <szymon.janc@gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-bluetooth-owner@vger.kernel.org
+To: Jukka Rissanen <jukka.rissanen@linux.intel.com>
+CC: Martin Townsend <mtownsend1973@gmail.com>,
+ linux-zigbee-devel@lists.sourceforge.net,
+ linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org,
+ marcel@holtmann.org, alex.aring@gmail.com
+Subject: Re: [PATCH v4 bluetooth] Fix lowpan_rcv
+References: <1412165422-31063-1-git-send-email-martin.townsend@xsilon.com>		 <1412174827.4860.144.camel@jrissane-mobl.ger.corp.intel.com>		 <542C1C96.80605@xsilon.com>	 <1412249319.13121.26.camel@jrissane-mobl.ger.corp.intel.com>	 <542D4232.2070303@xsilon.com> <1412258111.13121.35.camel@jrissane-mobl.ger.corp.intel.com>
+In-Reply-To: <1412258111.13121.35.camel@jrissane-mobl.ger.corp.intel.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Grzegorz, Szymon
+Hi Jukka,
 
-On Mon, Sep 22, 2014 at 1:01 PM, Grzegorz Kolodziejczyk
-<grzegorz.kolodziejczyk@tieto.com> wrote:
-> ---
->  android/hal-ipc-api.txt | 51 +++++++++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 51 insertions(+)
+Very bizarre that the patch causes a locking issue in the Tx path.  Is 
+it a side effect from not cloning the skb before calling process_data.  
+I couldn't see why a clone was being made so maybe I'm missing something 
+here.
+
+- Martin.
+
+
+On 02/10/14 14:55, Jukka Rissanen wrote:
+> Hi Martin,
 >
-> diff --git a/android/hal-ipc-api.txt b/android/hal-ipc-api.txt
-> index f6e1680..38f75e6 100644
-> --- a/android/hal-ipc-api.txt
-> +++ b/android/hal-ipc-api.txt
-> @@ -2396,3 +2396,54 @@ Notifications:
->         Opcode 0x95 - Ring Indication notification
+> On to, 2014-10-02 at 13:16 +0100, Martin Townsend wrote:
+>> Hi Jukka,
+>>
+>> Thanks for investigating this.
+>>
+>> If you set the dev in your receive function does the oops go away,  BTW this is where the pkt_type is set to PACKET_HOST, for us this was causing problems, I don't know if this is the same for you guys.
+>>
+>> Here's the code:
+>>
+>>              local_skb->protocol = htons(ETH_P_IPV6);
+>>>>>      local_skb->dev = dev;
+>>              local_skb->pkt_type = PACKET_HOST;
+>>
+>>              if (give_skb_to_upper(local_skb, dev)
+>>                              != NET_RX_SUCCESS) {
+>>                  kfree_skb(local_skb);
+>>
+>> - Martin.
+> So I applied this patch
 >
->                 Notification parameters: <none>
-> +
-> +
-> +Bluetooth MCE HAL (ID 11)
-> +=========================
-> +
-> +Android HAL name: "map_client" (BT_PROFILE_MAP_CLIENT_ID)
-> +
-> +Structures:
-> +
-> +       MAS instance: Instance ID (1 octet)
-> +                     Channel (1 octet)
-> +                     Message type (1 octet)
-> +                     Name (string)
-> +
-> +       Valid Message type: 0x01 = EMAIL
-> +                           0x02 = SMS_GSM
-> +                           0x04 = SMS_CDMA
-> +                           0x08 = MMS
-> +
-> +Commands and responses:
-> +
-> +       Opcode 0x00 - Error response
-> +
-> +               Response parameters: Status (1 octet)
-> +
-> +               Valid status values: 0x01 = Fail
-> +                                    0x02 = Not ready
-> +                                    0x03 = No memory
-> +                                    0x04 = Busy
-> +                                    0x05 = Done (already completed)
-> +                                    0x06 = Unsupported
-> +                                    0x07 = Parameter invalid
-> +                                    0x08 = Unhandled
-> +                                    0x09 = Authentication failure
-> +                                    0x0a = Remote device down
-> +
-> +       Opcode 0x01 - Get Remote MAS Instances
-> +
-> +               Command parameters: Remote address (6 octets)
-> +               Response parameters: <none>
-> +
-> +               In case of an error, the error response will be returned.
-> +
-> +Notifications:
-> +
-> +       Opcode 0x81 - Remote MAS Instances notification
-> +
-> +               Notification parameters: Status (1 octet)
-> +                                        Remote address (6 octets)
-> +                                        Number of instances (1 octet)
-> +                                        MAS instance (variable)
-> --
-> 1.9.3
+> diff --git a/net/bluetooth/6lowpan.c b/net/bluetooth/6lowpan.c
+> index e4f5ce5..aa64f91 100644
+> --- a/net/bluetooth/6lowpan.c
+> +++ b/net/bluetooth/6lowpan.c
+> @@ -323,6 +323,7 @@ static int recv_pkt(struct sk_buff *skb, struct
+> net_device *dev,
+>   
+>                  local_skb->protocol = htons(ETH_P_IPV6);
+>                  local_skb->pkt_type = PACKET_HOST;
+> +               local_skb->dev = dev;
+>   
+>                  if (give_skb_to_upper(local_skb, dev) != NET_RX_SUCCESS)
+> {
+>                          goto drop_local_skb;
+> @@ -362,6 +363,7 @@ static int recv_pkt(struct sk_buff *skb, struct
+> net_device *dev,
+>   
+>                          local_skb->protocol = htons(ETH_P_IPV6);
+>                          local_skb->pkt_type = PACKET_HOST;
+> +                       local_skb->dev = dev;
+>   
+>                          if (give_skb_to_upper(local_skb, dev)
+>                                                          !=
+> NET_RX_SUCCESS) {
 >
-> --
-
-Looks like we forgot about this set, or ? :)
-
-BR
-\Łukasz
-
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>
+> and I do not see the earlier null pointer oops any more.
+>
+>
+> Unfortunately a new error is seen:
+>
+> [  340.676353] inconsistent {IN-SOFTIRQ-W} -> {SOFTIRQ-ON-W} usage.
+> [  340.676353] kworker/u3:1/370 [HC0[0]:SC0[0]:HE1:SE1] takes:
+> [  340.676353]  (&(&list->lock)->rlock#6){+.?...}, at: [<f8319d4c>]
+> hci_send_acl+0xac/0x290 [bluetooth]
+> [  340.676353] {IN-SOFTIRQ-W} state was registered at:
+> [  340.676353]   [<c10915a3>] __lock_acquire+0x6d3/0x1d20
+> [  340.676353]   [<c109325d>] lock_acquire+0x9d/0x140
+> [  340.676353]   [<c1889c25>] _raw_spin_lock+0x45/0x80
+> [  340.676353]   [<f8319d4c>] hci_send_acl+0xac/0x290 [bluetooth]
+> [  340.676353]   [<f833abf0>] l2cap_do_send+0x60/0x100 [bluetooth]
+> [  340.676353]   [<f833e7c0>] l2cap_chan_send+0x7f0/0x10e0 [bluetooth]
+> [  340.676353]   [<f850691e>] send_pkt+0x4e/0xa0 [bluetooth_6lowpan]
+> [  340.676353]   [<f8506d20>] bt_xmit+0x3b0/0x770 [bluetooth_6lowpan]
+> [  340.676353]   [<c17742f4>] dev_hard_start_xmit+0x344/0x670
+> [  340.676353]   [<c17749ad>] __dev_queue_xmit+0x38d/0x680
+> [  340.676353]   [<c1774caf>] dev_queue_xmit+0xf/0x20
+> [  340.676353]   [<c177b8b0>] neigh_connected_output+0x130/0x1a0
+> [  340.676353]   [<c1812a63>] ip6_finish_output2+0x173/0x8c0
+> [  340.676353]   [<c18182db>] ip6_finish_output+0x7b/0x1b0
+> [  340.676353]   [<c18184a7>] ip6_output+0x97/0x2a0
+> ...
+>
+> I have to investigate this more what your new code is doing as I did not
+> see this error earlier before your patch.
+>
+> So I have very latest bluetooth-next (commit b57d4471fd18) + your v4
+> patch + above patch that sets the dev pointer, and this combination
+> triggers the above inconsistent softirq usage error.
+>
+>
+> Cheers,
+> Jukka
+>
+>
