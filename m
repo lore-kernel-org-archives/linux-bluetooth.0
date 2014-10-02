@@ -1,156 +1,135 @@
 Return-Path: <cyrus@holtmann.org>
-From: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
-Subject: [PATCH 1/2] mcap: Rename mcap-lib to mcap
-Date: Thu,  2 Oct 2014 15:25:16 +0300
-Message-Id: <1412252717-11671-1-git-send-email-ravikumar.veeramally@linux.intel.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Message-ID: <542D4232.2070303@xsilon.com>
+Date: Thu, 02 Oct 2014 13:16:50 +0100
+From: Martin Townsend <martin.townsend@xsilon.com>
+MIME-Version: 1.0
+To: Jukka Rissanen <jukka.rissanen@linux.intel.com>
+CC: Martin Townsend <mtownsend1973@gmail.com>,
+ linux-zigbee-devel@lists.sourceforge.net,
+ linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org,
+ marcel@holtmann.org, alex.aring@gmail.com
+Subject: Re: [PATCH v4 bluetooth] Fix lowpan_rcv
+References: <1412165422-31063-1-git-send-email-martin.townsend@xsilon.com>	 <1412174827.4860.144.camel@jrissane-mobl.ger.corp.intel.com>	 <542C1C96.80605@xsilon.com> <1412249319.13121.26.camel@jrissane-mobl.ger.corp.intel.com>
+In-Reply-To: <1412249319.13121.26.camel@jrissane-mobl.ger.corp.intel.com>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- Makefile.plugins                       | 2 +-
- android/Android.mk                     | 4 ++--
- android/Makefile.am                    | 4 ++--
- android/health.c                       | 2 +-
- android/mcaptest.c                     | 2 +-
- profiles/health/hdp.c                  | 2 +-
- profiles/health/hdp_util.c             | 2 +-
- profiles/health/{mcap-lib.c => mcap.c} | 2 +-
- profiles/health/{mcap-lib.h => mcap.h} | 0
- 9 files changed, 10 insertions(+), 10 deletions(-)
- rename profiles/health/{mcap-lib.c => mcap.c} (99%)
- rename profiles/health/{mcap-lib.h => mcap.h} (100%)
+Hi Jukka,
 
-diff --git a/Makefile.plugins b/Makefile.plugins
-index 7fd0e50..0448b91 100644
---- a/Makefile.plugins
-+++ b/Makefile.plugins
-@@ -64,7 +64,7 @@ builtin_sources += profiles/input/hog.c profiles/input/uhid_copy.h \
- 
- if EXPERIMENTAL
- builtin_modules += health
--builtin_sources += profiles/health/mcap-lib.h profiles/health/mcap-lib.c \
-+builtin_sources += profiles/health/mcap.h profiles/health/mcap.c \
- 			profiles/health/hdp_main.c profiles/health/hdp_types.h \
- 			profiles/health/hdp_manager.h \
- 			profiles/health/hdp_manager.c \
-diff --git a/android/Android.mk b/android/Android.mk
-index 3ace786..eb67690 100644
---- a/android/Android.mk
-+++ b/android/Android.mk
-@@ -56,7 +56,7 @@ LOCAL_SRC_FILES := \
- 	bluez/android/handsfree-client.c \
- 	bluez/android/gatt.c \
- 	bluez/android/health.c \
--	bluez/profiles/health/mcap-lib.c \
-+	bluez/profiles/health/mcap.c \
- 	bluez/src/log.c \
- 	bluez/src/shared/mgmt.c \
- 	bluez/src/shared/util.c \
-@@ -211,7 +211,7 @@ LOCAL_SRC_FILES := \
- 	bluez/btio/btio.c \
- 	bluez/lib/bluetooth.c \
- 	bluez/lib/hci.c \
--	bluez/profiles/health/mcap-lib.c \
-+	bluez/profiles/health/mcap.c \
- 	bluez/android/mcaptest.c \
- 
- LOCAL_C_INCLUDES := \
-diff --git a/android/Makefile.am b/android/Makefile.am
-index 4953531..75802dd 100644
---- a/android/Makefile.am
-+++ b/android/Makefile.am
-@@ -45,7 +45,7 @@ android_bluetoothd_SOURCES = android/main.c \
- 				android/handsfree-client.c android/handsfree-client.h \
- 				android/gatt.h android/gatt.c \
- 				android/health.h android/health.c \
--				profiles/health/mcap-lib.h profiles/health/mcap-lib.c \
-+				profiles/health/mcap.h profiles/health/mcap.c \
- 				attrib/att.c attrib/att.h \
- 				attrib/gatt.c attrib/gatt.h \
- 				attrib/gattrib.c attrib/gattrib.h \
-@@ -95,7 +95,7 @@ noinst_PROGRAMS += android/mcaptest
- android_mcaptest_SOURCES = android/mcaptest.c \
- 				src/log.h src/log.c \
- 				btio/btio.h btio/btio.c \
--				profiles/health/mcap-lib.h profiles/health/mcap-lib.c
-+				profiles/health/mcap.h profiles/health/mcap.c
- android_mcaptest_CFLAGS = $(AM_CFLAGS)
- android_mcaptest_LDADD = lib/libbluetooth-internal.la @GLIB_LIBS@
- 
-diff --git a/android/health.c b/android/health.c
-index 5d161e0..75811aa 100644
---- a/android/health.c
-+++ b/android/health.c
-@@ -43,7 +43,7 @@
- #include "src/shared/queue.h"
- #include "src/uuid-helper.h"
- #include "src/sdp-client.h"
--#include "profiles/health/mcap-lib.h"
-+#include "profiles/health/mcap.h"
- 
- #include "hal-msg.h"
- #include "ipc-common.h"
-diff --git a/android/mcaptest.c b/android/mcaptest.c
-index 638220b..5ef030c 100644
---- a/android/mcaptest.c
-+++ b/android/mcaptest.c
-@@ -38,7 +38,7 @@
- 
- #include "btio/btio.h"
- #include "lib/l2cap.h"
--#include "profiles/health/mcap-lib.h"
-+#include "profiles/health/mcap.h"
- 
- enum {
- 	MODE_NONE,
-diff --git a/profiles/health/hdp.c b/profiles/health/hdp.c
-index d2e634a..c1ce1b8 100644
---- a/profiles/health/hdp.c
-+++ b/profiles/health/hdp.c
-@@ -45,7 +45,7 @@
- #include "hdp_types.h"
- #include "hdp_util.h"
- #include "hdp.h"
--#include "mcap-lib.h"
-+#include "mcap.h"
- 
- #define ECHO_TIMEOUT	1 /* second */
- #define HDP_ECHO_LEN	15
-diff --git a/profiles/health/hdp_util.c b/profiles/health/hdp_util.c
-index c524054..af50b01 100644
---- a/profiles/health/hdp_util.c
-+++ b/profiles/health/hdp_util.c
-@@ -48,7 +48,7 @@
- #include "src/log.h"
- #include "src/dbus-common.h"
- 
--#include "mcap-lib.h"
-+#include "mcap.h"
- #include "hdp_types.h"
- #include "hdp.h"
- #include "hdp_util.h"
-diff --git a/profiles/health/mcap-lib.c b/profiles/health/mcap.c
-similarity index 99%
-rename from profiles/health/mcap-lib.c
-rename to profiles/health/mcap.c
-index 1706d9f..a20a7ad 100644
---- a/profiles/health/mcap-lib.c
-+++ b/profiles/health/mcap.c
-@@ -38,7 +38,7 @@
- #include "btio/btio.h"
- #include "src/log.h"
- 
--#include "mcap-lib.h"
-+#include "mcap.h"
- 
- #define MCAP_BTCLOCK_HALF (MCAP_BTCLOCK_FIELD / 2)
- #define CLK CLOCK_MONOTONIC
-diff --git a/profiles/health/mcap-lib.h b/profiles/health/mcap.h
-similarity index 100%
-rename from profiles/health/mcap-lib.h
-rename to profiles/health/mcap.h
--- 
-1.9.1
+Thanks for investigating this. 
 
+If you set the dev in your receive function does the oops go away,  BTW this is where the pkt_type is set to PACKET_HOST, for us this was causing problems, I don't know if this is the same for you guys.
+
+Here's the code:
+
+            local_skb->protocol = htons(ETH_P_IPV6);
+>>>     local_skb->dev = dev;
+            local_skb->pkt_type = PACKET_HOST;
+
+            if (give_skb_to_upper(local_skb, dev)
+                            != NET_RX_SUCCESS) {
+                kfree_skb(local_skb);
+
+- Martin.
+
+On 02/10/14 12:28, Jukka Rissanen wrote:
+> Hi Martin,
+>
+> On ke, 2014-10-01 at 16:24 +0100, Martin Townsend wrote:
+>> Hi Jukka,
+>>
+>> I spotted one thing in recv_pkt when skb_copy_expand fails it should goto drop but this is not what you are seeing.  This also exists in 6lowpan_rtnl.c so I will fix this in both for the next patch.
+>>
+>> I would be interested to know if the 802.15.4 wireless guys are seeing this to narrow this down.  I don't see this but then I had to manually add the code into my bluetooth tree from ours due to differences so I could have well screwed something up.
+>>
+>> - Martin.
+>>
+>> On 01/10/14 15:47, Jukka Rissanen wrote:
+>>> Hi Martin,
+>>>
+>>> just in case add me to cc: next time so I do not miss these 6lowpan
+>>> patches.
+>>>
+>>> On ke, 2014-10-01 at 13:10 +0100, Martin Townsend wrote:
+>>>> This series aims to fix incorrect return values in lowpan_rcv
+>>>> To achieve this it also refactors the receive path to
+>>>>   1) free skb only from lowpan_rcv and not functions that it calls
+>>>>   2) move skb delivery from IPHC
+>>>>
+>>>> I have only compile tested the changes for bluetooth as I don't have any HW
+>>>> available so would be grateful for any testing from the Bluetooth developers.
+>>>> I have done some minimal testing for IEEE802.15.4
+>>> FYI, I tried this with latest bluetooth-next tree and got following oops
+>>> when trying to connect to peer bt 6lowpan device. The system probably
+>>> crashed before any packet was delivered to peer as I did not see
+>>> anything on the other end of the connection.
+>>>
+>>>
+>>> BUG: unable to handle kernel NULL pointer dereference at 000000a0
+>>> IP: [<c17712c3>] __netif_receive_skb_core+0xa3/0x7b0
+>>> *pde = 00000000 
+>>> Oops: 0000 [#1] PREEMPT SMP 
+>>> Modules linked in: bluetooth_6lowpan 6lowpan rfcomm bnep ecb btusb
+>>> bluetooth nfc rfkill snd_intel8x0 ohci_pci snd_ac97_codec ac97_bus
+>>> parport_pc parport
+>>> CPU: 0 PID: 353 Comm: systemd-network Not tainted 3.17.0-rc1-bt6lowpan
+>>> #1
+>>> Hardware name: innotek GmbH VirtualBox/VirtualBox, BIOS VirtualBox
+>>> 12/01/2006
+>>> task: ccb695e0 ti: cc88e000 task.ti: cc88e000
+>>> EIP: 0060:[<c17712c3>] EFLAGS: 00010282 CPU: 0
+>>> EIP is at __netif_receive_skb_core+0xa3/0x7b0
+>>> EAX: cd964900 EBX: cd964900 ECX: 00000000 EDX: 00000000
+>>> ESI: cd964900 EDI: 00000001 EBP: cf00bf4c ESP: cf00bf18
+>>>  DS: 007b ES: 007b FS: 00d8 GS: 0033 SS: 0068
+>>> CR0: 8005003b CR2: d0cd6040 CR3: 0d057000 CR4: 000006d0
+>>> Stack:
+>>>  00000002 00000000 00000000 c1771279 cf73e698 cf00bf00 00000000 00000001
+>>>  cd964900 00000046 cd964900 00000000 cf73e698 cf00bf5c c17719eb cd964900
+>>>  00000000 cf00bf80 c177300f cf73e664 cf73e670 00000040 cf73e5d4 cf73e698
+>>> Call Trace:
+>>>  [<c1771279>] ? __netif_receive_skb_core+0x59/0x7b0
+> I investigated this a bit more by adding some debug prints into
+> __netif_receive_skb_core() and the reason for the oops is that the
+> skb->dev is NULL.
+>
+> The culprit seems to be this removal from skb_deliver() function:
+>
+> -	new->dev = dev;
+>
+> And then dev is null in bluetooth side. You seem to set it in ieee802154
+> side so the oops is not shown there.
+>
+>
+>>>  [<c17719eb>] __netif_receive_skb+0x1b/0x70
+>>>  [<c177300f>] process_backlog+0x9f/0x140
+>>>  [<c1772e48>] net_rx_action+0x128/0x250
+>>>  [<c104fd84>] __do_softirq+0xd4/0x300
+>>>  [<c104fcb0>] ? __local_bh_enable_ip+0xf0/0xf0
+>>>  [<c10049fc>] do_softirq_own_stack+0x2c/0x40
+>>>  <IRQ> 
+>>>  [<c1050136>] irq_exit+0x86/0xb0
+>>>  [<c188bd98>] smp_apic_timer_interrupt+0x38/0x50
+>>>  [<c188b6ce>] apic_timer_interrupt+0x32/0x38
+>>> Code: 00 31 c9 c7 44 24 04 00 00 00 00 c7 04 24 02 00 00 00 31 d2 b8 14
+>>> 42 c0 c1 e8 0a 1f 92 ff c7 45 e8 01 00 00 00 8b 45 ec 8b 50 14 <8b> 92
+>>> a0 00 00 00 89 50 74 b8 f8 7c ad c1 e8 1a f7 c5 ff 8b 5d
+>>> EIP: [<c17712c3>] __netif_receive_skb_core+0xa3/0x7b0 SS:ESP
+>>> 0068:cf00bf18
+>>> CR2: 00000000000000a0
+>>> ---[ end trace 704a740b1671072d ]---
+>>> Kernel panic - not syncing: Fatal exception in interrupt
+>>> Kernel Offset: 0x0 from 0xc1000000 (relocation range:
+>>> 0xc0000000-0xd07effff)
+>>> ---[ end Kernel panic - not syncing: Fatal exception in interrupt
+>>>
+>>>
+>>>
+> Cheers,
+> Jukka
+>
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-wpan" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
