@@ -2,117 +2,168 @@ Return-Path: <cyrus@holtmann.org>
 From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH 09/11] unit/test-hfp: Add send command tests for HFP HF
-Date: Thu,  2 Oct 2014 21:29:57 +0200
-Message-Id: <1412278199-5761-10-git-send-email-lukasz.rymanowski@tieto.com>
+Subject: [PATCH 05/11] shared/hfp: Add HFP HF parser
+Date: Thu,  2 Oct 2014 21:29:53 +0200
+Message-Id: <1412278199-5761-6-git-send-email-lukasz.rymanowski@tieto.com>
 In-Reply-To: <1412278199-5761-1-git-send-email-lukasz.rymanowski@tieto.com>
 References: <1412278199-5761-1-git-send-email-lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch adds following tests:
-/hfp/test_send_command_1
-/hfp/test_send_command_2
+This patch adds parser for AT responses and unsolicited results.
 ---
- unit/test-hfp.c | 71 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 71 insertions(+)
+ src/shared/hfp.c | 131 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 131 insertions(+)
 
-diff --git a/unit/test-hfp.c b/unit/test-hfp.c
-index ad26058..1926615 100644
---- a/unit/test-hfp.c
-+++ b/unit/test-hfp.c
-@@ -118,6 +118,9 @@ struct test_data {
- 		data.test_handler = test_hf_handler;			\
- 	} while (0)
- 
-+
-+static bool received_unsolicited = false;
-+
- static void context_quit(struct context *context)
- {
- 	g_main_loop_quit(context->main_loop);
-@@ -462,6 +465,60 @@ static void test_hf_init(gconstpointer data)
- 	execute_context(context);
+diff --git a/src/shared/hfp.c b/src/shared/hfp.c
+index b1cf08e..d267698 100644
+--- a/src/shared/hfp.c
++++ b/src/shared/hfp.c
+@@ -868,6 +868,128 @@ static void destroy_event_handler(void *data)
+ 	free(handler);
  }
  
-+static void hf_unsolicited_resp_cb(struct hfp_hf_result *result,
-+							void *user_data)
++static void hf_skip_whitespace(struct hfp_hf_result *result)
 +{
-+	received_unsolicited = true;
++	while (result->data[result->offset] == ' ')
++		result->offset++;
 +}
 +
-+static void hf_response_with_unsolicited_cb(const char *prefix,
-+							enum hfp_result res,
-+							void *user_data)
++static void hf_call_prefix_handler(struct hfp_hf *hfp, const char *data)
 +{
-+	struct context *context = user_data;
++	struct event_handler *handler;
++	const char *separators = ";:\0";
++	struct hfp_hf_result result_data;
++	char lookup_prefix[18];
++	uint8_t pref_len = 0;
++	const char *prefix;
++	int i;
 +
-+	g_assert_cmpstr(prefix, ==,  "AT+BRSF");
-+	g_assert(received_unsolicited);
-+	received_unsolicited = false;
++	result_data.offset = 0;
++	result_data.data = data;
 +
-+	hfp_hf_disconnect(context->hfp_hf);
++	hf_skip_whitespace(&result_data);
++
++	if (strlen(data + result_data.offset) < 2)
++		return;
++
++	prefix = data + result_data.offset;
++
++	pref_len = strcspn(prefix, separators);
++	if (pref_len > 17 || pref_len < 2)
++		return;
++
++	for (i = 0; i < pref_len; i++)
++		lookup_prefix[i] = toupper(prefix[i]);
++
++	lookup_prefix[pref_len] = '\0';
++	result_data.offset += pref_len;
++
++	handler = queue_find(hfp->event_handlers, match_handler_event_prefix,
++								lookup_prefix);
++
++	if (!handler)
++		return;
++
++	handler->callback(&result_data, handler->user_data);
++
 +}
 +
-+static void hf_response_cb(const char *prefix, enum hfp_result res,
-+							void *user_data)
++static char *find_cr_lf(char *str, size_t len)
 +{
-+	struct context *context = user_data;
++	char *ptr;
++	int count;
++	int offset;
 +
-+	g_assert_cmpstr(prefix, ==, "AT+BRSF");
++	offset = 0;
 +
-+	hfp_hf_disconnect(context->hfp_hf);
-+}
++	ptr = memchr(str, '\r', len);
++	while (ptr) {
++		/*
++		 * Check if there is more data after '\r'. If so check for
++		 * '\n'
++		 */
++		count = ptr-str;
++		if ((count < (int) (len - 1)) && *(ptr + 1) == '\n')
++			return ptr;
 +
-+static void test_hf_send_command(gconstpointer data)
-+{
-+	struct context *context = create_context(data);
-+	const struct test_pdu *pdu;
-+	bool ret;
++		/* There is only '\r'? Let's try to find next one */
++		offset += count + 1;
 +
-+	context->hfp_hf = hfp_hf_new(context->fd_client);
-+	g_assert(context->hfp_hf);
++		if (offset >= (int)len)
++			return NULL;
 +
-+	pdu = &context->data->pdu_list[context->pdu_offset++];
-+
-+	ret = hfp_hf_set_close_on_unref(context->hfp_hf, true);
-+	g_assert(ret);
-+
-+	if (context->data->response_func) {
-+		ret = hfp_hf_send_command(context->hfp_hf,
-+						context->data->response_func,
-+						context->data->hf_result_func,
-+						context, (char *)pdu->data);
-+		g_assert(ret);
++		ptr = memchr(str + offset, '\r', len - offset);
 +	}
 +
-+	execute_context(context);
++	return NULL;
 +}
 +
- int main(int argc, char *argv[])
- {
- 	g_test_init(&argc, &argv, NULL);
-@@ -532,6 +589,20 @@ int main(int argc, char *argv[])
- 			data_end());
- 
- 	define_hf_test("/hfp/test_init", test_hf_init, NULL, NULL, data_end());
-+	define_hf_test("/hfp/test_send_command_1", test_hf_send_command, NULL,
-+			hf_response_cb,
-+			raw_pdu('A', 'T', '+', 'B', 'R', 'S', 'F', '\0'),
-+			raw_pdu('\r', '\n', 'O', 'k', '\r', '\n'),
-+			data_end());
++static void hf_process_input(struct hfp_hf *hfp)
++{
++	char *str, *ptr;
++	size_t len, count, offset;
 +
-+	define_hf_test("/hfp/test_send_command_2", test_hf_send_command,
-+			hf_unsolicited_resp_cb,
-+			hf_response_with_unsolicited_cb,
-+			raw_pdu('A', 'T', '+', 'B', 'R', 'S', 'F', '\0'),
-+			raw_pdu('\r', '\n', '+', 'B', 'R', 'S', 'F', '\r',
-+									'\n'),
-+			raw_pdu('\r', '\n', 'O', 'k', '\r', '\n'),
-+			data_end());
++	str = ringbuf_peek(hfp->read_buf, 0, &len);
++	if (!str)
++		return;
++
++	offset = 0;
++
++	ptr = find_cr_lf(str, len);
++	while (ptr) {
++		count = ptr - (str + offset);
++		if (count == 0) {
++			/* 2 is for <cr><lf> */
++			offset += 2;
++		} else {
++			*ptr = '\0';
++			hf_call_prefix_handler(hfp, str + offset);
++			offset += count + 2;
++		}
++
++		if (offset >= len)
++			break;
++
++		ptr = find_cr_lf(str + offset, len - offset);
++	}
++
++	ringbuf_drain(hfp->read_buf, offset < len ? offset : len);
++}
++
++static bool hf_can_read_data(struct io *io, void *user_data)
++{
++	struct hfp_hf *hfp = user_data;
++	ssize_t bytes_read;
++
++	bytes_read = ringbuf_read(hfp->read_buf, hfp->fd);
++	if (bytes_read < 0)
++		return false;
++
++	hf_process_input(hfp);
++
++	return true;
++}
++
+ struct hfp_hf *hfp_hf_new(int fd)
+ {
+ 	struct hfp_hf *hfp;
+@@ -912,6 +1034,15 @@ struct hfp_hf *hfp_hf_new(int fd)
+ 		return NULL;
+ 	}
  
- 	return g_test_run();
++	if (!io_set_read_handler(hfp->io, hf_can_read_data, hfp,
++							read_watch_destroy)) {
++		queue_destroy(hfp->event_handlers,
++						destroy_event_handler);
++		io_destroy(hfp->io);
++		ringbuf_free(hfp->write_buf);
++		ringbuf_free(hfp->read_buf);
++	}
++
+ 	return hfp_hf_ref(hfp);
  }
+ 
 -- 
 1.8.4
 
