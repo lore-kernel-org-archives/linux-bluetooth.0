@@ -1,96 +1,83 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <542CFA52.6040602@tieto.com>
-Date: Thu, 02 Oct 2014 09:10:10 +0200
-From: Tyszkowski Jakub <jakub.tyszkowski@tieto.com>
+Date: Thu, 2 Oct 2014 10:00:10 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Peter Hurley <peter@hurleysoftware.com>
+Cc: Jukka Rissanen <jukka.rissanen@linux.intel.com>,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH v2] Bluetooth: Fix locking issue when creating l2cap
+ connection
+Message-ID: <20141002070010.GA11550@t440s.lan>
+References: <1412158707-26604-1-git-send-email-jukka.rissanen@linux.intel.com>
+ <20141001120944.GA25046@t440s.lan>
+ <542C09D5.9050405@hurleysoftware.com>
 MIME-Version: 1.0
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCHv3 07/17] android/tester: Make HDP tests use generic pdu
- struct
-References: <1412154099-28014-1-git-send-email-jakub.tyszkowski@tieto.com>	<1412154099-28014-8-git-send-email-jakub.tyszkowski@tieto.com> <CABBYNZJoqmsa45OQ0XO5rZSL7v877A4qMOyXm+VoZqs5wpm68g@mail.gmail.com>
-In-Reply-To: <CABBYNZJoqmsa45OQ0XO5rZSL7v877A4qMOyXm+VoZqs5wpm68g@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <542C09D5.9050405@hurleysoftware.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+Hi Peter,
 
-On 10/01/2014 02:21 PM, Luiz Augusto von Dentz wrote:
-> Hi Jakub,
->
-> On Wed, Oct 1, 2014 at 12:01 PM, Jakub Tyszkowski
-> <jakub.tyszkowski@tieto.com> wrote:
->> ---
->>   android/tester-hdp.c | 11 ++++++-----
->>   1 file changed, 6 insertions(+), 5 deletions(-)
->>
->> diff --git a/android/tester-hdp.c b/android/tester-hdp.c
->> index 9ecef21..e81df71 100644
->> --- a/android/tester-hdp.c
->> +++ b/android/tester-hdp.c
->> @@ -184,7 +184,8 @@ static void hdp_unregister_app_action(void)
->>          schedule_action_verification(step);
->>   }
->>
->> -static uint8_t hdp_rsp_pdu[] = { 0x07, /* PDU id */
->> +static const struct pdu hdp_rsp_pdu = raw_pdu(
->> +                       0x07, /* PDU id */
->>                          0x00, 0x00, /* Transaction id */
->>                          0x01, 0xc8, /* Response length */
->>                          0x01, 0xc5, /* Attributes length */
->> @@ -239,7 +240,7 @@ static uint8_t hdp_rsp_pdu[] = { 0x07, /* PDU id */
->>                          0x63, 0x6f, 0x73, 0x65, 0x20, 0x4d, 0x65, 0x74, 0x65,
->>                          0x72, 0x0d, 0x09, 0x03, 0x01, 0x08, 0x01, 0x09, 0x03,
->>                          0x02, 0x08, 0x00,
->> -                       0x00 };
->> +                       0x00);
->>
->>   static void hdp_sdp_cid_hook_cb(const void *data, uint16_t len, void *user_data)
->>   {
->> @@ -247,11 +248,11 @@ static void hdp_sdp_cid_hook_cb(const void *data, uint16_t len, void *user_data)
->>          struct bthost *bthost = hciemu_client_get_host(t_data->hciemu);
->>          struct emu_cid_data *cid_data = user_data;
->>
->> -       hdp_rsp_pdu[1] = ((uint8_t *) data)[1];
->> -       hdp_rsp_pdu[2] = ((uint8_t *) data)[2];
->> +       hdp_rsp_pdu.data[1] = ((uint8_t *) data)[1];
->> +       hdp_rsp_pdu.data[2] = ((uint8_t *) data)[2];
->
-> I suppose we could use memcpy here, or in case of iovec you can
-> actually send them separably them like this:
->
-> struct iovec iov[2]
->
-> iov[0].iov_base = data;
-> iov[0].iov_len = 2;
->
-> iov[1].iov_base = hdp_rsp_pdu.data + 2;
-> iov[1].iov_len = hdp_rsp_pdu.size - 2;
->
-> This way the variables can be const.
+On Wed, Oct 01, 2014, Peter Hurley wrote:
+> > As Szymon pointed out on IRC this version is also problematic in that
+> > the check for chan->state is not inside the same atomic section as where
+> > we change to a new state.
+> > 
+> > After some further analysis it seems like this lockdep warning is a
+> > false-positive because of the way that all other places besides
+> > l2cap_chan_connect() treat the locks. Most of these depend on the chan
+> > being available in conn->chan_l:
+> > 
+> > 	lock(conn->chan_lock);
+> > 	for_each(chan, conn->chan_l) {
+> > 		lock(chan->lock);
+> > 		...
+> > 		unlock(chan->lock);
+> > 	}
+> > 	unlock(conn->chan_lock);
+> > 
+> > Because the l2cap_chan_connect() code (or l2cap_chan_add actually) takes
+> > conn->chan_lock before attempting to add to conn->chan_l it makes the
+> > loop described above unable to reach the chan and therefore the deadlock
+> > is not possible.
+> > 
+> > There are at three exceptions I could find that don't follow exactly the
+> > above pattern (by depending on conn->chan_l content), and should
+> > therefore be considered separately:
+> > 
+> > 	l2cap_connect()
+> > 	l2cap_le_connect_req()
+> > 	l2cap_chan_timeout()
+> > 
+> > All three of these require the channel to be in a state that will make
+> > l2cap_chan_connect() return early failure before getting anywhere close
+> > to the risky l2cap_chan_add() call, so I would conclude that these are
+> > also safe from the deadlock.
+> 
+> Ok, but a lockdep report disables lockdep, which means that
+> 
+> 1. There could be other lockdep errors after this one
+> 2. Lockdep gets disabled for all subsystems so this can be masking
+> problems in other places.
+> 
+> So still worth fixing this lock inversion.
 
-memcpy was the first solution I proposed when this pdu refactor was part 
-of some other patch set. At that time You suggested to make pdus non 
-const and overwrite transaction ID to avoid copying. :)
-But I agree that with iovecs it will work with const pdus and without 
-copying. I'll fix that.
+Agreed.
 
->
->>          bthost_send_cid(bthost, cid_data->sdp_handle, cid_data->sdp_cid,
->> -                                       hdp_rsp_pdu, sizeof(hdp_rsp_pdu));
->> +                                       hdp_rsp_pdu.data, hdp_rsp_pdu.size);
->>   }
->>
->>   static void hdp_sdp_search_cb(uint16_t handle, uint16_t cid, void *user_data)
->> --
->> 1.9.1
->>
->> --
->> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
->> the body of a message to majordomo@vger.kernel.org
->> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->
->
->
+> Why does chan->lock need to be held when adding the channel to the
+> conn->chan_l if the chan is not retrievable until it's found on the
+> list?
 
-Regards
+That's a good point. As long as the L2CAP user (e.g. l2cap_sock.c)
+hasn't taken action to associate a chan object with a connection we
+could assume that it needs to itself take care of mutual exclusion.
+Looking at l2cap_sock.c this already seems to be a long-time assumption:
+there are plenty of places where the code reads and writes chan members
+without taking the chan->lock.
+
+The chan->lock still needs to be held when adding to the list since we
+want to make sure no other code touches it until l2cap_chan_connect
+returns, but by moving the lock taking later we can ensure that we take
+the conn->chan_lock first. I'll send a patch proposal for this soon.
+
+Johan
