@@ -1,148 +1,117 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: Marcin Kraglak <marcin.kraglak@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCHv2 1/5] android/tester: Add support for GATT Notification in tester
-Date: Thu, 02 Oct 2014 13:49:08 +0200
-Message-ID: <10464557.3gYgI5qHKV@uw000953>
-In-Reply-To: <1412074986-21285-1-git-send-email-marcin.kraglak@tieto.com>
-References: <1412074986-21285-1-git-send-email-marcin.kraglak@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Sender: linux-bluetooth-owner@vger.kernel.org
+Message-ID: <1412249319.13121.26.camel@jrissane-mobl.ger.corp.intel.com>
+Subject: Re: [PATCH v4 bluetooth] Fix lowpan_rcv
+From: Jukka Rissanen <jukka.rissanen@linux.intel.com>
+To: Martin Townsend <martin.townsend@xsilon.com>
+Cc: Martin Townsend <mtownsend1973@gmail.com>,
+	linux-zigbee-devel@lists.sourceforge.net,
+	linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org,
+	marcel@holtmann.org, alex.aring@gmail.com
+Date: Thu, 02 Oct 2014 14:28:39 +0300
+In-Reply-To: <542C1C96.80605@xsilon.com>
+References: <1412165422-31063-1-git-send-email-martin.townsend@xsilon.com>
+	 <1412174827.4860.144.camel@jrissane-mobl.ger.corp.intel.com>
+	 <542C1C96.80605@xsilon.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcin,
+Hi Martin,
 
-On Tuesday 30 of September 2014 13:03:02 Marcin Kraglak wrote:
-> Service register_for_notification and notification callbacks.
-> ---
->  android/tester-main.c | 51 +++++++++++++++++++++++++++++++++++++++++++++++++--
->  android/tester-main.h | 18 ++++++++++++++++++
->  2 files changed, 67 insertions(+), 2 deletions(-)
+On ke, 2014-10-01 at 16:24 +0100, Martin Townsend wrote:
+> Hi Jukka,
 > 
-> diff --git a/android/tester-main.c b/android/tester-main.c
-> index 5bf9096..2b9b410 100644
-> --- a/android/tester-main.c
-> +++ b/android/tester-main.c
-> @@ -717,6 +717,21 @@ static bool match_data(struct step *step)
->  			tester_debug("Gatt write_param doesn't match");
->  			return false;
->  		}
-> +
-> +		if (exp->callback_result.notification_registered !=
-> +				step->callback_result.notification_registered) {
-> +			tester_debug("Gatt registered flag mismatch");
-> +			return false;
-> +		}
-> +
-> +		if (exp->callback_result.notify_params) {
-> +			if (memcmp(step->callback_result.notify_params,
-> +					exp->callback_result.notify_params,
-> +					sizeof(btgatt_notify_params_t))) {
-> +				tester_debug("Gatt notify_param doesn't match");
-> +				return false;
-> +			}
-> +		}
->  	}
->  
->  	return true;
-> @@ -819,6 +834,9 @@ static void destroy_callback_step(void *data)
->  	if (step->callback_result.write_params)
->  		free(step->callback_result.write_params);
->  
-> +	if (step->callback_result.notify_params)
-> +		free(step->callback_result.notify_params);
-> +
->  	g_free(step);
->  	g_atomic_int_dec_and_test(&scheduled_cbacks_num);
->  }
-> @@ -1359,6 +1377,35 @@ static void gattc_write_descriptor_cb(int conn_id, int status,
->  	schedule_callback_call(step);
->  }
->  
-> +static void gattc_register_for_notification_cb(int conn_id, int registered,
-> +						int status,
-> +						btgatt_srvc_id_t *srvc_id,
-> +						btgatt_gatt_id_t *char_id)
-> +{
-> +	struct step *step = g_new0(struct step, 1);
-> +
-> +	step->callback = CB_GATTC_REGISTER_FOR_NOTIFICATION;
-> +	step->callback_result.status = status;
-> +	step->callback_result.conn_id = conn_id;
-> +	step->callback_result.service = g_memdup(srvc_id, sizeof(*srvc_id));
-> +	step->callback_result.characteristic = g_memdup(char_id,
-> +							sizeof(*char_id));
-> +	step->callback_result.notification_registered = registered;
-> +
-> +	schedule_callback_call(step);
-> +}
-> +
-> +static void gattc_notif_cb(int conn_id, btgatt_notify_params_t *p_data)
-> +{
-> +	struct step *step = g_new0(struct step, 1);
-> +
-> +	step->callback = CB_GATTC_NOTIFY;
-> +	step->callback_result.conn_id = conn_id;
-> +	step->callback_result.notify_params = g_memdup(p_data, sizeof(*p_data));
-> +
-> +	schedule_callback_call(step);
-> +}
-> +
->  static void gatts_register_server_cb(int status, int server_if,
->  							bt_uuid_t *app_uuid)
->  {
-> @@ -1480,8 +1527,8 @@ static const btgatt_client_callbacks_t btgatt_client_callbacks = {
->  	.get_characteristic_cb = gattc_get_characteristic_cb,
->  	.get_descriptor_cb = gattc_get_descriptor_cb,
->  	.get_included_service_cb = gattc_get_included_service_cb,
-> -	.register_for_notification_cb = NULL,
-> -	.notify_cb = NULL,
-> +	.register_for_notification_cb = gattc_register_for_notification_cb,
-> +	.notify_cb = gattc_notif_cb,
->  	.read_characteristic_cb = gattc_read_characteristic_cb,
->  	.write_characteristic_cb = gattc_write_characteristic_cb,
->  	.read_descriptor_cb = gattc_read_descriptor_cb,
-> diff --git a/android/tester-main.h b/android/tester-main.h
-> index e152ff3..218bb2d 100644
-> --- a/android/tester-main.h
-> +++ b/android/tester-main.h
-> @@ -203,6 +203,22 @@
->  		.callback_result.write_params = cb_write_data, \
->  	}
->  
-> +#define CALLBACK_GATTC_REGISTER_FOR_NOTIF(cb_res, cb_conn_id, cb_char,\
-> +						cb_service, cb_registered) { \
-> +		.callback = CB_GATTC_REGISTER_FOR_NOTIFICATION, \
-> +		.callback_result.conn_id = cb_conn_id, \
-> +		.callback_result.status = cb_res, \
-> +		.callback_result.service = cb_service, \
-> +		.callback_result.characteristic = cb_char, \
-> +		.callback_result.notification_registered = cb_registered \
-> +	}
-> +
-> +#define CALLBACK_GATTC_NOTIFY(cb_conn_id, cb_notify) { \
-> +		.callback = CB_GATTC_NOTIFY, \
-> +		.callback_result.conn_id = cb_conn_id, \
-> +		.callback_result.notify_params = cb_notify \
-> +	}
-> +
->  #define CALLBACK_GATTC_DISCONNECT(cb_res, cb_prop, cb_conn_id, cb_client_id) { \
->  		.callback = CB_GATTC_CLOSE, \
->  		.callback_result.status = cb_res, \
-> @@ -450,6 +466,8 @@ struct bt_callback_data {
->  	btgatt_srvc_id_t *included;
->  	btgatt_read_params_t *read_params;
->  	btgatt_write_params_t *write_params;
-> +	btgatt_notify_params_t *notify_params;
-> +	int notification_registered;
->  	int char_prop;
->  
->  	btpan_control_state_t ctrl_state;
+> I spotted one thing in recv_pkt when skb_copy_expand fails it should goto drop but this is not what you are seeing.  This also exists in 6lowpan_rtnl.c so I will fix this in both for the next patch.
+> 
+> I would be interested to know if the 802.15.4 wireless guys are seeing this to narrow this down.  I don't see this but then I had to manually add the code into my bluetooth tree from ours due to differences so I could have well screwed something up.
+> 
+> - Martin.
+> 
+> On 01/10/14 15:47, Jukka Rissanen wrote:
+> > Hi Martin,
+> >
+> > just in case add me to cc: next time so I do not miss these 6lowpan
+> > patches.
+> >
+> > On ke, 2014-10-01 at 13:10 +0100, Martin Townsend wrote:
+> >> This series aims to fix incorrect return values in lowpan_rcv
+> >> To achieve this it also refactors the receive path to
+> >>   1) free skb only from lowpan_rcv and not functions that it calls
+> >>   2) move skb delivery from IPHC
+> >>
+> >> I have only compile tested the changes for bluetooth as I don't have any HW
+> >> available so would be grateful for any testing from the Bluetooth developers.
+> >> I have done some minimal testing for IEEE802.15.4
+> > FYI, I tried this with latest bluetooth-next tree and got following oops
+> > when trying to connect to peer bt 6lowpan device. The system probably
+> > crashed before any packet was delivered to peer as I did not see
+> > anything on the other end of the connection.
+> >
+> >
+> > BUG: unable to handle kernel NULL pointer dereference at 000000a0
+> > IP: [<c17712c3>] __netif_receive_skb_core+0xa3/0x7b0
+> > *pde = 00000000 
+> > Oops: 0000 [#1] PREEMPT SMP 
+> > Modules linked in: bluetooth_6lowpan 6lowpan rfcomm bnep ecb btusb
+> > bluetooth nfc rfkill snd_intel8x0 ohci_pci snd_ac97_codec ac97_bus
+> > parport_pc parport
+> > CPU: 0 PID: 353 Comm: systemd-network Not tainted 3.17.0-rc1-bt6lowpan
+> > #1
+> > Hardware name: innotek GmbH VirtualBox/VirtualBox, BIOS VirtualBox
+> > 12/01/2006
+> > task: ccb695e0 ti: cc88e000 task.ti: cc88e000
+> > EIP: 0060:[<c17712c3>] EFLAGS: 00010282 CPU: 0
+> > EIP is at __netif_receive_skb_core+0xa3/0x7b0
+> > EAX: cd964900 EBX: cd964900 ECX: 00000000 EDX: 00000000
+> > ESI: cd964900 EDI: 00000001 EBP: cf00bf4c ESP: cf00bf18
+> >  DS: 007b ES: 007b FS: 00d8 GS: 0033 SS: 0068
+> > CR0: 8005003b CR2: d0cd6040 CR3: 0d057000 CR4: 000006d0
+> > Stack:
+> >  00000002 00000000 00000000 c1771279 cf73e698 cf00bf00 00000000 00000001
+> >  cd964900 00000046 cd964900 00000000 cf73e698 cf00bf5c c17719eb cd964900
+> >  00000000 cf00bf80 c177300f cf73e664 cf73e670 00000040 cf73e5d4 cf73e698
+> > Call Trace:
+> >  [<c1771279>] ? __netif_receive_skb_core+0x59/0x7b0
 
-This needs to be rebased. 
+I investigated this a bit more by adding some debug prints into
+__netif_receive_skb_core() and the reason for the oops is that the
+skb->dev is NULL.
 
--- 
-Best regards, 
-Szymon Janc
+The culprit seems to be this removal from skb_deliver() function:
+
+-	new->dev = dev;
+
+And then dev is null in bluetooth side. You seem to set it in ieee802154
+side so the oops is not shown there.
+
+
+> >  [<c17719eb>] __netif_receive_skb+0x1b/0x70
+> >  [<c177300f>] process_backlog+0x9f/0x140
+> >  [<c1772e48>] net_rx_action+0x128/0x250
+> >  [<c104fd84>] __do_softirq+0xd4/0x300
+> >  [<c104fcb0>] ? __local_bh_enable_ip+0xf0/0xf0
+> >  [<c10049fc>] do_softirq_own_stack+0x2c/0x40
+> >  <IRQ> 
+> >  [<c1050136>] irq_exit+0x86/0xb0
+> >  [<c188bd98>] smp_apic_timer_interrupt+0x38/0x50
+> >  [<c188b6ce>] apic_timer_interrupt+0x32/0x38
+> > Code: 00 31 c9 c7 44 24 04 00 00 00 00 c7 04 24 02 00 00 00 31 d2 b8 14
+> > 42 c0 c1 e8 0a 1f 92 ff c7 45 e8 01 00 00 00 8b 45 ec 8b 50 14 <8b> 92
+> > a0 00 00 00 89 50 74 b8 f8 7c ad c1 e8 1a f7 c5 ff 8b 5d
+> > EIP: [<c17712c3>] __netif_receive_skb_core+0xa3/0x7b0 SS:ESP
+> > 0068:cf00bf18
+> > CR2: 00000000000000a0
+> > ---[ end trace 704a740b1671072d ]---
+> > Kernel panic - not syncing: Fatal exception in interrupt
+> > Kernel Offset: 0x0 from 0xc1000000 (relocation range:
+> > 0xc0000000-0xd07effff)
+> > ---[ end Kernel panic - not syncing: Fatal exception in interrupt
+> >
+> >
+> >
+
+Cheers,
+Jukka
+
+
