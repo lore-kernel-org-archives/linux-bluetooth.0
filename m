@@ -1,77 +1,93 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.6\))
-Subject: Re: [PATCH] Bluetooth: Fix lockdep warning with l2cap_chan_connect
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1412234182-13370-1-git-send-email-johan.hedberg@gmail.com>
-Date: Thu, 2 Oct 2014 12:10:55 +0200
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <A8B53706-9D91-4D3F-9B90-B00CDCF43E71@holtmann.org>
-References: <1412234182-13370-1-git-send-email-johan.hedberg@gmail.com>
-To: Johan Hedberg <johan.hedberg@gmail.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ v3 5/5] shared/gatt-client: Handle ATT disconnection
+Date: Thu,  2 Oct 2014 12:51:41 +0300
+Message-Id: <1412243501-1755-5-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <1412243501-1755-1-git-send-email-luiz.dentz@gmail.com>
+References: <1412243501-1755-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-> The L2CAP connection's channel list lock (conn->chan_lock) must never be
-> taken while already holding a channel lock (chan->lock) in order to
-> avoid lock-inversion and lockdep warnings. So far the l2cap_chan_connect
-> function has acquired the chan->lock early in the function and then
-> later called l2cap_chan_add(conn, chan) which will try to take the
-> conn->chan_lock. This violates the correct order of taking the locks and
-> may lead to the following type of lockdep warnings:
-> 
-> -> #1 (&conn->chan_lock){+.+...}:
->       [<c109324d>] lock_acquire+0x9d/0x140
->       [<c188459c>] mutex_lock_nested+0x6c/0x420
->       [<d0aab48e>] l2cap_chan_add+0x1e/0x40 [bluetooth]
->       [<d0aac618>] l2cap_chan_connect+0x348/0x8f0 [bluetooth]
->       [<d0cc9a91>] lowpan_control_write+0x221/0x2d0 [bluetooth_6lowpan]
-> -> #0 (&chan->lock){+.+.+.}:
->       [<c10928d8>] __lock_acquire+0x1a18/0x1d20
->       [<c109324d>] lock_acquire+0x9d/0x140
->       [<c188459c>] mutex_lock_nested+0x6c/0x420
->       [<d0ab05fd>] l2cap_connect_cfm+0x1dd/0x3f0 [bluetooth]
->       [<d0a909c4>] hci_le_meta_evt+0x11a4/0x1260 [bluetooth]
->       [<d0a910eb>] hci_event_packet+0x3ab/0x3120 [bluetooth]
->       [<d0a7cb08>] hci_rx_work+0x208/0x4a0 [bluetooth]
-> 
->       CPU0                    CPU1
->       ----                    ----
->  lock(&conn->chan_lock);
->                               lock(&chan->lock);
->                               lock(&conn->chan_lock);
->  lock(&chan->lock);
-> 
-> Before calling l2cap_chan_add() the channel is not part of the
-> conn->chan_l list, and can therefore only be accessed by the L2CAP user
-> (such as l2cap_sock.c). We can therefore assume that it is the
-> responsibility of the user to handle mutual exclusion until this point
-> (which we can see is already true in l2cap_sock.c by it in many places
-> touching chan members without holding chan->lock).
-> 
-> Since the hci_conn and by exctension l2cap_conn creation in the
-> l2cap_chan_connect() function depend on chan details we cannot simply
-> add a mutex_lock(&conn->chan_lock) in the beginning of the function
-> (since the conn object doesn't yet exist there). What we can do however
-> is move the chan->lock taking later into the function where we already
-> have the conn object and can that way take conn->chan_lock first.
-> 
-> This patch implements the above strategy and does some other necessary
-> changes such as using __l2cap_chan_add() which assumes conn->chan_lock
-> is held, as well as adding a second needed label so the unlocking
-> happens as it should.
-> 
-> Reported-by: Jukka Rissanen <jukka.rissanen@linux.intel.com>
-> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
-> ---
-> net/bluetooth/l2cap_core.c | 13 ++++++++-----
-> 1 file changed, 8 insertions(+), 5 deletions(-)
+If ATT disconnects reset ready flag and propagate to the callback, also
+since there is no use for bt_att after that unref it.
+---
+ src/shared/gatt-client.c | 34 +++++++++++++++++++++++++++++-----
+ 1 file changed, 29 insertions(+), 5 deletions(-)
 
-patch has been applied to bluetooth-next tree.
-
-Regards
-
-Marcel
+diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
+index 5833e7a..03d722f 100644
+--- a/src/shared/gatt-client.c
++++ b/src/shared/gatt-client.c
+@@ -101,10 +101,10 @@ struct bt_gatt_client {
+ 	struct queue *long_write_queue;
+ 	bool in_long_write;
+ 
+-	/* List of registered notification/indication callbacks */
++	/* List of registered disconnect/notification/indication callbacks */
+ 	struct queue *notify_list;
+ 	int next_reg_id;
+-	unsigned int notify_id, ind_id;
++	unsigned int disc_id, notify_id, ind_id;
+ 	bool in_notify;
+ 	bool need_notify_cleanup;
+ 
+@@ -1219,8 +1219,12 @@ static void bt_gatt_client_free(struct bt_gatt_client *client)
+ 	if (client->debug_destroy)
+ 		client->debug_destroy(client->debug_data);
+ 
+-	bt_att_unregister(client->att, client->notify_id);
+-	bt_att_unregister(client->att, client->ind_id);
++	if (client->att) {
++		bt_att_unregister_disconnect(client->att, client->disc_id);
++		bt_att_unregister(client->att, client->notify_id);
++		bt_att_unregister(client->att, client->ind_id);
++		bt_att_unref(client->att);
++	}
+ 
+ 	gatt_client_clear_services(client);
+ 
+@@ -1228,10 +1232,25 @@ static void bt_gatt_client_free(struct bt_gatt_client *client)
+ 	queue_destroy(client->long_write_queue, long_write_op_unref);
+ 	queue_destroy(client->notify_list, notify_data_unref);
+ 
+-	bt_att_unref(client->att);
+ 	free(client);
+ }
+ 
++static void att_disconnect_cb(void *user_data)
++{
++	struct bt_gatt_client *client = user_data;
++
++	client->disc_id = 0;
++
++	bt_att_unref(client->att);
++	client->att = NULL;
++
++	client->in_init = false;
++	client->ready = false;
++
++	if (client->ready_callback)
++		client->ready_callback(false, 0, client->ready_data);
++}
++
+ struct bt_gatt_client *bt_gatt_client_new(struct bt_att *att, uint16_t mtu)
+ {
+ 	struct bt_gatt_client *client;
+@@ -1243,6 +1262,11 @@ struct bt_gatt_client *bt_gatt_client_new(struct bt_att *att, uint16_t mtu)
+ 	if (!client)
+ 		return NULL;
+ 
++	client->disc_id = bt_att_register_disconnect(att, att_disconnect_cb,
++								client, NULL);
++	if (!client->disc_id)
++		goto fail;
++
+ 	client->long_write_queue = queue_new();
+ 	if (!client->long_write_queue)
+ 		goto fail;
+-- 
+1.9.3
 
