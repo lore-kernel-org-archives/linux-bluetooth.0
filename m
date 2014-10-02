@@ -1,43 +1,61 @@
 Return-Path: <cyrus@holtmann.org>
-From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH 00/11] shared/hfp: Add support for HFP HF
-Date: Thu,  2 Oct 2014 21:29:48 +0200
-Message-Id: <1412278199-5761-1-git-send-email-lukasz.rymanowski@tieto.com>
+MIME-Version: 1.0
+In-Reply-To: <CABBYNZLBVPswz2C7xQMN4XCk4Dw+V4mZ08v65iQ+jfH7WmDpLQ@mail.gmail.com>
+References: <1412163494-20283-1-git-send-email-luiz.dentz@gmail.com>
+	<1412163494-20283-2-git-send-email-luiz.dentz@gmail.com>
+	<20141001123408.GA26432@t440s.lan>
+	<CABBYNZLK6JfiQWp+pNK8+Pg-YOcShrm4TcbwHdnAKtbfhOcJmg@mail.gmail.com>
+	<CAHrH25T1FqMi7zho+gYCbuhmdQpsVoqV5ee3H+UbZwwhqeNC9A@mail.gmail.com>
+	<CABBYNZLBVPswz2C7xQMN4XCk4Dw+V4mZ08v65iQ+jfH7WmDpLQ@mail.gmail.com>
+Date: Thu, 2 Oct 2014 11:36:35 -0700
+Message-ID: <CAHrH25SGArD8cOjs4-1ZxDVhNKG6+=k7BhaDSrS3yunOasyv7g@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 2/4] shared/gatt-client: Take fd in bt_gatt_client_new
+From: Arman Uguray <armansito@chromium.org>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Following patches extends hfp API with HFP HF functionality.
-HFP HF parser has been added and unit test for it.
+Hi Luiz,
 
-TODO: add functions to parse AT response.
+> Right, it might make the code more modular but also allow mistakes
+> such as creating 2 different instances of bt_att for handling client
+> and server separately.
+>
 
-To consider: how strict we should be when it comes to parsing
-AT responses. For example, at the moment, command +CCLC:<cr><lf>
-will be recognized as +CCLC: eventhough correct response format
-should be <cr><lf>+CCLC:<cr><lf>
+Yeah. I think overall libshared is going to be mostly a set of tools
+that are flexible enough to be put together in different ways based on
+platform needs. You can imagine an embedded peripheral platform that
+doesn't even run bluetoothd but instead simply uses btmgmt and
+bt_gatt_server. So, I like to think of the shared/ directory as a
+flexible library collection of sorts, though it may be just me.
 
-Note: As discussed on IRC I did not try to generalize code.
 
-Lukasz Rymanowski (11):
-  shared/hfp: Add support for HFP HF
-  shared/hfp: Add set_debug and close_on_unref API for HFP HF
-  shared/hfp: Add set disconnect handler and disconnect API to HFP HF
-  shared/hfp: Add register/unregister event for HFP HF
-  shared/hfp: Add HFP HF parser
-  shared/hfp: Add send AT command API for HFP HF
-  unit/test-hfp: Provide test_handler function via struct data
-  unit/test-hfp: Add init test for HFP HF
-  unit/test-hfp: Add send command tests for HFP HF
-  unit/test-hfp: Add tests for unsolicited results for HFP HF
-  unit/test-hfp: Add some robustness tests for HFP HF
+> Actually we should probably notify a error response otherwise it may
+> call destroy which gives no hint what happened with the call itself,
+> but now I figure you actually have a timeout callback which can be
+> used but it is not per operation and I can only register one at time
+> so I cannot register one in gatt-client.c otherwise it may get
+> overwritten, perhaps we should add a timeout callback to bt_att_send
+> or just remove since disconnect callback should be called anyway and
+> that can be registered by gatt-client.c.
+>
 
- src/shared/hfp.c | 618 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
- src/shared/hfp.h |  28 +++
- unit/test-hfp.c  | 272 ++++++++++++++++++++++--
- 3 files changed, 899 insertions(+), 19 deletions(-)
+Yeah, actually in my first patches for bt_att, the
+bt_att_response_func_t had a "bool timeout" parameter. I later added a
+bt_att_register_timeout in the bt_att_register_disconnect fashion,
+though Marcel suggested to have a single handler for now. I don't
+really know what the right thing to do is here but since there isn't
+really a good way to recover from a timeout other than a disconnect,
+maybe just invoking disconnect_callback would be sufficient.
 
--- 
-1.8.4
 
+> Btw, I resend the patches skipping this one, please check if they are
+> no breaking anything for you.
+>
+
+Just tried your patches and bt_gatt_client seems to work fine for me.
+
+Cheers,
+Arman
