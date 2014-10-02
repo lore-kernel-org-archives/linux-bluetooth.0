@@ -1,68 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Thu, 2 Oct 2014 13:49:19 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Jukka Rissanen <jukka.rissanen@linux.intel.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 0/2] Bluetooth: 6lowpan: Multicast fixes
+Message-ID: <20141002104919.GC23012@t440s.lan>
+References: <1412168355-27127-1-git-send-email-jukka.rissanen@linux.intel.com>
 MIME-Version: 1.0
-In-Reply-To: <1412237461-20373-1-git-send-email-jakub.tyszkowski@tieto.com>
-References: <1412237461-20373-1-git-send-email-jakub.tyszkowski@tieto.com>
-Date: Thu, 2 Oct 2014 14:22:17 +0300
-Message-ID: <CABBYNZLciwUPMPd8UyRThAALi2L0Xv1K57QzDWOzF0yNOPM-XA@mail.gmail.com>
-Subject: Re: [PATCHv4 00/13] android/tester: Unifying the way PDU is handled
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1412168355-27127-1-git-send-email-jukka.rissanen@linux.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jakub,
+Hi Jukka,
 
-On Thu, Oct 2, 2014 at 11:10 AM, Jakub Tyszkowski
-<jakub.tyszkowski@tieto.com> wrote:
-> This patchset makes all testers use common struct for using raw data (PDUs).
-> Also some helpers were added for pdu matching and sending.
->
-> v4 changes:
->   * patches were redone with iovectors from the start,
->   * sdp pdu sending was improved (no need to have non const pdus anymore)
->
-> v3 changes:
->   * added one more patch replacing the pdu struct with iovec and making testers
->     use bthost's iovec specific API.
->   * minor include fix
->   * minor commit message correction
->
-> v2 changes:
->   * added generic hook and connect callback in tester-main for handling simple
->     cases when only pdu exchange is needed on given channel
->
-> Jakub Tyszkowski (13):
->   android/tester: Replace gatt-tester's pdu structs with io vectors
->   android/tester: Expose structs holding request pdu and response pdu
->   android/tester: Make HidHost tests use io vectors for pdu
->   android/tester: Make PAN tests use io vectors for pdu
->   android/tester: Make HDP tests use io vectors for pdu
->   android/tester: Add generic hook to handle pdu exchange
->   android/tester: Make A2DP use generic pdu exchange mechanism
->   android/tester: Make AVRCP tests use generic pdu exchange mechanism
->   android/tester: Make GATT use generic cid_data
->   android/tester: Make HDP tests use generic PDU exchange mechanism
->   android/tester: Make HIDHost tests use generic PDU exchange mechanism
->   android/tester: Make PAN use generic PDU exchange mechanism
->   android/tester: Use generic connect callback for simple cases
->
->  android/tester-a2dp.c    | 108 +++++++--------------
->  android/tester-avrcp.c   | 180 +++++++++++++----------------------
->  android/tester-gatt.c    |  95 +++++++------------
->  android/tester-hdp.c     | 200 ++++++++++++++++-----------------------
->  android/tester-hidhost.c | 241 +++++++++++++++++++++--------------------------
->  android/tester-main.c    |  71 ++++++++++++++
->  android/tester-main.h    |  26 +++++
->  android/tester-pan.c     |  45 +++------
->  8 files changed, 430 insertions(+), 536 deletions(-)
->
-> --
-> 1.9.1
+On Wed, Oct 01, 2014, Jukka Rissanen wrote:
+> I noticed some issues in 6LoWPAN multicast support and this set
+> should fix them.
+> 
+> Patch 1 removes the restriction that we skip EAGAIN error code
+> for multicast packets. The extra check are actually useless as
+> we can treat multicast packets the same way as unicast ones.
+> 
+> Patch 2 adds error checks when sending multicast packet, if
+> multicast packet sending fails, we return error to the user
+> space.
+> 
+> Cheers,
+> Jukka
+> 
+> 
+> Jukka Rissanen (2):
+>   Bluetooth: 6lowpan: Return EAGAIN error also for multicast packets
+>   Bluetooth: 6lowpan: Check transmit errors for multicast packets
+> 
+>  net/bluetooth/6lowpan.c | 27 ++++++++++++++-------------
+>  1 file changed, 14 insertions(+), 13 deletions(-)
 
-Applied, thanks.
+Both patches have been applied to bluetooth-next. Thanks.
 
-
--- 
-Luiz Augusto von Dentz
+Johan
