@@ -1,137 +1,134 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcin Kraglak <marcin.kraglak@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv3 1/5] android/tester: Add support for GATT Notification in tester
-Date: Thu,  2 Oct 2014 14:34:07 +0200
-Message-Id: <1412253251-7258-1-git-send-email-marcin.kraglak@tieto.com>
+Subject: [PATCHv3 2/5] android/tester: Add GATT Register For Notification Success
+Date: Thu,  2 Oct 2014 14:34:08 +0200
+Message-Id: <1412253251-7258-2-git-send-email-marcin.kraglak@tieto.com>
+In-Reply-To: <1412253251-7258-1-git-send-email-marcin.kraglak@tieto.com>
+References: <1412253251-7258-1-git-send-email-marcin.kraglak@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Service register_for_notification and notification callbacks.
+Test GATT register for notification command.
 ---
- android/tester-main.c | 51 +++++++++++++++++++++++++++++++++++++++++++++++++--
- android/tester-main.h | 18 ++++++++++++++++++
- 2 files changed, 67 insertions(+), 2 deletions(-)
+ android/tester-gatt.c | 76 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 76 insertions(+)
 
-diff --git a/android/tester-main.c b/android/tester-main.c
-index 5517973..fe452f8 100644
---- a/android/tester-main.c
-+++ b/android/tester-main.c
-@@ -718,6 +718,21 @@ static bool match_data(struct step *step)
- 			tester_debug("Gatt write_param doesn't match");
- 			return false;
- 		}
-+
-+		if (exp->callback_result.notification_registered !=
-+				step->callback_result.notification_registered) {
-+			tester_debug("Gatt registered flag mismatch");
-+			return false;
-+		}
-+
-+		if (exp->callback_result.notify_params) {
-+			if (memcmp(step->callback_result.notify_params,
-+					exp->callback_result.notify_params,
-+					sizeof(btgatt_notify_params_t))) {
-+				tester_debug("Gatt notify_param doesn't match");
-+				return false;
-+			}
-+		}
- 	}
+diff --git a/android/tester-gatt.c b/android/tester-gatt.c
+index acad195..efef04f 100644
+--- a/android/tester-gatt.c
++++ b/android/tester-gatt.c
+@@ -94,6 +94,13 @@ struct write_char_data {
+ 	char *p_value;
+ };
  
- 	return true;
-@@ -820,6 +835,9 @@ static void destroy_callback_step(void *data)
- 	if (step->callback_result.write_params)
- 		free(step->callback_result.write_params);
++struct notif_data {
++	int conn_id;
++	const bt_bdaddr_t *bdaddr;
++	btgatt_srvc_id_t *service;
++	btgatt_gatt_id_t *charac;
++};
++
+ static bt_uuid_t client2_app_uuid = {
+ 	.uu = { 0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02,
+ 				0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02 },
+@@ -278,6 +285,13 @@ static struct write_char_data write_char_data_2 = {
+ 	.auth_req = 0
+ };
  
-+	if (step->callback_result.notify_params)
-+		free(step->callback_result.notify_params);
++static struct notif_data notif_data_1 = {
++	.conn_id = CONN1_ID,
++	.service = &service_1,
++	.charac = &characteristic_1,
++	.bdaddr = &emu_remote_bdaddr_val,
++};
 +
- 	g_free(step);
- 	g_atomic_int_dec_and_test(&scheduled_cbacks_num);
- }
-@@ -1360,6 +1378,35 @@ static void gattc_write_descriptor_cb(int conn_id, int status,
- 	schedule_callback_call(step);
- }
+ struct set_read_params {
+ 	btgatt_read_params_t *params;
+ 	btgatt_srvc_id_t *srvc_id;
+@@ -593,6 +607,18 @@ static struct iovec write_characteristic_3[] = {
+ 	end_pdu
+ };
  
-+static void gattc_register_for_notification_cb(int conn_id, int registered,
-+						int status,
-+						btgatt_srvc_id_t *srvc_id,
-+						btgatt_gatt_id_t *char_id)
-+{
-+	struct step *step = g_new0(struct step, 1);
++static struct iovec notification_1[] = {
++	raw_pdu(0x10, 0x01, 0x00, 0xff, 0xff, 0x00, 0x28),
++	raw_pdu(0x11, 0x06, 0x01, 0x00, 0x10, 0x00, 0x00, 0x18),
++	raw_pdu(0x10, 0x11, 0x00, 0xff, 0xff, 0x00, 0x28),
++	raw_pdu(0x01, 0x11, 0x11, 0x00, 0x0a),
++	raw_pdu(0x08, 0x01, 0x00, 0x10, 0x00, 0x03, 0x28),
++	raw_pdu(0x09, 0x07, 0x02, 0x00, 0x04, 0x00, 0x00, 0x19, 0x00),
++	raw_pdu(0x08, 0x03, 0x00, 0x10, 0x00, 0x03, 0x28),
++	raw_pdu(0x01, 0x08, 0x03, 0x00, 0x0a),
++	end_pdu
++};
 +
-+	step->callback = CB_GATTC_REGISTER_FOR_NOTIFICATION;
-+	step->callback_result.status = status;
-+	step->callback_result.conn_id = conn_id;
-+	step->callback_result.service = g_memdup(srvc_id, sizeof(*srvc_id));
-+	step->callback_result.characteristic = g_memdup(char_id,
-+							sizeof(*char_id));
-+	step->callback_result.notification_registered = registered;
-+
-+	schedule_callback_call(step);
-+}
-+
-+static void gattc_notif_cb(int conn_id, btgatt_notify_params_t *p_data)
-+{
-+	struct step *step = g_new0(struct step, 1);
-+
-+	step->callback = CB_GATTC_NOTIFY;
-+	step->callback_result.conn_id = conn_id;
-+	step->callback_result.notify_params = g_memdup(p_data, sizeof(*p_data));
-+
-+	schedule_callback_call(step);
-+}
-+
- static void gatts_register_server_cb(int status, int server_if,
- 							bt_uuid_t *app_uuid)
+ static void gatt_client_register_action(void)
  {
-@@ -1481,8 +1528,8 @@ static const btgatt_client_callbacks_t btgatt_client_callbacks = {
- 	.get_characteristic_cb = gattc_get_characteristic_cb,
- 	.get_descriptor_cb = gattc_get_descriptor_cb,
- 	.get_included_service_cb = gattc_get_included_service_cb,
--	.register_for_notification_cb = NULL,
--	.notify_cb = NULL,
-+	.register_for_notification_cb = gattc_register_for_notification_cb,
-+	.notify_cb = gattc_notif_cb,
- 	.read_characteristic_cb = gattc_read_characteristic_cb,
- 	.write_characteristic_cb = gattc_write_characteristic_cb,
- 	.read_descriptor_cb = gattc_read_descriptor_cb,
-diff --git a/android/tester-main.h b/android/tester-main.h
-index c6662ca..57b7508 100644
---- a/android/tester-main.h
-+++ b/android/tester-main.h
-@@ -218,6 +218,22 @@ struct pdu_set {
- 		.callback_result.write_params = cb_write_data, \
- 	}
+ 	struct test_data *data = tester_get_data();
+@@ -813,6 +839,24 @@ static void gatt_client_write_characteristic_action(void)
+ 	schedule_action_verification(step);
+ }
  
-+#define CALLBACK_GATTC_REGISTER_FOR_NOTIF(cb_res, cb_conn_id, cb_char,\
-+						cb_service, cb_registered) { \
-+		.callback = CB_GATTC_REGISTER_FOR_NOTIFICATION, \
-+		.callback_result.conn_id = cb_conn_id, \
-+		.callback_result.status = cb_res, \
-+		.callback_result.service = cb_service, \
-+		.callback_result.characteristic = cb_char, \
-+		.callback_result.notification_registered = cb_registered \
-+	}
++static void gatt_client_register_for_notification_action(void)
++{
++	struct test_data *data = tester_get_data();
++	struct step *current_data_step = queue_peek_head(data->steps);
++	struct notif_data *notif_data = current_data_step->set_data;
++	const btgatt_client_interface_t *client = data->if_gatt->client;
++	struct step *step = g_new0(struct step, 1);
++	int status;
 +
-+#define CALLBACK_GATTC_NOTIFY(cb_conn_id, cb_notify) { \
-+		.callback = CB_GATTC_NOTIFY, \
-+		.callback_result.conn_id = cb_conn_id, \
-+		.callback_result.notify_params = cb_notify \
-+	}
++	status = client->register_for_notification(notif_data->conn_id,
++							notif_data->bdaddr,
++							notif_data->service,
++							notif_data->charac);
++	step->action_status = status;
 +
- #define CALLBACK_GATTC_DISCONNECT(cb_res, cb_prop, cb_conn_id, cb_client_id) { \
- 		.callback = CB_GATTC_CLOSE, \
- 		.callback_result.status = cb_res, \
-@@ -473,6 +489,8 @@ struct bt_callback_data {
- 	btgatt_srvc_id_t *included;
- 	btgatt_read_params_t *read_params;
- 	btgatt_write_params_t *write_params;
-+	btgatt_notify_params_t *notify_params;
-+	int notification_registered;
- 	int char_prop;
++	schedule_action_verification(step);
++}
++
+ static void gatt_server_register_action(void)
+ {
+ 	struct test_data *data = tester_get_data();
+@@ -1828,6 +1872,38 @@ static struct test_case test_cases[] = {
+ 		ACTION_SUCCESS(bluetooth_disable_action, NULL),
+ 		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_OFF),
+ 	),
++	TEST_CASE_BREDRLE("Gatt Client - Register For Notification - Success",
++		ACTION_SUCCESS(init_pdus, notification_1),
++		ACTION_SUCCESS(bluetooth_enable_action, NULL),
++		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_ON),
++		ACTION_SUCCESS(emu_setup_powered_remote_action, NULL),
++		ACTION_SUCCESS(emu_set_ssp_mode_action, NULL),
++		ACTION_SUCCESS(emu_set_connect_cb_action, gatt_conn_cb),
++		ACTION_SUCCESS(gatt_client_register_action, &app1_uuid),
++		CALLBACK_STATUS(CB_GATTC_REGISTER_CLIENT, BT_STATUS_SUCCESS),
++		ACTION_SUCCESS(gatt_client_start_scan_action,
++							INT_TO_PTR(APP1_ID)),
++		CLLBACK_GATTC_SCAN_RES(prop_emu_remotes_default_set, 1, TRUE),
++		ACTION_SUCCESS(gatt_client_stop_scan_action,
++							INT_TO_PTR(APP1_ID)),
++		ACTION_SUCCESS(gatt_client_connect_action, &app1_conn_req),
++		CALLBACK_GATTC_CONNECT(GATT_STATUS_SUCCESS,
++						prop_emu_remotes_default_set,
++						CONN1_ID, APP1_ID),
++		ACTION_SUCCESS(gatt_client_search_services, &search_services_1),
++		CALLBACK_GATTC_SEARCH_COMPLETE(GATT_STATUS_SUCCESS, CONN1_ID),
++		ACTION_SUCCESS(gatt_client_get_characteristic_action,
++							&get_char_data_1),
++		CALLBACK_GATTC_GET_CHARACTERISTIC_CB(GATT_STATUS_SUCCESS,
++				CONN1_ID, &service_1, &characteristic_1, 4),
++		ACTION_SUCCESS(gatt_client_register_for_notification_action,
++								&notif_data_1),
++		CALLBACK_GATTC_REGISTER_FOR_NOTIF(GATT_STATUS_SUCCESS, CONN1_ID,
++							&characteristic_1,
++							&service_1, 1),
++		ACTION_SUCCESS(bluetooth_disable_action, NULL),
++		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_OFF),
++	),
  
- 	btpan_control_state_t ctrl_state;
+ 	TEST_CASE_BREDRLE("Gatt Server - Register",
+ 		ACTION_SUCCESS(gatt_server_register_action, &app1_uuid),
 -- 
 1.9.3
 
