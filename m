@@ -1,54 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
-From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
-Subject: [PATCH] android/gatt: Fix adding duplicate connection for server apps
-Date: Fri,  3 Oct 2014 12:42:09 +0200
-Message-Id: <1412332929-14595-1-git-send-email-jakub.tyszkowski@tieto.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Fri, 3 Oct 2014 13:20:23 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: Alfonso Acosta <fons@spotify.com>, linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth: Include ADV_IND report in Device Connected
+ event
+Message-ID: <20141003102023.GA8095@t440s.lan>
+References: <1412325293-6651-1-git-send-email-fons@spotify.com>
+ <7F79038B-2FA8-4DF5-B25A-D7E9AAE922A8@holtmann.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <7F79038B-2FA8-4DF5-B25A-D7E9AAE922A8@holtmann.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This replaces the usage of unsafe function for adding app connections
-with the one that is almost the same but first it checks if no
-duplicate entry is added to the list.
+Hi,
 
-This fixes connection callback being sent twice for server app when it
-initiates the connection, and removes duplicated code.
----
- android/gatt.c | 13 +------------
- 1 file changed, 1 insertion(+), 12 deletions(-)
+On Fri, Oct 03, 2014, Marcel Holtmann wrote:
+> > void mgmt_device_connected(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
+> > 			   u8 addr_type, u32 flags, u8 *name, u8 name_len,
+> > -			   u8 *dev_class);
+> > +			   u8 *dev_class, u8 *adv, u8 adv_len);
+> 
+> I keep wondering if we might just handover hci_conn instead. Something
+> Johan needs to comment on here.
 
-diff --git a/android/gatt.c b/android/gatt.c
-index b4a2554..dbe067f 100644
---- a/android/gatt.c
-+++ b/android/gatt.c
-@@ -6193,17 +6193,6 @@ done:
- 									NULL);
- }
- 
--static void create_listen_connections(void *data, void *user_data)
--{
--	struct gatt_device *dev = user_data;
--	int32_t id = PTR_TO_INT(data);
--	struct gatt_app *app;
--
--	app = find_app_by_id(id);
--	if (app)
--		create_connection(dev, app);
--}
--
- static void connect_confirm(GIOChannel *io, void *user_data)
- {
- 	struct gatt_device *dev;
-@@ -6252,7 +6241,7 @@ static void connect_confirm(GIOChannel *io, void *user_data)
- 		goto drop;
- 	}
- 
--	queue_foreach(listen_apps, create_listen_connections, dev);
-+	queue_foreach(listen_apps, create_app_connection, dev);
- 	device_set_state(dev, DEVICE_CONNECT_READY);
- 
- 	return;
--- 
-1.9.1
+That's something I was actually thinking of myself. I have no objections
+to simplifying the parameter list by passing the whole hci_conn to this
+function (this should however be done as a separate patch before this
+one).
 
+Johan
