@@ -1,45 +1,38 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 00/19] Add PDU structs
-Date: Fri,  3 Oct 2014 15:32:40 +0300
-Message-Id: <1412339579-8292-1-git-send-email-luiz.dentz@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+MIME-Version: 1.0
+In-Reply-To: <14AD7057-EAF4-4A7A-A184-B6F3ED487EBE@holtmann.org>
+References: <1412338226-7351-1-git-send-email-fons@spotify.com>
+ <1412338226-7351-3-git-send-email-fons@spotify.com> <14AD7057-EAF4-4A7A-A184-B6F3ED487EBE@holtmann.org>
+From: Alfonso Acosta <fons@spotify.com>
+Date: Fri, 3 Oct 2014 14:27:07 +0200
+Message-ID: <CAHF=Y4o1yjM35ck0V22LgXO1fR6OtjP86HbBLuUtgvEsDaQZuA@mail.gmail.com>
+Subject: Re: [PATCH v2 2/2] Bluetooth: Include ADV_IND report in Device
+ Connected event
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Marcel,
 
-This adds structs for each PDU which should make it more clear which
-size are expected, what fields does the PDU contains, etc and also make
-pointer arithmetic simpler.
+>> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+>> index f1407fe..1d8d734 100644
+>> --- a/include/net/bluetooth/hci_core.h
+>> +++ b/include/net/bluetooth/hci_core.h
+>> @@ -398,6 +398,8 @@ struct hci_conn {
+>>       __u16           le_conn_interval;
+>>       __u16           le_conn_latency;
+>>       __u16           le_supv_timeout;
+>> +     __u8            le_adv_data[HCI_MAX_AD_LENGTH];
+>> +     __u8            le_adv_len;
+>
+> le_adv_data_len here to make it consistent with the places we use this variables.
 
-Luiz Augusto von Dentz (19):
-  android/avrcp-lib: Add GetCapabilities structs
-  android/avrcp-lib: Add ListPlayerAttributes structs
-  android/avrcp-lib: Add ListPlayerValues structs
-  android/avrcp-lib: Add GetCurrentPlayerValue structs
-  android/avrcp-lib: Add SetPlayerApplicationSettingValue structs
-  android/avrcp-lib: Add GetPlayerAttributeText structs
-  android/avrcp-lib: Add GetPlayerValueText structs
-  android/avrcp-lib: Add GetElementAttributes structs
-  android/avrcp-lib: Add GetPlayStatus structs
-  android/avrcp-lib: Add RegisterNotification structs
-  android/avrcp-lib: Add SetAbsoluteVolume structs
-  android/avrcp-lib: Add SetAddressedPlayer structs
-  android/avrcp-lib: Add SetBrowsed structs
-  android/avrcp-lib: Add GetFolderItems structs
-  android/avrcp-lib: Add ChangePath structs
-  android/avrcp-lib: Add GetItemAttributes structs
-  android/avrcp-lib: Add PlayItem structs
-  android/avrcp-lib: Add Search structs
-  android/avrcp-lib: Add AddToNowPlaying structs
-
- android/avrcp-lib.c | 1021 ++++++++++++++++++++++++++++++++++-----------------
- android/avrcp-lib.h |    6 +-
- android/avrcp.c     |   20 +-
- unit/test-avrcp.c   |   33 +-
- 4 files changed, 710 insertions(+), 370 deletions(-)
+Done in v3.
 
 -- 
-1.9.3
+Alfonso Acosta
 
+Embedded Systems Engineer at Spotify
+Birger Jarlsgatan 61, Stockholm, Sweden
+http://www.spotify.com
