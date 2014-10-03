@@ -1,51 +1,54 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-From: Alfonso Acosta <fons@spotify.com>
-Date: Fri, 3 Oct 2014 09:14:51 +0200
-Message-ID: <CAHF=Y4pBMLaF1osqQNk1fkw1UHGk6SMYhQ=u5zYZ6qswoFKWBA@mail.gmail.com>
-Subject: Connecting to propietary remote GATT service: plugins vs D-Bus GATT API
-To: linux-bluetooth@vger.kernel.org
-Cc: Mattias Jansson <mjansson@spotify.com>
+In-Reply-To: <CAHrH25RR_Cc3yPuMrU8mEiH64mu485AdJsiGSZdFMP_xR_+vNg@mail.gmail.com>
+References: <1412238337-23289-1-git-send-email-marcin.kraglak@tieto.com>
+	<1412238337-23289-3-git-send-email-marcin.kraglak@tieto.com>
+	<CAHrH25RR_Cc3yPuMrU8mEiH64mu485AdJsiGSZdFMP_xR_+vNg@mail.gmail.com>
+Date: Fri, 3 Oct 2014 08:35:36 +0200
+Message-ID: <CABD6X-+sbmNDnWmhYcQH6bwj6m9AmYuTgO-DnmEC_36VFeS+3Q@mail.gmail.com>
+Subject: Re: [PATCH 3/4] shared/gatt: Add included service iterator
+From: Marcin Kraglak <marcin.kraglak@tieto.com>
+To: Arman Uguray <armansito@chromium.org>,
+	"linux-bluetooth@vger.kernel.org development"
+	<linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Arman,
 
-I need to connect to a non-standard remote GATT service. We don't plan
-to submit the resulting client code for the time being (it would be of
-little interest for the general public), for which it would be good to
-keep it as decoupled as possible from bluetoothd.
+On 3 October 2014 05:35, Arman Uguray <armansito@chromium.org> wrote:
+> Hi Marcin,
+>
+>
+>> +bool bt_gatt_iter_next_included_service(struct bt_gatt_iter *iter,
+>> +                               uint16_t *handle, uint16_t *start_handle,
+>> +                               uint16_t *end_handle, uint8_t uuid[16])
+>> +{
+>> +       struct bt_gatt_result *read_result;
+>> +       const void *pdu_ptr;
+>> +       int i = 0;
+>> +
+>> +       if (!iter || !iter->result || !handle || !start_handle || !end_handle
+>> +                                                               || !uuid)
+>> +               return false;
+>> +
+>> +       if (iter->result->opcode != BT_ATT_OP_READ_BY_TYPE_RSP)
+>> +               return false;
+>
+> Remember that characteristics are also obtained via a Read By Type
+> request. I think we should make it so that
+> bt_gatt_iter_next_included_service and
+> bt_gatt_iter_next_characteristic return false if called on the
+> incorrect PDU. So it might make sense to add a flag to bt_gatt_result
+> such as "is_include" and check against that in both functions.
+>
 
-As I see it, I have two options:
+I think we can use data_length instead of flag. For characteristics
+data_len is 7 or 21, for included it is 6 or 8.
+Is it ok?
+> Thanks,
+> Arman
 
-1) Create a BlueZ plugin. bluetoothd supports external plugins through
-shared objects but that's not enough to decouple them from bluetoothd:
-
- * Is bluetoothd's API supposed to be respected across versions?
- * Even if the answer is true, which I doubt, without a decoupled set
-of header files which the plugin can use, I don't see a way to build
-it outside of BlueZ's tree.
-
-2) Use the experimental D-Bus GATT API.
-
-Even if the API is likely to change, it would allow to build and
-implement the client in a separate process.
-
-Its documentation (doc/gatt-api.txt) made me assume that the API would
-be automatically exposed for all services in remote devices since we
-discover them when pairing or connecting to a device for the first
-time. However, that doesn't seem to be the case. Is there a reason not
-to do it?
-
-Comments? Thoughts?
-
-Thanks,
-
-Fons
--- 
-Alfonso Acosta
-
-Embedded Systems Engineer at Spotify
-Birger Jarlsgatan 61, Stockholm, Sweden
-http://www.spotify.com
+BR
+Marcin
