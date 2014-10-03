@@ -1,53 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <CABD6X-+sbmNDnWmhYcQH6bwj6m9AmYuTgO-DnmEC_36VFeS+3Q@mail.gmail.com>
-References: <1412238337-23289-1-git-send-email-marcin.kraglak@tieto.com>
-	<1412238337-23289-3-git-send-email-marcin.kraglak@tieto.com>
-	<CAHrH25RR_Cc3yPuMrU8mEiH64mu485AdJsiGSZdFMP_xR_+vNg@mail.gmail.com>
-	<CABD6X-+sbmNDnWmhYcQH6bwj6m9AmYuTgO-DnmEC_36VFeS+3Q@mail.gmail.com>
-Date: Fri, 3 Oct 2014 08:37:58 -0700
-Message-ID: <CAHrH25TshWdxPOxXgBioz2vxN9NZqQj-0eHgg92Qz1QwK_ExsQ@mail.gmail.com>
-Subject: Re: [PATCH 3/4] shared/gatt: Add included service iterator
+Sender: armansito@google.com
+In-Reply-To: <CAHF=Y4oGjUc=j4DE_pyC5Ue5ymsaoaGXJRzYHdWTHa2EF1k9Gg@mail.gmail.com>
+References: <CAHF=Y4pBMLaF1osqQNk1fkw1UHGk6SMYhQ=u5zYZ6qswoFKWBA@mail.gmail.com>
+	<F54B539B-3C7A-48C6-B608-417FBCB5050F@holtmann.org>
+	<CAHF=Y4oGjUc=j4DE_pyC5Ue5ymsaoaGXJRzYHdWTHa2EF1k9Gg@mail.gmail.com>
+Date: Fri, 3 Oct 2014 08:35:09 -0700
+Message-ID: <CAHrH25Qw2s0T_MCJndAbv63Eixc7zcJ-KTZG8Y1aKZTy+J8gMw@mail.gmail.com>
+Subject: Re: Connecting to propietary remote GATT service: plugins vs D-Bus
+ GATT API
 From: Arman Uguray <armansito@chromium.org>
-To: Marcin Kraglak <marcin.kraglak@tieto.com>
-Cc: "linux-bluetooth@vger.kernel.org development"
-	<linux-bluetooth@vger.kernel.org>
+To: Alfonso Acosta <fons@spotify.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+	BlueZ development <linux-bluetooth@vger.kernel.org>, Mattias Jansson <mjansson@spotify.com>
 Content-Type: text/plain; charset=UTF-8
-Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcin,
+Hi Marcel & Alfonso,
 
->>> +bool bt_gatt_iter_next_included_service(struct bt_gatt_iter *iter,
->>> +                               uint16_t *handle, uint16_t *start_handle,
->>> +                               uint16_t *end_handle, uint8_t uuid[16])
->>> +{
->>> +       struct bt_gatt_result *read_result;
->>> +       const void *pdu_ptr;
->>> +       int i = 0;
->>> +
->>> +       if (!iter || !iter->result || !handle || !start_handle || !end_handle
->>> +                                                               || !uuid)
->>> +               return false;
->>> +
->>> +       if (iter->result->opcode != BT_ATT_OP_READ_BY_TYPE_RSP)
->>> +               return false;
->>
->> Remember that characteristics are also obtained via a Read By Type
->> request. I think we should make it so that
->> bt_gatt_iter_next_included_service and
->> bt_gatt_iter_next_characteristic return false if called on the
->> incorrect PDU. So it might make sense to add a flag to bt_gatt_result
->> such as "is_include" and check against that in both functions.
->>
->
-> I think we can use data_length instead of flag. For characteristics
-> data_len is 7 or 21, for included it is 6 or 8.
-> Is it ok?
+> I did start it with -E . In fact "gdbus introspect -r --system -o /
+> -d org.bluez" shows the GattManager1 interface, but no
+> dev_XX_XX_XX_XX_XX_XX/serviceXX(/charYYYY) object exposing
+> GattService1 or GattCharacteristic1, not even while connecting to
+> a bonded BLE device with GATT services.
 
-Yeah, that would work too (probably might be better actually, since
-it's consistent with the ATT protocol PDU approach in those
-iterators). So yeah, let's go with your suggestion.
+The experimental D-Bus API is not implemented, so yeah you won't see
+any of those objects. It is in the timeline to get that support built
+in the upcoming months but currently everyone who's using that API
+went and wrote their forked implementation of it. Some of the GATT
+server side support is there, so building and running with -E should
+expose a GattManager1, though I don't think that's fully implemented
+either.
+
+For client the quickest way for you might be to actually write a
+plugin (using the GAttrib code). I would just look at some of the
+profile code, like input/hog or heartrate and maybe add your
+implementation as a profile and expose a simple D-Bus API for it if
+necessary. Since you're not going to submit this upstream, this might
+be the quickest approach for the short term.
 
 Cheers,
 Arman
