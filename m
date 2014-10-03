@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 11/19] android/avrcp-lib: Add SetAbsoluteVolume structs
-Date: Fri,  3 Oct 2014 15:32:51 +0300
-Message-Id: <1412339579-8292-12-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 09/19] android/avrcp-lib: Add GetPlayStatus structs
+Date: Fri,  3 Oct 2014 15:32:49 +0300
+Message-Id: <1412339579-8292-10-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1412339579-8292-1-git-send-email-luiz.dentz@gmail.com>
 References: <1412339579-8292-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,72 +12,76 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
 ---
- android/avrcp-lib.c | 20 +++++++++++++++++---
- 1 file changed, 17 insertions(+), 3 deletions(-)
+ android/avrcp-lib.c | 29 +++++++++++++++++++----------
+ 1 file changed, 19 insertions(+), 10 deletions(-)
 
 diff --git a/android/avrcp-lib.c b/android/avrcp-lib.c
-index 72cb087..4a4b1d8 100644
+index 3a7a81f..371294a 100644
 --- a/android/avrcp-lib.c
 +++ b/android/avrcp-lib.c
-@@ -189,6 +189,14 @@ struct register_notification_rsp {
- 	uint8_t data[0];
+@@ -173,6 +173,12 @@ struct get_element_attributes_rsp {
+ 	struct media_item items[0];
  } __attribute__ ((packed));
  
-+struct set_volume_req {
-+	uint8_t value;
-+} __attribute__ ((packed));
-+
-+struct set_volume_rsp {
-+	uint8_t value;
++struct get_play_status_rsp {
++	uint32_t duration;
++	uint32_t position;
++	uint8_t status;
 +} __attribute__ ((packed));
 +
  struct avrcp_control_handler {
  	uint8_t id;
  	uint8_t code;
-@@ -893,6 +901,7 @@ static ssize_t set_volume(struct avrcp *session, uint8_t transaction,
- 					void *user_data)
- {
- 	struct avrcp_player *player = user_data;
-+	struct set_volume_req *req;
- 	uint8_t volume;
- 
- 	DBG("");
-@@ -903,7 +912,9 @@ static ssize_t set_volume(struct avrcp *session, uint8_t transaction,
- 	if (!params || params_len != sizeof(volume))
- 		return -EINVAL;
- 
--	volume = params[0] & 0x7f;
-+	req = (void *) params;
-+
-+	volume = req->value & 0x7f;
- 
- 	return player->ind->set_volume(session, transaction, volume,
- 							player->user_data);
-@@ -2199,6 +2210,7 @@ static gboolean set_volume_rsp(struct avctp *conn,
+@@ -2122,6 +2128,7 @@ static gboolean get_play_status_rsp(struct avctp *conn,
  	struct avrcp *session = user_data;
  	struct avrcp_player *player = session->player;
  	struct avrcp_header *pdu;
-+	struct set_volume_rsp *rsp;
- 	uint8_t value = 0;
- 	int err;
- 
-@@ -2218,12 +2230,14 @@ static gboolean set_volume_rsp(struct avctp *conn,
++	struct get_play_status_rsp *rsp;
+ 	uint8_t status = 0;
+ 	uint32_t position = 0;
+ 	uint32_t duration = 0;
+@@ -2143,14 +2150,16 @@ static gboolean get_play_status_rsp(struct avctp *conn,
  		goto done;
  	}
  
--	if (pdu->params_len < 1) {
-+	if (pdu->params_len < sizeof(*rsp)) {
+-	if (pdu->params_len < 5) {
++	if (pdu->params_len != sizeof(*rsp)) {
  		err = -EPROTO;
  		goto done;
  	}
  
--	value = pdu->params[0] & 0x7f;
+-	duration = get_be32(&pdu->params[0]);
+-	position = get_be32(&pdu->params[4]);
+-	status = pdu->params[8];
 +	rsp = (void *) pdu->params;
 +
-+	value = rsp->value & 0x7f;
++	duration = get_be32(&rsp->duration);
++	position = get_be32(&rsp->position);
++	status = rsp->status;
  	err = 0;
  
  done:
+@@ -2947,14 +2956,14 @@ int avrcp_get_play_status_rsp(struct avrcp *session, uint8_t transaction,
+ 				uint8_t status)
+ {
+ 	struct iovec iov;
+-	uint8_t pdu[9];
++	struct get_play_status_rsp rsp;
+ 
+-	put_be32(duration, &pdu[0]);
+-	put_be32(position, &pdu[4]);
+-	pdu[8] = status;
++	put_be32(duration, &rsp.duration);
++	put_be32(position, &rsp.position);
++	rsp.status = status;
+ 
+-	iov.iov_base = &pdu;
+-	iov.iov_len = sizeof(pdu);
++	iov.iov_base = &rsp;
++	iov.iov_len = sizeof(rsp);
+ 
+ 	return avrcp_send(session, transaction, AVC_CTYPE_STABLE,
+ 				AVC_SUBUNIT_PANEL, AVRCP_GET_PLAY_STATUS,
 -- 
 1.9.3
 
