@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 07/19] android/avrcp-lib: Add GetPlayerValueText structs
-Date: Fri,  3 Oct 2014 15:32:47 +0300
-Message-Id: <1412339579-8292-8-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 05/19] android/avrcp-lib: Add SetPlayerApplicationSettingValue structs
+Date: Fri,  3 Oct 2014 15:32:45 +0300
+Message-Id: <1412339579-8292-6-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1412339579-8292-1-git-send-email-luiz.dentz@gmail.com>
 References: <1412339579-8292-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,111 +12,133 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
 ---
- android/avrcp-lib.c | 48 ++++++++++++++++++++++++++++++++----------------
- 1 file changed, 32 insertions(+), 16 deletions(-)
+ android/avrcp-lib.c | 49 +++++++++++++++++++++++++++++++------------------
+ android/avrcp-lib.h |  2 +-
+ unit/test-avrcp.c   |  3 ++-
+ 3 files changed, 34 insertions(+), 20 deletions(-)
 
 diff --git a/android/avrcp-lib.c b/android/avrcp-lib.c
-index f2cd137..2ceb2b1 100644
+index 15d3d75..2b22c44 100644
 --- a/android/avrcp-lib.c
 +++ b/android/avrcp-lib.c
-@@ -144,6 +144,17 @@ struct get_attribute_text_rsp {
- 	struct text_value values[0];
+@@ -122,6 +122,11 @@ struct value_rsp {
+ 	struct attr_value values[0];
  } __attribute__ ((packed));
  
-+struct get_value_text_req {
-+	uint8_t attr;
++struct set_value_req {
 +	uint8_t number;
-+	uint8_t values[0];
-+} __attribute__ ((packed));
-+
-+struct get_value_text_rsp {
-+	uint8_t number;
-+	struct text_value values[0];
++	struct attr_value values[0];
 +} __attribute__ ((packed));
 +
  struct avrcp_control_handler {
  	uint8_t id;
  	uint8_t code;
-@@ -669,21 +680,26 @@ static ssize_t get_value_text(struct avrcp *session, uint8_t transaction,
+@@ -693,26 +698,33 @@ static ssize_t set_value(struct avrcp *session, uint8_t transaction,
  					void *user_data)
  {
  	struct avrcp_player *player = user_data;
-+	struct get_value_text_req *req;
++	struct set_value_req *req;
++	uint8_t attrs[AVRCP_ATTRIBUTE_LAST];
++	uint8_t values[AVRCP_ATTRIBUTE_LAST];
+ 	int i;
  
  	DBG("");
  
--	if (params_len != 2 + params[1])
-+	if (!player->ind || !player->ind->get_value_text)
+-	if (!params || params_len != params[0] * 2 + 1)
++	if (!player->ind || !player->ind->set_value)
 +		return -ENOSYS;
 +
 +	if (!params || params_len < sizeof(*req))
- 		return -EINVAL;
- 
--	if (params[0] > AVRCP_ATTRIBUTE_LAST ||
--					params[0] == AVRCP_ATTRIBUTE_ILEGAL)
-+	req = (void *) params;
-+	if (params_len != sizeof(*req) + req->number)
- 		return -EINVAL;
- 
--	if (!check_value(params[0], params[1], &params[2]))
-+	if (req->number > AVRCP_ATTRIBUTE_LAST ||
-+					req->number == AVRCP_ATTRIBUTE_ILEGAL)
- 		return -EINVAL;
- 
--	if (!player->ind || !player->ind->get_value_text)
--		return -ENOSYS;
-+	if (!check_value(req->attr, req->number, req->values))
 +		return -EINVAL;
- 
- 	return player->ind->get_value_text(session, transaction, params[0],
- 						params[1], &params[2],
-@@ -1900,16 +1916,16 @@ int avrcp_get_player_value_text(struct avrcp *session, uint8_t attr,
- 					uint8_t number, uint8_t *values)
- {
- 	struct iovec iov[2];
--	uint8_t pdu[2];
-+	struct get_value_text_req req;
- 
- 	if (!number)
++
++	req = (void *) params;
++	if (params_len < sizeof(*req) + req->number * sizeof(*req->values))
  		return -EINVAL;
  
--	pdu[0] = attr;
--	pdu[1] = number;
-+	req.attr = attr;
-+	req.number = number;
+-	for (i = 0; i < params[0]; i++) {
+-		uint8_t attr = params[i * 2 + 1];
+-		uint8_t val = params[i * 2 + 2];
++	for (i = 0; i < req->number; i++) {
++		attrs[i] = req->values[i].attr;
++		values[i] = req->values[i].value;
  
--	iov[0].iov_base = pdu;
--	iov[0].iov_len = sizeof(pdu);
-+	iov[0].iov_base = &req;
-+	iov[0].iov_len = sizeof(req);
+-		if (!check_value(attr, 1, &val))
++		if (!check_value(attrs[i], 1, &values[i]))
+ 			return -EINVAL;
+ 	}
  
- 	iov[1].iov_base = values;
- 	iov[1].iov_len = number;
-@@ -2921,7 +2937,7 @@ int avrcp_get_player_values_text_rsp(struct avrcp *session,
- 					uint8_t *values, const char **text)
+-	if (!player->ind || !player->ind->set_value)
+-		return -ENOSYS;
+-
+-	return player->ind->set_value(session, transaction, params[0],
+-					&params[1], player->user_data);
++	return player->ind->set_value(session, transaction, req->number,
++					attrs, values, player->user_data);
+ }
+ 
+ static ssize_t get_play_status(struct avrcp *session, uint8_t transaction,
+@@ -2009,25 +2021,26 @@ done:
+ int avrcp_set_player_value(struct avrcp *session, uint8_t number,
+ 					uint8_t *attrs, uint8_t *values)
  {
- 	struct iovec iov[1 + AVRCP_ATTRIBUTE_LAST * 2];
--	uint8_t val[AVRCP_ATTRIBUTE_LAST][4];
-+	struct text_value val[AVRCP_ATTRIBUTE_LAST];
+-	struct iovec iov;
+-	uint8_t pdu[2 * AVRCP_ATTRIBUTE_LAST + 1];
++	struct iovec iov[2];
++	struct attr_value val[AVRCP_ATTRIBUTE_LAST];
  	int i;
  
  	if (number > AVRCP_ATTRIBUTE_LAST)
-@@ -2936,11 +2952,11 @@ int avrcp_get_player_values_text_rsp(struct avrcp *session,
- 		if (text[i])
- 			len = strlen(text[i]);
+ 		return -EINVAL;
  
--		val[i][0] = values[i];
--		put_be16(AVRCP_CHARSET_UTF8, &val[i][1]);
--		val[i][3] = len;
-+		val[i].attr = values[i];
-+		put_be16(AVRCP_CHARSET_UTF8, &val[i].charset);
-+		val[i].len = len;
+-	pdu[0] = number;
++	iov[0].iov_base = &number;
++	iov[0].iov_len = sizeof(number);
  
--		iov[i + 1].iov_base = val[i];
-+		iov[i + 1].iov_base = &val[i];
- 		iov[i + 1].iov_len = sizeof(val[i]);
+ 	for (i = 0; i < number; i++) {
+-		pdu[i * 2 + 1] = attrs[i];
+-		pdu[i * 2 + 2] = values[i];
++		val[i].attr = attrs[i];
++		val[i].value = values[i];
+ 	}
  
- 		iov[i + 2].iov_base = (void *) text[i];
+-	iov.iov_base = pdu;
+-	iov.iov_len = 1 + number * 2;
++	iov[1].iov_base = val;
++	iov[1].iov_len = sizeof(*val) * number;
+ 
+ 	return avrcp_send_req(session, AVC_CTYPE_CONTROL, AVC_SUBUNIT_PANEL,
+-					AVRCP_SET_PLAYER_VALUE, &iov, 1,
++					AVRCP_SET_PLAYER_VALUE, iov, 2,
+ 					set_value_rsp, session);
+ }
+ 
+diff --git a/android/avrcp-lib.h b/android/avrcp-lib.h
+index ee03958..5af5064 100644
+--- a/android/avrcp-lib.h
++++ b/android/avrcp-lib.h
+@@ -147,7 +147,7 @@ struct avrcp_control_ind {
+ 					void *user_data);
+ 	int (*set_value) (struct avrcp *session, uint8_t transaction,
+ 					uint8_t number, uint8_t *attrs,
+-					void *user_data);
++					uint8_t *values, void *user_data);
+ 	int (*get_play_status) (struct avrcp *session, uint8_t transaction,
+ 					void *user_data);
+ 	int (*get_element_attributes) (struct avrcp *session,
+diff --git a/unit/test-avrcp.c b/unit/test-avrcp.c
+index e8cf34a..53a54df 100644
+--- a/unit/test-avrcp.c
++++ b/unit/test-avrcp.c
+@@ -472,7 +472,8 @@ static int get_value(struct avrcp *session, uint8_t transaction,
+ }
+ 
+ static int set_value(struct avrcp *session, uint8_t transaction,
+-			uint8_t number, uint8_t *attrs, void *user_data)
++			uint8_t number, uint8_t *attrs, uint8_t *values,
++			void *user_data)
+ {
+ 	DBG("");
+ 
 -- 
 1.9.3
 
