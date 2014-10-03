@@ -1,103 +1,64 @@
 Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
-To: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
+To: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/6] android/hal-ipc-api: Add MCE HAL
-Date: Fri, 03 Oct 2014 13:17:49 +0200
-Message-ID: <10702950.eQvIYeUa7I@uw000953>
-In-Reply-To: <1411383708-28621-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
-References: <1411383708-28621-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+Subject: Re: [PATCH] android/gatt: Fix adding duplicate connection for server apps
+Date: Fri, 03 Oct 2014 12:49:54 +0200
+Message-ID: <2614039.CqHTy7gBEc@uw000953>
+In-Reply-To: <1412332929-14595-1-git-send-email-jakub.tyszkowski@tieto.com>
+References: <1412332929-14595-1-git-send-email-jakub.tyszkowski@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Grzegorz,
+Hi Jakub,
 
-On Monday 22 of September 2014 13:01:43 Grzegorz Kolodziejczyk wrote:
-> ---
->  android/hal-ipc-api.txt | 51 +++++++++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 51 insertions(+)
+On Friday 03 of October 2014 12:42:09 Jakub Tyszkowski wrote:
+> This replaces the usage of unsafe function for adding app connections
+> with the one that is almost the same but first it checks if no
+> duplicate entry is added to the list.
 > 
-> diff --git a/android/hal-ipc-api.txt b/android/hal-ipc-api.txt
-> index f6e1680..38f75e6 100644
-> --- a/android/hal-ipc-api.txt
-> +++ b/android/hal-ipc-api.txt
-> @@ -2396,3 +2396,54 @@ Notifications:
->  	Opcode 0x95 - Ring Indication notification
+> This fixes connection callback being sent twice for server app when it
+> initiates the connection, and removes duplicated code.
+> ---
+>  android/gatt.c | 13 +------------
+>  1 file changed, 1 insertion(+), 12 deletions(-)
+> 
+> diff --git a/android/gatt.c b/android/gatt.c
+> index b4a2554..dbe067f 100644
+> --- a/android/gatt.c
+> +++ b/android/gatt.c
+> @@ -6193,17 +6193,6 @@ done:
+>  									NULL);
+>  }
 >  
->  		Notification parameters: <none>
-> +
-> +
-> +Bluetooth MCE HAL (ID 11)
-> +=========================
+> -static void create_listen_connections(void *data, void *user_data)
+> -{
+> -	struct gatt_device *dev = user_data;
+> -	int32_t id = PTR_TO_INT(data);
+> -	struct gatt_app *app;
+> -
+> -	app = find_app_by_id(id);
+> -	if (app)
+> -		create_connection(dev, app);
+> -}
+> -
+>  static void connect_confirm(GIOChannel *io, void *user_data)
+>  {
+>  	struct gatt_device *dev;
+> @@ -6252,7 +6241,7 @@ static void connect_confirm(GIOChannel *io, void *user_data)
+>  		goto drop;
+>  	}
+>  
+> -	queue_foreach(listen_apps, create_listen_connections, dev);
+> +	queue_foreach(listen_apps, create_app_connection, dev);
+>  	device_set_state(dev, DEVICE_CONNECT_READY);
+>  
+>  	return;
+> 
 
-I'd prefer if we stick to term 'map client' instead of MCE.
-
-> +
-> +Android HAL name: "map_client" (BT_PROFILE_MAP_CLIENT_ID)
-> +
-> +Structures:
-
-Since this is used only in one place I'd defined it there (see below).
-
-> +
-> +	MAS instance: Instance ID (1 octet)
-> +	              Channel (1 octet)
-> +	              Message type (1 octet)
-
-This should be named 'Message types'.
-
-> +	              Name (string)
-> +
-> +	Valid Message type: 0x01 = EMAIL
-> +	                    0x02 = SMS_GSM
-> +	                    0x04 = SMS_CDMA
-> +	                    0x08 = MMS
-
-I think we should not define that in IPC since this is not defined in HAL.
-Especially that this should be bitmask, not values. Just pass whatever we
-get from remote SDP.
-
-> +
-> +Commands and responses:
-> +
-> +	Opcode 0x00 - Error response
-> +
-> +		Response parameters: Status (1 octet)
-> +
-> +		Valid status values: 0x01 = Fail
-> +		                     0x02 = Not ready
-> +		                     0x03 = No memory
-> +		                     0x04 = Busy
-> +		                     0x05 = Done (already completed)
-> +		                     0x06 = Unsupported
-> +		                     0x07 = Parameter invalid
-> +		                     0x08 = Unhandled
-> +		                     0x09 = Authentication failure
-> +		                     0x0a = Remote device down
-> +
-> +	Opcode 0x01 - Get Remote MAS Instances
-> +
-> +		Command parameters: Remote address (6 octets)
-> +		Response parameters: <none>
-> +
-> +		In case of an error, the error response will be returned.
-> +
-> +Notifications:
-> +
-> +	Opcode 0x81 - Remote MAS Instances notification
-> +
-> +		Notification parameters: Status (1 octet)
-> +		                         Remote address (6 octets)
-> +		                         Number of instances (1 octet)
-> +		                         MAS instance (variable)
-
-Number of instances (1 octet)
-Instance ID #(1 octet)
-Channel #(1 octet)
-Message type #(1 octet)
-Name # (string)
+Applied, thanks.
 
 -- 
 Best regards, 
