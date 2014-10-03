@@ -1,50 +1,53 @@
 Return-Path: <cyrus@holtmann.org>
+MIME-Version: 1.0
+In-Reply-To: <CABD6X-+sbmNDnWmhYcQH6bwj6m9AmYuTgO-DnmEC_36VFeS+3Q@mail.gmail.com>
+References: <1412238337-23289-1-git-send-email-marcin.kraglak@tieto.com>
+	<1412238337-23289-3-git-send-email-marcin.kraglak@tieto.com>
+	<CAHrH25RR_Cc3yPuMrU8mEiH64mu485AdJsiGSZdFMP_xR_+vNg@mail.gmail.com>
+	<CABD6X-+sbmNDnWmhYcQH6bwj6m9AmYuTgO-DnmEC_36VFeS+3Q@mail.gmail.com>
+Date: Fri, 3 Oct 2014 08:37:58 -0700
+Message-ID: <CAHrH25TshWdxPOxXgBioz2vxN9NZqQj-0eHgg92Qz1QwK_ExsQ@mail.gmail.com>
+Subject: Re: [PATCH 3/4] shared/gatt: Add included service iterator
 From: Arman Uguray <armansito@chromium.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Arman Uguray <armansito@chromium.org>
-Subject: [PATCH BlueZ 0/3] Introduce shared/gatt-server.
-Date: Fri,  3 Oct 2014 15:39:08 -0700
-Message-Id: <1412375951-13940-1-git-send-email-armansito@chromium.org>
+To: Marcin Kraglak <marcin.kraglak@tieto.com>
+Cc: "linux-bluetooth@vger.kernel.org development"
+	<linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch set introduces shared/gatt-client and implements the server side of
-ATT Exchange MTU request. I made the decision to keep gatt-db internal to
-gatt-server due to the following reasons:
+Hi Marcin,
 
-  1. I want to keep all ATT protocol details to remain internal to gatt-server
-  and gatt-client. gatt-db creates a layering problem for attributes that get
-  added with a high-level read/write handler. In this case, gatt-db leaves the
-  responsibility of obtaining the attribute value and forming the ATT protocol
-  response to the layer that registered the read handler. We want the actual PDU
-  construction to be done by gatt-server, hence gatt-server needs to inject its
-  own read/write handlers and provide a level of indirection to the upper-layer
-  to obtain the value.
+>>> +bool bt_gatt_iter_next_included_service(struct bt_gatt_iter *iter,
+>>> +                               uint16_t *handle, uint16_t *start_handle,
+>>> +                               uint16_t *end_handle, uint8_t uuid[16])
+>>> +{
+>>> +       struct bt_gatt_result *read_result;
+>>> +       const void *pdu_ptr;
+>>> +       int i = 0;
+>>> +
+>>> +       if (!iter || !iter->result || !handle || !start_handle || !end_handle
+>>> +                                                               || !uuid)
+>>> +               return false;
+>>> +
+>>> +       if (iter->result->opcode != BT_ATT_OP_READ_BY_TYPE_RSP)
+>>> +               return false;
+>>
+>> Remember that characteristics are also obtained via a Read By Type
+>> request. I think we should make it so that
+>> bt_gatt_iter_next_included_service and
+>> bt_gatt_iter_next_characteristic return false if called on the
+>> incorrect PDU. So it might make sense to add a flag to bt_gatt_result
+>> such as "is_include" and check against that in both functions.
+>>
+>
+> I think we can use data_length instead of flag. For characteristics
+> data_len is 7 or 21, for included it is 6 or 8.
+> Is it ok?
 
-  My decision here is to write functions in the bt_gatt_server_* namespace to
-  add/remove attributes into the database.
+Yeah, that would work too (probably might be better actually, since
+it's consistent with the ATT protocol PDU approach in those
+iterators). So yeah, let's go with your suggestion.
 
-  2. This allows gatt-server to correctly send Service Changed indications
-  without having the gatt-db modified behind its back.
-
-  3. gatt-db exposes structures like shared/queue in its public interface which,
-  after some mailing discussions, were decided to remain internal to shared
-  code.
-
-Arman Uguray (3):
-  shared/att: Drop the connection is a request is received while one is
-    pending.
-  shared/gatt-server: Introduce shared/gatt-server.
-  shared/gatt-server: Support Exchange MTU request.
-
- Makefile.am              |   1 +
- src/shared/att.c         | 101 +++++++++++++---------
- src/shared/gatt-server.c | 219 +++++++++++++++++++++++++++++++++++++++++++++++
- src/shared/gatt-server.h |  47 ++++++++++
- 4 files changed, 328 insertions(+), 40 deletions(-)
- create mode 100644 src/shared/gatt-server.c
- create mode 100644 src/shared/gatt-server.h
-
--- 
-2.1.0.rc2.206.gedb03e5
-
+Cheers,
+Arman
