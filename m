@@ -2,161 +2,105 @@ Return-Path: <cyrus@holtmann.org>
 From: Arman Uguray <armansito@chromium.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Arman Uguray <armansito@chromium.org>
-Subject: [PATCH BlueZ 1/3] shared/att: Drop the connection is a request is received while one is pending.
-Date: Fri,  3 Oct 2014 15:39:09 -0700
-Message-Id: <1412375951-13940-2-git-send-email-armansito@chromium.org>
+Subject: [PATCH BlueZ 3/3] shared/gatt-server: Support Exchange MTU request.
+Date: Fri,  3 Oct 2014 15:39:11 -0700
+Message-Id: <1412375951-13940-4-git-send-email-armansito@chromium.org>
 In-Reply-To: <1412375951-13940-1-git-send-email-armansito@chromium.org>
 References: <1412375951-13940-1-git-send-email-armansito@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-With this patch, when bt_att is being used for the server role, it now makes
-sure that a second request drops the connection unless a response for a previous
-request has been sent.
+This patch adds handling for the exchange MTU request.
 ---
- src/shared/att.c | 101 +++++++++++++++++++++++++++++++++----------------------
- 1 file changed, 61 insertions(+), 40 deletions(-)
+ src/shared/gatt-server.c | 66 +++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 65 insertions(+), 1 deletion(-)
 
-diff --git a/src/shared/att.c b/src/shared/att.c
-index de35aef..96f34a3 100644
---- a/src/shared/att.c
-+++ b/src/shared/att.c
-@@ -64,6 +64,8 @@ struct bt_att {
- 	bool in_disconn;
- 	bool need_disconn_cleanup;
+diff --git a/src/shared/gatt-server.c b/src/shared/gatt-server.c
+index 8e32def..050aaba 100644
+--- a/src/shared/gatt-server.c
++++ b/src/shared/gatt-server.c
+@@ -34,16 +34,80 @@
+ #define MAX(a, b) ((a) > (b) ? (a) : (b))
+ #endif
  
-+	bool in_req;			/* There's a pending incoming request */
++#ifndef MIN
++#define MIN(a, b) ((a) < (b) ? (a) : (b))
++#endif
 +
- 	uint8_t *buf;
+ struct bt_gatt_server {
+ 	struct gatt_db *db;
+ 	struct bt_att *att;
+ 	int ref_count;
  	uint16_t mtu;
++
++	unsigned int mtu_id;
++
++	bt_gatt_server_debug_func_t debug_callback;
++	bt_gatt_server_destroy_func_t debug_destroy;
++	void *debug_data;
+ };
  
-@@ -460,6 +462,9 @@ static bool can_write_data(struct io *io, void *user_data)
- 	case ATT_OP_TYPE_IND:
- 		att->pending_ind = op;
- 		break;
-+	case ATT_OP_TYPE_RSP:
-+		/* Set in_req to false to indicate that no request is pending */
-+		att->in_req = false;
- 	default:
- 		destroy_att_send_op(op);
- 		return true;
-@@ -604,6 +609,46 @@ static void handle_notify(struct bt_att *att, uint8_t opcode, uint8_t *pdu,
- 	bt_att_unref(att);
- }
- 
-+static void disconn_handler(void *data, void *user_data)
++static void gatt_server_unregister_handlers(struct bt_gatt_server *server)
 +{
-+	struct att_disconn *disconn = data;
-+
-+	if (disconn->removed)
-+		return;
-+
-+	if (disconn->callback)
-+		disconn->callback(disconn->user_data);
++	bt_att_unregister(server->att, server->mtu_id);
 +}
 +
-+static bool disconnect_cb(struct io *io, void *user_data)
++static void gatt_server_cleanup(struct bt_gatt_server *server)
 +{
-+	struct bt_att *att = user_data;
++	gatt_server_unregister_handlers(server);
++	bt_att_unref(server->att);
++	server->att = NULL;
++}
 +
-+	io_destroy(att->io);
-+	att->io = NULL;
++static void encode_error_rsp(uint8_t opcode, uint16_t handle, uint8_t ecode,
++								uint8_t pdu[4])
++{
++	pdu[0] = opcode;
++	pdu[3] = ecode;
++	put_le16(handle, pdu + 1);
++}
 +
-+	util_debug(att->debug_callback, att->debug_data,
-+						"Physical link disconnected");
++static void exchange_mtu_cb(uint8_t opcode, const void *pdu,
++					uint16_t length, void *user_data)
++{
++	struct bt_gatt_server *server = user_data;
++	uint16_t client_rx_mtu;
++	uint16_t final_mtu;
++	uint8_t rsp_pdu[4];
 +
-+	bt_att_ref(att);
-+	att->in_disconn = true;
-+	queue_foreach(att->disconn_list, disconn_handler, NULL);
-+	att->in_disconn = false;
-+
-+	if (att->need_disconn_cleanup) {
-+		queue_remove_all(att->disconn_list, match_disconn_removed, NULL,
-+							destroy_att_disconn);
-+		att->need_disconn_cleanup = false;
++	if (length != 2) {
++		encode_error_rsp(opcode, 0, BT_ATT_ERROR_INVALID_PDU, rsp_pdu);
++		bt_att_send(server->att, BT_ATT_OP_ERROR_RSP, rsp_pdu,
++					sizeof(rsp_pdu), NULL, NULL, NULL);
++		return;
 +	}
 +
-+	bt_att_cancel_all(att);
-+	bt_att_unregister_all(att);
++	client_rx_mtu = get_le16(pdu);
++	final_mtu = MAX(MIN(client_rx_mtu, server->mtu), BT_ATT_DEFAULT_LE_MTU);
 +
-+	bt_att_unref(att);
++	/* Respond with the server MTU */
++	put_le16(server->mtu, rsp_pdu);
++	bt_att_send(server->att, BT_ATT_OP_MTU_RSP, rsp_pdu, 2, NULL, NULL,
++									NULL);
 +
-+	return false;
++	/* Set the bt_att transport MTU */
++	server->mtu = final_mtu;
++	bt_att_set_mtu(server->att, final_mtu);
 +}
 +
- static bool can_read_data(struct io *io, void *user_data)
+ static bool gatt_server_register_att_handlers(struct bt_gatt_server *server)
  {
- 	struct bt_att *att = user_data;
-@@ -635,6 +680,22 @@ static bool can_read_data(struct io *io, void *user_data)
- 		util_debug(att->debug_callback, att->debug_data,
- 				"ATT opcode cannot be handled: 0x%02x", opcode);
- 		break;
-+	case ATT_OP_TYPE_REQ:
-+		/* If a request is currently pending, then the sequential
-+		 * protocol was violated. Disconnect the bearer and notify the
-+		 * upper-layer.
-+		 */
-+		if (att->in_req) {
-+			util_debug(att->debug_callback, att->debug_data,
-+					"Received request while another is "
-+					"pending: 0x%02x", opcode);
-+			disconnect_cb(att->io, att);
-+			return false;
-+		}
+-	/* TODO */
++	/* EXCHANGE MTU request */
++	server->mtu_id = bt_att_register(server->att, BT_ATT_OP_MTU_REQ,
++								exchange_mtu_cb,
++								server, NULL);
++	if (!server->mtu_id)
++		return false;
 +
-+		att->in_req = true;
-+
-+		/* Fall through to the next case */
- 	default:
- 		/* For all other opcodes notify the upper layer of the PDU and
- 		 * let them act on it.
-@@ -648,46 +709,6 @@ static bool can_read_data(struct io *io, void *user_data)
  	return true;
  }
  
--static void disconn_handler(void *data, void *user_data)
--{
--	struct att_disconn *disconn = data;
--
--	if (disconn->removed)
--		return;
--
--	if (disconn->callback)
--		disconn->callback(disconn->user_data);
--}
--
--static bool disconnect_cb(struct io *io, void *user_data)
--{
--	struct bt_att *att = user_data;
--
--	io_destroy(att->io);
--	att->io = NULL;
--
--	util_debug(att->debug_callback, att->debug_data,
--						"Physical link disconnected");
--
--	bt_att_ref(att);
--	att->in_disconn = true;
--	queue_foreach(att->disconn_list, disconn_handler, NULL);
--	att->in_disconn = false;
--
--	if (att->need_disconn_cleanup) {
--		queue_remove_all(att->disconn_list, match_disconn_removed, NULL,
--							destroy_att_disconn);
--		att->need_disconn_cleanup = false;
--	}
--
--	bt_att_cancel_all(att);
--	bt_att_unregister_all(att);
--
--	bt_att_unref(att);
--
--	return false;
--}
--
- struct bt_att *bt_att_new(int fd)
- {
- 	struct bt_att *att;
 -- 
 2.1.0.rc2.206.gedb03e5
 
