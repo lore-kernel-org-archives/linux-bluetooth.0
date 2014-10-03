@@ -1,44 +1,72 @@
 Return-Path: <cyrus@holtmann.org>
 From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 3/6] android/map-client: Add Android MAP client header
-Date: Fri,  3 Oct 2014 16:04:01 +0200
-Message-Id: <1412345044-30259-3-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+Subject: [PATCH v2 4/6] android/hal-map-client: Add skeleton for MAP client HAL
+Date: Fri,  3 Oct 2014 16:04:02 +0200
+Message-Id: <1412345044-30259-4-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 In-Reply-To: <1412345044-30259-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 References: <1412345044-30259-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This header file has been taken from Codeaurora forum.
+This adds skeleton with stubs and proper build system entries.
 ---
- android/Makefile.am       |  1 +
- android/hardware/bt_mce.h | 57 +++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 58 insertions(+)
- create mode 100644 android/hardware/bt_mce.h
+ android/Android.mk           |  1 +
+ android/Makefile.am          |  1 +
+ android/hal-bluetooth.c      |  3 ++
+ android/hal-map-client.c     | 93 ++++++++++++++++++++++++++++++++++++++++++++
+ android/hal-msg.h            |  3 +-
+ android/hal.h                |  2 +
+ android/hardware/bluetooth.h |  1 +
+ 7 files changed, 103 insertions(+), 1 deletion(-)
+ create mode 100644 android/hal-map-client.c
 
+diff --git a/android/Android.mk b/android/Android.mk
+index 3daa260..e36c8f1 100644
+--- a/android/Android.mk
++++ b/android/Android.mk
+@@ -132,6 +132,7 @@ LOCAL_SRC_FILES := \
+ 	bluez/android/hal-gatt.c \
+ 	bluez/android/hal-utils.c \
+ 	bluez/android/hal-health.c \
++	bluez/android/hal-map-client.c \
+ 
+ ifeq ($(BLUEZ_EXTENSIONS), true)
+ LOCAL_SRC_FILES += bluez/android/hal-handsfree-client.c
 diff --git a/android/Makefile.am b/android/Makefile.am
-index 7ae2c76..53bca33 100644
+index 53bca33..f11cff6 100644
 --- a/android/Makefile.am
 +++ b/android/Makefile.am
-@@ -80,6 +80,7 @@ android_bluetooth_default_la_SOURCES = android/hal.h android/hal-bluetooth.c \
- 					android/hardware/bt_rc.h \
- 					android/hardware/bt_sock.h \
- 					android/hardware/bt_hf_client.h \
-+					android/hardware/bt_mce.h \
- 					android/hardware/hardware.h \
- 					android/cutils/properties.h \
- 					android/ipc-common.h \
-diff --git a/android/hardware/bt_mce.h b/android/hardware/bt_mce.h
+@@ -67,6 +67,7 @@ android_bluetooth_default_la_SOURCES = android/hal.h android/hal-bluetooth.c \
+ 					android/hal-handsfree.c \
+ 					android/hal-handsfree-client.c \
+ 					android/hal-gatt.c \
++					android/hal-map-client.c \
+ 					android/hardware/bluetooth.h \
+ 					android/hardware/bt_av.h \
+ 					android/hardware/bt_gatt.h \
+diff --git a/android/hal-bluetooth.c b/android/hal-bluetooth.c
+index 6754279..97440e2 100644
+--- a/android/hal-bluetooth.c
++++ b/android/hal-bluetooth.c
+@@ -854,6 +854,9 @@ static const void *get_profile_interface(const char *profile_id)
+ #if BLUEZ_EXTENSIONS
+ 	if (!strcmp(profile_id, BT_PROFILE_HANDSFREE_CLIENT_ID))
+ 		return bt_get_hf_client_interface();
++
++	if (!strcmp(profile_id, BT_PROFILE_MAP_CLIENT_ID))
++		return bt_get_map_client_interface();
+ #endif
+ 
+ 	return NULL;
+diff --git a/android/hal-map-client.c b/android/hal-map-client.c
 new file mode 100644
-index 0000000..c87f64e
+index 0000000..ac7d031
 --- /dev/null
-+++ b/android/hardware/bt_mce.h
-@@ -0,0 +1,57 @@
++++ b/android/hal-map-client.c
+@@ -0,0 +1,93 @@
 +/*
-+ * Copyright (c) 2013, The Linux Foundation. All rights reserved.
-+ * Not a Contribution
-+ *
-+ * Copyright (C) 2012 The Android Open Source Project
++ * Copyright (C) 2014 Intel Corporation
 + *
 + * Licensed under the Apache License, Version 2.0 (the "License");
 + * you may not use this file except in compliance with the License.
@@ -51,46 +79,132 @@ index 0000000..c87f64e
 + * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 + * See the License for the specific language governing permissions and
 + * limitations under the License.
++ *
 + */
 +
-+#ifndef ANDROID_INCLUDE_BT_MCE_H
-+#define ANDROID_INCLUDE_BT_MCE_H
++#include <stdbool.h>
 +
-+__BEGIN_DECLS
++#include "hal-log.h"
++#include "hal.h"
++#include "hal-msg.h"
++#include "hal-ipc.h"
 +
-+/** MAS instance description */
-+typedef struct
++static const btmce_callbacks_t *cbs = NULL;
++
++static bool interface_ready(void)
 +{
-+    int  id;
-+    int  scn;
-+    int  msg_types;
-+    char *p_name;
-+} btmce_mas_instance_t;
++	return cbs != NULL;
++}
 +
-+/** callback for get_remote_mas_instances */
-+typedef void (*btmce_remote_mas_instances_callback)(bt_status_t status, bt_bdaddr_t *bd_addr,
-+                                                    int num_instances, btmce_mas_instance_t *instances);
++/* Event Handlers */
 +
-+typedef struct {
-+    /** set to sizeof(btmce_callbacks_t) */
-+    size_t      size;
-+    btmce_remote_mas_instances_callback  remote_mas_instances_cb;
-+} btmce_callbacks_t;
++static void handle_remote_mas_instances(void *buf, uint16_t len, int fd)
++{
 +
-+typedef struct {
-+    /** set to size of this struct */
-+    size_t size;
++}
 +
-+    /** register BT MCE callbacks */
-+    bt_status_t (*init)(btmce_callbacks_t *callbacks);
++/*
++ * handlers will be called from notification thread context,
++ * index in table equals to 'opcode - HAL_MINIMUM_EVENT'
++ */
++static const struct hal_ipc_handler ev_handlers[] = {
++	/* HAL_EV_MCE_REMOTE_MAS_INSTANCES */
++	{ handle_remote_mas_instances, true,
++			sizeof(struct hal_ev_map_client_remote_mas_instances) }
++};
 +
-+    /** search for MAS instances on remote device */
-+    bt_status_t (*get_remote_mas_instances)(bt_bdaddr_t *bd_addr);
-+} btmce_interface_t;
++/* API */
 +
-+__END_DECLS
++static bt_status_t get_remote_mas_instances(bt_bdaddr_t *bd_addr)
++{
++	return BT_STATUS_UNSUPPORTED;
++}
 +
-+#endif /* ANDROID_INCLUDE_BT_MCE_H */
++static bt_status_t init(btmce_callbacks_t *callbacks)
++{
++	struct hal_cmd_register_module cmd;
++	int ret;
++
++	DBG("");
++
++	if (interface_ready())
++		return BT_STATUS_DONE;
++
++	cbs = callbacks;
++
++	hal_ipc_register(HAL_SERVICE_ID_MAP_CLIENT, ev_handlers,
++				sizeof(ev_handlers)/sizeof(ev_handlers[0]));
++
++	cmd.service_id = HAL_SERVICE_ID_MAP_CLIENT;
++
++	ret = hal_ipc_cmd(HAL_SERVICE_ID_CORE, HAL_OP_REGISTER_MODULE,
++					sizeof(cmd), &cmd, 0, NULL, NULL);
++
++	if (ret != BT_STATUS_SUCCESS) {
++		cbs = NULL;
++		hal_ipc_unregister(HAL_SERVICE_ID_MAP_CLIENT);
++	}
++
++	return ret;
++}
++
++static btmce_interface_t iface = {
++	.size = sizeof(iface),
++	.init = init,
++	.get_remote_mas_instances = get_remote_mas_instances
++};
++
++btmce_interface_t *bt_get_map_client_interface(void)
++{
++	return &iface;
++}
+diff --git a/android/hal-msg.h b/android/hal-msg.h
+index b3ed28a..ac9e046 100644
+--- a/android/hal-msg.h
++++ b/android/hal-msg.h
+@@ -36,8 +36,9 @@ static const char BLUEZ_HAL_SK_PATH[] = "\0bluez_hal_socket";
+ #define HAL_SERVICE_ID_AVRCP		8
+ #define HAL_SERVICE_ID_GATT		9
+ #define HAL_SERVICE_ID_HANDSFREE_CLIENT	10
++#define HAL_SERVICE_ID_MAP_CLIENT	11
+ 
+-#define HAL_SERVICE_ID_MAX HAL_SERVICE_ID_HANDSFREE_CLIENT
++#define HAL_SERVICE_ID_MAX HAL_SERVICE_ID_MAP_CLIENT
+ 
+ /* Core Service */
+ 
+diff --git a/android/hal.h b/android/hal.h
+index c34022d..cff1b35 100644
+--- a/android/hal.h
++++ b/android/hal.h
+@@ -26,6 +26,7 @@
+ #include <hardware/bt_gatt_client.h>
+ #include <hardware/bt_gatt_server.h>
+ #include <hardware/bt_hl.h>
++#include <hardware/bt_mce.h>
+ 
+ #ifdef BLUEZ_EXTENSIONS
+ #include <hardware/bt_hf_client.h>
+@@ -39,6 +40,7 @@ btrc_interface_t *bt_get_avrcp_interface(void);
+ bthf_interface_t *bt_get_handsfree_interface(void);
+ btgatt_interface_t *bt_get_gatt_interface(void);
+ bthl_interface_t *bt_get_health_interface(void);
++btmce_interface_t *bt_get_map_client_interface(void);
+ 
+ #ifdef BLUEZ_EXTENSIONS
+ bthf_client_interface_t *bt_get_hf_client_interface(void);
+diff --git a/android/hardware/bluetooth.h b/android/hardware/bluetooth.h
+index 0d3283b..b957c6f 100644
+--- a/android/hardware/bluetooth.h
++++ b/android/hardware/bluetooth.h
+@@ -43,6 +43,7 @@ __BEGIN_DECLS
+ #define BT_PROFILE_SOCKETS_ID "socket"
+ #define BT_PROFILE_HIDHOST_ID "hidhost"
+ #define BT_PROFILE_PAN_ID "pan"
++#define BT_PROFILE_MAP_CLIENT_ID "map_client"
+ 
+ #define BT_PROFILE_GATT_ID "gatt"
+ #define BT_PROFILE_AV_RC_ID "avrcp"
 -- 
 1.9.3
 
