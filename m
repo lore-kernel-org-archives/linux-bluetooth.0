@@ -2,147 +2,147 @@ Return-Path: <cyrus@holtmann.org>
 From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
-Subject: [PATCH 4/5] android/tester: Add case verifying encryption on HIDHost
-Date: Fri,  3 Oct 2014 15:08:42 +0200
-Message-Id: <1412341723-8415-4-git-send-email-jakub.tyszkowski@tieto.com>
+Subject: [PATCH 2/5] android/tester: Improve HIDHost data sending verification
+Date: Fri,  3 Oct 2014 15:08:40 +0200
+Message-Id: <1412341723-8415-2-git-send-email-jakub.tyszkowski@tieto.com>
 In-Reply-To: <1412341723-8415-1-git-send-email-jakub.tyszkowski@tieto.com>
 References: <1412341723-8415-1-git-send-email-jakub.tyszkowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This case verifies if encryption is enabled when connecting to
-HID Keyboard device.
+Hciemu hooks may be called in different test stage than we expect
+and we shouldn't blindly verifying the step with success every time
+when data is send, as we really dont know the step we are currently in.
+
+This patch fixes this issue by splitting the action in two steps: action
+step that triggers data sending and callback step that verifies on
+remotes sid that data was send.
 ---
- android/tester-hidhost.c | 102 +++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 102 insertions(+)
+ android/tester-hidhost.c | 35 +++++++++++++----------------------
+ android/tester-main.c    |  3 +++
+ android/tester-main.h    |  3 +++
+ 3 files changed, 19 insertions(+), 22 deletions(-)
 
 diff --git a/android/tester-hidhost.c b/android/tester-hidhost.c
-index be840b0..24036ce 100644
+index 8da5d32..be840b0 100644
 --- a/android/tester-hidhost.c
 +++ b/android/tester-hidhost.c
-@@ -132,6 +132,80 @@ static struct emu_l2cap_cid_data sdp_cid_data = {
- 	.is_sdp = TRUE,
- };
+@@ -183,9 +183,9 @@ static void hid_ctrl_cid_hook_cb(const void *data, uint16_t len,
+ 		/* Successfully verify sending data step */
+ 		step = g_new0(struct step, 1);
  
-+#define hid_keyboard_rsp_pdu	0x07, \
-+			0x00, 0x01, \
-+			0x02, 0x04, \
-+			0x02, 0x01, \
-+			0x36, 0x01, 0xfe, 0x36, 0x01, 0x93, 0x09, 0x00, 0x00, \
-+			0x0a, 0x00, 0x01, 0x00, 0x00, 0x09, 0x00, 0x01, 0x35, \
-+			0x03, 0x19, 0x11, 0x24, 0x09, 0x00, 0x04, 0x35, 0x0d, \
-+			0x35, 0x06, 0x19, 0x01, 0x00, 0x09, 0x00, 0x11, 0x35, \
-+			0x03, 0x19, 0x00, 0x11, 0x09, 0x00, 0x06, 0x35, 0x09, \
-+			0x09, 0x65, 0x6e, 0x09, 0x00, 0x6a, 0x09, 0x01, 0x00, \
-+			0x09, 0x00, 0x09, 0x35, 0x08, 0x35, 0x06, 0x19, 0x11, \
-+			0x24, 0x09, 0x01, 0x00, 0x09, 0x00, 0x0d, 0x35, 0x0f, \
-+			0x35, 0x0d, 0x35, 0x06, 0x19, 0x01, 0x00, 0x09, 0x00, \
-+			0x13, 0x35, 0x03, 0x19, 0x00, 0x11, 0x09, 0x01, 0x00, \
-+			0x25, 0x10, 0x53, 0x41, 0x4d, 0x53, 0x55, 0x4e, 0x47, \
-+			0x20, 0x4b, 0x65, 0x79, 0x62, 0x6f, 0x61, 0x72, 0x64, \
-+			0x09, 0x01, 0x01, 0x25, 0x08, 0x4b, 0x65, 0x79, 0x62, \
-+			0x6f, 0x61, 0x72, 0x64, 0x09, 0x01, 0x02, 0x25, 0x0d, \
-+			0x43, 0x53, 0x52, 0x20, 0x48, 0x49, 0x44, 0x45, 0x6e, \
-+			0x67, 0x69, 0x6e, 0x65, 0x09, 0x02, 0x00, 0x09, 0x01, \
-+			0x00, 0x09, 0x02, 0x01, 0x09, 0x01, 0x11, 0x09, 0x02, \
-+			0x02, 0x08, 0x40, 0x09, 0x02, 0x03, 0x08, 0x23, 0x09, \
-+			0x02, 0x04, 0x28, 0x01, 0x09, 0x02, 0x05, 0x28, 0x01, \
-+			0x09, 0x02, 0x06, 0x35, 0xb7, 0x35, 0xb5, 0x08, 0x22, \
-+			0x25, 0xb1, 0x05, 0x01, 0x09, 0x06, 0xa1, 0x01, 0x05, \
-+			0x07, 0x85, 0x01, 0x19, 0xe0, 0x29, 0xe7, 0x15, 0x00, \
-+			0x25, 0x01, 0x75, 0x01, 0x95, 0x08, 0x81, 0x02, 0x95, \
-+			0x01, 0x75, 0x08, 0x81, 0x01, 0x95, 0x05, 0x75, 0x01, \
-+			0x05, 0x08, 0x85, 0x01, 0x19, 0x01, 0x29, 0x05, 0x91, \
-+			0x02, 0x95, 0x01, 0x75, 0x03, 0x91, 0x03, 0x95, 0x06, \
-+			0x75, 0x08, 0x15, 0x00, 0x25, 0x65, 0x05, 0x07, 0x19, \
-+			0x00, 0x29, 0x6f, 0x81, 0x00, 0xc0, 0x05, 0x0c, 0x09, \
-+			0x01, 0xa1, 0x01, 0x85, 0x02, 0x05, 0x0c, 0x15, 0x00, \
-+			0x25, 0x01, 0x75, 0x01, 0x95, 0x18, 0x09, 0xe2, 0x09, \
-+			0xea, 0x09, 0xe9, 0x09, 0xb7, 0x09, 0xcd, 0x0a, 0x23, \
-+			0x02, 0x0a, 0x8a, 0x01, 0x0a, 0x21, 0x02, 0x75, 0x01, \
-+			0x95, 0x03, 0x81, 0x02, 0x75, 0x01, 0x95, 0x05, 0x81, \
-+			0x01, 0x05, 0x08, 0x85, 0xff, 0x95, 0x01, 0x75, 0x02, \
-+			0x09, 0x24, 0x09, 0x26, 0x81, 0x02, 0x75, 0x06, 0x81, \
-+			0x01, 0xc0, 0x06, 0x7f, 0xff, 0x09, 0x01, 0xa1, 0x01, \
-+			0x85, 0x03, 0x15, 0x00, 0x25, 0x01, 0x09, 0xb9, 0x09, \
-+			0xb5, 0x09, 0xba, 0x09, 0xbb, 0x09, 0xbc, 0x09, 0xbd, \
-+			0x09, 0xb6, 0x09, 0xb7, 0x75, 0x01, 0x95, 0x06, 0x81, \
-+			0x02, 0x75, 0x01, 0x95, 0x02, 0x81, 0x01, 0xc0, 0x09, \
-+			0x02, 0x07, 0x35, 0x08, 0x35, 0x06, 0x09, 0x04, 0x09, \
-+			0x09, 0x01, 0x00, 0x09, 0x02, 0x08, 0x28, 0x00, 0x09, \
-+			0x02, 0x09, 0x28, 0x01, 0x09, 0x02, 0x0a, 0x28, 0x01, \
-+			0x09, 0x02, 0x0b, 0x09, 0x01, 0x00, 0x09, 0x02, 0x0c, \
-+			0x09, 0x1f, 0x40, 0x09, 0x02, 0x0d, 0x28, 0x00, 0x09, \
-+			0x02, 0x0e, 0x28, 0x01, 0x36, 0x00, 0x65, 0x09, 0x00, \
-+			0x00, 0x0a, 0x00, 0x01, 0x00, 0x01, 0x09, 0x00, 0x01, \
-+			0x35, 0x03, 0x19, 0x12, 0x00, 0x09, 0x00, 0x04, 0x35, \
-+			0x0d, 0x35, 0x06, 0x19, 0x01, 0x00, 0x09, 0x00, 0x01, \
-+			0x35, 0x03, 0x19, 0x00, 0x01, 0x09, 0x00, 0x06, 0x35, \
-+			0x09, 0x09, 0x65, 0x6e, 0x09, 0x00, 0x6a, 0x09, 0x01, \
-+			0x00, 0x09, 0x00, 0x09, 0x35, 0x08, 0x35, 0x06, 0x19, \
-+			0x12, 0x00, 0x09, 0x01, 0x00, 0x09, 0x01, 0x01, 0x25, \
-+			0x00, 0x09, 0x02, 0x00, 0x09, 0x01, 0x00, 0x09, 0x02, \
-+			0x01, 0x09, 0x23, 0x3d, 0x09, 0x02, 0x02, 0x09, 0x01, \
-+			0x3d, 0x09, 0x02, 0x03, 0x09, 0x00, 0x00, 0x09, 0x02, \
-+			0x04, 0x28, 0x01, 0x09, 0x02, 0x05, 0x09, 0x00,	0x02, \
-+			0x00
-+
-+static const struct pdu_set sdp_kb_pdus[] = {
-+	{ raw_pdu(did_req_pdu), raw_pdu(did_rsp_pdu) },
-+	{ raw_pdu(hid_req_pdu), raw_pdu(hid_keyboard_rsp_pdu) },
-+	{ end_pdu, end_pdu },
-+};
-+
-+static struct emu_l2cap_cid_data sdp_kb_cid_data = {
-+	.pdu = sdp_kb_pdus,
-+	.is_sdp = TRUE,
-+};
-+
- static struct emu_l2cap_cid_data ctrl_cid_data;
- static struct emu_l2cap_cid_data intr_cid_data;
+-		step->action_status = BT_STATUS_SUCCESS;
++		step->callback = CB_EMU_CONFIRM_SEND_DATA;
  
-@@ -239,6 +313,12 @@ static struct emu_set_l2cap_data l2cap_setup_sdp_data = {
- 	.user_data = &sdp_cid_data,
- };
+-		schedule_action_verification(step);
++		schedule_callback_verification(step);
+ 		break;
+ 	}
+ }
+@@ -213,9 +213,9 @@ static void hid_intr_cid_hook_cb(const void *data, uint16_t len,
+ 		/* Successfully verify sending data step */
+ 		step = g_new0(struct step, 1);
  
-+static struct emu_set_l2cap_data l2cap_setup_kb_sdp_data = {
-+	.psm = 1,
-+	.func = tester_generic_connect_cb,
-+	.user_data = &sdp_kb_cid_data,
-+};
-+
- /* Emulate Control Channel (PSM = 17) */
- static struct emu_set_l2cap_data l2cap_setup_cc_data = {
- 	.psm = 17,
-@@ -517,6 +597,28 @@ static struct test_case test_cases[] = {
- 		ACTION_SUCCESS(hidhost_send_data_action, NULL),
- 		CALLBACK(CB_EMU_CONFIRM_SEND_DATA),
+-		step->action_status = BT_STATUS_SUCCESS;
++		step->callback = CB_EMU_CONFIRM_SEND_DATA;
+ 
+-		schedule_action_verification(step);
++		schedule_callback_verification(step);
+ 		break;
+ 	}
+ }
+@@ -345,40 +345,29 @@ static void hidhost_set_report_action(void)
+ {
+ 	struct test_data *data = tester_get_data();
+ 	const uint8_t *hid_addr = hciemu_get_client_bdaddr(data->hciemu);
++	struct step *step = g_new0(struct step, 1);
+ 	char *buf = "fe0201";
+ 	bt_bdaddr_t bdaddr;
+-	int status;
+ 
+ 	bdaddr2android((const bdaddr_t *) hid_addr, &bdaddr);
+ 
+-	/* Successfull result should be verified on the other end (hook) */
+-	status = data->if_hid->send_data(&bdaddr, buf);
+-	if (status) {
+-		struct step *step = g_new0(struct step, 1);
+-
+-		step->action_status = status;
+-		schedule_action_verification(step);
+-	}
++	step->action_status = data->if_hid->send_data(&bdaddr, buf);
++	schedule_action_verification(step);
+ }
+ 
+ static void hidhost_send_data_action(void)
+ {
+ 	struct test_data *data = tester_get_data();
+ 	const uint8_t *hid_addr = hciemu_get_client_bdaddr(data->hciemu);
++	struct step *step = g_new0(struct step, 1);
+ 	char *buf = "010101";
+ 	bt_bdaddr_t bdaddr;
+-	int status;
+ 
+ 	bdaddr2android((const bdaddr_t *) hid_addr, &bdaddr);
+ 
+-	/* Successfull result should be verified on the other end (hook) */
+-	status = data->if_hid->set_report(&bdaddr, BTHH_INPUT_REPORT, buf);
+-	if (status) {
+-		struct step *step = g_new0(struct step, 1);
+-
+-		step->action_status = status;
+-		schedule_action_verification(step);
+-	}
++	step->action_status = data->if_hid->set_report(&bdaddr,
++							BTHH_INPUT_REPORT, buf);
++	schedule_action_verification(step);
+ }
+ 
+ static struct test_case test_cases[] = {
+@@ -509,6 +498,7 @@ static struct test_case test_cases[] = {
+ 		CALLBACK_STATE(CB_HH_CONNECTION_STATE,
+ 						BTHH_CONN_STATE_CONNECTED),
+ 		ACTION_SUCCESS(hidhost_set_report_action, NULL),
++		CALLBACK(CB_EMU_CONFIRM_SEND_DATA),
  	),
-+	TEST_CASE_BREDRLE("HidHost Connect Encrypted Success",
-+		ACTION_SUCCESS(bluetooth_enable_action, NULL),
-+		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_ON),
-+		ACTION_SUCCESS(emu_setup_powered_remote_action, NULL),
-+		ACTION_SUCCESS(emu_set_ssp_mode_action, NULL),
-+		ACTION_SUCCESS(set_default_ssp_request_handler, NULL),
-+		ACTION_SUCCESS(emu_add_l2cap_server_action,
-+						&l2cap_setup_kb_sdp_data),
-+		ACTION_SUCCESS(emu_add_l2cap_server_action,
-+							&l2cap_setup_cc_data),
-+		ACTION_SUCCESS(emu_add_l2cap_server_action,
-+							&l2cap_setup_ic_data),
-+		ACTION_SUCCESS(hidhost_connect_action, NULL),
-+		CALLBACK(CB_EMU_ENCRYPTION_ENABLED),
-+		CALLBACK_STATE(CB_HH_CONNECTION_STATE,
-+						BTHH_CONN_STATE_CONNECTED),
-+		ACTION_SUCCESS(hidhost_send_data_action, NULL),
-+		ACTION_SUCCESS(bluetooth_disable_action, NULL),
-+		CALLBACK_STATE(CB_HH_CONNECTION_STATE,
-+						BTHH_CONN_STATE_DISCONNECTED),
-+		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_OFF),
-+	),
+ 	TEST_CASE_BREDRLE("HidHost SendData Success",
+ 		ACTION_SUCCESS(bluetooth_enable_action, NULL),
+@@ -525,6 +515,7 @@ static struct test_case test_cases[] = {
+ 		CALLBACK_STATE(CB_HH_CONNECTION_STATE,
+ 						BTHH_CONN_STATE_CONNECTED),
+ 		ACTION_SUCCESS(hidhost_send_data_action, NULL),
++		CALLBACK(CB_EMU_CONFIRM_SEND_DATA),
+ 	),
  };
  
- struct queue *get_hidhost_tests(void)
+diff --git a/android/tester-main.c b/android/tester-main.c
+index 5d66fe1..c637fd5 100644
+--- a/android/tester-main.c
++++ b/android/tester-main.c
+@@ -101,6 +101,9 @@ static struct {
+ 	DBG_CB(CB_GATTS_REQUEST_WRITE),
+ 	DBG_CB(CB_GATTS_REQUEST_EXEC_WRITE),
+ 	DBG_CB(CB_GATTS_RESPONSE_CONFIRMATION),
++
++	/* Emulator callbacks */
++	DBG_CB(CB_EMU_CONFIRM_SEND_DATA),
+ };
+ 
+ static gboolean check_callbacks_called(gpointer user_data)
+diff --git a/android/tester-main.h b/android/tester-main.h
+index 3e5c27d..6245381 100644
+--- a/android/tester-main.h
++++ b/android/tester-main.h
+@@ -397,6 +397,9 @@ typedef enum {
+ 	CB_GATTS_REQUEST_WRITE,
+ 	CB_GATTS_REQUEST_EXEC_WRITE,
+ 	CB_GATTS_RESPONSE_CONFIRMATION,
++
++	/* Emulator callbacks */
++	CB_EMU_CONFIRM_SEND_DATA,
+ } expected_bt_callback_t;
+ 
+ struct test_data {
 -- 
 1.9.1
 
