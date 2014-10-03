@@ -1,43 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-Sender: armansito@google.com
-In-Reply-To: <CAHF=Y4oGjUc=j4DE_pyC5Ue5ymsaoaGXJRzYHdWTHa2EF1k9Gg@mail.gmail.com>
-References: <CAHF=Y4pBMLaF1osqQNk1fkw1UHGk6SMYhQ=u5zYZ6qswoFKWBA@mail.gmail.com>
-	<F54B539B-3C7A-48C6-B608-417FBCB5050F@holtmann.org>
-	<CAHF=Y4oGjUc=j4DE_pyC5Ue5ymsaoaGXJRzYHdWTHa2EF1k9Gg@mail.gmail.com>
-Date: Fri, 3 Oct 2014 08:35:09 -0700
-Message-ID: <CAHrH25Qw2s0T_MCJndAbv63Eixc7zcJ-KTZG8Y1aKZTy+J8gMw@mail.gmail.com>
-Subject: Re: Connecting to propietary remote GATT service: plugins vs D-Bus
- GATT API
-From: Arman Uguray <armansito@chromium.org>
-To: Alfonso Acosta <fons@spotify.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>,
-	BlueZ development <linux-bluetooth@vger.kernel.org>, Mattias Jansson <mjansson@spotify.com>
-Content-Type: text/plain; charset=UTF-8
+From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH v2 0/6] android/map-client: Add HAL part
+Date: Fri,  3 Oct 2014 16:04:37 +0200
+Message-Id: <1412345077-30317-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel & Alfonso,
+v2. changes:
+*Defines in HAL are the same as in IPC
+*Removed MAP instance structures section in ipc api doc
+*Check if MAP instance name is null terminated
+*Fixed multiline comment
 
-> I did start it with -E . In fact "gdbus introspect -r --system -o /
-> -d org.bluez" shows the GattManager1 interface, but no
-> dev_XX_XX_XX_XX_XX_XX/serviceXX(/charYYYY) object exposing
-> GattService1 or GattCharacteristic1, not even while connecting to
-> a bonded BLE device with GATT services.
+Grzegorz Kolodziejczyk (6):
+  android/hal-ipc-api: Add MAP client HAL
+  android/hal-map-client-api: Add get remote MAS instance command and
+    event
+  android/map-client: Add Android MAP client header
+  android/hal-map-client: Add skeleton for MAP client HAL
+  android/hal-map-client: Add event handler
+  android/hal-map-client: Add API calls
 
-The experimental D-Bus API is not implemented, so yeah you won't see
-any of those objects. It is in the timeline to get that support built
-in the upcoming months but currently everyone who's using that API
-went and wrote their forked implementation of it. Some of the GATT
-server side support is there, so building and running with -E should
-expose a GattManager1, though I don't think that's fully implemented
-either.
+ android/Android.mk           |   1 +
+ android/Makefile.am          |   2 +
+ android/hal-bluetooth.c      |   3 +
+ android/hal-ipc-api.txt      |  42 ++++++++++++
+ android/hal-map-client.c     | 152 +++++++++++++++++++++++++++++++++++++++++++
+ android/hal-msg.h            |  26 +++++++-
+ android/hal.h                |   2 +
+ android/hardware/bluetooth.h |   1 +
+ android/hardware/bt_mce.h    |  57 ++++++++++++++++
+ 9 files changed, 285 insertions(+), 1 deletion(-)
+ create mode 100644 android/hal-map-client.c
+ create mode 100644 android/hardware/bt_mce.h
 
-For client the quickest way for you might be to actually write a
-plugin (using the GAttrib code). I would just look at some of the
-profile code, like input/hog or heartrate and maybe add your
-implementation as a profile and expose a simple D-Bus API for it if
-necessary. Since you're not going to submit this upstream, this might
-be the quickest approach for the short term.
+-- 
+1.9.3
 
-Cheers,
-Arman
