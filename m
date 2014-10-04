@@ -1,46 +1,55 @@
 Return-Path: <cyrus@holtmann.org>
-From: basile@opensource.dyc.edu
-To: linux-bluetooth@vger.kernel.org
-Cc: blueness@gentoo.org, pacho@gentoo.org,
-	"Anthony G. Basile" <basile@opensource.dyc.edu>
-Subject: [PATCH] emulator/serial.c: use posix_openpt() instead of getpt()
-Date: Sat,  4 Oct 2014 10:31:42 -0400
-Message-Id: <1412433102-12904-1-git-send-email-basile@opensource.dyc.edu>
+Date: Sat, 4 Oct 2014 16:24:38 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Alfonso Acosta <fons@spotify.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH v3] Bluetooth: Include ADV_IND report in Device Connected
+ event
+Message-ID: <20141004132438.GA314@t440s.P-661HNU-F1>
+References: <1412338971-14306-1-git-send-email-fons@spotify.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1412338971-14306-1-git-send-email-fons@spotify.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: "Anthony G. Basile" <basile@opensource.dyc.edu>
+Hi Alfonso,
 
-getpt(3) is glibc-specific and is not provided in musl and possibly
-other libc's. Instead, we use use posix_openpt(3) which is equivalent
-and portable.
+On Fri, Oct 03, 2014, Alfonso Acosta wrote:
+>  void mgmt_device_connected(struct hci_dev *hdev, struct hci_conn *conn,
+> -			   u32 flags, u8 *name, u8 name_len);
+> +			   u32 flags, u8 *name, u8 name_len,
+> +			   u8 *adv, u8 adv_len);
 
-Signed-off-by: Anthony G. Basile <basile@opensource.dyc.edu>
----
- emulator/serial.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+Now that you're already passing the full hci_conn to this function I
+guess it's a bit pointless to add new parameters to it which would
+anyway come from that same hci_conn object.
 
-diff --git a/emulator/serial.c b/emulator/serial.c
-index 9583be4..8b49dc6 100644
---- a/emulator/serial.c
-+++ b/emulator/serial.c
-@@ -32,6 +32,7 @@
- #include <unistd.h>
- #include <stdlib.h>
- #include <string.h>
-+#include <fcntl.h>
- #include <sys/param.h>
- #include <sys/epoll.h>
- #include <sys/uio.h>
-@@ -160,7 +161,7 @@ static void open_pty(struct serial *serial)
- {
- 	enum btdev_type uninitialized_var(type);
- 
--	serial->fd = getpt();
-+	serial->fd = posix_openpt(O_RDWR | O_NOCTTY);
- 	if (serial->fd < 0) {
- 		perror("Failed to get master pseudo terminal");
- 		return;
--- 
-2.0.4
+>  void mgmt_device_connected(struct hci_dev *hdev, struct hci_conn *conn,
+> -			   u32 flags, u8 *name, u8 name_len)
+> +			   u32 flags, u8 *name, u8 name_len,
+> +			   u8 *adv, u8 adv_len)
+>  {
+>  	char buf[512];
+>  	struct mgmt_ev_device_connected *ev = (void *) buf;
+> @@ -6183,13 +6184,24 @@ void mgmt_device_connected(struct hci_dev *hdev, struct hci_conn *conn,
+>  
+>  	ev->flags = __cpu_to_le32(flags);
+>  
+> -	if (name_len > 0)
+> -		eir_len = eir_append_data(ev->eir, 0, EIR_NAME_COMPLETE,
+> -					  name, name_len);
+> +	/* We must ensure that the EIR Data fields are ordered and
+> +	 * unique. Keep it simple for now and avoid the problem by not
+> +	 * adding any BR/EDR data to the LE adv.
+> +	 */
+> +	if (adv) {
 
+And once you do the earlier fix I suppose this check becomes:
+
+	if (conn->le_adv_data_len > 0) {
+
+Besides this one issue with the unnecessary extra parameters both of
+your patches look good to me.
+
+Johan
