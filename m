@@ -1,68 +1,58 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <CABBYNZLj2gGoCW-5hmkG2dA0i6Ss9RVJjjQhPzv=vk1ARephmQ@mail.gmail.com>
-References: <1412375951-13940-1-git-send-email-armansito@chromium.org>
-	<1412375951-13940-3-git-send-email-armansito@chromium.org>
-	<CABBYNZLj2gGoCW-5hmkG2dA0i6Ss9RVJjjQhPzv=vk1ARephmQ@mail.gmail.com>
-Date: Mon, 6 Oct 2014 09:15:15 -0400
-Message-ID: <CAHrH25R28cLmLQH25TsTxXA=BRVMdbTec3atg5t6fMUEd_oSgw@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 2/3] shared/gatt-server: Introduce shared/gatt-server.
-From: Arman Uguray <armansito@chromium.org>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+In-Reply-To: <1412339579-8292-1-git-send-email-luiz.dentz@gmail.com>
+References: <1412339579-8292-1-git-send-email-luiz.dentz@gmail.com>
+Date: Mon, 6 Oct 2014 16:04:21 +0300
+Message-ID: <CABBYNZKo6tPgqoKqWsVm0Seaqs5AUokiBe1Wu2rcLTXTRKTirQ@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 00/19] Add PDU structs
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+Hi,
 
-> I think it is better to be able to attach/detach and existing db
-> object because otherwise we will need to reconstruct it on every
-> connection, furthermore the db might exist anyway since we need to be
-> able to register services even when we are not connected.
+On Fri, Oct 3, 2014 at 3:32 PM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 >
+> This adds structs for each PDU which should make it more clear which
+> size are expected, what fields does the PDU contains, etc and also make
+> pointer arithmetic simpler.
+>
+> Luiz Augusto von Dentz (19):
+>   android/avrcp-lib: Add GetCapabilities structs
+>   android/avrcp-lib: Add ListPlayerAttributes structs
+>   android/avrcp-lib: Add ListPlayerValues structs
+>   android/avrcp-lib: Add GetCurrentPlayerValue structs
+>   android/avrcp-lib: Add SetPlayerApplicationSettingValue structs
+>   android/avrcp-lib: Add GetPlayerAttributeText structs
+>   android/avrcp-lib: Add GetPlayerValueText structs
+>   android/avrcp-lib: Add GetElementAttributes structs
+>   android/avrcp-lib: Add GetPlayStatus structs
+>   android/avrcp-lib: Add RegisterNotification structs
+>   android/avrcp-lib: Add SetAbsoluteVolume structs
+>   android/avrcp-lib: Add SetAddressedPlayer structs
+>   android/avrcp-lib: Add SetBrowsed structs
+>   android/avrcp-lib: Add GetFolderItems structs
+>   android/avrcp-lib: Add ChangePath structs
+>   android/avrcp-lib: Add GetItemAttributes structs
+>   android/avrcp-lib: Add PlayItem structs
+>   android/avrcp-lib: Add Search structs
+>   android/avrcp-lib: Add AddToNowPlaying structs
+>
+>  android/avrcp-lib.c | 1021 ++++++++++++++++++++++++++++++++++-----------------
+>  android/avrcp-lib.h |    6 +-
+>  android/avrcp.c     |   20 +-
+>  unit/test-avrcp.c   |   33 +-
+>  4 files changed, 710 insertions(+), 370 deletions(-)
+>
+> --
+> 1.9.3
 
-Yeah, I did it this way for the reasons I explained in the cover
-letter: I basically want to keep the layering related to ATT protocol
-within bt_gatt_server, however the way gatt-db is currently structured
-makes it difficult. This particularly arises from the generic
-read/write handlers, where an attribute value is stored outside of the
-database and fetched via a callback.
+Applied.
 
-When bt_gatt_server receives a request, say Read By Group Type, it
-calls gatt_db_read_by_group_type and then calls gatt_db_read for each
-attribute handle returned. If there's no value stored in the database
-and the value should be obtained elsewhere, then gatt-db invokes the
-registered read callback. That read callback needs to eventually make
-the value known to bt_gatt_server.
 
-So my initial thought was to add an extra layer of callbacks between
-bt_gatt_server and make bt_gatt_server the global server database that
-can handle multiple bt_att instances that can be attached/detached on
-demand. I think I could go back to the way I had it before, have
-bt_gatt_server accept a gatt-db in its constructor, and perhaps handle
-a special function for the read handling, such as a
-bt_gatt_server_set_read_value_for_handle of sorts that can get called
-from the read handler and that helps bt_gatt_server construct the ATT
-protocol response, but still there are problems such as how the
-generic gatt-db read handler will know which bt_gatt_server instance
-to call this function on (as there can be several bt_gatt_server
-instances for each device that acts simultaneously as a client and a
-server). The way things currently are, you can't reliably pass this
-information as user_data in the read callback, i.e. there is currently
-no way to say which bt_gatt_server the request originated from. If
-gatt-db is internal to bt_gatt_server and there are wrappers for
-functions such as gatt_db_add_characteristic in the bt_gatt_server_*
-namespace, then we can hook callbacks up in a way that handles this.
-
-So maybe it's better to have a single bt_gatt_server that exists for
-the lifetime of the application and for each new connection we create
-a bt_att and attach it to bt_gatt_server. Or, we go back to what we
-originally had in mind, i.e. one gatt-db and multiple per-connection
-bt_gatt_server instances but we will have to rework gatt-db a little
-for this. Note that this hasn't been a problem for the android code,
-since everything is implemented in one android/gatt layer, hence
-gatt-db is inherently internal to the transport handling.
-
-Cheers,
-Arman
+-- 
+Luiz Augusto von Dentz
