@@ -1,35 +1,29 @@
 Return-Path: <cyrus@holtmann.org>
-From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH] android/client: Print peer and CHLD features only on connected event
-Date: Mon,  6 Oct 2014 12:34:14 +0200
-Message-Id: <1412591654-10250-1-git-send-email-lukasz.rymanowski@tieto.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.6\))
+Subject: Re: [PATCH v4 bluetooth] 6lowpan: fix incorrect return values in lowpan_rcv
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <54325289.2010500@xsilon.com>
+Date: Mon, 6 Oct 2014 10:50:01 +0200
+Cc: Alexander Aring <alex.aring@gmail.com>,
+	Martin Townsend <mtownsend1973@gmail.com>,
+	linux-zigbee-devel@lists.sourceforge.net,
+	BlueZ development <linux-bluetooth@vger.kernel.org>,
+	linux-wpan@vger.kernel.org, werner@almesberger.net,
+	Jukka Rissanen <jukka.rissanen@linux.intel.com>
+Message-Id: <3A343A01-FBD8-458D-A7FA-E57CBADAE15F@holtmann.org>
+References: <1412165422-31063-1-git-send-email-martin.townsend@xsilon.com> <1412165422-31063-2-git-send-email-martin.townsend@xsilon.com> <20141005175049.GA15923@omega> <5431B18B.4030603@xsilon.com> <20141006071225.GA10024@omega> <54325289.2010500@xsilon.com>
+To: Martin Townsend <martin.townsend@xsilon.com>
+Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-We want to print peer and CHLD features are only when client gets
-connected event. Otherwise it might be confusing as those fields are not
-set.
----
- android/client/if-hf-client.c | 4 ++++
- 1 file changed, 4 insertions(+)
+Hi Martin,
 
-diff --git a/android/client/if-hf-client.c b/android/client/if-hf-client.c
-index 07c09cd..0f4f3e9 100644
---- a/android/client/if-hf-client.c
-+++ b/android/client/if-hf-client.c
-@@ -203,6 +203,10 @@ static void hf_client_connection_state_callback(
- 	haltest_info("%s: state=%s bd_addr=%s\n", __func__,
- 				bthf_client_connection_state_t2str(state),
- 				bt_bdaddr_t2str(bd_addr, last_addr));
-+
-+	if ( state != BTHF_CLIENT_CONNECTION_STATE_CONNECTED)
-+		return;
-+
- 	haltest_info("\tpeer_features%s\n", pear_features_t2str(peer_feat));
- 	haltest_info("\tchld_feat=%s\n", chld_features_t2str(chld_feat));
- }
--- 
-1.8.4
+> Are you ok with me breaking this down into separate patches and submitting them individually to bluetooth-next?
+
+yes, just break it down into smaller logical patches.
+
+Regards
+
+Marcel
 
