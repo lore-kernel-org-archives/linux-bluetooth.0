@@ -1,66 +1,49 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v2 1/6] android/tester: Make client2 app uuid value name consistent
-Date: Mon, 06 Oct 2014 13:11:59 +0200
-Message-ID: <3730533.q5ECsSFLWj@uw000953>
-In-Reply-To: <1412325892-25013-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
-References: <1412325892-25013-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+Date: Mon, 6 Oct 2014 14:14:16 +0300
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: Lukasz Rymanowski <lukasz.rymanowski@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	Szymon Janc <szymon.janc@gmail.com>
+Subject: Re: [PATCH] android/gatt: Fix unneeded increment
+Message-ID: <20141006111413.GA26210@aemeltch-MOBL1>
+References: <1412581779-22424-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <CAN_7+YZg2pYzzZZW6j+D918vEpQxe+tfEL0NNciU4wuz0_FD0g@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <CAN_7+YZg2pYzzZZW6j+D918vEpQxe+tfEL0NNciU4wuz0_FD0g@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Grzegorz,
+Hi Lukasz,
 
-On Friday 03 of October 2014 10:44:47 Grzegorz Kolodziejczyk wrote:
-> Application uudis for tester should be name unified and consistent.
-> ---
->  android/tester-gatt.c | 12 ++++++------
->  1 file changed, 6 insertions(+), 6 deletions(-)
+On Mon, Oct 06, 2014 at 01:06:49PM +0200, Lukasz Rymanowski wrote:
+> Hi Andrei,
 > 
-> diff --git a/android/tester-gatt.c b/android/tester-gatt.c
-> index 4c9eba5..4326749 100644
-> --- a/android/tester-gatt.c
-> +++ b/android/tester-gatt.c
-> @@ -41,6 +41,11 @@ static bt_uuid_t app1_uuid = {
->  				0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01 },
->  };
->  
-> +static bt_uuid_t app2_uuid = {
-> +	.uu = { 0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02,
-> +				0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02 },
-> +};
-> +
->  struct gatt_connect_data {
->  	const int app_id;
->  	const int conn_id;
-> @@ -101,11 +106,6 @@ struct notif_data {
->  	btgatt_gatt_id_t *charac;
->  };
->  
-> -static bt_uuid_t client2_app_uuid = {
-> -	.uu = { 0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02,
-> -				0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02 },
-> -};
-> -
->  static bt_bdaddr_t emu_remote_bdaddr_val = {
->  	.address = { 0x00, 0xaa, 0x01, 0x01, 0x00, 0x00 },
->  };
-> @@ -1263,7 +1263,7 @@ static struct test_case test_cases[] = {
->  		ACTION_SUCCESS(emu_set_connect_cb_action, gatt_conn_cb),
->  		ACTION_SUCCESS(gatt_client_register_action, &app1_uuid),
->  		CALLBACK_STATUS(CB_GATTC_REGISTER_CLIENT, BT_STATUS_SUCCESS),
-> -		ACTION_SUCCESS(gatt_client_register_action, &client2_app_uuid),
-> +		ACTION_SUCCESS(gatt_client_register_action, &app2_uuid),
->  		CALLBACK_STATUS(CB_GATTC_REGISTER_CLIENT, BT_STATUS_SUCCESS),
->  		ACTION_SUCCESS(gatt_client_start_scan_action,
->  							INT_TO_PTR(APP1_ID)),
+> On Mon, Oct 6, 2014 at 9:49 AM, Andrei Emeltchenko
+> <Andrei.Emeltchenko.news@gmail.com> wrote:
+> > From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> >
+> > ---
+> >  android/gatt.c | 2 +-
+> >  1 file changed, 1 insertion(+), 1 deletion(-)
+> >
+> > diff --git a/android/gatt.c b/android/gatt.c
+> > index dbe067f..ecd1813 100644
+> > --- a/android/gatt.c
+> > +++ b/android/gatt.c
+> > @@ -3169,7 +3169,7 @@ static guint signed_write_cmd(struct gatt_device *dev, uint16_t handle,
+> >                 return 0;
+> >         }
+> >
+> > -       bt_update_sign_counter(&dev->bdaddr, LOCAL_CSRK, sign_cnt++);
+> > +       bt_update_sign_counter(&dev->bdaddr, LOCAL_CSRK, sign_cnt);
 > 
+> Your rfc:  "[RFC] android/gatt: Fix sign_cnt increment" shall be used
+> instead of this patch.
 
-All patches applied, thanks.
+Yes, it was sent later. I called it RFC since wanted double check from the
+code authors.
 
--- 
-Best regards, 
-Szymon Janc
+Best regards 
+Andrei Emeltchenko 
+
