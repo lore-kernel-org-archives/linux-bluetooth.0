@@ -1,58 +1,66 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1412339579-8292-1-git-send-email-luiz.dentz@gmail.com>
-References: <1412339579-8292-1-git-send-email-luiz.dentz@gmail.com>
-Date: Mon, 6 Oct 2014 16:04:21 +0300
-Message-ID: <CABBYNZKo6tPgqoKqWsVm0Seaqs5AUokiBe1Wu2rcLTXTRKTirQ@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 00/19] Add PDU structs
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+In-Reply-To: <1412600108.28177.0.camel@linux-0dmf.site>
+References: <CAG0bkvK4-gfeYXXsdNg4BKdjxmo1e5d8rKuABohtYNNBHKJwDA@mail.gmail.com>
+	<1412598268.1132.15.camel@linux-0dmf.site>
+	<CAG0bkv+nKt-TgONDLENNUncz9NScdJGcYR+J2Z6b=wg2grvqhg@mail.gmail.com>
+	<1412600108.28177.0.camel@linux-0dmf.site>
+Date: Mon, 6 Oct 2014 18:33:29 +0530
+Message-ID: <CAG0bkvK=fumhJNzuSgx=HFHiVP08V+QH2wLajdffx+f5ugoQPQ@mail.gmail.com>
+Subject: Re: btusb_intr_complete returns -EPIPE
+From: Naveen Kumar Parna <pnaveenkos@gmail.com>
+To: Oliver Neukum <oneukum@suse.de>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	linux-usb@vger.kernel.org
 Content-Type: text/plain; charset=UTF-8
-Sender: linux-bluetooth-owner@vger.kernel.org
+Sender: linux-usb-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
-
-On Fri, Oct 3, 2014 at 3:32 PM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->
-> This adds structs for each PDU which should make it more clear which
-> size are expected, what fields does the PDU contains, etc and also make
-> pointer arithmetic simpler.
->
-> Luiz Augusto von Dentz (19):
->   android/avrcp-lib: Add GetCapabilities structs
->   android/avrcp-lib: Add ListPlayerAttributes structs
->   android/avrcp-lib: Add ListPlayerValues structs
->   android/avrcp-lib: Add GetCurrentPlayerValue structs
->   android/avrcp-lib: Add SetPlayerApplicationSettingValue structs
->   android/avrcp-lib: Add GetPlayerAttributeText structs
->   android/avrcp-lib: Add GetPlayerValueText structs
->   android/avrcp-lib: Add GetElementAttributes structs
->   android/avrcp-lib: Add GetPlayStatus structs
->   android/avrcp-lib: Add RegisterNotification structs
->   android/avrcp-lib: Add SetAbsoluteVolume structs
->   android/avrcp-lib: Add SetAddressedPlayer structs
->   android/avrcp-lib: Add SetBrowsed structs
->   android/avrcp-lib: Add GetFolderItems structs
->   android/avrcp-lib: Add ChangePath structs
->   android/avrcp-lib: Add GetItemAttributes structs
->   android/avrcp-lib: Add PlayItem structs
->   android/avrcp-lib: Add Search structs
->   android/avrcp-lib: Add AddToNowPlaying structs
->
->  android/avrcp-lib.c | 1021 ++++++++++++++++++++++++++++++++++-----------------
->  android/avrcp-lib.h |    6 +-
->  android/avrcp.c     |   20 +-
->  unit/test-avrcp.c   |   33 +-
->  4 files changed, 710 insertions(+), 370 deletions(-)
->
-> --
-> 1.9.3
-
-Applied.
+Thank you very much. I will try that patch.
 
 
--- 
-Luiz Augusto von Dentz
+
+Thanks,
+Naveen
+
+On Mon, Oct 6, 2014 at 6:25 PM, Oliver Neukum <oneukum@suse.de> wrote:
+> On Mon, 2014-10-06 at 18:18 +0530, Naveen Kumar Parna wrote:
+>> Hi,
+>>
+>> I just collected the usbmon log(1.mon.out) and attached it. It stalls
+>> for INT in transfers.
+>>
+>> Corresponding kernel log is here:
+>> Oct  6 18:00:48 naveen-OptiPlex-745 kernel: [ 7528.718473] hci3 urb
+>> ffff88012954dd80 status -32 count 0
+>> Oct  6 18:05:35 naveen-OptiPlex-745 kernel: [ 7814.688122] hci3 urb
+>> ffff88012954dd80 status -32 count 0
+>> Oct  6 18:05:35 naveen-OptiPlex-745 kernel: [ 7814.693086] hci3 urb
+>> ffff88012954dd80 status -32 count 0
+>> Oct  6 18:05:35 naveen-OptiPlex-745 kernel: [ 7814.695058] hci3 urb
+>> ffff88012954dd80 status -32 count 0
+>> Oct  6 18:05:35 naveen-OptiPlex-745 kernel: [ 7814.703073] hci3 urb
+>> ffff88012954dd80 status -32 count 0
+>> Oct  6 18:05:35 naveen-OptiPlex-745 kernel: [ 7814.717038] hci5 urb
+>> ffff88012954de40 status -32 count 0
+>> Oct  6 18:05:35 naveen-OptiPlex-745 kernel: [ 7814.717496] hci3 urb
+>> ffff88012954dd80 status -32 count 0
+>>
+>> Corresponding Usbmon trace:
+>> ffff88012954dd80 2936526502 C Ii:1:009:1 -32:1 0
+>> ffff88012954dd80 3223215374 C Ii:1:009:1 -32:1 0
+>> ffff88012954dd80 3223220352 C Ii:1:009:1 -32:1 0
+>> ffff88012954dd80 3223222332 C Ii:1:009:1 -32:1 0
+>> ffff88012954dd80 3223230362 C Ii:1:009:1 -32:1 0
+>> ffff88012954de40 3223244362 C Ii:1:019:1 -32:1 0
+>> ffff88012954dd80 3223244830 C Ii:1:009:1 -32:1 0
+>>
+>> Does it gives any clue?
+>
+> Not really. I'll make a patch to clear the condition.
+> Let's see what happens then.
+>
+>         Regards
+>                 Oliver
+>
+>
