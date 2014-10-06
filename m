@@ -1,37 +1,50 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <CAHrH25Qw2s0T_MCJndAbv63Eixc7zcJ-KTZG8Y1aKZTy+J8gMw@mail.gmail.com>
-References: <CAHF=Y4pBMLaF1osqQNk1fkw1UHGk6SMYhQ=u5zYZ6qswoFKWBA@mail.gmail.com>
- <F54B539B-3C7A-48C6-B608-417FBCB5050F@holtmann.org> <CAHF=Y4oGjUc=j4DE_pyC5Ue5ymsaoaGXJRzYHdWTHa2EF1k9Gg@mail.gmail.com>
- <CAHrH25Qw2s0T_MCJndAbv63Eixc7zcJ-KTZG8Y1aKZTy+J8gMw@mail.gmail.com>
+In-Reply-To: <1412637149-2966-1-git-send-email-fons@spotify.com>
+References: <1412637149-2966-1-git-send-email-fons@spotify.com>
 From: Alfonso Acosta <fons@spotify.com>
-Date: Tue, 7 Oct 2014 01:25:42 +0200
-Message-ID: <CAHF=Y4qdhn=QjQEU+Sv44NNvAzdjn3wutboXENR0=H9Lx28vbg@mail.gmail.com>
-Subject: Re: Connecting to propietary remote GATT service: plugins vs D-Bus
- GATT API
-To: Arman Uguray <armansito@chromium.org>
-Cc: Marcel Holtmann <marcel@holtmann.org>,
-	BlueZ development <linux-bluetooth@vger.kernel.org>, Mattias Jansson <mjansson@spotify.com>
+Date: Tue, 7 Oct 2014 01:14:02 +0200
+Message-ID: <CAHF=Y4riYZOVmi6QQ5LidL4dNznbox4t0T9M73LZipn0LetzNg@mail.gmail.com>
+Subject: Re: [PATCH v3] Bluetooth: Include ADV_IND report in Device Connected event
+To: Alfonso Acosta <fons@spotify.com>,
+	BlueZ development <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Arman,
+Hi Johan,
 
 
-> For client the quickest way for you might be to actually write a
-> plugin (using the GAttrib code). I would just look at some of the
-> profile code, like input/hog or heartrate and maybe add your
-> implementation as a profile and expose a simple D-Bus API for it if
-> necessary. Since you're not going to submit this upstream, this might
-> be the quickest approach for the short term.
+> On Fri, Oct 03, 2014, Alfonso Acosta wrote:
+>>  void mgmt_device_connected(struct hci_dev *hdev, struct hci_conn *conn,
+>> -                        u32 flags, u8 *name, u8 name_len);
+>> +                        u32 flags, u8 *name, u8 name_len,
+>> +                        u8 *adv, u8 adv_len);
+>
+> Now that you're already passing the full hci_conn to this function I
+> guess it's a bit pointless to add new parameters to it which would
+> anyway come from that same hci_conn object.
 
-That's exactly what I had in mind before I learned about the GATT API.
-We will go with this, at least until the GATT API is automatically
-exposed.
+True, I didn't think about it when merging the second patch.
+
+
+>> +     /* We must ensure that the EIR Data fields are ordered and
+>> +      * unique. Keep it simple for now and avoid the problem by not
+>> +      * adding any BR/EDR data to the LE adv.
+>> +      */
+>> +     if (adv) {
+>
+> And once you do the earlier fix I suppose this check becomes:
+>
+>         if (conn->le_adv_data_len > 0) {
+
+
+Both remarks have been taken care of in version 4.
 
 Thanks,
 
 Fons
+
 
 
 -- 
