@@ -1,57 +1,159 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1412600108.28177.0.camel@linux-0dmf.site>
-Subject: Re: btusb_intr_complete returns -EPIPE
-From: Oliver Neukum <oneukum@suse.de>
-To: Naveen Kumar Parna <pnaveenkos@gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	linux-usb@vger.kernel.org
-Date: Mon, 06 Oct 2014 14:55:08 +0200
-In-Reply-To: <CAG0bkv+nKt-TgONDLENNUncz9NScdJGcYR+J2Z6b=wg2grvqhg@mail.gmail.com>
-References: <CAG0bkvK4-gfeYXXsdNg4BKdjxmo1e5d8rKuABohtYNNBHKJwDA@mail.gmail.com>
-	 <1412598268.1132.15.camel@linux-0dmf.site>
-	 <CAG0bkv+nKt-TgONDLENNUncz9NScdJGcYR+J2Z6b=wg2grvqhg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Sender: linux-usb-owner@vger.kernel.org
+From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH 7/7] android/tester: Add GATT server delete service test cases
+Date: Mon,  6 Oct 2014 14:54:06 +0200
+Message-Id: <1412600046-9865-7-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+In-Reply-To: <1412600046-9865-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+References: <1412600046-9865-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Mon, 2014-10-06 at 18:18 +0530, Naveen Kumar Parna wrote:
-> Hi,
-> 
-> I just collected the usbmon log(1.mon.out) and attached it. It stalls
-> for INT in transfers.
-> 
-> Corresponding kernel log is here:
-> Oct  6 18:00:48 naveen-OptiPlex-745 kernel: [ 7528.718473] hci3 urb
-> ffff88012954dd80 status -32 count 0
-> Oct  6 18:05:35 naveen-OptiPlex-745 kernel: [ 7814.688122] hci3 urb
-> ffff88012954dd80 status -32 count 0
-> Oct  6 18:05:35 naveen-OptiPlex-745 kernel: [ 7814.693086] hci3 urb
-> ffff88012954dd80 status -32 count 0
-> Oct  6 18:05:35 naveen-OptiPlex-745 kernel: [ 7814.695058] hci3 urb
-> ffff88012954dd80 status -32 count 0
-> Oct  6 18:05:35 naveen-OptiPlex-745 kernel: [ 7814.703073] hci3 urb
-> ffff88012954dd80 status -32 count 0
-> Oct  6 18:05:35 naveen-OptiPlex-745 kernel: [ 7814.717038] hci5 urb
-> ffff88012954de40 status -32 count 0
-> Oct  6 18:05:35 naveen-OptiPlex-745 kernel: [ 7814.717496] hci3 urb
-> ffff88012954dd80 status -32 count 0
-> 
-> Corresponding Usbmon trace:
-> ffff88012954dd80 2936526502 C Ii:1:009:1 -32:1 0
-> ffff88012954dd80 3223215374 C Ii:1:009:1 -32:1 0
-> ffff88012954dd80 3223220352 C Ii:1:009:1 -32:1 0
-> ffff88012954dd80 3223222332 C Ii:1:009:1 -32:1 0
-> ffff88012954dd80 3223230362 C Ii:1:009:1 -32:1 0
-> ffff88012954de40 3223244362 C Ii:1:019:1 -32:1 0
-> ffff88012954dd80 3223244830 C Ii:1:009:1 -32:1 0
-> 
-> Does it gives any clue?
+This adds delete service by server test cases.
+---
+ android/tester-gatt.c | 54 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ android/tester-main.c | 16 ++++++++++++++-
+ android/tester-main.h |  7 +++++++
+ 3 files changed, 76 insertions(+), 1 deletion(-)
 
-Not really. I'll make a patch to clear the condition.
-Let's see what happens then.
-
-	Regards
-		Oliver
-
+diff --git a/android/tester-gatt.c b/android/tester-gatt.c
+index abc28eb..b15735a 100644
+--- a/android/tester-gatt.c
++++ b/android/tester-gatt.c
+@@ -163,6 +163,11 @@ struct stop_srvc_data {
+ 	int *srvc_handle;
+ };
+ 
++struct delete_srvc_data {
++	int app_id;
++	int *srvc_handle;
++};
++
+ static bt_bdaddr_t emu_remote_bdaddr_val = {
+ 	.address = { 0x00, 0xaa, 0x01, 0x01, 0x00, 0x00 },
+ };
+@@ -518,6 +523,15 @@ static struct stop_srvc_data stop_bad_srvc_data_1 = {
+ 	.srvc_handle = &srvc_bad_handle
+ };
+ 
++static struct delete_srvc_data delete_srvc_data_1 = {
++	.app_id = APP1_ID,
++	.srvc_handle = &srvc1_handle
++};
++
++static struct delete_srvc_data delete_bad_srvc_data_1 = {
++	.app_id = APP1_ID,
++	.srvc_handle = &srvc_bad_handle
++};
+ struct set_read_params {
+ 	btgatt_read_params_t *params;
+ 	btgatt_srvc_id_t *srvc_id;
+@@ -1310,6 +1324,20 @@ static void gatt_server_stop_srvc_action(void)
+ 	schedule_action_verification(step);
+ }
+ 
++static void gatt_server_delete_srvc_action(void)
++{
++	struct test_data *data = tester_get_data();
++	struct step *current_data_step = queue_peek_head(data->steps);
++	struct delete_srvc_data *delete_srvc_data = current_data_step->set_data;
++	struct step *step = g_new0(struct step, 1);
++
++	step->action_status = data->if_gatt->server->delete_service(
++						delete_srvc_data->app_id,
++						*delete_srvc_data->srvc_handle);
++
++	schedule_action_verification(step);
++}
++
+ static void gatt_cid_hook_cb(const void *data, uint16_t len, void *user_data)
+ {
+ 	struct test_data *t_data = tester_get_data();
+@@ -2817,6 +2845,32 @@ static struct test_case test_cases[] = {
+ 		CALLBACK_GATTS_SERVICE_STOPPED(GATT_STATUS_FAILURE, APP1_ID,
+ 									NULL),
+ 	),
++	TEST_CASE_BREDRLE("Gatt Server - Delete Service Successful",
++		ACTION_SUCCESS(gatt_server_register_action, &app1_uuid),
++		CALLBACK_STATUS(CB_GATTS_REGISTER_SERVER, BT_STATUS_SUCCESS),
++		ACTION_SUCCESS(gatt_server_add_service_action,
++							&add_service_data_1),
++		CALLBACK_GATTS_SERVICE_ADDED(GATT_STATUS_SUCCESS, APP1_ID,
++							&service_add_1, NULL,
++							&srvc1_handle),
++		ACTION_SUCCESS(gatt_server_delete_srvc_action,
++							&delete_srvc_data_1),
++		CALLBACK_GATTS_SERVICE_DELETED(GATT_STATUS_SUCCESS, APP1_ID,
++								&srvc1_handle),
++	),
++	TEST_CASE_BREDRLE("Gatt Server - Delete Service wrong handle",
++		ACTION_SUCCESS(gatt_server_register_action, &app1_uuid),
++		CALLBACK_STATUS(CB_GATTS_REGISTER_SERVER, BT_STATUS_SUCCESS),
++		ACTION_SUCCESS(gatt_server_add_service_action,
++							&add_service_data_1),
++		CALLBACK_GATTS_SERVICE_ADDED(GATT_STATUS_SUCCESS, APP1_ID,
++							&service_add_1, NULL,
++							&srvc1_handle),
++		ACTION_FAIL(gatt_server_delete_srvc_action,
++						&delete_bad_srvc_data_1),
++		CALLBACK_GATTS_SERVICE_DELETED(GATT_STATUS_FAILURE, APP1_ID,
++									NULL),
++	),
+ };
+ 
+ struct queue *get_gatt_tests(void)
+diff --git a/android/tester-main.c b/android/tester-main.c
+index 253599b..a804f11 100644
+--- a/android/tester-main.c
++++ b/android/tester-main.c
+@@ -1636,6 +1636,20 @@ static void gatts_service_stopped_cb(int status, int server_if, int srvc_handle)
+ 	schedule_callback_verification(step);
+ }
+ 
++static void gatts_service_deleted_cb(int status, int server_if, int srvc_handle)
++{
++	struct step *step = g_new0(struct step, 1);
++
++	step->callback = CB_GATTS_SERVICE_DELETED;
++
++	step->callback_result.status = status;
++	step->callback_result.gatt_app_id = server_if;
++	step->callback_result.srvc_handle = g_memdup(&srvc_handle,
++							sizeof(srvc_handle));
++
++	schedule_callback_verification(step);
++}
++
+ static void pan_control_state_cb(btpan_control_state_t state,
+ 					bt_status_t error, int local_role,
+ 							const char *ifname)
+@@ -1765,7 +1779,7 @@ static const btgatt_server_callbacks_t btgatt_server_callbacks = {
+ 	.descriptor_added_cb = gatts_descriptor_added_cb,
+ 	.service_started_cb = gatts_service_started_cb,
+ 	.service_stopped_cb = gatts_service_stopped_cb,
+-	.service_deleted_cb = NULL,
++	.service_deleted_cb = gatts_service_deleted_cb,
+ 	.request_read_cb = NULL,
+ 	.request_write_cb = NULL,
+ 	.request_exec_write_cb = NULL,
+diff --git a/android/tester-main.h b/android/tester-main.h
+index 04195a7..22c5c8b 100644
+--- a/android/tester-main.h
++++ b/android/tester-main.h
+@@ -311,6 +311,13 @@ struct pdu_set {
+ 		.callback_result.srvc_handle = cb_srvc_handle, \
+ 	}
+ 
++#define CALLBACK_GATTS_SERVICE_DELETED(cb_res, cb_server_id, cb_srvc_handle) { \
++		.callback = CB_GATTS_SERVICE_DELETED, \
++		.callback_result.status = cb_res, \
++		.callback_result.gatt_app_id = cb_server_id, \
++		.callback_result.srvc_handle = cb_srvc_handle, \
++	}
++
+ #define CALLBACK_PAN_CTRL_STATE(cb, cb_res, cb_state, cb_local_role) { \
+ 		.callback = cb, \
+ 		.callback_result.status = cb_res, \
+-- 
+1.9.3
 
