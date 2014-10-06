@@ -1,136 +1,124 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1412602169.28177.2.camel@linux-0dmf.site>
-Subject: Re: btusb_intr_complete returns -EPIPE
-From: Oliver Neukum <oneukum@suse.de>
-To: Naveen Kumar Parna <pnaveenkos@gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	linux-usb@vger.kernel.org, acho@suse.com
-Date: Mon, 06 Oct 2014 15:29:29 +0200
-In-Reply-To: <CAG0bkvK=fumhJNzuSgx=HFHiVP08V+QH2wLajdffx+f5ugoQPQ@mail.gmail.com>
-References: <CAG0bkvK4-gfeYXXsdNg4BKdjxmo1e5d8rKuABohtYNNBHKJwDA@mail.gmail.com>
-	 <1412598268.1132.15.camel@linux-0dmf.site>
-	 <CAG0bkv+nKt-TgONDLENNUncz9NScdJGcYR+J2Z6b=wg2grvqhg@mail.gmail.com>
-	 <1412600108.28177.0.camel@linux-0dmf.site>
-	 <CAG0bkvK=fumhJNzuSgx=HFHiVP08V+QH2wLajdffx+f5ugoQPQ@mail.gmail.com>
-Content-Type: multipart/mixed; boundary="=-CVq7vkVDEYrMBB7w80+z"
-Mime-Version: 1.0
+MIME-Version: 1.0
+In-Reply-To: <1412341081-20594-3-git-send-email-mariusz.skamra@tieto.com>
+References: <1412341081-20594-1-git-send-email-mariusz.skamra@tieto.com>
+	<1412341081-20594-3-git-send-email-mariusz.skamra@tieto.com>
+Date: Mon, 6 Oct 2014 15:28:09 +0200
+Message-ID: <CAMv5GbcynhHgC613AUZVKk3Ye88DctsjxgpXJj17fuPZFau1Ow@mail.gmail.com>
+Subject: Re: [PATCH 3/4] android/tester: Add Gatt Write Descriptor Wrong Param
+From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
+To: Mariusz Skamra <mariusz.skamra@tieto.com>
+Cc: linux-bluetooth <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Hi Mariusz,
 
---=-CVq7vkVDEYrMBB7w80+z
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
+On 3 October 2014 14:58, Mariusz Skamra <mariusz.skamra@tieto.com> wrote:
+>
+> Write descriptor value using wrong parameters test case
+> ---
+>  android/tester-gatt.c | 55 +++++++++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 55 insertions(+)
+>
+> diff --git a/android/tester-gatt.c b/android/tester-gatt.c
+> index 79de14f..3c686aa 100644
+> --- a/android/tester-gatt.c
+> +++ b/android/tester-gatt.c
+> @@ -287,6 +287,17 @@ static struct write_char_data write_char_data_1 = {
+>         .auth_req = 0
+>  };
+>
+> +static struct write_desc_data write_desc_data_2 = {
+> +       .conn_id = CONN1_ID,
+> +       .service = &service_1,
+> +       .characteristic = &characteristic_1,
+> +       .descriptor = &desc_2,
+> +       .write_type = 2,
+> +       .len = sizeof(value_2),
+> +       .auth_req = 0,
+> +       .p_value = value_2,
+> +};
+> +
+>  static struct write_char_data write_char_data_2 = {
+>         .conn_id = CONN1_ID,
+>         .service = &service_1,
+> @@ -424,6 +435,14 @@ static struct set_write_params set_write_param_4 = {
+>         .status = BT_STATUS_SUCCESS
+>  };
+>
 
-On Mon, 2014-10-06 at 18:33 +0530, Naveen Kumar Parna wrote:
-> Thank you very much. I will try that patch.
+I suggest to declare test case structures as in current order, without
+mixing with other struct types:
 
-Then please try.
+e.g. :
+"
+... set_write_param_3 ...
+... set_write_param_4 ...
+... set_write_param_5 ...
 
-	Regards
-		Oliver
+> +static struct set_write_params set_write_param_5 = {
+> +       .params = &write_params_1,
+> +       .srvc_id = &service_1,
+> +       .char_id = &characteristic_1,
+> +       .descr_id = &desc_2,
+> +       .status = 0x01
+> +};
+> +
+>  static struct set_notify_params set_notify_param_1 = {
+>         .params = &notify_params_1,
+>         .value = value_1,
+> @@ -2256,6 +2275,42 @@ static struct test_case test_cases[] = {
+>                 ACTION_SUCCESS(bluetooth_disable_action, NULL),
+>                 CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_OFF),
+>                 ),
+> +       TEST_CASE_BREDRLE("Gatt Client - Write Descriptor - Wrong Param",
+> +               ACTION_SUCCESS(init_pdus, write_descriptor_1),
+> +               ACTION_SUCCESS(bluetooth_enable_action, NULL),
+> +               CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_ON),
+> +               ACTION_SUCCESS(init_write_params_action, &set_write_param_5),
+> +               ACTION_SUCCESS(emu_setup_powered_remote_action, NULL),
+> +               ACTION_SUCCESS(emu_set_ssp_mode_action, NULL),
+> +               ACTION_SUCCESS(emu_set_connect_cb_action, gatt_conn_cb),
+> +               ACTION_SUCCESS(gatt_client_register_action, &app1_uuid),
+> +               CALLBACK_STATUS(CB_GATTC_REGISTER_CLIENT, BT_STATUS_SUCCESS),
+> +               ACTION_SUCCESS(gatt_client_start_scan_action,
+> +                                                       INT_TO_PTR(APP1_ID)),
+> +               CLLBACK_GATTC_SCAN_RES(prop_emu_remotes_default_set, 1, TRUE),
+> +               ACTION_SUCCESS(gatt_client_stop_scan_action,
+> +                                                       INT_TO_PTR(APP1_ID)),
+> +               ACTION_SUCCESS(gatt_client_connect_action, &app1_conn_req),
+> +               CALLBACK_GATTC_CONNECT(GATT_STATUS_SUCCESS,
+> +                                               prop_emu_remotes_default_set,
+> +                                               CONN1_ID, APP1_ID),
+> +               ACTION_SUCCESS(gatt_client_search_services, &search_services_1),
+> +               CALLBACK_GATTC_SEARCH_COMPLETE(GATT_STATUS_SUCCESS, CONN1_ID),
+> +               ACTION_SUCCESS(gatt_client_get_characteristic_action,
+> +                                                       &get_char_data_1),
+> +               CALLBACK_GATTC_GET_CHARACTERISTIC_CB(GATT_STATUS_SUCCESS,
+> +                               CONN1_ID, &service_1, &characteristic_1, 4),
+> +               ACTION_SUCCESS(gatt_client_get_descriptor_action,
+> +                                                       &get_desc_data_1),
+> +               CALLBACK_GATTC_GET_DESCRIPTOR(GATT_STATUS_SUCCESS, CONN1_ID,
+> +                               &service_1, &characteristic_1, &desc_1),
+> +               ACTION_FAIL(gatt_client_write_descriptor_action,
+> +                                                       &write_desc_data_2),
+> +               CALLBACK_GATTC_WRITE_DESCRIPTOR(GATT_STATUS_FAILURE,
+> +                                               CONN1_ID, &write_params_1),
+> +               ACTION_SUCCESS(bluetooth_disable_action, NULL),
+> +               CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_OFF),
+> +               ),
+>  };
+>
+>  struct queue *get_gatt_tests(void)
+> --
+> 1.9.1
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
-
---=-CVq7vkVDEYrMBB7w80+z
-Content-Disposition: attachment; filename="0001-btusb-clear-halt-if-intr-in-stalls.patch"
-Content-Type: text/x-patch; name="0001-btusb-clear-halt-if-intr-in-stalls.patch";
-	charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-
->From f9f74591abed07ee71c46d443dd10176d05096c5 Mon Sep 17 00:00:00 2001
-From: Oliver Neukum <oneukum@suse.de>
-Date: Mon, 6 Oct 2014 15:27:54 +0200
-Subject: [PATCH] btusb: clear halt if intr in stalls
-
-Use a work queue for clearing a halt.
-
-Signed-off-by: Oliver Neukum <oneukum@suse.de>
----
- drivers/bluetooth/btusb.c | 34 ++++++++++++++++++++++++++++++++--
- 1 file changed, 32 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 292c38e..65a2c6b 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -273,6 +273,7 @@ struct btusb_data {
- 
- 	struct work_struct work;
- 	struct work_struct waker;
-+	struct work_struct intr_in_work;
- 
- 	struct usb_anchor tx_anchor;
- 	struct usb_anchor intr_anchor;
-@@ -314,14 +315,15 @@ static void btusb_intr_complete(struct urb *urb)
- 	struct hci_dev *hdev = urb->context;
- 	struct btusb_data *data = hci_get_drvdata(hdev);
- 	int err;
-+	int status = urb->status;
- 
- 	BT_DBG("%s urb %p status %d count %d", hdev->name,
--					urb, urb->status, urb->actual_length);
-+					urb, status, urb->actual_length);
- 
- 	if (!test_bit(HCI_RUNNING, &hdev->flags))
- 		return;
- 
--	if (urb->status == 0) {
-+	if (status == 0) {
- 		hdev->stat.byte_rx += urb->actual_length;
- 
- 		if (hci_recv_fragment(hdev, HCI_EVENT_PKT,
-@@ -330,6 +332,10 @@ static void btusb_intr_complete(struct urb *urb)
- 			BT_ERR("%s corrupted event packet", hdev->name);
- 			hdev->stat.err_rx++;
- 		}
-+	} else if (status == -EPIPE) {
-+		usb_mark_last_busy(data->udev);
-+		schedule_work(&data->intr_in_work);
-+		return;
- 	}
- 
- 	if (!test_bit(BTUSB_INTR_RUNNING, &data->flags))
-@@ -971,6 +977,29 @@ static void btusb_waker(struct work_struct *work)
- 	usb_autopm_put_interface(data->intf);
- }
- 
-+static void clear_halt_intr_in(struct work_struct *work)
-+{
-+	struct btusb_data *data = container_of(work, struct btusb_data, waker);
-+	int err;
-+
-+	err = usb_autopm_get_interface(data->intf);
-+	if (err < 0)
-+		return;
-+
-+	err = usb_clear_halt(data->udev,
-+			     usb_rcvbulkpipe(data->udev,
-+					     data->intr_ep->bEndpointAddress));
-+	if (err < 0)
-+		return;
-+
-+	if (!test_bit(BTUSB_INTR_RUNNING, &data->flags))
-+		return;
-+
-+	btusb_submit_intr_urb(data->hdev, GFP_ATOMIC);
-+
-+	usb_autopm_put_interface(data->intf);
-+}
-+
- static int btusb_setup_bcm92035(struct hci_dev *hdev)
- {
- 	struct sk_buff *skb;
-@@ -1759,6 +1788,7 @@ static int btusb_probe(struct usb_interface *intf,
- 
- 	INIT_WORK(&data->work, btusb_work);
- 	INIT_WORK(&data->waker, btusb_waker);
-+	INIT_WORK(&data->intr_in_work, clear_halt_intr_in);
- 	spin_lock_init(&data->txlock);
- 
- 	init_usb_anchor(&data->tx_anchor);
--- 
-1.8.4.5
-
-
---=-CVq7vkVDEYrMBB7w80+z--
-
+BR,
+Grzegorz
