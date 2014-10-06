@@ -1,83 +1,186 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Mon, 06 Oct 2014 04:26:02 -0700 (PDT)
+From: Szymon Janc <szymon.janc@tieto.com>
+To: Mariusz Skamra <mariusz.skamra@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 1/4] android/tester: Add Gatt Write Descriptor Success
+Message-ID: <3366693.8ogLESeT2z@uw000953>
+In-Reply-To: <1412341081-20594-1-git-send-email-mariusz.skamra@tieto.com>
+References: <1412341081-20594-1-git-send-email-mariusz.skamra@tieto.com>
 MIME-Version: 1.0
-Date: Mon, 6 Oct 2014 17:05:06 +0530
-Message-ID: <CAG0bkvK4-gfeYXXsdNg4BKdjxmo1e5d8rKuABohtYNNBHKJwDA@mail.gmail.com>
-Subject: btusb_intr_complete returns -EPIPE
-From: Naveen Kumar Parna <pnaveenkos@gmail.com>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	linux-usb@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Mariusz,
 
-I am using  “3.1.0-7.fc16.x86_64” kernel and testing eight USB
-Bluetooth dongles using btusb.ko module.
+On Friday 03 of October 2014 14:57:58 Mariusz Skamra wrote:
+> Write descriptor value test case.
+> ---
+>  android/tester-gatt.c | 107 ++++++++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 107 insertions(+)
+> 
+> diff --git a/android/tester-gatt.c b/android/tester-gatt.c
+> index 4c9eba5..79de14f 100644
+> --- a/android/tester-gatt.c
+> +++ b/android/tester-gatt.c
+> @@ -94,6 +94,17 @@ struct write_char_data {
+>  	char *p_value;
+>  };
+>  
+> +struct write_desc_data {
+> +	int conn_id;
+> +	btgatt_srvc_id_t *service;
+> +	btgatt_gatt_id_t *characteristic;
+> +	btgatt_gatt_id_t *descriptor;
+> +	int write_type;
+> +	int len;
+> +	int auth_req;
+> +	char *p_value;
+> +};
+> +
+>  struct notif_data {
+>  	int conn_id;
+>  	const bt_bdaddr_t *bdaddr;
+> @@ -286,6 +297,17 @@ static struct write_char_data write_char_data_2 = {
+>  	.auth_req = 0
+>  };
+>  
+> +static struct write_desc_data write_desc_data_1 = {
+> +	.conn_id = CONN1_ID,
+> +	.service = &service_1,
+> +	.characteristic = &characteristic_1,
+> +	.descriptor = &desc_1,
+> +	.write_type = 2,
+> +	.len = sizeof(value_2),
+> +	.auth_req = 0,
+> +	.p_value = value_2,
+> +};
+> +
+>  static struct notif_data notif_data_1 = {
+>  	.conn_id = CONN1_ID,
+>  	.service = &service_1,
+> @@ -394,6 +416,14 @@ static struct set_write_params set_write_param_3 = {
+>  	.status = 0x01
+>  };
+>  
+> +static struct set_write_params set_write_param_4 = {
+> +	.params = &write_params_1,
+> +	.srvc_id = &service_1,
+> +	.char_id = &characteristic_1,
+> +	.descr_id = &desc_1,
+> +	.status = BT_STATUS_SUCCESS
+> +};
+> +
+>  static struct set_notify_params set_notify_param_1 = {
+>  	.params = &notify_params_1,
+>  	.value = value_1,
+> @@ -638,6 +668,24 @@ static struct iovec write_characteristic_3[] = {
+>  	end_pdu
+>  };
+>  
+> +static struct iovec write_descriptor_1[] = {
+> +	raw_pdu(0x10, 0x01, 0x00, 0xff, 0xff, 0x00, 0x28),
+> +	raw_pdu(0x11, 0x06, 0x01, 0x00, 0x10, 0x00, 0x00, 0x18),
+> +	raw_pdu(0x10, 0x11, 0x00, 0xff, 0xff, 0x00, 0x28),
+> +	raw_pdu(0x01, 0x11, 0x11, 0x00, 0x0a),
+> +	raw_pdu(0x08, 0x01, 0x00, 0x10, 0x00, 0x03, 0x28),
+> +	raw_pdu(0x09, 0x07, 0x02, 0x00, 0x04, 0x00, 0x00, 0x19, 0x00),
+> +	raw_pdu(0x08, 0x03, 0x00, 0x10, 0x00, 0x03, 0x28),
+> +	raw_pdu(0x01, 0x08, 0x03, 0x00, 0x0a),
+> +	raw_pdu(0x04, 0x01, 0x00, 0x10, 0x00),
+> +	raw_pdu(0x05, 0x01, 0x04, 0x00, 0x00, 0x29),
+> +	raw_pdu(0x04, 0x05, 0x00, 0x10, 0x00),
+> +	raw_pdu(0x01, 0x04, 0x05, 0x00, 0x0a),
+> +	raw_pdu(0x12, 0x04, 0x00, 0x00, 0x01, 0x02, 0x03),
+> +	raw_pdu(0x13),
+> +	end_pdu
+> +};
+> +
+>  static struct iovec notification_1[] = {
+>  	raw_pdu(0x10, 0x01, 0x00, 0xff, 0xff, 0x00, 0x28),
+>  	raw_pdu(0x11, 0x06, 0x01, 0x00, 0x10, 0x00, 0x00, 0x18),
+> @@ -962,6 +1010,29 @@ static void gatt_server_unregister_action(void)
+>  	schedule_action_verification(step);
+>  }
+>  
+> +static void gatt_client_write_descriptor_action(void)
+> +{
+> +	struct test_data *data = tester_get_data();
+> +	struct step *current_data_step = queue_peek_head(data->steps);
+> +	struct write_desc_data *write_desc_data = current_data_step->set_data;
+> +	const btgatt_client_interface_t *client = data->if_gatt->client;
+> +	struct step *step = g_new0(struct step, 1);
+> +	int status;
+> +
+> +	status = client->write_descriptor(write_desc_data->conn_id,
+> +						write_desc_data->service,
+> +						write_desc_data->characteristic,
+> +						write_desc_data->descriptor,
+> +						write_desc_data->write_type,
+> +						write_desc_data->len,
+> +						write_desc_data->auth_req,
+> +						write_desc_data->p_value);
+> +
+> +	step->action_status = status;
+> +
+> +	schedule_action_verification(step);
+> +}
+> +
+>  static void gatt_cid_hook_cb(const void *data, uint16_t len, void *user_data)
+>  {
+>  	struct test_data *t_data = tester_get_data();
+> @@ -2149,6 +2220,42 @@ static struct test_case test_cases[] = {
+>  		ACTION_SUCCESS(gatt_server_register_action, &app1_uuid),
+>  		CALLBACK_STATUS(CB_GATTS_REGISTER_SERVER, BT_STATUS_SUCCESS),
+>  	),
+> +	TEST_CASE_BREDRLE("Gatt Client - Write Descriptor - Success",
+> +		ACTION_SUCCESS(init_pdus, write_descriptor_1),
+> +		ACTION_SUCCESS(bluetooth_enable_action, NULL),
+> +		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_ON),
+> +		ACTION_SUCCESS(init_write_params_action, &set_write_param_4),
+> +		ACTION_SUCCESS(emu_setup_powered_remote_action, NULL),
+> +		ACTION_SUCCESS(emu_set_ssp_mode_action, NULL),
+> +		ACTION_SUCCESS(emu_set_connect_cb_action, gatt_conn_cb),
+> +		ACTION_SUCCESS(gatt_client_register_action, &app1_uuid),
+> +		CALLBACK_STATUS(CB_GATTC_REGISTER_CLIENT, BT_STATUS_SUCCESS),
+> +		ACTION_SUCCESS(gatt_client_start_scan_action,
+> +							INT_TO_PTR(APP1_ID)),
+> +		CLLBACK_GATTC_SCAN_RES(prop_emu_remotes_default_set, 1, TRUE),
+> +		ACTION_SUCCESS(gatt_client_stop_scan_action,
+> +							INT_TO_PTR(APP1_ID)),
+> +		ACTION_SUCCESS(gatt_client_connect_action, &app1_conn_req),
+> +		CALLBACK_GATTC_CONNECT(GATT_STATUS_SUCCESS,
+> +						prop_emu_remotes_default_set,
+> +						CONN1_ID, APP1_ID),
+> +		ACTION_SUCCESS(gatt_client_search_services, &search_services_1),
+> +		CALLBACK_GATTC_SEARCH_COMPLETE(GATT_STATUS_SUCCESS, CONN1_ID),
+> +		ACTION_SUCCESS(gatt_client_get_characteristic_action,
+> +							&get_char_data_1),
+> +		CALLBACK_GATTC_GET_CHARACTERISTIC_CB(GATT_STATUS_SUCCESS,
+> +				CONN1_ID, &service_1, &characteristic_1, 4),
+> +		ACTION_SUCCESS(gatt_client_get_descriptor_action,
+> +							&get_desc_data_1),
+> +		CALLBACK_GATTC_GET_DESCRIPTOR(GATT_STATUS_SUCCESS, CONN1_ID,
+> +				&service_1, &characteristic_1, &desc_1),
+> +		ACTION_SUCCESS(gatt_client_write_descriptor_action,
+> +							&write_desc_data_1),
+> +		CALLBACK_GATTC_WRITE_DESCRIPTOR(GATT_STATUS_SUCCESS,
+> +						CONN1_ID, &write_params_1),
+> +		ACTION_SUCCESS(bluetooth_disable_action, NULL),
+> +		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_OFF),
+> +		),
+>  };
 
+Please do not mix client and server tests. So this should be up before server
+tests. Same goes for rest of the patches.
 
-Once I power-on the system and loading the btusb.ko driver immediately
-results the below mentioned errors:
+Other than that those look good to me.
 
-[ 1389.410907] hci3 urb ffff88012954dd80 status -32 count 0
+>  
+>  struct queue *get_gatt_tests(void)
+> 
 
-[ 1389.411367] hci4 urb ffff88012954d3c0 status -32 count 0
-
-[ 1389.411845] hci1 urb ffff88012b4b6b40 status -32 count 0
-
-[ 1389.412238] hci2 urb ffff8801347ee0c0 status -32 count 0
-
-[ 1518.647255] hci3 urb ffff88012954dd80 status -32 count 0
-
-[ 1518.647722] hci4 urb ffff88012954d3c0 status -32 count 0
-
-[ 1518.648120] hci1 urb ffff88012b4b6b40 status -32 count 0
-
-[ 1518.648514] hci2 urb ffff8801347ee0c0 status -32 count 0
-
-[ 1518.722033] hci2 urb ffff8801347ee0c0 status -32 count 0
-
-[ 2191.964545] hci4 urb ffff88012954d3c0 status -32 count 0
-
-[ 2191.965001] hci1 urb ffff88012b4b6b40 status -32 count 0
-
-[ 2191.965396] hci2 urb ffff8801347ee0c0 status -32 count 0
-
-[ 2191.966530] hci2 urb ffff8801347ee0c0 status -32 count 0
-
-[ 2191.975514] hci4 urb ffff88012954d3c0 status -32 count 0
-
-[ 2191.975936] hci1 urb ffff88012b4b6b40 status -32 count 0
-
-[ 2191.976330] hci2 urb ffff8801347ee0c0 status -32 count 0
-
-[ 2191.977503] hci4 urb ffff88012954d3c0 status -32 count 0
-
-[ 2191.977929] hci1 urb ffff88012b4b6b40 status -32 count 0
-
-[ 2191.978325] hci2 urb ffff8801347ee0c0 status -32 count 0
-
-[ 2560.132682] hci2 urb ffff8801347ee0c0 status -32 count 0
-
-[ 2569.160895] hci4 urb ffff88012954d3c0 status -32 count 0
-
-[ 2569.161367] hci1 urb ffff88012b4b6b40 status -32 count 0
-
-[ 2569.161827] hci2 urb ffff8801347ee0c0 status -32 count 0
-
-[ 3022.252541] hci2 urb ffff8801347ee0c0 status -32 count 0
-
-[ 3022.254504] hci2 urb ffff8801347ee0c0 status -32 count 0
-
-
-These errors will repeat until sending a proper HCI command on the USB
-bus. Again after some time duration same error will repeats.
-
-The error -32(-EPIPE) says , Endpoint stalled.  For non-control
-endpoints, reset this status with usb_clear_halt().
-
-But I don’t see the error(-EPIPE) handling code in btusb module. Does
-anyone has the patch for this scenario?
-
-Thanks,
-Naveen
+-- 
+Best regards, 
+Szymon Janc
