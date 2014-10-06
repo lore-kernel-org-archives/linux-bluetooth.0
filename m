@@ -1,57 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
-From: Ruslan Mstoi <ruslan.mstoi@linux.intel.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Ruslan Mstoi <ruslan.mstoi@linux.intel.com>
-Subject: [PATCH] android/pts: Updated PBAP PICS and PIXITs for PTS 5.3
-Date: Mon,  6 Oct 2014 17:13:12 +0300
-Message-Id: <1412604792-28728-1-git-send-email-ruslan.mstoi@linux.intel.com>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [RFC] android/gatt: Fix sign_cnt increment
+Date: Mon, 06 Oct 2014 15:50:16 +0200
+Message-ID: <706305081.yQHgjJLZMt@uw000953>
+In-Reply-To: <1412583238-3307-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1412581779-22424-1-git-send-email-Andrei.Emeltchenko.news@gmail.com> <1412583238-3307-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- android/pics-pbap.txt  | 2 +-
- android/pixit-pbap.txt | 2 +-
- android/pts-pbap.txt   | 4 ++--
- 3 files changed, 4 insertions(+), 4 deletions(-)
+Hi Andrei,
 
-diff --git a/android/pics-pbap.txt b/android/pics-pbap.txt
-index bcb71b6..cb4126c 100644
---- a/android/pics-pbap.txt
-+++ b/android/pics-pbap.txt
-@@ -1,6 +1,6 @@
- PBAP PICS for the PTS tool.
- 
--PTS version: 5.2
-+PTS version: 5.3
- 
- * - different than PTS defaults
- # - not yet implemented/supported
-diff --git a/android/pixit-pbap.txt b/android/pixit-pbap.txt
-index 7bc374b..f7a93c6 100644
---- a/android/pixit-pbap.txt
-+++ b/android/pixit-pbap.txt
-@@ -1,6 +1,6 @@
- PBAP PIXIT for the PTS tool.
- 
--PTS version: 5.2
-+PTS version: 5.3
- 
- * - different than PTS defaults
- & - should be set to IUT Bluetooth address
-diff --git a/android/pts-pbap.txt b/android/pts-pbap.txt
-index 6341f5c..67e366d 100644
---- a/android/pts-pbap.txt
-+++ b/android/pts-pbap.txt
-@@ -1,7 +1,7 @@
- PTS test results for PBAP
- 
--PTS version: 5.2
--Tested: 04-August-2014
-+PTS version: 5.3
-+Tested: 06-October-2014
- Android version: 4.4.4
- 
- Results:
+On Monday 06 of October 2014 11:13:58 Andrei Emeltchenko wrote:
+> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> 
+> ---
+>  android/gatt.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/android/gatt.c b/android/gatt.c
+> index dbe067f..718b137 100644
+> --- a/android/gatt.c
+> +++ b/android/gatt.c
+> @@ -3169,7 +3169,7 @@ static guint signed_write_cmd(struct gatt_device *dev, uint16_t handle,
+>  		return 0;
+>  	}
+>  
+> -	bt_update_sign_counter(&dev->bdaddr, LOCAL_CSRK, sign_cnt++);
+> +	bt_update_sign_counter(&dev->bdaddr, LOCAL_CSRK, ++sign_cnt);
+>  
+>  	return res;
+>  }
+
+Applied. Thanks. 
+
 -- 
-1.9.1
-
+Best regards, 
+Szymon Janc
