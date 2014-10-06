@@ -1,10 +1,12 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-Date: Mon, 6 Oct 2014 17:53:04 +0530
-Message-ID: <CAG0bkvKYd23+HmHBf+xQOVd9MQ72y1QVysAFbU9A-LoPmnQ2SA@mail.gmail.com>
-Subject: btusb_intr_complete returns -EPIPE
-From: Naveen Kumar Parna <pnaveenkos@gmail.com>
-To: linux-usb@vger.kernel.org
+In-Reply-To: <1412593085-12618-1-git-send-email-lukasz.rymanowski@tieto.com>
+References: <1412593085-12618-1-git-send-email-lukasz.rymanowski@tieto.com>
+Date: Mon, 6 Oct 2014 14:21:31 +0200
+Message-ID: <CAN_7+Yaps1ZA97wYjSE+vpieF=64x7fY__nC+d-VtCb6NDSzPg@mail.gmail.com>
+Subject: Re: [PATCH 1/2] shared/hfp: Improve next_field() function
+From: Lukasz Rymanowski <lukasz.rymanowski@gmail.com>
+To: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,72 +14,37 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi,
 
-I am using  “3.1.0-7.fc16.x86_64” kernel and testing eight USB
-Bluetooth dongles using btusb.ko module.
+On Mon, Oct 6, 2014 at 12:58 PM, Lukasz Rymanowski
+<lukasz.rymanowski@tieto.com> wrote:
+> In HF Client case we might have "-" separator between hf data. For
+> example +CIND: ("signal",(0-5))
+> With this patch next_field() is able to skip "-" as well.
+> ---
+>  src/shared/hfp.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+>
+> diff --git a/src/shared/hfp.c b/src/shared/hfp.c
+> index efc981f..bc091b5 100644
+> --- a/src/shared/hfp.c
+> +++ b/src/shared/hfp.c
+> @@ -221,7 +221,8 @@ done:
+>
+>  static void next_field(struct hfp_gw_result *result)
+>  {
+> -       if (result->data[result->offset] == ',')
+> +       if (result->data[result->offset] == ',' ||
+> +                                       result->data[result->offset] == '-')
 
+Actually this might brake parsing some AT commands.  Ignore this patch.
 
-Once I power-on the system and loading the btusb.ko driver immediately
-results the below mentioned errors:
-
-[ 1389.410907] hci3 urb ffff88012954dd80 status -32 count 0
-
-[ 1389.411367] hci4 urb ffff88012954d3c0 status -32 count 0
-
-[ 1389.411845] hci1 urb ffff88012b4b6b40 status -32 count 0
-
-[ 1389.412238] hci2 urb ffff8801347ee0c0 status -32 count 0
-
-[ 1518.647255] hci3 urb ffff88012954dd80 status -32 count 0
-
-[ 1518.647722] hci4 urb ffff88012954d3c0 status -32 count 0
-
-[ 1518.648120] hci1 urb ffff88012b4b6b40 status -32 count 0
-
-[ 1518.648514] hci2 urb ffff8801347ee0c0 status -32 count 0
-
-[ 1518.722033] hci2 urb ffff8801347ee0c0 status -32 count 0
-
-[ 2191.964545] hci4 urb ffff88012954d3c0 status -32 count 0
-
-[ 2191.965001] hci1 urb ffff88012b4b6b40 status -32 count 0
-
-[ 2191.965396] hci2 urb ffff8801347ee0c0 status -32 count 0
-
-[ 2191.966530] hci2 urb ffff8801347ee0c0 status -32 count 0
-
-[ 2191.975514] hci4 urb ffff88012954d3c0 status -32 count 0
-
-[ 2191.975936] hci1 urb ffff88012b4b6b40 status -32 count 0
-
-[ 2191.976330] hci2 urb ffff8801347ee0c0 status -32 count 0
-
-[ 2191.977503] hci4 urb ffff88012954d3c0 status -32 count 0
-
-[ 2191.977929] hci1 urb ffff88012b4b6b40 status -32 count 0
-
-[ 2191.978325] hci2 urb ffff8801347ee0c0 status -32 count 0
-
-[ 2560.132682] hci2 urb ffff8801347ee0c0 status -32 count 0
-
-[ 2569.160895] hci4 urb ffff88012954d3c0 status -32 count 0
-
-[ 2569.161367] hci1 urb ffff88012b4b6b40 status -32 count 0
-
-[ 2569.161827] hci2 urb ffff8801347ee0c0 status -32 count 0
-
-[ 3022.252541] hci2 urb ffff8801347ee0c0 status -32 count 0
-
-[ 3022.254504] hci2 urb ffff8801347ee0c0 status -32 count 0
-
-
-These errors will repeat until sending a proper HCI command on the USB
-bus. Again after some time duration same error will repeats.
-
-The error -32(-EPIPE) says , Endpoint stalled.  For non-control
-endpoints, reset this status with usb_clear_halt().
-
-But I don’t see the error(-EPIPE) handling code in btusb module. Does
-anyone has the patch for this scenario?
-
-Thanks,
-Naveen
+\Lukasz
+>                 result->offset++;
+>  }
+>
+> --
+> 1.8.4
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
