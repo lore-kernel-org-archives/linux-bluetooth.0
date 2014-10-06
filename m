@@ -1,93 +1,67 @@
 Return-Path: <cyrus@holtmann.org>
 From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/3] android/tester: Add GATT server start service test cases
-Date: Mon,  6 Oct 2014 16:27:43 +0200
-Message-Id: <1412605665-13527-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+Subject: [PATCH 3/3] android/tester: Add GATT server delete service test cases
+Date: Mon,  6 Oct 2014 16:27:45 +0200
+Message-Id: <1412605665-13527-3-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+In-Reply-To: <1412605665-13527-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+References: <1412605665-13527-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This adds start service by server test cases.
+This adds delete service by server test cases.
 ---
- android/tester-gatt.c | 100 ++++++++++++++++++++++++++++++++++++++++++++++++++
- android/tester-main.c |  16 +++++++-
- android/tester-main.h |   7 ++++
- 3 files changed, 122 insertions(+), 1 deletion(-)
+ android/tester-gatt.c | 54 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ android/tester-main.c | 16 ++++++++++++++-
+ android/tester-main.h |  7 +++++++
+ 3 files changed, 76 insertions(+), 1 deletion(-)
 
 diff --git a/android/tester-gatt.c b/android/tester-gatt.c
-index e86e929..19ba703 100644
+index 1f369c2..d4516ef 100644
 --- a/android/tester-gatt.c
 +++ b/android/tester-gatt.c
-@@ -37,6 +37,10 @@
- #define CONN1_ID	1
- #define CONN2_ID	2
- 
-+#define GATT_SERVER_TRANSPORT_LE		0x00
-+#define GATT_SERVER_TRANSPORT_BREDR		0x01
-+#define GATT_SERVER_TRANSPORT_LE_BREDR		0x02
-+
- static struct queue *list; /* List of gatt test cases */
- 
- static int srvc1_handle;
-@@ -138,6 +142,12 @@ struct add_desc_data {
- 	int permissions;
+@@ -153,6 +153,11 @@ struct stop_srvc_data {
+ 	int *srvc_handle;
  };
  
-+struct start_srvc_data {
++struct delete_srvc_data {
 +	int app_id;
 +	int *srvc_handle;
-+	int transport;
 +};
 +
  static bt_bdaddr_t emu_remote_bdaddr_val = {
  	.address = { 0x00, 0xaa, 0x01, 0x01, 0x00, 0x00 },
  };
-@@ -459,6 +469,30 @@ static struct add_desc_data add_desc_data_1 = {
- 	.permissions = 0
+@@ -508,6 +513,15 @@ static struct stop_srvc_data stop_bad_srvc_data_1 = {
+ 	.srvc_handle = &srvc_bad_handle
  };
  
-+static struct start_srvc_data start_srvc_data_1 = {
++static struct delete_srvc_data delete_srvc_data_1 = {
 +	.app_id = APP1_ID,
-+	.srvc_handle = &srvc1_handle,
-+	.transport = GATT_SERVER_TRANSPORT_LE_BREDR
++	.srvc_handle = &srvc1_handle
 +};
 +
-+static struct start_srvc_data start_srvc_data_2 = {
++static struct delete_srvc_data delete_bad_srvc_data_1 = {
 +	.app_id = APP1_ID,
-+	.srvc_handle = &srvc1_handle,
-+	.transport = GATT_SERVER_TRANSPORT_LE
++	.srvc_handle = &srvc_bad_handle
 +};
-+
-+static struct start_srvc_data start_bad_srvc_data_1 = {
-+	.app_id = APP1_ID,
-+	.srvc_handle = &srvc_bad_handle,
-+	.transport = GATT_SERVER_TRANSPORT_LE
-+};
-+
-+static struct start_srvc_data start_bad_srvc_data_2 = {
-+	.app_id = APP1_ID,
-+	.srvc_handle = &srvc1_handle,
-+	.transport = -1
-+};
-+
  struct set_read_params {
  	btgatt_read_params_t *params;
  	btgatt_srvc_id_t *srvc_id;
-@@ -1222,6 +1256,21 @@ static void gatt_server_add_desc_action(void)
+@@ -1300,6 +1314,20 @@ static void gatt_server_stop_srvc_action(void)
  	schedule_action_verification(step);
  }
  
-+static void gatt_server_start_srvc_action(void)
++static void gatt_server_delete_srvc_action(void)
 +{
 +	struct test_data *data = tester_get_data();
 +	struct step *current_data_step = queue_peek_head(data->steps);
-+	struct start_srvc_data *start_srvc_data = current_data_step->set_data;
++	struct delete_srvc_data *delete_srvc_data = current_data_step->set_data;
 +	struct step *step = g_new0(struct step, 1);
 +
-+	step->action_status = data->if_gatt->server->start_service(
-+						start_srvc_data->app_id,
-+						*start_srvc_data->srvc_handle,
-+						start_srvc_data->transport);
++	step->action_status = data->if_gatt->server->delete_service(
++						delete_srvc_data->app_id,
++						*delete_srvc_data->srvc_handle);
 +
 +	schedule_action_verification(step);
 +}
@@ -95,11 +69,11 @@ index e86e929..19ba703 100644
  static void gatt_cid_hook_cb(const void *data, uint16_t len, void *user_data)
  {
  	struct test_data *t_data = tester_get_data();
-@@ -2645,6 +2694,57 @@ static struct test_case test_cases[] = {
- 		CALLBACK_GATTS_DESCRIPTOR_ADDED(GATT_STATUS_FAILURE, APP2_ID,
- 						&app2_uuid, NULL, NULL, NULL),
+@@ -2807,6 +2835,32 @@ static struct test_case test_cases[] = {
+ 		CALLBACK_GATTS_SERVICE_STOPPED(GATT_STATUS_FAILURE, APP1_ID,
+ 									NULL),
  	),
-+	TEST_CASE_BREDRLE("Gatt Server - Start Service Successful BREDRLE",
++	TEST_CASE_BREDRLE("Gatt Server - Delete Service Successful",
 +		ACTION_SUCCESS(gatt_server_register_action, &app1_uuid),
 +		CALLBACK_STATUS(CB_GATTS_REGISTER_SERVER, BT_STATUS_SUCCESS),
 +		ACTION_SUCCESS(gatt_server_add_service_action,
@@ -107,12 +81,12 @@ index e86e929..19ba703 100644
 +		CALLBACK_GATTS_SERVICE_ADDED(GATT_STATUS_SUCCESS, APP1_ID,
 +							&service_add_1, NULL,
 +							&srvc1_handle),
-+		ACTION_SUCCESS(gatt_server_start_srvc_action,
-+							&start_srvc_data_1),
-+		CALLBACK_GATTS_SERVICE_STARTED(GATT_STATUS_SUCCESS, APP1_ID,
++		ACTION_SUCCESS(gatt_server_delete_srvc_action,
++							&delete_srvc_data_1),
++		CALLBACK_GATTS_SERVICE_DELETED(GATT_STATUS_SUCCESS, APP1_ID,
 +								&srvc1_handle),
 +	),
-+	TEST_CASE_BREDRLE("Gatt Server - Start Service Successful LE",
++	TEST_CASE_BREDRLE("Gatt Server - Delete Service wrong handle",
 +		ACTION_SUCCESS(gatt_server_register_action, &app1_uuid),
 +		CALLBACK_STATUS(CB_GATTS_REGISTER_SERVER, BT_STATUS_SUCCESS),
 +		ACTION_SUCCESS(gatt_server_add_service_action,
@@ -120,52 +94,27 @@ index e86e929..19ba703 100644
 +		CALLBACK_GATTS_SERVICE_ADDED(GATT_STATUS_SUCCESS, APP1_ID,
 +							&service_add_1, NULL,
 +							&srvc1_handle),
-+		ACTION_SUCCESS(gatt_server_start_srvc_action,
-+							&start_srvc_data_2),
-+		CALLBACK_GATTS_SERVICE_STARTED(GATT_STATUS_SUCCESS, APP1_ID,
-+								&srvc1_handle),
-+	),
-+	TEST_CASE_BREDRLE("Gatt Server - Start Service wrong service handle",
-+		ACTION_SUCCESS(gatt_server_register_action, &app1_uuid),
-+		CALLBACK_STATUS(CB_GATTS_REGISTER_SERVER, BT_STATUS_SUCCESS),
-+		ACTION_SUCCESS(gatt_server_add_service_action,
-+							&add_service_data_1),
-+		CALLBACK_GATTS_SERVICE_ADDED(GATT_STATUS_SUCCESS, APP1_ID,
-+						&service_add_1, NULL, NULL),
-+		ACTION_FAIL(gatt_server_start_srvc_action,
-+							&start_bad_srvc_data_1),
-+		CALLBACK_GATTS_SERVICE_STARTED(GATT_STATUS_FAILURE, APP1_ID,
++		ACTION_FAIL(gatt_server_delete_srvc_action,
++						&delete_bad_srvc_data_1),
++		CALLBACK_GATTS_SERVICE_DELETED(GATT_STATUS_FAILURE, APP1_ID,
 +									NULL),
-+	),
-+	TEST_CASE_BREDRLE("Gatt Server - Start Service wrong server transport",
-+		ACTION_SUCCESS(gatt_server_register_action, &app1_uuid),
-+		CALLBACK_STATUS(CB_GATTS_REGISTER_SERVER, BT_STATUS_SUCCESS),
-+		ACTION_SUCCESS(gatt_server_add_service_action,
-+							&add_service_data_1),
-+		CALLBACK_GATTS_SERVICE_ADDED(GATT_STATUS_SUCCESS, APP1_ID,
-+							&service_add_1, NULL,
-+							&srvc1_handle),
-+		ACTION_FAIL(gatt_server_start_srvc_action,
-+							&start_bad_srvc_data_2),
-+		CALLBACK_GATTS_SERVICE_STARTED(GATT_STATUS_FAILURE, APP1_ID,
-+								&srvc1_handle),
 +	),
  };
  
  struct queue *get_gatt_tests(void)
 diff --git a/android/tester-main.c b/android/tester-main.c
-index 30e1c59..4ffa3c1 100644
+index 253599b..a804f11 100644
 --- a/android/tester-main.c
 +++ b/android/tester-main.c
-@@ -1608,6 +1608,20 @@ static void gatts_descriptor_added_cb(int status, int server_if,
+@@ -1636,6 +1636,20 @@ static void gatts_service_stopped_cb(int status, int server_if, int srvc_handle)
  	schedule_callback_verification(step);
  }
  
-+static void gatts_service_started_cb(int status, int server_if, int srvc_handle)
++static void gatts_service_deleted_cb(int status, int server_if, int srvc_handle)
 +{
 +	struct step *step = g_new0(struct step, 1);
 +
-+	step->callback = CB_GATTS_SERVICE_STARTED;
++	step->callback = CB_GATTS_SERVICE_DELETED;
 +
 +	step->callback_result.status = status;
 +	step->callback_result.gatt_app_id = server_if;
@@ -178,25 +127,25 @@ index 30e1c59..4ffa3c1 100644
  static void pan_control_state_cb(btpan_control_state_t state,
  					bt_status_t error, int local_role,
  							const char *ifname)
-@@ -1735,7 +1749,7 @@ static const btgatt_server_callbacks_t btgatt_server_callbacks = {
- 	.included_service_added_cb = gatts_included_service_added_cb,
- 	.characteristic_added_cb = gatts_characteristic_added_cb,
+@@ -1765,7 +1779,7 @@ static const btgatt_server_callbacks_t btgatt_server_callbacks = {
  	.descriptor_added_cb = gatts_descriptor_added_cb,
--	.service_started_cb = NULL,
-+	.service_started_cb = gatts_service_started_cb,
- 	.service_stopped_cb = NULL,
- 	.service_deleted_cb = NULL,
+ 	.service_started_cb = gatts_service_started_cb,
+ 	.service_stopped_cb = gatts_service_stopped_cb,
+-	.service_deleted_cb = NULL,
++	.service_deleted_cb = gatts_service_deleted_cb,
  	.request_read_cb = NULL,
+ 	.request_write_cb = NULL,
+ 	.request_exec_write_cb = NULL,
 diff --git a/android/tester-main.h b/android/tester-main.h
-index 17a6eb3..1906a8d 100644
+index 04195a7..22c5c8b 100644
 --- a/android/tester-main.h
 +++ b/android/tester-main.h
-@@ -297,6 +297,13 @@ struct pdu_set {
- 		.store_desc_handle = cb_store_desc_handle, \
+@@ -311,6 +311,13 @@ struct pdu_set {
+ 		.callback_result.srvc_handle = cb_srvc_handle, \
  	}
  
-+#define CALLBACK_GATTS_SERVICE_STARTED(cb_res, cb_server_id, cb_srvc_handle) { \
-+		.callback = CB_GATTS_SERVICE_STARTED, \
++#define CALLBACK_GATTS_SERVICE_DELETED(cb_res, cb_server_id, cb_srvc_handle) { \
++		.callback = CB_GATTS_SERVICE_DELETED, \
 +		.callback_result.status = cb_res, \
 +		.callback_result.gatt_app_id = cb_server_id, \
 +		.callback_result.srvc_handle = cb_srvc_handle, \
