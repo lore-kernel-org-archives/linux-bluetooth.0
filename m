@@ -1,87 +1,229 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <CAHrH25R28cLmLQH25TsTxXA=BRVMdbTec3atg5t6fMUEd_oSgw@mail.gmail.com>
-References: <1412375951-13940-1-git-send-email-armansito@chromium.org>
-	<1412375951-13940-3-git-send-email-armansito@chromium.org>
-	<CABBYNZLj2gGoCW-5hmkG2dA0i6Ss9RVJjjQhPzv=vk1ARephmQ@mail.gmail.com>
-	<CAHrH25R28cLmLQH25TsTxXA=BRVMdbTec3atg5t6fMUEd_oSgw@mail.gmail.com>
-Date: Mon, 6 Oct 2014 19:01:34 +0300
-Message-ID: <CABBYNZJRX6vorDhW6_XecwKjEmvz3D6g97f9X_DjJRL=5dV5Ag@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 2/3] shared/gatt-server: Introduce shared/gatt-server.
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Arman Uguray <armansito@chromium.org>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+From: Bharat Panda <bharat.panda@samsung.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: cpgs@samsung.com, Bharat Panda <bharat.panda@samsung.com>
+Subject: [PATCH ] audio/avrcp: Add Support for PLAYBACK_POS_CHANGED_EVENT
+Date: Mon, 06 Oct 2014 21:19:55 +0530
+Message-id: <1412610595-16393-1-git-send-email-bharat.panda@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Arman,
+As per AVRCP 1.5 spec, 6.7.2, page 57.
 
-On Mon, Oct 6, 2014 at 4:15 PM, Arman Uguray <armansito@chromium.org> wrote:
-> Hi Luiz,
->
->> I think it is better to be able to attach/detach and existing db
->> object because otherwise we will need to reconstruct it on every
->> connection, furthermore the db might exist anyway since we need to be
->> able to register services even when we are not connected.
->>
->
-> Yeah, I did it this way for the reasons I explained in the cover
-> letter: I basically want to keep the layering related to ATT protocol
-> within bt_gatt_server, however the way gatt-db is currently structured
-> makes it difficult. This particularly arises from the generic
-> read/write handlers, where an attribute value is stored outside of the
-> database and fetched via a callback.
->
-> When bt_gatt_server receives a request, say Read By Group Type, it
-> calls gatt_db_read_by_group_type and then calls gatt_db_read for each
-> attribute handle returned. If there's no value stored in the database
-> and the value should be obtained elsewhere, then gatt-db invokes the
-> registered read callback. That read callback needs to eventually make
-> the value known to bt_gatt_server.
+EVENT_PLAYBACK_POS_CHANGED shall be notified in the following conditions:
 
-Yep, I realize this is a bit messed up because even though
-gatt_db_read can be asynchronous it does not take a callback, worse it
-takes a bdaddr (most likely inspired by Android HAL)?
+	1. TG has reached the registered playback Interval time.
+	2. Changed PLAY STATUS.
+	3. Changed Current Track.
+	4. Reached end or beginning of track.
+---
+ profiles/audio/avrcp.c | 49 +++++++++++++++++++++++++++++++++++++++++++++++++
+ profiles/audio/avrcp.h |  1 +
+ profiles/audio/media.c | 23 ++++++++++++++---------
+ 3 files changed, 64 insertions(+), 9 deletions(-)
 
-> So my initial thought was to add an extra layer of callbacks between
-> bt_gatt_server and make bt_gatt_server the global server database that
-> can handle multiple bt_att instances that can be attached/detached on
-> demand. I think I could go back to the way I had it before, have
-> bt_gatt_server accept a gatt-db in its constructor, and perhaps handle
-> a special function for the read handling, such as a
-> bt_gatt_server_set_read_value_for_handle of sorts that can get called
-> from the read handler and that helps bt_gatt_server construct the ATT
-> protocol response, but still there are problems such as how the
-> generic gatt-db read handler will know which bt_gatt_server instance
-> to call this function on (as there can be several bt_gatt_server
-> instances for each device that acts simultaneously as a client and a
-> server). The way things currently are, you can't reliably pass this
-> information as user_data in the read callback, i.e. there is currently
-> no way to say which bt_gatt_server the request originated from. If
-> gatt-db is internal to bt_gatt_server and there are wrappers for
-> functions such as gatt_db_add_characteristic in the bt_gatt_server_*
-> namespace, then we can hook callbacks up in a way that handles this.
-
-Id say we need to pass a callback along with a userdata,
-gatt_db_read_t can probably take a the callback and another user_data
-associated with it so when it is completed it should be called.
-
-> So maybe it's better to have a single bt_gatt_server that exists for
-> the lifetime of the application and for each new connection we create
-> a bt_att and attach it to bt_gatt_server. Or, we go back to what we
-> originally had in mind, i.e. one gatt-db and multiple per-connection
-> bt_gatt_server instances but we will have to rework gatt-db a little
-> for this. Note that this hasn't been a problem for the android code,
-> since everything is implemented in one android/gatt layer, hence
-> gatt-db is inherently internal to the transport handling.
-
-Not sure how having bt_gatt_server not per connection would help here,
-the problem seems much more related to asynchronous calls, be it
-gatt_db or bt_gatt_server it does not seem to change anything you
-would still have to create a context that tracks the originating
-bt_att to send the response to, Android code seem to be building the
-response itself which I think it is to be in someplace else.
-
+diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c
+index 5c3c4f9..77f1dcb 100644
+--- a/profiles/audio/avrcp.c
++++ b/profiles/audio/avrcp.c
+@@ -198,6 +198,7 @@ struct pending_list_items {
+ struct avrcp_player {
+ 	struct avrcp_server *server;
+ 	GSList *sessions;
++	uint16_t pos_timer;
+ 	uint16_t id;
+ 	uint8_t scope;
+ 	uint64_t uid;
+@@ -627,6 +628,7 @@ void avrcp_player_event(struct avrcp_player *player, uint8_t id,
+ 	uint8_t buf[AVRCP_HEADER_LENGTH + 9];
+ 	struct avrcp_header *pdu = (void *) buf;
+ 	uint16_t size;
++	uint32_t *pos = NULL;
+ 	GSList *l;
+ 	int attr;
+ 	int val;
+@@ -673,6 +675,18 @@ void avrcp_player_event(struct avrcp_player *player, uint8_t id,
+ 		pdu->params[size++] = attr;
+ 		pdu->params[size++] = val;
+ 		break;
++	case AVRCP_EVENT_PLAYBACK_POS_CHANGED:
++		size = 5;
++		pos = (uint32_t *) data;
++
++		be32toh(*pos);
++		memcpy(&pdu->params[1], pos, sizeof(uint32_t));
++
++		if (player->pos_timer > 0) {
++			g_source_remove(player->pos_timer);
++			player->pos_timer = 0;
++		}
++		break;
+ 	default:
+ 		error("Unknown event %u", id);
+ 		return;
+@@ -1429,6 +1443,19 @@ static bool handle_passthrough(struct avctp *conn, uint8_t op, bool pressed,
+ 	return handler->func(session);
+ }
+ 
++static gboolean interval_timeout(gpointer user_data)
++{
++	uint32_t pos;
++	struct avrcp_player *mp = user_data;
++
++	pos = player_get_position(mp);
++	mp->pos_timer = 0;
++	avrcp_player_event(mp, AVRCP_EVENT_PLAYBACK_POS_CHANGED,
++						&pos);
++
++	return FALSE;
++}
++
+ static uint8_t avrcp_handle_register_notification(struct avrcp *session,
+ 						struct avrcp_header *pdu,
+ 						uint8_t transaction)
+@@ -1436,6 +1463,8 @@ static uint8_t avrcp_handle_register_notification(struct avrcp *session,
+ 	struct avrcp_player *player = target_get_player(session);
+ 	struct btd_device *dev = session->dev;
+ 	uint16_t len = ntohs(pdu->params_len);
++	uint32_t interval;
++	uint32_t pos;
+ 	uint64_t uid;
+ 	GList *settings;
+ 
+@@ -1467,6 +1496,20 @@ static uint8_t avrcp_handle_register_notification(struct avrcp *session,
+ 	case AVRCP_EVENT_TRACK_REACHED_START:
+ 		len = 1;
+ 		break;
++	case AVRCP_EVENT_PLAYBACK_POS_CHANGED:
++		len = 5;
++
++		interval = htole32(pdu->params[1]);
++		player->pos_timer = g_timeout_add_seconds(interval,
++								interval_timeout, player);
++
++		pos = player_get_position(player);
++		be32toh(pos);
++		/* Fill the value for sending INTERIM response */
++		memcpy(&pdu->params[1], &pos, sizeof(uint32_t));
++
++		break;
++
+ 	case AVRCP_EVENT_SETTINGS_CHANGED:
+ 		len = 1;
+ 		settings = player_list_settings(player);
+@@ -2949,6 +2992,11 @@ static void player_destroy(gpointer data)
+ 	if (player->destroy)
+ 		player->destroy(player->user_data);
+ 
++	if (player->pos_timer != 0) {
++		g_source_remove(player->pos_timer);
++		player->pos_timer = 0;
++	}
++
+ 	g_slist_free(player->sessions);
+ 	g_free(player->path);
+ 	g_free(player->change_path);
+@@ -3407,6 +3455,7 @@ static void target_init(struct avrcp *session)
+ 				(1 << AVRCP_EVENT_TRACK_CHANGED) |
+ 				(1 << AVRCP_EVENT_TRACK_REACHED_START) |
+ 				(1 << AVRCP_EVENT_TRACK_REACHED_END) |
++				(1 << AVRCP_EVENT_PLAYBACK_POS_CHANGED) |
+ 				(1 << AVRCP_EVENT_SETTINGS_CHANGED);
+ 
+ 	if (target->version < 0x0104)
+diff --git a/profiles/audio/avrcp.h b/profiles/audio/avrcp.h
+index 6ac5294..4816e4b 100644
+--- a/profiles/audio/avrcp.h
++++ b/profiles/audio/avrcp.h
+@@ -74,6 +74,7 @@
+ #define AVRCP_EVENT_TRACK_CHANGED		0x02
+ #define AVRCP_EVENT_TRACK_REACHED_END		0x03
+ #define AVRCP_EVENT_TRACK_REACHED_START		0x04
++#define	AVRCP_EVENT_PLAYBACK_POS_CHANGED	0x05
+ #define AVRCP_EVENT_SETTINGS_CHANGED		0x08
+ #define AVRCP_EVENT_AVAILABLE_PLAYERS_CHANGED	0x0a
+ #define AVRCP_EVENT_ADDRESSED_PLAYER_CHANGED	0x0b
+diff --git a/profiles/audio/media.c b/profiles/audio/media.c
+index ef7b910..cc19c61 100644
+--- a/profiles/audio/media.c
++++ b/profiles/audio/media.c
+@@ -1305,6 +1305,9 @@ static gboolean set_status(struct media_player *mp, DBusMessageIter *iter)
+ 	mp->status = g_strdup(value);
+ 
+ 	avrcp_player_event(mp->player, AVRCP_EVENT_STATUS_CHANGED, mp->status);
++	avrcp_player_event(mp->player,
++					AVRCP_EVENT_PLAYBACK_POS_CHANGED,
++					&mp->position);
+ 
+ 	return TRUE;
+ }
+@@ -1312,7 +1315,6 @@ static gboolean set_status(struct media_player *mp, DBusMessageIter *iter)
+ static gboolean set_position(struct media_player *mp, DBusMessageIter *iter)
+ {
+ 	uint64_t value;
+-	const char *status;
+ 
+ 	if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_INT64)
+ 			return FALSE;
+@@ -1321,11 +1323,6 @@ static gboolean set_position(struct media_player *mp, DBusMessageIter *iter)
+ 
+ 	value /= 1000;
+ 
+-	if (value > get_position(mp))
+-		status = "forward-seek";
+-	else
+-		status = "reverse-seek";
+-
+ 	mp->position = value;
+ 	g_timer_start(mp->timer);
+ 
+@@ -1334,6 +1331,9 @@ static gboolean set_position(struct media_player *mp, DBusMessageIter *iter)
+ 	if (!mp->position) {
+ 		avrcp_player_event(mp->player,
+ 					AVRCP_EVENT_TRACK_REACHED_START, NULL);
++		avrcp_player_event(mp->player,
++					AVRCP_EVENT_PLAYBACK_POS_CHANGED,
++					&mp->position);
+ 		return TRUE;
+ 	}
+ 
+@@ -1344,11 +1344,13 @@ static gboolean set_position(struct media_player *mp, DBusMessageIter *iter)
+ 	if (mp->position == UINT32_MAX || mp->position >= mp->duration) {
+ 		avrcp_player_event(mp->player, AVRCP_EVENT_TRACK_REACHED_END,
+ 									NULL);
++		avrcp_player_event(mp->player,
++					AVRCP_EVENT_PLAYBACK_POS_CHANGED,
++					&mp->position);
+ 		return TRUE;
+ 	}
+-
+-	/* Send a status change to force resync the position */
+-	avrcp_player_event(mp->player, AVRCP_EVENT_STATUS_CHANGED, status);
++	avrcp_player_event(mp->player, AVRCP_EVENT_PLAYBACK_POS_CHANGED,
++								&mp->position);
+ 
+ 	return TRUE;
+ }
+@@ -1456,6 +1458,7 @@ static gboolean parse_player_metadata(struct media_player *mp,
+ 	int ctype;
+ 	gboolean title = FALSE;
+ 	uint64_t uid;
++	uint32_t pos;
+ 
+ 	ctype = dbus_message_iter_get_arg_type(iter);
+ 	if (ctype != DBUS_TYPE_ARRAY)
+@@ -1521,9 +1524,11 @@ static gboolean parse_player_metadata(struct media_player *mp,
+ 	mp->position = 0;
+ 	g_timer_start(mp->timer);
+ 	uid = get_uid(mp);
++	pos = get_position(mp);
+ 
+ 	avrcp_player_event(mp->player, AVRCP_EVENT_TRACK_CHANGED, &uid);
+ 	avrcp_player_event(mp->player, AVRCP_EVENT_TRACK_REACHED_START, NULL);
++	avrcp_player_event(mp->player, AVRCP_EVENT_PLAYBACK_POS_CHANGED, &pos);
+ 
+ 	return TRUE;
+ }
 -- 
-Luiz Augusto von Dentz
+1.9.1
+
