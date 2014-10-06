@@ -1,38 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
-From: Gowtham Anandha Babu <gowtham.ab@samsung.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: d.kasatkin@samsung.com, bharat.panda@samsung.com, cpgs@samsung.com,
-	Gowtham Anandha Babu <gowtham.ab@samsung.com>
-Subject: [PATCH 0/6] Add support for MAP MASInstance feature
-Date: Tue, 07 Oct 2014 09:36:50 +0530
-Message-id: <1412654816-14971-1-git-send-email-gowtham.ab@samsung.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+MIME-Version: 1.0
+In-Reply-To: <CAHrH25Qw2s0T_MCJndAbv63Eixc7zcJ-KTZG8Y1aKZTy+J8gMw@mail.gmail.com>
+References: <CAHF=Y4pBMLaF1osqQNk1fkw1UHGk6SMYhQ=u5zYZ6qswoFKWBA@mail.gmail.com>
+ <F54B539B-3C7A-48C6-B608-417FBCB5050F@holtmann.org> <CAHF=Y4oGjUc=j4DE_pyC5Ue5ymsaoaGXJRzYHdWTHa2EF1k9Gg@mail.gmail.com>
+ <CAHrH25Qw2s0T_MCJndAbv63Eixc7zcJ-KTZG8Y1aKZTy+J8gMw@mail.gmail.com>
+From: Alfonso Acosta <fons@spotify.com>
+Date: Tue, 7 Oct 2014 01:25:42 +0200
+Message-ID: <CAHF=Y4qdhn=QjQEU+Sv44NNvAzdjn3wutboXENR0=H9Lx28vbg@mail.gmail.com>
+Subject: Re: Connecting to propietary remote GATT service: plugins vs D-Bus
+ GATT API
+To: Arman Uguray <armansito@chromium.org>
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+	BlueZ development <linux-bluetooth@vger.kernel.org>, Mattias Jansson <mjansson@spotify.com>
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch-set implements MAP 1.2 MAS Instance feature.
+Hi Arman,
 
-The patch 1,2,3 will handle the Client part(MCE). It passes
-the PTS 5.3 test case:TC_MCE_MMI_BV_01_I.
 
-The patch 4,5,6 will handle the Server part(MSE). It passes
-the PTS 5.3 test case:TC_MSE_MMI_BV_02_I.
+> For client the quickest way for you might be to actually write a
+> plugin (using the GAttrib code). I would just look at some of the
+> profile code, like input/hog or heartrate and maybe add your
+> implementation as a profile and expose a simple D-Bus API for it if
+> necessary. Since you're not going to submit this upstream, this might
+> be the quickest approach for the short term.
 
-Gowtham Anandha Babu (6):
-  doc/obex-api: Add description about MASInstance request
-  test/map-client: Add D-Bus API support to make MASInstance request
-  obexd/client/map: Add API Calls for request and handlers for response
-  obexd/mas: Add support for providing MASInstance Info as response
-  obexd/messages: Add prototypes for MASInstance response
-  obexd/message-dummy: Add MAS Instance description to response
+That's exactly what I had in mind before I learned about the GATT API.
+We will go with this, at least until the GATT API is automatically
+exposed.
 
- doc/obex-api.txt               |  6 +++
- obexd/client/map.c             | 88 ++++++++++++++++++++++++++++++++++++++++++
- obexd/plugins/mas.c            | 62 +++++++++++++++++++++++++++++
- obexd/plugins/messages-dummy.c | 18 +++++++++
- obexd/plugins/messages.h       | 16 ++++++++
- test/map-client                |  9 +++++
- 6 files changed, 199 insertions(+)
+Thanks,
+
+Fons
+
 
 -- 
-1.9.1
+Alfonso Acosta
 
+Embedded Systems Engineer at Spotify
+Birger Jarlsgatan 61, Stockholm, Sweden
+http://www.spotify.com
