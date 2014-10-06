@@ -1,124 +1,68 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1412341081-20594-3-git-send-email-mariusz.skamra@tieto.com>
-References: <1412341081-20594-1-git-send-email-mariusz.skamra@tieto.com>
-	<1412341081-20594-3-git-send-email-mariusz.skamra@tieto.com>
-Date: Mon, 6 Oct 2014 15:28:09 +0200
-Message-ID: <CAMv5GbcynhHgC613AUZVKk3Ye88DctsjxgpXJj17fuPZFau1Ow@mail.gmail.com>
-Subject: Re: [PATCH 3/4] android/tester: Add Gatt Write Descriptor Wrong Param
-From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
-To: Mariusz Skamra <mariusz.skamra@tieto.com>
-Cc: linux-bluetooth <linux-bluetooth@vger.kernel.org>
+In-Reply-To: <CABBYNZLj2gGoCW-5hmkG2dA0i6Ss9RVJjjQhPzv=vk1ARephmQ@mail.gmail.com>
+References: <1412375951-13940-1-git-send-email-armansito@chromium.org>
+	<1412375951-13940-3-git-send-email-armansito@chromium.org>
+	<CABBYNZLj2gGoCW-5hmkG2dA0i6Ss9RVJjjQhPzv=vk1ARephmQ@mail.gmail.com>
+Date: Mon, 6 Oct 2014 09:15:15 -0400
+Message-ID: <CAHrH25R28cLmLQH25TsTxXA=BRVMdbTec3atg5t6fMUEd_oSgw@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 2/3] shared/gatt-server: Introduce shared/gatt-server.
+From: Arman Uguray <armansito@chromium.org>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Mariusz,
+Hi Luiz,
 
-On 3 October 2014 14:58, Mariusz Skamra <mariusz.skamra@tieto.com> wrote:
->
-> Write descriptor value using wrong parameters test case
-> ---
->  android/tester-gatt.c | 55 +++++++++++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 55 insertions(+)
->
-> diff --git a/android/tester-gatt.c b/android/tester-gatt.c
-> index 79de14f..3c686aa 100644
-> --- a/android/tester-gatt.c
-> +++ b/android/tester-gatt.c
-> @@ -287,6 +287,17 @@ static struct write_char_data write_char_data_1 = {
->         .auth_req = 0
->  };
->
-> +static struct write_desc_data write_desc_data_2 = {
-> +       .conn_id = CONN1_ID,
-> +       .service = &service_1,
-> +       .characteristic = &characteristic_1,
-> +       .descriptor = &desc_2,
-> +       .write_type = 2,
-> +       .len = sizeof(value_2),
-> +       .auth_req = 0,
-> +       .p_value = value_2,
-> +};
-> +
->  static struct write_char_data write_char_data_2 = {
->         .conn_id = CONN1_ID,
->         .service = &service_1,
-> @@ -424,6 +435,14 @@ static struct set_write_params set_write_param_4 = {
->         .status = BT_STATUS_SUCCESS
->  };
+> I think it is better to be able to attach/detach and existing db
+> object because otherwise we will need to reconstruct it on every
+> connection, furthermore the db might exist anyway since we need to be
+> able to register services even when we are not connected.
 >
 
-I suggest to declare test case structures as in current order, without
-mixing with other struct types:
+Yeah, I did it this way for the reasons I explained in the cover
+letter: I basically want to keep the layering related to ATT protocol
+within bt_gatt_server, however the way gatt-db is currently structured
+makes it difficult. This particularly arises from the generic
+read/write handlers, where an attribute value is stored outside of the
+database and fetched via a callback.
 
-e.g. :
-"
-... set_write_param_3 ...
-... set_write_param_4 ...
-... set_write_param_5 ...
+When bt_gatt_server receives a request, say Read By Group Type, it
+calls gatt_db_read_by_group_type and then calls gatt_db_read for each
+attribute handle returned. If there's no value stored in the database
+and the value should be obtained elsewhere, then gatt-db invokes the
+registered read callback. That read callback needs to eventually make
+the value known to bt_gatt_server.
 
-> +static struct set_write_params set_write_param_5 = {
-> +       .params = &write_params_1,
-> +       .srvc_id = &service_1,
-> +       .char_id = &characteristic_1,
-> +       .descr_id = &desc_2,
-> +       .status = 0x01
-> +};
-> +
->  static struct set_notify_params set_notify_param_1 = {
->         .params = &notify_params_1,
->         .value = value_1,
-> @@ -2256,6 +2275,42 @@ static struct test_case test_cases[] = {
->                 ACTION_SUCCESS(bluetooth_disable_action, NULL),
->                 CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_OFF),
->                 ),
-> +       TEST_CASE_BREDRLE("Gatt Client - Write Descriptor - Wrong Param",
-> +               ACTION_SUCCESS(init_pdus, write_descriptor_1),
-> +               ACTION_SUCCESS(bluetooth_enable_action, NULL),
-> +               CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_ON),
-> +               ACTION_SUCCESS(init_write_params_action, &set_write_param_5),
-> +               ACTION_SUCCESS(emu_setup_powered_remote_action, NULL),
-> +               ACTION_SUCCESS(emu_set_ssp_mode_action, NULL),
-> +               ACTION_SUCCESS(emu_set_connect_cb_action, gatt_conn_cb),
-> +               ACTION_SUCCESS(gatt_client_register_action, &app1_uuid),
-> +               CALLBACK_STATUS(CB_GATTC_REGISTER_CLIENT, BT_STATUS_SUCCESS),
-> +               ACTION_SUCCESS(gatt_client_start_scan_action,
-> +                                                       INT_TO_PTR(APP1_ID)),
-> +               CLLBACK_GATTC_SCAN_RES(prop_emu_remotes_default_set, 1, TRUE),
-> +               ACTION_SUCCESS(gatt_client_stop_scan_action,
-> +                                                       INT_TO_PTR(APP1_ID)),
-> +               ACTION_SUCCESS(gatt_client_connect_action, &app1_conn_req),
-> +               CALLBACK_GATTC_CONNECT(GATT_STATUS_SUCCESS,
-> +                                               prop_emu_remotes_default_set,
-> +                                               CONN1_ID, APP1_ID),
-> +               ACTION_SUCCESS(gatt_client_search_services, &search_services_1),
-> +               CALLBACK_GATTC_SEARCH_COMPLETE(GATT_STATUS_SUCCESS, CONN1_ID),
-> +               ACTION_SUCCESS(gatt_client_get_characteristic_action,
-> +                                                       &get_char_data_1),
-> +               CALLBACK_GATTC_GET_CHARACTERISTIC_CB(GATT_STATUS_SUCCESS,
-> +                               CONN1_ID, &service_1, &characteristic_1, 4),
-> +               ACTION_SUCCESS(gatt_client_get_descriptor_action,
-> +                                                       &get_desc_data_1),
-> +               CALLBACK_GATTC_GET_DESCRIPTOR(GATT_STATUS_SUCCESS, CONN1_ID,
-> +                               &service_1, &characteristic_1, &desc_1),
-> +               ACTION_FAIL(gatt_client_write_descriptor_action,
-> +                                                       &write_desc_data_2),
-> +               CALLBACK_GATTC_WRITE_DESCRIPTOR(GATT_STATUS_FAILURE,
-> +                                               CONN1_ID, &write_params_1),
-> +               ACTION_SUCCESS(bluetooth_disable_action, NULL),
-> +               CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_OFF),
-> +               ),
->  };
->
->  struct queue *get_gatt_tests(void)
-> --
-> 1.9.1
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+So my initial thought was to add an extra layer of callbacks between
+bt_gatt_server and make bt_gatt_server the global server database that
+can handle multiple bt_att instances that can be attached/detached on
+demand. I think I could go back to the way I had it before, have
+bt_gatt_server accept a gatt-db in its constructor, and perhaps handle
+a special function for the read handling, such as a
+bt_gatt_server_set_read_value_for_handle of sorts that can get called
+from the read handler and that helps bt_gatt_server construct the ATT
+protocol response, but still there are problems such as how the
+generic gatt-db read handler will know which bt_gatt_server instance
+to call this function on (as there can be several bt_gatt_server
+instances for each device that acts simultaneously as a client and a
+server). The way things currently are, you can't reliably pass this
+information as user_data in the read callback, i.e. there is currently
+no way to say which bt_gatt_server the request originated from. If
+gatt-db is internal to bt_gatt_server and there are wrappers for
+functions such as gatt_db_add_characteristic in the bt_gatt_server_*
+namespace, then we can hook callbacks up in a way that handles this.
 
-BR,
-Grzegorz
+So maybe it's better to have a single bt_gatt_server that exists for
+the lifetime of the application and for each new connection we create
+a bt_att and attach it to bt_gatt_server. Or, we go back to what we
+originally had in mind, i.e. one gatt-db and multiple per-connection
+bt_gatt_server instances but we will have to rework gatt-db a little
+for this. Note that this hasn't been a problem for the android code,
+since everything is implemented in one android/gatt layer, hence
+gatt-db is inherently internal to the transport handling.
+
+Cheers,
+Arman
