@@ -1,110 +1,72 @@
 Return-Path: <cyrus@holtmann.org>
-From: Vikrampal Yadav <vikram.pal@samsung.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: luiz.dentz@gmail.com, d.kasatkin@samsung.com,
-	vikram.pal@samsung.com, cpgs@samsung.com
-Subject: [PATCH] Monitor: Add AVRCP PASS THROUGH command support
-Date: Tue, 07 Oct 2014 15:35:51 +0530
-Message-id: <1412676351-29503-1-git-send-email-vikram.pal@samsung.com>
+MIME-Version: 1.0
+In-Reply-To: <20141007080154.GA30209@t440s.lan>
+References: <1412637149-2966-1-git-send-email-fons@spotify.com> <20141007080154.GA30209@t440s.lan>
+From: Alfonso Acosta <fons@spotify.com>
+Date: Tue, 7 Oct 2014 11:30:33 +0200
+Message-ID: <CAHF=Y4r5EprHoZ83oxu2damcMtVoVzP2Y9P13hxZDXsDM44zTQ@mail.gmail.com>
+Subject: Re: [PATCH v4] Bluetooth: Include ADV_IND report in Device Connected event
+To: Alfonso Acosta <fons@spotify.com>,
+	BlueZ development <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Support for decoding AVRCP PASS THROUGH command added in Bluetooth
-monitor.
----
- monitor/avctp.c | 63 +++++++++++++++++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 61 insertions(+), 2 deletions(-)
+Hi Johan,
 
-diff --git a/monitor/avctp.c b/monitor/avctp.c
-index 9de46d1..a4e34c5 100644
---- a/monitor/avctp.c
-+++ b/monitor/avctp.c
-@@ -182,6 +182,20 @@
- #define AVRCP_MEDIA_SEARCH		0x02
- #define AVRCP_MEDIA_NOW_PLAYING		0x03
- 
-+/* operands in passthrough commands */
-+#define AVC_PANEL_VOLUME_UP		0x41
-+#define AVC_PANEL_VOLUME_DOWN		0x42
-+#define AVC_PANEL_MUTE			0x43
-+#define AVC_PANEL_PLAY			0x44
-+#define AVC_PANEL_STOP			0x45
-+#define AVC_PANEL_PAUSE			0x46
-+#define AVC_PANEL_RECORD		0x47
-+#define AVC_PANEL_REWIND		0x48
-+#define AVC_PANEL_FAST_FORWARD		0x49
-+#define AVC_PANEL_EJECT			0x4a
-+#define AVC_PANEL_FORWARD		0x4b
-+#define AVC_PANEL_BACKWARD		0x4c
-+
- struct avctp_frame {
- 	uint8_t hdr;
- 	uint8_t pt;
-@@ -631,9 +645,54 @@ static const char *scope2str(uint8_t scope)
- 	}
- }
- 
--static bool avrcp_passthrough_packet(struct avctp_frame *avctp_frame)
-+static char *op2str(uint8_t op)
-+{
-+	switch (op & 0x7f) {
-+	case AVC_PANEL_VOLUME_UP:
-+		return "VOLUME UP";
-+	case AVC_PANEL_VOLUME_DOWN:
-+		return "VOLUME DOWN";
-+	case AVC_PANEL_MUTE:
-+		return "MUTE";
-+	case AVC_PANEL_PLAY:
-+		return "PLAY";
-+	case AVC_PANEL_STOP:
-+		return "STOP";
-+	case AVC_PANEL_PAUSE:
-+		return "PAUSE";
-+	case AVC_PANEL_RECORD:
-+		return "RECORD";
-+	case AVC_PANEL_REWIND:
-+		return "REWIND";
-+	case AVC_PANEL_FAST_FORWARD:
-+		return "FAST FORWARD";
-+	case AVC_PANEL_EJECT:
-+		return "EJECT";
-+	case AVC_PANEL_FORWARD:
-+		return "FORWARD";
-+	case AVC_PANEL_BACKWARD:
-+		return "BACKWARD";
-+	default:
-+		return "UNKNOWN";
-+	}
-+}
-+
-+static bool avrcp_passthrough_packet(struct avctp_frame *avctp_frame,
-+								uint8_t indent)
- {
- 	struct l2cap_frame *frame = &avctp_frame->l2cap_frame;
-+	uint8_t op, len;
-+
-+	if (!l2cap_frame_get_u8(frame, &op))
-+		return false;
-+
-+	print_field("%*cOperation: 0x%02x (%s %s)", (indent - 2), ' ', op,
-+				op2str(op), op & 0x80 ? "Released" : "Pressed");
-+
-+	if (!l2cap_frame_get_u8(frame, &len))
-+		return false;
-+
-+	print_field("%*cLength: 0x%02x", (indent - 2), ' ', len);
- 
- 	packet_hexdump(frame->data, frame->size);
- 	return true;
-@@ -1555,7 +1614,7 @@ static bool avrcp_control_packet(struct avctp_frame *avctp_frame)
- 
- 	switch (opcode) {
- 	case 0x7c:
--		return avrcp_passthrough_packet(avctp_frame);
-+		return avrcp_passthrough_packet(avctp_frame, 10);
- 	case 0x00:
- 		if (!l2cap_frame_get_u8(frame, &company[0]) ||
- 				!l2cap_frame_get_u8(frame, &company[1]) ||
+
+> On Mon, Oct 06, 2014, Alfonso Acosta wrote:
+>> @@ -4322,7 +4323,7 @@ static void check_pending_le_conn(struct hci_dev *hdev, bdaddr_t *addr,
+>>                * count consistent once the connection is established.
+>>                */
+>>               params->conn = hci_conn_get(conn);
+>> -             return;
+>> +             return conn;
+>>       }
+>>
+>>       switch (PTR_ERR(conn)) {
+>> @@ -4335,7 +4336,10 @@ static void check_pending_le_conn(struct hci_dev *hdev, bdaddr_t *addr,
+>>               break;
+>>       default:
+>>               BT_DBG("Failed to connect: err %ld", PTR_ERR(conn));
+>> +             return NULL;
+>>       }
+>> +
+>> +     return conn;
+>>  }
+>
+> I just realized that in this last part of check_pending_le_conn()
+> IS_ERR(conn) will true (since the first part that I quoted handles the
+> !IS_ERR(conn) condition) so you should really be explicitly returning
+> NULL here instead of the conn pointer. This is particularly important
+> since you're only checking for non-NULL in the calling code instead of
+> doing IS_ERR() there.
+>
+>> -     if (conn->dev_class && memcmp(conn->dev_class, "\0\0\0", 3) != 0)
+>> -             eir_len = eir_append_data(ev->eir, eir_len,
+>> -                                       EIR_CLASS_OF_DEV, conn->dev_class, 3);
+>> +             if (conn->dev_class &&
+>> +                 memcmp(conn->dev_class, "\0\0\0", 3) != 0)
+>> +                     eir_len = eir_append_data(ev->eir, eir_len,
+>> +                                               EIR_CLASS_OF_DEV,
+>> +                                               conn->dev_class, 3);
+>> +     }
+>
+> I know this is not your fault but a redundancy in the existing code, but
+> the check for if (conn->dev_class) is pointless since the variable is
+> defined as an array, i.e. it will always be non-NULL. To make this fix
+> clear it's probably better to have it as a separate patch either before
+> or after your current two patches.
+>
+> To make it easier to get the right versions of these applied could you
+> please send the entire set again instead of just this one patch. Thanks.
+
+The v5 bundle takes care of both remarks.
+
+
 -- 
-1.9.1
+Alfonso Acosta
 
+Embedded Systems Engineer at Spotify
+Birger Jarlsgatan 61, Stockholm, Sweden
+http://www.spotify.com
