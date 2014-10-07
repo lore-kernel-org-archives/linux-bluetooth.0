@@ -1,90 +1,88 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcin Kraglak <marcin.kraglak@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 4/6] shared/gatt: Add Secondary services to service_list
-Date: Tue,  7 Oct 2014 09:19:23 +0200
-Message-Id: <1412666365-9562-5-git-send-email-marcin.kraglak@tieto.com>
+Subject: [PATCH 5/6] shared/gatt: Add gatt-client include service iterator
+Date: Tue,  7 Oct 2014 09:19:24 +0200
+Message-Id: <1412666365-9562-6-git-send-email-marcin.kraglak@tieto.com>
 In-Reply-To: <1412666365-9562-1-git-send-email-marcin.kraglak@tieto.com>
 References: <1412666365-9562-1-git-send-email-marcin.kraglak@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-If included service was found and doesn't exist on service list,
-create Secondary Service and insert it.
 ---
- src/shared/gatt-client.c | 52 +++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 51 insertions(+), 1 deletion(-)
+ src/shared/gatt-client.c | 30 ++++++++++++++++++++++++++++++
+ src/shared/gatt-client.h | 10 ++++++++++
+ 2 files changed, 40 insertions(+)
 
 diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
-index 16b1630..54e6fec 100644
+index 54e6fec..b823c28 100644
 --- a/src/shared/gatt-client.c
 +++ b/src/shared/gatt-client.c
-@@ -471,6 +471,7 @@ static void discover_incl_cb(bool success, uint8_t att_ecode,
- 						&includes[i].start_handle,
- 						&includes[i].end_handle,
- 						includes[i].uuid)) {
-+		struct service_list *service;
- 		uuid_to_string(includes[i].uuid, uuid_str);
- 		util_debug(client->debug_callback, client->debug_data,
- 				"handle: 0x%04x, start: 0x%04x, end: 0x%04x,"
-@@ -478,7 +479,56 @@ static void discover_incl_cb(bool success, uint8_t att_ecode,
- 				includes[i].start_handle,
- 				includes[i].end_handle, uuid_str);
+@@ -1635,6 +1635,36 @@ bool bt_gatt_characteristic_iter_next(struct bt_gatt_characteristic_iter *iter,
+ 	return true;
+ }
  
--		/* TODO check if included service is on list */
++bool bt_gatt_include_service_iter_init(struct bt_gatt_include_service_iter *i,
++					const bt_gatt_service_t *service)
++{
++	if (!i || !service)
++		return false;
 +
-+		/*
-+		 * Check if included service was found previously in this
-+		 * session
-+		 */
-+		for (service = op->result_head; service; service =
-+								service->next) {
-+			if (service->service.start_handle ==
-+						includes[i].start_handle)
-+				break;
-+		}
++	memset(i, 0, sizeof(*i));
++	i->service = (struct service_list *) service;
 +
-+		/*
-+		 * Check if included service was found in previous session
-+		 */
-+		if (!service) {
-+			for (service = client->svc_head; service; service =
-+								service->next) {
-+				if (service->service.start_handle ==
-+						includes[i].start_handle)
-+					break;
-+			}
-+		}
++	return true;
++}
 +
-+		if (!service) {
-+			service = new0(struct service_list, 1);
-+			if (!service) {
-+				free(includes);
-+				success = false;
-+				goto done;
-+			}
++bool bt_gatt_include_service_iter_next(struct bt_gatt_include_service_iter *i,
++					const bt_gatt_included_service_t **incl)
++{
++	struct service_list *service;
 +
-+			service->service.primary = false;
-+			service->service.start_handle =
-+						includes[i].start_handle;
-+			service->service.end_handle = includes[i].end_handle;
-+			memcpy(service->service.uuid, includes[i].uuid,
-+								UUID_BYTES);
++	if (!i || !incl)
++		return false;
 +
-+			service_list_insert_services(&op->result_head,
-+							&op->result_tail,
-+							service, service);
++	service = i->service;
 +
-+			/*
-+			 * TODO: Newly created Secondary Service can contain
-+			 * Included Services too. They should be discovered
-+			 * before characteristic discovery.
-+			 */
-+		}
++	if (i->pos >= service->num_includes)
++		return false;
 +
- 		i++;
- 	}
++	*incl = &service->includes[i->pos++];
++
++	return true;
++}
++
+ struct read_op {
+ 	bt_gatt_client_read_callback_t callback;
+ 	void *user_data;
+diff --git a/src/shared/gatt-client.h b/src/shared/gatt-client.h
+index 05b4838..df6515e 100644
+--- a/src/shared/gatt-client.h
++++ b/src/shared/gatt-client.h
+@@ -113,6 +113,11 @@ struct bt_gatt_characteristic_iter {
+ 	size_t pos;
+ };
  
++struct bt_gatt_include_service_iter {
++	void *service;
++	size_t pos;
++};
++
+ bool bt_gatt_service_iter_init(struct bt_gatt_service_iter *iter,
+ 						struct bt_gatt_client *client);
+ bool bt_gatt_service_iter_next(struct bt_gatt_service_iter *iter,
+@@ -129,6 +134,11 @@ bool bt_gatt_characteristic_iter_init(struct bt_gatt_characteristic_iter *iter,
+ bool bt_gatt_characteristic_iter_next(struct bt_gatt_characteristic_iter *iter,
+ 					const bt_gatt_characteristic_t **chrc);
+ 
++bool bt_gatt_include_service_iter_init(struct bt_gatt_include_service_iter *i,
++					const bt_gatt_service_t *service);
++bool bt_gatt_include_service_iter_next(struct bt_gatt_include_service_iter *i,
++					const bt_gatt_included_service_t **inc);
++
+ typedef void (*bt_gatt_client_read_callback_t)(bool success, uint8_t att_ecode,
+ 					const uint8_t *value, uint16_t length,
+ 					void *user_data);
 -- 
 1.9.3
 
