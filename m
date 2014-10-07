@@ -1,34 +1,35 @@
 Return-Path: <cyrus@holtmann.org>
-From: Martin Townsend <mtownsend1973@gmail.com>
-To: linux-bluetooth@vger.kernel.org,
-	linux-wpan@vger.kernel.org
-Cc: marcel@holtmann.org,
-	alex.aring@gmail.com,
-	jukka.rissanen@linux.intel.com,
-	Martin Townsend <martin.townsend@xsilon.com>
-Subject: [PATCH bluetooth-next] 6lowpan: Use pskb_expand_head in IPHC decompression.
-Date: Tue,  7 Oct 2014 16:33:56 +0100
-Message-Id: <1412696037-25111-1-git-send-email-martin.townsend@xsilon.com>
+MIME-Version: 1.0
+In-Reply-To: <20141007145305.GA10391@t440s.P-661HNU-F1>
+References: <1412671452-24854-1-git-send-email-fons@spotify.com> <20141007145305.GA10391@t440s.P-661HNU-F1>
+From: Alfonso Acosta <fons@spotify.com>
+Date: Tue, 7 Oct 2014 17:10:21 +0200
+Message-ID: <CAHF=Y4q-mDj6_tFQUVjrkaZ+4ASx_RhsNUUd6J=D6i_cBzuyfA@mail.gmail.com>
+Subject: Re: [PATCH v5 0/3] Bluetooth: Include ADV_IND report in Device
+ Connected event
+To: Alfonso Acosta <fons@spotify.com>,
+	BlueZ development <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch aims to reduce the amount of copying in the receive path when
-decompressing by checking for headroom and calling pskb_expand_head if required.
-Another benefit of this is that the skb pointer passed to the decompression
-routine will be the same skb after decompression.  This will be a step towards
-freeing the skb within the receive function and not within all the error paths
-of the decompression routine.
+Hi Johan,
 
-Bluetooth and 802.15.4 have been changed to ensure that only one reference
-to the skb exists before calling the decompression routine as this is a
-requirement of pskb_expand_head.
 
-Martin Townsend (1):
-  6lowpan: Use pskb_expand_head in IPHC decompression.
+> Thanks. All three patches have been applied to the bluetooth-next tree.
+>
+> One minor change I did was to add a bit more descriptive commit message
+> to patch 1/3 since one-sentence messages should really only be
+> acceptable for very trivial and obvious patches.
 
- net/6lowpan/iphc.c            | 53 ++++++++++++++++++++++---------------------
- net/bluetooth/6lowpan.c       | 19 ++++++++++++----
- net/ieee802154/6lowpan_rtnl.c | 13 +++++++++++
- 3 files changed, 55 insertions(+), 30 deletions(-)
+Thanks, I actually thought that the change was trivial enough to be
+explained in a single phrase. I will have it in mind for future patches.
+
+
 
 -- 
-1.9.1
+Alfonso Acosta
+
+Embedded Systems Engineer at Spotify
+Birger Jarlsgatan 61, Stockholm, Sweden
+http://www.spotify.com
