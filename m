@@ -1,22 +1,64 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <5433A1D0.4040803@xsilon.com>
-Date: Tue, 07 Oct 2014 09:18:24 +0100
-From: Martin Townsend <martin.townsend@xsilon.com>
+Date: Tue, 7 Oct 2014 11:01:54 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Alfonso Acosta <fons@spotify.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH v4] Bluetooth: Include ADV_IND report in Device Connected
+ event
+Message-ID: <20141007080154.GA30209@t440s.lan>
+References: <1412637149-2966-1-git-send-email-fons@spotify.com>
 MIME-Version: 1.0
-To: linux-bluetooth@vger.kernel.org
-Subject: Question on recv_pkt
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1412637149-2966-1-git-send-email-fons@spotify.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Alfonso,
 
-I'm trying to work out why the skb is cloned in recv_pkt in net/bluetooth/6lowpan.c when performing IPHC [0].  I would like to call process_data with an unshared skb as my proposal for the next patch is to use pskb_expand_head[1] in the decompression routine to save copying but this requires an skb with users == 1 otherwise it will call BUG().
-In light of the locking problem Jukka was seeing with my previous patch I'm wondering if me removing this skb_clone was the cause so I want to make sure I know what it's there for before sending the patch.  Any help is appreciated.
+On Mon, Oct 06, 2014, Alfonso Acosta wrote:
+> @@ -4322,7 +4323,7 @@ static void check_pending_le_conn(struct hci_dev *hdev, bdaddr_t *addr,
+>  		 * count consistent once the connection is established.
+>  		 */
+>  		params->conn = hci_conn_get(conn);
+> -		return;
+> +		return conn;
+>  	}
+>  
+>  	switch (PTR_ERR(conn)) {
+> @@ -4335,7 +4336,10 @@ static void check_pending_le_conn(struct hci_dev *hdev, bdaddr_t *addr,
+>  		break;
+>  	default:
+>  		BT_DBG("Failed to connect: err %ld", PTR_ERR(conn));
+> +		return NULL;
+>  	}
+> +
+> +	return conn;
+>  }
 
-- Martin.
+I just realized that in this last part of check_pending_le_conn()
+IS_ERR(conn) will true (since the first part that I quoted handles the
+!IS_ERR(conn) condition) so you should really be explicitly returning
+NULL here instead of the conn pointer. This is particularly important
+since you're only checking for non-NULL in the calling code instead of
+doing IS_ERR() there.
 
+> -	if (conn->dev_class && memcmp(conn->dev_class, "\0\0\0", 3) != 0)
+> -		eir_len = eir_append_data(ev->eir, eir_len,
+> -					  EIR_CLASS_OF_DEV, conn->dev_class, 3);
+> +		if (conn->dev_class &&
+> +		    memcmp(conn->dev_class, "\0\0\0", 3) != 0)
+> +			eir_len = eir_append_data(ev->eir, eir_len,
+> +						  EIR_CLASS_OF_DEV,
+> +						  conn->dev_class, 3);
+> +	}
 
-[0]http://lxr.free-electrons.com/source/net/bluetooth/6lowpan.c#L258
-[1]http://lxr.free-electrons.com/source/net/core/skbuff.c#L1037
+I know this is not your fault but a redundancy in the existing code, but
+the check for if (conn->dev_class) is pointless since the variable is
+defined as an array, i.e. it will always be non-NULL. To make this fix
+clear it's probably better to have it as a separate patch either before
+or after your current two patches.
 
+To make it easier to get the right versions of these applied could you
+please send the entire set again instead of just this one patch. Thanks.
+
+Johan
