@@ -2,109 +2,152 @@ Return-Path: <cyrus@holtmann.org>
 From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH v2 02/11] shared/hfp: Add set_debug and close_on_unref API for HFP HF
-Date: Tue,  7 Oct 2014 11:22:11 +0200
-Message-Id: <1412673740-24336-3-git-send-email-lukasz.rymanowski@tieto.com>
+Subject: [PATCH v2 01/11] shared/hfp: Add support for HFP HF
+Date: Tue,  7 Oct 2014 11:22:10 +0200
+Message-Id: <1412673740-24336-2-git-send-email-lukasz.rymanowski@tieto.com>
 In-Reply-To: <1412673740-24336-1-git-send-email-lukasz.rymanowski@tieto.com>
 References: <1412673740-24336-1-git-send-email-lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+This patch add struct hfp_hf plus fuctions to create an instance ref and
+unref. This code based on existing hfp_gw
 ---
- src/shared/hfp.c | 57 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- src/shared/hfp.h |  3 +++
- 2 files changed, 60 insertions(+)
+ src/shared/hfp.c | 92 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ src/shared/hfp.h |  6 ++++
+ 2 files changed, 98 insertions(+)
 
 diff --git a/src/shared/hfp.c b/src/shared/hfp.c
-index dbd049a..ad2daa2 100644
+index efc981f..dbd049a 100644
 --- a/src/shared/hfp.c
 +++ b/src/shared/hfp.c
-@@ -70,6 +70,10 @@ struct hfp_hf {
- 	struct ringbuf *read_buf;
- 	struct ringbuf *write_buf;
- 
-+	hfp_debug_func_t debug_callback;
-+	hfp_destroy_func_t debug_destroy;
-+	void *debug_data;
-+
- 	bool in_disconnect;
+@@ -62,6 +62,18 @@ struct hfp_gw {
  	bool destroyed;
  };
-@@ -886,6 +890,8 @@ void hfp_hf_unref(struct hfp_hf *hfp)
- 	if (hfp->close_on_unref)
- 		close(hfp->fd);
  
-+	hfp_hf_set_debug(hfp, NULL, NULL, NULL);
++struct hfp_hf {
++	int ref_count;
++	int fd;
++	bool close_on_unref;
++	struct io *io;
++	struct ringbuf *read_buf;
++	struct ringbuf *write_buf;
 +
- 	ringbuf_free(hfp->read_buf);
- 	hfp->read_buf = NULL;
++	bool in_disconnect;
++	bool destroyed;
++};
++
+ struct cmd_handler {
+ 	char *prefix;
+ 	void *user_data;
+@@ -807,3 +819,83 @@ bool hfp_gw_disconnect(struct hfp_gw *hfp)
  
-@@ -899,3 +905,54 @@ void hfp_hf_unref(struct hfp_hf *hfp)
- 
- 	hfp->destroyed = true;
+ 	return io_shutdown(hfp->io);
  }
 +
-+static void hf_read_tracing(const void *buf, size_t count,
-+							void *user_data)
++struct hfp_hf *hfp_hf_new(int fd)
 +{
-+	struct hfp_hf *hfp = user_data;
++	struct hfp_hf *hfp;
 +
-+	util_hexdump('>', buf, count, hfp->debug_callback, hfp->debug_data);
-+}
++	if (fd < 0)
++		return NULL;
 +
-+static void hf_write_tracing(const void *buf, size_t count,
-+							void *user_data)
-+{
-+	struct hfp_hf *hfp = user_data;
-+
-+	util_hexdump('<', buf, count, hfp->debug_callback, hfp->debug_data);
-+}
-+
-+bool hfp_hf_set_debug(struct hfp_hf *hfp, hfp_debug_func_t callback,
-+				void *user_data, hfp_destroy_func_t destroy)
-+{
++	hfp = new0(struct hfp_hf, 1);
 +	if (!hfp)
-+		return false;
++		return NULL;
 +
-+	if (hfp->debug_destroy)
-+		hfp->debug_destroy(hfp->debug_data);
++	hfp->fd = fd;
++	hfp->close_on_unref = false;
 +
-+	hfp->debug_callback = callback;
-+	hfp->debug_destroy = destroy;
-+	hfp->debug_data = user_data;
-+
-+	if (hfp->debug_callback) {
-+		ringbuf_set_input_tracing(hfp->read_buf, hf_read_tracing, hfp);
-+		ringbuf_set_input_tracing(hfp->write_buf, hf_write_tracing,
-+									hfp);
-+	} else {
-+		ringbuf_set_input_tracing(hfp->read_buf, NULL, NULL);
-+		ringbuf_set_input_tracing(hfp->write_buf, NULL, NULL);
++	hfp->read_buf = ringbuf_new(4096);
++	if (!hfp->read_buf) {
++		free(hfp);
++		return NULL;
 +	}
 +
-+	return true;
++	hfp->write_buf = ringbuf_new(4096);
++	if (!hfp->write_buf) {
++		ringbuf_free(hfp->read_buf);
++		free(hfp);
++		return NULL;
++	}
++
++	hfp->io = io_new(fd);
++	if (!hfp->io) {
++		ringbuf_free(hfp->write_buf);
++		ringbuf_free(hfp->read_buf);
++		free(hfp);
++		return NULL;
++	}
++
++	return hfp_hf_ref(hfp);
 +}
 +
-+bool hfp_hf_set_close_on_unref(struct hfp_hf *hfp, bool do_close)
++struct hfp_hf *hfp_hf_ref(struct hfp_hf *hfp)
 +{
 +	if (!hfp)
-+		return false;
++		return NULL;
 +
-+	hfp->close_on_unref = do_close;
++	__sync_fetch_and_add(&hfp->ref_count, 1);
 +
-+	return true;
++	return hfp;
++}
++
++void hfp_hf_unref(struct hfp_hf *hfp)
++{
++	if (!hfp)
++		return;
++
++	if (__sync_sub_and_fetch(&hfp->ref_count, 1))
++		return;
++
++	io_set_write_handler(hfp->io, NULL, NULL, NULL);
++	io_set_read_handler(hfp->io, NULL, NULL, NULL);
++	io_set_disconnect_handler(hfp->io, NULL, NULL, NULL);
++
++	io_destroy(hfp->io);
++	hfp->io = NULL;
++
++	if (hfp->close_on_unref)
++		close(hfp->fd);
++
++	ringbuf_free(hfp->read_buf);
++	hfp->read_buf = NULL;
++
++	ringbuf_free(hfp->write_buf);
++	hfp->write_buf = NULL;
++
++	if (!hfp->in_disconnect) {
++		free(hfp);
++		return;
++	}
++
++	hfp->destroyed = true;
 +}
 diff --git a/src/shared/hfp.h b/src/shared/hfp.h
-index 50d9c4b..ae67ac2 100644
+index 743db65..50d9c4b 100644
 --- a/src/shared/hfp.h
 +++ b/src/shared/hfp.h
-@@ -130,3 +130,6 @@ bool hfp_gw_result_has_next(struct hfp_gw_result *result);
- struct hfp_hf *hfp_hf_new(int fd);
- struct hfp_hf *hfp_hf_ref(struct hfp_hf *hfp);
- void hfp_hf_unref(struct hfp_hf *hfp);
-+bool hfp_hf_set_debug(struct hfp_hf *hfp, hfp_debug_func_t callback,
-+				void *user_data, hfp_destroy_func_t destroy);
-+bool hfp_hf_set_close_on_unref(struct hfp_hf *hfp, bool do_close);
+@@ -76,9 +76,11 @@ typedef void (*hfp_destroy_func_t)(void *user_data);
+ typedef void (*hfp_debug_func_t)(const char *str, void *user_data);
+ 
+ typedef void (*hfp_command_func_t)(const char *command, void *user_data);
++
+ typedef void (*hfp_disconnect_func_t)(void *user_data);
+ 
+ struct hfp_gw;
++struct hfp_hf;
+ 
+ struct hfp_gw *hfp_gw_new(int fd);
+ 
+@@ -124,3 +126,7 @@ bool hfp_gw_result_get_string(struct hfp_gw_result *result, char *buf,
+ bool hfp_gw_result_get_unquoted_string(struct hfp_gw_result *result, char *buf,
+ 								uint8_t len);
+ bool hfp_gw_result_has_next(struct hfp_gw_result *result);
++
++struct hfp_hf *hfp_hf_new(int fd);
++struct hfp_hf *hfp_hf_ref(struct hfp_hf *hfp);
++void hfp_hf_unref(struct hfp_hf *hfp);
 -- 
 1.8.4
 
