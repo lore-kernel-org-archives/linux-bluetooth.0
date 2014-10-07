@@ -3,104 +3,123 @@ From: Gowtham Anandha Babu <gowtham.ab@samsung.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: d.kasatkin@samsung.com, bharat.panda@samsung.com, cpgs@samsung.com,
 	Gowtham Anandha Babu <gowtham.ab@samsung.com>
-Subject: [PATCH 4/6] obexd/mas: Add support for providing MASInstance Info as
- response
-Date: Tue, 07 Oct 2014 09:36:54 +0530
-Message-id: <1412654816-14971-5-git-send-email-gowtham.ab@samsung.com>
+Subject: [PATCH 3/6] obexd/client/map: Add API Calls for request and handlers
+ for response
+Date: Tue, 07 Oct 2014 09:36:53 +0530
+Message-id: <1412654816-14971-4-git-send-email-gowtham.ab@samsung.com>
 In-reply-to: <1412654816-14971-1-git-send-email-gowtham.ab@samsung.com>
 References: <1412654816-14971-1-git-send-email-gowtham.ab@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- obexd/plugins/mas.c | 62 +++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 62 insertions(+)
+ obexd/client/map.c | 88 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 88 insertions(+)
 
-diff --git a/obexd/plugins/mas.c b/obexd/plugins/mas.c
-index fb97fe3..f9ccab7 100644
---- a/obexd/plugins/mas.c
-+++ b/obexd/plugins/mas.c
-@@ -660,6 +660,56 @@ static void *message_set_status_open(const char *name, int oflag, mode_t mode,
- 	return mas;
+diff --git a/obexd/client/map.c b/obexd/client/map.c
+index 44db96c..50b498c 100644
+--- a/obexd/client/map.c
++++ b/obexd/client/map.c
+@@ -1800,6 +1800,90 @@ static DBusMessage *map_push_message(DBusConnection *connection,
+ 	return push_message(map, message, filename, folder, apparam);
  }
  
-+static void get_mas_instance_info_cb(void *session, int err, uint16_t size,
-+					const char *name, void *user_data)
++static void mas_instance_info_cb(struct obc_session *session,
++				struct obc_transfer *transfer,
++				GError *err, void *user_data)
 +{
-+	struct mas_session *mas = user_data;
++	struct pending_request *request = user_data;
++	DBusMessage *reply;
++	char *contents;
++	size_t size;
++	int perr;
 +
-+	DBG("");
-+
-+	if (err < 0 && err != -EAGAIN) {
-+		obex_object_set_io_flags(mas, G_IO_ERR, err);
-+		return;
++	if (err != NULL) {
++		reply = g_dbus_create_error(request->msg,
++						ERROR_INTERFACE ".Failed",
++						"%s", err->message);
++		goto done;
 +	}
 +
-+	g_string_append(mas->buffer, name);
++	perr = obc_transfer_get_contents(transfer, &contents, &size);
++	if (perr < 0) {
++		reply = g_dbus_create_error(request->msg,
++						ERROR_INTERFACE ".Failed",
++						"Error reading contents: %s",
++						strerror(-perr));
++		goto done;
++	}
 +
-+	mas->finished = TRUE;
-+	mas->outparams = NULL;
++	reply = dbus_message_new_method_return(request->msg);
++	if (reply == NULL) {
++		g_free(contents);
++		goto clean;
++	}
 +
-+	if (err != -EAGAIN)
-+		obex_object_set_io_flags(mas, G_IO_IN, err);
++	dbus_message_append_args(reply, DBUS_TYPE_STRING, &contents,
++							DBUS_TYPE_INVALID);
++done:
++	g_dbus_send_message(conn, reply);
++clean:
++	pending_request_free(request);
 +
 +}
 +
-+static void *mas_instance_info_open(const char *name, int oflag, mode_t mode,
-+				void *driver_data, size_t *size, int *err)
++static DBusMessage *map_get_mas_instance_info(DBusConnection *connection,
++					DBusMessage *message, void *user_data)
 +{
-+	struct mas_session *mas = driver_data;
-+	uint16_t mas_instance_id = -1;
++	struct map_data *map = user_data;
++	GObexApparam *apparam;
++	struct pending_request *request;
++	struct obc_transfer *transfer;
++	GError *err = NULL;
++	DBusMessage *reply;
 +
-+	DBG("name %s ", name);
++	if (map->mas_instance_id < 0)
++		return g_dbus_create_error(message,
++				ERROR_INTERFACE ".InvalidArguments", NULL);
 +
-+	if (oflag != O_RDONLY) {
-+		*err = -EBADR;
-+		return NULL;
++	apparam = g_obex_apparam_set_uint16(NULL, MAP_AP_MASINSTANCEID,
++							map->mas_instance_id);
++
++	transfer = obc_transfer_get("x-bt/MASInstanceInformation", NULL, NULL, &err);
++	if (transfer == NULL) {
++		g_obex_apparam_free(apparam);
++		goto fail;
 +	}
 +
-+	g_obex_apparam_get_uint16(mas->inparams, MAP_AP_MASINSTANCEID, &mas_instance_id);
++	obc_transfer_set_apparam(transfer, apparam);
 +
-+	DBG("mas-instance-id : %d", mas_instance_id);
++	request = pending_request_new(map, message);
 +
-+	mas->buffer = g_string_new("");
++	if (!obc_session_queue(map->session, transfer, mas_instance_info_cb,
++							request, &err)) {
++		pending_request_free(request);
++		goto fail;
++	}
 +
-+	*err = messages_get_mas_instance_info(mas->backend_data, mas_instance_id,
-+			get_mas_instance_info_cb, mas);
-+	if (*err < 0)
-+		return NULL;
-+	else
-+		return mas;
++	return NULL;
++
++fail:
++	reply = g_dbus_create_error(message, ERROR_INTERFACE ".Failed", "%s",
++								err->message);
++	g_error_free(err);
++	return reply;
++
 +}
 +
-+
- static ssize_t any_get_next_header(void *object, void *buf, size_t mtu,
- 								uint8_t *hi)
- {
-@@ -812,6 +862,17 @@ static struct obex_mime_type_driver mime_message_update = {
- 	.write = any_write,
- };
- 
-+static struct obex_mime_type_driver mime_mas_instance_info = {
-+	.target = MAS_TARGET,
-+	.target_size = TARGET_SIZE,
-+	.mimetype = "x-bt/MASInstanceInformation",
-+	.get_next_header = any_get_next_header,
-+	.open = mas_instance_info_open,
-+	.close = any_close,
-+	.read = any_read,
-+	.write = any_write,
-+};
-+
- static struct obex_mime_type_driver *map_drivers[] = {
- 	&mime_map,
- 	&mime_message,
-@@ -820,6 +881,7 @@ static struct obex_mime_type_driver *map_drivers[] = {
- 	&mime_notification_registration,
- 	&mime_message_status,
- 	&mime_message_update,
-+	&mime_mas_instance_info,
- 	NULL
+ static const GDBusMethodTable map_methods[] = {
+ 	{ GDBUS_ASYNC_METHOD("SetFolder",
+ 				GDBUS_ARGS({ "name", "s" }), NULL,
+@@ -1826,6 +1910,10 @@ static const GDBusMethodTable map_methods[] = {
+ 			GDBUS_ARGS({ "transfer", "o" },
+ 						{ "properties", "a{sv}" }),
+ 			map_push_message) },
++	{ GDBUS_ASYNC_METHOD("GetMASInstanceInfo",
++			NULL,
++			GDBUS_ARGS({ "description", "s" }),
++			map_get_mas_instance_info) },
+ 	{ }
  };
  
 -- 
