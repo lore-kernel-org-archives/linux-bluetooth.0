@@ -1,64 +1,214 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 7 Oct 2014 11:01:54 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Alfonso Acosta <fons@spotify.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v4] Bluetooth: Include ADV_IND report in Device Connected
- event
-Message-ID: <20141007080154.GA30209@t440s.lan>
-References: <1412637149-2966-1-git-send-email-fons@spotify.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1412637149-2966-1-git-send-email-fons@spotify.com>
+From: Marcin Kraglak <marcin.kraglak@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH 3/6] shared/gatt: Discover included services
+Date: Tue,  7 Oct 2014 09:19:22 +0200
+Message-Id: <1412666365-9562-4-git-send-email-marcin.kraglak@tieto.com>
+In-Reply-To: <1412666365-9562-1-git-send-email-marcin.kraglak@tieto.com>
+References: <1412666365-9562-1-git-send-email-marcin.kraglak@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Alfonso,
+---
+ src/shared/gatt-client.c | 116 +++++++++++++++++++++++++++++++++++++++++++++--
+ src/shared/gatt-client.h |   7 +++
+ 2 files changed, 119 insertions(+), 4 deletions(-)
 
-On Mon, Oct 06, 2014, Alfonso Acosta wrote:
-> @@ -4322,7 +4323,7 @@ static void check_pending_le_conn(struct hci_dev *hdev, bdaddr_t *addr,
->  		 * count consistent once the connection is established.
->  		 */
->  		params->conn = hci_conn_get(conn);
-> -		return;
-> +		return conn;
->  	}
->  
->  	switch (PTR_ERR(conn)) {
-> @@ -4335,7 +4336,10 @@ static void check_pending_le_conn(struct hci_dev *hdev, bdaddr_t *addr,
->  		break;
->  	default:
->  		BT_DBG("Failed to connect: err %ld", PTR_ERR(conn));
-> +		return NULL;
->  	}
-> +
-> +	return conn;
->  }
+diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
+index 724fde2..16b1630 100644
+--- a/src/shared/gatt-client.c
++++ b/src/shared/gatt-client.c
+@@ -69,6 +69,8 @@ struct service_list {
+ 	bt_gatt_service_t service;
+ 	struct chrc_data *chrcs;
+ 	size_t num_chrcs;
++	bt_gatt_included_service_t *includes;
++	size_t num_includes;
+ 	struct service_list *next;
+ };
+ 
+@@ -240,6 +242,14 @@ static void service_destroy_characteristics(struct service_list *service)
+ 	free(service->chrcs);
+ }
+ 
++static void service_destroy_includes(struct service_list *service)
++{
++	free(service->includes);
++
++	service->includes = NULL;
++	service->num_includes = 0;
++}
++
+ static void service_list_clear(struct service_list **head,
+ 						struct service_list **tail)
+ {
+@@ -252,6 +262,7 @@ static void service_list_clear(struct service_list **head,
+ 
+ 	while (l) {
+ 		service_destroy_characteristics(l);
++		service_destroy_includes(l);
+ 		tmp = l;
+ 		l = tmp->next;
+ 		free(tmp);
+@@ -280,6 +291,7 @@ static void service_list_clear_range(struct service_list **head,
+ 		}
+ 
+ 		service_destroy_characteristics(cur);
++		service_destroy_includes(cur);
+ 
+ 		if (!prev)
+ 			*head = cur->next;
+@@ -413,6 +425,101 @@ static int uuid_cmp(const uint8_t uuid128[16], uint16_t uuid16)
+ 	return memcmp(uuid128, rhs_uuid, sizeof(rhs_uuid));
+ }
+ 
++static void discover_incl_cb(bool success, uint8_t att_ecode,
++		struct bt_gatt_result *result,
++		void *user_data)
++{
++	struct discovery_op *op = user_data;
++	struct bt_gatt_client *client = op->client;
++	struct bt_gatt_iter iter;
++	char uuid_str[MAX_LEN_UUID_STR];
++	bt_gatt_included_service_t *includes;
++	unsigned int includes_count, i;
++
++	if (!success) {
++		if (att_ecode == BT_ATT_ERROR_ATTRIBUTE_NOT_FOUND) {
++			success = true;
++			goto next;
++		}
++
++		goto done;
++	}
++
++	if (!result || !bt_gatt_iter_init(&iter, result)) {
++		success = false;
++		goto done;
++	}
++
++	includes_count = bt_gatt_result_included_count(result);
++	if (includes_count == 0) {
++		success = false;
++		goto done;
++	}
++
++	includes = new0(bt_gatt_included_service_t, includes_count);
++	if (!includes) {
++		success = false;
++		goto done;
++	}
++
++	util_debug(client->debug_callback, client->debug_data,
++						"Included services found: %u",
++						includes_count);
++
++	i = 0;
++	while (bt_gatt_iter_next_included_service(&iter, &includes[i].handle,
++						&includes[i].start_handle,
++						&includes[i].end_handle,
++						includes[i].uuid)) {
++		uuid_to_string(includes[i].uuid, uuid_str);
++		util_debug(client->debug_callback, client->debug_data,
++				"handle: 0x%04x, start: 0x%04x, end: 0x%04x,"
++				"uuid: %s", includes[i].handle,
++				includes[i].start_handle,
++				includes[i].end_handle, uuid_str);
++
++		/* TODO check if included service is on list */
++		i++;
++	}
++
++	op->cur_service->includes = includes;
++	op->cur_service->num_includes = includes_count;
++
++next:
++	if (!op->cur_service->next) {
++		op->cur_service = op->result_head;
++		if (bt_gatt_discover_characteristics(client->att,
++					op->cur_service->service.start_handle,
++					op->cur_service->service.end_handle,
++					discover_chrcs_cb,
++					discovery_op_ref(op),
++					discovery_op_unref))
++			return;
++
++		util_debug(client->debug_callback, client->debug_data,
++				"Failed to start characteristic discovery");
++		discovery_op_unref(op);
++		success = false;
++		goto done;
++	}
++
++	op->cur_service = op->cur_service->next;
++	if (bt_gatt_discover_included_services(client->att,
++				op->cur_service->service.start_handle,
++				op->cur_service->service.end_handle,
++				discover_incl_cb,
++				discovery_op_ref(op),
++				discovery_op_unref))
++		return;
++	util_debug(client->debug_callback, client->debug_data,
++					"Failed to start included discovery");
++	discovery_op_unref(op);
++	success = false;
++
++done:
++	op->complete_func(op, success, att_ecode);
++}
++
+ static void discover_descs_cb(bool success, uint8_t att_ecode,
+ 						struct bt_gatt_result *result,
+ 						void *user_data)
+@@ -517,6 +624,7 @@ done:
+ 	op->complete_func(op, success, att_ecode);
+ }
+ 
++
+ static void discover_chrcs_cb(bool success, uint8_t att_ecode,
+ 						struct bt_gatt_result *result,
+ 						void *user_data)
+@@ -686,18 +794,18 @@ static void discover_primary_cb(bool success, uint8_t att_ecode,
+ 	if (!op->result_head)
+ 		goto done;
+ 
+-	/* Sequentially discover the characteristics of all services */
++	/* Sequentially discover included services */
+ 	op->cur_service = op->result_head;
+-	if (bt_gatt_discover_characteristics(client->att,
++	if (bt_gatt_discover_included_services(client->att,
+ 					op->cur_service->service.start_handle,
+ 					op->cur_service->service.end_handle,
+-					discover_chrcs_cb,
++					discover_incl_cb,
+ 					discovery_op_ref(op),
+ 					discovery_op_unref))
+ 		return;
+ 
+ 	util_debug(client->debug_callback, client->debug_data,
+-				"Failed to start characteristic discovery");
++				"Failed to start included services discovery");
+ 	discovery_op_unref(op);
+ 	success = false;
+ 
+diff --git a/src/shared/gatt-client.h b/src/shared/gatt-client.h
+index 22d4dc0..05b4838 100644
+--- a/src/shared/gatt-client.h
++++ b/src/shared/gatt-client.h
+@@ -96,6 +96,13 @@ typedef struct {
+ 	size_t num_descs;
+ } bt_gatt_characteristic_t;
+ 
++typedef struct {
++	uint16_t handle;
++	uint16_t start_handle;
++	uint16_t end_handle;
++	uint8_t uuid[BT_GATT_UUID_SIZE];
++} bt_gatt_included_service_t;
++
+ struct bt_gatt_service_iter {
+ 	struct bt_gatt_client *client;
+ 	void *ptr;
+-- 
+1.9.3
 
-I just realized that in this last part of check_pending_le_conn()
-IS_ERR(conn) will true (since the first part that I quoted handles the
-!IS_ERR(conn) condition) so you should really be explicitly returning
-NULL here instead of the conn pointer. This is particularly important
-since you're only checking for non-NULL in the calling code instead of
-doing IS_ERR() there.
-
-> -	if (conn->dev_class && memcmp(conn->dev_class, "\0\0\0", 3) != 0)
-> -		eir_len = eir_append_data(ev->eir, eir_len,
-> -					  EIR_CLASS_OF_DEV, conn->dev_class, 3);
-> +		if (conn->dev_class &&
-> +		    memcmp(conn->dev_class, "\0\0\0", 3) != 0)
-> +			eir_len = eir_append_data(ev->eir, eir_len,
-> +						  EIR_CLASS_OF_DEV,
-> +						  conn->dev_class, 3);
-> +	}
-
-I know this is not your fault but a redundancy in the existing code, but
-the check for if (conn->dev_class) is pointless since the variable is
-defined as an array, i.e. it will always be non-NULL. To make this fix
-clear it's probably better to have it as a separate patch either before
-or after your current two patches.
-
-To make it easier to get the right versions of these applied could you
-please send the entire set again instead of just this one patch. Thanks.
-
-Johan
