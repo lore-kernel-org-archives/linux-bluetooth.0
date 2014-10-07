@@ -1,214 +1,57 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcin Kraglak <marcin.kraglak@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 3/6] shared/gatt: Discover included services
-Date: Tue,  7 Oct 2014 09:19:22 +0200
-Message-Id: <1412666365-9562-4-git-send-email-marcin.kraglak@tieto.com>
+Subject: [PATCH 6/6] tools/btgatt-client: Print found include services
+Date: Tue,  7 Oct 2014 09:19:25 +0200
+Message-Id: <1412666365-9562-7-git-send-email-marcin.kraglak@tieto.com>
 In-Reply-To: <1412666365-9562-1-git-send-email-marcin.kraglak@tieto.com>
 References: <1412666365-9562-1-git-send-email-marcin.kraglak@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- src/shared/gatt-client.c | 116 +++++++++++++++++++++++++++++++++++++++++++++--
- src/shared/gatt-client.h |   7 +++
- 2 files changed, 119 insertions(+), 4 deletions(-)
+ tools/btgatt-client.c | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
 
-diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
-index 724fde2..16b1630 100644
---- a/src/shared/gatt-client.c
-+++ b/src/shared/gatt-client.c
-@@ -69,6 +69,8 @@ struct service_list {
- 	bt_gatt_service_t service;
- 	struct chrc_data *chrcs;
- 	size_t num_chrcs;
-+	bt_gatt_included_service_t *includes;
-+	size_t num_includes;
- 	struct service_list *next;
- };
- 
-@@ -240,6 +242,14 @@ static void service_destroy_characteristics(struct service_list *service)
- 	free(service->chrcs);
- }
- 
-+static void service_destroy_includes(struct service_list *service)
-+{
-+	free(service->includes);
-+
-+	service->includes = NULL;
-+	service->num_includes = 0;
-+}
-+
- static void service_list_clear(struct service_list **head,
- 						struct service_list **tail)
+diff --git a/tools/btgatt-client.c b/tools/btgatt-client.c
+index 5c692ff..a217819 100644
+--- a/tools/btgatt-client.c
++++ b/tools/btgatt-client.c
+@@ -174,7 +174,9 @@ static void print_uuid(const uint8_t uuid[16])
+ static void print_service(const bt_gatt_service_t *service)
  {
-@@ -252,6 +262,7 @@ static void service_list_clear(struct service_list **head,
+ 	struct bt_gatt_characteristic_iter iter;
++	struct bt_gatt_include_service_iter include_iter;
+ 	const bt_gatt_characteristic_t *chrc;
++	const bt_gatt_included_service_t *incl;
+ 	size_t i;
  
- 	while (l) {
- 		service_destroy_characteristics(l);
-+		service_destroy_includes(l);
- 		tmp = l;
- 		l = tmp->next;
- 		free(tmp);
-@@ -280,6 +291,7 @@ static void service_list_clear_range(struct service_list **head,
- 		}
- 
- 		service_destroy_characteristics(cur);
-+		service_destroy_includes(cur);
- 
- 		if (!prev)
- 			*head = cur->next;
-@@ -413,6 +425,101 @@ static int uuid_cmp(const uint8_t uuid128[16], uint16_t uuid16)
- 	return memcmp(uuid128, rhs_uuid, sizeof(rhs_uuid));
- }
- 
-+static void discover_incl_cb(bool success, uint8_t att_ecode,
-+		struct bt_gatt_result *result,
-+		void *user_data)
-+{
-+	struct discovery_op *op = user_data;
-+	struct bt_gatt_client *client = op->client;
-+	struct bt_gatt_iter iter;
-+	char uuid_str[MAX_LEN_UUID_STR];
-+	bt_gatt_included_service_t *includes;
-+	unsigned int includes_count, i;
-+
-+	if (!success) {
-+		if (att_ecode == BT_ATT_ERROR_ATTRIBUTE_NOT_FOUND) {
-+			success = true;
-+			goto next;
-+		}
-+
-+		goto done;
-+	}
-+
-+	if (!result || !bt_gatt_iter_init(&iter, result)) {
-+		success = false;
-+		goto done;
-+	}
-+
-+	includes_count = bt_gatt_result_included_count(result);
-+	if (includes_count == 0) {
-+		success = false;
-+		goto done;
-+	}
-+
-+	includes = new0(bt_gatt_included_service_t, includes_count);
-+	if (!includes) {
-+		success = false;
-+		goto done;
-+	}
-+
-+	util_debug(client->debug_callback, client->debug_data,
-+						"Included services found: %u",
-+						includes_count);
-+
-+	i = 0;
-+	while (bt_gatt_iter_next_included_service(&iter, &includes[i].handle,
-+						&includes[i].start_handle,
-+						&includes[i].end_handle,
-+						includes[i].uuid)) {
-+		uuid_to_string(includes[i].uuid, uuid_str);
-+		util_debug(client->debug_callback, client->debug_data,
-+				"handle: 0x%04x, start: 0x%04x, end: 0x%04x,"
-+				"uuid: %s", includes[i].handle,
-+				includes[i].start_handle,
-+				includes[i].end_handle, uuid_str);
-+
-+		/* TODO check if included service is on list */
-+		i++;
-+	}
-+
-+	op->cur_service->includes = includes;
-+	op->cur_service->num_includes = includes_count;
-+
-+next:
-+	if (!op->cur_service->next) {
-+		op->cur_service = op->result_head;
-+		if (bt_gatt_discover_characteristics(client->att,
-+					op->cur_service->service.start_handle,
-+					op->cur_service->service.end_handle,
-+					discover_chrcs_cb,
-+					discovery_op_ref(op),
-+					discovery_op_unref))
-+			return;
-+
-+		util_debug(client->debug_callback, client->debug_data,
-+				"Failed to start characteristic discovery");
-+		discovery_op_unref(op);
-+		success = false;
-+		goto done;
-+	}
-+
-+	op->cur_service = op->cur_service->next;
-+	if (bt_gatt_discover_included_services(client->att,
-+				op->cur_service->service.start_handle,
-+				op->cur_service->service.end_handle,
-+				discover_incl_cb,
-+				discovery_op_ref(op),
-+				discovery_op_unref))
-+		return;
-+	util_debug(client->debug_callback, client->debug_data,
-+					"Failed to start included discovery");
-+	discovery_op_unref(op);
-+	success = false;
-+
-+done:
-+	op->complete_func(op, success, att_ecode);
-+}
-+
- static void discover_descs_cb(bool success, uint8_t att_ecode,
- 						struct bt_gatt_result *result,
- 						void *user_data)
-@@ -517,6 +624,7 @@ done:
- 	op->complete_func(op, success, att_ecode);
- }
- 
-+
- static void discover_chrcs_cb(bool success, uint8_t att_ecode,
- 						struct bt_gatt_result *result,
- 						void *user_data)
-@@ -686,18 +794,18 @@ static void discover_primary_cb(bool success, uint8_t att_ecode,
- 	if (!op->result_head)
- 		goto done;
- 
--	/* Sequentially discover the characteristics of all services */
-+	/* Sequentially discover included services */
- 	op->cur_service = op->result_head;
--	if (bt_gatt_discover_characteristics(client->att,
-+	if (bt_gatt_discover_included_services(client->att,
- 					op->cur_service->service.start_handle,
- 					op->cur_service->service.end_handle,
--					discover_chrcs_cb,
-+					discover_incl_cb,
- 					discovery_op_ref(op),
- 					discovery_op_unref))
+ 	if (!bt_gatt_characteristic_iter_init(&iter, service)) {
+@@ -182,12 +184,24 @@ static void print_service(const bt_gatt_service_t *service)
  		return;
+ 	}
  
- 	util_debug(client->debug_callback, client->debug_data,
--				"Failed to start characteristic discovery");
-+				"Failed to start included services discovery");
- 	discovery_op_unref(op);
- 	success = false;
++	if (!bt_gatt_include_service_iter_init(&include_iter, service)) {
++		PRLOG("Failed to initialize include service iterator\n");
++		return;
++	}
+ 	printf(COLOR_RED "service %s" COLOR_OFF " - start: 0x%04x, "
+ 				"end: 0x%04x, uuid: ",
+ 				service->primary ? "primary" : "second.",
+ 				service->start_handle, service->end_handle);
+ 	print_uuid(service->uuid);
  
-diff --git a/src/shared/gatt-client.h b/src/shared/gatt-client.h
-index 22d4dc0..05b4838 100644
---- a/src/shared/gatt-client.h
-+++ b/src/shared/gatt-client.h
-@@ -96,6 +96,13 @@ typedef struct {
- 	size_t num_descs;
- } bt_gatt_characteristic_t;
- 
-+typedef struct {
-+	uint16_t handle;
-+	uint16_t start_handle;
-+	uint16_t end_handle;
-+	uint8_t uuid[BT_GATT_UUID_SIZE];
-+} bt_gatt_included_service_t;
++	while (bt_gatt_include_service_iter_next(&include_iter, &incl)) {
++		printf("\t  " COLOR_GREEN "include" COLOR_OFF " - handle: "
++					"0x%04x, - start: 0x%04x, end: 0x%04x,"
++					"uuid: ", incl->handle,
++					incl->start_handle, incl->end_handle);
++			print_uuid(incl->uuid);
++	}
 +
- struct bt_gatt_service_iter {
- 	struct bt_gatt_client *client;
- 	void *ptr;
+ 	while (bt_gatt_characteristic_iter_next(&iter, &chrc)) {
+ 		printf("\t  " COLOR_YELLOW "charac" COLOR_OFF
+ 				" - start: 0x%04x, end: 0x%04x, "
 -- 
 1.9.3
 
