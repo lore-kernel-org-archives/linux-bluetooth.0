@@ -2,178 +2,58 @@ Return-Path: <cyrus@holtmann.org>
 From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH v2 08/11] unit/test-hfp: Add init test for HFP HF
-Date: Tue,  7 Oct 2014 11:22:17 +0200
-Message-Id: <1412673740-24336-9-git-send-email-lukasz.rymanowski@tieto.com>
+Subject: [PATCH v2 07/11] unit/test-hfp: Provide test_handler function via struct data
+Date: Tue,  7 Oct 2014 11:22:16 +0200
+Message-Id: <1412673740-24336-8-git-send-email-lukasz.rymanowski@tieto.com>
 In-Reply-To: <1412673740-24336-1-git-send-email-lukasz.rymanowski@tieto.com>
 References: <1412673740-24336-1-git-send-email-lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch adds basic infrastruction for HFP HF test plus
-init test.
-
-It also moves send_pdu function in the file so it can be used by
-test_hf_handler
+This patch allows us to use user defined test handler depends on needs.
+Will use it in following patches which implements tests for HFP HF.
 ---
- unit/test-hfp.c | 96 ++++++++++++++++++++++++++++++++++++++++++++++-----------
- 1 file changed, 78 insertions(+), 18 deletions(-)
+ unit/test-hfp.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
 diff --git a/unit/test-hfp.c b/unit/test-hfp.c
-index 4b3473b..ad26058 100644
+index a8801b0..4b3473b 100644
 --- a/unit/test-hfp.c
 +++ b/unit/test-hfp.c
-@@ -36,6 +36,7 @@ struct context {
- 	int fd_server;
- 	int fd_client;
- 	struct hfp_gw *hfp;
-+	struct hfp_hf *hfp_hf;
- 	const struct test_data *data;
- 	unsigned int pdu_offset;
- };
-@@ -52,6 +53,8 @@ struct test_data {
+@@ -52,6 +52,7 @@ struct test_data {
  	char *test_name;
  	struct test_pdu *pdu_list;
  	hfp_result_func_t result_func;
-+	hfp_response_func_t response_func;
-+	hfp_hf_result_func_t hf_result_func;
- 	GIOFunc test_handler;
++	GIOFunc test_handler;
  };
  
-@@ -99,6 +102,22 @@ struct test_data {
- 		data.test_handler = test_handler;			\
+ #define data(args...) ((const unsigned char[]) { args })
+@@ -95,6 +96,7 @@ struct test_data {
+ 		data.result_func = result_function;			\
+ 		memcpy(data.pdu_list, pdus, sizeof(pdus));		\
+ 		g_test_add_data_func(name, &data, function);		\
++		data.test_handler = test_handler;			\
  	} while (0)
  
-+#define define_hf_test(name, function, result_func, response_function,	\
-+								args...)\
-+	do {								\
-+		const struct test_pdu pdus[] = {			\
-+			args, { }					\
-+		};							\
-+		static struct test_data data;				\
-+		data.test_name = g_strdup(name);			\
-+		data.pdu_list = g_malloc(sizeof(pdus));			\
-+		data.hf_result_func = result_func;			\
-+		data.response_func = response_function;			\
-+		memcpy(data.pdu_list, pdus, sizeof(pdus));		\
-+		g_test_add_data_func(name, &data, function);		\
-+		data.test_handler = test_hf_handler;			\
-+	} while (0)
-+
  static void context_quit(struct context *context)
- {
- 	g_main_loop_quit(context->main_loop);
-@@ -128,6 +147,46 @@ static gboolean test_handler(GIOChannel *channel, GIOCondition cond,
- 	return FALSE;
- }
+@@ -158,6 +160,7 @@ static struct context *create_context(gconstpointer data)
+ 	struct context *context = g_new0(struct context, 1);
+ 	GIOChannel *channel;
+ 	int err, sv[2];
++	const struct test_data *d = data;
  
-+static gboolean send_pdu(gpointer user_data)
-+{
-+	struct context *context = user_data;
-+	const struct test_pdu *pdu;
-+	ssize_t len;
-+
-+	pdu = &context->data->pdu_list[context->pdu_offset++];
-+
-+	if (pdu && !pdu->valid)
-+		return FALSE;
-+
-+	len = write(context->fd_server, pdu->data, pdu->size);
-+	g_assert_cmpint(len, ==, pdu->size);
-+
-+	pdu = &context->data->pdu_list[context->pdu_offset];
-+	if (pdu->fragmented)
-+		g_idle_add(send_pdu, context);
-+
-+	return FALSE;
-+}
-+
-+static gboolean test_hf_handler(GIOChannel *channel, GIOCondition cond,
-+							gpointer user_data)
-+{
-+	struct context *context = user_data;
-+
-+	if (cond & (G_IO_HUP | G_IO_ERR | G_IO_NVAL))
-+		goto done;
-+
-+	send_pdu(context);
-+
-+	return TRUE;
-+
-+done:
-+	context_quit(context);
-+	context->watch_id = 0;
-+
-+	return FALSE;
-+}
-+
- static void cmd_handler(const char *command, void *user_data)
- {
- 	struct context *context = user_data;
-@@ -203,6 +262,9 @@ static void execute_context(struct context *context)
- 	if (context->hfp)
- 		hfp_gw_unref(context->hfp);
+ 	context->main_loop = g_main_loop_new(NULL, FALSE);
+ 	g_assert(context->main_loop);
+@@ -173,7 +176,8 @@ static struct context *create_context(gconstpointer data)
  
-+	if (context->hfp_hf)
-+		hfp_hf_unref(context->hfp_hf);
+ 	context->watch_id = g_io_add_watch(channel,
+ 				G_IO_IN | G_IO_HUP | G_IO_ERR | G_IO_NVAL,
+-				test_handler, context);
++				d->test_handler, context);
 +
- 	g_free(context);
- }
+ 	g_assert(context->watch_id > 0);
  
-@@ -275,24 +337,6 @@ static void test_register(gconstpointer data)
- 	execute_context(context);
- }
- 
--static gboolean send_pdu(gpointer user_data)
--{
--	struct context *context = user_data;
--	const struct test_pdu *pdu;
--	ssize_t len;
--
--	pdu = &context->data->pdu_list[context->pdu_offset++];
--
--	len = write(context->fd_server, pdu->data, pdu->size);
--	g_assert_cmpint(len, ==, pdu->size);
--
--	pdu = &context->data->pdu_list[context->pdu_offset];
--	if (pdu->fragmented)
--		g_idle_add(send_pdu, context);
--
--	return FALSE;
--}
--
- static void test_fragmented(gconstpointer data)
- {
- 	struct context *context = create_context(data);
-@@ -404,6 +448,20 @@ static void check_string_2(struct hfp_gw_result *result,
- 	hfp_gw_send_result(context->hfp, HFP_RESULT_ERROR);
- }
- 
-+static void test_hf_init(gconstpointer data)
-+{
-+	struct context *context = create_context(data);
-+
-+	context->hfp_hf = hfp_hf_new(context->fd_client);
-+	g_assert(context->hfp_hf);
-+	g_assert(hfp_hf_set_close_on_unref(context->hfp_hf, true));
-+
-+	hfp_hf_unref(context->hfp_hf);
-+	context->hfp_hf = NULL;
-+
-+	execute_context(context);
-+}
-+
- int main(int argc, char *argv[])
- {
- 	g_test_init(&argc, &argv, NULL);
-@@ -473,5 +531,7 @@ int main(int argc, char *argv[])
- 			raw_pdu('\r'),
- 			data_end());
- 
-+	define_hf_test("/hfp/test_init", test_hf_init, NULL, NULL, data_end());
-+
- 	return g_test_run();
- }
+ 	g_io_channel_unref(channel);
 -- 
 1.8.4
 
