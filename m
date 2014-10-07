@@ -1,46 +1,41 @@
 Return-Path: <cyrus@holtmann.org>
-From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH v2 00/11] shared/hfp: Add support for HFP HF
-Date: Tue,  7 Oct 2014 11:22:09 +0200
-Message-Id: <1412673740-24336-1-git-send-email-lukasz.rymanowski@tieto.com>
+Message-ID: <1412672146.919.5.camel@gentoo.org>
+Subject: Re: Regarding why some tools are not installed
+From: Pacho Ramos <pacho@gentoo.org>
+To: BlueZ development <linux-bluetooth@vger.kernel.org>
+Date: Tue, 07 Oct 2014 10:55:46 +0200
+In-Reply-To: <1410689236.29532.12.camel@gentoo.org>
+References: <1410689236.29532.12.camel@gentoo.org>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Following patches extends hfp API with HFP HF functionality.
-HFP HF parser has been added and unit test for it.
+El dom, 14-09-2014 a las 12:07 +0200, Pacho Ramos escribió:
+> Hello
+> 
+> Recently a user told me that he needed to use hex2hcd to get his
+> Broadcom firmware loaded by his bluetooth adaptor. We wonder about why
+> it's not installed by default when we build with "experimental"
+> configure option:
+> if EXPERIMENTAL
+> noinst_PROGRAMS += tools/bdaddr tools/avinfo tools/avtest \
+>                         tools/scotest tools/amptest tools/hwdb \
+>                         tools/hcieventmask tools/hcisecfilter \
+>                         tools/btmgmt tools/btinfo tools/btattach \
+>                         tools/btsnoop tools/btproxy tools/btiotest \
+>                         tools/cltest tools/seq2bseq tools/hex2hcd \
+>                         tools/ibeacon tools/btgatt-client
+> (in Makefile.tools)
+> 
+> Thanks a lot for the info
+> 
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> 
 
-To consider: how strict we should be when it comes to parsing
-AT responses. For example, at the moment, command +CCLC:<cr><lf>
-will be recognized as +CCLC: eventhough correct response format
-should be <cr><lf>+CCLC:<cr><lf>
-
-Note: As discussed on IRC I did not try to generalize code.
-
-v2:
-* minor self review fixes
-* response callback on send command, contains now result (OK/ERROR) and
-data from unsolicited response if available.
-
-Lukasz Rymanowski (11):
-  shared/hfp: Add support for HFP HF
-  shared/hfp: Add set_debug and close_on_unref API for HFP HF
-  shared/hfp: Add set disconnect handler and disconnect API to HFP HF
-  shared/hfp: Add register/unregister event for HFP HF
-  shared/hfp: Add HFP HF parser
-  shared/hfp: Add send AT command API for HFP HF
-  unit/test-hfp: Provide test_handler function via struct data
-  unit/test-hfp: Add init test for HFP HF
-  unit/test-hfp: Add send command tests for HFP HF
-  unit/test-hfp: Add tests for unsolicited results for HFP HF
-  unit/test-hfp: Add some robustness tests for HFP HF
-
- src/shared/hfp.c | 625 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
- src/shared/hfp.h |  27 +++
- unit/test-hfp.c  | 260 +++++++++++++++++++++--
- 3 files changed, 893 insertions(+), 19 deletions(-)
-
--- 
-1.8.4
+The same occurs with gatttool :/, do you know why they are explicitly
+not installed? 
 
