@@ -1,150 +1,110 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1412676071.1926.1.camel@linux-0dmf.site>
-Subject: Re: btusb_intr_complete returns -EPIPE
-From: Oliver Neukum <oneukum@suse.de>
-To: Naveen Kumar Parna <pnaveenkos@gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	linux-usb@vger.kernel.org, acho@suse.com
-Date: Tue, 07 Oct 2014 12:01:11 +0200
-In-Reply-To: <CAG0bkv+_t8CqM9w5N1hKJtT=_mQmtWWCPe-9jSHuOkNZCL3B9A@mail.gmail.com>
-References: <CAG0bkvK4-gfeYXXsdNg4BKdjxmo1e5d8rKuABohtYNNBHKJwDA@mail.gmail.com>
-	 <1412598268.1132.15.camel@linux-0dmf.site>
-	 <CAG0bkv+nKt-TgONDLENNUncz9NScdJGcYR+J2Z6b=wg2grvqhg@mail.gmail.com>
-	 <1412600108.28177.0.camel@linux-0dmf.site>
-	 <CAG0bkvK=fumhJNzuSgx=HFHiVP08V+QH2wLajdffx+f5ugoQPQ@mail.gmail.com>
-	 <1412602169.28177.2.camel@linux-0dmf.site>
-	 <CAG0bkv+d9SxToWpk49s=C-w_aA4zbP_RvV_8kcgV254rsvHR0A@mail.gmail.com>
-	 <1412607050.1743.1.camel@linux-0dmf.site>
-	 <CAG0bkvKJZMhurNNpc_2wgaACRzhyEikb0G0YSY7QnxqBe1rnjw@mail.gmail.com>
-	 <CAG0bkv+_t8CqM9w5N1hKJtT=_mQmtWWCPe-9jSHuOkNZCL3B9A@mail.gmail.com>
-Content-Type: multipart/mixed; boundary="=-qkGcsr9gj8O6hqRRVOH8"
-Mime-Version: 1.0
+From: Vikrampal Yadav <vikram.pal@samsung.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: luiz.dentz@gmail.com, d.kasatkin@samsung.com,
+	vikram.pal@samsung.com, cpgs@samsung.com
+Subject: [PATCH] Monitor: Add AVRCP PASS THROUGH command support
+Date: Tue, 07 Oct 2014 15:35:51 +0530
+Message-id: <1412676351-29503-1-git-send-email-vikram.pal@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-
---=-qkGcsr9gj8O6hqRRVOH8
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-
-On Tue, 2014-10-07 at 12:14 +0530, Naveen Kumar Parna wrote:
-> > +       err = usb_clear_halt(data->udev,
-> > +                            usb_rcvbulkpipe(data->udev,
-> > +                                            data->intr_ep->bEndpointAddress));
-> 
-> EPIPE occurred for INT in endpoint, so we should use usb_rcvintpipe()
-> instead of usb_rcvbulkpipe() right?
-
-Yes. And I noticed a copy and past error.
-
-> Does the “lsusb –v” gives any clue about the reason for getting -EPIPE?
-
-No. Could you nevertheless test the attached version?
-
-	Regards
-		Oliver
-
-
---=-qkGcsr9gj8O6hqRRVOH8
-Content-Disposition: attachment; filename="0001-btusb-clear-halt-if-intr-in-stalls.patch"
-Content-Type: text/x-patch; name="0001-btusb-clear-halt-if-intr-in-stalls.patch";
-	charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-
->From b8109554277bde9da4275e7a9ce1ef76b43ebd59 Mon Sep 17 00:00:00 2001
-From: Oliver Neukum <oneukum@suse.de>
-Date: Mon, 6 Oct 2014 15:27:54 +0200
-Subject: [PATCH] btusb: clear halt if intr in stalls
-
-Use a work queue for clearing a halt.
-
-Signed-off-by: Oliver Neukum <oneukum@suse.de>
+Support for decoding AVRCP PASS THROUGH command added in Bluetooth
+monitor.
 ---
- drivers/bluetooth/btusb.c | 34 ++++++++++++++++++++++++++++++++--
- 1 file changed, 32 insertions(+), 2 deletions(-)
+ monitor/avctp.c | 63 +++++++++++++++++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 61 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 292c38e..716c37a 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -273,6 +273,7 @@ struct btusb_data {
+diff --git a/monitor/avctp.c b/monitor/avctp.c
+index 9de46d1..a4e34c5 100644
+--- a/monitor/avctp.c
++++ b/monitor/avctp.c
+@@ -182,6 +182,20 @@
+ #define AVRCP_MEDIA_SEARCH		0x02
+ #define AVRCP_MEDIA_NOW_PLAYING		0x03
  
- 	struct work_struct work;
- 	struct work_struct waker;
-+	struct work_struct intr_in_work;
- 
- 	struct usb_anchor tx_anchor;
- 	struct usb_anchor intr_anchor;
-@@ -314,14 +315,15 @@ static void btusb_intr_complete(struct urb *urb)
- 	struct hci_dev *hdev = urb->context;
- 	struct btusb_data *data = hci_get_drvdata(hdev);
- 	int err;
-+	int status = urb->status;
- 
- 	BT_DBG("%s urb %p status %d count %d", hdev->name,
--					urb, urb->status, urb->actual_length);
-+					urb, status, urb->actual_length);
- 
- 	if (!test_bit(HCI_RUNNING, &hdev->flags))
- 		return;
- 
--	if (urb->status == 0) {
-+	if (status == 0) {
- 		hdev->stat.byte_rx += urb->actual_length;
- 
- 		if (hci_recv_fragment(hdev, HCI_EVENT_PKT,
-@@ -330,6 +332,10 @@ static void btusb_intr_complete(struct urb *urb)
- 			BT_ERR("%s corrupted event packet", hdev->name);
- 			hdev->stat.err_rx++;
- 		}
-+	} else if (status == -EPIPE) {
-+		usb_mark_last_busy(data->udev);
-+		schedule_work(&data->intr_in_work);
-+		return;
++/* operands in passthrough commands */
++#define AVC_PANEL_VOLUME_UP		0x41
++#define AVC_PANEL_VOLUME_DOWN		0x42
++#define AVC_PANEL_MUTE			0x43
++#define AVC_PANEL_PLAY			0x44
++#define AVC_PANEL_STOP			0x45
++#define AVC_PANEL_PAUSE			0x46
++#define AVC_PANEL_RECORD		0x47
++#define AVC_PANEL_REWIND		0x48
++#define AVC_PANEL_FAST_FORWARD		0x49
++#define AVC_PANEL_EJECT			0x4a
++#define AVC_PANEL_FORWARD		0x4b
++#define AVC_PANEL_BACKWARD		0x4c
++
+ struct avctp_frame {
+ 	uint8_t hdr;
+ 	uint8_t pt;
+@@ -631,9 +645,54 @@ static const char *scope2str(uint8_t scope)
  	}
- 
- 	if (!test_bit(BTUSB_INTR_RUNNING, &data->flags))
-@@ -971,6 +977,29 @@ static void btusb_waker(struct work_struct *work)
- 	usb_autopm_put_interface(data->intf);
  }
  
-+static void clear_halt_intr_in(struct work_struct *work)
+-static bool avrcp_passthrough_packet(struct avctp_frame *avctp_frame)
++static char *op2str(uint8_t op)
 +{
-+	struct btusb_data *data = container_of(work, struct btusb_data, intr_in_work);
-+	int err;
-+
-+	err = usb_autopm_get_interface(data->intf);
-+	if (err < 0)
-+		return;
-+
-+	err = usb_clear_halt(data->udev,
-+			     usb_rcvintpipe(data->udev,
-+					     data->intr_ep->bEndpointAddress));
-+	if (err < 0)
-+		return;
-+
-+	if (!test_bit(BTUSB_INTR_RUNNING, &data->flags))
-+		return;
-+
-+	btusb_submit_intr_urb(data->hdev, GFP_NOIO);
-+
-+	usb_autopm_put_interface(data->intf);
++	switch (op & 0x7f) {
++	case AVC_PANEL_VOLUME_UP:
++		return "VOLUME UP";
++	case AVC_PANEL_VOLUME_DOWN:
++		return "VOLUME DOWN";
++	case AVC_PANEL_MUTE:
++		return "MUTE";
++	case AVC_PANEL_PLAY:
++		return "PLAY";
++	case AVC_PANEL_STOP:
++		return "STOP";
++	case AVC_PANEL_PAUSE:
++		return "PAUSE";
++	case AVC_PANEL_RECORD:
++		return "RECORD";
++	case AVC_PANEL_REWIND:
++		return "REWIND";
++	case AVC_PANEL_FAST_FORWARD:
++		return "FAST FORWARD";
++	case AVC_PANEL_EJECT:
++		return "EJECT";
++	case AVC_PANEL_FORWARD:
++		return "FORWARD";
++	case AVC_PANEL_BACKWARD:
++		return "BACKWARD";
++	default:
++		return "UNKNOWN";
++	}
 +}
 +
- static int btusb_setup_bcm92035(struct hci_dev *hdev)
++static bool avrcp_passthrough_packet(struct avctp_frame *avctp_frame,
++								uint8_t indent)
  {
- 	struct sk_buff *skb;
-@@ -1759,6 +1788,7 @@ static int btusb_probe(struct usb_interface *intf,
+ 	struct l2cap_frame *frame = &avctp_frame->l2cap_frame;
++	uint8_t op, len;
++
++	if (!l2cap_frame_get_u8(frame, &op))
++		return false;
++
++	print_field("%*cOperation: 0x%02x (%s %s)", (indent - 2), ' ', op,
++				op2str(op), op & 0x80 ? "Released" : "Pressed");
++
++	if (!l2cap_frame_get_u8(frame, &len))
++		return false;
++
++	print_field("%*cLength: 0x%02x", (indent - 2), ' ', len);
  
- 	INIT_WORK(&data->work, btusb_work);
- 	INIT_WORK(&data->waker, btusb_waker);
-+	INIT_WORK(&data->intr_in_work, clear_halt_intr_in);
- 	spin_lock_init(&data->txlock);
+ 	packet_hexdump(frame->data, frame->size);
+ 	return true;
+@@ -1555,7 +1614,7 @@ static bool avrcp_control_packet(struct avctp_frame *avctp_frame)
  
- 	init_usb_anchor(&data->tx_anchor);
+ 	switch (opcode) {
+ 	case 0x7c:
+-		return avrcp_passthrough_packet(avctp_frame);
++		return avrcp_passthrough_packet(avctp_frame, 10);
+ 	case 0x00:
+ 		if (!l2cap_frame_get_u8(frame, &company[0]) ||
+ 				!l2cap_frame_get_u8(frame, &company[1]) ||
 -- 
-1.8.4.5
-
-
---=-qkGcsr9gj8O6hqRRVOH8--
+1.9.1
 
