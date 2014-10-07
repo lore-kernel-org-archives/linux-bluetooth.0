@@ -3,51 +3,35 @@ From: Gowtham Anandha Babu <gowtham.ab@samsung.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: d.kasatkin@samsung.com, bharat.panda@samsung.com, cpgs@samsung.com,
 	Gowtham Anandha Babu <gowtham.ab@samsung.com>
-Subject: [PATCH 2/6] test/map-client: Add D-Bus API support to make MASInstance
- request
-Date: Tue, 07 Oct 2014 09:36:52 +0530
-Message-id: <1412654816-14971-3-git-send-email-gowtham.ab@samsung.com>
+Subject: [PATCH 1/6] doc/obex-api: Add description about MASInstance request
+Date: Tue, 07 Oct 2014 09:36:51 +0530
+Message-id: <1412654816-14971-2-git-send-email-gowtham.ab@samsung.com>
 In-reply-to: <1412654816-14971-1-git-send-email-gowtham.ab@samsung.com>
 References: <1412654816-14971-1-git-send-email-gowtham.ab@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- test/map-client | 9 +++++++++
- 1 file changed, 9 insertions(+)
+ doc/obex-api.txt | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-diff --git a/test/map-client b/test/map-client
-index b9695da..a1666b2 100755
---- a/test/map-client
-+++ b/test/map-client
-@@ -66,6 +66,8 @@ def parse_options():
- 			help="Undeletes the message")
- 	parser.add_option("-u", "--update-inbox", action="store_true", dest="update_inbox",
- 			help="Checks for new mails")
-+	parser.add_option("-m", "--mas-instance-info", action="store_true", dest="get_mas_info",
-+			help="Get MAS Instance Information")
+diff --git a/doc/obex-api.txt b/doc/obex-api.txt
+index a39abc0..d432da1 100644
+--- a/doc/obex-api.txt
++++ b/doc/obex-api.txt
+@@ -715,6 +715,12 @@ Methods		void SetFolder(string name)
+ 			Possible errors: org.bluez.obex.Error.InvalidArguments
+ 					 org.bluez.obex.Error.Failed
  
- 	return parser.parse_args()
- 
-@@ -172,6 +174,10 @@ class MapClient:
- 	def update_inbox(self):
- 		self.map.UpdateInbox()
- 
-+	def get_mas_instance_info(self):
-+		ret = self.map.GetMASInstanceInfo()
-+		print(pformat(unwrap(ret)))
++		string GetMASInstanceInfo(void)
 +
- 
- if  __name__ == '__main__':
- 
-@@ -229,4 +235,7 @@ if  __name__ == '__main__':
- 	if options.update_inbox:
- 		map_client.update_inbox()
- 
-+	if options.get_mas_info:
-+		map_client.get_mas_instance_info()
++			Request remote for MAS Instance Information
 +
- 	mainloop.run()
++			Possible errors: org.bluez.obex.Error.InvalidArguments
++					 org.bluez.obex.Error.Failed
+ 
+ Filter:		uint16 Offset:
+ 
 -- 
 1.9.1
 
