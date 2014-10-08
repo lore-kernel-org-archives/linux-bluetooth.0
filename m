@@ -1,52 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <000f01cfe21b$7cdac460$76904d20$@samsung.com>
-References: <000f01cfe21b$7cdac460$76904d20$@samsung.com>
-Date: Wed, 8 Oct 2014 13:47:24 +0300
-Message-ID: <CABBYNZ+E4vG-y1+oKMgBiydd3KMDD51Hht19ACcuQKVtHynHxQ@mail.gmail.com>
-Subject: Re: Query regarding the PTS MAP 1.2 push message test case execution
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Gowtham Anandha Babu <gowtham.ab@samsung.com>
+Message-ID: <1412765090.21709.18.camel@linux-0dmf.site>
+Subject: Re: btusb_intr_complete returns -EPIPE
+From: Oliver Neukum <oneukum@suse.de>
+To: Naveen Kumar Parna <pnaveenkos@gmail.com>
 Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	Bharat Panda <bharat.panda@samsung.com>,
-	Dmitry Kasatkin <d.kasatkin@samsung.com>, cpgs@samsung.com
-Content-Type: text/plain; charset=UTF-8
+	linux-usb@vger.kernel.org, acho@suse.com
+Date: Wed, 08 Oct 2014 12:44:50 +0200
+In-Reply-To: <CAG0bkvKugdQSDm+GKRbLGLzrURth5ty9KU-8d3ED-a9sgdDkMg@mail.gmail.com>
+References: <CAG0bkvK4-gfeYXXsdNg4BKdjxmo1e5d8rKuABohtYNNBHKJwDA@mail.gmail.com>
+	 <1412598268.1132.15.camel@linux-0dmf.site>
+	 <CAG0bkv+nKt-TgONDLENNUncz9NScdJGcYR+J2Z6b=wg2grvqhg@mail.gmail.com>
+	 <1412600108.28177.0.camel@linux-0dmf.site>
+	 <CAG0bkvK=fumhJNzuSgx=HFHiVP08V+QH2wLajdffx+f5ugoQPQ@mail.gmail.com>
+	 <1412602169.28177.2.camel@linux-0dmf.site>
+	 <CAG0bkv+d9SxToWpk49s=C-w_aA4zbP_RvV_8kcgV254rsvHR0A@mail.gmail.com>
+	 <1412607050.1743.1.camel@linux-0dmf.site>
+	 <CAG0bkvKJZMhurNNpc_2wgaACRzhyEikb0G0YSY7QnxqBe1rnjw@mail.gmail.com>
+	 <CAG0bkv+_t8CqM9w5N1hKJtT=_mQmtWWCPe-9jSHuOkNZCL3B9A@mail.gmail.com>
+	 <1412676071.1926.1.camel@linux-0dmf.site>
+	 <CAG0bkvKYT5+ZBZwdvG71g98CqZR03er6rN4y5RRfq6UUL5KnCw@mail.gmail.com>
+	 <CAG0bkv+YK6_wP+cnZEmfRZnLXa=7N1CMyYqVAbao22gf74dhbw@mail.gmail.com>
+	 <1412759368.21709.15.camel@linux-0dmf.site>
+	 <CAG0bkvKugdQSDm+GKRbLGLzrURth5ty9KU-8d3ED-a9sgdDkMg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+On Wed, 2014-10-08 at 15:51 +0530, Naveen Kumar Parna wrote:
+> hcidump does not show anything when the stalls happen.
 
-On Tue, Oct 7, 2014 at 1:42 PM, Gowtham Anandha Babu
-<gowtham.ab@samsung.com> wrote:
-> Hi,
->
-> I am currently validating all the test cases of PTS 5.3 for MAP 1.2.
-> How to push the message bluez map-client to MSE(server)?
-> The approach which I followed is described below:
->
-> On MCE(Bluez - map-client):
-> 1) Run bluetoothd
-> 2) Run obexd
-> 3) ./map-client -d <REMOTE_BT_ADDR>  -c telecom/msg/outbox/ -p PUSH_MSG
->
-> On MSE(PTS tool)
-> 1) Running the test-case: TC_MCE_MMU_BV_01_I
-> 2) After running the test-case. I am getting the User Action Required
-> (Please find this in attached image).
->
-> The PUSH_MSG will be the filename of the message which we are pushing to
-> MSE(server).
-> So, I tried pushing the attached file with the same command as shown above
-> by replacing PUSH_MSG with filename of the attached.
-> But I am getting "org.bluez.obex.Error.Failed: Unable to open file".
->
-> How to push the message? Am I missing something?
+There is nothing in all logs. Do you see the problem
+with single devices?
 
-First you need to check if obexd has permission to open the file, also
-you can try obexctl instead using send command should have the same
-result as map-client but it is a bit more up to date in terms of
-features.
+	Regards
+		Oliver
 
 
--- 
-Luiz Augusto von Dentz
