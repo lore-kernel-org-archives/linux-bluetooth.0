@@ -2,108 +2,105 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH 08/13] android/handsfree: Move clip into device structure
-Date: Wed,  8 Oct 2014 09:12:18 +0200
-Message-Id: <1412752343-7001-8-git-send-email-szymon.janc@tieto.com>
+Subject: [PATCH 07/13] android/handsfree: Pass device to SCO handling functions
+Date: Wed,  8 Oct 2014 09:12:17 +0200
+Message-Id: <1412752343-7001-7-git-send-email-szymon.janc@tieto.com>
 In-Reply-To: <1412752343-7001-1-git-send-email-szymon.janc@tieto.com>
 References: <1412752343-7001-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- android/handsfree.c | 36 ++++++++++++++++++++++++------------
- 1 file changed, 24 insertions(+), 12 deletions(-)
+ android/handsfree.c | 35 +++++++++++++++++++----------------
+ 1 file changed, 19 insertions(+), 16 deletions(-)
 
 diff --git a/android/handsfree.c b/android/handsfree.c
-index d83f0a2..e7b8a6e 100644
+index 7c8020c..d83f0a2 100644
 --- a/android/handsfree.c
 +++ b/android/handsfree.c
-@@ -131,6 +131,7 @@ struct hf_device {
- 	struct hfp_codec codecs[CODECS_COUNT];
- 
- 	guint ring;
-+	char *clip;
- 	bool hsp;
- 
- 	struct hfp_gw *gw;
-@@ -255,6 +256,11 @@ static void device_cleanup(struct hf_device *dev)
- 	if (dev->ring) {
- 		g_source_remove(dev->ring);
- 		dev->ring = 0;
-+
-+		if (dev->clip) {
-+			g_free(dev->clip);
-+			dev->clip = NULL;
-+		}
- 	}
- 
- 	set_audio_state(dev, HAL_EV_HANDSFREE_AUDIO_STATE_DISCONNECTED);
-@@ -2018,12 +2024,12 @@ done:
- 
- static gboolean ring_cb(gpointer user_data)
+@@ -852,15 +852,17 @@ static void at_cmd_btrh(struct hfp_gw_result *result, enum hfp_gw_cmd_type type,
+ static gboolean sco_watch_cb(GIOChannel *chan, GIOCondition cond,
+ 							gpointer user_data)
  {
--	char *clip = user_data;
+-	g_io_channel_shutdown(device.sco, TRUE, NULL);
+-	g_io_channel_unref(device.sco);
+-	device.sco = NULL;
 +	struct hf_device *dev = user_data;
- 
--	hfp_gw_send_info(device.gw, "RING");
-+	hfp_gw_send_info(dev->gw, "RING");
- 
--	if (device.clip_enabled && clip)
--		hfp_gw_send_info(device.gw, "%s", clip);
-+	if (dev->clip_enabled && dev->clip)
-+		hfp_gw_send_info(dev->gw, "%s", dev->clip);
- 
- 	return TRUE;
- }
-@@ -2065,7 +2071,7 @@ static void phone_state_waiting(int num_active, int num_held, uint8_t type,
- static void phone_state_incoming(int num_active, int num_held, uint8_t type,
- 					const uint8_t *number, int number_len)
- {
--	char *clip, *num;
-+	char *num;
- 
- 	if (device.setup_state == HAL_HANDSFREE_CALL_STATE_INCOMING) {
- 		if (device.num_active != num_active ||
-@@ -2096,19 +2102,20 @@ static void phone_state_incoming(int num_active, int num_held, uint8_t type,
- 	num = number_len ? (char *) number : "";
- 
- 	if (type == HAL_HANDSFREE_CALL_ADDRTYPE_INTERNATIONAL && num[0] != '+')
--		clip = g_strdup_printf("+CLIP: \"+%s\",%u", num, type);
-+		device.clip = g_strdup_printf("+CLIP: \"+%s\",%u", num, type);
- 	else
--		clip = g_strdup_printf("+CLIP: \"%s\",%u", num, type);
-+		device.clip = g_strdup_printf("+CLIP: \"%s\",%u", num, type);
- 
- 	/* send first RING */
--	ring_cb(clip);
-+	ring_cb(&device);
- 
- 	device.ring = g_timeout_add_seconds_full(G_PRIORITY_DEFAULT,
- 							RING_TIMEOUT, ring_cb,
--							clip, g_free);
--
--	if (!device.ring)
--		g_free(clip);
-+							&device, NULL);
-+	if (!device.ring) {
-+		g_free(device.clip);
-+		device.clip = NULL;
-+	}
- }
- 
- static void phone_state_idle(int num_active, int num_held)
-@@ -2116,6 +2123,11 @@ static void phone_state_idle(int num_active, int num_held)
- 	if (device.ring) {
- 		g_source_remove(device.ring);
- 		device.ring = 0;
 +
-+		if (device.clip) {
-+			g_free(device.clip);
-+			device.clip = NULL;
-+		}
++	g_io_channel_shutdown(dev->sco, TRUE, NULL);
++	g_io_channel_unref(dev->sco);
++	dev->sco = NULL;
+ 
+ 	DBG("");
+ 
+-	device.sco_watch = 0;
++	dev->sco_watch = 0;
+ 
+-	set_audio_state(&device, HAL_EV_HANDSFREE_AUDIO_STATE_DISCONNECTED);
++	set_audio_state(dev, HAL_EV_HANDSFREE_AUDIO_STATE_DISCONNECTED);
+ 
+ 	return FALSE;
+ }
+@@ -894,19 +896,20 @@ done:
+ 
+ static void connect_sco_cb(GIOChannel *chan, GError *err, gpointer user_data)
+ {
++	struct hf_device *dev = user_data;
++
+ 	if (err) {
+ 		error("handsfree: audio connect failed (%s)", err->message);
+ 
+-		set_audio_state(&device,
+-				HAL_EV_HANDSFREE_AUDIO_STATE_DISCONNECTED);
++		set_audio_state(dev, HAL_EV_HANDSFREE_AUDIO_STATE_DISCONNECTED);
+ 
+-		if (!(device.features & HFP_HF_FEAT_CODEC))
++		if (!(dev->features & HFP_HF_FEAT_CODEC))
+ 			return;
+ 
+ 		/* If other failed, try connecting with CVSD */
+-		if (device.negotiated_codec != CODEC_ID_CVSD) {
++		if (dev->negotiated_codec != CODEC_ID_CVSD) {
+ 			info("handsfree: trying fallback with CVSD");
+-			select_codec(&device, CODEC_ID_CVSD);
++			select_codec(dev, CODEC_ID_CVSD);
+ 		}
+ 
+ 		return;
+@@ -914,11 +917,11 @@ static void connect_sco_cb(GIOChannel *chan, GError *err, gpointer user_data)
+ 
+ 	g_io_channel_set_close_on_unref(chan, TRUE);
+ 
+-	device.sco = g_io_channel_ref(chan);
+-	device.sco_watch = g_io_add_watch(chan, G_IO_ERR | G_IO_HUP | G_IO_NVAL,
+-							sco_watch_cb, NULL);
++	dev->sco = g_io_channel_ref(chan);
++	dev->sco_watch = g_io_add_watch(chan, G_IO_ERR | G_IO_HUP | G_IO_NVAL,
++							sco_watch_cb, dev);
+ 
+-	set_audio_state(&device, HAL_EV_HANDSFREE_AUDIO_STATE_CONNECTED);
++	set_audio_state(dev, HAL_EV_HANDSFREE_AUDIO_STATE_CONNECTED);
+ }
+ 
+ static bool connect_sco(void)
+@@ -937,7 +940,7 @@ static bool connect_sco(void)
+ 	else
+ 		voice_settings = BT_VOICE_CVSD_16BIT;
+ 
+-	io = bt_io_connect(connect_sco_cb, NULL, NULL, &gerr,
++	io = bt_io_connect(connect_sco_cb, &device, NULL, &gerr,
+ 				BT_IO_OPT_SOURCE_BDADDR, &adapter_addr,
+ 				BT_IO_OPT_DEST_BDADDR, &device.bdaddr,
+ 				BT_IO_OPT_VOICE, voice_settings,
+@@ -2373,7 +2376,7 @@ static void confirm_sco_cb(GIOChannel *chan, gpointer user_data)
+ 		goto drop;
  	}
  
- 	switch (device.setup_state) {
+-	if (!bt_io_accept(chan, connect_sco_cb, NULL, NULL, NULL)) {
++	if (!bt_io_accept(chan, connect_sco_cb, &device, NULL, NULL)) {
+ 		error("handsfree: failed to accept audio connection");
+ 		goto drop;
+ 	}
 -- 
 1.9.1
 
