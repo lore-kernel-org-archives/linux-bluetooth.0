@@ -1,45 +1,57 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcin Kraglak <marcin.kraglak@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv3 06/13] shared/gatt: Remove not needed function parameter
-Date: Wed,  8 Oct 2014 10:31:43 +0200
-Message-Id: <1412757110-3509-7-git-send-email-marcin.kraglak@tieto.com>
+Subject: [PATCHv3 13/13] tools/btgatt-client: Print found include services
+Date: Wed,  8 Oct 2014 10:31:50 +0200
+Message-Id: <1412757110-3509-14-git-send-email-marcin.kraglak@tieto.com>
 In-Reply-To: <1412757110-3509-1-git-send-email-marcin.kraglak@tieto.com>
 References: <1412757110-3509-1-git-send-email-marcin.kraglak@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-According to SPEC 4.1 4.5.1 "Find Included Services" there is no need
-to pass UUID to discover_included_services() function.
 ---
- src/shared/gatt-helpers.c | 1 -
- src/shared/gatt-helpers.h | 1 -
- 2 files changed, 2 deletions(-)
+ tools/btgatt-client.c | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
 
-diff --git a/src/shared/gatt-helpers.c b/src/shared/gatt-helpers.c
-index fd8d06c..48e7379 100644
---- a/src/shared/gatt-helpers.c
-+++ b/src/shared/gatt-helpers.c
-@@ -1002,7 +1002,6 @@ done:
+diff --git a/tools/btgatt-client.c b/tools/btgatt-client.c
+index 5c692ff..5465d53 100644
+--- a/tools/btgatt-client.c
++++ b/tools/btgatt-client.c
+@@ -174,7 +174,9 @@ static void print_uuid(const uint8_t uuid[16])
+ static void print_service(const bt_gatt_service_t *service)
+ {
+ 	struct bt_gatt_characteristic_iter iter;
++	struct bt_gatt_incl_service_iter include_iter;
+ 	const bt_gatt_characteristic_t *chrc;
++	const bt_gatt_included_service_t *incl;
+ 	size_t i;
  
- bool bt_gatt_discover_included_services(struct bt_att *att,
- 					uint16_t start, uint16_t end,
--					bt_uuid_t *uuid,
- 					bt_gatt_discovery_callback_t callback,
- 					void *user_data,
- 					bt_gatt_destroy_func_t destroy)
-diff --git a/src/shared/gatt-helpers.h b/src/shared/gatt-helpers.h
-index 8c434c1..f2c7ec5 100644
---- a/src/shared/gatt-helpers.h
-+++ b/src/shared/gatt-helpers.h
-@@ -82,7 +82,6 @@ bool bt_gatt_discover_secondary_services(struct bt_att *att, bt_uuid_t *uuid,
- 					bt_gatt_destroy_func_t destroy);
- bool bt_gatt_discover_included_services(struct bt_att *att,
- 					uint16_t start, uint16_t end,
--					bt_uuid_t *uuid,
- 					bt_gatt_discovery_callback_t callback,
- 					void *user_data,
- 					bt_gatt_destroy_func_t destroy);
+ 	if (!bt_gatt_characteristic_iter_init(&iter, service)) {
+@@ -182,12 +184,24 @@ static void print_service(const bt_gatt_service_t *service)
+ 		return;
+ 	}
+ 
++	if (!bt_gatt_include_service_iter_init(&include_iter, service)) {
++		PRLOG("Failed to initialize include service iterator\n");
++		return;
++	}
+ 	printf(COLOR_RED "service %s" COLOR_OFF " - start: 0x%04x, "
+ 				"end: 0x%04x, uuid: ",
+ 				service->primary ? "primary" : "second.",
+ 				service->start_handle, service->end_handle);
+ 	print_uuid(service->uuid);
+ 
++	while (bt_gatt_include_service_iter_next(&include_iter, &incl)) {
++		printf("\t  " COLOR_GREEN "include" COLOR_OFF " - handle: "
++					"0x%04x, - start: 0x%04x, end: 0x%04x,"
++					"uuid: ", incl->handle,
++					incl->start_handle, incl->end_handle);
++			print_uuid(incl->uuid);
++	}
++
+ 	while (bt_gatt_characteristic_iter_next(&iter, &chrc)) {
+ 		printf("\t  " COLOR_YELLOW "charac" COLOR_OFF
+ 				" - start: 0x%04x, end: 0x%04x, "
 -- 
 1.9.3
 
