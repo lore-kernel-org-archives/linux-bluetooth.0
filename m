@@ -1,46 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
-From: Martin Townsend <mtownsend1973@gmail.com>
-To: linux-bluetooth@vger.kernel.org,
-	linux-wpan@vger.kernel.org
-Cc: marcel@holtmann.org,
-	alex.aring@gmail.com,
-	jukka.rissanen@linux.intel.com,
-	Martin Townsend <martin.townsend@xsilon.com>
-Subject: [PATCH v4 bluetooth-next] 6lowpan: Use pskb_expand_head in IPHC decompression.
-Date: Wed,  8 Oct 2014 14:46:54 +0100
-Message-Id: <1412776015-372-1-git-send-email-martin.townsend@xsilon.com>
+Message-ID: <54353F58.4090301@xsilon.com>
+Date: Wed, 08 Oct 2014 14:42:48 +0100
+From: Martin Townsend <martin.townsend@xsilon.com>
+MIME-Version: 1.0
+To: Jukka Rissanen <jukka.rissanen@linux.intel.com>
+CC: linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org,
+ marcel@holtmann.org, alex.aring@gmail.com
+Subject: Re: [PATCH bluetooth-next] 6lowpan: Use pskb_expand_head in IPHC
+ decompression.
+References: <1412696037-25111-1-git-send-email-martin.townsend@xsilon.com>			 <1412696037-25111-2-git-send-email-martin.townsend@xsilon.com>			 <543408B2.1070309@xsilon.com>		 <1412763863.2705.22.camel@jrissane-mobl.ger.corp.intel.com>		 <54351AF4.5060907@xsilon.com>	 <1412770375.2705.25.camel@jrissane-mobl.ger.corp.intel.com>	 <54353387.3070007@xsilon.com> <1412775335.2705.31.camel@jrissane-mobl.ger.corp.intel.com>
+In-Reply-To: <1412775335.2705.31.camel@jrissane-mobl.ger.corp.intel.com>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch aims to reduce the amount of copying in the receive path when
-decompressing by checking for headroom and calling pskb_expand_head if required.
-Another benefit of this is that the skb pointer passed to the decompression
-routine will be the same skb after decompression.  This will be a step towards
-freeing the skb within the receive function and not within all the error paths
-of the decompression routine.
+hi Jukka,
 
-Bluetooth and 802.15.4 have been changed to ensure that the skb isn't shared
-before calling the decompression routine as this is a requirement of
-pskb_expand_head.
+Thank you for running all these tests for me, it's very much appreciated.
+I'll send out v4 in a bit.
 
-v1 -> v2
-Use const int for new headroom size.
-Remove blank line.
-Use skb_unshare instead of skb_copy_expand. 
-Use consume_skb.
+Cheers, Martin.
 
-v2 -> v3 
-Remove cases where we are trying to free a NULL skb.
-
-v3 -> v4
-Now uses skb_share_check to ensure the skb isn't shared before decompressing.
-
-Martin Townsend (1):
-  6lowpan: Use pskb_expand_head in IPHC decompression.
-
- net/6lowpan/iphc.c            | 51 +++++++++++++++++++++----------------------
- net/bluetooth/6lowpan.c       |  7 ++++++
- net/ieee802154/6lowpan_rtnl.c |  5 +++++
- 3 files changed, 37 insertions(+), 26 deletions(-)
-
--- 
-1.9.1
+On 08/10/14 14:35, Jukka Rissanen wrote:
+> Hi Martin,
+>
+> On ke, 2014-10-08 at 13:52 +0100, Martin Townsend wrote:
+>> Hi Jukka,
+>>
+>> I've misunderstood the constraints on pskb_expand_head.   I don't suppose you could quickly try this patch it now uses skb_share_check to ensure  skb->users == 1 and then I've put back in the skb_clone code that I took out which I think is causing the problem:
+> Tried this one and did not see any errors so far. I will leave my test
+> to run for the night. Please send a v4 and I will try to review it
+> tomorrow.
+>
+> Cheers,
+> Jukka
+>
+>
