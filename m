@@ -1,50 +1,58 @@
 Return-Path: <cyrus@holtmann.org>
+Message-ID: <543553AD.9000501@xsilon.com>
+Date: Wed, 08 Oct 2014 16:09:33 +0100
+From: Martin Townsend <martin.townsend@xsilon.com>
 MIME-Version: 1.0
-In-Reply-To: <1412629304-3391-1-git-send-email-armansito@chromium.org>
-References: <1412629304-3391-1-git-send-email-armansito@chromium.org>
-Date: Wed, 8 Oct 2014 11:14:06 -0400
-Message-ID: <CAHrH25TbsEmz3qdQTLZdcqFx8=dRRqpcivT2mPM+xWEOi0HFyA@mail.gmail.com>
-Subject: Re: [PATCH BlueZ v1 0/5] Introduce shared/gatt-server.
-From: Arman Uguray <armansito@chromium.org>
-To: Arman Uguray <armansito@chromium.org>
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-bluetooth-owner@vger.kernel.org
+To: Alexander Aring <alex.aring@gmail.com>,
+ Martin Townsend <mtownsend1973@gmail.com>
+CC: linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org,
+ marcel@holtmann.org, jukka.rissanen@linux.intel.com
+Subject: Re: [PATCH v4 bluetooth-next] 6lowpan: Use pskb_expand_head in IPHC
+ decompression.
+References: <1412776015-372-1-git-send-email-martin.townsend@xsilon.com> <1412776015-372-2-git-send-email-martin.townsend@xsilon.com> <20141008145917.GA23456@omega>
+In-Reply-To: <20141008145917.GA23456@omega>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Mon, Oct 6, 2014 at 5:01 PM, Arman Uguray <armansito@chromium.org> wrote:
-> *v1:
->   - Make gatt-db external to gatt-server, as initially discussed.
->   - Also implement Read By Group Type request.
+Hi  Alex,
+
+I completely missed it, unless reassembly can result in a shared skb? can you confirm that it doesn't then I'll remove the line.
+
+Thanks, Martin.
+
+On 08/10/14 15:59, Alexander Aring wrote:
+> Hi Martin,
 >
-> Arman Uguray (5):
->   Revert "plugins/sixaxis: Add a set_leds_sysfs() function"
->   shared/att: Drop the connection is a request is received while one is
->     pending.
->   shared/gatt-server: Introduce shared/gatt-server.
->   shared/gatt-server: Support Exchange MTU request.
->   shared/gatt-server: Support Read By Group Type request.
+> On Wed, Oct 08, 2014 at 02:46:55PM +0100, Martin Townsend wrote:
+>> Currently there are potentially 2 skb_copy_expand calls in IPHC
+>> decompression.  This patch replaces this with one call to
+>> pskb_expand_head.  It also checks to see if there is enough headroom
+>> first to ensure it's only done if necessary.
+>> As pskb_expand_head must only have one reference the calling code
+>> now ensures this.
+>>
+>> Signed-off-by: Martin Townsend <martin.townsend@xsilon.com>
+> ...
+>> --- a/net/ieee802154/6lowpan_rtnl.c
+>> +++ b/net/ieee802154/6lowpan_rtnl.c
+>> @@ -537,6 +537,11 @@ static int lowpan_rcv(struct sk_buff *skb, struct net_device *dev,
+>>  		if (ret == NET_RX_DROP)
+>>  			goto drop;
+>>  	} else {
+>> +		/* Decompression may use pskb_expand_head so no shared skb's */
+>> +		skb = skb_share_check(skb, GFP_ATOMIC);
+>> +		if (!skb)
+>> +			goto drop;
+>> +
+> We do this already at [0], is it really necessary do it here again?
 >
->  Makefile.am              |   1 +
->  configure.ac             |   4 +-
->  plugins/sixaxis.c        |  89 +-----------
->  src/shared/att.c         | 101 ++++++++------
->  src/shared/gatt-server.c | 347 +++++++++++++++++++++++++++++++++++++++++++++++
->  src/shared/gatt-server.h |  40 ++++++
->  6 files changed, 455 insertions(+), 127 deletions(-)
->  create mode 100644 src/shared/gatt-server.c
->  create mode 100644 src/shared/gatt-server.h
+> This ensures that 6lowpan header replacing doesn't affect the af_802154
+> implementation.
 >
+> - Alex
+>
+> [0] http://lxr.free-electrons.com/source/net/ieee802154/6lowpan_rtnl.c#L466
 > --
-> 2.1.0.rc2.206.gedb03e5
->
-
-ping.
-
-Also ignore the bit about 'Revert "plugins/sixaxis: Add a
-set_leds_sysfs() function"'. I revert it locally since it gives me
-some dependency issues when compiling for Chromium OS; it's not part
-of the patch set I uploaded.
-
-Cheers,
-Arman
+> To unsubscribe from this list: send the line "unsubscribe linux-wpan" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
