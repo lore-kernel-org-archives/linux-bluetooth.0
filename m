@@ -1,67 +1,68 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 3/8] unit/test-avrcp: Add /TP/MPS/BV-04-C test
-Date: Wed,  8 Oct 2014 15:31:44 +0300
-Message-Id: <1412771509-7996-3-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 4/8] unit/test-avrcp: Add /TP/MPS/BV-05-C test
+Date: Wed,  8 Oct 2014 15:31:45 +0300
+Message-Id: <1412771509-7996-4-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1412771509-7996-1-git-send-email-luiz.dentz@gmail.com>
 References: <1412771509-7996-1-git-send-email-luiz.dentz@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Verify the SetBrowsedPlayer response issued by the TG.
+Verify the AddressedPlayerChanged Notification issued by the TG and the
+procedure associated to this.
 ---
- unit/test-avrcp.c | 25 +++++++++++++++++++++++++
- 1 file changed, 25 insertions(+)
+ unit/test-avrcp.c | 23 +++++++++++++++++++++++
+ 1 file changed, 23 insertions(+)
 
 diff --git a/unit/test-avrcp.c b/unit/test-avrcp.c
-index 92c3420..146858b 100644
+index 146858b..7998976 100644
 --- a/unit/test-avrcp.c
 +++ b/unit/test-avrcp.c
-@@ -586,6 +586,20 @@ static int set_addressed(struct avrcp *session, uint8_t transaction,
- 	return -EAGAIN;
- }
+@@ -526,6 +526,7 @@ static int register_notification(struct avrcp *session, uint8_t transaction,
+ 	struct context *context = user_data;
+ 	uint64_t track;
+ 	uint8_t settings[3];
++	uint16_t player[2];
+ 	void *data;
+ 	size_t len;
  
-+static int set_browsed(struct avrcp *session, uint8_t transaction,
-+						uint16_t id, void *user_data)
-+{
-+	const char *folders[1] = { "Filesystem" };
+@@ -551,6 +552,13 @@ static int register_notification(struct avrcp *session, uint8_t transaction,
+ 		data = settings;
+ 		len = sizeof(settings);
+ 		break;
++	case AVRCP_EVENT_ADDRESSED_PLAYER_CHANGED:
++		player[0] = 0x0001;
++		player[1] = 0xabcd;
 +
-+	DBG("");
-+
-+	avrcp_set_browsed_player_rsp(session, transaction,
-+					AVRCP_STATUS_SUCCESS, 0xabcd, 0, 1,
-+					folders);
-+
-+	return -EAGAIN;
-+}
-+
- static int get_folder_items(struct avrcp *session, uint8_t transaction,
- 				uint8_t scope, uint32_t start, uint32_t end,
- 				uint16_t number, uint32_t *attrs,
-@@ -683,6 +697,7 @@ static const struct avrcp_control_ind control_ind = {
- 	.register_notification = register_notification,
- 	.set_volume = set_volume,
- 	.set_addressed = set_addressed,
-+	.set_browsed = set_browsed,
- 	.get_folder_items = get_folder_items,
- 	.change_path = change_path,
- 	.get_item_attributes = get_item_attributes,
-@@ -860,6 +875,16 @@ int main(int argc, char *argv[])
- 			brs_pdu(0x00, 0x11, 0x0e, 0x70, 0x00, 0x02,
- 				0xab, 0xcd));
++		data = player;
++		len = sizeof(player);
++		break;
+ 	default:
+ 		return -EINVAL;
+ 	}
+@@ -885,6 +893,21 @@ int main(int argc, char *argv[])
+ 				0x46, 0x69, 0x6c, 0x65, 0x73, 0x79,
+ 				0x73, 0x74, 0x65, 0x6d));
  
-+	/* SetBrowsedPlayer - TG */
-+	define_test("/TP/MPS/BV-04-C", test_server,
-+			brs_pdu(0x00, 0x11, 0x0e, 0x70, 0x00, 0x02,
-+				0xab, 0xcd),
-+			brs_pdu(0x02, 0x11, 0x0e, 0x70, 0x00, 0x16,
-+				0x04, 0xab, 0xcd, 0x00, 0x00, 0x00,
-+				0x00, 0x00, 0x6a, 0x01, 0x00, 0x0a,
-+				0x46, 0x69, 0x6c, 0x65, 0x73, 0x79,
-+				0x73, 0x74, 0x65, 0x6d));
++	/* AddressedPlayerChanged notification – TG */
++	define_test("/TP/MPS/BV-05-C", test_server,
++			raw_pdu(0x00, 0x11, 0x0e, 0x03, 0x48, 0x00,
++				0x00, 0x19, 0x58, AVRCP_REGISTER_NOTIFICATION,
++				0x00, 0x00, 0x05, 0x0b,
++				0x00, 0x00, 0x00, 0x00),
++			frg_pdu(0x02, 0x11, 0x0e, AVC_CTYPE_INTERIM, 0x48, 0x00,
++				0x00, 0x19, 0x58, AVRCP_REGISTER_NOTIFICATION,
++				0x00, 0x00, 0x05, 0x0b,
++				0x00, 0x01, 0xab, 0xcd),
++			raw_pdu(0x02, 0x11, 0x0e, AVC_CTYPE_CHANGED, 0x48, 0x00,
++				0x00, 0x19, 0x58, AVRCP_REGISTER_NOTIFICATION,
++				0x00, 0x00, 0x05, 0x0b,
++				0x01, 0x00, 0xcd, 0xab));
 +
  	/* GetFolderItems - CT */
  	define_test("/TP/MPS/BV-08-C", test_client,
