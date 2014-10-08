@@ -1,49 +1,86 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 8 Oct 2014 16:59:19 +0200
-From: Alexander Aring <alex.aring@gmail.com>
-To: Martin Townsend <mtownsend1973@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org,
-	marcel@holtmann.org, jukka.rissanen@linux.intel.com,
-	Martin Townsend <martin.townsend@xsilon.com>
-Subject: Re: [PATCH v4 bluetooth-next] 6lowpan: Use pskb_expand_head in IPHC
- decompression.
-Message-ID: <20141008145917.GA23456@omega>
-References: <1412776015-372-1-git-send-email-martin.townsend@xsilon.com>
- <1412776015-372-2-git-send-email-martin.townsend@xsilon.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-In-Reply-To: <1412776015-372-2-git-send-email-martin.townsend@xsilon.com>
+From: Loic Poulain <loic.poulain@intel.com>
+To: marcel@holtmann.org, gustavo@padovan.org, johan.hedberg@gmail.com
+Cc: linux-bluetooth@vger.kernel.org,
+	Loic Poulain <loic.poulain@intel.com>
+Subject: [PATCH] Bluetooth: HCI H5 peer reset detection
+Date: Wed,  8 Oct 2014 16:54:28 +0200
+Message-Id: <1412780068-19449-1-git-send-email-loic.poulain@intel.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Martin,
+H5 Specification says:
+If a SYNC message is received while in the Active State, it is
+assumed that the peer device has reset. The local device should
+therefore perform a full reset of the upper stack, and start Link
+Establishment again at the Uninitialized State. Upon entering the
+Active State, the first packet sent shall have its SEQ and ACK
+numbers set to zero.
 
-On Wed, Oct 08, 2014 at 02:46:55PM +0100, Martin Townsend wrote:
-> Currently there are potentially 2 skb_copy_expand calls in IPHC
-> decompression.  This patch replaces this with one call to
-> pskb_expand_head.  It also checks to see if there is enough headroom
-> first to ensure it's only done if necessary.
-> As pskb_expand_head must only have one reference the calling code
-> now ensures this.
-> 
-> Signed-off-by: Martin Townsend <martin.townsend@xsilon.com>
-...
-> --- a/net/ieee802154/6lowpan_rtnl.c
-> +++ b/net/ieee802154/6lowpan_rtnl.c
-> @@ -537,6 +537,11 @@ static int lowpan_rcv(struct sk_buff *skb, struct net_device *dev,
->  		if (ret == NET_RX_DROP)
->  			goto drop;
->  	} else {
-> +		/* Decompression may use pskb_expand_head so no shared skb's */
-> +		skb = skb_share_check(skb, GFP_ATOMIC);
-> +		if (!skb)
-> +			goto drop;
-> +
+This patch resets the HCI H5 driver data/state to unitialized and
+reports an HCI hardware error event to notify the upper stack that
+HCI synchronization has been lost. H5 will be re-synchronized and
+upper stack should generate an HCI Reset command.
 
-We do this already at [0], is it really necessary do it here again?
+Signed-off-by: Loic Poulain <loic.poulain@intel.com>
+---
+ drivers/bluetooth/hci_h5.c | 34 ++++++++++++++++++++++++++++++++++
+ 1 file changed, 34 insertions(+)
 
-This ensures that 6lowpan header replacing doesn't affect the af_802154
-implementation.
+diff --git a/drivers/bluetooth/hci_h5.c b/drivers/bluetooth/hci_h5.c
+index caacb42..5c5e9ac 100644
+--- a/drivers/bluetooth/hci_h5.c
++++ b/drivers/bluetooth/hci_h5.c
+@@ -168,6 +168,36 @@ wakeup:
+ 	hci_uart_tx_wakeup(hu);
+ }
+ 
++static void h5_peer_reset(struct hci_uart *hu)
++{
++	struct h5 *h5 = hu->priv;
++	struct sk_buff *skb;
++	const unsigned char hard_err[] = { 0x10, 0x01, 0x00 };
++
++	BT_ERR("Peer device has reset");
++
++	h5->state = H5_UNINITIALIZED;
++
++	del_timer(&h5->timer);
++
++	skb_queue_purge(&h5->rel);
++	skb_queue_purge(&h5->unrel);
++	skb_queue_purge(&h5->unack);
++
++	h5->tx_seq = 0;
++	h5->tx_ack = 0;
++
++	skb = bt_skb_alloc(3, GFP_ATOMIC);
++	if (!skb)
++		return;
++
++	bt_cb(skb)->pkt_type = HCI_EVENT_PKT;
++	memcpy(skb_put(skb, 3), hard_err, 3);
++
++	/* Send Hardware Error to upper stack */
++	hci_recv_frame(hu->hdev, skb);
++}
++
+ static int h5_open(struct hci_uart *hu)
+ {
+ 	struct h5 *h5;
+@@ -283,8 +313,12 @@ static void h5_handle_internal_rx(struct hci_uart *hu)
+ 	conf_req[2] = h5_cfg_field(h5);
+ 
+ 	if (memcmp(data, sync_req, 2) == 0) {
++		if (h5->state == H5_ACTIVE)
++			h5_peer_reset(hu);
+ 		h5_link_control(hu, sync_rsp, 2);
+ 	} else if (memcmp(data, sync_rsp, 2) == 0) {
++		if (h5->state == H5_ACTIVE)
++			h5_peer_reset(hu);
+ 		h5->state = H5_INITIALIZED;
+ 		h5_link_control(hu, conf_req, 3);
+ 	} else if (memcmp(data, conf_req, 2) == 0) {
+-- 
+1.8.3.2
 
-- Alex
-
-[0] http://lxr.free-electrons.com/source/net/ieee802154/6lowpan_rtnl.c#L466
