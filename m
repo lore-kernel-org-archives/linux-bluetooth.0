@@ -1,52 +1,160 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v2 0/6] android/map-client: Add HAL part
-Date: Wed, 08 Oct 2014 14:59:04 +0200
-Message-ID: <1594333.ziacNapFH9@uw000953>
-In-Reply-To: <1412345077-30317-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
-References: <1412345077-30317-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+Message-ID: <54353387.3070007@xsilon.com>
+Date: Wed, 08 Oct 2014 13:52:23 +0100
+From: Martin Townsend <martin.townsend@xsilon.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Sender: linux-bluetooth-owner@vger.kernel.org
+To: Jukka Rissanen <jukka.rissanen@linux.intel.com>
+CC: linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org,
+ marcel@holtmann.org, alex.aring@gmail.com
+Subject: Re: [PATCH bluetooth-next] 6lowpan: Use pskb_expand_head in IPHC
+ decompression.
+References: <1412696037-25111-1-git-send-email-martin.townsend@xsilon.com>		 <1412696037-25111-2-git-send-email-martin.townsend@xsilon.com>		 <543408B2.1070309@xsilon.com>	 <1412763863.2705.22.camel@jrissane-mobl.ger.corp.intel.com>	 <54351AF4.5060907@xsilon.com> <1412770375.2705.25.camel@jrissane-mobl.ger.corp.intel.com>
+In-Reply-To: <1412770375.2705.25.camel@jrissane-mobl.ger.corp.intel.com>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Grzegorz,
+Hi Jukka,
 
-On Friday 03 of October 2014 16:04:37 Grzegorz Kolodziejczyk wrote:
-> v2. changes:
-> *Defines in HAL are the same as in IPC
-> *Removed MAP instance structures section in ipc api doc
-> *Check if MAP instance name is null terminated
-> *Fixed multiline comment
-> 
-> Grzegorz Kolodziejczyk (6):
->   android/hal-ipc-api: Add MAP client HAL
->   android/hal-map-client-api: Add get remote MAS instance command and
->     event
->   android/map-client: Add Android MAP client header
->   android/hal-map-client: Add skeleton for MAP client HAL
->   android/hal-map-client: Add event handler
->   android/hal-map-client: Add API calls
-> 
->  android/Android.mk           |   1 +
->  android/Makefile.am          |   2 +
->  android/hal-bluetooth.c      |   3 +
->  android/hal-ipc-api.txt      |  42 ++++++++++++
->  android/hal-map-client.c     | 152 +++++++++++++++++++++++++++++++++++++++++++
->  android/hal-msg.h            |  26 +++++++-
->  android/hal.h                |   2 +
->  android/hardware/bluetooth.h |   1 +
->  android/hardware/bt_mce.h    |  57 ++++++++++++++++
->  9 files changed, 285 insertions(+), 1 deletion(-)
->  create mode 100644 android/hal-map-client.c
->  create mode 100644 android/hardware/bt_mce.h
-> 
+I've misunderstood the constraints on pskb_expand_head.   I don't suppose you could quickly try this patch it now uses skb_share_check to ensure  skb->users == 1 and then I've put back in the skb_clone code that I took out which I think is causing the problem:
 
-I've applied this set after some random cleanups and fixes. In future please test
-if code build on both Linux and Android. Thanks.
+Many Thanks,
+Martin.
 
+Currently there are potentially 2 skb_copy_expand calls in IPHC
+decompression.  This patch replaces this with one call to
+pskb_expand_head.  It also checks to see if there is enough headroom
+first to ensure it's only done if necessary.
+As pskb_expand_head must only have one reference the calling code
+now ensures this.
+---
+ net/6lowpan/iphc.c            | 51 +++++++++++++++++++++----------------------
+ net/bluetooth/6lowpan.c       |  7 ++++++
+ net/ieee802154/6lowpan_rtnl.c |  5 +++++
+ 3 files changed, 37 insertions(+), 26 deletions(-)
+
+diff --git a/net/6lowpan/iphc.c b/net/6lowpan/iphc.c
+index 142eef5..853b4b8 100644
+--- a/net/6lowpan/iphc.c
++++ b/net/6lowpan/iphc.c
+@@ -174,30 +174,22 @@ static int uncompress_context_based_src_addr(struct sk_buff *skb,
+ static int skb_deliver(struct sk_buff *skb, struct ipv6hdr *hdr,
+ 		       struct net_device *dev, skb_delivery_cb deliver_skb)
+ {
+-	struct sk_buff *new;
+ 	int stat;
+ 
+-	new = skb_copy_expand(skb, sizeof(struct ipv6hdr), skb_tailroom(skb),
+-			      GFP_ATOMIC);
+-	kfree_skb(skb);
+-
+-	if (!new)
+-		return -ENOMEM;
+-
+-	skb_push(new, sizeof(struct ipv6hdr));
+-	skb_reset_network_header(new);
+-	skb_copy_to_linear_data(new, hdr, sizeof(struct ipv6hdr));
++	skb_push(skb, sizeof(struct ipv6hdr));
++	skb_reset_network_header(skb);
++	skb_copy_to_linear_data(skb, hdr, sizeof(struct ipv6hdr));
+ 
+-	new->protocol = htons(ETH_P_IPV6);
+-	new->pkt_type = PACKET_HOST;
+-	new->dev = dev;
++	skb->protocol = htons(ETH_P_IPV6);
++	skb->pkt_type = PACKET_HOST;
++	skb->dev = dev;
+ 
+ 	raw_dump_table(__func__, "raw skb data dump before receiving",
+-		       new->data, new->len);
++		       skb->data, skb->len);
+ 
+-	stat = deliver_skb(new, dev);
++	stat = deliver_skb(skb, dev);
+ 
+-	kfree_skb(new);
++	consume_skb(skb);
+ 
+ 	return stat;
+ }
+@@ -460,7 +452,7 @@ int lowpan_process_data(struct sk_buff *skb, struct net_device *dev,
+ 	/* UDP data uncompression */
+ 	if (iphc0 & LOWPAN_IPHC_NH_C) {
+ 		struct udphdr uh;
+-		struct sk_buff *new;
++		const int needed = sizeof(struct udphdr) + sizeof(hdr);
+ 
+ 		if (uncompress_udp_header(skb, &uh))
+ 			goto drop;
+@@ -468,14 +460,13 @@ int lowpan_process_data(struct sk_buff *skb, struct net_device *dev,
+ 		/* replace the compressed UDP head by the uncompressed UDP
+ 		 * header
+ 		 */
+-		new = skb_copy_expand(skb, sizeof(struct udphdr),
+-				      skb_tailroom(skb), GFP_ATOMIC);
+-		kfree_skb(skb);
+-
+-		if (!new)
+-			return -ENOMEM;
+-
+-		skb = new;
++		if (skb_headroom(skb) < needed) {
++			err = pskb_expand_head(skb, needed, 0, GFP_ATOMIC);
++			if (unlikely(err)) {
++				kfree_skb(skb);
++				return err;
++			}
++		}
+ 
+ 		skb_push(skb, sizeof(struct udphdr));
+ 		skb_reset_transport_header(skb);
+@@ -485,6 +476,14 @@ int lowpan_process_data(struct sk_buff *skb, struct net_device *dev,
+ 			       (u8 *)&uh, sizeof(uh));
+ 
+ 		hdr.nexthdr = UIP_PROTO_UDP;
++	} else {
++		if (skb_headroom(skb) < sizeof(hdr)) {
++			err = pskb_expand_head(skb, sizeof(hdr), 0, GFP_ATOMIC);
++			if (unlikely(err)) {
++				kfree_skb(skb);
++				return err;
++			}
++		}
+ 	}
+ 
+ 	hdr.payload_len = htons(skb->len);
+diff --git a/net/bluetooth/6lowpan.c b/net/bluetooth/6lowpan.c
+index c2e0d14..6643a7c 100644
+--- a/net/bluetooth/6lowpan.c
++++ b/net/bluetooth/6lowpan.c
+@@ -343,6 +343,13 @@ static int recv_pkt(struct sk_buff *skb, struct net_device *dev,
+ 		kfree_skb(local_skb);
+ 		kfree_skb(skb);
+ 	} else {
++		/* Decompression may use pskb_expand_head so no shared skb's */
++		skb = skb_share_check(skb, GFP_ATOMIC);
++		if (!skb) {
++			dev->stats.rx_dropped++;
++			return NET_RX_DROP;
++		}
++
+ 		switch (skb->data[0] & 0xe0) {
+ 		case LOWPAN_DISPATCH_IPHC:	/* ipv6 datagram */
+ 			local_skb = skb_clone(skb, GFP_ATOMIC);
+diff --git a/net/ieee802154/6lowpan_rtnl.c b/net/ieee802154/6lowpan_rtnl.c
+index c7e07b8..702ad04 100644
+--- a/net/ieee802154/6lowpan_rtnl.c
++++ b/net/ieee802154/6lowpan_rtnl.c
+@@ -537,6 +537,11 @@ static int lowpan_rcv(struct sk_buff *skb, struct net_device *dev,
+ 		if (ret == NET_RX_DROP)
+ 			goto drop;
+ 	} else {
++		/* Decompression may use pskb_expand_head so no shared skb's */
++		skb = skb_share_check(skb, GFP_ATOMIC);
++		if (!skb)
++			goto drop;
++
+ 		switch (skb->data[0] & 0xe0) {
+ 		case LOWPAN_DISPATCH_IPHC:	/* ipv6 datagram */
+ 			ret = process_data(skb, &hdr);
 -- 
-Best regards, 
-Szymon Janc
+1.9.1
