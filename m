@@ -1,191 +1,321 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <5434E7DA.3000107@xsilon.com>
-Date: Wed, 08 Oct 2014 08:29:30 +0100
-From: Martin Townsend <martin.townsend@xsilon.com>
-MIME-Version: 1.0
-To: Alexander Aring <alex.aring@gmail.com>,
- Martin Townsend <mtownsend1973@gmail.com>
-CC: linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org,
- marcel@holtmann.org, jukka.rissanen@linux.intel.com
-Subject: Re: [PATCH v2 bluetooth-next] 6lowpan: Use pskb_expand_head in IPHC
- decompression.
-References: <1412711549-24653-1-git-send-email-martin.townsend@xsilon.com> <1412711549-24653-2-git-send-email-martin.townsend@xsilon.com> <20141007201442.GB12298@omega>
-In-Reply-To: <20141007201442.GB12298@omega>
-Content-Type: text/plain; charset=utf-8
+From: Szymon Janc <szymon.janc@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Szymon Janc <szymon.janc@tieto.com>
+Subject: [PATCH 13/13] android/handsfree: Make remote device non-static
+Date: Wed,  8 Oct 2014 09:12:23 +0200
+Message-Id: <1412752343-7001-13-git-send-email-szymon.janc@tieto.com>
+In-Reply-To: <1412752343-7001-1-git-send-email-szymon.janc@tieto.com>
+References: <1412752343-7001-1-git-send-email-szymon.janc@tieto.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Alex,
+Remote device object is now created on-demand instead of being static.
+---
+ android/handsfree.c | 144 +++++++++++++++++++++++++++++++---------------------
+ 1 file changed, 86 insertions(+), 58 deletions(-)
 
-On 07/10/14 21:14, Alexander Aring wrote:
-> Hi Martin,
->
-> looks fine for me now only some little tiny hint which cames in v2.
->
-> On Tue, Oct 07, 2014 at 08:52:29PM +0100, Martin Townsend wrote:
->> Currently there are potentially 2 skb_copy_expand calls in IPHC
->> decompression.  This patch replaces this with one call to
->> pskb_expand_head.  It also checks to see if there is enough headroom
->> first to ensure it's only done if necessary.
->> As pskb_expand_head must only have one reference the calling code
->> now ensures this.
->>
->> Signed-off-by: Martin Townsend <martin.townsend@xsilon.com>
->> ---
->>  net/6lowpan/iphc.c            | 51 +++++++++++++++++++++----------------------
->>  net/bluetooth/6lowpan.c       | 13 +++++++----
->>  net/ieee802154/6lowpan_rtnl.c |  5 +++++
->>  3 files changed, 39 insertions(+), 30 deletions(-)
->>
->> diff --git a/net/6lowpan/iphc.c b/net/6lowpan/iphc.c
->> index 142eef5..853b4b8 100644
->> --- a/net/6lowpan/iphc.c
->> +++ b/net/6lowpan/iphc.c
->> @@ -174,30 +174,22 @@ static int uncompress_context_based_src_addr(struct sk_buff *skb,
->>  static int skb_deliver(struct sk_buff *skb, struct ipv6hdr *hdr,
->>  		       struct net_device *dev, skb_delivery_cb deliver_skb)
->>  {
->> -	struct sk_buff *new;
->>  	int stat;
->>  
->> -	new = skb_copy_expand(skb, sizeof(struct ipv6hdr), skb_tailroom(skb),
->> -			      GFP_ATOMIC);
->> -	kfree_skb(skb);
->> -
->> -	if (!new)
->> -		return -ENOMEM;
->> -
->> -	skb_push(new, sizeof(struct ipv6hdr));
->> -	skb_reset_network_header(new);
->> -	skb_copy_to_linear_data(new, hdr, sizeof(struct ipv6hdr));
->> +	skb_push(skb, sizeof(struct ipv6hdr));
->> +	skb_reset_network_header(skb);
->> +	skb_copy_to_linear_data(skb, hdr, sizeof(struct ipv6hdr));
->>  
->> -	new->protocol = htons(ETH_P_IPV6);
->> -	new->pkt_type = PACKET_HOST;
->> -	new->dev = dev;
->> +	skb->protocol = htons(ETH_P_IPV6);
->> +	skb->pkt_type = PACKET_HOST;
->> +	skb->dev = dev;
->>  
->>  	raw_dump_table(__func__, "raw skb data dump before receiving",
->> -		       new->data, new->len);
->> +		       skb->data, skb->len);
->>  
->> -	stat = deliver_skb(new, dev);
->> +	stat = deliver_skb(skb, dev);
->>  
->> -	kfree_skb(new);
->> +	consume_skb(skb);
->>  
->>  	return stat;
->>  }
->> @@ -460,7 +452,7 @@ int lowpan_process_data(struct sk_buff *skb, struct net_device *dev,
->>  	/* UDP data uncompression */
->>  	if (iphc0 & LOWPAN_IPHC_NH_C) {
->>  		struct udphdr uh;
->> -		struct sk_buff *new;
->> +		const int needed = sizeof(struct udphdr) + sizeof(hdr);
->>  
->>  		if (uncompress_udp_header(skb, &uh))
->>  			goto drop;
->> @@ -468,14 +460,13 @@ int lowpan_process_data(struct sk_buff *skb, struct net_device *dev,
->>  		/* replace the compressed UDP head by the uncompressed UDP
->>  		 * header
->>  		 */
->> -		new = skb_copy_expand(skb, sizeof(struct udphdr),
->> -				      skb_tailroom(skb), GFP_ATOMIC);
->> -		kfree_skb(skb);
->> -
->> -		if (!new)
->> -			return -ENOMEM;
->> -
->> -		skb = new;
->> +		if (skb_headroom(skb) < needed) {
->> +			err = pskb_expand_head(skb, needed, 0, GFP_ATOMIC);
->> +			if (unlikely(err)) {
->> +				kfree_skb(skb);
->> +				return err;
->> +			}
->> +		}
->>  
->>  		skb_push(skb, sizeof(struct udphdr));
->>  		skb_reset_transport_header(skb);
->> @@ -485,6 +476,14 @@ int lowpan_process_data(struct sk_buff *skb, struct net_device *dev,
->>  			       (u8 *)&uh, sizeof(uh));
->>  
->>  		hdr.nexthdr = UIP_PROTO_UDP;
->> +	} else {
->> +		if (skb_headroom(skb) < sizeof(hdr)) {
->> +			err = pskb_expand_head(skb, sizeof(hdr), 0, GFP_ATOMIC);
->> +			if (unlikely(err)) {
->> +				kfree_skb(skb);
->> +				return err;
->> +			}
->> +		}
->>  	}
->>  
->>  	hdr.payload_len = htons(skb->len);
->> diff --git a/net/bluetooth/6lowpan.c b/net/bluetooth/6lowpan.c
->> index c2e0d14..7714f4b 100644
->> --- a/net/bluetooth/6lowpan.c
->> +++ b/net/bluetooth/6lowpan.c
->> @@ -343,13 +343,18 @@ static int recv_pkt(struct sk_buff *skb, struct net_device *dev,
->>  		kfree_skb(local_skb);
->>  		kfree_skb(skb);
->>  	} else {
->> +		/* Decompression may use pskb_expand_head, ensure skb unique */
->> +		skb = skb_unshare(skb, GFP_ATOMIC);
->> +		if (!skb) {
->> +			dev->stats.rx_dropped++;
->> +			kfree_skb(skb);
-> skb is always NULL here. kfree_skb is null proofed. It's no-op.
-Well spotted, will remove.
->
->> +			return NET_RX_DROP;
->> +		}
-> wee need something like:
->
-> foo = skb_unshare(skb, GFP_ATOMIC);
-> if (!foo) {
-> 	... do whatever you want to do like "dev->stats.rx_dropped++;"
-> 	kfree_skb(skb);
-> 	return NET_RX_DROP;
-> }
-> skb = foo;
->
->> +
->>  		switch (skb->data[0] & 0xe0) {
->>  		case LOWPAN_DISPATCH_IPHC:	/* ipv6 datagram */
->> -			local_skb = skb_clone(skb, GFP_ATOMIC);
->> -			if (!local_skb)
->> -				goto drop;
->>  
->> -			ret = process_data(local_skb, dev, chan);
->> +			ret = process_data(skb, dev, chan);
->>  			if (ret != NET_RX_SUCCESS)
->>  				goto drop;
->>  
->> diff --git a/net/ieee802154/6lowpan_rtnl.c b/net/ieee802154/6lowpan_rtnl.c
->> index c7e07b8..a87caa3 100644
->> --- a/net/ieee802154/6lowpan_rtnl.c
->> +++ b/net/ieee802154/6lowpan_rtnl.c
->> @@ -537,6 +537,11 @@ static int lowpan_rcv(struct sk_buff *skb, struct net_device *dev,
->>  		if (ret == NET_RX_DROP)
->>  			goto drop;
->>  	} else {
->> +		/* Decompression may use pskb_expand_head, ensure skb unique */
->> +		skb = skb_unshare(skb, GFP_ATOMIC);
->> +		if (!skb)
->> +			goto drop_skb;
->> +
-v3 coming up.
-> Same here. I know the surrounding code have similar issues... it's
-> already on TODO list but if you like you can fix it.
->
-> - Alex
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-wpan" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-- Martin.
+diff --git a/android/handsfree.c b/android/handsfree.c
+index 58eade4..2e617f6 100644
+--- a/android/handsfree.c
++++ b/android/handsfree.c
+@@ -37,6 +37,8 @@
+ #include "src/sdp-client.h"
+ #include "src/uuid-helper.h"
+ #include "src/shared/hfp.h"
++#include "src/shared/queue.h"
++#include "src/shared/util.h"
+ #include "btio/btio.h"
+ #include "hal-msg.h"
+ #include "ipc-common.h"
+@@ -155,7 +157,7 @@ static const struct hfp_codec codecs_defaults[] = {
+ 	{ CODEC_ID_MSBC, false, false},
+ };
+ 
+-static struct hf_device device;
++static struct queue *devices = NULL;
+ 
+ static uint32_t hfp_ag_features = 0;
+ 
+@@ -172,32 +174,6 @@ static GIOChannel *hsp_server = NULL;
+ 
+ static GIOChannel *sco_server = NULL;
+ 
+-static struct hf_device *find_default_device(void)
+-{
+-	/* TODO should be replaced by find_device() eventually */
+-
+-	return &device;
+-}
+-
+-static struct hf_device *find_device(const bdaddr_t *bdaddr)
+-{
+-	if (bacmp(&device.bdaddr, bdaddr))
+-		return NULL;
+-
+-	return &device;
+-}
+-
+-static struct hf_device *get_device(const bdaddr_t *bdaddr)
+-{
+-	struct hf_device *dev;
+-
+-	dev = find_device(bdaddr);
+-	if (dev)
+-		return dev;
+-
+-	return &device;
+-}
+-
+ static void set_state(struct hf_device *dev, uint8_t state)
+ {
+ 	struct hal_ev_handsfree_conn_state ev;
+@@ -246,28 +222,38 @@ static void init_codecs(struct hf_device *dev)
+ 		dev->codecs[MSBC_OFFSET].local_supported = true;
+ }
+ 
+-static void device_init(struct hf_device *dev, const bdaddr_t *bdaddr)
++static struct hf_device *device_create(const bdaddr_t *bdaddr)
+ {
+-	bacpy(&dev->bdaddr, bdaddr);
++	struct hf_device *dev;
+ 
++	dev = new0(struct hf_device, 1);
++	if (!dev)
++		return NULL;
++
++	bacpy(&dev->bdaddr, bdaddr);
+ 	dev->setup_state = HAL_HANDSFREE_CALL_STATE_IDLE;
++	dev->state = HAL_EV_HANDSFREE_CONN_STATE_DISCONNECTED;
++	dev->audio_state = HAL_EV_HANDSFREE_AUDIO_STATE_DISCONNECTED;
+ 
+ 	memcpy(dev->inds, inds_defaults, sizeof(dev->inds));
+ 
+ 	init_codecs(dev);
+ 
+-	set_state(dev, HAL_EV_HANDSFREE_CONN_STATE_CONNECTING);
++	if (!queue_push_head(devices, dev)) {
++		free(dev);
++		return NULL;
++	}
++
++	return dev;
+ }
+ 
+-static void device_cleanup(struct hf_device *dev)
++static void device_destroy(struct hf_device *dev)
+ {
+ 	if (dev->gw) {
+ 		hfp_gw_unref(dev->gw);
+ 		dev->gw = NULL;
+ 	}
+ 
+-	set_state(dev, HAL_EV_HANDSFREE_CONN_STATE_DISCONNECTED);
+-
+ 	if (dev->sco_watch) {
+ 		g_source_remove(dev->sco_watch);
+ 		dev->sco_watch = 0;
+@@ -290,8 +276,45 @@ static void device_cleanup(struct hf_device *dev)
+ 	}
+ 
+ 	set_audio_state(dev, HAL_EV_HANDSFREE_AUDIO_STATE_DISCONNECTED);
++	set_state(dev, HAL_EV_HANDSFREE_CONN_STATE_DISCONNECTED);
++
++	queue_remove(devices, dev);
++	free(dev);
++}
++
++static struct hf_device *find_default_device(void)
++{
++	/* TODO should be replaced by find_device() eventually */
++
++	return queue_peek_head(devices);
++}
+ 
+-	memset(dev, 0, sizeof(*dev));
++static bool match_by_bdaddr(const void *data, const void *match_data)
++{
++	const struct hf_device *dev = data;
++	const bdaddr_t *addr = match_data;
++
++	return !bacmp(&dev->bdaddr, addr);
++}
++
++static struct hf_device *find_device(const bdaddr_t *bdaddr)
++{
++	return queue_find(devices, match_by_bdaddr, bdaddr);
++}
++
++static struct hf_device *get_device(const bdaddr_t *bdaddr)
++{
++	struct hf_device *dev;
++
++	dev = find_device(bdaddr);
++	if (dev)
++		return dev;
++
++	/* TODO For now allow only 1 remote device */
++	if (!queue_isempty(devices))
++		return NULL;
++
++	return device_create(bdaddr);
+ }
+ 
+ static void disconnect_watch(void *user_data)
+@@ -300,7 +323,7 @@ static void disconnect_watch(void *user_data)
+ 
+ 	DBG("");
+ 
+-	device_cleanup(dev);
++	device_destroy(dev);
+ }
+ 
+ static void at_cmd_unknown(const char *command, void *user_data)
+@@ -1421,7 +1444,7 @@ static void connect_cb(GIOChannel *chan, GError *err, gpointer user_data)
+ 
+ failed:
+ 	g_io_channel_shutdown(chan, TRUE, NULL);
+-	device_cleanup(dev);
++	device_destroy(dev);
+ }
+ 
+ static void confirm_cb(GIOChannel *chan, gpointer data)
+@@ -1454,15 +1477,16 @@ static void confirm_cb(GIOChannel *chan, gpointer data)
+ 		goto drop;
+ 	}
+ 
+-	device_init(dev, &bdaddr);
+-
+ 	if (!bt_io_accept(chan, connect_cb, dev, NULL, NULL)) {
+ 		error("handsfree: failed to accept connection");
+-		device_cleanup(dev);
++		device_destroy(dev);
+ 		goto drop;
+ 	}
+ 
+ 	dev->hsp = GPOINTER_TO_INT(data);
++
++	set_state(dev, HAL_EV_HANDSFREE_CONN_STATE_CONNECTING);
++
+ 	return;
+ 
+ drop:
+@@ -1541,7 +1565,7 @@ static void sdp_hsp_search_cb(sdp_list_t *recs, int err, gpointer data)
+ 	return;
+ 
+ fail:
+-	device_cleanup(dev);
++	device_destroy(dev);
+ }
+ 
+ static int sdp_search_hsp(struct hf_device *dev)
+@@ -1629,7 +1653,7 @@ static void sdp_hfp_search_cb(sdp_list_t *recs, int err, gpointer data)
+ 	return;
+ 
+ fail:
+-	device_cleanup(dev);
++	device_destroy(dev);
+ }
+ 
+ static int sdp_search_hfp(struct hf_device *dev)
+@@ -1653,13 +1677,8 @@ static void handle_connect(const void *buf, uint16_t len)
+ 
+ 	DBG("");
+ 
+-	dev = find_default_device();
+-	if (dev) {
+-		status = HAL_STATUS_FAILED;
+-		goto failed;
+-	}
+-
+ 	android2bdaddr(&cmd->bdaddr, &bdaddr);
++
+ 	dev = get_device(&bdaddr);
+ 	if (!dev) {
+ 		status = HAL_STATUS_FAILED;
+@@ -1674,17 +1693,17 @@ static void handle_connect(const void *buf, uint16_t len)
+ 	ba2str(&bdaddr, addr);
+ 	DBG("connecting to %s", addr);
+ 
+-	device_init(dev, &bdaddr);
+-
+ 	/* prefer HFP over HSP */
+ 	ret = hfp_server ? sdp_search_hfp(dev) : sdp_search_hsp(dev);
+ 	if (ret < 0) {
+ 		error("handsfree: SDP search failed");
+-		device_cleanup(dev);
++		device_destroy(dev);
+ 		status = HAL_STATUS_FAILED;
+ 		goto failed;
+ 	}
+ 
++	set_state(dev, HAL_EV_HANDSFREE_CONN_STATE_CONNECTING);
++
+ 	status = HAL_STATUS_SUCCESS;
+ 
+ failed:
+@@ -1712,7 +1731,6 @@ static void handle_disconnect(const void *buf, uint16_t len)
+ 	if (dev->state == HAL_EV_HANDSFREE_CONN_STATE_DISCONNECTED) {
+ 		status = HAL_STATUS_FAILED;
+ 		goto failed;
+-
+ 	}
+ 
+ 	if (dev->state == HAL_EV_HANDSFREE_CONN_STATE_DISCONNECTING) {
+@@ -1721,7 +1739,7 @@ static void handle_disconnect(const void *buf, uint16_t len)
+ 	}
+ 
+ 	if (dev->state == HAL_EV_HANDSFREE_CONN_STATE_CONNECTING) {
+-		device_cleanup(dev);
++		device_destroy(dev);
+ 	} else {
+ 		set_state(dev, HAL_EV_HANDSFREE_CONN_STATE_DISCONNECTING);
+ 		hfp_gw_disconnect(dev->gw);
+@@ -2849,13 +2867,15 @@ bool bt_handsfree_register(struct ipc *ipc, const bdaddr_t *addr, uint8_t mode)
+ 
+ 	bacpy(&adapter_addr, addr);
+ 
+-	if (!enable_hsp_ag())
++	devices = queue_new();
++	if (!devices)
+ 		return false;
+ 
+-	if (!enable_sco_server()) {
+-		cleanup_hsp_ag();
+-		return false;
+-	}
++	if (!enable_hsp_ag())
++		goto failed_queue;
++
++	if (!enable_sco_server())
++		goto failed_hsp;
+ 
+ 	if (mode == HAL_MODE_HANDSFREE_HSP_ONLY)
+ 		goto done;
+@@ -2868,9 +2888,14 @@ bool bt_handsfree_register(struct ipc *ipc, const bdaddr_t *addr, uint8_t mode)
+ 	if (enable_hfp_ag())
+ 		goto done;
+ 
+-	cleanup_hsp_ag();
+ 	disable_sco_server();
+ 	hfp_ag_features = 0;
++failed_hsp:
++	cleanup_hsp_ag();
++failed_queue:
++	queue_destroy(devices, NULL);
++	devices = NULL;
++
+ 	return false;
+ 
+ done:
+@@ -2896,4 +2921,7 @@ void bt_handsfree_unregister(void)
+ 	disable_sco_server();
+ 
+ 	hfp_ag_features = 0;
++
++	queue_destroy(devices, (queue_destroy_func_t) device_destroy);
++	devices = NULL;
+ }
+-- 
+1.9.1
+
