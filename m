@@ -1,201 +1,52 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 8 Oct 2014 11:10:44 +0300
-From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
-To: Szymon Janc <szymon.janc@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 09/13] android/handsfree: Pass device to SCO handling
- functions
-Message-ID: <20141008081042.GB429@aemeltch-MOBL1>
-References: <1412752343-7001-1-git-send-email-szymon.janc@tieto.com>
- <1412752343-7001-9-git-send-email-szymon.janc@tieto.com>
+Date: Wed, 8 Oct 2014 10:06:19 +0200
+From: Alexander Aring <alex.aring@gmail.com>
+To: Martin Townsend <mtownsend1973@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org,
+	marcel@holtmann.org, jukka.rissanen@linux.intel.com,
+	Martin Townsend <martin.townsend@xsilon.com>
+Subject: Re: [PATCH v3 bluetooth-next] 6lowpan: Use pskb_expand_head in IPHC
+ decompression.
+Message-ID: <20141008080618.GB32554@omega>
+References: <1412753745-6469-1-git-send-email-martin.townsend@xsilon.com>
+ <1412753745-6469-2-git-send-email-martin.townsend@xsilon.com>
+ <20141008075458.GA32554@omega>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1412752343-7001-9-git-send-email-szymon.janc@tieto.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20141008075458.GA32554@omega>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Szymon,
+Hi Martin,
 
-On Wed, Oct 08, 2014 at 09:12:19AM +0200, Szymon Janc wrote:
-> ---
->  android/handsfree.c | 60 ++++++++++++++++++++++++++---------------------------
->  1 file changed, 30 insertions(+), 30 deletions(-)
-
-The same subject as patch 07, maybe they need to be merged?
-
-Best regards 
-Andrei Emeltchenko 
-
+On Wed, Oct 08, 2014 at 09:54:58AM +0200, Alexander Aring wrote:
+...
 > 
-> diff --git a/android/handsfree.c b/android/handsfree.c
-> index e7b8a6e..c41748b 100644
-> --- a/android/handsfree.c
-> +++ b/android/handsfree.c
-> @@ -930,25 +930,25 @@ static void connect_sco_cb(GIOChannel *chan, GError *err, gpointer user_data)
->  	set_audio_state(dev, HAL_EV_HANDSFREE_AUDIO_STATE_CONNECTED);
->  }
->  
-> -static bool connect_sco(void)
-> +static bool connect_sco(struct hf_device *dev)
->  {
->  	GIOChannel *io;
->  	GError *gerr = NULL;
->  	uint16_t voice_settings;
->  
-> -	if (device.sco)
-> +	if (dev->sco)
->  		return false;
->  
-> -	if (!(device.features & HFP_HF_FEAT_CODEC))
-> +	if (!(dev->features & HFP_HF_FEAT_CODEC))
->  		voice_settings = 0;
-> -	else if (device.negotiated_codec != CODEC_ID_CVSD)
-> +	else if (dev->negotiated_codec != CODEC_ID_CVSD)
->  		voice_settings = BT_VOICE_TRANSPARENT;
->  	else
->  		voice_settings = BT_VOICE_CVSD_16BIT;
->  
-> -	io = bt_io_connect(connect_sco_cb, &device, NULL, &gerr,
-> +	io = bt_io_connect(connect_sco_cb, dev, NULL, &gerr,
->  				BT_IO_OPT_SOURCE_BDADDR, &adapter_addr,
-> -				BT_IO_OPT_DEST_BDADDR, &device.bdaddr,
-> +				BT_IO_OPT_DEST_BDADDR, &dev->bdaddr,
->  				BT_IO_OPT_VOICE, voice_settings,
->  				BT_IO_OPT_INVALID);
->  
-> @@ -960,7 +960,7 @@ static bool connect_sco(void)
->  
->  	g_io_channel_unref(io);
->  
-> -	set_audio_state(&device, HAL_EV_HANDSFREE_AUDIO_STATE_CONNECTING);
-> +	set_audio_state(dev, HAL_EV_HANDSFREE_AUDIO_STATE_CONNECTING);
->  
->  	return true;
->  }
-> @@ -991,7 +991,7 @@ static void at_cmd_bcc(struct hfp_gw_result *result, enum hfp_gw_cmd_type type,
->  		 * we try connect to negotiated codec. If it fails, and it isn't
->  		 * CVSD codec, try connect CVSD
->  		 */
-> -		if (!connect_sco() && dev->negotiated_codec != CODEC_ID_CVSD)
-> +		if (!connect_sco(dev) && dev->negotiated_codec != CODEC_ID_CVSD)
->  			select_codec(dev, CODEC_ID_CVSD);
->  
->  		return;
-> @@ -1032,7 +1032,7 @@ static void at_cmd_bcs(struct hfp_gw_result *result, enum hfp_gw_cmd_type type,
->  		hfp_gw_send_result(dev->gw, HFP_RESULT_OK);
->  
->  		/* Connect sco with negotiated parameters */
-> -		connect_sco();
-> +		connect_sco(dev);
->  		return;
->  	case HFP_GW_CMD_TYPE_READ:
->  	case HFP_GW_CMD_TYPE_TEST:
-> @@ -1681,38 +1681,38 @@ failed:
->  					HAL_OP_HANDSFREE_DISCONNECT, status);
->  }
->  
-> -static bool disconnect_sco(void)
-> +static bool disconnect_sco(struct hf_device *dev)
->  {
-> -	if (!device.sco)
-> +	if (!dev->sco)
->  		return false;
->  
-> -	set_audio_state(&device, HAL_EV_HANDSFREE_AUDIO_STATE_DISCONNECTING);
-> +	set_audio_state(dev, HAL_EV_HANDSFREE_AUDIO_STATE_DISCONNECTING);
->  
-> -	if (device.sco_watch) {
-> -		g_source_remove(device.sco_watch);
-> -		device.sco_watch = 0;
-> +	if (dev->sco_watch) {
-> +		g_source_remove(dev->sco_watch);
-> +		dev->sco_watch = 0;
->  	}
->  
-> -	g_io_channel_shutdown(device.sco, TRUE, NULL);
-> -	g_io_channel_unref(device.sco);
-> -	device.sco = NULL;
-> +	g_io_channel_shutdown(dev->sco, TRUE, NULL);
-> +	g_io_channel_unref(dev->sco);
-> +	dev->sco = NULL;
->  
-> -	set_audio_state(&device, HAL_EV_HANDSFREE_AUDIO_STATE_DISCONNECTED);
-> +	set_audio_state(dev, HAL_EV_HANDSFREE_AUDIO_STATE_DISCONNECTED);
->  	return true;
->  }
->  
-> -static bool connect_audio(void)
-> +static bool connect_audio(struct hf_device *dev)
->  {
-> -	if (device.audio_state != HAL_EV_HANDSFREE_AUDIO_STATE_DISCONNECTED)
-> +	if (dev->audio_state != HAL_EV_HANDSFREE_AUDIO_STATE_DISCONNECTED)
->  		return false;
->  
->  	/* we haven't negotiated codec, start selection */
-> -	if ((device.features & HFP_HF_FEAT_CODEC) && !device.negotiated_codec) {
-> -		select_codec(&device, 0);
-> +	if ((dev->features & HFP_HF_FEAT_CODEC) && !dev->negotiated_codec) {
-> +		select_codec(dev, 0);
->  		return true;
->  	}
->  
-> -	return connect_sco();
-> +	return connect_sco(dev);
->  }
->  
->  static void handle_connect_audio(const void *buf, uint16_t len)
-> @@ -1731,7 +1731,7 @@ static void handle_connect_audio(const void *buf, uint16_t len)
->  		goto done;
->  	}
->  
-> -	status = connect_audio() ? HAL_STATUS_SUCCESS : HAL_STATUS_FAILED;
-> +	status = connect_audio(&device) ? HAL_STATUS_SUCCESS : HAL_STATUS_FAILED;
->  
->  done:
->  	ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_HANDSFREE,
-> @@ -1754,7 +1754,7 @@ static void handle_disconnect_audio(const void *buf, uint16_t len)
->  		goto done;
->  	}
->  
-> -	status = disconnect_sco() ? HAL_STATUS_SUCCESS : HAL_STATUS_FAILED;
-> +	status = disconnect_sco(&device) ? HAL_STATUS_SUCCESS : HAL_STATUS_FAILED;
->  
->  done:
->  	ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_HANDSFREE,
-> @@ -2042,7 +2042,7 @@ static void phone_state_dialing(int num_active, int num_held)
->  		update_indicator(IND_CALLHELD, 2);
->  
->  	if (device.num_active == 0 && device.num_held == 0)
-> -		connect_audio();
-> +		connect_audio(&device);
->  }
->  
->  static void phone_state_alerting(int num_active, int num_held)
-> @@ -2136,7 +2136,7 @@ static void phone_state_idle(int num_active, int num_held)
->  			update_indicator(IND_CALL, 1);
->  
->  			if (device.num_active == 0 && device.num_held == 0)
-> -				connect_audio();
-> +				connect_audio(&device);
->  		}
->  
->  		if (num_held > device.num_held)
-> @@ -2180,9 +2180,9 @@ static void phone_state_idle(int num_active, int num_held)
->  			 * was no call setup change this means that there were
->  			 * calls present when headset was connected.
->  			 */
-> -			connect_audio();
-> +			connect_audio(&device);
->  		} else if (num_active == 0 && num_held == 0) {
-> -			disconnect_sco();
-> +			disconnect_sco(&device);
->  		}
->  
->  		update_indicator(IND_CALLHELD,
-> -- 
-> 1.9.1
+> here we lost the skb reference from parameter if failed and I don't see
+> that skb_unshare free it on failing (maybe I am wrong here).
 > 
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+I will do this step by step.
+
+1. call skb_unshare
+
+2. check if cloned
+
+3. call skb_copy
+
+4. call __alloc_skb
+
+5. __alloc_skb return NULL
+
+6. assign to temp nskb;
+
+7. parameter skb will be freed. kfree_skb(skb).
+
+8. skb = nskb;
+
+9. return skb;
+
+So I see that kfree_skb(skb) is always called also on failure.
+
+So your code seems to be correct. This is a lack of documentation.
+
+- Alex
