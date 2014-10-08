@@ -2,148 +2,40 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH 13/13] android/handsfree: Make remote device non-static
-Date: Wed,  8 Oct 2014 09:12:23 +0200
-Message-Id: <1412752343-7001-13-git-send-email-szymon.janc@tieto.com>
+Subject: [PATCH 12/13] android/handsfree: Add helper for getting device
+Date: Wed,  8 Oct 2014 09:12:22 +0200
+Message-Id: <1412752343-7001-12-git-send-email-szymon.janc@tieto.com>
 In-Reply-To: <1412752343-7001-1-git-send-email-szymon.janc@tieto.com>
 References: <1412752343-7001-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Remote device object is now created on-demand instead of being static.
+For now this is just dummy to minime use of global static device.
 ---
- android/handsfree.c | 144 +++++++++++++++++++++++++++++++---------------------
- 1 file changed, 86 insertions(+), 58 deletions(-)
+ android/handsfree.c | 321 ++++++++++++++++++++++++++++++++++++++--------------
+ 1 file changed, 238 insertions(+), 83 deletions(-)
 
 diff --git a/android/handsfree.c b/android/handsfree.c
-index 58eade4..2e617f6 100644
+index 60aa504..58eade4 100644
 --- a/android/handsfree.c
 +++ b/android/handsfree.c
-@@ -37,6 +37,8 @@
- #include "src/sdp-client.h"
- #include "src/uuid-helper.h"
- #include "src/shared/hfp.h"
-+#include "src/shared/queue.h"
-+#include "src/shared/util.h"
- #include "btio/btio.h"
- #include "hal-msg.h"
- #include "ipc-common.h"
-@@ -155,7 +157,7 @@ static const struct hfp_codec codecs_defaults[] = {
- 	{ CODEC_ID_MSBC, false, false},
- };
- 
--static struct hf_device device;
-+static struct queue *devices = NULL;
- 
- static uint32_t hfp_ag_features = 0;
- 
-@@ -172,32 +174,6 @@ static GIOChannel *hsp_server = NULL;
+@@ -172,6 +172,32 @@ static GIOChannel *hsp_server = NULL;
  
  static GIOChannel *sco_server = NULL;
  
--static struct hf_device *find_default_device(void)
--{
--	/* TODO should be replaced by find_device() eventually */
--
--	return &device;
--}
--
--static struct hf_device *find_device(const bdaddr_t *bdaddr)
--{
--	if (bacmp(&device.bdaddr, bdaddr))
--		return NULL;
--
--	return &device;
--}
--
--static struct hf_device *get_device(const bdaddr_t *bdaddr)
--{
--	struct hf_device *dev;
--
--	dev = find_device(bdaddr);
--	if (dev)
--		return dev;
--
--	return &device;
--}
--
- static void set_state(struct hf_device *dev, uint8_t state)
- {
- 	struct hal_ev_handsfree_conn_state ev;
-@@ -246,28 +222,38 @@ static void init_codecs(struct hf_device *dev)
- 		dev->codecs[MSBC_OFFSET].local_supported = true;
- }
- 
--static void device_init(struct hf_device *dev, const bdaddr_t *bdaddr)
-+static struct hf_device *device_create(const bdaddr_t *bdaddr)
- {
--	bacpy(&dev->bdaddr, bdaddr);
-+	struct hf_device *dev;
- 
-+	dev = new0(struct hf_device, 1);
-+	if (!dev)
-+		return NULL;
-+
-+	bacpy(&dev->bdaddr, bdaddr);
- 	dev->setup_state = HAL_HANDSFREE_CALL_STATE_IDLE;
-+	dev->state = HAL_EV_HANDSFREE_CONN_STATE_DISCONNECTED;
-+	dev->audio_state = HAL_EV_HANDSFREE_AUDIO_STATE_DISCONNECTED;
- 
- 	memcpy(dev->inds, inds_defaults, sizeof(dev->inds));
- 
- 	init_codecs(dev);
- 
--	set_state(dev, HAL_EV_HANDSFREE_CONN_STATE_CONNECTING);
-+	if (!queue_push_head(devices, dev)) {
-+		free(dev);
-+		return NULL;
-+	}
-+
-+	return dev;
- }
- 
--static void device_cleanup(struct hf_device *dev)
-+static void device_destroy(struct hf_device *dev)
- {
- 	if (dev->gw) {
- 		hfp_gw_unref(dev->gw);
- 		dev->gw = NULL;
- 	}
- 
--	set_state(dev, HAL_EV_HANDSFREE_CONN_STATE_DISCONNECTED);
--
- 	if (dev->sco_watch) {
- 		g_source_remove(dev->sco_watch);
- 		dev->sco_watch = 0;
-@@ -290,8 +276,45 @@ static void device_cleanup(struct hf_device *dev)
- 	}
- 
- 	set_audio_state(dev, HAL_EV_HANDSFREE_AUDIO_STATE_DISCONNECTED);
-+	set_state(dev, HAL_EV_HANDSFREE_CONN_STATE_DISCONNECTED);
-+
-+	queue_remove(devices, dev);
-+	free(dev);
-+}
-+
 +static struct hf_device *find_default_device(void)
 +{
 +	/* TODO should be replaced by find_device() eventually */
 +
-+	return queue_peek_head(devices);
-+}
- 
--	memset(dev, 0, sizeof(*dev));
-+static bool match_by_bdaddr(const void *data, const void *match_data)
-+{
-+	const struct hf_device *dev = data;
-+	const bdaddr_t *addr = match_data;
-+
-+	return !bacmp(&dev->bdaddr, addr);
++	return &device;
 +}
 +
 +static struct hf_device *find_device(const bdaddr_t *bdaddr)
 +{
-+	return queue_find(devices, match_by_bdaddr, bdaddr);
++	if (bacmp(&device.bdaddr, bdaddr))
++		return NULL;
++
++	return &device;
 +}
 +
 +static struct hf_device *get_device(const bdaddr_t *bdaddr)
@@ -154,168 +46,643 @@ index 58eade4..2e617f6 100644
 +	if (dev)
 +		return dev;
 +
-+	/* TODO For now allow only 1 remote device */
-+	if (!queue_isempty(devices))
-+		return NULL;
++	return &device;
++}
 +
-+	return device_create(bdaddr);
- }
+ static void set_state(struct hf_device *dev, uint8_t state)
+ {
+ 	struct hal_ev_handsfree_conn_state ev;
+@@ -1403,6 +1429,7 @@ static void confirm_cb(GIOChannel *chan, gpointer data)
+ 	char address[18];
+ 	bdaddr_t bdaddr;
+ 	GError *err = NULL;
++	struct hf_device *dev;
  
- static void disconnect_watch(void *user_data)
-@@ -300,7 +323,7 @@ static void disconnect_watch(void *user_data)
+ 	bt_io_get(chan, &err,
+ 			BT_IO_OPT_DEST, address,
+@@ -1416,20 +1443,26 @@ static void confirm_cb(GIOChannel *chan, gpointer data)
  
- 	DBG("");
+ 	DBG("incoming connect from %s", address);
  
--	device_cleanup(dev);
-+	device_destroy(dev);
- }
- 
- static void at_cmd_unknown(const char *command, void *user_data)
-@@ -1421,7 +1444,7 @@ static void connect_cb(GIOChannel *chan, GError *err, gpointer user_data)
- 
- failed:
- 	g_io_channel_shutdown(chan, TRUE, NULL);
--	device_cleanup(dev);
-+	device_destroy(dev);
- }
- 
- static void confirm_cb(GIOChannel *chan, gpointer data)
-@@ -1454,15 +1477,16 @@ static void confirm_cb(GIOChannel *chan, gpointer data)
+-	if (device.state != HAL_EV_HANDSFREE_CONN_STATE_DISCONNECTED) {
++	dev = get_device(&bdaddr);
++	if (!dev) {
++		error("handsfree: Failed to get device object for %s", address);
++		goto drop;
++	}
++
++	if (dev->state != HAL_EV_HANDSFREE_CONN_STATE_DISCONNECTED) {
+ 		info("handsfree: refusing connection from %s", address);
  		goto drop;
  	}
  
--	device_init(dev, &bdaddr);
--
- 	if (!bt_io_accept(chan, connect_cb, dev, NULL, NULL)) {
+-	device_init(&device, &bdaddr);
++	device_init(dev, &bdaddr);
+ 
+-	if (!bt_io_accept(chan, connect_cb, &device, NULL, NULL)) {
++	if (!bt_io_accept(chan, connect_cb, dev, NULL, NULL)) {
  		error("handsfree: failed to accept connection");
--		device_cleanup(dev);
-+		device_destroy(dev);
+-		device_cleanup(&device);
++		device_cleanup(dev);
  		goto drop;
  	}
  
- 	dev->hsp = GPOINTER_TO_INT(data);
-+
-+	set_state(dev, HAL_EV_HANDSFREE_CONN_STATE_CONNECTING);
-+
+-	device.hsp = GPOINTER_TO_INT(data);
++	dev->hsp = GPOINTER_TO_INT(data);
  	return;
  
  drop:
-@@ -1541,7 +1565,7 @@ static void sdp_hsp_search_cb(sdp_list_t *recs, int err, gpointer data)
- 	return;
- 
- fail:
--	device_cleanup(dev);
-+	device_destroy(dev);
- }
- 
- static int sdp_search_hsp(struct hf_device *dev)
-@@ -1629,7 +1653,7 @@ static void sdp_hfp_search_cb(sdp_list_t *recs, int err, gpointer data)
- 	return;
- 
- fail:
--	device_cleanup(dev);
-+	device_destroy(dev);
- }
- 
- static int sdp_search_hfp(struct hf_device *dev)
-@@ -1653,13 +1677,8 @@ static void handle_connect(const void *buf, uint16_t len)
+@@ -1612,6 +1645,7 @@ static int sdp_search_hfp(struct hf_device *dev)
+ static void handle_connect(const void *buf, uint16_t len)
+ {
+ 	const struct hal_cmd_handsfree_connect *cmd = buf;
++	struct hf_device *dev;
+ 	char addr[18];
+ 	uint8_t status;
+ 	bdaddr_t bdaddr;
+@@ -1619,23 +1653,34 @@ static void handle_connect(const void *buf, uint16_t len)
  
  	DBG("");
  
--	dev = find_default_device();
--	if (dev) {
--		status = HAL_STATUS_FAILED;
--		goto failed;
--	}
--
- 	android2bdaddr(&cmd->bdaddr, &bdaddr);
-+
- 	dev = get_device(&bdaddr);
- 	if (!dev) {
+-	if (device.state != HAL_EV_HANDSFREE_CONN_STATE_DISCONNECTED) {
++	dev = find_default_device();
++	if (dev) {
  		status = HAL_STATUS_FAILED;
-@@ -1674,17 +1693,17 @@ static void handle_connect(const void *buf, uint16_t len)
+ 		goto failed;
+ 	}
+ 
+ 	android2bdaddr(&cmd->bdaddr, &bdaddr);
++	dev = get_device(&bdaddr);
++	if (!dev) {
++		status = HAL_STATUS_FAILED;
++		goto failed;
++	}
++
++	if (dev->state != HAL_EV_HANDSFREE_CONN_STATE_DISCONNECTED) {
++		status = HAL_STATUS_FAILED;
++		goto failed;
++	}
+ 
  	ba2str(&bdaddr, addr);
  	DBG("connecting to %s", addr);
  
--	device_init(dev, &bdaddr);
--
+-	device_init(&device, &bdaddr);
++	device_init(dev, &bdaddr);
+ 
  	/* prefer HFP over HSP */
- 	ret = hfp_server ? sdp_search_hfp(dev) : sdp_search_hsp(dev);
+-	ret = hfp_server ? sdp_search_hfp(&device) : sdp_search_hsp(&device);
++	ret = hfp_server ? sdp_search_hfp(dev) : sdp_search_hsp(dev);
  	if (ret < 0) {
  		error("handsfree: SDP search failed");
--		device_cleanup(dev);
-+		device_destroy(dev);
+-		device_cleanup(&device);
++		device_cleanup(dev);
  		status = HAL_STATUS_FAILED;
  		goto failed;
  	}
+@@ -1650,6 +1695,7 @@ failed:
+ static void handle_disconnect(const void *buf, uint16_t len)
+ {
+ 	const struct hal_cmd_handsfree_disconnect *cmd = buf;
++	struct hf_device *dev;
+ 	bdaddr_t bdaddr;
+ 	uint8_t status;
  
-+	set_state(dev, HAL_EV_HANDSFREE_CONN_STATE_CONNECTING);
+@@ -1657,23 +1703,28 @@ static void handle_disconnect(const void *buf, uint16_t len)
+ 
+ 	android2bdaddr(cmd->bdaddr, &bdaddr);
+ 
+-	if (device.state == HAL_EV_HANDSFREE_CONN_STATE_DISCONNECTED ||
+-			bacmp(&device.bdaddr, &bdaddr)) {
++	dev = find_device(&bdaddr);
++	if (!dev) {
++		status = HAL_STATUS_FAILED;
++		goto failed;
++	}
 +
- 	status = HAL_STATUS_SUCCESS;
- 
- failed:
-@@ -1712,7 +1731,6 @@ static void handle_disconnect(const void *buf, uint16_t len)
- 	if (dev->state == HAL_EV_HANDSFREE_CONN_STATE_DISCONNECTED) {
++	if (dev->state == HAL_EV_HANDSFREE_CONN_STATE_DISCONNECTED) {
  		status = HAL_STATUS_FAILED;
  		goto failed;
--
+ 
  	}
  
- 	if (dev->state == HAL_EV_HANDSFREE_CONN_STATE_DISCONNECTING) {
-@@ -1721,7 +1739,7 @@ static void handle_disconnect(const void *buf, uint16_t len)
+-	if (device.state == HAL_EV_HANDSFREE_CONN_STATE_DISCONNECTING) {
++	if (dev->state == HAL_EV_HANDSFREE_CONN_STATE_DISCONNECTING) {
+ 		status = HAL_STATUS_SUCCESS;
+ 		goto failed;
  	}
  
- 	if (dev->state == HAL_EV_HANDSFREE_CONN_STATE_CONNECTING) {
--		device_cleanup(dev);
-+		device_destroy(dev);
+-	if (device.state == HAL_EV_HANDSFREE_CONN_STATE_CONNECTING) {
+-		device_cleanup(&device);
++	if (dev->state == HAL_EV_HANDSFREE_CONN_STATE_CONNECTING) {
++		device_cleanup(dev);
  	} else {
- 		set_state(dev, HAL_EV_HANDSFREE_CONN_STATE_DISCONNECTING);
- 		hfp_gw_disconnect(dev->gw);
-@@ -2849,13 +2867,15 @@ bool bt_handsfree_register(struct ipc *ipc, const bdaddr_t *addr, uint8_t mode)
+-		set_state(&device, HAL_EV_HANDSFREE_CONN_STATE_DISCONNECTING);
+-		hfp_gw_disconnect(device.gw);
++		set_state(dev, HAL_EV_HANDSFREE_CONN_STATE_DISCONNECTING);
++		hfp_gw_disconnect(dev->gw);
+ 	}
  
- 	bacpy(&adapter_addr, addr);
+ 	status = HAL_STATUS_SUCCESS;
+@@ -1720,6 +1771,7 @@ static bool connect_audio(struct hf_device *dev)
+ static void handle_connect_audio(const void *buf, uint16_t len)
+ {
+ 	const struct hal_cmd_handsfree_connect_audio *cmd = buf;
++	struct hf_device *dev;
+ 	bdaddr_t bdaddr;
+ 	uint8_t status;
  
--	if (!enable_hsp_ag())
-+	devices = queue_new();
-+	if (!devices)
- 		return false;
+@@ -1727,13 +1779,18 @@ static void handle_connect_audio(const void *buf, uint16_t len)
  
--	if (!enable_sco_server()) {
--		cleanup_hsp_ag();
--		return false;
--	}
-+	if (!enable_hsp_ag())
-+		goto failed_queue;
-+
-+	if (!enable_sco_server())
-+		goto failed_hsp;
+ 	android2bdaddr(cmd->bdaddr, &bdaddr);
  
- 	if (mode == HAL_MODE_HANDSFREE_HSP_ONLY)
+-	if (device.audio_state != HAL_EV_HANDSFREE_AUDIO_STATE_DISCONNECTED ||
+-			bacmp(&device.bdaddr, &bdaddr)) {
++	dev = find_device(&bdaddr);
++	if (!dev) {
+ 		status = HAL_STATUS_FAILED;
  		goto done;
-@@ -2868,9 +2888,14 @@ bool bt_handsfree_register(struct ipc *ipc, const bdaddr_t *addr, uint8_t mode)
- 	if (enable_hfp_ag())
- 		goto done;
+ 	}
  
--	cleanup_hsp_ag();
- 	disable_sco_server();
- 	hfp_ag_features = 0;
-+failed_hsp:
-+	cleanup_hsp_ag();
-+failed_queue:
-+	queue_destroy(devices, NULL);
-+	devices = NULL;
+-	status = connect_audio(&device) ? HAL_STATUS_SUCCESS : HAL_STATUS_FAILED;
++	if (dev->audio_state != HAL_EV_HANDSFREE_AUDIO_STATE_DISCONNECTED) {
++		status = HAL_STATUS_FAILED;
++		goto done;
++	}
 +
- 	return false;
++	status = connect_audio(dev) ? HAL_STATUS_SUCCESS : HAL_STATUS_FAILED;
  
  done:
-@@ -2896,4 +2921,7 @@ void bt_handsfree_unregister(void)
- 	disable_sco_server();
+ 	ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_HANDSFREE,
+@@ -1743,6 +1800,7 @@ done:
+ static void handle_disconnect_audio(const void *buf, uint16_t len)
+ {
+ 	const struct hal_cmd_handsfree_disconnect_audio *cmd = buf;
++	struct hf_device *dev;
+ 	bdaddr_t bdaddr;
+ 	uint8_t status;
  
- 	hfp_ag_features = 0;
+@@ -1750,13 +1808,18 @@ static void handle_disconnect_audio(const void *buf, uint16_t len)
+ 
+ 	android2bdaddr(cmd->bdaddr, &bdaddr);
+ 
+-	if (device.audio_state != HAL_EV_HANDSFREE_AUDIO_STATE_CONNECTED ||
+-			bacmp(&device.bdaddr, &bdaddr)) {
++	dev = find_device(&bdaddr);
++	if (!dev) {
+ 		status = HAL_STATUS_FAILED;
+ 		goto done;
+ 	}
+ 
+-	status = disconnect_sco(&device) ? HAL_STATUS_SUCCESS : HAL_STATUS_FAILED;
++	if (dev->audio_state != HAL_EV_HANDSFREE_AUDIO_STATE_CONNECTED) {
++		status = HAL_STATUS_FAILED;
++		goto done;
++	}
 +
-+	queue_destroy(devices, (queue_destroy_func_t) device_destroy);
-+	devices = NULL;
++	status = disconnect_sco(dev) ? HAL_STATUS_SUCCESS : HAL_STATUS_FAILED;
+ 
+ done:
+ 	ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_HANDSFREE,
+@@ -1765,34 +1828,50 @@ done:
+ 
+ static void handle_start_vr(const void *buf, uint16_t len)
+ {
++	struct hf_device *dev;
+ 	uint8_t status;
+ 
+ 	DBG("");
+ 
+-	if (device.features & HFP_HF_FEAT_VR) {
+-		hfp_gw_send_info(device.gw, "+BVRA: 1");
++	dev = find_default_device();
++	if (!dev) {
++		status = HAL_STATUS_FAILED;
++		goto done;
++	}
++
++	if (dev->features & HFP_HF_FEAT_VR) {
++		hfp_gw_send_info(dev->gw, "+BVRA: 1");
+ 		status = HAL_STATUS_SUCCESS;
+ 	} else {
+ 		status = HAL_STATUS_FAILED;
+ 	}
+ 
++done:
+ 	ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_HANDSFREE,
+ 					HAL_OP_HANDSFREE_START_VR, status);
  }
+ 
+ static void handle_stop_vr(const void *buf, uint16_t len)
+ {
++	struct hf_device *dev;
+ 	uint8_t status;
+ 
+ 	DBG("");
+ 
+-	if (device.features & HFP_HF_FEAT_VR) {
+-		hfp_gw_send_info(device.gw, "+BVRA: 0");
++	dev = find_default_device();
++	if (!dev) {
++		status = HAL_STATUS_FAILED;
++		goto done;
++	}
++
++	if (dev->features & HFP_HF_FEAT_VR) {
++		hfp_gw_send_info(dev->gw, "+BVRA: 0");
+ 		status = HAL_STATUS_SUCCESS;
+ 	} else {
+ 		status = HAL_STATUS_FAILED;
+ 	}
+ 
++done:
+ 	ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_HANDSFREE,
+ 				HAL_OP_HANDSFREE_STOP_VR, status);
+ }
+@@ -1800,20 +1879,27 @@ static void handle_stop_vr(const void *buf, uint16_t len)
+ static void handle_volume_control(const void *buf, uint16_t len)
+ {
+ 	const struct hal_cmd_handsfree_volume_control *cmd = buf;
++	struct hf_device *dev;
+ 	uint8_t status, volume;
+ 
+ 	DBG("type=%u volume=%u", cmd->type, cmd->volume);
+ 
++	dev = find_default_device();
++	if (!dev) {
++		status = HAL_STATUS_FAILED;
++		goto done;
++	}
++
+ 	volume = cmd->volume > 15 ? 15 : cmd->volume;
+ 
+ 	switch (cmd->type) {
+ 	case HAL_HANDSFREE_VOLUME_TYPE_MIC:
+-		hfp_gw_send_info(device.gw, "+VGM: %u", volume);
++		hfp_gw_send_info(dev->gw, "+VGM: %u", volume);
+ 
+ 		status = HAL_STATUS_SUCCESS;
+ 		break;
+ 	case HAL_HANDSFREE_VOLUME_TYPE_SPEAKER:
+-		hfp_gw_send_info(device.gw, "+VGS: %u", volume);
++		hfp_gw_send_info(dev->gw, "+VGS: %u", volume);
+ 
+ 		status = HAL_STATUS_SUCCESS;
+ 		break;
+@@ -1822,6 +1908,7 @@ static void handle_volume_control(const void *buf, uint16_t len)
+ 		break;
+ 	}
+ 
++done:
+ 	ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_HANDSFREE,
+ 				HAL_OP_HANDSFREE_VOLUME_CONTROL, status);
+ }
+@@ -1848,22 +1935,34 @@ static void update_indicator(struct hf_device *dev, int ind, uint8_t val)
+ static void handle_device_status_notif(const void *buf, uint16_t len)
+ {
+ 	const struct hal_cmd_handsfree_device_status_notif *cmd = buf;
++	struct hf_device *dev;
++	uint8_t status;
+ 
+ 	DBG("");
+ 
+-	update_indicator(&device, IND_SERVICE, cmd->state);
+-	update_indicator(&device, IND_ROAM, cmd->type);
+-	update_indicator(&device, IND_SIGNAL, cmd->signal);
+-	update_indicator(&device, IND_BATTCHG, cmd->battery);
++	dev = find_default_device();
++	if (!dev) {
++		status = HAL_STATUS_FAILED;
++		goto done;
++	}
++
++	update_indicator(dev, IND_SERVICE, cmd->state);
++	update_indicator(dev, IND_ROAM, cmd->type);
++	update_indicator(dev, IND_SIGNAL, cmd->signal);
++	update_indicator(dev, IND_BATTCHG, cmd->battery);
+ 
++	status = HAL_STATUS_SUCCESS;
++
++done:
+ 	ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_HANDSFREE,
+-					HAL_OP_HANDSFREE_DEVICE_STATUS_NOTIF,
+-					HAL_STATUS_SUCCESS);
++				HAL_OP_HANDSFREE_DEVICE_STATUS_NOTIF, status);
+ }
+ 
+ static void handle_cops(const void *buf, uint16_t len)
+ {
+ 	const struct hal_cmd_handsfree_cops_response *cmd = buf;
++	struct hf_device *dev;
++	uint8_t status;
+ 
+ 	if (len != sizeof(*cmd) + cmd->len ||
+ 			(cmd->len != 0 && cmd->buf[cmd->len - 1] != '\0')) {
+@@ -1874,13 +1973,22 @@ static void handle_cops(const void *buf, uint16_t len)
+ 
+ 	DBG("");
+ 
+-	hfp_gw_send_info(device.gw, "+COPS: 0,0,\"%.16s\"",
++	dev = find_default_device();
++	if (!dev) {
++		status = HAL_STATUS_FAILED;
++		goto done;
++	}
++
++	hfp_gw_send_info(dev->gw, "+COPS: 0,0,\"%.16s\"",
+ 					cmd->len ? (char *) cmd->buf : "");
+ 
+-	hfp_gw_send_result(device.gw, HFP_RESULT_OK);
++	hfp_gw_send_result(dev->gw, HFP_RESULT_OK);
++
++	status = HAL_STATUS_SUCCESS;
+ 
++done:
+ 	ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_HANDSFREE,
+-			HAL_OP_HANDSFREE_COPS_RESPONSE, HAL_STATUS_SUCCESS);
++				HAL_OP_HANDSFREE_COPS_RESPONSE, status);
+ }
+ 
+ static unsigned int get_callsetup(uint8_t state)
+@@ -1900,38 +2008,51 @@ static unsigned int get_callsetup(uint8_t state)
+ static void handle_cind(const void *buf, uint16_t len)
+ {
+ 	const struct hal_cmd_handsfree_cind_response *cmd = buf;
++	struct hf_device *dev;
++	uint8_t status;
+ 
+ 	DBG("");
+ 
++	dev = find_default_device();
++	if (!dev) {
++		status = HAL_STATUS_FAILED;
++		goto done;
++	}
++
+ 	/* HAL doesn't provide indicators values so need to convert here */
+-	device.inds[IND_SERVICE].val = cmd->svc;
+-	device.inds[IND_CALL].val = !!(cmd->num_active + cmd->num_held);
+-	device.inds[IND_CALLSETUP].val = get_callsetup(cmd->state);
+-	device.inds[IND_CALLHELD].val = cmd->num_held ?
++	dev->inds[IND_SERVICE].val = cmd->svc;
++	dev->inds[IND_CALL].val = !!(cmd->num_active + cmd->num_held);
++	dev->inds[IND_CALLSETUP].val = get_callsetup(cmd->state);
++	dev->inds[IND_CALLHELD].val = cmd->num_held ?
+ 						(cmd->num_active ? 1 : 2) : 0;
+-	device.inds[IND_SIGNAL].val = cmd->signal;
+-	device.inds[IND_ROAM].val = cmd->roam;
+-	device.inds[IND_BATTCHG].val = cmd->batt_chg;
++	dev->inds[IND_SIGNAL].val = cmd->signal;
++	dev->inds[IND_ROAM].val = cmd->roam;
++	dev->inds[IND_BATTCHG].val = cmd->batt_chg;
+ 
+ 	/* Order must match indicators_defaults table */
+-	hfp_gw_send_info(device.gw, "+CIND: %u,%u,%u,%u,%u,%u,%u",
+-						device.inds[IND_SERVICE].val,
+-						device.inds[IND_CALL].val,
+-						device.inds[IND_CALLSETUP].val,
+-						device.inds[IND_CALLHELD].val,
+-						device.inds[IND_SIGNAL].val,
+-						device.inds[IND_ROAM].val,
+-						device.inds[IND_BATTCHG].val);
++	hfp_gw_send_info(dev->gw, "+CIND: %u,%u,%u,%u,%u,%u,%u",
++						dev->inds[IND_SERVICE].val,
++						dev->inds[IND_CALL].val,
++						dev->inds[IND_CALLSETUP].val,
++						dev->inds[IND_CALLHELD].val,
++						dev->inds[IND_SIGNAL].val,
++						dev->inds[IND_ROAM].val,
++						dev->inds[IND_BATTCHG].val);
+ 
+-	hfp_gw_send_result(device.gw, HFP_RESULT_OK);
++	hfp_gw_send_result(dev->gw, HFP_RESULT_OK);
+ 
++	status = HAL_STATUS_SUCCESS;
++
++done:
+ 	ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_HANDSFREE,
+-			HAL_OP_HANDSFREE_CIND_RESPONSE, HAL_STATUS_SUCCESS);
++				HAL_OP_HANDSFREE_CIND_RESPONSE, status);
+ }
+ 
+ static void handle_formatted_at_resp(const void *buf, uint16_t len)
+ {
+ 	const struct hal_cmd_handsfree_formatted_at_response *cmd = buf;
++	struct hf_device *dev;
++	uint8_t status;
+ 
+ 	DBG("");
+ 
+@@ -1942,33 +2063,53 @@ static void handle_formatted_at_resp(const void *buf, uint16_t len)
+ 		return;
+ 	}
+ 
+-	hfp_gw_send_info(device.gw, "%s", cmd->len ? (char *) cmd->buf : "");
++	dev = find_default_device();
++	if (!dev) {
++		status = HAL_STATUS_FAILED;
++		goto done;
++	}
+ 
++	hfp_gw_send_info(dev->gw, "%s", cmd->len ? (char *) cmd->buf : "");
++
++	status = HAL_STATUS_SUCCESS;
++
++done:
+ 	ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_HANDSFREE,
+-					HAL_OP_HANDSFREE_FORMATTED_AT_RESPONSE,
+-					HAL_STATUS_SUCCESS);
++			HAL_OP_HANDSFREE_FORMATTED_AT_RESPONSE, status);
+ }
+ 
+ static void handle_at_resp(const void *buf, uint16_t len)
+ {
+ 	const struct hal_cmd_handsfree_at_response *cmd = buf;
++	struct hf_device *dev;
++	uint8_t status;
+ 
+ 	DBG("");
+ 
++	dev = find_default_device();
++	if (!dev) {
++		status = HAL_STATUS_FAILED;
++		goto done;
++	}
++
+ 	if (cmd->response == HAL_HANDSFREE_AT_RESPONSE_OK)
+-		hfp_gw_send_result(device.gw, HFP_RESULT_OK);
+-	else if (device.cmee_enabled)
+-		hfp_gw_send_error(device.gw, cmd->error);
++		hfp_gw_send_result(dev->gw, HFP_RESULT_OK);
++	else if (dev->cmee_enabled)
++		hfp_gw_send_error(dev->gw, cmd->error);
+ 	else
+-		hfp_gw_send_result(device.gw, HFP_RESULT_ERROR);
++		hfp_gw_send_result(dev->gw, HFP_RESULT_ERROR);
++
++	status = HAL_STATUS_SUCCESS;
+ 
++done:
+ 	ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_HANDSFREE,
+-			HAL_OP_HANDSFREE_AT_RESPONSE, HAL_STATUS_SUCCESS);
++					HAL_OP_HANDSFREE_AT_RESPONSE, status);
+ }
+ 
+ static void handle_clcc_resp(const void *buf, uint16_t len)
+ {
+ 	const struct hal_cmd_handsfree_clcc_response *cmd = buf;
++	struct hf_device *dev;
+ 	uint8_t status;
+ 	char *number;
+ 
+@@ -1981,8 +2122,14 @@ static void handle_clcc_resp(const void *buf, uint16_t len)
+ 
+ 	DBG("");
+ 
++	dev = find_default_device();
++	if (!dev) {
++		status = HAL_STATUS_FAILED;
++		goto done;
++	}
++
+ 	if (!cmd->index) {
+-		hfp_gw_send_result(device.gw, HFP_RESULT_OK);
++		hfp_gw_send_result(dev->gw, HFP_RESULT_OK);
+ 
+ 		status = HAL_STATUS_SUCCESS;
+ 		goto done;
+@@ -1999,13 +2146,13 @@ static void handle_clcc_resp(const void *buf, uint16_t len)
+ 	case HAL_HANDSFREE_CALL_STATE_ALERTING:
+ 		if (cmd->type == HAL_HANDSFREE_CALL_ADDRTYPE_INTERNATIONAL &&
+ 							number[0] != '+')
+-			hfp_gw_send_info(device.gw,
++			hfp_gw_send_info(dev->gw,
+ 					"+CLCC: %u,%u,%u,%u,%u,\"+%s\",%u",
+ 					cmd->index, cmd->dir, cmd->state,
+ 					cmd->mode, cmd->mpty, number,
+ 					cmd->type);
+ 		else
+-			hfp_gw_send_info(device.gw,
++			hfp_gw_send_info(dev->gw,
+ 					"+CLCC: %u,%u,%u,%u,%u,\"%s\",%u",
+ 					cmd->index, cmd->dir, cmd->state,
+ 					cmd->mode, cmd->mpty, number,
+@@ -2213,6 +2360,7 @@ static void phone_state_idle(struct hf_device *dev, int num_active,
+ static void handle_phone_state_change(const void *buf, uint16_t len)
+ {
+ 	const struct hal_cmd_handsfree_phone_state_change *cmd = buf;
++	struct hf_device *dev;
+ 	uint8_t status;
+ 
+ 	if (len != sizeof(*cmd) + cmd->number_len || (cmd->number_len != 0 &&
+@@ -2225,32 +2373,38 @@ static void handle_phone_state_change(const void *buf, uint16_t len)
+ 	DBG("active=%u hold=%u state=%u", cmd->num_active, cmd->num_held,
+ 								cmd->state);
+ 
++	dev = find_default_device();
++	if (!dev) {
++		status = HAL_STATUS_FAILED;
++		goto failed;
++	}
++
+ 	switch (cmd->state) {
+ 	case HAL_HANDSFREE_CALL_STATE_DIALING:
+-		phone_state_dialing(&device, cmd->num_active, cmd->num_held);
++		phone_state_dialing(dev, cmd->num_active, cmd->num_held);
+ 		break;
+ 	case HAL_HANDSFREE_CALL_STATE_ALERTING:
+-		phone_state_alerting(&device, cmd->num_active, cmd->num_held);
++		phone_state_alerting(dev, cmd->num_active, cmd->num_held);
+ 		break;
+ 	case HAL_HANDSFREE_CALL_STATE_INCOMING:
+-		phone_state_incoming(&device, cmd->num_active, cmd->num_held,
++		phone_state_incoming(dev, cmd->num_active, cmd->num_held,
+ 						cmd->type, cmd->number,
+ 						cmd->number_len);
+ 		break;
+ 	case HAL_HANDSFREE_CALL_STATE_IDLE:
+-		phone_state_idle(&device, cmd->num_active, cmd->num_held);
++		phone_state_idle(dev, cmd->num_active, cmd->num_held);
+ 		break;
+ 	default:
+ 		DBG("unhandled new state %u (current state %u)", cmd->state,
+-							device.setup_state);
++							dev->setup_state);
+ 
+ 		status = HAL_STATUS_FAILED;
+ 		goto failed;
+ 	}
+ 
+-	device.num_active = cmd->num_active;
+-	device.num_held = cmd->num_held;
+-	device.setup_state = cmd->state;
++	dev->num_active = cmd->num_active;
++	dev->num_held = cmd->num_held;
++	dev->setup_state = cmd->state;
+ 
+ 	status = HAL_STATUS_SUCCESS;
+ 
+@@ -2374,9 +2528,7 @@ static void confirm_sco_cb(GIOChannel *chan, gpointer user_data)
+ 	char address[18];
+ 	bdaddr_t bdaddr;
+ 	GError *err = NULL;
+-
+-	if (device.sco)
+-		goto drop;
++	struct hf_device *dev;
+ 
+ 	bt_io_get(chan, &err,
+ 			BT_IO_OPT_DEST, address,
+@@ -2390,18 +2542,19 @@ static void confirm_sco_cb(GIOChannel *chan, gpointer user_data)
+ 
+ 	DBG("incoming SCO connection from %s", address);
+ 
+-	if (device.state != HAL_EV_HANDSFREE_CONN_STATE_SLC_CONNECTED ||
+-			bacmp(&device.bdaddr, &bdaddr)) {
++	dev = find_device(&bdaddr);
++	if (!dev || dev->state != HAL_EV_HANDSFREE_CONN_STATE_SLC_CONNECTED ||
++								dev->sco) {
+ 		error("handsfree: audio connection from %s rejected", address);
+ 		goto drop;
+ 	}
+ 
+-	if (!bt_io_accept(chan, connect_sco_cb, &device, NULL, NULL)) {
++	if (!bt_io_accept(chan, connect_sco_cb, dev, NULL, NULL)) {
+ 		error("handsfree: failed to accept audio connection");
+ 		goto drop;
+ 	}
+ 
+-	set_audio_state(&device, HAL_EV_HANDSFREE_AUDIO_STATE_CONNECTING);
++	set_audio_state(dev, HAL_EV_HANDSFREE_AUDIO_STATE_CONNECTING);
+ 	return;
+ 
+ drop:
+@@ -2633,21 +2786,23 @@ static void bt_sco_get_fd(const void *buf, uint16_t len)
+ 	int fd;
+ 	GError *err;
+ 	struct sco_rsp_get_fd rsp;
++	struct hf_device *dev;
+ 
+ 	DBG("");
+ 
+-	if (!device.sco)
++	dev = find_default_device();
++	if (!dev || !dev->sco)
+ 		goto failed;
+ 
+ 	err = NULL;
+-	if (!bt_io_get(device.sco, &err, BT_IO_OPT_MTU, &rsp.mtu,
++	if (!bt_io_get(dev->sco, &err, BT_IO_OPT_MTU, &rsp.mtu,
+ 							BT_IO_OPT_INVALID)) {
+ 		error("Unable to get MTU: %s\n", err->message);
+ 		g_clear_error(&err);
+ 		goto failed;
+ 	}
+ 
+-	fd = g_io_channel_unix_get_fd(device.sco);
++	fd = g_io_channel_unix_get_fd(dev->sco);
+ 
+ 	DBG("fd %d mtu %u", fd, rsp.mtu);
+ 
 -- 
 1.9.1
 
