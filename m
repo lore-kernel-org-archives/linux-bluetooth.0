@@ -2,167 +2,202 @@ Return-Path: <cyrus@holtmann.org>
 From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH v3 05/11] shared/hfp: Add HFP HF parser
-Date: Wed,  8 Oct 2014 12:15:25 +0200
-Message-Id: <1412763331-30989-6-git-send-email-lukasz.rymanowski@tieto.com>
+Subject: [PATCH v3 04/11] shared/hfp: Add register/unregister event for HFP HF
+Date: Wed,  8 Oct 2014 12:15:24 +0200
+Message-Id: <1412763331-30989-5-git-send-email-lukasz.rymanowski@tieto.com>
 In-Reply-To: <1412763331-30989-1-git-send-email-lukasz.rymanowski@tieto.com>
 References: <1412763331-30989-1-git-send-email-lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch adds parser for AT responses and unsolicited results.
+This patch adds API which allows to register/unregister for unsolicited
+responses.
 ---
- src/shared/hfp.c | 130 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 130 insertions(+)
+ src/shared/hfp.c | 108 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ src/shared/hfp.h |   8 +++++
+ 2 files changed, 116 insertions(+)
 
 diff --git a/src/shared/hfp.c b/src/shared/hfp.c
-index b1cf08e..d61d76d 100644
+index b7855ed..b1cf08e 100644
 --- a/src/shared/hfp.c
 +++ b/src/shared/hfp.c
-@@ -868,6 +868,127 @@ static void destroy_event_handler(void *data)
- 	free(handler);
+@@ -70,6 +70,8 @@ struct hfp_hf {
+ 	struct ringbuf *read_buf;
+ 	struct ringbuf *write_buf;
+ 
++	struct queue *event_handlers;
++
+ 	hfp_debug_func_t debug_callback;
+ 	hfp_destroy_func_t debug_destroy;
+ 	void *debug_data;
+@@ -94,6 +96,18 @@ struct hfp_gw_result {
+ 	unsigned int offset;
+ };
+ 
++struct hfp_hf_result {
++	const char *data;
++	unsigned int offset;
++};
++
++struct event_handler {
++	char *prefix;
++	void *user_data;
++	hfp_destroy_func_t destroy;
++	hfp_hf_result_func_t callback;
++};
++
+ static void destroy_cmd_handler(void *data)
+ {
+ 	struct cmd_handler *handler = data;
+@@ -828,6 +842,32 @@ bool hfp_gw_disconnect(struct hfp_gw *hfp)
+ 	return io_shutdown(hfp->io);
  }
  
-+static void hf_skip_whitespace(struct hfp_hf_result *result)
++static bool match_handler_event_prefix(const void *a, const void *b)
 +{
-+	while (result->data[result->offset] == ' ')
-+		result->offset++;
-+}
++	const struct event_handler *handler = a;
++	const char *prefix = b;
 +
-+static void hf_call_prefix_handler(struct hfp_hf *hfp, const char *data)
-+{
-+	struct event_handler *handler;
-+	const char *separators = ";:\0";
-+	struct hfp_hf_result result_data;
-+	char lookup_prefix[18];
-+	uint8_t pref_len = 0;
-+	const char *prefix;
-+	int i;
-+
-+	result_data.offset = 0;
-+	result_data.data = data;
-+
-+	hf_skip_whitespace(&result_data);
-+
-+	if (strlen(data + result_data.offset) < 2)
-+		return;
-+
-+	prefix = data + result_data.offset;
-+
-+	pref_len = strcspn(prefix, separators);
-+	if (pref_len > 17 || pref_len < 2)
-+		return;
-+
-+	for (i = 0; i < pref_len; i++)
-+		lookup_prefix[i] = toupper(prefix[i]);
-+
-+	lookup_prefix[pref_len] = '\0';
-+	result_data.offset += pref_len + 1;
-+
-+	handler = queue_find(hfp->event_handlers, match_handler_event_prefix,
-+								lookup_prefix);
-+
-+	if (!handler)
-+		return;
-+
-+	handler->callback(&result_data, handler->user_data);
-+}
-+
-+static char *find_cr_lf(char *str, size_t len)
-+{
-+	char *ptr;
-+	int count;
-+	int offset;
-+
-+	offset = 0;
-+
-+	ptr = memchr(str, '\r', len);
-+	while (ptr) {
-+		/*
-+		 * Check if there is more data after '\r'. If so check for
-+		 * '\n'
-+		 */
-+		count = ptr-str;
-+		if ((count < (int) (len - 1)) && *(ptr + 1) == '\n')
-+			return ptr;
-+
-+		/* There is only '\r'? Let's try to find next one */
-+		offset += count + 1;
-+
-+		if (offset >= (int)len)
-+			return NULL;
-+
-+		ptr = memchr(str + offset, '\r', len - offset);
-+	}
-+
-+	return NULL;
-+}
-+
-+static void hf_process_input(struct hfp_hf *hfp)
-+{
-+	char *str, *ptr;
-+	size_t len, count, offset;
-+
-+	str = ringbuf_peek(hfp->read_buf, 0, &len);
-+	if (!str)
-+		return;
-+
-+	offset = 0;
-+
-+	ptr = find_cr_lf(str, len);
-+	while (ptr) {
-+		count = ptr - (str + offset);
-+		if (count == 0) {
-+			/* 2 is for <cr><lf> */
-+			offset += 2;
-+		} else {
-+			*ptr = '\0';
-+			hf_call_prefix_handler(hfp, str + offset);
-+			offset += count + 2;
-+		}
-+
-+		if (offset >= len)
-+			break;
-+
-+		ptr = find_cr_lf(str + offset, len - offset);
-+	}
-+
-+	ringbuf_drain(hfp->read_buf, offset < len ? offset : len);
-+}
-+
-+static bool hf_can_read_data(struct io *io, void *user_data)
-+{
-+	struct hfp_hf *hfp = user_data;
-+	ssize_t bytes_read;
-+
-+	bytes_read = ringbuf_read(hfp->read_buf, hfp->fd);
-+	if (bytes_read < 0)
++	if (strlen(handler->prefix) != strlen(prefix))
 +		return false;
 +
-+	hf_process_input(hfp);
++	if (memcmp(handler->prefix, prefix, strlen(prefix)))
++		return false;
 +
 +	return true;
++}
++
++static void destroy_event_handler(void *data)
++{
++	struct event_handler *handler = data;
++
++	if (handler->destroy)
++		handler->destroy(handler->user_data);
++
++	free(handler->prefix);
++
++	free(handler);
 +}
 +
  struct hfp_hf *hfp_hf_new(int fd)
  {
  	struct hfp_hf *hfp;
-@@ -912,6 +1033,15 @@ struct hfp_hf *hfp_hf_new(int fd)
+@@ -863,6 +903,15 @@ struct hfp_hf *hfp_hf_new(int fd)
  		return NULL;
  	}
  
-+	if (!io_set_read_handler(hfp->io, hf_can_read_data, hfp,
-+							read_watch_destroy)) {
-+		queue_destroy(hfp->event_handlers,
-+						destroy_event_handler);
++	hfp->event_handlers = queue_new();
++	if (!hfp->event_handlers) {
 +		io_destroy(hfp->io);
 +		ringbuf_free(hfp->write_buf);
 +		ringbuf_free(hfp->read_buf);
++		free(hfp);
++		return NULL;
 +	}
 +
  	return hfp_hf_ref(hfp);
  }
  
+@@ -902,6 +951,9 @@ void hfp_hf_unref(struct hfp_hf *hfp)
+ 	ringbuf_free(hfp->write_buf);
+ 	hfp->write_buf = NULL;
+ 
++	queue_destroy(hfp->event_handlers, destroy_event_handler);
++	hfp->event_handlers = NULL;
++
+ 	if (!hfp->in_disconnect) {
+ 		free(hfp);
+ 		return;
+@@ -961,6 +1013,62 @@ bool hfp_hf_set_close_on_unref(struct hfp_hf *hfp, bool do_close)
+ 	return true;
+ }
+ 
++bool hfp_hf_register(struct hfp_hf *hfp, hfp_hf_result_func_t callback,
++						const char *prefix,
++						void *user_data,
++						hfp_destroy_func_t destroy)
++{
++	struct event_handler *handler;
++
++	if (!callback)
++		return false;
++
++	handler = new0(struct event_handler, 1);
++	if (!handler)
++		return false;
++
++	handler->callback = callback;
++	handler->user_data = user_data;
++
++	handler->prefix = strdup(prefix);
++	if (!handler->prefix) {
++		free(handler);
++		return false;
++	}
++
++	if (queue_find(hfp->event_handlers, match_handler_event_prefix,
++							handler->prefix)) {
++		destroy_event_handler(handler);
++		return false;
++	}
++
++	handler->destroy = destroy;
++
++	return queue_push_tail(hfp->event_handlers, handler);
++}
++
++bool hfp_hf_unregister(struct hfp_hf *hfp, const char *prefix)
++{
++	struct cmd_handler *handler;
++	char *lookup_prefix;
++
++	lookup_prefix = strdup(prefix);
++	if (!lookup_prefix)
++		return false;
++
++	handler = queue_remove_if(hfp->event_handlers,
++						match_handler_event_prefix,
++						lookup_prefix);
++	free(lookup_prefix);
++
++	if (!handler)
++		return false;
++
++	destroy_event_handler(handler);
++
++	return true;
++}
++
+ static void hf_disconnect_watch_destroy(void *user_data)
+ {
+ 	struct hfp_hf *hfp = user_data;
+diff --git a/src/shared/hfp.h b/src/shared/hfp.h
+index a9a169b..85037b1 100644
+--- a/src/shared/hfp.h
++++ b/src/shared/hfp.h
+@@ -68,10 +68,14 @@ enum hfp_gw_cmd_type {
+ };
+ 
+ struct hfp_gw_result;
++struct hfp_hf_result;
+ 
+ typedef void (*hfp_result_func_t)(struct hfp_gw_result *result,
+ 				enum hfp_gw_cmd_type type, void *user_data);
+ 
++typedef void (*hfp_hf_result_func_t)(struct hfp_hf_result *result,
++							void *user_data);
++
+ typedef void (*hfp_destroy_func_t)(void *user_data);
+ typedef void (*hfp_debug_func_t)(const char *str, void *user_data);
+ 
+@@ -138,3 +142,7 @@ bool hfp_hf_set_disconnect_handler(struct hfp_hf *hfp,
+ 					void *user_data,
+ 					hfp_destroy_func_t destroy);
+ bool hfp_hf_disconnect(struct hfp_hf *hfp);
++bool hfp_hf_register(struct hfp_hf *hfp, hfp_hf_result_func_t callback,
++					const char *prefix, void *user_data,
++					hfp_destroy_func_t destroy);
++bool hfp_hf_unregister(struct hfp_hf *hfp, const char *prefix);
 -- 
 1.8.4
 
