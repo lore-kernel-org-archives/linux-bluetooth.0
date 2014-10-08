@@ -1,39 +1,59 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1412765090.21709.18.camel@linux-0dmf.site>
-Subject: Re: btusb_intr_complete returns -EPIPE
-From: Oliver Neukum <oneukum@suse.de>
-To: Naveen Kumar Parna <pnaveenkos@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <1412654816-14971-1-git-send-email-gowtham.ab@samsung.com>
+References: <1412654816-14971-1-git-send-email-gowtham.ab@samsung.com>
+Date: Wed, 8 Oct 2014 13:38:53 +0300
+Message-ID: <CABBYNZ+GQ7ffqVnpTKVBZ02_5bqQoPhjz7Ue+ELpfCKGLZF0kg@mail.gmail.com>
+Subject: Re: [PATCH 0/6] Add support for MAP MASInstance feature
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Gowtham Anandha Babu <gowtham.ab@samsung.com>
 Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	linux-usb@vger.kernel.org, acho@suse.com
-Date: Wed, 08 Oct 2014 12:44:50 +0200
-In-Reply-To: <CAG0bkvKugdQSDm+GKRbLGLzrURth5ty9KU-8d3ED-a9sgdDkMg@mail.gmail.com>
-References: <CAG0bkvK4-gfeYXXsdNg4BKdjxmo1e5d8rKuABohtYNNBHKJwDA@mail.gmail.com>
-	 <1412598268.1132.15.camel@linux-0dmf.site>
-	 <CAG0bkv+nKt-TgONDLENNUncz9NScdJGcYR+J2Z6b=wg2grvqhg@mail.gmail.com>
-	 <1412600108.28177.0.camel@linux-0dmf.site>
-	 <CAG0bkvK=fumhJNzuSgx=HFHiVP08V+QH2wLajdffx+f5ugoQPQ@mail.gmail.com>
-	 <1412602169.28177.2.camel@linux-0dmf.site>
-	 <CAG0bkv+d9SxToWpk49s=C-w_aA4zbP_RvV_8kcgV254rsvHR0A@mail.gmail.com>
-	 <1412607050.1743.1.camel@linux-0dmf.site>
-	 <CAG0bkvKJZMhurNNpc_2wgaACRzhyEikb0G0YSY7QnxqBe1rnjw@mail.gmail.com>
-	 <CAG0bkv+_t8CqM9w5N1hKJtT=_mQmtWWCPe-9jSHuOkNZCL3B9A@mail.gmail.com>
-	 <1412676071.1926.1.camel@linux-0dmf.site>
-	 <CAG0bkvKYT5+ZBZwdvG71g98CqZR03er6rN4y5RRfq6UUL5KnCw@mail.gmail.com>
-	 <CAG0bkv+YK6_wP+cnZEmfRZnLXa=7N1CMyYqVAbao22gf74dhbw@mail.gmail.com>
-	 <1412759368.21709.15.camel@linux-0dmf.site>
-	 <CAG0bkvKugdQSDm+GKRbLGLzrURth5ty9KU-8d3ED-a9sgdDkMg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+	Dmitry Kasatkin <d.kasatkin@samsung.com>,
+	Bharat Panda <bharat.panda@samsung.com>, cpgs@samsung.com
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Wed, 2014-10-08 at 15:51 +0530, Naveen Kumar Parna wrote:
-> hcidump does not show anything when the stalls happen.
+Hi,
 
-There is nothing in all logs. Do you see the problem
-with single devices?
+On Tue, Oct 7, 2014 at 7:06 AM, Gowtham Anandha Babu
+<gowtham.ab@samsung.com> wrote:
+> This patch-set implements MAP 1.2 MAS Instance feature.
+>
+> The patch 1,2,3 will handle the Client part(MCE). It passes
+> the PTS 5.3 test case:TC_MCE_MMI_BV_01_I.
+>
+> The patch 4,5,6 will handle the Server part(MSE). It passes
+> the PTS 5.3 test case:TC_MSE_MMI_BV_02_I.
+>
+> Gowtham Anandha Babu (6):
+>   doc/obex-api: Add description about MASInstance request
+>   test/map-client: Add D-Bus API support to make MASInstance request
+>   obexd/client/map: Add API Calls for request and handlers for response
+>   obexd/mas: Add support for providing MASInstance Info as response
+>   obexd/messages: Add prototypes for MASInstance response
+>   obexd/message-dummy: Add MAS Instance description to response
+>
+>  doc/obex-api.txt               |  6 +++
+>  obexd/client/map.c             | 88 ++++++++++++++++++++++++++++++++++++++++++
+>  obexd/plugins/mas.c            | 62 +++++++++++++++++++++++++++++
+>  obexd/plugins/messages-dummy.c | 18 +++++++++
+>  obexd/plugins/messages.h       | 16 ++++++++
+>  test/map-client                |  9 +++++
+>  6 files changed, 199 insertions(+)
+>
+> --
+> 1.9.1
 
-	Regards
-		Oliver
+My plan is to actually do this as the name of the folder for each instance:
+
+<MAS 1 info>/telecom/...
+<MAS 2 info>/telecom/...
+
+If there is no info, due to version or lack of support, then we
+fallback to record description or something like that so we can
+support multiple instances.
 
 
+-- 
+Luiz Augusto von Dentz
