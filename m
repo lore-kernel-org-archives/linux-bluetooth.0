@@ -1,68 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: Ruslan Mstoi <ruslan.mstoi@linux.intel.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] android/pts: Updated PBAP PICS and PIXITs for PTS 5.3
-Date: Wed, 08 Oct 2014 15:20:21 +0200
-Message-ID: <201828290.fjkmFgbEsp@uw000953>
-In-Reply-To: <1412604792-28728-1-git-send-email-ruslan.mstoi@linux.intel.com>
-References: <1412604792-28728-1-git-send-email-ruslan.mstoi@linux.intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Sender: linux-bluetooth-owner@vger.kernel.org
+Message-ID: <1412774247.1629.4.camel@linux-0dmf.site>
+Subject: Re: btusb_intr_complete returns -EPIPE
+From: Oliver Neukum <oneukum@suse.de>
+To: Naveen Kumar Parna <pnaveenkos@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	linux-usb@vger.kernel.org, acho@suse.com
+Date: Wed, 08 Oct 2014 15:17:27 +0200
+In-Reply-To: <CAG0bkvLy9YNdD-0hYNygT0cVEHAZebobxwJKdsuUcXsLmq9BfQ@mail.gmail.com>
+References: <CAG0bkvK4-gfeYXXsdNg4BKdjxmo1e5d8rKuABohtYNNBHKJwDA@mail.gmail.com>
+	 <1412598268.1132.15.camel@linux-0dmf.site>
+	 <CAG0bkv+nKt-TgONDLENNUncz9NScdJGcYR+J2Z6b=wg2grvqhg@mail.gmail.com>
+	 <1412600108.28177.0.camel@linux-0dmf.site>
+	 <CAG0bkvK=fumhJNzuSgx=HFHiVP08V+QH2wLajdffx+f5ugoQPQ@mail.gmail.com>
+	 <1412602169.28177.2.camel@linux-0dmf.site>
+	 <CAG0bkv+d9SxToWpk49s=C-w_aA4zbP_RvV_8kcgV254rsvHR0A@mail.gmail.com>
+	 <1412607050.1743.1.camel@linux-0dmf.site>
+	 <CAG0bkvKJZMhurNNpc_2wgaACRzhyEikb0G0YSY7QnxqBe1rnjw@mail.gmail.com>
+	 <CAG0bkv+_t8CqM9w5N1hKJtT=_mQmtWWCPe-9jSHuOkNZCL3B9A@mail.gmail.com>
+	 <1412676071.1926.1.camel@linux-0dmf.site>
+	 <CAG0bkvKYT5+ZBZwdvG71g98CqZR03er6rN4y5RRfq6UUL5KnCw@mail.gmail.com>
+	 <CAG0bkv+YK6_wP+cnZEmfRZnLXa=7N1CMyYqVAbao22gf74dhbw@mail.gmail.com>
+	 <1412759368.21709.15.camel@linux-0dmf.site>
+	 <CAG0bkvKugdQSDm+GKRbLGLzrURth5ty9KU-8d3ED-a9sgdDkMg@mail.gmail.com>
+	 <1412765090.21709.18.camel@linux-0dmf.site>
+	 <CAG0bkvLy9YNdD-0hYNygT0cVEHAZebobxwJKdsuUcXsLmq9BfQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Sender: linux-usb-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Ruslan,
+On Wed, 2014-10-08 at 18:31 +0530, Naveen Kumar Parna wrote:
+> Later connected third device(hci2) and after 2mins observed –EPIPE for
+> hci2(hci2 urb ffff880124f11cc0 status -32 count 0)
 
-On Monday 06 of October 2014 17:13:12 Ruslan Mstoi wrote:
-> ---
->  android/pics-pbap.txt  | 2 +-
->  android/pixit-pbap.txt | 2 +-
->  android/pts-pbap.txt   | 4 ++--
->  3 files changed, 4 insertions(+), 4 deletions(-)
-> 
-> diff --git a/android/pics-pbap.txt b/android/pics-pbap.txt
-> index bcb71b6..cb4126c 100644
-> --- a/android/pics-pbap.txt
-> +++ b/android/pics-pbap.txt
-> @@ -1,6 +1,6 @@
->  PBAP PICS for the PTS tool.
->  
-> -PTS version: 5.2
-> +PTS version: 5.3
->  
->  * - different than PTS defaults
->  # - not yet implemented/supported
-> diff --git a/android/pixit-pbap.txt b/android/pixit-pbap.txt
-> index 7bc374b..f7a93c6 100644
-> --- a/android/pixit-pbap.txt
-> +++ b/android/pixit-pbap.txt
-> @@ -1,6 +1,6 @@
->  PBAP PIXIT for the PTS tool.
->  
-> -PTS version: 5.2
-> +PTS version: 5.3
->  
->  * - different than PTS defaults
->  & - should be set to IUT Bluetooth address
-> diff --git a/android/pts-pbap.txt b/android/pts-pbap.txt
-> index 6341f5c..67e366d 100644
-> --- a/android/pts-pbap.txt
-> +++ b/android/pts-pbap.txt
-> @@ -1,7 +1,7 @@
->  PTS test results for PBAP
->  
-> -PTS version: 5.2
-> -Tested: 04-August-2014
-> +PTS version: 5.3
-> +Tested: 06-October-2014
->  Android version: 4.4.4
->  
->  Results:
-> 
+This points to a problem in the USB HC driver.
+Can you enable debugging in that driver.
 
-Applied, thanks.
+	Regards
+		Oliver
 
--- 
-Best regards, 
-Szymon Janc
+
