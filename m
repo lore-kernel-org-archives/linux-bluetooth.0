@@ -1,160 +1,63 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <54353387.3070007@xsilon.com>
-Date: Wed, 08 Oct 2014 13:52:23 +0100
-From: Martin Townsend <martin.townsend@xsilon.com>
-MIME-Version: 1.0
-To: Jukka Rissanen <jukka.rissanen@linux.intel.com>
-CC: linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org,
- marcel@holtmann.org, alex.aring@gmail.com
-Subject: Re: [PATCH bluetooth-next] 6lowpan: Use pskb_expand_head in IPHC
- decompression.
-References: <1412696037-25111-1-git-send-email-martin.townsend@xsilon.com>		 <1412696037-25111-2-git-send-email-martin.townsend@xsilon.com>		 <543408B2.1070309@xsilon.com>	 <1412763863.2705.22.camel@jrissane-mobl.ger.corp.intel.com>	 <54351AF4.5060907@xsilon.com> <1412770375.2705.25.camel@jrissane-mobl.ger.corp.intel.com>
-In-Reply-To: <1412770375.2705.25.camel@jrissane-mobl.ger.corp.intel.com>
-Content-Type: text/plain; charset=utf-8
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ 8/8] unit/test-avrcp: Add /TP/MPS/BI-02-C test
+Date: Wed,  8 Oct 2014 15:31:49 +0300
+Message-Id: <1412771509-7996-8-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <1412771509-7996-1-git-send-email-luiz.dentz@gmail.com>
+References: <1412771509-7996-1-git-send-email-luiz.dentz@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jukka,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-I've misunderstood the constraints on pskb_expand_head.   I don't suppose you could quickly try this patch it now uses skb_share_check to ensure  skb->users == 1 and then I've put back in the skb_clone code that I took out which I think is causing the problem:
-
-Many Thanks,
-Martin.
-
-Currently there are potentially 2 skb_copy_expand calls in IPHC
-decompression.  This patch replaces this with one call to
-pskb_expand_head.  It also checks to see if there is enough headroom
-first to ensure it's only done if necessary.
-As pskb_expand_head must only have one reference the calling code
-now ensures this.
+Verify the SetBrowsedPlayer response issued by the TG when an invalid
+player is requested.
 ---
- net/6lowpan/iphc.c            | 51 +++++++++++++++++++++----------------------
- net/bluetooth/6lowpan.c       |  7 ++++++
- net/ieee802154/6lowpan_rtnl.c |  5 +++++
- 3 files changed, 37 insertions(+), 26 deletions(-)
+ unit/test-avrcp.c | 19 ++++++++++++++++---
+ 1 file changed, 16 insertions(+), 3 deletions(-)
 
-diff --git a/net/6lowpan/iphc.c b/net/6lowpan/iphc.c
-index 142eef5..853b4b8 100644
---- a/net/6lowpan/iphc.c
-+++ b/net/6lowpan/iphc.c
-@@ -174,30 +174,22 @@ static int uncompress_context_based_src_addr(struct sk_buff *skb,
- static int skb_deliver(struct sk_buff *skb, struct ipv6hdr *hdr,
- 		       struct net_device *dev, skb_delivery_cb deliver_skb)
+diff --git a/unit/test-avrcp.c b/unit/test-avrcp.c
+index 18a8785..128ab00 100644
+--- a/unit/test-avrcp.c
++++ b/unit/test-avrcp.c
+@@ -607,13 +607,19 @@ static int set_addressed(struct avrcp *session, uint8_t transaction,
+ static int set_browsed(struct avrcp *session, uint8_t transaction,
+ 						uint16_t id, void *user_data)
  {
--	struct sk_buff *new;
- 	int stat;
++	struct context *context = user_data;
+ 	const char *folders[1] = { "Filesystem" };
  
--	new = skb_copy_expand(skb, sizeof(struct ipv6hdr), skb_tailroom(skb),
--			      GFP_ATOMIC);
--	kfree_skb(skb);
--
--	if (!new)
--		return -ENOMEM;
--
--	skb_push(new, sizeof(struct ipv6hdr));
--	skb_reset_network_header(new);
--	skb_copy_to_linear_data(new, hdr, sizeof(struct ipv6hdr));
-+	skb_push(skb, sizeof(struct ipv6hdr));
-+	skb_reset_network_header(skb);
-+	skb_copy_to_linear_data(skb, hdr, sizeof(struct ipv6hdr));
+ 	DBG("");
  
--	new->protocol = htons(ETH_P_IPV6);
--	new->pkt_type = PACKET_HOST;
--	new->dev = dev;
-+	skb->protocol = htons(ETH_P_IPV6);
-+	skb->pkt_type = PACKET_HOST;
-+	skb->dev = dev;
+-	avrcp_set_browsed_player_rsp(session, transaction,
+-					AVRCP_STATUS_SUCCESS, 0xabcd, 0, 1,
+-					folders);
++	if (g_str_equal(context->data->test_name, "/TP/MPS/BI-02-C"))
++		avrcp_set_browsed_player_rsp(session, transaction,
++						AVRCP_STATUS_INVALID_PLAYER_ID,
++						0, 0, 0, NULL);
++	else
++		avrcp_set_browsed_player_rsp(session, transaction,
++						AVRCP_STATUS_SUCCESS,
++						0xabcd, 0, 1, folders);
  
- 	raw_dump_table(__func__, "raw skb data dump before receiving",
--		       new->data, new->len);
-+		       skb->data, skb->len);
- 
--	stat = deliver_skb(new, dev);
-+	stat = deliver_skb(skb, dev);
- 
--	kfree_skb(new);
-+	consume_skb(skb);
- 
- 	return stat;
+ 	return -EAGAIN;
  }
-@@ -460,7 +452,7 @@ int lowpan_process_data(struct sk_buff *skb, struct net_device *dev,
- 	/* UDP data uncompression */
- 	if (iphc0 & LOWPAN_IPHC_NH_C) {
- 		struct udphdr uh;
--		struct sk_buff *new;
-+		const int needed = sizeof(struct udphdr) + sizeof(hdr);
+@@ -991,6 +997,13 @@ int main(int argc, char *argv[])
+ 				AVRCP_SET_ADDRESSED_PLAYER,
+ 				0x00, 0x00, 0x01, 0x11));
  
- 		if (uncompress_udp_header(skb, &uh))
- 			goto drop;
-@@ -468,14 +460,13 @@ int lowpan_process_data(struct sk_buff *skb, struct net_device *dev,
- 		/* replace the compressed UDP head by the uncompressed UDP
- 		 * header
- 		 */
--		new = skb_copy_expand(skb, sizeof(struct udphdr),
--				      skb_tailroom(skb), GFP_ATOMIC);
--		kfree_skb(skb);
--
--		if (!new)
--			return -ENOMEM;
--
--		skb = new;
-+		if (skb_headroom(skb) < needed) {
-+			err = pskb_expand_head(skb, needed, 0, GFP_ATOMIC);
-+			if (unlikely(err)) {
-+				kfree_skb(skb);
-+				return err;
-+			}
-+		}
- 
- 		skb_push(skb, sizeof(struct udphdr));
- 		skb_reset_transport_header(skb);
-@@ -485,6 +476,14 @@ int lowpan_process_data(struct sk_buff *skb, struct net_device *dev,
- 			       (u8 *)&uh, sizeof(uh));
- 
- 		hdr.nexthdr = UIP_PROTO_UDP;
-+	} else {
-+		if (skb_headroom(skb) < sizeof(hdr)) {
-+			err = pskb_expand_head(skb, sizeof(hdr), 0, GFP_ATOMIC);
-+			if (unlikely(err)) {
-+				kfree_skb(skb);
-+				return err;
-+			}
-+		}
- 	}
- 
- 	hdr.payload_len = htons(skb->len);
-diff --git a/net/bluetooth/6lowpan.c b/net/bluetooth/6lowpan.c
-index c2e0d14..6643a7c 100644
---- a/net/bluetooth/6lowpan.c
-+++ b/net/bluetooth/6lowpan.c
-@@ -343,6 +343,13 @@ static int recv_pkt(struct sk_buff *skb, struct net_device *dev,
- 		kfree_skb(local_skb);
- 		kfree_skb(skb);
- 	} else {
-+		/* Decompression may use pskb_expand_head so no shared skb's */
-+		skb = skb_share_check(skb, GFP_ATOMIC);
-+		if (!skb) {
-+			dev->stats.rx_dropped++;
-+			return NET_RX_DROP;
-+		}
++	/* SetBrowsedPlayer - TG */
++	define_test("/TP/MPS/BI-02-C", test_server,
++			brs_pdu(0x00, 0x11, 0x0e, 0x70, 0x00, 0x02,
++				0xab, 0xcd),
++			brs_pdu(0x02, 0x11, 0x0e, 0x70, 0x00, 0x01,
++				0x11));
 +
- 		switch (skb->data[0] & 0xe0) {
- 		case LOWPAN_DISPATCH_IPHC:	/* ipv6 datagram */
- 			local_skb = skb_clone(skb, GFP_ATOMIC);
-diff --git a/net/ieee802154/6lowpan_rtnl.c b/net/ieee802154/6lowpan_rtnl.c
-index c7e07b8..702ad04 100644
---- a/net/ieee802154/6lowpan_rtnl.c
-+++ b/net/ieee802154/6lowpan_rtnl.c
-@@ -537,6 +537,11 @@ static int lowpan_rcv(struct sk_buff *skb, struct net_device *dev,
- 		if (ret == NET_RX_DROP)
- 			goto drop;
- 	} else {
-+		/* Decompression may use pskb_expand_head so no shared skb's */
-+		skb = skb_share_check(skb, GFP_ATOMIC);
-+		if (!skb)
-+			goto drop;
-+
- 		switch (skb->data[0] & 0xe0) {
- 		case LOWPAN_DISPATCH_IPHC:	/* ipv6 datagram */
- 			ret = process_data(skb, &hdr);
+ 	/*
+ 	 * Media Content Navigation Commands and Notifications for Content
+ 	 * Browsing.
 -- 
-1.9.1
+1.9.3
+
