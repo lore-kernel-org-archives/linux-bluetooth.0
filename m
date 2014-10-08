@@ -2,144 +2,341 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH 05/13] android/handsfree: Pass device pointer when registering AT commands
-Date: Wed,  8 Oct 2014 09:12:15 +0200
-Message-Id: <1412752343-7001-5-git-send-email-szymon.janc@tieto.com>
+Subject: [PATCH 02/13] android/handsfree: Make init, cleanup and state functions static less
+Date: Wed,  8 Oct 2014 09:12:12 +0200
+Message-Id: <1412752343-7001-2-git-send-email-szymon.janc@tieto.com>
 In-Reply-To: <1412752343-7001-1-git-send-email-szymon.janc@tieto.com>
 References: <1412752343-7001-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- android/handsfree.c | 74 ++++++++++++++++++++++++++---------------------------
- 1 file changed, 37 insertions(+), 37 deletions(-)
+ android/handsfree.c | 122 ++++++++++++++++++++++++++--------------------------
+ 1 file changed, 60 insertions(+), 62 deletions(-)
 
 diff --git a/android/handsfree.c b/android/handsfree.c
-index e66fa84..f5b5169 100644
+index df3cb42..7fa8cfd 100644
 --- a/android/handsfree.c
 +++ b/android/handsfree.c
-@@ -1064,36 +1064,36 @@ static void at_cmd_ckpd(struct hfp_gw_result *result, enum hfp_gw_cmd_type type,
- 	hfp_gw_send_result(dev->gw, HFP_RESULT_ERROR);
+@@ -171,102 +171,102 @@ static GIOChannel *hsp_server = NULL;
+ 
+ static GIOChannel *sco_server = NULL;
+ 
+-static void device_set_state(uint8_t state)
++static void set_state(struct hf_device *dev, uint8_t state)
+ {
+ 	struct hal_ev_handsfree_conn_state ev;
+ 	char address[18];
+ 
+-	if (device.state == state)
++	if (dev->state == state)
+ 		return;
+ 
+-	device.state = state;
++	dev->state = state;
+ 
+-	ba2str(&device.bdaddr, address);
++	ba2str(&dev->bdaddr, address);
+ 	DBG("device %s state %u", address, state);
+ 
+-	bdaddr2android(&device.bdaddr, ev.bdaddr);
++	bdaddr2android(&dev->bdaddr, ev.bdaddr);
+ 	ev.state = state;
+ 
+ 	ipc_send_notif(hal_ipc, HAL_SERVICE_ID_HANDSFREE,
+ 				HAL_EV_HANDSFREE_CONN_STATE, sizeof(ev), &ev);
  }
  
--static void register_post_slc_at(void)
-+static void register_post_slc_at(struct hf_device *dev)
+-static void device_set_audio_state(uint8_t state)
++static void set_audio_state(struct hf_device *dev, uint8_t state)
  {
--	if (device.hsp) {
--		hfp_gw_register(device.gw, at_cmd_ckpd, "+CKPD", &device, NULL);
--		hfp_gw_register(device.gw, at_cmd_vgs, "+VGS", &device, NULL);
--		hfp_gw_register(device.gw, at_cmd_vgm, "+VGM", &device, NULL);
-+	if (dev->hsp) {
-+		hfp_gw_register(dev->gw, at_cmd_ckpd, "+CKPD", dev, NULL);
-+		hfp_gw_register(dev->gw, at_cmd_vgs, "+VGS", dev, NULL);
-+		hfp_gw_register(dev->gw, at_cmd_vgm, "+VGM", dev, NULL);
+ 	struct hal_ev_handsfree_audio_state ev;
+ 	char address[18];
+ 
+-	if (device.audio_state == state)
++	if (dev->audio_state == state)
  		return;
+ 
+-	device.audio_state = state;
++	dev->audio_state = state;
+ 
+-	ba2str(&device.bdaddr, address);
++	ba2str(&dev->bdaddr, address);
+ 	DBG("device %s audio state %u", address, state);
+ 
+-	bdaddr2android(&device.bdaddr, ev.bdaddr);
++	bdaddr2android(&dev->bdaddr, ev.bdaddr);
+ 	ev.state = state;
+ 
+ 	ipc_send_notif(hal_ipc, HAL_SERVICE_ID_HANDSFREE,
+ 				HAL_EV_HANDSFREE_AUDIO_STATE, sizeof(ev), &ev);
+ }
+ 
+-static void init_codecs(void)
++static void init_codecs(struct hf_device *dev)
+ {
+-	memcpy(device.codecs, codecs_defaults, sizeof(device.codecs));
++	memcpy(dev->codecs, codecs_defaults, sizeof(dev->codecs));
+ 
+ 	if (hfp_ag_features & HFP_AG_FEAT_CODEC)
+-		device.codecs[MSBC_OFFSET].local_supported = true;
++		dev->codecs[MSBC_OFFSET].local_supported = true;
+ }
+ 
+-static void device_init(const bdaddr_t *bdaddr)
++static void device_init(struct hf_device *dev, const bdaddr_t *bdaddr)
+ {
+-	bacpy(&device.bdaddr, bdaddr);
++	bacpy(&dev->bdaddr, bdaddr);
+ 
+-	device.setup_state = HAL_HANDSFREE_CALL_STATE_IDLE;
++	dev->setup_state = HAL_HANDSFREE_CALL_STATE_IDLE;
+ 
+-	memcpy(device.inds, inds_defaults, sizeof(device.inds));
++	memcpy(dev->inds, inds_defaults, sizeof(dev->inds));
+ 
+-	init_codecs();
++	init_codecs(dev);
+ 
+-	device_set_state(HAL_EV_HANDSFREE_CONN_STATE_CONNECTING);
++	set_state(dev, HAL_EV_HANDSFREE_CONN_STATE_CONNECTING);
+ }
+ 
+-static void device_cleanup(void)
++static void device_cleanup(struct hf_device *dev)
+ {
+-	if (device.gw) {
+-		hfp_gw_unref(device.gw);
+-		device.gw = NULL;
++	if (dev->gw) {
++		hfp_gw_unref(dev->gw);
++		dev->gw = NULL;
  	}
  
--	hfp_gw_register(device.gw, at_cmd_a, "A", &device, NULL);
--	hfp_gw_register(device.gw, at_cmd_d, "D", &device, NULL);
--	hfp_gw_register(device.gw, at_cmd_ccwa, "+CCWA", &device, NULL);
--	hfp_gw_register(device.gw, at_cmd_chup, "+CHUP", &device, NULL);
--	hfp_gw_register(device.gw, at_cmd_clcc, "+CLCC", &device, NULL);
--	hfp_gw_register(device.gw, at_cmd_cops, "+COPS", &device, NULL);
--	hfp_gw_register(device.gw, at_cmd_cmee, "+CMEE", &device, NULL);
--	hfp_gw_register(device.gw, at_cmd_clip, "+CLIP", &device, NULL);
--	hfp_gw_register(device.gw, at_cmd_vts, "+VTS", &device, NULL);
--	hfp_gw_register(device.gw, at_cmd_cnum, "+CNUM", &device, NULL);
--	hfp_gw_register(device.gw, at_cmd_bia, "+BIA", &device, NULL);
--	hfp_gw_register(device.gw, at_cmd_binp, "+BINP", &device, NULL);
--	hfp_gw_register(device.gw, at_cmd_bldn, "+BLDN", &device, NULL);
--	hfp_gw_register(device.gw, at_cmd_bvra, "+BVRA", &device, NULL);
--	hfp_gw_register(device.gw, at_cmd_nrec, "+NREC", &device, NULL);
--	hfp_gw_register(device.gw, at_cmd_vgs, "+VGS", &device, NULL);
--	hfp_gw_register(device.gw, at_cmd_vgm, "+VGM", &device, NULL);
--	hfp_gw_register(device.gw, at_cmd_bsir, "+BSIR", &device, NULL);
--	hfp_gw_register(device.gw, at_cmd_btrh, "+BTRH", &device, NULL);
--	hfp_gw_register(device.gw, at_cmd_bcc, "+BCC", &device, NULL);
--	hfp_gw_register(device.gw, at_cmd_bcs, "+BCS", &device, NULL);
-+	hfp_gw_register(dev->gw, at_cmd_a, "A", dev, NULL);
-+	hfp_gw_register(dev->gw, at_cmd_d, "D", dev, NULL);
-+	hfp_gw_register(dev->gw, at_cmd_ccwa, "+CCWA", dev, NULL);
-+	hfp_gw_register(dev->gw, at_cmd_chup, "+CHUP", dev, NULL);
-+	hfp_gw_register(dev->gw, at_cmd_clcc, "+CLCC", dev, NULL);
-+	hfp_gw_register(dev->gw, at_cmd_cops, "+COPS", dev, NULL);
-+	hfp_gw_register(dev->gw, at_cmd_cmee, "+CMEE", dev, NULL);
-+	hfp_gw_register(dev->gw, at_cmd_clip, "+CLIP", dev, NULL);
-+	hfp_gw_register(dev->gw, at_cmd_vts, "+VTS", dev, NULL);
-+	hfp_gw_register(dev->gw, at_cmd_cnum, "+CNUM", dev, NULL);
-+	hfp_gw_register(dev->gw, at_cmd_bia, "+BIA", dev, NULL);
-+	hfp_gw_register(dev->gw, at_cmd_binp, "+BINP", dev, NULL);
-+	hfp_gw_register(dev->gw, at_cmd_bldn, "+BLDN", dev, NULL);
-+	hfp_gw_register(dev->gw, at_cmd_bvra, "+BVRA", dev, NULL);
-+	hfp_gw_register(dev->gw, at_cmd_nrec, "+NREC", dev, NULL);
-+	hfp_gw_register(dev->gw, at_cmd_vgs, "+VGS", dev, NULL);
-+	hfp_gw_register(dev->gw, at_cmd_vgm, "+VGM", dev, NULL);
-+	hfp_gw_register(dev->gw, at_cmd_bsir, "+BSIR", dev, NULL);
-+	hfp_gw_register(dev->gw, at_cmd_btrh, "+BTRH", dev, NULL);
-+	hfp_gw_register(dev->gw, at_cmd_bcc, "+BCC", dev, NULL);
-+	hfp_gw_register(dev->gw, at_cmd_bcs, "+BCS", dev, NULL);
+-	device_set_state(HAL_EV_HANDSFREE_CONN_STATE_DISCONNECTED);
++	set_state(dev, HAL_EV_HANDSFREE_CONN_STATE_DISCONNECTED);
+ 
+-	if (device.sco_watch) {
+-		g_source_remove(device.sco_watch);
+-		device.sco_watch = 0;
++	if (dev->sco_watch) {
++		g_source_remove(dev->sco_watch);
++		dev->sco_watch = 0;
+ 	}
+ 
+-	if (device.sco) {
+-		g_io_channel_shutdown(device.sco, TRUE, NULL);
+-		g_io_channel_unref(device.sco);
+-		device.sco = NULL;
++	if (dev->sco) {
++		g_io_channel_shutdown(dev->sco, TRUE, NULL);
++		g_io_channel_unref(dev->sco);
++		dev->sco = NULL;
+ 	}
+ 
+-	if (device.ring) {
+-		g_source_remove(device.ring);
+-		device.ring = 0;
++	if (dev->ring) {
++		g_source_remove(dev->ring);
++		dev->ring = 0;
+ 	}
+ 
+-	device_set_audio_state(HAL_EV_HANDSFREE_AUDIO_STATE_DISCONNECTED);
++	set_audio_state(dev, HAL_EV_HANDSFREE_AUDIO_STATE_DISCONNECTED);
+ 
+-	memset(&device, 0, sizeof(device));
++	memset(dev, 0, sizeof(*dev));
  }
  
- static void at_cmd_cmer(struct hfp_gw_result *result, enum hfp_gw_cmd_type type,
-@@ -1130,7 +1130,7 @@ static void at_cmd_cmer(struct hfp_gw_result *result, enum hfp_gw_cmd_type type,
- 		if (dev->features & HFP_HF_FEAT_3WAY)
+ static void disconnect_watch(void *user_data)
+ {
+ 	DBG("");
+ 
+-	device_cleanup();
++	device_cleanup(&device);
+ }
+ 
+ static void at_cmd_unknown(const char *command, void *user_data)
+@@ -833,7 +833,7 @@ static gboolean sco_watch_cb(GIOChannel *chan, GIOCondition cond,
+ 
+ 	device.sco_watch = 0;
+ 
+-	device_set_audio_state(HAL_EV_HANDSFREE_AUDIO_STATE_DISCONNECTED);
++	set_audio_state(&device, HAL_EV_HANDSFREE_AUDIO_STATE_DISCONNECTED);
+ 
+ 	return FALSE;
+ }
+@@ -868,12 +868,10 @@ done:
+ static void connect_sco_cb(GIOChannel *chan, GError *err, gpointer user_data)
+ {
+ 	if (err) {
+-		uint8_t status;
+-
+ 		error("handsfree: audio connect failed (%s)", err->message);
+ 
+-		status = HAL_EV_HANDSFREE_AUDIO_STATE_DISCONNECTED;
+-		device_set_audio_state(status);
++		set_audio_state(&device,
++				HAL_EV_HANDSFREE_AUDIO_STATE_DISCONNECTED);
+ 
+ 		if (!(device.features & HFP_HF_FEAT_CODEC))
+ 			return;
+@@ -893,7 +891,7 @@ static void connect_sco_cb(GIOChannel *chan, GError *err, gpointer user_data)
+ 	device.sco_watch = g_io_add_watch(chan, G_IO_ERR | G_IO_HUP | G_IO_NVAL,
+ 							sco_watch_cb, NULL);
+ 
+-	device_set_audio_state(HAL_EV_HANDSFREE_AUDIO_STATE_CONNECTED);
++	set_audio_state(&device, HAL_EV_HANDSFREE_AUDIO_STATE_CONNECTED);
+ }
+ 
+ static bool connect_sco(void)
+@@ -926,7 +924,7 @@ static bool connect_sco(void)
+ 
+ 	g_io_channel_unref(io);
+ 
+-	device_set_audio_state(HAL_EV_HANDSFREE_AUDIO_STATE_CONNECTING);
++	set_audio_state(&device, HAL_EV_HANDSFREE_AUDIO_STATE_CONNECTING);
+ 
+ 	return true;
+ }
+@@ -1101,7 +1099,7 @@ static void at_cmd_cmer(struct hfp_gw_result *result, enum hfp_gw_cmd_type type,
  			return;
  
--		register_post_slc_at();
-+		register_post_slc_at(dev);
- 		set_state(dev, HAL_EV_HANDSFREE_CONN_STATE_SLC_CONNECTED);
+ 		register_post_slc_at();
+-		device_set_state(HAL_EV_HANDSFREE_CONN_STATE_SLC_CONNECTED);
++		set_state(&device, HAL_EV_HANDSFREE_CONN_STATE_SLC_CONNECTED);
  		return;
  	case HFP_GW_CMD_TYPE_TEST:
-@@ -1257,7 +1257,7 @@ static void at_cmd_chld(struct hfp_gw_result *result, enum hfp_gw_cmd_type type,
- 		hfp_gw_send_info(dev->gw, "+CHLD: (%s)", HFP_AG_CHLD);
- 		hfp_gw_send_result(dev->gw, HFP_RESULT_OK);
+ 	case HFP_GW_CMD_TYPE_READ:
+@@ -1225,7 +1223,7 @@ static void at_cmd_chld(struct hfp_gw_result *result, enum hfp_gw_cmd_type type,
+ 		hfp_gw_send_result(device.gw, HFP_RESULT_OK);
  
--		register_post_slc_at();
-+		register_post_slc_at(dev);
- 		set_state(dev, HAL_EV_HANDSFREE_CONN_STATE_SLC_CONNECTED);
+ 		register_post_slc_at();
+-		device_set_state(HAL_EV_HANDSFREE_CONN_STATE_SLC_CONNECTED);
++		set_state(&device, HAL_EV_HANDSFREE_CONN_STATE_SLC_CONNECTED);
  		return;
  	case HFP_GW_CMD_TYPE_READ:
-@@ -1341,13 +1341,13 @@ failed:
- 	hfp_gw_send_result(dev->gw, HFP_RESULT_ERROR);
- }
+ 	case HFP_GW_CMD_TYPE_COMMAND:
+@@ -1259,7 +1257,7 @@ static void at_cmd_bac(struct hfp_gw_result *result, enum hfp_gw_cmd_type type,
+ 			goto failed;
  
--static void register_slc_at(void)
-+static void register_slc_at(struct hf_device *dev)
- {
--	hfp_gw_register(device.gw, at_cmd_brsf, "+BRSF", &device, NULL);
--	hfp_gw_register(device.gw, at_cmd_cind, "+CIND", &device, NULL);
--	hfp_gw_register(device.gw, at_cmd_cmer, "+CMER", &device, NULL);
--	hfp_gw_register(device.gw, at_cmd_chld, "+CHLD", &device, NULL);
--	hfp_gw_register(device.gw, at_cmd_bac, "+BAC", &device, NULL);
-+	hfp_gw_register(dev->gw, at_cmd_brsf, "+BRSF", dev, NULL);
-+	hfp_gw_register(dev->gw, at_cmd_cind, "+CIND", dev, NULL);
-+	hfp_gw_register(dev->gw, at_cmd_cmer, "+CMER", dev, NULL);
-+	hfp_gw_register(dev->gw, at_cmd_chld, "+CHLD", dev, NULL);
-+	hfp_gw_register(dev->gw, at_cmd_bac, "+BAC", dev, NULL);
- }
+ 		/* set codecs to defaults */
+-		init_codecs();
++		init_codecs(&device);
+ 		device.negotiated_codec = 0;
  
- static void connect_cb(GIOChannel *chan, GError *err, gpointer user_data)
-@@ -1368,17 +1368,17 @@ static void connect_cb(GIOChannel *chan, GError *err, gpointer user_data)
- 	g_io_channel_set_close_on_unref(chan, FALSE);
+ 		/*
+@@ -1337,18 +1335,18 @@ static void connect_cb(GIOChannel *chan, GError *err, gpointer user_data)
  
- 	hfp_gw_set_close_on_unref(dev->gw, true);
--	hfp_gw_set_command_handler(dev->gw, at_cmd_unknown, NULL, NULL);
-+	hfp_gw_set_command_handler(dev->gw, at_cmd_unknown, dev, NULL);
- 	hfp_gw_set_disconnect_handler(dev->gw, disconnect_watch, NULL, NULL);
- 
- 	if (dev->hsp) {
--		register_post_slc_at();
-+		register_post_slc_at(dev);
- 		set_state(dev, HAL_EV_HANDSFREE_CONN_STATE_CONNECTED);
- 		set_state(dev, HAL_EV_HANDSFREE_CONN_STATE_SLC_CONNECTED);
+ 	if (device.hsp) {
+ 		register_post_slc_at();
+-		device_set_state(HAL_EV_HANDSFREE_CONN_STATE_CONNECTED);
+-		device_set_state(HAL_EV_HANDSFREE_CONN_STATE_SLC_CONNECTED);
++		set_state(&device, HAL_EV_HANDSFREE_CONN_STATE_CONNECTED);
++		set_state(&device, HAL_EV_HANDSFREE_CONN_STATE_SLC_CONNECTED);
  		return;
  	}
  
--	register_slc_at();
-+	register_slc_at(dev);
- 	set_state(dev, HAL_EV_HANDSFREE_CONN_STATE_CONNECTED);
+ 	register_slc_at();
+-	device_set_state(HAL_EV_HANDSFREE_CONN_STATE_CONNECTED);
++	set_state(&device, HAL_EV_HANDSFREE_CONN_STATE_CONNECTED);
  	return;
  
+ failed:
+ 	g_io_channel_shutdown(chan, TRUE, NULL);
+-	device_cleanup();
++	device_cleanup(&device);
+ }
+ 
+ static void confirm_cb(GIOChannel *chan, gpointer data)
+@@ -1374,11 +1372,11 @@ static void confirm_cb(GIOChannel *chan, gpointer data)
+ 		goto drop;
+ 	}
+ 
+-	device_init(&bdaddr);
++	device_init(&device, &bdaddr);
+ 
+ 	if (!bt_io_accept(chan, connect_cb, NULL, NULL, NULL)) {
+ 		error("handsfree: failed to accept connection");
+-		device_cleanup();
++		device_cleanup(&device);
+ 		goto drop;
+ 	}
+ 
+@@ -1460,7 +1458,7 @@ static void sdp_hsp_search_cb(sdp_list_t *recs, int err, gpointer data)
+ 	return;
+ 
+ fail:
+-	device_cleanup();
++	device_cleanup(&device);
+ }
+ 
+ static int sdp_search_hsp(void)
+@@ -1547,7 +1545,7 @@ static void sdp_hfp_search_cb(sdp_list_t *recs, int err, gpointer data)
+ 	return;
+ 
+ fail:
+-	device_cleanup();
++	device_cleanup(&device);
+ }
+ 
+ static int sdp_search_hfp(void)
+@@ -1580,13 +1578,13 @@ static void handle_connect(const void *buf, uint16_t len)
+ 	ba2str(&bdaddr, addr);
+ 	DBG("connecting to %s", addr);
+ 
+-	device_init(&bdaddr);
++	device_init(&device, &bdaddr);
+ 
+ 	/* prefer HFP over HSP */
+ 	ret = hfp_server ? sdp_search_hfp() : sdp_search_hsp();
+ 	if (ret < 0) {
+ 		error("handsfree: SDP search failed");
+-		device_cleanup();
++		device_cleanup(&device);
+ 		status = HAL_STATUS_FAILED;
+ 		goto failed;
+ 	}
+@@ -1621,9 +1619,9 @@ static void handle_disconnect(const void *buf, uint16_t len)
+ 	}
+ 
+ 	if (device.state == HAL_EV_HANDSFREE_CONN_STATE_CONNECTING) {
+-		device_cleanup();
++		device_cleanup(&device);
+ 	} else {
+-		device_set_state(HAL_EV_HANDSFREE_CONN_STATE_DISCONNECTING);
++		set_state(&device, HAL_EV_HANDSFREE_CONN_STATE_DISCONNECTING);
+ 		hfp_gw_disconnect(device.gw);
+ 	}
+ 
+@@ -1639,7 +1637,7 @@ static bool disconnect_sco(void)
+ 	if (!device.sco)
+ 		return false;
+ 
+-	device_set_audio_state(HAL_EV_HANDSFREE_AUDIO_STATE_DISCONNECTING);
++	set_audio_state(&device, HAL_EV_HANDSFREE_AUDIO_STATE_DISCONNECTING);
+ 
+ 	if (device.sco_watch) {
+ 		g_source_remove(device.sco_watch);
+@@ -1650,7 +1648,7 @@ static bool disconnect_sco(void)
+ 	g_io_channel_unref(device.sco);
+ 	device.sco = NULL;
+ 
+-	device_set_audio_state(HAL_EV_HANDSFREE_AUDIO_STATE_DISCONNECTED);
++	set_audio_state(&device, HAL_EV_HANDSFREE_AUDIO_STATE_DISCONNECTED);
+ 	return true;
+ }
+ 
+@@ -2340,7 +2338,7 @@ static void confirm_sco_cb(GIOChannel *chan, gpointer user_data)
+ 		goto drop;
+ 	}
+ 
+-	device_set_audio_state(HAL_EV_HANDSFREE_AUDIO_STATE_CONNECTING);
++	set_audio_state(&device, HAL_EV_HANDSFREE_AUDIO_STATE_CONNECTING);
+ 	return;
+ 
+ drop:
 -- 
 1.9.1
 
