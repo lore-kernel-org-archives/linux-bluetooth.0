@@ -1,128 +1,119 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 8 Oct 2014 11:06:14 +0300
-From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
-To: Szymon Janc <szymon.janc@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 08/13] android/handsfree: Move clip into device structure
-Message-ID: <20141008080611.GA429@aemeltch-MOBL1>
-References: <1412752343-7001-1-git-send-email-szymon.janc@tieto.com>
- <1412752343-7001-8-git-send-email-szymon.janc@tieto.com>
+Date: Wed, 8 Oct 2014 09:55:00 +0200
+From: Alexander Aring <alex.aring@gmail.com>
+To: Martin Townsend <mtownsend1973@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org,
+	marcel@holtmann.org, jukka.rissanen@linux.intel.com,
+	Martin Townsend <martin.townsend@xsilon.com>
+Subject: Re: [PATCH v3 bluetooth-next] 6lowpan: Use pskb_expand_head in IPHC
+ decompression.
+Message-ID: <20141008075458.GA32554@omega>
+References: <1412753745-6469-1-git-send-email-martin.townsend@xsilon.com>
+ <1412753745-6469-2-git-send-email-martin.townsend@xsilon.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1412752343-7001-8-git-send-email-szymon.janc@tieto.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=utf-8
+In-Reply-To: <1412753745-6469-2-git-send-email-martin.townsend@xsilon.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Szymon,
+Hi Martin,
 
-On Wed, Oct 08, 2014 at 09:12:18AM +0200, Szymon Janc wrote:
+On Wed, Oct 08, 2014 at 08:35:45AM +0100, Martin Townsend wrote:
+> Currently there are potentially 2 skb_copy_expand calls in IPHC
+> decompression.  This patch replaces this with one call to
+> pskb_expand_head.  It also checks to see if there is enough headroom
+> first to ensure it's only done if necessary.
+> As pskb_expand_head must only have one reference the calling code
+> now ensures this.
+> 
+> Signed-off-by: Martin Townsend <martin.townsend@xsilon.com>
 > ---
->  android/handsfree.c | 36 ++++++++++++++++++++++++------------
->  1 file changed, 24 insertions(+), 12 deletions(-)
-
-This one would benefit from small commit msg.
-
+>  net/6lowpan/iphc.c            | 51 +++++++++++++++++++++----------------------
+>  net/bluetooth/6lowpan.c       | 12 ++++++----
+>  net/ieee802154/6lowpan_rtnl.c |  5 +++++
+>  3 files changed, 38 insertions(+), 30 deletions(-)
 > 
-> diff --git a/android/handsfree.c b/android/handsfree.c
-> index d83f0a2..e7b8a6e 100644
-> --- a/android/handsfree.c
-> +++ b/android/handsfree.c
-> @@ -131,6 +131,7 @@ struct hf_device {
->  	struct hfp_codec codecs[CODECS_COUNT];
->  
->  	guint ring;
-> +	char *clip;
->  	bool hsp;
->  
->  	struct hfp_gw *gw;
-> @@ -255,6 +256,11 @@ static void device_cleanup(struct hf_device *dev)
->  	if (dev->ring) {
->  		g_source_remove(dev->ring);
->  		dev->ring = 0;
-> +
-> +		if (dev->clip) {
-> +			g_free(dev->clip);
-> +			dev->clip = NULL;
-
-Is this needed? apparently there is memset(dev,0,) after that.
-
-Best regards 
-Andrei Emeltchenko 
-
-> +		}
->  	}
->  
->  	set_audio_state(dev, HAL_EV_HANDSFREE_AUDIO_STATE_DISCONNECTED);
-> @@ -2018,12 +2024,12 @@ done:
->  
->  static gboolean ring_cb(gpointer user_data)
+> diff --git a/net/6lowpan/iphc.c b/net/6lowpan/iphc.c
+> index 142eef5..853b4b8 100644
+> --- a/net/6lowpan/iphc.c
+> +++ b/net/6lowpan/iphc.c
+> @@ -174,30 +174,22 @@ static int uncompress_context_based_src_addr(struct sk_buff *skb,
+>  static int skb_deliver(struct sk_buff *skb, struct ipv6hdr *hdr,
+>  		       struct net_device *dev, skb_delivery_cb deliver_skb)
 >  {
-> -	char *clip = user_data;
-> +	struct hf_device *dev = user_data;
+> -	struct sk_buff *new;
+>  	int stat;
 >  
-> -	hfp_gw_send_info(device.gw, "RING");
-> +	hfp_gw_send_info(dev->gw, "RING");
->  
-> -	if (device.clip_enabled && clip)
-> -		hfp_gw_send_info(device.gw, "%s", clip);
-> +	if (dev->clip_enabled && dev->clip)
-> +		hfp_gw_send_info(dev->gw, "%s", dev->clip);
->  
->  	return TRUE;
->  }
-> @@ -2065,7 +2071,7 @@ static void phone_state_waiting(int num_active, int num_held, uint8_t type,
->  static void phone_state_incoming(int num_active, int num_held, uint8_t type,
->  					const uint8_t *number, int number_len)
->  {
-> -	char *clip, *num;
-> +	char *num;
->  
->  	if (device.setup_state == HAL_HANDSFREE_CALL_STATE_INCOMING) {
->  		if (device.num_active != num_active ||
-> @@ -2096,19 +2102,20 @@ static void phone_state_incoming(int num_active, int num_held, uint8_t type,
->  	num = number_len ? (char *) number : "";
->  
->  	if (type == HAL_HANDSFREE_CALL_ADDRTYPE_INTERNATIONAL && num[0] != '+')
-> -		clip = g_strdup_printf("+CLIP: \"+%s\",%u", num, type);
-> +		device.clip = g_strdup_printf("+CLIP: \"+%s\",%u", num, type);
->  	else
-> -		clip = g_strdup_printf("+CLIP: \"%s\",%u", num, type);
-> +		device.clip = g_strdup_printf("+CLIP: \"%s\",%u", num, type);
->  
->  	/* send first RING */
-> -	ring_cb(clip);
-> +	ring_cb(&device);
->  
->  	device.ring = g_timeout_add_seconds_full(G_PRIORITY_DEFAULT,
->  							RING_TIMEOUT, ring_cb,
-> -							clip, g_free);
+> -	new = skb_copy_expand(skb, sizeof(struct ipv6hdr), skb_tailroom(skb),
+> -			      GFP_ATOMIC);
+> -	kfree_skb(skb);
 > -
-> -	if (!device.ring)
-> -		g_free(clip);
-> +							&device, NULL);
-> +	if (!device.ring) {
-> +		g_free(device.clip);
-> +		device.clip = NULL;
-> +	}
->  }
+> -	if (!new)
+> -		return -ENOMEM;
+> -
+> -	skb_push(new, sizeof(struct ipv6hdr));
+> -	skb_reset_network_header(new);
+> -	skb_copy_to_linear_data(new, hdr, sizeof(struct ipv6hdr));
+> +	skb_push(skb, sizeof(struct ipv6hdr));
+> +	skb_reset_network_header(skb);
+> +	skb_copy_to_linear_data(skb, hdr, sizeof(struct ipv6hdr));
 >  
->  static void phone_state_idle(int num_active, int num_held)
-> @@ -2116,6 +2123,11 @@ static void phone_state_idle(int num_active, int num_held)
->  	if (device.ring) {
->  		g_source_remove(device.ring);
->  		device.ring = 0;
-> +
-> +		if (device.clip) {
-> +			g_free(device.clip);
-> +			device.clip = NULL;
+
+Just a hint, don't do that in this patch or send a patch series.
+I would in a future move:
+
+skb_push(skb, sizeof(struct ipv6hdr));
+skb_reset_network_header(skb);
+skb_copy_to_linear_data(skb, hdr, sizeof(struct ipv6hdr));
+
+into the end of iphc decompression, because we do the same thing for
+transport header in iphc decompression.
+
+> -	new->protocol = htons(ETH_P_IPV6);
+> -	new->pkt_type = PACKET_HOST;
+> -	new->dev = dev;
+> +	skb->protocol = htons(ETH_P_IPV6);
+> +	skb->pkt_type = PACKET_HOST;
+> +	skb->dev = dev;
+
+This we should leave here. Then bluetooth/802.15.4 can set different
+things here.
+
+...
+>  	hdr.payload_len = htons(skb->len);
+> diff --git a/net/bluetooth/6lowpan.c b/net/bluetooth/6lowpan.c
+> index c2e0d14..bd85edf 100644
+> --- a/net/bluetooth/6lowpan.c
+> +++ b/net/bluetooth/6lowpan.c
+> @@ -343,13 +343,17 @@ static int recv_pkt(struct sk_buff *skb, struct net_device *dev,
+>  		kfree_skb(local_skb);
+>  		kfree_skb(skb);
+>  	} else {
+> +		/* Decompression may use pskb_expand_head, ensure skb unique */
+> +		skb = skb_unshare(skb, GFP_ATOMIC);
+> +		if (!skb) {
+> +			dev->stats.rx_dropped++;
+> +			return NET_RX_DROP;
 > +		}
->  	}
->  
->  	switch (device.setup_state) {
-> -- 
-> 1.9.1
-> 
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> +
+
+What I meant here in my previous review notes is that kfree_skb(skb);
+was correct but in this case we can't do it, we need a temp variable.
+
+skb = skb_unshare(skb, GFP_ATOMIC);
+
+here we lost the skb reference from parameter if failed and I don't see
+that skb_unshare free it on failing (maybe I am wrong here).
+
+foo(any name for a tmp skb name, I see a lot of nskb names for a tmp skb
+name. Maybe this is a usual name convention) = skb_unshare(skb, GFP_ATOMIC);
+
+Then we don't lost the "skb" parameter reference and can free it with
+kfree_skb(skb).
+
+If all is fine we can run a skb = foo.
+
+I think that skb_unshare and the buffer is NOT shared then (skb == foo),
+but I am not sure about this. If it's NOT the same then we have some
+memory leaking here.
+
+- Alex
