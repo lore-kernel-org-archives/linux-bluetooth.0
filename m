@@ -1,41 +1,64 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 8 Oct 2014 11:37:06 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Alexander Aring <alex.aring@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org, jukka.rissanen@linux.intel.com
-Subject: Re: [PATCH bluetooth-next] bluetooth: 6lowpan: fix skb_unshare
- behaviour
-Message-ID: <20141008083706.GA13231@t440s.lan>
-References: <1412756693-19410-1-git-send-email-alex.aring@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1412756693-19410-1-git-send-email-alex.aring@gmail.com>
+From: Marcin Kraglak <marcin.kraglak@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCHv3 07/13] shared/gatt: Add function bt_gatt_result_included_count()
+Date: Wed,  8 Oct 2014 10:31:44 +0200
+Message-Id: <1412757110-3509-8-git-send-email-marcin.kraglak@tieto.com>
+In-Reply-To: <1412757110-3509-1-git-send-email-marcin.kraglak@tieto.com>
+References: <1412757110-3509-1-git-send-email-marcin.kraglak@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Alex,
+It will return number of included services in result.
+---
+ src/shared/gatt-helpers.c | 21 +++++++++++++++++++++
+ src/shared/gatt-helpers.h |  1 +
+ 2 files changed, 22 insertions(+)
 
-On Wed, Oct 08, 2014, Alexander Aring wrote:
-> This patch reverts commit:
-> 
-> a7807d73 ("Bluetooth: 6lowpan: Avoid memory leak if memory allocation
-> fails")
-> 
-> which was wrong suggested by Alexander Aring. The function skb_unshare
-> run also kfree_skb on failure.
-> 
-> Signed-off-by: Alexander Aring <alex.aring@gmail.com>
-> ---
-> compile tested only.
-> 
->  net/bluetooth/6lowpan.c | 8 ++------
->  1 file changed, 2 insertions(+), 6 deletions(-)
+diff --git a/src/shared/gatt-helpers.c b/src/shared/gatt-helpers.c
+index 48e7379..92d0696 100644
+--- a/src/shared/gatt-helpers.c
++++ b/src/shared/gatt-helpers.c
+@@ -140,6 +140,27 @@ unsigned int bt_gatt_result_descriptor_count(struct bt_gatt_result *result)
+ 	return result_element_count(result);
+ }
+ 
++unsigned int bt_gatt_result_included_count(struct bt_gatt_result *result)
++{
++	struct bt_gatt_result *cur;
++	unsigned int count = 0;
++
++	if (!result)
++		return 0;
++
++	if (result->opcode != BT_ATT_OP_READ_BY_TYPE_RSP)
++		return 0;
++
++	if (result->data_len != 6 && result->data_len != 8)
++		return 0;
++
++	for (cur = result; cur; cur = cur->next)
++		if (cur->opcode == BT_ATT_OP_READ_BY_TYPE_RSP)
++			count += cur->pdu_len / cur->data_len;
++
++	return count;
++}
++
+ bool bt_gatt_iter_init(struct bt_gatt_iter *iter, struct bt_gatt_result *result)
+ {
+ 	if (!iter || !result)
+diff --git a/src/shared/gatt-helpers.h b/src/shared/gatt-helpers.h
+index f2c7ec5..07c145d 100644
+--- a/src/shared/gatt-helpers.h
++++ b/src/shared/gatt-helpers.h
+@@ -38,6 +38,7 @@ struct bt_gatt_iter {
+ unsigned int bt_gatt_result_service_count(struct bt_gatt_result *result);
+ unsigned int bt_gatt_result_characteristic_count(struct bt_gatt_result *result);
+ unsigned int bt_gatt_result_descriptor_count(struct bt_gatt_result *result);
++unsigned int bt_gatt_result_included_count(struct bt_gatt_result *result);
+ 
+ bool bt_gatt_iter_init(struct bt_gatt_iter *iter, struct bt_gatt_result *result);
+ bool bt_gatt_iter_next_service(struct bt_gatt_iter *iter,
+-- 
+1.9.3
 
-This doesn't look like something that should only go to bluetooth-next
-(which you've tagged it for). The bluetooth-next tree (since 3.17 has
-been released) has moved to catering 3.19 patches whereas this patch
-seems to be something that's fixing an issue heading to 3.18-rc1. So it
-seems to me this patch should in fact be going to the bluetooth.git tree
-instead of bluetooth-next.git. Am I right?
-
-Johan
