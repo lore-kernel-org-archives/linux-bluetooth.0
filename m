@@ -1,53 +1,58 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1412757110-3509-1-git-send-email-marcin.kraglak@tieto.com>
-References: <1412757110-3509-1-git-send-email-marcin.kraglak@tieto.com>
-Date: Fri, 10 Oct 2014 07:20:16 +0200
-Message-ID: <CABD6X-JVW89X0wmSwCrTCjpoKEvEXaFa_j7E32paOKpR9rsBfg@mail.gmail.com>
-Subject: Re: [PATCHv3 00/13] Included service discovery
-From: Marcin Kraglak <marcin.kraglak@tieto.com>
-To: "linux-bluetooth@vger.kernel.org development"
-	<linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+Subject: [PATCH 8/8] unit/hfp: Add test for +CME ERROR: response
+Date: Fri, 10 Oct 2014 01:50:52 +0200
+Message-Id: <1412898652-12281-9-git-send-email-lukasz.rymanowski@tieto.com>
+In-Reply-To: <1412898652-12281-1-git-send-email-lukasz.rymanowski@tieto.com>
+References: <1412898652-12281-1-git-send-email-lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On 8 October 2014 10:31, Marcin Kraglak <marcin.kraglak@tieto.com> wrote:
-> In this version after primary service discovery,
-> secondary services are discovered. Next included
-> services are resolved. With this approach we
-> don't have recursively search for included service,
-> like it was TODO in previous proposal.
-> There is also small coding style fix suggested by Arman.
-> Comments are welcome
->
-> BR
-> Marcin
->
-> Marcin Kraglak (13):
->   shared/gatt: Add discover_secondary_services()
->   shared/gatt: Add initial implementation of discover_included_services
->   shared/gatt: Discover included services 128 bit UUIDS
->   shared/gatt: Add extra check in characteristic iterator
->   shared/gatt: Add included service iterator
->   shared/gatt: Remove not needed function parameter
->   shared/gatt: Add function bt_gatt_result_included_count()
->   shared/gatt: Distinguish Primary from Secondary services
->   tools/btgatt-client: Print type of service
->   shared/gatt: Discover secondary services
->   shared/gatt: Discover included services
->   shared/gatt: Add gatt-client include service iterator
->   tools/btgatt-client: Print found include services
->
->  src/shared/gatt-client.c  | 249 +++++++++++++++++++++++++--
->  src/shared/gatt-client.h  |  18 ++
->  src/shared/gatt-helpers.c | 418 +++++++++++++++++++++++++++++++++++++++++++---
->  src/shared/gatt-helpers.h |  10 +-
->  tools/btgatt-client.c     |  17 +-
->  5 files changed, 678 insertions(+), 34 deletions(-)
->
-> --
-> 1.9.3
->
+---
+ unit/test-hfp.c | 21 +++++++++++++++++++++
+ 1 file changed, 21 insertions(+)
 
-ping
+diff --git a/unit/test-hfp.c b/unit/test-hfp.c
+index 9c71ee9..ff5532e 100644
+--- a/unit/test-hfp.c
++++ b/unit/test-hfp.c
+@@ -487,6 +487,19 @@ static void hf_response_with_data(const char *prefix, enum hfp_result res,
+ 	hfp_hf_disconnect(context->hfp_hf);
+ }
+ 
++static void hf_cme_error_response_cb(const char *prefix,
++							enum hfp_result res,
++							enum hfp_error cme_err,
++							void *user_data)
++{
++	struct context *context = user_data;
++
++	g_assert_cmpstr(prefix, ==, "AT+CHLD");
++	g_assert_cmpint(res, ==, HFP_RESULT_CME_ERROR);
++	g_assert_cmpint(cme_err, ==, 30);
++
++	hfp_hf_disconnect(context->hfp_hf);
++}
+ static void hf_brsf_response_cb(const char *prefix, enum hfp_result res,
+ 							enum hfp_error cme_err,
+ 							void *user_data)
+@@ -721,6 +734,14 @@ int main(int argc, char *argv[])
+ 			frg_pdu('\r', '\n', 'O', 'k', '\r', '\n'),
+ 			data_end());
+ 
++	define_hf_test("/hfp/test_send_command_3", test_hf_send_command, NULL,
++			hf_cme_error_response_cb,
++			raw_pdu('A', 'T', '+', 'C', 'H', 'L', 'D', '=',
++								'1', '\0'),
++			frg_pdu('\r', '\n', '+', 'C', 'M', 'E', ' ', 'E'),
++			frg_pdu('R', 'R', 'O', 'R', ':', '3', '0', '\r', '\n'),
++			data_end());
++
+ 	define_hf_test("/hfp/test_unsolicited_1", test_hf_unsolicited,
+ 			hf_result_handler, NULL,
+ 			raw_pdu('+', 'C', 'L', 'C', 'C', '\0'),
+-- 
+1.8.4
+
