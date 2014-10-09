@@ -1,296 +1,142 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1412763331-30989-7-git-send-email-lukasz.rymanowski@tieto.com>
-References: <1412763331-30989-1-git-send-email-lukasz.rymanowski@tieto.com>
-	<1412763331-30989-7-git-send-email-lukasz.rymanowski@tieto.com>
-Date: Thu, 9 Oct 2014 10:05:42 +0200
-Message-ID: <CAMudyAu_zGbHYaYJLtMFMngyaM==vqRpTQgpujjOJi0FJNbJCQ@mail.gmail.com>
-Subject: Re: [PATCH v3 06/11] shared/hfp: Add send AT command API for HFP HF
-From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+In-Reply-To: <3D02B219753AD44CBDDDE484323B17741130DD22@SHSMSX104.ccr.corp.intel.com>
+References: <1412758479-13214-1-git-send-email-chao.jie.gu@intel.com>
+	<1412758479-13214-2-git-send-email-chao.jie.gu@intel.com>
+	<CABBYNZ+NW=1aW6_sMppq2kU4FUou0pK5DhHQ7ykhUFkf4dCCsw@mail.gmail.com>
+	<3D02B219753AD44CBDDDE484323B17741130DD22@SHSMSX104.ccr.corp.intel.com>
+Date: Thu, 9 Oct 2014 11:00:34 +0300
+Message-ID: <CABBYNZLtwXrN1tYH+5vvPrcYq8Xaa5mdwba6vyQMvC0_s4Z0Cg@mail.gmail.com>
+Subject: Re: [PATCH v4 1/3] shared/att.c: Add signed command outgoing and CSRK function
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: "Gu, Chao Jie" <chao.jie.gu@intel.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi,
 
-On 8 October 2014 12:15, Lukasz Rymanowski <lukasz.rymanowski@tieto.com> wrote:
-> This patch adds handling send and response of AT command.
-> Note that we always wait for AT command response before sending next
-> command, however user can fill hfp_hf with more than one command.
-> All the commands are queued and send one by one.
-> ---
->  src/shared/hfp.c | 182 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
->  src/shared/hfp.h |   5 ++
->  2 files changed, 187 insertions(+)
+On Thu, Oct 9, 2014 at 7:02 AM, Gu, Chao Jie <chao.jie.gu@intel.com> wrote:
+> Hi Luiz,
 >
-> diff --git a/src/shared/hfp.c b/src/shared/hfp.c
-> index d61d76d..9681aae 100644
-> --- a/src/shared/hfp.c
-> +++ b/src/shared/hfp.c
-> @@ -70,6 +70,10 @@ struct hfp_hf {
->         struct ringbuf *read_buf;
->         struct ringbuf *write_buf;
+>> > @@ -77,6 +78,16 @@ struct bt_att {
+>> >         bt_att_debug_func_t debug_callback;
+>> >         bt_att_destroy_func_t debug_destroy;
+>> >         void *debug_data;
+>> > +
+>> > +       struct bt_crypto *crypto;
+>> > +
+>> > +       bool valid_local_csrk;
+>> > +       uint8_t local_csrk[16];
+>> > +       uint32_t local_sign_cnt;
+>> > +
+>> > +       bool valid_remote_csrk;
+>> > +       uint8_t remote_csrk[16];
+>> > +       uint32_t remote_sign_cnt;
+>>
+>> Maybe it is better to have pointers to a structs so you can free the data once it
+>> becomes invalid and it also removes the necessity of extra flags just to tell if the data
+>> is still valid since you can check if the pointer is not NULL then it must be valid.
 >
-> +       bool writer_active;
-> +       struct queue *cmd_queue;
-> +       bool command_in_progress;
-> +
->         struct queue *event_handlers;
->
->         hfp_debug_func_t debug_callback;
-> @@ -101,6 +105,14 @@ struct hfp_hf_result {
->         unsigned int offset;
->  };
->
-> +struct cmd_response {
-> +       char *prefix;
-> +       hfp_response_func_t resp_cb;
-> +       struct hfp_hf_result *response;
-> +       char *resp_data;
-> +       void *user_data;
-> +};
-> +
->  struct event_handler {
->         char *prefix;
->         void *user_data;
-> @@ -868,12 +880,74 @@ static void destroy_event_handler(void *data)
->         free(handler);
->  }
->
-> +static bool hf_can_write_data(struct io *io, void *user_data)
-> +{
-> +       struct hfp_hf *hfp = user_data;
-> +       ssize_t bytes_written;
-> +
-> +       bytes_written = ringbuf_write(hfp->write_buf, hfp->fd);
-> +       if (bytes_written < 0)
-> +               return false;
-> +
-> +       if (ringbuf_len(hfp->write_buf) > 0)
-> +               return true;
-> +
-> +       return false;
-> +}
-> +
-> +static void hf_write_watch_destroy(void *user_data)
-> +{
-> +       struct hfp_hf *hfp = user_data;
-> +
-> +       hfp->writer_active = false;
-> +}
-> +
->  static void hf_skip_whitespace(struct hfp_hf_result *result)
->  {
->         while (result->data[result->offset] == ' ')
->                 result->offset++;
->  }
->
-> +static bool is_response(const char *msg, enum hfp_result *result)
-> +{
-> +       if (strcmp(msg, "OK") == 0) {
-> +               *result = HFP_RESULT_OK;
-> +               return true;
-> +       }
-> +
-> +       if (strcmp(msg, "ERROR") == 0) {
-> +               *result = HFP_RESULT_ERROR;
-> +               return true;
-> +       }
-> +
-> +       return false;
-> +}
-> +
-> +static void hf_wakeup_writer(struct hfp_hf *hfp)
-> +{
-> +       if (hfp->writer_active)
-> +               return;
-> +
-> +       if (!ringbuf_len(hfp->write_buf))
-> +               return;
-> +
-> +       if (!io_set_write_handler(hfp->io, hf_can_write_data,
-> +                                       hfp, hf_write_watch_destroy))
-> +               return;
-> +
-> +       hfp->writer_active = true;
-> +}
-> +
-> +static void destroy_cmd_response(void *data)
-> +{
-> +       struct cmd_response *cmd = data;
-> +
-> +       free(cmd->prefix);
-> +       free(cmd->resp_data);
-> +       free(cmd->response);
-> +       free(cmd);
-> +}
-> +
->  static void hf_call_prefix_handler(struct hfp_hf *hfp, const char *data)
->  {
->         struct event_handler *handler;
-> @@ -904,6 +978,46 @@ static void hf_call_prefix_handler(struct hfp_hf *hfp, const char *data)
->         lookup_prefix[pref_len] = '\0';
->         result_data.offset += pref_len + 1;
->
-> +       if (hfp->command_in_progress) {
-> +               struct cmd_response *cmd;
-> +               enum hfp_result result;
-> +
-> +               cmd = queue_peek_head(hfp->cmd_queue);
-> +               if (!cmd)
-> +                       return;
-> +
-> +               if (is_response(lookup_prefix, &result)) {
-> +                       cmd->resp_cb(result, cmd->response, cmd->user_data);
-> +
-> +                       queue_remove(hfp->cmd_queue, cmd);
-> +                       destroy_cmd_response(cmd);
-> +
-> +                       if (!queue_isempty(hfp->cmd_queue)) {
-> +                               hf_wakeup_writer(hfp);
-> +                               return;
-> +                       }
-> +
-> +                       hfp->command_in_progress = false;
-> +
-> +                       return;
-> +               }
-> +               /*
-> +                * Check if unsolicited result is the response for ongoing
-> +                * command. If not we try to find registered handler for it
-> +                * later.
-> +                */
-> +               if (strcmp(lookup_prefix, &cmd->prefix[2]) == 0 &&
-> +                                                       !cmd->resp_data) {
+> This is good idea to remove the extra flags. However, we define the struct to do this which
+> would result in some problem. Now we initialize the local_sign_cnt in the bt_att_new function
+> and only add local_sign_cnt value when signed write command outgoing. Meanwile, we set local
+> CSRK in the bt_gatt_client_set_local_csrk function when there is valid CSRK provided. This two
+> Parameter set at different time now.
 
-Looks like I missed the case where we can get more then one response
-before OK e.g. on AT+CLCC we can get +CLCC, ..., +CLCC, OK.
-Will fix that.
-> +                       /* Store response and wait for OK */
-> +                       cmd->resp_data = strdup(result_data.data);
-> +
-> +                       cmd->response = new0(struct hfp_hf_result, 1);
-> +                       cmd->response->offset = result_data.offset;
-> +                       cmd->response->data = cmd->resp_data;
-> +                       return;
-> +               }
-> +       }
-> +
->         handler = queue_find(hfp->event_handlers, match_handler_event_prefix,
->                                                                 lookup_prefix);
->
-> @@ -1033,6 +1147,19 @@ struct hfp_hf *hfp_hf_new(int fd)
->                 return NULL;
->         }
->
-> +       hfp->cmd_queue = queue_new();
-> +       if (!hfp->cmd_queue) {
-> +               io_destroy(hfp->io);
-> +               ringbuf_free(hfp->write_buf);
-> +               ringbuf_free(hfp->read_buf);
-> +               queue_destroy(hfp->event_handlers, NULL);
-> +               free(hfp);
-> +               return NULL;
-> +       }
-> +
-> +       hfp->writer_active = false;
-> +       hfp->command_in_progress = false;
-> +
->         if (!io_set_read_handler(hfp->io, hf_can_read_data, hfp,
->                                                         read_watch_destroy)) {
->                 queue_destroy(hfp->event_handlers,
-> @@ -1084,6 +1211,9 @@ void hfp_hf_unref(struct hfp_hf *hfp)
->         queue_destroy(hfp->event_handlers, destroy_event_handler);
->         hfp->event_handlers = NULL;
->
-> +       queue_destroy(hfp->cmd_queue, destroy_cmd_response);
-> +       hfp->cmd_queue = NULL;
-> +
->         if (!hfp->in_disconnect) {
->                 free(hfp);
->                 return;
-> @@ -1143,6 +1273,58 @@ bool hfp_hf_set_close_on_unref(struct hfp_hf *hfp, bool do_close)
->         return true;
->  }
->
-> +bool hfp_hf_send_command(struct hfp_hf *hfp, hfp_response_func_t resp_cb,
-> +                               void *user_data, const char *format, ...)
-> +{
-> +       va_list ap;
-> +       char *fmt;
-> +       int len;
-> +       const char *separators = ";?=\0";
-> +       uint8_t prefix_len;
-> +       struct cmd_response *cmd;
-> +
-> +       if (!hfp || !format || !resp_cb)
-> +               return false;
-> +
-> +       if (asprintf(&fmt, "%s\r", format) < 0)
-> +               return false;
-> +
-> +       cmd = new0(struct cmd_response, 1);
-> +       if (!cmd)
-> +               return false;
-> +
-> +       va_start(ap, format);
-> +       len = ringbuf_vprintf(hfp->write_buf, fmt, ap);
-> +       va_end(ap);
-> +
-> +       free(fmt);
-> +
-> +       if (len < 0) {
-> +               free(cmd);
-> +               return false;
-> +       }
-> +
-> +       prefix_len = strcspn(format, separators);
-> +       cmd->prefix = strndup(format, prefix_len);
-> +       cmd->resp_cb = resp_cb;
-> +       cmd->user_data = user_data;
-> +
-> +       if (!queue_push_tail(hfp->cmd_queue, cmd)) {
-> +               ringbuf_drain(hfp->write_buf, len);
-> +               free(cmd);
-> +               return false;
-> +       }
-> +
-> +       if (hfp->command_in_progress)
-> +               return true;
-> +
-> +       hfp->command_in_progress = true;
-> +
-> +       hf_wakeup_writer(hfp);
-> +
-> +       return true;
-> +}
-> +
->  bool hfp_hf_register(struct hfp_hf *hfp, hfp_hf_result_func_t callback,
->                                                 const char *prefix,
->                                                 void *user_data,
-> diff --git a/src/shared/hfp.h b/src/shared/hfp.h
-> index 85037b1..773d827 100644
-> --- a/src/shared/hfp.h
-> +++ b/src/shared/hfp.h
-> @@ -83,6 +83,9 @@ typedef void (*hfp_command_func_t)(const char *command, void *user_data);
->
->  typedef void (*hfp_disconnect_func_t)(void *user_data);
->
-> +typedef void (*hfp_response_func_t)(enum hfp_result result,
-> +                                               struct hfp_hf_result *resp,
-> +                                               void *user_data);
->  struct hfp_gw;
->  struct hfp_hf;
->
-> @@ -146,3 +149,5 @@ bool hfp_hf_register(struct hfp_hf *hfp, hfp_hf_result_func_t callback,
->                                         const char *prefix, void *user_data,
->                                         hfp_destroy_func_t destroy);
->  bool hfp_hf_unregister(struct hfp_hf *hfp, const char *prefix);
-> +bool hfp_hf_send_command(struct hfp_hf *hfp, hfp_response_func_t resp_cb,
-> +                               void *user_data, const char *format, ...);
-> --
-> 1.8.4
->
+Well I guess this was your design, it doesn't have to be this way, in
+fact I believe there is no point of initializing the counter if there
+is no valid CSRK because one depend on the other, also perhaps you
+have a bug in bt_gatt_client_set_local_csrk since I believe every time
+you set CSRK you should reset the counter otherwise you may be
+carrying the counters from the past CSRK which probably won't work.
 
-\Łukasz
+Also don't to have to pass the counter when setting the key, the
+counter probably need to be restored on every connection so
+bt_gatt_client_set_local_csrk and bt_att_set_remote_csrk probably
+needs to take the counter and instead of having a valid flag you can
+probably reset by setting NULL as key or an invalid counter if one
+exists.
+
+> If we have pointers to a struct including local_csrk and local_signd_cnt, we initialize the local_sign_cnt
+> meanwhile the struct should not be NULL because of incuding it. In fact, local_csrk is not valid at this time.
+> If we initialize the local_signed_cnt when CSRK is valid , it would be risk to change local_signed_cnt by user
+> calling bt_gatt_client_set_local_csrk.
+>> >  };
+>> >
+>> >  enum att_op_type {
+>> > @@ -176,6 +187,8 @@ struct att_send_op {
+>> >         bt_att_response_func_t callback;
+>> >         bt_att_destroy_func_t destroy;
+>> >         void *user_data;
+>> > +
+>> > +       struct bt_att *att;
+>> >  };
+>> >
+>> >  static void destroy_att_send_op(void *data) @@ -277,6 +290,10 @@
+>> > static bool encode_pdu(struct att_send_op *op, const void *pdu,
+>> >                                                 uint16_t length,
+>> > uint16_t mtu)  {
+>> >         uint16_t pdu_len = 1;
+>> > +       struct bt_att *att = op->att;
+>> > +
+>> > +       if (op->opcode & ATT_OP_SIGNED_MASK)
+>> > +               pdu_len += BT_ATT_SIGNATURE_LEN;
+>> >
+>> >         if (length && pdu)
+>> >                 pdu_len += length;
+>> > @@ -293,17 +310,32 @@ static bool encode_pdu(struct att_send_op *op, const
+>> void *pdu,
+>> >         if (pdu_len > 1)
+>> >                 memcpy(op->pdu + 1, pdu, length);
+>> >
+>> > +       if (op->opcode & ATT_OP_SIGNED_MASK) {
+>> > +               if (bt_crypto_sign_att(att->crypto,
+>> > +                                       att->local_csrk,
+>> > +                                       op->pdu,
+>> > +                                       1 + length,
+>> > +                                       att->local_sign_cnt,
+>> > +                                       &((uint8_t *) op->pdu)[1 +
+>> length]))
+>> > +                       att->local_sign_cnt++;
+>> > +               else
+>> > +                       return false;
+>> > +       }
+>> > +
+>>
+>> You can probably bail out early if you check !(op->opcode & ATT_OP_SIGNED_MASK),
+>> also perhaps it is a good idea to start defining structs for the PDUs to simplify the
+>> access.
+>>
+> If we bail out this checking early , maybe we have to need two different encode_pdu
+> function to implement it such as naming new encode_signed_pdu function to do this.
+
+But you return true anyway after this code, no idea why you need a new
+function for that, all I was suggesting is the following:
+
+if (!(op->opcode & ATT_OP_SIGNED_MASK))
+    return true;
+
+if (!bt_crypto_sign_att...)
+    return false;
+
+att->local_sign_cnt++;
+
+return true;
+
+> However, I think encoding signed_write_command pdu most difference is adding
+> signatgure in the end of pdu. As old stack, we can see every command has their
+> own encode_pdu function. In fact, most procedure is common. So I think all in one
+> encode_pdu function is new feature in new ATT Stack, so this implementation is
+> at lowest price to compatible with new ATT Stack. That is why I didn’t bail out early
+> this checking (op->opcode & ATT_OP_SIGNED_MASK). Following this implementation,
+> there is no need to create another the encode function to implement signed_write,
+> Just using one encode_pdu function to do this is OK.
+>
+> Do you think this make sense?
+
+
+
+-- 
+Luiz Augusto von Dentz
