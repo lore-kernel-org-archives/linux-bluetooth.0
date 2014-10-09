@@ -2,80 +2,109 @@ Return-Path: <cyrus@holtmann.org>
 From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH v4 11/11] unit/test-hfp: Add some robustness tests for HFP HF
-Date: Fri, 10 Oct 2014 01:50:11 +0200
-Message-Id: <1412898611-12199-12-git-send-email-lukasz.rymanowski@tieto.com>
+Subject: [PATCH v4 02/11] shared/hfp: Add set_debug and close_on_unref API for HFP HF
+Date: Fri, 10 Oct 2014 01:50:02 +0200
+Message-Id: <1412898611-12199-3-git-send-email-lukasz.rymanowski@tieto.com>
 In-Reply-To: <1412898611-12199-1-git-send-email-lukasz.rymanowski@tieto.com>
 References: <1412898611-12199-1-git-send-email-lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch adds folowing tests:
-/hfp/test_hf_corrupted_1
-/hfp/test_hf_corrupted_2
-/hfp/test_hf_empty
-/hfp/test_hf_unknown
 ---
- unit/test-hfp.c | 40 ++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 40 insertions(+)
+ src/shared/hfp.c | 57 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ src/shared/hfp.h |  3 +++
+ 2 files changed, 60 insertions(+)
 
-diff --git a/unit/test-hfp.c b/unit/test-hfp.c
-index 266f8cd..2515f26 100644
---- a/unit/test-hfp.c
-+++ b/unit/test-hfp.c
-@@ -566,6 +566,25 @@ static void test_hf_unsolicited(gconstpointer data)
- 	execute_context(context);
- }
+diff --git a/src/shared/hfp.c b/src/shared/hfp.c
+index dbd049a..ad2daa2 100644
+--- a/src/shared/hfp.c
++++ b/src/shared/hfp.c
+@@ -70,6 +70,10 @@ struct hfp_hf {
+ 	struct ringbuf *read_buf;
+ 	struct ringbuf *write_buf;
  
-+static void test_hf_robustness(gconstpointer data)
++	hfp_debug_func_t debug_callback;
++	hfp_destroy_func_t debug_destroy;
++	void *debug_data;
++
+ 	bool in_disconnect;
+ 	bool destroyed;
+ };
+@@ -886,6 +890,8 @@ void hfp_hf_unref(struct hfp_hf *hfp)
+ 	if (hfp->close_on_unref)
+ 		close(hfp->fd);
+ 
++	hfp_hf_set_debug(hfp, NULL, NULL, NULL);
++
+ 	ringbuf_free(hfp->read_buf);
+ 	hfp->read_buf = NULL;
+ 
+@@ -899,3 +905,54 @@ void hfp_hf_unref(struct hfp_hf *hfp)
+ 
+ 	hfp->destroyed = true;
+ }
++
++static void hf_read_tracing(const void *buf, size_t count,
++							void *user_data)
 +{
-+	struct context *context = create_context(data);
-+	bool ret;
++	struct hfp_hf *hfp = user_data;
 +
-+	context->hfp_hf = hfp_hf_new(context->fd_client);
-+	g_assert(context->hfp_hf);
-+
-+	ret = hfp_hf_set_close_on_unref(context->hfp_hf, true);
-+	g_assert(ret);
-+
-+	send_pdu(context);
-+
-+	hfp_hf_unref(context->hfp_hf);
-+	context->hfp_hf = NULL;
-+
-+	execute_context(context);
++	util_hexdump('>', buf, count, hfp->debug_callback, hfp->debug_data);
 +}
 +
- int main(int argc, char *argv[])
- {
- 	g_test_init(&argc, &argv, NULL);
-@@ -676,5 +695,26 @@ int main(int argc, char *argv[])
- 			frg_pdu('\n'),
- 			data_end());
- 
-+	define_hf_test("/hfp/test_hf_corrupted_1", test_hf_unsolicited,
-+			hf_result_handler, NULL,
-+			raw_pdu('+', 'C', 'L', 'C', 'C', '\0'),
-+			frg_pdu('\r', 'X', '\r', '\n'),
-+			frg_pdu('+', 'C', 'L', 'C', 'C', ':', '1', ',', '3'),
-+			frg_pdu(',', '0', '\r', '\n'),
-+			data_end());
++static void hf_write_tracing(const void *buf, size_t count,
++							void *user_data)
++{
++	struct hfp_hf *hfp = user_data;
 +
-+	define_hf_test("/hfp/test_hf_corrupted_2", test_hf_unsolicited,
-+			hf_result_handler, NULL,
-+			raw_pdu('+', 'C', 'L', 'C', 'C', '\0'),
-+			raw_pdu('+', 'C', 'L', 'C', 'C', '\r', '\n'),
-+			data_end());
++	util_hexdump('<', buf, count, hfp->debug_callback, hfp->debug_data);
++}
 +
-+	define_hf_test("/hfp/test_hf_empty", test_hf_robustness, NULL, NULL,
-+			raw_pdu('\r'), data_end());
++bool hfp_hf_set_debug(struct hfp_hf *hfp, hfp_debug_func_t callback,
++				void *user_data, hfp_destroy_func_t destroy)
++{
++	if (!hfp)
++		return false;
 +
-+	define_hf_test("/hfp/test_hf_unknown", test_hf_robustness, NULL, NULL,
-+			raw_pdu('\r', '\n', 'B', 'R', '\r', '\n'),
-+			data_end());
++	if (hfp->debug_destroy)
++		hfp->debug_destroy(hfp->debug_data);
 +
- 	return g_test_run();
- }
++	hfp->debug_callback = callback;
++	hfp->debug_destroy = destroy;
++	hfp->debug_data = user_data;
++
++	if (hfp->debug_callback) {
++		ringbuf_set_input_tracing(hfp->read_buf, hf_read_tracing, hfp);
++		ringbuf_set_input_tracing(hfp->write_buf, hf_write_tracing,
++									hfp);
++	} else {
++		ringbuf_set_input_tracing(hfp->read_buf, NULL, NULL);
++		ringbuf_set_input_tracing(hfp->write_buf, NULL, NULL);
++	}
++
++	return true;
++}
++
++bool hfp_hf_set_close_on_unref(struct hfp_hf *hfp, bool do_close)
++{
++	if (!hfp)
++		return false;
++
++	hfp->close_on_unref = do_close;
++
++	return true;
++}
+diff --git a/src/shared/hfp.h b/src/shared/hfp.h
+index 50d9c4b..ae67ac2 100644
+--- a/src/shared/hfp.h
++++ b/src/shared/hfp.h
+@@ -130,3 +130,6 @@ bool hfp_gw_result_has_next(struct hfp_gw_result *result);
+ struct hfp_hf *hfp_hf_new(int fd);
+ struct hfp_hf *hfp_hf_ref(struct hfp_hf *hfp);
+ void hfp_hf_unref(struct hfp_hf *hfp);
++bool hfp_hf_set_debug(struct hfp_hf *hfp, hfp_debug_func_t callback,
++				void *user_data, hfp_destroy_func_t destroy);
++bool hfp_hf_set_close_on_unref(struct hfp_hf *hfp, bool do_close);
 -- 
 1.8.4
 
