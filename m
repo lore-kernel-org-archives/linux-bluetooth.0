@@ -1,231 +1,296 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1412629304-3391-3-git-send-email-armansito@chromium.org>
-References: <1412629304-3391-1-git-send-email-armansito@chromium.org>
-	<1412629304-3391-3-git-send-email-armansito@chromium.org>
-Date: Thu, 9 Oct 2014 10:18:23 +0200
-Message-ID: <CABD6X-J6J7RMiZeTg5M2hJnEroRh1Xy0+XQVWBdgccweMrGfyw@mail.gmail.com>
-Subject: Re: [PATCH BlueZ v1 2/4] shared/gatt-server: Introduce shared/gatt-server.
-From: Marcin Kraglak <marcin.kraglak@tieto.com>
-To: Arman Uguray <armansito@chromium.org>
-Cc: "linux-bluetooth@vger.kernel.org development"
-	<linux-bluetooth@vger.kernel.org>
+In-Reply-To: <1412763331-30989-7-git-send-email-lukasz.rymanowski@tieto.com>
+References: <1412763331-30989-1-git-send-email-lukasz.rymanowski@tieto.com>
+	<1412763331-30989-7-git-send-email-lukasz.rymanowski@tieto.com>
+Date: Thu, 9 Oct 2014 10:05:42 +0200
+Message-ID: <CAMudyAu_zGbHYaYJLtMFMngyaM==vqRpTQgpujjOJi0FJNbJCQ@mail.gmail.com>
+Subject: Re: [PATCH v3 06/11] shared/hfp: Add send AT command API for HFP HF
+From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Arman,
+Hi,
 
-On 6 October 2014 23:01, Arman Uguray <armansito@chromium.org> wrote:
-> This patch introduces bt_gatt_server which will implement the server-side of the
-> ATT protocol over a bt_att structure and construct responses based on a gatt_db
-> structure.
+On 8 October 2014 12:15, Lukasz Rymanowski <lukasz.rymanowski@tieto.com> wrote:
+> This patch adds handling send and response of AT command.
+> Note that we always wait for AT command response before sending next
+> command, however user can fill hfp_hf with more than one command.
+> All the commands are queued and send one by one.
 > ---
->  Makefile.am              |   1 +
->  src/shared/gatt-server.c | 125 +++++++++++++++++++++++++++++++++++++++++++++++
->  src/shared/gatt-server.h |  40 +++++++++++++++
->  3 files changed, 166 insertions(+)
->  create mode 100644 src/shared/gatt-server.c
->  create mode 100644 src/shared/gatt-server.h
+>  src/shared/hfp.c | 182 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  src/shared/hfp.h |   5 ++
+>  2 files changed, 187 insertions(+)
 >
-> diff --git a/Makefile.am b/Makefile.am
-> index 1a1a43f..2dfea28 100644
-> --- a/Makefile.am
-> +++ b/Makefile.am
-> @@ -114,6 +114,7 @@ shared_sources = src/shared/io.h src/shared/timeout.h \
->                         src/shared/att.h src/shared/att.c \
->                         src/shared/gatt-helpers.h src/shared/gatt-helpers.c \
->                         src/shared/gatt-client.h src/shared/gatt-client.c \
-> +                       src/shared/gatt-server.h src/shared/gatt-server.c \
->                         src/shared/gatt-db.h src/shared/gatt-db.c \
->                         src/shared/gap.h src/shared/gap.c
+> diff --git a/src/shared/hfp.c b/src/shared/hfp.c
+> index d61d76d..9681aae 100644
+> --- a/src/shared/hfp.c
+> +++ b/src/shared/hfp.c
+> @@ -70,6 +70,10 @@ struct hfp_hf {
+>         struct ringbuf *read_buf;
+>         struct ringbuf *write_buf;
 >
-> diff --git a/src/shared/gatt-server.c b/src/shared/gatt-server.c
-> new file mode 100644
-> index 0000000..544e60e
-> --- /dev/null
-> +++ b/src/shared/gatt-server.c
-> @@ -0,0 +1,125 @@
-> +/*
-> + *
-> + *  BlueZ - Bluetooth protocol stack for Linux
-> + *
-> + *  Copyright (C) 2014  Google Inc.
-> + *
-> + *
-> + *  This library is free software; you can redistribute it and/or
-> + *  modify it under the terms of the GNU Lesser General Public
-> + *  License as published by the Free Software Foundation; either
-> + *  version 2.1 of the License, or (at your option) any later version.
-> + *
-> + *  This library is distributed in the hope that it will be useful,
-> + *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-> + *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-> + *  Lesser General Public License for more details.
-> + *
-> + *  You should have received a copy of the GNU Lesser General Public
-> + *  License along with this library; if not, write to the Free Software
-> + *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-> + *
-> + */
+> +       bool writer_active;
+> +       struct queue *cmd_queue;
+> +       bool command_in_progress;
 > +
-> +#include "src/shared/att.h"
-> +#include "lib/uuid.h"
-> +#include "src/shared/queue.h"
-> +#include "src/shared/gatt-db.h"
-> +#include "src/shared/gatt-server.h"
-> +#include "src/shared/gatt-helpers.h"
-> +#include "src/shared/att-types.h"
-> +#include "src/shared/util.h"
-> +
-> +#ifndef MAX
-> +#define MAX(a, b) ((a) > (b) ? (a) : (b))
-> +#endif
-> +
-> +struct bt_gatt_server {
-> +       struct gatt_db *db;
-> +       struct bt_att *att;
-> +       int ref_count;
-> +       uint16_t mtu;
-> +
-> +       bt_gatt_server_debug_func_t debug_callback;
-> +       bt_gatt_server_destroy_func_t debug_destroy;
-> +       void *debug_data;
+>         struct queue *event_handlers;
+>
+>         hfp_debug_func_t debug_callback;
+> @@ -101,6 +105,14 @@ struct hfp_hf_result {
+>         unsigned int offset;
+>  };
+>
+> +struct cmd_response {
+> +       char *prefix;
+> +       hfp_response_func_t resp_cb;
+> +       struct hfp_hf_result *response;
+> +       char *resp_data;
+> +       void *user_data;
 > +};
 > +
-> +static bool gatt_server_register_att_handlers(struct bt_gatt_server *server)
+>  struct event_handler {
+>         char *prefix;
+>         void *user_data;
+> @@ -868,12 +880,74 @@ static void destroy_event_handler(void *data)
+>         free(handler);
+>  }
+>
+> +static bool hf_can_write_data(struct io *io, void *user_data)
 > +{
-> +       /* TODO */
-> +       return true;
+> +       struct hfp_hf *hfp = user_data;
+> +       ssize_t bytes_written;
+> +
+> +       bytes_written = ringbuf_write(hfp->write_buf, hfp->fd);
+> +       if (bytes_written < 0)
+> +               return false;
+> +
+> +       if (ringbuf_len(hfp->write_buf) > 0)
+> +               return true;
+> +
+> +       return false;
 > +}
 > +
-> +static void gatt_server_cleanup(struct bt_gatt_server *server)
+> +static void hf_write_watch_destroy(void *user_data)
 > +{
-> +       bt_att_unref(server->att);
-> +       server->att = NULL;
+> +       struct hfp_hf *hfp = user_data;
+> +
+> +       hfp->writer_active = false;
 > +}
 > +
-> +struct bt_gatt_server *bt_gatt_server_new(struct gatt_db *db,
-> +                                       struct bt_att *att, uint16_t mtu)
+>  static void hf_skip_whitespace(struct hfp_hf_result *result)
+>  {
+>         while (result->data[result->offset] == ' ')
+>                 result->offset++;
+>  }
+>
+> +static bool is_response(const char *msg, enum hfp_result *result)
 > +{
-> +       struct bt_gatt_server *server;
+> +       if (strcmp(msg, "OK") == 0) {
+> +               *result = HFP_RESULT_OK;
+> +               return true;
+> +       }
 > +
-> +       if (!att)
-> +               return NULL;
+> +       if (strcmp(msg, "ERROR") == 0) {
+> +               *result = HFP_RESULT_ERROR;
+> +               return true;
+> +       }
 > +
-> +       server = new0(struct bt_gatt_server, 1);
-> +       if (!server)
-> +               return NULL;
+> +       return false;
+> +}
 > +
-> +       server->db = db;
-> +       server->att = bt_att_ref(att);
-> +       server->mtu = MAX(mtu, BT_ATT_DEFAULT_LE_MTU);
+> +static void hf_wakeup_writer(struct hfp_hf *hfp)
+> +{
+> +       if (hfp->writer_active)
+> +               return;
 > +
-> +       if (!gatt_server_register_att_handlers(server)) {
-> +               gatt_db_destroy(server->db);
-> +               bt_att_unref(att);
-> +               free(server);
+> +       if (!ringbuf_len(hfp->write_buf))
+> +               return;
+> +
+> +       if (!io_set_write_handler(hfp->io, hf_can_write_data,
+> +                                       hfp, hf_write_watch_destroy))
+> +               return;
+> +
+> +       hfp->writer_active = true;
+> +}
+> +
+> +static void destroy_cmd_response(void *data)
+> +{
+> +       struct cmd_response *cmd = data;
+> +
+> +       free(cmd->prefix);
+> +       free(cmd->resp_data);
+> +       free(cmd->response);
+> +       free(cmd);
+> +}
+> +
+>  static void hf_call_prefix_handler(struct hfp_hf *hfp, const char *data)
+>  {
+>         struct event_handler *handler;
+> @@ -904,6 +978,46 @@ static void hf_call_prefix_handler(struct hfp_hf *hfp, const char *data)
+>         lookup_prefix[pref_len] = '\0';
+>         result_data.offset += pref_len + 1;
+>
+> +       if (hfp->command_in_progress) {
+> +               struct cmd_response *cmd;
+> +               enum hfp_result result;
+> +
+> +               cmd = queue_peek_head(hfp->cmd_queue);
+> +               if (!cmd)
+> +                       return;
+> +
+> +               if (is_response(lookup_prefix, &result)) {
+> +                       cmd->resp_cb(result, cmd->response, cmd->user_data);
+> +
+> +                       queue_remove(hfp->cmd_queue, cmd);
+> +                       destroy_cmd_response(cmd);
+> +
+> +                       if (!queue_isempty(hfp->cmd_queue)) {
+> +                               hf_wakeup_writer(hfp);
+> +                               return;
+> +                       }
+> +
+> +                       hfp->command_in_progress = false;
+> +
+> +                       return;
+> +               }
+> +               /*
+> +                * Check if unsolicited result is the response for ongoing
+> +                * command. If not we try to find registered handler for it
+> +                * later.
+> +                */
+> +               if (strcmp(lookup_prefix, &cmd->prefix[2]) == 0 &&
+> +                                                       !cmd->resp_data) {
+
+Looks like I missed the case where we can get more then one response
+before OK e.g. on AT+CLCC we can get +CLCC, ..., +CLCC, OK.
+Will fix that.
+> +                       /* Store response and wait for OK */
+> +                       cmd->resp_data = strdup(result_data.data);
+> +
+> +                       cmd->response = new0(struct hfp_hf_result, 1);
+> +                       cmd->response->offset = result_data.offset;
+> +                       cmd->response->data = cmd->resp_data;
+> +                       return;
+> +               }
+> +       }
+> +
+>         handler = queue_find(hfp->event_handlers, match_handler_event_prefix,
+>                                                                 lookup_prefix);
+>
+> @@ -1033,6 +1147,19 @@ struct hfp_hf *hfp_hf_new(int fd)
+>                 return NULL;
+>         }
+>
+> +       hfp->cmd_queue = queue_new();
+> +       if (!hfp->cmd_queue) {
+> +               io_destroy(hfp->io);
+> +               ringbuf_free(hfp->write_buf);
+> +               ringbuf_free(hfp->read_buf);
+> +               queue_destroy(hfp->event_handlers, NULL);
+> +               free(hfp);
 > +               return NULL;
 > +       }
 > +
-> +       return bt_gatt_server_ref(server);
-> +}
+> +       hfp->writer_active = false;
+> +       hfp->command_in_progress = false;
 > +
-> +struct bt_gatt_server *bt_gatt_server_ref(struct bt_gatt_server *server)
+>         if (!io_set_read_handler(hfp->io, hf_can_read_data, hfp,
+>                                                         read_watch_destroy)) {
+>                 queue_destroy(hfp->event_handlers,
+> @@ -1084,6 +1211,9 @@ void hfp_hf_unref(struct hfp_hf *hfp)
+>         queue_destroy(hfp->event_handlers, destroy_event_handler);
+>         hfp->event_handlers = NULL;
+>
+> +       queue_destroy(hfp->cmd_queue, destroy_cmd_response);
+> +       hfp->cmd_queue = NULL;
+> +
+>         if (!hfp->in_disconnect) {
+>                 free(hfp);
+>                 return;
+> @@ -1143,6 +1273,58 @@ bool hfp_hf_set_close_on_unref(struct hfp_hf *hfp, bool do_close)
+>         return true;
+>  }
+>
+> +bool hfp_hf_send_command(struct hfp_hf *hfp, hfp_response_func_t resp_cb,
+> +                               void *user_data, const char *format, ...)
 > +{
-> +       if (!server)
-> +               return NULL;
+> +       va_list ap;
+> +       char *fmt;
+> +       int len;
+> +       const char *separators = ";?=\0";
+> +       uint8_t prefix_len;
+> +       struct cmd_response *cmd;
 > +
-> +       __sync_fetch_and_add(&server->ref_count, 1);
-> +
-> +       return server;
-> +}
-> +
-> +void bt_gatt_server_unref(struct bt_gatt_server *server)
-> +{
-> +       if (__sync_sub_and_fetch(&server->ref_count, 1))
-> +               return;
-> +
-> +       if (server->debug_destroy)
-> +               server->debug_destroy(server->debug_data);
-> +
-> +       gatt_server_cleanup(server);
-> +
-> +       free(server);
-> +}
-> +
-> +bool bt_gatt_server_set_debug(struct bt_gatt_server *server,
-> +                                       bt_gatt_server_debug_func_t callback,
-> +                                       void *user_data,
-> +                                       bt_gatt_server_destroy_func_t destroy)
-> +{
-> +       if (!server)
+> +       if (!hfp || !format || !resp_cb)
 > +               return false;
 > +
-> +       if (server->debug_destroy)
-> +               server->debug_destroy(server->debug_data);
+> +       if (asprintf(&fmt, "%s\r", format) < 0)
+> +               return false;
 > +
-> +       server->debug_callback = callback;
-> +       server->debug_destroy = destroy;
-> +       server->debug_data = user_data;
+> +       cmd = new0(struct cmd_response, 1);
+> +       if (!cmd)
+> +               return false;
+> +
+> +       va_start(ap, format);
+> +       len = ringbuf_vprintf(hfp->write_buf, fmt, ap);
+> +       va_end(ap);
+> +
+> +       free(fmt);
+> +
+> +       if (len < 0) {
+> +               free(cmd);
+> +               return false;
+> +       }
+> +
+> +       prefix_len = strcspn(format, separators);
+> +       cmd->prefix = strndup(format, prefix_len);
+> +       cmd->resp_cb = resp_cb;
+> +       cmd->user_data = user_data;
+> +
+> +       if (!queue_push_tail(hfp->cmd_queue, cmd)) {
+> +               ringbuf_drain(hfp->write_buf, len);
+> +               free(cmd);
+> +               return false;
+> +       }
+> +
+> +       if (hfp->command_in_progress)
+> +               return true;
+> +
+> +       hfp->command_in_progress = true;
+> +
+> +       hf_wakeup_writer(hfp);
 > +
 > +       return true;
 > +}
-> diff --git a/src/shared/gatt-server.h b/src/shared/gatt-server.h
-> new file mode 100644
-> index 0000000..e3c4def
-> --- /dev/null
-> +++ b/src/shared/gatt-server.h
-> @@ -0,0 +1,40 @@
-> +/*
-> + *
-> + *  BlueZ - Bluetooth protocol stack for Linux
-> + *
-> + *  Copyright (C) 2014  Google Inc.
-> + *
-> + *
-> + *  This library is free software; you can redistribute it and/or
-> + *  modify it under the terms of the GNU Lesser General Public
-> + *  License as published by the Free Software Foundation; either
-> + *  version 2.1 of the License, or (at your option) any later version.
-> + *
-> + *  This library is distributed in the hope that it will be useful,
-> + *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-> + *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-> + *  Lesser General Public License for more details.
-> + *
-> + *  You should have received a copy of the GNU Lesser General Public
-> + *  License along with this library; if not, write to the Free Software
-> + *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-> + *
-> + */
 > +
-> +#include <stdint.h>
-> +
-> +struct bt_gatt_server;
-> +
-> +struct bt_gatt_server *bt_gatt_server_new(struct gatt_db *db,
-> +                                       struct bt_att *att, uint16_t mtu);
-> +
-> +struct bt_gatt_server *bt_gatt_server_ref(struct bt_gatt_server *server);
-> +void bt_gatt_server_unref(struct bt_gatt_server *server);
-> +
-> +typedef void (*bt_gatt_server_destroy_func_t)(void *user_data);
-> +typedef void (*bt_gatt_server_debug_func_t)(const char *str, void *user_data);
-> +
-> +bool bt_gatt_server_set_debug(struct bt_gatt_server *server,
-> +                                       bt_gatt_server_debug_func_t callback,
-> +                                       void *user_data,
-> +                                       bt_gatt_server_destroy_func_t destroy);
-> --
-> 2.1.0.rc2.206.gedb03e5
+>  bool hfp_hf_register(struct hfp_hf *hfp, hfp_hf_result_func_t callback,
+>                                                 const char *prefix,
+>                                                 void *user_data,
+> diff --git a/src/shared/hfp.h b/src/shared/hfp.h
+> index 85037b1..773d827 100644
+> --- a/src/shared/hfp.h
+> +++ b/src/shared/hfp.h
+> @@ -83,6 +83,9 @@ typedef void (*hfp_command_func_t)(const char *command, void *user_data);
 >
+>  typedef void (*hfp_disconnect_func_t)(void *user_data);
+>
+> +typedef void (*hfp_response_func_t)(enum hfp_result result,
+> +                                               struct hfp_hf_result *resp,
+> +                                               void *user_data);
+>  struct hfp_gw;
+>  struct hfp_hf;
+>
+> @@ -146,3 +149,5 @@ bool hfp_hf_register(struct hfp_hf *hfp, hfp_hf_result_func_t callback,
+>                                         const char *prefix, void *user_data,
+>                                         hfp_destroy_func_t destroy);
+>  bool hfp_hf_unregister(struct hfp_hf *hfp, const char *prefix);
+> +bool hfp_hf_send_command(struct hfp_hf *hfp, hfp_response_func_t resp_cb,
+> +                               void *user_data, const char *format, ...);
 > --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> 1.8.4
+>
 
-It looks good in context of future usage in Android
-
-BR
-Marcin
+\Łukasz
