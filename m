@@ -1,39 +1,45 @@
 Return-Path: <cyrus@holtmann.org>
-From: Vikrampal Yadav <vikram.pal@samsung.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: luiz.dentz@gmail.com, d.kasatkin@samsung.com,
-	vikram.pal@samsung.com, cpgs@samsung.com
-Subject: [PATCH] Monitor: Fix indentation for AVRCP PASS THROUGH commands
-Date: Thu, 09 Oct 2014 17:27:06 +0530
-Message-id: <1412855826-3665-1-git-send-email-vikram.pal@samsung.com>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] bnep: Add extra debug information for bnep_up
+Date: Thu, 09 Oct 2014 13:30:44 +0200
+Message-ID: <3300021.NoEnUzGqr8@uw000953>
+In-Reply-To: <1412849863-6691-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1412849863-6691-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Intendation for AVRCP PASS THROUGH commands' decoding fixed.
----
- monitor/avctp.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+Hi Andrei,
 
-diff --git a/monitor/avctp.c b/monitor/avctp.c
-index a4e34c5..4abd18f 100644
---- a/monitor/avctp.c
-+++ b/monitor/avctp.c
-@@ -686,13 +686,13 @@ static bool avrcp_passthrough_packet(struct avctp_frame *avctp_frame,
- 	if (!l2cap_frame_get_u8(frame, &op))
- 		return false;
+On Thursday 09 of October 2014 13:17:43 Andrei Emeltchenko wrote:
+> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> 
+> Adding extra debug information helps to investigate failing cases
+> ---
+>  profiles/network/bnep.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+> 
+> diff --git a/profiles/network/bnep.c b/profiles/network/bnep.c
+> index 136709d..a6b8728 100644
+> --- a/profiles/network/bnep.c
+> +++ b/profiles/network/bnep.c
+> @@ -210,7 +210,8 @@ static int bnep_if_up(const char *devname)
+>  	close(sk);
+>  
+>  	if (err < 0) {
+> -		error("Could not bring up %s", devname);
+> +		error("Could not bring up %s: %s(%d)", devname, strerror(errno),
+> +									errno);
+>  		return err;
+>  	}
+
+You should use -err no errno here. Errno might be already overwritten by call
+to close().
  
--	print_field("%*cOperation: 0x%02x (%s %s)", (indent - 2), ' ', op,
-+	print_field("%*cOperation: 0x%02x (%s %s)", (indent - 8), ' ', op,
- 				op2str(op), op & 0x80 ? "Released" : "Pressed");
- 
- 	if (!l2cap_frame_get_u8(frame, &len))
- 		return false;
- 
--	print_field("%*cLength: 0x%02x", (indent - 2), ' ', len);
-+	print_field("%*cLength: 0x%02x", (indent - 8), ' ', len);
- 
- 	packet_hexdump(frame->data, frame->size);
- 	return true;
+
 -- 
-1.9.1
-
+Best regards, 
+Szymon Janc
