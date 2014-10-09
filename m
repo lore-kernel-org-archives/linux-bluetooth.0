@@ -1,51 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
 From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Aleksander Drewnicki <ext.aleksander.drewnicki@tieto.com>
-Subject: [PATCH 10/10] android/client: Add completion for mce method
-Date: Thu,  9 Oct 2014 14:45:14 +0200
-Message-Id: <1412858714-2845-11-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+Subject: [PATCH 06/10] android/ipc-tester: Add cases for MAP client msg size
+Date: Thu,  9 Oct 2014 14:45:10 +0200
+Message-Id: <1412858714-2845-7-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 In-Reply-To: <1412858714-2845-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 References: <1412858714-2845-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Aleksander Drewnicki <ext.aleksander.drewnicki@tieto.com>
-
-This patch adds completion functions to mce method.
+Add cases testing message size verification for MAP client opcodes.
 ---
- android/client/if-mce.c | 11 ++++++++++-
- 1 file changed, 10 insertions(+), 1 deletion(-)
+ android/ipc-tester.c | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
 
-diff --git a/android/client/if-mce.c b/android/client/if-mce.c
-index 76c9f73..5f101e0 100644
---- a/android/client/if-mce.c
-+++ b/android/client/if-mce.c
-@@ -54,6 +54,15 @@ static void init_p(int argc, const char **argv)
- 	EXEC(if_mce->init, &mce_cbacks);
- }
+diff --git a/android/ipc-tester.c b/android/ipc-tester.c
+index 7dd25e8..357dda9 100644
+--- a/android/ipc-tester.c
++++ b/android/ipc-tester.c
+@@ -1486,5 +1486,19 @@ int main(int argc, char *argv[])
+ 			HAL_SERVICE_ID_BLUETOOTH,
+ 			HAL_SERVICE_ID_HANDSFREE_CLIENT);
  
-+static void get_remote_mas_instances_c(int argc, const char **argv,
-+					enum_func *enum_func, void **user)
-+{
-+	if (argc == 3) {
-+		*user = NULL;
-+		*enum_func = enum_devices;
-+	}
-+}
++	/* check for valid data size for MAP CLIENT */
++	test_datasize_valid("MAP CLIENT Get instances+",
++				HAL_SERVICE_ID_MAP_CLIENT,
++				HAL_OP_MAP_CLIENT_GET_INSTANCES,
++				sizeof(struct hal_cmd_map_client_get_instances),
++				1, HAL_SERVICE_ID_BLUETOOTH,
++				HAL_SERVICE_ID_MAP_CLIENT);
++	test_datasize_valid("MAP CLIENT Get instances-",
++				HAL_SERVICE_ID_MAP_CLIENT,
++				HAL_OP_MAP_CLIENT_GET_INSTANCES,
++				sizeof(struct hal_cmd_map_client_get_instances),
++				-1, HAL_SERVICE_ID_BLUETOOTH,
++				HAL_SERVICE_ID_MAP_CLIENT);
 +
- /* search for MAS instances on remote device */
- 
- static void get_remote_mas_instances_p(int argc, const char **argv)
-@@ -68,7 +77,7 @@ static void get_remote_mas_instances_p(int argc, const char **argv)
- 
- static struct method methods[] = {
- 	STD_METHOD(init),
--	STD_METHODH(get_remote_mas_instances, "<addr>"),
-+	STD_METHODCH(get_remote_mas_instances, "<addr>"),
- 	END_METHOD
- };
- 
+ 	return tester_run();
+ }
 -- 
 1.9.3
 
