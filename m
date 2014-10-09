@@ -1,108 +1,79 @@
 Return-Path: <cyrus@holtmann.org>
-From: Alfonso Acosta <fons@spotify.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Defer connection-parameter removal when unpairing without disconnecting
-Date: Thu,  9 Oct 2014 13:03:48 +0000
-Message-Id: <1412859828-6224-1-git-send-email-fons@spotify.com>
+From: Vikrampal <vikram.pal@samsung.com>
+To: 'Luiz Augusto von Dentz' <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	'Dmitry Kasatkin' <d.kasatkin@samsung.com>, cpgs@samsung.com
+References: <1412855826-3665-1-git-send-email-vikram.pal@samsung.com>
+ <CABBYNZJ-SdhX2S6_BPoPYe2qyavnpqhWAYgKmPi4qAABsrMw2g@mail.gmail.com>
+In-reply-to: <CABBYNZJ-SdhX2S6_BPoPYe2qyavnpqhWAYgKmPi4qAABsrMw2g@mail.gmail.com>
+Subject: RE: [PATCH] Monitor: Fix indentation for AVRCP PASS THROUGH commands
+Date: Thu, 09 Oct 2014 18:29:31 +0530
+Message-id: <005a01cfe3c0$f5d1d830$e1758890$@samsung.com>
+MIME-version: 1.0
+Content-type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Systematically removing the LE connection parameters and autoconnect
-action is inconvenient for rebonding without disconnecting from
-userland (i.e. unpairing followed by repairing without
-disconnecting). The parameters will be lost after unparing and
-userland needs to take care of book-keeping them and re-adding them.
+Hi Luiz,
 
-This patch allows userland to forget about parameter management when
-rebonding without disconnecting. It defers clearing the connection
-parameters when unparing without disconnecting, giving a chance of
-keeping the parameters if a repairing happens before the connection is
-closed.
+> -----Original Message-----
+> From: Luiz Augusto von Dentz [mailto:luiz.dentz@gmail.com]
+> Sent: Thursday, October 09, 2014 5:29 PM
+> To: Vikrampal Yadav
+> Cc: linux-bluetooth@vger.kernel.org; Dmitry Kasatkin; cpgs@samsung.com
+> Subject: Re: [PATCH] Monitor: Fix indentation for AVRCP PASS THROUGH
+> commands
+> 
+> Hi Vikram,
+> 
+> On Thu, Oct 9, 2014 at 2:57 PM, Vikrampal Yadav
+> <vikram.pal@samsung.com> wrote:
+> > Intendation for AVRCP PASS THROUGH commands' decoding fixed.
+> 
+> Please use lower case at the beginning e.g. monitor:
+> 
+> > ---
+> >  monitor/avctp.c | 4 ++--
+> >  1 file changed, 2 insertions(+), 2 deletions(-)
+> >
+> > diff --git a/monitor/avctp.c b/monitor/avctp.c index a4e34c5..4abd18f
+> > 100644
+> > --- a/monitor/avctp.c
+> > +++ b/monitor/avctp.c
+> > @@ -686,13 +686,13 @@ static bool avrcp_passthrough_packet(struct
+> avctp_frame *avctp_frame,
+> >         if (!l2cap_frame_get_u8(frame, &op))
+> >                 return false;
+> >
+> > -       print_field("%*cOperation: 0x%02x (%s %s)", (indent - 2), ' ', op,
+> > +       print_field("%*cOperation: 0x%02x (%s %s)", (indent - 8), ' ',
+> > + op,
+> >                                 op2str(op), op & 0x80 ? "Released" :
+> > "Pressed");
+> >
+> >         if (!l2cap_frame_get_u8(frame, &len))
+> >                 return false;
+> >
+> > -       print_field("%*cLength: 0x%02x", (indent - 2), ' ', len);
+> > +       print_field("%*cLength: 0x%02x", (indent - 8), ' ', len);
+> >
+> >         packet_hexdump(frame->data, frame->size);
+> >         return true;
+> > --
+> > 1.9.1
+> 
+> 
+> Could you please start adding the output of the btmon to the description
+> once you add new parsers like this that way we can spot more easily
+> formatting bugs such as this.
+> 
+> 
+> 
+> --
+> Luiz Augusto von Dentz
 
-Signed-off-by: Alfonso Acosta <fons@spotify.com>
----
- include/net/bluetooth/hci_core.h |  1 +
- net/bluetooth/hci_conn.c         |  6 ++++++
- net/bluetooth/mgmt.c             | 16 +++++++++++++---
- 3 files changed, 20 insertions(+), 3 deletions(-)
+Sure!
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 07ddeed62..b8685a7 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -555,6 +555,7 @@ enum {
- 	HCI_CONN_STK_ENCRYPT,
- 	HCI_CONN_AUTH_INITIATOR,
- 	HCI_CONN_DROP,
-+	HCI_CONN_PARAM_REMOVAL_PEND,
- };
- 
- static inline bool hci_conn_ssp_enabled(struct hci_conn *conn)
-diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index b9517bd..d106f29 100644
---- a/net/bluetooth/hci_conn.c
-+++ b/net/bluetooth/hci_conn.c
-@@ -356,6 +356,9 @@ static void hci_conn_timeout(struct work_struct *work)
- 		conn->state = BT_CLOSED;
- 		break;
- 	}
-+
-+	if (test_and_clear_bit(HCI_CONN_MODE_CHANGE_PEND, &conn->flags))
-+		hci_conn_params_del(conn->hdev, &conn->dst, conn->dst_type);
- }
- 
- /* Enter sniff mode */
-@@ -544,6 +547,9 @@ int hci_conn_del(struct hci_conn *conn)
- 
- 	hci_conn_del_sysfs(conn);
- 
-+	if (test_and_clear_bit(HCI_CONN_MODE_CHANGE_PEND, &conn->flags))
-+		hci_conn_params_del(conn->hdev, &conn->dst, conn->dst_type);
-+
- 	hci_dev_put(hdev);
- 
- 	hci_conn_put(conn);
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 3fd88b0..0f2c0e9 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -2700,6 +2700,7 @@ static int unpair_device(struct sock *sk, struct hci_dev *hdev, void *data,
- 	struct hci_cp_disconnect dc;
- 	struct pending_cmd *cmd;
- 	struct hci_conn *conn;
-+	struct hci_conn *le_conn = NULL;
- 	int err;
- 
- 	memset(&rp, 0, sizeof(rp));
-@@ -2736,7 +2737,17 @@ static int unpair_device(struct sock *sk, struct hci_dev *hdev, void *data,
- 
- 		hci_remove_irk(hdev, &cp->addr.bdaddr, addr_type);
- 
--		hci_conn_params_del(hdev, &cp->addr.bdaddr, addr_type);
-+		le_conn = hci_conn_hash_lookup_ba(hdev, LE_LINK,
-+						  &cp->addr.bdaddr);
-+
-+		/* If the BLE connection is being used, defer clearing up
-+		 * the connection parameters until closing to give a
-+		 * chance of keeping them if a repairing happens.
-+		 */
-+		if (le_conn && !cp->disconnect)
-+			set_bit(HCI_CONN_PARAM_REMOVAL_PEND, &le_conn->flags);
-+		else
-+			hci_conn_params_del(hdev, &cp->addr.bdaddr, addr_type);
- 
- 		err = hci_remove_ltk(hdev, &cp->addr.bdaddr, addr_type);
- 	}
-@@ -2752,8 +2763,7 @@ static int unpair_device(struct sock *sk, struct hci_dev *hdev, void *data,
- 			conn = hci_conn_hash_lookup_ba(hdev, ACL_LINK,
- 						       &cp->addr.bdaddr);
- 		else
--			conn = hci_conn_hash_lookup_ba(hdev, LE_LINK,
--						       &cp->addr.bdaddr);
-+			conn = le_conn;
- 	} else {
- 		conn = NULL;
- 	}
--- 
-1.9.1
+Regards,
+Vikram
 
