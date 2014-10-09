@@ -1,89 +1,45 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Gu, Chao Jie" <chao.jie.gu@intel.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: RE: [PATCH v4 1/3] shared/att.c: Add signed command outgoing and
- CSRK function
-Date: Thu, 9 Oct 2014 04:02:43 +0000
-Message-ID: <3D02B219753AD44CBDDDE484323B17741130DD22@SHSMSX104.ccr.corp.intel.com>
-References: <1412758479-13214-1-git-send-email-chao.jie.gu@intel.com>
-	<1412758479-13214-2-git-send-email-chao.jie.gu@intel.com>
- <CABBYNZ+NW=1aW6_sMppq2kU4FUou0pK5DhHQ7ykhUFkf4dCCsw@mail.gmail.com>
-In-Reply-To: <CABBYNZ+NW=1aW6_sMppq2kU4FUou0pK5DhHQ7ykhUFkf4dCCsw@mail.gmail.com>
-Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
+In-Reply-To: <35741970-1ED7-4A2B-8625-4F16186FA764@holtmann.org>
+References: <1411746855-9936-1-git-send-email-fons@spotify.com>
+ <24D2CD11-D43B-4F53-8A7C-175934A54C87@holtmann.org> <CAHF=Y4owMj-RBquSk2GWVjGSL4H1SU0qC6pVEN6DJvdmyqw9zA@mail.gmail.com>
+ <BCEE5DFC-08DA-43A7-AED8-BEFD837B07ED@holtmann.org> <CAHF=Y4p-st7N4+kUezYWjy7L58zcH-1t0AO0ME6axZ76ZK+oKQ@mail.gmail.com>
+ <1D7AEE8B-51DB-4A6D-8EBA-3EC81760224E@holtmann.org> <CAHF=Y4pkXTvcN6YQTH6DPboeav7BCa8T0HUSfOHfag+W9GJ8fQ@mail.gmail.com>
+ <CAHF=Y4r0Dx1b8vwWAwTWSNq+JD_1_622px4UG4FD1vsfS+BWiw@mail.gmail.com> <35741970-1ED7-4A2B-8625-4F16186FA764@holtmann.org>
+From: Alfonso Acosta <fons@spotify.com>
+Date: Thu, 9 Oct 2014 03:01:32 +0200
+Message-ID: <CAHF=Y4rhOMZ684riRJNrqOjnCXW_CuNdjCfTRtAVRg=dWUfxQA@mail.gmail.com>
+Subject: Re: [PATCH v3] Bluetooth: Add HCI_AUTO_CONN_DIRECT_REPORT_IND
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-SGkgTHVpeiwNCg0KPiA+IEBAIC03Nyw2ICs3OCwxNiBAQCBzdHJ1Y3QgYnRfYXR0IHsNCj4gPiAg
-ICAgICAgIGJ0X2F0dF9kZWJ1Z19mdW5jX3QgZGVidWdfY2FsbGJhY2s7DQo+ID4gICAgICAgICBi
-dF9hdHRfZGVzdHJveV9mdW5jX3QgZGVidWdfZGVzdHJveTsNCj4gPiAgICAgICAgIHZvaWQgKmRl
-YnVnX2RhdGE7DQo+ID4gKw0KPiA+ICsgICAgICAgc3RydWN0IGJ0X2NyeXB0byAqY3J5cHRvOw0K
-PiA+ICsNCj4gPiArICAgICAgIGJvb2wgdmFsaWRfbG9jYWxfY3NyazsNCj4gPiArICAgICAgIHVp
-bnQ4X3QgbG9jYWxfY3Nya1sxNl07DQo+ID4gKyAgICAgICB1aW50MzJfdCBsb2NhbF9zaWduX2Nu
-dDsNCj4gPiArDQo+ID4gKyAgICAgICBib29sIHZhbGlkX3JlbW90ZV9jc3JrOw0KPiA+ICsgICAg
-ICAgdWludDhfdCByZW1vdGVfY3Nya1sxNl07DQo+ID4gKyAgICAgICB1aW50MzJfdCByZW1vdGVf
-c2lnbl9jbnQ7DQo+IA0KPiBNYXliZSBpdCBpcyBiZXR0ZXIgdG8gaGF2ZSBwb2ludGVycyB0byBh
-IHN0cnVjdHMgc28geW91IGNhbiBmcmVlIHRoZSBkYXRhIG9uY2UgaXQNCj4gYmVjb21lcyBpbnZh
-bGlkIGFuZCBpdCBhbHNvIHJlbW92ZXMgdGhlIG5lY2Vzc2l0eSBvZiBleHRyYSBmbGFncyBqdXN0
-IHRvIHRlbGwgaWYgdGhlIGRhdGENCj4gaXMgc3RpbGwgdmFsaWQgc2luY2UgeW91IGNhbiBjaGVj
-ayBpZiB0aGUgcG9pbnRlciBpcyBub3QgTlVMTCB0aGVuIGl0IG11c3QgYmUgdmFsaWQuDQoNClRo
-aXMgaXMgZ29vZCBpZGVhIHRvIHJlbW92ZSB0aGUgZXh0cmEgZmxhZ3MuIEhvd2V2ZXIsIHdlIGRl
-ZmluZSB0aGUgc3RydWN0IHRvIGRvIHRoaXMgd2hpY2gNCndvdWxkIHJlc3VsdCBpbiBzb21lIHBy
-b2JsZW0uIE5vdyB3ZSBpbml0aWFsaXplIHRoZSBsb2NhbF9zaWduX2NudCBpbiB0aGUgYnRfYXR0
-X25ldyBmdW5jdGlvbg0KYW5kIG9ubHkgYWRkIGxvY2FsX3NpZ25fY250IHZhbHVlIHdoZW4gc2ln
-bmVkIHdyaXRlIGNvbW1hbmQgb3V0Z29pbmcuIE1lYW53aWxlLCB3ZSBzZXQgbG9jYWwNCkNTUksg
-aW4gdGhlIGJ0X2dhdHRfY2xpZW50X3NldF9sb2NhbF9jc3JrIGZ1bmN0aW9uIHdoZW4gdGhlcmUg
-aXMgdmFsaWQgQ1NSSyBwcm92aWRlZC4gVGhpcyB0d28NClBhcmFtZXRlciBzZXQgYXQgZGlmZmVy
-ZW50IHRpbWUgbm93Lg0KDQpJZiB3ZSBoYXZlIHBvaW50ZXJzIHRvIGEgc3RydWN0IGluY2x1ZGlu
-ZyBsb2NhbF9jc3JrIGFuZCBsb2NhbF9zaWduZF9jbnQsIHdlIGluaXRpYWxpemUgdGhlIGxvY2Fs
-X3NpZ25fY250IA0KbWVhbndoaWxlIHRoZSBzdHJ1Y3Qgc2hvdWxkIG5vdCBiZSBOVUxMIGJlY2F1
-c2Ugb2YgaW5jdWRpbmcgaXQuIEluIGZhY3QsIGxvY2FsX2NzcmsgaXMgbm90IHZhbGlkIGF0IHRo
-aXMgdGltZS4NCklmIHdlIGluaXRpYWxpemUgdGhlIGxvY2FsX3NpZ25lZF9jbnQgd2hlbiBDU1JL
-IGlzIHZhbGlkICwgaXQgd291bGQgYmUgcmlzayB0byBjaGFuZ2UgbG9jYWxfc2lnbmVkX2NudCBi
-eSB1c2VyDQpjYWxsaW5nIGJ0X2dhdHRfY2xpZW50X3NldF9sb2NhbF9jc3JrLg0KPiA+ICB9Ow0K
-PiA+DQo+ID4gIGVudW0gYXR0X29wX3R5cGUgew0KPiA+IEBAIC0xNzYsNiArMTg3LDggQEAgc3Ry
-dWN0IGF0dF9zZW5kX29wIHsNCj4gPiAgICAgICAgIGJ0X2F0dF9yZXNwb25zZV9mdW5jX3QgY2Fs
-bGJhY2s7DQo+ID4gICAgICAgICBidF9hdHRfZGVzdHJveV9mdW5jX3QgZGVzdHJveTsNCj4gPiAg
-ICAgICAgIHZvaWQgKnVzZXJfZGF0YTsNCj4gPiArDQo+ID4gKyAgICAgICBzdHJ1Y3QgYnRfYXR0
-ICphdHQ7DQo+ID4gIH07DQo+ID4NCj4gPiAgc3RhdGljIHZvaWQgZGVzdHJveV9hdHRfc2VuZF9v
-cCh2b2lkICpkYXRhKSBAQCAtMjc3LDYgKzI5MCwxMCBAQA0KPiA+IHN0YXRpYyBib29sIGVuY29k
-ZV9wZHUoc3RydWN0IGF0dF9zZW5kX29wICpvcCwgY29uc3Qgdm9pZCAqcGR1LA0KPiA+ICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHVpbnQxNl90IGxlbmd0
-aCwNCj4gPiB1aW50MTZfdCBtdHUpICB7DQo+ID4gICAgICAgICB1aW50MTZfdCBwZHVfbGVuID0g
-MTsNCj4gPiArICAgICAgIHN0cnVjdCBidF9hdHQgKmF0dCA9IG9wLT5hdHQ7DQo+ID4gKw0KPiA+
-ICsgICAgICAgaWYgKG9wLT5vcGNvZGUgJiBBVFRfT1BfU0lHTkVEX01BU0spDQo+ID4gKyAgICAg
-ICAgICAgICAgIHBkdV9sZW4gKz0gQlRfQVRUX1NJR05BVFVSRV9MRU47DQo+ID4NCj4gPiAgICAg
-ICAgIGlmIChsZW5ndGggJiYgcGR1KQ0KPiA+ICAgICAgICAgICAgICAgICBwZHVfbGVuICs9IGxl
-bmd0aDsNCj4gPiBAQCAtMjkzLDE3ICszMTAsMzIgQEAgc3RhdGljIGJvb2wgZW5jb2RlX3BkdShz
-dHJ1Y3QgYXR0X3NlbmRfb3AgKm9wLCBjb25zdA0KPiB2b2lkICpwZHUsDQo+ID4gICAgICAgICBp
-ZiAocGR1X2xlbiA+IDEpDQo+ID4gICAgICAgICAgICAgICAgIG1lbWNweShvcC0+cGR1ICsgMSwg
-cGR1LCBsZW5ndGgpOw0KPiA+DQo+ID4gKyAgICAgICBpZiAob3AtPm9wY29kZSAmIEFUVF9PUF9T
-SUdORURfTUFTSykgew0KPiA+ICsgICAgICAgICAgICAgICBpZiAoYnRfY3J5cHRvX3NpZ25fYXR0
-KGF0dC0+Y3J5cHRvLA0KPiA+ICsgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICBhdHQtPmxvY2FsX2NzcmssDQo+ID4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgIG9wLT5wZHUsDQo+ID4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgIDEgKyBsZW5ndGgsDQo+ID4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgIGF0dC0+bG9jYWxfc2lnbl9jbnQsDQo+ID4gKyAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICYoKHVpbnQ4X3QgKikgb3AtPnBkdSlbMSArDQo+IGxlbmd0aF0pKQ0KPiA+
-ICsgICAgICAgICAgICAgICAgICAgICAgIGF0dC0+bG9jYWxfc2lnbl9jbnQrKzsNCj4gPiArICAg
-ICAgICAgICAgICAgZWxzZQ0KPiA+ICsgICAgICAgICAgICAgICAgICAgICAgIHJldHVybiBmYWxz
-ZTsNCj4gPiArICAgICAgIH0NCj4gPiArDQo+IA0KPiBZb3UgY2FuIHByb2JhYmx5IGJhaWwgb3V0
-IGVhcmx5IGlmIHlvdSBjaGVjayAhKG9wLT5vcGNvZGUgJiBBVFRfT1BfU0lHTkVEX01BU0spLA0K
-PiBhbHNvIHBlcmhhcHMgaXQgaXMgYSBnb29kIGlkZWEgdG8gc3RhcnQgZGVmaW5pbmcgc3RydWN0
-cyBmb3IgdGhlIFBEVXMgdG8gc2ltcGxpZnkgdGhlDQo+IGFjY2Vzcy4NCj4gDQpJZiB3ZSBiYWls
-IG91dCB0aGlzIGNoZWNraW5nIGVhcmx5ICwgbWF5YmUgd2UgaGF2ZSB0byBuZWVkIHR3byBkaWZm
-ZXJlbnQgZW5jb2RlX3BkdQ0KZnVuY3Rpb24gdG8gaW1wbGVtZW50IGl0IHN1Y2ggYXMgbmFtaW5n
-IG5ldyBlbmNvZGVfc2lnbmVkX3BkdSBmdW5jdGlvbiB0byBkbyB0aGlzLg0KDQpIb3dldmVyLCBJ
-IHRoaW5rIGVuY29kaW5nIHNpZ25lZF93cml0ZV9jb21tYW5kIHBkdSBtb3N0IGRpZmZlcmVuY2Ug
-aXMgYWRkaW5nIA0Kc2lnbmF0Z3VyZSBpbiB0aGUgZW5kIG9mIHBkdS4gQXMgb2xkIHN0YWNrLCB3
-ZSBjYW4gc2VlIGV2ZXJ5IGNvbW1hbmQgaGFzIHRoZWlyIA0Kb3duIGVuY29kZV9wZHUgZnVuY3Rp
-b24uIEluIGZhY3QsIG1vc3QgcHJvY2VkdXJlIGlzIGNvbW1vbi4gU28gSSB0aGluayBhbGwgaW4g
-b25lIA0KZW5jb2RlX3BkdSBmdW5jdGlvbiBpcyBuZXcgZmVhdHVyZSBpbiBuZXcgQVRUIFN0YWNr
-LCBzbyB0aGlzIGltcGxlbWVudGF0aW9uIGlzIA0KYXQgbG93ZXN0IHByaWNlIHRvIGNvbXBhdGli
-bGUgd2l0aCBuZXcgQVRUIFN0YWNrLiBUaGF0IGlzIHdoeSBJIGRpZG7igJl0IGJhaWwgb3V0IGVh
-cmx5DQp0aGlzIGNoZWNraW5nIChvcC0+b3Bjb2RlICYgQVRUX09QX1NJR05FRF9NQVNLKS4gRm9s
-bG93aW5nIHRoaXMgaW1wbGVtZW50YXRpb24sDQp0aGVyZSBpcyBubyBuZWVkIHRvIGNyZWF0ZSBh
-bm90aGVyIHRoZSBlbmNvZGUgZnVuY3Rpb24gdG8gaW1wbGVtZW50IHNpZ25lZF93cml0ZSwNCkp1
-c3QgdXNpbmcgb25lIGVuY29kZV9wZHUgZnVuY3Rpb24gdG8gZG8gdGhpcyBpcyBPSy4NCg0KRG8g
-eW91IHRoaW5rIHRoaXMgbWFrZSBzZW5zZT8NCg0KVGhhbmtzDQpDaGFvamllIEd1DQoNCg==
+Hi Marcel,
+
+
+> what sounds most simple to me is that we allow for a way to suspend and later resume the trigger for doing service discovery. Attaching the attribute channel is fine, but then essentially tell it to stay put.
+>
+> This all becomes tricky and we might need to have some redesign and cleanups to do to make this work cleanly. We also long term want to switch to the newly designed gatt-client.c that we are working on. So something to keep in mind.
+>
+> However one thing has to present and that is our GATT server. So even if we stall everything else and even if we drop the keys and unpair, the GATT server needs to be operational. So we need to attach the ATT protocol to the ATT socket that we are getting from the kernel on every single connection.
+
+Thanks. Using your suggestion I am suspending the trigger for doing
+service discovery until rebonding is completed. As expected, without
+the connection re-establishment, rebonding is now considerably faster.
+
+I, however, have to keep the ATT socket around until resuming the
+service discovery, which is a bit dirty. But I guess I can live with
+that until the new gatt-client is in.
+
+Thanks again,
+
+Fons
+
+-- 
+Alfonso Acosta
+
+Embedded Systems Engineer at Spotify
+Birger Jarlsgatan 61, Stockholm, Sweden
+http://www.spotify.com
