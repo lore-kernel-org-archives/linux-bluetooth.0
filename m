@@ -1,56 +1,138 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 9 Oct 2014 10:57:36 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Alexander Aring <alex.aring@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org, jukka.rissanen@linux.intel.com
-Subject: Re: [PATCH bluetooth-next] bluetooth: 6lowpan: fix skb_unshare
- behaviour
-Message-ID: <20141009075736.GA6565@t440s.lan>
-References: <1412756693-19410-1-git-send-email-alex.aring@gmail.com>
- <20141008083706.GA13231@t440s.lan>
- <20141008084736.GA19532@omega>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20141008084736.GA19532@omega>
-Sender: linux-bluetooth-owner@vger.kernel.org
+From: Martin Townsend <mtownsend1973@gmail.com>
+To: linux-bluetooth@vger.kernel.org,
+	linux-wpan@vger.kernel.org
+Cc: marcel@holtmann.org,
+	alex.aring@gmail.com,
+	jukka.rissanen@linux.intel.com,
+	Martin Townsend <martin.townsend@xsilon.com>
+Subject: [PATCH v5 bluetooth-next] 6lowpan: Use pskb_expand_head in IPHC decompression.
+Date: Thu,  9 Oct 2014 08:46:34 +0100
+Message-Id: <1412840794-17283-2-git-send-email-martin.townsend@xsilon.com>
+In-Reply-To: <1412840794-17283-1-git-send-email-martin.townsend@xsilon.com>
+References: <1412840794-17283-1-git-send-email-martin.townsend@xsilon.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Alex,
+Currently there are potentially 2 skb_copy_expand calls in IPHC
+decompression.  This patch replaces this with one call to
+pskb_expand_head.  It also checks to see if there is enough headroom
+first to ensure it's only done if necessary.
+As pskb_expand_head must only have one reference the calling code
+now ensures this.
 
-On Wed, Oct 08, 2014, Alexander Aring wrote:
-> On Wed, Oct 08, 2014 at 11:37:06AM +0300, Johan Hedberg wrote:
-> > Hi Alex,
-> > 
-> > On Wed, Oct 08, 2014, Alexander Aring wrote:
-> > > This patch reverts commit:
-> > > 
-> > > a7807d73 ("Bluetooth: 6lowpan: Avoid memory leak if memory allocation
-> > > fails")
-> > > 
-> > > which was wrong suggested by Alexander Aring. The function skb_unshare
-> > > run also kfree_skb on failure.
-> > > 
-> > > Signed-off-by: Alexander Aring <alex.aring@gmail.com>
-> > > ---
-> > > compile tested only.
-> > > 
-> > >  net/bluetooth/6lowpan.c | 8 ++------
-> > >  1 file changed, 2 insertions(+), 6 deletions(-)
-> > 
-> > This doesn't look like something that should only go to bluetooth-next
-> > (which you've tagged it for). The bluetooth-next tree (since 3.17 has
-> > been released) has moved to catering 3.19 patches whereas this patch
-> > seems to be something that's fixing an issue heading to 3.18-rc1. So it
-> > seems to me this patch should in fact be going to the bluetooth.git tree
-> > instead of bluetooth-next.git. Am I right?
-> > 
-> 
-> yes, but commit a7807d73 isn't inside of bluetooth.git right now. Should
-> I rebase it to some other repository or cc stable here?
+Signed-off-by: Martin Townsend <martin.townsend@xsilon.com>
+---
+ net/6lowpan/iphc.c      | 51 ++++++++++++++++++++++++-------------------------
+ net/bluetooth/6lowpan.c |  7 +++++++
+ 2 files changed, 32 insertions(+), 26 deletions(-)
 
-No, you shouldn't need to do anything. We'll take care of rebasing
-bluetooth.git appropriately, applying the patch and eventually making a
-pull request for it. My only concern was with the "PATCH bluetooth-next"
-annotation in the subject.
-
-Johan
+diff --git a/net/6lowpan/iphc.c b/net/6lowpan/iphc.c
+index 142eef5..853b4b8 100644
+--- a/net/6lowpan/iphc.c
++++ b/net/6lowpan/iphc.c
+@@ -174,30 +174,22 @@ static int uncompress_context_based_src_addr(struct sk_buff *skb,
+ static int skb_deliver(struct sk_buff *skb, struct ipv6hdr *hdr,
+ 		       struct net_device *dev, skb_delivery_cb deliver_skb)
+ {
+-	struct sk_buff *new;
+ 	int stat;
+ 
+-	new = skb_copy_expand(skb, sizeof(struct ipv6hdr), skb_tailroom(skb),
+-			      GFP_ATOMIC);
+-	kfree_skb(skb);
+-
+-	if (!new)
+-		return -ENOMEM;
+-
+-	skb_push(new, sizeof(struct ipv6hdr));
+-	skb_reset_network_header(new);
+-	skb_copy_to_linear_data(new, hdr, sizeof(struct ipv6hdr));
++	skb_push(skb, sizeof(struct ipv6hdr));
++	skb_reset_network_header(skb);
++	skb_copy_to_linear_data(skb, hdr, sizeof(struct ipv6hdr));
+ 
+-	new->protocol = htons(ETH_P_IPV6);
+-	new->pkt_type = PACKET_HOST;
+-	new->dev = dev;
++	skb->protocol = htons(ETH_P_IPV6);
++	skb->pkt_type = PACKET_HOST;
++	skb->dev = dev;
+ 
+ 	raw_dump_table(__func__, "raw skb data dump before receiving",
+-		       new->data, new->len);
++		       skb->data, skb->len);
+ 
+-	stat = deliver_skb(new, dev);
++	stat = deliver_skb(skb, dev);
+ 
+-	kfree_skb(new);
++	consume_skb(skb);
+ 
+ 	return stat;
+ }
+@@ -460,7 +452,7 @@ int lowpan_process_data(struct sk_buff *skb, struct net_device *dev,
+ 	/* UDP data uncompression */
+ 	if (iphc0 & LOWPAN_IPHC_NH_C) {
+ 		struct udphdr uh;
+-		struct sk_buff *new;
++		const int needed = sizeof(struct udphdr) + sizeof(hdr);
+ 
+ 		if (uncompress_udp_header(skb, &uh))
+ 			goto drop;
+@@ -468,14 +460,13 @@ int lowpan_process_data(struct sk_buff *skb, struct net_device *dev,
+ 		/* replace the compressed UDP head by the uncompressed UDP
+ 		 * header
+ 		 */
+-		new = skb_copy_expand(skb, sizeof(struct udphdr),
+-				      skb_tailroom(skb), GFP_ATOMIC);
+-		kfree_skb(skb);
+-
+-		if (!new)
+-			return -ENOMEM;
+-
+-		skb = new;
++		if (skb_headroom(skb) < needed) {
++			err = pskb_expand_head(skb, needed, 0, GFP_ATOMIC);
++			if (unlikely(err)) {
++				kfree_skb(skb);
++				return err;
++			}
++		}
+ 
+ 		skb_push(skb, sizeof(struct udphdr));
+ 		skb_reset_transport_header(skb);
+@@ -485,6 +476,14 @@ int lowpan_process_data(struct sk_buff *skb, struct net_device *dev,
+ 			       (u8 *)&uh, sizeof(uh));
+ 
+ 		hdr.nexthdr = UIP_PROTO_UDP;
++	} else {
++		if (skb_headroom(skb) < sizeof(hdr)) {
++			err = pskb_expand_head(skb, sizeof(hdr), 0, GFP_ATOMIC);
++			if (unlikely(err)) {
++				kfree_skb(skb);
++				return err;
++			}
++		}
+ 	}
+ 
+ 	hdr.payload_len = htons(skb->len);
+diff --git a/net/bluetooth/6lowpan.c b/net/bluetooth/6lowpan.c
+index c2e0d14..6643a7c 100644
+--- a/net/bluetooth/6lowpan.c
++++ b/net/bluetooth/6lowpan.c
+@@ -343,6 +343,13 @@ static int recv_pkt(struct sk_buff *skb, struct net_device *dev,
+ 		kfree_skb(local_skb);
+ 		kfree_skb(skb);
+ 	} else {
++		/* Decompression may use pskb_expand_head so no shared skb's */
++		skb = skb_share_check(skb, GFP_ATOMIC);
++		if (!skb) {
++			dev->stats.rx_dropped++;
++			return NET_RX_DROP;
++		}
++
+ 		switch (skb->data[0] & 0xe0) {
+ 		case LOWPAN_DISPATCH_IPHC:	/* ipv6 datagram */
+ 			local_skb = skb_clone(skb, GFP_ATOMIC);
+-- 
+1.9.1
