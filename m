@@ -1,73 +1,90 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 10 Oct 2014 03:07:01 -0700 (PDT)
-From: Szymon Janc <szymon.janc@tieto.com>
-To: Alex Gal <a.gal@miip.ca>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Adds Sony Move Navigation controller.
-Message-ID: <2485489.uEt5Y7pmtU@uw000953>
-In-Reply-To: <1412697877-7508-1-git-send-email-a.gal@miip.ca>
-References: <1412697877-7508-1-git-send-email-a.gal@miip.ca>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+From: Marcin Kraglak <marcin.kraglak@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCHv4 12/14] shared/gatt: Add gatt-client include service iterator
+Date: Fri, 10 Oct 2014 11:15:46 +0200
+Message-Id: <1412932548-28363-13-git-send-email-marcin.kraglak@tieto.com>
+In-Reply-To: <1412932548-28363-1-git-send-email-marcin.kraglak@tieto.com>
+References: <1412932548-28363-1-git-send-email-marcin.kraglak@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Alex,
+It will allow user to take value, handle, start and end handle
+of included service.
+---
+ src/shared/gatt-client.c | 30 ++++++++++++++++++++++++++++++
+ src/shared/gatt-client.h | 10 ++++++++++
+ 2 files changed, 40 insertions(+)
 
-Thanks for patch, some small comments from my side.
-
-On Tuesday 07 of October 2014 12:04:37 Alex Gal wrote:
-> Signed-off-by: Alex <a.gal@miip.ca>
-
-We don't use SOB in userspace so this is not needed.
-
-Also I'd prefer if you could put plugin change into separate patch.
-And prefix them appropriately ie. "sixaxis: " for plugin and "input: "
-for input change.
-
-> ---
->  plugins/sixaxis.c       | 7 +++++++
->  profiles/input/server.c | 4 ++++
->  2 files changed, 11 insertions(+)
-> 
-> diff --git a/plugins/sixaxis.c b/plugins/sixaxis.c
-> index b09404a..6f7893e 100644
-> --- a/plugins/sixaxis.c
-> +++ b/plugins/sixaxis.c
-> @@ -60,6 +60,13 @@ static const struct {
->  		.pid = 0x0268,
->  		.version = 0x0000,
->  	},
-> +	{
-> +		.name = "PLAYSTATION(R)3 Controller", /* Move Navigation */
-
-Does Move Navigation use same name as DS3?
-
-> +		.source = 0x0002,
-> +		.vid = 0x054c,
-> +		.pid = 0x042f,
-> +		.version = 0x0000,
-> +	},
->  };
->  
->  struct leds_data {
-> diff --git a/profiles/input/server.c b/profiles/input/server.c
-> index 307db96..5463311 100644
-> --- a/profiles/input/server.c
-> +++ b/profiles/input/server.c
-> @@ -140,6 +140,10 @@ static bool dev_is_sixaxis(const bdaddr_t *src, const bdaddr_t *dst)
->  	if (vid == 0x054c && pid == 0x05c4)
->  		return true;
->  
-> +    /* Move Navigation */
-> +	if (vid == 0x054c && pid == 0x042f)
-> +		return true;
-> +
->  	return false;
->  }
->  
-> 
-
+diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
+index 80d7a1a..679242c 100644
+--- a/src/shared/gatt-client.c
++++ b/src/shared/gatt-client.c
+@@ -1673,6 +1673,36 @@ bool bt_gatt_characteristic_iter_next(struct bt_gatt_characteristic_iter *iter,
+ 	return true;
+ }
+ 
++bool bt_gatt_include_service_iter_init(struct bt_gatt_incl_service_iter *iter,
++					const bt_gatt_service_t *service)
++{
++	if (!iter || !service)
++		return false;
++
++	memset(iter, 0, sizeof(*iter));
++	iter->service = (struct service_list *) service;
++
++	return true;
++}
++
++bool bt_gatt_include_service_iter_next(struct bt_gatt_incl_service_iter *iter,
++					const bt_gatt_included_service_t **incl)
++{
++	struct service_list *service;
++
++	if (!iter || !incl)
++		return false;
++
++	service = iter->service;
++
++	if (iter->pos >= service->num_includes)
++		return false;
++
++	*incl = &service->includes[iter->pos++];
++
++	return true;
++}
++
+ struct read_op {
+ 	bt_gatt_client_read_callback_t callback;
+ 	void *user_data;
+diff --git a/src/shared/gatt-client.h b/src/shared/gatt-client.h
+index 05b4838..bf4e7bb 100644
+--- a/src/shared/gatt-client.h
++++ b/src/shared/gatt-client.h
+@@ -113,6 +113,11 @@ struct bt_gatt_characteristic_iter {
+ 	size_t pos;
+ };
+ 
++struct bt_gatt_incl_service_iter {
++	void *service;
++	size_t pos;
++};
++
+ bool bt_gatt_service_iter_init(struct bt_gatt_service_iter *iter,
+ 						struct bt_gatt_client *client);
+ bool bt_gatt_service_iter_next(struct bt_gatt_service_iter *iter,
+@@ -129,6 +134,11 @@ bool bt_gatt_characteristic_iter_init(struct bt_gatt_characteristic_iter *iter,
+ bool bt_gatt_characteristic_iter_next(struct bt_gatt_characteristic_iter *iter,
+ 					const bt_gatt_characteristic_t **chrc);
+ 
++bool bt_gatt_include_service_iter_init(struct bt_gatt_incl_service_iter *iter,
++					const bt_gatt_service_t *service);
++bool bt_gatt_include_service_iter_next(struct bt_gatt_incl_service_iter *iter,
++					const bt_gatt_included_service_t **inc);
++
+ typedef void (*bt_gatt_client_read_callback_t)(bool success, uint8_t att_ecode,
+ 					const uint8_t *value, uint16_t length,
+ 					void *user_data);
 -- 
-Best regards, 
-Szymon Janc
+1.9.3
+
