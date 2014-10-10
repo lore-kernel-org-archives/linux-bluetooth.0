@@ -1,90 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcin Kraglak <marcin.kraglak@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv4 12/14] shared/gatt: Add gatt-client include service iterator
-Date: Fri, 10 Oct 2014 11:15:46 +0200
-Message-Id: <1412932548-28363-13-git-send-email-marcin.kraglak@tieto.com>
+Subject: [PATCHv4 14/14] shared/gatt: Fix searching descriptors
+Date: Fri, 10 Oct 2014 11:15:48 +0200
+Message-Id: <1412932548-28363-15-git-send-email-marcin.kraglak@tieto.com>
 In-Reply-To: <1412932548-28363-1-git-send-email-marcin.kraglak@tieto.com>
 References: <1412932548-28363-1-git-send-email-marcin.kraglak@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-It will allow user to take value, handle, start and end handle
-of included service.
+Descriptor discovery range started from characteristic value handle + 1
+and end with characteristic end handle. If characteristic value handle
+is 0xffff, then discovery range was set to 0x0000-0xffff.
+Found during PTS test case TC_GAD_CL_BV_03_C.
 ---
- src/shared/gatt-client.c | 30 ++++++++++++++++++++++++++++++
- src/shared/gatt-client.h | 10 ++++++++++
- 2 files changed, 40 insertions(+)
+ src/shared/gatt-client.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
-index 80d7a1a..679242c 100644
+index 679242c..045f9f9 100644
 --- a/src/shared/gatt-client.c
 +++ b/src/shared/gatt-client.c
-@@ -1673,6 +1673,36 @@ bool bt_gatt_characteristic_iter_next(struct bt_gatt_characteristic_iter *iter,
- 	return true;
- }
+@@ -714,8 +714,8 @@ static void discover_chrcs_cb(bool success, uint8_t att_ecode,
+ 	for (i = 0; i < chrc_count; i++) {
+ 		op->cur_chrc_index = i;
+ 		op->cur_chrc = chrcs + i;
+-		desc_start = chrcs[i].chrc_external.value_handle + 1;
+-		if (desc_start > chrcs[i].chrc_external.end_handle)
++		desc_start = chrcs[i].chrc_external.value_handle;
++		if (desc_start++ == chrcs[i].chrc_external.end_handle)
+ 			continue;
  
-+bool bt_gatt_include_service_iter_init(struct bt_gatt_incl_service_iter *iter,
-+					const bt_gatt_service_t *service)
-+{
-+	if (!iter || !service)
-+		return false;
-+
-+	memset(iter, 0, sizeof(*iter));
-+	iter->service = (struct service_list *) service;
-+
-+	return true;
-+}
-+
-+bool bt_gatt_include_service_iter_next(struct bt_gatt_incl_service_iter *iter,
-+					const bt_gatt_included_service_t **incl)
-+{
-+	struct service_list *service;
-+
-+	if (!iter || !incl)
-+		return false;
-+
-+	service = iter->service;
-+
-+	if (iter->pos >= service->num_includes)
-+		return false;
-+
-+	*incl = &service->includes[iter->pos++];
-+
-+	return true;
-+}
-+
- struct read_op {
- 	bt_gatt_client_read_callback_t callback;
- 	void *user_data;
-diff --git a/src/shared/gatt-client.h b/src/shared/gatt-client.h
-index 05b4838..bf4e7bb 100644
---- a/src/shared/gatt-client.h
-+++ b/src/shared/gatt-client.h
-@@ -113,6 +113,11 @@ struct bt_gatt_characteristic_iter {
- 	size_t pos;
- };
- 
-+struct bt_gatt_incl_service_iter {
-+	void *service;
-+	size_t pos;
-+};
-+
- bool bt_gatt_service_iter_init(struct bt_gatt_service_iter *iter,
- 						struct bt_gatt_client *client);
- bool bt_gatt_service_iter_next(struct bt_gatt_service_iter *iter,
-@@ -129,6 +134,11 @@ bool bt_gatt_characteristic_iter_init(struct bt_gatt_characteristic_iter *iter,
- bool bt_gatt_characteristic_iter_next(struct bt_gatt_characteristic_iter *iter,
- 					const bt_gatt_characteristic_t **chrc);
- 
-+bool bt_gatt_include_service_iter_init(struct bt_gatt_incl_service_iter *iter,
-+					const bt_gatt_service_t *service);
-+bool bt_gatt_include_service_iter_next(struct bt_gatt_incl_service_iter *iter,
-+					const bt_gatt_included_service_t **inc);
-+
- typedef void (*bt_gatt_client_read_callback_t)(bool success, uint8_t att_ecode,
- 					const uint8_t *value, uint16_t length,
- 					void *user_data);
+ 		if (bt_gatt_discover_descriptors(client->att, desc_start,
 -- 
 1.9.3
 
