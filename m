@@ -1,64 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcin Kraglak <marcin.kraglak@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv4 08/14] shared/gatt: Distinguish Primary from Secondary services
-Date: Fri, 10 Oct 2014 11:15:42 +0200
-Message-Id: <1412932548-28363-9-git-send-email-marcin.kraglak@tieto.com>
+Subject: [PATCHv4 04/14] shared/gatt: Add extra check in characteristic iterator
+Date: Fri, 10 Oct 2014 11:15:38 +0200
+Message-Id: <1412932548-28363-5-git-send-email-marcin.kraglak@tieto.com>
 In-Reply-To: <1412932548-28363-1-git-send-email-marcin.kraglak@tieto.com>
 References: <1412932548-28363-1-git-send-email-marcin.kraglak@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Add flag primary to distinguish service as primary or secondary.
+Avoid incorrect reading of included service discovery results.
 ---
- src/shared/gatt-client.c | 7 +++++--
- src/shared/gatt-client.h | 1 +
- 2 files changed, 6 insertions(+), 2 deletions(-)
+ src/shared/gatt-helpers.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
-index 03d722f..724fde2 100644
---- a/src/shared/gatt-client.c
-+++ b/src/shared/gatt-client.c
-@@ -202,7 +202,8 @@ static void mark_notify_data_invalid_if_in_range(void *data, void *user_data)
+diff --git a/src/shared/gatt-helpers.c b/src/shared/gatt-helpers.c
+index c18f738..58104d9 100644
+--- a/src/shared/gatt-helpers.c
++++ b/src/shared/gatt-helpers.c
+@@ -123,6 +123,9 @@ unsigned int bt_gatt_result_characteristic_count(struct bt_gatt_result *result)
+ 	if (result->opcode != BT_ATT_OP_READ_BY_TYPE_RSP)
+ 		return 0;
  
- static bool service_list_add_service(struct service_list **head,
- 						struct service_list **tail,
--						uint16_t start, uint16_t end,
-+						bool primary, uint16_t start,
-+						uint16_t end,
- 						uint8_t uuid[BT_GATT_UUID_SIZE])
- {
- 	struct service_list *list;
-@@ -211,6 +212,7 @@ static bool service_list_add_service(struct service_list **head,
- 	if (!list)
++	if (result->data_len != 21 && result->data_len != 7)
++		return 0;
++
+ 	return result_element_count(result);
+ }
+ 
+@@ -239,6 +242,9 @@ bool bt_gatt_iter_next_characteristic(struct bt_gatt_iter *iter,
+ 	if (iter->result->opcode != BT_ATT_OP_READ_BY_TYPE_RSP)
  		return false;
  
-+	list->service.primary = primary;
- 	list->service.start_handle = start;
- 	list->service.end_handle = end;
- 	memcpy(list->service.uuid, uuid, UUID_BYTES);
-@@ -668,7 +670,8 @@ static void discover_primary_cb(bool success, uint8_t att_ecode,
++	if (iter->result->data_len != 21 && iter->result->data_len != 7)
++		return false;
++
+ 	op = iter->result->op;
+ 	pdu_ptr = iter->result->pdu + iter->pos;
  
- 		/* Store the service */
- 		if (!service_list_add_service(&op->result_head,
--					&op->result_tail, start, end, uuid)) {
-+					&op->result_tail, true, start, end,
-+					uuid)) {
- 			util_debug(client->debug_callback, client->debug_data,
- 						"Failed to store service");
- 			success = false;
-diff --git a/src/shared/gatt-client.h b/src/shared/gatt-client.h
-index 6807f6b..22d4dc0 100644
---- a/src/shared/gatt-client.h
-+++ b/src/shared/gatt-client.h
-@@ -75,6 +75,7 @@ bool bt_gatt_client_set_debug(struct bt_gatt_client *client,
- 					bt_gatt_client_destroy_func_t destroy);
- 
- typedef struct {
-+	bool primary;
- 	uint16_t start_handle;
- 	uint16_t end_handle;
- 	uint8_t uuid[BT_GATT_UUID_SIZE];
 -- 
 1.9.3
 
