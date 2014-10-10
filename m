@@ -1,45 +1,64 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcin Kraglak <marcin.kraglak@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv4 06/14] shared/gatt: Remove not needed function parameter
-Date: Fri, 10 Oct 2014 11:15:40 +0200
-Message-Id: <1412932548-28363-7-git-send-email-marcin.kraglak@tieto.com>
+Subject: [PATCHv4 07/14] shared/gatt: Add function bt_gatt_result_included_count()
+Date: Fri, 10 Oct 2014 11:15:41 +0200
+Message-Id: <1412932548-28363-8-git-send-email-marcin.kraglak@tieto.com>
 In-Reply-To: <1412932548-28363-1-git-send-email-marcin.kraglak@tieto.com>
 References: <1412932548-28363-1-git-send-email-marcin.kraglak@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-According to SPEC 4.1 4.5.1 "Find Included Services" there is no need
-to pass UUID to discover_included_services() function.
+It will return number of included services in result.
 ---
- src/shared/gatt-helpers.c | 1 -
- src/shared/gatt-helpers.h | 1 -
- 2 files changed, 2 deletions(-)
+ src/shared/gatt-helpers.c | 21 +++++++++++++++++++++
+ src/shared/gatt-helpers.h |  1 +
+ 2 files changed, 22 insertions(+)
 
 diff --git a/src/shared/gatt-helpers.c b/src/shared/gatt-helpers.c
-index fd8d06c..48e7379 100644
+index 48e7379..92d0696 100644
 --- a/src/shared/gatt-helpers.c
 +++ b/src/shared/gatt-helpers.c
-@@ -1002,7 +1002,6 @@ done:
+@@ -140,6 +140,27 @@ unsigned int bt_gatt_result_descriptor_count(struct bt_gatt_result *result)
+ 	return result_element_count(result);
+ }
  
- bool bt_gatt_discover_included_services(struct bt_att *att,
- 					uint16_t start, uint16_t end,
--					bt_uuid_t *uuid,
- 					bt_gatt_discovery_callback_t callback,
- 					void *user_data,
- 					bt_gatt_destroy_func_t destroy)
++unsigned int bt_gatt_result_included_count(struct bt_gatt_result *result)
++{
++	struct bt_gatt_result *cur;
++	unsigned int count = 0;
++
++	if (!result)
++		return 0;
++
++	if (result->opcode != BT_ATT_OP_READ_BY_TYPE_RSP)
++		return 0;
++
++	if (result->data_len != 6 && result->data_len != 8)
++		return 0;
++
++	for (cur = result; cur; cur = cur->next)
++		if (cur->opcode == BT_ATT_OP_READ_BY_TYPE_RSP)
++			count += cur->pdu_len / cur->data_len;
++
++	return count;
++}
++
+ bool bt_gatt_iter_init(struct bt_gatt_iter *iter, struct bt_gatt_result *result)
+ {
+ 	if (!iter || !result)
 diff --git a/src/shared/gatt-helpers.h b/src/shared/gatt-helpers.h
-index 8c434c1..f2c7ec5 100644
+index f2c7ec5..07c145d 100644
 --- a/src/shared/gatt-helpers.h
 +++ b/src/shared/gatt-helpers.h
-@@ -82,7 +82,6 @@ bool bt_gatt_discover_secondary_services(struct bt_att *att, bt_uuid_t *uuid,
- 					bt_gatt_destroy_func_t destroy);
- bool bt_gatt_discover_included_services(struct bt_att *att,
- 					uint16_t start, uint16_t end,
--					bt_uuid_t *uuid,
- 					bt_gatt_discovery_callback_t callback,
- 					void *user_data,
- 					bt_gatt_destroy_func_t destroy);
+@@ -38,6 +38,7 @@ struct bt_gatt_iter {
+ unsigned int bt_gatt_result_service_count(struct bt_gatt_result *result);
+ unsigned int bt_gatt_result_characteristic_count(struct bt_gatt_result *result);
+ unsigned int bt_gatt_result_descriptor_count(struct bt_gatt_result *result);
++unsigned int bt_gatt_result_included_count(struct bt_gatt_result *result);
+ 
+ bool bt_gatt_iter_init(struct bt_gatt_iter *iter, struct bt_gatt_result *result);
+ bool bt_gatt_iter_next_service(struct bt_gatt_iter *iter,
 -- 
 1.9.3
 
