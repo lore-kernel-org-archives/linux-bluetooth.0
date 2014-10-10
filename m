@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH v2 1/2] Bluetooth: Fix RFCOMM NSC response
-Date: Fri, 10 Oct 2014 15:43:12 +0200
-Message-Id: <1412948593-32106-1-git-send-email-szymon.janc@tieto.com>
+Subject: [PATCH] Bluetooth: Fix RFCOMM NSC response
+Date: Fri, 10 Oct 2014 15:21:29 +0200
+Message-Id: <1412947289-27091-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
@@ -20,26 +20,22 @@ This was affecting TC_RFC_BV_25_C PTS qualification test.
 
 Signed-off-by: Szymon Janc <szymon.janc@tieto.com>
 ---
-
-V2: moved sanitization to macro ifself
-    added second patch that also fix __test_pf 
-
  net/bluetooth/rfcomm/core.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/net/bluetooth/rfcomm/core.c b/net/bluetooth/rfcomm/core.c
-index ca957d3..aa38fa8 100644
+index ca957d3..d340577 100644
 --- a/net/bluetooth/rfcomm/core.c
 +++ b/net/bluetooth/rfcomm/core.c
-@@ -78,7 +78,7 @@ static struct rfcomm_session *rfcomm_session_del(struct rfcomm_session *s);
- #define __get_type(b)     ((b & 0xef))
+@@ -1558,7 +1558,7 @@ static int rfcomm_recv_mcc(struct rfcomm_session *s, struct sk_buff *skb)
+ 	struct rfcomm_mcc *mcc = (void *) skb->data;
+ 	u8 type, cr, len;
  
- #define __test_ea(b)      ((b & 0x01))
--#define __test_cr(b)      ((b & 0x02))
-+#define __test_cr(b)      (!!(b & 0x02))
- #define __test_pf(b)      ((b & 0x10))
+-	cr   = __test_cr(mcc->type);
++	cr   = !!__test_cr(mcc->type);
+ 	type = __get_mcc_type(mcc->type);
+ 	len  = __get_mcc_len(mcc->len);
  
- #define __addr(cr, dlci)       (((dlci & 0x3f) << 2) | (cr << 1) | 0x01)
 -- 
 1.9.1
 
