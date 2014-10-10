@@ -1,115 +1,122 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.6\))
-Subject: Re: [RFC] need for new scan api for bluetooth low energy.
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <93AC6768-49F3-43CC-8014-83DD3C0EA3D3@holtmann.org>
-Date: Fri, 10 Oct 2014 12:52:57 +0200
-Cc: Arman Uguray <armansito@chromium.org>,
-	BlueZ development <linux-bluetooth@vger.kernel.org>,
-	Scott James Remnant <keybuk@google.com>
-Message-Id: <8A0217F1-C062-466F-8C04-38E324BDD55D@holtmann.org>
-References: <CAD0=r8yozB8eMdJOuffUeQZVFVf5xEXnP5tCt+k3m0e9wzMxiA@mail.gmail.com> <735FD32E-BD15-4CE1-8D9C-44B8EC56DF7A@holtmann.org> <CAHrH25Q6XqsLjGyfoXwimrap9=kKHOQn-G=k4Fz6HXmEPJ7EtQ@mail.gmail.com> <20140917051457.GA4671@t440s.P-661HNU-F1> <CAD0=r8x-=O7XAqQF_wBHQEqSkfifzgWW2AagW2EvsDUtM-E_ow@mail.gmail.com> <20140917065252.GA5554@t440s.lan> <CAD0=r8z9g+F7Z9X_8PE4jk3JbA+oLj9Of33RSqxiRd0dn9AnXQ@mail.gmail.com> <8868B74C-0DDD-43C1-BCBF-2578A700EF72@holtmann.org> <CAD0=r8xQzhizXo4umQ_mG_WMH7Akp4bji-9PNRGzqj-7HWnyNA@mail.gmail.com> <0EA633E6-A0F5-4F67-B421-9857466C1175@holtmann.org> <CAD0=r8w035mLnWTKtEfxZ7agzwTFRO9dsv+6qdafcBG7RYzYDQ@mail.gmail.com> <F673E928-258E-47F7-B71A-F32410974538@holtmann.org> <CAD0=r8xMcGP-Hjt8uCSY9Qx9VJLov5scSwRTvFr3PAaOXXbyzQ@mail.gmail.com> <CAD0=r8zcPCWKyTQLQeG68uA21_sEv+5wDKNB-GJzgS1+BcD+bQ@mail.gmail.com> <372D8399-BFC6-413F-924F-44CE79030516@holtmann.org> <CAD0=r8x2bub9E+ohicwfxK0AAykRTUSrrTjAD-tFv-aj7xGoww@mail.gmail.com> <CAD0=r8xYGQgGf+DKewk
-  9hwFBSwUwnUuaNuBTe3A3vY0FkeiB1g@mail.gmail.com> <375944C8-4378-4589-A883-786F531EA291@holtmann.org> <CAD0=r8xDHvVq9QyCwo7_di_QRhbqEYdGJCKevQoEQ8WZRwA4dA@mail.gmail.com> <93AC6768-49F3-43CC-8014-83DD3C0EA3D3@holtmann.org>
-To: Jakub Pawlowski <jpawlowski@google.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] doc: Add commands for Start Service Discovery and Stop Service Discovery
+Date: Fri, 10 Oct 2014 12:49:17 +0200
+Message-Id: <1412938157-70760-1-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jakub,
+---
+ doc/mgmt-api.txt | 88 +++++++++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 87 insertions(+), 1 deletion(-)
 
->>>> Ok, new updated version - we do only passive scan, and we send Device
->>>> found event:
->>>> 
->>>> 
->>>> diff --git a/doc/mgmt-api.txt b/doc/mgmt-api.txt
->>>> index 11e2490..3d03617 100644
->>>> --- a/doc/mgmt-api.txt
->>>> +++ b/doc/mgmt-api.txt
->>>> @@ -2135,6 +2135,29 @@ Set Public Address Command
->>>>                              Invalid Index
->>>> 
->>>> 
->>>> +Start Passive LE Filtered Device Scan
->>>> +=======================
->>>> +
->>>> +       Command Code:           0x003A
->>>> +       Controller Index:       <controller id>
->>>> +       Command Parameters:     UUID (16 Octets)
->>>> +                    max_pathloss (1 octet)
->>>> +
->>>> +       Return Parameters:
->>>> +
->>>> +       This command starts passive LE scan, and filter received
->>>> advertisements: if AD contains both TX power level and Service
->>>> Solicitation, and UUID is contained in Service Solicitation and
->>>> computed pathloss is smaller than max_pathloss parameter, then a
->>>> Device Found event will be sent.
->>> 
->>> generally we tried to avoid to specific LE only commands. Our attempts with the kernel APIs where to make them as generic as possible. So I think something along the lines of adding and removing UUID filters should be something we should target at.
->>> 
->>> Add UUID Notification Filter
->>> ============================
->>> 
->>>       Command Parameters:     Address_Type (1 Octet)
->>>                               UUID (16 Octets)
->>>                               Max_Pathloss (1 Octet)
->>>       Return Parameters:      Address_Type (1 Octet)
->>> 
->>> 
->>> Remove UUID Notification Filter
->>> ===============================
->>> 
->>>       Command Parameters:     Address_Type (1 Octet)
->>>                               UUID (16 Octets)
->>>       Return Parameters:      Address_Type (1 Octet)
->>> 
->>> The Address_Type would be defined the same way as for Start Discovery command.
->>> 
->>> Now we can discuss if on the mgmt level we want to use pathloss or rather a range of RSSI. I have seen that RSSI is preferred and that the translation from RSSI and advertising data with TX power level is done in the daemon. So for kernel API it might be better to expose RSSI range.
->>> 
->>> Besides a RSSI range, we might also want to allow giving a RSSI threshold that defines how much the RSSI to change between events to be reported again.
->> 
->> Some mobile devices that I'm working can change power level for
->> advertising, that makes raw RSSI filter useless. It must be pathloss,
->> that's why I require TX power in advertisement.
-> 
-> you will still get it, but just have to do the math in the daemon. The only difference is that the daemon gets woken up for RSSI ranges that in the end you might filter out.
-> 
->>> 
->>> That said, the danger with a generic notification filter like this is that we can not implement it efficiently with current hardware without vendor commands. If you use duplicate filtering, then Broadcom and CSR chips behave fully different. Broadcom only filters on BD_ADDR and report devices once no matter what the RSSI, while CSR will report the same device again if the RSSI changes.
->>> 
->>> With that in mind, it might be safer to introduce a one-shot mgmt API that needs to be repeatedly called to keep scanning for new devices.
->>> 
->>> Start Service Discovery
->>> =======================
->>> 
->>>       Command Parameters:     Address_Type (1 Octet)
->>>                               Min_RSSI (1 Octet)
->>>                               Max_RSSI (1 Octet)
->>>                               Num_UUID (1 Octet)
->>>                               UUID[i] (16 Octets)
->>>       Return Parameters:      Address_Type (1 Octet)
->>> 
->>> Stop Service Discovery
->>> ======================
->>> 
->>>       Command Parameters:     Address_Type (1 Octet)
->>>       Return Parameters:      Address_Type (1 Octet)
->>> 
->>> Without having dedicated controller support for filtering, having such a dedicated discovery for services with a specific UUID seems to be more appropriate and more safe. Since we could always add controller based filtering for background scanning once there is controller support.
->> 
->> I preffer the "Add UUID Notification Filter" and "Remove UUID
->> Notification Filter". For controllers like Broadcom that reports only
->> one advertisement can we restart scan internally in kernel ? Why
->> propagate that event higher ?
-> 
-> Personally I would prefer just adding another filter as well. However it might be better to start with something like a one-shot handling and see where that is taking us. It is a little bit less intrusive and you could also use active scanning. At the same time you could also easily make it work for BR/EDR. I am thinking here along the lines of something wanting to pair a mouse. You just give the HID UUID and start interleaved discovery for that service on both transports.
-
-I send a proposal for doing an one-shot service discovery. So you can propose a RSSI Threshold and a list of possible UUIDs to look for.
-
-If RSSI Threshold is 127 or the Num_UUID is 0, then it will behave the same way as Start Discovery. I think this is how we should get started to tackle this problem.
-
-Regards
-
-Marcel
+diff --git a/doc/mgmt-api.txt b/doc/mgmt-api.txt
+index daf036b4c1ec..2038f883cc95 100644
+--- a/doc/mgmt-api.txt
++++ b/doc/mgmt-api.txt
+@@ -2135,6 +2135,89 @@ Set Public Address Command
+ 				Invalid Index
+ 
+ 
++Start Service Discovery Command
++===============================
++
++	Command Code:		0x003a
++	Controller Index:	<controller id>
++	Command Parameters:	Address_Type (1 Octet)
++				RSSI_Threshold (1 Octet)
++				Num_UUID (1 Octet)
++				UUID[i] (16 Octets)
++	Return Parameters:	Address_Type (1 Octet)
++
++	This command is used to start the process of discovering remote
++	devices with a specific UUID. A Device Found event will be sent
++	for each discovered device.
++
++	Possible values for the Address_Type parameter are a bit-wise or
++	of the following bits:
++
++		0	BR/EDR
++		1	LE Public
++		2	LE Random
++
++	By combining these e.g. the following values are possible:
++
++		1	BR/EDR
++		6	LE (public & random)
++		7	BR/EDR/LE (interleaved discovery)
++
++	The service discovery uses active scanning for Low Energy scanning
++	and will search for UUID in both advertising data and scan response
++	data.
++
++	Found devices that have a RSSI value smaller than RSSI_Threshold
++	are not reported via DeviceFound event. Setting a value of 127
++	will cause all devices to be reported.
++
++	The list of UUIDs identifies a logical OR. Only one of the UUIDs
++	have to match to cause a DeviceFound event. Providing an empty
++	list of UUIDs with Num_UUID set to 0 which means that DeviceFound
++	events are send out for all devices above the RSSI_Threshold.
++
++	In case the RSSI_Threshold is set to 127 and the Num_UUID is 0,
++	then this command behaves exactly the same as Start Discovery.
++
++	When the discovery procedure starts the Discovery event will
++	notify this similar to Start Discovery.
++
++	This command can only be used when the controller is powered.
++
++	This command generates a Command Complete event on success
++	or failure.
++
++	Possible errors:	Busy
++				Not Supported
++				Invalid Parameters
++				Not Powered
++				Invalid Index
++
++
++Stop Service Discovery Command
++==============================
++
++	Command Code:		0x003b
++	Controller Index:	<controller id>
++	Command Parameters:	Address_Type (1 Octet)
++	Return Parameters:	Address_Type (1 Octet)
++
++	This command is used to stop the service discovery process started
++	using the Start Service Discovery command.
++
++	When the discovery procedure stops the Discovery event will
++	notify this similar to Stop Discovery.
++
++	This command can only be used when the controller is powered.
++
++	This command generates a Command Complete event on success
++	or failure.
++
++	Possible errors:	Rejected
++				Invalid Parameters
++				Invalid Index
++
++
+ Command Complete Event
+ ======================
+ 
+@@ -2555,7 +2638,10 @@ Discovering Event
+ 
+ 	This event indicates that the controller has started discovering
+ 	devices. This discovering state can come and go multiple times
+-	between a StartDiscover and a StopDiscovery command.
++	between a Start Discover and a Stop Discovery commands.
++
++	The Start Service Discovery and Stop Service Discovery commands
++	will also trigger this event.
+ 
+ 	The valid values for the Discovering parameter are 0x01
+ 	(enabled) and 0x00 (disabled).
+-- 
+1.9.3
 
