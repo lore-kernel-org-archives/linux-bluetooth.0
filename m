@@ -1,37 +1,79 @@
 Return-Path: <cyrus@holtmann.org>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH v2 01/12] android/handsfree: Define proper type for device structure
+Date: Fri, 10 Oct 2014 09:49:06 +0200
+Message-ID: <3339030.YPMfla4FKY@uw000953>
+In-Reply-To: <1412763314-12871-1-git-send-email-szymon.janc@tieto.com>
+References: <1412763314-12871-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
-In-Reply-To: <B2B9E083-A86D-426A-9E79-5F168A8FA017@holtmann.org>
-References: <1412859828-6224-1-git-send-email-fons@spotify.com>
- <20141009141430.GA31807@t440s.P-661HNU-F1> <CAHF=Y4pJOC3gA1g-+o1e4HRJraFqpCGOAUuqNiS7b0CvAqEBJg@mail.gmail.com>
- <B2B9E083-A86D-426A-9E79-5F168A8FA017@holtmann.org>
-From: Alfonso Acosta <fons@spotify.com>
-Date: Fri, 10 Oct 2014 10:14:25 +0200
-Message-ID: <CAHF=Y4p3Rn=Q3pdW3ML7=H00pBcGUSjr3SfAsm6v+Da8_LPcCQ@mail.gmail.com>
-Subject: Re: [PATCH] Bluetooth: Defer connection-parameter removal when
- unpairing without disconnecting
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+On Wednesday 08 of October 2014 12:15:03 Szymon Janc wrote:
+> ---
+>  android/handsfree.c | 36 +++++++++++++++++++-----------------
+>  1 file changed, 19 insertions(+), 17 deletions(-)
+> 
+> diff --git a/android/handsfree.c b/android/handsfree.c
+> index a815d3b..0b82223 100644
+> --- a/android/handsfree.c
+> +++ b/android/handsfree.c
+> @@ -110,22 +110,7 @@ struct hfp_codec {
+>  	bool remote_supported;
+>  };
+>  
+> -static const struct indicator inds_defaults[] = {
+> -		{ "service",   0, 1, 0, false, true },
+> -		{ "call",      0, 1, 0, true, true },
+> -		{ "callsetup", 0, 3, 0, true, true },
+> -		{ "callheld",  0, 2, 0, true, true },
+> -		{ "signal",    0, 5, 0, false, true },
+> -		{ "roam",      0, 1, 0, false, true },
+> -		{ "battchg",   0, 5, 0, false, true },
+> -};
+> -
+> -static const struct hfp_codec codecs_defaults[] = {
+> -	{ CODEC_ID_CVSD, true, false},
+> -	{ CODEC_ID_MSBC, false, false},
+> -};
+> -
+> -static struct {
+> +struct hf_device {
+>  	bdaddr_t bdaddr;
+>  	uint8_t state;
+>  	uint8_t audio_state;
+> @@ -152,7 +137,24 @@ static struct {
+>  
+>  	GIOChannel *sco;
+>  	guint sco_watch;
+> -} device;
+> +};
+> +
+> +static const struct indicator inds_defaults[] = {
+> +		{ "service",   0, 1, 0, false, true },
+> +		{ "call",      0, 1, 0, true, true },
+> +		{ "callsetup", 0, 3, 0, true, true },
+> +		{ "callheld",  0, 2, 0, true, true },
+> +		{ "signal",    0, 5, 0, false, true },
+> +		{ "roam",      0, 1, 0, false, true },
+> +		{ "battchg",   0, 5, 0, false, true },
+> +};
+> +
+> +static const struct hfp_codec codecs_defaults[] = {
+> +	{ CODEC_ID_CVSD, true, false},
+> +	{ CODEC_ID_MSBC, false, false},
+> +};
+> +
+> +static struct hf_device device;
+>  
+>  static uint32_t hfp_ag_features = 0;
+>  
+> 
 
-
-> don't we also need to clear the flag when the new pairing succeed?
-
-Yep, in fact that's the whole point of the flag .... which I missed.
-Thanks for your patience :)
-
-> If we destroy hci_conn anyway, there is pretty much no point in test_and_clear_bit and we could just use test_bit here.
-
-Fair point, I will change them to test_bit.
-
-
-
+Pushed.
 
 -- 
-Alfonso Acosta
-
-Embedded Systems Engineer at Spotify
-Birger Jarlsgatan 61, Stockholm, Sweden
-http://www.spotify.com
+Best regards, 
+Szymon Janc
