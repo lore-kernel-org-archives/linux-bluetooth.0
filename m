@@ -1,122 +1,73 @@
 Return-Path: <cyrus@holtmann.org>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] doc: Add commands for Start Service Discovery and Stop Service Discovery
-Date: Fri, 10 Oct 2014 12:49:17 +0200
-Message-Id: <1412938157-70760-1-git-send-email-marcel@holtmann.org>
+Date: Fri, 10 Oct 2014 03:07:01 -0700 (PDT)
+From: Szymon Janc <szymon.janc@tieto.com>
+To: Alex Gal <a.gal@miip.ca>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Adds Sony Move Navigation controller.
+Message-ID: <2485489.uEt5Y7pmtU@uw000953>
+In-Reply-To: <1412697877-7508-1-git-send-email-a.gal@miip.ca>
+References: <1412697877-7508-1-git-send-email-a.gal@miip.ca>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- doc/mgmt-api.txt | 88 +++++++++++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 87 insertions(+), 1 deletion(-)
+Hi Alex,
 
-diff --git a/doc/mgmt-api.txt b/doc/mgmt-api.txt
-index daf036b4c1ec..2038f883cc95 100644
---- a/doc/mgmt-api.txt
-+++ b/doc/mgmt-api.txt
-@@ -2135,6 +2135,89 @@ Set Public Address Command
- 				Invalid Index
- 
- 
-+Start Service Discovery Command
-+===============================
-+
-+	Command Code:		0x003a
-+	Controller Index:	<controller id>
-+	Command Parameters:	Address_Type (1 Octet)
-+				RSSI_Threshold (1 Octet)
-+				Num_UUID (1 Octet)
-+				UUID[i] (16 Octets)
-+	Return Parameters:	Address_Type (1 Octet)
-+
-+	This command is used to start the process of discovering remote
-+	devices with a specific UUID. A Device Found event will be sent
-+	for each discovered device.
-+
-+	Possible values for the Address_Type parameter are a bit-wise or
-+	of the following bits:
-+
-+		0	BR/EDR
-+		1	LE Public
-+		2	LE Random
-+
-+	By combining these e.g. the following values are possible:
-+
-+		1	BR/EDR
-+		6	LE (public & random)
-+		7	BR/EDR/LE (interleaved discovery)
-+
-+	The service discovery uses active scanning for Low Energy scanning
-+	and will search for UUID in both advertising data and scan response
-+	data.
-+
-+	Found devices that have a RSSI value smaller than RSSI_Threshold
-+	are not reported via DeviceFound event. Setting a value of 127
-+	will cause all devices to be reported.
-+
-+	The list of UUIDs identifies a logical OR. Only one of the UUIDs
-+	have to match to cause a DeviceFound event. Providing an empty
-+	list of UUIDs with Num_UUID set to 0 which means that DeviceFound
-+	events are send out for all devices above the RSSI_Threshold.
-+
-+	In case the RSSI_Threshold is set to 127 and the Num_UUID is 0,
-+	then this command behaves exactly the same as Start Discovery.
-+
-+	When the discovery procedure starts the Discovery event will
-+	notify this similar to Start Discovery.
-+
-+	This command can only be used when the controller is powered.
-+
-+	This command generates a Command Complete event on success
-+	or failure.
-+
-+	Possible errors:	Busy
-+				Not Supported
-+				Invalid Parameters
-+				Not Powered
-+				Invalid Index
-+
-+
-+Stop Service Discovery Command
-+==============================
-+
-+	Command Code:		0x003b
-+	Controller Index:	<controller id>
-+	Command Parameters:	Address_Type (1 Octet)
-+	Return Parameters:	Address_Type (1 Octet)
-+
-+	This command is used to stop the service discovery process started
-+	using the Start Service Discovery command.
-+
-+	When the discovery procedure stops the Discovery event will
-+	notify this similar to Stop Discovery.
-+
-+	This command can only be used when the controller is powered.
-+
-+	This command generates a Command Complete event on success
-+	or failure.
-+
-+	Possible errors:	Rejected
-+				Invalid Parameters
-+				Invalid Index
-+
-+
- Command Complete Event
- ======================
- 
-@@ -2555,7 +2638,10 @@ Discovering Event
- 
- 	This event indicates that the controller has started discovering
- 	devices. This discovering state can come and go multiple times
--	between a StartDiscover and a StopDiscovery command.
-+	between a Start Discover and a Stop Discovery commands.
-+
-+	The Start Service Discovery and Stop Service Discovery commands
-+	will also trigger this event.
- 
- 	The valid values for the Discovering parameter are 0x01
- 	(enabled) and 0x00 (disabled).
+Thanks for patch, some small comments from my side.
+
+On Tuesday 07 of October 2014 12:04:37 Alex Gal wrote:
+> Signed-off-by: Alex <a.gal@miip.ca>
+
+We don't use SOB in userspace so this is not needed.
+
+Also I'd prefer if you could put plugin change into separate patch.
+And prefix them appropriately ie. "sixaxis: " for plugin and "input: "
+for input change.
+
+> ---
+>  plugins/sixaxis.c       | 7 +++++++
+>  profiles/input/server.c | 4 ++++
+>  2 files changed, 11 insertions(+)
+> 
+> diff --git a/plugins/sixaxis.c b/plugins/sixaxis.c
+> index b09404a..6f7893e 100644
+> --- a/plugins/sixaxis.c
+> +++ b/plugins/sixaxis.c
+> @@ -60,6 +60,13 @@ static const struct {
+>  		.pid = 0x0268,
+>  		.version = 0x0000,
+>  	},
+> +	{
+> +		.name = "PLAYSTATION(R)3 Controller", /* Move Navigation */
+
+Does Move Navigation use same name as DS3?
+
+> +		.source = 0x0002,
+> +		.vid = 0x054c,
+> +		.pid = 0x042f,
+> +		.version = 0x0000,
+> +	},
+>  };
+>  
+>  struct leds_data {
+> diff --git a/profiles/input/server.c b/profiles/input/server.c
+> index 307db96..5463311 100644
+> --- a/profiles/input/server.c
+> +++ b/profiles/input/server.c
+> @@ -140,6 +140,10 @@ static bool dev_is_sixaxis(const bdaddr_t *src, const bdaddr_t *dst)
+>  	if (vid == 0x054c && pid == 0x05c4)
+>  		return true;
+>  
+> +    /* Move Navigation */
+> +	if (vid == 0x054c && pid == 0x042f)
+> +		return true;
+> +
+>  	return false;
+>  }
+>  
+> 
+
 -- 
-1.9.3
-
+Best regards, 
+Szymon Janc
