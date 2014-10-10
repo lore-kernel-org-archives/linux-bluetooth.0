@@ -1,26 +1,55 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.6\))
-Subject: Re: Bluez dual-mode support
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <29A2697B0516A946B1023D5E798DFCF65B5C257D@mail-yang>
-Date: Fri, 10 Oct 2014 17:40:54 +0200
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Message-Id: <39BD3B94-98FF-4BAC-BE5C-3FB50EEA676E@holtmann.org>
-References: <29A2697B0516A946B1023D5E798DFCF65B5C257D@mail-yang>
-To: "Boulais, Marc-Andre" <maboulais@rheinmetall.ca>
-Sender: linux-bluetooth-owner@vger.kernel.org
+MIME-Version: 1.0
+In-Reply-To: <CAHF=Y4p3Rn=Q3pdW3ML7=H00pBcGUSjr3SfAsm6v+Da8_LPcCQ@mail.gmail.com>
+References: <1412859828-6224-1-git-send-email-fons@spotify.com>
+ <20141009141430.GA31807@t440s.P-661HNU-F1> <CAHF=Y4pJOC3gA1g-+o1e4HRJraFqpCGOAUuqNiS7b0CvAqEBJg@mail.gmail.com>
+ <B2B9E083-A86D-426A-9E79-5F168A8FA017@holtmann.org> <CAHF=Y4p3Rn=Q3pdW3ML7=H00pBcGUSjr3SfAsm6v+Da8_LPcCQ@mail.gmail.com>
+From: Alfonso Acosta <fons@spotify.com>
+Date: Fri, 10 Oct 2014 17:40:18 +0200
+Message-ID: <CAHF=Y4rYUzodgmbOapsPfBF+ksEXjnGMmr75Bi3FTEf3MJWF5g@mail.gmail.com>
+Subject: Re: [PATCH] Bluetooth: Defer connection-parameter removal when
+ unpairing without disconnecting
+To: Marcel Holtmann <marcel@holtmann.org>, johan.hedberg@gmail.com
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marc,
+Hi Jhoan and Marcel,
 
-> Does BlueZ support a "dual mode" where both Bluetooth "classic" and "low-energy" are enabled? I need to support classic and LE Bluetooth devices in my network.
-> 
-> Furthermore, is there an recent list of Bluetooth chipsets supported by BlueZ for Low Energy? any chipset recommendations would be greatly appreciated. 
+I sent v2 which I hope addresses all your remarks.
 
-yes, BlueZ 5.x fully supports dual-mode operation. Almost all recent chipsets should be supported. So any USB based Bluetooth controller should actually work out of the box.
+Thanks,
 
-Regards
+Fons
 
-Marcel
+On Fri, Oct 10, 2014 at 10:14 AM, Alfonso Acosta <fons@spotify.com> wrote:
+> Hi Marcel,
+>
+>
+>> don't we also need to clear the flag when the new pairing succeed?
+>
+> Yep, in fact that's the whole point of the flag .... which I missed.
+> Thanks for your patience :)
+>
+>> If we destroy hci_conn anyway, there is pretty much no point in test_and_clear_bit and we could just use test_bit here.
+>
+> Fair point, I will change them to test_bit.
+>
+>
+>
+>
+> --
+> Alfonso Acosta
+>
+> Embedded Systems Engineer at Spotify
+> Birger Jarlsgatan 61, Stockholm, Sweden
+> http://www.spotify.com
 
+
+
+-- 
+Alfonso Acosta
+
+Embedded Systems Engineer at Spotify
+Birger Jarlsgatan 61, Stockholm, Sweden
+http://www.spotify.com
