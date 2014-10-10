@@ -1,41 +1,59 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
+From: Sebastian Chlad <sebastian.chlad@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH] Bluetooth: Fix RFCOMM NSC response
-Date: Fri, 10 Oct 2014 15:21:29 +0200
-Message-Id: <1412947289-27091-1-git-send-email-szymon.janc@tieto.com>
+Cc: Sebastian Chlad <sebastian.chlad@tieto.com>
+Subject: [PATCH 2/2] android/pts: Update PTS files for SPP
+Date: Fri, 10 Oct 2014 14:10:17 +0200
+Message-Id: <1412943017-17823-2-git-send-email-sebastian.chlad@tieto.com>
+In-Reply-To: <1412943017-17823-1-git-send-email-sebastian.chlad@tieto.com>
+References: <1412943017-17823-1-git-send-email-sebastian.chlad@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-rfcomm_send_nsc expects cr to be either 0 or 1 since it is later
-passed to __mcc_type macro and shitfed. Unfortunatelly cr extracted
-from received frame type was not sanitized and shifted value was passed
-resulting in bogus response.
-
-Note: shifted value was also passed to other functions but was used
-only in if satements so this bug appears only for NSC case.
-
-This was affecting TC_RFC_BV_25_C PTS qualification test.
-
-Signed-off-by: Szymon Janc <szymon.janc@tieto.com>
 ---
- net/bluetooth/rfcomm/core.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ android/pics-spp.txt  | 2 +-
+ android/pixit-spp.txt | 2 +-
+ android/pts-spp.txt   | 4 ++--
+ 3 files changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/net/bluetooth/rfcomm/core.c b/net/bluetooth/rfcomm/core.c
-index ca957d3..d340577 100644
---- a/net/bluetooth/rfcomm/core.c
-+++ b/net/bluetooth/rfcomm/core.c
-@@ -1558,7 +1558,7 @@ static int rfcomm_recv_mcc(struct rfcomm_session *s, struct sk_buff *skb)
- 	struct rfcomm_mcc *mcc = (void *) skb->data;
- 	u8 type, cr, len;
+diff --git a/android/pics-spp.txt b/android/pics-spp.txt
+index 3296738..f015236 100644
+--- a/android/pics-spp.txt
++++ b/android/pics-spp.txt
+@@ -1,6 +1,6 @@
+ SPP PICS for the PTS tool.
  
--	cr   = __test_cr(mcc->type);
-+	cr   = !!__test_cr(mcc->type);
- 	type = __get_mcc_type(mcc->type);
- 	len  = __get_mcc_len(mcc->len);
+-PTS version: 5.2
++PTS version: 5.3
  
+ * - different than PTS defaults
+ # - not yet implemented/supported
+diff --git a/android/pixit-spp.txt b/android/pixit-spp.txt
+index bb9605e..a8a8202 100644
+--- a/android/pixit-spp.txt
++++ b/android/pixit-spp.txt
+@@ -1,6 +1,6 @@
+ SPP PIXIT for the PTS tool.
+ 
+-PTS version: 5.2
++PTS version: 5.3
+ 
+ * - different than PTS defaults
+ & - should be set to IUT Bluetooth address
+diff --git a/android/pts-spp.txt b/android/pts-spp.txt
+index ba511eb..328c949 100644
+--- a/android/pts-spp.txt
++++ b/android/pts-spp.txt
+@@ -1,7 +1,7 @@
+ PTS test results for SPP
+ 
+-PTS version: 5.2
+-Tested: 21-July-2014
++PTS version: 5.3
++Tested: 10-October-2014
+ Android version: 4.4.4
+ 
+ Results:
 -- 
-1.9.1
+1.8.5.3
 
