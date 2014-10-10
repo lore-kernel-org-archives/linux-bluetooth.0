@@ -1,79 +1,94 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcin Kraglak <marcin.kraglak@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv4 11/14] shared/gatt: Discover included services
-Date: Fri, 10 Oct 2014 11:15:45 +0200
-Message-Id: <1412932548-28363-12-git-send-email-marcin.kraglak@tieto.com>
+Subject: [PATCHv4 10/14] shared/gatt: Discover secondary services
+Date: Fri, 10 Oct 2014 11:15:44 +0200
+Message-Id: <1412932548-28363-11-git-send-email-marcin.kraglak@tieto.com>
 In-Reply-To: <1412932548-28363-1-git-send-email-marcin.kraglak@tieto.com>
 References: <1412932548-28363-1-git-send-email-marcin.kraglak@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Add searching of secondary services in gatt-client.
 ---
- src/shared/gatt-client.c | 114 +++++++++++++++++++++++++++++++++++++++++++++--
- src/shared/gatt-client.h |   7 +++
- 2 files changed, 117 insertions(+), 4 deletions(-)
+ src/shared/gatt-client.c | 116 +++++++++++++++++++++++++++++++++++++++++------
+ 1 file changed, 103 insertions(+), 13 deletions(-)
 
 diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
-index 9a0ec35..80d7a1a 100644
+index 724fde2..9a0ec35 100644
 --- a/src/shared/gatt-client.c
 +++ b/src/shared/gatt-client.c
-@@ -69,6 +69,8 @@ struct service_list {
- 	bt_gatt_service_t service;
- 	struct chrc_data *chrcs;
- 	size_t num_chrcs;
-+	bt_gatt_included_service_t *includes;
-+	size_t num_includes;
- 	struct service_list *next;
- };
- 
-@@ -253,6 +255,14 @@ static void service_destroy_characteristics(struct service_list *service)
- 	free(service->chrcs);
+@@ -200,23 +200,36 @@ static void mark_notify_data_invalid_if_in_range(void *data, void *user_data)
+ 		notify_data->invalid = true;
  }
  
-+static void service_destroy_includes(struct service_list *service)
-+{
-+	free(service->includes);
-+
-+	service->includes = NULL;
-+	service->num_includes = 0;
+-static bool service_list_add_service(struct service_list **head,
+-						struct service_list **tail,
+-						bool primary, uint16_t start,
+-						uint16_t end,
++static struct service_list *new_service_list(uint16_t start, uint16_t end,
++						bool primary,
+ 						uint8_t uuid[BT_GATT_UUID_SIZE])
+ {
+ 	struct service_list *list;
+ 
+ 	list = new0(struct service_list, 1);
+ 	if (!list)
+-		return false;
++		return NULL;
+ 
+ 	list->service.primary = primary;
+ 	list->service.start_handle = start;
+ 	list->service.end_handle = end;
+ 	memcpy(list->service.uuid, uuid, UUID_BYTES);
+ 
++	return list;
 +}
 +
- static void service_list_clear(struct service_list **head,
- 						struct service_list **tail)
- {
-@@ -265,6 +275,7 @@ static void service_list_clear(struct service_list **head,
- 
- 	while (l) {
- 		service_destroy_characteristics(l);
-+		service_destroy_includes(l);
- 		tmp = l;
- 		l = tmp->next;
- 		free(tmp);
-@@ -293,6 +304,7 @@ static void service_list_clear_range(struct service_list **head,
- 		}
- 
- 		service_destroy_characteristics(cur);
-+		service_destroy_includes(cur);
- 
- 		if (!prev)
- 			*head = cur->next;
-@@ -428,6 +440,99 @@ static int uuid_cmp(const uint8_t uuid128[16], uint16_t uuid16)
- 	return memcmp(uuid128, rhs_uuid, sizeof(rhs_uuid));
++static bool service_list_add_service(struct service_list **head,
++						struct service_list **tail,
++						bool primary, uint16_t start,
++						uint16_t end,
++						uint8_t uuid[BT_GATT_UUID_SIZE])
++{
++	struct service_list *list;
++
++	list = new_service_list(start, end, primary, uuid);
++	if (!list)
++		return false;
++
+ 	if (!(*head))
+ 		*head = *tail = list;
+ 	else {
+@@ -364,6 +377,8 @@ struct discovery_op {
+ 	struct bt_gatt_client *client;
+ 	struct service_list *result_head, *result_tail, *cur_service;
+ 	struct chrc_data *cur_chrc;
++	uint16_t start;
++	uint16_t end;
+ 	int cur_chrc_index;
+ 	int ref_count;
+ 	void (*complete_func)(struct discovery_op *op, bool success,
+@@ -634,6 +649,78 @@ done:
+ 	op->complete_func(op, success, att_ecode);
  }
  
-+static void discover_incl_cb(bool success, uint8_t att_ecode,
-+		struct bt_gatt_result *result,
-+		void *user_data)
++static void discover_secondary_cb(bool success, uint8_t att_ecode,
++						struct bt_gatt_result *result,
++						void *user_data)
 +{
 +	struct discovery_op *op = user_data;
 +	struct bt_gatt_client *client = op->client;
 +	struct bt_gatt_iter iter;
++	uint16_t start, end;
++	uint8_t uuid[BT_GATT_UUID_SIZE];
 +	char uuid_str[MAX_LEN_UUID_STR];
-+	bt_gatt_included_service_t *includes;
-+	unsigned int includes_count, i;
++	struct service_list *service;
 +
 +	if (!success) {
++		util_debug(client->debug_callback, client->debug_data,
++					"Secondary service discovery failed."
++					" ATT ECODE: 0x%02x", att_ecode);
 +		if (att_ecode == BT_ATT_ERROR_ATTRIBUTE_NOT_FOUND) {
 +			success = true;
 +			goto next;
@@ -87,67 +102,42 @@ index 9a0ec35..80d7a1a 100644
 +		goto done;
 +	}
 +
-+	includes_count = bt_gatt_result_included_count(result);
-+	if (includes_count == 0) {
-+		success = false;
-+		goto done;
-+	}
-+
-+	includes = new0(bt_gatt_included_service_t, includes_count);
-+	if (!includes) {
-+		success = false;
-+		goto done;
-+	}
-+
 +	util_debug(client->debug_callback, client->debug_data,
-+						"Included services found: %u",
-+						includes_count);
++					"Secondary services found: %u",
++					bt_gatt_result_service_count(result));
 +
-+	i = 0;
-+	while (bt_gatt_iter_next_included_service(&iter, &includes[i].handle,
-+						&includes[i].start_handle,
-+						&includes[i].end_handle,
-+						includes[i].uuid)) {
-+		uuid_to_string(includes[i].uuid, uuid_str);
++	while (bt_gatt_iter_next_service(&iter, &start, &end, uuid)) {
++		uuid_to_string(uuid, uuid_str);
 +		util_debug(client->debug_callback, client->debug_data,
-+				"handle: 0x%04x, start: 0x%04x, end: 0x%04x,"
-+				"uuid: %s", includes[i].handle,
-+				includes[i].start_handle,
-+				includes[i].end_handle, uuid_str);
-+		i++;
-+	}
++				"start: 0x%04x, end: 0x%04x, uuid: %s",
++				start, end, uuid_str);
 +
-+	op->cur_service->includes = includes;
-+	op->cur_service->num_includes = includes_count;
++		/* Store the service */
++		service = new_service_list(start, end, false, uuid);
++		if (!service) {
++			util_debug(client->debug_callback, client->debug_data,
++						"Failed to create service");
++			success = false;
++			goto done;
++		}
++
++		service_list_insert_services(&op->result_head, &op->result_tail,
++							service, service);
++	}
 +
 +next:
-+	if (!op->cur_service->next) {
-+		op->cur_service = op->result_head;
-+		if (bt_gatt_discover_characteristics(client->att,
++	/* Sequentially discover the characteristics of all services */
++	op->cur_service = op->result_head;
++	if (bt_gatt_discover_characteristics(client->att,
 +					op->cur_service->service.start_handle,
 +					op->cur_service->service.end_handle,
 +					discover_chrcs_cb,
 +					discovery_op_ref(op),
 +					discovery_op_unref))
-+			return;
-+
-+		util_debug(client->debug_callback, client->debug_data,
-+				"Failed to start characteristic discovery");
-+		discovery_op_unref(op);
-+		success = false;
-+		goto done;
-+	}
-+
-+	op->cur_service = op->cur_service->next;
-+	if (bt_gatt_discover_included_services(client->att,
-+				op->cur_service->service.start_handle,
-+				op->cur_service->service.end_handle,
-+				discover_incl_cb,
-+				discovery_op_ref(op),
-+				discovery_op_unref))
 +		return;
++
 +	util_debug(client->debug_callback, client->debug_data,
-+					"Failed to start included discovery");
++				"Failed to start characteristic discovery");
 +	discovery_op_unref(op);
 +	success = false;
 +
@@ -155,58 +145,53 @@ index 9a0ec35..80d7a1a 100644
 +	op->complete_func(op, success, att_ecode);
 +}
 +
- static void discover_descs_cb(bool success, uint8_t att_ecode,
+ static void discover_primary_cb(bool success, uint8_t att_ecode,
  						struct bt_gatt_result *result,
  						void *user_data)
-@@ -532,6 +637,7 @@ done:
- 	op->complete_func(op, success, att_ecode);
- }
+@@ -686,18 +773,17 @@ static void discover_primary_cb(bool success, uint8_t att_ecode,
+ 	if (!op->result_head)
+ 		goto done;
  
-+
- static void discover_chrcs_cb(bool success, uint8_t att_ecode,
- 						struct bt_gatt_result *result,
- 						void *user_data)
-@@ -702,18 +808,18 @@ static void discover_secondary_cb(bool success, uint8_t att_ecode,
- 	}
- 
- next:
 -	/* Sequentially discover the characteristics of all services */
-+	/* Sequentially discover included services */
++	/* Discover secondary services */
  	op->cur_service = op->result_head;
 -	if (bt_gatt_discover_characteristics(client->att,
-+	if (bt_gatt_discover_included_services(client->att,
- 					op->cur_service->service.start_handle,
- 					op->cur_service->service.end_handle,
+-					op->cur_service->service.start_handle,
+-					op->cur_service->service.end_handle,
 -					discover_chrcs_cb,
-+					discover_incl_cb,
- 					discovery_op_ref(op),
- 					discovery_op_unref))
+-					discovery_op_ref(op),
+-					discovery_op_unref))
++	if (bt_gatt_discover_secondary_services(client->att, NULL,
++							op->start, op->end,
++							discover_secondary_cb,
++							discovery_op_ref(op),
++							discovery_op_unref))
  		return;
  
  	util_debug(client->debug_callback, client->debug_data,
 -				"Failed to start characteristic discovery");
-+				"Failed to start included services discovery");
++				"Failed to start secondary service discovery");
  	discovery_op_unref(op);
  	success = false;
  
-diff --git a/src/shared/gatt-client.h b/src/shared/gatt-client.h
-index 22d4dc0..05b4838 100644
---- a/src/shared/gatt-client.h
-+++ b/src/shared/gatt-client.h
-@@ -96,6 +96,13 @@ typedef struct {
- 	size_t num_descs;
- } bt_gatt_characteristic_t;
+@@ -870,6 +956,8 @@ static void process_service_changed(struct bt_gatt_client *client,
  
-+typedef struct {
-+	uint16_t handle;
-+	uint16_t start_handle;
-+	uint16_t end_handle;
-+	uint8_t uuid[BT_GATT_UUID_SIZE];
-+} bt_gatt_included_service_t;
-+
- struct bt_gatt_service_iter {
- 	struct bt_gatt_client *client;
- 	void *ptr;
+ 	op->client = client;
+ 	op->complete_func = service_changed_complete;
++	op->start = start_handle;
++	op->end = end_handle;
+ 
+ 	if (!bt_gatt_discover_primary_services(client->att, NULL,
+ 						start_handle, end_handle,
+@@ -1002,6 +1090,8 @@ static bool gatt_client_init(struct bt_gatt_client *client, uint16_t mtu)
+ 
+ 	op->client = client;
+ 	op->complete_func = init_complete;
++	op->start = 0x0001;
++	op->end = 0xffff;
+ 
+ 	/* Configure the MTU */
+ 	if (!bt_gatt_exchange_mtu(client->att, MAX(BT_ATT_DEFAULT_LE_MTU, mtu),
 -- 
 1.9.3
 
