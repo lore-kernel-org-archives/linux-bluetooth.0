@@ -1,106 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: Sebastian Chlad <sebastian.chlad@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] android/pts: RFCOMM PTS 5.3 update
-Date: Fri, 10 Oct 2014 10:36:17 +0200
-Message-ID: <3547833.DRWoKMx4kZ@uw000953>
-In-Reply-To: <1412867744-11403-1-git-send-email-sebastian.chlad@tieto.com>
-References: <1412867744-11403-1-git-send-email-sebastian.chlad@tieto.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <B2B9E083-A86D-426A-9E79-5F168A8FA017@holtmann.org>
+References: <1412859828-6224-1-git-send-email-fons@spotify.com>
+ <20141009141430.GA31807@t440s.P-661HNU-F1> <CAHF=Y4pJOC3gA1g-+o1e4HRJraFqpCGOAUuqNiS7b0CvAqEBJg@mail.gmail.com>
+ <B2B9E083-A86D-426A-9E79-5F168A8FA017@holtmann.org>
+From: Alfonso Acosta <fons@spotify.com>
+Date: Fri, 10 Oct 2014 10:14:25 +0200
+Message-ID: <CAHF=Y4p3Rn=Q3pdW3ML7=H00pBcGUSjr3SfAsm6v+Da8_LPcCQ@mail.gmail.com>
+Subject: Re: [PATCH] Bluetooth: Defer connection-parameter removal when
+ unpairing without disconnecting
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Sebastian,
+Hi Marcel,
 
-On Thursday 09 of October 2014 17:15:44 Sebastian Chlad wrote:
-> PTS tests results for RFCOMM on PTS 5.3.
-> PICS' and PIXITs checked against PTS 5.3.
-> ---
->  android/pics-rfcomm.txt  |  2 +-
->  android/pixit-rfcomm.txt |  2 +-
->  android/pts-rfcomm.txt   | 22 ++++++++--------------
->  3 files changed, 10 insertions(+), 16 deletions(-)
-> 
-> diff --git a/android/pics-rfcomm.txt b/android/pics-rfcomm.txt
-> index 9dfb32e..c970363 100644
-> --- a/android/pics-rfcomm.txt
-> +++ b/android/pics-rfcomm.txt
-> @@ -1,6 +1,6 @@
->  RFCOMM PICS for the PTS tool.
->  
-> -PTS version: 5.2
-> +PTS version: 5.3
->  
->  * - different than PTS defaults
->  # - not yet implemented/supported
-> diff --git a/android/pixit-rfcomm.txt b/android/pixit-rfcomm.txt
-> index 07810d2..187f3b4 100644
-> --- a/android/pixit-rfcomm.txt
-> +++ b/android/pixit-rfcomm.txt
-> @@ -1,6 +1,6 @@
->  RFCOMM PIXIT for the PTS tool.
->  
-> -PTS version: 5.2
-> +PTS version: 5.3
->  
->  * - different than PTS defaults
->  & - should be set to IUT Bluetooth address
-> diff --git a/android/pts-rfcomm.txt b/android/pts-rfcomm.txt
-> index 9bfc7a2..d869ee0 100644
-> --- a/android/pts-rfcomm.txt
-> +++ b/android/pts-rfcomm.txt
-> @@ -1,7 +1,7 @@
->  PTS test results for RFCOMM
->  
-> -PTS version: 5.2
-> -Tested: 17-July-2014
-> +PTS version: 5.3
-> +Tested: 08-October-2014
->  Android version: 4.4.4
->  
->  Results:
-> @@ -17,29 +17,23 @@ Test Name		Result	Notes
->  TC_RFC_BV_01_C		PASS	rctest -n -P 1 <btaddr>
->  TC_RFC_BV_02_C		PASS	rctest -r -P 1
->  TC_RFC_BV_03_C		PASS	rctest -r -P 1
-> -TC_RFC_BV_04_C		FAIL	PTS issue #12421
-> -				PTS issue #12414
-> -				NOTE: DISC on DLC is expected; IUT disconnects
-> -					rfcomm session (close)
-> +TC_RFC_BV_04_C		PASS	NOTE: use ets provided in PTS issue #12414
->  TC_RFC_BV_05_C		PASS	rctest -n -P 4 <btaddr>
->  				Note: test requires IUT to connect on the given
->  				channel. sdptool browse <btaddr> to check the
->  				channel.
->  TC_RFC_BV_06_C		PASS	rctest -r -P 1
->  TC_RFC_BV_07_C		PASS	rctest -r -P 1
-> -TC_RFC_BV_08_C		INC	PTS issue #12397
-> -				NOTE: Incorrect frame type sent in response to
-> -					the DISC command
-> +TC_RFC_BV_08_C		PASS	rctest -r -P 1
-> +				Note: use ets provided in PTS issue #12397
->  TC_RFC_BV_11_C		PASS	rctest -r -P 1
-> -TC_RFC_BV_13_C		FAIL	PTS issue #12397
-> -				NOTE: IUT sent the correct frame type (UIH)
-> -				but the parameters did not match the
-> -				requirements
-> +TC_RFC_BV_13_C		PASS	rctest -r -P 1
-> +				Note: use ets provided in PTS issue #12397
->  TC_RFC_BV_14_C		N/A
->  TC_RFC_BV_15_C		PASS	rctest -r -P 1
->  TC_RFC_BV_17_C		PASS	rctest -d -P 1
->  TC_RFC_BV_19_C		PASS
->  TC_RFC_BV_21_C		INC	PTS issue #12421
->  TC_RFC_BV_22_C		INC	PTS issue #12421
-> -TC_RFC_BV_25_C		INC	PTS issue #12421
-> +TC_RFC_BV_25_C		INC	PTS issue #12621
->  -------------------------------------------------------------------------------
-> 
 
-Applied (after moving PTS issues into same line as affected test name). Thanks.
+> don't we also need to clear the flag when the new pairing succeed?
+
+Yep, in fact that's the whole point of the flag .... which I missed.
+Thanks for your patience :)
+
+> If we destroy hci_conn anyway, there is pretty much no point in test_and_clear_bit and we could just use test_bit here.
+
+Fair point, I will change them to test_bit.
+
+
+
 
 -- 
-Best regards, 
-Szymon Janc
+Alfonso Acosta
+
+Embedded Systems Engineer at Spotify
+Birger Jarlsgatan 61, Stockholm, Sweden
+http://www.spotify.com
