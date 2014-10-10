@@ -1,41 +1,58 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.6\))
-Subject: Re: [PATCH] Bluetooth: Defer connection-parameter removal when unpairing without disconnecting
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <CAHF=Y4pJOC3gA1g-+o1e4HRJraFqpCGOAUuqNiS7b0CvAqEBJg@mail.gmail.com>
-Date: Fri, 10 Oct 2014 09:36:46 +0200
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
-Message-Id: <B2B9E083-A86D-426A-9E79-5F168A8FA017@holtmann.org>
-References: <1412859828-6224-1-git-send-email-fons@spotify.com> <20141009141430.GA31807@t440s.P-661HNU-F1> <CAHF=Y4pJOC3gA1g-+o1e4HRJraFqpCGOAUuqNiS7b0CvAqEBJg@mail.gmail.com>
-To: Alfonso Acosta <fons@spotify.com>
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCHv2] bnep: Add extra debug information for bnep_up
+Date: Fri, 10 Oct 2014 10:18:45 +0300
+Message-Id: <1412925525-28420-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1448347.mpMmb7OWnU@uw000953>
+References: <1448347.mpMmb7OWnU@uw000953>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Alfonso,
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
->>> +
->>> +     if (test_and_clear_bit(HCI_CONN_MODE_CHANGE_PEND, &conn->flags))
->>> +             hci_conn_params_del(conn->hdev, &conn->dst, conn->dst_type);
->>> }
->>> 
->>> /* Enter sniff mode */
->>> @@ -544,6 +547,9 @@ int hci_conn_del(struct hci_conn *conn)
->>> 
->>>      hci_conn_del_sysfs(conn);
->>> 
->>> +     if (test_and_clear_bit(HCI_CONN_MODE_CHANGE_PEND, &conn->flags))
->>> +             hci_conn_params_del(conn->hdev, &conn->dst, conn->dst_type);
->> I suppose the above two test_and_clear_bit() calls should be operating
->> on HCI_CONN_PARAM_REMOVAL_PEND and not HCI_CONN_MODE_CHANGE_PEND?
-> 
-> Darn. Yes, my bad.
+Adding extra debug information helps to investigate failing cases
+Return meaningful error code.
+---
+ profiles/network/bnep.c | 15 +++++++--------
+ 1 file changed, 7 insertions(+), 8 deletions(-)
 
-don't we also need to clear the flag when the new pairing succeed?
-
-If we destroy hci_conn anyway, there is pretty much no point in test_and_clear_bit and we could just use test_bit here.
-
-Regards
-
-Marcel
+diff --git a/profiles/network/bnep.c b/profiles/network/bnep.c
+index 136709d..070c22e 100644
+--- a/profiles/network/bnep.c
++++ b/profiles/network/bnep.c
+@@ -195,7 +195,7 @@ static int bnep_connadd(int sk, uint16_t role, char *dev)
+ static int bnep_if_up(const char *devname)
+ {
+ 	struct ifreq ifr;
+-	int sk, err;
++	int sk, err = 0;
+ 
+ 	sk = socket(AF_INET, SOCK_DGRAM, 0);
+ 
+@@ -205,16 +205,15 @@ static int bnep_if_up(const char *devname)
+ 	ifr.ifr_flags |= IFF_UP;
+ 	ifr.ifr_flags |= IFF_MULTICAST;
+ 
+-	err = ioctl(sk, SIOCSIFFLAGS, (void *) &ifr);
++	if (ioctl(sk, SIOCSIFFLAGS, (void *) &ifr) < 0) {
++		err = -errno;
++		error("Could not bring up %s: %s(%d)", devname, strerror(-err),
++									-err);
++	}
+ 
+ 	close(sk);
+ 
+-	if (err < 0) {
+-		error("Could not bring up %s", devname);
+-		return err;
+-	}
+-
+-	return 0;
++	return err;
+ }
+ 
+ static int bnep_if_down(const char *devname)
+-- 
+1.9.1
 
