@@ -1,110 +1,125 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <F4236E26-CB50-4334-9AD9-0D930B2B9955@holtmann.org>
-References: <1412991237-20847-1-git-send-email-fons@spotify.com> <F4236E26-CB50-4334-9AD9-0D930B2B9955@holtmann.org>
 From: Alfonso Acosta <fons@spotify.com>
-Date: Sat, 11 Oct 2014 13:14:12 +0200
-Message-ID: <CAHF=Y4o7BE5hVzNgyXR0_jGPqNLnfjj1MgzuTU0iB-tvvgKa3A@mail.gmail.com>
-Subject: Re: [PATCH v3] Bluetooth: Defer connection-parameter removal when unpairing
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH v4] Bluetooth: Defer connection-parameter removal when unpairing
+Date: Sat, 11 Oct 2014 11:14:14 +0000
+Message-Id: <1413026054-5913-1-git-send-email-fons@spotify.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Systematically removing the LE connection parameters and autoconnect
+action is inconvenient for rebonding without disconnecting from
+userland (i.e. unpairing followed by repairing without
+disconnecting). The parameters will be lost after unparing and
+userland needs to take care of book-keeping them and re-adding them.
 
->> @@ -356,6 +356,9 @@ static void hci_conn_timeout(struct work_struct *wor=
-k)
->>               conn->state =3D BT_CLOSED;
->>               break;
->>       }
->> +
->> +     if (test_and_clear_bit(HCI_CONN_PARAM_REMOVAL_PEND, &conn->flags))
->> +             hci_conn_params_del(conn->hdev, &conn->dst, conn->dst_type=
-);
->
-> do we really need this one? The hci_conn_timeout should trigger when the =
-connection establishment has a timeout and that is really non of the concer=
-ns here. And in case we hit an idle disconnect timeout, we are still ending=
- up in hci_conn_del eventually, right? If not, I am having the slight feeli=
-ng that you might have uncovered a bug that we should fix.
+This patch allows userland to forget about parameter management when
+rebonding without disconnecting. It defers clearing the connection
+parameters when unparing without disconnecting, giving a chance of
+keeping the parameters if a repairing happens before the connection is
+closed.
 
-It's probably just lack of familiarity with the code, but it wasn't
-all that clear to me that hci_conn_del is called after
-hci_conn_timeout kicks in. I removed it.
+Signed-off-by: Alfonso Acosta <fons@spotify.com>
 
->
->>
->>               err =3D hci_remove_ltk(hdev, &cp->addr.bdaddr, addr_type);
->>       }
->> @@ -2748,12 +2758,12 @@ static int unpair_device(struct sock *sk, struct=
- hci_dev *hdev, void *data,
->>       }
->>
->>       if (cp->disconnect) {
->> +             /* Only lookup the connection in the BR/EDR since the
->> +              * LE connection was already looked up earlier.
->> +              */
->>               if (cp->addr.type =3D=3D BDADDR_BREDR)
->>                       conn =3D hci_conn_hash_lookup_ba(hdev, ACL_LINK,
->>                                                      &cp->addr.bdaddr);
->> -             else
->> -                     conn =3D hci_conn_hash_lookup_ba(hdev, LE_LINK,
->> -                                                    &cp->addr.bdaddr);
->>       } else {
->>               conn =3D NULL;
->>       }
->
-> I know that Johan told you to do it this way, but seeing the patch now ma=
-kes me a bit uneasy. The usage of uninitilized_var in this case can lead to=
- errors in the future. The logic that the compiler is wrong here is not obv=
-ious. Which means a week from now all of us have forgotten why we did it.
->
-> So here is what I would do to make this easier.
->
->         if (cp->addr.type =3D=3D BDADDR_BREDR) {
->                 if (cp->disconnect) {
->                         conn =3D hci_conn_hash_lookup_ba(hdev, ACL_LINK,
->                                                        &cp->addr.bdaddr);
->                 else
->                         conn =3D NULL;
->
->                 err =3D hci_remove_link_key(hdev, &cp->addr.bdaddr);
->         } else {
->                 conn =3D hci_conn_hash_lookup_ba(hdev, LE_LINK,
->                                                &cp->addr.bdaddr);
->                 if (conn) {
->                         set_bit(HCI_CONN_PARAM_REMOVAL_PEND, &conn->flags=
-);
->
->                         if (!cp->disconnect)
->                                 conn =3D NULL;
->                 }
->
->                 ...
->
->                 hci_remove_irk(hdev, &cp->addr.bdaddr, addr_type);
->
->                 err =3D hci_remove_ltk(hdev, &cp->addr.bdaddr, addr_type)=
-;
->         }
->
-> Add some minor comments on why we set conn =3D NULL and this should be a =
-simpler block. Mainly because the difference between BR/EDR and LE are cont=
-ained in a single spot and not spread out over two places.
->
-> This already takes into account my comment from above to just set the PAR=
-AM_REMOVAL flag no matter if we actually be asked to disconnect or not.
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 07ddeed62..b8685a7 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -555,6 +555,7 @@ enum {
+ 	HCI_CONN_STK_ENCRYPT,
+ 	HCI_CONN_AUTH_INITIATOR,
+ 	HCI_CONN_DROP,
++	HCI_CONN_PARAM_REMOVAL_PEND,
+ };
+ 
+ static inline bool hci_conn_ssp_enabled(struct hci_conn *conn)
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+index b9517bd..11aac06 100644
+--- a/net/bluetooth/hci_conn.c
++++ b/net/bluetooth/hci_conn.c
+@@ -544,6 +544,9 @@ int hci_conn_del(struct hci_conn *conn)
+ 
+ 	hci_conn_del_sysfs(conn);
+ 
++	if (test_bit(HCI_CONN_PARAM_REMOVAL_PEND, &conn->flags))
++		hci_conn_params_del(conn->hdev, &conn->dst, conn->dst_type);
++
+ 	hci_dev_put(hdev);
+ 
+ 	hci_conn_put(conn);
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 3fd88b0..2911a5e 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -2725,10 +2725,29 @@ static int unpair_device(struct sock *sk, struct hci_dev *hdev, void *data,
+ 	}
+ 
+ 	if (cp->addr.type == BDADDR_BREDR) {
++		if (cp->disconnect)
++			conn = hci_conn_hash_lookup_ba(hdev, ACL_LINK,
++						       &cp->addr.bdaddr);
++		else
++			conn = NULL; /* Avoid disconnecting later on*/
++
+ 		err = hci_remove_link_key(hdev, &cp->addr.bdaddr);
+ 	} else {
+ 		u8 addr_type;
+ 
++		conn = hci_conn_hash_lookup_ba(hdev, LE_LINK,
++					       &cp->addr.bdaddr);
++		if (conn) {
++			/* Defer clearing up the connection parameters
++			 * until closing to give a chance of keeping
++			 * them if a repairing happens.
++			 */
++			set_bit(HCI_CONN_PARAM_REMOVAL_PEND, &conn->flags);
++
++			if (!cp->disconnect)
++				conn = NULL; /* Avoid disconnecting later on*/
++		}
++
+ 		if (cp->addr.type == BDADDR_LE_PUBLIC)
+ 			addr_type = ADDR_LE_DEV_PUBLIC;
+ 		else
+@@ -2736,8 +2755,6 @@ static int unpair_device(struct sock *sk, struct hci_dev *hdev, void *data,
+ 
+ 		hci_remove_irk(hdev, &cp->addr.bdaddr, addr_type);
+ 
+-		hci_conn_params_del(hdev, &cp->addr.bdaddr, addr_type);
+-
+ 		err = hci_remove_ltk(hdev, &cp->addr.bdaddr, addr_type);
+ 	}
+ 
+@@ -2747,17 +2764,6 @@ static int unpair_device(struct sock *sk, struct hci_dev *hdev, void *data,
+ 		goto unlock;
+ 	}
+ 
+-	if (cp->disconnect) {
+-		if (cp->addr.type == BDADDR_BREDR)
+-			conn = hci_conn_hash_lookup_ba(hdev, ACL_LINK,
+-						       &cp->addr.bdaddr);
+-		else
+-			conn = hci_conn_hash_lookup_ba(hdev, LE_LINK,
+-						       &cp->addr.bdaddr);
+-	} else {
+-		conn = NULL;
+-	}
+-
+ 	if (!conn) {
+ 		err = cmd_complete(sk, hdev->id, MGMT_OP_UNPAIR_DEVICE, 0,
+ 				   &rp, sizeof(rp));
+@@ -3062,6 +3068,11 @@ static void pairing_complete(struct pending_cmd *cmd, u8 status)
+ 	hci_conn_put(conn);
+ 
+ 	mgmt_pending_remove(cmd);
++
++	/* The device is paired so there is no need to remove
++	 * its connection parameters anymore.
++	 */
++	clear_bit(HCI_CONN_PARAM_REMOVAL_PEND, &conn->flags);
+ }
+ 
+ void mgmt_smp_complete(struct hci_conn *conn, bool complete)
+-- 
+1.9.1
 
-Yep, I agree, what you propose is way cleaner. Thanks.
-
-
-V4 takes care of your remarks.
-
-
---=20
-Alfonso Acosta
-
-Embedded Systems Engineer at Spotify
-Birger Jarlsgatan 61, Stockholm, Sweden
-http://www.spotify.com
