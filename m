@@ -1,39 +1,78 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.6\))
+MIME-Version: 1.0
+In-Reply-To: <0025B704-1B18-4B1E-B27D-DF84AA2F9201@holtmann.org>
+References: <1413026054-5913-1-git-send-email-fons@spotify.com> <0025B704-1B18-4B1E-B27D-DF84AA2F9201@holtmann.org>
+From: Alfonso Acosta <fons@spotify.com>
+Date: Sat, 11 Oct 2014 16:30:48 +0200
+Message-ID: <CAHF=Y4oqcDKpPySM-qgscD8-=oTrm01Y_KnezTZt4irJ8C1FPg@mail.gmail.com>
 Subject: Re: [PATCH v4] Bluetooth: Defer connection-parameter removal when unpairing
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <CAHF=Y4oqcDKpPySM-qgscD8-=oTrm01Y_KnezTZt4irJ8C1FPg@mail.gmail.com>
-Date: Sat, 11 Oct 2014 18:10:53 +0200
+To: Marcel Holtmann <marcel@holtmann.org>
 Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
-Message-Id: <0B397464-8049-478A-B49D-7B5CEED6EFA5@holtmann.org>
-References: <1413026054-5913-1-git-send-email-fons@spotify.com> <0025B704-1B18-4B1E-B27D-DF84AA2F9201@holtmann.org> <CAHF=Y4oqcDKpPySM-qgscD8-=oTrm01Y_KnezTZt4irJ8C1FPg@mail.gmail.com>
-To: Alfonso Acosta <fons@spotify.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Alfonso,
+Hi Marcel,
 
->>>      if (cp->addr.type == BDADDR_BREDR) {
->>> +             if (cp->disconnect)
->>> +                     conn = hci_conn_hash_lookup_ba(hdev, ACL_LINK,
->>> +                                                    &cp->addr.bdaddr);
->>> +             else
->>> +                     conn = NULL; /* Avoid disconnecting later on*/
->>> +
->> 
->> I do not think this is a comment style that is valid in the network subsystem coding style and even if it is valid, it would be pretty unusual.
-> 
-> Excuse my ignorance, but Where is the network subsystem coding style
-> documented? I haven't been able to find it.
+>>       if (cp->addr.type == BDADDR_BREDR) {
+>> +             if (cp->disconnect)
+>> +                     conn = hci_conn_hash_lookup_ba(hdev, ACL_LINK,
+>> +                                                    &cp->addr.bdaddr);
+>> +             else
+>> +                     conn = NULL; /* Avoid disconnecting later on*/
+>> +
+>
+> I do not think this is a comment style that is valid in the network subsystem coding style and even if it is valid, it would be pretty unusual.
 
-that is actually a good question and I am not sure I have a really good answer for that.
+Excuse my ignorance, but Where is the network subsystem coding style
+documented? I haven't been able to find it.
 
-It is essentially Documentation/CodingStyle plus a few extra special cases. Some of them I think are only documented in scripts/checkpatch.pl --strict. The --strict switch is also called --subjective so some of the rules really only apply to the net/ and drivers/net/. I think the term subjective gives it away pretty clearly ;)
+> Generally I would do comment on the whole code. So something like this:
+>         /* When disconnect of the the connection is requested,
+>          * then look up the connection. If the remote device is
+>          * connected, it will be later used to terminate the
+>          * link.
+>          *
+>          * Setting it to NULL explicitly will cause no
+>          * termination of the link.
+>          */
+>         if (cp->disconnect)
+>                 conn = hci_conn_hash_lookup_ba(hdev, ACL_LINK,
+>                                                &cp->addr.bdaddr);
+>         else
+>                 conn = NULL;
+>
+>>               err = hci_remove_link_key(hdev, &cp->addr.bdaddr);
+>>       } else {
+>>               u8 addr_type;
+>>
+>> +             conn = hci_conn_hash_lookup_ba(hdev, LE_LINK,
+>> +                                            &cp->addr.bdaddr);
+>> +             if (conn) {
+>> +                     /* Defer clearing up the connection parameters
+>> +                      * until closing to give a chance of keeping
+>> +                      * them if a repairing happens.
+>> +                      */
+>> +                     set_bit(HCI_CONN_PARAM_REMOVAL_PEND, &conn->flags);
+>> +
+>> +                     if (!cp->disconnect)
+>> +                             conn = NULL; /* Avoid disconnecting later on*/
+>
+> And here I would do this:
+>
+>                 /* If disconnection is not requested, then clear the
+>                  * connection variable so that that the link is not
+>                  * terminated.
+>                  */
+>                 if (!cp->disconnect)
+>                         conn = NULL;
 
-We just end up following the rules of the network subsystem here. So there is a difference between the coding style that we use in BlueZ userspace and the one that we use in the kernel. Not a major difference, but it comes to comment styles and multi-line indentations you see the difference.
+Thanks, I submitted V5 to correct this.
 
-Regards
 
-Marcel
 
+-- 
+Alfonso Acosta
+
+Embedded Systems Engineer at Spotify
+Birger Jarlsgatan 61, Stockholm, Sweden
+http://www.spotify.com
