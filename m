@@ -1,173 +1,182 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.6\))
-Subject: Re: [PATCH v3] Bluetooth: Defer connection-parameter removal when unpairing
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1412991237-20847-1-git-send-email-fons@spotify.com>
-Date: Sat, 11 Oct 2014 10:32:21 +0200
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <F4236E26-CB50-4334-9AD9-0D930B2B9955@holtmann.org>
-References: <1412991237-20847-1-git-send-email-fons@spotify.com>
-To: Alfonso Acosta <fons@spotify.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Sat, 11 Oct 2014 09:36:22 +0200
+From: Alexander Aring <alex.aring@gmail.com>
+To: Martin Townsend <mtownsend1973@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org,
+	marcel@holtmann.org, jukka.rissanen@linux.intel.com,
+	Martin Townsend <martin.townsend@xsilon.com>
+Subject: Re: [PATCH v5 bluetooth-next] 6lowpan: Use pskb_expand_head in IPHC
+ decompression.
+Message-ID: <20141011073620.GA28500@omega>
+References: <1412840794-17283-1-git-send-email-martin.townsend@xsilon.com>
+ <1412840794-17283-2-git-send-email-martin.townsend@xsilon.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+In-Reply-To: <1412840794-17283-2-git-send-email-martin.townsend@xsilon.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Alfonso,
+Hi Martin,
 
-> Systematically removing the LE connection parameters and autoconnect
-> action is inconvenient for rebonding without disconnecting from
-> userland (i.e. unpairing followed by repairing without
-> disconnecting). The parameters will be lost after unparing and
-> userland needs to take care of book-keeping them and re-adding them.
+This is only a summarize what we should now to try to do here for next
+version.
+
+I know... this patch ends in a global debate on principles how we deal
+with the replacement of 6LoWPAN -> IPv6 header. Current behaviour is
+more a hack.
+
+On Thu, Oct 09, 2014 at 08:46:34AM +0100, Martin Townsend wrote:
+> Currently there are potentially 2 skb_copy_expand calls in IPHC
+> decompression.  This patch replaces this with one call to
+> pskb_expand_head.  It also checks to see if there is enough headroom
+> first to ensure it's only done if necessary.
+> As pskb_expand_head must only have one reference the calling code
+> now ensures this.
 > 
-> This patch allows userland to forget about parameter management when
-> rebonding without disconnecting. It defers clearing the connection
-> parameters when unparing without disconnecting, giving a chance of
-> keeping the parameters if a repairing happens before the connection is
-> closed.
+> Signed-off-by: Martin Townsend <martin.townsend@xsilon.com>
+> ---
+>  net/6lowpan/iphc.c      | 51 ++++++++++++++++++++++++-------------------------
+>  net/bluetooth/6lowpan.c |  7 +++++++
+>  2 files changed, 32 insertions(+), 26 deletions(-)
 > 
-> Signed-off-by: Alfonso Acosta <fons@spotify.com>
-> 
-> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-> index 07ddeed62..b8685a7 100644
-> --- a/include/net/bluetooth/hci_core.h
-> +++ b/include/net/bluetooth/hci_core.h
-> @@ -555,6 +555,7 @@ enum {
-> 	HCI_CONN_STK_ENCRYPT,
-> 	HCI_CONN_AUTH_INITIATOR,
-> 	HCI_CONN_DROP,
-> +	HCI_CONN_PARAM_REMOVAL_PEND,
-> };
-> 
-> static inline bool hci_conn_ssp_enabled(struct hci_conn *conn)
-> diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-> index b9517bd..eb9988f 100644
-> --- a/net/bluetooth/hci_conn.c
-> +++ b/net/bluetooth/hci_conn.c
-> @@ -356,6 +356,9 @@ static void hci_conn_timeout(struct work_struct *work)
-> 		conn->state = BT_CLOSED;
-> 		break;
-> 	}
+> diff --git a/net/6lowpan/iphc.c b/net/6lowpan/iphc.c
+> index 142eef5..853b4b8 100644
+> --- a/net/6lowpan/iphc.c
+> +++ b/net/6lowpan/iphc.c
+> @@ -174,30 +174,22 @@ static int uncompress_context_based_src_addr(struct sk_buff *skb,
+>  static int skb_deliver(struct sk_buff *skb, struct ipv6hdr *hdr,
+>  		       struct net_device *dev, skb_delivery_cb deliver_skb)
+>  {
+> -	struct sk_buff *new;
+>  	int stat;
+>  
+> -	new = skb_copy_expand(skb, sizeof(struct ipv6hdr), skb_tailroom(skb),
+> -			      GFP_ATOMIC);
+> -	kfree_skb(skb);
+> -
+> -	if (!new)
+> -		return -ENOMEM;
+> -
+> -	skb_push(new, sizeof(struct ipv6hdr));
+> -	skb_reset_network_header(new);
+> -	skb_copy_to_linear_data(new, hdr, sizeof(struct ipv6hdr));
+> +	skb_push(skb, sizeof(struct ipv6hdr));
+> +	skb_reset_network_header(skb);
+> +	skb_copy_to_linear_data(skb, hdr, sizeof(struct ipv6hdr));
+>  
+> -	new->protocol = htons(ETH_P_IPV6);
+> -	new->pkt_type = PACKET_HOST;
+> -	new->dev = dev;
+> +	skb->protocol = htons(ETH_P_IPV6);
+> +	skb->pkt_type = PACKET_HOST;
+> +	skb->dev = dev;
+>  
+>  	raw_dump_table(__func__, "raw skb data dump before receiving",
+> -		       new->data, new->len);
+> +		       skb->data, skb->len);
+>  
+> -	stat = deliver_skb(new, dev);
+> +	stat = deliver_skb(skb, dev);
+>  
+> -	kfree_skb(new);
+> +	consume_skb(skb);
+>  
+>  	return stat;
+>  }
+> @@ -460,7 +452,7 @@ int lowpan_process_data(struct sk_buff *skb, struct net_device *dev,
+>  	/* UDP data uncompression */
+>  	if (iphc0 & LOWPAN_IPHC_NH_C) {
+>  		struct udphdr uh;
+> -		struct sk_buff *new;
+> +		const int needed = sizeof(struct udphdr) + sizeof(hdr);
+>  
+>  		if (uncompress_udp_header(skb, &uh))
+>  			goto drop;
+> @@ -468,14 +460,13 @@ int lowpan_process_data(struct sk_buff *skb, struct net_device *dev,
+>  		/* replace the compressed UDP head by the uncompressed UDP
+>  		 * header
+>  		 */
+> -		new = skb_copy_expand(skb, sizeof(struct udphdr),
+> -				      skb_tailroom(skb), GFP_ATOMIC);
+> -		kfree_skb(skb);
+> -
+> -		if (!new)
+> -			return -ENOMEM;
+> -
+> -		skb = new;
+> +		if (skb_headroom(skb) < needed) {
+> +			err = pskb_expand_head(skb, needed, 0, GFP_ATOMIC);
+> +			if (unlikely(err)) {
+> +				kfree_skb(skb);
+> +				return err;
+> +			}
+> +		}
+
+use skb_cow_head here.
+
+>  
+>  		skb_push(skb, sizeof(struct udphdr));
+>  		skb_reset_transport_header(skb);
+> @@ -485,6 +476,14 @@ int lowpan_process_data(struct sk_buff *skb, struct net_device *dev,
+>  			       (u8 *)&uh, sizeof(uh));
+>  
+>  		hdr.nexthdr = UIP_PROTO_UDP;
+> +	} else {
+> +		if (skb_headroom(skb) < sizeof(hdr)) {
+> +			err = pskb_expand_head(skb, sizeof(hdr), 0, GFP_ATOMIC);
+> +			if (unlikely(err)) {
+> +				kfree_skb(skb);
+> +				return err;
+> +			}
+> +		}
+
+same here.
+
+>  	}
+>  
+>  	hdr.payload_len = htons(skb->len);
+> diff --git a/net/bluetooth/6lowpan.c b/net/bluetooth/6lowpan.c
+> index c2e0d14..6643a7c 100644
+> --- a/net/bluetooth/6lowpan.c
+> +++ b/net/bluetooth/6lowpan.c
+> @@ -343,6 +343,13 @@ static int recv_pkt(struct sk_buff *skb, struct net_device *dev,
+>  		kfree_skb(local_skb);
+>  		kfree_skb(skb);
+>  	} else {
+> +		/* Decompression may use pskb_expand_head so no shared skb's */
+> +		skb = skb_share_check(skb, GFP_ATOMIC);
+> +		if (!skb) {
+> +			dev->stats.rx_dropped++;
+> +			return NET_RX_DROP;
+> +		}
 > +
-> +	if (test_and_clear_bit(HCI_CONN_PARAM_REMOVAL_PEND, &conn->flags))
-> +		hci_conn_params_del(conn->hdev, &conn->dst, conn->dst_type);
 
-do we really need this one? The hci_conn_timeout should trigger when the connection establishment has a timeout and that is really non of the concerns here. And in case we hit an idle disconnect timeout, we are still ending up in hci_conn_del eventually, right? If not, I am having the slight feeling that you might have uncovered a bug that we should fix.
+I see now that case LOWPAN_DISPATCH_IPHC: runs a "local_skb =
+skb_clone(skb, GFP_ATOMIC);" and send the local_skb to process_data. So
+is the share_check really needed? In my opinion there are several things
+wrong.
 
-> }
-> 
-> /* Enter sniff mode */
-> @@ -544,6 +547,9 @@ int hci_conn_del(struct hci_conn *conn)
-> 
-> 	hci_conn_del_sysfs(conn);
-> 
-> +	if (test_bit(HCI_CONN_PARAM_REMOVAL_PEND, &conn->flags))
-> +		hci_conn_params_del(conn->hdev, &conn->dst, conn->dst_type);
-> +
-> 	hci_dev_put(hdev);
-> 
-> 	hci_conn_put(conn);
-> diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-> index 3fd88b0..0af579d 100644
-> --- a/net/bluetooth/mgmt.c
-> +++ b/net/bluetooth/mgmt.c
-> @@ -2699,7 +2699,7 @@ static int unpair_device(struct sock *sk, struct hci_dev *hdev, void *data,
-> 	struct mgmt_rp_unpair_device rp;
-> 	struct hci_cp_disconnect dc;
-> 	struct pending_cmd *cmd;
-> -	struct hci_conn *conn;
-> +	struct hci_conn *uninitialized_var(conn);
-> 	int err;
-> 
-> 	memset(&rp, 0, sizeof(rp));
-> @@ -2736,7 +2736,17 @@ static int unpair_device(struct sock *sk, struct hci_dev *hdev, void *data,
-> 
-> 		hci_remove_irk(hdev, &cp->addr.bdaddr, addr_type);
-> 
-> -		hci_conn_params_del(hdev, &cp->addr.bdaddr, addr_type);
-> +		conn = hci_conn_hash_lookup_ba(hdev, LE_LINK,
-> +					       &cp->addr.bdaddr);
-> +
-> +		/* If the BLE connection is being used, defer clearing up
-> +		 * the connection parameters until closing to give a
-> +		 * chance of keeping them if a repairing happens.
-> +		 */
-> +		if (conn && !cp->disconnect)
-> +			set_bit(HCI_CONN_PARAM_REMOVAL_PEND, &conn->flags);
-> +		else
-> +			hci_conn_params_del(hdev, &cp->addr.bdaddr, addr_type);
+What bluetooth should do here is:
 
-Coming to think about this a bit in detail, why are we making a difference on if we disconnect here or not. We could make the code a lot simpler. Just always set the PARAM_REMOVAL flag when unpairing and clear it when pairing. If we disconnect right away or not should not affect the usage of this flag.
+Always run skb = skb_share_check(skb, GFP_ATOMIC); at first of this function.
 
-As long as the connection is up, we can happily keep the flags around. Only when the connection goes away, we really need to ensure that we know if we want to remove them or not. Honestly, we should have done it that way in the first place and not spread hci_conn_params_del in different places. The central logic to delete or keep connection parameters should be run when hci_conn goes away.
+In if (skb->data[0] == LOWPAN_DISPATCH_IPV6):
 
-> 
-> 		err = hci_remove_ltk(hdev, &cp->addr.bdaddr, addr_type);
-> 	}
-> @@ -2748,12 +2758,12 @@ static int unpair_device(struct sock *sk, struct hci_dev *hdev, void *data,
-> 	}
-> 
-> 	if (cp->disconnect) {
-> +		/* Only lookup the connection in the BR/EDR since the
-> +		 * LE connection was already looked up earlier.
-> +		 */
-> 		if (cp->addr.type == BDADDR_BREDR)
-> 			conn = hci_conn_hash_lookup_ba(hdev, ACL_LINK,
-> 						       &cp->addr.bdaddr);
-> -		else
-> -			conn = hci_conn_hash_lookup_ba(hdev, LE_LINK,
-> -						       &cp->addr.bdaddr);
-> 	} else {
-> 		conn = NULL;
-> 	}
+ - only run a skb_pull (doesn't change the data buffer, only skb attribute)
+   for the one byte dispatch.
+ - run other things like skb_reset_network_header, etc...
 
-I know that Johan told you to do it this way, but seeing the patch now makes me a bit uneasy. The usage of uninitilized_var in this case can lead to errors in the future. The logic that the compiler is wrong here is not obvious. Which means a week from now all of us have forgotten why we did it.
+ -> Currently this works because we run a complete skb_copy_expand here.
+    But this is not needed, we need a clone because we don't modify the
+    data buffer.
 
-So here is what I would do to make this easier.
+ -> To Jukka: I don't see a skb_pull for the one byte dispatch value?
+    What's happend here? Also IPv6 dispatch is part of rfc4944 and btle
+    6LoWPAN is only realted to rfc6282 (IPHC). I think you don't need handling
+    for this here.
 
-	if (cp->addr.type == BDADDR_BREDR) { 
-		if (cp->disconnect) {
-                        conn = hci_conn_hash_lookup_ba(hdev, ACL_LINK,
-                                                       &cp->addr.bdaddr);
-		else
-			conn = NULL;
 
-		err = hci_remove_link_key(hdev, &cp->addr.bdaddr);
-	} else {
-		conn = hci_conn_hash_lookup_ba(hdev, LE_LINK,
-                                               &cp->addr.bdaddr);
-		if (conn) {
-			set_bit(HCI_CONN_PARAM_REMOVAL_PEND, &conn->flags);
 
-			if (!cp->disconnect)
-				conn = NULL;
-		}
+In "case LOWPAN_DISPATCH_IPHC:" we should remove the skb_clone, because
+this is already handled by "skb_share_check" then.
 
-		...
-
-		hci_remove_irk(hdev, &cp->addr.bdaddr, addr_type);
-
-		err = hci_remove_ltk(hdev, &cp->addr.bdaddr, addr_type);
-	}
-
-Add some minor comments on why we set conn = NULL and this should be a simpler block. Mainly because the difference between BR/EDR and LE are contained in a single spot and not spread out over two places.
-
-This already takes into account my comment from above to just set the PARAM_REMOVAL flag no matter if we actually be asked to disconnect or not.
-
-> @@ -3062,6 +3072,11 @@ static void pairing_complete(struct pending_cmd *cmd, u8 status)
-> 	hci_conn_put(conn);
-> 
-> 	mgmt_pending_remove(cmd);
-> +
-> +	/* The device is paired so there is no need to remove
-> +	 * its connection parameters anymore.
-> +	 */
-> +	clear_bit(HCI_CONN_PARAM_REMOVAL_PEND, &conn->flags);
-> }
-> 
-> void mgmt_smp_complete(struct hci_conn *conn, bool complete)
-
-Regards
-
-Marcel
-
+- Alex
