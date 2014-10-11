@@ -1,80 +1,140 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Sat, 11 Oct 2014 08:55:42 +0200
-From: Alexander Aring <alex.aring@gmail.com>
-To: Martin Townsend <mtownsend1973@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org,
-	marcel@holtmann.org, jukka.rissanen@linux.intel.com,
-	Martin Townsend <martin.townsend@xsilon.com>,
-	werner@almesberger.net
-Subject: Re: [PATCH v5 bluetooth-next] 6lowpan: Use pskb_expand_head in IPHC
- decompression.
-Message-ID: <20141011065541.GA27638@omega>
-References: <1412840794-17283-1-git-send-email-martin.townsend@xsilon.com>
- <1412840794-17283-2-git-send-email-martin.townsend@xsilon.com>
- <20141010194116.GA31843@omega>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-In-Reply-To: <20141010194116.GA31843@omega>
+In-Reply-To: <1412991237-20847-1-git-send-email-fons@spotify.com>
+References: <1412991237-20847-1-git-send-email-fons@spotify.com>
+From: Alfonso Acosta <fons@spotify.com>
+Date: Sat, 11 Oct 2014 03:37:03 +0200
+Message-ID: <CAHF=Y4ok8pdO=aWPwBSEBwbN--XV6KPR0sDx-WjApp5eBfUZCQ@mail.gmail.com>
+Subject: Re: [PATCH v3] Bluetooth: Defer connection-parameter removal when unpairing
+To: BlueZ development <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Martin,
+I shortened the commit message header and moved the
+clear_bit(HCI_CONN_PARAM_REMOVAL_PEND) to cover all the pairing
+completion cases.
 
-On Fri, Oct 10, 2014 at 09:41:16PM +0200, Alexander Aring wrote:
+On Sat, Oct 11, 2014 at 3:33 AM, Alfonso Acosta <fons@spotify.com> wrote:
+> Systematically removing the LE connection parameters and autoconnect
+> action is inconvenient for rebonding without disconnecting from
+> userland (i.e. unpairing followed by repairing without
+> disconnecting). The parameters will be lost after unparing and
+> userland needs to take care of book-keeping them and re-adding them.
+>
+> This patch allows userland to forget about parameter management when
+> rebonding without disconnecting. It defers clearing the connection
+> parameters when unparing without disconnecting, giving a chance of
+> keeping the parameters if a repairing happens before the connection is
+> closed.
+>
+> Signed-off-by: Alfonso Acosta <fons@spotify.com>
+>
+> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+> index 07ddeed62..b8685a7 100644
+> --- a/include/net/bluetooth/hci_core.h
+> +++ b/include/net/bluetooth/hci_core.h
+> @@ -555,6 +555,7 @@ enum {
+>         HCI_CONN_STK_ENCRYPT,
+>         HCI_CONN_AUTH_INITIATOR,
+>         HCI_CONN_DROP,
+> +       HCI_CONN_PARAM_REMOVAL_PEND,
+>  };
+>
+>  static inline bool hci_conn_ssp_enabled(struct hci_conn *conn)
+> diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+> index b9517bd..eb9988f 100644
+> --- a/net/bluetooth/hci_conn.c
+> +++ b/net/bluetooth/hci_conn.c
+> @@ -356,6 +356,9 @@ static void hci_conn_timeout(struct work_struct *work)
+>                 conn->state = BT_CLOSED;
+>                 break;
+>         }
+> +
+> +       if (test_and_clear_bit(HCI_CONN_PARAM_REMOVAL_PEND, &conn->flags))
+> +               hci_conn_params_del(conn->hdev, &conn->dst, conn->dst_type);
+>  }
+>
+>  /* Enter sniff mode */
+> @@ -544,6 +547,9 @@ int hci_conn_del(struct hci_conn *conn)
+>
+>         hci_conn_del_sysfs(conn);
+>
+> +       if (test_bit(HCI_CONN_PARAM_REMOVAL_PEND, &conn->flags))
+> +               hci_conn_params_del(conn->hdev, &conn->dst, conn->dst_type);
+> +
+>         hci_dev_put(hdev);
+>
+>         hci_conn_put(conn);
+> diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+> index 3fd88b0..0af579d 100644
+> --- a/net/bluetooth/mgmt.c
+> +++ b/net/bluetooth/mgmt.c
+> @@ -2699,7 +2699,7 @@ static int unpair_device(struct sock *sk, struct hci_dev *hdev, void *data,
+>         struct mgmt_rp_unpair_device rp;
+>         struct hci_cp_disconnect dc;
+>         struct pending_cmd *cmd;
+> -       struct hci_conn *conn;
+> +       struct hci_conn *uninitialized_var(conn);
+>         int err;
+>
+>         memset(&rp, 0, sizeof(rp));
+> @@ -2736,7 +2736,17 @@ static int unpair_device(struct sock *sk, struct hci_dev *hdev, void *data,
+>
+>                 hci_remove_irk(hdev, &cp->addr.bdaddr, addr_type);
+>
+> -               hci_conn_params_del(hdev, &cp->addr.bdaddr, addr_type);
+> +               conn = hci_conn_hash_lookup_ba(hdev, LE_LINK,
+> +                                              &cp->addr.bdaddr);
+> +
+> +               /* If the BLE connection is being used, defer clearing up
+> +                * the connection parameters until closing to give a
+> +                * chance of keeping them if a repairing happens.
+> +                */
+> +               if (conn && !cp->disconnect)
+> +                       set_bit(HCI_CONN_PARAM_REMOVAL_PEND, &conn->flags);
+> +               else
+> +                       hci_conn_params_del(hdev, &cp->addr.bdaddr, addr_type);
+>
+>                 err = hci_remove_ltk(hdev, &cp->addr.bdaddr, addr_type);
+>         }
+> @@ -2748,12 +2758,12 @@ static int unpair_device(struct sock *sk, struct hci_dev *hdev, void *data,
+>         }
+>
+>         if (cp->disconnect) {
+> +               /* Only lookup the connection in the BR/EDR since the
+> +                * LE connection was already looked up earlier.
+> +                */
+>                 if (cp->addr.type == BDADDR_BREDR)
+>                         conn = hci_conn_hash_lookup_ba(hdev, ACL_LINK,
+>                                                        &cp->addr.bdaddr);
+> -               else
+> -                       conn = hci_conn_hash_lookup_ba(hdev, LE_LINK,
+> -                                                      &cp->addr.bdaddr);
+>         } else {
+>                 conn = NULL;
+>         }
+> @@ -3062,6 +3072,11 @@ static void pairing_complete(struct pending_cmd *cmd, u8 status)
+>         hci_conn_put(conn);
+>
+>         mgmt_pending_remove(cmd);
+> +
+> +       /* The device is paired so there is no need to remove
+> +        * its connection parameters anymore.
+> +        */
+> +       clear_bit(HCI_CONN_PARAM_REMOVAL_PEND, &conn->flags);
+>  }
+>
+>  void mgmt_smp_complete(struct hci_conn *conn, bool complete)
+> --
+> 1.9.1
+>
 
-...
 
-> >  	hdr.payload_len = htons(skb->len);
-> > diff --git a/net/bluetooth/6lowpan.c b/net/bluetooth/6lowpan.c
-> > index c2e0d14..6643a7c 100644
-> > --- a/net/bluetooth/6lowpan.c
-> > +++ b/net/bluetooth/6lowpan.c
-> > @@ -343,6 +343,13 @@ static int recv_pkt(struct sk_buff *skb, struct net_device *dev,
-> >  		kfree_skb(local_skb);
-> >  		kfree_skb(skb);
-> >  	} else {
-> > +		/* Decompression may use pskb_expand_head so no shared skb's */
-> > +		skb = skb_share_check(skb, GFP_ATOMIC);
-> > +		if (!skb) {
-> > +			dev->stats.rx_dropped++;
-> > +			return NET_RX_DROP;
-> > +		}
-> > +
-> >  		switch (skb->data[0] & 0xe0) {
-> >  		case LOWPAN_DISPATCH_IPHC:	/* ipv6 datagram */
-> >  			local_skb = skb_clone(skb, GFP_ATOMIC);
-> 
-> 
-> Now we come to this function.
-> 
-> There exist two global rules here:
-> 
-> 1.
-> 
-> If we change only the skb pointers head/tail with e.g. skb_push then we
-> need a cloned skb only. We don't change the skb data buffer here.
-> 
-> We need this in LOWPAN_DISPATCH_IPV6, here we run only one skb_pull for
-> one byte, and the FRAGN and FRAG1 dispatches in 802.15.4 6LoWPAN.
-> 
-> skb_share_check do this, we have surely a clone afterwards and the
-> sk_buff attributes are not changed elsewhere, which means we are
-> allowed to manipulate the skb attributes.
-> 
-> 2.
-> 
-> If we touch the data buffer, then we need a skb_copy. We need this at
-> LOWPAN_DISPATCH_IPHC because here we replacing the data buffer.
-> 
-> skb_unshare do this for us.
-> 
 
-This is not correct. I mean the chain of thought is correct. But a
-private copy of data buffer is already done by pskb_expand_head, which
-is used before modify the data buffer. If we should not run it, then it
-would be correct. This handling is done by decompression IPHC.
+-- 
+Alfonso Acosta
 
-So we don't need skb_unshare. Now it's very interesting if we can use
-skb_cow_head, when replacing transport/network header, because we only
-need to modify the headroom. Otherwise we should use skb_cow.
-
-- Alex
+Embedded Systems Engineer at Spotify
+Birger Jarlsgatan 61, Stockholm, Sweden
+http://www.spotify.com
