@@ -1,136 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
-From: Alfonso Acosta <fons@spotify.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v5] Bluetooth: Defer connection-parameter removal when unpairing
-Date: Sat, 11 Oct 2014 14:27:24 +0000
-Message-Id: <1413037644-15858-1-git-send-email-fons@spotify.com>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.6\))
+Subject: Re: [PATCH v3] Bluetooth: Defer connection-parameter removal when unpairing
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <CAHF=Y4o7BE5hVzNgyXR0_jGPqNLnfjj1MgzuTU0iB-tvvgKa3A@mail.gmail.com>
+Date: Sat, 11 Oct 2014 13:56:01 +0200
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
+Message-Id: <5240CE7E-B366-410A-93C4-5FCC3358A68F@holtmann.org>
+References: <1412991237-20847-1-git-send-email-fons@spotify.com> <F4236E26-CB50-4334-9AD9-0D930B2B9955@holtmann.org> <CAHF=Y4o7BE5hVzNgyXR0_jGPqNLnfjj1MgzuTU0iB-tvvgKa3A@mail.gmail.com>
+To: Alfonso Acosta <fons@spotify.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Systematically removing the LE connection parameters and autoconnect
-action is inconvenient for rebonding without disconnecting from
-userland (i.e. unpairing followed by repairing without
-disconnecting). The parameters will be lost after unparing and
-userland needs to take care of book-keeping them and re-adding them.
+Hi Alfonso,
 
-This patch allows userland to forget about parameter management when
-rebonding without disconnecting. It defers clearing the connection
-parameters when unparing without disconnecting, giving a chance of
-keeping the parameters if a repairing happens before the connection is
-closed.
+>>> @@ -356,6 +356,9 @@ static void hci_conn_timeout(struct work_struct *work)
+>>>              conn->state = BT_CLOSED;
+>>>              break;
+>>>      }
+>>> +
+>>> +     if (test_and_clear_bit(HCI_CONN_PARAM_REMOVAL_PEND, &conn->flags))
+>>> +             hci_conn_params_del(conn->hdev, &conn->dst, conn->dst_type);
+>> 
+>> do we really need this one? The hci_conn_timeout should trigger when the connection establishment has a timeout and that is really non of the concerns here. And in case we hit an idle disconnect timeout, we are still ending up in hci_conn_del eventually, right? If not, I am having the slight feeling that you might have uncovered a bug that we should fix.
+> 
+> It's probably just lack of familiarity with the code, but it wasn't
+> all that clear to me that hci_conn_del is called after
+> hci_conn_timeout kicks in. I removed it.
 
-Signed-off-by: Alfonso Acosta <fons@spotify.com>
+there is always a possibility that you found an actual bug that we trigger, but has not done any harm. At least not harm that anybody has noticed so far. So if this happens, then I like to fix the actual bug.
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 07ddeed62..b8685a7 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -555,6 +555,7 @@ enum {
- 	HCI_CONN_STK_ENCRYPT,
- 	HCI_CONN_AUTH_INITIATOR,
- 	HCI_CONN_DROP,
-+	HCI_CONN_PARAM_REMOVAL_PEND,
- };
- 
- static inline bool hci_conn_ssp_enabled(struct hci_conn *conn)
-diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index b9517bd..11aac06 100644
---- a/net/bluetooth/hci_conn.c
-+++ b/net/bluetooth/hci_conn.c
-@@ -544,6 +544,9 @@ int hci_conn_del(struct hci_conn *conn)
- 
- 	hci_conn_del_sysfs(conn);
- 
-+	if (test_bit(HCI_CONN_PARAM_REMOVAL_PEND, &conn->flags))
-+		hci_conn_params_del(conn->hdev, &conn->dst, conn->dst_type);
-+
- 	hci_dev_put(hdev);
- 
- 	hci_conn_put(conn);
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 3fd88b0..063b0a7 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -2725,10 +2725,40 @@ static int unpair_device(struct sock *sk, struct hci_dev *hdev, void *data,
- 	}
- 
- 	if (cp->addr.type == BDADDR_BREDR) {
-+		/* If disconnection is requested, then look up the
-+		 * connection. If the remote device is connected, it
-+		 * will be later used to terminate the link.
-+		 *
-+		 * Setting it to NULL explicitly will cause no
-+		 * termination of the link.
-+		 */
-+		if (cp->disconnect)
-+			conn = hci_conn_hash_lookup_ba(hdev, ACL_LINK,
-+						       &cp->addr.bdaddr);
-+		else
-+			conn = NULL;
-+
- 		err = hci_remove_link_key(hdev, &cp->addr.bdaddr);
- 	} else {
- 		u8 addr_type;
- 
-+		conn = hci_conn_hash_lookup_ba(hdev, LE_LINK,
-+					       &cp->addr.bdaddr);
-+		if (conn) {
-+			/* Defer clearing up the connection parameters
-+			 * until closing to give a chance of keeping
-+			 * them if a repairing happens.
-+			 */
-+			set_bit(HCI_CONN_PARAM_REMOVAL_PEND, &conn->flags);
-+
-+			/* If disconnection is not requested, then
-+			 * clear the connection variable so that the
-+			 * link is not terminated.
-+			 */
-+			if (!cp->disconnect)
-+				conn = NULL;
-+		}
-+
- 		if (cp->addr.type == BDADDR_LE_PUBLIC)
- 			addr_type = ADDR_LE_DEV_PUBLIC;
- 		else
-@@ -2736,8 +2766,6 @@ static int unpair_device(struct sock *sk, struct hci_dev *hdev, void *data,
- 
- 		hci_remove_irk(hdev, &cp->addr.bdaddr, addr_type);
- 
--		hci_conn_params_del(hdev, &cp->addr.bdaddr, addr_type);
--
- 		err = hci_remove_ltk(hdev, &cp->addr.bdaddr, addr_type);
- 	}
- 
-@@ -2747,17 +2775,6 @@ static int unpair_device(struct sock *sk, struct hci_dev *hdev, void *data,
- 		goto unlock;
- 	}
- 
--	if (cp->disconnect) {
--		if (cp->addr.type == BDADDR_BREDR)
--			conn = hci_conn_hash_lookup_ba(hdev, ACL_LINK,
--						       &cp->addr.bdaddr);
--		else
--			conn = hci_conn_hash_lookup_ba(hdev, LE_LINK,
--						       &cp->addr.bdaddr);
--	} else {
--		conn = NULL;
--	}
--
- 	if (!conn) {
- 		err = cmd_complete(sk, hdev->id, MGMT_OP_UNPAIR_DEVICE, 0,
- 				   &rp, sizeof(rp));
-@@ -3062,6 +3079,11 @@ static void pairing_complete(struct pending_cmd *cmd, u8 status)
- 	hci_conn_put(conn);
- 
- 	mgmt_pending_remove(cmd);
-+
-+	/* The device is paired so there is no need to remove
-+	 * its connection parameters anymore.
-+	 */
-+	clear_bit(HCI_CONN_PARAM_REMOVAL_PEND, &conn->flags);
- }
- 
- void mgmt_smp_complete(struct hci_conn *conn, bool complete)
--- 
-1.9.1
+Regards
+
+Marcel
 
