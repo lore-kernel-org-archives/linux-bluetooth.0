@@ -1,40 +1,45 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.6\))
-Subject: Re: [PATCH v6] Bluetooth: Defer connection-parameter removal when unpairing
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1413063887-25870-1-git-send-email-fons@spotify.com>
-Date: Mon, 13 Oct 2014 00:45:51 +0200
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <EDC21CD6-FBF6-43DA-A8E4-40BF710EA50E@holtmann.org>
-References: <1413063887-25870-1-git-send-email-fons@spotify.com>
-To: Alfonso Acosta <fons@spotify.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+MIME-Version: 1.0
+In-Reply-To: <CAHF=Y4r+ofDDBv5+YpFPcvctqYAAGiwNj0u94+XDsoskbSF4Mw@mail.gmail.com>
+References: <1412991237-20847-1-git-send-email-fons@spotify.com>
+ <F4236E26-CB50-4334-9AD9-0D930B2B9955@holtmann.org> <CAHF=Y4o7BE5hVzNgyXR0_jGPqNLnfjj1MgzuTU0iB-tvvgKa3A@mail.gmail.com>
+ <5240CE7E-B366-410A-93C4-5FCC3358A68F@holtmann.org> <CAHF=Y4r+ofDDBv5+YpFPcvctqYAAGiwNj0u94+XDsoskbSF4Mw@mail.gmail.com>
+From: Alfonso Acosta <fons@spotify.com>
+Date: Sun, 12 Oct 2014 12:45:38 +0200
+Message-ID: <CAHF=Y4rb3d6=Ys+7pQEuaLRsyYYrj5qmxGdjWW6oHFy9P-dxqA@mail.gmail.com>
+Subject: Re: [PATCH v3] Bluetooth: Defer connection-parameter removal when unpairing
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Alfonso,
-
-> Systematically removing the LE connection parameters and autoconnect
-> action is inconvenient for rebonding without disconnecting from
-> userland (i.e. unpairing followed by repairing without
-> disconnecting). The parameters will be lost after unparing and
-> userland needs to take care of book-keeping them and re-adding them.
-> 
-> This patch allows userland to forget about parameter management when
-> rebonding without disconnecting. It defers clearing the connection
-> parameters when unparing without disconnecting, giving a chance of
-> keeping the parameters if a repairing happens before the connection is
+> I see that, when receiving a Disconnect Complete event,
+> hci_disconn_complete_evt() deallocates the connection. But ...
+>
+> 1. What if the controller misbehaves and doesn't send a Disconnect
+> Complete event? AFAIU, the connection will never be deallocated in
+> this case.
+>
+> Wouldn't it make sense to have a timer for this? e.g. make
+> hci_disconnect() queue hci_conn_timeout() and, in the later, delete
+> the connection if it's not referenced and it was already marked as
 > closed.
-> 
-> Signed-off-by: Alfonso Acosta <fons@spotify.com>
+>
+> 2. What if the controller sends an error in the Command Status event
+> and the Disconnect Complete never arrives?
+>
+> I see that  hci_cs_disconnect() notifies userland if it was triggered
+> through mgmt, but it doesn't provide a retry mechanism in case the
+> disconnection came from the kernel itself. In fact, what happens with
+> the connection's deallocation in this case? Is it ensured in any way?
 
-patch looks good, but I wonder why we do not have a diffstat here. Are you not using git format-patch and git send-email to send patches? If not, then you might want to start with that.
+3. What if the controller sends an error in the Disconnect Complete? I
+see the same issues as in (2).
 
-Anyhow, since we are in the middle of the merge window for 3.18, I am not yet applying the patch to bluetooth-next, but just for reference here, ack from my side.
 
-Acked-by: Marcel Holtmann <marcel@holtmann.org>
+-- 
+Alfonso Acosta
 
-Regards
-
-Marcel
-
+Embedded Systems Engineer at Spotify
+Birger Jarlsgatan 61, Stockholm, Sweden
+http://www.spotify.com
