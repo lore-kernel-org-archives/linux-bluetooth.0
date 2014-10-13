@@ -1,44 +1,56 @@
 Return-Path: <cyrus@holtmann.org>
+From: Szymon Janc <szymon.janc@gmail.com>
+To: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 00/10] android/map-client: Add MAP client daemon implementation
+Date: Mon, 13 Oct 2014 22:47:45 +0200
+Message-ID: <15197372.1KNekK2V4o@athlon>
+In-Reply-To: <1412858714-2845-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+References: <1412858714-2845-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 MIME-Version: 1.0
-In-Reply-To: <CABBYNZ+Nx9iWAYEJiZY5CSE8x_ynjRFpfawB5c-6+eCKNOHcwg@mail.gmail.com>
-References: <1412629304-3391-1-git-send-email-armansito@chromium.org>
-	<1412629304-3391-5-git-send-email-armansito@chromium.org>
-	<CABBYNZ+Nx9iWAYEJiZY5CSE8x_ynjRFpfawB5c-6+eCKNOHcwg@mail.gmail.com>
-Date: Mon, 13 Oct 2014 13:57:46 -0700
-Message-ID: <CAHrH25SzRsikERavxBtwcq_tyUtj7BCCg_u4hznLsPOh_Nh+qQ@mail.gmail.com>
-Subject: Re: [PATCH BlueZ v1 4/4] shared/gatt-server: Support Read By Group
- Type request.
-From: Arman Uguray <armansito@chromium.org>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Arman Uguray <armansito@chromium.org>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="us-ascii"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+Hi Grzegorz,
 
+On Thursday 09 October 2014 14:45:04 Grzegorz Kolodziejczyk wrote:
+> v1.
+> *Add MAP client daemon implementation (skeleton, body)
+> *Add haltest MAP client support
+> 
+> Aleksander Drewnicki (4):
+>   android/client: Add skeleton for mce calls
+>   android/client: Add code for mce callback
+>   android/client: Add code for mce method
+>   android/client: Add completion for mce method
+> 
+> Grzegorz Kolodziejczyk (6):
+>   android/map-client: Add initial files
+>   android/map-client: Add stubs for MAP client commands handlers
+>   android/map-client: Add support for get remote MAS instances
+>   android/ipc-tester: Add missing service opcode boundries test cases
+>   android/ipc-tester: Add case for MAP client service opcode boundries
+>   android/ipc-tester: Add cases for MAP client msg size
+> 
+>  android/Android.mk       |   5 +-
+>  android/Makefile.am      |   2 +
+>  android/client/haltest.c |   2 +
+>  android/client/if-bt.c   |   3 +
+>  android/client/if-main.h |   3 +
+>  android/client/if-mce.c  |  87 +++++++++++++++++++++
+>  android/ipc-tester.c     |  32 ++++++++
+>  android/main.c           |  12 +++
+>  android/map-client.c     | 197
+> +++++++++++++++++++++++++++++++++++++++++++++++ android/map-client.h     | 
+> 26 +++++++
+>  10 files changed, 368 insertions(+), 1 deletion(-)
+>  create mode 100644 android/client/if-mce.c
+>  create mode 100644 android/map-client.c
+>  create mode 100644 android/map-client.h
 
->> +       if (queue_isempty(q)) {
->> +               ecode = BT_ATT_ERROR_ATTRIBUTE_NOT_FOUND;
->> +               goto error;
->> +       }
->
-> This function is quite long, perhaps using queue_foreach be better
-> than iterating inline since you destroy the queue at end but it would
-> be a problem if one of items fails to be encoded, the funny thing is
-> that it is possible to do the same with queue_find and return true to
-> interrupt in case of failure but it would be a obvious abuse of the
-> API so perhaps queue_foreach_func_t could have a return as well and in
-> case it return false we stop.
->
+android/client patches are now upstream so no need to resend them. Thanks.
 
-I would have to modify too many places that use queue_foreach by
-adding a somewhat suspicious "return true" with no obvious meaning, so
-I decided not to do that for this patch set. For v2 I went ahead and
-broke the encoding bit into its own helper which I plan to extend in
-the future for other read requests. Hopefully this'll make the code
-more readable although it doesn't call queue_foreach.
-
-Cheers,
-Arman
+-- 
+Szymon K. Janc
+szymon.janc@gmail.com
