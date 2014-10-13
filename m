@@ -1,60 +1,69 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH v3 1/2] Bluetooth: Fix RFCOMM NSC response
-Date: Mon, 13 Oct 2014 11:43:53 +0200
-Message-Id: <1413193434-16779-1-git-send-email-szymon.janc@tieto.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Mon, 13 Oct 2014 11:41:00 +0200
+From: Alexander Aring <alex.aring@gmail.com>
+To: Martin Townsend <martin.townsend@xsilon.com>
+Cc: Martin Townsend <mtownsend1973@gmail.com>,
+	linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org,
+	marcel@holtmann.org, jukka.rissanen@linux.intel.com
+Subject: Re: [PATCH v5 bluetooth-next] 6lowpan: Use pskb_expand_head in IPHC
+ decompression.
+Message-ID: <20141013094058.GB20544@omega>
+References: <1412840794-17283-1-git-send-email-martin.townsend@xsilon.com>
+ <1412840794-17283-2-git-send-email-martin.townsend@xsilon.com>
+ <20141011073620.GA28500@omega>
+ <543B90FA.2060603@xsilon.com>
+ <20141013085538.GA20544@omega>
+ <543B9B4C.1010303@xsilon.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+In-Reply-To: <543B9B4C.1010303@xsilon.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-rfcomm_send_nsc expects CR to be either 0 or 1 since it is later
-passed to __mcc_type macro and shitfed. Unfortunatelly CR extracted
-from received frame type was not sanitized and shifted value was passed
-resulting in bogus response.
+On Mon, Oct 13, 2014 at 10:28:44AM +0100, Martin Townsend wrote:
+...
+> >> If it's ok with everyone I'll change pskb_expand_head to skb_cow or skb_cow_head and leave the bluetooth code as it is with this v5 patch.
+> > For me it's confusing, you do that on skb, but we never used skb
+> > afterwards (maybe on freeing) but we use local_skb, the local_skb should
+> > always be cloned because we running skb_clone before.
+> skb_clone does ensure that the skb isn't shared anymore so I think it will be safe to remove the skb_share_check.  Or I can move it to the start of the function like we do for 802.15.4?
 
-Note: shifted value was also passed to other functions but was used
-only in if satements so this bug appears only for NSC case.
+We need to clarify the following points:
 
-The CR bit in the value octet shall be set to the same value
-as the CR bit in the type field octet of the not supported command
-frame but the CR bit for NCS response should be set to 0 since it is
-always a response.
+skb_is_shared:
 
-This was affecting TC_RFC_BV_25_C PTS qualification test.
+It's used twice in some packet handler functions or elsewhere.
 
-Signed-off-by: Szymon Janc <szymon.janc@tieto.com>
----
+now a skb_clone:
 
-V3: fixed invalid CR
-V2: moved sanitization to macro ifself
-    added second patch that also fix __test_pf 
+A skb clone is only a copy of struct sk_buff, so we can safely run
+skb_pull and skb_push, skb->dev = foo. Simple for modify skb attributes.
 
- net/bluetooth/rfcomm/core.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+now a skb_copy:
 
-diff --git a/net/bluetooth/rfcomm/core.c b/net/bluetooth/rfcomm/core.c
-index af73bc3..d0bbc73 100644
---- a/net/bluetooth/rfcomm/core.c
-+++ b/net/bluetooth/rfcomm/core.c
-@@ -78,7 +78,7 @@ static struct rfcomm_session *rfcomm_session_del(struct rfcomm_session *s);
- #define __get_type(b)     ((b & 0xef))
- 
- #define __test_ea(b)      ((b & 0x01))
--#define __test_cr(b)      ((b & 0x02))
-+#define __test_cr(b)      (!!(b & 0x02))
- #define __test_pf(b)      ((b & 0x10))
- 
- #define __addr(cr, dlci)       (((dlci & 0x3f) << 2) | (cr << 1) | 0x01)
-@@ -904,7 +904,7 @@ static int rfcomm_send_nsc(struct rfcomm_session *s, int cr, u8 type)
- 	hdr->len  = __len8(sizeof(*mcc) + 1);
- 
- 	mcc = (void *) ptr; ptr += sizeof(*mcc);
--	mcc->type = __mcc_type(cr, RFCOMM_NSC);
-+	mcc->type = __mcc_type(0, RFCOMM_NSC);
- 	mcc->len  = __len8(1);
- 
- 	/* Type that we didn't like */
--- 
-1.9.1
+It's a complete private copy with private data buffer which allow us to
+make skb->data[#] = foobar;
 
+
+
+Now skb_share_check do:
+
+if skb_is_shared true, then make a clone. This doesn't allow to
+manipulate the data, but skb_cow make a copy of the private data so this
+is okay for IPHC call. Means after skb_cow, we have something like
+skb_copy, but skb_cow should be faster. ;-)
+
+Also skb_share_check checks if skb_is_shared is false, then we don't
+need a skb_clone, because it's not shared, then we are allow to
+manipulate skb attributes, because nobody else use it.
+
+
+
+I would add skb_share_check at beginning of this function like 802.15.4
+but the IPV6 DISPATCH of bluetooth do a complete copy of the data buffer
+which seems not necessary, but this is another issue and maybe I think
+that the IPV6 DISPATCH value isn't needed by bluetooth 6lowpan. <-- But I
+am not sure about this. I also can't see that bluetooth 6lowpan runs
+skb_pull for the one byte dispatch value. Jukka need to check that, if
+he has time and feel like to doing it.
+
+- Alex
