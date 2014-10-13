@@ -1,84 +1,66 @@
 Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@gmail.com>
-To: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
+To: Sebastian Chlad <sebastian.chlad@tieto.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 02/10] android/map-client: Add stubs for MAP client commands handlers
-Date: Mon, 13 Oct 2014 21:58:13 +0200
-Message-ID: <1797034.Wjt854TcTE@athlon>
-In-Reply-To: <1412858714-2845-3-git-send-email-grzegorz.kolodziejczyk@tieto.com>
-References: <1412858714-2845-1-git-send-email-grzegorz.kolodziejczyk@tieto.com> <1412858714-2845-3-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+Subject: Re: [PATCH 1/2] android/pts: Update HSP files for PTS 5.3
+Date: Mon, 13 Oct 2014 20:55:43 +0200
+Message-ID: <1633217.uelCufP3Z3@athlon>
+In-Reply-To: <1412943017-17823-1-git-send-email-sebastian.chlad@tieto.com>
+References: <1412943017-17823-1-git-send-email-sebastian.chlad@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Grzegorz,
+Hi Sebastian,
 
-On Thursday 09 October 2014 14:45:06 Grzegorz Kolodziejczyk wrote:
-> Add empty handlers for MAP client IPC commands.
+On Friday 10 October 2014 14:10:16 Sebastian Chlad wrote:
 > ---
->  android/map-client.c | 33 ++++++++++++++++++++++++++++++++-
->  1 file changed, 32 insertions(+), 1 deletion(-)
+>  android/pics-hsp.txt  | 2 +-
+>  android/pixit-hsp.txt | 2 +-
+>  android/pts-hsp.txt   | 4 ++--
+>  3 files changed, 4 insertions(+), 4 deletions(-)
 > 
-> diff --git a/android/map-client.c b/android/map-client.c
-> index 4556461..1001b36 100644
-> --- a/android/map-client.c
-> +++ b/android/map-client.c
-> @@ -28,17 +28,48 @@
->  #include <stdbool.h>
->  #include <stdlib.h>
->  #include <stdint.h>
-> +#include <glib.h>
+> diff --git a/android/pics-hsp.txt b/android/pics-hsp.txt
+> index 330a197..7e71b14 100644
+> --- a/android/pics-hsp.txt
+> +++ b/android/pics-hsp.txt
+> @@ -1,6 +1,6 @@
+>  HSP PICS for the PTS tool.
 > 
->  #include "ipc.h"
->  #include "lib/bluetooth.h"
->  #include "map-client.h"
-> +#include "src/log.h"
-> +#include "hal-msg.h"
-> +
-> +static struct ipc *hal_ipc = NULL;
-> +static bdaddr_t adapter_addr;
-> +
-> +static void handle_get_instances(const void *buf, uint16_t len)
-> +{
-> +	DBG("");
-> +
-> +	ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_MAP_CLIENT,
-> +			HAL_OP_MAP_CLIENT_GET_INSTANCES, HAL_STATUS_FAILED);
-> +}
-> +
-> +static const struct ipc_handler cmd_handlers[] = {
-> +	{handle_get_instances, false,
-> +			sizeof(struct hal_cmd_map_client_get_instances)},
+> -PTS version: 5.2
+> +PTS version: 5.3
+> 
+>  * - different than PTS defaults
+>  # - not yet implemented/supported
+> diff --git a/android/pixit-hsp.txt b/android/pixit-hsp.txt
+> index a097277..6be4731 100644
+> --- a/android/pixit-hsp.txt
+> +++ b/android/pixit-hsp.txt
+> @@ -1,6 +1,6 @@
+>  HSP PIXIT for the PTS tool.
+> 
+> -PTS version: 5.2
+> +PTS version: 5.3
+> 
+>  * - different than PTS defaults
+>  & - should be set to IUT Bluetooth address
+> diff --git a/android/pts-hsp.txt b/android/pts-hsp.txt
+> index 0df9806..9031b82 100644
+> --- a/android/pts-hsp.txt
+> +++ b/android/pts-hsp.txt
+> @@ -1,7 +1,7 @@
+>  PTS test results for HSP
+> 
+> -PTS version: 5.2
+> -Tested: 15-July-2014
+> +PTS version: 5.3
+> +Tested: 10-October-2014
+>  Android version: 4.4.4
+> 
+>  Results:
 
-Style issue: there should be spaces after { and before }.
-Also please add comment about define type just like in other handlers (I'm 
-aware that there is just 1 handler here but lets be consistent).
-
-> +};
-> 
->  bool bt_map_client_register(struct ipc *ipc, const bdaddr_t *addr, uint8_t
-> mode) {
-> -	return false;
-> +	DBG("");
-> +
-> +	bacpy(&adapter_addr, addr);
-> +
-> +	hal_ipc = ipc;
-> +
-> +	ipc_register(hal_ipc, HAL_SERVICE_ID_MAP_CLIENT, cmd_handlers,
-> +						G_N_ELEMENTS(cmd_handlers));
-> +
-> +	return true;
->  }
-> 
->  void bt_map_client_unregister(void)
->  {
-> +	DBG("");
-> 
-> +	ipc_unregister(hal_ipc, HAL_SERVICE_ID_MAP_CLIENT);
-> +	hal_ipc = NULL;
->  }
+Both patches applied. Thanks.
 
 -- 
 Szymon K. Janc
