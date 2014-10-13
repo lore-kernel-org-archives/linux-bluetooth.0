@@ -2,74 +2,161 @@ Return-Path: <cyrus@holtmann.org>
 From: Arman Uguray <armansito@chromium.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Arman Uguray <armansito@chromium.org>
-Subject: [PATCH v2 2/5] shared/att: Respond with ERROR_REQUEST_NOT_SUPPORTED for unhandled requests.
-Date: Mon, 13 Oct 2014 14:09:59 -0700
-Message-Id: <1413234602-20566-3-git-send-email-armansito@chromium.org>
+Subject: [PATCH v2 1/5] shared/att: Drop the connection if a request is received while one is pending.
+Date: Mon, 13 Oct 2014 14:09:58 -0700
+Message-Id: <1413234602-20566-2-git-send-email-armansito@chromium.org>
 In-Reply-To: <1413234602-20566-1-git-send-email-armansito@chromium.org>
 References: <1413234602-20566-1-git-send-email-armansito@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-With this patch bt_att automatically responds with ERROR_REQUEST_NOT_SUPPORTED
-to an incoming request for which no handler has been registered via
-bt_att_register.
+With this patch, when bt_att is being used for the server role, it now makes
+sure that a second request drops the connection unless a response for a previous
+request has been sent.
 ---
- src/shared/att.c | 23 +++++++++++++++++++++++
- 1 file changed, 23 insertions(+)
+ src/shared/att.c | 101 +++++++++++++++++++++++++++++++++----------------------
+ 1 file changed, 61 insertions(+), 40 deletions(-)
 
 diff --git a/src/shared/att.c b/src/shared/att.c
-index 96f34a3..d086ca8 100644
+index de35aef..96f34a3 100644
 --- a/src/shared/att.c
 +++ b/src/shared/att.c
-@@ -562,6 +562,7 @@ struct notify_data {
- 	uint8_t opcode;
- 	uint8_t *pdu;
- 	ssize_t pdu_len;
-+	bool handler_found;
- };
+@@ -64,6 +64,8 @@ struct bt_att {
+ 	bool in_disconn;
+ 	bool need_disconn_cleanup;
  
- static void notify_handler(void *data, void *user_data)
-@@ -575,11 +576,27 @@ static void notify_handler(void *data, void *user_data)
- 	if (notify->opcode != not_data->opcode)
- 		return;
- 
-+	not_data->handler_found = true;
++	bool in_req;			/* There's a pending incoming request */
 +
- 	if (notify->callback)
- 		notify->callback(not_data->opcode, not_data->pdu,
- 					not_data->pdu_len, notify->user_data);
+ 	uint8_t *buf;
+ 	uint16_t mtu;
+ 
+@@ -460,6 +462,9 @@ static bool can_write_data(struct io *io, void *user_data)
+ 	case ATT_OP_TYPE_IND:
+ 		att->pending_ind = op;
+ 		break;
++	case ATT_OP_TYPE_RSP:
++		/* Set in_req to false to indicate that no request is pending */
++		att->in_req = false;
+ 	default:
+ 		destroy_att_send_op(op);
+ 		return true;
+@@ -604,6 +609,46 @@ static void handle_notify(struct bt_att *att, uint8_t opcode, uint8_t *pdu,
+ 	bt_att_unref(att);
  }
  
-+static void respond_not_supported(struct bt_att *att, uint8_t opcode)
++static void disconn_handler(void *data, void *user_data)
 +{
-+	uint8_t pdu[4];
++	struct att_disconn *disconn = data;
 +
-+	memset(pdu, 0, sizeof(pdu));
-+	pdu[0] = opcode;
-+	pdu[1] = 0;
-+	pdu[2] = 0;
-+	pdu[3] = BT_ATT_ERROR_REQUEST_NOT_SUPPORTED;
++	if (disconn->removed)
++		return;
 +
-+	bt_att_send(att, BT_ATT_OP_ERROR_RSP, pdu, sizeof(pdu), NULL, NULL,
-+									NULL);
++	if (disconn->callback)
++		disconn->callback(disconn->user_data);
 +}
 +
- static void handle_notify(struct bt_att *att, uint8_t opcode, uint8_t *pdu,
- 								ssize_t pdu_len)
- {
-@@ -607,6 +624,12 @@ static void handle_notify(struct bt_att *att, uint8_t opcode, uint8_t *pdu,
- 	}
- 
- 	bt_att_unref(att);
++static bool disconnect_cb(struct io *io, void *user_data)
++{
++	struct bt_att *att = user_data;
 +
-+	/* If this was a request and no handler was registered for it, respond
-+	 * with "Not Supported"
-+	 */
-+	if (!data.handler_found && get_op_type(opcode) == ATT_OP_TYPE_REQ)
-+		respond_not_supported(att, opcode);
++	io_destroy(att->io);
++	att->io = NULL;
++
++	util_debug(att->debug_callback, att->debug_data,
++						"Physical link disconnected");
++
++	bt_att_ref(att);
++	att->in_disconn = true;
++	queue_foreach(att->disconn_list, disconn_handler, NULL);
++	att->in_disconn = false;
++
++	if (att->need_disconn_cleanup) {
++		queue_remove_all(att->disconn_list, match_disconn_removed, NULL,
++							destroy_att_disconn);
++		att->need_disconn_cleanup = false;
++	}
++
++	bt_att_cancel_all(att);
++	bt_att_unregister_all(att);
++
++	bt_att_unref(att);
++
++	return false;
++}
++
+ static bool can_read_data(struct io *io, void *user_data)
+ {
+ 	struct bt_att *att = user_data;
+@@ -635,6 +680,22 @@ static bool can_read_data(struct io *io, void *user_data)
+ 		util_debug(att->debug_callback, att->debug_data,
+ 				"ATT opcode cannot be handled: 0x%02x", opcode);
+ 		break;
++	case ATT_OP_TYPE_REQ:
++		/* If a request is currently pending, then the sequential
++		 * protocol was violated. Disconnect the bearer and notify the
++		 * upper-layer.
++		 */
++		if (att->in_req) {
++			util_debug(att->debug_callback, att->debug_data,
++					"Received request while another is "
++					"pending: 0x%02x", opcode);
++			disconnect_cb(att->io, att);
++			return false;
++		}
++
++		att->in_req = true;
++
++		/* Fall through to the next case */
+ 	default:
+ 		/* For all other opcodes notify the upper layer of the PDU and
+ 		 * let them act on it.
+@@ -648,46 +709,6 @@ static bool can_read_data(struct io *io, void *user_data)
+ 	return true;
  }
  
- static void disconn_handler(void *data, void *user_data)
+-static void disconn_handler(void *data, void *user_data)
+-{
+-	struct att_disconn *disconn = data;
+-
+-	if (disconn->removed)
+-		return;
+-
+-	if (disconn->callback)
+-		disconn->callback(disconn->user_data);
+-}
+-
+-static bool disconnect_cb(struct io *io, void *user_data)
+-{
+-	struct bt_att *att = user_data;
+-
+-	io_destroy(att->io);
+-	att->io = NULL;
+-
+-	util_debug(att->debug_callback, att->debug_data,
+-						"Physical link disconnected");
+-
+-	bt_att_ref(att);
+-	att->in_disconn = true;
+-	queue_foreach(att->disconn_list, disconn_handler, NULL);
+-	att->in_disconn = false;
+-
+-	if (att->need_disconn_cleanup) {
+-		queue_remove_all(att->disconn_list, match_disconn_removed, NULL,
+-							destroy_att_disconn);
+-		att->need_disconn_cleanup = false;
+-	}
+-
+-	bt_att_cancel_all(att);
+-	bt_att_unregister_all(att);
+-
+-	bt_att_unref(att);
+-
+-	return false;
+-}
+-
+ struct bt_att *bt_att_new(int fd)
+ {
+ 	struct bt_att *att;
 -- 
 2.1.0.rc2.206.gedb03e5
 
