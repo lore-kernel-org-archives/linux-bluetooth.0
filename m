@@ -1,45 +1,45 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 13 Oct 2014 19:11:14 +0200
-From: Alexander Aring <alex.aring@gmail.com>
-To: Jukka Rissanen <jukka.rissanen@linux.intel.com>
-Cc: Martin Townsend <martin.townsend@xsilon.com>,
-	Martin Townsend <mtownsend1973@gmail.com>,
-	linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org,
-	marcel@holtmann.org
-Subject: Re: [PATCH v6 bluetooth-next] 6lowpan: Use skb_cow in IPHC
- decompression.
-Message-ID: <20141013171111.GA25249@omega>
-References: <1413194456-26351-1-git-send-email-martin.townsend@xsilon.com>
- <1413194456-26351-2-git-send-email-martin.townsend@xsilon.com>
- <1413200959.2705.90.camel@jrissane-mobl.ger.corp.intel.com>
- <543BCF44.1030001@xsilon.com>
- <1413211468.2705.104.camel@jrissane-mobl.ger.corp.intel.com>
- <543BE816.80304@xsilon.com>
- <1413212954.2705.106.camel@jrissane-mobl.ger.corp.intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-In-Reply-To: <1413212954.2705.106.camel@jrissane-mobl.ger.corp.intel.com>
+In-Reply-To: <20141013161319.GA27533@t440s.P-661HNU-F1>
+References: <1413200623-31278-1-git-send-email-fons@spotify.com>
+ <1413200623-31278-3-git-send-email-fons@spotify.com> <20141013161319.GA27533@t440s.P-661HNU-F1>
+From: Alfonso Acosta <fons@spotify.com>
+Date: Mon, 13 Oct 2014 19:02:06 +0200
+Message-ID: <CAHF=Y4r9ua3W0=kfbL6=3K+xxGda61gn2e8fb9P-1vzUQjTeOw@mail.gmail.com>
+Subject: Re: [PATCH v3 1/2] core: Add Manufacturer Specific Data EIR field
+To: Alfonso Acosta <fons@spotify.com>,
+	BlueZ development <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jukka,
+Hi Johan and Marcel,
 
-On Mon, Oct 13, 2014 at 06:09:14PM +0300, Jukka Rissanen wrote:
-> Hi Martin,
-> 
-> On ma, 2014-10-13 at 15:56 +0100, Martin Townsend wrote:
-> > Hi Jukka,
-> > 
-> > Does this patch help?
-> 
-> Unfortunately no, I still see inconsistent lock state. It would probably
-> have been too easy :)
-> 
+>> +             case EIR_MANUFACTURER_DATA:
+>> +                     if (data_len < 2 || data_len > 2 + sizeof(eir->msd->data))
+>> +                             break;
+>> +                     eir->msd = g_malloc(sizeof(*eir->msd));
+>> +                     eir->msd->company = get_le16(data);
+>> +                     eir->msd->data_len = data_len - 2;
+>> +                     memcpy(&eir->msd->data, data + 2, eir->msd->data_len);
+>> +                     break;
+>
+> Wouldn't this lead to a memory leaks if a device (violating the spec. but
+> still) had two or more manufacturer data entries in it's AD/EIR data?
+> Taking example from how remote name entries are handled you should
+> probably g_free(eir->msd) before allocating a new one.
 
-I remeber something, I think 802.15.4 had similar issues long time ago.
+Very good point. So, should I support multiple MSD fields or just the
+first (last) one for now?
 
-The fix was 20e7c4e80dcd01dad5e6c8b32455228b8fe9c619 ("6lowpan: fix
-lockdep splats"). Please check that, you need something like that!
+In all honesty, just like Johan, I didn't even know it was legal to
+provide multiple ones.
 
-- Alex
+Thanks,
 
-[0] 
+-- 
+Alfonso Acosta
+
+Embedded Systems Engineer at Spotify
+Birger Jarlsgatan 61, Stockholm, Sweden
+http://www.spotify.com
