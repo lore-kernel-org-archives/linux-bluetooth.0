@@ -1,299 +1,269 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 2/4] android/avrcp-lib: Rework callback return
-Date: Mon, 13 Oct 2014 12:55:48 +0300
-Message-Id: <1413194150-21751-2-git-send-email-luiz.dentz@gmail.com>
-In-Reply-To: <1413194150-21751-1-git-send-email-luiz.dentz@gmail.com>
-References: <1413194150-21751-1-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 1/4] android/avrcp-lib: Add status parameter
+Date: Mon, 13 Oct 2014 12:55:47 +0300
+Message-Id: <1413194150-21751-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This allow callbacks to return 0 instead of -EAGAIN when responding
-asynchronously which is more consistent since it is not an error.
+This adds status parameter for functions generating browsing reponses
+as it may not be possible to respond synchronously using the return of
+the callback while processing the request.
 ---
- android/avrcp-lib.c | 12 +++++++++++-
- android/avrcp.c     |  8 ++++----
- unit/test-avrcp.c   | 42 +++++++++++++++++++++---------------------
- 3 files changed, 36 insertions(+), 26 deletions(-)
+ android/avrcp-lib.c | 91 ++++++++++++++++++++++++++++-------------------------
+ android/avrcp-lib.h | 16 +++++-----
+ unit/test-avrcp.c   | 13 ++++----
+ 3 files changed, 64 insertions(+), 56 deletions(-)
 
 diff --git a/android/avrcp-lib.c b/android/avrcp-lib.c
-index f3cdab9..60d6e97 100644
+index b7d0f5e..f3cdab9 100644
 --- a/android/avrcp-lib.c
 +++ b/android/avrcp-lib.c
-@@ -496,6 +496,9 @@ static ssize_t handle_vendordep_pdu(struct avctp *conn, uint8_t transaction,
+@@ -3337,6 +3337,20 @@ int avrcp_set_addressed_player_rsp(struct avrcp *session, uint8_t transaction,
+ 				&iov, 1);
+ }
  
- 	ret = handler->func(session, transaction, pdu->params_len, pdu->params,
- 							session->control_data);
-+	if (ret == 0)
-+		return -EAGAIN;
++static int avrcp_status_rsp(struct avrcp *session, uint8_t transaction,
++						uint8_t pdu_id, uint8_t status)
++{
++	struct iovec iov;
 +
- 	if (ret < 0) {
- 		if (ret == -EAGAIN)
- 			return ret;
-@@ -622,6 +625,9 @@ static ssize_t handle_browsing_pdu(struct avctp *conn,
++	if (status > AVRCP_STATUS_ADDRESSED_PLAYER_CHANGED)
++		return -EINVAL;
++
++	iov.iov_base = &status;
++	iov.iov_len = sizeof(status);
++
++	return avrcp_send_browsing(session, transaction, pdu_id, &iov, 1);
++}
++
+ int avrcp_set_browsed_player_rsp(struct avrcp *session, uint8_t transaction,
+ 					uint8_t status, uint16_t counter,
+ 					uint32_t items, uint8_t depth,
+@@ -3347,13 +3361,9 @@ int avrcp_set_browsed_player_rsp(struct avrcp *session, uint8_t transaction,
+ 	uint16_t len[UINT8_MAX];
+ 	int i;
  
- 	ret = handler->func(session, transaction, pdu->params_len, pdu->params,
- 							session->control_data);
-+	if (ret == 0)
-+		return -EAGAIN;
+-	if (status != AVRCP_STATUS_SUCCESS) {
+-		iov[0].iov_base = &status;
+-		iov[0].iov_len = sizeof(status);
+-		return avrcp_send_browsing(session, transaction,
+-						AVRCP_SET_BROWSED_PLAYER,
+-						iov, 1);
+-	}
++	if (status != AVRCP_STATUS_SUCCESS)
++		return avrcp_status_rsp(session, transaction,
++					AVRCP_SET_BROWSED_PLAYER, status);
+ 
+ 	rsp.status = status;
+ 	put_be16(counter, &rsp.counter);
+@@ -3390,16 +3400,20 @@ int avrcp_set_browsed_player_rsp(struct avrcp *session, uint8_t transaction,
+ }
+ 
+ int avrcp_get_folder_items_rsp(struct avrcp *session, uint8_t transaction,
+-					uint16_t counter, uint8_t number,
+-					uint8_t *type, uint16_t *len,
+-					uint8_t **params)
++					uint8_t status, uint16_t counter,
++					uint8_t number, uint8_t *type,
++					uint16_t *len, uint8_t **params)
+ {
+ 	struct iovec iov[UINT8_MAX * 2 + 1];
+ 	struct get_folder_items_rsp rsp;
+ 	uint8_t item[UINT8_MAX][3];
+ 	int i;
+ 
+-	rsp.status = AVRCP_STATUS_SUCCESS;
++	if (status != AVRCP_STATUS_SUCCESS)
++		return avrcp_status_rsp(session, transaction,
++					AVRCP_GET_FOLDER_ITEMS, status);
 +
- 	if (ret < 0) {
- 		if (ret == -EAGAIN)
- 			return ret;
-@@ -1171,7 +1177,7 @@ static ssize_t request_continuing(struct avrcp *session, uint8_t transaction,
- 	if (err < 0)
++	rsp.status = status;
+ 	put_be16(counter, &rsp.counter);
+ 	put_be16(number, &rsp.number);
+ 
+@@ -3422,12 +3436,16 @@ int avrcp_get_folder_items_rsp(struct avrcp *session, uint8_t transaction,
+ }
+ 
+ int avrcp_change_path_rsp(struct avrcp *session, uint8_t transaction,
+-								uint32_t items)
++						uint8_t status, uint32_t items)
+ {
+ 	struct iovec iov;
+ 	struct change_path_rsp rsp;
+ 
+-	rsp.status = AVRCP_STATUS_SUCCESS;
++	if (status != AVRCP_STATUS_SUCCESS)
++		return avrcp_status_rsp(session, transaction, AVRCP_CHANGE_PATH,
++									status);
++
++	rsp.status = status;
+ 	put_be32(items, &rsp.items);
+ 
+ 	iov.iov_base = &rsp;
+@@ -3477,12 +3495,9 @@ int avrcp_get_item_attributes_rsp(struct avrcp *session, uint8_t transaction,
+ 	if (number > AVRCP_MEDIA_ATTRIBUTE_LAST)
  		return -EINVAL;
  
--	return -EAGAIN;
-+	return 0;
+-	if (status != AVRCP_STATUS_SUCCESS) {
+-		iov[0].iov_base = &status;
+-		iov[0].iov_len = sizeof(status);
+-		return avrcp_send_browsing(session, transaction,
+-					AVRCP_GET_ITEM_ATTRIBUTES, iov, 1);
+-	}
++	if (status != AVRCP_STATUS_SUCCESS)
++		return avrcp_status_rsp(session, transaction,
++					AVRCP_GET_ITEM_ATTRIBUTES, status);
+ 
+ 	rsp.status = status;
+ 	rsp.number = number;
+@@ -3498,27 +3513,24 @@ int avrcp_get_item_attributes_rsp(struct avrcp *session, uint8_t transaction,
+ 					number * 2 + 1);
  }
  
- static ssize_t abort_continuing(struct avrcp *session, uint8_t transaction,
-@@ -1186,6 +1192,10 @@ static ssize_t abort_continuing(struct avrcp *session, uint8_t transaction,
- 	continuing_free(session->continuing);
- 	session->continuing = NULL;
+-int avrcp_play_item_rsp(struct avrcp *session, uint8_t transaction)
++int avrcp_play_item_rsp(struct avrcp *session, uint8_t transaction,
++								uint8_t status)
+ {
+-	struct iovec iov;
+-	struct play_item_rsp rsp;
+-
+-	rsp.status = AVRCP_STATUS_SUCCESS;
+-
+-	iov.iov_base = &rsp;
+-	iov.iov_len = sizeof(rsp);
+-
+-	return avrcp_send_browsing(session, transaction, AVRCP_PLAY_ITEM,
+-								&iov, 1);
++	return avrcp_status_rsp(session, transaction, AVRCP_PLAY_ITEM,
++								status);
+ }
  
-+	avrcp_send_internal(session, transaction, AVC_CTYPE_ACCEPTED,
-+				AVC_SUBUNIT_PANEL, AVRCP_ABORT_CONTINUING,
-+				AVRCP_PACKET_TYPE_SINGLE, NULL, 0);
+-int avrcp_search_rsp(struct avrcp *session, uint8_t transaction,
++int avrcp_search_rsp(struct avrcp *session, uint8_t transaction, uint8_t status,
+ 					uint16_t counter, uint32_t items)
+ {
+ 	struct iovec iov;
+ 	struct search_rsp rsp;
+ 
+-	rsp.status = AVRCP_STATUS_SUCCESS;
++	if (status != AVRCP_STATUS_SUCCESS)
++		return avrcp_status_rsp(session, transaction, AVRCP_SEARCH,
++								status);
 +
- 	return 0;
++	rsp.status = status;
+ 	put_be16(counter, &rsp.counter);
+ 	put_be32(items, &rsp.items);
+ 
+@@ -3529,18 +3541,11 @@ int avrcp_search_rsp(struct avrcp *session, uint8_t transaction,
+ 								&iov, 1);
  }
  
-diff --git a/android/avrcp.c b/android/avrcp.c
-index 940de0b..a0d412d 100644
---- a/android/avrcp.c
-+++ b/android/avrcp.c
-@@ -642,7 +642,7 @@ static int handle_get_capabilities_cmd(struct avrcp *session,
- 	avrcp_get_capabilities_rsp(session, transaction, sizeof(events),
- 								events);
- 
--	return -EAGAIN;
-+	return 0;
+-int avrcp_add_to_now_playing_rsp(struct avrcp *session, uint8_t transaction)
++int avrcp_add_to_now_playing_rsp(struct avrcp *session, uint8_t transaction,
++								uint8_t status)
+ {
+-	struct iovec iov;
+-	struct add_to_now_playing_rsp rsp;
+-
+-	rsp.status = AVRCP_STATUS_SUCCESS;
+-
+-	iov.iov_base = &rsp;
+-	iov.iov_len = sizeof(rsp);
+-
+-	return avrcp_send_browsing(session, transaction,
+-					AVRCP_ADD_TO_NOW_PLAYING, &iov, 1);
++	return avrcp_status_rsp(session, transaction, AVRCP_ADD_TO_NOW_PLAYING,
++								status);
  }
  
- static void push_request(struct avrcp_device *dev, uint8_t pdu_id,
-@@ -671,7 +671,7 @@ static int handle_get_play_status_cmd(struct avrcp *session,
+ int avrcp_send_passthrough(struct avrcp *session, uint32_t vendor, uint8_t op)
+diff --git a/android/avrcp-lib.h b/android/avrcp-lib.h
+index 9985c4a..2299c83 100644
+--- a/android/avrcp-lib.h
++++ b/android/avrcp-lib.h
+@@ -327,17 +327,19 @@ int avrcp_set_browsed_player_rsp(struct avrcp *session, uint8_t transaction,
+ 					uint32_t items, uint8_t depth,
+ 					const char **folders);
+ int avrcp_get_folder_items_rsp(struct avrcp *session, uint8_t transaction,
+-					uint16_t counter, uint8_t number,
+-					uint8_t *type, uint16_t *len,
+-					uint8_t **params);
++					uint8_t status, uint16_t counter,
++					uint8_t number, uint8_t *type,
++					uint16_t *len, uint8_t **params);
+ int avrcp_change_path_rsp(struct avrcp *session, uint8_t transaction,
+-								uint32_t items);
++						uint8_t status, uint32_t items);
+ int avrcp_get_item_attributes_rsp(struct avrcp *session, uint8_t transaction,
+ 					uint8_t status, uint8_t number,
+ 					uint32_t *attrs, const char **text);
+-int avrcp_play_item_rsp(struct avrcp *session, uint8_t transaction);
+-int avrcp_search_rsp(struct avrcp *session, uint8_t transaction,
++int avrcp_play_item_rsp(struct avrcp *session, uint8_t transaction,
++					uint8_t status);
++int avrcp_search_rsp(struct avrcp *session, uint8_t transaction, uint8_t status,
+ 					uint16_t counter, uint32_t items);
+-int avrcp_add_to_now_playing_rsp(struct avrcp *session, uint8_t transaction);
++int avrcp_add_to_now_playing_rsp(struct avrcp *session, uint8_t transaction,
++								uint8_t status);
  
- 	push_request(dev, AVRCP_GET_PLAY_STATUS, 0, transaction);
- 
--	return -EAGAIN;
-+	return 0;
- }
- 
- static int handle_get_element_attrs_cmd(struct avrcp *session,
-@@ -707,7 +707,7 @@ done:
- 
- 	push_request(dev, AVRCP_GET_ELEMENT_ATTRIBUTES, 0, transaction);
- 
--	return -EAGAIN;
-+	return 0;
- 
- }
- 
-@@ -741,7 +741,7 @@ static int handle_register_notification_cmd(struct avrcp *session,
- 
- 	push_request(dev, AVRCP_REGISTER_NOTIFICATION, event, transaction);
- 
--	return -EAGAIN;
-+	return 0;
- }
- 
- static const struct avrcp_control_ind control_ind = {
+ int avrcp_send_passthrough(struct avrcp *session, uint32_t vendor, uint8_t op);
 diff --git a/unit/test-avrcp.c b/unit/test-avrcp.c
-index a6a1872..4f6526c 100644
+index 154175e..a6a1872 100644
 --- a/unit/test-avrcp.c
 +++ b/unit/test-avrcp.c
-@@ -409,7 +409,7 @@ static int list_attributes(struct avrcp *session, uint8_t transaction,
+@@ -719,8 +719,8 @@ static int get_folder_items(struct avrcp *session, uint8_t transaction,
+ 	if (start > 1)
+ 		return -ERANGE;
  
- 	avrcp_list_player_attributes_rsp(session, transaction, 0, NULL);
+-	avrcp_get_folder_items_rsp(session, transaction, 0xabcd, 0, NULL, NULL,
+-									NULL);
++	avrcp_get_folder_items_rsp(session, transaction, AVRCP_STATUS_SUCCESS,
++						0xabcd, 0, NULL, NULL, NULL);
  
--	return -EAGAIN;
-+	return 0;
+ 	return -EAGAIN;
  }
+@@ -734,7 +734,7 @@ static int change_path(struct avrcp *session, uint8_t transaction,
+ 	if (!uid)
+ 		return -ENOTDIR;
  
- static int get_attribute_text(struct avrcp *session, uint8_t transaction,
-@@ -428,7 +428,7 @@ static int get_attribute_text(struct avrcp *session, uint8_t transaction,
- 	avrcp_get_player_attribute_text_rsp(session, transaction, number, attrs,
- 									text);
+-	avrcp_change_path_rsp(session, transaction, 0);
++	avrcp_change_path_rsp(session, transaction, AVRCP_STATUS_SUCCESS, 0);
  
--	return -EAGAIN;
-+	return 0;
+ 	return -EAGAIN;
  }
+@@ -768,7 +768,7 @@ static int play_item(struct avrcp *session, uint8_t transaction, uint8_t scope,
+ 	if (!uid)
+ 		return -ENOENT;
  
- static int list_values(struct avrcp *session, uint8_t transaction,
-@@ -472,7 +472,7 @@ static int get_value(struct avrcp *session, uint8_t transaction,
- 	avrcp_get_current_player_value_rsp(session, transaction, number, attrs,
- 									values);
+-	avrcp_play_item_rsp(session, transaction);
++	avrcp_play_item_rsp(session, transaction, AVRCP_STATUS_SUCCESS);
  
--	return -EAGAIN;
-+	return 0;
+ 	return -EAGAIN;
  }
+@@ -778,7 +778,7 @@ static int search(struct avrcp *session, uint8_t transaction,
+ {
+ 	DBG("");
  
- static int set_value(struct avrcp *session, uint8_t transaction,
-@@ -483,7 +483,7 @@ static int set_value(struct avrcp *session, uint8_t transaction,
+-	avrcp_search_rsp(session, transaction, 0xaabb, 0);
++	avrcp_search_rsp(session, transaction, AVRCP_STATUS_SUCCESS, 0xaabb, 0);
  
- 	avrcp_set_player_value_rsp(session, transaction);
- 
--	return -EAGAIN;
-+	return 0;
+ 	return -EAGAIN;
  }
+@@ -792,7 +792,8 @@ static int add_to_now_playing(struct avrcp *session, uint8_t transaction,
+ 	if (!uid)
+ 		return -ENOENT;
  
- static int get_play_status(struct avrcp *session, uint8_t transaction,
-@@ -494,7 +494,7 @@ static int get_play_status(struct avrcp *session, uint8_t transaction,
- 	avrcp_get_play_status_rsp(session, transaction, 0xaaaaaaaa, 0xbbbbbbbb,
- 									0x00);
+-	avrcp_add_to_now_playing_rsp(session, transaction);
++	avrcp_add_to_now_playing_rsp(session, transaction,
++							AVRCP_STATUS_SUCCESS);
  
--	return -EAGAIN;
-+	return 0;
+ 	return -EAGAIN;
  }
- 
- static int get_element_attributes(struct avrcp *session, uint8_t transaction,
-@@ -516,7 +516,7 @@ static int get_element_attributes(struct avrcp *session, uint8_t transaction,
- 	} else
- 		avrcp_get_element_attrs_rsp(session, transaction, NULL, 0);
- 
--	return -EAGAIN;
-+	return 0;
- }
- 
- static int track_changed(struct avrcp *session, uint8_t transaction,
-@@ -541,7 +541,7 @@ static int track_changed(struct avrcp *session, uint8_t transaction,
- 						AVRCP_EVENT_TRACK_CHANGED,
- 						&track, sizeof(track));
- 
--	return -EAGAIN;
-+	return 0;
- }
- 
- static int settings_changed(struct avrcp *session, uint8_t transaction,
-@@ -563,7 +563,7 @@ static int settings_changed(struct avrcp *session, uint8_t transaction,
- 						AVRCP_EVENT_SETTINGS_CHANGED,
- 						settings, sizeof(settings));
- 
--	return -EAGAIN;
-+	return 0;
- }
- 
- static int available_players_changed(struct avrcp *session, uint8_t transaction,
-@@ -579,7 +579,7 @@ static int available_players_changed(struct avrcp *session, uint8_t transaction,
- 					AVRCP_EVENT_AVAILABLE_PLAYERS_CHANGED,
- 					NULL, 0);
- 
--	return -EAGAIN;
-+	return 0;
- }
- 
- static int addressed_player_changed(struct avrcp *session, uint8_t transaction,
-@@ -600,7 +600,7 @@ static int addressed_player_changed(struct avrcp *session, uint8_t transaction,
- 					AVRCP_EVENT_ADDRESSED_PLAYER_CHANGED,
- 					player, sizeof(player));
- 
--	return -EAGAIN;
-+	return 0;
- }
- 
- static int uids_changed(struct avrcp *session, uint8_t transaction,
-@@ -622,13 +622,13 @@ static int uids_changed(struct avrcp *session, uint8_t transaction,
- 
- 	if (!g_str_equal(context->data->test_name, "/TP/MCN/CB/BV-11-C") &&
- 		!g_str_equal(context->data->test_name, "/TP/MCN/CB/BI-05-C"))
--		return -EAGAIN;
-+		return 0;
- 
- 	avrcp_register_notification_rsp(session, transaction, AVC_CTYPE_CHANGED,
- 						AVRCP_EVENT_UIDS_CHANGED,
- 						&counter, sizeof(counter));
- 
--	return -EAGAIN;
-+	return 0;
- }
- 
- static int register_notification(struct avrcp *session, uint8_t transaction,
-@@ -663,7 +663,7 @@ static int set_volume(struct avrcp *session, uint8_t transaction,
- 
- 	avrcp_set_volume_rsp(session, transaction, volume);
- 
--	return -EAGAIN;
-+	return 0;
- }
- 
- static int set_addressed(struct avrcp *session, uint8_t transaction,
-@@ -681,7 +681,7 @@ static int set_addressed(struct avrcp *session, uint8_t transaction,
- 
- 	avrcp_set_addressed_player_rsp(session, transaction, status);
- 
--	return -EAGAIN;
-+	return 0;
- }
- 
- static int set_browsed(struct avrcp *session, uint8_t transaction,
-@@ -701,7 +701,7 @@ static int set_browsed(struct avrcp *session, uint8_t transaction,
- 						AVRCP_STATUS_SUCCESS,
- 						0xabcd, 0, 1, folders);
- 
--	return -EAGAIN;
-+	return 0;
- }
- 
- static int get_folder_items(struct avrcp *session, uint8_t transaction,
-@@ -722,7 +722,7 @@ static int get_folder_items(struct avrcp *session, uint8_t transaction,
- 	avrcp_get_folder_items_rsp(session, transaction, AVRCP_STATUS_SUCCESS,
- 						0xabcd, 0, NULL, NULL, NULL);
- 
--	return -EAGAIN;
-+	return 0;
- }
- 
- static int change_path(struct avrcp *session, uint8_t transaction,
-@@ -736,7 +736,7 @@ static int change_path(struct avrcp *session, uint8_t transaction,
- 
- 	avrcp_change_path_rsp(session, transaction, AVRCP_STATUS_SUCCESS, 0);
- 
--	return -EAGAIN;
-+	return 0;
- }
- 
- static int get_item_attributes(struct avrcp *session, uint8_t transaction,
-@@ -757,7 +757,7 @@ static int get_item_attributes(struct avrcp *session, uint8_t transaction,
- 	avrcp_get_item_attributes_rsp(session, transaction, status, 0, NULL,
- 									NULL);
- 
--	return -EAGAIN;
-+	return 0;
- }
- 
- static int play_item(struct avrcp *session, uint8_t transaction, uint8_t scope,
-@@ -770,7 +770,7 @@ static int play_item(struct avrcp *session, uint8_t transaction, uint8_t scope,
- 
- 	avrcp_play_item_rsp(session, transaction, AVRCP_STATUS_SUCCESS);
- 
--	return -EAGAIN;
-+	return 0;
- }
- 
- static int search(struct avrcp *session, uint8_t transaction,
-@@ -780,7 +780,7 @@ static int search(struct avrcp *session, uint8_t transaction,
- 
- 	avrcp_search_rsp(session, transaction, AVRCP_STATUS_SUCCESS, 0xaabb, 0);
- 
--	return -EAGAIN;
-+	return 0;
- }
- 
- static int add_to_now_playing(struct avrcp *session, uint8_t transaction,
-@@ -795,7 +795,7 @@ static int add_to_now_playing(struct avrcp *session, uint8_t transaction,
- 	avrcp_add_to_now_playing_rsp(session, transaction,
- 							AVRCP_STATUS_SUCCESS);
- 
--	return -EAGAIN;
-+	return 0;
- }
- 
- static const struct avrcp_control_ind control_ind = {
 -- 
 1.9.3
 
