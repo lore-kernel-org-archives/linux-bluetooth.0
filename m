@@ -1,156 +1,242 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-Date: Mon, 13 Oct 2014 17:09:41 -0700
-Message-ID: <CACUGKYPh7MZ7gLgnBWm=rtAbkRSis-qy3UwcCmKiLdyg9aop6w@mail.gmail.com>
-Subject: Not getting an AVDTP: incoming connect
-From: John Tobias <john.tobias.ph@gmail.com>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+From: Arman Uguray <armansito@chromium.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: Arman Uguray <armansito@chromium.org>
+Subject: [PATCH v2 5/5] shared/gatt-server: Support Read By Group Type request.
+Date: Mon, 13 Oct 2014 14:10:02 -0700
+Message-Id: <1413234602-20566-6-git-send-email-armansito@chromium.org>
+In-Reply-To: <1413234602-20566-1-git-send-email-armansito@chromium.org>
+References: <1413234602-20566-1-git-send-email-armansito@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcell / Bluez Team:
+This patch adds handling for the Read By Group Type request.
+---
+ src/shared/gatt-server.c | 179 ++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 178 insertions(+), 1 deletion(-)
 
-I was running the PTS 5.2 and there were an occurrences that the bluez
-did not show a similar message below:
+diff --git a/src/shared/gatt-server.c b/src/shared/gatt-server.c
+index c7b0873..d6d0155 100644
+--- a/src/shared/gatt-server.c
++++ b/src/shared/gatt-server.c
+@@ -45,6 +45,7 @@ struct bt_gatt_server {
+ 	uint16_t mtu;
+ 
+ 	unsigned int mtu_id;
++	unsigned int read_by_grp_type_id;
+ 
+ 	bt_gatt_server_debug_func_t debug_callback;
+ 	bt_gatt_server_destroy_func_t debug_destroy;
+@@ -54,6 +55,7 @@ struct bt_gatt_server {
+ static void gatt_server_unregister_handlers(struct bt_gatt_server *server)
+ {
+ 	bt_att_unregister(server->att, server->mtu_id);
++	bt_att_unregister(server->att, server->read_by_grp_type_id);
+ }
+ 
+ static void gatt_server_cleanup(struct bt_gatt_server *server)
+@@ -71,6 +73,166 @@ static void encode_error_rsp(uint8_t opcode, uint16_t handle, uint8_t ecode,
+ 	put_le16(handle, pdu + 1);
+ }
+ 
++static bool get_uuid_le(const uint8_t *uuid, size_t len, bt_uuid_t *out_uuid)
++{
++	uint128_t u128;
++
++	switch (len) {
++	case 2:
++		bt_uuid16_create(out_uuid, get_le16(uuid));
++		return true;
++	case 16:
++		bswap_128(uuid, &u128.data);
++		bt_uuid128_create(out_uuid, u128);
++		return true;
++	default:
++		return false;
++	}
++
++	return false;
++}
++
++static bool encode_read_by_grp_type_rsp(struct gatt_db *db, struct queue *q,
++						uint16_t mtu,
++						uint8_t *pdu, uint16_t *len)
++{
++	int iter = 0;
++	uint16_t start_handle, end_handle;
++	uint8_t *value;
++	int value_len;
++	uint8_t data_val_len;
++
++	*len = 0;
++
++	while (queue_peek_head(q)) {
++		start_handle = PTR_TO_UINT(queue_pop_head(q));
++		value = NULL;
++		value_len = 0;
++
++		/* This should never be deferred to the read callback for
++		 * primary/secondary service declarations.
++		 */
++		if (!gatt_db_read(db, start_handle, 0,
++						BT_ATT_OP_READ_BY_GRP_TYPE_REQ,
++						NULL, &value,
++						&value_len) || value_len < 0)
++			return false;
++
++		/* Use the first attribute to determine the length of each
++		 * attribute data unit. Stop the list when a different attribute
++		 * value is seen.
++		 */
++		if (iter == 0) {
++			data_val_len = value_len;
++			pdu[0] = data_val_len + 4;
++			iter++;
++		} else if (value_len != data_val_len)
++			break;
++
++		/* Stop if this unit would surpass the MTU */
++		if (iter + data_val_len + 4 > mtu)
++			break;
++
++		end_handle = gatt_db_get_end_handle(db, start_handle);
++
++		put_le16(start_handle, pdu + iter);
++		put_le16(end_handle, pdu + iter + 2);
++		memcpy(pdu + iter + 4, value, value_len);
++
++		iter += data_val_len + 4;
++	}
++
++	*len = iter;
++
++	return true;
++}
++
++static void read_by_grp_type_cb(uint8_t opcode, const void *pdu,
++					uint16_t length, void *user_data)
++{
++	struct bt_gatt_server *server = user_data;
++	uint16_t start, end;
++	bt_uuid_t type;
++	bt_uuid_t prim, snd;
++	uint16_t mtu = bt_att_get_mtu(server->att);
++	uint8_t rsp_pdu[mtu];
++	uint16_t rsp_len;
++	uint8_t rsp_opcode;
++	uint8_t ecode = 0;
++	uint16_t ehandle = 0;
++	struct queue *q = NULL;
++
++	if (length != 6 && length != 20) {
++		ecode = BT_ATT_ERROR_INVALID_PDU;
++		goto error;
++	}
++
++	q = queue_new();
++	if (!q) {
++		ecode = BT_ATT_ERROR_INSUFFICIENT_RESOURCES;
++		goto error;
++	}
++
++	start = get_le16(pdu);
++	end = get_le16(pdu + 2);
++	get_uuid_le(pdu + 4, length - 4, &type);
++
++	util_debug(server->debug_callback, server->debug_data,
++				"Read By Grp Type - start: 0x%04x end: 0x%04x",
++				start, end);
++
++	if (!start || !end) {
++		ecode = BT_ATT_ERROR_INVALID_HANDLE;
++		goto error;
++	}
++
++	ehandle = start;
++
++	if (start > end) {
++		ecode = BT_ATT_ERROR_INVALID_HANDLE;
++		goto error;
++	}
++
++	/* GATT defines that only the <<Primary Service>> and
++	 * <<Secondary Service>> group types can be used for the
++	 * "Read By Group Type" request (Core v4.1, Vol 3, sec 2.5.3). Return an
++	 * error if any other group type is given.
++	 */
++	bt_uuid16_create(&prim, GATT_PRIM_SVC_UUID);
++	bt_uuid16_create(&snd, GATT_SND_SVC_UUID);
++	if (bt_uuid_cmp(&type, &prim) && bt_uuid_cmp(&type, &snd)) {
++		ecode = BT_ATT_ERROR_UNSUPPORTED_GROUP_TYPE;
++		goto error;
++	}
++
++	gatt_db_read_by_group_type(server->db, start, end, type, q);
++
++	if (queue_isempty(q)) {
++		ecode = BT_ATT_ERROR_ATTRIBUTE_NOT_FOUND;
++		goto error;
++	}
++
++	if (!encode_read_by_grp_type_rsp(server->db, q, mtu, rsp_pdu,
++								&rsp_len)) {
++		ecode = BT_ATT_ERROR_UNLIKELY;
++		goto error;
++	}
++
++	rsp_opcode = BT_ATT_OP_READ_BY_GRP_TYPE_RSP;
++
++	goto done;
++
++error:
++	rsp_opcode = BT_ATT_OP_ERROR_RSP;
++	rsp_len = 4;
++	encode_error_rsp(opcode, ehandle, ecode, rsp_pdu);
++
++done:
++	queue_destroy(q, NULL);
++	bt_att_send(server->att, rsp_opcode, rsp_pdu, rsp_len,
++							NULL, NULL, NULL);
++}
++
+ static void exchange_mtu_cb(uint8_t opcode, const void *pdu,
+ 					uint16_t length, void *user_data)
+ {
+@@ -97,18 +259,33 @@ static void exchange_mtu_cb(uint8_t opcode, const void *pdu,
+ 	/* Set MTU to be the minimum */
+ 	server->mtu = final_mtu;
+ 	bt_att_set_mtu(server->att, final_mtu);
++
++	util_debug(server->debug_callback, server->debug_data,
++			"MTU exchange complete, with MTU: %u", final_mtu);
+ }
+ 
+ static bool gatt_server_register_att_handlers(struct bt_gatt_server *server)
+ {
+-	/* EXCHANGE MTU request */
++	/* Exchange MTU */
+ 	server->mtu_id = bt_att_register(server->att, BT_ATT_OP_MTU_REQ,
+ 								exchange_mtu_cb,
+ 								server, NULL);
+ 	if (!server->mtu_id)
+ 		return false;
+ 
++	/* Read By Group Type */
++	server->read_by_grp_type_id = bt_att_register(server->att,
++						BT_ATT_OP_READ_BY_GRP_TYPE_REQ,
++						read_by_grp_type_cb,
++						server, NULL);
++	if (!server->read_by_grp_type_id)
++		goto fail;
++
+ 	return true;
++
++fail:
++	gatt_server_unregister_handlers(server);
++	return false;
+ }
+ 
+ struct bt_gatt_server *bt_gatt_server_new(struct gatt_db *db,
+-- 
+2.1.0.rc2.206.gedb03e5
 
-[agent] Authorize service 0000110d-0000-1000-8000-00805f9b34fb (yes/no):
-
-
-1. I logs below are the traces of the bluetoothd not prompting the
-Authorize service message:
-
-t 13 23:27:22 DEV9MRCNERGAAAQYDKGP bluetoothd[152]:
-src/adapter.c:connected_callback() hci0 device 00:1B:DC:07:32:D3
-connected eir_len 31
-Oct 13 23:27:22 DEV9MRCNERGAAAQYDKGP bluetoothd[152]: on_connected
-Oct 13 23:27:26 DEV9MRCNERGAAAQYDKGP bluetoothd[152]:
-src/adapter.c:dev_disconnected() Device 00:1B:DC:07:32:D3
-disconnected, reason 2
-Oct 13 23:27:26 DEV9MRCNERGAAAQYDKGP bluetoothd[152]:
-src/adapter.c:adapter_remove_connection()
-Oct 13 23:27:26 DEV9MRCNERGAAAQYDKGP bluetoothd[152]:
-plugins/policy.c:disconnect_cb() reason 2
-Oct 13 23:27:26 DEV9MRCNERGAAAQYDKGP bluetoothd[152]:
-src/adapter.c:bonding_attempt_complete() hci0 bdaddr 00:1B:DC:07:32:D3
-type 0 status 0xe
-Oct 13 23:27:26 DEV9MRCNERGAAAQYDKGP bluetoothd[152]:
-src/device.c:device_bonding_complete() bonding (nil) status 0x0e
-Oct 13 23:27:26 DEV9MRCNERGAAAQYDKGP bluetoothd[152]:
-src/device.c:device_bonding_failed() status 14
-Oct 13 23:27:26 DEV9MRCNERGAAAQYDKGP bluetoothd[152]:
-src/adapter.c:resume_discovery()
-Oct 13 23:27:26 DEV9MRCNERGAAAQYDKGP bluetoothd[152]: on_disconnected
-Oct 13 23:27:26 DEV9MRCNERGAAAQYDKGP bluetoothd[152]: setting adv
-params failed: Operation not permitted
-Oct 13 23:27:26 DEV9MRCNERGAAAQYDKGP bluetoothd[152]: failed to enable
-advertising
-
-
-2. These messages are the traces of the bluetoothd showing the
-Authorize service message:
-
-Oct 13 23:29:48 DEV9MRCNERGAAAQYDKGP bluetoothd[152]:
-src/adapter.c:connected_callback() hci0 device 00:1B:DC:07:32:D3
-connected eir_len 31
-Oct 13 23:29:48 DEV9MRCNERGAAAQYDKGP bluetoothd[152]: on_connected
-Oct 13 23:29:48 DEV9MRCNERGAAAQYDKGP bluetoothd[152]:
-profiles/audio/avdtp.c:avdtp_confirm_cb() AVDTP: incoming connect from
-00:1B:DC:07:32:D3
-Oct 13 23:29:48 DEV9MRCNERGAAAQYDKGP bluetoothd[152]:
-profiles/audio/source.c:source_set_state() State changed
-/org/bluez/hci0/dev_00_1B_DC_07_32_D3: SOURCE_STATE_DISCONNECTED ->
-SOURCE_STATE_CONNECTING
-Oct 13 23:29:48 DEV9MRCNERGAAAQYDKGP bluetoothd[152]:
-src/agent.c:agent_ref() 0x77a601d0: ref=2
-Oct 13 23:29:48 DEV9MRCNERGAAAQYDKGP bluetoothd[152]:
-src/agent.c:agent_authorize_service() authorize service request was
-sent for /org/bluez/hci0/dev_00_1B_DC_07_32_D3
-Oct 13 23:29:52 DEV9MRCNERGAAAQYDKGP bluetoothd[152]:
-src/agent.c:agent_ref() 0x77a601d0: ref=3
-Oct 13 23:29:52 DEV9MRCNERGAAAQYDKGP bluetoothd[152]:
-src/agent.c:agent_unref() 0x77a601d0: ref=2
-Oct 13 23:29:52 DEV9MRCNERGAAAQYDKGP bluetoothd[152]:
-src/agent.c:agent_unref() 0x77a601d0: ref=1
-Oct 13 23:29:52 DEV9MRCNERGAAAQYDKGP bluetoothd[152]:
-profiles/audio/avdtp.c:avdtp_connect_cb() AVDTP: connected signaling
-channel to 00:1B:DC:07:32:D3
-Oct 13 23:29:52 DEV9MRCNERGAAAQYDKGP bluetoothd[152]:
-profiles/audio/avdtp.c:avdtp_connect_cb() AVDTP imtu=672, omtu=672
-Oct 13 23:29:52 DEV9MRCNERGAAAQYDKGP bluetoothd[152]:
-profiles/audio/avdtp.c:session_cb()
-Oct 13 23:29:52 DEV9MRCNERGAAAQYDKGP bluetoothd[152]:
-profiles/audio/avdtp.c:avdtp_parse_cmd() Received DISCOVER_CMD
-Oct 13 23:29:52 DEV9MRCNERGAAAQYDKGP bluetoothd[152]:
-profiles/audio/avdtp.c:session_cb()
-Oct 13 23:29:52 DEV9MRCNERGAAAQYDKGP bluetoothd[152]:
-profiles/audio/avdtp.c:avdtp_parse_cmd() Received
-GET_CAPABILITIES_CMD
-Oct 13 23:29:52 DEV9MRCNERGAAAQYDKGP bluetoothd[152]:
-profiles/audio/a2dp.c:endpoint_getcap_ind() Sink 0x77a69bd8:
-Get_Capability_Ind
-Oct 13 23:29:52 DEV9MRCNERGAAAQYDKGP bluetoothd[152]:
-profiles/audio/avdtp.c:session_cb()
-Oct 13 23:29:52 DEV9MRCNERGAAAQYDKGP bluetoothd[152]:
-profiles/audio/avdtp.c:avdtp_parse_cmd() Received
-SET_CONFIGURATION_CMD
-Oct 13 23:29:52 DEV9MRCNERGAAAQYDKGP bluetoothd[152]:
-profiles/audio/a2dp.c:endpoint_setconf_ind() Sink 0x77a69bd8:
-Set_Configuration_Ind
-Oct 13 23:29:52 DEV9MRCNERGAAAQYDKGP bluetoothd[152]:
-profiles/audio/avdtp.c:avdtp_ref() 0x77a6afa8: ref=1
-Oct 13 23:29:52 DEV9MRCNERGAAAQYDKGP bluetoothd[152]:
-profiles/audio/a2dp.c:setup_ref() 0x77a5d040: ref=1
-Oct 13 23:29:52 DEV9MRCNERGAAAQYDKGP bluetoothd[152]:
-profiles/audio/media.c:media_endpoint_async_call() Calling
-SetConfiguration: name = :1.6 path = /MediaEndpoint/A2DPSink
-Oct 13 23:29:52 DEV9MRCNERGAAAQYDKGP bluetoothd[152]:
-profiles/audio/avdtp.c:avdtp_ref() 0x77a6afa8: ref=2
-Oct 13 23:29:52 DEV9MRCNERGAAAQYDKGP bluetoothd[152]:
-profiles/audio/avdtp.c:avdtp_sep_set_state() stream state changed:
-IDLE -> CONFIGURED
-Oct 13 23:29:52 DEV9MRCNERGAAAQYDKGP bluetoothd[152]:
-profiles/audio/a2dp.c:setup_unref() 0x77a5d040: ref=0
-Oct 13 23:29:52 DEV9MRCNERGAAAQYDKGP bluetoothd[152]:
-profiles/audio/a2dp.c:setup_free() 0x77a5d040
-Oct 13 23:29:52 DEV9MRCNERGAAAQYDKGP bluetoothd[152]:
-profiles/audio/avdtp.c:avdtp_unref() 0x77a6afa8: ref=1
-Oct 13 23:29:53 DEV9MRCNERGAAAQYDKGP bluetoothd[152]:
-profiles/audio/avdtp.c:session_cb()
-Oct 13 23:29:53 DEV9MRCNERGAAAQYDKGP bluetoothd[152]:
-profiles/audio/avdtp.c:avdtp_parse_cmd() Received OPEN_CMD
-Oct 13 23:29:53 DEV9MRCNERGAAAQYDKGP bluetoothd[152]:
-profiles/audio/a2dp.c:open_ind() Sink 0x77a69bd8: Open_Ind
-Oct 13 23:29:53 DEV9MRCNERGAAAQYDKGP bluetoothd[152]:
-profiles/audio/avdtp.c:avdtp_confirm_cb() AVDTP: incoming connect from
-00:1B:DC:07:32:D3
-Oct 13 23:29:53 DEV9MRCNERGAAAQYDKGP bluetoothd[152]:
-profiles/audio/avdtp.c:avdtp_connect_cb() AVDTP: connected transport
-channel to 00:1B:DC:07:32:D3
-Oct 13 23:29:53 DEV9MRCNERGAAAQYDKGP bluetoothd[152]:
-profiles/audio/avdtp.c:avdtp_sep_set_state() stream state changed:
-CONFIGURED -> OPEN
-Oct 13 23:29:53 DEV9MRCNERGAAAQYDKGP bluetoothd[152]:
-src/service.c:change_state() 0x77a70eb8: device 00:1B:DC:07:32:D3
-profile a2dp-source state changed: disconnected -> connected (0)
-Oct 13 23:29:53 DEV9MRCNERGAAAQYDKGP bluetoothd[152]:
-plugins/policy.c:service_cb() Added a2dp-source reconnect 1
-Oct 13 23:29:53 DEV9MRCNERGAAAQYDKGP bluetoothd[152]:
-profiles/audio/source.c:source_set_state() State changed
-/org/bluez/hci0/dev_00_1B_DC_07_32_D3: SOURCE_STATE_CONNECTING ->
-SOURCE_STATE_CONNECTED
-Oct 13 23:29:53 DEV9MRCNERGAAAQYDKGP bluetoothd[152]:
-profiles/audio/transport.c:transport_update_playing()
-/org/bluez/hci0/dev_00_1B_DC_07_32_D3/fd19 State=TRANSPORT_STATE_IDLE
-
-
-It seems the avdtp_server_socket did not received the signals and
-that's the reason why the avdtp_confirm_cb function did not execute. I
-would like to know what are the possible scenario why the bluetoothd
-did not receive the event?.
-Because, if I re-run the PTS with the same test case, the bluez could
-received the event.
-
-Regards,
-
-john
