@@ -1,79 +1,168 @@
 Return-Path: <cyrus@holtmann.org>
-From: Bharat Panda <bharat.panda@samsung.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: cpgs@samsung.com, Bharat Panda <bharat.panda@samsung.com>
-Subject: [PATCH ] obexd/mas: Add Support fo MSETime filter
-Date: Tue, 14 Oct 2014 15:48:02 +0530
-Message-id: <1413281882-29686-1-git-send-email-bharat.panda@samsung.com>
+MIME-Version: 1.0
+In-Reply-To: <CACUGKYPh7MZ7gLgnBWm=rtAbkRSis-qy3UwcCmKiLdyg9aop6w@mail.gmail.com>
+References: <CACUGKYPh7MZ7gLgnBWm=rtAbkRSis-qy3UwcCmKiLdyg9aop6w@mail.gmail.com>
+Date: Tue, 14 Oct 2014 12:51:56 +0300
+Message-ID: <CABBYNZLK3w+feOuikzWrG4VhsAR7Ky+S7WZpnBOsHJGR_kE+gA@mail.gmail.com>
+Subject: Re: Not getting an AVDTP: incoming connect
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: John Tobias <john.tobias.ph@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Changes made to add support for MSE local time parameter
-along with GetMessageListing response.
----
- obexd/plugins/mas.c | 28 ++++++++++++++++++++++++++++
- 1 file changed, 28 insertions(+)
+Hi John,
 
-diff --git a/obexd/plugins/mas.c b/obexd/plugins/mas.c
-index fb97fe3..7f14bf8 100644
---- a/obexd/plugins/mas.c
-+++ b/obexd/plugins/mas.c
-@@ -30,6 +30,7 @@
- #include <glib.h>
- #include <fcntl.h>
- #include <inttypes.h>
-+#include <sys/time.h>
- 
- #include <gobex/gobex.h>
- #include <gobex/gobex-apparam.h>
-@@ -228,6 +229,25 @@ static void g_string_append_escaped_printf(GString *string,
- 	va_end(ap);
- }
- 
-+static gchar *get_mse_timestamp(void)
-+{
-+	struct timeval time_val;
-+	struct tm ltime;
-+	gchar *local_ts;
-+
-+	gettimeofday(&time_val, NULL);
-+
-+	if (!localtime_r(&time_val.tv_sec, &ltime))
-+		return NULL;
-+
-+	local_ts = g_strdup_printf("%04d%02d%02dT%02d%02d%02d",
-+					ltime.tm_year + 1900, ltime.tm_mon + 1,
-+					ltime.tm_mday, ltime.tm_hour,
-+					ltime.tm_min, ltime.tm_sec);
-+
-+	return local_ts;
-+}
-+
- static const char *yesorno(gboolean a)
- {
- 	if (a)
-@@ -243,6 +263,7 @@ static void get_messages_listing_cb(void *session, int err, uint16_t size,
- {
- 	struct mas_session *mas = user_data;
- 	uint16_t max = 1024;
-+	gchar *mse_time;
- 
- 	if (err < 0 && err != -EAGAIN) {
- 		obex_object_set_io_flags(mas, G_IO_ERR, err);
-@@ -358,6 +379,13 @@ proceed:
- 		mas->outparams = g_obex_apparam_set_uint8(mas->outparams,
- 						MAP_AP_NEWMESSAGE,
- 						newmsg ? 1 : 0);
-+		/* Response to report the local time of MSE */
-+		mse_time = get_mse_timestamp();
-+		if (mse_time) {
-+			g_obex_apparam_set_string(mas->outparams,
-+						MAP_AP_MSETIME, mse_time);
-+			g_free(mse_time);
-+		}
- 	}
- 
- 	if (err != -EAGAIN)
+On Tue, Oct 14, 2014 at 3:09 AM, John Tobias <john.tobias.ph@gmail.com> wrote:
+> Hi Marcell / Bluez Team:
+>
+> I was running the PTS 5.2 and there were an occurrences that the bluez
+> did not show a similar message below:
+>
+> [agent] Authorize service 0000110d-0000-1000-8000-00805f9b34fb (yes/no):
+>
+>
+> 1. I logs below are the traces of the bluetoothd not prompting the
+> Authorize service message:
+>
+> t 13 23:27:22 DEV9MRCNERGAAAQYDKGP bluetoothd[152]:
+> src/adapter.c:connected_callback() hci0 device 00:1B:DC:07:32:D3
+> connected eir_len 31
+> Oct 13 23:27:22 DEV9MRCNERGAAAQYDKGP bluetoothd[152]: on_connected
+> Oct 13 23:27:26 DEV9MRCNERGAAAQYDKGP bluetoothd[152]:
+> src/adapter.c:dev_disconnected() Device 00:1B:DC:07:32:D3
+> disconnected, reason 2
+> Oct 13 23:27:26 DEV9MRCNERGAAAQYDKGP bluetoothd[152]:
+> src/adapter.c:adapter_remove_connection()
+> Oct 13 23:27:26 DEV9MRCNERGAAAQYDKGP bluetoothd[152]:
+> plugins/policy.c:disconnect_cb() reason 2
+> Oct 13 23:27:26 DEV9MRCNERGAAAQYDKGP bluetoothd[152]:
+> src/adapter.c:bonding_attempt_complete() hci0 bdaddr 00:1B:DC:07:32:D3
+> type 0 status 0xe
+> Oct 13 23:27:26 DEV9MRCNERGAAAQYDKGP bluetoothd[152]:
+> src/device.c:device_bonding_complete() bonding (nil) status 0x0e
+> Oct 13 23:27:26 DEV9MRCNERGAAAQYDKGP bluetoothd[152]:
+> src/device.c:device_bonding_failed() status 14
+> Oct 13 23:27:26 DEV9MRCNERGAAAQYDKGP bluetoothd[152]:
+> src/adapter.c:resume_discovery()
+> Oct 13 23:27:26 DEV9MRCNERGAAAQYDKGP bluetoothd[152]: on_disconnected
+> Oct 13 23:27:26 DEV9MRCNERGAAAQYDKGP bluetoothd[152]: setting adv
+> params failed: Operation not permitted
+> Oct 13 23:27:26 DEV9MRCNERGAAAQYDKGP bluetoothd[152]: failed to enable
+> advertising
+>
+>
+> 2. These messages are the traces of the bluetoothd showing the
+> Authorize service message:
+>
+> Oct 13 23:29:48 DEV9MRCNERGAAAQYDKGP bluetoothd[152]:
+> src/adapter.c:connected_callback() hci0 device 00:1B:DC:07:32:D3
+> connected eir_len 31
+> Oct 13 23:29:48 DEV9MRCNERGAAAQYDKGP bluetoothd[152]: on_connected
+> Oct 13 23:29:48 DEV9MRCNERGAAAQYDKGP bluetoothd[152]:
+> profiles/audio/avdtp.c:avdtp_confirm_cb() AVDTP: incoming connect from
+> 00:1B:DC:07:32:D3
+> Oct 13 23:29:48 DEV9MRCNERGAAAQYDKGP bluetoothd[152]:
+> profiles/audio/source.c:source_set_state() State changed
+> /org/bluez/hci0/dev_00_1B_DC_07_32_D3: SOURCE_STATE_DISCONNECTED ->
+> SOURCE_STATE_CONNECTING
+> Oct 13 23:29:48 DEV9MRCNERGAAAQYDKGP bluetoothd[152]:
+> src/agent.c:agent_ref() 0x77a601d0: ref=2
+> Oct 13 23:29:48 DEV9MRCNERGAAAQYDKGP bluetoothd[152]:
+> src/agent.c:agent_authorize_service() authorize service request was
+> sent for /org/bluez/hci0/dev_00_1B_DC_07_32_D3
+> Oct 13 23:29:52 DEV9MRCNERGAAAQYDKGP bluetoothd[152]:
+> src/agent.c:agent_ref() 0x77a601d0: ref=3
+> Oct 13 23:29:52 DEV9MRCNERGAAAQYDKGP bluetoothd[152]:
+> src/agent.c:agent_unref() 0x77a601d0: ref=2
+> Oct 13 23:29:52 DEV9MRCNERGAAAQYDKGP bluetoothd[152]:
+> src/agent.c:agent_unref() 0x77a601d0: ref=1
+> Oct 13 23:29:52 DEV9MRCNERGAAAQYDKGP bluetoothd[152]:
+> profiles/audio/avdtp.c:avdtp_connect_cb() AVDTP: connected signaling
+> channel to 00:1B:DC:07:32:D3
+> Oct 13 23:29:52 DEV9MRCNERGAAAQYDKGP bluetoothd[152]:
+> profiles/audio/avdtp.c:avdtp_connect_cb() AVDTP imtu=672, omtu=672
+> Oct 13 23:29:52 DEV9MRCNERGAAAQYDKGP bluetoothd[152]:
+> profiles/audio/avdtp.c:session_cb()
+> Oct 13 23:29:52 DEV9MRCNERGAAAQYDKGP bluetoothd[152]:
+> profiles/audio/avdtp.c:avdtp_parse_cmd() Received DISCOVER_CMD
+> Oct 13 23:29:52 DEV9MRCNERGAAAQYDKGP bluetoothd[152]:
+> profiles/audio/avdtp.c:session_cb()
+> Oct 13 23:29:52 DEV9MRCNERGAAAQYDKGP bluetoothd[152]:
+> profiles/audio/avdtp.c:avdtp_parse_cmd() Received
+> GET_CAPABILITIES_CMD
+> Oct 13 23:29:52 DEV9MRCNERGAAAQYDKGP bluetoothd[152]:
+> profiles/audio/a2dp.c:endpoint_getcap_ind() Sink 0x77a69bd8:
+> Get_Capability_Ind
+> Oct 13 23:29:52 DEV9MRCNERGAAAQYDKGP bluetoothd[152]:
+> profiles/audio/avdtp.c:session_cb()
+> Oct 13 23:29:52 DEV9MRCNERGAAAQYDKGP bluetoothd[152]:
+> profiles/audio/avdtp.c:avdtp_parse_cmd() Received
+> SET_CONFIGURATION_CMD
+> Oct 13 23:29:52 DEV9MRCNERGAAAQYDKGP bluetoothd[152]:
+> profiles/audio/a2dp.c:endpoint_setconf_ind() Sink 0x77a69bd8:
+> Set_Configuration_Ind
+> Oct 13 23:29:52 DEV9MRCNERGAAAQYDKGP bluetoothd[152]:
+> profiles/audio/avdtp.c:avdtp_ref() 0x77a6afa8: ref=1
+> Oct 13 23:29:52 DEV9MRCNERGAAAQYDKGP bluetoothd[152]:
+> profiles/audio/a2dp.c:setup_ref() 0x77a5d040: ref=1
+> Oct 13 23:29:52 DEV9MRCNERGAAAQYDKGP bluetoothd[152]:
+> profiles/audio/media.c:media_endpoint_async_call() Calling
+> SetConfiguration: name = :1.6 path = /MediaEndpoint/A2DPSink
+> Oct 13 23:29:52 DEV9MRCNERGAAAQYDKGP bluetoothd[152]:
+> profiles/audio/avdtp.c:avdtp_ref() 0x77a6afa8: ref=2
+> Oct 13 23:29:52 DEV9MRCNERGAAAQYDKGP bluetoothd[152]:
+> profiles/audio/avdtp.c:avdtp_sep_set_state() stream state changed:
+> IDLE -> CONFIGURED
+> Oct 13 23:29:52 DEV9MRCNERGAAAQYDKGP bluetoothd[152]:
+> profiles/audio/a2dp.c:setup_unref() 0x77a5d040: ref=0
+> Oct 13 23:29:52 DEV9MRCNERGAAAQYDKGP bluetoothd[152]:
+> profiles/audio/a2dp.c:setup_free() 0x77a5d040
+> Oct 13 23:29:52 DEV9MRCNERGAAAQYDKGP bluetoothd[152]:
+> profiles/audio/avdtp.c:avdtp_unref() 0x77a6afa8: ref=1
+> Oct 13 23:29:53 DEV9MRCNERGAAAQYDKGP bluetoothd[152]:
+> profiles/audio/avdtp.c:session_cb()
+> Oct 13 23:29:53 DEV9MRCNERGAAAQYDKGP bluetoothd[152]:
+> profiles/audio/avdtp.c:avdtp_parse_cmd() Received OPEN_CMD
+> Oct 13 23:29:53 DEV9MRCNERGAAAQYDKGP bluetoothd[152]:
+> profiles/audio/a2dp.c:open_ind() Sink 0x77a69bd8: Open_Ind
+> Oct 13 23:29:53 DEV9MRCNERGAAAQYDKGP bluetoothd[152]:
+> profiles/audio/avdtp.c:avdtp_confirm_cb() AVDTP: incoming connect from
+> 00:1B:DC:07:32:D3
+> Oct 13 23:29:53 DEV9MRCNERGAAAQYDKGP bluetoothd[152]:
+> profiles/audio/avdtp.c:avdtp_connect_cb() AVDTP: connected transport
+> channel to 00:1B:DC:07:32:D3
+> Oct 13 23:29:53 DEV9MRCNERGAAAQYDKGP bluetoothd[152]:
+> profiles/audio/avdtp.c:avdtp_sep_set_state() stream state changed:
+> CONFIGURED -> OPEN
+> Oct 13 23:29:53 DEV9MRCNERGAAAQYDKGP bluetoothd[152]:
+> src/service.c:change_state() 0x77a70eb8: device 00:1B:DC:07:32:D3
+> profile a2dp-source state changed: disconnected -> connected (0)
+> Oct 13 23:29:53 DEV9MRCNERGAAAQYDKGP bluetoothd[152]:
+> plugins/policy.c:service_cb() Added a2dp-source reconnect 1
+> Oct 13 23:29:53 DEV9MRCNERGAAAQYDKGP bluetoothd[152]:
+> profiles/audio/source.c:source_set_state() State changed
+> /org/bluez/hci0/dev_00_1B_DC_07_32_D3: SOURCE_STATE_CONNECTING ->
+> SOURCE_STATE_CONNECTED
+> Oct 13 23:29:53 DEV9MRCNERGAAAQYDKGP bluetoothd[152]:
+> profiles/audio/transport.c:transport_update_playing()
+> /org/bluez/hci0/dev_00_1B_DC_07_32_D3/fd19 State=TRANSPORT_STATE_IDLE
+>
+>
+> It seems the avdtp_server_socket did not received the signals and
+> that's the reason why the avdtp_confirm_cb function did not execute. I
+> would like to know what are the possible scenario why the bluetoothd
+> did not receive the event?.
+> Because, if I re-run the PTS with the same test case, the bluez could
+> received the event.
+
+It would probably help if you have the HCI logs as well, perhaps there
+is something wrong with authentication or we are rejecting the L2CAP
+connection for some reason. Also note that the server socket is only
+initialized if once a endpoint is registered so perhaps in case 1 you
+did not have any endpoint available.
+
+
 -- 
-1.9.1
-
+Luiz Augusto von Dentz
