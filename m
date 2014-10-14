@@ -1,97 +1,55 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Tue, 14 Oct 2014 11:38:49 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Jukka Rissanen <jukka.rissanen@linux.intel.com>
+Cc: Martin Townsend <mtownsend1973@gmail.com>,
+	linux-bluetooth@vger.kernel.org, marcel@holtmann.org
+Subject: Re: [PATCH bluetooth] Bluetooth: Fix missing channel unlock in
+ l2cap_le_credits
+Message-ID: <20141014083849.GA9524@t440s>
+References: <1413224685-3700-1-git-send-email-mtownsend1973@gmail.com>
+ <1413275501.2705.110.camel@jrissane-mobl.ger.corp.intel.com>
 MIME-Version: 1.0
-In-Reply-To: <1797034.Wjt854TcTE@athlon>
-References: <1412858714-2845-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
-	<1412858714-2845-3-git-send-email-grzegorz.kolodziejczyk@tieto.com>
-	<1797034.Wjt854TcTE@athlon>
-Date: Tue, 14 Oct 2014 10:58:55 +0200
-Message-ID: <CAMv5GbcpRmh-viv9m=qmgDP6rRidkQeXFfuLEziw7d_ERnX5YQ@mail.gmail.com>
-Subject: Re: [PATCH 02/10] android/map-client: Add stubs for MAP client
- commands handlers
-From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
-To: Szymon Janc <szymon.janc@gmail.com>
-Cc: linux-bluetooth <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1413275501.2705.110.camel@jrissane-mobl.ger.corp.intel.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Szymon,
+Hi Jukka,
 
-On 13 October 2014 21:58, Szymon Janc <szymon.janc@gmail.com> wrote:
-> Hi Grzegorz,
->
-> On Thursday 09 October 2014 14:45:06 Grzegorz Kolodziejczyk wrote:
->> Add empty handlers for MAP client IPC commands.
->> ---
->>  android/map-client.c | 33 ++++++++++++++++++++++++++++++++-
->>  1 file changed, 32 insertions(+), 1 deletion(-)
->>
->> diff --git a/android/map-client.c b/android/map-client.c
->> index 4556461..1001b36 100644
->> --- a/android/map-client.c
->> +++ b/android/map-client.c
->> @@ -28,17 +28,48 @@
->>  #include <stdbool.h>
->>  #include <stdlib.h>
->>  #include <stdint.h>
->> +#include <glib.h>
->>
->>  #include "ipc.h"
->>  #include "lib/bluetooth.h"
->>  #include "map-client.h"
->> +#include "src/log.h"
->> +#include "hal-msg.h"
->> +
->> +static struct ipc *hal_ipc = NULL;
->> +static bdaddr_t adapter_addr;
->> +
->> +static void handle_get_instances(const void *buf, uint16_t len)
->> +{
->> +     DBG("");
->> +
->> +     ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_MAP_CLIENT,
->> +                     HAL_OP_MAP_CLIENT_GET_INSTANCES, HAL_STATUS_FAILED);
->> +}
->> +
->> +static const struct ipc_handler cmd_handlers[] = {
->> +     {handle_get_instances, false,
->> +                     sizeof(struct hal_cmd_map_client_get_instances)},
->
-> Style issue: there should be spaces after { and before }.
-> Also please add comment about define type just like in other handlers (I'm
-> aware that there is just 1 handler here but lets be consistent).
->
+On Tue, Oct 14, 2014, Jukka Rissanen wrote:
+> On ma, 2014-10-13 at 19:24 +0100, Martin Townsend wrote:
+> > In the error case where credits is greater than max_credits there
+> > is a missing l2cap_chan_unlock before returning.
+> > 
+> > Signed-off-by: Martin Townsend <mtownsend1973@gmail.com>
+> > ---
+> >  net/bluetooth/l2cap_core.c | 1 +
+> >  1 file changed, 1 insertion(+)
+> > 
+> > diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+> > index 46547b9..bfb6af8 100644
+> > --- a/net/bluetooth/l2cap_core.c
+> > +++ b/net/bluetooth/l2cap_core.c
+> > @@ -5544,6 +5544,7 @@ static inline int l2cap_le_credits(struct l2cap_conn *conn,
+> >  	if (credits > max_credits) {
+> >  		BT_ERR("LE credits overflow");
+> >  		l2cap_send_disconn_req(chan, ECONNRESET);
+> > +		l2cap_chan_unlock(chan);
+> >  
+> >  		/* Return 0 so that we don't trigger an unnecessary
+> >  		 * command reject packet.
+> 
+> I did some testing with this patch and although it did not fix the
+> inconsistent lock issue I am seeing, it did fix the mutex hang. I have
+> two locking issue and this patch fixed the other one.
 
-Ok, I'll fix it.
->> +};
->>
->>  bool bt_map_client_register(struct ipc *ipc, const bdaddr_t *addr, uint8_t
->> mode) {
->> -     return false;
->> +     DBG("");
->> +
->> +     bacpy(&adapter_addr, addr);
->> +
->> +     hal_ipc = ipc;
->> +
->> +     ipc_register(hal_ipc, HAL_SERVICE_ID_MAP_CLIENT, cmd_handlers,
->> +                                             G_N_ELEMENTS(cmd_handlers));
->> +
->> +     return true;
->>  }
->>
->>  void bt_map_client_unregister(void)
->>  {
->> +     DBG("");
->>
->> +     ipc_unregister(hal_ipc, HAL_SERVICE_ID_MAP_CLIENT);
->> +     hal_ipc = NULL;
->>  }
->
-> --
-> Szymon K. Janc
-> szymon.janc@gmail.com
+When this code branch is taken it means that the remote side is not
+behaving properly and is sending a ridiculous amount of credits. It's
+worth investigating this further to fix such an issue (assuming that
+other side is also running BlueZ).
 
+> Tested-by: Jukka Rissanen <jukka.rissanen@linux.intel.com>
 
-Best regards,
-Grzegorz
+Thanks for testing!
+
+Johan
