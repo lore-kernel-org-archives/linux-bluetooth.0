@@ -1,45 +1,135 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <CAHF=Y4r9ua3W0=kfbL6=3K+xxGda61gn2e8fb9P-1vzUQjTeOw@mail.gmail.com>
-References: <1413200623-31278-1-git-send-email-fons@spotify.com>
- <1413200623-31278-3-git-send-email-fons@spotify.com> <20141013161319.GA27533@t440s.P-661HNU-F1>
- <CAHF=Y4r9ua3W0=kfbL6=3K+xxGda61gn2e8fb9P-1vzUQjTeOw@mail.gmail.com>
 From: Alfonso Acosta <fons@spotify.com>
-Date: Tue, 14 Oct 2014 14:48:43 +0200
-Message-ID: <CAHF=Y4pHcAfLk4RStdbRGkF_s34CbzPuCf+5dcfWRt6OuUPmOw@mail.gmail.com>
-Subject: Re: [PATCH v3 1/2] core: Add Manufacturer Specific Data EIR field
-To: Alfonso Acosta <fons@spotify.com>,
-	BlueZ development <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH v4 2/2] core: Add subscription API for Manufacturer Specific Data
+Date: Tue, 14 Oct 2014 12:46:05 +0000
+Message-Id: <1413290765-20398-3-git-send-email-fons@spotify.com>
+In-Reply-To: <1413290765-20398-1-git-send-email-fons@spotify.com>
+References: <1413290765-20398-1-git-send-email-fons@spotify.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
->>> +             case EIR_MANUFACTURER_DATA:
->>> +                     if (data_len < 2 || data_len > 2 + sizeof(eir->msd->data))
->>> +                             break;
->>> +                     eir->msd = g_malloc(sizeof(*eir->msd));
->>> +                     eir->msd->company = get_le16(data);
->>> +                     eir->msd->data_len = data_len - 2;
->>> +                     memcpy(&eir->msd->data, data + 2, eir->msd->data_len);
->>> +                     break;
->>
->> Wouldn't this lead to a memory leaks if a device (violating the spec. but
->> still) had two or more manufacturer data entries in it's AD/EIR data?
->> Taking example from how remote name entries are handled you should
->> probably g_free(eir->msd) before allocating a new one.
->
-> Very good point. So, should I support multiple MSD fields or just the
-> first (last) one for now?
->
-> In all honesty, just like Johan, I didn't even know it was legal to
-> provide multiple ones.
+This patch allows plugins to be notified whenever an adapter receives
+Manufacturer Specific Data in the advertising reports from a device.
 
-The v4 bundle I just sent supports multiple MSD fields in the same EIR
-data block.
+This can happen when new device is discovered or when we autoconnect
+to it.
+---
+ src/adapter.c | 44 ++++++++++++++++++++++++++++++++++++++++++++
+ src/adapter.h | 10 ++++++++++
+ 2 files changed, 54 insertions(+)
 
+diff --git a/src/adapter.c b/src/adapter.c
+index 92ee1a0..f23db62 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -206,6 +206,7 @@ struct btd_adapter {
+ 	gboolean initialized;
+ 
+ 	GSList *pin_callbacks;
++	GSList *msd_callbacks;
+ 
+ 	GSList *drivers;
+ 	GSList *profiles;
+@@ -4549,6 +4550,9 @@ static void adapter_remove(struct btd_adapter *adapter)
+ 
+ 	g_slist_free(adapter->pin_callbacks);
+ 	adapter->pin_callbacks = NULL;
++
++	g_slist_free(adapter->msd_callbacks);
++	adapter->msd_callbacks = NULL;
+ }
+ 
+ const char *adapter_get_path(struct btd_adapter *adapter)
+@@ -4647,6 +4651,28 @@ static void confirm_name(struct btd_adapter *adapter, const bdaddr_t *bdaddr,
+ 						confirm_name_timeout, adapter);
+ }
+ 
++void adapter_msd_notify(struct btd_adapter *adapter, struct btd_device *dev,
++						GSList *msd_list)
++{
++	GSList *cb_l, *cb_next;
++	GSList *msd_l, *msd_next;
++
++	for (cb_l = adapter->msd_callbacks; cb_l != NULL; cb_l = cb_next) {
++		btd_msd_cb_t cb = cb_l->data;
++
++		cb_next = g_slist_next(cb_l);
++
++		for (msd_l = msd_list; msd_l != NULL; msd_l = msd_next) {
++			const struct eir_msd *msd = msd_l->data;
++
++			msd_next = g_slist_next(msd_l);
++
++			cb(adapter, dev, msd->company, msd->data,
++								msd->data_len);
++		}
++	}
++}
++
+ static void update_found_devices(struct btd_adapter *adapter,
+ 					const bdaddr_t *bdaddr,
+ 					uint8_t bdaddr_type, int8_t rssi,
+@@ -4738,6 +4764,9 @@ static void update_found_devices(struct btd_adapter *adapter,
+ 
+ 	device_add_eir_uuids(dev, eir_data.services);
+ 
++	if (eir_data.msd_list)
++		adapter_msd_notify(adapter, dev, eir_data.msd_list);
++
+ 	eir_data_free(&eir_data);
+ 
+ 	/*
+@@ -5173,6 +5202,18 @@ void btd_adapter_unregister_pin_cb(struct btd_adapter *adapter,
+ 	adapter->pin_callbacks = g_slist_remove(adapter->pin_callbacks, cb);
+ }
+ 
++void btd_adapter_unregister_msd_cb(struct btd_adapter *adapter,
++							btd_msd_cb_t cb)
++{
++	adapter->msd_callbacks = g_slist_remove(adapter->msd_callbacks, cb);
++}
++
++void btd_adapter_register_msd_cb(struct btd_adapter *adapter,
++							btd_msd_cb_t cb)
++{
++	adapter->msd_callbacks = g_slist_prepend(adapter->msd_callbacks, cb);
++}
++
+ int btd_adapter_set_fast_connectable(struct btd_adapter *adapter,
+ 							gboolean enable)
+ {
+@@ -6663,6 +6704,9 @@ static void connected_callback(uint16_t index, uint16_t length,
+ 		btd_device_device_set_name(device, eir_data.name);
+ 	}
+ 
++	if (eir_data.msd_list)
++		adapter_msd_notify(adapter, device, eir_data.msd_list);
++
+ 	eir_data_free(&eir_data);
+ }
+ 
+diff --git a/src/adapter.h b/src/adapter.h
+index 6801fee..8f4098a 100644
+--- a/src/adapter.h
++++ b/src/adapter.h
+@@ -138,6 +138,16 @@ struct btd_adapter_pin_cb_iter *btd_adapter_pin_cb_iter_new(
+ void btd_adapter_pin_cb_iter_free(struct btd_adapter_pin_cb_iter *iter);
+ bool btd_adapter_pin_cb_iter_end(struct btd_adapter_pin_cb_iter *iter);
+ 
++typedef void (*btd_msd_cb_t) (struct btd_adapter *adapter,
++							struct btd_device *dev,
++							uint16_t company,
++							const uint8_t *data,
++							uint8_t data_len);
++void btd_adapter_register_msd_cb(struct btd_adapter *adapter,
++							btd_msd_cb_t cb);
++void btd_adapter_unregister_msd_cb(struct btd_adapter *adapter,
++							btd_msd_cb_t cb);
++
+ /* If TRUE, enables fast connectabe, i.e. reduces page scan interval and changes
+  * type. If FALSE, disables fast connectable, i.e. sets page scan interval and
+  * type to default values. Valid for both connectable and discoverable modes. */
 -- 
-Alfonso Acosta
+1.9.1
 
-Embedded Systems Engineer at Spotify
-Birger Jarlsgatan 61, Stockholm, Sweden
-http://www.spotify.com
