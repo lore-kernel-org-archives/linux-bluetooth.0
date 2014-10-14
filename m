@@ -1,72 +1,45 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <543D474D.1040700@mlsw.biz>
-Date: Tue, 14 Oct 2014 11:54:53 -0400
-From: Nathan Jozwiak <njozwiak@mlsw.biz>
 MIME-Version: 1.0
-To: linux-bluetooth@vger.kernel.org
-Subject: GATT Notification not sending
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <CAHF=Y4r9ua3W0=kfbL6=3K+xxGda61gn2e8fb9P-1vzUQjTeOw@mail.gmail.com>
+References: <1413200623-31278-1-git-send-email-fons@spotify.com>
+ <1413200623-31278-3-git-send-email-fons@spotify.com> <20141013161319.GA27533@t440s.P-661HNU-F1>
+ <CAHF=Y4r9ua3W0=kfbL6=3K+xxGda61gn2e8fb9P-1vzUQjTeOw@mail.gmail.com>
+From: Alfonso Acosta <fons@spotify.com>
+Date: Tue, 14 Oct 2014 14:48:43 +0200
+Message-ID: <CAHF=Y4pHcAfLk4RStdbRGkF_s34CbzPuCf+5dcfWRt6OuUPmOw@mail.gmail.com>
+Subject: Re: [PATCH v3 1/2] core: Add Manufacturer Specific Data EIR field
+To: Alfonso Acosta <fons@spotify.com>,
+	BlueZ development <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi all,
+>>> +             case EIR_MANUFACTURER_DATA:
+>>> +                     if (data_len < 2 || data_len > 2 + sizeof(eir->msd->data))
+>>> +                             break;
+>>> +                     eir->msd = g_malloc(sizeof(*eir->msd));
+>>> +                     eir->msd->company = get_le16(data);
+>>> +                     eir->msd->data_len = data_len - 2;
+>>> +                     memcpy(&eir->msd->data, data + 2, eir->msd->data_len);
+>>> +                     break;
+>>
+>> Wouldn't this lead to a memory leaks if a device (violating the spec. but
+>> still) had two or more manufacturer data entries in it's AD/EIR data?
+>> Taking example from how remote name entries are handled you should
+>> probably g_free(eir->msd) before allocating a new one.
+>
+> Very good point. So, should I support multiple MSD fields or just the
+> first (last) one for now?
+>
+> In all honesty, just like Johan, I didn't even know it was legal to
+> provide multiple ones.
 
-I'm trying to send a notification to a client when a characteristic 
-value is updated by the server.
+The v4 bundle I just sent supports multiple MSD fields in the same EIR
+data block.
 
-Here is the characteristics creation in the GATT server:
+-- 
+Alfonso Acosta
 
-     /* Notification characteristic */
-     bt_uuid16_create(&uuid, GATT_CHARAC_UUID);
-     atval[0] = GATT_CHR_PROP_READ | GATT_CHR_PROP_NOTIFY;
-     put_le16(h + 1, &atval[1]);
-     put_le16(UUID_NOTIFY, &atval[3]);
-     attrib_db_add(adapter->adapter, h++, &uuid, ATT_NONE, 
-ATT_NOT_PERMITTED, atval, 5);
-
-     /* Notification value */
-     bt_uuid16_create(&uuid, UUID_NOTIFY);
-     ekey_valid_handle = h;
-     atval[0] = 0x00;
-     attrib_db_add(adapter->adapter, h++, &uuid, ATT_NONE, 
-ATT_NOT_PERMITTED, atval, 1);
-
-     /* Notification Client Characteristic Config (CCC) */
-     bt_uuid16_create(&uuid, GATT_CLIENT_CHARAC_CFG_UUID);
-     atval[0] = 0x00;
-     attrib_db_add(adapter->adapter, h++, &uuid, ATT_NONE, ATT_NONE, 
-atval, 1);
-
-I am connecting to the GATT server using the gatttool on another Linux 
-system.
-
-	[CON][00:02:72:C9:5E:0F][LE]> char-desc 0x18
-	handle: 0x0018, uuid: 2803
-	handle: 0x0019, uuid: f005
-	handle: 0x001a, uuid: 2902
-	[CON][00:02:72:C9:5E:0F][LE]> char-read-hnd 0x1a
-	Characteristic value/descriptor: 00 01
-	[CON][00:02:72:C9:5E:0F][LE]> char-read-hnd 0x19
-	Characteristic value/descriptor: 00
-
-Should the CCC init to 0x01? That doesn't make sense to me. Wouldn't 
-that indicate the client was already setup for notifications?
-
-I have an application that communicates with bluetoothd over TCP 
-sockets. So when I send bluetoothd a command it will forward it, my 
-application will process it, and respond to bluetoothd which will then 
-update the Notification characteristic value depending on the 
-success/failure of processing. I then need to notify the client of the 
-change so it can reread the value to see if the command was successful.
-
-	[CON][00:02:72:C9:5E:0F][LE]> char-write-cmd 0x000b 0x1234567890
-	[CON][00:02:72:C9:5E:0F][LE]> char-read-hnd 0x19
-	Characteristic value/descriptor: ff
-
-The update of the characteristic value worked fine. But I am using btmon 
-to monitor traffic between the two devices and I see no messages going 
-out from the server to the client.
-
-
-Thanks,
-Nate
+Embedded Systems Engineer at Spotify
+Birger Jarlsgatan 61, Stockholm, Sweden
+http://www.spotify.com
