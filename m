@@ -1,100 +1,175 @@
 Return-Path: <cyrus@holtmann.org>
-From: Alfonso Acosta <fons@spotify.com>
+From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v4 1/2] core: Add Manufacturer Specific Data EIR field
-Date: Tue, 14 Oct 2014 12:46:04 +0000
-Message-Id: <1413290765-20398-2-git-send-email-fons@spotify.com>
-In-Reply-To: <1413290765-20398-1-git-send-email-fons@spotify.com>
-References: <1413290765-20398-1-git-send-email-fons@spotify.com>
+Subject: [PATCH v2 3/5] android/map-client: Add support for get remote MAS instances
+Date: Tue, 14 Oct 2014 13:24:33 +0200
+Message-Id: <1413285875-17814-4-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+In-Reply-To: <1413285875-17814-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+References: <1413285875-17814-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Add data structure and parsing support.
+This allows to get remote mas instances. In case of wrong sdp record
+fail status will be returned in notification.
 ---
- src/eir.c | 22 ++++++++++++++++++++++
- src/eir.h |  8 ++++++++
- 2 files changed, 30 insertions(+)
+ android/map-client.c | 130 ++++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 129 insertions(+), 1 deletion(-)
 
-diff --git a/src/eir.c b/src/eir.c
-index d22ad91..2ea8731 100644
---- a/src/eir.c
-+++ b/src/eir.c
-@@ -53,6 +53,8 @@ void eir_data_free(struct eir_data *eir)
- 	eir->hash = NULL;
- 	g_free(eir->randomizer);
- 	eir->randomizer = NULL;
-+	g_slist_free_full(eir->msd_list, g_free);
-+	eir->msd_list = NULL;
- }
+diff --git a/android/map-client.c b/android/map-client.c
+index 142c680..2069fbe 100644
+--- a/android/map-client.c
++++ b/android/map-client.c
+@@ -30,21 +30,149 @@
+ #include <stdint.h>
+ #include <glib.h>
  
- static void eir_parse_uuid16(struct eir_data *eir, const void *data,
-@@ -137,6 +139,22 @@ static char *name2utf8(const uint8_t *name, uint8_t len)
- 	return g_strdup(utf8_name);
- }
++#include "lib/sdp.h"
++#include "lib/sdp_lib.h"
++#include "src/sdp-client.h"
++
+ #include "ipc.h"
+ #include "lib/bluetooth.h"
+ #include "map-client.h"
+ #include "src/log.h"
+ #include "hal-msg.h"
++#include "ipc-common.h"
++#include "utils.h"
++#include "src/shared/util.h"
  
-+static void eir_parse_msd(struct eir_data *eir, const uint8_t *data,
-+								uint8_t len)
+ static struct ipc *hal_ipc = NULL;
+ static bdaddr_t adapter_addr;
+ 
++static int fill_mce_inst(void *buf, int32_t id, int32_t scn, int32_t msg_type,
++					const void *name, uint8_t name_len)
 +{
-+	struct eir_msd *msd;
++	struct hal_map_client_mas_instance *inst = buf;
 +
-+	if (len < 2 || len > 2 + sizeof(msd->data))
-+		return;
++	inst->id = id;
++	inst->scn = scn;
++	inst->msg_types = msg_type;
++	inst->name_len = name_len;
 +
-+	msd = g_malloc(sizeof(*msd));
-+	msd->company = get_le16(data);
-+	msd->data_len = len - 2;
-+	memcpy(&msd->data, data + 2, msd->data_len);
++	if (name_len)
++		memcpy(inst->name, name, name_len);
 +
-+	eir->msd_list = g_slist_append(eir->msd_list, msd);
++	return sizeof(*inst) + name_len;
 +}
 +
- void eir_parse(struct eir_data *eir, const uint8_t *eir_data, uint8_t eir_len)
++static void map_client_sdp_search_cb(sdp_list_t *recs, int err, gpointer data)
++{
++	uint8_t buf[IPC_MTU];
++	struct hal_ev_map_client_remote_mas_instances *ev = (void *) buf;
++	bdaddr_t *dst = data;
++	sdp_list_t *list, *protos;
++	uint8_t status;
++	int32_t id, scn, msg_type, name_len, num_instances = 0;
++	char *name;
++	size_t size;
++
++	size = sizeof(*ev);
++	bdaddr2android(dst, &ev->bdaddr);
++
++	if (err < 0) {
++		error("mce: Unable to get SDP record: %s", strerror(-err));
++		status = HAL_STATUS_FAILED;
++		goto fail;
++	}
++
++	for (list = recs; list != NULL; list = list->next) {
++		sdp_record_t *rec = list->data;
++		sdp_data_t *data;
++
++		data = sdp_data_get(rec, SDP_ATTR_MAS_INSTANCE_ID);
++		if (!data) {
++			error("mce: cannot get mas instance id");
++			continue;
++		}
++
++		id = data->val.uint8;
++
++		data = sdp_data_get(rec, SDP_ATTR_SVCNAME_PRIMARY);
++		if (!data) {
++			error("mce: cannot get mas instance name");
++			continue;
++		}
++
++		name = data->val.str;
++		name_len = data->unitSize;
++
++		data = sdp_data_get(rec, SDP_ATTR_SUPPORTED_MESSAGE_TYPES);
++		if (!data) {
++			error("mce: cannot get mas instance msg type");
++			continue;
++		}
++
++		msg_type = data->val.uint8;
++
++		if (sdp_get_access_protos(rec, &protos)) {
++			error("mce: cannot get mas instance sdp protocol list");
++			continue;
++		}
++
++		scn = sdp_get_proto_port(protos, RFCOMM_UUID);
++		if (scn) {
++			error("mce: cannot get mas instance rfcomm channel");
++			continue;
++		}
++
++		sdp_list_foreach(protos, (sdp_list_func_t) sdp_list_free, NULL);
++		sdp_list_free(protos, NULL);
++
++		size += fill_mce_inst(buf + size, id, scn, msg_type, name,
++								name_len);
++		num_instances++;
++	}
++
++	status = HAL_STATUS_SUCCESS;
++
++fail:
++	ev->num_instances = num_instances;
++	ev->status = status;
++
++	ipc_send_notif(hal_ipc, HAL_SERVICE_ID_MAP_CLIENT,
++			HAL_EV_MAP_CLIENT_REMOTE_MAS_INSTANCES, size, buf);
++
++	free(dst);
++}
++
+ static void handle_get_instances(const void *buf, uint16_t len)
  {
- 	uint16_t len = 0;
-@@ -240,6 +258,10 @@ void eir_parse(struct eir_data *eir, const uint8_t *eir_data, uint8_t eir_len)
- 			eir->did_product = data[4] | (data[5] << 8);
- 			eir->did_version = data[6] | (data[7] << 8);
- 			break;
++	const struct hal_cmd_map_client_get_instances *cmd = buf;
++	uint8_t status;
++	bdaddr_t *dst;
++	uuid_t uuid;
 +
-+		case EIR_MANUFACTURER_DATA:
-+			eir_parse_msd(eir, data, data_len);
-+			break;
- 		}
+ 	DBG("");
  
- 		eir_data += field_len + 1;
-diff --git a/src/eir.h b/src/eir.h
-index e486fa2..1d5d3b3 100644
---- a/src/eir.h
-+++ b/src/eir.h
-@@ -37,6 +37,7 @@
- #define EIR_SSP_RANDOMIZER          0x0F  /* SSP Randomizer */
- #define EIR_DEVICE_ID               0x10  /* device ID */
- #define EIR_GAP_APPEARANCE          0x19  /* GAP appearance */
-+#define EIR_MANUFACTURER_DATA       0xFF  /* Manufacturer Specific Data */
- 
- /* Flags Descriptions */
- #define EIR_LIM_DISC                0x01 /* LE Limited Discoverable Mode */
-@@ -47,6 +48,12 @@
- #define EIR_SIM_HOST                0x10 /* Simultaneous LE and BR/EDR to Same
- 					    Device Capable (Host) */
- 
-+struct eir_msd {
-+	uint16_t company;
-+	uint8_t data[HCI_MAX_EIR_LENGTH];
-+	uint8_t data_len;
-+};
++	dst = new0(bdaddr_t, 1);
++	if (!dst) {
++		error("mce: Fail to allocate cb data");
++		status = HAL_STATUS_FAILED;
++		goto failed;
++	}
 +
- struct eir_data {
- 	GSList *services;
- 	unsigned int flags;
-@@ -62,6 +69,7 @@ struct eir_data {
- 	uint16_t did_product;
- 	uint16_t did_version;
- 	uint16_t did_source;
-+	GSList *msd_list;
- };
++	android2bdaddr(&cmd->bdaddr, dst);
++	sdp_uuid16_create(&uuid, MAP_MSE_SVCLASS_ID);
++
++	if (bt_search_service(&adapter_addr, dst, &uuid,
++				map_client_sdp_search_cb, dst, free, 0)) {
++		error("mce: Failed to search SDP details");
++		status = HAL_STATUS_FAILED;
++		goto failed;
++	}
++
++	status = HAL_STATUS_SUCCESS;
++
++failed:
+ 	ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_MAP_CLIENT,
+-			HAL_OP_MAP_CLIENT_GET_INSTANCES, HAL_STATUS_FAILED);
++				HAL_OP_MAP_CLIENT_GET_INSTANCES, status);
+ }
  
- void eir_data_free(struct eir_data *eir);
+ static const struct ipc_handler cmd_handlers[] = {
 -- 
-1.9.1
+1.9.3
 
