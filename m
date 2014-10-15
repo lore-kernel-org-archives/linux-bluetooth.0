@@ -1,74 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
 From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v3 2/5] android/map-client: Add stubs for MAP client commands handlers
-Date: Wed, 15 Oct 2014 16:27:58 +0200
-Message-Id: <1413383281-17292-3-git-send-email-grzegorz.kolodziejczyk@tieto.com>
-In-Reply-To: <1413383281-17292-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
-References: <1413383281-17292-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+Subject: [PATCH v3 0/5] android/map-client: Add MAP client daemon implementation
+Date: Wed, 15 Oct 2014 16:27:56 +0200
+Message-Id: <1413383281-17292-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Add empty handlers for MAP client IPC commands.
----
- android/map-client.c | 34 +++++++++++++++++++++++++++++++++-
- 1 file changed, 33 insertions(+), 1 deletion(-)
+v1.
+*Add MAP client daemon implementation (skeleton, body)
+*Add haltest MAP client support
 
-diff --git a/android/map-client.c b/android/map-client.c
-index 4556461..142c680 100644
---- a/android/map-client.c
-+++ b/android/map-client.c
-@@ -28,17 +28,49 @@
- #include <stdbool.h>
- #include <stdlib.h>
- #include <stdint.h>
-+#include <glib.h>
- 
- #include "ipc.h"
- #include "lib/bluetooth.h"
- #include "map-client.h"
-+#include "src/log.h"
-+#include "hal-msg.h"
-+
-+static struct ipc *hal_ipc = NULL;
-+static bdaddr_t adapter_addr;
-+
-+static void handle_get_instances(const void *buf, uint16_t len)
-+{
-+	DBG("");
-+
-+	ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_MAP_CLIENT,
-+			HAL_OP_MAP_CLIENT_GET_INSTANCES, HAL_STATUS_FAILED);
-+}
-+
-+static const struct ipc_handler cmd_handlers[] = {
-+	/* HAL_OP_MAP_CLIENT_GET_INSTANCES */
-+	{ handle_get_instances, false,
-+			sizeof(struct hal_cmd_map_client_get_instances) },
-+};
- 
- bool bt_map_client_register(struct ipc *ipc, const bdaddr_t *addr, uint8_t mode)
- {
--	return false;
-+	DBG("");
-+
-+	bacpy(&adapter_addr, addr);
-+
-+	hal_ipc = ipc;
-+
-+	ipc_register(hal_ipc, HAL_SERVICE_ID_MAP_CLIENT, cmd_handlers,
-+						G_N_ELEMENTS(cmd_handlers));
-+
-+	return true;
- }
- 
- void bt_map_client_unregister(void)
- {
-+	DBG("");
- 
-+	ipc_unregister(hal_ipc, HAL_SERVICE_ID_MAP_CLIENT);
-+	hal_ipc = NULL;
- }
+v2.
+*Fix style issue in cmd handler
+*Change if-else to if statements for map client instance create
+*Check if allocation of cb data has failed
+*Set free as destroy callback function for search service
+*Fix status overwrite (add fail label)
+
+v3.
+*Fix protos handling, rfcomm channel check
+
+Grzegorz Kolodziejczyk (5):
+  android/map-client: Add initial files
+  android/map-client: Add stubs for MAP client commands handlers
+  android/map-client: Add support for get remote MAS instances
+  android/ipc-tester: Add case for MAP client service opcode boundries
+  android/ipc-tester: Add cases for MAP client msg size
+
+ android/Android.mk   |   1 +
+ android/Makefile.am  |   1 +
+ android/ipc-tester.c |  18 +++++
+ android/main.c       |  12 +++
+ android/map-client.c | 205 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ android/map-client.h |  26 +++++++
+ 6 files changed, 263 insertions(+)
+ create mode 100644 android/map-client.c
+ create mode 100644 android/map-client.h
+
 -- 
 1.9.3
 
