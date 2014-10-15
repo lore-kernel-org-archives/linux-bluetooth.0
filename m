@@ -1,69 +1,96 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Wed, 15 Oct 2014 12:11:02 -0400 (EDT)
+From: Alan Stern <stern@rowland.harvard.edu>
+To: Naveen Kumar Parna <pnaveenkos@gmail.com>
+cc: Oliver Neukum <oneukum@suse.de>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	<linux-usb@vger.kernel.org>, <acho@suse.com>
+Subject: Re: btusb_intr_complete returns -EPIPE
+In-Reply-To: <CAG0bkvKo0FQh+8_qTUMbttq_ggBnfr8dgeJAopxyozNK6u4=Fw@mail.gmail.com>
+Message-ID: <Pine.LNX.4.44L0.1410151207020.1210-100000@iolanthe.rowland.org>
 MIME-Version: 1.0
-In-Reply-To: <CABBYNZLYLDmjM0h2C9-sYOAxsRt4usdgr323bVmj=rF8byvjEw@mail.gmail.com>
-References: <1413234602-20566-1-git-send-email-armansito@chromium.org>
-	<1413234602-20566-2-git-send-email-armansito@chromium.org>
-	<CABBYNZLYLDmjM0h2C9-sYOAxsRt4usdgr323bVmj=rF8byvjEw@mail.gmail.com>
-Date: Wed, 15 Oct 2014 10:36:39 -0700
-Message-ID: <CAHrH25S-W2gVkeJfsn74VCcD9h2wS86zWDcUVKX=-994pwV76A@mail.gmail.com>
-Subject: Re: [PATCH v2 1/5] shared/att: Drop the connection if a request is
- received while one is pending.
-From: Arman Uguray <armansito@chromium.org>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: TEXT/PLAIN; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+On Wed, 15 Oct 2014, Naveen Kumar Parna wrote:
 
+> Hi Oliver,
+> 
+> I tried this test in two different set of hardware configurations.
+> 
+> 
+> 
+> i)                    I tried in multiple test systems which has
+> EHCI-USB host controller on PCI card and internal USB 2.0
+> hub("rate-matching" hub). All the test systems with this configuration
+> gives spurious stall packets.
+> 
+> [lowerlayers@banunxcas29 ~]$ lspci | grep -i usb
+> 
+> 00:1a.0 USB Controller: Intel Corporation 5 Series/3400 Series Chipset
+> USB2 Enhanced Host Controller (rev 05)
+> 
+> 00:1d.0 USB Controller: Intel Corporation 5 Series/3400 Series Chipset
+> USB2 Enhanced Host Controller (rev 05)
+> 
+> 
+> lsusb:
+> 
+> Bus 001 Device 002: ID 8087:0020 Intel Corp. Integrated Rate Matching Hub
+> 
+> Bus 002 Device 002: ID 8087:0020 Intel Corp. Integrated Rate Matching Hub
+> 
+> Bus 001 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub
+> 
+> Bus 002 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub
+> 
+> 
+> 
+> 
+> 
+> ii)                   I found different test systems which has
+> OHCI-USB host controller on PCI card and internal USB 1.1 hub. All the
+> test systems with this configuration are not producing stall packets.
+> 
+>  [lowerlayers@camunxcas11 ~]$ lspci | grep -i usb
+> 
+> 00:02.0 USB Controller: nVidia Corporation CK804 USB Controller (rev a2)
+> 
+> 00:02.1 USB Controller: nVidia Corporation CK804 USB Controller (rev a3)
+> 
+> 
+> lsusb:
+> 
+> Bus 002 Device 001: ID 1d6b:0001 Linux Foundation 1.1 root hub
+> 
+> Bus 002 Device 002: ID 0451:2077 Texas Instruments, Inc. TUSB2077 Hub
+> 
+> 
+> 
+> 
+> My device is a full-speed device. So , stall packets are due to buggy
+> USB 2.0 hub?
 
->> +       case ATT_OP_TYPE_REQ:
->> +               /* If a request is currently pending, then the sequential
->> +                * protocol was violated. Disconnect the bearer and notify the
->> +                * upper-layer.
->> +                */
->
-> It seems this code is not following our coding style regarding multi
-> line comments, check doc/coding-style.txt(M2: Multiple line comment)
-> the first line should be empty.
->
+It's entirely possible that the stall packets are created by the hub.  
+When a full-speed device is connected to a USB-2 hub, and the device 
+fails to respond to a packet sent by the host, the hub reports this 
+failure as a stall.
 
-I didn't realize that was the comment style. I've seen both styles in
-daemon code and I think I went with this one because of that. I'd
-rather have the code be consistent (since shared/att uses this style
-elsewhere) and maybe do a style correction pass in another patch?
+When the device is connected to an OHCI controller, such failures would
+be reported in a different way, such as a -EPROTO or -EILSEQ status.
 
+> Is there a chance of getting stall packets “If the device runs at low
+> speed or full speed and is connected through a USB-2.0 hub”? If so it
+> looks like hub driver issue right?
 
->> +               if (att->in_req) {
->> +                       util_debug(att->debug_callback, att->debug_data,
->> +                                       "Received request while another is "
->> +                                       "pending: 0x%02x", opcode);
->> +                       disconnect_cb(att->io, att);
->> +                       return false;
->> +               }
->> +
->> +               att->in_req = true;
->> +
->> +               /* Fall through to the next case */
->
-> This might cause a problem with our own code when connecting to each
-> other if bt_att_cancel is used, apparently bt_att_cancel does not send
-> anything to the remote side which seems to enable sending a new
-> request without waiting any response for the first one.
->
+If the problem is that the device fails to respond to a packet then it 
+is an issue with the device.
 
-I'm confused. Do you mean if bt_att is being used in the client role,
-it can send multiple requests this way? That is correct, though I
-don't see how that's related to this patch? Currently bt_att_cancel
-can be used to cancel waiting for a pending request and send the next
-one, as you said. In that regard, it doesn't actually "cancel"
-anything if the PDU has been sent over the air already. I don't know
-how big of a problem this is, since the remote end should normally
-detect the error and terminate the connection anyway. If this becomes
-a problem we can always prevent canceling a request that has already
-left the queue and is pending. Though, again, this isn't really
-related to this patch unless I'm missing something.
+> If the hub is the problem… what will be the better solution? Is it
+> possible to change internal hub?
 
-Thanks,
-Arman
+No, it is not possible.
+
+Alan Stern
+
