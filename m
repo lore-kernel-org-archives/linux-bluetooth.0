@@ -1,51 +1,58 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1413367888.7328.1.camel@linux-0dmf.site>
-References: <Pine.LNX.4.44L0.1410091030580.1372-100000@iolanthe.rowland.org>
-	<1413367888.7328.1.camel@linux-0dmf.site>
-Date: Wed, 15 Oct 2014 18:39:31 +0530
-Message-ID: <CAG0bkvJ8QrvdhCQjwOm79KMZWbE7S=keOfdTy7hyUCV-RmLegQ@mail.gmail.com>
-Subject: Re: btusb_intr_complete returns -EPIPE
-From: Naveen Kumar Parna <pnaveenkos@gmail.com>
-To: Oliver Neukum <oneukum@suse.de>
-Cc: Alan Stern <stern@rowland.harvard.edu>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	linux-usb@vger.kernel.org, acho@suse.com
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-usb-owner@vger.kernel.org
+From: Sebastian Chlad <sebastian.chlad@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Sebastian Chlad <sebastian.chlad@tieto.com>
+Subject: [PATCH] android/pts: Update MAP PTS tests
+Date: Wed, 15 Oct 2014 15:04:53 +0200
+Message-Id: <1413378293-18074-1-git-send-email-sebastian.chlad@tieto.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-EHCI controller on PCI card and hub("rate-matching" hub) also internal.
+Checked and tested against PTS 5.3
+---
+ android/pics-map.txt  | 2 +-
+ android/pixit-map.txt | 2 +-
+ android/pts-map.txt   | 4 ++--
+ 3 files changed, 4 insertions(+), 4 deletions(-)
 
-Is it possible to change the internal hub?
+diff --git a/android/pics-map.txt b/android/pics-map.txt
+index 461c6ce..3f783a9 100644
+--- a/android/pics-map.txt
++++ b/android/pics-map.txt
+@@ -1,6 +1,6 @@
+ MAP PICS for the PTS tool.
+ 
+-PTS version: 5.2
++PTS version: 5.3
+ 
+ * - different than PTS defaults
+ # - not yet implemented/supported
+diff --git a/android/pixit-map.txt b/android/pixit-map.txt
+index 45a374a..c8c130c 100644
+--- a/android/pixit-map.txt
++++ b/android/pixit-map.txt
+@@ -1,6 +1,6 @@
+ MAP PIXIT for the PTS tool.
+ 
+-PTS version: 5.2
++PTS version: 5.3
+ 
+ * - different than PTS defaults
+ & - should be set to IUT Bluetooth address
+diff --git a/android/pts-map.txt b/android/pts-map.txt
+index 5f5a4f3..57cb317 100644
+--- a/android/pts-map.txt
++++ b/android/pts-map.txt
+@@ -1,7 +1,7 @@
+ PTS test results for MAP
+ 
+-PTS version: 5.2
+-Tested: 16-July-2014
++PTS version: 5.3
++Tested: 15-October-2014
+ Android version: 4.4.4
+ 
+ Results:
+-- 
+1.8.5.3
 
-
-
-Thanks,
-Naveen
-
-On Wed, Oct 15, 2014 at 3:41 PM, Oliver Neukum <oneukum@suse.de> wrote:
-> On Thu, 2014-10-09 at 10:31 -0400, Alan Stern wrote:
->> On Thu, 9 Oct 2014, Naveen Kumar Parna wrote:
->>
->> > Hi Oliver & Alan,
->> >
->> >
->> >
->> > Thanks for your inputs.
->> >
->> >
->> >
->> > I enabled the dynamic debugging for USB HC driver. Please correct me
->> > if I am wrong.
->>
->> Debugging the kernel (or doing anything else to the kernel, for that
->> matter) won't solve the problem if it is caused by a buggy hub.
->
-> Indeed. Could you just try a different hub?
->
->         Regards
->                 Oliver
->
->
->
