@@ -1,40 +1,29 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1413367888.7328.1.camel@linux-0dmf.site>
-Subject: Re: btusb_intr_complete returns -EPIPE
-From: Oliver Neukum <oneukum@suse.de>
-To: Alan Stern <stern@rowland.harvard.edu>
-Cc: Naveen Kumar Parna <pnaveenkos@gmail.com>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	linux-usb@vger.kernel.org, acho@suse.com
-In-Reply-To: <Pine.LNX.4.44L0.1410091030580.1372-100000@iolanthe.rowland.org>
-References: <Pine.LNX.4.44L0.1410091030580.1372-100000@iolanthe.rowland.org>
-Content-Type: text/plain; charset="UTF-8"
-Date: Wed, 15 Oct 2014 12:11:28 +0200
-Mime-Version: 1.0
-Sender: linux-usb-owner@vger.kernel.org
+MIME-Version: 1.0
+In-Reply-To: <2485489.uEt5Y7pmtU@uw000953>
+References: <1412697877-7508-1-git-send-email-a.gal@miip.ca> <2485489.uEt5Y7pmtU@uw000953>
+From: Alex Gal <a.gal@miip.ca>
+Date: Wed, 15 Oct 2014 07:24:54 -0400
+Message-ID: <CAEa95am-R7z9LSN-_PmmQ3a=Z_YrsawOJAuVpWkgJVLK0i669Q@mail.gmail.com>
+Subject: Re: [PATCH] Adds Sony Move Navigation controller.
+To: Szymon Janc <szymon.janc@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Thu, 2014-10-09 at 10:31 -0400, Alan Stern wrote:
-> On Thu, 9 Oct 2014, Naveen Kumar Parna wrote:
-> 
-> > Hi Oliver & Alan,
-> > 
-> > 
-> > 
-> > Thanks for your inputs.
-> > 
-> > 
-> > 
-> > I enabled the dynamic debugging for USB HC driver. Please correct me
-> > if I am wrong.
-> 
-> Debugging the kernel (or doing anything else to the kernel, for that
-> matter) won't solve the problem if it is caused by a buggy hub.
+Hi Szymon,
 
-Indeed. Could you just try a different hub?
+On Fri, Oct 10, 2014 at 6:07 AM, Szymon Janc <szymon.janc@tieto.com> wrote:
 
-	Regards
-		Oliver
+> Thanks for patch, some small comments from my side.
 
+No problem, I will resend the patches later this week.
 
+By the way, you were right about the Move Navigation clones since they
+try to connect with a different mac address. I will try to see what
+can be done about them.
 
+Thank you,
+
+Alex
