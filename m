@@ -1,50 +1,64 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 15 Oct 2014 16:50:00 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: "Min Jun,Xi" <xi.minjun@gmail.com>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: Sebastian Chlad <sebastian.chlad@tieto.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: BT-4.1 features (e.g. concurrent GAP operations) support
-Message-ID: <20141015145000.GA26735@t440s.fdxtended.com>
-References: <CAB0Wyv=3HBi6wnStgjGFwg7HUODoYj3mZBVTnZnC+tb+Mipyxw@mail.gmail.com>
+Subject: Re: [PATCH] android/pts: PTS tests update for RFCOMM
+Date: Wed, 15 Oct 2014 16:43:08 +0200
+Message-ID: <8683164.RoZK7BKA0g@leonov>
+In-Reply-To: <1413199783-19452-1-git-send-email-sebastian.chlad@tieto.com>
+References: <1413199783-19452-1-git-send-email-sebastian.chlad@tieto.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <CAB0Wyv=3HBi6wnStgjGFwg7HUODoYj3mZBVTnZnC+tb+Mipyxw@mail.gmail.com>
+Content-Type: text/plain; charset="us-ascii"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Sebastian,
 
-On Wed, Oct 15, 2014, Min Jun,Xi wrote:
-> Where can I find the latest BT-4.1 features support for
-> Bluetooth-subsystem and BlueZ?
-
-I don't think the detailed feature status is documented anywhere but the
-code, so the most reliable way would be to get the latest user space and
-kernel trees and experiment with them yourself.
-
-> In the 4.1 features, I know connection-oriented channels has been supported;
+On Monday 13 of October 2014 13:29:43 Sebastian Chlad wrote:
+> Test TC_RFC_BV_25_C depends on kernel patches for Non-Supported Command,
+> "Bluetooth: Fix RFCOMM NSC response" and "Bluetooth: Improve
+> RFCOMM__test_pf macro robustness"
+> ---
+>  android/pts-rfcomm.txt | 6 ++++--
+>  1 file changed, 4 insertions(+), 2 deletions(-)
 > 
-> I have one question about this new feature (Bluetooth Specification
-> Version 4.1[Vol 3] page 293 of 668, ): "2.2.2.5 Concurrent Operation
-> in Multiple GAP Roles"; this feature is very useful to support
-> mesh-like topology,
+> diff --git a/android/pts-rfcomm.txt b/android/pts-rfcomm.txt
+> index 5d51905..98a691b 100644
+> --- a/android/pts-rfcomm.txt
+> +++ b/android/pts-rfcomm.txt
+> @@ -1,8 +1,9 @@
+>  PTS test results for RFCOMM
 > 
-> From the description in chapter 2.2.2.5, the controller should support
-> operations in multiple GAP roles concurrently, and the host should
-> read the supported Link Layer States and State combinations from the
-> Controller before any procedures or modes are used.
+>  PTS version: 5.3
+> -Tested: 08-October-2014
+> +Tested: 13-October-2014
+>  Android version: 4.4.4
+> +Kernel version: 3.18
 > 
-> Can anyone tell me if the bluetooth subsystem has supported the Link
-> Layer states and the States combinations? I am also looking for the
-> Controller support operations in multiple GAP roles concurrently, can
-> anyone know if CSR/Nordic/Broadcom has got the USB dongles which
-> supports concurrent operation and can used under Linux?
+>  Results:
+>  PASS	test passed
+> @@ -18,6 +19,7 @@ TC_RFC_BV_01_C		PASS	rctest -n -P 1 <btaddr>
+>  TC_RFC_BV_02_C		PASS	rctest -r -P 1
+>  TC_RFC_BV_03_C		PASS	rctest -r -P 1
+>  TC_RFC_BV_04_C		PASS	Note: use ETS provided in PTS issue #12414
+> +				rctest -r -P 1
+>  TC_RFC_BV_05_C		PASS	rctest -n -P 4 <btaddr>
+>  				Note: test requires IUT to connect on the given
+>  				channel. sdptool browse <btaddr> to check the
+> @@ -35,5 +37,5 @@ TC_RFC_BV_17_C		PASS	rctest -d -P 1
+>  TC_RFC_BV_19_C		PASS
+>  TC_RFC_BV_21_C		INC	PTS issue #12421
+>  TC_RFC_BV_22_C		INC	PTS issue #12421
+> -TC_RFC_BV_25_C		INC	PTS issue #12621
+> +TC_RFC_BV_25_C		PASS	rctest -r -P 1
+>  ---------------------------------------------------------------------------
+> ----
 
-We don't specifically look at the controller supported states at the
-moment but simply stick to what we know existing controllers to be
-capable of. This means that you will be able to both scan and advertise
-at the same time (i.e. act as central and peripheral). What we do limit
-(since we don't know if HW that supports it) is new LE connection
-creation when there already is an existing slave-role connection.
 
-Johan
+I've change kernel version to 3.19 since fix mentioned was applied to 
+bluetooth-next.git tree.
+
+Applied. Thanks.
+-- 
+BR
+Szymon Janc
