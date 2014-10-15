@@ -1,88 +1,69 @@
 Return-Path: <cyrus@holtmann.org>
-From: Gowtham Anandha Babu <gowtham.ab@samsung.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: luiz.dentz@gmail.com, d.kasatkin@samsung.com,
-	bharat.panda@samsung.com, cpgs@samsung.com,
-	Gowtham Anandha Babu <gowtham.ab@samsung.com>
-Subject: [PBAP 1/2] obexd/client/pbap: Add support for spd,fav in PBAP
-Date: Wed, 15 Oct 2014 19:09:41 +0530
-Message-id: <1413380382-3302-1-git-send-email-gowtham.ab@samsung.com>
+Date: Wed, 15 Oct 2014 15:36:31 +0200
+From: Alexander Aring <alex.aring@gmail.com>
+To: Jukka Rissanen <jukka.rissanen@linux.intel.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth: Incorrect locking when sending data in softirq
+Message-ID: <20141015133629.GA17138@omega>
+References: <1413376985-25812-1-git-send-email-jukka.rissanen@linux.intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+In-Reply-To: <1413376985-25812-1-git-send-email-jukka.rissanen@linux.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Add support for the speed-dial and favorite entries in PBAP.
----
- doc/obex-api.txt          |  2 ++
- obexd/client/pbap.c       | 10 +++++++---
- obexd/plugins/phonebook.h |  4 ++++
- 3 files changed, 13 insertions(+), 3 deletions(-)
+Hi Jukka,
 
-diff --git a/doc/obex-api.txt b/doc/obex-api.txt
-index f80ef39..4439a41 100644
---- a/doc/obex-api.txt
-+++ b/doc/obex-api.txt
-@@ -341,6 +341,8 @@ Methods		void Select(string location, string phonebook)
- 				"och":	outgoing call history
- 				"mch":	missing call history
- 				"cch":	combination of ich och mch
-+				"spd":	speed dials entry ( only for "internal" )
-+				"fav":	favorites entry ( only for "internal" )
- 
- 			Possible errors: org.bluez.obex.Error.InvalidArguments
- 					 org.bluez.obex.Error.Failed
-diff --git a/obexd/client/pbap.c b/obexd/client/pbap.c
-index 2089860..614616c 100644
---- a/obexd/client/pbap.c
-+++ b/obexd/client/pbap.c
-@@ -183,11 +183,13 @@ static const GMarkupParser listing_parser = {
- static char *build_phonebook_path(const char *location, const char *item)
- {
- 	char *path = NULL, *tmp, *tmp1;
-+	int int_telecom = 0;
- 
- 	if (!g_ascii_strcasecmp(location, "int") ||
--			!g_ascii_strcasecmp(location, "internal"))
-+			!g_ascii_strcasecmp(location, "internal")) {
- 		path = g_strdup("/telecom");
--	else if (!g_ascii_strncasecmp(location, "sim", 3)) {
-+		int_telecom = 1;
-+	} else if (!g_ascii_strncasecmp(location, "sim", 3)) {
- 		if (strlen(location) == 3)
- 			tmp = g_strdup("sim1");
- 		else
-@@ -202,7 +204,9 @@ static char *build_phonebook_path(const char *location, const char *item)
- 		!g_ascii_strcasecmp(item, "ich") ||
- 		!g_ascii_strcasecmp(item, "och") ||
- 		!g_ascii_strcasecmp(item, "mch") ||
--		!g_ascii_strcasecmp(item, "cch")) {
-+		!g_ascii_strcasecmp(item, "cch") ||
-+		(int_telecom && !g_ascii_strcasecmp(item, "spd")) ||
-+		(int_telecom && !g_ascii_strcasecmp(item, "fav"))) {
- 		tmp = path;
- 		tmp1 = g_ascii_strdown(item, -1);
- 		path = g_build_filename(tmp, tmp1, NULL);
-diff --git a/obexd/plugins/phonebook.h b/obexd/plugins/phonebook.h
-index fff33c1..70a9cb7 100644
---- a/obexd/plugins/phonebook.h
-+++ b/obexd/plugins/phonebook.h
-@@ -37,6 +37,8 @@
- #define PB_CALLS_INCOMING_FOLDER "/telecom/ich"
- #define PB_CALLS_MISSED_FOLDER "/telecom/mch"
- #define PB_CALLS_OUTGOING_FOLDER "/telecom/och"
-+#define PB_CALLS_SPEEDDIAL_FOLDER "/telecom/spd"
-+#define PB_CALLS_FAVORITE_FOLDER "/telecom/fav"
- #define PB_LUID_FOLDER "/telecom/pb/luid"
- 
- #define PB_CONTACTS "/telecom/pb.vcf"
-@@ -44,6 +46,8 @@
- #define PB_CALLS_INCOMING "/telecom/ich.vcf"
- #define PB_CALLS_MISSED "/telecom/mch.vcf"
- #define PB_CALLS_OUTGOING "/telecom/och.vcf"
-+#define PB_CALLS_SPEEDDIAL "/telecom/spd.vcf"
-+#define PB_CALLS_FAVORITE "/telecom/fav.vcf"
- #define PB_DEVINFO "/telecom/devinfo.txt"
- #define PB_INFO_LOG "/telecom/pb/info.log"
- #define PB_CC_LOG "/telecom/pb/luid/cc.log"
--- 
-1.9.1
+I am not sure but I think this issue occurs because the bt_xmit callback
+is called in an atomic context.
 
+The function hci_queue_acl seems to be some function which is used in
+some others context which isn't an atomic context, means maybe in
+some workqueue context or something else, where "might_sleep()" is
+allowed. Simple this function isn't irqsafe.
+
+With this patch you would make it allowed that this function can called
+inside of an "atomic context", so you make it irqsafe.
+
+By changing these locking mechanism to spin_lock_irqsave/spin_unlock_irqrestore
+you need to be sure that all others which locks the queue->lock should
+also call spin_lock_irqsave/spin_unlock_irqrestore and not
+spin_lock/spin_unlock anymore.
+
+This would be a huge design change in bluetooth, maybe the bluetooth
+maintainers will ack this, I don't know. Maybe there exist also some
+other calling path where "might_sleep()" is allowed and you have the
+issue again.
+
+
+
+Another "possible" solution would be a similar function but this is irqsafe.
+Maybe "hci_queue_acl_irqsafe". I don't know how possible that is, simple
+that not every context call the spin_foo_irqave functions. If the lock
+is used somewhere else... this would be hard to solve to change
+spin__foo/spin_foo_irqsave.
+
+
+
+
+A second "possible" easy solution would maybe that bt_xmit setups a
+workqueue, at the end of the xmit call you should schedule the workqueue
+then. But this is a terrible solution, because you lost all context
+information from bt_xmit calls (atomic context, lockings, etc...), also
+that "might_sleep()" is allowed while transmit isn't nice.
+
+We have the same issue in 802.15.4 because some driver calls spi_sync(),
+then we start a workqueue for it and run the work callback afterwards
+which calls spi_sync at least.
+
+spi_sync is just a framework above spi_async with some fancy scheduler
+function like wait_for_completion. We can't run spi_sync in the xmit
+function because this call wait_for_completion ("might_sleep()") and
+this isn't allowed in atomic context.
+
+
+
+I don't can't say what you need to do here. I only want to let you know
+my suggestions to this patch.
+
+- Alex
