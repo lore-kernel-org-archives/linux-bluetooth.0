@@ -1,49 +1,51 @@
 Return-Path: <cyrus@holtmann.org>
-From: Vikrampal Yadav <vikram.pal@samsung.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: luiz.dentz@gmail.com, d.kasatkin@samsung.com,
-	vikram.pal@samsung.com, cpgs@samsung.com
-Subject: [PATCH] monitor: Fix indentation for AVRCP PASS THROUGH commands
-Date: Wed, 15 Oct 2014 19:11:49 +0530
-Message-id: <1413380509-596-1-git-send-email-vikram.pal@samsung.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+MIME-Version: 1.0
+In-Reply-To: <1413367888.7328.1.camel@linux-0dmf.site>
+References: <Pine.LNX.4.44L0.1410091030580.1372-100000@iolanthe.rowland.org>
+	<1413367888.7328.1.camel@linux-0dmf.site>
+Date: Wed, 15 Oct 2014 18:39:31 +0530
+Message-ID: <CAG0bkvJ8QrvdhCQjwOm79KMZWbE7S=keOfdTy7hyUCV-RmLegQ@mail.gmail.com>
+Subject: Re: btusb_intr_complete returns -EPIPE
+From: Naveen Kumar Parna <pnaveenkos@gmail.com>
+To: Oliver Neukum <oneukum@suse.de>
+Cc: Alan Stern <stern@rowland.harvard.edu>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	linux-usb@vger.kernel.org, acho@suse.com
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-usb-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Intendation for AVRCP PASS THROUGH commands' decoding fixed.
+EHCI controller on PCI card and hub("rate-matching" hub) also internal.
 
-btmon snippets:
+Is it possible to change the internal hub?
 
-      Channel: 66 len 14 [PSM 23 mode 0] {chan 3}
-      AVCTP Control: Command: type 0x00 label 0 PID 0x110e
-        AV/C: Status: address 0x48 opcode 0x7c
-          Subunit: Panel
-          Opcode: Passthrough
-	  Operation: 0x44 (PLAY Pressed)
-	  Lenght: 0x00
----
- monitor/avctp.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/monitor/avctp.c b/monitor/avctp.c
-index a4e34c5..4abd18f 100644
---- a/monitor/avctp.c
-+++ b/monitor/avctp.c
-@@ -686,13 +686,13 @@ static bool avrcp_passthrough_packet(struct avctp_frame *avctp_frame,
- 	if (!l2cap_frame_get_u8(frame, &op))
- 		return false;
- 
--	print_field("%*cOperation: 0x%02x (%s %s)", (indent - 2), ' ', op,
-+	print_field("%*cOperation: 0x%02x (%s %s)", (indent - 8), ' ', op,
- 				op2str(op), op & 0x80 ? "Released" : "Pressed");
- 
- 	if (!l2cap_frame_get_u8(frame, &len))
- 		return false;
- 
--	print_field("%*cLength: 0x%02x", (indent - 2), ' ', len);
-+	print_field("%*cLength: 0x%02x", (indent - 8), ' ', len);
- 
- 	packet_hexdump(frame->data, frame->size);
- 	return true;
--- 
-1.9.1
 
+Thanks,
+Naveen
+
+On Wed, Oct 15, 2014 at 3:41 PM, Oliver Neukum <oneukum@suse.de> wrote:
+> On Thu, 2014-10-09 at 10:31 -0400, Alan Stern wrote:
+>> On Thu, 9 Oct 2014, Naveen Kumar Parna wrote:
+>>
+>> > Hi Oliver & Alan,
+>> >
+>> >
+>> >
+>> > Thanks for your inputs.
+>> >
+>> >
+>> >
+>> > I enabled the dynamic debugging for USB HC driver. Please correct me
+>> > if I am wrong.
+>>
+>> Debugging the kernel (or doing anything else to the kernel, for that
+>> matter) won't solve the problem if it is caused by a buggy hub.
+>
+> Indeed. Could you just try a different hub?
+>
+>         Regards
+>                 Oliver
+>
+>
+>
