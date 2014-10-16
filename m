@@ -1,33 +1,51 @@
 Return-Path: <cyrus@holtmann.org>
-From: Gowtham Anandha Babu <gowtham.ab@samsung.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: 'Bharat Panda' <bharat.panda@samsung.com>,
-	'Dmitry Kasatkin' <d.kasatkin@samsung.com>, cpgs@samsung.com
-Subject: Query regarding creation of multiple MAS Instance ID:
-Date: Thu, 16 Oct 2014 19:48:23 +0530
-Message-id: <000b01cfe94c$216de430$6449ac90$@samsung.com>
-MIME-version: 1.0
-Content-type: text/plain; charset=us-ascii
+Date: Thu, 16 Oct 2014 10:16:20 -0400 (EDT)
+From: Alan Stern <stern@rowland.harvard.edu>
+To: Naveen Kumar Parna <pnaveenkos@gmail.com>
+cc: Oliver Neukum <oneukum@suse.de>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	<linux-usb@vger.kernel.org>, <acho@suse.com>
+Subject: Re: btusb_intr_complete returns -EPIPE
+In-Reply-To: <CAG0bkvJD_j_SUuSm4_+DiMqc-RH63BDU=cAtbkmNZdJ-ps=q6g@mail.gmail.com>
+Message-ID: <Pine.LNX.4.44L0.1410161012530.1316-100000@iolanthe.rowland.org>
+MIME-Version: 1.0
+Content-Type: TEXT/PLAIN; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi All,
+On Thu, 16 Oct 2014, Naveen Kumar Parna wrote:
 
-I am working on obexd MAP profile. Is it possible to create multiple MAS
-Instance in bluez? 
-Because right now bluez has only one MAS Instance support (only one
-MAS_UUID), which is advertised to MCE based on the XML format followed in
-src/profile.c.
-When I add one more record to MAS_RECORD XML format by changing the value as
-0x01, I am not able see two instances getting loaded.
-		<attribute id=\"0x0315\">				\
-			<uint8 value=\"0x01\"/>			\
-		</attribute>						\
+> > It's entirely possible that the stall packets are created by the hub.
+> > When a full-speed device is connected to a USB-2 hub, and the device
+> > fails to respond to a packet sent by the host, the hub reports this
+> > failure as a stall.
+> 
+> Here I don’t think device fails to respond to a packet sent by the
+> host. I verified this by connecting Ellisys USB analyser in between
+> host and devices.
+> 
+> For example Look at the attached(Sample_HciEvt.png) HCI event captured
+> by Ellisys USB analyser. It is a valid HCI event from device to Host.
+> IN transaction 96 1 ACK FS 16 bytes (FF 2F C2 01 00 17 00 DF 00 01 10
+> 00 00 A9 EE 0F)
+> IN transaction 96 1 ACK FS 16 bytes (00 00 00 5A 06 9D 39 00 00 66 00
+> 00 00 00 00 00)
+> IN transaction 96 1 ACK FS 16 bytes (00 00 00 00 00 00 00 00 00 00 00
+> 8E 05 28 00 01)
+> IN transaction 96 1 ACK FS 1 byte (00)
 
-Do we need to create one more UUID like OBEX_MAS1_UUID and OBEX_MAS2_UUID to
-support multiple mas instances?  
-Or what could be the possible solutions?
+This doesn't prove anything.  All it means is that the device responded 
+properly on these four occasions.  What if the device failed to respond 
+on some other occasion?  You have to compare the output of the analyzer 
+with the output from usbmon.  If usbmon shows a STALL and the analyzer 
+shows a valid reply for the very same packet, then you'll know the 
+device isn't at fault.
 
-Regards.
-Gowtham Anandha Babu
+You should also run a similar test when you connect the device through
+a USB-2 hub.  In fact, you should run two tests.  In one test, connect
+the analyzer to the cable segment between the computer and the hub; in 
+the other test, connect the analyzer to the cable segment between the 
+hub and the device.
+
+Alan Stern
 
