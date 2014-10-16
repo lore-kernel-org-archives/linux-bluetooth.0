@@ -1,102 +1,81 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1413380382-3302-1-git-send-email-gowtham.ab@samsung.com>
-References: <1413380382-3302-1-git-send-email-gowtham.ab@samsung.com>
-Date: Thu, 16 Oct 2014 10:45:45 +0300
-Message-ID: <CABBYNZK6ghHfT0j9yBcDCJqv1EzLrQ3YjNC6vtRhqjSFzJiCtg@mail.gmail.com>
-Subject: Re: [PBAP 1/2] obexd/client/pbap: Add support for spd,fav in PBAP
+In-Reply-To: <CAHrH25S-W2gVkeJfsn74VCcD9h2wS86zWDcUVKX=-994pwV76A@mail.gmail.com>
+References: <1413234602-20566-1-git-send-email-armansito@chromium.org>
+	<1413234602-20566-2-git-send-email-armansito@chromium.org>
+	<CABBYNZLYLDmjM0h2C9-sYOAxsRt4usdgr323bVmj=rF8byvjEw@mail.gmail.com>
+	<CAHrH25S-W2gVkeJfsn74VCcD9h2wS86zWDcUVKX=-994pwV76A@mail.gmail.com>
+Date: Thu, 16 Oct 2014 10:31:43 +0300
+Message-ID: <CABBYNZLjX_r=1fBb68mb0vJ_K7p=6Wh-W77ikVWi6s+DRuHVNA@mail.gmail.com>
+Subject: Re: [PATCH v2 1/5] shared/att: Drop the connection if a request is
+ received while one is pending.
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Gowtham Anandha Babu <gowtham.ab@samsung.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	Dmitry Kasatkin <d.kasatkin@samsung.com>,
-	Bharat Panda <bharat.panda@samsung.com>, cpgs@samsung.com
+To: Arman Uguray <armansito@chromium.org>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Arman,
 
-On Wed, Oct 15, 2014 at 4:39 PM, Gowtham Anandha Babu
-<gowtham.ab@samsung.com> wrote:
-> Add support for the speed-dial and favorite entries in PBAP.
-> ---
->  doc/obex-api.txt          |  2 ++
->  obexd/client/pbap.c       | 10 +++++++---
->  obexd/plugins/phonebook.h |  4 ++++
->  3 files changed, 13 insertions(+), 3 deletions(-)
+On Wed, Oct 15, 2014 at 8:36 PM, Arman Uguray <armansito@chromium.org> wrote:
+> Hi Luiz,
 >
-> diff --git a/doc/obex-api.txt b/doc/obex-api.txt
-> index f80ef39..4439a41 100644
-> --- a/doc/obex-api.txt
-> +++ b/doc/obex-api.txt
-> @@ -341,6 +341,8 @@ Methods             void Select(string location, string phonebook)
->                                 "och":  outgoing call history
->                                 "mch":  missing call history
->                                 "cch":  combination of ich och mch
-> +                               "spd":  speed dials entry ( only for "internal" )
-> +                               "fav":  favorites entry ( only for "internal" )
 >
->                         Possible errors: org.bluez.obex.Error.InvalidArguments
->                                          org.bluez.obex.Error.Failed
-> diff --git a/obexd/client/pbap.c b/obexd/client/pbap.c
-> index 2089860..614616c 100644
-> --- a/obexd/client/pbap.c
-> +++ b/obexd/client/pbap.c
-> @@ -183,11 +183,13 @@ static const GMarkupParser listing_parser = {
->  static char *build_phonebook_path(const char *location, const char *item)
->  {
->         char *path = NULL, *tmp, *tmp1;
-> +       int int_telecom = 0;
+>>> +       case ATT_OP_TYPE_REQ:
+>>> +               /* If a request is currently pending, then the sequential
+>>> +                * protocol was violated. Disconnect the bearer and notify the
+>>> +                * upper-layer.
+>>> +                */
+>>
+>> It seems this code is not following our coding style regarding multi
+>> line comments, check doc/coding-style.txt(M2: Multiple line comment)
+>> the first line should be empty.
+>>
 >
->         if (!g_ascii_strcasecmp(location, "int") ||
-> -                       !g_ascii_strcasecmp(location, "internal"))
-> +                       !g_ascii_strcasecmp(location, "internal")) {
->                 path = g_strdup("/telecom");
-> -       else if (!g_ascii_strncasecmp(location, "sim", 3)) {
-> +               int_telecom = 1;
-> +       } else if (!g_ascii_strncasecmp(location, "sim", 3)) {
->                 if (strlen(location) == 3)
->                         tmp = g_strdup("sim1");
->                 else
-> @@ -202,7 +204,9 @@ static char *build_phonebook_path(const char *location, const char *item)
->                 !g_ascii_strcasecmp(item, "ich") ||
->                 !g_ascii_strcasecmp(item, "och") ||
->                 !g_ascii_strcasecmp(item, "mch") ||
-> -               !g_ascii_strcasecmp(item, "cch")) {
-> +               !g_ascii_strcasecmp(item, "cch") ||
-> +               (int_telecom && !g_ascii_strcasecmp(item, "spd")) ||
-> +               (int_telecom && !g_ascii_strcasecmp(item, "fav"))) {
->                 tmp = path;
->                 tmp1 = g_ascii_strdown(item, -1);
->                 path = g_build_filename(tmp, tmp1, NULL);
-> diff --git a/obexd/plugins/phonebook.h b/obexd/plugins/phonebook.h
-> index fff33c1..70a9cb7 100644
-> --- a/obexd/plugins/phonebook.h
-> +++ b/obexd/plugins/phonebook.h
-> @@ -37,6 +37,8 @@
->  #define PB_CALLS_INCOMING_FOLDER "/telecom/ich"
->  #define PB_CALLS_MISSED_FOLDER "/telecom/mch"
->  #define PB_CALLS_OUTGOING_FOLDER "/telecom/och"
-> +#define PB_CALLS_SPEEDDIAL_FOLDER "/telecom/spd"
-> +#define PB_CALLS_FAVORITE_FOLDER "/telecom/fav"
->  #define PB_LUID_FOLDER "/telecom/pb/luid"
->
->  #define PB_CONTACTS "/telecom/pb.vcf"
-> @@ -44,6 +46,8 @@
->  #define PB_CALLS_INCOMING "/telecom/ich.vcf"
->  #define PB_CALLS_MISSED "/telecom/mch.vcf"
->  #define PB_CALLS_OUTGOING "/telecom/och.vcf"
-> +#define PB_CALLS_SPEEDDIAL "/telecom/spd.vcf"
-> +#define PB_CALLS_FAVORITE "/telecom/fav.vcf"
->  #define PB_DEVINFO "/telecom/devinfo.txt"
->  #define PB_INFO_LOG "/telecom/pb/info.log"
->  #define PB_CC_LOG "/telecom/pb/luid/cc.log"
-> --
-> 1.9.1
+> I didn't realize that was the comment style. I've seen both styles in
+> daemon code and I think I went with this one because of that. I'd
+> rather have the code be consistent (since shared/att uses this style
+> elsewhere) and maybe do a style correction pass in another patch?
 
-Applied, please make sure you following the 50/72 format for commits,
-it is documented in the HACKING document and I would like that we stay
-consistent with it.
+Sure, I can probably fix this myself just made the comment to let you
+know that we do in fact have a coding style for it.
+
+>
+>>> +               if (att->in_req) {
+>>> +                       util_debug(att->debug_callback, att->debug_data,
+>>> +                                       "Received request while another is "
+>>> +                                       "pending: 0x%02x", opcode);
+>>> +                       disconnect_cb(att->io, att);
+>>> +                       return false;
+>>> +               }
+>>> +
+>>> +               att->in_req = true;
+>>> +
+>>> +               /* Fall through to the next case */
+>>
+>> This might cause a problem with our own code when connecting to each
+>> other if bt_att_cancel is used, apparently bt_att_cancel does not send
+>> anything to the remote side which seems to enable sending a new
+>> request without waiting any response for the first one.
+>>
+>
+> I'm confused. Do you mean if bt_att is being used in the client role,
+> it can send multiple requests this way? That is correct, though I
+> don't see how that's related to this patch? Currently bt_att_cancel
+> can be used to cancel waiting for a pending request and send the next
+> one, as you said. In that regard, it doesn't actually "cancel"
+> anything if the PDU has been sent over the air already. I don't know
+> how big of a problem this is, since the remote end should normally
+> detect the error and terminate the connection anyway. If this becomes
+> a problem we can always prevent canceling a request that has already
+> left the queue and is pending. Though, again, this isn't really
+> related to this patch unless I'm missing something.
+
+Sorry for the confusion, this patch is actually fine what we really
+need to fix is bt_att_cancel should not really remove the pending
+request otherwise the remote may disconnect if we proceed with another
+request.
 
 
 -- 
