@@ -1,130 +1,64 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1413450936.29366.1.camel@linux-0dmf.site>
-References: <Pine.LNX.4.44L0.1410151207020.1210-100000@iolanthe.rowland.org>
-	<1413450936.29366.1.camel@linux-0dmf.site>
-Date: Thu, 16 Oct 2014 16:24:02 +0530
-Message-ID: <CAG0bkv+bu23Fm_thq7A5AOrCEXaaWmcKNaX-193GqFh=W0S8xA@mail.gmail.com>
-Subject: Re: btusb_intr_complete returns -EPIPE
-From: Naveen Kumar Parna <pnaveenkos@gmail.com>
-To: Oliver Neukum <oneukum@suse.de>
-Cc: Alan Stern <stern@rowland.harvard.edu>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	linux-usb@vger.kernel.org, acho@suse.com
-Content-Type: text/plain; charset=UTF-8
+From: Marcin Kraglak <marcin.kraglak@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCHv5 14/14] shared/gatt: Add function bt_gatt_result_included_count()
+Date: Thu, 16 Oct 2014 12:17:26 +0200
+Message-Id: <1413454646-23076-15-git-send-email-marcin.kraglak@tieto.com>
+In-Reply-To: <1413454646-23076-1-git-send-email-marcin.kraglak@tieto.com>
+References: <1413454646-23076-1-git-send-email-marcin.kraglak@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Thu, Oct 16, 2014 at 2:45 PM, Oliver Neukum <oneukum@suse.de> wrote:
->
-> On Wed, 2014-10-15 at 12:11 -0400, Alan Stern wrote:
-> > > If the hub is the problem… what will be the better solution? Is it
-> > > possible to change internal hub?
-> >
-> > No, it is not possible.
->
-> Indeed. However, it is possible to use an additional in between your
-> devices and the internal hub.
->
->         Regards
->                 Oliver
->
->
+It will return number of included services in result.
+---
+ src/shared/gatt-helpers.c | 21 +++++++++++++++++++++
+ src/shared/gatt-helpers.h |  1 +
+ 2 files changed, 22 insertions(+)
 
+diff --git a/src/shared/gatt-helpers.c b/src/shared/gatt-helpers.c
+index 48e7379..92d0696 100644
+--- a/src/shared/gatt-helpers.c
++++ b/src/shared/gatt-helpers.c
+@@ -140,6 +140,27 @@ unsigned int bt_gatt_result_descriptor_count(struct bt_gatt_result *result)
+ 	return result_element_count(result);
+ }
+ 
++unsigned int bt_gatt_result_included_count(struct bt_gatt_result *result)
++{
++	struct bt_gatt_result *cur;
++	unsigned int count = 0;
++
++	if (!result)
++		return 0;
++
++	if (result->opcode != BT_ATT_OP_READ_BY_TYPE_RSP)
++		return 0;
++
++	if (result->data_len != 6 && result->data_len != 8)
++		return 0;
++
++	for (cur = result; cur; cur = cur->next)
++		if (cur->opcode == BT_ATT_OP_READ_BY_TYPE_RSP)
++			count += cur->pdu_len / cur->data_len;
++
++	return count;
++}
++
+ bool bt_gatt_iter_init(struct bt_gatt_iter *iter, struct bt_gatt_result *result)
+ {
+ 	if (!iter || !result)
+diff --git a/src/shared/gatt-helpers.h b/src/shared/gatt-helpers.h
+index f2c7ec5..07c145d 100644
+--- a/src/shared/gatt-helpers.h
++++ b/src/shared/gatt-helpers.h
+@@ -38,6 +38,7 @@ struct bt_gatt_iter {
+ unsigned int bt_gatt_result_service_count(struct bt_gatt_result *result);
+ unsigned int bt_gatt_result_characteristic_count(struct bt_gatt_result *result);
+ unsigned int bt_gatt_result_descriptor_count(struct bt_gatt_result *result);
++unsigned int bt_gatt_result_included_count(struct bt_gatt_result *result);
+ 
+ bool bt_gatt_iter_init(struct bt_gatt_iter *iter, struct bt_gatt_result *result);
+ bool bt_gatt_iter_next_service(struct bt_gatt_iter *iter,
+-- 
+1.9.3
 
-Tested with this configuration(external hubs Dev 3, Dev 4, Dev 17, Dev
-10) and got the same result.
-
-/:  Bus 02.Port 1: Dev 1, Class=root_hub, Driver=ehci-pci/2p, 480M
-
-/:  Bus 01.Port 1: Dev 1, Class=root_hub, Driver=ehci-pci/2p, 480M
-
-    |__ Port 1: Dev 2, If 0, Class=hub, Driver=hub/6p, 480M
-
-        |__ Port 5: Dev 3, If 0, Class=hub, Driver=hub/7p, 12M
-
-            |__ Port 1: Dev 4, If 0, Class=hub, Driver=hub/7p, 12M
-
-                |__ Port 1: Dev 11, If 0, Class=vend., Driver=, 12M
-
-                |__ Port 2: Dev 12, If 0, Class=vend., Driver=, 12M
-
-                |__ Port 3: Dev 13, If 0, Class=vend., Driver=, 12M
-
-                |__ Port 4: Dev 14, If 0, Class=vend., Driver=, 12M
-
-                |__ Port 5: Dev 15, If 0, Class=vend., Driver=, 12M
-
-                |__ Port 6: Dev 16, If 0, Class=vend., Driver=, 12M
-
-                |__ Port 7: Dev 17, If 0, Class=hub, Driver=hub/2p, 12M
-
-                    |__ Port 1: Dev 21, If 0, Class=vend., Driver=, 12M
-
-                    |__ Port 2: Dev 22, If 0, Class=vend., Driver=, 12M
-
-            |__ Port 2: Dev 5, If 0, Class='bInterfaceClass 0xe0 not
-yet handled', Driver=btusb, 12M
-
-            |__ Port 2: Dev 5, If 1, Class='bInterfaceClass 0xe0 not
-yet handled', Driver=btusb, 12M
-
-            |__ Port 2: Dev 5, If 2, Class=app., Driver=, 12M
-
-            |__ Port 3: Dev 6, If 0, Class='bInterfaceClass 0xe0 not
-yet handled', Driver=btusb, 12M
-
-            |__ Port 3: Dev 6, If 1, Class='bInterfaceClass 0xe0 not
-yet handled', Driver=btusb, 12M
-
-            |__ Port 3: Dev 6, If 2, Class=app., Driver=, 12M
-
-            |__ Port 4: Dev 7, If 0, Class='bInterfaceClass 0xe0 not
-yet handled', Driver=btusb, 12M
-
-            |__ Port 4: Dev 7, If 1, Class='bInterfaceClass 0xe0 not
-yet handled', Driver=btusb, 12M
-
-            |__ Port 4: Dev 7, If 2, Class=app., Driver=, 12M
-
-            |__ Port 5: Dev 8, If 0, Class='bInterfaceClass 0xe0 not
-yet handled', Driver=btusb, 12M
-
-            |__ Port 5: Dev 8, If 1, Class='bInterfaceClass 0xe0 not
-yet handled', Driver=btusb, 12M
-
-            |__ Port 5: Dev 8, If 2, Class=app., Driver=, 12M
-
-            |__ Port 6: Dev 9, If 0, Class='bInterfaceClass 0xe0 not
-yet handled', Driver=btusb, 12M
-
-            |__ Port 6: Dev 9, If 1, Class='bInterfaceClass 0xe0 not
-yet handled', Driver=btusb, 12M
-
-            |__ Port 6: Dev 9, If 2, Class=app., Driver=, 12M
-
-            |__ Port 7: Dev 10, If 0, Class=hub, Driver=hub/3p, 12M
-
-                |__ Port 1: Dev 18, If 0, Class='bInterfaceClass 0xe0
-not yet handled', Driver=btusb, 12M
-
-                |__ Port 1: Dev 18, If 1, Class='bInterfaceClass 0xe0
-not yet handled', Driver=btusb, 12M
-
-                |__ Port 1: Dev 18, If 2, Class=app., Driver=, 12M
-
-                |__ Port 2: Dev 19, If 0, Class='bInterfaceClass 0xe0
-not yet handled', Driver=btusb, 12M
-
-                |__ Port 2: Dev 19, If 1, Class='bInterfaceClass 0xe0
-not yet handled', Driver=btusb, 12M
-
-                |__ Port 2: Dev 19, If 2, Class=app., Driver=, 12M
-
-                |__ Port 3: Dev 20, If 0, Class='bInterfaceClass 0xe0
-not yet handled', Driver=btusb, 12M
-
-                |__ Port 3: Dev 20, If 1, Class='bInterfaceClass 0xe0
-not yet handled', Driver=btusb, 12M
-
-                |__ Port 3: Dev 20, If 2, Class=app., Driver=, 12M
