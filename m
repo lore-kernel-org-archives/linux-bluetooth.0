@@ -1,33 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <CAPJhuYJS1wSDc9GssTLUAbuLRPW7ud6VyG4C8k3X2ok4LLmWNw@mail.gmail.com>
-References: <CAPJhuYJ9hTkoavCcg5O5jXJOONUQpns2S2iXgHQCza7v9u=zig@mail.gmail.com>
-	<CAPJhuYJS1wSDc9GssTLUAbuLRPW7ud6VyG4C8k3X2ok4LLmWNw@mail.gmail.com>
-Date: Wed, 15 Oct 2014 20:44:29 -0700
-Message-ID: <CAPJhuY+vsNXuUK+yVEZoK_T34+Ldv+QaXSWxMY8xDJTPOivKRQ@mail.gmail.com>
-Subject: Re: help needed for bluez debugging. - suspend-resume
-From: John Miller <jmiller5611@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-bluetooth-owner@vger.kernel.org
+From: roy.qing.li@gmail.com
+To: linux-bluetooth@vger.kernel.org,
+	marcel@holtmann.org,
+	gustavo@padovan.org,
+	johan.hedberg@gmail.com
+Subject: [PATCH] Bluetooth: 6lowpan: remove unnecessary codes in give_skb_to_upper
+Date: Thu, 16 Oct 2014 10:21:55 +0800
+Message-Id: <1413426115-17077-1-git-send-email-roy.qing.li@gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Somebody, please help
+From: Li RongQing <roy.qing.li@gmail.com>
 
+netif_rx() only returns NET_RX_DROP and NET_RX_SUCCESS, not returns
+negative value
 
-On Wed, Oct 15, 2014 at 5:11 PM, John Miller <jmiller5611@gmail.com> wrote:
-> Hello,
->
-> I ran into a problem in which after resuming form suspend my bluetooth
-> headset does not autoconnect.
->
-> i have bluez-5.19 in my system with chromium OS on kernel 3.14
->
-> btmon says that when my HCI host tries to connect after resuming,
-> "authentication failure" error pops up.
->
-> How can i further debug this issue?
->
-> What could be the reason for failure?
->
-> Please help.
+Signed-off-by: Li RongQing <roy.qing.li@gmail.com>
+---
+ net/bluetooth/6lowpan.c |    9 +--------
+ 1 file changed, 1 insertion(+), 8 deletions(-)
+
+diff --git a/net/bluetooth/6lowpan.c b/net/bluetooth/6lowpan.c
+index c2e0d14..9b5c89b 100644
+--- a/net/bluetooth/6lowpan.c
++++ b/net/bluetooth/6lowpan.c
+@@ -249,19 +249,12 @@ static struct lowpan_dev *lookup_dev(struct l2cap_conn *conn)
+ static int give_skb_to_upper(struct sk_buff *skb, struct net_device *dev)
+ {
+ 	struct sk_buff *skb_cp;
+-	int ret;
+ 
+ 	skb_cp = skb_copy(skb, GFP_ATOMIC);
+ 	if (!skb_cp)
+ 		return -ENOMEM;
+ 
+-	ret = netif_rx(skb_cp);
+-	if (ret < 0) {
+-		BT_DBG("receive skb %d", ret);
+-		return NET_RX_DROP;
+-	}
+-
+-	return ret;
++	return netif_rx(skb_cp);
+ }
+ 
+ static int process_data(struct sk_buff *skb, struct net_device *netdev,
+-- 
+1.7.10.4
