@@ -1,29 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1413450936.29366.1.camel@linux-0dmf.site>
-Subject: Re: btusb_intr_complete returns -EPIPE
-From: Oliver Neukum <oneukum@suse.de>
-To: Alan Stern <stern@rowland.harvard.edu>
-Cc: Naveen Kumar Parna <pnaveenkos@gmail.com>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	linux-usb@vger.kernel.org, acho@suse.com
-In-Reply-To: <Pine.LNX.4.44L0.1410151207020.1210-100000@iolanthe.rowland.org>
-References: <Pine.LNX.4.44L0.1410151207020.1210-100000@iolanthe.rowland.org>
-Content-Type: text/plain; charset="UTF-8"
-Date: Thu, 16 Oct 2014 11:15:36 +0200
-Mime-Version: 1.0
+From: Gowtham Anandha Babu <gowtham.ab@samsung.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: d.kasatkin@samsung.com, bharat.panda@samsung.com, cpgs@samsung.com,
+	Gowtham Anandha Babu <gowtham.ab@samsung.com>
+Subject: [PATCH] src/profile: Add feature bits to MAS SDP record
+Date: Thu, 16 Oct 2014 15:31:24 +0530
+Message-id: <1413453684-16326-1-git-send-email-gowtham.ab@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Wed, 2014-10-15 at 12:11 -0400, Alan Stern wrote:
-> > If the hub is the problem… what will be the better solution? Is it
-> > possible to change internal hub?
-> 
-> No, it is not possible.
+Add MAP supported features bits to MAS SDP record.
+Fix the PTS 5.3 test-cases:
+TC_MSE_MFB_BV_02_I
+TC_MSE_MFB_BV_05_I
+---
+ src/profile.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-Indeed. However, it is possible to use an additional in between your
-devices and the internal hub.
-
-	Regards
-		Oliver
-
+diff --git a/src/profile.c b/src/profile.c
+index 7aca3be..bccb145 100644
+--- a/src/profile.c
++++ b/src/profile.c
+@@ -439,6 +439,9 @@
+ 		<attribute id=\"0x0316\">				\
+ 			<uint8 value=\"0x0F\"/>				\
+ 		</attribute>						\
++		<attribute id=\"0x0317\">				\
++			<uint32 value=\"0x0000007f\"/>			\
++		</attribute>						\
+ 	</record>"
+ 
+ #define MNS_RECORD							\
+-- 
+1.9.1
 
