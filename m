@@ -1,82 +1,191 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <CAHrH25S-W2gVkeJfsn74VCcD9h2wS86zWDcUVKX=-994pwV76A@mail.gmail.com>
-References: <1413234602-20566-1-git-send-email-armansito@chromium.org>
-	<1413234602-20566-2-git-send-email-armansito@chromium.org>
-	<CABBYNZLYLDmjM0h2C9-sYOAxsRt4usdgr323bVmj=rF8byvjEw@mail.gmail.com>
-	<CAHrH25S-W2gVkeJfsn74VCcD9h2wS86zWDcUVKX=-994pwV76A@mail.gmail.com>
-Date: Thu, 16 Oct 2014 10:31:43 +0300
-Message-ID: <CABBYNZLjX_r=1fBb68mb0vJ_K7p=6Wh-W77ikVWi6s+DRuHVNA@mail.gmail.com>
-Subject: Re: [PATCH v2 1/5] shared/att: Drop the connection if a request is
- received while one is pending.
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Arman Uguray <armansito@chromium.org>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <Pine.LNX.4.44L0.1410151207020.1210-100000@iolanthe.rowland.org>
+References: <CAG0bkvKo0FQh+8_qTUMbttq_ggBnfr8dgeJAopxyozNK6u4=Fw@mail.gmail.com>
+	<Pine.LNX.4.44L0.1410151207020.1210-100000@iolanthe.rowland.org>
+Date: Thu, 16 Oct 2014 12:43:22 +0530
+Message-ID: <CAG0bkvJD_j_SUuSm4_+DiMqc-RH63BDU=cAtbkmNZdJ-ps=q6g@mail.gmail.com>
+Subject: Re: btusb_intr_complete returns -EPIPE
+From: Naveen Kumar Parna <pnaveenkos@gmail.com>
+To: Alan Stern <stern@rowland.harvard.edu>
+Cc: Oliver Neukum <oneukum@suse.de>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	linux-usb@vger.kernel.org, acho@suse.com
+Content-Type: multipart/mixed; boundary=047d7bdc78f8de497f050584fb14
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Arman,
+--047d7bdc78f8de497f050584fb14
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Oct 15, 2014 at 8:36 PM, Arman Uguray <armansito@chromium.org> wrote:
-> Hi Luiz,
+> It's entirely possible that the stall packets are created by the hub.
+> When a full-speed device is connected to a USB-2 hub, and the device
+> fails to respond to a packet sent by the host, the hub reports this
+> failure as a stall.
+
+Here I don=E2=80=99t think device fails to respond to a packet sent by the
+host. I verified this by connecting Ellisys USB analyser in between
+host and devices.
+
+For example Look at the attached(Sample_HciEvt.png) HCI event captured
+by Ellisys USB analyser. It is a valid HCI event from device to Host.
+IN transaction 96 1 ACK FS 16 bytes (FF 2F C2 01 00 17 00 DF 00 01 10
+00 00 A9 EE 0F)
+IN transaction 96 1 ACK FS 16 bytes (00 00 00 5A 06 9D 39 00 00 66 00
+00 00 00 00 00)
+IN transaction 96 1 ACK FS 16 bytes (00 00 00 00 00 00 00 00 00 00 00
+8E 05 28 00 01)
+IN transaction 96 1 ACK FS 1 byte (00)
+
+Due to spurious stall packets , sometimes btusb driver is not
+receiving this full event , instead it got STALL packet instead of
+first 16 bytes plus rest of other 33 bytes.
+
+
+
+> When the device is connected to an OHCI controller, such failures would
+> be reported in a different way, such as a -EPROTO or -EILSEQ status.
 >
->
->>> +       case ATT_OP_TYPE_REQ:
->>> +               /* If a request is currently pending, then the sequential
->>> +                * protocol was violated. Disconnect the bearer and notify the
->>> +                * upper-layer.
->>> +                */
->>
->> It seems this code is not following our coding style regarding multi
->> line comments, check doc/coding-style.txt(M2: Multiple line comment)
->> the first line should be empty.
->>
->
-> I didn't realize that was the comment style. I've seen both styles in
-> daemon code and I think I went with this one because of that. I'd
-> rather have the code be consistent (since shared/att uses this style
-> elsewhere) and maybe do a style correction pass in another patch?
 
-Sure, I can probably fix this myself just made the comment to let you
-know that we do in fact have a coding style for it.
+I did not observed -EPROTO or -EILSEQ status in OHCI controller scenario.
 
->
->>> +               if (att->in_req) {
->>> +                       util_debug(att->debug_callback, att->debug_data,
->>> +                                       "Received request while another is "
->>> +                                       "pending: 0x%02x", opcode);
->>> +                       disconnect_cb(att->io, att);
->>> +                       return false;
->>> +               }
->>> +
->>> +               att->in_req = true;
->>> +
->>> +               /* Fall through to the next case */
->>
->> This might cause a problem with our own code when connecting to each
->> other if bt_att_cancel is used, apparently bt_att_cancel does not send
->> anything to the remote side which seems to enable sending a new
->> request without waiting any response for the first one.
->>
->
-> I'm confused. Do you mean if bt_att is being used in the client role,
-> it can send multiple requests this way? That is correct, though I
-> don't see how that's related to this patch? Currently bt_att_cancel
-> can be used to cancel waiting for a pending request and send the next
-> one, as you said. In that regard, it doesn't actually "cancel"
-> anything if the PDU has been sent over the air already. I don't know
-> how big of a problem this is, since the remote end should normally
-> detect the error and terminate the connection anyway. If this becomes
-> a problem we can always prevent canceling a request that has already
-> left the queue and is pending. Though, again, this isn't really
-> related to this patch unless I'm missing something.
+Thanks,
+Naveen
 
-Sorry for the confusion, this patch is actually fine what we really
-need to fix is bt_att_cancel should not really remove the pending
-request otherwise the remote may disconnect if we proceed with another
-request.
+--047d7bdc78f8de497f050584fb14
+Content-Type: image/png; name="Sample_HciEvt.png"
+Content-Disposition: attachment; filename="Sample_HciEvt.png"
+Content-Transfer-Encoding: base64
+X-Attachment-Id: f_i1brsut40
 
-
--- 
-Luiz Augusto von Dentz
+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
+--047d7bdc78f8de497f050584fb14--
