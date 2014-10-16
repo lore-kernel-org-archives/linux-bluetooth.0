@@ -1,53 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <Pine.LNX.4.44L0.1410161007340.1316-100000@iolanthe.rowland.org>
-References: <CAG0bkv+bu23Fm_thq7A5AOrCEXaaWmcKNaX-193GqFh=W0S8xA@mail.gmail.com>
-	<Pine.LNX.4.44L0.1410161007340.1316-100000@iolanthe.rowland.org>
-Date: Thu, 16 Oct 2014 20:35:54 +0530
-Message-ID: <CAG0bkvLtNwYBVJeRKQ7JZ0f4M4+FBSK3U98X_wyPTSfKE08yOA@mail.gmail.com>
-Subject: Re: btusb_intr_complete returns -EPIPE
-From: Naveen Kumar Parna <pnaveenkos@gmail.com>
-To: Alan Stern <stern@rowland.harvard.edu>
-Cc: Oliver Neukum <oneukum@suse.de>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	linux-usb@vger.kernel.org, acho@suse.com
-Content-Type: text/plain; charset=UTF-8
+From: Gowtham Anandha Babu <gowtham.ab@samsung.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: 'Bharat Panda' <bharat.panda@samsung.com>,
+	'Dmitry Kasatkin' <d.kasatkin@samsung.com>, cpgs@samsung.com
+Subject: Query regarding creation of multiple MAS Instance ID:
+Date: Thu, 16 Oct 2014 19:48:23 +0530
+Message-id: <000b01cfe94c$216de430$6449ac90$@samsung.com>
+MIME-version: 1.0
+Content-type: text/plain; charset=us-ascii
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Ok, I will do this and update you.
-But Currently I am on long leave and I can update you on 27th Oct.
+Hi All,
 
-Thanks,
-Naveen
+I am working on obexd MAP profile. Is it possible to create multiple MAS
+Instance in bluez? 
+Because right now bluez has only one MAS Instance support (only one
+MAS_UUID), which is advertised to MCE based on the XML format followed in
+src/profile.c.
+When I add one more record to MAS_RECORD XML format by changing the value as
+0x01, I am not able see two instances getting loaded.
+		<attribute id=\"0x0315\">				\
+			<uint8 value=\"0x01\"/>			\
+		</attribute>						\
 
-On Thu, Oct 16, 2014 at 7:39 PM, Alan Stern <stern@rowland.harvard.edu> wrote:
-> On Thu, 16 Oct 2014, Naveen Kumar Parna wrote:
->
->> > Indeed. However, it is possible to use an additional in between your
->> > devices and the internal hub.
->> >
->> >         Regards
->> >                 Oliver
->> >
->> >
->>
->>
->> Tested with this configuration(external hubs Dev 3, Dev 4, Dev 17, Dev
->> 10) and got the same result.
->>
->> /:  Bus 02.Port 1: Dev 1, Class=root_hub, Driver=ehci-pci/2p, 480M
->>
->> /:  Bus 01.Port 1: Dev 1, Class=root_hub, Driver=ehci-pci/2p, 480M
->>
->>     |__ Port 1: Dev 2, If 0, Class=hub, Driver=hub/6p, 480M
->>
->>         |__ Port 5: Dev 3, If 0, Class=hub, Driver=hub/7p, 12M
->>
->>             |__ Port 1: Dev 4, If 0, Class=hub, Driver=hub/7p, 12M
->
-> This is not what Oliver meant.  You have to use a USB-2 hub.  And
-> having one of them is enough; you don't need two.
->
-> Alan Stern
->
+Do we need to create one more UUID like OBEX_MAS1_UUID and OBEX_MAS2_UUID to
+support multiple mas instances?  
+Or what could be the possible solutions?
+
+Regards.
+Gowtham Anandha Babu
+
