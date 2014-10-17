@@ -1,35 +1,57 @@
 Return-Path: <cyrus@holtmann.org>
-From: Martin Townsend <mtownsend1973@gmail.com>
-To: linux-bluetooth@vger.kernel.org,
-	linux-wpan@vger.kernel.org
-Cc: marcel@holtmann.org,
-	alex.aring@gmail.com,
-	jukka.rissanen@linux.intel.com,
-	Martin Townsend <mtownsend1973@gmail.com>
-Subject: [PATCH bluetooth-next 0/5] Move skb delivery out of IPHC.
-Date: Sat, 18 Oct 2014 08:09:08 +0100
-Message-Id: <1413616153-7562-1-git-send-email-mtownsend1973@gmail.com>
+From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] android/pts: Update PAN PTS tests
+Date: Fri, 17 Oct 2014 17:42:53 +0200
+Message-Id: <1413560573-3261-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This series moves skb delivery out of IPHC and into the receive routines of
-both bluetooth and 802.15.4.  The reason is that we need to support more
-(de)compression schemes in the future.  It also means that calling 
-lowpan_process_data now only returns error codes or 0 for success so 
-this has been cleaned up.  The final patch then renames occurences of
-lowpan_process_data and process_data to something more meaningful.
+Checked and tested against PTS 5.3
+---
+ android/pics-pan.txt  | 2 +-
+ android/pixit-pan.txt | 2 +-
+ android/pts-pan.txt   | 4 ++--
+ 3 files changed, 4 insertions(+), 4 deletions(-)
 
-Martin Townsend (5):
-  Remove skb_deliver from IPHC.
-  Fix process_data return values
-  Use consume_skb when packet processed successfully.
-  Remove unused skb_delivery_cb typedef.
-  Rename process_data and lowpan_process_data.
-
- include/net/6lowpan.h         | 12 ++++++------
- net/6lowpan/iphc.c            | 42 ++++++++++++------------------------------
- net/bluetooth/6lowpan.c       | 29 ++++++++++++++++++++---------
- net/ieee802154/6lowpan_rtnl.c | 34 +++++++++++++++-------------------
- 4 files changed, 53 insertions(+), 64 deletions(-)
-
+diff --git a/android/pics-pan.txt b/android/pics-pan.txt
+index 20b91c7..7c4939a 100644
+--- a/android/pics-pan.txt
++++ b/android/pics-pan.txt
+@@ -1,6 +1,6 @@
+ PAN PICS for the PTS tool.
+ 
+-PTS version: 5.2
++PTS version: 5.3
+ 
+ * - different than PTS defaults
+ # - not yet implemented/supported
+diff --git a/android/pixit-pan.txt b/android/pixit-pan.txt
+index a4233c6..680abb2 100644
+--- a/android/pixit-pan.txt
++++ b/android/pixit-pan.txt
+@@ -1,6 +1,6 @@
+ PAN PIXIT for the PTS tool.
+ 
+-PTS version: 5.2
++PTS version: 5.3
+ 
+ * - different than PTS defaults
+ & - should be set to IUT or PTS Bluetooth address respectively
+diff --git a/android/pts-pan.txt b/android/pts-pan.txt
+index 0af186c..dac1dec 100644
+--- a/android/pts-pan.txt
++++ b/android/pts-pan.txt
+@@ -1,7 +1,7 @@
+ PTS test results for PAN
+ 
+-PTS version: 5.2
+-Tested: 05-August-2014
++PTS version: 5.3
++Tested: 17-October-2014
+ Android version: 4.4.4
+ 
+ Results:
 -- 
-1.9.1
+1.9.3
+
