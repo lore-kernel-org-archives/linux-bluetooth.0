@@ -1,94 +1,73 @@
 Return-Path: <cyrus@holtmann.org>
-From: Bharat Bhusan Panda <bharat.panda@samsung.com>
-To: 'Luiz Augusto von Dentz' <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org, cpgs@samsung.com
-References: <1413281882-29686-1-git-send-email-bharat.panda@samsung.com>
- <CABBYNZJ5Kq4z67EKhnH9pmL02jkW3begif2=s=qxYH+VeNBSzw@mail.gmail.com>
-In-reply-to: <CABBYNZJ5Kq4z67EKhnH9pmL02jkW3begif2=s=qxYH+VeNBSzw@mail.gmail.com>
-Subject: RE: [PATCH ] obexd/mas: Add Support fo MSETime filter
-Date: Fri, 17 Oct 2014 18:24:40 +0530
-Message-id: <015f01cfea09$95eff510$c1cfdf30$@samsung.com>
-MIME-version: 1.0
-Content-type: text/plain; charset=UTF-8
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH 6/6] bnep: Fix bnep_add_to_bridge() errno usage
+Date: Fri, 17 Oct 2014 15:54:10 +0300
+Message-Id: <1413550450-16577-6-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1413550450-16577-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1413550450-16577-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-> > ---
-> >  obexd/plugins/mas.c | 28 ++++++++++++++++++++++++++++
-> >  1 file changed, 28 insertions(+)
-> >
-> > diff --git a/obexd/plugins/mas.c b/obexd/plugins/mas.c index
-> > fb97fe3..7f14bf8 100644
-> > --- a/obexd/plugins/mas.c
-> > +++ b/obexd/plugins/mas.c
-> > @@ -30,6 +30,7 @@
-> >  #include <glib.h>
-> >  #include <fcntl.h>
-> >  #include <inttypes.h>
-> > +#include <sys/time.h>
-> >
-> >  #include <gobex/gobex.h>
-> >  #include <gobex/gobex-apparam.h>
-> > @@ -228,6 +229,25 @@ static void
-> g_string_append_escaped_printf(GString *string,
-> >         va_end(ap);
-> >  }
-> >
-> > +static gchar *get_mse_timestamp(void) {
-> > +       struct timeval time_val;
-> > +       struct tm ltime;
-> > +       gchar *local_ts;
-> > +
-> > +       gettimeofday(&time_val, NULL);
-> > +
-> > +       if (!localtime_r(&time_val.tv_sec, &ltime))
-> > +               return NULL;
-> > +
-> > +       local_ts = g_strdup_printf("%04d%02d%02dT%02d%02d%02d",
-> > +                                       ltime.tm_year + 1900, ltime.tm_mon + 1,
-> > +                                       ltime.tm_mday, ltime.tm_hour,
-> > +                                       ltime.tm_min, ltime.tm_sec);
-> > +
-> > +       return local_ts;
-> > +}
-> > +
-> >  static const char *yesorno(gboolean a)  {
-> >         if (a)
-> > @@ -243,6 +263,7 @@ static void get_messages_listing_cb(void *session,
-> > int err, uint16_t size,  {
-> >         struct mas_session *mas = user_data;
-> >         uint16_t max = 1024;
-> > +       gchar *mse_time;
-> >
-> >         if (err < 0 && err != -EAGAIN) {
-> >                 obex_object_set_io_flags(mas, G_IO_ERR, err); @@
-> > -358,6 +379,13 @@ proceed:
-> >                 mas->outparams = g_obex_apparam_set_uint8(mas->outparams,
-> >                                                 MAP_AP_NEWMESSAGE,
-> >                                                 newmsg ? 1 : 0);
-> > +               /* Response to report the local time of MSE */
-> > +               mse_time = get_mse_timestamp();
-> > +               if (mse_time) {
-> > +                       g_obex_apparam_set_string(mas->outparams,
-> > +                                               MAP_AP_MSETIME, mse_time);
-> > +                       g_free(mse_time);
-> > +               }
-> >         }
-> >
-> >         if (err != -EAGAIN)
-> > --
-> > 1.9.1
-> 
-> Does this works when the system has timedated running, perhaps we need
-> to know if the time is set in UTC or not and in case of the later we probably
-> need to provide the timezone as well.
->
-Yes it works with system-timedated running. Only thing need to handle here is for different timezone other than UTC/GMT.
-In further patches I will try to provide support with handling other timezones as well.
+Avoid errno be overwritten and make code consistent.
+---
+ profiles/network/bnep.c | 23 +++++++++++------------
+ 1 file changed, 11 insertions(+), 12 deletions(-)
+
+diff --git a/profiles/network/bnep.c b/profiles/network/bnep.c
+index 18051c3..c40ed69 100644
+--- a/profiles/network/bnep.c
++++ b/profiles/network/bnep.c
+@@ -491,7 +491,7 @@ static int bnep_add_to_bridge(const char *devname, const char *bridge)
+ {
+ 	int ifindex;
+ 	struct ifreq ifr;
+-	int sk, err;
++	int sk, err = 0;
  
-Best Regards,
-Bharat
-
+ 	if (!devname || !bridge)
+ 		return -EINVAL;
+@@ -506,16 +506,16 @@ static int bnep_add_to_bridge(const char *devname, const char *bridge)
+ 	strncpy(ifr.ifr_name, bridge, IFNAMSIZ - 1);
+ 	ifr.ifr_ifindex = ifindex;
+ 
+-	err = ioctl(sk, SIOCBRADDIF, &ifr);
++	if (ioctl(sk, SIOCBRADDIF, &ifr) < 0) {
++		err = -errno;
++		error("bnep: Can't add %s to the bridge %s: %s(%d)",
++					devname, bridge, strerror(-err), -err);
++	} else
++		info("bridge %s: interface %s added", bridge, devname);
+ 
+ 	close(sk);
+ 
+-	if (err < 0)
+-		return err;
+-
+-	info("bridge %s: interface %s added", bridge, devname);
+-
+-	return 0;
++	return err;
+ }
+ 
+ static int bnep_del_from_bridge(const char *devname, const char *bridge)
+@@ -561,11 +561,10 @@ int bnep_server_add(int sk, uint16_t dst, char *bridge, char *iface,
+ 	if (err < 0)
+ 		return err;
+ 
+-	if (bnep_add_to_bridge(iface, bridge) < 0) {
+-		error("bnep: Can't add %s to the bridge %s: %s(%d)",
+-					iface, bridge, strerror(errno), errno);
++	err = bnep_add_to_bridge(iface, bridge);
++	if (err < 0) {
+ 		bnep_conndel(addr);
+-		return -errno;
++		return err;
+ 	}
+ 
+ 	return bnep_if_up(iface);
+-- 
+1.9.1
 
