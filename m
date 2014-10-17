@@ -1,34 +1,68 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 8.0 \(1990.1\))
-Subject: Re: Multiple BLE connections to one GATT-Server
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <5440E4BE.3020303@gmx.com>
-Date: Fri, 17 Oct 2014 13:45:16 +0200
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <9210860D-F9EC-4606-8310-9E1DA92351A5@holtmann.org>
-References: <5440E4BE.3020303@gmx.com>
-To: "T. Bolten" <t.bolten@gmx.com>
+MIME-Version: 1.0
+In-Reply-To: <000b01cfe94c$216de430$6449ac90$@samsung.com>
+References: <000b01cfe94c$216de430$6449ac90$@samsung.com>
+Date: Fri, 17 Oct 2014 13:41:20 +0200
+Message-ID: <CABBYNZKPex1xe0yJQkfOopBWj3QRiwF4cQd=1Jxj=xOLV69QJw@mail.gmail.com>
+Subject: Re: Query regarding creation of multiple MAS Instance ID:
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Gowtham Anandha Babu <gowtham.ab@samsung.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	Bharat Panda <bharat.panda@samsung.com>,
+	Dmitry Kasatkin <d.kasatkin@samsung.com>, cpgs@samsung.com
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi,
 
-> I'm new in the area of Bluetooth-programming and I hope this is the right place for my question. A web search at the usual web portals was not very helpful due to contradictory statements and I'm "lost" in the Bluetooth Core specification.
-> 
-> Basically my question related to Bluetooth Low Energy is the following:
-> 
-> Is it technically possible to connect multiple BLE GATT Clients (in my case smartphones, called in the bluetooth terminology central/master device?) to one BLE GATT Server (in my case a Linux box with Bluez, called in the bluetooth terminology slave or peripheral device?)?
-> 
-> 
-> The basic idea here is that several different smartphones should simultaneously read (read-only, not write) some self-defined service characteristics to inform the clients about some kind of progress or event state. These progress-information is unfortunately to large to be included in the advertisement package.
-> 
-> 
-> I have already an implementation that advertises a service with some self defined characteristics but I can connect to this GATT service only with one smartphone - then the advertising stops and I'm unable to connect to this service with an other device.
+On Thu, Oct 16, 2014 at 4:18 PM, Gowtham Anandha Babu
+<gowtham.ab@samsung.com> wrote:
+> Hi All,
+>
+> I am working on obexd MAP profile. Is it possible to create multiple MAS
+> Instance in bluez?
+> Because right now bluez has only one MAS Instance support (only one
+> MAS_UUID), which is advertised to MCE based on the XML format followed in
+> src/profile.c.
+> When I add one more record to MAS_RECORD XML format by changing the value as
+> 0x01, I am not able see two instances getting loaded.
+>                 <attribute id=\"0x0315\">                               \
+>                         <uint8 value=\"0x01\"/>                 \
+>                 </attribute>                                            \
 
-this is a hardware specific detail. BlueZ will support as many connection in peripheral role as the hardware supports. Some might have single connections in peripheral, but others might all multiple. You need to test this and see if the hardware is working correctly for your use cases.
+How you are doing that? You should be able to call
+ProfileManager1.RegisterProfile if that is what you doing and it is
+not working perhaps we have a bug somewhere. Two very important things
+you need to check:
 
-Regards
+1. It cannot use the same path for both instances
+2. Each instance needs a different channel
 
-Marcel
+So if you are register via XML you need to take care of those details,
+but perhaps you are using the default record by just providing the
+UUID, that probably will not work because apparently we have hardcoded
+the channel, if that is the case we should probably add a check if
+there is another instance already register and use a different
+channel/psm.
 
+> Do we need to create one more UUID like OBEX_MAS1_UUID and OBEX_MAS2_UUID to
+> support multiple mas instances?
+> Or what could be the possible solutions?
+
+Each instance has to have the service class set to MAS UUID, otherwise
+no one will be able to discover it.
+
+>
+> Regards.
+> Gowtham Anandha Babu
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+
+
+-- 
+Luiz Augusto von Dentz
