@@ -1,27 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 8.0 \(1990.1\))
-Subject: Re: [PATCH bluetooth] Bluetooth: Fix missing channel unlock in l2cap_le_credits
+Subject: Re: [PATCH v6 bluetooth-next] 6lowpan: Use skb_cow in IPHC decompression.
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1413224685-3700-1-git-send-email-mtownsend1973@gmail.com>
-Date: Fri, 17 Oct 2014 16:18:24 +0200
-Cc: linux-bluetooth@vger.kernel.org, jukka.rissanen@linux.intel.com,
-	Johan Hedberg <johan.hedberg@gmail.com>
-Message-Id: <031954F7-A072-495B-A1FA-CC8793C4601C@holtmann.org>
-References: <1413224685-3700-1-git-send-email-mtownsend1973@gmail.com>
+In-Reply-To: <1413194456-26351-2-git-send-email-martin.townsend@xsilon.com>
+Date: Fri, 17 Oct 2014 16:15:52 +0200
+Cc: linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org,
+	alex.aring@gmail.com, jukka.rissanen@linux.intel.com,
+	Martin Townsend <martin.townsend@xsilon.com>
+Message-Id: <934EB47B-5CAD-453A-AD44-0B84CED3C2C3@holtmann.org>
+References: <1413194456-26351-1-git-send-email-martin.townsend@xsilon.com> <1413194456-26351-2-git-send-email-martin.townsend@xsilon.com>
 To: Martin Townsend <mtownsend1973@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Martin,
 
-> In the error case where credits is greater than max_credits there
-> is a missing l2cap_chan_unlock before returning.
+> Currently there are potentially 2 skb_copy_expand calls in IPHC
+> decompression.  This patch replaces this with one call to
+> skb_cow which will check to see if there is enough headroom
+> first to ensure it's only done if necessary and will handle
+> alignment issues for cache.
+> As skb_cow uses pskb_expand_head we ensure the skb isn't shared from
+> bluetooth and ieee802.15.4 code that use the IPHC decompression.
 > 
-> Signed-off-by: Martin Townsend <mtownsend1973@gmail.com>
+> Signed-off-by: Martin Townsend <martin.townsend@xsilon.com>
 > ---
-> net/bluetooth/l2cap_core.c | 1 +
-> 1 file changed, 1 insertion(+)
+> net/6lowpan/iphc.c      | 47 +++++++++++++++++++++--------------------------
+> net/bluetooth/6lowpan.c |  4 ++++
+> 2 files changed, 25 insertions(+), 26 deletions(-)
 
 patch has been applied to bluetooth-next tree.
 
