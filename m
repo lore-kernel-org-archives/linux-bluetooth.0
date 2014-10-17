@@ -1,61 +1,78 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1413551445.2705.152.camel@jrissane-mobl.ger.corp.intel.com>
-Subject: Re: [PATCH] Bluetooth: 6lowpan: remove unnecessary codes in
- give_skb_to_upper
-From: Jukka Rissanen <jukka.rissanen@linux.intel.com>
-To: roy.qing.li@gmail.com
-Cc: linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
- gustavo@padovan.org,  johan.hedberg@gmail.com
-Date: Fri, 17 Oct 2014 16:10:45 +0300
-In-Reply-To: <1413426115-17077-1-git-send-email-roy.qing.li@gmail.com>
-References: <1413426115-17077-1-git-send-email-roy.qing.li@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+From: Sebastian Chlad <sebastian.chlad@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Sebastian Chlad <sebastian.chlad@tieto.com>
+Subject: [PATCH] android/pts: Update PTS files for DIS
+Date: Fri, 17 Oct 2014 15:08:19 +0200
+Message-Id: <1413551299-32329-1-git-send-email-sebastian.chlad@tieto.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+PICS and PIXITs updated to PTS 5.3. Regression done for Android
+4.4.4.
+---
+ android/pics-dis.txt  | 2 +-
+ android/pixit-dis.txt | 4 ++--
+ android/pts-dis.txt   | 7 +++++--
+ 3 files changed, 8 insertions(+), 5 deletions(-)
 
-On to, 2014-10-16 at 10:21 +0800, roy.qing.li@gmail.com wrote:
-> From: Li RongQing <roy.qing.li@gmail.com>
-> 
-> netif_rx() only returns NET_RX_DROP and NET_RX_SUCCESS, not returns
-> negative value
-> 
-> Signed-off-by: Li RongQing <roy.qing.li@gmail.com>
-> ---
->  net/bluetooth/6lowpan.c |    9 +--------
->  1 file changed, 1 insertion(+), 8 deletions(-)
-> 
-> diff --git a/net/bluetooth/6lowpan.c b/net/bluetooth/6lowpan.c
-> index c2e0d14..9b5c89b 100644
-> --- a/net/bluetooth/6lowpan.c
-> +++ b/net/bluetooth/6lowpan.c
-> @@ -249,19 +249,12 @@ static struct lowpan_dev *lookup_dev(struct l2cap_conn *conn)
->  static int give_skb_to_upper(struct sk_buff *skb, struct net_device *dev)
->  {
->  	struct sk_buff *skb_cp;
-> -	int ret;
->  
->  	skb_cp = skb_copy(skb, GFP_ATOMIC);
->  	if (!skb_cp)
->  		return -ENOMEM;
->  
-> -	ret = netif_rx(skb_cp);
-> -	if (ret < 0) {
-> -		BT_DBG("receive skb %d", ret);
-> -		return NET_RX_DROP;
-> -	}
-> -
-> -	return ret;
-> +	return netif_rx(skb_cp);
->  }
->  
->  static int process_data(struct sk_buff *skb, struct net_device *netdev,
+diff --git a/android/pics-dis.txt b/android/pics-dis.txt
+index 0a1ab3f..169173d 100644
+--- a/android/pics-dis.txt
++++ b/android/pics-dis.txt
+@@ -1,6 +1,6 @@
+ DIS PICS for the PTS tool.
+ 
+-PTS version: 5.2
++PTS version: 5.3
+ 
+ * - different than PTS defaults
+ 
+diff --git a/android/pixit-dis.txt b/android/pixit-dis.txt
+index c29ec36..71729fe 100644
+--- a/android/pixit-dis.txt
++++ b/android/pixit-dis.txt
+@@ -1,6 +1,6 @@
+ DIS PIXIT for the PTS tool.
+ 
+-PTS version: 5.2
++PTS version: 5.3
+ 
+ * - different than PTS defaults
+ & - should be set to IUT Bluetooth address
+@@ -19,7 +19,7 @@ TSPX_delete_link_key					FALSE
+ TSPX_pin_code						0000
+ TSPX_use_dynamic_pin					FALSE
+ TSPX_delete_ltk						FALSE
+-TSPX_security_enabled					TRUE
++TSPX_security_enabled					TRUE (*)
+ TSPX_iut_setup_att_over_br_edr				FALSE
+ TSPX_tester_appearance					0000
+ -------------------------------------------------------------------------------
+diff --git a/android/pts-dis.txt b/android/pts-dis.txt
+index 8489430..215baa2 100644
+--- a/android/pts-dis.txt
++++ b/android/pts-dis.txt
+@@ -1,7 +1,7 @@
+ PTS test results for DIS
+ 
+-PTS version: 5.2
+-Tested: 29-July-2014
++PTS version: 5.3
++Tested: 18-October-2014
+ Android version: 4.4.4
+ 
+ Results:
+@@ -11,6 +11,9 @@ INC	test is inconclusive
+ N/A	test is disabled due to PICS setup
+ NONE	test result is none
+ 
++NOTE: DIS testing might require some extra properties to be set. Please refer
++to the README file in android folder. Section: Customization.
++
+ -------------------------------------------------------------------------------
+ Test Name		Result	Notes
+ -------------------------------------------------------------------------------
+-- 
+1.8.5.3
 
-Ack to this.
-
-Signed-off-by: Jukka Rissanen <jukka.rissanen@linux.intel.com>
-
-
-Cheers,
-Jukka
