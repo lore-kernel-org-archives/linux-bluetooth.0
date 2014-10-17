@@ -1,44 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 8.0 \(1990.1\))
-Subject: Re: Correct use of le_set_scan_response_data_cp / hci_send_req ?
+Subject: Re: Multiple BLE connections to one GATT-Server
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <CAOE8yMDJOB2iNnS6DFyE2=GBbKTEd4GPE_KcNCPT1d1eaUyzfw@mail.gmail.com>
-Date: Fri, 17 Oct 2014 13:46:33 +0200
-Cc: linux-bluetooth <linux-bluetooth@vger.kernel.org>
-Message-Id: <A3918155-03E6-4545-9929-563122917221@holtmann.org>
-References: <CAOE8yMDJOB2iNnS6DFyE2=GBbKTEd4GPE_KcNCPT1d1eaUyzfw@mail.gmail.com>
-To: mvogt1@gmail.com
+In-Reply-To: <5440E4BE.3020303@gmx.com>
+Date: Fri, 17 Oct 2014 13:45:16 +0200
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <9210860D-F9EC-4606-8310-9E1DA92351A5@holtmann.org>
+References: <5440E4BE.3020303@gmx.com>
+To: "T. Bolten" <t.bolten@gmx.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Martin,
+Hi,
 
-> I try to create a btle server which does advertise itsself with the
-> name "HEY".
+> I'm new in the area of Bluetooth-programming and I hope this is the right place for my question. A web search at the usual web portals was not very helpful due to contradictory statements and I'm "lost" in the Bluetooth Core specification.
 > 
-> Attached is a demo program.
-> Compile with:
+> Basically my question related to Bluetooth Low Energy is the following:
 > 
-> g++ -o leserv leserv.cpp -lbluetooth
+> Is it technically possible to connect multiple BLE GATT Clients (in my case smartphones, called in the bluetooth terminology central/master device?) to one BLE GATT Server (in my case a Linux box with Bluez, called in the bluetooth terminology slave or peripheral device?)?
 > 
-> then start the program as root.
-> And on another host start:
 > 
-> hcitool lescan
+> The basic idea here is that several different smartphones should simultaneously read (read-only, not write) some self-defined service characteristics to inform the clients about some kind of progress or event state. These progress-information is unfortunately to large to be included in the advertisement package.
 > 
-> The current version prints "HEY" but I think the API
-> is wrong here. Every other version which can be found
-> on the internet uses the
 > 
-> // does not work
-> //hci_le_set_scan_response_data(hciSocket,(uint8_t*)msg,strlen(msg),0);
-> 
-> implementation, and this one does not work.
-> 
-> What would be a correct example for this task?
+> I have already an implementation that advertises a service with some self defined characteristics but I can connect to this GATT service only with one smartphone - then the advertising stops and I'm unable to connect to this service with an other device.
 
-you need to the read advertising data format struct. If you are configuring the scan response data, then it needs to follow the TLV format defined by the Bluetooth SIG.
+this is a hardware specific detail. BlueZ will support as many connection in peripheral role as the hardware supports. Some might have single connections in peripheral, but others might all multiple. You need to test this and see if the hardware is working correctly for your use cases.
 
 Regards
 
