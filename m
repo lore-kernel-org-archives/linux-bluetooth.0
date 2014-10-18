@@ -6,30 +6,64 @@ Cc: marcel@holtmann.org,
 	alex.aring@gmail.com,
 	jukka.rissanen@linux.intel.com,
 	Martin Townsend <mtownsend1973@gmail.com>
-Subject: [PATCH bluetooth-next 4/5] Remove unused skb_delivery_cb typedef.
-Date: Sat, 18 Oct 2014 08:09:12 +0100
-Message-Id: <1413616153-7562-5-git-send-email-mtownsend1973@gmail.com>
+Subject: [PATCH bluetooth-next 2/5] Fix process_data return values
+Date: Sat, 18 Oct 2014 08:09:10 +0100
+Message-Id: <1413616153-7562-3-git-send-email-mtownsend1973@gmail.com>
 In-Reply-To: <1413616153-7562-1-git-send-email-mtownsend1973@gmail.com>
 References: <1413616153-7562-1-git-send-email-mtownsend1973@gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+As process_data now returns just error codes fix up the calls to this
+function to only drop the skb if an error code is returned.
+
 Signed-off-by: Martin Townsend <mtownsend1973@gmail.com>
 ---
- include/net/6lowpan.h | 2 --
- 1 file changed, 2 deletions(-)
+ net/bluetooth/6lowpan.c       | 2 +-
+ net/ieee802154/6lowpan_rtnl.c | 6 +++---
+ 2 files changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/include/net/6lowpan.h b/include/net/6lowpan.h
-index 99aa7e3..abfa359 100644
---- a/include/net/6lowpan.h
-+++ b/include/net/6lowpan.h
-@@ -372,8 +372,6 @@ lowpan_uncompress_size(const struct sk_buff *skb, u16 *dgram_offset)
- 	return skb->len + uncomp_header - ret;
- }
+diff --git a/net/bluetooth/6lowpan.c b/net/bluetooth/6lowpan.c
+index 03787e0..702bf3c 100644
+--- a/net/bluetooth/6lowpan.c
++++ b/net/bluetooth/6lowpan.c
+@@ -347,7 +347,7 @@ static int recv_pkt(struct sk_buff *skb, struct net_device *dev,
+ 				goto drop;
  
--typedef int (*skb_delivery_cb)(struct sk_buff *skb, struct net_device *dev);
--
- int lowpan_process_data(struct sk_buff *skb, struct net_device *dev,
- 		const u8 *saddr, const u8 saddr_type, const u8 saddr_len,
- 		const u8 *daddr, const u8 daddr_type, const u8 daddr_len,
+ 			ret = process_data(local_skb, dev, chan);
+-			if (ret != NET_RX_SUCCESS)
++			if (ret < 0)
+ 				goto drop;
+ 
+ 			local_skb->protocol = htons(ETH_P_IPV6);
+diff --git a/net/ieee802154/6lowpan_rtnl.c b/net/ieee802154/6lowpan_rtnl.c
+index 82ef0df..2c6bc36 100644
+--- a/net/ieee802154/6lowpan_rtnl.c
++++ b/net/ieee802154/6lowpan_rtnl.c
+@@ -533,14 +533,14 @@ static int lowpan_rcv(struct sk_buff *skb, struct net_device *dev,
+ 		switch (skb->data[0] & 0xe0) {
+ 		case LOWPAN_DISPATCH_IPHC:	/* ipv6 datagram */
+ 			ret = process_data(skb, &hdr);
+-			if (ret == NET_RX_DROP)
++			if (ret < 0)
+ 				goto drop;
+ 			break;
+ 		case LOWPAN_DISPATCH_FRAG1:	/* first fragment header */
+ 			ret = lowpan_frag_rcv(skb, LOWPAN_DISPATCH_FRAG1);
+ 			if (ret == 1) {
+ 				ret = process_data(skb, &hdr);
+-				if (ret == NET_RX_DROP)
++				if (ret < 0)
+ 					goto drop;
+ 			}
+ 			break;
+@@ -548,7 +548,7 @@ static int lowpan_rcv(struct sk_buff *skb, struct net_device *dev,
+ 			ret = lowpan_frag_rcv(skb, LOWPAN_DISPATCH_FRAGN);
+ 			if (ret == 1) {
+ 				ret = process_data(skb, &hdr);
+-				if (ret == NET_RX_DROP)
++				if (ret < 0)
+ 					goto drop;
+ 			}
+ 			break;
 -- 
 1.9.1
