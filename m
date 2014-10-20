@@ -1,58 +1,88 @@
 Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
-To: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
+To: Sebastian Chlad <sebastian.chlad@tieto.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] android/tester: Add missing hook removal
-Date: Mon, 20 Oct 2014 12:10:06 +0200
-Message-ID: <30738176.KvdmmQySec@uw000953>
-In-Reply-To: <1413547812-12345-1-git-send-email-jakub.tyszkowski@tieto.com>
-References: <1413547812-12345-1-git-send-email-jakub.tyszkowski@tieto.com>
+Subject: Re: [PATCH] android/pts: Update PTS files for DIS
+Date: Mon, 20 Oct 2014 12:08:53 +0200
+Message-ID: <2942690.Q9DBQ4VjRo@uw000953>
+In-Reply-To: <1413551299-32329-1-git-send-email-sebastian.chlad@tieto.com>
+References: <1413551299-32329-1-git-send-email-sebastian.chlad@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jakub,
+Hi Sebastian,
 
-On Friday 17 of October 2014 14:10:12 Jakub Tyszkowski wrote:
-> Missing hook removal was resulting in memory leak:
-> 936 bytes in 39 blocks are definitely lost in loss record 42 of 45
-> ==15026==    at 0x4C2AB80: malloc (in
-> /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
-> ==15026==    by 0x407D60: btdev_add_hook (btdev.c:3226)
-> ==15026==    by 0x40EB75: read_info_callback (tester-main.c:364)
-> ==15026==    by 0x4142B5: request_complete (mgmt.c:245)
-> ==15026==    by 0x41441A: can_read_data (mgmt.c:349)
-> ==15026==    by 0x41663C: read_callback (io-glib.c:170)
-> ==15026==    by 0x5083CE4: g_main_context_dispatch (in
-> /lib/x86_64-linux-gnu/libglib-2.0.so.0.4002.0)
-> ==15026==    by 0x5084047: ??? (in
-> /lib/x86_64-linux-gnu/libglib-2.0.so.0.4002.0)
-> ==15026==    by 0x5084309: g_main_loop_run (in
-> /lib/x86_64-linux-gnu/libglib-2.0.so.0.4002.0)
-> ==15026==    by 0x4162D0: tester_run (tester.c:815)
-> ==15026==    by 0x40263E: main (tester-main.c:2716)
+On Friday 17 of October 2014 15:08:19 Sebastian Chlad wrote:
+> PICS and PIXITs updated to PTS 5.3. Regression done for Android
+> 4.4.4.
 > ---
->  android/tester-main.c | 3 +++
->  1 file changed, 3 insertions(+)
+>  android/pics-dis.txt  | 2 +-
+>  android/pixit-dis.txt | 4 ++--
+>  android/pts-dis.txt   | 7 +++++--
+>  3 files changed, 8 insertions(+), 5 deletions(-)
 > 
-> diff --git a/android/tester-main.c b/android/tester-main.c
-> index a804f11..fc1de06 100644
-> --- a/android/tester-main.c
-> +++ b/android/tester-main.c
-> @@ -212,6 +212,9 @@ static void test_post_teardown(const void *test_data)
->  {
->  	struct test_data *data = tester_get_data();
+> diff --git a/android/pics-dis.txt b/android/pics-dis.txt
+> index 0a1ab3f..169173d 100644
+> --- a/android/pics-dis.txt
+> +++ b/android/pics-dis.txt
+> @@ -1,6 +1,6 @@
+>  DIS PICS for the PTS tool.
 >  
-> +	/* remove hook for encryption change */
-> +	hciemu_del_hook(data->hciemu, HCIEMU_HOOK_POST_EVT, 0x08);
+> -PTS version: 5.2
+> +PTS version: 5.3
+>  
+>  * - different than PTS defaults
+>  
+> diff --git a/android/pixit-dis.txt b/android/pixit-dis.txt
+> index c29ec36..71729fe 100644
+> --- a/android/pixit-dis.txt
+> +++ b/android/pixit-dis.txt
+> @@ -1,6 +1,6 @@
+>  DIS PIXIT for the PTS tool.
+>  
+> -PTS version: 5.2
+> +PTS version: 5.3
+>  
+>  * - different than PTS defaults
+>  & - should be set to IUT Bluetooth address
+> @@ -19,7 +19,7 @@ TSPX_delete_link_key					FALSE
+>  TSPX_pin_code						0000
+>  TSPX_use_dynamic_pin					FALSE
+>  TSPX_delete_ltk						FALSE
+> -TSPX_security_enabled					TRUE
+> +TSPX_security_enabled					TRUE (*)
+>  TSPX_iut_setup_att_over_br_edr				FALSE
+>  TSPX_tester_appearance					0000
+>  -------------------------------------------------------------------------------
+> diff --git a/android/pts-dis.txt b/android/pts-dis.txt
+> index 8489430..215baa2 100644
+> --- a/android/pts-dis.txt
+> +++ b/android/pts-dis.txt
+> @@ -1,7 +1,7 @@
+>  PTS test results for DIS
+>  
+> -PTS version: 5.2
+> -Tested: 29-July-2014
+> +PTS version: 5.3
+> +Tested: 18-October-2014
+>  Android version: 4.4.4
+>  
+>  Results:
+> @@ -11,6 +11,9 @@ INC	test is inconclusive
+>  N/A	test is disabled due to PICS setup
+>  NONE	test result is none
+>  
+> +NOTE: DIS testing might require some extra properties to be set. Please refer
+> +to the README file in android folder. Section: Customization.
 > +
->  	hciemu_unref(data->hciemu);
->  	data->hciemu = NULL;
->  
+>  -------------------------------------------------------------------------------
+>  Test Name		Result	Notes
+>  -------------------------------------------------------------------------------
 > 
 
-Applied, thanks.
+Patch applied, thanks.
 
 -- 
 Best regards, 
