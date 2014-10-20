@@ -1,69 +1,60 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1413550450-16577-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1413550450-16577-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-Date: Mon, 20 Oct 2014 15:37:55 +0300
-Message-ID: <CABBYNZJf2PdRCyiwMrXWx1TDXrvneA7LKN64f0u5CFBW_nBouw@mail.gmail.com>
-Subject: Re: [PATCH 1/6] bnep: Avoid double error print for bnep_connadd()
+In-Reply-To: <CAHrH25SLjFr4iaKy8WJAfrz0oZpqENpkBJesNd4_xa_br+E6cA@mail.gmail.com>
+References: <1413234602-20566-1-git-send-email-armansito@chromium.org>
+	<CAHrH25SLjFr4iaKy8WJAfrz0oZpqENpkBJesNd4_xa_br+E6cA@mail.gmail.com>
+Date: Mon, 20 Oct 2014 15:09:13 +0300
+Message-ID: <CABBYNZJ0gvAx00rL_sTrG2ktm0jiYpRFo4=fSRCeAey+vQ9DXQ@mail.gmail.com>
+Subject: Re: [PATCH v2 0/5] Introduce shared/gatt-server.
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+To: Arman Uguray <armansito@chromium.org>
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+Hi Arman,
 
-On Fri, Oct 17, 2014 at 3:54 PM, Andrei Emeltchenko
-<Andrei.Emeltchenko.news@gmail.com> wrote:
-> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+On Thu, Oct 16, 2014 at 9:49 PM, Arman Uguray <armansito@chromium.org> wrote:
+> On Mon, Oct 13, 2014 at 2:09 PM, Arman Uguray <armansito@chromium.org> wrote:
+>> *v2:
+>>   - Split read_by_grp_type_cb into two functions by moving the response PDU
+>>     encoding loop into a helper function.
+>>
+>> *v1:
+>>   - Make gatt-db external to gatt-server, as initially discussed.
+>>   - Also implement Read By Group Type request.
+>>
+>> Arman Uguray (5):
+>>   shared/att: Drop the connection if a request is received while one is
+>>     pending.
+>>   shared/att: Respond with ERROR_REQUEST_NOT_SUPPORTED for unhandled
+>>     requests.
+>>   shared/gatt-server: Introduce shared/gatt-server.
+>>   shared/gatt-server: Support Exchange MTU request.
+>>   shared/gatt-server: Support Read By Group Type request.
+>>
+>>  Makefile.am              |   1 +
+>>  src/shared/att.c         | 124 +++++++++++------
+>>  src/shared/gatt-server.c | 356 +++++++++++++++++++++++++++++++++++++++++++++++
+>>  src/shared/gatt-server.h |  40 ++++++
+>>  4 files changed, 481 insertions(+), 40 deletions(-)
+>>  create mode 100644 src/shared/gatt-server.c
+>>  create mode 100644 src/shared/gatt-server.h
+>>
+>> --
+>> 2.1.0.rc2.206.gedb03e5
+>>
 >
-> This avoids double printing the same error with bnep connection add
-> ioctl.
-> ---
->  profiles/network/bnep.c | 14 ++++++--------
->  1 file changed, 6 insertions(+), 8 deletions(-)
->
-> diff --git a/profiles/network/bnep.c b/profiles/network/bnep.c
-> index 136709d..035beb1 100644
-> --- a/profiles/network/bnep.c
-> +++ b/profiles/network/bnep.c
-> @@ -316,10 +316,8 @@ static gboolean bnep_setup_cb(GIOChannel *chan, GIOCondition cond,
->         setsockopt(sk, SOL_SOCKET, SO_RCVTIMEO, &timeo, sizeof(timeo));
->
->         sk = g_io_channel_unix_get_fd(session->io);
-> -       if (bnep_connadd(sk, session->src, session->iface)) {
-> -               error("bnep conn could not be added");
-> +       if (bnep_connadd(sk, session->src, session->iface) < 0)
->                 goto failed;
-> -       }
->
->         if (bnep_if_up(session->iface)) {
->                 error("could not up %s", session->iface);
-> @@ -556,14 +554,14 @@ static int bnep_del_from_bridge(const char *devname, const char *bridge)
->  int bnep_server_add(int sk, uint16_t dst, char *bridge, char *iface,
->                                                 const bdaddr_t *addr)
->  {
-> +       int err;
-> +
->         if (!bridge || !iface || !addr)
->                 return -EINVAL;
->
-> -       if (bnep_connadd(sk, dst, iface) < 0) {
-> -               error("Can't add connection to the bridge %s: %s(%d)",
-> -                                               bridge, strerror(errno), errno);
-> -               return -errno;
-> -       }
-> +       err = bnep_connadd(sk, dst, iface);
-> +       if (err < 0)
-> +               return err;
->
->         if (bnep_add_to_bridge(iface, bridge) < 0) {
->                 error("Can't add %s to the bridge %s: %s(%d)",
+> ping. Luiz made comments on one of the patches but I believe they've
+> been addressed.
 > --
-> 1.9.1
 
-Applied, thanks.
+This is now pushed, note that Ive made a couple changes both in the
+code and the commit message, please next time follow 50/72 format for
+the commit message (check HACKING if you don't know what Im talking
+about).
+
 
 -- 
 Luiz Augusto von Dentz
