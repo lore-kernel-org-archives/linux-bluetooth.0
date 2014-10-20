@@ -1,42 +1,103 @@
 Return-Path: <cyrus@holtmann.org>
-From: Martin Townsend <mtownsend1973@gmail.com>
-To: linux-bluetooth@vger.kernel.org,
-	linux-wpan@vger.kernel.org
-Cc: marcel@holtmann.org,
-	alex.aring@gmail.com,
-	jukka.rissanen@linux.intel.com,
-	Martin Townsend <martin.townsend@xsilon.com>
-Subject: [PATCH v2 bluetooth-next 0/4] 6lowpan: Move skb delivery out of IPHC
-Date: Mon, 20 Oct 2014 15:39:47 +0100
-Message-Id: <1413815991-5078-1-git-send-email-martin.townsend@xsilon.com>
+From: Ruslan Mstoi <ruslan.mstoi@linux.intel.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Ruslan Mstoi <ruslan.mstoi@linux.intel.com>
+Subject: [PATCH] android/pts: Updated SM PICS and PIXITs for PTS 5.3
+Date: Mon, 20 Oct 2014 17:21:08 +0300
+Message-Id: <1413814868-20811-1-git-send-email-ruslan.mstoi@linux.intel.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This series moves skb delivery out of IPHC and into the receive routines of
-both bluetooth and 802.15.4.  The reason is that we need to support more
-(de)compression schemes in the future.  It also means that calling 
-lowpan_process_data now only returns error codes or 0 for success so 
-this has been cleaned up.  The final patch then renames occurences of
-lowpan_process_data and process_data to something more meaningful.
+---
+ android/pics-sm.txt  |  6 +++---
+ android/pixit-sm.txt |  2 +-
+ android/pts-sm.txt   | 12 +++++-------
+ 3 files changed, 9 insertions(+), 11 deletions(-)
 
-v1 -> v2
-
-* Handle freeing of skb in lowpan_give_skb_to_devices for 802.15.14
-* Added another skb_consume in bluetooth code for uncompressed IPv6 headers
-* Added missing skb_consume for local_skb for bluetooth in compreesed IPv6 header
-  path
-* Combine patch 4 into 1.
-
-Martin Townsend (4):
-  6lowpan: remove skb_deliver from IPHC
-  6lowpan: fix process_data return values
-  bluetooth:6lowpan: use consume_skb when packet processed successfully
-  ieee802154: 6lowpan: rename process_data and lowpan_process_data
-
- include/net/6lowpan.h         | 12 ++++++------
- net/6lowpan/iphc.c            | 42 ++++++++++++----------------------------
- net/bluetooth/6lowpan.c       | 34 +++++++++++++++++++++-----------
- net/ieee802154/6lowpan_rtnl.c | 45 +++++++++++++++++++++++--------------------
- 4 files changed, 65 insertions(+), 68 deletions(-)
-
+diff --git a/android/pics-sm.txt b/android/pics-sm.txt
+index dcdfff8..c1bfe0e 100644
+--- a/android/pics-sm.txt
++++ b/android/pics-sm.txt
+@@ -1,6 +1,6 @@
+ SM PICS for the PTS tool.
+ 
+-PTS version: 5.2
++PTS version: 5.3
+ 
+ * - different than PTS defaults
+ 
+@@ -25,7 +25,7 @@ Parameter Name	Selected	Description
+ TSPC_SM_2_1	True		Authenticated MITM protection (O)
+ TSPC_SM_2_2	True		Unauthenticated no MITM protection (C.1)
+ TSPC_SM_2_3	True		No security requirements (M)
+-TSPC_SM_2_4	False		OOB supported (O)
++TSPC_SM_2_4	False (*)	OOB supported (O)
+ -------------------------------------------------------------------------------
+ C.1: If TSPC_SM_2_1 is supported then Mandatory, else Optional
+ -------------------------------------------------------------------------------
+@@ -45,7 +45,7 @@ Parameter Name	Selected	Description
+ -------------------------------------------------------------------------------
+ TSPC_SM_4_1	True		Just Works (O)
+ TSPC_SM_4_2	True		Passkey Entry (C.1)
+-TSPC_SM_4_3	False		Out of Band (C.1)
++TSPC_SM_4_3	False (*)	Out of Band (C.1)
+ -------------------------------------------------------------------------------
+ C.1: If TSPC_SM_2_1 is supported, at least one of these features shall be
+ 	supported.
+diff --git a/android/pixit-sm.txt b/android/pixit-sm.txt
+index 2526e29..2d1442b 100644
+--- a/android/pixit-sm.txt
++++ b/android/pixit-sm.txt
+@@ -1,6 +1,6 @@
+ SM PIXIT for the PTS tool.
+ 
+-PTS version: 5.2
++PTS version: 5.3
+ 
+ * - different than PTS defaults
+ & - should be set to IUT Bluetooth address
+diff --git a/android/pts-sm.txt b/android/pts-sm.txt
+index a5c0aba..8a38d32 100644
+--- a/android/pts-sm.txt
++++ b/android/pts-sm.txt
+@@ -1,7 +1,7 @@
+ PTS test results for SM
+ 
+-PTS version: 5.2
+-Tested: 25-July-2014
++PTS version: 5.3
++Tested: 20-October-2014
+ Android version: 4.4.4
+ kernel version: 3.17
+ 
+@@ -66,8 +66,7 @@ TC_OOB_BI_01_C		N/A
+ TC_OOB_BI_02_C		N/A
+ TC_EKS_BV_01_C		PASS
+ TC_EKS_BV_02_C		PASS
+-TC_EKS_BI_01_C		INC	PTS issue #12449
+-				btmgmt io-cap 0x03
++TC_EKS_BI_01_C		PASS	btmgmt io-cap 0x03
+ TC_EKS_BI_02_C		PASS
+ TC_SIGN_BV_01_C		INC	PTS issue #12305
+ TC_SIGN_BV_03_C		PASS	haltest
+@@ -79,7 +78,7 @@ TC_KDU_BV_01_C		PASS	btmgmt pairable on
+ TC_KDU_BV_02_C		PASS	PTS issue #12302
+ 				Note: Can pass it with following instructions:
+ 				btmgmt privacy on
+-				btmgmt advetising on
++				btmgmt advertising on
+ 				Check our random address (valid for 15 min)
+ 				Set PIXIT TSPX_bd_addr_iut to random address
+ 				Set PIXIT TSPX_peer_type to 01
+@@ -95,7 +94,6 @@ TC_KDU_BV_05_C		PASS	PTS issue #12302
+ TC_KDU_BV_06_C		PASS	btmgmt pair -c 0x03 -t 0x01 <addr>
+ TC_KDU_BV_07_C		PASS	btmgmt pairable on
+ TC_SIP_BV_01_C		PASS	btmgmt pair -c 0x03 -t 0x01 <addr>
+-TC_SIP_BV_02_C		INC	PTS issue #12460
+-				l2test -n -J4 -V le_public <addr>
++TC_SIP_BV_02_C		PASS	l2test -n -J4 -V le_public <addr>
+ TC_SIE_BV_01_C		PASS	btmgmt pair -c 0x03 -t 0x01 <addr>
+ -------------------------------------------------------------------------------
 -- 
 1.9.1
+
