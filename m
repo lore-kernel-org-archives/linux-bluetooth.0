@@ -1,13 +1,15 @@
 Return-Path: <cyrus@holtmann.org>
-From: Bharat Bhusan Panda <bharat.panda@samsung.com>
+From: Gowtham Anandha Babu <gowtham.ab@samsung.com>
 To: 'Luiz Augusto von Dentz' <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org, cpgs@samsung.com
-References: <1412610595-16393-1-git-send-email-bharat.panda@samsung.com>
- <CABBYNZLTMaJQ2hO_LoCgZQz-EwCQ9LuD9mDgK-w54XDc3wNCvw@mail.gmail.com>
-In-reply-to: <CABBYNZLTMaJQ2hO_LoCgZQz-EwCQ9LuD9mDgK-w54XDc3wNCvw@mail.gmail.com>
-Subject: RE: [PATCH ] audio/avrcp: Add Support for PLAYBACK_POS_CHANGED_EVENT
-Date: Mon, 20 Oct 2014 18:41:57 +0530
-Message-id: <018701cfec67$7ad7bfa0$70873ee0$@samsung.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	'Bharat Panda' <bharat.panda@samsung.com>,
+	'Dmitry Kasatkin' <d.kasatkin@samsung.com>, cpgs@samsung.com
+References: <000b01cfe94c$216de430$6449ac90$@samsung.com>
+ <CABBYNZKPex1xe0yJQkfOopBWj3QRiwF4cQd=1Jxj=xOLV69QJw@mail.gmail.com>
+In-reply-to: <CABBYNZKPex1xe0yJQkfOopBWj3QRiwF4cQd=1Jxj=xOLV69QJw@mail.gmail.com>
+Subject: RE: Query regarding creation of multiple MAS Instance ID:
+Date: Mon, 20 Oct 2014 18:29:31 +0530
+Message-id: <000301cfec65$bdb08cf0$3911a6d0$@samsung.com>
 MIME-version: 1.0
 Content-type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -15,271 +17,373 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Luiz,
 
-> > As per AVRCP 1.5 spec, 6.7.2, page 57.
-> >
-> > EVENT_PLAYBACK_POS_CHANGED shall be notified in the following
-> conditions:
-> >
-> >         1. TG has reached the registered playback Interval time.
-> >         2. Changed PLAY STATUS.
-> >         3. Changed Current Track.
-> >         4. Reached end or beginning of track.
-> > ---
-> >  profiles/audio/avrcp.c | 49
-> > +++++++++++++++++++++++++++++++++++++++++++++++++
-> >  profiles/audio/avrcp.h |  1 +
-> >  profiles/audio/media.c | 23 ++++++++++++++---------
-> >  3 files changed, 64 insertions(+), 9 deletions(-)
-> >
-> > diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c index
-> > 5c3c4f9..77f1dcb 100644
-> > --- a/profiles/audio/avrcp.c
-> > +++ b/profiles/audio/avrcp.c
-> > @@ -198,6 +198,7 @@ struct pending_list_items {  struct avrcp_player {
-> >         struct avrcp_server *server;
-> >         GSList *sessions;
-> > +       uint16_t pos_timer;
-> >         uint16_t id;
-> >         uint8_t scope;
-> >         uint64_t uid;
-> > @@ -627,6 +628,7 @@ void avrcp_player_event(struct avrcp_player
-> *player, uint8_t id,
-> >         uint8_t buf[AVRCP_HEADER_LENGTH + 9];
-> >         struct avrcp_header *pdu = (void *) buf;
-> >         uint16_t size;
-> > +       uint32_t *pos = NULL;
-> >         GSList *l;
-> >         int attr;
-> >         int val;
-> > @@ -673,6 +675,18 @@ void avrcp_player_event(struct avrcp_player
-> *player, uint8_t id,
-> >                 pdu->params[size++] = attr;
-> >                 pdu->params[size++] = val;
-> >                 break;
-> > +       case AVRCP_EVENT_PLAYBACK_POS_CHANGED:
-> > +               size = 5;
-> > +               pos = (uint32_t *) data;
-> > +
-> > +               be32toh(*pos);
-> > +               memcpy(&pdu->params[1], pos, sizeof(uint32_t));
-> > +
-> > +               if (player->pos_timer > 0) {
-> > +                       g_source_remove(player->pos_timer);
-> > +                       player->pos_timer = 0;
-> > +               }
-> > +               break;
+> -----Original Message-----
+> From: Luiz Augusto von Dentz [mailto:luiz.dentz@gmail.com]
+> Sent: Friday, October 17, 2014 5:11 PM
+> To: Gowtham Anandha Babu
+> Cc: linux-bluetooth@vger.kernel.org; Bharat Panda; Dmitry Kasatkin;
+> cpgs@samsung.com
+> Subject: Re: Query regarding creation of multiple MAS Instance ID:
 > 
-> Note that it is meant to be playback interval, so if it is not playing we should
-> not send anything.
-Yes, will change it accordingly.
+> Hi,
 > 
-> >         default:
-> >                 error("Unknown event %u", id);
-> >                 return;
-> > @@ -1429,6 +1443,19 @@ static bool handle_passthrough(struct avctp
-> *conn, uint8_t op, bool pressed,
-> >         return handler->func(session);  }
+> On Thu, Oct 16, 2014 at 4:18 PM, Gowtham Anandha Babu
+> <gowtham.ab@samsung.com> wrote:
+> > Hi All,
 > >
-> > +static gboolean interval_timeout(gpointer user_data) {
-> > +       uint32_t pos;
-> > +       struct avrcp_player *mp = user_data;
-> > +
-> > +       pos = player_get_position(mp);
-> > +       mp->pos_timer = 0;
-> > +       avrcp_player_event(mp, AVRCP_EVENT_PLAYBACK_POS_CHANGED,
-> > +                                               &pos);
-> > +
-> > +       return FALSE;
-> > +}
-> > +
-> >  static uint8_t avrcp_handle_register_notification(struct avrcp *session,
-> >                                                 struct avrcp_header *pdu,
-> >                                                 uint8_t transaction)
-> > @@ -1436,6 +1463,8 @@ static uint8_t
-> avrcp_handle_register_notification(struct avrcp *session,
-> >         struct avrcp_player *player = target_get_player(session);
-> >         struct btd_device *dev = session->dev;
-> >         uint16_t len = ntohs(pdu->params_len);
-> > +       uint32_t interval;
-> > +       uint32_t pos;
-> >         uint64_t uid;
-> >         GList *settings;
-> >
-> > @@ -1467,6 +1496,20 @@ static uint8_t
-> avrcp_handle_register_notification(struct avrcp *session,
-> >         case AVRCP_EVENT_TRACK_REACHED_START:
-> >                 len = 1;
-> >                 break;
-> > +       case AVRCP_EVENT_PLAYBACK_POS_CHANGED:
-> > +               len = 5;
-> > +
-> > +               interval = htole32(pdu->params[1]);
-> > +               player->pos_timer = g_timeout_add_seconds(interval,
-> > +
-> > + interval_timeout, player);
-> > +
-> > +               pos = player_get_position(player);
-> > +               be32toh(pos);
-> > +               /* Fill the value for sending INTERIM response */
-> > +               memcpy(&pdu->params[1], &pos, sizeof(uint32_t));
-> > +
-> > +               break;
-> > +
-> >         case AVRCP_EVENT_SETTINGS_CHANGED:
-> >                 len = 1;
-> >                 settings = player_list_settings(player); @@ -2949,6
-> > +2992,11 @@ static void player_destroy(gpointer data)
-> >         if (player->destroy)
-> >                 player->destroy(player->user_data);
-> >
-> > +       if (player->pos_timer != 0) {
-> > +               g_source_remove(player->pos_timer);
-> > +               player->pos_timer = 0;
-> > +       }
-> > +
-> >         g_slist_free(player->sessions);
-> >         g_free(player->path);
-> >         g_free(player->change_path);
-> > @@ -3407,6 +3455,7 @@ static void target_init(struct avrcp *session)
-> >                                 (1 << AVRCP_EVENT_TRACK_CHANGED) |
-> >                                 (1 << AVRCP_EVENT_TRACK_REACHED_START) |
-> >                                 (1 << AVRCP_EVENT_TRACK_REACHED_END) |
-> > +                               (1 <<
-> > + AVRCP_EVENT_PLAYBACK_POS_CHANGED) |
-> >                                 (1 << AVRCP_EVENT_SETTINGS_CHANGED);
-> >
-> >         if (target->version < 0x0104)
-> > diff --git a/profiles/audio/avrcp.h b/profiles/audio/avrcp.h index
-> > 6ac5294..4816e4b 100644
-> > --- a/profiles/audio/avrcp.h
-> > +++ b/profiles/audio/avrcp.h
-> > @@ -74,6 +74,7 @@
-> >  #define AVRCP_EVENT_TRACK_CHANGED              0x02
-> >  #define AVRCP_EVENT_TRACK_REACHED_END          0x03
-> >  #define AVRCP_EVENT_TRACK_REACHED_START                0x04
-> > +#define        AVRCP_EVENT_PLAYBACK_POS_CHANGED        0x05
-> >  #define AVRCP_EVENT_SETTINGS_CHANGED           0x08
-> >  #define AVRCP_EVENT_AVAILABLE_PLAYERS_CHANGED  0x0a
-> >  #define AVRCP_EVENT_ADDRESSED_PLAYER_CHANGED   0x0b
-> > diff --git a/profiles/audio/media.c b/profiles/audio/media.c index
-> > ef7b910..cc19c61 100644
-> > --- a/profiles/audio/media.c
-> > +++ b/profiles/audio/media.c
-> > @@ -1305,6 +1305,9 @@ static gboolean set_status(struct media_player
-> *mp, DBusMessageIter *iter)
-> >         mp->status = g_strdup(value);
-> >
-> >         avrcp_player_event(mp->player, AVRCP_EVENT_STATUS_CHANGED,
-> > mp->status);
-> > +       avrcp_player_event(mp->player,
-> > +                                       AVRCP_EVENT_PLAYBACK_POS_CHANGED,
-> > +                                       &mp->position);
-> >
-> >         return TRUE;
-> >  }
-> > @@ -1312,7 +1315,6 @@ static gboolean set_status(struct media_player
-> > *mp, DBusMessageIter *iter)  static gboolean set_position(struct
-> > media_player *mp, DBusMessageIter *iter)  {
-> >         uint64_t value;
-> > -       const char *status;
-> >
-> >         if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_INT64)
-> >                         return FALSE;
-> > @@ -1321,11 +1323,6 @@ static gboolean set_position(struct
-> > media_player *mp, DBusMessageIter *iter)
-> >
-> >         value /= 1000;
-> >
-> > -       if (value > get_position(mp))
-> > -               status = "forward-seek";
-> > -       else
-> > -               status = "reverse-seek";
-> > -
+> > I am working on obexd MAP profile. Is it possible to create multiple
+> > MAS Instance in bluez?
+> > Because right now bluez has only one MAS Instance support (only one
+> > MAS_UUID), which is advertised to MCE based on the XML format
+> followed
+> > in src/profile.c.
+> > When I add one more record to MAS_RECORD XML format by changing the
+> > value as 0x01, I am not able see two instances getting loaded.
+> >                 <attribute id=\"0x0315\">                               \
+> >                         <uint8 value=\"0x01\"/>                 \
+> >                 </attribute>                                            \
 > 
-> Not sure what is reasoning of removing these, the remote side may not
-> register for position change and in that case it would not get any seek event
-> to synchronize the position.
-
-Yes, PLAYBACK_STATUS_CHANGED and POSITION_CHANGED both should be sent in this case.
-If only PLAYBACK_STATUS_CHANGED is sent, the CT will query for position if it didn’t receive " POSITION_CHANGED " event after PLAYBACK_STATUS_CHANGED.
+> How you are doing that? You should be able to call
+> ProfileManager1.RegisterProfile if that is what you doing and it is not working
+> perhaps we have a bug somewhere. Two very important things you need to
+> check:
 > 
-> >         mp->position = value;
-> >         g_timer_start(mp->timer);
+> 1. It cannot use the same path for both instances 2. Each instance needs a
+> different channel
+> 
+> So if you are register via XML you need to take care of those details, but
+> perhaps you are using the default record by just providing the UUID, that
+> probably will not work because apparently we have hardcoded the channel,
+> if that is the case we should probably add a check if there is another instance
+> already register and use a different channel/psm.
+> 
+> > Do we need to create one more UUID like OBEX_MAS1_UUID and
+> > OBEX_MAS2_UUID to support multiple mas instances?
+> > Or what could be the possible solutions?
+> 
+> Each instance has to have the service class set to MAS UUID, otherwise no
+> one will be able to discover it.
+> 
 > >
-> > @@ -1334,6 +1331,9 @@ static gboolean set_position(struct media_player
-> *mp, DBusMessageIter *iter)
-> >         if (!mp->position) {
-> >                 avrcp_player_event(mp->player,
+> > Regards.
+> > Gowtham Anandha Babu
 > >
-> > AVRCP_EVENT_TRACK_REACHED_START, NULL);
-> > +               avrcp_player_event(mp->player,
-> > +                                       AVRCP_EVENT_PLAYBACK_POS_CHANGED,
-> > +                                       &mp->position);
-> >                 return TRUE;
-> >         }
-> >
-> > @@ -1344,11 +1344,13 @@ static gboolean set_position(struct
-> media_player *mp, DBusMessageIter *iter)
-> >         if (mp->position == UINT32_MAX || mp->position >= mp->duration) {
-> >                 avrcp_player_event(mp->player,
-> AVRCP_EVENT_TRACK_REACHED_END,
-> >
-> > NULL);
-> > +               avrcp_player_event(mp->player,
-> > +                                       AVRCP_EVENT_PLAYBACK_POS_CHANGED,
-> > +                                       &mp->position);
-> >                 return TRUE;
-> >         }
-> > -
-> > -       /* Send a status change to force resync the position */
-> > -       avrcp_player_event(mp->player, AVRCP_EVENT_STATUS_CHANGED,
-> status);
-> > +       avrcp_player_event(mp->player,
-> AVRCP_EVENT_PLAYBACK_POS_CHANGED,
-> > +
-> > + &mp->position);
-> >
-> >         return TRUE;
-> >  }
-> > @@ -1456,6 +1458,7 @@ static gboolean parse_player_metadata(struct
-> media_player *mp,
-> >         int ctype;
-> >         gboolean title = FALSE;
-> >         uint64_t uid;
-> > +       uint32_t pos;
-> >
-> >         ctype = dbus_message_iter_get_arg_type(iter);
-> >         if (ctype != DBUS_TYPE_ARRAY)
-> > @@ -1521,9 +1524,11 @@ static gboolean parse_player_metadata(struct
-> media_player *mp,
-> >         mp->position = 0;
-> >         g_timer_start(mp->timer);
-> >         uid = get_uid(mp);
-> > +       pos = get_position(mp);
-> >
-> >         avrcp_player_event(mp->player, AVRCP_EVENT_TRACK_CHANGED,
-> &uid);
-> >         avrcp_player_event(mp->player,
-> > AVRCP_EVENT_TRACK_REACHED_START, NULL);
-> > +       avrcp_player_event(mp->player,
-> > + AVRCP_EVENT_PLAYBACK_POS_CHANGED, &pos);
-> >
-> >         return TRUE;
-> >  }
 > > --
-> > 1.9.1
+> > To unsubscribe from this list: send the line "unsubscribe
+> > linux-bluetooth" in the body of a message to majordomo@vger.kernel.org
+> > More majordomo info at  http://vger.kernel.org/majordomo-info.html
 > 
-> Overall EVENT_PLAYBACK_POS_CHANGED cause more problems than it
-> solves, because position is already part of the play status and that normally
-> has to be queried anyway, also self synchronizing is way more efficient since
-> we can't estimate the speed when the playback is fast-foward or rewind, and
-> even if we could that would generate a lot of traffic depending on what
-> interval the remote side wants to be updated.
+> 
+> 
+> --
+> Luiz Augusto von Dentz
 
-Playback position was not a part of play status though, it was trying resync the position by sending forward-seek or reverse seek as status changed event.
-In some control devices, it expects a playback_pos_changed event followed by TRACK_REACHED_START, TRACK_REACHED_END, PLAYBACK_STATUS_CHANGED and also when interval of registered for getting the playback position.
-Your input on the same will be highly valuable.
+Here is what I did exactly after your comments, 
 
-Best Regards,
-Bharat
+1) Based on the flag, I managed the two MAS Instances in bluetooth.c
+
+diff --git a/obexd/plugins/bluetooth.c b/obexd/plugins/bluetooth.c
+index cf326cc..3a0c022 100644
+--- a/obexd/plugins/bluetooth.c
++++ b/obexd/plugins/bluetooth.c
+@@ -50,6 +50,8 @@
+ #define BT_RX_MTU 32767
+ #define BT_TX_MTU 32767
+ 
++gboolean MAS = FALSE;
++
+ struct bluetooth_profile {
+ 	struct obex_server *server;
+ 	struct obex_service_driver *driver;
+@@ -269,7 +271,20 @@ static int register_profile(struct bluetooth_profile *profile)
+ 	char *xml;
+ 	int ret = 0;
+ 
+-	profile->path = g_strconcat("/org/bluez/obex/", profile->uuid, NULL);
++
++	if(!g_ascii_strcasecmp(profile->uuid, OBEX_MAS_UUID))
++		if(!MAS) {
++			profile->path = g_strconcat("/org/bluez/obex/MAS1/", 
++							profile->uuid, NULL);
++			MAS = TRUE;
++		}
++		else
++			profile->path = g_strconcat("/org/bluez/obex/MAS2/", 
++							profile->uuid, NULL);
++	else
++		profile->path = g_strconcat("/org/bluez/obex/", profile->uuid, NULL);
++
+ 	g_strdelimit(profile->path, "-", '_');
+ 
+ 	if (!g_dbus_register_interface(connection, profile->path,
+@@ -290,6 +305,10 @@ static int register_profile(struct bluetooth_profile *profile)
+ 
+ 	dbus_message_iter_append_basic(&iter, DBUS_TYPE_OBJECT_PATH,
+ 							&profile->path);
+ 	dbus_message_iter_append_basic(&iter, DBUS_TYPE_STRING,
+ 							&profile->uuid);
+ 	dbus_message_iter_open_container(&iter, DBUS_TYPE_ARRAY,
+@@ -346,7 +365,9 @@ static const char *service2uuid(uint16_t service)
+ 		return "00005005-0000-1000-8000-0002ee000001";
+ 	case OBEX_SYNCEVOLUTION:
+ 		return "00000002-0000-1000-8000-0002ee000002";
+-	case OBEX_MAS:
++	case OBEX_MAS1:
++		return OBEX_MAS_UUID;
++	case OBEX_MAS2:
+ 		return OBEX_MAS_UUID;
+ 	case OBEX_MNS:
+ 		return OBEX_MNS_UUID;
+
+2) Created one more MAS Instance in mas.c
+
+diff --git a/obexd/plugins/mas.c b/obexd/plugins/mas.c
+index fb97fe3..fb482e2 100644
+--- a/obexd/plugins/mas.c
++++ b/obexd/plugins/mas.c
+@@ -728,9 +728,9 @@ static int any_close(void *obj)
+ 	return 0;
+ }
+ 
+-static struct obex_service_driver mas = {
+-	.name = "Message Access server",
+-	.service = OBEX_MAS,
++static struct obex_service_driver mas1 = {
++	.name = "Message Access server 1",
++	.service = OBEX_MAS1,
+ 	.target = MAS_TARGET,
+ 	.target_size = TARGET_SIZE,
+ 	.connect = mas_connect,
+@@ -740,6 +740,18 @@ static struct obex_service_driver mas = {
+ 	.disconnect = mas_disconnect,
+ };
+ 
++static struct obex_service_driver mas2 = {
++        .name = "Message Access server 2",
++        .service = OBEX_MAS2,
++        .target = MAS_TARGET,
++        .target_size = TARGET_SIZE,
++        .connect = mas_connect,
++        .get = mas_get,
++        .put = mas_put,
++        .setpath = mas_setpath,
++        .disconnect = mas_disconnect,
++};
++
+ static struct obex_mime_type_driver mime_map = {
+ 	.target = MAS_TARGET,
+ 	.target_size = TARGET_SIZE,
+@@ -838,10 +850,14 @@ static int mas_init(void)
+ 			goto failed;
+ 	}
+ 
+-	err = obex_service_driver_register(&mas);
++	err = obex_service_driver_register(&mas1);
+ 	if (err < 0)
+ 		goto failed;
+ 
++	err = obex_service_driver_register(&mas2);
++	if(err < 0)
++		goto failed;
++
+ 	return 0;
+ 
+ failed:
+@@ -857,7 +873,8 @@ static void mas_exit(void)
+ {
+ 	int i;
+ 
+-	obex_service_driver_unregister(&mas);
++	obex_service_driver_unregister(&mas1);
++        	obex_service_driver_unregister(&mas2);
+ 
+ 	for (i = 0; map_drivers[i] != NULL; ++i)
+ 		obex_mime_type_driver_unregister(map_drivers[i]);
+@@ -865,4 +882,5 @@ static void mas_exit(void)
+ 	messages_exit();
+ }
+ 
+-OBEX_PLUGIN_DEFINE(mas, mas_init, mas_exit)
++OBEX_PLUGIN_DEFINE(mas1, mas_init, mas_exit)
++OBEX_PLUGIN_DEFINE(mas2, mas_init, mas_exit)
+diff --git a/obexd/src/obexd.h b/obexd/src/obexd.h
+index 42c3c4d..59de70e 100644
+--- a/obexd/src/obexd.h
++++ b/obexd/src/obexd.h
+@@ -28,7 +28,8 @@
+ #define OBEX_IRMC	(1 << 5)
+ #define OBEX_PCSUITE	(1 << 6)
+ #define OBEX_SYNCEVOLUTION	(1 << 7)
+-#define OBEX_MAS	(1 << 8)
++#define OBEX_MAS1	(1 << 8)
++#define OBEX_MAS2	(1 << 10)
+ #define OBEX_MNS	(1 << 9)
+ 
+ gboolean plugin_init(const char *pattern, const char *exclude);
+
+3) Assigned different channel and path for both instances 
+4)Added one more SDP record (XML) in profile.c
+
+diff --git a/src/profile.c b/src/profile.c
+index 7aca3be..ab5b5c2 100644
+--- a/src/profile.c
++++ b/src/profile.c
+@@ -62,7 +62,8 @@
+ #define HFP_AG_DEFAULT_CHANNEL	13
+ #define SYNC_DEFAULT_CHANNEL	14
+ #define PBAP_DEFAULT_CHANNEL	15
+-#define MAS_DEFAULT_CHANNEL	16
++#define MAS1_DEFAULT_CHANNEL	16
++#define MAS2_DEFAULT_CHANNEL	18
+ #define MNS_DEFAULT_CHANNEL	17
+ 
+ #define BTD_PROFILE_PSM_AUTO	-1
+@@ -395,7 +396,7 @@
+ 		</attribute>						\
+ 	</record>"
+ 
+-#define MAS_RECORD							\
++#define MAS_RECORD1							\
+ 	"<?xml version=\"1.0\" encoding=\"UTF-8\" ?>			\
+ 	<record>							\
+ 		<attribute id=\"0x0001\">				\
+@@ -441,6 +442,52 @@
+ 		</attribute>						\
+ 	</record>"
+ 
++#define MAS_RECORD2							\
++	"<?xml version=\"1.0\" encoding=\"UTF-8\" ?>			\
++	<record>							\
++		<attribute id=\"0x0001\">				\
++			<sequence>					\
++				<uuid value=\"0x1132\"/>		\
++			</sequence>					\
++		</attribute>						\
++		<attribute id=\"0x0004\">				\
++			<sequence>					\
++				<sequence>				\
++					<uuid value=\"0x0100\"/>	\
++				</sequence>				\
++				<sequence>				\
++					<uuid value=\"0x0003\"/>	\
++					<uint8 value=\"0x%02x\"/>	\
++				</sequence>				\
++				<sequence>				\
++					<uuid value=\"0x0008\"/>	\
++				</sequence>				\
++			</sequence>					\
++		</attribute>						\
++		<attribute id=\"0x0005\">				\
++			<sequence>					\
++				<uuid value=\"0x1002\" />		\
++			</sequence>					\
++		</attribute>						\
++		<attribute id=\"0x0009\">				\
++			<sequence>					\
++				<sequence>				\
++					<uuid value=\"0x1134\"/>	\
++					<uint16 value=\"0x%04x\" />	\
++				</sequence>				\
++			</sequence>					\
++		</attribute>						\
++		<attribute id=\"0x0100\">				\
++			<text value=\"%s\"/>				\
++		</attribute>						\
++		<attribute id=\"0x0315\">				\
++			<uint8 value=\"0x01\"/>				\
++		</attribute>						\
++		<attribute id=\"0x0316\">				\
++			<uint8 value=\"0x0F\"/>				\
++		</attribute>						\
++	</record>"
++
+ #define MNS_RECORD							\
+ 	"<?xml version=\"1.0\" encoding=\"UTF-8\" ?>			\
+ 	<record>							\
+@@ -562,6 +609,8 @@
+ 
+ struct ext_io;
+ 
++gboolean MAS = FALSE;
++
+ struct ext_profile {
+ 	struct btd_profile p;
+ 
+@@ -1734,10 +1787,17 @@ static char *get_pse_record(struct ext_profile *ext, struct ext_io *l2cap,
+ 								ext->name);
+ }
+ 
+-static char *get_mas_record(struct ext_profile *ext, struct ext_io *l2cap,
++static char *get_mas_record1(struct ext_profile *ext, struct ext_io *l2cap,
++							struct ext_io *rfcomm)
++{
++	return g_strdup_printf(MAS_RECORD1, rfcomm->chan, ext->version,
++								ext->name);
++}
++
++static char *get_mas_record2(struct ext_profile *ext, struct ext_io *l2cap,
+ 							struct ext_io *rfcomm)
+ {
+-	return g_strdup_printf(MAS_RECORD, rfcomm->chan, ext->version,
++	return g_strdup_printf(MAS_RECORD2, rfcomm->chan, ext->version,
+ 								ext->name);
+ }
+ 
+@@ -1949,10 +2009,17 @@ static struct default_settings {
+ 		.version	= 0x0101,
+ 	}, {
+ 		.uuid		= OBEX_MAS_UUID,
+-		.name		= "Message Access",
+-		.channel	= MAS_DEFAULT_CHANNEL,
++		.name		= "Message Access 1",
++		.channel	= MAS1_DEFAULT_CHANNEL,
++		.authorize	= true,
++		.get_record	= get_mas_record1,
++		.version	= 0x0100
++	}, {
++		.uuid		= OBEX_MAS_UUID,
++		.name		= "Message Access 2",
++		.channel	= MAS2_DEFAULT_CHANNEL,
+ 		.authorize	= true,
+-		.get_record	= get_mas_record,
++		.get_record	= get_mas_record2,
+ 		.version	= 0x0100
+ 	}, {
+ 		.uuid		= OBEX_MNS_UUID,
+@@ -1981,8 +2048,21 @@ static void ext_set_defaults(struct ext_profile *ext)
+ 		struct default_settings *settings = &defaults[i];
+ 		const char *remote_uuid;
+ 
++		DBG("%s ==  %s",ext->uuid, settings->uuid);
++
+ 		if (strcasecmp(ext->uuid, settings->uuid) != 0)
+ 			continue;
++		
++		if(!strcasecmp(ext->uuid, OBEX_MAS_UUID))
++			if(MAS) {
++				MAS = 0;
++				continue;
++			}
++		
++		if(!strcasecmp(ext->uuid, OBEX_MAS_UUID))
++			MAS = TRUE;
++
++		DBG("MATCHED  %s ==  %s MAS = %d",ext->uuid, settings->uuid, MAS);
+ 
+ 		if (settings->remote_uuid)
+ 			remote_uuid = settings->remote_uuid;
+@@ -2022,6 +2102,8 @@ static void ext_set_defaults(struct ext_profile *ext)
+ 
+ 		if (settings->name)
+ 			ext->name = g_strdup(settings->name);
++		
++		return;
+ 	}
+ }
+
+
+After this changes I am able to load the two MAS Instances successfully. Is it fine? What do you think?
+
+Regards,
+Gowtham Anandha Babu 
 
