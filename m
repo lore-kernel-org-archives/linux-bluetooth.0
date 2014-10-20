@@ -1,90 +1,51 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@gmail.com>
-To: Jeff Chua <jeff.chua.linux@gmail.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>, linux-bluetooth <linux-bluetooth@vger.kernel.org>
-Subject: Re: how to set PSCAN mode in .conf?
-Date: Mon, 20 Oct 2014 20:49:01 +0200
-Message-ID: <5460120.arhYbJZIVa@athlon>
-In-Reply-To: <CAAJw_ZvrynW0W6fE21ieG+KUwWr_g7-9kDonKYT3ZoEi3Nntiw@mail.gmail.com>
-References: <CAAJw_ZuK6SUy22R133CezsqoU4+dTzxmsipBAp7rCvYBo+zrxw@mail.gmail.com> <8940108C-6C27-49E3-80C8-8983F32D6F55@holtmann.org> <CAAJw_ZvrynW0W6fE21ieG+KUwWr_g7-9kDonKYT3ZoEi3Nntiw@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 8.0 \(1990.1\))
+Subject: Re: [RFC] need for new scan api for bluetooth low energy.
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <CAD0=r8wKVvcWTVarU3ik_j2F53f9LWjemA1SD4outm_O8atOOQ@mail.gmail.com>
+Date: Mon, 20 Oct 2014 20:22:02 +0200
+Cc: Arman Uguray <armansito@chromium.org>,
+	BlueZ development <linux-bluetooth@vger.kernel.org>,
+	Scott James Remnant <keybuk@google.com>
+Message-Id: <A03DCD0E-70CF-4509-AC41-6238E74DA5F9@holtmann.org>
+References: <CAD0=r8yozB8eMdJOuffUeQZVFVf5xEXnP5tCt+k3m0e9wzMxiA@mail.gmail.com> <735FD32E-BD15-4CE1-8D9C-44B8EC56DF7A@holtmann.org> <CAHrH25Q6XqsLjGyfoXwimrap9=kKHOQn-G=k4Fz6HXmEPJ7EtQ@mail.gmail.com> <20140917051457.GA4671@t440s.P-661HNU-F1> <CAD0=r8x-=O7XAqQF_wBHQEqSkfifzgWW2AagW2EvsDUtM-E_ow@mail.gmail.com> <20140917065252.GA5554@t440s.lan> <CAD0=r8z9g+F7Z9X_8PE4jk3JbA+oLj9Of33RSqxiRd0dn9AnXQ@mail.gmail.com> <8868B74C-0DDD-43C1-BCBF-2578A700EF72@holtmann.org> <CAD0=r8xQzhizXo4umQ_mG_WMH7Akp4bji-9PNRGzqj-7HWnyNA@mail.gmail.com> <0EA633E6-A0F5-4F67-B421-9857466C1175@holtmann.org> <CAD0=r8w035mLnWTKtEfxZ7agzwTFRO9dsv+6qdafcBG7RYzYDQ@mail.gmail.com> <F673E928-258E-47F7-B71A-F32410974538@holtmann.org> <CAD0=r8xMcGP-Hjt8uCSY9Qx9VJLov5scSwRTvFr3PAaOXXbyzQ@mail.gmail.com> <CAD0=r8zcPCWKyTQLQeG68uA21_sEv+5wDKNB-GJzgS1+BcD+bQ@mail.gmail.com> <372D8399-BFC6-413F-924F-44CE79030516@holtmann.org> <CAD0=r8x2bub9E+ohicwfxK0AAykRTUSrrTjAD-tFv-aj7xGoww@mail.gmail.com> <375944C8-4378-4589-A
+ 883-786F531EA291@holtmann.org> <CAD0=r8xDHvVq9QyCwo7_di_QRhbqEYdGJCKevQoEQ8WZRwA4dA@mail.gmail.com> <93AC6768-49F3-43CC-8014-83DD3C0EA3D3@holtmann.org> <8A0217F1-C062-466F-8C04-38E324BDD55D@holtmann.org> <CAD0=r8wuVAB0H1sRghzsmm0Ak9+r2_f13541_dP6QCV1ZeogNw@mail.gmail.com> <CAD0=r8wKVvcWTVarU3ik_j2F53f9LWjemA1SD4outm_O8atOOQ@mail.gmail.com>
+To: Jakub Pawlowski <jpawlowski@google.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jeff,
+Hi Jakub,
 
-On Tuesday 21 October 2014 01:40:46 Jeff Chua wrote:
-> On Mon, Oct 20, 2014 at 11:59 PM, Marcel Holtmann <marcel@holtmann.org> 
-wrote:
-> >> But on older bluez-5.21, the PSCAN and ISCAN are enabled automatically.
-> > 
-> > this is intentionally. Starting with BlueZ 5.23 and Linux 3.17, the Page
-> > Scan state is controlled by the kernel. If you have no devices paired /
-> > configured, then it will just disable Page Scan. If you do not know about
-> > devices, then there is also no point in allowing anybody to connect.
-> > 
-> > You can use the management command Add Device to add BR/EDR devices. If
-> > you add at least one device, then Page Scan will be enabled automatically
-> > by the kernel. If you want to be always connectable, then you can set the
-> > device manually connectable.
-> > 
-> > Using bluetoothctl does exactly the right thing. For being discoverable,
-> > you need to be connectable and discoverable. So Page Scan and Inquiry
-> > Scan enabled. However if you do not have any paired devices and turn
-> > discoverable back off, then both will be disabled.
-> > 
-> > Just try it. Pair with a device and see that Page Scan gets turn on
-> > magically.
-> Marcel,
-> 
-> Excellent info that would have taken me a long time to find out!
-> Thanks for sharing!
-> 
-> I tried  ...
-> 
-> # btmgmt add-device -t BR/EDR -a 1 F4:B7:E2:E9:54:68
-> hci0:   Type: BR/EDR  Bus: USB
->         BD Address: F4:B7:E2:E9:54:68  ACL MTU: 1021:8  SCO MTU: 64:1
->         UP RUNNING PSCAN
-> 
-> I don't know what the actions are supposed to do, but "-a 1" works.
-> 
-> Next I tried "connectable" but "info" still didn't show the
-> connectable and hciconfig didn't show ISCAN.
-> 
-> # btmgmt connectable F4:B7:E2:E9:54:68
-> hci0 Set Connectable complete, settings: powered bondable ssp br/edr le
+you really should not top-post on this mailing list. It breaks the flow for everybody else.
 
-Proper syntax for this would be:
-btmgmt -i hci0 connectable on
+> I started implementing service scanning and I have a questions:
+> 
+> We initially agreed on version that uses le deduplication that needs
+> to be restarted after each device found.
+> When I started looking into that it's going to be much more restarting:
+> - need to restart after each packet from device that advertise service
+> we're interested that's not in RSSI range. That's because controller
+> that I use doesn't send advertisement again when RSSI changes.
+> - need to restart every 0.5 or 1 second in case when some device added
+> service I'm interested at to it's advertisement
 
-> # btmgmt info
-> hci0:   addr F4:B7:E2:E9:54:68 version 6 manufacturer 15 class 0x000000
->         supported settings: powered connectable fast-connectable
-> discoverable bondable link-security ssp br/edr hs le advertising
-> debug-keys privacy configuration
->         current settings: powered bondable ssp br/edr le
-> 
-> But if I use bluetoothctl "discoverable on", ISCAN showed up on hciconfig.
-> 
-> And one last thing ... if I put btmgmt in a script and run it right up
-> hciconfig hci0 up, the command would not work. A minimum of "sleep 1"
-> is required.
-> 
-> So, what's the best way to set the device to be always discoverable?
-> And I need this because the "server" needs to be discoverable by the
-> Intermec scanners. The scanner would scan a "server barcode" to
-> connect to the server. And this was the default behavior on
-> bluez-5.21.
-> 
-> 
-> Thanks,
-> Jeff.
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth"
-> in the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+I think first we might need to have a HCI_QUIRK that we can set on hci_dev->quirks that tells us what kind of behavior the controller has. We can argue what is the expected default since the specification is pretty much unclear.
 
--- 
-Szymon K. Janc
-szymon.janc@gmail.com
+Since for all known devices, we are using the whitelist, I am happy to accept that Broadcom controllers just need a quirk to restart scanning. We have to find a nice sweat spot on when to do it. So this would need some testing. So just go and play with it.
+
+My initial take would be that when you see a device with the matching filter, then you start a timeout. And after that timeout restart. Postpone the timeout if you find more devices that match your filter up to x seconds. That should get your there.
+
+> Can we conseider implementation using le scan without deduplication,
+> and do packet de-duplication in kernel in hci_le_adv_report_evt ?
+> I've started implementing it this way and it works really nice. The
+> issue here might be that it might consume more energy.
+
+If you get a really bad controller, then this will go ballistic. Trust me, we had this and some controllers will report every single advertising packet up to the host. You can not process this quickly enough. It gets worse if you have a peripheral that advertises with a high duty cycle. Then you will consume extra power.
+
+You need to test this in a real scenario where you actually have tons and tons peripherals around. It can get really bad. I mean it all depends on what you are actually want to do and how much precision you need. My first instinct is to just restart scanning to get new results.
+
+Regards
+
+Marcel
+
