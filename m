@@ -1,54 +1,50 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 20 Oct 2014 11:10:46 +0200
-From: Alexander Aring <alex.aring@gmail.com>
-To: Martin Townsend <martin.townsend@xsilon.com>
-Cc: Martin Townsend <mtownsend1973@gmail.com>,
-	linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org,
-	marcel@holtmann.org, jukka.rissanen@linux.intel.com
-Subject: Re: [PATCH bluetooth-next 0/5] Move skb delivery out of IPHC.
-Message-ID: <20141020091043.GC5404@omega>
-References: <1413616153-7562-1-git-send-email-mtownsend1973@gmail.com>
- <20141020072520.GA5404@omega>
- <5444C90D.9020402@xsilon.com>
- <20141020085555.GB5404@omega>
- <5444CF99.4080305@xsilon.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-In-Reply-To: <5444CF99.4080305@xsilon.com>
+In-Reply-To: <2CF57A644018A745B8FE029C7223E16E11964A9B@SHSMSX104.ccr.corp.intel.com>
+References: <2CF57A644018A745B8FE029C7223E16E11964A9B@SHSMSX104.ccr.corp.intel.com>
+Date: Mon, 20 Oct 2014 12:02:55 +0300
+Message-ID: <CABBYNZKoNVhj91NQ1e3PF2ORaAcMs4NsX300bj0cLic1=Joicw@mail.gmail.com>
+Subject: Re: Use HFP as sco sink and source at the same time
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: "Zheng, Wu" <wu.zheng@intel.com>
+Cc: "Von Dentz, Luiz" <luiz.von.dentz@intel.com>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Mon, Oct 20, 2014 at 10:02:17AM +0100, Martin Townsend wrote:
-> Hi Alex,
-> 
-> I've completely forgotten what the original problem was it was so long ago :)  , let me dig through the old emails and see if I can jog my memory. 
-> 
-> My intention was to do the kfree_skb patch in my next submission but I'll see what I can do.
-> 
+Hi,
 
-yea, the problem a general error handling issue in mainly two parts:
+On Mon, Oct 20, 2014 at 11:15 AM, Zheng, Wu <wu.zheng@intel.com> wrote:
+> Hi Luiz,
+>
+> HFP is used on IVI and meet some issues.
+>
+> EXACT STEPS LEADING TO PROBLEM:
+> ===========================================================
+> 1. pair BT phone by bluetoothctl
+> 2. launch dialer app
+> 3. make voice call and answer, the voice can be heard from IVI speaker
+> 4. pair and connect BT headset with bluetoothctl
+>
+> EXPECTED OUTCOME:
+> ===================
+> Voice send out from the BT headset
+> ACTUAL OUTCOME
+> ===================
+> sound still heard from IVI speaker, doesn't auto switch to BT handset
+>
+> I don't make sure if Bluez can support it or not?
+>
+> Question: the SCOs connection of HFP on IVI can be used as SCO sink and source at the same time?
+>
+> It is the issue of https://bugs.tizen.org/jira/browse/TC-160.
 
- - detection errors. Means the NET_RX_FOO conversion to errno. But you
-   put out the netif_rx call outside of lowpan_header_create which is
-   very well. I approve that one. Now it's important that the "lowpan
-   give to upper layer" functions not returning ERRNO's and NET_RX_FOO.
-
-   Again, errno is a negative value and NET_RX_FOO is 0 or 1. We can't
-   check on a error with if (ret < 0) or (ret == NET_RX_DROP). Also
-   (ret != NET_RX_SUCCESS) will not work because it's "1" and "0"
-   indicate successful or sometimes not successful because NET_RX_DROP
-   was returned and this is "0". Lot of confusing here.
-
-   For the "lowpan give to upper layer" functions doesn't matter if
-   errno is returned or NET_RX_FOO, but don't a mix of both!
-   The "lowpan_header_create" should return errno's.
-
- - Second issue was a complete wrong reaction on error handling and
-   memory managment with "kfree_skb" which needs a fix of the above one
-   at first to introduce a correct error handling.
+Yes, by design it is duplex so both sink and source works
+simultaneously, perhaps you are talking about of sending the
+microphone data to the other end which has probably nothing to do with
+Bluetooth but with audio routing not being properly configured.
 
 
-Now I see a little bit the fix of the first one. But not the second one.
-Or should these things all fine now, otherwise I will take a more
-careful review.
-
-- Alex
+-- 
+Luiz Augusto von Dentz
