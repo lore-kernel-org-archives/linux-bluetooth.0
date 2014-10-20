@@ -1,47 +1,292 @@
 Return-Path: <cyrus@holtmann.org>
-From: Gowtham Anandha Babu <gowtham.ab@samsung.com>
+From: Alfonso Acosta <fons@spotify.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: d.kasatkin@samsung.com, bharat.panda@samsung.com, cpgs@samsung.com,
-	luiz.dentz@gmail.com, Gowtham Anandha Babu <gowtham.ab@samsung.com>
-Subject: [PATCH 1/3] obexd/map: Add support for MAP feature bits
-Date: Mon, 20 Oct 2014 20:34:27 +0530
-Message-id: <1413817469-4255-1-git-send-email-gowtham.ab@samsung.com>
+Subject: [PATCH v2] core: Add btd_adapter_recreate_bonding()
+Date: Mon, 20 Oct 2014 15:01:25 +0000
+Message-Id: <1413817285-23388-2-git-send-email-fons@spotify.com>
+In-Reply-To: <1413817285-23388-1-git-send-email-fons@spotify.com>
+References: <1413817285-23388-1-git-send-email-fons@spotify.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Handles MAP supported feature bits as per the
-MAP 1.2 specs section 7.1.1.
----
- obexd/client/map.c | 9 +++++++++
- 1 file changed, 9 insertions(+)
+This patch adds btd_adapter_recreate_bonding() which rebonds a device,
+i.e. it performs an unbonding operation inmediately followed by a
+bonding operation.
 
-diff --git a/obexd/client/map.c b/obexd/client/map.c
-index 44db96c..43b0471 100644
---- a/obexd/client/map.c
-+++ b/obexd/client/map.c
-@@ -100,6 +100,7 @@ struct map_data {
- 	GHashTable *messages;
- 	int16_t mas_instance_id;
- 	uint8_t supported_message_types;
-+	uint32_t supported_features;
- };
- 
- struct pending_request {
-@@ -2003,6 +2004,14 @@ static void parse_service_record(struct map_data *map)
- 		map->supported_message_types = *(uint8_t *)data;
- 	else
- 		DBG("Failed to read supported message types");
-+
-+	/* Supported Feature Bits */
-+	data = obc_session_get_attribute(map->session,
-+					SDP_ATTR_MAP_SUPPORTED_FEATURES);
-+	if(data != NULL)
-+		map->supported_features = *(uint32_t *)data;
-+	else
-+		map->supported_features = 0x0000001f;
+Although there is no internal use for btd_adapter_recreate_bonding()
+yet, it is useful for plugins dealing with devices which require
+renegotiaing their keys. For instance, when dealing with devices
+without persistent storage which lose their keys on reset.
+
+Certain caveats have been taken into account when rebonding with a LE
+device:
+
+ * If the device to rebond is already connected, the rebonding is done
+   without disconnecting to avoid the extra latency of reestablishing
+   the connection.
+
+ * If no connection exists, we connect before unbonding anyways to
+   avoid losing the device's autoconnection and connection parameters,
+   which are removed by the kernel when unpairing if no connection
+   exists.
+
+ * Not closing the connection requires defering attribute discovery
+   until the rebonding is done. Otherwise, the security level could be
+   elavated with the old LTK, which may be invalid since we are
+   rebonding. When rebonding, attribute discovery is suspended and the
+   ATT socket is saved to allow resuming it once bonding is finished.
+---
+ src/adapter.c | 57 ++++++++++++++++++++++++++++++++++++++++++++++++++++++---
+ src/adapter.h |  7 ++++++-
+ src/device.c  | 58 +++++++++++++++++++++++++++++++++++++++++++++++++++++++---
+ src/device.h  |  4 ++++
+ 4 files changed, 119 insertions(+), 7 deletions(-)
+
+diff --git a/src/adapter.c b/src/adapter.c
+index 1a7d4eb..d67c507 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -5195,14 +5195,15 @@ int btd_adapter_read_clock(struct btd_adapter *adapter, const bdaddr_t *bdaddr,
  }
  
- static int map_probe(struct obc_session *session)
+ int btd_adapter_remove_bonding(struct btd_adapter *adapter,
+-				const bdaddr_t *bdaddr, uint8_t bdaddr_type)
++				const bdaddr_t *bdaddr, uint8_t bdaddr_type,
++				uint8_t disconnect)
+ {
+ 	struct mgmt_cp_unpair_device cp;
+ 
+ 	memset(&cp, 0, sizeof(cp));
+ 	bacpy(&cp.addr.bdaddr, bdaddr);
+ 	cp.addr.type = bdaddr_type;
+-	cp.disconnect = 1;
++	cp.disconnect = disconnect;
+ 
+ 	if (mgmt_send(adapter->mgmt, MGMT_OP_UNPAIR_DEVICE,
+ 				adapter->dev_id, sizeof(cp), &cp,
+@@ -5212,6 +5213,53 @@ int btd_adapter_remove_bonding(struct btd_adapter *adapter,
+ 	return -EIO;
+ }
+ 
++int btd_adapter_recreate_bonding(struct btd_adapter *adapter,
++					const bdaddr_t *bdaddr,
++					uint8_t bdaddr_type,
++					uint8_t io_cap)
++{
++	struct btd_device *device;
++	int err;
++
++	device = btd_adapter_get_device(adapter, bdaddr, bdaddr_type);
++
++	if (!device || !device_is_bonded(device, bdaddr_type))
++		return -EINVAL;
++
++	device_set_rebonding(device, bdaddr_type, true);
++
++	/* Make sure the device is connected before unbonding to avoid
++	 * losing the device's autoconnection and connection
++	 * parameters, which are removed by the kernel when unpairing
++	 * if no connection exists. We would had anyways implicitly
++	 * connected when bonding later on, so we might as well just
++	 * do it explicitly now.
++	 */
++	if (bdaddr_type != BDADDR_BREDR && !btd_device_is_connected(device)) {
++		err = device_connect_le(device);
++		if (err < 0)
++			goto failed;
++	}
++
++	/* Unbond without disconnecting to avoid the connection
++	 * re-establishment latency
++	 */
++	err = btd_adapter_remove_bonding(adapter, bdaddr, bdaddr_type, 0);
++	if (err < 0)
++		goto failed;
++
++	err = adapter_create_bonding(adapter, bdaddr, bdaddr_type, io_cap);
++	if (err < 0)
++		goto failed;
++
++	return 0;
++
++failed:
++	error("failed: %s", strerror(-err));
++	device_set_rebonding(device, bdaddr_type, false);
++	return err;
++}
++
+ static void pincode_reply_complete(uint8_t status, uint16_t length,
+ 					const void *param, void *user_data)
+ {
+@@ -5594,8 +5642,11 @@ static void bonding_complete(struct btd_adapter *adapter,
+ 	else
+ 		device = btd_adapter_find_device(adapter, bdaddr, addr_type);
+ 
+-	if (device != NULL)
++	if (device != NULL) {
+ 		device_bonding_complete(device, addr_type, status);
++		if (device_is_rebonding(device, addr_type))
++			device_rebonding_complete(device, addr_type);
++	}
+ 
+ 	resume_discovery(adapter);
+ 
+diff --git a/src/adapter.h b/src/adapter.h
+index 6801fee..bd00d3e 100644
+--- a/src/adapter.h
++++ b/src/adapter.h
+@@ -158,7 +158,12 @@ int btd_adapter_disconnect_device(struct btd_adapter *adapter,
+ 							uint8_t bdaddr_type);
+ 
+ int btd_adapter_remove_bonding(struct btd_adapter *adapter,
+-				const bdaddr_t *bdaddr, uint8_t bdaddr_type);
++				const bdaddr_t *bdaddr, uint8_t bdaddr_type,
++				uint8_t disconnect);
++int btd_adapter_recreate_bonding(struct btd_adapter *adapter,
++					const bdaddr_t *bdaddr,
++					uint8_t bdaddr_type,
++					uint8_t io_cap);
+ 
+ int btd_adapter_pincode_reply(struct btd_adapter *adapter,
+ 					const  bdaddr_t *bdaddr,
+diff --git a/src/device.c b/src/device.c
+index 875a5c5..4aab349 100644
+--- a/src/device.c
++++ b/src/device.c
+@@ -158,6 +158,7 @@ struct att_callbacks {
+ struct bearer_state {
+ 	bool paired;
+ 	bool bonded;
++	bool rebonding;
+ 	bool connected;
+ 	bool svc_resolved;
+ };
+@@ -221,6 +222,8 @@ struct btd_device {
+ 	int8_t		rssi;
+ 
+ 	GIOChannel	*att_io;
++	GIOChannel	*att_rebond_io;
++
+ 	guint		cleanup_id;
+ 	guint		store_id;
+ };
+@@ -522,6 +525,9 @@ static void device_free(gpointer user_data)
+ 
+ 	attio_cleanup(device);
+ 
++	if (device->att_rebond_io)
++		g_io_channel_unref(device->att_rebond_io);
++
+ 	if (device->tmp_records)
+ 		sdp_list_free(device->tmp_records,
+ 					(sdp_free_func_t) sdp_record_free);
+@@ -1739,6 +1745,23 @@ long device_bonding_last_duration(struct btd_device *device)
+ 	return bonding->last_attempt_duration_ms;
+ }
+ 
++bool device_is_rebonding(struct btd_device *device, uint8_t bdaddr_type)
++{
++	struct bearer_state *state = get_state(device, bdaddr_type);
++
++	return state->rebonding;
++}
++
++void device_set_rebonding(struct btd_device *device, uint8_t bdaddr_type,
++				bool rebonding)
++{
++	struct bearer_state *state = get_state(device, bdaddr_type);
++
++	state->rebonding = rebonding;
++
++	DBG("rebonding = %d", rebonding);
++}
++
+ static void create_bond_req_exit(DBusConnection *conn, void *user_data)
+ {
+ 	struct btd_device *device = user_data;
+@@ -2029,7 +2052,7 @@ void device_remove_connection(struct btd_device *device, uint8_t bdaddr_type)
+ 
+ 	if (state->paired && !state->bonded)
+ 		btd_adapter_remove_bonding(device->adapter, &device->bdaddr,
+-								bdaddr_type);
++								bdaddr_type, 1);
+ 
+ 	if (device->bredr_state.connected || device->le_state.connected)
+ 		return;
+@@ -2639,13 +2662,13 @@ static void device_remove_stored(struct btd_device *device)
+ 	if (device->bredr_state.bonded) {
+ 		device->bredr_state.bonded = false;
+ 		btd_adapter_remove_bonding(device->adapter, &device->bdaddr,
+-								BDADDR_BREDR);
++							BDADDR_BREDR, 1);
+ 	}
+ 
+ 	if (device->le_state.bonded) {
+ 		device->le_state.bonded = false;
+ 		btd_adapter_remove_bonding(device->adapter, &device->bdaddr,
+-							device->bdaddr_type);
++							device->bdaddr_type, 1);
+ 	}
+ 
+ 	device->bredr_state.paired = false;
+@@ -3628,6 +3651,18 @@ bool device_attach_attrib(struct btd_device *dev, GIOChannel *io)
+ 	GAttrib *attrib;
+ 	BtIOSecLevel sec_level;
+ 
++	DBG("");
++
++	if (dev->le_state.rebonding) {
++		DBG("postponing due to rebonding");
++		/* Keep the att socket, and defer attaching the attributes
++		 * until rebonding is done.
++		 */
++		if (!dev->att_rebond_io)
++			dev->att_rebond_io = g_io_channel_ref(io);
++		return false;
++	}
++
+ 	bt_io_get(io, &gerr, BT_IO_OPT_SEC_LEVEL, &sec_level,
+ 						BT_IO_OPT_INVALID);
+ 	if (gerr) {
+@@ -4269,6 +4304,23 @@ void device_bonding_complete(struct btd_device *device, uint8_t bdaddr_type,
+ 	}
+ }
+ 
++bool device_rebonding_complete(struct btd_device *device, uint8_t bdaddr_type)
++{
++	bool ret = true;
++
++	DBG("");
++
++	device_set_rebonding(device, bdaddr_type, false);
++
++	if (bdaddr_type != BDADDR_BREDR && device->att_rebond_io) {
++		ret = device_attach_attrib(device, device->att_rebond_io);
++		g_io_channel_unref(device->att_rebond_io);
++		device->att_rebond_io = NULL;
++	}
++
++	return ret;
++}
++
+ static gboolean svc_idle_cb(gpointer user_data)
+ {
+ 	struct svc_callback *cb = user_data;
+diff --git a/src/device.h b/src/device.h
+index 2e0473e..18b5c6e 100644
+--- a/src/device.h
++++ b/src/device.h
+@@ -94,6 +94,10 @@ bool device_is_retrying(struct btd_device *device);
+ void device_bonding_complete(struct btd_device *device, uint8_t bdaddr_type,
+ 							uint8_t status);
+ gboolean device_is_bonding(struct btd_device *device, const char *sender);
++bool device_is_rebonding(struct btd_device *device, uint8_t bdaddr_type);
++void device_set_rebonding(struct btd_device *device, uint8_t bdaddr_type,
++				bool rebonding);
++bool device_rebonding_complete(struct btd_device *device, uint8_t bdaddr_type);
+ void device_bonding_attempt_failed(struct btd_device *device, uint8_t status);
+ void device_bonding_failed(struct btd_device *device, uint8_t status);
+ struct btd_adapter_pin_cb_iter *device_bonding_iter(struct btd_device *device);
 -- 
 1.9.1
 
