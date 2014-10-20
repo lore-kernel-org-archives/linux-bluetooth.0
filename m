@@ -1,40 +1,65 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 20 Oct 2014 15:42:06 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Alfonso Acosta <fons@spotify.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v4 2/2] core: Add subscription API for Manufacturer
- Specific Data
-Message-ID: <20141020134206.GB31414@t440s>
-References: <1413290765-20398-1-git-send-email-fons@spotify.com>
- <1413290765-20398-3-git-send-email-fons@spotify.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-In-Reply-To: <1413290765-20398-3-git-send-email-fons@spotify.com>
+From: Marcin Kraglak <marcin.kraglak@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH 2/2] android/pts: Update PICS, PIXIT and test results for MPS
+Date: Mon, 20 Oct 2014 15:33:52 +0200
+Message-Id: <1413812032-26631-2-git-send-email-marcin.kraglak@tieto.com>
+In-Reply-To: <1413812032-26631-1-git-send-email-marcin.kraglak@tieto.com>
+References: <1413812032-26631-1-git-send-email-marcin.kraglak@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Alfonso,
+---
+ android/pics-mps.txt  | 2 +-
+ android/pixit-mps.txt | 2 +-
+ android/pts-mps.txt   | 6 +++---
+ 3 files changed, 5 insertions(+), 5 deletions(-)
 
-On Tue, Oct 14, 2014, Alfonso Acosta wrote:
-> This patch allows plugins to be notified whenever an adapter receives
-> Manufacturer Specific Data in the advertising reports from a device.
-> 
-> This can happen when new device is discovered or when we autoconnect
-> to it.
-> ---
->  src/adapter.c | 44 ++++++++++++++++++++++++++++++++++++++++++++
->  src/adapter.h | 10 ++++++++++
->  2 files changed, 54 insertions(+)
+diff --git a/android/pics-mps.txt b/android/pics-mps.txt
+index 6fa9858..ab937a6 100644
+--- a/android/pics-mps.txt
++++ b/android/pics-mps.txt
+@@ -1,6 +1,6 @@
+ MPS PICS for the PTS tool.
+ 
+-PTS version: 5.2
++PTS version: 5.3
+ 
+ * - different than PTS defaults
+ # - not yet implemented/supported
+diff --git a/android/pixit-mps.txt b/android/pixit-mps.txt
+index 088efe9..56f5122 100644
+--- a/android/pixit-mps.txt
++++ b/android/pixit-mps.txt
+@@ -1,6 +1,6 @@
+ MPS PIXIT for the PTS tool.
+ 
+-PTS version: 5.2
++PTS version: 5.3
+ 
+ * - different than PTS defaults
+ & - should be set to IUT Bluetooth address
+diff --git a/android/pts-mps.txt b/android/pts-mps.txt
+index 2f661bb..46d2510 100644
+--- a/android/pts-mps.txt
++++ b/android/pts-mps.txt
+@@ -1,7 +1,7 @@
+ PTS test results for MPS
+ 
+-PTS version: 5.2
+-Tested: 31.07.2014
++PTS version: 5.3
++Tested: 20.10.2014
+ Android version: 4.4.4
+ 
+ Results:
+@@ -50,5 +50,5 @@ TC_SRC_TG_HFAV_CLH_MD_BV_04_I		PASS	Do not use AOSP Music player.
+ 						Use e.g. MortPlayer or Poweramp
+ TC_SRC_TG_HFAV_CLH_MD_BV_05_I		PASS
+ TC_SRC_TG_HFAV_CLH_MD_BV_06_I		PASS
+-TC_PAIRING_HF_SNK_CT			PASS
++TC_PAIRING_HF_SNK_CT			N/A	Pairing helper for MD tests
+ -------------------------------------------------------------------------------
+-- 
+1.9.3
 
-This patch also doesn't compile (the error from the first patch might
-have gone away, but then there's this new one):
-
-src/adapter.c:4654:6: error: no previous declaration for ‘adapter_msd_notify’ [-Werror=missing-declarations]
- void adapter_msd_notify(struct btd_adapter *adapter, struct btd_device *dev,
-      ^
-cc1: all warnings being treated as errors
-make[1]: *** [src/bluetoothd-adapter.o] Error 1
-
-
-Johan
