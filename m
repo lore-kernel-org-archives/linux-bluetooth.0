@@ -1,48 +1,74 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Mon, 20 Oct 2014 21:25:42 +0200
+From: Alexander Aring <alex.aring@gmail.com>
+To: Martin Townsend <mtownsend1973@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org,
+	marcel@holtmann.org, jukka.rissanen@linux.intel.com,
+	Martin Townsend <martin.townsend@xsilon.com>
+Subject: Re: [PATCH v2 bluetooth-next 1/4] 6lowpan: remove skb_deliver from
+ IPHC
+Message-ID: <20141020192541.GA1630@omega>
+References: <1413815991-5078-1-git-send-email-martin.townsend@xsilon.com>
+ <1413815991-5078-2-git-send-email-martin.townsend@xsilon.com>
+ <20141020191855.GB31180@omega>
 MIME-Version: 1.0
-Sender: armansito@google.com
-In-Reply-To: <526D5B5F-0DB1-4FED-B193-59B2604BE719@holtmann.org>
-References: <1413824244-35297-1-git-send-email-jamuraa@chromium.org>
-	<1413824244-35297-2-git-send-email-jamuraa@chromium.org>
-	<526D5B5F-0DB1-4FED-B193-59B2604BE719@holtmann.org>
-Date: Mon, 20 Oct 2014 12:28:03 -0700
-Message-ID: <CAHrH25Tz98y=s4nPy6pabstTFAW+dO6XX=hqhjN=gZt_cP0YcQ@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 1/1] GATT shim to src/shared bt_att
-From: Arman Uguray <armansito@chromium.org>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: Michael Janssen <jamuraa@chromium.org>,
-	BlueZ development <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20141020191855.GB31180@omega>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+On Mon, Oct 20, 2014 at 09:18:55PM +0200, Alexander Aring wrote:
 
+...
 
-On Mon, Oct 20, 2014 at 11:10 AM, Marcel Holtmann <marcel@holtmann.org> wrote:
-> Hi Michael,
->
->> This patch implements a version of GAttrib which is backed by
->> bt_att, which enables the simultaneous use of GAttrib and bt_att.
->>
->> This should enable smooth transition of profiles from the GAttrib
->> API to the src/shared bt_att API.
->> ---
->> Makefile.am             |   8 +-
->> Makefile.tools          |  11 +-
->> attrib/gattrib-shared.c | 306 ++++++++++++++++++++++++++++++++++++++++++++++++
->> configure.ac            |   4 +
->> 4 files changed, 327 insertions(+), 2 deletions(-)
->> create mode 100644 attrib/gattrib-shared.c
->
-> to be honest, I would convert this in one go. If we can have a shim that just provides the GAttrib API, then lets use that and put it into src/ and remove attrib/ directory.
->
+> >  
+> > diff --git a/net/ieee802154/6lowpan_rtnl.c b/net/ieee802154/6lowpan_rtnl.c
+> > index 0c1a49b..898d317 100644
+> > --- a/net/ieee802154/6lowpan_rtnl.c
+> > +++ b/net/ieee802154/6lowpan_rtnl.c
+> > @@ -146,8 +146,9 @@ static int lowpan_give_skb_to_devices(struct sk_buff *skb,
+> >  		if (lowpan_dev_info(entry->ldev)->real_dev == skb->dev) {
+> >  			skb_cp = skb_copy(skb, GFP_ATOMIC);
+> >  			if (!skb_cp) {
+> > -				stat = -ENOMEM;
+> > -				break;
+> > +				kfree_skb(skb);
+> > +				rcu_read_unlock();
+> > +				return NET_RX_DROP;
+> >  			}
+> >  
+> >  			skb_cp->dev = entry->ldev;
+> > @@ -155,6 +156,11 @@ static int lowpan_give_skb_to_devices(struct sk_buff *skb,
+> >  		}
+> >  	rcu_read_unlock();
+> >  
+> > +	if (stat == NET_RX_SUCCESS)
+> > +		consume_skb(skb);
+> > +	else
+> > +		kfree_skb(skb);
+> > +
+> 
+> You will not see it because somebody forgot brackets in the above
+> "list_for_each_entry_rcu" loop. But variable "stat" in this case is only
+> for the last entry of netif_rx call.
+> 
+> Also if netif_rx returns NET_RX_DROP, which is the else branch in this
+> case. In case of netif_rx the skb will be freed somewhere else.
+> 
+> Calltrace:
+> 
+> - netif_rx
+> - netif_rx_internal
+> - enqueue_to_backlog
+>   - kfree_skb(skb);
+>   - return NET_RX_DROP;
+> 
 
-Not sure what exactly you mean here by converting this in one go.
-There is still a lot of code in attrib/ that is needed in conjunction
-with GAttrib, such as all the ATT protocol encode/decode functions and
-GATT procedure wrappers, so we are going to have to compile that stuff
-in anyway and moving all of that into src/ doesn't make much sense to
-me. So, for the shim, it made sense to put it in attrib/ initially.
+I think, we need here something like:
 
-Cheers,
-Arman
+stat = netif_rx(foo);
+if (stat == NET_RX_SUCCESS)
+	consume_skb(foo);
+
+inside the loop.
+
+- Alex
