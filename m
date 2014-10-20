@@ -1,69 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <5444C90D.9020402@xsilon.com>
-Date: Mon, 20 Oct 2014 09:34:21 +0100
-From: Martin Townsend <martin.townsend@xsilon.com>
-MIME-Version: 1.0
-To: Alexander Aring <alex.aring@gmail.com>,
-	Martin Townsend <mtownsend1973@gmail.com>
-CC: linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org,
-	marcel@holtmann.org, jukka.rissanen@linux.intel.com
-Subject: Re: [PATCH bluetooth-next 0/5] Move skb delivery out of IPHC.
-References: <1413616153-7562-1-git-send-email-mtownsend1973@gmail.com> <20141020072520.GA5404@omega>
-In-Reply-To: <20141020072520.GA5404@omega>
-Content-Type: text/plain; charset=utf-8
+From: Marcin Kraglak <marcin.kraglak@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH 2/2] android/pts: Update test results for IOPT
+Date: Mon, 20 Oct 2014 10:27:22 +0200
+Message-Id: <1413793642-5431-2-git-send-email-marcin.kraglak@tieto.com>
+In-Reply-To: <1413793642-5431-1-git-send-email-marcin.kraglak@tieto.com>
+References: <1413793642-5431-1-git-send-email-marcin.kraglak@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Alex,
+---
+ android/pts-iopt.txt | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-On 20/10/14 08:25, Alexander Aring wrote:
-> Hi Martin,
->
-> I did a fast quick test and it's still working. I see now the conversion
-> from to errno, but you didn't change/fix the behaviour with kfree_skb. I
-> am pretty sure this is still broken with and without your patch.
->
-> I know you want to make smaller patches but can you please add the
-> conversion simple to this patch series? What I see now is the change
-> from if (ret != NET_RX_FOO) to errno. This change the behaviour of
-> current somewhat working state. What I mean, it's okay to change that
-> but please in a serie which contains also fixes for the kfree_skb thing.
-Is this the kfree_skb in lowpan_give_skb_to_devices? I'll add it in.
-> Important:
-> All patches should be compileable after each patch keyword "bisectable"
-> otherwise people can't use "git bisect".
-After each patch everything should be compilable or at least I thought is was :)
-> But in your case this should be fine.
->
-> It should also not broken between them, but this is a bigger issue.
-> Smaller patches for better review are welcome.
->
->
-> To your patch series:
->
-> - You missed a tag "6lowpan:", "ieee802154: 6lowpan:" or "bluetooth: 6lowpan:"
->   Use the tag which best fit to your patch. Also add a tag to the
->   cover-letter "6lowpan:"
-will do
->
-> - Please "fixup" patch 4/5 with patch 1/5. "fixup" is some git language,
->   what I mean is just include the remove of "skb_delivery_cb skb_deliver", when
->   remove the use of that. Now you have two patches for this in your git
->   history, with "git rebase -i" and a fixup you don't need to touch the
->   patch again. Just for information, maybe you don't know that. Fast
->   googleing results [0] tutorial.
-no probs
->
-> - Sometimes you add a dot in commit message, sometimes not. Please start
->   the commit msg in lower case and remove the dot.
->
-ok.
-> - Alex
->
-> [0] http://fle.github.io/git-tip-keep-your-branch-clean-with-fixup-and-autosquash.html
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-wpan" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+diff --git a/android/pts-iopt.txt b/android/pts-iopt.txt
+index 2ce572c..c13b6e5 100644
+--- a/android/pts-iopt.txt
++++ b/android/pts-iopt.txt
+@@ -1,7 +1,7 @@
+ PTS test results for IOPT
+ 
+-PTS version: 5.2
+-Tested: 11-August-2014
++PTS version: 5.3
++Tested: 20-October-2014
+ Android version: 4.4.4
+ 
+ Results:
+-- 
+1.9.3
 
-- Martin.
