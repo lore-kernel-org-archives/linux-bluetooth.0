@@ -1,80 +1,143 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <8940108C-6C27-49E3-80C8-8983F32D6F55@holtmann.org>
-References: <CAAJw_ZuK6SUy22R133CezsqoU4+dTzxmsipBAp7rCvYBo+zrxw@mail.gmail.com>
-	<8BA7CD92-B061-41CE-BD43-7E1B7CD1DF6A@holtmann.org>
-	<CAAJw_ZsCeWWoFvdm1Sid6xSDGawp8RaqP07TM1Q2CvSF8DxU=w@mail.gmail.com>
-	<8940108C-6C27-49E3-80C8-8983F32D6F55@holtmann.org>
-Date: Tue, 21 Oct 2014 01:40:46 +0800
-Message-ID: <CAAJw_ZvrynW0W6fE21ieG+KUwWr_g7-9kDonKYT3ZoEi3Nntiw@mail.gmail.com>
-Subject: Re: how to set PSCAN mode in .conf?
-From: Jeff Chua <jeff.chua.linux@gmail.com>
+In-Reply-To: <1412938157-70760-1-git-send-email-marcel@holtmann.org>
+References: <1412938157-70760-1-git-send-email-marcel@holtmann.org>
+Date: Mon, 20 Oct 2014 10:02:12 -0700
+Message-ID: <CAD0=r8zAKR_iGcqyeRotDoshhAp=5U8SCcKJrr+GUsAsy-4TLQ@mail.gmail.com>
+Subject: Re: [PATCH] doc: Add commands for Start Service Discovery and Stop
+ Service Discovery
+From: Jakub Pawlowski <jpawlowski@google.com>
 To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth <linux-bluetooth@vger.kernel.org>
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Mon, Oct 20, 2014 at 11:59 PM, Marcel Holtmann <marcel@holtmann.org> wro=
-te:
+I think that RSSI_Threshold should be per UUID:
 
->> But on older bluez-5.21, the PSCAN and ISCAN are enabled automatically.
++       Command Parameters:     Address_Type (1 Octet)
++                               Num_Filters (1 Octet)
++                               Filter1 {
++                                   RSSI_Threshold (1 Octet)
++                                   UUID[i] (16 Octets)
++                               }
++                               Filter2 {}
++                               ...
+
+On Fri, Oct 10, 2014 at 3:49 AM, Marcel Holtmann <marcel@holtmann.org> wrote:
+> ---
+>  doc/mgmt-api.txt | 88 +++++++++++++++++++++++++++++++++++++++++++++++++++++++-
+>  1 file changed, 87 insertions(+), 1 deletion(-)
 >
-> this is intentionally. Starting with BlueZ 5.23 and Linux 3.17, the Page =
-Scan state is controlled by the kernel. If you have no devices paired / con=
-figured, then it will just disable Page Scan. If you do not know about devi=
-ces, then there is also no point in allowing anybody to connect.
-
-> You can use the management command Add Device to add BR/EDR devices. If y=
-ou add at least one device, then Page Scan will be enabled automatically by=
- the kernel. If you want to be always connectable, then you can set the dev=
-ice manually connectable.
+> diff --git a/doc/mgmt-api.txt b/doc/mgmt-api.txt
+> index daf036b4c1ec..2038f883cc95 100644
+> --- a/doc/mgmt-api.txt
+> +++ b/doc/mgmt-api.txt
+> @@ -2135,6 +2135,89 @@ Set Public Address Command
+>                                 Invalid Index
 >
-> Using bluetoothctl does exactly the right thing. For being discoverable, =
-you need to be connectable and discoverable. So Page Scan and Inquiry Scan =
-enabled. However if you do not have any paired devices and turn discoverabl=
-e back off, then both will be disabled.
 >
-> Just try it. Pair with a device and see that Page Scan gets turn on magic=
-ally.
-
-Marcel,
-
-Excellent info that would have taken me a long time to find out!
-Thanks for sharing!
-
-I tried  ...
-
-# btmgmt add-device -t BR/EDR -a 1 F4:B7:E2:E9:54:68
-hci0:   Type: BR/EDR  Bus: USB
-        BD Address: F4:B7:E2:E9:54:68  ACL MTU: 1021:8  SCO MTU: 64:1
-        UP RUNNING PSCAN
-
-I don't know what the actions are supposed to do, but "-a 1" works.
-
-Next I tried "connectable" but "info" still didn't show the
-connectable and hciconfig didn't show ISCAN.
-
-# btmgmt connectable F4:B7:E2:E9:54:68
-hci0 Set Connectable complete, settings: powered bondable ssp br/edr le
-# btmgmt info
-hci0:   addr F4:B7:E2:E9:54:68 version 6 manufacturer 15 class 0x000000
-        supported settings: powered connectable fast-connectable
-discoverable bondable link-security ssp br/edr hs le advertising
-debug-keys privacy configuration
-        current settings: powered bondable ssp br/edr le
-
-But if I use bluetoothctl "discoverable on", ISCAN showed up on hciconfig.
-
-And one last thing ... if I put btmgmt in a script and run it right up
-hciconfig hci0 up, the command would not work. A minimum of "sleep 1"
-is required.
-
-So, what's the best way to set the device to be always discoverable?
-And I need this because the "server" needs to be discoverable by the
-Intermec scanners. The scanner would scan a "server barcode" to
-connect to the server. And this was the default behavior on
-bluez-5.21.
-
-
-Thanks,
-Jeff.
+> +Start Service Discovery Command
+> +===============================
+> +
+> +       Command Code:           0x003a
+> +       Controller Index:       <controller id>
+> +       Command Parameters:     Address_Type (1 Octet)
+> +                               RSSI_Threshold (1 Octet)
+> +                               Num_UUID (1 Octet)
+> +                               UUID[i] (16 Octets)
+> +       Return Parameters:      Address_Type (1 Octet)
+> +
+> +       This command is used to start the process of discovering remote
+> +       devices with a specific UUID. A Device Found event will be sent
+> +       for each discovered device.
+> +
+> +       Possible values for the Address_Type parameter are a bit-wise or
+> +       of the following bits:
+> +
+> +               0       BR/EDR
+> +               1       LE Public
+> +               2       LE Random
+> +
+> +       By combining these e.g. the following values are possible:
+> +
+> +               1       BR/EDR
+> +               6       LE (public & random)
+> +               7       BR/EDR/LE (interleaved discovery)
+> +
+> +       The service discovery uses active scanning for Low Energy scanning
+> +       and will search for UUID in both advertising data and scan response
+> +       data.
+> +
+> +       Found devices that have a RSSI value smaller than RSSI_Threshold
+> +       are not reported via DeviceFound event. Setting a value of 127
+> +       will cause all devices to be reported.
+> +
+> +       The list of UUIDs identifies a logical OR. Only one of the UUIDs
+> +       have to match to cause a DeviceFound event. Providing an empty
+> +       list of UUIDs with Num_UUID set to 0 which means that DeviceFound
+> +       events are send out for all devices above the RSSI_Threshold.
+> +
+> +       In case the RSSI_Threshold is set to 127 and the Num_UUID is 0,
+> +       then this command behaves exactly the same as Start Discovery.
+> +
+> +       When the discovery procedure starts the Discovery event will
+> +       notify this similar to Start Discovery.
+> +
+> +       This command can only be used when the controller is powered.
+> +
+> +       This command generates a Command Complete event on success
+> +       or failure.
+> +
+> +       Possible errors:        Busy
+> +                               Not Supported
+> +                               Invalid Parameters
+> +                               Not Powered
+> +                               Invalid Index
+> +
+> +
+> +Stop Service Discovery Command
+> +==============================
+> +
+> +       Command Code:           0x003b
+> +       Controller Index:       <controller id>
+> +       Command Parameters:     Address_Type (1 Octet)
+> +       Return Parameters:      Address_Type (1 Octet)
+> +
+> +       This command is used to stop the service discovery process started
+> +       using the Start Service Discovery command.
+> +
+> +       When the discovery procedure stops the Discovery event will
+> +       notify this similar to Stop Discovery.
+> +
+> +       This command can only be used when the controller is powered.
+> +
+> +       This command generates a Command Complete event on success
+> +       or failure.
+> +
+> +       Possible errors:        Rejected
+> +                               Invalid Parameters
+> +                               Invalid Index
+> +
+> +
+>  Command Complete Event
+>  ======================
+>
+> @@ -2555,7 +2638,10 @@ Discovering Event
+>
+>         This event indicates that the controller has started discovering
+>         devices. This discovering state can come and go multiple times
+> -       between a StartDiscover and a StopDiscovery command.
+> +       between a Start Discover and a Stop Discovery commands.
+> +
+> +       The Start Service Discovery and Stop Service Discovery commands
+> +       will also trigger this event.
+>
+>         The valid values for the Discovering parameter are 0x01
+>         (enabled) and 0x00 (disabled).
+> --
+> 1.9.3
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
