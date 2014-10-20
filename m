@@ -1,87 +1,54 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Zheng, Wu" <wu.zheng@intel.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-CC: "'linux-bluetooth@vger.kernel.org'" <linux-bluetooth@vger.kernel.org>
-Subject: RE: Use HFP as sco sink and source at the same time
-Date: Mon, 20 Oct 2014 09:16:15 +0000
-Message-ID: <2CF57A644018A745B8FE029C7223E16E11964BC7@SHSMSX104.ccr.corp.intel.com>
-References: <2CF57A644018A745B8FE029C7223E16E11964A9B@SHSMSX104.ccr.corp.intel.com>
- <CABBYNZKoNVhj91NQ1e3PF2ORaAcMs4NsX300bj0cLic1=Joicw@mail.gmail.com>
-In-Reply-To: <CABBYNZKoNVhj91NQ1e3PF2ORaAcMs4NsX300bj0cLic1=Joicw@mail.gmail.com>
-Content-Type: text/plain; charset="utf-8"
+Date: Mon, 20 Oct 2014 11:10:46 +0200
+From: Alexander Aring <alex.aring@gmail.com>
+To: Martin Townsend <martin.townsend@xsilon.com>
+Cc: Martin Townsend <mtownsend1973@gmail.com>,
+	linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org,
+	marcel@holtmann.org, jukka.rissanen@linux.intel.com
+Subject: Re: [PATCH bluetooth-next 0/5] Move skb delivery out of IPHC.
+Message-ID: <20141020091043.GC5404@omega>
+References: <1413616153-7562-1-git-send-email-mtownsend1973@gmail.com>
+ <20141020072520.GA5404@omega>
+ <5444C90D.9020402@xsilon.com>
+ <20141020085555.GB5404@omega>
+ <5444CF99.4080305@xsilon.com>
 MIME-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=utf-8
+In-Reply-To: <5444CF99.4080305@xsilon.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-SGkgTHVpeiwNCg0KVGhhbmtzIGZvciB5b3VyIHJlc3BvbnNlLg0KDQpGb3IgaHR0cHM6Ly9idWdz
-LnRpemVuLm9yZy9qaXJhL2Jyb3dzZS9UQy0xNjAsIHdlIGNhbiBnZXQgdGhlIHJlbGF0ZWQgbG9n
-IG9mIHB1bHNlYXVkaW8uDQoNCltwdWxzZWF1ZGlvXSByb3V0ZXIuYzogcm91dGluZyAnZGlhbGVy
-JyA9PiAnQmx1ZXRvb3RoIE1vbm8gSGFuZHNmcmVlJw0KRDogW3B1bHNlYXVkaW9dIGF1ZGlvbWdy
-LmM6IHNraXAgcmVnaXN0ZXJpbmcgbm9kZXMgd2hpbGUgdGhlIGRvbWFpbiBpcyBkb3duDQpEOiBb
-cHVsc2VhdWRpb10gY29uc3RyYWluLmM6IG5vZGUgJ0JsdWV0b290aCBNb25vIEhhbmRzZnJlZScg
-YWRkZWQgdG8gY29uc3RyYWluIHByb2ZpbGUvYmx1ZXpfY2FyZC4wMF8xNl80NF9GRF8zNV9EMg0K
-RDogW3B1bHNlYXVkaW9dIGRpc2NvdmVyLmM6IGNhcmQgJ2JsdWV6X2NhcmQuMDBfMTZfNDRfRkRf
-MzVfRDInIGRlZmF1bHQgcHJvZmlsZSAnb2ZmJw0KRDogW3B1bHNlYXVkaW9dIGRpc2NvdmVyLmM6
-IHNjaGVkdWxpbmcgY2FyZCBjaGVjaw0KSTogW3B1bHNlYXVkaW9dIG1vZHVsZS5jOiBMb2FkZWQg
-Im1vZHVsZS1ibHVlejUtZGV2aWNlIiAoaW5kZXg6ICMyMTsgYXJndW1lbnQ6ICJwYXRoPS9vcmcv
-Ymx1ZXovaGNpMC9kZXZfMDBfMTZfNDRfRkRfMzVfRDIiKS4NCkQ6IFtwdWxzZWF1ZGlvXSBibHVl
-ejUtdXRpbC5jOiBUcmFuc3BvcnQgL29yZy9ibHVlei9oY2kwL2Rldl8wMF8xNl80NF9GRF8zNV9E
-Mi9mZDEgYXZhaWxhYmxlIGZvciBwcm9maWxlIGEyZHBfc2luaw0KRDogW3B1bHNlYXVkaW9dIGRp
-c2NvdmVyLmM6IGNhcmQgY2hlY2sgc3RhcnRzDQpEOiBbcHVsc2VhdWRpb10gZGlzY292ZXIuYzog
-Y2FyZCAnYmx1ZXpfY2FyZC4wMF8xNl80NF9GRF8zNV9EMicgaGFzIG5vIHNpbmtzL3NvdXJjZXMu
-IERvIHJvdXRpbmcgLi4uDQpEOiBbcHVsc2VhdWRpb10gcm91dGVyLmM6IHVzaW5nICdwaG9uZScg
-cm91dGVyIGdyb3VwIHdoZW4gcm91dGluZyAnZGlhbGVyJw0KRDogW3B1bHNlYXVkaW9dIGNvbnN0
-cmFpbi5jOiBhcHBseWluZyBjb25zdHJhaW4gcHJvZmlsZS9ibHVlel9jYXJkLjAwXzE2XzQ0X0ZE
-XzM1X0QyDQpEOiBbcHVsc2VhdWRpb10gY29uc3RyYWluLmM6ICAgIHVuYmxvY2tpbmcgJ0JsdWV0
-b290aCBNb25vIEhhbmRzZnJlZScgaW4gdGFibGUgJ2RlZmF1bHRfZHJpdmVyJw0KRDogW3B1bHNl
-YXVkaW9dIGNvbnN0cmFpbi5jOiAgICB1bmJsb2NraW5nICdCbHVldG9vdGggTW9ubyBIYW5kc2Zy
-ZWUnIGluIHRhYmxlICdwaG9uZScNCkQ6IFtwdWxzZWF1ZGlvXSBjb25zdHJhaW4uYzogICAgYmxv
-Y2tpbmcgJ0JsdWV0b290aCBTdGVyZW8gSGVhZHBob25lJyBpbiB0YWJsZSAnZGVmYXVsdF9kcml2
-ZXInDQpEOiBbcHVsc2VhdWRpb10gY29uc3RyYWluLmM6ICAgIHVuYmxvY2tpbmcgJ0JsdWV0b290
-aCBNb25vIEhhbmRzZnJlZScgaW4gdGFibGUgJ3Bob25lJw0KRDogW3B1bHNlYXVkaW9dIHJvdXRl
-ci5jOiByb3V0aW5nICdkaWFsZXInID0+ICdCbHVldG9vdGggTW9ubyBIYW5kc2ZyZWUnDQpEOiBb
-cHVsc2VhdWRpb10gYXVkaW9tZ3IuYzogaWdub3JpbmcgZGVmYXVsdCByb3V0ZSBkaWFsZXIgPT4g
-Qmx1ZXRvb3RoIE1vbm8gSGFuZHNmcmVlOiBpbmNvbXBsZXRlIGlucHV0IG9yIG91dHB1dA0KRDog
-W3B1bHNlYXVkaW9dIHN3aXRjaC5jOiBjaGFuZ2luZyBwcm9maWxlICdvZmYnID0+ICdoc3AnDQpX
-OiBbcHVsc2VhdWRpb10gbW9kdWxlLWJsdWV6NS1kZXZpY2UuYzogUmVmdXNlZCB0byBzd2l0Y2gg
-cHJvZmlsZSB0byBoc3A6IE5vdCBjb25uZWN0ZWQNCkQ6IFtwdWxzZWF1ZGlvXSBzd2l0Y2guYzog
-Y2FuJ3Qgcm91dGUgdG8gJ0JsdWV0b290aCBNb25vIEhhbmRzZnJlZSc6IG5vIHNpbmsNCkQ6IFtw
-dWxzZWF1ZGlvXSB2b2x1bWUuYzogcmVzZXQgdm9sdW1lIGNsYXNzZXMgb24gbm9kZSAnQmx1ZXRv
-b3RoIE1vbm8gSGFuZHNmcmVlJw0KRDogW3B1bHNlYXVkaW9dIHZvbHVtZS5jOiBhZGQgdm9sdW1l
-IGNsYXNzIDcgKFBob25lKSB0byBub2RlICdCbHVldG9vdGggTW9ubyBIYW5kc2ZyZWUnIChjbG1h
-c2sgMHgwKQ0KRDogW3B1bHNlYXVkaW9dIHJvdXRlci5jOiB1c2luZyAncGhvbmUnIHJvdXRlciBn
-cm91cCB3aGVuIHJvdXRpbmcgJ0NhciBLaXQnDQpEOiBbcHVsc2VhdWRpb10gcm91dGVyLmM6IHJv
-dXRpbmcgJ0NhciBLaXQnID0+ICdCbHVldG9vdGggTW9ubyBIYW5kc2ZyZWUnDQpEOiBbcHVsc2Vh
-dWRpb10gYXVkaW9tZ3IuYzogaWdub3JpbmcgZGVmYXVsdCByb3V0ZSBDYXIgS2l0ID0+IEJsdWV0
-b290aCBNb25vIEhhbmRzZnJlZTogaW5jb21wbGV0ZSBpbnB1dCBvciBvdXRwdXQNCkQ6IFtwdWxz
-ZWF1ZGlvXSBzd2l0Y2guYzogY2hhbmdpbmcgcHJvZmlsZSAnb2ZmJyA9PiAnaHNwJw0KVzogW3B1
-bHNlYXVkaW9dIG1vZHVsZS1ibHVlejUtZGV2aWNlLmM6IFJlZnVzZWQgdG8gc3dpdGNoIHByb2Zp
-bGUgdG8gaHNwOiBOb3QgY29ubmVjdGVkDQpEOiBbcHVsc2VhdWRpb10gc3dpdGNoLmM6IGNhbid0
-IHJvdXRlIHRvICdCbHVldG9vdGggTW9ubyBIYW5kc2ZyZWUnOiBubyBzaW5rDQoNCk5vdCBtYWtl
-IHN1cmUgaWYgdGhlIEJsdWV0b290aCBoYW5kbGUgdG8gcHVsc2VhdWRpbyBjYW4gd29yayB3ZWxs
-IG9yIG5vdO+8nw0KDQpXaGF0IGRvIHlvdSB0aGluaz8NCg0KQmVzdCBSZWdhcmRzDQpaaGVuZyBX
-dQ0KDQoNCi0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tDQpGcm9tOiBMdWl6IEF1Z3VzdG8gdm9u
-IERlbnR6IFttYWlsdG86bHVpei5kZW50ekBnbWFpbC5jb21dIA0KU2VudDogTW9uZGF5LCBPY3Rv
-YmVyIDIwLCAyMDE0IDU6MDMgUE0NClRvOiBaaGVuZywgV3UNCkNjOiBWb24gRGVudHosIEx1aXo7
-IGxpbnV4LWJsdWV0b290aEB2Z2VyLmtlcm5lbC5vcmcNClN1YmplY3Q6IFJlOiBVc2UgSEZQIGFz
-IHNjbyBzaW5rIGFuZCBzb3VyY2UgYXQgdGhlIHNhbWUgdGltZQ0KDQpIaSwNCg0KT24gTW9uLCBP
-Y3QgMjAsIDIwMTQgYXQgMTE6MTUgQU0sIFpoZW5nLCBXdSA8d3UuemhlbmdAaW50ZWwuY29tPiB3
-cm90ZToNCj4gSGkgTHVpeiwNCj4NCj4gSEZQIGlzIHVzZWQgb24gSVZJIGFuZCBtZWV0IHNvbWUg
-aXNzdWVzLg0KPg0KPiBFWEFDVCBTVEVQUyBMRUFESU5HIFRPIFBST0JMRU06DQo+ID09PT09PT09
-PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09DQo+IDEu
-IHBhaXIgQlQgcGhvbmUgYnkgYmx1ZXRvb3RoY3RsDQo+IDIuIGxhdW5jaCBkaWFsZXIgYXBwDQo+
-IDMuIG1ha2Ugdm9pY2UgY2FsbCBhbmQgYW5zd2VyLCB0aGUgdm9pY2UgY2FuIGJlIGhlYXJkIGZy
-b20gSVZJIHNwZWFrZXIgDQo+IDQuIHBhaXIgYW5kIGNvbm5lY3QgQlQgaGVhZHNldCB3aXRoIGJs
-dWV0b290aGN0bA0KPg0KPiBFWFBFQ1RFRCBPVVRDT01FOg0KPiA9PT09PT09PT09PT09PT09PT09
-DQo+IFZvaWNlIHNlbmQgb3V0IGZyb20gdGhlIEJUIGhlYWRzZXQNCj4gQUNUVUFMIE9VVENPTUUN
-Cj4gPT09PT09PT09PT09PT09PT09PQ0KPiBzb3VuZCBzdGlsbCBoZWFyZCBmcm9tIElWSSBzcGVh
-a2VyLCBkb2Vzbid0IGF1dG8gc3dpdGNoIHRvIEJUIGhhbmRzZXQNCj4NCj4gSSBkb24ndCBtYWtl
-IHN1cmUgaWYgQmx1ZXogY2FuIHN1cHBvcnQgaXQgb3Igbm90Pw0KPg0KPiBRdWVzdGlvbjogdGhl
-IFNDT3MgY29ubmVjdGlvbiBvZiBIRlAgb24gSVZJIGNhbiBiZSB1c2VkIGFzIFNDTyBzaW5rIGFu
-ZCBzb3VyY2UgYXQgdGhlIHNhbWUgdGltZT8NCj4NCj4gSXQgaXMgdGhlIGlzc3VlIG9mIGh0dHBz
-Oi8vYnVncy50aXplbi5vcmcvamlyYS9icm93c2UvVEMtMTYwLg0KDQpZZXMsIGJ5IGRlc2lnbiBp
-dCBpcyBkdXBsZXggc28gYm90aCBzaW5rIGFuZCBzb3VyY2Ugd29ya3Mgc2ltdWx0YW5lb3VzbHks
-IHBlcmhhcHMgeW91IGFyZSB0YWxraW5nIGFib3V0IG9mIHNlbmRpbmcgdGhlIG1pY3JvcGhvbmUg
-ZGF0YSB0byB0aGUgb3RoZXIgZW5kIHdoaWNoIGhhcyBwcm9iYWJseSBub3RoaW5nIHRvIGRvIHdp
-dGggQmx1ZXRvb3RoIGJ1dCB3aXRoIGF1ZGlvIHJvdXRpbmcgbm90IGJlaW5nIHByb3Blcmx5IGNv
-bmZpZ3VyZWQuDQoNCg0KLS0NCkx1aXogQXVndXN0byB2b24gRGVudHoNCg==
+On Mon, Oct 20, 2014 at 10:02:17AM +0100, Martin Townsend wrote:
+> Hi Alex,
+> 
+> I've completely forgotten what the original problem was it was so long ago :)  , let me dig through the old emails and see if I can jog my memory. 
+> 
+> My intention was to do the kfree_skb patch in my next submission but I'll see what I can do.
+> 
+
+yea, the problem a general error handling issue in mainly two parts:
+
+ - detection errors. Means the NET_RX_FOO conversion to errno. But you
+   put out the netif_rx call outside of lowpan_header_create which is
+   very well. I approve that one. Now it's important that the "lowpan
+   give to upper layer" functions not returning ERRNO's and NET_RX_FOO.
+
+   Again, errno is a negative value and NET_RX_FOO is 0 or 1. We can't
+   check on a error with if (ret < 0) or (ret == NET_RX_DROP). Also
+   (ret != NET_RX_SUCCESS) will not work because it's "1" and "0"
+   indicate successful or sometimes not successful because NET_RX_DROP
+   was returned and this is "0". Lot of confusing here.
+
+   For the "lowpan give to upper layer" functions doesn't matter if
+   errno is returned or NET_RX_FOO, but don't a mix of both!
+   The "lowpan_header_create" should return errno's.
+
+ - Second issue was a complete wrong reaction on error handling and
+   memory managment with "kfree_skb" which needs a fix of the above one
+   at first to introduce a correct error handling.
+
+
+Now I see a little bit the fix of the first one. But not the second one.
+Or should these things all fine now, otherwise I will take a more
+careful review.
+
+- Alex
