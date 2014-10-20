@@ -1,65 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcin Kraglak <marcin.kraglak@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 2/2] android/pts: Update PICS, PIXIT and test results for MPS
-Date: Mon, 20 Oct 2014 15:33:52 +0200
-Message-Id: <1413812032-26631-2-git-send-email-marcin.kraglak@tieto.com>
-In-Reply-To: <1413812032-26631-1-git-send-email-marcin.kraglak@tieto.com>
-References: <1413812032-26631-1-git-send-email-marcin.kraglak@tieto.com>
+Subject: [PATCH 1/2] android/bluetooth: Fix Supported feature bitmask for MPMD scenarios
+Date: Mon, 20 Oct 2014 15:33:51 +0200
+Message-Id: <1413812032-26631-1-git-send-email-marcin.kraglak@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Set A2DP-SRC_AVRCP-TG instead of A2DP-SNK_AVRCP-CT_DUN-DT bit.
+It was affecting TC_SDP_CTH_SD_BV_01_I PTS test case.
 ---
- android/pics-mps.txt  | 2 +-
- android/pixit-mps.txt | 2 +-
- android/pts-mps.txt   | 6 +++---
- 3 files changed, 5 insertions(+), 5 deletions(-)
+ android/bluetooth.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/android/pics-mps.txt b/android/pics-mps.txt
-index 6fa9858..ab937a6 100644
---- a/android/pics-mps.txt
-+++ b/android/pics-mps.txt
-@@ -1,6 +1,6 @@
- MPS PICS for the PTS tool.
+diff --git a/android/bluetooth.c b/android/bluetooth.c
+index 827e205..03eb1a1 100644
+--- a/android/bluetooth.c
++++ b/android/bluetooth.c
+@@ -70,7 +70,7 @@
+  */
+ #define MPS_DEFAULT_MPMD ((1ULL << 1) | (1ULL << 3) | (1ULL << 5) | \
+ 				(1ULL << 6) | (1ULL << 8) | (1ULL << 10) | \
+-				(1ULL << 12) | (1ULL << 15) | (1ULL << 18))
++				(1ULL << 12) | (1ULL << 15) | (1ULL << 17))
  
--PTS version: 5.2
-+PTS version: 5.3
- 
- * - different than PTS defaults
- # - not yet implemented/supported
-diff --git a/android/pixit-mps.txt b/android/pixit-mps.txt
-index 088efe9..56f5122 100644
---- a/android/pixit-mps.txt
-+++ b/android/pixit-mps.txt
-@@ -1,6 +1,6 @@
- MPS PIXIT for the PTS tool.
- 
--PTS version: 5.2
-+PTS version: 5.3
- 
- * - different than PTS defaults
- & - should be set to IUT Bluetooth address
-diff --git a/android/pts-mps.txt b/android/pts-mps.txt
-index 2f661bb..46d2510 100644
---- a/android/pts-mps.txt
-+++ b/android/pts-mps.txt
-@@ -1,7 +1,7 @@
- PTS test results for MPS
- 
--PTS version: 5.2
--Tested: 31.07.2014
-+PTS version: 5.3
-+Tested: 20.10.2014
- Android version: 4.4.4
- 
- Results:
-@@ -50,5 +50,5 @@ TC_SRC_TG_HFAV_CLH_MD_BV_04_I		PASS	Do not use AOSP Music player.
- 						Use e.g. MortPlayer or Poweramp
- TC_SRC_TG_HFAV_CLH_MD_BV_05_I		PASS
- TC_SRC_TG_HFAV_CLH_MD_BV_06_I		PASS
--TC_PAIRING_HF_SNK_CT			PASS
-+TC_PAIRING_HF_SNK_CT			N/A	Pairing helper for MD tests
- -------------------------------------------------------------------------------
+ /*
+  * bits in bitmask as defined in table 6.5 of Multi Profile Specification
 -- 
 1.9.3
 
