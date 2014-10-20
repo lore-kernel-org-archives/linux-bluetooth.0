@@ -1,194 +1,62 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <CAD0=r8wuVAB0H1sRghzsmm0Ak9+r2_f13541_dP6QCV1ZeogNw@mail.gmail.com>
-References: <CAD0=r8yozB8eMdJOuffUeQZVFVf5xEXnP5tCt+k3m0e9wzMxiA@mail.gmail.com>
-	<735FD32E-BD15-4CE1-8D9C-44B8EC56DF7A@holtmann.org>
-	<CAHrH25Q6XqsLjGyfoXwimrap9=kKHOQn-G=k4Fz6HXmEPJ7EtQ@mail.gmail.com>
-	<20140917051457.GA4671@t440s.P-661HNU-F1>
-	<CAD0=r8x-=O7XAqQF_wBHQEqSkfifzgWW2AagW2EvsDUtM-E_ow@mail.gmail.com>
-	<20140917065252.GA5554@t440s.lan>
-	<CAD0=r8z9g+F7Z9X_8PE4jk3JbA+oLj9Of33RSqxiRd0dn9AnXQ@mail.gmail.com>
-	<8868B74C-0DDD-43C1-BCBF-2578A700EF72@holtmann.org>
-	<CAD0=r8xQzhizXo4umQ_mG_WMH7Akp4bji-9PNRGzqj-7HWnyNA@mail.gmail.com>
-	<0EA633E6-A0F5-4F67-B421-9857466C1175@holtmann.org>
-	<CAD0=r8w035mLnWTKtEfxZ7agzwTFRO9dsv+6qdafcBG7RYzYDQ@mail.gmail.com>
-	<F673E928-258E-47F7-B71A-F32410974538@holtmann.org>
-	<CAD0=r8xMcGP-Hjt8uCSY9Qx9VJLov5scSwRTvFr3PAaOXXbyzQ@mail.gmail.com>
-	<CAD0=r8zcPCWKyTQLQeG68uA21_sEv+5wDKNB-GJzgS1+BcD+bQ@mail.gmail.com>
-	<372D8399-BFC6-413F-924F-44CE79030516@holtmann.org>
-	<CAD0=r8x2bub9E+ohicwfxK0AAykRTUSrrTjAD-tFv-aj7xGoww@mail.gmail.com>
-	<375944C8-4378-4589-A883-786F531EA291@holtmann.org>
-	<CAD0=r8xDHvVq9QyCwo7_di_QRhbqEYdGJCKevQoEQ8WZRwA4dA@mail.gmail.com>
-	<93AC6768-49F3-43CC-8014-83DD3C0EA3D3@holtmann.org>
-	<8A0217F1-C062-466F-8C04-38E324BDD55D@holtmann.org>
-	<CAD0=r8wuVAB0H1sRghzsmm0Ak9+r2_f13541_dP6QCV1ZeogNw@mail.gmail.com>
-Date: Mon, 20 Oct 2014 09:55:34 -0700
-Message-ID: <CAD0=r8wKVvcWTVarU3ik_j2F53f9LWjemA1SD4outm_O8atOOQ@mail.gmail.com>
-Subject: Re: [RFC] need for new scan api for bluetooth low energy.
-From: Jakub Pawlowski <jpawlowski@google.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: Arman Uguray <armansito@chromium.org>,
-	BlueZ development <linux-bluetooth@vger.kernel.org>, Scott James Remnant <keybuk@google.com>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 8.0 \(1990.1\))
+Subject: Re: how to set PSCAN mode in .conf?
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <CAAJw_ZsCeWWoFvdm1Sid6xSDGawp8RaqP07TM1Q2CvSF8DxU=w@mail.gmail.com>
+Date: Mon, 20 Oct 2014 17:59:40 +0200
+Cc: linux-bluetooth <linux-bluetooth@vger.kernel.org>
+Message-Id: <8940108C-6C27-49E3-80C8-8983F32D6F55@holtmann.org>
+References: <CAAJw_ZuK6SUy22R133CezsqoU4+dTzxmsipBAp7rCvYBo+zrxw@mail.gmail.com> <8BA7CD92-B061-41CE-BD43-7E1B7CD1DF6A@holtmann.org> <CAAJw_ZsCeWWoFvdm1Sid6xSDGawp8RaqP07TM1Q2CvSF8DxU=w@mail.gmail.com>
+To: Jeff Chua <jeff.chua.linux@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel.
+Hi Jeff,
 
-I started implementing service scanning and I have a questions:
+>>> latest bluez doesn't read hcid.conf, so how can I enable "pscan" in
+>>> the conf file?
+>>> 
+>>> I know "hciconfig hci0 pscan" works, but I would still like to set
+>>> that via the .conf file.
+>> 
+>> the mgmt interface has a connectable option and with BlueZ 5 that will be enabled by default for < 3.17 kernel. With >= 3.17 kernels the kernel automatically enables it based on our BR/EDR device list.
+> 
+> Marcel,
+> 
+> I'm on Linux 3.18-rc1, bluez git
+> (a848ceb0721d9e405f9326441b1958e289c6e81f) and it's not enabling PSCAN
+> by default. I have to manually enable it via "hciconfig hci0 pscan" or
+> "bluetoothctl" (discoverable on).
+> 
+> Something broken? Or something I didn't configure properly?
+> 
+> I've tried two devices ...
+> 
+> T:  Bus=03 Lev=02 Prnt=02 Port=03 Cnt=03 Dev#= 23 Spd=12   MxCh= 0
+> D:  Ver= 2.00 Cls=ff(vend.) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
+> P:  Vendor=0a5c ProdID=21e6 Rev= 1.12
+> S:  Manufacturer=Broadcom Corp
+> S:  Product=BCM20702A0
+> S:  SerialNumber=F4B7E2E95468
+> 
+> T:  Bus=01 Lev=01 Prnt=01 Port=01 Cnt=01 Dev#=  2 Spd=12   MxCh= 0
+> D:  Ver= 2.00 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
+> P:  Vendor=0a12 ProdID=0001 Rev=31.64
+> C:* #Ifs= 2 Cfg#= 1 Atr=c0 MxPwr=  0mA
+> 
+> 
+> But on older bluez-5.21, the PSCAN and ISCAN are enabled automatically.
 
-We initially agreed on version that uses le deduplication that needs
-to be restarted after each device found.
-When I started looking into that it's going to be much more restarting:
-- need to restart after each packet from device that advertise service
-we're interested that's not in RSSI range. That's because controller
-that I use doesn't send advertisement again when RSSI changes.
-- need to restart every 0.5 or 1 second in case when some device added
-service I'm interested at to it's advertisement
+this is intentionally. Starting with BlueZ 5.23 and Linux 3.17, the Page Scan state is controlled by the kernel. If you have no devices paired / configured, then it will just disable Page Scan. If you do not know about devices, then there is also no point in allowing anybody to connect.
 
+You can use the management command Add Device to add BR/EDR devices. If you add at least one device, then Page Scan will be enabled automatically by the kernel. If you want to be always connectable, then you can set the device manually connectable.
 
-Can we conseider implementation using le scan without deduplication,
-and do packet de-duplication in kernel in hci_le_adv_report_evt ?
-I've started implementing it this way and it works really nice. The
-issue here might be that it might consume more energy.
+Using bluetoothctl does exactly the right thing. For being discoverable, you need to be connectable and discoverable. So Page Scan and Inquiry Scan enabled. However if you do not have any paired devices and turn discoverable back off, then both will be disabled.
 
+Just try it. Pair with a device and see that Page Scan gets turn on magically.
 
+Regards
 
-On Fri, Oct 10, 2014 at 8:49 AM, Jakub Pawlowski <jpawlowski@google.com> wr=
-ote:
-> Thanks for info!
->
-> I'll look into that.
->
-> On Fri, Oct 10, 2014 at 3:52 AM, Marcel Holtmann <marcel@holtmann.org> wr=
-ote:
->> Hi Jakub,
->>
->>>>>> Ok, new updated version - we do only passive scan, and we send Devic=
-e
->>>>>> found event:
->>>>>>
->>>>>>
->>>>>> diff --git a/doc/mgmt-api.txt b/doc/mgmt-api.txt
->>>>>> index 11e2490..3d03617 100644
->>>>>> --- a/doc/mgmt-api.txt
->>>>>> +++ b/doc/mgmt-api.txt
->>>>>> @@ -2135,6 +2135,29 @@ Set Public Address Command
->>>>>>                              Invalid Index
->>>>>>
->>>>>>
->>>>>> +Start Passive LE Filtered Device Scan
->>>>>> +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D
->>>>>> +
->>>>>> +       Command Code:           0x003A
->>>>>> +       Controller Index:       <controller id>
->>>>>> +       Command Parameters:     UUID (16 Octets)
->>>>>> +                    max_pathloss (1 octet)
->>>>>> +
->>>>>> +       Return Parameters:
->>>>>> +
->>>>>> +       This command starts passive LE scan, and filter received
->>>>>> advertisements: if AD contains both TX power level and Service
->>>>>> Solicitation, and UUID is contained in Service Solicitation and
->>>>>> computed pathloss is smaller than max_pathloss parameter, then a
->>>>>> Device Found event will be sent.
->>>>>
->>>>> generally we tried to avoid to specific LE only commands. Our attempt=
-s with the kernel APIs where to make them as generic as possible. So I thin=
-k something along the lines of adding and removing UUID filters should be s=
-omething we should target at.
->>>>>
->>>>> Add UUID Notification Filter
->>>>> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D
->>>>>
->>>>>       Command Parameters:     Address_Type (1 Octet)
->>>>>                               UUID (16 Octets)
->>>>>                               Max_Pathloss (1 Octet)
->>>>>       Return Parameters:      Address_Type (1 Octet)
->>>>>
->>>>>
->>>>> Remove UUID Notification Filter
->>>>> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D
->>>>>
->>>>>       Command Parameters:     Address_Type (1 Octet)
->>>>>                               UUID (16 Octets)
->>>>>       Return Parameters:      Address_Type (1 Octet)
->>>>>
->>>>> The Address_Type would be defined the same way as for Start Discovery=
- command.
->>>>>
->>>>> Now we can discuss if on the mgmt level we want to use pathloss or ra=
-ther a range of RSSI. I have seen that RSSI is preferred and that the trans=
-lation from RSSI and advertising data with TX power level is done in the da=
-emon. So for kernel API it might be better to expose RSSI range.
->>>>>
->>>>> Besides a RSSI range, we might also want to allow giving a RSSI thres=
-hold that defines how much the RSSI to change between events to be reported=
- again.
->>>>
->>>> Some mobile devices that I'm working can change power level for
->>>> advertising, that makes raw RSSI filter useless. It must be pathloss,
->>>> that's why I require TX power in advertisement.
->>>
->>> you will still get it, but just have to do the math in the daemon. The =
-only difference is that the daemon gets woken up for RSSI ranges that in th=
-e end you might filter out.
->>>
->>>>>
->>>>> That said, the danger with a generic notification filter like this is=
- that we can not implement it efficiently with current hardware without ven=
-dor commands. If you use duplicate filtering, then Broadcom and CSR chips b=
-ehave fully different. Broadcom only filters on BD_ADDR and report devices =
-once no matter what the RSSI, while CSR will report the same device again i=
-f the RSSI changes.
->>>>>
->>>>> With that in mind, it might be safer to introduce a one-shot mgmt API=
- that needs to be repeatedly called to keep scanning for new devices.
->>>>>
->>>>> Start Service Discovery
->>>>> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
->>>>>
->>>>>       Command Parameters:     Address_Type (1 Octet)
->>>>>                               Min_RSSI (1 Octet)
->>>>>                               Max_RSSI (1 Octet)
->>>>>                               Num_UUID (1 Octet)
->>>>>                               UUID[i] (16 Octets)
->>>>>       Return Parameters:      Address_Type (1 Octet)
->>>>>
->>>>> Stop Service Discovery
->>>>> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
->>>>>
->>>>>       Command Parameters:     Address_Type (1 Octet)
->>>>>       Return Parameters:      Address_Type (1 Octet)
->>>>>
->>>>> Without having dedicated controller support for filtering, having suc=
-h a dedicated discovery for services with a specific UUID seems to be more =
-appropriate and more safe. Since we could always add controller based filte=
-ring for background scanning once there is controller support.
->>>>
->>>> I preffer the "Add UUID Notification Filter" and "Remove UUID
->>>> Notification Filter". For controllers like Broadcom that reports only
->>>> one advertisement can we restart scan internally in kernel ? Why
->>>> propagate that event higher ?
->>>
->>> Personally I would prefer just adding another filter as well. However i=
-t might be better to start with something like a one-shot handling and see =
-where that is taking us. It is a little bit less intrusive and you could al=
-so use active scanning. At the same time you could also easily make it work=
- for BR/EDR. I am thinking here along the lines of something wanting to pai=
-r a mouse. You just give the HID UUID and start interleaved discovery for t=
-hat service on both transports.
->>
->> I send a proposal for doing an one-shot service discovery. So you can pr=
-opose a RSSI Threshold and a list of possible UUIDs to look for.
->>
->> If RSSI Threshold is 127 or the Num_UUID is 0, then it will behave the s=
-ame way as Start Discovery. I think this is how we should get started to ta=
-ckle this problem.
->>
->> Regards
->>
->> Marcel
->>
+Marcel
+
