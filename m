@@ -1,40 +1,56 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Zheng, Wu" <wu.zheng@intel.com>
-To: "Von Dentz, Luiz" <luiz.von.dentz@intel.com>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Use HFP as sco sink and source at the same time
-Date: Mon, 20 Oct 2014 08:15:35 +0000
-Message-ID: <2CF57A644018A745B8FE029C7223E16E11964A9B@SHSMSX104.ccr.corp.intel.com>
-Content-Type: text/plain; charset="us-ascii"
+Date: Mon, 20 Oct 2014 09:25:23 +0200
+From: Alexander Aring <alex.aring@gmail.com>
+To: Martin Townsend <mtownsend1973@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org,
+	marcel@holtmann.org, jukka.rissanen@linux.intel.com
+Subject: Re: [PATCH bluetooth-next 0/5] Move skb delivery out of IPHC.
+Message-ID: <20141020072520.GA5404@omega>
+References: <1413616153-7562-1-git-send-email-mtownsend1973@gmail.com>
 MIME-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=utf-8
+In-Reply-To: <1413616153-7562-1-git-send-email-mtownsend1973@gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+Hi Martin,
 
-HFP is used on IVI and meet some issues.
+I did a fast quick test and it's still working. I see now the conversion
+from to errno, but you didn't change/fix the behaviour with kfree_skb. I
+am pretty sure this is still broken with and without your patch.
 
-EXACT STEPS LEADING TO PROBLEM:
-===========================================================
-1. pair BT phone by bluetoothctl
-2. launch dialer app
-3. make voice call and answer, the voice can be heard from IVI speaker
-4. pair and connect BT headset with bluetoothctl
+I know you want to make smaller patches but can you please add the
+conversion simple to this patch series? What I see now is the change
+from if (ret != NET_RX_FOO) to errno. This change the behaviour of
+current somewhat working state. What I mean, it's okay to change that
+but please in a serie which contains also fixes for the kfree_skb thing.
 
-EXPECTED OUTCOME:
-===================
-Voice send out from the BT headset
-ACTUAL OUTCOME
-===================
-sound still heard from IVI speaker, doesn't auto switch to BT handset
+Important:
+All patches should be compileable after each patch keyword "bisectable"
+otherwise people can't use "git bisect".
 
-I don't make sure if Bluez can support it or not?
+But in your case this should be fine.
 
-Question: the SCOs connection of HFP on IVI can be used as SCO sink and source at the same time?
+It should also not broken between them, but this is a bigger issue.
+Smaller patches for better review are welcome.
 
-It is the issue of https://bugs.tizen.org/jira/browse/TC-160.
 
-Thanks.
+To your patch series:
 
-Best Regards
-Zheng Wu
+- You missed a tag "6lowpan:", "ieee802154: 6lowpan:" or "bluetooth: 6lowpan:"
+  Use the tag which best fit to your patch. Also add a tag to the
+  cover-letter "6lowpan:"
+
+- Please "fixup" patch 4/5 with patch 1/5. "fixup" is some git language,
+  what I mean is just include the remove of "skb_delivery_cb skb_deliver", when
+  remove the use of that. Now you have two patches for this in your git
+  history, with "git rebase -i" and a fixup you don't need to touch the
+  patch again. Just for information, maybe you don't know that. Fast
+  googleing results [0] tutorial.
+
+- Sometimes you add a dot in commit message, sometimes not. Please start
+  the commit msg in lower case and remove the dot.
+
+
+- Alex
+
+[0] http://fle.github.io/git-tip-keep-your-branch-clean-with-fixup-and-autosquash.html
