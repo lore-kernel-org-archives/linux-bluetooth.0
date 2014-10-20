@@ -1,76 +1,192 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <5444DEAA.60307@xsilon.com>
-Date: Mon, 20 Oct 2014 11:06:34 +0100
-From: Martin Townsend <martin.townsend@xsilon.com>
 MIME-Version: 1.0
-To: Alexander Aring <alex.aring@gmail.com>
-CC: Martin Townsend <mtownsend1973@gmail.com>,
- linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org,
- marcel@holtmann.org, jukka.rissanen@linux.intel.com
-Subject: Re: [PATCH bluetooth-next 0/5] Move skb delivery out of IPHC.
-References: <1413616153-7562-1-git-send-email-mtownsend1973@gmail.com> <20141020072520.GA5404@omega> <5444C90D.9020402@xsilon.com> <20141020085555.GB5404@omega> <5444CF99.4080305@xsilon.com> <20141020091043.GC5404@omega>
-In-Reply-To: <20141020091043.GC5404@omega>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <1413383281-17292-4-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+References: <1413383281-17292-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+	<1413383281-17292-4-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+Date: Mon, 20 Oct 2014 12:01:16 +0200
+Message-ID: <CAMv5GbfYYgY3Jrnmp8hSZm6bPieuD8DiqsA=q4FPvhmrAGFrzw@mail.gmail.com>
+Subject: Re: [PATCH v3 3/5] android/map-client: Add support for get remote MAS instances
+From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
+To: linux-bluetooth <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Alex,
+Hi,
 
-I think if I put the skb free stuff in lowpan_give_skb_to_devices then it should all be fixed.
-
-- lowpan_process_data or now lowpan_header_decompress will either
-     - always free the skb on error and return an error code
-     - or return 0.  So there is no chance of NET_RX_FOO codes being returned as we have moved skb deilvery out of this path.
-
-- This means that lowpan_recv can now checks to see if ret < 0, I could change this to ret != 0 if you want but the outcome is the same, if decompression fails then skb has been freed so goto drop.
-
-- This leaves the last part lowpan_give_skb_to_devices must now free or consume the skb (which I've just added).
-
-Hopefully this sorts out the original problem? or have I missed something.
-
-My next patch series will remove all the kfree_skb's from decompression but I don't think this fixes anything just makes the code more maintainable in that we don't have to worry about making sure all error paths are covered.
-
-Let me know what you think and then I'll send v2.
-
-- Martin.
-
-
-
-On 20/10/14 10:10, Alexander Aring wrote:
-> On Mon, Oct 20, 2014 at 10:02:17AM +0100, Martin Townsend wrote:
->> Hi Alex,
->>
->> I've completely forgotten what the original problem was it was so long ago :)  , let me dig through the old emails and see if I can jog my memory. 
->>
->> My intention was to do the kfree_skb patch in my next submission but I'll see what I can do.
->>
-> yea, the problem a general error handling issue in mainly two parts:
+On 15 October 2014 16:27, Grzegorz Kolodziejczyk
+<grzegorz.kolodziejczyk@tieto.com> wrote:
 >
->  - detection errors. Means the NET_RX_FOO conversion to errno. But you
->    put out the netif_rx call outside of lowpan_header_create which is
->    very well. I approve that one. Now it's important that the "lowpan
->    give to upper layer" functions not returning ERRNO's and NET_RX_FOO.
+> This allows to get remote mas instances. In case of wrong sdp record
+> fail status will be returned in notification.
+> ---
+>  android/map-client.c | 131 ++++++++++++++++++++++++++++++++++++++++++++++++++-
+>  1 file changed, 130 insertions(+), 1 deletion(-)
 >
->    Again, errno is a negative value and NET_RX_FOO is 0 or 1. We can't
->    check on a error with if (ret < 0) or (ret == NET_RX_DROP). Also
->    (ret != NET_RX_SUCCESS) will not work because it's "1" and "0"
->    indicate successful or sometimes not successful because NET_RX_DROP
->    was returned and this is "0". Lot of confusing here.
+> diff --git a/android/map-client.c b/android/map-client.c
+> index 142c680..12f600b 100644
+> --- a/android/map-client.c
+> +++ b/android/map-client.c
+> @@ -30,21 +30,150 @@
+>  #include <stdint.h>
+>  #include <glib.h>
 >
->    For the "lowpan give to upper layer" functions doesn't matter if
->    errno is returned or NET_RX_FOO, but don't a mix of both!
->    The "lowpan_header_create" should return errno's.
+> +#include "lib/sdp.h"
+> +#include "lib/sdp_lib.h"
+> +#include "src/sdp-client.h"
+> +
+>  #include "ipc.h"
+>  #include "lib/bluetooth.h"
+>  #include "map-client.h"
+>  #include "src/log.h"
+>  #include "hal-msg.h"
+> +#include "ipc-common.h"
+> +#include "utils.h"
+> +#include "src/shared/util.h"
 >
->  - Second issue was a complete wrong reaction on error handling and
->    memory managment with "kfree_skb" which needs a fix of the above one
->    at first to introduce a correct error handling.
+>  static struct ipc *hal_ipc = NULL;
+>  static bdaddr_t adapter_addr;
 >
+> +static int fill_mce_inst(void *buf, int32_t id, int32_t scn, int32_t msg_type,
+> +                                       const void *name, uint8_t name_len)
+> +{
+> +       struct hal_map_client_mas_instance *inst = buf;
+> +
+> +       inst->id = id;
+> +       inst->scn = scn;
+> +       inst->msg_types = msg_type;
+> +       inst->name_len = name_len;
+> +
+> +       if (name_len)
+> +               memcpy(inst->name, name, name_len);
+> +
+> +       return sizeof(*inst) + name_len;
+> +}
+> +
+> +static void map_client_sdp_search_cb(sdp_list_t *recs, int err, gpointer data)
+> +{
+> +       uint8_t buf[IPC_MTU];
+> +       struct hal_ev_map_client_remote_mas_instances *ev = (void *) buf;
+> +       bdaddr_t *dst = data;
+> +       sdp_list_t *list, *protos;
+> +       uint8_t status;
+> +       int32_t id, scn, msg_type, name_len, num_instances = 0;
+> +       char *name;
+> +       size_t size;
+> +
+> +       size = sizeof(*ev);
+> +       bdaddr2android(dst, &ev->bdaddr);
+> +
+> +       if (err < 0) {
+> +               error("mce: Unable to get SDP record: %s", strerror(-err));
+> +               status = HAL_STATUS_FAILED;
+> +               goto fail;
+> +       }
+> +
+> +       for (list = recs; list != NULL; list = list->next) {
+> +               sdp_record_t *rec = list->data;
+> +               sdp_data_t *data;
+> +
+> +               data = sdp_data_get(rec, SDP_ATTR_MAS_INSTANCE_ID);
+> +               if (!data) {
+> +                       error("mce: cannot get mas instance id");
+> +                       continue;
+> +               }
+> +
+> +               id = data->val.uint8;
+> +
+> +               data = sdp_data_get(rec, SDP_ATTR_SVCNAME_PRIMARY);
+> +               if (!data) {
+> +                       error("mce: cannot get mas instance name");
+> +                       continue;
+> +               }
+> +
+> +               name = data->val.str;
+> +               name_len = data->unitSize;
+> +
+> +               data = sdp_data_get(rec, SDP_ATTR_SUPPORTED_MESSAGE_TYPES);
+> +               if (!data) {
+> +                       error("mce: cannot get mas instance msg type");
+> +                       continue;
+> +               }
+> +
+> +               msg_type = data->val.uint8;
+> +
+> +               if (sdp_get_access_protos(rec, &protos) < 0) {
+> +                       error("mce: cannot get mas instance sdp protocol list");
+> +                       continue;
+> +               }
+> +
+> +               scn = sdp_get_proto_port(protos, RFCOMM_UUID);
+> +
+> +               sdp_list_foreach(protos, (sdp_list_func_t) sdp_list_free, NULL);
+> +               sdp_list_free(protos, NULL);
+> +
+> +               if (!scn) {
+> +                       error("mce: cannot get mas instance rfcomm channel");
+> +                       continue;
+> +               }
+> +
+> +               size += fill_mce_inst(buf + size, id, scn, msg_type, name,
+> +                                                               name_len);
+> +               num_instances++;
+> +       }
+> +
+> +       status = HAL_STATUS_SUCCESS;
+> +
+> +fail:
+> +       ev->num_instances = num_instances;
+> +       ev->status = status;
+> +
+> +       ipc_send_notif(hal_ipc, HAL_SERVICE_ID_MAP_CLIENT,
+> +                       HAL_EV_MAP_CLIENT_REMOTE_MAS_INSTANCES, size, buf);
+> +
+> +       free(dst);
+
+
+This "free(dst)" should also be removed while using bt_destroy function.
+
 >
-> Now I see a little bit the fix of the first one. But not the second one.
-> Or should these things all fine now, otherwise I will take a more
-> careful review.
+> +}
+> +
+>  static void handle_get_instances(const void *buf, uint16_t len)
+>  {
+> +       const struct hal_cmd_map_client_get_instances *cmd = buf;
+> +       uint8_t status;
+> +       bdaddr_t *dst;
+> +       uuid_t uuid;
+> +
+>         DBG("");
 >
-> - Alex
+> +       dst = new0(bdaddr_t, 1);
+> +       if (!dst) {
+> +               error("mce: Fail to allocate cb data");
+> +               status = HAL_STATUS_FAILED;
+> +               goto failed;
+> +       }
+> +
+> +       android2bdaddr(&cmd->bdaddr, dst);
+> +       sdp_uuid16_create(&uuid, MAP_MSE_SVCLASS_ID);
+> +
+> +       if (bt_search_service(&adapter_addr, dst, &uuid,
+> +                               map_client_sdp_search_cb, dst, free, 0)) {
+> +               error("mce: Failed to search SDP details");
+> +               status = HAL_STATUS_FAILED;
+> +               goto failed;
+> +       }
+> +
+> +       status = HAL_STATUS_SUCCESS;
+> +
+> +failed:
+>         ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_MAP_CLIENT,
+> -                       HAL_OP_MAP_CLIENT_GET_INSTANCES, HAL_STATUS_FAILED);
+> +                               HAL_OP_MAP_CLIENT_GET_INSTANCES, status);
+>  }
+>
+>  static const struct ipc_handler cmd_handlers[] = {
 > --
-> To unsubscribe from this list: send the line "unsubscribe linux-wpan" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> 1.9.3
+>
+
+Best regards,
+Grzegorz
