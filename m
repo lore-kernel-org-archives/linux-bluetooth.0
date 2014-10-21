@@ -1,40 +1,28 @@
 Return-Path: <cyrus@holtmann.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 8.0 \(1990.1\))
-Subject: Re: [PATCH] core: Add ControllerMode to list of supported options
+Subject: Re: Confused about gatttool in Makefile.tools
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1413877738-23941-1-git-send-email-jacob@teenageengineering.com>
-Date: Tue, 21 Oct 2014 04:08:23 -0700
+In-Reply-To: <20141021183846.3ec677db@Fedora>
+Date: Tue, 21 Oct 2014 04:12:28 -0700
 Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <3055BAC9-79FC-42D1-B8ED-292E8B5D2665@holtmann.org>
-References: <1413877738-23941-1-git-send-email-jacob@teenageengineering.com>
-To: Jacob Siverskog <jacob@teenageengineering.com>
+Message-Id: <830724D3-5CFE-4838-BE86-777836B8B90D@holtmann.org>
+References: <20141021183846.3ec677db@Fedora>
+To: Qian Lei <qianl.fnst@cn.fujitsu.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jacob,
+Hi Quian,
 
-> Signed-off-by: Jacob Siverskog <jacob@teenageengineering.com>
+> I don't understand the log message "build: Only compile actually
+> selected binaries" in commit ed7989e, which modifies the file
+> Makefile.tools. Gatttool and some other programs are only compiled and
+> do not been installed into system any more. I'm confused about it, why
+> did we do this?
 
-we do not add signed-off-by for userspace patches. That is only required for kernel patches.
+some tools are only useful to developers. They should not be installed. We only install tools that are generally useful (or considered legacy like hciconfig).
 
-> Prevent warning message 'Unknown key ControllerMode in main.conf'.
-> ---
-> src/main.c | 1 +
-> 1 file changed, 1 insertion(+)
-> 
-> diff --git a/src/main.c b/src/main.c
-> index 191dc11..061060d 100644
-> --- a/src/main.c
-> +++ b/src/main.c
-> @@ -79,6 +79,7 @@ static const char * const supported_options[] = {
-> 	"ReverseServiceDiscovery",
-> 	"NameResolving",
-> 	"DebugKeys",
-> +	"ControllerMode",
-> };
-
-Good catch. Please resend the patch without signed-off-by line.
+The jump to BlueZ 5 came with a massive cleanup of our tools and only a selected few get installed. Main operation should be done with bluetoothctl these days.
 
 Regards
 
