@@ -1,43 +1,60 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-From: Sujay Sarkhel <ssarkhe@ncsu.edu>
-Date: Mon, 20 Oct 2014 19:43:51 -0700
-Message-ID: <CAE7yNv_mZU-yyLszs5BmhUc7MLSwK=TZZ4ArJfeS9Cnn4VgkeQ@mail.gmail.com>
-Subject: BlueZ 5: SDP Record & D-Bus APIs
-To: linux-bluetooth@vger.kernel.org
+From: Sujay Sarkhel <sujay.sarkhel@ncsu.edu>
+Date: Mon, 20 Oct 2014 19:17:26 -0700
+Message-ID: <CAE7yNv_iJc=mS+ksZeWwzgYJ6zpDFB+3hRnpwWMT_HjG4ZLTiA@mail.gmail.com>
+Subject: BlueZ 5.24: Using the LE Heart Rate Profile
+To: linux-bluetooth <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-I'm still getting used to BlueZ 5 D-Bus APIs and I was wondering if
-someone can help me with a few queries that I've:
+Hi,
 
-1. BlueZ 4 D-Bus Device API provided a method called
-DiscoverServices(string pattern) that could be used to retrieve
-service information from the remote device in XML format. I used to
-use this XML information to retrieve several meta-data relevant to my
-use-case.
+I'm pretty much new to using BlueZ 5 and I've been experimenting with
+a Bluetooth LE heart rate watch on a Raspberry Pi. I would really
+appreciate if someone can point me to the right direction.
 
-For example: for Device ID profile, I would want to retrieve vendor
-information (id/vendoridsource, etc), for HDP, the optional text
-associated with an MDEP, etc.
+When I run the "test-heartrate" test, I see the following error:
 
->From what I understand, this method does not exist anymore in the
-exposed APIs. I was wondering whether there's a workaround? How can I
-still look at the meta-data?
+Traceback (most recent call last):
+  File "./test-heartrate", line 88, in <module>
+    properties = dev_prop.GetAll(HEARTRATE_INTERFACE)
+  File "/usr/lib/python2.7/dist-packages/dbus/proxies.py", line 70, in __call__
+    return self._proxy_method(*args, **keywords)
+  File "/usr/lib/python2.7/dist-packages/dbus/proxies.py", line 145, in __call__
+    **keywords)
+  File "/usr/lib/python2.7/dist-packages/dbus/connection.py", line
+651, in call_blocking
+    message, timeout)
+dbus.exceptions.DBusException: org.freedesktop.DBus.Error.InvalidArgs:
+No such interface 'org.bluez.HeartRate1'
 
-2. I was investigating how to work with the BlueZ D-Bus GATT APIs when
-it comes to talking to GATT services on remote devices. Is that
-possible? If yes, then how do I retrieve the list of object path
-corresponding to the available remote services?
+Not sure what I'm doing wrong. Here're some relevant information
 
-I've a Bluetooth LE heart rate watch, to which I can connect and use
-gatttool to talk to. I was wondering how to do the same using the
-experimental APIs.
+BlueZ version installed: 5.24
 
-I apologize in advance for my ignorance. Still learning about BlueZ,
-D-Bus and Bluetooth LE.
+For installation, I followed the steps listed in:
+http://www.linuxfromscratch.org/blfs/view/svn/general/bluez.html (with
+one addition: I added --enable-experimental during configuration)
 
-Would really appreciate any pointers in this regard. Thanks!
+It seems I'm facing the same issue as described at:
+http://comments.gmane.org/gmane.linux.bluez.kernel/47931
+I've followed the suggestion provided as well as tried passing -E to
+bluetoothd while running it but to no avail.
 
-- Sujay
+I can successfully run:
+test-discovery : To discover devices, including the heart-rate watch
+test-device connect <bt_addr>: To connect to this device
+
+But the one that is failing for me is test-heartrate
+
+Even after connecting to the device, when I try to introspect (
+dbus-send --system --dest=org.bluez --print-reply [obj_path]
+org.freedesktop.DBus.Introspectable.Introspect), I don't see the
+"org.bluez.HeartRate1" showing up, with its appropriate methods.
+
+I can post the entire introspection data, along with the device
+properties that I get, if that helps.
+
+Would really appreciate any helpful pointer in this regard. Thanks!!
