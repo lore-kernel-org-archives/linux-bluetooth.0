@@ -1,42 +1,53 @@
 Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
-To: Marcin Kraglak <marcin.kraglak@tieto.com>
+To: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/2] android/bluetooth: Fix Supported feature bitmask for MPMD scenarios
-Date: Tue, 21 Oct 2014 11:03:50 +0200
-Message-ID: <5359012.3MzvoDGJvz@uw000953>
-In-Reply-To: <1413812032-26631-1-git-send-email-marcin.kraglak@tieto.com>
-References: <1413812032-26631-1-git-send-email-marcin.kraglak@tieto.com>
+Subject: Re: [PATCH v3 0/5] android/map-client: Add MAP client daemon implementation
+Date: Tue, 21 Oct 2014 10:34:41 +0200
+Message-ID: <1569157.Vgjyl7bW8i@uw000953>
+In-Reply-To: <1413383281-17292-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+References: <1413383281-17292-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcin,
+Hi Grzegorz,
 
-On Monday 20 of October 2014 15:33:51 Marcin Kraglak wrote:
-> Set A2DP-SRC_AVRCP-TG instead of A2DP-SNK_AVRCP-CT_DUN-DT bit.
-> It was affecting TC_SDP_CTH_SD_BV_01_I PTS test case.
-> ---
->  android/bluetooth.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+On Wednesday 15 of October 2014 16:27:56 Grzegorz Kolodziejczyk wrote:
+> v1.
+> *Add MAP client daemon implementation (skeleton, body)
+> *Add haltest MAP client support
 > 
-> diff --git a/android/bluetooth.c b/android/bluetooth.c
-> index 827e205..03eb1a1 100644
-> --- a/android/bluetooth.c
-> +++ b/android/bluetooth.c
-> @@ -70,7 +70,7 @@
->   */
->  #define MPS_DEFAULT_MPMD ((1ULL << 1) | (1ULL << 3) | (1ULL << 5) | \
->  				(1ULL << 6) | (1ULL << 8) | (1ULL << 10) | \
-> -				(1ULL << 12) | (1ULL << 15) | (1ULL << 18))
-> +				(1ULL << 12) | (1ULL << 15) | (1ULL << 17))
->  
->  /*
->   * bits in bitmask as defined in table 6.5 of Multi Profile Specification
+> v2.
+> *Fix style issue in cmd handler
+> *Change if-else to if statements for map client instance create
+> *Check if allocation of cb data has failed
+> *Set free as destroy callback function for search service
+> *Fix status overwrite (add fail label)
+> 
+> v3.
+> *Fix protos handling, rfcomm channel check
+> 
+> Grzegorz Kolodziejczyk (5):
+>   android/map-client: Add initial files
+>   android/map-client: Add stubs for MAP client commands handlers
+>   android/map-client: Add support for get remote MAS instances
+>   android/ipc-tester: Add case for MAP client service opcode boundries
+>   android/ipc-tester: Add cases for MAP client msg size
+> 
+>  android/Android.mk   |   1 +
+>  android/Makefile.am  |   1 +
+>  android/ipc-tester.c |  18 +++++
+>  android/main.c       |  12 +++
+>  android/map-client.c | 205 +++++++++++++++++++++++++++++++++++++++++++++++++++
+>  android/map-client.h |  26 +++++++
+>  6 files changed, 263 insertions(+)
+>  create mode 100644 android/map-client.c
+>  create mode 100644 android/map-client.h
 > 
 
-Both patches applied. Thanks.
+I've fixed this double free you mentioned and applied all patches, thanks.
 
 -- 
 Best regards, 
