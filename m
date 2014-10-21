@@ -1,54 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v3 0/5] android/map-client: Add MAP client daemon implementation
-Date: Tue, 21 Oct 2014 10:34:41 +0200
-Message-ID: <1569157.Vgjyl7bW8i@uw000953>
-In-Reply-To: <1413383281-17292-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
-References: <1413383281-17292-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+From: Jacob Siverskog <jacob@teenageengineering.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Jacob Siverskog <jacob@teenageengineering.com>
+Subject: [PATCH] core: Add ControllerMode to list of supported options
+Date: Tue, 21 Oct 2014 09:48:58 +0200
+Message-Id: <1413877738-23941-1-git-send-email-jacob@teenageengineering.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Grzegorz,
+Signed-off-by: Jacob Siverskog <jacob@teenageengineering.com>
 
-On Wednesday 15 of October 2014 16:27:56 Grzegorz Kolodziejczyk wrote:
-> v1.
-> *Add MAP client daemon implementation (skeleton, body)
-> *Add haltest MAP client support
-> 
-> v2.
-> *Fix style issue in cmd handler
-> *Change if-else to if statements for map client instance create
-> *Check if allocation of cb data has failed
-> *Set free as destroy callback function for search service
-> *Fix status overwrite (add fail label)
-> 
-> v3.
-> *Fix protos handling, rfcomm channel check
-> 
-> Grzegorz Kolodziejczyk (5):
->   android/map-client: Add initial files
->   android/map-client: Add stubs for MAP client commands handlers
->   android/map-client: Add support for get remote MAS instances
->   android/ipc-tester: Add case for MAP client service opcode boundries
->   android/ipc-tester: Add cases for MAP client msg size
-> 
->  android/Android.mk   |   1 +
->  android/Makefile.am  |   1 +
->  android/ipc-tester.c |  18 +++++
->  android/main.c       |  12 +++
->  android/map-client.c | 205 +++++++++++++++++++++++++++++++++++++++++++++++++++
->  android/map-client.h |  26 +++++++
->  6 files changed, 263 insertions(+)
->  create mode 100644 android/map-client.c
->  create mode 100644 android/map-client.h
-> 
+Prevent warning message 'Unknown key ControllerMode in main.conf'.
+---
+ src/main.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-I've fixed this double free you mentioned and applied all patches, thanks.
-
+diff --git a/src/main.c b/src/main.c
+index 191dc11..061060d 100644
+--- a/src/main.c
++++ b/src/main.c
+@@ -79,6 +79,7 @@ static const char * const supported_options[] = {
+ 	"ReverseServiceDiscovery",
+ 	"NameResolving",
+ 	"DebugKeys",
++	"ControllerMode",
+ };
+ 
+ GKeyFile *btd_get_main_conf(void)
 -- 
-Best regards, 
-Szymon Janc
+1.8.3.2
+
