@@ -1,35 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <07E0A5D2-1E7E-4D89-A8A8-F87E643882A0@holtmann.org>
-References: <CAAJw_ZuK6SUy22R133CezsqoU4+dTzxmsipBAp7rCvYBo+zrxw@mail.gmail.com>
-	<8BA7CD92-B061-41CE-BD43-7E1B7CD1DF6A@holtmann.org>
-	<CAAJw_ZsCeWWoFvdm1Sid6xSDGawp8RaqP07TM1Q2CvSF8DxU=w@mail.gmail.com>
-	<8940108C-6C27-49E3-80C8-8983F32D6F55@holtmann.org>
-	<CAAJw_ZvrynW0W6fE21ieG+KUwWr_g7-9kDonKYT3ZoEi3Nntiw@mail.gmail.com>
-	<07E0A5D2-1E7E-4D89-A8A8-F87E643882A0@holtmann.org>
-Date: Tue, 21 Oct 2014 13:46:28 +0800
-Message-ID: <CAAJw_ZshxjeK5N3wcFn5cCUZJ0iKVcpFeDUAoijh7JZiweGjqg@mail.gmail.com>
-Subject: Re: how to set PSCAN mode in .conf?
-From: Jeff Chua <jeff.chua.linux@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth <linux-bluetooth@vger.kernel.org>
+From: Sujay Sarkhel <ssarkhe@ncsu.edu>
+Date: Mon, 20 Oct 2014 19:43:51 -0700
+Message-ID: <CAE7yNv_mZU-yyLszs5BmhUc7MLSwK=TZZ4ArJfeS9Cnn4VgkeQ@mail.gmail.com>
+Subject: BlueZ 5: SDP Record & D-Bus APIs
+To: linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Tue, Oct 21, 2014 at 2:03 AM, Marcel Holtmann <marcel@holtmann.org> wrote:
+I'm still getting used to BlueZ 5 D-Bus APIs and I was wondering if
+someone can help me with a few queries that I've:
 
-> See doc/mgmt-api.txt for the details since btmgmt maps the management interface. In short action 1 means to allow incoming connections.
+1. BlueZ 4 D-Bus Device API provided a method called
+DiscoverServices(string pattern) that could be used to retrieve
+service information from the remote device in XML format. I used to
+use this XML information to retrieve several meta-data relevant to my
+use-case.
 
-Marcel,
+For example: for Device ID profile, I would want to retrieve vendor
+information (id/vendoridsource, etc), for HDP, the optional text
+associated with an MDEP, etc.
 
-Got it. I tried "-a 0" and it returned Invalid Parameters. But anyway,
-"1" is the one I needed.
+>From what I understand, this method does not exist anymore in the
+exposed APIs. I was wondering whether there's a workaround? How can I
+still look at the meta-data?
 
-> Mixing btmgmt and hciconfig is not a good idea. hciconfig is for all style APIs and btmgmt is for new mgmt interfaces. For example bluetoothd only uses the mgmt interface. So my advice is to just run bluetoothd and then use the D-Bus command to make it discoverable. That will always work correctly and still is as you have seen by running bluetoothctl.
->
-> It is like this kernel -> mgmt -> bluetoothd -> D-Bus -> bluetoothctl. And you can replace bluetoothctl with a Python script or your own code.
+2. I was investigating how to work with the BlueZ D-Bus GATT APIs when
+it comes to talking to GATT services on remote devices. Is that
+possible? If yes, then how do I retrieve the list of object path
+corresponding to the available remote services?
 
-Great advice. Thank you for sharing.
+I've a Bluetooth LE heart rate watch, to which I can connect and use
+gatttool to talk to. I was wondering how to do the same using the
+experimental APIs.
 
-Jeff.
+I apologize in advance for my ignorance. Still learning about BlueZ,
+D-Bus and Bluetooth LE.
+
+Would really appreciate any pointers in this regard. Thanks!
+
+- Sujay
