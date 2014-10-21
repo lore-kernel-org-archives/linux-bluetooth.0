@@ -1,28 +1,27 @@
 Return-Path: <cyrus@holtmann.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 8.0 \(1990.1\))
-Subject: Re: Confused about gatttool in Makefile.tools
+Subject: Re: how to set PSCAN mode in .conf?
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20141021183846.3ec677db@Fedora>
-Date: Tue, 21 Oct 2014 04:12:28 -0700
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <830724D3-5CFE-4838-BE86-777836B8B90D@holtmann.org>
-References: <20141021183846.3ec677db@Fedora>
-To: Qian Lei <qianl.fnst@cn.fujitsu.com>
+In-Reply-To: <CAAJw_ZshxjeK5N3wcFn5cCUZJ0iKVcpFeDUAoijh7JZiweGjqg@mail.gmail.com>
+Date: Tue, 21 Oct 2014 04:06:40 -0700
+Cc: linux-bluetooth <linux-bluetooth@vger.kernel.org>
+Message-Id: <A5A941D6-C4EB-45A1-96A5-8E9E2990EEDB@holtmann.org>
+References: <CAAJw_ZuK6SUy22R133CezsqoU4+dTzxmsipBAp7rCvYBo+zrxw@mail.gmail.com> <8BA7CD92-B061-41CE-BD43-7E1B7CD1DF6A@holtmann.org> <CAAJw_ZsCeWWoFvdm1Sid6xSDGawp8RaqP07TM1Q2CvSF8DxU=w@mail.gmail.com> <8940108C-6C27-49E3-80C8-8983F32D6F55@holtmann.org> <CAAJw_ZvrynW0W6fE21ieG+KUwWr_g7-9kDonKYT3ZoEi3Nntiw@mail.gmail.com> <07E0A5D2-1E7E-4D89-A8A8-F87E643882A0@holtmann.org> <CAAJw_ZshxjeK5N3wcFn5cCUZJ0iKVcpFeDUAoijh7JZiweGjqg@mail.gmail.com>
+To: Jeff Chua <jeff.chua.linux@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Quian,
+Hi Jeff,
 
-> I don't understand the log message "build: Only compile actually
-> selected binaries" in commit ed7989e, which modifies the file
-> Makefile.tools. Gatttool and some other programs are only compiled and
-> do not been installed into system any more. I'm confused about it, why
-> did we do this?
+>> See doc/mgmt-api.txt for the details since btmgmt maps the management interface. In short action 1 means to allow incoming connections.
+> 
+> Got it. I tried "-a 0" and it returned Invalid Parameters. But anyway,
+> "1" is the one I needed.
 
-some tools are only useful to developers. They should not be installed. We only install tools that are generally useful (or considered legacy like hciconfig).
+the documentation clearly says that action 0x00 and 0x02 are only valid for LE addresses. Action 0x01 is valid for BR/EDR and LE addresses.
 
-The jump to BlueZ 5 came with a massive cleanup of our tools and only a selected few get installed. Main operation should be done with bluetoothctl these days.
+If anyone wants to implement action 0x00 semantics on BR/EDR, then it requires using Periodic Inquiry. It is possible, but it is not a common use case these days.
 
 Regards
 
