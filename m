@@ -1,56 +1,69 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv2 1/3] bnep: Add error print and return errno instead of -1
-Date: Wed, 22 Oct 2014 16:34:28 +0300
-Message-Id: <1413984870-24023-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <CAMv5Gbck+=b9kY-s+gd3shJsLUDAEZib5dKGM09ZBWkP==ufFw@mail.gmail.com>
+Subject: [PATCHv2 2/3] bnep: trivial: code cleanup
+Date: Wed, 22 Oct 2014 16:34:29 +0300
+Message-Id: <1413984870-24023-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1413984870-24023-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <CAMv5Gbck+=b9kY-s+gd3shJsLUDAEZib5dKGM09ZBWkP==ufFw@mail.gmail.com>
+ <1413984870-24023-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
 ---
- profiles/network/bnep.c | 15 +++++++--------
- 1 file changed, 7 insertions(+), 8 deletions(-)
+ profiles/network/bnep.c | 9 ++++-----
+ 1 file changed, 4 insertions(+), 5 deletions(-)
 
 diff --git a/profiles/network/bnep.c b/profiles/network/bnep.c
-index 927367c..f8fcd1f 100644
+index f8fcd1f..d8883d6 100644
 --- a/profiles/network/bnep.c
 +++ b/profiles/network/bnep.c
-@@ -219,7 +219,7 @@ static int bnep_if_up(const char *devname)
- static int bnep_if_down(const char *devname)
+@@ -133,7 +133,6 @@ const char *bnep_name(uint16_t id)
+ int bnep_init(void)
  {
- 	struct ifreq ifr;
--	int sk, err;
-+	int sk, err = 0;
+ 	ctl = socket(PF_BLUETOOTH, SOCK_RAW, BTPROTO_BNEP);
+-
+ 	if (ctl < 0) {
+ 		int err = -errno;
  
- 	sk = socket(AF_INET, SOCK_DGRAM, 0);
+@@ -141,7 +140,7 @@ int bnep_init(void)
+ 			warn("kernel lacks bnep-protocol support");
+ 		else
+ 			error("bnep: Failed to open control socket: %s (%d)",
+-						strerror(-err), -err);
++							strerror(-err), -err);
  
-@@ -229,16 +229,15 @@ static int bnep_if_down(const char *devname)
- 	ifr.ifr_flags &= ~IFF_UP;
+ 		return err;
+ 	}
+@@ -165,7 +164,7 @@ static int bnep_conndel(const bdaddr_t *dst)
+ 	if (ioctl(ctl, BNEPCONNDEL, &req) < 0) {
+ 		int err = -errno;
+ 		error("bnep: Failed to kill connection: %s (%d)",
+-						strerror(-err), -err);
++							strerror(-err), -err);
+ 		return err;
+ 	}
+ 	return 0;
+@@ -184,7 +183,7 @@ static int bnep_connadd(int sk, uint16_t role, char *dev)
+ 	if (ioctl(ctl, BNEPCONNADD, &req) < 0) {
+ 		int err = -errno;
+ 		error("bnep: Failed to add device %s: %s(%d)",
+-				dev, strerror(-err), -err);
++						dev, strerror(-err), -err);
+ 		return err;
+ 	}
  
- 	/* Bring down the interface */
--	err = ioctl(sk, SIOCSIFFLAGS, (void *) &ifr);
-+	if (ioctl(sk, SIOCSIFFLAGS, (void *) &ifr) < 0) {
-+		err = -errno;
-+		error("bnep: Could not bring down %s: %s(%d)",
+@@ -208,7 +207,7 @@ static int bnep_if_up(const char *devname)
+ 	if (ioctl(sk, SIOCSIFFLAGS, (void *) &ifr) < 0) {
+ 		err = -errno;
+ 		error("bnep: Could not bring up %s: %s(%d)",
+-				devname, strerror(-err), -err);
 +						devname, strerror(-err), -err);
-+	}
+ 	}
  
  	close(sk);
- 
--	if (err < 0) {
--		error("bnep: Could not bring down %s", devname);
--		return err;
--	}
--
--	return 0;
-+	return err;
- }
- 
- static gboolean bnep_watchdog_cb(GIOChannel *chan, GIOCondition cond,
 -- 
 1.9.1
 
