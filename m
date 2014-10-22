@@ -1,56 +1,87 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: rtk_btusb issues
-Mime-Version: 1.0 (Mac OS X Mail 8.0 \(1990.1\))
-Content-Type: text/plain; charset=us-ascii
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <59774.86.105.94.79.1413974113.squirrel@boosthardware.com>
-Date: Wed, 22 Oct 2014 06:05:45 -0700
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <7FC77530-F48C-436C-8954-195E9CD08E97@holtmann.org>
-References: <59774.86.105.94.79.1413974113.squirrel@boosthardware.com>
-To: Patrick Shirkey <pshirkey@boosthardware.com>
+MIME-Version: 1.0
+In-Reply-To: <1413976251-32402-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1413976251-32402-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+	<1413976251-32402-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Date: Wed, 22 Oct 2014 14:55:54 +0200
+Message-ID: <CAMv5Gbck+=b9kY-s+gd3shJsLUDAEZib5dKGM09ZBWkP==ufFw@mail.gmail.com>
+Subject: Re: [PATCH 3/3] bnep: Return errno instead of -1 and print error
+From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
+To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+Cc: linux-bluetooth <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Patrick,
+Hi Andrei,
 
-> I have an android device running the rtk_btusb driver. The original driver
-> was a couple of years old and there was a problem with stability with BLE.
-> In addition the localname was not found in the scan_response data.
-> 
-> I upgraded the bluetooth stack by manually backporting from a recent
-> kernel. That fixed the issue wit the scan_repsonse data but there were
-> still stability issues with BLE devices (although slightly improved
-> compared to the older bluetooth stack).
-> 
-> I have tried upgrading the driver to the latest version of the rtk_btusb
-> driver from the git repo and ported the hooks for bluedroid from the old
-> driver however I get issues with hci send command when loading the driver.
-> 
-> http://pastebin.com/hXALmXBr
-> 
-> I traced the command but I am not sure where the send value is generated.
-> I can see the function definition in the hci_dev struct but not the
-> location where the value is actually set.
-> 
-> I thought it might be an issue specific to bluedroid so I installed bluez
-> but the issue is still there so it appears to be a bug in my version of
-> the driver or something wrong with the bluetooth kernel layer.
-> 
-> I went back to the older version of the driver running against  bluez
-> instead of bluedroid. That gets me further along but I still cannot
-> initialise the bluetooth system on the device.
-> 
-> http://pastebin.com/HcSZXiMu
-> 
-> Does anyone have any suggestions for how to go about resolving this
-> situation I have got myself into?
+On 22 October 2014 13:10, Andrei Emeltchenko
+<Andrei.Emeltchenko.news@gmail.com> wrote:
+> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+>
+> Make code consistent with the rest returning -errno and printing error
+> message.
+> ---
+>  profiles/network/bnep.c | 18 +++++++++---------
+>  1 file changed, 9 insertions(+), 9 deletions(-)
+>
+> diff --git a/profiles/network/bnep.c b/profiles/network/bnep.c
+> index 4cf38d9..09d4b65 100644
+> --- a/profiles/network/bnep.c
+> +++ b/profiles/network/bnep.c
+> @@ -231,7 +231,7 @@ static int bnep_if_down(const char *devname)
+>         if (ioctl(sk, SIOCSIFFLAGS, (void *) &ifr) < 0) {
+>                 err = -errno;
+>                 error("bnep: Could not bring down %s: %s(%d)",
+> -                               devname, strerror(-err), -err);
+> +                                               devname, strerror(-err), -err);
 
-the rtk_btusb driver is not an upstream driver and that is the main problem. There has been recently an effort to get btusb support the Realtek devices, but then it went silent again.
+Why don't you fix this indention in first patch ? (this line is added
+in previous patch)
 
-What you need is having proper Realtek support in btusb and nothing else. Out of tree hacked up vendor drivers are not something any of us will likely have a look at and trying to fix.
+>         }
+>
+>         close(sk);
+> @@ -520,7 +520,7 @@ static int bnep_del_from_bridge(const char *devname, const char *bridge)
+>  {
+>         int ifindex;
+>         struct ifreq ifr;
+> -       int sk, err;
+> +       int sk, err = 0;
+>
+>         if (!devname || !bridge)
+>                 return -EINVAL;
+> @@ -535,16 +535,16 @@ static int bnep_del_from_bridge(const char *devname, const char *bridge)
+>         strncpy(ifr.ifr_name, bridge, IFNAMSIZ - 1);
+>         ifr.ifr_ifindex = ifindex;
+>
+> -       err = ioctl(sk, SIOCBRDELIF, &ifr);
+> +       if (ioctl(sk, SIOCBRDELIF, &ifr) < 0) {
+> +               err = -errno;
+> +               error("bnep: Can't delete %s from the bridge %s: %s(%d)",
+> +                                       devname, bridge, strerror(-err), -err);
+> +       } else
+> +               info("bridge %s: interface %s removed", bridge, devname);
+>
+>         close(sk);
+>
+> -       if (err < 0)
+> -               return err;
+> -
+> -       info("bridge %s: interface %s removed", bridge, devname);
+> -
+> -       return 0;
+> +       return err;
+>  }
+>
+>  int bnep_server_add(int sk, uint16_t dst, char *bridge, char *iface,
+> --
+> 1.9.1
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
-Regards
-
-Marcel
-
+BR,
+Grzegorz
