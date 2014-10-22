@@ -1,88 +1,253 @@
 Return-Path: <cyrus@holtmann.org>
+From: Szymon Janc <szymon.janc@gmail.com>
+To: Marcin Kraglak <marcin.kraglak@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCHv5 03/14] shared/gatt: Discover included services 128 bit UUIDS
+Date: Wed, 22 Oct 2014 20:43:42 +0200
+Message-ID: <3896657.u0WVNEEou6@athlon>
+In-Reply-To: <1413454646-23076-4-git-send-email-marcin.kraglak@tieto.com>
+References: <1413454646-23076-1-git-send-email-marcin.kraglak@tieto.com> <1413454646-23076-4-git-send-email-marcin.kraglak@tieto.com>
 MIME-Version: 1.0
-Date: Wed, 22 Oct 2014 13:12:10 -0700
-Message-ID: <CAHrH25S3h=LjaXSFkJiz5X41JD9-1zNJiD1R7hQNfA3aSbO0sg@mail.gmail.com>
-Subject: Attribute security permissions and CCC descriptors in shared/gatt-server.
-From: Arman Uguray <armansito@chromium.org>
-To: BlueZ development <linux-bluetooth@vger.kernel.org>,
-	Marcin Kraglak <marcin.kraglak@tieto.com>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	Marcel Holtmann <marcel@holtmann.org>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="us-ascii"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi all,
+Hi Marcin,
 
-I have some unresolved questions about two aspects of
-shared/gatt-server and I thought it might be better to discuss them
-before moving on with the related parts of the implementation.
+On Thursday 16 October 2014 12:17:15 Marcin Kraglak wrote:
+> If included services has 128 bit UUID, it won't be returned in
+> READ_BY_TYPE_RSP. To get UUID READ_REQUEST is used.
+> This procedure is described in CORE SPEC 4.5.1 "Find Included Services".
+> ---
+>  src/shared/gatt-helpers.c | 170
+> +++++++++++++++++++++++++++++++++++++++++++++- 1 file changed, 169
+> insertions(+), 1 deletion(-)
+> 
+> diff --git a/src/shared/gatt-helpers.c b/src/shared/gatt-helpers.c
+> index dcb2a2f..c18f738 100644
+> --- a/src/shared/gatt-helpers.c
+> +++ b/src/shared/gatt-helpers.c
+> @@ -692,6 +692,160 @@ bool bt_gatt_discover_secondary_services(struct bt_att
+> *att, bt_uuid_t *uuid, destroy, false);
+>  }
+> 
+> +struct read_incl_data {
+> +	struct discovery_op *op;
+> +	struct bt_gatt_result *result;
+> +	int pos;
+> +	int ref_count;
+> +};
+> +
+> +static struct read_incl_data *new_read_included(struct bt_gatt_result *res)
+> +{
+> +	struct read_incl_data *data;
+> +
+> +	data = new0(struct read_incl_data, 1);
+> +	if (!data)
+> +		return NULL;
+> +
+> +	data->op = discovery_op_ref(res->op);
+> +	data->result = res;
+> +
+> +	return data;
+> +};
+> +
+> +static struct read_incl_data *read_included_ref(struct read_incl_data
+> *data) +{
+> +	__sync_fetch_and_add(&data->ref_count, 1);
+> +
+> +	return data;
+> +}
+> +
+> +static void read_included_unref(void *data)
+> +{
+> +	struct read_incl_data *read_data = data;
+> +
+> +	if (__sync_sub_and_fetch(&read_data->ref_count, 1))
+> +		return;
+> +
+> +	discovery_op_unref(read_data->op);
+> +
+> +	free(read_data);
+> +}
+> +
+> +static void discover_included_cb(uint8_t opcode, const void *pdu,
+> +					uint16_t length, void *user_data);
+> +
+> +static void read_included_cb(uint8_t opcode, const void *pdu,
+> +					uint16_t length, void *user_data)
+> +{
+> +	struct read_incl_data *data = user_data;
+> +	struct bt_gatt_result *final_result = NULL;
+> +	struct discovery_op *op = data->op;
+> +	struct bt_gatt_result *cur_result;
+> +	uint8_t att_ecode = 0;
+> +	uint16_t handle;
+> +	uint8_t read_pdu[2];
+> +	bool success;
+> +
+> +	if (opcode == BT_ATT_OP_ERROR_RSP) {
+> +		success = false;
+> +		att_ecode = process_error(pdu, length);
+> +		goto done;
+> +	}
+> +
+> +	if (opcode != BT_ATT_OP_READ_RSP || (!pdu && length)) {
+> +		success = false;
+> +		goto done;
+> +	}
+> +
+> +	if (length != 16) {
 
-*** 1. Who will be responsible for Attribute Permission checks? ***
+I think we should have those magic numbers defined (this is more general 
+comment since more code here uses magic values). It might be clear for you now 
+why this must be 16 but won't be in 2 months :)
 
-These mainly come in play when the remote end wants to read or write
-the value of a characteristic/descriptor. We currently have read &
-write callbacks that get assigned by the upper-layer to a
-characteristic/descriptor definition in shared/gatt-db. Since these
-callbacks already handle the read/write it initially made sense to me
-that this is where encryption/authentication/authorization permission
-checks can be performed. I then realized that there are cases where we
-may want to perform this check before we invoke the read/write
-callback. For instance, the Prepare Write request requires attribute
-permission checks to be performed, however (in the current design) we
-wouldn't actually call the write callback until a subsequent Execute
-Write request is received.
-
-The main problem here is the fact that shared/att is designed to be
-transport agnostic: it doesn't know whether the underlying connection
-is AF_BLUETOOTH or something else, so it can't make assumptions on the
-nature of the connection to obtain security level information. We
-could add some sort of delegate callback to this end, perhaps
-something like:
-
-static uint8_t my_sec_handler(void *user_data)
-{
-        ....
-        return sec;
-}
-...
-bt_att_register_security_handler(att, my_sec_handler);
-
-And then bt_gatt_server can obtain the current security level like this:
-
-uint8_t sec = bt_att_get_security_level(att);
-
-where bt_att_get_security_level is implemented as:
-
-static uint8_t bt_att_get_security_level(struct bt_att *att)
-{
-      if (!att || !att->security_callback)
-              return 0;
-
-      return att->security_callback(att->security_data);
-}
+> +		success = false;
+> +		goto done;
+> +	}
 
 
-I'm mostly thinking out loud here; would something like this make sense?
 
+Empty line here.
 
-*** 2. Is shared/gatt-server responsible for keeping track of Client
-Characteristic Configuration descriptor states for each bonded client?
-***
+> +	cur_result = result_create(opcode, pdu, length, length, op);
+> +	if (!cur_result) {
+> +		success = false;
+> +		goto done;
+> +	}
+> +
+> +	if (!op->result_head)
+> +		op->result_head = op->result_tail = cur_result;
 
-Currently, the descriptor read/write operations need to be handled by
-the upper layer via the read/write callbacks anyway, since the
-side-effects of a writing to a particular CCC descriptor need to be
-implemented by the related profile. In the bonding case, the
-read/write callbacks could determine what value to return and how to
-cache the value on a per-device basis without shared/gatt-db having a
-notion of "per-client CCC descriptors".
+Braces on both branches.
 
-Does this make sense? If so, is there a point of keeping the "bdaddr_t
-*bdaddr" arguments of gatt_db_read_t, gatt_db_write_t, gatt_db_read,
-and gatt_db_write? Note that I'm currently passing NULL to all of
-these calls for this parameter in shared/gatt-server, since bt_att
-doesn't have a notion of a BD_ADDR.
+> +	else {
+> +		op->result_tail->next = cur_result;
+> +		op->result_tail = cur_result;
+> +	}
+> +
+> +	if (data->pos == data->result->pdu_len) {
+> +		uint16_t last_handle, data_len;
+> +		uint8_t pdu[6];
+> +
+> +		data_len = data->result->data_len;
+> +		last_handle = get_le16(data->result->pdu + data->pos -
+> +								data_len);
 
-Thanks,
-Arman
+This data_len variable doesn't make code clearer.
+
+> +		if (last_handle == op->end_handle) {
+> +			final_result = op->result_head;
+> +			success = true;
+> +			goto done;
+> +		}
+> +
+> +		put_le16(last_handle + 1, pdu);
+> +		put_le16(op->end_handle, pdu + 2);
+> +		put_le16(GATT_INCLUDE_UUID, pdu + 4);
+> +
+> +		if (bt_att_send(op->att, BT_ATT_OP_READ_BY_TYPE_REQ,
+> +						pdu, sizeof(pdu),
+> +						discover_included_cb,
+> +						discovery_op_ref(op),
+> +						discovery_op_unref))
+
+This should fit just in 2 lines, instead of 4.
+
+> +			return;
+> +
+> +		discovery_op_unref(op);
+> +		success = false;
+> +		goto done;
+> +	}
+> +
+> +	handle = get_le16(data->result->pdu + data->pos + 2);
+> +	put_le16(handle, read_pdu);
+
+So if both are LE value why not just memcpy() here?
+
+> +
+> +	data->pos += data->result->data_len;
+> +
+> +	if (bt_att_send(op->att, BT_ATT_OP_READ_REQ, read_pdu, sizeof(read_pdu),
+> +							read_included_cb,
+> +							read_included_ref(data),
+> +							read_included_unref))
+
+Ditto.
+
+> +		return;
+> +
+> +	read_included_unref(data);
+> +	success = false;
+> +
+> +done:
+> +	if (op->callback)
+> +		op->callback(success, att_ecode, final_result, op->user_data);
+> +}
+> +
+> +static void read_included(struct read_incl_data *data)
+> +{
+> +	struct discovery_op *op = data->op;
+> +	uint16_t handle;
+> +	uint8_t pdu[2];
+> +
+> +	handle = get_le16(data->result->pdu + 2);
+> +	put_le16(handle, pdu);
+
+memcpy
+
+> +
+> +	data->pos += data->result->data_len;
+> +
+> +	if (bt_att_send(op->att, BT_ATT_OP_READ_REQ, pdu, sizeof(pdu),
+> +							read_included_cb,
+> +							read_included_ref(data),
+> +							read_included_unref))
+> +		return;
+> +
+> +	read_included_unref(data);
+> +
+> +	if (op->callback)
+> +		op->callback(false, 0, NULL, data->op->user_data);
+> +}
+> +
+>  static void discover_included_cb(uint8_t opcode, const void *pdu,
+>  					uint16_t length, void *user_data)
+>  {
+> @@ -721,7 +875,8 @@ static void discover_included_cb(uint8_t opcode, const
+> void *pdu,
+> 
+>  	data_length = ((uint8_t *) pdu)[0];
+> 
+> -	if ((length - 1) % data_length || data_length != 8) {
+> +	if (((length - 1) % data_length) ||
+> +				(data_length != 8 && data_length != 6)) {
+>  		success = false;
+>  		goto done;
+>  	}
+> @@ -740,6 +895,19 @@ static void discover_included_cb(uint8_t opcode, const
+> void *pdu, op->result_tail = cur_result;
+>  	}
+> 
+> +	if (data_length == 6) {
+> +		struct read_incl_data *data;
+> +
+> +		data = new_read_included(cur_result);
+> +		if (!data) {
+> +			success = false;
+> +			goto done;
+> +		}
+> +
+> +		read_included(data);
+> +		return;
+> +	}
+> +
+>  	last_handle = get_le16(pdu + length - data_length);
+>  	if (last_handle != op->end_handle) {
+>  		uint8_t pdu[6];
+
+-- 
+Szymon K. Janc
+szymon.janc@gmail.com
