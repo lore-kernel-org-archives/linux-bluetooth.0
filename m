@@ -2,11 +2,11 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v4 01/11] shared/hfp: Add support for HFP HF
-Date: Wed, 22 Oct 2014 13:00:53 +0200
-Message-ID: <2009037.IXf9F6m0Mk@uw000953>
-In-Reply-To: <1412898611-12199-2-git-send-email-lukasz.rymanowski@tieto.com>
-References: <1412898611-12199-1-git-send-email-lukasz.rymanowski@tieto.com> <1412898611-12199-2-git-send-email-lukasz.rymanowski@tieto.com>
+Subject: Re: [PATCH v4 04/11] shared/hfp: Add register/unregister event for HFP HF
+Date: Wed, 22 Oct 2014 13:00:46 +0200
+Message-ID: <11593362.6Zs3oQ3sJP@uw000953>
+In-Reply-To: <1412898611-12199-5-git-send-email-lukasz.rymanowski@tieto.com>
+References: <1412898611-12199-1-git-send-email-lukasz.rymanowski@tieto.com> <1412898611-12199-5-git-send-email-lukasz.rymanowski@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -14,151 +14,209 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Łukasz,
 
-On Friday 10 of October 2014 01:50:01 Lukasz Rymanowski wrote:
-> This patch add struct hfp_hf plus fuctions to create an instance ref and
-> unref. This code based on existing hfp_gw
+On Friday 10 of October 2014 01:50:04 Lukasz Rymanowski wrote:
+> This patch adds API which allows to register/unregister for unsolicited
+> responses.
 > ---
->  src/shared/hfp.c | 92 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
->  src/shared/hfp.h |  6 ++++
->  2 files changed, 98 insertions(+)
+>  src/shared/hfp.c | 108 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  src/shared/hfp.h |   8 +++++
+>  2 files changed, 116 insertions(+)
 > 
 > diff --git a/src/shared/hfp.c b/src/shared/hfp.c
-> index efc981f..dbd049a 100644
+> index b7855ed..b1cf08e 100644
 > --- a/src/shared/hfp.c
 > +++ b/src/shared/hfp.c
-> @@ -62,6 +62,18 @@ struct hfp_gw {
->  	bool destroyed;
+> @@ -70,6 +70,8 @@ struct hfp_hf {
+>  	struct ringbuf *read_buf;
+>  	struct ringbuf *write_buf;
+>  
+> +	struct queue *event_handlers;
+> +
+>  	hfp_debug_func_t debug_callback;
+>  	hfp_destroy_func_t debug_destroy;
+>  	void *debug_data;
+> @@ -94,6 +96,18 @@ struct hfp_gw_result {
+>  	unsigned int offset;
 >  };
 >  
-> +struct hfp_hf {
-> +	int ref_count;
-> +	int fd;
-> +	bool close_on_unref;
-> +	struct io *io;
-> +	struct ringbuf *read_buf;
-> +	struct ringbuf *write_buf;
-> +
-> +	bool in_disconnect;
-> +	bool destroyed;
+> +struct hfp_hf_result {
+> +	const char *data;
+> +	unsigned int offset;
 > +};
 > +
->  struct cmd_handler {
->  	char *prefix;
->  	void *user_data;
-> @@ -807,3 +819,83 @@ bool hfp_gw_disconnect(struct hfp_gw *hfp)
->  
+> +struct event_handler {
+> +	char *prefix;
+> +	void *user_data;
+> +	hfp_destroy_func_t destroy;
+> +	hfp_hf_result_func_t callback;
+> +};
+> +
+>  static void destroy_cmd_handler(void *data)
+>  {
+>  	struct cmd_handler *handler = data;
+> @@ -828,6 +842,32 @@ bool hfp_gw_disconnect(struct hfp_gw *hfp)
 >  	return io_shutdown(hfp->io);
 >  }
-> +
-> +struct hfp_hf *hfp_hf_new(int fd)
+>  
+> +static bool match_handler_event_prefix(const void *a, const void *b)
 > +{
-> +	struct hfp_hf *hfp;
+> +	const struct event_handler *handler = a;
+> +	const char *prefix = b;
 > +
-> +	if (fd < 0)
-> +		return NULL;
+> +	if (strlen(handler->prefix) != strlen(prefix))
+> +		return false;
 > +
-> +	hfp = new0(struct hfp_hf, 1);
-> +	if (!hfp)
-> +		return NULL;
+> +	if (memcmp(handler->prefix, prefix, strlen(prefix)))
+> +		return false;
+
+Why not just use strcmp() here?
+I'm aware that this was based on gw code so you may also fix it there :)
+
 > +
-> +	hfp->fd = fd;
-> +	hfp->close_on_unref = false;
+> +	return true;
+> +}
 > +
-> +	hfp->read_buf = ringbuf_new(4096);
-> +	if (!hfp->read_buf) {
-> +		free(hfp);
-> +		return NULL;
-> +	}
+> +static void destroy_event_handler(void *data)
+> +{
+> +	struct event_handler *handler = data;
 > +
-> +	hfp->write_buf = ringbuf_new(4096);
-> +	if (!hfp->write_buf) {
-> +		ringbuf_free(hfp->read_buf);
-> +		free(hfp);
-> +		return NULL;
-> +	}
+> +	if (handler->destroy)
+> +		handler->destroy(handler->user_data);
 > +
-> +	hfp->io = io_new(fd);
-> +	if (!hfp->io) {
+> +	free(handler->prefix);
+> +
+> +	free(handler);
+> +}
+> +
+>  struct hfp_hf *hfp_hf_new(int fd)
+>  {
+>  	struct hfp_hf *hfp;
+> @@ -863,6 +903,15 @@ struct hfp_hf *hfp_hf_new(int fd)
+>  		return NULL;
+>  	}
+>  
+> +	hfp->event_handlers = queue_new();
+> +	if (!hfp->event_handlers) {
+> +		io_destroy(hfp->io);
 > +		ringbuf_free(hfp->write_buf);
 > +		ringbuf_free(hfp->read_buf);
 > +		free(hfp);
 > +		return NULL;
 > +	}
 > +
-> +	return hfp_hf_ref(hfp);
-> +}
+>  	return hfp_hf_ref(hfp);
+>  }
+>  
+> @@ -902,6 +951,9 @@ void hfp_hf_unref(struct hfp_hf *hfp)
+>  	ringbuf_free(hfp->write_buf);
+>  	hfp->write_buf = NULL;
+>  
+> +	queue_destroy(hfp->event_handlers, destroy_event_handler);
+> +	hfp->event_handlers = NULL;
 > +
-> +struct hfp_hf *hfp_hf_ref(struct hfp_hf *hfp)
+>  	if (!hfp->in_disconnect) {
+>  		free(hfp);
+>  		return;
+> @@ -961,6 +1013,62 @@ bool hfp_hf_set_close_on_unref(struct hfp_hf *hfp, bool do_close)
+>  	return true;
+>  }
+>  
+> +bool hfp_hf_register(struct hfp_hf *hfp, hfp_hf_result_func_t callback,
+> +						const char *prefix,
+> +						void *user_data,
+> +						hfp_destroy_func_t destroy)
 > +{
-> +	if (!hfp)
-> +		return NULL;
+> +	struct event_handler *handler;
 > +
-> +	__sync_fetch_and_add(&hfp->ref_count, 1);
+> +	if (!callback)
+> +		return false;
 > +
-> +	return hfp;
-> +}
+> +	handler = new0(struct event_handler, 1);
+> +	if (!handler)
+> +		return false;
 > +
-> +void hfp_hf_unref(struct hfp_hf *hfp)
-> +{
-> +	if (!hfp)
-> +		return;
+> +	handler->callback = callback;
+> +	handler->user_data = user_data;
 > +
-> +	if (__sync_sub_and_fetch(&hfp->ref_count, 1))
-> +		return;
-> +
-> +	io_set_write_handler(hfp->io, NULL, NULL, NULL);
-> +	io_set_read_handler(hfp->io, NULL, NULL, NULL);
-> +	io_set_disconnect_handler(hfp->io, NULL, NULL, NULL);
-> +
-> +	io_destroy(hfp->io);
-> +	hfp->io = NULL;
-> +
-> +	if (hfp->close_on_unref)
-> +		close(hfp->fd);
-> +
-> +	ringbuf_free(hfp->read_buf);
-> +	hfp->read_buf = NULL;
-> +
-> +	ringbuf_free(hfp->write_buf);
-> +	hfp->write_buf = NULL;
-> +
-> +	if (!hfp->in_disconnect) {
-> +		free(hfp);
-> +		return;
+> +	handler->prefix = strdup(prefix);
+> +	if (!handler->prefix) {
+> +		free(handler);
+> +		return false;
 > +	}
 > +
-> +	hfp->destroyed = true;
+> +	if (queue_find(hfp->event_handlers, match_handler_event_prefix,
+> +							handler->prefix)) {
+> +		destroy_event_handler(handler);
+> +		return false;
+> +	}
+> +
+> +	handler->destroy = destroy;
+> +
+> +	return queue_push_tail(hfp->event_handlers, handler);
 > +}
+> +
+> +bool hfp_hf_unregister(struct hfp_hf *hfp, const char *prefix)
+> +{
+> +	struct cmd_handler *handler;
+> +	char *lookup_prefix;
+> +
+> +	lookup_prefix = strdup(prefix);
+> +	if (!lookup_prefix)
+> +		return false;
+
+This strdup seems superfluous. If this is only due to to queue api being
+non-const then I'd just cast it to (void *).
+
+> +
+> +	handler = queue_remove_if(hfp->event_handlers,
+> +						match_handler_event_prefix,
+> +						lookup_prefix);
+> +	free(lookup_prefix);
+> +
+> +	if (!handler)
+> +		return false;
+> +
+> +	destroy_event_handler(handler);
+> +
+> +	return true;
+> +}
+> +
+>  static void hf_disconnect_watch_destroy(void *user_data)
+>  {
+>  	struct hfp_hf *hfp = user_data;
 > diff --git a/src/shared/hfp.h b/src/shared/hfp.h
-> index 743db65..50d9c4b 100644
+> index a9a169b..85037b1 100644
 > --- a/src/shared/hfp.h
 > +++ b/src/shared/hfp.h
-> @@ -76,9 +76,11 @@ typedef void (*hfp_destroy_func_t)(void *user_data);
+> @@ -68,10 +68,14 @@ enum hfp_gw_cmd_type {
+>  };
+>  
+>  struct hfp_gw_result;
+> +struct hfp_hf_result;
+
+As before, I'd keep hf stuff in single section.
+
+>  
+>  typedef void (*hfp_result_func_t)(struct hfp_gw_result *result,
+>  				enum hfp_gw_cmd_type type, void *user_data);
+>  
+> +typedef void (*hfp_hf_result_func_t)(struct hfp_hf_result *result,
+> +							void *user_data);
+> +
+
+Same here.
+
+>  typedef void (*hfp_destroy_func_t)(void *user_data);
 >  typedef void (*hfp_debug_func_t)(const char *str, void *user_data);
 >  
->  typedef void (*hfp_command_func_t)(const char *command, void *user_data);
-> +
-
-Unrelated.
-
->  typedef void (*hfp_disconnect_func_t)(void *user_data);
->  
->  struct hfp_gw;
-> +struct hfp_hf;
-
-I'd prefer if we have all hfp_hf stuff in same section.
-
->  
->  struct hfp_gw *hfp_gw_new(int fd);
->  
-> @@ -124,3 +126,7 @@ bool hfp_gw_result_get_string(struct hfp_gw_result *result, char *buf,
->  bool hfp_gw_result_get_unquoted_string(struct hfp_gw_result *result, char *buf,
->  								uint8_t len);
->  bool hfp_gw_result_has_next(struct hfp_gw_result *result);
-> +
-> +struct hfp_hf *hfp_hf_new(int fd);
-> +struct hfp_hf *hfp_hf_ref(struct hfp_hf *hfp);
-> +void hfp_hf_unref(struct hfp_hf *hfp);
+> @@ -138,3 +142,7 @@ bool hfp_hf_set_disconnect_handler(struct hfp_hf *hfp,
+>  					void *user_data,
+>  					hfp_destroy_func_t destroy);
+>  bool hfp_hf_disconnect(struct hfp_hf *hfp);
+> +bool hfp_hf_register(struct hfp_hf *hfp, hfp_hf_result_func_t callback,
+> +					const char *prefix, void *user_data,
+> +					hfp_destroy_func_t destroy);
+> +bool hfp_hf_unregister(struct hfp_hf *hfp, const char *prefix);
 > 
 
 -- 
