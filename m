@@ -1,101 +1,56 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1413896899-29802-1-git-send-email-bharat.panda@samsung.com>
-References: <1413896899-29802-1-git-send-email-bharat.panda@samsung.com>
-Date: Wed, 22 Oct 2014 17:12:47 +0300
-Message-ID: <CABBYNZKVoMv6bz=nvTeKOfb1rgbSi8Xv8E=uATRDBx14O9iyNw@mail.gmail.com>
-Subject: Re: [PATCH v3] obexd/mas: Add Support for MSETime filter
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Bharat Panda <bharat.panda@samsung.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	cpgs@samsung.com
-Content-Type: text/plain; charset=UTF-8
+Date: Wed, 22 Oct 2014 13:48:52 +0000 (GMT)
+From: =?euc-kr?B?udrC+b+t?= <chanyeol.park@samsung.com>
+Subject: [RFC] Bluetooth : Fix hci_sync miss wakeup interrupt
+To: linux-bluetooth@vger.kernel.org
+Reply-to: chanyeol.park@samsung.com
+MIME-version: 1.0
+Content-type: text/plain; charset=euc-kr
+MIME-version: 1.0
+Message-id: <132658595.194181413985732727.JavaMail.weblogic@epmlwas01a>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
-
-On Tue, Oct 21, 2014 at 4:08 PM, Bharat Panda <bharat.panda@samsung.com> wrote:
-> Changes made to add support for MSE local time and timezone offset
-> parameter along with GetMessageListing response.
-> ---
->  obexd/plugins/mas.c | 37 +++++++++++++++++++++++++++++++++++++
->  1 file changed, 37 insertions(+)
->
-> diff --git a/obexd/plugins/mas.c b/obexd/plugins/mas.c
-> index fb97fe3..5b95b3a 100644
-> --- a/obexd/plugins/mas.c
-> +++ b/obexd/plugins/mas.c
-> @@ -30,6 +30,7 @@
->  #include <glib.h>
->  #include <fcntl.h>
->  #include <inttypes.h>
-> +#include <sys/time.h>
->
->  #include <gobex/gobex.h>
->  #include <gobex/gobex-apparam.h>
-> @@ -228,6 +229,34 @@ static void g_string_append_escaped_printf(GString *string,
->         va_end(ap);
->  }
->
-> +static gchar *get_mse_timestamp(void)
-> +{
-> +       struct timeval time_val;
-> +       struct tm ltime;
-> +       gchar *local_ts;
-> +       char sign;
-> +
-> +       gettimeofday(&time_val, NULL);
-> +
-> +       if (!localtime_r(&time_val.tv_sec, &ltime))
-> +               return NULL;
-> +
-> +       if (difftime(mktime(localtime(&time_val.tv_sec)),
-> +                               mktime(gmtime(&time_val.tv_sec))) < 0)
-> +               sign = '+';
-> +       else
-> +               sign = '-';
-> +
-> +       local_ts = g_strdup_printf("%04d%02d%02dT%02d%02d%02d%c%2ld%2ld",
-> +                                       ltime.tm_year + 1900, ltime.tm_mon + 1,
-> +                                       ltime.tm_mday, ltime.tm_hour,
-> +                                       ltime.tm_min, ltime.tm_sec, sign,
-> +                                       ltime.tm_gmtoff/3600,
-> +                                       (ltime.tm_gmtoff%3600)/60);
-> +
-> +       return local_ts;
-> +}
-> +
->  static const char *yesorno(gboolean a)
->  {
->         if (a)
-> @@ -243,6 +272,7 @@ static void get_messages_listing_cb(void *session, int err, uint16_t size,
->  {
->         struct mas_session *mas = user_data;
->         uint16_t max = 1024;
-> +       gchar *mse_time;
->
->         if (err < 0 && err != -EAGAIN) {
->                 obex_object_set_io_flags(mas, G_IO_ERR, err);
-> @@ -358,6 +388,13 @@ proceed:
->                 mas->outparams = g_obex_apparam_set_uint8(mas->outparams,
->                                                 MAP_AP_NEWMESSAGE,
->                                                 newmsg ? 1 : 0);
-> +               /* Response to report the local time of MSE */
-> +               mse_time = get_mse_timestamp();
-> +               if (mse_time) {
-> +                       g_obex_apparam_set_string(mas->outparams,
-> +                                               MAP_AP_MSETIME, mse_time);
-> +                       g_free(mse_time);
-> +               }
->         }
->
->         if (err != -EAGAIN)
-> --
-> 1.9.1
-
-Applied, thanks.
+DQpfX2hjaV9jbWRfc3luY19ldigpLCBfX2hjaV9yZXFfc3luYygpIGNvdWxkIG1pc3Mgd2FrZV91
+cF9pbnRlcnJ1cHQgZnJvbQ0KaGNpX3JlcV9zeW5jX2NvbXBsZXRlKCkgYmVjYXVzZSBoY2lfY21k
+X3dvcmsoKSB3b3JrcXVlZSBhbmQgaXRzIHJlcG9uc2UNCmNvdWxkIGJlIGNvbXBsZXRlZCBiZWZv
+cmUgdGhleSBhcmUgcmVhZHkgdG8gZ2V0IHRoZSBzaWduYWwgdGhyb3VnaA0KYWRkX3dhaXRfcXVl
+dWUoKSwgc2V0X2N1cnJlbnRfc3RhdGUoVEFTS19JTlRFUlJVUFRJQkxFKS4NCg0KU2lnbmVkLW9m
+Zi1ieTogQ2hhbi15ZW9sIFBhcmsgPGNoYW55ZW9sLnBhcmtAc2Ftc3VuZy5jb20+DQpTaWduZWQt
+b2ZmLWJ5OiBLeXVuZ21pbiBQYXJrIDxreXVuZ21pbi5wYXJrQHNhbXN1bmcuY29tPg0KLS0tDQog
+bmV0L2JsdWV0b290aC9oY2lfY29yZS5jIHwgMTggKysrKysrKysrKystLS0tLS0tDQogMSBmaWxl
+IGNoYW5nZWQsIDExIGluc2VydGlvbnMoKyksIDcgZGVsZXRpb25zKC0pDQoNCmRpZmYgLS1naXQg
+YS9uZXQvYmx1ZXRvb3RoL2hjaV9jb3JlLmMgYi9uZXQvYmx1ZXRvb3RoL2hjaV9jb3JlLmMNCmlu
+ZGV4IGNiMDVkN2YuLmMwMDhmMWYgMTAwNjQ0DQotLS0gYS9uZXQvYmx1ZXRvb3RoL2hjaV9jb3Jl
+LmMNCisrKyBiL25ldC9ibHVldG9vdGgvaGNpX2NvcmUuYw0KQEAgLTExNDcsMTMgKzExNDcsMTUg
+QEAgc3RydWN0IHNrX2J1ZmYgKl9faGNpX2NtZF9zeW5jX2V2KHN0cnVjdCBoY2lfZGV2ICpoZGV2
+LCB1MTYgb3Bjb2RlLCB1MzIgcGxlbiwNCg0KICAgICAgICBoZGV2LT5yZXFfc3RhdHVzID0gSENJ
+X1JFUV9QRU5EOw0KDQotICAgICAgIGVyciA9IGhjaV9yZXFfcnVuKCZyZXEsIGhjaV9yZXFfc3lu
+Y19jb21wbGV0ZSk7DQotICAgICAgIGlmIChlcnIgPCAwKQ0KLSAgICAgICAgICAgICAgIHJldHVy
+biBFUlJfUFRSKGVycik7DQotDQogICAgICAgIGFkZF93YWl0X3F1ZXVlKCZoZGV2LT5yZXFfd2Fp
+dF9xLCAmd2FpdCk7DQogICAgICAgIHNldF9jdXJyZW50X3N0YXRlKFRBU0tfSU5URVJSVVBUSUJM
+RSk7DQoNCisgICAgICAgZXJyID0gaGNpX3JlcV9ydW4oJnJlcSwgaGNpX3JlcV9zeW5jX2NvbXBs
+ZXRlKTsNCisgICAgICAgaWYgKGVyciA8IDApIHsNCisgICAgICAgICAgICAgICByZW1vdmVfd2Fp
+dF9xdWV1ZSgmaGRldi0+cmVxX3dhaXRfcSwgJndhaXQpOw0KKyAgICAgICAgICAgICAgIHJldHVy
+biBFUlJfUFRSKGVycik7DQorICAgICAgIH0NCisNCiAgICAgICAgc2NoZWR1bGVfdGltZW91dCh0
+aW1lb3V0KTsNCg0KICAgICAgICByZW1vdmVfd2FpdF9xdWV1ZSgmaGRldi0+cmVxX3dhaXRfcSwg
+JndhaXQpOw0KQEAgLTEyMTEsMTAgKzEyMTMsMTUgQEAgc3RhdGljIGludCBfX2hjaV9yZXFfc3lu
+YyhzdHJ1Y3QgaGNpX2RldiAqaGRldiwNCg0KICAgICAgICBmdW5jKCZyZXEsIG9wdCk7DQoNCisg
+ICAgICAgYWRkX3dhaXRfcXVldWUoJmhkZXYtPnJlcV93YWl0X3EsICZ3YWl0KTsNCisgICAgICAg
+c2V0X2N1cnJlbnRfc3RhdGUoVEFTS19JTlRFUlJVUFRJQkxFKTsNCisNCiAgICAgICAgZXJyID0g
+aGNpX3JlcV9ydW4oJnJlcSwgaGNpX3JlcV9zeW5jX2NvbXBsZXRlKTsNCiAgICAgICAgaWYgKGVy
+ciA8IDApIHsNCiAgICAgICAgICAgICAgICBoZGV2LT5yZXFfc3RhdHVzID0gMDsNCg0KKyAgICAg
+ICAgICAgICAgIHJlbW92ZV93YWl0X3F1ZXVlKCZoZGV2LT5yZXFfd2FpdF9xLCAmd2FpdCk7DQor
+DQogICAgICAgICAgICAgICAgLyogRU5PREFUQSBtZWFucyB0aGUgSENJIHJlcXVlc3QgY29tbWFu
+ZCBxdWV1ZSBpcyBlbXB0eS4NCiAgICAgICAgICAgICAgICAgKiBUaGlzIGNhbiBoYXBwZW4gd2hl
+biBhIHJlcXVlc3Qgd2l0aCBjb25kaXRpb25hbHMgZG9lc24ndA0KICAgICAgICAgICAgICAgICAq
+IHRyaWdnZXIgYW55IGNvbW1hbmRzIHRvIGJlIHNlbnQuIFRoaXMgaXMgbm9ybWFsIGJlaGF2aW9y
+DQpAQCAtMTIyNiw5ICsxMjMzLDYgQEAgc3RhdGljIGludCBfX2hjaV9yZXFfc3luYyhzdHJ1Y3Qg
+aGNpX2RldiAqaGRldiwNCiAgICAgICAgICAgICAgICByZXR1cm4gZXJyOw0KICAgICAgICB9DQoN
+Ci0gICAgICAgYWRkX3dhaXRfcXVldWUoJmhkZXYtPnJlcV93YWl0X3EsICZ3YWl0KTsNCi0gICAg
+ICAgc2V0X2N1cnJlbnRfc3RhdGUoVEFTS19JTlRFUlJVUFRJQkxFKTsNCi0NCiAgICAgICAgc2No
+ZWR1bGVfdGltZW91dCh0aW1lb3V0KTsNCg0KICAgICAgICByZW1vdmVfd2FpdF9xdWV1ZSgmaGRl
+di0+cmVxX3dhaXRfcSwgJndhaXQpOw0KLS0NCjEuOS4xIA0KICAgICAgIA0KDQogIA0KDQogICAg
+ICAgICANCiAgDQo=
 
 
--- 
-Luiz Augusto von Dentz
