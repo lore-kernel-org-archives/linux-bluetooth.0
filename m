@@ -2,11 +2,11 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@gmail.com>
 To: Marcin Kraglak <marcin.kraglak@tieto.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCHv5 10/14] shared/gatt: Discover included services
-Date: Wed, 22 Oct 2014 20:20:49 +0200
-Message-ID: <2074647.A3i83LWUpB@athlon>
-In-Reply-To: <1413454646-23076-11-git-send-email-marcin.kraglak@tieto.com>
-References: <1413454646-23076-1-git-send-email-marcin.kraglak@tieto.com> <1413454646-23076-11-git-send-email-marcin.kraglak@tieto.com>
+Subject: Re: [PATCHv5 08/14] tools/btgatt-client: Print type of service
+Date: Wed, 22 Oct 2014 20:00:15 +0200
+Message-ID: <2910797.H92HIHLy1G@athlon>
+In-Reply-To: <1413454646-23076-9-git-send-email-marcin.kraglak@tieto.com>
+References: <1413454646-23076-1-git-send-email-marcin.kraglak@tieto.com> <1413454646-23076-9-git-send-email-marcin.kraglak@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -14,222 +14,29 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Marcin,
 
-On Thursday 16 October 2014 12:17:22 Marcin Kraglak wrote:
+On Thursday 16 October 2014 12:17:20 Marcin Kraglak wrote:
 > ---
->  src/shared/gatt-client.c | 114
-> +++++++++++++++++++++++++++++++++++++++++++++-- src/shared/gatt-client.h | 
->  7 +++
->  2 files changed, 117 insertions(+), 4 deletions(-)
+>  tools/btgatt-client.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
 > 
-> diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
-> index e04724c..971788c 100644
-> --- a/src/shared/gatt-client.c
-> +++ b/src/shared/gatt-client.c
-> @@ -69,6 +69,8 @@ struct service_list {
->  	bt_gatt_service_t service;
->  	struct chrc_data *chrcs;
->  	size_t num_chrcs;
-> +	bt_gatt_included_service_t *includes;
-> +	size_t num_includes;
->  	struct service_list *next;
->  };
+> diff --git a/tools/btgatt-client.c b/tools/btgatt-client.c
+> index d900e08..5c692ff 100644
+> --- a/tools/btgatt-client.c
+> +++ b/tools/btgatt-client.c
+> @@ -182,8 +182,9 @@ static void print_service(const bt_gatt_service_t
+> *service) return;
+>  	}
 > 
-> @@ -253,6 +255,14 @@ static void service_destroy_characteristics(struct
-> service_list *service) free(service->chrcs);
->  }
-> 
-> +static void service_destroy_includes(struct service_list *service)
-> +{
-> +	free(service->includes);
-> +
-> +	service->includes = NULL;
-> +	service->num_includes = 0;
-> +}
-> +
->  static void service_list_clear(struct service_list **head,
->  						struct service_list **tail)
->  {
-> @@ -265,6 +275,7 @@ static void service_list_clear(struct service_list
-> **head,
-> 
->  	while (l) {
->  		service_destroy_characteristics(l);
-> +		service_destroy_includes(l);
->  		tmp = l;
->  		l = tmp->next;
->  		free(tmp);
-> @@ -293,6 +304,7 @@ static void service_list_clear_range(struct service_list
-> **head, }
-> 
->  		service_destroy_characteristics(cur);
-> +		service_destroy_includes(cur);
-> 
->  		if (!prev)
->  			*head = cur->next;
-> @@ -428,6 +440,99 @@ static int uuid_cmp(const uint8_t uuid128[16], uint16_t
-> uuid16) return memcmp(uuid128, rhs_uuid, sizeof(rhs_uuid));
->  }
-> 
-> +static void discover_incl_cb(bool success, uint8_t att_ecode,
-> +		struct bt_gatt_result *result,
-> +		void *user_data)
+> -	printf(COLOR_RED "service" COLOR_OFF " - start: 0x%04x, "
+> +	printf(COLOR_RED "service %s" COLOR_OFF " - start: 0x%04x, "
+>  				"end: 0x%04x, uuid: ",
+> +				service->primary ? "primary" : "second.",
+>  				service->start_handle, service->end_handle);
 
-Indentation is broken here and those likely fit in single line.
+As we discussed offline, maybe having "type: foo" would be nicer instead of 
+"serivce second." ?
 
-> +{
-> +	struct discovery_op *op = user_data;
-> +	struct bt_gatt_client *client = op->client;
-> +	struct bt_gatt_iter iter;
-> +	char uuid_str[MAX_LEN_UUID_STR];
-> +	bt_gatt_included_service_t *includes;
-> +	unsigned int includes_count, i;
-> +
-> +	if (!success) {
-> +		if (att_ecode == BT_ATT_ERROR_ATTRIBUTE_NOT_FOUND) {
-> +			success = true;
-> +			goto next;
-> +		}
-> +
-> +		goto done;
-> +	}
-> +
-> +	if (!result || !bt_gatt_iter_init(&iter, result)) {
-> +		success = false;
-> +		goto done;
-> +	}
-> +
-> +	includes_count = bt_gatt_result_included_count(result);
-> +	if (includes_count == 0) {
-> +		success = false;
-> +		goto done;
-> +	}
-> +
-> +	includes = new0(bt_gatt_included_service_t, includes_count);
-> +	if (!includes) {
-> +		success = false;
-> +		goto done;
-> +	}
-> +
-> +	util_debug(client->debug_callback, client->debug_data,
-> +						"Included services found: %u",
-> +						includes_count);
-> +
-> +	i = 0;
-> +	while (bt_gatt_iter_next_included_service(&iter, &includes[i].handle,
-> +						&includes[i].start_handle,
-> +						&includes[i].end_handle,
-> +						includes[i].uuid)) {
-> +		uuid_to_string(includes[i].uuid, uuid_str);
-> +		util_debug(client->debug_callback, client->debug_data,
-> +				"handle: 0x%04x, start: 0x%04x, end: 0x%04x,"
-> +				"uuid: %s", includes[i].handle,
-> +				includes[i].start_handle,
-> +				includes[i].end_handle, uuid_str);
-> +		i++;
-> +	}
-
-I'd use for(;;) + break here. Also should we verify if this loop iterated 
-includes_count times?
-
-> +
-> +	op->cur_service->includes = includes;
-> +	op->cur_service->num_includes = includes_count;
-> +
-> +next:
-> +	if (!op->cur_service->next) {
-> +		op->cur_service = op->result_head;
-> +		if (bt_gatt_discover_characteristics(client->att,
-> +					op->cur_service->service.start_handle,
-> +					op->cur_service->service.end_handle,
-> +					discover_chrcs_cb,
-> +					discovery_op_ref(op),
-> +					discovery_op_unref))
-> +			return;
-> +
-> +		util_debug(client->debug_callback, client->debug_data,
-> +				"Failed to start characteristic discovery");
-> +		discovery_op_unref(op);
-> +		success = false;
-> +		goto done;
-> +	}
-> +
-> +	op->cur_service = op->cur_service->next;
-> +	if (bt_gatt_discover_included_services(client->att,
-> +				op->cur_service->service.start_handle,
-> +				op->cur_service->service.end_handle,
-> +				discover_incl_cb,
-> +				discovery_op_ref(op),
-> +				discovery_op_unref))
-> +		return;
-
-Empty line here.
-
-> +	util_debug(client->debug_callback, client->debug_data,
-> +					"Failed to start included discovery");
-> +	discovery_op_unref(op);
-> +	success = false;
-> +
-> +done:
-> +	op->complete_func(op, success, att_ecode);
-
-This is always called with success == false so maybe label should be called 
-failed and called with hardcoded false?  Or there is some codepath missing for 
-success case?
-
-> +}
-> +
->  static void discover_descs_cb(bool success, uint8_t att_ecode,
->  						struct bt_gatt_result *result,
->  						void *user_data)
-> @@ -532,6 +637,7 @@ done:
->  	op->complete_func(op, success, att_ecode);
->  }
-> 
-> +
->  static void discover_chrcs_cb(bool success, uint8_t att_ecode,
->  						struct bt_gatt_result *result,
->  						void *user_data)
-> @@ -703,18 +809,18 @@ static void discover_secondary_cb(bool success,
-> uint8_t att_ecode, }
-> 
->  next:
-> -	/* Sequentially discover the characteristics of all services */
-> +	/* Sequentially discover included services */
->  	op->cur_service = op->result_head;
-> -	if (bt_gatt_discover_characteristics(client->att,
-> +	if (bt_gatt_discover_included_services(client->att,
->  					op->cur_service->service.start_handle,
->  					op->cur_service->service.end_handle,
-> -					discover_chrcs_cb,
-> +					discover_incl_cb,
->  					discovery_op_ref(op),
->  					discovery_op_unref))
->  		return;
-> 
->  	util_debug(client->debug_callback, client->debug_data,
-> -				"Failed to start characteristic discovery");
-> +				"Failed to start included services discovery");
->  	discovery_op_unref(op);
->  	success = false;
-> 
-> diff --git a/src/shared/gatt-client.h b/src/shared/gatt-client.h
-> index 22d4dc0..05b4838 100644
-> --- a/src/shared/gatt-client.h
-> +++ b/src/shared/gatt-client.h
-> @@ -96,6 +96,13 @@ typedef struct {
->  	size_t num_descs;
->  } bt_gatt_characteristic_t;
-> 
-> +typedef struct {
-> +	uint16_t handle;
-> +	uint16_t start_handle;
-> +	uint16_t end_handle;
-> +	uint8_t uuid[BT_GATT_UUID_SIZE];
-> +} bt_gatt_included_service_t;
-> +
->  struct bt_gatt_service_iter {
->  	struct bt_gatt_client *client;
->  	void *ptr;
+>  	print_uuid(service->uuid);
 
 -- 
 Szymon K. Janc
