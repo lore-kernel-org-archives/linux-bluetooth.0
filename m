@@ -1,50 +1,49 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <59774.86.105.94.79.1413974113.squirrel@boosthardware.com>
-Date: Wed, 22 Oct 2014 21:35:13 +1100 (EST)
-Subject: rtk_btusb issues
-From: "Patrick Shirkey" <pshirkey@boosthardware.com>
-To: linux-bluetooth@vger.kernel.org
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Sender: linux-bluetooth-owner@vger.kernel.org
+From: Martin Townsend <mtownsend1973@gmail.com>
+To: linux-bluetooth@vger.kernel.org,
+	linux-wpan@vger.kernel.org
+Cc: marcel@holtmann.org,
+	alex.aring@gmail.com,
+	jukka.rissanen@linux.intel.com,
+	Martin Townsend <mtownsend1973@gmail.com>
+Subject: [PATCH v3 bluetooth-next 3/4] bluetooth:6lowpan: use consume_skb when packet processed successfully
+Date: Wed, 22 Oct 2014 09:39:49 +0100
+Message-Id: <1413967190-28890-4-git-send-email-martin.townsend@xsilon.com>
+In-Reply-To: <1413967190-28890-1-git-send-email-martin.townsend@xsilon.com>
+References: <1413967190-28890-1-git-send-email-martin.townsend@xsilon.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+From: Martin Townsend <mtownsend1973@gmail.com>
 
-I have an android device running the rtk_btusb driver. The original driver
-was a couple of years old and there was a problem with stability with BLE.
-In addition the localname was not found in the scan_response data.
+Signed-off-by: Martin Townsend <mtownsend1973@gmail.com>
+---
+ net/bluetooth/6lowpan.c | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
 
-I upgraded the bluetooth stack by manually backporting from a recent
-kernel. That fixed the issue wit the scan_repsonse data but there were
-still stability issues with BLE devices (although slightly improved
-compared to the older bluetooth stack).
-
-I have tried upgrading the driver to the latest version of the rtk_btusb
-driver from the git repo and ported the hooks for bluedroid from the old
-driver however I get issues with hci send command when loading the driver.
-
-http://pastebin.com/hXALmXBr
-
-I traced the command but I am not sure where the send value is generated.
-I can see the function definition in the hci_dev struct but not the
-location where the value is actually set.
-
-I thought it might be an issue specific to bluedroid so I installed bluez
-but the issue is still there so it appears to be a bug in my version of
-the driver or something wrong with the bluetooth kernel layer.
-
-I went back to the older version of the driver running against  bluez
-instead of bluedroid. That gets me further along but I still cannot
-initialise the bluetooth system on the device.
-
-http://pastebin.com/HcSZXiMu
-
-Does anyone have any suggestions for how to go about resolving this
-situation I have got myself into?
-
-
-
---
-Patrick Shirkey
-Boost Hardware Ltd
+diff --git a/net/bluetooth/6lowpan.c b/net/bluetooth/6lowpan.c
+index 94bbb66..40e2cec 100644
+--- a/net/bluetooth/6lowpan.c
++++ b/net/bluetooth/6lowpan.c
+@@ -337,8 +337,8 @@ static int recv_pkt(struct sk_buff *skb, struct net_device *dev,
+ 		dev->stats.rx_bytes += skb->len;
+ 		dev->stats.rx_packets++;
+ 
+-		kfree_skb(local_skb);
+-		kfree_skb(skb);
++		consume_skb(local_skb);
++		consume_skb(skb);
+ 	} else {
+ 		switch (skb->data[0] & 0xe0) {
+ 		case LOWPAN_DISPATCH_IPHC:	/* ipv6 datagram */
+@@ -363,7 +363,8 @@ static int recv_pkt(struct sk_buff *skb, struct net_device *dev,
+ 			dev->stats.rx_bytes += skb->len;
+ 			dev->stats.rx_packets++;
+ 
+-			kfree_skb(skb);
++			consume_skb(local_skb);
++			consume_skb(skb);
+ 			break;
+ 		default:
+ 			break;
+-- 
+1.9.1
