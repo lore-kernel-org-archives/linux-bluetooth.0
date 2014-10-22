@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv2 2/3] bnep: trivial: code cleanup
-Date: Wed, 22 Oct 2014 16:34:29 +0300
-Message-Id: <1413984870-24023-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv2 3/3] bnep: Return errno instead of -1 and print error
+Date: Wed, 22 Oct 2014 16:34:30 +0300
+Message-Id: <1413984870-24023-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1413984870-24023-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <CAMv5Gbck+=b9kY-s+gd3shJsLUDAEZib5dKGM09ZBWkP==ufFw@mail.gmail.com>
  <1413984870-24023-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
@@ -12,58 +12,49 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
+Make code consistent with the rest returning -errno and printing error
+message.
 ---
- profiles/network/bnep.c | 9 ++++-----
- 1 file changed, 4 insertions(+), 5 deletions(-)
+ profiles/network/bnep.c | 16 ++++++++--------
+ 1 file changed, 8 insertions(+), 8 deletions(-)
 
 diff --git a/profiles/network/bnep.c b/profiles/network/bnep.c
-index f8fcd1f..d8883d6 100644
+index d8883d6..09d4b65 100644
 --- a/profiles/network/bnep.c
 +++ b/profiles/network/bnep.c
-@@ -133,7 +133,6 @@ const char *bnep_name(uint16_t id)
- int bnep_init(void)
+@@ -520,7 +520,7 @@ static int bnep_del_from_bridge(const char *devname, const char *bridge)
  {
- 	ctl = socket(PF_BLUETOOTH, SOCK_RAW, BTPROTO_BNEP);
--
- 	if (ctl < 0) {
- 		int err = -errno;
+ 	int ifindex;
+ 	struct ifreq ifr;
+-	int sk, err;
++	int sk, err = 0;
  
-@@ -141,7 +140,7 @@ int bnep_init(void)
- 			warn("kernel lacks bnep-protocol support");
- 		else
- 			error("bnep: Failed to open control socket: %s (%d)",
--						strerror(-err), -err);
-+							strerror(-err), -err);
+ 	if (!devname || !bridge)
+ 		return -EINVAL;
+@@ -535,16 +535,16 @@ static int bnep_del_from_bridge(const char *devname, const char *bridge)
+ 	strncpy(ifr.ifr_name, bridge, IFNAMSIZ - 1);
+ 	ifr.ifr_ifindex = ifindex;
  
- 		return err;
- 	}
-@@ -165,7 +164,7 @@ static int bnep_conndel(const bdaddr_t *dst)
- 	if (ioctl(ctl, BNEPCONNDEL, &req) < 0) {
- 		int err = -errno;
- 		error("bnep: Failed to kill connection: %s (%d)",
--						strerror(-err), -err);
-+							strerror(-err), -err);
- 		return err;
- 	}
- 	return 0;
-@@ -184,7 +183,7 @@ static int bnep_connadd(int sk, uint16_t role, char *dev)
- 	if (ioctl(ctl, BNEPCONNADD, &req) < 0) {
- 		int err = -errno;
- 		error("bnep: Failed to add device %s: %s(%d)",
--				dev, strerror(-err), -err);
-+						dev, strerror(-err), -err);
- 		return err;
- 	}
- 
-@@ -208,7 +207,7 @@ static int bnep_if_up(const char *devname)
- 	if (ioctl(sk, SIOCSIFFLAGS, (void *) &ifr) < 0) {
- 		err = -errno;
- 		error("bnep: Could not bring up %s: %s(%d)",
--				devname, strerror(-err), -err);
-+						devname, strerror(-err), -err);
- 	}
+-	err = ioctl(sk, SIOCBRDELIF, &ifr);
++	if (ioctl(sk, SIOCBRDELIF, &ifr) < 0) {
++		err = -errno;
++		error("bnep: Can't delete %s from the bridge %s: %s(%d)",
++					devname, bridge, strerror(-err), -err);
++	} else
++		info("bridge %s: interface %s removed", bridge, devname);
  
  	close(sk);
+ 
+-	if (err < 0)
+-		return err;
+-
+-	info("bridge %s: interface %s removed", bridge, devname);
+-
+-	return 0;
++	return err;
+ }
+ 
+ int bnep_server_add(int sk, uint16_t dst, char *bridge, char *iface,
 -- 
 1.9.1
 
