@@ -1,117 +1,108 @@
 Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@gmail.com>
-To: Arman Uguray <armansito@chromium.org>
-Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	Marcin Kraglak <marcin.kraglak@tieto.com>,
-	"linux-bluetooth@vger.kernel.org development"
-	<linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCHv5 00/14] Included service discovery
-Date: Wed, 22 Oct 2014 20:39:14 +0200
-Message-ID: <2326994.RrINgRSL6X@athlon>
-In-Reply-To: <CAHrH25T_OGAuC2aS3FvV2ZNffv0Ep2PxxOk4+HDn7YXuvfJqbQ@mail.gmail.com>
-References: <1413454646-23076-1-git-send-email-marcin.kraglak@tieto.com> <CABBYNZKQ-1s9p_18HOnKW3Sew+cMrW+6SnPJHwp-s5m5nYF3QQ@mail.gmail.com> <CAHrH25T_OGAuC2aS3FvV2ZNffv0Ep2PxxOk4+HDn7YXuvfJqbQ@mail.gmail.com>
+To: Marcin Kraglak <marcin.kraglak@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCHv5 11/14] shared/gatt: Add gatt-client include service iterator
+Date: Wed, 22 Oct 2014 20:29:21 +0200
+Message-ID: <12297005.3fX06ItIqc@athlon>
+In-Reply-To: <1413454646-23076-12-git-send-email-marcin.kraglak@tieto.com>
+References: <1413454646-23076-1-git-send-email-marcin.kraglak@tieto.com> <1413454646-23076-12-git-send-email-marcin.kraglak@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Marcin,
 
-On Wednesday 22 October 2014 08:35:05 Arman Uguray wrote:
-> Hi Luiz,
+On Thursday 16 October 2014 12:17:23 Marcin Kraglak wrote:
+> It will allow user to take value, handle, start and end handle
+> of included service.
+> ---
+>  src/shared/gatt-client.c | 30 ++++++++++++++++++++++++++++++
+>  src/shared/gatt-client.h | 10 ++++++++++
+>  2 files changed, 40 insertions(+)
 > 
-> On Wed, Oct 22, 2014 at 7:54 AM, Luiz Augusto von Dentz
+> diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
+> index 971788c..28865da 100644
+> --- a/src/shared/gatt-client.c
+> +++ b/src/shared/gatt-client.c
+> @@ -1674,6 +1674,36 @@ bool bt_gatt_characteristic_iter_next(struct
+> bt_gatt_characteristic_iter *iter, return true;
+>  }
 > 
-> <luiz.dentz@gmail.com> wrote:
-> > Hi Marcin,
-> > 
-> > On Wed, Oct 22, 2014 at 9:25 AM, Marcin Kraglak
-> > 
-> > <marcin.kraglak@tieto.com> wrote:
-> >> On 16 October 2014 12:17, Marcin Kraglak <marcin.kraglak@tieto.com> 
-wrote:
-> >>> v3:
-> >>> In this version after primary service discovery,
-> >>> secondary services are discovered. Next included
-> >>> services are resolved. With this approach we
-> >>> don't have recursively search for included service,
-> >>> like it was TODO in previous proposal.
-> >>> There is also small coding style fix suggested by Arman.
-> >>> 
-> >>> v4:
-> >>> If no secondary services found, continue include services search (fixed
-> >>> in gatt-client.c).
-> >>> Fixed wrong debug logs (primary->secondary).
-> >>> Fixed searching descriptors
-> >>> 
-> >>> v5:
-> >>> Ignore Unsupported Group Type Error in response to secondary service
-> >>> discovery and continue included services discovery.
-> >>> 
-> >>> Marcin Kraglak (14):
-> >>>   shared/gatt: Add discover_secondary_services()
-> >>>   shared/gatt: Add initial implementation of discover_included_services
-> >>>   shared/gatt: Discover included services 128 bit UUIDS
-> >>>   shared/gatt: Add extra check in characteristic iterator
-> >>>   shared/gatt: Add included service iterator
-> >>>   shared/gatt: Remove not needed function parameter
-> >>>   shared/gatt: Distinguish Primary from Secondary services
-> >>>   tools/btgatt-client: Print type of service
-> >>>   shared/gatt: Discover secondary services
-> >>>   shared/gatt: Discover included services
-> >>>   shared/gatt: Add gatt-client include service iterator
-> >>>   tools/btgatt-client: Print found include services
-> >>>   shared/gatt: Fix searching descriptors
-> >>>   shared/gatt: Add function bt_gatt_result_included_count()
-> >>>  
-> >>>  src/shared/gatt-client.c  | 263 +++++++++++++++++++++++++++--
-> >>>  src/shared/gatt-client.h  |  18 ++
-> >>>  src/shared/gatt-helpers.c | 418
-> >>>  +++++++++++++++++++++++++++++++++++++++++++---
-> >>>  src/shared/gatt-helpers.h |  10 +-
-> >>>  tools/btgatt-client.c     |  17 +-
-> >>>  5 files changed, 690 insertions(+), 36 deletions(-)
-> >>> 
-> >>> --
-> >>> 1.9.3
-> > 
-> > Patches looks fine to me, but I would like Arman to ack before applying.
-> 
-> I'm fine with the patches as they are, though I saw that Szymon has
-> left comments on some of them (I'm guessing he's a doing a pass of the
-> patch set now). I'm good with it as long as his comments are
-> addressed.
+> +bool bt_gatt_include_service_iter_init(struct bt_gatt_incl_service_iter
+> *iter, +					const bt_gatt_service_t *service)
+> +{
+> +	if (!iter || !service)
+> +		return false;
+> +
+> +	memset(iter, 0, sizeof(*iter));
+> +	iter->service = (struct service_list *) service;
 
-I really think we should have more comments and less magic numbers there.
-Otherwise this code will be hard to maintain in long term.
 
+I know that this is based on existing code but I'll comment on it here :)
+
+This cast is really confusing. Either it should be casted to void* as service 
+field inside iter or service should be const in iter if we are passing const 
+data there. Or it should be of type service_list and named services?
+
+This list interface is kinda hard to read and I don't really like it without 
+proper macros (like in kernel code)...
+
+> +
+> +	return true;
+> +}
+> +
+> +bool bt_gatt_include_service_iter_next(struct bt_gatt_incl_service_iter
+> *iter, +					const bt_gatt_included_service_t **incl)
+> +{
+> +	struct service_list *service;
+> +
+> +	if (!iter || !incl)
+> +		return false;
+> +
+> +	service = iter->service;
+> +
+> +	if (iter->pos >= service->num_includes)
+> +		return false;
+> +
+> +	*incl = &service->includes[iter->pos++];
+> +
+> +	return true;
+> +}
+> +
+>  struct read_op {
+>  	bt_gatt_client_read_callback_t callback;
+>  	void *user_data;
+> diff --git a/src/shared/gatt-client.h b/src/shared/gatt-client.h
+> index 05b4838..bf4e7bb 100644
+> --- a/src/shared/gatt-client.h
+> +++ b/src/shared/gatt-client.h
+> @@ -113,6 +113,11 @@ struct bt_gatt_characteristic_iter {
+>  	size_t pos;
+>  };
 > 
-> > Btw, there is one thing I would like to see addressed, right now
-> > whenever we disconnect the cache is lost which doesn't use the CCC
-> > ability to persist across connections, this can cause us to loose
-> > notifications when reconnecting because the code don't remember any
-> > handles and this is specially bad for profiles such as HoG since we
-> > may loose some input events while rediscovering, in fact we should
-> > probably store the cache whenever the remote supports service changed
-> > and be able to reload them so we only have to do the discover again if
-> > something has changed.
+> +struct bt_gatt_incl_service_iter {
+> +	void *service;
+> +	size_t pos;
+> +};
+> +
+>  bool bt_gatt_service_iter_init(struct bt_gatt_service_iter *iter,
+>  						struct bt_gatt_client *client);
+>  bool bt_gatt_service_iter_next(struct bt_gatt_service_iter *iter,
+> @@ -129,6 +134,11 @@ bool bt_gatt_characteristic_iter_init(struct
+> bt_gatt_characteristic_iter *iter, bool
+> bt_gatt_characteristic_iter_next(struct bt_gatt_characteristic_iter *iter,
+> const bt_gatt_characteristic_t **chrc);
 > 
-> There's an item in the top-level TODO for long-term caching of
-> attributes, so I guess this falls under that?
-> 
-> > --
-> > Luiz Augusto von Dentz
-> > --
-> > To unsubscribe from this list: send the line "unsubscribe linux-bluetooth"
-> > in the body of a message to majordomo@vger.kernel.org
-> > More majordomo info at  http://vger.kernel.org/majordomo-info.html
-> 
-> Cheers,
-> -Arman
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth"
-> in the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> +bool bt_gatt_include_service_iter_init(struct bt_gatt_incl_service_iter
+> *iter, +					const bt_gatt_service_t *service);
+> +bool bt_gatt_include_service_iter_next(struct bt_gatt_incl_service_iter
+> *iter, +					const bt_gatt_included_service_t **inc);
+> +
+>  typedef void (*bt_gatt_client_read_callback_t)(bool success, uint8_t
+> att_ecode, const uint8_t *value, uint16_t length,
+>  					void *user_data);
 
 -- 
 Szymon K. Janc
