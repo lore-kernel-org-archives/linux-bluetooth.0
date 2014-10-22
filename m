@@ -1,56 +1,104 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@gmail.com>
-To: Marcin Kraglak <marcin.kraglak@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCHv5 04/14] shared/gatt: Add extra check in characteristic iterator
-Date: Wed, 22 Oct 2014 19:49:04 +0200
-Message-ID: <6285776.MQfY2tAud8@athlon>
-In-Reply-To: <1413454646-23076-5-git-send-email-marcin.kraglak@tieto.com>
-References: <1413454646-23076-1-git-send-email-marcin.kraglak@tieto.com> <1413454646-23076-5-git-send-email-marcin.kraglak@tieto.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+In-Reply-To: <CABBYNZJ6cR80Y0pmPyW_kgVCdssz-JHcLAij8X3+xx4DQb2+6w@mail.gmail.com>
+References: <1413838861-29956-1-git-send-email-armansito@chromium.org>
+	<1413838861-29956-2-git-send-email-armansito@chromium.org>
+	<CABBYNZJ6cR80Y0pmPyW_kgVCdssz-JHcLAij8X3+xx4DQb2+6w@mail.gmail.com>
+Date: Wed, 22 Oct 2014 08:40:53 -0700
+Message-ID: <CAHrH25R-SFMYOB+E2VzFogr0NRSB52XHfiQ+JQj0W+oAYdXRLw@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 1/8] shared/att: bt_att_cancel should not cancel
+ pending requests/indications.
+From: Arman Uguray <armansito@google.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: Arman Uguray <armansito@chromium.org>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcin,
+Hi Luiz,
 
-On Thursday 16 October 2014 12:17:16 Marcin Kraglak wrote:
-> Avoid incorrect reading of included service discovery results.
-> ---
->  src/shared/gatt-helpers.c | 6 ++++++
->  1 file changed, 6 insertions(+)
-> 
-> diff --git a/src/shared/gatt-helpers.c b/src/shared/gatt-helpers.c
-> index c18f738..58104d9 100644
-> --- a/src/shared/gatt-helpers.c
-> +++ b/src/shared/gatt-helpers.c
-> @@ -123,6 +123,9 @@ unsigned int bt_gatt_result_characteristic_count(struct
-> bt_gatt_result *result) if (result->opcode != BT_ATT_OP_READ_BY_TYPE_RSP)
->  		return 0;
-> 
-> +	if (result->data_len != 21 && result->data_len != 7)
-> +		return 0;
 
-This really needs to be commented (or better use meaningful defines instead of 
-magic values).
+On Wed, Oct 22, 2014 at 7:39 AM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> Hi Arman,
+>
+> On Tue, Oct 21, 2014 at 12:00 AM, Arman Uguray <armansito@chromium.org> wrote:
+>> bt_att_cancel and bt_att_cancel_all no longer destroy any pending
+>> request or indication, since this would cause a later bt_att_send to
+>> erroneously send out a request or indication before a
+>> response/confirmation for a pending one is received. Instead, they now
+>> keep the pending operations but clear their response and destroy
+>> callbacks since the upper layer is no longer interested in them.
+>> ---
+>>  src/shared/att.c | 24 ++++++++++++++----------
+>>  1 file changed, 14 insertions(+), 10 deletions(-)
+>>
+>> diff --git a/src/shared/att.c b/src/shared/att.c
+>> index 503e06c..c70d396 100644
+>> --- a/src/shared/att.c
+>> +++ b/src/shared/att.c
+>> @@ -1029,15 +1029,17 @@ bool bt_att_cancel(struct bt_att *att, unsigned int id)
+>>                 return false;
+>>
+>>         if (att->pending_req && att->pending_req->id == id) {
+>> -               op = att->pending_req;
+>> -               att->pending_req = NULL;
+>> -               goto done;
+>> +               /* Don't cancel the pending request; remove it's handlers */
+>> +               att->pending_req->callback = NULL;
+>> +               att->pending_req->destroy = NULL;
+>> +               return true;
+>>         }
+>>
+>>         if (att->pending_ind && att->pending_ind->id == id) {
+>> -               op = att->pending_ind;
+>> -               att->pending_ind = NULL;
+>> -               goto done;
+>> +               /* Don't cancel the pending indication; remove it's handlers */
+>> +               att->pending_ind->callback = NULL;
+>> +               att->pending_ind->destroy = NULL;
+>> +               return true;
+>>         }
+>>
+>>         op = queue_remove_if(att->req_queue, match_op_id, UINT_TO_PTR(id));
+>> @@ -1073,13 +1075,15 @@ bool bt_att_cancel_all(struct bt_att *att)
+>>         queue_remove_all(att->write_queue, NULL, NULL, destroy_att_send_op);
+>>
+>>         if (att->pending_req) {
+>> -               destroy_att_send_op(att->pending_req);
+>> -               att->pending_req = NULL;
+>> +               /* Don't cancel the pending request; remove it's handlers */
+>> +               att->pending_req->callback = NULL;
+>> +               att->pending_req->destroy = NULL;
+>>         }
+>>
+>>         if (att->pending_ind) {
+>> -               destroy_att_send_op(att->pending_ind);
+>> -               att->pending_ind = NULL;
+>> +               /* Don't cancel the pending indication; remove it's handlers */
+>> +               att->pending_ind->callback = NULL;
+>> +               att->pending_ind->destroy = NULL;
+>>         }
+>>
+>>         return true;
+>> --
+>> 2.1.0.rc2.206.gedb03e5
+>
+> I would like to first finish with Marcin's patches, are you okay with
+> v5? Btw, please make sure you follow the HACKING document when
+> submitting patches so we can be consistent from now on.
+>
+>
+> --
+> Luiz Augusto von Dentz
 
-> +
->  	return result_element_count(result);
->  }
-> 
-> @@ -239,6 +242,9 @@ bool bt_gatt_iter_next_characteristic(struct
-> bt_gatt_iter *iter, if (iter->result->opcode != BT_ATT_OP_READ_BY_TYPE_RSP)
->  		return false;
-> 
-> +	if (iter->result->data_len != 21 && iter->result->data_len != 7)
-> +		return false;
+I'm fine with Marcin's v5, though we may have to wait for v6 since I
+saw some comments fly by from Szymon.
 
-Ditto.
+Yeah I'm following HACKING from now on. So far I used the code around
+me (shared/mgmt, etc) as the style guide and might have repeated
+mistakes that already existed in the code, so it might makes sense to
+do a general style fix pass within src/shared at some point.
 
-> +
->  	op = iter->result->op;
->  	pdu_ptr = iter->result->pdu + iter->pos;
-
--- 
-Szymon K. Janc
-szymon.janc@gmail.com
+-Arman
