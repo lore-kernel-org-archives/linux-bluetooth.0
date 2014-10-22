@@ -1,116 +1,117 @@
 Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@gmail.com>
-To: Marcin Kraglak <marcin.kraglak@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCHv5 05/14] shared/gatt: Add included service iterator
-Date: Wed, 22 Oct 2014 20:43:50 +0200
-Message-ID: <3761978.EAA0JlRKJm@athlon>
-In-Reply-To: <1413454646-23076-6-git-send-email-marcin.kraglak@tieto.com>
-References: <1413454646-23076-1-git-send-email-marcin.kraglak@tieto.com> <1413454646-23076-6-git-send-email-marcin.kraglak@tieto.com>
+To: Arman Uguray <armansito@chromium.org>
+Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	Marcin Kraglak <marcin.kraglak@tieto.com>,
+	"linux-bluetooth@vger.kernel.org development"
+	<linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCHv5 00/14] Included service discovery
+Date: Wed, 22 Oct 2014 20:39:14 +0200
+Message-ID: <2326994.RrINgRSL6X@athlon>
+In-Reply-To: <CAHrH25T_OGAuC2aS3FvV2ZNffv0Ep2PxxOk4+HDn7YXuvfJqbQ@mail.gmail.com>
+References: <1413454646-23076-1-git-send-email-marcin.kraglak@tieto.com> <CABBYNZKQ-1s9p_18HOnKW3Sew+cMrW+6SnPJHwp-s5m5nYF3QQ@mail.gmail.com> <CAHrH25T_OGAuC2aS3FvV2ZNffv0Ep2PxxOk4+HDn7YXuvfJqbQ@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcin,
+Hi,
 
-On Thursday 16 October 2014 12:17:17 Marcin Kraglak wrote:
-> It will fetch included services from result.
-> ---
->  src/shared/gatt-helpers.c | 58
-> +++++++++++++++++++++++++++++++++++++++++++++++ src/shared/gatt-helpers.h |
->  3 +++
->  2 files changed, 61 insertions(+)
+On Wednesday 22 October 2014 08:35:05 Arman Uguray wrote:
+> Hi Luiz,
 > 
-> diff --git a/src/shared/gatt-helpers.c b/src/shared/gatt-helpers.c
-> index 58104d9..fd8d06c 100644
-> --- a/src/shared/gatt-helpers.c
-> +++ b/src/shared/gatt-helpers.c
-> @@ -186,6 +186,64 @@ struct discovery_op {
->  	bt_gatt_destroy_func_t destroy;
->  };
+> On Wed, Oct 22, 2014 at 7:54 AM, Luiz Augusto von Dentz
 > 
-> +bool bt_gatt_iter_next_included_service(struct bt_gatt_iter *iter,
-> +				uint16_t *handle, uint16_t *start_handle,
-> +				uint16_t *end_handle, uint8_t uuid[16])
-> +{
-> +	struct bt_gatt_result *read_result;
-> +	const void *pdu_ptr;
-> +	int i = 0;
-> +
-> +	if (!iter || !iter->result || !handle || !start_handle || !end_handle
-> +								|| !uuid)
-> +		return false;
-> +
-> +	if (iter->result->opcode != BT_ATT_OP_READ_BY_TYPE_RSP)
-> +		return false;
-> +
-> +	if (iter->result->data_len != 8 && iter->result->data_len != 6)
-> +		return false;
-> +
-> +	pdu_ptr = iter->result->pdu + iter->pos;
-> +
-> +	if (iter->result->data_len == 8) {
-> +		*handle = get_le16(pdu_ptr);
-> +		*start_handle = get_le16(pdu_ptr + 2);
-> +		*end_handle = get_le16(pdu_ptr + 4);
-> +		convert_uuid_le(pdu_ptr + 6, 2, uuid);
-> +
-> +		iter->pos += iter->result->data_len;
-> +
-> +		if (iter->pos == iter->result->pdu_len) {
-> +			iter->result = iter->result->next;
-> +			iter->pos = 0;
-> +		}
-> +
-> +		return true;
-> +	}
-> +
-> +	*handle = get_le16(pdu_ptr);
-> +	*start_handle = get_le16(pdu_ptr + 2);
-> +	*end_handle = get_le16(pdu_ptr + 4);
-> +	read_result = iter->result;
-> +
-> +	do {
-> +		read_result = read_result->next;
-> +	} while (read_result && i++ < (iter->pos / iter->result->data_len));
-
-This loop looks quite unusual. Maybe use for and break inside?
-Also please put some comment about those calculations.
-
-> +
-> +	if (!read_result)
-> +		return false;
-> +
-> +	convert_uuid_le(read_result->pdu, read_result->data_len, uuid);
-> +	iter->pos += iter->result->data_len;
-> +	if (iter->pos == iter->result->pdu_len) {
-> +		iter->result = read_result->next;
-> +		iter->pos = 0;
-> +	}
-> +
-> +	return true;
-> +}
-> +
->  bool bt_gatt_iter_next_service(struct bt_gatt_iter *iter,
->  				uint16_t *start_handle, uint16_t *end_handle,
->  				uint8_t uuid[16])
-> diff --git a/src/shared/gatt-helpers.h b/src/shared/gatt-helpers.h
-> index 8a25dea..8c434c1 100644
-> --- a/src/shared/gatt-helpers.h
-> +++ b/src/shared/gatt-helpers.h
-> @@ -49,6 +49,9 @@ bool bt_gatt_iter_next_characteristic(struct bt_gatt_iter
-> *iter, uint8_t uuid[16]);
->  bool bt_gatt_iter_next_descriptor(struct bt_gatt_iter *iter, uint16_t
-> *handle, uint8_t uuid[16]);
-> +bool bt_gatt_iter_next_included_service(struct bt_gatt_iter *iter,
-
-
-
-> +				uint16_t *handle, uint16_t *start_handle,
-> +				uint16_t *end_handle, uint8_t uuid[16]);
+> <luiz.dentz@gmail.com> wrote:
+> > Hi Marcin,
+> > 
+> > On Wed, Oct 22, 2014 at 9:25 AM, Marcin Kraglak
+> > 
+> > <marcin.kraglak@tieto.com> wrote:
+> >> On 16 October 2014 12:17, Marcin Kraglak <marcin.kraglak@tieto.com> 
+wrote:
+> >>> v3:
+> >>> In this version after primary service discovery,
+> >>> secondary services are discovered. Next included
+> >>> services are resolved. With this approach we
+> >>> don't have recursively search for included service,
+> >>> like it was TODO in previous proposal.
+> >>> There is also small coding style fix suggested by Arman.
+> >>> 
+> >>> v4:
+> >>> If no secondary services found, continue include services search (fixed
+> >>> in gatt-client.c).
+> >>> Fixed wrong debug logs (primary->secondary).
+> >>> Fixed searching descriptors
+> >>> 
+> >>> v5:
+> >>> Ignore Unsupported Group Type Error in response to secondary service
+> >>> discovery and continue included services discovery.
+> >>> 
+> >>> Marcin Kraglak (14):
+> >>>   shared/gatt: Add discover_secondary_services()
+> >>>   shared/gatt: Add initial implementation of discover_included_services
+> >>>   shared/gatt: Discover included services 128 bit UUIDS
+> >>>   shared/gatt: Add extra check in characteristic iterator
+> >>>   shared/gatt: Add included service iterator
+> >>>   shared/gatt: Remove not needed function parameter
+> >>>   shared/gatt: Distinguish Primary from Secondary services
+> >>>   tools/btgatt-client: Print type of service
+> >>>   shared/gatt: Discover secondary services
+> >>>   shared/gatt: Discover included services
+> >>>   shared/gatt: Add gatt-client include service iterator
+> >>>   tools/btgatt-client: Print found include services
+> >>>   shared/gatt: Fix searching descriptors
+> >>>   shared/gatt: Add function bt_gatt_result_included_count()
+> >>>  
+> >>>  src/shared/gatt-client.c  | 263 +++++++++++++++++++++++++++--
+> >>>  src/shared/gatt-client.h  |  18 ++
+> >>>  src/shared/gatt-helpers.c | 418
+> >>>  +++++++++++++++++++++++++++++++++++++++++++---
+> >>>  src/shared/gatt-helpers.h |  10 +-
+> >>>  tools/btgatt-client.c     |  17 +-
+> >>>  5 files changed, 690 insertions(+), 36 deletions(-)
+> >>> 
+> >>> --
+> >>> 1.9.3
+> > 
+> > Patches looks fine to me, but I would like Arman to ack before applying.
 > 
->  typedef void (*bt_gatt_destroy_func_t)(void *user_data);
+> I'm fine with the patches as they are, though I saw that Szymon has
+> left comments on some of them (I'm guessing he's a doing a pass of the
+> patch set now). I'm good with it as long as his comments are
+> addressed.
+
+I really think we should have more comments and less magic numbers there.
+Otherwise this code will be hard to maintain in long term.
+
+> 
+> > Btw, there is one thing I would like to see addressed, right now
+> > whenever we disconnect the cache is lost which doesn't use the CCC
+> > ability to persist across connections, this can cause us to loose
+> > notifications when reconnecting because the code don't remember any
+> > handles and this is specially bad for profiles such as HoG since we
+> > may loose some input events while rediscovering, in fact we should
+> > probably store the cache whenever the remote supports service changed
+> > and be able to reload them so we only have to do the discover again if
+> > something has changed.
+> 
+> There's an item in the top-level TODO for long-term caching of
+> attributes, so I guess this falls under that?
+> 
+> > --
+> > Luiz Augusto von Dentz
+> > --
+> > To unsubscribe from this list: send the line "unsubscribe linux-bluetooth"
+> > in the body of a message to majordomo@vger.kernel.org
+> > More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> 
+> Cheers,
+> -Arman
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth"
+> in the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
 -- 
 Szymon K. Janc
