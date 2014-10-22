@@ -1,61 +1,50 @@
 Return-Path: <cyrus@holtmann.org>
+Message-ID: <59774.86.105.94.79.1413974113.squirrel@boosthardware.com>
+Date: Wed, 22 Oct 2014 21:35:13 +1100 (EST)
+Subject: rtk_btusb issues
+From: "Patrick Shirkey" <pshirkey@boosthardware.com>
+To: linux-bluetooth@vger.kernel.org
 MIME-Version: 1.0
-In-Reply-To: <1413817469-4255-1-git-send-email-gowtham.ab@samsung.com>
-References: <1413817469-4255-1-git-send-email-gowtham.ab@samsung.com>
-Date: Wed, 22 Oct 2014 13:44:14 +0300
-Message-ID: <CABBYNZ+J=K_Cvh9QPUsR-r1ub5RYawsT=Bg=wD4AF4n0Lor-ZA@mail.gmail.com>
-Subject: Re: [PATCH 1/3] obexd/map: Add support for MAP feature bits
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Gowtham Anandha Babu <gowtham.ab@samsung.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	Dmitry Kasatkin <d.kasatkin@samsung.com>,
-	Bharat Panda <bharat.panda@samsung.com>, cpgs@samsung.com
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=US-ASCII
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi,
 
-On Mon, Oct 20, 2014 at 6:04 PM, Gowtham Anandha Babu
-<gowtham.ab@samsung.com> wrote:
-> Handles MAP supported feature bits as per the
-> MAP 1.2 specs section 7.1.1.
-> ---
->  obexd/client/map.c | 9 +++++++++
->  1 file changed, 9 insertions(+)
->
-> diff --git a/obexd/client/map.c b/obexd/client/map.c
-> index 44db96c..43b0471 100644
-> --- a/obexd/client/map.c
-> +++ b/obexd/client/map.c
-> @@ -100,6 +100,7 @@ struct map_data {
->         GHashTable *messages;
->         int16_t mas_instance_id;
->         uint8_t supported_message_types;
-> +       uint32_t supported_features;
->  };
->
->  struct pending_request {
-> @@ -2003,6 +2004,14 @@ static void parse_service_record(struct map_data *map)
->                 map->supported_message_types = *(uint8_t *)data;
->         else
->                 DBG("Failed to read supported message types");
-> +
-> +       /* Supported Feature Bits */
-> +       data = obc_session_get_attribute(map->session,
-> +                                       SDP_ATTR_MAP_SUPPORTED_FEATURES);
-> +       if(data != NULL)
-> +               map->supported_features = *(uint32_t *)data;
-> +       else
-> +               map->supported_features = 0x0000001f;
->  }
->
->  static int map_probe(struct obc_session *session)
-> --
-> 1.9.1
+I have an android device running the rtk_btusb driver. The original driver
+was a couple of years old and there was a problem with stability with BLE.
+In addition the localname was not found in the scan_response data.
 
-Applied, thanks.
+I upgraded the bluetooth stack by manually backporting from a recent
+kernel. That fixed the issue wit the scan_repsonse data but there were
+still stability issues with BLE devices (although slightly improved
+compared to the older bluetooth stack).
+
+I have tried upgrading the driver to the latest version of the rtk_btusb
+driver from the git repo and ported the hooks for bluedroid from the old
+driver however I get issues with hci send command when loading the driver.
+
+http://pastebin.com/hXALmXBr
+
+I traced the command but I am not sure where the send value is generated.
+I can see the function definition in the hci_dev struct but not the
+location where the value is actually set.
+
+I thought it might be an issue specific to bluedroid so I installed bluez
+but the issue is still there so it appears to be a bug in my version of
+the driver or something wrong with the bluetooth kernel layer.
+
+I went back to the older version of the driver running against  bluez
+instead of bluedroid. That gets me further along but I still cannot
+initialise the bluetooth system on the device.
+
+http://pastebin.com/HcSZXiMu
+
+Does anyone have any suggestions for how to go about resolving this
+situation I have got myself into?
 
 
--- 
-Luiz Augusto von Dentz
+
+--
+Patrick Shirkey
+Boost Hardware Ltd
