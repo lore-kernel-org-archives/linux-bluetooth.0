@@ -1,87 +1,70 @@
 Return-Path: <cyrus@holtmann.org>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: Sebastian Chlad <sebastian.chlad@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] android/pts: Update PTS files for HOGP
+Date: Wed, 22 Oct 2014 13:50:19 +0200
+Message-ID: <1911601.S2zjcBIUEE@uw000953>
+In-Reply-To: <1413885347-28938-1-git-send-email-sebastian.chlad@tieto.com>
+References: <1413885347-28938-1-git-send-email-sebastian.chlad@tieto.com>
 MIME-Version: 1.0
-In-Reply-To: <1413976251-32402-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1413976251-32402-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-	<1413976251-32402-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-Date: Wed, 22 Oct 2014 14:55:54 +0200
-Message-ID: <CAMv5Gbck+=b9kY-s+gd3shJsLUDAEZib5dKGM09ZBWkP==ufFw@mail.gmail.com>
-Subject: Re: [PATCH 3/3] bnep: Return errno instead of -1 and print error
-From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
-To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-Cc: linux-bluetooth <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+Hi Sebastian,
 
-On 22 October 2014 13:10, Andrei Emeltchenko
-<Andrei.Emeltchenko.news@gmail.com> wrote:
-> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
->
-> Make code consistent with the rest returning -errno and printing error
-> message.
+On Tuesday 21 of October 2014 11:55:47 Sebastian Chlad wrote:
+> PICS and PIXITs updated to PTS 5.3. Regression done for Android
+> 4.4.4.
 > ---
->  profiles/network/bnep.c | 18 +++++++++---------
->  1 file changed, 9 insertions(+), 9 deletions(-)
->
-> diff --git a/profiles/network/bnep.c b/profiles/network/bnep.c
-> index 4cf38d9..09d4b65 100644
-> --- a/profiles/network/bnep.c
-> +++ b/profiles/network/bnep.c
-> @@ -231,7 +231,7 @@ static int bnep_if_down(const char *devname)
->         if (ioctl(sk, SIOCSIFFLAGS, (void *) &ifr) < 0) {
->                 err = -errno;
->                 error("bnep: Could not bring down %s: %s(%d)",
-> -                               devname, strerror(-err), -err);
-> +                                               devname, strerror(-err), -err);
+>  android/pics-hogp.txt  | 2 +-
+>  android/pixit-hogp.txt | 2 +-
+>  android/pts-hogp.txt   | 4 ++--
+>  3 files changed, 4 insertions(+), 4 deletions(-)
+> 
+> diff --git a/android/pics-hogp.txt b/android/pics-hogp.txt
+> index d7192bf..61cf56a 100644
+> --- a/android/pics-hogp.txt
+> +++ b/android/pics-hogp.txt
+> @@ -1,6 +1,6 @@
+>  HOGP PICS for the PTS tool.
+>  
+> -PTS version: 5.2
+> +PTS version: 5.3
+>  
+>  * - different than PTS defaults
+>  # - not yet implemented/supported
+> diff --git a/android/pixit-hogp.txt b/android/pixit-hogp.txt
+> index 067c280..d32fe69 100644
+> --- a/android/pixit-hogp.txt
+> +++ b/android/pixit-hogp.txt
+> @@ -1,6 +1,6 @@
+>  HOGP PIXIT for the PTS tool.
+>  
+> -PTS version: 5.2
+> +PTS version: 5.3
+>  
+>  * - different than PTS defaults
+>  & - should be set to IUT Bluetooth address
+> diff --git a/android/pts-hogp.txt b/android/pts-hogp.txt
+> index 19292d1..d86522d 100644
+> --- a/android/pts-hogp.txt
+> +++ b/android/pts-hogp.txt
+> @@ -1,7 +1,7 @@
+>  PTS test results for HoG
+>  
+> -PTS version: 5.2
+> -Tested: 22-July-2014
+> +PTS version: 5.3
+> +Tested: 21-October-2014
+>  Android version: 4.4.4
+>  
+>  Results:
+> 
 
-Why don't you fix this indention in first patch ? (this line is added
-in previous patch)
+Patch applied, thanks.
 
->         }
->
->         close(sk);
-> @@ -520,7 +520,7 @@ static int bnep_del_from_bridge(const char *devname, const char *bridge)
->  {
->         int ifindex;
->         struct ifreq ifr;
-> -       int sk, err;
-> +       int sk, err = 0;
->
->         if (!devname || !bridge)
->                 return -EINVAL;
-> @@ -535,16 +535,16 @@ static int bnep_del_from_bridge(const char *devname, const char *bridge)
->         strncpy(ifr.ifr_name, bridge, IFNAMSIZ - 1);
->         ifr.ifr_ifindex = ifindex;
->
-> -       err = ioctl(sk, SIOCBRDELIF, &ifr);
-> +       if (ioctl(sk, SIOCBRDELIF, &ifr) < 0) {
-> +               err = -errno;
-> +               error("bnep: Can't delete %s from the bridge %s: %s(%d)",
-> +                                       devname, bridge, strerror(-err), -err);
-> +       } else
-> +               info("bridge %s: interface %s removed", bridge, devname);
->
->         close(sk);
->
-> -       if (err < 0)
-> -               return err;
-> -
-> -       info("bridge %s: interface %s removed", bridge, devname);
-> -
-> -       return 0;
-> +       return err;
->  }
->
->  int bnep_server_add(int sk, uint16_t dst, char *bridge, char *iface,
-> --
-> 1.9.1
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-
-BR,
-Grzegorz
+-- 
+Best regards, 
+Szymon Janc
