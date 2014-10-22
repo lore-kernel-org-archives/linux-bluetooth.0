@@ -1,70 +1,68 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: Sebastian Chlad <sebastian.chlad@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] android/pts: Update PTS files for HOGP
-Date: Wed, 22 Oct 2014 13:50:19 +0200
-Message-ID: <1911601.S2zjcBIUEE@uw000953>
-In-Reply-To: <1413885347-28938-1-git-send-email-sebastian.chlad@tieto.com>
-References: <1413885347-28938-1-git-send-email-sebastian.chlad@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH 2/3] bnep: trivial: code cleanup
+Date: Wed, 22 Oct 2014 14:10:50 +0300
+Message-Id: <1413976251-32402-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1413976251-32402-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1413976251-32402-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Sebastian,
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-On Tuesday 21 of October 2014 11:55:47 Sebastian Chlad wrote:
-> PICS and PIXITs updated to PTS 5.3. Regression done for Android
-> 4.4.4.
-> ---
->  android/pics-hogp.txt  | 2 +-
->  android/pixit-hogp.txt | 2 +-
->  android/pts-hogp.txt   | 4 ++--
->  3 files changed, 4 insertions(+), 4 deletions(-)
-> 
-> diff --git a/android/pics-hogp.txt b/android/pics-hogp.txt
-> index d7192bf..61cf56a 100644
-> --- a/android/pics-hogp.txt
-> +++ b/android/pics-hogp.txt
-> @@ -1,6 +1,6 @@
->  HOGP PICS for the PTS tool.
->  
-> -PTS version: 5.2
-> +PTS version: 5.3
->  
->  * - different than PTS defaults
->  # - not yet implemented/supported
-> diff --git a/android/pixit-hogp.txt b/android/pixit-hogp.txt
-> index 067c280..d32fe69 100644
-> --- a/android/pixit-hogp.txt
-> +++ b/android/pixit-hogp.txt
-> @@ -1,6 +1,6 @@
->  HOGP PIXIT for the PTS tool.
->  
-> -PTS version: 5.2
-> +PTS version: 5.3
->  
->  * - different than PTS defaults
->  & - should be set to IUT Bluetooth address
-> diff --git a/android/pts-hogp.txt b/android/pts-hogp.txt
-> index 19292d1..d86522d 100644
-> --- a/android/pts-hogp.txt
-> +++ b/android/pts-hogp.txt
-> @@ -1,7 +1,7 @@
->  PTS test results for HoG
->  
-> -PTS version: 5.2
-> -Tested: 22-July-2014
-> +PTS version: 5.3
-> +Tested: 21-October-2014
->  Android version: 4.4.4
->  
->  Results:
-> 
+---
+ profiles/network/bnep.c | 9 ++++-----
+ 1 file changed, 4 insertions(+), 5 deletions(-)
 
-Patch applied, thanks.
-
+diff --git a/profiles/network/bnep.c b/profiles/network/bnep.c
+index 1024919..4cf38d9 100644
+--- a/profiles/network/bnep.c
++++ b/profiles/network/bnep.c
+@@ -133,7 +133,6 @@ const char *bnep_name(uint16_t id)
+ int bnep_init(void)
+ {
+ 	ctl = socket(PF_BLUETOOTH, SOCK_RAW, BTPROTO_BNEP);
+-
+ 	if (ctl < 0) {
+ 		int err = -errno;
+ 
+@@ -141,7 +140,7 @@ int bnep_init(void)
+ 			warn("kernel lacks bnep-protocol support");
+ 		else
+ 			error("bnep: Failed to open control socket: %s (%d)",
+-						strerror(-err), -err);
++							strerror(-err), -err);
+ 
+ 		return err;
+ 	}
+@@ -165,7 +164,7 @@ static int bnep_conndel(const bdaddr_t *dst)
+ 	if (ioctl(ctl, BNEPCONNDEL, &req) < 0) {
+ 		int err = -errno;
+ 		error("bnep: Failed to kill connection: %s (%d)",
+-						strerror(-err), -err);
++							strerror(-err), -err);
+ 		return err;
+ 	}
+ 	return 0;
+@@ -184,7 +183,7 @@ static int bnep_connadd(int sk, uint16_t role, char *dev)
+ 	if (ioctl(ctl, BNEPCONNADD, &req) < 0) {
+ 		int err = -errno;
+ 		error("bnep: Failed to add device %s: %s(%d)",
+-				dev, strerror(-err), -err);
++						dev, strerror(-err), -err);
+ 		return err;
+ 	}
+ 
+@@ -208,7 +207,7 @@ static int bnep_if_up(const char *devname)
+ 	if (ioctl(sk, SIOCSIFFLAGS, (void *) &ifr) < 0) {
+ 		err = -errno;
+ 		error("bnep: Could not bring up %s: %s(%d)",
+-				devname, strerror(-err), -err);
++						devname, strerror(-err), -err);
+ 	}
+ 
+ 	close(sk);
 -- 
-Best regards, 
-Szymon Janc
+1.9.1
+
