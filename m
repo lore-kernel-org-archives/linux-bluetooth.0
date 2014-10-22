@@ -1,104 +1,106 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <CABBYNZJ6cR80Y0pmPyW_kgVCdssz-JHcLAij8X3+xx4DQb2+6w@mail.gmail.com>
-References: <1413838861-29956-1-git-send-email-armansito@chromium.org>
-	<1413838861-29956-2-git-send-email-armansito@chromium.org>
-	<CABBYNZJ6cR80Y0pmPyW_kgVCdssz-JHcLAij8X3+xx4DQb2+6w@mail.gmail.com>
-Date: Wed, 22 Oct 2014 08:40:53 -0700
-Message-ID: <CAHrH25R-SFMYOB+E2VzFogr0NRSB52XHfiQ+JQj0W+oAYdXRLw@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 1/8] shared/att: bt_att_cancel should not cancel
- pending requests/indications.
-From: Arman Uguray <armansito@google.com>
+In-Reply-To: <CABBYNZKQ-1s9p_18HOnKW3Sew+cMrW+6SnPJHwp-s5m5nYF3QQ@mail.gmail.com>
+References: <1413454646-23076-1-git-send-email-marcin.kraglak@tieto.com>
+	<CABD6X-+URkwy0eEVMoUusc3ymFb6fdnFZ0z+jfPdVNq+ibXRQQ@mail.gmail.com>
+	<CABBYNZKQ-1s9p_18HOnKW3Sew+cMrW+6SnPJHwp-s5m5nYF3QQ@mail.gmail.com>
+Date: Wed, 22 Oct 2014 08:35:05 -0700
+Message-ID: <CAHrH25T_OGAuC2aS3FvV2ZNffv0Ep2PxxOk4+HDn7YXuvfJqbQ@mail.gmail.com>
+Subject: Re: [PATCHv5 00/14] Included service discovery
+From: Arman Uguray <armansito@chromium.org>
 To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Arman Uguray <armansito@chromium.org>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Cc: Marcin Kraglak <marcin.kraglak@tieto.com>,
+	"linux-bluetooth@vger.kernel.org development"
+	<linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Luiz,
 
-
-On Wed, Oct 22, 2014 at 7:39 AM, Luiz Augusto von Dentz
+On Wed, Oct 22, 2014 at 7:54 AM, Luiz Augusto von Dentz
 <luiz.dentz@gmail.com> wrote:
-> Hi Arman,
+> Hi Marcin,
 >
-> On Tue, Oct 21, 2014 at 12:00 AM, Arman Uguray <armansito@chromium.org> wrote:
->> bt_att_cancel and bt_att_cancel_all no longer destroy any pending
->> request or indication, since this would cause a later bt_att_send to
->> erroneously send out a request or indication before a
->> response/confirmation for a pending one is received. Instead, they now
->> keep the pending operations but clear their response and destroy
->> callbacks since the upper layer is no longer interested in them.
->> ---
->>  src/shared/att.c | 24 ++++++++++++++----------
->>  1 file changed, 14 insertions(+), 10 deletions(-)
->>
->> diff --git a/src/shared/att.c b/src/shared/att.c
->> index 503e06c..c70d396 100644
->> --- a/src/shared/att.c
->> +++ b/src/shared/att.c
->> @@ -1029,15 +1029,17 @@ bool bt_att_cancel(struct bt_att *att, unsigned int id)
->>                 return false;
->>
->>         if (att->pending_req && att->pending_req->id == id) {
->> -               op = att->pending_req;
->> -               att->pending_req = NULL;
->> -               goto done;
->> +               /* Don't cancel the pending request; remove it's handlers */
->> +               att->pending_req->callback = NULL;
->> +               att->pending_req->destroy = NULL;
->> +               return true;
->>         }
->>
->>         if (att->pending_ind && att->pending_ind->id == id) {
->> -               op = att->pending_ind;
->> -               att->pending_ind = NULL;
->> -               goto done;
->> +               /* Don't cancel the pending indication; remove it's handlers */
->> +               att->pending_ind->callback = NULL;
->> +               att->pending_ind->destroy = NULL;
->> +               return true;
->>         }
->>
->>         op = queue_remove_if(att->req_queue, match_op_id, UINT_TO_PTR(id));
->> @@ -1073,13 +1075,15 @@ bool bt_att_cancel_all(struct bt_att *att)
->>         queue_remove_all(att->write_queue, NULL, NULL, destroy_att_send_op);
->>
->>         if (att->pending_req) {
->> -               destroy_att_send_op(att->pending_req);
->> -               att->pending_req = NULL;
->> +               /* Don't cancel the pending request; remove it's handlers */
->> +               att->pending_req->callback = NULL;
->> +               att->pending_req->destroy = NULL;
->>         }
->>
->>         if (att->pending_ind) {
->> -               destroy_att_send_op(att->pending_ind);
->> -               att->pending_ind = NULL;
->> +               /* Don't cancel the pending indication; remove it's handlers */
->> +               att->pending_ind->callback = NULL;
->> +               att->pending_ind->destroy = NULL;
->>         }
->>
->>         return true;
->> --
->> 2.1.0.rc2.206.gedb03e5
+> On Wed, Oct 22, 2014 at 9:25 AM, Marcin Kraglak
+> <marcin.kraglak@tieto.com> wrote:
+>> On 16 October 2014 12:17, Marcin Kraglak <marcin.kraglak@tieto.com> wrote:
+>>> v3:
+>>> In this version after primary service discovery,
+>>> secondary services are discovered. Next included
+>>> services are resolved. With this approach we
+>>> don't have recursively search for included service,
+>>> like it was TODO in previous proposal.
+>>> There is also small coding style fix suggested by Arman.
+>>>
+>>> v4:
+>>> If no secondary services found, continue include services search (fixed
+>>> in gatt-client.c).
+>>> Fixed wrong debug logs (primary->secondary).
+>>> Fixed searching descriptors
+>>>
+>>> v5:
+>>> Ignore Unsupported Group Type Error in response to secondary service
+>>> discovery and continue included services discovery.
+>>>
+>>> Marcin Kraglak (14):
+>>>   shared/gatt: Add discover_secondary_services()
+>>>   shared/gatt: Add initial implementation of discover_included_services
+>>>   shared/gatt: Discover included services 128 bit UUIDS
+>>>   shared/gatt: Add extra check in characteristic iterator
+>>>   shared/gatt: Add included service iterator
+>>>   shared/gatt: Remove not needed function parameter
+>>>   shared/gatt: Distinguish Primary from Secondary services
+>>>   tools/btgatt-client: Print type of service
+>>>   shared/gatt: Discover secondary services
+>>>   shared/gatt: Discover included services
+>>>   shared/gatt: Add gatt-client include service iterator
+>>>   tools/btgatt-client: Print found include services
+>>>   shared/gatt: Fix searching descriptors
+>>>   shared/gatt: Add function bt_gatt_result_included_count()
+>>>
+>>>  src/shared/gatt-client.c  | 263 +++++++++++++++++++++++++++--
+>>>  src/shared/gatt-client.h  |  18 ++
+>>>  src/shared/gatt-helpers.c | 418 +++++++++++++++++++++++++++++++++++++++++++---
+>>>  src/shared/gatt-helpers.h |  10 +-
+>>>  tools/btgatt-client.c     |  17 +-
+>>>  5 files changed, 690 insertions(+), 36 deletions(-)
+>>>
+>>> --
+>>> 1.9.3
+>>>
 >
-> I would like to first finish with Marcin's patches, are you okay with
-> v5? Btw, please make sure you follow the HACKING document when
-> submitting patches so we can be consistent from now on.
+> Patches looks fine to me, but I would like Arman to ack before applying.
 >
+
+I'm fine with the patches as they are, though I saw that Szymon has
+left comments on some of them (I'm guessing he's a doing a pass of the
+patch set now). I'm good with it as long as his comments are
+addressed.
+
+
+> Btw, there is one thing I would like to see addressed, right now
+> whenever we disconnect the cache is lost which doesn't use the CCC
+> ability to persist across connections, this can cause us to loose
+> notifications when reconnecting because the code don't remember any
+> handles and this is specially bad for profiles such as HoG since we
+> may loose some input events while rediscovering, in fact we should
+> probably store the cache whenever the remote supports service changed
+> and be able to reload them so we only have to do the discover again if
+> something has changed.
+>
+
+There's an item in the top-level TODO for long-term caching of
+attributes, so I guess this falls under that?
+
+
 >
 > --
 > Luiz Augusto von Dentz
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
-I'm fine with Marcin's v5, though we may have to wait for v6 since I
-saw some comments fly by from Szymon.
-
-Yeah I'm following HACKING from now on. So far I used the code around
-me (shared/mgmt, etc) as the style guide and might have repeated
-mistakes that already existed in the code, so it might makes sense to
-do a general style fix pass within src/shared at some point.
-
+Cheers,
 -Arman
