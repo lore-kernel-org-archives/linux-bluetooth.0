@@ -1,68 +1,54 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 3/3] bnep: Return errno instead of -1 and print error
-Date: Wed, 22 Oct 2014 14:10:51 +0300
-Message-Id: <1413976251-32402-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1413976251-32402-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1413976251-32402-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCH 1/3] bnep: Add error print and return errno instead of -1
+Date: Wed, 22 Oct 2014 14:10:49 +0300
+Message-Id: <1413976251-32402-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Make code consistent with the rest returning -errno and printing error
-message.
 ---
- profiles/network/bnep.c | 18 +++++++++---------
- 1 file changed, 9 insertions(+), 9 deletions(-)
+ profiles/network/bnep.c | 15 +++++++--------
+ 1 file changed, 7 insertions(+), 8 deletions(-)
 
 diff --git a/profiles/network/bnep.c b/profiles/network/bnep.c
-index 4cf38d9..09d4b65 100644
+index 927367c..1024919 100644
 --- a/profiles/network/bnep.c
 +++ b/profiles/network/bnep.c
-@@ -231,7 +231,7 @@ static int bnep_if_down(const char *devname)
- 	if (ioctl(sk, SIOCSIFFLAGS, (void *) &ifr) < 0) {
- 		err = -errno;
- 		error("bnep: Could not bring down %s: %s(%d)",
--				devname, strerror(-err), -err);
-+						devname, strerror(-err), -err);
- 	}
- 
- 	close(sk);
-@@ -520,7 +520,7 @@ static int bnep_del_from_bridge(const char *devname, const char *bridge)
+@@ -219,7 +219,7 @@ static int bnep_if_up(const char *devname)
+ static int bnep_if_down(const char *devname)
  {
- 	int ifindex;
  	struct ifreq ifr;
 -	int sk, err;
 +	int sk, err = 0;
  
- 	if (!devname || !bridge)
- 		return -EINVAL;
-@@ -535,16 +535,16 @@ static int bnep_del_from_bridge(const char *devname, const char *bridge)
- 	strncpy(ifr.ifr_name, bridge, IFNAMSIZ - 1);
- 	ifr.ifr_ifindex = ifindex;
+ 	sk = socket(AF_INET, SOCK_DGRAM, 0);
  
--	err = ioctl(sk, SIOCBRDELIF, &ifr);
-+	if (ioctl(sk, SIOCBRDELIF, &ifr) < 0) {
+@@ -229,16 +229,15 @@ static int bnep_if_down(const char *devname)
+ 	ifr.ifr_flags &= ~IFF_UP;
+ 
+ 	/* Bring down the interface */
+-	err = ioctl(sk, SIOCSIFFLAGS, (void *) &ifr);
++	if (ioctl(sk, SIOCSIFFLAGS, (void *) &ifr) < 0) {
 +		err = -errno;
-+		error("bnep: Can't delete %s from the bridge %s: %s(%d)",
-+					devname, bridge, strerror(-err), -err);
-+	} else
-+		info("bridge %s: interface %s removed", bridge, devname);
++		error("bnep: Could not bring down %s: %s(%d)",
++				devname, strerror(-err), -err);
++	}
  
  	close(sk);
  
--	if (err < 0)
+-	if (err < 0) {
+-		error("bnep: Could not bring down %s", devname);
 -		return err;
--
--	info("bridge %s: interface %s removed", bridge, devname);
+-	}
 -
 -	return 0;
 +	return err;
  }
  
- int bnep_server_add(int sk, uint16_t dst, char *bridge, char *iface,
+ static gboolean bnep_watchdog_cb(GIOChannel *chan, GIOCondition cond,
 -- 
 1.9.1
 
