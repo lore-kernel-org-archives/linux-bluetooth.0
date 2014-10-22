@@ -1,76 +1,176 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <61125.86.105.94.79.1413985352.squirrel@boosthardware.com>
-In-Reply-To: <7FC77530-F48C-436C-8954-195E9CD08E97@holtmann.org>
-References: <59774.86.105.94.79.1413974113.squirrel@boosthardware.com>
-    <7FC77530-F48C-436C-8954-195E9CD08E97@holtmann.org>
-Date: Thu, 23 Oct 2014 00:42:32 +1100 (EST)
-Subject: Re: rtk_btusb issues
-From: "Patrick Shirkey" <pshirkey@boosthardware.com>
-To: linux-bluetooth@vger.kernel.org
+From: Szymon Janc <szymon.janc@tieto.com>
+To: Marcin Kraglak <marcin.kraglak@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCHv5 02/14] shared/gatt: Add initial implementation of discover_included_services
+Date: Wed, 22 Oct 2014 15:37:05 +0200
+Message-ID: <2219675.GnLsqXaRSG@uw000953>
+In-Reply-To: <1413454646-23076-3-git-send-email-marcin.kraglak@tieto.com>
+References: <1413454646-23076-1-git-send-email-marcin.kraglak@tieto.com> <1413454646-23076-3-git-send-email-marcin.kraglak@tieto.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Hi Marcin,
 
-On Thu, October 23, 2014 12:05 am, Marcel Holtmann wrote:
-> Hi Patrick,
->
->> I have an android device running the rtk_btusb driver. The original
->> driver
->> was a couple of years old and there was a problem with stability with
->> BLE.
->> In addition the localname was not found in the scan_response data.
->>
->> I upgraded the bluetooth stack by manually backporting from a recent
->> kernel. That fixed the issue wit the scan_repsonse data but there were
->> still stability issues with BLE devices (although slightly improved
->> compared to the older bluetooth stack).
->>
->> I have tried upgrading the driver to the latest version of the rtk_btusb
->> driver from the git repo and ported the hooks for bluedroid from the old
->> driver however I get issues with hci send command when loading the
->> driver.
->>
->> http://pastebin.com/hXALmXBr
->>
->> I traced the command but I am not sure where the send value is
->> generated.
->> I can see the function definition in the hci_dev struct but not the
->> location where the value is actually set.
->>
->> I thought it might be an issue specific to bluedroid so I installed
->> bluez
->> but the issue is still there so it appears to be a bug in my version of
->> the driver or something wrong with the bluetooth kernel layer.
->>
->> I went back to the older version of the driver running against  bluez
->> instead of bluedroid. That gets me further along but I still cannot
->> initialise the bluetooth system on the device.
->>
->> http://pastebin.com/HcSZXiMu
->>
->> Does anyone have any suggestions for how to go about resolving this
->> situation I have got myself into?
->
-> the rtk_btusb driver is not an upstream driver and that is the main
-> problem. There has been recently an effort to get btusb support the
-> Realtek devices, but then it went silent again.
->
-> What you need is having proper Realtek support in btusb and nothing else.
-> Out of tree hacked up vendor drivers are not something any of us will
-> likely have a look at and trying to fix.
->
+On Thursday 16 of October 2014 12:17:14 Marcin Kraglak wrote:
+> Current implementation allow to discover included services with
+> 16 bit UUID only.
+> ---
+>  src/shared/gatt-helpers.c | 108 +++++++++++++++++++++++++++++++++++++++++++++-
+>  1 file changed, 106 insertions(+), 2 deletions(-)
+> 
+> diff --git a/src/shared/gatt-helpers.c b/src/shared/gatt-helpers.c
+> index 4dc787f..dcb2a2f 100644
+> --- a/src/shared/gatt-helpers.c
+> +++ b/src/shared/gatt-helpers.c
+> @@ -692,6 +692,82 @@ bool bt_gatt_discover_secondary_services(struct bt_att *att, bt_uuid_t *uuid,
+>  								destroy, false);
+>  }
+>  
+> +static void discover_included_cb(uint8_t opcode, const void *pdu,
+> +					uint16_t length, void *user_data)
+> +{
+> +	struct bt_gatt_result *final_result = NULL;
+> +	struct discovery_op *op = user_data;
+> +	struct bt_gatt_result *cur_result;
+> +	uint8_t att_ecode = 0;
+> +	uint16_t last_handle;
+> +	size_t data_length;
+> +	bool success;
+> +
+> +	if (opcode == BT_ATT_OP_ERROR_RSP) {
+> +		success = false;
 
-My quest is to fix the stability issue not the rtk_btusb driver.  I
-spotted the "new" branch in the git tree. I am testing that driver now.
+set this right before goto , otherwise it looks strange to
+set success to false and then jump to success label.
 
-Do you know if there are known issues with BLE stability on the 8723au
-chipset?
+> +		att_ecode = process_error(pdu, length);
+> +
+> +		if (att_ecode == BT_ATT_ERROR_ATTRIBUTE_NOT_FOUND &&
+> +							op->result_head)
+> +			goto success;
+> +
+> +		goto done;
+> +	}
+> +
+> +	if (opcode != BT_ATT_OP_READ_BY_TYPE_RSP || !pdu || length < 6) {
+> +		success = false;
+> +		goto done;
+> +	}
+> +
+> +	data_length = ((uint8_t *) pdu)[0];
 
+pdu is const pointer so cast it to (const uint8_t *).
+Also I'm not entirely sure about this byte pdu processing, maybe we should have
+proper packed structs for those (not sure how feasible that would be, though)
 
+> +
 
+Please comment this in code.
 
---
-Patrick Shirkey
-Boost Hardware Ltd
+> +	if ((length - 1) % data_length || data_length != 8) {
+> +		success = false;
+> +		goto done;
+> +	}
+> +
+> +	cur_result = result_create(opcode, pdu + 1, length - 1,
+> +							data_length, op);
+> +	if (!cur_result) {
+> +		success = false;
+> +		goto done;
+> +	}
+> +
+> +	if (!op->result_head)
+> +		op->result_head = op->result_tail = cur_result;
+
+Both branches should in braces.
+
+> +	else {
+> +		op->result_tail->next = cur_result;
+> +		op->result_tail = cur_result;
+> +	}
+> +
+> +	last_handle = get_le16(pdu + length - data_length);
+> +	if (last_handle != op->end_handle) {
+> +		uint8_t pdu[6];
+> +
+> +		put_le16(last_handle + 1, pdu);
+> +		put_le16(op->end_handle, pdu + 2);
+> +		put_le16(GATT_INCLUDE_UUID, pdu + 4);
+> +
+> +		if (bt_att_send(op->att, BT_ATT_OP_READ_BY_TYPE_REQ,
+> +							pdu, sizeof(pdu),
+> +							discover_included_cb,
+> +							discovery_op_ref(op),
+> +							discovery_op_unref))
+> +			return;
+> +
+> +		discovery_op_unref(op);
+> +		success = false;
+
+goto done: missing maybe?
+
+also I'd change labels' names a bit:
+done -> failed
+success -> done
+
+> +	}
+> +
+> +success:
+> +	success = true;
+> +	final_result = op->result_head;
+> +
+> +done:
+> +	if (op->callback)
+> +		op->callback(success, att_ecode, final_result, op->user_data);
+> +}
+> +
+>  bool bt_gatt_discover_included_services(struct bt_att *att,
+>  					uint16_t start, uint16_t end,
+>  					bt_uuid_t *uuid,
+> @@ -699,8 +775,36 @@ bool bt_gatt_discover_included_services(struct bt_att *att,
+>  					void *user_data,
+>  					bt_gatt_destroy_func_t destroy)
+>  {
+> -	/* TODO */
+> -	return false;
+> +	struct discovery_op *op;
+> +	uint8_t pdu[6];
+> +
+> +	if (!att)
+> +		return false;
+> +
+> +	op = new0(struct discovery_op, 1);
+> +	if (!op)
+> +		return false;
+> +
+> +	op->att = att;
+> +	op->callback = callback;
+> +	op->user_data = user_data;
+> +	op->destroy = destroy;
+> +	op->end_handle = end;
+> +
+> +	put_le16(start, pdu);
+> +	put_le16(end, pdu + 2);
+> +	put_le16(GATT_INCLUDE_UUID, pdu + 4);
+> +
+> +	if (!bt_att_send(att, BT_ATT_OP_READ_BY_TYPE_REQ,
+> +					pdu, sizeof(pdu),
+> +					discover_included_cb,
+> +					discovery_op_ref(op),
+> +					discovery_op_unref)) {
+> +		free(op);
+> +		return false;
+> +	}
+> +
+> +	return true;
+>  }
+>  
+>  static void discover_chrcs_cb(uint8_t opcode, const void *pdu,
+> 
+
+-- 
+Best regards, 
+Szymon Janc
