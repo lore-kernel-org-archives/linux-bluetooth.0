@@ -2,11 +2,11 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@gmail.com>
 To: Marcin Kraglak <marcin.kraglak@tieto.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCHv5 08/14] tools/btgatt-client: Print type of service
-Date: Wed, 22 Oct 2014 20:00:15 +0200
-Message-ID: <2910797.H92HIHLy1G@athlon>
-In-Reply-To: <1413454646-23076-9-git-send-email-marcin.kraglak@tieto.com>
-References: <1413454646-23076-1-git-send-email-marcin.kraglak@tieto.com> <1413454646-23076-9-git-send-email-marcin.kraglak@tieto.com>
+Subject: Re: [PATCHv5 04/14] shared/gatt: Add extra check in characteristic iterator
+Date: Wed, 22 Oct 2014 19:49:04 +0200
+Message-ID: <6285776.MQfY2tAud8@athlon>
+In-Reply-To: <1413454646-23076-5-git-send-email-marcin.kraglak@tieto.com>
+References: <1413454646-23076-1-git-send-email-marcin.kraglak@tieto.com> <1413454646-23076-5-git-send-email-marcin.kraglak@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -14,29 +14,42 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Marcin,
 
-On Thursday 16 October 2014 12:17:20 Marcin Kraglak wrote:
+On Thursday 16 October 2014 12:17:16 Marcin Kraglak wrote:
+> Avoid incorrect reading of included service discovery results.
 > ---
->  tools/btgatt-client.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
+>  src/shared/gatt-helpers.c | 6 ++++++
+>  1 file changed, 6 insertions(+)
 > 
-> diff --git a/tools/btgatt-client.c b/tools/btgatt-client.c
-> index d900e08..5c692ff 100644
-> --- a/tools/btgatt-client.c
-> +++ b/tools/btgatt-client.c
-> @@ -182,8 +182,9 @@ static void print_service(const bt_gatt_service_t
-> *service) return;
->  	}
+> diff --git a/src/shared/gatt-helpers.c b/src/shared/gatt-helpers.c
+> index c18f738..58104d9 100644
+> --- a/src/shared/gatt-helpers.c
+> +++ b/src/shared/gatt-helpers.c
+> @@ -123,6 +123,9 @@ unsigned int bt_gatt_result_characteristic_count(struct
+> bt_gatt_result *result) if (result->opcode != BT_ATT_OP_READ_BY_TYPE_RSP)
+>  		return 0;
 > 
-> -	printf(COLOR_RED "service" COLOR_OFF " - start: 0x%04x, "
-> +	printf(COLOR_RED "service %s" COLOR_OFF " - start: 0x%04x, "
->  				"end: 0x%04x, uuid: ",
-> +				service->primary ? "primary" : "second.",
->  				service->start_handle, service->end_handle);
+> +	if (result->data_len != 21 && result->data_len != 7)
+> +		return 0;
 
-As we discussed offline, maybe having "type: foo" would be nicer instead of 
-"serivce second." ?
+This really needs to be commented (or better use meaningful defines instead of 
+magic values).
 
->  	print_uuid(service->uuid);
+> +
+>  	return result_element_count(result);
+>  }
+> 
+> @@ -239,6 +242,9 @@ bool bt_gatt_iter_next_characteristic(struct
+> bt_gatt_iter *iter, if (iter->result->opcode != BT_ATT_OP_READ_BY_TYPE_RSP)
+>  		return false;
+> 
+> +	if (iter->result->data_len != 21 && iter->result->data_len != 7)
+> +		return false;
+
+Ditto.
+
+> +
+>  	op = iter->result->op;
+>  	pdu_ptr = iter->result->pdu + iter->pos;
 
 -- 
 Szymon K. Janc
