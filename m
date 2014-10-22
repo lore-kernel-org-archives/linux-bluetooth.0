@@ -1,54 +1,166 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/3] bnep: Add error print and return errno instead of -1
-Date: Wed, 22 Oct 2014 14:10:49 +0300
-Message-Id: <1413976251-32402-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH v4 01/11] shared/hfp: Add support for HFP HF
+Date: Wed, 22 Oct 2014 13:00:53 +0200
+Message-ID: <2009037.IXf9F6m0Mk@uw000953>
+In-Reply-To: <1412898611-12199-2-git-send-email-lukasz.rymanowski@tieto.com>
+References: <1412898611-12199-1-git-send-email-lukasz.rymanowski@tieto.com> <1412898611-12199-2-git-send-email-lukasz.rymanowski@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Hi Łukasz,
 
----
- profiles/network/bnep.c | 15 +++++++--------
- 1 file changed, 7 insertions(+), 8 deletions(-)
+On Friday 10 of October 2014 01:50:01 Lukasz Rymanowski wrote:
+> This patch add struct hfp_hf plus fuctions to create an instance ref and
+> unref. This code based on existing hfp_gw
+> ---
+>  src/shared/hfp.c | 92 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  src/shared/hfp.h |  6 ++++
+>  2 files changed, 98 insertions(+)
+> 
+> diff --git a/src/shared/hfp.c b/src/shared/hfp.c
+> index efc981f..dbd049a 100644
+> --- a/src/shared/hfp.c
+> +++ b/src/shared/hfp.c
+> @@ -62,6 +62,18 @@ struct hfp_gw {
+>  	bool destroyed;
+>  };
+>  
+> +struct hfp_hf {
+> +	int ref_count;
+> +	int fd;
+> +	bool close_on_unref;
+> +	struct io *io;
+> +	struct ringbuf *read_buf;
+> +	struct ringbuf *write_buf;
+> +
+> +	bool in_disconnect;
+> +	bool destroyed;
+> +};
+> +
+>  struct cmd_handler {
+>  	char *prefix;
+>  	void *user_data;
+> @@ -807,3 +819,83 @@ bool hfp_gw_disconnect(struct hfp_gw *hfp)
+>  
+>  	return io_shutdown(hfp->io);
+>  }
+> +
+> +struct hfp_hf *hfp_hf_new(int fd)
+> +{
+> +	struct hfp_hf *hfp;
+> +
+> +	if (fd < 0)
+> +		return NULL;
+> +
+> +	hfp = new0(struct hfp_hf, 1);
+> +	if (!hfp)
+> +		return NULL;
+> +
+> +	hfp->fd = fd;
+> +	hfp->close_on_unref = false;
+> +
+> +	hfp->read_buf = ringbuf_new(4096);
+> +	if (!hfp->read_buf) {
+> +		free(hfp);
+> +		return NULL;
+> +	}
+> +
+> +	hfp->write_buf = ringbuf_new(4096);
+> +	if (!hfp->write_buf) {
+> +		ringbuf_free(hfp->read_buf);
+> +		free(hfp);
+> +		return NULL;
+> +	}
+> +
+> +	hfp->io = io_new(fd);
+> +	if (!hfp->io) {
+> +		ringbuf_free(hfp->write_buf);
+> +		ringbuf_free(hfp->read_buf);
+> +		free(hfp);
+> +		return NULL;
+> +	}
+> +
+> +	return hfp_hf_ref(hfp);
+> +}
+> +
+> +struct hfp_hf *hfp_hf_ref(struct hfp_hf *hfp)
+> +{
+> +	if (!hfp)
+> +		return NULL;
+> +
+> +	__sync_fetch_and_add(&hfp->ref_count, 1);
+> +
+> +	return hfp;
+> +}
+> +
+> +void hfp_hf_unref(struct hfp_hf *hfp)
+> +{
+> +	if (!hfp)
+> +		return;
+> +
+> +	if (__sync_sub_and_fetch(&hfp->ref_count, 1))
+> +		return;
+> +
+> +	io_set_write_handler(hfp->io, NULL, NULL, NULL);
+> +	io_set_read_handler(hfp->io, NULL, NULL, NULL);
+> +	io_set_disconnect_handler(hfp->io, NULL, NULL, NULL);
+> +
+> +	io_destroy(hfp->io);
+> +	hfp->io = NULL;
+> +
+> +	if (hfp->close_on_unref)
+> +		close(hfp->fd);
+> +
+> +	ringbuf_free(hfp->read_buf);
+> +	hfp->read_buf = NULL;
+> +
+> +	ringbuf_free(hfp->write_buf);
+> +	hfp->write_buf = NULL;
+> +
+> +	if (!hfp->in_disconnect) {
+> +		free(hfp);
+> +		return;
+> +	}
+> +
+> +	hfp->destroyed = true;
+> +}
+> diff --git a/src/shared/hfp.h b/src/shared/hfp.h
+> index 743db65..50d9c4b 100644
+> --- a/src/shared/hfp.h
+> +++ b/src/shared/hfp.h
+> @@ -76,9 +76,11 @@ typedef void (*hfp_destroy_func_t)(void *user_data);
+>  typedef void (*hfp_debug_func_t)(const char *str, void *user_data);
+>  
+>  typedef void (*hfp_command_func_t)(const char *command, void *user_data);
+> +
 
-diff --git a/profiles/network/bnep.c b/profiles/network/bnep.c
-index 927367c..1024919 100644
---- a/profiles/network/bnep.c
-+++ b/profiles/network/bnep.c
-@@ -219,7 +219,7 @@ static int bnep_if_up(const char *devname)
- static int bnep_if_down(const char *devname)
- {
- 	struct ifreq ifr;
--	int sk, err;
-+	int sk, err = 0;
- 
- 	sk = socket(AF_INET, SOCK_DGRAM, 0);
- 
-@@ -229,16 +229,15 @@ static int bnep_if_down(const char *devname)
- 	ifr.ifr_flags &= ~IFF_UP;
- 
- 	/* Bring down the interface */
--	err = ioctl(sk, SIOCSIFFLAGS, (void *) &ifr);
-+	if (ioctl(sk, SIOCSIFFLAGS, (void *) &ifr) < 0) {
-+		err = -errno;
-+		error("bnep: Could not bring down %s: %s(%d)",
-+				devname, strerror(-err), -err);
-+	}
- 
- 	close(sk);
- 
--	if (err < 0) {
--		error("bnep: Could not bring down %s", devname);
--		return err;
--	}
--
--	return 0;
-+	return err;
- }
- 
- static gboolean bnep_watchdog_cb(GIOChannel *chan, GIOCondition cond,
+Unrelated.
+
+>  typedef void (*hfp_disconnect_func_t)(void *user_data);
+>  
+>  struct hfp_gw;
+> +struct hfp_hf;
+
+I'd prefer if we have all hfp_hf stuff in same section.
+
+>  
+>  struct hfp_gw *hfp_gw_new(int fd);
+>  
+> @@ -124,3 +126,7 @@ bool hfp_gw_result_get_string(struct hfp_gw_result *result, char *buf,
+>  bool hfp_gw_result_get_unquoted_string(struct hfp_gw_result *result, char *buf,
+>  								uint8_t len);
+>  bool hfp_gw_result_has_next(struct hfp_gw_result *result);
+> +
+> +struct hfp_hf *hfp_hf_new(int fd);
+> +struct hfp_hf *hfp_hf_ref(struct hfp_hf *hfp);
+> +void hfp_hf_unref(struct hfp_hf *hfp);
+> 
+
 -- 
-1.9.1
-
+Best regards, 
+Szymon Janc
