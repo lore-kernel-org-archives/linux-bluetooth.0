@@ -1,50 +1,56 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 22 Oct 2014 16:37:44 +0300
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
-Cc: linux-bluetooth <linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCH 3/3] bnep: Return errno instead of -1 and print error
-Message-ID: <20141022133742.GA14103@aemeltch-MOBL1>
-References: <1413976251-32402-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <1413976251-32402-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <CAMv5Gbck+=b9kY-s+gd3shJsLUDAEZib5dKGM09ZBWkP==ufFw@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCHv2 1/3] bnep: Add error print and return errno instead of -1
+Date: Wed, 22 Oct 2014 16:34:28 +0300
+Message-Id: <1413984870-24023-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <CAMv5Gbck+=b9kY-s+gd3shJsLUDAEZib5dKGM09ZBWkP==ufFw@mail.gmail.com>
+References: <CAMv5Gbck+=b9kY-s+gd3shJsLUDAEZib5dKGM09ZBWkP==ufFw@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Grzegorz,
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-On Wed, Oct 22, 2014 at 02:55:54PM +0200, Grzegorz Kolodziejczyk wrote:
-> Hi Andrei,
-> 
-> On 22 October 2014 13:10, Andrei Emeltchenko
-> <Andrei.Emeltchenko.news@gmail.com> wrote:
-> > From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-> >
-> > Make code consistent with the rest returning -errno and printing error
-> > message.
-> > ---
-> >  profiles/network/bnep.c | 18 +++++++++---------
-> >  1 file changed, 9 insertions(+), 9 deletions(-)
-> >
-> > diff --git a/profiles/network/bnep.c b/profiles/network/bnep.c
-> > index 4cf38d9..09d4b65 100644
-> > --- a/profiles/network/bnep.c
-> > +++ b/profiles/network/bnep.c
-> > @@ -231,7 +231,7 @@ static int bnep_if_down(const char *devname)
-> >         if (ioctl(sk, SIOCSIFFLAGS, (void *) &ifr) < 0) {
-> >                 err = -errno;
-> >                 error("bnep: Could not bring down %s: %s(%d)",
-> > -                               devname, strerror(-err), -err);
-> > +                                               devname, strerror(-err), -err);
-> 
-> Why don't you fix this indention in first patch ? (this line is added
-> in previous patch)
+---
+ profiles/network/bnep.c | 15 +++++++--------
+ 1 file changed, 7 insertions(+), 8 deletions(-)
 
-Sorry, resend the series.
-
-Best regards 
-Andrei Emeltchenko 
+diff --git a/profiles/network/bnep.c b/profiles/network/bnep.c
+index 927367c..f8fcd1f 100644
+--- a/profiles/network/bnep.c
++++ b/profiles/network/bnep.c
+@@ -219,7 +219,7 @@ static int bnep_if_up(const char *devname)
+ static int bnep_if_down(const char *devname)
+ {
+ 	struct ifreq ifr;
+-	int sk, err;
++	int sk, err = 0;
+ 
+ 	sk = socket(AF_INET, SOCK_DGRAM, 0);
+ 
+@@ -229,16 +229,15 @@ static int bnep_if_down(const char *devname)
+ 	ifr.ifr_flags &= ~IFF_UP;
+ 
+ 	/* Bring down the interface */
+-	err = ioctl(sk, SIOCSIFFLAGS, (void *) &ifr);
++	if (ioctl(sk, SIOCSIFFLAGS, (void *) &ifr) < 0) {
++		err = -errno;
++		error("bnep: Could not bring down %s: %s(%d)",
++						devname, strerror(-err), -err);
++	}
+ 
+ 	close(sk);
+ 
+-	if (err < 0) {
+-		error("bnep: Could not bring down %s", devname);
+-		return err;
+-	}
+-
+-	return 0;
++	return err;
+ }
+ 
+ static gboolean bnep_watchdog_cb(GIOChannel *chan, GIOCondition cond,
+-- 
+1.9.1
 
