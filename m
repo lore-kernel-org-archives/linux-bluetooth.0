@@ -2,11 +2,11 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: Marcin Kraglak <marcin.kraglak@tieto.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCHv5 02/14] shared/gatt: Add initial implementation of discover_included_services
-Date: Wed, 22 Oct 2014 15:37:05 +0200
-Message-ID: <2219675.GnLsqXaRSG@uw000953>
-In-Reply-To: <1413454646-23076-3-git-send-email-marcin.kraglak@tieto.com>
-References: <1413454646-23076-1-git-send-email-marcin.kraglak@tieto.com> <1413454646-23076-3-git-send-email-marcin.kraglak@tieto.com>
+Subject: Re: [PATCHv5 01/14] shared/gatt: Add discover_secondary_services()
+Date: Wed, 22 Oct 2014 15:37:03 +0200
+Message-ID: <7564815.XQcDrbhVg6@uw000953>
+In-Reply-To: <1413454646-23076-2-git-send-email-marcin.kraglak@tieto.com>
+References: <1413454646-23076-1-git-send-email-marcin.kraglak@tieto.com> <1413454646-23076-2-git-send-email-marcin.kraglak@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -14,162 +14,155 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Marcin,
 
-On Thursday 16 of October 2014 12:17:14 Marcin Kraglak wrote:
-> Current implementation allow to discover included services with
-> 16 bit UUID only.
+On Thursday 16 of October 2014 12:17:13 Marcin Kraglak wrote:
+> This pach implements searching Secondary Services in given range.
+
+typo pach -> patch
+
 > ---
->  src/shared/gatt-helpers.c | 108 +++++++++++++++++++++++++++++++++++++++++++++-
->  1 file changed, 106 insertions(+), 2 deletions(-)
+>  src/shared/gatt-helpers.c | 56 +++++++++++++++++++++++++++++++++--------------
+>  src/shared/gatt-helpers.h |  5 +++++
+>  2 files changed, 45 insertions(+), 16 deletions(-)
 > 
 > diff --git a/src/shared/gatt-helpers.c b/src/shared/gatt-helpers.c
-> index 4dc787f..dcb2a2f 100644
+> index 55e6992..4dc787f 100644
 > --- a/src/shared/gatt-helpers.c
 > +++ b/src/shared/gatt-helpers.c
-> @@ -692,6 +692,82 @@ bool bt_gatt_discover_secondary_services(struct bt_att *att, bt_uuid_t *uuid,
->  								destroy, false);
+> @@ -175,6 +175,7 @@ struct discovery_op {
+>  	uint16_t end_handle;
+>  	int ref_count;
+>  	bt_uuid_t uuid;
+> +	uint16_t service_type;
+>  	struct bt_gatt_result *result_head;
+>  	struct bt_gatt_result *result_tail;
+>  	bt_gatt_discovery_callback_t callback;
+> @@ -487,7 +488,7 @@ static void read_by_grp_type_cb(uint8_t opcode, const void *pdu,
+>  
+>  		put_le16(last_end + 1, pdu);
+>  		put_le16(op->end_handle, pdu + 2);
+> -		put_le16(GATT_PRIM_SVC_UUID, pdu + 4);
+> +		put_le16(op->service_type, pdu + 4);
+>  
+>  		if (bt_att_send(op->att, BT_ATT_OP_READ_BY_GRP_TYPE_REQ,
+>  							pdu, sizeof(pdu),
+> @@ -569,7 +570,7 @@ static void find_by_type_val_cb(uint8_t opcode, const void *pdu,
+>  
+>  		put_le16(last_end + 1, pdu);
+>  		put_le16(op->end_handle, pdu + 2);
+> -		put_le16(GATT_PRIM_SVC_UUID, pdu + 4);
+> +		put_le16(op->service_type, pdu + 4);
+>  		put_uuid_le(&op->uuid, pdu + 6);
+>  
+>  		if (bt_att_send(op->att, BT_ATT_OP_FIND_BY_TYPE_VAL_REQ,
+> @@ -594,21 +595,12 @@ done:
+>  		op->callback(success, att_ecode, final_result, op->user_data);
 >  }
 >  
-> +static void discover_included_cb(uint8_t opcode, const void *pdu,
-> +					uint16_t length, void *user_data)
+> -bool bt_gatt_discover_all_primary_services(struct bt_att *att, bt_uuid_t *uuid,
+> -					bt_gatt_discovery_callback_t callback,
+> -					void *user_data,
+> -					bt_gatt_destroy_func_t destroy)
+> -{
+> -	return bt_gatt_discover_primary_services(att, uuid, 0x0001, 0xffff,
+> -							callback, user_data,
+> -							destroy);
+> -}
+> -
+> -bool bt_gatt_discover_primary_services(struct bt_att *att, bt_uuid_t *uuid,
+> +static bool discover_services(struct bt_att *att, bt_uuid_t *uuid,
+>  					uint16_t start, uint16_t end,
+>  					bt_gatt_discovery_callback_t callback,
+>  					void *user_data,
+> -					bt_gatt_destroy_func_t destroy)
+> +					bt_gatt_destroy_func_t destroy,
+> +					bool primary)
+>  {
+>  	struct discovery_op *op;
+>  	bool result;
+> @@ -625,6 +617,8 @@ bool bt_gatt_discover_primary_services(struct bt_att *att, bt_uuid_t *uuid,
+>  	op->callback = callback;
+>  	op->user_data = user_data;
+>  	op->destroy = destroy;
+> +	/* set service uuid to primary or secondary */
+> +	op->service_type = primary ? GATT_PRIM_SVC_UUID : GATT_SND_SVC_UUID;
+>  
+>  	/* If UUID is NULL, then discover all primary services */
+>  	if (!uuid) {
+> @@ -632,7 +626,7 @@ bool bt_gatt_discover_primary_services(struct bt_att *att, bt_uuid_t *uuid,
+>  
+>  		put_le16(start, pdu);
+>  		put_le16(end, pdu + 2);
+> -		put_le16(GATT_PRIM_SVC_UUID, pdu + 4);
+> +		put_le16(op->service_type, pdu + 4);
+>  
+>  		result = bt_att_send(att, BT_ATT_OP_READ_BY_GRP_TYPE_REQ,
+>  							pdu, sizeof(pdu),
+> @@ -652,7 +646,7 @@ bool bt_gatt_discover_primary_services(struct bt_att *att, bt_uuid_t *uuid,
+>  
+>  		put_le16(start, pdu);
+>  		put_le16(end, pdu + 2);
+> -		put_le16(GATT_PRIM_SVC_UUID, pdu + 4);
+> +		put_le16(op->service_type, pdu + 4);
+>  		put_uuid_le(&op->uuid, pdu + 6);
+>  
+>  		result = bt_att_send(att, BT_ATT_OP_FIND_BY_TYPE_VAL_REQ,
+> @@ -668,6 +662,36 @@ bool bt_gatt_discover_primary_services(struct bt_att *att, bt_uuid_t *uuid,
+>  	return result;
+>  }
+>  
+> +bool bt_gatt_discover_all_primary_services(struct bt_att *att, bt_uuid_t *uuid,
+> +					bt_gatt_discovery_callback_t callback,
+> +					void *user_data,
+> +					bt_gatt_destroy_func_t destroy)
 > +{
-> +	struct bt_gatt_result *final_result = NULL;
-> +	struct discovery_op *op = user_data;
-> +	struct bt_gatt_result *cur_result;
-> +	uint8_t att_ecode = 0;
-> +	uint16_t last_handle;
-> +	size_t data_length;
-> +	bool success;
+> +	return bt_gatt_discover_primary_services(att, uuid, 0x0001, 0xffff,
+> +							callback, user_data,
+> +							destroy);
+> +}
 > +
-> +	if (opcode == BT_ATT_OP_ERROR_RSP) {
-> +		success = false;
-
-set this right before goto , otherwise it looks strange to
-set success to false and then jump to success label.
-
-> +		att_ecode = process_error(pdu, length);
+> +bool bt_gatt_discover_primary_services(struct bt_att *att, bt_uuid_t *uuid,
+> +					uint16_t start, uint16_t end,
+> +					bt_gatt_discovery_callback_t callback,
+> +					void *user_data,
+> +					bt_gatt_destroy_func_t destroy)
+> +{
+> +	return discover_services(att, uuid, start, end, callback, user_data,
+> +								destroy, true);
+> +}
 > +
-> +		if (att_ecode == BT_ATT_ERROR_ATTRIBUTE_NOT_FOUND &&
-> +							op->result_head)
-> +			goto success;
-> +
-> +		goto done;
-> +	}
-> +
-> +	if (opcode != BT_ATT_OP_READ_BY_TYPE_RSP || !pdu || length < 6) {
-> +		success = false;
-> +		goto done;
-> +	}
-> +
-> +	data_length = ((uint8_t *) pdu)[0];
-
-pdu is const pointer so cast it to (const uint8_t *).
-Also I'm not entirely sure about this byte pdu processing, maybe we should have
-proper packed structs for those (not sure how feasible that would be, though)
-
-> +
-
-Please comment this in code.
-
-> +	if ((length - 1) % data_length || data_length != 8) {
-> +		success = false;
-> +		goto done;
-> +	}
-> +
-> +	cur_result = result_create(opcode, pdu + 1, length - 1,
-> +							data_length, op);
-> +	if (!cur_result) {
-> +		success = false;
-> +		goto done;
-> +	}
-> +
-> +	if (!op->result_head)
-> +		op->result_head = op->result_tail = cur_result;
-
-Both branches should in braces.
-
-> +	else {
-> +		op->result_tail->next = cur_result;
-> +		op->result_tail = cur_result;
-> +	}
-> +
-> +	last_handle = get_le16(pdu + length - data_length);
-> +	if (last_handle != op->end_handle) {
-> +		uint8_t pdu[6];
-> +
-> +		put_le16(last_handle + 1, pdu);
-> +		put_le16(op->end_handle, pdu + 2);
-> +		put_le16(GATT_INCLUDE_UUID, pdu + 4);
-> +
-> +		if (bt_att_send(op->att, BT_ATT_OP_READ_BY_TYPE_REQ,
-> +							pdu, sizeof(pdu),
-> +							discover_included_cb,
-> +							discovery_op_ref(op),
-> +							discovery_op_unref))
-> +			return;
-> +
-> +		discovery_op_unref(op);
-> +		success = false;
-
-goto done: missing maybe?
-
-also I'd change labels' names a bit:
-done -> failed
-success -> done
-
-> +	}
-> +
-> +success:
-> +	success = true;
-> +	final_result = op->result_head;
-> +
-> +done:
-> +	if (op->callback)
-> +		op->callback(success, att_ecode, final_result, op->user_data);
+> +bool bt_gatt_discover_secondary_services(struct bt_att *att, bt_uuid_t *uuid,
+> +					uint16_t start, uint16_t end,
+> +					bt_gatt_discovery_callback_t callback,
+> +					void *user_data,
+> +					bt_gatt_destroy_func_t destroy)
+> +{
+> +	return discover_services(att, uuid, start, end, callback, user_data,
+> +								destroy, false);
 > +}
 > +
 >  bool bt_gatt_discover_included_services(struct bt_att *att,
 >  					uint16_t start, uint16_t end,
 >  					bt_uuid_t *uuid,
-> @@ -699,8 +775,36 @@ bool bt_gatt_discover_included_services(struct bt_att *att,
+> diff --git a/src/shared/gatt-helpers.h b/src/shared/gatt-helpers.h
+> index f6f4b62..8a25dea 100644
+> --- a/src/shared/gatt-helpers.h
+> +++ b/src/shared/gatt-helpers.h
+> @@ -72,6 +72,11 @@ bool bt_gatt_discover_primary_services(struct bt_att *att, bt_uuid_t *uuid,
+>  					bt_gatt_discovery_callback_t callback,
 >  					void *user_data,
->  					bt_gatt_destroy_func_t destroy)
->  {
-> -	/* TODO */
-> -	return false;
-> +	struct discovery_op *op;
-> +	uint8_t pdu[6];
-> +
-> +	if (!att)
-> +		return false;
-> +
-> +	op = new0(struct discovery_op, 1);
-> +	if (!op)
-> +		return false;
-> +
-> +	op->att = att;
-> +	op->callback = callback;
-> +	op->user_data = user_data;
-> +	op->destroy = destroy;
-> +	op->end_handle = end;
-> +
-> +	put_le16(start, pdu);
-> +	put_le16(end, pdu + 2);
-> +	put_le16(GATT_INCLUDE_UUID, pdu + 4);
-> +
-> +	if (!bt_att_send(att, BT_ATT_OP_READ_BY_TYPE_REQ,
-> +					pdu, sizeof(pdu),
-> +					discover_included_cb,
-> +					discovery_op_ref(op),
-> +					discovery_op_unref)) {
-> +		free(op);
-> +		return false;
-> +	}
-> +
-> +	return true;
->  }
->  
->  static void discover_chrcs_cb(uint8_t opcode, const void *pdu,
-> 
+>  					bt_gatt_destroy_func_t destroy);
+> +bool bt_gatt_discover_secondary_services(struct bt_att *att, bt_uuid_t *uuid,
+> +					uint16_t start, uint16_t end,
+> +					bt_gatt_discovery_callback_t callback,
+> +					void *user_data,
+> +					bt_gatt_destroy_func_t destroy);
+>  bool bt_gatt_discover_included_services(struct bt_att *att,
+>  					uint16_t start, uint16_t end,
+>  					bt_uuid_t *uuid,
+
+This is not related to this patch only but I have a feeling that those
+functions names are getting to long. Maybe we should think of something
+more compact?
 
 -- 
 Best regards, 
