@@ -1,56 +1,76 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 22 Oct 2014 13:48:52 +0000 (GMT)
-From: =?euc-kr?B?udrC+b+t?= <chanyeol.park@samsung.com>
-Subject: [RFC] Bluetooth : Fix hci_sync miss wakeup interrupt
+Message-ID: <61125.86.105.94.79.1413985352.squirrel@boosthardware.com>
+In-Reply-To: <7FC77530-F48C-436C-8954-195E9CD08E97@holtmann.org>
+References: <59774.86.105.94.79.1413974113.squirrel@boosthardware.com>
+    <7FC77530-F48C-436C-8954-195E9CD08E97@holtmann.org>
+Date: Thu, 23 Oct 2014 00:42:32 +1100 (EST)
+Subject: Re: rtk_btusb issues
+From: "Patrick Shirkey" <pshirkey@boosthardware.com>
 To: linux-bluetooth@vger.kernel.org
-Reply-to: chanyeol.park@samsung.com
-MIME-version: 1.0
-Content-type: text/plain; charset=euc-kr
-MIME-version: 1.0
-Message-id: <132658595.194181413985732727.JavaMail.weblogic@epmlwas01a>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-DQpfX2hjaV9jbWRfc3luY19ldigpLCBfX2hjaV9yZXFfc3luYygpIGNvdWxkIG1pc3Mgd2FrZV91
-cF9pbnRlcnJ1cHQgZnJvbQ0KaGNpX3JlcV9zeW5jX2NvbXBsZXRlKCkgYmVjYXVzZSBoY2lfY21k
-X3dvcmsoKSB3b3JrcXVlZSBhbmQgaXRzIHJlcG9uc2UNCmNvdWxkIGJlIGNvbXBsZXRlZCBiZWZv
-cmUgdGhleSBhcmUgcmVhZHkgdG8gZ2V0IHRoZSBzaWduYWwgdGhyb3VnaA0KYWRkX3dhaXRfcXVl
-dWUoKSwgc2V0X2N1cnJlbnRfc3RhdGUoVEFTS19JTlRFUlJVUFRJQkxFKS4NCg0KU2lnbmVkLW9m
-Zi1ieTogQ2hhbi15ZW9sIFBhcmsgPGNoYW55ZW9sLnBhcmtAc2Ftc3VuZy5jb20+DQpTaWduZWQt
-b2ZmLWJ5OiBLeXVuZ21pbiBQYXJrIDxreXVuZ21pbi5wYXJrQHNhbXN1bmcuY29tPg0KLS0tDQog
-bmV0L2JsdWV0b290aC9oY2lfY29yZS5jIHwgMTggKysrKysrKysrKystLS0tLS0tDQogMSBmaWxl
-IGNoYW5nZWQsIDExIGluc2VydGlvbnMoKyksIDcgZGVsZXRpb25zKC0pDQoNCmRpZmYgLS1naXQg
-YS9uZXQvYmx1ZXRvb3RoL2hjaV9jb3JlLmMgYi9uZXQvYmx1ZXRvb3RoL2hjaV9jb3JlLmMNCmlu
-ZGV4IGNiMDVkN2YuLmMwMDhmMWYgMTAwNjQ0DQotLS0gYS9uZXQvYmx1ZXRvb3RoL2hjaV9jb3Jl
-LmMNCisrKyBiL25ldC9ibHVldG9vdGgvaGNpX2NvcmUuYw0KQEAgLTExNDcsMTMgKzExNDcsMTUg
-QEAgc3RydWN0IHNrX2J1ZmYgKl9faGNpX2NtZF9zeW5jX2V2KHN0cnVjdCBoY2lfZGV2ICpoZGV2
-LCB1MTYgb3Bjb2RlLCB1MzIgcGxlbiwNCg0KICAgICAgICBoZGV2LT5yZXFfc3RhdHVzID0gSENJ
-X1JFUV9QRU5EOw0KDQotICAgICAgIGVyciA9IGhjaV9yZXFfcnVuKCZyZXEsIGhjaV9yZXFfc3lu
-Y19jb21wbGV0ZSk7DQotICAgICAgIGlmIChlcnIgPCAwKQ0KLSAgICAgICAgICAgICAgIHJldHVy
-biBFUlJfUFRSKGVycik7DQotDQogICAgICAgIGFkZF93YWl0X3F1ZXVlKCZoZGV2LT5yZXFfd2Fp
-dF9xLCAmd2FpdCk7DQogICAgICAgIHNldF9jdXJyZW50X3N0YXRlKFRBU0tfSU5URVJSVVBUSUJM
-RSk7DQoNCisgICAgICAgZXJyID0gaGNpX3JlcV9ydW4oJnJlcSwgaGNpX3JlcV9zeW5jX2NvbXBs
-ZXRlKTsNCisgICAgICAgaWYgKGVyciA8IDApIHsNCisgICAgICAgICAgICAgICByZW1vdmVfd2Fp
-dF9xdWV1ZSgmaGRldi0+cmVxX3dhaXRfcSwgJndhaXQpOw0KKyAgICAgICAgICAgICAgIHJldHVy
-biBFUlJfUFRSKGVycik7DQorICAgICAgIH0NCisNCiAgICAgICAgc2NoZWR1bGVfdGltZW91dCh0
-aW1lb3V0KTsNCg0KICAgICAgICByZW1vdmVfd2FpdF9xdWV1ZSgmaGRldi0+cmVxX3dhaXRfcSwg
-JndhaXQpOw0KQEAgLTEyMTEsMTAgKzEyMTMsMTUgQEAgc3RhdGljIGludCBfX2hjaV9yZXFfc3lu
-YyhzdHJ1Y3QgaGNpX2RldiAqaGRldiwNCg0KICAgICAgICBmdW5jKCZyZXEsIG9wdCk7DQoNCisg
-ICAgICAgYWRkX3dhaXRfcXVldWUoJmhkZXYtPnJlcV93YWl0X3EsICZ3YWl0KTsNCisgICAgICAg
-c2V0X2N1cnJlbnRfc3RhdGUoVEFTS19JTlRFUlJVUFRJQkxFKTsNCisNCiAgICAgICAgZXJyID0g
-aGNpX3JlcV9ydW4oJnJlcSwgaGNpX3JlcV9zeW5jX2NvbXBsZXRlKTsNCiAgICAgICAgaWYgKGVy
-ciA8IDApIHsNCiAgICAgICAgICAgICAgICBoZGV2LT5yZXFfc3RhdHVzID0gMDsNCg0KKyAgICAg
-ICAgICAgICAgIHJlbW92ZV93YWl0X3F1ZXVlKCZoZGV2LT5yZXFfd2FpdF9xLCAmd2FpdCk7DQor
-DQogICAgICAgICAgICAgICAgLyogRU5PREFUQSBtZWFucyB0aGUgSENJIHJlcXVlc3QgY29tbWFu
-ZCBxdWV1ZSBpcyBlbXB0eS4NCiAgICAgICAgICAgICAgICAgKiBUaGlzIGNhbiBoYXBwZW4gd2hl
-biBhIHJlcXVlc3Qgd2l0aCBjb25kaXRpb25hbHMgZG9lc24ndA0KICAgICAgICAgICAgICAgICAq
-IHRyaWdnZXIgYW55IGNvbW1hbmRzIHRvIGJlIHNlbnQuIFRoaXMgaXMgbm9ybWFsIGJlaGF2aW9y
-DQpAQCAtMTIyNiw5ICsxMjMzLDYgQEAgc3RhdGljIGludCBfX2hjaV9yZXFfc3luYyhzdHJ1Y3Qg
-aGNpX2RldiAqaGRldiwNCiAgICAgICAgICAgICAgICByZXR1cm4gZXJyOw0KICAgICAgICB9DQoN
-Ci0gICAgICAgYWRkX3dhaXRfcXVldWUoJmhkZXYtPnJlcV93YWl0X3EsICZ3YWl0KTsNCi0gICAg
-ICAgc2V0X2N1cnJlbnRfc3RhdGUoVEFTS19JTlRFUlJVUFRJQkxFKTsNCi0NCiAgICAgICAgc2No
-ZWR1bGVfdGltZW91dCh0aW1lb3V0KTsNCg0KICAgICAgICByZW1vdmVfd2FpdF9xdWV1ZSgmaGRl
-di0+cmVxX3dhaXRfcSwgJndhaXQpOw0KLS0NCjEuOS4xIA0KICAgICAgIA0KDQogIA0KDQogICAg
-ICAgICANCiAgDQo=
+
+On Thu, October 23, 2014 12:05 am, Marcel Holtmann wrote:
+> Hi Patrick,
+>
+>> I have an android device running the rtk_btusb driver. The original
+>> driver
+>> was a couple of years old and there was a problem with stability with
+>> BLE.
+>> In addition the localname was not found in the scan_response data.
+>>
+>> I upgraded the bluetooth stack by manually backporting from a recent
+>> kernel. That fixed the issue wit the scan_repsonse data but there were
+>> still stability issues with BLE devices (although slightly improved
+>> compared to the older bluetooth stack).
+>>
+>> I have tried upgrading the driver to the latest version of the rtk_btusb
+>> driver from the git repo and ported the hooks for bluedroid from the old
+>> driver however I get issues with hci send command when loading the
+>> driver.
+>>
+>> http://pastebin.com/hXALmXBr
+>>
+>> I traced the command but I am not sure where the send value is
+>> generated.
+>> I can see the function definition in the hci_dev struct but not the
+>> location where the value is actually set.
+>>
+>> I thought it might be an issue specific to bluedroid so I installed
+>> bluez
+>> but the issue is still there so it appears to be a bug in my version of
+>> the driver or something wrong with the bluetooth kernel layer.
+>>
+>> I went back to the older version of the driver running against  bluez
+>> instead of bluedroid. That gets me further along but I still cannot
+>> initialise the bluetooth system on the device.
+>>
+>> http://pastebin.com/HcSZXiMu
+>>
+>> Does anyone have any suggestions for how to go about resolving this
+>> situation I have got myself into?
+>
+> the rtk_btusb driver is not an upstream driver and that is the main
+> problem. There has been recently an effort to get btusb support the
+> Realtek devices, but then it went silent again.
+>
+> What you need is having proper Realtek support in btusb and nothing else.
+> Out of tree hacked up vendor drivers are not something any of us will
+> likely have a look at and trying to fix.
+>
+
+My quest is to fix the stability issue not the rtk_btusb driver.  I
+spotted the "new" branch in the git tree. I am testing that driver now.
+
+Do you know if there are known issues with BLE stability on the 8723au
+chipset?
 
 
+
+
+--
+Patrick Shirkey
+Boost Hardware Ltd
