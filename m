@@ -1,43 +1,179 @@
 Return-Path: <cyrus@holtmann.org>
-From: Fabian Frederick <fabf@skynet.be>
-To: linux-kernel@vger.kernel.org
-Cc: Fabian Frederick <fabf@skynet.be>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Gustavo Padovan <gustavo@padovan.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-bluetooth@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: [PATCH 1/1 net-next] Bluetooth: fix shadow warning in hci_disconnect()
-Date: Thu, 23 Oct 2014 18:22:45 +0200
-Message-Id: <1414081365-6461-1-git-send-email-fabf@skynet.be>
+MIME-Version: 1.0
+In-Reply-To: <2009037.IXf9F6m0Mk@uw000953>
+References: <1412898611-12199-1-git-send-email-lukasz.rymanowski@tieto.com>
+	<1412898611-12199-2-git-send-email-lukasz.rymanowski@tieto.com>
+	<2009037.IXf9F6m0Mk@uw000953>
+Date: Thu, 23 Oct 2014 17:00:41 +0200
+Message-ID: <CAMudyAtgBEMLcQbX8uq0rfP=SSGyZ=D6A+NjR8jZqdD=7MH3Og@mail.gmail.com>
+Subject: Re: [PATCH v4 01/11] shared/hfp: Add support for HFP HF
+From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+To: Szymon Janc <szymon.janc@tieto.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-use cpr for hci_cp_read_clock_offset instead of cp
-(already defined above).
+Hi Szymon,
 
-Signed-off-by: Fabian Frederick <fabf@skynet.be>
----
- net/bluetooth/hci_conn.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+On 22 October 2014 13:00, Szymon Janc <szymon.janc@tieto.com> wrote:
+> Hi Łukasz,
+>
+> On Friday 10 of October 2014 01:50:01 Lukasz Rymanowski wrote:
+>> This patch add struct hfp_hf plus fuctions to create an instance ref and
+>> unref. This code based on existing hfp_gw
+>> ---
+>>  src/shared/hfp.c | 92 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+>>  src/shared/hfp.h |  6 ++++
+>>  2 files changed, 98 insertions(+)
+>>
+>> diff --git a/src/shared/hfp.c b/src/shared/hfp.c
+>> index efc981f..dbd049a 100644
+>> --- a/src/shared/hfp.c
+>> +++ b/src/shared/hfp.c
+>> @@ -62,6 +62,18 @@ struct hfp_gw {
+>>       bool destroyed;
+>>  };
+>>
+>> +struct hfp_hf {
+>> +     int ref_count;
+>> +     int fd;
+>> +     bool close_on_unref;
+>> +     struct io *io;
+>> +     struct ringbuf *read_buf;
+>> +     struct ringbuf *write_buf;
+>> +
+>> +     bool in_disconnect;
+>> +     bool destroyed;
+>> +};
+>> +
+>>  struct cmd_handler {
+>>       char *prefix;
+>>       void *user_data;
+>> @@ -807,3 +819,83 @@ bool hfp_gw_disconnect(struct hfp_gw *hfp)
+>>
+>>       return io_shutdown(hfp->io);
+>>  }
+>> +
+>> +struct hfp_hf *hfp_hf_new(int fd)
+>> +{
+>> +     struct hfp_hf *hfp;
+>> +
+>> +     if (fd < 0)
+>> +             return NULL;
+>> +
+>> +     hfp = new0(struct hfp_hf, 1);
+>> +     if (!hfp)
+>> +             return NULL;
+>> +
+>> +     hfp->fd = fd;
+>> +     hfp->close_on_unref = false;
+>> +
+>> +     hfp->read_buf = ringbuf_new(4096);
+>> +     if (!hfp->read_buf) {
+>> +             free(hfp);
+>> +             return NULL;
+>> +     }
+>> +
+>> +     hfp->write_buf = ringbuf_new(4096);
+>> +     if (!hfp->write_buf) {
+>> +             ringbuf_free(hfp->read_buf);
+>> +             free(hfp);
+>> +             return NULL;
+>> +     }
+>> +
+>> +     hfp->io = io_new(fd);
+>> +     if (!hfp->io) {
+>> +             ringbuf_free(hfp->write_buf);
+>> +             ringbuf_free(hfp->read_buf);
+>> +             free(hfp);
+>> +             return NULL;
+>> +     }
+>> +
+>> +     return hfp_hf_ref(hfp);
+>> +}
+>> +
+>> +struct hfp_hf *hfp_hf_ref(struct hfp_hf *hfp)
+>> +{
+>> +     if (!hfp)
+>> +             return NULL;
+>> +
+>> +     __sync_fetch_and_add(&hfp->ref_count, 1);
+>> +
+>> +     return hfp;
+>> +}
+>> +
+>> +void hfp_hf_unref(struct hfp_hf *hfp)
+>> +{
+>> +     if (!hfp)
+>> +             return;
+>> +
+>> +     if (__sync_sub_and_fetch(&hfp->ref_count, 1))
+>> +             return;
+>> +
+>> +     io_set_write_handler(hfp->io, NULL, NULL, NULL);
+>> +     io_set_read_handler(hfp->io, NULL, NULL, NULL);
+>> +     io_set_disconnect_handler(hfp->io, NULL, NULL, NULL);
+>> +
+>> +     io_destroy(hfp->io);
+>> +     hfp->io = NULL;
+>> +
+>> +     if (hfp->close_on_unref)
+>> +             close(hfp->fd);
+>> +
+>> +     ringbuf_free(hfp->read_buf);
+>> +     hfp->read_buf = NULL;
+>> +
+>> +     ringbuf_free(hfp->write_buf);
+>> +     hfp->write_buf = NULL;
+>> +
+>> +     if (!hfp->in_disconnect) {
+>> +             free(hfp);
+>> +             return;
+>> +     }
+>> +
+>> +     hfp->destroyed = true;
+>> +}
+>> diff --git a/src/shared/hfp.h b/src/shared/hfp.h
+>> index 743db65..50d9c4b 100644
+>> --- a/src/shared/hfp.h
+>> +++ b/src/shared/hfp.h
+>> @@ -76,9 +76,11 @@ typedef void (*hfp_destroy_func_t)(void *user_data);
+>>  typedef void (*hfp_debug_func_t)(const char *str, void *user_data);
+>>
+>>  typedef void (*hfp_command_func_t)(const char *command, void *user_data);
+>> +
+>
+> Unrelated.
 
-diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index b9517bd..6151e09 100644
---- a/net/bluetooth/hci_conn.c
-+++ b/net/bluetooth/hci_conn.c
-@@ -141,10 +141,10 @@ int hci_disconnect(struct hci_conn *conn, __u8 reason)
- 	 */
- 	if (conn->type == ACL_LINK && conn->role == HCI_ROLE_MASTER) {
- 		struct hci_dev *hdev = conn->hdev;
--		struct hci_cp_read_clock_offset cp;
-+		struct hci_cp_read_clock_offset cpr;
- 
--		cp.handle = cpu_to_le16(conn->handle);
--		hci_send_cmd(hdev, HCI_OP_READ_CLOCK_OFFSET, sizeof(cp), &cp);
-+		cpr.handle = cpu_to_le16(conn->handle);
-+		hci_send_cmd(hdev, HCI_OP_READ_CLOCK_OFFSET, sizeof(cpr), &cpr);
- 	}
- 
- 	conn->state = BT_DISCONN;
--- 
-1.9.3
+True.
+
+>
+>>  typedef void (*hfp_disconnect_func_t)(void *user_data);
+>>
+>>  struct hfp_gw;
+>> +struct hfp_hf;
+>
+> I'd prefer if we have all hfp_hf stuff in same section.
+
+OK
+
+>
+>>
+>>  struct hfp_gw *hfp_gw_new(int fd);
+>>
+>> @@ -124,3 +126,7 @@ bool hfp_gw_result_get_string(struct hfp_gw_result *result, char *buf,
+>>  bool hfp_gw_result_get_unquoted_string(struct hfp_gw_result *result, char *buf,
+>>                                                               uint8_t len);
+>>  bool hfp_gw_result_has_next(struct hfp_gw_result *result);
+>> +
+>> +struct hfp_hf *hfp_hf_new(int fd);
+>> +struct hfp_hf *hfp_hf_ref(struct hfp_hf *hfp);
+>> +void hfp_hf_unref(struct hfp_hf *hfp);
+>>
+>
+> --
+> Best regards,
+> Szymon Janc
+
+\Łukasz
