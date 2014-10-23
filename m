@@ -2,8 +2,8 @@ Return-Path: <cyrus@holtmann.org>
 From: Marcin Kraglak <marcin.kraglak@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Subject: [PATCHv6 10/14] shared/gatt: Discover secondary services
-Date: Thu, 23 Oct 2014 14:36:15 +0200
-Message-Id: <1414067775-17128-1-git-send-email-marcin.kraglak@tieto.com>
+Date: Thu, 23 Oct 2014 14:35:25 +0200
+Message-Id: <1414067725-17047-1-git-send-email-marcin.kraglak@tieto.com>
 In-Reply-To: <1414059337-12040-11-git-send-email-marcin.kraglak@tieto.com>
 References: <1414059337-12040-11-git-send-email-marcin.kraglak@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
