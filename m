@@ -1,194 +1,134 @@
 Return-Path: <cyrus@holtmann.org>
-From: Marcin Kraglak <marcin.kraglak@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv6 10/14] shared/gatt: Discover secondary services
-Date: Thu, 23 Oct 2014 14:35:25 +0200
-Message-Id: <1414067725-17047-1-git-send-email-marcin.kraglak@tieto.com>
-In-Reply-To: <1414059337-12040-11-git-send-email-marcin.kraglak@tieto.com>
-References: <1414059337-12040-11-git-send-email-marcin.kraglak@tieto.com>
+Date: Thu, 23 Oct 2014 15:29:35 +0300
+From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
+To: Patrick Shirkey <pshirkey@boosthardware.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [bluetooth]  btusb issues
+Message-ID: <20141023122933.GA29656@aemeltch-mobl1.fi.intel.com>
+References: <65245.86.105.94.79.1414054796.squirrel@boosthardware.com>
+ <49444.86.105.94.79.1414061963.squirrel@boosthardware.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <49444.86.105.94.79.1414061963.squirrel@boosthardware.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Add searching of secondary services in gatt-client.
----
- src/shared/gatt-client.c | 113 +++++++++++++++++++++++++++++++++++++++++------
- 1 file changed, 100 insertions(+), 13 deletions(-)
+Hi Patrick,
 
-diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
-index 724fde2..acc0cb9 100644
---- a/src/shared/gatt-client.c
-+++ b/src/shared/gatt-client.c
-@@ -200,23 +200,36 @@ static void mark_notify_data_invalid_if_in_range(void *data, void *user_data)
- 		notify_data->invalid = true;
- }
- 
--static bool service_list_add_service(struct service_list **head,
--						struct service_list **tail,
--						bool primary, uint16_t start,
--						uint16_t end,
-+static struct service_list *new_service_list(uint16_t start, uint16_t end,
-+						bool primary,
- 						uint8_t uuid[BT_GATT_UUID_SIZE])
- {
- 	struct service_list *list;
- 
- 	list = new0(struct service_list, 1);
- 	if (!list)
--		return false;
-+		return NULL;
- 
- 	list->service.primary = primary;
- 	list->service.start_handle = start;
- 	list->service.end_handle = end;
- 	memcpy(list->service.uuid, uuid, UUID_BYTES);
- 
-+	return list;
-+}
-+
-+static bool service_list_add_service(struct service_list **head,
-+						struct service_list **tail,
-+						bool primary, uint16_t start,
-+						uint16_t end,
-+						uint8_t uuid[BT_GATT_UUID_SIZE])
-+{
-+	struct service_list *list;
-+
-+	list = new_service_list(start, end, primary, uuid);
-+	if (!list)
-+		return false;
-+
- 	if (!(*head))
- 		*head = *tail = list;
- 	else {
-@@ -364,6 +377,8 @@ struct discovery_op {
- 	struct bt_gatt_client *client;
- 	struct service_list *result_head, *result_tail, *cur_service;
- 	struct chrc_data *cur_chrc;
-+	uint16_t start;
-+	uint16_t end;
- 	int cur_chrc_index;
- 	int ref_count;
- 	void (*complete_func)(struct discovery_op *op, bool success,
-@@ -634,6 +649,75 @@ done:
- 	op->complete_func(op, success, att_ecode);
- }
- 
-+static void discover_secondary_cb(bool success, uint8_t att_ecode,
-+						struct bt_gatt_result *result,
-+						void *user_data)
-+{
-+	struct discovery_op *op = user_data;
-+	struct bt_gatt_client *client = op->client;
-+	struct bt_gatt_iter iter;
-+	uint16_t start, end;
-+	uint8_t uuid[BT_GATT_UUID_SIZE];
-+	char uuid_str[MAX_LEN_UUID_STR];
-+	struct service_list *service;
-+
-+	if (!success) {
-+		util_debug(client->debug_callback, client->debug_data,
-+					"Secondary service discovery failed."
-+					" ATT ECODE: 0x%02x", att_ecode);
-+		switch (att_ecode) {
-+		case BT_ATT_ERROR_ATTRIBUTE_NOT_FOUND:
-+		case BT_ATT_ERROR_UNSUPPORTED_GROUP_TYPE:
-+			goto next;
-+		default:
-+			goto done;
-+		}
-+	}
-+
-+	if (!result || !bt_gatt_iter_init(&iter, result))
-+		goto done;
-+
-+	util_debug(client->debug_callback, client->debug_data,
-+					"Secondary services found: %u",
-+					bt_gatt_result_service_count(result));
-+
-+	while (bt_gatt_iter_next_service(&iter, &start, &end, uuid)) {
-+		uuid_to_string(uuid, uuid_str);
-+		util_debug(client->debug_callback, client->debug_data,
-+				"start: 0x%04x, end: 0x%04x, uuid: %s",
-+				start, end, uuid_str);
-+
-+		/* Store the service */
-+		service = new_service_list(start, end, false, uuid);
-+		if (!service) {
-+			util_debug(client->debug_callback, client->debug_data,
-+						"Failed to create service");
-+			goto done;
-+		}
-+
-+		service_list_insert_services(&op->result_head, &op->result_tail,
-+							service, service);
-+	}
-+
-+next:
-+	/* Sequentially discover the characteristics of all services */
-+	op->cur_service = op->result_head;
-+	if (bt_gatt_discover_characteristics(client->att,
-+					op->cur_service->service.start_handle,
-+					op->cur_service->service.end_handle,
-+					discover_chrcs_cb,
-+					discovery_op_ref(op),
-+					discovery_op_unref))
-+		return;
-+
-+	util_debug(client->debug_callback, client->debug_data,
-+				"Failed to start characteristic discovery");
-+	discovery_op_unref(op);
-+
-+done:
-+	op->complete_func(op, false, att_ecode);
-+}
-+
- static void discover_primary_cb(bool success, uint8_t att_ecode,
- 						struct bt_gatt_result *result,
- 						void *user_data)
-@@ -686,18 +770,17 @@ static void discover_primary_cb(bool success, uint8_t att_ecode,
- 	if (!op->result_head)
- 		goto done;
- 
--	/* Sequentially discover the characteristics of all services */
-+	/* Discover secondary services */
- 	op->cur_service = op->result_head;
--	if (bt_gatt_discover_characteristics(client->att,
--					op->cur_service->service.start_handle,
--					op->cur_service->service.end_handle,
--					discover_chrcs_cb,
--					discovery_op_ref(op),
--					discovery_op_unref))
-+	if (bt_gatt_discover_secondary_services(client->att, NULL,
-+							op->start, op->end,
-+							discover_secondary_cb,
-+							discovery_op_ref(op),
-+							discovery_op_unref))
- 		return;
- 
- 	util_debug(client->debug_callback, client->debug_data,
--				"Failed to start characteristic discovery");
-+				"Failed to start secondary service discovery");
- 	discovery_op_unref(op);
- 	success = false;
- 
-@@ -870,6 +953,8 @@ static void process_service_changed(struct bt_gatt_client *client,
- 
- 	op->client = client;
- 	op->complete_func = service_changed_complete;
-+	op->start = start_handle;
-+	op->end = end_handle;
- 
- 	if (!bt_gatt_discover_primary_services(client->att, NULL,
- 						start_handle, end_handle,
-@@ -1002,6 +1087,8 @@ static bool gatt_client_init(struct bt_gatt_client *client, uint16_t mtu)
- 
- 	op->client = client;
- 	op->complete_func = init_complete;
-+	op->start = 0x0001;
-+	op->end = 0xffff;
- 
- 	/* Configure the MTU */
- 	if (!bt_gatt_exchange_mtu(client->att, MAX(BT_ATT_DEFAULT_LE_MTU, mtu),
--- 
-1.9.3
+On Thu, Oct 23, 2014 at 09:59:23PM +1100, Patrick Shirkey wrote:
+> 
+> On Thu, October 23, 2014 7:59 pm, Patrick Shirkey wrote:
+> > Hi,
+> >
+> > I have now got backports to run with bluez instead of bluedroid and the
+> > btusb driver instead of rtk_btusb.
+> >
+> > However the android bluetooth system does not want to run for me.
 
+So what is not working? Do you have logcat with "BlueZ" and "bluetothd" logs?
+
+Best regards 
+Andrei Emeltchenko 
+
+> >
+> 
+> For reference purposes I have got bluez running on an 8723au chipset with
+> the btusb driver from the "new" branch of the btusb git repo.
+> 
+> Here's an overview of the steps required:
+> 
+> - Patch the 3.4 kernel with the patch files from the aosp-bluez "misc" repo
+> - Completely replace bluedroid in the android tree with bluez including
+> the modifed bionic tree from the aosp-bluez repo
+> - Cross compile the backports drivers replacing btusb.c with the version
+> from the "new" branch in the git repo.
+> - Copy the modules from the backports tree to the linux tree before
+> building the firmware image. (overwrite the .ko files generated by the
+> kernel build)
+> - Include the firmware binary images from the git repo "new" branch in the
+> android build so they are copied to the /system/etc/firmware/ folder in
+> the firmware image
+> - Modify the init.rc script to include the init.bluetooth.rc file
+> - Modify the <platform>.mk file (in this case
+> /device/softwinner/wing-k70/wing-k70.mk) to load the following modules on
+> boot:
+>     /system/vendor/modules/compat.ko
+>     /system/vendor/modules/bluetooth.ko
+>     /system/vendor/modules/btusb.ko
+> 
+> enable debug logging with :
+> 
+> setprop persist.sys.bluetooth.debug 1
+> 
+> 
+> 
+> # btmgmt info
+> hci0:	addr CC:D2:9C:73:CB:45 version 6 manufacturer 93 class 0x000000
+> 	supported settings: powered connectable fast-connectable discoverable
+> bondable link-security ssp br/edr hs le advertising debug-keys privacy
+> 	current settings: bondable ssp br/edr le
+> 	name BlueZ for Android
+> 	short name
+> 
+> 
+> # haltest
+> audio_hw_device_open returned -98
+> hw_get_module_by_class returned -2
+> thread_evt_cb: evt=ASSOCIATE_JVM
+> if_bluetooth->init: BT_STATUS_SUCCESS
+> get_profile_interface(handsfree) : 0xb6e58134
+> get_profile_interface(a2dp) : 0xb6e580ec
+> get_profile_interface(avrcp) : 0xb6e58100
+> get_profile_interface(health) : 0xb6e583d0
+> get_profile_interface(hidhost) : 0xb6e580a0
+> get_profile_interface(pan) : 0xb6e580d0
+> get_profile_interface(gatt) : 0xb6e581ac
+> get_profile_interface(socket) : 0xb6e58094
+> if_bluetooth->init: BT_STATUS_DONE
+> if_av->init: BT_STATUS_SUCCESS
+> if_rc->init: BT_STATUS_SUCCESS
+> if_gatt->init: BT_STATUS_FAIL
+> adapter_properties_cb: status=BT_STATUS_SUCCESS num_properties=1
+> prop: type=BT_PROPERTY_UUIDS len=80 val={0000110e, 0000110c, 0000110a,
+> 0000113b, 00001200}
+> adapter_properties_cb: status=BT_STATUS_SUCCESS num_properties=1
+> prop: type=BT_PROPERTY_UUIDS len=80 val={0000110e, 0000110c, 0000110a,
+> 0000113b, 00001200}
+> adapter_properties_cb: status=BT_STATUS_SUCCESS num_properties=1
+> prop: type=BT_PROPERTY_UUIDS len=80 val={0000110e, 0000110c, 0000110a,
+> 0000113b, 00001200}
+> if_hf->init: BT_STATUS_FAIL
+> if_hh->init: BT_STATUS_SUCCESS
+> if_pan->init: BT_STATUS_FAIL
+> adapter_properties_cb: status=BT_STATUS_SUCCESS num_properties=1
+> prop: type=BT_PROPERTY_UUIDS len=80 val={0000110e, 0000110c, 0000110a,
+> 0000113b, 00001200}
+> adapter_properties_cb: status=BT_STATUS_SUCCESS num_properties=1
+> prop: type=BT_PROPERTY_UUIDS len=80 val={0000110e, 0000110c, 0000110a,
+> 0000113b, 00001200}
+> if_hl->init: BT_STATUS_SUCCESS
+> >
+> 
+> 
+> # btmgmt le on
+> hci0 Set Low Energy complete, settings: bondable ssp br/edr le
+> # btmgmt find
+> Unable to start discovery. status 0x0f (Not Powered)
+> # btmgmt power on
+> hci0 Set Powered complete, settings: powered bondable ssp br/edr le
+> # btmgmt find
+> Discovery started
+> hci0 dev_found: BC:6A:29:AB:2C:AA type LE Public rssi -44 flags 0x0000 AD
+> flags 0x06 eir_len 25
+> 
+> 
+> 
+> 
+> 
+> --
+> Patrick Shirkey
+> Boost Hardware Ltd
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
