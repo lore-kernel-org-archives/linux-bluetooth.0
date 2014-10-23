@@ -1,57 +1,155 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcin Kraglak <marcin.kraglak@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv6 04/14] shared/gatt: Add extra check in characteristic iterator
-Date: Thu, 23 Oct 2014 12:15:27 +0200
-Message-Id: <1414059337-12040-5-git-send-email-marcin.kraglak@tieto.com>
+Subject: [PATCHv6 01/14] shared/gatt: Add discover_secondary_services()
+Date: Thu, 23 Oct 2014 12:15:24 +0200
+Message-Id: <1414059337-12040-2-git-send-email-marcin.kraglak@tieto.com>
 In-Reply-To: <1414059337-12040-1-git-send-email-marcin.kraglak@tieto.com>
 References: <1414059337-12040-1-git-send-email-marcin.kraglak@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Avoid incorrect reading of included service discovery results.
+This pacth implements searching Secondary Services in given range.
 ---
- src/shared/gatt-helpers.c | 20 ++++++++++++++++++++
- 1 file changed, 20 insertions(+)
+ src/shared/gatt-helpers.c | 56 +++++++++++++++++++++++++++++++++--------------
+ src/shared/gatt-helpers.h |  5 +++++
+ 2 files changed, 45 insertions(+), 16 deletions(-)
 
 diff --git a/src/shared/gatt-helpers.c b/src/shared/gatt-helpers.c
-index d689c56..0dbd999 100644
+index 55e6992..4dc787f 100644
 --- a/src/shared/gatt-helpers.c
 +++ b/src/shared/gatt-helpers.c
-@@ -123,6 +123,16 @@ unsigned int bt_gatt_result_characteristic_count(struct bt_gatt_result *result)
- 	if (result->opcode != BT_ATT_OP_READ_BY_TYPE_RSP)
- 		return 0;
+@@ -175,6 +175,7 @@ struct discovery_op {
+ 	uint16_t end_handle;
+ 	int ref_count;
+ 	bt_uuid_t uuid;
++	uint16_t service_type;
+ 	struct bt_gatt_result *result_head;
+ 	struct bt_gatt_result *result_tail;
+ 	bt_gatt_discovery_callback_t callback;
+@@ -487,7 +488,7 @@ static void read_by_grp_type_cb(uint8_t opcode, const void *pdu,
  
-+	/*
-+	 * Data length contains 7 or 21 octets:
-+	 * 2 octets: Attribute handle
-+	 * 1 octet: Characteristic properties
-+	 * 2 octets: Characteristic value handle
-+	 * 2 or 16 octets: characteristic UUID
-+	 */
-+	if (result->data_len != 21 && result->data_len != 7)
-+		return 0;
-+
- 	return result_element_count(result);
+ 		put_le16(last_end + 1, pdu);
+ 		put_le16(op->end_handle, pdu + 2);
+-		put_le16(GATT_PRIM_SVC_UUID, pdu + 4);
++		put_le16(op->service_type, pdu + 4);
+ 
+ 		if (bt_att_send(op->att, BT_ATT_OP_READ_BY_GRP_TYPE_REQ,
+ 							pdu, sizeof(pdu),
+@@ -569,7 +570,7 @@ static void find_by_type_val_cb(uint8_t opcode, const void *pdu,
+ 
+ 		put_le16(last_end + 1, pdu);
+ 		put_le16(op->end_handle, pdu + 2);
+-		put_le16(GATT_PRIM_SVC_UUID, pdu + 4);
++		put_le16(op->service_type, pdu + 4);
+ 		put_uuid_le(&op->uuid, pdu + 6);
+ 
+ 		if (bt_att_send(op->att, BT_ATT_OP_FIND_BY_TYPE_VAL_REQ,
+@@ -594,21 +595,12 @@ done:
+ 		op->callback(success, att_ecode, final_result, op->user_data);
  }
  
-@@ -239,6 +249,16 @@ bool bt_gatt_iter_next_characteristic(struct bt_gatt_iter *iter,
- 	if (iter->result->opcode != BT_ATT_OP_READ_BY_TYPE_RSP)
- 		return false;
+-bool bt_gatt_discover_all_primary_services(struct bt_att *att, bt_uuid_t *uuid,
+-					bt_gatt_discovery_callback_t callback,
+-					void *user_data,
+-					bt_gatt_destroy_func_t destroy)
+-{
+-	return bt_gatt_discover_primary_services(att, uuid, 0x0001, 0xffff,
+-							callback, user_data,
+-							destroy);
+-}
+-
+-bool bt_gatt_discover_primary_services(struct bt_att *att, bt_uuid_t *uuid,
++static bool discover_services(struct bt_att *att, bt_uuid_t *uuid,
+ 					uint16_t start, uint16_t end,
+ 					bt_gatt_discovery_callback_t callback,
+ 					void *user_data,
+-					bt_gatt_destroy_func_t destroy)
++					bt_gatt_destroy_func_t destroy,
++					bool primary)
+ {
+ 	struct discovery_op *op;
+ 	bool result;
+@@ -625,6 +617,8 @@ bool bt_gatt_discover_primary_services(struct bt_att *att, bt_uuid_t *uuid,
+ 	op->callback = callback;
+ 	op->user_data = user_data;
+ 	op->destroy = destroy;
++	/* set service uuid to primary or secondary */
++	op->service_type = primary ? GATT_PRIM_SVC_UUID : GATT_SND_SVC_UUID;
  
-+	/*
-+	 * Data length contains 7 or 21 octets:
-+	 * 2 octets: Attribute handle
-+	 * 1 octet: Characteristic properties
-+	 * 2 octets: Characteristic value handle
-+	 * 2 or 16 octets: characteristic UUID
-+	 */
-+	if (iter->result->data_len != 21 && iter->result->data_len != 7)
-+		return false;
+ 	/* If UUID is NULL, then discover all primary services */
+ 	if (!uuid) {
+@@ -632,7 +626,7 @@ bool bt_gatt_discover_primary_services(struct bt_att *att, bt_uuid_t *uuid,
+ 
+ 		put_le16(start, pdu);
+ 		put_le16(end, pdu + 2);
+-		put_le16(GATT_PRIM_SVC_UUID, pdu + 4);
++		put_le16(op->service_type, pdu + 4);
+ 
+ 		result = bt_att_send(att, BT_ATT_OP_READ_BY_GRP_TYPE_REQ,
+ 							pdu, sizeof(pdu),
+@@ -652,7 +646,7 @@ bool bt_gatt_discover_primary_services(struct bt_att *att, bt_uuid_t *uuid,
+ 
+ 		put_le16(start, pdu);
+ 		put_le16(end, pdu + 2);
+-		put_le16(GATT_PRIM_SVC_UUID, pdu + 4);
++		put_le16(op->service_type, pdu + 4);
+ 		put_uuid_le(&op->uuid, pdu + 6);
+ 
+ 		result = bt_att_send(att, BT_ATT_OP_FIND_BY_TYPE_VAL_REQ,
+@@ -668,6 +662,36 @@ bool bt_gatt_discover_primary_services(struct bt_att *att, bt_uuid_t *uuid,
+ 	return result;
+ }
+ 
++bool bt_gatt_discover_all_primary_services(struct bt_att *att, bt_uuid_t *uuid,
++					bt_gatt_discovery_callback_t callback,
++					void *user_data,
++					bt_gatt_destroy_func_t destroy)
++{
++	return bt_gatt_discover_primary_services(att, uuid, 0x0001, 0xffff,
++							callback, user_data,
++							destroy);
++}
 +
- 	op = iter->result->op;
- 	pdu_ptr = iter->result->pdu + iter->pos;
- 
++bool bt_gatt_discover_primary_services(struct bt_att *att, bt_uuid_t *uuid,
++					uint16_t start, uint16_t end,
++					bt_gatt_discovery_callback_t callback,
++					void *user_data,
++					bt_gatt_destroy_func_t destroy)
++{
++	return discover_services(att, uuid, start, end, callback, user_data,
++								destroy, true);
++}
++
++bool bt_gatt_discover_secondary_services(struct bt_att *att, bt_uuid_t *uuid,
++					uint16_t start, uint16_t end,
++					bt_gatt_discovery_callback_t callback,
++					void *user_data,
++					bt_gatt_destroy_func_t destroy)
++{
++	return discover_services(att, uuid, start, end, callback, user_data,
++								destroy, false);
++}
++
+ bool bt_gatt_discover_included_services(struct bt_att *att,
+ 					uint16_t start, uint16_t end,
+ 					bt_uuid_t *uuid,
+diff --git a/src/shared/gatt-helpers.h b/src/shared/gatt-helpers.h
+index f6f4b62..8a25dea 100644
+--- a/src/shared/gatt-helpers.h
++++ b/src/shared/gatt-helpers.h
+@@ -72,6 +72,11 @@ bool bt_gatt_discover_primary_services(struct bt_att *att, bt_uuid_t *uuid,
+ 					bt_gatt_discovery_callback_t callback,
+ 					void *user_data,
+ 					bt_gatt_destroy_func_t destroy);
++bool bt_gatt_discover_secondary_services(struct bt_att *att, bt_uuid_t *uuid,
++					uint16_t start, uint16_t end,
++					bt_gatt_discovery_callback_t callback,
++					void *user_data,
++					bt_gatt_destroy_func_t destroy);
+ bool bt_gatt_discover_included_services(struct bt_att *att,
+ 					uint16_t start, uint16_t end,
+ 					bt_uuid_t *uuid,
 -- 
 1.9.3
 
