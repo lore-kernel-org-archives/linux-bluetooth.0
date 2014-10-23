@@ -1,52 +1,70 @@
 Return-Path: <cyrus@holtmann.org>
-From: Martin Townsend <mtownsend1973@gmail.com>
-To: linux-bluetooth@vger.kernel.org,
-	linux-wpan@vger.kernel.org
-Cc: marcel@holtmann.org,
-	alex.aring@gmail.com,
-	jukka.rissanen@linux.intel.com,
-	Martin Townsend <martin.townsend@xsilon.com>
-Subject: [PATCH v3 bluetooth-next 0/4] 6lowpan: Move skb delivery out of IPHC
-Date: Thu, 23 Oct 2014 14:12:24 +0100
-Message-Id: <1414069948-29731-1-git-send-email-martin.townsend@xsilon.com>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: Marcin Kraglak <marcin.kraglak@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCHv6 00/14] Included service discovery
+Date: Thu, 23 Oct 2014 14:59:20 +0200
+Message-ID: <3217191.obB9pmHZrM@uw000953>
+In-Reply-To: <1414059337-12040-1-git-send-email-marcin.kraglak@tieto.com>
+References: <1414059337-12040-1-git-send-email-marcin.kraglak@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This series moves skb delivery out of IPHC and into the receive routines of
-both bluetooth and 802.15.4.  The reason is that we need to support more
-(de)compression schemes in the future.  It also means that calling 
-lowpan_process_data now only returns error codes or 0 for success so 
-this has been cleaned up.  The final patch then renames occurences of
-lowpan_process_data and process_data to something more meaningful.
+Hi Marcin,
 
-v1 -> v2
+On Thursday 23 of October 2014 12:15:23 Marcin Kraglak wrote:
+> v3:
+> In this version after primary service discovery,
+> secondary services are discovered. Next included
+> services are resolved. With this approach we
+> don't have recursively search for included service,
+> like it was TODO in previous proposal.
+> There is also small coding style fix suggested by Arman.
+> 
+> v4:
+> If no secondary services found, continue include services search (fixed
+> in gatt-client.c).
+> Fixed wrong debug logs (primary->secondary).
+> Fixed searching descriptors
+> 
+> v5:
+> Ignore Unsupported Group Type Error in response to secondary service
+> discovery and continue included services discovery.
+> 
+> v6
+> * Added comments to specific calculations and numbers.
+> * Fixed goto labels as suggested by Szymon
+> * Changed printing type of service.
+> * Typo fixes pointed by Szymon
+> 
+> Marcin Kraglak (14):
+>   shared/gatt: Add discover_secondary_services()
+>   shared/gatt: Add initial implementation of discover_included_services
+>   shared/gatt: Discover included services 128 bit UUIDS
+>   shared/gatt: Add extra check in characteristic iterator
+>   shared/gatt: Add included service iterator
+>   shared/gatt: Add function bt_gatt_result_included_count()
+>   shared/gatt: Remove not needed function parameter
+>   shared/gatt: Distinguish Primary from Secondary services
+>   tools/btgatt-client: Print type of service
+>   shared/gatt: Discover secondary services
+>   shared/gatt: Discover included services
+>   shared/gatt: Add gatt-client include service iterator
+>   tools/btgatt-client: Print found include services
+>   shared/gatt: Fix searching descriptors
+> 
+>  src/shared/gatt-client.c  | 252 +++++++++++++++++++++++--
+>  src/shared/gatt-client.h  |  18 ++
+>  src/shared/gatt-helpers.c | 462 ++++++++++++++++++++++++++++++++++++++++++++--
+>  src/shared/gatt-helpers.h |  10 +-
+>  tools/btgatt-client.c     |  20 +-
+>  5 files changed, 725 insertions(+), 37 deletions(-)
+> 
 
-* Handle freeing of skb in lowpan_give_skb_to_devices for 802.15.14
-* Added another skb_consume in bluetooth code for uncompressed IPv6 headers
-* Added missing skb_consume for local_skb for bluetooth in compreesed IPv6 header
-  path
-* Combine patch 4 into 1.
-
-v2 -> v3
-
-* Ensure error codes aren't returned in the bluetooth skb delivery function.
-* In lowpan_give_skb_to_devices return NET_RX_DROP when the first call to
-  netif_rx fails.
-
-v3 -> v4
-
-* Fixed incorrect frag return handling due to refactoring skb_deliver.
-
-Martin Townsend (4):
-  6lowpan: remove skb_deliver from IPHC
-  6lowpan: fix process_data return values
-  bluetooth:6lowpan: use consume_skb when packet processed successfully
-  ieee802154: 6lowpan: rename process_data and lowpan_process_data
-
- include/net/6lowpan.h         | 12 ++++-----
- net/6lowpan/iphc.c            | 42 +++++++++----------------------
- net/bluetooth/6lowpan.c       | 36 ++++++++++++++++++---------
- net/ieee802154/6lowpan_rtnl.c | 58 +++++++++++++++++++++++++++----------------
- 4 files changed, 78 insertions(+), 70 deletions(-)
+All patches in this set have been applied. Thanks a lot.
 
 -- 
-1.9.1
+Best regards, 
+Szymon Janc
