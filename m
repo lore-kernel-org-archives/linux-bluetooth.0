@@ -1,50 +1,79 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Thu, 23 Oct 2014 19:30:53 +0200 (CEST)
+From: Fabian Frederick <fabf@skynet.be>
+Reply-To: Fabian Frederick <fabf@skynet.be>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: "Gustavo F. Padovan" <gustavo@padovan.org>,
+	Network Development <netdev@vger.kernel.org>,
+	linux-kernel <linux-kernel@vger.kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	BlueZ development <linux-bluetooth@vger.kernel.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>
+Message-ID: <20326343.74480.1414085453988.open-xchange@webmail.nmp.skynet.be>
+In-Reply-To: <2F67F6E8-CA99-4998-AE68-89E60D62C39D@holtmann.org>
+References: <1414081365-6461-1-git-send-email-fabf@skynet.be> <2F67F6E8-CA99-4998-AE68-89E60D62C39D@holtmann.org>
+Subject: Re: [PATCH 1/1 net-next] Bluetooth: fix shadow warning in
+ hci_disconnect()
 MIME-Version: 1.0
-In-Reply-To: <1414082009-40903-1-git-send-email-jamuraa@chromium.org>
-References: <1414082009-40903-1-git-send-email-jamuraa@chromium.org>
-Date: Thu, 23 Oct 2014 10:50:52 -0700
-Message-ID: <CAJLTA8iaAd8jrLdPMy16Ha70EzKyHwBmOK3Rgi3W4M9x88AuYg@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 0/5] Unit tests for GAttrib
-From: Michael Janssen <jamuraa@chromium.org>
-To: linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset=UTF-8
-Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Thu Oct 23 2014 at 9:33:36 AM Michael Janssen <jamuraa@chromium.org> wrote:
+
+
+> On 23 October 2014 at 18:29 Marcel Holtmann <marcel@holtmann.org> wrote:
 >
-> Since we want to shim GAttrib for a smooth transition to bt_att
-> profiles, this patch cleans up the API and adds unit tests for
-> GAttrib functions.
 >
-> This adds tests for all but the register / unregister functions, which
-> I will send in a separate patch since they are slightly more complicated due
-> to catchalls.
+> Hi Fabian,
 >
-> Michael Janssen (5):
->   Remove unused g_attrib_set_debug function
->   attrib: Remove MTU-probing code
->   attrib: Add mtu argument to g_attrib_new
->   attrib: remove g_attrib_is_encrypted
->   Add unit test for gattrib
+> > use cpr for hci_cp_read_clock_offset instead of cp
+> > (already defined above).
+> >
+> > Signed-off-by: Fabian Frederick <fabf@skynet.be>
+> > ---
+> > net/bluetooth/hci_conn.c | 6 +++---
+> > 1 file changed, 3 insertions(+), 3 deletions(-)
+> >
+> > diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+> > index b9517bd..6151e09 100644
+> > --- a/net/bluetooth/hci_conn.c
+> > +++ b/net/bluetooth/hci_conn.c
+> > @@ -141,10 +141,10 @@ int hci_disconnect(struct hci_conn *conn, __u8 re=
+ason)
+> >=C2=A0 =C2=A0 =C2=A0 */
+> >=C2=A0 =C2=A0 =C2=A0if (conn->type =3D=3D ACL_LINK && conn->role =3D=3D =
+HCI_ROLE_MASTER) {
+> >=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0struct hci_dev *hdev =3D=
+ conn->hdev;
+> > -=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0struct hci_cp_read_clock_offs=
+et cp;
+> > +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0struct hci_cp_read_clock_offs=
+et cpr;
+> >
+> > -=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0cp.handle =3D cpu_to_le16(con=
+n->handle);
+> > -=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0hci_send_cmd(hdev, HCI_OP_REA=
+D_CLOCK_OFFSET, sizeof(cp), &cp);
+> > +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0cpr.handle =3D cpu_to_le16(co=
+nn->handle);
+> > +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0hci_send_cmd(hdev, HCI_OP_REA=
+D_CLOCK_OFFSET, sizeof(cpr), &cpr);
 >
->  .gitignore           |   1 +
->  Makefile.am          |   7 +
->  attrib/gattrib.c     |  38 +---
->  attrib/gattrib.h     |   7 +-
->  attrib/gatttool.c    |  17 +-
->  attrib/interactive.c |  17 +-
->  src/attrib-server.c  |   9 +-
->  src/device.c         |  11 +-
->  unit/test-gattrib.c  | 584 +++++++++++++++++++++++++++++++++++++++++++++++++++
->  9 files changed, 645 insertions(+), 46 deletions(-)
->  create mode 100644 unit/test-gattrib.c
+> valid change, but I do not like cpr as variable name. We need to come up =
+with
+> a better one. There are other places in the code where we had the same th=
+ing.
+> Please have a look there.
 >
-> --
-> 2.1.0.rc2.206.gedb03e5
+> Regards
+>
+> Marcel
 >
 
-I just realized this patchset is missing a bunch of style fixes (also,
-it has a massive block comment) in unit/test-gattrib.c.  A v2 will
-come which fixes style to conform with HACKING.   If there are other
-comments I will incorporate those too.
+Hi Marcel,
+
+=C2=A0 Maybe read_cp (like commit c1f23a2bfc89 with struct hci_cp_auth_requ=
+ested
+auth_cp) ?
+
+Regards,
+Fabian
