@@ -1,37 +1,58 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcin Kraglak <marcin.kraglak@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv6 14/14] shared/gatt: Fix searching descriptors
-Date: Thu, 23 Oct 2014 12:15:37 +0200
-Message-Id: <1414059337-12040-15-git-send-email-marcin.kraglak@tieto.com>
+Subject: [PATCHv6 13/14] tools/btgatt-client: Print found include services
+Date: Thu, 23 Oct 2014 12:15:36 +0200
+Message-Id: <1414059337-12040-14-git-send-email-marcin.kraglak@tieto.com>
 In-Reply-To: <1414059337-12040-1-git-send-email-marcin.kraglak@tieto.com>
 References: <1414059337-12040-1-git-send-email-marcin.kraglak@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Descriptor discovery range started from characteristic value handle + 1
-and end with characteristic end handle. If characteristic value handle
-is 0xffff, then discovery range was set to 0x0000-0xffff.
-Found during PTS test case TC_GAD_CL_BV_03_C.
 ---
- src/shared/gatt-client.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ tools/btgatt-client.c | 15 +++++++++++++++
+ 1 file changed, 15 insertions(+)
 
-diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
-index 1c50d82..f884365 100644
---- a/src/shared/gatt-client.c
-+++ b/src/shared/gatt-client.c
-@@ -706,8 +706,8 @@ static void discover_chrcs_cb(bool success, uint8_t att_ecode,
- 	for (i = 0; i < chrc_count; i++) {
- 		op->cur_chrc_index = i;
- 		op->cur_chrc = chrcs + i;
--		desc_start = chrcs[i].chrc_external.value_handle + 1;
--		if (desc_start > chrcs[i].chrc_external.end_handle)
-+		desc_start = chrcs[i].chrc_external.value_handle;
-+		if (desc_start++ == chrcs[i].chrc_external.end_handle)
- 			continue;
+diff --git a/tools/btgatt-client.c b/tools/btgatt-client.c
+index d21bc34..b7bfa24 100644
+--- a/tools/btgatt-client.c
++++ b/tools/btgatt-client.c
+@@ -174,7 +174,9 @@ static void print_uuid(const uint8_t uuid[16])
+ static void print_service(const bt_gatt_service_t *service)
+ {
+ 	struct bt_gatt_characteristic_iter iter;
++	struct bt_gatt_incl_service_iter include_iter;
+ 	const bt_gatt_characteristic_t *chrc;
++	const bt_gatt_included_service_t *incl;
+ 	size_t i;
  
- 		if (bt_gatt_discover_descriptors(client->att, desc_start,
+ 	if (!bt_gatt_characteristic_iter_init(&iter, service)) {
+@@ -182,12 +184,25 @@ static void print_service(const bt_gatt_service_t *service)
+ 		return;
+ 	}
+ 
++	if (!bt_gatt_include_service_iter_init(&include_iter, service)) {
++		PRLOG("Failed to initialize include service iterator\n");
++		return;
++	}
++
+ 	printf(COLOR_RED "service" COLOR_OFF " - start: 0x%04x, "
+ 				"end: 0x%04x, type: %s, uuid: ",
+ 				service->start_handle, service->end_handle,
+ 				service->primary ? "primary" : "secondary");
+ 	print_uuid(service->uuid);
+ 
++	while (bt_gatt_include_service_iter_next(&include_iter, &incl)) {
++		printf("\t  " COLOR_GREEN "include" COLOR_OFF " - handle: "
++					"0x%04x, - start: 0x%04x, end: 0x%04x,"
++					"uuid: ", incl->handle,
++					incl->start_handle, incl->end_handle);
++		print_uuid(incl->uuid);
++	}
++
+ 	while (bt_gatt_characteristic_iter_next(&iter, &chrc)) {
+ 		printf("\t  " COLOR_YELLOW "charac" COLOR_OFF
+ 				" - start: 0x%04x, end: 0x%04x, "
 -- 
 1.9.3
 
