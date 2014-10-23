@@ -1,119 +1,71 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcin Kraglak <marcin.kraglak@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv6 05/14] shared/gatt: Add included service iterator
-Date: Thu, 23 Oct 2014 12:15:28 +0200
-Message-Id: <1414059337-12040-6-git-send-email-marcin.kraglak@tieto.com>
+Subject: [PATCHv6 06/14] shared/gatt: Add function bt_gatt_result_included_count()
+Date: Thu, 23 Oct 2014 12:15:29 +0200
+Message-Id: <1414059337-12040-7-git-send-email-marcin.kraglak@tieto.com>
 In-Reply-To: <1414059337-12040-1-git-send-email-marcin.kraglak@tieto.com>
 References: <1414059337-12040-1-git-send-email-marcin.kraglak@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-It will fetch included services from result.
+It will return number of included services in result.
 ---
- src/shared/gatt-helpers.c | 74 +++++++++++++++++++++++++++++++++++++++++++++++
- src/shared/gatt-helpers.h |  3 ++
- 2 files changed, 77 insertions(+)
+ src/shared/gatt-helpers.c | 28 ++++++++++++++++++++++++++++
+ src/shared/gatt-helpers.h |  1 +
+ 2 files changed, 29 insertions(+)
 
 diff --git a/src/shared/gatt-helpers.c b/src/shared/gatt-helpers.c
-index 0dbd999..1516e79 100644
+index 1516e79..f993243 100644
 --- a/src/shared/gatt-helpers.c
 +++ b/src/shared/gatt-helpers.c
-@@ -193,6 +193,80 @@ struct discovery_op {
- 	bt_gatt_destroy_func_t destroy;
- };
+@@ -147,6 +147,34 @@ unsigned int bt_gatt_result_descriptor_count(struct bt_gatt_result *result)
+ 	return result_element_count(result);
+ }
  
-+bool bt_gatt_iter_next_included_service(struct bt_gatt_iter *iter,
-+				uint16_t *handle, uint16_t *start_handle,
-+				uint16_t *end_handle, uint8_t uuid[16])
++unsigned int bt_gatt_result_included_count(struct bt_gatt_result *result)
 +{
-+	struct bt_gatt_result *read_result;
-+	const void *pdu_ptr;
-+	int i = 0;
++	struct bt_gatt_result *cur;
++	unsigned int count = 0;
 +
-+	if (!iter || !iter->result || !handle || !start_handle || !end_handle
-+								|| !uuid)
-+		return false;
++	if (!result)
++		return 0;
 +
-+	if (iter->result->opcode != BT_ATT_OP_READ_BY_TYPE_RSP)
-+		return false;
++	if (result->opcode != BT_ATT_OP_READ_BY_TYPE_RSP)
++		return 0;
 +
 +	/*
-+	 * iter->result points to READ_BY_TYPE_RSP with data length containing:
++	 * Data length can be of length 6 or 8 octets:
 +	 * 2 octets - include service handle
 +	 * 2 octets - start handle of included service
 +	 * 2 octets - end handle of included service
-+	 * optional 2  octets - Bluetooth UUID
++	 * 2 octets (optionally) - 16 bit Bluetooth UUID
 +	 */
-+	if (iter->result->data_len != 8 && iter->result->data_len != 6)
-+		return false;
++	if (result->data_len != 6 && result->data_len != 8)
++		return 0;
 +
-+	pdu_ptr = iter->result->pdu + iter->pos;
++	for (cur = result; cur; cur = cur->next)
++		if (cur->opcode == BT_ATT_OP_READ_BY_TYPE_RSP)
++			count += cur->pdu_len / cur->data_len;
 +
-+	/* This result contains 16 bit UUID */
-+	if (iter->result->data_len == 8) {
-+		*handle = get_le16(pdu_ptr);
-+		*start_handle = get_le16(pdu_ptr + 2);
-+		*end_handle = get_le16(pdu_ptr + 4);
-+		convert_uuid_le(pdu_ptr + 6, 2, uuid);
-+
-+		iter->pos += iter->result->data_len;
-+
-+		if (iter->pos == iter->result->pdu_len) {
-+			iter->result = iter->result->next;
-+			iter->pos = 0;
-+		}
-+
-+		return true;
-+	}
-+
-+	*handle = get_le16(pdu_ptr);
-+	*start_handle = get_le16(pdu_ptr + 2);
-+	*end_handle = get_le16(pdu_ptr + 4);
-+	read_result = iter->result;
-+
-+	/*
-+	 * Find READ_RSP with include service UUID.
-+	 * If number of current data set in READ_BY_TYPE_RSP is n, then we must
-+	 * go to n'th PDU next to current item->result
-+	 */
-+	for (read_result = read_result->next; read_result; i++) {
-+		if (i >= (iter->pos / iter->result->data_len))
-+			break;
-+
-+		read_result = read_result->next;
-+	}
-+
-+	if (!read_result)
-+		return false;
-+
-+	convert_uuid_le(read_result->pdu, read_result->data_len, uuid);
-+	iter->pos += iter->result->data_len;
-+	if (iter->pos == iter->result->pdu_len) {
-+		iter->result = read_result->next;
-+		iter->pos = 0;
-+	}
-+
-+	return true;
++	return count;
 +}
 +
- bool bt_gatt_iter_next_service(struct bt_gatt_iter *iter,
- 				uint16_t *start_handle, uint16_t *end_handle,
- 				uint8_t uuid[16])
+ bool bt_gatt_iter_init(struct bt_gatt_iter *iter, struct bt_gatt_result *result)
+ {
+ 	if (!iter || !result)
 diff --git a/src/shared/gatt-helpers.h b/src/shared/gatt-helpers.h
-index 8a25dea..8c434c1 100644
+index 8c434c1..df003ac 100644
 --- a/src/shared/gatt-helpers.h
 +++ b/src/shared/gatt-helpers.h
-@@ -49,6 +49,9 @@ bool bt_gatt_iter_next_characteristic(struct bt_gatt_iter *iter,
- 				uint8_t uuid[16]);
- bool bt_gatt_iter_next_descriptor(struct bt_gatt_iter *iter, uint16_t *handle,
- 							uint8_t uuid[16]);
-+bool bt_gatt_iter_next_included_service(struct bt_gatt_iter *iter,
-+				uint16_t *handle, uint16_t *start_handle,
-+				uint16_t *end_handle, uint8_t uuid[16]);
+@@ -38,6 +38,7 @@ struct bt_gatt_iter {
+ unsigned int bt_gatt_result_service_count(struct bt_gatt_result *result);
+ unsigned int bt_gatt_result_characteristic_count(struct bt_gatt_result *result);
+ unsigned int bt_gatt_result_descriptor_count(struct bt_gatt_result *result);
++unsigned int bt_gatt_result_included_count(struct bt_gatt_result *result);
  
- typedef void (*bt_gatt_destroy_func_t)(void *user_data);
- 
+ bool bt_gatt_iter_init(struct bt_gatt_iter *iter, struct bt_gatt_result *result);
+ bool bt_gatt_iter_next_service(struct bt_gatt_iter *iter,
 -- 
 1.9.3
 
