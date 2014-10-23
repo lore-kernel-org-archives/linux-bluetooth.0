@@ -1,59 +1,66 @@
 Return-Path: <cyrus@holtmann.org>
-From: Marcin Kraglak <marcin.kraglak@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv6 00/14] Included service discovery
-Date: Thu, 23 Oct 2014 12:15:23 +0200
-Message-Id: <1414059337-12040-1-git-send-email-marcin.kraglak@tieto.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Thu, 23 Oct 2014 12:30:43 +0200
+From: Alexander Aring <alex.aring@gmail.com>
+To: Martin Townsend <martin.townsend@xsilon.com>
+Cc: Martin Townsend <mtownsend1973@gmail.com>,
+	linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org,
+	marcel@holtmann.org, jukka.rissanen@linux.intel.com
+Subject: Re: [PATCH v3 bluetooth-next 0/4] 6lowpan: Move skb delivery out of
+ IPHC
+Message-ID: <20141023103023.GA12549@x61s.guest.pengutronix.de>
+References: <1413967190-28890-1-git-send-email-martin.townsend@xsilon.com>
+ <20141023094355.GA11768@x61s.guest.pengutronix.de>
+ <5448CFA8.3020604@xsilon.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+In-Reply-To: <5448CFA8.3020604@xsilon.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-v3:
-In this version after primary service discovery,
-secondary services are discovered. Next included
-services are resolved. With this approach we
-don't have recursively search for included service,
-like it was TODO in previous proposal.
-There is also small coding style fix suggested by Arman.
+Hi Martin,
 
-v4:
-If no secondary services found, continue include services search (fixed
-in gatt-client.c).
-Fixed wrong debug logs (primary->secondary).
-Fixed searching descriptors
+On Thu, Oct 23, 2014 at 10:51:36AM +0100, Martin Townsend wrote:
+> Hi Alex,
+> 
+> Looks like the SKB is now non-linear which causes the skb_put to assert.  Maybe skb_linearlize will help[0]
+> 
+> I'll also take a look.
 
-v5:
-Ignore Unsupported Group Type Error in response to secondary service
-discovery and continue included services discovery.
+yes, I did also take a fast look at:
 
-v6
-* Added comments to specific calculations and numbers.
-* Fixed goto labels as suggested by Szymon
-* Changed printing type of service.
-* Typo fixes pointed by Szymon
+"kernel BUG at net/core/skbuff.c:1275!"
 
-Marcin Kraglak (14):
-  shared/gatt: Add discover_secondary_services()
-  shared/gatt: Add initial implementation of discover_included_services
-  shared/gatt: Discover included services 128 bit UUIDS
-  shared/gatt: Add extra check in characteristic iterator
-  shared/gatt: Add included service iterator
-  shared/gatt: Add function bt_gatt_result_included_count()
-  shared/gatt: Remove not needed function parameter
-  shared/gatt: Distinguish Primary from Secondary services
-  tools/btgatt-client: Print type of service
-  shared/gatt: Discover secondary services
-  shared/gatt: Discover included services
-  shared/gatt: Add gatt-client include service iterator
-  tools/btgatt-client: Print found include services
-  shared/gatt: Fix searching descriptors
+But why occurs this now? I think you didn't change anything in this
+behaviour in the sequence of skb_put, etc...
 
- src/shared/gatt-client.c  | 252 +++++++++++++++++++++++--
- src/shared/gatt-client.h  |  18 ++
- src/shared/gatt-helpers.c | 462 ++++++++++++++++++++++++++++++++++++++++++++--
- src/shared/gatt-helpers.h |  10 +-
- tools/btgatt-client.c     |  20 +-
- 5 files changed, 725 insertions(+), 37 deletions(-)
 
--- 
-1.9.3
 
+I know now why this happens, maybe I can't test it currently fast.
+
+In file net/ieee802154/6lowpan_rtnl.c at function "lowpan_rcv"
+
+case LOWPAN_DISPATCH_FRAG1:     /* first fragment header */
+	ret = lowpan_frag_rcv(skb, LOWPAN_DISPATCH_FRAG1);
+	if (ret == 1) {
+		ret = iphc_decompress(skb, &hdr);
+		if (ret < 0) 
+			goto drop;
+	}
+	break;
+case LOWPAN_DISPATCH_FRAGN:     /* next fragments headers */
+	ret = lowpan_frag_rcv(skb, LOWPAN_DISPATCH_FRAGN);
+	if (ret == 1) {
+		ret = iphc_decompress(skb, &hdr);
+		if (ret < 0) 
+			goto drop;
+	}
+	break;
+
+later you do _ALWAYS_ a "lowpan_give_skb_to_devices". But you changed
+now the behaviour, because in case of LOWPAN_DISPATCH_FRAG1 or
+LOWPAN_DISPATCH_FRAGN should lowpan_give_skb_to_devices only called when
+lowpan_frag_rcv returns 1 and after iphc_decompress.
+
+I think that's your problem. Always call lowpan_give_skb_to_devices
+seems to be 100% wrong.
+
+- Alex
