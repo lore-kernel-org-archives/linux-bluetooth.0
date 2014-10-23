@@ -1,79 +1,203 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 23 Oct 2014 19:30:53 +0200 (CEST)
-From: Fabian Frederick <fabf@skynet.be>
-Reply-To: Fabian Frederick <fabf@skynet.be>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: "Gustavo F. Padovan" <gustavo@padovan.org>,
-	Network Development <netdev@vger.kernel.org>,
-	linux-kernel <linux-kernel@vger.kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	BlueZ development <linux-bluetooth@vger.kernel.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>
-Message-ID: <20326343.74480.1414085453988.open-xchange@webmail.nmp.skynet.be>
-In-Reply-To: <2F67F6E8-CA99-4998-AE68-89E60D62C39D@holtmann.org>
-References: <1414081365-6461-1-git-send-email-fabf@skynet.be> <2F67F6E8-CA99-4998-AE68-89E60D62C39D@holtmann.org>
-Subject: Re: [PATCH 1/1 net-next] Bluetooth: fix shadow warning in
- hci_disconnect()
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+From: Jakub Pawlowski <jpawlowski@google.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Jakub Pawlowski <jpawlowski@google.com>
+Subject: [PATCH] Add new method - service discovery
+Date: Thu, 23 Oct 2014 10:21:14 -0700
+Message-Id: <1414084874-24359-2-git-send-email-jpawlowski@google.com>
+In-Reply-To: <1414084874-24359-1-git-send-email-jpawlowski@google.com>
+References: <1414084874-24359-1-git-send-email-jpawlowski@google.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+---
+ lib/mgmt.h     |  26 ++++++++++++
+ tools/btmgmt.c | 128 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 154 insertions(+)
 
+diff --git a/lib/mgmt.h b/lib/mgmt.h
+index 46766a9..8f37937 100644
+--- a/lib/mgmt.h
++++ b/lib/mgmt.h
+@@ -445,6 +445,32 @@ struct mgmt_cp_set_public_address {
+ 	bdaddr_t bdaddr;
+ } __packed;
+ 
++#define MGMT_OP_START_SERVICE_DISCOVERY		0x003A
++
++#define MGMT_RANGE_NONE     0X00
++#define MGMT_RANGE_RSSI     0X01
++#define MGMT_RANGE_PATHLOSS 0X02
++
++struct mgmt_uuid_filter {
++	uint8_t range_method;
++	int8_t pathloss;
++	int8_t rssi;
++	uint8_t uuid[16];
++} __packed;
++
++struct mgmt_cp_start_service_discovery {
++	uint8_t type;
++	uint16_t filter_count;
++	struct mgmt_uuid_filter filter[0];
++} __packed;
++#define MGMT_START_SERVICE_DISCOVERY_SIZE	1
++
++#define MGMT_OP_STOP_SERVICE_DISCOVERY		0x003B
++struct mgmt_cp_stop_service_discovery {
++	uint8_t type;
++} __packed;
++#define MGMT_STOP_SERVICE_DISCOVERY_SIZE	1
++
+ #define MGMT_EV_CMD_COMPLETE		0x0001
+ struct mgmt_ev_cmd_complete {
+ 	uint16_t opcode;
+diff --git a/tools/btmgmt.c b/tools/btmgmt.c
+index 03d0a05..2a919a7 100644
+--- a/tools/btmgmt.c
++++ b/tools/btmgmt.c
+@@ -1546,6 +1546,133 @@ static void cmd_con(struct mgmt *mgmt, uint16_t index, int argc, char **argv)
+ 	}
+ }
+ 
++static void find_service_rsp(uint8_t status, uint16_t len, const void *param,
++							void *user_data)
++{
++	free(user_data);
++	if (status != 0) {
++		fprintf(stderr,
++			"Unable to start service discovery. status 0x%02x (%s)\n",
++						status, mgmt_errstr(status));
++		mainloop_quit();
++		return;
++	}
++
++	printf("Service discovery started\n");
++	discovery = true;
++}
++
++static void find_service_usage(void)
++{
++	printf("Usage: btmgmt find-service -u UUID [-r RSSI_Threshold] [-p Pathloss_Threshold] [-l|-b]>\n");
++}
++
++static struct option find_service_options[] = {
++	{ "help",	no_argument, 0, 'h' },
++	{ "le-only",	no_argument, 0, 'l' },
++	{ "bredr-only",	no_argument, 0, 'b' },
++	{ "uuid",	required_argument, 0, 'u' },
++	{ "rssi",	required_argument, 0, 'r' },
++	{ "pathloss",	required_argument, 0, 'p' },
++	{ 0, 0, 0, 0 }
++};
++
++static void uuid_to_uuid128(uuid_t *uuid128, const uuid_t *uuid);
++
++static void cmd_find_service(struct mgmt *mgmt, uint16_t index, int argc, char **argv)
++{
++	struct mgmt_cp_start_service_discovery *cp;
++	struct mgmt_uuid_filter *filter;
++	uint8_t type;
++	int opt;
++	int total_size = sizeof(struct mgmt_cp_start_service_discovery) + sizeof(struct mgmt_uuid_filter);
++	uuid_t uuid;
++	uint128_t uint128;
++	uuid_t uuid128;
++
++	if (index == MGMT_INDEX_NONE)
++		index = 0;
++
++	type = 0;
++	hci_set_bit(BDADDR_BREDR, &type);
++	hci_set_bit(BDADDR_LE_PUBLIC, &type);
++	hci_set_bit(BDADDR_LE_RANDOM, &type);
++
++	cp = malloc(total_size);
++	if(cp == NULL) {
++		fprintf(stderr, "Unable to allocate memory for mgmt_cp_start_service_discovery structure.\n");
++	}
++
++	memset(cp, 0, total_size);
++
++	filter = cp->filter;
++
++	if(argc == 1) {
++		find_service_usage();
++		exit(EXIT_FAILURE);
++	}
++
++	while ((opt = getopt_long(argc, argv, "+lbu:r:p:h", find_service_options,
++								NULL)) != -1) {
++		switch (opt) {
++		case 'l':
++			hci_clear_bit(BDADDR_BREDR, &type);
++			hci_set_bit(BDADDR_LE_PUBLIC, &type);
++			hci_set_bit(BDADDR_LE_RANDOM, &type);
++			break;
++		case 'b':
++			hci_set_bit(BDADDR_BREDR, &type);
++			hci_clear_bit(BDADDR_LE_PUBLIC, &type);
++			hci_clear_bit(BDADDR_LE_RANDOM, &type);
++			break;
++		case 'u':
++			if (bt_string2uuid(&uuid, optarg) < 0) {
++				printf("Invalid UUID: %s\n", optarg);
++				exit(EXIT_FAILURE);
++			}
++			uuid_to_uuid128(&uuid128, &uuid);
++			ntoh128((uint128_t *) uuid128.value.uuid128.data, &uint128);
++			htob128(&uint128, (uint128_t *) filter->uuid);
++			break;
++		case 'r':
++			filter->rssi = atoi(optarg);
++			filter->range_method |= MGMT_RANGE_RSSI;
++			printf("rssi filter: %d %d", filter->rssi, filter->range_method);
++			break;
++		case 'p':
++			filter->pathloss = atoi(optarg);
++			filter->range_method |= MGMT_RANGE_PATHLOSS;
++			printf("pathloss filter: %d %d", filter->pathloss, filter->range_method);
++			break;
++		case 'h':
++			find_service_usage();
++			exit(EXIT_SUCCESS);
++		default:
++			find_service_usage();
++			exit(EXIT_FAILURE);
++		}
++	}
++
++	argc -= optind;
++	argv += optind;
++	optind = 0;
++
++	if (argc > 0) {
++		find_service_usage();
++		exit(EXIT_FAILURE);
++	}
++
++	cp->type = type;
++	cp->filter_count = 1;
++
++	if (mgmt_send(mgmt, MGMT_OP_START_SERVICE_DISCOVERY, index, total_size, cp,
++						find_service_rsp, cp, NULL) == 0) {
++		free(cp);
++		fprintf(stderr, "Unable to send start_service_discovery cmd\n");
++		exit(EXIT_FAILURE);
++	}
++}
++
+ static void find_rsp(uint8_t status, uint16_t len, const void *param,
+ 							void *user_data)
+ {
+@@ -2866,6 +2993,7 @@ static struct {
+ 	{ "disconnect", cmd_disconnect, "Disconnect device"		},
+ 	{ "con",	cmd_con,	"List connections"		},
+ 	{ "find",	cmd_find,	"Discover nearby devices"	},
++	{ "find-service",	cmd_find_service,	"Discover nearby service"	},
+ 	{ "name",	cmd_name,	"Set local name"		},
+ 	{ "pair",	cmd_pair,	"Pair with a remote device"	},
+ 	{ "cancelpair",	cmd_cancel_pair,"Cancel pairing"		},
+-- 
+2.1.0.rc2.206.gedb03e5
 
-> On 23 October 2014 at 18:29 Marcel Holtmann <marcel@holtmann.org> wrote:
->
->
-> Hi Fabian,
->
-> > use cpr for hci_cp_read_clock_offset instead of cp
-> > (already defined above).
-> >
-> > Signed-off-by: Fabian Frederick <fabf@skynet.be>
-> > ---
-> > net/bluetooth/hci_conn.c | 6 +++---
-> > 1 file changed, 3 insertions(+), 3 deletions(-)
-> >
-> > diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-> > index b9517bd..6151e09 100644
-> > --- a/net/bluetooth/hci_conn.c
-> > +++ b/net/bluetooth/hci_conn.c
-> > @@ -141,10 +141,10 @@ int hci_disconnect(struct hci_conn *conn, __u8 re=
-ason)
-> >=C2=A0 =C2=A0 =C2=A0 */
-> >=C2=A0 =C2=A0 =C2=A0if (conn->type =3D=3D ACL_LINK && conn->role =3D=3D =
-HCI_ROLE_MASTER) {
-> >=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0struct hci_dev *hdev =3D=
- conn->hdev;
-> > -=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0struct hci_cp_read_clock_offs=
-et cp;
-> > +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0struct hci_cp_read_clock_offs=
-et cpr;
-> >
-> > -=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0cp.handle =3D cpu_to_le16(con=
-n->handle);
-> > -=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0hci_send_cmd(hdev, HCI_OP_REA=
-D_CLOCK_OFFSET, sizeof(cp), &cp);
-> > +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0cpr.handle =3D cpu_to_le16(co=
-nn->handle);
-> > +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0hci_send_cmd(hdev, HCI_OP_REA=
-D_CLOCK_OFFSET, sizeof(cpr), &cpr);
->
-> valid change, but I do not like cpr as variable name. We need to come up =
-with
-> a better one. There are other places in the code where we had the same th=
-ing.
-> Please have a look there.
->
-> Regards
->
-> Marcel
->
-
-Hi Marcel,
-
-=C2=A0 Maybe read_cp (like commit c1f23a2bfc89 with struct hci_cp_auth_requ=
-ested
-auth_cp) ?
-
-Regards,
-Fabian
