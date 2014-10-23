@@ -1,83 +1,51 @@
 Return-Path: <cyrus@holtmann.org>
-From: Michael Janssen <jamuraa@chromium.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Michael Janssen <jamuraa@chromium.org>
-Subject: [PATCH BlueZ 4/5] attrib: remove g_attrib_is_encrypted
-Date: Thu, 23 Oct 2014 09:33:28 -0700
-Message-Id: <1414082009-40903-5-git-send-email-jamuraa@chromium.org>
-In-Reply-To: <1414082009-40903-1-git-send-email-jamuraa@chromium.org>
-References: <1414082009-40903-1-git-send-email-jamuraa@chromium.org>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 8.0 \(1990.1\))
+Subject: Re: [PATCH 1/1 net-next] Bluetooth: fix shadow warning in hci_disconnect()
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1414081365-6461-1-git-send-email-fabf@skynet.be>
+Date: Thu, 23 Oct 2014 09:29:08 -0700
+Cc: linux-kernel <linux-kernel@vger.kernel.org>,
+	"Gustavo F. Padovan" <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	BlueZ development <linux-bluetooth@vger.kernel.org>,
+	Network Development <netdev@vger.kernel.org>
+Message-Id: <2F67F6E8-CA99-4998-AE68-89E60D62C39D@holtmann.org>
+References: <1414081365-6461-1-git-send-email-fabf@skynet.be>
+To: Fabian Frederick <fabf@skynet.be>
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This function is only used in one place and encryption is the
-responsibility of the channel, not the attribute.
----
- attrib/gattrib.c    | 12 ------------
- attrib/gattrib.h    |  2 --
- src/attrib-server.c |  9 +++++++--
- 3 files changed, 7 insertions(+), 16 deletions(-)
+Hi Fabian,
 
-diff --git a/attrib/gattrib.c b/attrib/gattrib.c
-index a6511a2..a65d1ca 100644
---- a/attrib/gattrib.c
-+++ b/attrib/gattrib.c
-@@ -690,18 +690,6 @@ static int event_cmp_by_id(gconstpointer a, gconstpointer b)
- 	return evt->id - id;
- }
- 
--gboolean g_attrib_is_encrypted(GAttrib *attrib)
--{
--	BtIOSecLevel sec_level;
--
--	if (!bt_io_get(attrib->io, NULL,
--			BT_IO_OPT_SEC_LEVEL, &sec_level,
--			BT_IO_OPT_INVALID))
--		return FALSE;
--
--	return sec_level > BT_IO_SEC_LOW;
--}
--
- gboolean g_attrib_unregister(GAttrib *attrib, guint id)
- {
- 	struct event *evt;
-diff --git a/attrib/gattrib.h b/attrib/gattrib.h
-index 99b8b37..1557b99 100644
---- a/attrib/gattrib.h
-+++ b/attrib/gattrib.h
-@@ -62,8 +62,6 @@ guint g_attrib_register(GAttrib *attrib, guint8 opcode, guint16 handle,
- 				GAttribNotifyFunc func, gpointer user_data,
- 				GDestroyNotify notify);
- 
--gboolean g_attrib_is_encrypted(GAttrib *attrib);
--
- uint8_t *g_attrib_get_buffer(GAttrib *attrib, size_t *len);
- gboolean g_attrib_set_mtu(GAttrib *attrib, int mtu);
- 
-diff --git a/src/attrib-server.c b/src/attrib-server.c
-index e65fff2..1ccfc65 100644
---- a/src/attrib-server.c
-+++ b/src/attrib-server.c
-@@ -375,12 +375,17 @@ static struct attribute *attrib_db_add_new(struct gatt_server *server,
- static uint8_t att_check_reqs(struct gatt_channel *channel, uint8_t opcode,
- 								int reqs)
- {
-+	BtIOSecLevel sec_level;
-+	GIOChannel *io = g_attrib_get_channel(channel->attrib);
-+
- 	/* FIXME: currently, it is assumed an encrypted link is enough for
- 	 * authentication. This will allow to enable the SMP negotiation once
- 	 * it is on upstream kernel. High security level should be mapped
- 	 * to authentication and medium to encryption permission. */
--	if (!channel->encrypted)
--		channel->encrypted = g_attrib_is_encrypted(channel->attrib);
-+	if (!channel->encrypted &&
-+			    bt_io_get(io, NULL, BT_IO_OPT_SEC_LEVEL, &sec_level,
-+							     BT_IO_OPT_INVALID))
-+		channel->encrypted = sec_level > BT_IO_SEC_LOW;
- 	if (reqs == ATT_AUTHENTICATION && !channel->encrypted)
- 		return ATT_ECODE_AUTHENTICATION;
- 	else if (reqs == ATT_AUTHORIZATION)
--- 
-2.1.0.rc2.206.gedb03e5
+> use cpr for hci_cp_read_clock_offset instead of cp
+> (already defined above).
+> 
+> Signed-off-by: Fabian Frederick <fabf@skynet.be>
+> ---
+> net/bluetooth/hci_conn.c | 6 +++---
+> 1 file changed, 3 insertions(+), 3 deletions(-)
+> 
+> diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+> index b9517bd..6151e09 100644
+> --- a/net/bluetooth/hci_conn.c
+> +++ b/net/bluetooth/hci_conn.c
+> @@ -141,10 +141,10 @@ int hci_disconnect(struct hci_conn *conn, __u8 reason)
+> 	 */
+> 	if (conn->type == ACL_LINK && conn->role == HCI_ROLE_MASTER) {
+> 		struct hci_dev *hdev = conn->hdev;
+> -		struct hci_cp_read_clock_offset cp;
+> +		struct hci_cp_read_clock_offset cpr;
+> 
+> -		cp.handle = cpu_to_le16(conn->handle);
+> -		hci_send_cmd(hdev, HCI_OP_READ_CLOCK_OFFSET, sizeof(cp), &cp);
+> +		cpr.handle = cpu_to_le16(conn->handle);
+> +		hci_send_cmd(hdev, HCI_OP_READ_CLOCK_OFFSET, sizeof(cpr), &cpr);
+
+valid change, but I do not like cpr as variable name. We need to come up with a better one. There are other places in the code where we had the same thing. Please have a look there.
+
+Regards
+
+Marcel
 
