@@ -1,12 +1,12 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <44190135.DuM4UiHnJI@uw000953>
+In-Reply-To: <2626729.yqIRdlFYHe@uw000953>
 References: <1412898611-12199-1-git-send-email-lukasz.rymanowski@tieto.com>
-	<1412898611-12199-9-git-send-email-lukasz.rymanowski@tieto.com>
-	<44190135.DuM4UiHnJI@uw000953>
-Date: Thu, 23 Oct 2014 17:00:59 +0200
-Message-ID: <CAMudyAs5d5KowKPsWXPzCmCzg1D+GjQwtMGdm5pJDNgSeOXBBQ@mail.gmail.com>
-Subject: Re: [PATCH v4 08/11] unit/test-hfp: Add init test for HFP HF
+	<1412898611-12199-6-git-send-email-lukasz.rymanowski@tieto.com>
+	<2626729.yqIRdlFYHe@uw000953>
+Date: Thu, 23 Oct 2014 17:00:33 +0200
+Message-ID: <CAMudyAuc==ZCs63sXoL757-Ffk81gTcAE2Y1fuvE7P-KESGx2Q@mail.gmail.com>
+Subject: Re: [PATCH v4 05/11] shared/hfp: Add HFP HF parser
 From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 To: Szymon Janc <szymon.janc@tieto.com>
 Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
@@ -19,186 +19,190 @@ Hi Szymon,
 On 22 October 2014 13:00, Szymon Janc <szymon.janc@tieto.com> wrote:
 > Hi Łukasz,
 >
-> On Friday 10 of October 2014 01:50:08 Lukasz Rymanowski wrote:
->> This patch adds basic infrastruction for HFP HF test plus
->> init test.
->>
->> It also moves send_pdu function in the file so it can be used by
->> test_hf_handler
+> On Friday 10 of October 2014 01:50:05 Lukasz Rymanowski wrote:
+>> This patch adds parser for AT responses and unsolicited results.
 >> ---
->>  unit/test-hfp.c | 102 ++++++++++++++++++++++++++++++++++++++++++++++----------
->>  1 file changed, 84 insertions(+), 18 deletions(-)
+>>  src/shared/hfp.c | 129 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+>>  1 file changed, 129 insertions(+)
 >>
->> diff --git a/unit/test-hfp.c b/unit/test-hfp.c
->> index 4b3473b..274ee55 100644
->> --- a/unit/test-hfp.c
->> +++ b/unit/test-hfp.c
->> @@ -36,6 +36,7 @@ struct context {
->>       int fd_server;
->>       int fd_client;
->>       struct hfp_gw *hfp;
->> +     struct hfp_hf *hfp_hf;
->>       const struct test_data *data;
->>       unsigned int pdu_offset;
->>  };
->> @@ -52,6 +53,8 @@ struct test_data {
->>       char *test_name;
->>       struct test_pdu *pdu_list;
->>       hfp_result_func_t result_func;
->> +     hfp_response_func_t response_func;
->> +     hfp_hf_result_func_t hf_result_func;
->>       GIOFunc test_handler;
->>  };
->>
->> @@ -99,6 +102,22 @@ struct test_data {
->>               data.test_handler = test_handler;                       \
->>       } while (0)
->>
->> +#define define_hf_test(name, function, result_func, response_function,       \
->> +                                                             args...)\
->> +     do {                                                            \
->> +             const struct test_pdu pdus[] = {                        \
->> +                     args, { }                                       \
->> +             };                                                      \
->> +             static struct test_data data;                           \
->> +             data.test_name = g_strdup(name);                        \
->> +             data.pdu_list = g_malloc(sizeof(pdus));                 \
->> +             data.hf_result_func = result_func;                      \
->> +             data.response_func = response_function;                 \
->> +             memcpy(data.pdu_list, pdus, sizeof(pdus));              \
->> +             g_test_add_data_func(name, &data, function);            \
->> +             data.test_handler = test_hf_handler;                    \
->> +     } while (0)
->> +
->>  static void context_quit(struct context *context)
->>  {
->>       g_main_loop_quit(context->main_loop);
->> @@ -128,6 +147,52 @@ static gboolean test_handler(GIOChannel *channel, GIOCondition cond,
->>       return FALSE;
+>> diff --git a/src/shared/hfp.c b/src/shared/hfp.c
+>> index b1cf08e..5179092 100644
+>> --- a/src/shared/hfp.c
+>> +++ b/src/shared/hfp.c
+>> @@ -868,6 +868,126 @@ static void destroy_event_handler(void *data)
+>>       free(handler);
 >>  }
 >>
->> +static gboolean send_pdu(gpointer user_data)
+>> +static void hf_skip_whitespace(struct hfp_hf_result *result)
 >> +{
->> +     struct context *context = user_data;
->> +     const struct test_pdu *pdu;
->> +     ssize_t len;
->> +
->> +     pdu = &context->data->pdu_list[context->pdu_offset++];
->> +
->> +     if (pdu && !pdu->valid)
->> +             return FALSE;
->> +
->> +     len = write(context->fd_server, pdu->data, pdu->size);
->> +     g_assert_cmpint(len, ==, pdu->size);
->> +
->> +     pdu = &context->data->pdu_list[context->pdu_offset];
->> +     if (pdu->fragmented)
->> +             g_idle_add(send_pdu, context);
->> +
->> +     return FALSE;
+>> +     while (result->data[result->offset] == ' ')
+>> +             result->offset++;
 >> +}
 >> +
->> +static gboolean test_hf_handler(GIOChannel *channel, GIOCondition cond,
->> +                                                     gpointer user_data)
+>> +static void hf_call_prefix_handler(struct hfp_hf *hfp, const char *data)
 >> +{
->> +     struct context *context = user_data;
->> +     gchar buf[60];
->> +     gsize bytes_read;
->> +     GError *error = NULL;
+>> +     struct event_handler *handler;
+>> +     const char *separators = ";:\0";
+>> +     struct hfp_hf_result result_data;
+>> +     char lookup_prefix[18];
+>> +     uint8_t pref_len = 0;
+>> +     const char *prefix;
+>> +     int i;
 >> +
->> +     if (cond & (G_IO_HUP | G_IO_ERR | G_IO_NVAL))
->> +             goto done;
+>> +     result_data.offset = 0;
+>> +     result_data.data = data;
 >> +
->> +     /* dummy read */
->> +     g_io_channel_read_chars(channel, buf, 60, &bytes_read, &error);
+>> +     hf_skip_whitespace(&result_data);
 >> +
->> +     send_pdu(context);
+>> +     if (strlen(data + result_data.offset) < 2)
+>> +             return;
 >> +
->> +     return TRUE;
+>> +     prefix = data + result_data.offset;
 >> +
->> +done:
->> +     context_quit(context);
->> +     context->watch_id = 0;
+>> +     pref_len = strcspn(prefix, separators);
+>> +     if (pref_len > 17 || pref_len < 2)
+>> +             return;
 >> +
->> +     return FALSE;
+>> +     for (i = 0; i < pref_len; i++)
+>> +             lookup_prefix[i] = toupper(prefix[i]);
+>> +
+>> +     lookup_prefix[pref_len] = '\0';
+>> +     result_data.offset += pref_len + 1;
+>> +
+>> +     handler = queue_find(hfp->event_handlers, match_handler_event_prefix,
+>> +                                                             lookup_prefix);
+>> +     if (!handler)
+>> +             return;
+>> +
+>> +     handler->callback(&result_data, handler->user_data);
 >> +}
 >> +
->>  static void cmd_handler(const char *command, void *user_data)
->>  {
->>       struct context *context = user_data;
->> @@ -203,6 +268,9 @@ static void execute_context(struct context *context)
->>       if (context->hfp)
->>               hfp_gw_unref(context->hfp);
->>
->> +     if (context->hfp_hf)
->> +             hfp_hf_unref(context->hfp_hf);
->> +
->>       g_free(context);
->>  }
->>
->> @@ -275,24 +343,6 @@ static void test_register(gconstpointer data)
->>       execute_context(context);
->>  }
->>
->> -static gboolean send_pdu(gpointer user_data)
->> -{
->> -     struct context *context = user_data;
->> -     const struct test_pdu *pdu;
->> -     ssize_t len;
->> -
->> -     pdu = &context->data->pdu_list[context->pdu_offset++];
->> -
->> -     len = write(context->fd_server, pdu->data, pdu->size);
->> -     g_assert_cmpint(len, ==, pdu->size);
->> -
->> -     pdu = &context->data->pdu_list[context->pdu_offset];
->> -     if (pdu->fragmented)
->> -             g_idle_add(send_pdu, context);
->> -
->> -     return FALSE;
->> -}
->> -
->>  static void test_fragmented(gconstpointer data)
->>  {
->>       struct context *context = create_context(data);
->> @@ -404,6 +454,20 @@ static void check_string_2(struct hfp_gw_result *result,
->>       hfp_gw_send_result(context->hfp, HFP_RESULT_ERROR);
->>  }
->>
->> +static void test_hf_init(gconstpointer data)
+>> +static char *find_cr_lf(char *str, size_t len)
 >> +{
->> +     struct context *context = create_context(data);
+>> +     char *ptr;
+>> +     int count;
+>> +     int offset;
 >> +
->> +     context->hfp_hf = hfp_hf_new(context->fd_client);
->> +     g_assert(context->hfp_hf);
->> +     g_assert(hfp_hf_set_close_on_unref(context->hfp_hf, true));
+>> +     offset = 0;
 >> +
->> +     hfp_hf_unref(context->hfp_hf);
->> +     context->hfp_hf = NULL;
->> +
->> +     execute_context(context);
->> +}
->> +
->>  int main(int argc, char *argv[])
->>  {
->>       g_test_init(&argc, &argv, NULL);
->> @@ -473,5 +537,7 @@ int main(int argc, char *argv[])
->>                       raw_pdu('\r'),
->>                       data_end());
->>
->> +     define_hf_test("/hfp/test_init", test_hf_init, NULL, NULL, data_end());
+>> +     ptr = memchr(str, '\r', len);
+>> +     while (ptr) {
+>> +             /*
+>> +              * Check if there is more data after '\r'. If so check for
+>> +              * '\n'
+>> +              */
+>> +             count = ptr-str;
 >
-> I'd prefer if all hfp_hf tests were prefixed like this:
-> "/hfp_hf/test_foo"
->
-> This will allow to avoid doubling tests name like this one (there is already
-> /hfp/test_init test).
->
-OK
+> Style: spaces around -
 
+>
+>> +             if ((count < (int) (len - 1)) && *(ptr + 1) == '\n')
+>> +                     return ptr;
+>
+> If you make count size_t then this cast is not needed.
+>
 >> +
->>       return g_test_run();
+>> +             /* There is only '\r'? Let's try to find next one */
+>> +             offset += count + 1;
+>> +
+>> +             if (offset >= (int)len)
+>
+> If you make offset size_t then this cast is not needed.
+> Also such casting should have space '(int) foo'.
+>
+>> +                     return NULL;
+>> +
+>> +             ptr = memchr(str + offset, '\r', len - offset);
+>> +     }
+>> +
+>> +     return NULL;
+>> +}
+>> +
+>> +static void hf_process_input(struct hfp_hf *hfp)
+>> +{
+>> +     char *str, *ptr;
+>> +     size_t len, count, offset;
+>> +
+>> +     str = ringbuf_peek(hfp->read_buf, 0, &len);
+>> +     if (!str)
+>> +             return;
+>> +
+>> +     offset = 0;
+>> +
+>> +     ptr = find_cr_lf(str, len);
+>> +     while (ptr) {
+>> +             count = ptr - (str + offset);
+>
+> If you would adjust str pointer instead of using str + offset everywhere
+> then this code would be a bit simpler to follow.
+>
+see below
+
+> Also this would not handle wrapped string correctly. Check how this is handled
+> in process_input().
+
+Missed that. Will fix, also will fix that code as asprintf should not
+be use. str is not a string in case buffer is wrapped.
+Also will need to keep offset so I can concatenate str and str2 which
+will come from the begging of ringbuf
+>
+>> +             if (count == 0) {
+>> +                     /* 2 is for <cr><lf> */
+>> +                     offset += 2;
+>> +             } else {
+>> +                     *ptr = '\0';
+>> +                     hf_call_prefix_handler(hfp, str + offset);
+>> +                     offset += count + 2;
+>> +             }
+>> +
+>> +             if (offset >= len)
+>> +                     break;
+>> +
+>> +             ptr = find_cr_lf(str + offset, len - offset);
+>> +     }
+>> +
+>> +     ringbuf_drain(hfp->read_buf, offset < len ? offset : len);
+>> +}
+>> +
+>> +static bool hf_can_read_data(struct io *io, void *user_data)
+>> +{
+>> +     struct hfp_hf *hfp = user_data;
+>> +     ssize_t bytes_read;
+>> +
+>> +     bytes_read = ringbuf_read(hfp->read_buf, hfp->fd);
+>> +     if (bytes_read < 0)
+>> +             return false;
+>> +
+>> +     hf_process_input(hfp);
+>> +
+>> +     return true;
+>> +}
+>> +
+>>  struct hfp_hf *hfp_hf_new(int fd)
+>>  {
+>>       struct hfp_hf *hfp;
+>> @@ -912,6 +1032,15 @@ struct hfp_hf *hfp_hf_new(int fd)
+>>               return NULL;
+>>       }
+>>
+>> +     if (!io_set_read_handler(hfp->io, hf_can_read_data, hfp,
+>> +                                                     read_watch_destroy)) {
+>> +             queue_destroy(hfp->event_handlers,
+>> +                                             destroy_event_handler);
+>> +             io_destroy(hfp->io);
+>> +             ringbuf_free(hfp->write_buf);
+>> +             ringbuf_free(hfp->read_buf);
+>
+> You are missing free(hfp); return NULL; here.
+
+ah, some rebase issue. thanks
+
+>
+>> +     }
+>> +
+>>       return hfp_hf_ref(hfp);
 >>  }
+>>
 >>
 >
 > --
