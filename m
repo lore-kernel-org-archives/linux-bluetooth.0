@@ -1,82 +1,128 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1414158494-12020-1-git-send-email-luiz.dentz@gmail.com>
-References: <1414158494-12020-1-git-send-email-luiz.dentz@gmail.com>
-Date: Fri, 24 Oct 2014 09:56:19 -0700
-Message-ID: <CAHrH25ScMKevmBxzaOqtg3pvk-tzje5YRF--rEENAXXAPouAqQ@mail.gmail.com>
-Subject: Re: [PATCH BlueZ] shared/gatt-db: Expose gatt_db_attribute
-From: Arman Uguray <armansito@chromium.org>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+From: Sebastian Chlad <sebastian.chlad@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Sebastian Chlad <sebastian.chlad@tieto.com>
+Subject: [PATCH v2] android/pts: Interim PTS tests results for L2CAP
+Date: Fri, 24 Oct 2014 17:45:42 +0200
+Message-Id: <1414165542-8527-1-git-send-email-sebastian.chlad@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+---
+ android/pts-l2cap.txt | 60 +++++++++++++++++++++++++++++++++++++--------------
+ 1 file changed, 44 insertions(+), 16 deletions(-)
 
-On Fri, Oct 24, 2014 at 6:48 AM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->
-> This is just a draft API to reduce the lookups in gatt_db and make it
-> a little bit more convenient for batch operations, so the general idea
-> is to be able to get a hold of it via gatt_db_get_attribute but also
-> replace the handles in the queues with proper attributes so the server
-> code don't have to lookup again when reading/writing, checking
-> permissions, or any other operation that can be done directly.
-> ---
->  src/shared/gatt-db.h | 22 ++++++++++++++++++++++
->  1 file changed, 22 insertions(+)
->
-> diff --git a/src/shared/gatt-db.h b/src/shared/gatt-db.h
-> index 8d18434..ab7469a 100644
-> --- a/src/shared/gatt-db.h
-> +++ b/src/shared/gatt-db.h
-> @@ -96,3 +96,25 @@ bool gatt_db_get_service_uuid(struct gatt_db *db, uint16_t handle,
->
->  bool gatt_db_get_attribute_permissions(struct gatt_db *db, uint16_t handle,
->                                                         uint32_t *permissions);
-> +
-> +struct gatt_db_attribute;
-> +
-> +struct gatt_db_attribute *gatt_db_get_attribute(struct gatt_db *attrib,
-> +                                       uint16_t handle, uint16_t offset);
-> +
+diff --git a/android/pts-l2cap.txt b/android/pts-l2cap.txt
+index 0746ea7..9706d69 100644
+--- a/android/pts-l2cap.txt
++++ b/android/pts-l2cap.txt
+@@ -1,7 +1,7 @@
+ PTS test results for L2CAP
+ 
+-PTS version: 5.2
+-Tested: 14-August-2014
++PTS version: 5.3
++Tested: 24-October-2014
+ Android version: 4.4.4
+ Kernel version: 3.18
+ 
+@@ -15,28 +15,37 @@ N/A    test is disabled due to PICS setup
+ Test Name		Result	Notes
+ -------------------------------------------------------------------------------
+ TC_COS_CED_BV_01_C	PASS	l2test -n -P 4113 <bdaddr>
+-TC_COS_CED_BV_03_C	PASS	l2test -w -N 1 -P 4113
+-TC_COS_CED_BV_04_C	PASS	l2test -r -P 4113
+-TC_COS_CED_BV_05_C	PASS	l2test -r -P 4113
+-TC_COS_CED_BV_07_C	PASS	l2test -r -P 4113
+-TC_COS_CED_BV_08_C	PASS	l2test -r -P 4113
++TC_COS_CED_BV_03_C	PASS	l2test -y -N 1 -P 4113 <bdaddr>
++TC_COS_CED_BV_04_C	PASS	l2test -n -P 4113 <bdaddr>
++TC_COS_CED_BV_05_C	PASS	PTS issue #12351
++				btmgmt ssp off
++				l2test -r -P 4113
++TC_COS_CED_BV_07_C	PASS	l2test -n -P 4113 <bdaddr>
++TC_COS_CED_BV_08_C	PASS	l2test -n -P 4113 <bdaddr>
+ TC_COS_CED_BV_09_C	PASS	l2test -n -P 4113 <bdaddr>
+ TC_COS_CED_BV_10_C	N/A
+-TC_COS_CED_BV_11_C	PASS	l2test -r -P 4113
++TC_COS_CED_BV_11_C	PASS	l2test -u -P 4113 <bdaddr>
+ TC_COS_CED_BI_01_C	PASS
+-TC_COS_CFD_BV_01_C	PASS	l2test -r -P 4113
+-TC_COS_CFD_BV_02_C	PASS	l2test -r -P 4113
+-TC_COS_CFD_BV_03_C	PASS	l2test -r -P 4113
++TC_COS_CFD_BV_01_C	PASS	PTS issue #12351
++				btmgmt ssp off
++				l2test -r -P 4113
++TC_COS_CFD_BV_02_C	PASS	l2test -n -P 4113 <bdaddr>
++TC_COS_CFD_BV_03_C	PASS	l2test -n -P 4113 <bdaddr>
+ TC_COS_CFD_BV_08_C	PASS	l2test -n -P 4113 <bdaddr>
+ TC_COS_CFD_BV_09_C	PASS	l2test -n -P 4113 <bdaddr>
+ TC_COS_CFD_BV_10_C	N/A
+-TC_COS_CFD_BI_11_C	PASS	l2test -r -P 4113
+-TC_COS_CFD_BV_12_C	PASS	l2test -r -P 4113
++TC_COS_CFD_BV_11_C	PASS	l2test -n -P 4113 <bdaddr>
++TC_COS_CFD_BV_12_C	PASS	l2test -n -P 4113 <bdaddr>
+ TC_COS_CFD_BV_13_C	N/A
+ TC_COS_IEX_BV_01_C	PASS	l2test -n -P 4113 <bdaddr>
+ TC_COS_IEX_BV_02_C	PASS
+ TC_COS_ECH_BV_01_C	PASS
+ TC_COS_ECH_BV_02_C	PASS	l2ping -c 1 <bdaddr>
++TC_COS_CFC_BV_01_C	INC	JIRA #BA-181
++TC_COS_CFC_BV_02_C	INC	JIRA #BA-181
++TC_COS_CFC_BV_03_C	PASS	l2test -u -V le_public <bdaddr>
++TC_COS_CFC_BV_04_C	PASS	l2test -u -V le_public <bdaddr>
++TC_COS_CFC_BV_05_C	PASS	l2test -m -V le_public <bdaddr>
+ TC_CLS_CLR_BV_01_C	N/A
+ TC_CLS_UCD_BV_01_C	PASS
+ TC_CLS_UCD_BV_02_C	PASS	l2test -s -G -N 1 -P 4113 <bdaddr>
+@@ -75,10 +84,12 @@ TC_OFS_BV_01_C		PASS	l2test -x -X ertm -P 4113 -F 0 -N 1
+ TC_OFS_BV_02_C		PASS	l2test -r -X ertm -P 4113 -F 0
+ TC_OFS_BV_03_C		PASS	l2test -x -X streaming -P 4113 -F 0 -N 1
+ TC_OFS_BV_04_C		PASS	l2test -r -X streaming -P 4113 -F 0
++				JIRA issue #BA-180
+ TC_OFS_BV_05_C		PASS	l2test -x -X ertm -P 4113 -N 1
+ TC_OFS_BV_06_C		PASS	l2test -r -X ertm -P 4113
+ TC_OFS_BV_07_C		PASS	l2test -x -X streaming -P 4113 -F 0 -N 1
+ TC_OFS_BV_08_C		PASS	l2test -r -X streaming -P 4113
++				JIRA issue #BA-180
+ TC_ERM_BV_01_C		PASS	l2test -x -X ertm -P 4113 -N 3 -Y 3
+ TC_ERM_BV_02_C		PASS	l2test -r -X ertm -P 4113
+ TC_ERM_BV_03_C		PASS	l2test -r -X ertm -P 4113
+@@ -92,7 +103,7 @@ TC_ERM_BV_11_C		PASS	l2test -x -X ertm -P 4113 -N 1 -Q 1
+ TC_ERM_BV_12_C		PASS	l2test -x -X ertm -P 4113 -R -N 1 -Q 1
+ TC_ERM_BV_13_C		PASS	l2test -x -X ertm -P 4113 -N 2
+ TC_ERM_BV_14_C		PASS	l2test -x -X ertm -P 4113 -N 4
+-TC_ERM_BV_15_C		PASS	l2test -X ertm -P 4113 -N 4
++TC_ERM_BV_15_C		PASS	l2test -x -X ertm -P 4113 -N 4
+ TC_ERM_BV_16_C		N/A
+ TC_ERM_BV_17_C		PASS	l2test -X ertm -P 4113
+ TC_ERM_BV_18_C		PASS	l2test -x -X ertm -P 4113 -N 1
+@@ -147,6 +158,23 @@ TC_ECF_BV_08_C		N/A
+ TC_LE_CPU_BV_01_C	PASS	l2test -r -V le_public -J 4
+ TC_LE_CPU_BV_02_C	PASS	l2test -n -V le_public -J 4 <braddr>
+ TC_LE_CPU_BI_01_C	PASS	l2test -n -V le_public -J 4 <braddr>
+-TC_LE_CPU_BI_02_C	INC	PTS issue #12339
++TC_LE_CPU_BI_02_C	PASS	PTS issue #12339
++				Note: use Common.dll and ETS for L2CAP
++				from #12339
+ 				l2test -r -V le_public -J 4
+-TC_LE_REJ_BV_01_C	PASS	l2test -n -V le_public -J 4 <braddr>
++TC_LE_REJ_BI_01_C	PASS	l2test -n -V le_public -J 4 <braddr>
++TC_LE_REJ_BI_02_C	PASS	l2test -n -V le_public -J 4 <braddr>
++TC_LE_CFC_BV_01_C	PASS	l2test -n -V le_public -P 37 <braddr>
++TC_LE_CFC_BV_02_C	PASS	l2test -n -V le_public -P 37 <braddr>
++TC_LE_CFC_BV_03_C	INC	PTS issue #12665
++TC_LE_CFC_BV_04_C	PASS	l2test -n -V le_public -P 241  <braddr>
++TC_LE_CFC_BV_05_C	INC	PTS issue #12665
++TC_LE_CFC_BV_06_C	INC	JIRA #BA-182
++TC_LE_CFC_BV_07_C	INC	JIRA #BA-183
++TC_LE_CFC_BI_01_C	INC	JIRA #BA-183
++TC_LE_CFC_BV_08_C	PASS	l2test -n -V le_public -P 37 <braddr>
++TC_LE_CFC_BV_09_C	PASS	l2test -n -V le_public -P 37 <braddr>
++TC_LE_CFC_BV_16_C	PASS	l2test -n -V le_public -P 37 <braddr>
++TC_LE_CFC_BV_17_C	N/A
++TC_LE_CID_BV_01_C	INC
++TC_LE_CID_BV_02_I	INC
+-- 
+1.8.5.3
 
-What's the offset parameter here for? Why not just get the attribute by handle?
-
-
-> +const bt_uuid_t *gatt_db_attribute_get_type(struct gatt_db_attribute *attrib);
-> +
-> +bool gatt_db_attribute_get_service_uuid(struct gatt_db_attribute *attrib,
-> +                                                       bt_uuid_t *uuid);
-> +
-> +bool gatt_db_attribute_get_permissions(struct gatt_db_attribute *attrib,
-> +                                                       uint32_t *permissions);
-> +
-> +bool gatt_db_attribute_read(struct gatt_db_attribute *attrib,
-> +                                       uint8_t opcode, bdaddr_t *bdaddr,
-> +                                       void *callback, void *user_data);
-> +
-> +bool gatt_db_attribute_write(struct gatt_db_attribute *attrib,
-> +                                       const uint8_t *value, size_t len,
-> +                                       uint8_t opcode, bdaddr_t *bdaddr,
-> +                                       void *callback, void *user_data);
-> --
-
-Are these functions meant to replace the existing gatt_db_read, etc?
-We might as well just replace all of those with functions that accept
-a struct gatt_db_attribute. So that all functions would be preceded by
-a call to gatt_db_get_attribute, followed by one of these functions.
-Unless you want to keep the other functions as helpers that accomplish
-the same thing.
-
-> 1.9.3
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-
-Cheers,
-Arman
