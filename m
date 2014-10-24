@@ -2,62 +2,50 @@ Return-Path: <cyrus@holtmann.org>
 From: Michael Janssen <jamuraa@chromium.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Michael Janssen <jamuraa@chromium.org>
-Subject: [PATCH BlueZ v2 7/7] attrib: fix GATTRIB_ALL_REQS behavior
-Date: Fri, 24 Oct 2014 13:36:23 -0700
-Message-Id: <1414182983-23959-8-git-send-email-jamuraa@chromium.org>
+Subject: [PATCH BlueZ v2 1/7] Remove unused g_attrib_set_debug function
+Date: Fri, 24 Oct 2014 13:36:17 -0700
+Message-Id: <1414182983-23959-2-git-send-email-jamuraa@chromium.org>
 In-Reply-To: <1414182983-23959-1-git-send-email-jamuraa@chromium.org>
 References: <1414182983-23959-1-git-send-email-jamuraa@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-g_attrib_register(..., GATTRIB_ALL_REQS, ...) behavior would previously
-include indications, this fixes it to only include requests and
-commands.
+This function is not used, and also not implemented.
 ---
- attrib/gattrib.c | 23 ++++++++++++++++++++++-
- 1 file changed, 22 insertions(+), 1 deletion(-)
+ attrib/gattrib.c | 5 -----
+ attrib/gattrib.h | 3 ---
+ 2 files changed, 8 deletions(-)
 
 diff --git a/attrib/gattrib.c b/attrib/gattrib.c
-index a65d1ca..f678435 100644
+index 912dffb..71d1cef 100644
 --- a/attrib/gattrib.c
 +++ b/attrib/gattrib.c
-@@ -147,6 +147,27 @@ static bool is_response(guint8 opcode)
- 	return false;
+@@ -651,11 +651,6 @@ gboolean g_attrib_cancel_all(GAttrib *attrib)
+ 	return ret;
  }
  
-+static bool is_request(guint8 opcode)
-+{
-+	switch (opcode) {
-+	case ATT_OP_MTU_REQ:
-+	case ATT_OP_FIND_INFO_REQ:
-+	case ATT_OP_FIND_BY_TYPE_REQ:
-+	case ATT_OP_READ_BY_TYPE_REQ:
-+	case ATT_OP_READ_REQ:
-+	case ATT_OP_READ_BLOB_REQ:
-+	case ATT_OP_READ_MULTI_REQ:
-+	case ATT_OP_READ_BY_GROUP_REQ:
-+	case ATT_OP_WRITE_REQ:
-+	case ATT_OP_WRITE_CMD:
-+	case ATT_OP_PREP_WRITE_REQ:
-+	case ATT_OP_EXEC_WRITE_REQ:
-+		return true;
-+	}
-+
-+	return false;
-+}
-+
- GAttrib *g_attrib_ref(GAttrib *attrib)
+-gboolean g_attrib_set_debug(GAttrib *attrib,
+-		GAttribDebugFunc func, gpointer user_data)
+-{
+-	return TRUE;
+-}
+ 
+ uint8_t *g_attrib_get_buffer(GAttrib *attrib, size_t *len)
  {
- 	int refs;
-@@ -373,7 +394,7 @@ static bool match_event(struct event *evt, const uint8_t *pdu, gsize len)
- 	if (evt->expected == GATTRIB_ALL_EVENTS)
- 		return true;
+diff --git a/attrib/gattrib.h b/attrib/gattrib.h
+index 3fe92c7..18df2ad 100644
+--- a/attrib/gattrib.h
++++ b/attrib/gattrib.h
+@@ -58,9 +58,6 @@ guint g_attrib_send(GAttrib *attrib, guint id, const guint8 *pdu, guint16 len,
+ gboolean g_attrib_cancel(GAttrib *attrib, guint id);
+ gboolean g_attrib_cancel_all(GAttrib *attrib);
  
--	if (!is_response(pdu[0]) && evt->expected == GATTRIB_ALL_REQS)
-+	if (is_request(pdu[0]) && evt->expected == GATTRIB_ALL_REQS)
- 		return true;
- 
- 	if (evt->expected == pdu[0] && evt->handle == GATTRIB_ALL_HANDLES)
+-gboolean g_attrib_set_debug(GAttrib *attrib,
+-		GAttribDebugFunc func, gpointer user_data);
+-
+ guint g_attrib_register(GAttrib *attrib, guint8 opcode, guint16 handle,
+ 				GAttribNotifyFunc func, gpointer user_data,
+ 				GDestroyNotify notify);
 -- 
 2.1.0.rc2.206.gedb03e5
 
