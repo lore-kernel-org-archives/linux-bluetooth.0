@@ -2,46 +2,62 @@ Return-Path: <cyrus@holtmann.org>
 From: Michael Janssen <jamuraa@chromium.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Michael Janssen <jamuraa@chromium.org>
-Subject: [PATCH BlueZ v2 0/7] Unit tests for GAttrib
-Date: Fri, 24 Oct 2014 13:36:16 -0700
-Message-Id: <1414182983-23959-1-git-send-email-jamuraa@chromium.org>
+Subject: [PATCH BlueZ v2 2/7] attrib: Remove MTU-probing code
+Date: Fri, 24 Oct 2014 13:36:18 -0700
+Message-Id: <1414182983-23959-3-git-send-email-jamuraa@chromium.org>
+In-Reply-To: <1414182983-23959-1-git-send-email-jamuraa@chromium.org>
+References: <1414182983-23959-1-git-send-email-jamuraa@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Since we want to replace GAttrib with a bt_att shim for a smooth transition 
-to bt_att profiles, this patch cleans up the API and adds unit tests for
-GAttrib functions.
+Probing for the MTU using bt_io is problematic for
+testing because you cannot impersonate AF_BLUETOOTH sockets
+with a socketpair.
+---
+ attrib/gattrib.c | 13 +------------
+ 1 file changed, 1 insertion(+), 12 deletions(-)
 
-This adds tests for all but the register / unregister functions, which
-I will send in a separate patch since they are slightly more complicated due
-to catchalls.
-
-v1 -> v2:
- * Add g_attrib_register tests
- * Cleanup of unit/test-gattrib.c
- * Bugfix for GATTRIB_ALL_REQS
-
-Michael Janssen (7):
-  Remove unused g_attrib_set_debug function
-  attrib: Remove MTU-probing code
-  attrib: Add mtu argument to g_attrib_new
-  attrib: remove g_attrib_is_encrypted
-  Add unit tests for gattrib
-  attrib: Add unit tests for g_attrib_register
-  attrib: fix GATTRIB_ALL_REQS behavior
-
- .gitignore           |   1 +
- Makefile.am          |   7 +
- attrib/gattrib.c     |  61 +++----
- attrib/gattrib.h     |   7 +-
- attrib/gatttool.c    |  17 +-
- attrib/interactive.c |  17 +-
- src/attrib-server.c  |   9 +-
- src/device.c         |  11 +-
- unit/test-gattrib.c  | 505 +++++++++++++++++++++++++++++++++++++++++++++++++++
- 9 files changed, 588 insertions(+), 47 deletions(-)
- create mode 100644 unit/test-gattrib.c
-
+diff --git a/attrib/gattrib.c b/attrib/gattrib.c
+index 71d1cef..fa41ade 100644
+--- a/attrib/gattrib.c
++++ b/attrib/gattrib.c
+@@ -476,27 +476,17 @@ done:
+ GAttrib *g_attrib_new(GIOChannel *io)
+ {
+ 	struct _GAttrib *attrib;
+-	uint16_t imtu;
+ 	uint16_t att_mtu;
+ 	uint16_t cid;
+-	GError *gerr = NULL;
+ 
+ 	g_io_channel_set_encoding(io, NULL, NULL);
+ 	g_io_channel_set_buffered(io, FALSE);
+ 
+-	bt_io_get(io, &gerr, BT_IO_OPT_IMTU, &imtu,
+-				BT_IO_OPT_CID, &cid, BT_IO_OPT_INVALID);
+-	if (gerr) {
+-		error("%s", gerr->message);
+-		g_error_free(gerr);
+-		return NULL;
+-	}
+-
+ 	attrib = g_try_new0(struct _GAttrib, 1);
+ 	if (attrib == NULL)
+ 		return NULL;
+ 
+-	att_mtu = (cid == ATT_CID) ? ATT_DEFAULT_LE_MTU : imtu;
++	att_mtu = ATT_DEFAULT_LE_MTU;
+ 
+ 	attrib->buf = g_malloc0(att_mtu);
+ 	attrib->buflen = att_mtu;
+@@ -651,7 +641,6 @@ gboolean g_attrib_cancel_all(GAttrib *attrib)
+ 	return ret;
+ }
+ 
+-
+ uint8_t *g_attrib_get_buffer(GAttrib *attrib, size_t *len)
+ {
+ 	if (len == NULL)
 -- 
 2.1.0.rc2.206.gedb03e5
 
