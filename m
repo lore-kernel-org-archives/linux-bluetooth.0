@@ -2,62 +2,62 @@ Return-Path: <cyrus@holtmann.org>
 From: Michael Janssen <jamuraa@chromium.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Michael Janssen <jamuraa@chromium.org>
-Subject: [PATCH BlueZ v2 2/7] attrib: Remove MTU-probing code
-Date: Fri, 24 Oct 2014 13:36:18 -0700
-Message-Id: <1414182983-23959-3-git-send-email-jamuraa@chromium.org>
+Subject: [PATCH BlueZ v2 7/7] attrib: fix GATTRIB_ALL_REQS behavior
+Date: Fri, 24 Oct 2014 13:36:23 -0700
+Message-Id: <1414182983-23959-8-git-send-email-jamuraa@chromium.org>
 In-Reply-To: <1414182983-23959-1-git-send-email-jamuraa@chromium.org>
 References: <1414182983-23959-1-git-send-email-jamuraa@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Probing for the MTU using bt_io is problematic for
-testing because you cannot impersonate AF_BLUETOOTH sockets
-with a socketpair.
+g_attrib_register(..., GATTRIB_ALL_REQS, ...) behavior would previously
+include indications, this fixes it to only include requests and
+commands.
 ---
- attrib/gattrib.c | 13 +------------
- 1 file changed, 1 insertion(+), 12 deletions(-)
+ attrib/gattrib.c | 23 ++++++++++++++++++++++-
+ 1 file changed, 22 insertions(+), 1 deletion(-)
 
 diff --git a/attrib/gattrib.c b/attrib/gattrib.c
-index 71d1cef..fa41ade 100644
+index a65d1ca..f678435 100644
 --- a/attrib/gattrib.c
 +++ b/attrib/gattrib.c
-@@ -476,27 +476,17 @@ done:
- GAttrib *g_attrib_new(GIOChannel *io)
- {
- 	struct _GAttrib *attrib;
--	uint16_t imtu;
- 	uint16_t att_mtu;
- 	uint16_t cid;
--	GError *gerr = NULL;
- 
- 	g_io_channel_set_encoding(io, NULL, NULL);
- 	g_io_channel_set_buffered(io, FALSE);
- 
--	bt_io_get(io, &gerr, BT_IO_OPT_IMTU, &imtu,
--				BT_IO_OPT_CID, &cid, BT_IO_OPT_INVALID);
--	if (gerr) {
--		error("%s", gerr->message);
--		g_error_free(gerr);
--		return NULL;
--	}
--
- 	attrib = g_try_new0(struct _GAttrib, 1);
- 	if (attrib == NULL)
- 		return NULL;
- 
--	att_mtu = (cid == ATT_CID) ? ATT_DEFAULT_LE_MTU : imtu;
-+	att_mtu = ATT_DEFAULT_LE_MTU;
- 
- 	attrib->buf = g_malloc0(att_mtu);
- 	attrib->buflen = att_mtu;
-@@ -651,7 +641,6 @@ gboolean g_attrib_cancel_all(GAttrib *attrib)
- 	return ret;
+@@ -147,6 +147,27 @@ static bool is_response(guint8 opcode)
+ 	return false;
  }
  
--
- uint8_t *g_attrib_get_buffer(GAttrib *attrib, size_t *len)
++static bool is_request(guint8 opcode)
++{
++	switch (opcode) {
++	case ATT_OP_MTU_REQ:
++	case ATT_OP_FIND_INFO_REQ:
++	case ATT_OP_FIND_BY_TYPE_REQ:
++	case ATT_OP_READ_BY_TYPE_REQ:
++	case ATT_OP_READ_REQ:
++	case ATT_OP_READ_BLOB_REQ:
++	case ATT_OP_READ_MULTI_REQ:
++	case ATT_OP_READ_BY_GROUP_REQ:
++	case ATT_OP_WRITE_REQ:
++	case ATT_OP_WRITE_CMD:
++	case ATT_OP_PREP_WRITE_REQ:
++	case ATT_OP_EXEC_WRITE_REQ:
++		return true;
++	}
++
++	return false;
++}
++
+ GAttrib *g_attrib_ref(GAttrib *attrib)
  {
- 	if (len == NULL)
+ 	int refs;
+@@ -373,7 +394,7 @@ static bool match_event(struct event *evt, const uint8_t *pdu, gsize len)
+ 	if (evt->expected == GATTRIB_ALL_EVENTS)
+ 		return true;
+ 
+-	if (!is_response(pdu[0]) && evt->expected == GATTRIB_ALL_REQS)
++	if (is_request(pdu[0]) && evt->expected == GATTRIB_ALL_REQS)
+ 		return true;
+ 
+ 	if (evt->expected == pdu[0] && evt->handle == GATTRIB_ALL_HANDLES)
 -- 
 2.1.0.rc2.206.gedb03e5
 
