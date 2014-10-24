@@ -1,62 +1,35 @@
 Return-Path: <cyrus@holtmann.org>
-From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+From: Marcin Kraglak <marcin.kraglak@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH v5 00/11] shared/hfp: Add support for HFP HF
-Date: Fri, 24 Oct 2014 13:59:24 +0200
-Message-Id: <1414151975-20588-1-git-send-email-lukasz.rymanowski@tieto.com>
+Subject: [PATCH] shared/io: Remove disconnect handler in io_destoy
+Date: Fri, 24 Oct 2014 13:16:19 +0200
+Message-Id: <1414149379-2497-1-git-send-email-marcin.kraglak@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Following patches extends hfp API with HFP HF functionality.
-HFP HF parser has been added and unit test for it.
+Diconnect callback may be called after destroying IO in next
+mainloop iteration (it leada to reading freed data). Removing
+disconnect handler prevents that situation.
+---
+ src/shared/io-glib.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-To consider: how strict we should be when it comes to parsing
-AT responses. For example, at the moment, command +CCLC:<cr><lf>
-will be recognized as +CCLC: eventhough correct response format
-should be <cr><lf>+CCLC:<cr><lf>
-
-Note: As discussed on IRC I did not try to generalize code.
-
-v2:
-* minor self review fixes
-* response callback on send command, contains now result (OK/ERROR) and
-data from unsolicited response if available.
-
-v3:
-* Fix some memory leaks found on self review
-
-v4:
-* Fallback to approach from v1 in context of response callback for AT command.
-Bassically, if AT+X has +X and OK response, response callback contains only OK or
-ERROR code (including CME which will be added in following patches). To get +X
-response, user need to use hfp_hf_register() API. It is done mostly to keep hfp.c
-simple. With this approach we do not have to cache all +X in hfp.c before calling
-response callback.
-
-v5:
-* Szymon comments taken into account
-* Support to handle wrapped commands in ringbuffer. Note that for testing I used
-modified buffer size in hfp but eventually unit test will be done for that.
-
-Lukasz Rymanowski (11):
-  shared/hfp: Add support for HFP HF
-  shared/hfp: Add set_debug and close_on_unref API for HFP HF
-  shared/hfp: Add set disconnect handler and disconnect API to HFP HF
-  shared/hfp: Add register/unregister event for HFP HF
-  shared/hfp: Add HFP HF parser
-  shared/hfp: Add send AT command API for HFP HF
-  unit/test-hfp: Provide test_handler function via struct data
-  unit/test-hfp: Add init test for HFP HF
-  unit/test-hfp: Add send command tests for HFP HF
-  unit/test-hfp: Add tests for unsolicited results for HFP HF
-  unit/test-hfp: Add some robustness tests for HFP HF
-
- src/shared/hfp.c | 649 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
- src/shared/hfp.h |  30 +++
- unit/test-hfp.c  | 283 ++++++++++++++++++++++--
- 3 files changed, 943 insertions(+), 19 deletions(-)
-
+diff --git a/src/shared/io-glib.c b/src/shared/io-glib.c
+index a2ada66..5ebde3d 100644
+--- a/src/shared/io-glib.c
++++ b/src/shared/io-glib.c
+@@ -115,6 +115,11 @@ void io_destroy(struct io *io)
+ 		io->write_watch = 0;
+ 	}
+ 
++	if (io->disconnect_watch > 0) {
++		g_source_remove(io->disconnect_watch);
++		io->disconnect_watch = 0;
++	}
++
+ 	g_io_channel_unref(io->channel);
+ 	io->channel = NULL;
+ 
 -- 
-1.8.4
+1.9.3
 
