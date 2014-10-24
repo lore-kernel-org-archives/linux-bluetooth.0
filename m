@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Sebastian Chlad <sebastian.chlad@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Sebastian Chlad <sebastian.chlad@tieto.com>
-Subject: [PATCH v2] android/pts: Interim PTS tests results for L2CAP
-Date: Fri, 24 Oct 2014 17:45:42 +0200
-Message-Id: <1414165542-8527-1-git-send-email-sebastian.chlad@tieto.com>
+Subject: [PATCH] android/pts: Interim PTS tests results for L2CAP
+Date: Fri, 24 Oct 2014 16:23:49 +0200
+Message-Id: <1414160629-763-1-git-send-email-sebastian.chlad@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
@@ -13,7 +13,7 @@ List-ID: <linux-bluetooth.vger.kernel.org>
  1 file changed, 44 insertions(+), 16 deletions(-)
 
 diff --git a/android/pts-l2cap.txt b/android/pts-l2cap.txt
-index 0746ea7..9706d69 100644
+index 0746ea7..3c664f7 100644
 --- a/android/pts-l2cap.txt
 +++ b/android/pts-l2cap.txt
 @@ -1,7 +1,7 @@
@@ -69,9 +69,9 @@ index 0746ea7..9706d69 100644
  TC_COS_ECH_BV_02_C	PASS	l2ping -c 1 <bdaddr>
 +TC_COS_CFC_BV_01_C	INC	JIRA #BA-181
 +TC_COS_CFC_BV_02_C	INC	JIRA #BA-181
-+TC_COS_CFC_BV_03_C	PASS	l2test -u -V le_public <bdaddr>
-+TC_COS_CFC_BV_04_C	PASS	l2test -u -V le_public <bdaddr>
-+TC_COS_CFC_BV_05_C	PASS	l2test -m -V le_public <bdaddr>
++TC_COS_CFC_BV_03_C	PASS	l2test -u -V le_public 00:1B:dc:07:2f:f0
++TC_COS_CFC_BV_04_C	PASS	l2test -u -V le_public 00:1B:dc:07:2f:f0
++TC_COS_CFC_BV_05_C	PASS	l2test -m -V le_public 00:1B:dc:07:2f:f0
  TC_CLS_CLR_BV_01_C	N/A
  TC_CLS_UCD_BV_01_C	PASS
  TC_CLS_UCD_BV_02_C	PASS	l2test -s -G -N 1 -P 4113 <bdaddr>
