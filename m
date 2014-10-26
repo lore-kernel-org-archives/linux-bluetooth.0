@@ -1,92 +1,47 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <CABBYNZ+=4x0f5_+O0gGjRHZZ3otVZ9WNiv3yod7A_7qON8JovQ@mail.gmail.com>
-References: <1414158494-12020-1-git-send-email-luiz.dentz@gmail.com>
-	<CAHrH25ScMKevmBxzaOqtg3pvk-tzje5YRF--rEENAXXAPouAqQ@mail.gmail.com>
-	<CABBYNZ+=4x0f5_+O0gGjRHZZ3otVZ9WNiv3yod7A_7qON8JovQ@mail.gmail.com>
-Date: Sun, 26 Oct 2014 14:14:48 -0700
-Message-ID: <CAHrH25Tr2p=z1UKjnipwbW==jGt7gNovVfMYjnpbPqnKegTDgQ@mail.gmail.com>
-Subject: Re: [PATCH BlueZ] shared/gatt-db: Expose gatt_db_attribute
 From: Arman Uguray <armansito@chromium.org>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+To: linux-bluetooth@vger.kernel.org
+Cc: Arman Uguray <armansito@chromium.org>
+Subject: [PATCH BlueZ 7/7] TODO: Add new shared/gatt TODO items.
+Date: Sun, 26 Oct 2014 14:12:47 -0700
+Message-Id: <1414357967-9371-8-git-send-email-armansito@chromium.org>
+In-Reply-To: <1414357967-9371-1-git-send-email-armansito@chromium.org>
+References: <1414357967-9371-1-git-send-email-armansito@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+Added items for adding packed structs for ATT PDUs and improving unit test
+coverage.
+---
+ TODO | 15 +++++++++++++++
+ 1 file changed, 15 insertions(+)
 
-On Sun, Oct 26, 2014 at 11:48 AM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> Hi Arman,
->
-> On Fri, Oct 24, 2014 at 7:56 PM, Arman Uguray <armansito@chromium.org> wrote:
->> Hi Luiz,
->>
->> On Fri, Oct 24, 2014 at 6:48 AM, Luiz Augusto von Dentz
->> <luiz.dentz@gmail.com> wrote:
->>> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->>>
->>> This is just a draft API to reduce the lookups in gatt_db and make it
->>> a little bit more convenient for batch operations, so the general idea
->>> is to be able to get a hold of it via gatt_db_get_attribute but also
->>> replace the handles in the queues with proper attributes so the server
->>> code don't have to lookup again when reading/writing, checking
->>> permissions, or any other operation that can be done directly.
->>> ---
->>>  src/shared/gatt-db.h | 22 ++++++++++++++++++++++
->>>  1 file changed, 22 insertions(+)
->>>
->>> diff --git a/src/shared/gatt-db.h b/src/shared/gatt-db.h
->>> index 8d18434..ab7469a 100644
->>> --- a/src/shared/gatt-db.h
->>> +++ b/src/shared/gatt-db.h
->>> @@ -96,3 +96,25 @@ bool gatt_db_get_service_uuid(struct gatt_db *db, uint16_t handle,
->>>
->>>  bool gatt_db_get_attribute_permissions(struct gatt_db *db, uint16_t handle,
->>>                                                         uint32_t *permissions);
->>> +
->>> +struct gatt_db_attribute;
->>> +
->>> +struct gatt_db_attribute *gatt_db_get_attribute(struct gatt_db *attrib,
->>> +                                       uint16_t handle, uint16_t offset);
->>> +
->>
->> What's the offset parameter here for? Why not just get the attribute by handle?
->
-> Probably an artifact of copy and pasting things around, it should be
-> just the handle.
->
->>
->>> +const bt_uuid_t *gatt_db_attribute_get_type(struct gatt_db_attribute *attrib);
->>> +
->>> +bool gatt_db_attribute_get_service_uuid(struct gatt_db_attribute *attrib,
->>> +                                                       bt_uuid_t *uuid);
->>> +
->>> +bool gatt_db_attribute_get_permissions(struct gatt_db_attribute *attrib,
->>> +                                                       uint32_t *permissions);
->>> +
->>> +bool gatt_db_attribute_read(struct gatt_db_attribute *attrib,
->>> +                                       uint8_t opcode, bdaddr_t *bdaddr,
->>> +                                       void *callback, void *user_data);
->>> +
->>> +bool gatt_db_attribute_write(struct gatt_db_attribute *attrib,
->>> +                                       const uint8_t *value, size_t len,
->>> +                                       uint8_t opcode, bdaddr_t *bdaddr,
->>> +                                       void *callback, void *user_data);
->>> --
->>
->> Are these functions meant to replace the existing gatt_db_read, etc?
->> We might as well just replace all of those with functions that accept
->> a struct gatt_db_attribute. So that all functions would be preceded by
->> a call to gatt_db_get_attribute, followed by one of these functions.
->> Unless you want to keep the other functions as helpers that accomplish
->> the same thing.
->
-> Yes this would replace some functions that requires handles, I just
-> wanted to sync up first to get some feedback but it seems these
-> changes will be straight forward and perhaps we don't even need to
-> keep the old functions around.
->
+diff --git a/TODO b/TODO
+index fe5ebe5..b5a9612 100644
+--- a/TODO
++++ b/TODO
+@@ -105,6 +105,21 @@ ATT/GATT (new shared stack)
+   Priority: Medium
+   Complexity: C1
+ 
++- Add complete GATT test coverage in unit/test-gatt following the GATT test
++  spec. This could use shared/gatt-client and shared/gatt-server at the same
++  time to test both against eachother. We should definitely have tests for
++  gatt-server and gatt-client simultaneously on one side of the connection.
++
++  Priority: High
++  Complexity: C4
++
++- Define packed structs for ATT protocol PDUs in shared/att-types to improve
++  readability. We should probably do this once there are extensive unit tests
++  for gatt-client/gatt-server so that we don't accidentally break working code.
++
++  Priority: Medium
++  Complexity: C2
++
+ - Introduce a handler interface to shared/gatt-client which can be used by the
+   upper layer to determine when the link has been disconnected or an ATT
+   protocol request times out.
+-- 
+2.1.0.rc2.206.gedb03e5
 
-Yeah, it makes sense to have these just replace the old ones I think.
