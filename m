@@ -2,36 +2,35 @@ Return-Path: <cyrus@holtmann.org>
 From: Arman Uguray <armansito@chromium.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Arman Uguray <armansito@chromium.org>
-Subject: [PATCH BlueZ 3/7] tools/btgatt-client: Fix read-long-value offset parsing.
-Date: Sun, 26 Oct 2014 14:12:43 -0700
-Message-Id: <1414357967-9371-4-git-send-email-armansito@chromium.org>
+Subject: [PATCH BlueZ 1/7] shared/gatt-client: Fix bug in service changed queue.
+Date: Sun, 26 Oct 2014 14:12:41 -0700
+Message-Id: <1414357967-9371-2-git-send-email-armansito@chromium.org>
 In-Reply-To: <1414357967-9371-1-git-send-email-armansito@chromium.org>
 References: <1414357967-9371-1-git-send-email-armansito@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch fixes the way read-long-value command parses the "offset"
-argument by interpreting it as base 10 instead of 16, which is more
-intuitive.
+This patch fixes a bug where the handle range for queued service changed
+events weren't getting stored. This caused service discovery to be
+initiated for the 0x0000-0x0000 range, which caused an error response.
 ---
- tools/btgatt-client.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ src/shared/gatt-client.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/tools/btgatt-client.c b/tools/btgatt-client.c
-index b7bfa24..e7cd31c 100644
---- a/tools/btgatt-client.c
-+++ b/tools/btgatt-client.c
-@@ -486,8 +486,8 @@ static void cmd_read_long_value(struct client *cli, char *cmd_str)
- 	}
- 
- 	endptr = NULL;
--	offset = strtol(argv[1], &endptr, 16);
--	if (!endptr || *endptr != '\0' || !handle) {
-+	offset = strtol(argv[1], &endptr, 10);
-+	if (!endptr || *endptr != '\0') {
- 		printf("Invalid offset: %s\n", argv[1]);
+diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
+index 57d3e1f..faae71c 100644
+--- a/src/shared/gatt-client.c
++++ b/src/shared/gatt-client.c
+@@ -1095,6 +1095,9 @@ static void service_changed_cb(uint16_t value_handle, const uint8_t *value,
+ 	if (!op)
  		return;
- 	}
+ 
++	op->start_handle = start;
++	op->end_handle = end;
++
+ 	queue_push_tail(client->svc_chngd_queue, op);
+ }
+ 
 -- 
 2.1.0.rc2.206.gedb03e5
 
