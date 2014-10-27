@@ -1,76 +1,126 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1414425900-21784-7-git-send-email-luiz.dentz@gmail.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ 4/9] shared/gatt-db: Add gatt_db_attribute_get_service_uuid
+Date: Mon, 27 Oct 2014 18:04:55 +0200
+Message-Id: <1414425900-21784-4-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <1414425900-21784-1-git-send-email-luiz.dentz@gmail.com>
 References: <1414425900-21784-1-git-send-email-luiz.dentz@gmail.com>
-	<1414425900-21784-7-git-send-email-luiz.dentz@gmail.com>
-Date: Mon, 27 Oct 2014 11:43:57 -0700
-Message-ID: <CAHrH25SZZZ_Kb_cmJPetKpoTsLzBJk5wTLNmu40GUFEQQbx=FA@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 7/9] shared/gatt-db: Add gatt_db_attribute_write
-From: Arman Uguray <armansito@chromium.org>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
+---
+ src/shared/gatt-db.c | 41 +++++++++++++++++++++++++++++++++--------
+ 1 file changed, 33 insertions(+), 8 deletions(-)
 
->
-> ---
->  src/shared/gatt-db.c | 17 ++++++++++++++++-
->  1 file changed, 16 insertions(+), 1 deletion(-)
->
-> diff --git a/src/shared/gatt-db.c b/src/shared/gatt-db.c
-> index acd2e9a..4ff7358 100644
-> --- a/src/shared/gatt-db.c
-> +++ b/src/shared/gatt-db.c
-> @@ -906,5 +906,20 @@ bool gatt_db_attribute_write(struct gatt_db_attribute *attrib, uint16_t offset,
->                                         gatt_db_attribute_write_t func,
->                                         void *user_data)
->  {
-> -       return false;
-> +       if (!attrib)
-> +               return false;
-> +
-> +       if (offset > attrib->value_len ||
-> +                               len > (unsigned) (attrib->value_len - offset))
-> +               return false;
+diff --git a/src/shared/gatt-db.c b/src/shared/gatt-db.c
+index 938cb67..5df6b10 100644
+--- a/src/shared/gatt-db.c
++++ b/src/shared/gatt-db.c
+@@ -46,6 +46,7 @@ struct gatt_db {
+ };
+ 
+ struct gatt_db_attribute {
++	struct gatt_db_service *service;
+ 	uint16_t handle;
+ 	bt_uuid_t uuid;
+ 	uint32_t permissions;
+@@ -70,7 +71,8 @@ static bool match_service_by_handle(const void *data, const void *user_data)
+ 	return service->attributes[0]->handle == PTR_TO_INT(user_data);
+ }
+ 
+-static struct gatt_db_attribute *new_attribute(const bt_uuid_t *type,
++static struct gatt_db_attribute *new_attribute(struct gatt_db_service *service,
++							const bt_uuid_t *type,
+ 							const uint8_t *val,
+ 							uint16_t len)
+ {
+@@ -80,6 +82,7 @@ static struct gatt_db_attribute *new_attribute(const bt_uuid_t *type,
+ 	if (!attribute)
+ 		return NULL;
+ 
++	attribute->service = service;
+ 	attribute->uuid = *type;
+ 	attribute->value_len = len;
+ 	if (len) {
+@@ -187,7 +190,7 @@ uint16_t gatt_db_add_service(struct gatt_db *db, const bt_uuid_t *uuid,
+ 
+ 	len = uuid_to_le(uuid, value);
+ 
+-	service->attributes[0] = new_attribute(type, value, len);
++	service->attributes[0] = new_attribute(service, type, value, len);
+ 	if (!service->attributes[0]) {
+ 		gatt_db_service_destroy(service);
+ 		return 0;
+@@ -297,14 +300,14 @@ uint16_t gatt_db_add_characteristic(struct gatt_db *db, uint16_t handle,
+ 	len += sizeof(uint16_t);
+ 	len += uuid_to_le(uuid, &value[3]);
+ 
+-	service->attributes[i] = new_attribute(&characteristic_uuid, value,
+-									len);
++	service->attributes[i] = new_attribute(service, &characteristic_uuid,
++								value, len);
+ 	if (!service->attributes[i])
+ 		return 0;
+ 
+ 	update_attribute_handle(service, i++);
+ 
+-	service->attributes[i] = new_attribute(uuid, NULL, 0);
++	service->attributes[i] = new_attribute(service, uuid, NULL, 0);
+ 	if (!service->attributes[i]) {
+ 		free(service->attributes[i - 1]);
+ 		return 0;
+@@ -335,7 +338,7 @@ uint16_t gatt_db_add_char_descriptor(struct gatt_db *db, uint16_t handle,
+ 	if (!i)
+ 		return 0;
+ 
+-	service->attributes[i] = new_attribute(uuid, NULL, 0);
++	service->attributes[i] = new_attribute(service, uuid, NULL, 0);
+ 	if (!service->attributes[i])
+ 		return 0;
+ 
+@@ -385,8 +388,9 @@ uint16_t gatt_db_add_included_service(struct gatt_db *db, uint16_t handle,
+ 	if (!index)
+ 		return 0;
+ 
+-	service->attributes[index] = new_attribute(&included_service_uuid,
+-								value, len);
++	service->attributes[index] = new_attribute(service,
++							&included_service_uuid,
++							value, len);
+ 	if (!service->attributes[index])
+ 		return 0;
+ 
+@@ -839,6 +843,27 @@ const bt_uuid_t *gatt_db_attribute_get_type(struct gatt_db_attribute *attrib)
+ bool gatt_db_attribute_get_service_uuid(struct gatt_db_attribute *attrib,
+ 							bt_uuid_t *uuid)
+ {
++	if (!attrib)
++		return false;
++
++	if (attrib->value_len == sizeof(uint16_t)) {
++		uint16_t value;
++
++		value = get_le16(attrib->value);
++		bt_uuid16_create(uuid, value);
++
++		return true;
++	}
++
++	if (attrib->value_len == sizeof(uint128_t)) {
++		uint128_t value;
++
++		bswap_128(attrib->value, &value);
++		bt_uuid128_create(uuid, value);
++
++		return true;
++	}
++
+ 	return false;
+ }
+ 
+-- 
+1.9.3
 
-Won't this incorrectly fail if the attribute value has a variable
-length? Quoted from Core v4.1 Vol 3 ATT: 3.4.5.1 Write Request: "If
-the attribute value has a variable length, then the attribute value
-shall be truncated or lengthened to match the length of the Attribute
-Value parameter". So we can't really make assumptions on value_len
-here.
-
-Also, if the attribute value is being implemented by the higher layer,
-then won't the value_len field of the attribute structure be invalid
-in general? Unless we always cache the full value in the attribute
-structure based on the last time gatt-db invoked the read callback but
-then this would still incorrectly fail if we never read the attribute
-value beforehand.
-
-I think we can assume that all attributes that are created without a
-write callback are not writable. I think we should always delegate
-writes to a callback and just return false here if the callback was
-never set (this would mean that the attribute is not writable). The
-callback can perform the necessary offset and length checks as needed
-by the service it's implementing, so we wouldn't end up making any
-assumptions there.
-
-> +
-> +       if (attrib->write_func) {
-> +               attrib->write_func(attrib->handle, offset, value, len, opcode,
-> +                                               bdaddr, attrib->user_data);
-> +               return true;
-> +       }
-> +
-> +       memcpy(&attrib->value[offset], value, len);
-> +
-> +       return true;
->  }
-> --
-
-Cheers,
-Arman
