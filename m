@@ -1,32 +1,46 @@
 Return-Path: <cyrus@holtmann.org>
-From: Arman Uguray <armansito@chromium.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Arman Uguray <armansito@chromium.org>
-Subject: [PATCH BlueZ v1 0/7] shared/gatt: Various bug fixes.
-Date: Mon, 27 Oct 2014 07:35:35 -0700
-Message-Id: <1414420542-15336-1-git-send-email-armansito@chromium.org>
+Message-ID: <1414420099.2705.218.camel@jrissane-mobl.ger.corp.intel.com>
+Subject: Re: [PATCH v2 2/3] Bluetooth: 6lowpan: Fix lockdep splats
+From: Jukka Rissanen <jukka.rissanen@linux.intel.com>
+To: Alexander Aring <alex.aring@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Date: Mon, 27 Oct 2014 16:28:19 +0200
+In-Reply-To: <20141027141000.GB24691@omega>
+References: <1414418683-1057-1-git-send-email-jukka.rissanen@linux.intel.com>
+	 <1414418683-1057-3-git-send-email-jukka.rissanen@linux.intel.com>
+	 <20141027141000.GB24691@omega>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-*v1:
-  - Fixed potential invalid access while obtaining end group handle.
-  - Fixed some compile warnings.
+Hi Alex,
 
-Arman Uguray (7):
-  shared/gatt-client: Fix bug in service changed queue.
-  shared/gatt-client: Fix bug in service changed handling.
-  tools/btgatt-client: Fix read-long-value offset parsing.
-  tools/btgatt-client: Fix off-by-one error.
-  tools/btgatt-client: Print prompt on service changed.
-  shared/gatt-db: Fix range handling in read by grp type.
-  TODO: Add new shared/gatt TODO items.
+On ma, 2014-10-27 at 15:10 +0100, Alexander Aring wrote:
+> Hi Jukka,
+> 
+> On Mon, Oct 27, 2014 at 04:04:42PM +0200, Jukka Rissanen wrote:
+> > When a device ndo_start_xmit() calls again dev_queue_xmit(),
+> > lockdep can complain because dev_queue_xmit() is re-entered and the
+> > spinlocks protecting tx queues share a common lockdep class.
+> > 
+> > Same issue was fixed for ieee802162 in commit "20e7c4e80dcd"
+> > 
+> 
+> s/ieee802162/ieee802154/
 
- TODO                     | 15 +++++++++++++++
- src/shared/gatt-client.c | 14 +++++++++-----
- src/shared/gatt-db.c     | 11 ++++++++++-
- tools/btgatt-client.c    | 11 +++++++----
- 4 files changed, 41 insertions(+), 10 deletions(-)
+Good catch.
 
--- 
-2.1.0.rc2.206.gedb03e5
+> 
+> 
+> I know it's hard. I also do some mistake on these IEEE number word
+> salads.
+
+Yep, it was also very difficult to see (or actually impossible because I
+missed this one) when I was proof reading the patches before sending :)
+
+
+Thanks,
+Jukka
+
 
