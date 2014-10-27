@@ -2,195 +2,55 @@ Return-Path: <cyrus@holtmann.org>
 From: Michael Janssen <jamuraa@chromium.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Michael Janssen <jamuraa@chromium.org>
-Subject: [PATCH BlueZ v3 06/10] attrib: Add unit tests for g_attrib_register
-Date: Mon, 27 Oct 2014 15:13:57 -0700
-Message-Id: <1414448041-27866-7-git-send-email-jamuraa@chromium.org>
-In-Reply-To: <1414448041-27866-1-git-send-email-jamuraa@chromium.org>
-References: <1414448041-27866-1-git-send-email-jamuraa@chromium.org>
+Subject: [PATCH BlueZ v3 00/10] Unit tests for gattrib
+Date: Mon, 27 Oct 2014 15:13:51 -0700
+Message-Id: <1414448041-27866-1-git-send-email-jamuraa@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- unit/test-gattrib.c | 157 +++++++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 156 insertions(+), 1 deletion(-)
+Since we want to replace GAttrib with a bt_att shim for a smooth transition 
+to bt_att profiles, this patch cleans up the API and adds unit tests for
+GAttrib functions.
 
-diff --git a/unit/test-gattrib.c b/unit/test-gattrib.c
-index 23a5485..61db4a1 100644
---- a/unit/test-gattrib.c
-+++ b/unit/test-gattrib.c
-@@ -45,6 +45,23 @@
- 
- #define data(args...) ((const unsigned char[]) { args })
- 
-+struct test_pdu {
-+	bool valid;
-+	bool sent;
-+	bool received;
-+	const uint8_t *data;
-+	size_t size;
-+};
-+
-+#define pdu(args...)				\
-+	{					\
-+		.valid = true,			\
-+		.sent = false,			\
-+		.received = false,		\
-+		.data = data(args),		\
-+		.size = sizeof(data(args)),	\
-+	}
-+
- struct context {
- 	GMainLoop *main_loop;
- 	GIOChannel *att_io;
-@@ -298,9 +315,147 @@ static void test_cancel(struct context *cxt, gconstpointer unused)
- 	g_assert(!canceled);
- }
- 
-+static void send_test_pdus(gpointer context, struct test_pdu *pdus)
-+{
-+	struct context *cxt = context;
-+	size_t len;
-+	int fd;
-+	struct test_pdu *cur_pdu;
-+
-+	fd = g_io_channel_unix_get_fd(cxt->server_io);
-+
-+	for (cur_pdu = pdus; cur_pdu->valid; cur_pdu++)
-+		cur_pdu->sent = false;
-+
-+	for (cur_pdu = pdus; cur_pdu->valid; cur_pdu++) {
-+		if (g_test_verbose())
-+			util_hexdump('>', cur_pdu->data, cur_pdu->size,
-+						 test_debug, "send_test_pdus: ");
-+		len = write(fd, cur_pdu->data, cur_pdu->size);
-+		g_assert_cmpint(len, ==, cur_pdu->size);
-+		do {
-+			g_main_context_iteration(NULL, TRUE);
-+		} while (g_main_context_pending(NULL));
-+		cur_pdu->sent = true;
-+	}
-+}
-+
-+#define PDU_MTU_RESP pdu(ATT_OP_MTU_RESP, 0x17)
-+#define PDU_FIND_INFO_REQ pdu(ATT_OP_FIND_INFO_REQ, 0x01, 0x00, 0xFF, 0xFF)
-+#define PDU_IND_NODATA pdu(ATT_OP_HANDLE_IND, 0x01, 0x00)
-+#define PDU_INVALID_IND pdu(ATT_OP_HANDLE_IND, 0x14)
-+#define PDU_IND_DATA pdu(ATT_OP_HANDLE_IND, 0x14, 0x00, 0x01)
-+
-+static void notify_canary_expect(const guint8 *pdu, guint16 len, gpointer data)
-+{
-+	struct test_pdu *expected = data;
-+	int cmp;
-+
-+	if (g_test_verbose())
-+		util_hexdump('<', pdu, len, test_debug,
-+						      "notify_canary_expect: ");
-+
-+	while (expected->valid && expected->received)
-+		expected++;
-+
-+	g_assert(expected->valid);
-+
-+	if (g_test_verbose())
-+		util_hexdump('?', expected->data, expected->size, test_debug,
-+						      "notify_canary_expect: ");
-+
-+	g_assert_cmpint(expected->size, ==, len);
-+
-+	cmp = memcmp(pdu, expected->data, expected->size);
-+
-+	g_assert(cmp == 0);
-+
-+	expected->received = true;
-+}
-+
- static void test_register(struct context *cxt, gconstpointer user_data)
- {
--	/* TODO */
-+	guint reg_id;
-+	gboolean success;
-+	struct test_pdu pdus[] = {
-+		/* Unmatched by any (GATTRIB_ALL_EVENTS) */
-+		PDU_MTU_RESP,
-+		/*
-+		 * Unmatched PDU opcode
-+		 * Unmatched handle (GATTRIB_ALL_REQS) */
-+		PDU_FIND_INFO_REQ,
-+		/*
-+		 * Matched PDU opcode
-+		 * Unmatched handle (GATTRIB_ALL_HANDLES) */
-+		PDU_IND_NODATA,
-+		/*
-+		 * Matched PDU opcode
-+		 * Invalid length? */
-+		PDU_INVALID_IND,
-+		/*
-+		 * Matched PDU opcode
-+		 * Matched handle */
-+		PDU_IND_DATA,
-+		{ },
-+	};
-+	struct test_pdu req_pdus[] = { PDU_FIND_INFO_REQ, { } };
-+	struct test_pdu all_ind_pdus[] = {
-+		PDU_IND_NODATA,
-+		PDU_INVALID_IND,
-+		PDU_IND_DATA,
-+		{ },
-+	};
-+	struct test_pdu followed_ind_pdus[] = { PDU_IND_DATA, { } };
-+
-+	/*
-+	 * Without registering anything, should be able to ignore everything but
-+	 * an unexpected response. */
-+	send_test_pdus(cxt, pdus + 1);
-+
-+	reg_id = g_attrib_register(cxt->att, GATTRIB_ALL_EVENTS,
-+				      GATTRIB_ALL_HANDLES, notify_canary_expect,
-+								    pdus, NULL);
-+
-+	send_test_pdus(cxt, pdus);
-+
-+	g_attrib_unregister(cxt->att, reg_id);
-+
-+	if (g_test_verbose())
-+		g_print("ALL_REQS, ALL_HANDLES\r\n");
-+
-+	reg_id = g_attrib_register(cxt->att, GATTRIB_ALL_REQS,
-+				      GATTRIB_ALL_HANDLES, notify_canary_expect,
-+								req_pdus, NULL);
-+
-+	send_test_pdus(cxt, pdus);
-+
-+	g_attrib_unregister(cxt->att, reg_id);
-+
-+	if (g_test_verbose())
-+		g_print("IND, ALL_HANDLES\r\n");
-+
-+	reg_id = g_attrib_register(cxt->att, ATT_OP_HANDLE_IND,
-+				      GATTRIB_ALL_HANDLES, notify_canary_expect,
-+							    all_ind_pdus, NULL);
-+
-+	send_test_pdus(cxt, pdus);
-+
-+	g_attrib_unregister(cxt->att, reg_id);
-+
-+	if (g_test_verbose())
-+		g_print("IND, 0x0014\r\n");
-+
-+	reg_id = g_attrib_register(cxt->att, ATT_OP_HANDLE_IND, 0x0014,
-+					notify_canary_expect, followed_ind_pdus,
-+									  NULL);
-+
-+	send_test_pdus(cxt, pdus);
-+
-+	g_attrib_unregister(cxt->att, reg_id);
-+
-+	success = g_attrib_unregister(cxt->att, reg_id);
-+
-+	g_assert(!success);
- }
- 
- static void test_buffers(struct context *cxt, gconstpointer unused)
+This adds tests for all but the register / unregister functions, which
+I will send in a separate patch since they are slightly more complicated due
+to catchalls.
+
+v1 -> v2:
+ * Add g_attrib_register tests
+ * Cleanup of unit/test-gattrib.c
+ * Bugfix for GATTRIB_ALL_REQS
+
+v2 -> v3:
+ * Just move g_attrib_is_encrypted to static (Luiz)
+ * Check that registered-for PDUs were delivered
+ * Respond to Request PDU when registered for it.
+ * Copy result PDUs since they aren't guaranteed to live beyond callback.
+
+Michael Janssen (10):
+  Remove unused g_attrib_set_debug function
+  attrib: Remove MTU-probing code
+  attrib: Add mtu argument to g_attrib_new
+  attrib: remove g_attrib_is_encrypted
+  Add unit tests for gattrib
+  attrib: Add unit tests for g_attrib_register
+  attrib: fix GATTRIB_ALL_REQS behavior
+  unit/gattrib: Check expected PDUs were delivered
+  unit/gattrib: Respond to the request PDU.
+  unit/gattrib: copy result PDU
+
+ .gitignore           |   1 +
+ Makefile.am          |   7 +
+ attrib/gattrib.c     |  61 +++---
+ attrib/gattrib.h     |   7 +-
+ attrib/gatttool.c    |  17 +-
+ attrib/interactive.c |  17 +-
+ src/attrib-server.c  |  12 ++
+ src/device.c         |  11 +-
+ unit/test-gattrib.c  | 552 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ 9 files changed, 640 insertions(+), 45 deletions(-)
+ create mode 100644 unit/test-gattrib.c
+
 -- 
 2.1.0.rc2.206.gedb03e5
 
