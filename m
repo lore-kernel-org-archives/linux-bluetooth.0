@@ -2,46 +2,37 @@ Return-Path: <cyrus@holtmann.org>
 From: Arman Uguray <armansito@chromium.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Arman Uguray <armansito@chromium.org>
-Subject: [PATCH BlueZ v1 7/7] TODO: Add new shared/gatt TODO items.
-Date: Mon, 27 Oct 2014 07:35:42 -0700
-Message-Id: <1414420542-15336-8-git-send-email-armansito@chromium.org>
+Subject: [PATCH BlueZ v1 5/7] tools/btgatt-client: Print prompt on service changed.
+Date: Mon, 27 Oct 2014 07:35:40 -0700
+Message-Id: <1414420542-15336-6-git-send-email-armansito@chromium.org>
 In-Reply-To: <1414420542-15336-1-git-send-email-armansito@chromium.org>
 References: <1414420542-15336-1-git-send-email-armansito@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Added items for adding packed structs for ATT PDUs and improving unit test
-coverage.
+The service changed handler now prints the command line prompt if the
+changed service list empty.
 ---
- TODO | 15 +++++++++++++++
- 1 file changed, 15 insertions(+)
+ tools/btgatt-client.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
-diff --git a/TODO b/TODO
-index fe5ebe5..b5a9612 100644
---- a/TODO
-+++ b/TODO
-@@ -105,6 +105,21 @@ ATT/GATT (new shared stack)
-   Priority: Medium
-   Complexity: C1
+diff --git a/tools/btgatt-client.c b/tools/btgatt-client.c
+index ea9acb7..5eedfd0 100644
+--- a/tools/btgatt-client.c
++++ b/tools/btgatt-client.c
+@@ -304,8 +304,11 @@ static void service_changed_cb(uint16_t start_handle, uint16_t end_handle,
+ 	printf("\nService Changed handled - start: 0x%04x end: 0x%04x\n",
+ 						start_handle, end_handle);
  
-+- Add complete GATT test coverage in unit/test-gatt following the GATT test
-+  spec. This could use shared/gatt-client and shared/gatt-server at the same
-+  time to test both against eachother. We should definitely have tests for
-+  gatt-server and gatt-client simultaneously on one side of the connection.
-+
-+  Priority: High
-+  Complexity: C4
-+
-+- Define packed structs for ATT protocol PDUs in shared/att-types to improve
-+  readability. We should probably do this once there are extensive unit tests
-+  for gatt-client/gatt-server so that we don't accidentally break working code.
-+
-+  Priority: Medium
-+  Complexity: C2
-+
- - Introduce a handler interface to shared/gatt-client which can be used by the
-   upper layer to determine when the link has been disconnected or an ATT
-   protocol request times out.
+-	if (!bt_gatt_service_iter_next_by_handle(&iter, start_handle, &service))
++	if (!bt_gatt_service_iter_next_by_handle(&iter, start_handle,
++								&service)) {
++		print_prompt();
+ 		return;
++	}
+ 
+ 	print_service(service);
+ 
 -- 
 2.1.0.rc2.206.gedb03e5
 
