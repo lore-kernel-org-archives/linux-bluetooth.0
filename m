@@ -2,72 +2,103 @@ Return-Path: <cyrus@holtmann.org>
 From: Michael Janssen <jamuraa@chromium.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Michael Janssen <jamuraa@chromium.org>
-Subject: [PATCH BlueZ v3 10/10] unit/gattrib: copy result PDU
-Date: Mon, 27 Oct 2014 15:14:01 -0700
-Message-Id: <1414448041-27866-11-git-send-email-jamuraa@chromium.org>
+Subject: [PATCH BlueZ v3 08/10] unit/gattrib: Check expected PDUs were delivered
+Date: Mon, 27 Oct 2014 15:13:59 -0700
+Message-Id: <1414448041-27866-9-git-send-email-jamuraa@chromium.org>
 In-Reply-To: <1414448041-27866-1-git-send-email-jamuraa@chromium.org>
 References: <1414448041-27866-1-git-send-email-jamuraa@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Memory is not guaranteed to stay around after the result
-function is called, so we must copy the PDU.
+Check that the PDUs that we expect to receive when
+registering for events have been delivered.
 ---
- unit/test-gattrib.c | 12 ++++++++----
- 1 file changed, 8 insertions(+), 4 deletions(-)
+ unit/test-gattrib.c | 35 ++++++++++++++++++++++++++++-------
+ 1 file changed, 28 insertions(+), 7 deletions(-)
 
 diff --git a/unit/test-gattrib.c b/unit/test-gattrib.c
-index 0ccf09a..e8d7c84 100644
+index 61db4a1..f93ed35 100644
 --- a/unit/test-gattrib.c
 +++ b/unit/test-gattrib.c
-@@ -203,7 +203,7 @@ static gboolean test_client(GIOChannel *channel, GIOCondition cond,
- 
- struct result_data {
- 	guint8 status;
--	const guint8 *pdu;
-+	guint8 *pdu;
- 	guint16 len;
- 	bool done;
- };
-@@ -212,8 +212,10 @@ static void result_canary(guint8 status, const guint8 *pdu, guint16 len,
- 								gpointer data)
+@@ -376,7 +376,7 @@ static void notify_canary_expect(const guint8 *pdu, guint16 len, gpointer data)
+ static void test_register(struct context *cxt, gconstpointer user_data)
  {
- 	struct result_data *result = data;
+ 	guint reg_id;
+-	gboolean success;
++	gboolean canceled;
+ 	struct test_pdu pdus[] = {
+ 		/* Unmatched by any (GATTRIB_ALL_EVENTS) */
+ 		PDU_MTU_RESP,
+@@ -406,6 +406,7 @@ static void test_register(struct context *cxt, gconstpointer user_data)
+ 		{ },
+ 	};
+ 	struct test_pdu followed_ind_pdus[] = { PDU_IND_DATA, { } };
++	struct test_pdu *current_pdu;
+ 
+ 	/*
+ 	 * Without registering anything, should be able to ignore everything but
+@@ -418,7 +419,12 @@ static void test_register(struct context *cxt, gconstpointer user_data)
+ 
+ 	send_test_pdus(cxt, pdus);
+ 
+-	g_attrib_unregister(cxt->att, reg_id);
++	canceled = g_attrib_unregister(cxt->att, reg_id);
 +
- 	result->status = status;
--	result->pdu = pdu;
-+	result->pdu = g_malloc0(len);
-+	memcpy(result->pdu, pdu, len);
- 	result->len = len;
++	g_assert(canceled);
++
++	for (current_pdu = pdus; current_pdu->valid; current_pdu++)
++		g_assert(current_pdu->received);
  
  	if (g_test_verbose())
-@@ -229,7 +231,7 @@ static void test_send(struct context *cxt, gconstpointer unused)
- 	struct challenge_response data = {
- 		.expect = data(0x02, 0x00, 0x02),
- 		.expect_len = 3,
--		.respond = data(0x01, 0x02, 0x03, 0x04),
-+		.respond = data(0x03, 0x02, 0x03, 0x04),
- 		.respond_len = 4,
- 		.received = false,
- 	};
-@@ -251,6 +253,8 @@ static void test_send(struct context *cxt, gconstpointer unused)
+ 		g_print("ALL_REQS, ALL_HANDLES\r\n");
+@@ -429,7 +435,12 @@ static void test_register(struct context *cxt, gconstpointer user_data)
  
- 	cmp = memcmp(results.pdu, data.respond, results.len);
+ 	send_test_pdus(cxt, pdus);
  
-+	g_free(results.pdu);
+-	g_attrib_unregister(cxt->att, reg_id);
++	canceled = g_attrib_unregister(cxt->att, reg_id);
 +
- 	g_assert(cmp == 0);
++	g_assert(canceled);
++
++	for (current_pdu = req_pdus; current_pdu->valid; current_pdu++)
++		g_assert(current_pdu->received);
+ 
+ 	if (g_test_verbose())
+ 		g_print("IND, ALL_HANDLES\r\n");
+@@ -440,7 +451,12 @@ static void test_register(struct context *cxt, gconstpointer user_data)
+ 
+ 	send_test_pdus(cxt, pdus);
+ 
+-	g_attrib_unregister(cxt->att, reg_id);
++	canceled = g_attrib_unregister(cxt->att, reg_id);
++
++	g_assert(canceled);
++
++	for (current_pdu = all_ind_pdus; current_pdu->valid; current_pdu++)
++		g_assert(current_pdu->received);
+ 
+ 	if (g_test_verbose())
+ 		g_print("IND, 0x0014\r\n");
+@@ -451,11 +467,16 @@ static void test_register(struct context *cxt, gconstpointer user_data)
+ 
+ 	send_test_pdus(cxt, pdus);
+ 
+-	g_attrib_unregister(cxt->att, reg_id);
++	canceled = g_attrib_unregister(cxt->att, reg_id);
++
++	g_assert(canceled);
+ 
+-	success = g_attrib_unregister(cxt->att, reg_id);
++	for (current_pdu = followed_ind_pdus; current_pdu->valid; current_pdu++)
++		g_assert(current_pdu->received);
+ 
+-	g_assert(!success);
++	canceled = g_attrib_unregister(cxt->att, reg_id);
++
++	g_assert(!canceled);
  }
  
-@@ -262,7 +266,7 @@ static void test_cancel(struct context *cxt, gconstpointer unused)
- 	struct challenge_response data = {
- 		.expect = data(0x02, 0x00, 0x02),
- 		.expect_len = 3,
--		.respond = data(0x01, 0x02, 0x03, 0x04),
-+		.respond = data(0x03, 0x02, 0x03, 0x04),
- 		.respond_len = 4,
- 		.received = false,
- 	};
+ static void test_buffers(struct context *cxt, gconstpointer unused)
 -- 
 2.1.0.rc2.206.gedb03e5
 
