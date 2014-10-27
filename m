@@ -1,73 +1,30 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Mon, 27 Oct 2014 06:22:41 +0100
+From: Alexander Aring <alex.aring@gmail.com>
+To: Martin Townsend <mtownsend1973@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org,
+	marcel@holtmann.org, jukka.rissanen@linux.intel.com,
+	Martin Townsend <martin.townsend@xsilon.com>
+Subject: Re: [PATCH v5 bluetooth-next 0/4] 6lowpan: Move skb delivery out of
+ IPHC
+Message-ID: <20141027052237.GA21400@omega>
+References: <1414075256-9448-1-git-send-email-martin.townsend@xsilon.com>
 MIME-Version: 1.0
-In-Reply-To: <1414357967-9371-7-git-send-email-armansito@chromium.org>
-References: <1414357967-9371-1-git-send-email-armansito@chromium.org>
-	<1414357967-9371-7-git-send-email-armansito@chromium.org>
-Date: Mon, 27 Oct 2014 07:54:43 +0100
-Message-ID: <CABD6X-+zxqP8eEeBxrcP9bGW6f9mmbAp=GCJch8OhCEoyzg6Bg@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 6/7] shared/gatt-db: Fix range handling in read by
- grp type.
-From: Marcin Kraglak <marcin.kraglak@tieto.com>
-To: Arman Uguray <armansito@chromium.org>
-Cc: "linux-bluetooth@vger.kernel.org development"
-	<linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=utf-8
+In-Reply-To: <1414075256-9448-1-git-send-email-martin.townsend@xsilon.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Arman,
+On Thu, Oct 23, 2014 at 03:40:52PM +0100, Martin Townsend wrote:
+> This series moves skb delivery out of IPHC and into the receive routines of
+> both bluetooth and 802.15.4.  The reason is that we need to support more
+> (de)compression schemes in the future.  It also means that calling 
+> lowpan_process_data now only returns error codes or 0 for success so 
+> this has been cleaned up.  The final patch then renames occurences of
+> lowpan_process_data and process_data to something more meaningful.
+> 
 
-On 26 October 2014 22:12, Arman Uguray <armansito@chromium.org> wrote:
-> This patch fixes bug in gatt_db_read_by_grp_type in which the range end handle
-> was being ignored. This caused incorrect results to be sent for a database
-> where services exists beyond the end handle provided in the request.
-> ---
->  src/shared/gatt-db.c | 11 ++++++++++-
->  1 file changed, 10 insertions(+), 1 deletion(-)
->
-> diff --git a/src/shared/gatt-db.c b/src/shared/gatt-db.c
-> index b3f95d2..4e74030 100644
-> --- a/src/shared/gatt-db.c
-> +++ b/src/shared/gatt-db.c
-> @@ -428,6 +428,7 @@ static void read_by_group_type(void *data, void *user_data)
->  {
->         struct read_by_group_type_data *search_data = user_data;
->         struct gatt_db_service *service = data;
-> +       uint16_t grp_start, grp_end;
->
->         if (!service->active)
->                 return;
-> @@ -439,7 +440,15 @@ static void read_by_group_type(void *data, void *user_data)
->         if (bt_uuid_cmp(&search_data->uuid, &service->attributes[0]->uuid))
->                 return;
->
-> -       if (service->attributes[0]->handle < search_data->start_handle)
-> +       grp_start = service->attributes[0]->handle;
-> +       grp_end = service->attributes[service->num_handles - 1]->handle;
+Acked-by: Alexander Aring <alex.aring@gmail.com>
 
-I suggest
+on the complete serie.
 
-grp_end = grp_start + num_handles - 1
-
-because not all attributes must be in use. First attribute must be
-filled, because it's service decl.
-> +
-> +       if (grp_end < search_data->start_handle ||
-> +                               grp_start > search_data->end_handle)
-> +               return;
-> +
-> +       if (service->attributes[0]->handle < search_data->start_handle ||
-> +               service->attributes[0]->handle > search_data->end_handle)
->                 return;
->
->         /* Remember size of uuid */
-> --
-> 2.1.0.rc2.206.gedb03e5
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-
-BR
-Marcin
+- Alex
