@@ -1,45 +1,45 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1414411726.2705.204.camel@jrissane-mobl.ger.corp.intel.com>
-Subject: Re: [PATCH v5 bluetooth-next 0/4] 6lowpan: Move skb delivery out of
- IPHC
-From: Jukka Rissanen <jukka.rissanen@linux.intel.com>
-To: Alexander Aring <alex.aring@gmail.com>
-Cc: Martin Townsend <mtownsend1973@gmail.com>,
-	linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org,
-	marcel@holtmann.org, Martin Townsend <martin.townsend@xsilon.com>
-Date: Mon, 27 Oct 2014 14:08:46 +0200
-In-Reply-To: <20141027052237.GA21400@omega>
-References: <1414075256-9448-1-git-send-email-martin.townsend@xsilon.com>
-	 <20141027052237.GA21400@omega>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+MIME-Version: 1.0
+In-Reply-To: <1414074741-20286-1-git-send-email-aurelien.zanelli@parrot.com>
+References: <1414074741-20286-1-git-send-email-aurelien.zanelli@parrot.com>
+Date: Mon, 27 Oct 2014 12:41:11 +0200
+Message-ID: <CABBYNZJP5xUn=_5h-3Ks8VmfhsXESf-dXt7MwO1wOZGN=K9dUA@mail.gmail.com>
+Subject: Re: [PATCH 0/2] sbc: fix frame length in DUAL_CHANNEL mode
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: =?UTF-8?Q?Aur=C3=A9lien_Zanelli?= <aurelien.zanelli@parrot.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On ma, 2014-10-27 at 06:22 +0100, Alexander Aring wrote:
-> On Thu, Oct 23, 2014 at 03:40:52PM +0100, Martin Townsend wrote:
-> > This series moves skb delivery out of IPHC and into the receive routines of
-> > both bluetooth and 802.15.4.  The reason is that we need to support more
-> > (de)compression schemes in the future.  It also means that calling 
-> > lowpan_process_data now only returns error codes or 0 for success so 
-> > this has been cleaned up.  The final patch then renames occurences of
-> > lowpan_process_data and process_data to something more meaningful.
-> > 
-> 
-> Acked-by: Alexander Aring <alex.aring@gmail.com>
-> 
-> on the complete serie.
-> 
-> - Alex
+Hi Aurélien,
+
+On Thu, Oct 23, 2014 at 5:32 PM, Aurélien Zanelli
+<aurelien.zanelli@parrot.com> wrote:
+> Hi everyone,
+> I was playing with sbc encoder in GStreamer, which use bluez sbc library to
+> encode and I found two issues related to DUAL_CHANNEL mode in it.
+>
+> First the frame length calculation for DUAL_CHANNEL mode was wrong. I found
+> the A2DP specification and it seems that for DUAL_CHANNEL mode, we should use
+> the same formula as MONO mode to calculate the frame length. The first patch
+> intend to fix this.
+>
+> The second patch try to fix an overflow which can occur when the frame length
+> is greater than 255.
+>
+> Aurélien Zanelli (2):
+>   sbc: fix frame length calculation for DUAL_CHANNEL mode
+>   sbc: use an uint16 to store frame length in internal frame structure
+>
+>  sbc/sbc.c |    4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+>
+> --
+> 1.7.10.4
+
+Applied, thanks.
 
 
-Tested this with Bluetooth 6lowpan and everything works just fine so ack
-also from me.
-
-Acked-by: Jukka Rissanen <jukka.rissanen@linux.intel.com>
-
-
-Cheers,
-Jukka
-
-
+-- 
+Luiz Augusto von Dentz
