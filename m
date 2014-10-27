@@ -1,60 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Mon, 27 Oct 2014 15:10:03 +0100
+From: Alexander Aring <alex.aring@gmail.com>
+To: Jukka Rissanen <jukka.rissanen@linux.intel.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH v2 2/3] Bluetooth: 6lowpan: Fix lockdep splats
+Message-ID: <20141027141000.GB24691@omega>
+References: <1414418683-1057-1-git-send-email-jukka.rissanen@linux.intel.com>
+ <1414418683-1057-3-git-send-email-jukka.rissanen@linux.intel.com>
 MIME-Version: 1.0
-In-Reply-To: <1414418485-20786-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1414418485-20786-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-Date: Mon, 27 Oct 2014 15:14:10 +0100
-Message-ID: <CABD6X-+fR5tjmATzaiTfSORaubN=C8hPTLK3BALzsQsUjT4pXA@mail.gmail.com>
-Subject: Re: [RFC] gatt: Fix wrong function exit
-From: Marcin Kraglak <marcin.kraglak@tieto.com>
-To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org development"
-	<linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=utf-8
+In-Reply-To: <1414418683-1057-3-git-send-email-jukka.rissanen@linux.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+Hi Jukka,
 
-On 27 October 2014 15:01, Andrei Emeltchenko
-<Andrei.Emeltchenko.news@gmail.com> wrote:
-> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
->
-> ---
->  src/shared/gatt-helpers.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/src/shared/gatt-helpers.c b/src/shared/gatt-helpers.c
-> index d751d5a..4f53de3 100644
-> --- a/src/shared/gatt-helpers.c
-> +++ b/src/shared/gatt-helpers.c
-> @@ -1029,7 +1029,7 @@ static void discover_included_cb(uint8_t opcode, const void *pdu,
->                 data = new_read_included(cur_result);
->                 if (!data) {
->                         success = false;
-> -                       goto done;
-> +                       goto failed;
->                 }
->
->                 read_included(data);
-> --
-> 1.9.1
-In fact exit here is wrong and should be goto failed.
-Anyway, I found that we call goto failed more times in this function
-than goto done, so maybe it is better to change labels like this:
-failed:
-    success = false;
+On Mon, Oct 27, 2014 at 04:04:42PM +0200, Jukka Rissanen wrote:
+> When a device ndo_start_xmit() calls again dev_queue_xmit(),
+> lockdep can complain because dev_queue_xmit() is re-entered and the
+> spinlocks protecting tx queues share a common lockdep class.
+> 
+> Same issue was fixed for ieee802162 in commit "20e7c4e80dcd"
+> 
 
-done:
-    if (op->callback)
-        op->callback(success, att_ecode, final_result, op->user_data);
+s/ieee802162/ieee802154/
 
-and set success = true before goto done;
 
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+I know it's hard. I also do some mistake on these IEEE number word
+salads.
 
-BR
-Marcin
+- Alex
