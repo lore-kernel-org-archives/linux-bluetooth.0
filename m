@@ -1,127 +1,73 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <Pine.LNX.4.44L0.1410161007340.1316-100000@iolanthe.rowland.org>
-References: <CAG0bkv+bu23Fm_thq7A5AOrCEXaaWmcKNaX-193GqFh=W0S8xA@mail.gmail.com>
-	<Pine.LNX.4.44L0.1410161007340.1316-100000@iolanthe.rowland.org>
-Date: Mon, 27 Oct 2014 14:49:06 +0530
-Message-ID: <CAG0bkvKd7w1acwQfBPknKmTJN0Xhj0PmPUw_kanBkMRcTsGXmg@mail.gmail.com>
-Subject: Re: btusb_intr_complete returns -EPIPE
-From: Naveen Kumar Parna <pnaveenkos@gmail.com>
-To: Alan Stern <stern@rowland.harvard.edu>
-Cc: Oliver Neukum <oneukum@suse.de>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	linux-usb@vger.kernel.org, acho@suse.com
+In-Reply-To: <1414357967-9371-7-git-send-email-armansito@chromium.org>
+References: <1414357967-9371-1-git-send-email-armansito@chromium.org>
+	<1414357967-9371-7-git-send-email-armansito@chromium.org>
+Date: Mon, 27 Oct 2014 07:54:43 +0100
+Message-ID: <CABD6X-+zxqP8eEeBxrcP9bGW6f9mmbAp=GCJch8OhCEoyzg6Bg@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 6/7] shared/gatt-db: Fix range handling in read by
+ grp type.
+From: Marcin Kraglak <marcin.kraglak@tieto.com>
+To: Arman Uguray <armansito@chromium.org>
+Cc: "linux-bluetooth@vger.kernel.org development"
+	<linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Thu, Oct 16, 2014 at 7:39 PM, Alan Stern <stern@rowland.harvard.edu> wrote:
-> On Thu, 16 Oct 2014, Naveen Kumar Parna wrote:
+Hi Arman,
+
+On 26 October 2014 22:12, Arman Uguray <armansito@chromium.org> wrote:
+> This patch fixes bug in gatt_db_read_by_grp_type in which the range end handle
+> was being ignored. This caused incorrect results to be sent for a database
+> where services exists beyond the end handle provided in the request.
+> ---
+>  src/shared/gatt-db.c | 11 ++++++++++-
+>  1 file changed, 10 insertions(+), 1 deletion(-)
 >
->> > Indeed. However, it is possible to use an additional in between your
->> > devices and the internal hub.
->> >
->> >         Regards
->> >                 Oliver
->> >
->> >
->>
->>
->> Tested with this configuration(external hubs Dev 3, Dev 4, Dev 17, Dev
->> 10) and got the same result.
->>
->> /:  Bus 02.Port 1: Dev 1, Class=root_hub, Driver=ehci-pci/2p, 480M
->>
->> /:  Bus 01.Port 1: Dev 1, Class=root_hub, Driver=ehci-pci/2p, 480M
->>
->>     |__ Port 1: Dev 2, If 0, Class=hub, Driver=hub/6p, 480M
->>
->>         |__ Port 5: Dev 3, If 0, Class=hub, Driver=hub/7p, 12M
->>
->>             |__ Port 1: Dev 4, If 0, Class=hub, Driver=hub/7p, 12M
+> diff --git a/src/shared/gatt-db.c b/src/shared/gatt-db.c
+> index b3f95d2..4e74030 100644
+> --- a/src/shared/gatt-db.c
+> +++ b/src/shared/gatt-db.c
+> @@ -428,6 +428,7 @@ static void read_by_group_type(void *data, void *user_data)
+>  {
+>         struct read_by_group_type_data *search_data = user_data;
+>         struct gatt_db_service *service = data;
+> +       uint16_t grp_start, grp_end;
 >
-> This is not what Oliver meant.  You have to use a USB-2 hub.  And
-> having one of them is enough; you don't need two.
+>         if (!service->active)
+>                 return;
+> @@ -439,7 +440,15 @@ static void read_by_group_type(void *data, void *user_data)
+>         if (bt_uuid_cmp(&search_data->uuid, &service->attributes[0]->uuid))
+>                 return;
 >
-> Alan Stern
+> -       if (service->attributes[0]->handle < search_data->start_handle)
+> +       grp_start = service->attributes[0]->handle;
+> +       grp_end = service->attributes[service->num_handles - 1]->handle;
+
+I suggest
+
+grp_end = grp_start + num_handles - 1
+
+because not all attributes must be in use. First attribute must be
+filled, because it's service decl.
+> +
+> +       if (grp_end < search_data->start_handle ||
+> +                               grp_start > search_data->end_handle)
+> +               return;
+> +
+> +       if (service->attributes[0]->handle < search_data->start_handle ||
+> +               service->attributes[0]->handle > search_data->end_handle)
+>                 return;
 >
+>         /* Remember size of uuid */
+> --
+> 2.1.0.rc2.206.gedb03e5
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
-
-As suggested, I connected USB-2 hub(Dev 87) in between my devices and
-the internal hub. In this scenario also observed the STALL packets.
-
-I am interested in understanding the objective of this test, can you
-please help me?
-
-
-[lowerlayers@banunxcas29 ~]$ lsusb -t
-
-1-1.5.1:1.2: No such file or directory
-
-1-1.5.3:1.2: No such file or directory
-
-1-1.5.4:1.2: No such file or directory
-
-/:  Bus 02.Port 1: Dev 1, Class=root_hub, Driver=ehci-pci/2p, 480M
-
-/:  Bus 01.Port 1: Dev 1, Class=root_hub, Driver=ehci-pci/2p, 480M
-
-    |__ Port 1: Dev 2, If 0, Class=hub, Driver=hub/6p, 480M
-
-        |__ Port 5: Dev 87, If 0, Class=hub, Driver=hub/4p, 480M
-
-            |__ Port 1: Dev 88, If 0, Class='bInterfaceClass 0xe0 not
-yet handled', Driver=btusb, 12M
-
-            |__ Port 1: Dev 88, If 1, Class='bInterfaceClass 0xe0 not
-yet handled', Driver=btusb, 12M
-
-            |__ Port 1: Dev 88, If 2, Class=app., Driver=, 12M
-
-            |__ Port 3: Dev 90, If 0, Class='bInterfaceClass 0xe0 not
-yet handled', Driver=btusb, 12M
-
-            |__ Port 3: Dev 90, If 1, Class='bInterfaceClass 0xe0 not
-yet handled', Driver=btusb, 12M
-
-            |__ Port 3: Dev 90, If 2, Class=app., Driver=, 12M
-
-            |__ Port 4: Dev 89, If 0, Class='bInterfaceClass 0xe0 not
-yet handled', Driver=btusb, 12M
-
-            |__ Port 4: Dev 89, If 1, Class='bInterfaceClass 0xe0 not
-yet handled', Driver=btusb, 12M
-
-            |__ Port 4: Dev 89, If 2, Class=app., Driver=, 12M
-
-
-
-[root@banunxcas29 ~]# cat /sys/kernel/debug/usb/usbmon/1u
-
-ffff8800b2036540 2419900733 C Ii:1:090:1 -32:1 0
-
-ffff8800b2036540 2419900753 S Ii:1:090:1 -115:1 16 <
-
-ffff8800b2036540 963424773 C Ii:1:090:1 -32:1 0
-
-ffff8800b2036540 963424792 S Ii:1:090:1 -115:1 16 <
-
-ffff8800b2036540 963448864 C Ii:1:090:1 -32:1 0
-
-ffff8800b2036540 963448880 S Ii:1:090:1 -115:1 16 <
-
-
-/var/log/kernel
-
-Oct 27 13:21:15 banunxcas29 kernel: [1017571.251514] hci2 urb
-ffff8800b2036540 status -32 count 0
-
-Oct 27 14:05:15 banunxcas29 kernel: [1020211.003086] hci2 urb
-ffff8800b2036540 status -32 count 0
-
-Oct 27 14:05:15 banunxcas29 kernel: [1020211.027178] hci2 urb
-ffff8800b2036540 status -32 count 0
-
-
-Thanks,
-Naveen
+BR
+Marcin
