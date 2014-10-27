@@ -1,56 +1,45 @@
 Return-Path: <cyrus@holtmann.org>
 From: Jukka Rissanen <jukka.rissanen@linux.intel.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 2/3] Bluetooth: 6lowpan: Fix lockdep splats
-Date: Mon, 27 Oct 2014 16:04:42 +0200
-Message-Id: <1414418683-1057-3-git-send-email-jukka.rissanen@linux.intel.com>
-In-Reply-To: <1414418683-1057-1-git-send-email-jukka.rissanen@linux.intel.com>
-References: <1414418683-1057-1-git-send-email-jukka.rissanen@linux.intel.com>
+Subject: [PATCH v2 0/3] Avoiding lockdep warnings in 6lowpan
+Date: Mon, 27 Oct 2014 16:04:40 +0200
+Message-Id: <1414418683-1057-1-git-send-email-jukka.rissanen@linux.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-When a device ndo_start_xmit() calls again dev_queue_xmit(),
-lockdep can complain because dev_queue_xmit() is re-entered and the
-spinlocks protecting tx queues share a common lockdep class.
+Hi,
 
-Same issue was fixed for ieee802162 in commit "20e7c4e80dcd"
+v2:
+- rebased on top of latest upstream
+- fixed indentation error in patch 1
 
-Signed-off-by: Jukka Rissanen <jukka.rissanen@linux.intel.com>
----
- net/bluetooth/6lowpan.c | 19 +++++++++++++++++++
- 1 file changed, 19 insertions(+)
 
-diff --git a/net/bluetooth/6lowpan.c b/net/bluetooth/6lowpan.c
-index a681247..7254bdd 100644
---- a/net/bluetooth/6lowpan.c
-+++ b/net/bluetooth/6lowpan.c
-@@ -662,7 +662,26 @@ static netdev_tx_t bt_xmit(struct sk_buff *skb, struct net_device *netdev)
- 	return err < 0 ? NET_XMIT_DROP : err;
- }
- 
-+static struct lock_class_key bt_tx_busylock;
-+static struct lock_class_key bt_netdev_xmit_lock_key;
-+
-+static void bt_set_lockdep_class_one(struct net_device *dev,
-+				     struct netdev_queue *txq,
-+				     void *_unused)
-+{
-+	lockdep_set_class(&txq->_xmit_lock, &bt_netdev_xmit_lock_key);
-+}
-+
-+static int bt_dev_init(struct net_device *dev)
-+{
-+	netdev_for_each_tx_queue(dev, bt_set_lockdep_class_one, NULL);
-+	dev->qdisc_tx_busylock = &bt_tx_busylock;
-+
-+	return 0;
-+}
-+
- static const struct net_device_ops netdev_ops = {
-+	.ndo_init		= bt_dev_init,
- 	.ndo_start_xmit		= bt_xmit,
- };
- 
+v1:
+patch 1 changes all rwlocks to RCU as suggested by Peter Hurley.
+This should help the performance.
+
+The patch 2 is ported from ieee802154 as suggested by Alex Aring.
+This will help avoid lockdep warnings in certain transmit scenarios.
+
+The patch 3 changes normal spin locks to spin_lock_bh() variant when
+queueing outgoing packets in hci_queue_acl(). This is needed as packets
+coming from 6lowpan link are sent from softirq. Thanks again to
+Peter Hurley pointing this out.
+
+
+Cheers,
+Jukka
+
+
+Jukka Rissanen (3):
+  Bluetooth: 6lowpan: Converting rwlocks to use RCU
+  Bluetooth: 6lowpan: Fix lockdep splats
+  Bluetooth: Wrong style spin lock used
+
+ net/bluetooth/6lowpan.c  | 241 ++++++++++++++++++++++++++++-------------------
+ net/bluetooth/hci_core.c |   4 +-
+ 2 files changed, 148 insertions(+), 97 deletions(-)
+
 -- 
 1.8.3.1
 
