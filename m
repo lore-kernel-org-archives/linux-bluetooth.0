@@ -1,45 +1,94 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1414074741-20286-1-git-send-email-aurelien.zanelli@parrot.com>
-References: <1414074741-20286-1-git-send-email-aurelien.zanelli@parrot.com>
-Date: Mon, 27 Oct 2014 12:41:11 +0200
-Message-ID: <CABBYNZJP5xUn=_5h-3Ks8VmfhsXESf-dXt7MwO1wOZGN=K9dUA@mail.gmail.com>
-Subject: Re: [PATCH 0/2] sbc: fix frame length in DUAL_CHANNEL mode
+In-Reply-To: <1414182983-23959-5-git-send-email-jamuraa@chromium.org>
+References: <1414182983-23959-1-git-send-email-jamuraa@chromium.org>
+	<1414182983-23959-5-git-send-email-jamuraa@chromium.org>
+Date: Mon, 27 Oct 2014 12:35:09 +0200
+Message-ID: <CABBYNZJGLgc01kYuujQUtigje967L=4WfwRQ=LOLdn-MK83nMQ@mail.gmail.com>
+Subject: Re: [PATCH BlueZ v2 4/7] attrib: remove g_attrib_is_encrypted
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: =?UTF-8?Q?Aur=C3=A9lien_Zanelli?= <aurelien.zanelli@parrot.com>
+To: Michael Janssen <jamuraa@chromium.org>
 Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Aurélien,
+Hi Michael,
 
-On Thu, Oct 23, 2014 at 5:32 PM, Aurélien Zanelli
-<aurelien.zanelli@parrot.com> wrote:
-> Hi everyone,
-> I was playing with sbc encoder in GStreamer, which use bluez sbc library to
-> encode and I found two issues related to DUAL_CHANNEL mode in it.
+On Fri, Oct 24, 2014 at 11:36 PM, Michael Janssen <jamuraa@chromium.org> wrote:
+> This function is only used in one place and encryption is the
+> responsibility of the channel, not the attribute.
+> ---
+>  attrib/gattrib.c    | 12 ------------
+>  attrib/gattrib.h    |  2 --
+>  src/attrib-server.c |  9 +++++++--
+>  3 files changed, 7 insertions(+), 16 deletions(-)
 >
-> First the frame length calculation for DUAL_CHANNEL mode was wrong. I found
-> the A2DP specification and it seems that for DUAL_CHANNEL mode, we should use
-> the same formula as MONO mode to calculate the frame length. The first patch
-> intend to fix this.
+> diff --git a/attrib/gattrib.c b/attrib/gattrib.c
+> index a6511a2..a65d1ca 100644
+> --- a/attrib/gattrib.c
+> +++ b/attrib/gattrib.c
+> @@ -690,18 +690,6 @@ static int event_cmp_by_id(gconstpointer a, gconstpointer b)
+>         return evt->id - id;
+>  }
 >
-> The second patch try to fix an overflow which can occur when the frame length
-> is greater than 255.
+> -gboolean g_attrib_is_encrypted(GAttrib *attrib)
+> -{
+> -       BtIOSecLevel sec_level;
+> -
+> -       if (!bt_io_get(attrib->io, NULL,
+> -                       BT_IO_OPT_SEC_LEVEL, &sec_level,
+> -                       BT_IO_OPT_INVALID))
+> -               return FALSE;
+> -
+> -       return sec_level > BT_IO_SEC_LOW;
+> -}
+> -
+>  gboolean g_attrib_unregister(GAttrib *attrib, guint id)
+>  {
+>         struct event *evt;
+> diff --git a/attrib/gattrib.h b/attrib/gattrib.h
+> index 99b8b37..1557b99 100644
+> --- a/attrib/gattrib.h
+> +++ b/attrib/gattrib.h
+> @@ -62,8 +62,6 @@ guint g_attrib_register(GAttrib *attrib, guint8 opcode, guint16 handle,
+>                                 GAttribNotifyFunc func, gpointer user_data,
+>                                 GDestroyNotify notify);
 >
-> Aurélien Zanelli (2):
->   sbc: fix frame length calculation for DUAL_CHANNEL mode
->   sbc: use an uint16 to store frame length in internal frame structure
+> -gboolean g_attrib_is_encrypted(GAttrib *attrib);
+> -
+>  uint8_t *g_attrib_get_buffer(GAttrib *attrib, size_t *len);
+>  gboolean g_attrib_set_mtu(GAttrib *attrib, int mtu);
 >
->  sbc/sbc.c |    4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
->
+> diff --git a/src/attrib-server.c b/src/attrib-server.c
+> index e65fff2..1ccfc65 100644
+> --- a/src/attrib-server.c
+> +++ b/src/attrib-server.c
+> @@ -375,12 +375,17 @@ static struct attribute *attrib_db_add_new(struct gatt_server *server,
+>  static uint8_t att_check_reqs(struct gatt_channel *channel, uint8_t opcode,
+>                                                                 int reqs)
+>  {
+> +       BtIOSecLevel sec_level;
+> +       GIOChannel *io = g_attrib_get_channel(channel->attrib);
+> +
+>         /* FIXME: currently, it is assumed an encrypted link is enough for
+>          * authentication. This will allow to enable the SMP negotiation once
+>          * it is on upstream kernel. High security level should be mapped
+>          * to authentication and medium to encryption permission. */
+> -       if (!channel->encrypted)
+> -               channel->encrypted = g_attrib_is_encrypted(channel->attrib);
+> +       if (!channel->encrypted &&
+> +                           bt_io_get(io, NULL, BT_IO_OPT_SEC_LEVEL, &sec_level,
+> +                                                            BT_IO_OPT_INVALID))
+> +               channel->encrypted = sec_level > BT_IO_SEC_LOW;
+>         if (reqs == ATT_AUTHENTICATION && !channel->encrypted)
+>                 return ATT_ECODE_AUTHENTICATION;
+>         else if (reqs == ATT_AUTHORIZATION)
 > --
-> 1.7.10.4
+> 2.1.0.rc2.206.gedb03e5
 
-Applied, thanks.
-
+I would prefer that you make g_attrib_is_encrypted static instead of
+merging it with att_check_reqs.
 
 -- 
 Luiz Augusto von Dentz
