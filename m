@@ -1,31 +1,45 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [RFC] gatt: Fix wrong function exit
-Date: Mon, 27 Oct 2014 16:01:25 +0200
-Message-Id: <1414418485-20786-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Message-ID: <1414411726.2705.204.camel@jrissane-mobl.ger.corp.intel.com>
+Subject: Re: [PATCH v5 bluetooth-next 0/4] 6lowpan: Move skb delivery out of
+ IPHC
+From: Jukka Rissanen <jukka.rissanen@linux.intel.com>
+To: Alexander Aring <alex.aring@gmail.com>
+Cc: Martin Townsend <mtownsend1973@gmail.com>,
+	linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org,
+	marcel@holtmann.org, Martin Townsend <martin.townsend@xsilon.com>
+Date: Mon, 27 Oct 2014 14:08:46 +0200
+In-Reply-To: <20141027052237.GA21400@omega>
+References: <1414075256-9448-1-git-send-email-martin.townsend@xsilon.com>
+	 <20141027052237.GA21400@omega>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+On ma, 2014-10-27 at 06:22 +0100, Alexander Aring wrote:
+> On Thu, Oct 23, 2014 at 03:40:52PM +0100, Martin Townsend wrote:
+> > This series moves skb delivery out of IPHC and into the receive routines of
+> > both bluetooth and 802.15.4.  The reason is that we need to support more
+> > (de)compression schemes in the future.  It also means that calling 
+> > lowpan_process_data now only returns error codes or 0 for success so 
+> > this has been cleaned up.  The final patch then renames occurences of
+> > lowpan_process_data and process_data to something more meaningful.
+> > 
+> 
+> Acked-by: Alexander Aring <alex.aring@gmail.com>
+> 
+> on the complete serie.
+> 
+> - Alex
 
----
- src/shared/gatt-helpers.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/src/shared/gatt-helpers.c b/src/shared/gatt-helpers.c
-index d751d5a..4f53de3 100644
---- a/src/shared/gatt-helpers.c
-+++ b/src/shared/gatt-helpers.c
-@@ -1029,7 +1029,7 @@ static void discover_included_cb(uint8_t opcode, const void *pdu,
- 		data = new_read_included(cur_result);
- 		if (!data) {
- 			success = false;
--			goto done;
-+			goto failed;
- 		}
- 
- 		read_included(data);
--- 
-1.9.1
+Tested this with Bluetooth 6lowpan and everything works just fine so ack
+also from me.
+
+Acked-by: Jukka Rissanen <jukka.rissanen@linux.intel.com>
+
+
+Cheers,
+Jukka
+
 
