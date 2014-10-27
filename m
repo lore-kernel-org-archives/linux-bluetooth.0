@@ -2,81 +2,50 @@ Return-Path: <cyrus@holtmann.org>
 From: Michael Janssen <jamuraa@chromium.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Michael Janssen <jamuraa@chromium.org>
-Subject: [PATCH BlueZ v3 04/10] attrib: remove g_attrib_is_encrypted
-Date: Mon, 27 Oct 2014 15:13:55 -0700
-Message-Id: <1414448041-27866-5-git-send-email-jamuraa@chromium.org>
+Subject: [PATCH BlueZ v3 01/10] Remove unused g_attrib_set_debug function
+Date: Mon, 27 Oct 2014 15:13:52 -0700
+Message-Id: <1414448041-27866-2-git-send-email-jamuraa@chromium.org>
 In-Reply-To: <1414448041-27866-1-git-send-email-jamuraa@chromium.org>
 References: <1414448041-27866-1-git-send-email-jamuraa@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This function is only used in one place and encryption is the
-responsibility of the channel, not the attribute.
+This function is not used, and also not implemented.
 ---
- attrib/gattrib.c    | 12 ------------
- attrib/gattrib.h    |  2 --
- src/attrib-server.c | 12 ++++++++++++
- 3 files changed, 12 insertions(+), 14 deletions(-)
+ attrib/gattrib.c | 5 -----
+ attrib/gattrib.h | 3 ---
+ 2 files changed, 8 deletions(-)
 
 diff --git a/attrib/gattrib.c b/attrib/gattrib.c
-index a6511a2..a65d1ca 100644
+index 912dffb..71d1cef 100644
 --- a/attrib/gattrib.c
 +++ b/attrib/gattrib.c
-@@ -690,18 +690,6 @@ static int event_cmp_by_id(gconstpointer a, gconstpointer b)
- 	return evt->id - id;
+@@ -651,11 +651,6 @@ gboolean g_attrib_cancel_all(GAttrib *attrib)
+ 	return ret;
  }
  
--gboolean g_attrib_is_encrypted(GAttrib *attrib)
+-gboolean g_attrib_set_debug(GAttrib *attrib,
+-		GAttribDebugFunc func, gpointer user_data)
 -{
--	BtIOSecLevel sec_level;
--
--	if (!bt_io_get(attrib->io, NULL,
--			BT_IO_OPT_SEC_LEVEL, &sec_level,
--			BT_IO_OPT_INVALID))
--		return FALSE;
--
--	return sec_level > BT_IO_SEC_LOW;
+-	return TRUE;
 -}
--
- gboolean g_attrib_unregister(GAttrib *attrib, guint id)
+ 
+ uint8_t *g_attrib_get_buffer(GAttrib *attrib, size_t *len)
  {
- 	struct event *evt;
 diff --git a/attrib/gattrib.h b/attrib/gattrib.h
-index 99b8b37..1557b99 100644
+index 3fe92c7..18df2ad 100644
 --- a/attrib/gattrib.h
 +++ b/attrib/gattrib.h
-@@ -62,8 +62,6 @@ guint g_attrib_register(GAttrib *attrib, guint8 opcode, guint16 handle,
+@@ -58,9 +58,6 @@ guint g_attrib_send(GAttrib *attrib, guint id, const guint8 *pdu, guint16 len,
+ gboolean g_attrib_cancel(GAttrib *attrib, guint id);
+ gboolean g_attrib_cancel_all(GAttrib *attrib);
+ 
+-gboolean g_attrib_set_debug(GAttrib *attrib,
+-		GAttribDebugFunc func, gpointer user_data);
+-
+ guint g_attrib_register(GAttrib *attrib, guint8 opcode, guint16 handle,
  				GAttribNotifyFunc func, gpointer user_data,
  				GDestroyNotify notify);
- 
--gboolean g_attrib_is_encrypted(GAttrib *attrib);
--
- uint8_t *g_attrib_get_buffer(GAttrib *attrib, size_t *len);
- gboolean g_attrib_set_mtu(GAttrib *attrib, int mtu);
- 
-diff --git a/src/attrib-server.c b/src/attrib-server.c
-index e65fff2..6571577 100644
---- a/src/attrib-server.c
-+++ b/src/attrib-server.c
-@@ -372,6 +372,18 @@ static struct attribute *attrib_db_add_new(struct gatt_server *server,
- 	return a;
- }
- 
-+static bool g_attrib_is_encrypted(GAttrib *attrib)
-+{
-+	BtIOSecLevel sec_level;
-+	GIOChannel *io = g_attrib_get_channel(attrib);
-+
-+	if (!bt_io_get(io, NULL, BT_IO_OPT_SEC_LEVEL, &sec_level,
-+							     BT_IO_OPT_INVALID))
-+		return FALSE;
-+
-+	return sec_level > BT_IO_SEC_LOW;
-+}
-+
- static uint8_t att_check_reqs(struct gatt_channel *channel, uint8_t opcode,
- 								int reqs)
- {
 -- 
 2.1.0.rc2.206.gedb03e5
 
