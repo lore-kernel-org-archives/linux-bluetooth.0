@@ -2,103 +2,62 @@ Return-Path: <cyrus@holtmann.org>
 From: Michael Janssen <jamuraa@chromium.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Michael Janssen <jamuraa@chromium.org>
-Subject: [PATCH BlueZ v3 08/10] unit/gattrib: Check expected PDUs were delivered
-Date: Mon, 27 Oct 2014 15:13:59 -0700
-Message-Id: <1414448041-27866-9-git-send-email-jamuraa@chromium.org>
+Subject: [PATCH BlueZ v3 02/10] attrib: Remove MTU-probing code
+Date: Mon, 27 Oct 2014 15:13:53 -0700
+Message-Id: <1414448041-27866-3-git-send-email-jamuraa@chromium.org>
 In-Reply-To: <1414448041-27866-1-git-send-email-jamuraa@chromium.org>
 References: <1414448041-27866-1-git-send-email-jamuraa@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Check that the PDUs that we expect to receive when
-registering for events have been delivered.
+Probing for the MTU using bt_io is problematic for
+testing because you cannot impersonate AF_BLUETOOTH sockets
+with a socketpair.
 ---
- unit/test-gattrib.c | 35 ++++++++++++++++++++++++++++-------
- 1 file changed, 28 insertions(+), 7 deletions(-)
+ attrib/gattrib.c | 13 +------------
+ 1 file changed, 1 insertion(+), 12 deletions(-)
 
-diff --git a/unit/test-gattrib.c b/unit/test-gattrib.c
-index 61db4a1..f93ed35 100644
---- a/unit/test-gattrib.c
-+++ b/unit/test-gattrib.c
-@@ -376,7 +376,7 @@ static void notify_canary_expect(const guint8 *pdu, guint16 len, gpointer data)
- static void test_register(struct context *cxt, gconstpointer user_data)
+diff --git a/attrib/gattrib.c b/attrib/gattrib.c
+index 71d1cef..fa41ade 100644
+--- a/attrib/gattrib.c
++++ b/attrib/gattrib.c
+@@ -476,27 +476,17 @@ done:
+ GAttrib *g_attrib_new(GIOChannel *io)
  {
- 	guint reg_id;
--	gboolean success;
-+	gboolean canceled;
- 	struct test_pdu pdus[] = {
- 		/* Unmatched by any (GATTRIB_ALL_EVENTS) */
- 		PDU_MTU_RESP,
-@@ -406,6 +406,7 @@ static void test_register(struct context *cxt, gconstpointer user_data)
- 		{ },
- 	};
- 	struct test_pdu followed_ind_pdus[] = { PDU_IND_DATA, { } };
-+	struct test_pdu *current_pdu;
+ 	struct _GAttrib *attrib;
+-	uint16_t imtu;
+ 	uint16_t att_mtu;
+ 	uint16_t cid;
+-	GError *gerr = NULL;
  
- 	/*
- 	 * Without registering anything, should be able to ignore everything but
-@@ -418,7 +419,12 @@ static void test_register(struct context *cxt, gconstpointer user_data)
+ 	g_io_channel_set_encoding(io, NULL, NULL);
+ 	g_io_channel_set_buffered(io, FALSE);
  
- 	send_test_pdus(cxt, pdus);
+-	bt_io_get(io, &gerr, BT_IO_OPT_IMTU, &imtu,
+-				BT_IO_OPT_CID, &cid, BT_IO_OPT_INVALID);
+-	if (gerr) {
+-		error("%s", gerr->message);
+-		g_error_free(gerr);
+-		return NULL;
+-	}
+-
+ 	attrib = g_try_new0(struct _GAttrib, 1);
+ 	if (attrib == NULL)
+ 		return NULL;
  
--	g_attrib_unregister(cxt->att, reg_id);
-+	canceled = g_attrib_unregister(cxt->att, reg_id);
-+
-+	g_assert(canceled);
-+
-+	for (current_pdu = pdus; current_pdu->valid; current_pdu++)
-+		g_assert(current_pdu->received);
+-	att_mtu = (cid == ATT_CID) ? ATT_DEFAULT_LE_MTU : imtu;
++	att_mtu = ATT_DEFAULT_LE_MTU;
  
- 	if (g_test_verbose())
- 		g_print("ALL_REQS, ALL_HANDLES\r\n");
-@@ -429,7 +435,12 @@ static void test_register(struct context *cxt, gconstpointer user_data)
- 
- 	send_test_pdus(cxt, pdus);
- 
--	g_attrib_unregister(cxt->att, reg_id);
-+	canceled = g_attrib_unregister(cxt->att, reg_id);
-+
-+	g_assert(canceled);
-+
-+	for (current_pdu = req_pdus; current_pdu->valid; current_pdu++)
-+		g_assert(current_pdu->received);
- 
- 	if (g_test_verbose())
- 		g_print("IND, ALL_HANDLES\r\n");
-@@ -440,7 +451,12 @@ static void test_register(struct context *cxt, gconstpointer user_data)
- 
- 	send_test_pdus(cxt, pdus);
- 
--	g_attrib_unregister(cxt->att, reg_id);
-+	canceled = g_attrib_unregister(cxt->att, reg_id);
-+
-+	g_assert(canceled);
-+
-+	for (current_pdu = all_ind_pdus; current_pdu->valid; current_pdu++)
-+		g_assert(current_pdu->received);
- 
- 	if (g_test_verbose())
- 		g_print("IND, 0x0014\r\n");
-@@ -451,11 +467,16 @@ static void test_register(struct context *cxt, gconstpointer user_data)
- 
- 	send_test_pdus(cxt, pdus);
- 
--	g_attrib_unregister(cxt->att, reg_id);
-+	canceled = g_attrib_unregister(cxt->att, reg_id);
-+
-+	g_assert(canceled);
- 
--	success = g_attrib_unregister(cxt->att, reg_id);
-+	for (current_pdu = followed_ind_pdus; current_pdu->valid; current_pdu++)
-+		g_assert(current_pdu->received);
- 
--	g_assert(!success);
-+	canceled = g_attrib_unregister(cxt->att, reg_id);
-+
-+	g_assert(!canceled);
+ 	attrib->buf = g_malloc0(att_mtu);
+ 	attrib->buflen = att_mtu;
+@@ -651,7 +641,6 @@ gboolean g_attrib_cancel_all(GAttrib *attrib)
+ 	return ret;
  }
  
- static void test_buffers(struct context *cxt, gconstpointer unused)
+-
+ uint8_t *g_attrib_get_buffer(GAttrib *attrib, size_t *len)
+ {
+ 	if (len == NULL)
 -- 
 2.1.0.rc2.206.gedb03e5
 
