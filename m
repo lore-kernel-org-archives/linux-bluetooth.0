@@ -1,146 +1,78 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <59573.86.105.94.79.1414530902.squirrel@boosthardware.com>
-In-Reply-To: <90788656-5735-477F-BDAD-005F7D35A241@holtmann.org>
-References: <58517.86.105.94.79.1414160561.squirrel@boosthardware.com>
-    <90788656-5735-477F-BDAD-005F7D35A241@holtmann.org>
-Date: Wed, 29 Oct 2014 08:15:02 +1100 (EST)
-Subject: Re: [bluetooth] btusb duplicate filtering
-From: "Patrick Shirkey" <pshirkey@boosthardware.com>
-To: "Marcel Holtmann" <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
-MIME-Version: 1.0
-Content-Type: text/plain;charset=iso-8859-1
+From: Marcin Kraglak <marcin.kraglak@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCHv2 7/7] unit/test-gatt: Add search characteristics test case
+Date: Tue, 28 Oct 2014 20:37:47 +0100
+Message-Id: <1414525067-15076-7-git-send-email-marcin.kraglak@tieto.com>
+In-Reply-To: <1414525067-15076-1-git-send-email-marcin.kraglak@tieto.com>
+References: <1414525067-15076-1-git-send-email-marcin.kraglak@tieto.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+---
+ unit/test-gatt.c | 36 ++++++++++++++++++++++++++++++++++++
+ 1 file changed, 36 insertions(+)
 
-On Wed, October 29, 2014 4:20 am, Marcel Holtmann wrote:
-> Hi Patrick,
->
->> I am seeing the following behaviour with an android device running the
->> 8723au chipset with bluez + backports + btusb.c (new branch).
->>
->> Step 1:
->>
->> 1: enable BT via settings UI
->> 2: open BLE scanner app
->> 3: app finds all BLE devices
->>
->> Step 2:
->>
->> 4: close BLE scanner app
->> 5: open BLE scanner app
->> 6: app cannot find any BLE device
->>
->>
->> - Szymon has suggested it is related to duplicate filtering and may be
->> handled at the driver or chipset firmware level.
->>
->> - I found this post which might provide some useful background info.
->>
->> http://stackoverflow.com/questions/19502853/android-4-3-ble-filtering-behaviour-of-startlescan
->>
->> - My question is can I do anything at the driver/kernel/bluez level so
->> that BLE devices always show up?
->
-> so we are always using the duplicate filtering of the controller. Not
-> using it will cause an overflow of advertising reports in a busy
-> environment.
->
-> The difference between certain manufactures is that some filter strictly
-> only on address, other filter on address + RSSI. Meaning that if the RSSI
-> changes you get another event. What I know is that Broadcom is in the
-> first camp and CSR/TI are in the second camp.
->
-> This means that if you care about devices found on a constant basis and
-> depend on the RSSI changing, you need to stop and restart the LE scan for
-> at least Broadcom based controllers. I have no idea in what camp the
-> Realtek one falls since I yet have to get one of these.
->
+diff --git a/unit/test-gatt.c b/unit/test-gatt.c
+index 3ee9460..27471ea 100644
+--- a/unit/test-gatt.c
++++ b/unit/test-gatt.c
+@@ -270,6 +270,17 @@ static void primary_cb(bool success, uint8_t att_ecode,
+ 	context_quit(context);
+ }
+ 
++static void characteristic_cb(bool success, uint8_t att_ecode,
++						struct bt_gatt_result *result,
++						void *user_data)
++{
++	struct context *context = user_data;
++
++	g_assert(success);
++
++	context_quit(context);
++}
++
+ static void included_cb(bool success, uint8_t att_ecode,
+ 						struct bt_gatt_result *result,
+ 						void *user_data)
+@@ -332,6 +343,17 @@ static void test_search_included(gconstpointer data)
+ 	execute_context(context);
+ }
+ 
++static void test_search_chars(gconstpointer data)
++{
++	struct context *context = create_context(512, data);
++
++	g_assert(bt_gatt_discover_characteristics(context->att, 0x0010, 0x0020,
++						characteristic_cb, context,
++						NULL));
++
++	execute_context(context);
++}
++
+ int main(int argc, char *argv[])
+ {
+ 	g_test_init(&argc, &argv, NULL);
+@@ -413,5 +435,19 @@ int main(int argc, char *argv[])
+ 			raw_pdu(0x08, 0x06, 0x00, 0xff, 0xff, 0x02, 0x28),
+ 			raw_pdu(0x01, 0x08, 0x06, 0x00, 0x0a));
+ 
++	define_test("/TP/GAD/CL/BV-04-C", test_search_chars, ATT, NULL,
++			raw_pdu(0x02, 0x00, 0x02),
++			raw_pdu(0x03, 0x00, 0x02),
++			raw_pdu(0x08, 0x10, 0x00, 0x20, 0x00, 0x03, 0x28),
++			raw_pdu(0x09, 0x07, 0x11, 0x00, 02, 0x12, 0x00, 0x25,
++					0x2a),
++			raw_pdu(0x08, 0x12, 0x00, 0x20, 0x00, 0x03, 0x28),
++			raw_pdu(0x09, 0x15, 0x13, 0x00, 0x02, 0x14, 0x00, 0x85,
++					0x00, 0xef, 0xcd, 0xab, 0x89, 0x67,
++					0x45, 0x23, 0x01, 0x00, 0x00, 0x00,
++					0x00, 0x00, 0x00),
++			raw_pdu(0x08, 0x14, 0x00, 0x20, 0x00, 0x03, 0x28),
++			raw_pdu(0x01, 0x08, 0x12, 0x00, 0x0a));
++
+ 	return g_test_run();
+ }
+-- 
+1.9.3
 
-I have an app here that is designed to start a new scan via the android
-API every time it checks for available BLE devices. The app runs well on
-other devices with different chipsets. The results on the 8723au might be
-useful information. I can see BLE devices have been found in the settings
-UI but the test app is not getting anything useful from the Android layer.
-
-Example output:
-
-10-28 13:50:46.270 D/BluetoothAdapter(25700): startLeScan(): null
-10-28 13:50:46.270 D/BtGatt.GattService(14120): registerClient() -
-UUID=623b34f6-592b-4d61-9c7f-d6c124f470d1
-10-28 13:50:46.270 I/bluetoothd(14150): bluetoothd[14151]:
-external/bluetooth/bluez/android/gatt.c:handle_client_register()
-10-28 13:50:46.270 D/BtGatt.GattService(14120): onClientRegistered() -
-UUID=623b34f6-592b-4d61-9c7f-d6c124f470d1, clientIf=94
-10-28 13:50:46.270 D/BluetoothAdapter(25700): onClientRegistered() -
-status=0 clientIf=94
-10-28 13:50:46.280 D/BtGatt.GattService(14120): startScan() - queue=0
-10-28 13:50:46.280 D/BtGatt.GattService(14120): startScan() - adding
-client=94
-10-28 13:50:46.280 I/bluetoothd(14150): bluetoothd[14151]:
-external/bluetooth/bluez/android/gatt.c:handle_client_scan() new state 1
-10-28 13:50:46.280 I/bluetoothd(14150): bluetoothd[14151]:
-external/bluetooth/bluez/android/bluetooth.c:start_discovery() type=0x6
-10-28 13:50:46.280 I/bluetoothd(14150): bluetoothd[14151]:
-external/bluetooth/bluez/android/bluetooth.c:mgmt_discovering_event() type
-6 discovering 1
-10-28 13:50:46.280 I/bluetoothd(14150): bluetoothd[14151]:
-external/bluetooth/bluez/android/bluetooth.c:check_discovery_state() 6 0
-10-28 13:50:51.290 D/BluetoothAdapter(25700): stopLeScan()
-10-28 13:50:51.290 D/BtGatt.GattService(14120): stopScan() - queue=1
-10-28 13:50:51.290 D/BtGatt.GattService(14120): stopScan() - queue empty;
-stopping scan
-10-28 13:50:51.290 I/bluetoothd(14150): bluetoothd[14151]:
-external/bluetooth/bluez/android/gatt.c:handle_client_scan() new state 0
-10-28 13:50:51.290 I/bluetoothd(14150): bluetoothd[14151]:
-external/bluetooth/bluez/android/gatt.c:handle_client_scan() Stopping LE
-SCAN
-10-28 13:50:51.290 I/bluetoothd(14150): bluetoothd[14151]:
-external/bluetooth/bluez/android/bluetooth.c:stop_discovery() type=0x6
-10-28 13:50:51.300 I/bluetoothd(14150): bluetoothd[14151]:
-external/bluetooth/bluez/android/bluetooth.c:mgmt_discovering_event() type
-6 discovering 0
-10-28 13:50:51.300 I/bluetoothd(14150): bluetoothd[14151]:
-external/bluetooth/bluez/android/bluetooth.c:check_discovery_state() 0 6
-10-28 13:50:51.300 D/BtGatt.GattService(14120): unregisterClient() -
-clientIf=94
-10-28 13:50:51.300 I/bluetoothd(14150): bluetoothd[14151]:
-external/bluetooth/bluez/android/gatt.c:handle_client_unregister()
-10-28 13:50:51.310 D/BluetoothAdapter(25700): startLeScan(): null
-10-28 13:50:51.310 D/BtGatt.GattService(14120): registerClient() -
-UUID=40001646-6658-4840-bf66-c6ebc5c0c718
-10-28 13:50:51.310 I/bluetoothd(14150): bluetoothd[14151]:
-external/bluetooth/bluez/android/gatt.c:handle_client_register()
-10-28 13:50:51.320 D/BtGatt.GattService(14120): onClientRegistered() -
-UUID=40001646-6658-4840-bf66-c6ebc5c0c718, clientIf=95
-10-28 13:50:51.320 D/BluetoothAdapter(25700): onClientRegistered() -
-status=0 clientIf=95
-10-28 13:50:51.320 D/BtGatt.GattService(14120): startScan() - queue=0
-10-28 13:50:51.320 D/BtGatt.GattService(14120): startScan() - adding
-client=95
-10-28 13:50:51.320 I/bluetoothd(14150): bluetoothd[14151]:
-external/bluetooth/bluez/android/gatt.c:handle_client_scan() new state 1
-10-28 13:50:51.320 I/bluetoothd(14150): bluetoothd[14151]:
-external/bluetooth/bluez/android/bluetooth.c:start_discovery() type=0x6
-10-28 13:50:51.330 I/bluetoothd(14150): bluetoothd[14151]:
-external/bluetooth/bluez/android/bluetooth.c:mgmt_discovering_event() type
-6 discovering 1
-10-28 13:50:51.330 I/bluetoothd(14150): bluetoothd[14151]:
-external/bluetooth/bluez/android/bluetooth.c:check_discovery_state() 6 0
-
-etc...
-
-> On an independent thread we are talking about adding a quirk to our
-> internal discovery handling to automatically restart scan for the
-> controllers that do the strict filtering based on address only.
->
-
-I'll try to follow the thread but feel free to ping me directly if/when
-some code appears.
-
-
-
-
---
-Patrick Shirkey
-Boost Hardware Ltd
