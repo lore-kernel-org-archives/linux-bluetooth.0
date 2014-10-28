@@ -1,50 +1,76 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 28 Oct 2014 13:27:44 -0400 (EDT)
-From: Alan Stern <stern@rowland.harvard.edu>
-To: Naveen Kumar Parna <pnaveenkos@gmail.com>
-cc: Oliver Neukum <oneukum@suse.de>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	<linux-usb@vger.kernel.org>, <acho@suse.com>
-Subject: Re: btusb_intr_complete returns -EPIPE
-In-Reply-To: <CAG0bkvJv0VdeKXMOg-6+LVYJU1qD5bQboJ3MNGrUY9xPNMTALw@mail.gmail.com>
-Message-ID: <Pine.LNX.4.44L0.1410281324190.1213-100000@iolanthe.rowland.org>
-MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=UTF-8
-Sender: linux-usb-owner@vger.kernel.org
+Subject: Re: rtk_btusb issues
+Mime-Version: 1.0 (Mac OS X Mail 8.0 \(1990.1\))
+Content-Type: text/plain; charset=us-ascii
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <61125.86.105.94.79.1413985352.squirrel@boosthardware.com>
+Date: Tue, 28 Oct 2014 10:27:34 -0700
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <1D81E85A-37D6-483E-A4DB-EEC6A38A0FE6@holtmann.org>
+References: <59774.86.105.94.79.1413974113.squirrel@boosthardware.com> <7FC77530-F48C-436C-8954-195E9CD08E97@holtmann.org> <61125.86.105.94.79.1413985352.squirrel@boosthardware.com>
+To: Patrick Shirkey <pshirkey@boosthardware.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Tue, 28 Oct 2014, Naveen Kumar Parna wrote:
+Hi Patrik,
 
-> >> You should also run a similar test when you connect the device through
-> >> a USB-2 hub.  In fact, you should run two tests.  In one test, connect
-> >> the analyzer to the cable segment between the computer and the hub; in
-> >> the other test, connect the analyzer to the cable segment between the
-> >> hub and the device.
-> >>
-> >
+>>> I have an android device running the rtk_btusb driver. The original
+>>> driver
+>>> was a couple of years old and there was a problem with stability with
+>>> BLE.
+>>> In addition the localname was not found in the scan_response data.
+>>> 
+>>> I upgraded the bluetooth stack by manually backporting from a recent
+>>> kernel. That fixed the issue wit the scan_repsonse data but there were
+>>> still stability issues with BLE devices (although slightly improved
+>>> compared to the older bluetooth stack).
+>>> 
+>>> I have tried upgrading the driver to the latest version of the rtk_btusb
+>>> driver from the git repo and ported the hooks for bluedroid from the old
+>>> driver however I get issues with hci send command when loading the
+>>> driver.
+>>> 
+>>> http://pastebin.com/hXALmXBr
+>>> 
+>>> I traced the command but I am not sure where the send value is
+>>> generated.
+>>> I can see the function definition in the hci_dev struct but not the
+>>> location where the value is actually set.
+>>> 
+>>> I thought it might be an issue specific to bluedroid so I installed
+>>> bluez
+>>> but the issue is still there so it appears to be a bug in my version of
+>>> the driver or something wrong with the bluetooth kernel layer.
+>>> 
+>>> I went back to the older version of the driver running against  bluez
+>>> instead of bluedroid. That gets me further along but I still cannot
+>>> initialise the bluetooth system on the device.
+>>> 
+>>> http://pastebin.com/HcSZXiMu
+>>> 
+>>> Does anyone have any suggestions for how to go about resolving this
+>>> situation I have got myself into?
+>> 
+>> the rtk_btusb driver is not an upstream driver and that is the main
+>> problem. There has been recently an effort to get btusb support the
+>> Realtek devices, but then it went silent again.
+>> 
+>> What you need is having proper Realtek support in btusb and nothing else.
+>> Out of tree hacked up vendor drivers are not something any of us will
+>> likely have a look at and trying to fix.
+>> 
 > 
-> I connected the USB analyzer to the cable segment between the computer
-> and the external USB-2 hub(devices are attached to this external USB-2
-> hub). In this scenario , got the stall in usbmon trace, but not in
-> analyzer log. But USB analyzer log shows “Incomplete IN transaction”.
-> Please check the attached "Elisys_Usb_log.png".
-> 
-> 
-> 
-> Incomplete IN transaction           2              1
-> INCOMPLETE     HS           No data                884.626 273 217
+> My quest is to fix the stability issue not the rtk_btusb driver.  I
+> spotted the "new" branch in the git tree. I am testing that driver now.
 
-> Does it gives any clue?
+and it would be useful if these patches get upstream.
 
-Not really.  I think your analyzer output is incomplete.  For example,
-a high-speed Interrupt transaction to a full-speed device should have a
-Start Split packet and a Complete Split packet.  I don't see either of
-those in your picture.
+> Do you know if there are known issues with BLE stability on the 8723au
+> chipset?
 
-> For the second test(connect the analyzer to the cable segment between
-> the hub and the device): Is it possible with single external USB hub?
+I have not tested any of the Realtek Bluetooth hardware so far.
 
-Of course it is.  What's the difficulty?
+Regards
 
-Alan Stern
+Marcel
 
