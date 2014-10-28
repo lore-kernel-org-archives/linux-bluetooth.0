@@ -1,11 +1,11 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1414513123-5689-6-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <1414513123-5689-5-git-send-email-luiz.dentz@gmail.com>
 References: <1414513123-5689-1-git-send-email-luiz.dentz@gmail.com>
-	<1414513123-5689-6-git-send-email-luiz.dentz@gmail.com>
-Date: Tue, 28 Oct 2014 15:20:12 -0700
-Message-ID: <CAHrH25QSxe2L7ixyiT30e19sLDQQ_MyXEH7qObTDmuCHFVbJPw@mail.gmail.com>
-Subject: Re: [PATCH v2 6/9] shared/gatt-db: Add gatt_db_attribute_read
+	<1414513123-5689-5-git-send-email-luiz.dentz@gmail.com>
+Date: Tue, 28 Oct 2014 15:12:46 -0700
+Message-ID: <CAHrH25Qpctiu72k7rNz5ccWhPeZoqjn1MM-BULuTVVN1sp6Bzg@mail.gmail.com>
+Subject: Re: [PATCH v2 5/9] shared/gatt-db: Add gatt_db_attribute_get_permissions
 From: Arman Uguray <armansito@chromium.org>
 To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
@@ -20,58 +20,45 @@ On Tue, Oct 28, 2014 at 9:18 AM, Luiz Augusto von Dentz
 > From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 >
 > ---
->  src/shared/gatt-db.c | 18 +++++++++++++++++-
->  1 file changed, 17 insertions(+), 1 deletion(-)
+>  src/shared/gatt-db.c | 7 ++++++-
+>  1 file changed, 6 insertions(+), 1 deletion(-)
 >
 > diff --git a/src/shared/gatt-db.c b/src/shared/gatt-db.c
-> index f43cac3..b5b6c72 100644
+> index 9a3f864..f43cac3 100644
 > --- a/src/shared/gatt-db.c
 > +++ b/src/shared/gatt-db.c
-> @@ -891,7 +891,23 @@ bool gatt_db_attribute_read(struct gatt_db_attribute *attrib, uint16_t offset,
->                                 uint8_t opcode, bdaddr_t *bdaddr,
->                                 gatt_db_attribute_read_t func, void *user_data)
+> @@ -879,7 +879,12 @@ bool gatt_db_attribute_get_service_uuid(struct gatt_db_attribute *attrib,
+>  bool gatt_db_attribute_get_permissions(struct gatt_db_attribute *attrib,
+>                                                         uint32_t *permissions)
 >  {
 > -       return false;
-> +       if (!attrib || !func)
-> +               return false;
-> +
-> +       if (attrib->read_func) {
-> +               attrib->read_func(attrib->handle, offset, opcode, bdaddr,
-> +                                                       attrib->user_data);
-> +               return true;
-> +       }
-> +
-> +       /* Check length boundary if value is stored in the db */
-> +       if (offset >= attrib->value_len)
+> +       if (!attrib || !permissions)
 > +               return false;
 
-Thanks for moving this after the callback check. As for valid
-boundaries, I've actually seen devices that allow sending an offset
-that is the same as the length of the value. They just return an empty
-value PDU back. So maybe return NULL for the value if offset ==
-attrib->value_len? What I had in mind was:
+So, based on my understanding, android/gatt treats an attribute
+permission value of "0" as "this is a declaration attribute since we
+didn't explicitly set it". Hence, returning 0 here will break things
+in the android code once it starts using the gatt_db_attribute_*
+functions.
 
-  if (offset > attrib->value_len)
-      return false;
+That said, I don't like this logic one bit in the first place. Instead
+of having "0" mean "anything goes" and having a special define for "no
+permissions" (such as GATT_PERM_NONE from android/gatt and
+BT_GATT_PERM from shared/att-types), we should just treat 0 to mean no
+permissions. I.e. we should define BT_GATT_PERM_NONE as 0, and have
+gatt_db_add_service, _add_characteristic, etc. explicitly set at least
+the BT_GATT_PERM_READ permission on the declaration attributes.
 
-  func(attrib, 0, (offset == attrib->value_len) ? NULL :
-&attrib->value[offset], ...);
-
-  return true;
-
-Then we would guard against the invalid access but the large offset
-would still be a valid. I guess it really comes down to what we
-consider to be a "valid" offset but I've seen implementations that do
-this. Up to you.
+In short we should unify the permission story for shared/gatt and
+android/gatt sooner then later.
 
 > +
-> +       func(attrib, 0, &attrib->value[offset], attrib->value_len - offset,
-> +                                                               user_data);
+> +       *permissions = attrib->permissions;
 > +
 > +       return true;
 >  }
 >
->  bool gatt_db_attribute_write(struct gatt_db_attribute *attrib, uint16_t offset,
+>  bool gatt_db_attribute_read(struct gatt_db_attribute *attrib, uint16_t offset,
 > --
 > 1.9.3
 >
