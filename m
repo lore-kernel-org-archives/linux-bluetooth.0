@@ -1,48 +1,50 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 8.0 \(1990.1\))
-Subject: Re: BlueZ 5: SDP Record & D-Bus APIs
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <CAE7yNv_mZU-yyLszs5BmhUc7MLSwK=TZZ4ArJfeS9Cnn4VgkeQ@mail.gmail.com>
-Date: Tue, 28 Oct 2014 10:31:37 -0700
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <508E57A5-CE70-43BE-9FC3-6F883E6397CB@holtmann.org>
-References: <CAE7yNv_mZU-yyLszs5BmhUc7MLSwK=TZZ4ArJfeS9Cnn4VgkeQ@mail.gmail.com>
-To: Sujay Sarkhel <ssarkhe@ncsu.edu>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Tue, 28 Oct 2014 13:27:44 -0400 (EDT)
+From: Alan Stern <stern@rowland.harvard.edu>
+To: Naveen Kumar Parna <pnaveenkos@gmail.com>
+cc: Oliver Neukum <oneukum@suse.de>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	<linux-usb@vger.kernel.org>, <acho@suse.com>
+Subject: Re: btusb_intr_complete returns -EPIPE
+In-Reply-To: <CAG0bkvJv0VdeKXMOg-6+LVYJU1qD5bQboJ3MNGrUY9xPNMTALw@mail.gmail.com>
+Message-ID: <Pine.LNX.4.44L0.1410281324190.1213-100000@iolanthe.rowland.org>
+MIME-Version: 1.0
+Content-Type: TEXT/PLAIN; charset=UTF-8
+Sender: linux-usb-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Sujay,
+On Tue, 28 Oct 2014, Naveen Kumar Parna wrote:
 
-> I'm still getting used to BlueZ 5 D-Bus APIs and I was wondering if
-> someone can help me with a few queries that I've:
+> >> You should also run a similar test when you connect the device through
+> >> a USB-2 hub.  In fact, you should run two tests.  In one test, connect
+> >> the analyzer to the cable segment between the computer and the hub; in
+> >> the other test, connect the analyzer to the cable segment between the
+> >> hub and the device.
+> >>
+> >
 > 
-> 1. BlueZ 4 D-Bus Device API provided a method called
-> DiscoverServices(string pattern) that could be used to retrieve
-> service information from the remote device in XML format. I used to
-> use this XML information to retrieve several meta-data relevant to my
-> use-case.
+> I connected the USB analyzer to the cable segment between the computer
+> and the external USB-2 hub(devices are attached to this external USB-2
+> hub). In this scenario , got the stall in usbmon trace, but not in
+> analyzer log. But USB analyzer log shows “Incomplete IN transaction”.
+> Please check the attached "Elisys_Usb_log.png".
 > 
-> For example: for Device ID profile, I would want to retrieve vendor
-> information (id/vendoridsource, etc), for HDP, the optional text
-> associated with an MDEP, etc.
-
-the Device ID information are represented in form of the Modalias property.
-
-For anything HDP related that should be part of the Health API actually. If it is missing there, then that sounds to me like a bug in that API that should be fixed.
-
-> From what I understand, this method does not exist anymore in the
-> exposed APIs. I was wondering whether there's a workaround? How can I
-> still look at the meta-data?
 > 
-> 2. I was investigating how to work with the BlueZ D-Bus GATT APIs when
-> it comes to talking to GATT services on remote devices. Is that
-> possible? If yes, then how do I retrieve the list of object path
-> corresponding to the available remote services?
+> 
+> Incomplete IN transaction           2              1
+> INCOMPLETE     HS           No data                884.626 273 217
 
-We are developing a new D-Bus based generic GATT API. It is brand new and you can follow the progress on the mailing list.
+> Does it gives any clue?
 
-Regards
+Not really.  I think your analyzer output is incomplete.  For example,
+a high-speed Interrupt transaction to a full-speed device should have a
+Start Split packet and a Complete Split packet.  I don't see either of
+those in your picture.
 
-Marcel
+> For the second test(connect the analyzer to the cable segment between
+> the hub and the device): Is it possible with single external USB hub?
+
+Of course it is.  What's the difficulty?
+
+Alan Stern
 
