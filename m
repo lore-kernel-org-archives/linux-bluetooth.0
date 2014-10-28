@@ -1,11 +1,11 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1414513123-5689-5-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <1414513123-5689-2-git-send-email-luiz.dentz@gmail.com>
 References: <1414513123-5689-1-git-send-email-luiz.dentz@gmail.com>
-	<1414513123-5689-5-git-send-email-luiz.dentz@gmail.com>
-Date: Tue, 28 Oct 2014 15:12:46 -0700
-Message-ID: <CAHrH25Qpctiu72k7rNz5ccWhPeZoqjn1MM-BULuTVVN1sp6Bzg@mail.gmail.com>
-Subject: Re: [PATCH v2 5/9] shared/gatt-db: Add gatt_db_attribute_get_permissions
+	<1414513123-5689-2-git-send-email-luiz.dentz@gmail.com>
+Date: Tue, 28 Oct 2014 14:59:58 -0700
+Message-ID: <CAHrH25SZshncGdAC7ECLq0XYs81R1HHkNOp_HNhA3Z9G-+w96g@mail.gmail.com>
+Subject: Re: [PATCH v2 2/9] shared/gatt-db: Add gatt_db_get_attribute
 From: Arman Uguray <armansito@chromium.org>
 To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
@@ -20,45 +20,43 @@ On Tue, Oct 28, 2014 at 9:18 AM, Luiz Augusto von Dentz
 > From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 >
 > ---
->  src/shared/gatt-db.c | 7 ++++++-
->  1 file changed, 6 insertions(+), 1 deletion(-)
+>  src/shared/gatt-db.c | 20 +++++++++++++++++++-
+>  1 file changed, 19 insertions(+), 1 deletion(-)
 >
 > diff --git a/src/shared/gatt-db.c b/src/shared/gatt-db.c
-> index 9a3f864..f43cac3 100644
+> index 19784d1..bfc7bfa 100644
 > --- a/src/shared/gatt-db.c
 > +++ b/src/shared/gatt-db.c
-> @@ -879,7 +879,12 @@ bool gatt_db_attribute_get_service_uuid(struct gatt_db_attribute *attrib,
->  bool gatt_db_attribute_get_permissions(struct gatt_db_attribute *attrib,
->                                                         uint32_t *permissions)
+> @@ -806,7 +806,25 @@ bool gatt_db_get_attribute_permissions(struct gatt_db *db, uint16_t handle,
+>  struct gatt_db_attribute *gatt_db_get_attribute(struct gatt_db *db,
+>                                                         uint16_t handle)
 >  {
-> -       return false;
-> +       if (!attrib || !permissions)
-> +               return false;
-
-So, based on my understanding, android/gatt treats an attribute
-permission value of "0" as "this is a declaration attribute since we
-didn't explicitly set it". Hence, returning 0 here will break things
-in the android code once it starts using the gatt_db_attribute_*
-functions.
-
-That said, I don't like this logic one bit in the first place. Instead
-of having "0" mean "anything goes" and having a special define for "no
-permissions" (such as GATT_PERM_NONE from android/gatt and
-BT_GATT_PERM from shared/att-types), we should just treat 0 to mean no
-permissions. I.e. we should define BT_GATT_PERM_NONE as 0, and have
-gatt_db_add_service, _add_characteristic, etc. explicitly set at least
-the BT_GATT_PERM_READ permission on the declaration attributes.
-
-In short we should unify the permission story for shared/gatt and
-android/gatt sooner then later.
-
+> -       return NULL;
+> +       struct gatt_db_service *service;
+> +       uint16_t service_handle;
 > +
-> +       *permissions = attrib->permissions;
+> +       if (!db || !handle)
+> +               return NULL;
 > +
-> +       return true;
+> +       service = queue_find(db->services, find_service_for_handle,
+> +                                                       INT_TO_PTR(handle));
+
+Shouldn't this be UINT_TO_PTR?
+
+> +       if (!service)
+> +               return NULL;
+> +
+> +       service_handle = service->attributes[0]->handle;
+> +
+> +       /*
+> +        * We can safely get attribute from attributes array with offset,
+> +        * because find_service_for_handle() check if given handle is
+> +        * in service range.
+> +        */
+> +       return service->attributes[handle - service_handle];
 >  }
 >
->  bool gatt_db_attribute_read(struct gatt_db_attribute *attrib, uint16_t offset,
+>  uint16_t gatt_db_attribute_get_start_handle(struct gatt_db_attribute *attrib)
 > --
 > 1.9.3
 >
