@@ -1,97 +1,80 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 27 Oct 2014 21:12:20 -0700
-From: Stephen Hemminger <stephen@networkplumber.org>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] bluetooth: spelling fixes
-Message-ID: <20141027211220.2cef5542@urahara>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+From: Gabriel Souza Franco <gabrielfrancosouza@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Gabriel Souza Franco <gabrielfrancosouza@gmail.com>
+Subject: [PATCH BlueZ] lib: Change bluetooth.h to compile using strict C
+Date: Mon, 27 Oct 2014 23:09:52 -0200
+Message-Id: <1414458592-11844-1-git-send-email-gabrielfrancosouza@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Fix spelling errors in comments.
+Signed-off-by: Gabriel Souza Franco <gabrielfrancosouza@gmail.com>
+---
 
-Signed-off-by: Stephen Hemminger <stephen@networkplumber.org>
+This change enables programs writen with strict C syntax
+(e.g. "-std=c11 -pedantic") to compile when including
+bluetooth.h. Also changed src/shared/util.h to match.
 
---- a/net/bluetooth/hci_core.c	2014-10-06 10:05:06.110702506 -0700
-+++ b/net/bluetooth/hci_core.c	2014-10-27 20:38:05.303731745 -0700
-@@ -4477,7 +4477,7 @@ int hci_req_run(struct hci_request *req,
+ lib/bluetooth.h   | 10 +++++-----
+ src/shared/util.h | 10 +++++-----
+ 2 files changed, 10 insertions(+), 10 deletions(-)
+
+diff --git a/lib/bluetooth.h b/lib/bluetooth.h
+index 61c1f9a..f214d81 100644
+--- a/lib/bluetooth.h
++++ b/lib/bluetooth.h
+@@ -156,18 +156,18 @@ enum {
  
- 	BT_DBG("length %u", skb_queue_len(&req->cmd_q));
+ /* Bluetooth unaligned access */
+ #define bt_get_unaligned(ptr)			\
+-({						\
++__extension__ ({				\
+ 	struct __attribute__((packed)) {	\
+-		typeof(*(ptr)) __v;		\
+-	} *__p = (typeof(__p)) (ptr);		\
++		__typeof__(*(ptr)) __v;		\
++	} *__p = (__typeof__(__p)) (ptr);	\
+ 	__p->__v;				\
+ })
  
--	/* If an error occured during request building, remove all HCI
-+	/* If an error occurred during request building, remove all HCI
- 	 * commands queued on the HCI request queue.
- 	 */
- 	if (req->err) {
-@@ -4546,7 +4546,7 @@ int hci_send_cmd(struct hci_dev *hdev, _
- 		return -ENOMEM;
- 	}
+ #define bt_put_unaligned(val, ptr)		\
+ do {						\
+ 	struct __attribute__((packed)) {	\
+-		typeof(*(ptr)) __v;		\
+-	} *__p = (typeof(__p)) (ptr);		\
++		__typeof__(*(ptr)) __v;		\
++	} *__p = (__typeof__(__p)) (ptr);	\
+ 	__p->__v = (val);			\
+ } while(0)
  
--	/* Stand-alone HCI commands must be flaged as
-+	/* Stand-alone HCI commands must be flagged as
- 	 * single-command requests.
- 	 */
- 	bt_cb(skb)->req.start = true;
-@@ -4566,7 +4566,7 @@ void hci_req_add_ev(struct hci_request *
+diff --git a/src/shared/util.h b/src/shared/util.h
+index 04c600f..8437662 100644
+--- a/src/shared/util.h
++++ b/src/shared/util.h
+@@ -57,18 +57,18 @@
+ #endif
  
- 	BT_DBG("%s opcode 0x%4.4x plen %d", hdev->name, opcode, plen);
+ #define get_unaligned(ptr)			\
+-({						\
++__extension__ ({				\
+ 	struct __attribute__((packed)) {	\
+-		typeof(*(ptr)) __v;		\
+-	} *__p = (typeof(__p)) (ptr);		\
++		__typeof__(*(ptr)) __v;		\
++	} *__p = (__typeof__(__p)) (ptr);	\
+ 	__p->__v;				\
+ })
  
--	/* If an error occured during request building, there is no point in
-+	/* If an error occurred during request building, there is no point in
- 	 * queueing the HCI command. We can simply return.
- 	 */
- 	if (req->err)
---- a/net/bluetooth/hci_event.c	2014-09-28 16:27:20.641506741 -0700
-+++ b/net/bluetooth/hci_event.c	2014-10-27 20:37:29.615852803 -0700
-@@ -1045,7 +1045,7 @@ static void hci_cc_le_set_adv_enable(str
+ #define put_unaligned(val, ptr)			\
+ do {						\
+ 	struct __attribute__((packed)) {	\
+-		typeof(*(ptr)) __v;		\
+-	} *__p = (typeof(__p)) (ptr);		\
++		__typeof__(*(ptr)) __v;		\
++	} *__p = (__typeof__(__p)) (ptr);	\
+ 	__p->__v = (val);			\
+ } while (0)
  
- 	hci_dev_lock(hdev);
- 
--	/* If we're doing connection initation as peripheral. Set a
-+	/* If we're doing connection initiation as peripheral. Set a
- 	 * timeout in case something goes wrong.
- 	 */
- 	if (*sent) {
---- a/net/bluetooth/hci_sock.c	2014-07-31 11:26:45.986016732 -0700
-+++ b/net/bluetooth/hci_sock.c	2014-10-27 20:37:15.439909336 -0700
-@@ -987,7 +987,7 @@ static int hci_sock_sendmsg(struct kiocb
- 			skb_queue_tail(&hdev->raw_q, skb);
- 			queue_work(hdev->workqueue, &hdev->tx_work);
- 		} else {
--			/* Stand-alone HCI commands must be flaged as
-+			/* Stand-alone HCI commands must be flagged as
- 			 * single-command requests.
- 			 */
- 			bt_cb(skb)->req.start = true;
---- a/net/bluetooth/l2cap_core.c	2014-10-06 10:05:06.110702506 -0700
-+++ b/net/bluetooth/l2cap_core.c	2014-10-27 20:38:38.879642783 -0700
-@@ -4084,7 +4084,7 @@ static inline int l2cap_config_req(struc
- 		chan->num_conf_req++;
- 	}
- 
--	/* Got Conf Rsp PENDING from remote side and asume we sent
-+	/* Got Conf Rsp PENDING from remote side and assume we sent
- 	   Conf Rsp PENDING in the code above */
- 	if (test_bit(CONF_REM_CONF_PEND, &chan->conf_state) &&
- 	    test_bit(CONF_LOC_CONF_PEND, &chan->conf_state)) {
---- a/net/bluetooth/smp.c	2014-10-06 10:05:06.110702506 -0700
-+++ b/net/bluetooth/smp.c	2014-10-27 20:37:03.367961578 -0700
-@@ -970,7 +970,7 @@ static u8 smp_cmd_pairing_req(struct l2c
- 	if (sec_level > conn->hcon->pending_sec_level)
- 		conn->hcon->pending_sec_level = sec_level;
- 
--	/* If we need MITM check that it can be acheived */
-+	/* If we need MITM check that it can be achieved */
- 	if (conn->hcon->pending_sec_level >= BT_SECURITY_HIGH) {
- 		u8 method;
- 
-@@ -1028,7 +1028,7 @@ static u8 smp_cmd_pairing_rsp(struct l2c
- 
- 	auth = rsp->auth_req & AUTH_REQ_MASK;
- 
--	/* If we need MITM check that it can be acheived */
-+	/* If we need MITM check that it can be achieved */
- 	if (conn->hcon->pending_sec_level >= BT_SECURITY_HIGH) {
- 		u8 method;
- 
+-- 
+2.1.2
+
