@@ -1,26 +1,38 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 8.0 \(1990.1\))
-Subject: Re: [PATCH] bluetooth: spelling fixes
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20141027211220.2cef5542@urahara>
-Date: Tue, 28 Oct 2014 09:25:19 -0700
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <D2EC33D7-6E07-42C0-80E3-B1E816A51E2B@holtmann.org>
-References: <20141027211220.2cef5542@urahara>
-To: Stephen Hemminger <stephen@networkplumber.org>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH v2 5/9] shared/gatt-db: Add gatt_db_attribute_get_permissions
+Date: Tue, 28 Oct 2014 18:18:39 +0200
+Message-Id: <1414513123-5689-5-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <1414513123-5689-1-git-send-email-luiz.dentz@gmail.com>
+References: <1414513123-5689-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Stephen,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-> Fix spelling errors in comments.
-> 
-> Signed-off-by: Stephen Hemminger <stephen@networkplumber.org>
+---
+ src/shared/gatt-db.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
 
-patch has been applied to bluetooth-next tree.
-
-Regards
-
-Marcel
+diff --git a/src/shared/gatt-db.c b/src/shared/gatt-db.c
+index 9a3f864..f43cac3 100644
+--- a/src/shared/gatt-db.c
++++ b/src/shared/gatt-db.c
+@@ -879,7 +879,12 @@ bool gatt_db_attribute_get_service_uuid(struct gatt_db_attribute *attrib,
+ bool gatt_db_attribute_get_permissions(struct gatt_db_attribute *attrib,
+ 							uint32_t *permissions)
+ {
+-	return false;
++	if (!attrib || !permissions)
++		return false;
++
++	*permissions = attrib->permissions;
++
++	return true;
+ }
+ 
+ bool gatt_db_attribute_read(struct gatt_db_attribute *attrib, uint16_t offset,
+-- 
+1.9.3
 
