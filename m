@@ -1,56 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
-From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] tools/mcaptest: Add missing mainloop quit
-Date: Tue, 28 Oct 2014 15:42:36 +0100
-Message-Id: <1414507356-7620-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 8.0 \(1990.1\))
+Subject: Re: [PATCH] Bluetooth: Revert SMP self-test patches
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1414506132-21330-1-git-send-email-johan.hedberg@gmail.com>
+Date: Tue, 28 Oct 2014 07:36:10 -0700
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <F4B069E6-AD50-4D2A-AB80-4928CC0D8F17@holtmann.org>
+References: <1414506132-21330-1-git-send-email-johan.hedberg@gmail.com>
+To: Johan Hedberg <johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-MCAP test should quit from main loop if mcl disconnects or if can't
-create mdl, mcl. Tested with PTS 5.3 test cases.
----
- tools/mcaptest.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+Hi Johan,
 
-diff --git a/tools/mcaptest.c b/tools/mcaptest.c
-index 5ef030c..dd638c9 100644
---- a/tools/mcaptest.c
-+++ b/tools/mcaptest.c
-@@ -151,6 +151,8 @@ static void mcl_disconnected(struct mcap_mcl *mcl, gpointer data)
- {
- 	/* TODO */
- 	printf("MCL disconnected\n");
-+
-+	g_main_loop_quit(mloop);
- }
- 
- static void mcl_uncached(struct mcap_mcl *mcl, gpointer data)
-@@ -174,6 +176,7 @@ static void create_mdl_cb(struct mcap_mdl *mcap_mdl, uint8_t type, GError *gerr,
- 	if (gerr) {
- 		printf("MDL error: %s\n", gerr->message);
- 
-+		g_main_loop_quit(mloop);
- 		return;
- 	}
- 
-@@ -186,6 +189,8 @@ static void create_mdl_cb(struct mcap_mdl *mcap_mdl, uint8_t type, GError *gerr,
- 								NULL, &err)) {
- 		printf("Error connecting to mdl: %s\n", err->message);
- 		g_error_free(err);
-+
-+		g_main_loop_quit(mloop);
- 	}
- }
- 
-@@ -255,6 +260,7 @@ static void create_mcl_cb(struct mcap_mcl *mcap_mcl, GError *err, gpointer data)
- 	if (err) {
- 		printf("Could not connect MCL: %s\n", err->message);
- 
-+		g_main_loop_quit(mloop);
- 		return;
- 	}
- 
--- 
-1.9.3
+> This reverts commits c6992e9ef2a17e9738b7bb8a03a7fe581a8f9977 and
+> 4cd3362da899a59955146851dd860198b0aaaa75.
+> 
+> The reason for the revert is that we cannot have more than one module
+> initialization function and the SMP one breaks the build with modular
+> kernels. As the proper fix for this is right now looking non-trivial
+> it's better to simply revert the problematic patches in order to keep
+> the upstream tree compilable.
+> 
+> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+> ---
+> net/bluetooth/Kconfig |   6 ---
+> net/bluetooth/smp.c   | 120 --------------------------------------------------
+> 2 files changed, 126 deletions(-)
+
+patch has been applied to bluetooth-next tree.
+
+Regards
+
+Marcel
 
