@@ -1,174 +1,57 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <CAHrH25RzmJBWa2O42jQZTgQbx4Pvzy06rkq+S9Bw=ZrdBWp2Dw@mail.gmail.com>
-References: <1414425900-21784-1-git-send-email-luiz.dentz@gmail.com>
-	<CAHrH25RzmJBWa2O42jQZTgQbx4Pvzy06rkq+S9Bw=ZrdBWp2Dw@mail.gmail.com>
-Date: Tue, 28 Oct 2014 18:11:44 +0200
-Message-ID: <CABBYNZL2mOABEaLf2VG6LOwjxvKMZwPz9WUxdUOQfjTyHe2WYQ@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 1/9] shared/gatt-db: Expose gatt_db_attribute
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Arman Uguray <armansito@chromium.org>
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 8.0 \(1990.1\))
+Subject: Re: [PATCH v3 0/3] Avoiding lockdep warnings in 6lowpan
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1414509409-11970-1-git-send-email-jukka.rissanen@linux.intel.com>
+Date: Tue, 28 Oct 2014 09:06:15 -0700
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <B6A26971-A82F-4840-96A7-9D70A7762B2C@holtmann.org>
+References: <1414509409-11970-1-git-send-email-jukka.rissanen@linux.intel.com>
+To: Jukka Rissanen <jukka.rissanen@linux.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Arman,
+Hi Jukka,
 
-On Mon, Oct 27, 2014 at 8:57 PM, Arman Uguray <armansito@chromium.org> wrote:
-> Hi Luiz,
->
-> On Mon, Oct 27, 2014 at 9:04 AM, Luiz Augusto von Dentz
-> <luiz.dentz@gmail.com> wrote:
->> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->>
->> This is the new API to reduce the lookups in gatt_db and make it
->> a little bit more convenient for batch operations, so the general idea
->> is to be able to get a hold of it via gatt_db_get_attribute but also
->> replace the handles in the queues with proper attributes so the server
->> code don't have to lookup again when reading/writing, checking
->> permissions, or any other operation that can be done directly.
->> ---
->>  src/shared/gatt-db.c | 49 +++++++++++++++++++++++++++++++++++++++++++++++++
->>  src/shared/gatt-db.h | 33 +++++++++++++++++++++++++++++++++
->>  2 files changed, 82 insertions(+)
->>
->> diff --git a/src/shared/gatt-db.c b/src/shared/gatt-db.c
->> index b3f95d2..75fdff2 100644
->> --- a/src/shared/gatt-db.c
->> +++ b/src/shared/gatt-db.c
->> @@ -793,3 +793,52 @@ bool gatt_db_get_attribute_permissions(struct gatt_db *db, uint16_t handle,
->>         return true;
->>
->>  }
->> +
->> +struct gatt_db_attribute *gatt_db_get_attribute(struct gatt_db *db,
->> +                                                       uint16_t handle)
->> +{
->> +       return NULL;
->> +}
->> +
->> +uint16_t gatt_db_attribute_get_start_handle(struct gatt_db_attribute *attrib)
->> +{
->> +       return 0;
->> +}
->> +
->> +uint16_t gatt_db_attribute_get_end_handle(struct gatt_db_attribute *attrib)
->> +{
->> +       return 0;
->> +}
->> +
->> +const bt_uuid_t *gatt_db_attribute_get_type(struct gatt_db_attribute *attrib)
->> +{
->> +       return NULL;
->> +}
->> +
->> +bool gatt_db_attribute_get_service_uuid(struct gatt_db_attribute *attrib,
->> +                                                       bt_uuid_t *uuid)
->> +{
->> +       return false;
->> +}
->> +
->> +bool gatt_db_attribute_get_permissions(struct gatt_db_attribute *attrib,
->> +                                                       uint32_t *permissions)
->> +{
->> +       return false;
->> +}
->> +
->> +bool gatt_db_attribute_read(struct gatt_db_attribute *attrib, uint16_t offset,
->> +                               uint8_t opcode, bdaddr_t *bdaddr,
->> +                               gatt_db_attribute_read_t func, void *user_data)
->> +{
->> +       return false;
->> +}
->> +
->> +bool gatt_db_attribute_write(struct gatt_db_attribute *attrib, uint16_t offset,
->> +                                       const uint8_t *value, size_t len,
->> +                                       uint8_t opcode, bdaddr_t *bdaddr,
->> +                                       gatt_db_attribute_write_t func,
->> +                                       void *user_data)
->> +{
->> +       return false;
->> +}
->> diff --git a/src/shared/gatt-db.h b/src/shared/gatt-db.h
->> index 8d18434..0c16e88 100644
->> --- a/src/shared/gatt-db.h
->> +++ b/src/shared/gatt-db.h
->> @@ -96,3 +96,36 @@ bool gatt_db_get_service_uuid(struct gatt_db *db, uint16_t handle,
->>
->>  bool gatt_db_get_attribute_permissions(struct gatt_db *db, uint16_t handle,
->>                                                         uint32_t *permissions);
->> +
->> +struct gatt_db_attribute;
->> +
->> +struct gatt_db_attribute *gatt_db_get_attribute(struct gatt_db *db,
->> +                                                       uint16_t handle);
->> +
->> +uint16_t gatt_db_attribute_get_start_handle(struct gatt_db_attribute *attrib);
->> +uint16_t gatt_db_attribute_get_end_handle(struct gatt_db_attribute *attrib);
->> +
->> +const bt_uuid_t *gatt_db_attribute_get_type(struct gatt_db_attribute *attrib);
->> +
->> +bool gatt_db_attribute_get_service_uuid(struct gatt_db_attribute *attrib,
->> +                                                       bt_uuid_t *uuid);
->> +
->> +bool gatt_db_attribute_get_permissions(struct gatt_db_attribute *attrib,
->> +                                                       uint32_t *permissions);
->> +
->> +typedef void (*gatt_db_attribute_read_t) (struct gatt_db_attribute *attrib,
->> +                                       int err, uint8_t *value, size_t length,
->> +                                       void *user_data);
->
-> So we currently have gatt_db_read_t and gatt_db_write_t, which are
-> stored with the attribute, and gatt_db_attribute_read_t and
-> gatt_db_attribute_write_t which are used to report the result of a
-> read or write. I think this is a bit confusing. Should we call these
-> something like gatt_db_read_complete_t or gatt_db_read_result_func_t
-> perhaps?
-
-Confusing in which way? We should probably use gatt_db_attribute
-prefix anyway and it looked too big to use complete so I just went
-with the shortest term I could find.
-
-> Also, won't we also have to change gatt_db_read_t and gatt_db_write_t
-> signatures to accept the result functions? If the read/write is being
-> handled by a callback, then they should report the result back using
-> the new callbacks. This way the code can be uniform regardless of
-> whether the result was obtained directly from the database or was
-> delegated to a callback (or at least this is what I was trying to do
-> in the patch set I sent out last week).
-
-Yep, that is the second part of these changes, but I would like to
-first get gatt_db_attribute API done because changing gatt_db_read_t
-and gatt_db_write_t will cause quite a lot of other changes which make
-it harder to review the details if everything is in a single
-patch-set.
-
->> +
->> +bool gatt_db_attribute_read(struct gatt_db_attribute *attrib, uint16_t offset,
->> +                               uint8_t opcode, bdaddr_t *bdaddr,
->> +                               gatt_db_attribute_read_t func, void *user_data);
->> +
->> +typedef void (*gatt_db_attribute_write_t) (struct gatt_db_attribute *attrib,
->> +                                               int err, void *user_data);
->> +
->> +bool gatt_db_attribute_write(struct gatt_db_attribute *attrib, uint16_t offset,
->> +                                       const uint8_t *value, size_t len,
->> +                                       uint8_t opcode, bdaddr_t *bdaddr,
->> +                                       gatt_db_attribute_write_t func,
->> +                                       void *user_data);
->> --
->> 1.9.3
->>
->> --
->> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
->> the body of a message to majordomo@vger.kernel.org
->> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->
+> v3:
+> - typo in patch 2 commit message (s/ieee802162/ieee802154/)
+> 
+> 
+> v2:
+> - rebased on top of latest upstream
+> - fixed indentation error in patch 1
+> 
+> 
+> v1:
+> patch 1 changes all rwlocks to RCU as suggested by Peter Hurley.
+> This should help the performance.
+> 
+> The patch 2 is ported from ieee802154 as suggested by Alex Aring.
+> This will help avoid lockdep warnings in certain transmit scenarios.
+> 
+> The patch 3 changes normal spin locks to spin_lock_bh() variant when
+> queueing outgoing packets in hci_queue_acl(). This is needed as packets
+> coming from 6lowpan link are sent from softirq. Thanks again to
+> Peter Hurley pointing this out.
+> 
+> 
 > Cheers,
-> Arman
+> Jukka
+> 
+> 
+> Jukka Rissanen (3):
+>  Bluetooth: 6lowpan: Converting rwlocks to use RCU
+>  Bluetooth: 6lowpan: Fix lockdep splats
+>  Bluetooth: Wrong style spin lock used
+> 
+> net/bluetooth/6lowpan.c  | 241 ++++++++++++++++++++++++++++-------------------
+> net/bluetooth/hci_core.c |   4 +-
+> 2 files changed, 148 insertions(+), 97 deletions(-)
 
+the first 2 patches have been applied to bluetooth-next tree. The 3rd patch needs to be updated with a proper comment.
 
+Regards
 
--- 
-Luiz Augusto von Dentz
+Marcel
+
