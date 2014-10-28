@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Bharat Panda <bharat.panda@samsung.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: cpgs@samsung.com, Bharat Panda <bharat.panda@samsung.com>
-Subject: [PATCH ] obexd/ftp: Update ftp transfer progress
-Date: Tue, 28 Oct 2014 19:49:35 +0530
-Message-id: <1414505975-29158-1-git-send-email-bharat.panda@samsung.com>
+Subject: [PATCH  2/2] obexd/ftp: Update ftp transfer progress
+Date: Tue, 28 Oct 2014 19:24:22 +0530
+Message-id: <1414504462-25412-1-git-send-email-bharat.panda@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
