@@ -1,41 +1,91 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 8.0 \(1990.1\))
-Subject: Re: [PATCH v3 3/3] Bluetooth: Wrong style spin lock used
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1414509409-11970-4-git-send-email-jukka.rissanen@linux.intel.com>
-Date: Tue, 28 Oct 2014 09:02:37 -0700
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <E21832E9-79BA-499D-B9B0-E380D1AC0E21@holtmann.org>
-References: <1414509409-11970-1-git-send-email-jukka.rissanen@linux.intel.com> <1414509409-11970-4-git-send-email-jukka.rissanen@linux.intel.com>
-To: Jukka Rissanen <jukka.rissanen@linux.intel.com>
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCHv2 2/2] gatt: Refactor discover_included_cb()
+Date: Tue, 28 Oct 2014 17:20:02 +0200
+Message-Id: <1414509602-2534-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1414509602-2534-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1414509602-2534-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jukka,
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-> Use spin_lock_bh() as the code is called from softirq in networking subsystem.
-> This is needed to prevent deadlocks when 6lowpan link is in use.
-> 
-> Signed-off-by: Jukka Rissanen <jukka.rissanen@linux.intel.com>
-> ---
-> net/bluetooth/hci_core.c | 4 ++--
-> 1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-> index cb05d7f..0242e01 100644
-> --- a/net/bluetooth/hci_core.c
-> +++ b/net/bluetooth/hci_core.c
-> @@ -4662,7 +4662,7 @@ static void hci_queue_acl(struct hci_chan *chan, struct sk_buff_head *queue,
-> 		skb_shinfo(skb)->frag_list = NULL;
-> 
-> 		/* Queue all fragments atomically */
-> -		spin_lock(&queue->lock);
-> +		spin_lock_bh(&queue->lock);
+Initialize variable at declaration fixing setting it to the same value
+many times.
+---
+ src/shared/gatt-helpers.c | 20 +++++---------------
+ 1 file changed, 5 insertions(+), 15 deletions(-)
 
-so I would actually prefer that we add a comment here why we need this. Since it is not obvious in this context that we might have a hci_send_acl from softirq. It really only happens with 6LoWPAN sending network packets since other L2CAP sockets will actually not trigger this.
-
-Regards
-
-Marcel
+diff --git a/src/shared/gatt-helpers.c b/src/shared/gatt-helpers.c
+index 4f53de3..5713924 100644
+--- a/src/shared/gatt-helpers.c
++++ b/src/shared/gatt-helpers.c
+@@ -974,7 +974,7 @@ static void discover_included_cb(uint8_t opcode, const void *pdu,
+ 	uint8_t att_ecode = 0;
+ 	uint16_t last_handle;
+ 	size_t data_length;
+-	bool success;
++	bool success = false;
+ 
+ 	if (opcode == BT_ATT_OP_ERROR_RSP) {
+ 		att_ecode = process_error(pdu, length);
+@@ -983,14 +983,11 @@ static void discover_included_cb(uint8_t opcode, const void *pdu,
+ 							op->result_head)
+ 			goto done;
+ 
+-		success = false;
+ 		goto failed;
+ 	}
+ 
+-	if (opcode != BT_ATT_OP_READ_BY_TYPE_RSP || !pdu || length < 6) {
+-		success = false;
++	if (opcode != BT_ATT_OP_READ_BY_TYPE_RSP || !pdu || length < 6)
+ 		goto failed;
+-	}
+ 
+ 	data_length = ((const uint8_t *) pdu)[0];
+ 
+@@ -1004,17 +1001,13 @@ static void discover_included_cb(uint8_t opcode, const void *pdu,
+ 	 * optional 2 octets - Bluetooth UUID of included service
+ 	 */
+ 	if ((data_length != 8 && data_length != 6) ||
+-						(length - 1) % data_length) {
+-		success = false;
++						(length - 1) % data_length)
+ 		goto failed;
+-	}
+ 
+ 	cur_result = result_create(opcode, pdu + 1, length - 1,
+ 							data_length, op);
+-	if (!cur_result) {
+-		success = false;
++	if (!cur_result)
+ 		goto failed;
+-	}
+ 
+ 	if (!op->result_head) {
+ 		op->result_head = op->result_tail = cur_result;
+@@ -1027,10 +1020,8 @@ static void discover_included_cb(uint8_t opcode, const void *pdu,
+ 		struct read_incl_data *data;
+ 
+ 		data = new_read_included(cur_result);
+-		if (!data) {
+-			success = false;
++		if (!data)
+ 			goto failed;
+-		}
+ 
+ 		read_included(data);
+ 		return;
+@@ -1052,7 +1043,6 @@ static void discover_included_cb(uint8_t opcode, const void *pdu,
+ 			return;
+ 
+ 		discovery_op_unref(op);
+-		success = false;
+ 		goto failed;
+ 	}
+ 
+-- 
+1.9.1
 
