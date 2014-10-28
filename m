@@ -1,49 +1,56 @@
 Return-Path: <cyrus@holtmann.org>
-From: Jukka Rissanen <jukka.rissanen@linux.intel.com>
+From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v3 0/3] Avoiding lockdep warnings in 6lowpan
-Date: Tue, 28 Oct 2014 17:16:46 +0200
-Message-Id: <1414509409-11970-1-git-send-email-jukka.rissanen@linux.intel.com>
+Subject: [PATCH] tools/mcaptest: Add missing mainloop quit
+Date: Tue, 28 Oct 2014 15:42:36 +0100
+Message-Id: <1414507356-7620-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+MCAP test should quit from main loop if mcl disconnects or if can't
+create mdl, mcl. Tested with PTS 5.3 test cases.
+---
+ tools/mcaptest.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-v3:
-- typo in patch 2 commit message (s/ieee802162/ieee802154/)
-
-
-v2:
-- rebased on top of latest upstream
-- fixed indentation error in patch 1
-
-
-v1:
-patch 1 changes all rwlocks to RCU as suggested by Peter Hurley.
-This should help the performance.
-
-The patch 2 is ported from ieee802154 as suggested by Alex Aring.
-This will help avoid lockdep warnings in certain transmit scenarios.
-
-The patch 3 changes normal spin locks to spin_lock_bh() variant when
-queueing outgoing packets in hci_queue_acl(). This is needed as packets
-coming from 6lowpan link are sent from softirq. Thanks again to
-Peter Hurley pointing this out.
-
-
-Cheers,
-Jukka
-
-
-Jukka Rissanen (3):
-  Bluetooth: 6lowpan: Converting rwlocks to use RCU
-  Bluetooth: 6lowpan: Fix lockdep splats
-  Bluetooth: Wrong style spin lock used
-
- net/bluetooth/6lowpan.c  | 241 ++++++++++++++++++++++++++++-------------------
- net/bluetooth/hci_core.c |   4 +-
- 2 files changed, 148 insertions(+), 97 deletions(-)
-
+diff --git a/tools/mcaptest.c b/tools/mcaptest.c
+index 5ef030c..dd638c9 100644
+--- a/tools/mcaptest.c
++++ b/tools/mcaptest.c
+@@ -151,6 +151,8 @@ static void mcl_disconnected(struct mcap_mcl *mcl, gpointer data)
+ {
+ 	/* TODO */
+ 	printf("MCL disconnected\n");
++
++	g_main_loop_quit(mloop);
+ }
+ 
+ static void mcl_uncached(struct mcap_mcl *mcl, gpointer data)
+@@ -174,6 +176,7 @@ static void create_mdl_cb(struct mcap_mdl *mcap_mdl, uint8_t type, GError *gerr,
+ 	if (gerr) {
+ 		printf("MDL error: %s\n", gerr->message);
+ 
++		g_main_loop_quit(mloop);
+ 		return;
+ 	}
+ 
+@@ -186,6 +189,8 @@ static void create_mdl_cb(struct mcap_mdl *mcap_mdl, uint8_t type, GError *gerr,
+ 								NULL, &err)) {
+ 		printf("Error connecting to mdl: %s\n", err->message);
+ 		g_error_free(err);
++
++		g_main_loop_quit(mloop);
+ 	}
+ }
+ 
+@@ -255,6 +260,7 @@ static void create_mcl_cb(struct mcap_mcl *mcap_mcl, GError *err, gpointer data)
+ 	if (err) {
+ 		printf("Could not connect MCL: %s\n", err->message);
+ 
++		g_main_loop_quit(mloop);
+ 		return;
+ 	}
+ 
 -- 
-1.8.3.1
+1.9.3
 
