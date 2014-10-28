@@ -1,31 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+From: Jukka Rissanen <jukka.rissanen@linux.intel.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv2 1/2] gatt: Fix wrong function exit
-Date: Tue, 28 Oct 2014 17:20:01 +0200
-Message-Id: <1414509602-2534-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCH v3 3/3] Bluetooth: Wrong style spin lock used
+Date: Tue, 28 Oct 2014 17:16:49 +0200
+Message-Id: <1414509409-11970-4-git-send-email-jukka.rissanen@linux.intel.com>
+In-Reply-To: <1414509409-11970-1-git-send-email-jukka.rissanen@linux.intel.com>
+References: <1414509409-11970-1-git-send-email-jukka.rissanen@linux.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Use spin_lock_bh() as the code is called from softirq in networking subsystem.
+This is needed to prevent deadlocks when 6lowpan link is in use.
 
+Signed-off-by: Jukka Rissanen <jukka.rissanen@linux.intel.com>
 ---
- src/shared/gatt-helpers.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ net/bluetooth/hci_core.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/src/shared/gatt-helpers.c b/src/shared/gatt-helpers.c
-index d751d5a..4f53de3 100644
---- a/src/shared/gatt-helpers.c
-+++ b/src/shared/gatt-helpers.c
-@@ -1029,7 +1029,7 @@ static void discover_included_cb(uint8_t opcode, const void *pdu,
- 		data = new_read_included(cur_result);
- 		if (!data) {
- 			success = false;
--			goto done;
-+			goto failed;
- 		}
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index cb05d7f..0242e01 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -4662,7 +4662,7 @@ static void hci_queue_acl(struct hci_chan *chan, struct sk_buff_head *queue,
+ 		skb_shinfo(skb)->frag_list = NULL;
  
- 		read_included(data);
+ 		/* Queue all fragments atomically */
+-		spin_lock(&queue->lock);
++		spin_lock_bh(&queue->lock);
+ 
+ 		__skb_queue_tail(queue, skb);
+ 
+@@ -4679,7 +4679,7 @@ static void hci_queue_acl(struct hci_chan *chan, struct sk_buff_head *queue,
+ 			__skb_queue_tail(queue, skb);
+ 		} while (list);
+ 
+-		spin_unlock(&queue->lock);
++		spin_unlock_bh(&queue->lock);
+ 	}
+ }
+ 
 -- 
-1.9.1
+1.8.3.1
 
