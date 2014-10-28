@@ -1,74 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: rtk_btusb issues
+Subject: Re: [RFC] Bluetooth : Fix hci_sync miss wakeup interrupt
 Mime-Version: 1.0 (Mac OS X Mail 8.0 \(1990.1\))
 Content-Type: text/plain; charset=us-ascii
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <61125.86.105.94.79.1413985352.squirrel@boosthardware.com>
-Date: Tue, 28 Oct 2014 10:27:34 -0700
+In-Reply-To: <132658595.194181413985732727.JavaMail.weblogic@epmlwas01a>
+Date: Tue, 28 Oct 2014 10:26:38 -0700
 Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <1D81E85A-37D6-483E-A4DB-EEC6A38A0FE6@holtmann.org>
-References: <59774.86.105.94.79.1413974113.squirrel@boosthardware.com> <7FC77530-F48C-436C-8954-195E9CD08E97@holtmann.org> <61125.86.105.94.79.1413985352.squirrel@boosthardware.com>
-To: Patrick Shirkey <pshirkey@boosthardware.com>
+Message-Id: <6112AC01-B1C4-4DF8-8085-63334761D725@holtmann.org>
+References: <132658595.194181413985732727.JavaMail.weblogic@epmlwas01a>
+To: chanyeol.park@samsung.com
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Patrik,
+Hi Chan-yeol,
 
->>> I have an android device running the rtk_btusb driver. The original
->>> driver
->>> was a couple of years old and there was a problem with stability with
->>> BLE.
->>> In addition the localname was not found in the scan_response data.
->>> 
->>> I upgraded the bluetooth stack by manually backporting from a recent
->>> kernel. That fixed the issue wit the scan_repsonse data but there were
->>> still stability issues with BLE devices (although slightly improved
->>> compared to the older bluetooth stack).
->>> 
->>> I have tried upgrading the driver to the latest version of the rtk_btusb
->>> driver from the git repo and ported the hooks for bluedroid from the old
->>> driver however I get issues with hci send command when loading the
->>> driver.
->>> 
->>> http://pastebin.com/hXALmXBr
->>> 
->>> I traced the command but I am not sure where the send value is
->>> generated.
->>> I can see the function definition in the hci_dev struct but not the
->>> location where the value is actually set.
->>> 
->>> I thought it might be an issue specific to bluedroid so I installed
->>> bluez
->>> but the issue is still there so it appears to be a bug in my version of
->>> the driver or something wrong with the bluetooth kernel layer.
->>> 
->>> I went back to the older version of the driver running against  bluez
->>> instead of bluedroid. That gets me further along but I still cannot
->>> initialise the bluetooth system on the device.
->>> 
->>> http://pastebin.com/HcSZXiMu
->>> 
->>> Does anyone have any suggestions for how to go about resolving this
->>> situation I have got myself into?
->> 
->> the rtk_btusb driver is not an upstream driver and that is the main
->> problem. There has been recently an effort to get btusb support the
->> Realtek devices, but then it went silent again.
->> 
->> What you need is having proper Realtek support in btusb and nothing else.
->> Out of tree hacked up vendor drivers are not something any of us will
->> likely have a look at and trying to fix.
->> 
+> __hci_cmd_sync_ev(), __hci_req_sync() could miss wake_up_interrupt from
+> hci_req_sync_complete() because hci_cmd_work() workquee and its reponse
+> could be completed before they are ready to get the signal through
+> add_wait_queue(), set_current_state(TASK_INTERRUPTIBLE).
 > 
-> My quest is to fix the stability issue not the rtk_btusb driver.  I
-> spotted the "new" branch in the git tree. I am testing that driver now.
+> Signed-off-by: Chan-yeol Park <chanyeol.park@samsung.com>
+> Signed-off-by: Kyungmin Park <kyungmin.park@samsung.com>
+> ---
+> net/bluetooth/hci_core.c | 18 +++++++++++-------
+> 1 file changed, 11 insertions(+), 7 deletions(-)
+> 
+> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+> index cb05d7f..c008f1f 100644
+> --- a/net/bluetooth/hci_core.c
+> +++ b/net/bluetooth/hci_core.c
+> @@ -1147,13 +1147,15 @@ struct sk_buff *__hci_cmd_sync_ev(struct hci_dev *hdev, u16 opcode, u32 plen,
+> 
+>        hdev->req_status = HCI_REQ_PEND;
+> 
+> -       err = hci_req_run(&req, hci_req_sync_complete);
+> -       if (err < 0)
+> -               return ERR_PTR(err);
+> -
 
-and it would be useful if these patches get upstream.
-
-> Do you know if there are known issues with BLE stability on the 8723au
-> chipset?
-
-I have not tested any of the Realtek Bluetooth hardware so far.
+the whole patch has whitespace damages. Please fix this.
 
 Regards
 
