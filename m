@@ -1,176 +1,165 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <CABBYNZLeHNuFJrEManG1WUXpKNojRhJcyki0xvuVRyaAbbV0Yg@mail.gmail.com>
+In-Reply-To: <CAHrH25RJDcHgDNV+Y0S0jyOwko_WJcHKygPY3=rZcCN23aZ3HA@mail.gmail.com>
 References: <1414513123-5689-1-git-send-email-luiz.dentz@gmail.com>
 	<CAHrH25RJDcHgDNV+Y0S0jyOwko_WJcHKygPY3=rZcCN23aZ3HA@mail.gmail.com>
-	<CABBYNZLeHNuFJrEManG1WUXpKNojRhJcyki0xvuVRyaAbbV0Yg@mail.gmail.com>
-Date: Wed, 29 Oct 2014 09:00:37 -0700
-Message-ID: <CAHrH25TF_V3uoSJ_PJk2ZRfS4_xTZVMb8r-vht65TeKQqdZPkQ@mail.gmail.com>
+Date: Wed, 29 Oct 2014 17:54:31 +0200
+Message-ID: <CABBYNZLeHNuFJrEManG1WUXpKNojRhJcyki0xvuVRyaAbbV0Yg@mail.gmail.com>
 Subject: Re: [PATCH v2 1/9] shared/gatt-db: Expose gatt_db_attribute
-From: Arman Uguray <armansito@chromium.org>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Arman Uguray <armansito@chromium.org>
 Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+Hi Arman,
 
-On Wed, Oct 29, 2014 at 8:54 AM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> Hi Arman,
+On Wed, Oct 29, 2014 at 5:09 PM, Arman Uguray <armansito@chromium.org> wrote:
+> Hi Luiz,
 >
-> On Wed, Oct 29, 2014 at 5:09 PM, Arman Uguray <armansito@chromium.org> wrote:
->> Hi Luiz,
+> On Tue, Oct 28, 2014 at 9:18 AM, Luiz Augusto von Dentz
+> <luiz.dentz@gmail.com> wrote:
+>> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 >>
->> On Tue, Oct 28, 2014 at 9:18 AM, Luiz Augusto von Dentz
->> <luiz.dentz@gmail.com> wrote:
->>> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->>>
->>> This is the new API to reduce the lookups in gatt_db and make it
->>> a little bit more convenient for batch operations, so the general idea
->>> is to be able to get a hold of it via gatt_db_get_attribute but also
->>> replace the handles in the queues with proper attributes so the server
->>> code don't have to lookup again when reading/writing, checking
->>> permissions, or any other operation that can be done directly.
->>> ---
->>> v2: Address problems gatt_db_attribute_read and gatt_db_attribute_write
->>> pointed out by Arman.
->>>
->>>  src/shared/gatt-db.c | 49 +++++++++++++++++++++++++++++++++++++++++++++++++
->>>  src/shared/gatt-db.h | 33 +++++++++++++++++++++++++++++++++
->>>  2 files changed, 82 insertions(+)
->>>
->>> diff --git a/src/shared/gatt-db.c b/src/shared/gatt-db.c
->>> index 65c5759..19784d1 100644
->>> --- a/src/shared/gatt-db.c
->>> +++ b/src/shared/gatt-db.c
->>> @@ -802,3 +802,52 @@ bool gatt_db_get_attribute_permissions(struct gatt_db *db, uint16_t handle,
->>>         return true;
->>>
->>>  }
->>> +
->>> +struct gatt_db_attribute *gatt_db_get_attribute(struct gatt_db *db,
->>> +                                                       uint16_t handle)
->>> +{
->>> +       return NULL;
->>> +}
->>> +
->>> +uint16_t gatt_db_attribute_get_start_handle(struct gatt_db_attribute *attrib)
->>> +{
->>> +       return 0;
->>> +}
->>> +
->>> +uint16_t gatt_db_attribute_get_end_handle(struct gatt_db_attribute *attrib)
->>> +{
->>> +       return 0;
->>> +}
->>> +
->>> +const bt_uuid_t *gatt_db_attribute_get_type(struct gatt_db_attribute *attrib)
->>> +{
->>> +       return NULL;
->>> +}
->>> +
->>> +bool gatt_db_attribute_get_service_uuid(struct gatt_db_attribute *attrib,
->>> +                                                       bt_uuid_t *uuid)
->>> +{
->>> +       return false;
->>> +}
->>> +
->>> +bool gatt_db_attribute_get_permissions(struct gatt_db_attribute *attrib,
->>> +                                                       uint32_t *permissions)
->>> +{
->>> +       return false;
->>> +}
->>> +
->>> +bool gatt_db_attribute_read(struct gatt_db_attribute *attrib, uint16_t offset,
->>> +                               uint8_t opcode, bdaddr_t *bdaddr,
->>> +                               gatt_db_attribute_read_t func, void *user_data)
->>> +{
->>> +       return false;
->>> +}
->>> +
->>> +bool gatt_db_attribute_write(struct gatt_db_attribute *attrib, uint16_t offset,
->>> +                                       const uint8_t *value, size_t len,
->>> +                                       uint8_t opcode, bdaddr_t *bdaddr,
->>> +                                       gatt_db_attribute_write_t func,
->>> +                                       void *user_data)
->>> +{
->>> +       return false;
->>> +}
->>> diff --git a/src/shared/gatt-db.h b/src/shared/gatt-db.h
->>> index 8d18434..0c16e88 100644
->>> --- a/src/shared/gatt-db.h
->>> +++ b/src/shared/gatt-db.h
->>> @@ -96,3 +96,36 @@ bool gatt_db_get_service_uuid(struct gatt_db *db, uint16_t handle,
->>>
->>>  bool gatt_db_get_attribute_permissions(struct gatt_db *db, uint16_t handle,
->>>                                                         uint32_t *permissions);
->>> +
->>> +struct gatt_db_attribute;
->>> +
->>> +struct gatt_db_attribute *gatt_db_get_attribute(struct gatt_db *db,
->>> +                                                       uint16_t handle);
->>> +
->>> +uint16_t gatt_db_attribute_get_start_handle(struct gatt_db_attribute *attrib);
->>> +uint16_t gatt_db_attribute_get_end_handle(struct gatt_db_attribute *attrib);
->>> +
->>> +const bt_uuid_t *gatt_db_attribute_get_type(struct gatt_db_attribute *attrib);
->>> +
->>> +bool gatt_db_attribute_get_service_uuid(struct gatt_db_attribute *attrib,
->>> +                                                       bt_uuid_t *uuid);
->>> +
->>> +bool gatt_db_attribute_get_permissions(struct gatt_db_attribute *attrib,
->>> +                                                       uint32_t *permissions);
->>> +
->>> +typedef void (*gatt_db_attribute_read_t) (struct gatt_db_attribute *attrib,
->>> +                                       int err, uint8_t *value, size_t length,
->>> +                                       void *user_data);
+>> This is the new API to reduce the lookups in gatt_db and make it
+>> a little bit more convenient for batch operations, so the general idea
+>> is to be able to get a hold of it via gatt_db_get_attribute but also
+>> replace the handles in the queues with proper attributes so the server
+>> code don't have to lookup again when reading/writing, checking
+>> permissions, or any other operation that can be done directly.
+>> ---
+>> v2: Address problems gatt_db_attribute_read and gatt_db_attribute_write
+>> pointed out by Arman.
 >>
->> Should the "err" argument here and in gatt_db_attribute_write_it be
->> uint8_t instead of int? The pre-defined ATT protocol errors as well as
->> profile/application defined errors are reported in one byte in an
->> error response. What would we need a larger or a negative value for?
->
-> Usually we use negative errno to report errors and then have a central
-> point converting them to native protocol, but perhaps we have to give
-> the possibility to provide the ATT errors directly here, which is kind
-> of a stack violation if you ask me, but Android does seems to be doing
-> it by expecting the application to respond with proper error code, so
-> perhaps we do both and treat positive returns as ATT error code and
-> negative as errno.
->
-
-Sounds good to me.
-
->>> +
->>> +bool gatt_db_attribute_read(struct gatt_db_attribute *attrib, uint16_t offset,
->>> +                               uint8_t opcode, bdaddr_t *bdaddr,
->>> +                               gatt_db_attribute_read_t func, void *user_data);
->>> +
->>> +typedef void (*gatt_db_attribute_write_t) (struct gatt_db_attribute *attrib,
->>> +                                               int err, void *user_data);
->>> +
->>> +bool gatt_db_attribute_write(struct gatt_db_attribute *attrib, uint16_t offset,
->>> +                                       const uint8_t *value, size_t len,
->>> +                                       uint8_t opcode, bdaddr_t *bdaddr,
->>> +                                       gatt_db_attribute_write_t func,
->>> +                                       void *user_data);
->>> --
->>> 1.9.3
->>>
->>> --
->>> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
->>> the body of a message to majordomo@vger.kernel.org
->>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>>  src/shared/gatt-db.c | 49 +++++++++++++++++++++++++++++++++++++++++++++++++
+>>  src/shared/gatt-db.h | 33 +++++++++++++++++++++++++++++++++
+>>  2 files changed, 82 insertions(+)
 >>
->> Cheers,
->> Arman
+>> diff --git a/src/shared/gatt-db.c b/src/shared/gatt-db.c
+>> index 65c5759..19784d1 100644
+>> --- a/src/shared/gatt-db.c
+>> +++ b/src/shared/gatt-db.c
+>> @@ -802,3 +802,52 @@ bool gatt_db_get_attribute_permissions(struct gatt_db *db, uint16_t handle,
+>>         return true;
+>>
+>>  }
+>> +
+>> +struct gatt_db_attribute *gatt_db_get_attribute(struct gatt_db *db,
+>> +                                                       uint16_t handle)
+>> +{
+>> +       return NULL;
+>> +}
+>> +
+>> +uint16_t gatt_db_attribute_get_start_handle(struct gatt_db_attribute *attrib)
+>> +{
+>> +       return 0;
+>> +}
+>> +
+>> +uint16_t gatt_db_attribute_get_end_handle(struct gatt_db_attribute *attrib)
+>> +{
+>> +       return 0;
+>> +}
+>> +
+>> +const bt_uuid_t *gatt_db_attribute_get_type(struct gatt_db_attribute *attrib)
+>> +{
+>> +       return NULL;
+>> +}
+>> +
+>> +bool gatt_db_attribute_get_service_uuid(struct gatt_db_attribute *attrib,
+>> +                                                       bt_uuid_t *uuid)
+>> +{
+>> +       return false;
+>> +}
+>> +
+>> +bool gatt_db_attribute_get_permissions(struct gatt_db_attribute *attrib,
+>> +                                                       uint32_t *permissions)
+>> +{
+>> +       return false;
+>> +}
+>> +
+>> +bool gatt_db_attribute_read(struct gatt_db_attribute *attrib, uint16_t offset,
+>> +                               uint8_t opcode, bdaddr_t *bdaddr,
+>> +                               gatt_db_attribute_read_t func, void *user_data)
+>> +{
+>> +       return false;
+>> +}
+>> +
+>> +bool gatt_db_attribute_write(struct gatt_db_attribute *attrib, uint16_t offset,
+>> +                                       const uint8_t *value, size_t len,
+>> +                                       uint8_t opcode, bdaddr_t *bdaddr,
+>> +                                       gatt_db_attribute_write_t func,
+>> +                                       void *user_data)
+>> +{
+>> +       return false;
+>> +}
+>> diff --git a/src/shared/gatt-db.h b/src/shared/gatt-db.h
+>> index 8d18434..0c16e88 100644
+>> --- a/src/shared/gatt-db.h
+>> +++ b/src/shared/gatt-db.h
+>> @@ -96,3 +96,36 @@ bool gatt_db_get_service_uuid(struct gatt_db *db, uint16_t handle,
+>>
+>>  bool gatt_db_get_attribute_permissions(struct gatt_db *db, uint16_t handle,
+>>                                                         uint32_t *permissions);
+>> +
+>> +struct gatt_db_attribute;
+>> +
+>> +struct gatt_db_attribute *gatt_db_get_attribute(struct gatt_db *db,
+>> +                                                       uint16_t handle);
+>> +
+>> +uint16_t gatt_db_attribute_get_start_handle(struct gatt_db_attribute *attrib);
+>> +uint16_t gatt_db_attribute_get_end_handle(struct gatt_db_attribute *attrib);
+>> +
+>> +const bt_uuid_t *gatt_db_attribute_get_type(struct gatt_db_attribute *attrib);
+>> +
+>> +bool gatt_db_attribute_get_service_uuid(struct gatt_db_attribute *attrib,
+>> +                                                       bt_uuid_t *uuid);
+>> +
+>> +bool gatt_db_attribute_get_permissions(struct gatt_db_attribute *attrib,
+>> +                                                       uint32_t *permissions);
+>> +
+>> +typedef void (*gatt_db_attribute_read_t) (struct gatt_db_attribute *attrib,
+>> +                                       int err, uint8_t *value, size_t length,
+>> +                                       void *user_data);
 >
->
->
-> --
-> Luiz Augusto von Dentz
+> Should the "err" argument here and in gatt_db_attribute_write_it be
+> uint8_t instead of int? The pre-defined ATT protocol errors as well as
+> profile/application defined errors are reported in one byte in an
+> error response. What would we need a larger or a negative value for?
 
-Cheers,
-Arman
+Usually we use negative errno to report errors and then have a central
+point converting them to native protocol, but perhaps we have to give
+the possibility to provide the ATT errors directly here, which is kind
+of a stack violation if you ask me, but Android does seems to be doing
+it by expecting the application to respond with proper error code, so
+perhaps we do both and treat positive returns as ATT error code and
+negative as errno.
+
+>> +
+>> +bool gatt_db_attribute_read(struct gatt_db_attribute *attrib, uint16_t offset,
+>> +                               uint8_t opcode, bdaddr_t *bdaddr,
+>> +                               gatt_db_attribute_read_t func, void *user_data);
+>> +
+>> +typedef void (*gatt_db_attribute_write_t) (struct gatt_db_attribute *attrib,
+>> +                                               int err, void *user_data);
+>> +
+>> +bool gatt_db_attribute_write(struct gatt_db_attribute *attrib, uint16_t offset,
+>> +                                       const uint8_t *value, size_t len,
+>> +                                       uint8_t opcode, bdaddr_t *bdaddr,
+>> +                                       gatt_db_attribute_write_t func,
+>> +                                       void *user_data);
+>> --
+>> 1.9.3
+>>
+>> --
+>> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+>> the body of a message to majordomo@vger.kernel.org
+>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>
+> Cheers,
+> Arman
+
+
+
+-- 
+Luiz Augusto von Dentz
