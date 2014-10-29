@@ -1,10 +1,13 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1414513123-5689-1-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <CABBYNZL87g7vbe1bxO9vZb0BZJgy3__riqBxVhiK1wWE4rfHiQ@mail.gmail.com>
 References: <1414513123-5689-1-git-send-email-luiz.dentz@gmail.com>
-Date: Wed, 29 Oct 2014 08:09:49 -0700
-Message-ID: <CAHrH25RJDcHgDNV+Y0S0jyOwko_WJcHKygPY3=rZcCN23aZ3HA@mail.gmail.com>
-Subject: Re: [PATCH v2 1/9] shared/gatt-db: Expose gatt_db_attribute
+	<1414513123-5689-7-git-send-email-luiz.dentz@gmail.com>
+	<CAHrH25S04qADGehBAbmEWxEqqg0gcKB0k9JJPtDdbsTq=HLx1Q@mail.gmail.com>
+	<CABBYNZL87g7vbe1bxO9vZb0BZJgy3__riqBxVhiK1wWE4rfHiQ@mail.gmail.com>
+Date: Wed, 29 Oct 2014 08:06:23 -0700
+Message-ID: <CAHrH25Tbpr+5zTo_F-M7ZvLK5Sd6G9UgPTrtoMrksw0iOoOq1A@mail.gmail.com>
+Subject: Re: [PATCH v2 7/9] shared/gatt-db: Add gatt_db_attribute_write
 From: Arman Uguray <armansito@chromium.org>
 To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
@@ -14,135 +17,125 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Luiz,
 
-On Tue, Oct 28, 2014 at 9:18 AM, Luiz Augusto von Dentz
+On Wed, Oct 29, 2014 at 7:41 AM, Luiz Augusto von Dentz
 <luiz.dentz@gmail.com> wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> Hi Arman,
 >
-> This is the new API to reduce the lookups in gatt_db and make it
-> a little bit more convenient for batch operations, so the general idea
-> is to be able to get a hold of it via gatt_db_get_attribute but also
-> replace the handles in the queues with proper attributes so the server
-> code don't have to lookup again when reading/writing, checking
-> permissions, or any other operation that can be done directly.
-> ---
-> v2: Address problems gatt_db_attribute_read and gatt_db_attribute_write
-> pointed out by Arman.
+> On Wed, Oct 29, 2014 at 12:30 AM, Arman Uguray <armansito@chromium.org> wrote:
+>> Hi Luiz,
+>>
+>> On Tue, Oct 28, 2014 at 9:18 AM, Luiz Augusto von Dentz
+>> <luiz.dentz@gmail.com> wrote:
+>>> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>>>
+>>> ---
+>>>  src/shared/gatt-db.c | 32 ++++++++++++++++++++++++++++++--
+>>>  1 file changed, 30 insertions(+), 2 deletions(-)
+>>>
+>>> diff --git a/src/shared/gatt-db.c b/src/shared/gatt-db.c
+>>> index b5b6c72..5a912f8 100644
+>>> --- a/src/shared/gatt-db.c
+>>> +++ b/src/shared/gatt-db.c
+>>> @@ -900,7 +900,7 @@ bool gatt_db_attribute_read(struct gatt_db_attribute *attrib, uint16_t offset,
+>>>                 return true;
+>>>         }
+>>>
+>>> -       /* Check length boundary if value is stored in the db */
+>>> +       /* Check boundary if value is stored in the db */
+>>>         if (offset >= attrib->value_len)
+>>>                 return false;
+>>>
+>>> @@ -916,5 +916,33 @@ bool gatt_db_attribute_write(struct gatt_db_attribute *attrib, uint16_t offset,
+>>>                                         gatt_db_attribute_write_t func,
+>>>                                         void *user_data)
+>>>  {
+>>> -       return false;
+>>> +       if (!attrib)
+>>> +               return false;
+>>> +
+>>> +       if (attrib->write_func) {
+>>> +               attrib->write_func(attrib->handle, offset, value, len, opcode,
+>>> +                                               bdaddr, attrib->user_data);
+>>> +               return true;
+>>> +       }
+>>> +
+>>> +       /* For values stored in db allocate on demand */
+>>> +       if (!attrib->value) {
+>>> +               attrib->value = malloc0(len + offset);
+>>> +               if (!attrib->value)
+>>> +                       return false;
+>>> +               attrib->value_len = len + offset;
+>>> +       } else if (offset >= attrib->value_len ||
+>>> +                               len > (unsigned) (attrib->value_len - offset)) {
+>>> +               attrib->value = realloc(attrib->value, len + offset);
+>>
+>> I wouldn't immediately modify attrib->value here. Use a temporary, so
+>> that if realloc fails, the write will fail but the attribute value
+>> will remain unmodified.
 >
->  src/shared/gatt-db.c | 49 +++++++++++++++++++++++++++++++++++++++++++++++++
->  src/shared/gatt-db.h | 33 +++++++++++++++++++++++++++++++++
->  2 files changed, 82 insertions(+)
+> Well realloc would still affect the pointer anyway, and I guess if it
+> fails it would return the original pointer and nothing would be change
+> so the return is only really useful if the original pointer is NULL
+> then it acts as malloc.
 >
-> diff --git a/src/shared/gatt-db.c b/src/shared/gatt-db.c
-> index 65c5759..19784d1 100644
-> --- a/src/shared/gatt-db.c
-> +++ b/src/shared/gatt-db.c
-> @@ -802,3 +802,52 @@ bool gatt_db_get_attribute_permissions(struct gatt_db *db, uint16_t handle,
->         return true;
->
->  }
-> +
-> +struct gatt_db_attribute *gatt_db_get_attribute(struct gatt_db *db,
-> +                                                       uint16_t handle)
-> +{
-> +       return NULL;
-> +}
-> +
-> +uint16_t gatt_db_attribute_get_start_handle(struct gatt_db_attribute *attrib)
-> +{
-> +       return 0;
-> +}
-> +
-> +uint16_t gatt_db_attribute_get_end_handle(struct gatt_db_attribute *attrib)
-> +{
-> +       return 0;
-> +}
-> +
-> +const bt_uuid_t *gatt_db_attribute_get_type(struct gatt_db_attribute *attrib)
-> +{
-> +       return NULL;
-> +}
-> +
-> +bool gatt_db_attribute_get_service_uuid(struct gatt_db_attribute *attrib,
-> +                                                       bt_uuid_t *uuid)
-> +{
-> +       return false;
-> +}
-> +
-> +bool gatt_db_attribute_get_permissions(struct gatt_db_attribute *attrib,
-> +                                                       uint32_t *permissions)
-> +{
-> +       return false;
-> +}
-> +
-> +bool gatt_db_attribute_read(struct gatt_db_attribute *attrib, uint16_t offset,
-> +                               uint8_t opcode, bdaddr_t *bdaddr,
-> +                               gatt_db_attribute_read_t func, void *user_data)
-> +{
-> +       return false;
-> +}
-> +
-> +bool gatt_db_attribute_write(struct gatt_db_attribute *attrib, uint16_t offset,
-> +                                       const uint8_t *value, size_t len,
-> +                                       uint8_t opcode, bdaddr_t *bdaddr,
-> +                                       gatt_db_attribute_write_t func,
-> +                                       void *user_data)
-> +{
-> +       return false;
-> +}
-> diff --git a/src/shared/gatt-db.h b/src/shared/gatt-db.h
-> index 8d18434..0c16e88 100644
-> --- a/src/shared/gatt-db.h
-> +++ b/src/shared/gatt-db.h
-> @@ -96,3 +96,36 @@ bool gatt_db_get_service_uuid(struct gatt_db *db, uint16_t handle,
->
->  bool gatt_db_get_attribute_permissions(struct gatt_db *db, uint16_t handle,
->                                                         uint32_t *permissions);
-> +
-> +struct gatt_db_attribute;
-> +
-> +struct gatt_db_attribute *gatt_db_get_attribute(struct gatt_db *db,
-> +                                                       uint16_t handle);
-> +
-> +uint16_t gatt_db_attribute_get_start_handle(struct gatt_db_attribute *attrib);
-> +uint16_t gatt_db_attribute_get_end_handle(struct gatt_db_attribute *attrib);
-> +
-> +const bt_uuid_t *gatt_db_attribute_get_type(struct gatt_db_attribute *attrib);
-> +
-> +bool gatt_db_attribute_get_service_uuid(struct gatt_db_attribute *attrib,
-> +                                                       bt_uuid_t *uuid);
-> +
-> +bool gatt_db_attribute_get_permissions(struct gatt_db_attribute *attrib,
-> +                                                       uint32_t *permissions);
-> +
-> +typedef void (*gatt_db_attribute_read_t) (struct gatt_db_attribute *attrib,
-> +                                       int err, uint8_t *value, size_t length,
-> +                                       void *user_data);
 
-Should the "err" argument here and in gatt_db_attribute_write_it be
-uint8_t instead of int? The pre-defined ATT protocol errors as well as
-profile/application defined errors are reported in one byte in an
-error response. What would we need a larger or a negative value for?
+I see, sounds good then.
 
-> +
-> +bool gatt_db_attribute_read(struct gatt_db_attribute *attrib, uint16_t offset,
-> +                               uint8_t opcode, bdaddr_t *bdaddr,
-> +                               gatt_db_attribute_read_t func, void *user_data);
-> +
-> +typedef void (*gatt_db_attribute_write_t) (struct gatt_db_attribute *attrib,
-> +                                               int err, void *user_data);
-> +
-> +bool gatt_db_attribute_write(struct gatt_db_attribute *attrib, uint16_t offset,
-> +                                       const uint8_t *value, size_t len,
-> +                                       uint8_t opcode, bdaddr_t *bdaddr,
-> +                                       gatt_db_attribute_write_t func,
-> +                                       void *user_data);
-> --
-> 1.9.3
+>>> +               if (!attrib->value)
+>>> +                       return 0;
+>>
+>> return false, to be consistent with the previous block.
+>
+> Will fix this.
+>
+>>> +               attrib->value_len = len + offset;
+>>> +       }
+>>> +
+>>> +       memcpy(&attrib->value[offset], value, len);
+>>
+>> I'm still not sure about allowing writes if attrib->write_func is
+>> NULL. My thinking is, if the write_func is not set, then this
+>> attribute is not writable so we always return false. This is
+>> automatically the case for all declaration attributes since they
+>> wouldn't have write permission. All other writes will then always be
+>> delegated to the upper layer. This would keep things a bit simpler I
+>> think, especially since we wouldn't want some accidental usage of
+>> gatt_db_attribute_write on a declaration handle to break the database.
+>
+> The db has no idea of permissions bits to begin with so it cannot
+> check consistency between permissions and callbacks, and I do remember
+> commenting that this allows to store values in the db itself, which is
+> very convenient for plugins, this is also valid for read, any plugin
+> should be able to read values stored in the db, so at in terms of API
+> it is consistent to allow writes without a callback.
+>
+
+Fair enough. In this case it looks like we are making the values be
+variable length as the db's default behavior, which is fine with me.
+We should probably later start documenting these things some place
+though.
+
+>>> +
+>>> +       if (func)
+>>> +               func(attrib, 0, user_data);
+>>> +
+>>> +       return true;
+>>>  }
+>>> --
+>>> 1.9.3
+>>>
+>>> --
+>>> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+>>> the body of a message to majordomo@vger.kernel.org
+>>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>>
+>> Cheers,
+>> Arman
+>
+>
 >
 > --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> Luiz Augusto von Dentz
 
 Cheers,
 Arman
