@@ -1,117 +1,62 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1414421776-4029-1-git-send-email-ravikumar.veeramally@linux.intel.com>
-References: <1414421776-4029-1-git-send-email-ravikumar.veeramally@linux.intel.com>
-Date: Wed, 29 Oct 2014 13:41:34 +0200
-Message-ID: <CABBYNZKzgANn_ys7xEzsrsmSG-qu_5XX0Es36P8cdGPLXa=2EA@mail.gmail.com>
-Subject: Re: [PATCH 1/4] android/tester: Fix wrong state comparison in A2DP
- and AVRCP tests
+In-Reply-To: <1414577015-11215-1-git-send-email-bharat.panda@samsung.com>
+References: <1414577015-11215-1-git-send-email-bharat.panda@samsung.com>
+Date: Wed, 29 Oct 2014 13:32:04 +0200
+Message-ID: <CABBYNZ+8Ab_Z_EibMyyJurmRPq7XQif_CpLzJYXP4qZK7J8LFg@mail.gmail.com>
+Subject: Re: [PATCH ] profiles/audio: Fix bluetoothd crash in a2dp
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+To: Bharat Panda <bharat.panda@samsung.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	cpgs@samsung.com
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Ravi,
+Hi,
 
-On Mon, Oct 27, 2014 at 4:56 PM, Ravi kumar Veeramally
-<ravikumar.veeramally@linux.intel.com> wrote:
+On Wed, Oct 29, 2014 at 12:03 PM, Bharat Panda <bharat.panda@samsung.com> wrote:
+> Checks for NULL session before calling avdtp_get_device, as
+> setup->session will be NULL if configuraion was aborted.
+
+Could you please add the backtrace of the crash?
+
 > ---
+>  profiles/audio/a2dp.c | 6 +++++-
+>  1 file changed, 5 insertions(+), 1 deletion(-)
+>
+> diff --git a/profiles/audio/a2dp.c b/profiles/audio/a2dp.c
+> index c9dac9a..810d1e6 100644
+> --- a/profiles/audio/a2dp.c
+> +++ b/profiles/audio/a2dp.c
+> @@ -379,7 +379,7 @@ static void stream_state_changed(struct avdtp_stream *stream,
+>  static gboolean auto_config(gpointer data)
+>  {
+>         struct a2dp_setup *setup = data;
+> -       struct btd_device *dev = avdtp_get_device(setup->session);
+> +       struct btd_device *dev = NULL;
+>         struct btd_service *service;
+>
+>         /* Check if configuration was aborted */
+> @@ -389,6 +389,10 @@ static gboolean auto_config(gpointer data)
+>         if (setup->err != NULL)
+>                 goto done;
+>
+> +       /* session will be NULL if configuration was aborted */
+> +       if (setup->session)
+> +               dev = avdtp_get_device(setup->session);
+> +
+>         avdtp_stream_add_cb(setup->session, setup->stream,
+>                                 stream_state_changed, setup->sep);
 
-Could you please add a description why this is needed, even though I
-get it is always good idea to add a bit more description since it is
-fixing something.
+Perhaps this is caused by g_idle_add in endpoint_setconf_ind, but by
+looking at it seems that we have some better options as either call it
+auto_config directly which may cause the session to be freed before
+returning to avdtp_setconf_cmd, take a extra reference which might
+still cause some problems since the session would still exists while
+we may be disconnected already, or the one I prefer is to take the id
+of g_idle_add and do g_source_remove if the setup is aborted.
 
->  android/tester-main.c | 20 ++++++++++++++++++--
->  android/tester-main.h | 11 +++++++----
->  2 files changed, 25 insertions(+), 6 deletions(-)
->
-> diff --git a/android/tester-main.c b/android/tester-main.c
-> index f4d18e2..8cf62c2 100644
-> --- a/android/tester-main.c
-> +++ b/android/tester-main.c
-> @@ -654,6 +654,22 @@ static bool match_data(struct step *step)
->                 return false;
->         }
->
-> +       if (exp->callback_result.av_conn_state !=
-> +                                       step->callback_result.av_conn_state) {
-> +               tester_debug("Callback av conn state mismatch: 0x%x vs 0x%x",
-> +                                       step->callback_result.av_conn_state,
-> +                                       exp->callback_result.av_conn_state);
-> +               return false;
-> +       }
-> +
-> +       if (exp->callback_result.av_audio_state !=
-> +                                       step->callback_result.av_audio_state) {
-> +               tester_debug("Callback av audio state mismatch: 0x%x vs 0x%x",
-> +                                       step->callback_result.av_audio_state,
-> +                                       exp->callback_result.av_audio_state);
-> +               return false;
-> +       }
-> +
->         if (exp->callback_result.pairing_variant !=
->                                         step->callback_result.pairing_variant) {
->                 tester_debug("Callback pairing result mismatch: %d vs %d",
-> @@ -1863,7 +1879,7 @@ static void a2dp_connection_state_cb(btav_connection_state_t state,
->         struct step *step = g_new0(struct step, 1);
->
->         step->callback = CB_A2DP_CONN_STATE;
-> -       step->callback_result.state = state;
-> +       step->callback_result.av_conn_state = state;
->
->         schedule_callback_verification(step);
->  }
-> @@ -1873,7 +1889,7 @@ static void a2dp_audio_state_cb(btav_audio_state_t state, bt_bdaddr_t *bd_addr)
->         struct step *step = g_new0(struct step, 1);
->
->         step->callback = CB_A2DP_AUDIO_STATE;
-> -       step->callback_result.state = state;
-> +       step->callback_result.av_audio_state = state;
->
->         schedule_callback_verification(step);
->  }
-> diff --git a/android/tester-main.h b/android/tester-main.h
-> index c938d44..ff6e43c 100644
-> --- a/android/tester-main.h
-> +++ b/android/tester-main.h
-> @@ -387,14 +387,14 @@ struct pdu_set {
->                 .callback_result.channel_state = cb_state, \
->         }
->
-> -#define CALLBACK_AV_CONN_STATE(cb, cb_state) { \
-> +#define CALLBACK_AV_CONN_STATE(cb, cb_av_conn_state) { \
->                 .callback = cb, \
-> -               .callback_result.state = cb_state, \
-> +               .callback_result.av_conn_state = cb_av_conn_state, \
->         }
->
-> -#define CALLBACK_AV_AUDIO_STATE(cb, cb_state) { \
-> +#define CALLBACK_AV_AUDIO_STATE(cb, cb_av_audio_state) { \
->                 .callback = cb, \
-> -               .callback_result.state = cb_state, \
-> +               .callback_result.av_audio_state = cb_av_audio_state, \
->         }
->
->  #define CALLBACK_DEVICE_PROPS(props, prop_cnt) \
-> @@ -641,6 +641,9 @@ struct bt_callback_data {
->         int mdep_cfg_index;
->         bthl_app_reg_state_t app_state;
->         bthl_channel_state_t channel_state;
-> +
-> +       btav_connection_state_t av_conn_state;
-> +       btav_audio_state_t av_audio_state;
->  };
->
->  /*
-> --
-> 2.1.0
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
 
 
