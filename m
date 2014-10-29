@@ -2,101 +2,80 @@ Return-Path: <cyrus@holtmann.org>
 From: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
-Subject: [PATCH_v2 4/4] android/tester: Add AVRCP GetElementAttributes test case
-Date: Wed, 29 Oct 2014 14:13:32 +0200
-Message-Id: <1414584812-7477-4-git-send-email-ravikumar.veeramally@linux.intel.com>
+Subject: [PATCH_v2 3/4] android/tester: Add AVRCP RegNotifTrackChanged test case
+Date: Wed, 29 Oct 2014 14:13:31 +0200
+Message-Id: <1414584812-7477-3-git-send-email-ravikumar.veeramally@linux.intel.com>
 In-Reply-To: <1414584812-7477-1-git-send-email-ravikumar.veeramally@linux.intel.com>
 References: <1414584812-7477-1-git-send-email-ravikumar.veeramally@linux.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- android/tester-avrcp.c | 85 ++++++++++++++++++++++++++++++++++++++++++++++++++
- android/tester-main.c  | 26 +++++++++++++++
- android/tester-main.h  | 10 ++++++
- 3 files changed, 121 insertions(+)
+ android/tester-avrcp.c | 69 +++++++++++++++++++++++++++++++++++++++++++++++++-
+ android/tester-main.c  | 16 ++++++++++++
+ android/tester-main.h  |  8 ++++++
+ 3 files changed, 92 insertions(+), 1 deletion(-)
 
 diff --git a/android/tester-avrcp.c b/android/tester-avrcp.c
-index dda8eb2..99412bd 100644
+index c01f5b7..dda8eb2 100644
 --- a/android/tester-avrcp.c
 +++ b/android/tester-avrcp.c
-@@ -25,6 +25,7 @@
- 
+@@ -26,6 +26,7 @@
  static struct queue *list;
  
-+#define AVRCP_GET_ELEMENT_ATTRIBUTES	0x20
  #define AVRCP_GET_PLAY_STATUS		0x30
- #define AVRCP_REGISTER_NOTIFICATION	0x31
++#define AVRCP_REGISTER_NOTIFICATION	0x31
  
-@@ -89,6 +90,18 @@ static struct emu_l2cap_cid_data sdp_data = {
- 			0x31, 0x00, 0x00, 0x09, 0x02, 0xFF, 0xFF, 0xFF, 0xFF, \
- 							0xFF, 0xFF, 0xFF, 0xFF
+ #define sdp_rsp_pdu	0x07, \
+ 			0x00, 0x00, \
+@@ -81,6 +82,13 @@ static struct emu_l2cap_cid_data sdp_data = {
+ 			0x30, 0x00, 0x00, 0x09, 0xbb, 0xbb, 0xbb, 0xbb, 0xaa, \
+ 							0xaa, 0xaa, 0xaa, 0x00
  
-+#define req_ele_attr 0x00, 0x11, 0x0e, 0x01, 0x48, 0x00, 0x00, 0x19, 0x58, \
-+			0x20, 0x00, 0x00, 0x0D, 0x00, 0x00, 0x00, 0x00, \
-+			0x02, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x07
++#define req_track_notif 0x00, 0x11, 0x0e, 0x03, 0x48, 0x00, 0x00, 0x19, 0x58, \
++			0x31, 0x00, 0x00, 0x05, 0x02, 0x00, 0x00, 0x00, 0x00
 +
-+#define rsp_ele_attr 0x02, 0x11, 0x0e, 0x0c, 0x48, 0x00, 0x00, 0x19, 0x58, \
-+			0x20, 0x00, 0x00, 0x2a, 0x02, 0x00, 0x00, 0x00, 0x01, \
-+			0x00, 0x6a, 0x00, 0x13, 0x47, 0x69, 0x76, 0x65, 0x20, \
-+			0x50, 0x65, 0x61, 0x63, 0x65, 0x20, 0x61, 0x20, 0x43, \
-+			0x68, 0x61, 0x6e, 0x63, 0x65, 0x00, 0x00, 0x00, 0x07, \
-+			0x00, 0x6a, 0x00, 0x06, 0x31, 0x30, 0x33, 0x30, 0x30, \
-+									0x30
++#define rsp_track_notif 0x00, 0x11, 0x0e, 0x0F, 0x48, 0x00, 0x00, 0x19, 0x58, \
++			0x31, 0x00, 0x00, 0x09, 0x02, 0xFF, 0xFF, 0xFF, 0xFF, \
++							0xFF, 0xFF, 0xFF, 0xFF
 +
  static const struct pdu_set pdus[] = {
  	{ raw_pdu(req_dsc), raw_pdu(rsp_dsc) },
  	{ raw_pdu(req_get), raw_pdu(rsp_get) },
-@@ -106,6 +119,20 @@ static struct emu_l2cap_cid_data a2dp_data = {
- 
- static struct emu_l2cap_cid_data avrcp_data;
- 
-+static btrc_element_attr_val_t ele_attrs[2] = {
-+	{
-+	.attr_id = BTRC_MEDIA_ATTR_TITLE,
-+	.text = {0x47, 0x69, 0x76, 0x65, 0x20, 0x50, 0x65, 0x61, 0x63, 0x65, \
-+			 0x20, 0x61, 0x20, 0x43, 0x68, 0x61, 0x6e, 0x63, 0x65}
-+	},
-+	{
-+	.attr_id = BTRC_MEDIA_ATTR_PLAYING_TIME,
-+	.text = {0x31, 0x30, 0x33, 0x30, 0x30, 0x30}
-+	}
-+};
-+
-+static btrc_element_attr_val_t exp_attrs[2];
-+
- static void print_avrcp(const char *str, void *user_data)
+@@ -106,7 +114,7 @@ static void print_avrcp(const char *str, void *user_data)
+ static void avrcp_cid_hook_cb(const void *data, uint16_t len, void *user_data)
  {
- 	tester_debug("avrcp: %s", str);
-@@ -137,6 +164,19 @@ static void avrcp_cid_hook_cb(const void *data, uint16_t len, void *user_data)
- 			schedule_callback_verification(step);
- 		}
+ 	struct step *step;
+-	uint8_t pdu;
++	uint8_t pdu, event;
+ 
+ 	util_hexdump('>', data, len, print_avrcp, NULL);
+ 
+@@ -120,6 +128,15 @@ static void avrcp_cid_hook_cb(const void *data, uint16_t len, void *user_data)
+ 		step->callback_result.play_status = ((uint8_t *) data)[21];
+ 		schedule_callback_verification(step);
  		break;
-+	case AVRCP_GET_ELEMENT_ATTRIBUTES:
-+		step = g_new0(struct step, 1);
-+		step->callback = CB_AVRCP_GET_ATTR_RSP;
-+		step->callback_result.num_of_attrs = ((uint8_t *) data)[13];
-+
-+		memset(exp_attrs, 0, 2 * sizeof(btrc_element_attr_val_t));
-+		exp_attrs[0].attr_id = get_be16(data + 16);
-+		memcpy(exp_attrs[0].text, data + 22, 19);
-+		exp_attrs[1].attr_id = get_be16(data + 43);
-+		memcpy(exp_attrs[1].text, data + 49, 6);
-+		step->callback_result.attrs = exp_attrs;
-+		schedule_callback_verification(step);
++	case AVRCP_REGISTER_NOTIFICATION:
++		event = ((uint8_t *) data)[13];
++		if (event == 0x02) {
++			step = g_new0(struct step, 1);
++			step->callback = CB_AVRCP_REG_NOTIF_RSP;
++			step->callback_result.rc_index = get_be64(data + 14);
++			schedule_callback_verification(step);
++		}
 +		break;
  	}
  }
  
-@@ -274,6 +314,29 @@ static void avrcp_reg_notif_track_changed_rsp(void)
+@@ -229,6 +246,34 @@ static void avrcp_get_play_status_rsp(void)
  	schedule_action_verification(step);
  }
  
-+static void avrcp_get_element_attributes_req(void)
++static void avrcp_reg_notif_track_changed_req(void)
 +{
 +	struct test_data *data = tester_get_data();
 +	struct bthost *bthost = hciemu_client_get_host(data->hciemu);
-+	const struct iovec pdu = raw_pdu(req_ele_attr);
++	const struct iovec pdu = raw_pdu(req_track_notif);
 +	struct step *step = g_new0(struct step, 1);
 +
 +	bthost_send_cid_v(bthost, avrcp_data.handle, avrcp_data.cid, &pdu, 1);
@@ -104,13 +83,18 @@ index dda8eb2..99412bd 100644
 +	schedule_action_verification(step);
 +}
 +
-+static void avrcp_get_element_attributes_rsp(void)
++static void avrcp_reg_notif_track_changed_rsp(void)
 +{
 +	struct test_data *data = tester_get_data();
 +	struct step *step = g_new0(struct step, 1);
++	uint64_t track;
++	btrc_register_notification_t reg;
 +
-+	step->action_status = data->if_avrcp->get_element_attr_rsp(2,
-+								ele_attrs);
++	track = 0xffffffffffffffff;
++	memcpy(reg.track, &track, sizeof(btrc_uid_t));
++	step->action_status = data->if_avrcp->register_notification_rsp(
++							BTRC_EVT_TRACK_CHANGE,
++					BTRC_NOTIFICATION_TYPE_INTERIM, &reg);
 +
 +	schedule_action_verification(step);
 +}
@@ -118,11 +102,11 @@ index dda8eb2..99412bd 100644
  static struct test_case test_cases[] = {
  	TEST_CASE_BREDRLE("AVRCP Init",
  		ACTION_SUCCESS(dummy_action, NULL),
-@@ -361,6 +424,28 @@ static struct test_case test_cases[] = {
+@@ -294,6 +339,28 @@ static struct test_case test_cases[] = {
  		ACTION_SUCCESS(bluetooth_disable_action, NULL),
  		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_OFF),
  	),
-+	TEST_CASE_BREDRLE("AVRCP GetElementAttributes - Success",
++	TEST_CASE_BREDRLE("AVRCP RegNotifTrackChanged - Success",
 +		ACTION_SUCCESS(bluetooth_enable_action, NULL),
 +		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_ON),
 +		ACTION_SUCCESS(emu_setup_powered_remote_action, NULL),
@@ -136,11 +120,11 @@ index dda8eb2..99412bd 100644
 +					BTAV_CONNECTION_STATE_CONNECTING),
 +		CALLBACK_AV_CONN_STATE(CB_A2DP_CONN_STATE,
 +					BTAV_CONNECTION_STATE_CONNECTED),
-+		ACTION_SUCCESS(avrcp_get_element_attributes_req, NULL),
-+		CALLBACK(CB_AVRCP_GET_ATTR_REQ),
-+		ACTION_SUCCESS(avrcp_get_element_attributes_rsp, NULL),
-+		CALLBACK_RC_GET_ELEMENT_ATTRIBUTES(CB_AVRCP_GET_ATTR_RSP, 2,
-+								ele_attrs),
++		ACTION_SUCCESS(avrcp_reg_notif_track_changed_req, NULL),
++		CALLBACK(CB_AVRCP_REG_NOTIF_REQ),
++		ACTION_SUCCESS(avrcp_reg_notif_track_changed_rsp, NULL),
++		CALLBACK_RC_REG_NOTIF_TRACK_CHANGED(CB_AVRCP_REG_NOTIF_RSP,
++							0xffffffffffffffff),
 +		ACTION_SUCCESS(bluetooth_disable_action, NULL),
 +		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_OFF),
 +	),
@@ -148,85 +132,72 @@ index dda8eb2..99412bd 100644
  
  struct queue *get_avrcp_tests(void)
 diff --git a/android/tester-main.c b/android/tester-main.c
-index a416914..515c69e 100644
+index 7b1e4d8..a416914 100644
 --- a/android/tester-main.c
 +++ b/android/tester-main.c
-@@ -700,6 +700,22 @@ static bool match_data(struct step *step)
+@@ -694,6 +694,12 @@ static bool match_data(struct step *step)
  		return false;
  	}
  
-+	if (exp->callback_result.num_of_attrs !=
-+					step->callback_result.num_of_attrs) {
-+		tester_debug("Callback rc num of attrs mismatch");
++	if (exp->callback_result.rc_index !=
++					step->callback_result.rc_index) {
++		tester_debug("Callback rc_index mismatch");
 +		return false;
-+	}
-+
-+	if (exp->callback_result.attrs) {
-+		if (memcmp(step->callback_result.attrs,
-+				exp->callback_result.attrs,
-+				exp->callback_result.num_of_attrs *
-+				sizeof(btrc_element_attr_val_t))) {
-+			tester_debug("Callback rc element attributes doesn't match");
-+			return false;
-+		}
 +	}
 +
  	if (exp->callback_result.pairing_variant !=
  					step->callback_result.pairing_variant) {
  		tester_debug("Callback pairing result mismatch: %d vs %d",
-@@ -1947,10 +1963,20 @@ static void avrcp_register_notification_cb(btrc_event_id_t event_id,
+@@ -1932,9 +1938,19 @@ static void avrcp_get_play_status_cb(void)
  	schedule_callback_verification(step);
  }
  
-+static void avrcp_get_element_attr_cb(uint8_t num_attr,
-+						btrc_media_attr_t *p_attrs)
++static void avrcp_register_notification_cb(btrc_event_id_t event_id,
++								uint32_t param)
 +{
 +	struct step *step = g_new0(struct step, 1);
 +
-+	step->callback = CB_AVRCP_GET_ATTR_REQ;
++	step->callback = CB_AVRCP_REG_NOTIF_REQ;
 +	schedule_callback_verification(step);
 +}
 +
  static btrc_callbacks_t btavrcp_callbacks = {
  	.size = sizeof(btavrcp_callbacks),
  	.get_play_status_cb = avrcp_get_play_status_cb,
- 	.register_notification_cb = avrcp_register_notification_cb,
-+	.get_element_attr_cb = avrcp_get_element_attr_cb,
++	.register_notification_cb = avrcp_register_notification_cb,
  };
  
  static const btgatt_client_callbacks_t btgatt_client_callbacks = {
 diff --git a/android/tester-main.h b/android/tester-main.h
-index d46b262..ac310a3 100644
+index 7301501..d46b262 100644
 --- a/android/tester-main.h
 +++ b/android/tester-main.h
-@@ -409,6 +409,12 @@ struct pdu_set {
- 		.callback_result.rc_index = cb_index, \
+@@ -404,6 +404,11 @@ struct pdu_set {
+ 		.callback_result.play_status = cb_status, \
  	}
  
-+#define CALLBACK_RC_GET_ELEMENT_ATTRIBUTES(cb, cb_num_of_attrs, cb_attrs) { \
++#define CALLBACK_RC_REG_NOTIF_TRACK_CHANGED(cb, cb_index) { \
 +		.callback = cb, \
-+		.callback_result.num_of_attrs = cb_num_of_attrs, \
-+		.callback_result.attrs = cb_attrs, \
++		.callback_result.rc_index = cb_index, \
 +	}
 +
  #define CALLBACK_DEVICE_PROPS(props, prop_cnt) \
  	CALLBACK_PROPS(CB_BT_REMOTE_DEVICE_PROPERTIES, props, prop_cnt)
  
-@@ -484,6 +490,8 @@ typedef enum {
+@@ -477,6 +482,8 @@ typedef enum {
+ 	/* AVRCP */
+ 	CB_AVRCP_PLAY_STATUS_REQ,
  	CB_AVRCP_PLAY_STATUS_RSP,
- 	CB_AVRCP_REG_NOTIF_REQ,
- 	CB_AVRCP_REG_NOTIF_RSP,
-+	CB_AVRCP_GET_ATTR_REQ,
-+	CB_AVRCP_GET_ATTR_RSP,
++	CB_AVRCP_REG_NOTIF_REQ,
++	CB_AVRCP_REG_NOTIF_RSP,
  
  	/* Gatt client */
  	CB_GATTC_REGISTER_CLIENT,
-@@ -666,6 +674,8 @@ struct bt_callback_data {
+@@ -658,6 +665,7 @@ struct bt_callback_data {
+ 	uint32_t song_length;
  	uint32_t song_position;
  	btrc_play_status_t play_status;
- 	uint64_t rc_index;
-+	uint8_t num_of_attrs;
-+	btrc_element_attr_val_t *attrs;
++	uint64_t rc_index;
  };
  
  /*
