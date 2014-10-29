@@ -1,141 +1,243 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <CABBYNZL87g7vbe1bxO9vZb0BZJgy3__riqBxVhiK1wWE4rfHiQ@mail.gmail.com>
-References: <1414513123-5689-1-git-send-email-luiz.dentz@gmail.com>
-	<1414513123-5689-7-git-send-email-luiz.dentz@gmail.com>
-	<CAHrH25S04qADGehBAbmEWxEqqg0gcKB0k9JJPtDdbsTq=HLx1Q@mail.gmail.com>
-	<CABBYNZL87g7vbe1bxO9vZb0BZJgy3__riqBxVhiK1wWE4rfHiQ@mail.gmail.com>
-Date: Wed, 29 Oct 2014 08:06:23 -0700
-Message-ID: <CAHrH25Tbpr+5zTo_F-M7ZvLK5Sd6G9UgPTrtoMrksw0iOoOq1A@mail.gmail.com>
-Subject: Re: [PATCH v2 7/9] shared/gatt-db: Add gatt_db_attribute_write
-From: Arman Uguray <armansito@chromium.org>
+In-Reply-To: <CABBYNZJE1QT19dMgOU5fq+rufB9TQjL0Vbzx7JRfHNZw-y60ng@mail.gmail.com>
+References: <1414525067-15076-1-git-send-email-marcin.kraglak@tieto.com>
+	<1414525067-15076-2-git-send-email-marcin.kraglak@tieto.com>
+	<CABBYNZJE1QT19dMgOU5fq+rufB9TQjL0Vbzx7JRfHNZw-y60ng@mail.gmail.com>
+Date: Wed, 29 Oct 2014 08:03:54 -0700
+Message-ID: <CAJLTA8j6bJCVPpEG69+s_vzgGDetGmTGfmDpvd9KkKyXNoCUQQ@mail.gmail.com>
+Subject: Re: [PATCHv2 2/7] unit/test-gatt: Add search all primary services
+ test case
+From: Michael Janssen <jamuraa@google.com>
 To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
+Cc: Marcin Kraglak <marcin.kraglak@tieto.com>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
-
-On Wed, Oct 29, 2014 at 7:41 AM, Luiz Augusto von Dentz
+On Wed, Oct 29, 2014 at 5:32 AM, Luiz Augusto von Dentz
 <luiz.dentz@gmail.com> wrote:
-> Hi Arman,
+> Hi Marcin,
 >
-> On Wed, Oct 29, 2014 at 12:30 AM, Arman Uguray <armansito@chromium.org> wrote:
->> Hi Luiz,
+> On Tue, Oct 28, 2014 at 9:37 PM, Marcin Kraglak
+> <marcin.kraglak@tieto.com> wrote:
+>> ---
+>>  unit/test-gatt.c | 85 ++++++++++++++++++++++++++++++++++++++++++++++++++------
+>>  1 file changed, 77 insertions(+), 8 deletions(-)
 >>
->> On Tue, Oct 28, 2014 at 9:18 AM, Luiz Augusto von Dentz
->> <luiz.dentz@gmail.com> wrote:
->>> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->>>
->>> ---
->>>  src/shared/gatt-db.c | 32 ++++++++++++++++++++++++++++++--
->>>  1 file changed, 30 insertions(+), 2 deletions(-)
->>>
->>> diff --git a/src/shared/gatt-db.c b/src/shared/gatt-db.c
->>> index b5b6c72..5a912f8 100644
->>> --- a/src/shared/gatt-db.c
->>> +++ b/src/shared/gatt-db.c
->>> @@ -900,7 +900,7 @@ bool gatt_db_attribute_read(struct gatt_db_attribute *attrib, uint16_t offset,
->>>                 return true;
->>>         }
->>>
->>> -       /* Check length boundary if value is stored in the db */
->>> +       /* Check boundary if value is stored in the db */
->>>         if (offset >= attrib->value_len)
->>>                 return false;
->>>
->>> @@ -916,5 +916,33 @@ bool gatt_db_attribute_write(struct gatt_db_attribute *attrib, uint16_t offset,
->>>                                         gatt_db_attribute_write_t func,
->>>                                         void *user_data)
->>>  {
->>> -       return false;
->>> +       if (!attrib)
->>> +               return false;
->>> +
->>> +       if (attrib->write_func) {
->>> +               attrib->write_func(attrib->handle, offset, value, len, opcode,
->>> +                                               bdaddr, attrib->user_data);
->>> +               return true;
->>> +       }
->>> +
->>> +       /* For values stored in db allocate on demand */
->>> +       if (!attrib->value) {
->>> +               attrib->value = malloc0(len + offset);
->>> +               if (!attrib->value)
->>> +                       return false;
->>> +               attrib->value_len = len + offset;
->>> +       } else if (offset >= attrib->value_len ||
->>> +                               len > (unsigned) (attrib->value_len - offset)) {
->>> +               attrib->value = realloc(attrib->value, len + offset);
+>> diff --git a/unit/test-gatt.c b/unit/test-gatt.c
+>> index bbbf9a5..f84b0fc 100644
+>> --- a/unit/test-gatt.c
+>> +++ b/unit/test-gatt.c
+>> @@ -35,8 +35,10 @@
 >>
->> I wouldn't immediately modify attrib->value here. Use a temporary, so
->> that if realloc fails, the write will fail but the attribute value
->> will remain unmodified.
+>>  #include <glib.h>
+>>
+>> +#include "lib/uuid.h"
+>>  #include "src/shared/util.h"
+>>  #include "src/shared/att.h"
+>> +#include "src/shared/gatt-helpers.h"
+>>  #include "src/shared/gatt-client.h"
+>>
+>>  struct test_pdu {
+>> @@ -45,14 +47,22 @@ struct test_pdu {
+>>         size_t size;
+>>  };
+>>
+>> +enum context_type {
+>> +       ATT,
+>> +       CLIENT,
+>> +       SERVER
+>> +};
 >
-> Well realloc would still affect the pointer anyway, and I guess if it
-> fails it would return the original pointer and nothing would be change
-> so the return is only really useful if the original pointer is NULL
-> then it acts as malloc.
+> Well the ATT part of this is a bit weird, do we really need to do this
+> distinction.
 >
+>>  struct test_data {
+>>         char *test_name;
+>>         struct test_pdu *pdu_list;
+>> +       enum context_type context_type;
+>>  };
+>>
+>>  struct context {
+>>         GMainLoop *main_loop;
+>>         struct bt_gatt_client *client;
+>> +       struct bt_att *att;
+>>         guint source;
+>>         guint process;
+>>         int fd;
+>> @@ -69,13 +79,14 @@ struct context {
+>>                 .size = sizeof(data(args)),                     \
+>>         }
+>>
+>> -#define define_test(name, function, args...)                           \
+>> +#define define_test(name, function, type, args...)                     \
+>>         do {                                                            \
+>>                 const struct test_pdu pdus[] = {                        \
+>>                         args, { }                                       \
+>>                 };                                                      \
+>>                 static struct test_data data;                           \
+>>                 data.test_name = g_strdup(name);                        \
+>> +               data.context_type = type;                               \
+>>                 data.pdu_list = g_malloc(sizeof(pdus));                 \
+>>                 memcpy(data.pdu_list, pdus, sizeof(pdus));              \
+>>                 g_test_add_data_func(name, &data, function);            \
+>> @@ -182,6 +193,7 @@ static void gatt_debug(const char *str, void *user_data)
+>>  static struct context *create_context(uint16_t mtu, gconstpointer data)
+>>  {
+>>         struct context *context = g_new0(struct context, 1);
+>> +       const struct test_data *test_data = data;
+>>         GIOChannel *channel;
+>>         int err, sv[2];
+>>         struct bt_att *att;
+>> @@ -195,12 +207,25 @@ static struct context *create_context(uint16_t mtu, gconstpointer data)
+>>         att = bt_att_new(sv[0]);
+>>         g_assert(att);
+>>
+>> -       context->client = bt_gatt_client_new(att, mtu);
+>> -       g_assert(context->client);
+>> +       switch (test_data->context_type) {
+>> +       case ATT:
+>> +               context->att = att;
+>>
+>> -       if (g_test_verbose())
+>> -               bt_gatt_client_set_debug(context->client, gatt_debug, "gatt:",
+>> -                                                                       NULL);
+>> +               bt_gatt_exchange_mtu(context->att, mtu, NULL, NULL, NULL);
+>> +               break;
+>> +       case CLIENT:
+>> +               context->client = bt_gatt_client_new(att, mtu);
+>> +               g_assert(context->client);
+>> +
+>> +               if (g_test_verbose())
+>> +                       bt_gatt_client_set_debug(context->client, gatt_debug,
+>> +                                                               "gatt:", NULL);
+>> +
+>> +               bt_att_unref(att);
+>> +               break;
+>> +       default:
+>> +               break;
+>> +       }
+>>
+>>         channel = g_io_channel_unix_new(sv[1]);
+>>
+>> @@ -214,7 +239,6 @@ static struct context *create_context(uint16_t mtu, gconstpointer data)
+>>         g_assert(context->source > 0);
+>>
+>>         g_io_channel_unref(channel);
+>> -       bt_att_unref(att);
+>>
+>>         context->fd = sv[1];
+>>         context->data = data;
+>> @@ -222,6 +246,17 @@ static struct context *create_context(uint16_t mtu, gconstpointer data)
+>>         return context;
+>>  }
+>>
+>> +static void primary_cb(bool success, uint8_t att_ecode,
+>> +                                               struct bt_gatt_result *result,
+>> +                                               void *user_data)
+>> +{
+>> +       struct context *context = user_data;
+>> +
+>> +       g_assert(success);
+>> +
+>> +       context_quit(context);
+>> +}
+>> +
+>>  static void destroy_context(struct context *context)
+>>  {
+>>         if (context->source > 0)
+>> @@ -229,6 +264,9 @@ static void destroy_context(struct context *context)
+>>
+>>         bt_gatt_client_unref(context->client);
+>>
+>> +       if (context->att)
+>> +               bt_att_unref(context->att);
+>> +
+>>         g_main_loop_unref(context->main_loop);
+>>
+>>         test_free(context->data);
+>> @@ -249,6 +287,16 @@ static void test_client(gconstpointer data)
+>>         execute_context(context);
+>>  }
+>>
+>> +static void test_search_primary(gconstpointer data)
+>> +{
+>> +       struct context *context = create_context(512, data);
+>> +
+>> +       bt_gatt_discover_all_primary_services(context->att, NULL, primary_cb,
+>> +                                                               context, NULL);
+>
+> Doesn't bt_gatt_client does the same here, I guess I missed this
+> detail in the first time but if this is just testing client side then
+> it should use bt_gatt_client and if that cannot be tested we probably
+> have a problem with our API. I guess PTS would just pass if we do more
+> than search the primary services, so things like setting the MTU etc
+> should not be a problem here.
 
-I see, sounds good then.
+Specifically setting the MTU is allowed, but the reason to avoid using
+bt_gatt_client_new/init here is to avoid the automatic service
+discovery.  This is probably a good idea at least for testing the
+different types of discovery.  (is bt_gatt_client  Alternately maybe
+just test the type of discovery used by bt_gatt_client.  When
+implementing the read value tests, the auto-discovery of
+bt_gatt_client may make the test data longer because it needs to be
+included in every one.
 
->>> +               if (!attrib->value)
->>> +                       return 0;
+>> +       execute_context(context);
+>> +}
+>> +
+>>  int main(int argc, char *argv[])
+>>  {
+>>         g_test_init(&argc, &argv, NULL);
+>> @@ -259,8 +307,29 @@ int main(int argc, char *argv[])
+>>          * The test group objective is to verify Generic Attribute Profile
+>>          * Server Configuration.
+>>          */
+>> -       define_test("/TP/GAC/CL/BV-01-C", test_client,
+>> +       define_test("/TP/GAC/CL/BV-01-C", test_client, CLIENT,
+>>                                 raw_pdu(0x02, 0x00, 0x02));
 >>
->> return false, to be consistent with the previous block.
->
-> Will fix this.
->
->>> +               attrib->value_len = len + offset;
->>> +       }
->>> +
->>> +       memcpy(&attrib->value[offset], value, len);
+>> +       /*
+>> +        * Discovery
+>> +        *
+>> +        * The test group objective is to verify Generic Attribute Profile
+>> +        * Discovery of Services and Service Characteristics.
+>> +        */
+>> +       define_test("/TP/GAD/CL/BV-01-C", test_search_primary, ATT,
+>> +                       raw_pdu(0x02, 0x00, 0x02),
+>> +                       raw_pdu(0x03, 0x00, 0x02),
+>> +                       raw_pdu(0x10, 0x01, 0x00, 0xff, 0xff, 0x00, 0x28),
+>> +                       raw_pdu(0x11, 0x06, 0x10, 0x00, 0x13, 0x00, 0x00, 0x18,
+>> +                                       0x20, 0x00, 0x29, 0x00, 0xb0, 0x68,
+>> +                                       0x30, 0x00, 0x32, 0x00, 0x19, 0x18),
+>> +                       raw_pdu(0x10, 0x33, 0x00, 0xff, 0xff, 0x00, 0x28),
+>> +                       raw_pdu(0x11, 0x14, 0x90, 0x00, 0x96, 0x00, 0xef, 0xcd,
+>> +                                       0xab, 0x89, 0x67, 0x45, 0x23, 0x01,
+>> +                                       0x00, 0x00, 0x00, 0x00, 0x85, 0x60,
+>> +                                       0x00, 0x00),
+>> +                       raw_pdu(0x10, 0x97, 0x00, 0xff, 0xff, 0x00, 0x28),
+>> +                       raw_pdu(0x01, 0x10, 0x97, 0x00, 0x0a));
+>> +
+>>         return g_test_run();
+>>  }
+>> --
+>> 1.9.3
 >>
->> I'm still not sure about allowing writes if attrib->write_func is
->> NULL. My thinking is, if the write_func is not set, then this
->> attribute is not writable so we always return false. This is
->> automatically the case for all declaration attributes since they
->> wouldn't have write permission. All other writes will then always be
->> delegated to the upper layer. This would keep things a bit simpler I
->> think, especially since we wouldn't want some accidental usage of
->> gatt_db_attribute_write on a declaration handle to break the database.
->
-> The db has no idea of permissions bits to begin with so it cannot
-> check consistency between permissions and callbacks, and I do remember
-> commenting that this allows to store values in the db itself, which is
-> very convenient for plugins, this is also valid for read, any plugin
-> should be able to read values stored in the db, so at in terms of API
-> it is consistent to allow writes without a callback.
->
-
-Fair enough. In this case it looks like we are making the values be
-variable length as the db's default behavior, which is fine with me.
-We should probably later start documenting these things some place
-though.
-
->>> +
->>> +       if (func)
->>> +               func(attrib, 0, user_data);
->>> +
->>> +       return true;
->>>  }
->>> --
->>> 1.9.3
->>>
->>> --
->>> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
->>> the body of a message to majordomo@vger.kernel.org
->>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->>
->> Cheers,
->> Arman
+>> --
+>> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+>> the body of a message to majordomo@vger.kernel.org
+>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 >
 >
 >
 > --
 > Luiz Augusto von Dentz
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
-Cheers,
-Arman
+-- 
+Michael Janssen
