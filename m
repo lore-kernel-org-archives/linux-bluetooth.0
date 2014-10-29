@@ -1,146 +1,99 @@
 Return-Path: <cyrus@holtmann.org>
+MIME-Version: 1.0
+In-Reply-To: <CAHrH25QSxe2L7ixyiT30e19sLDQQ_MyXEH7qObTDmuCHFVbJPw@mail.gmail.com>
+References: <1414513123-5689-1-git-send-email-luiz.dentz@gmail.com>
+	<1414513123-5689-6-git-send-email-luiz.dentz@gmail.com>
+	<CAHrH25QSxe2L7ixyiT30e19sLDQQ_MyXEH7qObTDmuCHFVbJPw@mail.gmail.com>
+Date: Wed, 29 Oct 2014 11:15:11 +0200
+Message-ID: <CABBYNZ+cJwcQFKtt0Tg5Cn7++2=X7SSz3sO_USEcCR20chwy_g@mail.gmail.com>
+Subject: Re: [PATCH v2 6/9] shared/gatt-db: Add gatt_db_attribute_read
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ] shared/gatt-db: Fix use of INT_TO_PTR for handles
-Date: Wed, 29 Oct 2014 11:26:32 +0200
-Message-Id: <1414574792-2339-1-git-send-email-luiz.dentz@gmail.com>
+To: Arman Uguray <armansito@chromium.org>
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Arman,
 
-This make use of UINT_TO_PTR since handles are uint16_t.
----
- src/shared/gatt-db.c | 28 ++++++++++++++--------------
- 1 file changed, 14 insertions(+), 14 deletions(-)
+On Wed, Oct 29, 2014 at 12:20 AM, Arman Uguray <armansito@chromium.org> wrote:
+> Hi Luiz,
+>
+> On Tue, Oct 28, 2014 at 9:18 AM, Luiz Augusto von Dentz
+> <luiz.dentz@gmail.com> wrote:
+>> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>>
+>> ---
+>>  src/shared/gatt-db.c | 18 +++++++++++++++++-
+>>  1 file changed, 17 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/src/shared/gatt-db.c b/src/shared/gatt-db.c
+>> index f43cac3..b5b6c72 100644
+>> --- a/src/shared/gatt-db.c
+>> +++ b/src/shared/gatt-db.c
+>> @@ -891,7 +891,23 @@ bool gatt_db_attribute_read(struct gatt_db_attribute *attrib, uint16_t offset,
+>>                                 uint8_t opcode, bdaddr_t *bdaddr,
+>>                                 gatt_db_attribute_read_t func, void *user_data)
+>>  {
+>> -       return false;
+>> +       if (!attrib || !func)
+>> +               return false;
+>> +
+>> +       if (attrib->read_func) {
+>> +               attrib->read_func(attrib->handle, offset, opcode, bdaddr,
+>> +                                                       attrib->user_data);
+>> +               return true;
+>> +       }
+>> +
+>> +       /* Check length boundary if value is stored in the db */
+>> +       if (offset >= attrib->value_len)
+>> +               return false;
+>
+> Thanks for moving this after the callback check. As for valid
+> boundaries, I've actually seen devices that allow sending an offset
+> that is the same as the length of the value. They just return an empty
+> value PDU back. So maybe return NULL for the value if offset ==
+> attrib->value_len? What I had in mind was:
 
-diff --git a/src/shared/gatt-db.c b/src/shared/gatt-db.c
-index 65c5759..6b5e84c 100644
---- a/src/shared/gatt-db.c
-+++ b/src/shared/gatt-db.c
-@@ -67,7 +67,7 @@ static bool match_service_by_handle(const void *data, const void *user_data)
- {
- 	const struct gatt_db_service *service = data;
- 
--	return service->attributes[0]->handle == PTR_TO_INT(user_data);
-+	return service->attributes[0]->handle == PTR_TO_UINT(user_data);
- }
- 
- static struct gatt_db_attribute *new_attribute(const bt_uuid_t *type,
-@@ -214,7 +214,7 @@ bool gatt_db_remove_service(struct gatt_db *db, uint16_t handle)
- 	struct gatt_db_service *service;
- 
- 	service = queue_remove_if(db->services, match_service_by_handle,
--							INT_TO_PTR(handle));
-+							UINT_TO_PTR(handle));
- 	if (!service)
- 		return false;
- 
-@@ -282,7 +282,7 @@ uint16_t gatt_db_add_characteristic(struct gatt_db *db, uint16_t handle,
- 	int i;
- 
- 	service = queue_find(db->services, match_service_by_handle,
--							INT_TO_PTR(handle));
-+							UINT_TO_PTR(handle));
- 	if (!service)
- 		return 0;
- 
-@@ -327,7 +327,7 @@ uint16_t gatt_db_add_char_descriptor(struct gatt_db *db, uint16_t handle,
- 	int i;
- 
- 	service = queue_find(db->services, match_service_by_handle,
--							INT_TO_PTR(handle));
-+							UINT_TO_PTR(handle));
- 	if (!service)
- 		return 0;
- 
-@@ -355,12 +355,12 @@ uint16_t gatt_db_add_included_service(struct gatt_db *db, uint16_t handle,
- 	int index;
- 
- 	service = queue_find(db->services, match_service_by_handle,
--							INT_TO_PTR(handle));
-+							UINT_TO_PTR(handle));
- 	if (!service)
- 		return 0;
- 
- 	included_service = queue_find(db->services, match_service_by_handle,
--						INT_TO_PTR(included_handle));
-+						UINT_TO_PTR(included_handle));
- 
- 	if (!included_service)
- 		return 0;
-@@ -406,7 +406,7 @@ bool gatt_db_service_set_active(struct gatt_db *db, uint16_t handle,
- 	struct gatt_db_service *service;
- 
- 	service = queue_find(db->services, match_service_by_handle,
--							INT_TO_PTR(handle));
-+							UINT_TO_PTR(handle));
- 	if (!service)
- 		return false;
- 
-@@ -636,7 +636,7 @@ void gatt_db_find_information(struct gatt_db *db, uint16_t start_handle,
- static bool find_service_for_handle(const void *data, const void *user_data)
- {
- 	const struct gatt_db_service *service = data;
--	uint16_t handle = PTR_TO_INT(user_data);
-+	uint16_t handle = PTR_TO_UINT(user_data);
- 	uint16_t start, end;
- 
- 	start = service->attributes[0]->handle;
-@@ -657,7 +657,7 @@ bool gatt_db_read(struct gatt_db *db, uint16_t handle, uint16_t offset,
- 		return false;
- 
- 	service = queue_find(db->services, find_service_for_handle,
--						INT_TO_PTR(handle));
-+						UINT_TO_PTR(handle));
- 	if (!service)
- 		return false;
- 
-@@ -695,7 +695,7 @@ bool gatt_db_write(struct gatt_db *db, uint16_t handle, uint16_t offset,
- 	struct gatt_db_attribute *a;
- 
- 	service = queue_find(db->services, find_service_for_handle,
--						INT_TO_PTR(handle));
-+						UINT_TO_PTR(handle));
- 	if (!service)
- 		return false;
- 
-@@ -719,7 +719,7 @@ const bt_uuid_t *gatt_db_get_attribute_type(struct gatt_db *db,
- 	uint16_t service_handle;
- 
- 	service = queue_find(db->services, find_service_for_handle,
--						INT_TO_PTR(handle));
-+						UINT_TO_PTR(handle));
- 	if (!service)
- 		return NULL;
- 
-@@ -737,7 +737,7 @@ uint16_t gatt_db_get_end_handle(struct gatt_db *db, uint16_t handle)
- 	struct gatt_db_service *service;
- 
- 	service = queue_find(db->services, find_service_for_handle,
--						INT_TO_PTR(handle));
-+						UINT_TO_PTR(handle));
- 	if (!service)
- 		return 0;
- 
-@@ -750,7 +750,7 @@ bool gatt_db_get_service_uuid(struct gatt_db *db, uint16_t handle,
- 	struct gatt_db_service *service;
- 
- 	service = queue_find(db->services, find_service_for_handle,
--						INT_TO_PTR(handle));
-+						UINT_TO_PTR(handle));
- 	if (!service)
- 		return false;
- 
-@@ -783,7 +783,7 @@ bool gatt_db_get_attribute_permissions(struct gatt_db *db, uint16_t handle,
- 	uint16_t service_handle;
- 
- 	service = queue_find(db->services, find_service_for_handle,
--							INT_TO_PTR(handle));
-+							UINT_TO_PTR(handle));
- 	if (!service)
- 		return false;
- 
+But then this would be valid for any offset past value_len doesn't it
+or this is specific to determine the side of the value, in the other
+hand there does exist an error for invalid offset which I thought
+would be preferable, well if we can distinct this error which
+currently we do not because of the bool return.
+
+>   if (offset > attrib->value_len)
+>       return false;
+>
+>   func(attrib, 0, (offset == attrib->value_len) ? NULL :
+> &attrib->value[offset], ...);
+>
+>   return true;
+>
+> Then we would guard against the invalid access but the large offset
+> would still be a valid. I guess it really comes down to what we
+> consider to be a "valid" offset but I've seen implementations that do
+> this. Up to you.
+>
+>> +
+>> +       func(attrib, 0, &attrib->value[offset], attrib->value_len - offset,
+>> +                                                               user_data);
+>> +
+>> +       return true;
+>>  }
+>>
+>>  bool gatt_db_attribute_write(struct gatt_db_attribute *attrib, uint16_t offset,
+>> --
+>> 1.9.3
+>>
+>> --
+>> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+>> the body of a message to majordomo@vger.kernel.org
+>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>
+> Cheers,
+> Arman
+
+
+
 -- 
-1.9.3
-
+Luiz Augusto von Dentz
