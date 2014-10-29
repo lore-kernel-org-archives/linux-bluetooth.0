@@ -1,124 +1,128 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <CAHrH25S04qADGehBAbmEWxEqqg0gcKB0k9JJPtDdbsTq=HLx1Q@mail.gmail.com>
-References: <1414513123-5689-1-git-send-email-luiz.dentz@gmail.com>
-	<1414513123-5689-7-git-send-email-luiz.dentz@gmail.com>
-	<CAHrH25S04qADGehBAbmEWxEqqg0gcKB0k9JJPtDdbsTq=HLx1Q@mail.gmail.com>
-Date: Wed, 29 Oct 2014 16:41:50 +0200
-Message-ID: <CABBYNZL87g7vbe1bxO9vZb0BZJgy3__riqBxVhiK1wWE4rfHiQ@mail.gmail.com>
-Subject: Re: [PATCH v2 7/9] shared/gatt-db: Add gatt_db_attribute_write
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Arman Uguray <armansito@chromium.org>
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+From: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
+Subject: [PATCH 2/2] android/tester: Add AVRCP RegNotifPlayStatusChanged test case
+Date: Wed, 29 Oct 2014 15:47:20 +0200
+Message-Id: <1414590440-15101-2-git-send-email-ravikumar.veeramally@linux.intel.com>
+In-Reply-To: <1414590440-15101-1-git-send-email-ravikumar.veeramally@linux.intel.com>
+References: <1414590440-15101-1-git-send-email-ravikumar.veeramally@linux.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Arman,
+---
+ android/tester-avrcp.c | 60 ++++++++++++++++++++++++++++++++++++++++++++++++++
+ android/tester-main.h  |  5 +++++
+ 2 files changed, 65 insertions(+)
 
-On Wed, Oct 29, 2014 at 12:30 AM, Arman Uguray <armansito@chromium.org> wrote:
-> Hi Luiz,
->
-> On Tue, Oct 28, 2014 at 9:18 AM, Luiz Augusto von Dentz
-> <luiz.dentz@gmail.com> wrote:
->> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->>
->> ---
->>  src/shared/gatt-db.c | 32 ++++++++++++++++++++++++++++++--
->>  1 file changed, 30 insertions(+), 2 deletions(-)
->>
->> diff --git a/src/shared/gatt-db.c b/src/shared/gatt-db.c
->> index b5b6c72..5a912f8 100644
->> --- a/src/shared/gatt-db.c
->> +++ b/src/shared/gatt-db.c
->> @@ -900,7 +900,7 @@ bool gatt_db_attribute_read(struct gatt_db_attribute *attrib, uint16_t offset,
->>                 return true;
->>         }
->>
->> -       /* Check length boundary if value is stored in the db */
->> +       /* Check boundary if value is stored in the db */
->>         if (offset >= attrib->value_len)
->>                 return false;
->>
->> @@ -916,5 +916,33 @@ bool gatt_db_attribute_write(struct gatt_db_attribute *attrib, uint16_t offset,
->>                                         gatt_db_attribute_write_t func,
->>                                         void *user_data)
->>  {
->> -       return false;
->> +       if (!attrib)
->> +               return false;
->> +
->> +       if (attrib->write_func) {
->> +               attrib->write_func(attrib->handle, offset, value, len, opcode,
->> +                                               bdaddr, attrib->user_data);
->> +               return true;
->> +       }
->> +
->> +       /* For values stored in db allocate on demand */
->> +       if (!attrib->value) {
->> +               attrib->value = malloc0(len + offset);
->> +               if (!attrib->value)
->> +                       return false;
->> +               attrib->value_len = len + offset;
->> +       } else if (offset >= attrib->value_len ||
->> +                               len > (unsigned) (attrib->value_len - offset)) {
->> +               attrib->value = realloc(attrib->value, len + offset);
->
-> I wouldn't immediately modify attrib->value here. Use a temporary, so
-> that if realloc fails, the write will fail but the attribute value
-> will remain unmodified.
-
-Well realloc would still affect the pointer anyway, and I guess if it
-fails it would return the original pointer and nothing would be change
-so the return is only really useful if the original pointer is NULL
-then it acts as malloc.
-
->> +               if (!attrib->value)
->> +                       return 0;
->
-> return false, to be consistent with the previous block.
-
-Will fix this.
-
->> +               attrib->value_len = len + offset;
->> +       }
->> +
->> +       memcpy(&attrib->value[offset], value, len);
->
-> I'm still not sure about allowing writes if attrib->write_func is
-> NULL. My thinking is, if the write_func is not set, then this
-> attribute is not writable so we always return false. This is
-> automatically the case for all declaration attributes since they
-> wouldn't have write permission. All other writes will then always be
-> delegated to the upper layer. This would keep things a bit simpler I
-> think, especially since we wouldn't want some accidental usage of
-> gatt_db_attribute_write on a declaration handle to break the database.
-
-The db has no idea of permissions bits to begin with so it cannot
-check consistency between permissions and callbacks, and I do remember
-commenting that this allows to store values in the db itself, which is
-very convenient for plugins, this is also valid for read, any plugin
-should be able to read values stored in the db, so at in terms of API
-it is consistent to allow writes without a callback.
-
->> +
->> +       if (func)
->> +               func(attrib, 0, user_data);
->> +
->> +       return true;
->>  }
->> --
->> 1.9.3
->>
->> --
->> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
->> the body of a message to majordomo@vger.kernel.org
->> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->
-> Cheers,
-> Arman
-
-
-
+diff --git a/android/tester-avrcp.c b/android/tester-avrcp.c
+index 2ff9fa0..0b4faf3 100644
+--- a/android/tester-avrcp.c
++++ b/android/tester-avrcp.c
+@@ -98,6 +98,12 @@ static struct emu_l2cap_cid_data sdp_data = {
+ 				0x58, 0x31, 0x00, 0x00, 0x04, 0x05, 0xFF, \
+ 							0xFF, 0xFF, 0xFF
+ 
++#define req_status_notif 0x00, 0x11, 0x0e, 0x03, 0x48, 0x00, 0x00, 0x19, \
++				0x58, 0x31, 0x00, 0x00, 0x05, 0x01, 0x00, \
++							0x00, 0x00, 0x00
++
++#define rsp_status_notif 0x00, 0x11, 0x0e, 0x0D, 0x48, 0x00, 0x00, 0x19, \
++				0x58, 0x31, 0x00, 0x00, 0x01, 0x01, 0x00
+ 
+ #define req_ele_attr 0x00, 0x11, 0x0e, 0x01, 0x48, 0x00, 0x00, 0x19, 0x58, \
+ 			0x20, 0x00, 0x00, 0x0D, 0x00, 0x00, 0x00, 0x00, \
+@@ -177,6 +183,12 @@ static void avrcp_cid_hook_cb(const void *data, uint16_t len, void *user_data)
+ 			step->callback_result.song_position =
+ 							get_be32(data + 14);
+ 			schedule_callback_verification(step);
++		} else if (event == 0x01) {
++			step = g_new0(struct step, 1);
++			step->callback = CB_AVRCP_REG_NOTIF_RSP;
++			step->callback_result.play_status =
++							((uint8_t *) data)[14];
++			schedule_callback_verification(step);
+ 		}
+ 		break;
+ 	case AVRCP_GET_ELEMENT_ATTRIBUTES:
+@@ -355,6 +367,32 @@ static void avrcp_reg_notif_play_position_changed_rsp(void)
+ 	schedule_action_verification(step);
+ }
+ 
++static void avrcp_reg_notif_play_status_changed_req(void)
++{
++	struct test_data *data = tester_get_data();
++	struct bthost *bthost = hciemu_client_get_host(data->hciemu);
++	const struct iovec pdu = raw_pdu(req_status_notif);
++	struct step *step = g_new0(struct step, 1);
++
++	bthost_send_cid_v(bthost, avrcp_data.handle, avrcp_data.cid, &pdu, 1);
++	step->action_status = BT_STATUS_SUCCESS;
++	schedule_action_verification(step);
++}
++
++static void avrcp_reg_notif_play_status_changed_rsp(void)
++{
++	struct test_data *data = tester_get_data();
++	struct step *step = g_new0(struct step, 1);
++	btrc_register_notification_t reg;
++
++	reg.play_status = BTRC_PLAYSTATE_STOPPED;
++	step->action_status = data->if_avrcp->register_notification_rsp(
++						BTRC_EVT_PLAY_STATUS_CHANGED,
++					BTRC_NOTIFICATION_TYPE_CHANGED, &reg);
++
++	schedule_action_verification(step);
++}
++
+ static void avrcp_get_element_attributes_req(void)
+ {
+ 	struct test_data *data = tester_get_data();
+@@ -487,6 +525,28 @@ static struct test_case test_cases[] = {
+ 		ACTION_SUCCESS(bluetooth_disable_action, NULL),
+ 		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_OFF),
+ 	),
++	TEST_CASE_BREDRLE("AVRCP RegNotifPlayStatusChanged - Success",
++		ACTION_SUCCESS(bluetooth_enable_action, NULL),
++		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_ON),
++		ACTION_SUCCESS(emu_setup_powered_remote_action, NULL),
++		ACTION_SUCCESS(emu_set_ssp_mode_action, NULL),
++		ACTION_SUCCESS(set_default_ssp_request_handler, NULL),
++		ACTION_SUCCESS(emu_add_l2cap_server_action, &sdp_setup_data),
++		ACTION_SUCCESS(emu_add_l2cap_server_action, &a2dp_setup_data),
++		ACTION_SUCCESS(emu_add_l2cap_server_action, &avrcp_setup_data),
++		ACTION_SUCCESS(avrcp_connect_action, NULL),
++		CALLBACK_AV_CONN_STATE(CB_A2DP_CONN_STATE,
++					BTAV_CONNECTION_STATE_CONNECTING),
++		CALLBACK_AV_CONN_STATE(CB_A2DP_CONN_STATE,
++					BTAV_CONNECTION_STATE_CONNECTED),
++		ACTION_SUCCESS(avrcp_reg_notif_play_status_changed_req, NULL),
++		CALLBACK(CB_AVRCP_REG_NOTIF_REQ),
++		ACTION_SUCCESS(avrcp_reg_notif_play_status_changed_rsp, NULL),
++		CALLBACK_RC_REG_NOTIF_STATUS_CHANGED(CB_AVRCP_REG_NOTIF_RSP,
++									0x00),
++		ACTION_SUCCESS(bluetooth_disable_action, NULL),
++		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_OFF),
++	),
+ 	TEST_CASE_BREDRLE("AVRCP GetElementAttributes - Success",
+ 		ACTION_SUCCESS(bluetooth_enable_action, NULL),
+ 		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_ON),
+diff --git a/android/tester-main.h b/android/tester-main.h
+index 1a779a2..4407514 100644
+--- a/android/tester-main.h
++++ b/android/tester-main.h
+@@ -414,6 +414,11 @@ struct pdu_set {
+ 		.callback_result.song_position = cb_position, \
+ 	}
+ 
++#define CALLBACK_RC_REG_NOTIF_STATUS_CHANGED(cb, cb_status) { \
++		.callback = cb, \
++		.callback_result.play_status = cb_status, \
++	}
++
+ #define CALLBACK_RC_GET_ELEMENT_ATTRIBUTES(cb, cb_num_of_attrs, cb_attrs) { \
+ 		.callback = cb, \
+ 		.callback_result.num_of_attrs = cb_num_of_attrs, \
 -- 
-Luiz Augusto von Dentz
+2.1.0
+
