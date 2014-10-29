@@ -1,165 +1,93 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <CAHrH25RJDcHgDNV+Y0S0jyOwko_WJcHKygPY3=rZcCN23aZ3HA@mail.gmail.com>
-References: <1414513123-5689-1-git-send-email-luiz.dentz@gmail.com>
-	<CAHrH25RJDcHgDNV+Y0S0jyOwko_WJcHKygPY3=rZcCN23aZ3HA@mail.gmail.com>
-Date: Wed, 29 Oct 2014 17:54:31 +0200
-Message-ID: <CABBYNZLeHNuFJrEManG1WUXpKNojRhJcyki0xvuVRyaAbbV0Yg@mail.gmail.com>
-Subject: Re: [PATCH v2 1/9] shared/gatt-db: Expose gatt_db_attribute
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Arman Uguray <armansito@chromium.org>
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
+In-Reply-To: <1414596229-23184-2-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+References: <1414596229-23184-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+	<1414596229-23184-2-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+Date: Wed, 29 Oct 2014 16:46:07 +0100
+Message-ID: <CAMv5GbdJSsUFrybrw-cynJFZ1+dOpAE5g18CAvswCrfkxps3dQ@mail.gmail.com>
+Subject: Re: [PATCH 2/2] tools/mcaptest: Add no exit after MCL disconnect to mcaptool
+From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
+To: linux-bluetooth <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Arman,
+Hi,
 
-On Wed, Oct 29, 2014 at 5:09 PM, Arman Uguray <armansito@chromium.org> wrote:
-> Hi Luiz,
+On 29 October 2014 16:23, Grzegorz Kolodziejczyk
+<grzegorz.kolodziejczyk@tieto.com> wrote:
+> This is needed while reconnecting MCL or some PTS test cases:
+> TC_MCAP_CM_REC_BV_x_C - test cases branch
+> ---
+>  tools/mcaptest.c | 14 +++++++++++++-
+>  1 file changed, 13 insertions(+), 1 deletion(-)
 >
-> On Tue, Oct 28, 2014 at 9:18 AM, Luiz Augusto von Dentz
-> <luiz.dentz@gmail.com> wrote:
->> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->>
->> This is the new API to reduce the lookups in gatt_db and make it
->> a little bit more convenient for batch operations, so the general idea
->> is to be able to get a hold of it via gatt_db_get_attribute but also
->> replace the handles in the queues with proper attributes so the server
->> code don't have to lookup again when reading/writing, checking
->> permissions, or any other operation that can be done directly.
->> ---
->> v2: Address problems gatt_db_attribute_read and gatt_db_attribute_write
->> pointed out by Arman.
->>
->>  src/shared/gatt-db.c | 49 +++++++++++++++++++++++++++++++++++++++++++++++++
->>  src/shared/gatt-db.h | 33 +++++++++++++++++++++++++++++++++
->>  2 files changed, 82 insertions(+)
->>
->> diff --git a/src/shared/gatt-db.c b/src/shared/gatt-db.c
->> index 65c5759..19784d1 100644
->> --- a/src/shared/gatt-db.c
->> +++ b/src/shared/gatt-db.c
->> @@ -802,3 +802,52 @@ bool gatt_db_get_attribute_permissions(struct gatt_db *db, uint16_t handle,
->>         return true;
->>
->>  }
->> +
->> +struct gatt_db_attribute *gatt_db_get_attribute(struct gatt_db *db,
->> +                                                       uint16_t handle)
->> +{
->> +       return NULL;
->> +}
->> +
->> +uint16_t gatt_db_attribute_get_start_handle(struct gatt_db_attribute *attrib)
->> +{
->> +       return 0;
->> +}
->> +
->> +uint16_t gatt_db_attribute_get_end_handle(struct gatt_db_attribute *attrib)
->> +{
->> +       return 0;
->> +}
->> +
->> +const bt_uuid_t *gatt_db_attribute_get_type(struct gatt_db_attribute *attrib)
->> +{
->> +       return NULL;
->> +}
->> +
->> +bool gatt_db_attribute_get_service_uuid(struct gatt_db_attribute *attrib,
->> +                                                       bt_uuid_t *uuid)
->> +{
->> +       return false;
->> +}
->> +
->> +bool gatt_db_attribute_get_permissions(struct gatt_db_attribute *attrib,
->> +                                                       uint32_t *permissions)
->> +{
->> +       return false;
->> +}
->> +
->> +bool gatt_db_attribute_read(struct gatt_db_attribute *attrib, uint16_t offset,
->> +                               uint8_t opcode, bdaddr_t *bdaddr,
->> +                               gatt_db_attribute_read_t func, void *user_data)
->> +{
->> +       return false;
->> +}
->> +
->> +bool gatt_db_attribute_write(struct gatt_db_attribute *attrib, uint16_t offset,
->> +                                       const uint8_t *value, size_t len,
->> +                                       uint8_t opcode, bdaddr_t *bdaddr,
->> +                                       gatt_db_attribute_write_t func,
->> +                                       void *user_data)
->> +{
->> +       return false;
->> +}
->> diff --git a/src/shared/gatt-db.h b/src/shared/gatt-db.h
->> index 8d18434..0c16e88 100644
->> --- a/src/shared/gatt-db.h
->> +++ b/src/shared/gatt-db.h
->> @@ -96,3 +96,36 @@ bool gatt_db_get_service_uuid(struct gatt_db *db, uint16_t handle,
->>
->>  bool gatt_db_get_attribute_permissions(struct gatt_db *db, uint16_t handle,
->>                                                         uint32_t *permissions);
->> +
->> +struct gatt_db_attribute;
->> +
->> +struct gatt_db_attribute *gatt_db_get_attribute(struct gatt_db *db,
->> +                                                       uint16_t handle);
->> +
->> +uint16_t gatt_db_attribute_get_start_handle(struct gatt_db_attribute *attrib);
->> +uint16_t gatt_db_attribute_get_end_handle(struct gatt_db_attribute *attrib);
->> +
->> +const bt_uuid_t *gatt_db_attribute_get_type(struct gatt_db_attribute *attrib);
->> +
->> +bool gatt_db_attribute_get_service_uuid(struct gatt_db_attribute *attrib,
->> +                                                       bt_uuid_t *uuid);
->> +
->> +bool gatt_db_attribute_get_permissions(struct gatt_db_attribute *attrib,
->> +                                                       uint32_t *permissions);
->> +
->> +typedef void (*gatt_db_attribute_read_t) (struct gatt_db_attribute *attrib,
->> +                                       int err, uint8_t *value, size_t length,
->> +                                       void *user_data);
+> diff --git a/tools/mcaptest.c b/tools/mcaptest.c
+> index 6d50544..1bccb21 100644
+> --- a/tools/mcaptest.c
+> +++ b/tools/mcaptest.c
+> @@ -67,6 +67,8 @@ static int mdl_disconnect_timeout = -1;
 >
-> Should the "err" argument here and in gatt_db_attribute_write_it be
-> uint8_t instead of int? The pre-defined ATT protocol errors as well as
-> profile/application defined errors are reported in one byte in an
-> error response. What would we need a larger or a negative value for?
-
-Usually we use negative errno to report errors and then have a central
-point converting them to native protocol, but perhaps we have to give
-the possibility to provide the ATT errors directly here, which is kind
-of a stack violation if you ask me, but Android does seems to be doing
-it by expecting the application to respond with proper error code, so
-perhaps we do both and treat positive returns as ATT error code and
-negative as errno.
-
->> +
->> +bool gatt_db_attribute_read(struct gatt_db_attribute *attrib, uint16_t offset,
->> +                               uint8_t opcode, bdaddr_t *bdaddr,
->> +                               gatt_db_attribute_read_t func, void *user_data);
->> +
->> +typedef void (*gatt_db_attribute_write_t) (struct gatt_db_attribute *attrib,
->> +                                               int err, void *user_data);
->> +
->> +bool gatt_db_attribute_write(struct gatt_db_attribute *attrib, uint16_t offset,
->> +                                       const uint8_t *value, size_t len,
->> +                                       uint8_t opcode, bdaddr_t *bdaddr,
->> +                                       gatt_db_attribute_write_t func,
->> +                                       void *user_data);
->> --
->> 1.9.3
->>
->> --
->> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
->> the body of a message to majordomo@vger.kernel.org
->> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>  static struct mcap_mcl *mcl = NULL;
 >
-> Cheers,
-> Arman
+> +static gboolean no_close_after_mcl_disc = FALSE;
+> +
+>  #define REQ_CLOCK_ACC 0x1400
+>
+>  static void mdl_connected_cb(struct mcap_mdl *mdl, void *data)
+> @@ -152,6 +154,9 @@ static void mcl_disconnected(struct mcap_mcl *mcl, gpointer data)
+>         /* TODO */
+>         printf("MCL disconnected\n");
+>
+> +       if (no_close_after_mcl_disc)
+> +               return;
+> +
+>         g_main_loop_quit(mloop);
+>  }
+>
+> @@ -288,6 +293,7 @@ static void usage(void)
+>                 "\t-f <timeout> disconnect MDL after it's connected\n"
+>                 "\t-u send \'Unavailable\' on first MDL connection request\n");
+>         printf("Options:\n"
+> +               "\t-n don't exit after mcl disconnect \n"
+>                 "\t-i <hcidev>        HCI device\n"
+>                 "\t-C <control_ch>    Control channel PSM\n"
+>                 "\t-D <data_ch>       Data channel PSM\n");
+> @@ -302,6 +308,7 @@ static struct option main_options[] = {
+>         { "connect_dl",         0, 0, 'd' },
+>         { "disconnect_dl",      1, 0, 'f' },
+>         { "unavailable_dl",     0, 0, 'u' },
+> +       { "no exit mcl disc",   0, 0, 'n' },
+>         { "control_ch",         1, 0, 'C' },
+>         { "data_ch",            1, 0, 'D' },
+>         { 0, 0, 0, 0 }
+> @@ -323,7 +330,7 @@ int main(int argc, char *argv[])
+>                 exit(1);
+>         }
+>
+> -       while ((opt = getopt_long(argc, argv, "+i:c:C:D:e:f:dghu",
+> +       while ((opt = getopt_long(argc, argv, "+i:c:C:D:e:f:dghun",
+>                                                 main_options, NULL)) != EOF) {
+>                 switch (opt) {
+>                 case 'i':
+> @@ -367,6 +374,11 @@ int main(int argc, char *argv[])
+>
+>                         break;
+>
+> +               case 'n':
+> +                       no_close_after_mcl_disc = TRUE;
+> +
+> +                       break;
+> +
+>                 case 'C':
+>                         ccpsm = atoi(optarg);
+>
+> --
+> 1.9.3
+>
 
+I forgot to add checks for other exits (e.g. in case of MDL error).
+Please don't apply I'll send v2
 
-
--- 
-Luiz Augusto von Dentz
+BR,
+Grzegorz
