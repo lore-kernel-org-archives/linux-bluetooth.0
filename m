@@ -2,56 +2,152 @@ Return-Path: <cyrus@holtmann.org>
 From: Jakub Pawlowski <jpawlowski@google.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Jakub Pawlowski <jpawlowski@google.com>
-Subject: [PATCH v2 3/4] Adding HCI_QUIRK_ADV_RSSI_DEDUP
-Date: Wed, 29 Oct 2014 11:24:30 -0700
-Message-Id: <1414607071-9801-3-git-send-email-jpawlowski@google.com>
-In-Reply-To: <1414607071-9801-1-git-send-email-jpawlowski@google.com>
-References: <1414607071-9801-1-git-send-email-jpawlowski@google.com>
+Subject: [PATCH v2 1/4] add restart_le_scan
+Date: Wed, 29 Oct 2014 11:24:28 -0700
+Message-Id: <1414607071-9801-1-git-send-email-jpawlowski@google.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-When this quirk is set, the device, when in scan with deduplication is
-not sending advertising reports for device when RSSI value changes.
+Currently there is no way to restart le scan. It's needed in
+preparation for new service scan method. The way it work: it disable,
+and then enable le scan on controller. During this restart special flag
+is set to make sure we won't remove disable scan work from workqueue.
 
 Signed-off-by: Jakub Pawlowski <jpawlowski@google.com>
 ---
- include/net/bluetooth/hci.h      | 9 +++++++++
- include/net/bluetooth/hci_core.h | 2 ++
- 2 files changed, 11 insertions(+)
+ include/net/bluetooth/hci.h      |  1 +
+ include/net/bluetooth/hci_core.h |  2 ++
+ net/bluetooth/hci_core.c         | 42 ++++++++++++++++++++++++++++++++++++++++
+ net/bluetooth/hci_event.c        |  9 ++++++---
+ 4 files changed, 51 insertions(+), 3 deletions(-)
 
 diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index b15d240..d8a8e0d 100644
+index 6e8f249..b15d240 100644
 --- a/include/net/bluetooth/hci.h
 +++ b/include/net/bluetooth/hci.h
-@@ -129,6 +129,15 @@ enum {
- 	 * during the hdev->setup vendor callback.
- 	 */
- 	HCI_QUIRK_INVALID_BDADDR,
-+
-+	/* When this quirk is set, the device, when in scan with de-duplication
-+	 * is not sending advertising reports for device when RSSI value
-+	 * changes.
-+	 *
-+	 * This quirk can be set before hci_register_dev is called or
-+	 * during the hdev->setup vendor callback.
-+	 */
-+	HCI_QUIRK_DUPLICATION,
+@@ -194,6 +194,7 @@ enum {
+ 	HCI_FAST_CONNECTABLE,
+ 	HCI_BREDR_ENABLED,
+ 	HCI_LE_SCAN_INTERRUPTED,
++	HCI_LE_SCAN_RESTARTING,
  };
  
- /* HCI device flags */
+ /* A mask for the flags that are supposed to remain when a reset happens
 diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 3c585885..e8e55f0 100644
+index b8685a7..3c585885 100644
 --- a/include/net/bluetooth/hci_core.h
 +++ b/include/net/bluetooth/hci_core.h
-@@ -1304,6 +1304,8 @@ void hci_sock_dev_event(struct hci_dev *hdev, int event);
- #define DISCOV_INTERLEAVED_INQUIRY_LEN	0x04
- #define DISCOV_BREDR_INQUIRY_LEN	0x08
+@@ -334,6 +334,7 @@ struct hci_dev {
+ 	unsigned long		dev_flags;
  
-+#define DISCOV_LE_RESTART_DELAY msecs_to_jiffies(300)
+ 	struct delayed_work	le_scan_disable;
++	struct delayed_work	le_scan_restart;
+ 
+ 	__s8			adv_tx_power;
+ 	__u8			adv_data[HCI_MAX_AD_LENGTH];
+@@ -1369,6 +1370,7 @@ void mgmt_new_conn_param(struct hci_dev *hdev, bdaddr_t *bdaddr,
+ 			 u16 max_interval, u16 latency, u16 timeout);
+ void mgmt_reenable_advertising(struct hci_dev *hdev);
+ void mgmt_smp_complete(struct hci_conn *conn, bool complete);
++void restart_le_scan(struct hci_dev *hdev, unsigned long delay);
+ 
+ u8 hci_le_conn_update(struct hci_conn *conn, u16 min, u16 max, u16 latency,
+ 		      u16 to_multiplier);
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index cb05d7f..85bca9c 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -2580,6 +2580,7 @@ static int hci_dev_do_close(struct hci_dev *hdev)
+ 		cancel_delayed_work(&hdev->service_cache);
+ 
+ 	cancel_delayed_work_sync(&hdev->le_scan_disable);
++	cancel_delayed_work_sync(&hdev->le_scan_restart);
+ 
+ 	if (test_bit(HCI_MGMT, &hdev->dev_flags))
+ 		cancel_delayed_work_sync(&hdev->rpa_expired);
+@@ -3846,6 +3847,8 @@ static void le_scan_disable_work(struct work_struct *work)
+ 
+ 	BT_DBG("%s", hdev->name);
+ 
++	cancel_delayed_work_sync(&hdev->le_scan_restart);
 +
- int mgmt_control(struct sock *sk, struct msghdr *msg, size_t len);
- int mgmt_new_settings(struct hci_dev *hdev);
- void mgmt_index_added(struct hci_dev *hdev);
+ 	hci_req_init(&req, hdev);
+ 
+ 	hci_req_add_le_scan_disable(&req);
+@@ -3855,6 +3858,44 @@ static void le_scan_disable_work(struct work_struct *work)
+ 		BT_ERR("Disable LE scanning request failed: err %d", err);
+ }
+ 
++void restart_le_scan(struct hci_dev *hdev, unsigned long delay)
++{
++	queue_delayed_work(hdev->workqueue, &hdev->le_scan_restart, delay);
++}
++
++static void le_scan_restart_work_complete(struct hci_dev *hdev, u8 status)
++{
++	clear_bit(HCI_LE_SCAN_RESTARTING, &hdev->dev_flags);
++
++	if (status)
++		BT_ERR("Failed to restart LE scanning: status %d", status);
++}
++
++static void le_scan_restart_work(struct work_struct *work)
++{
++	struct hci_dev *hdev = container_of(work, struct hci_dev,
++					    le_scan_restart.work);
++	struct hci_request req;
++	struct hci_cp_le_set_scan_enable cp;
++	int err;
++
++	BT_DBG("%s", hdev->name);
++
++	hci_req_init(&req, hdev);
++
++	hci_req_add_le_scan_disable(&req);
++
++	memset(&cp, 0, sizeof(cp));
++	cp.enable = LE_SCAN_ENABLE;
++	hci_req_add(&req, HCI_OP_LE_SET_SCAN_ENABLE, sizeof(cp), &cp);
++
++	set_bit(HCI_LE_SCAN_RESTARTING, &hdev->dev_flags);
++
++	err = hci_req_run(&req, le_scan_restart_work_complete);
++	if (err)
++		BT_ERR("Disable LE scanning request failed: err %d", err);
++}
++
+ static void set_random_addr(struct hci_request *req, bdaddr_t *rpa)
+ {
+ 	struct hci_dev *hdev = req->hdev;
+@@ -4032,6 +4073,7 @@ struct hci_dev *hci_alloc_dev(void)
+ 	INIT_DELAYED_WORK(&hdev->power_off, hci_power_off);
+ 	INIT_DELAYED_WORK(&hdev->discov_off, hci_discov_off);
+ 	INIT_DELAYED_WORK(&hdev->le_scan_disable, le_scan_disable_work);
++	INIT_DELAYED_WORK(&hdev->le_scan_restart, le_scan_restart_work);
+ 
+ 	skb_queue_head_init(&hdev->rx_q);
+ 	skb_queue_head_init(&hdev->cmd_q);
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 9629153..976387b 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -1152,10 +1152,13 @@ static void hci_cc_le_set_scan_enable(struct hci_dev *hdev,
+ 					  d->last_adv_data_len, NULL, 0);
+ 		}
+ 
+-		/* Cancel this timer so that we don't try to disable scanning
+-		 * when it's already disabled.
++		/* If HCI_LE_SCAN_RESTARTING is set, don't cancel this timer,
++		 * because we're just restarting scan. Otherwise cancel it so
++		 * that we don't try to disable scanning when it's already
++		 * disabled.
+ 		 */
+-		cancel_delayed_work(&hdev->le_scan_disable);
++		if (!test_bit(HCI_LE_SCAN_RESTARTING, &hdev->dev_flags))
++			cancel_delayed_work(&hdev->le_scan_disable);
+ 
+ 		clear_bit(HCI_LE_SCAN, &hdev->dev_flags);
+ 
 -- 
 2.1.0.rc2.206.gedb03e5
 
