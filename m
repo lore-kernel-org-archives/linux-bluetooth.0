@@ -1,79 +1,30 @@
 Return-Path: <cyrus@holtmann.org>
 From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 2/2] tools/mcaptest: Add no exit after MCL disconnect to mcaptool
-Date: Wed, 29 Oct 2014 16:23:49 +0100
-Message-Id: <1414596229-23184-2-git-send-email-grzegorz.kolodziejczyk@tieto.com>
-In-Reply-To: <1414596229-23184-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
-References: <1414596229-23184-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+Subject: [PATCH 1/2] tools/mcaptest: Add missing MCL connected log
+Date: Wed, 29 Oct 2014 16:23:48 +0100
+Message-Id: <1414596229-23184-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This is needed while reconnecting MCL or some PTS test cases:
-TC_MCAP_CM_REC_BV_x_C - test cases branch
+Loging state of MCAP channels is very helpful while analyzing
+connection.
 ---
- tools/mcaptest.c | 14 +++++++++++++-
- 1 file changed, 13 insertions(+), 1 deletion(-)
+ tools/mcaptest.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
 diff --git a/tools/mcaptest.c b/tools/mcaptest.c
-index 6d50544..1bccb21 100644
+index dd638c9..6d50544 100644
 --- a/tools/mcaptest.c
 +++ b/tools/mcaptest.c
-@@ -67,6 +67,8 @@ static int mdl_disconnect_timeout = -1;
+@@ -257,6 +257,8 @@ static void mcl_connected(struct mcap_mcl *mcap_mcl, gpointer data)
  
- static struct mcap_mcl *mcl = NULL;
- 
-+static gboolean no_close_after_mcl_disc = FALSE;
+ static void create_mcl_cb(struct mcap_mcl *mcap_mcl, GError *err, gpointer data)
+ {
++	printf("%s\n", __func__);
 +
- #define REQ_CLOCK_ACC 0x1400
- 
- static void mdl_connected_cb(struct mcap_mdl *mdl, void *data)
-@@ -152,6 +154,9 @@ static void mcl_disconnected(struct mcap_mcl *mcl, gpointer data)
- 	/* TODO */
- 	printf("MCL disconnected\n");
- 
-+	if (no_close_after_mcl_disc)
-+		return;
-+
- 	g_main_loop_quit(mloop);
- }
- 
-@@ -288,6 +293,7 @@ static void usage(void)
- 		"\t-f <timeout> disconnect MDL after it's connected\n"
- 		"\t-u send \'Unavailable\' on first MDL connection request\n");
- 	printf("Options:\n"
-+		"\t-n don't exit after mcl disconnect \n"
- 		"\t-i <hcidev>        HCI device\n"
- 		"\t-C <control_ch>    Control channel PSM\n"
- 		"\t-D <data_ch>       Data channel PSM\n");
-@@ -302,6 +308,7 @@ static struct option main_options[] = {
- 	{ "connect_dl",		0, 0, 'd' },
- 	{ "disconnect_dl",	1, 0, 'f' },
- 	{ "unavailable_dl",	0, 0, 'u' },
-+	{ "no exit mcl disc",	0, 0, 'n' },
- 	{ "control_ch",		1, 0, 'C' },
- 	{ "data_ch",		1, 0, 'D' },
- 	{ 0, 0, 0, 0 }
-@@ -323,7 +330,7 @@ int main(int argc, char *argv[])
- 		exit(1);
- 	}
- 
--	while ((opt = getopt_long(argc, argv, "+i:c:C:D:e:f:dghu",
-+	while ((opt = getopt_long(argc, argv, "+i:c:C:D:e:f:dghun",
- 						main_options, NULL)) != EOF) {
- 		switch (opt) {
- 		case 'i':
-@@ -367,6 +374,11 @@ int main(int argc, char *argv[])
- 
- 			break;
- 
-+		case 'n':
-+			no_close_after_mcl_disc = TRUE;
-+
-+			break;
-+
- 		case 'C':
- 			ccpsm = atoi(optarg);
+ 	if (err) {
+ 		printf("Could not connect MCL: %s\n", err->message);
  
 -- 
 1.9.3
