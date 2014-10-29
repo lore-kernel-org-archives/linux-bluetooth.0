@@ -1,159 +1,125 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1414574792-2339-1-git-send-email-luiz.dentz@gmail.com>
-References: <1414574792-2339-1-git-send-email-luiz.dentz@gmail.com>
-Date: Wed, 29 Oct 2014 16:50:05 +0200
-Message-ID: <CABBYNZLUtW6DZJCpxt8D3PmfRKvNvnR1npjYYuvd1P-cAJMq9A@mail.gmail.com>
-Subject: Re: [PATCH BlueZ] shared/gatt-db: Fix use of INT_TO_PTR for handles
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+In-Reply-To: <CABBYNZ+HQNf=MOxPffwnXpyj2pWQGZGvq84_uuxEgz2K3NRixw@mail.gmail.com>
+References: <1414513123-5689-1-git-send-email-luiz.dentz@gmail.com>
+	<1414513123-5689-5-git-send-email-luiz.dentz@gmail.com>
+	<CAHrH25Qpctiu72k7rNz5ccWhPeZoqjn1MM-BULuTVVN1sp6Bzg@mail.gmail.com>
+	<CABBYNZ+HQNf=MOxPffwnXpyj2pWQGZGvq84_uuxEgz2K3NRixw@mail.gmail.com>
+Date: Wed, 29 Oct 2014 07:45:17 -0700
+Message-ID: <CAHrH25TYW_y4Q470uwi80OYV4dLrBi+HdvAi7gF_pUjuEnzb4w@mail.gmail.com>
+Subject: Re: [PATCH v2 5/9] shared/gatt-db: Add gatt_db_attribute_get_permissions
+From: Arman Uguray <armansito@chromium.org>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Luiz,
 
-On Wed, Oct 29, 2014 at 11:26 AM, Luiz Augusto von Dentz
+On Wed, Oct 29, 2014 at 1:50 AM, Luiz Augusto von Dentz
 <luiz.dentz@gmail.com> wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> Hi Arman,
 >
-> This make use of UINT_TO_PTR since handles are uint16_t.
-> ---
->  src/shared/gatt-db.c | 28 ++++++++++++++--------------
->  1 file changed, 14 insertions(+), 14 deletions(-)
+> On Wed, Oct 29, 2014 at 12:12 AM, Arman Uguray <armansito@chromium.org> wrote:
+>> Hi Luiz,
+>>
+>> On Tue, Oct 28, 2014 at 9:18 AM, Luiz Augusto von Dentz
+>> <luiz.dentz@gmail.com> wrote:
+>>> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>>>
+>>> ---
+>>>  src/shared/gatt-db.c | 7 ++++++-
+>>>  1 file changed, 6 insertions(+), 1 deletion(-)
+>>>
+>>> diff --git a/src/shared/gatt-db.c b/src/shared/gatt-db.c
+>>> index 9a3f864..f43cac3 100644
+>>> --- a/src/shared/gatt-db.c
+>>> +++ b/src/shared/gatt-db.c
+>>> @@ -879,7 +879,12 @@ bool gatt_db_attribute_get_service_uuid(struct gatt_db_attribute *attrib,
+>>>  bool gatt_db_attribute_get_permissions(struct gatt_db_attribute *attrib,
+>>>                                                         uint32_t *permissions)
+>>>  {
+>>> -       return false;
+>>> +       if (!attrib || !permissions)
+>>> +               return false;
+>>
+>> So, based on my understanding, android/gatt treats an attribute
+>> permission value of "0" as "this is a declaration attribute since we
+>> didn't explicitly set it". Hence, returning 0 here will break things
+>> in the android code once it starts using the gatt_db_attribute_*
+>> functions.
 >
-> diff --git a/src/shared/gatt-db.c b/src/shared/gatt-db.c
-> index 65c5759..6b5e84c 100644
-> --- a/src/shared/gatt-db.c
-> +++ b/src/shared/gatt-db.c
-> @@ -67,7 +67,7 @@ static bool match_service_by_handle(const void *data, const void *user_data)
->  {
->         const struct gatt_db_service *service = data;
+> The check here is for the permissions pointer passed to the function
+> to receive the value, if it is NULL it is probably a misuse of the
+> API.
 >
-> -       return service->attributes[0]->handle == PTR_TO_INT(user_data);
-> +       return service->attributes[0]->handle == PTR_TO_UINT(user_data);
->  }
+
+Oops, I misread the code there, so there's nothing wrong here.
+
+>> That said, I don't like this logic one bit in the first place. Instead
+>> of having "0" mean "anything goes" and having a special define for "no
+>> permissions" (such as GATT_PERM_NONE from android/gatt and
+>> BT_GATT_PERM from shared/att-types), we should just treat 0 to mean no
+>> permissions. I.e. we should define BT_GATT_PERM_NONE as 0, and have
+>> gatt_db_add_service, _add_characteristic, etc. explicitly set at least
+>> the BT_GATT_PERM_READ permission on the declaration attributes.
 >
->  static struct gatt_db_attribute *new_attribute(const bt_uuid_t *type,
-> @@ -214,7 +214,7 @@ bool gatt_db_remove_service(struct gatt_db *db, uint16_t handle)
->         struct gatt_db_service *service;
+> I guess you are confusing this code with some ideas I have in the past
+> about doing the permissions check in the db itself, this is no longer
+> the case since Vinicius pointed out this wouldn't be possible with the
+> current design of the db and I remember you also agreeing that the
+> permissions should be checked in the server or somewhere else, not
+> sure why you got the impression this would do anything with the
+> permissions, it just read what permissions have been attached to the
+> attribute nothing else.
 >
->         service = queue_remove_if(db->services, match_service_by_handle,
-> -                                                       INT_TO_PTR(handle));
-> +                                                       UINT_TO_PTR(handle));
->         if (!service)
->                 return false;
+
+Sorry I misread the check above, so there is nothing wrong with this
+function as it is. As for permission checks, there's no confusion, I
+still think bt_gatt_server should perform those. My issue in general
+(and this is not specifically related to this patch) is having a
+permission value of "0" mean "no permission set, this must be a
+declaration". I think eventually we should explicitly set the
+permissions of declaration attributes to BT_GATT_PERM READ inside
+functions like gatt_db_add_service.
+
+>> In short we should unify the permission story for shared/gatt and
+>> android/gatt sooner then later.
 >
-> @@ -282,7 +282,7 @@ uint16_t gatt_db_add_characteristic(struct gatt_db *db, uint16_t handle,
->         int i;
+> That I guess is bt_gatt_server business since that is per connection
+> it should check what permissions the db has stored and perform the
+> necessary checks, so the defines and everything else related to
+> permissions so probably be in bt_gatt_server.
 >
->         service = queue_find(db->services, match_service_by_handle,
-> -                                                       INT_TO_PTR(handle));
-> +                                                       UINT_TO_PTR(handle));
->         if (!service)
->                 return 0;
+
+You're right, the reason that I mentioned this here is because storing
+the correct permission values is still gatt_db's job, even if
+bt_gatt_server performs the checks while handling requests. There is
+nothing wrong with this patch though.
+
+>>> +
+>>> +       *permissions = attrib->permissions;
+>>> +
+>>> +       return true;
+>>>  }
+>>>
+>>>  bool gatt_db_attribute_read(struct gatt_db_attribute *attrib, uint16_t offset,
+>>> --
+>>> 1.9.3
+>>>
+>>> --
+>>> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+>>> the body of a message to majordomo@vger.kernel.org
+>>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>>
+>> Cheers,
+>> Arman
 >
-> @@ -327,7 +327,7 @@ uint16_t gatt_db_add_char_descriptor(struct gatt_db *db, uint16_t handle,
->         int i;
 >
->         service = queue_find(db->services, match_service_by_handle,
-> -                                                       INT_TO_PTR(handle));
-> +                                                       UINT_TO_PTR(handle));
->         if (!service)
->                 return 0;
->
-> @@ -355,12 +355,12 @@ uint16_t gatt_db_add_included_service(struct gatt_db *db, uint16_t handle,
->         int index;
->
->         service = queue_find(db->services, match_service_by_handle,
-> -                                                       INT_TO_PTR(handle));
-> +                                                       UINT_TO_PTR(handle));
->         if (!service)
->                 return 0;
->
->         included_service = queue_find(db->services, match_service_by_handle,
-> -                                               INT_TO_PTR(included_handle));
-> +                                               UINT_TO_PTR(included_handle));
->
->         if (!included_service)
->                 return 0;
-> @@ -406,7 +406,7 @@ bool gatt_db_service_set_active(struct gatt_db *db, uint16_t handle,
->         struct gatt_db_service *service;
->
->         service = queue_find(db->services, match_service_by_handle,
-> -                                                       INT_TO_PTR(handle));
-> +                                                       UINT_TO_PTR(handle));
->         if (!service)
->                 return false;
->
-> @@ -636,7 +636,7 @@ void gatt_db_find_information(struct gatt_db *db, uint16_t start_handle,
->  static bool find_service_for_handle(const void *data, const void *user_data)
->  {
->         const struct gatt_db_service *service = data;
-> -       uint16_t handle = PTR_TO_INT(user_data);
-> +       uint16_t handle = PTR_TO_UINT(user_data);
->         uint16_t start, end;
->
->         start = service->attributes[0]->handle;
-> @@ -657,7 +657,7 @@ bool gatt_db_read(struct gatt_db *db, uint16_t handle, uint16_t offset,
->                 return false;
->
->         service = queue_find(db->services, find_service_for_handle,
-> -                                               INT_TO_PTR(handle));
-> +                                               UINT_TO_PTR(handle));
->         if (!service)
->                 return false;
->
-> @@ -695,7 +695,7 @@ bool gatt_db_write(struct gatt_db *db, uint16_t handle, uint16_t offset,
->         struct gatt_db_attribute *a;
->
->         service = queue_find(db->services, find_service_for_handle,
-> -                                               INT_TO_PTR(handle));
-> +                                               UINT_TO_PTR(handle));
->         if (!service)
->                 return false;
->
-> @@ -719,7 +719,7 @@ const bt_uuid_t *gatt_db_get_attribute_type(struct gatt_db *db,
->         uint16_t service_handle;
->
->         service = queue_find(db->services, find_service_for_handle,
-> -                                               INT_TO_PTR(handle));
-> +                                               UINT_TO_PTR(handle));
->         if (!service)
->                 return NULL;
->
-> @@ -737,7 +737,7 @@ uint16_t gatt_db_get_end_handle(struct gatt_db *db, uint16_t handle)
->         struct gatt_db_service *service;
->
->         service = queue_find(db->services, find_service_for_handle,
-> -                                               INT_TO_PTR(handle));
-> +                                               UINT_TO_PTR(handle));
->         if (!service)
->                 return 0;
->
-> @@ -750,7 +750,7 @@ bool gatt_db_get_service_uuid(struct gatt_db *db, uint16_t handle,
->         struct gatt_db_service *service;
->
->         service = queue_find(db->services, find_service_for_handle,
-> -                                               INT_TO_PTR(handle));
-> +                                               UINT_TO_PTR(handle));
->         if (!service)
->                 return false;
->
-> @@ -783,7 +783,7 @@ bool gatt_db_get_attribute_permissions(struct gatt_db *db, uint16_t handle,
->         uint16_t service_handle;
->
->         service = queue_find(db->services, find_service_for_handle,
-> -                                                       INT_TO_PTR(handle));
-> +                                                       UINT_TO_PTR(handle));
->         if (!service)
->                 return false;
 >
 > --
-> 1.9.3
+> Luiz Augusto von Dentz
 
-I went ahead and pushed this one.
-
-
--- 
-Luiz Augusto von Dentz
+Cheers,
+Arman
