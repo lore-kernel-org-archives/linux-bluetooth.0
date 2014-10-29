@@ -1,98 +1,95 @@
 Return-Path: <cyrus@holtmann.org>
-From: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
-Subject: [PATCH_v2 1/4] android/tester: Fix wrong state comparison in A2DP and AVRCP tests
-Date: Wed, 29 Oct 2014 14:13:29 +0200
-Message-Id: <1414584812-7477-1-git-send-email-ravikumar.veeramally@linux.intel.com>
+MIME-Version: 1.0
+In-Reply-To: <1414497485-24300-1-git-send-email-bharat.panda@samsung.com>
+References: <1414497485-24300-1-git-send-email-bharat.panda@samsung.com>
+Date: Wed, 29 Oct 2014 14:02:36 +0200
+Message-ID: <CABBYNZK2zKXW-HChKB3B-1JwK0j4x0xZb+BTBfKys3KOt5gWsA@mail.gmail.com>
+Subject: Re: [PATCH ] obexd/mas: Handle register notification open
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Bharat Panda <bharat.panda@samsung.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	cpgs@samsung.com
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-btav_connection_state_t and btav_audio_state_t enum values are wrongly
-stored in different enum type(bt_state_t state).
----
- android/tester-main.c | 20 ++++++++++++++++++--
- android/tester-main.h | 11 +++++++----
- 2 files changed, 25 insertions(+), 6 deletions(-)
+Hi,
 
-diff --git a/android/tester-main.c b/android/tester-main.c
-index f4d18e2..8cf62c2 100644
---- a/android/tester-main.c
-+++ b/android/tester-main.c
-@@ -654,6 +654,22 @@ static bool match_data(struct step *step)
- 		return false;
- 	}
- 
-+	if (exp->callback_result.av_conn_state !=
-+					step->callback_result.av_conn_state) {
-+		tester_debug("Callback av conn state mismatch: 0x%x vs 0x%x",
-+					step->callback_result.av_conn_state,
-+					exp->callback_result.av_conn_state);
-+		return false;
-+	}
-+
-+	if (exp->callback_result.av_audio_state !=
-+					step->callback_result.av_audio_state) {
-+		tester_debug("Callback av audio state mismatch: 0x%x vs 0x%x",
-+					step->callback_result.av_audio_state,
-+					exp->callback_result.av_audio_state);
-+		return false;
-+	}
-+
- 	if (exp->callback_result.pairing_variant !=
- 					step->callback_result.pairing_variant) {
- 		tester_debug("Callback pairing result mismatch: %d vs %d",
-@@ -1863,7 +1879,7 @@ static void a2dp_connection_state_cb(btav_connection_state_t state,
- 	struct step *step = g_new0(struct step, 1);
- 
- 	step->callback = CB_A2DP_CONN_STATE;
--	step->callback_result.state = state;
-+	step->callback_result.av_conn_state = state;
- 
- 	schedule_callback_verification(step);
- }
-@@ -1873,7 +1889,7 @@ static void a2dp_audio_state_cb(btav_audio_state_t state, bt_bdaddr_t *bd_addr)
- 	struct step *step = g_new0(struct step, 1);
- 
- 	step->callback = CB_A2DP_AUDIO_STATE;
--	step->callback_result.state = state;
-+	step->callback_result.av_audio_state = state;
- 
- 	schedule_callback_verification(step);
- }
-diff --git a/android/tester-main.h b/android/tester-main.h
-index c938d44..ff6e43c 100644
---- a/android/tester-main.h
-+++ b/android/tester-main.h
-@@ -387,14 +387,14 @@ struct pdu_set {
- 		.callback_result.channel_state = cb_state, \
- 	}
- 
--#define CALLBACK_AV_CONN_STATE(cb, cb_state) { \
-+#define CALLBACK_AV_CONN_STATE(cb, cb_av_conn_state) { \
- 		.callback = cb, \
--		.callback_result.state = cb_state, \
-+		.callback_result.av_conn_state = cb_av_conn_state, \
- 	}
- 
--#define CALLBACK_AV_AUDIO_STATE(cb, cb_state) { \
-+#define CALLBACK_AV_AUDIO_STATE(cb, cb_av_audio_state) { \
- 		.callback = cb, \
--		.callback_result.state = cb_state, \
-+		.callback_result.av_audio_state = cb_av_audio_state, \
- 	}
- 
- #define CALLBACK_DEVICE_PROPS(props, prop_cnt) \
-@@ -641,6 +641,9 @@ struct bt_callback_data {
- 	int mdep_cfg_index;
- 	bthl_app_reg_state_t app_state;
- 	bthl_channel_state_t channel_state;
-+
-+	btav_connection_state_t av_conn_state;
-+	btav_audio_state_t av_audio_state;
- };
- 
- /*
+On Tue, Oct 28, 2014 at 1:58 PM, Bharat Panda <bharat.panda@samsung.com> wrote:
+> Changes made to handle method open for mime_notification_registration
+> ---
+>  obexd/plugins/mas.c | 29 ++++++++++++++++++++++++++++-
+>  1 file changed, 28 insertions(+), 1 deletion(-)
+>
+> diff --git a/obexd/plugins/mas.c b/obexd/plugins/mas.c
+> index db40509..08d6ce7 100644
+> --- a/obexd/plugins/mas.c
+> +++ b/obexd/plugins/mas.c
+> @@ -72,6 +72,7 @@ struct mas_session {
+>         GObexApparam *inparams;
+>         GObexApparam *outparams;
+>         gboolean ap_sent;
+> +       int notification_status;
+>  };
+>
+>  static const uint8_t MAS_TARGET[TARGET_SIZE] = {
+> @@ -766,6 +767,32 @@ static int any_close(void *obj)
+>         return 0;
+>  }
+>
+> +static void *notification_registration_open(const char *name, int oflag,
+> +                       mode_t mode, void *driver_data, size_t *size, int *err)
+> +{
+> +       struct mas_session *mas = driver_data;
+> +       uint8_t status;
+> +
+> +       DBG("");
+> +
+> +       if (O_RDONLY) {
+> +               *err = -EBADR;
+> +               return NULL;
+> +       }
+> +
+> +       if (!g_obex_apparam_get_uint8(mas->inparams, MAP_AP_NOTIFICATIONSTATUS,
+> +                               &status)) {
+
+The line above is not aligned according to out coding style.
+
+> +               *err = -EBADR;
+> +               return NULL;
+> +       }
+> +
+> +       mas->notification_status = status;
+
+Please use uint8_t for notification_status if that is the value it can assume.
+
+> +       mas->finished = TRUE;
+> +       *err = 0;
+> +
+> +       return mas;
+> +}
+> +
+>  static struct obex_service_driver mas = {
+>         .name = "Message Access server",
+>         .service = OBEX_MAS,
+> @@ -824,7 +851,7 @@ static struct obex_mime_type_driver mime_notification_registration = {
+>         .target = MAS_TARGET,
+>         .target_size = TARGET_SIZE,
+>         .mimetype = "x-bt/MAP-NotificationRegistration",
+> -       .open = any_open,
+> +       .open = notification_registration_open,
+>         .close = any_close,
+>         .read = any_read,
+>         .write = any_write,
+> --
+> 1.9.1
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+
+
 -- 
-2.1.0
-
+Luiz Augusto von Dentz
