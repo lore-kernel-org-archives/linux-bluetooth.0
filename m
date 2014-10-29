@@ -1,31 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
-From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/2] tools/mcaptest: Add missing MCL connected log
-Date: Wed, 29 Oct 2014 16:23:48 +0100
-Message-Id: <1414596229-23184-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 8.0 \(1990.1\))
+Subject: Re: [PATCH v4] Bluetooth: Wrong style spin lock used
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1414570560-29904-1-git-send-email-jukka.rissanen@linux.intel.com>
+Date: Wed, 29 Oct 2014 08:23:10 -0700
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <6A8DB35A-D68A-4036-93EA-C55CCBD652C8@holtmann.org>
+References: <1414570560-29904-1-git-send-email-jukka.rissanen@linux.intel.com>
+To: Jukka Rissanen <jukka.rissanen@linux.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Loging state of MCAP channels is very helpful while analyzing
-connection.
----
- tools/mcaptest.c | 2 ++
- 1 file changed, 2 insertions(+)
+Hi Jukka,
 
-diff --git a/tools/mcaptest.c b/tools/mcaptest.c
-index dd638c9..6d50544 100644
---- a/tools/mcaptest.c
-+++ b/tools/mcaptest.c
-@@ -257,6 +257,8 @@ static void mcl_connected(struct mcap_mcl *mcap_mcl, gpointer data)
- 
- static void create_mcl_cb(struct mcap_mcl *mcap_mcl, GError *err, gpointer data)
- {
-+	printf("%s\n", __func__);
-+
- 	if (err) {
- 		printf("Could not connect MCL: %s\n", err->message);
- 
--- 
-1.9.3
+> Use spin_lock_bh() as the code is called from softirq in networking subsystem.
+> This is needed to prevent deadlocks when 6lowpan link is in use.
+> 
+> Signed-off-by: Jukka Rissanen <jukka.rissanen@linux.intel.com>
+> ---
+> Hi,
+> 
+> this v4 adds a comment why spin_lock_bh() is needed here.
+> 
+> Cheers,
+> Jukka
+> 
+> net/bluetooth/hci_core.c | 10 +++++++---
+> 1 file changed, 7 insertions(+), 3 deletions(-)
+
+patch has been applied to bluetooth-next tree.
+
+Regards
+
+Marcel
 
