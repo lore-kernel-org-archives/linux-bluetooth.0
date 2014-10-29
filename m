@@ -1,37 +1,148 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 8.0 \(1990.1\))
-Subject: Re: [PATCH v4] Bluetooth: Wrong style spin lock used
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1414570560-29904-1-git-send-email-jukka.rissanen@linux.intel.com>
-Date: Wed, 29 Oct 2014 08:23:10 -0700
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <6A8DB35A-D68A-4036-93EA-C55CCBD652C8@holtmann.org>
-References: <1414570560-29904-1-git-send-email-jukka.rissanen@linux.intel.com>
-To: Jukka Rissanen <jukka.rissanen@linux.intel.com>
+MIME-Version: 1.0
+In-Reply-To: <1414513123-5689-1-git-send-email-luiz.dentz@gmail.com>
+References: <1414513123-5689-1-git-send-email-luiz.dentz@gmail.com>
+Date: Wed, 29 Oct 2014 08:09:49 -0700
+Message-ID: <CAHrH25RJDcHgDNV+Y0S0jyOwko_WJcHKygPY3=rZcCN23aZ3HA@mail.gmail.com>
+Subject: Re: [PATCH v2 1/9] shared/gatt-db: Expose gatt_db_attribute
+From: Arman Uguray <armansito@chromium.org>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jukka,
+Hi Luiz,
 
-> Use spin_lock_bh() as the code is called from softirq in networking subsystem.
-> This is needed to prevent deadlocks when 6lowpan link is in use.
-> 
-> Signed-off-by: Jukka Rissanen <jukka.rissanen@linux.intel.com>
+On Tue, Oct 28, 2014 at 9:18 AM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>
+> This is the new API to reduce the lookups in gatt_db and make it
+> a little bit more convenient for batch operations, so the general idea
+> is to be able to get a hold of it via gatt_db_get_attribute but also
+> replace the handles in the queues with proper attributes so the server
+> code don't have to lookup again when reading/writing, checking
+> permissions, or any other operation that can be done directly.
 > ---
-> Hi,
-> 
-> this v4 adds a comment why spin_lock_bh() is needed here.
-> 
-> Cheers,
-> Jukka
-> 
-> net/bluetooth/hci_core.c | 10 +++++++---
-> 1 file changed, 7 insertions(+), 3 deletions(-)
+> v2: Address problems gatt_db_attribute_read and gatt_db_attribute_write
+> pointed out by Arman.
+>
+>  src/shared/gatt-db.c | 49 +++++++++++++++++++++++++++++++++++++++++++++++++
+>  src/shared/gatt-db.h | 33 +++++++++++++++++++++++++++++++++
+>  2 files changed, 82 insertions(+)
+>
+> diff --git a/src/shared/gatt-db.c b/src/shared/gatt-db.c
+> index 65c5759..19784d1 100644
+> --- a/src/shared/gatt-db.c
+> +++ b/src/shared/gatt-db.c
+> @@ -802,3 +802,52 @@ bool gatt_db_get_attribute_permissions(struct gatt_db *db, uint16_t handle,
+>         return true;
+>
+>  }
+> +
+> +struct gatt_db_attribute *gatt_db_get_attribute(struct gatt_db *db,
+> +                                                       uint16_t handle)
+> +{
+> +       return NULL;
+> +}
+> +
+> +uint16_t gatt_db_attribute_get_start_handle(struct gatt_db_attribute *attrib)
+> +{
+> +       return 0;
+> +}
+> +
+> +uint16_t gatt_db_attribute_get_end_handle(struct gatt_db_attribute *attrib)
+> +{
+> +       return 0;
+> +}
+> +
+> +const bt_uuid_t *gatt_db_attribute_get_type(struct gatt_db_attribute *attrib)
+> +{
+> +       return NULL;
+> +}
+> +
+> +bool gatt_db_attribute_get_service_uuid(struct gatt_db_attribute *attrib,
+> +                                                       bt_uuid_t *uuid)
+> +{
+> +       return false;
+> +}
+> +
+> +bool gatt_db_attribute_get_permissions(struct gatt_db_attribute *attrib,
+> +                                                       uint32_t *permissions)
+> +{
+> +       return false;
+> +}
+> +
+> +bool gatt_db_attribute_read(struct gatt_db_attribute *attrib, uint16_t offset,
+> +                               uint8_t opcode, bdaddr_t *bdaddr,
+> +                               gatt_db_attribute_read_t func, void *user_data)
+> +{
+> +       return false;
+> +}
+> +
+> +bool gatt_db_attribute_write(struct gatt_db_attribute *attrib, uint16_t offset,
+> +                                       const uint8_t *value, size_t len,
+> +                                       uint8_t opcode, bdaddr_t *bdaddr,
+> +                                       gatt_db_attribute_write_t func,
+> +                                       void *user_data)
+> +{
+> +       return false;
+> +}
+> diff --git a/src/shared/gatt-db.h b/src/shared/gatt-db.h
+> index 8d18434..0c16e88 100644
+> --- a/src/shared/gatt-db.h
+> +++ b/src/shared/gatt-db.h
+> @@ -96,3 +96,36 @@ bool gatt_db_get_service_uuid(struct gatt_db *db, uint16_t handle,
+>
+>  bool gatt_db_get_attribute_permissions(struct gatt_db *db, uint16_t handle,
+>                                                         uint32_t *permissions);
+> +
+> +struct gatt_db_attribute;
+> +
+> +struct gatt_db_attribute *gatt_db_get_attribute(struct gatt_db *db,
+> +                                                       uint16_t handle);
+> +
+> +uint16_t gatt_db_attribute_get_start_handle(struct gatt_db_attribute *attrib);
+> +uint16_t gatt_db_attribute_get_end_handle(struct gatt_db_attribute *attrib);
+> +
+> +const bt_uuid_t *gatt_db_attribute_get_type(struct gatt_db_attribute *attrib);
+> +
+> +bool gatt_db_attribute_get_service_uuid(struct gatt_db_attribute *attrib,
+> +                                                       bt_uuid_t *uuid);
+> +
+> +bool gatt_db_attribute_get_permissions(struct gatt_db_attribute *attrib,
+> +                                                       uint32_t *permissions);
+> +
+> +typedef void (*gatt_db_attribute_read_t) (struct gatt_db_attribute *attrib,
+> +                                       int err, uint8_t *value, size_t length,
+> +                                       void *user_data);
 
-patch has been applied to bluetooth-next tree.
+Should the "err" argument here and in gatt_db_attribute_write_it be
+uint8_t instead of int? The pre-defined ATT protocol errors as well as
+profile/application defined errors are reported in one byte in an
+error response. What would we need a larger or a negative value for?
 
-Regards
+> +
+> +bool gatt_db_attribute_read(struct gatt_db_attribute *attrib, uint16_t offset,
+> +                               uint8_t opcode, bdaddr_t *bdaddr,
+> +                               gatt_db_attribute_read_t func, void *user_data);
+> +
+> +typedef void (*gatt_db_attribute_write_t) (struct gatt_db_attribute *attrib,
+> +                                               int err, void *user_data);
+> +
+> +bool gatt_db_attribute_write(struct gatt_db_attribute *attrib, uint16_t offset,
+> +                                       const uint8_t *value, size_t len,
+> +                                       uint8_t opcode, bdaddr_t *bdaddr,
+> +                                       gatt_db_attribute_write_t func,
+> +                                       void *user_data);
+> --
+> 1.9.3
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
-Marcel
-
+Cheers,
+Arman
