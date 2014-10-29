@@ -1,153 +1,288 @@
 Return-Path: <cyrus@holtmann.org>
-From: Jakub Pawlowski <jpawlowski@google.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Jakub Pawlowski <jpawlowski@google.com>
-Subject: [PATCH v2 1/4] add restart_le_scan
-Date: Wed, 29 Oct 2014 11:24:28 -0700
-Message-Id: <1414607071-9801-1-git-send-email-jpawlowski@google.com>
+MIME-Version: 1.0
+In-Reply-To: <CABBYNZKa20z8QcCfe2KtEZw43sFQigPrZfP2=22xBijxkyxvXw@mail.gmail.com>
+References: <1414525067-15076-1-git-send-email-marcin.kraglak@tieto.com>
+	<1414525067-15076-2-git-send-email-marcin.kraglak@tieto.com>
+	<CABBYNZJE1QT19dMgOU5fq+rufB9TQjL0Vbzx7JRfHNZw-y60ng@mail.gmail.com>
+	<CAJLTA8j6bJCVPpEG69+s_vzgGDetGmTGfmDpvd9KkKyXNoCUQQ@mail.gmail.com>
+	<CABBYNZKa20z8QcCfe2KtEZw43sFQigPrZfP2=22xBijxkyxvXw@mail.gmail.com>
+Date: Wed, 29 Oct 2014 09:11:55 -0700
+Message-ID: <CAHrH25SvtX8E6r-aNn_w1x9KrfYCaR+yG81M30B=Q510nHs98A@mail.gmail.com>
+Subject: Re: [PATCHv2 2/7] unit/test-gatt: Add search all primary services
+ test case
+From: Arman Uguray <armansito@chromium.org>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: Michael Janssen <jamuraa@google.com>,
+	Marcin Kraglak <marcin.kraglak@tieto.com>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Currently there is no way to restart le scan. It's needed in
-preparation for new service scan method. The way it work: it disable,
-and then enable le scan on controller. During this restart special flag
-is set to make sure we won't remove disable scan work from workqueue.
+Hi Luiz,
 
-Signed-off-by: Jakub Pawlowski <jpawlowski@google.com>
----
- include/net/bluetooth/hci.h      |  1 +
- include/net/bluetooth/hci_core.h |  2 ++
- net/bluetooth/hci_core.c         | 42 ++++++++++++++++++++++++++++++++++++++++
- net/bluetooth/hci_event.c        |  9 ++++++---
- 4 files changed, 51 insertions(+), 3 deletions(-)
+On Wed, Oct 29, 2014 at 8:25 AM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> Hi Michael,
+>
+> On Wed, Oct 29, 2014 at 5:03 PM, Michael Janssen <jamuraa@google.com> wrote:
+>> On Wed, Oct 29, 2014 at 5:32 AM, Luiz Augusto von Dentz
+>> <luiz.dentz@gmail.com> wrote:
+>>> Hi Marcin,
+>>>
+>>> On Tue, Oct 28, 2014 at 9:37 PM, Marcin Kraglak
+>>> <marcin.kraglak@tieto.com> wrote:
+>>>> ---
+>>>>  unit/test-gatt.c | 85 ++++++++++++++++++++++++++++++++++++++++++++++++++------
+>>>>  1 file changed, 77 insertions(+), 8 deletions(-)
+>>>>
+>>>> diff --git a/unit/test-gatt.c b/unit/test-gatt.c
+>>>> index bbbf9a5..f84b0fc 100644
+>>>> --- a/unit/test-gatt.c
+>>>> +++ b/unit/test-gatt.c
+>>>> @@ -35,8 +35,10 @@
+>>>>
+>>>>  #include <glib.h>
+>>>>
+>>>> +#include "lib/uuid.h"
+>>>>  #include "src/shared/util.h"
+>>>>  #include "src/shared/att.h"
+>>>> +#include "src/shared/gatt-helpers.h"
+>>>>  #include "src/shared/gatt-client.h"
+>>>>
+>>>>  struct test_pdu {
+>>>> @@ -45,14 +47,22 @@ struct test_pdu {
+>>>>         size_t size;
+>>>>  };
+>>>>
+>>>> +enum context_type {
+>>>> +       ATT,
+>>>> +       CLIENT,
+>>>> +       SERVER
+>>>> +};
+>>>
+>>> Well the ATT part of this is a bit weird, do we really need to do this
+>>> distinction.
+>>>
+>>>>  struct test_data {
+>>>>         char *test_name;
+>>>>         struct test_pdu *pdu_list;
+>>>> +       enum context_type context_type;
+>>>>  };
+>>>>
+>>>>  struct context {
+>>>>         GMainLoop *main_loop;
+>>>>         struct bt_gatt_client *client;
+>>>> +       struct bt_att *att;
+>>>>         guint source;
+>>>>         guint process;
+>>>>         int fd;
+>>>> @@ -69,13 +79,14 @@ struct context {
+>>>>                 .size = sizeof(data(args)),                     \
+>>>>         }
+>>>>
+>>>> -#define define_test(name, function, args...)                           \
+>>>> +#define define_test(name, function, type, args...)                     \
+>>>>         do {                                                            \
+>>>>                 const struct test_pdu pdus[] = {                        \
+>>>>                         args, { }                                       \
+>>>>                 };                                                      \
+>>>>                 static struct test_data data;                           \
+>>>>                 data.test_name = g_strdup(name);                        \
+>>>> +               data.context_type = type;                               \
+>>>>                 data.pdu_list = g_malloc(sizeof(pdus));                 \
+>>>>                 memcpy(data.pdu_list, pdus, sizeof(pdus));              \
+>>>>                 g_test_add_data_func(name, &data, function);            \
+>>>> @@ -182,6 +193,7 @@ static void gatt_debug(const char *str, void *user_data)
+>>>>  static struct context *create_context(uint16_t mtu, gconstpointer data)
+>>>>  {
+>>>>         struct context *context = g_new0(struct context, 1);
+>>>> +       const struct test_data *test_data = data;
+>>>>         GIOChannel *channel;
+>>>>         int err, sv[2];
+>>>>         struct bt_att *att;
+>>>> @@ -195,12 +207,25 @@ static struct context *create_context(uint16_t mtu, gconstpointer data)
+>>>>         att = bt_att_new(sv[0]);
+>>>>         g_assert(att);
+>>>>
+>>>> -       context->client = bt_gatt_client_new(att, mtu);
+>>>> -       g_assert(context->client);
+>>>> +       switch (test_data->context_type) {
+>>>> +       case ATT:
+>>>> +               context->att = att;
+>>>>
+>>>> -       if (g_test_verbose())
+>>>> -               bt_gatt_client_set_debug(context->client, gatt_debug, "gatt:",
+>>>> -                                                                       NULL);
+>>>> +               bt_gatt_exchange_mtu(context->att, mtu, NULL, NULL, NULL);
+>>>> +               break;
+>>>> +       case CLIENT:
+>>>> +               context->client = bt_gatt_client_new(att, mtu);
+>>>> +               g_assert(context->client);
+>>>> +
+>>>> +               if (g_test_verbose())
+>>>> +                       bt_gatt_client_set_debug(context->client, gatt_debug,
+>>>> +                                                               "gatt:", NULL);
+>>>> +
+>>>> +               bt_att_unref(att);
+>>>> +               break;
+>>>> +       default:
+>>>> +               break;
+>>>> +       }
+>>>>
+>>>>         channel = g_io_channel_unix_new(sv[1]);
+>>>>
+>>>> @@ -214,7 +239,6 @@ static struct context *create_context(uint16_t mtu, gconstpointer data)
+>>>>         g_assert(context->source > 0);
+>>>>
+>>>>         g_io_channel_unref(channel);
+>>>> -       bt_att_unref(att);
+>>>>
+>>>>         context->fd = sv[1];
+>>>>         context->data = data;
+>>>> @@ -222,6 +246,17 @@ static struct context *create_context(uint16_t mtu, gconstpointer data)
+>>>>         return context;
+>>>>  }
+>>>>
+>>>> +static void primary_cb(bool success, uint8_t att_ecode,
+>>>> +                                               struct bt_gatt_result *result,
+>>>> +                                               void *user_data)
+>>>> +{
+>>>> +       struct context *context = user_data;
+>>>> +
+>>>> +       g_assert(success);
+>>>> +
+>>>> +       context_quit(context);
+>>>> +}
+>>>> +
+>>>>  static void destroy_context(struct context *context)
+>>>>  {
+>>>>         if (context->source > 0)
+>>>> @@ -229,6 +264,9 @@ static void destroy_context(struct context *context)
+>>>>
+>>>>         bt_gatt_client_unref(context->client);
+>>>>
+>>>> +       if (context->att)
+>>>> +               bt_att_unref(context->att);
+>>>> +
+>>>>         g_main_loop_unref(context->main_loop);
+>>>>
+>>>>         test_free(context->data);
+>>>> @@ -249,6 +287,16 @@ static void test_client(gconstpointer data)
+>>>>         execute_context(context);
+>>>>  }
+>>>>
+>>>> +static void test_search_primary(gconstpointer data)
+>>>> +{
+>>>> +       struct context *context = create_context(512, data);
+>>>> +
+>>>> +       bt_gatt_discover_all_primary_services(context->att, NULL, primary_cb,
+>>>> +                                                               context, NULL);
+>>>
+>>> Doesn't bt_gatt_client does the same here, I guess I missed this
+>>> detail in the first time but if this is just testing client side then
+>>> it should use bt_gatt_client and if that cannot be tested we probably
+>>> have a problem with our API. I guess PTS would just pass if we do more
+>>> than search the primary services, so things like setting the MTU etc
+>>> should not be a problem here.
+>>
+>> Specifically setting the MTU is allowed, but the reason to avoid using
+>> bt_gatt_client_new/init here is to avoid the automatic service
+>> discovery.  This is probably a good idea at least for testing the
+>> different types of discovery.  (is bt_gatt_client  Alternately maybe
+>> just test the type of discovery used by bt_gatt_client.  When
+>> implementing the read value tests, the auto-discovery of
+>> bt_gatt_client may make the test data longer because it needs to be
+>> included in every one.
+>
+> Isn't it what we want? To run exactly as it would be run against PTS
+> so we avoid surprises? Not only this avoid auto-discovery but the
+> caching done by bt_gatt_client which we would probably have to test
+> separately, so it is much more code that we exercise if we test
+> bt_gatt_client at the expense of a little bit more PDUs. Perhaps we
+> could have a define containing the common PDUs that auto-discovery
+> causes so the upcoming tests don't need to duplicate these PDUs.
+>
 
-diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index 6e8f249..b15d240 100644
---- a/include/net/bluetooth/hci.h
-+++ b/include/net/bluetooth/hci.h
-@@ -194,6 +194,7 @@ enum {
- 	HCI_FAST_CONNECTABLE,
- 	HCI_BREDR_ENABLED,
- 	HCI_LE_SCAN_INTERRUPTED,
-+	HCI_LE_SCAN_RESTARTING,
- };
- 
- /* A mask for the flags that are supposed to remain when a reset happens
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index b8685a7..3c585885 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -334,6 +334,7 @@ struct hci_dev {
- 	unsigned long		dev_flags;
- 
- 	struct delayed_work	le_scan_disable;
-+	struct delayed_work	le_scan_restart;
- 
- 	__s8			adv_tx_power;
- 	__u8			adv_data[HCI_MAX_AD_LENGTH];
-@@ -1369,6 +1370,7 @@ void mgmt_new_conn_param(struct hci_dev *hdev, bdaddr_t *bdaddr,
- 			 u16 max_interval, u16 latency, u16 timeout);
- void mgmt_reenable_advertising(struct hci_dev *hdev);
- void mgmt_smp_complete(struct hci_conn *conn, bool complete);
-+void restart_le_scan(struct hci_dev *hdev, unsigned long delay);
- 
- u8 hci_le_conn_update(struct hci_conn *conn, u16 min, u16 max, u16 latency,
- 		      u16 to_multiplier);
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index cb05d7f..85bca9c 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -2580,6 +2580,7 @@ static int hci_dev_do_close(struct hci_dev *hdev)
- 		cancel_delayed_work(&hdev->service_cache);
- 
- 	cancel_delayed_work_sync(&hdev->le_scan_disable);
-+	cancel_delayed_work_sync(&hdev->le_scan_restart);
- 
- 	if (test_bit(HCI_MGMT, &hdev->dev_flags))
- 		cancel_delayed_work_sync(&hdev->rpa_expired);
-@@ -3846,6 +3847,8 @@ static void le_scan_disable_work(struct work_struct *work)
- 
- 	BT_DBG("%s", hdev->name);
- 
-+	cancel_delayed_work_sync(&hdev->le_scan_restart);
-+
- 	hci_req_init(&req, hdev);
- 
- 	hci_req_add_le_scan_disable(&req);
-@@ -3855,6 +3858,44 @@ static void le_scan_disable_work(struct work_struct *work)
- 		BT_ERR("Disable LE scanning request failed: err %d", err);
- }
- 
-+void restart_le_scan(struct hci_dev *hdev, unsigned long delay)
-+{
-+	queue_delayed_work(hdev->workqueue, &hdev->le_scan_restart, delay);
-+}
-+
-+static void le_scan_restart_work_complete(struct hci_dev *hdev, u8 status)
-+{
-+	clear_bit(HCI_LE_SCAN_RESTARTING, &hdev->dev_flags);
-+
-+	if (status)
-+		BT_ERR("Failed to restart LE scanning: status %d", status);
-+}
-+
-+static void le_scan_restart_work(struct work_struct *work)
-+{
-+	struct hci_dev *hdev = container_of(work, struct hci_dev,
-+					    le_scan_restart.work);
-+	struct hci_request req;
-+	struct hci_cp_le_set_scan_enable cp;
-+	int err;
-+
-+	BT_DBG("%s", hdev->name);
-+
-+	hci_req_init(&req, hdev);
-+
-+	hci_req_add_le_scan_disable(&req);
-+
-+	memset(&cp, 0, sizeof(cp));
-+	cp.enable = LE_SCAN_ENABLE;
-+	hci_req_add(&req, HCI_OP_LE_SET_SCAN_ENABLE, sizeof(cp), &cp);
-+
-+	set_bit(HCI_LE_SCAN_RESTARTING, &hdev->dev_flags);
-+
-+	err = hci_req_run(&req, le_scan_restart_work_complete);
-+	if (err)
-+		BT_ERR("Disable LE scanning request failed: err %d", err);
-+}
-+
- static void set_random_addr(struct hci_request *req, bdaddr_t *rpa)
- {
- 	struct hci_dev *hdev = req->hdev;
-@@ -4032,6 +4073,7 @@ struct hci_dev *hci_alloc_dev(void)
- 	INIT_DELAYED_WORK(&hdev->power_off, hci_power_off);
- 	INIT_DELAYED_WORK(&hdev->discov_off, hci_discov_off);
- 	INIT_DELAYED_WORK(&hdev->le_scan_disable, le_scan_disable_work);
-+	INIT_DELAYED_WORK(&hdev->le_scan_restart, le_scan_restart_work);
- 
- 	skb_queue_head_init(&hdev->rx_q);
- 	skb_queue_head_init(&hdev->cmd_q);
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 9629153..976387b 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -1152,10 +1152,13 @@ static void hci_cc_le_set_scan_enable(struct hci_dev *hdev,
- 					  d->last_adv_data_len, NULL, 0);
- 		}
- 
--		/* Cancel this timer so that we don't try to disable scanning
--		 * when it's already disabled.
-+		/* If HCI_LE_SCAN_RESTARTING is set, don't cancel this timer,
-+		 * because we're just restarting scan. Otherwise cancel it so
-+		 * that we don't try to disable scanning when it's already
-+		 * disabled.
- 		 */
--		cancel_delayed_work(&hdev->le_scan_disable);
-+		if (!test_bit(HCI_LE_SCAN_RESTARTING, &hdev->dev_flags))
-+			cancel_delayed_work(&hdev->le_scan_disable);
- 
- 		clear_bit(HCI_LE_SCAN, &hdev->dev_flags);
- 
--- 
-2.1.0.rc2.206.gedb03e5
+In general, there is value in unit testing the gatt-helpers functions
+directly but overall I agree with Luiz that we should run these tests
+exactly like we would run it against the PTS. As long as the
+"database" we're returning in the response PDUs matches the complexity
+required by the test specification, a simple initialization of
+bt_gatt_client would give us all major discovery test cases. Of course
+we'll need to call gatt-helpers directly for test cases involving GATT
+procedures that don't aren't currently being used by bt_gatt_client
+(e.g. discover services by UUID).
 
+So it's probably OK to leave these ATT level tests for now but we also
+want at least a CLIENT level test to verify all of discovery test spec
+cases using the service/characteristic/include iterators.
+
+>>>> +       execute_context(context);
+>>>> +}
+>>>> +
+>>>>  int main(int argc, char *argv[])
+>>>>  {
+>>>>         g_test_init(&argc, &argv, NULL);
+>>>> @@ -259,8 +307,29 @@ int main(int argc, char *argv[])
+>>>>          * The test group objective is to verify Generic Attribute Profile
+>>>>          * Server Configuration.
+>>>>          */
+>>>> -       define_test("/TP/GAC/CL/BV-01-C", test_client,
+>>>> +       define_test("/TP/GAC/CL/BV-01-C", test_client, CLIENT,
+>>>>                                 raw_pdu(0x02, 0x00, 0x02));
+>>>>
+>>>> +       /*
+>>>> +        * Discovery
+>>>> +        *
+>>>> +        * The test group objective is to verify Generic Attribute Profile
+>>>> +        * Discovery of Services and Service Characteristics.
+>>>> +        */
+>>>> +       define_test("/TP/GAD/CL/BV-01-C", test_search_primary, ATT,
+>>>> +                       raw_pdu(0x02, 0x00, 0x02),
+>>>> +                       raw_pdu(0x03, 0x00, 0x02),
+>>>> +                       raw_pdu(0x10, 0x01, 0x00, 0xff, 0xff, 0x00, 0x28),
+>>>> +                       raw_pdu(0x11, 0x06, 0x10, 0x00, 0x13, 0x00, 0x00, 0x18,
+>>>> +                                       0x20, 0x00, 0x29, 0x00, 0xb0, 0x68,
+>>>> +                                       0x30, 0x00, 0x32, 0x00, 0x19, 0x18),
+>>>> +                       raw_pdu(0x10, 0x33, 0x00, 0xff, 0xff, 0x00, 0x28),
+>>>> +                       raw_pdu(0x11, 0x14, 0x90, 0x00, 0x96, 0x00, 0xef, 0xcd,
+>>>> +                                       0xab, 0x89, 0x67, 0x45, 0x23, 0x01,
+>>>> +                                       0x00, 0x00, 0x00, 0x00, 0x85, 0x60,
+>>>> +                                       0x00, 0x00),
+>>>> +                       raw_pdu(0x10, 0x97, 0x00, 0xff, 0xff, 0x00, 0x28),
+>>>> +                       raw_pdu(0x01, 0x10, 0x97, 0x00, 0x0a));
+>>>> +
+>>>>         return g_test_run();
+>>>>  }
+>>>> --
+>>>> 1.9.3
+>>>>
+>>>> --
+>>>> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+>>>> the body of a message to majordomo@vger.kernel.org
+>>>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>>>
+>>>
+>>>
+>>> --
+>>> Luiz Augusto von Dentz
+>>> --
+>>> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+>>> the body of a message to majordomo@vger.kernel.org
+>>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>>
+>> --
+>> Michael Janssen
+>
+>
+>
+> --
+> Luiz Augusto von Dentz
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+--
+Arman
