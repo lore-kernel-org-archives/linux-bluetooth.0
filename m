@@ -1,129 +1,114 @@
 Return-Path: <cyrus@holtmann.org>
-From: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
-Subject: [PATCH 1/2] android/tester: Add AVRCP RegNotifPlayPositionChanged test case
-Date: Wed, 29 Oct 2014 15:47:19 +0200
-Message-Id: <1414590440-15101-1-git-send-email-ravikumar.veeramally@linux.intel.com>
+MIME-Version: 1.0
+In-Reply-To: <1414584812-7477-1-git-send-email-ravikumar.veeramally@linux.intel.com>
+References: <1414584812-7477-1-git-send-email-ravikumar.veeramally@linux.intel.com>
+Date: Wed, 29 Oct 2014 14:48:47 +0200
+Message-ID: <CABBYNZ+3=h0y+chO1G3VNUEo2LK56kA1VXwgoZj1R8JJbGWSYg@mail.gmail.com>
+Subject: Re: [PATCH_v2 1/4] android/tester: Fix wrong state comparison in A2DP
+ and AVRCP tests
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- android/tester-avrcp.c | 63 ++++++++++++++++++++++++++++++++++++++++++++++++++
- android/tester-main.h  |  5 ++++
- 2 files changed, 68 insertions(+)
+Hi Ravi,
 
-diff --git a/android/tester-avrcp.c b/android/tester-avrcp.c
-index 7c02ec2..2ff9fa0 100644
---- a/android/tester-avrcp.c
-+++ b/android/tester-avrcp.c
-@@ -90,6 +90,15 @@ static struct emu_l2cap_cid_data sdp_data = {
- 			0x31, 0x00, 0x00, 0x09, 0x02, 0xFF, 0xFF, 0xFF, 0xFF, \
- 							0xFF, 0xFF, 0xFF, 0xFF
- 
-+#define req_position_notif 0x00, 0x11, 0x0e, 0x03, 0x48, 0x00, 0x00, 0x19, \
-+				0x58, 0x31, 0x00, 0x00, 0x05, 0x05, 0x00, \
-+							0x00, 0x00, 0x00
-+
-+#define rsp_position_notif 0x00, 0x11, 0x0e, 0x0F, 0x48, 0x00, 0x00, 0x19, \
-+				0x58, 0x31, 0x00, 0x00, 0x04, 0x05, 0xFF, \
-+							0xFF, 0xFF, 0xFF
-+
-+
- #define req_ele_attr 0x00, 0x11, 0x0e, 0x01, 0x48, 0x00, 0x00, 0x19, 0x58, \
- 			0x20, 0x00, 0x00, 0x0D, 0x00, 0x00, 0x00, 0x00, \
- 			0x02, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x07
-@@ -162,6 +171,12 @@ static void avrcp_cid_hook_cb(const void *data, uint16_t len, void *user_data)
- 			step->callback = CB_AVRCP_REG_NOTIF_RSP;
- 			step->callback_result.rc_index = get_be64(data + 14);
- 			schedule_callback_verification(step);
-+		} else if (event == 0x05) {
-+			step = g_new0(struct step, 1);
-+			step->callback = CB_AVRCP_REG_NOTIF_RSP;
-+			step->callback_result.song_position =
-+							get_be32(data + 14);
-+			schedule_callback_verification(step);
- 		}
- 		break;
- 	case AVRCP_GET_ELEMENT_ATTRIBUTES:
-@@ -314,6 +329,32 @@ static void avrcp_reg_notif_track_changed_rsp(void)
- 	schedule_action_verification(step);
- }
- 
-+static void avrcp_reg_notif_play_position_changed_req(void)
-+{
-+	struct test_data *data = tester_get_data();
-+	struct bthost *bthost = hciemu_client_get_host(data->hciemu);
-+	const struct iovec pdu = raw_pdu(req_position_notif);
-+	struct step *step = g_new0(struct step, 1);
-+
-+	bthost_send_cid_v(bthost, avrcp_data.handle, avrcp_data.cid, &pdu, 1);
-+	step->action_status = BT_STATUS_SUCCESS;
-+	schedule_action_verification(step);
-+}
-+
-+static void avrcp_reg_notif_play_position_changed_rsp(void)
-+{
-+	struct test_data *data = tester_get_data();
-+	struct step *step = g_new0(struct step, 1);
-+	btrc_register_notification_t reg;
-+
-+	reg.song_pos = 0xffffffff;
-+	step->action_status = data->if_avrcp->register_notification_rsp(
-+						BTRC_EVT_PLAY_POS_CHANGED,
-+					BTRC_NOTIFICATION_TYPE_INTERIM, &reg);
-+
-+	schedule_action_verification(step);
-+}
-+
- static void avrcp_get_element_attributes_req(void)
- {
- 	struct test_data *data = tester_get_data();
-@@ -424,6 +465,28 @@ static struct test_case test_cases[] = {
- 		ACTION_SUCCESS(bluetooth_disable_action, NULL),
- 		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_OFF),
- 	),
-+	TEST_CASE_BREDRLE("AVRCP RegNotifPlayPositionChanged - Success",
-+		ACTION_SUCCESS(bluetooth_enable_action, NULL),
-+		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_ON),
-+		ACTION_SUCCESS(emu_setup_powered_remote_action, NULL),
-+		ACTION_SUCCESS(emu_set_ssp_mode_action, NULL),
-+		ACTION_SUCCESS(set_default_ssp_request_handler, NULL),
-+		ACTION_SUCCESS(emu_add_l2cap_server_action, &sdp_setup_data),
-+		ACTION_SUCCESS(emu_add_l2cap_server_action, &a2dp_setup_data),
-+		ACTION_SUCCESS(emu_add_l2cap_server_action, &avrcp_setup_data),
-+		ACTION_SUCCESS(avrcp_connect_action, NULL),
-+		CALLBACK_AV_CONN_STATE(CB_A2DP_CONN_STATE,
-+					BTAV_CONNECTION_STATE_CONNECTING),
-+		CALLBACK_AV_CONN_STATE(CB_A2DP_CONN_STATE,
-+					BTAV_CONNECTION_STATE_CONNECTED),
-+		ACTION_SUCCESS(avrcp_reg_notif_play_position_changed_req, NULL),
-+		CALLBACK(CB_AVRCP_REG_NOTIF_REQ),
-+		ACTION_SUCCESS(avrcp_reg_notif_play_position_changed_rsp, NULL),
-+		CALLBACK_RC_REG_NOTIF_POSITION_CHANGED(CB_AVRCP_REG_NOTIF_RSP,
-+								0xffffffff),
-+		ACTION_SUCCESS(bluetooth_disable_action, NULL),
-+		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_OFF),
-+	),
- 	TEST_CASE_BREDRLE("AVRCP GetElementAttributes - Success",
- 		ACTION_SUCCESS(bluetooth_enable_action, NULL),
- 		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_ON),
-diff --git a/android/tester-main.h b/android/tester-main.h
-index ac310a3..1a779a2 100644
---- a/android/tester-main.h
-+++ b/android/tester-main.h
-@@ -409,6 +409,11 @@ struct pdu_set {
- 		.callback_result.rc_index = cb_index, \
- 	}
- 
-+#define CALLBACK_RC_REG_NOTIF_POSITION_CHANGED(cb, cb_position) { \
-+		.callback = cb, \
-+		.callback_result.song_position = cb_position, \
-+	}
-+
- #define CALLBACK_RC_GET_ELEMENT_ATTRIBUTES(cb, cb_num_of_attrs, cb_attrs) { \
- 		.callback = cb, \
- 		.callback_result.num_of_attrs = cb_num_of_attrs, \
+On Wed, Oct 29, 2014 at 2:13 PM, Ravi kumar Veeramally
+<ravikumar.veeramally@linux.intel.com> wrote:
+> btav_connection_state_t and btav_audio_state_t enum values are wrongly
+> stored in different enum type(bt_state_t state).
+> ---
+>  android/tester-main.c | 20 ++++++++++++++++++--
+>  android/tester-main.h | 11 +++++++----
+>  2 files changed, 25 insertions(+), 6 deletions(-)
+>
+> diff --git a/android/tester-main.c b/android/tester-main.c
+> index f4d18e2..8cf62c2 100644
+> --- a/android/tester-main.c
+> +++ b/android/tester-main.c
+> @@ -654,6 +654,22 @@ static bool match_data(struct step *step)
+>                 return false;
+>         }
+>
+> +       if (exp->callback_result.av_conn_state !=
+> +                                       step->callback_result.av_conn_state) {
+> +               tester_debug("Callback av conn state mismatch: 0x%x vs 0x%x",
+> +                                       step->callback_result.av_conn_state,
+> +                                       exp->callback_result.av_conn_state);
+> +               return false;
+> +       }
+> +
+> +       if (exp->callback_result.av_audio_state !=
+> +                                       step->callback_result.av_audio_state) {
+> +               tester_debug("Callback av audio state mismatch: 0x%x vs 0x%x",
+> +                                       step->callback_result.av_audio_state,
+> +                                       exp->callback_result.av_audio_state);
+> +               return false;
+> +       }
+> +
+>         if (exp->callback_result.pairing_variant !=
+>                                         step->callback_result.pairing_variant) {
+>                 tester_debug("Callback pairing result mismatch: %d vs %d",
+> @@ -1863,7 +1879,7 @@ static void a2dp_connection_state_cb(btav_connection_state_t state,
+>         struct step *step = g_new0(struct step, 1);
+>
+>         step->callback = CB_A2DP_CONN_STATE;
+> -       step->callback_result.state = state;
+> +       step->callback_result.av_conn_state = state;
+>
+>         schedule_callback_verification(step);
+>  }
+> @@ -1873,7 +1889,7 @@ static void a2dp_audio_state_cb(btav_audio_state_t state, bt_bdaddr_t *bd_addr)
+>         struct step *step = g_new0(struct step, 1);
+>
+>         step->callback = CB_A2DP_AUDIO_STATE;
+> -       step->callback_result.state = state;
+> +       step->callback_result.av_audio_state = state;
+>
+>         schedule_callback_verification(step);
+>  }
+> diff --git a/android/tester-main.h b/android/tester-main.h
+> index c938d44..ff6e43c 100644
+> --- a/android/tester-main.h
+> +++ b/android/tester-main.h
+> @@ -387,14 +387,14 @@ struct pdu_set {
+>                 .callback_result.channel_state = cb_state, \
+>         }
+>
+> -#define CALLBACK_AV_CONN_STATE(cb, cb_state) { \
+> +#define CALLBACK_AV_CONN_STATE(cb, cb_av_conn_state) { \
+>                 .callback = cb, \
+> -               .callback_result.state = cb_state, \
+> +               .callback_result.av_conn_state = cb_av_conn_state, \
+>         }
+>
+> -#define CALLBACK_AV_AUDIO_STATE(cb, cb_state) { \
+> +#define CALLBACK_AV_AUDIO_STATE(cb, cb_av_audio_state) { \
+>                 .callback = cb, \
+> -               .callback_result.state = cb_state, \
+> +               .callback_result.av_audio_state = cb_av_audio_state, \
+>         }
+>
+>  #define CALLBACK_DEVICE_PROPS(props, prop_cnt) \
+> @@ -641,6 +641,9 @@ struct bt_callback_data {
+>         int mdep_cfg_index;
+>         bthl_app_reg_state_t app_state;
+>         bthl_channel_state_t channel_state;
+> +
+> +       btav_connection_state_t av_conn_state;
+> +       btav_audio_state_t av_audio_state;
+>  };
+>
+>  /*
+> --
+> 2.1.0
+
+Applied, please notice that I fixed 4/4 myself, apparently Ive
+indicated you the wrong like while check-patch actually complained
+about line 165.
+
+
 -- 
-2.1.0
-
+Luiz Augusto von Dentz
