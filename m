@@ -1,84 +1,123 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1414586161-11825-1-git-send-email-bharat.panda@samsung.com>
-References: <1414586161-11825-1-git-send-email-bharat.panda@samsung.com>
-Date: Wed, 29 Oct 2014 16:45:13 +0200
-Message-ID: <CABBYNZ+Duy54Xxh8WrHGs_prqiGq1SxkTqwPZS9RKL1eac_szg@mail.gmail.com>
-Subject: Re: [PATCH v2] obexd/mas: Handle register notification open
+In-Reply-To: <CAHrH25S04qADGehBAbmEWxEqqg0gcKB0k9JJPtDdbsTq=HLx1Q@mail.gmail.com>
+References: <1414513123-5689-1-git-send-email-luiz.dentz@gmail.com>
+	<1414513123-5689-7-git-send-email-luiz.dentz@gmail.com>
+	<CAHrH25S04qADGehBAbmEWxEqqg0gcKB0k9JJPtDdbsTq=HLx1Q@mail.gmail.com>
+Date: Wed, 29 Oct 2014 16:41:50 +0200
+Message-ID: <CABBYNZL87g7vbe1bxO9vZb0BZJgy3__riqBxVhiK1wWE4rfHiQ@mail.gmail.com>
+Subject: Re: [PATCH v2 7/9] shared/gatt-db: Add gatt_db_attribute_write
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Bharat Panda <bharat.panda@samsung.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	cpgs@samsung.com
+To: Arman Uguray <armansito@chromium.org>
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Arman,
 
-On Wed, Oct 29, 2014 at 2:36 PM, Bharat Panda <bharat.panda@samsung.com> wrote:
-> Changes made to handle method open for mime_notification_registration
-> ---
->  obexd/plugins/mas.c | 29 ++++++++++++++++++++++++++++-
->  1 file changed, 28 insertions(+), 1 deletion(-)
+On Wed, Oct 29, 2014 at 12:30 AM, Arman Uguray <armansito@chromium.org> wrote:
+> Hi Luiz,
 >
-> diff --git a/obexd/plugins/mas.c b/obexd/plugins/mas.c
-> index db40509..61e221d 100644
-> --- a/obexd/plugins/mas.c
-> +++ b/obexd/plugins/mas.c
-> @@ -72,6 +72,7 @@ struct mas_session {
->         GObexApparam *inparams;
->         GObexApparam *outparams;
->         gboolean ap_sent;
-> +       uint8_t notification_status;
->  };
+> On Tue, Oct 28, 2014 at 9:18 AM, Luiz Augusto von Dentz
+> <luiz.dentz@gmail.com> wrote:
+>> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>>
+>> ---
+>>  src/shared/gatt-db.c | 32 ++++++++++++++++++++++++++++++--
+>>  1 file changed, 30 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/src/shared/gatt-db.c b/src/shared/gatt-db.c
+>> index b5b6c72..5a912f8 100644
+>> --- a/src/shared/gatt-db.c
+>> +++ b/src/shared/gatt-db.c
+>> @@ -900,7 +900,7 @@ bool gatt_db_attribute_read(struct gatt_db_attribute *attrib, uint16_t offset,
+>>                 return true;
+>>         }
+>>
+>> -       /* Check length boundary if value is stored in the db */
+>> +       /* Check boundary if value is stored in the db */
+>>         if (offset >= attrib->value_len)
+>>                 return false;
+>>
+>> @@ -916,5 +916,33 @@ bool gatt_db_attribute_write(struct gatt_db_attribute *attrib, uint16_t offset,
+>>                                         gatt_db_attribute_write_t func,
+>>                                         void *user_data)
+>>  {
+>> -       return false;
+>> +       if (!attrib)
+>> +               return false;
+>> +
+>> +       if (attrib->write_func) {
+>> +               attrib->write_func(attrib->handle, offset, value, len, opcode,
+>> +                                               bdaddr, attrib->user_data);
+>> +               return true;
+>> +       }
+>> +
+>> +       /* For values stored in db allocate on demand */
+>> +       if (!attrib->value) {
+>> +               attrib->value = malloc0(len + offset);
+>> +               if (!attrib->value)
+>> +                       return false;
+>> +               attrib->value_len = len + offset;
+>> +       } else if (offset >= attrib->value_len ||
+>> +                               len > (unsigned) (attrib->value_len - offset)) {
+>> +               attrib->value = realloc(attrib->value, len + offset);
 >
->  static const uint8_t MAS_TARGET[TARGET_SIZE] = {
-> @@ -766,6 +767,32 @@ static int any_close(void *obj)
->         return 0;
->  }
->
-> +static void *notification_registration_open(const char *name, int oflag,
-> +                       mode_t mode, void *driver_data, size_t *size, int *err)
-> +{
-> +       struct mas_session *mas = driver_data;
-> +       uint8_t status;
-> +
-> +       DBG("");
-> +
-> +       if (O_RDONLY) {
-> +               *err = -EBADR;
-> +               return NULL;
-> +       }
-> +
-> +       if (!g_obex_apparam_get_uint8(mas->inparams,
-> +                       MAP_AP_NOTIFICATIONSTATUS, &status)) {
-> +               *err = -EBADR;
-> +               return NULL;
-> +       }
-> +
-> +       mas->notification_status = status;
-> +       mas->finished = TRUE;
-> +       *err = 0;
-> +
-> +       return mas;
-> +}
-> +
->  static struct obex_service_driver mas = {
->         .name = "Message Access server",
->         .service = OBEX_MAS,
-> @@ -824,7 +851,7 @@ static struct obex_mime_type_driver mime_notification_registration = {
->         .target = MAS_TARGET,
->         .target_size = TARGET_SIZE,
->         .mimetype = "x-bt/MAP-NotificationRegistration",
-> -       .open = any_open,
-> +       .open = notification_registration_open,
->         .close = any_close,
->         .read = any_read,
->         .write = any_write,
-> --
-> 1.9.1
+> I wouldn't immediately modify attrib->value here. Use a temporary, so
+> that if realloc fails, the write will fail but the attribute value
+> will remain unmodified.
 
-Pushed, thanks.
+Well realloc would still affect the pointer anyway, and I guess if it
+fails it would return the original pointer and nothing would be change
+so the return is only really useful if the original pointer is NULL
+then it acts as malloc.
+
+>> +               if (!attrib->value)
+>> +                       return 0;
+>
+> return false, to be consistent with the previous block.
+
+Will fix this.
+
+>> +               attrib->value_len = len + offset;
+>> +       }
+>> +
+>> +       memcpy(&attrib->value[offset], value, len);
+>
+> I'm still not sure about allowing writes if attrib->write_func is
+> NULL. My thinking is, if the write_func is not set, then this
+> attribute is not writable so we always return false. This is
+> automatically the case for all declaration attributes since they
+> wouldn't have write permission. All other writes will then always be
+> delegated to the upper layer. This would keep things a bit simpler I
+> think, especially since we wouldn't want some accidental usage of
+> gatt_db_attribute_write on a declaration handle to break the database.
+
+The db has no idea of permissions bits to begin with so it cannot
+check consistency between permissions and callbacks, and I do remember
+commenting that this allows to store values in the db itself, which is
+very convenient for plugins, this is also valid for read, any plugin
+should be able to read values stored in the db, so at in terms of API
+it is consistent to allow writes without a callback.
+
+>> +
+>> +       if (func)
+>> +               func(attrib, 0, user_data);
+>> +
+>> +       return true;
+>>  }
+>> --
+>> 1.9.3
+>>
+>> --
+>> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+>> the body of a message to majordomo@vger.kernel.org
+>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>
+> Cheers,
+> Arman
+
 
 
 -- 
