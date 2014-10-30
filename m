@@ -1,131 +1,268 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1414505975-29158-1-git-send-email-bharat.panda@samsung.com>
-References: <1414505975-29158-1-git-send-email-bharat.panda@samsung.com>
-Date: Thu, 30 Oct 2014 16:19:16 +0200
-Message-ID: <CABBYNZLQqs7KCBZRaHQSNv2axGot_yEe8U77j7kAHE5AJfQgSQ@mail.gmail.com>
-Subject: Re: [PATCH ] obexd/ftp: Update ftp transfer progress
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Bharat Panda <bharat.panda@samsung.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	cpgs@samsung.com
+In-Reply-To: <1414677465-19862-1-git-send-email-luiz.dentz@gmail.com>
+References: <1414677465-19862-1-git-send-email-luiz.dentz@gmail.com>
+Date: Thu, 30 Oct 2014 07:17:20 -0700
+Message-ID: <CAHrH25R3nmMiKp-Vz6OOYrqPGbTqjgnWYUQWjqucbUQTwbJNHw@mail.gmail.com>
+Subject: Re: [PATCH BlueZ v3 1/9] shared/gatt-db: Expose gatt_db_attribute
+From: Arman Uguray <armansito@chromium.org>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Luiz,
 
-On Tue, Oct 28, 2014 at 4:19 PM, Bharat Panda <bharat.panda@samsung.com> wrote:
-> Adds support for updating file transfer progress for FTP
-
-What this is really doing is enabling transfer management for FTP,
-please change the description.
-
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>
+> This is the new API to reduce the lookups in gatt_db and make it
+> a little bit more convenient for batch operations, so the general idea
+> is to be able to get a hold of it via gatt_db_get_attribute but also
+> replace the handles in the queues with proper attributes so the server
+> code don't have to lookup again when reading/writing, checking
+> permissions, or any other operation that can be done directly.
 > ---
->  obexd/plugins/ftp.c | 21 ++++++++++++++++++++-
->  obexd/plugins/ftp.h |  1 +
->  2 files changed, 21 insertions(+), 1 deletion(-)
+> v2: Address problems gatt_db_attribute_read and gatt_db_attribute_write
+> pointed out by Arman.
+> v3: Allow gatt_db_attribute_read to work if offset equals to value length.
 >
-> diff --git a/obexd/plugins/ftp.c b/obexd/plugins/ftp.c
-> index 773861d..2004a77 100644
-> --- a/obexd/plugins/ftp.c
-> +++ b/obexd/plugins/ftp.c
-> @@ -59,6 +59,7 @@ static const uint8_t FTP_TARGET[TARGET_SIZE] = {
+>  src/shared/gatt-db.c | 49 +++++++++++++++++++++++++++++++++++++++++++++++++
+>  src/shared/gatt-db.h | 33 +++++++++++++++++++++++++++++++++
+>  2 files changed, 82 insertions(+)
 >
->  struct ftp_session {
->         struct obex_session *os;
-> +       struct obex_transfer *transfer;
->         char *folder;
->  };
+> diff --git a/src/shared/gatt-db.c b/src/shared/gatt-db.c
+> index 6b5e84c..6c7234f 100644
+> --- a/src/shared/gatt-db.c
+> +++ b/src/shared/gatt-db.c
+> @@ -802,3 +802,52 @@ bool gatt_db_get_attribute_permissions(struct gatt_db *db, uint16_t handle,
+>         return true;
 >
-> @@ -116,6 +117,8 @@ void *ftp_connect(struct obex_session *os, int *err)
->         if (err)
->                 *err = 0;
->
-> +       ftp->transfer = manager_register_transfer(os);
-> +
->         DBG("session %p created", ftp);
->
->         return ftp;
-> @@ -136,6 +139,9 @@ int ftp_get(struct obex_session *os, void *user_data)
->         if (ret < 0)
->                 return ret;
->
-> +       if (type == NULL)
-> +               manager_emit_transfer_started(ftp->transfer);
-
-Please add a comment before the code above saying that we only care
-about actual file transfers not other operations.
-
->         return 0;
 >  }
->
-> @@ -181,6 +187,9 @@ int ftp_chkput(struct obex_session *os, void *user_data)
->
->         ret = obex_put_stream_start(os, path);
->
-> +       if (ret == 0)
-> +               manager_emit_transfer_started(ftp->transfer);
 > +
->         g_free(path);
->
->         return ret;
-> @@ -471,10 +480,19 @@ void ftp_disconnect(struct obex_session *os, void *user_data)
->
->         manager_unregister_session(os);
->
-> +       manager_unregister_transfer(ftp->transfer);
-> +
->         g_free(ftp->folder);
->         g_free(ftp);
->  }
->
-> +void ftp_progress(struct obex_session *os, void *user_data)
+> +struct gatt_db_attribute *gatt_db_get_attribute(struct gatt_db *db,
+> +                                                       uint16_t handle)
 > +{
-> +       struct ftp_session *ftp = user_data;
-> +
-> +       manager_emit_transfer_progress(ftp->transfer);
+> +       return NULL;
 > +}
 > +
->  static struct obex_service_driver ftp = {
->         .name = "File Transfer server",
->         .service = OBEX_FTP,
-> @@ -486,7 +504,8 @@ static struct obex_service_driver ftp = {
->         .chkput = ftp_chkput,
->         .setpath = ftp_setpath,
->         .action = ftp_action,
-> -       .disconnect = ftp_disconnect
-> +       .disconnect = ftp_disconnect,
-> +       .progress = ftp_progress
-
-For consistency, please add progress after connect so it appears in
-the same sequence as they are defined by service.h
-
->  };
+> +uint16_t gatt_db_attribute_get_start_handle(struct gatt_db_attribute *attrib)
+> +{
+> +       return 0;
+> +}
+> +
+> +uint16_t gatt_db_attribute_get_end_handle(struct gatt_db_attribute *attrib)
+> +{
+> +       return 0;
+> +}
+> +
+> +const bt_uuid_t *gatt_db_attribute_get_type(struct gatt_db_attribute *attrib)
+> +{
+> +       return NULL;
+> +}
+> +
+> +bool gatt_db_attribute_get_service_uuid(struct gatt_db_attribute *attrib,
+> +                                                       bt_uuid_t *uuid)
+> +{
+> +       return false;
+> +}
+> +
+> +bool gatt_db_attribute_get_permissions(struct gatt_db_attribute *attrib,
+> +                                                       uint32_t *permissions)
+> +{
+> +       return false;
+> +}
+> +
+> +bool gatt_db_attribute_read(struct gatt_db_attribute *attrib, uint16_t offset,
+> +                               uint8_t opcode, bdaddr_t *bdaddr,
+> +                               gatt_db_attribute_read_t func, void *user_data)
+> +{
+> +       return false;
+> +}
+> +
+> +bool gatt_db_attribute_write(struct gatt_db_attribute *attrib, uint16_t offset,
+> +                                       const uint8_t *value, size_t len,
+> +                                       uint8_t opcode, bdaddr_t *bdaddr,
+> +                                       gatt_db_attribute_write_t func,
+> +                                       void *user_data)
+> +{
+> +       return false;
+> +}
+> diff --git a/src/shared/gatt-db.h b/src/shared/gatt-db.h
+> index 8d18434..0c16e88 100644
+> --- a/src/shared/gatt-db.h
+> +++ b/src/shared/gatt-db.h
+> @@ -96,3 +96,36 @@ bool gatt_db_get_service_uuid(struct gatt_db *db, uint16_t handle,
 >
->  static int ftp_init(void)
-> diff --git a/obexd/plugins/ftp.h b/obexd/plugins/ftp.h
-> index f06de84..c0e97a7 100644
-> --- a/obexd/plugins/ftp.h
-> +++ b/obexd/plugins/ftp.h
-> @@ -28,3 +28,4 @@ int ftp_put(struct obex_session *os, void *user_data);
->  int ftp_setpath(struct obex_session *os, void *user_data);
->  void ftp_disconnect(struct obex_session *os, void *user_data);
->  int ftp_action(struct obex_session *os, void *user_data);
-> +void ftp_progress(struct obex_session *os, void *user_data);
-
-If you are not planning on using ftp_progress anywhere else please
-make it static.
-
+>  bool gatt_db_get_attribute_permissions(struct gatt_db *db, uint16_t handle,
+>                                                         uint32_t *permissions);
+> +
+> +struct gatt_db_attribute;
+> +
+> +struct gatt_db_attribute *gatt_db_get_attribute(struct gatt_db *db,
+> +                                                       uint16_t handle);
+> +
+> +uint16_t gatt_db_attribute_get_start_handle(struct gatt_db_attribute *attrib);
+> +uint16_t gatt_db_attribute_get_end_handle(struct gatt_db_attribute *attrib);
+> +
+> +const bt_uuid_t *gatt_db_attribute_get_type(struct gatt_db_attribute *attrib);
+> +
+> +bool gatt_db_attribute_get_service_uuid(struct gatt_db_attribute *attrib,
+> +                                                       bt_uuid_t *uuid);
+> +
+> +bool gatt_db_attribute_get_permissions(struct gatt_db_attribute *attrib,
+> +                                                       uint32_t *permissions);
+> +
+> +typedef void (*gatt_db_attribute_read_t) (struct gatt_db_attribute *attrib,
+> +                                       int err, uint8_t *value, size_t length,
+> +                                       void *user_data);
+> +
+> +bool gatt_db_attribute_read(struct gatt_db_attribute *attrib, uint16_t offset,
+> +                               uint8_t opcode, bdaddr_t *bdaddr,
+> +                               gatt_db_attribute_read_t func, void *user_data);
+> +
+> +typedef void (*gatt_db_attribute_write_t) (struct gatt_db_attribute *attrib,
+> +                                               int err, void *user_data);
+> +
+> +bool gatt_db_attribute_write(struct gatt_db_attribute *attrib, uint16_t offset,
+> +                                       const uint8_t *value, size_t len,
+> +                                       uint8_t opcode, bdaddr_t *bdaddr,
+> +                                       gatt_db_attribute_write_t func,
+> +                                       void *user_data);
 > --
-> 1.9.1
+> 1.9.3
 >
 > --
 > To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
 > the body of a message to majordomo@vger.kernel.org
 > More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
+This patch set looks good to me.
+
+-Arman
 
 
--- 
-Luiz Augusto von Dentz
+On Thu, Oct 30, 2014 at 6:57 AM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>
+> This is the new API to reduce the lookups in gatt_db and make it
+> a little bit more convenient for batch operations, so the general idea
+> is to be able to get a hold of it via gatt_db_get_attribute but also
+> replace the handles in the queues with proper attributes so the server
+> code don't have to lookup again when reading/writing, checking
+> permissions, or any other operation that can be done directly.
+> ---
+> v2: Address problems gatt_db_attribute_read and gatt_db_attribute_write
+> pointed out by Arman.
+> v3: Allow gatt_db_attribute_read to work if offset equals to value length.
+>
+>  src/shared/gatt-db.c | 49 +++++++++++++++++++++++++++++++++++++++++++++++++
+>  src/shared/gatt-db.h | 33 +++++++++++++++++++++++++++++++++
+>  2 files changed, 82 insertions(+)
+>
+> diff --git a/src/shared/gatt-db.c b/src/shared/gatt-db.c
+> index 6b5e84c..6c7234f 100644
+> --- a/src/shared/gatt-db.c
+> +++ b/src/shared/gatt-db.c
+> @@ -802,3 +802,52 @@ bool gatt_db_get_attribute_permissions(struct gatt_db *db, uint16_t handle,
+>         return true;
+>
+>  }
+> +
+> +struct gatt_db_attribute *gatt_db_get_attribute(struct gatt_db *db,
+> +                                                       uint16_t handle)
+> +{
+> +       return NULL;
+> +}
+> +
+> +uint16_t gatt_db_attribute_get_start_handle(struct gatt_db_attribute *attrib)
+> +{
+> +       return 0;
+> +}
+> +
+> +uint16_t gatt_db_attribute_get_end_handle(struct gatt_db_attribute *attrib)
+> +{
+> +       return 0;
+> +}
+> +
+> +const bt_uuid_t *gatt_db_attribute_get_type(struct gatt_db_attribute *attrib)
+> +{
+> +       return NULL;
+> +}
+> +
+> +bool gatt_db_attribute_get_service_uuid(struct gatt_db_attribute *attrib,
+> +                                                       bt_uuid_t *uuid)
+> +{
+> +       return false;
+> +}
+> +
+> +bool gatt_db_attribute_get_permissions(struct gatt_db_attribute *attrib,
+> +                                                       uint32_t *permissions)
+> +{
+> +       return false;
+> +}
+> +
+> +bool gatt_db_attribute_read(struct gatt_db_attribute *attrib, uint16_t offset,
+> +                               uint8_t opcode, bdaddr_t *bdaddr,
+> +                               gatt_db_attribute_read_t func, void *user_data)
+> +{
+> +       return false;
+> +}
+> +
+> +bool gatt_db_attribute_write(struct gatt_db_attribute *attrib, uint16_t offset,
+> +                                       const uint8_t *value, size_t len,
+> +                                       uint8_t opcode, bdaddr_t *bdaddr,
+> +                                       gatt_db_attribute_write_t func,
+> +                                       void *user_data)
+> +{
+> +       return false;
+> +}
+> diff --git a/src/shared/gatt-db.h b/src/shared/gatt-db.h
+> index 8d18434..0c16e88 100644
+> --- a/src/shared/gatt-db.h
+> +++ b/src/shared/gatt-db.h
+> @@ -96,3 +96,36 @@ bool gatt_db_get_service_uuid(struct gatt_db *db, uint16_t handle,
+>
+>  bool gatt_db_get_attribute_permissions(struct gatt_db *db, uint16_t handle,
+>                                                         uint32_t *permissions);
+> +
+> +struct gatt_db_attribute;
+> +
+> +struct gatt_db_attribute *gatt_db_get_attribute(struct gatt_db *db,
+> +                                                       uint16_t handle);
+> +
+> +uint16_t gatt_db_attribute_get_start_handle(struct gatt_db_attribute *attrib);
+> +uint16_t gatt_db_attribute_get_end_handle(struct gatt_db_attribute *attrib);
+> +
+> +const bt_uuid_t *gatt_db_attribute_get_type(struct gatt_db_attribute *attrib);
+> +
+> +bool gatt_db_attribute_get_service_uuid(struct gatt_db_attribute *attrib,
+> +                                                       bt_uuid_t *uuid);
+> +
+> +bool gatt_db_attribute_get_permissions(struct gatt_db_attribute *attrib,
+> +                                                       uint32_t *permissions);
+> +
+> +typedef void (*gatt_db_attribute_read_t) (struct gatt_db_attribute *attrib,
+> +                                       int err, uint8_t *value, size_t length,
+> +                                       void *user_data);
+> +
+> +bool gatt_db_attribute_read(struct gatt_db_attribute *attrib, uint16_t offset,
+> +                               uint8_t opcode, bdaddr_t *bdaddr,
+> +                               gatt_db_attribute_read_t func, void *user_data);
+> +
+> +typedef void (*gatt_db_attribute_write_t) (struct gatt_db_attribute *attrib,
+> +                                               int err, void *user_data);
+> +
+> +bool gatt_db_attribute_write(struct gatt_db_attribute *attrib, uint16_t offset,
+> +                                       const uint8_t *value, size_t len,
+> +                                       uint8_t opcode, bdaddr_t *bdaddr,
+> +                                       gatt_db_attribute_write_t func,
+> +                                       void *user_data);
+> --
+> 1.9.3
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
