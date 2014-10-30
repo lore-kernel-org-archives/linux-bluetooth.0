@@ -1,60 +1,38 @@
 Return-Path: <cyrus@holtmann.org>
-From: Michael Janssen <jamuraa@chromium.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Michael Janssen <jamuraa@chromium.org>
-Subject: [PATCH BlueZ v4 00/10] Unit tests for gattrib API
-Date: Wed, 29 Oct 2014 19:45:35 -0700
-Message-Id: <1414637145-32919-1-git-send-email-jamuraa@chromium.org>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Message-ID: <54519D19.6070205@hurleysoftware.com>
+Date: Wed, 29 Oct 2014 22:06:17 -0400
+From: Peter Hurley <peter@hurleysoftware.com>
+MIME-Version: 1.0
+To: Sasha Levin <sasha.levin@oracle.com>, marcel@holtmann.org,
+ gustavo@padovan.org, johan.hedberg@gmail.com
+CC: davem@davemloft.net, linux-bluetooth@vger.kernel.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth: Revert "Bluetooth: rfcomm: Remove unnecessary
+ krfcommd event"
+References: <1414632736-18782-1-git-send-email-sasha.levin@oracle.com>
+In-Reply-To: <1414632736-18782-1-git-send-email-sasha.levin@oracle.com>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Since we want to replace GAttrib with a bt_att shim for a smooth transition 
-to bt_att profiles, this patch cleans up the API and adds unit tests for
-GAttrib functions.
+Hi Sasha,
 
-This adds tests for all but the register / unregister functions, which
-I will send in a separate patch since they are slightly more complicated due
-to catchalls.
+On 10/29/2014 09:32 PM, Sasha Levin wrote:
+> This reverts commit e5842cdb0f4f2c68f6acd39e286e5d10d8c073e8.
+> 
+> We can't call rfcomm_process_sessions() while our task state is not
+> TASK_RUNNING since rfcomm_process_sessions() tries to lock mutexes
+> and sleep. The scheduler even complains about it:
+> 
+> [   21.683959] WARNING: CPU: 13 PID: 8165 at kernel/sched/core.c:7305 __might_sleep+0xe5/0x1b0()
+> [   21.683962] do not call blocking ops when !TASK_RUNNING; state=1 set at rfcomm_run (net/bluetooth/rfcomm/core.c:2096)
 
-v1 -> v2:
-  * Add g_attrib_register tests
-  * Cleanup of unit/test-gattrib.c
-  * Bugfix for GATTRIB_ALL_REQS
+This problem is in-process with Peter Z and Oleg and a new api
+for handling nested sleeps.
 
-v2 -> v3:
-  * Just move g_attrib_is_encrypted to static (Luiz)
-  * Check that registered-for PDUs were delivered
-  * Respond to Request PDU when registered for it.
-  * Copy result PDUs since they aren't guaranteed to live beyond callback.
+The thread is here
+http://www.gossamer-threads.com/lists/linux/kernel/2019181?do=post_view_threaded
+and the reminder thread here
+https://lkml.org/lkml/2014/10/27/343
 
-v3 -> v4:
-  * Rework to use g_main_loop_run() for running
-  * Reuse pdu_data struct in expect_response
-
-Michael Janssen (10):
-  Remove unused g_attrib_set_debug function
-  attrib: Remove MTU-probing code
-  attrib: Add mtu argument to g_attrib_new
-  attrib: remove g_attrib_is_encrypted
-  Add unit tests for gattrib
-  attrib: Add unit tests for g_attrib_register
-  attrib: fix GATTRIB_ALL_REQS behavior
-  unit/gattrib: Check expected PDUs were delivered
-  unit/gattrib: Respond to the request PDU.
-  unit/gattrib: copy result PDU
-
- .gitignore           |   1 +
- Makefile.am          |   7 +
- attrib/gattrib.c     |  61 +++---
- attrib/gattrib.h     |   7 +-
- attrib/gatttool.c    |  17 +-
- attrib/interactive.c |  17 +-
- src/attrib-server.c  |  12 ++
- src/device.c         |  11 +-
- unit/test-gattrib.c  | 578 +++++++++++++++++++++++++++++++++++++++++++++++++++
- 9 files changed, 666 insertions(+), 45 deletions(-)
- create mode 100644 unit/test-gattrib.c
-
--- 
-2.1.0.rc2.206.gedb03e5
-
+Regards,
+Peter Hurley
