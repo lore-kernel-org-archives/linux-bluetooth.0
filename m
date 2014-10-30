@@ -3,12 +3,12 @@ From: Bharat Panda <bharat.panda@samsung.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: cpgs@samsung.com, Bharat Panda <bharat.panda@samsung.com>
 Subject: [PATCH v3] obexd/ftp: Update ftp transfer progress
-Date: Thu, 30 Oct 2014 20:29:24 +0530
-Message-id: <1414681164-27682-1-git-send-email-bharat.panda@samsung.com>
+Date: Thu, 30 Oct 2014 20:24:54 +0530
+Message-id: <1414680894-27631-1-git-send-email-bharat.panda@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Enables transfer management for FTP
+Adds support for updating file transfer progress for FTP
 ---
  obexd/plugins/ftp.c | 23 +++++++++++++++++++++++
  1 file changed, 23 insertions(+)
