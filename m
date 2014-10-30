@@ -2,62 +2,54 @@ Return-Path: <cyrus@holtmann.org>
 From: Michael Janssen <jamuraa@chromium.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Michael Janssen <jamuraa@chromium.org>
-Subject: [PATCH BlueZ v4 02/10] attrib: Remove MTU-probing code
-Date: Wed, 29 Oct 2014 19:45:37 -0700
-Message-Id: <1414637145-32919-3-git-send-email-jamuraa@chromium.org>
+Subject: [PATCH BlueZ v4 10/10] unit/gattrib: copy result PDU
+Date: Wed, 29 Oct 2014 19:45:45 -0700
+Message-Id: <1414637145-32919-11-git-send-email-jamuraa@chromium.org>
 In-Reply-To: <1414637145-32919-1-git-send-email-jamuraa@chromium.org>
 References: <1414637145-32919-1-git-send-email-jamuraa@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Probing for the MTU using bt_io is problematic for
-testing because you cannot impersonate AF_BLUETOOTH sockets
-with a socketpair.
+Memory is not guaranteed to stay around after the result
+function is called, so we must copy the PDU.
 ---
- attrib/gattrib.c | 13 +------------
- 1 file changed, 1 insertion(+), 12 deletions(-)
+ unit/test-gattrib.c | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
 
-diff --git a/attrib/gattrib.c b/attrib/gattrib.c
-index 71d1cef..fa41ade 100644
---- a/attrib/gattrib.c
-+++ b/attrib/gattrib.c
-@@ -476,27 +476,17 @@ done:
- GAttrib *g_attrib_new(GIOChannel *io)
+diff --git a/unit/test-gattrib.c b/unit/test-gattrib.c
+index 4f1343b..56dc709 100644
+--- a/unit/test-gattrib.c
++++ b/unit/test-gattrib.c
+@@ -212,7 +212,7 @@ static gboolean test_client(GIOChannel *channel, GIOCondition cond,
+ 
+ struct result_data {
+ 	guint8 status;
+-	const guint8 *pdu;
++	guint8 *pdu;
+ 	guint16 len;
+ 	GSourceFunc complete_cb;
+ 	gpointer user_data;
+@@ -222,8 +222,10 @@ static void result_canary(guint8 status, const guint8 *pdu, guint16 len,
+ 								gpointer data)
  {
- 	struct _GAttrib *attrib;
--	uint16_t imtu;
- 	uint16_t att_mtu;
- 	uint16_t cid;
--	GError *gerr = NULL;
+ 	struct result_data *result = data;
++
+ 	result->status = status;
+-	result->pdu = pdu;
++	result->pdu = g_malloc0(len);
++	memcpy(result->pdu, pdu, len);
+ 	result->len = len;
  
- 	g_io_channel_set_encoding(io, NULL, NULL);
- 	g_io_channel_set_buffered(io, FALSE);
+ 	if (g_test_verbose())
+@@ -267,6 +269,8 @@ static void test_send(struct context *cxt, gconstpointer unused)
  
--	bt_io_get(io, &gerr, BT_IO_OPT_IMTU, &imtu,
--				BT_IO_OPT_CID, &cid, BT_IO_OPT_INVALID);
--	if (gerr) {
--		error("%s", gerr->message);
--		g_error_free(gerr);
--		return NULL;
--	}
--
- 	attrib = g_try_new0(struct _GAttrib, 1);
- 	if (attrib == NULL)
- 		return NULL;
+ 	cmp = memcmp(results.pdu, data.respond.data, results.len);
  
--	att_mtu = (cid == ATT_CID) ? ATT_DEFAULT_LE_MTU : imtu;
-+	att_mtu = ATT_DEFAULT_LE_MTU;
++	g_free(results.pdu);
++
+ 	g_assert(cmp == 0);
  
- 	attrib->buf = g_malloc0(att_mtu);
- 	attrib->buflen = att_mtu;
-@@ -651,7 +641,6 @@ gboolean g_attrib_cancel_all(GAttrib *attrib)
- 	return ret;
- }
- 
--
- uint8_t *g_attrib_get_buffer(GAttrib *attrib, size_t *len)
- {
- 	if (len == NULL)
+ 	g_free(results.pdu);
 -- 
 2.1.0.rc2.206.gedb03e5
 
