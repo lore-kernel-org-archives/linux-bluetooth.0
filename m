@@ -2,11 +2,11 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/2] android/handsfree: Add helper to check codec negotiation support
-Date: Thu, 30 Oct 2014 11:45:49 +0100
-Message-ID: <2743363.kKbHWhdAb9@leonov>
-In-Reply-To: <1414624053-24250-1-git-send-email-lukasz.rymanowski@tieto.com>
-References: <1414624053-24250-1-git-send-email-lukasz.rymanowski@tieto.com>
+Subject: Re: [PATCH 2/2] android/handsfree: Be more strict on SLC creation
+Date: Thu, 30 Oct 2014 11:23:45 +0100
+Message-ID: <4224642.3qVV3Hzp2h@leonov>
+In-Reply-To: <1414624053-24250-2-git-send-email-lukasz.rymanowski@tieto.com>
+References: <1414624053-24250-1-git-send-email-lukasz.rymanowski@tieto.com> <1414624053-24250-2-git-send-email-lukasz.rymanowski@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -14,96 +14,60 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Łukasz,
 
-On Thursday 30 of October 2014 00:07:32 Lukasz Rymanowski wrote:
-> This patch adds helper to test if codec negotiation is supported.
-> 
-> This patch fixes also logic behind that. So far we assumed that codec
-> negotiation is there if HFP HF does support it, even HFP AG does not
-> support it. It cause a problem with e.g. SLC creation in scenario where
-> HFP AG is not supporting codec negoctiation. In such a case we
-> incorrectly reply with ERROR on AT+CIND? because we incorretly expected
-> AT+BAC before that command. Issue found on UPF.
+On Thursday 30 of October 2014 00:07:33 Lukasz Rymanowski wrote:
+> In case of any issue during SLC creation lets just drop the link
 > ---
->  android/handsfree.c | 18 ++++++++++++------
->  1 file changed, 12 insertions(+), 6 deletions(-)
+>  android/handsfree.c | 12 ++++++++++++
+>  1 file changed, 12 insertions(+)
 > 
 > diff --git a/android/handsfree.c b/android/handsfree.c
-> index 356dbe0..595919a 100644
+> index 595919a..c8d3c04 100644
 > --- a/android/handsfree.c
 > +++ b/android/handsfree.c
-> @@ -938,6 +938,12 @@ done:
->  	hfp_gw_send_info(dev->gw, "+BCS: %u", type);
+> @@ -1251,6 +1251,9 @@ static void at_cmd_cind(struct hfp_gw_result *result,
+> enum hfp_gw_cmd_type type, }
+> 
+>  	hfp_gw_send_result(dev->gw, HFP_RESULT_ERROR);
+> +
+> +	if (dev->state != HAL_EV_HANDSFREE_CONN_STATE_SLC_CONNECTED)
+> +		hfp_gw_disconnect(dev->gw);
 >  }
 > 
-> +static bool codec_negotiation_supported(struct hf_device *dev)
-> +{
-> +	return (dev->features & HFP_HF_FEAT_CODEC) &&
-> +			(hfp_ag_features & HFP_AG_FEAT_CODEC);
-> +}
+>  static void at_cmd_brsf(struct hfp_gw_result *result, enum hfp_gw_cmd_type
+> type, @@ -1280,6 +1283,9 @@ static void at_cmd_brsf(struct hfp_gw_result
+> *result, enum hfp_gw_cmd_type type, }
+> 
+>  	hfp_gw_send_result(dev->gw, HFP_RESULT_ERROR);
 > +
->  static void connect_sco_cb(GIOChannel *chan, GError *err, gpointer
-> user_data) {
->  	struct hf_device *dev = user_data;
-> @@ -947,7 +953,7 @@ static void connect_sco_cb(GIOChannel *chan, GError
-> *err, gpointer user_data)
+> +	if (dev->state != HAL_EV_HANDSFREE_CONN_STATE_SLC_CONNECTED)
+> +		hfp_gw_disconnect(dev->gw);
+>  }
 > 
->  		set_audio_state(dev, HAL_EV_HANDSFREE_AUDIO_STATE_DISCONNECTED);
+>  static void at_cmd_chld(struct hfp_gw_result *result, enum hfp_gw_cmd_type
+> type, @@ -1319,6 +1325,9 @@ static void at_cmd_chld(struct hfp_gw_result
+> *result, enum hfp_gw_cmd_type type, }
 > 
-> -		if (!(dev->features & HFP_HF_FEAT_CODEC))
-> +		if (!codec_negotiation_supported(dev))
->  			return;
+>  	hfp_gw_send_result(dev->gw, HFP_RESULT_ERROR);
+> +
+> +	if (dev->state != HAL_EV_HANDSFREE_CONN_STATE_SLC_CONNECTED)
+> +		hfp_gw_disconnect(dev->gw);
+>  }
 > 
->  		/* If other failed, try connecting with CVSD */
-> @@ -977,7 +983,7 @@ static bool connect_sco(struct hf_device *dev)
->  	if (dev->sco)
->  		return false;
+>  static struct hfp_codec *find_codec_by_type(struct hf_device *dev, uint8_t
+> type) @@ -1392,6 +1401,9 @@ static void at_cmd_bac(struct hfp_gw_result
+> *result, enum hfp_gw_cmd_type type,
 > 
-> -	if (!(dev->features & HFP_HF_FEAT_CODEC))
-> +	if (!codec_negotiation_supported(dev))
->  		voice_settings = 0;
->  	else if (dev->negotiated_codec != CODEC_ID_CVSD)
->  		voice_settings = BT_VOICE_TRANSPARENT;
-> @@ -1012,7 +1018,7 @@ static void at_cmd_bcc(struct hfp_gw_result *result,
-> enum hfp_gw_cmd_type type,
+>  failed:
+>  	hfp_gw_send_result(dev->gw, HFP_RESULT_ERROR);
+> +
+> +	if (dev->state != HAL_EV_HANDSFREE_CONN_STATE_SLC_CONNECTED)
+> +		hfp_gw_disconnect(dev->gw);
+>  }
 > 
->  	switch (type) {
->  	case HFP_GW_CMD_TYPE_COMMAND:
-> -		if (!(dev->features & HFP_HF_FEAT_CODEC))
-> +		if (!codec_negotiation_supported(dev))
->  			break;
-> 
->  		if (hfp_gw_result_has_next(result))
-> @@ -1204,7 +1210,7 @@ static void at_cmd_cind(struct hfp_gw_result *result,
-> enum hfp_gw_cmd_type type, * If device supports Codec Negotiation, AT+BAC
-> should be
->  		 * received first
->  		 */
-> -		if ((dev->features & HFP_HF_FEAT_CODEC) &&
-> +		if (codec_negotiation_supported(dev) &&
->  				!dev->codecs[CVSD_OFFSET].remote_supported)
->  			break;
-> 
-> @@ -1336,7 +1342,7 @@ static void at_cmd_bac(struct hfp_gw_result *result,
-> enum hfp_gw_cmd_type type,
-> 
->  	switch (type) {
->  	case HFP_GW_CMD_TYPE_SET:
-> -		if (!(dev->features & HFP_HF_FEAT_CODEC))
-> +		if (!codec_negotiation_supported(dev))
->  			goto failed;
-> 
->  		/* set codecs to defaults */
-> @@ -1765,7 +1771,7 @@ static bool connect_audio(struct hf_device *dev)
->  		return false;
-> 
->  	/* we haven't negotiated codec, start selection */
-> -	if ((dev->features & HFP_HF_FEAT_CODEC) && !dev->negotiated_codec) {
-> +	if (codec_negotiation_supported(dev) && !dev->negotiated_codec) {
->  		select_codec(dev, 0);
->  		return true;
->  	}
+>  static void register_slc_at(struct hf_device *dev)
 
-This patch is now applied, thanks.
+In general I agree with dropping connection if there are any issues with SLC 
+creation. But it looks like you miss AT+CMER command.
 
 -- 
 BR
