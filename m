@@ -1,71 +1,54 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1414637145-32919-1-git-send-email-jamuraa@chromium.org>
-References: <1414637145-32919-1-git-send-email-jamuraa@chromium.org>
-Date: Thu, 30 Oct 2014 15:29:41 -0700
-Message-ID: <CAHrH25Sg36wm4z5=bh-r8h42Axk1Dq-m5BeY4_U8aCkQ-Hs9Qw@mail.gmail.com>
-Subject: Re: [PATCH BlueZ v4 00/10] Unit tests for gattrib API
+In-Reply-To: <1414677465-19862-8-git-send-email-luiz.dentz@gmail.com>
+References: <1414677465-19862-1-git-send-email-luiz.dentz@gmail.com>
+	<1414677465-19862-8-git-send-email-luiz.dentz@gmail.com>
+Date: Thu, 30 Oct 2014 10:56:48 -0700
+Message-ID: <CAHrH25TPXh65KVbofwR=-44TuWkOB+mK6Zu30qVqRQCNXKP+QQ@mail.gmail.com>
+Subject: Re: [PATCH BlueZ v3 8/9] shared/gatt-db: Add gatt_db_attribute_get_start_handle
 From: Arman Uguray <armansito@chromium.org>
-To: Michael Janssen <jamuraa@chromium.org>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-> On Wed, Oct 29, 2014 at 7:45 PM, Michael Janssen <jamuraa@chromium.org> wrote:
-> Since we want to replace GAttrib with a bt_att shim for a smooth transition
-> to bt_att profiles, this patch cleans up the API and adds unit tests for
-> GAttrib functions.
+Hi Luiz,
+
+> On Thu, Oct 30, 2014 at 6:57 AM, Luiz Augusto von Dentz <luiz.dentz@gmail.com> wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 >
-> This adds tests for all but the register / unregister functions, which
-> I will send in a separate patch since they are slightly more complicated due
-> to catchalls.
+> ---
+>  src/shared/gatt-db.c | 5 ++++-
+>  1 file changed, 4 insertions(+), 1 deletion(-)
 >
-> v1 -> v2:
->   * Add g_attrib_register tests
->   * Cleanup of unit/test-gattrib.c
->   * Bugfix for GATTRIB_ALL_REQS
+> diff --git a/src/shared/gatt-db.c b/src/shared/gatt-db.c
+> index 6296a82..60a1b23 100644
+> --- a/src/shared/gatt-db.c
+> +++ b/src/shared/gatt-db.c
+> @@ -833,7 +833,10 @@ struct gatt_db_attribute *gatt_db_get_attribute(struct gatt_db *db,
 >
-> v2 -> v3:
->   * Just move g_attrib_is_encrypted to static (Luiz)
->   * Check that registered-for PDUs were delivered
->   * Respond to Request PDU when registered for it.
->   * Copy result PDUs since they aren't guaranteed to live beyond callback.
+>  uint16_t gatt_db_attribute_get_start_handle(struct gatt_db_attribute *attrib)
+
+Expanding on the discussion about gatt_db_attribute_get_end_handle,
+should we then rename this function to gatt_db_attribute_get_handle?
+
+>  {
+> -       return 0;
+> +       if (!attrib)
+> +               return 0;
+> +
+> +       return attrib->handle;
+>  }
 >
-> v3 -> v4:
->   * Rework to use g_main_loop_run() for running
->   * Reuse pdu_data struct in expect_response
->
-> Michael Janssen (10):
->   Remove unused g_attrib_set_debug function
->   attrib: Remove MTU-probing code
->   attrib: Add mtu argument to g_attrib_new
->   attrib: remove g_attrib_is_encrypted
->   Add unit tests for gattrib
->   attrib: Add unit tests for g_attrib_register
->   attrib: fix GATTRIB_ALL_REQS behavior
->   unit/gattrib: Check expected PDUs were delivered
->   unit/gattrib: Respond to the request PDU.
->   unit/gattrib: copy result PDU
->
->  .gitignore           |   1 +
->  Makefile.am          |   7 +
->  attrib/gattrib.c     |  61 +++---
->  attrib/gattrib.h     |   7 +-
->  attrib/gatttool.c    |  17 +-
->  attrib/interactive.c |  17 +-
->  src/attrib-server.c  |  12 ++
->  src/device.c         |  11 +-
->  unit/test-gattrib.c  | 578 +++++++++++++++++++++++++++++++++++++++++++++++++++
->  9 files changed, 666 insertions(+), 45 deletions(-)
->  create mode 100644 unit/test-gattrib.c
->
+>  uint16_t gatt_db_attribute_get_end_handle(struct gatt_db_attribute *attrib)
 > --
-> 2.1.0.rc2.206.gedb03e5
+> 1.9.3
 >
 > --
 > To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
 > the body of a message to majordomo@vger.kernel.org
 > More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
-ping
+Cheers,
+Arman
