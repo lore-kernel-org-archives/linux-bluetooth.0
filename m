@@ -1,84 +1,62 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <4224642.3qVV3Hzp2h@leonov>
-References: <1414624053-24250-1-git-send-email-lukasz.rymanowski@tieto.com>
-	<1414624053-24250-2-git-send-email-lukasz.rymanowski@tieto.com>
-	<4224642.3qVV3Hzp2h@leonov>
-Date: Thu, 30 Oct 2014 16:39:26 +0100
-Message-ID: <CAMudyAsya7SpQW+9ik+gR8iQ-qcR5n03_cj1Hd9+LQS-SaXOmg@mail.gmail.com>
-Subject: Re: [PATCH 2/2] android/handsfree: Be more strict on SLC creation
-From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-To: Szymon Janc <szymon.janc@tieto.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ 2/2] shared/att: Fix another memory leak
+Date: Thu, 30 Oct 2014 17:36:33 +0200
+Message-Id: <1414683393-26703-2-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <1414683393-26703-1-git-send-email-luiz.dentz@gmail.com>
+References: <1414683393-26703-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Szymon,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-On 30 October 2014 11:23, Szymon Janc <szymon.janc@tieto.com> wrote:
-> Hi Łukasz,
->
-> On Thursday 30 of October 2014 00:07:33 Lukasz Rymanowski wrote:
->> In case of any issue during SLC creation lets just drop the link
->> ---
->>  android/handsfree.c | 12 ++++++++++++
->>  1 file changed, 12 insertions(+)
->>
->> diff --git a/android/handsfree.c b/android/handsfree.c
->> index 595919a..c8d3c04 100644
->> --- a/android/handsfree.c
->> +++ b/android/handsfree.c
->> @@ -1251,6 +1251,9 @@ static void at_cmd_cind(struct hfp_gw_result *result,
->> enum hfp_gw_cmd_type type, }
->>
->>       hfp_gw_send_result(dev->gw, HFP_RESULT_ERROR);
->> +
->> +     if (dev->state != HAL_EV_HANDSFREE_CONN_STATE_SLC_CONNECTED)
->> +             hfp_gw_disconnect(dev->gw);
->>  }
->>
->>  static void at_cmd_brsf(struct hfp_gw_result *result, enum hfp_gw_cmd_type
->> type, @@ -1280,6 +1283,9 @@ static void at_cmd_brsf(struct hfp_gw_result
->> *result, enum hfp_gw_cmd_type type, }
->>
->>       hfp_gw_send_result(dev->gw, HFP_RESULT_ERROR);
->> +
->> +     if (dev->state != HAL_EV_HANDSFREE_CONN_STATE_SLC_CONNECTED)
->> +             hfp_gw_disconnect(dev->gw);
->>  }
->>
->>  static void at_cmd_chld(struct hfp_gw_result *result, enum hfp_gw_cmd_type
->> type, @@ -1319,6 +1325,9 @@ static void at_cmd_chld(struct hfp_gw_result
->> *result, enum hfp_gw_cmd_type type, }
->>
->>       hfp_gw_send_result(dev->gw, HFP_RESULT_ERROR);
->> +
->> +     if (dev->state != HAL_EV_HANDSFREE_CONN_STATE_SLC_CONNECTED)
->> +             hfp_gw_disconnect(dev->gw);
->>  }
->>
->>  static struct hfp_codec *find_codec_by_type(struct hf_device *dev, uint8_t
->> type) @@ -1392,6 +1401,9 @@ static void at_cmd_bac(struct hfp_gw_result
->> *result, enum hfp_gw_cmd_type type,
->>
->>  failed:
->>       hfp_gw_send_result(dev->gw, HFP_RESULT_ERROR);
->> +
->> +     if (dev->state != HAL_EV_HANDSFREE_CONN_STATE_SLC_CONNECTED)
->> +             hfp_gw_disconnect(dev->gw);
->>  }
->>
->>  static void register_slc_at(struct hf_device *dev)
->
-> In general I agree with dropping connection if there are any issues with SLC
-> creation. But it looks like you miss AT+CMER command.
+Before resetting destroy callback to NULL it needs to be called so the
+user_data can be properly freed:
 
-True, will fix that.
+104 (40 direct, 64 indirect) bytes in 1 blocks are definitely lost in loss record 47 of 55
+   at 0x4C291D4: calloc (in /usr/lib64/valgrind/vgpreload_memcheck-amd64-linux.so)
+   by 0x408359: bt_gatt_exchange_mtu (gatt-helpers.c:479)
+   by 0x405345: bt_gatt_client_new (gatt-client.c:1196)
+   by 0x401A4B: test_client (test-gatt.c:198)
+   by 0x4E9E5E0: ??? (in /usr/lib64/libglib-2.0.so.0.3800.2)
+   by 0x4E9E7A5: ??? (in /usr/lib64/libglib-2.0.so.0.3800.2)
+   by 0x4E9E7A5: ??? (in /usr/lib64/libglib-2.0.so.0.3800.2)
+   by 0x4E9E7A5: ??? (in /usr/lib64/libglib-2.0.so.0.3800.2)
+   by 0x4E9EB1A: g_test_run_suite (in /usr/lib64/libglib-2.0.so.0.3800.2)
+   by 0x40162E: main (test-gatt.c:265)
+---
+ src/shared/att.c | 12 ++++++++++--
+ 1 file changed, 10 insertions(+), 2 deletions(-)
 
->
-> --
-> BR
-> Szymon Janc
+diff --git a/src/shared/att.c b/src/shared/att.c
+index 715c968..e2a50be 100644
+--- a/src/shared/att.c
++++ b/src/shared/att.c
+@@ -1083,13 +1083,21 @@ bool bt_att_cancel_all(struct bt_att *att)
+ 	if (att->pending_req) {
+ 		/* Don't cancel the pending request; remove it's handlers */
+ 		att->pending_req->callback = NULL;
+-		att->pending_req->destroy = NULL;
++		/* Destroy the user_data since it is no longer useful */
++		if (att->pending_req->destroy) {
++			att->pending_req->destroy(att->pending_req->user_data);
++			att->pending_req->destroy = NULL;
++		}
+ 	}
+ 
+ 	if (att->pending_ind) {
+ 		/* Don't cancel the pending indication; remove it's handlers */
+ 		att->pending_ind->callback = NULL;
+-		att->pending_ind->destroy = NULL;
++		/* Destroy the user_data since it is no longer useful */
++		if (att->pending_ind->destroy) {
++			att->pending_ind->destroy(att->pending_ind->user_data);
++			att->pending_ind->destroy = NULL;
++		}
+ 	}
+ 
+ 	return true;
+-- 
+1.9.3
 
-\Łukasz
