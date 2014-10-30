@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v3 9/9] shared/gatt-db: Add gatt_db_attribute_get_end_handle
-Date: Thu, 30 Oct 2014 15:57:45 +0200
-Message-Id: <1414677465-19862-9-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v3 8/9] shared/gatt-db: Add gatt_db_attribute_get_start_handle
+Date: Thu, 30 Oct 2014 15:57:44 +0200
+Message-Id: <1414677465-19862-8-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1414677465-19862-1-git-send-email-luiz.dentz@gmail.com>
 References: <1414677465-19862-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -16,21 +16,21 @@ From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
  1 file changed, 4 insertions(+), 1 deletion(-)
 
 diff --git a/src/shared/gatt-db.c b/src/shared/gatt-db.c
-index 60a1b23..74cd0be 100644
+index 6296a82..60a1b23 100644
 --- a/src/shared/gatt-db.c
 +++ b/src/shared/gatt-db.c
-@@ -841,7 +841,10 @@ uint16_t gatt_db_attribute_get_start_handle(struct gatt_db_attribute *attrib)
+@@ -833,7 +833,10 @@ struct gatt_db_attribute *gatt_db_get_attribute(struct gatt_db *db,
  
- uint16_t gatt_db_attribute_get_end_handle(struct gatt_db_attribute *attrib)
+ uint16_t gatt_db_attribute_get_start_handle(struct gatt_db_attribute *attrib)
  {
 -	return 0;
 +	if (!attrib)
 +		return 0;
 +
-+	return attrib->handle + attrib->service->num_handles - 1;
++	return attrib->handle;
  }
  
- const bt_uuid_t *gatt_db_attribute_get_type(struct gatt_db_attribute *attrib)
+ uint16_t gatt_db_attribute_get_end_handle(struct gatt_db_attribute *attrib)
 -- 
 1.9.3
 
