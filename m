@@ -1,162 +1,230 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <CABD6X-J29UQGOB792V2XC5by2RyQCw2ym3uAu+ot5m7od8KHzg@mail.gmail.com>
-References: <1412898652-12281-1-git-send-email-lukasz.rymanowski@tieto.com>
-	<1412898652-12281-5-git-send-email-lukasz.rymanowski@tieto.com>
-	<CABD6X-J29UQGOB792V2XC5by2RyQCw2ym3uAu+ot5m7od8KHzg@mail.gmail.com>
-Date: Thu, 30 Oct 2014 16:53:58 +0100
-Message-ID: <CAMudyAuS_ySJZP2Y_NT5dQiVJZKBPSW_MwqOWCNHKZ7+CLNyiw@mail.gmail.com>
-Subject: Re: [PATCH 4/8] shared/hfp: Add handling +CME ERROR to parser
-From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+In-Reply-To: <CABD6X-Ltou_HJR+Aqy_LWKObFsuvTQzXLacf+3kf-O_mKnufLQ@mail.gmail.com>
+References: <1414525067-15076-1-git-send-email-marcin.kraglak@tieto.com>
+	<1414525067-15076-2-git-send-email-marcin.kraglak@tieto.com>
+	<CABBYNZJE1QT19dMgOU5fq+rufB9TQjL0Vbzx7JRfHNZw-y60ng@mail.gmail.com>
+	<CAJLTA8j6bJCVPpEG69+s_vzgGDetGmTGfmDpvd9KkKyXNoCUQQ@mail.gmail.com>
+	<CABBYNZKa20z8QcCfe2KtEZw43sFQigPrZfP2=22xBijxkyxvXw@mail.gmail.com>
+	<CAHrH25SvtX8E6r-aNn_w1x9KrfYCaR+yG81M30B=Q510nHs98A@mail.gmail.com>
+	<CABD6X-Ltou_HJR+Aqy_LWKObFsuvTQzXLacf+3kf-O_mKnufLQ@mail.gmail.com>
+Date: Thu, 30 Oct 2014 17:41:03 +0200
+Message-ID: <CABBYNZKx4nLd+XgRWiPAbE=M5gRE35Kk6VmNZcgfRuLb-A9ynA@mail.gmail.com>
+Subject: Re: [PATCHv2 2/7] unit/test-gatt: Add search all primary services
+ test case
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: Marcin Kraglak <marcin.kraglak@tieto.com>
-Cc: "linux-bluetooth@vger.kernel.org development"
-	<linux-bluetooth@vger.kernel.org>
+Cc: Arman Uguray <armansito@chromium.org>,
+	Michael Janssen <jamuraa@google.com>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Marcin,
 
-On 30 October 2014 10:43, Marcin Kraglak <marcin.kraglak@tieto.com> wrote:
-> Hi Lukasz,
+On Thu, Oct 30, 2014 at 8:26 AM, Marcin Kraglak
+<marcin.kraglak@tieto.com> wrote:
+> Hi Luiz, Arman
 >
-> On 10 October 2014 01:50, Lukasz Rymanowski <lukasz.rymanowski@tieto.com> wrote:
->> ---
->>  src/shared/hfp.c | 22 +++++++++++++++++++---
->>  src/shared/hfp.h |  2 ++
->>  unit/test-hfp.c  |  2 ++
->>  3 files changed, 23 insertions(+), 3 deletions(-)
+> On 29 October 2014 17:11, Arman Uguray <armansito@chromium.org> wrote:
+>> Hi Luiz,
 >>
->> diff --git a/src/shared/hfp.c b/src/shared/hfp.c
->> index 87e4017..6f2d28a 100644
->> --- a/src/shared/hfp.c
->> +++ b/src/shared/hfp.c
->> @@ -903,7 +903,9 @@ static void hf_skip_whitespace(struct hfp_context *context)
->>                 context->offset++;
->>  }
->>
->> -static bool is_response(const char *prefix, enum hfp_result *result)
->> +static bool is_response(const char *prefix, enum hfp_result *result,
->> +                                               enum hfp_error *cme_err,
->> +                                               struct hfp_context *context)
->>  {
->>         if (strcmp(prefix, "OK") == 0) {
->>                 *result = HFP_RESULT_OK;
->> @@ -940,6 +942,19 @@ static bool is_response(const char *prefix, enum hfp_result *result)
->>                 return true;
->>         }
->>
->> +       if (strcmp(prefix, "+CME ERROR") == 0) {
->> +               uint32_t val;
->> +
->> +               *result = HFP_RESULT_CME_ERROR;
->> +
->> +               if (hfp_context_get_number(context, &val))
->> +                       *cme_err = val;
+>> On Wed, Oct 29, 2014 at 8:25 AM, Luiz Augusto von Dentz
+>> <luiz.dentz@gmail.com> wrote:
+>>> Hi Michael,
+>>>
+>>> On Wed, Oct 29, 2014 at 5:03 PM, Michael Janssen <jamuraa@google.com> wrote:
+>>>> On Wed, Oct 29, 2014 at 5:32 AM, Luiz Augusto von Dentz
+>>>> <luiz.dentz@gmail.com> wrote:
+>>>>> Hi Marcin,
+>>>>>
+>>>>> On Tue, Oct 28, 2014 at 9:37 PM, Marcin Kraglak
+>>>>> <marcin.kraglak@tieto.com> wrote:
+>>>>>> ---
+>>>>>>  unit/test-gatt.c | 85 ++++++++++++++++++++++++++++++++++++++++++++++++++------
+>>>>>>  1 file changed, 77 insertions(+), 8 deletions(-)
+>>>>>>
+>>>>>> diff --git a/unit/test-gatt.c b/unit/test-gatt.c
+>>>>>> index bbbf9a5..f84b0fc 100644
+>>>>>> --- a/unit/test-gatt.c
+>>>>>> +++ b/unit/test-gatt.c
+>>>>>> @@ -35,8 +35,10 @@
+>>>>>>
+>>>>>>  #include <glib.h>
+>>>>>>
+>>>>>> +#include "lib/uuid.h"
+>>>>>>  #include "src/shared/util.h"
+>>>>>>  #include "src/shared/att.h"
+>>>>>> +#include "src/shared/gatt-helpers.h"
+>>>>>>  #include "src/shared/gatt-client.h"
+>>>>>>
+>>>>>>  struct test_pdu {
+>>>>>> @@ -45,14 +47,22 @@ struct test_pdu {
+>>>>>>         size_t size;
+>>>>>>  };
+>>>>>>
+>>>>>> +enum context_type {
+>>>>>> +       ATT,
+>>>>>> +       CLIENT,
+>>>>>> +       SERVER
+>>>>>> +};
+>>>>>
+>>>>> Well the ATT part of this is a bit weird, do we really need to do this
+>>>>> distinction.
+>>>>>
+>>>>>>  struct test_data {
+>>>>>>         char *test_name;
+>>>>>>         struct test_pdu *pdu_list;
+>>>>>> +       enum context_type context_type;
+>>>>>>  };
+>>>>>>
+>>>>>>  struct context {
+>>>>>>         GMainLoop *main_loop;
+>>>>>>         struct bt_gatt_client *client;
+>>>>>> +       struct bt_att *att;
+>>>>>>         guint source;
+>>>>>>         guint process;
+>>>>>>         int fd;
+>>>>>> @@ -69,13 +79,14 @@ struct context {
+>>>>>>                 .size = sizeof(data(args)),                     \
+>>>>>>         }
+>>>>>>
+>>>>>> -#define define_test(name, function, args...)                           \
+>>>>>> +#define define_test(name, function, type, args...)                     \
+>>>>>>         do {                                                            \
+>>>>>>                 const struct test_pdu pdus[] = {                        \
+>>>>>>                         args, { }                                       \
+>>>>>>                 };                                                      \
+>>>>>>                 static struct test_data data;                           \
+>>>>>>                 data.test_name = g_strdup(name);                        \
+>>>>>> +               data.context_type = type;                               \
+>>>>>>                 data.pdu_list = g_malloc(sizeof(pdus));                 \
+>>>>>>                 memcpy(data.pdu_list, pdus, sizeof(pdus));              \
+>>>>>>                 g_test_add_data_func(name, &data, function);            \
+>>>>>> @@ -182,6 +193,7 @@ static void gatt_debug(const char *str, void *user_data)
+>>>>>>  static struct context *create_context(uint16_t mtu, gconstpointer data)
+>>>>>>  {
+>>>>>>         struct context *context = g_new0(struct context, 1);
+>>>>>> +       const struct test_data *test_data = data;
+>>>>>>         GIOChannel *channel;
+>>>>>>         int err, sv[2];
+>>>>>>         struct bt_att *att;
+>>>>>> @@ -195,12 +207,25 @@ static struct context *create_context(uint16_t mtu, gconstpointer data)
+>>>>>>         att = bt_att_new(sv[0]);
+>>>>>>         g_assert(att);
+>>>>>>
+>>>>>> -       context->client = bt_gatt_client_new(att, mtu);
+>>>>>> -       g_assert(context->client);
+>>>>>> +       switch (test_data->context_type) {
+>>>>>> +       case ATT:
+>>>>>> +               context->att = att;
+>>>>>>
+>>>>>> -       if (g_test_verbose())
+>>>>>> -               bt_gatt_client_set_debug(context->client, gatt_debug, "gatt:",
+>>>>>> -                                                                       NULL);
+>>>>>> +               bt_gatt_exchange_mtu(context->att, mtu, NULL, NULL, NULL);
+>>>>>> +               break;
+>>>>>> +       case CLIENT:
+>>>>>> +               context->client = bt_gatt_client_new(att, mtu);
+>>>>>> +               g_assert(context->client);
+>>>>>> +
+>>>>>> +               if (g_test_verbose())
+>>>>>> +                       bt_gatt_client_set_debug(context->client, gatt_debug,
+>>>>>> +                                                               "gatt:", NULL);
+>>>>>> +
+>>>>>> +               bt_att_unref(att);
+>>>>>> +               break;
+>>>>>> +       default:
+>>>>>> +               break;
+>>>>>> +       }
+>>>>>>
+>>>>>>         channel = g_io_channel_unix_new(sv[1]);
+>>>>>>
+>>>>>> @@ -214,7 +239,6 @@ static struct context *create_context(uint16_t mtu, gconstpointer data)
+>>>>>>         g_assert(context->source > 0);
+>>>>>>
+>>>>>>         g_io_channel_unref(channel);
+>>>>>> -       bt_att_unref(att);
+>>>>>>
+>>>>>>         context->fd = sv[1];
+>>>>>>         context->data = data;
+>>>>>> @@ -222,6 +246,17 @@ static struct context *create_context(uint16_t mtu, gconstpointer data)
+>>>>>>         return context;
+>>>>>>  }
+>>>>>>
+>>>>>> +static void primary_cb(bool success, uint8_t att_ecode,
+>>>>>> +                                               struct bt_gatt_result *result,
+>>>>>> +                                               void *user_data)
+>>>>>> +{
+>>>>>> +       struct context *context = user_data;
+>>>>>> +
+>>>>>> +       g_assert(success);
+>>>>>> +
+>>>>>> +       context_quit(context);
+>>>>>> +}
+>>>>>> +
+>>>>>>  static void destroy_context(struct context *context)
+>>>>>>  {
+>>>>>>         if (context->source > 0)
+>>>>>> @@ -229,6 +264,9 @@ static void destroy_context(struct context *context)
+>>>>>>
+>>>>>>         bt_gatt_client_unref(context->client);
+>>>>>>
+>>>>>> +       if (context->att)
+>>>>>> +               bt_att_unref(context->att);
+>>>>>> +
+>>>>>>         g_main_loop_unref(context->main_loop);
+>>>>>>
+>>>>>>         test_free(context->data);
+>>>>>> @@ -249,6 +287,16 @@ static void test_client(gconstpointer data)
+>>>>>>         execute_context(context);
+>>>>>>  }
+>>>>>>
+>>>>>> +static void test_search_primary(gconstpointer data)
+>>>>>> +{
+>>>>>> +       struct context *context = create_context(512, data);
+>>>>>> +
+>>>>>> +       bt_gatt_discover_all_primary_services(context->att, NULL, primary_cb,
+>>>>>> +                                                               context, NULL);
+>>>>>
+>>>>> Doesn't bt_gatt_client does the same here, I guess I missed this
+>>>>> detail in the first time but if this is just testing client side then
+>>>>> it should use bt_gatt_client and if that cannot be tested we probably
+>>>>> have a problem with our API. I guess PTS would just pass if we do more
+>>>>> than search the primary services, so things like setting the MTU etc
+>>>>> should not be a problem here.
+>>>>
+>>>> Specifically setting the MTU is allowed, but the reason to avoid using
+>>>> bt_gatt_client_new/init here is to avoid the automatic service
+>>>> discovery.  This is probably a good idea at least for testing the
+>>>> different types of discovery.  (is bt_gatt_client  Alternately maybe
+>>>> just test the type of discovery used by bt_gatt_client.  When
+>>>> implementing the read value tests, the auto-discovery of
+>>>> bt_gatt_client may make the test data longer because it needs to be
+>>>> included in every one.
+>>>
+>>> Isn't it what we want? To run exactly as it would be run against PTS
+>>> so we avoid surprises? Not only this avoid auto-discovery but the
+>>> caching done by bt_gatt_client which we would probably have to test
+>>> separately, so it is much more code that we exercise if we test
+>>> bt_gatt_client at the expense of a little bit more PDUs. Perhaps we
+>>> could have a define containing the common PDUs that auto-discovery
+>>> causes so the upcoming tests don't need to duplicate these PDUs.
+>>>
 >
-> maybe check if val <= HFP_ERROR_NETWORK_NOT_ALLOWED? otherwise we can pass
-> value bigger that enum.
+> I agree we test much more code while testing gatt-client. My idea was
+> to use bt_att in GAD group,
+> because we need to send specified packets and it is more like testing
+> protocol than profile.
+> Whole discovery using gatt-client will be tested in most of GAR and
+> GAW test cases.
+> I'm sure that it will be bigger part of unit tests.
 
-Will do so.
+Fair enough, but please add the test description to the commits so we
+are consistent, for example:
 
->And maybe we could call resp_cb with context
-> intead of cme_err which is valid just in case of
-> CME ERROR response? What you think?
+unit/test-gatt: Add <test name> test
 
-Just don't want to bother user with parsing context. Err and cme_err
-should be fine.
-
->> +               else
->> +                       *cme_err = HFP_ERROR_AG_FAILURE;
->> +
->> +               return true;
->> +       }
->> +
->>         return false;
->>  }
->>
->> @@ -972,6 +987,7 @@ static void hf_call_prefix_handler(struct hfp_hf *hfp, const char *data)
->>         const char *separators = ";:\0";
->>         struct hfp_context context;
->>         enum hfp_result result;
->> +       enum hfp_error cme_err = 0;
->
-> shouldn't we set set cme_err = HFP_RESULT_OK?
-
-This is not meant to be HFP_RESULT_OK but 0. We usually set not used
-values to 0. Maybe I put comment there.
-
->
->>         char lookup_prefix[18];
->>         uint8_t pref_len = 0;
->>         const char *prefix;
->> @@ -997,14 +1013,14 @@ static void hf_call_prefix_handler(struct hfp_hf *hfp, const char *data)
->>         lookup_prefix[pref_len] = '\0';
->>         context.offset += pref_len + 1;
->>
->> -       if (is_response(lookup_prefix, &result)) {
->> +       if (is_response(lookup_prefix, &result, &cme_err, &context)) {
->>                 struct cmd_response *cmd;
->>
->>                 cmd = queue_peek_head(hfp->cmd_queue);
->>                 if (!cmd)
->>                         return;
->>
->> -               cmd->resp_cb(cmd->prefix, result, cmd->user_data);
->> +               cmd->resp_cb(cmd->prefix, result, cme_err, cmd->user_data);
->>
->>                 queue_remove(hfp->cmd_queue, cmd);
->>                 destroy_cmd_response(cmd);
->> diff --git a/src/shared/hfp.h b/src/shared/hfp.h
->> index 27c26a2..e4a70e0 100644
->> --- a/src/shared/hfp.h
->> +++ b/src/shared/hfp.h
->> @@ -34,6 +34,7 @@ enum hfp_result {
->>         HFP_RESULT_NO_ANSWER    = 8,
->>         HFP_RESULT_DELAYED      = 9,
->>         HFP_RESULT_BLACKLISTED  = 10,
->> +       HFP_RESULT_CME_ERROR    = 11,
->>  };
->>
->>  enum hfp_error {
->> @@ -86,6 +87,7 @@ typedef void (*hfp_disconnect_func_t)(void *user_data);
->>
->>  typedef void (*hfp_response_func_t)(const char *prefix,
->>                                                         enum hfp_result result,
->> +                                                       enum hfp_error cme_err,
->>                                                         void *user_data);
->>
->>  struct hfp_gw;
->> diff --git a/unit/test-hfp.c b/unit/test-hfp.c
->> index c597fd0..bc05086 100644
->> --- a/unit/test-hfp.c
->> +++ b/unit/test-hfp.c
->> @@ -476,6 +476,7 @@ static void hf_unsolicited_resp_cb(struct hfp_context *context,
->>  }
->>
->>  static void hf_response_with_data(const char *prefix, enum hfp_result res,
->> +                                                       enum hfp_error cme_err,
->>                                                         void *user_data)
->>  {
->>         struct context *context = user_data;
->> @@ -487,6 +488,7 @@ static void hf_response_with_data(const char *prefix, enum hfp_result res,
->>  }
->>
->>  static void hf_brsf_response_cb(const char *prefix, enum hfp_result res,
->> +                                                       enum hfp_error cme_err,
->>                                                         void *user_data)
->>  {
->>         struct context *context = user_data;
->> --
->> 1.8.4
->>
->> --
->> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
->> the body of a message to majordomo@vger.kernel.org
->> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->
-> BR
-> Marcin
-
-BR
-Lukasz
+Verify that a Generic Attribute Profile client discovers Primary
+Services in a GATT server.
