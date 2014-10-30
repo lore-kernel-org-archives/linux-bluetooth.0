@@ -1,61 +1,115 @@
 Return-Path: <cyrus@holtmann.org>
 From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/2] android/pts: Update PTS pics, pixit for MCAP
-Date: Thu, 30 Oct 2014 13:44:45 +0100
-Message-Id: <1414673086-4076-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+Subject: [PATCH v2 2/2] tools/mcaptest: Add no close paramameter
+Date: Thu, 30 Oct 2014 12:15:07 +0100
+Message-Id: <1414667707-2640-2-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+In-Reply-To: <1414667707-2640-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+References: <1414667707-2640-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-PICS and PIXIT checked against PTS 5.3. Regression round on PTS 5.3
-against androi 4.4.4.
+If parametr is given mcaptest don't exit after: receiving err, or while
+MCL disconnects. This is needed while reconnecting MCL or some PTS
+test cases:
+TC_MCAP_CM_REC_BV_x_C - test cases branch
+TC_MCAP_ERR_BI_x_C - test cases branch
 ---
- android/pics-mcap.txt  | 4 ++--
- android/pixit-mcap.txt | 4 ++--
- 2 files changed, 4 insertions(+), 4 deletions(-)
+ tools/mcaptest.c | 25 ++++++++++++++++++++++---
+ 1 file changed, 22 insertions(+), 3 deletions(-)
 
-diff --git a/android/pics-mcap.txt b/android/pics-mcap.txt
-index adc97d7..dd71ab4 100644
---- a/android/pics-mcap.txt
-+++ b/android/pics-mcap.txt
-@@ -1,6 +1,6 @@
- MCAP PICS for the PTS tool.
+diff --git a/tools/mcaptest.c b/tools/mcaptest.c
+index 6d50544..42734eb 100644
+--- a/tools/mcaptest.c
++++ b/tools/mcaptest.c
+@@ -67,6 +67,8 @@ static int mdl_disconnect_timeout = -1;
  
--PTS version: 5.2
-+PTS version: 5.3
+ static struct mcap_mcl *mcl = NULL;
  
- * - different than PTS defaults
- # - not yet implemented/supported
-@@ -13,7 +13,7 @@ O - optional
- Parameter Name	Selected	Description
- -------------------------------------------------------------------------------
- TSPC_MCAP_1_A_1	True (*)	Supports Standard Op Codes (C.1)
--TSPC_MCAP_1_A_2	False		Supports Clock Synchronization Protocol (C.1)
-+TSPC_MCAP_1_A_2	True (*)	Supports Clock Synchronization Protocol (C.1)
- -------------------------------------------------------------------------------
- C.1: Support for at least one of the defined protocols is Mandatory.
- -------------------------------------------------------------------------------
-diff --git a/android/pixit-mcap.txt b/android/pixit-mcap.txt
-index fb6f456..d05a953 100644
---- a/android/pixit-mcap.txt
-+++ b/android/pixit-mcap.txt
-@@ -1,6 +1,6 @@
- MCAP PIXIT for the PTS tool.
++static gboolean no_close = FALSE;
++
+ #define REQ_CLOCK_ACC 0x1400
  
--PTS version: 5.2
-+PTS version: 5.3
+ static void mdl_connected_cb(struct mcap_mdl *mdl, void *data)
+@@ -152,6 +154,9 @@ static void mcl_disconnected(struct mcap_mcl *mcl, gpointer data)
+ 	/* TODO */
+ 	printf("MCL disconnected\n");
  
- * - different than PTS defaults
- & - should be set to IUT Bluetooth address
-@@ -19,7 +19,7 @@ TSPX_MCAP_l2cap_psm_data_B
- TSPX_MCAP_bluetooth_clock_access_resolution		55
- TSPX_MCAP_create_mdl_configuration
- TSPX_MCAP_data_channel_setup_mode
--TSPX_MCAP_iut_initiate_connection			TRUE (*)
-+TSPX_MCAP_iut_initiate_connection			FALSE
- TSPX_MCAP_mdep_id					12
- TSPX_MCAP_profile_name
- TSPX_MCAP_sync_lead_time				0BB8
++	if (no_close)
++		return;
++
+ 	g_main_loop_quit(mloop);
+ }
+ 
+@@ -176,7 +181,9 @@ static void create_mdl_cb(struct mcap_mdl *mcap_mdl, uint8_t type, GError *gerr,
+ 	if (gerr) {
+ 		printf("MDL error: %s\n", gerr->message);
+ 
+-		g_main_loop_quit(mloop);
++		if (!no_close)
++			g_main_loop_quit(mloop);
++
+ 		return;
+ 	}
+ 
+@@ -190,6 +197,9 @@ static void create_mdl_cb(struct mcap_mdl *mcap_mdl, uint8_t type, GError *gerr,
+ 		printf("Error connecting to mdl: %s\n", err->message);
+ 		g_error_free(err);
+ 
++		if (no_close)
++			return;
++
+ 		g_main_loop_quit(mloop);
+ 	}
+ }
+@@ -262,7 +272,9 @@ static void create_mcl_cb(struct mcap_mcl *mcap_mcl, GError *err, gpointer data)
+ 	if (err) {
+ 		printf("Could not connect MCL: %s\n", err->message);
+ 
+-		g_main_loop_quit(mloop);
++		if (!no_close)
++			g_main_loop_quit(mloop);
++
+ 		return;
+ 	}
+ 
+@@ -288,6 +300,7 @@ static void usage(void)
+ 		"\t-f <timeout> disconnect MDL after it's connected\n"
+ 		"\t-u send \'Unavailable\' on first MDL connection request\n");
+ 	printf("Options:\n"
++		"\t-n don't exit after mcl disconnect/err receive\n"
+ 		"\t-i <hcidev>        HCI device\n"
+ 		"\t-C <control_ch>    Control channel PSM\n"
+ 		"\t-D <data_ch>       Data channel PSM\n");
+@@ -302,6 +315,7 @@ static struct option main_options[] = {
+ 	{ "connect_dl",		0, 0, 'd' },
+ 	{ "disconnect_dl",	1, 0, 'f' },
+ 	{ "unavailable_dl",	0, 0, 'u' },
++	{ "no exit mcl dis/err",0, 0, 'n' },
+ 	{ "control_ch",		1, 0, 'C' },
+ 	{ "data_ch",		1, 0, 'D' },
+ 	{ 0, 0, 0, 0 }
+@@ -323,7 +337,7 @@ int main(int argc, char *argv[])
+ 		exit(1);
+ 	}
+ 
+-	while ((opt = getopt_long(argc, argv, "+i:c:C:D:e:f:dghu",
++	while ((opt = getopt_long(argc, argv, "+i:c:C:D:e:f:dghun",
+ 						main_options, NULL)) != EOF) {
+ 		switch (opt) {
+ 		case 'i':
+@@ -367,6 +381,11 @@ int main(int argc, char *argv[])
+ 
+ 			break;
+ 
++		case 'n':
++			no_close = TRUE;
++
++			break;
++
+ 		case 'C':
+ 			ccpsm = atoi(optarg);
+ 
 -- 
 1.9.3
 
