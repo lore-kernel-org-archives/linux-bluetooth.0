@@ -1,134 +1,61 @@
 Return-Path: <cyrus@holtmann.org>
 From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 2/2] android/pts: Update PTS results for MCAP
-Date: Thu, 30 Oct 2014 13:44:46 +0100
-Message-Id: <1414673086-4076-2-git-send-email-grzegorz.kolodziejczyk@tieto.com>
-In-Reply-To: <1414673086-4076-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
-References: <1414673086-4076-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+Subject: [PATCH 1/2] android/pts: Update PTS pics, pixit for MCAP
+Date: Thu, 30 Oct 2014 13:44:45 +0100
+Message-Id: <1414673086-4076-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Tested on android 4.4.4 against PTS 5.3.
+PICS and PIXIT checked against PTS 5.3. Regression round on PTS 5.3
+against androi 4.4.4.
 ---
- android/pts-mcap.txt | 81 +++++++++++++++++++++++++---------------------------
- 1 file changed, 39 insertions(+), 42 deletions(-)
+ android/pics-mcap.txt  | 4 ++--
+ android/pixit-mcap.txt | 4 ++--
+ 2 files changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/android/pts-mcap.txt b/android/pts-mcap.txt
-index c35fefb..7ba47eb 100644
---- a/android/pts-mcap.txt
-+++ b/android/pts-mcap.txt
-@@ -1,7 +1,7 @@
- PTS test results for MCAP
+diff --git a/android/pics-mcap.txt b/android/pics-mcap.txt
+index adc97d7..dd71ab4 100644
+--- a/android/pics-mcap.txt
++++ b/android/pics-mcap.txt
+@@ -1,6 +1,6 @@
+ MCAP PICS for the PTS tool.
  
 -PTS version: 5.2
--Tested: 07-August-2014
 +PTS version: 5.3
-+Tested: 30-October-2014
- Android version: 4.4.4
  
- Results:
-@@ -16,31 +16,28 @@ Note: Test were done with ssp enabled and in most of the cases requires pairing
+ * - different than PTS defaults
+ # - not yet implemented/supported
+@@ -13,7 +13,7 @@ O - optional
+ Parameter Name	Selected	Description
  -------------------------------------------------------------------------------
- Test Name		Result	Notes
+ TSPC_MCAP_1_A_1	True (*)	Supports Standard Op Codes (C.1)
+-TSPC_MCAP_1_A_2	False		Supports Clock Synchronization Protocol (C.1)
++TSPC_MCAP_1_A_2	True (*)	Supports Clock Synchronization Protocol (C.1)
  -------------------------------------------------------------------------------
--TC_MCAP_CE_BV_01_C	PASS	mcaptest -C 4099 -D 4101 -dc <PTS addr>
--TC_MCAP_CE_BV_02_C	PASS	mcaptest -C 4099 -D 4101
--TC_MCAP_CE_BV_03_C	PASS	mcaptest -C 4099 -D 4101 -c <PTS addr>
--TC_MCAP_CE_BV_04_C	PASS	mcaptest -C 4099 -D 4101 -d
-+TC_MCAP_CE_BV_01_C	INC	PTS Issue #12693
-+TC_MCAP_CE_BV_02_C	INC	PTS Issue #12693
-+TC_MCAP_CE_BV_03_C	INC	PTS Issue #12693
-+TC_MCAP_CE_BV_04_C	INC	PTS Issue #12693
- TC_MCAP_CM_ABT_BV_01_C	N/A
--TC_MCAP_CM_ABT_BV_02_C	PASS	mcaptest -C 4099 -D 4101
-+TC_MCAP_CM_ABT_BV_02_C	INC	PTS Issue #12693
- TC_MCAP_CM_ABT_BV_03_C	N/A
- TC_MCAP_CM_DEL_BV_01_C	N/A
--TC_MCAP_CM_DEL_BV_02_C	PASS	mcaptest -C 4099 -D 4101
-+TC_MCAP_CM_DEL_BV_02_C	INC	PTS Issue #12693
- TC_MCAP_CM_DEL_BV_02_C	N/A
--TC_MCAP_CM_DEL_BV_04_C	PASS	mcaptest -C 4099 -D 4101
-+TC_MCAP_CM_DEL_BV_04_C	INC	PTS Issue #12693
- TC_MCAP_CM_DIS_BV_01_C	PASS	mcaptest -C 4099 -D 4101 -e 2 -f 2
- TC_MCAP_CM_DIS_BV_02_C	PASS	mcaptest -C 4099 -D 4101
--TC_MCAP_CM_DIS_BV_03_C	PASS	mcaptest -C 4099 -D 4101
-+TC_MCAP_CM_DIS_BV_03_C	INC	PTS Issue #12693
- TC_MCAP_CM_DIS_BV_04_C	PASS	mcaptest -C 4099 -D 4101 -e 2 -f 2
- TC_MCAP_CM_DIS_BV_05_C	PASS	mcaptest -C 4099 -D 4101
- TC_MCAP_CM_REC_BV_01_C	N/A
--TC_MCAP_CM_REC_BV_02_C	PASS	mcaptest -C 4099 -D 4101
-+TC_MCAP_CM_REC_BV_02_C	INC	PTS Issue #12693
- TC_MCAP_CM_REC_BV_03_C	N/A
--TC_MCAP_CM_REC_BV_04_C	PASS	mcaptest -C 4099 -D 4101
--				Note: It may be necessary to confirm pairing
--					twice (second time when IUT is back in
--					range).
-+TC_MCAP_CM_REC_BV_04_C	INC	PTS Issue #12693
- TC_MCAP_CM_REC_BV_05_C	N/A
--TC_MCAP_CM_REC_BV_06_C	PASS	mcaptest -C 4099 -D 4101
-+TC_MCAP_CM_REC_BV_06_C	INC	PTS Issue #12693
- TC_MCAP_CS_ERR_BI_01_C	N/A
- TC_MCAP_CS_ERR_BI_02_C	N/A
- TC_MCAP_CS_ERR_BI_03_C	N/A
-@@ -53,31 +50,31 @@ TC_MCAP_CS_R_BV_01_I	N/A
- TC_MCAP_CS_R_BV_02_I	N/A
- TC_MCAP_CS_R_BV_03_C	N/A
- TC_MCAP_CS_T_BV_04_C	N/A
--TC_MCAP_ERR_BI_01_C	PASS	mcaptest -C 4099 -D 4101
--TC_MCAP_ERR_BI_02_C	PASS	mcaptest -C 4099 -D 4101 -d
--TC_MCAP_ERR_BI_03_C	PASS	mcaptest -C 4099 -D 4101
--TC_MCAP_ERR_BI_04_C	PASS	mcaptest -C 4099 -D 4101 -d
--TC_MCAP_ERR_BI_05_C	PASS	mcaptest -C 4099 -D 4101
--TC_MCAP_ERR_BI_06_C	PASS	mcaptest -C 4099 -D 4101 -d
--TC_MCAP_ERR_BI_07_C	PASS	mcaptest -C 4099 -D 4101
--TC_MCAP_ERR_BI_08_C	PASS	mcaptest -C 4099 -D 4101 -d
--TC_MCAP_ERR_BI_09_C	PASS	mcaptest -C 4099 -D 4101
--TC_MCAP_ERR_BI_10_C	PASS	mcaptest -C 4099 -D 4101
--TC_MCAP_ERR_BI_11_C	PASS	mcaptest -C 4099 -D 4101 -d
--TC_MCAP_ERR_BI_12_C	PASS	mcaptest -C 4099 -D 4101 -d
--TC_MCAP_ERR_BI_13_C	PASS	mcaptest -C 4099 -D 4101
--TC_MCAP_ERR_BI_14_C	PASS	mcaptest -C 4099 -D 4101
--TC_MCAP_ERR_BI_15_C	PASS	mcaptest -C 4099 -D 4101 -d
--TC_MCAP_ERR_BI_16_C	PASS	mcaptest -C 4099 -D 4101 -u
--TC_MCAP_ERR_BI_17_C	PASS	mcaptest -C 4099 -D 4101 -d
--TC_MCAP_ERR_BI_18_C	PASS	mcaptest -C 4099 -D 4101 -d
--TC_MCAP_ERR_BI_19_C	PASS	mcaptest -C 4099 -D 4101
--TC_MCAP_ERR_BI_20_C	PASS	mcaptest -C 4099 -D 4101 -g
-+TC_MCAP_ERR_BI_01_C	INC	PTS Issue #12693
-+TC_MCAP_ERR_BI_02_C	INC	PTS Issue #12693
-+TC_MCAP_ERR_BI_03_C	INC	PTS Issue #12693
-+TC_MCAP_ERR_BI_04_C	INC	PTS Issue #12693
-+TC_MCAP_ERR_BI_05_C	INC	PTS Issue #12693
-+TC_MCAP_ERR_BI_06_C	INC	PTS Issue #12693
-+TC_MCAP_ERR_BI_07_C	INC	PTS Issue #12693
-+TC_MCAP_ERR_BI_08_C	INC	PTS Issue #12693
-+TC_MCAP_ERR_BI_09_C	INC	PTS Issue #12693
-+TC_MCAP_ERR_BI_10_C	INC	PTS Issue #12693
-+TC_MCAP_ERR_BI_11_C	INC	PTS Issue #12693
-+TC_MCAP_ERR_BI_12_C	INC	PTS Issue #12693
-+TC_MCAP_ERR_BI_13_C	INC	PTS Issue #12693
-+TC_MCAP_ERR_BI_14_C	INC	PTS Issue #12693
-+TC_MCAP_ERR_BI_15_C	INC	PTS Issue #12693
-+TC_MCAP_ERR_BI_16_C	INC	PTS Issue #12693
-+TC_MCAP_ERR_BI_17_C	INC	PTS Issue #12693
-+TC_MCAP_ERR_BI_18_C	INC	PTS Issue #12693
-+TC_MCAP_ERR_BI_19_C	N/A
-+TC_MCAP_ERR_BI_20_C	INC	PTS Issue #12693
- TC_MCAP_INV_BI_01_C	PASS	mcaptest -C 4099 -D 4101 -dc <PTS addr>
--TC_MCAP_INV_BI_02_C	PASS	mcaptest -C 4099 -D 4101 -d
--TC_MCAP_INV_BI_03_C	PASS	mcaptest -C 4099 -D 4101 -dc <PTS addr>
--TC_MCAP_INV_BI_04_C	PASS	mcaptest -C 4099 -D 4101 -c <PTS addr>
--TC_MCAP_INV_BI_05_C	PASS	mcaptest -C 4099 -D 4101
--TC_MCAP_INV_BI_06_C	PASS	mcaptest -C 4099 -D 4101
--TC_MCAP_INV_BI_07_C	PASS	mcaptest -C 4099 -D 4101
-+TC_MCAP_INV_BI_02_C	INC	PTS Issue #12693
-+TC_MCAP_INV_BI_03_C	INC	PTS Issue #12693
-+TC_MCAP_INV_BI_04_C	INC	PTS Issue #12693
-+TC_MCAP_INV_BI_05_C	INC	PTS Issue #12693
-+TC_MCAP_INV_BI_06_C	INC	PTS Issue #12693
-+TC_MCAP_INV_BI_07_C	INC	PTS Issue #12693
+ C.1: Support for at least one of the defined protocols is Mandatory.
  -------------------------------------------------------------------------------
+diff --git a/android/pixit-mcap.txt b/android/pixit-mcap.txt
+index fb6f456..d05a953 100644
+--- a/android/pixit-mcap.txt
++++ b/android/pixit-mcap.txt
+@@ -1,6 +1,6 @@
+ MCAP PIXIT for the PTS tool.
+ 
+-PTS version: 5.2
++PTS version: 5.3
+ 
+ * - different than PTS defaults
+ & - should be set to IUT Bluetooth address
+@@ -19,7 +19,7 @@ TSPX_MCAP_l2cap_psm_data_B
+ TSPX_MCAP_bluetooth_clock_access_resolution		55
+ TSPX_MCAP_create_mdl_configuration
+ TSPX_MCAP_data_channel_setup_mode
+-TSPX_MCAP_iut_initiate_connection			TRUE (*)
++TSPX_MCAP_iut_initiate_connection			FALSE
+ TSPX_MCAP_mdep_id					12
+ TSPX_MCAP_profile_name
+ TSPX_MCAP_sync_lead_time				0BB8
 -- 
 1.9.3
 
