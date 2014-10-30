@@ -1,95 +1,134 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <CAHrH25Sr5LmHv_QcNjrfX78ak1d0z+0B_n5Yc4-ZQm-DG_nE7w@mail.gmail.com>
-References: <1414513123-5689-1-git-send-email-luiz.dentz@gmail.com>
-	<1414513123-5689-6-git-send-email-luiz.dentz@gmail.com>
-	<CAHrH25QSxe2L7ixyiT30e19sLDQQ_MyXEH7qObTDmuCHFVbJPw@mail.gmail.com>
-	<CABBYNZ+cJwcQFKtt0Tg5Cn7++2=X7SSz3sO_USEcCR20chwy_g@mail.gmail.com>
-	<CAHrH25Sr5LmHv_QcNjrfX78ak1d0z+0B_n5Yc4-ZQm-DG_nE7w@mail.gmail.com>
-Date: Thu, 30 Oct 2014 15:44:50 +0200
-Message-ID: <CABBYNZ+hDAsTUv+Eu+a59nMJME7zTfy_EzrZ3BHDPPeSsMm-=Q@mail.gmail.com>
-Subject: Re: [PATCH v2 6/9] shared/gatt-db: Add gatt_db_attribute_read
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Arman Uguray <armansito@chromium.org>
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH 2/2] android/pts: Update PTS results for MCAP
+Date: Thu, 30 Oct 2014 13:44:46 +0100
+Message-Id: <1414673086-4076-2-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+In-Reply-To: <1414673086-4076-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+References: <1414673086-4076-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Arman,
+Tested on android 4.4.4 against PTS 5.3.
+---
+ android/pts-mcap.txt | 81 +++++++++++++++++++++++++---------------------------
+ 1 file changed, 39 insertions(+), 42 deletions(-)
 
-On Wed, Oct 29, 2014 at 4:59 PM, Arman Uguray <armansito@chromium.org> wrote:
-> Hi Luiz,
->
-> On Wed, Oct 29, 2014 at 2:15 AM, Luiz Augusto von Dentz
-> <luiz.dentz@gmail.com> wrote:
->> Hi Arman,
->>
->> On Wed, Oct 29, 2014 at 12:20 AM, Arman Uguray <armansito@chromium.org> wrote:
->>> Hi Luiz,
->>>
->>> On Tue, Oct 28, 2014 at 9:18 AM, Luiz Augusto von Dentz
->>> <luiz.dentz@gmail.com> wrote:
->>>> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->>>>
->>>> ---
->>>>  src/shared/gatt-db.c | 18 +++++++++++++++++-
->>>>  1 file changed, 17 insertions(+), 1 deletion(-)
->>>>
->>>> diff --git a/src/shared/gatt-db.c b/src/shared/gatt-db.c
->>>> index f43cac3..b5b6c72 100644
->>>> --- a/src/shared/gatt-db.c
->>>> +++ b/src/shared/gatt-db.c
->>>> @@ -891,7 +891,23 @@ bool gatt_db_attribute_read(struct gatt_db_attribute *attrib, uint16_t offset,
->>>>                                 uint8_t opcode, bdaddr_t *bdaddr,
->>>>                                 gatt_db_attribute_read_t func, void *user_data)
->>>>  {
->>>> -       return false;
->>>> +       if (!attrib || !func)
->>>> +               return false;
->>>> +
->>>> +       if (attrib->read_func) {
->>>> +               attrib->read_func(attrib->handle, offset, opcode, bdaddr,
->>>> +                                                       attrib->user_data);
->>>> +               return true;
->>>> +       }
->>>> +
->>>> +       /* Check length boundary if value is stored in the db */
->>>> +       if (offset >= attrib->value_len)
->>>> +               return false;
->>>
->>> Thanks for moving this after the callback check. As for valid
->>> boundaries, I've actually seen devices that allow sending an offset
->>> that is the same as the length of the value. They just return an empty
->>> value PDU back. So maybe return NULL for the value if offset ==
->>> attrib->value_len? What I had in mind was:
->>
->> But then this would be valid for any offset past value_len doesn't it
->> or this is specific to determine the side of the value, in the other
->> hand there does exist an error for invalid offset which I thought
->> would be preferable, well if we can distinct this error which
->> currently we do not because of the bool return.
->>
->
-> So for your first point, the offset should be valid for the side of
-> the value only but invalid beyond that. E.g. the CSR uEnergy device I
-> have does the following:
->
->    offset == value_len - 1 --->  result is 1 byte (the last byte)
->    offset == value_len ---> result is 0 bytes
->    offset > value_len ---> result is ERROR_INVALID_OFFSET
->
-> I'm not exactly sure if the spec dictates that it be this way but this
-> is how I've seen several devices behave.
->
-> As for the bool return problem, maybe we can report the error in the
-> callback instead? When the read is being handled by read_func, we will
-> use the "err" argument gatt_db_attribute_read_t to report ATT errors
-> in the future, so maybe we should do the same here. If the offset is
-> invalid, we call func(attrib, BT_ATT_ERROR_INVALID_OFFSET, NULL, 0,
-> user_data); and return true.
-
-Fair enough, I will fix it in v3.
-
+diff --git a/android/pts-mcap.txt b/android/pts-mcap.txt
+index c35fefb..7ba47eb 100644
+--- a/android/pts-mcap.txt
++++ b/android/pts-mcap.txt
+@@ -1,7 +1,7 @@
+ PTS test results for MCAP
+ 
+-PTS version: 5.2
+-Tested: 07-August-2014
++PTS version: 5.3
++Tested: 30-October-2014
+ Android version: 4.4.4
+ 
+ Results:
+@@ -16,31 +16,28 @@ Note: Test were done with ssp enabled and in most of the cases requires pairing
+ -------------------------------------------------------------------------------
+ Test Name		Result	Notes
+ -------------------------------------------------------------------------------
+-TC_MCAP_CE_BV_01_C	PASS	mcaptest -C 4099 -D 4101 -dc <PTS addr>
+-TC_MCAP_CE_BV_02_C	PASS	mcaptest -C 4099 -D 4101
+-TC_MCAP_CE_BV_03_C	PASS	mcaptest -C 4099 -D 4101 -c <PTS addr>
+-TC_MCAP_CE_BV_04_C	PASS	mcaptest -C 4099 -D 4101 -d
++TC_MCAP_CE_BV_01_C	INC	PTS Issue #12693
++TC_MCAP_CE_BV_02_C	INC	PTS Issue #12693
++TC_MCAP_CE_BV_03_C	INC	PTS Issue #12693
++TC_MCAP_CE_BV_04_C	INC	PTS Issue #12693
+ TC_MCAP_CM_ABT_BV_01_C	N/A
+-TC_MCAP_CM_ABT_BV_02_C	PASS	mcaptest -C 4099 -D 4101
++TC_MCAP_CM_ABT_BV_02_C	INC	PTS Issue #12693
+ TC_MCAP_CM_ABT_BV_03_C	N/A
+ TC_MCAP_CM_DEL_BV_01_C	N/A
+-TC_MCAP_CM_DEL_BV_02_C	PASS	mcaptest -C 4099 -D 4101
++TC_MCAP_CM_DEL_BV_02_C	INC	PTS Issue #12693
+ TC_MCAP_CM_DEL_BV_02_C	N/A
+-TC_MCAP_CM_DEL_BV_04_C	PASS	mcaptest -C 4099 -D 4101
++TC_MCAP_CM_DEL_BV_04_C	INC	PTS Issue #12693
+ TC_MCAP_CM_DIS_BV_01_C	PASS	mcaptest -C 4099 -D 4101 -e 2 -f 2
+ TC_MCAP_CM_DIS_BV_02_C	PASS	mcaptest -C 4099 -D 4101
+-TC_MCAP_CM_DIS_BV_03_C	PASS	mcaptest -C 4099 -D 4101
++TC_MCAP_CM_DIS_BV_03_C	INC	PTS Issue #12693
+ TC_MCAP_CM_DIS_BV_04_C	PASS	mcaptest -C 4099 -D 4101 -e 2 -f 2
+ TC_MCAP_CM_DIS_BV_05_C	PASS	mcaptest -C 4099 -D 4101
+ TC_MCAP_CM_REC_BV_01_C	N/A
+-TC_MCAP_CM_REC_BV_02_C	PASS	mcaptest -C 4099 -D 4101
++TC_MCAP_CM_REC_BV_02_C	INC	PTS Issue #12693
+ TC_MCAP_CM_REC_BV_03_C	N/A
+-TC_MCAP_CM_REC_BV_04_C	PASS	mcaptest -C 4099 -D 4101
+-				Note: It may be necessary to confirm pairing
+-					twice (second time when IUT is back in
+-					range).
++TC_MCAP_CM_REC_BV_04_C	INC	PTS Issue #12693
+ TC_MCAP_CM_REC_BV_05_C	N/A
+-TC_MCAP_CM_REC_BV_06_C	PASS	mcaptest -C 4099 -D 4101
++TC_MCAP_CM_REC_BV_06_C	INC	PTS Issue #12693
+ TC_MCAP_CS_ERR_BI_01_C	N/A
+ TC_MCAP_CS_ERR_BI_02_C	N/A
+ TC_MCAP_CS_ERR_BI_03_C	N/A
+@@ -53,31 +50,31 @@ TC_MCAP_CS_R_BV_01_I	N/A
+ TC_MCAP_CS_R_BV_02_I	N/A
+ TC_MCAP_CS_R_BV_03_C	N/A
+ TC_MCAP_CS_T_BV_04_C	N/A
+-TC_MCAP_ERR_BI_01_C	PASS	mcaptest -C 4099 -D 4101
+-TC_MCAP_ERR_BI_02_C	PASS	mcaptest -C 4099 -D 4101 -d
+-TC_MCAP_ERR_BI_03_C	PASS	mcaptest -C 4099 -D 4101
+-TC_MCAP_ERR_BI_04_C	PASS	mcaptest -C 4099 -D 4101 -d
+-TC_MCAP_ERR_BI_05_C	PASS	mcaptest -C 4099 -D 4101
+-TC_MCAP_ERR_BI_06_C	PASS	mcaptest -C 4099 -D 4101 -d
+-TC_MCAP_ERR_BI_07_C	PASS	mcaptest -C 4099 -D 4101
+-TC_MCAP_ERR_BI_08_C	PASS	mcaptest -C 4099 -D 4101 -d
+-TC_MCAP_ERR_BI_09_C	PASS	mcaptest -C 4099 -D 4101
+-TC_MCAP_ERR_BI_10_C	PASS	mcaptest -C 4099 -D 4101
+-TC_MCAP_ERR_BI_11_C	PASS	mcaptest -C 4099 -D 4101 -d
+-TC_MCAP_ERR_BI_12_C	PASS	mcaptest -C 4099 -D 4101 -d
+-TC_MCAP_ERR_BI_13_C	PASS	mcaptest -C 4099 -D 4101
+-TC_MCAP_ERR_BI_14_C	PASS	mcaptest -C 4099 -D 4101
+-TC_MCAP_ERR_BI_15_C	PASS	mcaptest -C 4099 -D 4101 -d
+-TC_MCAP_ERR_BI_16_C	PASS	mcaptest -C 4099 -D 4101 -u
+-TC_MCAP_ERR_BI_17_C	PASS	mcaptest -C 4099 -D 4101 -d
+-TC_MCAP_ERR_BI_18_C	PASS	mcaptest -C 4099 -D 4101 -d
+-TC_MCAP_ERR_BI_19_C	PASS	mcaptest -C 4099 -D 4101
+-TC_MCAP_ERR_BI_20_C	PASS	mcaptest -C 4099 -D 4101 -g
++TC_MCAP_ERR_BI_01_C	INC	PTS Issue #12693
++TC_MCAP_ERR_BI_02_C	INC	PTS Issue #12693
++TC_MCAP_ERR_BI_03_C	INC	PTS Issue #12693
++TC_MCAP_ERR_BI_04_C	INC	PTS Issue #12693
++TC_MCAP_ERR_BI_05_C	INC	PTS Issue #12693
++TC_MCAP_ERR_BI_06_C	INC	PTS Issue #12693
++TC_MCAP_ERR_BI_07_C	INC	PTS Issue #12693
++TC_MCAP_ERR_BI_08_C	INC	PTS Issue #12693
++TC_MCAP_ERR_BI_09_C	INC	PTS Issue #12693
++TC_MCAP_ERR_BI_10_C	INC	PTS Issue #12693
++TC_MCAP_ERR_BI_11_C	INC	PTS Issue #12693
++TC_MCAP_ERR_BI_12_C	INC	PTS Issue #12693
++TC_MCAP_ERR_BI_13_C	INC	PTS Issue #12693
++TC_MCAP_ERR_BI_14_C	INC	PTS Issue #12693
++TC_MCAP_ERR_BI_15_C	INC	PTS Issue #12693
++TC_MCAP_ERR_BI_16_C	INC	PTS Issue #12693
++TC_MCAP_ERR_BI_17_C	INC	PTS Issue #12693
++TC_MCAP_ERR_BI_18_C	INC	PTS Issue #12693
++TC_MCAP_ERR_BI_19_C	N/A
++TC_MCAP_ERR_BI_20_C	INC	PTS Issue #12693
+ TC_MCAP_INV_BI_01_C	PASS	mcaptest -C 4099 -D 4101 -dc <PTS addr>
+-TC_MCAP_INV_BI_02_C	PASS	mcaptest -C 4099 -D 4101 -d
+-TC_MCAP_INV_BI_03_C	PASS	mcaptest -C 4099 -D 4101 -dc <PTS addr>
+-TC_MCAP_INV_BI_04_C	PASS	mcaptest -C 4099 -D 4101 -c <PTS addr>
+-TC_MCAP_INV_BI_05_C	PASS	mcaptest -C 4099 -D 4101
+-TC_MCAP_INV_BI_06_C	PASS	mcaptest -C 4099 -D 4101
+-TC_MCAP_INV_BI_07_C	PASS	mcaptest -C 4099 -D 4101
++TC_MCAP_INV_BI_02_C	INC	PTS Issue #12693
++TC_MCAP_INV_BI_03_C	INC	PTS Issue #12693
++TC_MCAP_INV_BI_04_C	INC	PTS Issue #12693
++TC_MCAP_INV_BI_05_C	INC	PTS Issue #12693
++TC_MCAP_INV_BI_06_C	INC	PTS Issue #12693
++TC_MCAP_INV_BI_07_C	INC	PTS Issue #12693
+ -------------------------------------------------------------------------------
 -- 
-Luiz Augusto von Dentz
+1.9.3
+
