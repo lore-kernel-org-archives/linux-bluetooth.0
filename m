@@ -1,56 +1,90 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <CABD6X-LU8otVFRUiKoe-ppk2KGeQfym28VHFgdBEv22G-yuF-g@mail.gmail.com>
-References: <1414624583-29236-1-git-send-email-lukasz.rymanowski@tieto.com>
-	<CABD6X-LU8otVFRUiKoe-ppk2KGeQfym28VHFgdBEv22G-yuF-g@mail.gmail.com>
-Date: Thu, 30 Oct 2014 16:09:55 +0100
-Message-ID: <CAMudyAs4X9vmGmUYvp9TTj1_q7X7fqXS5+CH3GdDY8L=Y_rrXA@mail.gmail.com>
-Subject: Re: [PATCH 1/2] shared/hfp: Remove reduntant check
-From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-To: Marcin Kraglak <marcin.kraglak@tieto.com>
-Cc: "linux-bluetooth@vger.kernel.org development"
-	<linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+From: Bharat Panda <bharat.panda@samsung.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: cpgs@samsung.com, Bharat Panda <bharat.panda@samsung.com>
+Subject: [PATCH v3] obexd/ftp: Update ftp transfer progress
+Date: Thu, 30 Oct 2014 20:29:24 +0530
+Message-id: <1414681164-27682-1-git-send-email-bharat.panda@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcin, Szymon,
+Enables transfer management for FTP
+---
+ obexd/plugins/ftp.c | 23 +++++++++++++++++++++++
+ 1 file changed, 23 insertions(+)
 
-On 30 October 2014 11:11, Marcin Kraglak <marcin.kraglak@tieto.com> wrote:
-> Hi Lukasz,
->
-> On 30 October 2014 00:16, Lukasz Rymanowski <lukasz.rymanowski@tieto.com> wrote:
->> This check is not needed. Below memcmp check is sufficient
->> ---
->>  src/shared/hfp.c | 3 ---
->>  1 file changed, 3 deletions(-)
->>
->> diff --git a/src/shared/hfp.c b/src/shared/hfp.c
->> index 22e9622..f5a812d 100644
->> --- a/src/shared/hfp.c
->> +++ b/src/shared/hfp.c
->> @@ -135,9 +135,6 @@ static bool match_handler_prefix(const void *a, const void *b)
->>         const struct cmd_handler *handler = a;
->>         const char *prefix = b;
->>
->> -       if (strlen(handler->prefix) != strlen(prefix))
->> -               return false;
->> -
->>         if (memcmp(handler->prefix, prefix, strlen(prefix)))
->>                 return false;
-> it is incorrect in case prefix is sub-string of handler->prefix
+diff --git a/obexd/plugins/ftp.c b/obexd/plugins/ftp.c
+index 773861d..35497a2 100644
+--- a/obexd/plugins/ftp.c
++++ b/obexd/plugins/ftp.c
+@@ -59,6 +59,7 @@ static const uint8_t FTP_TARGET[TARGET_SIZE] = {
+ 
+ struct ftp_session {
+ 	struct obex_session *os;
++	struct obex_transfer *transfer;
+ 	char *folder;
+ };
+ 
+@@ -116,6 +117,8 @@ void *ftp_connect(struct obex_session *os, int *err)
+ 	if (err)
+ 		*err = 0;
+ 
++	ftp->transfer = manager_register_transfer(os);
++
+ 	DBG("session %p created", ftp);
+ 
+ 	return ftp;
+@@ -136,6 +139,13 @@ int ftp_get(struct obex_session *os, void *user_data)
+ 	if (ret < 0)
+ 		return ret;
+ 
++	/*
++	 * Below code takes care about the actual file transfer
++	 * not other ftp operations.
++	 */
++	if (type == NULL)
++		manager_emit_transfer_started(ftp->transfer);
++
+ 	return 0;
+ }
+ 
+@@ -181,6 +191,9 @@ int ftp_chkput(struct obex_session *os, void *user_data)
+ 
+ 	ret = obex_put_stream_start(os, path);
+ 
++	if (ret == 0)
++		manager_emit_transfer_started(ftp->transfer);
++
+ 	g_free(path);
+ 
+ 	return ret;
+@@ -471,16 +484,26 @@ void ftp_disconnect(struct obex_session *os, void *user_data)
+ 
+ 	manager_unregister_session(os);
+ 
++	manager_unregister_transfer(ftp->transfer);
++
+ 	g_free(ftp->folder);
+ 	g_free(ftp);
+ }
+ 
++static void ftp_progress(struct obex_session *os, void *user_data)
++{
++	struct ftp_session *ftp = user_data;
++
++	manager_emit_transfer_progress(ftp->transfer);
++}
++
+ static struct obex_service_driver ftp = {
+ 	.name = "File Transfer server",
+ 	.service = OBEX_FTP,
+ 	.target = FTP_TARGET,
+ 	.target_size = TARGET_SIZE,
+ 	.connect = ftp_connect,
++	.progress = ftp_progress,
+ 	.get = ftp_get,
+ 	.put = ftp_put,
+ 	.chkput = ftp_chkput,
+-- 
+1.9.1
 
-strcmp will do the work here.
-
-\Lukasz
->>
->> --
->> 1.8.4
->>
->> --
->> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
->> the body of a message to majordomo@vger.kernel.org
->> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->
-> BR
-> Marcin
