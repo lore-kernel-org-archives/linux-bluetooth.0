@@ -2,195 +2,171 @@ Return-Path: <cyrus@holtmann.org>
 From: Michael Janssen <jamuraa@chromium.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Michael Janssen <jamuraa@chromium.org>
-Subject: [PATCH BlueZ v4 06/10] attrib: Add unit tests for g_attrib_register
-Date: Wed, 29 Oct 2014 19:45:41 -0700
-Message-Id: <1414637145-32919-7-git-send-email-jamuraa@chromium.org>
+Subject: [PATCH BlueZ v4 03/10] attrib: Add mtu argument to g_attrib_new
+Date: Wed, 29 Oct 2014 19:45:38 -0700
+Message-Id: <1414637145-32919-4-git-send-email-jamuraa@chromium.org>
 In-Reply-To: <1414637145-32919-1-git-send-email-jamuraa@chromium.org>
 References: <1414637145-32919-1-git-send-email-jamuraa@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Instead of using the default MTU, use one passed
+in by the user, and detect it from the channel when
+it is created.
 ---
- unit/test-gattrib.c | 157 +++++++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 156 insertions(+), 1 deletion(-)
+ attrib/gattrib.c     | 10 +++-------
+ attrib/gattrib.h     |  2 +-
+ attrib/gatttool.c    | 17 ++++++++++++++++-
+ attrib/interactive.c | 17 ++++++++++++++++-
+ src/device.c         | 11 ++++++++++-
+ 5 files changed, 46 insertions(+), 11 deletions(-)
 
-diff --git a/unit/test-gattrib.c b/unit/test-gattrib.c
-index a8ff7da..e25746c 100644
---- a/unit/test-gattrib.c
-+++ b/unit/test-gattrib.c
-@@ -45,6 +45,23 @@
- 
- #define data(args...) ((const unsigned char[]) { args })
- 
-+struct test_pdu {
-+	bool valid;
-+	bool sent;
-+	bool received;
-+	const uint8_t *data;
-+	size_t size;
-+};
-+
-+#define pdu(args...)				\
-+	{					\
-+		.valid = true,			\
-+		.sent = false,			\
-+		.received = false,		\
-+		.data = data(args),		\
-+		.size = sizeof(data(args)),	\
-+	}
-+
- struct context {
- 	GMainLoop *main_loop;
- 	GIOChannel *att_io;
-@@ -325,9 +342,147 @@ static void test_cancel(struct context *cxt, gconstpointer unused)
- 	g_assert(!canceled);
+diff --git a/attrib/gattrib.c b/attrib/gattrib.c
+index fa41ade..a6511a2 100644
+--- a/attrib/gattrib.c
++++ b/attrib/gattrib.c
+@@ -473,11 +473,9 @@ done:
+ 	return TRUE;
  }
  
-+static void send_test_pdus(gpointer context, struct test_pdu *pdus)
-+{
-+	struct context *cxt = context;
-+	size_t len;
-+	int fd;
-+	struct test_pdu *cur_pdu;
-+
-+	fd = g_io_channel_unix_get_fd(cxt->server_io);
-+
-+	for (cur_pdu = pdus; cur_pdu->valid; cur_pdu++)
-+		cur_pdu->sent = false;
-+
-+	for (cur_pdu = pdus; cur_pdu->valid; cur_pdu++) {
-+		if (g_test_verbose())
-+			util_hexdump('>', cur_pdu->data, cur_pdu->size,
-+						 test_debug, "send_test_pdus: ");
-+		len = write(fd, cur_pdu->data, cur_pdu->size);
-+		g_assert_cmpint(len, ==, cur_pdu->size);
-+		cur_pdu->sent = true;
-+	}
-+
-+	g_idle_add(context_stop_main_loop, cxt);
-+	g_main_loop_run(cxt->main_loop);
-+}
-+
-+#define PDU_MTU_RESP pdu(ATT_OP_MTU_RESP, 0x17)
-+#define PDU_FIND_INFO_REQ pdu(ATT_OP_FIND_INFO_REQ, 0x01, 0x00, 0xFF, 0xFF)
-+#define PDU_IND_NODATA pdu(ATT_OP_HANDLE_IND, 0x01, 0x00)
-+#define PDU_INVALID_IND pdu(ATT_OP_HANDLE_IND, 0x14)
-+#define PDU_IND_DATA pdu(ATT_OP_HANDLE_IND, 0x14, 0x00, 0x01)
-+
-+static void notify_canary_expect(const guint8 *pdu, guint16 len, gpointer data)
-+{
-+	struct test_pdu *expected = data;
-+	int cmp;
-+
-+	if (g_test_verbose())
-+		util_hexdump('<', pdu, len, test_debug,
-+						      "notify_canary_expect: ");
-+
-+	while (expected->valid && expected->received)
-+		expected++;
-+
-+	g_assert(expected->valid);
-+
-+	if (g_test_verbose())
-+		util_hexdump('?', expected->data, expected->size, test_debug,
-+						      "notify_canary_expect: ");
-+
-+	g_assert_cmpint(expected->size, ==, len);
-+
-+	cmp = memcmp(pdu, expected->data, expected->size);
-+
-+	g_assert(cmp == 0);
-+
-+	expected->received = true;
-+}
-+
- static void test_register(struct context *cxt, gconstpointer user_data)
+-GAttrib *g_attrib_new(GIOChannel *io)
++GAttrib *g_attrib_new(GIOChannel *io, guint16 mtu)
  {
--	/* TODO */
-+	guint reg_id;
-+	gboolean success;
-+	struct test_pdu pdus[] = {
-+		/* Unmatched by any (GATTRIB_ALL_EVENTS) */
-+		PDU_MTU_RESP,
-+		/*
-+		 * Unmatched PDU opcode
-+		 * Unmatched handle (GATTRIB_ALL_REQS) */
-+		PDU_FIND_INFO_REQ,
-+		/*
-+		 * Matched PDU opcode
-+		 * Unmatched handle (GATTRIB_ALL_HANDLES) */
-+		PDU_IND_NODATA,
-+		/*
-+		 * Matched PDU opcode
-+		 * Invalid length? */
-+		PDU_INVALID_IND,
-+		/*
-+		 * Matched PDU opcode
-+		 * Matched handle */
-+		PDU_IND_DATA,
-+		{ },
-+	};
-+	struct test_pdu req_pdus[] = { PDU_FIND_INFO_REQ, { } };
-+	struct test_pdu all_ind_pdus[] = {
-+		PDU_IND_NODATA,
-+		PDU_INVALID_IND,
-+		PDU_IND_DATA,
-+		{ },
-+	};
-+	struct test_pdu followed_ind_pdus[] = { PDU_IND_DATA, { } };
-+
-+	/*
-+	 * Without registering anything, should be able to ignore everything but
-+	 * an unexpected response. */
-+	send_test_pdus(cxt, pdus + 1);
-+
-+	reg_id = g_attrib_register(cxt->att, GATTRIB_ALL_EVENTS,
-+				      GATTRIB_ALL_HANDLES, notify_canary_expect,
-+								    pdus, NULL);
-+
-+	send_test_pdus(cxt, pdus);
-+
-+	g_attrib_unregister(cxt->att, reg_id);
-+
-+	if (g_test_verbose())
-+		g_print("ALL_REQS, ALL_HANDLES\r\n");
-+
-+	reg_id = g_attrib_register(cxt->att, GATTRIB_ALL_REQS,
-+				      GATTRIB_ALL_HANDLES, notify_canary_expect,
-+								req_pdus, NULL);
-+
-+	send_test_pdus(cxt, pdus);
-+
-+	g_attrib_unregister(cxt->att, reg_id);
-+
-+	if (g_test_verbose())
-+		g_print("IND, ALL_HANDLES\r\n");
-+
-+	reg_id = g_attrib_register(cxt->att, ATT_OP_HANDLE_IND,
-+				      GATTRIB_ALL_HANDLES, notify_canary_expect,
-+							    all_ind_pdus, NULL);
-+
-+	send_test_pdus(cxt, pdus);
-+
-+	g_attrib_unregister(cxt->att, reg_id);
-+
-+	if (g_test_verbose())
-+		g_print("IND, 0x0014\r\n");
-+
-+	reg_id = g_attrib_register(cxt->att, ATT_OP_HANDLE_IND, 0x0014,
-+					notify_canary_expect, followed_ind_pdus,
-+									  NULL);
-+
-+	send_test_pdus(cxt, pdus);
-+
-+	g_attrib_unregister(cxt->att, reg_id);
-+
-+	success = g_attrib_unregister(cxt->att, reg_id);
-+
-+	g_assert(!success);
- }
+ 	struct _GAttrib *attrib;
+-	uint16_t att_mtu;
+-	uint16_t cid;
  
- static void test_buffers(struct context *cxt, gconstpointer unused)
+ 	g_io_channel_set_encoding(io, NULL, NULL);
+ 	g_io_channel_set_buffered(io, FALSE);
+@@ -486,10 +484,8 @@ GAttrib *g_attrib_new(GIOChannel *io)
+ 	if (attrib == NULL)
+ 		return NULL;
+ 
+-	att_mtu = ATT_DEFAULT_LE_MTU;
+-
+-	attrib->buf = g_malloc0(att_mtu);
+-	attrib->buflen = att_mtu;
++	attrib->buf = g_malloc0(mtu);
++	attrib->buflen = mtu;
+ 
+ 	attrib->io = g_io_channel_ref(io);
+ 	attrib->requests = g_queue_new();
+diff --git a/attrib/gattrib.h b/attrib/gattrib.h
+index 18df2ad..99b8b37 100644
+--- a/attrib/gattrib.h
++++ b/attrib/gattrib.h
+@@ -42,7 +42,7 @@ typedef void (*GAttribDebugFunc)(const char *str, gpointer user_data);
+ typedef void (*GAttribNotifyFunc)(const guint8 *pdu, guint16 len,
+ 							gpointer user_data);
+ 
+-GAttrib *g_attrib_new(GIOChannel *io);
++GAttrib *g_attrib_new(GIOChannel *io, guint16 mtu);
+ GAttrib *g_attrib_ref(GAttrib *attrib);
+ void g_attrib_unref(GAttrib *attrib);
+ 
+diff --git a/attrib/gatttool.c b/attrib/gatttool.c
+index db5da62..8f92d62 100644
+--- a/attrib/gatttool.c
++++ b/attrib/gatttool.c
+@@ -123,6 +123,9 @@ static gboolean listen_start(gpointer user_data)
+ static void connect_cb(GIOChannel *io, GError *err, gpointer user_data)
+ {
+ 	GAttrib *attrib;
++	uint16_t mtu;
++	uint16_t cid;
++	GError *gerr = NULL;
+ 
+ 	if (err) {
+ 		g_printerr("%s\n", err->message);
+@@ -130,7 +133,19 @@ static void connect_cb(GIOChannel *io, GError *err, gpointer user_data)
+ 		g_main_loop_quit(event_loop);
+ 	}
+ 
+-	attrib = g_attrib_new(io);
++	bt_io_get(io, &gerr, BT_IO_OPT_IMTU, &mtu,
++				BT_IO_OPT_CID, &cid, BT_IO_OPT_INVALID);
++
++	if (gerr) {
++		g_printerr("Can't detect MTU, using default: %s", gerr->message);
++		g_error_free(gerr);
++		mtu = ATT_DEFAULT_LE_MTU;
++	}
++
++	if (cid == ATT_CID)
++		mtu = ATT_DEFAULT_LE_MTU;
++
++	attrib = g_attrib_new(io, mtu);
+ 
+ 	if (opt_listen)
+ 		g_idle_add(listen_start, attrib);
+diff --git a/attrib/interactive.c b/attrib/interactive.c
+index 08f39f7..7911ba5 100644
+--- a/attrib/interactive.c
++++ b/attrib/interactive.c
+@@ -150,13 +150,28 @@ static void events_handler(const uint8_t *pdu, uint16_t len, gpointer user_data)
+ 
+ static void connect_cb(GIOChannel *io, GError *err, gpointer user_data)
+ {
++	uint16_t mtu;
++	uint16_t cid;
++
+ 	if (err) {
+ 		set_state(STATE_DISCONNECTED);
+ 		error("%s\n", err->message);
+ 		return;
+ 	}
+ 
+-	attrib = g_attrib_new(iochannel);
++	bt_io_get(io, &err, BT_IO_OPT_IMTU, &mtu,
++				BT_IO_OPT_CID, &cid, BT_IO_OPT_INVALID);
++
++	if (err) {
++		g_printerr("Can't detect MTU, using default: %s", err->message);
++		g_error_free(err);
++		mtu = ATT_DEFAULT_LE_MTU;
++	}
++
++	if (cid == ATT_CID)
++		mtu = ATT_DEFAULT_LE_MTU;
++
++	attrib = g_attrib_new(iochannel, mtu);
+ 	g_attrib_register(attrib, ATT_OP_HANDLE_NOTIFY, GATTRIB_ALL_HANDLES,
+ 						events_handler, attrib, NULL);
+ 	g_attrib_register(attrib, ATT_OP_HANDLE_IND, GATTRIB_ALL_HANDLES,
+diff --git a/src/device.c b/src/device.c
+index 875a5c5..0925951 100644
+--- a/src/device.c
++++ b/src/device.c
+@@ -3627,11 +3627,17 @@ bool device_attach_attrib(struct btd_device *dev, GIOChannel *io)
+ 	GError *gerr = NULL;
+ 	GAttrib *attrib;
+ 	BtIOSecLevel sec_level;
++	uint16_t mtu;
++	uint16_t cid;
+ 
+ 	bt_io_get(io, &gerr, BT_IO_OPT_SEC_LEVEL, &sec_level,
++						BT_IO_OPT_IMTU, &mtu,
++						BT_IO_OPT_CID, &cid,
+ 						BT_IO_OPT_INVALID);
++
+ 	if (gerr) {
+ 		error("bt_io_get: %s", gerr->message);
++		mtu = ATT_DEFAULT_LE_MTU;
+ 		g_error_free(gerr);
+ 		return false;
+ 	}
+@@ -3649,7 +3655,10 @@ bool device_attach_attrib(struct btd_device *dev, GIOChannel *io)
+ 		}
+ 	}
+ 
+-	attrib = g_attrib_new(io);
++	if (cid == ATT_CID)
++		mtu = ATT_DEFAULT_LE_MTU;
++
++	attrib = g_attrib_new(io, mtu);
+ 	if (!attrib) {
+ 		error("Unable to create new GAttrib instance");
+ 		return false;
 -- 
 2.1.0.rc2.206.gedb03e5
 
