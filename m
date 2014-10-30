@@ -1,74 +1,63 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ] Revert "core: Fix unnecessary calls to agent_cancel()"
-Date: Thu, 30 Oct 2014 10:47:25 +0200
-Message-Id: <1414658845-21769-1-git-send-email-luiz.dentz@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Message-ID: <1414655671.2918.2.camel@jrissane-mobl.ger.corp.intel.com>
+Subject: Re: [patch] Bluetooth: 6lowpan: use after free in
+ disconnect_devices()
+From: Jukka Rissanen <jukka.rissanen@linux.intel.com>
+To: Dan Carpenter <dan.carpenter@oracle.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>, Gustavo Padovan
+ <gustavo@padovan.org>,  Johan Hedberg <johan.hedberg@gmail.com>, "David S.
+ Miller" <davem@davemloft.net>,  linux-bluetooth@vger.kernel.org,
+ netdev@vger.kernel.org,  linux-kernel@vger.kernel.org,
+ kernel-janitors@vger.kernel.org
+Date: Thu, 30 Oct 2014 09:54:31 +0200
+In-Reply-To: <20141029161057.GF5290@mwanda>
+References: <20141029161057.GF5290@mwanda>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Dan,
 
-agent_cancel calls are necessary since agent_unref only call it in case
-the last reference is dropped.
----
- src/adapter.c | 8 ++++++--
- src/agent.c   | 1 +
- src/device.c  | 1 +
- 3 files changed, 8 insertions(+), 2 deletions(-)
+On ke, 2014-10-29 at 19:10 +0300, Dan Carpenter wrote:
+> This was accidentally changed from list_for_each_entry_safe() to
+> list_for_each_entry() so now it has a use after free bug.  I've changed
+> it back.
 
-diff --git a/src/adapter.c b/src/adapter.c
-index 54e7496..21c1bb6 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -1091,8 +1091,10 @@ static void service_auth_cancel(struct service_auth *auth)
- 
- 	dbus_error_free(&derr);
- 
--	if (auth->agent != NULL)
-+	if (auth->agent != NULL) {
-+		agent_cancel(auth->agent);
- 		agent_unref(auth->agent);
-+	}
- 
- 	g_free(auth);
- }
-@@ -5173,8 +5175,10 @@ int btd_cancel_authorization(guint id)
- 
- 	g_queue_remove(auth->adapter->auths, auth);
- 
--	if (auth->agent)
-+	if (auth->agent) {
-+		agent_cancel(auth->agent);
- 		agent_unref(auth->agent);
-+	}
- 
- 	g_free(auth);
- 
-diff --git a/src/agent.c b/src/agent.c
-index 9ab1c8b..97daf71 100644
---- a/src/agent.c
-+++ b/src/agent.c
-@@ -350,6 +350,7 @@ static void simple_agent_reply(DBusPendingCall *call, void *user_data)
- 
- 		if (dbus_error_has_name(&err, DBUS_ERROR_NO_REPLY)) {
- 			error("Timed out waiting for reply from agent");
-+			agent_cancel(agent);
- 			dbus_message_unref(message);
- 			dbus_error_free(&err);
- 			agent_unref(agent);
-diff --git a/src/device.c b/src/device.c
-index 875a5c5..db6c4f8 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -1879,6 +1879,7 @@ static void bonding_request_free(struct bonding_req *bonding)
- 		g_free(bonding->cb_iter);
- 
- 	if (bonding->agent) {
-+		agent_cancel(bonding->agent);
- 		agent_unref(bonding->agent);
- 		bonding->agent = NULL;
- 	}
--- 
-1.9.3
+Good catch! Thanks for the patch.
 
+Acked-by: Jukka Rissanen <jukka.rissanen@linux.intel.com>
+
+> 
+> Fixes: 90305829635d ('Bluetooth: 6lowpan: Converting rwlocks to use RCU')
+> Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
+> 
+> diff --git a/net/bluetooth/6lowpan.c b/net/bluetooth/6lowpan.c
+> index 7254bdd..eef298d 100644
+> --- a/net/bluetooth/6lowpan.c
+> +++ b/net/bluetooth/6lowpan.c
+> @@ -1383,7 +1383,7 @@ static const struct file_operations lowpan_control_fops = {
+>  
+>  static void disconnect_devices(void)
+>  {
+> -	struct lowpan_dev *entry, *new_dev;
+> +	struct lowpan_dev *entry, *tmp, *new_dev;
+>  	struct list_head devices;
+>  
+>  	INIT_LIST_HEAD(&devices);
+> @@ -1408,7 +1408,7 @@ static void disconnect_devices(void)
+>  
+>  	rcu_read_unlock();
+>  
+> -	list_for_each_entry(entry, &devices, list) {
+> +	list_for_each_entry_safe(entry, tmp, &devices, list) {
+>  		ifdown(entry->netdev);
+>  		BT_DBG("Unregistering netdev %s %p",
+>  		       entry->netdev->name, entry->netdev);
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+
+Cheers,
+Jukka
