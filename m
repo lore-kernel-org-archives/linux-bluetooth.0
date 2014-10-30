@@ -2,62 +2,125 @@ Return-Path: <cyrus@holtmann.org>
 From: Michael Janssen <jamuraa@chromium.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Michael Janssen <jamuraa@chromium.org>
-Subject: [PATCH BlueZ v4 07/10] attrib: fix GATTRIB_ALL_REQS behavior
-Date: Wed, 29 Oct 2014 19:45:42 -0700
-Message-Id: <1414637145-32919-8-git-send-email-jamuraa@chromium.org>
+Subject: [PATCH BlueZ v4 09/10] unit/gattrib: Respond to the request PDU.
+Date: Wed, 29 Oct 2014 19:45:44 -0700
+Message-Id: <1414637145-32919-10-git-send-email-jamuraa@chromium.org>
 In-Reply-To: <1414637145-32919-1-git-send-email-jamuraa@chromium.org>
 References: <1414637145-32919-1-git-send-email-jamuraa@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-g_attrib_register(..., GATTRIB_ALL_REQS, ...) behavior would previously
-include indications, this fixes it to only include requests and
-commands.
 ---
- attrib/gattrib.c | 23 ++++++++++++++++++++++-
- 1 file changed, 22 insertions(+), 1 deletion(-)
+ unit/test-gattrib.c | 35 ++++++++++++++++++++++++++++-------
+ 1 file changed, 28 insertions(+), 7 deletions(-)
 
-diff --git a/attrib/gattrib.c b/attrib/gattrib.c
-index a65d1ca..f678435 100644
---- a/attrib/gattrib.c
-+++ b/attrib/gattrib.c
-@@ -147,6 +147,27 @@ static bool is_response(guint8 opcode)
- 	return false;
+diff --git a/unit/test-gattrib.c b/unit/test-gattrib.c
+index 85f0f2b..4f1343b 100644
+--- a/unit/test-gattrib.c
++++ b/unit/test-gattrib.c
+@@ -357,7 +357,7 @@ static void send_test_pdus(gpointer context, struct test_pdu *pdus)
+ 	for (cur_pdu = pdus; cur_pdu->valid; cur_pdu++) {
+ 		if (g_test_verbose())
+ 			util_hexdump('>', cur_pdu->data, cur_pdu->size,
+-						 test_debug, "send_test_pdus: ");
++                                                test_debug, "send_test_pdus: ");
+ 		len = write(fd, cur_pdu->data, cur_pdu->size);
+ 		g_assert_cmpint(len, ==, cur_pdu->size);
+ 		cur_pdu->sent = true;
+@@ -369,13 +369,20 @@ static void send_test_pdus(gpointer context, struct test_pdu *pdus)
+ 
+ #define PDU_MTU_RESP pdu(ATT_OP_MTU_RESP, 0x17)
+ #define PDU_FIND_INFO_REQ pdu(ATT_OP_FIND_INFO_REQ, 0x01, 0x00, 0xFF, 0xFF)
++#define PDU_NO_ATT_ERR pdu(ATT_OP_ERROR, ATT_OP_FIND_INFO_REQ, 0x00, 0x00, 0x0A)
+ #define PDU_IND_NODATA pdu(ATT_OP_HANDLE_IND, 0x01, 0x00)
+ #define PDU_INVALID_IND pdu(ATT_OP_HANDLE_IND, 0x14)
+ #define PDU_IND_DATA pdu(ATT_OP_HANDLE_IND, 0x14, 0x00, 0x01)
+ 
++struct expect_test_data {
++  struct test_pdu *expected;
++  GAttrib *att;
++};
++
+ static void notify_canary_expect(const guint8 *pdu, guint16 len, gpointer data)
+ {
+-	struct test_pdu *expected = data;
++	struct expect_test_data *expect = data;
++        struct test_pdu *expected = expect->expected;
+ 	int cmp;
+ 
+ 	if (g_test_verbose())
+@@ -398,6 +405,14 @@ static void notify_canary_expect(const guint8 *pdu, guint16 len, gpointer data)
+ 	g_assert(cmp == 0);
+ 
+ 	expected->received = true;
++
++	if (pdu[0] == ATT_OP_FIND_INFO_REQ) {
++		struct test_pdu no_attributes = PDU_NO_ATT_ERR;
++		int reqid;
++		reqid = g_attrib_send(expect->att, 0, no_attributes.data,
++					  no_attributes.size, NULL, NULL, NULL);
++		g_assert(reqid != 0);
++	}
  }
  
-+static bool is_request(guint8 opcode)
-+{
-+	switch (opcode) {
-+	case ATT_OP_MTU_REQ:
-+	case ATT_OP_FIND_INFO_REQ:
-+	case ATT_OP_FIND_BY_TYPE_REQ:
-+	case ATT_OP_READ_BY_TYPE_REQ:
-+	case ATT_OP_READ_REQ:
-+	case ATT_OP_READ_BLOB_REQ:
-+	case ATT_OP_READ_MULTI_REQ:
-+	case ATT_OP_READ_BY_GROUP_REQ:
-+	case ATT_OP_WRITE_REQ:
-+	case ATT_OP_WRITE_CMD:
-+	case ATT_OP_PREP_WRITE_REQ:
-+	case ATT_OP_EXEC_WRITE_REQ:
-+		return true;
-+	}
+ static void test_register(struct context *cxt, gconstpointer user_data)
+@@ -434,15 +449,19 @@ static void test_register(struct context *cxt, gconstpointer user_data)
+ 	};
+ 	struct test_pdu followed_ind_pdus[] = { PDU_IND_DATA, { } };
+ 	struct test_pdu *current_pdu;
++	struct expect_test_data expect;
 +
-+	return false;
-+}
-+
- GAttrib *g_attrib_ref(GAttrib *attrib)
- {
- 	int refs;
-@@ -373,7 +394,7 @@ static bool match_event(struct event *evt, const uint8_t *pdu, gsize len)
- 	if (evt->expected == GATTRIB_ALL_EVENTS)
- 		return true;
++	expect.att = cxt->att;
  
--	if (!is_response(pdu[0]) && evt->expected == GATTRIB_ALL_REQS)
-+	if (is_request(pdu[0]) && evt->expected == GATTRIB_ALL_REQS)
- 		return true;
+ 	/*
+ 	 * Without registering anything, should be able to ignore everything but
+ 	 * an unexpected response. */
+ 	send_test_pdus(cxt, pdus + 1);
  
- 	if (evt->expected == pdu[0] && evt->handle == GATTRIB_ALL_HANDLES)
++	expect.expected = pdus;
+ 	reg_id = g_attrib_register(cxt->att, GATTRIB_ALL_EVENTS,
+ 				      GATTRIB_ALL_HANDLES, notify_canary_expect,
+-								    pdus, NULL);
++								 &expect, NULL);
+ 
+ 	send_test_pdus(cxt, pdus);
+ 
+@@ -456,9 +475,10 @@ static void test_register(struct context *cxt, gconstpointer user_data)
+ 	if (g_test_verbose())
+ 		g_print("ALL_REQS, ALL_HANDLES\r\n");
+ 
++	expect.expected = req_pdus;
+ 	reg_id = g_attrib_register(cxt->att, GATTRIB_ALL_REQS,
+ 				      GATTRIB_ALL_HANDLES, notify_canary_expect,
+-								req_pdus, NULL);
++								 &expect, NULL);
+ 
+ 	send_test_pdus(cxt, pdus);
+ 
+@@ -472,9 +492,10 @@ static void test_register(struct context *cxt, gconstpointer user_data)
+ 	if (g_test_verbose())
+ 		g_print("IND, ALL_HANDLES\r\n");
+ 
++	expect.expected = all_ind_pdus;
+ 	reg_id = g_attrib_register(cxt->att, ATT_OP_HANDLE_IND,
+ 				      GATTRIB_ALL_HANDLES, notify_canary_expect,
+-							    all_ind_pdus, NULL);
++								 &expect, NULL);
+ 
+ 	send_test_pdus(cxt, pdus);
+ 
+@@ -488,9 +509,9 @@ static void test_register(struct context *cxt, gconstpointer user_data)
+ 	if (g_test_verbose())
+ 		g_print("IND, 0x0014\r\n");
+ 
++	expect.expected = followed_ind_pdus;
+ 	reg_id = g_attrib_register(cxt->att, ATT_OP_HANDLE_IND, 0x0014,
+-					notify_canary_expect, followed_ind_pdus,
+-									  NULL);
++					notify_canary_expect, &expect, NULL);
+ 
+ 	send_test_pdus(cxt, pdus);
+ 
 -- 
 2.1.0.rc2.206.gedb03e5
 
