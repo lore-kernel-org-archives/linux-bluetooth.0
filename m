@@ -1,74 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 2/2] android/handsfree: Be more strict on SLC creation
-Date: Thu, 30 Oct 2014 11:23:45 +0100
-Message-ID: <4224642.3qVV3Hzp2h@leonov>
-In-Reply-To: <1414624053-24250-2-git-send-email-lukasz.rymanowski@tieto.com>
-References: <1414624053-24250-1-git-send-email-lukasz.rymanowski@tieto.com> <1414624053-24250-2-git-send-email-lukasz.rymanowski@tieto.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <1414624583-29236-1-git-send-email-lukasz.rymanowski@tieto.com>
+References: <1414624583-29236-1-git-send-email-lukasz.rymanowski@tieto.com>
+Date: Thu, 30 Oct 2014 11:11:25 +0100
+Message-ID: <CABD6X-LU8otVFRUiKoe-ppk2KGeQfym28VHFgdBEv22G-yuF-g@mail.gmail.com>
+Subject: Re: [PATCH 1/2] shared/hfp: Remove reduntant check
+From: Marcin Kraglak <marcin.kraglak@tieto.com>
+To: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+Cc: "linux-bluetooth@vger.kernel.org development"
+	<linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Łukasz,
+Hi Lukasz,
 
-On Thursday 30 of October 2014 00:07:33 Lukasz Rymanowski wrote:
-> In case of any issue during SLC creation lets just drop the link
+On 30 October 2014 00:16, Lukasz Rymanowski <lukasz.rymanowski@tieto.com> wrote:
+> This check is not needed. Below memcmp check is sufficient
 > ---
->  android/handsfree.c | 12 ++++++++++++
->  1 file changed, 12 insertions(+)
-> 
-> diff --git a/android/handsfree.c b/android/handsfree.c
-> index 595919a..c8d3c04 100644
-> --- a/android/handsfree.c
-> +++ b/android/handsfree.c
-> @@ -1251,6 +1251,9 @@ static void at_cmd_cind(struct hfp_gw_result *result,
-> enum hfp_gw_cmd_type type, }
-> 
->  	hfp_gw_send_result(dev->gw, HFP_RESULT_ERROR);
-> +
-> +	if (dev->state != HAL_EV_HANDSFREE_CONN_STATE_SLC_CONNECTED)
-> +		hfp_gw_disconnect(dev->gw);
->  }
-> 
->  static void at_cmd_brsf(struct hfp_gw_result *result, enum hfp_gw_cmd_type
-> type, @@ -1280,6 +1283,9 @@ static void at_cmd_brsf(struct hfp_gw_result
-> *result, enum hfp_gw_cmd_type type, }
-> 
->  	hfp_gw_send_result(dev->gw, HFP_RESULT_ERROR);
-> +
-> +	if (dev->state != HAL_EV_HANDSFREE_CONN_STATE_SLC_CONNECTED)
-> +		hfp_gw_disconnect(dev->gw);
->  }
-> 
->  static void at_cmd_chld(struct hfp_gw_result *result, enum hfp_gw_cmd_type
-> type, @@ -1319,6 +1325,9 @@ static void at_cmd_chld(struct hfp_gw_result
-> *result, enum hfp_gw_cmd_type type, }
-> 
->  	hfp_gw_send_result(dev->gw, HFP_RESULT_ERROR);
-> +
-> +	if (dev->state != HAL_EV_HANDSFREE_CONN_STATE_SLC_CONNECTED)
-> +		hfp_gw_disconnect(dev->gw);
->  }
-> 
->  static struct hfp_codec *find_codec_by_type(struct hf_device *dev, uint8_t
-> type) @@ -1392,6 +1401,9 @@ static void at_cmd_bac(struct hfp_gw_result
-> *result, enum hfp_gw_cmd_type type,
-> 
->  failed:
->  	hfp_gw_send_result(dev->gw, HFP_RESULT_ERROR);
-> +
-> +	if (dev->state != HAL_EV_HANDSFREE_CONN_STATE_SLC_CONNECTED)
-> +		hfp_gw_disconnect(dev->gw);
->  }
-> 
->  static void register_slc_at(struct hf_device *dev)
+>  src/shared/hfp.c | 3 ---
+>  1 file changed, 3 deletions(-)
+>
+> diff --git a/src/shared/hfp.c b/src/shared/hfp.c
+> index 22e9622..f5a812d 100644
+> --- a/src/shared/hfp.c
+> +++ b/src/shared/hfp.c
+> @@ -135,9 +135,6 @@ static bool match_handler_prefix(const void *a, const void *b)
+>         const struct cmd_handler *handler = a;
+>         const char *prefix = b;
+>
+> -       if (strlen(handler->prefix) != strlen(prefix))
+> -               return false;
+> -
+>         if (memcmp(handler->prefix, prefix, strlen(prefix)))
+>                 return false;
+it is incorrect in case prefix is sub-string of handler->prefix
+>
+> --
+> 1.8.4
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
-In general I agree with dropping connection if there are any issues with SLC 
-creation. But it looks like you miss AT+CMER command.
-
--- 
 BR
-Szymon Janc
+Marcin
