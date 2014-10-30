@@ -1,90 +1,131 @@
 Return-Path: <cyrus@holtmann.org>
-From: Bharat Panda <bharat.panda@samsung.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: cpgs@samsung.com, Bharat Panda <bharat.panda@samsung.com>
-Subject: [PATCH v3] obexd/ftp: Update ftp transfer progress
-Date: Thu, 30 Oct 2014 20:24:54 +0530
-Message-id: <1414680894-27631-1-git-send-email-bharat.panda@samsung.com>
+MIME-Version: 1.0
+In-Reply-To: <1414505975-29158-1-git-send-email-bharat.panda@samsung.com>
+References: <1414505975-29158-1-git-send-email-bharat.panda@samsung.com>
+Date: Thu, 30 Oct 2014 16:19:16 +0200
+Message-ID: <CABBYNZLQqs7KCBZRaHQSNv2axGot_yEe8U77j7kAHE5AJfQgSQ@mail.gmail.com>
+Subject: Re: [PATCH ] obexd/ftp: Update ftp transfer progress
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Bharat Panda <bharat.panda@samsung.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	cpgs@samsung.com
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Adds support for updating file transfer progress for FTP
----
- obexd/plugins/ftp.c | 23 +++++++++++++++++++++++
- 1 file changed, 23 insertions(+)
+Hi,
 
-diff --git a/obexd/plugins/ftp.c b/obexd/plugins/ftp.c
-index 773861d..35497a2 100644
---- a/obexd/plugins/ftp.c
-+++ b/obexd/plugins/ftp.c
-@@ -59,6 +59,7 @@ static const uint8_t FTP_TARGET[TARGET_SIZE] = {
- 
- struct ftp_session {
- 	struct obex_session *os;
-+	struct obex_transfer *transfer;
- 	char *folder;
- };
- 
-@@ -116,6 +117,8 @@ void *ftp_connect(struct obex_session *os, int *err)
- 	if (err)
- 		*err = 0;
- 
-+	ftp->transfer = manager_register_transfer(os);
-+
- 	DBG("session %p created", ftp);
- 
- 	return ftp;
-@@ -136,6 +139,13 @@ int ftp_get(struct obex_session *os, void *user_data)
- 	if (ret < 0)
- 		return ret;
- 
-+	/*
-+	 * Below code takes care about the actual file transfer
-+	 * not other ftp operations.
-+	 */
-+	if (type == NULL)
-+		manager_emit_transfer_started(ftp->transfer);
-+
- 	return 0;
- }
- 
-@@ -181,6 +191,9 @@ int ftp_chkput(struct obex_session *os, void *user_data)
- 
- 	ret = obex_put_stream_start(os, path);
- 
-+	if (ret == 0)
-+		manager_emit_transfer_started(ftp->transfer);
-+
- 	g_free(path);
- 
- 	return ret;
-@@ -471,16 +484,26 @@ void ftp_disconnect(struct obex_session *os, void *user_data)
- 
- 	manager_unregister_session(os);
- 
-+	manager_unregister_transfer(ftp->transfer);
-+
- 	g_free(ftp->folder);
- 	g_free(ftp);
- }
- 
-+static void ftp_progress(struct obex_session *os, void *user_data)
-+{
-+	struct ftp_session *ftp = user_data;
-+
-+	manager_emit_transfer_progress(ftp->transfer);
-+}
-+
- static struct obex_service_driver ftp = {
- 	.name = "File Transfer server",
- 	.service = OBEX_FTP,
- 	.target = FTP_TARGET,
- 	.target_size = TARGET_SIZE,
- 	.connect = ftp_connect,
-+	.progress = ftp_progress,
- 	.get = ftp_get,
- 	.put = ftp_put,
- 	.chkput = ftp_chkput,
+On Tue, Oct 28, 2014 at 4:19 PM, Bharat Panda <bharat.panda@samsung.com> wrote:
+> Adds support for updating file transfer progress for FTP
+
+What this is really doing is enabling transfer management for FTP,
+please change the description.
+
+> ---
+>  obexd/plugins/ftp.c | 21 ++++++++++++++++++++-
+>  obexd/plugins/ftp.h |  1 +
+>  2 files changed, 21 insertions(+), 1 deletion(-)
+>
+> diff --git a/obexd/plugins/ftp.c b/obexd/plugins/ftp.c
+> index 773861d..2004a77 100644
+> --- a/obexd/plugins/ftp.c
+> +++ b/obexd/plugins/ftp.c
+> @@ -59,6 +59,7 @@ static const uint8_t FTP_TARGET[TARGET_SIZE] = {
+>
+>  struct ftp_session {
+>         struct obex_session *os;
+> +       struct obex_transfer *transfer;
+>         char *folder;
+>  };
+>
+> @@ -116,6 +117,8 @@ void *ftp_connect(struct obex_session *os, int *err)
+>         if (err)
+>                 *err = 0;
+>
+> +       ftp->transfer = manager_register_transfer(os);
+> +
+>         DBG("session %p created", ftp);
+>
+>         return ftp;
+> @@ -136,6 +139,9 @@ int ftp_get(struct obex_session *os, void *user_data)
+>         if (ret < 0)
+>                 return ret;
+>
+> +       if (type == NULL)
+> +               manager_emit_transfer_started(ftp->transfer);
+
+Please add a comment before the code above saying that we only care
+about actual file transfers not other operations.
+
+>         return 0;
+>  }
+>
+> @@ -181,6 +187,9 @@ int ftp_chkput(struct obex_session *os, void *user_data)
+>
+>         ret = obex_put_stream_start(os, path);
+>
+> +       if (ret == 0)
+> +               manager_emit_transfer_started(ftp->transfer);
+> +
+>         g_free(path);
+>
+>         return ret;
+> @@ -471,10 +480,19 @@ void ftp_disconnect(struct obex_session *os, void *user_data)
+>
+>         manager_unregister_session(os);
+>
+> +       manager_unregister_transfer(ftp->transfer);
+> +
+>         g_free(ftp->folder);
+>         g_free(ftp);
+>  }
+>
+> +void ftp_progress(struct obex_session *os, void *user_data)
+> +{
+> +       struct ftp_session *ftp = user_data;
+> +
+> +       manager_emit_transfer_progress(ftp->transfer);
+> +}
+> +
+>  static struct obex_service_driver ftp = {
+>         .name = "File Transfer server",
+>         .service = OBEX_FTP,
+> @@ -486,7 +504,8 @@ static struct obex_service_driver ftp = {
+>         .chkput = ftp_chkput,
+>         .setpath = ftp_setpath,
+>         .action = ftp_action,
+> -       .disconnect = ftp_disconnect
+> +       .disconnect = ftp_disconnect,
+> +       .progress = ftp_progress
+
+For consistency, please add progress after connect so it appears in
+the same sequence as they are defined by service.h
+
+>  };
+>
+>  static int ftp_init(void)
+> diff --git a/obexd/plugins/ftp.h b/obexd/plugins/ftp.h
+> index f06de84..c0e97a7 100644
+> --- a/obexd/plugins/ftp.h
+> +++ b/obexd/plugins/ftp.h
+> @@ -28,3 +28,4 @@ int ftp_put(struct obex_session *os, void *user_data);
+>  int ftp_setpath(struct obex_session *os, void *user_data);
+>  void ftp_disconnect(struct obex_session *os, void *user_data);
+>  int ftp_action(struct obex_session *os, void *user_data);
+> +void ftp_progress(struct obex_session *os, void *user_data);
+
+If you are not planning on using ftp_progress anywhere else please
+make it static.
+
+> --
+> 1.9.1
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+
+
 -- 
-1.9.1
-
+Luiz Augusto von Dentz
