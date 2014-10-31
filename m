@@ -1,55 +1,78 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcin Kraglak <marcin.kraglak@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv3 5/7] unit/test-gatt: Add TP/GAD/CL/BV-02-C-2 test
-Date: Fri, 31 Oct 2014 09:52:01 +0100
-Message-Id: <1414745523-31699-5-git-send-email-marcin.kraglak@tieto.com>
+Subject: [PATCHv3 7/7] unit/test-gatt: Add TP/GAD/CL/BV-04-C test
+Date: Fri, 31 Oct 2014 09:52:03 +0100
+Message-Id: <1414745523-31699-7-git-send-email-marcin.kraglak@tieto.com>
 In-Reply-To: <1414745523-31699-1-git-send-email-marcin.kraglak@tieto.com>
 References: <1414745523-31699-1-git-send-email-marcin.kraglak@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Verify that a Generic Attribute Profile client
-can discover Primary Services selected by service
-using 128-bit UUID.
+can discover characteristic declarations within
+a specified service definition.
 ---
- unit/test-gatt.c | 20 ++++++++++++++++++++
- 1 file changed, 20 insertions(+)
+ unit/test-gatt.c | 36 ++++++++++++++++++++++++++++++++++++
+ 1 file changed, 36 insertions(+)
 
 diff --git a/unit/test-gatt.c b/unit/test-gatt.c
-index 1167d4d..239f471 100644
+index 3ee9460..27471ea 100644
 --- a/unit/test-gatt.c
 +++ b/unit/test-gatt.c
-@@ -99,6 +99,12 @@ static bt_uuid_t uuid_16 = {
- 	.value.u16 = 0x1800
- };
+@@ -270,6 +270,17 @@ static void primary_cb(bool success, uint8_t att_ecode,
+ 	context_quit(context);
+ }
  
-+static bt_uuid_t uuid_128 = {
-+	.type = BT_UUID128,
-+	.value.u128.data = {0x00, 0x00, 0x18, 0x0d, 0x00, 0x00, 0x10, 0x00,
-+				0x80, 0x00, 0x00, 0x80, 0x5f, 0x9b, 0x34, 0xfb}
-+};
++static void characteristic_cb(bool success, uint8_t att_ecode,
++						struct bt_gatt_result *result,
++						void *user_data)
++{
++	struct context *context = user_data;
 +
- static void test_debug(const char *str, void *user_data)
- {
- 	const char *prefix = user_data;
-@@ -349,5 +355,19 @@ int main(int argc, char *argv[])
- 					0x18),
- 			raw_pdu(0x01, 0x06, 0x08, 0x00, 0x0a));
++	g_assert(success);
++
++	context_quit(context);
++}
++
+ static void included_cb(bool success, uint8_t att_ecode,
+ 						struct bt_gatt_result *result,
+ 						void *user_data)
+@@ -332,6 +343,17 @@ static void test_search_included(gconstpointer data)
+ 	execute_context(context);
+ }
  
-+	define_test("/TP/GAD/CL/BV-02-C-2", test_search_primary, ATT, &uuid_128,
++static void test_search_chars(gconstpointer data)
++{
++	struct context *context = create_context(512, data);
++
++	g_assert(bt_gatt_discover_characteristics(context->att, 0x0010, 0x0020,
++						characteristic_cb, context,
++						NULL));
++
++	execute_context(context);
++}
++
+ int main(int argc, char *argv[])
+ {
+ 	g_test_init(&argc, &argv, NULL);
+@@ -413,5 +435,19 @@ int main(int argc, char *argv[])
+ 			raw_pdu(0x08, 0x06, 0x00, 0xff, 0xff, 0x02, 0x28),
+ 			raw_pdu(0x01, 0x08, 0x06, 0x00, 0x0a));
+ 
++	define_test("/TP/GAD/CL/BV-04-C", test_search_chars, ATT, NULL,
 +			raw_pdu(0x02, 0x00, 0x02),
 +			raw_pdu(0x03, 0x00, 0x02),
-+			raw_pdu(06, 0x01, 0x00, 0xff, 0xff, 0x00, 0x28, 0xfb,
-+					0x34, 0x9b, 0x5f, 0x80, 0x00, 0x00,
-+					0x80, 0x00, 0x10, 0x00, 0x00, 0x0d,
-+					0x18, 0x00, 0x00),
-+			raw_pdu(0x07, 0x10, 0x00, 0x17, 0x00),
-+			raw_pdu(06, 0x18, 0x00, 0xff, 0xff, 0x00, 0x28, 0xfb,
-+					0x34, 0x9b, 0x5f, 0x80, 0x00, 0x00,
-+					0x80, 0x00, 0x10, 0x00, 0x00, 0x0d,
-+					0x18, 0x00, 0x00),
-+			raw_pdu(0x01, 0x06, 0x08, 0x00, 0x0a));
++			raw_pdu(0x08, 0x10, 0x00, 0x20, 0x00, 0x03, 0x28),
++			raw_pdu(0x09, 0x07, 0x11, 0x00, 02, 0x12, 0x00, 0x25,
++					0x2a),
++			raw_pdu(0x08, 0x12, 0x00, 0x20, 0x00, 0x03, 0x28),
++			raw_pdu(0x09, 0x15, 0x13, 0x00, 0x02, 0x14, 0x00, 0x85,
++					0x00, 0xef, 0xcd, 0xab, 0x89, 0x67,
++					0x45, 0x23, 0x01, 0x00, 0x00, 0x00,
++					0x00, 0x00, 0x00),
++			raw_pdu(0x08, 0x14, 0x00, 0x20, 0x00, 0x03, 0x28),
++			raw_pdu(0x01, 0x08, 0x12, 0x00, 0x0a));
 +
  	return g_test_run();
  }
