@@ -1,46 +1,75 @@
 Return-Path: <cyrus@holtmann.org>
-From: Gowtham Anandha Babu <gowtham.ab@samsung.com>
+From: chanyeol.park@samsung.com
 To: linux-bluetooth@vger.kernel.org
-Cc: d.kasatkin@samsung.com, bharat.panda@samsung.com, cpgs@samsung.com,
-	luiz.dentz@gmail.com, Gowtham Anandha Babu <gowtham.ab@samsung.com>
-Subject: [PATCH] tools/sdptool: Add MAP supported features for MNS
-Date: Fri, 31 Oct 2014 11:00:23 +0530
-Message-id: <1414733423-18958-1-git-send-email-gowtham.ab@samsung.com>
+Subject: [RFC v2] Bluetooth : Fix hci_sync miss wakeup interrupt
+Date: Fri, 31 Oct 2014 14:23:06 +0900
+Message-id: <1414732986-20487-1-git-send-email-chanyeol.park@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Add MapSupportedFeatures into MNS
-attribute names.
----
- tools/sdptool.c | 8 +++++++-
- 1 file changed, 7 insertions(+), 1 deletion(-)
+From: Chan-yeol Park <chanyeol.park@samsung.com>
 
-diff --git a/tools/sdptool.c b/tools/sdptool.c
-index f2d3068..88a52bb 100644
---- a/tools/sdptool.c
-+++ b/tools/sdptool.c
-@@ -239,6 +239,11 @@ static struct attrib_def mas_attrib_names[] = {
- 	{ 0x0317, "MapSupportedFeatures", NULL, 0 },
- };
+__hci_cmd_sync_ev(), __hci_req_sync() could miss wake_up_interrupt from
+hci_req_sync_complete() because hci_cmd_work() workquee and its reponse
+could be completed before they are ready to get the signal through
+add_wait_queue(), set_current_state(TASK_INTERRUPTIBLE).
+
+Signed-off-by: Chan-yeol Park <chanyeol.park@samsung.com>
+Signed-off-by: Kyungmin Park <kyungmin.park@samsung.com>
+---
+ net/bluetooth/hci_core.c | 18 +++++++++++-------
+ 1 file changed, 11 insertions(+), 7 deletions(-)
+
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index cb05d7f..c008f1f 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -1147,13 +1147,15 @@ struct sk_buff *__hci_cmd_sync_ev(struct hci_dev *hdev, u16 opcode, u32 plen,
  
-+/* Name of the various MNS attributes. See BT assigned numbers */
-+static struct attrib_def mns_attrib_names[] = {
-+	{ 0x0317, "MapSupportedFeatures", NULL, 0 },
-+};
+ 	hdev->req_status = HCI_REQ_PEND;
+ 
+-	err = hci_req_run(&req, hci_req_sync_complete);
+-	if (err < 0)
+-		return ERR_PTR(err);
+-
+ 	add_wait_queue(&hdev->req_wait_q, &wait);
+ 	set_current_state(TASK_INTERRUPTIBLE);
+ 
++	err = hci_req_run(&req, hci_req_sync_complete);
++	if (err < 0) {
++		remove_wait_queue(&hdev->req_wait_q, &wait);
++		return ERR_PTR(err);
++	}
 +
- /* Same for the UUIDs. See BT assigned numbers */
- static struct uuid_def uuid16_names[] = {
- 	/* -- Protocols -- */
-@@ -327,7 +332,8 @@ static struct uuid_def uuid16_names[] = {
- 	{ 0x1131, "Headset (HSP)", NULL, 0 },
- 	{ 0x1132, "Message Access (MAP) - MAS",
- 		mas_attrib_names, N_ELEMENTS(mas_attrib_names) },
--	{ 0x1133, "Message Access (MAP) - MNS", NULL, 0 },
-+	{ 0x1133, "Message Access (MAP) - MNS",
-+		mns_attrib_names, N_ELEMENTS(mns_attrib_names) },
- 	{ 0x1134, "Message Access (MAP)", NULL, 0 },
- 	/* ... */
- 	{ 0x1200, "PnPInformation",
+ 	schedule_timeout(timeout);
+ 
+ 	remove_wait_queue(&hdev->req_wait_q, &wait);
+@@ -1211,10 +1213,15 @@ static int __hci_req_sync(struct hci_dev *hdev,
+ 
+ 	func(&req, opt);
+ 
++	add_wait_queue(&hdev->req_wait_q, &wait);
++	set_current_state(TASK_INTERRUPTIBLE);
++
+ 	err = hci_req_run(&req, hci_req_sync_complete);
+ 	if (err < 0) {
+ 		hdev->req_status = 0;
+ 
++		remove_wait_queue(&hdev->req_wait_q, &wait);
++
+ 		/* ENODATA means the HCI request command queue is empty.
+ 		 * This can happen when a request with conditionals doesn't
+ 		 * trigger any commands to be sent. This is normal behavior
+@@ -1226,9 +1233,6 @@ static int __hci_req_sync(struct hci_dev *hdev,
+ 		return err;
+ 	}
+ 
+-	add_wait_queue(&hdev->req_wait_q, &wait);
+-	set_current_state(TASK_INTERRUPTIBLE);
+-
+ 	schedule_timeout(timeout);
+ 
+ 	remove_wait_queue(&hdev->req_wait_q, &wait);
 -- 
 1.9.1
 
