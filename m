@@ -2,32 +2,103 @@ Return-Path: <cyrus@holtmann.org>
 From: Michael Janssen <jamuraa@chromium.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Michael Janssen <jamuraa@chromium.org>
-Subject: [PATCH BlueZ v5 8/8] unit/gattrib: Only init log on --verbose
-Date: Fri, 31 Oct 2014 11:14:59 -0700
-Message-Id: <1414779299-18197-9-git-send-email-jamuraa@chromium.org>
+Subject: [PATCH BlueZ v5 6/8] unit/gattrib: Check expected PDUs were delivered
+Date: Fri, 31 Oct 2014 11:14:57 -0700
+Message-Id: <1414779299-18197-7-git-send-email-jamuraa@chromium.org>
 In-Reply-To: <1414779299-18197-1-git-send-email-jamuraa@chromium.org>
 References: <1414779299-18197-1-git-send-email-jamuraa@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Check that the PDUs that we expect to receive when
+registering for events have been delivered.
 ---
- unit/test-gattrib.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ unit/test-gattrib.c | 35 ++++++++++++++++++++++++++++-------
+ 1 file changed, 28 insertions(+), 7 deletions(-)
 
 diff --git a/unit/test-gattrib.c b/unit/test-gattrib.c
-index a1ff530..cd43c3a 100644
+index 473112c..326478d 100644
 --- a/unit/test-gattrib.c
 +++ b/unit/test-gattrib.c
-@@ -553,7 +553,8 @@ int main(int argc, char *argv[])
+@@ -404,7 +404,7 @@ static void notify_canary_expect(const guint8 *pdu, guint16 len, gpointer data)
+ static void test_register(struct context *cxt, gconstpointer user_data)
  {
- 	g_test_init(&argc, &argv, NULL);
- 
--	__btd_log_init("*", 0);
-+	if (g_test_verbose())
-+		__btd_log_init("*", 0);
+ 	guint reg_id;
+-	gboolean success;
++	gboolean canceled;
+ 	struct test_pdu pdus[] = {
+ 		/* Unmatched by any (GATTRIB_ALL_EVENTS) */
+ 		PDU_MTU_RESP,
+@@ -434,6 +434,7 @@ static void test_register(struct context *cxt, gconstpointer user_data)
+ 		{ },
+ 	};
+ 	struct test_pdu followed_ind_pdus[] = { PDU_IND_DATA, { } };
++	struct test_pdu *current_pdu;
  
  	/*
- 	 * Test the GAttrib API behavior
+ 	 * Without registering anything, should be able to ignore everything but
+@@ -446,7 +447,12 @@ static void test_register(struct context *cxt, gconstpointer user_data)
+ 
+ 	send_test_pdus(cxt, pdus);
+ 
+-	g_attrib_unregister(cxt->att, reg_id);
++	canceled = g_attrib_unregister(cxt->att, reg_id);
++
++	g_assert(canceled);
++
++	for (current_pdu = pdus; current_pdu->valid; current_pdu++)
++		g_assert(current_pdu->received);
+ 
+ 	if (g_test_verbose())
+ 		g_print("ALL_REQS, ALL_HANDLES\r\n");
+@@ -457,7 +463,12 @@ static void test_register(struct context *cxt, gconstpointer user_data)
+ 
+ 	send_test_pdus(cxt, pdus);
+ 
+-	g_attrib_unregister(cxt->att, reg_id);
++	canceled = g_attrib_unregister(cxt->att, reg_id);
++
++	g_assert(canceled);
++
++	for (current_pdu = req_pdus; current_pdu->valid; current_pdu++)
++		g_assert(current_pdu->received);
+ 
+ 	if (g_test_verbose())
+ 		g_print("IND, ALL_HANDLES\r\n");
+@@ -468,7 +479,12 @@ static void test_register(struct context *cxt, gconstpointer user_data)
+ 
+ 	send_test_pdus(cxt, pdus);
+ 
+-	g_attrib_unregister(cxt->att, reg_id);
++	canceled = g_attrib_unregister(cxt->att, reg_id);
++
++	g_assert(canceled);
++
++	for (current_pdu = all_ind_pdus; current_pdu->valid; current_pdu++)
++		g_assert(current_pdu->received);
+ 
+ 	if (g_test_verbose())
+ 		g_print("IND, 0x0014\r\n");
+@@ -479,11 +495,16 @@ static void test_register(struct context *cxt, gconstpointer user_data)
+ 
+ 	send_test_pdus(cxt, pdus);
+ 
+-	g_attrib_unregister(cxt->att, reg_id);
++	canceled = g_attrib_unregister(cxt->att, reg_id);
++
++	g_assert(canceled);
+ 
+-	success = g_attrib_unregister(cxt->att, reg_id);
++	for (current_pdu = followed_ind_pdus; current_pdu->valid; current_pdu++)
++		g_assert(current_pdu->received);
+ 
+-	g_assert(!success);
++	canceled = g_attrib_unregister(cxt->att, reg_id);
++
++	g_assert(!canceled);
+ }
+ 
+ static void test_buffers(struct context *cxt, gconstpointer unused)
 -- 
 2.1.0.rc2.206.gedb03e5
 
