@@ -1,119 +1,70 @@
 Return-Path: <cyrus@holtmann.org>
 From: Gowtham Anandha Babu <gowtham.ab@samsung.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: d.kasatkin@samsung.com, bharat.panda@samsung.com, cpgs@samsung.com
-Subject: [PATCH v1 5/7] monitor/rfcomm: Add handlers for mcc frame type
-Date: Fri, 31 Oct 2014 20:38:32 +0530
-Message-id: <1414768114-3775-6-git-send-email-gowtham.ab@samsung.com>
+Cc: d.kasatkin@samsung.com, bharat.panda@samsung.com, cpgs@samsung.com,
+	Gowtham Anandha Babu <gowtham.ab@samsung.com>
+Subject: [PATCH v1 3/7] monitor/rfcomm: Add support for UIH frame decoding
+Date: Fri, 31 Oct 2014 20:38:30 +0530
+Message-id: <1414768114-3775-4-git-send-email-gowtham.ab@samsung.com>
 In-reply-to: <1414768114-3775-1-git-send-email-gowtham.ab@samsung.com>
 References: <1414768114-3775-1-git-send-email-gowtham.ab@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Bharat Panda <bharat.panda@samsung.com>
-
-Changes made to decode different mcc frame type in RFCOMM
-for btmon.
+Changes made to decode UIH frame in btmon.
 ---
- monitor/rfcomm.c | 78 ++++++++++++++++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 76 insertions(+), 2 deletions(-)
+ monitor/rfcomm.c | 29 +++++++++++++++++++++++++++++
+ 1 file changed, 29 insertions(+)
 
 diff --git a/monitor/rfcomm.c b/monitor/rfcomm.c
-index a43b2a2..b85e8fd 100644
+index 395a7b8..6994ffd 100644
 --- a/monitor/rfcomm.c
 +++ b/monitor/rfcomm.c
-@@ -90,6 +90,51 @@ static void print_rfcomm_hdr(const struct l2cap_frame *frame,
- 	print_field("FCS : (0x%2.2x)", fcs);
+@@ -46,6 +46,7 @@
+ 
+ #define GET_LEN8(length) ((length & 0xfe) >> 1)
+ #define GET_LEN16(length) ((length & 0xfffe) >> 1)
++#define GET_PF(ctr) (((ctr) >> 4) & 0x1)
+ 
+ struct rfcomm_lhdr {
+ 	uint8_t address;
+@@ -60,8 +61,36 @@ static void print_rfcomm_hdr(const struct l2cap_frame *frame,
+ {
  }
  
-+static inline void mcc_test(const struct l2cap_frame *frame,
-+				struct rfcomm_lhdr hdr, struct rfcomm_lmcc mcc)
-+{
-+}
-+
-+static inline void mcc_fcon(const struct l2cap_frame *frame,
-+				struct rfcomm_lhdr hdr, struct rfcomm_lmcc mcc)
-+{
-+}
-+
-+static inline void mcc_fcoff(const struct l2cap_frame *frame,
-+				struct rfcomm_lhdr hdr, struct rfcomm_lmcc mcc)
-+{
-+}
-+
-+static inline void mcc_msc(const struct l2cap_frame *frame,
-+				struct rfcomm_lhdr hdr, struct rfcomm_lmcc mcc)
++static inline bool mcc_frame(const struct l2cap_frame *frame,
++						struct rfcomm_lhdr hdr)
 +{
 +	packet_hexdump(frame->data, frame->size);
++	return true;
 +}
 +
-+static inline void mcc_rpn(const struct l2cap_frame *frame,
-+				struct rfcomm_lhdr hdr, struct rfcomm_lmcc mcc)
-+{
-+	packet_hexdump(frame->data, frame->size);
-+}
-+
-+static inline void mcc_rls(const struct l2cap_frame *frame,
-+				struct rfcomm_lhdr hdr, struct rfcomm_lmcc mcc)
-+{
-+	packet_hexdump(frame->data, frame->size);
-+}
-+
-+static inline void mcc_pn(const struct l2cap_frame *frame,
-+				struct rfcomm_lhdr hdr, struct rfcomm_lmcc mcc)
-+{
-+	packet_hexdump(frame->data, frame->size);
-+}
-+
-+static inline void mcc_nsc(const struct l2cap_frame *frame,
-+				struct rfcomm_lhdr hdr, struct rfcomm_lmcc mcc)
-+{
-+	packet_hexdump(frame->data, frame->size);
-+}
-+
- static const char *type2str(uint8_t type)
+ static bool uih_frame(const struct l2cap_frame *frame, struct rfcomm_lhdr hdr)
  {
- 	switch (type) {
-@@ -141,8 +186,37 @@ static inline bool mcc_frame(const struct l2cap_frame *frame,
- 	print_indent(7, opcode_color, "RFCOMM(s): ", "", COLOR_OFF, "%s %s",
- 					type2str(type), CR_STR(mcc.type));
- 
--	print_rfcomm_hdr(&rfcomm_frame, hdr);
--	packet_hexdump(rfcomm_frame.data, rfcomm_frame.size);
-+	switch (type) {
-+	case RFCOMM_TEST:
-+		mcc_test(&rfcomm_frame, hdr, mcc);
-+		packet_hexdump(rfcomm_frame.data, rfcomm_frame.size);
-+		break;
-+	case RFCOMM_FCON:
-+		mcc_fcon(&rfcomm_frame, hdr, mcc);
-+		break;
-+	case RFCOMM_FCOFF:
-+		mcc_fcoff(&rfcomm_frame, hdr, mcc);
-+		break;
-+	case RFCOMM_MSC:
-+		mcc_msc(&rfcomm_frame, hdr, mcc);
-+		break;
-+	case RFCOMM_RPN:
-+		mcc_rpn(&rfcomm_frame, hdr, mcc);
-+		break;
-+	case RFCOMM_RLS:
-+		mcc_rls(&rfcomm_frame, hdr, mcc);
-+		break;
-+	case RFCOMM_PN:
-+		mcc_pn(&rfcomm_frame, hdr, mcc);
-+		break;
-+	case RFCOMM_NSC:
-+		mcc_nsc(&rfcomm_frame, hdr, mcc);
-+		break;
-+	default:
-+		print_field("MCC message type 0x%02x: ", type);
++	uint8_t credits;
++
++	struct l2cap_frame rfcomm_frame;
++
++	l2cap_frame_pull(&rfcomm_frame, frame, 0);
++
++	if (!RFCOMM_GET_CHANNEL(hdr.address)) {
++		return mcc_frame(&rfcomm_frame, hdr);
++	} else {
++		print_indent(7, opcode_color, "RFCOMM(d): UIH ", "",
++								COLOR_OFF, "");
 +		print_rfcomm_hdr(&rfcomm_frame, hdr);
-+		packet_hexdump(rfcomm_frame.data, rfcomm_frame.size);
++		if (GET_PF(hdr.control)) {
++			if (!l2cap_frame_get_u8(&rfcomm_frame, &credits))
++				return false;
++			print_field("Credits %d", credits);
++			return true;
++		}
 +	}
- 
++
++	packet_hexdump(rfcomm_frame.data, rfcomm_frame.size);
  	return true;
  }
+ 
 -- 
 1.9.1
 
