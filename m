@@ -1,35 +1,27 @@
 Return-Path: <cyrus@holtmann.org>
-From: Marcin Kraglak <marcin.kraglak@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv3 1/7] shared/io: Remove disconnect handler in io_destroy
-Date: Fri, 31 Oct 2014 09:51:57 +0100
-Message-Id: <1414745523-31699-1-git-send-email-marcin.kraglak@tieto.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Fri, 31 Oct 2014 10:39:08 +0200
+From: Johan Hedberg <johan.hedberg@intel.com>
+To: Loic Poulain <loic.poulain@intel.com>
+Cc: marcel@holtmann.org, gustavo@padovan.org,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth: HCI H5 peer reset detection
+Message-ID: <20141031083908.GB18888@t440s.P-661HNU-F1>
+References: <1412780068-19449-1-git-send-email-loic.poulain@intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1412780068-19449-1-git-send-email-loic.poulain@intel.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Diconnect callback may be called after destroying IO in next
-mainloop iteration (it leada to reading freed data). Removing
-disconnect handler prevents that situation.
----
- src/shared/io-glib.c | 5 +++++
- 1 file changed, 5 insertions(+)
+Hi Loic,
 
-diff --git a/src/shared/io-glib.c b/src/shared/io-glib.c
-index a2ada66..5ebde3d 100644
---- a/src/shared/io-glib.c
-+++ b/src/shared/io-glib.c
-@@ -115,6 +115,11 @@ void io_destroy(struct io *io)
- 		io->write_watch = 0;
- 	}
- 
-+	if (io->disconnect_watch > 0) {
-+		g_source_remove(io->disconnect_watch);
-+		io->disconnect_watch = 0;
-+	}
-+
- 	g_io_channel_unref(io->channel);
- 	io->channel = NULL;
- 
--- 
-1.9.3
+On Wed, Oct 08, 2014, Loic Poulain wrote:
+> This patch resets the HCI H5 driver data/state to unitialized and
+> reports an HCI hardware error event to notify the upper stack that
+> HCI synchronization has been lost. H5 will be re-synchronized and
+> upper stack should generate an HCI Reset command.
 
+I couldn't find anywhere where we'd currently do this "upper stack"
+behavior that you describe (there . Did you have some follow-up patches to
+implement that?
+
+Johan
