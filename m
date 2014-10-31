@@ -1,133 +1,62 @@
 Return-Path: <cyrus@holtmann.org>
+MIME-Version: 1.0
+In-Reply-To: <1414683393-26703-1-git-send-email-luiz.dentz@gmail.com>
+References: <1414683393-26703-1-git-send-email-luiz.dentz@gmail.com>
+Date: Fri, 31 Oct 2014 15:36:37 +0200
+Message-ID: <CABBYNZ+_b19JMqN-9RfEMOOr0F=5iYf+9Mw3JP0D41WecCSdpA@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 1/2] shared/att: Fix memory leak
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v4 1/9] shared/gatt-db: Expose gatt_db_attribute
-Date: Fri, 31 Oct 2014 15:39:46 +0200
-Message-Id: <1414762794-30166-1-git-send-email-luiz.dentz@gmail.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi,
 
-This is the new API to reduce the lookups in gatt_db and make it
-a little bit more convenient for batch operations, so the general idea
-is to be able to get a hold of it via gatt_db_get_attribute but also
-replace the handles in the queues with proper attributes so the server
-code don't have to lookup again when reading/writing, checking
-permissions, or any other operation that can be done directly.
----
-v2: Address problems gatt_db_attribute_read and gatt_db_attribute_write
-pointed out by Arman.
-v3: Allow gatt_db_attribute_read to work if offset equals to value length.
-v4: Fix using attribute handle for service related operations.
+On Thu, Oct 30, 2014 at 5:36 PM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>
+> This fixes the following backtrack when running test-gatt:
+>
+> 104 (40 direct, 64 indirect) bytes in 1 blocks are definitely lost in loss record 58 of 63
+>    at 0x4C291D4: calloc (in /usr/lib64/valgrind/vgpreload_memcheck-amd64-linux.so)
+>    by 0x405E59: bt_gatt_exchange_mtu (gatt-helpers.c:477)
+>    by 0x4082D5: bt_gatt_client_new (gatt-client.c:1196)
+>    by 0x4030AB: create_context.constprop.4 (test-gatt.c:230)
+>    by 0x4032A5: test_client (test-gatt.c:320)
+>    by 0x4E9E5E0: ??? (in /usr/lib64/libglib-2.0.so.0.3800.2)
+>    by 0x4E9E7A5: ??? (in /usr/lib64/libglib-2.0.so.0.3800.2)
+>    by 0x4E9E7A5: ??? (in /usr/lib64/libglib-2.0.so.0.3800.2)
+>    by 0x4E9E7A5: ??? (in /usr/lib64/libglib-2.0.so.0.3800.2)
+>    by 0x4E9EB1A: g_test_run_suite (in /usr/lib64/libglib-2.0.so.0.3800.2)
+>    by 0x402A41: main (test-gatt.c:452)
+> ---
+>  src/shared/att.c | 6 ++++++
+>  1 file changed, 6 insertions(+)
+>
+> diff --git a/src/shared/att.c b/src/shared/att.c
+> index c70d396..715c968 100644
+> --- a/src/shared/att.c
+> +++ b/src/shared/att.c
+> @@ -817,6 +817,12 @@ void bt_att_unref(struct bt_att *att)
+>         bt_att_unregister_all(att);
+>         bt_att_cancel_all(att);
+>
+> +       if (att->pending_req)
+> +               destroy_att_send_op(att->pending_req);
+> +
+> +       if (att->pending_ind)
+> +               destroy_att_send_op(att->pending_ind);
+> +
+>         io_destroy(att->io);
+>         att->io = NULL;
+>
+> --
+> 1.9.3
 
- src/shared/gatt-db.c | 51 +++++++++++++++++++++++++++++++++++++++++++++++++++
- src/shared/gatt-db.h | 36 ++++++++++++++++++++++++++++++++++++
- 2 files changed, 87 insertions(+)
+I went ahead and I applied this 2 after a few tweaks.
 
-diff --git a/src/shared/gatt-db.c b/src/shared/gatt-db.c
-index 6b5e84c..3ade7a9 100644
---- a/src/shared/gatt-db.c
-+++ b/src/shared/gatt-db.c
-@@ -802,3 +802,54 @@ bool gatt_db_get_attribute_permissions(struct gatt_db *db, uint16_t handle,
- 	return true;
- 
- }
-+
-+struct gatt_db_attribute *gatt_db_get_attribute(struct gatt_db *db,
-+							uint16_t handle)
-+{
-+	return NULL;
-+}
-+
-+const bt_uuid_t *gatt_db_attribute_get_type(struct gatt_db_attribute *attrib)
-+{
-+	return NULL;
-+}
-+
-+uint16_t gatt_db_attribute_get_handle(struct gatt_db_attribute *attrib)
-+{
-+	return 0;
-+}
-+
-+bool gatt_db_attribute_get_service_uuid(struct gatt_db_attribute *attrib,
-+							bt_uuid_t *uuid)
-+{
-+	return false;
-+}
-+
-+bool gatt_db_attribute_get_service_handles(struct gatt_db_attribute *attrib,
-+						uint16_t *start_handle,
-+						uint16_t *end_handle)
-+{
-+	return false;
-+}
-+
-+bool gatt_db_attribute_get_permissions(struct gatt_db_attribute *attrib,
-+							uint32_t *permissions)
-+{
-+	return false;
-+}
-+
-+bool gatt_db_attribute_read(struct gatt_db_attribute *attrib, uint16_t offset,
-+				uint8_t opcode, bdaddr_t *bdaddr,
-+				gatt_db_attribute_read_t func, void *user_data)
-+{
-+	return false;
-+}
-+
-+bool gatt_db_attribute_write(struct gatt_db_attribute *attrib, uint16_t offset,
-+					const uint8_t *value, size_t len,
-+					uint8_t opcode, bdaddr_t *bdaddr,
-+					gatt_db_attribute_write_t func,
-+					void *user_data)
-+{
-+	return false;
-+}
-diff --git a/src/shared/gatt-db.h b/src/shared/gatt-db.h
-index 8d18434..15be67f 100644
---- a/src/shared/gatt-db.h
-+++ b/src/shared/gatt-db.h
-@@ -96,3 +96,39 @@ bool gatt_db_get_service_uuid(struct gatt_db *db, uint16_t handle,
- 
- bool gatt_db_get_attribute_permissions(struct gatt_db *db, uint16_t handle,
- 							uint32_t *permissions);
-+
-+struct gatt_db_attribute;
-+
-+struct gatt_db_attribute *gatt_db_get_attribute(struct gatt_db *db,
-+							uint16_t handle);
-+
-+const bt_uuid_t *gatt_db_attribute_get_type(struct gatt_db_attribute *attrib);
-+
-+uint16_t gatt_db_attribute_get_handle(struct gatt_db_attribute *attrib);
-+
-+bool gatt_db_attribute_get_service_uuid(struct gatt_db_attribute *attrib,
-+							bt_uuid_t *uuid);
-+
-+bool gatt_db_attribute_get_service_handles(struct gatt_db_attribute *attrib,
-+						uint16_t *start_handle,
-+						uint16_t *end_handle);
-+
-+bool gatt_db_attribute_get_permissions(struct gatt_db_attribute *attrib,
-+							uint32_t *permissions);
-+
-+typedef void (*gatt_db_attribute_read_t) (struct gatt_db_attribute *attrib,
-+					int err, uint8_t *value, size_t length,
-+					void *user_data);
-+
-+bool gatt_db_attribute_read(struct gatt_db_attribute *attrib, uint16_t offset,
-+				uint8_t opcode, bdaddr_t *bdaddr,
-+				gatt_db_attribute_read_t func, void *user_data);
-+
-+typedef void (*gatt_db_attribute_write_t) (struct gatt_db_attribute *attrib,
-+						int err, void *user_data);
-+
-+bool gatt_db_attribute_write(struct gatt_db_attribute *attrib, uint16_t offset,
-+					const uint8_t *value, size_t len,
-+					uint8_t opcode, bdaddr_t *bdaddr,
-+					gatt_db_attribute_write_t func,
-+					void *user_data);
+
 -- 
-1.9.3
-
+Luiz Augusto von Dentz
