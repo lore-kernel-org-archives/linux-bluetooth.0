@@ -1,49 +1,55 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 31 Oct 2014 16:06:03 -0400
-From: "John W. Linville" <linville@tuxdriver.com>
-To: linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: pull request: bluetooth-next 2014-10-31
-Message-ID: <20141031200603.GD3768@tuxdriver.com>
-References: <20141031182803.GA5772@t440s.P-661HNU-F1>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 0/8] shared/hfp: Add support for HFP HF - part 2
+Date: Fri, 31 Oct 2014 20:32:49 +0100
+Message-ID: <2651171.yOGlzQfTJK@leonov>
+In-Reply-To: <1412898652-12281-1-git-send-email-lukasz.rymanowski@tieto.com>
+References: <1412898652-12281-1-git-send-email-lukasz.rymanowski@tieto.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20141031182803.GA5772@t440s.P-661HNU-F1>
-Sender: linux-kernel-owner@vger.kernel.org
+Content-Type: text/plain; charset="utf-8"
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Fri, Oct 31, 2014 at 08:28:03PM +0200, Johan Hedberg wrote:
-> Hi John,
-> 
-> Here's the first bluetooth-next pull request for 3.19. The vast majority
-> of patches are for ieee802154 from Alexander Aring with various fixes
-> and cleanups. There are also several LE/SMP fixes as well as improved
-> support for handling LE devices that have lost their pairing information
-> (the patches from Alfonso). Jukka provides a couple of stability fixes
-> for 6lowpan and Szymon conformance fixes for RFCOMM. For the HCI drivers
-> we have one new USB ID for an Acer controller as well as a reset
-> handling fix for H5.
-> 
-> Please let me know if there are any issues pulling. Thanks.
-> 
-> Johan
-> 
-> ---
-> The following changes since commit 61ed53deb1c6a4386d8710dbbfcee8779c381931:
-> 
->   Merge tag 'ntb-3.18' of git://github.com/jonmason/ntb (2014-10-19 12:58:22 -0700)
-> 
-> are available in the git repository at:
-> 
-> 
->   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git for-upstream
-> 
-> for you to fetch changes up to b509c02d0f31639dda90f9b7269668b86c9b25ef:
-> 
->   Bluetooth: HCI H5 peer reset detection (2014-10-31 19:54:34 +0200)
+Hi Łukasz,
 
-Pulling now...
+On Friday 10 of October 2014 01:50:44 Lukasz Rymanowski wrote:
+> Following patches applies on:
+> [PATCH v4 00/11] shared/hfp: Add support for HFP HF
+> 
+> This is last part of patches for HFP HF in shared code. Next ones
+> will be done in android part.
+> 
+> This set mostly affects functions which help to parse hfp response.
+> This has been unified so it can be used by hfp gw and hf.
+> 
+> Also handling of +CME ERROR has been added and couple of unit tests.
+> 
+> Sending it now as I want to get early comments on approach. Future work
+> depends on it very much so I want to avoid too much rebasing.
+> 
+> Lukasz Rymanowski (8):
+>   shared/hfp: Rename hfp_gw_result to hfp_context
+>   shared/hfp: Rename hfp_hf_result to common hfp_context
+>   shared/hfp: Rename functions operating on context
+>   shared/hfp: Add handling +CME ERROR to parser
+>   shared/hfp: Minor fix in container close function
+>   shared/hfp: Add hfp_context_get_range function
+>   unit/hfp: Add unit tests for parsing hfp_context
+>   unit/hfp: Add test for +CME ERROR: response
+> 
+>  android/handsfree.c | 184 +++++++++++++++++++++++-----------------------
+>  src/shared/hfp.c    | 207
+> ++++++++++++++++++++++++++++++++-------------------- src/shared/hfp.h    | 
+> 28 ++++---
+>  unit/test-hfp.c     | 111 +++++++++++++++++++++++++---
+>  4 files changed, 334 insertions(+), 196 deletions(-)
+
+Those looks OK to me. Please send rebased version (and add clarifying comment 
+in 4/8). Thanks.
+
 
 -- 
-John W. Linville		Someday the world will need a hero, and you
-linville@tuxdriver.com			might be all we have.  Be ready.
+BR
+Szymon Janc
