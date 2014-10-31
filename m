@@ -1,143 +1,134 @@
 Return-Path: <cyrus@holtmann.org>
-From: Bharat Bhusan Panda <bharat.panda@samsung.com>
-To: 'Luiz Augusto von Dentz' <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org, cpgs@samsung.com
-References: <1414505975-29158-1-git-send-email-bharat.panda@samsung.com>
- <CABBYNZLQqs7KCBZRaHQSNv2axGot_yEe8U77j7kAHE5AJfQgSQ@mail.gmail.com>
-In-reply-to: <CABBYNZLQqs7KCBZRaHQSNv2axGot_yEe8U77j7kAHE5AJfQgSQ@mail.gmail.com>
-Subject: RE: [PATCH ] obexd/ftp: Update ftp transfer progress
-Date: Fri, 31 Oct 2014 12:38:07 +0530
-Message-id: <00a301cff4d9$7b21ffa0$7165fee0$@samsung.com>
-MIME-version: 1.0
-Content-type: text/plain; charset=UTF-8
-Sender: linux-bluetooth-owner@vger.kernel.org
+MIME-Version: 1.0
+In-Reply-To: <6112AC01-B1C4-4DF8-8085-63334761D725@holtmann.org>
+References: <132658595.194181413985732727.JavaMail.weblogic@epmlwas01a>
+	<6112AC01-B1C4-4DF8-8085-63334761D725@holtmann.org>
+Date: Fri, 31 Oct 2014 16:03:08 +0900
+Message-ID: <CAJx1FMPUkBREuxC0fGy4XDaZOV55N57e0aiOccvcy8_MOvdMgw@mail.gmail.com>
+Subject: Re: [RFC] Bluetooth : Fix hci_sync miss wakeup interrupt
+From: "Chanyeol,Park" <chanyeol.park@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org, =?UTF-8?B?67CV7LCs7Je0?= <chanyeol.park@samsung.com>
+Content-Type: multipart/alternative; boundary=bcaec51a77c8dab9b60506b296b0
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+--bcaec51a77c8dab9b60506b296b0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-> -----Original Message-----
-> From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-
-> owner@vger.kernel.org] On Behalf Of Luiz Augusto von Dentz
-> Sent: Thursday, October 30, 2014 7:49 PM
-> To: Bharat Panda
-> Cc: linux-bluetooth@vger.kernel.org; cpgs@samsung.com
-> Subject: Re: [PATCH ] obexd/ftp: Update ftp transfer progress
-> 
-> Hi,
-> 
-> On Tue, Oct 28, 2014 at 4:19 PM, Bharat Panda
-> <bharat.panda@samsung.com> wrote:
-> > Adds support for updating file transfer progress for FTP
-> 
-> What this is really doing is enabling transfer management for FTP, please
-> change the description.
+Hi Marcel
 
-> 
-> > ---
-> >  obexd/plugins/ftp.c | 21 ++++++++++++++++++++-  obexd/plugins/ftp.h
-> |
-> > 1 +
-> >  2 files changed, 21 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/obexd/plugins/ftp.c b/obexd/plugins/ftp.c index
-> > 773861d..2004a77 100644
-> > --- a/obexd/plugins/ftp.c
-> > +++ b/obexd/plugins/ftp.c
-> > @@ -59,6 +59,7 @@ static const uint8_t FTP_TARGET[TARGET_SIZE] = {
-> >
-> >  struct ftp_session {
-> >         struct obex_session *os;
-> > +       struct obex_transfer *transfer;
-> >         char *folder;
-> >  };
-> >
-> > @@ -116,6 +117,8 @@ void *ftp_connect(struct obex_session *os, int
-> *err)
-> >         if (err)
-> >                 *err = 0;
-> >
-> > +       ftp->transfer = manager_register_transfer(os);
-> > +
-> >         DBG("session %p created", ftp);
-> >
-> >         return ftp;
-> > @@ -136,6 +139,9 @@ int ftp_get(struct obex_session *os, void
-> *user_data)
-> >         if (ret < 0)
-> >                 return ret;
-> >
-> > +       if (type == NULL)
-> > +               manager_emit_transfer_started(ftp->transfer);
-> 
-> Please add a comment before the code above saying that we only care about
-> actual file transfers not other operations.
-> 
-> >         return 0;
-> >  }
-> >
-> > @@ -181,6 +187,9 @@ int ftp_chkput(struct obex_session *os, void
-> > *user_data)
-> >
-> >         ret = obex_put_stream_start(os, path);
-> >
-> > +       if (ret == 0)
-> > +               manager_emit_transfer_started(ftp->transfer);
-> > +
-> >         g_free(path);
-> >
-> >         return ret;
-> > @@ -471,10 +480,19 @@ void ftp_disconnect(struct obex_session *os,
-> > void *user_data)
-> >
-> >         manager_unregister_session(os);
-> >
-> > +       manager_unregister_transfer(ftp->transfer);
-> > +
-> >         g_free(ftp->folder);
-> >         g_free(ftp);
-> >  }
-> >
-> > +void ftp_progress(struct obex_session *os, void *user_data) {
-> > +       struct ftp_session *ftp = user_data;
-> > +
-> > +       manager_emit_transfer_progress(ftp->transfer);
-> > +}
-> > +
-> >  static struct obex_service_driver ftp = {
-> >         .name = "File Transfer server",
-> >         .service = OBEX_FTP,
-> > @@ -486,7 +504,8 @@ static struct obex_service_driver ftp = {
-> >         .chkput = ftp_chkput,
-> >         .setpath = ftp_setpath,
-> >         .action = ftp_action,
-> > -       .disconnect = ftp_disconnect
-> > +       .disconnect = ftp_disconnect,
-> > +       .progress = ftp_progress
-> 
-> For consistency, please add progress after connect so it appears in the same
-> sequence as they are defined by service.h
-> 
-> >  };
-> >
-> >  static int ftp_init(void)
-> > diff --git a/obexd/plugins/ftp.h b/obexd/plugins/ftp.h index
-> > f06de84..c0e97a7 100644
-> > --- a/obexd/plugins/ftp.h
-> > +++ b/obexd/plugins/ftp.h
-> > @@ -28,3 +28,4 @@ int ftp_put(struct obex_session *os, void
-> > *user_data);  int ftp_setpath(struct obex_session *os, void
-> > *user_data);  void ftp_disconnect(struct obex_session *os, void
-> > *user_data);  int ftp_action(struct obex_session *os, void
-> > *user_data);
-> > +void ftp_progress(struct obex_session *os, void *user_data);
-> 
-> If you are not planning on using ftp_progress anywhere else please make it
-> static.
-Yes this won't be used anywhere else. I will make it static.
+Due to internal reason I made mistake.
 
-I have made changes accordingly and submitted v3 patch for the same.
+I raised it again.
 
 Thanks
-Best Regards,
-Bharat
+Chanyeol
+2014. 10. 29. =EC=98=A4=EC=A0=84 2:32=EC=97=90 "Marcel Holtmann" <marcel@ho=
+ltmann.org>=EB=8B=98=EC=9D=B4 =EC=9E=91=EC=84=B1:
 
+> Hi Chan-yeol,
+>
+> > __hci_cmd_sync_ev(), __hci_req_sync() could miss wake_up_interrupt from
+> > hci_req_sync_complete() because hci_cmd_work() workquee and its reponse
+> > could be completed before they are ready to get the signal through
+> > add_wait_queue(), set_current_state(TASK_INTERRUPTIBLE).
+> >
+> > Signed-off-by: Chan-yeol Park <chanyeol.park@samsung.com>
+> > Signed-off-by: Kyungmin Park <kyungmin.park@samsung.com>
+> > ---
+> > net/bluetooth/hci_core.c | 18 +++++++++++-------
+> > 1 file changed, 11 insertions(+), 7 deletions(-)
+> >
+> > diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+> > index cb05d7f..c008f1f 100644
+> > --- a/net/bluetooth/hci_core.c
+> > +++ b/net/bluetooth/hci_core.c
+> > @@ -1147,13 +1147,15 @@ struct sk_buff *__hci_cmd_sync_ev(struct hci_de=
+v
+> *hdev, u16 opcode, u32 plen,
+> >
+> >        hdev->req_status =3D HCI_REQ_PEND;
+> >
+> > -       err =3D hci_req_run(&req, hci_req_sync_complete);
+> > -       if (err < 0)
+> > -               return ERR_PTR(err);
+> > -
+>
+> the whole patch has whitespace damages. Please fix this.
+>
+> Regards
+>
+> Marcel
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth=
+"
+> in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>
+
+--bcaec51a77c8dab9b60506b296b0
+Content-Type: text/html; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+
+<p dir=3D"ltr">Hi Marcel</p>
+<p dir=3D"ltr">Due to internal reason I made mistake.</p>
+<p dir=3D"ltr">I raised it again.</p>
+<p dir=3D"ltr">Thanks<br>
+Chanyeol</p>
+<div class=3D"gmail_quote">2014. 10. 29. =EC=98=A4=EC=A0=84 2:32=EC=97=90 &=
+quot;Marcel Holtmann&quot; &lt;<a href=3D"mailto:marcel@holtmann.org">marce=
+l@holtmann.org</a>&gt;=EB=8B=98=EC=9D=B4 =EC=9E=91=EC=84=B1:<br type=3D"att=
+ribution"><blockquote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;bord=
+er-left:1px #ccc solid;padding-left:1ex">Hi Chan-yeol,<br>
+<br>
+&gt; __hci_cmd_sync_ev(), __hci_req_sync() could miss wake_up_interrupt fro=
+m<br>
+&gt; hci_req_sync_complete() because hci_cmd_work() workquee and its repons=
+e<br>
+&gt; could be completed before they are ready to get the signal through<br>
+&gt; add_wait_queue(), set_current_state(TASK_INTERRUPTIBLE).<br>
+&gt;<br>
+&gt; Signed-off-by: Chan-yeol Park &lt;<a href=3D"mailto:chanyeol.park@sams=
+ung.com">chanyeol.park@samsung.com</a>&gt;<br>
+&gt; Signed-off-by: Kyungmin Park &lt;<a href=3D"mailto:kyungmin.park@samsu=
+ng.com">kyungmin.park@samsung.com</a>&gt;<br>
+&gt; ---<br>
+&gt; net/bluetooth/hci_core.c | 18 +++++++++++-------<br>
+&gt; 1 file changed, 11 insertions(+), 7 deletions(-)<br>
+&gt;<br>
+&gt; diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c<br>
+&gt; index cb05d7f..c008f1f 100644<br>
+&gt; --- a/net/bluetooth/hci_core.c<br>
+&gt; +++ b/net/bluetooth/hci_core.c<br>
+&gt; @@ -1147,13 +1147,15 @@ struct sk_buff *__hci_cmd_sync_ev(struct hci_d=
+ev *hdev, u16 opcode, u32 plen,<br>
+&gt;<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 hdev-&gt;req_status =3D HCI_REQ_PEND;<br>
+&gt;<br>
+&gt; -=C2=A0 =C2=A0 =C2=A0 =C2=A0err =3D hci_req_run(&amp;req, hci_req_sync=
+_complete);<br>
+&gt; -=C2=A0 =C2=A0 =C2=A0 =C2=A0if (err &lt; 0)<br>
+&gt; -=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0return ERR_PTR=
+(err);<br>
+&gt; -<br>
+<br>
+the whole patch has whitespace damages. Please fix this.<br>
+<br>
+Regards<br>
+<br>
+Marcel<br>
+<br>
+--<br>
+To unsubscribe from this list: send the line &quot;unsubscribe linux-blueto=
+oth&quot; in<br>
+the body of a message to <a href=3D"mailto:majordomo@vger.kernel.org">major=
+domo@vger.kernel.org</a><br>
+More majordomo info at=C2=A0 <a href=3D"http://vger.kernel.org/majordomo-in=
+fo.html" target=3D"_blank">http://vger.kernel.org/majordomo-info.html</a><b=
+r>
+</blockquote></div>
+
+--bcaec51a77c8dab9b60506b296b0--
