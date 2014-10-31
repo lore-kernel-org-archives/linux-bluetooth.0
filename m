@@ -1,238 +1,188 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <CABBYNZKx4nLd+XgRWiPAbE=M5gRE35Kk6VmNZcgfRuLb-A9ynA@mail.gmail.com>
-References: <1414525067-15076-1-git-send-email-marcin.kraglak@tieto.com>
-	<1414525067-15076-2-git-send-email-marcin.kraglak@tieto.com>
-	<CABBYNZJE1QT19dMgOU5fq+rufB9TQjL0Vbzx7JRfHNZw-y60ng@mail.gmail.com>
-	<CAJLTA8j6bJCVPpEG69+s_vzgGDetGmTGfmDpvd9KkKyXNoCUQQ@mail.gmail.com>
-	<CABBYNZKa20z8QcCfe2KtEZw43sFQigPrZfP2=22xBijxkyxvXw@mail.gmail.com>
-	<CAHrH25SvtX8E6r-aNn_w1x9KrfYCaR+yG81M30B=Q510nHs98A@mail.gmail.com>
-	<CABD6X-Ltou_HJR+Aqy_LWKObFsuvTQzXLacf+3kf-O_mKnufLQ@mail.gmail.com>
-	<CABBYNZKx4nLd+XgRWiPAbE=M5gRE35Kk6VmNZcgfRuLb-A9ynA@mail.gmail.com>
-Date: Fri, 31 Oct 2014 15:03:05 +0100
-Message-ID: <CABD6X-K9c4XWKUqLj921G0gRy4Lef-PPPEt1MkTKdsGr8HCCUA@mail.gmail.com>
-Subject: Re: [PATCHv2 2/7] unit/test-gatt: Add search all primary services
- test case
-From: Marcin Kraglak <marcin.kraglak@tieto.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Arman Uguray <armansito@chromium.org>,
-	Michael Janssen <jamuraa@google.com>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+In-Reply-To: <1414637145-32919-4-git-send-email-jamuraa@chromium.org>
+References: <1414637145-32919-1-git-send-email-jamuraa@chromium.org>
+	<1414637145-32919-4-git-send-email-jamuraa@chromium.org>
+Date: Fri, 31 Oct 2014 16:00:12 +0200
+Message-ID: <CABBYNZL6QTpAza4QGLmdupf3Ye=wbMu6Uqta=NSBhNmTuUerAg@mail.gmail.com>
+Subject: Re: [PATCH BlueZ v4 03/10] attrib: Add mtu argument to g_attrib_new
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Michael Janssen <jamuraa@chromium.org>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+Hi Michael,
 
-On 30 October 2014 16:41, Luiz Augusto von Dentz <luiz.dentz@gmail.com> wrote:
-> Hi Marcin,
+On Thu, Oct 30, 2014 at 4:45 AM, Michael Janssen <jamuraa@chromium.org> wrote:
+> Instead of using the default MTU, use one passed
+> in by the user, and detect it from the channel when
+> it is created.
+> ---
+>  attrib/gattrib.c     | 10 +++-------
+>  attrib/gattrib.h     |  2 +-
+>  attrib/gatttool.c    | 17 ++++++++++++++++-
+>  attrib/interactive.c | 17 ++++++++++++++++-
+>  src/device.c         | 11 ++++++++++-
+>  5 files changed, 46 insertions(+), 11 deletions(-)
 >
-> On Thu, Oct 30, 2014 at 8:26 AM, Marcin Kraglak
-> <marcin.kraglak@tieto.com> wrote:
->> Hi Luiz, Arman
->>
->> On 29 October 2014 17:11, Arman Uguray <armansito@chromium.org> wrote:
->>> Hi Luiz,
->>>
->>> On Wed, Oct 29, 2014 at 8:25 AM, Luiz Augusto von Dentz
->>> <luiz.dentz@gmail.com> wrote:
->>>> Hi Michael,
->>>>
->>>> On Wed, Oct 29, 2014 at 5:03 PM, Michael Janssen <jamuraa@google.com> wrote:
->>>>> On Wed, Oct 29, 2014 at 5:32 AM, Luiz Augusto von Dentz
->>>>> <luiz.dentz@gmail.com> wrote:
->>>>>> Hi Marcin,
->>>>>>
->>>>>> On Tue, Oct 28, 2014 at 9:37 PM, Marcin Kraglak
->>>>>> <marcin.kraglak@tieto.com> wrote:
->>>>>>> ---
->>>>>>>  unit/test-gatt.c | 85 ++++++++++++++++++++++++++++++++++++++++++++++++++------
->>>>>>>  1 file changed, 77 insertions(+), 8 deletions(-)
->>>>>>>
->>>>>>> diff --git a/unit/test-gatt.c b/unit/test-gatt.c
->>>>>>> index bbbf9a5..f84b0fc 100644
->>>>>>> --- a/unit/test-gatt.c
->>>>>>> +++ b/unit/test-gatt.c
->>>>>>> @@ -35,8 +35,10 @@
->>>>>>>
->>>>>>>  #include <glib.h>
->>>>>>>
->>>>>>> +#include "lib/uuid.h"
->>>>>>>  #include "src/shared/util.h"
->>>>>>>  #include "src/shared/att.h"
->>>>>>> +#include "src/shared/gatt-helpers.h"
->>>>>>>  #include "src/shared/gatt-client.h"
->>>>>>>
->>>>>>>  struct test_pdu {
->>>>>>> @@ -45,14 +47,22 @@ struct test_pdu {
->>>>>>>         size_t size;
->>>>>>>  };
->>>>>>>
->>>>>>> +enum context_type {
->>>>>>> +       ATT,
->>>>>>> +       CLIENT,
->>>>>>> +       SERVER
->>>>>>> +};
->>>>>>
->>>>>> Well the ATT part of this is a bit weird, do we really need to do this
->>>>>> distinction.
->>>>>>
->>>>>>>  struct test_data {
->>>>>>>         char *test_name;
->>>>>>>         struct test_pdu *pdu_list;
->>>>>>> +       enum context_type context_type;
->>>>>>>  };
->>>>>>>
->>>>>>>  struct context {
->>>>>>>         GMainLoop *main_loop;
->>>>>>>         struct bt_gatt_client *client;
->>>>>>> +       struct bt_att *att;
->>>>>>>         guint source;
->>>>>>>         guint process;
->>>>>>>         int fd;
->>>>>>> @@ -69,13 +79,14 @@ struct context {
->>>>>>>                 .size = sizeof(data(args)),                     \
->>>>>>>         }
->>>>>>>
->>>>>>> -#define define_test(name, function, args...)                           \
->>>>>>> +#define define_test(name, function, type, args...)                     \
->>>>>>>         do {                                                            \
->>>>>>>                 const struct test_pdu pdus[] = {                        \
->>>>>>>                         args, { }                                       \
->>>>>>>                 };                                                      \
->>>>>>>                 static struct test_data data;                           \
->>>>>>>                 data.test_name = g_strdup(name);                        \
->>>>>>> +               data.context_type = type;                               \
->>>>>>>                 data.pdu_list = g_malloc(sizeof(pdus));                 \
->>>>>>>                 memcpy(data.pdu_list, pdus, sizeof(pdus));              \
->>>>>>>                 g_test_add_data_func(name, &data, function);            \
->>>>>>> @@ -182,6 +193,7 @@ static void gatt_debug(const char *str, void *user_data)
->>>>>>>  static struct context *create_context(uint16_t mtu, gconstpointer data)
->>>>>>>  {
->>>>>>>         struct context *context = g_new0(struct context, 1);
->>>>>>> +       const struct test_data *test_data = data;
->>>>>>>         GIOChannel *channel;
->>>>>>>         int err, sv[2];
->>>>>>>         struct bt_att *att;
->>>>>>> @@ -195,12 +207,25 @@ static struct context *create_context(uint16_t mtu, gconstpointer data)
->>>>>>>         att = bt_att_new(sv[0]);
->>>>>>>         g_assert(att);
->>>>>>>
->>>>>>> -       context->client = bt_gatt_client_new(att, mtu);
->>>>>>> -       g_assert(context->client);
->>>>>>> +       switch (test_data->context_type) {
->>>>>>> +       case ATT:
->>>>>>> +               context->att = att;
->>>>>>>
->>>>>>> -       if (g_test_verbose())
->>>>>>> -               bt_gatt_client_set_debug(context->client, gatt_debug, "gatt:",
->>>>>>> -                                                                       NULL);
->>>>>>> +               bt_gatt_exchange_mtu(context->att, mtu, NULL, NULL, NULL);
->>>>>>> +               break;
->>>>>>> +       case CLIENT:
->>>>>>> +               context->client = bt_gatt_client_new(att, mtu);
->>>>>>> +               g_assert(context->client);
->>>>>>> +
->>>>>>> +               if (g_test_verbose())
->>>>>>> +                       bt_gatt_client_set_debug(context->client, gatt_debug,
->>>>>>> +                                                               "gatt:", NULL);
->>>>>>> +
->>>>>>> +               bt_att_unref(att);
->>>>>>> +               break;
->>>>>>> +       default:
->>>>>>> +               break;
->>>>>>> +       }
->>>>>>>
->>>>>>>         channel = g_io_channel_unix_new(sv[1]);
->>>>>>>
->>>>>>> @@ -214,7 +239,6 @@ static struct context *create_context(uint16_t mtu, gconstpointer data)
->>>>>>>         g_assert(context->source > 0);
->>>>>>>
->>>>>>>         g_io_channel_unref(channel);
->>>>>>> -       bt_att_unref(att);
->>>>>>>
->>>>>>>         context->fd = sv[1];
->>>>>>>         context->data = data;
->>>>>>> @@ -222,6 +246,17 @@ static struct context *create_context(uint16_t mtu, gconstpointer data)
->>>>>>>         return context;
->>>>>>>  }
->>>>>>>
->>>>>>> +static void primary_cb(bool success, uint8_t att_ecode,
->>>>>>> +                                               struct bt_gatt_result *result,
->>>>>>> +                                               void *user_data)
->>>>>>> +{
->>>>>>> +       struct context *context = user_data;
->>>>>>> +
->>>>>>> +       g_assert(success);
->>>>>>> +
->>>>>>> +       context_quit(context);
->>>>>>> +}
->>>>>>> +
->>>>>>>  static void destroy_context(struct context *context)
->>>>>>>  {
->>>>>>>         if (context->source > 0)
->>>>>>> @@ -229,6 +264,9 @@ static void destroy_context(struct context *context)
->>>>>>>
->>>>>>>         bt_gatt_client_unref(context->client);
->>>>>>>
->>>>>>> +       if (context->att)
->>>>>>> +               bt_att_unref(context->att);
->>>>>>> +
->>>>>>>         g_main_loop_unref(context->main_loop);
->>>>>>>
->>>>>>>         test_free(context->data);
->>>>>>> @@ -249,6 +287,16 @@ static void test_client(gconstpointer data)
->>>>>>>         execute_context(context);
->>>>>>>  }
->>>>>>>
->>>>>>> +static void test_search_primary(gconstpointer data)
->>>>>>> +{
->>>>>>> +       struct context *context = create_context(512, data);
->>>>>>> +
->>>>>>> +       bt_gatt_discover_all_primary_services(context->att, NULL, primary_cb,
->>>>>>> +                                                               context, NULL);
->>>>>>
->>>>>> Doesn't bt_gatt_client does the same here, I guess I missed this
->>>>>> detail in the first time but if this is just testing client side then
->>>>>> it should use bt_gatt_client and if that cannot be tested we probably
->>>>>> have a problem with our API. I guess PTS would just pass if we do more
->>>>>> than search the primary services, so things like setting the MTU etc
->>>>>> should not be a problem here.
->>>>>
->>>>> Specifically setting the MTU is allowed, but the reason to avoid using
->>>>> bt_gatt_client_new/init here is to avoid the automatic service
->>>>> discovery.  This is probably a good idea at least for testing the
->>>>> different types of discovery.  (is bt_gatt_client  Alternately maybe
->>>>> just test the type of discovery used by bt_gatt_client.  When
->>>>> implementing the read value tests, the auto-discovery of
->>>>> bt_gatt_client may make the test data longer because it needs to be
->>>>> included in every one.
->>>>
->>>> Isn't it what we want? To run exactly as it would be run against PTS
->>>> so we avoid surprises? Not only this avoid auto-discovery but the
->>>> caching done by bt_gatt_client which we would probably have to test
->>>> separately, so it is much more code that we exercise if we test
->>>> bt_gatt_client at the expense of a little bit more PDUs. Perhaps we
->>>> could have a define containing the common PDUs that auto-discovery
->>>> causes so the upcoming tests don't need to duplicate these PDUs.
->>>>
->>
->> I agree we test much more code while testing gatt-client. My idea was
->> to use bt_att in GAD group,
->> because we need to send specified packets and it is more like testing
->> protocol than profile.
->> Whole discovery using gatt-client will be tested in most of GAR and
->> GAW test cases.
->> I'm sure that it will be bigger part of unit tests.
+> diff --git a/attrib/gattrib.c b/attrib/gattrib.c
+> index fa41ade..a6511a2 100644
+> --- a/attrib/gattrib.c
+> +++ b/attrib/gattrib.c
+> @@ -473,11 +473,9 @@ done:
+>         return TRUE;
+>  }
 >
-> Fair enough, but please add the test description to the commits so we
-> are consistent, for example:
+> -GAttrib *g_attrib_new(GIOChannel *io)
+> +GAttrib *g_attrib_new(GIOChannel *io, guint16 mtu)
+>  {
+>         struct _GAttrib *attrib;
+> -       uint16_t att_mtu;
+> -       uint16_t cid;
 >
-> unit/test-gatt: Add <test name> test
+>         g_io_channel_set_encoding(io, NULL, NULL);
+>         g_io_channel_set_buffered(io, FALSE);
+> @@ -486,10 +484,8 @@ GAttrib *g_attrib_new(GIOChannel *io)
+>         if (attrib == NULL)
+>                 return NULL;
 >
-> Verify that a Generic Attribute Profile client discovers Primary
-> Services in a GATT server.
-I've added descriptions to commit messages
+> -       att_mtu = ATT_DEFAULT_LE_MTU;
+> -
+> -       attrib->buf = g_malloc0(att_mtu);
+> -       attrib->buflen = att_mtu;
+> +       attrib->buf = g_malloc0(mtu);
+> +       attrib->buflen = mtu;
+>
+>         attrib->io = g_io_channel_ref(io);
+>         attrib->requests = g_queue_new();
+> diff --git a/attrib/gattrib.h b/attrib/gattrib.h
+> index 18df2ad..99b8b37 100644
+> --- a/attrib/gattrib.h
+> +++ b/attrib/gattrib.h
+> @@ -42,7 +42,7 @@ typedef void (*GAttribDebugFunc)(const char *str, gpointer user_data);
+>  typedef void (*GAttribNotifyFunc)(const guint8 *pdu, guint16 len,
+>                                                         gpointer user_data);
+>
+> -GAttrib *g_attrib_new(GIOChannel *io);
+> +GAttrib *g_attrib_new(GIOChannel *io, guint16 mtu);
+>  GAttrib *g_attrib_ref(GAttrib *attrib);
+>  void g_attrib_unref(GAttrib *attrib);
+>
+> diff --git a/attrib/gatttool.c b/attrib/gatttool.c
+> index db5da62..8f92d62 100644
+> --- a/attrib/gatttool.c
+> +++ b/attrib/gatttool.c
+> @@ -123,6 +123,9 @@ static gboolean listen_start(gpointer user_data)
+>  static void connect_cb(GIOChannel *io, GError *err, gpointer user_data)
+>  {
+>         GAttrib *attrib;
+> +       uint16_t mtu;
+> +       uint16_t cid;
+> +       GError *gerr = NULL;
+>
+>         if (err) {
+>                 g_printerr("%s\n", err->message);
+> @@ -130,7 +133,19 @@ static void connect_cb(GIOChannel *io, GError *err, gpointer user_data)
+>                 g_main_loop_quit(event_loop);
+>         }
+>
+> -       attrib = g_attrib_new(io);
+> +       bt_io_get(io, &gerr, BT_IO_OPT_IMTU, &mtu,
+> +                               BT_IO_OPT_CID, &cid, BT_IO_OPT_INVALID);
+> +
+> +       if (gerr) {
+> +               g_printerr("Can't detect MTU, using default: %s", gerr->message);
+> +               g_error_free(gerr);
+> +               mtu = ATT_DEFAULT_LE_MTU;
+> +       }
+> +
+> +       if (cid == ATT_CID)
+> +               mtu = ATT_DEFAULT_LE_MTU;
+> +
+> +       attrib = g_attrib_new(io, mtu);
+>
+>         if (opt_listen)
+>                 g_idle_add(listen_start, attrib);
+> diff --git a/attrib/interactive.c b/attrib/interactive.c
+> index 08f39f7..7911ba5 100644
+> --- a/attrib/interactive.c
+> +++ b/attrib/interactive.c
+> @@ -150,13 +150,28 @@ static void events_handler(const uint8_t *pdu, uint16_t len, gpointer user_data)
+>
+>  static void connect_cb(GIOChannel *io, GError *err, gpointer user_data)
+>  {
+> +       uint16_t mtu;
+> +       uint16_t cid;
+> +
+>         if (err) {
+>                 set_state(STATE_DISCONNECTED);
+>                 error("%s\n", err->message);
+>                 return;
+>         }
+>
+> -       attrib = g_attrib_new(iochannel);
+> +       bt_io_get(io, &err, BT_IO_OPT_IMTU, &mtu,
+> +                               BT_IO_OPT_CID, &cid, BT_IO_OPT_INVALID);
+> +
+> +       if (err) {
+> +               g_printerr("Can't detect MTU, using default: %s", err->message);
+> +               g_error_free(err);
+> +               mtu = ATT_DEFAULT_LE_MTU;
+> +       }
+> +
+> +       if (cid == ATT_CID)
+> +               mtu = ATT_DEFAULT_LE_MTU;
+> +
+> +       attrib = g_attrib_new(iochannel, mtu);
+>         g_attrib_register(attrib, ATT_OP_HANDLE_NOTIFY, GATTRIB_ALL_HANDLES,
+>                                                 events_handler, attrib, NULL);
+>         g_attrib_register(attrib, ATT_OP_HANDLE_IND, GATTRIB_ALL_HANDLES,
+> diff --git a/src/device.c b/src/device.c
+> index 875a5c5..0925951 100644
+> --- a/src/device.c
+> +++ b/src/device.c
+> @@ -3627,11 +3627,17 @@ bool device_attach_attrib(struct btd_device *dev, GIOChannel *io)
+>         GError *gerr = NULL;
+>         GAttrib *attrib;
+>         BtIOSecLevel sec_level;
+> +       uint16_t mtu;
+> +       uint16_t cid;
+>
+>         bt_io_get(io, &gerr, BT_IO_OPT_SEC_LEVEL, &sec_level,
+> +                                               BT_IO_OPT_IMTU, &mtu,
+> +                                               BT_IO_OPT_CID, &cid,
+>                                                 BT_IO_OPT_INVALID);
+> +
+>         if (gerr) {
+>                 error("bt_io_get: %s", gerr->message);
+> +               mtu = ATT_DEFAULT_LE_MTU;
+>                 g_error_free(gerr);
+>                 return false;
+>         }
+> @@ -3649,7 +3655,10 @@ bool device_attach_attrib(struct btd_device *dev, GIOChannel *io)
+>                 }
+>         }
+>
+> -       attrib = g_attrib_new(io);
+> +       if (cid == ATT_CID)
+> +               mtu = ATT_DEFAULT_LE_MTU;
+> +
+> +       attrib = g_attrib_new(io, mtu);
+>         if (!attrib) {
+>                 error("Unable to create new GAttrib instance");
+>                 return false;
+> --
+> 2.1.0.rc2.206.gedb03e5
 
-BR
-Marcin
+I have to stop at this one since I have made a fix to the previous
+patch that did not compile cleanly this one needs rebasing now, this
+actually have some other compilation problems as well so please make
+sure you have everything enable, run bootstrap-configure, also you can
+make sure the patches compile separately by doing: git rebase ...
+--exec make
+
+
+-- 
+Luiz Augusto von Dentz
