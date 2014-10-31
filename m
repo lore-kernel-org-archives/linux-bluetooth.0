@@ -1,50 +1,49 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 31 Oct 2014 16:51:11 -0400 (EDT)
-From: Alan Stern <stern@rowland.harvard.edu>
-To: Naveen Kumar Parna <pnaveenkos@gmail.com>
-cc: Oliver Neukum <oneukum@suse.de>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	<linux-usb@vger.kernel.org>, <acho@suse.com>
-Subject: Re: btusb_intr_complete returns -EPIPE
-In-Reply-To: <CAG0bkvL-qy+Wvp7q39TOaQ1dZDd0PKyoXHjO=5TrJvdC8byr8A@mail.gmail.com>
-Message-ID: <Pine.LNX.4.44L0.1410311637550.1833-100000@iolanthe.rowland.org>
+Date: Fri, 31 Oct 2014 16:06:03 -0400
+From: "John W. Linville" <linville@tuxdriver.com>
+To: linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: pull request: bluetooth-next 2014-10-31
+Message-ID: <20141031200603.GD3768@tuxdriver.com>
+References: <20141031182803.GA5772@t440s.P-661HNU-F1>
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20141031182803.GA5772@t440s.P-661HNU-F1>
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Wed, 29 Oct 2014, Naveen Kumar Parna wrote:
-
-> Split packet transactions are hidden. I could see them by clicking on
-> the (Show/Hide Split transactions) button. For INT IN, I could see
-> only Start Split packet.
+On Fri, Oct 31, 2014 at 08:28:03PM +0200, Johan Hedberg wrote:
+> Hi John,
 > 
-> I attached([2014-10-28 session 144012] Trace0003.rar) complete log for
-> this scenario.
-
-How come the log doesn't contain any SOF packets?
-
-> SSPLIT IN transaction      114         1
-> HS           No data                884.562 264 267
+> Here's the first bluetooth-next pull request for 3.19. The vast majority
+> of patches are for ieee802154 from Alexander Aring with various fixes
+> and cleanups. There are also several LE/SMP fixes as well as improved
+> support for handling LE devices that have lost their pairing information
+> (the patches from Alfonso). Jukka provides a couple of stability fixes
+> for 6lowpan and Szymon conformance fixes for RFCOMM. For the HCI drivers
+> we have one new USB ID for an Acer controller as well as a reset
+> handling fix for H5.
 > 
-> SSPLIT IN transaction      115         1
-> HS           No data                884.562 265 217
+> Please let me know if there are any issues pulling. Thanks.
 > 
-> SSPLIT IN transaction      116         1
-> HS           No data                884.562 285 417
+> Johan
 > 
-> SSPLIT IN transaction      117         1
-> HS           No data                884.562 286 467
+> ---
+> The following changes since commit 61ed53deb1c6a4386d8710dbbfcee8779c381931:
+> 
+>   Merge tag 'ntb-3.18' of git://github.com/jonmason/ntb (2014-10-19 12:58:22 -0700)
+> 
+> are available in the git repository at:
+> 
+> 
+>   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git for-upstream
+> 
+> for you to fetch changes up to b509c02d0f31639dda90f9b7269668b86c9b25ef:
+> 
+>   Bluetooth: HCI H5 peer reset detection (2014-10-31 19:54:34 +0200)
 
-I see what you mean -- the log doesn't contain any CSPLIT transactions 
-for the interrupt endpoints.  Only SSPLIT.
+Pulling now...
 
-I'll need to see the scheduling information for these endpoints.  
-You'll have to run a 3.13 or later kernel; then the important files 
-will be under /sys/kernel/debug/usb/ehci/X/, where X is the PCI address 
-of the EHCI controller you are using.
-
-Copy the files in that directory while the test is running.
-
-Alan Stern
-
+-- 
+John W. Linville		Someday the world will need a hero, and you
+linville@tuxdriver.com			might be all we have.  Be ready.
