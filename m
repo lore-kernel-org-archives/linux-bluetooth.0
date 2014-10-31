@@ -1,43 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Fri, 31 Oct 2014 12:34:56 +0200
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCHv2 1/2] gatt: Fix wrong function exit
+Message-ID: <20141031103454.GA13697@aemeltch-mobl1.fi.intel.com>
+References: <1414509602-2534-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <CAHrH25TPXh65KVbofwR=-44TuWkOB+mK6Zu30qVqRQCNXKP+QQ@mail.gmail.com>
-References: <1414677465-19862-1-git-send-email-luiz.dentz@gmail.com>
-	<1414677465-19862-8-git-send-email-luiz.dentz@gmail.com>
-	<CAHrH25TPXh65KVbofwR=-44TuWkOB+mK6Zu30qVqRQCNXKP+QQ@mail.gmail.com>
-Date: Fri, 31 Oct 2014 13:00:26 +0200
-Message-ID: <CABBYNZKMU0PJyKTQkDcTWV47TH82_d34Hi8F6YX8KsM3MLDA6Q@mail.gmail.com>
-Subject: Re: [PATCH BlueZ v3 8/9] shared/gatt-db: Add gatt_db_attribute_get_start_handle
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Arman Uguray <armansito@chromium.org>
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1414509602-2534-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Arman,
+ping
 
-On Thu, Oct 30, 2014 at 7:56 PM, Arman Uguray <armansito@chromium.org> wrote:
-> Hi Luiz,
->
->> On Thu, Oct 30, 2014 at 6:57 AM, Luiz Augusto von Dentz <luiz.dentz@gmail.com> wrote:
->> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->>
->> ---
->>  src/shared/gatt-db.c | 5 ++++-
->>  1 file changed, 4 insertions(+), 1 deletion(-)
->>
->> diff --git a/src/shared/gatt-db.c b/src/shared/gatt-db.c
->> index 6296a82..60a1b23 100644
->> --- a/src/shared/gatt-db.c
->> +++ b/src/shared/gatt-db.c
->> @@ -833,7 +833,10 @@ struct gatt_db_attribute *gatt_db_get_attribute(struct gatt_db *db,
->>
->>  uint16_t gatt_db_attribute_get_start_handle(struct gatt_db_attribute *attrib)
->
-> Expanding on the discussion about gatt_db_attribute_get_end_handle,
-> should we then rename this function to gatt_db_attribute_get_handle?
-
-Yep.
-
--- 
-Luiz Augusto von Dentz
+On Tue, Oct 28, 2014 at 05:20:01PM +0200, Andrei Emeltchenko wrote:
+> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> 
+> ---
+>  src/shared/gatt-helpers.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/src/shared/gatt-helpers.c b/src/shared/gatt-helpers.c
+> index d751d5a..4f53de3 100644
+> --- a/src/shared/gatt-helpers.c
+> +++ b/src/shared/gatt-helpers.c
+> @@ -1029,7 +1029,7 @@ static void discover_included_cb(uint8_t opcode, const void *pdu,
+>  		data = new_read_included(cur_result);
+>  		if (!data) {
+>  			success = false;
+> -			goto done;
+> +			goto failed;
+>  		}
+>  
+>  		read_included(data);
+> -- 
+> 1.9.1
+> 
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
