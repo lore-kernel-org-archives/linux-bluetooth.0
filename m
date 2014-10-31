@@ -2,103 +2,62 @@ Return-Path: <cyrus@holtmann.org>
 From: Michael Janssen <jamuraa@chromium.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Michael Janssen <jamuraa@chromium.org>
-Subject: [PATCH BlueZ v5 6/8] unit/gattrib: Check expected PDUs were delivered
-Date: Fri, 31 Oct 2014 11:14:57 -0700
-Message-Id: <1414779299-18197-7-git-send-email-jamuraa@chromium.org>
+Subject: [PATCH BlueZ v5 5/8] attrib: fix GATTRIB_ALL_REQS behavior
+Date: Fri, 31 Oct 2014 11:14:56 -0700
+Message-Id: <1414779299-18197-6-git-send-email-jamuraa@chromium.org>
 In-Reply-To: <1414779299-18197-1-git-send-email-jamuraa@chromium.org>
 References: <1414779299-18197-1-git-send-email-jamuraa@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Check that the PDUs that we expect to receive when
-registering for events have been delivered.
+g_attrib_register(..., GATTRIB_ALL_REQS, ...) behavior would previously
+include indications, this fixes it to only include requests and
+commands.
 ---
- unit/test-gattrib.c | 35 ++++++++++++++++++++++++++++-------
- 1 file changed, 28 insertions(+), 7 deletions(-)
+ attrib/gattrib.c | 23 ++++++++++++++++++++++-
+ 1 file changed, 22 insertions(+), 1 deletion(-)
 
-diff --git a/unit/test-gattrib.c b/unit/test-gattrib.c
-index 473112c..326478d 100644
---- a/unit/test-gattrib.c
-+++ b/unit/test-gattrib.c
-@@ -404,7 +404,7 @@ static void notify_canary_expect(const guint8 *pdu, guint16 len, gpointer data)
- static void test_register(struct context *cxt, gconstpointer user_data)
- {
- 	guint reg_id;
--	gboolean success;
-+	gboolean canceled;
- 	struct test_pdu pdus[] = {
- 		/* Unmatched by any (GATTRIB_ALL_EVENTS) */
- 		PDU_MTU_RESP,
-@@ -434,6 +434,7 @@ static void test_register(struct context *cxt, gconstpointer user_data)
- 		{ },
- 	};
- 	struct test_pdu followed_ind_pdus[] = { PDU_IND_DATA, { } };
-+	struct test_pdu *current_pdu;
- 
- 	/*
- 	 * Without registering anything, should be able to ignore everything but
-@@ -446,7 +447,12 @@ static void test_register(struct context *cxt, gconstpointer user_data)
- 
- 	send_test_pdus(cxt, pdus);
- 
--	g_attrib_unregister(cxt->att, reg_id);
-+	canceled = g_attrib_unregister(cxt->att, reg_id);
-+
-+	g_assert(canceled);
-+
-+	for (current_pdu = pdus; current_pdu->valid; current_pdu++)
-+		g_assert(current_pdu->received);
- 
- 	if (g_test_verbose())
- 		g_print("ALL_REQS, ALL_HANDLES\r\n");
-@@ -457,7 +463,12 @@ static void test_register(struct context *cxt, gconstpointer user_data)
- 
- 	send_test_pdus(cxt, pdus);
- 
--	g_attrib_unregister(cxt->att, reg_id);
-+	canceled = g_attrib_unregister(cxt->att, reg_id);
-+
-+	g_assert(canceled);
-+
-+	for (current_pdu = req_pdus; current_pdu->valid; current_pdu++)
-+		g_assert(current_pdu->received);
- 
- 	if (g_test_verbose())
- 		g_print("IND, ALL_HANDLES\r\n");
-@@ -468,7 +479,12 @@ static void test_register(struct context *cxt, gconstpointer user_data)
- 
- 	send_test_pdus(cxt, pdus);
- 
--	g_attrib_unregister(cxt->att, reg_id);
-+	canceled = g_attrib_unregister(cxt->att, reg_id);
-+
-+	g_assert(canceled);
-+
-+	for (current_pdu = all_ind_pdus; current_pdu->valid; current_pdu++)
-+		g_assert(current_pdu->received);
- 
- 	if (g_test_verbose())
- 		g_print("IND, 0x0014\r\n");
-@@ -479,11 +495,16 @@ static void test_register(struct context *cxt, gconstpointer user_data)
- 
- 	send_test_pdus(cxt, pdus);
- 
--	g_attrib_unregister(cxt->att, reg_id);
-+	canceled = g_attrib_unregister(cxt->att, reg_id);
-+
-+	g_assert(canceled);
- 
--	success = g_attrib_unregister(cxt->att, reg_id);
-+	for (current_pdu = followed_ind_pdus; current_pdu->valid; current_pdu++)
-+		g_assert(current_pdu->received);
- 
--	g_assert(!success);
-+	canceled = g_attrib_unregister(cxt->att, reg_id);
-+
-+	g_assert(!canceled);
+diff --git a/attrib/gattrib.c b/attrib/gattrib.c
+index a65d1ca..f678435 100644
+--- a/attrib/gattrib.c
++++ b/attrib/gattrib.c
+@@ -147,6 +147,27 @@ static bool is_response(guint8 opcode)
+ 	return false;
  }
  
- static void test_buffers(struct context *cxt, gconstpointer unused)
++static bool is_request(guint8 opcode)
++{
++	switch (opcode) {
++	case ATT_OP_MTU_REQ:
++	case ATT_OP_FIND_INFO_REQ:
++	case ATT_OP_FIND_BY_TYPE_REQ:
++	case ATT_OP_READ_BY_TYPE_REQ:
++	case ATT_OP_READ_REQ:
++	case ATT_OP_READ_BLOB_REQ:
++	case ATT_OP_READ_MULTI_REQ:
++	case ATT_OP_READ_BY_GROUP_REQ:
++	case ATT_OP_WRITE_REQ:
++	case ATT_OP_WRITE_CMD:
++	case ATT_OP_PREP_WRITE_REQ:
++	case ATT_OP_EXEC_WRITE_REQ:
++		return true;
++	}
++
++	return false;
++}
++
+ GAttrib *g_attrib_ref(GAttrib *attrib)
+ {
+ 	int refs;
+@@ -373,7 +394,7 @@ static bool match_event(struct event *evt, const uint8_t *pdu, gsize len)
+ 	if (evt->expected == GATTRIB_ALL_EVENTS)
+ 		return true;
+ 
+-	if (!is_response(pdu[0]) && evt->expected == GATTRIB_ALL_REQS)
++	if (is_request(pdu[0]) && evt->expected == GATTRIB_ALL_REQS)
+ 		return true;
+ 
+ 	if (evt->expected == pdu[0] && evt->handle == GATTRIB_ALL_HANDLES)
 -- 
 2.1.0.rc2.206.gedb03e5
 
