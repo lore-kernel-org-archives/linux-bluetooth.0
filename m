@@ -1,96 +1,58 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcin Kraglak <marcin.kraglak@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] shared/att: Call destroy callback while canceling request.
-Date: Fri, 31 Oct 2014 09:59:23 +0100
-Message-Id: <1414745963-1622-1-git-send-email-marcin.kraglak@tieto.com>
+Subject: [PATCHv3 5/7] unit/test-gatt: Add TP/GAD/CL/BV-02-C-2 test
+Date: Fri, 31 Oct 2014 09:52:01 +0100
+Message-Id: <1414745523-31699-5-git-send-email-marcin.kraglak@tieto.com>
+In-Reply-To: <1414745523-31699-1-git-send-email-marcin.kraglak@tieto.com>
+References: <1414745523-31699-1-git-send-email-marcin.kraglak@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This should be called even if we want leave send_op as pending_req
-or pending_ind.
+Verify that a Generic Attribute Profile client
+can discover Primary Services selected by service
+using 128-bit UUID.
 ---
- src/shared/att.c | 39 +++++++++++++++++++++++++++------------
- 1 file changed, 27 insertions(+), 12 deletions(-)
+ unit/test-gatt.c | 20 ++++++++++++++++++++
+ 1 file changed, 20 insertions(+)
 
-diff --git a/src/shared/att.c b/src/shared/att.c
-index c70d396..f5a691d 100644
---- a/src/shared/att.c
-+++ b/src/shared/att.c
-@@ -836,6 +836,16 @@ void bt_att_unref(struct bt_att *att)
- 	if (att->debug_destroy)
- 		att->debug_destroy(att->debug_data);
+diff --git a/unit/test-gatt.c b/unit/test-gatt.c
+index 1167d4d..239f471 100644
+--- a/unit/test-gatt.c
++++ b/unit/test-gatt.c
+@@ -99,6 +99,12 @@ static bt_uuid_t uuid_16 = {
+ 	.value.u16 = 0x1800
+ };
  
-+	if (att->pending_req) {
-+		destroy_att_send_op(att->pending_req);
-+		att->pending_req = NULL;
-+	}
++static bt_uuid_t uuid_128 = {
++	.type = BT_UUID128,
++	.value.u128.data = {0x00, 0x00, 0x18, 0x0d, 0x00, 0x00, 0x10, 0x00,
++				0x80, 0x00, 0x00, 0x80, 0x5f, 0x9b, 0x34, 0xfb}
++};
 +
-+	if (att->pending_ind) {
-+		destroy_att_send_op(att->pending_ind);
-+		att->pending_ind = NULL;
-+	}
-+
- 	free(att->buf);
- 	att->buf = NULL;
- 
-@@ -1021,6 +1031,15 @@ static bool match_op_id(const void *a, const void *b)
- 	return op->id == id;
- }
- 
-+static void cancel_att_send_op(struct att_send_op *op) {
-+	if (op->destroy)
-+		op->destroy(op->user_data);
-+
-+	op->user_data = NULL;
-+	op->callback = NULL;
-+	op->destroy = NULL;
-+}
-+
- bool bt_att_cancel(struct bt_att *att, unsigned int id)
+ static void test_debug(const char *str, void *user_data)
  {
- 	struct att_send_op *op;
-@@ -1029,16 +1048,14 @@ bool bt_att_cancel(struct bt_att *att, unsigned int id)
- 		return false;
+ 	const char *prefix = user_data;
+@@ -349,5 +355,19 @@ int main(int argc, char *argv[])
+ 					0x18),
+ 			raw_pdu(0x01, 0x06, 0x08, 0x00, 0x0a));
  
- 	if (att->pending_req && att->pending_req->id == id) {
--		/* Don't cancel the pending request; remove it's handlers */
--		att->pending_req->callback = NULL;
--		att->pending_req->destroy = NULL;
-+		/* Don't destroy the pending request; remove it's handlers */
-+		cancel_att_send_op(att->pending_req);
- 		return true;
- 	}
- 
- 	if (att->pending_ind && att->pending_ind->id == id) {
--		/* Don't cancel the pending indication; remove it's handlers */
--		att->pending_ind->callback = NULL;
--		att->pending_ind->destroy = NULL;
-+		/* Don't destroy the pending indication; remove it's handlers */
-+		cancel_att_send_op(att->pending_ind);
- 		return true;
- 	}
- 
-@@ -1075,15 +1092,13 @@ bool bt_att_cancel_all(struct bt_att *att)
- 	queue_remove_all(att->write_queue, NULL, NULL, destroy_att_send_op);
- 
- 	if (att->pending_req) {
--		/* Don't cancel the pending request; remove it's handlers */
--		att->pending_req->callback = NULL;
--		att->pending_req->destroy = NULL;
-+		/* Don't destroy the pending request; remove it's handlers */
-+		cancel_att_send_op(att->pending_req);
- 	}
- 
- 	if (att->pending_ind) {
--		/* Don't cancel the pending indication; remove it's handlers */
--		att->pending_ind->callback = NULL;
--		att->pending_ind->destroy = NULL;
-+		/* Don't destroy the pending indication; remove it's handlers */
-+		cancel_att_send_op(att->pending_ind);
- 	}
- 
- 	return true;
++	define_test("/TP/GAD/CL/BV-02-C-2", test_search_primary, ATT, &uuid_128,
++			raw_pdu(0x02, 0x00, 0x02),
++			raw_pdu(0x03, 0x00, 0x02),
++			raw_pdu(06, 0x01, 0x00, 0xff, 0xff, 0x00, 0x28, 0xfb,
++					0x34, 0x9b, 0x5f, 0x80, 0x00, 0x00,
++					0x80, 0x00, 0x10, 0x00, 0x00, 0x0d,
++					0x18, 0x00, 0x00),
++			raw_pdu(0x07, 0x10, 0x00, 0x17, 0x00),
++			raw_pdu(06, 0x18, 0x00, 0xff, 0xff, 0x00, 0x28, 0xfb,
++					0x34, 0x9b, 0x5f, 0x80, 0x00, 0x00,
++					0x80, 0x00, 0x10, 0x00, 0x00, 0x0d,
++					0x18, 0x00, 0x00),
++			raw_pdu(0x01, 0x06, 0x08, 0x00, 0x0a));
++
+ 	return g_test_run();
+ }
 -- 
 1.9.3
 
