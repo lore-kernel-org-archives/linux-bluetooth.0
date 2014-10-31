@@ -1,65 +1,103 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <5453A5D5.3060801@intel.com>
-Date: Fri, 31 Oct 2014 16:08:05 +0100
-From: Loic Poulain <loic.poulain@intel.com>
 MIME-Version: 1.0
-To: marcel@holtmann.org, gustavo@padovan.org,
-	linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: HCI H5 peer reset detection
-References: <1412780068-19449-1-git-send-email-loic.poulain@intel.com> <20141031083908.GB18888@t440s.P-661HNU-F1>
-In-Reply-To: <20141031083908.GB18888@t440s.P-661HNU-F1>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+In-Reply-To: <1414681164-27682-1-git-send-email-bharat.panda@samsung.com>
+References: <1414681164-27682-1-git-send-email-bharat.panda@samsung.com>
+Date: Fri, 31 Oct 2014 17:04:24 +0200
+Message-ID: <CABBYNZ+L-OYKDmuywAQJroGJsRUojJM-Pn6LgZxtfsrTRyy_vg@mail.gmail.com>
+Subject: Re: [PATCH v3] obexd/ftp: Update ftp transfer progress
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Bharat Panda <bharat.panda@samsung.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	cpgs@samsung.com
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+Hi,
 
-This is just the expected behavior as described int the specification:
-
-UART Spec says:
-If the UART synchronization is lost in the communication from Host to Host
-Controller, then the Host Controller shall send a Hardware Error Event 
-to tell
-the Host about the synchronization error. The Host Controller will then 
-expect to
-receive an HCI_Reset command from the Host in order to perform a reset. The
-Host Controller will also use the HCI_Reset command in the byte stream from
-Host to Host Controller to re-synchronize.
-
-H5 part says:
-If a SYNC message is received while in the Active State, it is assumed 
-that the
-peer device has reset. The local device should therefore perform a full 
-reset of
-the upper stack, and start Link Establishment again at the Uninitialized 
-State.
-
-So, hardware error seems the best way to warn host stack about the H5 
-controller
-reset.
-
-Regarding the "upper stack", I know that Bluedroid restarts on hardware 
-error, but
-I ignore the Bluez behavior.
-
-Regards,
-Loic
-
-On 31/10/2014 09:39, Johan Hedberg wrote:
-> Hi Loic,
+On Thu, Oct 30, 2014 at 4:59 PM, Bharat Panda <bharat.panda@samsung.com> wrote:
+> Enables transfer management for FTP
+> ---
+>  obexd/plugins/ftp.c | 23 +++++++++++++++++++++++
+>  1 file changed, 23 insertions(+)
 >
-> On Wed, Oct 08, 2014, Loic Poulain wrote:
->> This patch resets the HCI H5 driver data/state to unitialized and
->> reports an HCI hardware error event to notify the upper stack that
->> HCI synchronization has been lost. H5 will be re-synchronized and
->> upper stack should generate an HCI Reset command.
-> I couldn't find anywhere where we'd currently do this "upper stack"
-> behavior that you describe (there . Did you have some follow-up patches to
-> implement that?
+> diff --git a/obexd/plugins/ftp.c b/obexd/plugins/ftp.c
+> index 773861d..35497a2 100644
+> --- a/obexd/plugins/ftp.c
+> +++ b/obexd/plugins/ftp.c
+> @@ -59,6 +59,7 @@ static const uint8_t FTP_TARGET[TARGET_SIZE] = {
 >
-> Johan
+>  struct ftp_session {
+>         struct obex_session *os;
+> +       struct obex_transfer *transfer;
+>         char *folder;
+>  };
+>
+> @@ -116,6 +117,8 @@ void *ftp_connect(struct obex_session *os, int *err)
+>         if (err)
+>                 *err = 0;
+>
+> +       ftp->transfer = manager_register_transfer(os);
+> +
+>         DBG("session %p created", ftp);
+>
+>         return ftp;
+> @@ -136,6 +139,13 @@ int ftp_get(struct obex_session *os, void *user_data)
+>         if (ret < 0)
+>                 return ret;
+>
+> +       /*
+> +        * Below code takes care about the actual file transfer
+> +        * not other ftp operations.
+> +        */
+> +       if (type == NULL)
+> +               manager_emit_transfer_started(ftp->transfer);
+> +
+>         return 0;
+>  }
+>
+> @@ -181,6 +191,9 @@ int ftp_chkput(struct obex_session *os, void *user_data)
+>
+>         ret = obex_put_stream_start(os, path);
+>
+> +       if (ret == 0)
+> +               manager_emit_transfer_started(ftp->transfer);
+> +
+>         g_free(path);
+>
+>         return ret;
+> @@ -471,16 +484,26 @@ void ftp_disconnect(struct obex_session *os, void *user_data)
+>
+>         manager_unregister_session(os);
+>
+> +       manager_unregister_transfer(ftp->transfer);
+> +
+>         g_free(ftp->folder);
+>         g_free(ftp);
+>  }
+>
+> +static void ftp_progress(struct obex_session *os, void *user_data)
+> +{
+> +       struct ftp_session *ftp = user_data;
+> +
+> +       manager_emit_transfer_progress(ftp->transfer);
+> +}
+> +
+>  static struct obex_service_driver ftp = {
+>         .name = "File Transfer server",
+>         .service = OBEX_FTP,
+>         .target = FTP_TARGET,
+>         .target_size = TARGET_SIZE,
+>         .connect = ftp_connect,
+> +       .progress = ftp_progress,
+>         .get = ftp_get,
+>         .put = ftp_put,
+>         .chkput = ftp_chkput,
+> --
+> 1.9.1
+
+Applied, thanks.
+
 
 -- 
-Intel Open Source Technology Center
-http://oss.intel.com/
-
+Luiz Augusto von Dentz
