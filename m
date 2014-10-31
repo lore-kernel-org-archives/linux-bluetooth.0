@@ -1,81 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcin Kraglak <marcin.kraglak@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv3 7/7] unit/test-gatt: Add TP/GAD/CL/BV-04-C test
-Date: Fri, 31 Oct 2014 09:52:03 +0100
-Message-Id: <1414745523-31699-7-git-send-email-marcin.kraglak@tieto.com>
+Subject: [PATCHv3 4/7] shared/gatt: Fix incorrect data read
+Date: Fri, 31 Oct 2014 09:52:00 +0100
+Message-Id: <1414745523-31699-4-git-send-email-marcin.kraglak@tieto.com>
 In-Reply-To: <1414745523-31699-1-git-send-email-marcin.kraglak@tieto.com>
 References: <1414745523-31699-1-git-send-email-marcin.kraglak@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Verify that a Generic Attribute Profile client
-can discover characteristic declarations within
-a specified service definition.
+Data set in Find By Type Value response contains 4 octets,
+2 for start handle and two for end group handle. Reading data
+with offset 6 from end of pdu can cause illegal access.
 ---
- unit/test-gatt.c | 36 ++++++++++++++++++++++++++++++++++++
- 1 file changed, 36 insertions(+)
+ src/shared/gatt-helpers.c | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
 
-diff --git a/unit/test-gatt.c b/unit/test-gatt.c
-index 3ee9460..27471ea 100644
---- a/unit/test-gatt.c
-+++ b/unit/test-gatt.c
-@@ -270,6 +270,17 @@ static void primary_cb(bool success, uint8_t att_ecode,
- 	context_quit(context);
- }
+diff --git a/src/shared/gatt-helpers.c b/src/shared/gatt-helpers.c
+index d751d5a..6e19066 100644
+--- a/src/shared/gatt-helpers.c
++++ b/src/shared/gatt-helpers.c
+@@ -686,7 +686,13 @@ static void find_by_type_val_cb(uint8_t opcode, const void *pdu,
+ 		op->result_tail = cur_result;
+ 	}
  
-+static void characteristic_cb(bool success, uint8_t att_ecode,
-+						struct bt_gatt_result *result,
-+						void *user_data)
-+{
-+	struct context *context = user_data;
-+
-+	g_assert(success);
-+
-+	context_quit(context);
-+}
-+
- static void included_cb(bool success, uint8_t att_ecode,
- 						struct bt_gatt_result *result,
- 						void *user_data)
-@@ -332,6 +343,17 @@ static void test_search_included(gconstpointer data)
- 	execute_context(context);
- }
+-	last_end = get_le16(pdu + length - 6);
++	/*
++	 * Each data set contains:
++	 * 2 octets with start handle
++	 * 2 octets with end handle
++	 * last_end is end handle of last data set
++	 */
++	last_end = get_le16(pdu + length - 2);
+ 	if (last_end < op->end_handle) {
+ 		uint8_t pdu[6 + get_uuid_len(&op->uuid)];
  
-+static void test_search_chars(gconstpointer data)
-+{
-+	struct context *context = create_context(512, data);
-+
-+	g_assert(bt_gatt_discover_characteristics(context->att, 0x0010, 0x0020,
-+						characteristic_cb, context,
-+						NULL));
-+
-+	execute_context(context);
-+}
-+
- int main(int argc, char *argv[])
- {
- 	g_test_init(&argc, &argv, NULL);
-@@ -413,5 +435,19 @@ int main(int argc, char *argv[])
- 			raw_pdu(0x08, 0x06, 0x00, 0xff, 0xff, 0x02, 0x28),
- 			raw_pdu(0x01, 0x08, 0x06, 0x00, 0x0a));
- 
-+	define_test("/TP/GAD/CL/BV-04-C", test_search_chars, ATT, NULL,
-+			raw_pdu(0x02, 0x00, 0x02),
-+			raw_pdu(0x03, 0x00, 0x02),
-+			raw_pdu(0x08, 0x10, 0x00, 0x20, 0x00, 0x03, 0x28),
-+			raw_pdu(0x09, 0x07, 0x11, 0x00, 02, 0x12, 0x00, 0x25,
-+					0x2a),
-+			raw_pdu(0x08, 0x12, 0x00, 0x20, 0x00, 0x03, 0x28),
-+			raw_pdu(0x09, 0x15, 0x13, 0x00, 0x02, 0x14, 0x00, 0x85,
-+					0x00, 0xef, 0xcd, 0xab, 0x89, 0x67,
-+					0x45, 0x23, 0x01, 0x00, 0x00, 0x00,
-+					0x00, 0x00, 0x00),
-+			raw_pdu(0x08, 0x14, 0x00, 0x20, 0x00, 0x03, 0x28),
-+			raw_pdu(0x01, 0x08, 0x12, 0x00, 0x0a));
-+
- 	return g_test_run();
- }
 -- 
 1.9.3
 
