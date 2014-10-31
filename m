@@ -1,48 +1,47 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=US-ASCII
-Mime-Version: 1.0 (Mac OS X Mail 8.0 \(1990.1\))
-Subject: Re: [PATCH] Bluetooth: HCI H5 peer reset detection
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <5453A5D5.3060801@intel.com>
-Date: Fri, 31 Oct 2014 09:50:58 -0700
-Cc: "Gustavo F. Padovan" <gustavo@padovan.org>,
-	linux-bluetooth@vger.kernel.org
-Message-Id: <E6505B84-8BD2-4FC2-BDE6-9ACEB363D045@holtmann.org>
-References: <1412780068-19449-1-git-send-email-loic.poulain@intel.com> <20141031083908.GB18888@t440s.P-661HNU-F1> <5453A5D5.3060801@intel.com>
-To: Loic Poulain <loic.poulain@intel.com>
+From: Bharat Panda <bharat.panda@samsung.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: cpgs@samsung.com, Bharat Panda <bharat.panda@samsung.com>
+Subject: [PATCH ] obexd/ftp: Handle transfer reset for FTP
+Date: Fri, 31 Oct 2014 21:16:47 +0530
+Message-id: <1414770407-11485-1-git-send-email-bharat.panda@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Loic,
+Changes made to emit transfer completed to .Transfer1 interface on
+ftp reset.
+---
+ obexd/plugins/ftp.c | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
 
-please do not top-post on this mailing list. It breaks the flow of things since everybody is doing inline quoting.
-
-> This is just the expected behavior as described int the specification:
-> 
-> UART Spec says:
-> If the UART synchronization is lost in the communication from Host to Host
-> Controller, then the Host Controller shall send a Hardware Error Event to tell
-> the Host about the synchronization error. The Host Controller will then expect to
-> receive an HCI_Reset command from the Host in order to perform a reset. The
-> Host Controller will also use the HCI_Reset command in the byte stream from
-> Host to Host Controller to re-synchronize.
-> 
-> H5 part says:
-> If a SYNC message is received while in the Active State, it is assumed that the
-> peer device has reset. The local device should therefore perform a full reset of
-> the upper stack, and start Link Establishment again at the Uninitialized State.
-> 
-> So, hardware error seems the best way to warn host stack about the H5 controller
-> reset.
-
-I am actually fine with doing it this way.
-
-> Regarding the "upper stack", I know that Bluedroid restarts on hardware error, but
-> I ignore the Bluez behavior.
-
-This is something we need to fix then. First and foremost this has to work with the Bluetooth subsystem in the kernel as well and not just a stack on top of HCI User Channel.
-
-Regards
-
-Marcel
+diff --git a/obexd/plugins/ftp.c b/obexd/plugins/ftp.c
+index 4c35467..e255f48 100644
+--- a/obexd/plugins/ftp.c
++++ b/obexd/plugins/ftp.c
+@@ -494,6 +494,13 @@ static void ftp_progress(struct obex_session *os, void *user_data)
+ 	manager_emit_transfer_progress(ftp->transfer);
+ }
+ 
++static void ftp_reset(struct obex_session *os, void *user_data)
++{
++	struct ftp_session *ftp = user_data;
++
++	manager_emit_transfer_completed(ftp->transfer);
++}
++
+ static struct obex_service_driver ftp = {
+ 	.name = "File Transfer server",
+ 	.service = OBEX_FTP,
+@@ -506,7 +513,8 @@ static struct obex_service_driver ftp = {
+ 	.chkput = ftp_chkput,
+ 	.setpath = ftp_setpath,
+ 	.action = ftp_action,
+-	.disconnect = ftp_disconnect
++	.disconnect = ftp_disconnect,
++	.reset = ftp_reset
+ };
+ 
+ static int ftp_init(void)
+-- 
+1.9.1
 
