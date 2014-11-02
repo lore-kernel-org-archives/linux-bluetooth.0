@@ -1,45 +1,66 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Use HCI_EV_HARDWARE_ERROR define for event payload
-Date: Sun,  2 Nov 2014 03:02:01 +0100
-Message-Id: <1414893721-91141-1-git-send-email-marcel@holtmann.org>
+Subject: [PATCH] Bluetooth: Print error message for HCI_Hardware_Error event
+Date: Sun,  2 Nov 2014 02:56:41 +0100
+Message-Id: <1414893401-85774-1-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-When constructing the event payload for the HCI_Hardware_Error event
-message, use the HCI_EV_HARDWARE_ERROR define.
-
-In addition rename the variables from hard_err to hw_err to clearly
-indicate that this is about the hardware error and not a hard error.
+When the HCI_Hardware_Error event is send by the controller or
+injected by the driver, then at least print an error message.
 
 Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- drivers/bluetooth/hci_h5.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ include/net/bluetooth/hci.h |  5 +++++
+ net/bluetooth/hci_event.c   | 11 +++++++++++
+ 2 files changed, 16 insertions(+)
 
-diff --git a/drivers/bluetooth/hci_h5.c b/drivers/bluetooth/hci_h5.c
-index 20bdd71559b1..bd1fe37a7993 100644
---- a/drivers/bluetooth/hci_h5.c
-+++ b/drivers/bluetooth/hci_h5.c
-@@ -172,7 +172,7 @@ static void h5_peer_reset(struct hci_uart *hu)
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+index 6e8f24967308..ecfa306e1375 100644
+--- a/include/net/bluetooth/hci.h
++++ b/include/net/bluetooth/hci.h
+@@ -1463,6 +1463,11 @@ struct hci_ev_cmd_status {
+ 	__le16   opcode;
+ } __packed;
+ 
++#define HCI_EV_HARDWARE_ERROR		0x10
++struct hci_ev_hardware_error {
++	__u8     code;
++} __packed;
++
+ #define HCI_EV_ROLE_CHANGE		0x12
+ struct hci_ev_role_change {
+ 	__u8     status;
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 3dd2550b4c07..2f02ff0ed781 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -2925,6 +2925,13 @@ static void hci_cmd_status_evt(struct hci_dev *hdev, struct sk_buff *skb)
+ 	}
+ }
+ 
++static void hci_hardware_error_evt(struct hci_dev *hdev, struct sk_buff *skb)
++{
++	struct hci_ev_hardware_error *ev = (void *) skb->data;
++
++	BT_ERR("%s hardware error 0x%2.2x", hdev->name, ev->code);
++}
++
+ static void hci_role_change_evt(struct hci_dev *hdev, struct sk_buff *skb)
  {
- 	struct h5 *h5 = hu->priv;
- 	struct sk_buff *skb;
--	const unsigned char hard_err[] = { 0x10, 0x01, 0x00 };
-+	const u8 hw_err[] = { HCI_EV_HARDWARE_ERROR, 0x01, 0x00 };
+ 	struct hci_ev_role_change *ev = (void *) skb->data;
+@@ -4746,6 +4753,10 @@ void hci_event_packet(struct hci_dev *hdev, struct sk_buff *skb)
+ 		hci_cmd_status_evt(hdev, skb);
+ 		break;
  
- 	BT_ERR("Peer device has reset");
- 
-@@ -192,7 +192,7 @@ static void h5_peer_reset(struct hci_uart *hu)
- 		return;
- 
- 	bt_cb(skb)->pkt_type = HCI_EVENT_PKT;
--	memcpy(skb_put(skb, 3), hard_err, 3);
-+	memcpy(skb_put(skb, 3), hw_err, 3);
- 
- 	/* Send Hardware Error to upper stack */
- 	hci_recv_frame(hu->hdev, skb);
++	case HCI_EV_HARDWARE_ERROR:
++		hci_hardware_error_evt(hdev, skb);
++		break;
++
+ 	case HCI_EV_ROLE_CHANGE:
+ 		hci_role_change_evt(hdev, skb);
+ 		break;
 -- 
 1.9.3
 
