@@ -1,63 +1,174 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 8.0 \(1990.1\))
-Subject: Re: [PATCH v2 1/4] add restart_le_scan
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1414607071-9801-1-git-send-email-jpawlowski@google.com>
-Date: Sun, 2 Nov 2014 11:42:47 -0800
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <7D190559-F7EA-4A3B-BF1F-EB53D1715049@holtmann.org>
-References: <1414607071-9801-1-git-send-email-jpawlowski@google.com>
-To: Jakub Pawlowski <jpawlowski@google.com>
+MIME-Version: 1.0
+In-Reply-To: <CAJLTA8hHqo-YTzD3JhvbLKETH2arQstgWjsc3m8MJXVoJfb8qg@mail.gmail.com>
+References: <1414762794-30166-1-git-send-email-luiz.dentz@gmail.com>
+	<CAHrH25SnMXEHDcXez0Kgf7O-5G+xQZPuFwDtJQP--G3Ty8S_6w@mail.gmail.com>
+	<CAJLTA8hHqo-YTzD3JhvbLKETH2arQstgWjsc3m8MJXVoJfb8qg@mail.gmail.com>
+Date: Sun, 2 Nov 2014 21:08:19 +0200
+Message-ID: <CABBYNZJvTxsNVDM3bnsFJOQ0d_j_-djtyxqMxpUPgu6f+R2+fA@mail.gmail.com>
+Subject: Re: [PATCH BlueZ v4 1/9] shared/gatt-db: Expose gatt_db_attribute
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Michael Janssen <jamuraa@google.com>
+Cc: Arman Uguray <armansito@chromium.org>,
+	BlueZ development <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jakub,
+Hi,
 
-the patch subject needs to start with Bluetooth:
+On Fri, Oct 31, 2014 at 11:06 PM, Michael Janssen <jamuraa@google.com> wrote:
+> Hi Luiz,
+>
+> On Fri, Oct 31, 2014 at 11:27 AM, Arman Uguray <armansito@chromium.org> wrote:
+>> Hi Luiz,
+>>
+>>> On Fri, Oct 31, 2014 at 6:39 AM, Luiz Augusto von Dentz <luiz.dentz@gmail.com> wrote:
+>>> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>>>
+>>> This is the new API to reduce the lookups in gatt_db and make it
+>>> a little bit more convenient for batch operations, so the general idea
+>>> is to be able to get a hold of it via gatt_db_get_attribute but also
+>>> replace the handles in the queues with proper attributes so the server
+>>> code don't have to lookup again when reading/writing, checking
+>>> permissions, or any other operation that can be done directly.
+>>> ---
+>>> v2: Address problems gatt_db_attribute_read and gatt_db_attribute_write
+>>> pointed out by Arman.
+>>> v3: Allow gatt_db_attribute_read to work if offset equals to value length.
+>>> v4: Fix using attribute handle for service related operations.
+>>>
+>>>  src/shared/gatt-db.c | 51 +++++++++++++++++++++++++++++++++++++++++++++++++++
+>>>  src/shared/gatt-db.h | 36 ++++++++++++++++++++++++++++++++++++
+>>>  2 files changed, 87 insertions(+)
+>>>
+>>> diff --git a/src/shared/gatt-db.c b/src/shared/gatt-db.c
+>>> index 6b5e84c..3ade7a9 100644
+>>> --- a/src/shared/gatt-db.c
+>>> +++ b/src/shared/gatt-db.c
+>>> @@ -802,3 +802,54 @@ bool gatt_db_get_attribute_permissions(struct gatt_db *db, uint16_t handle,
+>>>         return true;
+>>>
+>>>  }
+>>> +
+>>> +struct gatt_db_attribute *gatt_db_get_attribute(struct gatt_db *db,
+>>> +                                                       uint16_t handle)
+>>> +{
+>>> +       return NULL;
+>>> +}
+>>> +
+>>> +const bt_uuid_t *gatt_db_attribute_get_type(struct gatt_db_attribute *attrib)
+>>> +{
+>>> +       return NULL;
+>>> +}
+>>> +
+>>> +uint16_t gatt_db_attribute_get_handle(struct gatt_db_attribute *attrib)
+>>> +{
+>>> +       return 0;
+>>> +}
+>>> +
+>>> +bool gatt_db_attribute_get_service_uuid(struct gatt_db_attribute *attrib,
+>>> +                                                       bt_uuid_t *uuid)
+>>> +{
+>>> +       return false;
+>>> +}
+>>> +
+>>> +bool gatt_db_attribute_get_service_handles(struct gatt_db_attribute *attrib,
+>>> +                                               uint16_t *start_handle,
+>>> +                                               uint16_t *end_handle)
+>>> +{
+>>> +       return false;
+>>> +}
+>>> +
+>>> +bool gatt_db_attribute_get_permissions(struct gatt_db_attribute *attrib,
+>>> +                                                       uint32_t *permissions)
+>>> +{
+>>> +       return false;
+>>> +}
+>>> +
+>>> +bool gatt_db_attribute_read(struct gatt_db_attribute *attrib, uint16_t offset,
+>>> +                               uint8_t opcode, bdaddr_t *bdaddr,
+>>> +                               gatt_db_attribute_read_t func, void *user_data)
+>>> +{
+>>> +       return false;
+>>> +}
+>>> +
+>>> +bool gatt_db_attribute_write(struct gatt_db_attribute *attrib, uint16_t offset,
+>>> +                                       const uint8_t *value, size_t len,
+>>> +                                       uint8_t opcode, bdaddr_t *bdaddr,
+>>> +                                       gatt_db_attribute_write_t func,
+>>> +                                       void *user_data)
+>>> +{
+>>> +       return false;
+>>> +}
+>>> diff --git a/src/shared/gatt-db.h b/src/shared/gatt-db.h
+>>> index 8d18434..15be67f 100644
+>>> --- a/src/shared/gatt-db.h
+>>> +++ b/src/shared/gatt-db.h
+>>> @@ -96,3 +96,39 @@ bool gatt_db_get_service_uuid(struct gatt_db *db, uint16_t handle,
+>>>
+>>>  bool gatt_db_get_attribute_permissions(struct gatt_db *db, uint16_t handle,
+>>>                                                         uint32_t *permissions);
+>>> +
+>>> +struct gatt_db_attribute;
+>>> +
+>>> +struct gatt_db_attribute *gatt_db_get_attribute(struct gatt_db *db,
+>>> +                                                       uint16_t handle);
+>>> +
+>>> +const bt_uuid_t *gatt_db_attribute_get_type(struct gatt_db_attribute *attrib);
+>>> +
+>>> +uint16_t gatt_db_attribute_get_handle(struct gatt_db_attribute *attrib);
+>>> +
+>>> +bool gatt_db_attribute_get_service_uuid(struct gatt_db_attribute *attrib,
+>>> +                                                       bt_uuid_t *uuid);
+>>> +
+>>> +bool gatt_db_attribute_get_service_handles(struct gatt_db_attribute *attrib,
+>>> +                                               uint16_t *start_handle,
+>>> +                                               uint16_t *end_handle);
+>>> +
+>>> +bool gatt_db_attribute_get_permissions(struct gatt_db_attribute *attrib,
+>>> +                                                       uint32_t *permissions);
+>>> +
+>>> +typedef void (*gatt_db_attribute_read_t) (struct gatt_db_attribute *attrib,
+>>> +                                       int err, uint8_t *value, size_t length,
+>>> +                                       void *user_data);
+>>> +
+>>> +bool gatt_db_attribute_read(struct gatt_db_attribute *attrib, uint16_t offset,
+>>> +                               uint8_t opcode, bdaddr_t *bdaddr,
+>>> +                               gatt_db_attribute_read_t func, void *user_data);
+>>> +
+>>> +typedef void (*gatt_db_attribute_write_t) (struct gatt_db_attribute *attrib,
+>>> +                                               int err, void *user_data);
+>>> +
+>>> +bool gatt_db_attribute_write(struct gatt_db_attribute *attrib, uint16_t offset,
+>>> +                                       const uint8_t *value, size_t len,
+>>> +                                       uint8_t opcode, bdaddr_t *bdaddr,
+>>> +                                       gatt_db_attribute_write_t func,
+>>> +                                       void *user_data);
+>>> --
+>>> 1.9.3
+>>>
+>>> --
+>>> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+>>> the body of a message to majordomo@vger.kernel.org
+>>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>>
+>> Patch set looks good to me. You can go ahead and apply if Michael,
+>> Marcin, and others are also fine with it.
+>>
+>> Cheers,
+>> Arman
+>> --
+>> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+>> the body of a message to majordomo@vger.kernel.org
+>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>
+> These patches look good with the changes, unless Marcin has problems go for it.
+>
+> --
+> Michael Janssen
 
-> Currently there is no way to restart le scan. It's needed in
-> preparation for new service scan method. The way it work: it disable,
-> and then enable le scan on controller. During this restart special flag
-> is set to make sure we won't remove disable scan work from workqueue.
-> 
-> Signed-off-by: Jakub Pawlowski <jpawlowski@google.com>
-> ---
-> include/net/bluetooth/hci.h      |  1 +
-> include/net/bluetooth/hci_core.h |  2 ++
-> net/bluetooth/hci_core.c         | 42 ++++++++++++++++++++++++++++++++++++++++
-> net/bluetooth/hci_event.c        |  9 ++++++---
-> 4 files changed, 51 insertions(+), 3 deletions(-)
-> 
-> diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-> index 6e8f249..b15d240 100644
-> --- a/include/net/bluetooth/hci.h
-> +++ b/include/net/bluetooth/hci.h
-> @@ -194,6 +194,7 @@ enum {
-> 	HCI_FAST_CONNECTABLE,
-> 	HCI_BREDR_ENABLED,
-> 	HCI_LE_SCAN_INTERRUPTED,
-> +	HCI_LE_SCAN_RESTARTING,
-> };
-> 
-> /* A mask for the flags that are supposed to remain when a reset happens
-> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-> index b8685a7..3c585885 100644
-> --- a/include/net/bluetooth/hci_core.h
-> +++ b/include/net/bluetooth/hci_core.h
-> @@ -334,6 +334,7 @@ struct hci_dev {
-> 	unsigned long		dev_flags;
-> 
-> 	struct delayed_work	le_scan_disable;
-> +	struct delayed_work	le_scan_restart;
+Pushed.
 
-So I wonder if we need le_scan_restart delayed_work here. We might be able to just put that into le_scan_disable one using the HCI_LE_SCAN_RESTART flag.
-
-That said, I like to get this working also with the regular discovery procedure. It is just that there every found device will trigger the restart, while in the service discovery it is only the ones we care about. So we should expose an general mechanism here.
-
-I do not have figured every single detail our here, but that is where I like to go with this.
-
-Regards
-
-Marcel
-
+-- 
+Luiz Augusto von Dentz
