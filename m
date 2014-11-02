@@ -1,113 +1,45 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Introduce BT_BREDR and BT_LE config options
-Date: Sun,  2 Nov 2014 03:32:25 +0100
-Message-Id: <1414895545-108621-1-git-send-email-marcel@holtmann.org>
+Subject: [PATCH] Bluetooth: Use HCI_EV_HARDWARE_ERROR define for event payload
+Date: Sun,  2 Nov 2014 03:02:01 +0100
+Message-Id: <1414893721-91141-1-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The current kernel options do not make it clear which modules are for
-Bluetooth Classic (BR/EDR) and which are for Bluetooth Low Energy (LE).
+When constructing the event payload for the HCI_Hardware_Error event
+message, use the HCI_EV_HARDWARE_ERROR define.
 
-To make it really clear, introduce BT_BREDR and BT_LE options with
-proper dependencies into the different modules. Both new options
-default to y to not create a regression with previous kernel config
-files.
+In addition rename the variables from hard_err to hw_err to clearly
+indicate that this is about the hardware error and not a hard error.
 
 Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- net/bluetooth/Kconfig        | 20 +++++++++++++++-----
- net/bluetooth/bnep/Kconfig   |  2 +-
- net/bluetooth/cmtp/Kconfig   |  2 +-
- net/bluetooth/hidp/Kconfig   |  2 +-
- net/bluetooth/rfcomm/Kconfig |  2 +-
- 5 files changed, 19 insertions(+), 9 deletions(-)
+ drivers/bluetooth/hci_h5.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/net/bluetooth/Kconfig b/net/bluetooth/Kconfig
-index 600fb29288f4..5e97a8ff850b 100644
---- a/net/bluetooth/Kconfig
-+++ b/net/bluetooth/Kconfig
-@@ -39,11 +39,10 @@ menuconfig BT
- 	  to Bluetooth kernel modules are provided in the BlueZ packages.  For
- 	  more information, see <http://www.bluez.org/>.
+diff --git a/drivers/bluetooth/hci_h5.c b/drivers/bluetooth/hci_h5.c
+index 20bdd71559b1..bd1fe37a7993 100644
+--- a/drivers/bluetooth/hci_h5.c
++++ b/drivers/bluetooth/hci_h5.c
+@@ -172,7 +172,7 @@ static void h5_peer_reset(struct hci_uart *hu)
+ {
+ 	struct h5 *h5 = hu->priv;
+ 	struct sk_buff *skb;
+-	const unsigned char hard_err[] = { 0x10, 0x01, 0x00 };
++	const u8 hw_err[] = { HCI_EV_HARDWARE_ERROR, 0x01, 0x00 };
  
--config BT_6LOWPAN
--	tristate "Bluetooth 6LoWPAN support"
--	depends on BT && 6LOWPAN
--	help
--	  IPv6 compression over Bluetooth Low Energy.
-+config BT_BREDR
-+	bool "Bluetooth Classic (BR/EDR) features"
-+	depends on BT
-+	default y
+ 	BT_ERR("Peer device has reset");
  
- source "net/bluetooth/rfcomm/Kconfig"
+@@ -192,7 +192,7 @@ static void h5_peer_reset(struct hci_uart *hu)
+ 		return;
  
-@@ -53,4 +52,15 @@ source "net/bluetooth/cmtp/Kconfig"
+ 	bt_cb(skb)->pkt_type = HCI_EVENT_PKT;
+-	memcpy(skb_put(skb, 3), hard_err, 3);
++	memcpy(skb_put(skb, 3), hw_err, 3);
  
- source "net/bluetooth/hidp/Kconfig"
- 
-+config BT_LE
-+	bool "Bluetooth Low Energy (LE) features"
-+	depends on BT
-+	default y
-+
-+config BT_6LOWPAN
-+	tristate "Bluetooth 6LoWPAN support"
-+	depends on BT_LE && 6LOWPAN
-+	help
-+	  IPv6 compression over Bluetooth Low Energy.
-+
- source "drivers/bluetooth/Kconfig"
-diff --git a/net/bluetooth/bnep/Kconfig b/net/bluetooth/bnep/Kconfig
-index 71791fc9f6b1..9b70317c49dc 100644
---- a/net/bluetooth/bnep/Kconfig
-+++ b/net/bluetooth/bnep/Kconfig
-@@ -1,6 +1,6 @@
- config BT_BNEP
- 	tristate "BNEP protocol support"
--	depends on BT
-+	depends on BT_BREDR
- 	select CRC32
- 	help
- 	  BNEP (Bluetooth Network Encapsulation Protocol) is Ethernet
-diff --git a/net/bluetooth/cmtp/Kconfig b/net/bluetooth/cmtp/Kconfig
-index 94cbf42ce155..939da0fbdd88 100644
---- a/net/bluetooth/cmtp/Kconfig
-+++ b/net/bluetooth/cmtp/Kconfig
-@@ -1,6 +1,6 @@
- config BT_CMTP
- 	tristate "CMTP protocol support"
--	depends on BT && ISDN_CAPI
-+	depends on BT_BREDR && ISDN_CAPI
- 	help
- 	  CMTP (CAPI Message Transport Protocol) is a transport layer
- 	  for CAPI messages.  CMTP is required for the Bluetooth Common
-diff --git a/net/bluetooth/hidp/Kconfig b/net/bluetooth/hidp/Kconfig
-index 9332bc7aa851..bc8610b24077 100644
---- a/net/bluetooth/hidp/Kconfig
-+++ b/net/bluetooth/hidp/Kconfig
-@@ -1,6 +1,6 @@
- config BT_HIDP
- 	tristate "HIDP protocol support"
--	depends on BT && INPUT
-+	depends on BT_BREDR && INPUT
- 	select HID
- 	help
- 	  HIDP (Human Interface Device Protocol) is a transport layer
-diff --git a/net/bluetooth/rfcomm/Kconfig b/net/bluetooth/rfcomm/Kconfig
-index 18d352ea2bc7..335df7515220 100644
---- a/net/bluetooth/rfcomm/Kconfig
-+++ b/net/bluetooth/rfcomm/Kconfig
-@@ -1,6 +1,6 @@
- config BT_RFCOMM
- 	tristate "RFCOMM protocol support"
--	depends on BT
-+	depends on BT_BREDR
- 	help
- 	  RFCOMM provides connection oriented stream transport.  RFCOMM
- 	  support is required for Dialup Networking, OBEX and other Bluetooth
+ 	/* Send Hardware Error to upper stack */
+ 	hci_recv_frame(hu->hdev, skb);
 -- 
 1.9.3
 
