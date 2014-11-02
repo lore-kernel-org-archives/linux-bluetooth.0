@@ -1,46 +1,85 @@
 Return-Path: <cyrus@holtmann.org>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 8.0 \(1990.1\))
+Subject: Re: [PATCH v2 3/4] Adding HCI_QUIRK_ADV_RSSI_DEDUP
 From: Marcel Holtmann <marcel@holtmann.org>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/2] Bluetooth: Introduce HCI_QUIRK_STRICT_DUPLICATE_FILTER
-Date: Sun,  2 Nov 2014 20:52:23 +0100
-Message-Id: <1414957944-22818-1-git-send-email-marcel@holtmann.org>
+In-Reply-To: <1414607071-9801-3-git-send-email-jpawlowski@google.com>
+Date: Sun, 2 Nov 2014 11:45:48 -0800
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <846CEA35-DEAF-4396-8F4B-7F63EDAD33D1@holtmann.org>
+References: <1414607071-9801-1-git-send-email-jpawlowski@google.com> <1414607071-9801-3-git-send-email-jpawlowski@google.com>
+To: Jakub Pawlowski <jpawlowski@google.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Some vendors decide to use a struct duplicate filter policy that only
-filters on Bluetooth device addresses. This means that when the RSSI
-changes, these devices are not reported again. During discovery it is
-useful to actually get the RSSI updates.
+Hi Jakub,
 
-Since this is specific to each controller, add a new quirk setting
-that allows drivers to tell the core what kind of filtering policy
-the controller uses.
+patch subject must start with Bluetooth:.
 
-Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
----
- include/net/bluetooth/hci.h | 9 +++++++++
- 1 file changed, 9 insertions(+)
+> When this quirk is set, the device, when in scan with deduplication is
+> not sending advertising reports for device when RSSI value changes.
+> 
+> Signed-off-by: Jakub Pawlowski <jpawlowski@google.com>
+> ---
+> include/net/bluetooth/hci.h      | 9 +++++++++
+> include/net/bluetooth/hci_core.h | 2 ++
+> 2 files changed, 11 insertions(+)
+> 
+> diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+> index b15d240..d8a8e0d 100644
+> --- a/include/net/bluetooth/hci.h
+> +++ b/include/net/bluetooth/hci.h
+> @@ -129,6 +129,15 @@ enum {
+> 	 * during the hdev->setup vendor callback.
+> 	 */
+> 	HCI_QUIRK_INVALID_BDADDR,
+> +
+> +	/* When this quirk is set, the device, when in scan with de-duplication
+> +	 * is not sending advertising reports for device when RSSI value
+> +	 * changes.
+> +	 *
+> +	 * This quirk can be set before hci_register_dev is called or
+> +	 * during the hdev->setup vendor callback.
+> +	 */
+> +	HCI_QUIRK_DUPLICATION,
+> };
 
-diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index ecfa306e1375..2e08f5a89463 100644
---- a/include/net/bluetooth/hci.h
-+++ b/include/net/bluetooth/hci.h
-@@ -129,6 +129,15 @@ enum {
- 	 * during the hdev->setup vendor callback.
- 	 */
- 	HCI_QUIRK_INVALID_BDADDR,
+This is how I would name it.
+
 +
-+	/* When this quirk is set, the duplicate filtering during
-+	 * scanning is based on Bluetooth devices addresses. To allow
-+	 * RSSI based updates, restart scanning if needed.
-+	 *
-+	 * This quirk can be set before hci_register_dev is called or
-+	 * during the hdev->setup vendor callback.
-+	 */
-+	HCI_QUIRK_STRICT_DUPLICATE_FILTER,
- };
- 
- /* HCI device flags */
--- 
-1.9.3
++       /* When this quirk is set, the duplicate filtering during
++        * scanning is based on Bluetooth devices addresses. To allow
++        * RSSI based updates, restart scanning if needed.
++        *
++        * This quirk can be set before hci_register_dev is called or
++        * during the hdev->setup vendor callback.
++        */
++       HCI_QUIRK_STRICT_DUPLICATE_FILTER,
+
+Of course this patch has to come first to introduce this quirk. And then a second patch to actually enable it for Broadcom USB devices.
+
+        if (id->driver_info & BTUSB_BCM_PATCHRAM) {
+                hdev->setup = btusb_setup_bcm_patchram;
+                hdev->set_bdaddr = btusb_set_bdaddr_bcm;
++               set_bit(HCI_QUIRK_STRICT_DUPLICATE_FILTER, &hdev->quirks);
+        }
+
+> 
+> /* HCI device flags */
+> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+> index 3c585885..e8e55f0 100644
+> --- a/include/net/bluetooth/hci_core.h
+> +++ b/include/net/bluetooth/hci_core.h
+> @@ -1304,6 +1304,8 @@ void hci_sock_dev_event(struct hci_dev *hdev, int event);
+> #define DISCOV_INTERLEAVED_INQUIRY_LEN	0x04
+> #define DISCOV_BREDR_INQUIRY_LEN	0x08
+> 
+> +#define DISCOV_LE_RESTART_DELAY msecs_to_jiffies(300)
+> +
+
+This one does not belong into this patch.
+
+Regards
+
+Marcel
 
