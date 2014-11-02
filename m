@@ -1,30 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Sun, 2 Nov 2014 10:05:09 +0200
+Date: Sun, 2 Nov 2014 10:03:37 +0200
 From: Johan Hedberg <johan.hedberg@gmail.com>
 To: Marcel Holtmann <marcel@holtmann.org>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/2] Bluetooth: Add hci_reset_dev() for driver triggerd
- stack reset
-Message-ID: <20141102080509.GE20526@t440s.P-661HNU-F1>
-References: <1414912539-1010-1-git-send-email-marcel@holtmann.org>
+Subject: Re: [PATCH] Bluetooth: Introduce BT_BREDR and BT_LE config options
+Message-ID: <20141102080337.GD20526@t440s.P-661HNU-F1>
+References: <1414895545-108621-1-git-send-email-marcel@holtmann.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1414912539-1010-1-git-send-email-marcel@holtmann.org>
+In-Reply-To: <1414895545-108621-1-git-send-email-marcel@holtmann.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Marcel,
 
 On Sun, Nov 02, 2014, Marcel Holtmann wrote:
-> Some Bluetooth drivers require to reset the upper stack. To avoid having
-> all drivers send HCI Hardware Error events, provide a generic function
-> to wrap the reset functionality.
+> The current kernel options do not make it clear which modules are for
+> Bluetooth Classic (BR/EDR) and which are for Bluetooth Low Energy (LE).
+> 
+> To make it really clear, introduce BT_BREDR and BT_LE options with
+> proper dependencies into the different modules. Both new options
+> default to y to not create a regression with previous kernel config
+> files.
 > 
 > Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 > ---
->  include/net/bluetooth/hci_core.h |  1 +
->  net/bluetooth/hci_core.c         | 18 ++++++++++++++++++
->  2 files changed, 19 insertions(+)
+>  net/bluetooth/Kconfig        | 20 +++++++++++++++-----
+>  net/bluetooth/bnep/Kconfig   |  2 +-
+>  net/bluetooth/cmtp/Kconfig   |  2 +-
+>  net/bluetooth/hidp/Kconfig   |  2 +-
+>  net/bluetooth/rfcomm/Kconfig |  2 +-
+>  5 files changed, 19 insertions(+), 9 deletions(-)
 
-Both patches in this set have been applied to bluetooth-next. Thanks.
+Applied to bluetooth-next. Thanks.
 
 Johan
