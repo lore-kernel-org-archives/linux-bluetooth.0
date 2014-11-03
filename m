@@ -1,168 +1,64 @@
 Return-Path: <cyrus@holtmann.org>
-From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2] android/pts: Update PTS results for MCAP
-Date: Mon,  3 Nov 2014 10:31:16 +0100
-Message-Id: <1415007076-5141-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+From: Gowtham Anandha Babu <gowtham.ab@samsung.com>
+To: 'Luiz Augusto von Dentz' <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	'Dmitry Kasatkin' <d.kasatkin@samsung.com>,
+	'Bharat Panda' <bharat.panda@samsung.com>, cpgs@samsung.com
+References: <1414768114-3775-1-git-send-email-gowtham.ab@samsung.com>
+ <1414768114-3775-8-git-send-email-gowtham.ab@samsung.com>
+ <CABBYNZJOur6QU0rzFQN8qWXC-T0iEBDQ7La9rOdrpb-c0Sz5Vw@mail.gmail.com>
+In-reply-to: <CABBYNZJOur6QU0rzFQN8qWXC-T0iEBDQ7La9rOdrpb-c0Sz5Vw@mail.gmail.com>
+Subject: RE: [PATCH v1 7/7] monitor/rfcomm: Add rfcomm file in Android.mk
+Date: Mon, 03 Nov 2014 14:51:09 +0530
+Message-id: <000e01cff747$99350080$cb9f0180$@samsung.com>
+MIME-version: 1.0
+Content-type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Tested on android 4.4.4 against PTS 5.3
----
- android/pts-mcap.txt | 114 +++++++++++++++++++++++++++++++++------------------
- 1 file changed, 75 insertions(+), 39 deletions(-)
+Hi,
 
-diff --git a/android/pts-mcap.txt b/android/pts-mcap.txt
-index c35fefb..9d1fdcd 100644
---- a/android/pts-mcap.txt
-+++ b/android/pts-mcap.txt
-@@ -1,7 +1,7 @@
- PTS test results for MCAP
- 
--PTS version: 5.2
--Tested: 07-August-2014
-+PTS version: 5.3
-+Tested: 30-October-2014
- Android version: 4.4.4
- 
- Results:
-@@ -16,31 +16,42 @@ Note: Test were done with ssp enabled and in most of the cases requires pairing
- -------------------------------------------------------------------------------
- Test Name		Result	Notes
- -------------------------------------------------------------------------------
--TC_MCAP_CE_BV_01_C	PASS	mcaptest -C 4099 -D 4101 -dc <PTS addr>
--TC_MCAP_CE_BV_02_C	PASS	mcaptest -C 4099 -D 4101
--TC_MCAP_CE_BV_03_C	PASS	mcaptest -C 4099 -D 4101 -c <PTS addr>
--TC_MCAP_CE_BV_04_C	PASS	mcaptest -C 4099 -D 4101 -d
-+TC_MCAP_CE_BV_01_C	INC	PTS Issue #12693
-+				mcaptest -C 4099 -D 4101 -dc <PTS addr>
-+TC_MCAP_CE_BV_02_C	INC	PTS Issue #12693
-+				mcaptest -C 4099 -D 4101
-+TC_MCAP_CE_BV_03_C	INC	PTS Issue #12693
-+				mcaptest -C 4099 -D 4101 -c <PTS addr>
-+TC_MCAP_CE_BV_04_C	INC	PTS Issue #12693
-+				mcaptest -C 4099 -D 4101 -d
- TC_MCAP_CM_ABT_BV_01_C	N/A
--TC_MCAP_CM_ABT_BV_02_C	PASS	mcaptest -C 4099 -D 4101
-+TC_MCAP_CM_ABT_BV_02_C	INC	PTS Issue #12693
-+				mcaptest -C 4099 -D 4101
- TC_MCAP_CM_ABT_BV_03_C	N/A
- TC_MCAP_CM_DEL_BV_01_C	N/A
--TC_MCAP_CM_DEL_BV_02_C	PASS	mcaptest -C 4099 -D 4101
-+TC_MCAP_CM_DEL_BV_02_C	INC	PTS Issue #12693
-+				mcaptest -C 4099 -D 4101
- TC_MCAP_CM_DEL_BV_02_C	N/A
--TC_MCAP_CM_DEL_BV_04_C	PASS	mcaptest -C 4099 -D 4101
-+TC_MCAP_CM_DEL_BV_04_C	INC	PTS Issue #12693
-+				mcaptest -C 4099 -D 4101
- TC_MCAP_CM_DIS_BV_01_C	PASS	mcaptest -C 4099 -D 4101 -e 2 -f 2
- TC_MCAP_CM_DIS_BV_02_C	PASS	mcaptest -C 4099 -D 4101
--TC_MCAP_CM_DIS_BV_03_C	PASS	mcaptest -C 4099 -D 4101
-+TC_MCAP_CM_DIS_BV_03_C	INC	PTS Issue #12693
-+				mcaptest -C 4099 -D 4101
- TC_MCAP_CM_DIS_BV_04_C	PASS	mcaptest -C 4099 -D 4101 -e 2 -f 2
- TC_MCAP_CM_DIS_BV_05_C	PASS	mcaptest -C 4099 -D 4101
- TC_MCAP_CM_REC_BV_01_C	N/A
--TC_MCAP_CM_REC_BV_02_C	PASS	mcaptest -C 4099 -D 4101
-+TC_MCAP_CM_REC_BV_02_C	INC	PTS Issue #12693
-+				mcaptest -C 4099 -D 4101
- TC_MCAP_CM_REC_BV_03_C	N/A
--TC_MCAP_CM_REC_BV_04_C	PASS	mcaptest -C 4099 -D 4101
-+TC_MCAP_CM_REC_BV_04_C	INC	PTS Issue #12693
-+				mcaptest -C 4099 -D 4101
- 				Note: It may be necessary to confirm pairing
- 					twice (second time when IUT is back in
- 					range).
- TC_MCAP_CM_REC_BV_05_C	N/A
--TC_MCAP_CM_REC_BV_06_C	PASS	mcaptest -C 4099 -D 4101
-+TC_MCAP_CM_REC_BV_06_C	INC	PTS Issue #12693
-+				mcaptest -C 4099 -D 4101
- TC_MCAP_CS_ERR_BI_01_C	N/A
- TC_MCAP_CS_ERR_BI_02_C	N/A
- TC_MCAP_CS_ERR_BI_03_C	N/A
-@@ -53,31 +64,56 @@ TC_MCAP_CS_R_BV_01_I	N/A
- TC_MCAP_CS_R_BV_02_I	N/A
- TC_MCAP_CS_R_BV_03_C	N/A
- TC_MCAP_CS_T_BV_04_C	N/A
--TC_MCAP_ERR_BI_01_C	PASS	mcaptest -C 4099 -D 4101
--TC_MCAP_ERR_BI_02_C	PASS	mcaptest -C 4099 -D 4101 -d
--TC_MCAP_ERR_BI_03_C	PASS	mcaptest -C 4099 -D 4101
--TC_MCAP_ERR_BI_04_C	PASS	mcaptest -C 4099 -D 4101 -d
--TC_MCAP_ERR_BI_05_C	PASS	mcaptest -C 4099 -D 4101
--TC_MCAP_ERR_BI_06_C	PASS	mcaptest -C 4099 -D 4101 -d
--TC_MCAP_ERR_BI_07_C	PASS	mcaptest -C 4099 -D 4101
--TC_MCAP_ERR_BI_08_C	PASS	mcaptest -C 4099 -D 4101 -d
--TC_MCAP_ERR_BI_09_C	PASS	mcaptest -C 4099 -D 4101
--TC_MCAP_ERR_BI_10_C	PASS	mcaptest -C 4099 -D 4101
--TC_MCAP_ERR_BI_11_C	PASS	mcaptest -C 4099 -D 4101 -d
--TC_MCAP_ERR_BI_12_C	PASS	mcaptest -C 4099 -D 4101 -d
--TC_MCAP_ERR_BI_13_C	PASS	mcaptest -C 4099 -D 4101
--TC_MCAP_ERR_BI_14_C	PASS	mcaptest -C 4099 -D 4101
--TC_MCAP_ERR_BI_15_C	PASS	mcaptest -C 4099 -D 4101 -d
--TC_MCAP_ERR_BI_16_C	PASS	mcaptest -C 4099 -D 4101 -u
--TC_MCAP_ERR_BI_17_C	PASS	mcaptest -C 4099 -D 4101 -d
--TC_MCAP_ERR_BI_18_C	PASS	mcaptest -C 4099 -D 4101 -d
--TC_MCAP_ERR_BI_19_C	PASS	mcaptest -C 4099 -D 4101
--TC_MCAP_ERR_BI_20_C	PASS	mcaptest -C 4099 -D 4101 -g
-+TC_MCAP_ERR_BI_01_C	INC	PTS Issue #12693
-+				mcaptest -C 4099 -D 4101
-+TC_MCAP_ERR_BI_02_C	INC	PTS Issue #12693
-+				mcaptest -C 4099 -D 4101 -d
-+TC_MCAP_ERR_BI_03_C	INC	PTS Issue #12693
-+				mcaptest -C 4099 -D 4101
-+TC_MCAP_ERR_BI_04_C	INC	PTS Issue #12693
-+				mcaptest -C 4099 -D 4101 -d
-+TC_MCAP_ERR_BI_05_C	INC	PTS Issue #12693
-+				mcaptest -C 4099 -D 4101
-+TC_MCAP_ERR_BI_06_C	INC	PTS Issue #12693
-+				mcaptest -C 4099 -D 4101 -d
-+TC_MCAP_ERR_BI_07_C	INC	PTS Issue #12693
-+				mcaptest -C 4099 -D 4101
-+TC_MCAP_ERR_BI_08_C	INC	PTS Issue #12693
-+				mcaptest -C 4099 -D 4101 -d
-+TC_MCAP_ERR_BI_09_C	INC	PTS Issue #12693
-+				mcaptest -C 4099 -D 4101
-+TC_MCAP_ERR_BI_10_C	INC	PTS Issue #12693
-+				mcaptest -C 4099 -D 4101
-+TC_MCAP_ERR_BI_11_C	INC	PTS Issue #12693
-+				mcaptest -C 4099 -D 4101 -d
-+TC_MCAP_ERR_BI_12_C	INC	PTS Issue #12693
-+				mcaptest -C 4099 -D 4101 -d
-+TC_MCAP_ERR_BI_13_C	INC	PTS Issue #12693
-+				mcaptest -C 4099 -D 4101
-+TC_MCAP_ERR_BI_14_C	INC	PTS Issue #12693
-+				mcaptest -C 4099 -D 4101
-+TC_MCAP_ERR_BI_15_C	INC	PTS Issue #12693
-+				mcaptest -C 4099 -D 4101 -d
-+TC_MCAP_ERR_BI_16_C	INC	PTS Issue #12693
-+				mcaptest -C 4099 -D 4101 -u
-+TC_MCAP_ERR_BI_17_C	INC	PTS Issue #12693
-+				mcaptest -C 4099 -D 4101 -d
-+TC_MCAP_ERR_BI_18_C	INC	PTS Issue #12693
-+				mcaptest -C 4099 -D 4101 -d
-+TC_MCAP_ERR_BI_19_C	N/A
-+TC_MCAP_ERR_BI_20_C	INC	PTS Issue #12693
-+				mcaptest -C 4099 -D 4101 -g
- TC_MCAP_INV_BI_01_C	PASS	mcaptest -C 4099 -D 4101 -dc <PTS addr>
--TC_MCAP_INV_BI_02_C	PASS	mcaptest -C 4099 -D 4101 -d
--TC_MCAP_INV_BI_03_C	PASS	mcaptest -C 4099 -D 4101 -dc <PTS addr>
--TC_MCAP_INV_BI_04_C	PASS	mcaptest -C 4099 -D 4101 -c <PTS addr>
--TC_MCAP_INV_BI_05_C	PASS	mcaptest -C 4099 -D 4101
--TC_MCAP_INV_BI_06_C	PASS	mcaptest -C 4099 -D 4101
--TC_MCAP_INV_BI_07_C	PASS	mcaptest -C 4099 -D 4101
-+TC_MCAP_INV_BI_02_C	INC	PTS Issue #12693
-+				mcaptest -C 4099 -D 4101 -d
-+TC_MCAP_INV_BI_03_C	INC	PTS Issue #12693
-+				mcaptest -C 4099 -D 4101 -dc <PTS addr>
-+TC_MCAP_INV_BI_04_C	INC	PTS Issue #12693
-+				mcaptest -C 4099 -D 4101 -c <PTS addr>
-+TC_MCAP_INV_BI_05_C	INC	PTS Issue #12693
-+				mcaptest -C 4099 -D 4101
-+TC_MCAP_INV_BI_06_C	INC	PTS Issue #12693
-+				mcaptest -C 4099 -D 4101
-+TC_MCAP_INV_BI_07_C	INC	PTS Issue #12693
-+				mcaptest -C 4099 -D 4101
- -------------------------------------------------------------------------------
--- 
-1.9.3
+> -----Original Message-----
+> From: Luiz Augusto von Dentz [mailto:luiz.dentz@gmail.com]
+> Sent: Monday, November 03, 2014 2:35 PM
+> To: Gowtham Anandha Babu
+> Cc: linux-bluetooth@vger.kernel.org; Dmitry Kasatkin; Bharat Panda;
+> cpgs@samsung.com
+> Subject: Re: [PATCH v1 7/7] monitor/rfcomm: Add rfcomm file in Android.mk
+> 
+> Hi,
+> 
+> On Fri, Oct 31, 2014 at 5:08 PM, Gowtham Anandha Babu
+> <gowtham.ab@samsung.com> wrote:
+> > ---
+> >  android/Android.mk | 1 +
+> >  1 file changed, 1 insertion(+)
+> >
+> > diff --git a/android/Android.mk b/android/Android.mk index
+> > aefe41c..eebd863 100644
+> > --- a/android/Android.mk
+> > +++ b/android/Android.mk
+> > @@ -289,6 +289,7 @@ LOCAL_SRC_FILES := \
+> >         bluez/monitor/packet.c \
+> >         bluez/monitor/l2cap.c \
+> >         bluez/monitor/avctp.c \
+> > +       bluez/monitor/rfcomm.c \
+> >         bluez/monitor/uuid.c \
+> >         bluez/monitor/sdp.c \
+> >         bluez/monitor/vendor.c \
+> > --
+> > 1.9.1
+> 
+> Usually we try very hard to avoid breaking the build even within the same
+> patch-set, so if possible please squash this change.
+> 
+> 
+> --
+> Luiz Augusto von Dentz
+
+
+Do you want me to send this one(Android.mk) as a separate patch (out of this patch-set) or merge this one to first patch ?
+
+Regards,
+Gowtham Anandha Babu
 
