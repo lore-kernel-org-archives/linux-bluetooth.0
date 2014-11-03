@@ -1,71 +1,58 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <000e01cff747$99350080$cb9f0180$@samsung.com>
-References: <1414768114-3775-1-git-send-email-gowtham.ab@samsung.com>
-	<1414768114-3775-8-git-send-email-gowtham.ab@samsung.com>
-	<CABBYNZJOur6QU0rzFQN8qWXC-T0iEBDQ7La9rOdrpb-c0Sz5Vw@mail.gmail.com>
-	<000e01cff747$99350080$cb9f0180$@samsung.com>
-Date: Mon, 3 Nov 2014 12:11:21 +0200
-Message-ID: <CABBYNZ+N=2ZFWs_kKTzxDWo9OjjRPBgGXGqkwJK1akbYE0Fu3Q@mail.gmail.com>
-Subject: Re: [PATCH v1 7/7] monitor/rfcomm: Add rfcomm file in Android.mk
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Gowtham Anandha Babu <gowtham.ab@samsung.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	Dmitry Kasatkin <d.kasatkin@samsung.com>,
-	Bharat Panda <bharat.panda@samsung.com>, cpgs@samsung.com
-Content-Type: text/plain; charset=UTF-8
+From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+Subject: [PATCH v2 09/10] shared/hfp: Add function to skip field in hfp_context
+Date: Mon,  3 Nov 2014 10:36:00 +0100
+Message-Id: <1415007361-4177-10-git-send-email-lukasz.rymanowski@tieto.com>
+In-Reply-To: <1415007361-4177-1-git-send-email-lukasz.rymanowski@tieto.com>
+References: <1415007361-4177-1-git-send-email-lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Some fields in AT commands are not used by HFP spec. When parsing such
+commands it is convinient to just skip it without looking what is inside
+there
+---
+ src/shared/hfp.c | 12 ++++++++++++
+ src/shared/hfp.h |  1 +
+ 2 files changed, 13 insertions(+)
 
-On Mon, Nov 3, 2014 at 11:21 AM, Gowtham Anandha Babu
-<gowtham.ab@samsung.com> wrote:
-> Hi,
->
->> -----Original Message-----
->> From: Luiz Augusto von Dentz [mailto:luiz.dentz@gmail.com]
->> Sent: Monday, November 03, 2014 2:35 PM
->> To: Gowtham Anandha Babu
->> Cc: linux-bluetooth@vger.kernel.org; Dmitry Kasatkin; Bharat Panda;
->> cpgs@samsung.com
->> Subject: Re: [PATCH v1 7/7] monitor/rfcomm: Add rfcomm file in Android.mk
->>
->> Hi,
->>
->> On Fri, Oct 31, 2014 at 5:08 PM, Gowtham Anandha Babu
->> <gowtham.ab@samsung.com> wrote:
->> > ---
->> >  android/Android.mk | 1 +
->> >  1 file changed, 1 insertion(+)
->> >
->> > diff --git a/android/Android.mk b/android/Android.mk index
->> > aefe41c..eebd863 100644
->> > --- a/android/Android.mk
->> > +++ b/android/Android.mk
->> > @@ -289,6 +289,7 @@ LOCAL_SRC_FILES := \
->> >         bluez/monitor/packet.c \
->> >         bluez/monitor/l2cap.c \
->> >         bluez/monitor/avctp.c \
->> > +       bluez/monitor/rfcomm.c \
->> >         bluez/monitor/uuid.c \
->> >         bluez/monitor/sdp.c \
->> >         bluez/monitor/vendor.c \
->> > --
->> > 1.9.1
->>
->> Usually we try very hard to avoid breaking the build even within the same
->> patch-set, so if possible please squash this change.
->>
->>
->> --
->> Luiz Augusto von Dentz
->
->
-> Do you want me to send this one(Android.mk) as a separate patch (out of this patch-set) or merge this one to first patch ?
-
-Please merge, you can use git commit --squash/--fixup=<patch> and then
-git rebase --autosquash, there are actually many ways to do it.
-
+diff --git a/src/shared/hfp.c b/src/shared/hfp.c
+index 6c804f5..a35cb7b 100644
+--- a/src/shared/hfp.c
++++ b/src/shared/hfp.c
+@@ -415,6 +415,18 @@ bool hfp_context_has_next(struct hfp_context *context)
+ 	return context->data[context->offset] != '\0';
+ }
+ 
++void hfp_context_skip_field(struct hfp_context *context)
++{
++	const char *data = context->data;
++	unsigned int offset = context->offset;
++
++	while (data[offset] != '\0' && data[offset] != ',')
++		offset++;
++
++	context->offset = offset;
++	next_field(context);
++}
++
+ bool hfp_context_get_range(struct hfp_context *context, uint32_t *min,
+ 								uint32_t *max)
+ {
+diff --git a/src/shared/hfp.h b/src/shared/hfp.h
+index 5ba020d..2eb7838 100644
+--- a/src/shared/hfp.h
++++ b/src/shared/hfp.h
+@@ -130,6 +130,7 @@ bool hfp_context_get_unquoted_string(struct hfp_context *context,
+ bool hfp_context_get_range(struct hfp_context *context, unsigned int *min,
+ 							unsigned int *max);
+ bool hfp_context_has_next(struct hfp_context *context);
++void hfp_context_skip_field(struct hfp_context *context);
+ 
+ typedef void (*hfp_hf_result_func_t)(struct hfp_context *context,
+ 							void *user_data);
 -- 
-Luiz Augusto von Dentz
+1.8.4
+
