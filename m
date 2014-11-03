@@ -1,39 +1,71 @@
 Return-Path: <cyrus@holtmann.org>
-From: Gowtham Anandha Babu <gowtham.ab@samsung.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: d.kasatkin@samsung.com, bharat.panda@samsung.com, cpgs@samsung.com,
-	Gowtham Anandha Babu <gowtham.ab@samsung.com>
-Subject: [PATCH v1 0/6] Add support for RFCOMM in btmon
-Date: Mon, 03 Nov 2014 16:11:27 +0530
-Message-id: <1415011293-29661-1-git-send-email-gowtham.ab@samsung.com>
+MIME-Version: 1.0
+In-Reply-To: <000e01cff747$99350080$cb9f0180$@samsung.com>
+References: <1414768114-3775-1-git-send-email-gowtham.ab@samsung.com>
+	<1414768114-3775-8-git-send-email-gowtham.ab@samsung.com>
+	<CABBYNZJOur6QU0rzFQN8qWXC-T0iEBDQ7La9rOdrpb-c0Sz5Vw@mail.gmail.com>
+	<000e01cff747$99350080$cb9f0180$@samsung.com>
+Date: Mon, 3 Nov 2014 12:11:21 +0200
+Message-ID: <CABBYNZ+N=2ZFWs_kKTzxDWo9OjjRPBgGXGqkwJK1akbYE0Fu3Q@mail.gmail.com>
+Subject: Re: [PATCH v1 7/7] monitor/rfcomm: Add rfcomm file in Android.mk
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Gowtham Anandha Babu <gowtham.ab@samsung.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	Dmitry Kasatkin <d.kasatkin@samsung.com>,
+	Bharat Panda <bharat.panda@samsung.com>, cpgs@samsung.com
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Adds an initial implementation for RFCOMM in Bluetooth monitor.
+Hi,
 
-Implementation for Decoding MSC, RPN, RLS, PN, NSC frames 
-will  be covered in the next patch-set.
+On Mon, Nov 3, 2014 at 11:21 AM, Gowtham Anandha Babu
+<gowtham.ab@samsung.com> wrote:
+> Hi,
+>
+>> -----Original Message-----
+>> From: Luiz Augusto von Dentz [mailto:luiz.dentz@gmail.com]
+>> Sent: Monday, November 03, 2014 2:35 PM
+>> To: Gowtham Anandha Babu
+>> Cc: linux-bluetooth@vger.kernel.org; Dmitry Kasatkin; Bharat Panda;
+>> cpgs@samsung.com
+>> Subject: Re: [PATCH v1 7/7] monitor/rfcomm: Add rfcomm file in Android.mk
+>>
+>> Hi,
+>>
+>> On Fri, Oct 31, 2014 at 5:08 PM, Gowtham Anandha Babu
+>> <gowtham.ab@samsung.com> wrote:
+>> > ---
+>> >  android/Android.mk | 1 +
+>> >  1 file changed, 1 insertion(+)
+>> >
+>> > diff --git a/android/Android.mk b/android/Android.mk index
+>> > aefe41c..eebd863 100644
+>> > --- a/android/Android.mk
+>> > +++ b/android/Android.mk
+>> > @@ -289,6 +289,7 @@ LOCAL_SRC_FILES := \
+>> >         bluez/monitor/packet.c \
+>> >         bluez/monitor/l2cap.c \
+>> >         bluez/monitor/avctp.c \
+>> > +       bluez/monitor/rfcomm.c \
+>> >         bluez/monitor/uuid.c \
+>> >         bluez/monitor/sdp.c \
+>> >         bluez/monitor/vendor.c \
+>> > --
+>> > 1.9.1
+>>
+>> Usually we try very hard to avoid breaking the build even within the same
+>> patch-set, so if possible please squash this change.
+>>
+>>
+>> --
+>> Luiz Augusto von Dentz
+>
+>
+> Do you want me to send this one(Android.mk) as a separate patch (out of this patch-set) or merge this one to first patch ?
 
-v1: Added rfcomm.c file in Android.mk
-
-Bharat Panda (2):
-  monitor/rfcomm: Add handlers for mcc frame type
-  monitor/rfcomm: Add mcc type handlers code
-
-Gowtham Anandha Babu (4):
-  monitor/rfcomm: Add RFCOMM support to btmon
-  monitor/rfcomm: Add support for RFCOMM commands
-  monitor/rfcomm: Add support for UIH frame decoding
-  monitor/rfcomm: Add support for mcc frame decoding
-
- Makefile.tools     |   1 +
- android/Android.mk |   1 +
- monitor/l2cap.c    |   4 +
- monitor/l2cap.h    |   1 +
- monitor/rfcomm.c   | 333 +++++++++++++++++++++++++++++++++++++++++++++++++++++
- 5 files changed, 340 insertions(+)
- create mode 100644 monitor/rfcomm.c
+Please merge, you can use git commit --squash/--fixup=<patch> and then
+git rebase --autosquash, there are actually many ways to do it.
 
 -- 
-1.9.1
-
+Luiz Augusto von Dentz
