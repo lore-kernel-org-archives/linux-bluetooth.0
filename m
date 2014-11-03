@@ -1,66 +1,52 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 2/2] Bluetooth: Add hci_conn_lookup_type() helper function
-Date: Mon,  3 Nov 2014 05:16:08 +0100
-Message-Id: <1414988168-51327-2-git-send-email-marcel@holtmann.org>
+Subject: [PATCH 1/2] Bluetooth: btusb: Add internal callback for USB bulk rx data
+Date: Mon,  3 Nov 2014 05:16:07 +0100
+Message-Id: <1414988168-51327-1-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Some drivers require knowledge of what connection handle is assigned
-to what connection link type (ACL or SCO/eSCO). Instead of having each
-driver implement connection tracking, provide a simple helper function
-for lookup of the link type.
+Some vendors require special handling of the rx data from the USB
+bulk endpoints. For that case provide an internal callback that
+can overwrite it with a custom receive function.
 
 Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- include/net/bluetooth/hci.h      |  1 +
- include/net/bluetooth/hci_core.h | 20 ++++++++++++++++++++
- 2 files changed, 21 insertions(+)
+ drivers/bluetooth/btusb.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
-diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index 2e08f5a89463..d5f85d7746bc 100644
---- a/include/net/bluetooth/hci.h
-+++ b/include/net/bluetooth/hci.h
-@@ -274,6 +274,7 @@ enum {
- /* Low Energy links do not have defined link type. Use invented one */
- #define LE_LINK		0x80
- #define AMP_LINK	0x81
-+#define INVALID_LINK	0xff
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index c85426d6e33d..cd634f3b76d3 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -299,6 +299,8 @@ struct btusb_data {
+ 	unsigned int sco_num;
+ 	int isoc_altsetting;
+ 	int suspend_count;
++
++	int (*recv_bulk)(struct btusb_data *data, void *buffer, int count);
+ };
  
- /* LMP features */
- #define LMP_3SLOT	0x01
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 27ddb905b351..4e39a5adfcab 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -646,6 +646,26 @@ static inline unsigned int hci_conn_count(struct hci_dev *hdev)
- 	return c->acl_num + c->amp_num + c->sco_num + c->le_num;
- }
+ static inline void btusb_free_frags(struct btusb_data *data)
+@@ -590,7 +592,7 @@ static void btusb_bulk_complete(struct urb *urb)
+ 	if (urb->status == 0) {
+ 		hdev->stat.byte_rx += urb->actual_length;
  
-+static inline __u8 hci_conn_lookup_type(struct hci_dev *hdev, __u16 handle)
-+{
-+	struct hci_conn_hash *h = &hdev->conn_hash;
-+	struct hci_conn *c;
-+	__u8 type = INVALID_LINK;
+-		if (btusb_recv_bulk(data, urb->transfer_buffer,
++		if (data->recv_bulk(data, urb->transfer_buffer,
+ 				    urb->actual_length) < 0) {
+ 			BT_ERR("%s corrupted ACL packet", hdev->name);
+ 			hdev->stat.err_rx++;
+@@ -2012,6 +2014,8 @@ static int btusb_probe(struct usb_interface *intf,
+ 	init_usb_anchor(&data->isoc_anchor);
+ 	spin_lock_init(&data->rxlock);
+ 
++	data->recv_bulk = btusb_recv_bulk;
 +
-+	rcu_read_lock();
-+
-+	list_for_each_entry_rcu(c, &h->list, list) {
-+		if (c->handle == handle) {
-+			type = c->type;
-+			break;
-+		}
-+	}
-+
-+	rcu_read_unlock();
-+
-+	return type;
-+}
-+
- static inline struct hci_conn *hci_conn_hash_lookup_handle(struct hci_dev *hdev,
- 								__u16 handle)
- {
+ 	hdev = hci_alloc_dev();
+ 	if (!hdev)
+ 		return -ENOMEM;
 -- 
 1.9.3
 
