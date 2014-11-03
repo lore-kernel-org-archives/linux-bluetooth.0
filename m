@@ -2,11 +2,11 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: Sebastian Chlad <sebastian.chlad@tieto.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] android/pts: Correct typo in tests listing for IOPT
-Date: Mon, 03 Nov 2014 19:19:01 +0100
-Message-ID: <2433442.rEbgIbNuSO@leonov>
-In-Reply-To: <1415031889-10285-1-git-send-email-sebastian.chlad@tieto.com>
-References: <1415031889-10285-1-git-send-email-sebastian.chlad@tieto.com>
+Subject: Re: [PATCH] android/pts: Correct typo in MCAP tests listing
+Date: Mon, 03 Nov 2014 19:15:36 +0100
+Message-ID: <2060031.HHvN5f2bde@leonov>
+In-Reply-To: <1415029839-7065-1-git-send-email-sebastian.chlad@tieto.com>
+References: <1415029839-7065-1-git-send-email-sebastian.chlad@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -14,27 +14,26 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Sebastian,
 
-On Monday 03 of November 2014 17:24:49 Sebastian Chlad wrote:
+On Monday 03 of November 2014 16:50:39 Sebastian Chlad wrote:
 > ---
->  android/pts-iopt.txt | 2 +-
+>  android/pts-mcap.txt | 2 +-
 >  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> diff --git a/android/pts-iopt.txt b/android/pts-iopt.txt
-> index c13b6e5..aec40ed 100644
-> --- a/android/pts-iopt.txt
-> +++ b/android/pts-iopt.txt
-> @@ -18,7 +18,7 @@ TC_COD_BV_02_I	N/A	Under PTS 5.1 test shall be disabled 
-as
-> there is matching test case in HFP test suit (test No. 15)
->  			PICS settings for HFP shall be disabled for IOPT
->  TC_SDSS_BV_02_I	PASS
-> -TC_SDSA_BV_03_I	PASS
-> +TC_SDAS_BV_03_I	PASS
->  TC_SDR_BV_04_I	PASS	for every PTS bt profile:
->  			haltest: bluetooth get_remote_service_record <addr>
->  							<requred 128 sdp uuid>
+> diff --git a/android/pts-mcap.txt b/android/pts-mcap.txt
+> index 9d1fdcd..3b4766f 100644
+> --- a/android/pts-mcap.txt
+> +++ b/android/pts-mcap.txt
+> @@ -31,7 +31,7 @@ TC_MCAP_CM_ABT_BV_03_C	N/A
+>  TC_MCAP_CM_DEL_BV_01_C	N/A
+>  TC_MCAP_CM_DEL_BV_02_C	INC	PTS Issue #12693
+>  				mcaptest -C 4099 -D 4101
+> -TC_MCAP_CM_DEL_BV_02_C	N/A
+> +TC_MCAP_CM_DEL_BV_03_C	N/A
+>  TC_MCAP_CM_DEL_BV_04_C	INC	PTS Issue #12693
+>  				mcaptest -C 4099 -D 4101
+>  TC_MCAP_CM_DIS_BV_01_C	PASS	mcaptest -C 4099 -D 4101 -e 2 -f 2
 
-Applied as well, thanks.
+Pushed, thanks.
 
 -- 
 BR
