@@ -1,41 +1,157 @@
 Return-Path: <cyrus@holtmann.org>
 From: Gowtham Anandha Babu <gowtham.ab@samsung.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: d.kasatkin@samsung.com, bharat.panda@samsung.com, cpgs@samsung.com,
-	Gowtham Anandha Babu <gowtham.ab@samsung.com>
-Subject: [PATCH v2 0/6] Add support for RFCOMM in btmon
-Date: Mon, 03 Nov 2014 20:55:17 +0530
-Message-id: <1415028323-13861-1-git-send-email-gowtham.ab@samsung.com>
+To: 'Luiz Augusto von Dentz' <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	'Dmitry Kasatkin' <d.kasatkin@samsung.com>,
+	'Bharat Panda' <bharat.panda@samsung.com>, cpgs@samsung.com
+References: <1415011293-29661-1-git-send-email-gowtham.ab@samsung.com>
+ <1415011293-29661-6-git-send-email-gowtham.ab@samsung.com>
+ <CABBYNZ++OJPY_rg4FGaTT8=PMjCk94ZxhqGy93uprhd7U4FKwQ@mail.gmail.com>
+In-reply-to: <CABBYNZ++OJPY_rg4FGaTT8=PMjCk94ZxhqGy93uprhd7U4FKwQ@mail.gmail.com>
+Subject: RE: [PATCH v1 5/6] monitor/rfcomm: Add handlers for mcc frame type
+Date: Mon, 03 Nov 2014 20:54:26 +0530
+Message-id: <001001cff77a$4e4c0770$eae41650$@samsung.com>
+MIME-version: 1.0
+Content-type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Adds an initial implementation for RFCOMM in Bluetooth monitor.
+Hi,
 
-Implementation for Decoding MSC, RPN, RLS, PN, NSC frames 
-will  be covered in the next patch-set.
+> -----Original Message-----
+> From: Luiz Augusto von Dentz [mailto:luiz.dentz@gmail.com]
+> Sent: Monday, November 03, 2014 8:09 PM
+> To: Gowtham Anandha Babu
+> Cc: linux-bluetooth@vger.kernel.org; Dmitry Kasatkin; Bharat Panda;
+> cpgs@samsung.com
+> Subject: Re: [PATCH v1 5/6] monitor/rfcomm: Add handlers for mcc frame
+> type
+> 
+> Hi,
+> 
+> On Mon, Nov 3, 2014 at 12:41 PM, Gowtham Anandha Babu
+> <gowtham.ab@samsung.com> wrote:
+> > From: Bharat Panda <bharat.panda@samsung.com>
+> >
+> > Changes made to decode different mcc frame type in RFCOMM for btmon.
+> > ---
+> >  monitor/rfcomm.c | 78
+> > ++++++++++++++++++++++++++++++++++++++++++++++++++++++--
+> >  1 file changed, 76 insertions(+), 2 deletions(-)
+> >
+> > diff --git a/monitor/rfcomm.c b/monitor/rfcomm.c index
+> > a43b2a2..b85e8fd 100644
+> > --- a/monitor/rfcomm.c
+> > +++ b/monitor/rfcomm.c
+> > @@ -90,6 +90,51 @@ static void print_rfcomm_hdr(const struct
+> l2cap_frame *frame,
+> >         print_field("FCS : (0x%2.2x)", fcs);  }
+> >
+> > +static inline void mcc_test(const struct l2cap_frame *frame,
+> > +                               struct rfcomm_lhdr hdr, struct
+> > +rfcomm_lmcc mcc) { }
+> > +
+> > +static inline void mcc_fcon(const struct l2cap_frame *frame,
+> > +                               struct rfcomm_lhdr hdr, struct
+> > +rfcomm_lmcc mcc) { }
+> > +
+> > +static inline void mcc_fcoff(const struct l2cap_frame *frame,
+> > +                               struct rfcomm_lhdr hdr, struct
+> > +rfcomm_lmcc mcc) { }
+> > +
+> > +static inline void mcc_msc(const struct l2cap_frame *frame,
+> > +                               struct rfcomm_lhdr hdr, struct
+> > +rfcomm_lmcc mcc) {
+> > +       packet_hexdump(frame->data, frame->size); }
+> > +
+> > +static inline void mcc_rpn(const struct l2cap_frame *frame,
+> > +                               struct rfcomm_lhdr hdr, struct
+> > +rfcomm_lmcc mcc) {
+> > +       packet_hexdump(frame->data, frame->size); }
+> > +
+> > +static inline void mcc_rls(const struct l2cap_frame *frame,
+> > +                               struct rfcomm_lhdr hdr, struct
+> > +rfcomm_lmcc mcc) {
+> > +       packet_hexdump(frame->data, frame->size); }
+> > +
+> > +static inline void mcc_pn(const struct l2cap_frame *frame,
+> > +                               struct rfcomm_lhdr hdr, struct
+> > +rfcomm_lmcc mcc) {
+> > +       packet_hexdump(frame->data, frame->size); }
+> > +
+> > +static inline void mcc_nsc(const struct l2cap_frame *frame,
+> > +                               struct rfcomm_lhdr hdr, struct
+> > +rfcomm_lmcc mcc) {
+> > +       packet_hexdump(frame->data, frame->size); }
+> 
+> Im fine if you want to add parsing functions upfront but they should do
+> something useful other than just packet_hexdump otherwise don't bother,
+> btw please add the output that this changes are producing in the description
+> so we can more easily visualize the format you are proposing.
+> 
+> >  static const char *type2str(uint8_t type)  {
+> >         switch (type) {
+> > @@ -141,8 +186,37 @@ static inline bool mcc_frame(const struct
+> l2cap_frame *frame,
+> >         print_indent(7, opcode_color, "RFCOMM(s): ", "", COLOR_OFF, "%s
+> %s",
+> >                                         type2str(type),
+> > CR_STR(mcc.type));
+> >
+> > -       print_rfcomm_hdr(&rfcomm_frame, hdr);
+> > -       packet_hexdump(rfcomm_frame.data, rfcomm_frame.size);
+> > +       switch (type) {
+> > +       case RFCOMM_TEST:
+> > +               mcc_test(&rfcomm_frame, hdr, mcc);
+> > +               packet_hexdump(rfcomm_frame.data, rfcomm_frame.size);
+> > +               break;
+> > +       case RFCOMM_FCON:
+> > +               mcc_fcon(&rfcomm_frame, hdr, mcc);
+> > +               break;
+> > +       case RFCOMM_FCOFF:
+> > +               mcc_fcoff(&rfcomm_frame, hdr, mcc);
+> > +               break;
+> > +       case RFCOMM_MSC:
+> > +               mcc_msc(&rfcomm_frame, hdr, mcc);
+> > +               break;
+> > +       case RFCOMM_RPN:
+> > +               mcc_rpn(&rfcomm_frame, hdr, mcc);
+> > +               break;
+> > +       case RFCOMM_RLS:
+> > +               mcc_rls(&rfcomm_frame, hdr, mcc);
+> > +               break;
+> > +       case RFCOMM_PN:
+> > +               mcc_pn(&rfcomm_frame, hdr, mcc);
+> > +               break;
+> > +       case RFCOMM_NSC:
+> > +               mcc_nsc(&rfcomm_frame, hdr, mcc);
+> > +               break;
+> > +       default:
+> > +               print_field("MCC message type 0x%02x: ", type);
+> > +               print_rfcomm_hdr(&rfcomm_frame, hdr);
+> > +               packet_hexdump(rfcomm_frame.data, rfcomm_frame.size);
+> > +       }
+> >
+> >         return true;
+> >  }
+> > --
+> > 1.9.1
+> >
+> > --
+> > To unsubscribe from this list: send the line "unsubscribe
+> > linux-bluetooth" in the body of a message to majordomo@vger.kernel.org
+> > More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> 
+> 
+> 
+> --
+> Luiz Augusto von Dentz
 
-v1: Added rfcomm.c file in Android.mk
+I added Andoird.mk in the corresponding patch and included the logs in the final patch and submitted v2 for the same. If you want the complete log, I am ready to send it.
 
-v2: Adds the btmon log specific to rfcomm
+Btw we are almost done with the implementation for all the mcc frames. It will not be the hexdump kind of things.
+Since it is an initial skeleton we proposed this kind of changes.
 
-Bharat Panda (2):
-  monitor/rfcomm: Add handlers for mcc frame type
-  monitor/rfcomm: Add mcc type handlers code
-
-Gowtham Anandha Babu (4):
-  monitor/rfcomm: Add RFCOMM support to btmon
-  monitor/rfcomm: Add support for RFCOMM commands
-  monitor/rfcomm: Add support for UIH frame decoding
-  monitor/rfcomm: Add support for mcc frame decoding
-
- Makefile.tools     |   1 +
- android/Android.mk |   1 +
- monitor/l2cap.c    |   4 +
- monitor/l2cap.h    |   1 +
- monitor/rfcomm.c   | 333 +++++++++++++++++++++++++++++++++++++++++++++++++++++
- 5 files changed, 340 insertions(+)
- create mode 100644 monitor/rfcomm.c
-
--- 
-1.9.1
+Regards,
+Gowtham Anandha Babu
 
