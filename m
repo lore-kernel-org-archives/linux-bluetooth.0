@@ -1,115 +1,114 @@
 Return-Path: <cyrus@holtmann.org>
-From: Gowtham Anandha Babu <gowtham.ab@samsung.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: d.kasatkin@samsung.com, bharat.panda@samsung.com, cpgs@samsung.com,
-	Gowtham Anandha Babu <gowtham.ab@samsung.com>
-Subject: [PATCH v2 2/6] monitor/rfcomm: Add support for RFCOMM commands
-Date: Mon, 03 Nov 2014 20:55:19 +0530
-Message-id: <1415028323-13861-3-git-send-email-gowtham.ab@samsung.com>
-In-reply-to: <1415028323-13861-1-git-send-email-gowtham.ab@samsung.com>
-References: <1415028323-13861-1-git-send-email-gowtham.ab@samsung.com>
+MIME-Version: 1.0
+In-Reply-To: <1414779299-18197-1-git-send-email-jamuraa@chromium.org>
+References: <1414779299-18197-1-git-send-email-jamuraa@chromium.org>
+Date: Mon, 3 Nov 2014 17:26:42 +0200
+Message-ID: <CABBYNZKiiBXMfjRbWo+sp1Gd3LmUsxJ8QKPOHJoAFU3BOpaDhg@mail.gmail.com>
+Subject: Re: [PATCH BlueZ v5 0/8] Unit tests for gattrib API
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Michael Janssen <jamuraa@chromium.org>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Changes made to decode RFCOMM specific commands in btmon.
----
- monitor/rfcomm.c | 73 ++++++++++++++++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 71 insertions(+), 2 deletions(-)
+Hi Michael,
 
-diff --git a/monitor/rfcomm.c b/monitor/rfcomm.c
-index 8b7e8ce..395a7b8 100644
---- a/monitor/rfcomm.c
-+++ b/monitor/rfcomm.c
-@@ -44,18 +44,87 @@
- #include "sdp.h"
- #include "rfcomm.h"
- 
-+#define GET_LEN8(length) ((length & 0xfe) >> 1)
-+#define GET_LEN16(length) ((length & 0xfffe) >> 1)
-+
-+struct rfcomm_lhdr {
-+	uint8_t address;
-+	uint8_t control;
-+	uint16_t length;
-+} __attribute__((packed));
-+
- const char *opcode_color;
- 
-+static void print_rfcomm_hdr(const struct l2cap_frame *frame,
-+						struct rfcomm_lhdr hdr)
-+{
-+}
-+
-+static bool uih_frame(const struct l2cap_frame *frame, struct rfcomm_lhdr hdr)
-+{
-+	return true;
-+}
-+
- void rfcomm_packet(const struct l2cap_frame *frame)
- {
-+	uint8_t ctr_type, length, ex_length;
-+	const char *opcode_str;
-+	struct rfcomm_lhdr hdr;
-+	struct l2cap_frame rfcomm_frame;
-+
-+	l2cap_frame_pull(&rfcomm_frame, frame, 0);
-+
-+	if (!l2cap_frame_get_u8(&rfcomm_frame, &hdr.address) ||
-+			!l2cap_frame_get_u8(&rfcomm_frame, &hdr.control) ||
-+			!l2cap_frame_get_u8(&rfcomm_frame, &length))
-+		goto fail;
-+
-+	if (RFCOMM_TEST_EA(length))
-+		hdr.length = (uint16_t) GET_LEN8(length);
-+	else {
-+		if (!l2cap_frame_get_u8(&rfcomm_frame, &ex_length))
-+			goto fail;
-+		hdr.length = ((uint16_t)length << 8) | ex_length;
-+		hdr.length = GET_LEN16(hdr.length);
-+	}
-+
- 	if (frame->in)
- 		opcode_color = COLOR_MAGENTA;
- 	else
- 		opcode_color = COLOR_BLUE;
- 
--	print_indent(7, opcode_color, "RFCOMM: ", "",
--							COLOR_OFF, "");
-+	ctr_type = RFCOMM_GET_TYPE(hdr.control);
-+
-+	if (ctr_type == RFCOMM_UIH) {
-+		if (uih_frame(&rfcomm_frame, hdr))
-+			return;
-+		goto fail;
-+	} else {
-+		switch (ctr_type) {
-+		case RFCOMM_SABM:
-+			opcode_str = "SABM";
-+			break;
-+		case RFCOMM_UA:
-+			opcode_str = "UA";
-+			break;
-+		case RFCOMM_DM:
-+			opcode_str = "DM";
-+			break;
-+		case RFCOMM_DISC:
-+			opcode_str = "DISC";
-+			break;
-+		default:
-+			opcode_str = "ERR";
-+		}
-+
-+		print_indent(7, opcode_color, "RFCOMM(s): ", opcode_str,
-+								COLOR_OFF, "");
-+		print_rfcomm_hdr(&rfcomm_frame, hdr);
-+		return;
-+	}
- 
-+fail:
-+	print_text(COLOR_ERROR, "Frame too short");
- 	packet_hexdump(frame->data, frame->size);
- 	return;
- }
+On Fri, Oct 31, 2014 at 8:14 PM, Michael Janssen <jamuraa@chromium.org> wrote:
+> Since we want to replace GAttrib with a bt_att shim for a smooth transition
+> to bt_att profiles, this patch cleans up the API and adds unit tests for
+> GAttrib functions.
+>
+> This adds tests for all but the register / unregister functions, which
+> I will send in a separate patch since they are slightly more complicated due
+> to catchalls.
+>
+> v1 -> v2:
+>   * Add g_attrib_register tests
+>   * Cleanup of unit/test-gattrib.c
+>   * Bugfix for GATTRIB_ALL_REQS
+>
+> v2 -> v3:
+>   * Just move g_attrib_is_encrypted to static (Luiz)
+>   * Check that registered-for PDUs were delivered
+>   * Respond to Request PDU when registered for it.
+>   * Copy result PDUs since they aren't guaranteed to live beyond callback.
+>
+> v3 -> v4:
+>   * Rework to use g_main_loop_run() for running
+>   * Reuse pdu_data struct in expect_response
+>
+> v4 -> v5:
+>   * Rebase, fix compilation problems
+>   * Only init log on --verbose
+>
+> Michael Janssen (8):
+>   attrib: Add mtu argument to g_attrib_new
+>   attrib: remove g_attrib_is_encrypted
+>   Add unit tests for gattrib
+>   attrib: Add unit tests for g_attrib_register
+>   attrib: fix GATTRIB_ALL_REQS behavior
+>   unit/gattrib: Check expected PDUs were delivered
+>   unit/gattrib: Respond to the request PDU.
+>   unit/gattrib: Only init log on --verbose
+>
+>  .gitignore           |   1 +
+>  Makefile.am          |   7 +
+>  attrib/gattrib.c     |  44 ++--
+>  attrib/gattrib.h     |   4 +-
+>  attrib/gatttool.c    |  17 +-
+>  attrib/interactive.c |  17 +-
+>  src/attrib-server.c  |  12 ++
+>  src/device.c         |  11 +-
+>  unit/test-gattrib.c  | 576 +++++++++++++++++++++++++++++++++++++++++++++++++++
+>  9 files changed, 664 insertions(+), 25 deletions(-)
+>  create mode 100644 unit/test-gattrib.c
+>
+> --
+> 2.1.0.rc2.206.gedb03e5
+
+Ive applied this set, but notice that I have to change quite many
+things that check-patch was complaining and there was still a build
+problem in android/gatt.c:1442:g_attrib_new which you did not update
+so I had to fix it myself.
+
+Btw, after applying I realize the very first test had some problems:
+
+bluetoothd[14700]: attrib/gattrib.c:g_attrib_ref() 0x5da8670: ref=2
+==14700== Conditional jump or move depends on uninitialised value(s)
+==14700==    at 0x4032A6: test_refcount (test-gattrib.c:136)
+==14700==    by 0x4E9E5E0: ??? (in /usr/lib64/libglib-2.0.so.0.3800.2)
+==14700==    by 0x4E9E7A5: ??? (in /usr/lib64/libglib-2.0.so.0.3800.2)
+==14700==    by 0x4E9EB1A: g_test_run_suite (in
+/usr/lib64/libglib-2.0.so.0.3800.2)
+==14700==    by 0x402197: main (test-gattrib.c:579)
+==14700==  Uninitialised value was created by a stack allocation
+==14700==    at 0x403250: test_refcount (test-gattrib.c:125)
+==14700==
+bluetoothd[14700]: attrib/gattrib.c:g_attrib_unref() 0x5da8670: ref=1
+==14700== Conditional jump or move depends on uninitialised value(s)
+==14700==    at 0x4032D3: test_refcount (test-gattrib.c:140)
+==14700==    by 0x4E9E5E0: ??? (in /usr/lib64/libglib-2.0.so.0.3800.2)
+==14700==    by 0x4E9E7A5: ??? (in /usr/lib64/libglib-2.0.so.0.3800.2)
+==14700==    by 0x4E9EB1A: g_test_run_suite (in
+/usr/lib64/libglib-2.0.so.0.3800.2)
+==14700==    by 0x402197: main (test-gattrib.c:579)
+==14700==  Uninitialised value was created by a stack allocation
+==14700==    at 0x403250: test_refcount (test-gattrib.c:125)
+==14700==
+bluetoothd[14700]: attrib/gattrib.c:g_attrib_unref() 0x5da8670: ref=0
+==14700== Conditional jump or move depends on uninitialised value(s)
+==14700==    at 0x4032E3: test_refcount (test-gattrib.c:144)
+==14700==    by 0x4E9E5E0: ??? (in /usr/lib64/libglib-2.0.so.0.3800.2)
+==14700==    by 0x4E9E7A5: ??? (in /usr/lib64/libglib-2.0.so.0.3800.2)
+==14700==    by 0x4E9EB1A: g_test_run_suite (in
+/usr/lib64/libglib-2.0.so.0.3800.2)
+==14700==    by 0x402197: main (test-gattrib.c:579)
+==14700==  Uninitialised value was created by a stack allocation
+==14700==    at 0x403250: test_refcount (test-gattrib.c:125)
+==14700==
+
+
+
 -- 
-1.9.1
-
+Luiz Augusto von Dentz
