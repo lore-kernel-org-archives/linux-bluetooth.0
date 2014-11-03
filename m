@@ -2,57 +2,61 @@ Return-Path: <cyrus@holtmann.org>
 From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH v2 09/10] shared/hfp: Add function to skip field in hfp_context
-Date: Mon,  3 Nov 2014 10:36:00 +0100
-Message-Id: <1415007361-4177-10-git-send-email-lukasz.rymanowski@tieto.com>
+Subject: [PATCH v2 10/10] unit/test-hfp: Test for skip hfp_context field
+Date: Mon,  3 Nov 2014 10:36:01 +0100
+Message-Id: <1415007361-4177-11-git-send-email-lukasz.rymanowski@tieto.com>
 In-Reply-To: <1415007361-4177-1-git-send-email-lukasz.rymanowski@tieto.com>
 References: <1415007361-4177-1-git-send-email-lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Some fields in AT commands are not used by HFP spec. When parsing such
-commands it is convinient to just skip it without looking what is inside
-there
+This patch adds test:
+/hfp_hf/test_context_skip_field
 ---
- src/shared/hfp.c | 12 ++++++++++++
- src/shared/hfp.h |  1 +
- 2 files changed, 13 insertions(+)
+ unit/test-hfp.c | 24 ++++++++++++++++++++++++
+ 1 file changed, 24 insertions(+)
 
-diff --git a/src/shared/hfp.c b/src/shared/hfp.c
-index 6c804f5..a35cb7b 100644
---- a/src/shared/hfp.c
-+++ b/src/shared/hfp.c
-@@ -415,6 +415,18 @@ bool hfp_context_has_next(struct hfp_context *context)
- 	return context->data[context->offset] != '\0';
+diff --git a/unit/test-hfp.c b/unit/test-hfp.c
+index 617b336..ef8a100 100644
+--- a/unit/test-hfp.c
++++ b/unit/test-hfp.c
+@@ -556,6 +556,23 @@ static void hf_chld_result_handler(struct hfp_context *hf_context,
+ 	hfp_hf_disconnect(context->hfp_hf);
  }
  
-+void hfp_context_skip_field(struct hfp_context *context)
++static void hf_chld_skip_field(struct hfp_context *hf_context,
++							void *user_data)
 +{
-+	const char *data = context->data;
-+	unsigned int offset = context->offset;
++	struct context *context = user_data;
++	char str[3];
 +
-+	while (data[offset] != '\0' && data[offset] != ',')
-+		offset++;
++	g_assert(hf_context);
 +
-+	context->offset = offset;
-+	next_field(context);
++	hfp_context_skip_field(hf_context);
++
++	g_assert(hfp_context_get_unquoted_string(hf_context, str,
++								sizeof(str)));
++	g_assert_cmpstr(str, ==, "2x");
++
++	hfp_hf_disconnect(context->hfp_hf);
 +}
 +
- bool hfp_context_get_range(struct hfp_context *context, uint32_t *min,
- 								uint32_t *max)
+ static void hf_clcc_result_handler(struct hfp_context *hf_context,
+ 							void *user_data)
  {
-diff --git a/src/shared/hfp.h b/src/shared/hfp.h
-index 5ba020d..2eb7838 100644
---- a/src/shared/hfp.h
-+++ b/src/shared/hfp.h
-@@ -130,6 +130,7 @@ bool hfp_context_get_unquoted_string(struct hfp_context *context,
- bool hfp_context_get_range(struct hfp_context *context, unsigned int *min,
- 							unsigned int *max);
- bool hfp_context_has_next(struct hfp_context *context);
-+void hfp_context_skip_field(struct hfp_context *context);
+@@ -801,5 +818,12 @@ int main(int argc, char *argv[])
+ 			frg_pdu('1', ',', '2', 'x', '\r', '\n'),
+ 			data_end());
  
- typedef void (*hfp_hf_result_func_t)(struct hfp_context *context,
- 							void *user_data);
++	define_hf_test("/hfp_hf/test_context_skip_field", test_hf_unsolicited,
++			hf_chld_skip_field, NULL,
++			raw_pdu('+', 'C', 'H', 'L', 'D', '\0'),
++			frg_pdu('+', 'C', 'H', 'L', 'D', ':'),
++			frg_pdu('1', ',', '2', 'x', '\r', '\n'),
++			data_end());
++
+ 	return g_test_run();
+ }
 -- 
 1.8.4
 
