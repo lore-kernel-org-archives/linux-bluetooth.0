@@ -1,39 +1,68 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 3 Nov 2014 16:03:23 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Szymon Janc <szymon.janc@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	Jukka Taimisto <jtt@codenomicon.com>
-Subject: Re: [PATCH] Bluetooth: Fix invalid response for 'Start Discovery'
- command
-Message-ID: <20141103140323.GA9985@t440s.lan>
-References: <1415020856-9018-1-git-send-email-szymon.janc@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1415020856-9018-1-git-send-email-szymon.janc@tieto.com>
+From: Sebastian Chlad <sebastian.chlad@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Sebastian Chlad <sebastian.chlad@tieto.com>
+Subject: [PATCH] android/pts: Interim PTS tests results for L2CAP
+Date: Mon,  3 Nov 2014 14:44:46 +0100
+Message-Id: <1415022286-30683-1-git-send-email-sebastian.chlad@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Szymon,
+---
+ android/pts-l2cap.txt | 16 ++++++++--------
+ 1 file changed, 8 insertions(+), 8 deletions(-)
 
-On Mon, Nov 03, 2014, Szymon Janc wrote:
-> According to Management Interface API 'Start Discovery' command should
-> generate a Command Complete event on failure. Currently kernel is
-> sending Command Status on early errors. This results in userspace
-> ignoring such event due to invalid size.
-> 
-> bluetoothd[28499]: src/adapter.c:trigger_start_discovery()
-> bluetoothd[28499]: src/adapter.c:cancel_passive_scanning()
-> bluetoothd[28499]: src/adapter.c:start_discovery_timeout()
-> bluetoothd[28499]: src/adapter.c:start_discovery_complete() status 0x0a
-> bluetoothd[28499]: Wrong size of start discovery return parameters
-> 
-> Signed-off-by: Szymon Janc <szymon.janc@tieto.com>
-> Reported-by: Jukka Taimisto <jtt@codenomicon.com>
-> ---
->  net/bluetooth/mgmt.c | 56 ++++++++++++++++++++++++++++++++--------------------
->  1 file changed, 35 insertions(+), 21 deletions(-)
+diff --git a/android/pts-l2cap.txt b/android/pts-l2cap.txt
+index 9706d69..ea58899 100644
+--- a/android/pts-l2cap.txt
++++ b/android/pts-l2cap.txt
+@@ -83,19 +83,18 @@ TC_FOC_BV_03_C		PASS	l2test -r -X ertm -P 4113 -F 0
+ TC_OFS_BV_01_C		PASS	l2test -x -X ertm -P 4113 -F 0 -N 1
+ TC_OFS_BV_02_C		PASS	l2test -r -X ertm -P 4113 -F 0
+ TC_OFS_BV_03_C		PASS	l2test -x -X streaming -P 4113 -F 0 -N 1
+-TC_OFS_BV_04_C		PASS	l2test -r -X streaming -P 4113 -F 0
+-				JIRA issue #BA-180
++TC_OFS_BV_04_C		PASS	l2test -d -X streaming -P 4113 -F 0
+ TC_OFS_BV_05_C		PASS	l2test -x -X ertm -P 4113 -N 1
+ TC_OFS_BV_06_C		PASS	l2test -r -X ertm -P 4113
+ TC_OFS_BV_07_C		PASS	l2test -x -X streaming -P 4113 -F 0 -N 1
+-TC_OFS_BV_08_C		PASS	l2test -r -X streaming -P 4113
+-				JIRA issue #BA-180
++TC_OFS_BV_08_C		PASS	l2test -d -X streaming -P 4113
+ TC_ERM_BV_01_C		PASS	l2test -x -X ertm -P 4113 -N 3 -Y 3
+ TC_ERM_BV_02_C		PASS	l2test -r -X ertm -P 4113
+ TC_ERM_BV_03_C		PASS	l2test -r -X ertm -P 4113
+ TC_ERM_BV_05_C		PASS	l2test -x -X ertm -P 4113 -N 2 -Y 2
+ TC_ERM_BV_06_C		PASS	l2test -x -X ertm -P 4113 -N 2 -Y 2
+-TC_ERM_BV_07_C		PASS	l2test -r -H 1000 -K 10000 -X ertm -P 4113
++TC_ERM_BV_07_C		INC	PTS issue #12690
++				l2test -r -H 1000 -K 10000 -X ertm -P 4113
+ TC_ERM_BV_08_C		PASS	l2test -x -X ertm -P 4113 -N 1
+ TC_ERM_BV_09_C		PASS	l2test -X ertm -P 4113
+ TC_ERM_BV_10_C		PASS	l2test -x -X ertm -P 4113 -N 1
+@@ -107,10 +106,11 @@ TC_ERM_BV_15_C		PASS	l2test -x -X ertm -P 4113 -N 4
+ TC_ERM_BV_16_C		N/A
+ TC_ERM_BV_17_C		PASS	l2test -X ertm -P 4113
+ TC_ERM_BV_18_C		PASS	l2test -x -X ertm -P 4113 -N 1
+-TC_ERM_NV_19_C		PASS	l2test -x -X ertm -P 4113 -N 1
++TC_ERM_BV_19_C		PASS	l2test -x -X ertm -P 4113 -N 1
+ TC_ERM_BV_20_C		PASS	l2test -x -X ertm -P 4113 -N 1
+ TC_ERM_BV_21_C		PASS	l2test -x -X ertm -P 4113 -D 2000 -N 2
+-TC_ERM_BV_22_C		PASS	l2test -r -H 1000 -K 5000 -X ertm -P 4113
++TC_ERM_BV_22_C		INC	PTS issue #12690
++				l2test -r -H 1000 -K 5000 -X ertm -P 4113
+ TC_ERM_BV_23_C		PASS	l2test -x -X ertm -P 4113 -N 2
+ TC_ERM_BI_01_C		N/A
+ TC_ERM_BI_02_C		PASS	l2test -X ertm -P 4113
+@@ -118,7 +118,7 @@ TC_ERM_BI_03_C		PASS	l2test -x -X ertm -P 4113 -N 2
+ TC_ERM_BI_04_C		PASS	l2test -x -X ertm -P 4113 -N 2
+ TC_ERM_BI_05_C		PASS	l2test -x -X ertm -P 4113 -N 2
+ TC_STM_BV_01_C		PASS	l2test -x -X streaming -P 4113 -N 3 -Y 3
+-TC_STM_BV_02_C		PASS	l2test -r -X streaming -P 4113
++TC_STM_BV_02_C		PASS	l2test -d -X streaming -P 4113
+ TC_STM_BV_03_C		PASS	l2test -x -X streaming -P 4113 -N 2
+ TC_STM_BV_11_C		N/A
+ TC_STM_BV_12_C		N/A
+-- 
+1.8.5.3
 
-Applied to bluetooth-next. Thanks.
-
-Johan
