@@ -1,156 +1,27 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Mon, 3 Nov 2014 16:04:24 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Szymon Janc <szymon.janc@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] mgmt-tester: Fix expected response for invalid start
+ discovery tests
+Message-ID: <20141103140424.GB9985@t440s.lan>
+References: <1415020884-9069-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
-In-Reply-To: <1415011293-29661-2-git-send-email-gowtham.ab@samsung.com>
-References: <1415011293-29661-1-git-send-email-gowtham.ab@samsung.com>
-	<1415011293-29661-2-git-send-email-gowtham.ab@samsung.com>
-Date: Mon, 3 Nov 2014 16:33:14 +0200
-Message-ID: <CABBYNZ+rfs--zowAxbxv+3TYuC0sQb=2dBgFj=EY+AZ2anbh2Q@mail.gmail.com>
-Subject: Re: [PATCH v1 1/6] monitor/rfcomm: Add RFCOMM support to btmon
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Gowtham Anandha Babu <gowtham.ab@samsung.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	Dmitry Kasatkin <d.kasatkin@samsung.com>,
-	Bharat Panda <bharat.panda@samsung.com>, cpgs@samsung.com
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1415020884-9069-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Szymon,
 
-On Mon, Nov 3, 2014 at 12:41 PM, Gowtham Anandha Babu
-<gowtham.ab@samsung.com> wrote:
-> Changes made to add initial code to support RFCOMM frame in btmon.
+On Mon, Nov 03, 2014, Szymon Janc wrote:
+> According to Management Interface API 'Start Discovery' command should
+> generate a Command Complete event on failure.
 > ---
->  Makefile.tools   |  1 +
->  monitor/l2cap.c  |  4 ++++
->  monitor/l2cap.h  |  1 +
->  monitor/rfcomm.c | 61 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
->  4 files changed, 67 insertions(+)
->  create mode 100644 monitor/rfcomm.c
->
-> diff --git a/Makefile.tools b/Makefile.tools
-> index 42cccc6..75a6faa 100644
-> --- a/Makefile.tools
-> +++ b/Makefile.tools
-> @@ -26,6 +26,7 @@ monitor_btmon_SOURCES = monitor/main.c monitor/bt.h \
->                                 monitor/l2cap.h monitor/l2cap.c \
->                                 monitor/sdp.h monitor/sdp.c \
->                                 monitor/avctp.h monitor/avctp.c \
-> +                               monitor/rfcomm.h monitor/rfcomm.c \
->                                 monitor/uuid.h monitor/uuid.c \
->                                 monitor/hwdb.h monitor/hwdb.c \
->                                 monitor/keys.h monitor/keys.c \
+>  tools/mgmt-tester.c | 6 ++++++
+>  1 file changed, 6 insertions(+)
 
-I suspect you need to do the change to Android.mk here when you start
-modifying l2cap.c.
+Applied. Thanks.
 
-> diff --git a/monitor/l2cap.c b/monitor/l2cap.c
-> index c004d6b..ebdd20f 100644
-> --- a/monitor/l2cap.c
-> +++ b/monitor/l2cap.c
-> @@ -42,6 +42,7 @@
->  #include "keys.h"
->  #include "sdp.h"
->  #include "avctp.h"
-> +#include "rfcomm.h"
->
->  #define MAX_CHAN 64
->
-> @@ -2643,6 +2644,9 @@ static void l2cap_frame(uint16_t index, bool in, uint16_t handle,
->                 case 0x0001:
->                         sdp_packet(&frame);
->                         break;
-> +               case 0x0003:
-> +                       rfcomm_packet(&frame);
-> +                       break;
->                 case 0x001f:
->                         att_packet(index, in, handle, cid, data, size);
->                         break;
-> diff --git a/monitor/l2cap.h b/monitor/l2cap.h
-> index 5faaea6..1f70b68 100644
-> --- a/monitor/l2cap.h
-> +++ b/monitor/l2cap.h
-> @@ -153,3 +153,4 @@ static inline bool l2cap_frame_get_le64(struct l2cap_frame *frame,
->
->  void l2cap_packet(uint16_t index, bool in, uint16_t handle, uint8_t flags,
->                                         const void *data, uint16_t size);
-> +void rfcomm_packet(const struct l2cap_frame *frame);
-> diff --git a/monitor/rfcomm.c b/monitor/rfcomm.c
-> new file mode 100644
-> index 0000000..7d38a28
-> --- /dev/null
-> +++ b/monitor/rfcomm.c
-> @@ -0,0 +1,61 @@
-> +/*
-> + *
-> + *  BlueZ - Bluetooth protocol stack for Linux
-> + *
-> + *  Copyright (C) 2011-2014  Intel Corporation
-> + *  Copyright (C) 2002-2010  Marcel Holtmann <marcel@holtmann.org>
-> + *
-> + *
-> + *  This library is free software; you can redistribute it and/or
-> + *  modify it under the terms of the GNU Lesser General Public
-> + *  License as published by the Free Software Foundation; either
-> + *  version 2.1 of the License, or (at your option) any later version.
-> + *
-> + *  This library is distributed in the hope that it will be useful,
-> + *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-> + *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-> + *  Lesser General Public License for more details.
-> + *
-> + *  You should have received a copy of the GNU Lesser General Public
-> + *  License along with this library; if not, write to the Free Software
-> + *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-> + *
-> + */
-> +
-> +#ifdef HAVE_CONFIG_H
-> +#include <config.h>
-> +#endif
-> +
-> +#include <stdio.h>
-> +#include <stdlib.h>
-> +#include <string.h>
-> +#include <ctype.h>
-> +#include <inttypes.h>
-> +
-> +#include <bluetooth/bluetooth.h>
-> +
-> +#include "src/shared/util.h"
-> +#include "bt.h"
-> +#include "packet.h"
-> +#include "display.h"
-> +#include "l2cap.h"
-> +#include "uuid.h"
-> +#include "keys.h"
-> +#include "sdp.h"
-> +#include "rfcomm.h"
-> +
-> +const char *opcode_color;
-> +
-> +void rfcomm_packet(const struct l2cap_frame *frame)
-> +{
-> +       if (frame->in)
-> +               opcode_color = COLOR_MAGENTA;
-> +       else
-> +               opcode_color = COLOR_BLUE;
-> +
-> +       print_indent(7, opcode_color, "RFCOMM: ", "",
-> +                                                       COLOR_OFF, "");
-> +
-> +       packet_hexdump(frame->data, frame->size);
-> +       return;
-> +}
-> --
-> 1.9.1
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-
-
-
--- 
-Luiz Augusto von Dentz
+Johan
