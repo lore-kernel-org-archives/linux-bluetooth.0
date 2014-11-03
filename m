@@ -1,42 +1,50 @@
 Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
-To: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] android/client: Allow empty string for dial command
-Date: Mon, 03 Nov 2014 14:43:34 +0100
-Message-ID: <7043290.MkJvSqFmIS@uw000953>
-In-Reply-To: <1415018178-32132-1-git-send-email-lukasz.rymanowski@tieto.com>
-References: <1415018178-32132-1-git-send-email-lukasz.rymanowski@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+To: linux-bluetooth@vger.kernel.org
+Cc: Szymon Janc <szymon.janc@tieto.com>
+Subject: [PATCH] mgmt-tester: Fix expected response for invalid start discovery tests
+Date: Mon,  3 Nov 2014 14:21:24 +0100
+Message-Id: <1415020884-9069-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Łukasz,
+According to Management Interface API 'Start Discovery' command should
+generate a Command Complete event on failure.
+---
+ tools/mgmt-tester.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-On Monday 03 of November 2014 13:36:18 Lukasz Rymanowski wrote:
-> Empty string is used for redial command
-> ---
->  android/client/if-hf-client.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
-> 
-> diff --git a/android/client/if-hf-client.c b/android/client/if-hf-client.c
-> index 1108639..a837401 100644
-> --- a/android/client/if-hf-client.c
-> +++ b/android/client/if-hf-client.c
-> @@ -533,7 +533,8 @@ static void dial_p(int argc, const char **argv)
->  
->  	/* number string */
->  	if (argc <= 2) {
-> -		haltest_error("No number specified\n");
-> +		haltest_info("Number not specified. Redial\n");
-> +		EXEC(if_hf_client->dial, NULL);
->  		return;
->  	}
->  
-
-Applied, thanks. 
-
+diff --git a/tools/mgmt-tester.c b/tools/mgmt-tester.c
+index 7d34ffb..7d14fe4 100644
+--- a/tools/mgmt-tester.c
++++ b/tools/mgmt-tester.c
+@@ -1679,6 +1679,8 @@ static const struct generic_data start_discovery_not_powered_test_1 = {
+ 	.send_param = start_discovery_bredr_param,
+ 	.send_len = sizeof(start_discovery_bredr_param),
+ 	.expect_status = MGMT_STATUS_NOT_POWERED,
++	.expect_param = start_discovery_bredr_param,
++	.expect_len = sizeof(start_discovery_bredr_param),
+ };
+ 
+ static const struct generic_data start_discovery_invalid_param_test_1 = {
+@@ -1687,6 +1689,8 @@ static const struct generic_data start_discovery_invalid_param_test_1 = {
+ 	.send_param = start_discovery_invalid_param,
+ 	.send_len = sizeof(start_discovery_invalid_param),
+ 	.expect_status = MGMT_STATUS_INVALID_PARAMS,
++	.expect_param = start_discovery_invalid_param,
++	.expect_len = sizeof(start_discovery_invalid_param),
+ };
+ 
+ static const struct generic_data start_discovery_not_supported_test_1 = {
+@@ -1695,6 +1699,8 @@ static const struct generic_data start_discovery_not_supported_test_1 = {
+ 	.send_param = start_discovery_le_param,
+ 	.send_len = sizeof(start_discovery_le_param),
+ 	.expect_status = MGMT_STATUS_REJECTED,
++	.expect_param = start_discovery_le_param,
++	.expect_len = sizeof(start_discovery_le_param),
+ };
+ 
+ static const struct generic_data start_discovery_valid_param_test_1 = {
 -- 
-Best regards, 
-Szymon Janc
+1.9.3
+
