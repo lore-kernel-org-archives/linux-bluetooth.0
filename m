@@ -1,87 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
-From: Gowtham Anandha Babu <gowtham.ab@samsung.com>
-To: 'Luiz Augusto von Dentz' <luiz.dentz@gmail.com>,
-	'Vikrampal' <vikram.pal@samsung.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	'Dmitry Kasatkin' <d.kasatkin@samsung.com>,
-	'Bharat Panda' <bharat.panda@samsung.com>, cpgs@samsung.com
-References: <1414764241-2459-1-git-send-email-gowtham.ab@samsung.com>
- <00a501cff515$0d93ebb0$28bbc310$@samsung.com>
- <CABBYNZKZ1XuRWz6shfXRf4mEmeXJZT7-ubZ0rcUGdBy7=RbM5A@mail.gmail.com>
-In-reply-to: <CABBYNZKZ1XuRWz6shfXRf4mEmeXJZT7-ubZ0rcUGdBy7=RbM5A@mail.gmail.com>
-Subject: RE: [PATCH 0/6] Add support for RFCOMM in btmon
-Date: Mon, 03 Nov 2014 11:02:52 +0530
-Message-id: <000c01cff727$b17d0720$14771560$@samsung.com>
+Message-id: <545710F4.2090208@samsung.com>
+Date: Mon, 03 Nov 2014 14:21:56 +0900
+From: Chan-yeol Park <chanyeol.park@samsung.com>
 MIME-version: 1.0
-Content-type: text/plain; charset=UTF-8
+To: linux-bluetooth@vger.kernel.org
+Subject: Re: [RFC v2] Bluetooth : Fix hci_sync miss wakeup interrupt
+References: <1414732986-20487-1-git-send-email-chanyeol.park@samsung.com>
+ <20141101212409.GA11441@t440s.P-661HNU-F1>
+In-reply-to: <20141101212409.GA11441@t440s.P-661HNU-F1>
+Content-type: text/plain; charset=windows-1252; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Johan,
+On 11/02/2014 06:24 AM, Johan Hedberg wrote:
+> This fixed a really frequent hang for me of init HCI commands when 
+> running mgmt-tester. Is it through the our user space testers that you 
+> were seeing this issue as well? I might have seen the problem in the 
+> past too but for some reason it started showing up really frequently 
+> now. Johan 
 
-> -----Original Message-----
-> From: Luiz Augusto von Dentz [mailto:luiz.dentz@gmail.com]
-> Sent: Monday, November 03, 2014 12:28 AM
-> To: Vikrampal
-> Cc: Gowtham Anandha Babu; linux-bluetooth@vger.kernel.org; Dmitry
-> Kasatkin; Bharat Panda; cpgs@samsung.com
-> Subject: Re: [PATCH 0/6] Add support for RFCOMM in btmon
-> 
-> Hi,
-> 
-> On Fri, Oct 31, 2014 at 4:14 PM, Vikrampal <vikram.pal@samsung.com>
-> wrote:
-> > Hi,
-> >
-> >> -----Original Message-----
-> >> From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-
-> >> owner@vger.kernel.org] On Behalf Of Gowtham Anandha Babu
-> >> Sent: Friday, October 31, 2014 7:34 PM
-> >> To: linux-bluetooth@vger.kernel.org
-> >> Cc: d.kasatkin@samsung.com; bharat.panda@samsung.com;
-> >> cpgs@samsung.com; Gowtham Anandha Babu
-> >> Subject: [PATCH 0/6] Add support for RFCOMM in btmon
-> >>
-> >> Adds an initial implementation for RFCOMM in Bluetooth monitor.
-> >>
-> >> Implementation for Decoding MSC, RPN, RLS, PN, NSC frames will  be
-> >> covered in the next patch-set.
-> >>
-> >> Bharat Panda (2):
-> >>   monitor/rfcomm: Add handlers for mcc frame type
-> >>   monitor/rfcomm: Add mcc type handlers code
-> >>
-> >> Gowtham Anandha Babu (4):
-> >>   monitor/rfcomm: Add RFCOMM support to btmon
-> >>   monitor/rfcomm: Add support for RFCOMM commands
-> >>   monitor/rfcomm: Add support for UIH frame decoding
-> >>   monitor/rfcomm: Add support for mcc frame decoding
-> >>
-> >>  Makefile.tools   |   1 +
-> >>  monitor/l2cap.c  |   4 +
-> >>  monitor/l2cap.h  |   1 +
-> >>  monitor/rfcomm.c | 333
-> >> +++++++++++++++++++++++++++++++++++++++++++++++++++++++
-> >>  4 files changed, 339 insertions(+)
-> >>  create mode 100644 monitor/rfcomm.c
-> >>
-> >> --
-> >> 1.9.1
-> >>
-> >> --
-> >> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth"
-> > in
-> >> the body of a message to majordomo@vger.kernel.org More majordomo
-> >> info at  http://vger.kernel.org/majordomo-info.html
-> >
-> > Please note that android/Android.mk needs to be updated if we change
-> > anything on the build of btmon.
-> 
-> Yes, and apparently Android.mk has not been updated so we need this fixing
-> before we can apply.
+In case of me, I've faced this bug while I execute "hciconfig hci0 down" 
+and hci_dev_do_close(). and it takes about 5 second(HCI_CMD_TIMEOUT).
+As you mentioned this bug is shown recently. I guess some of patches 
+reveal our potential bug.
 
-I have updated the Andoird.mk file and submitted v1 for the same. Thanks for pointing out the mistake. 
+Thanks
+Chanyeol
 
-Regards,
-Gowtham Anandha Babu
+
 
