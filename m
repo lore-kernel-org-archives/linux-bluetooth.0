@@ -1,90 +1,50 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Mon, 3 Nov 2014 22:20:20 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCHv2 2/2] gatt: Refactor discover_included_cb()
+Message-ID: <20141103202020.GB25148@t440s.P-661HNU-F1>
+References: <1414509602-2534-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <1414509602-2534-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20141102132332.GB4544@t440s.P-661HNU-F1>
-References: <1414612349-2262-1-git-send-email-jpawlowski@google.com>
-	<1414612349-2262-2-git-send-email-jpawlowski@google.com>
-	<20141102132332.GB4544@t440s.P-661HNU-F1>
-Date: Mon, 3 Nov 2014 12:50:58 -0800
-Message-ID: <CAD0=r8zh1GqVGQBG3dJJBmzbE8txAVtK6OkvzeB-zT218S5yRw@mail.gmail.com>
-Subject: Re: [PATCH v1 2/2] service-find command for new kernel method usage
-From: Jakub Pawlowski <jpawlowski@google.com>
-To: Jakub Pawlowski <jpawlowski@google.com>,
-	BlueZ development <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1414509602-2534-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Sun, Nov 2, 2014 at 5:23 AM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
-> Hi Jakub,
->
-> On Wed, Oct 29, 2014, Jakub Pawlowski wrote:
->> +static void uuid_to_uuid128(uuid_t *uuid128, const uuid_t *uuid);
->
-> Please just move up this function instead of creating a
-> forward-declaration for it.
->
->> +static void cmd_find_service(struct mgmt *mgmt, uint16_t index, int argc, char **argv)
->> +{
->> +     struct mgmt_cp_start_service_discovery *cp;
->> +     struct mgmt_uuid_filter *filter;
->> +     uint8_t type;
->> +     int opt;
->> +     int total_size = sizeof(struct mgmt_cp_start_service_discovery) + sizeof(struct mgmt_uuid_filter);
->> +     uuid_t uuid;
->> +     uint128_t uint128;
->> +     uuid_t uuid128;
->> +
->> +     if (index == MGMT_INDEX_NONE)
->> +             index = 0;
->> +
->> +     type = 0;
->> +     hci_set_bit(BDADDR_BREDR, &type);
->> +     hci_set_bit(BDADDR_LE_PUBLIC, &type);
->> +     hci_set_bit(BDADDR_LE_RANDOM, &type);
->> +
->> +     cp = malloc(total_size);
->> +     if(cp == NULL) {
->
-> Missing space after 'if', however I wonder is there any point to do
-> dynamic allocation here since you always just have just one filter
-> entry. Having the send buffer on the stack might create simpler code
-> here.
+Hi Andrei,
 
-mgmt_cp_start_service_discovery have array of mgmt_uuid_filter at the
-end, and mgmt_send internally just do one malloc and memcpy to copy
-the whole data.
-Right now I just reserve all needed space. If I use stack variable how
-would I make sure that mgmt_uuid_filter is exactly at end of
-mgmt_cp_start_service_discovery ?
+On Tue, Oct 28, 2014, Andrei Emeltchenko wrote:
+> Initialize variable at declaration fixing setting it to the same value
+> many times.
+> ---
+>  src/shared/gatt-helpers.c | 20 +++++---------------
+>  1 file changed, 5 insertions(+), 15 deletions(-)
+> 
+> diff --git a/src/shared/gatt-helpers.c b/src/shared/gatt-helpers.c
+> index 4f53de3..5713924 100644
+> --- a/src/shared/gatt-helpers.c
+> +++ b/src/shared/gatt-helpers.c
+> @@ -974,7 +974,7 @@ static void discover_included_cb(uint8_t opcode, const void *pdu,
+>  	uint8_t att_ecode = 0;
+>  	uint16_t last_handle;
+>  	size_t data_length;
+> -	bool success;
+> +	bool success = false;
+>  
+>  	if (opcode == BT_ATT_OP_ERROR_RSP) {
+>  		att_ecode = process_error(pdu, length);
+> @@ -983,14 +983,11 @@ static void discover_included_cb(uint8_t opcode, const void *pdu,
+>  							op->result_head)
+>  			goto done;
+>  
+> -		success = false;
+>  		goto failed;
+>  	}
 
-I've fixed all other issues, and would re-send my patch after making
-sure that Marcel is fine with mgmt API as I defined it.
+We generally try to avoid variable initializations upon declaration to
+keep it clear what value is expected and where as well as make it easy
+to spot unused variables. So I'm not really convinced of this patch.
 
->
->> +             fprintf(stderr, "Unable to allocate memory for mgmt_cp_start_service_discovery structure.\n");
->> +     }
->
-> Wouldn't you need to return from the function in this case?
->
->> +     memset(cp, 0, total_size);
->> +
->> +     filter = cp->filter;
->> +
->> +     if(argc == 1) {
->
-> Missing space after 'if'.
->
->> +     if (mgmt_send(mgmt, MGMT_OP_START_SERVICE_DISCOVERY, index, total_size, cp,
->> +                                             find_service_rsp, cp, NULL) == 0) {
->> +             free(cp);
->> +             fprintf(stderr, "Unable to send start_service_discovery cmd\n");
->> +             exit(EXIT_FAILURE);
->> +     }
->> +}
->
-> mgmt_send allocates its own buffer for the send parameters so there's no
-> need for you to keep your own buffer around until the command completion
-> callback (where all you do is free it). However, this whole issue would
-> go away if you'd just use a stack variable.
->
-> Johan
+Johan
