@@ -1,30 +1,57 @@
 Return-Path: <cyrus@holtmann.org>
-From: Sebastian Chlad <sebastian.chlad@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Sebastian Chlad <sebastian.chlad@tieto.com>
-Subject: [PATCH] android/pts: Correct typo in HFP tests list
-Date: Mon,  3 Nov 2014 16:42:46 +0100
-Message-Id: <1415029366-6713-1-git-send-email-sebastian.chlad@tieto.com>
+From: "Urbani, Edmund" <edmund.urbani@lilandit.com>
+Message-ID: <5457A17D.9060404@LilandIT.com>
+Date: Mon, 03 Nov 2014 16:38:37 +0100
+MIME-Version: 1.0
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: How to get started on a GATT Server ?
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- android/pts-hfp.txt | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Hello all,
 
-diff --git a/android/pts-hfp.txt b/android/pts-hfp.txt
-index 8d75766..9de14cb 100644
---- a/android/pts-hfp.txt
-+++ b/android/pts-hfp.txt
-@@ -228,7 +228,7 @@ TC_HF_ATAH_BV_01_I	N/A
- TC_HF_OCA_BV_01_I	N/A
- TC_HF_IIA_BV_04_I	N/A
- TC_AG_COD_BV_02_I	PASS
--TC_AG_ATAH_BV_03_I	PASS
-+TC_AG_ATAH_BV_01_I	PASS
- TC_AG_ATA_BV_03_I	PASS
- TC_AG_ATH_BV_09_I	PASS
- TC_AG_SDP_BV_02_C	PASS
+I am trying to write a simple GATT-based service of my own. Right now I don't really know which docs I should be looking at. I have skimmed through bluez sources (5.23) and found gatt-service.h and gatt.h, as well as the gatt-example plugin.
+
+So far I am still trying to figure out whether I should be going the C API route or maybe use the D-Bus interface. Also gatt-service.c seems to suggest that there is a way to register a GATT service over D-Bus but running it gives me this:
+RegisterService: Method "RegisterService" with signature "oa{sv}" on interface "org.bluez.GattManager1" doesn't exist"
+
+Any pointers to help me get started would be appreciated. Thanks!
+
+Kind regards,
+   Edmund
+
 -- 
-1.8.5.3
+
+Mit freundlichen Grüßen
+Edmund Urbani
+Liland IT Team
+
+Email: Edmund.Urbani@Lilandit.com <mailto:Edmund.Urbani@lilandit.com>
+
+Liland IT GmbH ...does IT better
+Tel: +43 463 220111
+Fax: +43 463 220111-33
+Tel(GER): +49 221 65028588
+
+Find us at Facebook http://facebook.com/Lilandit
+http://green-badges.com
+http://iventcloud.com
+http://Lilandit.com
+
+<http://www.LilandIT.com> <http://www.LilandIT.com>
+
+Copyright © 2014, Liland IT GmbH
+
+Diese Mail enthaelt vertrauliche und/oder rechtlich geschuetzte Informationen.
+Wenn Sie nicht der richtige Adressat sind oder diese Email irrtuemlich erhalten 
+haben, informieren Sie bitte sofort den Absender und vernichten Sie diese Mail. 
+Das unerlaubte Kopieren sowie die unbefugte Weitergabe dieser Mail ist nicht 
+gestattet.
+
+This email may contain confidential and/or privileged information.
+If you are not the intended recipient (or have received this email in error) 
+please notify the sender immediately and destroy this email. Any unauthorised 
+copying, disclosure or distribution of the material in this email is strictly 
+forbidden.
 
