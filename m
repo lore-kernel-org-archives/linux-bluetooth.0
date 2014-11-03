@@ -2,57 +2,65 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH 3/3] emulator/bthost: Remove empty bthost_stop function
-Date: Mon,  3 Nov 2014 17:20:56 +0100
-Message-Id: <1415031656-3360-3-git-send-email-szymon.janc@tieto.com>
+Subject: [PATCH 2/3] emulator/bthost: Move smp_start to bthost_create
+Date: Mon,  3 Nov 2014 17:20:55 +0100
+Message-Id: <1415031656-3360-2-git-send-email-szymon.janc@tieto.com>
 In-Reply-To: <1415031656-3360-1-git-send-email-szymon.janc@tieto.com>
 References: <1415031656-3360-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+This creates smp while creating bthost allowing for early bailout if
+kernel doesn't support crypto. Fix crash if smp_start failed due to
+SMP code always assuming valid pointer.
 ---
- emulator/bthost.c | 4 ----
- emulator/bthost.h | 1 -
- emulator/hciemu.c | 2 --
- 3 files changed, 7 deletions(-)
+ emulator/bthost.c | 14 ++++++++------
+ 1 file changed, 8 insertions(+), 6 deletions(-)
 
 diff --git a/emulator/bthost.c b/emulator/bthost.c
-index 104916b..2022e6b 100644
+index a123228..104916b 100644
 --- a/emulator/bthost.c
 +++ b/emulator/bthost.c
-@@ -2386,7 +2386,3 @@ void bthost_send_rfcomm_data(struct bthost *bthost, uint16_t handle,
+@@ -223,6 +223,12 @@ struct bthost *bthost_create(void)
+ 	if (!bthost)
+ 		return NULL;
  
- 	free(uih_frame);
++	bthost->smp_data = smp_start(bthost);
++	if (!bthost->smp_data) {
++		free(bthost);
++		return NULL;
++	}
++
+ 	/* Set defaults */
+ 	bthost->io_capability = 0x03;
+ 
+@@ -436,6 +442,8 @@ void bthost_destroy(struct bthost *bthost)
+ 	if (bthost->rfcomm_conn_data)
+ 		free(bthost->rfcomm_conn_data);
+ 
++	smp_stop(bthost->smp_data);
++
+ 	free(bthost);
  }
+ 
+@@ -2268,8 +2276,6 @@ void bthost_start(struct bthost *bthost)
+ 	if (!bthost)
+ 		return;
+ 
+-	bthost->smp_data = smp_start(bthost);
 -
--void bthost_stop(struct bthost *bthost)
--{
--}
-diff --git a/emulator/bthost.h b/emulator/bthost.h
-index 62d415c..c0fa410 100644
---- a/emulator/bthost.h
-+++ b/emulator/bthost.h
-@@ -123,7 +123,6 @@ void bthost_send_rfcomm_data(struct bthost *bthost, uint16_t handle,
- 					uint16_t len);
+ 	bthost->ncmd = 1;
  
- void bthost_start(struct bthost *bthost);
--void bthost_stop(struct bthost *bthost);
+ 	send_command(bthost, BT_HCI_CMD_RESET, NULL, 0);
+@@ -2383,8 +2389,4 @@ void bthost_send_rfcomm_data(struct bthost *bthost, uint16_t handle,
  
- /* LE SMP support */
- 
-diff --git a/emulator/hciemu.c b/emulator/hciemu.c
-index fcaeb70..c5bfa77 100644
---- a/emulator/hciemu.c
-+++ b/emulator/hciemu.c
-@@ -376,8 +376,6 @@ void hciemu_unref(struct hciemu *hciemu)
- 
- 	queue_destroy(hciemu->post_command_hooks, destroy_command_hook);
- 
--	bthost_stop(hciemu->host_stack);
--
- 	g_source_remove(hciemu->host_source);
- 	g_source_remove(hciemu->client_source);
- 	g_source_remove(hciemu->master_source);
+ void bthost_stop(struct bthost *bthost)
+ {
+-	if (bthost->smp_data) {
+-		smp_stop(bthost->smp_data);
+-		bthost->smp_data = NULL;
+-	}
+ }
 -- 
 1.9.1
 
