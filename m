@@ -1,11 +1,11 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1415011293-29661-6-git-send-email-gowtham.ab@samsung.com>
+In-Reply-To: <1415011293-29661-2-git-send-email-gowtham.ab@samsung.com>
 References: <1415011293-29661-1-git-send-email-gowtham.ab@samsung.com>
-	<1415011293-29661-6-git-send-email-gowtham.ab@samsung.com>
-Date: Mon, 3 Nov 2014 16:39:06 +0200
-Message-ID: <CABBYNZ++OJPY_rg4FGaTT8=PMjCk94ZxhqGy93uprhd7U4FKwQ@mail.gmail.com>
-Subject: Re: [PATCH v1 5/6] monitor/rfcomm: Add handlers for mcc frame type
+	<1415011293-29661-2-git-send-email-gowtham.ab@samsung.com>
+Date: Mon, 3 Nov 2014 16:33:14 +0200
+Message-ID: <CABBYNZ+rfs--zowAxbxv+3TYuC0sQb=2dBgFj=EY+AZ2anbh2Q@mail.gmail.com>
+Subject: Re: [PATCH v1 1/6] monitor/rfcomm: Add RFCOMM support to btmon
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: Gowtham Anandha Babu <gowtham.ab@samsung.com>
 Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
@@ -19,116 +19,129 @@ Hi,
 
 On Mon, Nov 3, 2014 at 12:41 PM, Gowtham Anandha Babu
 <gowtham.ab@samsung.com> wrote:
-> From: Bharat Panda <bharat.panda@samsung.com>
->
-> Changes made to decode different mcc frame type in RFCOMM
-> for btmon.
+> Changes made to add initial code to support RFCOMM frame in btmon.
 > ---
->  monitor/rfcomm.c | 78 ++++++++++++++++++++++++++++++++++++++++++++++++++++++--
->  1 file changed, 76 insertions(+), 2 deletions(-)
+>  Makefile.tools   |  1 +
+>  monitor/l2cap.c  |  4 ++++
+>  monitor/l2cap.h  |  1 +
+>  monitor/rfcomm.c | 61 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  4 files changed, 67 insertions(+)
+>  create mode 100644 monitor/rfcomm.c
 >
+> diff --git a/Makefile.tools b/Makefile.tools
+> index 42cccc6..75a6faa 100644
+> --- a/Makefile.tools
+> +++ b/Makefile.tools
+> @@ -26,6 +26,7 @@ monitor_btmon_SOURCES = monitor/main.c monitor/bt.h \
+>                                 monitor/l2cap.h monitor/l2cap.c \
+>                                 monitor/sdp.h monitor/sdp.c \
+>                                 monitor/avctp.h monitor/avctp.c \
+> +                               monitor/rfcomm.h monitor/rfcomm.c \
+>                                 monitor/uuid.h monitor/uuid.c \
+>                                 monitor/hwdb.h monitor/hwdb.c \
+>                                 monitor/keys.h monitor/keys.c \
+
+I suspect you need to do the change to Android.mk here when you start
+modifying l2cap.c.
+
+> diff --git a/monitor/l2cap.c b/monitor/l2cap.c
+> index c004d6b..ebdd20f 100644
+> --- a/monitor/l2cap.c
+> +++ b/monitor/l2cap.c
+> @@ -42,6 +42,7 @@
+>  #include "keys.h"
+>  #include "sdp.h"
+>  #include "avctp.h"
+> +#include "rfcomm.h"
+>
+>  #define MAX_CHAN 64
+>
+> @@ -2643,6 +2644,9 @@ static void l2cap_frame(uint16_t index, bool in, uint16_t handle,
+>                 case 0x0001:
+>                         sdp_packet(&frame);
+>                         break;
+> +               case 0x0003:
+> +                       rfcomm_packet(&frame);
+> +                       break;
+>                 case 0x001f:
+>                         att_packet(index, in, handle, cid, data, size);
+>                         break;
+> diff --git a/monitor/l2cap.h b/monitor/l2cap.h
+> index 5faaea6..1f70b68 100644
+> --- a/monitor/l2cap.h
+> +++ b/monitor/l2cap.h
+> @@ -153,3 +153,4 @@ static inline bool l2cap_frame_get_le64(struct l2cap_frame *frame,
+>
+>  void l2cap_packet(uint16_t index, bool in, uint16_t handle, uint8_t flags,
+>                                         const void *data, uint16_t size);
+> +void rfcomm_packet(const struct l2cap_frame *frame);
 > diff --git a/monitor/rfcomm.c b/monitor/rfcomm.c
-> index a43b2a2..b85e8fd 100644
-> --- a/monitor/rfcomm.c
+> new file mode 100644
+> index 0000000..7d38a28
+> --- /dev/null
 > +++ b/monitor/rfcomm.c
-> @@ -90,6 +90,51 @@ static void print_rfcomm_hdr(const struct l2cap_frame *frame,
->         print_field("FCS : (0x%2.2x)", fcs);
->  }
->
-> +static inline void mcc_test(const struct l2cap_frame *frame,
-> +                               struct rfcomm_lhdr hdr, struct rfcomm_lmcc mcc)
-> +{
-> +}
+> @@ -0,0 +1,61 @@
+> +/*
+> + *
+> + *  BlueZ - Bluetooth protocol stack for Linux
+> + *
+> + *  Copyright (C) 2011-2014  Intel Corporation
+> + *  Copyright (C) 2002-2010  Marcel Holtmann <marcel@holtmann.org>
+> + *
+> + *
+> + *  This library is free software; you can redistribute it and/or
+> + *  modify it under the terms of the GNU Lesser General Public
+> + *  License as published by the Free Software Foundation; either
+> + *  version 2.1 of the License, or (at your option) any later version.
+> + *
+> + *  This library is distributed in the hope that it will be useful,
+> + *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+> + *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+> + *  Lesser General Public License for more details.
+> + *
+> + *  You should have received a copy of the GNU Lesser General Public
+> + *  License along with this library; if not, write to the Free Software
+> + *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+> + *
+> + */
 > +
-> +static inline void mcc_fcon(const struct l2cap_frame *frame,
-> +                               struct rfcomm_lhdr hdr, struct rfcomm_lmcc mcc)
-> +{
-> +}
+> +#ifdef HAVE_CONFIG_H
+> +#include <config.h>
+> +#endif
 > +
-> +static inline void mcc_fcoff(const struct l2cap_frame *frame,
-> +                               struct rfcomm_lhdr hdr, struct rfcomm_lmcc mcc)
-> +{
-> +}
+> +#include <stdio.h>
+> +#include <stdlib.h>
+> +#include <string.h>
+> +#include <ctype.h>
+> +#include <inttypes.h>
 > +
-> +static inline void mcc_msc(const struct l2cap_frame *frame,
-> +                               struct rfcomm_lhdr hdr, struct rfcomm_lmcc mcc)
+> +#include <bluetooth/bluetooth.h>
+> +
+> +#include "src/shared/util.h"
+> +#include "bt.h"
+> +#include "packet.h"
+> +#include "display.h"
+> +#include "l2cap.h"
+> +#include "uuid.h"
+> +#include "keys.h"
+> +#include "sdp.h"
+> +#include "rfcomm.h"
+> +
+> +const char *opcode_color;
+> +
+> +void rfcomm_packet(const struct l2cap_frame *frame)
 > +{
+> +       if (frame->in)
+> +               opcode_color = COLOR_MAGENTA;
+> +       else
+> +               opcode_color = COLOR_BLUE;
+> +
+> +       print_indent(7, opcode_color, "RFCOMM: ", "",
+> +                                                       COLOR_OFF, "");
+> +
 > +       packet_hexdump(frame->data, frame->size);
+> +       return;
 > +}
-> +
-> +static inline void mcc_rpn(const struct l2cap_frame *frame,
-> +                               struct rfcomm_lhdr hdr, struct rfcomm_lmcc mcc)
-> +{
-> +       packet_hexdump(frame->data, frame->size);
-> +}
-> +
-> +static inline void mcc_rls(const struct l2cap_frame *frame,
-> +                               struct rfcomm_lhdr hdr, struct rfcomm_lmcc mcc)
-> +{
-> +       packet_hexdump(frame->data, frame->size);
-> +}
-> +
-> +static inline void mcc_pn(const struct l2cap_frame *frame,
-> +                               struct rfcomm_lhdr hdr, struct rfcomm_lmcc mcc)
-> +{
-> +       packet_hexdump(frame->data, frame->size);
-> +}
-> +
-> +static inline void mcc_nsc(const struct l2cap_frame *frame,
-> +                               struct rfcomm_lhdr hdr, struct rfcomm_lmcc mcc)
-> +{
-> +       packet_hexdump(frame->data, frame->size);
-> +}
-
-Im fine if you want to add parsing functions upfront but they should
-do something useful other than just packet_hexdump otherwise don't
-bother, btw please add the output that this changes are producing in
-the description so we can more easily visualize the format you are
-proposing.
-
->  static const char *type2str(uint8_t type)
->  {
->         switch (type) {
-> @@ -141,8 +186,37 @@ static inline bool mcc_frame(const struct l2cap_frame *frame,
->         print_indent(7, opcode_color, "RFCOMM(s): ", "", COLOR_OFF, "%s %s",
->                                         type2str(type), CR_STR(mcc.type));
->
-> -       print_rfcomm_hdr(&rfcomm_frame, hdr);
-> -       packet_hexdump(rfcomm_frame.data, rfcomm_frame.size);
-> +       switch (type) {
-> +       case RFCOMM_TEST:
-> +               mcc_test(&rfcomm_frame, hdr, mcc);
-> +               packet_hexdump(rfcomm_frame.data, rfcomm_frame.size);
-> +               break;
-> +       case RFCOMM_FCON:
-> +               mcc_fcon(&rfcomm_frame, hdr, mcc);
-> +               break;
-> +       case RFCOMM_FCOFF:
-> +               mcc_fcoff(&rfcomm_frame, hdr, mcc);
-> +               break;
-> +       case RFCOMM_MSC:
-> +               mcc_msc(&rfcomm_frame, hdr, mcc);
-> +               break;
-> +       case RFCOMM_RPN:
-> +               mcc_rpn(&rfcomm_frame, hdr, mcc);
-> +               break;
-> +       case RFCOMM_RLS:
-> +               mcc_rls(&rfcomm_frame, hdr, mcc);
-> +               break;
-> +       case RFCOMM_PN:
-> +               mcc_pn(&rfcomm_frame, hdr, mcc);
-> +               break;
-> +       case RFCOMM_NSC:
-> +               mcc_nsc(&rfcomm_frame, hdr, mcc);
-> +               break;
-> +       default:
-> +               print_field("MCC message type 0x%02x: ", type);
-> +               print_rfcomm_hdr(&rfcomm_frame, hdr);
-> +               packet_hexdump(rfcomm_frame.data, rfcomm_frame.size);
-> +       }
->
->         return true;
->  }
 > --
 > 1.9.1
 >
