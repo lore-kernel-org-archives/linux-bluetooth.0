@@ -1,49 +1,54 @@
 Return-Path: <cyrus@holtmann.org>
-From: Simon Vincent <simon.vincent@xsilon.com>
-To: alex.aring@gmail.com
-Cc: linux-wpan@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-	Simon Vincent <simon.vincent@xsilon.com>
-Subject: [PATCHv2 bluetooth-next] 6lowpan: fix udp header compression when using raw sockets
-Date: Tue,  4 Nov 2014 14:48:23 +0000
-Message-Id: <1415112503-2053-1-git-send-email-simon.vincent@xsilon.com>
+Date: Tue, 4 Nov 2014 15:42:34 +0100
+From: Alexander Aring <alex.aring@gmail.com>
+To: Simon Vincent <simon.vincent@xsilon.com>
+Cc: linux-wpan@vger.kernel.org, linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCHv2 bluetooth-next] 6lowpan: fix udp header compression
+ when using raw sockets
+Message-ID: <20141104144232.GA30647@omega>
+References: <1415111693-1711-1-git-send-email-simon.vincent@xsilon.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+In-Reply-To: <1415111693-1711-1-git-send-email-simon.vincent@xsilon.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-If you use RAW sockets the transport header offset is not set by the
-ipv6 stack so when we get to the udp header compression it does not
-compress the right part of the packet.
+On Tue, Nov 04, 2014 at 02:34:53PM +0000, Simon Vincent wrote:
+> If you use RAW sockets the transport header offset is not set by the
+> ipv6 stack so when we get to the udp header compression it does not
+> compress the right part of the packet.
+> 
+> This patch adds a check for this scenario and sets the transport
+> header offset.
+> 
+> Signed-off-by: Simon Vincent <simon.vincent@xsilon.com>
+> ---
+>  net/6lowpan/iphc.c | 10 +++++++++-
+>  1 file changed, 9 insertions(+), 1 deletion(-)
+> 
+> diff --git a/net/6lowpan/iphc.c b/net/6lowpan/iphc.c
+> index 73a7065..305bf2b 100644
+> --- a/net/6lowpan/iphc.c
+> +++ b/net/6lowpan/iphc.c
+> @@ -512,9 +512,17 @@ static u8 lowpan_compress_addr_64(u8 **hc_ptr, u8 shift,
+>  
+>  static void compress_udp_header(u8 **hc_ptr, struct sk_buff *skb)
+>  {
+> -	struct udphdr *uh = udp_hdr(skb);
+> +	struct udphdr *uh;
+>  	u8 tmp;
+>  
+> +	/* In the case of RAW sockets the transport header is not set by
+> +	* the ip6 stack so we must set it ourselves
+> +	*/
 
-This patch adds a check for this scenario and sets the transport
-header offset.
+Should be:
 
-Signed-off-by: Simon Vincent <simon.vincent@xsilon.com>
----
- net/6lowpan/iphc.c | 10 +++++++++-
- 1 file changed, 9 insertions(+), 1 deletion(-)
+	/* In the case of RAW sockets the transport header is not set by
+	 * the ip6 stack so we must set it ourselves
+	 */
 
-diff --git a/net/6lowpan/iphc.c b/net/6lowpan/iphc.c
-index 73a7065..305bf2b 100644
---- a/net/6lowpan/iphc.c
-+++ b/net/6lowpan/iphc.c
-@@ -512,9 +512,17 @@ static u8 lowpan_compress_addr_64(u8 **hc_ptr, u8 shift,
- 
- static void compress_udp_header(u8 **hc_ptr, struct sk_buff *skb)
- {
--	struct udphdr *uh = udp_hdr(skb);
-+	struct udphdr *uh;
- 	u8 tmp;
- 
-+	/* In the case of RAW sockets the transport header is not set by
-+	 * the ip6 stack so we must set it ourselves
-+	 */
-+	if (skb->transport_header == skb->network_header)
-+		skb_set_transport_header(skb, sizeof(struct ipv6hdr));
-+
-+	uh = udp_hdr(skb);
-+
- 	if (((ntohs(uh->source) & LOWPAN_NHC_UDP_4BIT_MASK) ==
- 	     LOWPAN_NHC_UDP_4BIT_PORT) &&
- 	    ((ntohs(uh->dest) & LOWPAN_NHC_UDP_4BIT_MASK) ==
--- 
-1.9.1
+Otherwise looking good! ;-)
+
+- Alex
 
