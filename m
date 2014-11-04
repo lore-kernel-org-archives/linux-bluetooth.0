@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv1 28/47] android/handsfree: Add support for new API for formatted_at_response
-Date: Tue,  4 Nov 2014 10:18:51 +0200
-Message-Id: <1415089150-18798-29-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv1 29/47] android/handsfree: Add support for new API for at_response
+Date: Tue,  4 Nov 2014 10:18:52 +0200
+Message-Id: <1415089150-18798-30-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1415089150-18798-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1415089150-18798-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,83 +11,81 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-formatted_at_response has new parameter bdaddr in new Android API.
+at_response has new parameter bdaddr in new Android API.
 ---
- android/hal-handsfree.c | 11 +++++++++++
+ android/hal-handsfree.c | 12 ++++++++++++
  android/hal-ipc-api.txt |  1 +
  android/hal-msg.h       |  1 +
  android/handsfree.c     |  5 ++++-
- 4 files changed, 17 insertions(+), 1 deletion(-)
+ 4 files changed, 18 insertions(+), 1 deletion(-)
 
 diff --git a/android/hal-handsfree.c b/android/hal-handsfree.c
-index b240f84..058df79 100644
+index 058df79..e9388b8 100644
 --- a/android/hal-handsfree.c
 +++ b/android/hal-handsfree.c
-@@ -526,7 +526,11 @@ static bt_status_t cind_response(int svc, int num_active, int num_held,
- 					sizeof(cmd), &cmd, NULL, NULL, NULL);
+@@ -561,7 +561,12 @@ static bt_status_t formatted_at_response(const char *rsp)
+ 					len, cmd, NULL, NULL, NULL);
  }
  
 +#if ANDROID_VERSION > PLATFORM_VER(4, 4, 4)
-+static bt_status_t formatted_at_response(const char *rsp, bt_bdaddr_t *bd_addr)
++static bt_status_t at_response(bthf_at_response_t response, int error,
++							bt_bdaddr_t *bd_addr)
 +#else
- static bt_status_t formatted_at_response(const char *rsp)
+ static bt_status_t at_response(bthf_at_response_t response, int error)
 +#endif
  {
- 	char buf[IPC_MTU];
- 	struct hal_cmd_handsfree_formatted_at_response *cmd = (void *) buf;
-@@ -540,6 +544,13 @@ static bt_status_t formatted_at_response(const char *rsp)
- 	if (!rsp)
- 		return BT_STATUS_PARM_INVALID;
+ 	struct hal_cmd_handsfree_at_response cmd;
+ 
+@@ -570,6 +575,13 @@ static bt_status_t at_response(bthf_at_response_t response, int error)
+ 	if (!interface_ready())
+ 		return BT_STATUS_NOT_READY;
  
 +#if ANDROID_VERSION > PLATFORM_VER(4, 4, 4)
 +	if (!bd_addr)
 +		return BT_STATUS_PARM_INVALID;
 +
-+	memcpy(cmd->bdaddr, bd_addr, sizeof(cmd->bdaddr));
++	memcpy(cmd.bdaddr, bd_addr, sizeof(cmd.bdaddr));
 +#endif
 +
- 	cmd->len = strlen(rsp) + 1;
- 	memcpy(cmd->buf, rsp, cmd->len);
+ 	cmd.response = response;
+ 	cmd.error = error;
  
 diff --git a/android/hal-ipc-api.txt b/android/hal-ipc-api.txt
-index 27572e4..806114a 100644
+index 806114a..b5d5557 100644
 --- a/android/hal-ipc-api.txt
 +++ b/android/hal-ipc-api.txt
-@@ -908,6 +908,7 @@ Commands and responses:
- 	Opcode 0x0b - Formatted AT Response command/response
+@@ -917,6 +917,7 @@ Commands and responses:
  
- 		Command parameters: Pre-formatted AT response (string)
+ 		Command parameters: Response code (1 octet)
+ 		                    Error code (1 octet)
 +		                    Remote address (6 octets)
  		Response parameters: <none>
  
- 		In case of an error, the error response will be returned.
+ 		Valid response codes: 0x00 = ERROR
 diff --git a/android/hal-msg.h b/android/hal-msg.h
-index 17e6dee..5c5ed22 100644
+index 5c5ed22..4b3d8b8 100644
 --- a/android/hal-msg.h
 +++ b/android/hal-msg.h
-@@ -557,6 +557,7 @@ struct hal_cmd_handsfree_cind_response {
- #define HAL_OP_HANDSFREE_FORMATTED_AT_RESPONSE	0x0B
- struct hal_cmd_handsfree_formatted_at_response {
- 	uint16_t len;
+@@ -568,6 +568,7 @@ struct hal_cmd_handsfree_formatted_at_response {
+ struct hal_cmd_handsfree_at_response {
+ 	uint8_t response;
+ 	uint8_t error;
 +	uint8_t bdaddr[6];
- 	uint8_t buf[0];
  } __attribute__((packed));
  
+ #define HAL_HANDSFREE_CALL_DIRECTION_OUTGOING	0x00
 diff --git a/android/handsfree.c b/android/handsfree.c
-index 3ef19d7..19a46f6 100644
+index 19a46f6..92a341a 100644
 --- a/android/handsfree.c
 +++ b/android/handsfree.c
-@@ -2127,6 +2127,7 @@ static void handle_formatted_at_resp(const void *buf, uint16_t len)
+@@ -2160,11 +2160,14 @@ static void handle_at_resp(const void *buf, uint16_t len)
  {
- 	const struct hal_cmd_handsfree_formatted_at_response *cmd = buf;
+ 	const struct hal_cmd_handsfree_at_response *cmd = buf;
  	struct hf_device *dev;
 +	bdaddr_t bdaddr;
  	uint8_t status;
  
  	DBG("");
-@@ -2138,7 +2139,9 @@ static void handle_formatted_at_resp(const void *buf, uint16_t len)
- 		return;
- 	}
  
 -	dev = find_default_device();
 +	android2bdaddr(cmd->bdaddr, &bdaddr);
