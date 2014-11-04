@@ -1,49 +1,52 @@
 Return-Path: <cyrus@holtmann.org>
-From: Simon Vincent <simon.vincent@xsilon.com>
-To: alex.aring@gmail.com
-Cc: linux-wpan@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-	Simon Vincent <simon.vincent@xsilon.com>
-Subject: [PATCH bluetooth-next] ieee802154: 6lowpan: fix udp header compression when using raw skts
-Date: Tue,  4 Nov 2014 13:43:53 +0000
-Message-Id: <1415108633-32358-1-git-send-email-simon.vincent@xsilon.com>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: Sebastian Chlad <sebastian.chlad@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] android/pts: Re-test HDP profile on PTS 5.3
+Date: Tue, 04 Nov 2014 13:49:55 +0100
+Message-ID: <1966077.TmoJviThV2@uw000953>
+In-Reply-To: <1415101277-20038-1-git-send-email-sebastian.chlad@tieto.com>
+References: <1415101277-20038-1-git-send-email-sebastian.chlad@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-If you use RAW sockets the transport header offset is not set by the
-ipv6 stack so when we get to the udp header compression it does not
-compress the right part of the packet.
+Hi Sebastian,
 
-This patch adds a check for this scenario and sets the transport
-header offset.
+On Tuesday 04 of November 2014 12:41:17 Sebastian Chlad wrote:
+> PTS issue 12340 which incorrectly enabled TC_SRC_DE_BV_01_I
+> is solved in PTS 5.3.
+> ---
+>  android/pts-hdp.txt | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/android/pts-hdp.txt b/android/pts-hdp.txt
+> index ee8b5c8..0a3ff08 100644
+> --- a/android/pts-hdp.txt
+> +++ b/android/pts-hdp.txt
+> @@ -1,7 +1,7 @@
+>  PTS test results for HDP
+>  
+>  PTS version: 5.3
+> -Tested: 30-September-2014
+> +Tested: 04-November-2014
+>  Android version: 4.4.4
+>  
+>  Results:
+> @@ -140,7 +140,7 @@ TC_SRC_HCT_BV_07_C	PASS	haltest:
+>  				bluez-hdp health-device-profile 1
+>  				BTHL_MDEP_ROLE_SOURCE 4100
+>  				BTHL_CHANNEL_TYPE_RELIABLE pulse-oximeter
+> -TC_SRC_DE_BV_01_I	INC	PTS issue #12340
+> +TC_SRC_DE_BV_01_I	N/A
+>  TC_SRC_DE_BV_02_I	PASS	haltest:
+>  				hl register_application bluez-android Bluez
+>  				bluez-hdp health-device-profile 1
+> 
 
-Signed-off-by: Simon Vincent <simon.vincent@xsilon.com>
----
- net/6lowpan/iphc.c | 10 +++++++++-
- 1 file changed, 9 insertions(+), 1 deletion(-)
+Applied, thanks.
 
-diff --git a/net/6lowpan/iphc.c b/net/6lowpan/iphc.c
-index 73a7065..305bf2b 100644
---- a/net/6lowpan/iphc.c
-+++ b/net/6lowpan/iphc.c
-@@ -512,9 +512,17 @@ static u8 lowpan_compress_addr_64(u8 **hc_ptr, u8 shift,
- 
- static void compress_udp_header(u8 **hc_ptr, struct sk_buff *skb)
- {
--	struct udphdr *uh = udp_hdr(skb);
-+	struct udphdr *uh;
- 	u8 tmp;
- 
-+	/* In the case of RAW sockets the transport header is not set by
-+	* the ip6 stack so we must set it ourselves
-+	*/
-+	if (skb->transport_header == skb->network_header)
-+		skb_set_transport_header(skb, sizeof(struct ipv6hdr));
-+
-+	uh = udp_hdr(skb);
-+
- 	if (((ntohs(uh->source) & LOWPAN_NHC_UDP_4BIT_MASK) ==
- 	     LOWPAN_NHC_UDP_4BIT_PORT) &&
- 	    ((ntohs(uh->dest) & LOWPAN_NHC_UDP_4BIT_MASK) ==
 -- 
-1.9.1
-
+Best regards, 
+Szymon Janc
