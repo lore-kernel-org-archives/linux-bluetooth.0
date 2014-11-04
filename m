@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv1 04/47] android/hal-audio: Add support for new Android API
-Date: Tue,  4 Nov 2014 10:18:27 +0200
-Message-Id: <1415089150-18798-5-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv1 03/47] android/hal-bluetooth: Add missing functions
+Date: Tue,  4 Nov 2014 10:18:26 +0200
+Message-Id: <1415089150-18798-4-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1415089150-18798-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1415089150-18798-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,63 +11,63 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-For new Android API add parameter address to audio_open_output_stream()
-and audio_open_input_stream().
+Add missing HAL functions for new Android version
 ---
- android/hal-audio.c | 22 +++++++++++++++++++++-
- 1 file changed, 21 insertions(+), 1 deletion(-)
+ android/hal-bluetooth.c | 34 ++++++++++++++++++++++++++++++++++
+ 1 file changed, 34 insertions(+)
 
-diff --git a/android/hal-audio.c b/android/hal-audio.c
-index e70351e..d140071 100644
---- a/android/hal-audio.c
-+++ b/android/hal-audio.c
-@@ -1108,13 +1108,22 @@ static int in_remove_audio_effect(const struct audio_stream *stream,
- 	return -ENOSYS;
+diff --git a/android/hal-bluetooth.c b/android/hal-bluetooth.c
+index 5b6e99d..bbbdc37 100644
+--- a/android/hal-bluetooth.c
++++ b/android/hal-bluetooth.c
+@@ -948,6 +948,35 @@ static int config_hci_snoop_log(uint8_t enable)
+ 	return BT_STATUS_SUCCESS;
  }
  
 +#if ANDROID_VERSION > PLATFORM_VER(4, 4, 4)
-+static int audio_open_output_stream(struct audio_hw_device *dev,
-+					audio_io_handle_t handle,
-+					audio_devices_t devices,
-+					audio_output_flags_t flags,
-+					struct audio_config *config,
-+					struct audio_stream_out **stream_out,
-+					const char *address)
-+#else
- static int audio_open_output_stream(struct audio_hw_device *dev,
- 					audio_io_handle_t handle,
- 					audio_devices_t devices,
- 					audio_output_flags_t flags,
- 					struct audio_config *config,
- 					struct audio_stream_out **stream_out)
--
++static int get_connection_state(const bt_bdaddr_t *bd_addr)
++{
++	DBG("bdaddr: %s", bdaddr2str(bd_addr));
++
++	/* TODO: implement */
++
++	return BT_STATUS_UNSUPPORTED;
++}
++
++static int set_os_callouts(bt_os_callouts_t *callouts)
++{
++	DBG("callouts: %p", callouts);
++
++	/* TODO: implement */
++
++	return BT_STATUS_SUCCESS;
++}
++
++static int read_energy_info(void)
++{
++	DBG("");
++
++	/* TODO: implement */
++
++	return BT_STATUS_UNSUPPORTED;
++}
 +#endif
- {
- 	struct a2dp_audio_dev *a2dp_dev = (struct a2dp_audio_dev *) dev;
- 	struct a2dp_stream_out *out;
-@@ -1252,11 +1261,22 @@ static size_t audio_get_input_buffer_size(const struct audio_hw_device *dev,
- 	return -ENOSYS;
- }
- 
++
+ static const bt_interface_t bluetooth_if = {
+ 	.size = sizeof(bt_interface_t),
+ 	.init = init,
+@@ -974,6 +1003,11 @@ static const bt_interface_t bluetooth_if = {
+ 	.dut_mode_send = dut_mode_send,
+ 	.le_test_mode = le_test_mode,
+ 	.config_hci_snoop_log = config_hci_snoop_log,
 +#if ANDROID_VERSION > PLATFORM_VER(4, 4, 4)
-+static int audio_open_input_stream(struct audio_hw_device *dev,
-+					audio_io_handle_t handle,
-+					audio_devices_t devices,
-+					struct audio_config *config,
-+					struct audio_stream_in **stream_in,
-+					audio_input_flags_t flags,
-+					const char *address,
-+					audio_source_t source)
-+#else
- static int audio_open_input_stream(struct audio_hw_device *dev,
- 					audio_io_handle_t handle,
- 					audio_devices_t devices,
- 					struct audio_config *config,
- 					struct audio_stream_in **stream_in)
++	.get_connection_state = get_connection_state,
++	.set_os_callouts = set_os_callouts,
++	.read_energy_info = read_energy_info,
 +#endif
- {
- 	struct audio_stream_in *in;
+ };
  
+ static const bt_interface_t *get_bluetooth_interface(void)
 -- 
 1.9.1
 
