@@ -1,63 +1,49 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1415110033.2918.23.camel@jrissane-mobl.ger.corp.intel.com>
-Subject: Re: [PATCH bluetooth-next] ieee802154: 6lowpan: fix udp header
- compression when using raw skts
-From: Jukka Rissanen <jukka.rissanen@linux.intel.com>
-To: Simon Vincent <simon.vincent@xsilon.com>
-Cc: alex.aring@gmail.com, linux-wpan@vger.kernel.org,
-	linux-bluetooth@vger.kernel.org
-Date: Tue, 04 Nov 2014 16:07:13 +0200
-In-Reply-To: <1415108633-32358-1-git-send-email-simon.vincent@xsilon.com>
-References: <1415108633-32358-1-git-send-email-simon.vincent@xsilon.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+From: Szymon Janc <szymon.janc@tieto.com>
+To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCHv2 0/6] 1st serie of Android Lollipop BlueZ code
+Date: Tue, 04 Nov 2014 15:03:45 +0100
+Message-ID: <2069232.SV8JtI5hNT@uw000953>
+In-Reply-To: <1415103890-24375-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1415103890-24375-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Simon,
+Hi Andrei,
 
-On ti, 2014-11-04 at 13:43 +0000, Simon Vincent wrote:
-> If you use RAW sockets the transport header offset is not set by the
-> ipv6 stack so when we get to the udp header compression it does not
-> compress the right part of the packet.
+On Tuesday 04 of November 2014 14:24:44 Andrei Emeltchenko wrote:
+> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 > 
-> This patch adds a check for this scenario and sets the transport
-> header offset.
+> Adaptation of bluetooth.h HAL to BlueZ
 > 
-> Signed-off-by: Simon Vincent <simon.vincent@xsilon.com>
-> ---
->  net/6lowpan/iphc.c | 10 +++++++++-
->  1 file changed, 9 insertions(+), 1 deletion(-)
+> Andrei Emeltchenko (6):
+>   android/hal-bluetooth: Add parameter to create_bond
+>   android/hardware: Update bluetooth.h header from Android 5.0
+>   android/hal-bluetooth: Add missing functions
+>   android/client: Add new API argument for create_bond()
+>   android/tester: Use dummy parameter in create_bond()
+>   android/client: Add energy_info_callback print
 > 
-> diff --git a/net/6lowpan/iphc.c b/net/6lowpan/iphc.c
-> index 73a7065..305bf2b 100644
-> --- a/net/6lowpan/iphc.c
-> +++ b/net/6lowpan/iphc.c
-> @@ -512,9 +512,17 @@ static u8 lowpan_compress_addr_64(u8 **hc_ptr, u8 shift,
->  
->  static void compress_udp_header(u8 **hc_ptr, struct sk_buff *skb)
->  {
-> -	struct udphdr *uh = udp_hdr(skb);
-> +	struct udphdr *uh;
->  	u8 tmp;
->  
-> +	/* In the case of RAW sockets the transport header is not set by
-> +	* the ip6 stack so we must set it ourselves
-> +	*/
-> +	if (skb->transport_header == skb->network_header)
-> +		skb_set_transport_header(skb, sizeof(struct ipv6hdr));
-> +
-> +	uh = udp_hdr(skb);
-> +
->  	if (((ntohs(uh->source) & LOWPAN_NHC_UDP_4BIT_MASK) ==
->  	     LOWPAN_NHC_UDP_4BIT_PORT) &&
->  	    ((ntohs(uh->dest) & LOWPAN_NHC_UDP_4BIT_MASK) ==
+>  android/bluetooth.c          |  2 ++
+>  android/client/if-bt.c       | 21 +++++++++++-
+>  android/hal-bluetooth.c      | 53 +++++++++++++++++++++++++++-
+>  android/hal-ipc-api.txt      |  1 +
+>  android/hal-msg.h            |  5 +++
+>  android/hardware/bluetooth.h | 82 ++++++++++++++++++++++++++++++++++++++++++--
+>  android/tester-main.c        |  6 +++-
+>  7 files changed, 165 insertions(+), 5 deletions(-)
+> 
 
+Patches 1,3,4 and 6 are now applied. Thanks.
 
-Acked-by: Jukka Rissanen <jukka.rissanen@linux.intel.com>
+I've made few changes to them:
+- lets check against >=5.0.0 for new API
+- I've fixed missing checks for new API in 6/6
+- moved parameter validation to daemon in 1/6
 
-
-Cheers,
-Jukka
-
-
+-- 
+Best regards, 
+Szymon Janc
