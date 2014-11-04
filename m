@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv1 20/47] android/client: Add support for new GATT HAL API
-Date: Tue,  4 Nov 2014 10:18:43 +0200
-Message-Id: <1415089150-18798-21-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv1 45/47] android/handsfree: Use bdaddr provided for find_device()
+Date: Tue,  4 Nov 2014 10:19:08 +0200
+Message-Id: <1415089150-18798-46-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1415089150-18798-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1415089150-18798-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,91 +11,36 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Support scan(), client and server connect() commands new API.
 ---
- android/client/if-gatt.c | 32 ++++++++++++++++++++++++++++++++
- 1 file changed, 32 insertions(+)
+ android/handsfree.c | 10 +++++++---
+ 1 file changed, 7 insertions(+), 3 deletions(-)
 
-diff --git a/android/client/if-gatt.c b/android/client/if-gatt.c
-index d593022..d749922 100644
---- a/android/client/if-gatt.c
-+++ b/android/client/if-gatt.c
-@@ -933,6 +933,7 @@ static void scan_p(int argc, const char **argv)
+diff --git a/android/handsfree.c b/android/handsfree.c
+index 358e368..67df4cf 100644
+--- a/android/handsfree.c
++++ b/android/handsfree.c
+@@ -2901,14 +2901,18 @@ static void disable_sco_server(void)
  
- 	RETURN_IF_NULL(if_gatt);
+ static void bt_sco_get_fd(const void *buf, uint16_t len)
+ {
+-	int fd;
+-	GError *err;
++	const struct sco_cmd_get_fd *cmd = buf;
+ 	struct sco_rsp_get_fd rsp;
+ 	struct hf_device *dev;
++	bdaddr_t bdaddr;
++	GError *err;
++	int fd;
  
-+#if ANDROID_VERSION <= PLATFORM_VER(4, 4, 4)
- 	VERIFY_CLIENT_IF(2, client_if);
+ 	DBG("");
  
- 	/* start */
-@@ -940,6 +941,13 @@ static void scan_p(int argc, const char **argv)
- 		start = atoi(argv[3]);
- 
- 	EXEC(if_gatt->client->scan, client_if, start);
-+#else
-+	/* start */
-+	if (argc >= 3)
-+		start = atoi(argv[2]);
+-	dev = find_default_device();
++	android2bdaddr(cmd->bdaddr, &bdaddr);
 +
-+	EXEC(if_gatt->client->scan, start);
-+#endif
- }
++	dev = find_device(&bdaddr);
+ 	if (!dev || !dev->sco)
+ 		goto failed;
  
- /* connect */
-@@ -961,6 +969,9 @@ static void connect_p(int argc, const char **argv)
- 	int client_if;
- 	bt_bdaddr_t bd_addr;
- 	int is_direct = 1;
-+#if ANDROID_VERSION > PLATFORM_VER(4, 4, 4)
-+	int transport = 1;
-+#endif
- 
- 	RETURN_IF_NULL(if_gatt);
- 	VERIFY_CLIENT_IF(2, client_if);
-@@ -970,7 +981,16 @@ static void connect_p(int argc, const char **argv)
- 	if (argc > 4)
- 		is_direct = atoi(argv[4]);
- 
-+#if ANDROID_VERSION <= PLATFORM_VER(4, 4, 4)
- 	EXEC(if_gatt->client->connect, client_if, &bd_addr, is_direct);
-+#else
-+	/* transport */
-+	if (argc > 5)
-+		transport = atoi(argv[5]);
-+
-+	EXEC(if_gatt->client->connect, client_if, &bd_addr, is_direct,
-+								transport);
-+#endif
- }
- 
- /* disconnect */
-@@ -1574,6 +1594,9 @@ static void gatts_connect_p(int argc, const char *argv[])
- 	int server_if;
- 	bt_bdaddr_t bd_addr;
- 	int is_direct = 1;
-+#if ANDROID_VERSION > PLATFORM_VER(4, 4, 4)
-+	int transport = 1;
-+#endif
- 
- 	RETURN_IF_NULL(if_gatt);
- 	VERIFY_SERVER_IF(2, server_if);
-@@ -1583,7 +1606,16 @@ static void gatts_connect_p(int argc, const char *argv[])
- 	if (argc > 4)
- 		is_direct = atoi(argv[4]);
- 
-+#if ANDROID_VERSION <= PLATFORM_VER(4, 4, 4)
- 	EXEC(if_gatt->server->connect, server_if, &bd_addr, is_direct);
-+#else
-+	/* transport */
-+	if (argc > 5)
-+		transport = atoi(argv[5]);
-+
-+	EXEC(if_gatt->server->connect, server_if, &bd_addr, is_direct,
-+								transport);
-+#endif
- }
- 
- /* disconnect */
 -- 
 1.9.1
 
