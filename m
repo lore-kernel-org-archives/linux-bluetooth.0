@@ -1,214 +1,62 @@
 Return-Path: <cyrus@holtmann.org>
+From: "Urbani, Edmund" <edmund.urbani@lilandit.com>
+Message-ID: <5458C0CD.9010907@LilandIT.com>
+Date: Tue, 04 Nov 2014 13:04:29 +0100
 MIME-Version: 1.0
-In-Reply-To: <000401cff825$8d6c5800$a8450800$@samsung.com>
-References: <1415011293-29661-1-git-send-email-gowtham.ab@samsung.com>
-	<1415011293-29661-6-git-send-email-gowtham.ab@samsung.com>
-	<CABBYNZ++OJPY_rg4FGaTT8=PMjCk94ZxhqGy93uprhd7U4FKwQ@mail.gmail.com>
-	<001001cff77a$4e4c0770$eae41650$@samsung.com>
-	<CABBYNZJpChcwz973sBqdiz=3hD3oaUc9wXXQ6TtopO0oF2Pg=g@mail.gmail.com>
-	<000401cff825$8d6c5800$a8450800$@samsung.com>
-Date: Tue, 4 Nov 2014 14:07:45 +0200
-Message-ID: <CABBYNZJr0LEm6HD_N6ZT3jb4z8PEXHxX3U_eSVaJWaJX5UyfxA@mail.gmail.com>
-Subject: Re: [PATCH v1 5/6] monitor/rfcomm: Add handlers for mcc frame type
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Gowtham Anandha Babu <gowtham.ab@samsung.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	Dmitry Kasatkin <d.kasatkin@samsung.com>,
-	Bharat Panda <bharat.panda@samsung.com>, cpgs@samsung.com
-Content-Type: text/plain; charset=UTF-8
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: How to get started on a GATT Server ?
+References: <5457A17D.9060404@LilandIT.com> <CAHrH25RfMAiNTHYBR=vT+KuBtVwEKPuLRFfEiMGF9Ya__9Y5nA@mail.gmail.com>
+In-Reply-To: <CAHrH25RfMAiNTHYBR=vT+KuBtVwEKPuLRFfEiMGF9Ya__9Y5nA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+To: unlisted-recipients:; (no To-header on input)
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
 
-On Tue, Nov 4, 2014 at 1:49 PM, Gowtham Anandha Babu
-<gowtham.ab@samsung.com> wrote:
-> Hi,
+On 11/03/2014 08:32 PM, Arman Uguray wrote:
+> Hi Edmund,
 >
->> -----Original Message-----
->> From: Luiz Augusto von Dentz [mailto:luiz.dentz@gmail.com]
->> Sent: Monday, November 03, 2014 9:02 PM
->> To: Gowtham Anandha Babu
->> Cc: linux-bluetooth@vger.kernel.org; Dmitry Kasatkin; Bharat Panda;
->> cpgs@samsung.com
->> Subject: Re: [PATCH v1 5/6] monitor/rfcomm: Add handlers for mcc frame
->> type
+>> On Mon, Nov 3, 2014 at 7:38 AM, Urbani, Edmund <edmund.urbani@lilandit.com> wrote:
+>> Hello all,
 >>
->> Hi,
+>> I am trying to write a simple GATT-based service of my own. Right now I
+>> don't really know which docs I should be looking at. I have skimmed through
+>> bluez sources (5.23) and found gatt-service.h and gatt.h, as well as the
+>> gatt-example plugin.
 >>
->> On Mon, Nov 3, 2014 at 5:24 PM, Gowtham Anandha Babu
->> <gowtham.ab@samsung.com> wrote:
->> > Hi,
->> >
->> >> -----Original Message-----
->> >> From: Luiz Augusto von Dentz [mailto:luiz.dentz@gmail.com]
->> >> Sent: Monday, November 03, 2014 8:09 PM
->> >> To: Gowtham Anandha Babu
->> >> Cc: linux-bluetooth@vger.kernel.org; Dmitry Kasatkin; Bharat Panda;
->> >> cpgs@samsung.com
->> >> Subject: Re: [PATCH v1 5/6] monitor/rfcomm: Add handlers for mcc
->> >> frame type
->> >>
->> >> Hi,
->> >>
->> >> On Mon, Nov 3, 2014 at 12:41 PM, Gowtham Anandha Babu
->> >> <gowtham.ab@samsung.com> wrote:
->> >> > From: Bharat Panda <bharat.panda@samsung.com>
->> >> >
->> >> > Changes made to decode different mcc frame type in RFCOMM for
->> btmon.
->> >> > ---
->> >> >  monitor/rfcomm.c | 78
->> >> > ++++++++++++++++++++++++++++++++++++++++++++++++++++++-
->> -
->> >> >  1 file changed, 76 insertions(+), 2 deletions(-)
->> >> >
->> >> > diff --git a/monitor/rfcomm.c b/monitor/rfcomm.c index
->> >> > a43b2a2..b85e8fd 100644
->> >> > --- a/monitor/rfcomm.c
->> >> > +++ b/monitor/rfcomm.c
->> >> > @@ -90,6 +90,51 @@ static void print_rfcomm_hdr(const struct
->> >> l2cap_frame *frame,
->> >> >         print_field("FCS : (0x%2.2x)", fcs);  }
->> >> >
->> >> > +static inline void mcc_test(const struct l2cap_frame *frame,
->> >> > +                               struct rfcomm_lhdr hdr, struct
->> >> > +rfcomm_lmcc mcc) { }
->> >> > +
->> >> > +static inline void mcc_fcon(const struct l2cap_frame *frame,
->> >> > +                               struct rfcomm_lhdr hdr, struct
->> >> > +rfcomm_lmcc mcc) { }
->> >> > +
->> >> > +static inline void mcc_fcoff(const struct l2cap_frame *frame,
->> >> > +                               struct rfcomm_lhdr hdr, struct
->> >> > +rfcomm_lmcc mcc) { }
->> >> > +
->> >> > +static inline void mcc_msc(const struct l2cap_frame *frame,
->> >> > +                               struct rfcomm_lhdr hdr, struct
->> >> > +rfcomm_lmcc mcc) {
->> >> > +       packet_hexdump(frame->data, frame->size); }
->> >> > +
->> >> > +static inline void mcc_rpn(const struct l2cap_frame *frame,
->> >> > +                               struct rfcomm_lhdr hdr, struct
->> >> > +rfcomm_lmcc mcc) {
->> >> > +       packet_hexdump(frame->data, frame->size); }
->> >> > +
->> >> > +static inline void mcc_rls(const struct l2cap_frame *frame,
->> >> > +                               struct rfcomm_lhdr hdr, struct
->> >> > +rfcomm_lmcc mcc) {
->> >> > +       packet_hexdump(frame->data, frame->size); }
->> >> > +
->> >> > +static inline void mcc_pn(const struct l2cap_frame *frame,
->> >> > +                               struct rfcomm_lhdr hdr, struct
->> >> > +rfcomm_lmcc mcc) {
->> >> > +       packet_hexdump(frame->data, frame->size); }
->> >> > +
->> >> > +static inline void mcc_nsc(const struct l2cap_frame *frame,
->> >> > +                               struct rfcomm_lhdr hdr, struct
->> >> > +rfcomm_lmcc mcc) {
->> >> > +       packet_hexdump(frame->data, frame->size); }
->> >>
->> >> Im fine if you want to add parsing functions upfront but they should
->> >> do something useful other than just packet_hexdump otherwise don't
->> >> bother, btw please add the output that this changes are producing in
->> >> the description so we can more easily visualize the format you are
->> proposing.
->> >>
->> >> >  static const char *type2str(uint8_t type)  {
->> >> >         switch (type) {
->> >> > @@ -141,8 +186,37 @@ static inline bool mcc_frame(const struct
->> >> l2cap_frame *frame,
->> >> >         print_indent(7, opcode_color, "RFCOMM(s): ", "", COLOR_OFF,
->> >> > "%s
->> >> %s",
->> >> >                                         type2str(type),
->> >> > CR_STR(mcc.type));
->> >> >
->> >> > -       print_rfcomm_hdr(&rfcomm_frame, hdr);
->> >> > -       packet_hexdump(rfcomm_frame.data, rfcomm_frame.size);
->> >> > +       switch (type) {
->> >> > +       case RFCOMM_TEST:
->> >> > +               mcc_test(&rfcomm_frame, hdr, mcc);
->> >> > +               packet_hexdump(rfcomm_frame.data, rfcomm_frame.size);
->> >> > +               break;
->> >> > +       case RFCOMM_FCON:
->> >> > +               mcc_fcon(&rfcomm_frame, hdr, mcc);
->> >> > +               break;
->> >> > +       case RFCOMM_FCOFF:
->> >> > +               mcc_fcoff(&rfcomm_frame, hdr, mcc);
->> >> > +               break;
->> >> > +       case RFCOMM_MSC:
->> >> > +               mcc_msc(&rfcomm_frame, hdr, mcc);
->> >> > +               break;
->> >> > +       case RFCOMM_RPN:
->> >> > +               mcc_rpn(&rfcomm_frame, hdr, mcc);
->> >> > +               break;
->> >> > +       case RFCOMM_RLS:
->> >> > +               mcc_rls(&rfcomm_frame, hdr, mcc);
->> >> > +               break;
->> >> > +       case RFCOMM_PN:
->> >> > +               mcc_pn(&rfcomm_frame, hdr, mcc);
->> >> > +               break;
->> >> > +       case RFCOMM_NSC:
->> >> > +               mcc_nsc(&rfcomm_frame, hdr, mcc);
->> >> > +               break;
->> >> > +       default:
->> >> > +               print_field("MCC message type 0x%02x: ", type);
->> >> > +               print_rfcomm_hdr(&rfcomm_frame, hdr);
->> >> > +               packet_hexdump(rfcomm_frame.data, rfcomm_frame.size);
->> >> > +       }
->> >> >
->> >> >         return true;
->> >> >  }
->> >> > --
->> >> > 1.9.1
->> >> >
->> >> > --
->> >> > To unsubscribe from this list: send the line "unsubscribe
->> >> > linux-bluetooth" in the body of a message to
->> >> > majordomo@vger.kernel.org More majordomo info at
->> >> > http://vger.kernel.org/majordomo-info.html
->> >>
->> >>
->> >>
->> >> --
->> >> Luiz Augusto von Dentz
->> >
->> > I added Andoird.mk in the corresponding patch and included the logs in the
->> final patch and submitted v2 for the same. If you want the complete log, I am
->> ready to send it.
->>
->> I don't want the complete log just a single frame where we can see what the
->> patch does.
->>
->> > Btw we are almost done with the implementation for all the mcc frames. It
->> will not be the hexdump kind of things.
->> > Since it is an initial skeleton we proposed this kind of changes.
->>
->> I would understand if you add a skeleton to public function not for static
->> ones.
->>
->> --
->> Luiz Augusto von Dentz
+>> So far I am still trying to figure out whether I should be going the C API
+>> route or maybe use the D-Bus interface. Also gatt-service.c seems to suggest
+>> that there is a way to register a GATT service over D-Bus but running it
+>> gives me this:
+>> RegisterService: Method "RegisterService" with signature "oa{sv}" on
+>> interface "org.bluez.GattManager1" doesn't exist"
+> The reason you're not seeing GattManager1 is because it's hidden
+> behind the "experimental" flag. So you need to configure and run bluez
+> with the --enable-experimental and the --experimental flags
+> respectively.
 >
-> Here the frame means, a common structure for rfcomm packets. Like as below:
->
-> Struct rfcomm_data {
->         Struct rfcomm_lhdr hdr;
->         Struct rfcomm_lmcc mcc;
-> };
->
-> Or just an explanation about all the frame in the patch description is enough?
+> That said, that API implementation isn't complete and isn't in fact
+> even wired up with the internal attrib-server. We're working towards
+> rewriting all of the C API and finally implementing the proposed D-Bus
+> API but until then, I would ignore doc/gatt-api.txt (it's only a
+> proposal at the moment and isn't even included in release tarballs).
+> So for now you have to use the C API route. There will probably be an
+> announcement once that D-Bus API is finally supported.
 
-I think you misunderstood me, Im talking about a data frame, each
-patch should contain the output of single frame showing what it is
-producing as output.
+>> Any pointers to help me get started would be appreciated. Thanks!
+>>
+>> Kind regards,
+>>    Edmund
+> Cheers,
+> Arman
 
-> You are expecting me to add skeleton only for public functions rather than static ones. Is that correct?
+Thanks, I won't bother with the D-Bus interface then. But if the C API is being 
+rewritten now, that sounds like there is currently no stable API available at 
+all. :/ Or is it just the internals being rewritten?
 
-In this case yes since it does not effect any other part of the code,
-btw you could use a function table if you wish.
+So I assume, the fastest route the get a prototype that does something, would be 
+to get gatt-example.c to run and then modify that, right?
 
+Kind regards,
+  Edmund
 
--- 
-Luiz Augusto von Dentz
