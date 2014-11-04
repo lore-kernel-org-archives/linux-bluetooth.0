@@ -1,55 +1,79 @@
 Return-Path: <cyrus@holtmann.org>
-From: johan.hedberg@gmail.com
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Fix sparse warnings in RFCOMM
-Date: Tue,  4 Nov 2014 08:45:45 +0200
-Message-Id: <1415083545-32629-1-git-send-email-johan.hedberg@gmail.com>
+Date: Tue, 4 Nov 2014 08:39:18 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Jakub Pawlowski <jpawlowski@google.com>
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCH v1 2/2] service-find command for new kernel method usage
+Message-ID: <20141104063918.GA31334@t440s.P-661HNU-F1>
+References: <1414612349-2262-1-git-send-email-jpawlowski@google.com>
+ <1414612349-2262-2-git-send-email-jpawlowski@google.com>
+ <20141102132332.GB4544@t440s.P-661HNU-F1>
+ <CAD0=r8zh1GqVGQBG3dJJBmzbE8txAVtK6OkvzeB-zT218S5yRw@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <CAD0=r8zh1GqVGQBG3dJJBmzbE8txAVtK6OkvzeB-zT218S5yRw@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@intel.com>
+Hi Jakub,
 
-This patch fixes the following sparse warnings in rfcomm/core.c:
+On Mon, Nov 03, 2014, Jakub Pawlowski wrote:
+> On Sun, Nov 2, 2014 at 5:23 AM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
+> > Hi Jakub,
+> >
+> > On Wed, Oct 29, 2014, Jakub Pawlowski wrote:
+> >> +static void uuid_to_uuid128(uuid_t *uuid128, const uuid_t *uuid);
+> >
+> > Please just move up this function instead of creating a
+> > forward-declaration for it.
+> >
+> >> +static void cmd_find_service(struct mgmt *mgmt, uint16_t index, int argc, char **argv)
+> >> +{
+> >> +     struct mgmt_cp_start_service_discovery *cp;
+> >> +     struct mgmt_uuid_filter *filter;
+> >> +     uint8_t type;
+> >> +     int opt;
+> >> +     int total_size = sizeof(struct mgmt_cp_start_service_discovery) + sizeof(struct mgmt_uuid_filter);
+> >> +     uuid_t uuid;
+> >> +     uint128_t uint128;
+> >> +     uuid_t uuid128;
+> >> +
+> >> +     if (index == MGMT_INDEX_NONE)
+> >> +             index = 0;
+> >> +
+> >> +     type = 0;
+> >> +     hci_set_bit(BDADDR_BREDR, &type);
+> >> +     hci_set_bit(BDADDR_LE_PUBLIC, &type);
+> >> +     hci_set_bit(BDADDR_LE_RANDOM, &type);
+> >> +
+> >> +     cp = malloc(total_size);
+> >> +     if(cp == NULL) {
+> >
+> > Missing space after 'if', however I wonder is there any point to do
+> > dynamic allocation here since you always just have just one filter
+> > entry. Having the send buffer on the stack might create simpler code
+> > here.
+> 
+> mgmt_cp_start_service_discovery have array of mgmt_uuid_filter at the
+> end, and mgmt_send internally just do one malloc and memcpy to copy
+> the whole data.
+> Right now I just reserve all needed space. If I use stack variable how
+> would I make sure that mgmt_uuid_filter is exactly at end of
+> mgmt_cp_start_service_discovery ?
 
-net/bluetooth/rfcomm/core.c:391:16: warning: dubious: x | !y
-net/bluetooth/rfcomm/core.c:546:24: warning: dubious: x | !y
+Something like the following should work:
 
-Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
----
- net/bluetooth/rfcomm/core.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+	struct mgmt_cp_start_service_discovery *cp;
+	struct mgmt_uuid_filter *filter;
+	uint8_t buf[sizeof(*cp) + sizeof(*filter)];
 
-diff --git a/net/bluetooth/rfcomm/core.c b/net/bluetooth/rfcomm/core.c
-index bce9c3d39324..64e20dde4837 100644
---- a/net/bluetooth/rfcomm/core.c
-+++ b/net/bluetooth/rfcomm/core.c
-@@ -81,6 +81,8 @@ static struct rfcomm_session *rfcomm_session_del(struct rfcomm_session *s);
- #define __test_cr(b)      (!!(b & 0x02))
- #define __test_pf(b)      (!!(b & 0x10))
- 
-+#define __session_dir(s)  ((s)->initiator ? 0x00 : 0x01)
-+
- #define __addr(cr, dlci)       (((dlci & 0x3f) << 2) | (cr << 1) | 0x01)
- #define __ctrl(type, pf)       (((type & 0xef) | (pf << 4)))
- #define __dlci(dir, chn)       (((chn & 0x1f) << 1) | dir)
-@@ -388,7 +390,7 @@ static int __rfcomm_dlc_open(struct rfcomm_dlc *d, bdaddr_t *src, bdaddr_t *dst,
- 			return err;
- 	}
- 
--	dlci = __dlci(!s->initiator, channel);
-+	dlci = __dlci(__session_dir(s), channel);
- 
- 	/* Check if DLCI already exists */
- 	if (rfcomm_dlc_get(s, dlci))
-@@ -543,7 +545,7 @@ struct rfcomm_dlc *rfcomm_dlc_exists(bdaddr_t *src, bdaddr_t *dst, u8 channel)
- 	rfcomm_lock();
- 	s = rfcomm_session_get(src, dst);
- 	if (s) {
--		dlci = __dlci(!s->initiator, channel);
-+		dlci = __dlci(__session_dir(s), channel);
- 		dlc = rfcomm_dlc_get(s, dlci);
- 	}
- 	rfcomm_unlock();
--- 
-1.9.3
+	cp = (void *) buf;
+	filter = cp->filter;
 
+	...
+
+This kind of style has been used in a few other places, however in this
+case a possibly better approach (resulting in a bit simpler code) would
+be to use alloca().
+
+Johan
