@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv1 14/47] android/gatt: Add support for new parameter for connect
-Date: Tue,  4 Nov 2014 10:18:37 +0200
-Message-Id: <1415089150-18798-15-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv1 08/47] android/hal-sco: Implement dummy SCO HAL functions
+Date: Tue,  4 Nov 2014 10:18:31 +0200
+Message-Id: <1415089150-18798-9-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1415089150-18798-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1415089150-18798-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,67 +11,82 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Add support for new parameter in gatt client connect() for new Android
-API.
+Prevent from crash and print debug statements.
 ---
- android/gatt.c     | 2 ++
- android/hal-gatt.c | 8 ++++++++
- android/hal-msg.h  | 1 +
- 3 files changed, 11 insertions(+)
+ android/hal-sco.c | 53 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 53 insertions(+)
 
-diff --git a/android/gatt.c b/android/gatt.c
-index 5a531d9..e930b5a 100644
---- a/android/gatt.c
-+++ b/android/gatt.c
-@@ -2066,6 +2066,8 @@ static void handle_client_connect(const void *buf, uint16_t len)
- 
- 	/* TODO handle is_direct flag */
- 
-+	/* TODO handle transport flag */
-+
- 	status = handle_connect(cmd->client_if, &addr);
- 
- 	ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_GATT, HAL_OP_GATT_CLIENT_CONNECT,
-diff --git a/android/hal-gatt.c b/android/hal-gatt.c
-index d0e9184..9379192 100644
---- a/android/hal-gatt.c
-+++ b/android/hal-gatt.c
-@@ -617,8 +617,13 @@ static bt_status_t scan(int client_if, bool start)
- 					sizeof(cmd), &cmd, NULL, NULL, NULL);
+diff --git a/android/hal-sco.c b/android/hal-sco.c
+index 7434804..d5e9f0a 100644
+--- a/android/hal-sco.c
++++ b/android/hal-sco.c
+@@ -1237,6 +1237,51 @@ static int sco_dump(const audio_hw_device_t *device, int fd)
+ 	return 0;
  }
  
 +#if ANDROID_VERSION > PLATFORM_VER(4, 4, 4)
-+static bt_status_t connect(int client_if, const bt_bdaddr_t *bd_addr,
-+						bool is_direct, int transport)
-+#else
- static bt_status_t connect(int client_if, const bt_bdaddr_t *bd_addr,
- 								bool is_direct)
++static int set_master_mute(struct audio_hw_device *dev, bool mute)
++{
++	DBG("");
++	return -ENOSYS;
++}
++
++static int get_master_mute(struct audio_hw_device *dev, bool *mute)
++{
++	DBG("");
++	return -ENOSYS;
++}
++
++static int create_audio_patch(struct audio_hw_device *dev,
++					unsigned int num_sources,
++					const struct audio_port_config *sources,
++					unsigned int num_sinks,
++					const struct audio_port_config *sinks,
++					audio_patch_handle_t *handle)
++{
++	DBG("");
++	return -ENOSYS;
++}
++
++static int release_audio_patch(struct audio_hw_device *dev,
++					audio_patch_handle_t handle)
++{
++	DBG("");
++	return -ENOSYS;
++}
++
++static int get_audio_port(struct audio_hw_device *dev, struct audio_port *port)
++{
++	DBG("");
++	return -ENOSYS;
++}
++
++static int set_audio_port_config(struct audio_hw_device *dev,
++					const struct audio_port_config *config)
++{
++	DBG("");
++	return -ENOSYS;
++}
 +#endif
++
+ static int sco_close(hw_device_t *device)
  {
- 	struct hal_cmd_gatt_client_connect cmd;
- 
-@@ -627,6 +632,9 @@ static bt_status_t connect(int client_if, const bt_bdaddr_t *bd_addr,
- 
- 	cmd.client_if = client_if;
- 	cmd.is_direct = is_direct;
+ 	DBG("");
+@@ -1390,6 +1435,14 @@ static int sco_open(const hw_module_t *module, const char *name,
+ 	dev->dev.open_input_stream = sco_open_input_stream;
+ 	dev->dev.close_input_stream = sco_close_input_stream;
+ 	dev->dev.dump = sco_dump;
 +#if ANDROID_VERSION > PLATFORM_VER(4, 4, 4)
-+	cmd.transport = transport;
++	dev->dev.set_master_mute = set_master_mute;
++	dev->dev.get_master_mute = get_master_mute;
++	dev->dev.create_audio_patch = create_audio_patch;
++	dev->dev.release_audio_patch = release_audio_patch;
++	dev->dev.get_audio_port = get_audio_port;
++	dev->dev.set_audio_port_config = set_audio_port_config;
 +#endif
  
- 	memcpy(cmd.bdaddr, bd_addr, sizeof(*bd_addr));
+ 	*device = &dev->dev.common;
  
-diff --git a/android/hal-msg.h b/android/hal-msg.h
-index bcb73b2..8dd00a0 100644
---- a/android/hal-msg.h
-+++ b/android/hal-msg.h
-@@ -721,6 +721,7 @@ struct hal_cmd_gatt_client_connect {
- 	int32_t client_if;
- 	uint8_t bdaddr[6];
- 	uint8_t is_direct;
-+	int32_t transport;
- } __attribute__((packed));
- 
- #define HAL_OP_GATT_CLIENT_DISCONNECT		0x05
 -- 
 1.9.1
 
