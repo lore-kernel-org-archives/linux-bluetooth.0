@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv1 27/47] android/handsfree: Add support for new API for cind_response
-Date: Tue,  4 Nov 2014 10:18:50 +0200
-Message-Id: <1415089150-18798-28-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv1 34/47] android/handsfree: Add support for new API for volume_cmd_cb
+Date: Tue,  4 Nov 2014 10:18:57 +0200
+Message-Id: <1415089150-18798-35-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1415089150-18798-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1415089150-18798-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,93 +11,75 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-cind_response has new parameter bdaddr in new Android API.
+Volume Command notification callback has new parameter bdaddr.
 ---
- android/hal-handsfree.c | 14 ++++++++++++++
- android/hal-ipc-api.txt |  1 +
- android/hal-msg.h       |  1 +
- android/handsfree.c     |  5 ++++-
- 4 files changed, 20 insertions(+), 1 deletion(-)
+ android/hal-handsfree.c | 5 +++++
+ android/hal-ipc-api.txt | 1 +
+ android/hal-msg.h       | 1 +
+ android/handsfree.c     | 2 ++
+ 4 files changed, 9 insertions(+)
 
 diff --git a/android/hal-handsfree.c b/android/hal-handsfree.c
-index f28b8c7..b240f84 100644
+index ccd30a1..38eee0b 100644
 --- a/android/hal-handsfree.c
 +++ b/android/hal-handsfree.c
-@@ -488,9 +488,16 @@ static bt_status_t cops_response(const char *cops)
- 						len, cmd, NULL, NULL, NULL);
+@@ -96,7 +96,12 @@ static void handle_volume(void *buf, uint16_t len, int fd)
+ 	struct hal_ev_handsfree_volume *ev = buf;
+ 
+ 	if (cbs->volume_cmd_cb)
++#if ANDROID_VERSION > PLATFORM_VER(4, 4, 4)
++		cbs->volume_cmd_cb(ev->type, ev->volume,
++						(bt_bdaddr_t *) (ev->bdaddr));
++#else
+ 		cbs->volume_cmd_cb(ev->type, ev->volume);
++#endif
  }
  
-+#if ANDROID_VERSION > PLATFORM_VER(4, 4, 4)
-+static bt_status_t cind_response(int svc, int num_active, int num_held,
-+					bthf_call_state_t state, int signal,
-+					int roam, int batt_chg,
-+					bt_bdaddr_t *bd_addr)
-+#else
- static bt_status_t cind_response(int svc, int num_active, int num_held,
- 					bthf_call_state_t state, int signal,
- 					int roam, int batt_chg)
-+#endif
- {
- 	struct hal_cmd_handsfree_cind_response cmd;
- 
-@@ -499,6 +506,13 @@ static bt_status_t cind_response(int svc, int num_active, int num_held,
- 	if (!interface_ready())
- 		return BT_STATUS_NOT_READY;
- 
-+#if ANDROID_VERSION > PLATFORM_VER(4, 4, 4)
-+	if (!bd_addr)
-+		return BT_STATUS_PARM_INVALID;
-+
-+	memcpy(cmd.bdaddr, bd_addr, sizeof(cmd.bdaddr));
-+#endif
-+
- 	cmd.svc = svc;
- 	cmd.num_active = num_active;
- 	cmd.num_held = num_held;
+ static void handle_dial(void *buf, uint16_t len, int fd)
 diff --git a/android/hal-ipc-api.txt b/android/hal-ipc-api.txt
-index 4a591b1..27572e4 100644
+index 8a77b06..7c24e8e 100644
 --- a/android/hal-ipc-api.txt
 +++ b/android/hal-ipc-api.txt
-@@ -892,6 +892,7 @@ Commands and responses:
- 		                    Signal strength (1 octet)
- 		                    Roaming indicator (1 octet)
- 		                    Battery level (1 octet)
-+		                    Remote address (6 octets)
- 		Response parameters: <none>
+@@ -1025,6 +1025,7 @@ Notifications:
  
- 		Valid call setup states: 0x00 = Active
+ 		Notification parameters: Volume type (1 octet)
+ 		                         Volume (1 octet)
++		                         Remote address (6 octets)
+ 
+ 		Valid volume types: 0x00 = Speaker
+ 		                    0x01 = Microphone
 diff --git a/android/hal-msg.h b/android/hal-msg.h
-index a2f2de4..17e6dee 100644
+index 0abbb1f7..889b45e 100644
 --- a/android/hal-msg.h
 +++ b/android/hal-msg.h
-@@ -551,6 +551,7 @@ struct hal_cmd_handsfree_cind_response {
- 	uint8_t signal;
- 	uint8_t roam;
- 	uint8_t batt_chg;
+@@ -1363,6 +1363,7 @@ struct hal_ev_handsfree_hangup {
+ struct hal_ev_handsfree_volume {
+ 	uint8_t type;
+ 	uint8_t volume;
 +	uint8_t bdaddr[6];
  } __attribute__((packed));
  
- #define HAL_OP_HANDSFREE_FORMATTED_AT_RESPONSE	0x0B
+ #define HAL_EV_HANDSFREE_DIAL		0x87
 diff --git a/android/handsfree.c b/android/handsfree.c
-index 7089f7c..3ef19d7 100644
+index d31b14a..e9b6af5 100644
 --- a/android/handsfree.c
 +++ b/android/handsfree.c
-@@ -2081,11 +2081,14 @@ static void handle_cind(const void *buf, uint16_t len)
- {
- 	const struct hal_cmd_handsfree_cind_response *cmd = buf;
- 	struct hf_device *dev;
-+	bdaddr_t bdaddr;
- 	uint8_t status;
+@@ -361,6 +361,7 @@ static void at_cmd_vgm(struct hfp_gw_result *result, enum hfp_gw_cmd_type type,
  
- 	DBG("");
+ 		ev.type = HAL_HANDSFREE_VOLUME_TYPE_MIC;
+ 		ev.volume = val;
++		bdaddr2android(&dev->bdaddr, ev.bdaddr);
  
--	dev = find_default_device();
-+	android2bdaddr(cmd->bdaddr, &bdaddr);
-+
-+	dev = find_device(&bdaddr);
- 	if (!dev) {
- 		status = HAL_STATUS_FAILED;
- 		goto done;
+ 		ipc_send_notif(hal_ipc, HAL_SERVICE_ID_HANDSFREE,
+ 				HAL_EV_HANDSFREE_VOLUME, sizeof(ev), &ev);
+@@ -396,6 +397,7 @@ static void at_cmd_vgs(struct hfp_gw_result *result, enum hfp_gw_cmd_type type,
+ 
+ 		ev.type = HAL_HANDSFREE_VOLUME_TYPE_SPEAKER;
+ 		ev.volume = val;
++		bdaddr2android(&dev->bdaddr, ev.bdaddr);
+ 
+ 		ipc_send_notif(hal_ipc, HAL_SERVICE_ID_HANDSFREE,
+ 				HAL_EV_HANDSFREE_VOLUME, sizeof(ev), &ev);
 -- 
 1.9.1
 
