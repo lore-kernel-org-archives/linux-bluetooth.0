@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv1 06/47] android/hal-sco: Add support for new Android API
-Date: Tue,  4 Nov 2014 10:18:29 +0200
-Message-Id: <1415089150-18798-7-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv1 47/47] android/build: Disable declaration-after-statement warnings
+Date: Tue,  4 Nov 2014 10:19:10 +0200
+Message-Id: <1415089150-18798-48-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1415089150-18798-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1415089150-18798-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,62 +11,34 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Add new parameters to sco_open_input_stream() and
-sco_open_output_stream() for the new API.
+When building Android system libraries for Audio HAL produce lots of
+warnings.
 ---
- android/hal-sco.c | 21 +++++++++++++++++++++
- 1 file changed, 21 insertions(+)
+ android/Android.mk | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/android/hal-sco.c b/android/hal-sco.c
-index 91a3baf..231be33 100644
---- a/android/hal-sco.c
-+++ b/android/hal-sco.c
-@@ -612,12 +612,22 @@ static int out_remove_audio_effect(const struct audio_stream *stream,
- 	return -ENOSYS;
- }
+diff --git a/android/Android.mk b/android/Android.mk
+index bfdf03f..16f94b9 100644
+--- a/android/Android.mk
++++ b/android/Android.mk
+@@ -367,7 +367,7 @@ LOCAL_SHARED_LIBRARIES := \
+ 	libcutils \
+ 	libsbc \
  
-+#if ANDROID_VERSION > PLATFORM_VER(4, 4, 4)
-+static int sco_open_output_stream(struct audio_hw_device *dev,
-+					audio_io_handle_t handle,
-+					audio_devices_t devices,
-+					audio_output_flags_t flags,
-+					struct audio_config *config,
-+					struct audio_stream_out **stream_out,
-+					const char *address)
-+#else
- static int sco_open_output_stream(struct audio_hw_device *dev,
- 					audio_io_handle_t handle,
- 					audio_devices_t devices,
- 					audio_output_flags_t flags,
- 					struct audio_config *config,
- 					struct audio_stream_out **stream_out)
-+#endif
- {
- 	struct sco_dev *adev = (struct sco_dev *) dev;
- 	struct sco_stream_out *out;
-@@ -1060,11 +1070,22 @@ static uint32_t in_get_input_frames_lost(struct audio_stream_in *stream)
- 	return -ENOSYS;
- }
+-LOCAL_CFLAGS := $(BLUEZ_COMMON_CFLAGS)
++LOCAL_CFLAGS := $(BLUEZ_COMMON_CFLAGS) -Wno-declaration-after-statement
+ LOCAL_LDFLAGS := -ldl
  
-+#if ANDROID_VERSION > PLATFORM_VER(4, 4, 4)
-+static int sco_open_input_stream(struct audio_hw_device *dev,
-+					audio_io_handle_t handle,
-+					audio_devices_t devices,
-+					struct audio_config *config,
-+					struct audio_stream_in **stream_in,
-+					audio_input_flags_t flags,
-+					const char *address,
-+					audio_source_t source)
-+#else
- static int sco_open_input_stream(struct audio_hw_device *dev,
- 					audio_io_handle_t handle,
- 					audio_devices_t devices,
- 					struct audio_config *config,
- 					struct audio_stream_in **stream_in)
-+#endif
- {
- 	struct sco_dev *sco_dev = (struct sco_dev *) dev;
- 	struct sco_stream_in *in;
+ LOCAL_MODULE_PATH := $(TARGET_OUT_SHARED_LIBRARIES)/hw
+@@ -394,7 +394,7 @@ LOCAL_SHARED_LIBRARIES := \
+ 	libcutils \
+ 	libaudioutils \
+ 
+-LOCAL_CFLAGS := $(BLUEZ_COMMON_CFLAGS)
++LOCAL_CFLAGS := $(BLUEZ_COMMON_CFLAGS) -Wno-declaration-after-statement
+ 
+ LOCAL_MODULE_PATH := $(TARGET_OUT_SHARED_LIBRARIES)/hw
+ LOCAL_MODULE_TAGS := optional
 -- 
 1.9.1
 
