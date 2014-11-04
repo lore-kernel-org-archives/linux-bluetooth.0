@@ -2,342 +2,457 @@ Return-Path: <cyrus@holtmann.org>
 From: Jakub Pawlowski <jpawlowski@google.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Jakub Pawlowski <jpawlowski@google.com>
-Subject: [PATCH v4 2/3] Bluetooth: Extract generic start and stop discovery
-Date: Tue,  4 Nov 2014 09:23:23 -0800
-Message-Id: <1415121804-12065-2-git-send-email-jpawlowski@google.com>
+Subject: [PATCH v4 3/3] Bluetooth: start service discovery and stop service discovery
+Date: Tue,  4 Nov 2014 09:23:24 -0800
+Message-Id: <1415121804-12065-3-git-send-email-jpawlowski@google.com>
 In-Reply-To: <1415121804-12065-1-git-send-email-jpawlowski@google.com>
 References: <1415121804-12065-1-git-send-email-jpawlowski@google.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This commit extract generic_start_discovery and generic_stop_discovery
-in preparation for start and stop service discovery. The reason behind
-that is that both functions will share big part of code, and it would
-be much easier to maintain just one generic method.
+This patch introduces start service discovery and stop service
+discovery methods. The reason behind that is to enable users to find
+specific services in range by UUID. Whole filtering is done in
+mgmt_device_found.
 
 Signed-off-by: Jakub Pawlowski <jpawlowski@google.com>
 ---
- net/bluetooth/mgmt.c | 136 +++++++++++++++++++++++++++++++--------------------
- 1 file changed, 82 insertions(+), 54 deletions(-)
+ include/net/bluetooth/hci.h      |   1 +
+ include/net/bluetooth/hci_core.h |  11 ++
+ include/net/bluetooth/mgmt.h     |  24 ++++
+ net/bluetooth/hci_core.c         |   3 +
+ net/bluetooth/mgmt.c             | 242 ++++++++++++++++++++++++++++++++++++++-
+ 5 files changed, 277 insertions(+), 4 deletions(-)
 
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index ce0272c..364973b6 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -3648,7 +3648,8 @@ static int remove_remote_oob_data(struct sock *sk, struct hci_dev *hdev,
- 	return err;
- }
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+index 8d43a50..8ca1aeda 100644
+--- a/include/net/bluetooth/hci.h
++++ b/include/net/bluetooth/hci.h
+@@ -204,6 +204,7 @@ enum {
+ 	HCI_BREDR_ENABLED,
+ 	HCI_LE_SCAN_INTERRUPTED,
+ 	HCI_LE_SCAN_RESTARTING,
++	HCI_SERVICE_FILTER,
+ };
  
--static int mgmt_start_discovery_failed(struct hci_dev *hdev, u8 status)
-+static int mgmt_start_discovery_failed(struct hci_dev *hdev, u8 status,
-+				       uint16_t opcode)
- {
- 	struct pending_cmd *cmd;
- 	u8 type;
-@@ -3656,7 +3657,7 @@ static int mgmt_start_discovery_failed(struct hci_dev *hdev, u8 status)
+ /* A mask for the flags that are supposed to remain when a reset happens
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 1b7f9a6..be7e28b 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -143,6 +143,12 @@ struct oob_data {
+ 	u8 randomizer256[16];
+ };
  
- 	hci_discovery_set_state(hdev, DISCOVERY_STOPPED);
- 
--	cmd = mgmt_pending_find(MGMT_OP_START_DISCOVERY, hdev);
-+	cmd = mgmt_pending_find(opcode, hdev);
- 	if (!cmd)
- 		return -ENOENT;
- 
-@@ -3669,7 +3670,8 @@ static int mgmt_start_discovery_failed(struct hci_dev *hdev, u8 status)
- 	return err;
- }
- 
--static void start_discovery_complete(struct hci_dev *hdev, u8 status)
-+static void generic_start_discovery_complete(struct hci_dev *hdev, u8 status,
-+					     uint16_t opcode)
- {
- 	unsigned long timeout = 0;
- 
-@@ -3677,7 +3679,7 @@ static void start_discovery_complete(struct hci_dev *hdev, u8 status)
- 
- 	if (status) {
- 		hci_dev_lock(hdev);
--		mgmt_start_discovery_failed(hdev, status);
-+		mgmt_start_discovery_failed(hdev, status, opcode);
- 		hci_dev_unlock(hdev);
- 		return;
- 	}
-@@ -3708,10 +3710,18 @@ static void start_discovery_complete(struct hci_dev *hdev, u8 status)
- 	queue_delayed_work(hdev->workqueue, &hdev->le_scan_disable, timeout);
- }
- 
--static int start_discovery(struct sock *sk, struct hci_dev *hdev,
--			   void *data, u16 len)
-+static void start_discovery_complete(struct hci_dev *hdev, u8 status)
-+{
-+	generic_start_discovery_complete(hdev, status, MGMT_OP_START_DISCOVERY);
-+}
++struct uuid_filter {
++	struct list_head list;
++	s8 rssi;
++	u8 uuid[16];
++};
 +
-+static int generic_start_discovery(struct sock *sk, struct hci_dev *hdev,
-+				   uint16_t opcode,
-+			void (*complete_cb)(struct hci_dev *hdev, u8 status),
-+				   u8 type,
-+				   struct mgmt_uuid_filter *serv_filters,
-+				   __le16 serv_filter_cnt)
- {
--	struct mgmt_cp_start_discovery *cp = data;
- 	struct pending_cmd *cmd;
- 	struct hci_cp_le_set_scan_param param_cp;
- 	struct hci_cp_le_set_scan_enable enable_cp;
-@@ -3727,33 +3737,33 @@ static int start_discovery(struct sock *sk, struct hci_dev *hdev,
- 	hci_dev_lock(hdev);
+ #define HCI_MAX_SHORT_NAME_LENGTH	10
  
- 	if (!hdev_is_powered(hdev)) {
--		err = cmd_complete(sk, hdev->id, MGMT_OP_START_DISCOVERY,
-+		err = cmd_complete(sk, hdev->id, opcode,
- 				   MGMT_STATUS_NOT_POWERED,
--				   &cp->type, sizeof(cp->type));
-+				   &type, sizeof(type));
- 		goto failed;
- 	}
+ /* Default LE RPA expiry time, 15 minutes */
+@@ -307,6 +313,8 @@ struct hci_dev {
+ 	struct discovery_state	discovery;
+ 	struct hci_conn_hash	conn_hash;
  
- 	if (test_bit(HCI_PERIODIC_INQ, &hdev->dev_flags)) {
--		err = cmd_complete(sk, hdev->id, MGMT_OP_START_DISCOVERY,
--				   MGMT_STATUS_BUSY, &cp->type,
--				   sizeof(cp->type));
-+		err = cmd_complete(sk, hdev->id, opcode,
-+				   MGMT_STATUS_BUSY, &type,
-+				   sizeof(type));
- 		goto failed;
- 	}
++	struct list_head discov_uuid_filter;
++
+ 	struct list_head	mgmt_pending;
+ 	struct list_head	blacklist;
+ 	struct list_head	whitelist;
+@@ -1325,6 +1333,8 @@ void hci_sock_dev_event(struct hci_dev *hdev, int event);
+ #define DISCOV_INTERLEAVED_INQUIRY_LEN	0x04
+ #define DISCOV_BREDR_INQUIRY_LEN	0x08
  
- 	if (hdev->discovery.state != DISCOVERY_STOPPED) {
--		err = cmd_complete(sk, hdev->id, MGMT_OP_START_DISCOVERY,
--				   MGMT_STATUS_BUSY, &cp->type,
--				   sizeof(cp->type));
-+		err = cmd_complete(sk, hdev->id, opcode,
-+				   MGMT_STATUS_BUSY, &type,
-+				   sizeof(type));
- 		goto failed;
- 	}
++#define DISCOV_LE_RESTART_DELAY msecs_to_jiffies(300)
++
+ int mgmt_control(struct sock *sk, struct msghdr *msg, size_t len);
+ int mgmt_new_settings(struct hci_dev *hdev);
+ void mgmt_index_added(struct hci_dev *hdev);
+@@ -1391,6 +1401,7 @@ void mgmt_new_conn_param(struct hci_dev *hdev, bdaddr_t *bdaddr,
+ 			 u16 max_interval, u16 latency, u16 timeout);
+ void mgmt_reenable_advertising(struct hci_dev *hdev);
+ void mgmt_smp_complete(struct hci_conn *conn, bool complete);
++void mgmt_clean_up_service_discovery(struct hci_dev *hdev);
  
--	cmd = mgmt_pending_add(sk, MGMT_OP_START_DISCOVERY, hdev, NULL, 0);
-+	cmd = mgmt_pending_add(sk, opcode, hdev, NULL, 0);
- 	if (!cmd) {
- 		err = -ENOMEM;
- 		goto failed;
- 	}
+ u8 hci_le_conn_update(struct hci_conn *conn, u16 min, u16 max, u16 latency,
+ 		      u16 to_multiplier);
+diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
+index 414cd2f..a87a4e0 100644
+--- a/include/net/bluetooth/mgmt.h
++++ b/include/net/bluetooth/mgmt.h
+@@ -495,6 +495,30 @@ struct mgmt_cp_set_public_address {
+ } __packed;
+ #define MGMT_SET_PUBLIC_ADDRESS_SIZE	6
  
--	hdev->discovery.type = cp->type;
-+	hdev->discovery.type = type;
++#define MGMT_OP_START_SERVICE_DISCOVERY	0x003A
++#define MGMT_START_SERVICE_DISCOVERY_SIZE 1
++
++#define MGMT_RANGE_NONE			0x00
++#define MGMT_RANGE_RSSI			0x01
++#define MGMT_RANGE_PATHLOSS		0x02
++
++struct mgmt_uuid_filter {
++	__s8 rssi;
++	__u8 uuid[16];
++} __packed;
++
++struct mgmt_cp_start_service_discovery {
++	__u8 type;
++	__le16 filter_count;
++	struct mgmt_uuid_filter filter[0];
++} __packed;
++
++#define MGMT_OP_STOP_SERVICE_DISCOVERY	0x003B
++struct mgmt_cp_stop_service_discovery {
++	__u8 type;
++} __packed;
++#define MGMT_STOP_SERVICE_DISCOVERY_SIZE 1
++
+ #define MGMT_EV_CMD_COMPLETE		0x0001
+ struct mgmt_ev_cmd_complete {
+ 	__le16	opcode;
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index b926b6a..f861314 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -3828,6 +3828,7 @@ static void le_scan_disable_work(struct work_struct *work)
+ 	BT_DBG("%s", hdev->name);
+ 
+ 	cancel_delayed_work_sync(&hdev->le_scan_restart);
++	mgmt_clean_up_service_discovery(hdev);
  
  	hci_req_init(&req, hdev);
  
-@@ -3761,18 +3771,16 @@ static int start_discovery(struct sock *sk, struct hci_dev *hdev,
- 	case DISCOV_TYPE_BREDR:
- 		status = mgmt_bredr_support(hdev);
- 		if (status) {
--			err = cmd_complete(sk, hdev->id,
--					   MGMT_OP_START_DISCOVERY, status,
--					   &cp->type, sizeof(cp->type));
-+			err = cmd_complete(sk, hdev->id, opcode, status,
-+					   &type, sizeof(type));
- 			mgmt_pending_remove(cmd);
- 			goto failed;
- 		}
+@@ -4028,6 +4029,8 @@ struct hci_dev *hci_alloc_dev(void)
+ 	hdev->conn_info_min_age = DEFAULT_CONN_INFO_MIN_AGE;
+ 	hdev->conn_info_max_age = DEFAULT_CONN_INFO_MAX_AGE;
  
- 		if (test_bit(HCI_INQUIRY, &hdev->flags)) {
--			err = cmd_complete(sk, hdev->id,
--					   MGMT_OP_START_DISCOVERY,
--					   MGMT_STATUS_BUSY, &cp->type,
--					   sizeof(cp->type));
-+			err = cmd_complete(sk, hdev->id, opcode,
-+					   MGMT_STATUS_BUSY, &type,
-+					   sizeof(type));
- 			mgmt_pending_remove(cmd);
- 			goto failed;
- 		}
-@@ -3789,19 +3797,17 @@ static int start_discovery(struct sock *sk, struct hci_dev *hdev,
- 	case DISCOV_TYPE_INTERLEAVED:
- 		status = mgmt_le_support(hdev);
- 		if (status) {
--			err = cmd_complete(sk, hdev->id,
--					   MGMT_OP_START_DISCOVERY, status,
--					   &cp->type, sizeof(cp->type));
-+			err = cmd_complete(sk, hdev->id, opcode, status,
-+					   &type, sizeof(type));
- 			mgmt_pending_remove(cmd);
- 			goto failed;
- 		}
++	INIT_LIST_HEAD(&hdev->discov_uuid_filter);
++
+ 	mutex_init(&hdev->lock);
+ 	mutex_init(&hdev->req_lock);
  
- 		if (hdev->discovery.type == DISCOV_TYPE_INTERLEAVED &&
- 		    !test_bit(HCI_BREDR_ENABLED, &hdev->dev_flags)) {
--			err = cmd_complete(sk, hdev->id,
--					   MGMT_OP_START_DISCOVERY,
-+			err = cmd_complete(sk, hdev->id, opcode,
- 					   MGMT_STATUS_NOT_SUPPORTED,
--					   &cp->type, sizeof(cp->type));
-+					   &type, sizeof(type));
- 			mgmt_pending_remove(cmd);
- 			goto failed;
- 		}
-@@ -3813,11 +3819,9 @@ static int start_discovery(struct sock *sk, struct hci_dev *hdev,
- 			 */
- 			if (hci_conn_hash_lookup_state(hdev, LE_LINK,
- 						       BT_CONNECT)) {
--				err = cmd_complete(sk, hdev->id,
--						   MGMT_OP_START_DISCOVERY,
-+				err = cmd_complete(sk, hdev->id, opcode,
- 						   MGMT_STATUS_REJECTED,
--						   &cp->type,
--						   sizeof(cp->type));
-+						   &type, sizeof(type));
- 				mgmt_pending_remove(cmd);
- 				goto failed;
- 			}
-@@ -3840,10 +3844,9 @@ static int start_discovery(struct sock *sk, struct hci_dev *hdev,
- 		 */
- 		err = hci_update_random_address(&req, true, &own_addr_type);
- 		if (err < 0) {
--			err = cmd_complete(sk, hdev->id,
--					   MGMT_OP_START_DISCOVERY,
-+			err = cmd_complete(sk, hdev->id, opcode,
- 					   MGMT_STATUS_FAILED,
--					   &cp->type, sizeof(cp->type));
-+					   &type, sizeof(type));
- 			mgmt_pending_remove(cmd);
- 			goto failed;
- 		}
-@@ -3863,14 +3866,14 @@ static int start_discovery(struct sock *sk, struct hci_dev *hdev,
- 		break;
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 364973b6..2d21f7d 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -93,6 +93,8 @@ static const u16 mgmt_commands[] = {
+ 	MGMT_OP_READ_CONFIG_INFO,
+ 	MGMT_OP_SET_EXTERNAL_CONFIG,
+ 	MGMT_OP_SET_PUBLIC_ADDRESS,
++	MGMT_OP_START_SERVICE_DISCOVERY,
++	MGMT_OP_STOP_SERVICE_DISCOVERY,
+ };
  
- 	default:
--		err = cmd_complete(sk, hdev->id, MGMT_OP_START_DISCOVERY,
-+		err = cmd_complete(sk, hdev->id, opcode,
- 				   MGMT_STATUS_INVALID_PARAMS,
--				   &cp->type, sizeof(cp->type));
-+				   &type, sizeof(type));
- 		mgmt_pending_remove(cmd);
- 		goto failed;
- 	}
- 
--	err = hci_req_run(&req, start_discovery_complete);
-+	err = hci_req_run(&req, complete_cb);
- 	if (err < 0)
- 		mgmt_pending_remove(cmd);
- 	else
-@@ -3881,12 +3884,23 @@ failed:
- 	return err;
+ static const u16 mgmt_events[] = {
+@@ -1248,7 +1250,7 @@ static int send_settings_rsp(struct sock *sk, u16 opcode, struct hci_dev *hdev)
+ 			    sizeof(settings));
  }
  
--static int mgmt_stop_discovery_failed(struct hci_dev *hdev, u8 status)
-+static int start_discovery(struct sock *sk, struct hci_dev *hdev,
-+			   void *data, u16 len)
+-static void clean_up_hci_complete(struct hci_dev *hdev, u8 status)
++static void mgmt_clean_up_hci_complete(struct hci_dev *hdev, u8 status)
+ {
+ 	BT_DBG("%s status 0x%02x", hdev->name, status);
+ 
+@@ -1258,6 +1260,26 @@ static void clean_up_hci_complete(struct hci_dev *hdev, u8 status)
+ 	}
+ }
+ 
++void clean_up_service_discovery(struct hci_dev *hdev)
 +{
-+	struct mgmt_cp_start_discovery *cp = data;
++	struct uuid_filter *filter = NULL;
++	struct uuid_filter *tmp = NULL;
 +
-+	return generic_start_discovery(sk, hdev, MGMT_OP_START_DISCOVERY,
-+				       start_discovery_complete, cp->type, NULL,
-+				       0);
++	if (!test_bit(HCI_SERVICE_FILTER, &hdev->dev_flags))
++		return;
++
++	clear_bit(HCI_SERVICE_FILTER, &hdev->dev_flags);
++	cancel_delayed_work_sync(&hdev->le_scan_restart);
++
++	if (list_empty(&hdev->discov_uuid_filter))
++		return;
++
++	list_for_each_entry_safe(filter, tmp, &hdev->discov_uuid_filter, list) {
++		__list_del_entry(&filter->list);
++		kfree(filter);
++	}
 +}
 +
-+static int mgmt_stop_discovery_failed(struct hci_dev *hdev, u8 status,
-+				      uint16_t opcode)
+ static bool hci_stop_discovery(struct hci_request *req)
  {
- 	struct pending_cmd *cmd;
- 	int err;
+ 	struct hci_dev *hdev = req->hdev;
+@@ -1270,6 +1292,7 @@ static bool hci_stop_discovery(struct hci_request *req)
+ 			hci_req_add(req, HCI_OP_INQUIRY_CANCEL, 0, NULL);
+ 		} else {
+ 			cancel_delayed_work(&hdev->le_scan_disable);
++			clean_up_service_discovery(hdev);
+ 			hci_req_add_le_scan_disable(req);
+ 		}
  
--	cmd = mgmt_pending_find(MGMT_OP_STOP_DISCOVERY, hdev);
-+	cmd = mgmt_pending_find(opcode, hdev);
- 	if (!cmd)
- 		return -ENOENT;
- 
-@@ -3897,14 +3911,15 @@ static int mgmt_stop_discovery_failed(struct hci_dev *hdev, u8 status)
+@@ -5683,6 +5706,53 @@ unlock:
  	return err;
  }
  
--static void stop_discovery_complete(struct hci_dev *hdev, u8 status)
-+static void generic_stop_discovery_complete(struct hci_dev *hdev, u8 status,
-+					    uint16_t opcode)
- {
- 	BT_DBG("status %d", status);
- 
- 	hci_dev_lock(hdev);
- 
- 	if (status) {
--		mgmt_stop_discovery_failed(hdev, status);
-+		mgmt_stop_discovery_failed(hdev, status, opcode);
- 		goto unlock;
- 	}
- 
-@@ -3914,10 +3929,15 @@ unlock:
- 	hci_dev_unlock(hdev);
- }
- 
--static int stop_discovery(struct sock *sk, struct hci_dev *hdev, void *data,
--			  u16 len)
-+static void stop_discovery_complete(struct hci_dev *hdev, u8 status)
++static void start_service_discovery_complete(struct hci_dev *hdev, u8 status)
 +{
-+	generic_stop_discovery_complete(hdev, status, MGMT_OP_STOP_DISCOVERY);
++	generic_start_discovery_complete(hdev, status,
++					 MGMT_OP_START_SERVICE_DISCOVERY);
 +}
 +
-+static int generic_stop_discovery(struct sock *sk, struct hci_dev *hdev,
-+				  __u8 type,
-+			void (*stop_discovery_cb)(struct hci_dev *, u8))
- {
--	struct mgmt_cp_stop_discovery *mgmt_cp = data;
- 	struct pending_cmd *cmd;
- 	struct hci_request req;
- 	int err;
-@@ -3928,15 +3948,14 @@ static int stop_discovery(struct sock *sk, struct hci_dev *hdev, void *data,
- 
- 	if (!hci_discovery_active(hdev)) {
- 		err = cmd_complete(sk, hdev->id, MGMT_OP_STOP_DISCOVERY,
--				   MGMT_STATUS_REJECTED, &mgmt_cp->type,
--				   sizeof(mgmt_cp->type));
-+				   MGMT_STATUS_REJECTED, &type, sizeof(type));
- 		goto unlock;
- 	}
- 
--	if (hdev->discovery.type != mgmt_cp->type) {
-+	if (hdev->discovery.type != type) {
- 		err = cmd_complete(sk, hdev->id, MGMT_OP_STOP_DISCOVERY,
--				   MGMT_STATUS_INVALID_PARAMS, &mgmt_cp->type,
--				   sizeof(mgmt_cp->type));
-+				   MGMT_STATUS_INVALID_PARAMS, &type,
-+				   sizeof(type));
- 		goto unlock;
- 	}
- 
-@@ -3950,7 +3969,7 @@ static int stop_discovery(struct sock *sk, struct hci_dev *hdev, void *data,
- 
- 	hci_stop_discovery(&req);
- 
--	err = hci_req_run(&req, stop_discovery_complete);
-+	err = hci_req_run(&req, stop_discovery_cb);
- 	if (!err) {
- 		hci_discovery_set_state(hdev, DISCOVERY_STOPPING);
- 		goto unlock;
-@@ -3961,7 +3980,7 @@ static int stop_discovery(struct sock *sk, struct hci_dev *hdev, void *data,
- 	/* If no HCI commands were sent we're done */
- 	if (err == -ENODATA) {
- 		err = cmd_complete(sk, hdev->id, MGMT_OP_STOP_DISCOVERY, 0,
--				   &mgmt_cp->type, sizeof(mgmt_cp->type));
-+				   &type, sizeof(type));
- 		hci_discovery_set_state(hdev, DISCOVERY_STOPPED);
- 	}
- 
-@@ -3970,6 +3989,15 @@ unlock:
- 	return err;
- }
- 
-+static int stop_discovery(struct sock *sk, struct hci_dev *hdev, void *data,
-+			  u16 len)
++static int start_service_discovery(struct sock *sk, struct hci_dev *hdev,
++				   void *data, u16 len)
 +{
-+	struct mgmt_cp_stop_discovery *mgmt_cp = data;
++	struct mgmt_cp_start_service_discovery *cp = data;
++	u16 expected_len, filter_count;
++
++	BT_DBG("%s", hdev->name);
++
++	filter_count = __le16_to_cpu(cp->filter_count);
++
++	expected_len = sizeof(*cp) +
++		       filter_count * sizeof(struct mgmt_uuid_filter);
++	if (expected_len != len) {
++		BT_ERR("start_service_discovery: expected %u, got %u bytes",
++		       expected_len, len);
++
++		return cmd_status(sk, hdev->id, MGMT_OP_START_SERVICE_DISCOVERY,
++				  MGMT_STATUS_INVALID_PARAMS);
++	}
++
++	return generic_start_discovery(sk, hdev,
++				       MGMT_OP_START_SERVICE_DISCOVERY,
++				       start_service_discovery_complete,
++				       cp->type, cp->filter, cp->filter_count);
++}
++
++static void stop_service_discovery_complete(struct hci_dev *hdev, u8 status)
++{
++	generic_stop_discovery_complete(hdev, status,
++					MGMT_OP_STOP_SERVICE_DISCOVERY);
++}
++
++static int stop_service_discovery(struct sock *sk, struct hci_dev *hdev,
++				  void *data, u16 len)
++{
++	struct mgmt_cp_stop_service_discovery *mgmt_cp = data;
 +
 +	return generic_stop_discovery(sk, hdev, mgmt_cp->type,
-+				      stop_discovery_complete);
++					stop_service_discovery_complete);
 +}
 +
- static int confirm_name(struct sock *sk, struct hci_dev *hdev, void *data,
- 			u16 len)
- {
+ static const struct mgmt_handler {
+ 	int (*func) (struct sock *sk, struct hci_dev *hdev, void *data,
+ 		     u16 data_len);
+@@ -5747,6 +5817,8 @@ static const struct mgmt_handler {
+ 	{ read_config_info,       false, MGMT_READ_CONFIG_INFO_SIZE },
+ 	{ set_external_config,    false, MGMT_SET_EXTERNAL_CONFIG_SIZE },
+ 	{ set_public_address,     false, MGMT_SET_PUBLIC_ADDRESS_SIZE },
++	{ start_service_discovery, true,  MGMT_START_SERVICE_DISCOVERY_SIZE },
++	{ stop_service_discovery, false, MGMT_STOP_SERVICE_DISCOVERY_SIZE },
+ };
+ 
+ int mgmt_control(struct sock *sk, struct msghdr *msg, size_t msglen)
+@@ -6816,6 +6888,135 @@ void mgmt_read_local_oob_data_complete(struct hci_dev *hdev, u8 *hash192,
+ 	mgmt_pending_remove(cmd);
+ }
+ 
++struct parsed_uuid {
++	struct list_head list;
++	u8 uuid[16];
++};
++
++/* this is reversed hex representation of bluetooth base uuid. We need it for
++ * service uuid parsing in eir.
++ */
++static const u8 reverse_base_uuid[] = {
++			0xfb, 0x34, 0x9b, 0x5f, 0x80, 0x00, 0x00, 0x80,
++			0x00, 0x10, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
++};
++
++static int add_uuid_to_list(struct list_head *uuids, u8 *uuid)
++{
++	struct parsed_uuid *tmp_uuid;
++
++	tmp_uuid = kmalloc(sizeof(*tmp_uuid), GFP_KERNEL);
++	if (tmp_uuid == NULL)
++		return -ENOMEM;
++
++	memcpy(tmp_uuid->uuid, uuid, 16);
++	INIT_LIST_HEAD(&tmp_uuid->list);
++	list_add(&tmp_uuid->list, uuids);
++	return 0;
++}
++
++void free_uuids_list(struct list_head *uuids)
++{
++	struct parsed_uuid *uuidptr, *tmp_uuid;
++
++	list_for_each_entry_safe(uuidptr, tmp_uuid, uuids, list) {
++		__list_del_entry(&uuidptr->list);
++		kfree(uuidptr);
++	}
++}
++
++static int eir_parse(u8 *eir, u8 eir_len, struct list_head *uuids)
++{
++	size_t offset;
++	u8 uuid[16];
++	int i, ret;
++
++	offset = 0;
++	while (offset < eir_len) {
++		uint8_t field_len = eir[0];
++
++		/* Check for the end of EIR */
++		if (field_len == 0)
++			break;
++
++		if (offset + field_len > eir_len)
++			return -EINVAL;
++
++		switch (eir[1]) {
++		case EIR_UUID16_ALL:
++		case EIR_UUID16_SOME:
++			for (i = 0; i + 3 <= field_len; i += 2) {
++				memcpy(uuid, reverse_base_uuid, 16);
++				uuid[13] = eir[i + 3];
++				uuid[12] = eir[i + 2];
++				ret = add_uuid_to_list(uuids, uuid);
++				if (ret)
++					return ret;
++			}
++			break;
++		case EIR_UUID32_ALL:
++		case EIR_UUID32_SOME:
++			for (i = 0; i + 5 <= field_len; i += 4) {
++				memcpy(uuid, reverse_base_uuid, 16);
++				uuid[15] = eir[i + 5];
++				uuid[14] = eir[i + 4];
++				uuid[13] = eir[i + 3];
++				uuid[12] = eir[i + 2];
++				ret = add_uuid_to_list(uuids, uuid);
++				if (ret)
++					return ret;
++			}
++			break;
++		case EIR_UUID128_ALL:
++		case EIR_UUID128_SOME:
++			for (i = 0; i + 17 <= field_len; i += 4) {
++				memcpy(uuid, eir + i + 2, 16);
++				ret = add_uuid_to_list(uuids, uuid);
++				if (ret)
++					return ret;
++			}
++			break;
++		}
++
++		offset += field_len + 1;
++		eir += field_len + 1;
++	}
++	return 0;
++}
++
++enum {
++	NO_MATCH,
++	SERVICE_MATCH,
++	FULL_MATCH
++};
++
++uint8_t find_match(struct uuid_filter *filter, u8 *uuid, s8 rssi)
++{
++	if (memcmp(filter->uuid, uuid, 16) != 0)
++		return NO_MATCH;
++
++	if (rssi >= filter->rssi)
++		return FULL_MATCH;
++
++	return SERVICE_MATCH;
++}
++
++int find_matches(struct hci_dev *hdev, s8 rssi, struct list_head *uuids)
++{
++	struct uuid_filter *filter;
++	struct parsed_uuid *uuidptr, *tmp_uuid;
++	int match_type = 0, tmp;
++
++	list_for_each_entry_safe(uuidptr, tmp_uuid, uuids, list) {
++		list_for_each_entry(filter, &hdev->discov_uuid_filter, list) {
++			tmp = find_match(filter, uuidptr->uuid, rssi);
++			if (tmp > match_type)
++				match_type = tmp;
++		}
++	}
++	return match_type;
++}
++
+ void mgmt_device_found(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
+ 		       u8 addr_type, u8 *dev_class, s8 rssi, u32 flags,
+ 		       u8 *eir, u16 eir_len, u8 *scan_rsp, u8 scan_rsp_len)
+@@ -6823,6 +7024,9 @@ void mgmt_device_found(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
+ 	char buf[512];
+ 	struct mgmt_ev_device_found *ev = (void *) buf;
+ 	size_t ev_size;
++	LIST_HEAD(uuids);
++	int ret = 0;
++	u8 match_type = 0;
+ 
+ 	/* Don't send events for a non-kernel initiated discovery. With
+ 	 * LE one exception is if we have pend_le_reports > 0 in which
+@@ -6861,7 +7065,29 @@ void mgmt_device_found(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
+ 	ev->eir_len = cpu_to_le16(eir_len + scan_rsp_len);
+ 	ev_size = sizeof(*ev) + eir_len + scan_rsp_len;
+ 
+-	mgmt_event(MGMT_EV_DEVICE_FOUND, hdev, ev, ev_size, NULL);
++	if (test_bit(HCI_SERVICE_FILTER, &hdev->dev_flags)) {
++		mgmt_event(MGMT_EV_DEVICE_FOUND, hdev, ev, ev_size, NULL);
++		return;
++	}
++
++	ret = eir_parse(eir, eir_len, &uuids);
++	if (list_empty(&uuids) || ret != 0)
++		return;
++
++	match_type = find_matches(hdev, rssi, &uuids);
++	free_uuids_list(&uuids);
++
++	if (match_type == NO_MATCH)
++		return;
++
++	if (test_bit(HCI_QUIRK_STRICT_DUPLICATE_FILTER, &hdev->quirks)) {
++		queue_delayed_work(hdev->workqueue,
++				   &hdev->le_scan_restart,
++				   DISCOV_LE_RESTART_DELAY);
++	}
++	if (match_type == FULL_MATCH)
++		mgmt_event(MGMT_EV_DEVICE_FOUND, hdev, ev,
++			   ev_size, NULL);
+ }
+ 
+ void mgmt_remote_name(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
+@@ -6894,10 +7120,18 @@ void mgmt_discovering(struct hci_dev *hdev, u8 discovering)
+ 
+ 	BT_DBG("%s discovering %u", hdev->name, discovering);
+ 
+-	if (discovering)
++	if (discovering) {
+ 		cmd = mgmt_pending_find(MGMT_OP_START_DISCOVERY, hdev);
+-	else
++		if (cmd == NULL)
++			cmd = mgmt_pending_find(MGMT_OP_START_SERVICE_DISCOVERY,
++						hdev);
++
++	} else {
+ 		cmd = mgmt_pending_find(MGMT_OP_STOP_DISCOVERY, hdev);
++		if (cmd == NULL)
++			cmd = mgmt_pending_find(MGMT_OP_STOP_SERVICE_DISCOVERY,
++						hdev);
++	}
+ 
+ 	if (cmd != NULL) {
+ 		u8 type = hdev->discovery.type;
 -- 
 2.1.0.rc2.206.gedb03e5
 
