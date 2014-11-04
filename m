@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv1 22/47] android/handsfree: Add support for new API for handsfree init
-Date: Tue,  4 Nov 2014 10:18:45 +0200
-Message-Id: <1415089150-18798-23-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv1 12/47] android/hal-sco: Use bdaddr parameter in Get SCO fd command
+Date: Tue,  4 Nov 2014 10:18:35 +0200
+Message-Id: <1415089150-18798-13-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1415089150-18798-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1415089150-18798-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,118 +11,79 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Add max_client parameter to IPC following new parameter for HF init().
 ---
- android/hal-handsfree.c | 10 ++++++++++
- android/hal-ipc-api.txt |  1 +
- android/hal-msg.h       |  1 +
- android/handsfree.c     |  5 ++++-
- android/handsfree.h     |  3 ++-
- android/main.c          |  3 ++-
- 6 files changed, 20 insertions(+), 3 deletions(-)
+ android/hal-sco.c | 19 +++++++++++--------
+ 1 file changed, 11 insertions(+), 8 deletions(-)
 
-diff --git a/android/hal-handsfree.c b/android/hal-handsfree.c
-index 0c51789..5ed4497 100644
---- a/android/hal-handsfree.c
-+++ b/android/hal-handsfree.c
-@@ -226,7 +226,11 @@ static uint8_t get_mode(void)
- 	return HAL_MODE_HANDSFREE_HSP_ONLY;
+diff --git a/android/hal-sco.c b/android/hal-sco.c
+index b6d95a1..1daeaac 100644
+--- a/android/hal-sco.c
++++ b/android/hal-sco.c
+@@ -281,20 +281,23 @@ failed:
+ 	return SCO_STATUS_FAILED;
  }
  
-+#if ANDROID_VERSION > PLATFORM_VER(4, 4, 4)
-+static bt_status_t init(bthf_callbacks_t *callbacks, int max_hf_clients)
-+#else
- static bt_status_t init(bthf_callbacks_t *callbacks)
-+#endif
+-static int ipc_get_sco_fd(void)
++static int ipc_get_sco_fd(bt_bdaddr_t *bd_addr)
  {
- 	struct hal_cmd_register_module cmd;
- 	int ret;
-@@ -244,6 +248,12 @@ static bt_status_t init(bthf_callbacks_t *callbacks)
- 	cmd.service_id = HAL_SERVICE_ID_HANDSFREE;
- 	cmd.mode = get_mode();
+ 	int ret = SCO_STATUS_SUCCESS;
  
-+#if  ANDROID_VERSION > PLATFORM_VER(4, 4, 4)
-+	cmd.max_clients = max_hf_clients;
-+#else
-+	cmd.max_clients = 1;
-+#endif
+ 	pthread_mutex_lock(&sco_mutex);
+ 
+ 	if (sco_fd < 0) {
++		struct sco_cmd_get_fd cmd;
+ 		struct sco_rsp_get_fd rsp;
+ 		size_t rsp_len = sizeof(rsp);
+ 
+ 		DBG("Getting SCO fd");
+ 
+-		ret = sco_ipc_cmd(SCO_SERVICE_ID, SCO_OP_GET_FD, 0, NULL,
+-						&rsp_len, &rsp, &sco_fd);
++		memcpy(cmd.bdaddr, bd_addr, sizeof(cmd.bdaddr));
 +
- 	ret = hal_ipc_cmd(HAL_SERVICE_ID_CORE, HAL_OP_REGISTER_MODULE,
- 					sizeof(cmd), &cmd, NULL, NULL, NULL);
++		ret = sco_ipc_cmd(SCO_SERVICE_ID, SCO_OP_GET_FD, sizeof(cmd),
++						&cmd, &rsp_len, &rsp, &sco_fd);
  
-diff --git a/android/hal-ipc-api.txt b/android/hal-ipc-api.txt
-index 3a3ae92..4a9e261 100644
---- a/android/hal-ipc-api.txt
-+++ b/android/hal-ipc-api.txt
-@@ -128,6 +128,7 @@ Core Service (ID 0)
+ 		/* Sometimes mtu returned is wrong */
+ 		sco_mtu = /* rsp.mtu */ 48;
+@@ -453,7 +456,7 @@ static ssize_t out_write(struct audio_stream_out *stream, const void *buffer,
  
- 		Command parameters: Service id (1 octet)
- 		                    Mode (1 octet)
-+		                    Max Clients (4 octets)
- 		Response parameters: <none>
+ 	DBG("write to fd %d bytes %zu", sco_fd, bytes);
  
- 		In case a command is sent for an undeclared service ID, it will
-diff --git a/android/hal-msg.h b/android/hal-msg.h
-index 1876d6b..b5a4125 100644
---- a/android/hal-msg.h
-+++ b/android/hal-msg.h
-@@ -64,6 +64,7 @@ static const char BLUEZ_HAL_SK_PATH[] = "\0bluez_hal_socket";
- struct hal_cmd_register_module {
- 	uint8_t service_id;
- 	uint8_t mode;
-+	int32_t max_clients;
- } __attribute__((packed));
+-	if (ipc_get_sco_fd() != SCO_STATUS_SUCCESS)
++	if (ipc_get_sco_fd(&out->bd_addr) != SCO_STATUS_SUCCESS)
+ 		return -1;
  
- #define HAL_OP_UNREGISTER_MODULE	0x02
-diff --git a/android/handsfree.c b/android/handsfree.c
-index aaf4f7a..b54a606 100644
---- a/android/handsfree.c
-+++ b/android/handsfree.c
-@@ -2901,7 +2901,8 @@ static bool bt_sco_register(ipc_disconnect_cb disconnect)
- 	return true;
- }
+ 	if (!out->downmix_buf) {
+@@ -654,9 +657,6 @@ static int sco_open_output_stream(struct audio_hw_device *dev,
+ 		return -EIO;
+ 	}
  
--bool bt_handsfree_register(struct ipc *ipc, const bdaddr_t *addr, uint8_t mode)
-+bool bt_handsfree_register(struct ipc *ipc, const bdaddr_t *addr, uint8_t mode,
-+								int max_clients)
- {
- 	DBG("mode 0x%x", mode);
+-	if (ipc_get_sco_fd() != SCO_STATUS_SUCCESS)
+-		DBG("SCO is not connected yet; get fd on write()");
+-
+ 	out = calloc(1, sizeof(struct sco_stream_out));
+ 	if (!out)
+ 		return -ENOMEM;
+@@ -688,6 +688,9 @@ static int sco_open_output_stream(struct audio_hw_device *dev,
+ 	}
+ #endif
  
-@@ -2920,6 +2921,8 @@ bool bt_handsfree_register(struct ipc *ipc, const bdaddr_t *addr, uint8_t mode)
- 	if (mode == HAL_MODE_HANDSFREE_HSP_ONLY)
- 		goto done;
- 
-+	/* TODO: Handle max_clients argument */
++	if (ipc_get_sco_fd(&out->bd_addr) != SCO_STATUS_SUCCESS)
++		DBG("SCO is not connected yet; get fd on write()");
 +
- 	hfp_ag_features = HFP_AG_FEATURES;
+ 	if (config) {
+ 		DBG("config: rate %u chan mask %x format %d offload %p",
+ 				config->sample_rate, config->channel_mask,
+@@ -1047,7 +1050,7 @@ static ssize_t in_read(struct audio_stream_in *stream, void *buffer,
  
- 	if (mode == HAL_MODE_HANDSFREE_HFP_WBS)
-diff --git a/android/handsfree.h b/android/handsfree.h
-index e5eff47..d4fd649 100644
---- a/android/handsfree.h
-+++ b/android/handsfree.h
-@@ -21,5 +21,6 @@
-  *
-  */
+ 	DBG("Read from fd %d bytes %zu", sco_fd, bytes);
  
--bool bt_handsfree_register(struct ipc *ipc, const bdaddr_t *addr, uint8_t mode);
-+bool bt_handsfree_register(struct ipc *ipc, const bdaddr_t *addr, uint8_t mode,
-+							int max_clients);
- void bt_handsfree_unregister(void);
-diff --git a/android/main.c b/android/main.c
-index b5f6937..58dd9ab 100644
---- a/android/main.c
-+++ b/android/main.c
-@@ -209,7 +209,8 @@ static void service_register(const void *buf, uint16_t len)
+-	if (ipc_get_sco_fd() != SCO_STATUS_SUCCESS)
++	if (ipc_get_sco_fd(&in->bd_addr) != SCO_STATUS_SUCCESS)
+ 		return -1;
  
- 		break;
- 	case HAL_SERVICE_ID_HANDSFREE:
--		if (!bt_handsfree_register(hal_ipc, &adapter_bdaddr, m->mode)) {
-+		if (!bt_handsfree_register(hal_ipc, &adapter_bdaddr, m->mode,
-+							m->max_clients)) {
- 			status = HAL_STATUS_FAILED;
- 			goto failed;
- 		}
+ 	if (!in->resampler && in->cfg.rate != AUDIO_STREAM_SCO_RATE) {
 -- 
 1.9.1
 
