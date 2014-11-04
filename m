@@ -1,33 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv1 01/47] android: Set exact Android version
-Date: Tue,  4 Nov 2014 10:18:24 +0200
-Message-Id: <1415089150-18798-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1415089150-18798-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1415089150-18798-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 8.0 \(1990.1\))
+Subject: Re: [PATCH] Bluetooth: Fix sparse warnings in RFCOMM
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1415083545-32629-1-git-send-email-johan.hedberg@gmail.com>
+Date: Mon, 3 Nov 2014 23:02:48 -0800
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <EB1EA32A-9D67-4B85-97F9-58835F1A297D@holtmann.org>
+References: <1415083545-32629-1-git-send-email-johan.hedberg@gmail.com>
+To: Johan Hedberg <johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Hi Johan,
 
-For local build set exact current Android version.
----
- android/Makefile.am | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+> This patch fixes the following sparse warnings in rfcomm/core.c:
+> 
+> net/bluetooth/rfcomm/core.c:391:16: warning: dubious: x | !y
+> net/bluetooth/rfcomm/core.c:546:24: warning: dubious: x | !y
+> 
+> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+> ---
+> net/bluetooth/rfcomm/core.c | 6 ++++--
+> 1 file changed, 4 insertions(+), 2 deletions(-)
 
-diff --git a/android/Makefile.am b/android/Makefile.am
-index 496fbc4..bd05654 100644
---- a/android/Makefile.am
-+++ b/android/Makefile.am
-@@ -1,6 +1,6 @@
- if ANDROID
- 
--AM_CFLAGS += -DANDROID_VERSION=0xFFFFFF -DBLUEZ_EXTENSIONS
-+AM_CFLAGS += -DANDROID_VERSION=0x040404 -DBLUEZ_EXTENSIONS
- 
- android_plugindir = $(abs_top_srcdir)/android/.libs
- 
--- 
-1.9.1
+patch has been applied to bluetooth-next tree.
+
+Regards
+
+Marcel
 
