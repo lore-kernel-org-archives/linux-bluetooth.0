@@ -1,54 +1,92 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 4 Nov 2014 15:42:34 +0100
-From: Alexander Aring <alex.aring@gmail.com>
-To: Simon Vincent <simon.vincent@xsilon.com>
-Cc: linux-wpan@vger.kernel.org, linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCHv2 bluetooth-next] 6lowpan: fix udp header compression
- when using raw sockets
-Message-ID: <20141104144232.GA30647@omega>
-References: <1415111693-1711-1-git-send-email-simon.vincent@xsilon.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-In-Reply-To: <1415111693-1711-1-git-send-email-simon.vincent@xsilon.com>
-Sender: linux-wpan-owner@vger.kernel.org
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCHv2 2/2] android/hal-audio: Implement dummy Audio HAL functions
+Date: Tue,  4 Nov 2014 16:37:37 +0200
+Message-Id: <1415111857-399-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1415111857-399-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1415111857-399-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Tue, Nov 04, 2014 at 02:34:53PM +0000, Simon Vincent wrote:
-> If you use RAW sockets the transport header offset is not set by the
-> ipv6 stack so when we get to the udp header compression it does not
-> compress the right part of the packet.
-> 
-> This patch adds a check for this scenario and sets the transport
-> header offset.
-> 
-> Signed-off-by: Simon Vincent <simon.vincent@xsilon.com>
-> ---
->  net/6lowpan/iphc.c | 10 +++++++++-
->  1 file changed, 9 insertions(+), 1 deletion(-)
-> 
-> diff --git a/net/6lowpan/iphc.c b/net/6lowpan/iphc.c
-> index 73a7065..305bf2b 100644
-> --- a/net/6lowpan/iphc.c
-> +++ b/net/6lowpan/iphc.c
-> @@ -512,9 +512,17 @@ static u8 lowpan_compress_addr_64(u8 **hc_ptr, u8 shift,
->  
->  static void compress_udp_header(u8 **hc_ptr, struct sk_buff *skb)
->  {
-> -	struct udphdr *uh = udp_hdr(skb);
-> +	struct udphdr *uh;
->  	u8 tmp;
->  
-> +	/* In the case of RAW sockets the transport header is not set by
-> +	* the ip6 stack so we must set it ourselves
-> +	*/
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Should be:
+Enable debug prints and prevent crash.
+---
+ android/hal-audio.c | 53 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 53 insertions(+)
 
-	/* In the case of RAW sockets the transport header is not set by
-	 * the ip6 stack so we must set it ourselves
-	 */
-
-Otherwise looking good! ;-)
-
-- Alex
+diff --git a/android/hal-audio.c b/android/hal-audio.c
+index 0e9891d..1caa4eb 100644
+--- a/android/hal-audio.c
++++ b/android/hal-audio.c
+@@ -1354,6 +1354,51 @@ static int audio_dump(const audio_hw_device_t *device, int fd)
+ 	return -ENOSYS;
+ }
+ 
++#if ANDROID_VERSION >= PLATFORM_VER(5, 0, 0)
++static int set_master_mute(struct audio_hw_device *dev, bool mute)
++{
++	DBG("");
++	return -ENOSYS;
++}
++
++static int get_master_mute(struct audio_hw_device *dev, bool *mute)
++{
++	DBG("");
++	return -ENOSYS;
++}
++
++static int create_audio_patch(struct audio_hw_device *dev,
++					unsigned int num_sources,
++					const struct audio_port_config *sources,
++					unsigned int num_sinks,
++					const struct audio_port_config *sinks,
++					audio_patch_handle_t *handle)
++{
++	DBG("");
++	return -ENOSYS;
++}
++
++static int release_audio_patch(struct audio_hw_device *dev,
++					audio_patch_handle_t handle)
++{
++	DBG("");
++	return -ENOSYS;
++}
++
++static int get_audio_port(struct audio_hw_device *dev, struct audio_port *port)
++{
++	DBG("");
++	return -ENOSYS;
++}
++
++static int set_audio_port_config(struct audio_hw_device *dev,
++					const struct audio_port_config *config)
++{
++	DBG("");
++	return -ENOSYS;
++}
++#endif
++
+ static int audio_close(hw_device_t *device)
+ {
+ 	struct a2dp_audio_dev *a2dp_dev = (struct a2dp_audio_dev *)device;
+@@ -1550,6 +1595,14 @@ static int audio_open(const hw_module_t *module, const char *name,
+ 	a2dp_dev->dev.open_input_stream = audio_open_input_stream;
+ 	a2dp_dev->dev.close_input_stream = audio_close_input_stream;
+ 	a2dp_dev->dev.dump = audio_dump;
++#if ANDROID_VERSION >= PLATFORM_VER(5, 0, 0)
++	a2dp_dev->dev.set_master_mute = set_master_mute;
++	a2dp_dev->dev.get_master_mute = get_master_mute;
++	a2dp_dev->dev.create_audio_patch = create_audio_patch;
++	a2dp_dev->dev.release_audio_patch = release_audio_patch;
++	a2dp_dev->dev.get_audio_port = get_audio_port;
++	a2dp_dev->dev.set_audio_port_config = set_audio_port_config;
++#endif
+ 
+ 	for (i = 0; i < NUM_CODECS; i++) {
+ 		const struct audio_codec *codec = audio_codecs[i].get_codec();
+-- 
+1.9.1
 
