@@ -1,105 +1,343 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <5458C0CD.9010907@LilandIT.com>
-References: <5457A17D.9060404@LilandIT.com>
-	<CAHrH25RfMAiNTHYBR=vT+KuBtVwEKPuLRFfEiMGF9Ya__9Y5nA@mail.gmail.com>
-	<5458C0CD.9010907@LilandIT.com>
-Date: Tue, 4 Nov 2014 11:11:55 -0800
-Message-ID: <CAHrH25SBzCoJ+nvUbS2a8MfxbSG4nBhJ447qz7VKGSdGgMXM-A@mail.gmail.com>
-Subject: Re: How to get started on a GATT Server ?
-From: Arman Uguray <armansito@chromium.org>
-To: "Urbani, Edmund" <edmund.urbani@lilandit.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+From: Jakub Pawlowski <jpawlowski@google.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Jakub Pawlowski <jpawlowski@google.com>
+Subject: [PATCH v4 2/3] Bluetooth: Extract generic start and stop discovery
+Date: Tue,  4 Nov 2014 09:23:23 -0800
+Message-Id: <1415121804-12065-2-git-send-email-jpawlowski@google.com>
+In-Reply-To: <1415121804-12065-1-git-send-email-jpawlowski@google.com>
+References: <1415121804-12065-1-git-send-email-jpawlowski@google.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Edmund,
+This commit extract generic_start_discovery and generic_stop_discovery
+in preparation for start and stop service discovery. The reason behind
+that is that both functions will share big part of code, and it would
+be much easier to maintain just one generic method.
 
-On Tue, Nov 4, 2014 at 4:04 AM, Urbani, Edmund
-<edmund.urbani@lilandit.com> wrote:
->
-> On 11/03/2014 08:32 PM, Arman Uguray wrote:
->>
->> Hi Edmund,
->>
->>> On Mon, Nov 3, 2014 at 7:38 AM, Urbani, Edmund
->>> <edmund.urbani@lilandit.com> wrote:
->>> Hello all,
->>>
->>> I am trying to write a simple GATT-based service of my own. Right now I
->>> don't really know which docs I should be looking at. I have skimmed
->>> through
->>> bluez sources (5.23) and found gatt-service.h and gatt.h, as well as the
->>> gatt-example plugin.
->>>
->>> So far I am still trying to figure out whether I should be going the C
->>> API
->>> route or maybe use the D-Bus interface. Also gatt-service.c seems to
->>> suggest
->>> that there is a way to register a GATT service over D-Bus but running it
->>> gives me this:
->>> RegisterService: Method "RegisterService" with signature "oa{sv}" on
->>> interface "org.bluez.GattManager1" doesn't exist"
->>
->> The reason you're not seeing GattManager1 is because it's hidden
->> behind the "experimental" flag. So you need to configure and run bluez
->> with the --enable-experimental and the --experimental flags
->> respectively.
->>
->> That said, that API implementation isn't complete and isn't in fact
->> even wired up with the internal attrib-server. We're working towards
->> rewriting all of the C API and finally implementing the proposed D-Bus
->> API but until then, I would ignore doc/gatt-api.txt (it's only a
->> proposal at the moment and isn't even included in release tarballs).
->> So for now you have to use the C API route. There will probably be an
->> announcement once that D-Bus API is finally supported.
->
->
->>> Any pointers to help me get started would be appreciated. Thanks!
->>>
->>> Kind regards,
->>>    Edmund
->>
->> Cheers,
->> Arman
->
->
-> Thanks, I won't bother with the D-Bus interface then. But if the C API is
-> being rewritten now, that sounds like there is currently no stable API
-> available at all. :/ Or is it just the internals being rewritten?
->
+Signed-off-by: Jakub Pawlowski <jpawlowski@google.com>
+---
+ net/bluetooth/mgmt.c | 136 +++++++++++++++++++++++++++++++--------------------
+ 1 file changed, 82 insertions(+), 54 deletions(-)
 
-The C API for GATT interactions is being rewritten, i.e. the code in
-attrib/* is being deprecated in favor of code in src/shared/gatt*. You
-can still keep using the existing APIs though at some point we will
-rip out the existing attrib-server to be a combination of
-shared/gatt-db and shared/gatt-server. So, make sure you keep track of
-the patches going in.
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index ce0272c..364973b6 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -3648,7 +3648,8 @@ static int remove_remote_oob_data(struct sock *sk, struct hci_dev *hdev,
+ 	return err;
+ }
+ 
+-static int mgmt_start_discovery_failed(struct hci_dev *hdev, u8 status)
++static int mgmt_start_discovery_failed(struct hci_dev *hdev, u8 status,
++				       uint16_t opcode)
+ {
+ 	struct pending_cmd *cmd;
+ 	u8 type;
+@@ -3656,7 +3657,7 @@ static int mgmt_start_discovery_failed(struct hci_dev *hdev, u8 status)
+ 
+ 	hci_discovery_set_state(hdev, DISCOVERY_STOPPED);
+ 
+-	cmd = mgmt_pending_find(MGMT_OP_START_DISCOVERY, hdev);
++	cmd = mgmt_pending_find(opcode, hdev);
+ 	if (!cmd)
+ 		return -ENOENT;
+ 
+@@ -3669,7 +3670,8 @@ static int mgmt_start_discovery_failed(struct hci_dev *hdev, u8 status)
+ 	return err;
+ }
+ 
+-static void start_discovery_complete(struct hci_dev *hdev, u8 status)
++static void generic_start_discovery_complete(struct hci_dev *hdev, u8 status,
++					     uint16_t opcode)
+ {
+ 	unsigned long timeout = 0;
+ 
+@@ -3677,7 +3679,7 @@ static void start_discovery_complete(struct hci_dev *hdev, u8 status)
+ 
+ 	if (status) {
+ 		hci_dev_lock(hdev);
+-		mgmt_start_discovery_failed(hdev, status);
++		mgmt_start_discovery_failed(hdev, status, opcode);
+ 		hci_dev_unlock(hdev);
+ 		return;
+ 	}
+@@ -3708,10 +3710,18 @@ static void start_discovery_complete(struct hci_dev *hdev, u8 status)
+ 	queue_delayed_work(hdev->workqueue, &hdev->le_scan_disable, timeout);
+ }
+ 
+-static int start_discovery(struct sock *sk, struct hci_dev *hdev,
+-			   void *data, u16 len)
++static void start_discovery_complete(struct hci_dev *hdev, u8 status)
++{
++	generic_start_discovery_complete(hdev, status, MGMT_OP_START_DISCOVERY);
++}
++
++static int generic_start_discovery(struct sock *sk, struct hci_dev *hdev,
++				   uint16_t opcode,
++			void (*complete_cb)(struct hci_dev *hdev, u8 status),
++				   u8 type,
++				   struct mgmt_uuid_filter *serv_filters,
++				   __le16 serv_filter_cnt)
+ {
+-	struct mgmt_cp_start_discovery *cp = data;
+ 	struct pending_cmd *cmd;
+ 	struct hci_cp_le_set_scan_param param_cp;
+ 	struct hci_cp_le_set_scan_enable enable_cp;
+@@ -3727,33 +3737,33 @@ static int start_discovery(struct sock *sk, struct hci_dev *hdev,
+ 	hci_dev_lock(hdev);
+ 
+ 	if (!hdev_is_powered(hdev)) {
+-		err = cmd_complete(sk, hdev->id, MGMT_OP_START_DISCOVERY,
++		err = cmd_complete(sk, hdev->id, opcode,
+ 				   MGMT_STATUS_NOT_POWERED,
+-				   &cp->type, sizeof(cp->type));
++				   &type, sizeof(type));
+ 		goto failed;
+ 	}
+ 
+ 	if (test_bit(HCI_PERIODIC_INQ, &hdev->dev_flags)) {
+-		err = cmd_complete(sk, hdev->id, MGMT_OP_START_DISCOVERY,
+-				   MGMT_STATUS_BUSY, &cp->type,
+-				   sizeof(cp->type));
++		err = cmd_complete(sk, hdev->id, opcode,
++				   MGMT_STATUS_BUSY, &type,
++				   sizeof(type));
+ 		goto failed;
+ 	}
+ 
+ 	if (hdev->discovery.state != DISCOVERY_STOPPED) {
+-		err = cmd_complete(sk, hdev->id, MGMT_OP_START_DISCOVERY,
+-				   MGMT_STATUS_BUSY, &cp->type,
+-				   sizeof(cp->type));
++		err = cmd_complete(sk, hdev->id, opcode,
++				   MGMT_STATUS_BUSY, &type,
++				   sizeof(type));
+ 		goto failed;
+ 	}
+ 
+-	cmd = mgmt_pending_add(sk, MGMT_OP_START_DISCOVERY, hdev, NULL, 0);
++	cmd = mgmt_pending_add(sk, opcode, hdev, NULL, 0);
+ 	if (!cmd) {
+ 		err = -ENOMEM;
+ 		goto failed;
+ 	}
+ 
+-	hdev->discovery.type = cp->type;
++	hdev->discovery.type = type;
+ 
+ 	hci_req_init(&req, hdev);
+ 
+@@ -3761,18 +3771,16 @@ static int start_discovery(struct sock *sk, struct hci_dev *hdev,
+ 	case DISCOV_TYPE_BREDR:
+ 		status = mgmt_bredr_support(hdev);
+ 		if (status) {
+-			err = cmd_complete(sk, hdev->id,
+-					   MGMT_OP_START_DISCOVERY, status,
+-					   &cp->type, sizeof(cp->type));
++			err = cmd_complete(sk, hdev->id, opcode, status,
++					   &type, sizeof(type));
+ 			mgmt_pending_remove(cmd);
+ 			goto failed;
+ 		}
+ 
+ 		if (test_bit(HCI_INQUIRY, &hdev->flags)) {
+-			err = cmd_complete(sk, hdev->id,
+-					   MGMT_OP_START_DISCOVERY,
+-					   MGMT_STATUS_BUSY, &cp->type,
+-					   sizeof(cp->type));
++			err = cmd_complete(sk, hdev->id, opcode,
++					   MGMT_STATUS_BUSY, &type,
++					   sizeof(type));
+ 			mgmt_pending_remove(cmd);
+ 			goto failed;
+ 		}
+@@ -3789,19 +3797,17 @@ static int start_discovery(struct sock *sk, struct hci_dev *hdev,
+ 	case DISCOV_TYPE_INTERLEAVED:
+ 		status = mgmt_le_support(hdev);
+ 		if (status) {
+-			err = cmd_complete(sk, hdev->id,
+-					   MGMT_OP_START_DISCOVERY, status,
+-					   &cp->type, sizeof(cp->type));
++			err = cmd_complete(sk, hdev->id, opcode, status,
++					   &type, sizeof(type));
+ 			mgmt_pending_remove(cmd);
+ 			goto failed;
+ 		}
+ 
+ 		if (hdev->discovery.type == DISCOV_TYPE_INTERLEAVED &&
+ 		    !test_bit(HCI_BREDR_ENABLED, &hdev->dev_flags)) {
+-			err = cmd_complete(sk, hdev->id,
+-					   MGMT_OP_START_DISCOVERY,
++			err = cmd_complete(sk, hdev->id, opcode,
+ 					   MGMT_STATUS_NOT_SUPPORTED,
+-					   &cp->type, sizeof(cp->type));
++					   &type, sizeof(type));
+ 			mgmt_pending_remove(cmd);
+ 			goto failed;
+ 		}
+@@ -3813,11 +3819,9 @@ static int start_discovery(struct sock *sk, struct hci_dev *hdev,
+ 			 */
+ 			if (hci_conn_hash_lookup_state(hdev, LE_LINK,
+ 						       BT_CONNECT)) {
+-				err = cmd_complete(sk, hdev->id,
+-						   MGMT_OP_START_DISCOVERY,
++				err = cmd_complete(sk, hdev->id, opcode,
+ 						   MGMT_STATUS_REJECTED,
+-						   &cp->type,
+-						   sizeof(cp->type));
++						   &type, sizeof(type));
+ 				mgmt_pending_remove(cmd);
+ 				goto failed;
+ 			}
+@@ -3840,10 +3844,9 @@ static int start_discovery(struct sock *sk, struct hci_dev *hdev,
+ 		 */
+ 		err = hci_update_random_address(&req, true, &own_addr_type);
+ 		if (err < 0) {
+-			err = cmd_complete(sk, hdev->id,
+-					   MGMT_OP_START_DISCOVERY,
++			err = cmd_complete(sk, hdev->id, opcode,
+ 					   MGMT_STATUS_FAILED,
+-					   &cp->type, sizeof(cp->type));
++					   &type, sizeof(type));
+ 			mgmt_pending_remove(cmd);
+ 			goto failed;
+ 		}
+@@ -3863,14 +3866,14 @@ static int start_discovery(struct sock *sk, struct hci_dev *hdev,
+ 		break;
+ 
+ 	default:
+-		err = cmd_complete(sk, hdev->id, MGMT_OP_START_DISCOVERY,
++		err = cmd_complete(sk, hdev->id, opcode,
+ 				   MGMT_STATUS_INVALID_PARAMS,
+-				   &cp->type, sizeof(cp->type));
++				   &type, sizeof(type));
+ 		mgmt_pending_remove(cmd);
+ 		goto failed;
+ 	}
+ 
+-	err = hci_req_run(&req, start_discovery_complete);
++	err = hci_req_run(&req, complete_cb);
+ 	if (err < 0)
+ 		mgmt_pending_remove(cmd);
+ 	else
+@@ -3881,12 +3884,23 @@ failed:
+ 	return err;
+ }
+ 
+-static int mgmt_stop_discovery_failed(struct hci_dev *hdev, u8 status)
++static int start_discovery(struct sock *sk, struct hci_dev *hdev,
++			   void *data, u16 len)
++{
++	struct mgmt_cp_start_discovery *cp = data;
++
++	return generic_start_discovery(sk, hdev, MGMT_OP_START_DISCOVERY,
++				       start_discovery_complete, cp->type, NULL,
++				       0);
++}
++
++static int mgmt_stop_discovery_failed(struct hci_dev *hdev, u8 status,
++				      uint16_t opcode)
+ {
+ 	struct pending_cmd *cmd;
+ 	int err;
+ 
+-	cmd = mgmt_pending_find(MGMT_OP_STOP_DISCOVERY, hdev);
++	cmd = mgmt_pending_find(opcode, hdev);
+ 	if (!cmd)
+ 		return -ENOENT;
+ 
+@@ -3897,14 +3911,15 @@ static int mgmt_stop_discovery_failed(struct hci_dev *hdev, u8 status)
+ 	return err;
+ }
+ 
+-static void stop_discovery_complete(struct hci_dev *hdev, u8 status)
++static void generic_stop_discovery_complete(struct hci_dev *hdev, u8 status,
++					    uint16_t opcode)
+ {
+ 	BT_DBG("status %d", status);
+ 
+ 	hci_dev_lock(hdev);
+ 
+ 	if (status) {
+-		mgmt_stop_discovery_failed(hdev, status);
++		mgmt_stop_discovery_failed(hdev, status, opcode);
+ 		goto unlock;
+ 	}
+ 
+@@ -3914,10 +3929,15 @@ unlock:
+ 	hci_dev_unlock(hdev);
+ }
+ 
+-static int stop_discovery(struct sock *sk, struct hci_dev *hdev, void *data,
+-			  u16 len)
++static void stop_discovery_complete(struct hci_dev *hdev, u8 status)
++{
++	generic_stop_discovery_complete(hdev, status, MGMT_OP_STOP_DISCOVERY);
++}
++
++static int generic_stop_discovery(struct sock *sk, struct hci_dev *hdev,
++				  __u8 type,
++			void (*stop_discovery_cb)(struct hci_dev *, u8))
+ {
+-	struct mgmt_cp_stop_discovery *mgmt_cp = data;
+ 	struct pending_cmd *cmd;
+ 	struct hci_request req;
+ 	int err;
+@@ -3928,15 +3948,14 @@ static int stop_discovery(struct sock *sk, struct hci_dev *hdev, void *data,
+ 
+ 	if (!hci_discovery_active(hdev)) {
+ 		err = cmd_complete(sk, hdev->id, MGMT_OP_STOP_DISCOVERY,
+-				   MGMT_STATUS_REJECTED, &mgmt_cp->type,
+-				   sizeof(mgmt_cp->type));
++				   MGMT_STATUS_REJECTED, &type, sizeof(type));
+ 		goto unlock;
+ 	}
+ 
+-	if (hdev->discovery.type != mgmt_cp->type) {
++	if (hdev->discovery.type != type) {
+ 		err = cmd_complete(sk, hdev->id, MGMT_OP_STOP_DISCOVERY,
+-				   MGMT_STATUS_INVALID_PARAMS, &mgmt_cp->type,
+-				   sizeof(mgmt_cp->type));
++				   MGMT_STATUS_INVALID_PARAMS, &type,
++				   sizeof(type));
+ 		goto unlock;
+ 	}
+ 
+@@ -3950,7 +3969,7 @@ static int stop_discovery(struct sock *sk, struct hci_dev *hdev, void *data,
+ 
+ 	hci_stop_discovery(&req);
+ 
+-	err = hci_req_run(&req, stop_discovery_complete);
++	err = hci_req_run(&req, stop_discovery_cb);
+ 	if (!err) {
+ 		hci_discovery_set_state(hdev, DISCOVERY_STOPPING);
+ 		goto unlock;
+@@ -3961,7 +3980,7 @@ static int stop_discovery(struct sock *sk, struct hci_dev *hdev, void *data,
+ 	/* If no HCI commands were sent we're done */
+ 	if (err == -ENODATA) {
+ 		err = cmd_complete(sk, hdev->id, MGMT_OP_STOP_DISCOVERY, 0,
+-				   &mgmt_cp->type, sizeof(mgmt_cp->type));
++				   &type, sizeof(type));
+ 		hci_discovery_set_state(hdev, DISCOVERY_STOPPED);
+ 	}
+ 
+@@ -3970,6 +3989,15 @@ unlock:
+ 	return err;
+ }
+ 
++static int stop_discovery(struct sock *sk, struct hci_dev *hdev, void *data,
++			  u16 len)
++{
++	struct mgmt_cp_stop_discovery *mgmt_cp = data;
++
++	return generic_stop_discovery(sk, hdev, mgmt_cp->type,
++				      stop_discovery_complete);
++}
++
+ static int confirm_name(struct sock *sk, struct hci_dev *hdev, void *data,
+ 			u16 len)
+ {
+-- 
+2.1.0.rc2.206.gedb03e5
 
-Keep in mind that if you're developing your code on top of the master
-branch then things are meant to be in flight and unstable there, so
-you should follow releases anyway. I think we'll figure out a way so
-that the C based GATT server/client won't be entirely broken for
-people in between official BlueZ releases.
-
-> So I assume, the fastest route the get a prototype that does something,
-> would be to get gatt-example.c to run and then modify that, right?
->
-
-Yes, that is the easiest way right now. When the new C APIs are mature
-enough we will convert gatt-example to use the new code but that's
-still a few months down the line.
-
-> Kind regards,
->  Edmund
->
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth"
-> in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-
-Cheers,
-Arman
