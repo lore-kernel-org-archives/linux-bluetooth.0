@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv1 24/47] android/handsfree: Add support for new API for stop_vr
-Date: Tue,  4 Nov 2014 10:18:47 +0200
-Message-Id: <1415089150-18798-25-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv1 23/47] android/handsfree: Add support for new API for start_vr
+Date: Tue,  4 Nov 2014 10:18:46 +0200
+Message-Id: <1415089150-18798-24-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1415089150-18798-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1415089150-18798-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,7 +11,7 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-stop_voice_recognition() in new Android API has bd_addr parameter.
+start_voice_recognition() in new Android API has bd_addr parameter.
 ---
  android/hal-handsfree.c | 20 ++++++++++++++++++++
  android/hal-ipc-api.txt |  2 +-
@@ -20,17 +20,17 @@ stop_voice_recognition() in new Android API has bd_addr parameter.
  4 files changed, 29 insertions(+), 2 deletions(-)
 
 diff --git a/android/hal-handsfree.c b/android/hal-handsfree.c
-index ffc9497..8b4f026 100644
+index 5ed4497..ffc9497 100644
 --- a/android/hal-handsfree.c
 +++ b/android/hal-handsfree.c
-@@ -371,6 +371,25 @@ static bt_status_t start_voice_recognition(void)
+@@ -340,6 +340,25 @@ static bt_status_t disconnect_audio(bt_bdaddr_t *bd_addr)
+ 				&cmd, NULL, NULL, NULL);
  }
- #endif
  
 +#if ANDROID_VERSION > PLATFORM_VER(4, 4, 4)
-+static bt_status_t stop_voice_recognition(bt_bdaddr_t *bd_addr)
++static bt_status_t start_voice_recognition(bt_bdaddr_t *bd_addr)
 +{
-+	struct hal_cmd_handsfree_stop_vr cmd;
++	struct hal_cmd_handsfree_start_vr cmd;
 +
 +	DBG("");
 +
@@ -42,28 +42,28 @@ index ffc9497..8b4f026 100644
 +
 +	memcpy(cmd.bdaddr, bd_addr, sizeof(cmd.bdaddr));
 +
-+	return hal_ipc_cmd(HAL_SERVICE_ID_HANDSFREE, HAL_OP_HANDSFREE_STOP_VR,
++	return hal_ipc_cmd(HAL_SERVICE_ID_HANDSFREE, HAL_OP_HANDSFREE_START_VR,
 +						0, NULL, NULL, NULL, NULL);
 +}
 +#else
- static bt_status_t stop_voice_recognition(void)
+ static bt_status_t start_voice_recognition(void)
  {
  	DBG("");
-@@ -381,6 +400,7 @@ static bt_status_t stop_voice_recognition(void)
- 	return hal_ipc_cmd(HAL_SERVICE_ID_HANDSFREE, HAL_OP_HANDSFREE_STOP_VR,
+@@ -350,6 +369,7 @@ static bt_status_t start_voice_recognition(void)
+ 	return hal_ipc_cmd(HAL_SERVICE_ID_HANDSFREE, HAL_OP_HANDSFREE_START_VR,
  						0, NULL, NULL, NULL, NULL);
  }
 +#endif
  
- static bt_status_t volume_control(bthf_volume_type_t type, int volume)
+ static bt_status_t stop_voice_recognition(void)
  {
 diff --git a/android/hal-ipc-api.txt b/android/hal-ipc-api.txt
-index 2dacffd..bdf76c9 100644
+index 4a9e261..2dacffd 100644
 --- a/android/hal-ipc-api.txt
 +++ b/android/hal-ipc-api.txt
-@@ -842,7 +842,7 @@ Commands and responses:
+@@ -835,7 +835,7 @@ Commands and responses:
  
- 	Opcode 0x06 - Stop Voice Recognition command/response
+ 	Opcode 0x05 - Start Voice Recognition command/response
  
 -		Command parameters: <none>
 +		Command parameters: Remote address (6 octets)
@@ -71,28 +71,28 @@ index 2dacffd..bdf76c9 100644
  
  		In case of an error, the error response will be returned.
 diff --git a/android/hal-msg.h b/android/hal-msg.h
-index 96a7640..5d53957 100644
+index b5a4125..96a7640 100644
 --- a/android/hal-msg.h
 +++ b/android/hal-msg.h
-@@ -499,6 +499,9 @@ struct hal_cmd_handsfree_start_vr {
+@@ -494,6 +494,9 @@ struct hal_cmd_handsfree_disconnect_audio {
  } __attribute__((packed));
  
- #define HAL_OP_HANDSFREE_STOP_VR		0x06
-+struct hal_cmd_handsfree_stop_vr {
+ #define HAL_OP_HANDSFREE_START_VR		0x05
++struct hal_cmd_handsfree_start_vr {
 +	uint8_t bdaddr[6];
 +} __attribute__((packed));
  
- #define HAL_HANDSFREE_VOLUME_TYPE_SPEAKER	0x00
- #define HAL_HANDSFREE_VOLUME_TYPE_MIC		0x01
+ #define HAL_OP_HANDSFREE_STOP_VR		0x06
+ 
 diff --git a/android/handsfree.c b/android/handsfree.c
-index d858caf..410b979 100644
+index b54a606..d858caf 100644
 --- a/android/handsfree.c
 +++ b/android/handsfree.c
-@@ -1915,12 +1915,16 @@ done:
+@@ -1886,12 +1886,16 @@ done:
  
- static void handle_stop_vr(const void *buf, uint16_t len)
+ static void handle_start_vr(const void *buf, uint16_t len)
  {
-+	const struct hal_cmd_handsfree_stop_vr *cmd = buf;
++	const struct hal_cmd_handsfree_start_vr *cmd = buf;
  	struct hf_device *dev;
 +	bdaddr_t bdaddr;
  	uint8_t status;
