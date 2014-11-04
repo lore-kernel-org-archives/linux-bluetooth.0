@@ -1,50 +1,135 @@
 Return-Path: <cyrus@holtmann.org>
-From: Simon Vincent <simon.vincent@xsilon.com>
-To: alex.aring@gmail.com
-Cc: linux-wpan@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-	Simon Vincent <simon.vincent@xsilon.com>
-Subject: [PATCHv3 bluetooth-next] 6lowpan: fix udp header compression when using raw sockets
-Date: Tue,  4 Nov 2014 15:29:51 +0000
-Message-Id: <1415114991-3687-1-git-send-email-simon.vincent@xsilon.com>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCHv2 1/2] android/hal-audio: Add support for new Android API
+Date: Tue, 04 Nov 2014 16:02:42 +0100
+Message-ID: <1521740.NPV2CA47mL@uw000953>
+In-Reply-To: <1415111857-399-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1415111857-399-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-If you use RAW sockets the transport header offset is not set by the
-ipv6 stack so when we get to the udp header compression it does not
-compress the right part of the packet.
+Hi Andrei,
 
-This patch adds a check for this scenario and sets the transport
-header offset.
+On Tuesday 04 of November 2014 16:37:36 Andrei Emeltchenko wrote:
+> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> 
+> For new Android API add parameter address to audio_open_output_stream()
+> and audio_open_input_stream().
+> ---
+>  android/hal-audio.c | 64 ++++++++++++++++++++++++++++++++++++++++++++++++-----
+>  1 file changed, 59 insertions(+), 5 deletions(-)
+> 
+> diff --git a/android/hal-audio.c b/android/hal-audio.c
+> index e70351e..0e9891d 100644
+> --- a/android/hal-audio.c
+> +++ b/android/hal-audio.c
+> @@ -1108,13 +1108,13 @@ static int in_remove_audio_effect(const struct audio_stream *stream,
+>  	return -ENOSYS;
+>  }
+>  
+> -static int audio_open_output_stream(struct audio_hw_device *dev,
+> +static int audio_open_output_stream_real(struct audio_hw_device *dev,
+>  					audio_io_handle_t handle,
+>  					audio_devices_t devices,
+>  					audio_output_flags_t flags,
+>  					struct audio_config *config,
+> -					struct audio_stream_out **stream_out)
+> -
+> +					struct audio_stream_out **stream_out,
+> +					const char *address)
+>  {
+>  	struct a2dp_audio_dev *a2dp_dev = (struct a2dp_audio_dev *) dev;
+>  	struct a2dp_stream_out *out;
+> @@ -1171,6 +1171,31 @@ fail:
+>  	return -EIO;
+>  }
+>  
+> +#if ANDROID_VERSION >= PLATFORM_VER(5, 0, 0)
+> +static int audio_open_output_stream(struct audio_hw_device *dev,
+> +					audio_io_handle_t handle,
+> +					audio_devices_t devices,
+> +					audio_output_flags_t flags,
+> +					struct audio_config *config,
+> +					struct audio_stream_out **stream_out,
+> +					const char *address)
+> +{
+> +	return audio_open_output_stream_real(dev, handle, devices, flags,
+> +						config, stream_out, address);
+> +}
+> +#else
+> +static int audio_open_output_stream(struct audio_hw_device *dev,
+> +					audio_io_handle_t handle,
+> +					audio_devices_t devices,
+> +					audio_output_flags_t flags,
+> +					struct audio_config *config,
+> +					struct audio_stream_out **stream_out)
+> +{
+> +	return audio_open_output_stream_real(dev, handle, devices, flags,
+> +						config, stream_out, NULL);
+> +}
+> +#endif
+> +
+>  static void audio_close_output_stream(struct audio_hw_device *dev,
+>  					struct audio_stream_out *stream)
+>  {
+> @@ -1252,11 +1277,14 @@ static size_t audio_get_input_buffer_size(const struct audio_hw_device *dev,
+>  	return -ENOSYS;
+>  }
+>  
+> -static int audio_open_input_stream(struct audio_hw_device *dev,
+> +static int audio_open_input_stream_real(struct audio_hw_device *dev,
+>  					audio_io_handle_t handle,
+>  					audio_devices_t devices,
+>  					struct audio_config *config,
+> -					struct audio_stream_in **stream_in)
+> +					struct audio_stream_in **stream_in,
+> +					audio_input_flags_t flags,
+> +					const char *address,
+> +					audio_source_t source)
+>  {
+>  	struct audio_stream_in *in;
+>  
+> @@ -1287,6 +1315,32 @@ static int audio_open_input_stream(struct audio_hw_device *dev,
+>  	return 0;
+>  }
+>  
+> +#if ANDROID_VERSION >= PLATFORM_VER(5, 0, 0)
+> +static int audio_open_input_stream(struct audio_hw_device *dev,
+> +					audio_io_handle_t handle,
+> +					audio_devices_t devices,
+> +					struct audio_config *config,
+> +					struct audio_stream_in **stream_in,
+> +					audio_input_flags_t flags,
+> +					const char *address,
+> +					audio_source_t source)
+> +{
+> +	return audio_open_input_stream_real(dev, handle, devices, config,
+> +						stream_in, flags, address,
+> +						source);
+> +}
+> +#else
+> +static int audio_open_input_stream(struct audio_hw_device *dev,
+> +					audio_io_handle_t handle,
+> +					audio_devices_t devices,
+> +					struct audio_config *config,
+> +					struct audio_stream_in **stream_in)
+> +{
+> +	return audio_open_input_stream_real(dev, handle, devices, config,
+> +						stream_in, 0, NULL, 0);
+> +}
+> +#endif
+> +
+>  static void audio_close_input_stream(struct audio_hw_device *dev,
+>  					struct audio_stream_in *stream_in)
+>  {
+> 
 
-Signed-off-by: Simon Vincent <simon.vincent@xsilon.com>
----
-v3 fixed indentation
- net/6lowpan/iphc.c | 10 +++++++++-
- 1 file changed, 9 insertions(+), 1 deletion(-)
+Both patches applied, thanks.
 
-diff --git a/net/6lowpan/iphc.c b/net/6lowpan/iphc.c
-index 73a7065..305bf2b 100644
---- a/net/6lowpan/iphc.c
-+++ b/net/6lowpan/iphc.c
-@@ -512,9 +512,17 @@ static u8 lowpan_compress_addr_64(u8 **hc_ptr, u8 shift,
- 
- static void compress_udp_header(u8 **hc_ptr, struct sk_buff *skb)
- {
--	struct udphdr *uh = udp_hdr(skb);
-+	struct udphdr *uh;
- 	u8 tmp;
- 
-+	/* In the case of RAW sockets the transport header is not set by
-+	 * the ip6 stack so we must set it ourselves
-+	 */
-+	if (skb->transport_header == skb->network_header)
-+		skb_set_transport_header(skb, sizeof(struct ipv6hdr));
-+
-+	uh = udp_hdr(skb);
-+
- 	if (((ntohs(uh->source) & LOWPAN_NHC_UDP_4BIT_MASK) ==
- 	     LOWPAN_NHC_UDP_4BIT_PORT) &&
- 	    ((ntohs(uh->dest) & LOWPAN_NHC_UDP_4BIT_MASK) ==
 -- 
-1.9.1
-
+Best regards, 
+Szymon Janc
