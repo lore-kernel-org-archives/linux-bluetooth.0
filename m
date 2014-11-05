@@ -1,60 +1,47 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/6] android/client: Support new API for Audio HAL
-Date: Wed,  5 Nov 2014 14:41:48 +0200
-Message-Id: <1415191313-12810-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCH 4/6] android/client: Add support for new API for gatt scan()
+Date: Wed,  5 Nov 2014 14:41:51 +0200
+Message-Id: <1415191313-12810-4-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1415191313-12810-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1415191313-12810-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Add support for new parameter in open_output_stream().
+Fixes number of parameters in gatt scan()
 ---
- android/client/if-audio.c | 16 ++++++++++++++++
- 1 file changed, 16 insertions(+)
+ android/client/if-gatt.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-diff --git a/android/client/if-audio.c b/android/client/if-audio.c
-index f3f87fb..65e2f2f 100644
---- a/android/client/if-audio.c
-+++ b/android/client/if-audio.c
-@@ -60,7 +60,14 @@ SINTMAP(audio_channel_mask_t, -1, "(AUDIO_CHANNEL_INVALID)")
- 	DELEMENT(AUDIO_CHANNEL_OUT_MONO),
- 	DELEMENT(AUDIO_CHANNEL_OUT_STEREO),
- 	DELEMENT(AUDIO_CHANNEL_OUT_QUAD),
-+#if ANDROID_VERSION < PLATFORM_VER(5, 0, 0)
- 	DELEMENT(AUDIO_CHANNEL_OUT_SURROUND),
-+#else
-+	DELEMENT(AUDIO_CHANNEL_OUT_QUAD_BACK),
-+	DELEMENT(AUDIO_CHANNEL_OUT_QUAD_SIDE),
-+	DELEMENT(AUDIO_CHANNEL_OUT_5POINT1_BACK),
-+	DELEMENT(AUDIO_CHANNEL_OUT_5POINT1_SIDE),
-+#endif
- 	DELEMENT(AUDIO_CHANNEL_OUT_5POINT1),
- 	DELEMENT(AUDIO_CHANNEL_OUT_7POINT1),
- 	DELEMENT(AUDIO_CHANNEL_OUT_ALL),
-@@ -305,12 +312,21 @@ static void open_output_stream_p(int argc, const char **argv)
- 	}
- 	pthread_mutex_unlock(&state_mutex);
+diff --git a/android/client/if-gatt.c b/android/client/if-gatt.c
+index d593022..64429e4 100644
+--- a/android/client/if-gatt.c
++++ b/android/client/if-gatt.c
+@@ -933,6 +933,7 @@ static void scan_p(int argc, const char **argv)
  
-+#if ANDROID_VERSION >= PLATFORM_VER(5, 0, 0)
-+	err = if_audio->open_output_stream(if_audio,
-+						0,
-+						AUDIO_DEVICE_OUT_ALL_A2DP,
-+						AUDIO_OUTPUT_FLAG_NONE,
-+						NULL,
-+						&stream_out, NULL);
+ 	RETURN_IF_NULL(if_gatt);
+ 
++#if ANDROID_VERSION < PLATFORM_VER(5, 0, 0)
+ 	VERIFY_CLIENT_IF(2, client_if);
+ 
+ 	/* start */
+@@ -940,6 +941,13 @@ static void scan_p(int argc, const char **argv)
+ 		start = atoi(argv[3]);
+ 
+ 	EXEC(if_gatt->client->scan, client_if, start);
 +#else
- 	err = if_audio->open_output_stream(if_audio,
- 						0,
- 						AUDIO_DEVICE_OUT_ALL_A2DP,
- 						AUDIO_OUTPUT_FLAG_NONE,
- 						NULL,
- 						&stream_out);
++	/* start */
++	if (argc >= 3)
++		start = atoi(argv[2]);
++
++	EXEC(if_gatt->client->scan, start);
 +#endif
- 	if (err < 0) {
- 		haltest_error("open output stream returned %d\n", err);
- 		return;
+ }
+ 
+ /* connect */
 -- 
 1.9.1
 
