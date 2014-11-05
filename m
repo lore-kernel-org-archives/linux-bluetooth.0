@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 4/7] android/hal-sco: Save bd_addr for output stream of Audio SCO HAL
-Date: Wed,  5 Nov 2014 10:41:19 +0200
-Message-Id: <1415176882-12397-4-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCH 3/7] android/hal-sco: Implement dummy SCO HAL functions
+Date: Wed,  5 Nov 2014 10:41:18 +0200
+Message-Id: <1415176882-12397-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1415176882-12397-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1415176882-12397-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,55 +11,82 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Make use of address field which makes possible to query right SCO fd
-from handsfree multi-client code.
+Prevent from crash and print debug statements.
 ---
- android/Android.mk |  3 ++-
- android/hal-sco.c  | 10 ++++++++++
- 2 files changed, 12 insertions(+), 1 deletion(-)
+ android/hal-sco.c | 53 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 53 insertions(+)
 
-diff --git a/android/Android.mk b/android/Android.mk
-index aefe41c..bfdf03f 100644
---- a/android/Android.mk
-+++ b/android/Android.mk
-@@ -382,7 +382,8 @@ include $(BUILD_SHARED_LIBRARY)
- 
- include $(CLEAR_VARS)
- 
--LOCAL_SRC_FILES := bluez/android/hal-sco.c
-+LOCAL_SRC_FILES := bluez/android/hal-sco.c \
-+	bluez/android/hal-utils.c
- 
- LOCAL_C_INCLUDES = \
- 	$(call include-path-for, system-core) \
 diff --git a/android/hal-sco.c b/android/hal-sco.c
-index c5b86b0..e84dae0 100644
+index ca3022e..c5b86b0 100644
 --- a/android/hal-sco.c
 +++ b/android/hal-sco.c
-@@ -79,6 +79,8 @@ struct sco_stream_out {
- 	struct resampler_itfe *resampler;
- 	int16_t *resample_buf;
- 	uint32_t resample_frame_num;
-+
-+	bt_bdaddr_t bd_addr;
- };
- 
- static void sco_close_socket(void)
-@@ -667,6 +669,14 @@ static int sco_open_output_stream_real(struct audio_hw_device *dev,
- 	out->stream.write = out_write;
- 	out->stream.get_render_position = out_get_render_position;
+@@ -1271,6 +1271,51 @@ static int sco_dump(const audio_hw_device_t *device, int fd)
+ 	return 0;
+ }
  
 +#if ANDROID_VERSION >= PLATFORM_VER(5, 0, 0)
-+	if (address) {
-+		DBG("address %s", address);
++static int set_master_mute(struct audio_hw_device *dev, bool mute)
++{
++	DBG("");
++	return -ENOSYS;
++}
 +
-+		str2bt_bdaddr_t(address, &out->bd_addr);
-+	}
++static int get_master_mute(struct audio_hw_device *dev, bool *mute)
++{
++	DBG("");
++	return -ENOSYS;
++}
++
++static int create_audio_patch(struct audio_hw_device *dev,
++					unsigned int num_sources,
++					const struct audio_port_config *sources,
++					unsigned int num_sinks,
++					const struct audio_port_config *sinks,
++					audio_patch_handle_t *handle)
++{
++	DBG("");
++	return -ENOSYS;
++}
++
++static int release_audio_patch(struct audio_hw_device *dev,
++					audio_patch_handle_t handle)
++{
++	DBG("");
++	return -ENOSYS;
++}
++
++static int get_audio_port(struct audio_hw_device *dev, struct audio_port *port)
++{
++	DBG("");
++	return -ENOSYS;
++}
++
++static int set_audio_port_config(struct audio_hw_device *dev,
++					const struct audio_port_config *config)
++{
++	DBG("");
++	return -ENOSYS;
++}
 +#endif
 +
- 	if (config) {
- 		DBG("config: rate %u chan mask %x format %d offload %p",
- 				config->sample_rate, config->channel_mask,
+ static int sco_close(hw_device_t *device)
+ {
+ 	DBG("");
+@@ -1424,6 +1469,14 @@ static int sco_open(const hw_module_t *module, const char *name,
+ 	dev->dev.open_input_stream = sco_open_input_stream;
+ 	dev->dev.close_input_stream = sco_close_input_stream;
+ 	dev->dev.dump = sco_dump;
++#if ANDROID_VERSION >= PLATFORM_VER(5, 0, 0)
++	dev->dev.set_master_mute = set_master_mute;
++	dev->dev.get_master_mute = get_master_mute;
++	dev->dev.create_audio_patch = create_audio_patch;
++	dev->dev.release_audio_patch = release_audio_patch;
++	dev->dev.get_audio_port = get_audio_port;
++	dev->dev.set_audio_port_config = set_audio_port_config;
++#endif
+ 
+ 	*device = &dev->dev.common;
+ 
 -- 
 1.9.1
 
