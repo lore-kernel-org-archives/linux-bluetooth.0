@@ -1,88 +1,52 @@
 Return-Path: <cyrus@holtmann.org>
-From: Kuba Pawlak <kubax.t.pawlak@intel.com>
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Kuba Pawlak <kubax.t.pawlak@intel.com>
-Subject: [PATCH] Bluetooth: Clear role switch pending flag
-Date: Wed,  5 Nov 2014 13:56:00 +0100
-Message-Id: <1415192160-5975-1-git-send-email-kubax.t.pawlak@intel.com>
+Subject: [PATCH 5/6] android/client: Add support for new API for gatt connect()
+Date: Wed,  5 Nov 2014 14:41:52 +0200
+Message-Id: <1415191313-12810-5-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1415191313-12810-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1415191313-12810-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-If role switch was rejected by the controller and HCI Event: Command Status
-returned with status "Command Disallowed" (0x0C) the flag
-HCI_CONN_RSWITCH_PEND remains set. No further role switches are
-possible as this flag prevents us from sending any new HCI Switch Role
-requests and the only way to clear it is to receive a valid
-HCI Event Switch Role.
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-This patch clears the flag if command was rejected.
-
-2013-01-01 00:03:44.209913 < HCI Command: Switch Role (0x02|0x000b) plen 7
-    bdaddr BC:C6:DB:C4:6F:79 role 0x00
-    Role: Master
-2013-01-01 00:03:44.210867 > HCI Event: Command Status (0x0f) plen 4
-    Switch Role (0x02|0x000b) status 0x0c ncmd 1
-    Error: Command Disallowed
-
-Signed-off-by: Kuba Pawlak <kubax.t.pawlak@intel.com>
+Fixes number of parameters in gatt connect() for different Android API.
 ---
- net/bluetooth/hci_event.c | 27 +++++++++++++++++++++++++++
- 1 file changed, 27 insertions(+)
+ android/client/if-gatt.c | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
 
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 2f02ff0..be38684 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -1947,6 +1947,29 @@ unlock:
- 	hci_dev_unlock(hdev);
+diff --git a/android/client/if-gatt.c b/android/client/if-gatt.c
+index 64429e4..6b4ff28 100644
+--- a/android/client/if-gatt.c
++++ b/android/client/if-gatt.c
+@@ -969,6 +969,9 @@ static void connect_p(int argc, const char **argv)
+ 	int client_if;
+ 	bt_bdaddr_t bd_addr;
+ 	int is_direct = 1;
++#if ANDROID_VERSION >= PLATFORM_VER(5, 0, 0)
++	int transport = 1;
++#endif
+ 
+ 	RETURN_IF_NULL(if_gatt);
+ 	VERIFY_CLIENT_IF(2, client_if);
+@@ -978,7 +981,16 @@ static void connect_p(int argc, const char **argv)
+ 	if (argc > 4)
+ 		is_direct = atoi(argv[4]);
+ 
++#if ANDROID_VERSION < PLATFORM_VER(5, 0, 0)
+ 	EXEC(if_gatt->client->connect, client_if, &bd_addr, is_direct);
++#else
++	/* transport */
++	if (argc > 5)
++		transport = atoi(argv[5]);
++
++	EXEC(if_gatt->client->connect, client_if, &bd_addr, is_direct,
++								transport);
++#endif
  }
  
-+static void hci_cs_switch_role(struct hci_dev *hdev, u8 status)
-+{
-+	struct hci_cp_switch_role *cp;
-+	struct hci_conn *conn;
-+
-+	BT_DBG("%s status 0x%2.2x", hdev->name, status);
-+
-+	if (!status)
-+		return;
-+
-+	cp = hci_sent_cmd_data(hdev, HCI_OP_SWITCH_ROLE);
-+	if (!cp)
-+		return;
-+
-+	hci_dev_lock(hdev);
-+
-+	conn = hci_conn_hash_lookup_ba(hdev, ACL_LINK, &cp->bdaddr);
-+	if (conn)
-+		clear_bit(HCI_CONN_RSWITCH_PEND, &conn->flags);
-+
-+	hci_dev_unlock(hdev);
-+}
-+
- static void hci_inquiry_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
- {
- 	__u8 status = *((__u8 *) skb->data);
-@@ -2906,6 +2929,10 @@ static void hci_cmd_status_evt(struct hci_dev *hdev, struct sk_buff *skb)
- 		hci_cs_le_start_enc(hdev, ev->status);
- 		break;
- 
-+	case HCI_OP_SWITCH_ROLE:
-+		hci_cs_switch_role(hdev, ev->status);
-+		break;
-+
- 	default:
- 		BT_DBG("%s opcode 0x%4.4x", hdev->name, opcode);
- 		break;
+ /* disconnect */
 -- 
-1.7.11.7
-
-Intel GmbH
-Dornacher Strasse 1
-85622 Feldkirchen/Muenchen, Deutschland
-Sitz der Gesellschaft: Feldkirchen bei Muenchen
-Geschaeftsfuehrer: Christian Lamprechter, Hannes Schwaderer, Douglas Lusk
-Registergericht: Muenchen HRB 47456
-Ust.-IdNr./VAT Registration No.: DE129385895
-Citibank Frankfurt a.M. (BLZ 502 109 00) 600119052
+1.9.1
 
