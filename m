@@ -1,122 +1,50 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/7] android/hal-sco: Add support for new Android API
-Date: Wed,  5 Nov 2014 10:41:16 +0200
-Message-Id: <1415176882-12397-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCH 5/7] android/hal-sco: Save bd_addr for input stream of Audio SCO HAL
+Date: Wed,  5 Nov 2014 10:41:20 +0200
+Message-Id: <1415176882-12397-5-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1415176882-12397-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1415176882-12397-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Add new parameters to sco_open_input_stream() and
-sco_open_output_stream() for the new API.
+Make use of address field which makes possible to query right SCO fd
+from handsfree multi-client code.
 ---
- android/hal-sco.c | 63 +++++++++++++++++++++++++++++++++++++++++++++++++++----
- 1 file changed, 59 insertions(+), 4 deletions(-)
+ android/hal-sco.c | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
 
 diff --git a/android/hal-sco.c b/android/hal-sco.c
-index 91a3baf..d9c9a68 100644
+index e84dae0..442e2d0 100644
 --- a/android/hal-sco.c
 +++ b/android/hal-sco.c
-@@ -612,12 +612,13 @@ static int out_remove_audio_effect(const struct audio_stream *stream,
- 	return -ENOSYS;
- }
+@@ -103,6 +103,8 @@ struct sco_stream_in {
+ 	struct resampler_itfe *resampler;
+ 	int16_t *resample_buf;
+ 	uint32_t resample_frame_num;
++
++	bt_bdaddr_t bd_addr;
+ };
  
--static int sco_open_output_stream(struct audio_hw_device *dev,
-+static int sco_open_output_stream_real(struct audio_hw_device *dev,
- 					audio_io_handle_t handle,
- 					audio_devices_t devices,
- 					audio_output_flags_t flags,
- 					struct audio_config *config,
--					struct audio_stream_out **stream_out)
-+					struct audio_stream_out **stream_out,
-+					const char *address)
- {
- 	struct sco_dev *adev = (struct sco_dev *) dev;
- 	struct sco_stream_out *out;
-@@ -741,6 +742,31 @@ failed:
- 	return ret;
- }
+ struct sco_dev {
+@@ -1158,6 +1160,14 @@ static int sco_open_input_stream_real(struct audio_hw_device *dev,
+ 	in->stream.read = in_read;
+ 	in->stream.get_input_frames_lost = in_get_input_frames_lost;
  
 +#if ANDROID_VERSION >= PLATFORM_VER(5, 0, 0)
-+static int sco_open_output_stream(struct audio_hw_device *dev,
-+					audio_io_handle_t handle,
-+					audio_devices_t devices,
-+					audio_output_flags_t flags,
-+					struct audio_config *config,
-+					struct audio_stream_out **stream_out,
-+					const char *address)
-+{
-+	return  sco_open_output_stream_real(dev, handle, devices, flags,
-+						config, stream_out, address);
-+}
-+#else
-+static int sco_open_output_stream(struct audio_hw_device *dev,
-+					audio_io_handle_t handle,
-+					audio_devices_t devices,
-+					audio_output_flags_t flags,
-+					struct audio_config *config,
-+					struct audio_stream_out **stream_out)
-+{
-+	return sco_open_output_stream_real(dev, handle, devices, flags,
-+						config, stream_out, NULL);
-+}
++	if (address) {
++		DBG("address %s", address);
++
++		str2bt_bdaddr_t(address, &in->bd_addr);
++	}
 +#endif
 +
- static void sco_close_output_stream(struct audio_hw_device *dev,
- 					struct audio_stream_out *stream_out)
- {
-@@ -1060,11 +1086,14 @@ static uint32_t in_get_input_frames_lost(struct audio_stream_in *stream)
- 	return -ENOSYS;
- }
- 
--static int sco_open_input_stream(struct audio_hw_device *dev,
-+static int sco_open_input_stream_real(struct audio_hw_device *dev,
- 					audio_io_handle_t handle,
- 					audio_devices_t devices,
- 					struct audio_config *config,
--					struct audio_stream_in **stream_in)
-+					struct audio_stream_in **stream_in,
-+					audio_input_flags_t flags,
-+					const char *address,
-+					audio_source_t source)
- {
- 	struct sco_dev *sco_dev = (struct sco_dev *) dev;
- 	struct sco_stream_in *in;
-@@ -1165,6 +1194,32 @@ failed2:
- 	return ret;
- }
- 
-+#if ANDROID_VERSION >= PLATFORM_VER(5, 0, 0)
-+static int sco_open_input_stream(struct audio_hw_device *dev,
-+					audio_io_handle_t handle,
-+					audio_devices_t devices,
-+					struct audio_config *config,
-+					struct audio_stream_in **stream_in,
-+					audio_input_flags_t flags,
-+					const char *address,
-+					audio_source_t source)
-+{
-+	return sco_open_input_stream_real(dev, handle, devices, config,
-+						stream_in, flags, address,
-+						source);
-+}
-+#else
-+static int sco_open_input_stream(struct audio_hw_device *dev,
-+					audio_io_handle_t handle,
-+					audio_devices_t devices,
-+					struct audio_config *config,
-+					struct audio_stream_in **stream_in)
-+{
-+	return sco_open_input_stream_real(dev, handle, devices, config,
-+						stream_in, 0, NULL, 0);
-+}
-+#endif
-+
- static void sco_close_input_stream(struct audio_hw_device *dev,
- 					struct audio_stream_in *stream_in)
- {
+ 	if (config) {
+ 		DBG("config: rate %u chan mask %x format %d offload %p",
+ 				config->sample_rate, config->channel_mask,
 -- 
 1.9.1
 
