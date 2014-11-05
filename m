@@ -1,38 +1,47 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 5 Nov 2014 22:01:46 +0100
-From: Alexander Aring <alex.aring@gmail.com>
-To: Martin Townsend <mtownsend1973@gmail.com>
-Cc: linux-wpan@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-	jukka.rissanen@linux.intel.com, marcel@holtmann.org
-Subject: Re: [PATCH bluetooth-next] 6lowpan: move skb_free from error paths
- in decompression.
-Message-ID: <20141105210143.GA20379@omega>
-References: <1415136981-13497-1-git-send-email-mtownsend1973@gmail.com>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: Sebastian Chlad <sebastian.chlad@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] android/pts: Re-test HFP failing test cases
+Date: Wed, 05 Nov 2014 21:55:37 +0100
+Message-ID: <4481729.S7n7gxntoZ@leonov>
+In-Reply-To: <1415183585-22406-1-git-send-email-sebastian.chlad@tieto.com>
+References: <1415183585-22406-1-git-send-email-sebastian.chlad@tieto.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-In-Reply-To: <1415136981-13497-1-git-send-email-mtownsend1973@gmail.com>
+Content-Type: text/plain; charset="us-ascii"
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Martin,
+Hi Sebastian,
 
-On Tue, Nov 04, 2014 at 09:36:21PM +0000, Martin Townsend wrote:
-> Currently we ensure that the skb is freed on every error path in IPHC
-> decompression which makes it easy to introduce skb leaks.  By centralising
-> the skb_free into the receive function it makes future decompression routines
-> easier to maintain.  It does come at the expense of ensuring that the skb
-> passed into the decompression routine must not be copied.
+On Wednesday 05 of November 2014 11:33:05 Sebastian Chlad wrote:
+> For PTS issue #12039 ETS and DLL was provided. Respective tests
+> are passing.
+> ---
+>  android/pts-hfp.txt | 6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
 > 
+> diff --git a/android/pts-hfp.txt b/android/pts-hfp.txt
+> index 9de14cb..24a43e9 100644
+> --- a/android/pts-hfp.txt
+> +++ b/android/pts-hfp.txt
+> @@ -101,10 +101,10 @@ TC_AG_SLC_BV_06_I	PASS
+>  TC_AG_SLC_BV_07_I	PASS
+>  TC_AG_SLC_BV_09_I	N/A
+>  TC_AG_SLC_BV_10_I	N/A
+> -TC_AG_ACC_BV_08_I	INC	Possible PTS issue #12039
+> +TC_AG_ACC_BV_08_I	PASS	PTS issue #12039
+>  TC_AG_ACC_BV_09_I	PASS
+> -TC_AG_ACC_BV_10_I	INC	Possible PTS issue #12039
+> -TC_AG_ACC_BV_11_I	INC	Possible PTS issue #12039
+> +TC_AG_ACC_BV_10_I	PASS	PTS issue #12039
+> +TC_AG_ACC_BV_11_I	PASS	PTS issue #12039
+>  TC_AG_ACC_BI_12_I	PASS
+>  TC_AG_ACC_BI_13_I	PASS
+>  TC_AG_ACC_BI_14_I	PASS
 
-I just want to give it a try and want to test it but I got a:
+Applied, thanks.
 
-error: patch failed: net/ieee802154/6lowpan_rtnl.c:200
-error: net/ieee802154/6lowpan_rtnl.c: patch does not apply ...
-
-while applying.
-
-Is the patch really based on bluetooth-next [0]? Please respin this one if
-it doesn't break anything I will ack this one.
-
-- Alex
-
-[0] http://git.kernel.org/cgit/linux/kernel/git/bluetooth/bluetooth-next.git
+-- 
+BR
+Szymon Janc
