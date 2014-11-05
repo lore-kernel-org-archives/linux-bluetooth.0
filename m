@@ -1,78 +1,122 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 2/7] android/hal-sco: Remove deprecated API usage
-Date: Wed,  5 Nov 2014 10:41:17 +0200
-Message-Id: <1415176882-12397-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1415176882-12397-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1415176882-12397-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCH 1/7] android/hal-sco: Add support for new Android API
+Date: Wed,  5 Nov 2014 10:41:16 +0200
+Message-Id: <1415176882-12397-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Instead of deprecated functions use new ones. Fixes deprecation warnings
-during build.
+Add new parameters to sco_open_input_stream() and
+sco_open_output_stream() for the new API.
 ---
- android/hal-sco.c | 18 ++++++++++++++++++
- 1 file changed, 18 insertions(+)
+ android/hal-sco.c | 63 +++++++++++++++++++++++++++++++++++++++++++++++++++----
+ 1 file changed, 59 insertions(+), 4 deletions(-)
 
 diff --git a/android/hal-sco.c b/android/hal-sco.c
-index d9c9a68..ca3022e 100644
+index 91a3baf..d9c9a68 100644
 --- a/android/hal-sco.c
 +++ b/android/hal-sco.c
-@@ -438,7 +438,11 @@ static ssize_t out_write(struct audio_stream_out *stream, const void *buffer,
- 								size_t bytes)
- {
- 	struct sco_stream_out *out = (struct sco_stream_out *) stream;
-+#if ANDROID_VERSION >= PLATFORM_VER(5, 0, 0)
-+	size_t frame_num = bytes / audio_stream_out_frame_size(stream);
-+#else
- 	size_t frame_num = bytes / audio_stream_frame_size(&out->stream.common);
-+#endif
- 	size_t output_frame_num = frame_num;
- 	void *send_buf = out->downmix_buf;
- 	size_t total;
-@@ -507,8 +511,13 @@ static int out_set_sample_rate(struct audio_stream *stream, uint32_t rate)
- static size_t out_get_buffer_size(const struct audio_stream *stream)
- {
- 	struct sco_stream_out *out = (struct sco_stream_out *) stream;
-+#if ANDROID_VERSION >= PLATFORM_VER(5, 0, 0)
-+	size_t size = audio_stream_out_frame_size(&out->stream) *
-+							out->cfg.frame_num;
-+#else
- 	size_t size = audio_stream_frame_size(&out->stream.common) *
- 							out->cfg.frame_num;
-+#endif
+@@ -612,12 +612,13 @@ static int out_remove_audio_effect(const struct audio_stream *stream,
+ 	return -ENOSYS;
+ }
  
- 	/* buffer size without resampling */
- 	if (out->cfg.rate == AUDIO_STREAM_SCO_RATE)
-@@ -880,8 +889,13 @@ static int in_set_sample_rate(struct audio_stream *stream, uint32_t rate)
- static size_t in_get_buffer_size(const struct audio_stream *stream)
+-static int sco_open_output_stream(struct audio_hw_device *dev,
++static int sco_open_output_stream_real(struct audio_hw_device *dev,
+ 					audio_io_handle_t handle,
+ 					audio_devices_t devices,
+ 					audio_output_flags_t flags,
+ 					struct audio_config *config,
+-					struct audio_stream_out **stream_out)
++					struct audio_stream_out **stream_out,
++					const char *address)
  {
- 	struct sco_stream_in *in = (struct sco_stream_in *) stream;
-+#if ANDROID_VERSION >= PLATFORM_VER(5, 0, 0)
-+	size_t size = audio_stream_in_frame_size(&in->stream) *
-+							in->cfg.frame_num;
-+#else
- 	size_t size = audio_stream_frame_size(&in->stream.common) *
- 							in->cfg.frame_num;
-+#endif
+ 	struct sco_dev *adev = (struct sco_dev *) dev;
+ 	struct sco_stream_out *out;
+@@ -741,6 +742,31 @@ failed:
+ 	return ret;
+ }
  
- 	/* buffer size without resampling */
- 	if (in->cfg.rate == AUDIO_STREAM_SCO_RATE)
-@@ -1024,7 +1038,11 @@ static ssize_t in_read(struct audio_stream_in *stream, void *buffer,
- 								size_t bytes)
- {
- 	struct sco_stream_in *in = (struct sco_stream_in *) stream;
 +#if ANDROID_VERSION >= PLATFORM_VER(5, 0, 0)
-+	size_t frame_size = audio_stream_in_frame_size(&in->stream);
++static int sco_open_output_stream(struct audio_hw_device *dev,
++					audio_io_handle_t handle,
++					audio_devices_t devices,
++					audio_output_flags_t flags,
++					struct audio_config *config,
++					struct audio_stream_out **stream_out,
++					const char *address)
++{
++	return  sco_open_output_stream_real(dev, handle, devices, flags,
++						config, stream_out, address);
++}
 +#else
- 	size_t frame_size = audio_stream_frame_size(&stream->common);
++static int sco_open_output_stream(struct audio_hw_device *dev,
++					audio_io_handle_t handle,
++					audio_devices_t devices,
++					audio_output_flags_t flags,
++					struct audio_config *config,
++					struct audio_stream_out **stream_out)
++{
++	return sco_open_output_stream_real(dev, handle, devices, flags,
++						config, stream_out, NULL);
++}
 +#endif
- 	size_t frame_num = bytes / frame_size;
- 	size_t input_frame_num = frame_num;
- 	void *read_buf = buffer;
++
+ static void sco_close_output_stream(struct audio_hw_device *dev,
+ 					struct audio_stream_out *stream_out)
+ {
+@@ -1060,11 +1086,14 @@ static uint32_t in_get_input_frames_lost(struct audio_stream_in *stream)
+ 	return -ENOSYS;
+ }
+ 
+-static int sco_open_input_stream(struct audio_hw_device *dev,
++static int sco_open_input_stream_real(struct audio_hw_device *dev,
+ 					audio_io_handle_t handle,
+ 					audio_devices_t devices,
+ 					struct audio_config *config,
+-					struct audio_stream_in **stream_in)
++					struct audio_stream_in **stream_in,
++					audio_input_flags_t flags,
++					const char *address,
++					audio_source_t source)
+ {
+ 	struct sco_dev *sco_dev = (struct sco_dev *) dev;
+ 	struct sco_stream_in *in;
+@@ -1165,6 +1194,32 @@ failed2:
+ 	return ret;
+ }
+ 
++#if ANDROID_VERSION >= PLATFORM_VER(5, 0, 0)
++static int sco_open_input_stream(struct audio_hw_device *dev,
++					audio_io_handle_t handle,
++					audio_devices_t devices,
++					struct audio_config *config,
++					struct audio_stream_in **stream_in,
++					audio_input_flags_t flags,
++					const char *address,
++					audio_source_t source)
++{
++	return sco_open_input_stream_real(dev, handle, devices, config,
++						stream_in, flags, address,
++						source);
++}
++#else
++static int sco_open_input_stream(struct audio_hw_device *dev,
++					audio_io_handle_t handle,
++					audio_devices_t devices,
++					struct audio_config *config,
++					struct audio_stream_in **stream_in)
++{
++	return sco_open_input_stream_real(dev, handle, devices, config,
++						stream_in, 0, NULL, 0);
++}
++#endif
++
+ static void sco_close_input_stream(struct audio_hw_device *dev,
+ 					struct audio_stream_in *stream_in)
+ {
 -- 
 1.9.1
 
