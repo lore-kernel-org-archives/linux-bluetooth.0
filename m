@@ -1,40 +1,70 @@
 Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
-To: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] android/client: Print number on query current calls in hf-client
-Date: Wed, 05 Nov 2014 21:55:35 +0100
-Message-ID: <1750368.bag9xc8uWn@leonov>
-In-Reply-To: <1415198354-3470-1-git-send-email-lukasz.rymanowski@tieto.com>
-References: <1415198354-3470-1-git-send-email-lukasz.rymanowski@tieto.com>
+Subject: Re: [PATCH 1/6] android/client: Support new API for Audio HAL
+Date: Wed, 05 Nov 2014 21:52:05 +0100
+Message-ID: <2698840.v3KCzvQ2At@leonov>
+In-Reply-To: <1415191313-12810-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1415191313-12810-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset="us-ascii"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Łukasz,
+Hi Andrei,
 
-On Wednesday 05 of November 2014 15:39:14 Lukasz Rymanowski wrote:
+On Wednesday 05 of November 2014 14:41:48 Andrei Emeltchenko wrote:
+> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> 
+> Add support for new parameter in open_output_stream().
 > ---
->  android/client/if-hf-client.c | 3 +++
->  1 file changed, 3 insertions(+)
+>  android/client/if-audio.c | 16 ++++++++++++++++
+>  1 file changed, 16 insertions(+)
 > 
-> diff --git a/android/client/if-hf-client.c b/android/client/if-hf-client.c
-> index c383cab..3f6f7c2 100644
-> --- a/android/client/if-hf-client.c
-> +++ b/android/client/if-hf-client.c
-> @@ -312,6 +312,9 @@ static void hf_client_current_calls_callback(int index,
->  					bthf_client_call_direction_t2str(dir),
->  					bthf_client_call_state_t2str(state),
->  					bthf_client_call_mpty_type_t2str(mpty));
-> +
-> +	if (number)
-> +		haltest_info("%s: number=%s\n", __func__, number);
->  }
+> diff --git a/android/client/if-audio.c b/android/client/if-audio.c
+> index f3f87fb..65e2f2f 100644
+> --- a/android/client/if-audio.c
+> +++ b/android/client/if-audio.c
+> @@ -60,7 +60,14 @@ SINTMAP(audio_channel_mask_t, -1,
+> "(AUDIO_CHANNEL_INVALID)") DELEMENT(AUDIO_CHANNEL_OUT_MONO),
+>  	DELEMENT(AUDIO_CHANNEL_OUT_STEREO),
+>  	DELEMENT(AUDIO_CHANNEL_OUT_QUAD),
+> +#if ANDROID_VERSION < PLATFORM_VER(5, 0, 0)
+>  	DELEMENT(AUDIO_CHANNEL_OUT_SURROUND),
+> +#else
+> +	DELEMENT(AUDIO_CHANNEL_OUT_QUAD_BACK),
+> +	DELEMENT(AUDIO_CHANNEL_OUT_QUAD_SIDE),
+> +	DELEMENT(AUDIO_CHANNEL_OUT_5POINT1_BACK),
+> +	DELEMENT(AUDIO_CHANNEL_OUT_5POINT1_SIDE),
+> +#endif
+>  	DELEMENT(AUDIO_CHANNEL_OUT_5POINT1),
+>  	DELEMENT(AUDIO_CHANNEL_OUT_7POINT1),
+>  	DELEMENT(AUDIO_CHANNEL_OUT_ALL),
+> @@ -305,12 +312,21 @@ static void open_output_stream_p(int argc, const char
+> **argv) }
+>  	pthread_mutex_unlock(&state_mutex);
 > 
->  /* Callback for audio volume change */
+> +#if ANDROID_VERSION >= PLATFORM_VER(5, 0, 0)
+> +	err = if_audio->open_output_stream(if_audio,
+> +						0,
+> +						AUDIO_DEVICE_OUT_ALL_A2DP,
+> +						AUDIO_OUTPUT_FLAG_NONE,
+> +						NULL,
+> +						&stream_out, NULL);
+> +#else
+>  	err = if_audio->open_output_stream(if_audio,
+>  						0,
+>  						AUDIO_DEVICE_OUT_ALL_A2DP,
+>  						AUDIO_OUTPUT_FLAG_NONE,
+>  						NULL,
+>  						&stream_out);
+> +#endif
+>  	if (err < 0) {
+>  		haltest_error("open output stream returned %d\n", err);
+>  		return;
 
-Applied, thanks.
+All patches in this set are now applied, thanks.
 
 -- 
 BR
