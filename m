@@ -2,31 +2,30 @@ Return-Path: <cyrus@holtmann.org>
 From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH 1/7] android/handsfree-client: Typo fix in define name
-Date: Wed,  5 Nov 2014 12:22:05 +0100
-Message-Id: <1415186531-23288-2-git-send-email-lukasz.rymanowski@tieto.com>
-In-Reply-To: <1415186531-23288-1-git-send-email-lukasz.rymanowski@tieto.com>
-References: <1415186531-23288-1-git-send-email-lukasz.rymanowski@tieto.com>
+Subject: [PATCH 0/7] android/handsfree-client: First set of HFP HF 
+Date: Wed,  5 Nov 2014 12:22:04 +0100
+Message-Id: <1415186531-23288-1-git-send-email-lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- android/hal-msg.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+In this set service record, slc creation and incoming/outgoing
+connection support has been added.
 
-diff --git a/android/hal-msg.h b/android/hal-msg.h
-index bcb73b2..651865e 100644
---- a/android/hal-msg.h
-+++ b/android/hal-msg.h
-@@ -1059,7 +1059,7 @@ struct hal_cmd_hf_client_dial_memory {
- #define HAL_HF_CLIENT_ACTION_CHUP		0x08
- #define HAL_HF_CLIENT_ACTION_BRTH_0		0x09
- #define HAL_HF_CLIENT_ACTION_BRTH_1		0x0a
--#define HAL_HF_CLIENT_ACTION_BRTH_02		0x0b
-+#define HAL_HF_CLIENT_ACTION_BRTH_2		0x0b
- 
- #define HAL_OP_HF_CLIENT_CALL_ACTION		0x0a
- struct hal_cmd_hf_client_call_action {
+This code has been tested on UPF49.
+
+Lukasz Rymanowski (7):
+  android/handsfree-client: Typo fix in define name
+  android/handsfree-client: Add service record
+  android/handsfree-client: Add devices queue
+  android/handsfree-client: Add incoming connection handling
+  android/handsfree-client: Add SLC creation procedure
+  android/handsfree-client: Add support for outgoing connection
+  android/handsfree-client: Handle disconnect command
+
+ android/hal-msg.h          |   2 +-
+ android/handsfree-client.c | 997 ++++++++++++++++++++++++++++++++++++++++++++-
+ 2 files changed, 992 insertions(+), 7 deletions(-)
+
 -- 
 1.8.4
 
