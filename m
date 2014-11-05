@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/9] android/handsfree: Add support for new API for handsfree init
-Date: Wed,  5 Nov 2014 16:38:45 +0200
-Message-Id: <1415198333-7775-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCH 4/9] android/handsfree: Add support for new API for volume_control
+Date: Wed,  5 Nov 2014 16:38:48 +0200
+Message-Id: <1415198333-7775-5-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1415198333-7775-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1415198333-7775-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,129 +11,104 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Add max_client parameter to IPC following new parameter for HF init().
+volume_control() in new Android API has bd_addr parameter.
 ---
- android/hal-handsfree.c | 15 ++++++++++++++-
+ android/hal-handsfree.c | 21 ++++++++++++++++++++-
  android/hal-ipc-api.txt |  1 +
  android/hal-msg.h       |  1 +
  android/handsfree.c     |  5 ++++-
- android/handsfree.h     |  3 ++-
- android/main.c          |  3 ++-
- 6 files changed, 24 insertions(+), 4 deletions(-)
+ 4 files changed, 26 insertions(+), 2 deletions(-)
 
 diff --git a/android/hal-handsfree.c b/android/hal-handsfree.c
-index 0c51789..c575d2b 100644
+index e5dd8c5..c1d8702 100644
 --- a/android/hal-handsfree.c
 +++ b/android/hal-handsfree.c
-@@ -226,7 +226,7 @@ static uint8_t get_mode(void)
- 	return HAL_MODE_HANDSFREE_HSP_ONLY;
+@@ -405,7 +405,8 @@ static bt_status_t stop_voice_recognition(void)
  }
+ #endif
  
--static bt_status_t init(bthf_callbacks_t *callbacks)
-+static bt_status_t init_real(bthf_callbacks_t *callbacks, int max_hf_clients)
+-static bt_status_t volume_control(bthf_volume_type_t type, int volume)
++static bt_status_t volume_control_real(bthf_volume_type_t type, int volume,
++							bt_bdaddr_t *bd_addr)
  {
- 	struct hal_cmd_register_module cmd;
- 	int ret;
-@@ -243,6 +243,7 @@ static bt_status_t init(bthf_callbacks_t *callbacks)
+ 	struct hal_cmd_handsfree_volume_control cmd;
  
- 	cmd.service_id = HAL_SERVICE_ID_HANDSFREE;
- 	cmd.mode = get_mode();
-+	cmd.max_clients = max_hf_clients;
+@@ -414,14 +415,32 @@ static bt_status_t volume_control(bthf_volume_type_t type, int volume)
+ 	if (!interface_ready())
+ 		return BT_STATUS_NOT_READY;
  
- 	ret = hal_ipc_cmd(HAL_SERVICE_ID_CORE, HAL_OP_REGISTER_MODULE,
- 					sizeof(cmd), &cmd, NULL, NULL, NULL);
-@@ -255,6 +256,18 @@ static bt_status_t init(bthf_callbacks_t *callbacks)
- 	return ret;
++	memset(&cmd, 0, sizeof(cmd));
++
+ 	cmd.type = type;
+ 	cmd.volume = volume;
+ 
++	if (bd_addr)
++		memcpy(cmd.bdaddr, bd_addr, sizeof(cmd.bdaddr));
++
+ 	return hal_ipc_cmd(HAL_SERVICE_ID_HANDSFREE,
+ 				HAL_OP_HANDSFREE_VOLUME_CONTROL, sizeof(cmd),
+ 				&cmd, NULL, NULL, NULL);
  }
  
 +#if ANDROID_VERSION >= PLATFORM_VER(5, 0, 0)
-+static bt_status_t init(bthf_callbacks_t *callbacks, int max_hf_clients)
++static bt_status_t volume_control(bthf_volume_type_t type, int volume,
++							bt_bdaddr_t *bd_addr)
 +{
-+	return init_real(callbacks, max_hf_clients);
++	return volume_control_real(type, volume, bd_addr);
 +}
 +#else
-+static bt_status_t init(bthf_callbacks_t *callbacks)
++static bt_status_t volume_control(bthf_volume_type_t type, int volume)
 +{
-+	return init_real(callbacks, 1);
++	return volume_control_real(type, volume, NULL);
 +}
 +#endif
 +
- static bt_status_t handsfree_connect(bt_bdaddr_t *bd_addr)
- {
- 	struct hal_cmd_handsfree_connect cmd;
+ static bt_status_t device_status_notification(bthf_network_state_t state,
+ 						bthf_service_type_t type,
+ 						int signal, int battery)
 diff --git a/android/hal-ipc-api.txt b/android/hal-ipc-api.txt
-index 1bb591a..a9d4c8b 100644
+index e422529..a4c7777 100644
 --- a/android/hal-ipc-api.txt
 +++ b/android/hal-ipc-api.txt
-@@ -128,6 +128,7 @@ Core Service (ID 0)
+@@ -851,6 +851,7 @@ Commands and responses:
  
- 		Command parameters: Service id (1 octet)
- 		                    Mode (1 octet)
-+		                    Max Clients (4 octets)
+ 		Command parameters: Volume type (1 octet)
+ 		                    Volume (1 octet)
++		                    Remote address (6 octets)
  		Response parameters: <none>
  
- 		In case a command is sent for an undeclared service ID, it will
+ 		Valid volume types: 0x00 = Speaker
 diff --git a/android/hal-msg.h b/android/hal-msg.h
-index 1876d6b..b5a4125 100644
+index 5d53957..9833451 100644
 --- a/android/hal-msg.h
 +++ b/android/hal-msg.h
-@@ -64,6 +64,7 @@ static const char BLUEZ_HAL_SK_PATH[] = "\0bluez_hal_socket";
- struct hal_cmd_register_module {
- 	uint8_t service_id;
- 	uint8_t mode;
-+	int32_t max_clients;
+@@ -510,6 +510,7 @@ struct hal_cmd_handsfree_stop_vr {
+ struct hal_cmd_handsfree_volume_control {
+ 	uint8_t type;
+ 	uint8_t volume;
++	uint8_t bdaddr[6];
  } __attribute__((packed));
  
- #define HAL_OP_UNREGISTER_MODULE	0x02
+ #define HAL_HANDSFREE_NETWORK_STATE_NOT_AVAILABLE	0x00
 diff --git a/android/handsfree.c b/android/handsfree.c
-index 3aa4522..3bf42f1 100644
+index d31482c..fc6605a 100644
 --- a/android/handsfree.c
 +++ b/android/handsfree.c
-@@ -2901,7 +2901,8 @@ static bool bt_sco_register(ipc_disconnect_cb disconnect)
- 	return true;
- }
+@@ -1947,10 +1947,13 @@ static void handle_volume_control(const void *buf, uint16_t len)
+ 	const struct hal_cmd_handsfree_volume_control *cmd = buf;
+ 	struct hf_device *dev;
+ 	uint8_t status, volume;
++	bdaddr_t bdaddr;
  
--bool bt_handsfree_register(struct ipc *ipc, const bdaddr_t *addr, uint8_t mode)
-+bool bt_handsfree_register(struct ipc *ipc, const bdaddr_t *addr, uint8_t mode,
-+								int max_clients)
- {
- 	DBG("mode 0x%x", mode);
+ 	DBG("type=%u volume=%u", cmd->type, cmd->volume);
  
-@@ -2920,6 +2921,8 @@ bool bt_handsfree_register(struct ipc *ipc, const bdaddr_t *addr, uint8_t mode)
- 	if (mode == HAL_MODE_HANDSFREE_HSP_ONLY)
- 		goto done;
- 
-+	/* TODO: Handle max_clients argument */
+-	dev = find_default_device();
++	android2bdaddr(cmd->bdaddr, &bdaddr);
 +
- 	hfp_ag_features = HFP_AG_FEATURES;
- 
- 	if (mode == HAL_MODE_HANDSFREE_HFP_WBS)
-diff --git a/android/handsfree.h b/android/handsfree.h
-index e5eff47..d4fd649 100644
---- a/android/handsfree.h
-+++ b/android/handsfree.h
-@@ -21,5 +21,6 @@
-  *
-  */
- 
--bool bt_handsfree_register(struct ipc *ipc, const bdaddr_t *addr, uint8_t mode);
-+bool bt_handsfree_register(struct ipc *ipc, const bdaddr_t *addr, uint8_t mode,
-+							int max_clients);
- void bt_handsfree_unregister(void);
-diff --git a/android/main.c b/android/main.c
-index b5f6937..58dd9ab 100644
---- a/android/main.c
-+++ b/android/main.c
-@@ -209,7 +209,8 @@ static void service_register(const void *buf, uint16_t len)
- 
- 		break;
- 	case HAL_SERVICE_ID_HANDSFREE:
--		if (!bt_handsfree_register(hal_ipc, &adapter_bdaddr, m->mode)) {
-+		if (!bt_handsfree_register(hal_ipc, &adapter_bdaddr, m->mode,
-+							m->max_clients)) {
- 			status = HAL_STATUS_FAILED;
- 			goto failed;
- 		}
++	dev = find_device(&bdaddr);
+ 	if (!dev) {
+ 		status = HAL_STATUS_FAILED;
+ 		goto done;
 -- 
 1.9.1
 
