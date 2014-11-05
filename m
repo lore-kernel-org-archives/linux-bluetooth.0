@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 3/9] android/handsfree: Add support for new API for stop_vr
-Date: Wed,  5 Nov 2014 16:38:47 +0200
-Message-Id: <1415198333-7775-4-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCH 6/9] android/handsfree: Add support for new API for cind_response
+Date: Wed,  5 Nov 2014 16:38:50 +0200
+Message-Id: <1415198333-7775-7-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1415198333-7775-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1415198333-7775-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,29 +11,32 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-stop_voice_recognition() in new Android API has bd_addr parameter.
+cind_response has new parameter bdaddr in new Android API.
 ---
- android/hal-handsfree.c | 25 +++++++++++++++++++++++--
- android/hal-ipc-api.txt |  2 +-
- android/hal-msg.h       |  3 +++
- android/handsfree.c     |  6 +++++-
- 4 files changed, 32 insertions(+), 4 deletions(-)
+ android/hal-handsfree.c | 29 +++++++++++++++++++++++++++--
+ android/hal-ipc-api.txt |  1 +
+ android/hal-msg.h       |  1 +
+ android/handsfree.c     |  5 ++++-
+ 4 files changed, 33 insertions(+), 3 deletions(-)
 
 diff --git a/android/hal-handsfree.c b/android/hal-handsfree.c
-index 304281a..e5dd8c5 100644
+index 708d790..642d087 100644
 --- a/android/hal-handsfree.c
 +++ b/android/hal-handsfree.c
-@@ -373,17 +373,38 @@ static bt_status_t start_voice_recognition(void)
+@@ -504,9 +504,10 @@ static bt_status_t cops_response(const char *cops)
  }
  #endif
  
--static bt_status_t stop_voice_recognition(void)
-+static bt_status_t stop_voice_recognition_real(bt_bdaddr_t *bd_addr)
+-static bt_status_t cind_response(int svc, int num_active, int num_held,
++static bt_status_t cind_response_real(int svc, int num_active, int num_held,
+ 					bthf_call_state_t state, int signal,
+-					int roam, int batt_chg)
++					int roam, int batt_chg,
++					bt_bdaddr_t *bd_addr)
  {
-+	struct hal_cmd_handsfree_stop_vr cmd;
-+
- 	DBG("");
+ 	struct hal_cmd_handsfree_cind_response cmd;
  
+@@ -515,6 +516,11 @@ static bt_status_t cind_response(int svc, int num_active, int num_held,
  	if (!interface_ready())
  		return BT_STATUS_NOT_READY;
  
@@ -42,64 +45,66 @@ index 304281a..e5dd8c5 100644
 +	if (bd_addr)
 +		memcpy(cmd.bdaddr, bd_addr, sizeof(cmd.bdaddr));
 +
-+	memcpy(cmd.bdaddr, bd_addr, sizeof(cmd.bdaddr));
-+
- 	return hal_ipc_cmd(HAL_SERVICE_ID_HANDSFREE, HAL_OP_HANDSFREE_STOP_VR,
--						0, NULL, NULL, NULL, NULL);
-+					sizeof(cmd), &cmd, NULL, NULL, NULL);
+ 	cmd.svc = svc;
+ 	cmd.num_active = num_active;
+ 	cmd.num_held = num_held;
+@@ -528,6 +534,25 @@ static bt_status_t cind_response(int svc, int num_active, int num_held,
+ 					sizeof(cmd), &cmd, NULL, NULL, NULL);
  }
  
 +#if ANDROID_VERSION >= PLATFORM_VER(5, 0, 0)
-+static bt_status_t stop_voice_recognition(bt_bdaddr_t *bd_addr)
++static bt_status_t cind_response(int svc, int num_active, int num_held,
++					bthf_call_state_t state, int signal,
++					int roam, int batt_chg,
++					bt_bdaddr_t *bd_addr)
 +{
-+	return stop_voice_recognition_real(bd_addr);
++	return cind_response_real(svc, num_active, num_held, state, signal,
++						roam, batt_chg, bd_addr);
 +}
 +#else
-+static bt_status_t stop_voice_recognition(void)
++static bt_status_t cind_response(int svc, int num_active, int num_held,
++					bthf_call_state_t state, int signal,
++					int roam, int batt_chg)
 +{
-+	return stop_voice_recognition_real(NULL);
++	return cind_response_real(svc, num_active, num_held, state, signal,
++						roam, batt_chg, NULL);
 +}
 +#endif
 +
- static bt_status_t volume_control(bthf_volume_type_t type, int volume)
+ static bt_status_t formatted_at_response(const char *rsp)
  {
- 	struct hal_cmd_handsfree_volume_control cmd;
+ 	char buf[IPC_MTU];
 diff --git a/android/hal-ipc-api.txt b/android/hal-ipc-api.txt
-index 26d885f..e422529 100644
+index 4128746..4cfb91e 100644
 --- a/android/hal-ipc-api.txt
 +++ b/android/hal-ipc-api.txt
-@@ -842,7 +842,7 @@ Commands and responses:
- 
- 	Opcode 0x06 - Stop Voice Recognition command/response
- 
--		Command parameters: <none>
-+		Command parameters: Remote address (6 octets)
+@@ -892,6 +892,7 @@ Commands and responses:
+ 		                    Signal strength (1 octet)
+ 		                    Roaming indicator (1 octet)
+ 		                    Battery level (1 octet)
++		                    Remote address (6 octets)
  		Response parameters: <none>
  
- 		In case of an error, the error response will be returned.
+ 		Valid call setup states: 0x00 = Active
 diff --git a/android/hal-msg.h b/android/hal-msg.h
-index 96a7640..5d53957 100644
+index a2f2de4..17e6dee 100644
 --- a/android/hal-msg.h
 +++ b/android/hal-msg.h
-@@ -499,6 +499,9 @@ struct hal_cmd_handsfree_start_vr {
+@@ -551,6 +551,7 @@ struct hal_cmd_handsfree_cind_response {
+ 	uint8_t signal;
+ 	uint8_t roam;
+ 	uint8_t batt_chg;
++	uint8_t bdaddr[6];
  } __attribute__((packed));
  
- #define HAL_OP_HANDSFREE_STOP_VR		0x06
-+struct hal_cmd_handsfree_stop_vr {
-+	uint8_t bdaddr[6];
-+} __attribute__((packed));
- 
- #define HAL_HANDSFREE_VOLUME_TYPE_SPEAKER	0x00
- #define HAL_HANDSFREE_VOLUME_TYPE_MIC		0x01
+ #define HAL_OP_HANDSFREE_FORMATTED_AT_RESPONSE	0x0B
 diff --git a/android/handsfree.c b/android/handsfree.c
-index 60568c2..d31482c 100644
+index 7a61dfc..f34668d 100644
 --- a/android/handsfree.c
 +++ b/android/handsfree.c
-@@ -1915,12 +1915,16 @@ done:
- 
- static void handle_stop_vr(const void *buf, uint16_t len)
+@@ -2081,11 +2081,14 @@ static void handle_cind(const void *buf, uint16_t len)
  {
-+	const struct hal_cmd_handsfree_stop_vr *cmd = buf;
+ 	const struct hal_cmd_handsfree_cind_response *cmd = buf;
  	struct hf_device *dev;
 +	bdaddr_t bdaddr;
  	uint8_t status;
