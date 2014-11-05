@@ -1,107 +1,80 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 3/3] android/gatt: Add support for new parameter in srv connect()
-Date: Wed,  5 Nov 2014 11:53:37 +0200
-Message-Id: <1415181217-16510-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1415181217-16510-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1415181217-16510-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCH 1/3] android/gatt: Add support for new API
+Date: Wed,  5 Nov 2014 11:53:35 +0200
+Message-Id: <1415181217-16510-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Support transport parameter in new Android API.
+In new Android API client_if parameter is removed.
 ---
- android/gatt.c          |  2 ++
- android/hal-gatt.c      | 21 +++++++++++++++++++--
- android/hal-ipc-api.txt |  1 +
- android/hal-msg.h       |  1 +
- 4 files changed, 23 insertions(+), 2 deletions(-)
+ android/gatt.c     | 14 ++++++++------
+ android/hal-gatt.c | 14 +++++++++++++-
+ 2 files changed, 21 insertions(+), 7 deletions(-)
 
 diff --git a/android/gatt.c b/android/gatt.c
-index e930b5a..7cf612f 100644
+index b3dd6d3..5a531d9 100644
 --- a/android/gatt.c
 +++ b/android/gatt.c
-@@ -4184,6 +4184,8 @@ static void handle_server_connect(const void *buf, uint16_t len)
+@@ -1730,15 +1730,17 @@ static void handle_client_scan(const void *buf, uint16_t len)
+ {
+ 	const struct hal_cmd_gatt_client_scan *cmd = buf;
+ 	uint8_t status;
+-	void *registered;
  
- 	android2bdaddr(&cmd->bdaddr, &addr);
+ 	DBG("new state %d", cmd->start);
  
-+	/* TODO: Handle transport flag */
+-	registered = find_app_by_id(cmd->client_if);
+-	if (!registered) {
+-		error("gatt: Client not registered");
+-		status = HAL_STATUS_FAILED;
+-		goto reply;
++	if (cmd->client_if != 0) {
++		void *registered = find_app_by_id(cmd->client_if);
 +
- 	status = handle_connect(cmd->server_if, &addr);
++		if (!registered) {
++			error("gatt: Client not registered");
++			status = HAL_STATUS_FAILED;
++			goto reply;
++		}
+ 	}
  
- 	ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_GATT, HAL_OP_GATT_SERVER_CONNECT,
+ 	/* Turn off scan */
 diff --git a/android/hal-gatt.c b/android/hal-gatt.c
-index 82093fa..a324009 100644
+index c563fe9..080852a 100644
 --- a/android/hal-gatt.c
 +++ b/android/hal-gatt.c
-@@ -1136,8 +1136,9 @@ static bt_status_t unregister_server(int server_if)
+@@ -595,7 +595,7 @@ static bt_status_t unregister_client(int client_if)
  					sizeof(cmd), &cmd, NULL, NULL, NULL);
  }
  
--static bt_status_t server_connect(int server_if, const bt_bdaddr_t *bd_addr,
--								bool is_direct)
-+static bt_status_t server_connect_real(int server_if,
-+						const bt_bdaddr_t *bd_addr,
-+						bool is_direct, int transport)
+-static bt_status_t scan(int client_if, bool start)
++static bt_status_t scan_real(int client_if, bool start)
  {
- 	struct hal_cmd_gatt_server_connect cmd;
+ 	struct hal_cmd_gatt_client_scan cmd;
  
-@@ -1146,6 +1147,7 @@ static bt_status_t server_connect(int server_if, const bt_bdaddr_t *bd_addr,
- 
- 	cmd.server_if = server_if;
- 	cmd.is_direct = is_direct;
-+	cmd.transport = transport;
- 
- 	memcpy(cmd.bdaddr, bd_addr, sizeof(*bd_addr));
- 
-@@ -1153,6 +1155,21 @@ static bt_status_t server_connect(int server_if, const bt_bdaddr_t *bd_addr,
+@@ -609,6 +609,18 @@ static bt_status_t scan(int client_if, bool start)
  					sizeof(cmd), &cmd, NULL, NULL, NULL);
  }
  
 +#if ANDROID_VERSION >= PLATFORM_VER(5, 0, 0)
-+static bt_status_t server_connect(int server_if, const bt_bdaddr_t *bd_addr,
-+						bool is_direct, int transport)
++static bt_status_t scan(bool start)
 +{
-+	return server_connect_real(server_if, bd_addr, is_direct, transport);
++	return scan_real(0, start);
 +}
 +#else
-+static bt_status_t server_connect(int server_if, const bt_bdaddr_t *bd_addr,
-+								bool is_direct)
++static bt_status_t scan(int client_if, bool start)
 +{
-+	return server_connect_real(server_if, bd_addr, is_direct,
-+							BT_TRANSPORT_UNKNOWN);
++	return scan_real(client_if, start);
 +}
 +#endif
 +
- static bt_status_t server_disconnect(int server_if, const bt_bdaddr_t *bd_addr,
- 								int conn_id)
+ static bt_status_t connect(int client_if, const bt_bdaddr_t *bd_addr,
+ 								bool is_direct)
  {
-diff --git a/android/hal-ipc-api.txt b/android/hal-ipc-api.txt
-index d6e68f1..1bb591a 100644
---- a/android/hal-ipc-api.txt
-+++ b/android/hal-ipc-api.txt
-@@ -1756,6 +1756,7 @@ Commands and responses:
- 		Command parameters: Server (4 octets)
- 		                    Remote address (6 octes)
- 		                    Is Direct (1 octet)
-+		                    Transport (4 octets)
- 		Response parameters: <none>
- 
- 		In case of an error, the error response will be returned.
-diff --git a/android/hal-msg.h b/android/hal-msg.h
-index 8dd00a0..1876d6b 100644
---- a/android/hal-msg.h
-+++ b/android/hal-msg.h
-@@ -919,6 +919,7 @@ struct hal_cmd_gatt_server_connect {
- 	int32_t server_if;
- 	uint8_t bdaddr[6];
- 	uint8_t is_direct;
-+	int32_t transport;
- } __attribute__((packed));
- 
- #define HAL_OP_GATT_SERVER_DISCONNECT		0x1a
 -- 
 1.9.1
 
