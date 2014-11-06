@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 07/14] android/handsfree: Add support for new API for nrec_cmd_cb
-Date: Thu,  6 Nov 2014 10:32:02 +0200
-Message-Id: <1415262729-12573-8-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCH 10/14] android/handsfree: Add support for new API for cind_cmd_cb
+Date: Thu,  6 Nov 2014 10:32:05 +0200
+Message-Id: <1415262729-12573-11-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1415262729-12573-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1415262729-12573-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,66 +11,87 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-NREC Command notification callback has new parameter bdaddr.
+CIND Command notification callback has new parameter bdaddr.
+Currently use global device bdaddr.
 ---
- android/hal-handsfree.c | 4 ++++
- android/hal-ipc-api.txt | 1 +
- android/hal-msg.h       | 1 +
- android/handsfree.c     | 1 +
- 4 files changed, 7 insertions(+)
+ android/hal-handsfree.c | 9 ++++++++-
+ android/hal-ipc-api.txt | 2 +-
+ android/hal-msg.h       | 3 +++
+ android/handsfree.c     | 5 ++++-
+ 4 files changed, 16 insertions(+), 3 deletions(-)
 
 diff --git a/android/hal-handsfree.c b/android/hal-handsfree.c
-index 21d4444..76a2e0f 100644
+index 8618ddf..1ea8a9c 100644
 --- a/android/hal-handsfree.c
 +++ b/android/hal-handsfree.c
-@@ -146,7 +146,11 @@ static void handle_nrec(void *buf, uint16_t len, int fd)
- 	struct hal_ev_handsfree_nrec *ev = buf;
+@@ -180,8 +180,15 @@ static void handle_cnum(void *buf, uint16_t len, int fd)
  
- 	if (cbs->nrec_cmd_cb)
+ static void handle_cind(void *buf, uint16_t len, int fd)
+ {
+-	if (cbs->cind_cmd_cb)
++	if (cbs->cind_cmd_cb) {
 +#if ANDROID_VERSION >= PLATFORM_VER(5, 0, 0)
-+		cbs->nrec_cmd_cb(ev->nrec, (bt_bdaddr_t *) (ev->bdaddr));
++		struct hal_ev_handsfree_cind *ev = buf;
++
++		cbs->cind_cmd_cb((bt_bdaddr_t *) (ev->bdaddr));
 +#else
- 		cbs->nrec_cmd_cb(ev->nrec);
+ 		cbs->cind_cmd_cb();
 +#endif
++	}
  }
  
- static void handle_chld(void *buf, uint16_t len, int fd)
+ static void handle_cops(void *buf, uint16_t len, int fd)
 diff --git a/android/hal-ipc-api.txt b/android/hal-ipc-api.txt
-index 962650b..10808f4 100644
+index 27a0c24..97c5440 100644
 --- a/android/hal-ipc-api.txt
 +++ b/android/hal-ipc-api.txt
-@@ -1043,6 +1043,7 @@ Notifications:
- 	Opcode 0x89 - NREC Command notification
+@@ -1064,7 +1064,7 @@ Notifications:
  
- 		Notification parameters: NREC types (1 octet)
-+		                         Remote address (6 octets)
+ 	Opcode 0x8c - CIND Command notification
  
- 		Valid NREC types: 0x00 = Stop
- 		                  0x01 = Start
+-		Notification parameters: <none>
++		Notification parameters: Remote address (6 octets)
+ 
+ 	Opcode 0x8d - COPS Command notification
+ 
 diff --git a/android/hal-msg.h b/android/hal-msg.h
-index 00e66e2..321f193 100644
+index 2650d36..86a79c7 100644
 --- a/android/hal-msg.h
 +++ b/android/hal-msg.h
-@@ -1385,6 +1385,7 @@ struct hal_ev_handsfree_dtmf {
- #define HAL_EV_HANDSFREE_NREC		0x89
- struct hal_ev_handsfree_nrec {
- 	uint8_t nrec;
-+	uint8_t bdaddr[6];
+@@ -1405,6 +1405,9 @@ struct hal_ev_handsfree_cnum {
  } __attribute__((packed));
  
- #define HAL_HANDSFREE_CHLD_TYPE_RELEASEHELD			0x00
+ #define HAL_EV_HANDSFREE_CIND		0x8C
++struct hal_ev_handsfree_cind {
++	uint8_t bdaddr[6];
++} __attribute__((packed));
+ 
+ #define HAL_EV_HANDSFREE_COPS		0x8D
+ 
 diff --git a/android/handsfree.c b/android/handsfree.c
-index 53f3fd1..f47eaae 100644
+index 0b846e6..6ca25e3 100644
 --- a/android/handsfree.c
 +++ b/android/handsfree.c
-@@ -871,6 +871,7 @@ static void at_cmd_nrec(struct hfp_context *context,
- 			break;
- 
- 		ev.nrec = HAL_HANDSFREE_NREC_STOP;
+@@ -1246,6 +1246,7 @@ static void at_cmd_cind(struct hfp_context *result, enum hfp_gw_cmd_type type,
+ 								void *user_data)
+ {
+ 	struct hf_device *dev = user_data;
++	struct hal_ev_handsfree_cind ev;
+ 	char *buf, *ptr;
+ 	int len;
+ 	unsigned int i;
+@@ -1289,8 +1290,10 @@ static void at_cmd_cind(struct hfp_context *result, enum hfp_gw_cmd_type type,
+ 		g_free(buf);
+ 		return;
+ 	case HFP_GW_CMD_TYPE_READ:
 +		bdaddr2android(&dev->bdaddr, ev.bdaddr);
- 
++
  		ipc_send_notif(hal_ipc, HAL_SERVICE_ID_HANDSFREE,
- 					HAL_EV_HANDSFREE_NREC, sizeof(ev), &ev);
+-						HAL_EV_HANDSFREE_CIND, 0, NULL);
++					HAL_EV_HANDSFREE_CIND, sizeof(ev), &ev);
+ 		return;
+ 	case HFP_GW_CMD_TYPE_SET:
+ 	case HFP_GW_CMD_TYPE_COMMAND:
 -- 
 1.9.1
 
