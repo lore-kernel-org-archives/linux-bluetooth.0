@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 11/14] android/handsfree: Add support for new API for cops_cmd_cb
-Date: Thu,  6 Nov 2014 10:32:06 +0200
-Message-Id: <1415262729-12573-12-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCH 04/14] android/handsfree: Add support for new API for volume_cmd_cb
+Date: Thu,  6 Nov 2014 10:31:59 +0200
+Message-Id: <1415262729-12573-5-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1415262729-12573-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1415262729-12573-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,86 +11,75 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-COPS Command notification callback has new parameter bdaddr.
+Volume Command notification callback has new parameter bdaddr.
 ---
- android/hal-handsfree.c | 9 ++++++++-
- android/hal-ipc-api.txt | 2 +-
- android/hal-msg.h       | 3 +++
- android/handsfree.c     | 5 ++++-
- 4 files changed, 16 insertions(+), 3 deletions(-)
+ android/hal-handsfree.c | 5 +++++
+ android/hal-ipc-api.txt | 1 +
+ android/hal-msg.h       | 1 +
+ android/handsfree.c     | 2 ++
+ 4 files changed, 9 insertions(+)
 
 diff --git a/android/hal-handsfree.c b/android/hal-handsfree.c
-index 1ea8a9c..ea9614b 100644
+index dc40a17..bb64da0 100644
 --- a/android/hal-handsfree.c
 +++ b/android/hal-handsfree.c
-@@ -193,8 +193,15 @@ static void handle_cind(void *buf, uint16_t len, int fd)
+@@ -96,7 +96,12 @@ static void handle_volume(void *buf, uint16_t len, int fd)
+ 	struct hal_ev_handsfree_volume *ev = buf;
  
- static void handle_cops(void *buf, uint16_t len, int fd)
- {
--	if (cbs->cops_cmd_cb)
-+	if (cbs->cops_cmd_cb) {
+ 	if (cbs->volume_cmd_cb)
 +#if ANDROID_VERSION >= PLATFORM_VER(5, 0, 0)
-+		struct hal_ev_handsfree_cops *ev = buf;
-+
-+		cbs->cops_cmd_cb((bt_bdaddr_t *) (ev->bdaddr));
++		cbs->volume_cmd_cb(ev->type, ev->volume,
++						(bt_bdaddr_t *) (ev->bdaddr));
 +#else
- 		cbs->cops_cmd_cb();
+ 		cbs->volume_cmd_cb(ev->type, ev->volume);
 +#endif
-+	}
  }
  
- static void handle_clcc(void *buf, uint16_t len, int fd)
+ static void handle_dial(void *buf, uint16_t len, int fd)
 diff --git a/android/hal-ipc-api.txt b/android/hal-ipc-api.txt
-index 97c5440..64adf57 100644
+index 751c6ee..e462363 100644
 --- a/android/hal-ipc-api.txt
 +++ b/android/hal-ipc-api.txt
-@@ -1068,7 +1068,7 @@ Notifications:
+@@ -1025,6 +1025,7 @@ Notifications:
  
- 	Opcode 0x8d - COPS Command notification
+ 		Notification parameters: Volume type (1 octet)
+ 		                         Volume (1 octet)
++		                         Remote address (6 octets)
  
--		Notification parameters: <none>
-+		Notification parameters: Remote address (6 octets)
- 
- 	Opcode 0x8e - CLCC Command notification
- 
+ 		Valid volume types: 0x00 = Speaker
+ 		                    0x01 = Microphone
 diff --git a/android/hal-msg.h b/android/hal-msg.h
-index 86a79c7..5793a5b 100644
+index 0abbb1f7..889b45e 100644
 --- a/android/hal-msg.h
 +++ b/android/hal-msg.h
-@@ -1410,6 +1410,9 @@ struct hal_ev_handsfree_cind {
+@@ -1363,6 +1363,7 @@ struct hal_ev_handsfree_hangup {
+ struct hal_ev_handsfree_volume {
+ 	uint8_t type;
+ 	uint8_t volume;
++	uint8_t bdaddr[6];
  } __attribute__((packed));
  
- #define HAL_EV_HANDSFREE_COPS		0x8D
-+struct hal_ev_handsfree_cops {
-+	uint8_t bdaddr[6];
-+} __attribute__((packed));
- 
- #define HAL_EV_HANDSFREE_CLCC		0x8E
- 
+ #define HAL_EV_HANDSFREE_DIAL		0x87
 diff --git a/android/handsfree.c b/android/handsfree.c
-index 6ca25e3..b64dcc6 100644
+index 46f9a5d..83cc326 100644
 --- a/android/handsfree.c
 +++ b/android/handsfree.c
-@@ -418,6 +418,7 @@ static void at_cmd_cops(struct hfp_context *context,
- 				enum hfp_gw_cmd_type type, void *user_data)
- {
- 	struct hf_device *dev = user_data;
-+	struct hal_ev_handsfree_cops ev;
- 	unsigned int val;
+@@ -361,6 +361,7 @@ static void at_cmd_vgm(struct hfp_context *context,
  
- 	switch (type) {
-@@ -434,8 +435,10 @@ static void at_cmd_cops(struct hfp_context *context,
- 		hfp_gw_send_result(dev->gw, HFP_RESULT_OK);
- 		return;
- 	case HFP_GW_CMD_TYPE_READ:
+ 		ev.type = HAL_HANDSFREE_VOLUME_TYPE_MIC;
+ 		ev.volume = val;
 +		bdaddr2android(&dev->bdaddr, ev.bdaddr);
-+
+ 
  		ipc_send_notif(hal_ipc, HAL_SERVICE_ID_HANDSFREE,
--						HAL_EV_HANDSFREE_COPS, 0, NULL);
-+					HAL_EV_HANDSFREE_COPS, sizeof(ev), &ev);
- 		return;
- 	case HFP_GW_CMD_TYPE_TEST:
- 	case HFP_GW_CMD_TYPE_COMMAND:
+ 				HAL_EV_HANDSFREE_VOLUME, sizeof(ev), &ev);
+@@ -396,6 +397,7 @@ static void at_cmd_vgs(struct hfp_context *context,
+ 
+ 		ev.type = HAL_HANDSFREE_VOLUME_TYPE_SPEAKER;
+ 		ev.volume = val;
++		bdaddr2android(&dev->bdaddr, ev.bdaddr);
+ 
+ 		ipc_send_notif(hal_ipc, HAL_SERVICE_ID_HANDSFREE,
+ 				HAL_EV_HANDSFREE_VOLUME, sizeof(ev), &ev);
 -- 
 1.9.1
 
