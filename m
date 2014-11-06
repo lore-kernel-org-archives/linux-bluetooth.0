@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 10/14] android/handsfree: Add support for new API for cind_cmd_cb
-Date: Thu,  6 Nov 2014 10:32:05 +0200
-Message-Id: <1415262729-12573-11-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCH 02/14] android/handsfree: Add support for new API for handle_answer
+Date: Thu,  6 Nov 2014 10:31:57 +0200
+Message-Id: <1415262729-12573-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1415262729-12573-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1415262729-12573-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,7 +11,7 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-CIND Command notification callback has new parameter bdaddr.
+Answer Call Command notification callback has new parameter bdaddr.
 Currently use global device bdaddr.
 ---
  android/hal-handsfree.c | 9 ++++++++-
@@ -21,77 +21,77 @@ Currently use global device bdaddr.
  4 files changed, 16 insertions(+), 3 deletions(-)
 
 diff --git a/android/hal-handsfree.c b/android/hal-handsfree.c
-index 8618ddf..1ea8a9c 100644
+index c465277..f1ddfe1 100644
 --- a/android/hal-handsfree.c
 +++ b/android/hal-handsfree.c
-@@ -180,8 +180,15 @@ static void handle_cnum(void *buf, uint16_t len, int fd)
+@@ -67,8 +67,15 @@ static void handle_vr_state(void *buf, uint16_t len, int fd)
  
- static void handle_cind(void *buf, uint16_t len, int fd)
+ static void handle_answer(void *buf, uint16_t len, int fd)
  {
--	if (cbs->cind_cmd_cb)
-+	if (cbs->cind_cmd_cb) {
+-	if (cbs->answer_call_cmd_cb)
++	if (cbs->answer_call_cmd_cb) {
 +#if ANDROID_VERSION >= PLATFORM_VER(5, 0, 0)
-+		struct hal_ev_handsfree_cind *ev = buf;
++		struct hal_ev_handsfree_answer *ev = buf;
 +
-+		cbs->cind_cmd_cb((bt_bdaddr_t *) (ev->bdaddr));
++		cbs->answer_call_cmd_cb((bt_bdaddr_t *) (ev->bdaddr));
 +#else
- 		cbs->cind_cmd_cb();
+ 		cbs->answer_call_cmd_cb();
 +#endif
 +	}
  }
  
- static void handle_cops(void *buf, uint16_t len, int fd)
+ static void handle_hangup(void *buf, uint16_t len, int fd)
 diff --git a/android/hal-ipc-api.txt b/android/hal-ipc-api.txt
-index 27a0c24..97c5440 100644
+index 058af6f..48d30c9 100644
 --- a/android/hal-ipc-api.txt
 +++ b/android/hal-ipc-api.txt
-@@ -1064,7 +1064,7 @@ Notifications:
+@@ -1015,7 +1015,7 @@ Notifications:
  
- 	Opcode 0x8c - CIND Command notification
+ 	Opcode 0x84 - Answer Call Command notification
  
 -		Notification parameters: <none>
 +		Notification parameters: Remote address (6 octets)
  
- 	Opcode 0x8d - COPS Command notification
+ 	Opcode 0x85 - Hangup Call Command notification
  
 diff --git a/android/hal-msg.h b/android/hal-msg.h
-index 2650d36..86a79c7 100644
+index 4ea30dac..195e26c 100644
 --- a/android/hal-msg.h
 +++ b/android/hal-msg.h
-@@ -1405,6 +1405,9 @@ struct hal_ev_handsfree_cnum {
+@@ -1350,6 +1350,9 @@ struct hal_ev_handsfree_vr_state {
  } __attribute__((packed));
  
- #define HAL_EV_HANDSFREE_CIND		0x8C
-+struct hal_ev_handsfree_cind {
+ #define HAL_EV_HANDSFREE_ANSWER		0x84
++struct hal_ev_handsfree_answer {
 +	uint8_t bdaddr[6];
 +} __attribute__((packed));
  
- #define HAL_EV_HANDSFREE_COPS		0x8D
+ #define HAL_EV_HANDSFREE_HANGUP		0x85
  
 diff --git a/android/handsfree.c b/android/handsfree.c
-index 0b846e6..6ca25e3 100644
+index a5d4184..1525630 100644
 --- a/android/handsfree.c
 +++ b/android/handsfree.c
-@@ -1246,6 +1246,7 @@ static void at_cmd_cind(struct hfp_context *result, enum hfp_gw_cmd_type type,
- 								void *user_data)
+@@ -493,6 +493,7 @@ static void at_cmd_a(struct hfp_context *context,
+ 				enum hfp_gw_cmd_type type, void *user_data)
  {
  	struct hf_device *dev = user_data;
-+	struct hal_ev_handsfree_cind ev;
- 	char *buf, *ptr;
- 	int len;
- 	unsigned int i;
-@@ -1289,8 +1290,10 @@ static void at_cmd_cind(struct hfp_context *result, enum hfp_gw_cmd_type type,
- 		g_free(buf);
- 		return;
- 	case HFP_GW_CMD_TYPE_READ:
++	struct hal_ev_handsfree_answer ev;
+ 
+ 	DBG("");
+ 
+@@ -501,8 +502,10 @@ static void at_cmd_a(struct hfp_context *context,
+ 		if (hfp_context_has_next(context))
+ 			break;
+ 
 +		bdaddr2android(&dev->bdaddr, ev.bdaddr);
 +
  		ipc_send_notif(hal_ipc, HAL_SERVICE_ID_HANDSFREE,
--						HAL_EV_HANDSFREE_CIND, 0, NULL);
-+					HAL_EV_HANDSFREE_CIND, sizeof(ev), &ev);
- 		return;
- 	case HFP_GW_CMD_TYPE_SET:
- 	case HFP_GW_CMD_TYPE_COMMAND:
+-					HAL_EV_HANDSFREE_ANSWER, 0, NULL);
++				HAL_EV_HANDSFREE_ANSWER, sizeof(ev), &ev);
+ 
+ 		/* Framework is not replying with result for ATA */
+ 		hfp_gw_send_result(dev->gw, HFP_RESULT_OK);
 -- 
 1.9.1
 
