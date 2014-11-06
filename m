@@ -1,108 +1,199 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1415240111-10596-5-git-send-email-jamuraa@chromium.org>
-References: <1415240111-10596-1-git-send-email-jamuraa@chromium.org>
-	<1415240111-10596-5-git-send-email-jamuraa@chromium.org>
-Date: Thu, 6 Nov 2014 17:07:56 +0200
-Message-ID: <CABBYNZLxYBWrjUctYQnt3mVqf4+QgnYe0GttJNjF69phfkcp0g@mail.gmail.com>
-Subject: Re: [PATCH BlueZ v2 4/4] GATT shim to src/shared bt_att
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Michael Janssen <jamuraa@chromium.org>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [RFC 03/15] android/hardware: Update bluetooth.h header from Android 5.0
+Date: Thu,  6 Nov 2014 17:05:48 +0200
+Message-Id: <1415286360-26268-4-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1415286360-26268-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1415286360-26268-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Michael
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-On Thu, Nov 6, 2014 at 4:15 AM, Michael Janssen <jamuraa@chromium.org> wrote:
-> This patch implements a version of GAttrib which is backed by
-> bt_att, which enables the simultaneous use of GAttrib and bt_att.
->
-> This should enable smooth transition of profiles from the GAttrib
-> API to the src/shared bt_att API.
-> ---
->  attrib/gattrib.c | 1077 ++++++++++++++++--------------------------------------
->  1 file changed, 319 insertions(+), 758 deletions(-)
->  rewrite attrib/gattrib.c (80%)
+---
+ android/hardware/bluetooth.h | 82 ++++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 80 insertions(+), 2 deletions(-)
 
-I tried it and it does not pass the unit tests:
+diff --git a/android/hardware/bluetooth.h b/android/hardware/bluetooth.h
+index b957c6f..74cd1fc 100644
+--- a/android/hardware/bluetooth.h
++++ b/android/hardware/bluetooth.h
+@@ -17,6 +17,7 @@
+ #ifndef ANDROID_INCLUDE_BLUETOOTH_H
+ #define ANDROID_INCLUDE_BLUETOOTH_H
+ 
++#include <stdbool.h>
+ #include <stdint.h>
+ #include <sys/cdefs.h>
+ #include <sys/types.h>
+@@ -39,6 +40,7 @@ __BEGIN_DECLS
+ #define BT_PROFILE_HANDSFREE_ID "handsfree"
+ #define BT_PROFILE_HANDSFREE_CLIENT_ID "handsfree_client"
+ #define BT_PROFILE_ADVANCED_AUDIO_ID "a2dp"
++#define BT_PROFILE_ADVANCED_AUDIO_SINK_ID "a2dp_sink"
+ #define BT_PROFILE_HEALTH_ID "health"
+ #define BT_PROFILE_SOCKETS_ID "socket"
+ #define BT_PROFILE_HIDHOST_ID "hidhost"
+@@ -47,6 +49,7 @@ __BEGIN_DECLS
+ 
+ #define BT_PROFILE_GATT_ID "gatt"
+ #define BT_PROFILE_AV_RC_ID "avrcp"
++#define BT_PROFILE_AV_RC_CTRL_ID "avrcp_ctrl"
+ 
+ /** Bluetooth Address */
+ typedef struct {
+@@ -85,7 +88,8 @@ typedef enum {
+     BT_STATUS_PARM_INVALID,
+     BT_STATUS_UNHANDLED,
+     BT_STATUS_AUTH_FAILURE,
+-    BT_STATUS_RMT_DEV_DOWN
++    BT_STATUS_RMT_DEV_DOWN,
++    BT_STATUS_AUTH_REJECTED
+ 
+ } bt_status_t;
+ 
+@@ -94,6 +98,15 @@ typedef struct {
+     uint8_t pin[16];
+ } __attribute__((packed))bt_pin_code_t;
+ 
++typedef struct {
++    uint8_t status;
++    uint8_t ctrl_state;     /* stack reported state */
++    uint64_t tx_time;       /* in ms */
++    uint64_t rx_time;       /* in ms */
++    uint64_t idle_time;     /* in ms */
++    uint64_t energy_used;   /* a product of mA, V and ms */
++} __attribute__((packed))bt_activity_energy_info;
++
+ /** Bluetooth Adapter Discovery state */
+ typedef enum {
+     BT_DISCOVERY_STOPPED,
+@@ -128,6 +141,18 @@ typedef struct
+    int manufacturer;
+ } bt_remote_version_t;
+ 
++typedef struct
++{
++    uint8_t local_privacy_enabled;
++    uint8_t max_adv_instance;
++    uint8_t rpa_offload_supported;
++    uint8_t max_irk_list_size;
++    uint8_t max_adv_filter_supported;
++    uint8_t scan_result_storage_size_lobyte;
++    uint8_t scan_result_storage_size_hibyte;
++    uint8_t activity_energy_info_supported;
++}bt_local_le_features_t;
++
+ /* Bluetooth Adapter and Remote Device property types */
+ typedef enum {
+     /* Properties common to both adapter and remote device */
+@@ -210,6 +235,13 @@ typedef enum {
+ 
+     BT_PROPERTY_REMOTE_VERSION_INFO,
+ 
++    /**
++     * Description - Local LE features
++     * Access mode - GET.
++     * Data type   - bt_local_le_features_t.
++     */
++    BT_PROPERTY_LOCAL_LE_FEATURES,
++
+     BT_PROPERTY_REMOTE_DEVICE_TIMESTAMP = 0xFF,
+ } bt_property_type_t;
+ 
+@@ -221,6 +253,7 @@ typedef struct
+     void *val;
+ } bt_property_t;
+ 
++
+ /** Bluetooth Device Type */
+ typedef enum {
+     BT_DEVICE_DEVTYPE_BREDR = 0x1,
+@@ -323,6 +356,15 @@ typedef void (*dut_mode_recv_callback)(uint16_t opcode, uint8_t *buf, uint8_t le
+ * This callback shall be invoked whenever the le_tx_test, le_rx_test or le_test_end is invoked
+ * The num_packets is valid only for le_test_end command */
+ typedef void (*le_test_mode_callback)(bt_status_t status, uint16_t num_packets);
++
++/** Callback invoked when energy details are obtained */
++/* Ctrl_state-Current controller state-Active-1,scan-2,or idle-3 state as defined by HCI spec.
++ * If the ctrl_state value is 0, it means the API call failed
++ * Time values-In milliseconds as returned by the controller
++ * Energy used-Value as returned by the controller
++ * Status-Provides the status of the read_energy_info API call */
++typedef void (*energy_info_callback)(bt_activity_energy_info *energy_info);
++
+ /** TODO: Add callbacks for Link Up/Down and other generic
+   *  notifications/callbacks */
+ 
+@@ -342,8 +384,27 @@ typedef struct {
+     callback_thread_event thread_evt_cb;
+     dut_mode_recv_callback dut_mode_recv_cb;
+     le_test_mode_callback le_test_mode_cb;
++    energy_info_callback energy_info_cb;
+ } bt_callbacks_t;
+ 
++typedef void (*alarm_cb)(void *data);
++typedef bool (*set_wake_alarm_callout)(uint64_t delay_millis, bool should_wake, alarm_cb cb, void *data);
++typedef int (*acquire_wake_lock_callout)(const char *lock_name);
++typedef int (*release_wake_lock_callout)(const char *lock_name);
++
++/** The set of functions required by bluedroid to set wake alarms and
++  * grab wake locks. This struct is passed into the stack through the
++  * |set_os_callouts| function on |bt_interface_t|.
++  */
++typedef struct {
++  /* set to sizeof(bt_os_callouts_t) */
++  size_t size;
++
++  set_wake_alarm_callout set_wake_alarm;
++  acquire_wake_lock_callout acquire_wake_lock;
++  release_wake_lock_callout release_wake_lock;
++} bt_os_callouts_t;
++
+ /** NOTE: By default, no profiles are initialized at the time of init/enable.
+  *  Whenever the application invokes the 'init' API of a profile, then one of
+  *  the following shall occur:
+@@ -419,7 +480,7 @@ typedef struct {
+     int (*cancel_discovery)(void);
+ 
+     /** Create Bluetooth Bonding */
+-    int (*create_bond)(const bt_bdaddr_t *bd_addr);
++    int (*create_bond)(const bt_bdaddr_t *bd_addr, int transport);
+ 
+     /** Remove Bond */
+     int (*remove_bond)(const bt_bdaddr_t *bd_addr);
+@@ -427,6 +488,13 @@ typedef struct {
+     /** Cancel Bond */
+     int (*cancel_bond)(const bt_bdaddr_t *bd_addr);
+ 
++    /**
++     * Get the connection status for a given remote device.
++     * return value of 0 means the device is not connected,
++     * non-zero return status indicates an active connection.
++     */
++    int (*get_connection_state)(const bt_bdaddr_t *bd_addr);
++
+     /** BT Legacy PinKey Reply */
+     /** If accept==FALSE, then pin_len and pin_code shall be 0x0 */
+     int (*pin_reply)(const bt_bdaddr_t *bd_addr, uint8_t accept,
+@@ -455,6 +523,16 @@ typedef struct {
+ 
+     /* enable or disable bluetooth HCI snoop log */
+     int (*config_hci_snoop_log)(uint8_t enable);
++
++    /** Sets the OS call-out functions that bluedroid needs for alarms and wake locks.
++      * This should be called immediately after a successful |init|.
++      */
++    int (*set_os_callouts)(bt_os_callouts_t *callouts);
++
++    /** Read Energy info details - return value indicates BT_STATUS_SUCCESS or BT_STATUS_NOT_READY
++      * Success indicates that the VSC command was sent to controller
++      */
++    int (*read_energy_info)();
+ } bt_interface_t;
+ 
+ /** TODO: Need to add APIs for Service Discovery, Service authorization and
+-- 
+1.9.1
 
-/gattrib/register: **
-ERROR:unit/test-gattrib.c:479:test_register: assertion failed:
-(current_pdu->received)
-
-Also, we need to make sure it does cause any regressions to android-tester:
-
->sudo android/android-tester -d -p "Gatt":
-
-Test Summary
-------------
-Gatt Init                                            Passed       0.012 seconds
-Gatt Client - Register                               Passed       0.012 seconds
-Gatt Client - Unregister                             Passed       0.013 seconds
-Gatt Client - Scan                                   Passed       0.018 seconds
-Gatt Client - LE Connect                             Passed       0.037 seconds
-Gatt Client - LE Disconnect                          Passed       0.042 seconds
-Gatt Client - LE Multiple Client Conn./Disc.         Passed       0.036 seconds
-Gatt Client - Listen and Disconnect                  Passed       0.035 seconds
-Gatt Client - Double Listen                          Passed       0.065 seconds
-Gatt Client - Search Service - Single                Timed out    3.420 seconds
-Gatt Client - Search Service - Multiple              Timed out    3.004 seconds
-Gatt Client - Search Service - None                  Passed       0.043 seconds
-Gatt Client - Get Characteristic - Single            Timed out    2.964 seconds
-Gatt Client - Get Characteristic - None              Passed       0.041 seconds
-Gatt Client - Get Descriptor - Single                Timed out    2.948 seconds
-Gatt Client - Get Descriptor - Multiple              Timed out    3.000 seconds
-Gatt Client - Get Descriptor - None                  Timed out    3.002 seconds
-Gatt Client - Get Included Service - 16 UUID         Timed out    3.005 seconds
-Gatt Client - Get Included Service - 128 UUID        Timed out    2.999 seconds
-Gatt Client - Get Included Service - None            Timed out    2.996 seconds
-Gatt Client - Read Characteristic - Success          Timed out    2.999 seconds
-Gatt Client - Read Characteristic - Insuf. Auth.     Timed out    2.998 seconds
-Gatt Client - Read Characteristic - Wrong params     Timed out    3.001 seconds
-Gatt Client - Read Descriptor - Success              Timed out    3.009 seconds
-Gatt Client - Read Descriptor - Insuf. Auth.         Timed out    2.992 seconds
-Gatt Client - Read Descriptor - Wrong params         Timed out    3.006 seconds
-Gatt Client - Write Characteristic Cmd - Success     Timed out    3.000 seconds
-Gatt Client - Write Characteristic Req - Success     Timed out    3.004 seconds
-Gatt Client - Write Characteristic - Insuf. Auth.    Timed out    2.991 seconds
-Gatt Client - Write Characteristic - Wrong Params    Passed       0.018 seconds
-Gatt Client - Register For Notification - Success    Timed out    2.977 seconds
-Gatt Client - Deregister For Notification - Success  Timed out    3.010 seconds
-Gatt Client - Register For Notification - Indicate   Timed out    3.001 seconds
-Gatt Client - Register For Notification - Notify     Timed out    2.994 seconds
-Gatt Client - Write Descriptor - Success             Timed out    3.002 seconds
-Gatt Client - Write Descriptor - Insuf. Auth.        Timed out    2.999 seconds
-Gatt Client - Write Descriptor - Wrong Param         Timed out    3.001 seconds
-Gatt Server - Register                               Passed       0.027 seconds
-Gatt Server - Unregister                             Passed       0.021 seconds
-Gatt Server - LE Connect                             Passed       0.039 seconds
-Gatt Server - LE Disconnect                          Passed       0.036 seconds
-Gatt Server - LE Multiple Server Conn./Disc          Passed       0.032 seconds
-Gatt Server - Add Single Service Successful          Passed       0.016 seconds
-Gatt Server - Add Multiple Services Successful       Passed       0.016 seconds
-Gatt Server - Add Service with 0 handles             Passed       0.013 seconds
-Gatt Server - Add Secondary Service                  Passed       0.012 seconds
-Gatt Server - Add Included Service Successful        Passed       0.015 seconds
-Gatt Server - Add Inc. Service with wrong handle     Passed       0.014 seconds
-Gatt Server - Add Single Characteristic Successful   Passed       0.018 seconds
-Gatt Server - Add Char. wrong service handle         Passed       0.015 seconds
-Gatt Server - Add Single Descriptor Successful       Passed       0.017 seconds
-Gatt Server - Add Desc. wrong service handle         Passed       0.015 seconds
-Gatt Server - Add Desc. wrong app ID                 Passed       0.013 seconds
-Gatt Server - Start Service Successful BREDRLE       Passed       0.014 seconds
-Gatt Server - Start Service Successful LE            Passed       0.016 seconds
-Gatt Server - Start Service wrong service handle     Passed       0.014 seconds
-Gatt Server - Start Service wrong server transport   Passed       0.016 seconds
-Gatt Server - Stop Service Successful                Passed       0.015 seconds
-Gatt Server - Stop Service wrong service handle      Passed       0.017 seconds
-Gatt Server - Delete Service Successful              Passed       0.014 seconds
-Gatt Server - Delete Service wrong handle            Passed       0.017 seconds
-Gatt Server - Send Indication                        Timed out    3.557 seconds
-Gatt Server - Send Notification                      Passed       0.033 seconds
-Gatt Server - Send Notification, wrong conn id       Passed       0.031 seconds
-Gatt Server - Send response to read char request     Timed out    2.943 seconds
-Gatt Server - Send response to write char request    Timed out    2.997 seconds
-
-Total: 66, Passed: 38 (57.6%), Failed: 28, Not Run: 0
