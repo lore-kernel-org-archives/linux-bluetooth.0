@@ -1,44 +1,97 @@
 Return-Path: <cyrus@holtmann.org>
-From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
-Subject: [PATCH 1/4] android/gatt: Fix using wrong variable type
-Date: Thu,  6 Nov 2014 10:30:35 +0100
-Message-Id: <1415266238-12423-1-git-send-email-jakub.tyszkowski@tieto.com>
+Subject: [PATCH 03/14] android/handsfree: Add support for new API for hangup_call_cmd_cb
+Date: Thu,  6 Nov 2014 10:31:58 +0200
+Message-Id: <1415262729-12573-4-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1415262729-12573-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1415262729-12573-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Not all bytes were set thus the following valgrind report:
-==4748== Conditional jump or move depends on uninitialised value(s)
-==4748==    at 0x436493: att_handler (gatt.c:5922)
-==4748==    by 0x4448ED: received_data.part.2 (gattrib.c:432)
-==4748==    by 0x4E7FCE4: g_main_context_dispatch (in
-/lib/x86_64-linux-gnu/libglib-2.0.so.0.4002.0)
-==4748==    by 0x4E80047: ??? (in
-/lib/x86_64-linux-gnu/libglib-2.0.so.0.4002.0)
-==4748==    by 0x4E80309: g_main_loop_run (in
-/lib/x86_64-linux-gnu/libglib-2.0.so.0.4002.0)
-==4748==    by 0x4045B6: main (main.c:772)
-==4748==  Uninitialised value was created by a stack allocation
-==4748==    at 0x432690: get_cid.isra.5 (gatt.c:2983)
-==4748==
----
- android/gatt.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-diff --git a/android/gatt.c b/android/gatt.c
-index 7cf612f..d601cda 100644
---- a/android/gatt.c
-+++ b/android/gatt.c
-@@ -2965,7 +2965,7 @@ static void read_char_cb(guint8 status, const guint8 *pdu, guint16 len,
- static int get_cid(struct gatt_device *dev)
+Hangup Call Command notification callback has new parameter bdaddr.
+Currently use global device bdaddr.
+---
+ android/hal-handsfree.c | 9 ++++++++-
+ android/hal-ipc-api.txt | 2 +-
+ android/hal-msg.h       | 3 +++
+ android/handsfree.c     | 5 ++++-
+ 4 files changed, 16 insertions(+), 3 deletions(-)
+
+diff --git a/android/hal-handsfree.c b/android/hal-handsfree.c
+index f1ddfe1..dc40a17 100644
+--- a/android/hal-handsfree.c
++++ b/android/hal-handsfree.c
+@@ -80,8 +80,15 @@ static void handle_answer(void *buf, uint16_t len, int fd)
+ 
+ static void handle_hangup(void *buf, uint16_t len, int fd)
  {
- 	GIOChannel *io;
--	int cid;
-+	uint16_t cid;
+-	if (cbs->hangup_call_cmd_cb)
++	if (cbs->hangup_call_cmd_cb) {
++#if ANDROID_VERSION >= PLATFORM_VER(5, 0, 0)
++		struct hal_ev_handsfree_hangup *ev = buf;
++
++		cbs->hangup_call_cmd_cb((bt_bdaddr_t *) (ev->bdaddr));
++#else
+ 		cbs->hangup_call_cmd_cb();
++#endif
++	}
+ }
  
- 	io = g_attrib_get_channel(dev->attrib);
+ static void handle_volume(void *buf, uint16_t len, int fd)
+diff --git a/android/hal-ipc-api.txt b/android/hal-ipc-api.txt
+index 48d30c9..751c6ee 100644
+--- a/android/hal-ipc-api.txt
++++ b/android/hal-ipc-api.txt
+@@ -1019,7 +1019,7 @@ Notifications:
  
+ 	Opcode 0x85 - Hangup Call Command notification
+ 
+-		Notification parameters: <none>
++		Notification parameters: Remote address (6 octets)
+ 
+ 	Opcode 0x86 - Volume Command notification
+ 
+diff --git a/android/hal-msg.h b/android/hal-msg.h
+index 195e26c..0abbb1f7 100644
+--- a/android/hal-msg.h
++++ b/android/hal-msg.h
+@@ -1355,6 +1355,9 @@ struct hal_ev_handsfree_answer {
+ } __attribute__((packed));
+ 
+ #define HAL_EV_HANDSFREE_HANGUP		0x85
++struct hal_ev_handsfree_hangup {
++	uint8_t bdaddr[6];
++} __attribute__((packed));
+ 
+ #define HAL_EV_HANDSFREE_VOLUME		0x86
+ struct hal_ev_handsfree_volume {
+diff --git a/android/handsfree.c b/android/handsfree.c
+index 1525630..46f9a5d 100644
+--- a/android/handsfree.c
++++ b/android/handsfree.c
+@@ -596,6 +596,7 @@ static void at_cmd_chup(struct hfp_context *context,
+ 				enum hfp_gw_cmd_type type, void *user_data)
+ {
+ 	struct hf_device *dev = user_data;
++	struct hal_ev_handsfree_hangup ev;
+ 
+ 	DBG("");
+ 
+@@ -604,8 +605,10 @@ static void at_cmd_chup(struct hfp_context *context,
+ 		if (hfp_context_has_next(context))
+ 			break;
+ 
++		bdaddr2android(&dev->bdaddr, ev.bdaddr);
++
+ 		ipc_send_notif(hal_ipc, HAL_SERVICE_ID_HANDSFREE,
+-					HAL_EV_HANDSFREE_HANGUP, 0, NULL);
++				HAL_EV_HANDSFREE_HANGUP, sizeof(ev), &ev);
+ 
+ 		/* Framework is not replying with result for AT+CHUP */
+ 		hfp_gw_send_result(dev->gw, HFP_RESULT_OK);
 -- 
 1.9.1
 
