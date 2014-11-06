@@ -1,40 +1,78 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] android/tester: Fix typo in function name
-Date: Thu,  6 Nov 2014 16:29:41 +0200
-Message-Id: <1415284181-11427-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <1415278034-19223-3-git-send-email-marcin.kraglak@tieto.com>
+References: <1415278034-19223-1-git-send-email-marcin.kraglak@tieto.com>
+	<1415278034-19223-3-git-send-email-marcin.kraglak@tieto.com>
+Date: Thu, 6 Nov 2014 15:45:50 +0200
+Message-ID: <CABBYNZJbCQSSPAuK-GaqEmar-i79vgsGTcA5Xv+xs-8wY55Hkw@mail.gmail.com>
+Subject: Re: [PATCH 3/9] shared/gatt: Fix memory leak in discovery_op_unref
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Marcin Kraglak <marcin.kraglak@tieto.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Hi Marcin,
 
----
- android/tester-main.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+On Thu, Nov 6, 2014 at 2:47 PM, Marcin Kraglak <marcin.kraglak@tieto.com> wrote:
+> Free services list in discovery_op_unref. If discovery has been
+> interrupted, services from discovery_op were not pushed to
+> gatt_client service list, and it caused memory leak.
+> ---
 
-diff --git a/android/tester-main.c b/android/tester-main.c
-index 4d22249..ec03aa1 100644
---- a/android/tester-main.c
-+++ b/android/tester-main.c
-@@ -1339,7 +1339,7 @@ static void hidhost_connection_state_cb(bt_bdaddr_t *bd_addr,
- 	schedule_callback_verification(step);
- }
- 
--static void hidhost_virual_unplug_cb(bt_bdaddr_t *bd_addr, bthh_status_t status)
-+static void hidhost_virtual_unplug_cb(bt_bdaddr_t *bd_addr, bthh_status_t status)
- {
- 	struct step *step = g_new0(struct step, 1);
- 
-@@ -1393,7 +1393,7 @@ static bthh_callbacks_t bthh_callbacks = {
- 	.protocol_mode_cb = hidhost_protocol_mode_cb,
- 	.idle_time_cb = NULL,
- 	.get_report_cb = hidhost_get_report_cb,
--	.virtual_unplug_cb = hidhost_virual_unplug_cb
-+	.virtual_unplug_cb = hidhost_virtual_unplug_cb
- };
- 
- static void gattc_register_client_cb(int status, int client_if,
+Please add the backtrace if you have it.
+
+>  src/shared/gatt-client.c | 10 +++++++---
+>  1 file changed, 7 insertions(+), 3 deletions(-)
+>
+> diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
+> index 8689368..b4f28b2 100644
+> --- a/src/shared/gatt-client.c
+> +++ b/src/shared/gatt-client.c
+> @@ -411,6 +411,8 @@ static void discovery_op_unref(void *data)
+>         if (__sync_sub_and_fetch(&op->ref_count, 1))
+>                 return;
+>
+> +       service_list_clear(&op->result_head, &op->result_tail);
+> +
+>         free(data);
+>  }
+>
+> @@ -1140,6 +1142,10 @@ static void init_complete(struct discovery_op *op, bool success,
+>         client->svc_head = op->result_head;
+>         client->svc_tail = op->result_tail;
+>
+> +       /* Change owner of service list */
+> +       op->result_head = NULL;
+> +       op->result_tail = NULL;
+> +
+>         if (!client->svc_chngd_val_handle) {
+>                 client->ready = true;
+>                 goto done;
+> @@ -1164,12 +1170,10 @@ static void init_complete(struct discovery_op *op, bool success,
+>         util_debug(client->debug_callback, client->debug_data,
+>                         "Failed to register handler for \"Service Changed\"");
+>
+> -       client->svc_head = client->svc_tail = NULL;
+> -
+>  fail:
+>         util_debug(client->debug_callback, client->debug_data,
+>                         "Failed to initialize gatt-client");
+> -       service_list_clear(&op->result_head, &op->result_tail);
+> +       service_list_clear(&client->svc_head, &client->svc_head);
+>
+>  done:
+>         if (client->ready_callback)
+> --
+> 1.9.3
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+
+
 -- 
-1.9.1
-
+Luiz Augusto von Dentz
