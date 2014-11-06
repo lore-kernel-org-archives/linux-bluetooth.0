@@ -1,76 +1,65 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1415278034-19223-3-git-send-email-marcin.kraglak@tieto.com>
-References: <1415278034-19223-1-git-send-email-marcin.kraglak@tieto.com>
-	<1415278034-19223-3-git-send-email-marcin.kraglak@tieto.com>
-Date: Thu, 6 Nov 2014 15:45:50 +0200
-Message-ID: <CABBYNZJbCQSSPAuK-GaqEmar-i79vgsGTcA5Xv+xs-8wY55Hkw@mail.gmail.com>
-Subject: Re: [PATCH 3/9] shared/gatt: Fix memory leak in discovery_op_unref
+In-Reply-To: <1415266238-12423-4-git-send-email-jakub.tyszkowski@tieto.com>
+References: <1415266238-12423-1-git-send-email-jakub.tyszkowski@tieto.com>
+	<1415266238-12423-4-git-send-email-jakub.tyszkowski@tieto.com>
+Date: Thu, 6 Nov 2014 15:43:14 +0200
+Message-ID: <CABBYNZ+dZTiaMqw6F256zRzXP-0Z4oq8puGOegu_wXiMT6muBQ@mail.gmail.com>
+Subject: Re: [PATCH 4/4] android/gatt: Use proper identity address for auto connect
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Marcin Kraglak <marcin.kraglak@tieto.com>
+To: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
 Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcin,
+Hi Jakub,
 
-On Thu, Nov 6, 2014 at 2:47 PM, Marcin Kraglak <marcin.kraglak@tieto.com> wrote:
-> Free services list in discovery_op_unref. If discovery has been
-> interrupted, services from discovery_op were not pushed to
-> gatt_client service list, and it caused memory leak.
+On Thu, Nov 6, 2014 at 11:30 AM, Jakub Tyszkowski
+<jakub.tyszkowski@tieto.com> wrote:
+> We should behave the same as whe nwe connect using active scan.
 > ---
-
-Please add the backtrace if you have it.
-
->  src/shared/gatt-client.c | 10 +++++++---
->  1 file changed, 7 insertions(+), 3 deletions(-)
+>  android/gatt.c | 20 ++++++++++++++++++--
+>  1 file changed, 18 insertions(+), 2 deletions(-)
 >
-> diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
-> index 8689368..b4f28b2 100644
-> --- a/src/shared/gatt-client.c
-> +++ b/src/shared/gatt-client.c
-> @@ -411,6 +411,8 @@ static void discovery_op_unref(void *data)
->         if (__sync_sub_and_fetch(&op->ref_count, 1))
->                 return;
->
-> +       service_list_clear(&op->result_head, &op->result_tail);
+> diff --git a/android/gatt.c b/android/gatt.c
+> index 47dadc2..8cc7536 100644
+> --- a/android/gatt.c
+> +++ b/android/gatt.c
+> @@ -583,8 +583,24 @@ static void device_set_state(struct gatt_device *dev, uint32_t state)
+>  static bool auto_connect_le(struct gatt_device *dev)
+>  {
+>         /*  For LE devices use auto connect feature if possible */
+> -       if (bt_kernel_conn_control())
+> -               return  bt_auto_connect_add(&dev->bdaddr);
+> +       if (bt_kernel_conn_control()) {
+> +               const bdaddr_t *bdaddr;
 > +
->         free(data);
->  }
->
-> @@ -1140,6 +1142,10 @@ static void init_complete(struct discovery_op *op, bool success,
->         client->svc_head = op->result_head;
->         client->svc_tail = op->result_tail;
->
-> +       /* Change owner of service list */
-> +       op->result_head = NULL;
-> +       op->result_tail = NULL;
+> +               /*
+> +                * If address type is random it might be that IRK was received
+> +                * and random is just for faking Android Framework. ID address
+> +                * should be used for connection if present.
+> +                */
+> +               if (dev->bdaddr_type == BDADDR_LE_RANDOM) {
+> +                       bdaddr = bt_get_id_addr(&dev->bdaddr, NULL);
+> +                       if (!bdaddr)
+> +                               return -EINVAL;
+> +               } else {
+> +                       bdaddr = &dev->bdaddr;
+> +               }
 > +
->         if (!client->svc_chngd_val_handle) {
->                 client->ready = true;
->                 goto done;
-> @@ -1164,12 +1170,10 @@ static void init_complete(struct discovery_op *op, bool success,
->         util_debug(client->debug_callback, client->debug_data,
->                         "Failed to register handler for \"Service Changed\"");
+> +               return bt_auto_connect_add(bdaddr);
+> +       }
 >
-> -       client->svc_head = client->svc_tail = NULL;
-> -
->  fail:
->         util_debug(client->debug_callback, client->debug_data,
->                         "Failed to initialize gatt-client");
-> -       service_list_clear(&op->result_head, &op->result_tail);
-> +       service_list_clear(&client->svc_head, &client->svc_head);
->
->  done:
->         if (client->ready_callback)
+>         /* Trigger discovery if not already started */
+>         if (!scanning) {
 > --
-> 1.9.3
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> 1.9.1
+
+Perhaps this would be better done inside bt_auto_connect_add since
+anyway bt_get_id_addr is in bluetooth.c, actually perhaps
+auto_connect_le is not really necessary since bt_auto_connect_add
+should be able to do the checks done here.
 
 
 
