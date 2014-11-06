@@ -1,58 +1,35 @@
 Return-Path: <cyrus@holtmann.org>
-From: Marcin Kraglak <marcin.kraglak@tieto.com>
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 2/9] unit/test-gatt: Add TP/GAD/CL/BV-06-C test
-Date: Thu,  6 Nov 2014 13:47:07 +0100
-Message-Id: <1415278034-19223-2-git-send-email-marcin.kraglak@tieto.com>
-In-Reply-To: <1415278034-19223-1-git-send-email-marcin.kraglak@tieto.com>
-References: <1415278034-19223-1-git-send-email-marcin.kraglak@tieto.com>
+Subject: [PATCHv2] android/handsfree: Return default device for zero bdaddr
+Date: Thu,  6 Nov 2014 14:45:58 +0200
+Message-Id: <1415277958-26589-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <4917512.kiFJOhNPJF@uw000953>
+References: <4917512.kiFJOhNPJF@uw000953>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Verify that a Generic Attribute Profile client can find all
-Descriptors of a specified Characteristic.
----
- unit/test-gatt.c | 21 +++++++++++++++++++++
- 1 file changed, 21 insertions(+)
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-diff --git a/unit/test-gatt.c b/unit/test-gatt.c
-index f343fe6..a2ca5b6 100644
---- a/unit/test-gatt.c
-+++ b/unit/test-gatt.c
-@@ -334,6 +334,17 @@ static void test_search_chars(gconstpointer data)
- 	execute_context(context);
- }
+For the old Android API use find_default_device() function.
+---
+ android/handsfree.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/android/handsfree.c b/android/handsfree.c
+index b410f5d..33fcbdd 100644
+--- a/android/handsfree.c
++++ b/android/handsfree.c
+@@ -290,6 +290,9 @@ static bool match_by_bdaddr(const void *data, const void *match_data)
  
-+static void test_search_descs(gconstpointer data)
-+{
-+	struct context *context = create_context(512, data);
-+
-+	g_assert(bt_gatt_discover_descriptors(context->att, 0x0013, 0x0016,
-+							generic_search_cb,
-+							context, NULL));
-+
-+	execute_context(context);
-+}
-+
- int main(int argc, char *argv[])
+ static struct hf_device *find_device(const bdaddr_t *bdaddr)
  {
- 	g_test_init(&argc, &argv, NULL);
-@@ -429,5 +440,15 @@ int main(int argc, char *argv[])
- 			raw_pdu(0x08, 0x14, 0x00, 0x20, 0x00, 0x03, 0x28),
- 			raw_pdu(0x01, 0x08, 0x12, 0x00, 0x0a));
- 
-+	define_test("/TP/GAD/CL/BV-06-C", test_search_descs, ATT, NULL,
-+			raw_pdu(0x02, 0x00, 0x02),
-+			raw_pdu(0x03, 0x00, 0x02),
-+			raw_pdu(0x04, 0x13, 0x00, 0x16, 0x00),
-+			raw_pdu(0x05, 0x01, 0x13, 0x00, 0x02, 0x29, 0x14, 0x00,
-+					0x03, 0x29),
-+			raw_pdu(0x04, 0x15, 0x00, 0x16, 0x00),
-+			raw_pdu(0x05, 0x01, 0x15, 0x00, 0x04, 0x29, 0x16, 0x00,
-+					0x05, 0x29));
++	if (!bacmp(bdaddr, BDADDR_ANY))
++		return find_default_device();
 +
- 	return g_test_run();
+ 	return queue_find(devices, match_by_bdaddr, bdaddr);
  }
+ 
 -- 
-1.9.3
+1.9.1
 
