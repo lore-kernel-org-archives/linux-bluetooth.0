@@ -2,79 +2,50 @@ Return-Path: <cyrus@holtmann.org>
 From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
-Subject: [PATCH] tools/mcaptest: Don't block main loop when disconnection is expected
-Date: Thu,  6 Nov 2014 10:33:05 +0100
-Message-Id: <1415266385-18293-1-git-send-email-jakub.tyszkowski@tieto.com>
+Subject: [PATCH 4/4] android/gatt: Use proper identity address for auto connect
+Date: Thu,  6 Nov 2014 10:30:38 +0100
+Message-Id: <1415266238-12423-4-git-send-email-jakub.tyszkowski@tieto.com>
+In-Reply-To: <1415266238-12423-1-git-send-email-jakub.tyszkowski@tieto.com>
+References: <1415266238-12423-1-git-send-email-jakub.tyszkowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This triggers action after timeout without using sleep which was
-blocking main loop and mcaplib.
+We should behave the same as whe nwe connect using active scan.
 ---
- tools/mcaptest.c | 37 +++++++++++++++++++++++++------------
- 1 file changed, 25 insertions(+), 12 deletions(-)
+ android/gatt.c | 20 ++++++++++++++++++--
+ 1 file changed, 18 insertions(+), 2 deletions(-)
 
-diff --git a/tools/mcaptest.c b/tools/mcaptest.c
-index 42734eb..bebc890 100644
---- a/tools/mcaptest.c
-+++ b/tools/mcaptest.c
-@@ -71,31 +71,44 @@ static gboolean no_close = FALSE;
- 
- #define REQ_CLOCK_ACC 0x1400
- 
--static void mdl_connected_cb(struct mcap_mdl *mdl, void *data)
-+static gboolean close_mdl_timeout(gpointer user_data)
+diff --git a/android/gatt.c b/android/gatt.c
+index 47dadc2..8cc7536 100644
+--- a/android/gatt.c
++++ b/android/gatt.c
+@@ -583,8 +583,24 @@ static void device_set_state(struct gatt_device *dev, uint32_t state)
+ static bool auto_connect_le(struct gatt_device *dev)
  {
-+	struct mcap_mdl *mdl = user_data;
- 	int fd = -1;
- 
-+	fd = mcap_mdl_get_fd(mdl);
+ 	/*  For LE devices use auto connect feature if possible */
+-	if (bt_kernel_conn_control())
+-		return  bt_auto_connect_add(&dev->bdaddr);
++	if (bt_kernel_conn_control()) {
++		const bdaddr_t *bdaddr;
 +
-+	if (fd > 0)
-+		close(fd);
++		/*
++		 * If address type is random it might be that IRK was received
++		 * and random is just for faking Android Framework. ID address
++		 * should be used for connection if present.
++		 */
++		if (dev->bdaddr_type == BDADDR_LE_RANDOM) {
++			bdaddr = bt_get_id_addr(&dev->bdaddr, NULL);
++			if (!bdaddr)
++				return -EINVAL;
++		} else {
++			bdaddr = &dev->bdaddr;
++		}
 +
-+	return FALSE;
-+}
-+
-+static void mdl_connected_cb(struct mcap_mdl *mdl, void *data)
-+{
- 	printf("%s\n", __func__);
++		return bt_auto_connect_add(bdaddr);
++	}
  
--	if (mdl_disconnect && mdl_disconnect_timeout >= 0) {
--		sleep(mdl_disconnect_timeout);
-+	if (mdl_disconnect && mdl_disconnect_timeout >= 0)
-+		g_timeout_add(mdl_disconnect_timeout * 1000, close_mdl_timeout,
-+									mdl);
-+}
- 
--		fd = mcap_mdl_get_fd(mdl);
-+static gboolean close_mcl_timeout(gpointer user_data)
-+{
-+	struct mcap_mcl *mcl = user_data;
- 
--		if (fd > 0)
--			close(fd);
--	}
-+	mcap_close_mcl(mcl, TRUE);
-+
-+	return FALSE;
- }
- 
- static void mdl_closed_cb(struct mcap_mdl *mdl, void *data)
- {
- 	printf("%s\n", __func__);
- 
--	if (mcl_disconnect && mcl_disconnect_timeout >= 0) {
--		sleep(mcl_disconnect_timeout);
--
--		mcap_close_mcl(mcl, TRUE);
--	}
-+	if (mcl_disconnect && mcl_disconnect_timeout >= 0)
-+		g_timeout_add(mcl_disconnect_timeout * 1000, close_mcl_timeout,
-+									mcl);
- }
- 
- static void mdl_deleted_cb(struct mcap_mdl *mdl, void *data)
+ 	/* Trigger discovery if not already started */
+ 	if (!scanning) {
 -- 
 1.9.1
 
