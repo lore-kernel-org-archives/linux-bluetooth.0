@@ -1,43 +1,81 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 8.0 \(1990.1\))
-Subject: Re: [PATCHv2 1/2] Bluetooth: Clear role switch pending flag
-From: Marcel Holtmann <marcel@holtmann.org>
+From: Kuba Pawlak <kubax.t.pawlak@intel.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Kuba Pawlak <kubax.t.pawlak@intel.com>
+Subject: [PATCHv2 2/2] Bluetooth: Sort switch cases by opcode's numeric value
+Date: Thu,  6 Nov 2014 19:36:53 +0100
+Message-Id: <1415299013-24580-2-git-send-email-kubax.t.pawlak@intel.com>
 In-Reply-To: <1415299013-24580-1-git-send-email-kubax.t.pawlak@intel.com>
-Date: Thu, 6 Nov 2014 10:41:03 -0800
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <3987A164-2161-4E21-A33D-13ACD2A14CF2@holtmann.org>
 References: <1415299013-24580-1-git-send-email-kubax.t.pawlak@intel.com>
-To: Kuba Pawlak <kubax.t.pawlak@intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Kuba,
+Opcodes in switch/case in hci_cmd_status_evt are not sorted
+by value. This patch restores proper ordering.
 
-> If role switch was rejected by the controller and HCI Event: Command Status
-> returned with status "Command Disallowed" (0x0C) the flag
-> HCI_CONN_RSWITCH_PEND remains set. No further role switches are
-> possible as this flag prevents us from sending any new HCI Switch Role
-> requests and the only way to clear it is to receive a valid
-> HCI Event Switch Role.
-> 
-> This patch clears the flag if command was rejected.
-> 
-> 2013-01-01 00:03:44.209913 < HCI Command: Switch Role (0x02|0x000b) plen 7
->    bdaddr BC:C6:DB:C4:6F:79 role 0x00
->    Role: Master
-> 2013-01-01 00:03:44.210867 > HCI Event: Command Status (0x0f) plen 4
->    Switch Role (0x02|0x000b) status 0x0c ncmd 1
->    Error: Command Disallowed
-> 
-> Signed-off-by: Kuba Pawlak <kubax.t.pawlak@intel.com>
-> ---
-> net/bluetooth/hci_event.c | 27 +++++++++++++++++++++++++++
-> 1 file changed, 27 insertions(+)
+Signed-off-by: Kuba Pawlak <kubax.t.pawlak@intel.com>
+---
+ net/bluetooth/hci_event.c | 24 ++++++++++++------------
+ 1 file changed, 12 insertions(+), 12 deletions(-)
 
-patch has been applied to bluetooth-next tree.
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 73d9bb4..5e7be80 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -2873,6 +2873,10 @@ static void hci_cmd_status_evt(struct hci_dev *hdev, struct sk_buff *skb)
+ 		hci_cs_create_conn(hdev, ev->status);
+ 		break;
+ 
++	case HCI_OP_DISCONNECT:
++		hci_cs_disconnect(hdev, ev->status);
++		break;
++
+ 	case HCI_OP_ADD_SCO:
+ 		hci_cs_add_sco(hdev, ev->status);
+ 		break;
+@@ -2901,6 +2905,14 @@ static void hci_cmd_status_evt(struct hci_dev *hdev, struct sk_buff *skb)
+ 		hci_cs_setup_sync_conn(hdev, ev->status);
+ 		break;
+ 
++	case HCI_OP_CREATE_PHY_LINK:
++		hci_cs_create_phylink(hdev, ev->status);
++		break;
++
++	case HCI_OP_ACCEPT_PHY_LINK:
++		hci_cs_accept_phylink(hdev, ev->status);
++		break;
++
+ 	case HCI_OP_SNIFF_MODE:
+ 		hci_cs_sniff_mode(hdev, ev->status);
+ 		break;
+@@ -2913,18 +2925,6 @@ static void hci_cmd_status_evt(struct hci_dev *hdev, struct sk_buff *skb)
+ 		hci_cs_switch_role(hdev, ev->status);
+ 		break;
+ 
+-	case HCI_OP_DISCONNECT:
+-		hci_cs_disconnect(hdev, ev->status);
+-		break;
+-
+-	case HCI_OP_CREATE_PHY_LINK:
+-		hci_cs_create_phylink(hdev, ev->status);
+-		break;
+-
+-	case HCI_OP_ACCEPT_PHY_LINK:
+-		hci_cs_accept_phylink(hdev, ev->status);
+-		break;
+-
+ 	case HCI_OP_LE_CREATE_CONN:
+ 		hci_cs_le_create_conn(hdev, ev->status);
+ 		break;
+-- 
+1.7.11.7
 
-Regards
-
-Marcel
+Intel GmbH
+Dornacher Strasse 1
+85622 Feldkirchen/Muenchen, Deutschland
+Sitz der Gesellschaft: Feldkirchen bei Muenchen
+Geschaeftsfuehrer: Christian Lamprechter, Hannes Schwaderer, Douglas Lusk
+Registergericht: Muenchen HRB 47456
+Ust.-IdNr./VAT Registration No.: DE129385895
+Citibank Frankfurt a.M. (BLZ 502 109 00) 600119052
 
