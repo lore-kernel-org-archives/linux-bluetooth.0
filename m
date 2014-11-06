@@ -1,46 +1,77 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+From: Marcin Kraglak <marcin.kraglak@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 3/3] android/handsfree: Use bdaddr provided for find_device()
-Date: Thu,  6 Nov 2014 14:55:08 +0200
-Message-Id: <1415278508-3929-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1415278508-3929-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1415278508-3929-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCH 9/9] unit/test-gatt: Add TP/GAR/CL/BI-03-C test
+Date: Thu,  6 Nov 2014 13:47:14 +0100
+Message-Id: <1415278034-19223-9-git-send-email-marcin.kraglak@tieto.com>
+In-Reply-To: <1415278034-19223-1-git-send-email-marcin.kraglak@tieto.com>
+References: <1415278034-19223-1-git-send-email-marcin.kraglak@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-
+Verify Generic Attribute Profile client behavior when
+the Read Characteristic Value procedure fails due to
+insufficient authorization.
 ---
- android/handsfree.c | 10 +++++++---
- 1 file changed, 7 insertions(+), 3 deletions(-)
+ unit/test-gatt.c | 39 +++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 39 insertions(+)
 
-diff --git a/android/handsfree.c b/android/handsfree.c
-index 33fcbdd..9a2fdd0 100644
---- a/android/handsfree.c
-+++ b/android/handsfree.c
-@@ -2904,14 +2904,18 @@ static void disable_sco_server(void)
+diff --git a/unit/test-gatt.c b/unit/test-gatt.c
+index 6208192..39cdda3 100644
+--- a/unit/test-gatt.c
++++ b/unit/test-gatt.c
+@@ -510,6 +510,12 @@ const struct test_step test_read_3 = {
+ 	.expected_att_ecode = 0x02,
+ };
  
- static void bt_sco_get_fd(const void *buf, uint16_t len)
- {
--	int fd;
--	GError *err;
-+	const struct sco_cmd_get_fd *cmd = buf;
- 	struct sco_rsp_get_fd rsp;
- 	struct hf_device *dev;
-+	bdaddr_t bdaddr;
-+	GError *err;
-+	int fd;
- 
- 	DBG("");
- 
--	dev = find_default_device();
-+	android2bdaddr(cmd->bdaddr, &bdaddr);
++const struct test_step test_read_4 = {
++	.handle = 0x0003,
++	.func = test_read,
++	.expected_att_ecode = 0x08,
++};
 +
-+	dev = find_device(&bdaddr);
- 	if (!dev || !dev->sco)
- 		goto failed;
+ static void test_client(gconstpointer data)
+ {
+ 	struct context *context = create_context(512, data);
+@@ -767,5 +773,38 @@ int main(int argc, char *argv[])
+ 			raw_pdu(0x0a, 0x03, 0x00),
+ 			raw_pdu(0x01, 0x0a, 0x03, 0x00, 0x02));
  
++	define_test_client("/TP/GAR/CL/BI-03-C", test_client, service_data_1,
++			&test_read_4,
++			raw_pdu(0x02, 0x00, 0x02),
++			raw_pdu(0x03, 0x00, 0x02),
++			raw_pdu(0x10, 0x01, 0x00, 0xff, 0xff, 0x00, 0x28),
++			raw_pdu(0x11, 0x06, 0x01, 0x00, 0x04, 0x00, 0x01, 0x18),
++			raw_pdu(0x10, 0x05, 0x00, 0xff, 0xff, 0x00, 0x28),
++			raw_pdu(0x11, 0x06, 0x05, 0x00, 0x08, 0x00, 0x0d, 0x18),
++			raw_pdu(0x10, 0x09, 0x00, 0xff, 0xff, 0x00, 0x28),
++			raw_pdu(0x01, 0x10, 0x09, 0x00, 0x0a),
++			raw_pdu(0x10, 0x01, 0x00, 0xff, 0xff, 0x01, 0x28),
++			raw_pdu(0x01, 0x10, 0x01, 0x00, 0x0a),
++			raw_pdu(0x08, 0x01, 0x00, 0x04, 0x00, 0x02, 0x28),
++			raw_pdu(0x01, 0x08, 0x01, 0x00, 0x0a),
++			raw_pdu(0x08, 0x05, 0x00, 0x08, 0x00, 0x02, 0x28),
++			raw_pdu(0x01, 0x08, 0x05, 0x00, 0x0a),
++			raw_pdu(0x08, 0x01, 0x00, 0x04, 0x00, 0x03, 0x28),
++			raw_pdu(0x09, 0x07, 0x02, 0x00, 0x02, 0x03, 0x00, 0x00,
++					0x2a),
++			raw_pdu(0x08, 0x03, 0x00, 0x04, 0x00, 0x03, 0x28),
++			raw_pdu(0x01, 0x08, 0x03, 0x00, 0x0a),
++			raw_pdu(0x04, 0x04, 0x00, 0x04, 0x00),
++			raw_pdu(0x05, 0x01, 0x04, 0x00, 0x01, 0x29),
++			raw_pdu(0x08, 0x05, 0x00, 0x08, 0x00, 0x03, 0x28),
++			raw_pdu(0x09, 0x07, 0x06, 0x00, 0x02, 0x07, 0x00, 0x29,
++					0x2a),
++			raw_pdu(0x08, 0x07, 0x00, 0x08, 0x00, 0x03, 0x28),
++			raw_pdu(0x01, 0x08, 0x07, 0x00, 0x0a),
++			raw_pdu(0x04, 0x08, 0x00, 0x08, 0x00),
++			raw_pdu(0x05, 0x01, 0x08, 0x00, 0x01, 0x29),
++			raw_pdu(0x0a, 0x03, 0x00),
++			raw_pdu(0x01, 0x0a, 0x03, 0x00, 0x08));
++
+ 	return g_test_run();
+ }
 -- 
-1.9.1
+1.9.3
 
