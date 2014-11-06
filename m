@@ -2,31 +2,62 @@ Return-Path: <cyrus@holtmann.org>
 From: Michael Janssen <jamuraa@chromium.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Michael Janssen <jamuraa@chromium.org>
-Subject: [PATCH BlueZ v2 1/4] unit-gattrib: Fix uninitialized variable
-Date: Wed,  5 Nov 2014 18:15:08 -0800
-Message-Id: <1415240111-10596-2-git-send-email-jamuraa@chromium.org>
+Subject: [PATCH BlueZ v2 3/4] shared/att: Add support for BT_ATT_ALL_REQUESTS
+Date: Wed,  5 Nov 2014 18:15:10 -0800
+Message-Id: <1415240111-10596-4-git-send-email-jamuraa@chromium.org>
 In-Reply-To: <1415240111-10596-1-git-send-email-jamuraa@chromium.org>
 References: <1415240111-10596-1-git-send-email-jamuraa@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- unit/test-gattrib.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ src/shared/att-types.h |  3 +++
+ src/shared/att.c       | 11 ++++++++++-
+ 2 files changed, 13 insertions(+), 1 deletion(-)
 
-diff --git a/unit/test-gattrib.c b/unit/test-gattrib.c
-index 9ced45c..228ef5b 100644
---- a/unit/test-gattrib.c
-+++ b/unit/test-gattrib.c
-@@ -124,7 +124,7 @@ static void destroy_canary_increment(gpointer data)
- static void test_refcount(struct context *cxt, gconstpointer unused)
- {
- 	GAttrib *extra_ref;
--	int destroy_canary;
-+	int destroy_canary = 0;
+diff --git a/src/shared/att-types.h b/src/shared/att-types.h
+index a6b23e4..24bf3da 100644
+--- a/src/shared/att-types.h
++++ b/src/shared/att-types.h
+@@ -55,6 +55,9 @@
+ #define BT_ATT_OP_HANDLE_VAL_IND		0x1D
+ #define BT_ATT_OP_HANDLE_VAL_CONF		0x1E
  
- 	g_attrib_set_destroy_function(cxt->att, destroy_canary_increment,
- 							       &destroy_canary);
++/* Special opcode to receive all requests (legacy servers) */
++#define BT_ATT_ALL_REQUESTS 0x00
++
+ /* Error codes for Error response PDU */
+ #define BT_ATT_ERROR_INVALID_HANDLE			0x01
+ #define BT_ATT_ERROR_READ_NOT_PERMITTED			0x02
+diff --git a/src/shared/att.c b/src/shared/att.c
+index 6adde22..aa80cef 100644
+--- a/src/shared/att.c
++++ b/src/shared/att.c
+@@ -575,6 +575,15 @@ struct notify_data {
+ 	bool handler_found;
+ };
+ 
++static bool opcode_match(uint8_t opcode, uint8_t test_opcode)
++{
++	if (opcode == BT_ATT_ALL_REQUESTS &&
++				    get_op_type(test_opcode) == ATT_OP_TYPE_REQ)
++		return true;
++
++	return opcode == test_opcode;
++}
++
+ static void notify_handler(void *data, void *user_data)
+ {
+ 	struct att_notify *notify = data;
+@@ -583,7 +592,7 @@ static void notify_handler(void *data, void *user_data)
+ 	if (notify->removed)
+ 		return;
+ 
+-	if (notify->opcode != not_data->opcode)
++	if (!opcode_match(notify->opcode, not_data->opcode))
+ 		return;
+ 
+ 	not_data->handler_found = true;
 -- 
 2.1.2
 
