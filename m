@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 01/14] android/handsfree: Add support for new API for vr_cmd_cb
-Date: Thu,  6 Nov 2014 10:31:56 +0200
-Message-Id: <1415262729-12573-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCH 14/14] android/handsfree: Add support for new API for key_pressed_cmd_cb
+Date: Thu,  6 Nov 2014 10:32:09 +0200
+Message-Id: <1415262729-12573-15-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1415262729-12573-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1415262729-12573-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,66 +11,86 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Voice Recognition Command notification callback has new parameter bdaddr.
+Key Pressed Command notification callback has new parameter bdaddr.
 ---
- android/hal-handsfree.c | 4 ++++
- android/hal-ipc-api.txt | 1 +
- android/hal-msg.h       | 1 +
- android/handsfree.c     | 2 ++
- 4 files changed, 8 insertions(+)
+ android/hal-handsfree.c | 9 ++++++++-
+ android/hal-ipc-api.txt | 2 +-
+ android/hal-msg.h       | 3 +++
+ android/handsfree.c     | 6 +++++-
+ 4 files changed, 17 insertions(+), 3 deletions(-)
 
 diff --git a/android/hal-handsfree.c b/android/hal-handsfree.c
-index dfa37e7..c465277 100644
+index 76e036a..2834c80 100644
 --- a/android/hal-handsfree.c
 +++ b/android/hal-handsfree.c
-@@ -58,7 +58,11 @@ static void handle_vr_state(void *buf, uint16_t len, int fd)
- 	struct hal_ev_handsfree_vr_state *ev = buf;
+@@ -238,8 +238,15 @@ static void handle_unknown_at(void *buf, uint16_t len, int fd)
  
- 	if (cbs->vr_cmd_cb)
+ static void handle_hsp_key_press(void *buf, uint16_t len, int fd)
+ {
+-	if (cbs->key_pressed_cmd_cb)
++	if (cbs->key_pressed_cmd_cb) {
 +#if ANDROID_VERSION >= PLATFORM_VER(5, 0, 0)
-+		cbs->vr_cmd_cb(ev->state, (bt_bdaddr_t *) (ev->bdaddr));
++		struct hal_ev_handsfree_hsp_key_press *ev = buf;
++
++		cbs->key_pressed_cmd_cb((bt_bdaddr_t *) (ev->bdaddr));
 +#else
- 		cbs->vr_cmd_cb(ev->state);
+ 		cbs->key_pressed_cmd_cb();
 +#endif
++	}
  }
  
- static void handle_answer(void *buf, uint16_t len, int fd)
+ /*
 diff --git a/android/hal-ipc-api.txt b/android/hal-ipc-api.txt
-index 8424136..058af6f 100644
+index 3e8a38c..c7d5c59 100644
 --- a/android/hal-ipc-api.txt
 +++ b/android/hal-ipc-api.txt
-@@ -1008,6 +1008,7 @@ Notifications:
- 	Opcode 0x83 - Voice Recognition Command notification
+@@ -1081,7 +1081,7 @@ Notifications:
  
- 		Notification parameters: Voice recognition state (1 octet)
-+		                         Remote address (6 octets)
+ 	Opcode 0x90 - Key Pressed Command notification
  
- 		Valid voice recognition states: 0x00 = Stopped
- 		                                0x01 = Started
+-		Notification parameters: <none>
++		Notification parameters: Remote address (6 octets)
+ 
+ 
+ Bluetooth Advanced Audio HAL (ID 6)
 diff --git a/android/hal-msg.h b/android/hal-msg.h
-index 9b08966..4ea30dac 100644
+index f86e6b7..eef226e 100644
 --- a/android/hal-msg.h
 +++ b/android/hal-msg.h
-@@ -1346,6 +1346,7 @@ struct hal_ev_handsfree_audio_state {
- #define HAL_EV_HANDSFREE_VR		0x83
- struct hal_ev_handsfree_vr_state {
- 	uint8_t state;
-+	uint8_t bdaddr[6];
+@@ -1427,6 +1427,9 @@ struct hal_ev_handsfree_unknown_at {
  } __attribute__((packed));
  
- #define HAL_EV_HANDSFREE_ANSWER		0x84
+ #define HAL_EV_HANDSFREE_HSP_KEY_PRESS	0x90
++struct hal_ev_handsfree_hsp_key_press {
++	uint8_t bdaddr[6];
++} __attribute__((packed));
+ 
+ #define HAL_AVRCP_FEATURE_NONE			0x00
+ #define HAL_AVRCP_FEATURE_METADATA		0x01
 diff --git a/android/handsfree.c b/android/handsfree.c
-index e6e0f33..a5d4184 100644
+index d9cb929..4d8dff4 100644
 --- a/android/handsfree.c
 +++ b/android/handsfree.c
-@@ -822,6 +822,8 @@ static void at_cmd_bvra(struct hfp_context *context,
- 		else
- 			ev.state = HAL_HANDSFREE_VR_STOPPED;
+@@ -1143,6 +1143,7 @@ static void at_cmd_ckpd(struct hfp_context *result, enum hfp_gw_cmd_type type,
+ 								void *user_data)
+ {
+ 	struct hf_device *dev = user_data;
++	struct hal_ev_handsfree_hsp_key_press ev;
+ 	unsigned int val;
+ 
+ 	DBG("");
+@@ -1155,8 +1156,11 @@ static void at_cmd_ckpd(struct hfp_context *result, enum hfp_gw_cmd_type type,
+ 		if (hfp_context_has_next(result))
+ 			break;
  
 +		bdaddr2android(&dev->bdaddr, ev.bdaddr);
 +
  		ipc_send_notif(hal_ipc, HAL_SERVICE_ID_HANDSFREE,
- 					HAL_EV_HANDSFREE_VR, sizeof(ev), &ev);
+-				HAL_EV_HANDSFREE_HSP_KEY_PRESS, 0, NULL);
++						HAL_EV_HANDSFREE_HSP_KEY_PRESS,
++						sizeof(ev), &ev);
+ 
+ 		hfp_gw_send_result(dev->gw, HFP_RESULT_OK);
  		return;
 -- 
 1.9.1
