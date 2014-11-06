@@ -2,11 +2,11 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] android/doc: Fix typos
-Date: Thu, 06 Nov 2014 12:13:21 +0100
-Message-ID: <4266247.pcs9KIOJbE@uw000953>
-In-Reply-To: <1415261382-5355-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1415261382-5355-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: Re: [PATCH 0/9] 1st part of handsfree Android 5.0 adaptation code
+Date: Thu, 06 Nov 2014 12:11:28 +0100
+Message-ID: <7695076.WrWua4k2SN@uw000953>
+In-Reply-To: <1415198333-7775-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1415198333-7775-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -14,37 +14,32 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Andrei,
 
-On Thursday 06 of November 2014 10:09:42 Andrei Emeltchenko wrote:
+On Wednesday 05 of November 2014 16:38:44 Andrei Emeltchenko wrote:
 > From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 > 
-> ---
->  android/hal-ipc-api.txt | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+> Add support for Android 5.0 interfaces (1st part of patches).
 > 
-> diff --git a/android/hal-ipc-api.txt b/android/hal-ipc-api.txt
-> index c7d5c59..666e27f 100644
-> --- a/android/hal-ipc-api.txt
-> +++ b/android/hal-ipc-api.txt
-> @@ -1768,7 +1768,7 @@ Commands and responses:
->  	Opcode 0x19 - Connect Peripheral command/response
->  
->  		Command parameters: Server (4 octets)
-> -		                    Remote address (6 octes)
-> +		                    Remote address (6 octets)
->  		                    Is Direct (1 octet)
->  		                    Transport (4 octets)
->  		Response parameters: <none>
-> @@ -1778,7 +1778,7 @@ Commands and responses:
->  	Opcode 0x1a - Disconnect Peripheral command/response
->  
->  		Command parameters: Server (4 octets)
-> -		                    Remote address (6 octes)
-> +		                    Remote address (6 octets)
->  		                    Connection ID (1 octet)
->  		Response parameters: <none>
->  
+> Andrei Emeltchenko (9):
+>   android/handsfree: Add support for new API for handsfree init
+>   android/handsfree: Add support for new API for start_vr
+>   android/handsfree: Add support for new API for stop_vr
+>   android/handsfree: Add support for new API for volume_control
+>   android/handsfree: Add support for new API for cops_response
+>   android/handsfree: Add support for new API for cind_response
+>   android/handsfree: Add support for new API for formatted_at_response
+>   android/handsfree: Add support for new API for at_response
+>   android/handsfree: Add support for new API for clcc_response
+> 
+>  android/hal-handsfree.c | 209 +++++++++++++++++++++++++++++++++++++++++++++---
+>  android/hal-ipc-api.txt |  11 ++-
+>  android/hal-msg.h       |  13 +++
+>  android/handsfree.c     |  47 ++++++++---
+>  android/handsfree.h     |   3 +-
+>  android/main.c          |   3 +-
+>  6 files changed, 260 insertions(+), 26 deletions(-)
+> 
 
-Applied, thanks. 
+All patches in this set are now applied, thanks. 
 
 -- 
 Best regards, 
