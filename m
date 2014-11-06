@@ -1,46 +1,49 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 0/9] 1st part of handsfree Android 5.0 adaptation code
-Date: Thu, 06 Nov 2014 12:11:28 +0100
-Message-ID: <7695076.WrWua4k2SN@uw000953>
-In-Reply-To: <1415198333-7775-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1415198333-7775-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Sender: linux-bluetooth-owner@vger.kernel.org
+Message-ID: <1415270842.2918.51.camel@jrissane-mobl.ger.corp.intel.com>
+Subject: Re: [PATCH bluetooth-next] 6lowpan: move skb_free from error paths
+ in decompression.
+From: Jukka Rissanen <jukka.rissanen@linux.intel.com>
+To: Martin Townsend <martin.townsend@xsilon.com>
+Cc: Martin Townsend <mtownsend1973@gmail.com>, linux-wpan@vger.kernel.org,
+	linux-bluetooth@vger.kernel.org, alex.aring@gmail.com, marcel@holtmann.org
+Date: Thu, 06 Nov 2014 12:47:22 +0200
+In-Reply-To: <545B512A.1070900@xsilon.com>
+References: <1415136981-13497-1-git-send-email-mtownsend1973@gmail.com>
+	 <1415270051.2918.49.camel@jrissane-mobl.ger.corp.intel.com>
+	 <545B512A.1070900@xsilon.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+Hi Martin,
 
-On Wednesday 05 of November 2014 16:38:44 Andrei Emeltchenko wrote:
-> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+On to, 2014-11-06 at 10:44 +0000, Martin Townsend wrote:
+> Thanks for testing Jukka,
 > 
-> Add support for Android 5.0 interfaces (1st part of patches).
-> 
-> Andrei Emeltchenko (9):
->   android/handsfree: Add support for new API for handsfree init
->   android/handsfree: Add support for new API for start_vr
->   android/handsfree: Add support for new API for stop_vr
->   android/handsfree: Add support for new API for volume_control
->   android/handsfree: Add support for new API for cops_response
->   android/handsfree: Add support for new API for cind_response
->   android/handsfree: Add support for new API for formatted_at_response
->   android/handsfree: Add support for new API for at_response
->   android/handsfree: Add support for new API for clcc_response
-> 
->  android/hal-handsfree.c | 209 +++++++++++++++++++++++++++++++++++++++++++++---
->  android/hal-ipc-api.txt |  11 ++-
->  android/hal-msg.h       |  13 +++
->  android/handsfree.c     |  47 ++++++++---
->  android/handsfree.h     |   3 +-
->  android/main.c          |   3 +-
->  6 files changed, 260 insertions(+), 26 deletions(-)
-> 
+> I'll respin v2 later.
+> Out of interest, did you have kmemleak on?
 
-All patches in this set are now applied, thanks. 
+Yes, kmemleak was on, no issues reported.
 
--- 
-Best regards, 
-Szymon Janc
+
+> - Martin.
+> 
+> On 06/11/14 10:34, Jukka Rissanen wrote:
+> > Hi Martin,
+> >
+> > On ti, 2014-11-04 at 21:36 +0000, Martin Townsend wrote:
+> >> Currently we ensure that the skb is freed on every error path in IPHC
+> >> decompression which makes it easy to introduce skb leaks.  By centralising
+> >> the skb_free into the receive function it makes future decompression routines
+> >> easier to maintain.  It does come at the expense of ensuring that the skb
+> >> passed into the decompression routine must not be copied.
+> > Tested this with real bluetooth hw and no issues were found. Just rebase
+> > the patch with latest upstream (conflict had a very simple fix) so ack
+> > with actions to v2.
+> >
+> > Acked-by: Jukka Rissanen <jukka.rissanen@linux.intel.com>
+> >
+> >
+
+Cheers,
+Jukka
