@@ -1,96 +1,46 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1415278034-19223-1-git-send-email-marcin.kraglak@tieto.com>
-References: <1415278034-19223-1-git-send-email-marcin.kraglak@tieto.com>
-Date: Thu, 6 Nov 2014 17:43:37 +0200
-Message-ID: <CABBYNZJfo+6ornwsBvJKYXLUf-Wt3hop7ZimD-EjE_8OuN5tKA@mail.gmail.com>
-Subject: Re: [PATCH 1/9] unit/test-gatt: Use one generic search callback
+In-Reply-To: <1415240111-10596-1-git-send-email-jamuraa@chromium.org>
+References: <1415240111-10596-1-git-send-email-jamuraa@chromium.org>
+Date: Thu, 6 Nov 2014 17:43:01 +0200
+Message-ID: <CABBYNZK_1GjncnakjdDy=o9n7qfNB2DWsBKqsvP=bRWbNM12Hg@mail.gmail.com>
+Subject: Re: [PATCH BlueZ v2 0/4] GAttrib cleanup and switch to bt_att
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Marcin Kraglak <marcin.kraglak@tieto.com>
+To: Michael Janssen <jamuraa@chromium.org>
 Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcin,
+Hi Michael,
 
-On Thu, Nov 6, 2014 at 2:47 PM, Marcin Kraglak <marcin.kraglak@tieto.com> wrote:
-> In these callbacks only success is verified, so there is no need to
-> duplicate them.
-> ---
->  unit/test-gatt.c | 34 +++++++---------------------------
->  1 file changed, 7 insertions(+), 27 deletions(-)
+On Thu, Nov 6, 2014 at 4:15 AM, Michael Janssen <jamuraa@chromium.org> wrote:
+> This patch set cleans up gattrib and adds some missing functionality
+> to switch GAttrib to a shim on top of bt_att.  After this is merged,
+> profiles using GAttrib can be transitioned to bt_att.
 >
-> diff --git a/unit/test-gatt.c b/unit/test-gatt.c
-> index 27471ea..f343fe6 100644
-> --- a/unit/test-gatt.c
-> +++ b/unit/test-gatt.c
-> @@ -259,29 +259,7 @@ static struct context *create_context(uint16_t mtu, gconstpointer data)
->         return context;
->  }
+> v1 -> v2:
+>  * Keep old copyright on gattrib.c
+>  * Use 0x00 for sentinel value on BT_ATT_ALL_REQUESTS to futureproof
 >
-> -static void primary_cb(bool success, uint8_t att_ecode,
-> -                                               struct bt_gatt_result *result,
-> -                                               void *user_data)
-> -{
-> -       struct context *context = user_data;
-> -
-> -       g_assert(success);
-> -
-> -       context_quit(context);
-> -}
-> -
-> -static void characteristic_cb(bool success, uint8_t att_ecode,
-> -                                               struct bt_gatt_result *result,
-> -                                               void *user_data)
-> -{
-> -       struct context *context = user_data;
-> -
-> -       g_assert(success);
-> -
-> -       context_quit(context);
-> -}
-> -
-> -static void included_cb(bool success, uint8_t att_ecode,
-> +static void generic_search_cb(bool success, uint8_t att_ecode,
->                                                 struct bt_gatt_result *result,
->                                                 void *user_data)
->  {
-> @@ -328,7 +306,8 @@ static void test_search_primary(gconstpointer data)
->         const struct test_data *test_data = data;
+> Michael Janssen (4):
+>   unit-gattrib: Fix uninitialized variable
+>   gattrib: Remove unused GATTRIB_ALL_EVENTS
+>   shared/att: Add support for BT_ATT_ALL_REQUESTS
+>   GATT shim to src/shared bt_att
 >
->         bt_gatt_discover_all_primary_services(context->att, test_data->uuid,
-> -                                               primary_cb, context, NULL);
-> +                                                       generic_search_cb,
-> +                                                       context, NULL);
+>  attrib/gattrib.c       | 734 ++++++++++---------------------------------------
+>  attrib/gattrib.h       |   1 -
+>  src/shared/att-types.h |   3 +
+>  src/shared/att.c       |  11 +-
+>  unit/test-gattrib.c    |  18 +-
+>  5 files changed, 160 insertions(+), 607 deletions(-)
 >
->         execute_context(context);
->  }
-> @@ -338,7 +317,8 @@ static void test_search_included(gconstpointer data)
->         struct context *context = create_context(512, data);
->
->         bt_gatt_discover_included_services(context->att, 0x0001, 0xffff,
-> -                                               included_cb, context, NULL);
-> +                                                       generic_search_cb,
-> +                                                       context, NULL);
->
->         execute_context(context);
->  }
-> @@ -348,8 +328,8 @@ static void test_search_chars(gconstpointer data)
->         struct context *context = create_context(512, data);
->
->         g_assert(bt_gatt_discover_characteristics(context->att, 0x0010, 0x0020,
-> -                                               characteristic_cb, context,
-> -                                               NULL));
-> +                                                       generic_search_cb,
-> +                                                       context, NULL));
->
->         execute_context(context);
->  }
 > --
-> 1.9.3
+> 2.1.2
 
-Applied, thanks.
+Ive applied 1-3, the last one we need ensure it passes both unit tests
+and end-to-end tests before going ahead with it.
 
 
 -- 
