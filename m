@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 08/14] android/handsfree: Add support for new API for chld_cmd_cb
-Date: Thu,  6 Nov 2014 10:32:03 +0200
-Message-Id: <1415262729-12573-9-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCH 05/14] android/handsfree: Add support for new API for dial_call_cmd_cb
+Date: Thu,  6 Nov 2014 10:32:00 +0200
+Message-Id: <1415262729-12573-6-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1415262729-12573-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1415262729-12573-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,66 +11,77 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-CHLD Command notification callback has new parameter bdaddr.
+Dial Call Command notification callback has new parameter bdaddr.
 ---
  android/hal-handsfree.c | 4 ++++
- android/hal-ipc-api.txt | 1 +
+ android/hal-ipc-api.txt | 3 ++-
  android/hal-msg.h       | 1 +
- android/handsfree.c     | 1 +
- 4 files changed, 7 insertions(+)
+ android/handsfree.c     | 3 +++
+ 4 files changed, 10 insertions(+), 1 deletion(-)
 
 diff --git a/android/hal-handsfree.c b/android/hal-handsfree.c
-index 76a2e0f..e4ade61 100644
+index bb64da0..3a5eec6 100644
 --- a/android/hal-handsfree.c
 +++ b/android/hal-handsfree.c
-@@ -158,7 +158,11 @@ static void handle_chld(void *buf, uint16_t len, int fd)
- 	struct hal_ev_handsfree_chld *ev = buf;
+@@ -122,7 +122,11 @@ static void handle_dial(void *buf, uint16_t len, int fd)
+ 	if (ev->number_len)
+ 		number = (char *) ev->number;
  
- 	if (cbs->chld_cmd_cb)
 +#if ANDROID_VERSION >= PLATFORM_VER(5, 0, 0)
-+		cbs->chld_cmd_cb(ev->chld, (bt_bdaddr_t *) (ev->bdaddr));
++	cbs->dial_call_cmd_cb(number, (bt_bdaddr_t *) (ev->bdaddr));
 +#else
- 		cbs->chld_cmd_cb(ev->chld);
+ 	cbs->dial_call_cmd_cb(number);
 +#endif
  }
  
- static void handle_cnum(void *buf, uint16_t len, int fd)
+ static void handle_dtmf(void *buf, uint16_t len, int fd)
 diff --git a/android/hal-ipc-api.txt b/android/hal-ipc-api.txt
-index 10808f4..06a2beb 100644
+index e462363..bc41993 100644
 --- a/android/hal-ipc-api.txt
 +++ b/android/hal-ipc-api.txt
-@@ -1051,6 +1051,7 @@ Notifications:
- 	Opcode 0x8a - CHLD Command notification
+@@ -1032,7 +1032,8 @@ Notifications:
  
- 		Notification parameters: NREC types (1 octet)
-+		                         Remote address (6 octets)
+ 	Opcode 0x87 - Dial Call Command notification
  
- 		Valid CHLD types: 0x00 = Release and hold
- 		                  0x01 = Release active and accept held
+-		Notification parameters: Number (string)
++		Notification parameters: Remote address (6 octets)
++		                         Number (string)
+ 
+ 	Opcode 0x88 - DTMF Command notification
+ 
 diff --git a/android/hal-msg.h b/android/hal-msg.h
-index 321f193..24780f5 100644
+index 889b45e..a1cfff1 100644
 --- a/android/hal-msg.h
 +++ b/android/hal-msg.h
-@@ -1396,6 +1396,7 @@ struct hal_ev_handsfree_nrec {
- #define HAL_EV_HANDSFREE_CHLD		0x8A
- struct hal_ev_handsfree_chld {
- 	uint8_t chld;
-+	uint8_t bdaddr[6];
- } __attribute__((packed));
+@@ -1368,6 +1368,7 @@ struct hal_ev_handsfree_volume {
  
- #define HAL_EV_HANDSFREE_CNUM		0x8B
+ #define HAL_EV_HANDSFREE_DIAL		0x87
+ struct hal_ev_handsfree_dial {
++	uint8_t bdaddr[6];
+ 	uint16_t number_len;
+ 	uint8_t number[0];
+ } __attribute__((packed));
 diff --git a/android/handsfree.c b/android/handsfree.c
-index f47eaae..3bfb2ee 100644
+index 83cc326..6b67af5 100644
 --- a/android/handsfree.c
 +++ b/android/handsfree.c
-@@ -1352,6 +1352,7 @@ static void at_cmd_chld(struct hfp_context *result, enum hfp_gw_cmd_type type,
+@@ -537,6 +537,8 @@ static void at_cmd_d(struct hfp_context *context,
+ 						(char *) ev->number, 255))
+ 			break;
  
- 		/* value match HAL type */
- 		ev.chld = val;
++		bdaddr2android(&dev->bdaddr, ev->bdaddr);
++
+ 		ev->number_len = strlen((char *) ev->number);
+ 
+ 		if (ev->number[ev->number_len - 1] != ';')
+@@ -794,6 +796,7 @@ static void at_cmd_bldn(struct hfp_context *context,
+ 		if (hfp_context_has_next(context))
+ 			break;
+ 
 +		bdaddr2android(&dev->bdaddr, ev.bdaddr);
+ 		ev.number_len = 0;
  
  		ipc_send_notif(hal_ipc, HAL_SERVICE_ID_HANDSFREE,
- 					HAL_EV_HANDSFREE_CHLD, sizeof(ev), &ev);
 -- 
 1.9.1
 
