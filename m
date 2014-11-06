@@ -1,39 +1,52 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFC 09/15] android/hardware: Update bt_gatt_types.h header
-Date: Thu,  6 Nov 2014 17:05:54 +0200
-Message-Id: <1415286360-26268-10-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1415286360-26268-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1415286360-26268-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [RFC 00/15] Update android/hardware headers to 5.0 API
+Date: Thu,  6 Nov 2014 17:05:45 +0200
+Message-Id: <1415286360-26268-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
----
- android/hardware/bt_gatt_types.h | 8 ++++++++
- 1 file changed, 8 insertions(+)
+Replaces headers which allows to build only against the very
+latest Android for host.
 
-diff --git a/android/hardware/bt_gatt_types.h b/android/hardware/bt_gatt_types.h
-index 0ac217e..e037ddc 100644
---- a/android/hardware/bt_gatt_types.h
-+++ b/android/hardware/bt_gatt_types.h
-@@ -43,6 +43,14 @@ typedef struct
-     uint8_t             is_primary;
- } btgatt_srvc_id_t;
- 
-+/** Preferred physical Transport for GATT connection */
-+typedef enum
-+{
-+    GATT_TRANSPORT_AUTO,
-+    GATT_TRANSPORT_BREDR,
-+    GATT_TRANSPORT_LE
-+} btgatt_transport_t;
-+
- __END_DECLS
- 
- #endif /* ANDROID_INCLUDE_BT_GATT_TYPES_H */
+Andrei Emeltchenko (15):
+  android/hardware: Update bt_gatt_client.h header
+  android/hardware: Update bt_hf_client.h header
+  android/hardware: Update bluetooth.h header from Android 5.0
+  android/hardware: Update audio.h HAL header
+  android/system: Update system/audio.h header
+  android/cutils: Add missing bitops.h header
+  android/hardware: Update bt_hf.h header
+  android/hardware: Update bt_gatt_server.h header
+  android/hardware: Update bt_gatt_types.h header
+  android/hardware: Update bt_pan.h header
+  android/hardware: Update audio_effect.h header
+  android/hardware: Update bt_av.h header
+  android/hardware: Update bt_hh.h header
+  android/hardware: Update bt_mce.h header
+  android/hardware: Update bt_rc.h header
+
+ android/cutils/bitops.h           | 120 ++++++
+ android/hardware/audio.h          | 149 ++++++-
+ android/hardware/audio_effect.h   |   5 +-
+ android/hardware/bluetooth.h      |  82 +++-
+ android/hardware/bt_av.h          |  15 +-
+ android/hardware/bt_gatt_client.h | 134 +++++-
+ android/hardware/bt_gatt_server.h |  19 +-
+ android/hardware/bt_gatt_types.h  |   8 +
+ android/hardware/bt_hf.h          |  63 ++-
+ android/hardware/bt_hf_client.h   |  30 +-
+ android/hardware/bt_hh.h          |  10 +-
+ android/hardware/bt_mce.h         |   5 +-
+ android/hardware/bt_pan.h         |   4 +-
+ android/hardware/bt_rc.h          |  34 +-
+ android/system/audio.h            | 862 +++++++++++++++++++++++++++++++++++---
+ 15 files changed, 1414 insertions(+), 126 deletions(-)
+ create mode 100644 android/cutils/bitops.h
+
 -- 
 1.9.1
 
