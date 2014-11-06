@@ -2,62 +2,33 @@ Return-Path: <cyrus@holtmann.org>
 From: Michael Janssen <jamuraa@chromium.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Michael Janssen <jamuraa@chromium.org>
-Subject: [PATCH BlueZ v2 3/4] shared/att: Add support for BT_ATT_ALL_REQUESTS
-Date: Wed,  5 Nov 2014 18:15:10 -0800
-Message-Id: <1415240111-10596-4-git-send-email-jamuraa@chromium.org>
-In-Reply-To: <1415240111-10596-1-git-send-email-jamuraa@chromium.org>
-References: <1415240111-10596-1-git-send-email-jamuraa@chromium.org>
+Subject: [PATCH BlueZ v2 0/4] GAttrib cleanup and switch to bt_att
+Date: Wed,  5 Nov 2014 18:15:07 -0800
+Message-Id: <1415240111-10596-1-git-send-email-jamuraa@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- src/shared/att-types.h |  3 +++
- src/shared/att.c       | 11 ++++++++++-
- 2 files changed, 13 insertions(+), 1 deletion(-)
+This patch set cleans up gattrib and adds some missing functionality
+to switch GAttrib to a shim on top of bt_att.  After this is merged,
+profiles using GAttrib can be transitioned to bt_att.
 
-diff --git a/src/shared/att-types.h b/src/shared/att-types.h
-index a6b23e4..24bf3da 100644
---- a/src/shared/att-types.h
-+++ b/src/shared/att-types.h
-@@ -55,6 +55,9 @@
- #define BT_ATT_OP_HANDLE_VAL_IND		0x1D
- #define BT_ATT_OP_HANDLE_VAL_CONF		0x1E
- 
-+/* Special opcode to receive all requests (legacy servers) */
-+#define BT_ATT_ALL_REQUESTS 0x00
-+
- /* Error codes for Error response PDU */
- #define BT_ATT_ERROR_INVALID_HANDLE			0x01
- #define BT_ATT_ERROR_READ_NOT_PERMITTED			0x02
-diff --git a/src/shared/att.c b/src/shared/att.c
-index 6adde22..aa80cef 100644
---- a/src/shared/att.c
-+++ b/src/shared/att.c
-@@ -575,6 +575,15 @@ struct notify_data {
- 	bool handler_found;
- };
- 
-+static bool opcode_match(uint8_t opcode, uint8_t test_opcode)
-+{
-+	if (opcode == BT_ATT_ALL_REQUESTS &&
-+				    get_op_type(test_opcode) == ATT_OP_TYPE_REQ)
-+		return true;
-+
-+	return opcode == test_opcode;
-+}
-+
- static void notify_handler(void *data, void *user_data)
- {
- 	struct att_notify *notify = data;
-@@ -583,7 +592,7 @@ static void notify_handler(void *data, void *user_data)
- 	if (notify->removed)
- 		return;
- 
--	if (notify->opcode != not_data->opcode)
-+	if (!opcode_match(notify->opcode, not_data->opcode))
- 		return;
- 
- 	not_data->handler_found = true;
+v1 -> v2:
+ * Keep old copyright on gattrib.c
+ * Use 0x00 for sentinel value on BT_ATT_ALL_REQUESTS to futureproof
+
+Michael Janssen (4):
+  unit-gattrib: Fix uninitialized variable
+  gattrib: Remove unused GATTRIB_ALL_EVENTS
+  shared/att: Add support for BT_ATT_ALL_REQUESTS
+  GATT shim to src/shared bt_att
+
+ attrib/gattrib.c       | 734 ++++++++++---------------------------------------
+ attrib/gattrib.h       |   1 -
+ src/shared/att-types.h |   3 +
+ src/shared/att.c       |  11 +-
+ unit/test-gattrib.c    |  18 +-
+ 5 files changed, 160 insertions(+), 607 deletions(-)
+
 -- 
 2.1.2
 
