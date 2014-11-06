@@ -1,49 +1,47 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1415270842.2918.51.camel@jrissane-mobl.ger.corp.intel.com>
+Message-ID: <545B512A.1070900@xsilon.com>
+Date: Thu, 06 Nov 2014 10:44:58 +0000
+From: Martin Townsend <martin.townsend@xsilon.com>
+MIME-Version: 1.0
+To: Jukka Rissanen <jukka.rissanen@linux.intel.com>,
+ Martin Townsend <mtownsend1973@gmail.com>
+CC: linux-wpan@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+ alex.aring@gmail.com, marcel@holtmann.org
 Subject: Re: [PATCH bluetooth-next] 6lowpan: move skb_free from error paths
  in decompression.
-From: Jukka Rissanen <jukka.rissanen@linux.intel.com>
-To: Martin Townsend <martin.townsend@xsilon.com>
-Cc: Martin Townsend <mtownsend1973@gmail.com>, linux-wpan@vger.kernel.org,
-	linux-bluetooth@vger.kernel.org, alex.aring@gmail.com, marcel@holtmann.org
-Date: Thu, 06 Nov 2014 12:47:22 +0200
-In-Reply-To: <545B512A.1070900@xsilon.com>
-References: <1415136981-13497-1-git-send-email-mtownsend1973@gmail.com>
-	 <1415270051.2918.49.camel@jrissane-mobl.ger.corp.intel.com>
-	 <545B512A.1070900@xsilon.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+References: <1415136981-13497-1-git-send-email-mtownsend1973@gmail.com> <1415270051.2918.49.camel@jrissane-mobl.ger.corp.intel.com>
+In-Reply-To: <1415270051.2918.49.camel@jrissane-mobl.ger.corp.intel.com>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Martin,
+Thanks for testing Jukka,
 
-On to, 2014-11-06 at 10:44 +0000, Martin Townsend wrote:
-> Thanks for testing Jukka,
-> 
-> I'll respin v2 later.
-> Out of interest, did you have kmemleak on?
+I'll respin v2 later.
+Out of interest, did you have kmemleak on?
 
-Yes, kmemleak was on, no issues reported.
+- Martin.
 
-
-> - Martin.
-> 
-> On 06/11/14 10:34, Jukka Rissanen wrote:
-> > Hi Martin,
-> >
-> > On ti, 2014-11-04 at 21:36 +0000, Martin Townsend wrote:
-> >> Currently we ensure that the skb is freed on every error path in IPHC
-> >> decompression which makes it easy to introduce skb leaks.  By centralising
-> >> the skb_free into the receive function it makes future decompression routines
-> >> easier to maintain.  It does come at the expense of ensuring that the skb
-> >> passed into the decompression routine must not be copied.
-> > Tested this with real bluetooth hw and no issues were found. Just rebase
-> > the patch with latest upstream (conflict had a very simple fix) so ack
-> > with actions to v2.
-> >
-> > Acked-by: Jukka Rissanen <jukka.rissanen@linux.intel.com>
-> >
-> >
-
-Cheers,
-Jukka
+On 06/11/14 10:34, Jukka Rissanen wrote:
+> Hi Martin,
+>
+> On ti, 2014-11-04 at 21:36 +0000, Martin Townsend wrote:
+>> Currently we ensure that the skb is freed on every error path in IPHC
+>> decompression which makes it easy to introduce skb leaks.  By centralising
+>> the skb_free into the receive function it makes future decompression routines
+>> easier to maintain.  It does come at the expense of ensuring that the skb
+>> passed into the decompression routine must not be copied.
+> Tested this with real bluetooth hw and no issues were found. Just rebase
+> the patch with latest upstream (conflict had a very simple fix) so ack
+> with actions to v2.
+>
+> Acked-by: Jukka Rissanen <jukka.rissanen@linux.intel.com>
+>
+>
+> Cheers,
+> Jukka
+>
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-wpan" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
