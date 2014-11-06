@@ -1,35 +1,49 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Thu, 6 Nov 2014 14:35:26 +0200
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv2] android/handsfree: Return default device for zero bdaddr
-Date: Thu,  6 Nov 2014 14:45:58 +0200
-Message-Id: <1415277958-26589-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <4917512.kiFJOhNPJF@uw000953>
-References: <4917512.kiFJOhNPJF@uw000953>
+To: Szymon Janc <szymon.janc@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] android: Remove temporary BLUEZ_EXTENSION flag
+Message-ID: <20141106123524.GC868@aemeltch-MOBL1>
+References: <1415269130-7688-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <2084665.MKgJSzBybo@uw000953>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <2084665.MKgJSzBybo@uw000953>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Hi Szymon,
 
-For the old Android API use find_default_device() function.
----
- android/handsfree.c | 3 +++
- 1 file changed, 3 insertions(+)
+On Thu, Nov 06, 2014 at 12:54:03PM +0100, Szymon Janc wrote:
+> Hi Andrei,
+> 
+> On Thursday 06 of November 2014 12:18:50 Andrei Emeltchenko wrote:
+> > From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> > 
+> > BLUEZ_EXTENSION is replaced by ANDROID_VERSION >= PLATFORM_VER(5, 0, 0)
+> > check.
 
-diff --git a/android/handsfree.c b/android/handsfree.c
-index b410f5d..33fcbdd 100644
---- a/android/handsfree.c
-+++ b/android/handsfree.c
-@@ -290,6 +290,9 @@ static bool match_by_bdaddr(const void *data, const void *match_data)
- 
- static struct hf_device *find_device(const bdaddr_t *bdaddr)
- {
-+	if (!bacmp(bdaddr, BDADDR_ANY))
-+		return find_default_device();
-+
- 	return queue_find(devices, match_by_bdaddr, bdaddr);
- }
- 
--- 
-1.9.1
+...
+
+> > diff --git a/android/client/if-hf-client.c b/android/client/if-hf-client.c
+> > index 3f6f7c2..5783ffe 100644
+> > --- a/android/client/if-hf-client.c
+> > +++ b/android/client/if-hf-client.c
+> > @@ -18,6 +18,8 @@
+> >  #include "if-main.h"
+> >  #include "../hal-utils.h"
+> >  
+> > +#if ANDROID_VERSION >= PLATFORM_VER(5, 0, 0)
+> > +
+> 
+> I'd prefer if you handle this on Android.mk level.
+
+Yes, I was thinking about it. Last time I was trying to use those
+constructions in makefile I faced some problems.
+
+Will try this way.
+
+Best regards 
+Andrei Emeltchenko 
 
