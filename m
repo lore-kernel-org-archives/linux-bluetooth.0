@@ -1,76 +1,38 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 06/14] android/handsfree: Add support for new API for handle_dtmf
-Date: Thu,  6 Nov 2014 10:32:01 +0200
-Message-Id: <1415262729-12573-7-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1415262729-12573-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1415262729-12573-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCH 00/14] 2nd part of handsfree Android 5.0 adaptation code
+Date: Thu,  6 Nov 2014 10:31:55 +0200
+Message-Id: <1415262729-12573-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-DTMF Command notification callback has new parameter bdaddr.
----
- android/hal-handsfree.c | 4 ++++
- android/hal-ipc-api.txt | 1 +
- android/hal-msg.h       | 1 +
- android/handsfree.c     | 1 +
- 4 files changed, 7 insertions(+)
+Add support for Android 5.0 interfaces (2nd part of patches) - callbacks.
 
-diff --git a/android/hal-handsfree.c b/android/hal-handsfree.c
-index 3a5eec6..21d4444 100644
---- a/android/hal-handsfree.c
-+++ b/android/hal-handsfree.c
-@@ -134,7 +134,11 @@ static void handle_dtmf(void *buf, uint16_t len, int fd)
- 	struct hal_ev_handsfree_dtmf *ev = buf;
- 
- 	if (cbs->dtmf_cmd_cb)
-+#if ANDROID_VERSION >= PLATFORM_VER(5, 0, 0)
-+		cbs->dtmf_cmd_cb(ev->tone, (bt_bdaddr_t *) (ev->bdaddr));
-+#else
- 		cbs->dtmf_cmd_cb(ev->tone);
-+#endif
- }
- 
- static void handle_nrec(void *buf, uint16_t len, int fd)
-diff --git a/android/hal-ipc-api.txt b/android/hal-ipc-api.txt
-index bc41993..962650b 100644
---- a/android/hal-ipc-api.txt
-+++ b/android/hal-ipc-api.txt
-@@ -1038,6 +1038,7 @@ Notifications:
- 	Opcode 0x88 - DTMF Command notification
- 
- 		Notification parameters: Tone (1 octet)
-+		                         Remote address (6 octets)
- 
- 	Opcode 0x89 - NREC Command notification
- 
-diff --git a/android/hal-msg.h b/android/hal-msg.h
-index a1cfff1..00e66e2 100644
---- a/android/hal-msg.h
-+++ b/android/hal-msg.h
-@@ -1376,6 +1376,7 @@ struct hal_ev_handsfree_dial {
- #define HAL_EV_HANDSFREE_DTMF		0x88
- struct hal_ev_handsfree_dtmf {
- 	uint8_t tone;
-+	uint8_t bdaddr[6];
- } __attribute__((packed));
- 
- #define HAL_HANDSFREE_NREC_STOP		0x00
-diff --git a/android/handsfree.c b/android/handsfree.c
-index 6b67af5..53f3fd1 100644
---- a/android/handsfree.c
-+++ b/android/handsfree.c
-@@ -730,6 +730,7 @@ static void at_cmd_vts(struct hfp_context *context,
- 		if (hfp_context_has_next(context))
- 			break;
- 
-+		bdaddr2android(&dev->bdaddr, ev.bdaddr);
- 		ev.tone = str[0];
- 
- 		ipc_send_notif(hal_ipc, HAL_SERVICE_ID_HANDSFREE,
+Andrei Emeltchenko (14):
+  android/handsfree: Add support for new API for vr_cmd_cb
+  android/handsfree: Add support for new API for handle_answer
+  android/handsfree: Add support for new API for hangup_call_cmd_cb
+  android/handsfree: Add support for new API for volume_cmd_cb
+  android/handsfree: Add support for new API for dial_call_cmd_cb
+  android/handsfree: Add support for new API for handle_dtmf
+  android/handsfree: Add support for new API for nrec_cmd_cb
+  android/handsfree: Add support for new API for chld_cmd_cb
+  android/handsfree: Add support for new API for cnum_cmd_cb
+  android/handsfree: Add support for new API for cind_cmd_cb
+  android/handsfree: Add support for new API for cops_cmd_cb
+  android/handsfree: Add support for new API for clcc_cmd_cb
+  android/handsfree: Add support for new API for unknown_at_cmd_cb
+  android/handsfree: Add support for new API for key_pressed_cmd_cb
+
+ android/hal-handsfree.c | 95 ++++++++++++++++++++++++++++++++++++++++++++-----
+ android/hal-ipc-api.txt | 25 ++++++++-----
+ android/hal-msg.h       | 28 +++++++++++++++
+ android/handsfree.c     | 48 +++++++++++++++++++++----
+ 4 files changed, 172 insertions(+), 24 deletions(-)
+
 -- 
 1.9.1
 
