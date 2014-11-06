@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 14/14] android/handsfree: Add support for new API for key_pressed_cmd_cb
-Date: Thu,  6 Nov 2014 10:32:09 +0200
-Message-Id: <1415262729-12573-15-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCH 12/14] android/handsfree: Add support for new API for clcc_cmd_cb
+Date: Thu,  6 Nov 2014 10:32:07 +0200
+Message-Id: <1415262729-12573-13-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1415262729-12573-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1415262729-12573-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,87 +11,86 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Key Pressed Command notification callback has new parameter bdaddr.
+CLCC Command notification callback has new parameter bdaddr.
 ---
  android/hal-handsfree.c | 9 ++++++++-
  android/hal-ipc-api.txt | 2 +-
  android/hal-msg.h       | 3 +++
- android/handsfree.c     | 6 +++++-
- 4 files changed, 17 insertions(+), 3 deletions(-)
+ android/handsfree.c     | 5 ++++-
+ 4 files changed, 16 insertions(+), 3 deletions(-)
 
 diff --git a/android/hal-handsfree.c b/android/hal-handsfree.c
-index 76e036a..2834c80 100644
+index ea9614b..83d9909 100644
 --- a/android/hal-handsfree.c
 +++ b/android/hal-handsfree.c
-@@ -238,8 +238,15 @@ static void handle_unknown_at(void *buf, uint16_t len, int fd)
+@@ -206,8 +206,15 @@ static void handle_cops(void *buf, uint16_t len, int fd)
  
- static void handle_hsp_key_press(void *buf, uint16_t len, int fd)
+ static void handle_clcc(void *buf, uint16_t len, int fd)
  {
--	if (cbs->key_pressed_cmd_cb)
-+	if (cbs->key_pressed_cmd_cb) {
+-	if (cbs->clcc_cmd_cb)
++	if (cbs->clcc_cmd_cb) {
 +#if ANDROID_VERSION >= PLATFORM_VER(5, 0, 0)
-+		struct hal_ev_handsfree_hsp_key_press *ev = buf;
++		struct hal_ev_handsfree_clcc *ev = buf;
 +
-+		cbs->key_pressed_cmd_cb((bt_bdaddr_t *) (ev->bdaddr));
++		cbs->clcc_cmd_cb((bt_bdaddr_t *) (ev->bdaddr));
 +#else
- 		cbs->key_pressed_cmd_cb();
+ 		cbs->clcc_cmd_cb();
 +#endif
 +	}
  }
  
- /*
+ static void handle_unknown_at(void *buf, uint16_t len, int fd)
 diff --git a/android/hal-ipc-api.txt b/android/hal-ipc-api.txt
-index 3e8a38c..c7d5c59 100644
+index 64adf57..9c9ac35 100644
 --- a/android/hal-ipc-api.txt
 +++ b/android/hal-ipc-api.txt
-@@ -1081,7 +1081,7 @@ Notifications:
+@@ -1072,7 +1072,7 @@ Notifications:
  
- 	Opcode 0x90 - Key Pressed Command notification
+ 	Opcode 0x8e - CLCC Command notification
  
 -		Notification parameters: <none>
 +		Notification parameters: Remote address (6 octets)
  
+ 	Opcode 0x8f - Unknown AT Command notification
  
- Bluetooth Advanced Audio HAL (ID 6)
 diff --git a/android/hal-msg.h b/android/hal-msg.h
-index f86e6b7..eef226e 100644
+index 5793a5b..9b9c2b0 100644
 --- a/android/hal-msg.h
 +++ b/android/hal-msg.h
-@@ -1427,6 +1427,9 @@ struct hal_ev_handsfree_unknown_at {
+@@ -1415,6 +1415,9 @@ struct hal_ev_handsfree_cops {
  } __attribute__((packed));
  
- #define HAL_EV_HANDSFREE_HSP_KEY_PRESS	0x90
-+struct hal_ev_handsfree_hsp_key_press {
+ #define HAL_EV_HANDSFREE_CLCC		0x8E
++struct hal_ev_handsfree_clcc {
 +	uint8_t bdaddr[6];
 +} __attribute__((packed));
  
- #define HAL_AVRCP_FEATURE_NONE			0x00
- #define HAL_AVRCP_FEATURE_METADATA		0x01
+ #define HAL_EV_HANDSFREE_UNKNOWN_AT	0x8F
+ struct hal_ev_handsfree_unknown_at {
 diff --git a/android/handsfree.c b/android/handsfree.c
-index d9cb929..4d8dff4 100644
+index b64dcc6..9eaf38f 100644
 --- a/android/handsfree.c
 +++ b/android/handsfree.c
-@@ -1143,6 +1143,7 @@ static void at_cmd_ckpd(struct hfp_context *result, enum hfp_gw_cmd_type type,
- 								void *user_data)
+@@ -633,6 +633,7 @@ static void at_cmd_clcc(struct hfp_context *context,
+ 				enum hfp_gw_cmd_type type, void *user_data)
  {
  	struct hf_device *dev = user_data;
-+	struct hal_ev_handsfree_hsp_key_press ev;
- 	unsigned int val;
++	struct hal_ev_handsfree_clcc ev;
  
  	DBG("");
-@@ -1155,8 +1156,11 @@ static void at_cmd_ckpd(struct hfp_context *result, enum hfp_gw_cmd_type type,
- 		if (hfp_context_has_next(result))
+ 
+@@ -641,8 +642,10 @@ static void at_cmd_clcc(struct hfp_context *context,
+ 		if (hfp_context_has_next(context))
  			break;
  
 +		bdaddr2android(&dev->bdaddr, ev.bdaddr);
 +
  		ipc_send_notif(hal_ipc, HAL_SERVICE_ID_HANDSFREE,
--				HAL_EV_HANDSFREE_HSP_KEY_PRESS, 0, NULL);
-+						HAL_EV_HANDSFREE_HSP_KEY_PRESS,
-+						sizeof(ev), &ev);
- 
- 		hfp_gw_send_result(dev->gw, HFP_RESULT_OK);
+-					HAL_EV_HANDSFREE_CLCC, 0, NULL);
++					HAL_EV_HANDSFREE_CLCC, sizeof(ev), &ev);
  		return;
+ 	case HFP_GW_CMD_TYPE_READ:
+ 	case HFP_GW_CMD_TYPE_TEST:
 -- 
 1.9.1
 
