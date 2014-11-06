@@ -1,88 +1,112 @@
 Return-Path: <cyrus@holtmann.org>
-From: Kuba Pawlak <kubax.t.pawlak@intel.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Kuba Pawlak <kubax.t.pawlak@intel.com>
-Subject: [PATCHv2 1/2] Bluetooth: Clear role switch pending flag
-Date: Thu,  6 Nov 2014 19:36:52 +0100
-Message-Id: <1415299013-24580-1-git-send-email-kubax.t.pawlak@intel.com>
+Date: Thu, 6 Nov 2014 11:44:46 -0500 (EST)
+From: Alan Stern <stern@rowland.harvard.edu>
+To: Naveen Kumar Parna <pnaveenkos@gmail.com>
+cc: Oliver Neukum <oneukum@suse.de>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	<linux-usb@vger.kernel.org>, <acho@suse.com>
+Subject: Re: btusb_intr_complete returns -EPIPE
+In-Reply-To: <CAG0bkv+DL0bVs9irE7eUB3rC-J16Ue=b9+_TqeuTHJYMJDkC0g@mail.gmail.com>
+Message-ID: <Pine.LNX.4.44L0.1411061100280.886-100000@iolanthe.rowland.org>
+MIME-Version: 1.0
+Content-Type: TEXT/PLAIN; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-If role switch was rejected by the controller and HCI Event: Command Status
-returned with status "Command Disallowed" (0x0C) the flag
-HCI_CONN_RSWITCH_PEND remains set. No further role switches are
-possible as this flag prevents us from sending any new HCI Switch Role
-requests and the only way to clear it is to receive a valid
-HCI Event Switch Role.
+On Thu, 6 Nov 2014, Naveen Kumar Parna wrote:
 
-This patch clears the flag if command was rejected.
+> > Any idea why you see the CSPLITs now but didn't see them before?
+> 
+> It looks like , I failed to locate the exact portion of the analyzer
+> log that corresponds to one of those -32 events in the usbmon log.
 
-2013-01-01 00:03:44.209913 < HCI Command: Switch Role (0x02|0x000b) plen 7
-    bdaddr BC:C6:DB:C4:6F:79 role 0x00
-    Role: Master
-2013-01-01 00:03:44.210867 > HCI Event: Command Status (0x0f) plen 4
-    Switch Role (0x02|0x000b) status 0x0c ncmd 1
-    Error: Command Disallowed
+Well, I still don't understand that, but never mind...
 
-Signed-off-by: Kuba Pawlak <kubax.t.pawlak@intel.com>
----
- net/bluetooth/hci_event.c | 27 +++++++++++++++++++++++++++
- 1 file changed, 27 insertions(+)
+> USB Analyzer records several megabytes of data very quickly, so it’s
+> very hard to find the portion of the analyzer log that corresponds to
+> one of those -32 events in the usbmon log. To avoid this difficulty I
+> applied the attached patch
+> (0002-btusb-clear-halt-if-intr-in-stalls.patch – got it from Oliver
+> Neukum) to btusb driver and reloaded this driver.
+> 
+> The applied patch calls usb_clear_halt() on receiving the stall
+> response, so now I can easily search for ClearFeature(ENDPOINT_HALT)
+> request in the analyzer log. It can be found at "2.304 252 217" &
+> "2.316 264 600" time instance in the attached log.
+> 
+> Re ran the Analyzer again and attached it’s exported text
+> log([2014-11-06 session 125138] Trace0000_only_ep0_ep1.txt). Here
+> filtered out the BulkIN transactions.
+> 
+> usbmon log:
+> ffff8800b7670a80 506095728 C Ii:1:108:1 -32:1 0
+> ffff8800affdccc0 506107757 C Ii:1:108:1 -32:1 0
 
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 2f02ff0..73d9bb4 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -1947,6 +1947,29 @@ unlock:
- 	hci_dev_unlock(hdev);
- }
+> Here is the portion of the log that corresponds to “ffff8800b7670a80
+> 506095728 C Ii:1:108:1 -32:1 0”:
+> 
+> Start of Frame (6) HS 553.2 -> 553.7 2.302 964 717
+> SSPLIT IN transaction 105 1 HS No data 2.303 590 367
+> SSPLIT IN transaction 106 1 HS No data 2.303 591 283
+> SSPLIT IN transaction 107 1 HS No data 2.303 600 283
+> SSPLIT IN transaction 108 1 HS No data 2.303 601 350
+> Start of Frame (2) HS 554.0 -> 554.1 2.303 714 817
+> CSPLIT IN transaction 105 1 NAK HS No data 2.303 840 400
+> CSPLIT IN transaction 106 1 NAK HS No data 2.303 842 033
+> CSPLIT IN transaction 107 1 NAK HS No data 2.303 855 317
+> Start of Frame (3) HS 554.2 -> 554.4 2.303 964 850
+
+Obviously, there aren't any CSPLITs for device 108 ep 1.
+
+> Here is the portion of the log that corresponds to “ffff8800affdccc0
+> 506107757 C Ii:1:108:1 -32:1 0":
+> 
+> Start of Frame (6) HS 565.2 -> 565.7 2.314 966 383
+> SSPLIT IN transaction 105 1 HS No data 2.315 592 033
+> SSPLIT IN transaction 106 1 HS No data 2.315 592 967
+> SSPLIT IN transaction 107 1 HS No data 2.315 612 800
+> SSPLIT IN transaction 108 1 HS No data 2.315 613 850
+> Start of Frame (2) HS 566.0 -> 566.1 2.315 716 483
+> CSPLIT IN transaction 105 1 NAK HS No data 2.315 842 067
+> CSPLIT IN transaction 106 1 NAK HS No data 2.315 843 683
+> CSPLIT IN transaction 107 1 NAK HS No data 2.315 928 750
+> Start of Frame (3) HS 566.2 -> 566.4 2.315 966 517
+
+> In both the cases, CSPLIT of Dev-108 is missing in this portion of the log.
+> 
+> So, Does this test log gives some conclusion?
+
+It indicates that the EHCI host controller hardware isn't working 
+right.  Every now and then it skips sending CSPLIT packets when it 
+should send them.
+
+I suppose it's possible that the host controller is okay and the 
+problem is a bad memory chip.  That could also cause this sort of 
+error.  Regardless, it has to be a hardware problem.
+
+Now, this doesn't explain why you get the -32 status code.  Maybe the 
+patch below will provide more information.  Try running your test with 
+this patch installed and see what shows up in the dmesg log.
+
+Alan Stern
+
+
+
+Index: usb-3.18/drivers/usb/host/ehci-q.c
+===================================================================
+--- usb-3.18.orig/drivers/usb/host/ehci-q.c
++++ usb-3.18/drivers/usb/host/ehci-q.c
+@@ -346,6 +346,12 @@ qh_completions (struct ehci_hcd *ehci, s
+ 		/* always clean up qtds the hc de-activated */
+  retry_xacterr:
+ 		if ((token & QTD_STS_ACTIVE) == 0) {
++			u32 info2 = hc32_to_cpu(ehci, hw->hw_info2);
++
++			if ((info2 & QH_SMASK) && (token & 0x7e))
++				ehci_info(ehci, "split intr info2 %x token %x overlay token %x\n",
++						info2, token, hc32_to_cpu(ehci,
++							hw->hw_token));
  
-+static void hci_cs_switch_role(struct hci_dev *hdev, u8 status)
-+{
-+	struct hci_cp_switch_role *cp;
-+	struct hci_conn *conn;
-+
-+	BT_DBG("%s status 0x%2.2x", hdev->name, status);
-+
-+	if (!status)
-+		return;
-+
-+	cp = hci_sent_cmd_data(hdev, HCI_OP_SWITCH_ROLE);
-+	if (!cp)
-+		return;
-+
-+	hci_dev_lock(hdev);
-+
-+	conn = hci_conn_hash_lookup_ba(hdev, ACL_LINK, &cp->bdaddr);
-+	if (conn)
-+		clear_bit(HCI_CONN_RSWITCH_PEND, &conn->flags);
-+
-+	hci_dev_unlock(hdev);
-+}
-+
- static void hci_inquiry_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
- {
- 	__u8 status = *((__u8 *) skb->data);
-@@ -2886,6 +2909,10 @@ static void hci_cmd_status_evt(struct hci_dev *hdev, struct sk_buff *skb)
- 		hci_cs_exit_sniff_mode(hdev, ev->status);
- 		break;
- 
-+	case HCI_OP_SWITCH_ROLE:
-+		hci_cs_switch_role(hdev, ev->status);
-+		break;
-+
- 	case HCI_OP_DISCONNECT:
- 		hci_cs_disconnect(hdev, ev->status);
- 		break;
--- 
-1.7.11.7
-
-Intel GmbH
-Dornacher Strasse 1
-85622 Feldkirchen/Muenchen, Deutschland
-Sitz der Gesellschaft: Feldkirchen bei Muenchen
-Geschaeftsfuehrer: Christian Lamprechter, Hannes Schwaderer, Douglas Lusk
-Registergericht: Muenchen HRB 47456
-Ust.-IdNr./VAT Registration No.: DE129385895
-Citibank Frankfurt a.M. (BLZ 502 109 00) 600119052
+ 			/* Report Data Buffer Error: non-fatal but useful */
+ 			if (token & QTD_STS_DBE)
 
