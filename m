@@ -1,51 +1,80 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Pawlak, KubaX T" <kubax.t.pawlak@intel.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: RE: [PATCH] Bluetooth: Clear role switch pending flag
-Date: Thu, 6 Nov 2014 09:39:16 +0000
-Message-ID: <088CC8BACB3382439E91D9919CE350242234A869@IRSMSX107.ger.corp.intel.com>
-References: <1415192160-5975-1-git-send-email-kubax.t.pawlak@intel.com>
- <7CB3B364-424E-4E98-9981-DD216A3BCAE8@holtmann.org>
-In-Reply-To: <7CB3B364-424E-4E98-9981-DD216A3BCAE8@holtmann.org>
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
+From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
+Subject: [PATCH] tools/mcaptest: Don't block main loop when disconnection is expected
+Date: Thu,  6 Nov 2014 10:33:05 +0100
+Message-Id: <1415266385-18293-1-git-send-email-jakub.tyszkowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel
+This triggers action after timeout without using sleep which was
+blocking main loop and mcaplib.
+---
+ tools/mcaptest.c | 37 +++++++++++++++++++++++++------------
+ 1 file changed, 25 insertions(+), 12 deletions(-)
 
-> please sort these by opcode. I think we at least tried to have them in order of
-> opcode.
-> 
-
-Actually opcodes sorting in this function looks like this:
-0x0401
-0x0405
-0x0407
-0x0411
-0x0413
-0x0419
-0x041b
-0x041c
-0x0428
-0x0803 <-  sniff mode
-0x0804  <- exit sniff mode
-0x0406 <-disconnect
-0x0435
-0x0436
-0x200d <- LE related
-0x0219 
-
-Mine is 0x080b so it goes at the end and the list needs resorting or in the middle after 0x0803 and 0x0804. 
-
-Kuba
-Intel GmbH
-Dornacher Strasse 1
-85622 Feldkirchen/Muenchen, Deutschland
-Sitz der Gesellschaft: Feldkirchen bei Muenchen
-Geschaeftsfuehrer: Christian Lamprechter, Hannes Schwaderer, Douglas Lusk
-Registergericht: Muenchen HRB 47456
-Ust.-IdNr./VAT Registration No.: DE129385895
-Citibank Frankfurt a.M. (BLZ 502 109 00) 600119052
+diff --git a/tools/mcaptest.c b/tools/mcaptest.c
+index 42734eb..bebc890 100644
+--- a/tools/mcaptest.c
++++ b/tools/mcaptest.c
+@@ -71,31 +71,44 @@ static gboolean no_close = FALSE;
+ 
+ #define REQ_CLOCK_ACC 0x1400
+ 
+-static void mdl_connected_cb(struct mcap_mdl *mdl, void *data)
++static gboolean close_mdl_timeout(gpointer user_data)
+ {
++	struct mcap_mdl *mdl = user_data;
+ 	int fd = -1;
+ 
++	fd = mcap_mdl_get_fd(mdl);
++
++	if (fd > 0)
++		close(fd);
++
++	return FALSE;
++}
++
++static void mdl_connected_cb(struct mcap_mdl *mdl, void *data)
++{
+ 	printf("%s\n", __func__);
+ 
+-	if (mdl_disconnect && mdl_disconnect_timeout >= 0) {
+-		sleep(mdl_disconnect_timeout);
++	if (mdl_disconnect && mdl_disconnect_timeout >= 0)
++		g_timeout_add(mdl_disconnect_timeout * 1000, close_mdl_timeout,
++									mdl);
++}
+ 
+-		fd = mcap_mdl_get_fd(mdl);
++static gboolean close_mcl_timeout(gpointer user_data)
++{
++	struct mcap_mcl *mcl = user_data;
+ 
+-		if (fd > 0)
+-			close(fd);
+-	}
++	mcap_close_mcl(mcl, TRUE);
++
++	return FALSE;
+ }
+ 
+ static void mdl_closed_cb(struct mcap_mdl *mdl, void *data)
+ {
+ 	printf("%s\n", __func__);
+ 
+-	if (mcl_disconnect && mcl_disconnect_timeout >= 0) {
+-		sleep(mcl_disconnect_timeout);
+-
+-		mcap_close_mcl(mcl, TRUE);
+-	}
++	if (mcl_disconnect && mcl_disconnect_timeout >= 0)
++		g_timeout_add(mcl_disconnect_timeout * 1000, close_mcl_timeout,
++									mcl);
+ }
+ 
+ static void mdl_deleted_cb(struct mcap_mdl *mdl, void *data)
+-- 
+1.9.1
 
