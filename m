@@ -1,44 +1,69 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCHv2] android/handsfree: Return default device for zero bdaddr
-Date: Thu, 06 Nov 2014 13:57:19 +0100
-Message-ID: <2839608.s73lST7E4d@uw000953>
-In-Reply-To: <1415277958-26589-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <4917512.kiFJOhNPJF@uw000953> <1415277958-26589-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+From: Marcin Kraglak <marcin.kraglak@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCHv2 1/2] android/gatt: Initialize includes queue
+Date: Thu,  6 Nov 2014 13:57:05 +0100
+Message-Id: <1415278626-20784-1-git-send-email-marcin.kraglak@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+Initialize included queue even if service is Secondary Service.
+---
+ android/gatt.c | 25 +++++++++++--------------
+ 1 file changed, 11 insertions(+), 14 deletions(-)
 
-On Thursday 06 of November 2014 14:45:58 Andrei Emeltchenko wrote:
-> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-> 
-> For the old Android API use find_default_device() function.
-> ---
->  android/handsfree.c | 3 +++
->  1 file changed, 3 insertions(+)
-> 
-> diff --git a/android/handsfree.c b/android/handsfree.c
-> index b410f5d..33fcbdd 100644
-> --- a/android/handsfree.c
-> +++ b/android/handsfree.c
-> @@ -290,6 +290,9 @@ static bool match_by_bdaddr(const void *data, const void *match_data)
->  
->  static struct hf_device *find_device(const bdaddr_t *bdaddr)
->  {
-> +	if (!bacmp(bdaddr, BDADDR_ANY))
-> +		return find_default_device();
-> +
->  	return queue_find(devices, match_by_bdaddr, bdaddr);
->  }
->  
-
-Applied, thanks. 
-
+diff --git a/android/gatt.c b/android/gatt.c
+index 7cf612f..6b57145 100644
+--- a/android/gatt.c
++++ b/android/gatt.c
+@@ -318,8 +318,7 @@ static void destroy_service(void *data)
+ 	 * So we need to free service memory only once but we need to destroy
+ 	 * two queues
+ 	 */
+-	if (srvc->primary)
+-		queue_destroy(srvc->included, NULL);
++	queue_destroy(srvc->included, NULL);
+ 
+ 	free(srvc);
+ }
+@@ -1081,6 +1080,14 @@ static struct service *create_service(uint8_t id, bool primary, char *uuid,
+ 		return NULL;
+ 	}
+ 
++	s->included = queue_new();
++	if (!s->included) {
++		error("gatt: Cannot allocate memory for included queue");
++		queue_destroy(s->chars, NULL);
++		free(s);
++		return NULL;
++	}
++
+ 	if (bt_string_to_uuid(&s->id.uuid, uuid) < 0) {
+ 		error("gatt: Cannot convert string to uuid");
+ 		queue_destroy(s->chars, NULL);
+@@ -1092,20 +1099,10 @@ static struct service *create_service(uint8_t id, bool primary, char *uuid,
+ 
+ 	/* Put primary service to our local list */
+ 	s->primary = primary;
+-	if (s->primary) {
++	if (s->primary)
+ 		memcpy(&s->prim, data, sizeof(s->prim));
+-	} else {
++	else
+ 		memcpy(&s->incl, data, sizeof(s->incl));
+-		return s;
+-	}
+-
+-	/* For primary service allocate queue for included services */
+-	s->included = queue_new();
+-	if (!s->included) {
+-		queue_destroy(s->chars, NULL);
+-		free(s);
+-		return NULL;
+-	}
+ 
+ 	return s;
+ }
 -- 
-Best regards, 
-Szymon Janc
+1.9.3
+
