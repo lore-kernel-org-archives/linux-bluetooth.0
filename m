@@ -1,47 +1,94 @@
 Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
-To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 00/14] 2nd part of handsfree Android 5.0 adaptation code
-Date: Thu, 06 Nov 2014 12:42:47 +0100
-Message-ID: <2362169.Zd6WZyUPBF@uw000953>
-In-Reply-To: <1415262729-12573-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1415262729-12573-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: Re: [PATCH] tools/mcaptest: Don't block main loop when disconnection is expected
+Date: Thu, 06 Nov 2014 12:23:41 +0100
+Message-ID: <6103693.iikMHdRFtS@uw000953>
+In-Reply-To: <1415266385-18293-1-git-send-email-jakub.tyszkowski@tieto.com>
+References: <1415266385-18293-1-git-send-email-jakub.tyszkowski@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+Hi Jakub,
 
-On Thursday 06 of November 2014 10:31:55 Andrei Emeltchenko wrote:
-> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+On Thursday 06 of November 2014 10:33:05 Jakub Tyszkowski wrote:
+> This triggers action after timeout without using sleep which was
+> blocking main loop and mcaplib.
+> ---
+>  tools/mcaptest.c | 37 +++++++++++++++++++++++++------------
+>  1 file changed, 25 insertions(+), 12 deletions(-)
 > 
-> Add support for Android 5.0 interfaces (2nd part of patches) - callbacks.
+> diff --git a/tools/mcaptest.c b/tools/mcaptest.c
+> index 42734eb..bebc890 100644
+> --- a/tools/mcaptest.c
+> +++ b/tools/mcaptest.c
+> @@ -71,31 +71,44 @@ static gboolean no_close = FALSE;
+>  
+>  #define REQ_CLOCK_ACC 0x1400
+>  
+> -static void mdl_connected_cb(struct mcap_mdl *mdl, void *data)
+> +static gboolean close_mdl_timeout(gpointer user_data)
+>  {
+> +	struct mcap_mdl *mdl = user_data;
+>  	int fd = -1;
+
+This initialization is not needed now.
+>  
+> +	fd = mcap_mdl_get_fd(mdl);
+> +
+> +	if (fd > 0)
+> +		close(fd);
+
+0 is also valid fd. Probably won't happen with command line tool but lets
+be consistent on this.
+
+> +
+> +	return FALSE;
+> +}
+> +
+> +static void mdl_connected_cb(struct mcap_mdl *mdl, void *data)
+> +{
+>  	printf("%s\n", __func__);
+>  
+> -	if (mdl_disconnect && mdl_disconnect_timeout >= 0) {
+> -		sleep(mdl_disconnect_timeout);
+> +	if (mdl_disconnect && mdl_disconnect_timeout >= 0)
+> +		g_timeout_add(mdl_disconnect_timeout * 1000, close_mdl_timeout,
+> +									mdl);
+> +}
+>  
+> -		fd = mcap_mdl_get_fd(mdl);
+> +static gboolean close_mcl_timeout(gpointer user_data)
+> +{
+> +	struct mcap_mcl *mcl = user_data;
+>  
+> -		if (fd > 0)
+> -			close(fd);
+> -	}
+> +	mcap_close_mcl(mcl, TRUE);
+> +
+> +	return FALSE;
+>  }
+>  
+>  static void mdl_closed_cb(struct mcap_mdl *mdl, void *data)
+>  {
+>  	printf("%s\n", __func__);
+>  
+> -	if (mcl_disconnect && mcl_disconnect_timeout >= 0) {
+> -		sleep(mcl_disconnect_timeout);
+> -
+> -		mcap_close_mcl(mcl, TRUE);
+> -	}
+> +	if (mcl_disconnect && mcl_disconnect_timeout >= 0)
+> +		g_timeout_add(mcl_disconnect_timeout * 1000, close_mcl_timeout,
+> +									mcl);
+>  }
+>  
+>  static void mdl_deleted_cb(struct mcap_mdl *mdl, void *data)
 > 
-> Andrei Emeltchenko (14):
->   android/handsfree: Add support for new API for vr_cmd_cb
->   android/handsfree: Add support for new API for handle_answer
->   android/handsfree: Add support for new API for hangup_call_cmd_cb
->   android/handsfree: Add support for new API for volume_cmd_cb
->   android/handsfree: Add support for new API for dial_call_cmd_cb
->   android/handsfree: Add support for new API for handle_dtmf
->   android/handsfree: Add support for new API for nrec_cmd_cb
->   android/handsfree: Add support for new API for chld_cmd_cb
->   android/handsfree: Add support for new API for cnum_cmd_cb
->   android/handsfree: Add support for new API for cind_cmd_cb
->   android/handsfree: Add support for new API for cops_cmd_cb
->   android/handsfree: Add support for new API for clcc_cmd_cb
->   android/handsfree: Add support for new API for unknown_at_cmd_cb
->   android/handsfree: Add support for new API for key_pressed_cmd_cb
-> 
->  android/hal-handsfree.c | 95 ++++++++++++++++++++++++++++++++++++++++++++-----
->  android/hal-ipc-api.txt | 25 ++++++++-----
->  android/hal-msg.h       | 28 +++++++++++++++
->  android/handsfree.c     | 48 +++++++++++++++++++++----
->  4 files changed, 172 insertions(+), 24 deletions(-)
- 
-All patches applied, thanks a lot.
 
 -- 
 Best regards, 
