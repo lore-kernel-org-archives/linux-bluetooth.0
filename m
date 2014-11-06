@@ -1,59 +1,50 @@
 Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
-To: Marcin Kraglak <marcin.kraglak@tieto.com>
+To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/3] android/gatt: Initialize includes queue
-Date: Thu, 06 Nov 2014 12:19:02 +0100
-Message-ID: <3787530.1hodOjGVGq@uw000953>
-In-Reply-To: <1415192511-7651-1-git-send-email-marcin.kraglak@tieto.com>
-References: <1415192511-7651-1-git-send-email-marcin.kraglak@tieto.com>
+Subject: Re: [PATCH] android/doc: Fix typos
+Date: Thu, 06 Nov 2014 12:13:21 +0100
+Message-ID: <4266247.pcs9KIOJbE@uw000953>
+In-Reply-To: <1415261382-5355-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1415261382-5355-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcin,
+Hi Andrei,
 
-On Wednesday 05 of November 2014 14:01:49 Marcin Kraglak wrote:
-> Initialize included queue even if service is Secondary Service.
+On Thursday 06 of November 2014 10:09:42 Andrei Emeltchenko wrote:
+> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> 
 > ---
->  android/gatt.c | 9 +++------
->  1 file changed, 3 insertions(+), 6 deletions(-)
+>  android/hal-ipc-api.txt | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
 > 
-> diff --git a/android/gatt.c b/android/gatt.c
-> index b3dd6d3..87a7a12 100644
-> --- a/android/gatt.c
-> +++ b/android/gatt.c
-> @@ -318,8 +318,7 @@ static void destroy_service(void *data)
->  	 * So we need to free service memory only once but we need to destroy
->  	 * two queues
->  	 */
-> -	if (srvc->primary)
-> -		queue_destroy(srvc->included, NULL);
-> +	queue_destroy(srvc->included, NULL);
+> diff --git a/android/hal-ipc-api.txt b/android/hal-ipc-api.txt
+> index c7d5c59..666e27f 100644
+> --- a/android/hal-ipc-api.txt
+> +++ b/android/hal-ipc-api.txt
+> @@ -1768,7 +1768,7 @@ Commands and responses:
+>  	Opcode 0x19 - Connect Peripheral command/response
 >  
->  	free(srvc);
->  }
-> @@ -1092,12 +1091,10 @@ static struct service *create_service(uint8_t id, bool primary, char *uuid,
+>  		Command parameters: Server (4 octets)
+> -		                    Remote address (6 octes)
+> +		                    Remote address (6 octets)
+>  		                    Is Direct (1 octet)
+>  		                    Transport (4 octets)
+>  		Response parameters: <none>
+> @@ -1778,7 +1778,7 @@ Commands and responses:
+>  	Opcode 0x1a - Disconnect Peripheral command/response
 >  
->  	/* Put primary service to our local list */
->  	s->primary = primary;
-> -	if (s->primary) {
-> +	if (s->primary)
->  		memcpy(&s->prim, data, sizeof(s->prim));
-> -	} else {
-> +	else
->  		memcpy(&s->incl, data, sizeof(s->incl));
-> -		return s;
-> -	}
+>  		Command parameters: Server (4 octets)
+> -		                    Remote address (6 octes)
+> +		                    Remote address (6 octets)
+>  		                    Connection ID (1 octet)
+>  		Response parameters: <none>
 >  
->  	/* For primary service allocate queue for included services */
->  	s->included = queue_new();
 
-Please update (remove?) this comment to avoid confusion.
-And maybe move this queue_new() up where service is created.
-
-> 
+Applied, thanks. 
 
 -- 
 Best regards, 
