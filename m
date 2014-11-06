@@ -1,43 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcin Kraglak <marcin.kraglak@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 7/9] unit/test-gatt: Add TP/GAR/CL/BI-01-C test
-Date: Thu,  6 Nov 2014 13:47:12 +0100
-Message-Id: <1415278034-19223-7-git-send-email-marcin.kraglak@tieto.com>
+Subject: [PATCH 8/9] unit/test-gatt: Add TP/GAR/CL/BI-02-C test
+Date: Thu,  6 Nov 2014 13:47:13 +0100
+Message-Id: <1415278034-19223-8-git-send-email-marcin.kraglak@tieto.com>
 In-Reply-To: <1415278034-19223-1-git-send-email-marcin.kraglak@tieto.com>
 References: <1415278034-19223-1-git-send-email-marcin.kraglak@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Verify Generic Attribute Profile client behavior when the
-Read Characteristic Value procedure fails due to invalid handle.
+Verify Generic Attribute Profile client behavior when
+the Read Characteristic Value procedure fails due to
+read not permitted.
 ---
  unit/test-gatt.c | 39 +++++++++++++++++++++++++++++++++++++++
  1 file changed, 39 insertions(+)
 
 diff --git a/unit/test-gatt.c b/unit/test-gatt.c
-index 861740b..d91fd41 100644
+index d91fd41..6208192 100644
 --- a/unit/test-gatt.c
 +++ b/unit/test-gatt.c
-@@ -498,6 +498,12 @@ const struct test_step test_read_1 = {
- 	.length = 0x03
+@@ -504,6 +504,12 @@ const struct test_step test_read_2 = {
+ 	.expected_att_ecode = 0x01,
  };
  
-+const struct test_step test_read_2 = {
-+	.handle = 0x0000,
++const struct test_step test_read_3 = {
++	.handle = 0x0003,
 +	.func = test_read,
-+	.expected_att_ecode = 0x01,
++	.expected_att_ecode = 0x02,
 +};
 +
  static void test_client(gconstpointer data)
  {
  	struct context *context = create_context(512, data);
-@@ -689,5 +695,38 @@ int main(int argc, char *argv[])
- 			raw_pdu(0x0a, 0x03, 0x00),
- 			raw_pdu(0x0b, 0x01, 0x02, 0x03));
+@@ -728,5 +734,38 @@ int main(int argc, char *argv[])
+ 			raw_pdu(0x0a, 0x00, 0x00),
+ 			raw_pdu(0x01, 0x0a, 0x00, 0x00, 0x01));
  
-+	define_test_client("/TP/GAR/CL/BI-01-C", test_client, service_data_1,
-+			&test_read_2,
++	define_test_client("/TP/GAR/CL/BI-02-C", test_client, service_data_1,
++			&test_read_3,
 +			raw_pdu(0x02, 0x00, 0x02),
 +			raw_pdu(0x03, 0x00, 0x02),
 +			raw_pdu(0x10, 0x01, 0x00, 0xff, 0xff, 0x00, 0x28),
@@ -66,8 +67,8 @@ index 861740b..d91fd41 100644
 +			raw_pdu(0x01, 0x08, 0x07, 0x00, 0x0a),
 +			raw_pdu(0x04, 0x08, 0x00, 0x08, 0x00),
 +			raw_pdu(0x05, 0x01, 0x08, 0x00, 0x01, 0x29),
-+			raw_pdu(0x0a, 0x00, 0x00),
-+			raw_pdu(0x01, 0x0a, 0x00, 0x00, 0x01));
++			raw_pdu(0x0a, 0x03, 0x00),
++			raw_pdu(0x01, 0x0a, 0x03, 0x00, 0x02));
 +
  	return g_test_run();
  }
