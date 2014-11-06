@@ -1,20 +1,21 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 8.0 \(1990.1\))
-Subject: Re: [PATCHv2 bluetooth-next] 6lowpan: move skb_free from error paths in decompression
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1415301313-32290-1-git-send-email-mtownsend1973@gmail.com>
-Date: Thu, 6 Nov 2014 13:11:23 -0800
-Cc: linux-wpan@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-	alex.aring@gmail.com, jukka.rissanen@linux.intel.com
-Message-Id: <930045C7-036D-41C9-B877-3BB126AB55E5@holtmann.org>
-References: <1415301313-32290-1-git-send-email-mtownsend1973@gmail.com>
+Date: Thu, 6 Nov 2014 20:26:42 +0100
+From: Alexander Aring <alex.aring@gmail.com>
 To: Martin Townsend <mtownsend1973@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Cc: linux-wpan@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+	jukka.rissanen@linux.intel.com, marcel@holtmann.org
+Subject: Re: [PATCHv2 bluetooth-next] 6lowpan: move skb_free from error paths
+ in decompression
+Message-ID: <20141106192639.GC2321@omega>
+References: <1415301313-32290-1-git-send-email-mtownsend1973@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+In-Reply-To: <1415301313-32290-1-git-send-email-mtownsend1973@gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Martin,
 
+On Thu, Nov 06, 2014 at 07:15:13PM +0000, Martin Townsend wrote:
 > Currently we ensure that the skb is freed on every error path in IPHC
 > decompression which makes it easy to introduce skb leaks.  By centralising
 > the skb_free into the receive function it makes future decompression routines
@@ -22,15 +23,12 @@ Hi Martin,
 > passed into the decompression routine must not be copied.
 > 
 > Signed-off-by: Martin Townsend <mtownsend1973@gmail.com>
-> ---
-> net/6lowpan/iphc.c            | 31 ++++++++++++-------------------
-> net/bluetooth/6lowpan.c       | 15 +++++++--------
-> net/ieee802154/6lowpan_rtnl.c | 16 ++++++----------
-> 3 files changed, 25 insertions(+), 37 deletions(-)
 
-patch has been applied to bluetooth-next tree.
+so far I understand is that Jukka already acked this patch. So you
+could also add Acked-by: Jukka ... before sending this patch.
 
-Regards
+Nevertheless you will have also an ack from me now:
 
-Marcel
+Acked-by: Alexander Aring <alex.aring@gmail.com>
 
+- Alex
