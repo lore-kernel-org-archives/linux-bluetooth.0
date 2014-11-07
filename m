@@ -1,71 +1,260 @@
 Return-Path: <cyrus@holtmann.org>
-From: Jaganath Kanakkassery <jaganath.k@samsung.com>
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Jaganath Kanakkassery <jaganath.k@samsung.com>
-Subject: [PATCH] Bluetooth: Send mgmt_connected only if state is BT_CONFIG
-Date: Fri, 07 Nov 2014 16:39:09 +0530
-Message-id: <1415358549-28152-1-git-send-email-jaganath.k@samsung.com>
+Cc: szymon.janc@tieto.com
+Subject: [PATCHv3 2/2] android: Remove temporary BLUEZ_EXTENSION flag
+Date: Fri,  7 Nov 2014 12:42:01 +0200
+Message-Id: <1415356921-32320-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1415356921-32320-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1415356921-32320-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-If a remote name request is initiated while acl connection is going on,
-and if it fails then mgmt_connected will be sent. Evetually after acl
-connection, authentication will not be initiated and userspace will
-never get pairing reply.
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-< HCI Command: Create Connection (0x01|0x0005) plen 13
-    bdaddr AA:BB:CC:DD:EE:FF ptype 0xcc18 rswitch 0x01 clkoffset 0x2306 (valid)
-    Packet type: DM1 DM3 DM5 DH1 DH3 DH5
-> HCI Event: Command Status (0x0f) plen 4
-    Create Connection (0x01|0x0005) status 0x00 ncmd 1
-> HCI Event: Inquiry Complete (0x01) plen 1
-    status 0x00
-< HCI Command: Remote Name Request (0x01|0x0019) plen 10
-    bdaddr AA:BB:CC:DD:EE:FF mode 1 clkoffset 0x2306
-> HCI Event: Command Status (0x0f) plen 4
-    Remote Name Request (0x01|0x0019) status 0x0c ncmd 1
-    Error: Command Disallowed
-> HCI Event: Connect Complete (0x03) plen 11
-    status 0x00 handle 50 bdaddr 00:0D:FD:47:53:B2 type ACL encrypt 0x00
-< HCI Command: Read Remote Supported Features (0x01|0x001b) plen 2
-    handle 50
-> HCI Event: Command Status (0x0f) plen 4
-    Read Remote Supported Features (0x01|0x001b) status 0x00 ncmd 1
-> HCI Event: Max Slots Change (0x1b) plen 3
-    handle 50 slots 5
-> HCI Event: Read Remote Supported Features (0x0b) plen 11
-    status 0x00 handle 50
-    Features: 0xff 0xff 0x8f 0xfe 0x9b 0xff 0x59 0x83
-< HCI Command: Read Remote Extended Features (0x01|0x001c) plen 3
-    handle 50 page 1
-> HCI Event: Command Status (0x0f) plen 4
-    Read Remote Extended Features (0x01|0x001c) status 0x00 ncmd 1
-> HCI Event: Read Remote Extended Features (0x23) plen 13
-    status 0x00 handle 50 page 1 max 1
-    Features: 0x01 0x00 0x00 0x00 0x00 0x00 0x00 0x00
-
-This patch sends mgmt_connected in remote name command status only if conn->state
-is BT_CONFIG
-
-Signed-off-by: Jaganath Kanakkassery <jaganath.k@samsung.com>
+BLUEZ_EXTENSION is replaced by ANDROID_VERSION >= PLATFORM_VER(5, 0, 0)
+check.
 ---
- net/bluetooth/hci_event.c |    3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ android/Android.mk       | 15 +++++++--------
+ android/Makefile.am      |  2 +-
+ android/README           |  4 ----
+ android/client/haltest.c |  4 ++--
+ android/client/if-bt.c   |  4 ++--
+ android/client/if-main.h |  8 +++++---
+ android/hal-audio.c      |  1 +
+ android/hal-bluetooth.c  |  2 +-
+ android/hal-sco.c        |  1 +
+ android/hal-utils.h      |  2 --
+ android/hal.h            |  6 ++++--
+ 11 files changed, 24 insertions(+), 25 deletions(-)
 
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 5e7be80..68c882f 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -1581,7 +1581,8 @@ static void hci_check_pending_name(struct hci_dev *hdev, struct hci_conn *conn,
- 	struct discovery_state *discov = &hdev->discovery;
- 	struct inquiry_entry *e;
+diff --git a/android/Android.mk b/android/Android.mk
+index 16f94b9..64ed6b9 100644
+--- a/android/Android.mk
++++ b/android/Android.mk
+@@ -5,6 +5,10 @@ BLUEZ_VERSION := `grep "^AC_INIT" $(LOCAL_PATH)/bluez/configure.ac | sed -e "s/.
  
--	if (conn && !test_and_set_bit(HCI_CONN_MGMT_CONNECTED, &conn->flags))
-+	if (conn && conn->state == BT_CONFIG &&
-+	    !test_and_set_bit(HCI_CONN_MGMT_CONNECTED, &conn->flags))
- 		mgmt_device_connected(hdev, conn, 0, name, name_len);
+ ANDROID_VERSION := `echo $(PLATFORM_VERSION) | awk -F. '{ printf "0x%02d%02d%02d",$$1,$$2,$$3 }'`
  
- 	if (discov->state == DISCOVERY_STOPPED)
++ANDROID_VERSION_DEC := `echo $(PLATFORM_VERSION) | awk -F. '{ printf "%02d%02d%02d",$$1,$$2,$$3 }'`
++
++ANDROID_GE_5_0 := $(shell echo $(ANDROID_VERSION_DEC)\>=050000 | bc)
++
+ # Specify pathmap for glib and sbc
+ pathmap_INCL += glib:external/bluetooth/glib \
+ 		sbc:external/bluetooth/sbc \
+@@ -14,10 +18,6 @@ BLUEZ_COMMON_CFLAGS := -DVERSION=\"$(BLUEZ_VERSION)\" \
+ 			-DANDROID_VERSION=$(ANDROID_VERSION) \
+ 			-DANDROID_STORAGEDIR=\"/data/misc/bluetooth\" \
+ 
+-ifeq ($(BLUEZ_EXTENSIONS), true)
+-BLUEZ_COMMON_CFLAGS += -DBLUEZ_EXTENSIONS
+-endif
+-
+ # Enable warnings enabled in autotools build
+ BLUEZ_COMMON_CFLAGS += -Wall -Wextra \
+ 			-Wdeclaration-after-statement \
+@@ -134,11 +134,10 @@ LOCAL_SRC_FILES := \
+ 	bluez/android/hal-utils.c \
+ 	bluez/android/hal-health.c \
+ 
+-ifeq ($(BLUEZ_EXTENSIONS), true)
++ifeq ($(ANDROID_GE_5_0), 1)
+ LOCAL_SRC_FILES += \
+ 	bluez/android/hal-handsfree-client.c \
+-	bluez/android/hal-map-client.c \
+-
++	bluez/android/hal-map-client.c
+ endif
+ 
+ LOCAL_C_INCLUDES += \
+@@ -183,7 +182,7 @@ LOCAL_SRC_FILES := \
+ 	bluez/android/client/if-gatt.c \
+ 	bluez/android/hal-utils.c \
+ 
+-ifeq ($(BLUEZ_EXTENSIONS), true)
++ifeq ($(ANDROID_GE_5_0), 1)
+ LOCAL_SRC_FILES += \
+ 	bluez/android/client/if-hf-client.c \
+ 	bluez/android/client/if-mce.c
+diff --git a/android/Makefile.am b/android/Makefile.am
+index c547668..07bf7b5 100644
+--- a/android/Makefile.am
++++ b/android/Makefile.am
+@@ -1,6 +1,6 @@
+ if ANDROID
+ 
+-AM_CFLAGS += -DANDROID_VERSION=0x050505 -DBLUEZ_EXTENSIONS
++AM_CFLAGS += -DANDROID_VERSION=0x050505
+ 
+ android_plugindir = $(abs_top_srcdir)/android/.libs
+ 
+diff --git a/android/README b/android/README
+index 4be2c88..b1ac886 100644
+--- a/android/README
++++ b/android/README
+@@ -37,10 +37,6 @@ features (currently epoll_create1 and ppoll calls for Android 4.4). Sample
+ Bionic for Android 4.4 with all required features backported is available at
+ https://code.google.com/p/aosp-bluez.platform-bionic/
+ 
+-- Some of the bluetooth HALs are available only when BLUEZ_EXTENSIONS flag is
+-set in BoardConfig.mk or similar. Please read below for detail which HALs needs
+-that.
+-
+ Runtime requirements
+ --------------------
+ 
+diff --git a/android/client/haltest.c b/android/client/haltest.c
+index 781e45c..c8cfdc4 100644
+--- a/android/client/haltest.c
++++ b/android/client/haltest.c
+@@ -48,7 +48,7 @@ const struct interface *interfaces[] = {
+ 	&pan_if,
+ 	&hl_if,
+ 	&sock_if,
+-#ifdef BLUEZ_EXTENSIONS
++#if ANDROID_VERSION >= PLATFORM_VER(5, 0, 0)
+ 	&hf_client_if,
+ 	&mce_if,
+ #endif
+@@ -396,7 +396,7 @@ static void init(void)
+ 		BT_PROFILE_PAN_ID,
+ 		BT_PROFILE_GATT_ID,
+ 		BT_PROFILE_SOCKETS_ID,
+-#ifdef BLUEZ_EXTENSIONS
++#if ANDROID_VERSION >= PLATFORM_VER(5, 0, 0)
+ 		BT_PROFILE_HANDSFREE_CLIENT_ID,
+ 		BT_PROFILE_MAP_CLIENT_ID,
+ #endif
+diff --git a/android/client/if-bt.c b/android/client/if-bt.c
+index eef4454..48aff1b 100644
+--- a/android/client/if-bt.c
++++ b/android/client/if-bt.c
+@@ -757,7 +757,7 @@ static void get_profile_interface_c(int argc, const char **argv,
+ 		BT_PROFILE_PAN_ID,
+ 		BT_PROFILE_GATT_ID,
+ 		BT_PROFILE_AV_RC_ID,
+-#ifdef BLUEZ_EXTENSIONS
++#if ANDROID_VERSION >= PLATFORM_VER(5, 0, 0)
+ 		BT_PROFILE_HANDSFREE_CLIENT_ID,
+ 		BT_PROFILE_MAP_CLIENT_ID,
+ #endif
+@@ -799,7 +799,7 @@ static void get_profile_interface_p(int argc, const char **argv)
+ 		pif = (const void **) &if_rc;
+ 	else if (strcmp(BT_PROFILE_GATT_ID, id) == 0)
+ 		pif = (const void **) &if_gatt;
+-#ifdef BLUEZ_EXTENSIONS
++#if ANDROID_VERSION >= PLATFORM_VER(5, 0, 0)
+ 	else if (strcmp(BT_PROFILE_HANDSFREE_CLIENT_ID, id) == 0)
+ 		pif = (const void **) &if_hf_client;
+ 	else if (strcmp(BT_PROFILE_MAP_CLIENT_ID, id) == 0)
+diff --git a/android/client/if-main.h b/android/client/if-main.h
+index cb5f558..93cc98d 100644
+--- a/android/client/if-main.h
++++ b/android/client/if-main.h
+@@ -37,7 +37,9 @@
+ #include <hardware/bt_hf.h>
+ #include <hardware/bt_hl.h>
+ 
+-#ifdef BLUEZ_EXTENSIONS
++#include "hal.h"
++
++#if ANDROID_VERSION >= PLATFORM_VER(5, 0, 0)
+ #include <hardware/bt_hf_client.h>
+ #include <hardware/bt_mce.h>
+ #endif
+@@ -62,7 +64,7 @@ extern const btsock_interface_t *if_sock;
+ extern const btgatt_interface_t *if_gatt;
+ extern const btgatt_server_interface_t *if_gatt_server;
+ extern const btgatt_client_interface_t *if_gatt_client;
+-#ifdef BLUEZ_EXTENSIONS
++#if ANDROID_VERSION >= PLATFORM_VER(5, 0, 0)
+ extern const bthf_client_interface_t *if_hf_client;
+ extern const btmce_interface_t *if_mce;
+ #endif
+@@ -89,7 +91,7 @@ extern const struct interface sock_if;
+ extern const struct interface hf_if;
+ extern const struct interface hh_if;
+ extern const struct interface hl_if;
+-#ifdef BLUEZ_EXTENSIONS
++#if ANDROID_VERSION >= PLATFORM_VER(5, 0, 0)
+ extern const struct interface hf_client_if;
+ extern const struct interface mce_if;
+ #endif
+diff --git a/android/hal-audio.c b/android/hal-audio.c
+index 1caa4eb..207101f 100644
+--- a/android/hal-audio.c
++++ b/android/hal-audio.c
+@@ -36,6 +36,7 @@
+ #include "hal-msg.h"
+ #include "hal-audio.h"
+ #include "hal-utils.h"
++#include "hal.h"
+ 
+ #define FIXED_A2DP_PLAYBACK_LATENCY_MS 25
+ 
+diff --git a/android/hal-bluetooth.c b/android/hal-bluetooth.c
+index 1599174..9b5ce16 100644
+--- a/android/hal-bluetooth.c
++++ b/android/hal-bluetooth.c
+@@ -865,7 +865,7 @@ static const void *get_profile_interface(const char *profile_id)
+ 	if (!strcmp(profile_id, BT_PROFILE_HEALTH_ID))
+ 		return bt_get_health_interface();
+ 
+-#if BLUEZ_EXTENSIONS
++#if ANDROID_VERSION >= PLATFORM_VER(5, 0, 0)
+ 	if (!strcmp(profile_id, BT_PROFILE_HANDSFREE_CLIENT_ID))
+ 		return bt_get_hf_client_interface();
+ 
+diff --git a/android/hal-sco.c b/android/hal-sco.c
+index 6c4e975..380b2a8 100644
+--- a/android/hal-sco.c
++++ b/android/hal-sco.c
+@@ -33,6 +33,7 @@
+ #include "sco-msg.h"
+ #include "ipc-common.h"
+ #include "hal-log.h"
++#include "hal.h"
+ 
+ #define AUDIO_STREAM_DEFAULT_RATE	44100
+ #define AUDIO_STREAM_SCO_RATE		8000
+diff --git a/android/hal-utils.h b/android/hal-utils.h
+index ee0320c..9c59948 100644
+--- a/android/hal-utils.h
++++ b/android/hal-utils.h
+@@ -19,8 +19,6 @@
+ 
+ #include <hardware/bluetooth.h>
+ 
+-#define PLATFORM_VER(a,b,c) ((a << 16) | ( b << 8) | (c))
+-
+ #define MAX_UUID_STR_LEN	37
+ #define HAL_UUID_LEN		16
+ #define MAX_ADDR_STR_LEN	18
+diff --git a/android/hal.h b/android/hal.h
+index 9b41952..a2888f0 100644
+--- a/android/hal.h
++++ b/android/hal.h
+@@ -27,7 +27,9 @@
+ #include <hardware/bt_gatt_server.h>
+ #include <hardware/bt_hl.h>
+ 
+-#ifdef BLUEZ_EXTENSIONS
++#define PLATFORM_VER(a,b,c) ((a << 16) | ( b << 8) | (c))
++
++#if ANDROID_VERSION >= PLATFORM_VER(5, 0, 0)
+ #include <hardware/bt_hf_client.h>
+ #include <hardware/bt_mce.h>
+ #endif
+@@ -41,7 +43,7 @@ bthf_interface_t *bt_get_handsfree_interface(void);
+ btgatt_interface_t *bt_get_gatt_interface(void);
+ bthl_interface_t *bt_get_health_interface(void);
+ 
+-#ifdef BLUEZ_EXTENSIONS
++#if ANDROID_VERSION >= PLATFORM_VER(5, 0, 0)
+ bthf_client_interface_t *bt_get_hf_client_interface(void);
+ btmce_interface_t *bt_get_map_client_interface(void);
+ #endif
 -- 
-1.7.9.5
+1.9.1
 
