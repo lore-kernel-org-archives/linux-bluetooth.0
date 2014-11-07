@@ -1,47 +1,49 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCHv3 1/2] android/hardware: Update Anmdroid header to 5.0 API
-Date: Fri, 07 Nov 2014 13:03:55 +0100
-Message-ID: <1692354.o1VeTAIfWm@uw000953>
-In-Reply-To: <1415356921-32320-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1415356921-32320-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Date: Fri, 7 Nov 2014 13:45:31 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Gowtham Anandha Babu <gowtham.ab@samsung.com>
+Cc: linux-bluetooth@vger.kernel.org, d.kasatkin@samsung.com,
+	bharat.panda@samsung.com, cpgs@samsung.com
+Subject: Re: [PATCH  2/4] monitor/rfcomm: Add support for printing RFCOMM hdr
+Message-ID: <20141107114531.GA12813@t440s.lan>
+References: <1415358545-10145-1-git-send-email-gowtham.ab@samsung.com>
+ <1415358545-10145-3-git-send-email-gowtham.ab@samsung.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1415358545-10145-3-git-send-email-gowtham.ab@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+Hi Gowtham,
 
-On Friday 07 of November 2014 12:42:00 Andrei Emeltchenko wrote:
-> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+On Fri, Nov 07, 2014, Gowtham Anandha Babu wrote:
+> Changes made to decode RFCOMM hdr and print the same.
 > 
-> Android headers are used for host build.
-> ---
->  android/Android.mk                |   4 +-
->  android/Makefile.am               |   2 +-
->  android/hardware/audio.h          | 147 ++++++-
->  android/hardware/audio_effect.h   |   3 +-
->  android/hardware/bluetooth.h      |  82 +++-
->  android/hardware/bt_av.h          |  15 +-
->  android/hardware/bt_gatt_client.h | 134 +++++-
->  android/hardware/bt_gatt_server.h |  19 +-
->  android/hardware/bt_gatt_types.h  |   8 +
->  android/hardware/bt_hf.h          |  63 ++-
->  android/hardware/bt_hf_client.h   |  30 +-
->  android/hardware/bt_hh.h          |  10 +-
->  android/hardware/bt_mce.h         |   5 +-
->  android/hardware/bt_pan.h         |   4 +-
->  android/hardware/bt_rc.h          |  34 +-
->  android/system/audio.h            | 867 +++++++++++++++++++++++++++++++++++---
->  android/tester-a2dp.c             |   2 +-
->  android/tester-gatt.c             |  15 +-
->  android/tester-main.c             |  11 +-
->  19 files changed, 1312 insertions(+), 143 deletions(-)
+>       RFCOMM: Unnumbered Info with Header Check (UIH)(0xef)
 
-Both patches applied (after fixing typos in commit message), thanks.
+Could you add a space here between (UIH) and (0xef)
 
--- 
-Best regards, 
-Szymon Janc
+>          Address : (0x01)
+
+No space before ':' and no need to have parenthesis around the hex
+value. The reason why that exists elsewhere is to make it clear that the
+value is separate of the preceding string translation (which you don't
+have here).
+
+>            Command/Response Bit: 0
+>            DLCI : (0x00)
+>          Control : (0xef)
+>            Poll/Final Bit : 0
+>          Length : 10
+>          FCS : (0xaa)
+>         81 11 20 e0 27 00 9a 02 00 07 aa                 .. .'......             
+
+I'd prefer if we could try to stick to the hcidump-style decoding and
+make this more compact. I.e. you could have something like:
+
+	Address: 0x01 cr 0 dlci 0
+	Control: 0xef poll/final 0
+	Length: 10
+	...
+
+Johan
