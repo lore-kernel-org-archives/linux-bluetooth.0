@@ -1,33 +1,71 @@
 Return-Path: <cyrus@holtmann.org>
-From: Gowtham Anandha Babu <gowtham.ab@samsung.com>
+From: Jaganath Kanakkassery <jaganath.k@samsung.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: d.kasatkin@samsung.com, bharat.panda@samsung.com, cpgs@samsung.com,
-	Gowtham Anandha Babu <gowtham.ab@samsung.com>
-Subject: [PATCH  0/4] Add support for RFCOMM in btmon
-Date: Fri, 07 Nov 2014 16:39:01 +0530
-Message-id: <1415358545-10145-1-git-send-email-gowtham.ab@samsung.com>
+Cc: Jaganath Kanakkassery <jaganath.k@samsung.com>
+Subject: [PATCH] Bluetooth: Send mgmt_connected only if state is BT_CONFIG
+Date: Fri, 07 Nov 2014 16:39:09 +0530
+Message-id: <1415358549-28152-1-git-send-email-jaganath.k@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Adds an initial implementation for RFCOMM in Bluetooth monitor.
+If a remote name request is initiated while acl connection is going on,
+and if it fails then mgmt_connected will be sent. Evetually after acl
+connection, authentication will not be initiated and userspace will
+never get pairing reply.
 
-Implementation for Decoding MSC, RPN, RLS, PN, NSC frames 
-will  be covered in the next patch-set.
+< HCI Command: Create Connection (0x01|0x0005) plen 13
+    bdaddr AA:BB:CC:DD:EE:FF ptype 0xcc18 rswitch 0x01 clkoffset 0x2306 (valid)
+    Packet type: DM1 DM3 DM5 DH1 DH3 DH5
+> HCI Event: Command Status (0x0f) plen 4
+    Create Connection (0x01|0x0005) status 0x00 ncmd 1
+> HCI Event: Inquiry Complete (0x01) plen 1
+    status 0x00
+< HCI Command: Remote Name Request (0x01|0x0019) plen 10
+    bdaddr AA:BB:CC:DD:EE:FF mode 1 clkoffset 0x2306
+> HCI Event: Command Status (0x0f) plen 4
+    Remote Name Request (0x01|0x0019) status 0x0c ncmd 1
+    Error: Command Disallowed
+> HCI Event: Connect Complete (0x03) plen 11
+    status 0x00 handle 50 bdaddr 00:0D:FD:47:53:B2 type ACL encrypt 0x00
+< HCI Command: Read Remote Supported Features (0x01|0x001b) plen 2
+    handle 50
+> HCI Event: Command Status (0x0f) plen 4
+    Read Remote Supported Features (0x01|0x001b) status 0x00 ncmd 1
+> HCI Event: Max Slots Change (0x1b) plen 3
+    handle 50 slots 5
+> HCI Event: Read Remote Supported Features (0x0b) plen 11
+    status 0x00 handle 50
+    Features: 0xff 0xff 0x8f 0xfe 0x9b 0xff 0x59 0x83
+< HCI Command: Read Remote Extended Features (0x01|0x001c) plen 3
+    handle 50 page 1
+> HCI Event: Command Status (0x0f) plen 4
+    Read Remote Extended Features (0x01|0x001c) status 0x00 ncmd 1
+> HCI Event: Read Remote Extended Features (0x23) plen 13
+    status 0x00 handle 50 page 1 max 1
+    Features: 0x01 0x00 0x00 0x00 0x00 0x00 0x00 0x00
 
-Gowtham Anandha Babu (4):
-  monitor/rfcomm: Add RFCOMM support to btmon
-  monitor/rfcomm: Add support for printing RFCOMM hdr
-  monitor/rfcomm: Add support for UIH frame decoding
-  monitor/rfcomm: Add support for mcc frame decoding
+This patch sends mgmt_connected in remote name command status only if conn->state
+is BT_CONFIG
 
- Makefile.tools     |   1 +
- android/Android.mk |   1 +
- monitor/l2cap.c    |   4 +
- monitor/l2cap.h    |   1 +
- monitor/rfcomm.c   | 280 +++++++++++++++++++++++++++++++++++++++++++++++++++++
- 5 files changed, 287 insertions(+)
- create mode 100644 monitor/rfcomm.c
+Signed-off-by: Jaganath Kanakkassery <jaganath.k@samsung.com>
+---
+ net/bluetooth/hci_event.c |    3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 5e7be80..68c882f 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -1581,7 +1581,8 @@ static void hci_check_pending_name(struct hci_dev *hdev, struct hci_conn *conn,
+ 	struct discovery_state *discov = &hdev->discovery;
+ 	struct inquiry_entry *e;
+ 
+-	if (conn && !test_and_set_bit(HCI_CONN_MGMT_CONNECTED, &conn->flags))
++	if (conn && conn->state == BT_CONFIG &&
++	    !test_and_set_bit(HCI_CONN_MGMT_CONNECTED, &conn->flags))
+ 		mgmt_device_connected(hdev, conn, 0, name, name_len);
+ 
+ 	if (discov->state == DISCOVERY_STOPPED)
 -- 
-1.9.1
+1.7.9.5
 
