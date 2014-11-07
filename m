@@ -1,37 +1,45 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 8.0 \(1990.1\))
-Subject: Re: [PATCH bluetooth-next] bluetooth: 6lowpan: fix skb_unshare behaviour
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1412756693-19410-1-git-send-email-alex.aring@gmail.com>
-Date: Sat, 8 Nov 2014 11:03:28 -0800
-Cc: linux-bluetooth@vger.kernel.org, jukka.rissanen@linux.intel.com
-Message-Id: <094FC9D5-F770-45B5-9BFC-B936CB6F1C69@holtmann.org>
-References: <1412756693-19410-1-git-send-email-alex.aring@gmail.com>
-To: Alexander Aring <alex.aring@gmail.com>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: Alex Gal <a.gal@miip.ca>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 1/2] plugins/sixaxis: Add Sony Navigation Controller
+Date: Fri, 07 Nov 2014 22:00:37 +0100
+Message-ID: <11059845.T45spOuEj8@leonov>
+In-Reply-To: <1415287754-868-1-git-send-email-a.gal@miip.ca>
+References: <1415287754-868-1-git-send-email-a.gal@miip.ca>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Alex,
 
-> This patch reverts commit:
-> 
-> a7807d73 ("Bluetooth: 6lowpan: Avoid memory leak if memory allocation
-> fails")
-> 
-> which was wrong suggested by Alexander Aring. The function skb_unshare
-> run also kfree_skb on failure.
-> 
-> Signed-off-by: Alexander Aring <alex.aring@gmail.com>
+On Thursday 06 of November 2014 10:29:13 Alex Gal wrote:
 > ---
-> compile tested only.
+>  plugins/sixaxis.c | 7 +++++++
+>  1 file changed, 7 insertions(+)
 > 
-> net/bluetooth/6lowpan.c | 8 ++------
-> 1 file changed, 2 insertions(+), 6 deletions(-)
+> diff --git a/plugins/sixaxis.c b/plugins/sixaxis.c
+> index b09404a..ac53ba9 100644
+> --- a/plugins/sixaxis.c
+> +++ b/plugins/sixaxis.c
+> @@ -60,6 +60,13 @@ static const struct {
+>  		.pid = 0x0268,
+>  		.version = 0x0000,
+>  	},
+> +	{
+> +		.name = "Navigation Controller",
+> +		.source = 0x0002,
+> +		.vid = 0x054c,
+> +		.pid = 0x042f,
+> +		.version = 0x0000,
+> +	},
+>  };
+> 
+>  struct leds_data {
 
-patch has been applied to bluetooth-next tree.
+Both patches applied, thanks.
 
-Regards
-
-Marcel
-
+-- 
+BR
+Szymon Janc
