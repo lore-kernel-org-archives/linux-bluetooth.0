@@ -2,55 +2,149 @@ Return-Path: <cyrus@holtmann.org>
 From: Arman Uguray <armansito@chromium.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Arman Uguray <armansito@chromium.org>
-Subject: [PATCH BlueZ 11/11] TODO: Update shared/gatt-server items.
-Date: Fri,  7 Nov 2014 00:09:51 -0800
-Message-Id: <1415347791-11716-12-git-send-email-armansito@chromium.org>
+Subject: [PATCH BlueZ 07/11] shared/gatt-server: Add functions for sending notifications/indications.
+Date: Fri,  7 Nov 2014 00:09:47 -0800
+Message-Id: <1415347791-11716-8-git-send-email-armansito@chromium.org>
 In-Reply-To: <1415347791-11716-1-git-send-email-armansito@chromium.org>
 References: <1415347791-11716-1-git-send-email-armansito@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-shared/gatt-server has been introduced, so removed that item. Added new
-items for remaining tasks.
+This patch introduces new functions for sending notifications and
+indications as a GATT server.
 ---
- TODO | 20 ++++++++++++++++++--
- 1 file changed, 18 insertions(+), 2 deletions(-)
+ src/shared/gatt-server.c | 95 ++++++++++++++++++++++++++++++++++++++++++++++++
+ src/shared/gatt-server.h | 12 ++++++
+ 2 files changed, 107 insertions(+)
 
-diff --git a/TODO b/TODO
-index b5a9612..98f5885 100644
---- a/TODO
-+++ b/TODO
-@@ -155,12 +155,28 @@ ATT/GATT (new shared stack)
-   Priority: Medium
-   Complexity: C2
+diff --git a/src/shared/gatt-server.c b/src/shared/gatt-server.c
+index 49da84e..e77acce 100644
+--- a/src/shared/gatt-server.c
++++ b/src/shared/gatt-server.c
+@@ -1077,3 +1077,98 @@ bool bt_gatt_server_set_debug(struct bt_gatt_server *server,
  
--- Introduce shared/gatt-server, which combined with shared/gatt-db, can be used
--  as a GATT server implementation.
-+- Introduce a way for shared/gatt-server to check security permissions on the
-+  current connection through bt_att.
+ 	return true;
+ }
++
++bool bt_gatt_server_send_notification(struct bt_gatt_server *server,
++					uint16_t handle, const uint8_t *value,
++					uint16_t length)
++{
++	uint16_t pdu_len;
++	uint8_t *pdu;
++	bool result;
++
++	if (!server || (length && !value))
++		return false;
++
++	pdu_len = MIN(bt_att_get_mtu(server->att), length + 2);
++	pdu = malloc(pdu_len);
++	if (!pdu)
++		return false;
++
++	put_le16(handle, pdu);
++	memcpy(pdu + 2, value, length);
++
++	result = !!bt_att_send(server->att, BT_ATT_OP_HANDLE_VAL_NOT, pdu,
++						pdu_len, NULL, NULL, NULL);
++	free(pdu);
++
++	return result;
++}
++
++struct ind_data {
++	bt_gatt_server_conf_func_t callback;
++	bt_gatt_server_destroy_func_t destroy;
++	void *user_data;
++};
++
++static void destroy_ind_data(void *user_data)
++{
++	struct ind_data *data = user_data;
++
++	if (data->destroy)
++		data->destroy(data->user_data);
++
++	free(data);
++}
++
++static void conf_cb(uint8_t opcode, const void *pdu,
++					uint16_t length, void *user_data)
++{
++	struct ind_data *data = user_data;
++
++	if (data->callback)
++		data->callback(data->user_data);
++}
++
++bool bt_gatt_server_send_indication(struct bt_gatt_server *server,
++					uint16_t handle, const uint8_t *value,
++					uint16_t length,
++					bt_gatt_server_conf_func_t callback,
++					void *user_data,
++					bt_gatt_server_destroy_func_t destroy)
++{
++	uint16_t pdu_len;
++	uint8_t *pdu;
++	struct ind_data *data;
++	bool result;
++
++	if (!server || (length && !value))
++		return false;
++
++	pdu_len = MIN(bt_att_get_mtu(server->att), length + 2);
++	pdu = malloc(pdu_len);
++	if (!pdu)
++		return false;
++
++	data = new0(struct ind_data, 1);
++	if (!data) {
++		free(pdu);
++		return false;
++	}
++
++	data->callback = callback;
++	data->destroy = destroy;
++	data->user_data = user_data;
++
++	put_le16(handle, pdu);
++	memcpy(pdu + 2, value, length);
++
++	result = !!bt_att_send(server->att, BT_ATT_OP_HANDLE_VAL_IND, pdu,
++							pdu_len, conf_cb,
++							data, destroy_ind_data);
++	if (!result)
++		destroy_ind_data(data);
++
++	free(pdu);
++
++	return result;
++}
+diff --git a/src/shared/gatt-server.h b/src/shared/gatt-server.h
+index e3c4def..0e480e1 100644
+--- a/src/shared/gatt-server.h
++++ b/src/shared/gatt-server.h
+@@ -33,8 +33,20 @@ void bt_gatt_server_unref(struct bt_gatt_server *server);
  
-   Priority: Medium
-   Complexity: C2
+ typedef void (*bt_gatt_server_destroy_func_t)(void *user_data);
+ typedef void (*bt_gatt_server_debug_func_t)(const char *str, void *user_data);
++typedef void (*bt_gatt_server_conf_func_t)(void *user_data);
  
-+- Provide a tool for shared/gatt-server. This tool should demonstrate how a
-+  shared/gatt-db can be used together with a shared/gatt-server to implement the
-+  GATT server role. This should be written in a way so that it can be easily
-+  used in conjunction with a remote instance of tools/btgatt-client (i.e. it
-+  should listen for incoming connections, have similar verbose output, etc.)
+ bool bt_gatt_server_set_debug(struct bt_gatt_server *server,
+ 					bt_gatt_server_debug_func_t callback,
+ 					void *user_data,
+ 					bt_gatt_server_destroy_func_t destroy);
 +
-+  Priority: Medium
-+  Complexity: C2
++bool bt_gatt_server_send_notification(struct bt_gatt_server *server,
++					uint16_t handle, const uint8_t *value,
++					uint16_t length);
 +
-+- Implement other low-priority ATT protocol operations for shared/gatt-server:
-+
-+      Read Multiple Request
-+
-+  Priority: Low
-+  Complexity: C1
-+
- - Implement the server portion of doc/gatt-api.txt using shared/gatt-server once
-   it exists.
- 
++bool bt_gatt_server_send_indication(struct bt_gatt_server *server,
++					uint16_t handle, const uint8_t *value,
++					uint16_t length,
++					bt_gatt_server_conf_func_t callback,
++					void *user_data,
++					bt_gatt_server_destroy_func_t destroy);
 -- 
 2.1.0.rc2.206.gedb03e5
 
