@@ -1,73 +1,47 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 7 Nov 2014 14:20:43 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Arman Uguray <armansito@chromium.org>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH BlueZ 10/11] shared/gatt-client: Fix alignment warnings.
-Message-ID: <20141107122043.GA14496@t440s.lan>
-References: <1415347791-11716-1-git-send-email-armansito@chromium.org>
- <1415347791-11716-11-git-send-email-armansito@chromium.org>
+Subject: Re: [PATCHv3 1/2] android/hardware: Update Anmdroid header to 5.0 API
+Date: Fri, 07 Nov 2014 13:03:55 +0100
+Message-ID: <1692354.o1VeTAIfWm@uw000953>
+In-Reply-To: <1415356921-32320-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1415356921-32320-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1415347791-11716-11-git-send-email-armansito@chromium.org>
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Arman,
+Hi Andrei,
 
-On Fri, Nov 07, 2014, Arman Uguray wrote:
-> This patch addresses warnings that arise when compiled with
-> -W=cast-align.
-> ---
->  src/shared/gatt-client.c | 9 +++++----
->  1 file changed, 5 insertions(+), 4 deletions(-)
+On Friday 07 of November 2014 12:42:00 Andrei Emeltchenko wrote:
+> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 > 
-> diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
-> index b4f28b2..2e321b2 100644
-> --- a/src/shared/gatt-client.c
-> +++ b/src/shared/gatt-client.c
-> @@ -1647,7 +1647,7 @@ bool bt_gatt_characteristic_iter_init(struct bt_gatt_characteristic_iter *iter,
->  		return false;
->  
->  	memset(iter, 0, sizeof(*iter));
-> -	iter->service = (struct service_list *) service;
-> +	iter->service = (void *) service;
->  
->  	return true;
->  }
-> @@ -1677,7 +1677,7 @@ bool bt_gatt_include_service_iter_init(struct bt_gatt_incl_service_iter *iter,
->  		return false;
->  
->  	memset(iter, 0, sizeof(*iter));
-> -	iter->service = (struct service_list *) service;
-> +	iter->service = (void *) service;
->  
->  	return true;
->  }
-> @@ -2387,7 +2387,7 @@ bool bt_gatt_client_register_notify(struct bt_gatt_client *client,
->  	struct chrc_data *chrc = NULL;
->  	struct bt_gatt_service_iter iter;
->  	const bt_gatt_service_t *service;
-> -	size_t i;
-> +	size_t i, offset;
->  
->  	if (!client || !chrc_value_handle || !callback)
->  		return false;
-> @@ -2402,7 +2402,8 @@ bool bt_gatt_client_register_notify(struct bt_gatt_client *client,
->  	while (bt_gatt_service_iter_next(&iter, &service)) {
->  		if (chrc_value_handle >= service->start_handle &&
->  				chrc_value_handle <= service->end_handle) {
-> -			svc_data = (struct service_list *) service;
-> +			offset = offsetof(struct service_list, service);
-> +			svc_data = (void *) (service - offset);
->  			break;
+> Android headers are used for host build.
+> ---
+>  android/Android.mk                |   4 +-
+>  android/Makefile.am               |   2 +-
+>  android/hardware/audio.h          | 147 ++++++-
+>  android/hardware/audio_effect.h   |   3 +-
+>  android/hardware/bluetooth.h      |  82 +++-
+>  android/hardware/bt_av.h          |  15 +-
+>  android/hardware/bt_gatt_client.h | 134 +++++-
+>  android/hardware/bt_gatt_server.h |  19 +-
+>  android/hardware/bt_gatt_types.h  |   8 +
+>  android/hardware/bt_hf.h          |  63 ++-
+>  android/hardware/bt_hf_client.h   |  30 +-
+>  android/hardware/bt_hh.h          |  10 +-
+>  android/hardware/bt_mce.h         |   5 +-
+>  android/hardware/bt_pan.h         |   4 +-
+>  android/hardware/bt_rc.h          |  34 +-
+>  android/system/audio.h            | 867 +++++++++++++++++++++++++++++++++++---
+>  android/tester-a2dp.c             |   2 +-
+>  android/tester-gatt.c             |  15 +-
+>  android/tester-main.c             |  11 +-
+>  19 files changed, 1312 insertions(+), 143 deletions(-)
 
-Are you sure a (void *) case isn't enough for the last one too? After
-all offsetof() should be returning 0 which in the end results in a void *
-cast of the service pointer anyway.
+Both patches applied (after fixing typos in commit message), thanks.
 
-Btw, if we at any point find the need to really do this kind of pointer
-math I'd suggest adding a container_of() helper macro like the kernel
-uses.
-
-Johan
+-- 
+Best regards, 
+Szymon Janc
