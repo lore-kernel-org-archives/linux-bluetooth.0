@@ -2,157 +2,207 @@ Return-Path: <cyrus@holtmann.org>
 From: Arman Uguray <armansito@chromium.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Arman Uguray <armansito@chromium.org>
-Subject: [PATCH BlueZ 04/11] shared/gatt-server: Implement "Read" request.
-Date: Fri,  7 Nov 2014 00:09:44 -0800
-Message-Id: <1415347791-11716-5-git-send-email-armansito@chromium.org>
+Subject: [PATCH BlueZ 02/11] shared/gatt-server: Implement "Find Information" request.
+Date: Fri,  7 Nov 2014 00:09:42 -0800
+Message-Id: <1415347791-11716-3-git-send-email-armansito@chromium.org>
 In-Reply-To: <1415347791-11716-1-git-send-email-armansito@chromium.org>
 References: <1415347791-11716-1-git-send-email-armansito@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch implements the "Read" request for the GATT server role.
+This patch implements the "Find Information" request for the GATT
+server role.
 ---
- src/shared/gatt-server.c | 111 +++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 111 insertions(+)
+ src/shared/gatt-server.c | 156 ++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 155 insertions(+), 1 deletion(-)
 
 diff --git a/src/shared/gatt-server.c b/src/shared/gatt-server.c
-index db002db..5cf11a4 100644
+index ddb0be1..ddb714d 100644
 --- a/src/shared/gatt-server.c
 +++ b/src/shared/gatt-server.c
-@@ -67,6 +67,7 @@ struct bt_gatt_server {
- 	unsigned int find_info_id;
- 	unsigned int write_id;
- 	unsigned int write_cmd_id;
-+	unsigned int read_id;
+@@ -59,6 +59,7 @@ struct bt_gatt_server {
+ 	unsigned int mtu_id;
+ 	unsigned int read_by_grp_type_id;
+ 	unsigned int read_by_type_id;
++	unsigned int find_info_id;
  
  	struct async_read_op *pending_read_op;
- 	struct async_write_op *pending_write_op;
-@@ -87,6 +88,7 @@ static void bt_gatt_server_free(struct bt_gatt_server *server)
- 	bt_att_unregister(server->att, server->find_info_id);
- 	bt_att_unregister(server->att, server->write_id);
- 	bt_att_unregister(server->att, server->write_cmd_id);
-+	bt_att_unregister(server->att, server->read_id);
+ 
+@@ -75,11 +76,12 @@ static void bt_gatt_server_free(struct bt_gatt_server *server)
+ 	bt_att_unregister(server->att, server->mtu_id);
+ 	bt_att_unregister(server->att, server->read_by_grp_type_id);
+ 	bt_att_unregister(server->att, server->read_by_type_id);
+-	bt_att_unref(server->att);
++	bt_att_unregister(server->att, server->find_info_id);
  
  	if (server->pending_read_op)
  		server->pending_read_op->server = NULL;
-@@ -758,6 +760,108 @@ error:
+ 
++	bt_att_unref(server->att);
+ 	free(server);
+ }
+ 
+@@ -480,6 +482,150 @@ error:
  							NULL, NULL, NULL);
  }
  
-+static void read_complete_cb(struct gatt_db_attribute *attr, int err,
-+					const uint8_t *value, size_t len,
-+					void *user_data)
++static void put_uuid_le(const bt_uuid_t *src, void *dst)
 +{
-+	struct async_read_op *op = user_data;
-+	struct bt_gatt_server *server = op->server;
-+	uint16_t mtu;
-+	uint16_t handle;
++	bt_uuid_t uuid;
 +
-+	if (!server) {
-+		async_read_op_destroy(op);
-+		return;
++	switch (src->type) {
++	case BT_UUID16:
++		put_le16(src->value.u16, dst);
++		break;
++	case BT_UUID128:
++		bswap_128(&src->value.u128, dst);
++		break;
++	case BT_UUID32:
++		bt_uuid_to_uuid128(src, &uuid);
++		bswap_128(&uuid.value.u128, dst);
++		break;
++	default:
++		break;
 +	}
-+
-+	mtu = bt_att_get_mtu(server->att);
-+	handle = gatt_db_attribute_get_handle(attr);
-+
-+	if (err) {
-+		uint8_t pdu[4];
-+		uint8_t att_ecode = att_ecode_from_error(err);
-+
-+		encode_error_rsp(op->opcode, handle, att_ecode, pdu);
-+		bt_att_send(server->att, BT_ATT_OP_ERROR_RSP, pdu, 4, NULL,
-+								NULL, NULL);
-+		async_read_op_destroy(op);
-+		return;
-+	}
-+
-+	/* TODO: Send Read Blob response based on the request */
-+
-+	bt_att_send(server->att, BT_ATT_OP_READ_RSP, len ? value : NULL,
-+						MIN((unsigned) mtu - 1, len),
-+						NULL, NULL, NULL);
-+	async_read_op_destroy(op);
 +}
 +
-+static void read_cb(uint8_t opcode, const void *pdu,
++static bool encode_find_info_rsp(struct gatt_db *db, struct queue *q,
++						uint16_t mtu,
++						uint8_t *pdu, uint16_t *len)
++{
++	uint16_t handle;
++	struct gatt_db_attribute *attr;
++	const bt_uuid_t *type;
++	int uuid_len, cur_uuid_len;
++	int iter = 0;
++
++	*len = 0;
++
++	while (queue_peek_head(q)) {
++		attr = queue_pop_head(q);
++		handle = gatt_db_attribute_get_handle(attr);
++		type = gatt_db_attribute_get_type(attr);
++		if (!handle || !type)
++			return false;
++
++		cur_uuid_len = bt_uuid_len(type);
++
++		if (iter == 0) {
++			switch (cur_uuid_len) {
++			case 2:
++				uuid_len = 2;
++				pdu[0] = 0x01;
++				break;
++			case 4:
++			case 16:
++				uuid_len = 16;
++				pdu[0] = 0x02;
++				break;
++			default:
++				return false;
++			}
++
++			iter++;
++		} else if (cur_uuid_len != uuid_len)
++			break;
++
++		if (iter + uuid_len + 2 > mtu - 1)
++			break;
++
++		put_le16(handle, pdu + iter);
++		put_uuid_le(type, pdu + iter + 2);
++
++		iter += uuid_len + 2;
++	}
++
++	*len = iter;
++
++	return true;
++}
++
++static void find_info_cb(uint8_t opcode, const void *pdu,
 +					uint16_t length, void *user_data)
 +{
 +	struct bt_gatt_server *server = user_data;
++	uint16_t start, end;
 +	uint16_t mtu = bt_att_get_mtu(server->att);
-+	uint8_t error_pdu[4];
-+	uint16_t handle = 0;
-+	struct gatt_db_attribute *attr;
-+	uint8_t ecode;
-+	uint32_t perm;
-+	struct async_read_op *op = NULL;
++	uint8_t rsp_pdu[mtu];
++	uint16_t rsp_len;
++	uint8_t rsp_opcode;
++	uint8_t ecode = 0;
++	uint16_t ehandle = 0;
++	struct queue *q = NULL;
 +
-+	if (length != 2) {
++	if (length != 4) {
 +		ecode = BT_ATT_ERROR_INVALID_PDU;
 +		goto error;
 +	}
 +
-+	handle = get_le16(pdu);
-+	attr = gatt_db_get_attribute(server->db, handle);
-+	if (!attr) {
-+		ecode = BT_ATT_ERROR_INVALID_HANDLE;
-+		goto error;
-+	}
-+
-+	util_debug(server->debug_callback, server->debug_data,
-+					"Read - handle: 0x%04x", handle);
-+
-+	if (!gatt_db_attribute_get_permissions(attr, &perm)) {
-+		ecode = BT_ATT_ERROR_INVALID_HANDLE;
-+		goto error;
-+	}
-+
-+	if (perm && !(perm & BT_ATT_PERM_READ)) {
-+		ecode = BT_ATT_ERROR_READ_NOT_PERMITTED;
-+		goto error;
-+	}
-+
-+	if (server->pending_read_op) {
-+		ecode = BT_ATT_ERROR_UNLIKELY;
-+		goto error;
-+	}
-+
-+	op = new0(struct async_read_op, 1);
-+	if (!op) {
++	q = queue_new();
++	if (!q) {
 +		ecode = BT_ATT_ERROR_INSUFFICIENT_RESOURCES;
 +		goto error;
 +	}
 +
-+	op->opcode = opcode;
-+	op->server = server;
-+	server->pending_read_op = op;
++	start = get_le16(pdu);
++	end = get_le16(pdu + 2);
 +
-+	if (gatt_db_attribute_read(attr, 0, opcode, NULL, read_complete_cb, op))
-+		return;
++	util_debug(server->debug_callback, server->debug_data,
++					"Find Info - start: 0x%04x end: 0x%04x",
++					start, end);
 +
-+	ecode = BT_ATT_ERROR_UNLIKELY;
++	if (!start || !end) {
++		ecode = BT_ATT_ERROR_INVALID_HANDLE;
++		goto error;
++	}
++
++	ehandle = start;
++
++	if (start > end) {
++		ecode = BT_ATT_ERROR_INVALID_HANDLE;
++		goto error;
++	}
++
++	gatt_db_find_information(server->db, start, end, q);
++
++	if (queue_isempty(q)) {
++		ecode = BT_ATT_ERROR_ATTRIBUTE_NOT_FOUND;
++		goto error;
++	}
++
++	if (!encode_find_info_rsp(server->db, q, mtu, rsp_pdu, &rsp_len)) {
++		ecode = BT_ATT_ERROR_UNLIKELY;
++		goto error;
++	}
++
++	rsp_opcode = BT_ATT_OP_FIND_INFO_RSP;
++
++	goto done;
 +
 +error:
-+	if (op)
-+		async_read_op_destroy(op);
++	rsp_opcode = BT_ATT_OP_ERROR_RSP;
++	rsp_len = 4;
++	encode_error_rsp(opcode, ehandle, ecode, rsp_pdu);
 +
-+	encode_error_rsp(opcode, handle, ecode, error_pdu);
-+	bt_att_send(server->att, BT_ATT_OP_ERROR_RSP, error_pdu, 4, NULL, NULL,
-+									NULL);
++done:
++	queue_destroy(q, NULL);
++	bt_att_send(server->att, rsp_opcode, rsp_pdu, rsp_len,
++							NULL, NULL, NULL);
 +}
 +
  static void exchange_mtu_cb(uint8_t opcode, const void *pdu,
  					uint16_t length, void *user_data)
  {
-@@ -836,6 +940,13 @@ static bool gatt_server_register_att_handlers(struct bt_gatt_server *server)
- 	if (!server->write_cmd_id)
+@@ -536,6 +682,14 @@ static bool gatt_server_register_att_handlers(struct bt_gatt_server *server)
+ 	if (!server->read_by_type_id)
  		return false;
  
-+	/* Read Request */
-+	server->read_id = bt_att_register(server->att, BT_ATT_OP_READ_REQ,
-+								read_cb,
-+								server, NULL);
-+	if (!server->read_id)
++	/* Find Information */
++	server->find_info_id = bt_att_register(server->att,
++							BT_ATT_OP_FIND_INFO_REQ,
++							find_info_cb,
++							server, NULL);
++	if (!server->find_info_id)
 +		return false;
 +
  	return true;
