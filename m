@@ -1,90 +1,67 @@
 Return-Path: <cyrus@holtmann.org>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 7/7] android/handsfree-client: Handle disconnect command
+Date: Fri, 07 Nov 2014 20:56:14 +0100
+Message-ID: <1800542.EtE6XzkJ2e@leonov>
+In-Reply-To: <1415186531-23288-8-git-send-email-lukasz.rymanowski@tieto.com>
+References: <1415186531-23288-1-git-send-email-lukasz.rymanowski@tieto.com> <1415186531-23288-8-git-send-email-lukasz.rymanowski@tieto.com>
 MIME-Version: 1.0
-In-Reply-To: <20141107122043.GA14496@t440s.lan>
-References: <1415347791-11716-1-git-send-email-armansito@chromium.org>
-	<1415347791-11716-11-git-send-email-armansito@chromium.org>
-	<20141107122043.GA14496@t440s.lan>
-Date: Fri, 7 Nov 2014 12:11:48 -0800
-Message-ID: <CAHrH25RzwWyfxpS1NdJLG9XzA2fP4ejn3FQza5b2R7k7qrTjdQ@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 10/11] shared/gatt-client: Fix alignment warnings.
-From: Arman Uguray <armansito@chromium.org>
-To: BlueZ development <linux-bluetooth@vger.kernel.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+Hi Łukasz,
 
-> On Fri, Nov 7, 2014 at 4:20 AM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
-> Hi Arman,
->
-> On Fri, Nov 07, 2014, Arman Uguray wrote:
->> This patch addresses warnings that arise when compiled with
->> -W=cast-align.
->> ---
->>  src/shared/gatt-client.c | 9 +++++----
->>  1 file changed, 5 insertions(+), 4 deletions(-)
->>
->> diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
->> index b4f28b2..2e321b2 100644
->> --- a/src/shared/gatt-client.c
->> +++ b/src/shared/gatt-client.c
->> @@ -1647,7 +1647,7 @@ bool bt_gatt_characteristic_iter_init(struct bt_gatt_characteristic_iter *iter,
->>               return false;
->>
->>       memset(iter, 0, sizeof(*iter));
->> -     iter->service = (struct service_list *) service;
->> +     iter->service = (void *) service;
->>
->>       return true;
->>  }
->> @@ -1677,7 +1677,7 @@ bool bt_gatt_include_service_iter_init(struct bt_gatt_incl_service_iter *iter,
->>               return false;
->>
->>       memset(iter, 0, sizeof(*iter));
->> -     iter->service = (struct service_list *) service;
->> +     iter->service = (void *) service;
->>
->>       return true;
->>  }
->> @@ -2387,7 +2387,7 @@ bool bt_gatt_client_register_notify(struct bt_gatt_client *client,
->>       struct chrc_data *chrc = NULL;
->>       struct bt_gatt_service_iter iter;
->>       const bt_gatt_service_t *service;
->> -     size_t i;
->> +     size_t i, offset;
->>
->>       if (!client || !chrc_value_handle || !callback)
->>               return false;
->> @@ -2402,7 +2402,8 @@ bool bt_gatt_client_register_notify(struct bt_gatt_client *client,
->>       while (bt_gatt_service_iter_next(&iter, &service)) {
->>               if (chrc_value_handle >= service->start_handle &&
->>                               chrc_value_handle <= service->end_handle) {
->> -                     svc_data = (struct service_list *) service;
->> +                     offset = offsetof(struct service_list, service);
->> +                     svc_data = (void *) (service - offset);
->>                       break;
->
-> Are you sure a (void *) case isn't enough for the last one too? After
-> all offsetof() should be returning 0 which in the end results in a void *
-> cast of the service pointer anyway.
->
+On Wednesday 05 of November 2014 12:22:11 Lukasz Rymanowski wrote:
+> ---
+>  android/handsfree-client.c | 27 +++++++++++++++++++++++++--
+>  1 file changed, 25 insertions(+), 2 deletions(-)
+> 
+> diff --git a/android/handsfree-client.c b/android/handsfree-client.c
+> index d90cef0..751a9f1 100644
+> --- a/android/handsfree-client.c
+> +++ b/android/handsfree-client.c
+> @@ -195,9 +195,32 @@ static struct device *get_device(const bdaddr_t *addr)
+> 
+>  static void handle_disconnect(const void *buf, uint16_t len)
+>  {
+> -	DBG("Not Implemented");
+> +	const struct hal_cmd_hf_client_disconnect *cmd = buf;
+> +	struct device *dev;
+> +	uint32_t status;
+> +	bdaddr_t bdaddr;
+> +	char addr[18];
+> +
+> +	DBG("");
+> +
+> +	android2bdaddr(&cmd->bdaddr, &bdaddr);
+> +
+> +	ba2str(&bdaddr, addr);
+> +	DBG("Disconnect %s", addr);
+> +
+> +	dev = get_device(&bdaddr);
+> +	if (!dev) {
+> +		status = HAL_STATUS_FAILED;
+> +		goto done;
+> +	}
+> +
+> +	status = hfp_hf_disconnect(dev->hf) ? HAL_STATUS_SUCCESS :
+> +							HAL_STATUS_FAILED;
 
-Yeah, just a (void *) cast should be enough. I figured it's a bit more
-"correct" to do the pointer math in the code, but yeah that offset
-should be 0 (and afaik is guaranteed to be 0). I'll just remove the
-math I guess.
+Shouldn't 'connecting' and 'disconnecting' state be handled here?
 
-> Btw, if we at any point find the need to really do this kind of pointer
-> math I'd suggest adding a container_of() helper macro like the kernel
-> uses.
+> +
+> +done:
+> +
+>  	ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_HANDSFREE_CLIENT,
+> -			HAL_OP_HF_CLIENT_DISCONNECT, HAL_STATUS_UNSUPPORTED);
+> +			HAL_OP_HF_CLIENT_DISCONNECT, status);
+>  }
+> 
+>  static void handle_connect_audio(const void *buf, uint16_t len)
 
-I actually thought of adding a container_of macro then I decided that
-would be a bit of an overkill for just this case.
-
->
-> Johan
-
-Cheers,
-Arman
+-- 
+BR
+Szymon Janc
