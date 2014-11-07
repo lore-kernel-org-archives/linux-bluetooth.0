@@ -1,35 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
-From: Gowtham Anandha Babu <gowtham.ab@samsung.com>
+From: Sebastian Chlad <sebastian.chlad@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: d.kasatkin@samsung.com, bharat.panda@samsung.com, cpgs@samsung.com,
-	Gowtham Anandha Babu <gowtham.ab@samsung.com>
-Subject: [PATCH v1 0/4] Add support for RFCOMM in btmon
-Date: Fri, 07 Nov 2014 18:36:23 +0530
-Message-id: <1415365587-6217-1-git-send-email-gowtham.ab@samsung.com>
+Cc: Sebastian Chlad <sebastian.chlad@tieto.com>
+Subject: [PATCH] android/pts: PTS tests results for HDP
+Date: Fri,  7 Nov 2014 14:03:51 +0100
+Message-Id: <1415365431-7156-1-git-send-email-sebastian.chlad@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Adds an initial implementation for RFCOMM in Bluetooth monitor.
+PTS version 5.3. Android version 5.0
+---
+ android/pts-hdp.txt | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-Implementation for Decoding MSC, RPN, RLS, PN, NSC frames 
-will  be covered in the next patch-set.
-
-*v1: Incorporated Johan comments.
-
-Gowtham Anandha Babu (4):
-  monitor/rfcomm: Add RFCOMM support to btmon
-  monitor/rfcomm: Add support for printing RFCOMM hdr
-  monitor/rfcomm: Add support for UIH frame decoding
-  monitor/rfcomm: Add support for mcc frame decoding
-
- Makefile.tools     |   1 +
- android/Android.mk |   1 +
- monitor/l2cap.c    |   4 +
- monitor/l2cap.h    |   1 +
- monitor/rfcomm.c   | 275 +++++++++++++++++++++++++++++++++++++++++++++++++++++
- 5 files changed, 282 insertions(+)
- create mode 100644 monitor/rfcomm.c
-
+diff --git a/android/pts-hdp.txt b/android/pts-hdp.txt
+index 0a3ff08..1d25848 100644
+--- a/android/pts-hdp.txt
++++ b/android/pts-hdp.txt
+@@ -1,8 +1,8 @@
+ PTS test results for HDP
+ 
+ PTS version: 5.3
+-Tested: 04-November-2014
+-Android version: 4.4.4
++Tested: 07-November-2014
++Android version: 5.0
+ 
+ Results:
+ PASS	test passed
 -- 
-1.9.1
+1.8.5.3
 
