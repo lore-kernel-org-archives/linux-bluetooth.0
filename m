@@ -1,33 +1,67 @@
 Return-Path: <cyrus@holtmann.org>
-From: Sebastian Chlad <sebastian.chlad@tieto.com>
+From: Szymon Janc <szymon.janc@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Sebastian Chlad <sebastian.chlad@tieto.com>
-Subject: [PATCH] android/pts: PTS tests results for HDP
-Date: Fri,  7 Nov 2014 14:03:51 +0100
-Message-Id: <1415365431-7156-1-git-send-email-sebastian.chlad@tieto.com>
+Subject: Re: [PATCH] android/hal-pan: Update control_state callback to Android 5 API
+Date: Fri, 07 Nov 2014 13:28:17 +0100
+Message-ID: <13744770.NciSKC3nLc@uw000953>
+In-Reply-To: <1415346380-23275-1-git-send-email-szymon.janc@tieto.com>
+References: <1415346380-23275-1-git-send-email-szymon.janc@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-PTS version 5.3. Android version 5.0
----
- android/pts-hdp.txt | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+On Friday 07 of November 2014 08:46:20 Szymon Janc wrote:
+> Callback declaration was changed in Android 5 so parameters order must
+> be updated. Android Framework was also updated so we don't need
+> workaround for it in Android 5.
+> ---
+>  android/hal-pan.c | 11 +++++++++--
+>  1 file changed, 9 insertions(+), 2 deletions(-)
+> 
+> diff --git a/android/hal-pan.c b/android/hal-pan.c
+> index d9e042a..56fd340 100644
+> --- a/android/hal-pan.c
+> +++ b/android/hal-pan.c
+> @@ -19,6 +19,7 @@
+>  #include <stddef.h>
+>  #include <string.h>
+>  
+> +#include "hal-utils.h"
+>  #include "hal-log.h"
+>  #include "hal.h"
+>  #include "hal-msg.h"
+> @@ -45,19 +46,25 @@ static void handle_ctrl_state(void *buf, uint16_t len, int fd)
+>  {
+>  	struct hal_ev_pan_ctrl_state *ev = buf;
+>  
+> +#if ANDROID_VERSION >= PLATFORM_VER(5, 0, 0)
+> +	if (cbs->control_state_cb)
+> +		cbs->control_state_cb(ev->state, ev->local_role, ev->status,
+> +							(char *)ev->name);
+> +#else
+>  	/*
+> -	 * FIXME: Callback declared in bt_pan.h is 'typedef void
+> +	 * Callback declared in bt_pan.h is 'typedef void
+>  	 * (*btpan_control_state_callback)(btpan_control_state_t state,
+>  	 * bt_status_t error, int local_role, const char* ifname);
+>  	 * But PanService.Java defined it wrong way.
+>  	 * private void onControlStateChanged(int local_role, int state,
+>  	 * int error, String ifname).
+>  	 * First and third parameters are misplaced, so sending data according
+> -	 * to PanService.Java, fix this if issue fixed in PanService.Java.
+> +	 * to PanService.Java.
+>  	 */
+>  	if (cbs->control_state_cb)
+>  		cbs->control_state_cb(ev->local_role, ev->state, ev->status,
+>  							(char *)ev->name);
+> +#endif
+>  }
+>  
+>  /*
 
-diff --git a/android/pts-hdp.txt b/android/pts-hdp.txt
-index 0a3ff08..1d25848 100644
---- a/android/pts-hdp.txt
-+++ b/android/pts-hdp.txt
-@@ -1,8 +1,8 @@
- PTS test results for HDP
- 
- PTS version: 5.3
--Tested: 04-November-2014
--Android version: 4.4.4
-+Tested: 07-November-2014
-+Android version: 5.0
- 
- Results:
- PASS	test passed
+Pushed.
+
 -- 
-1.8.5.3
-
+Best regards, 
+Szymon Janc
