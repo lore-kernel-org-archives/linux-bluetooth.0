@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv3] android: Remove temporary BLUEZ_EXTENSION flag
-Date: Fri,  7 Nov 2014 11:47:50 +0200
-Message-Id: <1415353670-16042-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv2] android: Remove temporary BLUEZ_EXTENSION flag
+Date: Fri,  7 Nov 2014 11:33:53 +0200
+Message-Id: <1415352833-12217-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
@@ -12,16 +12,18 @@ From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 BLUEZ_EXTENSION is replaced by ANDROID_VERSION >= PLATFORM_VER(5, 0, 0)
 check.
 ---
- android/Android.mk       | 15 +++++++--------
- android/client/haltest.c |  4 ++--
- android/client/if-bt.c   |  4 ++--
- android/client/if-main.h |  8 +++++---
- android/hal-audio.c      |  1 +
- android/hal-bluetooth.c  |  2 +-
- android/hal-sco.c        |  1 +
- android/hal-utils.h      |  2 --
- android/hal.h            |  6 ++++--
- 9 files changed, 23 insertions(+), 20 deletions(-)
+ android/Android.mk            | 15 +++++++--------
+ android/client/haltest.c      |  4 ++--
+ android/client/if-bt.c        |  4 ++--
+ android/client/if-hf-client.c |  4 ++++
+ android/client/if-main.h      |  8 +++++---
+ android/client/if-mce.c       |  4 ++++
+ android/hal-audio.c           |  1 +
+ android/hal-bluetooth.c       |  2 +-
+ android/hal-sco.c             |  1 +
+ android/hal-utils.h           |  2 --
+ android/hal.h                 |  6 ++++--
+ 11 files changed, 31 insertions(+), 20 deletions(-)
 
 diff --git a/android/Android.mk b/android/Android.mk
 index bfdf03f..6b5d51f 100644
@@ -116,6 +118,25 @@ index eef4454..48aff1b 100644
  	else if (strcmp(BT_PROFILE_HANDSFREE_CLIENT_ID, id) == 0)
  		pif = (const void **) &if_hf_client;
  	else if (strcmp(BT_PROFILE_MAP_CLIENT_ID, id) == 0)
+diff --git a/android/client/if-hf-client.c b/android/client/if-hf-client.c
+index 3f6f7c2..5783ffe 100644
+--- a/android/client/if-hf-client.c
++++ b/android/client/if-hf-client.c
+@@ -18,6 +18,8 @@
+ #include "if-main.h"
+ #include "../hal-utils.h"
+ 
++#if ANDROID_VERSION >= PLATFORM_VER(5, 0, 0)
++
+ const bthf_client_interface_t *if_hf_client = NULL;
+ 
+ static char last_addr[MAX_ADDR_STR_LEN];
+@@ -666,3 +668,5 @@ const struct interface hf_client_if = {
+ 	.name = "handsfree_client",
+ 	.methods = methods
+ };
++
++#endif
 diff --git a/android/client/if-main.h b/android/client/if-main.h
 index cb5f558..93cc98d 100644
 --- a/android/client/if-main.h
@@ -149,6 +170,25 @@ index cb5f558..93cc98d 100644
  extern const struct interface hf_client_if;
  extern const struct interface mce_if;
  #endif
+diff --git a/android/client/if-mce.c b/android/client/if-mce.c
+index 5f101e0..b656328 100644
+--- a/android/client/if-mce.c
++++ b/android/client/if-mce.c
+@@ -18,6 +18,8 @@
+ #include "if-main.h"
+ #include "../hal-utils.h"
+ 
++#if ANDROID_VERSION >= PLATFORM_VER(5, 0, 0)
++
+ const btmce_interface_t *if_mce = NULL;
+ 
+ /*
+@@ -85,3 +87,5 @@ const struct interface mce_if = {
+ 	.name = "mce",
+ 	.methods = methods
+ };
++
++#endif
 diff --git a/android/hal-audio.c b/android/hal-audio.c
 index 1caa4eb..207101f 100644
 --- a/android/hal-audio.c
