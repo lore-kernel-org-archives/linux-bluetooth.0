@@ -1,268 +1,199 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv2] android: Remove temporary BLUEZ_EXTENSION flag
-Date: Fri,  7 Nov 2014 11:33:53 +0200
-Message-Id: <1415352833-12217-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Fri, 7 Nov 2014 11:27:54 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: linville@tuxdriver.com
+Cc: linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: pull request: bluetooth-next 2014-11-07
+Message-ID: <20141107092754.GA6995@t440s.lan>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="X1bOJ3K7DJ5YkBrT"
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-BLUEZ_EXTENSION is replaced by ANDROID_VERSION >= PLATFORM_VER(5, 0, 0)
-check.
+--X1bOJ3K7DJ5YkBrT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+
+Hi John
+
+Here's another set of patches for 3.19. Most of it is again fixes and
+cleanups to ieee802154 related code from Alexander Aring. We've also got
+better handling of hardware error events along with a proper API for HCI
+drivers to notify the HCI core of such situations. There's also a minor
+fix for mgmt events as well as a sparse warning fix. The code for
+sending HCI commands synchronously also gets a fix where we might loose
+the completion event in the case of very fast HW (particularly easily
+reproducible with an emulated HCI device).
+
+Please let me know if there are any issues pulling. Thanks.
+
+Johan
+
 ---
- android/Android.mk            | 15 +++++++--------
- android/client/haltest.c      |  4 ++--
- android/client/if-bt.c        |  4 ++--
- android/client/if-hf-client.c |  4 ++++
- android/client/if-main.h      |  8 +++++---
- android/client/if-mce.c       |  4 ++++
- android/hal-audio.c           |  1 +
- android/hal-bluetooth.c       |  2 +-
- android/hal-sco.c             |  1 +
- android/hal-utils.h           |  2 --
- android/hal.h                 |  6 ++++--
- 11 files changed, 31 insertions(+), 20 deletions(-)
+The following changes since commit 6bc6c49f1e2f3ab1bec05d1c08aad219ab4eb5d0:
 
-diff --git a/android/Android.mk b/android/Android.mk
-index bfdf03f..6b5d51f 100644
---- a/android/Android.mk
-+++ b/android/Android.mk
-@@ -5,6 +5,10 @@ BLUEZ_VERSION := `grep "^AC_INIT" $(LOCAL_PATH)/bluez/configure.ac | sed -e "s/.
- 
- ANDROID_VERSION := `echo $(PLATFORM_VERSION) | awk -F. '{ printf "0x%02d%02d%02d",$$1,$$2,$$3 }'`
- 
-+ANDROID_VERSION_DEC := `echo $(PLATFORM_VERSION) | awk -F. '{ printf "%02d%02d%02d",$$1,$$2,$$3 }'`
-+
-+ANDROID_GE_5_0 := $(shell echo $(ANDROID_VERSION_DEC)\>=050000 | bc)
-+
- # Specify pathmap for glib and sbc
- pathmap_INCL += glib:external/bluetooth/glib \
- 		sbc:external/bluetooth/sbc \
-@@ -14,10 +18,6 @@ BLUEZ_COMMON_CFLAGS := -DVERSION=\"$(BLUEZ_VERSION)\" \
- 			-DANDROID_VERSION=$(ANDROID_VERSION) \
- 			-DANDROID_STORAGEDIR=\"/data/misc/bluetooth\" \
- 
--ifeq ($(BLUEZ_EXTENSIONS), true)
--BLUEZ_COMMON_CFLAGS += -DBLUEZ_EXTENSIONS
--endif
--
- # Enable warnings enabled in autotools build
- BLUEZ_COMMON_CFLAGS += -Wall -Wextra \
- 			-Wdeclaration-after-statement \
-@@ -134,11 +134,10 @@ LOCAL_SRC_FILES := \
- 	bluez/android/hal-utils.c \
- 	bluez/android/hal-health.c \
- 
--ifeq ($(BLUEZ_EXTENSIONS), true)
-+ifeq ($(ANDROID_GE_5_0), 1)
- LOCAL_SRC_FILES += \
- 	bluez/android/hal-handsfree-client.c \
--	bluez/android/hal-map-client.c \
--
-+	bluez/android/hal-map-client.c
- endif
- 
- LOCAL_C_INCLUDES += \
-@@ -183,7 +182,7 @@ LOCAL_SRC_FILES := \
- 	bluez/android/client/if-gatt.c \
- 	bluez/android/hal-utils.c \
- 
--ifeq ($(BLUEZ_EXTENSIONS), true)
-+ifeq ($(ANDROID_GE_5_0), 1)
- LOCAL_SRC_FILES += \
- 	bluez/android/client/if-hf-client.c \
- 	bluez/android/client/if-mce.c
-diff --git a/android/client/haltest.c b/android/client/haltest.c
-index 781e45c..c8cfdc4 100644
---- a/android/client/haltest.c
-+++ b/android/client/haltest.c
-@@ -48,7 +48,7 @@ const struct interface *interfaces[] = {
- 	&pan_if,
- 	&hl_if,
- 	&sock_if,
--#ifdef BLUEZ_EXTENSIONS
-+#if ANDROID_VERSION >= PLATFORM_VER(5, 0, 0)
- 	&hf_client_if,
- 	&mce_if,
- #endif
-@@ -396,7 +396,7 @@ static void init(void)
- 		BT_PROFILE_PAN_ID,
- 		BT_PROFILE_GATT_ID,
- 		BT_PROFILE_SOCKETS_ID,
--#ifdef BLUEZ_EXTENSIONS
-+#if ANDROID_VERSION >= PLATFORM_VER(5, 0, 0)
- 		BT_PROFILE_HANDSFREE_CLIENT_ID,
- 		BT_PROFILE_MAP_CLIENT_ID,
- #endif
-diff --git a/android/client/if-bt.c b/android/client/if-bt.c
-index eef4454..48aff1b 100644
---- a/android/client/if-bt.c
-+++ b/android/client/if-bt.c
-@@ -757,7 +757,7 @@ static void get_profile_interface_c(int argc, const char **argv,
- 		BT_PROFILE_PAN_ID,
- 		BT_PROFILE_GATT_ID,
- 		BT_PROFILE_AV_RC_ID,
--#ifdef BLUEZ_EXTENSIONS
-+#if ANDROID_VERSION >= PLATFORM_VER(5, 0, 0)
- 		BT_PROFILE_HANDSFREE_CLIENT_ID,
- 		BT_PROFILE_MAP_CLIENT_ID,
- #endif
-@@ -799,7 +799,7 @@ static void get_profile_interface_p(int argc, const char **argv)
- 		pif = (const void **) &if_rc;
- 	else if (strcmp(BT_PROFILE_GATT_ID, id) == 0)
- 		pif = (const void **) &if_gatt;
--#ifdef BLUEZ_EXTENSIONS
-+#if ANDROID_VERSION >= PLATFORM_VER(5, 0, 0)
- 	else if (strcmp(BT_PROFILE_HANDSFREE_CLIENT_ID, id) == 0)
- 		pif = (const void **) &if_hf_client;
- 	else if (strcmp(BT_PROFILE_MAP_CLIENT_ID, id) == 0)
-diff --git a/android/client/if-hf-client.c b/android/client/if-hf-client.c
-index 3f6f7c2..5783ffe 100644
---- a/android/client/if-hf-client.c
-+++ b/android/client/if-hf-client.c
-@@ -18,6 +18,8 @@
- #include "if-main.h"
- #include "../hal-utils.h"
- 
-+#if ANDROID_VERSION >= PLATFORM_VER(5, 0, 0)
-+
- const bthf_client_interface_t *if_hf_client = NULL;
- 
- static char last_addr[MAX_ADDR_STR_LEN];
-@@ -666,3 +668,5 @@ const struct interface hf_client_if = {
- 	.name = "handsfree_client",
- 	.methods = methods
- };
-+
-+#endif
-diff --git a/android/client/if-main.h b/android/client/if-main.h
-index cb5f558..93cc98d 100644
---- a/android/client/if-main.h
-+++ b/android/client/if-main.h
-@@ -37,7 +37,9 @@
- #include <hardware/bt_hf.h>
- #include <hardware/bt_hl.h>
- 
--#ifdef BLUEZ_EXTENSIONS
-+#include "hal.h"
-+
-+#if ANDROID_VERSION >= PLATFORM_VER(5, 0, 0)
- #include <hardware/bt_hf_client.h>
- #include <hardware/bt_mce.h>
- #endif
-@@ -62,7 +64,7 @@ extern const btsock_interface_t *if_sock;
- extern const btgatt_interface_t *if_gatt;
- extern const btgatt_server_interface_t *if_gatt_server;
- extern const btgatt_client_interface_t *if_gatt_client;
--#ifdef BLUEZ_EXTENSIONS
-+#if ANDROID_VERSION >= PLATFORM_VER(5, 0, 0)
- extern const bthf_client_interface_t *if_hf_client;
- extern const btmce_interface_t *if_mce;
- #endif
-@@ -89,7 +91,7 @@ extern const struct interface sock_if;
- extern const struct interface hf_if;
- extern const struct interface hh_if;
- extern const struct interface hl_if;
--#ifdef BLUEZ_EXTENSIONS
-+#if ANDROID_VERSION >= PLATFORM_VER(5, 0, 0)
- extern const struct interface hf_client_if;
- extern const struct interface mce_if;
- #endif
-diff --git a/android/client/if-mce.c b/android/client/if-mce.c
-index 5f101e0..b656328 100644
---- a/android/client/if-mce.c
-+++ b/android/client/if-mce.c
-@@ -18,6 +18,8 @@
- #include "if-main.h"
- #include "../hal-utils.h"
- 
-+#if ANDROID_VERSION >= PLATFORM_VER(5, 0, 0)
-+
- const btmce_interface_t *if_mce = NULL;
- 
- /*
-@@ -85,3 +87,5 @@ const struct interface mce_if = {
- 	.name = "mce",
- 	.methods = methods
- };
-+
-+#endif
-diff --git a/android/hal-audio.c b/android/hal-audio.c
-index 1caa4eb..207101f 100644
---- a/android/hal-audio.c
-+++ b/android/hal-audio.c
-@@ -36,6 +36,7 @@
- #include "hal-msg.h"
- #include "hal-audio.h"
- #include "hal-utils.h"
-+#include "hal.h"
- 
- #define FIXED_A2DP_PLAYBACK_LATENCY_MS 25
- 
-diff --git a/android/hal-bluetooth.c b/android/hal-bluetooth.c
-index 1599174..9b5ce16 100644
---- a/android/hal-bluetooth.c
-+++ b/android/hal-bluetooth.c
-@@ -865,7 +865,7 @@ static const void *get_profile_interface(const char *profile_id)
- 	if (!strcmp(profile_id, BT_PROFILE_HEALTH_ID))
- 		return bt_get_health_interface();
- 
--#if BLUEZ_EXTENSIONS
-+#if ANDROID_VERSION >= PLATFORM_VER(5, 0, 0)
- 	if (!strcmp(profile_id, BT_PROFILE_HANDSFREE_CLIENT_ID))
- 		return bt_get_hf_client_interface();
- 
-diff --git a/android/hal-sco.c b/android/hal-sco.c
-index 6c4e975..380b2a8 100644
---- a/android/hal-sco.c
-+++ b/android/hal-sco.c
-@@ -33,6 +33,7 @@
- #include "sco-msg.h"
- #include "ipc-common.h"
- #include "hal-log.h"
-+#include "hal.h"
- 
- #define AUDIO_STREAM_DEFAULT_RATE	44100
- #define AUDIO_STREAM_SCO_RATE		8000
-diff --git a/android/hal-utils.h b/android/hal-utils.h
-index ee0320c..9c59948 100644
---- a/android/hal-utils.h
-+++ b/android/hal-utils.h
-@@ -19,8 +19,6 @@
- 
- #include <hardware/bluetooth.h>
- 
--#define PLATFORM_VER(a,b,c) ((a << 16) | ( b << 8) | (c))
--
- #define MAX_UUID_STR_LEN	37
- #define HAL_UUID_LEN		16
- #define MAX_ADDR_STR_LEN	18
-diff --git a/android/hal.h b/android/hal.h
-index 9b41952..a2888f0 100644
---- a/android/hal.h
-+++ b/android/hal.h
-@@ -27,7 +27,9 @@
- #include <hardware/bt_gatt_server.h>
- #include <hardware/bt_hl.h>
- 
--#ifdef BLUEZ_EXTENSIONS
-+#define PLATFORM_VER(a,b,c) ((a << 16) | ( b << 8) | (c))
-+
-+#if ANDROID_VERSION >= PLATFORM_VER(5, 0, 0)
- #include <hardware/bt_hf_client.h>
- #include <hardware/bt_mce.h>
- #endif
-@@ -41,7 +43,7 @@ bthf_interface_t *bt_get_handsfree_interface(void);
- btgatt_interface_t *bt_get_gatt_interface(void);
- bthl_interface_t *bt_get_health_interface(void);
- 
--#ifdef BLUEZ_EXTENSIONS
-+#if ANDROID_VERSION >= PLATFORM_VER(5, 0, 0)
- bthf_client_interface_t *bt_get_hf_client_interface(void);
- btmce_interface_t *bt_get_map_client_interface(void);
- #endif
--- 
-1.9.1
+  mwifiex: add cfg80211 dump_survey handler (2014-10-31 16:07:49 -0400)
 
+are available in the git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git for-upstream
+
+for you to fetch changes up to 56b2c3eea398c772dd895dc62c18cbdd1ba127b1:
+
+  6lowpan: move skb_free from error paths in decompression (2014-11-06 22:09:48 +0100)
+
+----------------------------------------------------------------
+Alexander Aring (41):
+      at86rf230: fix page parameter constraints
+      ieee802154: remove default channel settings
+      at86rf230: add default channel settings
+      cfg802154: introduce cfg802154_registered_device
+      mac802154: introduce mac802154_config_ops
+      ieee802154: add helper wpan_phy_to_rdev function
+      cfg802154: convert deprecated iface add and del
+      ieee802154: don't allow to change addr while netif_running
+      mac802154: add helper for converting dev_addr
+      mac802154: set extended address filter on ifup
+      mac802154: set short address filter on ifup
+      mac802154: set panid address filter on ifup
+      mac802154: move phy settings into netlink receive
+      ieee802154: add extended address validation helper
+      mac802154: iface: add validation for extended address
+      ieee802154: 6lowpan: remove set of mac address
+      ieee802154: add missing ULL definition
+      ieee802154: fix byteorder issues
+      mac802154: fix byteorder issues
+      ieee802154: sysfs: add missing include
+      mac802154: cfg: add missing include
+      ieee802154: remove unnecessary functions
+      netdevice: add ieee802154_ptr to net_device
+      ieee802154: rework wpan_phy index assignment
+      ieee802154: remove nl802154 unused functions
+      mac802154: move interface del handling in iface
+      mac802154: move interface add handling in iface
+      mac802154: move dev_hold out of ieee802154_if_add
+      ieee802154: rework interface registration
+      ieee802154: remove mlme get_phy callback
+      mac802154: add default interface registration
+      mac802154: add ieee802154_vif struct
+      ieee802154: add IEEE802154_EXTENDED_ADDR_LEN
+      ieee802154: add ieee802154_random_extended_addr
+      mac802154: add ieee802154_le64_to_be64
+      mac802154: cleanup ieee802154_netdev_to_extended_addr
+      mac802154: add support for perm_extended_addr
+      at86rf230: generate random perm extended address
+      at86rf230: add force slotted operation bit
+      mac802154: use IEEE802154_EXTENDED_ADDR_LEN
+      mac802154: fix typo promisuous to promiscuous
+
+Chan-yeol Park (1):
+      Bluetooth: Fix hci_sync missing wakeup interrupt
+
+Dan Carpenter (1):
+      ieee802154: || vs && in ieee802154_is_valid_extended_addr()
+
+Fengguang Wu (1):
+      at86rf230: fix simple_return.cocci warnings
+
+Johan Hedberg (1):
+      Bluetooth: Fix sparse warnings in RFCOMM
+
+Kuba Pawlak (2):
+      Bluetooth: Clear role switch pending flag
+      Bluetooth: Sort switch cases by opcode's numeric value
+
+Marcel Holtmann (11):
+      Bluetooth: Check status of command complete for HCI_Reset
+      Bluetooth: Print error message for HCI_Hardware_Error event
+      Bluetooth: Use HCI_EV_HARDWARE_ERROR define for event payload
+      Bluetooth: Introduce BT_BREDR and BT_LE config options
+      Bluetooth: Add hci_reset_dev() for driver triggerd stack reset
+      Bluetooth: Switch HCI H5 driver to use hci_reset_dev() function
+      Bluetooth: Introduce HCI_QUIRK_STRICT_DUPLICATE_FILTER
+      Bluetooth: Set HCI_QUIRK_STRICT_DUPLICATE_FILTER for Broadcom devices
+      Bluetooth: Consolidate whitelist debugfs entry into device_list
+      Bluetooth: btusb: Add internal callback for USB bulk rx data
+      Bluetooth: Add hci_conn_lookup_type() helper function
+
+Martin Townsend (1):
+      6lowpan: move skb_free from error paths in decompression
+
+Simon Vincent (1):
+      6lowpan: fix udp header compression when using raw sockets
+
+Szymon Janc (1):
+      Bluetooth: Fix invalid response for 'Start Discovery' command
+
+ MAINTAINERS                        |   1 -
+ drivers/bluetooth/btusb.c          |   7 +-
+ drivers/bluetooth/hci_h5.c         |  13 +--
+ drivers/net/ieee802154/at86rf230.c |  13 ++-
+ drivers/net/ieee802154/cc2520.c    |   1 +
+ include/linux/ieee802154.h         |  32 ++++++
+ include/linux/netdevice.h          |   3 +
+ include/net/bluetooth/hci.h        |  15 +++
+ include/net/bluetooth/hci_core.h   |  21 ++++
+ include/net/cfg802154.h            |  24 +++--
+ include/net/ieee802154_netdev.h    |  12 ---
+ include/net/mac802154.h            |  33 ++++++
+ include/net/nl802154.h             | 122 ---------------------
+ net/6lowpan/iphc.c                 |  41 +++----
+ net/bluetooth/6lowpan.c            |  15 ++-
+ net/bluetooth/Kconfig              |  20 +++-
+ net/bluetooth/bnep/Kconfig         |   2 +-
+ net/bluetooth/cmtp/Kconfig         |   2 +-
+ net/bluetooth/hci_core.c           |  72 ++++++-------
+ net/bluetooth/hci_event.c          |  61 +++++++++--
+ net/bluetooth/hidp/Kconfig         |   2 +-
+ net/bluetooth/mgmt.c               |  56 ++++++----
+ net/bluetooth/rfcomm/Kconfig       |   2 +-
+ net/bluetooth/rfcomm/core.c        |   6 +-
+ net/ieee802154/6lowpan_rtnl.c      |  38 ++-----
+ net/ieee802154/core.c              |  64 +++++------
+ net/ieee802154/core.h              |  29 +++++
+ net/ieee802154/nl-mac.c            | 203 ++++-------------------------------
+ net/ieee802154/nl-phy.c            |  23 ++--
+ net/ieee802154/rdev-ops.h          |  23 ++++
+ net/ieee802154/sysfs.c             |  16 ++-
+ net/mac802154/Makefile             |   2 +-
+ net/mac802154/cfg.c                |  47 ++++++++
+ net/mac802154/cfg.h                |   9 ++
+ net/mac802154/ieee802154_i.h       |  17 ++-
+ net/mac802154/iface.c              | 195 +++++++++++++++++++++------------
+ net/mac802154/mac_cmd.c            |  42 ++++----
+ net/mac802154/main.c               | 102 +++---------------
+ net/mac802154/mib.c                |  71 ------------
+ net/mac802154/rx.c                 |   4 +-
+ 40 files changed, 678 insertions(+), 783 deletions(-)
+ delete mode 100644 include/net/nl802154.h
+ create mode 100644 net/ieee802154/core.h
+ create mode 100644 net/ieee802154/rdev-ops.h
+ create mode 100644 net/mac802154/cfg.c
+ create mode 100644 net/mac802154/cfg.h
+
+
+--X1bOJ3K7DJ5YkBrT
+Content-Type: application/pgp-signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQIcBAEBAgAGBQJUXJCaAAoJECQj9vv5qNQSXyAQAJj2kpekYfoB8gB1s/5x8qTO
+6Qr832BIJZ13BOmL2jszTrAcY1Pq9LBFTiBvzshizefbA93O9o0xoT357yEFrJZG
+YC7oV6O+mrNFxFPUDbkcEtIoNxAEpWd/+pXYmJZZ9ZMfTjMcN3HGcalud+fRiFlM
+M/Av+n68wjvN7DItmWuLgWJenOqAZJ4+gEkHtYz5u6n9Uz8DAsOY5U6QSlmastw1
+ESjH6C2SwpDecBHIO+J9Zp5k2o2j3VovNanu8rtDD1X1gqbLWKR/nDvqjNDxtNeB
+YqXV23af+CDPltMeBUn1quIS+MDQGHUdQEH0jJvLsz8/STMQi10uTpxFG8Sxckuw
+bXuifdEEIN/EHpTeEEg1U4JRCnzhTbQkYFWNiIUG/4caGm2TBYdkEAgkY5zbEDtk
+TOi8zKIu1SEUz79iQ1iLb6bF+06HkXWNAN6FDW9sWeSnoFUmBS+9b4pqywH2sMdT
+yoRMAkGYDdj85meTkOrR7JbpYUqduocYAzCcW52CEzZZ3xsmcgtIme3IzU368rAX
+MsCMlAyz8exKc8iksL2L4LAPQKO7Am93oKYWUKp5uarvcspxGGiS/OGIvi5wlGU8
+aH8dRTlMY+Odq+F4pbfvo2cDF7YbYtJ84IpTvP+fyIQFAOGxuKvDuqXGCBJoBZ8z
+845T4eIWdDiuiOZKiw1F
+=DttJ
+-----END PGP SIGNATURE-----
+
+--X1bOJ3K7DJ5YkBrT--
