@@ -1,285 +1,192 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 07 Nov 2014 11:00:02 -0800 (PST)
-From: Szymon Janc <szymon.janc@tieto.com>
-To: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 4/7] android/handsfree-client: Add incoming connection handling
-Message-ID: <2745077.IzRp5KzAEY@leonov>
-In-Reply-To: <1415186531-23288-5-git-send-email-lukasz.rymanowski@tieto.com>
-References: <1415186531-23288-1-git-send-email-lukasz.rymanowski@tieto.com> <1415186531-23288-5-git-send-email-lukasz.rymanowski@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+From: Gowtham Anandha Babu <gowtham.ab@samsung.com>
+To: 'Luiz Augusto von Dentz' <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	'Dmitry Kasatkin' <d.kasatkin@samsung.com>,
+	'Bharat Panda' <bharat.panda@samsung.com>, cpgs@samsung.com
+References: <1415365587-6217-1-git-send-email-gowtham.ab@samsung.com>
+ <1415365587-6217-3-git-send-email-gowtham.ab@samsung.com>
+ <CABBYNZLmmLKH6VMkdy5E5faV8XbfMKyROoPMde1iBs-1EZyuzQ@mail.gmail.com>
+ <000d01cffa9b$1d086cc0$57194640$@samsung.com>
+In-reply-to: <000d01cffa9b$1d086cc0$57194640$@samsung.com>
+Subject: RE: [PATCH v1 2/4] monitor/rfcomm: Add support for printing RFCOMM hdr
+Date: Fri, 07 Nov 2014 21:16:29 +0530
+Message-id: <000e01cffaa2$0197b840$04c728c0$@samsung.com>
+MIME-version: 1.0
+Content-type: text/plain; charset=utf-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Łukasz,
+Hi Luiz,
 
-On Wednesday 05 of November 2014 12:22:08 Lukasz Rymanowski wrote:
-> ---
->  android/handsfree-client.c | 174
-> ++++++++++++++++++++++++++++++++++++++++++++- 1 file changed, 173
-> insertions(+), 1 deletion(-)
+> -----Original Message-----
+> From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-
+> owner@vger.kernel.org] On Behalf Of Gowtham Anandha Babu
+> Sent: Friday, November 07, 2014 8:27 PM
+> To: 'Luiz Augusto von Dentz'
+> Cc: linux-bluetooth@vger.kernel.org; 'Dmitry Kasatkin'; 'Bharat Panda';
+> cpgs@samsung.com
+> Subject: RE: [PATCH v1 2/4] monitor/rfcomm: Add support for printing
+> RFCOMM hdr
 > 
-> diff --git a/android/handsfree-client.c b/android/handsfree-client.c
-> index aa3912b..6be9851 100644
-> --- a/android/handsfree-client.c
-> +++ b/android/handsfree-client.c
-> @@ -36,6 +36,7 @@
->  #include "lib/sdp_lib.h"
->  #include "src/sdp-client.h"
->  #include "src/shared/queue.h"
-> +#include "btio/btio.h"
->  #include "ipc.h"
->  #include "ipc-common.h"
->  #include "src/log.h"
-> @@ -64,6 +65,11 @@
->  				HFP_HF_FEAT_RVC | HFP_HF_FEAT_ECS |\
->  				HFP_HF_FEAT_ECC)
+> Hi Luiz,
 > 
-> +struct device {
-> +	bdaddr_t bdaddr;
-> +	uint8_t state;
-> +};
-> +
->  static bdaddr_t adapter_addr;
+> > -----Original Message-----
+> > From: Luiz Augusto von Dentz [mailto:luiz.dentz@gmail.com]
+> > Sent: Friday, November 07, 2014 7:57 PM
+> > To: Gowtham Anandha Babu
+> > Cc: linux-bluetooth@vger.kernel.org; Dmitry Kasatkin; Bharat Panda;
+> > cpgs@samsung.com
+> > Subject: Re: [PATCH v1 2/4] monitor/rfcomm: Add support for printing
+> > RFCOMM hdr
+> >
+> > Hi Gowtham,
+> >
+> > On Fri, Nov 7, 2014 at 3:06 PM, Gowtham Anandha Babu
+> > <gowtham.ab@samsung.com> wrote:
+> > > Changes made to decode RFCOMM hdr and print the same.
+> > >
+> > >       RFCOMM: Unnumbered Info with Header Check (UIH)(0xef)
+> > >          Address: 0x01 cr 0 dlci 0x00
+> > >          Control: 0xef poll/final 0
+> > >          Length: 10
+> > >          FCS: 0xaa
+> > >         81 11 20 e0 27 00 9a 02 00 07 aa                 .. .'......
+> > >
+> > > ---
+> > >  monitor/rfcomm.c | 50
+> > > +++++++++++++++++++++++++++++++++++++++++++++++---
+> > >  1 file changed, 47 insertions(+), 3 deletions(-)
+> > >
+> > > diff --git a/monitor/rfcomm.c b/monitor/rfcomm.c index
+> > > 155bde2..a70c404 100644
+> > > --- a/monitor/rfcomm.c
+> > > +++ b/monitor/rfcomm.c
+> > > @@ -44,6 +44,11 @@
+> > >  #include "sdp.h"
+> > >  #include "rfcomm.h"
+> > >
+> > > +#define GET_LEN8(length) ((length & 0xfe) >> 1) #define
+> > > +GET_LEN16(length) ((length & 0xfffe) >> 1)
+> > > +#define GET_CR(type)   ((type & 0x02) >> 1)
+> > > +#define GET_PF(ctr) (((ctr) >> 4) & 0x1)
+> > > +
+> > >  struct rfcomm_lhdr {
+> > >         uint8_t address;
+> > >         uint8_t control;
+> > > @@ -57,6 +62,24 @@ struct rfcomm_frame {
+> > >         struct l2cap_frame l2cap_frame;  };
+> > >
+> > > +static void print_rfcomm_hdr(struct rfcomm_frame *rfcomm_frame,
+> > > +uint8_t indent) {
+> > > +       struct rfcomm_lhdr hdr = rfcomm_frame->hdr;
+> > > +
+> > > +       /* Address field */
+> > > +       print_field("%*cAddress: 0x%2.2x cr %d dlci 0x%2.2x", indent, ' ',
+> > > +                                       hdr.address, GET_CR(hdr.address),
+> > > +
+> > > + RFCOMM_GET_DLCI(hdr.address));
+> > > +
+> > > +       /* Control field */
+> > > +       print_field("%*cControl: 0x%2.2x poll/final %d", indent, ' ',
+> > > +                                       hdr.control,
+> > > + GET_PF(hdr.control));
+> > > +
+> > > +       /* Length and FCS */
+> > > +       print_field("%*cLength: %d", indent, ' ', hdr.length);
+> > > +       print_field("%*cFCS: 0x%2.2x", indent, ' ', hdr.fcs); }
+> > > +
+> > >  struct rfcomm_data {
+> > >         uint8_t frame;
+> > >         const char *str;
+> > > @@ -73,12 +96,13 @@ static const struct rfcomm_data rfcomm_table[] =
+> > > {
+> > >
+> > >  void rfcomm_packet(const struct l2cap_frame *frame)  {
+> > > -       uint8_t ctype;
+> > > +       uint8_t ctype, length, ex_length, indent = 1;
+> > >         const char *frame_str, *frame_color;
+> > >         struct l2cap_frame *l2cap_frame;
+> > >         struct rfcomm_frame rfcomm_frame;
+> > >         struct rfcomm_lhdr hdr;
+> > >         const struct rfcomm_data *rfcomm_data = NULL;
+> > > +       const void *ptr;
+> > >         int i;
+> > >
+> > >         l2cap_frame_pull(&rfcomm_frame.l2cap_frame, frame, 0); @@
+> > > -89,9 +113,24 @@ void rfcomm_packet(const struct l2cap_frame *frame)
+> > >                 goto fail;
+> > >
+> > >         if (!l2cap_frame_get_u8(l2cap_frame, &hdr.address) ||
+> > > -                       !l2cap_frame_get_u8(l2cap_frame, &hdr.control))
+> > > +                       !l2cap_frame_get_u8(l2cap_frame, &hdr.control) ||
+> > > +                       !l2cap_frame_get_u8(l2cap_frame, &length))
+> > >                 goto fail;
+> > >
+> > > +       /* length maybe 1 or 2 octets */
+> > > +       if (RFCOMM_TEST_EA(length))
+> > > +               hdr.length = (uint16_t) GET_LEN8(length);
+> > > +       else {
+> > > +               if (!l2cap_frame_get_u8(l2cap_frame, &ex_length))
+> > > +                       goto fail;
+> > > +               hdr.length = ((uint16_t)length << 8) | ex_length;
+> > > +               hdr.length = GET_LEN16(hdr.length);
+> > > +       }
+> > > +
+> > > +       /* fetching FCS by frame offset */
+> > > +       ptr = (l2cap_frame->data)+l2cap_frame->size-1;
+> > > +       hdr.fcs = *(uint8_t *)(ptr);
+> >
+> > You should probably use l2cap_frame_pull followed by
+> > l2cap_frame_get_u8 so we actually check if the frame is too short.
+> > Btw, the format looks much better now.
+> >
+> > >         /* Decoding frame type */
+> > >         ctype = RFCOMM_GET_TYPE(hdr.control);
+> > >
+> > > @@ -122,7 +161,12 @@ void rfcomm_packet(const struct l2cap_frame
+> > *frame)
+> > >                                                 "(0x%2.2x)", ctype);
+> > >
+> > >         rfcomm_frame.hdr = hdr;
+> > > -       packet_hexdump(l2cap_frame->data, l2cap_frame->size);
+> > > +       print_rfcomm_hdr(&rfcomm_frame, indent);
+> > > +
+> > > +       /* UIH frame */
+> > > +       if(ctype == 0xef)
+> > > +               packet_hexdump(l2cap_frame->data,
+> > > + l2cap_frame->size);
+> > > +
+> > >         return;
+> > >
+> > >  fail:
+> > > --
+> > > 1.9.1
+> > >
+> > > --
+> > > To unsubscribe from this list: send the line "unsubscribe
+> > > linux-bluetooth" in the body of a message to
+> > > majordomo@vger.kernel.org More majordomo info at
+> > > http://vger.kernel.org/majordomo-info.html
+> >
+> >
+> >
+> > --
+> > Luiz Augusto von Dentz
 > 
->  static struct ipc *hal_ipc = NULL;
-> @@ -71,6 +77,55 @@ static struct ipc *hal_ipc = NULL;
->  static uint32_t hfp_hf_features = 0;
->  static uint32_t hfp_hf_record_id = 0;
->  static struct queue *devices = NULL;
-> +static GIOChannel *hfp_hf_server = NULL;
-> +
-> +static bool match_by_bdaddr(const void *data, const void *user_data)
-> +{
-> +	const bdaddr_t *addr1 = data;
-> +	const bdaddr_t *addr2 = user_data;
-> +
-> +	return !bacmp(addr1, addr2);
-> +}
-> +
-> +static struct device *find_device(const bdaddr_t *addr)
-> +{
-> +	/* For now we support only one device */
-
-I'm not sure how this comment fits here.
-
-> +	return queue_find(devices, match_by_bdaddr, addr);
-> +}
-> +
-> +static struct device *device_create(const bdaddr_t *bdaddr)
-> +{
-> +	struct device *dev;
-> +
-> +	dev = g_malloc0(sizeof(struct device));
-
-This should be new0();
-
-> +	if (!dev)
-> +		return NULL;
-> +
-> +	if (!queue_push_tail(devices, dev)) {
-> +		error("hf-client: Could not push dev on the list");
-> +		free(dev);
-> +		return NULL;
-> +	}
-> +
-> +	bacpy(&dev->bdaddr, bdaddr);
-
-Please initialize state here explicitly. Will make code easier to follow.
-
-> +
-> +	return dev;
-> +}
-> +
-> +static struct device *get_device(const bdaddr_t *addr)
-> +{
-> +	struct device *dev;
-> +
-> +	dev = find_device(addr);
-> +	if (dev)
-> +		return dev;
-> +
-> +	/* We do support only one device as for now */
-> +	if (queue_isempty(devices))
-> +		return device_create(addr);
-> +
-> +	return NULL;
-> +}
+> I will incorporate this in v2. Is there any other changes stills needs to be
+> done?
 > 
->  static void handle_connect(const void *buf, uint16_t len)
->  {
-> @@ -192,6 +247,102 @@ static void handle_get_last_vc_tag_num(const void
-> *buf, uint16_t len) HAL_STATUS_UNSUPPORTED);
->  }
+> Regards,
+> Gowtham
 > 
-> +static void device_set_state(struct device *dev, uint8_t state)
-> +{
-> +	struct hal_ev_hf_client_conn_state ev;
-> +	char address[18];
-> +
-> +	memset(&ev, 0, sizeof(ev));
-> +
-> +	if (dev->state == state)
-> +		return;
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org More majordomo
+> info at  http://vger.kernel.org/majordomo-info.html
 
-Minor: this check could be done before clearing ev.
+I have changed FCS fetching by l2cap_frame_pull and submitted v2 for the same.
 
-> +
-> +	dev->state = state;
-> +
-> +	ba2str(&dev->bdaddr, address);
-> +	DBG("device %s state %u", address, state);
-> +
-> +	bdaddr2android(&dev->bdaddr, ev.bdaddr);
-> +	ev.state = state;
-> +
-> +	ipc_send_notif(hal_ipc, HAL_SERVICE_ID_HANDSFREE_CLIENT,
-> +				HAL_EV_HF_CLIENT_CONN_STATE, sizeof(ev), &ev);
-> +}
-> +
-> +static void (void *data)
+Regards,
+Gowtham
 
-Please make this parameter proper type.
-
-> +{
-> +	struct device *dev = data;
-> +
-
-I'd set state to disconnect here to be sure that framework always get proper 
-notification of disconnected device. 
-
-> +	queue_remove(devices, dev);
-> +	free(dev);
-> +}
-> +
-> +static void connect_cb(GIOChannel *chan, GError *err, gpointer user_data)
-> +{
-> +	struct device *dev = user_data;
-> +
-> +	DBG("");
-> +
-> +	if (err) {
-> +		error("hf-client: connect failed (%s)", err->message);
-> +		goto failed;
-> +	}
-> +
-> +	g_io_channel_set_close_on_unref(chan, FALSE);
-> +
-> +	/* TODO Create SLC here. For now do nothing, link will be dropped */
-> +
-> +	return;
-> +
-> +failed:
-> +	g_io_channel_shutdown(chan, TRUE, NULL);
-> +	device_destroy(dev);
-> +}
-> +
-> +static void confirm_cb(GIOChannel *chan, gpointer data)
-> +{
-> +	struct device *dev;
-> +	char address[18];
-> +	bdaddr_t bdaddr;
-> +	GError *err = NULL;
-> +
-> +	bt_io_get(chan, &err,
-> +			BT_IO_OPT_DEST, address,
-> +			BT_IO_OPT_DEST_BDADDR, &bdaddr,
-> +			BT_IO_OPT_INVALID);
-> +	if (err) {
-> +		error("hf-client: confirm failed (%s)", err->message);
-> +		g_error_free(err);
-> +		goto drop;
-> +	}
-> +
-> +	DBG("Incoming connection from %s", address);
-> +
-> +	dev = get_device(&bdaddr);
-> +	if (!dev) {
-> +		error("hf-client: There is other AG connected");
-> +		goto drop;
-> +	}
-> +
-> +	if (dev->state != HAL_HF_CLIENT_CONN_STATE_DISCONNECTED) {
-> +		error("hf-client: Connections is up or ongoing ?");
-> +		return;
-
-Shouldn't we drop connection here?
-
-> +	}
-> +
-> +	device_set_state(dev, HAL_HF_CLIENT_CONN_STATE_CONNECTING);
-> +
-> +	if (!bt_io_accept(chan, connect_cb, dev, NULL, NULL)) {
-> +		error("hf-client: failed to accept connection");
-
-set_state(DISCONNECTED) is missing here. As mentioned above, maybe this should 
-be handled in device_destroy() as this seems to be missing in more places?
-
-> +		device_destroy(dev);
-> +		goto drop;
-> +	}
-> +
-> +	return;
-> +
-> +drop:
-> +	g_io_channel_shutdown(chan, TRUE, NULL);
-> +}
-> +
->  static const struct ipc_handler cmd_handlers[] = {
->  	/* HAL_OP_HF_CLIENT_CONNECT */
->  	{ handle_connect, false,
-> @@ -304,6 +455,21 @@ static sdp_record_t *hfp_hf_record(void)
->  static bool enable_hf_client(void)
->  {
->  	sdp_record_t *rec;
-> +	GError *err = NULL;
-> +
-> +	if (hfp_hf_server)
-> +		return false;
-
-Can this happen?
-
-> +
-> +	hfp_hf_server =  bt_io_listen(NULL, confirm_cb, NULL, NULL, &err,
-> +					BT_IO_OPT_SOURCE_BDADDR, &adapter_addr,
-> +					BT_IO_OPT_CHANNEL, HFP_HF_CHANNEL,
-> +					BT_IO_OPT_SEC_LEVEL, BT_IO_SEC_MEDIUM,
-> +					BT_IO_OPT_INVALID);
-> +	if (!hfp_hf_server) {
-> +		error("Failed to listen on Handsfree rfcomm: %s", err->message);
-
-prefix this with hf-client: to avoid confusion with AG.
-
-> +		g_error_free(err);
-> +		return false;
-> +	}
-> 
->  	hfp_hf_features = HFP_HF_FEATURES;
-> 
-> @@ -326,6 +492,12 @@ static bool enable_hf_client(void)
-> 
->  static void cleanup_hfp_hf(void)
->  {
-> +	if (hfp_hf_server) {
-> +		g_io_channel_shutdown(hfp_hf_server, TRUE, NULL);
-> +		g_io_channel_unref(hfp_hf_server);
-> +		hfp_hf_server = NULL;
-> +	}
-> +
->  	if (hfp_hf_record_id > 0) {
->  		bt_adapter_remove_record(hfp_hf_record_id);
->  		hfp_hf_record_id = 0;
-> @@ -366,7 +538,7 @@ void bt_hf_client_unregister(void)
-> 
->  	cleanup_hfp_hf();
-> 
-> -	queue_destroy(devices, free);
-> +	queue_destroy(devices, device_destroy);
->  	devices = NULL;
-> 
->  	ipc_unregister(hal_ipc, HAL_SERVICE_ID_HANDSFREE);
-
--- 
-BR
-Szymon Janc
