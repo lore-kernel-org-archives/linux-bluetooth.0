@@ -1,215 +1,90 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <545CD2CB.3050500@LilandIT.com>
-References: <5457A17D.9060404@LilandIT.com>
-	<CAHrH25RfMAiNTHYBR=vT+KuBtVwEKPuLRFfEiMGF9Ya__9Y5nA@mail.gmail.com>
-	<5458C0CD.9010907@LilandIT.com>
-	<CAHrH25SBzCoJ+nvUbS2a8MfxbSG4nBhJ447qz7VKGSdGgMXM-A@mail.gmail.com>
-	<545A5CA3.1000807@LilandIT.com>
-	<CAHrH25TZgUU85PLOnQZQzxypwbQVa4Rto85H6vwbGg7F4G3QcQ@mail.gmail.com>
-	<545CD2CB.3050500@LilandIT.com>
-Date: Fri, 7 Nov 2014 12:32:07 -0800
-Message-ID: <CAHrH25Q+sJ9ES5Hgw3ng4Ew+b6CNQb6-ABygQdz_jbUDtpk=UQ@mail.gmail.com>
-Subject: Re: How to get started on a GATT Server ?
-From: Arman Uguray <armansito@google.com>
-To: "Urbani, Edmund" <edmund.urbani@lilandit.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+In-Reply-To: <20141107122043.GA14496@t440s.lan>
+References: <1415347791-11716-1-git-send-email-armansito@chromium.org>
+	<1415347791-11716-11-git-send-email-armansito@chromium.org>
+	<20141107122043.GA14496@t440s.lan>
+Date: Fri, 7 Nov 2014 12:11:48 -0800
+Message-ID: <CAHrH25RzwWyfxpS1NdJLG9XzA2fP4ejn3FQza5b2R7k7qrTjdQ@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 10/11] shared/gatt-client: Fix alignment warnings.
+From: Arman Uguray <armansito@chromium.org>
+To: BlueZ development <linux-bluetooth@vger.kernel.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Edmund,
+Hi Johan,
 
-> On Fri, Nov 7, 2014 at 6:10 AM, Urbani, Edmund <edmund.urbani@lilandit.com> wrote:
-> On 11/05/2014 06:47 PM, Arman Uguray wrote:
+> On Fri, Nov 7, 2014 at 4:20 AM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
+> Hi Arman,
+>
+> On Fri, Nov 07, 2014, Arman Uguray wrote:
+>> This patch addresses warnings that arise when compiled with
+>> -W=cast-align.
+>> ---
+>>  src/shared/gatt-client.c | 9 +++++----
+>>  1 file changed, 5 insertions(+), 4 deletions(-)
 >>
->> Hi Edmund,
+>> diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
+>> index b4f28b2..2e321b2 100644
+>> --- a/src/shared/gatt-client.c
+>> +++ b/src/shared/gatt-client.c
+>> @@ -1647,7 +1647,7 @@ bool bt_gatt_characteristic_iter_init(struct bt_gatt_characteristic_iter *iter,
+>>               return false;
 >>
->>> On Wed, Nov 5, 2014 at 9:21 AM, Urbani, Edmund
->>> <edmund.urbani@lilandit.com> wrote:
->>> On 11/04/2014 08:11 PM, Arman Uguray wrote:
->>>>
->>>> Hi Edmund,
->>>>
->>>> On Tue, Nov 4, 2014 at 4:04 AM, Urbani, Edmund
->>>> <edmund.urbani@lilandit.com> wrote:
->>>>>
->>>>> On 11/03/2014 08:32 PM, Arman Uguray wrote:
->>>>>>
->>>>>> Hi Edmund,
->>>>>>
->>>>>>> On Mon, Nov 3, 2014 at 7:38 AM, Urbani, Edmund
->>>>>>> <edmund.urbani@lilandit.com> wrote:
->>>>>>> Hello all,
->>>>>>>
->>>>>>> I am trying to write a simple GATT-based service of my own. Right now
->>>>>>> I
->>>>>>> don't really know which docs I should be looking at. I have skimmed
->>>>>>> through
->>>>>>> bluez sources (5.23) and found gatt-service.h and gatt.h, as well as
->>>>>>> the
->>>>>>> gatt-example plugin.
->>>>>>>
->>>>>>> So far I am still trying to figure out whether I should be going the
->>>>>>> C
->>>>>>> API
->>>>>>> route or maybe use the D-Bus interface. Also gatt-service.c seems to
->>>>>>> suggest
->>>>>>> that there is a way to register a GATT service over D-Bus but running
->>>>>>> it
->>>>>>> gives me this:
->>>>>>> RegisterService: Method "RegisterService" with signature "oa{sv}" on
->>>>>>> interface "org.bluez.GattManager1" doesn't exist"
->>>>>>
->>>>>> The reason you're not seeing GattManager1 is because it's hidden
->>>>>> behind the "experimental" flag. So you need to configure and run bluez
->>>>>> with the --enable-experimental and the --experimental flags
->>>>>> respectively.
->>>>>>
->>>>>> That said, that API implementation isn't complete and isn't in fact
->>>>>> even wired up with the internal attrib-server. We're working towards
->>>>>> rewriting all of the C API and finally implementing the proposed D-Bus
->>>>>> API but until then, I would ignore doc/gatt-api.txt (it's only a
->>>>>> proposal at the moment and isn't even included in release tarballs).
->>>>>> So for now you have to use the C API route. There will probably be an
->>>>>> announcement once that D-Bus API is finally supported.
->>>>>
->>>>>
->>>>>>> Any pointers to help me get started would be appreciated. Thanks!
->>>>>>>
->>>>>>> Kind regards,
->>>>>>>      Edmund
->>>>>>
->>>>>> Cheers,
->>>>>> Arman
->>>>>
->>>>>
->>>>> Thanks, I won't bother with the D-Bus interface then. But if the C API
->>>>> is
->>>>> being rewritten now, that sounds like there is currently no stable API
->>>>> available at all. :/ Or is it just the internals being rewritten?
->>>>>
->>>> The C API for GATT interactions is being rewritten, i.e. the code in
->>>> attrib/* is being deprecated in favor of code in src/shared/gatt*. You
->>>> can still keep using the existing APIs though at some point we will
->>>> rip out the existing attrib-server to be a combination of
->>>> shared/gatt-db and shared/gatt-server. So, make sure you keep track of
->>>> the patches going in.
->>>>
->>>> Keep in mind that if you're developing your code on top of the master
->>>> branch then things are meant to be in flight and unstable there, so
->>>> you should follow releases anyway. I think we'll figure out a way so
->>>> that the C based GATT server/client won't be entirely broken for
->>>> people in between official BlueZ releases.
->>>>
->>>>> So I assume, the fastest route the get a prototype that does something,
->>>>> would be to get gatt-example.c to run and then modify that, right?
->>>>>
->>>> Yes, that is the easiest way right now. When the new C APIs are mature
->>>> enough we will convert gatt-example to use the new code but that's
->>>> still a few months down the line.
->>>>
->>>>> Kind regards,
->>>>>    Edmund
->>>>>
->>>>>
->>>>> --
->>>>> To unsubscribe from this list: send the line "unsubscribe
->>>>> linux-bluetooth"
->>>>> in
->>>>> the body of a message to majordomo@vger.kernel.org
->>>>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->>>>
->>>> Cheers,
->>>> Arman
->>>
->>>
->>> Thanks, Arman. I now have a basic service with one characteristic and a
->>> read-only value up and running (I can see and read its value from another
->>> system using gatttool... though my iOS app still fails to discover the
->>> service :/ ).
->>>
->>> What I actually need however is a read/write attribute and a way to react
->>> to
->>> write requests. The examples in gatt-service.c all seem to be read-only.
->>> How
->>> would I get a call-back for an incoming write request?
->>>
->> It's not obvious from reading the existing code but the
->> "gatt_service_add" function defined attrib/gatt-service.h allows you
->> to specify read/write handlers using options passed via its variable
->> length argument list. You can look at profiles/proximity/linkloss.c
->> for an example of this. Looking at the link_loss_register function, I
->> see the profile register both a read and a write callback for the
->> Alert Level characteristic (the functions link_loss_alert_lvl_read and
->> link_loss_alert_lvl_write). I think this is what you're looking for.
+>>       memset(iter, 0, sizeof(*iter));
+>> -     iter->service = (struct service_list *) service;
+>> +     iter->service = (void *) service;
 >>
->> That said, the new API will hopefully make this more readable by doing
->> away with the variable argument list and having explicit functions and
->> arguments for inserting characteristics into the database with
->> read/write handlers.
+>>       return true;
+>>  }
+>> @@ -1677,7 +1677,7 @@ bool bt_gatt_include_service_iter_init(struct bt_gatt_incl_service_iter *iter,
+>>               return false;
 >>
->>> Kind regards,
->>>   Edmund
->>>
->>> --
->>> To unsubscribe from this list: send the line "unsubscribe
->>> linux-bluetooth"
->>> in
->>> the body of a message to majordomo@vger.kernel.org
->>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>>       memset(iter, 0, sizeof(*iter));
+>> -     iter->service = (struct service_list *) service;
+>> +     iter->service = (void *) service;
 >>
->> Cheers,
->> Arman
+>>       return true;
+>>  }
+>> @@ -2387,7 +2387,7 @@ bool bt_gatt_client_register_notify(struct bt_gatt_client *client,
+>>       struct chrc_data *chrc = NULL;
+>>       struct bt_gatt_service_iter iter;
+>>       const bt_gatt_service_t *service;
+>> -     size_t i;
+>> +     size_t i, offset;
+>>
+>>       if (!client || !chrc_value_handle || !callback)
+>>               return false;
+>> @@ -2402,7 +2402,8 @@ bool bt_gatt_client_register_notify(struct bt_gatt_client *client,
+>>       while (bt_gatt_service_iter_next(&iter, &service)) {
+>>               if (chrc_value_handle >= service->start_handle &&
+>>                               chrc_value_handle <= service->end_handle) {
+>> -                     svc_data = (struct service_list *) service;
+>> +                     offset = offsetof(struct service_list, service);
+>> +                     svc_data = (void *) (service - offset);
+>>                       break;
 >
-> Alright, I have a GATT service up and running with handlers for read and
-> write requests, and an iOS app that acts as the client/central.
->
-> The only thing that is still now working the way it should is service
-> discovery. Currently the client finds the service by connecting to any
-> device which advertises itself as connectable and then queries its service
-> UUIDs. Apparently my service UUID (currently still 16 bit) is not
-> advertised, and so I have to resort to this kind of slow, battery-consuming
-> service discovery. How do I get BlueZ to include the service UUID in LE
-> advertisements?
->
-
-As far as I know, there is a mgmt command for this which you could
-invoke directly from your plugin. I'm not sure if bluetoothd actually
-advertises any of the UUIDs registered in profiles. There is
-definitely no D-Bus API for this but others might be able to answer
-the current state affairs regarding hosted GATT services and if the
-daemon can advertise them. So, using the mgmt API directly might be
-your best bet for now.
-
-> This is the last obstacle to a demo-ready prototype for my project. Thanks
-> for everything so far!
->
-> And as for future development and production use - any guesses when a BlueZ
-> version with a stable GATT service interface over D-Bus might be released?
+> Are you sure a (void *) case isn't enough for the last one too? After
+> all offsetof() should be returning 0 which in the end results in a void *
+> cast of the service pointer anyway.
 >
 
-I can't speak for certain regarding a specific BlueZ release. My hope
-is to have a D-Bus API for GATT client role in the upcoming month (at
-least as experimental) and one for GATT server role, along with
-potential D-Bus APIs to put the device into advertising mode with
-certain service UUIDs being advertised in the following months. At
-least by the end of the year, we should have clean and easy to use C
-APIs in src/shared for both client and server roles finished.
+Yeah, just a (void *) cast should be enough. I figured it's a bit more
+"correct" to do the pointer math in the code, but yeah that offset
+should be 0 (and afaik is guaranteed to be 0). I'll just remove the
+math I guess.
 
-So, keep following the mailing list for patches and discussions that
-fly by; there's certainly a lot of activity around completing GATT API
-support now that we have most of the shared code in place.
+> Btw, if we at any point find the need to really do this kind of pointer
+> math I'd suggest adding a container_of() helper macro like the kernel
+> uses.
 
-> Kind regards,
->  Edmund Urbani
+I actually thought of adding a container_of macro then I decided that
+would be a bit of an overkill for just this case.
+
 >
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth"
-> in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> Johan
 
 Cheers,
 Arman
