@@ -2,186 +2,171 @@ Return-Path: <cyrus@holtmann.org>
 From: Arman Uguray <armansito@chromium.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Arman Uguray <armansito@chromium.org>
-Subject: [PATCH BlueZ 06/11] shared/att: Handle incoming confirmation PDU.
-Date: Fri,  7 Nov 2014 00:09:46 -0800
-Message-Id: <1415347791-11716-7-git-send-email-armansito@chromium.org>
+Subject: [PATCH BlueZ 09/11] shared/gatt-server: Implement "Execute Write" request.
+Date: Fri,  7 Nov 2014 00:09:49 -0800
+Message-Id: <1415347791-11716-10-git-send-email-armansito@chromium.org>
 In-Reply-To: <1415347791-11716-1-git-send-email-armansito@chromium.org>
 References: <1415347791-11716-1-git-send-email-armansito@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch adds handling of incoming confirmation PDUs to shared/att.
-The code makes sure that there is a pending indication and notifies
-the associated callback.
-
-Also included is a fix that automatically disconnects the io if a
-response is received while no request is pending.
+This patch adds support for handling ATT "Execute Write" requests for
+the server role.
 ---
- src/shared/att.c | 119 +++++++++++++++++++++++++++++++++++--------------------
- 1 file changed, 75 insertions(+), 44 deletions(-)
+ src/shared/gatt-server.c | 119 +++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 119 insertions(+)
 
-diff --git a/src/shared/att.c b/src/shared/att.c
-index aa80cef..f043523 100644
---- a/src/shared/att.c
-+++ b/src/shared/att.c
-@@ -514,6 +514,46 @@ static void wakeup_writer(struct bt_att *att)
- 	att->writer_active = true;
+diff --git a/src/shared/gatt-server.c b/src/shared/gatt-server.c
+index 48a55e7..3a247d9 100644
+--- a/src/shared/gatt-server.c
++++ b/src/shared/gatt-server.c
+@@ -88,6 +88,7 @@ struct bt_gatt_server {
+ 	unsigned int read_id;
+ 	unsigned int read_blob_id;
+ 	unsigned int prep_write_id;
++	unsigned int exec_write_id;
+ 
+ 	struct queue *prep_queue;
+ 	unsigned int max_prep_queue_len;
+@@ -114,6 +115,7 @@ static void bt_gatt_server_free(struct bt_gatt_server *server)
+ 	bt_att_unregister(server->att, server->read_id);
+ 	bt_att_unregister(server->att, server->read_blob_id);
+ 	bt_att_unregister(server->att, server->prep_write_id);
++	bt_att_unregister(server->att, server->exec_write_id);
+ 
+ 	if (server->pending_read_op)
+ 		server->pending_read_op->server = NULL;
+@@ -1039,6 +1041,116 @@ done:
+ 									NULL);
  }
  
-+static void disconn_handler(void *data, void *user_data)
++static void exec_next_prep_write(struct bt_gatt_server *server,
++					uint16_t ehandle, uint8_t att_ecode);
++
++static void exec_write_complete_cb(struct gatt_db_attribute *attr, int err,
++								void *user_data)
 +{
-+	struct att_disconn *disconn = data;
++	struct bt_gatt_server *server = user_data;
++	uint16_t handle = gatt_db_attribute_get_handle(attr);
++	uint16_t att_ecode = att_ecode_from_error(err);
 +
-+	if (disconn->removed)
-+		return;
-+
-+	if (disconn->callback)
-+		disconn->callback(disconn->user_data);
++	exec_next_prep_write(server, handle, att_ecode);
 +}
 +
-+static bool disconnect_cb(struct io *io, void *user_data)
++static void exec_next_prep_write(struct bt_gatt_server *server,
++					uint16_t ehandle, uint8_t att_ecode)
 +{
-+	struct bt_att *att = user_data;
++	struct prep_write_data *next = NULL;
++	uint8_t rsp_opcode = BT_ATT_OP_EXEC_WRITE_RSP;
++	uint8_t error_pdu[4];
++	uint8_t *rsp_pdu = NULL;
++	uint16_t rsp_len = 0;
++	struct gatt_db_attribute *attr;
++	bool status;
 +
-+	io_destroy(att->io);
-+	att->io = NULL;
++	if (att_ecode)
++		goto error;
 +
-+	util_debug(att->debug_callback, att->debug_data,
-+						"Physical link disconnected");
++	next = queue_pop_head(server->prep_queue);
++	if (!next)
++		goto done;
 +
-+	bt_att_ref(att);
-+	att->in_disconn = true;
-+	queue_foreach(att->disconn_list, disconn_handler, NULL);
-+	att->in_disconn = false;
-+
-+	if (att->need_disconn_cleanup) {
-+		queue_remove_all(att->disconn_list, match_disconn_removed, NULL,
-+							destroy_att_disconn);
-+		att->need_disconn_cleanup = false;
++	attr = gatt_db_get_attribute(server->db, next->handle);
++	if (!attr) {
++		att_ecode = BT_ATT_ERROR_UNLIKELY;
++		goto error;
 +	}
 +
-+	bt_att_cancel_all(att);
-+	bt_att_unregister_all(att);
++	status = gatt_db_attribute_write(attr, next->offset,
++						next->value, next->length,
++						BT_ATT_OP_EXEC_WRITE_REQ, NULL,
++						exec_write_complete_cb, server);
 +
-+	bt_att_unref(att);
++	prep_write_data_destroy(next);
 +
-+	return false;
++	if (status)
++		return;
++
++	att_ecode = BT_ATT_ERROR_UNLIKELY;
++
++error:
++	rsp_opcode = BT_ATT_OP_ERROR_RSP;
++	rsp_len = 4;
++	rsp_pdu = error_pdu;
++	encode_error_rsp(BT_ATT_OP_EXEC_WRITE_REQ, ehandle, att_ecode, rsp_pdu);
++
++done:
++	bt_att_send(server->att, rsp_opcode, rsp_pdu, rsp_len, NULL, NULL,
++									NULL);
 +}
 +
- static void handle_rsp(struct bt_att *att, uint8_t opcode, uint8_t *pdu,
- 								ssize_t pdu_len)
- {
-@@ -523,13 +563,19 @@ static void handle_rsp(struct bt_att *att, uint8_t opcode, uint8_t *pdu,
- 	uint8_t *rsp_pdu = NULL;
- 	uint16_t rsp_pdu_len = 0;
- 
--	/* If no request is pending, then the response is unexpected. */
-+	/*
-+	 * If no request is pending, then the response is unexpected. Disconnect
-+	 * the bearer.
-+	 */
- 	if (!op) {
--		wakeup_writer(att);
-+		util_debug(att->debug_callback, att->debug_data,
-+					"Received unexpected ATT response");
-+		disconnect_cb(att->io, att);
- 		return;
- 	}
- 
--	/* If the received response doesn't match the pending request, or if
-+	/*
-+	 * If the received response doesn't match the pending request, or if
- 	 * the request is malformed, end the current request with failure.
- 	 */
- 	if (opcode == BT_ATT_OP_ERROR_RSP) {
-@@ -568,6 +614,30 @@ done:
- 	wakeup_writer(att);
- }
- 
-+static void handle_conf(struct bt_att *att, uint8_t *pdu, ssize_t pdu_len)
++static void exec_write_cb(uint8_t opcode, const void *pdu,
++					uint16_t length, void *user_data)
 +{
-+	struct att_send_op *op = att->pending_ind;
++	struct bt_gatt_server *server = user_data;
++	uint8_t flags;
++	uint8_t ecode;
++	uint8_t rsp_opcode;
++	uint8_t error_pdu[4];
++	uint8_t *rsp_pdu = NULL;
++	uint16_t rsp_len = 0;
++	bool write;
 +
-+	/*
-+	 * Disconnect the bearer if the confirmation is unexpected or the PDU is
-+	 * invalid.
-+	 */
-+	if (!op || pdu_len) {
-+		util_debug(att->debug_callback, att->debug_data,
-+				"Received unexpected/invalid ATT confirmation");
-+		disconnect_cb(att->io, att);
-+		return;
++	if (length != 1) {
++		ecode = BT_ATT_ERROR_INVALID_PDU;
++		goto error;
 +	}
 +
-+	if (op->callback)
-+		op->callback(BT_ATT_OP_HANDLE_VAL_CONF, NULL, 0, op->user_data);
++	flags = ((uint8_t *) pdu)[0];
 +
-+	destroy_att_send_op(op);
-+	att->pending_ind = NULL;
++	if (flags == 0x00)
++		write = false;
++	else if (flags == 0x01)
++		write = true;
++	else {
++		ecode = BT_ATT_ERROR_INVALID_PDU;
++		goto error;
++	}
 +
-+	wakeup_writer(att);
++	if (!write) {
++		queue_remove_all(server->prep_queue, NULL, NULL,
++						prep_write_data_destroy);
++		rsp_opcode = BT_ATT_OP_EXEC_WRITE_RSP;
++		goto done;
++	}
++
++	exec_next_prep_write(server, 0, 0);
++
++	return;
++
++error:
++	rsp_opcode = BT_ATT_OP_ERROR_RSP;
++	rsp_len = 4;
++	rsp_pdu = error_pdu;
++	encode_error_rsp(opcode, 0, ecode, rsp_pdu);
++
++done:
++	bt_att_send(server->att, rsp_opcode, rsp_pdu, rsp_len, NULL, NULL,
++									NULL);
 +}
 +
- struct notify_data {
- 	uint8_t opcode;
- 	uint8_t *pdu;
-@@ -651,46 +721,6 @@ static void handle_notify(struct bt_att *att, uint8_t opcode, uint8_t *pdu,
- 		respond_not_supported(att, opcode);
+ static void exchange_mtu_cb(uint8_t opcode, const void *pdu,
+ 					uint16_t length, void *user_data)
+ {
+@@ -1139,6 +1251,13 @@ static bool gatt_server_register_att_handlers(struct bt_gatt_server *server)
+ 	if (!server->prep_write_id)
+ 		return false;
+ 
++	/* Execute Write Request */
++	server->exec_write_id = bt_att_register(server->att,
++						BT_ATT_OP_EXEC_WRITE_REQ,
++						exec_write_cb, server, NULL);
++	if (!server->exec_write_id)
++		return NULL;
++
+ 	return true;
  }
  
--static void disconn_handler(void *data, void *user_data)
--{
--	struct att_disconn *disconn = data;
--
--	if (disconn->removed)
--		return;
--
--	if (disconn->callback)
--		disconn->callback(disconn->user_data);
--}
--
--static bool disconnect_cb(struct io *io, void *user_data)
--{
--	struct bt_att *att = user_data;
--
--	io_destroy(att->io);
--	att->io = NULL;
--
--	util_debug(att->debug_callback, att->debug_data,
--						"Physical link disconnected");
--
--	bt_att_ref(att);
--	att->in_disconn = true;
--	queue_foreach(att->disconn_list, disconn_handler, NULL);
--	att->in_disconn = false;
--
--	if (att->need_disconn_cleanup) {
--		queue_remove_all(att->disconn_list, match_disconn_removed, NULL,
--							destroy_att_disconn);
--		att->need_disconn_cleanup = false;
--	}
--
--	bt_att_cancel_all(att);
--	bt_att_unregister_all(att);
--
--	bt_att_unref(att);
--
--	return false;
--}
--
- static bool can_read_data(struct io *io, void *user_data)
- {
- 	struct bt_att *att = user_data;
-@@ -720,7 +750,8 @@ static bool can_read_data(struct io *io, void *user_data)
- 		break;
- 	case ATT_OP_TYPE_CONF:
- 		util_debug(att->debug_callback, att->debug_data,
--				"ATT opcode cannot be handled: 0x%02x", opcode);
-+				"ATT confirmation received: 0x%02x", opcode);
-+		handle_conf(att, pdu + 1, bytes_read - 1);
- 		break;
- 	case ATT_OP_TYPE_REQ:
- 		/*
 -- 
 2.1.0.rc2.206.gedb03e5
 
