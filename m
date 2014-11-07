@@ -1,67 +1,73 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] android/hal-pan: Update control_state callback to Android 5 API
-Date: Fri, 07 Nov 2014 13:28:17 +0100
-Message-ID: <13744770.NciSKC3nLc@uw000953>
-In-Reply-To: <1415346380-23275-1-git-send-email-szymon.janc@tieto.com>
-References: <1415346380-23275-1-git-send-email-szymon.janc@tieto.com>
+Date: Fri, 7 Nov 2014 14:20:43 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Arman Uguray <armansito@chromium.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH BlueZ 10/11] shared/gatt-client: Fix alignment warnings.
+Message-ID: <20141107122043.GA14496@t440s.lan>
+References: <1415347791-11716-1-git-send-email-armansito@chromium.org>
+ <1415347791-11716-11-git-send-email-armansito@chromium.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1415347791-11716-11-git-send-email-armansito@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Friday 07 of November 2014 08:46:20 Szymon Janc wrote:
-> Callback declaration was changed in Android 5 so parameters order must
-> be updated. Android Framework was also updated so we don't need
-> workaround for it in Android 5.
+Hi Arman,
+
+On Fri, Nov 07, 2014, Arman Uguray wrote:
+> This patch addresses warnings that arise when compiled with
+> -W=cast-align.
 > ---
->  android/hal-pan.c | 11 +++++++++--
->  1 file changed, 9 insertions(+), 2 deletions(-)
+>  src/shared/gatt-client.c | 9 +++++----
+>  1 file changed, 5 insertions(+), 4 deletions(-)
 > 
-> diff --git a/android/hal-pan.c b/android/hal-pan.c
-> index d9e042a..56fd340 100644
-> --- a/android/hal-pan.c
-> +++ b/android/hal-pan.c
-> @@ -19,6 +19,7 @@
->  #include <stddef.h>
->  #include <string.h>
+> diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
+> index b4f28b2..2e321b2 100644
+> --- a/src/shared/gatt-client.c
+> +++ b/src/shared/gatt-client.c
+> @@ -1647,7 +1647,7 @@ bool bt_gatt_characteristic_iter_init(struct bt_gatt_characteristic_iter *iter,
+>  		return false;
 >  
-> +#include "hal-utils.h"
->  #include "hal-log.h"
->  #include "hal.h"
->  #include "hal-msg.h"
-> @@ -45,19 +46,25 @@ static void handle_ctrl_state(void *buf, uint16_t len, int fd)
->  {
->  	struct hal_ev_pan_ctrl_state *ev = buf;
+>  	memset(iter, 0, sizeof(*iter));
+> -	iter->service = (struct service_list *) service;
+> +	iter->service = (void *) service;
 >  
-> +#if ANDROID_VERSION >= PLATFORM_VER(5, 0, 0)
-> +	if (cbs->control_state_cb)
-> +		cbs->control_state_cb(ev->state, ev->local_role, ev->status,
-> +							(char *)ev->name);
-> +#else
->  	/*
-> -	 * FIXME: Callback declared in bt_pan.h is 'typedef void
-> +	 * Callback declared in bt_pan.h is 'typedef void
->  	 * (*btpan_control_state_callback)(btpan_control_state_t state,
->  	 * bt_status_t error, int local_role, const char* ifname);
->  	 * But PanService.Java defined it wrong way.
->  	 * private void onControlStateChanged(int local_role, int state,
->  	 * int error, String ifname).
->  	 * First and third parameters are misplaced, so sending data according
-> -	 * to PanService.Java, fix this if issue fixed in PanService.Java.
-> +	 * to PanService.Java.
->  	 */
->  	if (cbs->control_state_cb)
->  		cbs->control_state_cb(ev->local_role, ev->state, ev->status,
->  							(char *)ev->name);
-> +#endif
+>  	return true;
 >  }
+> @@ -1677,7 +1677,7 @@ bool bt_gatt_include_service_iter_init(struct bt_gatt_incl_service_iter *iter,
+>  		return false;
 >  
->  /*
+>  	memset(iter, 0, sizeof(*iter));
+> -	iter->service = (struct service_list *) service;
+> +	iter->service = (void *) service;
+>  
+>  	return true;
+>  }
+> @@ -2387,7 +2387,7 @@ bool bt_gatt_client_register_notify(struct bt_gatt_client *client,
+>  	struct chrc_data *chrc = NULL;
+>  	struct bt_gatt_service_iter iter;
+>  	const bt_gatt_service_t *service;
+> -	size_t i;
+> +	size_t i, offset;
+>  
+>  	if (!client || !chrc_value_handle || !callback)
+>  		return false;
+> @@ -2402,7 +2402,8 @@ bool bt_gatt_client_register_notify(struct bt_gatt_client *client,
+>  	while (bt_gatt_service_iter_next(&iter, &service)) {
+>  		if (chrc_value_handle >= service->start_handle &&
+>  				chrc_value_handle <= service->end_handle) {
+> -			svc_data = (struct service_list *) service;
+> +			offset = offsetof(struct service_list, service);
+> +			svc_data = (void *) (service - offset);
+>  			break;
 
-Pushed.
+Are you sure a (void *) case isn't enough for the last one too? After
+all offsetof() should be returning 0 which in the end results in a void *
+cast of the service pointer anyway.
 
--- 
-Best regards, 
-Szymon Janc
+Btw, if we at any point find the need to really do this kind of pointer
+math I'd suggest adding a container_of() helper macro like the kernel
+uses.
+
+Johan
