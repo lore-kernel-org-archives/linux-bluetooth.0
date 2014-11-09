@@ -1,81 +1,161 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCH 4/4] android/gatt: Use proper identity address for auto connect
-Date: Sun, 09 Nov 2014 20:47:37 +0100
-Message-ID: <2956983.gPnelmntDU@localhost.localdomain>
-In-Reply-To: <CABBYNZ+dZTiaMqw6F256zRzXP-0Z4oq8puGOegu_wXiMT6muBQ@mail.gmail.com>
-References: <1415266238-12423-1-git-send-email-jakub.tyszkowski@tieto.com> <1415266238-12423-4-git-send-email-jakub.tyszkowski@tieto.com> <CABBYNZ+dZTiaMqw6F256zRzXP-0Z4oq8puGOegu_wXiMT6muBQ@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+Subject: [PATCH v2 7/7] android/handsfree-client: Handle disconnect command
+Date: Sun,  9 Nov 2014 01:24:19 +0100
+Message-Id: <1415492659-3296-8-git-send-email-lukasz.rymanowski@tieto.com>
+In-Reply-To: <1415492659-3296-1-git-send-email-lukasz.rymanowski@tieto.com>
+References: <1415492659-3296-1-git-send-email-lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jakub, Luiz,
+This function adds handling of handsfree client disconnect.
+This patch also moves device_set_state and device_destroy funtion in the
+file as this is needed by the handle_disconnect
+---
+ android/handsfree-client.c | 118 ++++++++++++++++++++++++++++++---------------
+ 1 file changed, 80 insertions(+), 38 deletions(-)
 
-On Thursday 06 of November 2014 15:43:14 Luiz Augusto von Dentz wrote:
-> Hi Jakub,
-> 
-> On Thu, Nov 6, 2014 at 11:30 AM, Jakub Tyszkowski
-> 
-> <jakub.tyszkowski@tieto.com> wrote:
-> > We should behave the same as whe nwe connect using active scan.
-> > ---
-> > 
-> >  android/gatt.c | 20 ++++++++++++++++++--
-> >  1 file changed, 18 insertions(+), 2 deletions(-)
-> > 
-> > diff --git a/android/gatt.c b/android/gatt.c
-> > index 47dadc2..8cc7536 100644
-> > --- a/android/gatt.c
-> > +++ b/android/gatt.c
-> > @@ -583,8 +583,24 @@ static void device_set_state(struct gatt_device *dev,
-> > uint32_t state)> 
-> >  static bool auto_connect_le(struct gatt_device *dev)
-> >  {
-> >  
-> >         /*  For LE devices use auto connect feature if possible */
-> > 
-> > -       if (bt_kernel_conn_control())
-> > -               return  bt_auto_connect_add(&dev->bdaddr);
-> > +       if (bt_kernel_conn_control()) {
-> > +               const bdaddr_t *bdaddr;
-> > +
-> > +               /*
-> > +                * If address type is random it might be that IRK was
-> > received +                * and random is just for faking Android
-> > Framework. ID address +                * should be used for connection if
-> > present.
-> > +                */
-> > +               if (dev->bdaddr_type == BDADDR_LE_RANDOM) {
-> > +                       bdaddr = bt_get_id_addr(&dev->bdaddr, NULL);
-> > +                       if (!bdaddr)
-> > +                               return -EINVAL;
-> > +               } else {
-> > +                       bdaddr = &dev->bdaddr;
-> > +               }
-> > +
-> > +               return bt_auto_connect_add(bdaddr);
-> > +       }
-> > 
-> >         /* Trigger discovery if not already started */
-> >         if (!scanning) {
-> > 
-> > --
-> > 1.9.1
-> 
-> Perhaps this would be better done inside bt_auto_connect_add since
-> anyway bt_get_id_addr is in bluetooth.c, actually perhaps
-> auto_connect_le is not really necessary since bt_auto_connect_add
-> should be able to do the checks done here.
-
-I've applied this patch so we use proper address when connecting.
-Nevertheless, Jakub please send follow up patch that address Luiz comment.
-
-Thanks.
-
+diff --git a/android/handsfree-client.c b/android/handsfree-client.c
+index 698d3e8..a149781 100644
+--- a/android/handsfree-client.c
++++ b/android/handsfree-client.c
+@@ -193,11 +193,89 @@ static struct device *get_device(const bdaddr_t *addr)
+ 	return NULL;
+ }
+ 
++static void device_set_state(struct device *dev, uint8_t state)
++{
++	struct hal_ev_hf_client_conn_state ev;
++	char address[18];
++
++	if (dev->state == state)
++		return;
++
++	memset(&ev, 0, sizeof(ev));
++
++	dev->state = state;
++
++	ba2str(&dev->bdaddr, address);
++	DBG("device %s state %u", address, state);
++
++	bdaddr2android(&dev->bdaddr, ev.bdaddr);
++	ev.state = state;
++
++	ev.chld_feat = dev->chld_features;
++	ev.peer_feat = dev->features;
++
++	ipc_send_notif(hal_ipc, HAL_SERVICE_ID_HANDSFREE_CLIENT,
++				HAL_EV_HF_CLIENT_CONN_STATE, sizeof(ev), &ev);
++}
++
++static void device_destroy(struct device *dev)
++{
++	device_set_state(dev, HAL_HF_CLIENT_CONN_STATE_DISCONNECTED);
++	queue_remove(devices, dev);
++
++	if (dev->hf)
++		hfp_hf_unref(dev->hf);
++
++	free(dev);
++}
++
+ static void handle_disconnect(const void *buf, uint16_t len)
+ {
+-	DBG("Not Implemented");
++	const struct hal_cmd_hf_client_disconnect *cmd = buf;
++	struct device *dev;
++	uint32_t status;
++	bdaddr_t bdaddr;
++	char addr[18];
++
++	DBG("");
++
++	android2bdaddr(&cmd->bdaddr, &bdaddr);
++
++	ba2str(&bdaddr, addr);
++	DBG("Disconnect %s", addr);
++
++	dev = get_device(&bdaddr);
++	if (!dev) {
++		status = HAL_STATUS_FAILED;
++		goto done;
++	}
++
++	if (dev->state == HAL_HF_CLIENT_CONN_STATE_DISCONNECTED) {
++		status = HAL_STATUS_FAILED;
++		goto done;
++	}
++
++	if (dev->state == HAL_HF_CLIENT_CONN_STATE_DISCONNECTING) {
++		status = HAL_STATUS_SUCCESS;
++		goto done;
++	}
++
++	if (dev->state == HAL_HF_CLIENT_CONN_STATE_CONNECTING) {
++		device_destroy(dev);
++		status = HAL_STATUS_SUCCESS;
++		goto done;
++	}
++
++	status = hfp_hf_disconnect(dev->hf) ? HAL_STATUS_SUCCESS :
++							HAL_STATUS_FAILED;
++
++	if (status)
++		device_set_state(dev, HAL_HF_CLIENT_CONN_STATE_DISCONNECTING);
++
++done:
++
+ 	ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_HANDSFREE_CLIENT,
+-			HAL_OP_HF_CLIENT_DISCONNECT, HAL_STATUS_UNSUPPORTED);
++			HAL_OP_HF_CLIENT_DISCONNECT, status);
+ }
+ 
+ static void handle_connect_audio(const void *buf, uint16_t len)
+@@ -306,42 +384,6 @@ static void handle_get_last_vc_tag_num(const void *buf, uint16_t len)
+ 					HAL_STATUS_UNSUPPORTED);
+ }
+ 
+-static void device_set_state(struct device *dev, uint8_t state)
+-{
+-	struct hal_ev_hf_client_conn_state ev;
+-	char address[18];
+-
+-	if (dev->state == state)
+-		return;
+-
+-	memset(&ev, 0, sizeof(ev));
+-
+-	dev->state = state;
+-
+-	ba2str(&dev->bdaddr, address);
+-	DBG("device %s state %u", address, state);
+-
+-	bdaddr2android(&dev->bdaddr, ev.bdaddr);
+-	ev.state = state;
+-
+-	ev.chld_feat = dev->chld_features;
+-	ev.peer_feat = dev->features;
+-
+-	ipc_send_notif(hal_ipc, HAL_SERVICE_ID_HANDSFREE_CLIENT,
+-				HAL_EV_HF_CLIENT_CONN_STATE, sizeof(ev), &ev);
+-}
+-
+-static void device_destroy(struct device *dev)
+-{
+-	device_set_state(dev, HAL_HF_CLIENT_CONN_STATE_DISCONNECTED);
+-	queue_remove(devices, dev);
+-
+-	if (dev->hf)
+-		hfp_hf_unref(dev->hf);
+-
+-	free(dev);
+-}
+-
+ static void disconnect_watch(void *user_data)
+ {
+ 	DBG("");
 -- 
-BR
-Szymon Janc
+1.8.4
+
