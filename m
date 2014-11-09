@@ -2,244 +2,195 @@ Return-Path: <cyrus@holtmann.org>
 From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH v2 4/7] android/handsfree-client: Add incoming connection handling
-Date: Sun,  9 Nov 2014 01:24:16 +0100
-Message-Id: <1415492659-3296-5-git-send-email-lukasz.rymanowski@tieto.com>
+Subject: [PATCH v2 2/7] android/handsfree-client: Add service record
+Date: Sun,  9 Nov 2014 01:24:14 +0100
+Message-Id: <1415492659-3296-3-git-send-email-lukasz.rymanowski@tieto.com>
 In-Reply-To: <1415492659-3296-1-git-send-email-lukasz.rymanowski@tieto.com>
 References: <1415492659-3296-1-git-send-email-lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+This patch adds service record for HFP 1.6 HF role
+
+Note that we do not fix codec negotiation feature as this will be later
+controled by android property
 ---
- android/handsfree-client.c | 173 ++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 172 insertions(+), 1 deletion(-)
+ android/handsfree-client.c | 130 +++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 130 insertions(+)
 
 diff --git a/android/handsfree-client.c b/android/handsfree-client.c
-index aa3912b..4914baf 100644
+index 773ef76..b63aa13 100644
 --- a/android/handsfree-client.c
 +++ b/android/handsfree-client.c
-@@ -36,6 +36,8 @@
- #include "lib/sdp_lib.h"
- #include "src/sdp-client.h"
- #include "src/shared/queue.h"
-+#include "src/shared/util.h"
-+#include "btio/btio.h"
+@@ -32,18 +32,44 @@
+ #include <glib.h>
+ 
+ #include "lib/bluetooth.h"
++#include "lib/sdp.h"
++#include "lib/sdp_lib.h"
++#include "src/sdp-client.h"
  #include "ipc.h"
  #include "ipc-common.h"
  #include "src/log.h"
-@@ -64,6 +66,11 @@
- 				HFP_HF_FEAT_RVC | HFP_HF_FEAT_ECS |\
- 				HFP_HF_FEAT_ECC)
+ #include "utils.h"
  
-+struct device {
-+	bdaddr_t bdaddr;
-+	uint8_t state;
-+};
++#include "bluetooth.h"
+ #include "hal-msg.h"
+ #include "handsfree-client.h"
+ 
++#define HFP_HF_CHANNEL 7
++
++#define HFP_HF_FEAT_ECNR	0x00000001
++#define HFP_HF_FEAT_3WAY	0x00000002
++#define HFP_HF_FEAT_CLI		0x00000004
++#define HFP_HF_FEAT_VR		0x00000008
++#define HFP_HF_FEAT_RVC		0x00000010
++#define HFP_HF_FEAT_ECS		0x00000020
++#define HFP_HF_FEAT_ECC		0x00000040
++#define HFP_HF_FEAT_CODEC	0x00000080
++#define HFP_HF_FEAT_HF_IND	0x00000100
++#define HFP_HF_FEAT_ESCO_S4_T2	0x00000200
++
++
++#define HFP_HF_FEATURES (HFP_HF_FEAT_ECNR | HFP_HF_FEAT_3WAY |\
++				HFP_HF_FEAT_CLI | HFP_HF_FEAT_VR |\
++				HFP_HF_FEAT_RVC | HFP_HF_FEAT_ECS |\
++				HFP_HF_FEAT_ECC)
 +
  static bdaddr_t adapter_addr;
  
  static struct ipc *hal_ipc = NULL;
-@@ -71,6 +78,55 @@ static struct ipc *hal_ipc = NULL;
- static uint32_t hfp_hf_features = 0;
- static uint32_t hfp_hf_record_id = 0;
- static struct queue *devices = NULL;
-+static GIOChannel *hfp_hf_server = NULL;
-+
-+static bool match_by_bdaddr(const void *data, const void *user_data)
-+{
-+	const bdaddr_t *addr1 = data;
-+	const bdaddr_t *addr2 = user_data;
-+
-+	return !bacmp(addr1, addr2);
-+}
-+
-+static struct device *find_device(const bdaddr_t *addr)
-+{
-+	return queue_find(devices, match_by_bdaddr, addr);
-+}
-+
-+static struct device *device_create(const bdaddr_t *bdaddr)
-+{
-+	struct device *dev;
-+
-+	dev = new0(struct device, 1);
-+	if (!dev)
-+		return NULL;
-+
-+	if (!queue_push_tail(devices, dev)) {
-+		error("hf-client: Could not push dev on the list");
-+		free(dev);
-+		return NULL;
-+	}
-+
-+	bacpy(&dev->bdaddr, bdaddr);
-+	dev->state = HAL_HF_CLIENT_CONN_STATE_DISCONNECTED;
-+
-+	return dev;
-+}
-+
-+static struct device *get_device(const bdaddr_t *addr)
-+{
-+	struct device *dev;
-+
-+	dev = find_device(addr);
-+	if (dev)
-+		return dev;
-+
-+	/* We do support only one device as for now */
-+	if (queue_isempty(devices))
-+		return device_create(addr);
-+
-+	return NULL;
-+}
  
++static uint32_t hfp_hf_features = 0;
++static uint32_t hfp_hf_record_id = 0;
++
  static void handle_connect(const void *buf, uint16_t len)
  {
-@@ -192,6 +248,102 @@ static void handle_get_last_vc_tag_num(const void *buf, uint16_t len)
- 					HAL_STATUS_UNSUPPORTED);
- }
+ 	DBG("Not Implemented");
+@@ -205,12 +231,114 @@ static const struct ipc_handler cmd_handlers[] = {
+ 	{ handle_get_last_vc_tag_num, false, 0 },
+ };
  
-+static void device_set_state(struct device *dev, uint8_t state)
++static sdp_record_t *hfp_hf_record(void)
 +{
-+	struct hal_ev_hf_client_conn_state ev;
-+	char address[18];
++	sdp_list_t *svclass_id, *pfseq, *apseq, *root;
++	uuid_t root_uuid, svclass_uuid, ga_svclass_uuid;
++	uuid_t l2cap_uuid, rfcomm_uuid;
++	sdp_profile_desc_t profile;
++	sdp_list_t *aproto, *proto[2];
++	sdp_record_t *record;
++	sdp_data_t *channel, *features;
++	uint16_t sdpfeat;
++	uint8_t ch = HFP_HF_CHANNEL;
 +
-+	if (dev->state == state)
-+		return;
++	record = sdp_record_alloc();
++	if (!record)
++		return NULL;
 +
-+	memset(&ev, 0, sizeof(ev));
++	sdp_uuid16_create(&root_uuid, PUBLIC_BROWSE_GROUP);
++	root = sdp_list_append(NULL, &root_uuid);
++	sdp_set_browse_groups(record, root);
 +
-+	dev->state = state;
++	sdp_uuid16_create(&svclass_uuid, HANDSFREE_SVCLASS_ID);
++	svclass_id = sdp_list_append(NULL, &svclass_uuid);
++	sdp_uuid16_create(&ga_svclass_uuid, GENERIC_AUDIO_SVCLASS_ID);
++	svclass_id = sdp_list_append(svclass_id, &ga_svclass_uuid);
++	sdp_set_service_classes(record, svclass_id);
 +
-+	ba2str(&dev->bdaddr, address);
-+	DBG("device %s state %u", address, state);
++	sdp_uuid16_create(&profile.uuid, HANDSFREE_PROFILE_ID);
++	profile.version = 0x0106;
++	pfseq = sdp_list_append(NULL, &profile);
++	sdp_set_profile_descs(record, pfseq);
 +
-+	bdaddr2android(&dev->bdaddr, ev.bdaddr);
-+	ev.state = state;
++	sdp_uuid16_create(&l2cap_uuid, L2CAP_UUID);
++	proto[0] = sdp_list_append(NULL, &l2cap_uuid);
++	apseq = sdp_list_append(NULL, proto[0]);
 +
-+	ipc_send_notif(hal_ipc, HAL_SERVICE_ID_HANDSFREE_CLIENT,
-+				HAL_EV_HF_CLIENT_CONN_STATE, sizeof(ev), &ev);
++	sdp_uuid16_create(&rfcomm_uuid, RFCOMM_UUID);
++	proto[1] = sdp_list_append(NULL, &rfcomm_uuid);
++	channel = sdp_data_alloc(SDP_UINT8, &ch);
++	proto[1] = sdp_list_append(proto[1], channel);
++	apseq = sdp_list_append(apseq, proto[1]);
++
++	/* Codec Negotiation bit in SDP feature is different then in BRSF */
++	sdpfeat = hfp_hf_features & 0x0000003F;
++	if (hfp_hf_features & HFP_HF_FEAT_CODEC)
++		sdpfeat |= 0x00000020;
++	else
++		sdpfeat &= ~0x00000020;
++
++	features = sdp_data_alloc(SDP_UINT16, &sdpfeat);
++	sdp_attr_add(record, SDP_ATTR_SUPPORTED_FEATURES, features);
++
++	aproto = sdp_list_append(NULL, apseq);
++	sdp_set_access_protos(record, aproto);
++
++	sdp_set_info_attr(record, "Hands-Free unit", NULL, NULL);
++
++	sdp_data_free(channel);
++	sdp_list_free(proto[0], NULL);
++	sdp_list_free(proto[1], NULL);
++	sdp_list_free(apseq, NULL);
++	sdp_list_free(pfseq, NULL);
++	sdp_list_free(aproto, NULL);
++	sdp_list_free(root, NULL);
++	sdp_list_free(svclass_id, NULL);
++
++	return record;
 +}
 +
-+static void device_destroy(struct device *dev)
++static bool enable_hf_client(void)
 +{
-+	device_set_state(dev, HAL_HF_CLIENT_CONN_STATE_DISCONNECTED);
-+	queue_remove(devices, dev);
-+	free(dev);
-+}
++	sdp_record_t *rec;
 +
-+static void connect_cb(GIOChannel *chan, GError *err, gpointer user_data)
-+{
-+	struct device *dev = user_data;
++	hfp_hf_features = HFP_HF_FEATURES;
 +
-+	DBG("");
-+
-+	if (err) {
-+		error("hf-client: connect failed (%s)", err->message);
-+		goto failed;
-+	}
-+
-+	g_io_channel_set_close_on_unref(chan, FALSE);
-+
-+	/* TODO Create SLC here. For now do nothing, link will be dropped */
-+
-+	return;
-+
-+failed:
-+	g_io_channel_shutdown(chan, TRUE, NULL);
-+	device_destroy(dev);
-+}
-+
-+static void confirm_cb(GIOChannel *chan, gpointer data)
-+{
-+	struct device *dev;
-+	char address[18];
-+	bdaddr_t bdaddr;
-+	GError *err = NULL;
-+
-+	bt_io_get(chan, &err,
-+			BT_IO_OPT_DEST, address,
-+			BT_IO_OPT_DEST_BDADDR, &bdaddr,
-+			BT_IO_OPT_INVALID);
-+	if (err) {
-+		error("hf-client: confirm failed (%s)", err->message);
-+		g_error_free(err);
-+		goto drop;
-+	}
-+
-+	DBG("Incoming connection from %s", address);
-+
-+	dev = get_device(&bdaddr);
-+	if (!dev) {
-+		error("hf-client: There is other AG connected");
-+		goto drop;
-+	}
-+
-+	if (dev->state != HAL_HF_CLIENT_CONN_STATE_DISCONNECTED) {
-+		/* TODO: Handle colision */
-+		error("hf-client: Connections is up or ongoing ?");
-+		goto drop;
-+	}
-+
-+	device_set_state(dev, HAL_HF_CLIENT_CONN_STATE_CONNECTING);
-+
-+	if (!bt_io_accept(chan, connect_cb, dev, NULL, NULL)) {
-+		error("hf-client: failed to accept connection");
-+		device_destroy(dev);
-+		goto drop;
-+	}
-+
-+	return;
-+
-+drop:
-+	g_io_channel_shutdown(chan, TRUE, NULL);
-+}
-+
- static const struct ipc_handler cmd_handlers[] = {
- 	/* HAL_OP_HF_CLIENT_CONNECT */
- 	{ handle_connect, false,
-@@ -304,6 +456,19 @@ static sdp_record_t *hfp_hf_record(void)
- static bool enable_hf_client(void)
- {
- 	sdp_record_t *rec;
-+	GError *err = NULL;
-+
-+	hfp_hf_server =  bt_io_listen(NULL, confirm_cb, NULL, NULL, &err,
-+					BT_IO_OPT_SOURCE_BDADDR, &adapter_addr,
-+					BT_IO_OPT_CHANNEL, HFP_HF_CHANNEL,
-+					BT_IO_OPT_SEC_LEVEL, BT_IO_SEC_MEDIUM,
-+					BT_IO_OPT_INVALID);
-+	if (!hfp_hf_server) {
-+		error("hf-client: Failed to listen on Handsfree rfcomm: %s",
-+								err->message);
-+		g_error_free(err);
++	rec = hfp_hf_record();
++	if (!rec) {
++		error("hf-client: Could not create service record");
 +		return false;
 +	}
- 
- 	hfp_hf_features = HFP_HF_FEATURES;
- 
-@@ -326,6 +491,12 @@ static bool enable_hf_client(void)
- 
- static void cleanup_hfp_hf(void)
- {
-+	if (hfp_hf_server) {
-+		g_io_channel_shutdown(hfp_hf_server, TRUE, NULL);
-+		g_io_channel_unref(hfp_hf_server);
-+		hfp_hf_server = NULL;
++
++	if (bt_adapter_add_record(rec, 0) < 0) {
++		error("hf-client: Failed to register service record");
++		sdp_record_free(rec);
++		return false;
 +	}
 +
- 	if (hfp_hf_record_id > 0) {
- 		bt_adapter_remove_record(hfp_hf_record_id);
- 		hfp_hf_record_id = 0;
-@@ -366,7 +537,7 @@ void bt_hf_client_unregister(void)
++	hfp_hf_record_id = rec->handle;
++
++	return true;
++}
++
++static void cleanup_hfp_hf(void)
++{
++	if (hfp_hf_record_id > 0) {
++		bt_adapter_remove_record(hfp_hf_record_id);
++		hfp_hf_record_id = 0;
++	}
++}
++
+ bool bt_hf_client_register(struct ipc *ipc, const bdaddr_t *addr)
+ {
+ 	DBG("");
  
- 	cleanup_hfp_hf();
+ 	bacpy(&adapter_addr, addr);
  
--	queue_destroy(devices, free);
-+	queue_destroy(devices, (void *) device_destroy);
- 	devices = NULL;
++	if (!enable_hf_client())
++		return false;
++
+ 	hal_ipc = ipc;
+ 	ipc_register(hal_ipc, HAL_SERVICE_ID_HANDSFREE_CLIENT, cmd_handlers,
+ 						G_N_ELEMENTS(cmd_handlers));
+@@ -222,6 +350,8 @@ void bt_hf_client_unregister(void)
+ {
+ 	DBG("");
  
++	cleanup_hfp_hf();
++
  	ipc_unregister(hal_ipc, HAL_SERVICE_ID_HANDSFREE);
+ 	hal_ipc = NULL;
+ }
 -- 
 1.8.4
 
