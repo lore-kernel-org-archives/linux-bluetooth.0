@@ -2,150 +2,74 @@ Return-Path: <cyrus@holtmann.org>
 From: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
-Subject: [PATCH_v2 5/5] android/avrcp: Add initial support for new AVRCP CTRL interface
-Date: Mon, 10 Nov 2014 16:05:09 +0200
-Message-Id: <1415628309-7384-6-git-send-email-ravikumar.veeramally@linux.intel.com>
+Subject: [PATCH_v2 2/5] android/hal-msg: Add support for new AVRCP CTRL interface
+Date: Mon, 10 Nov 2014 16:05:06 +0200
+Message-Id: <1415628309-7384-3-git-send-email-ravikumar.veeramally@linux.intel.com>
 In-Reply-To: <1415628309-7384-1-git-send-email-ravikumar.veeramally@linux.intel.com>
 References: <1415628309-7384-1-git-send-email-ravikumar.veeramally@linux.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- android/avrcp.c | 72 +++++++++++++++++++++++++++++++++++++++++++++------------
- android/avrcp.h |  4 ++++
- android/main.c  | 11 +++++++++
- 3 files changed, 72 insertions(+), 15 deletions(-)
+ android/hal-msg.h | 24 +++++++++++++++++++++++-
+ 1 file changed, 23 insertions(+), 1 deletion(-)
 
-diff --git a/android/avrcp.c b/android/avrcp.c
-index a0d412d..f372128 100644
---- a/android/avrcp.c
-+++ b/android/avrcp.c
-@@ -1082,21 +1082,6 @@ bool bt_avrcp_register(struct ipc *ipc, const bdaddr_t *addr, uint8_t mode)
- 	}
- 	record_tg_id = rec->handle;
+diff --git a/android/hal-msg.h b/android/hal-msg.h
+index eef226e..ac691d8 100644
+--- a/android/hal-msg.h
++++ b/android/hal-msg.h
+@@ -37,6 +37,7 @@ static const char BLUEZ_HAL_SK_PATH[] = "\0bluez_hal_socket";
+ #define HAL_SERVICE_ID_GATT		9
+ #define HAL_SERVICE_ID_HANDSFREE_CLIENT	10
+ #define HAL_SERVICE_ID_MAP_CLIENT	11
++#define HAL_SERVICE_ID_AVRCP_CTRL	12
  
--	rec = avrcp_ct_record();
--	if (!rec) {
--		error("Failed to allocate AVRCP CT record");
--		bt_adapter_remove_record(record_tg_id);
--		goto fail;
--	}
--
--	if (bt_adapter_add_record(rec, 0) < 0) {
--		error("Failed to register AVRCP CT record");
--		bt_adapter_remove_record(record_tg_id);
--		sdp_record_free(rec);
--		goto fail;
--	}
--	record_ct_id = rec->handle;
--
- 	hal_ipc = ipc;
+ #define HAL_SERVICE_ID_MAX HAL_SERVICE_ID_MAP_CLIENT
  
- 	ipc_register(hal_ipc, HAL_SERVICE_ID_AVRCP, cmd_handlers,
-@@ -1171,3 +1156,60 @@ void bt_avrcp_disconnect(const bdaddr_t *dst)
+@@ -607,7 +608,7 @@ struct hal_cmd_handsfree_phone_state_change {
+ 	uint8_t number[0];
+ } __attribute__((packed));
  
- 	avrcp_device_remove(dev);
- }
-+
-+static void handle_send_passthrough(const void *buf, uint16_t len)
-+{
-+	DBG("Not Implemented");
-+
-+	ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_AVRCP_CTRL,
-+					HAL_OP_AVRCP_CTRL_SEND_PASSTHROUGH,
-+							HAL_STATUS_UNSUPPORTED);
-+}
-+
-+static const struct ipc_handler ctrl_cmd_handlers[] = {
-+	/* HAL_OP_AVRCP_CTRL_SEND_PASSTHROUGH */
-+	{ handle_send_passthrough, false,
-+			sizeof(struct hal_cmd_avrcp_ctrl_send_passthrough) },
-+};
-+
-+bool bt_avrcp_ctrl_register(struct ipc *ipc, const bdaddr_t *addr, uint8_t mode)
-+{
-+	sdp_record_t *rec;
-+
-+	DBG("");
-+
-+	rec = avrcp_ct_record();
-+	if (!rec) {
-+		error("Failed to allocate AVRCP CT record");
-+		goto fail;
-+	}
-+
-+	if (bt_adapter_add_record(rec, 0) < 0) {
-+		error("Failed to register AVRCP CT record");
-+		sdp_record_free(rec);
-+		goto fail;
-+	}
-+
-+	record_ct_id = rec->handle;
-+
-+	if (!hal_ipc)
-+		hal_ipc = ipc;
-+
-+	ipc_register(hal_ipc, HAL_SERVICE_ID_AVRCP_CTRL, ctrl_cmd_handlers,
-+					G_N_ELEMENTS(ctrl_cmd_handlers));
-+
-+	return true;
-+
-+fail:
-+	return false;
-+}
-+
-+void bt_avrcp_ctrl_unregister(void)
-+{
-+	DBG("");
-+
-+	ipc_unregister(hal_ipc, HAL_SERVICE_ID_AVRCP_CTRL);
-+
-+	bt_adapter_remove_record(record_ct_id);
-+	record_ct_id = 0;
-+}
-diff --git a/android/avrcp.h b/android/avrcp.h
-index 11e79b7..0af9f14 100644
---- a/android/avrcp.h
-+++ b/android/avrcp.h
-@@ -24,5 +24,9 @@
- bool bt_avrcp_register(struct ipc *ipc, const bdaddr_t *addr, uint8_t mode);
- void bt_avrcp_unregister(void);
+-/* AVRCP HAL API */
++/* AVRCP TARGET HAL API */
  
-+bool bt_avrcp_ctrl_register(struct ipc *ipc, const bdaddr_t *addr,
-+								uint8_t mode);
-+void bt_avrcp_ctrl_unregister(void);
-+
- void bt_avrcp_connect(const bdaddr_t *dst);
- void bt_avrcp_disconnect(const bdaddr_t *dst);
-diff --git a/android/main.c b/android/main.c
-index 58dd9ab..21becf6 100644
---- a/android/main.c
-+++ b/android/main.c
-@@ -208,6 +208,14 @@ static void service_register(const void *buf, uint16_t len)
- 		}
+ #define HAL_AVRCP_PLAY_STATUS_STOPPED	0x00
+ #define HAL_AVRCP_PLAY_STATUS_PLAYING	0x01
+@@ -711,6 +712,15 @@ struct hal_cmd_avrcp_set_volume {
+ 	uint8_t value;
+ } __attribute__((packed));
  
- 		break;
-+	case HAL_SERVICE_ID_AVRCP_CTRL:
-+		if (!bt_avrcp_ctrl_register(hal_ipc, &adapter_bdaddr,
-+								m->mode)) {
-+			status = HAL_STATUS_FAILED;
-+			goto failed;
-+		}
++/* AVRCP CTRL HAL API */
 +
-+		break;
- 	case HAL_SERVICE_ID_HANDSFREE:
- 		if (!bt_handsfree_register(hal_ipc, &adapter_bdaddr, m->mode,
- 							m->max_clients)) {
-@@ -286,6 +294,9 @@ static bool unregister_service(uint8_t id)
- 	case HAL_SERVICE_ID_AVRCP:
- 		bt_avrcp_unregister();
- 		break;
-+	case HAL_SERVICE_ID_AVRCP_CTRL:
-+		bt_avrcp_ctrl_unregister();
-+		break;
- 	case HAL_SERVICE_ID_HANDSFREE:
- 		bt_handsfree_unregister();
- 		break;
++#define HAL_OP_AVRCP_CTRL_SEND_PASSTHROUGH	0x01
++struct hal_cmd_avrcp_ctrl_send_passthrough {
++	uint8_t bdaddr[6];
++	uint8_t key_code;
++	uint8_t key_state;
++} __attribute__((packed));
++
+ /* GATT HAL API */
+ 
+ #define HAL_OP_GATT_CLIENT_REGISTER		0x01
+@@ -1499,6 +1509,18 @@ struct hal_ev_avrcp_passthrough_cmd {
+ 	uint8_t state;
+ } __attribute__((packed));
+ 
++#define HAL_EV_AVRCP_CTRL_CONN_STATE		0x80
++struct hal_ev_avrcp_ctrl_conn_state {
++	uint8_t state;
++	uint8_t bdaddr[6];
++} __attribute__((packed));
++
++#define HAL_EV_AVRCP_CTRL_PASSTHROUGH_RSP	0x81
++struct hal_ev_avrcp_ctrl_passthrough_rsp {
++	uint8_t id;
++	uint8_t key_state;
++} __attribute__((packed));
++
+ #define HAL_EV_GATT_CLIENT_REGISTER_CLIENT	0x81
+ struct hal_ev_gatt_client_register_client {
+ 	int32_t status;
 -- 
 2.1.0
 
