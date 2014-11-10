@@ -1,265 +1,157 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1415392919-17572-9-git-send-email-armansito@chromium.org>
-References: <1415392919-17572-1-git-send-email-armansito@chromium.org>
-	<1415392919-17572-9-git-send-email-armansito@chromium.org>
-Date: Mon, 10 Nov 2014 16:02:36 +0200
-Message-ID: <CABBYNZJL5mHR8OGK5sLi81aeDHBs-UxZj5oJ6b3VKG-C_mD4GA@mail.gmail.com>
-Subject: Re: [PATCH BlueZ v1 08/11] shared/gatt-server: Implement "Prepare
- Write" request.
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Arman Uguray <armansito@chromium.org>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+From: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
+Subject: [PATCH_v2 4/5] android/client: Add support for new AVRCP CTRL interface
+Date: Mon, 10 Nov 2014 16:05:08 +0200
+Message-Id: <1415628309-7384-5-git-send-email-ravikumar.veeramally@linux.intel.com>
+In-Reply-To: <1415628309-7384-1-git-send-email-ravikumar.veeramally@linux.intel.com>
+References: <1415628309-7384-1-git-send-email-ravikumar.veeramally@linux.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Arman,
+---
+ android/client/if-bt.c   |  2 ++
+ android/client/if-main.h |  2 ++
+ android/client/if-rc.c   | 88 ++++++++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 92 insertions(+)
 
-On Fri, Nov 7, 2014 at 10:41 PM, Arman Uguray <armansito@chromium.org> wrote:
-> This patch add support for handling ATT "Prepare Write" requests for the
-> server role.
-> ---
->  src/shared/gatt-server.c | 142 +++++++++++++++++++++++++++++++++++++++++++++++
->  src/shared/gatt-server.h |   3 +
->  2 files changed, 145 insertions(+)
->
-> diff --git a/src/shared/gatt-server.c b/src/shared/gatt-server.c
-> index e77acce..48a55e7 100644
-> --- a/src/shared/gatt-server.c
-> +++ b/src/shared/gatt-server.c
-> @@ -40,6 +40,8 @@
->  #define MIN(a, b) ((a) < (b) ? (a) : (b))
->  #endif
->
-> +#define DEFAULT_MAX_PREP_QUEUE_LEN 5
-> +
->  struct async_read_op {
->         struct bt_gatt_server *server;
->         uint8_t opcode;
-> @@ -55,6 +57,22 @@ struct async_write_op {
->         uint8_t opcode;
->  };
->
-> +struct prep_write_data {
-> +       struct bt_gatt_server *server;
-> +       uint8_t *value;
-> +       uint16_t handle;
-> +       uint16_t offset;
-> +       uint16_t length;
-> +};
-> +
-> +static void prep_write_data_destroy(void *user_data)
-> +{
-> +       struct prep_write_data *data = user_data;
-> +
-> +       free(data->value);
-> +       free(data);
-> +}
-> +
->  struct bt_gatt_server {
->         struct gatt_db *db;
->         struct bt_att *att;
-> @@ -69,6 +87,10 @@ struct bt_gatt_server {
->         unsigned int write_cmd_id;
->         unsigned int read_id;
->         unsigned int read_blob_id;
-> +       unsigned int prep_write_id;
-> +
-> +       struct queue *prep_queue;
-> +       unsigned int max_prep_queue_len;
->
->         struct async_read_op *pending_read_op;
->         struct async_write_op *pending_write_op;
-> @@ -91,6 +113,7 @@ static void bt_gatt_server_free(struct bt_gatt_server *server)
->         bt_att_unregister(server->att, server->write_cmd_id);
->         bt_att_unregister(server->att, server->read_id);
->         bt_att_unregister(server->att, server->read_blob_id);
-> +       bt_att_unregister(server->att, server->prep_write_id);
->
->         if (server->pending_read_op)
->                 server->pending_read_op->server = NULL;
-> @@ -98,6 +121,8 @@ static void bt_gatt_server_free(struct bt_gatt_server *server)
->         if (server->pending_write_op)
->                 server->pending_write_op->server = NULL;
->
-> +       queue_destroy(server->prep_queue, prep_write_data_destroy);
-> +
->         bt_att_unref(server->att);
->         free(server);
->  }
-> @@ -922,6 +947,98 @@ static void read_blob_cb(uint8_t opcode, const void *pdu,
->         handle_read_req(server, opcode, handle, offset);
->  }
->
-> +static void prep_write_cb(uint8_t opcode, const void *pdu,
-> +                                       uint16_t length, void *user_data)
-> +{
-> +       struct bt_gatt_server *server = user_data;
-> +       struct prep_write_data *prep_data = NULL;
-> +       uint16_t handle = 0;
-> +       uint16_t offset;
-> +       struct gatt_db_attribute *attr;
-> +       uint8_t rsp_opcode;
-> +       uint8_t rsp_pdu[MAX(4, length)];
-> +       uint16_t rsp_len;
-> +       uint8_t ecode;
-> +       uint32_t perm;
-> +
-> +       if (length < 4) {
-> +               ecode = BT_ATT_ERROR_INVALID_PDU;
-> +               goto error;
-> +       }
-> +
-> +       if (queue_length(server->prep_queue) >= server->max_prep_queue_len) {
-> +               ecode = BT_ATT_ERROR_PREPARE_QUEUE_FULL;
-> +               goto error;
-> +       }
-> +
-> +       handle = get_le16(pdu);
-> +       offset = get_le16(pdu + 2);
-> +
-> +       attr = gatt_db_get_attribute(server->db, handle);
-> +       if (!attr) {
-> +               ecode = BT_ATT_ERROR_INVALID_HANDLE;
-> +               goto error;
-> +       }
-> +
-> +       if (!gatt_db_attribute_get_permissions(attr, &perm)) {
-> +               ecode = BT_ATT_ERROR_INVALID_HANDLE;
-> +               goto error;
-> +       }
-> +
-> +       /*
-> +        * TODO: The "Prepare Write" request requires security permission checks
-> +        * to be performed before the write is executed. I.e., we can't leave
-> +        * the permission check to the upper layer since we can't call
-> +        * gatt_db_write until the entire queue is atomically processed during
-> +        * an "Execute Write" request. Figure out how to make this check here.
-> +        */
-> +       if (!(perm & BT_ATT_PERM_WRITE)) {
-> +               ecode = BT_ATT_ERROR_WRITE_NOT_PERMITTED;
-> +               goto error;
-> +       }
-> +
-> +       prep_data = new0(struct prep_write_data, 1);
-> +       if (!prep_data) {
-> +               ecode = BT_ATT_ERROR_INSUFFICIENT_RESOURCES;
-> +               goto error;
-> +       }
-> +
-> +       prep_data->length = length - 4;
-> +       if (prep_data->length) {
-> +               prep_data->value = malloc(prep_data->length);
-> +               if (!prep_data->value) {
-> +                       ecode = BT_ATT_ERROR_INSUFFICIENT_RESOURCES;
-> +                       goto error;
-> +               }
-> +       }
-> +
-> +       prep_data->server = server;
-> +       prep_data->handle = handle;
-> +       prep_data->offset = offset;
-> +       memcpy(prep_data->value, pdu + 4, prep_data->length);
-> +
-> +       queue_push_tail(server->prep_queue, prep_data);
-> +
-> +       /* Create the response */
-> +       rsp_len = length;
-> +       rsp_opcode = BT_ATT_OP_PREP_WRITE_RSP;
-> +       memcpy(rsp_pdu, pdu, rsp_len);
-> +
-> +       goto done;
-> +
-> +error:
-> +       if (prep_data)
-> +               prep_write_data_destroy(prep_data);
-> +
-> +       rsp_opcode = BT_ATT_OP_ERROR_RSP;
-> +       rsp_len = 4;
-> +       encode_error_rsp(opcode, handle, ecode, rsp_pdu);
-> +
-> +done:
-> +       bt_att_send(server->att, rsp_opcode, rsp_pdu, rsp_len, NULL, NULL,
-> +                                                                       NULL);
-> +}
-> +
->  static void exchange_mtu_cb(uint8_t opcode, const void *pdu,
->                                         uint16_t length, void *user_data)
->  {
-> @@ -1015,6 +1132,13 @@ static bool gatt_server_register_att_handlers(struct bt_gatt_server *server)
->         if (!server->read_blob_id)
->                 return false;
->
-> +       /* Prepare Write Request */
-> +       server->prep_write_id = bt_att_register(server->att,
-> +                                               BT_ATT_OP_PREP_WRITE_REQ,
-> +                                               prep_write_cb, server, NULL);
-> +       if (!server->prep_write_id)
-> +               return false;
-> +
->         return true;
->  }
->
-> @@ -1033,6 +1157,13 @@ struct bt_gatt_server *bt_gatt_server_new(struct gatt_db *db,
->         server->db = db;
->         server->att = bt_att_ref(att);
->         server->mtu = MAX(mtu, BT_ATT_DEFAULT_LE_MTU);
-> +       server->max_prep_queue_len = DEFAULT_MAX_PREP_QUEUE_LEN;
-> +
-> +       server->prep_queue = queue_new();
-> +       if (!server->prep_queue) {
-> +               bt_gatt_server_free(server);
-> +               return NULL;
-> +       }
->
->         if (!gatt_server_register_att_handlers(server)) {
->                 bt_gatt_server_free(server);
-> @@ -1078,6 +1209,17 @@ bool bt_gatt_server_set_debug(struct bt_gatt_server *server,
->         return true;
->  }
->
-> +bool bt_gatt_server_set_max_prep_queue_length(struct bt_gatt_server *server,
-> +                                                       unsigned int length)
-> +{
-> +       if (!server || !length)
-> +               return false;
-> +
-> +       server->max_prep_queue_len = length;
-> +
-> +       return true;
-> +}
-> +
->  bool bt_gatt_server_send_notification(struct bt_gatt_server *server,
->                                         uint16_t handle, const uint8_t *value,
->                                         uint16_t length)
-> diff --git a/src/shared/gatt-server.h b/src/shared/gatt-server.h
-> index 0e480e1..a95613c 100644
-> --- a/src/shared/gatt-server.h
-> +++ b/src/shared/gatt-server.h
-> @@ -40,6 +40,9 @@ bool bt_gatt_server_set_debug(struct bt_gatt_server *server,
->                                         void *user_data,
->                                         bt_gatt_server_destroy_func_t destroy);
->
-> +bool bt_gatt_server_set_max_prep_queue_length(struct bt_gatt_server *server,
-> +                                                       unsigned int length);
-
-Perhaps we should leave this API for later, Im not really sure if this
-will be ever used except perhaps for the TS in that case perhaps we
-should find a shorter name.
-
->  bool bt_gatt_server_send_notification(struct bt_gatt_server *server,
->                                         uint16_t handle, const uint8_t *value,
->                                         uint16_t length);
-> --
-> 2.1.0.rc2.206.gedb03e5
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-
-
-
+diff --git a/android/client/if-bt.c b/android/client/if-bt.c
+index 48aff1b..50212fc 100644
+--- a/android/client/if-bt.c
++++ b/android/client/if-bt.c
+@@ -800,6 +800,8 @@ static void get_profile_interface_p(int argc, const char **argv)
+ 	else if (strcmp(BT_PROFILE_GATT_ID, id) == 0)
+ 		pif = (const void **) &if_gatt;
+ #if ANDROID_VERSION >= PLATFORM_VER(5, 0, 0)
++	else if (strcmp(BT_PROFILE_AV_RC_CTRL_ID, id) == 0)
++		pif = (const void **) &if_rc_ctrl;
+ 	else if (strcmp(BT_PROFILE_HANDSFREE_CLIENT_ID, id) == 0)
+ 		pif = (const void **) &if_hf_client;
+ 	else if (strcmp(BT_PROFILE_MAP_CLIENT_ID, id) == 0)
+diff --git a/android/client/if-main.h b/android/client/if-main.h
+index 93cc98d..96409aa 100644
+--- a/android/client/if-main.h
++++ b/android/client/if-main.h
+@@ -65,6 +65,7 @@ extern const btgatt_interface_t *if_gatt;
+ extern const btgatt_server_interface_t *if_gatt_server;
+ extern const btgatt_client_interface_t *if_gatt_client;
+ #if ANDROID_VERSION >= PLATFORM_VER(5, 0, 0)
++extern const btrc_ctrl_interface_t *if_rc_ctrl;
+ extern const bthf_client_interface_t *if_hf_client;
+ extern const btmce_interface_t *if_mce;
+ #endif
+@@ -92,6 +93,7 @@ extern const struct interface hf_if;
+ extern const struct interface hh_if;
+ extern const struct interface hl_if;
+ #if ANDROID_VERSION >= PLATFORM_VER(5, 0, 0)
++extern const struct interface ctrl_rc_if;
+ extern const struct interface hf_client_if;
+ extern const struct interface mce_if;
+ #endif
+diff --git a/android/client/if-rc.c b/android/client/if-rc.c
+index ed65600..b42b8c6 100644
+--- a/android/client/if-rc.c
++++ b/android/client/if-rc.c
+@@ -28,6 +28,10 @@
+ 
+ const btrc_interface_t *if_rc = NULL;
+ 
++#if ANDROID_VERSION >= PLATFORM_VER(5, 0, 0)
++const btrc_ctrl_interface_t *if_rc_ctrl = NULL;
++#endif
++
+ SINTMAP(btrc_play_status_t, -1, "(unknown)")
+ 	DELEMENT(BTRC_PLAYSTATE_STOPPED),
+ 	DELEMENT(BTRC_PLAYSTATE_PLAYING),
+@@ -398,3 +402,87 @@ const struct interface rc_if = {
+ 	.name = "rc",
+ 	.methods = methods
+ };
++
++#if ANDROID_VERSION >= PLATFORM_VER(5, 0, 0)
++static void passthrough_rsp_cb(int id, int key_state)
++{
++	haltest_info("%s: id=%d key_state=%d\n", __func__, id, key_state);
++}
++
++static void connection_state_cb(bool state, bt_bdaddr_t *bd_addr)
++{
++	haltest_info("%s: state=%s bd_addr=%s\n", __func__,
++					state ? "true" : "false",
++					bt_bdaddr_t2str(bd_addr, last_addr));
++}
++
++static btrc_ctrl_callbacks_t rc_ctrl_cbacks = {
++	.size = sizeof(rc_ctrl_cbacks),
++	.passthrough_rsp_cb = passthrough_rsp_cb,
++	.connection_state_cb = connection_state_cb,
++};
++
++/* ctrl_init */
++
++static void ctrl_init_p(int argc, const char **argv)
++{
++	RETURN_IF_NULL(if_rc_ctrl);
++
++	EXEC(if_rc_ctrl->init, &rc_ctrl_cbacks);
++}
++
++/* ctrl_cleanup */
++
++static void ctrl_cleanup_p(int argc, const char **argv)
++{
++	RETURN_IF_NULL(if_rc_ctrl);
++
++	EXECV(if_rc_ctrl->cleanup);
++	if_rc_ctrl = NULL;
++}
++
++/* send_pass_through_cmd */
++
++static void send_pass_through_cmd_c(int argc, const char **argv,
++					enum_func *enum_func, void **user)
++{
++}
++
++static void send_pass_through_cmd_p(int argc, const char **argv)
++{
++	bt_bdaddr_t addr;
++	uint8_t key_code, key_state;
++
++	RETURN_IF_NULL(if_rc);
++	VERIFY_ADDR_ARG(2, &addr);
++
++	if (argc <= 4) {
++		haltest_error("No key code specified");
++		return;
++	}
++
++	key_code = (uint8_t) atoi(argv[3]);
++
++	if (argc <= 5) {
++		haltest_error("No key state specified");
++		return;
++	}
++
++	key_state = (uint8_t) atoi(argv[4]);
++
++	EXEC(if_rc_ctrl->send_pass_through_cmd, &addr, key_code, key_state);
++}
++
++static struct method ctrl_methods[] = {
++	STD_METHOD(ctrl_init),
++	STD_METHODCH(send_pass_through_cmd,
++					"<bd_addr> <key_code> <key_state>"),
++	STD_METHOD(ctrl_cleanup),
++	END_METHOD
++};
++
++const struct interface ctrl_rc_if = {
++	.name = "rc-ctrl",
++	.methods = ctrl_methods
++};
++#endif
 -- 
-Luiz Augusto von Dentz
+2.1.0
+
