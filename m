@@ -1,40 +1,85 @@
 Return-Path: <cyrus@holtmann.org>
-From: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
+From: johan.hedberg@gmail.com
 To: linux-bluetooth@vger.kernel.org
-Cc: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
-Subject: [PATCH_v2 0/5] Add support for new AVRCP ctrl interface
-Date: Mon, 10 Nov 2014 16:05:04 +0200
-Message-Id: <1415628309-7384-1-git-send-email-ravikumar.veeramally@linux.intel.com>
+Subject: [PATCH v3] Bluetooth: Fix sparse warning in amp.c
+Date: Mon, 10 Nov 2014 15:53:45 +0200
+Message-Id: <1415627625-15191-1-git-send-email-johan.hedberg@gmail.com>
+In-Reply-To: <1415626989-14499-1-git-send-email-johan.hedberg@gmail.com>
+References: <1415626989-14499-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-v2: Fixed Luiz's comments (added new interface at bottom in
-    hal-ipc-txt and ID in hal-msg.h).
+From: Johan Hedberg <johan.hedberg@intel.com>
 
-v1: Android Lollipop has new interface for AVRCP controller. It has
-    one command and two callbacks. Patchset updates support for IPC
-    doc, hal-msg, HAL part and client part. 
+This fixes the following sparse warning:
 
-Ravi kumar Veeramally (5):
-  android/hal-ipc-txt: Add support for new AVRCP CTRL interface
-  android/hal-msg: Add support for new AVRCP CTRL interface
-  android/hal-avrcp: Add suuport for new AVRCP ctrl interface
-  android/client: Add support for new AVRCP CTRL interface
-  android/avrcp: Add initial support for new AVRCP CTRL interface
+net/bluetooth/amp.c:152:53: warning: Variable length array is used.
 
- android/avrcp.c          |  72 ++++++++++++++++++++++------
- android/avrcp.h          |   4 ++
- android/client/if-bt.c   |   2 +
- android/client/if-main.h |   2 +
- android/client/if-rc.c   |  88 ++++++++++++++++++++++++++++++++++
- android/hal-avrcp.c      | 122 +++++++++++++++++++++++++++++++++++++++++++++++
- android/hal-bluetooth.c  |   3 ++
- android/hal-ipc-api.txt  |  45 ++++++++++++++++-
- android/hal-msg.h        |  24 +++++++++-
- android/hal.h            |   1 +
- android/main.c           |  11 +++++
- 11 files changed, 356 insertions(+), 18 deletions(-)
+The warning itself is probably harmless since this kind of usage of
+shash_desc is present also in other places in the kernel (there's even a
+convenience macro SHASH_DESC_ON_STACK available for defining such stack
+variables). However, dynamically allocated versions are also used in
+several places of the kernel (e.g. kernel/kexec.c and lib/digsig.c)
+which have the benefit of not exhibiting the sparse warning.
 
+Since there are no more sparse warnings in the Bluetooth subsystem after
+fixing this one it is now easier to spot whenever new ones might get
+introduced by future patches.
+
+Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+---
+v3: Use correct location of kernel/kexec.c in commit message
+v2: Fix missing signed-off-by line
+
+ net/bluetooth/amp.c | 25 ++++++++++++++++---------
+ 1 file changed, 16 insertions(+), 9 deletions(-)
+
+diff --git a/net/bluetooth/amp.c b/net/bluetooth/amp.c
+index 2640d78f30b8..ee016f039100 100644
+--- a/net/bluetooth/amp.c
++++ b/net/bluetooth/amp.c
+@@ -134,6 +134,7 @@ struct hci_conn *phylink_add(struct hci_dev *hdev, struct amp_mgr *mgr,
+ static int hmac_sha256(u8 *key, u8 ksize, char *plaintext, u8 psize, u8 *output)
+ {
+ 	struct crypto_shash *tfm;
++	struct shash_desc *shash;
+ 	int ret;
+ 
+ 	if (!ksize)
+@@ -148,18 +149,24 @@ static int hmac_sha256(u8 *key, u8 ksize, char *plaintext, u8 psize, u8 *output)
+ 	ret = crypto_shash_setkey(tfm, key, ksize);
+ 	if (ret) {
+ 		BT_DBG("crypto_ahash_setkey failed: err %d", ret);
+-	} else {
+-		char desc[sizeof(struct shash_desc) +
+-			crypto_shash_descsize(tfm)] CRYPTO_MINALIGN_ATTR;
+-		struct shash_desc *shash = (struct shash_desc *)desc;
+-
+-		shash->tfm = tfm;
+-		shash->flags = CRYPTO_TFM_REQ_MAY_SLEEP;
++		goto failed;
++	}
+ 
+-		ret = crypto_shash_digest(shash, plaintext, psize,
+-					  output);
++	shash = kzalloc(sizeof(*shash) + crypto_shash_descsize(tfm),
++			GFP_KERNEL);
++	if (!shash) {
++		ret = -ENOMEM;
++		goto failed;
+ 	}
+ 
++	shash->tfm = tfm;
++	shash->flags = CRYPTO_TFM_REQ_MAY_SLEEP;
++
++	ret = crypto_shash_digest(shash, plaintext, psize, output);
++
++	kfree(shash);
++
++failed:
+ 	crypto_free_shash(tfm);
+ 	return ret;
+ }
 -- 
 2.1.0
 
