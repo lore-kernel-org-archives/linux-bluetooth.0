@@ -1,123 +1,104 @@
 Return-Path: <cyrus@holtmann.org>
+Message-ID: <5460BE59.5010907@linux.intel.com>
+Date: Mon, 10 Nov 2014 15:32:09 +0200
+From: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
 MIME-Version: 1.0
-In-Reply-To: <1415619477-2358-2-git-send-email-ravikumar.veeramally@linux.intel.com>
-References: <1415619477-2358-1-git-send-email-ravikumar.veeramally@linux.intel.com>
-	<1415619477-2358-2-git-send-email-ravikumar.veeramally@linux.intel.com>
-Date: Mon, 10 Nov 2014 15:32:16 +0200
-Message-ID: <CABBYNZLArffoj1Ggf9O=yvd=UFnJGTQUK+UZV=VkMjTeaeg-_g@mail.gmail.com>
-Subject: Re: [PATCH 1/4] android/hal-ipc-txt: Add support for new AVRCP CTRL interface
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCH 2/4] android/hal-msg: Add support for new AVRCP CTRL interface
+References: <1415619477-2358-1-git-send-email-ravikumar.veeramally@linux.intel.com>	<1415619477-2358-3-git-send-email-ravikumar.veeramally@linux.intel.com> <CABBYNZK4rdKC9Q3hrr1mBNy=UcZ-UuicUSwGMW-SXpNYvYe04A@mail.gmail.com>
+In-Reply-To: <CABBYNZK4rdKC9Q3hrr1mBNy=UcZ-UuicUSwGMW-SXpNYvYe04A@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Ravi,
+Hi Luiz,
 
-On Mon, Nov 10, 2014 at 1:37 PM, Ravi kumar Veeramally
-<ravikumar.veeramally@linux.intel.com> wrote:
-> AVRCP controller interface added in Android Lollipop. Update it's
-> commands and notifications.
-> ---
->  android/hal-ipc-api.txt | 49 +++++++++++++++++++++++++++++++++++++++++++++----
->  1 file changed, 45 insertions(+), 4 deletions(-)
+On 11/10/2014 03:23 PM, Luiz Augusto von Dentz wrote:
+> Hi Ravi,
 >
-> diff --git a/android/hal-ipc-api.txt b/android/hal-ipc-api.txt
-> index 666e27f..fc78244 100644
-> --- a/android/hal-ipc-api.txt
-> +++ b/android/hal-ipc-api.txt
-> @@ -1241,7 +1241,7 @@ Notifications:
->                                       0x04 = Destroyed
->
->
-> -Bluetooth Remote Control HAL (ID 8)
-> +Bluetooth Remote Control Target HAL (ID 8)
->  ===================================
->
->  Android HAL name: "avrcp" (BT_PROFILE_AV_RC_ID)
-> @@ -1470,8 +1470,49 @@ Notifications:
->                 Notification parameters: ID (1 octet)
->                                          State (1 octet)
->
-> +Bluetooth Remote Control Controller HAL (ID 9)
-> +===================================
-> +
-> +Android HAL name: "avrcp-ctrl" (BT_PROFILE_AV_RC_CTRL_ID)
-> +
-> +Commands and responses:
-> +
-> +       Opcode 0x00 - Error response
-> +
-> +               Response parameters: Status (1 octet)
-> +
-> +               Valid status values: 0x01 = Fail
-> +                                    0x02 = Not ready
-> +                                    0x03 = No memory
-> +                                    0x04 = Busy
-> +                                    0x05 = Done (already completed)
-> +                                    0x06 = Unsupported
-> +                                    0x07 = Parameter invalid
-> +                                    0x08 = Unhandled
-> +                                    0x09 = Authentication failure
-> +                                    0x0a = Remote device down
-> +
-> +       Opcode 0x01 - Send Pass Through command/response
-> +
-> +               Command parameters: Remote Address (6 octets)
-> +                                   Key Code (1 octet)
-> +                                   Key State (1 octet)
-> +
-> +               In case of an error, the error response will be returned.
-> +
-> +Notifications:
-> +
-> +       Opcode 0x81 - Passthrough Response Notification
-> +
-> +               Notification parameters: ID (1 octet)
-> +                                        Key State (1 octet)
-> +
-> +       Opcode 0x82 - Connection State Notification
-> +
-> +               Notification parameters: State (1 octet)
-> +                                        Remote Address (6 octets)
+> On Mon, Nov 10, 2014 at 1:37 PM, Ravi kumar Veeramally
+> <ravikumar.veeramally@linux.intel.com> wrote:
+>> AVRCP controller interface added in Android Lollipop. Update it's
+>> commands and notifications. Update service ids also.
+>> ---
+>>   android/hal-msg.h | 30 ++++++++++++++++++++++++++----
+>>   1 file changed, 26 insertions(+), 4 deletions(-)
+>>
+>> diff --git a/android/hal-msg.h b/android/hal-msg.h
+>> index eef226e..cb6f23b 100644
+>> --- a/android/hal-msg.h
+>> +++ b/android/hal-msg.h
+>> @@ -34,9 +34,10 @@ static const char BLUEZ_HAL_SK_PATH[] = "\0bluez_hal_socket";
+>>   #define HAL_SERVICE_ID_A2DP            6
+>>   #define HAL_SERVICE_ID_HEALTH          7
+>>   #define HAL_SERVICE_ID_AVRCP           8
+>> -#define HAL_SERVICE_ID_GATT            9
+>> -#define HAL_SERVICE_ID_HANDSFREE_CLIENT        10
+>> -#define HAL_SERVICE_ID_MAP_CLIENT      11
+>> +#define HAL_SERVICE_ID_AVRCP_CTRL      9
+>> +#define HAL_SERVICE_ID_GATT            10
+>> +#define HAL_SERVICE_ID_HANDSFREE_CLIENT        11
+>> +#define HAL_SERVICE_ID_MAP_CLIENT      12
+> Since for the others interface added in 5.0 we did append to the end
+> this one should also go there, otherwise we will have to reorganize
+> all the ids.
+  Ok, I'll add it at the end.
 
-This should probably be added to the bottom as we did with other new
-HAL. Btw, perhaps we should keep a history of API changes e.g. since:
-5.0 per opcode so it become easier to identify changes in the future.
+Ravi.
+>>   #define HAL_SERVICE_ID_MAX HAL_SERVICE_ID_MAP_CLIENT
+>>
+>> @@ -607,7 +608,7 @@ struct hal_cmd_handsfree_phone_state_change {
+>>          uint8_t number[0];
+>>   } __attribute__((packed));
+>>
+>> -/* AVRCP HAL API */
+>> +/* AVRCP TARGET HAL API */
+>>
+>>   #define HAL_AVRCP_PLAY_STATUS_STOPPED  0x00
+>>   #define HAL_AVRCP_PLAY_STATUS_PLAYING  0x01
+>> @@ -711,6 +712,15 @@ struct hal_cmd_avrcp_set_volume {
+>>          uint8_t value;
+>>   } __attribute__((packed));
+>>
+>> +/* AVRCP CTRL HAL API */
+>> +
+>> +#define HAL_OP_AVRCP_CTRL_SEND_PASSTHROUGH     0x01
+>> +struct hal_cmd_avrcp_ctrl_send_passthrough {
+>> +       uint8_t bdaddr[6];
+>> +       uint8_t key_code;
+>> +       uint8_t key_state;
+>> +} __attribute__((packed));
+>> +
+>>   /* GATT HAL API */
+>>
+>>   #define HAL_OP_GATT_CLIENT_REGISTER            0x01
+>> @@ -1499,6 +1509,18 @@ struct hal_ev_avrcp_passthrough_cmd {
+>>          uint8_t state;
+>>   } __attribute__((packed));
+>>
+>> +#define HAL_EV_AVRCP_CTRL_CONN_STATE           0x80
+>> +struct hal_ev_avrcp_ctrl_conn_state {
+>> +       uint8_t state;
+>> +       uint8_t bdaddr[6];
+>> +} __attribute__((packed));
+>> +
+>> +#define HAL_EV_AVRCP_CTRL_PASSTHROUGH_RSP      0x81
+>> +struct hal_ev_avrcp_ctrl_passthrough_rsp {
+>> +       uint8_t id;
+>> +       uint8_t key_state;
+>> +} __attribute__((packed));
+>> +
+>>   #define HAL_EV_GATT_CLIENT_REGISTER_CLIENT     0x81
+>>   struct hal_ev_gatt_client_register_client {
+>>          int32_t status;
+>> --
+>> 2.1.0
+>>
+>> --
+>> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+>> the body of a message to majordomo@vger.kernel.org
+>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>
+>
 
-> -Bluetooth GATT HAL (ID 9)
-> +Bluetooth GATT HAL (ID 10)
->  =========================
->
->  Android HAL name: "gatt" (BT_PROFILE_GATT_ID)
-> @@ -2119,7 +2160,7 @@ Notifications:
->                                          Handle (4 octets)
->
->
-> -Bluetooth Handsfree Client HAL (ID 10)
-> +Bluetooth Handsfree Client HAL (ID 11)
->  ======================================
->
->  Android HAL name: "hf_client" (BT_PROFILE_HANDSFREE_CLIENT_ID)
-> @@ -2465,7 +2506,7 @@ Notifications:
->                 Notification parameters: <none>
->
->
-> -Bluetooth Map Client HAL (ID 11)
-> +Bluetooth Map Client HAL (ID 12)
->  =========================
->
->  Android HAL name: "map_client" (BT_PROFILE_MAP_CLIENT_ID)
-> --
-> 2.1.0
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-
-
-
--- 
-Luiz Augusto von Dentz
