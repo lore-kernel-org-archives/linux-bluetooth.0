@@ -1,13 +1,13 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <CABBYNZJL5mHR8OGK5sLi81aeDHBs-UxZj5oJ6b3VKG-C_mD4GA@mail.gmail.com>
+In-Reply-To: <CABBYNZLcVmOq5pxwWekpXDDFYmMc-dYp1wWQfCzXuJApXS8wRA@mail.gmail.com>
 References: <1415392919-17572-1-git-send-email-armansito@chromium.org>
-	<1415392919-17572-9-git-send-email-armansito@chromium.org>
-	<CABBYNZJL5mHR8OGK5sLi81aeDHBs-UxZj5oJ6b3VKG-C_mD4GA@mail.gmail.com>
-Date: Mon, 10 Nov 2014 08:26:25 -0800
-Message-ID: <CAHrH25T5FhZZ=rsMAYjZpX8RenKFCpxv=hdNmAfQuVg7e9exAw@mail.gmail.com>
-Subject: Re: [PATCH BlueZ v1 08/11] shared/gatt-server: Implement "Prepare
- Write" request.
+	<1415392919-17572-4-git-send-email-armansito@chromium.org>
+	<CABBYNZLcVmOq5pxwWekpXDDFYmMc-dYp1wWQfCzXuJApXS8wRA@mail.gmail.com>
+Date: Mon, 10 Nov 2014 08:18:12 -0800
+Message-ID: <CAHrH25T4ghCpXuo6XgX156W8gMtbZE7voptSQ6kX2L4taKkaTg@mail.gmail.com>
+Subject: Re: [PATCH BlueZ v1 03/11] shared/gatt-server: Implement "Write"
+ request and command.
 From: Arman Uguray <armansito@chromium.org>
 To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
@@ -17,250 +17,218 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Luiz,
 
-> On Mon, Nov 10, 2014 at 6:02 AM, Luiz Augusto von Dentz <luiz.dentz@gmail.com> wrote:
+> On Mon, Nov 10, 2014 at 3:57 AM, Luiz Augusto von Dentz <luiz.dentz@gmail.com> wrote:
 > Hi Arman,
 >
 > On Fri, Nov 7, 2014 at 10:41 PM, Arman Uguray <armansito@chromium.org> wrote:
->> This patch add support for handling ATT "Prepare Write" requests for the
->> server role.
+>> This patch implements the "Write" request and command for the GATT
+>> server role. Writes are delegated to the attribute's write handler,
+>> which is also responsible for performing certain permission checks.
 >> ---
->>  src/shared/gatt-server.c | 142 +++++++++++++++++++++++++++++++++++++++++++++++
->>  src/shared/gatt-server.h |   3 +
->>  2 files changed, 145 insertions(+)
+>>  src/shared/gatt-server.c | 146 +++++++++++++++++++++++++++++++++++++++++++++++
+>>  1 file changed, 146 insertions(+)
 >>
 >> diff --git a/src/shared/gatt-server.c b/src/shared/gatt-server.c
->> index e77acce..48a55e7 100644
+>> index ddb714d..db002db 100644
 >> --- a/src/shared/gatt-server.c
 >> +++ b/src/shared/gatt-server.c
->> @@ -40,6 +40,8 @@
->>  #define MIN(a, b) ((a) < (b) ? (a) : (b))
->>  #endif
->>
->> +#define DEFAULT_MAX_PREP_QUEUE_LEN 5
->> +
->>  struct async_read_op {
->>         struct bt_gatt_server *server;
->>         uint8_t opcode;
->> @@ -55,6 +57,22 @@ struct async_write_op {
->>         uint8_t opcode;
+>> @@ -50,6 +50,11 @@ struct async_read_op {
+>>         struct queue *db_data;
 >>  };
 >>
->> +struct prep_write_data {
+>> +struct async_write_op {
 >> +       struct bt_gatt_server *server;
->> +       uint8_t *value;
->> +       uint16_t handle;
->> +       uint16_t offset;
->> +       uint16_t length;
+>> +       uint8_t opcode;
 >> +};
->> +
->> +static void prep_write_data_destroy(void *user_data)
->> +{
->> +       struct prep_write_data *data = user_data;
->> +
->> +       free(data->value);
->> +       free(data);
->> +}
 >> +
 >>  struct bt_gatt_server {
 >>         struct gatt_db *db;
 >>         struct bt_att *att;
->> @@ -69,6 +87,10 @@ struct bt_gatt_server {
->>         unsigned int write_cmd_id;
->>         unsigned int read_id;
->>         unsigned int read_blob_id;
->> +       unsigned int prep_write_id;
->> +
->> +       struct queue *prep_queue;
->> +       unsigned int max_prep_queue_len;
+>> @@ -60,8 +65,11 @@ struct bt_gatt_server {
+>>         unsigned int read_by_grp_type_id;
+>>         unsigned int read_by_type_id;
+>>         unsigned int find_info_id;
+>> +       unsigned int write_id;
+>> +       unsigned int write_cmd_id;
 >>
 >>         struct async_read_op *pending_read_op;
->>         struct async_write_op *pending_write_op;
->> @@ -91,6 +113,7 @@ static void bt_gatt_server_free(struct bt_gatt_server *server)
->>         bt_att_unregister(server->att, server->write_cmd_id);
->>         bt_att_unregister(server->att, server->read_id);
->>         bt_att_unregister(server->att, server->read_blob_id);
->> +       bt_att_unregister(server->att, server->prep_write_id);
+>> +       struct async_write_op *pending_write_op;
+>>
+>>         bt_gatt_server_debug_func_t debug_callback;
+>>         bt_gatt_server_destroy_func_t debug_destroy;
+>> @@ -77,10 +85,15 @@ static void bt_gatt_server_free(struct bt_gatt_server *server)
+>>         bt_att_unregister(server->att, server->read_by_grp_type_id);
+>>         bt_att_unregister(server->att, server->read_by_type_id);
+>>         bt_att_unregister(server->att, server->find_info_id);
+>> +       bt_att_unregister(server->att, server->write_id);
+>> +       bt_att_unregister(server->att, server->write_cmd_id);
 >>
 >>         if (server->pending_read_op)
 >>                 server->pending_read_op->server = NULL;
->> @@ -98,6 +121,8 @@ static void bt_gatt_server_free(struct bt_gatt_server *server)
->>         if (server->pending_write_op)
->>                 server->pending_write_op->server = NULL;
 >>
->> +       queue_destroy(server->prep_queue, prep_write_data_destroy);
+>> +       if (server->pending_write_op)
+>> +               server->pending_write_op->server = NULL;
 >> +
 >>         bt_att_unref(server->att);
 >>         free(server);
 >>  }
->> @@ -922,6 +947,98 @@ static void read_blob_cb(uint8_t opcode, const void *pdu,
->>         handle_read_req(server, opcode, handle, offset);
+>> @@ -626,6 +639,125 @@ done:
+>>                                                         NULL, NULL, NULL);
 >>  }
 >>
->> +static void prep_write_cb(uint8_t opcode, const void *pdu,
+>> +static void async_write_op_destroy(struct async_write_op *op)
+>> +{
+>> +       if (op->server)
+>> +               op->server->pending_write_op = NULL;
+>> +
+>> +       free(op);
+>> +}
+>> +
+>> +static void write_complete_cb(struct gatt_db_attribute *attr, int err,
+>> +                                                               void *user_data)
+>> +{
+>> +       struct async_write_op *op = user_data;
+>> +       struct bt_gatt_server *server = op->server;
+>> +       uint16_t handle;
+>> +
+>> +       if (!server) {
+>> +               async_write_op_destroy(op);
+>> +               return;
+>> +       }
+>> +
+>> +       handle = gatt_db_attribute_get_handle(attr);
+>> +
+>> +       if (err) {
+>> +               uint8_t rsp_pdu[4];
+>> +               uint8_t att_ecode = att_ecode_from_error(err);
+>> +
+>> +               encode_error_rsp(op->opcode, handle, att_ecode, rsp_pdu);
+>> +               bt_att_send(server->att, BT_ATT_OP_ERROR_RSP, rsp_pdu, 4,
+>> +                                                       NULL, NULL, NULL);
+>> +       } else {
+>> +               /*
+>> +                * TODO: Make this function work with Prepare Write request once
+>> +                * it's supported.
+>> +                */
+>> +
+>> +               bt_att_send(server->att, BT_ATT_OP_WRITE_RSP, NULL, 0,
+>> +                                                       NULL, NULL, NULL);
+>> +       }
+>> +
+>> +       async_write_op_destroy(op);
+>> +}
+>> +
+>> +static void write_cb(uint8_t opcode, const void *pdu,
 >> +                                       uint16_t length, void *user_data)
 >> +{
 >> +       struct bt_gatt_server *server = user_data;
->> +       struct prep_write_data *prep_data = NULL;
->> +       uint16_t handle = 0;
->> +       uint16_t offset;
 >> +       struct gatt_db_attribute *attr;
->> +       uint8_t rsp_opcode;
->> +       uint8_t rsp_pdu[MAX(4, length)];
->> +       uint16_t rsp_len;
+>> +       uint16_t handle = 0;
+>> +       uint8_t rsp_pdu[4];
+>> +       gatt_db_attribute_write_t complete_func = NULL;
+>> +       struct async_write_op *op = NULL;
 >> +       uint8_t ecode;
 >> +       uint32_t perm;
 >> +
->> +       if (length < 4) {
+>> +       if (length < 2) {
 >> +               ecode = BT_ATT_ERROR_INVALID_PDU;
 >> +               goto error;
 >> +       }
 >> +
->> +       if (queue_length(server->prep_queue) >= server->max_prep_queue_len) {
->> +               ecode = BT_ATT_ERROR_PREPARE_QUEUE_FULL;
->> +               goto error;
->> +       }
->> +
 >> +       handle = get_le16(pdu);
->> +       offset = get_le16(pdu + 2);
->> +
 >> +       attr = gatt_db_get_attribute(server->db, handle);
 >> +       if (!attr) {
 >> +               ecode = BT_ATT_ERROR_INVALID_HANDLE;
 >> +               goto error;
 >> +       }
 >> +
+>> +       util_debug(server->debug_callback, server->debug_data,
+>> +                               "Write %s - handle: 0x%04x",
+>> +                               (opcode == BT_ATT_OP_WRITE_REQ) ? "Req" : "Cmd",
+>> +                               handle);
+>> +
 >> +       if (!gatt_db_attribute_get_permissions(attr, &perm)) {
 >> +               ecode = BT_ATT_ERROR_INVALID_HANDLE;
 >> +               goto error;
 >> +       }
 >> +
->> +       /*
->> +        * TODO: The "Prepare Write" request requires security permission checks
->> +        * to be performed before the write is executed. I.e., we can't leave
->> +        * the permission check to the upper layer since we can't call
->> +        * gatt_db_write until the entire queue is atomically processed during
->> +        * an "Execute Write" request. Figure out how to make this check here.
->> +        */
 >> +       if (!(perm & BT_ATT_PERM_WRITE)) {
 >> +               ecode = BT_ATT_ERROR_WRITE_NOT_PERMITTED;
 >> +               goto error;
 >> +       }
 >> +
->> +       prep_data = new0(struct prep_write_data, 1);
->> +       if (!prep_data) {
->> +               ecode = BT_ATT_ERROR_INSUFFICIENT_RESOURCES;
->> +               goto error;
->> +       }
+>> +       /* If this is not a command, set up the completion callback and data */
+>> +       if (opcode == BT_ATT_OP_WRITE_REQ) {
+>> +               if (server->pending_write_op) {
+>> +                       ecode = BT_ATT_ERROR_UNLIKELY;
+>> +                       goto error;
+>> +               }
 >> +
->> +       prep_data->length = length - 4;
->> +       if (prep_data->length) {
->> +               prep_data->value = malloc(prep_data->length);
->> +               if (!prep_data->value) {
+>> +               op = new0(struct async_write_op, 1);
+>> +               if (!op) {
 >> +                       ecode = BT_ATT_ERROR_INSUFFICIENT_RESOURCES;
 >> +                       goto error;
 >> +               }
+>> +
+>> +               op->server = server;
+>> +               op->opcode = opcode;
+>> +               server->pending_write_op = op;
+>> +
+>> +               complete_func = write_complete_cb;
 >> +       }
 >> +
->> +       prep_data->server = server;
->> +       prep_data->handle = handle;
->> +       prep_data->offset = offset;
->> +       memcpy(prep_data->value, pdu + 4, prep_data->length);
+>> +       if (gatt_db_attribute_write(attr, 0, pdu + 2, length - 2, opcode,
+>> +                                               NULL, complete_func, op))
+>> +               return;
+>
+> Currently gatt_db_attribute_write does not accept NULL callbacks so
+> this would probably fail for BT_ATT_OP_WRITE_CMD, so either we do
+> change it and allow unconfirmed writes or perhaps we can always set
+> write_complete_cb and server->pending_write_op so the server can tell
+> the write is still pending although for BT_ATT_OP_WRITE_CMD there is
+> no response.
+>
+
+You're right, fixed for v2.
+
+>> +       if (op)
+>> +               async_write_op_destroy(op);
 >> +
->> +       queue_push_tail(server->prep_queue, prep_data);
->> +
->> +       /* Create the response */
->> +       rsp_len = length;
->> +       rsp_opcode = BT_ATT_OP_PREP_WRITE_RSP;
->> +       memcpy(rsp_pdu, pdu, rsp_len);
->> +
->> +       goto done;
+>> +       ecode = BT_ATT_ERROR_UNLIKELY;
 >> +
 >> +error:
->> +       if (prep_data)
->> +               prep_write_data_destroy(prep_data);
+>> +       if (opcode == BT_ATT_OP_WRITE_CMD)
+>> +               return;
 >> +
->> +       rsp_opcode = BT_ATT_OP_ERROR_RSP;
->> +       rsp_len = 4;
 >> +       encode_error_rsp(opcode, handle, ecode, rsp_pdu);
->> +
->> +done:
->> +       bt_att_send(server->att, rsp_opcode, rsp_pdu, rsp_len, NULL, NULL,
->> +                                                                       NULL);
+>> +       bt_att_send(server->att, BT_ATT_OP_ERROR_RSP, rsp_pdu, 4,
+>> +                                                       NULL, NULL, NULL);
 >> +}
 >> +
 >>  static void exchange_mtu_cb(uint8_t opcode, const void *pdu,
 >>                                         uint16_t length, void *user_data)
 >>  {
->> @@ -1015,6 +1132,13 @@ static bool gatt_server_register_att_handlers(struct bt_gatt_server *server)
->>         if (!server->read_blob_id)
+>> @@ -690,6 +822,20 @@ static bool gatt_server_register_att_handlers(struct bt_gatt_server *server)
+>>         if (!server->find_info_id)
 >>                 return false;
 >>
->> +       /* Prepare Write Request */
->> +       server->prep_write_id = bt_att_register(server->att,
->> +                                               BT_ATT_OP_PREP_WRITE_REQ,
->> +                                               prep_write_cb, server, NULL);
->> +       if (!server->prep_write_id)
+>> +       /* Write Request */
+>> +       server->write_id = bt_att_register(server->att, BT_ATT_OP_WRITE_REQ,
+>> +                                                               write_cb,
+>> +                                                               server, NULL);
+>> +       if (!server->write_id)
+>> +               return false;
+>> +
+>> +       /* Write Command */
+>> +       server->write_cmd_id = bt_att_register(server->att, BT_ATT_OP_WRITE_CMD,
+>> +                                                               write_cb,
+>> +                                                               server, NULL);
+>> +       if (!server->write_cmd_id)
 >> +               return false;
 >> +
 >>         return true;
 >>  }
 >>
->> @@ -1033,6 +1157,13 @@ struct bt_gatt_server *bt_gatt_server_new(struct gatt_db *db,
->>         server->db = db;
->>         server->att = bt_att_ref(att);
->>         server->mtu = MAX(mtu, BT_ATT_DEFAULT_LE_MTU);
->> +       server->max_prep_queue_len = DEFAULT_MAX_PREP_QUEUE_LEN;
->> +
->> +       server->prep_queue = queue_new();
->> +       if (!server->prep_queue) {
->> +               bt_gatt_server_free(server);
->> +               return NULL;
->> +       }
->>
->>         if (!gatt_server_register_att_handlers(server)) {
->>                 bt_gatt_server_free(server);
->> @@ -1078,6 +1209,17 @@ bool bt_gatt_server_set_debug(struct bt_gatt_server *server,
->>         return true;
->>  }
->>
->> +bool bt_gatt_server_set_max_prep_queue_length(struct bt_gatt_server *server,
->> +                                                       unsigned int length)
->> +{
->> +       if (!server || !length)
->> +               return false;
->> +
->> +       server->max_prep_queue_len = length;
->> +
->> +       return true;
->> +}
->> +
->>  bool bt_gatt_server_send_notification(struct bt_gatt_server *server,
->>                                         uint16_t handle, const uint8_t *value,
->>                                         uint16_t length)
->> diff --git a/src/shared/gatt-server.h b/src/shared/gatt-server.h
->> index 0e480e1..a95613c 100644
->> --- a/src/shared/gatt-server.h
->> +++ b/src/shared/gatt-server.h
->> @@ -40,6 +40,9 @@ bool bt_gatt_server_set_debug(struct bt_gatt_server *server,
->>                                         void *user_data,
->>                                         bt_gatt_server_destroy_func_t destroy);
->>
->> +bool bt_gatt_server_set_max_prep_queue_length(struct bt_gatt_server *server,
->> +                                                       unsigned int length);
->
-> Perhaps we should leave this API for later, Im not really sure if this
-> will be ever used except perhaps for the TS in that case perhaps we
-> should find a shorter name.
->
-
-In our case would it even make sense to have a maximum queue length? I
-only added because there is an error for it and an application with
-memory constraints may want to limit the size perhaps? Anyway, for now
-I can set this to something arbitrary for v2.
-
->>  bool bt_gatt_server_send_notification(struct bt_gatt_server *server,
->>                                         uint16_t handle, const uint8_t *value,
->>                                         uint16_t length);
 >> --
 >> 2.1.0.rc2.206.gedb03e5
 >>
