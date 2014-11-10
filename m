@@ -1,11 +1,11 @@
 Return-Path: <cyrus@holtmann.org>
 From: johan.hedberg@gmail.com
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v3] Bluetooth: Fix sparse warning in amp.c
-Date: Mon, 10 Nov 2014 15:53:45 +0200
-Message-Id: <1415627625-15191-1-git-send-email-johan.hedberg@gmail.com>
-In-Reply-To: <1415626989-14499-1-git-send-email-johan.hedberg@gmail.com>
-References: <1415626989-14499-1-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH v2] Bluetooth: Fix sparse warning in amp.c
+Date: Mon, 10 Nov 2014 15:43:09 +0200
+Message-Id: <1415626989-14499-1-git-send-email-johan.hedberg@gmail.com>
+In-Reply-To: <1415607981-20337-1-git-send-email-johan.hedberg@gmail.com>
+References: <1415607981-20337-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
@@ -19,8 +19,8 @@ The warning itself is probably harmless since this kind of usage of
 shash_desc is present also in other places in the kernel (there's even a
 convenience macro SHASH_DESC_ON_STACK available for defining such stack
 variables). However, dynamically allocated versions are also used in
-several places of the kernel (e.g. kernel/kexec.c and lib/digsig.c)
-which have the benefit of not exhibiting the sparse warning.
+several places of the kernel (e.g. lib/kexec.c and lib/digsig.c) which
+have the benefit of not exhibiting the sparse warning.
 
 Since there are no more sparse warnings in the Bluetooth subsystem after
 fixing this one it is now easier to spot whenever new ones might get
@@ -28,7 +28,6 @@ introduced by future patches.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
-v3: Use correct location of kernel/kexec.c in commit message
 v2: Fix missing signed-off-by line
 
  net/bluetooth/amp.c | 25 ++++++++++++++++---------
