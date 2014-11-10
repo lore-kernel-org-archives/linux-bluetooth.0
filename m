@@ -1,44 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
-To: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v2 0/7] android/handsfree-client: First set of HFP HF
-Date: Mon, 10 Nov 2014 20:45:37 +0100
-Message-ID: <1816531.Kd67TxFnoA@leonov>
-In-Reply-To: <1415492659-3296-1-git-send-email-lukasz.rymanowski@tieto.com>
-References: <1415492659-3296-1-git-send-email-lukasz.rymanowski@tieto.com>
+Subject: Re: [PATCH 1/2] android/tester: initialize unused callback to NULL
+Date: Mon, 10 Nov 2014 20:49:52 +0100
+Message-ID: <4809434.9ubG9A4Jj5@leonov>
+In-Reply-To: <1415610288-2035-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1415610288-2035-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Lukasz,
+Hi Andrei,
 
-On Sunday 09 of November 2014 01:24:12 Lukasz Rymanowski wrote:
-> In this set service record, slc creation and incoming/outgoing
-> connection support has been added.
+On Monday 10 of November 2014 11:04:47 Andrei Emeltchenko wrote:
+> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 > 
-> This code has been tested on UPF49.
+> ---
+>  android/tester-main.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
 > 
-> v2:
-> * Handle Szymon comments
-> * Fix for checking codec negotiation support in 4/7
+> diff --git a/android/tester-main.c b/android/tester-main.c
+> index 44a2726..33ef3ce 100644
+> --- a/android/tester-main.c
+> +++ b/android/tester-main.c
+> @@ -1394,7 +1394,8 @@ static bthh_callbacks_t bthh_callbacks = {
+>  	.protocol_mode_cb = hidhost_protocol_mode_cb,
+>  	.idle_time_cb = NULL,
+>  	.get_report_cb = hidhost_get_report_cb,
+> -	.virtual_unplug_cb = hidhost_virtual_unplug_cb
+> +	.virtual_unplug_cb = hidhost_virtual_unplug_cb,
+> +	.handshake_cb = NULL,
+>  };
 > 
-> Lukasz Rymanowski (7):
->   android/handsfree-client: Typo fix in define name
->   android/handsfree-client: Add service record
->   android/handsfree-client: Add devices queue
->   android/handsfree-client: Add incoming connection handling
->   android/handsfree-client: Add SLC creation procedure
->   android/handsfree-client: Add support for outgoing connection
->   android/handsfree-client: Handle disconnect command
-> 
->  android/hal-msg.h          |    2 +-
->  android/handsfree-client.c | 1041
-> +++++++++++++++++++++++++++++++++++++++++++- 2 files changed, 1036
-> insertions(+), 7 deletions(-)
+>  static void gattc_register_client_cb(int status, int client_if,
 
-Patches 1-3 applied, thanks.
+Both patches applied, thanks.
 
 -- 
 BR
