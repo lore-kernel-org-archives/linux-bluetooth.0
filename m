@@ -1,96 +1,229 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1415619477-2358-3-git-send-email-ravikumar.veeramally@linux.intel.com>
-References: <1415619477-2358-1-git-send-email-ravikumar.veeramally@linux.intel.com>
-	<1415619477-2358-3-git-send-email-ravikumar.veeramally@linux.intel.com>
-Date: Mon, 10 Nov 2014 15:23:06 +0200
-Message-ID: <CABBYNZK4rdKC9Q3hrr1mBNy=UcZ-UuicUSwGMW-SXpNYvYe04A@mail.gmail.com>
-Subject: Re: [PATCH 2/4] android/hal-msg: Add support for new AVRCP CTRL interface
+In-Reply-To: <1415392919-17572-4-git-send-email-armansito@chromium.org>
+References: <1415392919-17572-1-git-send-email-armansito@chromium.org>
+	<1415392919-17572-4-git-send-email-armansito@chromium.org>
+Date: Mon, 10 Nov 2014 13:57:01 +0200
+Message-ID: <CABBYNZLcVmOq5pxwWekpXDDFYmMc-dYp1wWQfCzXuJApXS8wRA@mail.gmail.com>
+Subject: Re: [PATCH BlueZ v1 03/11] shared/gatt-server: Implement "Write"
+ request and command.
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
+To: Arman Uguray <armansito@chromium.org>
 Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Ravi,
+Hi Arman,
 
-On Mon, Nov 10, 2014 at 1:37 PM, Ravi kumar Veeramally
-<ravikumar.veeramally@linux.intel.com> wrote:
-> AVRCP controller interface added in Android Lollipop. Update it's
-> commands and notifications. Update service ids also.
+On Fri, Nov 7, 2014 at 10:41 PM, Arman Uguray <armansito@chromium.org> wrote:
+> This patch implements the "Write" request and command for the GATT
+> server role. Writes are delegated to the attribute's write handler,
+> which is also responsible for performing certain permission checks.
 > ---
->  android/hal-msg.h | 30 ++++++++++++++++++++++++++----
->  1 file changed, 26 insertions(+), 4 deletions(-)
+>  src/shared/gatt-server.c | 146 +++++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 146 insertions(+)
 >
-> diff --git a/android/hal-msg.h b/android/hal-msg.h
-> index eef226e..cb6f23b 100644
-> --- a/android/hal-msg.h
-> +++ b/android/hal-msg.h
-> @@ -34,9 +34,10 @@ static const char BLUEZ_HAL_SK_PATH[] = "\0bluez_hal_socket";
->  #define HAL_SERVICE_ID_A2DP            6
->  #define HAL_SERVICE_ID_HEALTH          7
->  #define HAL_SERVICE_ID_AVRCP           8
-> -#define HAL_SERVICE_ID_GATT            9
-> -#define HAL_SERVICE_ID_HANDSFREE_CLIENT        10
-> -#define HAL_SERVICE_ID_MAP_CLIENT      11
-> +#define HAL_SERVICE_ID_AVRCP_CTRL      9
-> +#define HAL_SERVICE_ID_GATT            10
-> +#define HAL_SERVICE_ID_HANDSFREE_CLIENT        11
-> +#define HAL_SERVICE_ID_MAP_CLIENT      12
+> diff --git a/src/shared/gatt-server.c b/src/shared/gatt-server.c
+> index ddb714d..db002db 100644
+> --- a/src/shared/gatt-server.c
+> +++ b/src/shared/gatt-server.c
+> @@ -50,6 +50,11 @@ struct async_read_op {
+>         struct queue *db_data;
+>  };
+>
+> +struct async_write_op {
+> +       struct bt_gatt_server *server;
+> +       uint8_t opcode;
+> +};
+> +
+>  struct bt_gatt_server {
+>         struct gatt_db *db;
+>         struct bt_att *att;
+> @@ -60,8 +65,11 @@ struct bt_gatt_server {
+>         unsigned int read_by_grp_type_id;
+>         unsigned int read_by_type_id;
+>         unsigned int find_info_id;
+> +       unsigned int write_id;
+> +       unsigned int write_cmd_id;
+>
+>         struct async_read_op *pending_read_op;
+> +       struct async_write_op *pending_write_op;
+>
+>         bt_gatt_server_debug_func_t debug_callback;
+>         bt_gatt_server_destroy_func_t debug_destroy;
+> @@ -77,10 +85,15 @@ static void bt_gatt_server_free(struct bt_gatt_server *server)
+>         bt_att_unregister(server->att, server->read_by_grp_type_id);
+>         bt_att_unregister(server->att, server->read_by_type_id);
+>         bt_att_unregister(server->att, server->find_info_id);
+> +       bt_att_unregister(server->att, server->write_id);
+> +       bt_att_unregister(server->att, server->write_cmd_id);
+>
+>         if (server->pending_read_op)
+>                 server->pending_read_op->server = NULL;
+>
+> +       if (server->pending_write_op)
+> +               server->pending_write_op->server = NULL;
+> +
+>         bt_att_unref(server->att);
+>         free(server);
+>  }
+> @@ -626,6 +639,125 @@ done:
+>                                                         NULL, NULL, NULL);
+>  }
+>
+> +static void async_write_op_destroy(struct async_write_op *op)
+> +{
+> +       if (op->server)
+> +               op->server->pending_write_op = NULL;
+> +
+> +       free(op);
+> +}
+> +
+> +static void write_complete_cb(struct gatt_db_attribute *attr, int err,
+> +                                                               void *user_data)
+> +{
+> +       struct async_write_op *op = user_data;
+> +       struct bt_gatt_server *server = op->server;
+> +       uint16_t handle;
+> +
+> +       if (!server) {
+> +               async_write_op_destroy(op);
+> +               return;
+> +       }
+> +
+> +       handle = gatt_db_attribute_get_handle(attr);
+> +
+> +       if (err) {
+> +               uint8_t rsp_pdu[4];
+> +               uint8_t att_ecode = att_ecode_from_error(err);
+> +
+> +               encode_error_rsp(op->opcode, handle, att_ecode, rsp_pdu);
+> +               bt_att_send(server->att, BT_ATT_OP_ERROR_RSP, rsp_pdu, 4,
+> +                                                       NULL, NULL, NULL);
+> +       } else {
+> +               /*
+> +                * TODO: Make this function work with Prepare Write request once
+> +                * it's supported.
+> +                */
+> +
+> +               bt_att_send(server->att, BT_ATT_OP_WRITE_RSP, NULL, 0,
+> +                                                       NULL, NULL, NULL);
+> +       }
+> +
+> +       async_write_op_destroy(op);
+> +}
+> +
+> +static void write_cb(uint8_t opcode, const void *pdu,
+> +                                       uint16_t length, void *user_data)
+> +{
+> +       struct bt_gatt_server *server = user_data;
+> +       struct gatt_db_attribute *attr;
+> +       uint16_t handle = 0;
+> +       uint8_t rsp_pdu[4];
+> +       gatt_db_attribute_write_t complete_func = NULL;
+> +       struct async_write_op *op = NULL;
+> +       uint8_t ecode;
+> +       uint32_t perm;
+> +
+> +       if (length < 2) {
+> +               ecode = BT_ATT_ERROR_INVALID_PDU;
+> +               goto error;
+> +       }
+> +
+> +       handle = get_le16(pdu);
+> +       attr = gatt_db_get_attribute(server->db, handle);
+> +       if (!attr) {
+> +               ecode = BT_ATT_ERROR_INVALID_HANDLE;
+> +               goto error;
+> +       }
+> +
+> +       util_debug(server->debug_callback, server->debug_data,
+> +                               "Write %s - handle: 0x%04x",
+> +                               (opcode == BT_ATT_OP_WRITE_REQ) ? "Req" : "Cmd",
+> +                               handle);
+> +
+> +       if (!gatt_db_attribute_get_permissions(attr, &perm)) {
+> +               ecode = BT_ATT_ERROR_INVALID_HANDLE;
+> +               goto error;
+> +       }
+> +
+> +       if (!(perm & BT_ATT_PERM_WRITE)) {
+> +               ecode = BT_ATT_ERROR_WRITE_NOT_PERMITTED;
+> +               goto error;
+> +       }
+> +
+> +       /* If this is not a command, set up the completion callback and data */
+> +       if (opcode == BT_ATT_OP_WRITE_REQ) {
+> +               if (server->pending_write_op) {
+> +                       ecode = BT_ATT_ERROR_UNLIKELY;
+> +                       goto error;
+> +               }
+> +
+> +               op = new0(struct async_write_op, 1);
+> +               if (!op) {
+> +                       ecode = BT_ATT_ERROR_INSUFFICIENT_RESOURCES;
+> +                       goto error;
+> +               }
+> +
+> +               op->server = server;
+> +               op->opcode = opcode;
+> +               server->pending_write_op = op;
+> +
+> +               complete_func = write_complete_cb;
+> +       }
+> +
+> +       if (gatt_db_attribute_write(attr, 0, pdu + 2, length - 2, opcode,
+> +                                               NULL, complete_func, op))
+> +               return;
 
-Since for the others interface added in 5.0 we did append to the end
-this one should also go there, otherwise we will have to reorganize
-all the ids.
+Currently gatt_db_attribute_write does not accept NULL callbacks so
+this would probably fail for BT_ATT_OP_WRITE_CMD, so either we do
+change it and allow unconfirmed writes or perhaps we can always set
+write_complete_cb and server->pending_write_op so the server can tell
+the write is still pending although for BT_ATT_OP_WRITE_CMD there is
+no response.
 
->  #define HAL_SERVICE_ID_MAX HAL_SERVICE_ID_MAP_CLIENT
->
-> @@ -607,7 +608,7 @@ struct hal_cmd_handsfree_phone_state_change {
->         uint8_t number[0];
->  } __attribute__((packed));
->
-> -/* AVRCP HAL API */
-> +/* AVRCP TARGET HAL API */
->
->  #define HAL_AVRCP_PLAY_STATUS_STOPPED  0x00
->  #define HAL_AVRCP_PLAY_STATUS_PLAYING  0x01
-> @@ -711,6 +712,15 @@ struct hal_cmd_avrcp_set_volume {
->         uint8_t value;
->  } __attribute__((packed));
->
-> +/* AVRCP CTRL HAL API */
+> +       if (op)
+> +               async_write_op_destroy(op);
 > +
-> +#define HAL_OP_AVRCP_CTRL_SEND_PASSTHROUGH     0x01
-> +struct hal_cmd_avrcp_ctrl_send_passthrough {
-> +       uint8_t bdaddr[6];
-> +       uint8_t key_code;
-> +       uint8_t key_state;
-> +} __attribute__((packed));
+> +       ecode = BT_ATT_ERROR_UNLIKELY;
 > +
->  /* GATT HAL API */
+> +error:
+> +       if (opcode == BT_ATT_OP_WRITE_CMD)
+> +               return;
+> +
+> +       encode_error_rsp(opcode, handle, ecode, rsp_pdu);
+> +       bt_att_send(server->att, BT_ATT_OP_ERROR_RSP, rsp_pdu, 4,
+> +                                                       NULL, NULL, NULL);
+> +}
+> +
+>  static void exchange_mtu_cb(uint8_t opcode, const void *pdu,
+>                                         uint16_t length, void *user_data)
+>  {
+> @@ -690,6 +822,20 @@ static bool gatt_server_register_att_handlers(struct bt_gatt_server *server)
+>         if (!server->find_info_id)
+>                 return false;
 >
->  #define HAL_OP_GATT_CLIENT_REGISTER            0x01
-> @@ -1499,6 +1509,18 @@ struct hal_ev_avrcp_passthrough_cmd {
->         uint8_t state;
->  } __attribute__((packed));
+> +       /* Write Request */
+> +       server->write_id = bt_att_register(server->att, BT_ATT_OP_WRITE_REQ,
+> +                                                               write_cb,
+> +                                                               server, NULL);
+> +       if (!server->write_id)
+> +               return false;
+> +
+> +       /* Write Command */
+> +       server->write_cmd_id = bt_att_register(server->att, BT_ATT_OP_WRITE_CMD,
+> +                                                               write_cb,
+> +                                                               server, NULL);
+> +       if (!server->write_cmd_id)
+> +               return false;
+> +
+>         return true;
+>  }
 >
-> +#define HAL_EV_AVRCP_CTRL_CONN_STATE           0x80
-> +struct hal_ev_avrcp_ctrl_conn_state {
-> +       uint8_t state;
-> +       uint8_t bdaddr[6];
-> +} __attribute__((packed));
-> +
-> +#define HAL_EV_AVRCP_CTRL_PASSTHROUGH_RSP      0x81
-> +struct hal_ev_avrcp_ctrl_passthrough_rsp {
-> +       uint8_t id;
-> +       uint8_t key_state;
-> +} __attribute__((packed));
-> +
->  #define HAL_EV_GATT_CLIENT_REGISTER_CLIENT     0x81
->  struct hal_ev_gatt_client_register_client {
->         int32_t status;
 > --
-> 2.1.0
+> 2.1.0.rc2.206.gedb03e5
 >
 > --
 > To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
