@@ -1,41 +1,55 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 10 Nov 2014 23:08:35 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 3/3] Bluetooth: Trigger SMP for the appropriate LE CoC
- errors
-Message-ID: <20141110210835.GA3944@t440s.P-661HNU-F1>
-References: <1415618695-21363-1-git-send-email-johan.hedberg@gmail.com>
- <1415618695-21363-4-git-send-email-johan.hedberg@gmail.com>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] android/gatt: Fix dead code warnings
+Date: Mon, 10 Nov 2014 21:05:41 +0100
+Message-ID: <1584207.SFKaHYrozt@leonov>
+In-Reply-To: <1415625918-10189-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1415625918-10189-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1415618695-21363-4-git-send-email-johan.hedberg@gmail.com>
+Content-Type: text/plain; charset="us-ascii"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Andrei,
 
-On Mon, Nov 10, 2014, johan.hedberg@gmail.com wrote:
-> +		/* smp_conn_security() will call l2cap_chan_lock() -
-> +		 * never for any CoC channel but only for the SMP
-> +		 * channel. However, this will still trigger lockdep
-> +		 * warnings of recursive locking, so to avoid these
-> +		 * unlock the channel here instead of after the call to
-> +		 * smp_conn_security().
-> +		 */
-> +		sec_level = chan->sec_level;
-> +		l2cap_chan_unlock(chan);
-> +
-> +		smp_conn_security(hcon, sec_level);
-> +		goto unlock;
+On Monday 10 of November 2014 15:25:18 Andrei Emeltchenko wrote:
+> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> 
+> gatt_db_attribute_get_permissions() used everywhere without check since
+> those conditions are checked already.
 
-It's might be possible to avoid this "hack" by using nested locking
-annotation, so you might want to hold off with this patch for now.
+It would make sense to put such warning into commit message if you are 
+referring to it in subject.
 
-I'm right now experimenting in making the rather simple change of using
-mutex_lock_nested(&chan->lock, chan->chan_type) in l2cap_chan_lock() to
-classify channels into separate groups based on their type. This should
-allow simultaneous CoC and SMP (fixed channel) lock acquisition without
-getting (false positive) warnings from lockdep.
+> ---
+>  android/gatt.c | 3 +--
+>  1 file changed, 1 insertion(+), 2 deletions(-)
+> 
+> diff --git a/android/gatt.c b/android/gatt.c
+> index 086bb94..04101f6 100644
+> --- a/android/gatt.c
+> +++ b/android/gatt.c
+> @@ -5992,8 +5992,7 @@ static void write_cmd_request(const uint8_t *cmd,
+> uint16_t cmd_len, if (!attrib)
+>  		return;
+> 
+> -	if (!gatt_db_attribute_get_permissions(attrib, &permissions))
+> -		return;
+> +	gatt_db_attribute_get_permissions(attrib, &permissions);
+> 
+>  	if (check_device_permissions(dev, cmd[0], permissions))
+>  		return;
 
-Johan
+So if we always pass valid pointers to this function, then maybe we should 
+change it definition to something like:
+
+uint32_t gatt_db_attribute_get_permissions(struct gatt_db_attribute *attrib);
+
+
+Thoughts?
+
+-- 
+BR
+Szymon Janc
