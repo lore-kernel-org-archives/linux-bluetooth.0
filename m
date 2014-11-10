@@ -1,41 +1,115 @@
 Return-Path: <cyrus@holtmann.org>
-From: johan.hedberg@gmail.com
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Fix mgmt connected notification
-Date: Mon, 10 Nov 2014 17:10:26 +0200
-Message-Id: <1415632226-22962-1-git-send-email-johan.hedberg@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <5460C0A8.6090400@linux.intel.com>
+References: <1415619477-2358-1-git-send-email-ravikumar.veeramally@linux.intel.com>
+	<1415619477-2358-2-git-send-email-ravikumar.veeramally@linux.intel.com>
+	<CABBYNZLArffoj1Ggf9O=yvd=UFnJGTQUK+UZV=VkMjTeaeg-_g@mail.gmail.com>
+	<5460C0A8.6090400@linux.intel.com>
+Date: Mon, 10 Nov 2014 15:55:41 +0200
+Message-ID: <CABBYNZJvH-_6i3jePA6pr9EDMWiQ3OPp6XNiHLaUe3v--82b+g@mail.gmail.com>
+Subject: Re: [PATCH 1/4] android/hal-ipc-txt: Add support for new AVRCP CTRL interface
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@intel.com>
+Hi Ravi,
 
-This patch fixes a regression that was introduced by commit
-cb77c3ec075a50e9f956f62dc2e4c0394df1d578. In addition to BT_CONFIG,
-BT_CONNECTED is also a state in which we may get a remote name and need
-to indicate over mgmt the connection status. This scenario is
-particularly likely to happen for incoming connections that do not need
-authentication since there the hci_conn state will reach BT_CONNECTED
-before the remote name is received.
+On Mon, Nov 10, 2014 at 3:42 PM, Ravi kumar Veeramally
+<ravikumar.veeramally@linux.intel.com> wrote:
+> Hi Luiz,
+>
+>
+> On 11/10/2014 03:32 PM, Luiz Augusto von Dentz wrote:
+>>
+>> Hi Ravi,
+>>
+>> On Mon, Nov 10, 2014 at 1:37 PM, Ravi kumar Veeramally
+>> <ravikumar.veeramally@linux.intel.com> wrote:
+>>>
+>>> AVRCP controller interface added in Android Lollipop. Update it's
+>>> commands and notifications.
+>>> ---
+>>>   android/hal-ipc-api.txt | 49
+>>> +++++++++++++++++++++++++++++++++++++++++++++----
+>>>   1 file changed, 45 insertions(+), 4 deletions(-)
+>>>
+>>> diff --git a/android/hal-ipc-api.txt b/android/hal-ipc-api.txt
+>>> index 666e27f..fc78244 100644
+>>> --- a/android/hal-ipc-api.txt
+>>> +++ b/android/hal-ipc-api.txt
+>>> @@ -1241,7 +1241,7 @@ Notifications:
+>>>                                        0x04 = Destroyed
+>>>
+>>>
+>>> -Bluetooth Remote Control HAL (ID 8)
+>>> +Bluetooth Remote Control Target HAL (ID 8)
+>>>   ===================================
+>>>
+>>>   Android HAL name: "avrcp" (BT_PROFILE_AV_RC_ID)
+>>> @@ -1470,8 +1470,49 @@ Notifications:
+>>>                  Notification parameters: ID (1 octet)
+>>>                                           State (1 octet)
+>>>
+>>> +Bluetooth Remote Control Controller HAL (ID 9)
+>>> +===================================
+>>> +
+>>> +Android HAL name: "avrcp-ctrl" (BT_PROFILE_AV_RC_CTRL_ID)
+>>> +
+>>> +Commands and responses:
+>>> +
+>>> +       Opcode 0x00 - Error response
+>>> +
+>>> +               Response parameters: Status (1 octet)
+>>> +
+>>> +               Valid status values: 0x01 = Fail
+>>> +                                    0x02 = Not ready
+>>> +                                    0x03 = No memory
+>>> +                                    0x04 = Busy
+>>> +                                    0x05 = Done (already completed)
+>>> +                                    0x06 = Unsupported
+>>> +                                    0x07 = Parameter invalid
+>>> +                                    0x08 = Unhandled
+>>> +                                    0x09 = Authentication failure
+>>> +                                    0x0a = Remote device down
+>>> +
+>>> +       Opcode 0x01 - Send Pass Through command/response
+>>> +
+>>> +               Command parameters: Remote Address (6 octets)
+>>> +                                   Key Code (1 octet)
+>>> +                                   Key State (1 octet)
+>>> +
+>>> +               In case of an error, the error response will be returned.
+>>> +
+>>> +Notifications:
+>>> +
+>>> +       Opcode 0x81 - Passthrough Response Notification
+>>> +
+>>> +               Notification parameters: ID (1 octet)
+>>> +                                        Key State (1 octet)
+>>> +
+>>> +       Opcode 0x82 - Connection State Notification
+>>> +
+>>> +               Notification parameters: State (1 octet)
+>>> +                                        Remote Address (6 octets)
+>>
+>> This should probably be added to the bottom as we did with other new
+>> HAL.
+>
+>   Sure, I will add at bottom in both hal-ipc-txt and hal-msg.h.
+>>
+>>   Btw, perhaps we should keep a history of API changes e.g. since:
+>> 5.0 per opcode so it become easier to identify changes in the future.
+>
+>   So where should we keep changes related 5.0?
 
-Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
----
- net/bluetooth/hci_event.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 68c882fd20fd..a97af145e7ec 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -1581,7 +1581,8 @@ static void hci_check_pending_name(struct hci_dev *hdev, struct hci_conn *conn,
- 	struct discovery_state *discov = &hdev->discovery;
- 	struct inquiry_entry *e;
- 
--	if (conn && conn->state == BT_CONFIG &&
-+	if (conn &&
-+	    (conn->state == BT_CONFIG || conn->state == BT_CONNECTED) &&
- 	    !test_and_set_bit(HCI_CONN_MGMT_CONNECTED, &conn->flags))
- 		mgmt_device_connected(hdev, conn, 0, name, name_len);
- 
--- 
-2.1.0
+I was thinking in something like this:
 
+Opcode 0x82 - Connection State Notification
+
+               Notification parameters: State (1 octet)
+                                        Remote Address (6 octets)
+               since: 5.0
