@@ -1,52 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1415375018-21866-2-git-send-email-gowtham.ab@samsung.com>
-References: <1415375018-21866-1-git-send-email-gowtham.ab@samsung.com>
-	<1415375018-21866-2-git-send-email-gowtham.ab@samsung.com>
-Date: Mon, 10 Nov 2014 11:07:36 +0200
-Message-ID: <CABBYNZLfsndufv5BhJZnfzG51vPhhsgqdconsiPRzpfsgW5RjA@mail.gmail.com>
-Subject: Re: [PATCH v2 0/4] Add support for RFCOMM in btmon
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Gowtham Anandha Babu <gowtham.ab@samsung.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	Dmitry Kasatkin <d.kasatkin@samsung.com>,
-	Bharat Panda <bharat.panda@samsung.com>, cpgs@samsung.com
-Content-Type: text/plain; charset=UTF-8
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH 2/2] android/client: Fix argument count in create_bond()
+Date: Mon, 10 Nov 2014 11:04:48 +0200
+Message-Id: <1415610288-2035-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1415610288-2035-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1415610288-2035-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Gowtham,
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-On Fri, Nov 7, 2014 at 5:43 PM, Gowtham Anandha Babu
-<gowtham.ab@samsung.com> wrote:
-> Adds an initial implementation for RFCOMM in Bluetooth monitor.
->
-> Implementation for Decoding MSC, RPN, RLS, PN, NSC frames
-> will  be covered in the next patch-set.
->
-> *v1: Incorporated Johan comments.
->
-> *v2: changed FCS fetching by l2cap_frame_pull
->
-> Gowtham Anandha Babu (4):
->   monitor/rfcomm: Add RFCOMM support to btmon
->   monitor/rfcomm: Add support for printing RFCOMM hdr
->   monitor/rfcomm: Add support for UIH frame decoding
->   monitor/rfcomm: Add support for mcc frame decoding
->
->  Makefile.tools     |   1 +
->  android/Android.mk |   1 +
->  monitor/l2cap.c    |   4 +
->  monitor/l2cap.h    |   2 +
->  monitor/rfcomm.c   | 275 +++++++++++++++++++++++++++++++++++++++++++++++++++++
->  5 files changed, 283 insertions(+)
->  create mode 100644 monitor/rfcomm.c
->
-> --
-> 1.9.1
+---
+ android/client/if-bt.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Applied, thanks.
-
-
+diff --git a/android/client/if-bt.c b/android/client/if-bt.c
+index 48aff1b..7325242 100644
+--- a/android/client/if-bt.c
++++ b/android/client/if-bt.c
+@@ -628,7 +628,7 @@ static void create_bond_p(int argc, const char **argv)
+ 	VERIFY_ADDR_ARG(2, &addr);
+ 
+ #if ANDROID_VERSION >= PLATFORM_VER(5, 0, 0)
+-	if (argc < 3)
++	if (argc < 4)
+ 		transport = BT_TRANSPORT_UNKNOWN;
+ 	else
+ 		transport = atoi(argv[3]);
 -- 
-Luiz Augusto von Dentz
+1.9.1
+
