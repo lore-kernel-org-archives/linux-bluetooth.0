@@ -2,201 +2,49 @@ Return-Path: <cyrus@holtmann.org>
 From: Arman Uguray <armansito@chromium.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Arman Uguray <armansito@chromium.org>
-Subject: [PATCH BlueZ v2 03/11] shared/gatt-server: Implement "Write" request and command.
-Date: Mon, 10 Nov 2014 09:07:19 -0800
-Message-Id: <1415639247-14320-4-git-send-email-armansito@chromium.org>
-In-Reply-To: <1415639247-14320-1-git-send-email-armansito@chromium.org>
-References: <1415639247-14320-1-git-send-email-armansito@chromium.org>
+Subject: [PATCH BlueZ v2 00/11] shared/gatt-server: Implement ATT operations
+Date: Mon, 10 Nov 2014 09:07:16 -0800
+Message-Id: <1415639247-14320-1-git-send-email-armansito@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch implements the "Write" request and command for the GATT
-server role. Writes are delegated to the attribute's write handler,
-which is also responsible for performing certain permission checks.
----
- src/shared/gatt-server.c | 135 +++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 135 insertions(+)
+This patch set implements the most important server-side ATT protocol
+operations by interfacing with the new gatt-db API functions. All
+requests except "Read Multiple" and "Signed Write Command" are provided
+in this set.
 
-diff --git a/src/shared/gatt-server.c b/src/shared/gatt-server.c
-index ddb714d..34cab05 100644
---- a/src/shared/gatt-server.c
-+++ b/src/shared/gatt-server.c
-@@ -50,6 +50,11 @@ struct async_read_op {
- 	struct queue *db_data;
- };
- 
-+struct async_write_op {
-+	struct bt_gatt_server *server;
-+	uint8_t opcode;
-+};
-+
- struct bt_gatt_server {
- 	struct gatt_db *db;
- 	struct bt_att *att;
-@@ -60,8 +65,11 @@ struct bt_gatt_server {
- 	unsigned int read_by_grp_type_id;
- 	unsigned int read_by_type_id;
- 	unsigned int find_info_id;
-+	unsigned int write_id;
-+	unsigned int write_cmd_id;
- 
- 	struct async_read_op *pending_read_op;
-+	struct async_write_op *pending_write_op;
- 
- 	bt_gatt_server_debug_func_t debug_callback;
- 	bt_gatt_server_destroy_func_t debug_destroy;
-@@ -77,10 +85,15 @@ static void bt_gatt_server_free(struct bt_gatt_server *server)
- 	bt_att_unregister(server->att, server->read_by_grp_type_id);
- 	bt_att_unregister(server->att, server->read_by_type_id);
- 	bt_att_unregister(server->att, server->find_info_id);
-+	bt_att_unregister(server->att, server->write_id);
-+	bt_att_unregister(server->att, server->write_cmd_id);
- 
- 	if (server->pending_read_op)
- 		server->pending_read_op->server = NULL;
- 
-+	if (server->pending_write_op)
-+		server->pending_write_op->server = NULL;
-+
- 	bt_att_unref(server->att);
- 	free(server);
- }
-@@ -626,6 +639,114 @@ done:
- 							NULL, NULL, NULL);
- }
- 
-+static void async_write_op_destroy(struct async_write_op *op)
-+{
-+	if (op->server)
-+		op->server->pending_write_op = NULL;
-+
-+	free(op);
-+}
-+
-+static void write_complete_cb(struct gatt_db_attribute *attr, int err,
-+								void *user_data)
-+{
-+	struct async_write_op *op = user_data;
-+	struct bt_gatt_server *server = op->server;
-+	uint16_t handle;
-+
-+	if (!server || op->opcode == BT_ATT_OP_WRITE_CMD) {
-+		async_write_op_destroy(op);
-+		return;
-+	}
-+
-+	handle = gatt_db_attribute_get_handle(attr);
-+
-+	if (err) {
-+		uint8_t rsp_pdu[4];
-+		uint8_t att_ecode = att_ecode_from_error(err);
-+
-+		encode_error_rsp(op->opcode, handle, att_ecode, rsp_pdu);
-+		bt_att_send(server->att, BT_ATT_OP_ERROR_RSP, rsp_pdu, 4,
-+							NULL, NULL, NULL);
-+	} else {
-+		bt_att_send(server->att, BT_ATT_OP_WRITE_RSP, NULL, 0,
-+							NULL, NULL, NULL);
-+	}
-+
-+	async_write_op_destroy(op);
-+}
-+
-+static void write_cb(uint8_t opcode, const void *pdu,
-+					uint16_t length, void *user_data)
-+{
-+	struct bt_gatt_server *server = user_data;
-+	struct gatt_db_attribute *attr;
-+	uint16_t handle = 0;
-+	uint8_t rsp_pdu[4];
-+	struct async_write_op *op = NULL;
-+	uint8_t ecode;
-+	uint32_t perm;
-+
-+	if (length < 2) {
-+		ecode = BT_ATT_ERROR_INVALID_PDU;
-+		goto error;
-+	}
-+
-+	handle = get_le16(pdu);
-+	attr = gatt_db_get_attribute(server->db, handle);
-+	if (!attr) {
-+		ecode = BT_ATT_ERROR_INVALID_HANDLE;
-+		goto error;
-+	}
-+
-+	util_debug(server->debug_callback, server->debug_data,
-+				"Write %s - handle: 0x%04x",
-+				(opcode == BT_ATT_OP_WRITE_REQ) ? "Req" : "Cmd",
-+				handle);
-+
-+	if (!gatt_db_attribute_get_permissions(attr, &perm)) {
-+		ecode = BT_ATT_ERROR_INVALID_HANDLE;
-+		goto error;
-+	}
-+
-+	if (!(perm & BT_ATT_PERM_WRITE)) {
-+		ecode = BT_ATT_ERROR_WRITE_NOT_PERMITTED;
-+		goto error;
-+	}
-+
-+	if (server->pending_write_op) {
-+		ecode = BT_ATT_ERROR_UNLIKELY;
-+		goto error;
-+	}
-+
-+	op = new0(struct async_write_op, 1);
-+	if (!op) {
-+		ecode = BT_ATT_ERROR_INSUFFICIENT_RESOURCES;
-+		goto error;
-+	}
-+
-+	op->server = server;
-+	op->opcode = opcode;
-+	server->pending_write_op = op;
-+
-+	if (gatt_db_attribute_write(attr, 0, pdu + 2, length - 2, opcode,
-+						NULL, write_complete_cb, op))
-+		return;
-+
-+	if (op)
-+		async_write_op_destroy(op);
-+
-+	ecode = BT_ATT_ERROR_UNLIKELY;
-+
-+error:
-+	if (opcode == BT_ATT_OP_WRITE_CMD)
-+		return;
-+
-+	encode_error_rsp(opcode, handle, ecode, rsp_pdu);
-+	bt_att_send(server->att, BT_ATT_OP_ERROR_RSP, rsp_pdu, 4,
-+							NULL, NULL, NULL);
-+}
-+
- static void exchange_mtu_cb(uint8_t opcode, const void *pdu,
- 					uint16_t length, void *user_data)
- {
-@@ -690,6 +811,20 @@ static bool gatt_server_register_att_handlers(struct bt_gatt_server *server)
- 	if (!server->find_info_id)
- 		return false;
- 
-+	/* Write Request */
-+	server->write_id = bt_att_register(server->att, BT_ATT_OP_WRITE_REQ,
-+								write_cb,
-+								server, NULL);
-+	if (!server->write_id)
-+		return false;
-+
-+	/* Write Command */
-+	server->write_cmd_id = bt_att_register(server->att, BT_ATT_OP_WRITE_CMD,
-+								write_cb,
-+								server, NULL);
-+	if (!server->write_cmd_id)
-+		return false;
-+
- 	return true;
- }
- 
+This patch set also doesn't address checks for encryption/authentication/
+authorization permissions. A TODO item has been added to address this
+later.
+
+*v1: Removed offsetof math while casting service pointer to (void *)
+*v2: - Added TODO for using struct iovec
+     - Removed bt_gatt_server_set_max_prep_queue_len
+     - Always pass write_cb to gatt_db_attribute_write even if the opcode is
+       "Write Command".
+     - Added more util_debug lines in handler functions.
+
+Arman Uguray (11):
+  shared/gatt-server: Implement "Read By Type" request.
+  shared/gatt-server: Implement "Find Information" request.
+  shared/gatt-server: Implement "Write" request and command.
+  shared/gatt-server: Implement "Read" request.
+  shared/gatt-server: Implement "Read Blob" request.
+  shared/att: Handle incoming confirmation PDU.
+  shared/gatt-server: Add functions for sending
+    notifications/indications.
+  shared/gatt-server: Implement "Prepare Write" request.
+  shared/gatt-server: Implement "Execute Write" request.
+  shared/gatt-client: Fix alignment warnings.
+  TODO: Update shared/gatt-server items.
+
+ TODO                     |   26 +-
+ src/shared/att.c         |  119 +++--
+ src/shared/gatt-client.c |    6 +-
+ src/shared/gatt-server.c | 1221 +++++++++++++++++++++++++++++++++++++++++++---
+ src/shared/gatt-server.h |   12 +
+ 5 files changed, 1257 insertions(+), 127 deletions(-)
+
 -- 
 2.1.0.rc2.206.gedb03e5
 
