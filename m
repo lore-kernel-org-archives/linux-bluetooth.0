@@ -2,156 +2,150 @@ Return-Path: <cyrus@holtmann.org>
 From: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
-Subject: [PATCH_v2 4/5] android/client: Add support for new AVRCP CTRL interface
-Date: Mon, 10 Nov 2014 16:05:08 +0200
-Message-Id: <1415628309-7384-5-git-send-email-ravikumar.veeramally@linux.intel.com>
+Subject: [PATCH_v2 5/5] android/avrcp: Add initial support for new AVRCP CTRL interface
+Date: Mon, 10 Nov 2014 16:05:09 +0200
+Message-Id: <1415628309-7384-6-git-send-email-ravikumar.veeramally@linux.intel.com>
 In-Reply-To: <1415628309-7384-1-git-send-email-ravikumar.veeramally@linux.intel.com>
 References: <1415628309-7384-1-git-send-email-ravikumar.veeramally@linux.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- android/client/if-bt.c   |  2 ++
- android/client/if-main.h |  2 ++
- android/client/if-rc.c   | 88 ++++++++++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 92 insertions(+)
+ android/avrcp.c | 72 +++++++++++++++++++++++++++++++++++++++++++++------------
+ android/avrcp.h |  4 ++++
+ android/main.c  | 11 +++++++++
+ 3 files changed, 72 insertions(+), 15 deletions(-)
 
-diff --git a/android/client/if-bt.c b/android/client/if-bt.c
-index 48aff1b..50212fc 100644
---- a/android/client/if-bt.c
-+++ b/android/client/if-bt.c
-@@ -800,6 +800,8 @@ static void get_profile_interface_p(int argc, const char **argv)
- 	else if (strcmp(BT_PROFILE_GATT_ID, id) == 0)
- 		pif = (const void **) &if_gatt;
- #if ANDROID_VERSION >= PLATFORM_VER(5, 0, 0)
-+	else if (strcmp(BT_PROFILE_AV_RC_CTRL_ID, id) == 0)
-+		pif = (const void **) &if_rc_ctrl;
- 	else if (strcmp(BT_PROFILE_HANDSFREE_CLIENT_ID, id) == 0)
- 		pif = (const void **) &if_hf_client;
- 	else if (strcmp(BT_PROFILE_MAP_CLIENT_ID, id) == 0)
-diff --git a/android/client/if-main.h b/android/client/if-main.h
-index 93cc98d..96409aa 100644
---- a/android/client/if-main.h
-+++ b/android/client/if-main.h
-@@ -65,6 +65,7 @@ extern const btgatt_interface_t *if_gatt;
- extern const btgatt_server_interface_t *if_gatt_server;
- extern const btgatt_client_interface_t *if_gatt_client;
- #if ANDROID_VERSION >= PLATFORM_VER(5, 0, 0)
-+extern const btrc_ctrl_interface_t *if_rc_ctrl;
- extern const bthf_client_interface_t *if_hf_client;
- extern const btmce_interface_t *if_mce;
- #endif
-@@ -92,6 +93,7 @@ extern const struct interface hf_if;
- extern const struct interface hh_if;
- extern const struct interface hl_if;
- #if ANDROID_VERSION >= PLATFORM_VER(5, 0, 0)
-+extern const struct interface ctrl_rc_if;
- extern const struct interface hf_client_if;
- extern const struct interface mce_if;
- #endif
-diff --git a/android/client/if-rc.c b/android/client/if-rc.c
-index ed65600..b42b8c6 100644
---- a/android/client/if-rc.c
-+++ b/android/client/if-rc.c
-@@ -28,6 +28,10 @@
+diff --git a/android/avrcp.c b/android/avrcp.c
+index a0d412d..f372128 100644
+--- a/android/avrcp.c
++++ b/android/avrcp.c
+@@ -1082,21 +1082,6 @@ bool bt_avrcp_register(struct ipc *ipc, const bdaddr_t *addr, uint8_t mode)
+ 	}
+ 	record_tg_id = rec->handle;
  
- const btrc_interface_t *if_rc = NULL;
+-	rec = avrcp_ct_record();
+-	if (!rec) {
+-		error("Failed to allocate AVRCP CT record");
+-		bt_adapter_remove_record(record_tg_id);
+-		goto fail;
+-	}
+-
+-	if (bt_adapter_add_record(rec, 0) < 0) {
+-		error("Failed to register AVRCP CT record");
+-		bt_adapter_remove_record(record_tg_id);
+-		sdp_record_free(rec);
+-		goto fail;
+-	}
+-	record_ct_id = rec->handle;
+-
+ 	hal_ipc = ipc;
  
-+#if ANDROID_VERSION >= PLATFORM_VER(5, 0, 0)
-+const btrc_ctrl_interface_t *if_rc_ctrl = NULL;
-+#endif
+ 	ipc_register(hal_ipc, HAL_SERVICE_ID_AVRCP, cmd_handlers,
+@@ -1171,3 +1156,60 @@ void bt_avrcp_disconnect(const bdaddr_t *dst)
+ 
+ 	avrcp_device_remove(dev);
+ }
 +
- SINTMAP(btrc_play_status_t, -1, "(unknown)")
- 	DELEMENT(BTRC_PLAYSTATE_STOPPED),
- 	DELEMENT(BTRC_PLAYSTATE_PLAYING),
-@@ -398,3 +402,87 @@ const struct interface rc_if = {
- 	.name = "rc",
- 	.methods = methods
- };
-+
-+#if ANDROID_VERSION >= PLATFORM_VER(5, 0, 0)
-+static void passthrough_rsp_cb(int id, int key_state)
++static void handle_send_passthrough(const void *buf, uint16_t len)
 +{
-+	haltest_info("%s: id=%d key_state=%d\n", __func__, id, key_state);
++	DBG("Not Implemented");
++
++	ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_AVRCP_CTRL,
++					HAL_OP_AVRCP_CTRL_SEND_PASSTHROUGH,
++							HAL_STATUS_UNSUPPORTED);
 +}
 +
-+static void connection_state_cb(bool state, bt_bdaddr_t *bd_addr)
-+{
-+	haltest_info("%s: state=%s bd_addr=%s\n", __func__,
-+					state ? "true" : "false",
-+					bt_bdaddr_t2str(bd_addr, last_addr));
-+}
-+
-+static btrc_ctrl_callbacks_t rc_ctrl_cbacks = {
-+	.size = sizeof(rc_ctrl_cbacks),
-+	.passthrough_rsp_cb = passthrough_rsp_cb,
-+	.connection_state_cb = connection_state_cb,
++static const struct ipc_handler ctrl_cmd_handlers[] = {
++	/* HAL_OP_AVRCP_CTRL_SEND_PASSTHROUGH */
++	{ handle_send_passthrough, false,
++			sizeof(struct hal_cmd_avrcp_ctrl_send_passthrough) },
 +};
 +
-+/* ctrl_init */
-+
-+static void ctrl_init_p(int argc, const char **argv)
++bool bt_avrcp_ctrl_register(struct ipc *ipc, const bdaddr_t *addr, uint8_t mode)
 +{
-+	RETURN_IF_NULL(if_rc_ctrl);
++	sdp_record_t *rec;
 +
-+	EXEC(if_rc_ctrl->init, &rc_ctrl_cbacks);
-+}
++	DBG("");
 +
-+/* ctrl_cleanup */
-+
-+static void ctrl_cleanup_p(int argc, const char **argv)
-+{
-+	RETURN_IF_NULL(if_rc_ctrl);
-+
-+	EXECV(if_rc_ctrl->cleanup);
-+	if_rc_ctrl = NULL;
-+}
-+
-+/* send_pass_through_cmd */
-+
-+static void send_pass_through_cmd_c(int argc, const char **argv,
-+					enum_func *enum_func, void **user)
-+{
-+}
-+
-+static void send_pass_through_cmd_p(int argc, const char **argv)
-+{
-+	bt_bdaddr_t addr;
-+	uint8_t key_code, key_state;
-+
-+	RETURN_IF_NULL(if_rc);
-+	VERIFY_ADDR_ARG(2, &addr);
-+
-+	if (argc <= 4) {
-+		haltest_error("No key code specified");
-+		return;
++	rec = avrcp_ct_record();
++	if (!rec) {
++		error("Failed to allocate AVRCP CT record");
++		goto fail;
 +	}
 +
-+	key_code = (uint8_t) atoi(argv[3]);
-+
-+	if (argc <= 5) {
-+		haltest_error("No key state specified");
-+		return;
++	if (bt_adapter_add_record(rec, 0) < 0) {
++		error("Failed to register AVRCP CT record");
++		sdp_record_free(rec);
++		goto fail;
 +	}
 +
-+	key_state = (uint8_t) atoi(argv[4]);
++	record_ct_id = rec->handle;
 +
-+	EXEC(if_rc_ctrl->send_pass_through_cmd, &addr, key_code, key_state);
++	if (!hal_ipc)
++		hal_ipc = ipc;
++
++	ipc_register(hal_ipc, HAL_SERVICE_ID_AVRCP_CTRL, ctrl_cmd_handlers,
++					G_N_ELEMENTS(ctrl_cmd_handlers));
++
++	return true;
++
++fail:
++	return false;
 +}
 +
-+static struct method ctrl_methods[] = {
-+	STD_METHOD(ctrl_init),
-+	STD_METHODCH(send_pass_through_cmd,
-+					"<bd_addr> <key_code> <key_state>"),
-+	STD_METHOD(ctrl_cleanup),
-+	END_METHOD
-+};
++void bt_avrcp_ctrl_unregister(void)
++{
++	DBG("");
 +
-+const struct interface ctrl_rc_if = {
-+	.name = "rc-ctrl",
-+	.methods = ctrl_methods
-+};
-+#endif
++	ipc_unregister(hal_ipc, HAL_SERVICE_ID_AVRCP_CTRL);
++
++	bt_adapter_remove_record(record_ct_id);
++	record_ct_id = 0;
++}
+diff --git a/android/avrcp.h b/android/avrcp.h
+index 11e79b7..0af9f14 100644
+--- a/android/avrcp.h
++++ b/android/avrcp.h
+@@ -24,5 +24,9 @@
+ bool bt_avrcp_register(struct ipc *ipc, const bdaddr_t *addr, uint8_t mode);
+ void bt_avrcp_unregister(void);
+ 
++bool bt_avrcp_ctrl_register(struct ipc *ipc, const bdaddr_t *addr,
++								uint8_t mode);
++void bt_avrcp_ctrl_unregister(void);
++
+ void bt_avrcp_connect(const bdaddr_t *dst);
+ void bt_avrcp_disconnect(const bdaddr_t *dst);
+diff --git a/android/main.c b/android/main.c
+index 58dd9ab..21becf6 100644
+--- a/android/main.c
++++ b/android/main.c
+@@ -208,6 +208,14 @@ static void service_register(const void *buf, uint16_t len)
+ 		}
+ 
+ 		break;
++	case HAL_SERVICE_ID_AVRCP_CTRL:
++		if (!bt_avrcp_ctrl_register(hal_ipc, &adapter_bdaddr,
++								m->mode)) {
++			status = HAL_STATUS_FAILED;
++			goto failed;
++		}
++
++		break;
+ 	case HAL_SERVICE_ID_HANDSFREE:
+ 		if (!bt_handsfree_register(hal_ipc, &adapter_bdaddr, m->mode,
+ 							m->max_clients)) {
+@@ -286,6 +294,9 @@ static bool unregister_service(uint8_t id)
+ 	case HAL_SERVICE_ID_AVRCP:
+ 		bt_avrcp_unregister();
+ 		break;
++	case HAL_SERVICE_ID_AVRCP_CTRL:
++		bt_avrcp_ctrl_unregister();
++		break;
+ 	case HAL_SERVICE_ID_HANDSFREE:
+ 		bt_handsfree_unregister();
+ 		break;
 -- 
 2.1.0
 
