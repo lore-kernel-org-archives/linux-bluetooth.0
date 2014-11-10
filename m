@@ -2,149 +2,186 @@ Return-Path: <cyrus@holtmann.org>
 From: Arman Uguray <armansito@chromium.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Arman Uguray <armansito@chromium.org>
-Subject: [PATCH BlueZ v2 07/11] shared/gatt-server: Add functions for sending notifications/indications.
-Date: Mon, 10 Nov 2014 09:07:23 -0800
-Message-Id: <1415639247-14320-8-git-send-email-armansito@chromium.org>
+Subject: [PATCH BlueZ v2 06/11] shared/att: Handle incoming confirmation PDU.
+Date: Mon, 10 Nov 2014 09:07:22 -0800
+Message-Id: <1415639247-14320-7-git-send-email-armansito@chromium.org>
 In-Reply-To: <1415639247-14320-1-git-send-email-armansito@chromium.org>
 References: <1415639247-14320-1-git-send-email-armansito@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch introduces new functions for sending notifications and
-indications as a GATT server.
----
- src/shared/gatt-server.c | 95 ++++++++++++++++++++++++++++++++++++++++++++++++
- src/shared/gatt-server.h | 12 ++++++
- 2 files changed, 107 insertions(+)
+This patch adds handling of incoming confirmation PDUs to shared/att.
+The code makes sure that there is a pending indication and notifies
+the associated callback.
 
-diff --git a/src/shared/gatt-server.c b/src/shared/gatt-server.c
-index 16b6460..a8749b8 100644
---- a/src/shared/gatt-server.c
-+++ b/src/shared/gatt-server.c
-@@ -1068,3 +1068,98 @@ bool bt_gatt_server_set_debug(struct bt_gatt_server *server,
- 
- 	return true;
+Also included is a fix that automatically disconnects the io if a
+response is received while no request is pending.
+---
+ src/shared/att.c | 119 +++++++++++++++++++++++++++++++++++--------------------
+ 1 file changed, 75 insertions(+), 44 deletions(-)
+
+diff --git a/src/shared/att.c b/src/shared/att.c
+index aa80cef..f043523 100644
+--- a/src/shared/att.c
++++ b/src/shared/att.c
+@@ -514,6 +514,46 @@ static void wakeup_writer(struct bt_att *att)
+ 	att->writer_active = true;
  }
-+
-+bool bt_gatt_server_send_notification(struct bt_gatt_server *server,
-+					uint16_t handle, const uint8_t *value,
-+					uint16_t length)
+ 
++static void disconn_handler(void *data, void *user_data)
 +{
-+	uint16_t pdu_len;
-+	uint8_t *pdu;
-+	bool result;
++	struct att_disconn *disconn = data;
 +
-+	if (!server || (length && !value))
-+		return false;
++	if (disconn->removed)
++		return;
 +
-+	pdu_len = MIN(bt_att_get_mtu(server->att), length + 2);
-+	pdu = malloc(pdu_len);
-+	if (!pdu)
-+		return false;
-+
-+	put_le16(handle, pdu);
-+	memcpy(pdu + 2, value, length);
-+
-+	result = !!bt_att_send(server->att, BT_ATT_OP_HANDLE_VAL_NOT, pdu,
-+						pdu_len, NULL, NULL, NULL);
-+	free(pdu);
-+
-+	return result;
++	if (disconn->callback)
++		disconn->callback(disconn->user_data);
 +}
 +
-+struct ind_data {
-+	bt_gatt_server_conf_func_t callback;
-+	bt_gatt_server_destroy_func_t destroy;
-+	void *user_data;
-+};
-+
-+static void destroy_ind_data(void *user_data)
++static bool disconnect_cb(struct io *io, void *user_data)
 +{
-+	struct ind_data *data = user_data;
++	struct bt_att *att = user_data;
 +
-+	if (data->destroy)
-+		data->destroy(data->user_data);
++	io_destroy(att->io);
++	att->io = NULL;
 +
-+	free(data);
-+}
++	util_debug(att->debug_callback, att->debug_data,
++						"Physical link disconnected");
 +
-+static void conf_cb(uint8_t opcode, const void *pdu,
-+					uint16_t length, void *user_data)
-+{
-+	struct ind_data *data = user_data;
++	bt_att_ref(att);
++	att->in_disconn = true;
++	queue_foreach(att->disconn_list, disconn_handler, NULL);
++	att->in_disconn = false;
 +
-+	if (data->callback)
-+		data->callback(data->user_data);
-+}
-+
-+bool bt_gatt_server_send_indication(struct bt_gatt_server *server,
-+					uint16_t handle, const uint8_t *value,
-+					uint16_t length,
-+					bt_gatt_server_conf_func_t callback,
-+					void *user_data,
-+					bt_gatt_server_destroy_func_t destroy)
-+{
-+	uint16_t pdu_len;
-+	uint8_t *pdu;
-+	struct ind_data *data;
-+	bool result;
-+
-+	if (!server || (length && !value))
-+		return false;
-+
-+	pdu_len = MIN(bt_att_get_mtu(server->att), length + 2);
-+	pdu = malloc(pdu_len);
-+	if (!pdu)
-+		return false;
-+
-+	data = new0(struct ind_data, 1);
-+	if (!data) {
-+		free(pdu);
-+		return false;
++	if (att->need_disconn_cleanup) {
++		queue_remove_all(att->disconn_list, match_disconn_removed, NULL,
++							destroy_att_disconn);
++		att->need_disconn_cleanup = false;
 +	}
 +
-+	data->callback = callback;
-+	data->destroy = destroy;
-+	data->user_data = user_data;
++	bt_att_cancel_all(att);
++	bt_att_unregister_all(att);
 +
-+	put_le16(handle, pdu);
-+	memcpy(pdu + 2, value, length);
++	bt_att_unref(att);
 +
-+	result = !!bt_att_send(server->att, BT_ATT_OP_HANDLE_VAL_IND, pdu,
-+							pdu_len, conf_cb,
-+							data, destroy_ind_data);
-+	if (!result)
-+		destroy_ind_data(data);
-+
-+	free(pdu);
-+
-+	return result;
++	return false;
 +}
-diff --git a/src/shared/gatt-server.h b/src/shared/gatt-server.h
-index e3c4def..0e480e1 100644
---- a/src/shared/gatt-server.h
-+++ b/src/shared/gatt-server.h
-@@ -33,8 +33,20 @@ void bt_gatt_server_unref(struct bt_gatt_server *server);
- 
- typedef void (*bt_gatt_server_destroy_func_t)(void *user_data);
- typedef void (*bt_gatt_server_debug_func_t)(const char *str, void *user_data);
-+typedef void (*bt_gatt_server_conf_func_t)(void *user_data);
- 
- bool bt_gatt_server_set_debug(struct bt_gatt_server *server,
- 					bt_gatt_server_debug_func_t callback,
- 					void *user_data,
- 					bt_gatt_server_destroy_func_t destroy);
 +
-+bool bt_gatt_server_send_notification(struct bt_gatt_server *server,
-+					uint16_t handle, const uint8_t *value,
-+					uint16_t length);
+ static void handle_rsp(struct bt_att *att, uint8_t opcode, uint8_t *pdu,
+ 								ssize_t pdu_len)
+ {
+@@ -523,13 +563,19 @@ static void handle_rsp(struct bt_att *att, uint8_t opcode, uint8_t *pdu,
+ 	uint8_t *rsp_pdu = NULL;
+ 	uint16_t rsp_pdu_len = 0;
+ 
+-	/* If no request is pending, then the response is unexpected. */
++	/*
++	 * If no request is pending, then the response is unexpected. Disconnect
++	 * the bearer.
++	 */
+ 	if (!op) {
+-		wakeup_writer(att);
++		util_debug(att->debug_callback, att->debug_data,
++					"Received unexpected ATT response");
++		disconnect_cb(att->io, att);
+ 		return;
+ 	}
+ 
+-	/* If the received response doesn't match the pending request, or if
++	/*
++	 * If the received response doesn't match the pending request, or if
+ 	 * the request is malformed, end the current request with failure.
+ 	 */
+ 	if (opcode == BT_ATT_OP_ERROR_RSP) {
+@@ -568,6 +614,30 @@ done:
+ 	wakeup_writer(att);
+ }
+ 
++static void handle_conf(struct bt_att *att, uint8_t *pdu, ssize_t pdu_len)
++{
++	struct att_send_op *op = att->pending_ind;
 +
-+bool bt_gatt_server_send_indication(struct bt_gatt_server *server,
-+					uint16_t handle, const uint8_t *value,
-+					uint16_t length,
-+					bt_gatt_server_conf_func_t callback,
-+					void *user_data,
-+					bt_gatt_server_destroy_func_t destroy);
++	/*
++	 * Disconnect the bearer if the confirmation is unexpected or the PDU is
++	 * invalid.
++	 */
++	if (!op || pdu_len) {
++		util_debug(att->debug_callback, att->debug_data,
++				"Received unexpected/invalid ATT confirmation");
++		disconnect_cb(att->io, att);
++		return;
++	}
++
++	if (op->callback)
++		op->callback(BT_ATT_OP_HANDLE_VAL_CONF, NULL, 0, op->user_data);
++
++	destroy_att_send_op(op);
++	att->pending_ind = NULL;
++
++	wakeup_writer(att);
++}
++
+ struct notify_data {
+ 	uint8_t opcode;
+ 	uint8_t *pdu;
+@@ -651,46 +721,6 @@ static void handle_notify(struct bt_att *att, uint8_t opcode, uint8_t *pdu,
+ 		respond_not_supported(att, opcode);
+ }
+ 
+-static void disconn_handler(void *data, void *user_data)
+-{
+-	struct att_disconn *disconn = data;
+-
+-	if (disconn->removed)
+-		return;
+-
+-	if (disconn->callback)
+-		disconn->callback(disconn->user_data);
+-}
+-
+-static bool disconnect_cb(struct io *io, void *user_data)
+-{
+-	struct bt_att *att = user_data;
+-
+-	io_destroy(att->io);
+-	att->io = NULL;
+-
+-	util_debug(att->debug_callback, att->debug_data,
+-						"Physical link disconnected");
+-
+-	bt_att_ref(att);
+-	att->in_disconn = true;
+-	queue_foreach(att->disconn_list, disconn_handler, NULL);
+-	att->in_disconn = false;
+-
+-	if (att->need_disconn_cleanup) {
+-		queue_remove_all(att->disconn_list, match_disconn_removed, NULL,
+-							destroy_att_disconn);
+-		att->need_disconn_cleanup = false;
+-	}
+-
+-	bt_att_cancel_all(att);
+-	bt_att_unregister_all(att);
+-
+-	bt_att_unref(att);
+-
+-	return false;
+-}
+-
+ static bool can_read_data(struct io *io, void *user_data)
+ {
+ 	struct bt_att *att = user_data;
+@@ -720,7 +750,8 @@ static bool can_read_data(struct io *io, void *user_data)
+ 		break;
+ 	case ATT_OP_TYPE_CONF:
+ 		util_debug(att->debug_callback, att->debug_data,
+-				"ATT opcode cannot be handled: 0x%02x", opcode);
++				"ATT confirmation received: 0x%02x", opcode);
++		handle_conf(att, pdu + 1, bytes_read - 1);
+ 		break;
+ 	case ATT_OP_TYPE_REQ:
+ 		/*
 -- 
 2.1.0.rc2.206.gedb03e5
 
