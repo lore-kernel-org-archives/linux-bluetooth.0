@@ -1,153 +1,278 @@
 Return-Path: <cyrus@holtmann.org>
-From: Jakub Pawlowski <jpawlowski@google.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Jakub Pawlowski <jpawlowski@google.com>
-Subject: [PATCH v6 1/3] Bluetooth: add hci_restart_le_scan
-Date: Mon, 10 Nov 2014 08:33:29 -0800
-Message-Id: <1415637211-11339-1-git-send-email-jpawlowski@google.com>
+MIME-Version: 1.0
+In-Reply-To: <CABBYNZJL5mHR8OGK5sLi81aeDHBs-UxZj5oJ6b3VKG-C_mD4GA@mail.gmail.com>
+References: <1415392919-17572-1-git-send-email-armansito@chromium.org>
+	<1415392919-17572-9-git-send-email-armansito@chromium.org>
+	<CABBYNZJL5mHR8OGK5sLi81aeDHBs-UxZj5oJ6b3VKG-C_mD4GA@mail.gmail.com>
+Date: Mon, 10 Nov 2014 08:26:25 -0800
+Message-ID: <CAHrH25T5FhZZ=rsMAYjZpX8RenKFCpxv=hdNmAfQuVg7e9exAw@mail.gmail.com>
+Subject: Re: [PATCH BlueZ v1 08/11] shared/gatt-server: Implement "Prepare
+ Write" request.
+From: Arman Uguray <armansito@chromium.org>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Currently there is no way to restart le scan. It's needed in
-preparation for new service scan method. The way it work: it disable,
-and then enable le scan on controller. During this restart special flag
-is set to make sure we won't remove disable scan work from workqueue.
+Hi Luiz,
 
-Signed-off-by: Jakub Pawlowski <jpawlowski@google.com>
----
- include/net/bluetooth/hci.h      |  1 +
- include/net/bluetooth/hci_core.h |  2 ++
- net/bluetooth/hci_core.c         | 42 ++++++++++++++++++++++++++++++++++++++++
- net/bluetooth/hci_event.c        |  9 ++++++---
- 4 files changed, 51 insertions(+), 3 deletions(-)
+> On Mon, Nov 10, 2014 at 6:02 AM, Luiz Augusto von Dentz <luiz.dentz@gmail.com> wrote:
+> Hi Arman,
+>
+> On Fri, Nov 7, 2014 at 10:41 PM, Arman Uguray <armansito@chromium.org> wrote:
+>> This patch add support for handling ATT "Prepare Write" requests for the
+>> server role.
+>> ---
+>>  src/shared/gatt-server.c | 142 +++++++++++++++++++++++++++++++++++++++++++++++
+>>  src/shared/gatt-server.h |   3 +
+>>  2 files changed, 145 insertions(+)
+>>
+>> diff --git a/src/shared/gatt-server.c b/src/shared/gatt-server.c
+>> index e77acce..48a55e7 100644
+>> --- a/src/shared/gatt-server.c
+>> +++ b/src/shared/gatt-server.c
+>> @@ -40,6 +40,8 @@
+>>  #define MIN(a, b) ((a) < (b) ? (a) : (b))
+>>  #endif
+>>
+>> +#define DEFAULT_MAX_PREP_QUEUE_LEN 5
+>> +
+>>  struct async_read_op {
+>>         struct bt_gatt_server *server;
+>>         uint8_t opcode;
+>> @@ -55,6 +57,22 @@ struct async_write_op {
+>>         uint8_t opcode;
+>>  };
+>>
+>> +struct prep_write_data {
+>> +       struct bt_gatt_server *server;
+>> +       uint8_t *value;
+>> +       uint16_t handle;
+>> +       uint16_t offset;
+>> +       uint16_t length;
+>> +};
+>> +
+>> +static void prep_write_data_destroy(void *user_data)
+>> +{
+>> +       struct prep_write_data *data = user_data;
+>> +
+>> +       free(data->value);
+>> +       free(data);
+>> +}
+>> +
+>>  struct bt_gatt_server {
+>>         struct gatt_db *db;
+>>         struct bt_att *att;
+>> @@ -69,6 +87,10 @@ struct bt_gatt_server {
+>>         unsigned int write_cmd_id;
+>>         unsigned int read_id;
+>>         unsigned int read_blob_id;
+>> +       unsigned int prep_write_id;
+>> +
+>> +       struct queue *prep_queue;
+>> +       unsigned int max_prep_queue_len;
+>>
+>>         struct async_read_op *pending_read_op;
+>>         struct async_write_op *pending_write_op;
+>> @@ -91,6 +113,7 @@ static void bt_gatt_server_free(struct bt_gatt_server *server)
+>>         bt_att_unregister(server->att, server->write_cmd_id);
+>>         bt_att_unregister(server->att, server->read_id);
+>>         bt_att_unregister(server->att, server->read_blob_id);
+>> +       bt_att_unregister(server->att, server->prep_write_id);
+>>
+>>         if (server->pending_read_op)
+>>                 server->pending_read_op->server = NULL;
+>> @@ -98,6 +121,8 @@ static void bt_gatt_server_free(struct bt_gatt_server *server)
+>>         if (server->pending_write_op)
+>>                 server->pending_write_op->server = NULL;
+>>
+>> +       queue_destroy(server->prep_queue, prep_write_data_destroy);
+>> +
+>>         bt_att_unref(server->att);
+>>         free(server);
+>>  }
+>> @@ -922,6 +947,98 @@ static void read_blob_cb(uint8_t opcode, const void *pdu,
+>>         handle_read_req(server, opcode, handle, offset);
+>>  }
+>>
+>> +static void prep_write_cb(uint8_t opcode, const void *pdu,
+>> +                                       uint16_t length, void *user_data)
+>> +{
+>> +       struct bt_gatt_server *server = user_data;
+>> +       struct prep_write_data *prep_data = NULL;
+>> +       uint16_t handle = 0;
+>> +       uint16_t offset;
+>> +       struct gatt_db_attribute *attr;
+>> +       uint8_t rsp_opcode;
+>> +       uint8_t rsp_pdu[MAX(4, length)];
+>> +       uint16_t rsp_len;
+>> +       uint8_t ecode;
+>> +       uint32_t perm;
+>> +
+>> +       if (length < 4) {
+>> +               ecode = BT_ATT_ERROR_INVALID_PDU;
+>> +               goto error;
+>> +       }
+>> +
+>> +       if (queue_length(server->prep_queue) >= server->max_prep_queue_len) {
+>> +               ecode = BT_ATT_ERROR_PREPARE_QUEUE_FULL;
+>> +               goto error;
+>> +       }
+>> +
+>> +       handle = get_le16(pdu);
+>> +       offset = get_le16(pdu + 2);
+>> +
+>> +       attr = gatt_db_get_attribute(server->db, handle);
+>> +       if (!attr) {
+>> +               ecode = BT_ATT_ERROR_INVALID_HANDLE;
+>> +               goto error;
+>> +       }
+>> +
+>> +       if (!gatt_db_attribute_get_permissions(attr, &perm)) {
+>> +               ecode = BT_ATT_ERROR_INVALID_HANDLE;
+>> +               goto error;
+>> +       }
+>> +
+>> +       /*
+>> +        * TODO: The "Prepare Write" request requires security permission checks
+>> +        * to be performed before the write is executed. I.e., we can't leave
+>> +        * the permission check to the upper layer since we can't call
+>> +        * gatt_db_write until the entire queue is atomically processed during
+>> +        * an "Execute Write" request. Figure out how to make this check here.
+>> +        */
+>> +       if (!(perm & BT_ATT_PERM_WRITE)) {
+>> +               ecode = BT_ATT_ERROR_WRITE_NOT_PERMITTED;
+>> +               goto error;
+>> +       }
+>> +
+>> +       prep_data = new0(struct prep_write_data, 1);
+>> +       if (!prep_data) {
+>> +               ecode = BT_ATT_ERROR_INSUFFICIENT_RESOURCES;
+>> +               goto error;
+>> +       }
+>> +
+>> +       prep_data->length = length - 4;
+>> +       if (prep_data->length) {
+>> +               prep_data->value = malloc(prep_data->length);
+>> +               if (!prep_data->value) {
+>> +                       ecode = BT_ATT_ERROR_INSUFFICIENT_RESOURCES;
+>> +                       goto error;
+>> +               }
+>> +       }
+>> +
+>> +       prep_data->server = server;
+>> +       prep_data->handle = handle;
+>> +       prep_data->offset = offset;
+>> +       memcpy(prep_data->value, pdu + 4, prep_data->length);
+>> +
+>> +       queue_push_tail(server->prep_queue, prep_data);
+>> +
+>> +       /* Create the response */
+>> +       rsp_len = length;
+>> +       rsp_opcode = BT_ATT_OP_PREP_WRITE_RSP;
+>> +       memcpy(rsp_pdu, pdu, rsp_len);
+>> +
+>> +       goto done;
+>> +
+>> +error:
+>> +       if (prep_data)
+>> +               prep_write_data_destroy(prep_data);
+>> +
+>> +       rsp_opcode = BT_ATT_OP_ERROR_RSP;
+>> +       rsp_len = 4;
+>> +       encode_error_rsp(opcode, handle, ecode, rsp_pdu);
+>> +
+>> +done:
+>> +       bt_att_send(server->att, rsp_opcode, rsp_pdu, rsp_len, NULL, NULL,
+>> +                                                                       NULL);
+>> +}
+>> +
+>>  static void exchange_mtu_cb(uint8_t opcode, const void *pdu,
+>>                                         uint16_t length, void *user_data)
+>>  {
+>> @@ -1015,6 +1132,13 @@ static bool gatt_server_register_att_handlers(struct bt_gatt_server *server)
+>>         if (!server->read_blob_id)
+>>                 return false;
+>>
+>> +       /* Prepare Write Request */
+>> +       server->prep_write_id = bt_att_register(server->att,
+>> +                                               BT_ATT_OP_PREP_WRITE_REQ,
+>> +                                               prep_write_cb, server, NULL);
+>> +       if (!server->prep_write_id)
+>> +               return false;
+>> +
+>>         return true;
+>>  }
+>>
+>> @@ -1033,6 +1157,13 @@ struct bt_gatt_server *bt_gatt_server_new(struct gatt_db *db,
+>>         server->db = db;
+>>         server->att = bt_att_ref(att);
+>>         server->mtu = MAX(mtu, BT_ATT_DEFAULT_LE_MTU);
+>> +       server->max_prep_queue_len = DEFAULT_MAX_PREP_QUEUE_LEN;
+>> +
+>> +       server->prep_queue = queue_new();
+>> +       if (!server->prep_queue) {
+>> +               bt_gatt_server_free(server);
+>> +               return NULL;
+>> +       }
+>>
+>>         if (!gatt_server_register_att_handlers(server)) {
+>>                 bt_gatt_server_free(server);
+>> @@ -1078,6 +1209,17 @@ bool bt_gatt_server_set_debug(struct bt_gatt_server *server,
+>>         return true;
+>>  }
+>>
+>> +bool bt_gatt_server_set_max_prep_queue_length(struct bt_gatt_server *server,
+>> +                                                       unsigned int length)
+>> +{
+>> +       if (!server || !length)
+>> +               return false;
+>> +
+>> +       server->max_prep_queue_len = length;
+>> +
+>> +       return true;
+>> +}
+>> +
+>>  bool bt_gatt_server_send_notification(struct bt_gatt_server *server,
+>>                                         uint16_t handle, const uint8_t *value,
+>>                                         uint16_t length)
+>> diff --git a/src/shared/gatt-server.h b/src/shared/gatt-server.h
+>> index 0e480e1..a95613c 100644
+>> --- a/src/shared/gatt-server.h
+>> +++ b/src/shared/gatt-server.h
+>> @@ -40,6 +40,9 @@ bool bt_gatt_server_set_debug(struct bt_gatt_server *server,
+>>                                         void *user_data,
+>>                                         bt_gatt_server_destroy_func_t destroy);
+>>
+>> +bool bt_gatt_server_set_max_prep_queue_length(struct bt_gatt_server *server,
+>> +                                                       unsigned int length);
+>
+> Perhaps we should leave this API for later, Im not really sure if this
+> will be ever used except perhaps for the TS in that case perhaps we
+> should find a shorter name.
+>
 
-diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index d5f85d7..8d43a50 100644
---- a/include/net/bluetooth/hci.h
-+++ b/include/net/bluetooth/hci.h
-@@ -203,6 +203,7 @@ enum {
- 	HCI_FAST_CONNECTABLE,
- 	HCI_BREDR_ENABLED,
- 	HCI_LE_SCAN_INTERRUPTED,
-+	HCI_LE_SCAN_RESTARTING,
- };
- 
- /* A mask for the flags that are supposed to remain when a reset happens
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 4e39a5a..1b7f9a6 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -334,6 +334,7 @@ struct hci_dev {
- 	unsigned long		dev_flags;
- 
- 	struct delayed_work	le_scan_disable;
-+	struct delayed_work	le_scan_restart;
- 
- 	__s8			adv_tx_power;
- 	__u8			adv_data[HCI_MAX_AD_LENGTH];
-@@ -1400,6 +1401,7 @@ int hci_update_random_address(struct hci_request *req, bool require_privacy,
- 			      u8 *own_addr_type);
- void hci_copy_identity_address(struct hci_dev *hdev, bdaddr_t *bdaddr,
- 			       u8 *bdaddr_type);
-+void hci_restart_le_scan(struct hci_dev *hdev, unsigned long delay);
- 
- #define SCO_AIRMODE_MASK       0x0003
- #define SCO_AIRMODE_CVSD       0x0000
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 6c162c8..b926b6a 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -2560,6 +2560,7 @@ static int hci_dev_do_close(struct hci_dev *hdev)
- 		cancel_delayed_work(&hdev->service_cache);
- 
- 	cancel_delayed_work_sync(&hdev->le_scan_disable);
-+	cancel_delayed_work_sync(&hdev->le_scan_restart);
- 
- 	if (test_bit(HCI_MGMT, &hdev->dev_flags))
- 		cancel_delayed_work_sync(&hdev->rpa_expired);
-@@ -3826,6 +3827,8 @@ static void le_scan_disable_work(struct work_struct *work)
- 
- 	BT_DBG("%s", hdev->name);
- 
-+	cancel_delayed_work_sync(&hdev->le_scan_restart);
-+
- 	hci_req_init(&req, hdev);
- 
- 	hci_req_add_le_scan_disable(&req);
-@@ -3835,6 +3838,44 @@ static void le_scan_disable_work(struct work_struct *work)
- 		BT_ERR("Disable LE scanning request failed: err %d", err);
- }
- 
-+void hci_restart_le_scan(struct hci_dev *hdev, unsigned long delay)
-+{
-+	queue_delayed_work(hdev->workqueue, &hdev->le_scan_restart, delay);
-+}
-+
-+static void le_scan_restart_work_complete(struct hci_dev *hdev, u8 status)
-+{
-+	clear_bit(HCI_LE_SCAN_RESTARTING, &hdev->dev_flags);
-+
-+	if (status)
-+		BT_ERR("Failed to restart LE scanning: status %d", status);
-+}
-+
-+static void le_scan_restart_work(struct work_struct *work)
-+{
-+	struct hci_dev *hdev = container_of(work, struct hci_dev,
-+					    le_scan_restart.work);
-+	struct hci_request req;
-+	struct hci_cp_le_set_scan_enable cp;
-+	int err;
-+
-+	BT_DBG("%s", hdev->name);
-+
-+	hci_req_init(&req, hdev);
-+
-+	hci_req_add_le_scan_disable(&req);
-+
-+	memset(&cp, 0, sizeof(cp));
-+	cp.enable = LE_SCAN_ENABLE;
-+	hci_req_add(&req, HCI_OP_LE_SET_SCAN_ENABLE, sizeof(cp), &cp);
-+
-+	set_bit(HCI_LE_SCAN_RESTARTING, &hdev->dev_flags);
-+
-+	err = hci_req_run(&req, le_scan_restart_work_complete);
-+	if (err)
-+		BT_ERR("Disable LE scanning request failed: err %d", err);
-+}
-+
- static void set_random_addr(struct hci_request *req, bdaddr_t *rpa)
- {
- 	struct hci_dev *hdev = req->hdev;
-@@ -4012,6 +4053,7 @@ struct hci_dev *hci_alloc_dev(void)
- 	INIT_DELAYED_WORK(&hdev->power_off, hci_power_off);
- 	INIT_DELAYED_WORK(&hdev->discov_off, hci_discov_off);
- 	INIT_DELAYED_WORK(&hdev->le_scan_disable, le_scan_disable_work);
-+	INIT_DELAYED_WORK(&hdev->le_scan_restart, le_scan_restart_work);
- 
- 	skb_queue_head_init(&hdev->rx_q);
- 	skb_queue_head_init(&hdev->cmd_q);
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 68c882f..287a39b 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -1157,10 +1157,13 @@ static void hci_cc_le_set_scan_enable(struct hci_dev *hdev,
- 					  d->last_adv_data_len, NULL, 0);
- 		}
- 
--		/* Cancel this timer so that we don't try to disable scanning
--		 * when it's already disabled.
-+		/* If HCI_LE_SCAN_RESTARTING is set, don't cancel this timer,
-+		 * because we're just restarting scan. Otherwise cancel it so
-+		 * that we don't try to disable scanning when it's already
-+		 * disabled.
- 		 */
--		cancel_delayed_work(&hdev->le_scan_disable);
-+		if (!test_bit(HCI_LE_SCAN_RESTARTING, &hdev->dev_flags))
-+			cancel_delayed_work(&hdev->le_scan_disable);
- 
- 		clear_bit(HCI_LE_SCAN, &hdev->dev_flags);
- 
--- 
-2.1.0.rc2.206.gedb03e5
+In our case would it even make sense to have a maximum queue length? I
+only added because there is an error for it and an application with
+memory constraints may want to limit the size perhaps? Anyway, for now
+I can set this to something arbitrary for v2.
 
+>>  bool bt_gatt_server_send_notification(struct bt_gatt_server *server,
+>>                                         uint16_t handle, const uint8_t *value,
+>>                                         uint16_t length);
+>> --
+>> 2.1.0.rc2.206.gedb03e5
+>>
+>> --
+>> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+>> the body of a message to majordomo@vger.kernel.org
+>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>
+>
+>
+> --
+> Luiz Augusto von Dentz
+
+Cheers,
+Arman
