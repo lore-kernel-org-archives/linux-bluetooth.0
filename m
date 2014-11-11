@@ -1,47 +1,160 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <000601cffdb2$4e3e8580$eabb9080$@samsung.com>
-References: <000601cffdb2$4e3e8580$eabb9080$@samsung.com>
-Date: Tue, 11 Nov 2014 16:32:38 +0200
-Message-ID: <CABBYNZJrH0pw5trYQu__ndOEHX8_=jT97E0fspd8=r1iPxOr6g@mail.gmail.com>
-Subject: Re: Query regarding sdptool
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Gowtham Anandha Babu <gowtham.ab@samsung.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	Bharat Panda <bharat.panda@samsung.com>, cpgs@samsung.com,
-	Dmitry Kasatkin <d.kasatkin@samsung.com>
-Content-Type: text/plain; charset=UTF-8
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ] shared/gatt-db: Add timeout to read/write
+Date: Tue, 11 Nov 2014 16:22:58 +0200
+Message-Id: <1415715778-28994-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Gowtham,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-On Tue, Nov 11, 2014 at 3:20 PM, Gowtham Anandha Babu
-<gowtham.ab@samsung.com> wrote:
-> Hi All,
->
-> I am currently testing sdptool.
-> The issues I am facing are,
->
-> 1) When I run ./sdptool del PBAP, I am getting the below error:
-> " No local SDP server!"
->
-> 2) When I run ./sdptool get PBAP, I am getting the below error:
-> "Failed to connect to SDP server on FF:FF:FF:00:00:00: Connection refused"
->
-> 3) when I run ./sdptool add PBAP, Nothing is printing, I don't know whether
-> it is added or not.
->
-> Bluetoothd is running and hci0 is up. Is there any file/script that I need
-> to run to make Local SDP server UP?
+This adds a timeout (1 second) to attribute operations since these can
+cause unexpected transport disconnections if they take too long to
+complete.
+---
+ src/shared/gatt-db.c | 66 ++++++++++++++++++++++++++++++++++++++++++++++++----
+ 1 file changed, 61 insertions(+), 5 deletions(-)
 
-First of all you are not suppose to interact with SDP database using
-sdptool, these commands have been deprecated long long time ago. If
-you want to test just registering and removing a record it is probably
-better to use test/test-profile. If you want to check local records
-with sdptool you need to run bluetooth with -C/--compat option and
-root permissions e.g. sudo sdptool browse local.
-
-
+diff --git a/src/shared/gatt-db.c b/src/shared/gatt-db.c
+index bab1202..a39eec2 100644
+--- a/src/shared/gatt-db.c
++++ b/src/shared/gatt-db.c
+@@ -22,14 +22,17 @@
+  */
+ 
+ #include <stdbool.h>
++#include <errno.h>
+ 
+ #include "lib/uuid.h"
+ #include "src/shared/util.h"
+ #include "src/shared/queue.h"
++#include "src/shared/timeout.h"
+ #include "src/shared/gatt-db.h"
+ 
+ #define MAX_CHAR_DECL_VALUE_LEN 19
+ #define MAX_INCLUDED_VALUE_LEN 6
++#define ATTRIBUTE_TIMEOUT 1000
+ 
+ static const bt_uuid_t primary_service_uuid = { .type = BT_UUID16,
+ 					.value.u16 = GATT_PRIM_SVC_UUID };
+@@ -46,13 +49,17 @@ struct gatt_db {
+ };
+ 
+ struct pending_read {
++	struct gatt_db_attribute *attrib;
+ 	unsigned int id;
++	unsigned int timeout_id;
+ 	gatt_db_attribute_read_t func;
+ 	void *user_data;
+ };
+ 
+ struct pending_write {
++	struct gatt_db_attribute *attrib;
+ 	unsigned int id;
++	unsigned int timeout_id;
+ 	gatt_db_attribute_write_t func;
+ 	void *user_data;
+ };
+@@ -773,6 +780,30 @@ bool gatt_db_attribute_get_permissions(struct gatt_db_attribute *attrib,
+ 	return true;
+ }
+ 
++static void pending_read_result(struct pending_read *p, int err,
++					const uint8_t *data, size_t length)
++{
++	if (p->timeout_id > 0)
++		timeout_remove(p->timeout_id);
++
++	p->func(p->attrib, err, data, length, p->user_data);
++
++	free(p);
++}
++
++static bool read_timeout(void *user_data)
++{
++	struct pending_read *p = user_data;
++
++	p->timeout_id = 0;
++
++	queue_remove(p->attrib->pending_reads, p);
++
++	pending_read_result(p, -ETIMEDOUT, NULL, 0);
++
++	return false;
++}
++
+ bool gatt_db_attribute_read(struct gatt_db_attribute *attrib, uint16_t offset,
+ 				uint8_t opcode, bdaddr_t *bdaddr,
+ 				gatt_db_attribute_read_t func, void *user_data)
+@@ -789,7 +820,10 @@ bool gatt_db_attribute_read(struct gatt_db_attribute *attrib, uint16_t offset,
+ 		if (!p)
+ 			return false;
+ 
++		p->attrib = attrib;
+ 		p->id = ++attrib->read_id;
++		p->timeout_id = timeout_add(ATTRIBUTE_TIMEOUT, read_timeout,
++								p, NULL);
+ 		p->func = func;
+ 		p->user_data = user_data;
+ 
+@@ -834,11 +868,32 @@ bool gatt_db_attribute_read_result(struct gatt_db_attribute *attrib,
+ 	if (!p)
+ 		return false;
+ 
+-	p->func(attrib, err, value, length, p->user_data);
++	pending_read_result(p, err, value, length);
++
++	return true;
++}
++
++static void pending_write_result(struct pending_write *p, int err)
++{
++	if (p->timeout_id > 0)
++		timeout_remove(p->timeout_id);
++
++	p->func(p->attrib, err, p->user_data);
+ 
+ 	free(p);
++}
+ 
+-	return true;
++static bool write_timeout(void *user_data)
++{
++	struct pending_write *p = user_data;
++
++	p->timeout_id = 0;
++
++	queue_remove(p->attrib->pending_writes, p);
++
++	pending_write_result(p, -ETIMEDOUT);
++
++	return false;
+ }
+ 
+ bool gatt_db_attribute_write(struct gatt_db_attribute *attrib, uint16_t offset,
+@@ -857,7 +912,10 @@ bool gatt_db_attribute_write(struct gatt_db_attribute *attrib, uint16_t offset,
+ 		if (!p)
+ 			return false;
+ 
++		p->attrib = attrib;
+ 		p->id = ++attrib->write_id;
++		p->timeout_id = timeout_add(ATTRIBUTE_TIMEOUT, write_timeout,
++								p, NULL);
+ 		p->func = func;
+ 		p->user_data = user_data;
+ 
+@@ -900,9 +958,7 @@ bool gatt_db_attribute_write_result(struct gatt_db_attribute *attrib,
+ 	if (!p)
+ 		return false;
+ 
+-	p->func(attrib, err, p->user_data);
+-
+-	free(p);
++	pending_write_result(p, err);
+ 
+ 	return true;
+ }
 -- 
-Luiz Augusto von Dentz
+1.9.3
+
