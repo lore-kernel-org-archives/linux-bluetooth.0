@@ -1,15 +1,11 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <CABBYNZLHzxY01_ESgP3ra6xByNAcN_GO9B146W=v+nL4pk7jhw@mail.gmail.com>
-References: <1415392919-17572-1-git-send-email-armansito@chromium.org>
-	<1415392919-17572-9-git-send-email-armansito@chromium.org>
-	<CABBYNZJL5mHR8OGK5sLi81aeDHBs-UxZj5oJ6b3VKG-C_mD4GA@mail.gmail.com>
-	<CAHrH25T5FhZZ=rsMAYjZpX8RenKFCpxv=hdNmAfQuVg7e9exAw@mail.gmail.com>
-	<CABBYNZLHzxY01_ESgP3ra6xByNAcN_GO9B146W=v+nL4pk7jhw@mail.gmail.com>
-Date: Tue, 11 Nov 2014 13:35:28 -0800
-Message-ID: <CAHrH25Q6NzxAdBng6Pm9SQeVqz2PbHx7pRRDEczLHrsgpzNCgQ@mail.gmail.com>
-Subject: Re: [PATCH BlueZ v1 08/11] shared/gatt-server: Implement "Prepare
- Write" request.
+In-Reply-To: <CABBYNZ+Pk2m_VBvqmV3C11=tNF2Oed8NY8id-1913Q-z3FWKrw@mail.gmail.com>
+References: <1415639247-14320-1-git-send-email-armansito@chromium.org>
+	<CABBYNZ+Pk2m_VBvqmV3C11=tNF2Oed8NY8id-1913Q-z3FWKrw@mail.gmail.com>
+Date: Tue, 11 Nov 2014 13:23:14 -0800
+Message-ID: <CAHrH25QpAHmgX+2NZQPf1ohUQgwX5UhUFWZkUfQ1VsG2zbAHsw@mail.gmail.com>
+Subject: Re: [PATCH BlueZ v2 00/11] shared/gatt-server: Implement ATT operations
 From: Arman Uguray <armansito@chromium.org>
 To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
@@ -19,43 +15,65 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Luiz,
 
-> On Tue, Nov 11, 2014 at 3:42 AM, Luiz Augusto von Dentz <luiz.dentz@gmail.com> wrote:
+> On Tue, Nov 11, 2014 at 3:52 AM, Luiz Augusto von Dentz <luiz.dentz@gmail.com> wrote:
 > Hi Arman,
 >
-> On Mon, Nov 10, 2014 at 6:26 PM, Arman Uguray <armansito@chromium.org> wrote:
->>>> diff --git a/src/shared/gatt-server.h b/src/shared/gatt-server.h
->>>> index 0e480e1..a95613c 100644
->>>> --- a/src/shared/gatt-server.h
->>>> +++ b/src/shared/gatt-server.h
->>>> @@ -40,6 +40,9 @@ bool bt_gatt_server_set_debug(struct bt_gatt_server *server,
->>>>                                         void *user_data,
->>>>                                         bt_gatt_server_destroy_func_t destroy);
->>>>
->>>> +bool bt_gatt_server_set_max_prep_queue_length(struct bt_gatt_server *server,
->>>> +                                                       unsigned int length);
->>>
->>> Perhaps we should leave this API for later, Im not really sure if this
->>> will be ever used except perhaps for the TS in that case perhaps we
->>> should find a shorter name.
->>>
+> On Mon, Nov 10, 2014 at 7:07 PM, Arman Uguray <armansito@chromium.org> wrote:
+>> This patch set implements the most important server-side ATT protocol
+>> operations by interfacing with the new gatt-db API functions. All
+>> requests except "Read Multiple" and "Signed Write Command" are provided
+>> in this set.
 >>
->> In our case would it even make sense to have a maximum queue length? I
->> only added because there is an error for it and an application with
->> memory constraints may want to limit the size perhaps? Anyway, for now
->> I can set this to something arbitrary for v2.
+>> This patch set also doesn't address checks for encryption/authentication/
+>> authorization permissions. A TODO item has been added to address this
+>> later.
+>>
+>> *v1: Removed offsetof math while casting service pointer to (void *)
+>> *v2: - Added TODO for using struct iovec
+>>      - Removed bt_gatt_server_set_max_prep_queue_len
+>>      - Always pass write_cb to gatt_db_attribute_write even if the opcode is
+>>        "Write Command".
+>>      - Added more util_debug lines in handler functions.
+>>
+>> Arman Uguray (11):
+>>   shared/gatt-server: Implement "Read By Type" request.
+>>   shared/gatt-server: Implement "Find Information" request.
+>>   shared/gatt-server: Implement "Write" request and command.
+>>   shared/gatt-server: Implement "Read" request.
+>>   shared/gatt-server: Implement "Read Blob" request.
+>>   shared/att: Handle incoming confirmation PDU.
+>>   shared/gatt-server: Add functions for sending
+>>     notifications/indications.
+>>   shared/gatt-server: Implement "Prepare Write" request.
+>>   shared/gatt-server: Implement "Execute Write" request.
+>>   shared/gatt-client: Fix alignment warnings.
+>>   TODO: Update shared/gatt-server items.
+>>
+>>  TODO                     |   26 +-
+>>  src/shared/att.c         |  119 +++--
+>>  src/shared/gatt-client.c |    6 +-
+>>  src/shared/gatt-server.c | 1221 +++++++++++++++++++++++++++++++++++++++++++---
+>>  src/shared/gatt-server.h |   12 +
+>>  5 files changed, 1257 insertions(+), 127 deletions(-)
+>>
+>> --
+>> 2.1.0.rc2.206.gedb03e5
 >
-> Perhaps having some arbitrary limit is good enough, not exactly
-> because of memory constraints since each entry should consume just a
-> few bytes but we don't want to timeout so I suggest we queue based on
-> how long we should wait the result to be called.
+> I went ahead and applied this set, I will probably send a patch in a
+> moment adding a timeout for db read/write operations, I figure 1
+> seconds should be enough to start with since LE is focus on low
+> latency, if that doesn't cut it we should adjust the write queue
+> according to how many operation it can deliver before it times out.
 >
 
-OK, that makes a lot of sense. For now we can keep the arbitrary limit
-and see how well it works.
+Sounds reasonable to me. I guess, since the ATT timeout is 30 seconds,
+a queue length of 30 and operation timeout of 1 seem good for now,
+even if not optimal for all cases. We can tweak this later as
+necessary.
 
+>
 > --
 > Luiz Augusto von Dentz
-
 
 Cheers,
 Arman
