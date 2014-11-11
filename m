@@ -1,129 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1415194959-18169-1-git-send-email-vikram.pal@samsung.com>
-References: <1415194959-18169-1-git-send-email-vikram.pal@samsung.com>
-Date: Tue, 11 Nov 2014 11:37:10 +0200
-Message-ID: <CABBYNZKXeLfm5dK6c-x=rRRuQSXgC2gYGUav0XGsv4sKQKzFFw@mail.gmail.com>
-Subject: Re: [PATCH] monitor: Fix AVRCP GetElementAttributes formatting issue
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Vikrampal Yadav <vikram.pal@samsung.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	Dmitry Kasatkin <d.kasatkin@samsung.com>, cpgs@samsung.com
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 8.0 \(1990.1\))
+Subject: Re: [PATCH v2] Bluetooth: Fix mgmt connected notification
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1415698404-21967-1-git-send-email-johan.hedberg@gmail.com>
+Date: Tue, 11 Nov 2014 18:36:18 +0900
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <C2B23799-3EFA-401D-ADA6-0F05834DB01B@holtmann.org>
+References: <1415632226-22962-1-git-send-email-johan.hedberg@gmail.com> <1415698404-21967-1-git-send-email-johan.hedberg@gmail.com>
+To: Johan Hedberg <johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Vikram,
+Hi Johan,
 
-On Wed, Nov 5, 2014 at 3:42 PM, Vikrampal Yadav <vikram.pal@samsung.com> wrote:
-> AVRCP GetElementAttributes formatting issue for AttributeValue fixed.
->
->       AVCTP Control: Response: type 0x00 label 4 PID 0x110e
->         AV/C: Stable: address 0x48 opcode 0x00
->           Subunit: Panel
->           Opcode: Vendor Dependent
->           Company ID: 0x001958
->           AVRCP: GetElementAttributes pt Single len 0x0040
->             AttributeCount: 0x04
->             Attribute: 0x00000001 (Title)
->             CharsetID: 0x006a (UTF-8)
->             AttributeValueLength: 0x0008
->             AttributeValue: fernando
->             Attribute: 0x00000002 (Artist)
->             CharsetID: 0x006a (UTF-8)
->             AttributeValueLength: 0x0004
->             AttributeValue: abba
->             Attribute: 0x00000003 (Album)
->             CharsetID: 0x006a (UTF-8)
->             AttributeValueLength: 0x000d
->             AttributeValue: Greatest Hits
->             Attribute: 0x00000007 (Track duration)
->             CharsetID: 0x006a (UTF-8)
->             AttributeValueLength: 0x0006
->             AttributeValue: 150000
-
-I don't get it, you seem to be changing ContinuingAttributeValue yet
-the frame above does not contain it?
-
+> This patch fixes a regression that was introduced by commit
+> cb77c3ec075a50e9f956f62dc2e4c0394df1d578. In addition to BT_CONFIG,
+> BT_CONNECTED is also a state in which we may get a remote name and need
+> to indicate over mgmt the connection status. This scenario is
+> particularly likely to happen for incoming connections that do not need
+> authentication since there the hci_conn state will reach BT_CONNECTED
+> before the remote name is received.
+> 
+> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 > ---
->  monitor/avctp.c | 20 +++++++++++++-------
->  1 file changed, 13 insertions(+), 7 deletions(-)
->
-> diff --git a/monitor/avctp.c b/monitor/avctp.c
-> index 4abd18f..11579ad 100644
-> --- a/monitor/avctp.c
-> +++ b/monitor/avctp.c
-> @@ -1122,7 +1122,9 @@ response:
->                 num = avrcp_continuing.num;
->
->                 if (avrcp_continuing.size > 0) {
-> +                       char attrval[1024];
+> v2: Added code comment to explain the conn->state checks
+> 
+> net/bluetooth/hci_event.c | 8 +++++++-
+> 1 file changed, 7 insertions(+), 1 deletion(-)
 
-The buffer should be as big as size can be which is UINT8_MAX.
+patch has been applied to bluetooth-next tree.
 
->                         uint16_t size;
-> +                       uint8_t idx;
->
->                         if (avrcp_continuing.size > len) {
->                                 size = len;
-> @@ -1132,16 +1134,17 @@ response:
->                                 avrcp_continuing.size = 0;
->                         }
->
-> -                       printf("ContinuingAttributeValue: ");
-> -                       for (; size > 0; size--) {
-> +                       for (idx = 0; size > 0; idx++, size--) {
->                                 uint8_t c;
->
->                                 if (!l2cap_frame_get_u8(frame, &c))
->                                         goto failed;
->
-> -                               printf("%1c", isprint(c) ? c : '.');
-> +                               sprintf(&attrval[idx], "%1c",
-> +                                                       isprint(c) ? c : '.');
->                         }
-> -                       printf("\n");
-> +                       print_field("%*cContinuingAttributeValue: %s",
-> +                                               (indent - 8), ' ', attrval);
->
->                         len -= size;
->                 }
-> @@ -1153,6 +1156,8 @@ response:
->         while (num > 0 && len > 0) {
->                 uint32_t attr;
->                 uint16_t charset, attrlen;
-> +               uint8_t idx;
-> +               char attrval[1024];
+Regards
 
-Same here, use UINT8_MAX.
+Marcel
 
->                 if (!l2cap_frame_get_be32(frame, &attr))
->                         goto failed;
-> @@ -1175,15 +1180,16 @@ response:
->                 len -= sizeof(attr) + sizeof(charset) + sizeof(attrlen);
->                 num--;
->
-> -               print_field("%*cAttributeValue: ", (indent - 8), ' ');
-> -               for (; attrlen > 0 && len > 0; attrlen--, len--) {
-> +               for (idx = 0; attrlen > 0 && len > 0; idx++, attrlen--, len--) {
->                         uint8_t c;
->
->                         if (!l2cap_frame_get_u8(frame, &c))
->                                 goto failed;
->
-> -                       printf("%1c", isprint(c) ? c : '.');
-> +                       sprintf(&attrval[idx], "%1c", isprint(c) ? c : '.');
->                 }
-> +               print_field("%*cAttributeValue: %s", (indent - 8),
-> +                                                               ' ', attrval);
->
->                 if (attrlen > 0)
->                         avrcp_continuing.size = attrlen;
-> --
-> 1.9.1
->
-
-
-
--- 
-Luiz Augusto von Dentz
