@@ -1,66 +1,108 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1415639247-14320-1-git-send-email-armansito@chromium.org>
-References: <1415639247-14320-1-git-send-email-armansito@chromium.org>
-Date: Tue, 11 Nov 2014 13:52:15 +0200
-Message-ID: <CABBYNZ+Pk2m_VBvqmV3C11=tNF2Oed8NY8id-1913Q-z3FWKrw@mail.gmail.com>
-Subject: Re: [PATCH BlueZ v2 00/11] shared/gatt-server: Implement ATT operations
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Arman Uguray <armansito@chromium.org>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+From: Vikrampal Yadav <vikram.pal@samsung.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: luiz.dentz@gmail.com, d.kasatkin@samsung.com,
+	vikram.pal@samsung.com, cpgs@samsung.com
+Subject: [PATCH v2] monitor: Fix AVRCP GetElementAttributes formatting issue
+Date: Tue, 11 Nov 2014 17:24:02 +0530
+Message-id: <1415706842-2106-1-git-send-email-vikram.pal@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Arman,
+AVRCP GetElementAttributes formatting issue for AttributeValue fixed.
 
-On Mon, Nov 10, 2014 at 7:07 PM, Arman Uguray <armansito@chromium.org> wrote:
-> This patch set implements the most important server-side ATT protocol
-> operations by interfacing with the new gatt-db API functions. All
-> requests except "Read Multiple" and "Signed Write Command" are provided
-> in this set.
->
-> This patch set also doesn't address checks for encryption/authentication/
-> authorization permissions. A TODO item has been added to address this
-> later.
->
-> *v1: Removed offsetof math while casting service pointer to (void *)
-> *v2: - Added TODO for using struct iovec
->      - Removed bt_gatt_server_set_max_prep_queue_len
->      - Always pass write_cb to gatt_db_attribute_write even if the opcode is
->        "Write Command".
->      - Added more util_debug lines in handler functions.
->
-> Arman Uguray (11):
->   shared/gatt-server: Implement "Read By Type" request.
->   shared/gatt-server: Implement "Find Information" request.
->   shared/gatt-server: Implement "Write" request and command.
->   shared/gatt-server: Implement "Read" request.
->   shared/gatt-server: Implement "Read Blob" request.
->   shared/att: Handle incoming confirmation PDU.
->   shared/gatt-server: Add functions for sending
->     notifications/indications.
->   shared/gatt-server: Implement "Prepare Write" request.
->   shared/gatt-server: Implement "Execute Write" request.
->   shared/gatt-client: Fix alignment warnings.
->   TODO: Update shared/gatt-server items.
->
->  TODO                     |   26 +-
->  src/shared/att.c         |  119 +++--
->  src/shared/gatt-client.c |    6 +-
->  src/shared/gatt-server.c | 1221 +++++++++++++++++++++++++++++++++++++++++++---
->  src/shared/gatt-server.h |   12 +
->  5 files changed, 1257 insertions(+), 127 deletions(-)
->
-> --
-> 2.1.0.rc2.206.gedb03e5
+      AVCTP Control: Response: type 0x00 label 4 PID 0x110e
+        AV/C: Stable: address 0x48 opcode 0x00
+          Subunit: Panel
+          Opcode: Vendor Dependent
+          Company ID: 0x001958
+          AVRCP: GetElementAttributes pt Single len 0x0040
+            AttributeCount: 0x04
+            Attribute: 0x00000001 (Title)
+            CharsetID: 0x006a (UTF-8)
+            AttributeValueLength: 0x0008
+            AttributeValue: fernando
+            Attribute: 0x00000002 (Artist)
+            CharsetID: 0x006a (UTF-8)
+            AttributeValueLength: 0x0004
+            AttributeValue: abba
+            Attribute: 0x00000003 (Album)
+            CharsetID: 0x006a (UTF-8)
+            AttributeValueLength: 0x000d
+            AttributeValue: Greatest Hits
+            Attribute: 0x00000007 (Track duration)
+            CharsetID: 0x006a (UTF-8)
+            AttributeValueLength: 0x0006
+            AttributeValue: 150000
+---
+ monitor/avctp.c | 20 +++++++++++++-------
+ 1 file changed, 13 insertions(+), 7 deletions(-)
 
-I went ahead and applied this set, I will probably send a patch in a
-moment adding a timeout for db read/write operations, I figure 1
-seconds should be enough to start with since LE is focus on low
-latency, if that doesn't cut it we should adjust the write queue
-according to how many operation it can deliver before it times out.
-
-
+diff --git a/monitor/avctp.c b/monitor/avctp.c
+index 4abd18f..11dc9b2 100644
+--- a/monitor/avctp.c
++++ b/monitor/avctp.c
+@@ -1122,7 +1122,9 @@ response:
+ 		num = avrcp_continuing.num;
+ 
+ 		if (avrcp_continuing.size > 0) {
++			char attrval[UINT8_MAX];
+ 			uint16_t size;
++			uint8_t idx;
+ 
+ 			if (avrcp_continuing.size > len) {
+ 				size = len;
+@@ -1132,16 +1134,17 @@ response:
+ 				avrcp_continuing.size = 0;
+ 			}
+ 
+-			printf("ContinuingAttributeValue: ");
+-			for (; size > 0; size--) {
++			for (idx = 0; size > 0; idx++, size--) {
+ 				uint8_t c;
+ 
+ 				if (!l2cap_frame_get_u8(frame, &c))
+ 					goto failed;
+ 
+-				printf("%1c", isprint(c) ? c : '.');
++				sprintf(&attrval[idx], "%1c",
++							isprint(c) ? c : '.');
+ 			}
+-			printf("\n");
++			print_field("%*cContinuingAttributeValue: %s",
++						(indent - 8), ' ', attrval);
+ 
+ 			len -= size;
+ 		}
+@@ -1153,6 +1156,8 @@ response:
+ 	while (num > 0 && len > 0) {
+ 		uint32_t attr;
+ 		uint16_t charset, attrlen;
++		uint8_t idx;
++		char attrval[UINT8_MAX];
+ 
+ 		if (!l2cap_frame_get_be32(frame, &attr))
+ 			goto failed;
+@@ -1175,15 +1180,16 @@ response:
+ 		len -= sizeof(attr) + sizeof(charset) + sizeof(attrlen);
+ 		num--;
+ 
+-		print_field("%*cAttributeValue: ", (indent - 8), ' ');
+-		for (; attrlen > 0 && len > 0; attrlen--, len--) {
++		for (idx = 0; attrlen > 0 && len > 0; idx++, attrlen--, len--) {
+ 			uint8_t c;
+ 
+ 			if (!l2cap_frame_get_u8(frame, &c))
+ 				goto failed;
+ 
+-			printf("%1c", isprint(c) ? c : '.');
++			sprintf(&attrval[idx], "%1c", isprint(c) ? c : '.');
+ 		}
++		print_field("%*cAttributeValue: %s", (indent - 8),
++								' ', attrval);
+ 
+ 		if (attrlen > 0)
+ 			avrcp_continuing.size = attrlen;
 -- 
-Luiz Augusto von Dentz
+1.9.1
+
