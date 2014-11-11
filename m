@@ -1,182 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Tue, 11 Nov 2014 16:35:02 -0500
+From: "John W. Linville" <linville@tuxdriver.com>
+To: linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: pull request: bluetooth-next 2014-11-07
+Message-ID: <20141111213501.GG6780@tuxdriver.com>
+References: <20141107092754.GA6995@t440s.lan>
 MIME-Version: 1.0
-In-Reply-To: <1415715778-28994-1-git-send-email-luiz.dentz@gmail.com>
-References: <1415715778-28994-1-git-send-email-luiz.dentz@gmail.com>
-Date: Tue, 11 Nov 2014 13:47:31 -0800
-Message-ID: <CAHrH25QeE9_L92fnzGCpQ+MA1FCp0rNHhbY7aEwHEsAEqVxdmw@mail.gmail.com>
-Subject: Re: [PATCH BlueZ] shared/gatt-db: Add timeout to read/write
-From: Arman Uguray <armansito@chromium.org>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20141107092754.GA6995@t440s.lan>
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
-
-> On Tue, Nov 11, 2014 at 6:22 AM, Luiz Augusto von Dentz <luiz.dentz@gmail.com> wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->
-> This adds a timeout (1 second) to attribute operations since these can
-> cause unexpected transport disconnections if they take too long to
-> complete.
+On Fri, Nov 07, 2014 at 11:27:54AM +0200, Johan Hedberg wrote:
+> Hi John
+> 
+> Here's another set of patches for 3.19. Most of it is again fixes and
+> cleanups to ieee802154 related code from Alexander Aring. We've also got
+> better handling of hardware error events along with a proper API for HCI
+> drivers to notify the HCI core of such situations. There's also a minor
+> fix for mgmt events as well as a sparse warning fix. The code for
+> sending HCI commands synchronously also gets a fix where we might loose
+> the completion event in the case of very fast HW (particularly easily
+> reproducible with an emulated HCI device).
+> 
+> Please let me know if there are any issues pulling. Thanks.
+> 
+> Johan
+> 
 > ---
->  src/shared/gatt-db.c | 66 ++++++++++++++++++++++++++++++++++++++++++++++++----
->  1 file changed, 61 insertions(+), 5 deletions(-)
->
-> diff --git a/src/shared/gatt-db.c b/src/shared/gatt-db.c
-> index bab1202..a39eec2 100644
-> --- a/src/shared/gatt-db.c
-> +++ b/src/shared/gatt-db.c
-> @@ -22,14 +22,17 @@
->   */
->
->  #include <stdbool.h>
-> +#include <errno.h>
->
->  #include "lib/uuid.h"
->  #include "src/shared/util.h"
->  #include "src/shared/queue.h"
-> +#include "src/shared/timeout.h"
->  #include "src/shared/gatt-db.h"
->
->  #define MAX_CHAR_DECL_VALUE_LEN 19
->  #define MAX_INCLUDED_VALUE_LEN 6
-> +#define ATTRIBUTE_TIMEOUT 1000
->
->  static const bt_uuid_t primary_service_uuid = { .type = BT_UUID16,
->                                         .value.u16 = GATT_PRIM_SVC_UUID };
-> @@ -46,13 +49,17 @@ struct gatt_db {
->  };
->
->  struct pending_read {
-> +       struct gatt_db_attribute *attrib;
->         unsigned int id;
-> +       unsigned int timeout_id;
->         gatt_db_attribute_read_t func;
->         void *user_data;
->  };
->
->  struct pending_write {
-> +       struct gatt_db_attribute *attrib;
->         unsigned int id;
-> +       unsigned int timeout_id;
->         gatt_db_attribute_write_t func;
->         void *user_data;
->  };
-> @@ -773,6 +780,30 @@ bool gatt_db_attribute_get_permissions(struct gatt_db_attribute *attrib,
->         return true;
->  }
->
-> +static void pending_read_result(struct pending_read *p, int err,
-> +                                       const uint8_t *data, size_t length)
-> +{
-> +       if (p->timeout_id > 0)
-> +               timeout_remove(p->timeout_id);
-> +
-> +       p->func(p->attrib, err, data, length, p->user_data);
-> +
-> +       free(p);
-> +}
-> +
-> +static bool read_timeout(void *user_data)
-> +{
-> +       struct pending_read *p = user_data;
-> +
-> +       p->timeout_id = 0;
-> +
-> +       queue_remove(p->attrib->pending_reads, p);
-> +
-> +       pending_read_result(p, -ETIMEDOUT, NULL, 0);
-> +
-> +       return false;
-> +}
-> +
->  bool gatt_db_attribute_read(struct gatt_db_attribute *attrib, uint16_t offset,
->                                 uint8_t opcode, bdaddr_t *bdaddr,
->                                 gatt_db_attribute_read_t func, void *user_data)
-> @@ -789,7 +820,10 @@ bool gatt_db_attribute_read(struct gatt_db_attribute *attrib, uint16_t offset,
->                 if (!p)
->                         return false;
->
-> +               p->attrib = attrib;
->                 p->id = ++attrib->read_id;
-> +               p->timeout_id = timeout_add(ATTRIBUTE_TIMEOUT, read_timeout,
-> +                                                               p, NULL);
->                 p->func = func;
->                 p->user_data = user_data;
->
-> @@ -834,11 +868,32 @@ bool gatt_db_attribute_read_result(struct gatt_db_attribute *attrib,
->         if (!p)
->                 return false;
->
-> -       p->func(attrib, err, value, length, p->user_data);
-> +       pending_read_result(p, err, value, length);
-> +
-> +       return true;
-> +}
-> +
-> +static void pending_write_result(struct pending_write *p, int err)
-> +{
-> +       if (p->timeout_id > 0)
-> +               timeout_remove(p->timeout_id);
-> +
-> +       p->func(p->attrib, err, p->user_data);
->
->         free(p);
-> +}
->
-> -       return true;
-> +static bool write_timeout(void *user_data)
-> +{
-> +       struct pending_write *p = user_data;
-> +
-> +       p->timeout_id = 0;
-> +
-> +       queue_remove(p->attrib->pending_writes, p);
-> +
-> +       pending_write_result(p, -ETIMEDOUT);
-> +
-> +       return false;
->  }
->
->  bool gatt_db_attribute_write(struct gatt_db_attribute *attrib, uint16_t offset,
-> @@ -857,7 +912,10 @@ bool gatt_db_attribute_write(struct gatt_db_attribute *attrib, uint16_t offset,
->                 if (!p)
->                         return false;
->
-> +               p->attrib = attrib;
->                 p->id = ++attrib->write_id;
-> +               p->timeout_id = timeout_add(ATTRIBUTE_TIMEOUT, write_timeout,
-> +                                                               p, NULL);
->                 p->func = func;
->                 p->user_data = user_data;
->
-> @@ -900,9 +958,7 @@ bool gatt_db_attribute_write_result(struct gatt_db_attribute *attrib,
->         if (!p)
->                 return false;
->
-> -       p->func(attrib, err, p->user_data);
-> -
-> -       free(p);
-> +       pending_write_result(p, err);
->
->         return true;
->  }
-> --
-> 1.9.3
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> The following changes since commit 6bc6c49f1e2f3ab1bec05d1c08aad219ab4eb5d0:
+> 
+>   mwifiex: add cfg80211 dump_survey handler (2014-10-31 16:07:49 -0400)
+> 
+> are available in the git repository at:
+> 
+>   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git for-upstream
+> 
+> for you to fetch changes up to 56b2c3eea398c772dd895dc62c18cbdd1ba127b1:
+> 
+>   6lowpan: move skb_free from error paths in decompression (2014-11-06 22:09:48 +0100)
 
-Overall I'm OK with this patch. One thing we need to figure out now
-though is deciding how we should report an errno like -ETIMEDOUT in an
-ATT Error Response. Right now I report 0xff if the error is negative
-or larger than UINT8_MAX (see
-src/shared/gatt-server.c:att_ecode_from_error), though we may want to
-map this to a more reasonable ATT application error.
+Pulling now...
 
-Cheers,
-Arman
+-- 
+John W. Linville		Someday the world will need a hero, and you
+linville@tuxdriver.com			might be all we have.  Be ready.
