@@ -1,211 +1,119 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1415707626-13531-1-git-send-email-ravikumar.veeramally@linux.intel.com>
-References: <1415707626-13531-1-git-send-email-ravikumar.veeramally@linux.intel.com>
-Date: Tue, 11 Nov 2014 15:13:14 +0200
-Message-ID: <CABBYNZ+vOdv72-1M4AwrG+njT3M0c3onTsUEnm8EXS6_=rKa-A@mail.gmail.com>
-Subject: Re: [PATCH_v3] android/avrcp: Add initial support for new AVRCP CTRL interface
+In-Reply-To: <1415706842-2106-1-git-send-email-vikram.pal@samsung.com>
+References: <1415706842-2106-1-git-send-email-vikram.pal@samsung.com>
+Date: Tue, 11 Nov 2014 14:46:44 +0200
+Message-ID: <CABBYNZJBqUggHXC88BhDT6ez97-V2AmMpwhwGgmz=J1S=3YZuw@mail.gmail.com>
+Subject: Re: [PATCH v2] monitor: Fix AVRCP GetElementAttributes formatting issue
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+To: Vikrampal Yadav <vikram.pal@samsung.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	Dmitry Kasatkin <d.kasatkin@samsung.com>, cpgs@samsung.com
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Ravi,
+Hi Vikram,
 
-On Tue, Nov 11, 2014 at 2:07 PM, Ravi kumar Veeramally
-<ravikumar.veeramally@linux.intel.com> wrote:
+On Tue, Nov 11, 2014 at 1:54 PM, Vikrampal Yadav <vikram.pal@samsung.com> wrote:
+> AVRCP GetElementAttributes formatting issue for AttributeValue fixed.
+>
+>       AVCTP Control: Response: type 0x00 label 4 PID 0x110e
+>         AV/C: Stable: address 0x48 opcode 0x00
+>           Subunit: Panel
+>           Opcode: Vendor Dependent
+>           Company ID: 0x001958
+>           AVRCP: GetElementAttributes pt Single len 0x0040
+>             AttributeCount: 0x04
+>             Attribute: 0x00000001 (Title)
+>             CharsetID: 0x006a (UTF-8)
+>             AttributeValueLength: 0x0008
+>             AttributeValue: fernando
+>             Attribute: 0x00000002 (Artist)
+>             CharsetID: 0x006a (UTF-8)
+>             AttributeValueLength: 0x0004
+>             AttributeValue: abba
+>             Attribute: 0x00000003 (Album)
+>             CharsetID: 0x006a (UTF-8)
+>             AttributeValueLength: 0x000d
+>             AttributeValue: Greatest Hits
+>             Attribute: 0x00000007 (Track duration)
+>             CharsetID: 0x006a (UTF-8)
+>             AttributeValueLength: 0x0006
+>             AttributeValue: 150000
 > ---
->  android/avrcp.c | 95 ++++++++++++++++++++++++++++++++++++++++++++++++---------
->  android/avrcp.h |  4 +++
->  android/main.c  | 11 +++++++
->  3 files changed, 96 insertions(+), 14 deletions(-)
+>  monitor/avctp.c | 20 +++++++++++++-------
+>  1 file changed, 13 insertions(+), 7 deletions(-)
 >
-> diff --git a/android/avrcp.c b/android/avrcp.c
-> index a0d412d..87335c3 100644
-> --- a/android/avrcp.c
-> +++ b/android/avrcp.c
-> @@ -60,6 +60,7 @@ static uint32_t record_ct_id = 0;
->  static GSList *devices = NULL;
->  static GIOChannel *server = NULL;
->  static struct ipc *hal_ipc = NULL;
-> +static struct ipc *hal_ipc_ctrl = NULL;
+> diff --git a/monitor/avctp.c b/monitor/avctp.c
+> index 4abd18f..11dc9b2 100644
+> --- a/monitor/avctp.c
+> +++ b/monitor/avctp.c
+> @@ -1122,7 +1122,9 @@ response:
+>                 num = avrcp_continuing.num;
 >
->  struct avrcp_request {
->         struct avrcp_device *dev;
-> @@ -1082,20 +1083,22 @@ bool bt_avrcp_register(struct ipc *ipc, const bdaddr_t *addr, uint8_t mode)
->         }
->         record_tg_id = rec->handle;
+>                 if (avrcp_continuing.size > 0) {
+> +                       char attrval[UINT8_MAX];
+>                         uint16_t size;
+> +                       uint8_t idx;
 >
-> -       rec = avrcp_ct_record();
-> -       if (!rec) {
-> -               error("Failed to allocate AVRCP CT record");
-> -               bt_adapter_remove_record(record_tg_id);
-> -               goto fail;
-> -       }
-> +       if (!record_ct_id) {
-> +               rec = avrcp_ct_record();
-> +               if (!rec) {
-> +                       error("Failed to allocate AVRCP CT record");
-> +                       bt_adapter_remove_record(record_tg_id);
-> +                       goto fail;
-> +               }
+>                         if (avrcp_continuing.size > len) {
+>                                 size = len;
+> @@ -1132,16 +1134,17 @@ response:
+>                                 avrcp_continuing.size = 0;
+>                         }
 >
-> -       if (bt_adapter_add_record(rec, 0) < 0) {
-> -               error("Failed to register AVRCP CT record");
-> -               bt_adapter_remove_record(record_tg_id);
-> -               sdp_record_free(rec);
-> -               goto fail;
-> +               if (bt_adapter_add_record(rec, 0) < 0) {
-> +                       error("Failed to register AVRCP CT record");
-> +                       bt_adapter_remove_record(record_tg_id);
-> +                       sdp_record_free(rec);
-> +                       goto fail;
-> +               }
-> +               record_ct_id = rec->handle;
->         }
-> -       record_ct_id = rec->handle;
+> -                       printf("ContinuingAttributeValue: ");
+> -                       for (; size > 0; size--) {
+> +                       for (idx = 0; size > 0; idx++, size--) {
+>                                 uint8_t c;
 >
->         hal_ipc = ipc;
+>                                 if (!l2cap_frame_get_u8(frame, &c))
+>                                         goto failed;
 >
-> @@ -1124,8 +1127,11 @@ void bt_avrcp_unregister(void)
->         bt_adapter_remove_record(record_tg_id);
->         record_tg_id = 0;
+> -                               printf("%1c", isprint(c) ? c : '.');
+> +                               sprintf(&attrval[idx], "%1c",
+> +                                                       isprint(c) ? c : '.');
+>                         }
+> -                       printf("\n");
+> +                       print_field("%*cContinuingAttributeValue: %s",
+> +                                               (indent - 8), ' ', attrval);
 >
-> -       bt_adapter_remove_record(record_ct_id);
-> -       record_ct_id = 0;
-> +       /* Remove only when AVRCP Controller already unregistered */
-> +       if (!hal_ipc_ctrl) {
-> +               bt_adapter_remove_record(record_ct_id);
-> +               record_ct_id = 0;
-> +       }
->
->         if (server) {
->                 g_io_channel_shutdown(server, TRUE, NULL);
-> @@ -1171,3 +1177,64 @@ void bt_avrcp_disconnect(const bdaddr_t *dst)
->
->         avrcp_device_remove(dev);
->  }
-> +
-> +static void handle_send_passthrough(const void *buf, uint16_t len)
-> +{
-> +       DBG("Not Implemented");
-> +
-> +       ipc_send_rsp(hal_ipc_ctrl, HAL_SERVICE_ID_AVRCP_CTRL,
-> +                                       HAL_OP_AVRCP_CTRL_SEND_PASSTHROUGH,
-> +                                                       HAL_STATUS_UNSUPPORTED);
-> +}
-> +
-> +static const struct ipc_handler ctrl_cmd_handlers[] = {
-> +       /* HAL_OP_AVRCP_CTRL_SEND_PASSTHROUGH */
-> +       { handle_send_passthrough, false,
-> +                       sizeof(struct hal_cmd_avrcp_ctrl_send_passthrough) },
-> +};
-> +
-> +bool bt_avrcp_ctrl_register(struct ipc *ipc, const bdaddr_t *addr, uint8_t mode)
-> +{
-> +       sdp_record_t *rec;
-> +
-> +       DBG("");
-> +
-> +       if (!record_ct_id) {
-> +               rec = avrcp_ct_record();
-> +               if (!rec) {
-> +                       error("Failed to allocate AVRCP CT record");
-> +                       goto fail;
-> +               }
-> +
-> +               if (bt_adapter_add_record(rec, 0) < 0) {
-> +                       error("Failed to register AVRCP CT record");
-> +                       sdp_record_free(rec);
-> +                       goto fail;
-> +               }
-> +               record_ct_id = rec->handle;
-> +       }
-> +
-> +       hal_ipc_ctrl = ipc;
-> +
-> +       ipc_register(hal_ipc_ctrl, HAL_SERVICE_ID_AVRCP_CTRL, ctrl_cmd_handlers,
-> +                                       G_N_ELEMENTS(ctrl_cmd_handlers));
-> +
-> +       return true;
-> +
-> +fail:
-> +       return false;
-> +}
-> +
-> +void bt_avrcp_ctrl_unregister(void)
-> +{
-> +       DBG("");
-> +
-> +       ipc_unregister(hal_ipc_ctrl, HAL_SERVICE_ID_AVRCP_CTRL);
-> +       hal_ipc_ctrl = NULL;
-> +
-> +       /* Remove only when AVRCP Target already unregistered */
-> +       if (!hal_ipc) {
-> +               bt_adapter_remove_record(record_ct_id);
-> +               record_ct_id = 0;
-> +       }
-> +}
-
-Looking a second time I believe this has still some problems,
-bt_avrcp_ctrl_register may be called without bt_avrcp_register which
-mean server, etc would not be initialized. Btw, perhaps a helper
-functions would make sense so you can put common code necessary for
-register/unregister independent of the interface.
-
-> diff --git a/android/avrcp.h b/android/avrcp.h
-> index 11e79b7..0af9f14 100644
-> --- a/android/avrcp.h
-> +++ b/android/avrcp.h
-> @@ -24,5 +24,9 @@
->  bool bt_avrcp_register(struct ipc *ipc, const bdaddr_t *addr, uint8_t mode);
->  void bt_avrcp_unregister(void);
->
-> +bool bt_avrcp_ctrl_register(struct ipc *ipc, const bdaddr_t *addr,
-> +                                                               uint8_t mode);
-> +void bt_avrcp_ctrl_unregister(void);
-> +
->  void bt_avrcp_connect(const bdaddr_t *dst);
->  void bt_avrcp_disconnect(const bdaddr_t *dst);
-> diff --git a/android/main.c b/android/main.c
-> index 58dd9ab..21becf6 100644
-> --- a/android/main.c
-> +++ b/android/main.c
-> @@ -208,6 +208,14 @@ static void service_register(const void *buf, uint16_t len)
+>                         len -= size;
 >                 }
+> @@ -1153,6 +1156,8 @@ response:
+>         while (num > 0 && len > 0) {
+>                 uint32_t attr;
+>                 uint16_t charset, attrlen;
+> +               uint8_t idx;
+> +               char attrval[UINT8_MAX];
 >
->                 break;
-> +       case HAL_SERVICE_ID_AVRCP_CTRL:
-> +               if (!bt_avrcp_ctrl_register(hal_ipc, &adapter_bdaddr,
-> +                                                               m->mode)) {
-> +                       status = HAL_STATUS_FAILED;
-> +                       goto failed;
-> +               }
-> +
-> +               break;
->         case HAL_SERVICE_ID_HANDSFREE:
->                 if (!bt_handsfree_register(hal_ipc, &adapter_bdaddr, m->mode,
->                                                         m->max_clients)) {
-> @@ -286,6 +294,9 @@ static bool unregister_service(uint8_t id)
->         case HAL_SERVICE_ID_AVRCP:
->                 bt_avrcp_unregister();
->                 break;
-> +       case HAL_SERVICE_ID_AVRCP_CTRL:
-> +               bt_avrcp_ctrl_unregister();
-> +               break;
->         case HAL_SERVICE_ID_HANDSFREE:
->                 bt_handsfree_unregister();
->                 break;
-> --
-> 2.1.0
+>                 if (!l2cap_frame_get_be32(frame, &attr))
+>                         goto failed;
+> @@ -1175,15 +1180,16 @@ response:
+>                 len -= sizeof(attr) + sizeof(charset) + sizeof(attrlen);
+>                 num--;
 >
+> -               print_field("%*cAttributeValue: ", (indent - 8), ' ');
+> -               for (; attrlen > 0 && len > 0; attrlen--, len--) {
+> +               for (idx = 0; attrlen > 0 && len > 0; idx++, attrlen--, len--) {
+>                         uint8_t c;
+>
+>                         if (!l2cap_frame_get_u8(frame, &c))
+>                                 goto failed;
+>
+> -                       printf("%1c", isprint(c) ? c : '.');
+> +                       sprintf(&attrval[idx], "%1c", isprint(c) ? c : '.');
+>                 }
+> +               print_field("%*cAttributeValue: %s", (indent - 8),
+> +                                                               ' ', attrval);
+>
+>                 if (attrlen > 0)
+>                         avrcp_continuing.size = attrlen;
 > --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> 1.9.1
 
+Applied, thanks.
 
 
 -- 
