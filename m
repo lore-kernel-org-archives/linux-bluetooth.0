@@ -1,40 +1,61 @@
 Return-Path: <cyrus@holtmann.org>
+MIME-Version: 1.0
+In-Reply-To: <CABBYNZLHzxY01_ESgP3ra6xByNAcN_GO9B146W=v+nL4pk7jhw@mail.gmail.com>
+References: <1415392919-17572-1-git-send-email-armansito@chromium.org>
+	<1415392919-17572-9-git-send-email-armansito@chromium.org>
+	<CABBYNZJL5mHR8OGK5sLi81aeDHBs-UxZj5oJ6b3VKG-C_mD4GA@mail.gmail.com>
+	<CAHrH25T5FhZZ=rsMAYjZpX8RenKFCpxv=hdNmAfQuVg7e9exAw@mail.gmail.com>
+	<CABBYNZLHzxY01_ESgP3ra6xByNAcN_GO9B146W=v+nL4pk7jhw@mail.gmail.com>
+Date: Tue, 11 Nov 2014 13:35:28 -0800
+Message-ID: <CAHrH25Q6NzxAdBng6Pm9SQeVqz2PbHx7pRRDEczLHrsgpzNCgQ@mail.gmail.com>
+Subject: Re: [PATCH BlueZ v1 08/11] shared/gatt-server: Implement "Prepare
+ Write" request.
 From: Arman Uguray <armansito@chromium.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Arman Uguray <armansito@chromium.org>
-Subject: [PATCH BlueZ 0/8] Introduce tools/btgatt-server and other bug fixes.
-Date: Tue, 11 Nov 2014 13:39:39 -0800
-Message-Id: <1415741987-22272-1-git-send-email-armansito@chromium.org>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch set introduces tools/btgatt-server. This tool serves as a
-standalone demo of combining shared/gatt-db, shared/gatt-server, and a
-listening L2CAP socket on the ATT channel. The tool exposes the GAP and
-GATT services, as well as a Heart Rate service. It's possible to hide/unhide
-the latter to test Service Changed events.
+Hi Luiz,
 
-The set also includes two small bug fixes for the way Service Changed
-characteristics are handled by shared/gatt-client.
+> On Tue, Nov 11, 2014 at 3:42 AM, Luiz Augusto von Dentz <luiz.dentz@gmail.com> wrote:
+> Hi Arman,
+>
+> On Mon, Nov 10, 2014 at 6:26 PM, Arman Uguray <armansito@chromium.org> wrote:
+>>>> diff --git a/src/shared/gatt-server.h b/src/shared/gatt-server.h
+>>>> index 0e480e1..a95613c 100644
+>>>> --- a/src/shared/gatt-server.h
+>>>> +++ b/src/shared/gatt-server.h
+>>>> @@ -40,6 +40,9 @@ bool bt_gatt_server_set_debug(struct bt_gatt_server *server,
+>>>>                                         void *user_data,
+>>>>                                         bt_gatt_server_destroy_func_t destroy);
+>>>>
+>>>> +bool bt_gatt_server_set_max_prep_queue_length(struct bt_gatt_server *server,
+>>>> +                                                       unsigned int length);
+>>>
+>>> Perhaps we should leave this API for later, Im not really sure if this
+>>> will be ever used except perhaps for the TS in that case perhaps we
+>>> should find a shorter name.
+>>>
+>>
+>> In our case would it even make sense to have a maximum queue length? I
+>> only added because there is an error for it and an application with
+>> memory constraints may want to limit the size perhaps? Anyway, for now
+>> I can set this to something arbitrary for v2.
+>
+> Perhaps having some arbitrary limit is good enough, not exactly
+> because of memory constraints since each entry should consume just a
+> few bytes but we don't want to timeout so I suggest we queue based on
+> how long we should wait the result to be called.
+>
 
-Arman Uguray (8):
-  tools/btgatt-server: Introduce btgatt-server.
-  tools/btgatt-server: Accept incoming connection and initialize server.
-  tools/btgatt-server: Populate the database.
-  tools/btgatt-server: Add command support and the notify command.
-  tools/btgatt-server: Add Heart Rate service simulation.
-  tools/btgatt-server: Add "heart-rate" command.
-  shared/gatt-client: Fix bug in service changed handler.
-  shared/gatt-client: Watch CCC while registering Service Changed
-    handler.
+OK, that makes a lot of sense. For now we can keep the arbitrary limit
+and see how well it works.
 
- .gitignore               |    1 +
- Makefile.tools           |    8 +
- src/shared/gatt-client.c |   25 +-
- tools/btgatt-server.c    | 1065 ++++++++++++++++++++++++++++++++++++++++++++++
- 4 files changed, 1093 insertions(+), 6 deletions(-)
- create mode 100644 tools/btgatt-server.c
+> --
+> Luiz Augusto von Dentz
 
--- 
-2.1.0.rc2.206.gedb03e5
 
+Cheers,
+Arman
