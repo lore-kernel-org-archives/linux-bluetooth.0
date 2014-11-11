@@ -2,284 +2,275 @@ Return-Path: <cyrus@holtmann.org>
 From: Arman Uguray <armansito@chromium.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Arman Uguray <armansito@chromium.org>
-Subject: [PATCH BlueZ 4/8] tools/btgatt-server: Add command support and the notify command.
-Date: Tue, 11 Nov 2014 13:39:43 -0800
-Message-Id: <1415741987-22272-5-git-send-email-armansito@chromium.org>
+Subject: [PATCH BlueZ 2/8] tools/btgatt-server: Accept incoming connection and initialize server.
+Date: Tue, 11 Nov 2014 13:39:41 -0800
+Message-Id: <1415741987-22272-3-git-send-email-armansito@chromium.org>
 In-Reply-To: <1415741987-22272-1-git-send-email-armansito@chromium.org>
 References: <1415741987-22272-1-git-send-email-armansito@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch adds a command REPL and introduces the "notify" command which
-allows sending notifications and indications.
+This patch adds code that listens for incoming connections and creates a
+bt_gatt_server and bt_att structure once a connection is accepted.
 ---
- tools/btgatt-server.c | 230 ++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 230 insertions(+)
+ tools/btgatt-server.c | 215 +++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 213 insertions(+), 2 deletions(-)
 
 diff --git a/tools/btgatt-server.c b/tools/btgatt-server.c
-index 9e94b3e..067e258 100644
+index 4508de2..bee6275 100644
 --- a/tools/btgatt-server.c
 +++ b/tools/btgatt-server.c
-@@ -26,6 +26,7 @@
+@@ -25,6 +25,7 @@
+ #include <stdint.h>
  #include <stdlib.h>
  #include <getopt.h>
- #include <unistd.h>
-+#include <errno.h>
++#include <unistd.h>
  
  #include <bluetooth/bluetooth.h>
  #include <bluetooth/hci.h>
-@@ -476,6 +477,217 @@ static int l2cap_le_att_listen_and_accept(bdaddr_t *src, int sec)
- 	return nsk;
- }
+@@ -32,8 +33,135 @@
+ #include <bluetooth/l2cap.h>
+ #include "lib/uuid.h"
  
-+static void notify_usage(void)
-+{
-+	printf("Usage: notify [options] <value_handle> <value>\n"
-+					"Options:\n"
-+					"\t -i, --indicate\tSend indication\n"
-+					"e.g.:\n"
-+					"\tnotify 0x0001 00 01 00\n");
-+}
++#include "monitor/mainloop.h"
++#include "src/shared/util.h"
++#include "src/shared/att.h"
++#include "src/shared/queue.h"
++#include "src/shared/gatt-db.h"
++#include "src/shared/gatt-server.h"
 +
-+static struct option notify_options[] = {
-+	{ "indicate",	0, 0, 'i' },
-+	{ }
++#define ATT_CID 4
++
++#define PRLOG(...) \
++	do { \
++		printf(__VA_ARGS__); \
++		print_prompt(); \
++	} while (0)
++
++#define COLOR_OFF	"\x1B[0m"
++#define COLOR_RED	"\x1B[0;91m"
++#define COLOR_GREEN	"\x1B[0;92m"
++#define COLOR_YELLOW	"\x1B[0;93m"
++#define COLOR_BLUE	"\x1B[0;94m"
++#define COLOR_MAGENTA	"\x1B[0;95m"
++#define COLOR_BOLDGRAY	"\x1B[1;30m"
++#define COLOR_BOLDWHITE	"\x1B[1;37m"
++
+ static bool verbose = false;
+ 
++struct server {
++	int fd;
++	struct gatt_db *db;
++	struct bt_gatt_server *gatt;
 +};
 +
-+static bool parse_args(char *str, int expected_argc,  char **argv, int *argc)
++static void print_prompt(void)
 +{
-+	char **ap;
-+
-+	for (ap = argv; (*ap = strsep(&str, " \t")) != NULL;) {
-+		if (**ap == '\0')
-+			continue;
-+
-+		(*argc)++;
-+		ap++;
-+
-+		if (*argc > expected_argc)
-+			return false;
-+	}
-+
-+	return true;
++	printf(COLOR_BLUE "[GATT server]" COLOR_OFF "# ");
++	fflush(stdout);
 +}
 +
-+static void conf_cb(void *user_data)
++static void att_disconnect_cb(void *user_data)
 +{
-+	PRLOG("Received confirmation\n");
++	printf("Device disconnected\n");
++
++	mainloop_quit();
 +}
 +
-+static void cmd_notify(struct server *server, char *cmd_str)
++static void att_debug_cb(const char *str, void *user_data)
 +{
-+	int opt, i;
-+	char *argvbuf[516];
-+	char **argv = argvbuf;
-+	int argc = 1;
-+	uint16_t handle;
-+	char *endptr = NULL;
-+	int length;
-+	uint8_t *value = NULL;
-+	bool indicate = false;
++	const char *prefix = user_data;
 +
-+	if (!parse_args(cmd_str, 514, argv + 1, &argc)) {
-+		printf("Too many arguments\n");
-+		notify_usage();
-+		return;
-+	}
-+
-+	optind = 0;
-+	argv[0] = "notify";
-+	while ((opt = getopt_long(argc, argv, "+i", notify_options,
-+								NULL)) != -1) {
-+		switch (opt) {
-+		case 'i':
-+			indicate = true;
-+			break;
-+		default:
-+			notify_usage();
-+			return;
-+		}
-+	}
-+
-+	argc -= optind;
-+	argv += optind;
-+
-+	if (argc < 1) {
-+		notify_usage();
-+		return;
-+	}
-+
-+	handle = strtol(argv[0], &endptr, 16);
-+	if (!endptr || *endptr != '\0' || !handle) {
-+		printf("Invalid handle: %s\n", argv[0]);
-+		return;
-+	}
-+
-+	length = argc - 1;
-+
-+	if (length > 0) {
-+		if (length > UINT16_MAX) {
-+			printf("Value too long\n");
-+			return;
-+		}
-+
-+		value = malloc(length);
-+		if (!value) {
-+			printf("Failed to construct value\n");
-+			return;
-+		}
-+
-+		for (i = 1; i < argc; i++) {
-+			if (strlen(argv[i]) != 2) {
-+				printf("Invalid value byte: %s\n",
-+								argv[i]);
-+				goto done;
-+			}
-+
-+			value[i-1] = strtol(argv[i], &endptr, 16);
-+			if (endptr == argv[i] || *endptr != '\0'
-+							|| errno == ERANGE) {
-+				printf("Invalid value byte: %s\n",
-+								argv[i]);
-+				goto done;
-+			}
-+		}
-+	}
-+
-+	if (indicate) {
-+		if (!bt_gatt_server_send_indication(server->gatt, handle,
-+							value, length,
-+							conf_cb, NULL, NULL))
-+			printf("Failed to initiate indication\n");
-+	} else if (!bt_gatt_server_send_notification(server->gatt, handle,
-+								value, length))
-+		printf("Failed to initiate notification\n");
-+
-+done:
-+	free(value);
++	PRLOG(COLOR_BOLDGRAY "%s" COLOR_BOLDWHITE "%s\n" COLOR_OFF, prefix,
++									str);
 +}
 +
-+static void cmd_help(struct server *server, char *cmd_str);
-+
-+typedef void (*command_func_t)(struct server *server, char *cmd_str);
-+
-+static struct {
-+	char *cmd;
-+	command_func_t func;
-+	char *doc;
-+} command[] = {
-+	{ "help", cmd_help, "\tDisplay help message" },
-+	{ "notify", cmd_notify, "\tSend handle-value notification" },
-+	{ }
-+};
-+
-+static void cmd_help(struct server *server, char *cmd_str)
++static void gatt_debug_cb(const char *str, void *user_data)
 +{
-+	int i;
++	const char *prefix = user_data;
 +
-+	printf("Commands:\n");
-+	for (i = 0; command[i].cmd; i++)
-+		printf("\t%-15s\t%s\n", command[i].cmd, command[i].doc);
++	PRLOG(COLOR_GREEN "%s%s\n" COLOR_OFF, prefix, str);
 +}
 +
-+static void prompt_read_cb(int fd, uint32_t events, void *user_data)
++static struct server *server_create(int fd, uint16_t mtu)
 +{
-+	ssize_t read;
-+	size_t len = 0;
-+	char *line = NULL;
-+	char *cmd = NULL, *args;
-+	struct server *server = user_data;
-+	int i;
++	struct server *server;
++	struct bt_att *att;
 +
-+	if (events & (EPOLLRDHUP | EPOLLHUP | EPOLLERR)) {
-+		mainloop_quit();
-+		return;
++	server = new0(struct server, 1);
++	if (!server) {
++		fprintf(stderr, "Failed to allocate memory for server\n");
++		return NULL;
 +	}
 +
-+	if ((read = getline(&line, &len, stdin)) == -1)
-+		return;
-+
-+	if (read <= 1) {
-+		cmd_help(server, NULL);
-+		print_prompt();
-+		return;
++	att = bt_att_new(fd);
++	if (!att) {
++		fprintf(stderr, "Failed to initialze ATT transport layer\n");
++		bt_att_unref(att);
++		free(server);
++		return NULL;
 +	}
 +
-+	line[read-1] = '\0';
-+	args = line;
-+
-+	while ((cmd = strsep(&args, " \t")))
-+		if (*cmd != '\0')
-+			break;
-+
-+	if (!cmd)
-+		goto failed;
-+
-+	for (i = 0; command[i].cmd; i++) {
-+		if (strcmp(command[i].cmd, cmd) == 0)
-+			break;
++	if (!bt_att_set_close_on_unref(att, true)) {
++		fprintf(stderr, "Failed to set up ATT transport layer\n");
++		bt_att_unref(att);
++		free(server);
++		return NULL;
 +	}
 +
-+	if (command[i].cmd)
-+		command[i].func(server, args);
-+	else
-+		fprintf(stderr, "Unknown command: %s\n", line);
++	if (!bt_att_register_disconnect(att, att_disconnect_cb, NULL, NULL)) {
++		fprintf(stderr, "Failed to set ATT disconnect handler\n");
++		bt_att_unref(att);
++		free(server);
++		return NULL;
++	}
 +
-+failed:
-+	print_prompt();
++	server->fd = fd;
++	server->db = gatt_db_new();
++	if (!server->db) {
++		fprintf(stderr, "Failed to create GATT database\n");
++		bt_att_unref(att);
++		free(server);
++		return NULL;
++	}
 +
-+	free(line);
++	server->gatt = bt_gatt_server_new(server->db, att, mtu);
++	if (!server->gatt) {
++		fprintf(stderr, "Failed to create GATT server\n");
++		gatt_db_destroy(server->db);
++		bt_att_unref(att);
++		free(server);
++		return NULL;
++	}
++
++	if (verbose) {
++		bt_att_set_debug(att, att_debug_cb, "att: ", NULL);
++		bt_gatt_server_set_debug(server->gatt, gatt_debug_cb,
++							"server: ", NULL);
++	}
++
++	/* bt_gatt_server already holds a reference */
++	bt_att_unref(att);
++
++	return server;
 +}
 +
-+static void signal_cb(int signum, void *user_data)
++static void server_destroy(struct server *server)
 +{
-+	switch (signum) {
-+	case SIGINT:
-+	case SIGTERM:
-+		mainloop_quit();
-+		break;
-+	default:
-+		break;
++	bt_gatt_server_unref(server->gatt);
++	gatt_db_destroy(server->db);
++}
++
+ static void usage(void)
+ {
+ 	printf("btgatt-server\n");
+@@ -57,6 +185,67 @@ static struct option main_options[] = {
+ 	{ }
+ };
+ 
++static int l2cap_le_att_listen_and_accept(bdaddr_t *src, int sec)
++{
++	int sk, nsk;
++	struct sockaddr_l2 srcaddr, addr;
++	socklen_t optlen;
++	struct bt_security btsec;
++	char ba[18];
++
++	sk = socket(PF_BLUETOOTH, SOCK_SEQPACKET, BTPROTO_L2CAP);
++	if (sk < 0) {
++		perror("Failed to create L2CAP sket");
++		return -1;
 +	}
++
++	/* Set up source address */
++	memset(&srcaddr, 0, sizeof(srcaddr));
++	srcaddr.l2_family = AF_BLUETOOTH;
++	srcaddr.l2_cid = htobs(ATT_CID);
++	srcaddr.l2_bdaddr_type = 0;
++	bacpy(&srcaddr.l2_bdaddr, src);
++
++	if (bind(sk, (struct sockaddr *)&srcaddr, sizeof(srcaddr)) < 0) {
++		perror("Failed to bind L2CAP sket");
++		close(sk);
++		return -1;
++	}
++
++	/* Set the security level */
++	memset(&btsec, 0, sizeof(btsec));
++	btsec.level = sec;
++	if (setsockopt(sk, SOL_BLUETOOTH, BT_SECURITY, &btsec,
++							sizeof(btsec)) != 0) {
++		fprintf(stderr, "Failed to set L2CAP security level\n");
++		close(sk);
++		return -1;
++	}
++
++	if (listen(sk, 10) < 0) {
++		perror("Listening on socket failed");
++		close(sk);
++		return -1;
++	}
++
++	printf("Started listening on ATT channel. Waiting for connections\n");
++
++	memset(&addr, 0, sizeof(addr));
++	optlen = sizeof(addr);
++	nsk = accept(sk, (struct sockaddr *)&addr, &optlen);
++	if (nsk < 0) {
++		perror("Accept failed");
++		close(sk);
++		return -1;
++	}
++
++	ba2str(&addr.l2_bdaddr, ba);
++	printf("Connect from %s\n", ba);
++	close(sk);
++
++	return nsk;
 +}
 +
  int main(int argc, char *argv[])
  {
  	int opt;
-@@ -484,6 +696,7 @@ int main(int argc, char *argv[])
+@@ -64,6 +253,8 @@ int main(int argc, char *argv[])
+ 	uint16_t mtu = 0;
  	bdaddr_t src_addr;
  	int dev_id = -1;
- 	int fd;
-+	sigset_t mask;
- 	struct server *server;
++	int fd;
++	struct server *server;
  
  	while ((opt = getopt_long(argc, argv, "+hvs:m:i:",
-@@ -568,8 +781,25 @@ int main(int argc, char *argv[])
+ 						main_options, NULL)) != -1) {
+@@ -133,7 +324,27 @@ int main(int argc, char *argv[])
  		return EXIT_FAILURE;
  	}
  
-+	if (mainloop_add_fd(fileno(stdin),
-+				EPOLLIN | EPOLLRDHUP | EPOLLHUP | EPOLLERR,
-+				prompt_read_cb, server, NULL) < 0) {
-+		fprintf(stderr, "Failed to initialize console\n");
-+		server_destroy(server);
-+
+-	/* TODO: Set up mainloop and listening LE socket */
++	fd = l2cap_le_att_listen_and_accept(&src_addr, sec);
++	if (fd < 0) {
++		fprintf(stderr, "Failed to accept L2CAP ATT connection\n");
 +		return EXIT_FAILURE;
 +	}
 +
- 	printf("Running GATT server\n");
++	mainloop_init();
++
++	server = server_create(fd, mtu);
++	if (!server) {
++		close(fd);
++		return EXIT_FAILURE;
++	}
++
++	printf("Running GATT server\n");
++
++	mainloop_run();
++
++	printf("\n\nShutting down...\n");
++
++	server_destroy(server);
  
-+	sigemptyset(&mask);
-+	sigaddset(&mask, SIGINT);
-+	sigaddset(&mask, SIGTERM);
-+
-+	mainloop_set_signal(&mask, signal_cb, NULL, NULL);
-+
-+	print_prompt();
-+
- 	mainloop_run();
- 
- 	printf("\n\nShutting down...\n");
+-	return 0;
++	return EXIT_SUCCESS;
+ }
 -- 
 2.1.0.rc2.206.gedb03e5
 
