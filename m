@@ -1,117 +1,41 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1415706842-2106-1-git-send-email-vikram.pal@samsung.com>
-References: <1415706842-2106-1-git-send-email-vikram.pal@samsung.com>
-Date: Tue, 11 Nov 2014 14:46:44 +0200
-Message-ID: <CABBYNZJBqUggHXC88BhDT6ez97-V2AmMpwhwGgmz=J1S=3YZuw@mail.gmail.com>
-Subject: Re: [PATCH v2] monitor: Fix AVRCP GetElementAttributes formatting issue
+In-Reply-To: <1415664656-36676-1-git-send-email-jamuraa@chromium.org>
+References: <1415664656-36676-1-git-send-email-jamuraa@chromium.org>
+Date: Tue, 11 Nov 2014 14:41:01 +0200
+Message-ID: <CABBYNZJgwjDFtYY-iSwqzqpyVgE8_0qN=4ZrY4PCsABF4BP-Ow@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] shared/att: bugfix for BT_ATT_ALL_REQUESTS
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Vikrampal Yadav <vikram.pal@samsung.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	Dmitry Kasatkin <d.kasatkin@samsung.com>, cpgs@samsung.com
+To: Michael Janssen <jamuraa@chromium.org>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Vikram,
+Hi Michael,
 
-On Tue, Nov 11, 2014 at 1:54 PM, Vikrampal Yadav <vikram.pal@samsung.com> wrote:
-> AVRCP GetElementAttributes formatting issue for AttributeValue fixed.
+On Tue, Nov 11, 2014 at 2:10 AM, Michael Janssen <jamuraa@chromium.org> wrote:
+> opcode can now be zero, since that is BT_ATT_ALL_REQUESTS
 >
->       AVCTP Control: Response: type 0x00 label 4 PID 0x110e
->         AV/C: Stable: address 0x48 opcode 0x00
->           Subunit: Panel
->           Opcode: Vendor Dependent
->           Company ID: 0x001958
->           AVRCP: GetElementAttributes pt Single len 0x0040
->             AttributeCount: 0x04
->             Attribute: 0x00000001 (Title)
->             CharsetID: 0x006a (UTF-8)
->             AttributeValueLength: 0x0008
->             AttributeValue: fernando
->             Attribute: 0x00000002 (Artist)
->             CharsetID: 0x006a (UTF-8)
->             AttributeValueLength: 0x0004
->             AttributeValue: abba
->             Attribute: 0x00000003 (Album)
->             CharsetID: 0x006a (UTF-8)
->             AttributeValueLength: 0x000d
->             AttributeValue: Greatest Hits
->             Attribute: 0x00000007 (Track duration)
->             CharsetID: 0x006a (UTF-8)
->             AttributeValueLength: 0x0006
->             AttributeValue: 150000
 > ---
->  monitor/avctp.c | 20 +++++++++++++-------
->  1 file changed, 13 insertions(+), 7 deletions(-)
+>  src/shared/att.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 >
-> diff --git a/monitor/avctp.c b/monitor/avctp.c
-> index 4abd18f..11dc9b2 100644
-> --- a/monitor/avctp.c
-> +++ b/monitor/avctp.c
-> @@ -1122,7 +1122,9 @@ response:
->                 num = avrcp_continuing.num;
+> diff --git a/src/shared/att.c b/src/shared/att.c
+> index aa80cef..48c36ac 100644
+> --- a/src/shared/att.c
+> +++ b/src/shared/att.c
+> @@ -1115,7 +1115,7 @@ unsigned int bt_att_register(struct bt_att *att, uint8_t opcode,
+>  {
+>         struct att_notify *notify;
 >
->                 if (avrcp_continuing.size > 0) {
-> +                       char attrval[UINT8_MAX];
->                         uint16_t size;
-> +                       uint8_t idx;
+> -       if (!att || !opcode || !callback || !att->io)
+> +       if (!att || !callback || !att->io)
+>                 return 0;
 >
->                         if (avrcp_continuing.size > len) {
->                                 size = len;
-> @@ -1132,16 +1134,17 @@ response:
->                                 avrcp_continuing.size = 0;
->                         }
->
-> -                       printf("ContinuingAttributeValue: ");
-> -                       for (; size > 0; size--) {
-> +                       for (idx = 0; size > 0; idx++, size--) {
->                                 uint8_t c;
->
->                                 if (!l2cap_frame_get_u8(frame, &c))
->                                         goto failed;
->
-> -                               printf("%1c", isprint(c) ? c : '.');
-> +                               sprintf(&attrval[idx], "%1c",
-> +                                                       isprint(c) ? c : '.');
->                         }
-> -                       printf("\n");
-> +                       print_field("%*cContinuingAttributeValue: %s",
-> +                                               (indent - 8), ' ', attrval);
->
->                         len -= size;
->                 }
-> @@ -1153,6 +1156,8 @@ response:
->         while (num > 0 && len > 0) {
->                 uint32_t attr;
->                 uint16_t charset, attrlen;
-> +               uint8_t idx;
-> +               char attrval[UINT8_MAX];
->
->                 if (!l2cap_frame_get_be32(frame, &attr))
->                         goto failed;
-> @@ -1175,15 +1180,16 @@ response:
->                 len -= sizeof(attr) + sizeof(charset) + sizeof(attrlen);
->                 num--;
->
-> -               print_field("%*cAttributeValue: ", (indent - 8), ' ');
-> -               for (; attrlen > 0 && len > 0; attrlen--, len--) {
-> +               for (idx = 0; attrlen > 0 && len > 0; idx++, attrlen--, len--) {
->                         uint8_t c;
->
->                         if (!l2cap_frame_get_u8(frame, &c))
->                                 goto failed;
->
-> -                       printf("%1c", isprint(c) ? c : '.');
-> +                       sprintf(&attrval[idx], "%1c", isprint(c) ? c : '.');
->                 }
-> +               print_field("%*cAttributeValue: %s", (indent - 8),
-> +                                                               ' ', attrval);
->
->                 if (attrlen > 0)
->                         avrcp_continuing.size = attrlen;
+>         notify = new0(struct att_notify, 1);
 > --
-> 1.9.1
+> 2.1.0.rc2.206.gedb03e5
 
 Applied, thanks.
 
