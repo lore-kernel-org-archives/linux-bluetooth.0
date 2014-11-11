@@ -1,108 +1,49 @@
 Return-Path: <cyrus@holtmann.org>
-From: Vikrampal Yadav <vikram.pal@samsung.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: luiz.dentz@gmail.com, d.kasatkin@samsung.com,
-	vikram.pal@samsung.com, cpgs@samsung.com
-Subject: [PATCH v2] monitor: Fix AVRCP GetElementAttributes formatting issue
-Date: Tue, 11 Nov 2014 17:24:02 +0530
-Message-id: <1415706842-2106-1-git-send-email-vikram.pal@samsung.com>
+MIME-Version: 1.0
+In-Reply-To: <CAHrH25T5FhZZ=rsMAYjZpX8RenKFCpxv=hdNmAfQuVg7e9exAw@mail.gmail.com>
+References: <1415392919-17572-1-git-send-email-armansito@chromium.org>
+	<1415392919-17572-9-git-send-email-armansito@chromium.org>
+	<CABBYNZJL5mHR8OGK5sLi81aeDHBs-UxZj5oJ6b3VKG-C_mD4GA@mail.gmail.com>
+	<CAHrH25T5FhZZ=rsMAYjZpX8RenKFCpxv=hdNmAfQuVg7e9exAw@mail.gmail.com>
+Date: Tue, 11 Nov 2014 13:42:11 +0200
+Message-ID: <CABBYNZLHzxY01_ESgP3ra6xByNAcN_GO9B146W=v+nL4pk7jhw@mail.gmail.com>
+Subject: Re: [PATCH BlueZ v1 08/11] shared/gatt-server: Implement "Prepare
+ Write" request.
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Arman Uguray <armansito@chromium.org>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-AVRCP GetElementAttributes formatting issue for AttributeValue fixed.
+Hi Arman,
 
-      AVCTP Control: Response: type 0x00 label 4 PID 0x110e
-        AV/C: Stable: address 0x48 opcode 0x00
-          Subunit: Panel
-          Opcode: Vendor Dependent
-          Company ID: 0x001958
-          AVRCP: GetElementAttributes pt Single len 0x0040
-            AttributeCount: 0x04
-            Attribute: 0x00000001 (Title)
-            CharsetID: 0x006a (UTF-8)
-            AttributeValueLength: 0x0008
-            AttributeValue: fernando
-            Attribute: 0x00000002 (Artist)
-            CharsetID: 0x006a (UTF-8)
-            AttributeValueLength: 0x0004
-            AttributeValue: abba
-            Attribute: 0x00000003 (Album)
-            CharsetID: 0x006a (UTF-8)
-            AttributeValueLength: 0x000d
-            AttributeValue: Greatest Hits
-            Attribute: 0x00000007 (Track duration)
-            CharsetID: 0x006a (UTF-8)
-            AttributeValueLength: 0x0006
-            AttributeValue: 150000
----
- monitor/avctp.c | 20 +++++++++++++-------
- 1 file changed, 13 insertions(+), 7 deletions(-)
+On Mon, Nov 10, 2014 at 6:26 PM, Arman Uguray <armansito@chromium.org> wrote:
+>>> diff --git a/src/shared/gatt-server.h b/src/shared/gatt-server.h
+>>> index 0e480e1..a95613c 100644
+>>> --- a/src/shared/gatt-server.h
+>>> +++ b/src/shared/gatt-server.h
+>>> @@ -40,6 +40,9 @@ bool bt_gatt_server_set_debug(struct bt_gatt_server *server,
+>>>                                         void *user_data,
+>>>                                         bt_gatt_server_destroy_func_t destroy);
+>>>
+>>> +bool bt_gatt_server_set_max_prep_queue_length(struct bt_gatt_server *server,
+>>> +                                                       unsigned int length);
+>>
+>> Perhaps we should leave this API for later, Im not really sure if this
+>> will be ever used except perhaps for the TS in that case perhaps we
+>> should find a shorter name.
+>>
+>
+> In our case would it even make sense to have a maximum queue length? I
+> only added because there is an error for it and an application with
+> memory constraints may want to limit the size perhaps? Anyway, for now
+> I can set this to something arbitrary for v2.
 
-diff --git a/monitor/avctp.c b/monitor/avctp.c
-index 4abd18f..11dc9b2 100644
---- a/monitor/avctp.c
-+++ b/monitor/avctp.c
-@@ -1122,7 +1122,9 @@ response:
- 		num = avrcp_continuing.num;
- 
- 		if (avrcp_continuing.size > 0) {
-+			char attrval[UINT8_MAX];
- 			uint16_t size;
-+			uint8_t idx;
- 
- 			if (avrcp_continuing.size > len) {
- 				size = len;
-@@ -1132,16 +1134,17 @@ response:
- 				avrcp_continuing.size = 0;
- 			}
- 
--			printf("ContinuingAttributeValue: ");
--			for (; size > 0; size--) {
-+			for (idx = 0; size > 0; idx++, size--) {
- 				uint8_t c;
- 
- 				if (!l2cap_frame_get_u8(frame, &c))
- 					goto failed;
- 
--				printf("%1c", isprint(c) ? c : '.');
-+				sprintf(&attrval[idx], "%1c",
-+							isprint(c) ? c : '.');
- 			}
--			printf("\n");
-+			print_field("%*cContinuingAttributeValue: %s",
-+						(indent - 8), ' ', attrval);
- 
- 			len -= size;
- 		}
-@@ -1153,6 +1156,8 @@ response:
- 	while (num > 0 && len > 0) {
- 		uint32_t attr;
- 		uint16_t charset, attrlen;
-+		uint8_t idx;
-+		char attrval[UINT8_MAX];
- 
- 		if (!l2cap_frame_get_be32(frame, &attr))
- 			goto failed;
-@@ -1175,15 +1180,16 @@ response:
- 		len -= sizeof(attr) + sizeof(charset) + sizeof(attrlen);
- 		num--;
- 
--		print_field("%*cAttributeValue: ", (indent - 8), ' ');
--		for (; attrlen > 0 && len > 0; attrlen--, len--) {
-+		for (idx = 0; attrlen > 0 && len > 0; idx++, attrlen--, len--) {
- 			uint8_t c;
- 
- 			if (!l2cap_frame_get_u8(frame, &c))
- 				goto failed;
- 
--			printf("%1c", isprint(c) ? c : '.');
-+			sprintf(&attrval[idx], "%1c", isprint(c) ? c : '.');
- 		}
-+		print_field("%*cAttributeValue: %s", (indent - 8),
-+								' ', attrval);
- 
- 		if (attrlen > 0)
- 			avrcp_continuing.size = attrlen;
+Perhaps having some arbitrary limit is good enough, not exactly
+because of memory constraints since each entry should consume just a
+few bytes but we don't want to timeout so I suggest we queue based on
+how long we should wait the result to be called.
+
 -- 
-1.9.1
-
+Luiz Augusto von Dentz
