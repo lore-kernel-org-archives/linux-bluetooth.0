@@ -2,27 +2,101 @@ Return-Path: <cyrus@holtmann.org>
 From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH v3 4/4] android/handsfree-client: Handle disconnect command
-Date: Tue, 11 Nov 2014 18:52:57 +0100
-Message-Id: <1415728377-20880-5-git-send-email-lukasz.rymanowski@tieto.com>
+Subject: [PATCH v3 1/4] android/handsfree-client: Add incoming connection handling
+Date: Tue, 11 Nov 2014 18:52:54 +0100
+Message-Id: <1415728377-20880-2-git-send-email-lukasz.rymanowski@tieto.com>
 In-Reply-To: <1415728377-20880-1-git-send-email-lukasz.rymanowski@tieto.com>
 References: <1415728377-20880-1-git-send-email-lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This function adds handling of handsfree client disconnect.
-This patch also moves device_set_state and device_destroy funtion in the
-file as this is needed by the handle_disconnect
 ---
- android/handsfree-client.c | 118 ++++++++++++++++++++++++++++++---------------
- 1 file changed, 80 insertions(+), 38 deletions(-)
+ android/handsfree-client.c | 184 ++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 181 insertions(+), 3 deletions(-)
 
 diff --git a/android/handsfree-client.c b/android/handsfree-client.c
-index ebf5d89..c576ae8 100644
+index aa3912b..88301a6 100644
 --- a/android/handsfree-client.c
 +++ b/android/handsfree-client.c
-@@ -193,11 +193,89 @@ static struct device *get_device(const bdaddr_t *addr)
- 	return NULL;
+@@ -36,6 +36,8 @@
+ #include "lib/sdp_lib.h"
+ #include "src/sdp-client.h"
+ #include "src/shared/queue.h"
++#include "src/shared/util.h"
++#include "btio/btio.h"
+ #include "ipc.h"
+ #include "ipc-common.h"
+ #include "src/log.h"
+@@ -64,6 +66,11 @@
+ 				HFP_HF_FEAT_RVC | HFP_HF_FEAT_ECS |\
+ 				HFP_HF_FEAT_ECC)
+ 
++struct device {
++	bdaddr_t bdaddr;
++	uint8_t state;
++};
++
+ static bdaddr_t adapter_addr;
+ 
+ static struct ipc *hal_ipc = NULL;
+@@ -71,6 +78,55 @@ static struct ipc *hal_ipc = NULL;
+ static uint32_t hfp_hf_features = 0;
+ static uint32_t hfp_hf_record_id = 0;
+ static struct queue *devices = NULL;
++static GIOChannel *hfp_hf_server = NULL;
++
++static bool match_by_bdaddr(const void *data, const void *user_data)
++{
++	const bdaddr_t *addr1 = data;
++	const bdaddr_t *addr2 = user_data;
++
++	return !bacmp(addr1, addr2);
++}
++
++static struct device *find_device(const bdaddr_t *addr)
++{
++	return queue_find(devices, match_by_bdaddr, addr);
++}
++
++static struct device *device_create(const bdaddr_t *bdaddr)
++{
++	struct device *dev;
++
++	dev = new0(struct device, 1);
++	if (!dev)
++		return NULL;
++
++	if (!queue_push_tail(devices, dev)) {
++		error("hf-client: Could not push dev on the list");
++		free(dev);
++		return NULL;
++	}
++
++	bacpy(&dev->bdaddr, bdaddr);
++	dev->state = HAL_HF_CLIENT_CONN_STATE_DISCONNECTED;
++
++	return dev;
++}
++
++static struct device *get_device(const bdaddr_t *addr)
++{
++	struct device *dev;
++
++	dev = find_device(addr);
++	if (dev)
++		return dev;
++
++	/* We do support only one device as for now */
++	if (queue_isempty(devices))
++		return device_create(addr);
++
++	return NULL;
++}
+ 
+ static void handle_connect(const void *buf, uint16_t len)
+ {
+@@ -192,6 +248,102 @@ static void handle_get_last_vc_tag_num(const void *buf, uint16_t len)
+ 					HAL_STATUS_UNSUPPORTED);
  }
  
 +static void device_set_state(struct device *dev, uint8_t state)
@@ -43,9 +117,6 @@ index ebf5d89..c576ae8 100644
 +	bdaddr2android(&dev->bdaddr, ev.bdaddr);
 +	ev.state = state;
 +
-+	ev.chld_feat = dev->chld_features;
-+	ev.peer_feat = dev->features;
-+
 +	ipc_send_notif(hal_ipc, HAL_SERVICE_ID_HANDSFREE_CLIENT,
 +				HAL_EV_HF_CLIENT_CONN_STATE, sizeof(ev), &ev);
 +}
@@ -54,108 +125,145 @@ index ebf5d89..c576ae8 100644
 +{
 +	device_set_state(dev, HAL_HF_CLIENT_CONN_STATE_DISCONNECTED);
 +	queue_remove(devices, dev);
-+
-+	if (dev->hf)
-+		hfp_hf_unref(dev->hf);
-+
 +	free(dev);
 +}
 +
- static void handle_disconnect(const void *buf, uint16_t len)
- {
--	DBG("Not Implemented");
-+	const struct hal_cmd_hf_client_disconnect *cmd = buf;
-+	struct device *dev;
-+	uint32_t status;
-+	bdaddr_t bdaddr;
-+	char addr[18];
++static void connect_cb(GIOChannel *chan, GError *err, gpointer user_data)
++{
++	struct device *dev = user_data;
 +
 +	DBG("");
 +
-+	android2bdaddr(&cmd->bdaddr, &bdaddr);
++	if (err) {
++		error("hf-client: connect failed (%s)", err->message);
++		goto failed;
++	}
 +
-+	ba2str(&bdaddr, addr);
-+	DBG("Disconnect %s", addr);
++	g_io_channel_set_close_on_unref(chan, FALSE);
++
++	/* TODO Create SLC here. For now do nothing, link will be dropped */
++
++	return;
++
++failed:
++	g_io_channel_shutdown(chan, TRUE, NULL);
++	device_destroy(dev);
++}
++
++static void confirm_cb(GIOChannel *chan, gpointer data)
++{
++	struct device *dev;
++	char address[18];
++	bdaddr_t bdaddr;
++	GError *err = NULL;
++
++	bt_io_get(chan, &err,
++			BT_IO_OPT_DEST, address,
++			BT_IO_OPT_DEST_BDADDR, &bdaddr,
++			BT_IO_OPT_INVALID);
++	if (err) {
++		error("hf-client: confirm failed (%s)", err->message);
++		g_error_free(err);
++		goto drop;
++	}
++
++	DBG("Incoming connection from %s", address);
 +
 +	dev = get_device(&bdaddr);
 +	if (!dev) {
-+		status = HAL_STATUS_FAILED;
-+		goto done;
++		error("hf-client: There is other AG connected");
++		goto drop;
 +	}
 +
-+	if (dev->state == HAL_HF_CLIENT_CONN_STATE_DISCONNECTED) {
-+		status = HAL_STATUS_FAILED;
-+		goto done;
++	if (dev->state != HAL_HF_CLIENT_CONN_STATE_DISCONNECTED) {
++		/* TODO: Handle colision */
++		error("hf-client: Connections is up or ongoing ?");
++		goto drop;
 +	}
 +
-+	if (dev->state == HAL_HF_CLIENT_CONN_STATE_DISCONNECTING) {
-+		status = HAL_STATUS_SUCCESS;
-+		goto done;
-+	}
++	device_set_state(dev, HAL_HF_CLIENT_CONN_STATE_CONNECTING);
 +
-+	if (dev->state == HAL_HF_CLIENT_CONN_STATE_CONNECTING) {
++	if (!bt_io_accept(chan, connect_cb, dev, NULL, NULL)) {
++		error("hf-client: failed to accept connection");
 +		device_destroy(dev);
-+		status = HAL_STATUS_SUCCESS;
-+		goto done;
++		goto drop;
 +	}
 +
-+	status = hfp_hf_disconnect(dev->hf) ? HAL_STATUS_SUCCESS :
-+							HAL_STATUS_FAILED;
++	return;
 +
-+	if (status)
-+		device_set_state(dev, HAL_HF_CLIENT_CONN_STATE_DISCONNECTING);
++drop:
++	g_io_channel_shutdown(chan, TRUE, NULL);
++}
 +
-+done:
-+
- 	ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_HANDSFREE_CLIENT,
--			HAL_OP_HF_CLIENT_DISCONNECT, HAL_STATUS_UNSUPPORTED);
-+			HAL_OP_HF_CLIENT_DISCONNECT, status);
- }
- 
- static void handle_connect_audio(const void *buf, uint16_t len)
-@@ -306,42 +384,6 @@ static void handle_get_last_vc_tag_num(const void *buf, uint16_t len)
- 					HAL_STATUS_UNSUPPORTED);
- }
- 
--static void device_set_state(struct device *dev, uint8_t state)
--{
--	struct hal_ev_hf_client_conn_state ev;
--	char address[18];
--
--	if (dev->state == state)
--		return;
--
--	memset(&ev, 0, sizeof(ev));
--
--	dev->state = state;
--
--	ba2str(&dev->bdaddr, address);
--	DBG("device %s state %u", address, state);
--
--	bdaddr2android(&dev->bdaddr, ev.bdaddr);
--	ev.state = state;
--
--	ev.chld_feat = dev->chld_features;
--	ev.peer_feat = dev->features;
--
--	ipc_send_notif(hal_ipc, HAL_SERVICE_ID_HANDSFREE_CLIENT,
--				HAL_EV_HF_CLIENT_CONN_STATE, sizeof(ev), &ev);
--}
--
--static void device_destroy(struct device *dev)
--{
--	device_set_state(dev, HAL_HF_CLIENT_CONN_STATE_DISCONNECTED);
--	queue_remove(devices, dev);
--
--	if (dev->hf)
--		hfp_hf_unref(dev->hf);
--
--	free(dev);
--}
--
- static void disconnect_watch(void *user_data)
+ static const struct ipc_handler cmd_handlers[] = {
+ 	/* HAL_OP_HF_CLIENT_CONNECT */
+ 	{ handle_connect, false,
+@@ -304,28 +456,54 @@ static sdp_record_t *hfp_hf_record(void)
+ static bool enable_hf_client(void)
  {
- 	DBG("");
+ 	sdp_record_t *rec;
++	GError *err = NULL;
++
++	hfp_hf_server =  bt_io_listen(NULL, confirm_cb, NULL, NULL, &err,
++					BT_IO_OPT_SOURCE_BDADDR, &adapter_addr,
++					BT_IO_OPT_CHANNEL, HFP_HF_CHANNEL,
++					BT_IO_OPT_SEC_LEVEL, BT_IO_SEC_MEDIUM,
++					BT_IO_OPT_INVALID);
++	if (!hfp_hf_server) {
++		error("hf-client: Failed to listen on Handsfree rfcomm: %s",
++								err->message);
++		g_error_free(err);
++		return false;
++	}
+ 
+ 	hfp_hf_features = HFP_HF_FEATURES;
+ 
+ 	rec = hfp_hf_record();
+ 	if (!rec) {
+ 		error("hf-client: Could not create service record");
+-		return false;
++		goto failed;
+ 	}
+ 
+ 	if (bt_adapter_add_record(rec, 0) < 0) {
+ 		error("hf-client: Failed to register service record");
+ 		sdp_record_free(rec);
+-		return false;
++		goto failed;
+ 	}
+ 
+ 	hfp_hf_record_id = rec->handle;
+ 
+ 	return true;
++
++failed:
++	g_io_channel_shutdown(hfp_hf_server, TRUE, NULL);
++	g_io_channel_unref(hfp_hf_server);
++	hfp_hf_server = NULL;
++
++	return false;
+ }
+ 
+ static void cleanup_hfp_hf(void)
+ {
++	if (hfp_hf_server) {
++		g_io_channel_shutdown(hfp_hf_server, TRUE, NULL);
++		g_io_channel_unref(hfp_hf_server);
++		hfp_hf_server = NULL;
++	}
++
+ 	if (hfp_hf_record_id > 0) {
+ 		bt_adapter_remove_record(hfp_hf_record_id);
+ 		hfp_hf_record_id = 0;
+@@ -366,7 +544,7 @@ void bt_hf_client_unregister(void)
+ 
+ 	cleanup_hfp_hf();
+ 
+-	queue_destroy(devices, free);
++	queue_destroy(devices, (void *) device_destroy);
+ 	devices = NULL;
+ 
+ 	ipc_unregister(hal_ipc, HAL_SERVICE_ID_HANDSFREE);
 -- 
 1.8.4
 
