@@ -1,32 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 8.0 \(1990.1\))
-Subject: Re: [PATCH] Bluetooth: 6lowpan: Remove unnecessary RCU callback
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1415708189-7184-1-git-send-email-johan.hedberg@gmail.com>
-Date: Tue, 11 Nov 2014 22:27:25 +0900
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <4BB86E93-1B3A-418C-BB96-24F201F9D66C@holtmann.org>
-References: <1415708189-7184-1-git-send-email-johan.hedberg@gmail.com>
-To: Johan Hedberg <johan.hedberg@gmail.com>
+From: Gowtham Anandha Babu <gowtham.ab@samsung.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: 'Bharat Panda' <bharat.panda@samsung.com>, cpgs@samsung.com,
+	'Dmitry Kasatkin' <d.kasatkin@samsung.com>
+Subject: Query regarding sdptool
+Date: Tue, 11 Nov 2014 18:50:13 +0530
+Message-id: <000601cffdb2$4e3e8580$eabb9080$@samsung.com>
+MIME-version: 1.0
+Content-type: text/plain; charset=us-ascii
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+Hi All,
 
-> When kfree() is all that's needed to free an object protected by RCU
-> there's a kfree_rcu() convenience function that can be used. This patch
-> updates the 6lowpan code to use this, thereby eliminating the need for
-> the separate peer_free() function.
-> 
-> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
-> ---
-> net/bluetooth/6lowpan.c | 11 ++---------
-> 1 file changed, 2 insertions(+), 9 deletions(-)
+I am currently testing sdptool. 
+The issues I am facing are, 
 
-patch has been applied to bluetooth-next tree.
+1) When I run ./sdptool del PBAP, I am getting the below error: 
+" No local SDP server!"
 
-Regards
+2) When I run ./sdptool get PBAP, I am getting the below error: 
+"Failed to connect to SDP server on FF:FF:FF:00:00:00: Connection refused"
 
-Marcel
+3) when I run ./sdptool add PBAP, Nothing is printing, I don't know whether
+it is added or not.
+
+Bluetoothd is running and hci0 is up. Is there any file/script that I need
+to run to make Local SDP server UP?
+
+Regards,
+Gowtham Anandha Babu
 
