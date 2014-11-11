@@ -1,31 +1,47 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 11 Nov 2014 10:56:49 -0500 (EST)
-From: Alan Stern <stern@rowland.harvard.edu>
-To: Naveen Kumar Parna <pnaveenkos@gmail.com>
-cc: Oliver Neukum <oneukum@suse.de>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	<linux-usb@vger.kernel.org>, <acho@suse.com>
-Subject: Re: btusb_intr_complete returns -EPIPE
-In-Reply-To: <CAG0bkvKaU8X2g=mjAMJrMk5AiDsS7FbtvccMEaQdC8yJOsxWAA@mail.gmail.com>
-Message-ID: <Pine.LNX.4.44L0.1411111055480.8671-100000@netrider.rowland.org>
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
+In-Reply-To: <000601cffdb2$4e3e8580$eabb9080$@samsung.com>
+References: <000601cffdb2$4e3e8580$eabb9080$@samsung.com>
+Date: Tue, 11 Nov 2014 16:32:38 +0200
+Message-ID: <CABBYNZJrH0pw5trYQu__ndOEHX8_=jT97E0fspd8=r1iPxOr6g@mail.gmail.com>
+Subject: Re: Query regarding sdptool
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Gowtham Anandha Babu <gowtham.ab@samsung.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	Bharat Panda <bharat.panda@samsung.com>, cpgs@samsung.com,
+	Dmitry Kasatkin <d.kasatkin@samsung.com>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Tue, 11 Nov 2014, Naveen Kumar Parna wrote:
+Hi Gowtham,
 
-> I am really glad we reached to a conclusion on this.
-> Thanks for all your help, without which I could not have seen this through.
+On Tue, Nov 11, 2014 at 3:20 PM, Gowtham Anandha Babu
+<gowtham.ab@samsung.com> wrote:
+> Hi All,
+>
+> I am currently testing sdptool.
+> The issues I am facing are,
+>
+> 1) When I run ./sdptool del PBAP, I am getting the below error:
+> " No local SDP server!"
+>
+> 2) When I run ./sdptool get PBAP, I am getting the below error:
+> "Failed to connect to SDP server on FF:FF:FF:00:00:00: Connection refused"
+>
+> 3) when I run ./sdptool add PBAP, Nothing is printing, I don't know whether
+> it is added or not.
+>
+> Bluetoothd is running and hci0 is up. Is there any file/script that I need
+> to run to make Local SDP server UP?
 
-You're welcome.
+First of all you are not suppose to interact with SDP database using
+sdptool, these commands have been deprecated long long time ago. If
+you want to test just registering and removing a record it is probably
+better to use test/test-profile. If you want to check local records
+with sdptool you need to run bluetooth with -C/--compat option and
+root permissions e.g. sudo sdptool browse local.
 
-> Now I am confronted with many of these controllers in my lab, with
-> this hardware issue.
-> I am not sure I can find a better way than just to tell people to replace them.
 
-You could try contacting the manufacturer to see if they are aware of 
-this problem and have any suggestions.
-
-Alan Stern
-
+-- 
+Luiz Augusto von Dentz
