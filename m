@@ -1,43 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
-From: Vikrampal Yadav <vikram.pal@samsung.com>
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: luiz.dentz@gmail.com, d.kasatkin@samsung.com,
-	vikram.pal@samsung.com, cpgs@samsung.com
-Subject: [PATCH 1/3] monitor: Adjust for ERTM control bytes
-Date: Wed, 12 Nov 2014 14:23:14 +0530
-Message-id: <1415782396-28799-1-git-send-email-vikram.pal@samsung.com>
+Subject: [PATCH] android/hal: Fix last service id number
+Date: Wed, 12 Nov 2014 10:22:06 +0200
+Message-Id: <1415780526-20367-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Adjustment for ERTM control bytes fixed.
----
- monitor/l2cap.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-diff --git a/monitor/l2cap.c b/monitor/l2cap.c
-index ebdd20f..b37f20f 100644
---- a/monitor/l2cap.c
-+++ b/monitor/l2cap.c
-@@ -2621,6 +2621,9 @@ static void l2cap_frame(uint16_t index, bool in, uint16_t handle,
- 		connless_packet(index, in, handle, cid, data, size);
- 		break;
- 	case 0x0003:
-+		/* Adjust for ERTM control bytes */
-+		data += 2;
-+		size -= 2;
- 		amp_packet(index, in, handle, cid, data, size);
- 		break;
- 	case 0x0004:
-@@ -2635,6 +2638,9 @@ static void l2cap_frame(uint16_t index, bool in, uint16_t handle,
- 	default:
- 		l2cap_frame_init(&frame, index, in, handle, cid, data, size);
+---
+ android/hal-msg.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/android/hal-msg.h b/android/hal-msg.h
+index eedd37b..773af5b 100644
+--- a/android/hal-msg.h
++++ b/android/hal-msg.h
+@@ -39,7 +39,7 @@ static const char BLUEZ_HAL_SK_PATH[] = "\0bluez_hal_socket";
+ #define HAL_SERVICE_ID_MAP_CLIENT	11
+ #define HAL_SERVICE_ID_AVRCP_CTRL	12
  
-+		if (frame.mode > 0)
-+			l2cap_frame_pull(&frame, &frame, 2);
-+
- 		print_indent(6, COLOR_CYAN, "Channel:", "", COLOR_OFF,
- 				" %d len %d [PSM %d mode %d] {chan %d}",
- 						cid, size, frame.psm,
+-#define HAL_SERVICE_ID_MAX HAL_SERVICE_ID_MAP_CLIENT
++#define HAL_SERVICE_ID_MAX HAL_SERVICE_ID_AVRCP_CTRL
+ 
+ /* Core Service */
+ 
 -- 
 1.9.1
 
