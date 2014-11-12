@@ -2,105 +2,110 @@ Return-Path: <cyrus@holtmann.org>
 From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH 14/14] android/handsfree-client: Implement codec negotiations
-Date: Wed, 12 Nov 2014 11:49:37 +0100
-Message-Id: <1415789377-20458-15-git-send-email-lukasz.rymanowski@tieto.com>
+Subject: [PATCH 02/14] android/handsfree-client: Add volume control handling
+Date: Wed, 12 Nov 2014 11:49:25 +0100
+Message-Id: <1415789377-20458-3-git-send-email-lukasz.rymanowski@tieto.com>
 In-Reply-To: <1415789377-20458-1-git-send-email-lukasz.rymanowski@tieto.com>
 References: <1415789377-20458-1-git-send-email-lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- android/handsfree-client.c | 62 ++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 62 insertions(+)
+ android/handsfree-client.c | 65 ++++++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 63 insertions(+), 2 deletions(-)
 
 diff --git a/android/handsfree-client.c b/android/handsfree-client.c
-index 4338c11..74d1547 100644
+index d8b0bb1..e498f89 100644
 --- a/android/handsfree-client.c
 +++ b/android/handsfree-client.c
-@@ -116,6 +116,7 @@ struct device {
- 	struct hfp_hf *hf;
- 	uint8_t state;
+@@ -391,10 +391,39 @@ done:
  
-+	uint8_t negotiated_codec;
- 	uint32_t features;
- 	struct hfp_codec codecs[2];
- 
-@@ -1034,6 +1035,66 @@ static void binp_cb(struct hfp_context *context, void *user_data)
- 					sizeof(*ev) + ev->number_len, ev);
- }
- 
-+static bool is_codec_supported_localy(struct device *dev, uint8_t codec)
-+{
-+	int i;
-+
-+	for (i = 0; i < CODECS_COUNT; i++) {
-+		if (dev->codecs[i].type != codec)
-+			continue;
-+
-+		return dev->codecs[i].local_supported;
-+	}
-+
-+	return false;
-+}
-+
-+static void bcs_resp(enum hfp_result result, enum hfp_error cme_err,
-+							void *user_data)
-+{
-+	DBG("%d", result);
-+}
-+
-+static void bcs_cb(struct hfp_context *context, void *user_data)
-+{
-+	struct device *dev = user_data;
-+	uint32_t codec;
-+	char codecs_string[2 * CODECS_COUNT + 1];
-+	char cmd[sizeof(codecs_string) + 7];
+ static void handle_volume_control(const void *buf, uint16_t len)
+ {
+-	DBG("Not Implemented");
++	const struct hal_cmd_hf_client_volume_control *cmd = buf;
++	struct device *dev;
++	uint8_t status;
++	bool ret;
 +
 +	DBG("");
 +
-+	if (!context) {
-+		error("hf-client: incorrect BCS response");
-+		return;
++	dev = find_default_device();
++	if (!dev) {
++		status = HAL_STATUS_FAILED;
++		goto done;
 +	}
 +
-+	memset(cmd, 0, sizeof(cmd));
++	switch (cmd->type) {
++	case HF_CLIENT_VOLUME_TYPE_SPEAKER:
++		ret = hfp_hf_send_command(dev->hf, cmd_complete_cb, NULL,
++						"AT+VGS=%d", cmd->volume);
++		break;
++	case HF_CLIENT_VOLUME_TYPE_MIC:
++		ret = hfp_hf_send_command(dev->hf, cmd_complete_cb, NULL,
++						"AT+VGM=%d", cmd->volume);
++		break;
++	default:
++		ret = false;
++		break;
++	}
 +
-+	if (!hfp_context_get_number(context, &codec))
-+		goto failed;
-+
-+	if (!is_codec_supported_localy(dev, codec))
-+		goto failed;
-+
-+	sprintf(cmd, "AT+BCS=%d", codec);
-+
-+	dev->negotiated_codec = codec;
-+
-+	goto done;
-+
-+failed:
-+	error("hf-client: Could not get codec");
-+
-+	strcpy(cmd, "AT+BCS=");
-+
-+	get_local_codecs_string(dev, codecs_string, sizeof(codecs_string));
-+	strcat(cmd, codecs_string);
++	status = ret ? HAL_STATUS_SUCCESS : HAL_STATUS_FAILED;
 +
 +done:
-+	hfp_hf_send_command(dev->hf, bcs_resp, dev, cmd);
+ 	ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_HANDSFREE_CLIENT,
+ 					HAL_OP_HF_CLIENT_VOLUME_CONTROL,
+-					HAL_STATUS_UNSUPPORTED);
++					status);
+ }
+ 
+ static void handle_dial(const void *buf, uint16_t len)
+@@ -543,6 +572,36 @@ static void bvra_cb(struct hfp_context *context, void *user_data)
+ 				HAL_EV_HF_CLIENT_VR_STATE, sizeof(ev), &ev);
+ }
+ 
++static void vgm_cb(struct hfp_context *context, void *user_data)
++{
++	struct hal_ev_hf_client_volume_changed ev;
++	uint32_t val;
++
++	if (!hfp_context_get_number(context, &val))
++		return;
++
++	ev.type = HF_CLIENT_VOLUME_TYPE_MIC;
++	ev.volume = val;
++
++	ipc_send_notif(hal_ipc, HAL_SERVICE_ID_HANDSFREE_CLIENT,
++				HAL_EV_HF_CLIENT_VR_STATE, sizeof(ev), &ev);
++}
++
++static void vgs_cb(struct hfp_context *context, void *user_data)
++{
++	struct hal_ev_hf_client_volume_changed ev;
++	uint32_t val;
++
++	if (!hfp_context_get_number(context, &val))
++		return;
++
++	ev.type = HF_CLIENT_VOLUME_TYPE_SPEAKER;
++	ev.volume = val;
++
++	ipc_send_notif(hal_ipc, HAL_SERVICE_ID_HANDSFREE_CLIENT,
++			HAL_EV_CLIENT_VOLUME_CHANGED, sizeof(ev), &ev);
 +}
 +
  static void slc_completed(struct device *dev)
  {
- 	int i;
-@@ -1064,6 +1125,7 @@ static void slc_completed(struct device *dev)
- 	hfp_hf_register(dev->hf, cops_cb, "+COPS", dev, NULL);
- 	hfp_hf_register(dev->hf, cnum_cb, "+CNUM", dev, NULL);
- 	hfp_hf_register(dev->hf, binp_cb, "+BINP", dev, NULL);
-+	hfp_hf_register(dev->hf, bcs_cb, "+BCS", dev, NULL);
+ 	DBG("");
+@@ -555,6 +614,8 @@ static void slc_completed(struct device *dev)
+ 	 */
  
- 	if (!hfp_hf_send_command(dev->hf, cmd_complete_cb, NULL, "AT+COPS=3,0"))
- 		info("hf-client: Could not send AT+COPS=3,0");
+ 	hfp_hf_register(dev->hf, bvra_cb, "+BRVA", dev, NULL);
++	hfp_hf_register(dev->hf, vgm_cb, "+VGM", dev, NULL);
++	hfp_hf_register(dev->hf, vgs_cb, "+VGS", dev, NULL);
+ }
+ 
+ static void slc_chld_cb(struct hfp_context *context, void *user_data)
 -- 
 1.8.4
 
