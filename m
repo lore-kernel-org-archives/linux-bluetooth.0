@@ -3,60 +3,41 @@ From: Vikrampal Yadav <vikram.pal@samsung.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: luiz.dentz@gmail.com, d.kasatkin@samsung.com,
 	vikram.pal@samsung.com, cpgs@samsung.com
-Subject: [PATCH 2/3] monitor: Fix for GetElementAttributes when
- AttributeValueLength zero
-Date: Wed, 12 Nov 2014 14:23:15 +0530
-Message-id: <1415782396-28799-2-git-send-email-vikram.pal@samsung.com>
-In-reply-to: <1415782396-28799-1-git-send-email-vikram.pal@samsung.com>
-References: <1415782396-28799-1-git-send-email-vikram.pal@samsung.com>
+Subject: [PATCH 1/3] monitor: Adjust for ERTM control bytes
+Date: Wed, 12 Nov 2014 14:23:14 +0530
+Message-id: <1415782396-28799-1-git-send-email-vikram.pal@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-      AVCTP Control: Response: type 0x00 label 0 PID 0x110e
-        AV/C: Stable: address 0x48 opcode 0x00
-          Subunit: Panel
-          Opcode: Vendor Dependent
-          Company ID: 0x001958
-          AVRCP: GetElementAttributes pt Single len 0x0019
-            AttributeCount: 0x03
-            Attribute: 0x00000001 (Title)
-            CharsetID: 0x006a (UTF-8)
-            AttributeValueLength: 0x0000
-            AttributeValue:
-            Attribute: 0x00000002 (Artist)
-            CharsetID: 0x006a (UTF-8)
-            AttributeValueLength: 0x0000
-            AttributeValue:
-            Attribute: 0x00000003 (Album)
-            CharsetID: 0x006a (UTF-8)
-            AttributeValueLength: 0x0000
-            AttributeValue:
+Adjustment for ERTM control bytes fixed.
 ---
- monitor/avctp.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ monitor/l2cap.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-diff --git a/monitor/avctp.c b/monitor/avctp.c
-index 11dc9b2..af91ecc 100644
---- a/monitor/avctp.c
-+++ b/monitor/avctp.c
-@@ -1122,7 +1122,7 @@ response:
- 		num = avrcp_continuing.num;
+diff --git a/monitor/l2cap.c b/monitor/l2cap.c
+index ebdd20f..b37f20f 100644
+--- a/monitor/l2cap.c
++++ b/monitor/l2cap.c
+@@ -2621,6 +2621,9 @@ static void l2cap_frame(uint16_t index, bool in, uint16_t handle,
+ 		connless_packet(index, in, handle, cid, data, size);
+ 		break;
+ 	case 0x0003:
++		/* Adjust for ERTM control bytes */
++		data += 2;
++		size -= 2;
+ 		amp_packet(index, in, handle, cid, data, size);
+ 		break;
+ 	case 0x0004:
+@@ -2635,6 +2638,9 @@ static void l2cap_frame(uint16_t index, bool in, uint16_t handle,
+ 	default:
+ 		l2cap_frame_init(&frame, index, in, handle, cid, data, size);
  
- 		if (avrcp_continuing.size > 0) {
--			char attrval[UINT8_MAX];
-+			char attrval[UINT8_MAX] = {0};
- 			uint16_t size;
- 			uint8_t idx;
- 
-@@ -1157,7 +1157,7 @@ response:
- 		uint32_t attr;
- 		uint16_t charset, attrlen;
- 		uint8_t idx;
--		char attrval[UINT8_MAX];
-+		char attrval[UINT8_MAX] = {0};
- 
- 		if (!l2cap_frame_get_be32(frame, &attr))
- 			goto failed;
++		if (frame.mode > 0)
++			l2cap_frame_pull(&frame, &frame, 2);
++
+ 		print_indent(6, COLOR_CYAN, "Channel:", "", COLOR_OFF,
+ 				" %d len %d [PSM %d mode %d] {chan %d}",
+ 						cid, size, frame.psm,
 -- 
 1.9.1
 
