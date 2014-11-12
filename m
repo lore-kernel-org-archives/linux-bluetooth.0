@@ -1,68 +1,55 @@
 Return-Path: <cyrus@holtmann.org>
 From: johan.hedberg@gmail.com
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 2/2] Bluetooth: Fix L2CAP socket lock nesting level
-Date: Wed, 12 Nov 2014 22:08:30 +0200
-Message-Id: <1415822910-25657-3-git-send-email-johan.hedberg@gmail.com>
-In-Reply-To: <1415822910-25657-1-git-send-email-johan.hedberg@gmail.com>
-References: <1415822910-25657-1-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH 0/2] Bluetooth: Lock nesting for L2CAP channels and sockets
+Date: Wed, 12 Nov 2014 22:08:28 +0200
+Message-Id: <1415822910-25657-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@intel.com>
+Hi,
 
-The teardown callback for L2CAP channels is problematic in that it is
-explicitly called for all types of channels from l2cap_chan_del(),
-meaning it's not possible to hard-code a nesting level when taking the
-socket lock. The simplest way to have a correct nesting level for the
-socket locking is to use the same value as for the chan. This also means
-that the other places trying to lock parent sockets need to be update to
-use the chan value (since L2CAP_NESTING_PARENT is defined as 2 whereas
-L2CAP_NESTING_PARENT has the value 1).
+I've spent the last few days fighting with all sorts of lockdep warnings
+in the Bluetooth subsystem. A lot of them come from the fact that we
+have cross-channel access for L2CAP channels. This ends up looking
+suspicious to lockdep unless we help out a bit by adding nesting level
+annotations.
 
-Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
----
- net/bluetooth/l2cap_sock.c | 13 ++++++++++---
- 1 file changed, 10 insertions(+), 3 deletions(-)
+It seems like we need at least three distinct nesting levels: SMP
+channels, "normal" channels, and parent/listening channels. This is
+because the parent channel lock may be held while also taking the lock
+of child channels, and the SMP channel may be accessed while holding the
+lock of any other channel (e.g. to request security level elevation).
 
-diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
-index f1a51564b8fd..7913c28c643d 100644
---- a/net/bluetooth/l2cap_sock.c
-+++ b/net/bluetooth/l2cap_sock.c
-@@ -307,7 +307,7 @@ static int l2cap_sock_accept(struct socket *sock, struct socket *newsock,
- 	long timeo;
- 	int err = 0;
- 
--	lock_sock_nested(sk, SINGLE_DEPTH_NESTING);
-+	lock_sock_nested(sk, L2CAP_NESTING_PARENT);
- 
- 	timeo = sock_rcvtimeo(sk, flags & O_NONBLOCK);
- 
-@@ -339,7 +339,7 @@ static int l2cap_sock_accept(struct socket *sock, struct socket *newsock,
- 
- 		release_sock(sk);
- 		timeo = schedule_timeout(timeo);
--		lock_sock_nested(sk, SINGLE_DEPTH_NESTING);
-+		lock_sock_nested(sk, L2CAP_NESTING_PARENT);
- 	}
- 	__set_current_state(TASK_RUNNING);
- 	remove_wait_queue(sk_sleep(sk), &wait);
-@@ -1252,7 +1252,14 @@ static void l2cap_sock_teardown_cb(struct l2cap_chan *chan, int err)
- 	struct sock *sk = chan->data;
- 	struct sock *parent;
- 
--	lock_sock_nested(sk, SINGLE_DEPTH_NESTING);
-+	/* This callback can be called both for server (BT_LISTEN)
-+	 * sockets as well as "normal" ones. To avoid lockdep warnings
-+	 * with child socket locking (through l2cap_sock_cleanup_listen)
-+	 * we need separation into separate nesting levels. The simplest
-+	 * way to accomplish this is to inherit the nesting level used
-+	 * for the channel.
-+	 */
-+	lock_sock_nested(sk, atomic_read(&chan->nesting));
- 
- 	parent = bt_sk(sk)->parent;
- 
--- 
-2.1.0
+We could in theory identify the type of channel in question implicitly
+by inspecting the channel in the l2cap_chan_lock function, however this
+is problematic since accessing channel data would usually already
+require holding the channel lock (not to mention that the logic for
+selecting the needed nesting level wouldn't be completely trivial).
+
+A simpler (imo) solution that I've gone for is to introduce a new
+"atomic_t nesting" channel member which contains the necessary nesting
+level and is set as soon as the level is known (i.e. initialized to
+"normal" upon channel creation or set to one of the two other levels
+when creating the SMP chan in smp.c or when setting chan->state to
+BT_LISTEN).
+
+The second patch contains a long needed fix for l2cap_sock_teardown_cb
+which only got a half-fix earlier this week (also from me) for its
+locking. This function gets called for all types of channels so it can't
+have a hard-coded nesting level for the socket lock. Instead I've opted
+for the socket lock inheriting the chan level and then also using that
+for the two other places calling lock_sock_nested() to be consistent.
+
+Johan
+
+----------------------------------------------------------------
+Johan Hedberg (2):
+      Bluetooth: Use proper nesting annotation for l2cap_chan lock
+      Bluetooth: Fix L2CAP socket lock nesting level
+
+ include/net/bluetooth/l2cap.h | 15 ++++++++++++++-
+ net/bluetooth/l2cap_sock.c    | 22 +++++++++++++++++++---
+ net/bluetooth/smp.c           | 11 +++++++++++
+ 3 files changed, 44 insertions(+), 4 deletions(-)
 
