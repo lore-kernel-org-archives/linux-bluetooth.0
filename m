@@ -2,50 +2,60 @@ Return-Path: <cyrus@holtmann.org>
 From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH 12/14] android/handsfree-client: Implement send DTMF codes
-Date: Wed, 12 Nov 2014 11:49:35 +0100
-Message-Id: <1415789377-20458-13-git-send-email-lukasz.rymanowski@tieto.com>
+Subject: [PATCH 08/14] android/handsfree-client: Send indicators val we got during SLC setup
+Date: Wed, 12 Nov 2014 11:49:31 +0100
+Message-Id: <1415789377-20458-9-git-send-email-lukasz.rymanowski@tieto.com>
 In-Reply-To: <1415789377-20458-1-git-send-email-lukasz.rymanowski@tieto.com>
 References: <1415789377-20458-1-git-send-email-lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Once SLC is done, Android is ready to get indicators values.
 ---
- android/handsfree-client.c | 20 ++++++++++++++++++--
- 1 file changed, 18 insertions(+), 2 deletions(-)
+ android/handsfree-client.c | 19 +++++++++++++++----
+ 1 file changed, 15 insertions(+), 4 deletions(-)
 
 diff --git a/android/handsfree-client.c b/android/handsfree-client.c
-index bc3e2cd..73898ea 100644
+index 97202d5..c710b48 100644
 --- a/android/handsfree-client.c
 +++ b/android/handsfree-client.c
-@@ -651,9 +651,25 @@ done:
+@@ -859,14 +859,24 @@ static void ciev_cb(struct hfp_context *context, void *user_data)
  
- static void handle_send_dtmf(const void *buf, uint16_t len)
+ static void slc_completed(struct device *dev)
  {
--	DBG("Not Implemented");
-+	const struct hal_cmd_hf_client_send_dtmf *cmd = buf;
-+	struct device *dev;
-+	uint8_t status;
++	int i;
++	struct indicator *ag_ind;
 +
-+	dev = find_default_device();
-+	if (!dev) {
-+		status = HAL_STATUS_FAILED;
-+		goto done;
+ 	DBG("");
+ 
++	ag_ind = dev->ag_ind;
++
+ 	device_set_state(dev, HAL_HF_CLIENT_CONN_STATE_SLC_CONNECTED);
+ 
+-	/*
+-	 * TODO: Notify Android with indicators, register unsolicited result
+-	 * handlers
+-	 */
++	/* Notify Android with indicators */
++	for (i = 0; i < HFP_INDICATOR_LAST; i++) {
++		if (!ag_ind[i].cb)
++			continue;
++
++		ag_ind[i].cb(ag_ind[i].val);
 +	}
 +
-+	if (hfp_hf_send_command(dev->hf, cmd_complete_cb, NULL, "AT+VTS=%c",
-+							(char) cmd->tone))
-+		status = HAL_STATUS_SUCCESS;
-+	else
-+		status = HAL_STATUS_FAILED;
-+
-+done:
- 	ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_HANDSFREE_CLIENT,
--			HAL_OP_HF_CLIENT_SEND_DTMF, HAL_STATUS_UNSUPPORTED);
-+					HAL_OP_HF_CLIENT_SEND_DTMF, status);
- }
++	/* TODO: register unsolicited results handlers */
  
- static void handle_get_last_vc_tag_num(const void *buf, uint16_t len)
+ 	hfp_hf_register(dev->hf, bvra_cb, "+BRVA", dev, NULL);
+ 	hfp_hf_register(dev->hf, vgm_cb, "+VGM", dev, NULL);
+@@ -959,6 +969,7 @@ static void set_indicator_value(uint8_t index, unsigned int val,
+ 			continue;
+ 
+ 		ag_ind[i].val = val;
++			ag_ind[i].cb(val);
+ 		return;
+ 	}
+ }
 -- 
 1.8.4
 
