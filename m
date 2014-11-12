@@ -1,36 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
-From: Gowtham Anandha Babu <gowtham.ab@samsung.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: d.kasatkin@samsung.com, bharat.panda@samsung.com, cpgs@samsung.com,
-	Gowtham Anandha Babu <gowtham.ab@samsung.com>
-Subject: [PATCH  1/3] src/profile: Add pbapsupportedfeatures to PSE
-Date: Wed, 12 Nov 2014 14:31:35 +0530
-Message-id: <1415782897-11667-1-git-send-email-gowtham.ab@samsung.com>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] android/hal: Fix last service id number
+Date: Wed, 12 Nov 2014 09:48:35 +0100
+Message-ID: <2168188.VBOHE1YtLx@uw000953>
+In-Reply-To: <1415780526-20367-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1415780526-20367-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Add PbapSupportedFeatures(0x0317) to PSE Record.
+Hi Andrei,
 
-PTS Test case passed:
-TP/SSM/BV-11-C [PSE Shares PbapSupportedFeatures bits].
----
- src/profile.c | 3 +++
- 1 file changed, 3 insertions(+)
+On Wednesday 12 of November 2014 10:22:06 Andrei Emeltchenko wrote:
+> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> 
+> ---
+>  android/hal-msg.h | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/android/hal-msg.h b/android/hal-msg.h
+> index eedd37b..773af5b 100644
+> --- a/android/hal-msg.h
+> +++ b/android/hal-msg.h
+> @@ -39,7 +39,7 @@ static const char BLUEZ_HAL_SK_PATH[] = "\0bluez_hal_socket";
+>  #define HAL_SERVICE_ID_MAP_CLIENT	11
+>  #define HAL_SERVICE_ID_AVRCP_CTRL	12
+>  
+> -#define HAL_SERVICE_ID_MAX HAL_SERVICE_ID_MAP_CLIENT
+> +#define HAL_SERVICE_ID_MAX HAL_SERVICE_ID_AVRCP_CTRL
+>  
+>  /* Core Service */
+>  
 
-diff --git a/src/profile.c b/src/profile.c
-index bccb145..252063b 100644
---- a/src/profile.c
-+++ b/src/profile.c
-@@ -393,6 +393,9 @@
- 		<attribute id=\"0x0314\">				\
- 			<uint8 value=\"0x01\"/>				\
- 		</attribute>						\
-+		<attribute id=\"0x0317\">				\
-+			<uint32 value=\"0x00000003\"/>			\
-+		</attribute>						\
- 	</record>"
- 
- #define MAS_RECORD							\
+Pushed, thanks. 
+
 -- 
-1.9.1
-
+Best regards, 
+Szymon Janc
