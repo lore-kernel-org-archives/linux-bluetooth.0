@@ -1,49 +1,50 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 2/4] android/client: Add handsfree wbs_cb() callback
-Date: Wed, 12 Nov 2014 17:14:27 +0200
-Message-Id: <1415805269-6838-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1415805269-6838-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1415805269-6838-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <1415782897-11667-1-git-send-email-gowtham.ab@samsung.com>
+References: <1415782897-11667-1-git-send-email-gowtham.ab@samsung.com>
+Date: Wed, 12 Nov 2014 17:15:37 +0200
+Message-ID: <CABBYNZKxBr4p3wwVdkdUD=c6qDY+mR8ozW4TNq1NZM+z3knaqQ@mail.gmail.com>
+Subject: Re: [PATCH 1/3] src/profile: Add pbapsupportedfeatures to PSE
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Gowtham Anandha Babu <gowtham.ab@samsung.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	Dmitry Kasatkin <d.kasatkin@samsung.com>,
+	Bharat Panda <bharat.panda@samsung.com>, cpgs@samsung.com
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Hi Gowtham,
 
----
- android/client/if-hf.c | 11 +++++++++++
- 1 file changed, 11 insertions(+)
+On Wed, Nov 12, 2014 at 11:01 AM, Gowtham Anandha Babu
+<gowtham.ab@samsung.com> wrote:
+> Add PbapSupportedFeatures(0x0317) to PSE Record.
+>
+> PTS Test case passed:
+> TP/SSM/BV-11-C [PSE Shares PbapSupportedFeatures bits].
+> ---
+>  src/profile.c | 3 +++
+>  1 file changed, 3 insertions(+)
+>
+> diff --git a/src/profile.c b/src/profile.c
+> index bccb145..252063b 100644
+> --- a/src/profile.c
+> +++ b/src/profile.c
+> @@ -393,6 +393,9 @@
+>                 <attribute id=\"0x0314\">                               \
+>                         <uint8 value=\"0x01\"/>                         \
+>                 </attribute>                                            \
+> +               <attribute id=\"0x0317\">                               \
+> +                       <uint32 value=\"0x00000003\"/>                  \
+> +               </attribute>                                            \
+>         </record>"
+>
+>  #define MAS_RECORD                                                     \
+> --
+> 1.9.1
 
-diff --git a/android/client/if-hf.c b/android/client/if-hf.c
-index 269e029..b0dd13a 100644
---- a/android/client/if-hf.c
-+++ b/android/client/if-hf.c
-@@ -355,6 +355,14 @@ static void key_pressed_cmd_cb(void)
- }
- #endif
- 
-+#if ANDROID_VERSION >= PLATFORM_VER(5, 0, 0)
-+static void wbs_cb(bthf_wbs_config_t wbs, bt_bdaddr_t *bd_addr)
-+{
-+	haltest_info("%s: bd_addr=%s\n", __func__,
-+					bt_bdaddr_t2str(bd_addr, last_addr));
-+}
-+#endif
-+
- static bthf_callbacks_t hf_cbacks = {
- 	.size = sizeof(hf_cbacks),
- 	.connection_state_cb = connection_state_cb,
-@@ -366,6 +374,9 @@ static bthf_callbacks_t hf_cbacks = {
- 	.dial_call_cmd_cb = dial_call_cmd_cb,
- 	.dtmf_cmd_cb = dtmf_cmd_cb,
- 	.nrec_cmd_cb = nrec_cmd_cb,
-+#if ANDROID_VERSION >= PLATFORM_VER(5, 0, 0)
-+	.wbs_cb = wbs_cb,
-+#endif
- 	.chld_cmd_cb = chld_cmd_cb,
- 	.cnum_cmd_cb = cnum_cmd_cb,
- 	.cind_cmd_cb = cind_cmd_cb,
+Applied, thanks.
+
+
 -- 
-1.9.1
-
+Luiz Augusto von Dentz
