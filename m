@@ -2,31 +2,29 @@ Return-Path: <cyrus@holtmann.org>
 From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH 11/14] android/handsfree-client: Retrieve subscriber number information
-Date: Wed, 12 Nov 2014 11:49:34 +0100
-Message-Id: <1415789377-20458-12-git-send-email-lukasz.rymanowski@tieto.com>
+Subject: [PATCH 13/14] android/handsfree-client: Implement handling AT+BIND and +BIND
+Date: Wed, 12 Nov 2014 11:49:36 +0100
+Message-Id: <1415789377-20458-14-git-send-email-lukasz.rymanowski@tieto.com>
 In-Reply-To: <1415789377-20458-1-git-send-email-lukasz.rymanowski@tieto.com>
 References: <1415789377-20458-1-git-send-email-lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- android/handsfree-client.c | 73 ++++++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 71 insertions(+), 2 deletions(-)
+ android/handsfree-client.c | 47 +++++++++++++++++++++++++++++++++++++++++++---
+ 1 file changed, 44 insertions(+), 3 deletions(-)
 
 diff --git a/android/handsfree-client.c b/android/handsfree-client.c
-index 6fe5495..bc3e2cd 100644
+index 73898ea..4338c11 100644
 --- a/android/handsfree-client.c
 +++ b/android/handsfree-client.c
-@@ -627,10 +627,26 @@ done:
+@@ -674,10 +674,23 @@ done:
  
- static void handle_retrieve_subscr_info(const void *buf, uint16_t len)
+ static void handle_get_last_vc_tag_num(const void *buf, uint16_t len)
  {
 -	DBG("Not Implemented");
 +	struct device *dev;
 +	uint8_t status;
-+
-+	DBG("");
 +
 +	dev = find_default_device();
 +	if (!dev) {
@@ -34,83 +32,58 @@ index 6fe5495..bc3e2cd 100644
 +		goto done;
 +	}
 +
-+	if (hfp_hf_send_command(dev->hf, cmd_complete_cb, NULL, "AT+CNUM"))
++	if (hfp_hf_send_command(dev->hf, cmd_complete_cb, NULL, "AT+BINP=1"))
 +		status = HAL_STATUS_SUCCESS;
 +	else
 +		status = HAL_STATUS_FAILED;
 +
 +done:
  	ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_HANDSFREE_CLIENT,
- 					HAL_OP_HF_CLIENT_RETRIEVE_SUBSCR_INFO,
+-					HAL_OP_HF_CLIENT_GET_LAST_VOICE_TAG_NUM,
 -					HAL_STATUS_UNSUPPORTED);
-+					status);
++			HAL_OP_HF_CLIENT_GET_LAST_VOICE_TAG_NUM, status);
  }
  
- static void handle_send_dtmf(const void *buf, uint16_t len)
-@@ -873,6 +889,58 @@ static void ciev_cb(struct hfp_context *context, void *user_data)
- 	}
+ static void disconnect_watch(void *user_data)
+@@ -994,6 +1007,33 @@ static void cops_cb(struct hfp_context *context, void *user_data)
+ 					sizeof(*ev) + ev->name_len, ev);
  }
  
-+static void cnum_cb(struct hfp_context *context, void *user_data)
++static void binp_cb(struct hfp_context *context, void *user_data)
 +{
 +	uint8_t buf[IPC_MTU];
-+	struct hal_ev_hf_client_subscriber_service_info *ev = (void *) buf;
-+	char number[16];
-+	uint32_t service;
++	struct hal_ev_hf_client_last_void_call_tag_num *ev = (void *) buf;
++	char number[255];
 +
 +	DBG("");
 +
 +	if (!context) {
-+		error("hf-client: incorrect CNUM response");
++		error("hf-client: incorrect COPS response");
 +		return;
 +	}
-+
-+	/* Alpha field is empty string, just skip it*/
-+	hfp_context_skip_field(context);
 +
 +	if (!hfp_context_get_string(context, number, sizeof(number))) {
-+		error("hf-client: Could not get number");
++		error("hf-client: incorrect COPS response");
 +		return;
 +	}
-+
-+	/* Type is not used in Android */
-+	hfp_context_skip_field(context);
-+
-+	/* Speed field is empty string, just skip it*/
-+	hfp_context_skip_field(context);
-+
-+	if (!hfp_context_get_number(context, &service))
-+		return;
 +
 +	memset(buf, 0, sizeof(buf));
-+	ev->name_len = strlen(number) + 1;
-+	memcpy(ev->name, number, ev->name_len);
-+
-+	switch (service) {
-+	case 4:
-+		ev->type = HAL_HF_CLIENT_SUBSCR_TYPE_VOICE;
-+		break;
-+	case 5:
-+		ev->type = HAL_HF_CLIENT_SUBSCR_TYPE_FAX;
-+		break;
-+	default:
-+		ev->type = HAL_HF_CLIENT_SUBSCR_TYPE_UNKNOWN;
-+		break;
-+	}
++	ev->number_len = strlen(number) + 1;
++	memcpy(ev->number, number, ev->number_len);
 +
 +	ipc_send_notif(hal_ipc, HAL_SERVICE_ID_HANDSFREE_CLIENT,
-+					HAL_EV_CLIENT_SUBSCRIBER_SERVICE_INFO,
-+					sizeof(*ev) + ev->name_len, ev);
++					HAL_EV_CLIENT_LAST_VOICE_CALL_TAG_NUM,
++					sizeof(*ev) + ev->number_len, ev);
 +}
 +
- static void cops_cb(struct hfp_context *context, void *user_data)
+ static void slc_completed(struct device *dev)
  {
- 	uint8_t buf[IPC_MTU];
-@@ -938,6 +1006,7 @@ static void slc_completed(struct device *dev)
- 	hfp_hf_register(dev->hf, clcc_cb, "+CLCC", dev, NULL);
+ 	int i;
+@@ -1023,6 +1063,7 @@ static void slc_completed(struct device *dev)
  	hfp_hf_register(dev->hf, ciev_cb, "+CIEV", dev, NULL);
  	hfp_hf_register(dev->hf, cops_cb, "+COPS", dev, NULL);
-+	hfp_hf_register(dev->hf, cnum_cb, "+CNUM", dev, NULL);
+ 	hfp_hf_register(dev->hf, cnum_cb, "+CNUM", dev, NULL);
++	hfp_hf_register(dev->hf, binp_cb, "+BINP", dev, NULL);
  
  	if (!hfp_hf_send_command(dev->hf, cmd_complete_cb, NULL, "AT+COPS=3,0"))
  		info("hf-client: Could not send AT+COPS=3,0");
