@@ -1,78 +1,72 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 3/4] android/client: Fix help for handsfree haltest tool
-Date: Wed, 12 Nov 2014 17:14:28 +0200
-Message-Id: <1415805269-6838-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1415805269-6838-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1415805269-6838-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCH BlueZ 3/3] android/gatt: Cleanup unused variables
+Date: Wed, 12 Nov 2014 17:03:14 +0200
+Message-Id: <1415804594-1761-3-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <1415804594-1761-1-git-send-email-luiz.dentz@gmail.com>
+References: <1415804594-1761-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
 ---
- android/client/if-hf.c | 37 ++++++++++++++++++++++++++++---------
- 1 file changed, 28 insertions(+), 9 deletions(-)
+ android/gatt.c | 21 ---------------------
+ 1 file changed, 21 deletions(-)
 
-diff --git a/android/client/if-hf.c b/android/client/if-hf.c
-index b0dd13a..c64d412 100644
---- a/android/client/if-hf.c
-+++ b/android/client/if-hf.c
-@@ -976,25 +976,44 @@ static void cleanup_p(int argc, const char **argv)
+diff --git a/android/gatt.c b/android/gatt.c
+index ddc4545..41409ad 100644
+--- a/android/gatt.c
++++ b/android/gatt.c
+@@ -6494,15 +6494,8 @@ static void device_info_read_cb(struct gatt_db_attribute *attrib,
+ 					uint8_t opcode, bdaddr_t *bdaddr,
+ 					void *user_data)
+ {
+-	struct gatt_device *dev;
+ 	char *buf = user_data;
+ 
+-	dev = find_device_by_addr(bdaddr);
+-	if (!dev) {
+-		error("gatt: Could not find device ?!");
+-		return;
+-	}
+-
+ 	gatt_db_attribute_read_result(attrib, id, 0, user_data, strlen(buf));
  }
  
- static struct method methods[] = {
-+#if ANDROID_VERSION >= PLATFORM_VER(5, 0, 0)
-+	STD_METHODH(init, "[<max_hf_clients>]"),
-+	STD_METHODH(start_voice_recognition, "<addr>"),
-+	STD_METHODH(stop_voice_recognition, "<addr>"),
-+	STD_METHODCH(volume_control, "<vol_type> <volume> <addr>"),
-+	STD_METHODH(cops_response, "<cops string> <addr>"),
-+	STD_METHODCH(cind_response,
-+			"<svc> <num_active> <num_held> <setup_state> <signal> "
-+			"<roam> <batt_chg> <addr>"),
-+	STD_METHODH(formatted_at_response, "<at_response> <addr>"),
-+	STD_METHODCH(at_response, "<response_code> [<error_code> <bdaddr>]"),
-+	STD_METHODCH(clcc_response,
-+			"<index> <direction> <state> <mode> <mpty> <number> "
-+			"<type> <addr>"),
-+#else
- 	STD_METHOD(init),
--	STD_METHODCH(connect, "<addr>"),
--	STD_METHODCH(disconnect, "<addr>"),
--	STD_METHODCH(connect_audio, "<addr>"),
--	STD_METHODCH(disconnect_audio, "<addr>"),
- 	STD_METHOD(start_voice_recognition),
- 	STD_METHOD(stop_voice_recognition),
- 	STD_METHODCH(volume_control, "<vol_type> <volume>"),
--	STD_METHODCH(device_status_notification,
--			"<ntk_state> <svt_type> <signal> <batt_chg>"),
- 	STD_METHODH(cops_response, "<cops string>"),
- 	STD_METHODCH(cind_response,
--			"<svc> <num_active> <num_held> <setup_state> <signal> <roam> <batt_chg>"),
-+			"<svc> <num_active> <num_held> <setup_state> <signal> "
-+			"<roam> <batt_chg>"),
- 	STD_METHODH(formatted_at_response, "<at_response>"),
- 	STD_METHODCH(at_response, "<response_code> [<error_code>]"),
- 	STD_METHODCH(clcc_response,
--			"<index> <direction> <state> <mode> <mpty> <number> <type>"),
-+			"<index> <direction> <state> <mode> <mpty> <number> "
-+			"<type>"),
-+#endif
-+	STD_METHODCH(connect, "<addr>"),
-+	STD_METHODCH(disconnect, "<addr>"),
-+	STD_METHODCH(connect_audio, "<addr>"),
-+	STD_METHODCH(disconnect_audio, "<addr>"),
-+	STD_METHODCH(device_status_notification,
-+			"<ntk_state> <svt_type> <signal> <batt_chg>"),
- 	STD_METHODCH(phone_state_change,
--			"<num_active> <num_held> <setup_state> <number> <type>"),
-+			"<num_active> <num_held> <setup_state> <number> "
-+			"<type>"),
- 	STD_METHOD(cleanup),
- 	END_METHOD
- };
+@@ -6511,15 +6504,8 @@ static void device_info_read_system_id_cb(struct gatt_db_attribute *attrib,
+ 					uint8_t opcode, bdaddr_t *bdaddr,
+ 					void *user_data)
+ {
+-	struct gatt_device *dev;
+ 	uint8_t pdu[8];
+ 
+-	dev = find_device_by_addr(bdaddr);
+-	if (!dev) {
+-		error("gatt: Could not find device ?!");
+-		return;
+-	}
+-
+ 	put_le64(bt_config_get_system_id(), pdu);
+ 
+ 	gatt_db_attribute_read_result(attrib, id, 0, pdu, sizeof(pdu));
+@@ -6530,15 +6516,8 @@ static void device_info_read_pnp_id_cb(struct gatt_db_attribute *attrib,
+ 					uint8_t opcode, bdaddr_t *bdaddr,
+ 					void *user_data)
+ {
+-	struct gatt_device *dev;
+ 	uint8_t pdu[7];
+ 
+-	dev = find_device_by_addr(bdaddr);
+-	if (!dev) {
+-		error("gatt: Could not find device ?!");
+-		return;
+-	}
+-
+ 	pdu[0] = bt_config_get_pnp_source();
+ 	put_le16(bt_config_get_pnp_vendor(), &pdu[1]);
+ 	put_le16(bt_config_get_pnp_product(), &pdu[3]);
 -- 
-1.9.1
+1.9.3
 
