@@ -1,55 +1,49 @@
 Return-Path: <cyrus@holtmann.org>
-From: johan.hedberg@gmail.com
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 0/2] Bluetooth: Lock nesting for L2CAP channels and sockets
-Date: Wed, 12 Nov 2014 22:08:28 +0200
-Message-Id: <1415822910-25657-1-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH 2/4] android/client: Add handsfree wbs_cb() callback
+Date: Wed, 12 Nov 2014 17:14:27 +0200
+Message-Id: <1415805269-6838-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1415805269-6838-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1415805269-6838-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-I've spent the last few days fighting with all sorts of lockdep warnings
-in the Bluetooth subsystem. A lot of them come from the fact that we
-have cross-channel access for L2CAP channels. This ends up looking
-suspicious to lockdep unless we help out a bit by adding nesting level
-annotations.
+---
+ android/client/if-hf.c | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
 
-It seems like we need at least three distinct nesting levels: SMP
-channels, "normal" channels, and parent/listening channels. This is
-because the parent channel lock may be held while also taking the lock
-of child channels, and the SMP channel may be accessed while holding the
-lock of any other channel (e.g. to request security level elevation).
-
-We could in theory identify the type of channel in question implicitly
-by inspecting the channel in the l2cap_chan_lock function, however this
-is problematic since accessing channel data would usually already
-require holding the channel lock (not to mention that the logic for
-selecting the needed nesting level wouldn't be completely trivial).
-
-A simpler (imo) solution that I've gone for is to introduce a new
-"atomic_t nesting" channel member which contains the necessary nesting
-level and is set as soon as the level is known (i.e. initialized to
-"normal" upon channel creation or set to one of the two other levels
-when creating the SMP chan in smp.c or when setting chan->state to
-BT_LISTEN).
-
-The second patch contains a long needed fix for l2cap_sock_teardown_cb
-which only got a half-fix earlier this week (also from me) for its
-locking. This function gets called for all types of channels so it can't
-have a hard-coded nesting level for the socket lock. Instead I've opted
-for the socket lock inheriting the chan level and then also using that
-for the two other places calling lock_sock_nested() to be consistent.
-
-Johan
-
-----------------------------------------------------------------
-Johan Hedberg (2):
-      Bluetooth: Use proper nesting annotation for l2cap_chan lock
-      Bluetooth: Fix L2CAP socket lock nesting level
-
- include/net/bluetooth/l2cap.h | 15 ++++++++++++++-
- net/bluetooth/l2cap_sock.c    | 22 +++++++++++++++++++---
- net/bluetooth/smp.c           | 11 +++++++++++
- 3 files changed, 44 insertions(+), 4 deletions(-)
+diff --git a/android/client/if-hf.c b/android/client/if-hf.c
+index 269e029..b0dd13a 100644
+--- a/android/client/if-hf.c
++++ b/android/client/if-hf.c
+@@ -355,6 +355,14 @@ static void key_pressed_cmd_cb(void)
+ }
+ #endif
+ 
++#if ANDROID_VERSION >= PLATFORM_VER(5, 0, 0)
++static void wbs_cb(bthf_wbs_config_t wbs, bt_bdaddr_t *bd_addr)
++{
++	haltest_info("%s: bd_addr=%s\n", __func__,
++					bt_bdaddr_t2str(bd_addr, last_addr));
++}
++#endif
++
+ static bthf_callbacks_t hf_cbacks = {
+ 	.size = sizeof(hf_cbacks),
+ 	.connection_state_cb = connection_state_cb,
+@@ -366,6 +374,9 @@ static bthf_callbacks_t hf_cbacks = {
+ 	.dial_call_cmd_cb = dial_call_cmd_cb,
+ 	.dtmf_cmd_cb = dtmf_cmd_cb,
+ 	.nrec_cmd_cb = nrec_cmd_cb,
++#if ANDROID_VERSION >= PLATFORM_VER(5, 0, 0)
++	.wbs_cb = wbs_cb,
++#endif
+ 	.chld_cmd_cb = chld_cmd_cb,
+ 	.cnum_cmd_cb = cnum_cmd_cb,
+ 	.cind_cmd_cb = cind_cmd_cb,
+-- 
+1.9.1
 
