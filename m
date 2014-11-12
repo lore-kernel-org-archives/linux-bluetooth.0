@@ -1,42 +1,38 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 12 Nov 2014 11:25:02 +0200
-From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
-To: Arman Uguray <armansito@chromium.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH BlueZ v2 05/11] shared/gatt-server: Implement "Read Blob"
- request.
-Message-ID: <20141112092500.GB10185@aemeltch-MOBL1>
-References: <1415639247-14320-1-git-send-email-armansito@chromium.org>
- <1415639247-14320-6-git-send-email-armansito@chromium.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1415639247-14320-6-git-send-email-armansito@chromium.org>
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH 2/3] android/client: Fix help for gatt client commands
+Date: Wed, 12 Nov 2014 11:09:20 +0200
+Message-Id: <1415783361-11991-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1415783361-11991-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1415783361-11991-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Arman,
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-On Mon, Nov 10, 2014 at 09:07:21AM -0800, Arman Uguray wrote:
-> This patch implements the "Read Blob" request for the GATT server role.
-> ---
->  src/shared/gatt-server.c | 100 ++++++++++++++++++++++++++++++++++++++++-------
->  1 file changed, 85 insertions(+), 15 deletions(-)
-> 
+---
+ android/client/if-gatt.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-...
-
-> +static void read_blob_cb(uint8_t opcode, const void *pdu,
-> +					uint16_t length, void *user_data)
-> +{
-> +	struct bt_gatt_server *server = user_data;
-> +	uint16_t handle, offset;
-> +
-> +	if (length != 4) {
-> +		uint8_t pdu[4];
-
-Can we avoid shadowing variables without any need?
-This unfortunately became common practice for gatt code.
-
-Best regards 
-Andrei Emeltchenko 
+diff --git a/android/client/if-gatt.c b/android/client/if-gatt.c
+index 72f97ba..301262b 100644
+--- a/android/client/if-gatt.c
++++ b/android/client/if-gatt.c
+@@ -1503,8 +1503,13 @@ static void test_command_p(int argc, const char **argv)
+ static struct method client_methods[] = {
+ 	STD_METHODH(register_client, "[<uuid>]"),
+ 	STD_METHODCH(unregister_client, "<client_if>"),
++#if ANDROID_VERSION >= PLATFORM_VER(5, 0, 0)
++	STD_METHODCH(scan, "[1|0]"),
++	STD_METHODCH(connect, "<client_if> <addr> [<is_direct>] [<transport]"),
++#else
+ 	STD_METHODCH(scan, "<client_if> [1|0]"),
+ 	STD_METHODCH(connect, "<client_if> <addr> [<is_direct>]"),
++#endif
+ 	STD_METHODCH(disconnect, "<client_if> <addr> <conn_id>"),
+ 	STD_METHODCH(refresh, "<client_if> <addr>"),
+ 	STD_METHODCH(search_service, "<conn_id> [<uuid>]"),
+-- 
+1.9.1
 
