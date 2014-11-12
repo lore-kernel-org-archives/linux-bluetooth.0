@@ -3,126 +3,60 @@ From: Vikrampal Yadav <vikram.pal@samsung.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: luiz.dentz@gmail.com, d.kasatkin@samsung.com,
 	vikram.pal@samsung.com, cpgs@samsung.com
-Subject: [PATCH 3/3] monitor: Add AVRCP SetBrowsedPlayer support
-Date: Wed, 12 Nov 2014 14:23:16 +0530
-Message-id: <1415782396-28799-3-git-send-email-vikram.pal@samsung.com>
+Subject: [PATCH 2/3] monitor: Fix for GetElementAttributes when
+ AttributeValueLength zero
+Date: Wed, 12 Nov 2014 14:23:15 +0530
+Message-id: <1415782396-28799-2-git-send-email-vikram.pal@samsung.com>
 In-reply-to: <1415782396-28799-1-git-send-email-vikram.pal@samsung.com>
 References: <1415782396-28799-1-git-send-email-vikram.pal@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Support for decoding AVRCP SetBrowsedPlayer added in Bluetooth monitor.
-
-> ACL Data RX: Handle 69 flags 0x02 dlen 16                    [hci0] 43.952518
-      Channel: 65 len 12 [PSM 27 mode 3] {chan 1}
-      AVCTP Browsing: Command: type 0x00 label 0 PID 0x110e
-        AVRCP: SetBrowsedPlayer: len 0x0002
-          PlayerID: 0x0001 (1)
+      AVCTP Control: Response: type 0x00 label 0 PID 0x110e
+        AV/C: Stable: address 0x48 opcode 0x00
+          Subunit: Panel
+          Opcode: Vendor Dependent
+          Company ID: 0x001958
+          AVRCP: GetElementAttributes pt Single len 0x0019
+            AttributeCount: 0x03
+            Attribute: 0x00000001 (Title)
+            CharsetID: 0x006a (UTF-8)
+            AttributeValueLength: 0x0000
+            AttributeValue:
+            Attribute: 0x00000002 (Artist)
+            CharsetID: 0x006a (UTF-8)
+            AttributeValueLength: 0x0000
+            AttributeValue:
+            Attribute: 0x00000003 (Album)
+            CharsetID: 0x006a (UTF-8)
+            AttributeValueLength: 0x0000
+            AttributeValue:
 ---
- monitor/avctp.c | 86 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 85 insertions(+), 1 deletion(-)
+ monitor/avctp.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/monitor/avctp.c b/monitor/avctp.c
-index af91ecc..0a1e92d 100644
+index 11dc9b2..af91ecc 100644
 --- a/monitor/avctp.c
 +++ b/monitor/avctp.c
-@@ -1637,11 +1637,95 @@ static bool avrcp_control_packet(struct avctp_frame *avctp_frame)
- 	}
- }
+@@ -1122,7 +1122,7 @@ response:
+ 		num = avrcp_continuing.num;
  
-+static bool avrcp_set_browsed_player(struct avctp_frame *avctp_frame)
-+{
-+	struct l2cap_frame *frame = &avctp_frame->l2cap_frame;
-+	uint32_t items;
-+	uint16_t id, uids, charset;
-+	uint8_t status, folders, indent = 2;
-+
-+	if (avctp_frame->hdr & 0x02)
-+		goto response;
-+
-+	if (!l2cap_frame_get_be16(frame, &id))
-+		return false;
-+
-+	print_field("%*cPlayerID: 0x%04x (%u)", indent, ' ', id, id);
-+	return true;
-+
-+response:
-+	if (!l2cap_frame_get_u8(frame, &status))
-+		return false;
-+
-+	print_field("%*cStatus: 0x%02x (%s)", indent, ' ', status,
-+							error2str(status));
-+
-+	if (!l2cap_frame_get_be16(frame, &uids))
-+		return false;
-+
-+	print_field("%*cUIDCounter: 0x%04x (%u)", indent, ' ', uids, uids);
-+
-+	if (!l2cap_frame_get_be32(frame, &items))
-+		return false;
-+
-+	print_field("%*cNumber of Items: 0x%08x (%u)", indent, ' ',
-+								items, items);
-+
-+	if (!l2cap_frame_get_be16(frame, &charset))
-+		return false;
-+
-+	print_field("%*cCharsetID: 0x%04x (%s)", indent, ' ', charset,
-+							charset2str(charset));
-+
-+	if (!l2cap_frame_get_u8(frame, &folders))
-+		return false;
-+
-+	print_field("%*cFolder Depth: 0x%02x (%u)", indent, ' ', folders,
-+								folders);
-+
-+	for (; folders > 0; folders--) {
-+		uint8_t len;
-+
-+		if (!l2cap_frame_get_u8(frame, &len))
-+			return false;
-+
-+		printf("Folder: ");
-+		for (; len > 0; len--) {
-+			uint8_t c;
-+
-+			if (!l2cap_frame_get_u8(frame, &c))
-+				return false;
-+
-+			printf("%1c", isprint(c) ? c : '.');
-+		}
-+		printf("\n");
-+	}
-+
-+	return true;
-+}
-+
- static bool avrcp_browsing_packet(struct avctp_frame *avctp_frame)
- {
- 	struct l2cap_frame *frame = &avctp_frame->l2cap_frame;
-+	uint16_t len;
-+	uint8_t pduid;
-+
-+	if (!l2cap_frame_get_u8(frame, &pduid))
-+		return false;
-+
-+	if (!l2cap_frame_get_be16(frame, &len))
-+		return false;
-+
-+	print_field("AVRCP: %s: len 0x%04x", pdu2str(pduid), len);
-+
-+	switch (pduid) {
-+	case AVRCP_SET_BROWSED_PLAYER:
-+		avrcp_set_browsed_player(avctp_frame);
-+		break;
-+	default:
-+		packet_hexdump(frame->data, frame->size);
-+	}
+ 		if (avrcp_continuing.size > 0) {
+-			char attrval[UINT8_MAX];
++			char attrval[UINT8_MAX] = {0};
+ 			uint16_t size;
+ 			uint8_t idx;
  
--	packet_hexdump(frame->data, frame->size);
- 	return true;
- }
+@@ -1157,7 +1157,7 @@ response:
+ 		uint32_t attr;
+ 		uint16_t charset, attrlen;
+ 		uint8_t idx;
+-		char attrval[UINT8_MAX];
++		char attrval[UINT8_MAX] = {0};
  
+ 		if (!l2cap_frame_get_be32(frame, &attr))
+ 			goto failed;
 -- 
 1.9.1
 
