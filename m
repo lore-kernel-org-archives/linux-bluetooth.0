@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Johan Hedberg <johan.hedberg@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 2/4] Bluetooth: Convert IRK list to RCU
-Date: Thu, 13 Nov 2014 14:37:48 +0200
-Message-Id: <1415882270-5621-3-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH 1/4] Bluetooth: Convert LTK list to RCU
+Date: Thu, 13 Nov 2014 14:37:47 +0200
+Message-Id: <1415882270-5621-2-git-send-email-johan.hedberg@gmail.com>
 In-Reply-To: <1415882270-5621-1-git-send-email-johan.hedberg@gmail.com>
 References: <1415882270-5621-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,138 +11,130 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-This patch set converts the hdev->identity_resolving_keys list to use
-RCU to eliminate the need to use hci_dev_lock/unlock.
-
-An additional change that must be done is to remove use of
-CRYPTO_ALG_ASYNC for the hdev-specific AES crypto context. The reason is
-that this context is used for matching RPAs and the loop that does the
-matching is under the RCU read lock, i.e. is an atomic section which
-cannot sleep.
+This patch set converts the hdev->long_term_keys list to use RCU to
+eliminate the need to use hci_dev_lock/unlock.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
  include/net/bluetooth/hci_core.h |  1 +
- net/bluetooth/hci_core.c         | 46 +++++++++++++++++++++++-----------------
- net/bluetooth/smp.c              | 10 ++++-----
- 3 files changed, 33 insertions(+), 24 deletions(-)
+ net/bluetooth/hci_core.c         | 42 +++++++++++++++++++++++-----------------
+ net/bluetooth/hci_event.c        |  4 ++--
+ net/bluetooth/smp.c              | 10 ++++------
+ 4 files changed, 31 insertions(+), 26 deletions(-)
 
 diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index a4adef22ad7c..fe2d5f299e12 100644
+index 4e39a5adfcab..a4adef22ad7c 100644
 --- a/include/net/bluetooth/hci_core.h
 +++ b/include/net/bluetooth/hci_core.h
-@@ -121,6 +121,7 @@ struct smp_ltk {
+@@ -108,6 +108,7 @@ struct smp_csrk {
  
- struct smp_irk {
+ struct smp_ltk {
  	struct list_head list;
 +	struct rcu_head rcu;
- 	bdaddr_t rpa;
  	bdaddr_t bdaddr;
- 	u8 addr_type;
+ 	u8 bdaddr_type;
+ 	u8 authenticated;
 diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index c9495fb9f595..90ea0b7670d2 100644
+index 6c162c8809cf..c9495fb9f595 100644
 --- a/net/bluetooth/hci_core.c
 +++ b/net/bluetooth/hci_core.c
-@@ -748,16 +748,15 @@ static const struct file_operations white_list_fops = {
- static int identity_resolving_keys_show(struct seq_file *f, void *ptr)
+@@ -778,17 +778,15 @@ static const struct file_operations identity_resolving_keys_fops = {
+ static int long_term_keys_show(struct seq_file *f, void *ptr)
  {
  	struct hci_dev *hdev = f->private;
 -	struct list_head *p, *n;
-+	struct smp_irk *irk;
++	struct smp_ltk *ltk;
  
 -	hci_dev_lock(hdev);
--	list_for_each_safe(p, n, &hdev->identity_resolving_keys) {
--		struct smp_irk *irk = list_entry(p, struct smp_irk, list);
+-	list_for_each_safe(p, n, &hdev->long_term_keys) {
+-		struct smp_ltk *ltk = list_entry(p, struct smp_ltk, list);
 +	rcu_read_lock();
-+	list_for_each_entry_rcu(irk, &hdev->identity_resolving_keys, list) {
- 		seq_printf(f, "%pMR (type %u) %*phN %pMR\n",
- 			   &irk->bdaddr, irk->addr_type,
- 			   16, irk->val, &irk->rpa);
- 	}
++	list_for_each_entry_rcu(ltk, &hdev->long_term_keys, list)
+ 		seq_printf(f, "%pMR (type %u) %u 0x%02x %u %.4x %.16llx %*phN\n",
+ 			   &ltk->bdaddr, ltk->bdaddr_type, ltk->authenticated,
+ 			   ltk->type, ltk->enc_size, __le16_to_cpu(ltk->ediv),
+ 			   __le64_to_cpu(ltk->rand), 16, ltk->val);
+-	}
 -	hci_dev_unlock(hdev);
 +	rcu_read_unlock();
  
  	return 0;
  }
-@@ -3114,11 +3113,11 @@ void hci_smp_ltks_clear(struct hci_dev *hdev)
+@@ -3106,11 +3104,11 @@ void hci_link_keys_clear(struct hci_dev *hdev)
  
- void hci_smp_irks_clear(struct hci_dev *hdev)
+ void hci_smp_ltks_clear(struct hci_dev *hdev)
  {
--	struct smp_irk *k, *tmp;
-+	struct smp_irk *k;
+-	struct smp_ltk *k, *tmp;
++	struct smp_ltk *k;
  
--	list_for_each_entry_safe(k, tmp, &hdev->identity_resolving_keys, list) {
+-	list_for_each_entry_safe(k, tmp, &hdev->long_term_keys, list) {
 -		list_del(&k->list);
 -		kfree(k);
-+	list_for_each_entry_rcu(k, &hdev->identity_resolving_keys, list) {
++	list_for_each_entry_rcu(k, &hdev->long_term_keys, list) {
 +		list_del_rcu(&k->list);
 +		kfree_rcu(k, rcu);
  	}
  }
  
-@@ -3221,17 +3220,22 @@ struct smp_irk *hci_find_irk_by_rpa(struct hci_dev *hdev, bdaddr_t *rpa)
+@@ -3184,15 +3182,18 @@ struct smp_ltk *hci_find_ltk(struct hci_dev *hdev, __le16 ediv, __le64 rand,
  {
- 	struct smp_irk *irk;
+ 	struct smp_ltk *k;
  
--	list_for_each_entry(irk, &hdev->identity_resolving_keys, list) {
--		if (!bacmp(&irk->rpa, rpa))
+-	list_for_each_entry(k, &hdev->long_term_keys, list) {
 +	rcu_read_lock();
-+	list_for_each_entry_rcu(irk, &hdev->identity_resolving_keys, list) {
-+		if (!bacmp(&irk->rpa, rpa)) {
-+			rcu_read_unlock();
- 			return irk;
-+		}
- 	}
++	list_for_each_entry_rcu(k, &hdev->long_term_keys, list) {
+ 		if (k->ediv != ediv || k->rand != rand)
+ 			continue;
  
--	list_for_each_entry(irk, &hdev->identity_resolving_keys, list) {
-+	list_for_each_entry_rcu(irk, &hdev->identity_resolving_keys, list) {
- 		if (smp_irk_matches(hdev, irk->val, rpa)) {
- 			bacpy(&irk->rpa, rpa);
-+			rcu_read_unlock();
- 			return irk;
- 		}
+ 		if (ltk_role(k->type) != role)
+ 			continue;
+ 
++		rcu_read_unlock();
+ 		return k;
  	}
 +	rcu_read_unlock();
  
  	return NULL;
  }
-@@ -3245,11 +3249,15 @@ struct smp_irk *hci_find_irk_by_addr(struct hci_dev *hdev, bdaddr_t *bdaddr,
- 	if (addr_type == ADDR_LE_DEV_RANDOM && (bdaddr->b[5] & 0xc0) != 0xc0)
- 		return NULL;
+@@ -3202,11 +3203,16 @@ struct smp_ltk *hci_find_ltk_by_addr(struct hci_dev *hdev, bdaddr_t *bdaddr,
+ {
+ 	struct smp_ltk *k;
  
--	list_for_each_entry(irk, &hdev->identity_resolving_keys, list) {
+-	list_for_each_entry(k, &hdev->long_term_keys, list)
 +	rcu_read_lock();
-+	list_for_each_entry_rcu(irk, &hdev->identity_resolving_keys, list) {
- 		if (addr_type == irk->addr_type &&
--		    bacmp(bdaddr, &irk->bdaddr) == 0)
-+		    bacmp(bdaddr, &irk->bdaddr) == 0) {
++	list_for_each_entry_rcu(k, &hdev->long_term_keys, list) {
+ 		if (addr_type == k->bdaddr_type &&
+ 		    bacmp(bdaddr, &k->bdaddr) == 0 &&
+-		    ltk_role(k->type) == role)
++		    ltk_role(k->type) == role) {
 +			rcu_read_unlock();
- 			return irk;
+ 			return k;
 +		}
- 	}
++	}
 +	rcu_read_unlock();
  
  	return NULL;
  }
-@@ -3344,7 +3352,7 @@ struct smp_irk *hci_add_irk(struct hci_dev *hdev, bdaddr_t *bdaddr,
- 		bacpy(&irk->bdaddr, bdaddr);
- 		irk->addr_type = addr_type;
- 
--		list_add(&irk->list, &hdev->identity_resolving_keys);
-+		list_add_rcu(&irk->list, &hdev->identity_resolving_keys);
+@@ -3309,7 +3315,7 @@ struct smp_ltk *hci_add_ltk(struct hci_dev *hdev, bdaddr_t *bdaddr,
+ 		key = kzalloc(sizeof(*key), GFP_KERNEL);
+ 		if (!key)
+ 			return NULL;
+-		list_add(&key->list, &hdev->long_term_keys);
++		list_add_rcu(&key->list, &hdev->long_term_keys);
  	}
  
- 	memcpy(irk->val, val, 16);
-@@ -3390,16 +3398,16 @@ int hci_remove_ltk(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 bdaddr_type)
+ 	bacpy(&key->bdaddr, bdaddr);
+@@ -3365,17 +3371,17 @@ int hci_remove_link_key(struct hci_dev *hdev, bdaddr_t *bdaddr)
  
- void hci_remove_irk(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 addr_type)
+ int hci_remove_ltk(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 bdaddr_type)
  {
--	struct smp_irk *k, *tmp;
-+	struct smp_irk *k;
+-	struct smp_ltk *k, *tmp;
++	struct smp_ltk *k;
+ 	int removed = 0;
  
--	list_for_each_entry_safe(k, tmp, &hdev->identity_resolving_keys, list) {
-+	list_for_each_entry_rcu(k, &hdev->identity_resolving_keys, list) {
- 		if (bacmp(bdaddr, &k->bdaddr) || k->addr_type != addr_type)
+-	list_for_each_entry_safe(k, tmp, &hdev->long_term_keys, list) {
++	list_for_each_entry_rcu(k, &hdev->long_term_keys, list) {
+ 		if (bacmp(bdaddr, &k->bdaddr) || k->bdaddr_type != bdaddr_type)
  			continue;
  
  		BT_DBG("%s removing %pMR", hdev->name, bdaddr);
@@ -151,44 +143,62 @@ index c9495fb9f595..90ea0b7670d2 100644
 -		kfree(k);
 +		list_del_rcu(&k->list);
 +		kfree_rcu(k, rcu);
+ 		removed++;
  	}
- }
  
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index aec3b1dce1cc..09d76547d985 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -4578,8 +4578,8 @@ static void hci_le_ltk_request_evt(struct hci_dev *hdev, struct sk_buff *skb)
+ 	 */
+ 	if (ltk->type == SMP_STK) {
+ 		set_bit(HCI_CONN_STK_ENCRYPT, &conn->flags);
+-		list_del(&ltk->list);
+-		kfree(ltk);
++		list_del_rcu(&ltk->list);
++		kfree_rcu(ltk, rcu);
+ 	} else {
+ 		clear_bit(HCI_CONN_STK_ENCRYPT, &conn->flags);
+ 	}
 diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
-index fd2dfe5222bc..7b610f615257 100644
+index 3dc5f0e66405..fd2dfe5222bc 100644
 --- a/net/bluetooth/smp.c
 +++ b/net/bluetooth/smp.c
-@@ -393,8 +393,8 @@ static void smp_chan_destroy(struct l2cap_conn *conn)
+@@ -383,13 +383,13 @@ static void smp_chan_destroy(struct l2cap_conn *conn)
+ 	/* If pairing failed clean up any keys we might have */
+ 	if (!complete) {
+ 		if (smp->ltk) {
+-			list_del(&smp->ltk->list);
+-			kfree(smp->ltk);
++			list_del_rcu(&smp->ltk->list);
++			kfree_rcu(smp->ltk, rcu);
+ 		}
+ 
+ 		if (smp->slave_ltk) {
+-			list_del(&smp->slave_ltk->list);
+-			kfree(smp->slave_ltk);
++			list_del_rcu(&smp->slave_ltk->list);
++			kfree_rcu(smp->slave_ltk, rcu);
  		}
  
  		if (smp->remote_irk) {
--			list_del(&smp->remote_irk->list);
--			kfree(smp->remote_irk);
-+			list_del_rcu(&smp->remote_irk->list);
-+			kfree_rcu(smp->remote_irk, rcu);
- 		}
- 	}
+@@ -1321,7 +1321,6 @@ static int smp_cmd_master_ident(struct l2cap_conn *conn, struct sk_buff *skb)
  
-@@ -655,8 +655,8 @@ static void smp_notify_keys(struct l2cap_conn *conn)
- 		 * just remove it.
- 		 */
- 		if (!bacmp(&smp->remote_irk->rpa, BDADDR_ANY)) {
--			list_del(&smp->remote_irk->list);
--			kfree(smp->remote_irk);
-+			list_del_rcu(&smp->remote_irk->list);
-+			kfree_rcu(smp->remote_irk, rcu);
- 			smp->remote_irk = NULL;
- 		}
- 	}
-@@ -1696,7 +1696,7 @@ int smp_register(struct hci_dev *hdev)
+ 	skb_pull(skb, sizeof(*rp));
  
- 	BT_DBG("%s", hdev->name);
+-	hci_dev_lock(hdev);
+ 	authenticated = (hcon->sec_level == BT_SECURITY_HIGH);
+ 	ltk = hci_add_ltk(hdev, &hcon->dst, hcon->dst_type, SMP_LTK,
+ 			  authenticated, smp->tk, smp->enc_key_size,
+@@ -1329,7 +1328,6 @@ static int smp_cmd_master_ident(struct l2cap_conn *conn, struct sk_buff *skb)
+ 	smp->ltk = ltk;
+ 	if (!(smp->remote_key_dist & KEY_DIST_MASK))
+ 		smp_distribute_keys(smp);
+-	hci_dev_unlock(hdev);
  
--	tfm_aes = crypto_alloc_blkcipher("ecb(aes)", 0, CRYPTO_ALG_ASYNC);
-+	tfm_aes = crypto_alloc_blkcipher("ecb(aes)", 0, 0);
- 	if (IS_ERR(tfm_aes)) {
- 		int err = PTR_ERR(tfm_aes);
- 		BT_ERR("Unable to create crypto context");
+ 	return 0;
+ }
 -- 
 2.1.0
 
