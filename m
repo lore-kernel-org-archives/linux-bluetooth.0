@@ -1,590 +1,1127 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <CABBYNZJnzR7=z36HAvmjnqacdnNaORAJN9eDz_vxO84MAxV1mQ@mail.gmail.com>
-References: <1415839007-21196-1-git-send-email-armansito@chromium.org>
-	<1415839007-21196-2-git-send-email-armansito@chromium.org>
-	<CABBYNZJnzR7=z36HAvmjnqacdnNaORAJN9eDz_vxO84MAxV1mQ@mail.gmail.com>
-Date: Thu, 13 Nov 2014 16:58:39 -0800
-Message-ID: <CAHrH25RV839RQwgGZJjT0+w0p53GhcLWHO4i36UshKgUb64Ecg@mail.gmail.com>
-Subject: Re: [PATCH BlueZ v1 1/7] shared/att: Add API for encoding ATT error response.
-From: Arman Uguray <armansito@chromium.org>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Arman Uguray <armansito@chromium.org>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+From: Michael Janssen <jamuraa@chromium.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: Michael Janssen <jamuraa@chromium.org>
+Subject: [PATCH BlueZ v2 4/4] GATT shim to src/shared bt_att
+Date: Thu, 13 Nov 2014 09:39:17 -0800
+Message-Id: <1415900357-27027-5-git-send-email-jamuraa@chromium.org>
+In-Reply-To: <1415900357-27027-1-git-send-email-jamuraa@chromium.org>
+References: <1415900357-27027-1-git-send-email-jamuraa@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+This patch implements a version of GAttrib which is backed by
+bt_att, which enables the simultaneous use of GAttrib and bt_att.
 
-> On Thu, Nov 13, 2014 at 8:10 AM, Luiz Augusto von Dentz <luiz.dentz@gmail.com> wrote:
-> Hi Arman,
->
-> On Thu, Nov 13, 2014 at 2:36 AM, Arman Uguray <armansito@chromium.org> wrote:
->> This patch adds bt_att_encode_error_rsp which allows encoding an ATT
->> protocol error response by correctly converting system errnos to ATT
->> protocol error codes. struct bt_att_pdu_error_rsp is introduced to
->> represent an error response PDU which can be sent directly over the
->> wire once properly encoded in network order.
->> ---
->>  src/shared/att-types.h    |  12 ++++
->>  src/shared/att.c          |  58 +++++++++++++++++-
->>  src/shared/att.h          |   3 +
->>  src/shared/gatt-client.c  |   8 ++-
->>  src/shared/gatt-helpers.c |   8 ++-
->>  src/shared/gatt-server.c  | 153 +++++++++++++++++++++++-----------------------
->>  6 files changed, 160 insertions(+), 82 deletions(-)
->>
->> diff --git a/src/shared/att-types.h b/src/shared/att-types.h
->> index 24bf3da..3d8829a 100644
->> --- a/src/shared/att-types.h
->> +++ b/src/shared/att-types.h
->> @@ -23,6 +23,10 @@
->>
->>  #include <stdint.h>
->>
->> +#ifndef __packed
->> +#define __packed __attribute__((packed))
->> +#endif
->> +
->>  #define BT_ATT_DEFAULT_LE_MTU 23
->>
->>  /* ATT protocol opcodes */
->> @@ -55,6 +59,14 @@
->>  #define BT_ATT_OP_HANDLE_VAL_IND               0x1D
->>  #define BT_ATT_OP_HANDLE_VAL_CONF              0x1E
->>
->> +/* Packed struct definitions for ATT protocol PDUs */
->> +/* TODO: Complete these definitions for all opcodes */
->> +struct bt_att_pdu_error_rsp {
->> +       uint8_t opcode;
->> +       uint16_t handle;
->> +       uint8_t ecode;
->> +} __packed;
->> +
->>  /* Special opcode to receive all requests (legacy servers) */
->>  #define BT_ATT_ALL_REQUESTS 0x00
->>
->> diff --git a/src/shared/att.c b/src/shared/att.c
->> index 6e1e538..e831078 100644
->> --- a/src/shared/att.c
->> +++ b/src/shared/att.c
->> @@ -35,13 +35,22 @@
->>  #include "src/shared/timeout.h"
->>  #include "lib/uuid.h"
->>  #include "src/shared/att.h"
->> -#include "src/shared/att-types.h"
->>
->>  #define ATT_MIN_PDU_LEN                        1  /* At least 1 byte for the opcode. */
->>  #define ATT_OP_CMD_MASK                        0x40
->>  #define ATT_OP_SIGNED_MASK             0x80
->>  #define ATT_TIMEOUT_INTERVAL           30000  /* 30000 ms */
->>
->> +/*
->> + * Common Profile and Service Error Code descriptions (see Supplement to the
->> + * Bluetooth Core Specification, sections 1.2 and 2). The error codes within
->> + * 0xE0-0xFC are reserved for future use. The remaining 3 are defined as the
->> + * following:
->> + */
->> +#define BT_ERROR_CCC_IMPROPERLY_CONFIGURED     0xfd
->> +#define BT_ERROR_ALREADY_IN_PROGRESS           0xfe
->> +#define BT_ERROR_OUT_OF_RANGE                  0xff
->> +
->>  struct att_send_op;
->>
->>  struct bt_att {
->> @@ -1218,3 +1227,50 @@ bool bt_att_unregister_all(struct bt_att *att)
->>
->>         return true;
->>  }
->> +
->> +static uint8_t att_ecode_from_error(int err)
->> +{
->> +       /*
->> +        * If the error fits in a single byte, treat it as an ATT protocol
->> +        * error as is. Since "0" is not a valid ATT protocol error code, we map
->> +        * that to UNLIKELY below.
->> +        */
->> +       if (err > 0 && err < UINT8_MAX)
->> +               return err;
->> +
->> +       /*
->> +        * Since we allow UNIX errnos, map them to appropriate ATT protocol
->> +        * and "Common Profile and Service" error codes.
->> +        */
->> +       switch (err) {
->> +       case -ENOENT:
->> +               return BT_ATT_ERROR_INVALID_HANDLE;
->> +       case -ENOMEM:
->> +               return BT_ATT_ERROR_INSUFFICIENT_RESOURCES;
->> +       case -EALREADY:
->> +               return BT_ERROR_ALREADY_IN_PROGRESS;
->> +       case -EOVERFLOW:
->> +               return BT_ERROR_OUT_OF_RANGE;
->> +       }
->> +
->> +       return BT_ATT_ERROR_UNLIKELY;
->> +}
->> +
->> +bool bt_att_encode_error_rsp(uint8_t opcode, uint16_t handle, int error,
->> +                                       struct bt_att_pdu_error_rsp *pdu)
->> +{
->> +       uint8_t ecode;
->> +
->> +       if (!pdu)
->> +               return false;
->> +
->> +       ecode = att_ecode_from_error(error);
->> +
->> +       memset(pdu, 0, sizeof(*pdu));
->> +
->> +       pdu->opcode = opcode;
->> +       put_le16(handle, &pdu->handle);
->> +       pdu->ecode = ecode;
->> +
->> +       return true;
->> +}
->> diff --git a/src/shared/att.h b/src/shared/att.h
->> index 1063021..a1a4821 100644
->> --- a/src/shared/att.h
->> +++ b/src/shared/att.h
->> @@ -76,3 +76,6 @@ unsigned int bt_att_register_disconnect(struct bt_att *att,
->>  bool bt_att_unregister_disconnect(struct bt_att *att, unsigned int id);
->>
->>  bool bt_att_unregister_all(struct bt_att *att);
->> +
->> +bool bt_att_encode_error_rsp(uint8_t opcode, uint16_t handle, int error,
->> +                                       struct bt_att_pdu_error_rsp *pdu);
->
-> Lets drop the encode part from the name, it should be implicit that it
-> will encode before sending. Also Im not sure why you have chosen to
-> pass the parameter as a struct, you could have passed separately by
-> value so encoding does not affect the caller stack, also I was
-> assuming that it would send the PDU after encoding it.
->
+This should enable smooth transition of profiles from the GAttrib
+API to the src/shared bt_att API.
+---
+ attrib/gattrib.c | 1096 +++++++++++++++++-------------------------------------
+ 1 file changed, 338 insertions(+), 758 deletions(-)
+ rewrite attrib/gattrib.c (80%)
 
-Ah, I see, so you're saying let's just have a bt_att_send_error_rsp
-that encodes and sends it. Yeah, I like that idea better, I'll upload
-this in a follow up.
+diff --git a/attrib/gattrib.c b/attrib/gattrib.c
+dissimilarity index 80%
+index fa51b6d..c686de0 100644
+--- a/attrib/gattrib.c
++++ b/attrib/gattrib.c
+@@ -1,758 +1,338 @@
+-/*
+- *
+- *  BlueZ - Bluetooth protocol stack for Linux
+- *
+- *  Copyright (C) 2010  Nokia Corporation
+- *  Copyright (C) 2010  Marcel Holtmann <marcel@holtmann.org>
+- *
+- *
+- *  This program is free software; you can redistribute it and/or modify
+- *  it under the terms of the GNU General Public License as published by
+- *  the Free Software Foundation; either version 2 of the License, or
+- *  (at your option) any later version.
+- *
+- *  This program is distributed in the hope that it will be useful,
+- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+- *  GNU General Public License for more details.
+- *
+- *  You should have received a copy of the GNU General Public License
+- *  along with this program; if not, write to the Free Software
+- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+- *
+- */
+-
+-#ifdef HAVE_CONFIG_H
+-#include "config.h"
+-#endif
+-
+-#include <stdint.h>
+-#include <stdbool.h>
+-#include <string.h>
+-#include <glib.h>
+-
+-#include <stdio.h>
+-
+-#include <bluetooth/bluetooth.h>
+-
+-#include "btio/btio.h"
+-#include "lib/uuid.h"
+-#include "src/shared/util.h"
+-#include "src/log.h"
+-#include "attrib/att.h"
+-#include "attrib/gattrib.h"
+-
+-#define GATT_TIMEOUT 30
+-
+-struct _GAttrib {
+-	GIOChannel *io;
+-	int refs;
+-	uint8_t *buf;
+-	size_t buflen;
+-	guint read_watch;
+-	guint write_watch;
+-	guint timeout_watch;
+-	GQueue *requests;
+-	GQueue *responses;
+-	GSList *events;
+-	guint next_cmd_id;
+-	GDestroyNotify destroy;
+-	gpointer destroy_user_data;
+-	bool stale;
+-};
+-
+-struct command {
+-	guint id;
+-	guint8 opcode;
+-	guint8 *pdu;
+-	guint16 len;
+-	guint8 expected;
+-	bool sent;
+-	GAttribResultFunc func;
+-	gpointer user_data;
+-	GDestroyNotify notify;
+-};
+-
+-struct event {
+-	guint id;
+-	guint8 expected;
+-	guint16 handle;
+-	GAttribNotifyFunc func;
+-	gpointer user_data;
+-	GDestroyNotify notify;
+-};
+-
+-static guint8 opcode2expected(guint8 opcode)
+-{
+-	switch (opcode) {
+-	case ATT_OP_MTU_REQ:
+-		return ATT_OP_MTU_RESP;
+-
+-	case ATT_OP_FIND_INFO_REQ:
+-		return ATT_OP_FIND_INFO_RESP;
+-
+-	case ATT_OP_FIND_BY_TYPE_REQ:
+-		return ATT_OP_FIND_BY_TYPE_RESP;
+-
+-	case ATT_OP_READ_BY_TYPE_REQ:
+-		return ATT_OP_READ_BY_TYPE_RESP;
+-
+-	case ATT_OP_READ_REQ:
+-		return ATT_OP_READ_RESP;
+-
+-	case ATT_OP_READ_BLOB_REQ:
+-		return ATT_OP_READ_BLOB_RESP;
+-
+-	case ATT_OP_READ_MULTI_REQ:
+-		return ATT_OP_READ_MULTI_RESP;
+-
+-	case ATT_OP_READ_BY_GROUP_REQ:
+-		return ATT_OP_READ_BY_GROUP_RESP;
+-
+-	case ATT_OP_WRITE_REQ:
+-		return ATT_OP_WRITE_RESP;
+-
+-	case ATT_OP_PREP_WRITE_REQ:
+-		return ATT_OP_PREP_WRITE_RESP;
+-
+-	case ATT_OP_EXEC_WRITE_REQ:
+-		return ATT_OP_EXEC_WRITE_RESP;
+-
+-	case ATT_OP_HANDLE_IND:
+-		return ATT_OP_HANDLE_CNF;
+-	}
+-
+-	return 0;
+-}
+-
+-static bool is_response(guint8 opcode)
+-{
+-	switch (opcode) {
+-	case ATT_OP_ERROR:
+-	case ATT_OP_MTU_RESP:
+-	case ATT_OP_FIND_INFO_RESP:
+-	case ATT_OP_FIND_BY_TYPE_RESP:
+-	case ATT_OP_READ_BY_TYPE_RESP:
+-	case ATT_OP_READ_RESP:
+-	case ATT_OP_READ_BLOB_RESP:
+-	case ATT_OP_READ_MULTI_RESP:
+-	case ATT_OP_READ_BY_GROUP_RESP:
+-	case ATT_OP_WRITE_RESP:
+-	case ATT_OP_PREP_WRITE_RESP:
+-	case ATT_OP_EXEC_WRITE_RESP:
+-	case ATT_OP_HANDLE_CNF:
+-		return true;
+-	}
+-
+-	return false;
+-}
+-
+-static bool is_request(guint8 opcode)
+-{
+-	switch (opcode) {
+-	case ATT_OP_MTU_REQ:
+-	case ATT_OP_FIND_INFO_REQ:
+-	case ATT_OP_FIND_BY_TYPE_REQ:
+-	case ATT_OP_READ_BY_TYPE_REQ:
+-	case ATT_OP_READ_REQ:
+-	case ATT_OP_READ_BLOB_REQ:
+-	case ATT_OP_READ_MULTI_REQ:
+-	case ATT_OP_READ_BY_GROUP_REQ:
+-	case ATT_OP_WRITE_REQ:
+-	case ATT_OP_WRITE_CMD:
+-	case ATT_OP_PREP_WRITE_REQ:
+-	case ATT_OP_EXEC_WRITE_REQ:
+-		return true;
+-	}
+-
+-	return false;
+-}
+-
+-GAttrib *g_attrib_ref(GAttrib *attrib)
+-{
+-	int refs;
+-
+-	if (!attrib)
+-		return NULL;
+-
+-	refs = __sync_add_and_fetch(&attrib->refs, 1);
+-
+-	DBG("%p: ref=%d", attrib, refs);
+-
+-	return attrib;
+-}
+-
+-static void command_destroy(struct command *cmd)
+-{
+-	if (cmd->notify)
+-		cmd->notify(cmd->user_data);
+-
+-	g_free(cmd->pdu);
+-	g_free(cmd);
+-}
+-
+-static void event_destroy(struct event *evt)
+-{
+-	if (evt->notify)
+-		evt->notify(evt->user_data);
+-
+-	g_free(evt);
+-}
+-
+-static void attrib_destroy(GAttrib *attrib)
+-{
+-	GSList *l;
+-	struct command *c;
+-
+-	while ((c = g_queue_pop_head(attrib->requests)))
+-		command_destroy(c);
+-
+-	while ((c = g_queue_pop_head(attrib->responses)))
+-		command_destroy(c);
+-
+-	g_queue_free(attrib->requests);
+-	attrib->requests = NULL;
+-
+-	g_queue_free(attrib->responses);
+-	attrib->responses = NULL;
+-
+-	for (l = attrib->events; l; l = l->next)
+-		event_destroy(l->data);
+-
+-	g_slist_free(attrib->events);
+-	attrib->events = NULL;
+-
+-	if (attrib->timeout_watch > 0)
+-		g_source_remove(attrib->timeout_watch);
+-
+-	if (attrib->write_watch > 0)
+-		g_source_remove(attrib->write_watch);
+-
+-	if (attrib->read_watch > 0)
+-		g_source_remove(attrib->read_watch);
+-
+-	if (attrib->io)
+-		g_io_channel_unref(attrib->io);
+-
+-	g_free(attrib->buf);
+-
+-	if (attrib->destroy)
+-		attrib->destroy(attrib->destroy_user_data);
+-
+-	g_free(attrib);
+-}
+-
+-void g_attrib_unref(GAttrib *attrib)
+-{
+-	int refs;
+-
+-	if (!attrib)
+-		return;
+-
+-	refs = __sync_sub_and_fetch(&attrib->refs, 1);
+-
+-	DBG("%p: ref=%d", attrib, refs);
+-
+-	if (refs > 0)
+-		return;
+-
+-	attrib_destroy(attrib);
+-}
+-
+-GIOChannel *g_attrib_get_channel(GAttrib *attrib)
+-{
+-	if (!attrib)
+-		return NULL;
+-
+-	return attrib->io;
+-}
+-
+-gboolean g_attrib_set_destroy_function(GAttrib *attrib,
+-		GDestroyNotify destroy, gpointer user_data)
+-{
+-	if (attrib == NULL)
+-		return FALSE;
+-
+-	attrib->destroy = destroy;
+-	attrib->destroy_user_data = user_data;
+-
+-	return TRUE;
+-}
+-
+-static gboolean disconnect_timeout(gpointer data)
+-{
+-	struct _GAttrib *attrib = data;
+-	struct command *c;
+-
+-	g_attrib_ref(attrib);
+-
+-	c = g_queue_pop_head(attrib->requests);
+-	if (c == NULL)
+-		goto done;
+-
+-	if (c->func)
+-		c->func(ATT_ECODE_TIMEOUT, NULL, 0, c->user_data);
+-
+-	command_destroy(c);
+-
+-	while ((c = g_queue_pop_head(attrib->requests))) {
+-		if (c->func)
+-			c->func(ATT_ECODE_ABORTED, NULL, 0, c->user_data);
+-		command_destroy(c);
+-	}
+-
+-done:
+-	attrib->stale = true;
+-
+-	g_attrib_unref(attrib);
+-
+-	return FALSE;
+-}
+-
+-static gboolean can_write_data(GIOChannel *io, GIOCondition cond,
+-								gpointer data)
+-{
+-	struct _GAttrib *attrib = data;
+-	struct command *cmd;
+-	GError *gerr = NULL;
+-	gsize len;
+-	GIOStatus iostat;
+-	GQueue *queue;
+-
+-	if (attrib->stale)
+-		return FALSE;
+-
+-	if (cond & (G_IO_HUP | G_IO_ERR | G_IO_NVAL))
+-		return FALSE;
+-
+-	queue = attrib->responses;
+-	cmd = g_queue_peek_head(queue);
+-	if (cmd == NULL) {
+-		queue = attrib->requests;
+-		cmd = g_queue_peek_head(queue);
+-	}
+-	if (cmd == NULL)
+-		return FALSE;
+-
+-	/*
+-	 * Verify that we didn't already send this command. This can only
+-	 * happen with elementes from attrib->requests.
+-	 */
+-	if (cmd->sent)
+-		return FALSE;
+-
+-	iostat = g_io_channel_write_chars(io, (char *) cmd->pdu, cmd->len,
+-								&len, &gerr);
+-	if (iostat != G_IO_STATUS_NORMAL) {
+-		if (gerr) {
+-			error("%s", gerr->message);
+-			g_error_free(gerr);
+-		}
+-
+-		return FALSE;
+-	}
+-
+-	if (cmd->expected == 0) {
+-		g_queue_pop_head(queue);
+-		command_destroy(cmd);
+-
+-		return TRUE;
+-	}
+-
+-	cmd->sent = true;
+-
+-	if (attrib->timeout_watch == 0)
+-		attrib->timeout_watch = g_timeout_add_seconds(GATT_TIMEOUT,
+-						disconnect_timeout, attrib);
+-
+-	return FALSE;
+-}
+-
+-static void destroy_sender(gpointer data)
+-{
+-	struct _GAttrib *attrib = data;
+-
+-	attrib->write_watch = 0;
+-	g_attrib_unref(attrib);
+-}
+-
+-static void wake_up_sender(struct _GAttrib *attrib)
+-{
+-	if (attrib->write_watch > 0)
+-		return;
+-
+-	attrib = g_attrib_ref(attrib);
+-	attrib->write_watch = g_io_add_watch_full(attrib->io,
+-				G_PRIORITY_DEFAULT, G_IO_OUT,
+-				can_write_data, attrib, destroy_sender);
+-}
+-
+-static bool match_event(struct event *evt, const uint8_t *pdu, gsize len)
+-{
+-	guint16 handle;
+-
+-	if (is_request(pdu[0]) && evt->expected == GATTRIB_ALL_REQS)
+-		return true;
+-
+-	if (evt->expected == pdu[0] && evt->handle == GATTRIB_ALL_HANDLES)
+-		return true;
+-
+-	if (len < 3)
+-		return false;
+-
+-	handle = get_le16(&pdu[1]);
+-
+-	if (evt->expected == pdu[0] && evt->handle == handle)
+-		return true;
+-
+-	return false;
+-}
+-
+-static gboolean received_data(GIOChannel *io, GIOCondition cond, gpointer data)
+-{
+-	struct _GAttrib *attrib = data;
+-	struct command *cmd = NULL;
+-	GSList *l;
+-	uint8_t buf[512], status;
+-	gsize len;
+-	GIOStatus iostat;
+-
+-	if (attrib->stale)
+-		return FALSE;
+-
+-	if (cond & (G_IO_HUP | G_IO_ERR | G_IO_NVAL)) {
+-		struct command *c;
+-
+-		while ((c = g_queue_pop_head(attrib->requests))) {
+-			if (c->func)
+-				c->func(ATT_ECODE_IO, NULL, 0, c->user_data);
+-			command_destroy(c);
+-		}
+-
+-		attrib->read_watch = 0;
+-
+-		return FALSE;
+-	}
+-
+-	memset(buf, 0, sizeof(buf));
+-
+-	iostat = g_io_channel_read_chars(io, (char *) buf, sizeof(buf),
+-								&len, NULL);
+-	if (iostat != G_IO_STATUS_NORMAL) {
+-		status = ATT_ECODE_IO;
+-		goto done;
+-	}
+-
+-	for (l = attrib->events; l; l = l->next) {
+-		struct event *evt = l->data;
+-
+-		if (match_event(evt, buf, len))
+-			evt->func(buf, len, evt->user_data);
+-	}
+-
+-	if (!is_response(buf[0]))
+-		return TRUE;
+-
+-	if (attrib->timeout_watch > 0) {
+-		g_source_remove(attrib->timeout_watch);
+-		attrib->timeout_watch = 0;
+-	}
+-
+-	cmd = g_queue_pop_head(attrib->requests);
+-	if (cmd == NULL) {
+-		/* Keep the watch if we have events to report */
+-		return attrib->events != NULL;
+-	}
+-
+-	if (buf[0] == ATT_OP_ERROR) {
+-		status = buf[4];
+-		goto done;
+-	}
+-
+-	if (cmd->expected != buf[0]) {
+-		status = ATT_ECODE_IO;
+-		goto done;
+-	}
+-
+-	status = 0;
+-
+-done:
+-	if (!g_queue_is_empty(attrib->requests) ||
+-					!g_queue_is_empty(attrib->responses))
+-		wake_up_sender(attrib);
+-
+-	if (cmd) {
+-		if (cmd->func)
+-			cmd->func(status, buf, len, cmd->user_data);
+-
+-		command_destroy(cmd);
+-	}
+-
+-	return TRUE;
+-}
+-
+-GAttrib *g_attrib_new(GIOChannel *io, guint16 mtu)
+-{
+-	struct _GAttrib *attrib;
+-
+-	g_io_channel_set_encoding(io, NULL, NULL);
+-	g_io_channel_set_buffered(io, FALSE);
+-
+-	attrib = g_try_new0(struct _GAttrib, 1);
+-	if (attrib == NULL)
+-		return NULL;
+-
+-	attrib->buf = g_malloc0(mtu);
+-	attrib->buflen = mtu;
+-
+-	attrib->io = g_io_channel_ref(io);
+-	attrib->requests = g_queue_new();
+-	attrib->responses = g_queue_new();
+-
+-	attrib->read_watch = g_io_add_watch(attrib->io,
+-			G_IO_IN | G_IO_HUP | G_IO_ERR | G_IO_NVAL,
+-			received_data, attrib);
+-
+-	return g_attrib_ref(attrib);
+-}
+-
+-guint g_attrib_send(GAttrib *attrib, guint id, const guint8 *pdu, guint16 len,
+-			GAttribResultFunc func, gpointer user_data,
+-			GDestroyNotify notify)
+-{
+-	struct command *c;
+-	GQueue *queue;
+-	uint8_t opcode;
+-
+-	if (attrib->stale)
+-		return 0;
+-
+-	c = g_try_new0(struct command, 1);
+-	if (c == NULL)
+-		return 0;
+-
+-	opcode = pdu[0];
+-
+-	c->opcode = opcode;
+-	c->expected = opcode2expected(opcode);
+-	c->pdu = g_malloc(len);
+-	memcpy(c->pdu, pdu, len);
+-	c->len = len;
+-	c->func = func;
+-	c->user_data = user_data;
+-	c->notify = notify;
+-
+-	if (is_response(opcode))
+-		queue = attrib->responses;
+-	else
+-		queue = attrib->requests;
+-
+-	if (id) {
+-		c->id = id;
+-		if (!is_response(opcode))
+-			g_queue_push_head(queue, c);
+-		else
+-			/* Don't re-order responses even if an ID is given */
+-			g_queue_push_tail(queue, c);
+-	} else {
+-		c->id = ++attrib->next_cmd_id;
+-		g_queue_push_tail(queue, c);
+-	}
+-
+-	/*
+-	 * If a command was added to the queue and it was empty before, wake up
+-	 * the sender. If the sender was already woken up by the second queue,
+-	 * wake_up_sender will just return.
+-	 */
+-	if (g_queue_get_length(queue) == 1)
+-		wake_up_sender(attrib);
+-
+-	return c->id;
+-}
+-
+-static int command_cmp_by_id(gconstpointer a, gconstpointer b)
+-{
+-	const struct command *cmd = a;
+-	guint id = GPOINTER_TO_UINT(b);
+-
+-	return cmd->id - id;
+-}
+-
+-gboolean g_attrib_cancel(GAttrib *attrib, guint id)
+-{
+-	GList *l = NULL;
+-	struct command *cmd;
+-	GQueue *queue;
+-
+-	if (attrib == NULL)
+-		return FALSE;
+-
+-	queue = attrib->requests;
+-	if (queue)
+-		l = g_queue_find_custom(queue, GUINT_TO_POINTER(id),
+-					command_cmp_by_id);
+-	if (l == NULL) {
+-		queue = attrib->responses;
+-		if (!queue)
+-			return FALSE;
+-		l = g_queue_find_custom(queue, GUINT_TO_POINTER(id),
+-					command_cmp_by_id);
+-	}
+-
+-	if (l == NULL)
+-		return FALSE;
+-
+-	cmd = l->data;
+-
+-	if (cmd == g_queue_peek_head(queue) && cmd->sent)
+-		cmd->func = NULL;
+-	else {
+-		g_queue_remove(queue, cmd);
+-		command_destroy(cmd);
+-	}
+-
+-	return TRUE;
+-}
+-
+-static gboolean cancel_all_per_queue(GQueue *queue)
+-{
+-	struct command *c, *head = NULL;
+-	gboolean first = TRUE;
+-
+-	if (queue == NULL)
+-		return FALSE;
+-
+-	while ((c = g_queue_pop_head(queue))) {
+-		if (first && c->sent) {
+-			/* If the command was sent ignore its callback ... */
+-			c->func = NULL;
+-			head = c;
+-			continue;
+-		}
+-
+-		first = FALSE;
+-		command_destroy(c);
+-	}
+-
+-	if (head) {
+-		/* ... and put it back in the queue */
+-		g_queue_push_head(queue, head);
+-	}
+-
+-	return TRUE;
+-}
+-
+-gboolean g_attrib_cancel_all(GAttrib *attrib)
+-{
+-	gboolean ret;
+-
+-	if (attrib == NULL)
+-		return FALSE;
+-
+-	ret = cancel_all_per_queue(attrib->requests);
+-	ret = cancel_all_per_queue(attrib->responses) && ret;
+-
+-	return ret;
+-}
+-
+-uint8_t *g_attrib_get_buffer(GAttrib *attrib, size_t *len)
+-{
+-	if (len == NULL)
+-		return NULL;
+-
+-	*len = attrib->buflen;
+-
+-	return attrib->buf;
+-}
+-
+-gboolean g_attrib_set_mtu(GAttrib *attrib, int mtu)
+-{
+-	if (mtu < ATT_DEFAULT_LE_MTU)
+-		return FALSE;
+-
+-	attrib->buf = g_realloc(attrib->buf, mtu);
+-
+-	attrib->buflen = mtu;
+-
+-	return TRUE;
+-}
+-
+-guint g_attrib_register(GAttrib *attrib, guint8 opcode, guint16 handle,
+-				GAttribNotifyFunc func, gpointer user_data,
+-				GDestroyNotify notify)
+-{
+-	static guint next_evt_id = 0;
+-	struct event *event;
+-
+-	event = g_try_new0(struct event, 1);
+-	if (event == NULL)
+-		return 0;
+-
+-	event->expected = opcode;
+-	event->handle = handle;
+-	event->func = func;
+-	event->user_data = user_data;
+-	event->notify = notify;
+-	event->id = ++next_evt_id;
+-
+-	attrib->events = g_slist_append(attrib->events, event);
+-
+-	return event->id;
+-}
+-
+-static int event_cmp_by_id(gconstpointer a, gconstpointer b)
+-{
+-	const struct event *evt = a;
+-	guint id = GPOINTER_TO_UINT(b);
+-
+-	return evt->id - id;
+-}
+-
+-gboolean g_attrib_unregister(GAttrib *attrib, guint id)
+-{
+-	struct event *evt;
+-	GSList *l;
+-
+-	if (id == 0) {
+-		warn("%s: invalid id", __func__);
+-		return FALSE;
+-	}
+-
+-	l = g_slist_find_custom(attrib->events, GUINT_TO_POINTER(id),
+-							event_cmp_by_id);
+-	if (l == NULL)
+-		return FALSE;
+-
+-	evt = l->data;
+-
+-	attrib->events = g_slist_remove(attrib->events, evt);
+-
+-	if (evt->notify)
+-		evt->notify(evt->user_data);
+-
+-	g_free(evt);
+-
+-	return TRUE;
+-}
+-
+-gboolean g_attrib_unregister_all(GAttrib *attrib)
+-{
+-	GSList *l;
+-
+-	if (attrib->events == NULL)
+-		return FALSE;
+-
+-	for (l = attrib->events; l; l = l->next) {
+-		struct event *evt = l->data;
+-
+-		if (evt->notify)
+-			evt->notify(evt->user_data);
+-
+-		g_free(evt);
+-	}
+-
+-	g_slist_free(attrib->events);
+-	attrib->events = NULL;
+-
+-	return TRUE;
+-}
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2010  Nokia Corporation
++ *  Copyright (C) 2010  Marcel Holtmann <marcel@holtmann.org>
++ *
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program; if not, write to the Free Software
++ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ *
++ */
++
++#ifdef HAVE_CONFIG_H
++#include "config.h"
++#endif
++
++#include <stdint.h>
++#include <stdbool.h>
++#include <string.h>
++#include <glib.h>
++
++#include <stdio.h>
++
++#include <bluetooth/bluetooth.h>
++
++#include "btio/btio.h"
++#include "src/log.h"
++#include "src/shared/util.h"
++#include "src/shared/att.h"
++#include "attrib/gattrib.h"
++
++struct _GAttrib {
++	int ref_count;
++	struct bt_att *att;
++	GIOChannel *io;
++	GDestroyNotify destroy;
++	gpointer destroy_user_data;
++	GQueue *callbacks;
++	uint8_t *buf;
++	int buflen;
++};
++
++
++struct attrib_callbacks {
++	GAttribResultFunc result_func;
++	GAttribNotifyFunc notify_func;
++	GDestroyNotify destroy_func;
++	gpointer user_data;
++	GAttrib *parent;
++	uint16_t notify_handle;
++};
++
++GAttrib *g_attrib_new(GIOChannel *io, guint16 mtu)
++{
++	gint fd;
++	GAttrib *attr;
++
++	if (!io)
++		return NULL;
++
++	fd = g_io_channel_unix_get_fd(io);
++	attr = new0(GAttrib, 1);
++	if (!attr)
++		return NULL;
++
++	g_io_channel_ref(io);
++	attr->io = io;
++
++	attr->att = bt_att_new(fd);
++	if (!attr->att)
++		goto fail;
++
++	attr->buf = g_malloc0(mtu);
++	attr->buflen = mtu;
++	if (!attr->buf)
++		goto fail;
++
++	attr->callbacks = g_queue_new();
++	if (!attr->callbacks)
++		goto fail;
++
++	return g_attrib_ref(attr);
++
++fail:
++	free(attr->buf);
++	bt_att_unref(attr->att);
++	g_io_channel_unref(io);
++	free(attr);
++	return NULL;
++}
++
++GAttrib *g_attrib_ref(GAttrib *attrib)
++{
++	if (!attrib)
++		return NULL;
++
++	__sync_fetch_and_add(&attrib->ref_count, 1);
++
++	DBG("%p: g_attrib_ref=%d ", attrib, attrib->ref_count);
++
++	return attrib;
++}
++
++static void attrib_callbacks_destroy(void *user_data)
++{
++	struct attrib_callbacks *cb = user_data;
++
++	if (!user_data || !g_queue_remove(cb->parent->callbacks, user_data))
++		return;
++
++	if (cb->destroy_func)
++		cb->destroy_func(cb->user_data);
++
++	free(user_data);
++}
++
++void g_attrib_unref(GAttrib *attrib)
++{
++	struct attrib_callbacks *cb;
++
++	if (!attrib)
++		return;
++
++	DBG("%p: g_attrib_unref=%d ", attrib, attrib->ref_count - 1);
++
++	if (__sync_sub_and_fetch(&attrib->ref_count, 1))
++		return;
++
++	if (attrib->destroy)
++		attrib->destroy(attrib->destroy_user_data);
++
++	while ((cb = g_queue_peek_head(attrib->callbacks)))
++		attrib_callbacks_destroy(cb);
++
++	g_queue_free(attrib->callbacks);
++
++	g_free(attrib->buf);
++
++	bt_att_unref(attrib->att);
++
++	g_io_channel_unref(attrib->io);
++
++	g_free(attrib);
++}
++
++GIOChannel *g_attrib_get_channel(GAttrib *attrib)
++{
++	if (!attrib)
++		return NULL;
++
++	return attrib->io;
++}
++
++gboolean g_attrib_set_destroy_function(GAttrib *attrib,
++		GDestroyNotify destroy, gpointer user_data)
++{
++	if (!attrib)
++		return FALSE;
++
++	attrib->destroy = destroy;
++	attrib->destroy_user_data = user_data;
++
++	return TRUE;
++}
++
++
++static uint8_t *construct_full_pdu(uint8_t opcode, const void *pdu,
++								uint16_t length)
++{
++	uint8_t *buf = malloc0(length + 1);
++
++	if (!buf)
++		return NULL;
++
++	buf[0] = opcode;
++	memcpy(buf + 1, pdu, length);
++
++	return buf;
++}
++
++static void attrib_callback_result(uint8_t opcode, const void *pdu,
++				   uint16_t length, void *user_data)
++{
++	uint8_t *buf;
++	struct attrib_callbacks *cb = user_data;
++	guint8 status = 0;
++
++	if (!cb)
++		return;
++
++	buf = construct_full_pdu(opcode, pdu, length);
++	if (!buf)
++		return;
++
++	if (opcode == BT_ATT_OP_ERROR_RSP) {
++		/* Error code is the third byte of the PDU data */
++		if (length < 4)
++			status = BT_ATT_ERROR_UNLIKELY;
++		else
++			status = ((guint8 *)pdu)[3];
++	}
++
++	if (cb->result_func)
++		cb->result_func(status, buf, length + 1, cb->user_data);
++
++	free(buf);
++}
++
++
++static void attrib_callback_notify(uint8_t opcode, const void *pdu,
++				uint16_t length, void *user_data)
++{
++	uint8_t *buf;
++	struct attrib_callbacks *cb = user_data;
++
++	if (!cb || !cb->notify_func)
++		return;
++
++	if (cb->notify_handle != GATTRIB_ALL_HANDLES && length < 2)
++		return;
++
++	if (cb->notify_handle != GATTRIB_ALL_HANDLES &&
++					     cb->notify_handle != get_le16(pdu))
++		return;
++
++	buf = construct_full_pdu(opcode, pdu, length);
++	if (!buf)
++		return;
++
++	cb->notify_func(buf, length + 1, cb->user_data);
++
++	free(buf);
++}
++
++guint g_attrib_send(GAttrib *attrib, guint id, const guint8 *pdu, guint16 len,
++			GAttribResultFunc func, gpointer user_data,
++			GDestroyNotify notify)
++{
++	struct attrib_callbacks *cb = NULL;
++	bt_att_response_func_t response_cb = NULL;
++	bt_att_destroy_func_t destroy_cb = NULL;
++
++	if (!pdu || !len)
++		return 0;
++
++	if (func || notify) {
++		cb = new0(struct attrib_callbacks, 1);
++		if (!cb)
++			return 0;
++		cb->result_func = func;
++		cb->user_data = user_data;
++		cb->destroy_func = notify;
++		cb->parent = attrib;
++		g_queue_push_head(attrib->callbacks, cb);
++		response_cb = attrib_callback_result;
++		destroy_cb = attrib_callbacks_destroy;
++	}
++
++	return bt_att_send(attrib->att, pdu[0], (void *)pdu + 1, len - 1,
++						   response_cb, cb, destroy_cb);
++}
++
++gboolean g_attrib_cancel(GAttrib *attrib, guint id)
++{
++	return bt_att_cancel(attrib->att, id);
++}
++
++gboolean g_attrib_cancel_all(GAttrib *attrib)
++{
++	return bt_att_cancel_all(attrib->att);
++}
++
++guint g_attrib_register(GAttrib *attrib, guint8 opcode, guint16 handle,
++				GAttribNotifyFunc func, gpointer user_data,
++				GDestroyNotify notify)
++{
++	struct attrib_callbacks *cb = NULL;
++
++	if (func || notify) {
++		cb = new0(struct attrib_callbacks, 1);
++		if (!cb)
++			return 0;
++		cb->notify_func = func;
++		cb->notify_handle = handle;
++		cb->user_data = user_data;
++		cb->destroy_func = notify;
++		cb->parent = attrib;
++		g_queue_push_head(attrib->callbacks, cb);
++	}
++
++	if (opcode == GATTRIB_ALL_REQS)
++		opcode = BT_ATT_ALL_REQUESTS;
++
++	return bt_att_register(attrib->att, opcode, attrib_callback_notify,
++			       cb, attrib_callbacks_destroy);
++}
++
++uint8_t *g_attrib_get_buffer(GAttrib *attrib, size_t *len)
++{
++	if (!len)
++		return NULL;
++
++	*len = attrib->buflen;
++	return attrib->buf;
++}
++
++gboolean g_attrib_set_mtu(GAttrib *attrib, int mtu)
++{
++	/* Clients of this expect a buffer to use. */
++	if (mtu > attrib->buflen) {
++		attrib->buf = g_realloc(attrib->buf, mtu);
++		attrib->buflen = mtu;
++	}
++
++	return bt_att_set_mtu(attrib->att, mtu);
++}
++
++gboolean g_attrib_unregister(GAttrib *attrib, guint id)
++{
++	return bt_att_unregister(attrib->att, id);
++}
++
++gboolean g_attrib_unregister_all(GAttrib *attrib)
++{
++	return bt_att_unregister_all(attrib->att);
++}
+-- 
+2.1.0.rc2.206.gedb03e5
 
-In the meantime though, I don't think this is really blocking the
-tools/btgatt-server patches, so if you're fine with the latest patch
-set, please apply them and I'll send the revised version of this patch
-seperately.
-
->> diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
->> index 30b271e..1f82048 100644
->> --- a/src/shared/gatt-client.c
->> +++ b/src/shared/gatt-client.c
->> @@ -1285,10 +1285,14 @@ static bool notify_data_write_ccc(struct notify_data *notify_data, bool enable,
->>
->>  static uint8_t process_error(const void *pdu, uint16_t length)
->>  {
->> -       if (!pdu || length != 4)
->> +       const struct bt_att_pdu_error_rsp *error_pdu;
->> +
->> +       if (!pdu || length != sizeof(struct bt_att_pdu_error_rsp))
->>                 return 0;
->>
->> -       return ((uint8_t *) pdu)[3];
->> +       error_pdu = pdu;
->> +
->> +       return error_pdu->ecode;
->>  }
->>
->>  static void enable_ccc_callback(uint8_t opcode, const void *pdu,
->> diff --git a/src/shared/gatt-helpers.c b/src/shared/gatt-helpers.c
->> index 220d0eb..9c8a3ba 100644
->> --- a/src/shared/gatt-helpers.c
->> +++ b/src/shared/gatt-helpers.c
->> @@ -430,10 +430,14 @@ static void destroy_mtu_op(void *user_data)
->>
->>  static uint8_t process_error(const void *pdu, uint16_t length)
->>  {
->> -       if (!pdu || length != 4)
->> +       const struct bt_att_pdu_error_rsp *error_pdu;
->> +
->> +       if (!pdu || length != sizeof(struct bt_att_pdu_error_rsp))
->>                 return 0;
->>
->> -       return ((uint8_t *) pdu)[3];
->> +       error_pdu = pdu;
->> +
->> +       return error_pdu->ecode;
->>  }
->>
->>  static void mtu_cb(uint8_t opcode, const void *pdu, uint16_t length,
->> diff --git a/src/shared/gatt-server.c b/src/shared/gatt-server.c
->> index 2ca318a..3262992 100644
->> --- a/src/shared/gatt-server.c
->> +++ b/src/shared/gatt-server.c
->> @@ -22,6 +22,7 @@
->>   */
->>
->>  #include <sys/uio.h>
->> +#include <errno.h>
->>
->>  #include "src/shared/att.h"
->>  #include "lib/uuid.h"
->> @@ -29,7 +30,6 @@
->>  #include "src/shared/gatt-db.h"
->>  #include "src/shared/gatt-server.h"
->>  #include "src/shared/gatt-helpers.h"
->> -#include "src/shared/att-types.h"
->>  #include "src/shared/util.h"
->>
->>  #ifndef MAX
->> @@ -133,22 +133,6 @@ static void bt_gatt_server_free(struct bt_gatt_server *server)
->>         free(server);
->>  }
->>
->> -static uint8_t att_ecode_from_error(int err)
->> -{
->> -       if (err < 0 || err > UINT8_MAX)
->> -               return 0xff;
->> -
->> -       return err;
->> -}
->> -
->> -static void encode_error_rsp(uint8_t opcode, uint16_t handle, uint8_t ecode,
->> -                                                               uint8_t pdu[4])
->> -{
->> -       pdu[0] = opcode;
->> -       pdu[3] = ecode;
->> -       put_le16(handle, pdu + 1);
->> -}
->> -
->>  static bool get_uuid_le(const uint8_t *uuid, size_t len, bt_uuid_t *out_uuid)
->>  {
->>         uint128_t u128;
->> @@ -315,8 +299,9 @@ static void read_by_grp_type_cb(uint8_t opcode, const void *pdu,
->>
->>  error:
->>         rsp_opcode = BT_ATT_OP_ERROR_RSP;
->> -       rsp_len = 4;
->> -       encode_error_rsp(opcode, ehandle, ecode, rsp_pdu);
->> +       rsp_len = sizeof(struct bt_att_pdu_error_rsp);
->> +       bt_att_encode_error_rsp(opcode, ehandle, ecode,
->> +                               (struct bt_att_pdu_error_rsp *) rsp_pdu);
->>
->>  done:
->>         queue_destroy(q, NULL);
->> @@ -355,13 +340,13 @@ static void read_by_type_read_complete_cb(struct gatt_db_attribute *attr,
->>
->>         /* Terminate the operation if there was an error */
->>         if (err) {
->> -               uint8_t pdu[4];
->> -               uint8_t att_ecode = att_ecode_from_error(err);
->> +               struct bt_att_pdu_error_rsp error_pdu;
->>
->> -               encode_error_rsp(BT_ATT_OP_READ_BY_TYPE_REQ, handle, att_ecode,
->> -                                                                       pdu);
->> -               bt_att_send(server->att, BT_ATT_OP_ERROR_RSP, pdu, 4, NULL,
->> -                                                               NULL, NULL);
->> +               bt_att_encode_error_rsp(BT_ATT_OP_READ_BY_TYPE_REQ, handle, err,
->> +                                                               &error_pdu);
->> +               bt_att_send(server->att, BT_ATT_OP_ERROR_RSP, &error_pdu,
->> +                                                       sizeof(error_pdu),
->> +                                                       NULL, NULL, NULL);
->>                 async_read_op_destroy(op);
->>                 return;
->>         }
->> @@ -437,8 +422,9 @@ static void process_read_by_type(struct async_read_op *op)
->>  error:
->>         ehandle = gatt_db_attribute_get_handle(attr);
->>         rsp_opcode = BT_ATT_OP_ERROR_RSP;
->> -       rsp_len = 4;
->> -       encode_error_rsp(BT_ATT_OP_READ_BY_TYPE_REQ, ehandle, ecode, op->pdu);
->> +       rsp_len = sizeof(struct bt_att_pdu_error_rsp);
->> +       bt_att_encode_error_rsp(BT_ATT_OP_READ_BY_TYPE_REQ, ehandle, ecode,
->> +                               (struct bt_att_pdu_error_rsp *) op->pdu);
->>
->>  done:
->>         bt_att_send(server->att, rsp_opcode, op->pdu, rsp_len, NULL,
->> @@ -452,7 +438,7 @@ static void read_by_type_cb(uint8_t opcode, const void *pdu,
->>         struct bt_gatt_server *server = user_data;
->>         uint16_t start, end;
->>         bt_uuid_t type;
->> -       uint8_t rsp_pdu[4];
->> +       struct bt_att_pdu_error_rsp error_pdu;
->>         uint16_t ehandle = 0;
->>         uint8_t ecode;
->>         struct queue *q = NULL;
->> @@ -524,9 +510,10 @@ static void read_by_type_cb(uint8_t opcode, const void *pdu,
->>         return;
->>
->>  error:
->> -       encode_error_rsp(opcode, ehandle, ecode, rsp_pdu);
->> +       bt_att_encode_error_rsp(opcode, ehandle, ecode, &error_pdu);
->>         queue_destroy(q, NULL);
->> -       bt_att_send(server->att, BT_ATT_OP_ERROR_RSP, rsp_pdu, 4,
->> +       bt_att_send(server->att, BT_ATT_OP_ERROR_RSP, &error_pdu,
->> +                                                       sizeof(error_pdu),
->>                                                         NULL, NULL, NULL);
->>  }
->>
->> @@ -665,8 +652,9 @@ static void find_info_cb(uint8_t opcode, const void *pdu,
->>
->>  error:
->>         rsp_opcode = BT_ATT_OP_ERROR_RSP;
->> -       rsp_len = 4;
->> -       encode_error_rsp(opcode, ehandle, ecode, rsp_pdu);
->> +       rsp_len = sizeof(struct bt_att_pdu_error_rsp);
->> +       bt_att_encode_error_rsp(opcode, ehandle, ecode,
->> +                               (struct bt_att_pdu_error_rsp *) rsp_pdu);
->>
->>  done:
->>         queue_destroy(q, NULL);
->> @@ -697,11 +685,11 @@ static void write_complete_cb(struct gatt_db_attribute *attr, int err,
->>         handle = gatt_db_attribute_get_handle(attr);
->>
->>         if (err) {
->> -               uint8_t rsp_pdu[4];
->> -               uint8_t att_ecode = att_ecode_from_error(err);
->> +               struct bt_att_pdu_error_rsp error_pdu;
->>
->> -               encode_error_rsp(op->opcode, handle, att_ecode, rsp_pdu);
->> -               bt_att_send(server->att, BT_ATT_OP_ERROR_RSP, rsp_pdu, 4,
->> +               bt_att_encode_error_rsp(op->opcode, handle, err, &error_pdu);
->> +               bt_att_send(server->att, BT_ATT_OP_ERROR_RSP, &error_pdu,
->> +                                                       sizeof(error_pdu),
->>                                                         NULL, NULL, NULL);
->>         } else {
->>                 bt_att_send(server->att, BT_ATT_OP_WRITE_RSP, NULL, 0,
->> @@ -717,7 +705,7 @@ static void write_cb(uint8_t opcode, const void *pdu,
->>         struct bt_gatt_server *server = user_data;
->>         struct gatt_db_attribute *attr;
->>         uint16_t handle = 0;
->> -       uint8_t rsp_pdu[4];
->> +       struct bt_att_pdu_error_rsp error_pdu;
->>         struct async_write_op *op = NULL;
->>         uint8_t ecode;
->>         uint32_t perm;
->> @@ -777,8 +765,9 @@ error:
->>         if (opcode == BT_ATT_OP_WRITE_CMD)
->>                 return;
->>
->> -       encode_error_rsp(opcode, handle, ecode, rsp_pdu);
->> -       bt_att_send(server->att, BT_ATT_OP_ERROR_RSP, rsp_pdu, 4,
->> +       bt_att_encode_error_rsp(opcode, handle, ecode, &error_pdu);
->> +       bt_att_send(server->att, BT_ATT_OP_ERROR_RSP, &error_pdu,
->> +                                                       sizeof(error_pdu),
->>                                                         NULL, NULL, NULL);
->>  }
->>
->> @@ -824,12 +813,12 @@ static void read_complete_cb(struct gatt_db_attribute *attr, int err,
->>         handle = gatt_db_attribute_get_handle(attr);
->>
->>         if (err) {
->> -               uint8_t pdu[4];
->> -               uint8_t att_ecode = att_ecode_from_error(err);
->> +               struct bt_att_pdu_error_rsp error_pdu;
->>
->> -               encode_error_rsp(op->opcode, handle, att_ecode, pdu);
->> -               bt_att_send(server->att, BT_ATT_OP_ERROR_RSP, pdu, 4, NULL,
->> -                                                               NULL, NULL);
->> +               bt_att_encode_error_rsp(op->opcode, handle, err, &error_pdu);
->> +               bt_att_send(server->att, BT_ATT_OP_ERROR_RSP, &error_pdu,
->> +                                                       sizeof(error_pdu),
->> +                                                       NULL, NULL, NULL);
->>                 async_read_op_destroy(op);
->>                 return;
->>         }
->> @@ -846,7 +835,7 @@ static void handle_read_req(struct bt_gatt_server *server, uint8_t opcode,
->>                                                                 uint16_t handle,
->>                                                                 uint16_t offset)
->>  {
->> -       uint8_t error_pdu[4];
->> +       struct bt_att_pdu_error_rsp error_pdu;
->>         struct gatt_db_attribute *attr;
->>         uint8_t ecode;
->>         uint32_t perm;
->> @@ -898,9 +887,10 @@ error:
->>         if (op)
->>                 async_read_op_destroy(op);
->>
->> -       encode_error_rsp(opcode, handle, ecode, error_pdu);
->> -       bt_att_send(server->att, BT_ATT_OP_ERROR_RSP, error_pdu, 4, NULL, NULL,
->> -                                                                       NULL);
->> +       bt_att_encode_error_rsp(opcode, handle, ecode, &error_pdu);
->> +       bt_att_send(server->att, BT_ATT_OP_ERROR_RSP, &error_pdu,
->> +                                                       sizeof(error_pdu),
->> +                                                       NULL, NULL, NULL);
->>  }
->>
->>  static void read_cb(uint8_t opcode, const void *pdu,
->> @@ -910,11 +900,13 @@ static void read_cb(uint8_t opcode, const void *pdu,
->>         uint16_t handle;
->>
->>         if (length != 2) {
->> -               uint8_t pdu[4];
->> +               struct bt_att_pdu_error_rsp error_pdu;
->>
->> -               encode_error_rsp(opcode, 0, BT_ATT_ERROR_INVALID_PDU, pdu);
->> -               bt_att_send(server->att, BT_ATT_OP_ERROR_RSP, pdu, 4, NULL,
->> -                                                               NULL, NULL);
->> +               bt_att_encode_error_rsp(opcode, 0, BT_ATT_ERROR_INVALID_PDU,
->> +                                                               &error_pdu);
->> +               bt_att_send(server->att, BT_ATT_OP_ERROR_RSP, &error_pdu,
->> +                                                       sizeof(error_pdu),
->> +                                                       NULL, NULL, NULL);
->>                 return;
->>         }
->>
->> @@ -930,11 +922,13 @@ static void read_blob_cb(uint8_t opcode, const void *pdu,
->>         uint16_t handle, offset;
->>
->>         if (length != 4) {
->> -               uint8_t pdu[4];
->> +               struct bt_att_pdu_error_rsp error_pdu;
->>
->> -               encode_error_rsp(opcode, 0, BT_ATT_ERROR_INVALID_PDU, pdu);
->> -               bt_att_send(server->att, BT_ATT_OP_ERROR_RSP, pdu, 4, NULL,
->> -                                                               NULL, NULL);
->> +               bt_att_encode_error_rsp(opcode, 0, BT_ATT_ERROR_INVALID_PDU,
->> +                                                               &error_pdu);
->> +               bt_att_send(server->att, BT_ATT_OP_ERROR_RSP, &error_pdu,
->> +                                                       sizeof(error_pdu),
->> +                                                       NULL, NULL, NULL);
->>                 return;
->>         }
->>
->> @@ -1031,8 +1025,9 @@ error:
->>                 prep_write_data_destroy(prep_data);
->>
->>         rsp_opcode = BT_ATT_OP_ERROR_RSP;
->> -       rsp_len = 4;
->> -       encode_error_rsp(opcode, handle, ecode, rsp_pdu);
->> +       rsp_len = sizeof(struct bt_att_pdu_error_rsp);
->> +       bt_att_encode_error_rsp(opcode, handle, ecode,
->> +                               (struct bt_att_pdu_error_rsp *) rsp_pdu);
->>
->>  done:
->>         bt_att_send(server->att, rsp_opcode, rsp_pdu, rsp_len, NULL, NULL,
->> @@ -1040,30 +1035,29 @@ done:
->>  }
->>
->>  static void exec_next_prep_write(struct bt_gatt_server *server,
->> -                                       uint16_t ehandle, uint8_t att_ecode);
->> +                                               uint16_t ehandle, int err);
->>
->>  static void exec_write_complete_cb(struct gatt_db_attribute *attr, int err,
->>                                                                 void *user_data)
->>  {
->>         struct bt_gatt_server *server = user_data;
->>         uint16_t handle = gatt_db_attribute_get_handle(attr);
->> -       uint16_t att_ecode = att_ecode_from_error(err);
->>
->> -       exec_next_prep_write(server, handle, att_ecode);
->> +       exec_next_prep_write(server, handle, err);
->>  }
->>
->>  static void exec_next_prep_write(struct bt_gatt_server *server,
->> -                                       uint16_t ehandle, uint8_t att_ecode)
->> +                                               uint16_t ehandle, int err)
->>  {
->>         struct prep_write_data *next = NULL;
->>         uint8_t rsp_opcode = BT_ATT_OP_EXEC_WRITE_RSP;
->> -       uint8_t error_pdu[4];
->> +       struct bt_att_pdu_error_rsp error_pdu;
->>         uint8_t *rsp_pdu = NULL;
->>         uint16_t rsp_len = 0;
->>         struct gatt_db_attribute *attr;
->>         bool status;
->>
->> -       if (att_ecode)
->> +       if (err)
->>                 goto error;
->>
->>         next = queue_pop_head(server->prep_queue);
->> @@ -1072,7 +1066,7 @@ static void exec_next_prep_write(struct bt_gatt_server *server,
->>
->>         attr = gatt_db_get_attribute(server->db, next->handle);
->>         if (!attr) {
->> -               att_ecode = BT_ATT_ERROR_UNLIKELY;
->> +               err = BT_ATT_ERROR_UNLIKELY;
->>                 goto error;
->>         }
->>
->> @@ -1086,14 +1080,15 @@ static void exec_next_prep_write(struct bt_gatt_server *server,
->>         if (status)
->>                 return;
->>
->> -       att_ecode = BT_ATT_ERROR_UNLIKELY;
->> +       err = BT_ATT_ERROR_UNLIKELY;
->>
->>  error:
->>         rsp_opcode = BT_ATT_OP_ERROR_RSP;
->> -       rsp_len = 4;
->> -       rsp_pdu = error_pdu;
->> -       encode_error_rsp(BT_ATT_OP_EXEC_WRITE_REQ, ehandle, att_ecode, rsp_pdu);
->> +       rsp_len = sizeof(error_pdu);
->> +       bt_att_encode_error_rsp(BT_ATT_OP_EXEC_WRITE_REQ, ehandle, err,
->> +                                                               &error_pdu);
->>
->> +       rsp_pdu = (uint8_t *) &error_pdu;
->>  done:
->>         bt_att_send(server->att, rsp_opcode, rsp_pdu, rsp_len, NULL, NULL,
->>                                                                         NULL);
->> @@ -1106,7 +1101,7 @@ static void exec_write_cb(uint8_t opcode, const void *pdu,
->>         uint8_t flags;
->>         uint8_t ecode;
->>         uint8_t rsp_opcode;
->> -       uint8_t error_pdu[4];
->> +       struct bt_att_pdu_error_rsp error_pdu;
->>         uint8_t *rsp_pdu = NULL;
->>         uint16_t rsp_len = 0;
->>         bool write;
->> @@ -1143,9 +1138,10 @@ static void exec_write_cb(uint8_t opcode, const void *pdu,
->>
->>  error:
->>         rsp_opcode = BT_ATT_OP_ERROR_RSP;
->> -       rsp_len = 4;
->> -       rsp_pdu = error_pdu;
->> -       encode_error_rsp(opcode, 0, ecode, rsp_pdu);
->> +       rsp_len = sizeof(error_pdu);
->> +       bt_att_encode_error_rsp(opcode, 0, ecode, &error_pdu);
->> +
->> +       rsp_pdu = (uint8_t *) &error_pdu;
->>
->>  done:
->>         bt_att_send(server->att, rsp_opcode, rsp_pdu, rsp_len, NULL, NULL,
->> @@ -1158,12 +1154,15 @@ static void exchange_mtu_cb(uint8_t opcode, const void *pdu,
->>         struct bt_gatt_server *server = user_data;
->>         uint16_t client_rx_mtu;
->>         uint16_t final_mtu;
->> -       uint8_t rsp_pdu[4];
->> +       uint8_t rsp_pdu[2];
->>
->>         if (length != 2) {
->> -               encode_error_rsp(opcode, 0, BT_ATT_ERROR_INVALID_PDU, rsp_pdu);
->> -               bt_att_send(server->att, BT_ATT_OP_ERROR_RSP, rsp_pdu,
->> -                                       sizeof(rsp_pdu), NULL, NULL, NULL);
->> +               struct bt_att_pdu_error_rsp error_pdu;
->> +
->> +               bt_att_encode_error_rsp(opcode, 0, BT_ATT_ERROR_INVALID_PDU,
->> +                                                               &error_pdu);
->> +               bt_att_send(server->att, BT_ATT_OP_ERROR_RSP, &error_pdu,
->> +                                       sizeof(error_pdu), NULL, NULL, NULL);
->>                 return;
->>         }
->>
->> --
->> 2.1.0.rc2.206.gedb03e5
->>
->> --
->> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
->> the body of a message to majordomo@vger.kernel.org
->> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->
->
->
-> --
-> Luiz Augusto von Dentz
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-
-Thanks,
-Arman
