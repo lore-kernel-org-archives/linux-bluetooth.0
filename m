@@ -1,71 +1,113 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 8.0 \(1990.1\))
-Subject: Re: [PATCH v2 0/2] Bluetooth: Lock nesting for L2CAP channels and sockets
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1415823742-26909-1-git-send-email-johan.hedberg@gmail.com>
-Date: Thu, 13 Nov 2014 15:52:17 +0900
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <512DFAFA-C290-4884-9141-AD6889D93954@holtmann.org>
-References: <1415823742-26909-1-git-send-email-johan.hedberg@gmail.com>
-To: Johan Hedberg <johan.hedberg@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+MIME-Version: 1.0
+Sender: armansito@google.com
+In-Reply-To: <ED9629AB-B978-49FE-A7D7-5D9E62642504@holtmann.org>
+References: <CAHrH25TMxuHY3hqQQFWe+=5ghzc5rrEG2ED5sa410ddiJ-YuDA@mail.gmail.com>
+	<50181A20-3313-48C7-924B-05C67B975139@holtmann.org>
+	<CAHrH25T6tmUO2Zvsr=R7+yHwQE0_hY_sMt4UQAmCBMZBOH0PRQ@mail.gmail.com>
+	<ED9629AB-B978-49FE-A7D7-5D9E62642504@holtmann.org>
+Date: Wed, 12 Nov 2014 21:28:14 -0800
+Message-ID: <CAHrH25Te4J6ospnJYA00mb1RofwHrS4=KD8LjmTLvo5Y4Jy8EQ@mail.gmail.com>
+Subject: Re: Handling EBUSY for LE connections.
+From: Arman Uguray <armansito@chromium.org>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>,
+	Jakub Pawlowski <jpawlowski@google.com>
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+Hi Marcel,
 
-> v2 has minor fixes to a code comment in patch 1/2 and the commit message
-> of patch 2/2.
-> 
-> From the original cover letter:
-> 
-> I've spent the last few days fighting with all sorts of lockdep warnings
-> in the Bluetooth subsystem. A lot of them come from the fact that we
-> have cross-channel access for L2CAP channels. This ends up looking
-> suspicious to lockdep unless we help out a bit by adding nesting level
-> annotations.
-> 
-> It seems like we need at least three distinct nesting levels: SMP
-> channels, "normal" channels, and parent/listening channels. This is
-> because the parent channel lock may be held while also taking the lock
-> of child channels, and the SMP channel may be accessed while holding the
-> lock of any other channel (e.g. to request security level elevation).
-> 
-> We could in theory identify the type of channel in question implicitly
-> by inspecting the channel in the l2cap_chan_lock function, however this
-> is problematic since accessing channel data would usually already
-> require holding the channel lock (not to mention that the logic for
-> selecting the needed nesting level wouldn't be completely trivial).
-> 
-> A simpler (imo) solution that I've gone for is to introduce a new
-> "atomic_t nesting" channel member which contains the necessary nesting
-> level and is set as soon as the level is known (i.e. initialized to
-> "normal" upon channel creation or set to one of the two other levels
-> when creating the SMP chan in smp.c or when setting chan->state to
-> BT_LISTEN).
-> 
-> The second patch contains a long needed fix for l2cap_sock_teardown_cb
-> which only got a half-fix earlier this week (also from me) for its
-> locking. This function gets called for all types of channels so it can't
-> have a hard-coded nesting level for the socket lock. Instead I've opted
-> for the socket lock inheriting the chan level and then also using that
-> for the two other places calling lock_sock_nested() to be consistent.
-> 
-> Johan
-> 
-> ----------------------------------------------------------------
-> Johan Hedberg (2):
->      Bluetooth: Use proper nesting annotation for l2cap_chan lock
->      Bluetooth: Fix L2CAP socket lock nesting level
-> 
-> include/net/bluetooth/l2cap.h | 15 ++++++++++++++-
-> net/bluetooth/l2cap_sock.c    | 22 +++++++++++++++++++---
-> net/bluetooth/smp.c           | 10 ++++++++++
-> 3 files changed, 43 insertions(+), 4 deletions(-)
+> On Wed, Nov 12, 2014 at 9:10 PM, Marcel Holtmann <marcel@holtmann.org> wr=
+ote:
+> Hi Arman,
+>
+>>>> We have a use case in which multiple LE connection attempts are made
+>>>> in rapid succession to a device that frequently rotates its private
+>>>> address. The connect call frequently fails with
+>>>> "org.bluez.Error.Failed: Device or resource is busy (16)". I tracked
+>>>> this down to a line in net/bluetooth/hci_conn.c:hci_connect_le that
+>>>> has the following comment before returning -EBUSY:
+>>>>
+>>>>   /* Since the controller supports only one LE connection attempt at a
+>>>>    * a time, we return -EBUSY if there is any connection attempt runni=
+ng.
+>>>>    */
+>>>>
+>>>> This is all fine and good, however the org.bluez.Error.Failed error
+>>>> name is too generic for an application to determine how to recover
+>>>> from this case and it would be nice if there was a way for an
+>>>> application to know that it should perhaps try connecting again later,
+>>>> especially without having to parse the error message string to make
+>>>> sense of things while there can be a clear error name.
+>>>>
+>>>> So, would it make sense for bluetoothd to return
+>>>> org.bluez.Error.InProgress or even org.bluez.Error.Busy here? Another
+>>>> potential solution I had in mind was to have bluetoothd actually queue
+>>>> LE connection attempts if one is already pending, or perhaps
+>>>> automatically schedule a retry if kernel returns EBUSY.
+>>>>
+>>>> What do you think is the best solution here?
+>>>
+>>> we should fix that directly in the kernel. Back in the days we had a si=
+milar issue with BR/EDR and some more "dumb" controllers. We queued the con=
+nection attempt in the kernel and issued it whenever the controller was fre=
+e again.
+>>>
+>>> One other thing that we should be doing for "direct" LE connection atte=
+mpts is to run them through the LE passive background scanning. That way we=
+ have the same connection logic handling the background scanning and the co=
+nnection attempts.
+>>>
+>>> Mainly I am thinking that if we have a L2CAP connect() request, we just=
+ add it to the LE passive background scanning. The only difference would be=
+ that these can actually time out. Otherwise it should be exactly the same.
+>>
+>> OK, so what is the work that I would need to do here? I'm not super
+>> familiar with the kernel code, hence I'd appreciate some guidance.
+>> From what you said, I gather two different work items:
+>>
+>>  1. Queue connection attempts and reissue when the controller becomes fr=
+ee.
+>>  2. Make use of background scanning.
+>>
+>> If we do #2 would we need #1 as well? I assume #2 will only be
+>> possible on later kernels, is there a solution that would easily
+>> backport to older kernels?
+>
+> the background scanning is part of 3.17 and later, and you want to backpo=
+rt that anyway. Main reason is that it using the controller whitelist and i=
+s needed for proper LE HID support anyway.
+>
 
-both patches have been applied to bluetooth-next tree.
+OK. For ChromiumOS's 3.10 and 3.14 kernels Scott has already done a
+backport from the latest bluetooth-next but we had concerns for kernel
+3.8. I guess for now I'll go with your background scan based
+suggestion and worry about those older platforms later.
 
-Regards
+> So the only thing that should be needed is the capabilities to add an ent=
+ry to the connection list that has a timeout. Right now only userspace via =
+mgmt Add/Remove Device can modify this list. These entries would come from =
+L2CAP connect() calls and need to fail if the device in question can not be=
+ found in x seconds.
+>
+> This means the connection logic from the background scanning should get a=
+ delayed workqueue for the timeout and we have to add timeout values to eac=
+h entry in our list. And then remove them when timeout has been reached and=
+ send a proper socket error back to userspace. The real advantage comes int=
+o play that as a result the connection handling would then also use the con=
+troller whitelist and with that can easily connect multiple device after ea=
+ch other. For the automatic connections that we trigger via mgmt Add/Remove=
+ Device this already works right now.
+>
 
-Marcel
+OK, that sounds straightforward actually. I'll start looking into this
+and probably send out some RFC patches later.
 
+> Regards
+>
+> Marcel
+>
+
+Thanks,
+Arman
