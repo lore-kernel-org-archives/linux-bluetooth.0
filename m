@@ -2,284 +2,199 @@ Return-Path: <cyrus@holtmann.org>
 From: Arman Uguray <armansito@chromium.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Arman Uguray <armansito@chromium.org>
-Subject: [PATCH BlueZ v1 5/7] tools/btgatt-server: Add command support and the notify command.
-Date: Wed, 12 Nov 2014 16:36:45 -0800
-Message-Id: <1415839007-21196-6-git-send-email-armansito@chromium.org>
+Subject: [PATCH BlueZ v1 2/7] tools/btgatt-server: Introduce btgatt-server.
+Date: Wed, 12 Nov 2014 16:36:42 -0800
+Message-Id: <1415839007-21196-3-git-send-email-armansito@chromium.org>
 In-Reply-To: <1415839007-21196-1-git-send-email-armansito@chromium.org>
 References: <1415839007-21196-1-git-send-email-armansito@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch adds a command REPL and introduces the "notify" command which
-allows sending notifications and indications.
+This patch introduces tools/btgatt-server, which is a command-line tool
+for testing and debugging shared/gatt-server.
 ---
- tools/btgatt-server.c | 230 ++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 230 insertions(+)
+ .gitignore            |   1 +
+ Makefile.tools        |   8 +++
+ tools/btgatt-server.c | 139 ++++++++++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 148 insertions(+)
+ create mode 100644 tools/btgatt-server.c
 
+diff --git a/.gitignore b/.gitignore
+index 164cc97..82304b0 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -75,6 +75,7 @@ tools/3dsp
+ tools/obexctl
+ tools/gatt-service
+ tools/btgatt-client
++tools/btgatt-server
+ tools/mcaptest
+ test/sap_client.pyc
+ test/bluezutils.pyc
+diff --git a/Makefile.tools b/Makefile.tools
+index 75a6faa..4bd683b 100644
+--- a/Makefile.tools
++++ b/Makefile.tools
+@@ -207,6 +207,14 @@ EXTRA_DIST += tools/hciattach.1 tools/hciconfig.1 \
+ 			tools/sdptool.1 tools/ciptool.1 tools/bccmd.1
+ endif
+ 
++if TOOLS
++bin_PROGRAMS += tools/btgatt-server
++
++tools_btgatt_server_SOURCES = tools/btgatt-server.c src/uuid-helper.c
++tools_btgatt_server_LDADD = lib/libbluetooth-internal.la \
++						src/libshared-mainloop.la
++endif
++
+ if HID2HCI
+ udevdir = @UDEV_DIR@
+ 
 diff --git a/tools/btgatt-server.c b/tools/btgatt-server.c
-index 545c8c4..4fcf10e 100644
---- a/tools/btgatt-server.c
+new file mode 100644
+index 0000000..4508de2
+--- /dev/null
 +++ b/tools/btgatt-server.c
-@@ -26,6 +26,7 @@
- #include <stdlib.h>
- #include <getopt.h>
- #include <unistd.h>
-+#include <errno.h>
- 
- #include <bluetooth/bluetooth.h>
- #include <bluetooth/hci.h>
-@@ -501,6 +502,217 @@ fail:
- 	return -1;
- }
- 
-+static void notify_usage(void)
+@@ -0,0 +1,139 @@
++/*
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2014  Google Inc.
++ *
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ */
++
++#ifdef HAVE_CONFIG_H
++#include <config.h>
++#endif
++
++#include <stdio.h>
++#include <stdbool.h>
++#include <stdint.h>
++#include <stdlib.h>
++#include <getopt.h>
++
++#include <bluetooth/bluetooth.h>
++#include <bluetooth/hci.h>
++#include <bluetooth/hci_lib.h>
++#include <bluetooth/l2cap.h>
++#include "lib/uuid.h"
++
++static bool verbose = false;
++
++static void usage(void)
 +{
-+	printf("Usage: notify [options] <value_handle> <value>\n"
-+					"Options:\n"
-+					"\t -i, --indicate\tSend indication\n"
-+					"e.g.:\n"
-+					"\tnotify 0x0001 00 01 00\n");
++	printf("btgatt-server\n");
++	printf("Usage:\n\tbtgatt-server [options]\n");
++
++	printf("Options:\n"
++		"\t-i, --index <id>\t\tSpecify adapter index, e.g. hci0\n"
++		"\t-m, --mtu <mtu>\t\t\tThe ATT MTU to use\n"
++		"\t-s, --security-level <sec>\tSet security level (low|"
++								"medium|high)\n"
++		"\t-v, --verbose\t\t\tEnable extra logging\n"
++		"\t-h, --help\t\t\tDisplay help\n");
 +}
 +
-+static struct option notify_options[] = {
-+	{ "indicate",	0, 0, 'i' },
++static struct option main_options[] = {
++	{ "index",		1, 0, 'i' },
++	{ "mtu",		1, 0, 'm' },
++	{ "security-level",	1, 0, 's' },
++	{ "verbose",		0, 0, 'v' },
++	{ "help",		0, 0, 'h' },
 +	{ }
 +};
 +
-+static bool parse_args(char *str, int expected_argc,  char **argv, int *argc)
++int main(int argc, char *argv[])
 +{
-+	char **ap;
++	int opt;
++	int sec = BT_SECURITY_LOW;
++	uint16_t mtu = 0;
++	bdaddr_t src_addr;
++	int dev_id = -1;
 +
-+	for (ap = argv; (*ap = strsep(&str, " \t")) != NULL;) {
-+		if (**ap == '\0')
-+			continue;
-+
-+		(*argc)++;
-+		ap++;
-+
-+		if (*argc > expected_argc)
-+			return false;
-+	}
-+
-+	return true;
-+}
-+
-+static void conf_cb(void *user_data)
-+{
-+	PRLOG("Received confirmation\n");
-+}
-+
-+static void cmd_notify(struct server *server, char *cmd_str)
-+{
-+	int opt, i;
-+	char *argvbuf[516];
-+	char **argv = argvbuf;
-+	int argc = 1;
-+	uint16_t handle;
-+	char *endptr = NULL;
-+	int length;
-+	uint8_t *value = NULL;
-+	bool indicate = false;
-+
-+	if (!parse_args(cmd_str, 514, argv + 1, &argc)) {
-+		printf("Too many arguments\n");
-+		notify_usage();
-+		return;
-+	}
-+
-+	optind = 0;
-+	argv[0] = "notify";
-+	while ((opt = getopt_long(argc, argv, "+i", notify_options,
-+								NULL)) != -1) {
++	while ((opt = getopt_long(argc, argv, "+hvs:m:i:",
++						main_options, NULL)) != -1) {
 +		switch (opt) {
++		case 'h':
++			usage();
++			return EXIT_SUCCESS;
++		case 'v':
++			verbose = true;
++			break;
++		case 's':
++			if (strcmp(optarg, "low") == 0)
++				sec = BT_SECURITY_LOW;
++			else if (strcmp(optarg, "medium") == 0)
++				sec = BT_SECURITY_MEDIUM;
++			else if (strcmp(optarg, "high") == 0)
++				sec = BT_SECURITY_HIGH;
++			else {
++				fprintf(stderr, "Invalid security level\n");
++				return EXIT_FAILURE;
++			}
++			break;
++		case 'm': {
++			int arg;
++
++			arg = atoi(optarg);
++			if (arg <= 0) {
++				fprintf(stderr, "Invalid MTU: %d\n", arg);
++				return EXIT_FAILURE;
++			}
++
++			if (arg > UINT16_MAX) {
++				fprintf(stderr, "MTU too large: %d\n", arg);
++				return EXIT_FAILURE;
++			}
++
++			mtu = (uint16_t)arg;
++			break;
++		}
 +		case 'i':
-+			indicate = true;
++			dev_id = hci_devid(optarg);
++			if (dev_id < 0) {
++				perror("Invalid adapter");
++				return EXIT_FAILURE;
++			}
++
 +			break;
 +		default:
-+			notify_usage();
-+			return;
++			fprintf(stderr, "Invalid option: %c\n", opt);
++			return EXIT_FAILURE;
 +		}
 +	}
 +
 +	argc -= optind;
-+	argv += optind;
++	argv -= optind;
++	optind = 0;
 +
-+	if (argc < 1) {
-+		notify_usage();
-+		return;
++	if (argc) {
++		usage();
++		return EXIT_SUCCESS;
 +	}
 +
-+	handle = strtol(argv[0], &endptr, 16);
-+	if (!endptr || *endptr != '\0' || !handle) {
-+		printf("Invalid handle: %s\n", argv[0]);
-+		return;
-+	}
-+
-+	length = argc - 1;
-+
-+	if (length > 0) {
-+		if (length > UINT16_MAX) {
-+			printf("Value too long\n");
-+			return;
-+		}
-+
-+		value = malloc(length);
-+		if (!value) {
-+			printf("Failed to construct value\n");
-+			return;
-+		}
-+
-+		for (i = 1; i < argc; i++) {
-+			if (strlen(argv[i]) != 2) {
-+				printf("Invalid value byte: %s\n",
-+								argv[i]);
-+				goto done;
-+			}
-+
-+			value[i-1] = strtol(argv[i], &endptr, 16);
-+			if (endptr == argv[i] || *endptr != '\0'
-+							|| errno == ERANGE) {
-+				printf("Invalid value byte: %s\n",
-+								argv[i]);
-+				goto done;
-+			}
-+		}
-+	}
-+
-+	if (indicate) {
-+		if (!bt_gatt_server_send_indication(server->gatt, handle,
-+							value, length,
-+							conf_cb, NULL, NULL))
-+			printf("Failed to initiate indication\n");
-+	} else if (!bt_gatt_server_send_notification(server->gatt, handle,
-+								value, length))
-+		printf("Failed to initiate notification\n");
-+
-+done:
-+	free(value);
-+}
-+
-+static void cmd_help(struct server *server, char *cmd_str);
-+
-+typedef void (*command_func_t)(struct server *server, char *cmd_str);
-+
-+static struct {
-+	char *cmd;
-+	command_func_t func;
-+	char *doc;
-+} command[] = {
-+	{ "help", cmd_help, "\tDisplay help message" },
-+	{ "notify", cmd_notify, "\tSend handle-value notification" },
-+	{ }
-+};
-+
-+static void cmd_help(struct server *server, char *cmd_str)
-+{
-+	int i;
-+
-+	printf("Commands:\n");
-+	for (i = 0; command[i].cmd; i++)
-+		printf("\t%-15s\t%s\n", command[i].cmd, command[i].doc);
-+}
-+
-+static void prompt_read_cb(int fd, uint32_t events, void *user_data)
-+{
-+	ssize_t read;
-+	size_t len = 0;
-+	char *line = NULL;
-+	char *cmd = NULL, *args;
-+	struct server *server = user_data;
-+	int i;
-+
-+	if (events & (EPOLLRDHUP | EPOLLHUP | EPOLLERR)) {
-+		mainloop_quit();
-+		return;
-+	}
-+
-+	if ((read = getline(&line, &len, stdin)) == -1)
-+		return;
-+
-+	if (read <= 1) {
-+		cmd_help(server, NULL);
-+		print_prompt();
-+		return;
-+	}
-+
-+	line[read-1] = '\0';
-+	args = line;
-+
-+	while ((cmd = strsep(&args, " \t")))
-+		if (*cmd != '\0')
-+			break;
-+
-+	if (!cmd)
-+		goto failed;
-+
-+	for (i = 0; command[i].cmd; i++) {
-+		if (strcmp(command[i].cmd, cmd) == 0)
-+			break;
-+	}
-+
-+	if (command[i].cmd)
-+		command[i].func(server, args);
-+	else
-+		fprintf(stderr, "Unknown command: %s\n", line);
-+
-+failed:
-+	print_prompt();
-+
-+	free(line);
-+}
-+
-+static void signal_cb(int signum, void *user_data)
-+{
-+	switch (signum) {
-+	case SIGINT:
-+	case SIGTERM:
-+		mainloop_quit();
-+		break;
-+	default:
-+		break;
-+	}
-+}
-+
- int main(int argc, char *argv[])
- {
- 	int opt;
-@@ -509,6 +721,7 @@ int main(int argc, char *argv[])
- 	bdaddr_t src_addr;
- 	int dev_id = -1;
- 	int fd;
-+	sigset_t mask;
- 	struct server *server;
- 
- 	while ((opt = getopt_long(argc, argv, "+hvs:m:i:",
-@@ -593,8 +806,25 @@ int main(int argc, char *argv[])
- 		return EXIT_FAILURE;
- 	}
- 
-+	if (mainloop_add_fd(fileno(stdin),
-+				EPOLLIN | EPOLLRDHUP | EPOLLHUP | EPOLLERR,
-+				prompt_read_cb, server, NULL) < 0) {
-+		fprintf(stderr, "Failed to initialize console\n");
-+		server_destroy(server);
-+
++	if (dev_id == -1)
++		bacpy(&src_addr, BDADDR_ANY);
++	else if (hci_devba(dev_id, &src_addr) < 0) {
++		perror("Adapter not available");
 +		return EXIT_FAILURE;
 +	}
 +
- 	printf("Running GATT server\n");
- 
-+	sigemptyset(&mask);
-+	sigaddset(&mask, SIGINT);
-+	sigaddset(&mask, SIGTERM);
++	/* TODO: Set up mainloop and listening LE socket */
 +
-+	mainloop_set_signal(&mask, signal_cb, NULL, NULL);
-+
-+	print_prompt();
-+
- 	mainloop_run();
- 
- 	printf("\n\nShutting down...\n");
++	return 0;
++}
 -- 
 2.1.0.rc2.206.gedb03e5
 
