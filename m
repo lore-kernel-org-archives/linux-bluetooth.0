@@ -1,144 +1,53 @@
 Return-Path: <cyrus@holtmann.org>
-From: Hannu Mallat <hannu.mallat@jollamobile.com>
+From: Marcin Kraglak <marcin.kraglak@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Hannu Mallat <hannu.mallat@jollamobile.com>
-Subject: [PATCH] gdbus: use caller's bus name in polkit authorization check
-Date: Thu, 13 Nov 2014 13:51:39 +0200
-Message-Id: <1415879499-920-1-git-send-email-hannu.mallat@jollamobile.com>
+Subject: [RFC 11/11] unit/test-gatt: Add /TP/GAR/CL/BI-11-C test
+Date: Thu, 13 Nov 2014 12:27:13 +0100
+Message-Id: <1415878033-6766-12-git-send-email-marcin.kraglak@tieto.com>
+In-Reply-To: <1415878033-6766-1-git-send-email-marcin.kraglak@tieto.com>
+References: <1415878033-6766-1-git-send-email-marcin.kraglak@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Use the message sender's bus name instead of bluetooth daemon's own
-bus name in polkit authorization query.
-
-Added the message as a parameter to GDBusSecurityFunction so that the
-sender name (and possibly other message characteristics) can be used
-for authorization.
+Verify Generic Attribute Profile client behavior when the Read Using
+Characteristic UUID procedure fails due to insufficient encryption
+key size.
 ---
- gdbus/gdbus.h  |  1 +
- gdbus/object.c |  8 +++++---
- gdbus/polkit.c | 16 +++++++++++-----
- 3 files changed, 17 insertions(+), 8 deletions(-)
+ unit/test-gatt.c | 15 +++++++++++++++
+ 1 file changed, 15 insertions(+)
 
-diff --git a/gdbus/gdbus.h b/gdbus/gdbus.h
-index 551c306..33689cd 100644
---- a/gdbus/gdbus.h
-+++ b/gdbus/gdbus.h
-@@ -84,6 +84,7 @@ typedef gboolean (*GDBusPropertyExists)(const GDBusPropertyTable *property,
- typedef guint32 GDBusPendingReply;
+diff --git a/unit/test-gatt.c b/unit/test-gatt.c
+index a2607ad..79deedf 100644
+--- a/unit/test-gatt.c
++++ b/unit/test-gatt.c
+@@ -798,6 +798,15 @@ const struct test_step test_read_by_uuid_6 = {
+ 			0x80, 0x00, 0x00, 0x80, 0x5F, 0x9B, 0x34, 0xFB}
+ };
  
- typedef void (* GDBusSecurityFunction) (DBusConnection *connection,
-+						DBusMessage *message,
- 						const char *action,
- 						gboolean interaction,
- 						GDBusPendingReply pending);
-diff --git a/gdbus/object.c b/gdbus/object.c
-index 4d5a64c..991fec7 100644
---- a/gdbus/object.c
-+++ b/gdbus/object.c
-@@ -341,6 +341,7 @@ void g_dbus_pending_error(DBusConnection *connection,
- }
- 
- int polkit_check_authorization(DBusConnection *conn,
-+				DBusMessage *message,
- 				const char *action, gboolean interaction,
- 				void (*function) (dbus_bool_t authorized,
- 							void *user_data),
-@@ -365,6 +366,7 @@ static void builtin_security_result(dbus_bool_t authorized, void *user_data)
- }
- 
- static void builtin_security_function(DBusConnection *conn,
-+						DBusMessage *message,
- 						const char *action,
- 						gboolean interaction,
- 						GDBusPendingReply pending)
-@@ -375,7 +377,7 @@ static void builtin_security_function(DBusConnection *conn,
- 	data->conn = conn;
- 	data->pending = pending;
- 
--	if (polkit_check_authorization(conn, action, interaction,
-+	if (polkit_check_authorization(conn, message, action, interaction,
- 				builtin_security_result, data, 30000) < 0)
- 		g_dbus_pending_error(conn, pending, NULL, NULL);
- }
-@@ -408,10 +410,10 @@ static gboolean check_privilege(DBusConnection *conn, DBusMessage *msg,
- 
- 		if (!(security->flags & G_DBUS_SECURITY_FLAG_BUILTIN) &&
- 							security->function)
--			security->function(conn, security->action,
-+			security->function(conn, msg, security->action,
- 						interaction, secdata->pending);
- 		else
--			builtin_security_function(conn, security->action,
-+			builtin_security_function(conn, msg, security->action,
- 						interaction, secdata->pending);
- 
- 		return TRUE;
-diff --git a/gdbus/polkit.c b/gdbus/polkit.c
-index 9e95fa3..ea224bd 100644
---- a/gdbus/polkit.c
-+++ b/gdbus/polkit.c
-@@ -32,6 +32,7 @@
- #include <glib.h>
- 
- int polkit_check_authorization(DBusConnection *conn,
-+				DBusMessage *message,
- 				const char *action, gboolean interaction,
- 				void (*function) (dbus_bool_t authorized,
- 							void *user_data),
-@@ -72,10 +73,9 @@ static void add_empty_string_dict(DBusMessageIter *iter)
- 	dbus_message_iter_close_container(iter, &dict);
- }
- 
--static void add_arguments(DBusConnection *conn, DBusMessageIter *iter,
-+static void add_arguments(const char *caller, DBusMessageIter *iter,
- 				const char *action, dbus_uint32_t flags)
- {
--	const char *busname = dbus_bus_get_unique_name(conn);
- 	const char *kind = "system-bus-name";
- 	const char *cancel = "";
- 	DBusMessageIter subject;
-@@ -83,7 +83,7 @@ static void add_arguments(DBusConnection *conn, DBusMessageIter *iter,
- 	dbus_message_iter_open_container(iter, DBUS_TYPE_STRUCT,
- 							NULL, &subject);
- 	dbus_message_iter_append_basic(&subject, DBUS_TYPE_STRING, &kind);
--	add_dict_with_string_value(&subject, "name", busname);
-+	add_dict_with_string_value(&subject, "name", caller);
- 	dbus_message_iter_close_container(iter, &subject);
- 
- 	dbus_message_iter_append_basic(iter, DBUS_TYPE_STRING, &action);
-@@ -143,6 +143,7 @@ done:
- #define AUTHORITY_PATH	"/org/freedesktop/PolicyKit1/Authority"
- 
- int polkit_check_authorization(DBusConnection *conn,
-+				DBusMessage *message,
- 				const char *action, gboolean interaction,
- 				void (*function) (dbus_bool_t authorized,
- 							void *user_data),
-@@ -153,8 +154,13 @@ int polkit_check_authorization(DBusConnection *conn,
- 	DBusMessageIter iter;
- 	DBusPendingCall *call;
- 	dbus_uint32_t flags = 0x00000000;
-+	const char *caller;
- 
--	if (conn == NULL)
-+	if (conn == NULL || message == NULL)
-+		return -EINVAL;
++const struct test_step test_read_by_uuid_7 = {
++	.handle = 0x0001,
++	.end_handle = 0xffff,
++	.func = test_read_by_uuid,
++	.expected_att_ecode = 0x0c,
++	.uuid = {0x00, 0x00, 0x2b, 0x0d, 0x00, 0x00, 0x10, 0x00,
++			0x80, 0x00, 0x00, 0x80, 0x5F, 0x9B, 0x34, 0xFB}
++};
 +
-+	caller = dbus_message_get_sender(message);
-+	if (caller == NULL)
- 		return -EINVAL;
+ static void test_client(gconstpointer data)
+ {
+ 	struct context *context = create_context(512, data);
+@@ -1026,5 +1035,11 @@ int main(int argc, char *argv[])
+ 			raw_pdu(0x08, 0x01, 0x00, 0xff, 0xff, 0x0d, 0x2b),
+ 			raw_pdu(0x01, 0x08, 0x0b, 0x00, 0x05));
  
- 	data = dbus_malloc0(sizeof(*data));
-@@ -175,7 +181,7 @@ int polkit_check_authorization(DBusConnection *conn,
- 		action = "org.freedesktop.policykit.exec";
- 
- 	dbus_message_iter_init_append(msg, &iter);
--	add_arguments(conn, &iter, action, flags);
-+	add_arguments(caller, &iter, action, flags);
- 
- 	if (dbus_connection_send_with_reply(conn, msg,
- 						&call, timeout) == FALSE) {
++	define_test_client("/TP/GAR/CL/BI-11-C", test_client, service_data_2,
++			&test_read_by_uuid_7,
++			SERVICE_DATA_2_PDU,
++			raw_pdu(0x08, 0x01, 0x00, 0xff, 0xff, 0x0d, 0x2b),
++			raw_pdu(0x01, 0x08, 0x0b, 0x00, 0x0c));
++
+ 	return g_test_run();
+ }
 -- 
-1.9.1
+1.9.3
 
