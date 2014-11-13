@@ -1,208 +1,121 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcin Kraglak <marcin.kraglak@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFC 05/11] unit/test-gatt: Add /TP/GAR/CL/BV-03-C-1 test
-Date: Thu, 13 Nov 2014 12:27:07 +0100
-Message-Id: <1415878033-6766-6-git-send-email-marcin.kraglak@tieto.com>
+Subject: [RFC 02/11] tools/btgatt-client: Add read-by-uuid cmd
+Date: Thu, 13 Nov 2014 12:27:04 +0100
+Message-Id: <1415878033-6766-3-git-send-email-marcin.kraglak@tieto.com>
 In-Reply-To: <1415878033-6766-1-git-send-email-marcin.kraglak@tieto.com>
 References: <1415878033-6766-1-git-send-email-marcin.kraglak@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Verify that a Generic Attribute Profile client can read a
-Characteristic Value selected by UUID using a 16-bit UUID.
+It is used to read characteristic values with known UUID.
 ---
- unit/test-gatt.c | 157 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 157 insertions(+)
+ tools/btgatt-client.c | 84 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 84 insertions(+)
 
-diff --git a/unit/test-gatt.c b/unit/test-gatt.c
-index 276857b..6ffcc2f 100644
---- a/unit/test-gatt.c
-+++ b/unit/test-gatt.c
-@@ -144,6 +144,41 @@ struct context {
- 		raw_pdu(0x04, 0x08, 0x00, 0x08, 0x00),			\
- 		raw_pdu(0x05, 0x01, 0x08, 0x00, 0x01, 0x29)
+diff --git a/tools/btgatt-client.c b/tools/btgatt-client.c
+index 7a1204f..f069189 100644
+--- a/tools/btgatt-client.c
++++ b/tools/btgatt-client.c
+@@ -401,6 +401,89 @@ static void cmd_services(struct client *cli, char *cmd_str)
+ 		services_usage();
+ }
  
-+#define SERVICE_DATA_2_PDU						\
-+		raw_pdu(0x02, 0x00, 0x02),				\
-+		raw_pdu(0x03, 0x00, 0x02),				\
-+		raw_pdu(0x10, 0x01, 0x00, 0xff, 0xff, 0x00, 0x28),	\
-+		raw_pdu(0x11, 0x06, 0x01, 0x00, 0x07, 0x00, 0x01, 0x18),\
-+		raw_pdu(0x10, 0x08, 0x00, 0xff, 0xff, 0x00, 0x28),	\
-+		raw_pdu(0x11, 0x06, 0x08, 0x00, 0x0b, 0x00, 0x0d, 0x18),\
-+		raw_pdu(0x10, 0x0c, 0x00, 0xff, 0xff, 0x00, 0x28),	\
-+		raw_pdu(0x01, 0x10, 0x0c, 0x00, 0x0a),			\
-+		raw_pdu(0x10, 0x01, 0x00, 0xff, 0xff, 0x01, 0x28),	\
-+		raw_pdu(0x01, 0x10, 0x01, 0x00, 0x0a),			\
-+		raw_pdu(0x08, 0x01, 0x00, 0x07, 0x00, 0x02, 0x28),	\
-+		raw_pdu(0x01, 0x08, 0x01, 0x00, 0x0a),			\
-+		raw_pdu(0x08, 0x08, 0x00, 0x0b, 0x00, 0x02, 0x28),	\
-+		raw_pdu(0x01, 0x08, 0x0b, 0x00, 0x0a),			\
-+		raw_pdu(0x08, 0x01, 0x00, 0x07, 0x00, 0x03, 0x28),	\
-+		raw_pdu(0x09, 0x07, 0x02, 0x00, 0x02, 0x03, 0x00, 0x00,	\
-+				0x2a),					\
-+		raw_pdu(0x08, 0x03, 0x00, 0x07, 0x00, 0x03, 0x28),	\
-+		raw_pdu(0x09, 0x07, 0x05, 0x00, 0x02, 0x06, 0x00, 0x00,	\
-+							0x2a),		\
-+		raw_pdu(0x08, 0x06, 0x00, 0x07, 0x00, 0x03, 0x28),	\
-+		raw_pdu(0x01, 0x08, 0x06, 0x00, 0x0a),			\
-+		raw_pdu(0x04, 0x04, 0x00, 0x04, 0x00),			\
-+		raw_pdu(0x05, 0x01, 0x04, 0x00, 0x01, 0x29),		\
-+		raw_pdu(0x04, 0x07, 0x00, 0x07, 0x00),			\
-+		raw_pdu(0x05, 0x01, 0x07, 0x00, 0x03, 0x29),		\
-+		raw_pdu(0x08, 0x08, 0x00, 0x0b, 0x00, 0x03, 0x28),	\
-+		raw_pdu(0x09, 0x07, 0x09, 0x00, 0x02, 0x0a, 0x00, 0x0d,	\
-+				0x2b),					\
-+		raw_pdu(0x08, 0x0a, 0x00, 0x0b, 0x00, 0x03, 0x28),	\
-+		raw_pdu(0x01, 0x08, 0x0a, 0x00, 0x0a),			\
-+		raw_pdu(0x04, 0x0b, 0x00, 0x0b, 0x00),			\
-+		raw_pdu(0x05, 0x01, 0x0b, 0x00, 0x02, 0x29)
-+
- static bt_uuid_t uuid_16 = {
- 	.type = BT_UUID16,
- 	.value.u16 = 0x1800
-@@ -223,6 +258,76 @@ const struct gatt_service gatt_service_2 = {
- const struct gatt_service *service_data_1[] = {&gatt_service_1,
- 							&gatt_service_2};
- 
-+const bt_gatt_service_t service_3 = {
-+	.primary = true,
-+	.start_handle = 0x0001,
-+	.end_handle = 0x0007,
-+	.uuid = {0x00, 0x00, 0x18, 0x01, 0x00, 0x00, 0x10, 0x00,
-+			0x80, 0x00, 0x00, 0x80, 0x5f, 0x9b, 0x34, 0xfb}
-+};
-+
-+const bt_gatt_service_t service_4 = {
-+	.primary = true,
-+	.start_handle = 0x0008,
-+	.end_handle = 0x000b,
-+	.uuid = {0x00, 0x00, 0x18, 0x0d, 0x00, 0x00, 0x10, 0x00,
-+			0x80, 0x00, 0x00, 0x80, 0x5f, 0x9b, 0x34, 0xfb}
-+};
-+
-+const bt_gatt_descriptor_t descriptor_3 = {
-+	.handle = 0x0007,
-+	.uuid = {0x00, 0x00, 0x29, 0x03, 0x00, 0x00, 0x10, 0x00,
-+			0x80, 0x00, 0x00, 0x80, 0x5f, 0x9b, 0x34, 0xfb}
-+};
-+
-+
-+const bt_gatt_characteristic_t characteristic_3 = {
-+	.start_handle = 0x0005,
-+	.end_handle = 0x0007,
-+	.value_handle = 0x0006,
-+	.properties = 0x02,
-+	.uuid = {0x00, 0x00, 0x2a, 0x00, 0x00, 0x00, 0x10, 0x00,
-+			0x80, 0x00, 0x00, 0x80, 0x5f, 0x9b, 0x34, 0xfb},
-+	.descs = &descriptor_3,
-+	.num_descs = 1
-+};
-+
-+const bt_gatt_descriptor_t descriptor_4 = {
-+	.handle = 0x000b,
-+	.uuid = {0x00, 0x00, 0x29, 0x02, 0x00, 0x00, 0x10, 0x00,
-+			0x80, 0x00, 0x00, 0x80, 0x5f, 0x9b, 0x34, 0xfb}
-+};
-+
-+const bt_gatt_characteristic_t characteristic_4 = {
-+	.start_handle = 0x0009,
-+	.end_handle = 0x000b,
-+	.value_handle = 0x000a,
-+	.properties = 0x02,
-+	.uuid = {0x00, 0x00, 0x2b, 0x0d, 0x00, 0x00, 0x10, 0x00,
-+			0x80, 0x00, 0x00, 0x80, 0x5f, 0x9b, 0x34, 0xfb},
-+	.descs = &descriptor_4,
-+	.num_descs = 1
-+};
-+
-+const bt_gatt_characteristic_t *characteristics_3[] = {&characteristic_1,
-+							&characteristic_3};
-+const bt_gatt_characteristic_t *characteristics_4[] = {&characteristic_4};
-+
-+const struct gatt_service gatt_service_3 = {
-+	.service = &service_3,
-+	.num_chars = sizeof(characteristics_3) / sizeof(characteristics_3[0]),
-+	.chars = characteristics_3
-+};
-+
-+const struct gatt_service gatt_service_4 = {
-+	.service = &service_4,
-+	.num_chars = sizeof(characteristics_4) / sizeof(characteristics_4[0]),
-+	.chars = characteristics_4
-+};
-+
-+const struct gatt_service *service_data_2[] = {&gatt_service_3,
-+							&gatt_service_4};
-+
- static void test_debug(const char *str, void *user_data)
- {
- 	const char *prefix = user_data;
-@@ -555,6 +660,50 @@ const struct test_step test_read_4 = {
- 	.expected_att_ecode = 0x08,
- };
- 
-+static void read_by_uuid_cb(bool success, uint8_t att_ecode,
-+						struct read_by_uuid_res *result,
-+						void *user_data)
++static void read_by_uuid_usage(void)
 +{
-+	struct context *context = user_data;
-+	const struct test_step *step = context->data->step;
++	printf("Usage: read-by-uuid <start_handle> <end_handle> <uuid>\n");
++}
 +
-+	g_assert(att_ecode == step->expected_att_ecode);
++static void read_by_uuid_cb(bool success, uint8_t att_ecode,
++			struct read_by_uuid_res *result, void *user_data)
++{
++	uint16_t handle;
++	uint8_t length;
++	uint8_t *data;
++	int i;
 +
-+	if (success && step->value) {
-+		uint16_t handle;
-+		uint8_t length;
-+		uint8_t *value;
-+
-+		read_by_uuid_res_get(result, &handle, &length, &value);
-+		g_assert(length == step->length);
-+		g_assert(memcmp(value, step->value, length) == 0);
++	if (!success) {
++		PRLOG("\nRead by UUID request failed: 0x%02x\n", att_ecode);
++		return;
 +	}
 +
-+	g_assert(read_by_uuid_res_next(result) == NULL);
++	if (!result) {
++		PRLOG("\nNo attribute found\n");
++		return;
++	}
 +
-+	context_quit(context);
++	for (; result; result = read_by_uuid_res_next(result)) {
++		read_by_uuid_res_get(result, &handle, &length, &data);
++		printf("\nHandle 0x%04X Read value", handle);
++
++		if (length == 0) {
++			PRLOG(": 0 bytes\n");
++			return;
++		}
++
++		printf(" (%u bytes): ", length);
++
++		for (i = 0; i < length; i++)
++			printf("%02x ", data[i]);
++
++		PRLOG("\n");
++	}
 +}
 +
-+static void test_read_by_uuid(struct context *context)
++static void cmd_read_by_uuid(struct client *cli, char *cmd_str)
 +{
-+	const struct test_step *step = context->data->step;
++	char *argv[3];
++	int argc = 0;
++	uint16_t start_handle, end_handle;
++	bt_uuid_t tmp, uuid;
++	char *endptr = NULL;
 +
-+	g_assert(bt_gatt_client_read_by_uuid(context->client, step->handle,
-+			step->end_handle, step->uuid, read_by_uuid_cb, context,
-+			NULL));
++	if (!bt_gatt_client_is_ready(cli->gatt)) {
++		printf("GATT client not initialized\n");
++		return;
++	}
++
++	if (!parse_args(cmd_str, 3, argv, &argc) || argc != 3) {
++		read_by_uuid_usage();
++		return;
++	}
++
++	start_handle = strtol(argv[0], &endptr, 0);
++	if (!endptr || *endptr != '\0' || !start_handle) {
++		printf("Invalid value handle: %s\n", argv[0]);
++		return;
++	}
++
++	end_handle = strtol(argv[1], &endptr, 0);
++	if (!endptr || *endptr != '\0' || !end_handle) {
++		printf("Invalid value handle: %s\n", argv[1]);
++		return;
++	}
++
++	if (bt_string_to_uuid(&tmp, argv[2]) < 0) {
++		printf("Invalid UUID: %s\n", argv[2]);
++		return;
++	}
++
++	bt_uuid_to_uuid128(&tmp, &uuid);
++
++	if (!bt_gatt_client_read_by_uuid(cli->gatt, start_handle, end_handle,
++			uuid.value.u128.data, read_by_uuid_cb, NULL, NULL))
++		printf("Failed to initiate read value procedure\n");
 +}
 +
-+const struct test_step test_read_by_uuid_1 = {
-+	.handle = 0x0001,
-+	.end_handle = 0xffff,
-+	.func = test_read_by_uuid,
-+	.expected_att_ecode = 0x0a,
-+	.value = read_data_1,
-+	.length = 0x03,
-+	.uuid = {0x00, 0x00, 0x2b, 0x0d, 0x00, 0x00, 0x10, 0x00,
-+			0x80, 0x00, 0x00, 0x80, 0x5F, 0x9B, 0x34, 0xFB}
-+};
-+
- static void test_client(gconstpointer data)
+ static void read_value_usage(void)
  {
- 	struct context *context = create_context(512, data);
-@@ -737,5 +886,13 @@ int main(int argc, char *argv[])
- 			raw_pdu(0x0a, 0x03, 0x00),
- 			raw_pdu(0x01, 0x0a, 0x03, 0x00, 0x08));
- 
-+	define_test_client("/TP/GAR/CL/BV-03-C", test_client, service_data_2,
-+			&test_read_by_uuid_1,
-+			SERVICE_DATA_2_PDU,
-+			raw_pdu(0x08, 0x01, 0x00, 0xff, 0xff, 0x0d, 0x2b),
-+			raw_pdu(0x09, 0x05, 0x0a, 0x00, 0x01, 0x02, 0x03),
-+			raw_pdu(0x08, 0x0b, 0x00, 0xff, 0xff, 0x0d, 0x2b),
-+			raw_pdu(0x01, 0x08, 0x0b, 0x00, 0x0a));
-+
- 	return g_test_run();
- }
+ 	printf("Usage: read-value <value_handle>\n");
+@@ -873,6 +956,7 @@ static struct {
+ 				"\tRead a characteristic or descriptor value" },
+ 	{ "read-long-value", cmd_read_long_value,
+ 		"\tRead a long characteristic or desctriptor value" },
++	{ "read-by-uuid", cmd_read_by_uuid, "\tRead by UUID" },
+ 	{ "write-value", cmd_write_value,
+ 			"\tWrite a characteristic or descriptor value" },
+ 	{ "write-long-value", cmd_write_long_value,
 -- 
 1.9.3
 
