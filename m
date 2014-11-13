@@ -1,299 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
+From: Johan Hedberg <johan.hedberg@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH] android/hal-ipc-txt: Documentation update and cleanup
-Date: Thu, 13 Nov 2014 09:01:21 +0100
-Message-Id: <1415865681-30171-1-git-send-email-szymon.janc@tieto.com>
+Subject: [PATCH 2/2] Bluetooth: Fix correct nesting for 6lowpan server channel
+Date: Thu, 13 Nov 2014 09:46:05 +0200
+Message-Id: <1415864765-7507-2-git-send-email-johan.hedberg@gmail.com>
+In-Reply-To: <1415864765-7507-1-git-send-email-johan.hedberg@gmail.com>
+References: <1415864765-7507-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch clarifies that 0x80 opcode is reserved and not used. This is
-in case we need to introduce confirmations for notifications.
+From: Johan Hedberg <johan.hedberg@intel.com>
 
-Error response definition is moved into common place and all HALs are
-simply referring to it. This is to keep valid status values in single
-place. Valis status is also updated with 'Authentication Rejected'
-error added in Android 5.0 API.
+Server channels in BT_LISTEN state should use L2CAP_NESTING_PARENT. This
+patch fixes the nesting value for the 6lowpan channel.
+
+Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- android/hal-ipc-api.txt | 168 ++++++------------------------------------------
- 1 file changed, 21 insertions(+), 147 deletions(-)
+ net/bluetooth/6lowpan.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/android/hal-ipc-api.txt b/android/hal-ipc-api.txt
-index 4f202c8..7c51728 100644
---- a/android/hal-ipc-api.txt
-+++ b/android/hal-ipc-api.txt
-@@ -55,7 +55,9 @@ The unique service ID is assigned by this specification for each HAL.
- As general rule of thumb, the opcode for command matches the opcode for a
- response. Or the opcode 0x00 for an error is returned.
+diff --git a/net/bluetooth/6lowpan.c b/net/bluetooth/6lowpan.c
+index 3d8ceb251d75..bdcaefd2db12 100644
+--- a/net/bluetooth/6lowpan.c
++++ b/net/bluetooth/6lowpan.c
+@@ -1130,6 +1130,8 @@ static struct l2cap_chan *bt_6lowpan_listen(void)
+ 	pchan->state = BT_LISTEN;
+ 	pchan->src_type = BDADDR_LE_PUBLIC;
  
--Notification opcodes start from 0x80.
-+Notification opcodes start from 0x81.
++	atomic_set(&pchan->nesting, L2CAP_NESTING_PARENT);
 +
-+Opcode 0x80 is reserved and shall not be used.
+ 	BT_DBG("psm 0x%04x chan %p src type %d", psm_6lowpan, pchan,
+ 	       pchan->src_type);
  
- All command/response opcodes have the least significant bit not set. And all
- notifications have the least significant bit set.
-@@ -115,14 +117,29 @@ specific service.
- 	init()                  --> register module handsfree
- 
- 
--Core Service (ID 0)
--===================
-+Error response is common for all services and has fixed structure:
- 
- 	Opcode 0x00 - Error response
- 
- 		Response parameters: Status (1 octet)
- 
--		Valid status values: 0x01	Failed
-+		Valid status values: 0x01 = Fail
-+		                     0x02 = Not ready
-+		                     0x03 = No memory
-+		                     0x04 = Busy
-+		                     0x05 = Done (already completed)
-+		                     0x06 = Unsupported
-+		                     0x07 = Parameter invalid
-+		                     0x08 = Unhandled
-+		                     0x09 = Authentication failure
-+		                     0x0a = Remote device down
-+		                     0x0b = Authentication rejected
-+
-+
-+Core Service (ID 0)
-+===================
-+
-+	Opcode 0x00 - Error response
- 
- 	Opcode 0x01 - Register module command/response
- 
-@@ -180,8 +197,6 @@ Commands and responses:
- 
- 	Opcode 0x00 - Error response
- 
--		Response parameters: Status (1 octet)
--
- 	Opcode 0x01 - Enable command/response
- 
- 		Command parameters: <none>
-@@ -436,19 +451,6 @@ Commands and responses:
- 
- 	Opcode 0x00 - Error response
- 
--		Response parameters: Status (1 octet)
--
--		Valid status values: 0x01 = Fail
--		                     0x02 = Not ready
--		                     0x03 = No memory
--		                     0x04 = Busy
--		                     0x05 = Done (already completed)
--		                     0x06 = Unsupported
--		                     0x07 = Parameter invalid
--		                     0x08 = Unhandled
--		                     0x09 = Authentication failure
--		                     0x0a = Remote device down
--
- 	Opcode 0x01 - Listen command/response
- 
- 		Command parameters: Socket type (1 octet)
-@@ -495,19 +497,6 @@ Commands and responses:
- 
- 	Opcode 0x00 - Error response
- 
--		Response parameters: Status (1 octet)
--
--		Valid status values: 0x01 = Fail
--		                     0x02 = Not ready
--		                     0x03 = No memory
--		                     0x04 = Busy
--		                     0x05 = Done (already completed)
--		                     0x06 = Unsupported
--		                     0x07 = Parameter invalid
--		                     0x08 = Unhandled
--		                     0x09 = Authentication failure
--		                     0x0a = Remote device down
--
- 	Opcode 0x01 - Connect command/response
- 
- 		Command parameters: Remote address (6 octets)
-@@ -692,19 +681,6 @@ Commands and responses:
- 
- 	Opcode 0x00 - Error response
- 
--		Response parameters: Status (1 octet)
--
--		Valid status values: 0x01 = Fail
--		                     0x02 = Not ready
--		                     0x03 = No memory
--		                     0x04 = Busy
--		                     0x05 = Done (already completed)
--		                     0x06 = Unsupported
--		                     0x07 = Parameter invalid
--		                     0x08 = Unhandled
--		                     0x09 = Authentication failure
--		                     0x0a = Remote device down
--
- 	Opcode 0x01 - Enable command/response
- 
- 		Command parameters: Local role (1 octet)
-@@ -792,19 +768,6 @@ Commands and responses:
- 
- 	Opcode 0x00 - Error response
- 
--		Response parameters: Status (1 octet)
--
--		Valid status values: 0x01 = Fail
--		                     0x02 = Not ready
--		                     0x03 = No memory
--		                     0x04 = Busy
--		                     0x05 = Done (already completed)
--		                     0x06 = Unsupported
--		                     0x07 = Parameter invalid
--		                     0x08 = Unhandled
--		                     0x09 = Authentication failure
--		                     0x0a = Remote device down
--
- 	Opcode 0x01 - Connect command/response
- 
- 		Command parameters: Remote address (6 octets)
-@@ -1093,19 +1056,6 @@ Commands and responses:
- 
- 	Opcode 0x00 - Error response
- 
--		Response parameters: Status (1 octet)
--
--		Valid status values: 0x01 = Fail
--		                     0x02 = Not ready
--		                     0x03 = No memory
--		                     0x04 = Busy
--		                     0x05 = Done (already completed)
--		                     0x06 = Unsupported
--		                     0x07 = Parameter invalid
--		                     0x08 = Unhandled
--		                     0x09 = Authentication failure
--		                     0x0a = Remote device down
--
- 	Opcode 0x01 - Connect command/response
- 
- 		Command parameters: Remote address (6 octets)
-@@ -1151,19 +1101,6 @@ Commands and responses:
- 
- 	Opcode 0x00 - Error response
- 
--		Response parameters: Status (1 octet)
--
--		Valid status values: 0x01 = Fail
--		                     0x02 = Not ready
--		                     0x03 = No memory
--		                     0x04 = Busy
--		                     0x05 = Done (already completed)
--		                     0x06 = Unsupported
--		                     0x07 = Parameter invalid
--		                     0x08 = Unhandled
--		                     0x09 = Authentication failure
--		                     0x0a = Remote device down
--
- 	Opcode 0x01 - Register Application command/response
- 
- 		Command parameters: Number of MDEP (1 octet)
-@@ -1250,19 +1187,6 @@ Commands and responses:
- 
- 	Opcode 0x00 - Error response
- 
--		Response parameters: Status (1 octet)
--
--		Valid status values: 0x01 = Fail
--		                     0x02 = Not ready
--		                     0x03 = No memory
--		                     0x04 = Busy
--		                     0x05 = Done (already completed)
--		                     0x06 = Unsupported
--		                     0x07 = Parameter invalid
--		                     0x08 = Unhandled
--		                     0x09 = Authentication failure
--		                     0x0a = Remote device down
--
- 	Opcode 0x01 - Get Play Status Response command/response
- 
- 		Command parameters: Status (1 octet)
-@@ -1495,19 +1419,6 @@ Commands and responses:
- 
- 	Opcode 0x00 - Error response
- 
--		Response parameters: Status (1 octet)
--
--		Valid status values: 0x01 = Fail
--		                     0x02 = Not ready
--		                     0x03 = No memory
--		                     0x04 = Busy
--		                     0x05 = Done (already completed)
--		                     0x06 = Unsupported
--		                     0x07 = Parameter invalid
--		                     0x08 = Unhandled
--		                     0x09 = Authentication failure
--		                     0x0a = Remote device down
--
- 	Opcode 0x01 - Register Client command/response
- 
- 		Command parameters: Service UUID (16 octets)
-@@ -2127,17 +2038,6 @@ Commands and response:
- 
- 	Opcode 0x00 - Error response
- 
--		Valid status values: 0x01 = Fail
--		                     0x02 = Not ready
--		                     0x03 = No memory
--		                     0x04 = Busy
--		                     0x05 = Done (already completed)
--		                     0x06 = Unsupported
--		                     0x07 = Parameter invalid
--		                     0x08 = Unhandled
--		                     0x09 = Authentication failure
--		                     0x0a = Remote device down
--
- 	Opcode 0x01 - Connect command/respose
- 
- 		Command parameters: Remote address (6 octects)
-@@ -2473,19 +2373,6 @@ Commands and responses:
- 
- 	Opcode 0x00 - Error response
- 
--		Response parameters: Status (1 octet)
--
--		Valid status values: 0x01 = Fail
--		                     0x02 = Not ready
--		                     0x03 = No memory
--		                     0x04 = Busy
--		                     0x05 = Done (already completed)
--		                     0x06 = Unsupported
--		                     0x07 = Parameter invalid
--		                     0x08 = Unhandled
--		                     0x09 = Authentication failure
--		                     0x0a = Remote device down
--
- 	Opcode 0x01 - Get Remote MAS Instances
- 
- 		Command parameters: Remote address (6 octets)
-@@ -2514,19 +2401,6 @@ Commands and responses:
- 
- 	Opcode 0x00 - Error response
- 
--		Response parameters: Status (1 octet)
--
--		Valid status values: 0x01 = Fail
--		                     0x02 = Not ready
--		                     0x03 = No memory
--		                     0x04 = Busy
--		                     0x05 = Done (already completed)
--		                     0x06 = Unsupported
--		                     0x07 = Parameter invalid
--		                     0x08 = Unhandled
--		                     0x09 = Authentication failure
--		                     0x0a = Remote device down
--
- 	Opcode 0x01 - Send Pass Through command/response
- 
- 		Command parameters: Remote Address (6 octets)
 -- 
-1.9.1
+2.1.0
 
