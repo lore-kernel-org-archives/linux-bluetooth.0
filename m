@@ -1,42 +1,30 @@
 Return-Path: <cyrus@holtmann.org>
-From: Johan Hedberg <johan.hedberg@gmail.com>
+From: "Urbani, Edmund" <edmund.urbani@lilandit.com>
+Message-ID: <5464A38E.20502@LilandIT.com>
+Date: Thu, 13 Nov 2014 13:26:54 +0100
+MIME-Version: 1.0
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 0/4] Bluetooth: More lockdep warning fixes with the help of RCU
-Date: Thu, 13 Nov 2014 14:37:46 +0200
-Message-Id: <1415882270-5621-1-git-send-email-johan.hedberg@gmail.com>
+Subject: gatttool --listen not working?
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hello all,
 
-This patch set converts the LTK and IRK lists to use RCU which
-eliminates the need to always hold the hdev lock while accessing these
-lists. This helps us fix more lockdep warnings arising from hdev locking
-in smp.c.
+I am trying to connect to a GATT service (running on an iPhone) and register a 
+notification listener using gatttool. I can read the attribute value with 
+gatttool and the --char-read argument just fine. When I add --listen, gatttool 
+keeps running, but I never see any notifications. Debugging on the other end 
+reveals that the iOS APIs didSubscribeToCharacteristic never gets called.
 
-What this patch set doesn't fix is the general problem of the SMP
-context holding references to list entries without any guarantee that
-those references stay valid if some other thread goes and removes the
-entries. For this the proper fix would probably be to introduce kref for
-the entries to ensure that external references stay valid. However,
-since that requires considerably more code it's better to first merge
-most lists into a single "remote device info" list that's protected both
-by kref and RCU.
+Any ideas why this is not working?
 
-Johan
+gatttool -i hci0 -t random --listen --char-read --handle 0x0034 -b 5C:A2:D5:C7:BF:14
+Characteristic value/descriptor: 2d
 
-----------------------------------------------------------------
-Johan Hedberg (4):
-      Bluetooth: Convert LTK list to RCU
-      Bluetooth: Convert IRK list to RCU
-      Bluetooth: Remove unnecessary hdev locking in smp.c
-      Bluetooth: Add debug logs to help track locking issues
+.... and then. Nothing.
 
- include/net/bluetooth/hci_core.h |  2 +
- net/bluetooth/hci_core.c         | 88 ++++++++++++++++++++++----------------
- net/bluetooth/hci_event.c        |  4 +-
- net/bluetooth/l2cap_core.c       |  3 +-
- net/bluetooth/l2cap_sock.c       | 10 ++++-
- net/bluetooth/smp.c              | 27 ++++--------
- 6 files changed, 75 insertions(+), 59 deletions(-)
+Kind regards,
+  Edmund
+
 
