@@ -2,48 +2,61 @@ Return-Path: <cyrus@holtmann.org>
 From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH 3/3] android/handsfree: Remove find default device
-Date: Thu, 13 Nov 2014 16:52:52 +0100
-Message-Id: <1415893972-18656-4-git-send-email-lukasz.rymanowski@tieto.com>
+Subject: [PATCH 1/3] android/handsfree: Send indicator notif to all connected devices
+Date: Thu, 13 Nov 2014 16:52:50 +0100
+Message-Id: <1415893972-18656-2-git-send-email-lukasz.rymanowski@tieto.com>
 In-Reply-To: <1415893972-18656-1-git-send-email-lukasz.rymanowski@tieto.com>
 References: <1415893972-18656-1-git-send-email-lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Now when Android provide bdaddr in all hfp calls we can remove
-find_defaul_device. We can use bdaddr to find device on the device
-queue.
 ---
- android/handsfree.c | 9 ---------
- 1 file changed, 9 deletions(-)
+ android/handsfree.c | 21 ++++++++++++++-------
+ 1 file changed, 14 insertions(+), 7 deletions(-)
 
 diff --git a/android/handsfree.c b/android/handsfree.c
-index 9bb8f43..2c7d53d 100644
+index 9a2fdd0..0001eb6 100644
 --- a/android/handsfree.c
 +++ b/android/handsfree.c
-@@ -273,13 +273,6 @@ static void device_destroy(struct hf_device *dev)
- 	free(dev);
+@@ -2038,24 +2038,31 @@ static void update_indicator(struct hf_device *dev, int ind, uint8_t val)
+ 	hfp_gw_send_info(dev->gw, "+CIEV: %u,%u", ind + 1, val);
  }
  
--static struct hf_device *find_default_device(void)
--{
--	/* TODO should be replaced by find_device() eventually */
--
--	return queue_peek_head(devices);
--}
--
- static bool match_by_bdaddr(const void *data, const void *match_data)
++static void device_status_notif(void *data, void *user_data)
++{
++	struct hf_device *dev = data;
++	struct hal_cmd_handsfree_device_status_notif *cmd = user_data;
++
++	update_indicator(dev, IND_SERVICE, cmd->state);
++	update_indicator(dev, IND_ROAM, cmd->type);
++	update_indicator(dev, IND_SIGNAL, cmd->signal);
++	update_indicator(dev, IND_BATTCHG, cmd->battery);
++}
++
+ static void handle_device_status_notif(const void *buf, uint16_t len)
  {
- 	const struct hf_device *dev = data;
-@@ -290,8 +283,6 @@ static bool match_by_bdaddr(const void *data, const void *match_data)
+ 	const struct hal_cmd_handsfree_device_status_notif *cmd = buf;
+-	struct hf_device *dev;
+ 	uint8_t status;
  
- static struct hf_device *find_device(const bdaddr_t *bdaddr)
- {
--	if (!bacmp(bdaddr, BDADDR_ANY))
--		return find_default_device();
+ 	DBG("");
  
- 	return queue_find(devices, match_by_bdaddr, bdaddr);
- }
+-	dev = find_default_device();
+-	if (!dev) {
++	if (queue_isempty(devices)) {
+ 		status = HAL_STATUS_FAILED;
+ 		goto done;
+ 	}
+ 
+-	update_indicator(dev, IND_SERVICE, cmd->state);
+-	update_indicator(dev, IND_ROAM, cmd->type);
+-	update_indicator(dev, IND_SIGNAL, cmd->signal);
+-	update_indicator(dev, IND_BATTCHG, cmd->battery);
++	/* Cast cmd to void as queue api needs that */
++	queue_foreach(devices, device_status_notif, (void *) cmd);
+ 
+ 	status = HAL_STATUS_SUCCESS;
+ 
 -- 
 1.8.4
 
