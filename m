@@ -1,118 +1,46 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1415804594-1761-1-git-send-email-luiz.dentz@gmail.com>
-References: <1415804594-1761-1-git-send-email-luiz.dentz@gmail.com>
-Date: Fri, 14 Nov 2014 10:47:04 +0200
-Message-ID: <CABBYNZJuVXcwp+958K-9ANKd3wnf0CSQJC0Oi2r+Kk7yW9M2Lg@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 1/3] android/gatt: Store Appearance and Privacy in db
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+From: Arman Uguray <armansito@chromium.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: Arman Uguray <armansito@chromium.org>
+Subject: [PATCH BlueZ] shared/gatt-client: Fix memory bug in service_changed_complete
+Date: Thu, 13 Nov 2014 19:23:50 -0800
+Message-Id: <1415935430-23790-1-git-send-email-armansito@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+This patch fixes a bug that got accidentally introduced in a previous
+memory leak fix, where the temporary discovery_op structure held on to
+the newly discovered service pointers after passing their ownership to
+the client and incorrectly free'd their memory. This was correctly fixed
+in init_complete but missed in service_changed_complete.
+---
+ src/shared/gatt-client.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
-On Wed, Nov 12, 2014 at 5:03 PM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->
-> This stores Appearance and Privacy values in the db itself since they
-> are static and don't depend in any context information.
-> ---
->  android/gatt.c | 49 +++++++++++++++++++++++++++++--------------------
->  1 file changed, 29 insertions(+), 20 deletions(-)
->
-> diff --git a/android/gatt.c b/android/gatt.c
-> index 086bb94..7105daf 100644
-> --- a/android/gatt.c
-> +++ b/android/gatt.c
-> @@ -6443,24 +6443,6 @@ static void gap_read_cb(struct gatt_db_attribute *attrib, unsigned int id,
->
->                 entry->length = strlen(name);
->                 memcpy(entry->value, bt_get_adapter_name(), entry->length);
-> -       } else if (attrib == gap_srvc_data.appear) {
-> -               entry->value = malloc0(2);
-> -               if (!entry->value) {
-> -                       entry->error = ATT_ECODE_INSUFF_RESOURCES;
-> -                       goto done;
-> -               }
-> -
-> -               put_le16(APPEARANCE_GENERIC_PHONE, entry->value);
-> -               entry->length = sizeof(uint8_t) * 2;
-> -       } else if (attrib == gap_srvc_data.priv) {
-> -               entry->value = malloc0(1);
-> -               if (!entry->value) {
-> -                       entry->error = ATT_ECODE_INSUFF_RESOURCES;
-> -                       goto done;
-> -               }
-> -
-> -               *entry->value = PERIPHERAL_PRIVACY_DISABLE;
-> -               entry->length = sizeof(uint8_t);
->         } else {
->                 entry->error = ATT_ECODE_ATTR_NOT_FOUND;
->         }
-> @@ -6471,6 +6453,15 @@ done:
->         entry->state  = REQUEST_DONE;
->  }
->
-> +static void write_confirm(struct gatt_db_attribute *attrib,
-> +                                               int err, void *user_data)
-> +{
-> +       if (!err)
-> +               return;
-> +
-> +       error("Error writting attribute %p", attrib);
-> +}
-> +
->  static void register_gap_service(void)
->  {
->         uint16_t start, end;
-> @@ -6491,12 +6482,21 @@ static void register_gap_service(void)
->
->         /* Appearance */
->         bt_uuid16_create(&uuid, GATT_CHARAC_APPEARANCE);
-> +
->         gap_srvc_data.appear =
->                         gatt_db_service_add_characteristic(gap_srvc_data.srvc,
->                                                         &uuid, GATT_PERM_READ,
->                                                         GATT_CHR_PROP_READ,
-> -                                                       gap_read_cb, NULL,
-> -                                                       NULL);
-> +                                                       NULL, NULL, NULL);
-> +       if (gap_srvc_data.appear) {
-> +               uint16_t value;
-> +               /* Store appearance into db */
-> +               value = cpu_to_le16(APPEARANCE_GENERIC_PHONE);
-> +               gatt_db_attribute_write(gap_srvc_data.appear, 0,
-> +                                               (void *) &value, sizeof(value),
-> +                                               ATT_OP_WRITE_REQ, NULL,
-> +                                               write_confirm, NULL);
-> +       }
->
->         /* Pripheral privacy flag */
->         bt_uuid16_create(&uuid, GATT_CHARAC_PERIPHERAL_PRIV_FLAG);
-> @@ -6506,6 +6506,15 @@ static void register_gap_service(void)
->                                                         GATT_CHR_PROP_READ,
->                                                         gap_read_cb, NULL,
->                                                         NULL);
-> +       if (gap_srvc_data.priv) {
-> +               uint8_t value;
-> +               /* Store privacy into db */
-> +               value = PERIPHERAL_PRIVACY_DISABLE;
-> +               gatt_db_attribute_write(gap_srvc_data.priv, 0,
-> +                                               &value, sizeof(value),
-> +                                               ATT_OP_WRITE_REQ, NULL,
-> +                                               write_confirm, NULL);
-> +       }
->
->         gatt_db_service_set_active(gap_srvc_data.srvc , true);
->
-> --
-> 1.9.3
-
-This has been applied.
-
-
+diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
+index b932e2d..389401a 100644
+--- a/src/shared/gatt-client.c
++++ b/src/shared/gatt-client.c
+@@ -993,6 +993,10 @@ static void service_changed_complete(struct discovery_op *op, bool success,
+ 	service_list_insert_services(&client->svc_head, &client->svc_tail,
+ 					op->result_head, op->result_tail);
+ 
++	/* Relinquish ownership of services, as the client now owns them */
++	op->result_head = NULL;
++	op->result_tail = NULL;
++
+ next:
+ 	/* Notify the upper layer of changed services */
+ 	if (client->svc_chngd_callback)
+@@ -1155,7 +1159,7 @@ static void init_complete(struct discovery_op *op, bool success,
+ 	client->svc_head = op->result_head;
+ 	client->svc_tail = op->result_tail;
+ 
+-	/* Change owner of service list */
++	/* Relinquish ownership of services, as the client now owns them */
+ 	op->result_head = NULL;
+ 	op->result_tail = NULL;
+ 
 -- 
-Luiz Augusto von Dentz
+2.1.0.rc2.206.gedb03e5
+
