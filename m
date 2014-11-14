@@ -2,284 +2,335 @@ Return-Path: <cyrus@holtmann.org>
 From: Arman Uguray <armansito@chromium.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Arman Uguray <armansito@chromium.org>
-Subject: [PATCH BlueZ v3 4/6] tools/btgatt-server: Add command support and the notify command.
-Date: Fri, 14 Nov 2014 12:20:26 -0800
-Message-Id: <1415996428-17528-5-git-send-email-armansito@chromium.org>
+Subject: [PATCH BlueZ v3 3/6] tools/btgatt-server: Populate the database.
+Date: Fri, 14 Nov 2014 12:20:25 -0800
+Message-Id: <1415996428-17528-4-git-send-email-armansito@chromium.org>
 In-Reply-To: <1415996428-17528-1-git-send-email-armansito@chromium.org>
 References: <1415996428-17528-1-git-send-email-armansito@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch adds a command REPL and introduces the "notify" command which
-allows sending notifications and indications.
+This patch populates the GATT database with the GAP and GATT services.
 ---
- tools/btgatt-server.c | 230 ++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 230 insertions(+)
+ tools/btgatt-server.c | 257 ++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 257 insertions(+)
 
 diff --git a/tools/btgatt-server.c b/tools/btgatt-server.c
-index 6a63018..c873278 100644
+index c724ab5..6a63018 100644
 --- a/tools/btgatt-server.c
 +++ b/tools/btgatt-server.c
-@@ -26,6 +26,7 @@
- #include <stdlib.h>
- #include <getopt.h>
- #include <unistd.h>
-+#include <errno.h>
+@@ -42,12 +42,18 @@
  
- #include <bluetooth/bluetooth.h>
- #include <bluetooth/hci.h>
-@@ -499,6 +500,217 @@ fail:
- 	return -1;
+ #define ATT_CID 4
+ 
++#define UUID_GAP 0x1800
++
+ #define PRLOG(...) \
+ 	do { \
+ 		printf(__VA_ARGS__); \
+ 		print_prompt(); \
+ 	} while (0)
+ 
++#ifndef MIN
++#define MIN(a, b) ((a) < (b) ? (a) : (b))
++#endif
++
+ #define COLOR_OFF	"\x1B[0m"
+ #define COLOR_RED	"\x1B[0;91m"
+ #define COLOR_GREEN	"\x1B[0;92m"
+@@ -57,12 +63,19 @@
+ #define COLOR_BOLDGRAY	"\x1B[1;30m"
+ #define COLOR_BOLDWHITE	"\x1B[1;37m"
+ 
++static const char test_device_name[] = "Very Long Test Device Name For Testing "
++				"ATT Protocol Operations On GATT Server";
+ static bool verbose = false;
+ 
+ struct server {
+ 	int fd;
+ 	struct gatt_db *db;
+ 	struct bt_gatt_server *gatt;
++
++	uint8_t *device_name;
++	size_t name_len;
++
++	bool svc_chngd_enabled;
+ };
+ 
+ static void print_prompt(void)
+@@ -93,10 +106,241 @@ static void gatt_debug_cb(const char *str, void *user_data)
+ 	PRLOG(COLOR_GREEN "%s%s\n" COLOR_OFF, prefix, str);
  }
  
-+static void notify_usage(void)
++static void gap_device_name_read_cb(struct gatt_db_attribute *attrib,
++					unsigned int id, uint16_t offset,
++					uint8_t opcode, bdaddr_t *bdaddr,
++					void *user_data)
 +{
-+	printf("Usage: notify [options] <value_handle> <value>\n"
-+					"Options:\n"
-+					"\t -i, --indicate\tSend indication\n"
-+					"e.g.:\n"
-+					"\tnotify 0x0001 00 01 00\n");
-+}
++	struct server *server = user_data;
++	uint8_t error = 0;
++	size_t len = 0;
++	const uint8_t *value = NULL;
 +
-+static struct option notify_options[] = {
-+	{ "indicate",	0, 0, 'i' },
-+	{ }
-+};
++	PRLOG("GAP Device Name Read called\n");
 +
-+static bool parse_args(char *str, int expected_argc,  char **argv, int *argc)
-+{
-+	char **ap;
++	len = server->name_len;
 +
-+	for (ap = argv; (*ap = strsep(&str, " \t")) != NULL;) {
-+		if (**ap == '\0')
-+			continue;
-+
-+		(*argc)++;
-+		ap++;
-+
-+		if (*argc > expected_argc)
-+			return false;
++	if (offset > len) {
++		error = BT_ATT_ERROR_INVALID_OFFSET;
++		goto done;
 +	}
 +
-+	return true;
-+}
-+
-+static void conf_cb(void *user_data)
-+{
-+	PRLOG("Received confirmation\n");
-+}
-+
-+static void cmd_notify(struct server *server, char *cmd_str)
-+{
-+	int opt, i;
-+	char *argvbuf[516];
-+	char **argv = argvbuf;
-+	int argc = 1;
-+	uint16_t handle;
-+	char *endptr = NULL;
-+	int length;
-+	uint8_t *value = NULL;
-+	bool indicate = false;
-+
-+	if (!parse_args(cmd_str, 514, argv + 1, &argc)) {
-+		printf("Too many arguments\n");
-+		notify_usage();
-+		return;
-+	}
-+
-+	optind = 0;
-+	argv[0] = "notify";
-+	while ((opt = getopt_long(argc, argv, "+i", notify_options,
-+								NULL)) != -1) {
-+		switch (opt) {
-+		case 'i':
-+			indicate = true;
-+			break;
-+		default:
-+			notify_usage();
-+			return;
-+		}
-+	}
-+
-+	argc -= optind;
-+	argv += optind;
-+
-+	if (argc < 1) {
-+		notify_usage();
-+		return;
-+	}
-+
-+	handle = strtol(argv[0], &endptr, 16);
-+	if (!endptr || *endptr != '\0' || !handle) {
-+		printf("Invalid handle: %s\n", argv[0]);
-+		return;
-+	}
-+
-+	length = argc - 1;
-+
-+	if (length > 0) {
-+		if (length > UINT16_MAX) {
-+			printf("Value too long\n");
-+			return;
-+		}
-+
-+		value = malloc(length);
-+		if (!value) {
-+			printf("Failed to construct value\n");
-+			return;
-+		}
-+
-+		for (i = 1; i < argc; i++) {
-+			if (strlen(argv[i]) != 2) {
-+				printf("Invalid value byte: %s\n",
-+								argv[i]);
-+				goto done;
-+			}
-+
-+			value[i-1] = strtol(argv[i], &endptr, 16);
-+			if (endptr == argv[i] || *endptr != '\0'
-+							|| errno == ERANGE) {
-+				printf("Invalid value byte: %s\n",
-+								argv[i]);
-+				goto done;
-+			}
-+		}
-+	}
-+
-+	if (indicate) {
-+		if (!bt_gatt_server_send_indication(server->gatt, handle,
-+							value, length,
-+							conf_cb, NULL, NULL))
-+			printf("Failed to initiate indication\n");
-+	} else if (!bt_gatt_server_send_notification(server->gatt, handle,
-+								value, length))
-+		printf("Failed to initiate notification\n");
++	len -= offset;
++	value = len ? &server->device_name[offset] : NULL;
 +
 +done:
-+	free(value);
++	gatt_db_attribute_read_result(attrib, id, error, value, len);
 +}
 +
-+static void cmd_help(struct server *server, char *cmd_str);
-+
-+typedef void (*command_func_t)(struct server *server, char *cmd_str);
-+
-+static struct {
-+	char *cmd;
-+	command_func_t func;
-+	char *doc;
-+} command[] = {
-+	{ "help", cmd_help, "\tDisplay help message" },
-+	{ "notify", cmd_notify, "\tSend handle-value notification" },
-+	{ }
-+};
-+
-+static void cmd_help(struct server *server, char *cmd_str)
++static void gap_device_name_write_cb(struct gatt_db_attribute *attrib,
++					unsigned int id, uint16_t offset,
++					const uint8_t *value, size_t len,
++					uint8_t opcode, bdaddr_t *bdaddr,
++					void *user_data)
 +{
-+	int i;
-+
-+	printf("Commands:\n");
-+	for (i = 0; command[i].cmd; i++)
-+		printf("\t%-15s\t%s\n", command[i].cmd, command[i].doc);
-+}
-+
-+static void prompt_read_cb(int fd, uint32_t events, void *user_data)
-+{
-+	ssize_t read;
-+	size_t len = 0;
-+	char *line = NULL;
-+	char *cmd = NULL, *args;
 +	struct server *server = user_data;
-+	int i;
++	uint8_t error = 0;
 +
-+	if (events & (EPOLLRDHUP | EPOLLHUP | EPOLLERR)) {
-+		mainloop_quit();
-+		return;
++	PRLOG("GAP Device Name Write called\n");
++
++	/* Implement this as a variable length attribute value. */
++	if (offset > server->name_len) {
++		error = BT_ATT_ERROR_INVALID_OFFSET;
++		goto done;
 +	}
 +
-+	if ((read = getline(&line, &len, stdin)) == -1)
-+		return;
++	if (offset + len != server->name_len) {
++		uint8_t *name;
 +
-+	if (read <= 1) {
-+		cmd_help(server, NULL);
-+		print_prompt();
-+		return;
++		name = realloc(server->device_name, offset + len);
++		if (!name) {
++			error = BT_ATT_ERROR_INSUFFICIENT_RESOURCES;
++			goto done;
++		}
++
++		server->device_name = name;
++		server->name_len = offset + len;
 +	}
 +
-+	line[read-1] = '\0';
-+	args = line;
++	if (value)
++		memcpy(server->device_name + offset, value, len);
 +
-+	while ((cmd = strsep(&args, " \t")))
-+		if (*cmd != '\0')
-+			break;
-+
-+	if (!cmd)
-+		goto failed;
-+
-+	for (i = 0; command[i].cmd; i++) {
-+		if (strcmp(command[i].cmd, cmd) == 0)
-+			break;
-+	}
-+
-+	if (command[i].cmd)
-+		command[i].func(server, args);
-+	else
-+		fprintf(stderr, "Unknown command: %s\n", line);
-+
-+failed:
-+	print_prompt();
-+
-+	free(line);
++done:
++	gatt_db_attribute_write_result(attrib, id, error);
 +}
 +
-+static void signal_cb(int signum, void *user_data)
++static void gap_device_name_ext_prop_read_cb(struct gatt_db_attribute *attrib,
++					unsigned int id, uint16_t offset,
++					uint8_t opcode, bdaddr_t *bdaddr,
++					void *user_data)
 +{
-+	switch (signum) {
-+	case SIGINT:
-+	case SIGTERM:
-+		mainloop_quit();
-+		break;
-+	default:
-+		break;
-+	}
++	uint8_t value[2];
++
++	PRLOG("Device Name Extended Properties Read called\n");
++
++	value[0] = BT_GATT_CHRC_EXT_PROP_RELIABLE_WRITE;
++	value[1] = 0;
++
++	gatt_db_attribute_read_result(attrib, id, 0, value, sizeof(value));
 +}
 +
- int main(int argc, char *argv[])
++static void gatt_service_changed_cb(struct gatt_db_attribute *attrib,
++					unsigned int id, uint16_t offset,
++					uint8_t opcode, bdaddr_t *bdaddr,
++					void *user_data)
++{
++	PRLOG("Service Changed Read called\n");
++
++	gatt_db_attribute_read_result(attrib, id, 0, NULL, 0);
++}
++
++static void gatt_svc_chngd_ccc_read_cb(struct gatt_db_attribute *attrib,
++					unsigned int id, uint16_t offset,
++					uint8_t opcode, bdaddr_t *bdaddr,
++					void *user_data)
++{
++	struct server *server = user_data;
++	uint8_t value[2];
++
++	PRLOG("Service Changed CCC Read called\n");
++
++	value[0] = server->svc_chngd_enabled ? 0x02 : 0x00;
++	value[1] = 0x00;
++
++	gatt_db_attribute_read_result(attrib, id, 0, value, sizeof(value));
++}
++
++static void gatt_svc_chngd_ccc_write_cb(struct gatt_db_attribute *attrib,
++					unsigned int id, uint16_t offset,
++					const uint8_t *value, size_t len,
++					uint8_t opcode, bdaddr_t *bdaddr,
++					void *user_data)
++{
++	struct server *server = user_data;
++	uint8_t ecode = 0;
++
++	PRLOG("Service Changed CCC Write called\n");
++
++	if (!value || len != 2) {
++		ecode = BT_ATT_ERROR_INVALID_ATTRIBUTE_VALUE_LEN;
++		goto done;
++	}
++
++	if (offset) {
++		ecode = BT_ATT_ERROR_INVALID_OFFSET;
++		goto done;
++	}
++
++	if (value[0] == 0x00)
++		server->svc_chngd_enabled = false;
++	else if (value[0] == 0x02)
++		server->svc_chngd_enabled = true;
++	else
++		ecode = 0x80;
++
++	PRLOG("Service Changed Enabled: %s\n",
++				server->svc_chngd_enabled ? "true" : "false");
++
++done:
++	gatt_db_attribute_write_result(attrib, id, ecode);
++}
++
++static void confirm_write(struct gatt_db_attribute *attr, int err,
++							void *user_data)
++{
++	if (!err)
++		return;
++
++	fprintf(stderr, "Error caching attribute %p - err: %d\n", attr, err);
++	exit(1);
++}
++
++static void populate_gap_service(struct server *server)
++{
++	bt_uuid_t uuid;
++	struct gatt_db_attribute *service, *tmp;
++	uint16_t appearance;
++
++	/* Add the GAP service */
++	bt_uuid16_create(&uuid, UUID_GAP);
++	service = gatt_db_add_service(server->db, &uuid, true, 6);
++
++	/*
++	 * Device Name characteristic. Make the value dynamically read and
++	 * written via callbacks.
++	 */
++	bt_uuid16_create(&uuid, GATT_CHARAC_DEVICE_NAME);
++	gatt_db_service_add_characteristic(service, &uuid,
++					BT_ATT_PERM_READ | BT_ATT_PERM_WRITE,
++					BT_GATT_CHRC_PROP_READ,
++					gap_device_name_read_cb,
++					gap_device_name_write_cb,
++					server);
++
++	bt_uuid16_create(&uuid, GATT_CHARAC_EXT_PROPER_UUID);
++	gatt_db_service_add_descriptor(service, &uuid, BT_ATT_PERM_READ,
++					gap_device_name_ext_prop_read_cb,
++					NULL, server);
++
++	/*
++	 * Appearance characteristic. Reads and writes should obtain the value
++	 * from the database.
++	 */
++	bt_uuid16_create(&uuid, GATT_CHARAC_APPEARANCE);
++	tmp = gatt_db_service_add_characteristic(service, &uuid,
++							BT_ATT_PERM_READ,
++							BT_GATT_CHRC_PROP_READ,
++							NULL, NULL, server);
++
++	/*
++	 * Write the appearance value to the database, since we're not using a
++	 * callback.
++	 */
++	put_le16(128, &appearance);
++	gatt_db_attribute_write(tmp, 0, (void *) &appearance,
++							sizeof(appearance),
++							BT_ATT_OP_WRITE_REQ,
++							NULL, confirm_write,
++							NULL);
++
++	gatt_db_service_set_active(service, true);
++}
++
++static void populate_gatt_service(struct server *server)
++{
++	bt_uuid_t uuid;
++	struct gatt_db_attribute *service;
++
++	/* Add the GATT service */
++	bt_uuid16_create(&uuid, 0x1801);
++	service = gatt_db_add_service(server->db, &uuid, true, 4);
++
++	bt_uuid16_create(&uuid, GATT_CHARAC_SERVICE_CHANGED);
++	gatt_db_service_add_characteristic(service, &uuid, BT_ATT_PERM_READ,
++			BT_GATT_CHRC_PROP_READ | BT_GATT_CHRC_PROP_INDICATE,
++			gatt_service_changed_cb,
++			NULL, server);
++
++	bt_uuid16_create(&uuid, GATT_CLIENT_CHARAC_CFG_UUID);
++	gatt_db_service_add_descriptor(service, &uuid,
++				BT_ATT_PERM_READ | BT_ATT_PERM_WRITE,
++				gatt_svc_chngd_ccc_read_cb,
++				gatt_svc_chngd_ccc_write_cb, server);
++
++	gatt_db_service_set_active(service, true);
++}
++
++static void populate_db(struct server *server)
++{
++	populate_gap_service(server);
++	populate_gatt_service(server);
++}
++
+ static struct server *server_create(int fd, uint16_t mtu)
  {
- 	int opt;
-@@ -507,6 +719,7 @@ int main(int argc, char *argv[])
- 	int fd;
- 	int sec = BT_SECURITY_LOW;
- 	uint16_t mtu = 0;
-+	sigset_t mask;
  	struct server *server;
+ 	struct bt_att *att;
++	size_t name_len = strlen(test_device_name);
  
- 	while ((opt = getopt_long(argc, argv, "+hvs:m:i:",
-@@ -591,8 +804,25 @@ int main(int argc, char *argv[])
- 		return EXIT_FAILURE;
+ 	server = new0(struct server, 1);
+ 	if (!server) {
+@@ -120,6 +364,16 @@ static struct server *server_create(int fd, uint16_t mtu)
+ 		goto fail;
  	}
  
-+	if (mainloop_add_fd(fileno(stdin),
-+				EPOLLIN | EPOLLRDHUP | EPOLLHUP | EPOLLERR,
-+				prompt_read_cb, server, NULL) < 0) {
-+		fprintf(stderr, "Failed to initialize console\n");
-+		server_destroy(server);
-+
-+		return EXIT_FAILURE;
++	server->name_len = name_len + 1;
++	server->device_name = malloc(name_len + 1);
++	if (!server->device_name) {
++		fprintf(stderr, "Failed to allocate memory for device name\n");
++		goto fail;
 +	}
 +
- 	printf("Running GATT server\n");
++	memcpy(server->device_name, test_device_name, name_len);
++	server->device_name[name_len] = '\0';
++
+ 	server->fd = fd;
+ 	server->db = gatt_db_new();
+ 	if (!server->db) {
+@@ -142,10 +396,13 @@ static struct server *server_create(int fd, uint16_t mtu)
+ 	/* bt_gatt_server already holds a reference */
+ 	bt_att_unref(att);
  
-+	sigemptyset(&mask);
-+	sigaddset(&mask, SIGINT);
-+	sigaddset(&mask, SIGTERM);
++	populate_db(server);
 +
-+	mainloop_set_signal(&mask, signal_cb, NULL, NULL);
-+
-+	print_prompt();
-+
- 	mainloop_run();
+ 	return server;
  
- 	printf("\n\nShutting down...\n");
+ fail:
+ 	gatt_db_destroy(server->db);
++	free(server->device_name);
+ 	bt_att_unref(att);
+ 	free(server);
+ 
 -- 
 2.1.0.rc2.206.gedb03e5
 
