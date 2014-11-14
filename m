@@ -2,284 +2,347 @@ Return-Path: <cyrus@holtmann.org>
 From: Arman Uguray <armansito@chromium.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Arman Uguray <armansito@chromium.org>
-Subject: [PATCH BlueZ v2 5/7] tools/btgatt-server: Add command support and the notify command.
-Date: Thu, 13 Nov 2014 18:49:51 -0800
-Message-Id: <1415933393-28902-6-git-send-email-armansito@chromium.org>
+Subject: [PATCH BlueZ v2 6/7] tools/btgatt-server: Add Heart Rate service simulation.
+Date: Thu, 13 Nov 2014 18:49:52 -0800
+Message-Id: <1415933393-28902-7-git-send-email-armansito@chromium.org>
 In-Reply-To: <1415933393-28902-1-git-send-email-armansito@chromium.org>
 References: <1415933393-28902-1-git-send-email-armansito@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch adds a command REPL and introduces the "notify" command which
-allows sending notifications and indications.
+This patch adds a Heart Rate service to the database which simulates a
+fake Heart Rate service implementation. The service can be enabled by
+default by passing the '-r' flag to the executable.
 ---
- tools/btgatt-server.c | 230 ++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 230 insertions(+)
+ tools/btgatt-server.c | 211 ++++++++++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 204 insertions(+), 7 deletions(-)
 
 diff --git a/tools/btgatt-server.c b/tools/btgatt-server.c
-index 545c8c4..4fcf10e 100644
+index 4fcf10e..76ebc9a 100644
 --- a/tools/btgatt-server.c
 +++ b/tools/btgatt-server.c
-@@ -26,6 +26,7 @@
+@@ -23,6 +23,7 @@
+ #include <stdio.h>
+ #include <stdbool.h>
+ #include <stdint.h>
++#include <time.h>
  #include <stdlib.h>
  #include <getopt.h>
  #include <unistd.h>
-+#include <errno.h>
+@@ -38,12 +39,18 @@
+ #include "src/shared/util.h"
+ #include "src/shared/att.h"
+ #include "src/shared/queue.h"
++#include "src/shared/timeout.h"
+ #include "src/shared/gatt-db.h"
+ #include "src/shared/gatt-server.h"
  
- #include <bluetooth/bluetooth.h>
- #include <bluetooth/hci.h>
-@@ -501,6 +502,217 @@ fail:
- 	return -1;
+-#define ATT_CID 4
++#define UUID_GAP			0x1800
++#define UUID_GATT			0x1801
++#define UUID_HEART_RATE			0x180d
++#define UUID_HEART_RATE_MSRMT		0x2a37
++#define UUID_HEART_RATE_BODY		0x2a38
++#define UUID_HEART_RATE_CTRL		0x2a39
+ 
+-#define UUID_GAP 0x1800
++#define ATT_CID 4
+ 
+ #define PRLOG(...) \
+ 	do { \
+@@ -77,6 +84,13 @@ struct server {
+ 	size_t name_len;
+ 
+ 	bool svc_chngd_enabled;
++
++	uint16_t hr_msrmt_handle;
++	uint16_t hr_energy_expended;
++	bool hr_visible;
++	bool hr_msrmt_enabled;
++	int hr_ee_count;
++	unsigned int hr_timeout_id;
+ };
+ 
+ static void print_prompt(void)
+@@ -248,6 +262,127 @@ done:
+ 	gatt_db_attribute_write_result(attrib, id, ecode);
  }
  
-+static void notify_usage(void)
++static void hr_msrmt_ccc_read_cb(struct gatt_db_attribute *attrib,
++					unsigned int id, uint16_t offset,
++					uint8_t opcode, bdaddr_t *bdaddr,
++					void *user_data)
 +{
-+	printf("Usage: notify [options] <value_handle> <value>\n"
-+					"Options:\n"
-+					"\t -i, --indicate\tSend indication\n"
-+					"e.g.:\n"
-+					"\tnotify 0x0001 00 01 00\n");
++	struct server *server = user_data;
++	uint8_t value[2];
++
++	value[0] = server->hr_msrmt_enabled ? 0x01 : 0x00;
++	value[1] = 0x00;
++
++	gatt_db_attribute_read_result(attrib, id, 0, value, 2);
 +}
 +
-+static struct option notify_options[] = {
-+	{ "indicate",	0, 0, 'i' },
-+	{ }
-+};
-+
-+static bool parse_args(char *str, int expected_argc,  char **argv, int *argc)
++static bool hr_msrmt_cb(void *user_data)
 +{
-+	char **ap;
++	struct server *server = user_data;
++	bool expended_present = !(server->hr_ee_count % 10);
++	uint16_t len = 2;
++	uint8_t pdu[4];
++	uint32_t cur_ee;
 +
-+	for (ap = argv; (*ap = strsep(&str, " \t")) != NULL;) {
-+		if (**ap == '\0')
-+			continue;
++	pdu[0] = 0x06;
++	pdu[1] = 90 + (rand() % 40);
 +
-+		(*argc)++;
-+		ap++;
-+
-+		if (*argc > expected_argc)
-+			return false;
++	if (expended_present) {
++		pdu[0] |= 0x08;
++		put_le16(server->hr_energy_expended, pdu + 2);
++		len += 2;
 +	}
++
++	bt_gatt_server_send_notification(server->gatt,
++						server->hr_msrmt_handle,
++						pdu, len);
++
++
++	cur_ee = server->hr_energy_expended;
++	server->hr_energy_expended = MIN(UINT16_MAX, cur_ee + 10);
++	server->hr_ee_count++;
 +
 +	return true;
 +}
 +
-+static void conf_cb(void *user_data)
++static void update_hr_msrmt_simulation(struct server *server)
 +{
-+	PRLOG("Received confirmation\n");
++	if (!server->hr_msrmt_enabled || !server->hr_visible) {
++		timeout_remove(server->hr_timeout_id);
++		return;
++	}
++
++	server->hr_timeout_id = timeout_add(1000, hr_msrmt_cb, server, NULL);
 +}
 +
-+static void cmd_notify(struct server *server, char *cmd_str)
++static void hr_msrmt_ccc_write_cb(struct gatt_db_attribute *attrib,
++					unsigned int id, uint16_t offset,
++					const uint8_t *value, size_t len,
++					uint8_t opcode, bdaddr_t *bdaddr,
++					void *user_data)
 +{
-+	int opt, i;
-+	char *argvbuf[516];
-+	char **argv = argvbuf;
-+	int argc = 1;
-+	uint16_t handle;
-+	char *endptr = NULL;
-+	int length;
-+	uint8_t *value = NULL;
-+	bool indicate = false;
++	struct server *server = user_data;
++	uint8_t ecode = 0;
 +
-+	if (!parse_args(cmd_str, 514, argv + 1, &argc)) {
-+		printf("Too many arguments\n");
-+		notify_usage();
-+		return;
++	if (!value || len != 2) {
++		ecode = BT_ATT_ERROR_INVALID_ATTRIBUTE_VALUE_LEN;
++		goto done;
 +	}
 +
-+	optind = 0;
-+	argv[0] = "notify";
-+	while ((opt = getopt_long(argc, argv, "+i", notify_options,
-+								NULL)) != -1) {
-+		switch (opt) {
-+		case 'i':
-+			indicate = true;
-+			break;
-+		default:
-+			notify_usage();
-+			return;
-+		}
++	if (offset) {
++		ecode = BT_ATT_ERROR_INVALID_OFFSET;
++		goto done;
 +	}
 +
-+	argc -= optind;
-+	argv += optind;
-+
-+	if (argc < 1) {
-+		notify_usage();
-+		return;
-+	}
-+
-+	handle = strtol(argv[0], &endptr, 16);
-+	if (!endptr || *endptr != '\0' || !handle) {
-+		printf("Invalid handle: %s\n", argv[0]);
-+		return;
-+	}
-+
-+	length = argc - 1;
-+
-+	if (length > 0) {
-+		if (length > UINT16_MAX) {
-+			printf("Value too long\n");
-+			return;
++	if (value[0] == 0x00)
++		server->hr_msrmt_enabled = false;
++	else if (value[0] == 0x01) {
++		if (server->hr_msrmt_enabled) {
++			PRLOG("HR Measurement Already Enabled\n");
++			goto done;
 +		}
 +
-+		value = malloc(length);
-+		if (!value) {
-+			printf("Failed to construct value\n");
-+			return;
-+		}
++		server->hr_msrmt_enabled = true;
++	} else
++		ecode = 0x80;
 +
-+		for (i = 1; i < argc; i++) {
-+			if (strlen(argv[i]) != 2) {
-+				printf("Invalid value byte: %s\n",
-+								argv[i]);
-+				goto done;
-+			}
++	PRLOG("HR: Measurement Enabled: %s\n",
++				server->hr_msrmt_enabled ? "true" : "false");
 +
-+			value[i-1] = strtol(argv[i], &endptr, 16);
-+			if (endptr == argv[i] || *endptr != '\0'
-+							|| errno == ERANGE) {
-+				printf("Invalid value byte: %s\n",
-+								argv[i]);
-+				goto done;
-+			}
-+		}
-+	}
-+
-+	if (indicate) {
-+		if (!bt_gatt_server_send_indication(server->gatt, handle,
-+							value, length,
-+							conf_cb, NULL, NULL))
-+			printf("Failed to initiate indication\n");
-+	} else if (!bt_gatt_server_send_notification(server->gatt, handle,
-+								value, length))
-+		printf("Failed to initiate notification\n");
++	update_hr_msrmt_simulation(server);
 +
 +done:
-+	free(value);
++	gatt_db_attribute_write_result(attrib, id, ecode);
 +}
 +
-+static void cmd_help(struct server *server, char *cmd_str);
-+
-+typedef void (*command_func_t)(struct server *server, char *cmd_str);
-+
-+static struct {
-+	char *cmd;
-+	command_func_t func;
-+	char *doc;
-+} command[] = {
-+	{ "help", cmd_help, "\tDisplay help message" },
-+	{ "notify", cmd_notify, "\tSend handle-value notification" },
-+	{ }
-+};
-+
-+static void cmd_help(struct server *server, char *cmd_str)
++static void hr_control_point_write_cb(struct gatt_db_attribute *attrib,
++					unsigned int id, uint16_t offset,
++					const uint8_t *value, size_t len,
++					uint8_t opcode, bdaddr_t *bdaddr,
++					void *user_data)
 +{
-+	int i;
-+
-+	printf("Commands:\n");
-+	for (i = 0; command[i].cmd; i++)
-+		printf("\t%-15s\t%s\n", command[i].cmd, command[i].doc);
-+}
-+
-+static void prompt_read_cb(int fd, uint32_t events, void *user_data)
-+{
-+	ssize_t read;
-+	size_t len = 0;
-+	char *line = NULL;
-+	char *cmd = NULL, *args;
 +	struct server *server = user_data;
-+	int i;
++	uint8_t ecode = 0;
 +
-+	if (events & (EPOLLRDHUP | EPOLLHUP | EPOLLERR)) {
-+		mainloop_quit();
-+		return;
++	if (!value || len != 1) {
++		ecode = BT_ATT_ERROR_INVALID_ATTRIBUTE_VALUE_LEN;
++		goto done;
 +	}
 +
-+	if ((read = getline(&line, &len, stdin)) == -1)
-+		return;
-+
-+	if (read <= 1) {
-+		cmd_help(server, NULL);
-+		print_prompt();
-+		return;
++	if (offset) {
++		ecode = BT_ATT_ERROR_INVALID_OFFSET;
++		goto done;
 +	}
 +
-+	line[read-1] = '\0';
-+	args = line;
-+
-+	while ((cmd = strsep(&args, " \t")))
-+		if (*cmd != '\0')
-+			break;
-+
-+	if (!cmd)
-+		goto failed;
-+
-+	for (i = 0; command[i].cmd; i++) {
-+		if (strcmp(command[i].cmd, cmd) == 0)
-+			break;
++	if (value[0] == 1) {
++		PRLOG("HR: Energy Expended value reset\n");
++		server->hr_energy_expended = 0;
 +	}
 +
-+	if (command[i].cmd)
-+		command[i].func(server, args);
-+	else
-+		fprintf(stderr, "Unknown command: %s\n", line);
-+
-+failed:
-+	print_prompt();
-+
-+	free(line);
++done:
++	gatt_db_attribute_write_result(attrib, id, ecode);
 +}
 +
-+static void signal_cb(int signum, void *user_data)
-+{
-+	switch (signum) {
-+	case SIGINT:
-+	case SIGTERM:
-+		mainloop_quit();
-+		break;
-+	default:
-+		break;
-+	}
-+}
-+
- int main(int argc, char *argv[])
+ static void confirm_write(struct gatt_db_attribute *attr, int err,
+ 							void *user_data)
  {
- 	int opt;
-@@ -509,6 +721,7 @@ int main(int argc, char *argv[])
- 	bdaddr_t src_addr;
- 	int dev_id = -1;
- 	int fd;
-+	sigset_t mask;
- 	struct server *server;
+@@ -315,7 +450,7 @@ static void populate_gatt_service(struct server *server)
+ 	struct gatt_db_attribute *service;
  
- 	while ((opt = getopt_long(argc, argv, "+hvs:m:i:",
-@@ -593,8 +806,25 @@ int main(int argc, char *argv[])
- 		return EXIT_FAILURE;
+ 	/* Add the GATT service */
+-	bt_uuid16_create(&uuid, 0x1801);
++	bt_uuid16_create(&uuid, UUID_GATT);
+ 	service = gatt_db_add_service(server->db, &uuid, true, 4);
+ 
+ 	bt_uuid16_create(&uuid, GATT_CHARAC_SERVICE_CHANGED);
+@@ -333,13 +468,64 @@ static void populate_gatt_service(struct server *server)
+ 	gatt_db_service_set_active(service, true);
+ }
+ 
++static void populate_hr_service(struct server *server)
++{
++	bt_uuid_t uuid;
++	struct gatt_db_attribute *service, *hr_msrmt, *body;
++	uint8_t body_loc = 1;  /* "Chest" */
++
++	/* Add Heart Rate Service */
++	bt_uuid16_create(&uuid, UUID_HEART_RATE);
++	service = gatt_db_add_service(server->db, &uuid, true, 8);
++
++	/* HR Measurement Characteristic */
++	bt_uuid16_create(&uuid, UUID_HEART_RATE_MSRMT);
++	hr_msrmt = gatt_db_service_add_characteristic(service, &uuid,
++						BT_ATT_PERM_NONE,
++						BT_GATT_CHRC_PROP_NOTIFY,
++						NULL, NULL, NULL);
++	server->hr_msrmt_handle = gatt_db_attribute_get_handle(hr_msrmt);
++
++	bt_uuid16_create(&uuid, GATT_CLIENT_CHARAC_CFG_UUID);
++	gatt_db_service_add_descriptor(service, &uuid,
++					BT_ATT_PERM_READ | BT_ATT_PERM_WRITE,
++					hr_msrmt_ccc_read_cb,
++					hr_msrmt_ccc_write_cb, server);
++
++	/*
++	 * Body Sensor Location Characteristic. Make reads obtain the value from
++	 * the database.
++	 */
++	bt_uuid16_create(&uuid, UUID_HEART_RATE_BODY);
++	body = gatt_db_service_add_characteristic(service, &uuid,
++						BT_ATT_PERM_READ,
++						BT_GATT_CHRC_PROP_READ,
++						NULL, NULL, server);
++	gatt_db_attribute_write(body, 0, (void *) &body_loc, sizeof(body_loc),
++							BT_ATT_OP_WRITE_REQ,
++							NULL, confirm_write,
++							NULL);
++
++	/* HR Control Point Characteristic */
++	bt_uuid16_create(&uuid, UUID_HEART_RATE_CTRL);
++	gatt_db_service_add_characteristic(service, &uuid,
++						BT_ATT_PERM_WRITE,
++						BT_GATT_CHRC_PROP_WRITE,
++						NULL, hr_control_point_write_cb,
++						server);
++
++	if (server->hr_visible)
++		gatt_db_service_set_active(service, true);
++}
++
+ static void populate_db(struct server *server)
+ {
+ 	populate_gap_service(server);
+ 	populate_gatt_service(server);
++	populate_hr_service(server);
+ }
+ 
+-static struct server *server_create(int fd, uint16_t mtu)
++static struct server *server_create(int fd, uint16_t mtu, bool hr_visible)
+ {
+ 	struct server *server;
+ 	struct bt_att *att;
+@@ -390,15 +576,19 @@ static struct server *server_create(int fd, uint16_t mtu)
+ 		goto fail;
  	}
  
-+	if (mainloop_add_fd(fileno(stdin),
-+				EPOLLIN | EPOLLRDHUP | EPOLLHUP | EPOLLERR,
-+				prompt_read_cb, server, NULL) < 0) {
-+		fprintf(stderr, "Failed to initialize console\n");
-+		server_destroy(server);
++	server->hr_visible = hr_visible;
 +
-+		return EXIT_FAILURE;
-+	}
-+
- 	printf("Running GATT server\n");
+ 	if (verbose) {
+ 		bt_att_set_debug(att, att_debug_cb, "att: ", NULL);
+ 		bt_gatt_server_set_debug(server->gatt, gatt_debug_cb,
+ 							"server: ", NULL);
+ 	}
  
-+	sigemptyset(&mask);
-+	sigaddset(&mask, SIGINT);
-+	sigaddset(&mask, SIGTERM);
++	/* Random seed for generating fake Heart Rate measurements */
++	srand(time(NULL));
 +
-+	mainloop_set_signal(&mask, signal_cb, NULL, NULL);
-+
-+	print_prompt();
-+
- 	mainloop_run();
+ 	/* bt_gatt_server already holds a reference */
+ 	bt_att_unref(att);
+-
+ 	populate_db(server);
  
- 	printf("\n\nShutting down...\n");
+ 	return server;
+@@ -414,6 +604,7 @@ fail:
+ 
+ static void server_destroy(struct server *server)
+ {
++	timeout_remove(server->hr_timeout_id);
+ 	bt_gatt_server_unref(server->gatt);
+ 	gatt_db_destroy(server->db);
+ }
+@@ -429,6 +620,7 @@ static void usage(void)
+ 		"\t-s, --security-level <sec>\tSet security level (low|"
+ 								"medium|high)\n"
+ 		"\t-v, --verbose\t\t\tEnable extra logging\n"
++		"\t-r, --heart-rate\t\tEnable Heart Rate service"
+ 		"\t-h, --help\t\t\tDisplay help\n");
+ }
+ 
+@@ -437,6 +629,7 @@ static struct option main_options[] = {
+ 	{ "mtu",		1, 0, 'm' },
+ 	{ "security-level",	1, 0, 's' },
+ 	{ "verbose",		0, 0, 'v' },
++	{ "heart-rate",		0, 0, 'r' },
+ 	{ "help",		0, 0, 'h' },
+ 	{ }
+ };
+@@ -722,9 +915,10 @@ int main(int argc, char *argv[])
+ 	int dev_id = -1;
+ 	int fd;
+ 	sigset_t mask;
++	bool hr_visible = false;
+ 	struct server *server;
+ 
+-	while ((opt = getopt_long(argc, argv, "+hvs:m:i:",
++	while ((opt = getopt_long(argc, argv, "+hvrs:m:i:",
+ 						main_options, NULL)) != -1) {
+ 		switch (opt) {
+ 		case 'h':
+@@ -733,6 +927,9 @@ int main(int argc, char *argv[])
+ 		case 'v':
+ 			verbose = true;
+ 			break;
++		case 'r':
++			hr_visible = true;
++			break;
+ 		case 's':
+ 			if (strcmp(optarg, "low") == 0)
+ 				sec = BT_SECURITY_LOW;
+@@ -800,7 +997,7 @@ int main(int argc, char *argv[])
+ 
+ 	mainloop_init();
+ 
+-	server = server_create(fd, mtu);
++	server = server_create(fd, mtu, hr_visible);
+ 	if (!server) {
+ 		close(fd);
+ 		return EXIT_FAILURE;
 -- 
 2.1.0.rc2.206.gedb03e5
 
