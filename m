@@ -2,184 +2,50 @@ Return-Path: <cyrus@holtmann.org>
 From: Arman Uguray <armansito@chromium.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Arman Uguray <armansito@chromium.org>
-Subject: [PATCH BlueZ v3 1/6] tools/btgatt-server: Introduce btgatt-server.
-Date: Fri, 14 Nov 2014 12:20:23 -0800
-Message-Id: <1415996428-17528-2-git-send-email-armansito@chromium.org>
-In-Reply-To: <1415996428-17528-1-git-send-email-armansito@chromium.org>
-References: <1415996428-17528-1-git-send-email-armansito@chromium.org>
+Subject: [PATCH BlueZ v3 0/6] Introduce tools/btgatt-server and other bug fixes.
+Date: Fri, 14 Nov 2014 12:20:22 -0800
+Message-Id: <1415996428-17528-1-git-send-email-armansito@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch introduces tools/btgatt-server, which is a command-line tool
-for testing and debugging shared/gatt-server.
----
- .gitignore            |   1 +
- Makefile.tools        |  11 +++--
- tools/btgatt-server.c | 114 ++++++++++++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 123 insertions(+), 3 deletions(-)
+This patch set introduces tools/btgatt-server. This tool serves as a
+standalone demo of combining shared/gatt-db, shared/gatt-server, and a
+listening L2CAP socket on the ATT channel. The tool exposes the GAP and
+GATT services, as well as a Heart Rate service. It's possible to hide/unhide
+the latter to test Service Changed events.
+
+The set also includes two small bug fixes for the way Service Changed
+characteristics are handled by shared/gatt-client.
+
+*v1: Fixed Luiz's comments:
+     - Style fixes.
+     - Make certain attribute values cached directly in gatt-db.
+     - Added an ATT error response encoding API and packed struct.
+
+*v2: Change bt_att_encode_error_rsp to bt_att_send_error_rsp.
+
+*v3: Fixed Luiz's comments:
+     - Fix all compile warnings and linker errors that are seen when patches in
+       the set are compiled seperately.
+     - Move btgatt-server experimental.
+
+     Fixed Michael's comments:
+     - Removed unnecessary memcpy after realloc.
+
+Arman Uguray (6):
+  tools/btgatt-server: Introduce btgatt-server.
+  tools/btgatt-server: Accept incoming connection and initialize server.
+  tools/btgatt-server: Populate the database.
+  tools/btgatt-server: Add command support and the notify command.
+  tools/btgatt-server: Add Heart Rate service simulation.
+  tools/btgatt-server: Add "heart-rate" command.
+
+ .gitignore            |    1 +
+ Makefile.tools        |   11 +-
+ tools/btgatt-server.c | 1086 +++++++++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 1095 insertions(+), 3 deletions(-)
  create mode 100644 tools/btgatt-server.c
 
-diff --git a/.gitignore b/.gitignore
-index 164cc97..82304b0 100644
---- a/.gitignore
-+++ b/.gitignore
-@@ -75,6 +75,7 @@ tools/3dsp
- tools/obexctl
- tools/gatt-service
- tools/btgatt-client
-+tools/btgatt-server
- tools/mcaptest
- test/sap_client.pyc
- test/bluezutils.pyc
-diff --git a/Makefile.tools b/Makefile.tools
-index 75a6faa..ef4162b 100644
---- a/Makefile.tools
-+++ b/Makefile.tools
-@@ -226,7 +226,8 @@ noinst_PROGRAMS += tools/bdaddr tools/avinfo tools/avtest \
- 			tools/btmgmt tools/btinfo tools/btattach \
- 			tools/btsnoop tools/btproxy tools/btiotest \
- 			tools/cltest tools/seq2bseq tools/hex2hcd \
--			tools/ibeacon tools/btgatt-client
-+			tools/ibeacon tools/btgatt-client \
-+			tools/btgatt-server
- 
- tools_bdaddr_SOURCES = tools/bdaddr.c src/oui.h src/oui.c
- tools_bdaddr_LDADD = lib/libbluetooth-internal.la @UDEV_LIBS@
-@@ -272,8 +273,12 @@ tools_ibeacon_SOURCES = tools/ibeacon.c monitor/bt.h
- tools_ibeacon_LDADD = src/libshared-mainloop.la
- 
- tools_btgatt_client_SOURCES = tools/btgatt-client.c src/uuid-helper.c
--tools_btgatt_client_LDADD = lib/libbluetooth-internal.la \
--				src/libshared-mainloop.la
-+tools_btgatt_client_LDADD = src/libshared-mainloop.la \
-+						lib/libbluetooth-internal.la
-+
-+tools_btgatt_server_SOURCES = tools/btgatt-server.c src/uuid-helper.c
-+tools_btgatt_server_LDADD = src/libshared-mainloop.la \
-+						lib/libbluetooth-internal.la
- 
- EXTRA_DIST += tools/bdaddr.1
- endif
-diff --git a/tools/btgatt-server.c b/tools/btgatt-server.c
-new file mode 100644
-index 0000000..c0d8dd6
---- /dev/null
-+++ b/tools/btgatt-server.c
-@@ -0,0 +1,114 @@
-+/*
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2014  Google Inc.
-+ *
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ */
-+
-+#ifdef HAVE_CONFIG_H
-+#include <config.h>
-+#endif
-+
-+#include <stdio.h>
-+#include <stdbool.h>
-+#include <stdint.h>
-+#include <stdlib.h>
-+#include <getopt.h>
-+
-+#include <bluetooth/bluetooth.h>
-+#include <bluetooth/hci.h>
-+#include <bluetooth/hci_lib.h>
-+#include <bluetooth/l2cap.h>
-+#include "lib/uuid.h"
-+
-+static bool verbose = false;
-+
-+static void usage(void)
-+{
-+	printf("btgatt-server\n");
-+	printf("Usage:\n\tbtgatt-server [options]\n");
-+
-+	printf("Options:\n"
-+		"\t-i, --index <id>\t\tSpecify adapter index, e.g. hci0\n"
-+		"\t-m, --mtu <mtu>\t\t\tThe ATT MTU to use\n"
-+		"\t-s, --security-level <sec>\tSet security level (low|"
-+								"medium|high)\n"
-+		"\t-v, --verbose\t\t\tEnable extra logging\n"
-+		"\t-h, --help\t\t\tDisplay help\n");
-+}
-+
-+static struct option main_options[] = {
-+	{ "index",		1, 0, 'i' },
-+	{ "mtu",		1, 0, 'm' },
-+	{ "security-level",	1, 0, 's' },
-+	{ "verbose",		0, 0, 'v' },
-+	{ "help",		0, 0, 'h' },
-+	{ }
-+};
-+
-+int main(int argc, char *argv[])
-+{
-+	int opt;
-+	bdaddr_t src_addr;
-+	int dev_id = -1;
-+
-+	while ((opt = getopt_long(argc, argv, "+hvs:m:i:",
-+						main_options, NULL)) != -1) {
-+		switch (opt) {
-+		case 'h':
-+			usage();
-+			return EXIT_SUCCESS;
-+		case 'v':
-+			verbose = true;
-+			break;
-+		case 's':
-+			/* TODO */
-+			break;
-+		case 'm':
-+			/* TODO */
-+			break;
-+		case 'i':
-+			dev_id = hci_devid(optarg);
-+			if (dev_id < 0) {
-+				perror("Invalid adapter");
-+				return EXIT_FAILURE;
-+			}
-+
-+			break;
-+		default:
-+			fprintf(stderr, "Invalid option: %c\n", opt);
-+			return EXIT_FAILURE;
-+		}
-+	}
-+
-+	argc -= optind;
-+	argv -= optind;
-+	optind = 0;
-+
-+	if (argc) {
-+		usage();
-+		return EXIT_SUCCESS;
-+	}
-+
-+	if (dev_id == -1)
-+		bacpy(&src_addr, BDADDR_ANY);
-+	else if (hci_devba(dev_id, &src_addr) < 0) {
-+		perror("Adapter not available");
-+		return EXIT_FAILURE;
-+	}
-+
-+	/* TODO: Set up mainloop and listening LE socket */
-+
-+	return 0;
-+}
 -- 
 2.1.0.rc2.206.gedb03e5
 
