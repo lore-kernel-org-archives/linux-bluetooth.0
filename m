@@ -1,222 +1,397 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1415933393-28902-3-git-send-email-armansito@chromium.org>
-References: <1415933393-28902-1-git-send-email-armansito@chromium.org>
-	<1415933393-28902-3-git-send-email-armansito@chromium.org>
-Date: Fri, 14 Nov 2014 15:28:16 +0200
-Message-ID: <CABBYNZ+cFsWyH-SP_ud8ogapTN_-D0f06p31pN8ifcsKK4Z+=Q@mail.gmail.com>
-Subject: Re: [PATCH BlueZ v2 2/7] tools/btgatt-server: Introduce btgatt-server.
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Arman Uguray <armansito@chromium.org>
+In-Reply-To: <CABBYNZJzrXYmqDGuJCy+NGaKj97Jq59TCibx8s43sT5Qq52VSg@mail.gmail.com>
+References: <1415878033-6766-1-git-send-email-marcin.kraglak@tieto.com>
+	<1415878033-6766-2-git-send-email-marcin.kraglak@tieto.com>
+	<CABBYNZJzrXYmqDGuJCy+NGaKj97Jq59TCibx8s43sT5Qq52VSg@mail.gmail.com>
+Date: Fri, 14 Nov 2014 14:13:37 +0100
+Message-ID: <CABD6X-JzJM71Z0NL+TTVat5JpnLYmb67p9C8DAFifHHpWLfwbA@mail.gmail.com>
+Subject: Re: [RFC 01/11] shared/gatt-client: Add read-by-uuid function
+From: Marcin Kraglak <marcin.kraglak@tieto.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Arman,
+Hi Luiz,
 
-On Fri, Nov 14, 2014 at 4:49 AM, Arman Uguray <armansito@chromium.org> wrote:
-> This patch introduces tools/btgatt-server, which is a command-line tool
-> for testing and debugging shared/gatt-server.
-> ---
->  .gitignore            |   1 +
->  Makefile.tools        |   8 +++
->  tools/btgatt-server.c | 139 ++++++++++++++++++++++++++++++++++++++++++++++++++
->  3 files changed, 148 insertions(+)
->  create mode 100644 tools/btgatt-server.c
+On 14 November 2014 13:44, Luiz Augusto von Dentz <luiz.dentz@gmail.com> wrote:
+> Hi Marcin,
 >
-> diff --git a/.gitignore b/.gitignore
-> index 164cc97..82304b0 100644
-> --- a/.gitignore
-> +++ b/.gitignore
-> @@ -75,6 +75,7 @@ tools/3dsp
->  tools/obexctl
->  tools/gatt-service
->  tools/btgatt-client
-> +tools/btgatt-server
->  tools/mcaptest
->  test/sap_client.pyc
->  test/bluezutils.pyc
-> diff --git a/Makefile.tools b/Makefile.tools
-> index 75a6faa..4bd683b 100644
-> --- a/Makefile.tools
-> +++ b/Makefile.tools
-> @@ -207,6 +207,14 @@ EXTRA_DIST += tools/hciattach.1 tools/hciconfig.1 \
->                         tools/sdptool.1 tools/ciptool.1 tools/bccmd.1
->  endif
+> On Thu, Nov 13, 2014 at 1:27 PM, Marcin Kraglak
+> <marcin.kraglak@tieto.com> wrote:
+>> This is exposed to allow client reading characteristic values
+>> with known uuid.
+>> ---
+>>  src/shared/gatt-client.c | 271 +++++++++++++++++++++++++++++++++++++++++++++++
+>>  src/shared/gatt-client.h |  18 ++++
+>>  2 files changed, 289 insertions(+)
+>>
+>> diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
+>> index 30b271e..0493b05 100644
+>> --- a/src/shared/gatt-client.c
+>> +++ b/src/shared/gatt-client.c
+>> @@ -44,6 +44,11 @@
+>>  #define GATT_SVC_UUID  0x1801
+>>  #define SVC_CHNGD_UUID 0x2a05
+>>
+>> +static const uint8_t bt_base_uuid[16] = {
+>> +       0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x10, 0x00,
+>> +       0x80, 0x00, 0x00, 0x80, 0x5F, 0x9B, 0x34, 0xFB
+>> +};
+>> +
+>>  struct chrc_data {
+>>         /* The public characteristic entry. */
+>>         bt_gatt_characteristic_t chrc_external;
+>> @@ -122,6 +127,15 @@ struct bt_gatt_client {
+>>         bool in_svc_chngd;
+>>  };
+>>
+>> +static bool is_bluetooth_uuid(const uint8_t uuid[BT_GATT_UUID_SIZE])
+>> +{
+>> +       if (memcmp(uuid, bt_base_uuid, 2) ||
+>> +                                       memcmp(&uuid[4], &bt_base_uuid[4], 12))
+>> +               return false;
+>> +
+>> +       return true;
+>> +}
+>> +
 >
-> +if TOOLS
-> +bin_PROGRAMS += tools/btgatt-server
-> +
-> +tools_btgatt_server_SOURCES = tools/btgatt-server.c src/uuid-helper.c
-> +tools_btgatt_server_LDADD = lib/libbluetooth-internal.la \
-> +                                               src/libshared-mainloop.la
-> +endif
+> Is this really different from uuid_cmp? Perhaps you use set uuid16
+> properly it should just do the same you are doing above.
+Ok, I'll use it.
+>
+>>  struct notify_data {
+>>         struct bt_gatt_client *client;
+>>         bool removed;
+>> @@ -2001,6 +2015,263 @@ bool bt_gatt_client_read_long_value(struct bt_gatt_client *client,
+>>         return true;
+>>  }
+>>
+>> +struct read_by_uuid_res {
+>> +       uint16_t handle;
+>> +       uint8_t length;
+>> +       uint8_t *data;
+>> +       struct read_by_uuid_res *next;
+>> +};
+>> +
+>> +bool read_by_uuid_res_get(struct read_by_uuid_res *result, uint16_t *handle,
+>> +                                       uint8_t *length, uint8_t **data)
+>> +{
+>> +       if (!result)
+>> +               return false;
+>> +
+>> +       *length = result->length;
+>> +       *handle = result->handle;
+>> +       *data = result->data;
+>> +
+>> +       return true;
+>> +}
+>> +
+>> +struct read_by_uuid_res *read_by_uuid_res_next(struct read_by_uuid_res *result)
+>> +{
+>> +       if (!result)
+>> +               return NULL;
+>> +
+>> +       return result->next;
+>> +}
+>> +
+>> +struct read_by_uuid_op {
+>> +       struct bt_gatt_client *client;
+>> +       bt_gatt_client_read_by_uuid_callback_t callback;
+>> +       int ref_count;
+>> +       uint16_t start_handle;
+>> +       uint16_t end_handle;
+>> +       uint8_t uuid[BT_GATT_UUID_SIZE];
+>> +       struct read_by_uuid_res *result_head;
+>> +       struct read_by_uuid_res *result_tail;
+>> +       void *user_data;
+>> +       bt_gatt_client_destroy_func_t destroy;
+>> +};
+>
+> Im not really sure this lists are really helping us, perhaps this is
+> the effect of using iterators in the API but that seems to create
+> duplicated code.
+>
+>> +static bool append_read_by_uuid_result(struct read_by_uuid_op *op,
+>> +                                       uint16_t handle, uint16_t length,
+>> +                                       const uint8_t *data)
+>> +{
+>> +       struct read_by_uuid_res *result;
+>> +
+>> +       result = new0(struct read_by_uuid_res, 1);
+>> +       if (!result)
+>> +               return false;
+>> +
+>> +       result->data = malloc(length);
+>> +       if (!result->data) {
+>> +               free(result);
+>> +               return false;
+>> +       }
+>> +
+>> +       result->handle = handle;
+>> +       result->length = length;
+>> +       memcpy(result->data, data, length);
+>> +
+>> +       if (op->result_head) {
+>> +               op->result_tail->next = result;
+>> +               op->result_tail = result;
+>> +       } else {
+>> +               op->result_head = op->result_tail = result;
+>> +       }
+>> +
+>> +       return true;
+>> +}
+>> +
+>> +static void destroy_read_by_uuid_result(void *data)
+>> +{
+>> +       struct read_by_uuid_res *result = data;
+>> +
+>> +       free(result->data);
+>> +       free(result);
+>> +}
+>> +
+>> +static struct read_by_uuid_op *read_by_uuid_op_ref(struct read_by_uuid_op *op)
+>> +{
+>> +       __sync_fetch_and_add(&op->ref_count, 1);
+>> +
+>> +       return op;
+>> +}
+>> +
+>> +static void read_by_uuid_op_unref(void *data)
+>> +{
+>> +       struct read_by_uuid_res *next, *temp;
+>> +       struct read_by_uuid_op *op = data;
+>> +
+>> +       if (__sync_sub_and_fetch(&op->ref_count, 1))
+>> +               return;
+>> +
+>> +       if (op->destroy)
+>> +               op->destroy(op->user_data);
+>> +
+>> +       for (temp = op->result_head; temp; temp = next) {
+>> +               next = temp->next;
+>> +               destroy_read_by_uuid_result(temp);
+>> +       }
+>> +
+>> +       free(op);
+>> +}
+>> +
+>> +static void read_by_uuid_cb(uint8_t opcode, const void *pdu,
+>> +                                       uint16_t length, void *user_data)
+>> +{
+>> +       struct read_by_uuid_op *op = user_data;
+>> +       size_t data_length;
+>> +       uint8_t att_ecode;
+>> +       uint16_t offset, last_handle;
+>> +       const uint8_t *data;
+>> +       bool success;
+>> +
+>> +       if (opcode == BT_ATT_OP_ERROR_RSP) {
+>> +               att_ecode = process_error(pdu, length);
+>> +               if (att_ecode == BT_ATT_ERROR_ATTRIBUTE_NOT_FOUND)
+>> +                       success = true;
+>> +               else
+>> +                       success = false;
+>> +
+>> +               goto done;
+>> +       }
+>> +
+>> +       if (opcode != BT_ATT_OP_READ_BY_TYPE_RSP || (!pdu && length)) {
+>> +               success = false;
+>> +               att_ecode = 0;
+>> +               goto done;
+>> +       }
+>> +
+>> +       data_length = ((const uint8_t *) pdu)[0];
+>> +       if ((length - 1) % data_length) {
+>> +               success = false;
+>> +               att_ecode = 0;
+>> +               goto done;
+>> +       }
+>> +
+>> +       for (offset = 1; offset < length; offset += data_length) {
+>> +               data = pdu + offset;
+>> +               if (!append_read_by_uuid_result(op, get_le16(data),
+>> +                                               data_length - 2, data + 2)) {
+>> +                       success = false;
+>> +                       att_ecode = 0;
+>> +                       goto done;
+>> +               }
+>> +       }
+>> +
+>> +       last_handle = get_le16(pdu + length - data_length);
+>> +       if (last_handle < op->end_handle) {
+>> +               uint8_t pdu[20];
+>> +
+>> +               put_le16(last_handle + 1, pdu);
+>> +               put_le16(op->end_handle, pdu + 2);
+>> +
+>> +               if (is_bluetooth_uuid(op->uuid)) {
+>> +                       put_le16((op->uuid[2] << 8) + op->uuid[3], pdu + 4);
+>> +                       /*
+>> +                        * 2 octets - start handle
+>> +                        * 2 octets - end handle
+>> +                        * 2 octets - 16-bit uuid
+>> +                        */
+>> +                       length = 6;
+>> +               } else {
+>> +                       bswap_128(&op->uuid, pdu + 4);
+>> +                       /*
+>> +                        * 2 octets - start handle
+>> +                        * 2 octets - end handle
+>> +                        * 16 octets - 128-bit uuid
+>> +                        */
+>> +                       length = 20;
+>> +               }
+>> +
+>> +               if (!bt_att_send(op->client->att, BT_ATT_OP_READ_BY_TYPE_REQ,
+>> +                                       pdu, length, read_by_uuid_cb,
+>> +                                       read_by_uuid_op_ref(op),
+>> +                                       read_by_uuid_op_unref)) {
+>> +                       read_by_uuid_op_unref(op);
+>> +                       success = false;
+>> +                       att_ecode = 0;
+>> +                       goto done;
+>> +               }
+>> +
+>> +               return;
+>> +       }
+>> +
+>> +       success = true;
+>> +       att_ecode = 0;
+>> +
+>> +done:
+>> +       if (op->callback)
+>> +               op->callback(success, att_ecode, op->result_head,
+>> +                                                               op->user_data);
+>> +}
+>> +
+>> +bool bt_gatt_client_read_by_uuid(struct bt_gatt_client *client,
+>> +                               uint16_t start_handle, uint16_t end_handle,
+>> +                               const uint8_t uuid[BT_GATT_UUID_SIZE],
+>> +                               bt_gatt_client_read_by_uuid_callback_t callback,
+>> +                               void *user_data,
+>> +                               bt_gatt_client_destroy_func_t destroy)
+>> +{
+>> +       struct read_by_uuid_op *op;
+>> +       uint16_t length;
+>> +       uint8_t pdu[20];
+>> +
+>> +       if (!client)
+>> +               return false;
+>> +
+>> +       if (start_handle > end_handle || start_handle == 0x0000)
+>> +               return false;
+>> +
+>> +       op = new0(struct read_by_uuid_op, 1);
+>> +       if (!op)
+>> +               return false;
+>> +
+>> +       op->client = client;
+>> +       op->start_handle = start_handle;
+>> +       op->end_handle = end_handle;
+>> +       op->destroy = destroy;
+>> +       op->callback = callback;
+>> +       op->user_data = user_data;
+>> +       memcpy(&op->uuid, uuid, 16);
+>> +
+>> +       /* Convert to 16-bit if it is Bluetooth UUID */
+>> +       if (is_bluetooth_uuid(uuid)) {
+>> +               put_le16((uuid[2] << 8) + uuid[3], pdu + 4);
+>> +               /*
+>> +                * 2 octets - start handle
+>> +                * 2 octets - end handle
+>> +                * 2 octets - 16-bit uuid
+>> +                */
+>> +               length = 6;
+>> +       } else {
+>> +               bswap_128(uuid, pdu + 4);
+>> +               /*
+>> +                * 2 octets - start handle
+>> +                * 2 octets - end handle
+>> +                * 16 octets - 128-bit uuid
+>> +                */
+>> +               length = 20;
+>> +       }
+>> +
+>> +       put_le16(start_handle, pdu);
+>> +       put_le16(end_handle, pdu + 2);
+>> +
+>> +       if (!bt_att_send(client->att, BT_ATT_OP_READ_BY_TYPE_REQ, pdu,
+>> +                                               length, read_by_uuid_cb,
+>> +                                               read_by_uuid_op_ref(op),
+>> +                                               read_by_uuid_op_unref)) {
+>> +               free(op);
+>> +               return false;
+>> +       }
+>> +
+>> +       return true;
+>> +}
+>> +
+>>  bool bt_gatt_client_write_without_response(struct bt_gatt_client *client,
+>>                                         uint16_t value_handle,
+>>                                         bool signed_write,
+>> diff --git a/src/shared/gatt-client.h b/src/shared/gatt-client.h
+>> index adccfc5..921ed75 100644
+>> --- a/src/shared/gatt-client.h
+>> +++ b/src/shared/gatt-client.h
+>> @@ -145,6 +145,24 @@ bool bt_gatt_client_read_long_value(struct bt_gatt_client *client,
+>>                                         void *user_data,
+>>                                         bt_gatt_client_destroy_func_t destroy);
+>>
+>> +struct read_by_uuid_res;
+>> +
+>> +struct read_by_uuid_res *read_by_uuid_res_next(struct read_by_uuid_res *result);
+>> +bool read_by_uuid_res_get(struct read_by_uuid_res *result, uint16_t *handle,
+>> +                                       uint8_t *length, uint8_t **data);
+>> +
+>> +typedef void (*bt_gatt_client_read_by_uuid_callback_t)(bool success,
+>> +                                               uint8_t att_ecode,
+>> +                                               struct read_by_uuid_res *result,
+>> +                                               void *user_data);
+>> +
+>> +bool bt_gatt_client_read_by_uuid(struct bt_gatt_client *client,
+>> +                               uint16_t start_handle, uint16_t end_handle,
+>> +                               const uint8_t uuid[BT_GATT_UUID_SIZE],
+>> +                               bt_gatt_client_read_by_uuid_callback_t callback,
+>> +                               void *user_data,
+>> +                               bt_gatt_client_destroy_func_t destroy);
+>
+> Isn't this essentially duplicating bt_gatt_service_iter_next_by_uuid?
+> I mean we should be reading everything already but this doesn't seems
+> to using the cache and in case it is just to fulfill a test perhaps it
+> is better to do it in gatt-helpers so we keep bt_gatt_client API
+> clean.
 
-Shouldn't it be placed under experimental together with btgatt-client?
+It is functionality of GATT client described in chapter 4.8.2 "Read
+Using Characteristic UUID".
+Difference is that client can read attributes by passing UUID, and
+results can contain
+different valu lengths. And client interprets results instead of gatt-helpers.
+I implemented it here because all read/write operations on
+characteristics and descriptors
+are exposed in bt_gatt_client, and all discovery stuff is implemented
+in gatt_helpers. But if
+you don't agree I can change it.
 
->  if HID2HCI
->  udevdir = @UDEV_DIR@
 >
-> diff --git a/tools/btgatt-server.c b/tools/btgatt-server.c
-> new file mode 100644
-> index 0000000..4508de2
-> --- /dev/null
-> +++ b/tools/btgatt-server.c
-> @@ -0,0 +1,139 @@
-> +/*
-> + *  BlueZ - Bluetooth protocol stack for Linux
-> + *
-> + *  Copyright (C) 2014  Google Inc.
-> + *
-> + *
-> + *  This program is free software; you can redistribute it and/or modify
-> + *  it under the terms of the GNU General Public License as published by
-> + *  the Free Software Foundation; either version 2 of the License, or
-> + *  (at your option) any later version.
-> + *
-> + *  This program is distributed in the hope that it will be useful,
-> + *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-> + *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-> + *  GNU General Public License for more details.
-> + *
-> + */
-> +
-> +#ifdef HAVE_CONFIG_H
-> +#include <config.h>
-> +#endif
-> +
-> +#include <stdio.h>
-> +#include <stdbool.h>
-> +#include <stdint.h>
-> +#include <stdlib.h>
-> +#include <getopt.h>
-> +
-> +#include <bluetooth/bluetooth.h>
-> +#include <bluetooth/hci.h>
-> +#include <bluetooth/hci_lib.h>
-> +#include <bluetooth/l2cap.h>
-> +#include "lib/uuid.h"
-> +
-> +static bool verbose = false;
-> +
-> +static void usage(void)
-> +{
-> +       printf("btgatt-server\n");
-> +       printf("Usage:\n\tbtgatt-server [options]\n");
-> +
-> +       printf("Options:\n"
-> +               "\t-i, --index <id>\t\tSpecify adapter index, e.g. hci0\n"
-> +               "\t-m, --mtu <mtu>\t\t\tThe ATT MTU to use\n"
-> +               "\t-s, --security-level <sec>\tSet security level (low|"
-> +                                                               "medium|high)\n"
-> +               "\t-v, --verbose\t\t\tEnable extra logging\n"
-> +               "\t-h, --help\t\t\tDisplay help\n");
-> +}
-> +
-> +static struct option main_options[] = {
-> +       { "index",              1, 0, 'i' },
-> +       { "mtu",                1, 0, 'm' },
-> +       { "security-level",     1, 0, 's' },
-> +       { "verbose",            0, 0, 'v' },
-> +       { "help",               0, 0, 'h' },
-> +       { }
-> +};
-> +
-> +int main(int argc, char *argv[])
-> +{
-> +       int opt;
-> +       int sec = BT_SECURITY_LOW;
-> +       uint16_t mtu = 0;
-> +       bdaddr_t src_addr;
-> +       int dev_id = -1;
-> +
-> +       while ((opt = getopt_long(argc, argv, "+hvs:m:i:",
-> +                                               main_options, NULL)) != -1) {
-> +               switch (opt) {
-> +               case 'h':
-> +                       usage();
-> +                       return EXIT_SUCCESS;
-> +               case 'v':
-> +                       verbose = true;
-> +                       break;
-> +               case 's':
-> +                       if (strcmp(optarg, "low") == 0)
-> +                               sec = BT_SECURITY_LOW;
-> +                       else if (strcmp(optarg, "medium") == 0)
-> +                               sec = BT_SECURITY_MEDIUM;
-> +                       else if (strcmp(optarg, "high") == 0)
-> +                               sec = BT_SECURITY_HIGH;
-> +                       else {
-> +                               fprintf(stderr, "Invalid security level\n");
-> +                               return EXIT_FAILURE;
-> +                       }
-> +                       break;
-> +               case 'm': {
-> +                       int arg;
-> +
-> +                       arg = atoi(optarg);
-> +                       if (arg <= 0) {
-> +                               fprintf(stderr, "Invalid MTU: %d\n", arg);
-> +                               return EXIT_FAILURE;
-> +                       }
-> +
-> +                       if (arg > UINT16_MAX) {
-> +                               fprintf(stderr, "MTU too large: %d\n", arg);
-> +                               return EXIT_FAILURE;
-> +                       }
-> +
-> +                       mtu = (uint16_t)arg;
-> +                       break;
-> +               }
-> +               case 'i':
-> +                       dev_id = hci_devid(optarg);
-> +                       if (dev_id < 0) {
-> +                               perror("Invalid adapter");
-> +                               return EXIT_FAILURE;
-> +                       }
-> +
-> +                       break;
-> +               default:
-> +                       fprintf(stderr, "Invalid option: %c\n", opt);
-> +                       return EXIT_FAILURE;
-> +               }
-> +       }
-> +
-> +       argc -= optind;
-> +       argv -= optind;
-> +       optind = 0;
-> +
-> +       if (argc) {
-> +               usage();
-> +               return EXIT_SUCCESS;
-> +       }
-> +
-> +       if (dev_id == -1)
-> +               bacpy(&src_addr, BDADDR_ANY);
-> +       else if (hci_devba(dev_id, &src_addr) < 0) {
-> +               perror("Adapter not available");
-> +               return EXIT_FAILURE;
-> +       }
-> +
-> +       /* TODO: Set up mainloop and listening LE socket */
-> +
-> +       return 0;
-> +}
+>>  bool bt_gatt_client_write_without_response(struct bt_gatt_client *client,
+>>                                         uint16_t value_handle,
+>>                                         bool signed_write,
+>> --
+>> 1.9.3
+>>
+>> --
+>> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+>> the body of a message to majordomo@vger.kernel.org
+>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>
+>
+>
 > --
-> 2.1.0.rc2.206.gedb03e5
+> Luiz Augusto von Dentz
 
-Btw, this is breaking the build if applied separately:
-
-tools/btgatt-server.c: In function ‘main’:
-tools/btgatt-server.c:64:11: error: variable ‘mtu’ set but not used
-[-Werror=unused-but-set-variable]
-  uint16_t mtu = 0;
-           ^
-tools/btgatt-server.c:63:6: error: variable ‘sec’ set but not used
-[-Werror=unused-but-set-variable]
-  int sec = BT_SECURITY_LOW;
-      ^
-
--- 
-Luiz Augusto von Dentz
+BR
+Marcin
