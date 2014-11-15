@@ -1,32 +1,53 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-From: Sujay Sarkhel <ssarkhe@ncsu.edu>
-Date: Fri, 14 Nov 2014 20:13:13 -0800
-Message-ID: <CAE7yNv9vBFaBincdFbf=jRGMd1iD-biA4FRhwi5k4b2i2Wdt6Q@mail.gmail.com>
-Subject: Thermometer D-Bus API Signature
-To: linux-bluetooth <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 8.0 \(1990.1\))
+Subject: Re: [PATCH 0/4] Bluetooth: More lockdep warning fixes with the help of RCU
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1415882270-5621-1-git-send-email-johan.hedberg@gmail.com>
+Date: Sat, 15 Nov 2014 09:55:15 +0900
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <CD2E8ED3-187F-4281-8F98-D2968DDAC85B@holtmann.org>
+References: <1415882270-5621-1-git-send-email-johan.hedberg@gmail.com>
+To: Johan Hedberg <johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-I was looking at the Health Thermometer Watcher hierarchy under
-docs/thermometer-api.txt and I guess the signature for the following
-method is incorrect:
+Hi Johan,
 
-           void MeasurementReceived(dict measurement)
+> This patch set converts the LTK and IRK lists to use RCU which
+> eliminates the need to always hold the hdev lock while accessing these
+> lists. This helps us fix more lockdep warnings arising from hdev locking
+> in smp.c.
+> 
+> What this patch set doesn't fix is the general problem of the SMP
+> context holding references to list entries without any guarantee that
+> those references stay valid if some other thread goes and removes the
+> entries. For this the proper fix would probably be to introduce kref for
+> the entries to ensure that external references stay valid. However,
+> since that requires considerably more code it's better to first merge
+> most lists into a single "remote device info" list that's protected both
+> by kref and RCU.
+> 
+> Johan
+> 
+> ----------------------------------------------------------------
+> Johan Hedberg (4):
+>      Bluetooth: Convert LTK list to RCU
+>      Bluetooth: Convert IRK list to RCU
+>      Bluetooth: Remove unnecessary hdev locking in smp.c
+>      Bluetooth: Add debug logs to help track locking issues
+> 
+> include/net/bluetooth/hci_core.h |  2 +
+> net/bluetooth/hci_core.c         | 88 ++++++++++++++++++++++----------------
+> net/bluetooth/hci_event.c        |  4 +-
+> net/bluetooth/l2cap_core.c       |  3 +-
+> net/bluetooth/l2cap_sock.c       | 10 ++++-
+> net/bluetooth/smp.c              | 27 ++++--------
+> 6 files changed, 75 insertions(+), 59 deletions(-)
 
-In my opinion, it should be:
+all 4 patches have been applied to bluetooth-next tree.
 
-       void MeasurementReceived(object device, dict measurement)
+Regards
 
-i.e. same as the one defined under heartrate-api.txt
+Marcel
 
-Unfortunately, I do not have an actual thermometer or an emulator to
-verify this but looking at the source code:
-https://git.kernel.org/cgit/bluetooth/bluez.git/tree/profiles/thermometer/thermometer.c
-for the method update_watcher (line #277), it looks that way.
-
-Can some developer kindly verify this please? Thanks!
-
-Regards,
-Sujay Sarkhel
