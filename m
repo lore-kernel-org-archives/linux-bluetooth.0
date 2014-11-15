@@ -1,47 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Fix clearing remote OOB data through mgmt
-Date: Sat, 15 Nov 2014 09:34:23 +0200
-Message-Id: <1416036863-27634-1-git-send-email-johan.hedberg@gmail.com>
+MIME-Version: 1.0
+From: Sujay Sarkhel <ssarkhe@ncsu.edu>
+Date: Fri, 14 Nov 2014 20:13:13 -0800
+Message-ID: <CAE7yNv9vBFaBincdFbf=jRGMd1iD-biA4FRhwi5k4b2i2Wdt6Q@mail.gmail.com>
+Subject: Thermometer D-Bus API Signature
+To: linux-bluetooth <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@intel.com>
+I was looking at the Health Thermometer Watcher hierarchy under
+docs/thermometer-api.txt and I guess the signature for the following
+method is incorrect:
 
-When passed BDADDR_ANY the Remove Remote OOB Data comand is specified to
-clear all entries. This patch adds the necessary check and calls
-hci_remote_oob_data_clear() when necessary.
+           void MeasurementReceived(dict measurement)
 
-Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
----
- net/bluetooth/mgmt.c | 7 +++++++
- 1 file changed, 7 insertions(+)
+In my opinion, it should be:
 
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index ce0272c6f71f..f85817604d0a 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -3635,12 +3635,19 @@ static int remove_remote_oob_data(struct sock *sk, struct hci_dev *hdev,
- 
- 	hci_dev_lock(hdev);
- 
-+	if (bacmp(&cp->addr.bdaddr, BDADDR_ANY)) {
-+		hci_remote_oob_data_clear(hdev);
-+		status = MGMT_STATUS_SUCCESS;
-+		goto done;
-+	}
-+
- 	err = hci_remove_remote_oob_data(hdev, &cp->addr.bdaddr);
- 	if (err < 0)
- 		status = MGMT_STATUS_INVALID_PARAMS;
- 	else
- 		status = MGMT_STATUS_SUCCESS;
- 
-+done:
- 	err = cmd_complete(sk, hdev->id, MGMT_OP_REMOVE_REMOTE_OOB_DATA,
- 			   status, &cp->addr, sizeof(cp->addr));
- 
--- 
-2.1.0
+       void MeasurementReceived(object device, dict measurement)
 
+i.e. same as the one defined under heartrate-api.txt
+
+Unfortunately, I do not have an actual thermometer or an emulator to
+verify this but looking at the source code:
+https://git.kernel.org/cgit/bluetooth/bluez.git/tree/profiles/thermometer/thermometer.c
+for the method update_watcher (line #277), it looks that way.
+
+Can some developer kindly verify this please? Thanks!
+
+Regards,
+Sujay Sarkhel
