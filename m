@@ -1,66 +1,38 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1415895699-19124-1-git-send-email-luiz.dentz@gmail.com>
-References: <1415895699-19124-1-git-send-email-luiz.dentz@gmail.com>
-Date: Mon, 17 Nov 2014 11:29:14 +0200
-Message-ID: <CABBYNZKeBshsh3zsbwVD5xGscec5oK0aEUHnD2hU35CfR9wObg@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 1/2] unit/test-gatt: Add debug for bt_att
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+From: Szymon Janc <szymon.janc@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Szymon Janc <szymon.janc@tieto.com>
+Subject: [PATCH] monitor/rfcomm: Fix not printing userdata in UIH frame with credits
+Date: Sun, 16 Nov 2014 22:26:07 +0100
+Message-Id: <1416173167-6401-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+> ACL Data RX: Handle 7 flags 0x02 dlen 19              [hci0] 8.723738
+      Channel: 65 len 15 [PSM 3 mode 0] {chan 1}
+      RFCOMM: Unnumbered Info with Header Check (UIH)(0xef)
+         Address: 0x09 cr 0 dlci 0x02
+         Control: 0xff poll/final 1
+         Length: 10
+         FCS: 0x5c
+         Credits: 1
+        41 54 2b 43 49 4e 44 3d 3f 0d 5c               AT+CIND=?.\
+---
+ monitor/rfcomm.c | 1 -
+ 1 file changed, 1 deletion(-)
 
-On Thu, Nov 13, 2014 at 6:21 PM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->
-> ---
->  unit/test-gatt.c | 10 +++++++---
->  1 file changed, 7 insertions(+), 3 deletions(-)
->
-> diff --git a/unit/test-gatt.c b/unit/test-gatt.c
-> index 39cdda3..31e524b 100644
-> --- a/unit/test-gatt.c
-> +++ b/unit/test-gatt.c
-> @@ -284,7 +284,7 @@ static gboolean test_handler(GIOChannel *channel, GIOCondition cond,
->         return TRUE;
->  }
->
-> -static void gatt_debug(const char *str, void *user_data)
-> +static void print_debug(const char *str, void *user_data)
->  {
->         const char *prefix = user_data;
->
-> @@ -381,6 +381,10 @@ static struct context *create_context(uint16_t mtu, gconstpointer data)
->         case ATT:
->                 context->att = att;
->
-> +               if (g_test_verbose())
-> +                       bt_att_set_debug(context->att, print_debug, "bt_att:",
-> +                                                                       NULL);
-> +
->                 bt_gatt_exchange_mtu(context->att, mtu, NULL, NULL, NULL);
->                 break;
->         case CLIENT:
-> @@ -388,8 +392,8 @@ static struct context *create_context(uint16_t mtu, gconstpointer data)
->                 g_assert(context->client);
->
->                 if (g_test_verbose())
-> -                       bt_gatt_client_set_debug(context->client, gatt_debug,
-> -                                                               "gatt:", NULL);
-> +                       bt_gatt_client_set_debug(context->client, print_debug,
-> +                                               "bt_gatt_client:", NULL);
->
->                 bt_gatt_client_set_ready_handler(context->client,
->                                                 client_ready_cb, context, NULL);
-> --
-> 1.9.3
-
-Pushed.
-
-
+diff --git a/monitor/rfcomm.c b/monitor/rfcomm.c
+index 881ae5e..b3db98b 100644
+--- a/monitor/rfcomm.c
++++ b/monitor/rfcomm.c
+@@ -171,7 +171,6 @@ static bool uih_frame(struct rfcomm_frame *rfcomm_frame, uint8_t indent)
+ 			return false;
+ 		hdr->credits = credits;
+ 		print_field("%*cCredits: %d", indent, ' ', hdr->credits);
+-		return true;
+ 	}
+ 
+ 	packet_hexdump(frame->data, frame->size);
 -- 
-Luiz Augusto von Dentz
+1.9.3
+
