@@ -1,35 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
-From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
-Subject: [PATCH 1/4] android/hal-ipc-api: Update HidHost with Android 5 API
-Date: Mon, 17 Nov 2014 15:06:55 +0100
-Message-Id: <1416233218-16456-1-git-send-email-jakub.tyszkowski@tieto.com>
+MIME-Version: 1.0
+In-Reply-To: <1415987861-21068-1-git-send-email-jamuraa@chromium.org>
+References: <1415987861-21068-1-git-send-email-jamuraa@chromium.org>
+Date: Mon, 17 Nov 2014 15:30:11 +0200
+Message-ID: <CABBYNZJ2WSDt-jxgfz=Cpheuow117W7CA9S-cBRDOBQVZe7ENQ@mail.gmail.com>
+Subject: Re: [PATCH BlueZ v3] GATT shim to src/shared bt_att
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Michael Janssen <jamuraa@chromium.org>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- android/hal-ipc-api.txt | 7 +++++++
- 1 file changed, 7 insertions(+)
+Hi Michael,
 
-diff --git a/android/hal-ipc-api.txt b/android/hal-ipc-api.txt
-index 67a6205..a5ec44b 100644
---- a/android/hal-ipc-api.txt
-+++ b/android/hal-ipc-api.txt
-@@ -671,6 +671,13 @@ Notifications:
- 		                     0x0c = Authentication failed
- 		                     0x0d = HDL
- 
-+	Opcode 0x87 - Handshake notification
-+
-+		Notification parameters: Remote address (6 octets)
-+		                         Status (1 octet)
-+
-+		Valid status values: Same as in Virtual Unplug notification
-+
- 
- Bluetooth PAN HAL (ID 4)
- ========================
--- 
-1.9.1
+On Fri, Nov 14, 2014 at 7:57 PM, Michael Janssen <jamuraa@chromium.org> wrote:
+> This patch implements a version of GAttrib which is backed by
+> bt_att, which enables the simultaneous use of GAttrib and bt_att.
+>
+> This should enable smooth transition of profiles from the GAttrib
+> API to the src/shared bt_att API.
+>
+> v2 -> v3:
+>         * Shared queues and mem management instead of glib
+>         * Formatting fixes
+>
 
+Applied, note that I had to do some fixes for a double free in
+attrib_callbacks_destroy since it is not safe to do queue_remove
+within the destroy callback passed to queue_destroy.
