@@ -1,52 +1,121 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcin Kraglak <marcin.kraglak@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 5/9] unit/test-gatt: Add /TP/GAR/CL/BI-06-C test
-Date: Mon, 17 Nov 2014 20:51:27 +0100
-Message-Id: <1416253891-21381-5-git-send-email-marcin.kraglak@tieto.com>
+Subject: [PATCH 2/9] tools/btgatt-client: Add read-by-uuid cmd
+Date: Mon, 17 Nov 2014 20:51:24 +0100
+Message-Id: <1416253891-21381-2-git-send-email-marcin.kraglak@tieto.com>
 In-Reply-To: <1416253891-21381-1-git-send-email-marcin.kraglak@tieto.com>
 References: <1416253891-21381-1-git-send-email-marcin.kraglak@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Verify Generic Attribute Profile client behavior when the Read
-Using Characteristic UUID procedure fails due to read not permitted.
+Implement reading characteristics by UUID in btgatt-client tool.
 ---
- unit/test-gatt.c | 15 +++++++++++++++
- 1 file changed, 15 insertions(+)
+ tools/btgatt-client.c | 84 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 84 insertions(+)
 
-diff --git a/unit/test-gatt.c b/unit/test-gatt.c
-index 4f88ce5..02c0205 100644
---- a/unit/test-gatt.c
-+++ b/unit/test-gatt.c
-@@ -766,6 +766,15 @@ const struct test_step test_read_by_uuid_2 = {
- 			0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e}
- };
- 
-+const struct test_step test_read_by_uuid_3 = {
-+	.handle = 0x0001,
-+	.end_handle = 0xffff,
-+	.func = test_read_by_uuid,
-+	.expected_att_ecode = 0x02,
-+	.uuid = {0x00, 0x00, 0x2b, 0x0d, 0x00, 0x00, 0x10, 0x00,
-+			0x80, 0x00, 0x00, 0x80, 0x5F, 0x9B, 0x34, 0xFB}
-+};
-+
- static void test_client(gconstpointer data)
- {
- 	struct context *context = create_context(512, data);
-@@ -970,5 +979,11 @@ int main(int argc, char *argv[])
- 					0x01, 0x00, 0x00),
- 			raw_pdu(0x01, 0x08, 0x0b, 0x00, 0x0a));
- 
-+	define_test_client("/TP/GAR/CL/BI-06-C", test_client, service_data_2,
-+			&test_read_by_uuid_3,
-+			SERVICE_DATA_2_PDU,
-+			raw_pdu(0x08, 0x01, 0x00, 0xff, 0xff, 0x0d, 0x2b),
-+			raw_pdu(0x01, 0x08, 0x0b, 0x00, 0x02));
-+
- 	return g_test_run();
+diff --git a/tools/btgatt-client.c b/tools/btgatt-client.c
+index 7a1204f..f069189 100644
+--- a/tools/btgatt-client.c
++++ b/tools/btgatt-client.c
+@@ -401,6 +401,89 @@ static void cmd_services(struct client *cli, char *cmd_str)
+ 		services_usage();
  }
+ 
++static void read_by_uuid_usage(void)
++{
++	printf("Usage: read-by-uuid <start_handle> <end_handle> <uuid>\n");
++}
++
++static void read_by_uuid_cb(bool success, uint8_t att_ecode,
++			struct read_by_uuid_res *result, void *user_data)
++{
++	uint16_t handle;
++	uint8_t length;
++	uint8_t *data;
++	int i;
++
++	if (!success) {
++		PRLOG("\nRead by UUID request failed: 0x%02x\n", att_ecode);
++		return;
++	}
++
++	if (!result) {
++		PRLOG("\nNo attribute found\n");
++		return;
++	}
++
++	for (; result; result = read_by_uuid_res_next(result)) {
++		read_by_uuid_res_get(result, &handle, &length, &data);
++		printf("\nHandle 0x%04X Read value", handle);
++
++		if (length == 0) {
++			PRLOG(": 0 bytes\n");
++			return;
++		}
++
++		printf(" (%u bytes): ", length);
++
++		for (i = 0; i < length; i++)
++			printf("%02x ", data[i]);
++
++		PRLOG("\n");
++	}
++}
++
++static void cmd_read_by_uuid(struct client *cli, char *cmd_str)
++{
++	char *argv[3];
++	int argc = 0;
++	uint16_t start_handle, end_handle;
++	bt_uuid_t tmp, uuid;
++	char *endptr = NULL;
++
++	if (!bt_gatt_client_is_ready(cli->gatt)) {
++		printf("GATT client not initialized\n");
++		return;
++	}
++
++	if (!parse_args(cmd_str, 3, argv, &argc) || argc != 3) {
++		read_by_uuid_usage();
++		return;
++	}
++
++	start_handle = strtol(argv[0], &endptr, 0);
++	if (!endptr || *endptr != '\0' || !start_handle) {
++		printf("Invalid value handle: %s\n", argv[0]);
++		return;
++	}
++
++	end_handle = strtol(argv[1], &endptr, 0);
++	if (!endptr || *endptr != '\0' || !end_handle) {
++		printf("Invalid value handle: %s\n", argv[1]);
++		return;
++	}
++
++	if (bt_string_to_uuid(&tmp, argv[2]) < 0) {
++		printf("Invalid UUID: %s\n", argv[2]);
++		return;
++	}
++
++	bt_uuid_to_uuid128(&tmp, &uuid);
++
++	if (!bt_gatt_client_read_by_uuid(cli->gatt, start_handle, end_handle,
++			uuid.value.u128.data, read_by_uuid_cb, NULL, NULL))
++		printf("Failed to initiate read value procedure\n");
++}
++
+ static void read_value_usage(void)
+ {
+ 	printf("Usage: read-value <value_handle>\n");
+@@ -873,6 +956,7 @@ static struct {
+ 				"\tRead a characteristic or descriptor value" },
+ 	{ "read-long-value", cmd_read_long_value,
+ 		"\tRead a long characteristic or desctriptor value" },
++	{ "read-by-uuid", cmd_read_by_uuid, "\tRead by UUID" },
+ 	{ "write-value", cmd_write_value,
+ 			"\tWrite a characteristic or descriptor value" },
+ 	{ "write-long-value", cmd_write_long_value,
 -- 
 1.9.3
 
