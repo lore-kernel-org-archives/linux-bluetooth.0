@@ -2,76 +2,65 @@ Return-Path: <cyrus@holtmann.org>
 From: Arman Uguray <armansito@chromium.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Arman Uguray <armansito@chromium.org>
-Subject: [PATCH BlueZ 03/12] shared/att: Directly close fd on ATT violations.
-Date: Mon, 17 Nov 2014 11:22:09 -0800
-Message-Id: <1416252138-17477-4-git-send-email-armansito@chromium.org>
-In-Reply-To: <1416252138-17477-1-git-send-email-armansito@chromium.org>
-References: <1416252138-17477-1-git-send-email-armansito@chromium.org>
+Subject: [PATCH BlueZ 00/12] core: Use shared/gatt-client.
+Date: Mon, 17 Nov 2014 11:22:06 -0800
+Message-Id: <1416252138-17477-1-git-send-email-armansito@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The existing code handles ATT protocol request timeouts and invalid
-incoming request PDUs by cleaning up the io structure via io_destroy.
-This doesn't always work, since this only terminates the connection if
-io_set_close_on_destroy has been set. Calling io_destroy to force a
-disconnect also has the added side-effect of not invoking the disconnect
-callback registered with struct io.
+This patch set integrates shared/gatt-client into bluetoothd. The following
+items have been tackled here:
 
-This patch fixes these by calling close directly on the file descriptor
-when required by the ATT protocol specification. This both cleans up the
-connection regardless of whether or not close_on_unref has been set, and
-it triggers the disconnect callback via an EPOLLHUP event.
----
- src/shared/att.c | 17 +++++++++++------
- 1 file changed, 11 insertions(+), 6 deletions(-)
+  1. src/device now uses shared/gatt-client to perform service discovery. State
+  updates such as disconnections, service changed events, etc. are done using
+  callback APIs of the new shared framework and attrib/gatt is no longer used to
+  perform GATT operations directly. A GAttrib instance is maintained for
+  backwards compatibility with profiles that haven't been converted yet.
 
-diff --git a/src/shared/att.c b/src/shared/att.c
-index 264cece..d441099 100644
---- a/src/shared/att.c
-+++ b/src/shared/att.c
-@@ -416,9 +416,6 @@ static bool timeout_cb(void *user_data)
- 	if (!op)
- 		return false;
- 
--	io_destroy(att->io);
--	att->io = NULL;
--
- 	util_debug(att->debug_callback, att->debug_data,
- 				"Operation timed out: 0x%02x", op->opcode);
- 
-@@ -428,6 +425,13 @@ static bool timeout_cb(void *user_data)
- 	op->timeout_id = 0;
- 	destroy_att_send_op(op);
- 
-+	/*
-+	 * Directly terminate the connection as required by the ATT protocol.
-+	 * This should trigger an io disconnect event which will clean up the
-+	 * io and notify the upper layer.
-+	 */
-+	close(att->fd);
-+
- 	return false;
- }
- 
-@@ -765,14 +769,15 @@ static bool can_read_data(struct io *io, void *user_data)
- 	case ATT_OP_TYPE_REQ:
- 		/*
- 		 * If a request is currently pending, then the sequential
--		 * protocol was violated. Disconnect the bearer and notify the
--		 * upper-layer.
-+		 * protocol was violated. Disconnect the bearer, which will
-+		 * promptly notify the upper layer via disconnect handlers.
- 		 */
- 		if (att->in_req) {
- 			util_debug(att->debug_callback, att->debug_data,
- 					"Received request while another is "
- 					"pending: 0x%02x", opcode);
--			disconnect_cb(att->io, att);
-+			close(att->fd);
-+
- 			return false;
- 		}
- 
+  2. A new gatt-callbacks API has been added which mirrors the attio APIs for
+  shared/gatt-client. Profiles/plugins are notified using these APIs when the
+  bearer disconnects, when services change, and when gatt-client is ready.
+
+  3. The profiles/gatt plugin has been rewritten. Since the GATT service is
+  handled by shared/gatt-client, this profile no longer deals with service
+  changed events performs out of place MTU exchanges, which used to get
+  performed in an arbitrary order. The profile has been renamed to profiles/gap
+  as it now only deals with the GAP service, and reads the "Appearance" and
+  "Device Name" characteristics using the new shared stack.
+
+Arman Uguray (12):
+  attrib/gattrib: Add g_attrib_get_att.
+  shared/att: Add bt_att_get_fd.
+  shared/att: Directly close fd on ATT violations.
+  shared/gatt-client: Call ready_handler only in init.
+  core: device: Use bt_att_register_disconnect.
+  core: device: Use shared/gatt-client for GATT.
+  core: Introduce gatt-callbacks
+  profiles/gatt: Don't handle GATT service.
+  profiles/gatt: Rename profile to gap.
+  profiles/gap: Rewrite using bt_gatt_client.
+  profiles/gap: Add Google copyright.
+  TODO: Update GAttrib related items.
+
+ Makefile.am              |   1 +
+ Makefile.plugins         |   4 +-
+ TODO                     |  25 +--
+ attrib/gattrib.c         |   8 +
+ attrib/gattrib.h         |   3 +
+ profiles/gap/gas.c       | 307 +++++++++++++++++++++++++++++++
+ profiles/gatt/gas.c      | 457 -----------------------------------------------
+ src/device.c             | 456 +++++++++++++++++++++++++++++++---------------
+ src/device.h             |   2 -
+ src/gatt-callbacks.h     |  42 +++++
+ src/shared/att-types.h   |   3 +-
+ src/shared/att.c         |  25 ++-
+ src/shared/att.h         |   1 +
+ src/shared/gatt-client.c |   3 +-
+ 14 files changed, 711 insertions(+), 626 deletions(-)
+ create mode 100644 profiles/gap/gas.c
+ delete mode 100644 profiles/gatt/gas.c
+ create mode 100644 src/gatt-callbacks.h
+
 -- 
 2.1.0.rc2.206.gedb03e5
 
