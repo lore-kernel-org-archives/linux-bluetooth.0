@@ -2,118 +2,354 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH 02/16] android/hal-gatt: Implement client scan_filter_param_setup
-Date: Mon, 17 Nov 2014 23:27:54 +0100
-Message-Id: <1416263288-30530-2-git-send-email-szymon.janc@tieto.com>
-In-Reply-To: <1416263288-30530-1-git-send-email-szymon.janc@tieto.com>
-References: <1416263288-30530-1-git-send-email-szymon.janc@tieto.com>
+Subject: [PATCH 01/16] android/hal-gatt: Implement Android 5 callbacks
+Date: Mon, 17 Nov 2014 23:27:53 +0100
+Message-Id: <1416263288-30530-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This adds required IPC message, HAL implementation and daemon stub
-handler.
+This adds IPC handlers for new GATT notifications and implementes
+requiured callbacks.
 ---
- android/gatt.c     | 16 ++++++++++++++++
- android/hal-gatt.c | 22 +++++++++++++++++++---
- android/hal-msg.h  | 16 ++++++++++++++++
- 3 files changed, 51 insertions(+), 3 deletions(-)
+ android/hal-gatt.c | 193 ++++++++++++++++++++++++++++++++++++++++++++++++++++-
+ android/hal-msg.h  | 113 +++++++++++++++++++++++++++++++
+ 2 files changed, 305 insertions(+), 1 deletion(-)
 
-diff --git a/android/gatt.c b/android/gatt.c
-index 5169468..a441e4f 100644
---- a/android/gatt.c
-+++ b/android/gatt.c
-@@ -5540,6 +5540,19 @@ reply:
- 			HAL_OP_GATT_SERVER_SEND_RESPONSE, status);
- }
- 
-+static void handle_client_scan_filter_setup(const void *buf, uint16_t len)
-+{
-+	const struct hal_cmd_gatt_client_scan_filter_setup *cmd = buf;
-+
-+	DBG("client_if %u", cmd->client_if);
-+
-+	/* TODO */
-+
-+	ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_GATT,
-+					HAL_OP_GATT_CLIENT_SCAN_FILTER_SETUP,
-+					HAL_STATUS_UNSUPPORTED);
-+}
-+
- static const struct ipc_handler cmd_handlers[] = {
- 	/* HAL_OP_GATT_CLIENT_REGISTER */
- 	{ handle_client_register, false,
-@@ -5646,6 +5659,9 @@ static const struct ipc_handler cmd_handlers[] = {
- 	/* HAL_OP_GATT_SERVER_SEND_RESPONSE */
- 	{ handle_server_send_response, true,
- 		sizeof(struct hal_cmd_gatt_server_send_response) },
-+	/* HAL_OP_GATT_CLIENT_SCAN_FILTER_SETUP */
-+	{ handle_client_scan_filter_setup, false,
-+		sizeof(struct hal_cmd_gatt_client_scan_filter_setup) },
- };
- 
- static uint8_t read_by_group_type(const uint8_t *cmd, uint16_t cmd_len,
 diff --git a/android/hal-gatt.c b/android/hal-gatt.c
-index 15ab357..f4c3d31 100644
+index 50364f5..15ab357 100644
 --- a/android/hal-gatt.c
 +++ b/android/hal-gatt.c
-@@ -1311,11 +1311,27 @@ static bt_status_t scan_filter_param_setup(int client_if, int action,
- 						int lost_timeout,
- 						int found_timeout_cnt)
- {
--	DBG("");
-+	struct hal_cmd_gatt_client_scan_filter_setup cmd;
- 
--	/* TODO */
-+	if (!interface_ready())
-+		return BT_STATUS_NOT_READY;
- 
--	return BT_STATUS_UNSUPPORTED;
-+	cmd.client_if = client_if;
-+	cmd.action = action;
-+	cmd.filter_index = filt_index;
-+	cmd.features = feat_seln;
-+	cmd.list_type = list_logic_type;
-+	cmd.filter_type = filt_logic_type;
-+	cmd.rssi_hi = rssi_high_thres;
-+	cmd.rssi_lo = rssi_low_thres;
-+	cmd.delivery_mode = dely_mode;
-+	cmd.found_timeout = found_timeout;
-+	cmd.lost_timeout = lost_timeout;
-+	cmd.found_timeout_cnt = found_timeout_cnt;
-+
-+	return hal_ipc_cmd(HAL_SERVICE_ID_GATT,
-+					HAL_OP_GATT_CLIENT_SCAN_FILTER_SETUP,
-+					sizeof(cmd), &cmd, NULL, NULL, NULL);
+@@ -470,6 +470,147 @@ static void handle_response_confirmation(void *buf, uint16_t len, int fd)
+ 		cbs->server->response_confirmation_cb(ev->status, ev->handle);
  }
  
- static bt_status_t scan_filter_add_remove(int client_if, int action,
++#if ANDROID_VERSION >= PLATFORM_VER(5, 0, 0)
++static void handle_configure_mtu(void *buf, uint16_t len, int fd)
++{
++	struct hal_ev_gatt_client_configure_mtu *ev = buf;
++
++	if (cbs->client->configure_mtu_cb)
++		cbs->client->configure_mtu_cb(ev->conn_id, ev->status, ev->mtu);
++}
++
++static void handle_filter_config(void *buf, uint16_t len, int fd)
++{
++	struct hal_ev_gatt_client_filter_config *ev = buf;
++
++	if (cbs->client->scan_filter_cfg_cb)
++		cbs->client->scan_filter_cfg_cb(ev->action, ev->client_if,
++						ev->status, ev->type,
++						ev->space);
++}
++
++static void handle_filter_params(void *buf, uint16_t len, int fd)
++{
++	struct hal_ev_gatt_client_filter_params *ev = buf;
++
++	if (cbs->client->scan_filter_param_cb)
++		cbs->client->scan_filter_param_cb(ev->action, ev->client_if,
++							ev->status, ev->space);
++}
++
++static void handle_filter_status(void *buf, uint16_t len, int fd)
++{
++	struct hal_ev_gatt_client_filter_status *ev = buf;
++
++	if (cbs->client->scan_filter_status_cb)
++		cbs->client->scan_filter_status_cb(ev->enable, ev->client_if,
++								ev->status);
++}
++
++static void handle__multi_adv_enable(void *buf, uint16_t len, int fd)
++{
++	struct hal_ev_gatt_client_multi_adv_enable *ev = buf;
++
++	if (cbs->client->multi_adv_enable_cb)
++		cbs->client->multi_adv_enable_cb(ev->client_if, ev->status);
++}
++
++static void handle_multi_adv_update(void *buf, uint16_t len, int fd)
++{
++	struct hal_ev_gatt_client_multi_adv_update *ev = buf;
++
++	if (cbs->client->multi_adv_update_cb)
++		cbs->client->multi_adv_update_cb(ev->client_if, ev->status);
++}
++
++static void handle_multi_adv_data(void *buf, uint16_t len, int fd)
++{
++	struct hal_ev_gatt_client_multi_adv_data *ev = buf;
++
++	if (cbs->client->multi_adv_data_cb)
++		cbs->client->multi_adv_data_cb(ev->client_if, ev->status);
++}
++
++static void handle_multi_adv_disable(void *buf, uint16_t len, int fd)
++{
++	struct hal_ev_gatt_client_multi_adv_disable *ev = buf;
++
++	if (cbs->client->multi_adv_disable_cb)
++		cbs->client->multi_adv_disable_cb(ev->client_if, ev->status);
++}
++
++static void handle_client_congestion(void *buf, uint16_t len, int fd)
++{
++	struct hal_ev_gatt_client_congestion *ev = buf;
++
++	if (cbs->client->congestion_cb)
++		cbs->client->congestion_cb(ev->conn_id, ev->congested);
++}
++
++static void handle_config_batchscan(void *buf, uint16_t len, int fd)
++{
++	struct hal_ev_gatt_client_config_batchscan *ev = buf;
++
++	if (cbs->client->batchscan_cfg_storage_cb)
++		cbs->client->batchscan_cfg_storage_cb(ev->client_if,
++								ev->status);
++}
++
++static void handle_enable_batchscan(void *buf, uint16_t len, int fd)
++{
++	struct hal_ev_gatt_client_enable_batchscan *ev = buf;
++
++	if (cbs->client->batchscan_enb_disable_cb)
++		cbs->client->batchscan_enb_disable_cb(ev->action, ev->client_if,
++								ev->status);
++}
++
++static void handle_client_batchscan_reports(void *buf, uint16_t len, int fd)
++{
++	struct hal_ev_gatt_client_batchscan_reports *ev = buf;
++
++	if (cbs->client->batchscan_reports_cb)
++		cbs->client->batchscan_reports_cb(ev->client_if, ev->status,
++							ev->format, ev->num,
++							ev->data_len, ev->data);
++}
++
++static void handle_batchscan_threshold(void *buf, uint16_t len, int fd)
++{
++	struct hal_ev_gatt_client_batchscan_threshold *ev = buf;
++
++	if (cbs->client->batchscan_threshold_cb)
++		cbs->client->batchscan_threshold_cb(ev->client_if);
++}
++
++static void handle_track_adv(void *buf, uint16_t len, int fd)
++{
++	struct hal_ev_gatt_client_track_adv *ev = buf;
++
++	if (cbs->client->track_adv_event_cb)
++		cbs->client->track_adv_event_cb(ev->client_if, ev->filetr_index,
++						ev->address_type,
++						(bt_bdaddr_t *) ev->address,
++						ev->state);
++}
++
++static void handle_indication_send(void *buf, uint16_t len, int fd)
++{
++	struct hal_ev_gatt_server_indication_sent *ev = buf;
++
++	if (cbs->server->indication_sent_cb)
++		cbs->server->indication_sent_cb(ev->conn_id, ev->status);
++}
++
++static void handle_server_congestion(void *buf, uint16_t len, int fd)
++{
++	struct hal_ev_gatt_server_congestion *ev = buf;
++
++	if (cbs->server->congestion_cb)
++		cbs->server->congestion_cb(ev->conn_id, ev->congested);
++}
++#endif
++
+ /*
+  * handlers will be called from notification thread context,
+  * index in table equals to 'opcode - HAL_MINIMUM_EVENT'
+@@ -565,7 +706,57 @@ static const struct hal_ipc_handler ev_handlers[] = {
+ 	/* HAL_EV_GATT_SERVER_RSP_CONFIRMATION */
+ 	{ handle_response_confirmation, false,
+ 		sizeof(struct hal_ev_gatt_server_rsp_confirmation) },
+-};
++#if ANDROID_VERSION >= PLATFORM_VER(5, 0, 0)
++	/* HAL_EV_GATT_CLIENT_CONFIGURE_MTU */
++	{ handle_configure_mtu, false,
++		sizeof(struct hal_ev_gatt_client_configure_mtu) },
++	/* HAL_EV_GATT_CLIENT_FILTER_CONFIG */
++	{ handle_filter_config, false,
++		sizeof(struct hal_ev_gatt_client_filter_config) },
++	/* HAL_EV_GATT_CLIENT_FILTER_PARAMS */
++	{ handle_filter_params, false,
++		sizeof(struct hal_ev_gatt_client_filter_params) },
++	/* HAL_EV_GATT_CLIENT_FILTER_STATUS */
++	{ handle_filter_status, false,
++		sizeof(struct hal_ev_gatt_client_filter_status) },
++	/* HAL_EV_GATT_CLIENT_MULTI_ADV_ENABLE */
++	{ handle__multi_adv_enable, false,
++		sizeof(struct hal_ev_gatt_client_multi_adv_enable) },
++	/* HAL_EV_GATT_CLIENT_MULTI_ADV_UPDATE */
++	{ handle_multi_adv_update, false,
++		sizeof(struct hal_ev_gatt_client_multi_adv_update) },
++	/* HAL_EV_GATT_CLIENT_MULTI_ADV_DATA */
++	{ handle_multi_adv_data, false,
++		sizeof(struct hal_ev_gatt_client_multi_adv_data) },
++	/* HAL_EV_GATT_CLIENT_MULTI_ADV_DISABLE */
++	{ handle_multi_adv_disable, false,
++		sizeof(struct hal_ev_gatt_client_multi_adv_disable) },
++	/* HAL_EV_GATT_CLIENT_CONGESTION */
++	{ handle_client_congestion, false,
++		sizeof(struct hal_ev_gatt_client_congestion) },
++	/* HAL_EV_GATT_CLIENT_CONFIG_BATCHSCAN */
++	{ handle_config_batchscan, false,
++		sizeof(struct hal_ev_gatt_client_config_batchscan) },
++	/* HAL_EV_GATT_CLIENT_ENABLE_BATCHSCAN */
++	{ handle_enable_batchscan, false,
++		sizeof(struct hal_ev_gatt_client_enable_batchscan) },
++	/* HAL_EV_GATT_CLIENT_BATCHSCAN_REPORTS */
++	{ handle_client_batchscan_reports, true,
++		sizeof(struct hal_ev_gatt_client_batchscan_reports) },
++	/* HAL_EV_GATT_CLIENT_BATCHSCAN_THRESHOLD */
++	{ handle_batchscan_threshold, false,
++		sizeof(struct hal_ev_gatt_client_batchscan_threshold) },
++	/* HAL_EV_GATT_CLIENT_TRACK_ADV */
++	{ handle_track_adv, false,
++		sizeof(struct hal_ev_gatt_client_track_adv) },
++	/* HAL_EV_GATT_SERVER_INDICATION_SENT */
++	{ handle_indication_send, false,
++		sizeof(struct hal_ev_gatt_server_indication_sent) },
++	/* HAL_EV_GATT_SERVER_CONGESTION */
++	{ handle_server_congestion, false,
++		sizeof(struct hal_ev_gatt_server_congestion) },
++#endif
++	};
+ 
+ /* Client API */
+ 
 diff --git a/android/hal-msg.h b/android/hal-msg.h
-index 438fa7b..c74c76b 100644
+index c86b0a6..438fa7b 100644
 --- a/android/hal-msg.h
 +++ b/android/hal-msg.h
-@@ -1028,6 +1028,22 @@ struct hal_cmd_gatt_server_send_response {
- 	uint8_t data[0];
+@@ -1782,6 +1782,119 @@ struct hal_ev_gatt_server_rsp_confirmation {
+ 	int32_t handle;
  } __attribute__((packed));
  
-+#define HAL_OP_GATT_CLIENT_SCAN_FILTER_SETUP	0x024
-+struct hal_cmd_gatt_client_scan_filter_setup {
-+	int32_t client_if;
-+	int32_t action;
-+	int32_t filter_index;
-+	int32_t features;
-+	int32_t list_type;
-+	int32_t filter_type;
-+	int32_t rssi_hi;
-+	int32_t rssi_lo;
-+	int32_t delivery_mode;
-+	int32_t found_timeout;
-+	int32_t lost_timeout;
-+	int32_t found_timeout_cnt;
++#define HAL_EV_GATT_CLIENT_CONFIGURE_MTU	0xa0
++struct hal_ev_gatt_client_configure_mtu {
++	int32_t conn_id;
++	int32_t status;
++	int32_t mtu;
 +} __attribute__((packed));
 +
- /* Handsfree client HAL API */
- 
- #define HAL_OP_HF_CLIENT_CONNECT		0x01
++#define HAL_EV_GATT_CLIENT_FILTER_CONFIG	0xa1
++struct hal_ev_gatt_client_filter_config {
++	int32_t action;
++	int32_t client_if;
++	int32_t status;
++	int32_t type;
++	int32_t space;
++}  __attribute__((packed));
++
++#define HAL_EV_GATT_CLIENT_FILTER_PARAMS	0xa2
++struct hal_ev_gatt_client_filter_params {
++	int32_t action;
++	int32_t client_if;
++	int32_t status;
++	int32_t space;
++}  __attribute__((packed));
++
++#define HAL_EV_GATT_CLIENT_FILTER_STATUS	0xa3
++struct hal_ev_gatt_client_filter_status {
++	int32_t enable;
++	int32_t client_if;
++	int32_t status;
++}  __attribute__((packed));
++
++#define HAL_EV_GATT_CLIENT_MULTI_ADV_ENABLE	0xa4
++struct hal_ev_gatt_client_multi_adv_enable {
++	int32_t client_if;
++	int32_t status;
++} __attribute__((packed));
++
++
++#define HAL_EV_GATT_CLIENT_MULTI_ADV_UPDATE	0xa5
++struct hal_ev_gatt_client_multi_adv_update {
++	int32_t client_if;
++	int32_t status;
++} __attribute__((packed));
++
++
++#define HAL_EV_GATT_CLIENT_MULTI_ADV_DATA	0xa6
++struct hal_ev_gatt_client_multi_adv_data {
++	int32_t client_if;
++	int32_t status;
++} __attribute__((packed));
++
++
++#define HAL_EV_GATT_CLIENT_MULTI_ADV_DISABLE	0xa7
++struct hal_ev_gatt_client_multi_adv_disable {
++	int32_t client_if;
++	int32_t status;
++} __attribute__((packed));
++
++#define HAL_EV_GATT_CLIENT_CONGESTION		0xa8
++struct hal_ev_gatt_client_congestion {
++	int32_t conn_id;
++	uint8_t congested;
++} __attribute__((packed));
++
++#define HAL_EV_GATT_CLIENT_CONFIG_BATCHSCAN	0xa9
++struct hal_ev_gatt_client_config_batchscan {
++	int32_t client_if;
++	int32_t status;
++} __attribute__((packed));
++
++#define HAL_EV_GATT_CLIENT_ENABLE_BATCHSCAN	0xaa
++struct hal_ev_gatt_client_enable_batchscan {
++	int32_t action;
++	int32_t client_if;
++	int32_t status;
++} __attribute__((packed));
++
++#define HAL_EV_GATT_CLIENT_BATCHSCAN_REPORTS	0xab
++struct hal_ev_gatt_client_batchscan_reports {
++	int32_t client_if;
++	int32_t status;
++	int32_t format;
++	int32_t num;
++	int32_t data_len;
++	uint8_t data[0];
++} __attribute__((packed));
++
++#define HAL_EV_GATT_CLIENT_BATCHSCAN_THRESHOLD	0xac
++struct hal_ev_gatt_client_batchscan_threshold {
++	int32_t client_if;
++} __attribute__((packed));
++
++#define HAL_EV_GATT_CLIENT_TRACK_ADV		0xad
++struct hal_ev_gatt_client_track_adv {
++	int32_t client_if;
++	int32_t filetr_index;
++	int32_t address_type;
++	uint8_t address[6];
++	int32_t state;
++} __attribute__((packed));
++
++#define HAL_EV_GATT_SERVER_INDICATION_SENT	0xae
++struct hal_ev_gatt_server_indication_sent {
++	int32_t conn_id;
++	int32_t status;
++} __attribute__((packed));
++
++#define HAL_EV_GATT_SERVER_CONGESTION		0xaf
++struct hal_ev_gatt_server_congestion {
++	int32_t conn_id;
++	uint8_t congested;
++} __attribute__((packed));
++
+ #define HAL_GATT_PERMISSION_READ			0x0001
+ #define HAL_GATT_PERMISSION_READ_ENCRYPTED		0x0002
+ #define HAL_GATT_PERMISSION_READ_ENCRYPTED_MITM		0x0004
 -- 
 1.9.3
 
