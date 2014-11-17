@@ -2,53 +2,34 @@ Return-Path: <cyrus@holtmann.org>
 From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
-Subject: [PATCH 4/4] android/client: Add handshake callback
-Date: Mon, 17 Nov 2014 15:06:58 +0100
-Message-Id: <1416233218-16456-4-git-send-email-jakub.tyszkowski@tieto.com>
-In-Reply-To: <1416233218-16456-1-git-send-email-jakub.tyszkowski@tieto.com>
-References: <1416233218-16456-1-git-send-email-jakub.tyszkowski@tieto.com>
+Subject: [PATCH 1/4] android/hal-ipc-api: Update HidHost with Android 5 API
+Date: Mon, 17 Nov 2014 15:06:55 +0100
+Message-Id: <1416233218-16456-1-git-send-email-jakub.tyszkowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- android/client/if-hh.c | 17 ++++++++++++++++-
- 1 file changed, 16 insertions(+), 1 deletion(-)
+ android/hal-ipc-api.txt | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
-diff --git a/android/client/if-hh.c b/android/client/if-hh.c
-index b2bf8ca..25519e5 100644
---- a/android/client/if-hh.c
-+++ b/android/client/if-hh.c
-@@ -100,6 +100,18 @@ static void virtual_unplug_cb(bt_bdaddr_t *bd_addr, bthh_status_t hh_status)
- 						bthh_status_t2str(hh_status));
- }
+diff --git a/android/hal-ipc-api.txt b/android/hal-ipc-api.txt
+index 67a6205..a5ec44b 100644
+--- a/android/hal-ipc-api.txt
++++ b/android/hal-ipc-api.txt
+@@ -671,6 +671,13 @@ Notifications:
+ 		                     0x0c = Authentication failed
+ 		                     0x0d = HDL
  
-+/* Callback for Android 5.0 handshake api. */
-+#if ANDROID_VERSION >= PLATFORM_VER(5, 0, 0)
-+static void handshake_cb(bt_bdaddr_t *bd_addr, bthh_status_t hh_status)
-+{
-+	char addr[MAX_ADDR_STR_LEN];
++	Opcode 0x87 - Handshake notification
 +
-+	haltest_info("%s: bd_addr=%s hh_status=%s\n", __func__,
-+						bt_bdaddr_t2str(bd_addr, addr),
-+						bthh_status_t2str(hh_status));
-+}
-+#endif
++		Notification parameters: Remote address (6 octets)
++		                         Status (1 octet)
 +
- /*
-  * Callback for get hid info
-  * hid_info will contain attr_mask, sub_class, app_id, vendor_id, product_id,
-@@ -163,7 +175,10 @@ static bthh_callbacks_t bthh_callbacks = {
- 	.protocol_mode_cb = protocol_mode_cb,
- 	.idle_time_cb = idle_time_cb,
- 	.get_report_cb = get_report_cb,
--	.virtual_unplug_cb = virtual_unplug_cb
-+	.virtual_unplug_cb = virtual_unplug_cb,
-+#if ANDROID_VERSION >= PLATFORM_VER(5, 0, 0)
-+	.handshake_cb = handshake_cb
-+#endif
- };
++		Valid status values: Same as in Virtual Unplug notification
++
  
- /* init */
+ Bluetooth PAN HAL (ID 4)
+ ========================
 -- 
 1.9.1
 
