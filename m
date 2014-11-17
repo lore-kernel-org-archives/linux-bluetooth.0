@@ -2,68 +2,53 @@ Return-Path: <cyrus@holtmann.org>
 From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
-Subject: [PATCH 3/4] android/hid: Support handshake message
-Date: Mon, 17 Nov 2014 15:06:57 +0100
-Message-Id: <1416233218-16456-3-git-send-email-jakub.tyszkowski@tieto.com>
+Subject: [PATCH 4/4] android/client: Add handshake callback
+Date: Mon, 17 Nov 2014 15:06:58 +0100
+Message-Id: <1416233218-16456-4-git-send-email-jakub.tyszkowski@tieto.com>
 In-Reply-To: <1416233218-16456-1-git-send-email-jakub.tyszkowski@tieto.com>
 References: <1416233218-16456-1-git-send-email-jakub.tyszkowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- android/hidhost.c | 25 ++++++++++++++++++++++++-
- 1 file changed, 24 insertions(+), 1 deletion(-)
+ android/client/if-hh.c | 17 ++++++++++++++++-
+ 1 file changed, 16 insertions(+), 1 deletion(-)
 
-diff --git a/android/hidhost.c b/android/hidhost.c
-index 657fa8f..ba44af0 100644
---- a/android/hidhost.c
-+++ b/android/hidhost.c
-@@ -80,6 +80,9 @@
- /* HID Virtual Cable Unplug */
- #define HID_VIRTUAL_CABLE_UNPLUG	0x05
- 
-+/* HID Max. Handshake status code */
-+#define HID_HANDSHAKE_ERROR	0x05
-+
- #define HOG_UUID		"00001812-0000-1000-8000-00805f9b34fb"
- 
- static bdaddr_t adapter_addr;
-@@ -391,6 +394,24 @@ send:
- 	g_free(ev);
+diff --git a/android/client/if-hh.c b/android/client/if-hh.c
+index b2bf8ca..25519e5 100644
+--- a/android/client/if-hh.c
++++ b/android/client/if-hh.c
+@@ -100,6 +100,18 @@ static void virtual_unplug_cb(bt_bdaddr_t *bd_addr, bthh_status_t hh_status)
+ 						bthh_status_t2str(hh_status));
  }
  
-+static void bt_hid_notify_handshake(struct hid_device *dev, uint8_t *buf,
-+									int len)
++/* Callback for Android 5.0 handshake api. */
++#if ANDROID_VERSION >= PLATFORM_VER(5, 0, 0)
++static void handshake_cb(bt_bdaddr_t *bd_addr, bthh_status_t hh_status)
 +{
-+	struct hal_ev_hidhost_handshake ev;
-+	int ev_len;
++	char addr[MAX_ADDR_STR_LEN];
 +
-+	ev_len = sizeof(ev);
-+	bdaddr2android(&dev->dst, ev.bdaddr);
-+
-+	/* crop result code to HAL range */
-+	ev.status = buf[0];
-+	if (ev.status > HID_HANDSHAKE_ERROR)
-+		ev.status = HID_HANDSHAKE_ERROR;
-+
-+	ipc_send_notif(hal_ipc, HAL_SERVICE_ID_HIDHOST,
-+					HAL_EV_HIDHOST_HANDSHAKE, ev_len, &ev);
++	haltest_info("%s: bd_addr=%s hh_status=%s\n", __func__,
++						bt_bdaddr_t2str(bd_addr, addr),
++						bthh_status_t2str(hh_status));
 +}
++#endif
 +
- static void bt_hid_notify_virtual_unplug(struct hid_device *dev,
- 							uint8_t *buf, int len)
- {
-@@ -441,7 +462,9 @@ static gboolean ctrl_io_watch_cb(GIOChannel *chan, gpointer data)
- 		break;
- 	}
+ /*
+  * Callback for get hid info
+  * hid_info will contain attr_mask, sub_class, app_id, vendor_id, product_id,
+@@ -163,7 +175,10 @@ static bthh_callbacks_t bthh_callbacks = {
+ 	.protocol_mode_cb = protocol_mode_cb,
+ 	.idle_time_cb = idle_time_cb,
+ 	.get_report_cb = get_report_cb,
+-	.virtual_unplug_cb = virtual_unplug_cb
++	.virtual_unplug_cb = virtual_unplug_cb,
++#if ANDROID_VERSION >= PLATFORM_VER(5, 0, 0)
++	.handshake_cb = handshake_cb
++#endif
+ };
  
--	if (buf[0] == (HID_MSG_CONTROL | HID_VIRTUAL_CABLE_UNPLUG))
-+	if (buf[0] < HID_MSG_CONTROL)
-+		bt_hid_notify_handshake(dev, buf, bread);
-+	else if (buf[0] == (HID_MSG_CONTROL | HID_VIRTUAL_CABLE_UNPLUG))
- 		bt_hid_notify_virtual_unplug(dev, buf, bread);
- 
- 	/* reset msg type request */
+ /* init */
 -- 
 1.9.1
 
