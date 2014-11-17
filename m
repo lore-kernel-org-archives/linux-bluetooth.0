@@ -2,349 +2,315 @@ Return-Path: <cyrus@holtmann.org>
 From: Arman Uguray <armansito@chromium.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Arman Uguray <armansito@chromium.org>
-Subject: [PATCH BlueZ 08/12] profiles/gatt: Don't handle GATT service.
-Date: Mon, 17 Nov 2014 11:22:14 -0800
-Message-Id: <1416252138-17477-9-git-send-email-armansito@chromium.org>
+Subject: [PATCH BlueZ 10/12] profiles/gap: Rewrite using bt_gatt_client.
+Date: Mon, 17 Nov 2014 11:22:16 -0800
+Message-Id: <1416252138-17477-11-git-send-email-armansito@chromium.org>
 In-Reply-To: <1416252138-17477-1-git-send-email-armansito@chromium.org>
 References: <1416252138-17477-1-git-send-email-armansito@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-ATT MTU exchange and handling of indications from the "Service Changed"
-characteristic are now handled by shared/gatt-client, so this profile
-should only deal with the GAP service.
+This patch rewrites the GAP profile to use the shared GATT stack instead
+of GAttrib. The profile now also handles the Device Name characteristic.
 ---
- profiles/gatt/gas.c | 248 ++--------------------------------------------------
- 1 file changed, 5 insertions(+), 243 deletions(-)
+ profiles/gap/gas.c | 213 +++++++++++++++++++++++++++++++++++++----------------
+ 1 file changed, 150 insertions(+), 63 deletions(-)
 
-diff --git a/profiles/gatt/gas.c b/profiles/gatt/gas.c
-index b51b4a8..75929c1 100644
---- a/profiles/gatt/gas.c
-+++ b/profiles/gatt/gas.c
-@@ -52,12 +52,8 @@
+diff --git a/profiles/gap/gas.c b/profiles/gap/gas.c
+index 91b317f..9813d68 100644
+--- a/profiles/gap/gas.c
++++ b/profiles/gap/gas.c
+@@ -24,6 +24,7 @@
+ #include <config.h>
+ #endif
+ 
++#include <ctype.h>
+ #include <stdbool.h>
+ #include <stdlib.h>
+ #include <sys/types.h>
+@@ -41,29 +42,28 @@
+ #include "src/profile.h"
+ #include "src/service.h"
+ #include "src/shared/util.h"
+-#include "attrib/att.h"
+-#include "attrib/gattrib.h"
+-#include "src/attio.h"
+-#include "attrib/gatt.h"
+ #include "src/log.h"
+ #include "src/textfile.h"
++#include "src/shared/att.h"
++#include "src/shared/gatt-client.h"
++#include "src/gatt-callbacks.h"
+ 
+ /* Generic Attribute/Access Service */
  struct gas {
  	struct btd_device *device;
- 	struct att_range gap;	/* GAP Primary service range */
--	struct att_range gatt;	/* GATT Primary service range */
- 	GAttrib *attrib;
- 	guint attioid;
--	guint changed_ind;
--	uint16_t changed_handle;
--	uint16_t mtu;
+-	struct att_range gap;	/* GAP Primary service range */
+-	GAttrib *attrib;
+-	guint attioid;
++	struct bt_gatt_client *client;
++	uint16_t start_handle, end_handle;
++	unsigned int gatt_cb_id;
  };
  
  static GSList *devices = NULL;
-@@ -80,68 +76,6 @@ static int cmp_device(gconstpointer a, gconstpointer b)
+ 
+ static void gas_free(struct gas *gas)
+ {
+-	if (gas->attioid)
+-		btd_device_remove_attio_callback(gas->device, gas->attioid);
++	if (gas->gatt_cb_id)
++		btd_device_remove_gatt_callbacks(gas->device,
++							gas->gatt_cb_id);
+ 
+-	g_attrib_unref(gas->attrib);
+ 	btd_device_unref(gas->device);
+ 	g_free(gas);
+ }
+@@ -76,86 +76,181 @@ static int cmp_device(gconstpointer a, gconstpointer b)
  	return (gas->device == device ? 0 : -1);
  }
  
--static void write_ctp_handle(struct btd_device *device, uint16_t uuid,
--					uint16_t handle)
--{
--	char *filename, group[6], value[7];
--	GKeyFile *key_file;
--	char *data;
--	gsize length = 0;
--
--	filename = btd_device_get_storage_path(device, "gatt");
--	if (!filename) {
--		warn("Unable to get gatt storage path for device");
--		return;
--	}
--
--	key_file = g_key_file_new();
--	g_key_file_load_from_file(key_file, filename, 0, NULL);
--
--	snprintf(group, sizeof(group), "%hu", uuid);
--	snprintf(value, sizeof(value), "0x%4.4X", handle);
--	g_key_file_set_string(key_file, group, "Value", value);
--
--	data = g_key_file_to_data(key_file, &length, NULL);
--	if (length > 0) {
--		create_file(filename, S_IRUSR | S_IWUSR);
--		g_file_set_contents(filename, data, length, NULL);
--	}
--
--	g_free(data);
--	g_free(filename);
--	g_key_file_free(key_file);
--}
--
--static int read_ctp_handle(struct btd_device *device, uint16_t uuid,
--					uint16_t *value)
--{
--	char *filename, group[6];
--	GKeyFile *key_file;
--	char *str;
--	int err = 0;
--
--	filename = btd_device_get_storage_path(device, "gatt");
--	if (!filename) {
--		warn("Unable to get gatt storage path for device");
--		return -ENOENT;
--	}
--
--	snprintf(group, sizeof(group), "%hu", uuid);
--
--	key_file = g_key_file_new();
--	g_key_file_load_from_file(key_file, filename, 0, NULL);
--
--	str = g_key_file_get_string(key_file, group, "Value", NULL);
--	if (str == NULL || sscanf(str, "%hx", value) != 1)
--		err = -ENOENT;
--
--	g_free(str);
--	g_free(filename);
--	g_key_file_free(key_file);
--
--	return err;
--}
--
- static void gap_appearance_cb(guint8 status, const guint8 *pdu, guint16 plen,
- 							gpointer user_data)
- {
-@@ -176,164 +110,16 @@ done:
- 	att_data_list_free(list);
- }
- 
--static void indication_cb(const uint8_t *pdu, uint16_t len, gpointer user_data)
--{
--	uint8_t bdaddr_type;
--	struct gas *gas = user_data;
--	uint16_t start, end, olen;
--	size_t plen;
--	uint8_t *opdu;
--
--	if (len < 7) { /* 1-byte opcode + 2-byte handle + 4 range */
--		error("Malformed ATT notification");
--		return;
--	}
--
--	start = get_le16(&pdu[3]);
--	end = get_le16(&pdu[5]);
--
--	DBG("Service Changed start: 0x%04X end: 0x%04X", start, end);
--
--	/* Confirming indication received */
--	opdu = g_attrib_get_buffer(gas->attrib, &plen);
--	olen = enc_confirmation(opdu, plen);
--	g_attrib_send(gas->attrib, 0, opdu, olen, NULL, NULL, NULL);
--
--	bdaddr_type = btd_device_get_bdaddr_type(gas->device);
--	if (!device_is_bonded(gas->device, bdaddr_type)) {
--		DBG("Ignoring Service Changed: device is not bonded");
--		return;
--	}
--
--	btd_device_gatt_set_service_changed(gas->device, start, end);
--}
--
--static void ccc_written_cb(guint8 status, const guint8 *pdu, guint16 plen,
+-static void gap_appearance_cb(guint8 status, const guint8 *pdu, guint16 plen,
 -							gpointer user_data)
--{
--	struct gas *gas = user_data;
--
--	if (status) {
--		error("Write Service Changed CCC failed: %s",
--						att_ecode2str(status));
--		return;
--	}
--
--	DBG("Service Changed indications enabled");
--
--	gas->changed_ind = g_attrib_register(gas->attrib, ATT_OP_HANDLE_IND,
--						gas->changed_handle,
--						indication_cb, gas, NULL);
--
--	write_ctp_handle(gas->device, GATT_CHARAC_SERVICE_CHANGED,
--					gas->changed_handle);
--}
--
--static void write_ccc(GAttrib *attrib, uint16_t handle, gpointer user_data)
--{
--	uint8_t value[2];
--
--	put_le16(GATT_CLIENT_CHARAC_CFG_IND_BIT, value);
--	gatt_write_char(attrib, handle, value, sizeof(value), ccc_written_cb,
--								user_data);
--}
--
--static void discover_ccc_cb(uint8_t status, GSList *descs, void *user_data)
--{
--	struct gas *gas = user_data;
--	struct gatt_desc *desc;
--
--	if (status != 0) {
--		error("Discover Service Changed CCC failed: %s",
--							att_ecode2str(status));
--		return;
--	}
--
--	/* There will be only one descriptor on list and it will be CCC */
--	desc = descs->data;
--
--	DBG("CCC: 0x%04x", desc->handle);
--	write_ccc(gas->attrib, desc->handle, user_data);
--}
--
--static void gatt_characteristic_cb(uint8_t status, GSList *characteristics,
--								void *user_data)
--{
--	struct gas *gas = user_data;
--	struct gatt_char *chr;
--	uint16_t start, end;
--	bt_uuid_t uuid;
--
--	if (status) {
--		error("Discover Service Changed handle: %s", att_ecode2str(status));
--		return;
--	}
--
--	chr = characteristics->data;
--
--	start = chr->value_handle + 1;
--	end = gas->gatt.end;
--
--	if (start > end) {
--		error("Inconsistent database: Service Changed CCC missing");
--		return;
--	}
--
--	gas->changed_handle = chr->value_handle;
--
--	bt_uuid16_create(&uuid, GATT_CLIENT_CHARAC_CFG_UUID);
--
--	gatt_discover_desc(gas->attrib, start, end, &uuid, discover_ccc_cb,
--									gas);
--}
--
--static void exchange_mtu_cb(guint8 status, const guint8 *pdu, guint16 plen,
--							gpointer user_data)
--{
--	struct gas *gas = user_data;
--	uint16_t rmtu;
--
--	if (status) {
--		error("MTU exchange: %s", att_ecode2str(status));
--		return;
--	}
--
--	if (!dec_mtu_resp(pdu, plen, &rmtu)) {
--		error("MTU exchange: protocol error");
--		return;
--	}
--
--	gas->mtu = MIN(rmtu, gas->mtu);
--	if (g_attrib_set_mtu(gas->attrib, gas->mtu))
--		DBG("MTU exchange succeeded: %d", gas->mtu);
--	else
--		DBG("MTU exchange failed");
--}
--
- static void attio_connected_cb(GAttrib *attrib, gpointer user_data)
++static char *name2utf8(const uint8_t *name, uint8_t len)
++{
++	char utf8_name[HCI_MAX_NAME_LENGTH + 2];
++	int i;
++
++	if (g_utf8_validate((const char *) name, len, NULL))
++		return g_strndup((char *) name, len);
++
++	memset(utf8_name, 0, sizeof(utf8_name));
++	strncpy(utf8_name, (char *) name, len);
++
++	/* Assume ASCII, and replace all non-ASCII with spaces */
++	for (i = 0; utf8_name[i] != '\0'; i++) {
++		if (!isascii(utf8_name[i]))
++			utf8_name[i] = ' ';
++	}
++
++	/* Remove leading and trailing whitespace characters */
++	g_strstrip(utf8_name);
++
++	return g_strdup(utf8_name);
++}
++
++static void read_device_name_cb(bool success, uint8_t att_ecode,
++					const uint8_t *value, uint16_t length,
++					void *user_data)
  {
  	struct gas *gas = user_data;
- 	GIOChannel *io;
- 	GError *gerr = NULL;
--	uint16_t cid, imtu;
- 	uint16_t app;
+-	struct att_data_list *list =  NULL;
+-	uint16_t app;
+-	uint8_t *atval;
++	char *name = name2utf8(value, length);
  
- 	gas->attrib = g_attrib_ref(attrib);
- 	io = g_attrib_get_channel(attrib);
- 
--	if (bt_io_get(io, &gerr, BT_IO_OPT_IMTU, &imtu,
--				BT_IO_OPT_CID, &cid, BT_IO_OPT_INVALID) &&
--							cid == ATT_CID) {
--		gatt_exchange_mtu(gas->attrib, imtu, exchange_mtu_cb, gas);
--		gas->mtu = imtu;
--		DBG("MTU Exchange: Requesting %d", imtu);
--	}
--
--	if (gerr) {
--		error("Could not acquire att imtu and cid: %s", gerr->message);
--		g_error_free(gerr);
--	}
--
- 	if (device_get_appearance(gas->device, &app) < 0) {
- 		bt_uuid_t uuid;
- 
-@@ -345,43 +131,23 @@ static void attio_connected_cb(GAttrib *attrib, gpointer user_data)
+-	if (status != 0) {
+-		error("Read characteristics by UUID failed: %s",
+-				att_ecode2str(status));
++	DBG("GAP Device Name: %s", name);
++
++	btd_device_device_set_name(gas->device, name);
++}
++
++static void handle_device_name(struct gas *gas,
++					const bt_gatt_characteristic_t *chrc)
++{
++	if (!bt_gatt_client_read_long_value(gas->client, chrc->value_handle, 0,
++						read_device_name_cb, gas, NULL))
++		DBG("Failed to send request to read device name");
++}
++
++static void read_appearance_cb(bool success, uint8_t att_ecode,
++					const uint8_t *value, uint16_t length,
++					void *user_data)
++{
++	struct gas *gas = user_data;
++	uint16_t appearance;
++
++	if (!success) {
++		DBG("Reading appearance failed with ATT error: %u", att_ecode);
+ 		return;
  	}
  
- 	/* TODO: Read other GAP characteristics - See Core spec page 1739 */
+-	list = dec_read_by_type_resp(pdu, plen);
+-	if (list == NULL)
++	/* The appearance value is a 16-bit unsigned integer */
++	if (length != 2) {
++		DBG("Malformed appearance value");
+ 		return;
 -
--	/*
--	 * When re-connecting <<Service Changed>> handle and characteristic
--	 * value doesn't need to read again: known information from the
--	 * previous interaction.
--	 */
--	if (gas->changed_handle == 0) {
--		bt_uuid_t uuid;
--
--		bt_uuid16_create(&uuid, GATT_CHARAC_SERVICE_CHANGED);
--
--		gatt_discover_char(gas->attrib, gas->gatt.start, gas->gatt.end,
--					&uuid, gatt_characteristic_cb, gas);
--	}
+-	if (list->len != 4) {
+-		error("GAP Appearance value: invalid data");
+-		goto done;
+ 	}
+ 
+-	atval = list->data[0] + 2; /* skip handle value */
+-	app = get_le16(atval);
++	appearance = get_le16(value);
+ 
+-	DBG("GAP Appearance: 0x%04x", app);
++	DBG("GAP Appearance: 0x%04x", appearance);
+ 
+-	device_set_appearance(gas->device, app);
++	device_set_appearance(gas->device, appearance);
++}
+ 
+-done:
+-	att_data_list_free(list);
++static void handle_appearance(struct gas *gas,
++					const bt_gatt_characteristic_t *chrc)
++{
++	uint16_t appearance;
++
++	if (device_get_appearance(gas->device, &appearance) >= 0)
++		return;
++
++	if (!bt_gatt_client_read_value(gas->client, chrc->value_handle,
++				read_appearance_cb, gas, NULL))
++		DBG("Failed to send request to read appearance");
  }
  
- static void attio_disconnected_cb(gpointer user_data)
+-static void attio_connected_cb(GAttrib *attrib, gpointer user_data)
++static bool uuid_cmp(uint16_t u16, const uint8_t uuid[16])
+ {
+-	struct gas *gas = user_data;
+-	GIOChannel *io;
+-	GError *gerr = NULL;
+-	uint16_t app;
++	uint128_t u128;
++	bt_uuid_t lhs, rhs;
+ 
+-	gas->attrib = g_attrib_ref(attrib);
+-	io = g_attrib_get_channel(attrib);
++	memcpy(u128.data, uuid, sizeof(uint8_t) * 16);
++	bt_uuid16_create(&lhs, u16);
++	bt_uuid128_create(&rhs, u128);
+ 
+-	if (device_get_appearance(gas->device, &app) < 0) {
+-		bt_uuid_t uuid;
++	return bt_uuid_cmp(&lhs, &rhs) == 0;
++}
+ 
+-		bt_uuid16_create(&uuid, GATT_CHARAC_APPEARANCE);
++static void reset_gap_service(struct gas *gas)
++{
++	struct bt_gatt_service_iter iter;
++	struct bt_gatt_characteristic_iter chrc_iter;
++	const bt_gatt_service_t *service = NULL;
++	const bt_gatt_characteristic_t *chrc = NULL;
++	bt_uuid_t gap_uuid;
+ 
+-		gatt_read_char_by_uuid(gas->attrib, gas->gap.start,
+-						gas->gap.end, &uuid,
+-						gap_appearance_cb, gas);
++	bt_string_to_uuid(&gap_uuid, GAP_UUID);
++
++	if (!bt_gatt_service_iter_init(&iter, gas->client)) {
++		DBG("Failed to initialize service iterator");
++		return;
+ 	}
+ 
+-	/* TODO: Read other GAP characteristics - See Core spec page 1739 */
++	if (!bt_gatt_service_iter_next_by_uuid(&iter, gap_uuid.value.u128.data,
++								&service)) {
++		error("GAP service not found on device");
++		return;
++	}
++
++	gas->start_handle = service->start_handle;
++	gas->end_handle = service->end_handle;
++
++	if (!bt_gatt_characteristic_iter_init(&chrc_iter, service)) {
++		DBG("Failed to initialize characteristic iterator");
++		return;
++	}
++
++	while (bt_gatt_characteristic_iter_next(&chrc_iter, &chrc)) {
++		if (uuid_cmp(GATT_CHARAC_DEVICE_NAME, chrc->uuid))
++			handle_device_name(gas, chrc);
++		else if (uuid_cmp(GATT_CHARAC_APPEARANCE, chrc->uuid))
++			handle_appearance(gas, chrc);
++
++		/*
++		 * TODO: Implement peripheral privacy feature.
++		 */
++	}
++}
++
++static void gatt_client_ready_cb(struct bt_gatt_client *client, void *user_data)
++{
++	struct gas *gas = user_data;
++
++	gas->client = client;
++
++	reset_gap_service(gas);
+ }
+ 
+-static void attio_disconnected_cb(gpointer user_data)
++static void gatt_svc_chngd_cb(struct bt_gatt_client *client,
++						uint16_t start_handle,
++						uint16_t end_handle,
++						void *user_data)
  {
  	struct gas *gas = user_data;
  
--	g_attrib_unregister(gas->attrib, gas->changed_ind);
--	gas->changed_ind = 0;
--
- 	g_attrib_unref(gas->attrib);
- 	gas->attrib = NULL;
+-	g_attrib_unref(gas->attrib);
+-	gas->attrib = NULL;
++	if (!gas->client || !gas->start_handle || !gas->end_handle)
++		return;
++
++	if (gas->end_handle < start_handle || gas->start_handle > end_handle)
++		return;
++
++	DBG("GAP service changed!");
++
++	reset_gap_service(gas);
  }
  
--static int gas_register(struct btd_device *device, struct att_range *gap,
--						struct att_range *gatt)
-+static int gas_register(struct btd_device *device, struct att_range *gap)
+-static int gas_register(struct btd_device *device, struct att_range *gap)
++static int gas_register(struct btd_device *device)
  {
  	struct gas *gas;
  
  	gas = g_new0(struct gas, 1);
- 	gas->gap.start = gap->start;
- 	gas->gap.end = gap->end;
--	gas->gatt.start = gatt->start;
--	gas->gatt.end = gatt->end;
+-	gas->gap.start = gap->start;
+-	gas->gap.end = gap->end;
  
  	gas->device = btd_device_ref(device);
- 
-@@ -391,9 +157,6 @@ static int gas_register(struct btd_device *device, struct att_range *gap,
- 						attio_connected_cb,
- 						attio_disconnected_cb, gas);
- 
--	read_ctp_handle(gas->device, GATT_CHARAC_SERVICE_CHANGED,
--					&gas->changed_handle);
 -
+ 	devices = g_slist_append(devices, gas);
+ 
+-	gas->attioid = btd_device_add_attio_callback(device,
+-						attio_connected_cb,
+-						attio_disconnected_cb, gas);
++	if (!gas->gatt_cb_id)
++		gas->gatt_cb_id = btd_device_add_gatt_callbacks(device,
++							gatt_client_ready_cb,
++							gatt_svc_chngd_cb,
++							NULL, gas);
+ 
  	return 0;
  }
- 
-@@ -414,17 +177,16 @@ static void gas_unregister(struct btd_device *device)
- static int gatt_driver_probe(struct btd_service *service)
+@@ -177,16 +272,8 @@ static void gas_unregister(struct btd_device *device)
+ static int gap_driver_probe(struct btd_service *service)
  {
  	struct btd_device *device = btd_service_get_device(service);
--	struct gatt_primary *gap, *gatt;
-+	struct gatt_primary *gap;
+-	struct gatt_primary *gap;
+-
+-	gap = btd_device_get_primary(device, GAP_UUID);
+-
+-	if (gap == NULL) {
+-		error("GAP service is mandatory");
+-		return -EINVAL;
+-	}
  
- 	gap = btd_device_get_primary(device, GAP_UUID);
--	gatt = btd_device_get_primary(device, GATT_UUID);
- 
--	if (gap == NULL || gatt == NULL) {
--		error("GAP and GATT are mandatory");
-+	if (gap == NULL) {
-+		error("GAP service is mandatory");
- 		return -EINVAL;
- 	}
- 
--	return gas_register(device, &gap->range, &gatt->range);
-+	return gas_register(device, &gap->range);
+-	return gas_register(device, &gap->range);
++	return gas_register(device);
  }
  
- static void gatt_driver_remove(struct btd_service *service)
+ static void gap_driver_remove(struct btd_service *service)
 -- 
 2.1.0.rc2.206.gedb03e5
 
