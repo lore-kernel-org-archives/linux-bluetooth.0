@@ -1,63 +1,60 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <CAHrH25TVuR3skQ2YrGCbm-rc9bHdfT7kazTbB-=P6WJ66TTKdg@mail.gmail.com>
-References: <1415935430-23790-1-git-send-email-armansito@chromium.org>
-	<CAHrH25TVuR3skQ2YrGCbm-rc9bHdfT7kazTbB-=P6WJ66TTKdg@mail.gmail.com>
-Date: Mon, 17 Nov 2014 11:49:05 +0200
-Message-ID: <CABBYNZKY=fCsM_qK0NLwE2VB5Qw64kZkVZMbaMSxyR0kLExgQg@mail.gmail.com>
-Subject: Re: [PATCH BlueZ] shared/gatt-client: Fix memory bug in service_changed_complete
+In-Reply-To: <1415996428-17528-1-git-send-email-armansito@chromium.org>
+References: <1415996428-17528-1-git-send-email-armansito@chromium.org>
+Date: Mon, 17 Nov 2014 11:48:42 +0200
+Message-ID: <CABBYNZJa0ys5dsrK2nu79ZJDUvZ2ytmFnnH3+-i_ia4ECe2bcQ@mail.gmail.com>
+Subject: Re: [PATCH BlueZ v3 0/6] Introduce tools/btgatt-server and other bug fixes.
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: Arman Uguray <armansito@chromium.org>
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Arman,
 
-On Fri, Nov 14, 2014 at 10:22 PM, Arman Uguray <armansito@chromium.org> wrote:
-> Hi,
+On Fri, Nov 14, 2014 at 10:20 PM, Arman Uguray <armansito@chromium.org> wrote:
+> This patch set introduces tools/btgatt-server. This tool serves as a
+> standalone demo of combining shared/gatt-db, shared/gatt-server, and a
+> listening L2CAP socket on the ATT channel. The tool exposes the GAP and
+> GATT services, as well as a Heart Rate service. It's possible to hide/unhide
+> the latter to test Service Changed events.
 >
->> On Thu, Nov 13, 2014 at 7:23 PM, Arman Uguray <armansito@chromium.org> wrote:
->> This patch fixes a bug that got accidentally introduced in a previous
->> memory leak fix, where the temporary discovery_op structure held on to
->> the newly discovered service pointers after passing their ownership to
->> the client and incorrectly free'd their memory. This was correctly fixed
->> in init_complete but missed in service_changed_complete.
->> ---
->>  src/shared/gatt-client.c | 6 +++++-
->>  1 file changed, 5 insertions(+), 1 deletion(-)
->>
->> diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
->> index b932e2d..389401a 100644
->> --- a/src/shared/gatt-client.c
->> +++ b/src/shared/gatt-client.c
->> @@ -993,6 +993,10 @@ static void service_changed_complete(struct discovery_op *op, bool success,
->>         service_list_insert_services(&client->svc_head, &client->svc_tail,
->>                                         op->result_head, op->result_tail);
->>
->> +       /* Relinquish ownership of services, as the client now owns them */
->> +       op->result_head = NULL;
->> +       op->result_tail = NULL;
->> +
->>  next:
->>         /* Notify the upper layer of changed services */
->>         if (client->svc_chngd_callback)
->> @@ -1155,7 +1159,7 @@ static void init_complete(struct discovery_op *op, bool success,
->>         client->svc_head = op->result_head;
->>         client->svc_tail = op->result_tail;
->>
->> -       /* Change owner of service list */
->> +       /* Relinquish ownership of services, as the client now owns them */
->>         op->result_head = NULL;
->>         op->result_tail = NULL;
->>
->> --
->> 2.1.0.rc2.206.gedb03e5
->>
+> The set also includes two small bug fixes for the way Service Changed
+> characteristics are handled by shared/gatt-client.
 >
-> ping.
+> *v1: Fixed Luiz's comments:
+>      - Style fixes.
+>      - Make certain attribute values cached directly in gatt-db.
+>      - Added an ATT error response encoding API and packed struct.
+>
+> *v2: Change bt_att_encode_error_rsp to bt_att_send_error_rsp.
+>
+> *v3: Fixed Luiz's comments:
+>      - Fix all compile warnings and linker errors that are seen when patches in
+>        the set are compiled seperately.
+>      - Move btgatt-server experimental.
+>
+>      Fixed Michael's comments:
+>      - Removed unnecessary memcpy after realloc.
+>
+> Arman Uguray (6):
+>   tools/btgatt-server: Introduce btgatt-server.
+>   tools/btgatt-server: Accept incoming connection and initialize server.
+>   tools/btgatt-server: Populate the database.
+>   tools/btgatt-server: Add command support and the notify command.
+>   tools/btgatt-server: Add Heart Rate service simulation.
+>   tools/btgatt-server: Add "heart-rate" command.
+>
+>  .gitignore            |    1 +
+>  Makefile.tools        |   11 +-
+>  tools/btgatt-server.c | 1086 +++++++++++++++++++++++++++++++++++++++++++++++++
+>  3 files changed, 1095 insertions(+), 3 deletions(-)
+>  create mode 100644 tools/btgatt-server.c
+>
 > --
+> 2.1.0.rc2.206.gedb03e5
 
 Applied, thanks.
 
