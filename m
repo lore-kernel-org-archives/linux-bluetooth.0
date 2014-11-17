@@ -1,74 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
-From: Johan Hedberg <johan.hedberg@gmail.com>
+From: Arman Uguray <armansito@chromium.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Fix BR/EDR-only address checks for remote OOB data
-Date: Mon, 17 Nov 2014 18:49:25 +0200
-Message-Id: <1416242965-29207-1-git-send-email-johan.hedberg@gmail.com>
+Cc: Arman Uguray <armansito@chromium.org>
+Subject: [PATCH BlueZ 2/2] TODO: tools/btgatt-server has been introduced.
+Date: Mon, 17 Nov 2014 08:08:12 -0800
+Message-Id: <1416240492-6122-2-git-send-email-armansito@chromium.org>
+In-Reply-To: <1416240492-6122-1-git-send-email-armansito@chromium.org>
+References: <1416240492-6122-1-git-send-email-armansito@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@intel.com>
-
-For now the mgmt commands dealing with remote OOB data are strictly
-BR/EDR-only. This patch fixes missing checks for the passed address type
-so that any non-BR/EDR value triggers the appropriate error response.
-
-Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- net/bluetooth/mgmt.c | 19 +++++++++++++++++++
- 1 file changed, 19 insertions(+)
+ TODO | 9 ---------
+ 1 file changed, 9 deletions(-)
 
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index b84c0923ec62..aaaa605f48b0 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -3589,6 +3589,13 @@ static int add_remote_oob_data(struct sock *sk, struct hci_dev *hdev,
- 		struct mgmt_cp_add_remote_oob_data *cp = data;
- 		u8 status;
+diff --git a/TODO b/TODO
+index fec0fa2..ca3779b 100644
+--- a/TODO
++++ b/TODO
+@@ -167,15 +167,6 @@ ATT/GATT (new shared stack)
+   Priority: Medium
+   Complexity: C2
  
-+		if (cp->addr.type != BDADDR_BREDR) {
-+			err = cmd_status(sk, hdev->id,
-+					 MGMT_OP_ADD_REMOTE_OOB_DATA,
-+					 MGMT_STATUS_INVALID_PARAMS);
-+			goto unlock;
-+		}
-+
- 		err = hci_add_remote_oob_data(hdev, &cp->addr.bdaddr,
- 					      cp->hash, cp->randomizer);
- 		if (err < 0)
-@@ -3602,6 +3609,13 @@ static int add_remote_oob_data(struct sock *sk, struct hci_dev *hdev,
- 		struct mgmt_cp_add_remote_oob_ext_data *cp = data;
- 		u8 status;
+-- Provide a tool for shared/gatt-server. This tool should demonstrate how a
+-  shared/gatt-db can be used together with a shared/gatt-server to implement the
+-  GATT server role. This should be written in a way so that it can be easily
+-  used in conjunction with a remote instance of tools/btgatt-client (i.e. it
+-  should listen for incoming connections, have similar verbose output, etc.)
+-
+-  Priority: Medium
+-  Complexity: C2
+-
+ - Implement other low-priority ATT protocol operations for shared/gatt-server:
  
-+		if (cp->addr.type != BDADDR_BREDR) {
-+			err = cmd_status(sk, hdev->id,
-+					 MGMT_OP_ADD_REMOTE_OOB_DATA,
-+					 MGMT_STATUS_INVALID_PARAMS);
-+			goto unlock;
-+		}
-+
- 		err = hci_add_remote_oob_ext_data(hdev, &cp->addr.bdaddr,
- 						  cp->hash192,
- 						  cp->randomizer192,
-@@ -3620,6 +3634,7 @@ static int add_remote_oob_data(struct sock *sk, struct hci_dev *hdev,
- 				 MGMT_STATUS_INVALID_PARAMS);
- 	}
- 
-+unlock:
- 	hci_dev_unlock(hdev);
- 	return err;
- }
-@@ -3633,6 +3648,10 @@ static int remove_remote_oob_data(struct sock *sk, struct hci_dev *hdev,
- 
- 	BT_DBG("%s", hdev->name);
- 
-+	if (cp->addr.type != BDADDR_BREDR)
-+		return cmd_status(sk, hdev->id, MGMT_OP_REMOVE_REMOTE_OOB_DATA,
-+				  MGMT_STATUS_INVALID_PARAMS);
-+
- 	hci_dev_lock(hdev);
- 
- 	if (!bacmp(&cp->addr.bdaddr, BDADDR_ANY)) {
+       Read Multiple Request
 -- 
-2.1.0
+2.1.0.rc2.206.gedb03e5
 
