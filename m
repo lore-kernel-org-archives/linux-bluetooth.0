@@ -1,50 +1,92 @@
 Return-Path: <cyrus@holtmann.org>
-From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
+From: Marcin Kraglak <marcin.kraglak@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] android/client: Add support for handshake callback
-Date: Mon, 17 Nov 2014 16:11:13 +0100
-Message-Id: <1416237073-8846-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+Subject: [PATCH] android/cts: Update CTS test results for Android 5.0
+Date: Mon, 17 Nov 2014 15:50:09 +0100
+Message-Id: <1416235809-12637-1-git-send-email-marcin.kraglak@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- android/client/if-hh.c | 16 +++++++++++++++-
- 1 file changed, 15 insertions(+), 1 deletion(-)
+ android/cts.txt | 50 +++++++++++++++++++++++++-------------------------
+ 1 file changed, 25 insertions(+), 25 deletions(-)
 
-diff --git a/android/client/if-hh.c b/android/client/if-hh.c
-index b2bf8ca..115809e 100644
---- a/android/client/if-hh.c
-+++ b/android/client/if-hh.c
-@@ -156,6 +156,19 @@ static void get_report_cb(bt_bdaddr_t *bd_addr, bthh_status_t hh_status,
- 					bthh_status_t2str(hh_status), rpt_size);
- }
+diff --git a/android/cts.txt b/android/cts.txt
+index 9a7f651..68feabf 100644
+--- a/android/cts.txt
++++ b/android/cts.txt
+@@ -1,15 +1,8 @@
+ Android Compatibility Test Suite results
  
-+/*
-+ * Callback for set_report/set_protocol api and if error
-+ * occurs for get_report/get_protocol api.
-+ */
-+static void handshake_cb(bt_bdaddr_t *bd_addr, bthh_status_t hh_status)
-+{
-+	char addr[MAX_ADDR_STR_LEN];
-+
-+	haltest_info("%s: bd_addr=%s hh_status=%s", __func__,
-+						bt_bdaddr_t2str(bd_addr, addr),
-+						bthh_status_t2str(hh_status));
-+}
-+
- static bthh_callbacks_t bthh_callbacks = {
- 	.size = sizeof(bthh_callbacks),
- 	.connection_state_cb = connection_state_cb,
-@@ -163,7 +176,8 @@ static bthh_callbacks_t bthh_callbacks = {
- 	.protocol_mode_cb = protocol_mode_cb,
- 	.idle_time_cb = idle_time_cb,
- 	.get_report_cb = get_report_cb,
--	.virtual_unplug_cb = virtual_unplug_cb
-+	.virtual_unplug_cb = virtual_unplug_cb,
-+	.handshake_cb = handshake_cb
- };
+-Tested: 11-July-2014
+-Android version: 4.4.4
+-CTS version: 4.4 R3
+-
+-Note:
+-CTS reliable write GATT tests require using CTS from master branch
+-or https://android-review.googlesource.com/99354 applied.
+-
+-(*) Due to bug in Bluedroid L2CAP implementation GATT server connect tests fails
+-without modified Linux kernel. Patches for Linux and/or Bluedroid are still TBD.
++Tested: 17-November-2014
++Android version: 5.0
++CTS version: 5.0 r0.5
  
- /* init */
+ -------------------------------------------------------------------------------
+ android.bluetooth.cts.BasicAdapterTest (automated tests)
+@@ -17,13 +10,13 @@ Test Name				Result	Notes
+ -------------------------------------------------------------------------------
+ testAndroidTestCaseSetupProperly	PASS
+ test_checkBluetoothAddress		PASS
+-test_enableDisable			PASS
+-test_getAddress				PASS
+-test_getBondedDevices			PASS
++test_enableDisable			FAIL
++test_getAddress				FAIL
++test_getBondedDevices			FAIL
+ test_getDefaultAdapter			PASS
+ test_getName				PASS
+ test_getRemoteDevice			PASS
+-test_listenUsingRfcommWithServiceRecord	PASS
++test_listenUsingRfcommWithServiceRecord	FAIL
+ -------------------------------------------------------------------------------
+ 
+ 
+@@ -43,16 +36,23 @@ BLE Client Test:
+ 	disconnect			PASS
+ BLE Server Test:
+ 	add service			PASS
+-	connection			FAIL	(*) bluedroid issue.
+-	read characteristic request	FAIL	(*)
+-	write characteristic request	FAIL	(*)
+-	read descriptor request		FAIL	(*)
+-	write descriptor request	FAIL	(*)
+-	reliable write			FAIL	(*)
+-	disconnection			FAIL	(*)
+-Insecure Client				PASS
+-Insecure Server				PASS	Required kernel patch commit ID:
++	connection			PASS
++	read characteristic request	FAIL
++	write characteristic request	FAIL
++	read descriptor request		FAIL
++	write descriptor request	FAIL
++	reliable write			FAIL
++	disconnection			FAIL
++Insecure Client				FAIL
++Insecure Server				FAIL	Required kernel patch commit ID:
+ 						ba15a58b179ed76a7e887177f2b06de1
+-Secure Client				PASS
+-Secure Server				PASS
++Secure Client				FAIL
++Secure Server				FAIL
++BLE Advertiser Test:
++	BLE Hardware Scan Filter	FAIL
++	BLE Tx Power Level		FAIL
++BLE Scanner Test
++	BLE Hardware Scan Filter	FAIL
++	BLE Tx Power Level		FAIL
++
+ -------------------------------------------------------------------------------
 -- 
 1.9.3
 
