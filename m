@@ -1,48 +1,66 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 2/3] shared/queue: Make queue_destroy safe
-Date: Mon, 17 Nov 2014 16:40:56 +0200
-Message-Id: <1416235257-12804-2-git-send-email-luiz.dentz@gmail.com>
-In-Reply-To: <1416235257-12804-1-git-send-email-luiz.dentz@gmail.com>
-References: <1416235257-12804-1-git-send-email-luiz.dentz@gmail.com>
+Cc: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
+Subject: [PATCH 2/4] android/hal: Update HidHost HAL for Android 5
+Date: Mon, 17 Nov 2014 15:06:56 +0100
+Message-Id: <1416233218-16456-2-git-send-email-jakub.tyszkowski@tieto.com>
+In-Reply-To: <1416233218-16456-1-git-send-email-jakub.tyszkowski@tieto.com>
+References: <1416233218-16456-1-git-send-email-jakub.tyszkowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-
-This makes queue_destroy and queue_remove_all safe even if destroy
-callback end up calling queue_remove.
 ---
- src/shared/queue.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ android/hal-hidhost.c | 11 +++++++++++
+ android/hal-msg.h     |  6 ++++++
+ 2 files changed, 17 insertions(+)
 
-diff --git a/src/shared/queue.c b/src/shared/queue.c
-index 6bfe995..0bf0bd3 100644
---- a/src/shared/queue.c
-+++ b/src/shared/queue.c
-@@ -329,6 +329,10 @@ unsigned int queue_remove_all(struct queue *queue, queue_match_func_t function,
+diff --git a/android/hal-hidhost.c b/android/hal-hidhost.c
+index 58b0218..3cfc6b6 100644
+--- a/android/hal-hidhost.c
++++ b/android/hal-hidhost.c
+@@ -102,6 +102,16 @@ static void handle_virtual_unplug(void *buf, uint16_t len, int fd)
+ 								ev->status);
+ }
  
- 		queue->entries -= count;
- 	} else {
-+		queue->head = NULL;
-+		queue->tail = NULL;
-+		queue->entries = 0;
++static void handle_handshake(void *buf, uint16_t len, int fd)
++{
++#if ANDROID_VERSION >= PLATFORM_VER(5, 0, 0)
++	struct hal_ev_hidhost_handshake *ev = buf;
 +
- 		while (entry) {
- 			struct queue_entry *tmp = entry;
++	if (cbacks->handshake_cb)
++		cbacks->handshake_cb((bt_bdaddr_t *) ev->bdaddr, ev->status);
++#endif
++}
++
+ /*
+  * handlers will be called from notification thread context,
+  * index in table equals to 'opcode - HAL_MINIMUM_EVENT'
+@@ -120,6 +130,7 @@ static const struct hal_ipc_handler ev_handlers[] = {
+ 	/* HAL_EV_HIDHOST_VIRTUAL_UNPLUG */
+ 	{ handle_virtual_unplug, false,
+ 				sizeof(struct hal_ev_hidhost_virtual_unplug) },
++	{ handle_handshake, false, sizeof(struct hal_ev_hidhost_handshake) },
+ };
  
-@@ -340,10 +344,6 @@ unsigned int queue_remove_all(struct queue *queue, queue_match_func_t function,
- 			free(tmp);
- 			count++;
- 		}
--
--		queue->head = NULL;
--		queue->tail = NULL;
--		queue->entries = 0;
- 	}
+ static bt_status_t hidhost_connect(bt_bdaddr_t *bd_addr)
+diff --git a/android/hal-msg.h b/android/hal-msg.h
+index 773af5b..35fb78a 100644
+--- a/android/hal-msg.h
++++ b/android/hal-msg.h
+@@ -1263,6 +1263,12 @@ struct hal_ev_hidhost_virtual_unplug {
+ 	uint8_t  status;
+ } __attribute__((packed));
  
- 	return count;
++#define HAL_EV_HIDHOST_HANDSHAKE		0x87
++struct hal_ev_hidhost_handshake {
++	uint8_t  bdaddr[6];
++	uint8_t  status;
++} __attribute__((packed));
++
+ #define HAL_EV_PAN_CTRL_STATE			0x81
+ struct hal_ev_pan_ctrl_state {
+ 	uint8_t  state;
 -- 
-1.9.3
+1.9.1
 
