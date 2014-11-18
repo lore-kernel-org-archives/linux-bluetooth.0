@@ -2,110 +2,133 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 03/14] android/handsfree-client: Add handling dial command
-Date: Tue, 18 Nov 2014 17:18:57 +0100
-Message-ID: <1791694.BgTKT9YC7S@uw000953>
-In-Reply-To: <1415789377-20458-4-git-send-email-lukasz.rymanowski@tieto.com>
-References: <1415789377-20458-1-git-send-email-lukasz.rymanowski@tieto.com> <1415789377-20458-4-git-send-email-lukasz.rymanowski@tieto.com>
+Subject: Re: [PATCH 02/14] android/handsfree-client: Add volume control handling
+Date: Tue, 18 Nov 2014 17:12:51 +0100
+Message-ID: <1987053.GDekqdnWuF@uw000953>
+In-Reply-To: <1415789377-20458-3-git-send-email-lukasz.rymanowski@tieto.com>
+References: <1415789377-20458-1-git-send-email-lukasz.rymanowski@tieto.com> <1415789377-20458-3-git-send-email-lukasz.rymanowski@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Wednesday 12 of November 2014 11:49:26 Lukasz Rymanowski wrote:
+Hi Łukasz,
+
+On Wednesday 12 of November 2014 11:49:25 Lukasz Rymanowski wrote:
 > ---
->  android/handsfree-client.c | 66 +++++++++++++++++++++++++++++++++++++++-------
->  1 file changed, 57 insertions(+), 9 deletions(-)
+>  android/handsfree-client.c | 65 ++++++++++++++++++++++++++++++++++++++++++++--
+>  1 file changed, 63 insertions(+), 2 deletions(-)
 > 
 > diff --git a/android/handsfree-client.c b/android/handsfree-client.c
-> index e498f89..4dfe9fb 100644
+> index d8b0bb1..e498f89 100644
 > --- a/android/handsfree-client.c
 > +++ b/android/handsfree-client.c
-> @@ -429,24 +429,72 @@ done:
->  static void handle_dial(const void *buf, uint16_t len)
+> @@ -391,10 +391,39 @@ done:
+>  
+>  static void handle_volume_control(const void *buf, uint16_t len)
 >  {
->  	const struct hal_cmd_hf_client_dial *cmd = buf;
+> -	DBG("Not Implemented");
+> +	const struct hal_cmd_hf_client_volume_control *cmd = buf;
 > +	struct device *dev;
 > +	uint8_t status;
 > +	bool ret;
->  
-> -	if (len != sizeof(*cmd) + cmd->number_len) {
-> -		error("Malformed number data, size (%u bytes), terminating",
-> -									len);
-> -		raise(SIGTERM);
-> -		return;
-> +	DBG("");
 > +
-> +	if (len != sizeof(*cmd) + cmd->number_len)
-> +		goto failed;
+> +	DBG("");
 > +
 > +	dev = find_default_device();
 > +	if (!dev) {
 > +		status = HAL_STATUS_FAILED;
 > +		goto done;
->  	}
->  
-> -	DBG("Not Implemented");
-> +	if (cmd->number_len > 0) {
-> +		if (cmd->number[cmd->number_len - 1] != '\0')
-> +			goto failed;
+> +	}
+
+Clip value to 15 here (just in case).
+
 > +
-> +		DBG("Dialing %s", cmd->number);
-> +
+> +	switch (cmd->type) {
+> +	case HF_CLIENT_VOLUME_TYPE_SPEAKER:
 > +		ret = hfp_hf_send_command(dev->hf, cmd_complete_cb, NULL,
-> +							"ATD%s;", cmd->number);
-> +	} else {
-> +		DBG("Redialing");
-> +
+> +						"AT+VGS=%d", cmd->volume);
+
+Please use %u for printing unsigned types.
+
+> +		break;
+> +	case HF_CLIENT_VOLUME_TYPE_MIC:
 > +		ret = hfp_hf_send_command(dev->hf, cmd_complete_cb, NULL,
-> +								"AT+BLDN");
+> +						"AT+VGM=%d", cmd->volume);
+> +		break;
+> +	default:
+> +		ret = false;
+> +		break;
 > +	}
 > +
-> +	status =  ret ? HAL_STATUS_SUCCESS : HAL_STATUS_FAILED;
+> +	status = ret ? HAL_STATUS_SUCCESS : HAL_STATUS_FAILED;
 > +
 > +done:
 >  	ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_HANDSFREE_CLIENT,
-> -				HAL_OP_HF_CLIENT_DIAL, HAL_STATUS_UNSUPPORTED);
-> +						HAL_OP_HF_CLIENT_DIAL, status);
-> +
-> +	return;
-> +
-> +failed:
-> +	error("Malformed number data, size (%u bytes), terminating", len);
-> +	raise(SIGTERM);
+>  					HAL_OP_HF_CLIENT_VOLUME_CONTROL,
+> -					HAL_STATUS_UNSUPPORTED);
+> +					status);
 >  }
 >  
->  static void handle_dial_memory(const void *buf, uint16_t len)
+>  static void handle_dial(const void *buf, uint16_t len)
+> @@ -543,6 +572,36 @@ static void bvra_cb(struct hfp_context *context, void *user_data)
+>  				HAL_EV_HF_CLIENT_VR_STATE, sizeof(ev), &ev);
+>  }
+>  
+> +static void vgm_cb(struct hfp_context *context, void *user_data)
+> +{
+> +	struct hal_ev_hf_client_volume_changed ev;
+> +	uint32_t val;
+
+Unsigned int here.
+
+> +
+> +	if (!hfp_context_get_number(context, &val))
+> +		return;
+> +
+> +	ev.type = HF_CLIENT_VOLUME_TYPE_MIC;
+> +	ev.volume = val;
+
+Consider clipping this to 15.
+
+> +
+> +	ipc_send_notif(hal_ipc, HAL_SERVICE_ID_HANDSFREE_CLIENT,
+> +				HAL_EV_HF_CLIENT_VR_STATE, sizeof(ev), &ev);
+> +}
+> +
+> +static void vgs_cb(struct hfp_context *context, void *user_data)
+> +{
+> +	struct hal_ev_hf_client_volume_changed ev;
+> +	uint32_t val;
+
+Unsigned int here.
+
+> +
+> +	if (!hfp_context_get_number(context, &val))
+> +		return;
+> +
+> +	ev.type = HF_CLIENT_VOLUME_TYPE_SPEAKER;
+> +	ev.volume = val;
+
+Consider clipping this to 15.
+
+> +
+> +	ipc_send_notif(hal_ipc, HAL_SERVICE_ID_HANDSFREE_CLIENT,
+> +			HAL_EV_CLIENT_VOLUME_CHANGED, sizeof(ev), &ev);
+> +}
+> +
+>  static void slc_completed(struct device *dev)
 >  {
-> -	DBG("Not Implemented");
-> +	const struct hal_cmd_hf_client_dial_memory *cmd = buf;
-> +	struct device *dev;
-> +	uint8_t status;
-> +
-> +	DBG("");
-> +
-> +	dev = find_default_device();
-> +	if (!dev) {
-> +		status = HAL_STATUS_FAILED;
-> +		goto done;
-> +	}
-
-Check if cmd->location is not < 0 (just in case).
-
-> +
-> +	if (hfp_hf_send_command(dev->hf, cmd_complete_cb, NULL , "ATD>%d;",
-> +								cmd->location))
-> +		status = HAL_STATUS_SUCCESS;
-> +	else
-> +		status = HAL_STATUS_FAILED;
-> +
-> +done:
->  	ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_HANDSFREE_CLIENT,
-> -			HAL_OP_HF_CLIENT_DIAL_MEMORY, HAL_STATUS_UNSUPPORTED);
-> +					HAL_OP_HF_CLIENT_DIAL_MEMORY, status);
+>  	DBG("");
+> @@ -555,6 +614,8 @@ static void slc_completed(struct device *dev)
+>  	 */
+>  
+>  	hfp_hf_register(dev->hf, bvra_cb, "+BRVA", dev, NULL);
+> +	hfp_hf_register(dev->hf, vgm_cb, "+VGM", dev, NULL);
+> +	hfp_hf_register(dev->hf, vgs_cb, "+VGS", dev, NULL);
 >  }
 >  
->  static void handle_call_action(const void *buf, uint16_t len)
+>  static void slc_chld_cb(struct hfp_context *context, void *user_data)
 > 
 
 -- 
