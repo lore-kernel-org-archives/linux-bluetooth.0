@@ -1,88 +1,77 @@
 Return-Path: <cyrus@holtmann.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 8.0 \(1990.1\))
-Subject: Re: [PATCH] Bluetooth: Call drain_workqueue() before resetting state
+Subject: Re: [PATCH] Add support for bluetooth BCM20702A1 variant
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1416294014-7741-1-git-send-email-johan.hedberg@gmail.com>
-Date: Tue, 18 Nov 2014 16:35:47 +0900
+In-Reply-To: <1416278788-20755-1-git-send-email-healthkit@gmail.com>
+Date: Tue, 18 Nov 2014 16:35:27 +0900
 Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <5F3C9C0A-C929-4E6C-9327-941713E64E85@holtmann.org>
-References: <1416294014-7741-1-git-send-email-johan.hedberg@gmail.com>
-To: Johan Hedberg <johan.hedberg@gmail.com>
+Message-Id: <BADC3B9A-495C-4ED3-8ECD-2234917C322F@holtmann.org>
+References: <1416278788-20755-1-git-send-email-healthkit@gmail.com>
+To: Fabio K <healthkit@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+Hi Fabio,
 
-> Doing things like hci_conn_hash_flush() while holding the hdev lock is
-> risky since its synchronous pending work cancellation could cause the
-> L2CAP layer to try to reacquire the hdev lock. Right now there doesn't
-> seem to be any obvious places where this would for certain happen but
-> it's already enough to cause lockdep to start warning against the hdev
-> and the work struct locks being taken in the "wrong" order:
+> This variant requires the flag BTUSB_BCM_PATCHRAM to work.
 > 
-> [  +0.000373] mgmt-tester/1603 is trying to acquire lock:
-> [  +0.000292]  ((&conn->pending_rx_work)){+.+.+.}, at: [<c104266d>] flush_work+0x0/0x181
-> [  +0.000270]
-> but task is already holding lock:
-> [  +0.000000]  (&hdev->lock){+.+.+.}, at: [<c13b9a80>] hci_dev_do_close+0x166/0x359
-> [  +0.000000]
-> which lock already depends on the new lock.
+> Relevant details from /sys/kernel/debug/usb/devices:
 > 
-> [  +0.000000]
-> the existing dependency chain (in reverse order) is:
-> [  +0.000000]
-> -> #1 (&hdev->lock){+.+.+.}:
-> [  +0.000000]        [<c105ea8f>] lock_acquire+0xe3/0x156
-> [  +0.000000]        [<c140c663>] mutex_lock_nested+0x54/0x375
-> [  +0.000000]        [<c13d644b>] l2cap_recv_frame+0x293/0x1a9c
-> [  +0.000000]        [<c13d7ca4>] process_pending_rx+0x50/0x5e
-> [  +0.000000]        [<c1041a3f>] process_one_work+0x21c/0x436
-> [  +0.000000]        [<c1041e3d>] worker_thread+0x1be/0x251
-> [  +0.000000]        [<c1045a22>] kthread+0x94/0x99
-> [  +0.000000]        [<c140f801>] ret_from_kernel_thread+0x21/0x30
-> [  +0.000000]
-> -> #0 ((&conn->pending_rx_work)){+.+.+.}:
-> [  +0.000000]        [<c105e158>] __lock_acquire+0xa07/0xc89
-> [  +0.000000]        [<c105ea8f>] lock_acquire+0xe3/0x156
-> [  +0.000000]        [<c1042696>] flush_work+0x29/0x181
-> [  +0.000000]        [<c1042864>] __cancel_work_timer+0x76/0x8f
-> [  +0.000000]        [<c104288c>] cancel_work_sync+0xf/0x11
-> [  +0.000000]        [<c13d4c18>] l2cap_conn_del+0x72/0x183
-> [  +0.000000]        [<c13d8953>] l2cap_disconn_cfm+0x49/0x55
-> [  +0.000000]        [<c13be37a>] hci_conn_hash_flush+0x7a/0xc3
-> [  +0.000000]        [<c13b9af6>] hci_dev_do_close+0x1dc/0x359
-> [  +0.012038]        [<c13bbe38>] hci_unregister_dev+0x6e/0x1a3
-> [  +0.000000]        [<c12d33c1>] vhci_release+0x28/0x47
-> [  +0.000000]        [<c10dd6a9>] __fput+0xd6/0x154
-> [  +0.000000]        [<c10dd757>] ____fput+0xd/0xf
-> [  +0.000000]        [<c1044bb2>] task_work_run+0x6b/0x8d
-> [  +0.000000]        [<c1001bd2>] do_notify_resume+0x3c/0x3f
-> [  +0.000000]        [<c140fa70>] work_notifysig+0x29/0x31
-> [  +0.000000]
-> other info that might help us debug this:
+> T:  Bus=01 Lev=02 Prnt=02 Port=04 Cnt=01 Dev#=  3 Spd=12   MxCh= 0
+> D:  Ver= 2.00 Cls=ff(vend.) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
+> P:  Vendor=13d3 ProdID=3404 Rev= 1.12
+> S:  Manufacturer=Broadcom Corp
+> S:  Product=BCM20702A0
+> S:  SerialNumber=240A646F1XXX
+> C:* #Ifs= 4 Cfg#= 1 Atr=e0 MxPwr=  0mA
+> I:* If#= 0 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
+> E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+> E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+> I:* If#= 1 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+> I:  If#= 1 Alt= 1 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+> I:  If#= 1 Alt= 2 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+> I:  If#= 1 Alt= 3 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+> I:  If#= 1 Alt= 4 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+> I:  If#= 1 Alt= 5 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+> I:* If#= 2 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=ff Driver=(none)
+> E:  Ad=84(I) Atr=02(Bulk) MxPS=  32 Ivl=0ms
+> E:  Ad=04(O) Atr=02(Bulk) MxPS=  32 Ivl=0ms
+> I:* If#= 3 Alt= 0 #EPs= 0 Cls=fe(app. ) Sub=01 Prot=01 Driver=(none)
 > 
-> [  +0.000000]  Possible unsafe locking scenario:
+> The firmware was extracted from a Windows 8.1 64-bit installation
+> and converted from 'hex' to 'hcd' for use in Linux.
 > 
-> [  +0.000000]        CPU0                    CPU1
-> [  +0.000000]        ----                    ----
-> [  +0.000000]   lock(&hdev->lock);
-> [  +0.000000]                                lock((&conn->pending_rx_work));
-> [  +0.000000]                                lock(&hdev->lock);
-> [  +0.000000]   lock((&conn->pending_rx_work));
-> [  +0.000000]
-> *** DEADLOCK ***
+> Under Windows it also identifies itself as BCM20702A0,
+> but the firmware is named "BCM20702A1_001.002.014.1315.1356.hex"
+> and is located in "%SYSTEMROOT%\system32\drivers\"
+> (md5 67cf6bfdae61c4bb819a66da984f7913)
+> (sha1 5f74cc6a9a3bf19ee0f8c3d01e4be34c609b188f)
 > 
-> Fully fixing this would require some quite heavy refactoring to change
-> how the hdev lock and hci_conn instances are handled together. A simpler
-> solution for now which this patch takes is to try ensure that the hdev
-> workqueue is empty before proceeding with the various cleanup calls,
-> including hci_conn_hash_flush().
+> The same firmware file is also available as a download at
+> http://www.asrock.com/mb/Intel/Z87E-ITX/?cat=Download&os=All
+> marked as "Bluetooth driver ver:12.0.0.7820"
 > 
-> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+> 'hcd' file should be placed at "brcm/BCM20702A0-13d3-3404.hcd"
+> inside the firmware directory (e.g. "/lib/firmware")
+> 
+> Signed-off-by: Fabio K <healthkit@gmail.com>
 > ---
-> net/bluetooth/hci_core.c | 10 ++++++++++
-> 1 file changed, 10 insertions(+)
+> drivers/bluetooth/btusb.c | 2 ++
+> 1 file changed, 2 insertions(+)
 
 patch has been applied to bluetooth-next tree.
 
