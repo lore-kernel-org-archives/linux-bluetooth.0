@@ -1,74 +1,62 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1416252138-17477-1-git-send-email-armansito@chromium.org>
-References: <1416252138-17477-1-git-send-email-armansito@chromium.org>
-Date: Tue, 18 Nov 2014 19:31:15 -0800
-Message-ID: <CAHrH25RC9HwEm-Td1cH8A7swJdSpkcO5P-y9qjB=m9OHzMMGcw@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 00/12] core: Use shared/gatt-client.
-From: Arman Uguray <armansito@chromium.org>
-To: BlueZ development <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 8.1 \(1993\))
+Subject: Re: [PATCH v2] ath3k: Add support of MCI 13d3:3408 bt device
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <CANoib0HW2umPpzzerYNq1fMMnkYxOa78o5X90-K=eNEnTGSO1w@mail.gmail.com>
+Date: Wed, 19 Nov 2014 07:56:05 +0900
+Cc: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-wireless@vger.kernel.org
+Message-Id: <F01422F2-5F7C-406A-A06B-2C2CE96B9E3A@holtmann.org>
+References: <CANoib0HW2umPpzzerYNq1fMMnkYxOa78o5X90-K=eNEnTGSO1w@mail.gmail.com>
+To: Dmitry Tunin <hanipouspilot@gmail.com>
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi all,
+Hi Dmitry,
 
-> On Mon, Nov 17, 2014 at 11:22 AM, Arman Uguray <armansito@chromium.org> wrote:
-> This patch set integrates shared/gatt-client into bluetoothd. The following
-> items have been tackled here:
->
->   1. src/device now uses shared/gatt-client to perform service discovery. State
->   updates such as disconnections, service changed events, etc. are done using
->   callback APIs of the new shared framework and attrib/gatt is no longer used to
->   perform GATT operations directly. A GAttrib instance is maintained for
->   backwards compatibility with profiles that haven't been converted yet.
->
->   2. A new gatt-callbacks API has been added which mirrors the attio APIs for
->   shared/gatt-client. Profiles/plugins are notified using these APIs when the
->   bearer disconnects, when services change, and when gatt-client is ready.
->
->   3. The profiles/gatt plugin has been rewritten. Since the GATT service is
->   handled by shared/gatt-client, this profile no longer deals with service
->   changed events performs out of place MTU exchanges, which used to get
->   performed in an arbitrary order. The profile has been renamed to profiles/gap
->   as it now only deals with the GAP service, and reads the "Appearance" and
->   "Device Name" characteristics using the new shared stack.
->
-> Arman Uguray (12):
->   attrib/gattrib: Add g_attrib_get_att.
->   shared/att: Add bt_att_get_fd.
->   shared/att: Directly close fd on ATT violations.
->   shared/gatt-client: Call ready_handler only in init.
->   core: device: Use bt_att_register_disconnect.
->   core: device: Use shared/gatt-client for GATT.
->   core: Introduce gatt-callbacks
->   profiles/gatt: Don't handle GATT service.
->   profiles/gatt: Rename profile to gap.
->   profiles/gap: Rewrite using bt_gatt_client.
->   profiles/gap: Add Google copyright.
->   TODO: Update GAttrib related items.
->
->  Makefile.am              |   1 +
->  Makefile.plugins         |   4 +-
->  TODO                     |  25 +--
->  attrib/gattrib.c         |   8 +
->  attrib/gattrib.h         |   3 +
->  profiles/gap/gas.c       | 307 +++++++++++++++++++++++++++++++
->  profiles/gatt/gas.c      | 457 -----------------------------------------------
->  src/device.c             | 456 +++++++++++++++++++++++++++++++---------------
->  src/device.h             |   2 -
->  src/gatt-callbacks.h     |  42 +++++
->  src/shared/att-types.h   |   3 +-
->  src/shared/att.c         |  25 ++-
->  src/shared/att.h         |   1 +
->  src/shared/gatt-client.c |   3 +-
->  14 files changed, 711 insertions(+), 626 deletions(-)
->  create mode 100644 profiles/gap/gas.c
->  delete mode 100644 profiles/gatt/gas.c
->  create mode 100644 src/gatt-callbacks.h
->
-> --
-> 2.1.0.rc2.206.gedb03e5
->
+> Add support for bluetooth MCI WB335 (AR9565) Wi-Fi+bt module.
+> It is AR3011 device according to iProduct == 0.
+> So btusb should be blacklisted
+> I submitted a wrong patch before asif  it was an AR3012 device,
+> but it works both ways. This is the right one.
 
-ping
+include the device details from /sys/kernel/debug/usb/devices.
+
+> 
+> Signed-off-by: Dmitry Tunin <hanipouspilot@gmail.com>
+> are */
+
+No idea what this are */ is.
+
+> 
+> ---
+> 
+> diff --git a/drivers/bluetooth/ath3k.c b/drivers/bluetooth/ath3k.c
+> index d85ced2..3b53116 100644
+> --- a/drivers/bluetooth/ath3k.c
+> +++ b/drivers/bluetooth/ath3k.c
+> @@ -69,6 +69,7 @@ static const struct usb_device_id ath3k_table[] = {
+>  { USB_DEVICE(0x0CF3, 0x3002) },
+>  { USB_DEVICE(0x0CF3, 0xE019) },
+>  { USB_DEVICE(0x13d3, 0x3304) },
+> + { USB_DEVICE(0x13d3, 0x3408) },
+> 
+>  /* Atheros AR9285 Malbec with sflash firmware */
+>  { USB_DEVICE(0x03F0, 0x311D) },
+> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+> index edfc17b..bbf5c1c 100644
+> --- a/drivers/bluetooth/btusb.c
+> +++ b/drivers/bluetooth/btusb.c
+> @@ -146,6 +146,7 @@ static const struct usb_device_id blacklist_table[] = {
+>  { USB_DEVICE(0x0cf3, 0x3002), .driver_info = BTUSB_IGNORE },
+>  { USB_DEVICE(0x0cf3, 0xe019), .driver_info = BTUSB_IGNORE },
+>  { USB_DEVICE(0x13d3, 0x3304), .driver_info = BTUSB_IGNORE },
+> + { USB_DEVICE(0x13d3, 0x3408), .driver_info = BTUSB_IGNORE },
+
+Fix whitespace here or use a proper mail client.
+
+Regards
+
+Marcel
+
