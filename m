@@ -1,202 +1,92 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 18 Nov 2014 11:19:52 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: linville@tuxdriver.com
-Cc: linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: pull request: bluetooth-next 2014-11-18
-Message-ID: <20141118091952.GA14015@t440s.lan>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="6TrnltStXW4iwmi0"
-Sender: linux-kernel-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 8.0 \(1990.1\))
+Subject: Re: [PATCH] Bluetooth: Call drain_workqueue() before resetting state
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1416294014-7741-1-git-send-email-johan.hedberg@gmail.com>
+Date: Tue, 18 Nov 2014 16:35:47 +0900
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <5F3C9C0A-C929-4E6C-9327-941713E64E85@holtmann.org>
+References: <1416294014-7741-1-git-send-email-johan.hedberg@gmail.com>
+To: Johan Hedberg <johan.hedberg@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Hi Johan,
 
---6TrnltStXW4iwmi0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+> Doing things like hci_conn_hash_flush() while holding the hdev lock is
+> risky since its synchronous pending work cancellation could cause the
+> L2CAP layer to try to reacquire the hdev lock. Right now there doesn't
+> seem to be any obvious places where this would for certain happen but
+> it's already enough to cause lockdep to start warning against the hdev
+> and the work struct locks being taken in the "wrong" order:
+> 
+> [  +0.000373] mgmt-tester/1603 is trying to acquire lock:
+> [  +0.000292]  ((&conn->pending_rx_work)){+.+.+.}, at: [<c104266d>] flush_work+0x0/0x181
+> [  +0.000270]
+> but task is already holding lock:
+> [  +0.000000]  (&hdev->lock){+.+.+.}, at: [<c13b9a80>] hci_dev_do_close+0x166/0x359
+> [  +0.000000]
+> which lock already depends on the new lock.
+> 
+> [  +0.000000]
+> the existing dependency chain (in reverse order) is:
+> [  +0.000000]
+> -> #1 (&hdev->lock){+.+.+.}:
+> [  +0.000000]        [<c105ea8f>] lock_acquire+0xe3/0x156
+> [  +0.000000]        [<c140c663>] mutex_lock_nested+0x54/0x375
+> [  +0.000000]        [<c13d644b>] l2cap_recv_frame+0x293/0x1a9c
+> [  +0.000000]        [<c13d7ca4>] process_pending_rx+0x50/0x5e
+> [  +0.000000]        [<c1041a3f>] process_one_work+0x21c/0x436
+> [  +0.000000]        [<c1041e3d>] worker_thread+0x1be/0x251
+> [  +0.000000]        [<c1045a22>] kthread+0x94/0x99
+> [  +0.000000]        [<c140f801>] ret_from_kernel_thread+0x21/0x30
+> [  +0.000000]
+> -> #0 ((&conn->pending_rx_work)){+.+.+.}:
+> [  +0.000000]        [<c105e158>] __lock_acquire+0xa07/0xc89
+> [  +0.000000]        [<c105ea8f>] lock_acquire+0xe3/0x156
+> [  +0.000000]        [<c1042696>] flush_work+0x29/0x181
+> [  +0.000000]        [<c1042864>] __cancel_work_timer+0x76/0x8f
+> [  +0.000000]        [<c104288c>] cancel_work_sync+0xf/0x11
+> [  +0.000000]        [<c13d4c18>] l2cap_conn_del+0x72/0x183
+> [  +0.000000]        [<c13d8953>] l2cap_disconn_cfm+0x49/0x55
+> [  +0.000000]        [<c13be37a>] hci_conn_hash_flush+0x7a/0xc3
+> [  +0.000000]        [<c13b9af6>] hci_dev_do_close+0x1dc/0x359
+> [  +0.012038]        [<c13bbe38>] hci_unregister_dev+0x6e/0x1a3
+> [  +0.000000]        [<c12d33c1>] vhci_release+0x28/0x47
+> [  +0.000000]        [<c10dd6a9>] __fput+0xd6/0x154
+> [  +0.000000]        [<c10dd757>] ____fput+0xd/0xf
+> [  +0.000000]        [<c1044bb2>] task_work_run+0x6b/0x8d
+> [  +0.000000]        [<c1001bd2>] do_notify_resume+0x3c/0x3f
+> [  +0.000000]        [<c140fa70>] work_notifysig+0x29/0x31
+> [  +0.000000]
+> other info that might help us debug this:
+> 
+> [  +0.000000]  Possible unsafe locking scenario:
+> 
+> [  +0.000000]        CPU0                    CPU1
+> [  +0.000000]        ----                    ----
+> [  +0.000000]   lock(&hdev->lock);
+> [  +0.000000]                                lock((&conn->pending_rx_work));
+> [  +0.000000]                                lock(&hdev->lock);
+> [  +0.000000]   lock((&conn->pending_rx_work));
+> [  +0.000000]
+> *** DEADLOCK ***
+> 
+> Fully fixing this would require some quite heavy refactoring to change
+> how the hdev lock and hci_conn instances are handled together. A simpler
+> solution for now which this patch takes is to try ensure that the hdev
+> workqueue is empty before proceeding with the various cleanup calls,
+> including hci_conn_hash_flush().
+> 
+> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+> ---
+> net/bluetooth/hci_core.c | 10 ++++++++++
+> 1 file changed, 10 insertions(+)
 
-Hi John,
+patch has been applied to bluetooth-next tree.
 
-Here's another bluetooth-next pull request for 3.19. We've got:
+Regards
 
- - Various fixes, cleanups and improvements to ieee802154/mac802154
- - Support for a Broadcom BCM20702A1 variant
- - Lots of lockdep fixes
- - Fixed handling of LE CoC errors that should trigger SMP
+Marcel
 
-Please let me know if there are any issues pulling. Thanks.
-
-Johan
-
----
-The following changes since commit 56b2c3eea398c772dd895dc62c18cbdd1ba127b1:
-
-  6lowpan: move skb_free from error paths in decompression (2014-11-06 22:09:48 +0100)
-
-are available in the git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git for-upstream
-
-for you to fetch changes up to a86c02ea38c53b695209b1181f9e2e18d73eb4e8:
-
-  Bluetooth: Add support for Broadcom BCM20702A1 variant (2014-11-18 08:32:14 +0100)
-
-----------------------------------------------------------------
-Alexander Aring (49):
-      Bluetooth: 6lowpan: fix skb_unshare behaviour
-      mac802154: move mac pib attributes into wpan_dev
-      mac802154: remove mac_params in sdata
-      ieee802154: rename wpan_phy_alloc
-      ieee802154: add cfg802154_registered_device list
-      ieee802154: add iftype to wpan_dev
-      ieee802154: add wpan_dev_list
-      ieee802154: sysfs add wpan_phy index and name
-      ieee802154: add new nl802154 header
-      ieee802154: add nl802154 framework
-      ieee802154: add wpan_phy dump support
-      ieee802154: add wpan_dev dump support
-      mac820154: don't set monitor dev_addr
-      ieee802154: netlink add rtnl lock
-      ieee802154: fix iface dump with lowpan
-      mac802154: protect address changes via ioctl
-      mac820154: move interface unregistration into iface
-      mac820154: rename sdata next to tmp
-      mac820154: move mutex locks out of loop
-      mac802154: add wpan_phy priv id
-      mac802154: change module description
-      mac802154: add ifname change notifier
-      ieee802154: cleanup cfg802154 intendation
-      ieee820154: add channel set support
-      ieee820154: remove valid page and channel checks
-      ieee820154: add pan_id setting support
-      ieee820154: add short_addr setting support
-      ieee820154: add backoff exponent setting support
-      at86rf230: remove invalid backoff exponent check
-      ieee820154: add max csma backoffs setting support
-      at86rf230: remove invalid max csma backoffs check
-      ieee820154: add max frame retries setting support
-      at86rf230: remove invalid max frame retries check
-      ieee820154: add lbt setting support
-      mac802154: add interframe spacing time handling
-      at86rf230: remove interframe spacing time workaround
-      mac802154: remove unused prototypes
-      at86rf230: fix commentation for symbol duration
-      mac802154: remove const for non pointer in driver-ops
-      mac802154: remove const for non pointer in cfg ops
-      mac802154: remove const for non pointer in rdev-ops
-      mac802154: remove deprecated linux-zigbee info
-      mac802154: use new nl802154 iftype types
-      mac802154: remove wpan_dev parameter in if_add
-      ieee802154: add new interface command
-      ieee802154: setting extended address while iface add
-      ieee802154: add del interface command
-      ieee802154: rename and move WPAN_NUM_ defines
-      ieee802154: fix byteorder for short address and panid
-
-Fabian Frederick (1):
-      Bluetooth: hidp: replace kzalloc/copy_from_user by memdup_user
-
-Fabio K (1):
-      Bluetooth: Add support for Broadcom BCM20702A1 variant
-
-Fugang Duan (1):
-      Bluetooth: hci-uart-ath: Correct the comments in this driver
-
-Jaganath Kanakkassery (1):
-      Bluetooth: Send mgmt_connected only if state is BT_CONFIG
-
-Johan Hedberg (20):
-      Bluetooth: Fix sparse warning in amp.c
-      Bluetooth: Fix mgmt connected notification
-      Bluetooth: 6lowpan: Remove unnecessary RCU callback
-      Bluetooth: Fix l2cap_sock_teardown_cb lockdep warning
-      Bluetooth: Remove unnecessary hci_dev_lock/unlock in smp.c
-      Bluetooth: Use proper nesting annotation for l2cap_chan lock
-      Bluetooth: Fix L2CAP socket lock nesting level
-      Bluetooth: Fix L2CAP nesting level initialization location
-      Bluetooth: Fix correct nesting for 6lowpan server channel
-      Bluetooth: Fix sending incorrect LE CoC PDU in BT_CONNECT2 state
-      Bluetooth: Add key preference parameter to smp_sufficient_security
-      Bluetooth: Trigger SMP for the appropriate LE CoC errors
-      Bluetooth: Convert LTK list to RCU
-      Bluetooth: Convert IRK list to RCU
-      Bluetooth: Remove unnecessary hdev locking in smp.c
-      Bluetooth: Add debug logs to help track locking issues
-      Bluetooth: Fix clearing remote OOB data through mgmt
-      Bluetooth: Fix BR/EDR-only address checks for remote OOB data
-      Bluetooth: Use shorter "rand" name for "randomizer"
-      Bluetooth: Call drain_workqueue() before resetting state
-
- MAINTAINERS                        |   1 +
- drivers/bluetooth/btusb.c          |   2 +
- drivers/bluetooth/hci_ath.c        |   2 +-
- drivers/net/ieee802154/at86rf230.c |  80 ++-
- drivers/net/ieee802154/fakelb.c    |   3 -
- include/linux/ieee802154.h         |  10 +
- include/net/bluetooth/hci.h        |  12 +-
- include/net/bluetooth/hci_core.h   |  16 +-
- include/net/bluetooth/l2cap.h      |  15 +-
- include/net/bluetooth/mgmt.h       |  12 +-
- include/net/cfg802154.h            |  86 +++-
- include/net/mac802154.h            |   3 +-
- include/net/nl802154.h             | 122 +++++
- net/bluetooth/6lowpan.c            |  21 +-
- net/bluetooth/amp.c                |  25 +-
- net/bluetooth/hci_core.c           | 112 ++--
- net/bluetooth/hci_event.c          |  30 +-
- net/bluetooth/hidp/core.c          |  10 +-
- net/bluetooth/l2cap_core.c         |  35 +-
- net/bluetooth/l2cap_sock.c         |  29 +-
- net/bluetooth/mgmt.c               |  52 +-
- net/bluetooth/smp.c                |  61 ++-
- net/bluetooth/smp.h                |   9 +-
- net/ieee802154/Makefile            |   2 +-
- net/ieee802154/core.c              | 166 +++++-
- net/ieee802154/core.h              |  17 +
- net/ieee802154/ieee802154.h        |   2 +-
- net/ieee802154/netlink.c           |   2 +-
- net/ieee802154/nl-mac.c            |  23 +-
- net/ieee802154/nl802154.c          | 957 +++++++++++++++++++++++++++++++++++
- net/ieee802154/nl802154.h          |   7 +
- net/ieee802154/rdev-ops.h          |  66 +++
- net/ieee802154/sysfs.c             |  24 +
- net/mac802154/cfg.c                | 165 +++++-
- net/mac802154/driver-ops.h         |  46 +-
- net/mac802154/ieee802154_i.h       |  38 +-
- net/mac802154/iface.c              | 165 ++++--
- net/mac802154/mac_cmd.c            |  36 +-
- net/mac802154/main.c               |  54 +-
- net/mac802154/mib.c                |  10 +-
- net/mac802154/rx.c                 |  14 +-
- net/mac802154/tx.c                 |   2 +-
- net/mac802154/util.c               |  35 +-
- 43 files changed, 2214 insertions(+), 365 deletions(-)
- create mode 100644 include/net/nl802154.h
- create mode 100644 net/ieee802154/nl802154.c
- create mode 100644 net/ieee802154/nl802154.h
-
-
---6TrnltStXW4iwmi0
-Content-Type: application/pgp-signature
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1
-
-iQIcBAEBAgAGBQJUaw84AAoJECQj9vv5qNQSw4kP/ifdpwsxh7tLoyhzj15ucelH
-cb5rpSJVM3wwQAWbnf+xAPofyUzkC0yJC+sMXZydw4R0zOtQEpomvhn8i4bDT3W9
-M+HWMk1HLlDnyZWmFHAXlSIG6DUtAy3RQxS3GsMqUwGhT/xmDtcCUdOD43iJXqor
-KE4eePPAHkVjhDJ701Xl8/wwxjR79H6k/r8VXOG9Jz8/8yyoMB+QG7klmF4Hu/G8
-CmOz2mynn/T3/zWhG930rro6Ho6/uyAcWrVwSHT4yP8BD0KKo5cOILL3gV4rPnh2
-YPUMPYf3ME/N4DC74GB8f87vxoDOvnmauecefrv7jnA8afabsK2EdjuFncRjXBZM
-J7q4OhvXKml6pMF6PalDmZ8WELGFNL0TKy7eaZbVvq7ra+dMncvBN3Vz4u+lqV/z
-bJma4UMRS+nEnm554lmL6LNz2pavJ9jrFWXNaFKatsp0SLe8Cp+bEGgjlnoYYdry
-2uxZzIqLKwG6jrCcpyVqYYpcFkljz+K992d3sl50dxGkbwLHbWZP6Wwwrtv8Ax7o
-MHIw/KIKfB4yL0sDperyi87FE5oriJ0/pf9HzfFApJoTDzmlSd8HLM4KbFTInRIr
-A0YM/8TNqJZBTYrkvaGUh4P7kdWUcfbg8fqvNI7KKH1XV0aIrmYy9wZROsZfpmJL
-MSS3OzMAJg60/MT6Qt4s
-=1ULF
------END PGP SIGNATURE-----
-
---6TrnltStXW4iwmi0--
