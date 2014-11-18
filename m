@@ -2,56 +2,76 @@ Return-Path: <cyrus@holtmann.org>
 From: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
-Subject: [PATCH_v2 1/2] android/hal-avrcp-ctrl: Create separate HAL for AVRCP CTRL
-Date: Tue, 18 Nov 2014 15:34:42 +0200
-Message-Id: <1416317683-15258-2-git-send-email-ravikumar.veeramally@linux.intel.com>
+Subject: [PATCH_v2 2/2] android/client: Create separate file for AVRCP CTRL
+Date: Tue, 18 Nov 2014 15:34:43 +0200
+Message-Id: <1416317683-15258-3-git-send-email-ravikumar.veeramally@linux.intel.com>
 In-Reply-To: <1416317683-15258-1-git-send-email-ravikumar.veeramally@linux.intel.com>
 References: <1416317683-15258-1-git-send-email-ravikumar.veeramally@linux.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Moving AVRCP CTRL interface HAL related code to hal-avrcp-ctrl.c.
-Separate HAL for every interface.
+Moving AVRCP CTRL interface client related code to if-rc-ctrl.c.
 ---
- android/Android.mk       |   3 +-
- android/Makefile.am      |   1 +
- android/hal-avrcp-ctrl.c | 144 +++++++++++++++++++++++++++++++++++++++++++++++
- android/hal-avrcp.c      | 121 ---------------------------------------
- 4 files changed, 147 insertions(+), 122 deletions(-)
- create mode 100644 android/hal-avrcp-ctrl.c
+ android/Android.mk          |   3 +-
+ android/Makefile.am         |   1 +
+ android/client/haltest.c    |   2 +
+ android/client/if-rc-ctrl.c | 112 ++++++++++++++++++++++++++++++++++++++++++++
+ android/client/if-rc.c      |  88 ----------------------------------
+ 5 files changed, 117 insertions(+), 89 deletions(-)
+ create mode 100644 android/client/if-rc-ctrl.c
 
 diff --git a/android/Android.mk b/android/Android.mk
-index ffbc943..2d3403a 100644
+index 2d3403a..5495fd5 100644
 --- a/android/Android.mk
 +++ b/android/Android.mk
-@@ -137,7 +137,8 @@ LOCAL_SRC_FILES := \
+@@ -186,7 +186,8 @@ LOCAL_SRC_FILES := \
  ifeq ($(ANDROID_GE_5_0_0), 1)
  LOCAL_SRC_FILES += \
- 	bluez/android/hal-handsfree-client.c \
--	bluez/android/hal-map-client.c
-+	bluez/android/hal-map-client.c \
-+	bluez/android/hal-avrcp-ctrl.c
+ 	bluez/android/client/if-hf-client.c \
+-	bluez/android/client/if-mce.c
++	bluez/android/client/if-mce.c \
++	bluez/android/client/if-rc-ctrl.c
  endif
  
  LOCAL_C_INCLUDES += \
 diff --git a/android/Makefile.am b/android/Makefile.am
-index 8085fb5..d807aaa 100644
+index d807aaa..3787489 100644
 --- a/android/Makefile.am
 +++ b/android/Makefile.am
-@@ -65,6 +65,7 @@ android_bluetooth_default_la_SOURCES = android/hal.h android/hal-bluetooth.c \
- 					android/hal-pan.c \
- 					android/hal-a2dp.c \
- 					android/hal-avrcp.c \
-+					android/hal-avrcp-ctrl.c \
- 					android/hal-handsfree.c \
- 					android/hal-handsfree-client.c \
- 					android/hal-gatt.c \
-diff --git a/android/hal-avrcp-ctrl.c b/android/hal-avrcp-ctrl.c
+@@ -116,6 +116,7 @@ android_haltest_SOURCES = android/client/haltest.c \
+ 				android/client/if-main.h \
+ 				android/client/if-av.c \
+ 				android/client/if-rc.c \
++				android/client/if-rc-ctrl.c \
+ 				android/client/if-bt.c \
+ 				android/client/if-gatt.c \
+ 				android/client/if-hf.c \
+diff --git a/android/client/haltest.c b/android/client/haltest.c
+index c8cfdc4..add1978 100644
+--- a/android/client/haltest.c
++++ b/android/client/haltest.c
+@@ -51,6 +51,7 @@ const struct interface *interfaces[] = {
+ #if ANDROID_VERSION >= PLATFORM_VER(5, 0, 0)
+ 	&hf_client_if,
+ 	&mce_if,
++	&ctrl_rc_if,
+ #endif
+ 	NULL
+ };
+@@ -399,6 +400,7 @@ static void init(void)
+ #if ANDROID_VERSION >= PLATFORM_VER(5, 0, 0)
+ 		BT_PROFILE_HANDSFREE_CLIENT_ID,
+ 		BT_PROFILE_MAP_CLIENT_ID,
++		BT_PROFILE_AV_RC_CTRL_ID,
+ #endif
+ 	};
+ 	const struct method *m;
+diff --git a/android/client/if-rc-ctrl.c b/android/client/if-rc-ctrl.c
 new file mode 100644
-index 0000000..e289fcd
+index 0000000..52573a0
 --- /dev/null
-+++ b/android/hal-avrcp-ctrl.c
-@@ -0,0 +1,144 @@
++++ b/android/client/if-rc-ctrl.c
+@@ -0,0 +1,112 @@
 +/*
 + * Copyright (C) 2014 Intel Corporation
 + *
@@ -69,268 +89,203 @@ index 0000000..e289fcd
 + *
 + */
 +
-+#include <stdbool.h>
-+#include <stddef.h>
++#include <stdio.h>
++#include <ctype.h>
 +#include <string.h>
-+#include <stdlib.h>
 +
-+#include "hal-utils.h"
-+#include "hal-log.h"
-+#include "hal.h"
-+#include "hal-msg.h"
-+#include "ipc-common.h"
-+#include "hal-ipc.h"
++#include <hardware/bluetooth.h>
++#include <hardware/bt_rc.h>
 +
-+static const btrc_ctrl_callbacks_t *cbs = NULL;
++#include "if-main.h"
++#include "pollhandler.h"
++#include "../hal-utils.h"
 +
-+static bool interface_ready(void)
++const btrc_ctrl_interface_t *if_rc_ctrl = NULL;
++static char last_addr[MAX_ADDR_STR_LEN];
++
++static void passthrough_rsp_cb(int id, int key_state)
 +{
-+	return cbs != NULL;
++	haltest_info("%s: id=%d key_state=%d\n", __func__, id, key_state);
 +}
 +
-+static void handle_connection_state(void *buf, uint16_t len, int fd)
++static void connection_state_cb(bool state, bt_bdaddr_t *bd_addr)
 +{
-+	struct hal_ev_avrcp_ctrl_conn_state *ev = buf;
-+
-+	if (cbs->connection_state_cb)
-+		cbs->connection_state_cb(ev->state,
-+						(bt_bdaddr_t *) (ev->bdaddr));
++	haltest_info("%s: state=%s bd_addr=%s\n", __func__,
++					state ? "true" : "false",
++					bt_bdaddr_t2str(bd_addr, last_addr));
 +}
 +
-+static void handle_passthrough_rsp(void *buf, uint16_t len, int fd)
-+{
-+	struct hal_ev_avrcp_ctrl_passthrough_rsp *ev = buf;
-+
-+	if (cbs->passthrough_rsp_cb)
-+		cbs->passthrough_rsp_cb(ev->id, ev->key_state);
-+}
-+
-+/*
-+ * handlers will be called from notification thread context,
-+ * index in table equals to 'opcode - HAL_MINIMUM_EVENT'
-+ */
-+static const struct hal_ipc_handler ev_handlers[] = {
-+	/* HAL_EV_AVRCP_CTRL_CONN_STATE */
-+	{ handle_connection_state, false,
-+			sizeof(struct hal_ev_avrcp_ctrl_conn_state) },
-+	/* HAL_EV_AVRCP_CTRL_PASSTHROUGH_RSP */
-+	{ handle_passthrough_rsp, false,
-+			sizeof(struct hal_ev_avrcp_ctrl_passthrough_rsp) },
++static btrc_ctrl_callbacks_t rc_ctrl_cbacks = {
++	.size = sizeof(rc_ctrl_cbacks),
++	.passthrough_rsp_cb = passthrough_rsp_cb,
++	.connection_state_cb = connection_state_cb,
 +};
 +
-+static bt_status_t init(btrc_ctrl_callbacks_t *callbacks)
++/* init */
++
++static void init_p(int argc, const char **argv)
 +{
-+	struct hal_cmd_register_module cmd;
-+	int ret;
++	RETURN_IF_NULL(if_rc_ctrl);
 +
-+	DBG("");
++	EXEC(if_rc_ctrl->init, &rc_ctrl_cbacks);
++}
 +
-+	if (interface_ready())
-+		return BT_STATUS_DONE;
++/* cleanup */
 +
-+	cbs = callbacks;
++static void cleanup_p(int argc, const char **argv)
++{
++	RETURN_IF_NULL(if_rc_ctrl);
 +
-+	hal_ipc_register(HAL_SERVICE_ID_AVRCP_CTRL, ev_handlers,
-+				sizeof(ev_handlers) / sizeof(ev_handlers[0]));
++	EXECV(if_rc_ctrl->cleanup);
++	if_rc_ctrl = NULL;
++}
 +
-+	cmd.service_id = HAL_SERVICE_ID_AVRCP_CTRL;
-+	cmd.mode = HAL_MODE_DEFAULT;
++/* send_pass_through_cmd */
 +
-+	ret = hal_ipc_cmd(HAL_SERVICE_ID_CORE, HAL_OP_REGISTER_MODULE,
-+					sizeof(cmd), &cmd, NULL, NULL, NULL);
++static void send_pass_through_cmd_c(int argc, const char **argv,
++					enum_func *enum_func, void **user)
++{
++}
 +
-+	if (ret != BT_STATUS_SUCCESS) {
-+		cbs = NULL;
-+		hal_ipc_unregister(HAL_SERVICE_ID_AVRCP_CTRL);
++static void send_pass_through_cmd_p(int argc, const char **argv)
++{
++	bt_bdaddr_t addr;
++	uint8_t key_code, key_state;
++
++	RETURN_IF_NULL(if_rc);
++	VERIFY_ADDR_ARG(2, &addr);
++
++	if (argc <= 4) {
++		haltest_error("No key code specified");
++		return;
 +	}
 +
-+	return ret;
-+}
++	key_code = (uint8_t) atoi(argv[3]);
 +
-+static bt_status_t send_pass_through_cmd(bt_bdaddr_t *bd_addr, uint8_t key_code,
-+							uint8_t key_state)
-+{
-+	struct hal_cmd_avrcp_ctrl_send_passthrough cmd;
-+
-+	DBG("");
-+
-+	if (!interface_ready())
-+		return BT_STATUS_NOT_READY;
-+
-+	memcpy(cmd.bdaddr, bd_addr, sizeof(cmd.bdaddr));
-+	cmd.key_code = key_code;
-+	cmd.key_state = key_state;
-+
-+	return hal_ipc_cmd(HAL_SERVICE_ID_AVRCP_CTRL,
-+					HAL_OP_AVRCP_CTRL_SEND_PASSTHROUGH,
-+					sizeof(cmd), &cmd, NULL, NULL, NULL);
-+}
-+
-+static void cleanup(void)
-+{
-+	struct hal_cmd_unregister_module cmd;
-+
-+	DBG("");
-+
-+	if (!interface_ready())
++	if (argc <= 5) {
++		haltest_error("No key state specified");
 +		return;
++	}
 +
-+	cbs = NULL;
++	key_state = (uint8_t) atoi(argv[4]);
 +
-+	cmd.service_id = HAL_SERVICE_ID_AVRCP_CTRL;
-+
-+	hal_ipc_cmd(HAL_SERVICE_ID_CORE, HAL_OP_UNREGISTER_MODULE,
-+					sizeof(cmd), &cmd, NULL, NULL, NULL);
-+
-+	hal_ipc_unregister(HAL_SERVICE_ID_AVRCP_CTRL);
++	EXEC(if_rc_ctrl->send_pass_through_cmd, &addr, key_code, key_state);
 +}
 +
-+static btrc_ctrl_interface_t iface = {
-+	.size = sizeof(iface),
-+	.init = init,
-+	.send_pass_through_cmd = send_pass_through_cmd,
-+	.cleanup = cleanup
++static struct method methods[] = {
++	STD_METHOD(init),
++	STD_METHODCH(send_pass_through_cmd,
++					"<bd_addr> <key_code> <key_state>"),
++	STD_METHOD(cleanup),
++	END_METHOD
 +};
 +
-+btrc_ctrl_interface_t *bt_get_avrcp_ctrl_interface(void)
-+{
-+	return &iface;
-+}
-diff --git a/android/hal-avrcp.c b/android/hal-avrcp.c
-index b9b8ab9..6c7f195 100644
---- a/android/hal-avrcp.c
-+++ b/android/hal-avrcp.c
-@@ -29,10 +29,6 @@
++const struct interface ctrl_rc_if = {
++	.name = "rc-ctrl",
++	.methods = methods
++};
+diff --git a/android/client/if-rc.c b/android/client/if-rc.c
+index b42b8c6..ed65600 100644
+--- a/android/client/if-rc.c
++++ b/android/client/if-rc.c
+@@ -28,10 +28,6 @@
  
- static const btrc_callbacks_t *cbs = NULL;
+ const btrc_interface_t *if_rc = NULL;
  
 -#if ANDROID_VERSION >= PLATFORM_VER(5, 0, 0)
--static const btrc_ctrl_callbacks_t *ctrl_cbs = NULL;
+-const btrc_ctrl_interface_t *if_rc_ctrl = NULL;
 -#endif
 -
- static bool interface_ready(void)
- {
- 	return cbs != NULL;
-@@ -690,120 +686,3 @@ btrc_interface_t *bt_get_avrcp_interface(void)
- {
- 	return &iface;
- }
+ SINTMAP(btrc_play_status_t, -1, "(unknown)")
+ 	DELEMENT(BTRC_PLAYSTATE_STOPPED),
+ 	DELEMENT(BTRC_PLAYSTATE_PLAYING),
+@@ -402,87 +398,3 @@ const struct interface rc_if = {
+ 	.name = "rc",
+ 	.methods = methods
+ };
 -
 -#if ANDROID_VERSION >= PLATFORM_VER(5, 0, 0)
--
--static bool ctrl_interface_ready(void)
+-static void passthrough_rsp_cb(int id, int key_state)
 -{
--	return ctrl_cbs != NULL;
+-	haltest_info("%s: id=%d key_state=%d\n", __func__, id, key_state);
 -}
 -
--static void handle_connection_state(void *buf, uint16_t len, int fd)
+-static void connection_state_cb(bool state, bt_bdaddr_t *bd_addr)
 -{
--	struct hal_ev_avrcp_ctrl_conn_state *ev = buf;
--
--	if (ctrl_cbs->connection_state_cb)
--		ctrl_cbs->connection_state_cb(ev->state,
--						(bt_bdaddr_t *) (ev->bdaddr));
+-	haltest_info("%s: state=%s bd_addr=%s\n", __func__,
+-					state ? "true" : "false",
+-					bt_bdaddr_t2str(bd_addr, last_addr));
 -}
 -
--static void handle_passthrough_rsp(void *buf, uint16_t len, int fd)
--{
--	struct hal_ev_avrcp_ctrl_passthrough_rsp *ev = buf;
--
--	if (ctrl_cbs->passthrough_rsp_cb)
--		ctrl_cbs->passthrough_rsp_cb(ev->id, ev->key_state);
--}
--
--/*
-- * handlers will be called from notification thread context,
-- * index in table equals to 'opcode - HAL_MINIMUM_EVENT'
-- */
--static const struct hal_ipc_handler ctrl_ev_handlers[] = {
--	/* HAL_EV_AVRCP_CTRL_CONN_STATE */
--	{ handle_connection_state, false,
--			sizeof(struct hal_ev_avrcp_ctrl_conn_state) },
--	/* HAL_EV_AVRCP_CTRL_PASSTHROUGH_RSP */
--	{ handle_passthrough_rsp, false,
--			sizeof(struct hal_ev_avrcp_ctrl_passthrough_rsp) },
+-static btrc_ctrl_callbacks_t rc_ctrl_cbacks = {
+-	.size = sizeof(rc_ctrl_cbacks),
+-	.passthrough_rsp_cb = passthrough_rsp_cb,
+-	.connection_state_cb = connection_state_cb,
 -};
 -
--static bt_status_t ctrl_init(btrc_ctrl_callbacks_t *callbacks)
+-/* ctrl_init */
+-
+-static void ctrl_init_p(int argc, const char **argv)
 -{
--	struct hal_cmd_register_module cmd;
--	int ret;
+-	RETURN_IF_NULL(if_rc_ctrl);
 -
--	DBG("");
+-	EXEC(if_rc_ctrl->init, &rc_ctrl_cbacks);
+-}
 -
--	if (ctrl_interface_ready())
--		return BT_STATUS_DONE;
+-/* ctrl_cleanup */
 -
--	ctrl_cbs = callbacks;
+-static void ctrl_cleanup_p(int argc, const char **argv)
+-{
+-	RETURN_IF_NULL(if_rc_ctrl);
 -
--	hal_ipc_register(HAL_SERVICE_ID_AVRCP_CTRL, ctrl_ev_handlers,
--			sizeof(ctrl_ev_handlers) / sizeof(ctrl_ev_handlers[0]));
+-	EXECV(if_rc_ctrl->cleanup);
+-	if_rc_ctrl = NULL;
+-}
 -
--	cmd.service_id = HAL_SERVICE_ID_AVRCP_CTRL;
--	cmd.mode = HAL_MODE_DEFAULT;
+-/* send_pass_through_cmd */
 -
--	ret = hal_ipc_cmd(HAL_SERVICE_ID_CORE, HAL_OP_REGISTER_MODULE,
--					sizeof(cmd), &cmd, NULL, NULL, NULL);
+-static void send_pass_through_cmd_c(int argc, const char **argv,
+-					enum_func *enum_func, void **user)
+-{
+-}
 -
--	if (ret != BT_STATUS_SUCCESS) {
--		cbs = NULL;
--		hal_ipc_unregister(HAL_SERVICE_ID_AVRCP_CTRL);
+-static void send_pass_through_cmd_p(int argc, const char **argv)
+-{
+-	bt_bdaddr_t addr;
+-	uint8_t key_code, key_state;
+-
+-	RETURN_IF_NULL(if_rc);
+-	VERIFY_ADDR_ARG(2, &addr);
+-
+-	if (argc <= 4) {
+-		haltest_error("No key code specified");
+-		return;
 -	}
 -
--	return ret;
--}
+-	key_code = (uint8_t) atoi(argv[3]);
 -
--static bt_status_t send_pass_through_cmd(bt_bdaddr_t *bd_addr, uint8_t key_code,
--							uint8_t key_state)
--{
--	struct hal_cmd_avrcp_ctrl_send_passthrough cmd;
--
--	DBG("");
--
--	if (!ctrl_interface_ready())
--		return BT_STATUS_NOT_READY;
--
--	memcpy(cmd.bdaddr, bd_addr, sizeof(cmd.bdaddr));
--	cmd.key_code = key_code;
--	cmd.key_state = key_state;
--
--	return hal_ipc_cmd(HAL_SERVICE_ID_AVRCP_CTRL,
--					HAL_OP_AVRCP_CTRL_SEND_PASSTHROUGH,
--					sizeof(cmd), &cmd, NULL, NULL, NULL);
--}
--
--static void ctrl_cleanup(void)
--{
--	struct hal_cmd_unregister_module cmd;
--
--	DBG("");
--
--	if (!ctrl_interface_ready())
+-	if (argc <= 5) {
+-		haltest_error("No key state specified");
 -		return;
+-	}
 -
--	ctrl_cbs = NULL;
+-	key_state = (uint8_t) atoi(argv[4]);
 -
--	cmd.service_id = HAL_SERVICE_ID_AVRCP_CTRL;
--
--	hal_ipc_cmd(HAL_SERVICE_ID_CORE, HAL_OP_UNREGISTER_MODULE,
--					sizeof(cmd), &cmd, NULL, NULL, NULL);
--
--	hal_ipc_unregister(HAL_SERVICE_ID_AVRCP_CTRL);
+-	EXEC(if_rc_ctrl->send_pass_through_cmd, &addr, key_code, key_state);
 -}
 -
--static btrc_ctrl_interface_t ctrl_iface = {
--	.size = sizeof(ctrl_iface),
--	.init = ctrl_init,
--	.send_pass_through_cmd = send_pass_through_cmd,
--	.cleanup = ctrl_cleanup
+-static struct method ctrl_methods[] = {
+-	STD_METHOD(ctrl_init),
+-	STD_METHODCH(send_pass_through_cmd,
+-					"<bd_addr> <key_code> <key_state>"),
+-	STD_METHOD(ctrl_cleanup),
+-	END_METHOD
 -};
 -
--btrc_ctrl_interface_t *bt_get_avrcp_ctrl_interface(void)
--{
--	return &ctrl_iface;
--}
+-const struct interface ctrl_rc_if = {
+-	.name = "rc-ctrl",
+-	.methods = ctrl_methods
+-};
 -#endif
 -- 
 2.1.0
