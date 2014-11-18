@@ -1,42 +1,41 @@
 Return-Path: <cyrus@holtmann.org>
-From: Sebastian Chlad <sebastian.chlad@tieto.com>
+From: Szymon Janc <szymon.janc@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Sebastian Chlad <sebastian.chlad@tieto.com>
-Subject: [PATCH v2] android/pts: PTS tests for MAP on Android 5
-Date: Tue, 18 Nov 2014 18:19:47 +0100
-Message-Id: <1416331187-12084-1-git-send-email-sebastian.chlad@tieto.com>
+Cc: Szymon Janc <szymon.janc@tieto.com>
+Subject: [PATCH 2/3] doc: Remove invalid error from Add/Remove Remote OOB Data commands
+Date: Tue, 18 Nov 2014 17:32:49 +0100
+Message-Id: <1416328370-19305-2-git-send-email-szymon.janc@tieto.com>
+In-Reply-To: <1416328370-19305-1-git-send-email-szymon.janc@tieto.com>
+References: <1416328370-19305-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Those commands are allowed to be executed when controller is not
+powered.
 ---
- android/pts-map.txt | 7 +++----
- 1 file changed, 3 insertions(+), 4 deletions(-)
+ doc/mgmt-api.txt | 2 --
+ 1 file changed, 2 deletions(-)
 
-diff --git a/android/pts-map.txt b/android/pts-map.txt
-index 57cb317..e8092e2 100644
---- a/android/pts-map.txt
-+++ b/android/pts-map.txt
-@@ -1,8 +1,8 @@
- PTS test results for MAP
+diff --git a/doc/mgmt-api.txt b/doc/mgmt-api.txt
+index 91cd0ab..32cb281 100644
+--- a/doc/mgmt-api.txt
++++ b/doc/mgmt-api.txt
+@@ -1280,7 +1280,6 @@ Add Remote Out Of Band Data Command
  
- PTS version: 5.3
--Tested: 15-October-2014
--Android version: 4.4.4
-+Tested: 18-November-2014
-+Android version: 5.0
+ 	Possible errors:	Failed
+ 				Invalid Parameters
+-				Not Powered
+ 				Invalid Index
  
- Results:
- PASS	test passed
-@@ -69,8 +69,7 @@ TC_MSE_MMB_BV_18_I	N/A
- TC_MSE_MMB_BV_13_I	PASS
- TC_MSE_MMB_BV_14_I	PASS
- TC_MSE_MMB_BV_15_I	PASS
--TC_MSE_MMB_BV_16_I	PASS	Android MAP server bug, fix provided at
--				android-review.googlesource.com/#/c/82757
-+TC_MSE_MMB_BV_16_I	PASS
- TC_MSE_MMD_BV_02_I	PASS
- TC_MSE_MMU_BV_02_I	PASS	At least one SMS must be present in inbox
- TC_MSE_MMU_BV_03_I	PASS
+ 
+@@ -1312,7 +1311,6 @@ Remove Remote Out Of Band Data Command
+ 	or failure.
+ 
+ 	Possible errors:	Invalid Parameters
+-				Not Powered
+ 				Invalid Index
+ 
+ 
 -- 
-1.8.5.3
+1.9.1
 
