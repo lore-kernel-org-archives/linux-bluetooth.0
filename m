@@ -1,121 +1,46 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 09/14] android/handsfree-client: Add support to get operator name
-Date: Tue, 18 Nov 2014 21:17:34 +0100
-Message-ID: <1822366.kYQ1BXEaQf@leonov>
-In-Reply-To: <1415789377-20458-10-git-send-email-lukasz.rymanowski@tieto.com>
-References: <1415789377-20458-1-git-send-email-lukasz.rymanowski@tieto.com> <1415789377-20458-10-git-send-email-lukasz.rymanowski@tieto.com>
+Date: Tue, 18 Nov 2014 15:14:36 -0500
+From: "John W. Linville" <linville@tuxdriver.com>
+To: linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: pull request: bluetooth-next 2014-11-18
+Message-ID: <20141118201435.GE13458@tuxdriver.com>
+References: <20141118091952.GA14015@t440s.lan>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20141118091952.GA14015@t440s.lan>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Łukasz,
-
-On Wednesday 12 of November 2014 11:49:32 Lukasz Rymanowski wrote:
+On Tue, Nov 18, 2014 at 11:19:52AM +0200, Johan Hedberg wrote:
+> Hi John,
+> 
+> Here's another bluetooth-next pull request for 3.19. We've got:
+> 
+>  - Various fixes, cleanups and improvements to ieee802154/mac802154
+>  - Support for a Broadcom BCM20702A1 variant
+>  - Lots of lockdep fixes
+>  - Fixed handling of LE CoC errors that should trigger SMP
+> 
+> Please let me know if there are any issues pulling. Thanks.
+> 
+> Johan
+> 
 > ---
->  android/handsfree-client.c | 58
-> ++++++++++++++++++++++++++++++++++++++++++++-- 1 file changed, 56
-> insertions(+), 2 deletions(-)
+> The following changes since commit 56b2c3eea398c772dd895dc62c18cbdd1ba127b1:
 > 
-> diff --git a/android/handsfree-client.c b/android/handsfree-client.c
-> index c710b48..2931c5c 100644
-> --- a/android/handsfree-client.c
-> +++ b/android/handsfree-client.c
-> @@ -603,10 +603,26 @@ done:
+>   6lowpan: move skb_free from error paths in decompression (2014-11-06 22:09:48 +0100)
 > 
->  static void handle_query_operator_name(const void *buf, uint16_t len)
->  {
-> -	DBG("Not Implemented");
-> +	struct device *dev;
-> +	uint8_t status;
-> +
-> +	DBG("");
-> +
-> +	dev = find_default_device();
-> +	if (!dev) {
-> +		status = HAL_STATUS_FAILED;
-> +		goto done;
-> +	}
-> +
-> +	if (hfp_hf_send_command(dev->hf, cmd_complete_cb, NULL, "AT+COPS?"))
-> +		status = HAL_STATUS_SUCCESS;
-> +	else
-> +		status = HAL_STATUS_FAILED;
-> +
-> +done:
->  	ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_HANDSFREE_CLIENT,
->  					HAL_OP_HF_CLIENT_QUERY_OPERATOR_NAME,
-> -					HAL_STATUS_UNSUPPORTED);
-> +					status);
->  }
+> are available in the git repository at:
 > 
->  static void handle_retrieve_subscr_info(const void *buf, uint16_t len)
-> @@ -857,6 +873,43 @@ static void ciev_cb(struct hfp_context *context, void
-> *user_data) }
->  }
+>   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git for-upstream
 > 
-> +static void cops_cb(struct hfp_context *context, void *user_data)
-> +{
-> +	uint8_t buf[IPC_MTU];
-> +	struct hal_ev_hf_client_operator_name *ev = (void *) buf;
-> +	char name[17];
-> +	uint32_t format;
-
-unsigned int
-
-> +
-> +	DBG("");
-> +
-> +	if (!context) {
-> +		error("hf-client: incorrect COPS response");
-> +		return;
-> +	}
-
-Not needed.
-
-> +
-> +	/* Not interested in mode */
-> +	hfp_context_skip_field(context);
-> +
-> +	if (!hfp_context_get_number(context, &format))
-> +		return;
-> +
-> +	if (format != 0)
-> +		info("hf-client: Not correct string format in +COSP");
-> +
-> +	if (!hfp_context_get_string(context, name, sizeof(name))) {
-> +		error("hf-client: incorrect COPS response");
-> +		return;
-> +	}
-> +
-> +	memset(buf, 0, sizeof(buf));
-
-This memset is not really needed since all relevant data is later overwritten.
-Maybe just extract name directly to ev->name?
-
-> +	ev->name_len = strlen(name) + 1;
-> +	memcpy(ev->name, name, ev->name_len);
-> +
-> +	ipc_send_notif(hal_ipc, HAL_SERVICE_ID_HANDSFREE_CLIENT,
-> +					HAL_EV_HF_CLIENT_OPERATOR_NAME,
-> +					sizeof(*ev) + ev->name_len, ev);
-> +}
-> +
->  static void slc_completed(struct device *dev)
->  {
->  	int i;
-> @@ -884,6 +937,7 @@ static void slc_completed(struct device *dev)
->  	hfp_hf_register(dev->hf, brth_cb, "+BTRH", dev, NULL);
->  	hfp_hf_register(dev->hf, clcc_cb, "+CLCC", dev, NULL);
->  	hfp_hf_register(dev->hf, ciev_cb, "+CIEV", dev, NULL);
-> +	hfp_hf_register(dev->hf, cops_cb, "+COPS", dev, NULL);
->  }
+> for you to fetch changes up to a86c02ea38c53b695209b1181f9e2e18d73eb4e8:
 > 
->  static void slc_chld_cb(struct hfp_context *context, void *user_data)
+>   Bluetooth: Add support for Broadcom BCM20702A1 variant (2014-11-18 08:32:14 +0100)
+
+Pulling now...
 
 -- 
-BR
-Szymon Janc
+John W. Linville		Someday the world will need a hero, and you
+linville@tuxdriver.com			might be all we have.  Be ready.
