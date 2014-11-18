@@ -2,215 +2,43 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH 3/3] mgmt-tester: Add 'Add Remote OOB Data' command tests
-Date: Tue, 18 Nov 2014 17:32:50 +0100
-Message-Id: <1416328370-19305-3-git-send-email-szymon.janc@tieto.com>
-In-Reply-To: <1416328370-19305-1-git-send-email-szymon.janc@tieto.com>
-References: <1416328370-19305-1-git-send-email-szymon.janc@tieto.com>
+Subject: [PATCH 1/3] doc: Update Remote OOB Management commands description
+Date: Tue, 18 Nov 2014 17:32:48 +0100
+Message-Id: <1416328370-19305-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Those commands accept only BR/EDR type of device.
 ---
- tools/mgmt-tester.c | 180 ++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 180 insertions(+)
+ doc/mgmt-api.txt | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/tools/mgmt-tester.c b/tools/mgmt-tester.c
-index 7d14fe4..c8ea45f 100644
---- a/tools/mgmt-tester.c
-+++ b/tools/mgmt-tester.c
-@@ -3067,6 +3067,161 @@ static const struct generic_data set_privacy_nval_param_test = {
- 	.expect_status = MGMT_STATUS_INVALID_PARAMS,
- };
+diff --git a/doc/mgmt-api.txt b/doc/mgmt-api.txt
+index 6374b61..91cd0ab 100644
+--- a/doc/mgmt-api.txt
++++ b/doc/mgmt-api.txt
+@@ -1254,8 +1254,8 @@ Add Remote Out Of Band Data Command
  
-+static const char add_remote_oob_data_valid_param_1[] = {
-+			0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x00,
-+			0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
-+			0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
-+			0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17,
-+			0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f };
-+
-+static const char add_remote_oob_data_valid_param_2[] = {
-+			0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x00,
-+			0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
-+			0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
-+			0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17,
-+			0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f,
-+			0x20, 0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27,
-+			0x28, 0x29, 0x2a, 0x2b, 0x2c, 0x2d, 0x2e, 0x2f,
-+			0x30, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37,
-+			0x38, 0x39, 0x3a, 0x3b, 0x3c, 0x3d, 0x3e, 0x3f};
-+
-+static const char add_remote_oob_data_invalid_param_1[] = {
-+			0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x01,
-+			0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
-+			0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
-+			0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17,
-+			0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f };
-+
-+static const char add_remote_oob_data_invalid_param_2[] = {
-+			0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x02,
-+			0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
-+			0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
-+			0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17,
-+			0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f };
-+
-+static const char add_remote_oob_data_invalid_param_3[] = {
-+			0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x01,
-+			0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
-+			0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
-+			0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17,
-+			0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f,
-+			0x20, 0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27,
-+			0x28, 0x29, 0x2a, 0x2b, 0x2c, 0x2d, 0x2e, 0x2f,
-+			0x30, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37,
-+			0x38, 0x39, 0x3a, 0x3b, 0x3c, 0x3d, 0x3e, 0x3f};
-+
-+static const char add_remote_oob_data_invalid_param_4[] = {
-+			0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x02,
-+			0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
-+			0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
-+			0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17,
-+			0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f,
-+			0x20, 0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27,
-+			0x28, 0x29, 0x2a, 0x2b, 0x2c, 0x2d, 0x2e, 0x2f,
-+			0x30, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37,
-+			0x38, 0x39, 0x3a, 0x3b, 0x3c, 0x3d, 0x3e, 0x3f};
-+
-+static const char add_remote_oob_data_invalid_param_5[] = {
-+			0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x00,
-+			0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
-+			0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
-+			0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17,
-+			0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f,
-+			0x28, 0x29, 0x2a, 0x2b, 0x2c, 0x2d, 0x2e, 0x2f};
-+
-+static const char add_remote_oob_data_invalid_param_6[] = {
-+			0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x00,
-+			0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
-+			0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
-+			0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17,
-+			0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f,
-+			0x20, 0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27,
-+			0x28, 0x29, 0x2a, 0x2b, 0x2c, 0x2d, 0x2e, 0x2f,
-+			0x30, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37,
-+			0x38, 0x39, 0x3a, 0x3b, 0x3c, 0x3d, 0x3e, 0x3f,
-+			0x48, 0x49, 0x4a, 0x4b, 0x4c, 0x4d, 0x4e, 0x4f};
-+
-+static const char add_remote_oob_data_valid_rsp[] = {
-+			0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x00 };
-+
-+static const char add_remote_oob_data_invalid1_rsp[] = {
-+			0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x01 };
-+
-+static const char add_remote_oob_data_invalid2_rsp[] = {
-+			0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x02 };
-+
-+static const struct generic_data add_remote_oob_data_success1_test = {
-+	.send_opcode = MGMT_OP_ADD_REMOTE_OOB_DATA,
-+	.send_param = add_remote_oob_data_valid_param_1,
-+	.send_len = sizeof(add_remote_oob_data_valid_param_1),
-+	.expect_status = MGMT_STATUS_SUCCESS,
-+	.expect_param = add_remote_oob_data_valid_rsp,
-+	.expect_len = sizeof(add_remote_oob_data_valid_rsp),
-+};
-+
-+static const struct generic_data add_remote_oob_data_success2_test = {
-+	.send_opcode = MGMT_OP_ADD_REMOTE_OOB_DATA,
-+	.send_param = add_remote_oob_data_valid_param_2,
-+	.send_len = sizeof(add_remote_oob_data_valid_param_2),
-+	.expect_status = MGMT_STATUS_SUCCESS,
-+	.expect_param = add_remote_oob_data_valid_rsp,
-+	.expect_len = sizeof(add_remote_oob_data_valid_rsp),
-+};
-+
-+static const struct generic_data add_remote_oob_data_invalid1_test = {
-+	.send_opcode = MGMT_OP_ADD_REMOTE_OOB_DATA,
-+	.send_param = add_remote_oob_data_invalid_param_1,
-+	.send_len = sizeof(add_remote_oob_data_invalid_param_1),
-+	.expect_status = MGMT_STATUS_INVALID_PARAMS,
-+	.expect_param = add_remote_oob_data_invalid1_rsp,
-+	.expect_len = sizeof(add_remote_oob_data_invalid1_rsp),
-+};
-+
-+static const struct generic_data add_remote_oob_data_invalid2_test = {
-+	.send_opcode = MGMT_OP_ADD_REMOTE_OOB_DATA,
-+	.send_param = add_remote_oob_data_invalid_param_2,
-+	.send_len = sizeof(add_remote_oob_data_invalid_param_2),
-+	.expect_status = MGMT_STATUS_INVALID_PARAMS,
-+	.expect_param = add_remote_oob_data_invalid2_rsp,
-+	.expect_len = sizeof(add_remote_oob_data_invalid2_rsp),
-+};
-+
-+static const struct generic_data add_remote_oob_data_invalid3_test = {
-+	.send_opcode = MGMT_OP_ADD_REMOTE_OOB_DATA,
-+	.send_param = add_remote_oob_data_invalid_param_3,
-+	.send_len = sizeof(add_remote_oob_data_invalid_param_3),
-+	.expect_status = MGMT_STATUS_INVALID_PARAMS,
-+	.expect_param = add_remote_oob_data_invalid1_rsp,
-+	.expect_len = sizeof(add_remote_oob_data_invalid1_rsp),
-+};
-+
-+static const struct generic_data add_remote_oob_data_invalid4_test = {
-+	.send_opcode = MGMT_OP_ADD_REMOTE_OOB_DATA,
-+	.send_param = add_remote_oob_data_invalid_param_4,
-+	.send_len = sizeof(add_remote_oob_data_invalid_param_4),
-+	.expect_status = MGMT_STATUS_INVALID_PARAMS,
-+	.expect_param = add_remote_oob_data_invalid2_rsp,
-+	.expect_len = sizeof(add_remote_oob_data_invalid2_rsp),
-+};
-+
-+static const struct generic_data add_remote_oob_data_invalid5_test = {
-+	.send_opcode = MGMT_OP_ADD_REMOTE_OOB_DATA,
-+	.send_param = add_remote_oob_data_invalid_param_5,
-+	.send_len = sizeof(add_remote_oob_data_invalid_param_5),
-+	.expect_status = MGMT_STATUS_INVALID_PARAMS,
-+	.expect_param = add_remote_oob_data_valid_rsp,
-+	.expect_len = sizeof(add_remote_oob_data_valid_rsp),
-+};
-+
-+static const struct generic_data add_remote_oob_data_invalid6_test = {
-+	.send_opcode = MGMT_OP_ADD_REMOTE_OOB_DATA,
-+	.send_param = add_remote_oob_data_invalid_param_6,
-+	.send_len = sizeof(add_remote_oob_data_invalid_param_6),
-+	.expect_status = MGMT_STATUS_INVALID_PARAMS,
-+	.expect_param = add_remote_oob_data_valid_rsp,
-+	.expect_len = sizeof(add_remote_oob_data_valid_rsp),
-+};
-+
- static const void *get_conn_info_send_param_func(uint16_t *len)
- {
- 	struct test_data *data = tester_get_data();
-@@ -4869,5 +5024,30 @@ int main(int argc, char *argv[])
- 				&remove_device_success_3,
- 				setup_add_device, test_command_generic);
+ 	Possible values for the Address_Type parameter:
+ 		0	BR/EDR
+-		1	LE Public
+-		2	LE Random
++		1	Reserved (not in use)
++		2	Reserved (not in use)
  
-+	test_bredrle("Add Remote OOB Data - Success 1",
-+				&add_remote_oob_data_success1_test,
-+				NULL, test_command_generic);
-+	test_bredrle("Add Remote OOB Data - Success 2",
-+				&add_remote_oob_data_success2_test,
-+				NULL, test_command_generic);
-+	test_bredrle("Add Remote OOB Data - Invalid Parameters 1",
-+				&add_remote_oob_data_invalid1_test,
-+				NULL, test_command_generic);
-+	test_bredrle("Add Remote OOB Data - Invalid Parameters 2",
-+				&add_remote_oob_data_invalid2_test,
-+				NULL, test_command_generic);
-+	test_bredrle("Add Remote OOB Data - Invalid Parameters 3",
-+				&add_remote_oob_data_invalid3_test,
-+				NULL, test_command_generic);
-+	test_bredrle("Add Remote OOB Data - Invalid Parameters 4",
-+				&add_remote_oob_data_invalid4_test,
-+				NULL, test_command_generic);
-+	test_bredrle("Add Remote OOB Data - Invalid Parameters 5",
-+				&add_remote_oob_data_invalid5_test,
-+				NULL, test_command_generic);
-+	test_bredrle("Add Remote OOB Data - Invalid Parameters 6",
-+				&add_remote_oob_data_invalid6_test,
-+				NULL, test_command_generic);
-+
- 	return tester_run();
- }
+ 	Provided Out Of Band data is persistent over power down/up toggles.
+ 
+@@ -1299,8 +1299,8 @@ Remove Remote Out Of Band Data Command
+ 
+ 	Possible values for the Address_Type parameter:
+ 		0	BR/EDR
+-		1	LE Public
+-		2	LE Random
++		1	Reserved (not in use)
++		2	Reserved (not in use)
+ 
+ 	When the Address parameter is 00:00:00:00:00:00, then all
+ 	previously added data will be removed.
 -- 
 1.9.1
 
