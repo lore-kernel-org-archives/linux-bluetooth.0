@@ -1,32 +1,45 @@
 Return-Path: <cyrus@holtmann.org>
-From: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
+From: Marcin Kraglak <marcin.kraglak@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
-Subject: [PATCH 0/2] Create separate file for AVRCP CTRL
-Date: Tue, 18 Nov 2014 14:54:47 +0200
-Message-Id: <1416315289-2126-1-git-send-email-ravikumar.veeramally@linux.intel.com>
+Subject: [PATCH] android/pts: Update IOPT PICS and PTS test results
+Date: Tue, 18 Nov 2014 13:39:00 +0100
+Message-Id: <1416314340-32688-1-git-send-email-marcin.kraglak@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Patchset contains changes related to AVRCP CTRL. Moving AVRCP CTRL
-HAL and Client related changes to it's own file (agreed on IRC to
-maintain separate file for each HAL).
+---
+ android/pics-iopt.txt | 2 +-
+ android/pts-iopt.txt  | 4 ++--
+ 2 files changed, 3 insertions(+), 3 deletions(-)
 
-Ravi kumar Veeramally (2):
-  android/hal-avrcp-ctrl: Create separate HAL for AVRCP CTRL
-  android/client: Create separate file for AVRCP CTRL
-
- android/Android.mk          |   2 +
- android/Makefile.am         |   2 +
- android/client/haltest.c    |   2 +
- android/client/if-rc-ctrl.c | 112 ++++++++++++++++++++++++++++++++++
- android/client/if-rc.c      |  88 ---------------------------
- android/hal-avrcp-ctrl.c    | 144 ++++++++++++++++++++++++++++++++++++++++++++
- android/hal-avrcp.c         | 121 -------------------------------------
- 7 files changed, 262 insertions(+), 209 deletions(-)
- create mode 100644 android/client/if-rc-ctrl.c
- create mode 100644 android/hal-avrcp-ctrl.c
-
+diff --git a/android/pics-iopt.txt b/android/pics-iopt.txt
+index 0b7446e..1276224 100644
+--- a/android/pics-iopt.txt
++++ b/android/pics-iopt.txt
+@@ -96,7 +96,7 @@ TSPC_support_HealthDeviceProfile_Sink	True (*)	Support for: HDP
+ TSPC_support_HealthDeviceProfile_Source	False		Support for: HDP
+ 							Role: Source
+ 
+-TSPC_support_NewHandsFreeProfile_AG	False		Support for: HFP
++TSPC_support_NewHandsFreeProfile_AG	True		Support for: HFP
+ 							Role: Audio gateway
+ 
+ TSPC_support_NewHandsFreeProfile_HF	False		Support for: HFP
+diff --git a/android/pts-iopt.txt b/android/pts-iopt.txt
+index aec40ed..f746b1c 100644
+--- a/android/pts-iopt.txt
++++ b/android/pts-iopt.txt
+@@ -1,8 +1,8 @@
+ PTS test results for IOPT
+ 
+ PTS version: 5.3
+-Tested: 20-October-2014
+-Android version: 4.4.4
++Tested: 18-November-2014
++Android version: 5.0
+ 
+ Results:
+ PASS	test passed
 -- 
-2.1.0
+1.9.3
 
