@@ -1,55 +1,49 @@
 Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
-To: Marcin Kraglak <marcin.kraglak@tieto.com>
+To: Sebastian Chlad <sebastian.chlad@tieto.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] android/pts: Update IOPT PICS and PTS test results
-Date: Tue, 18 Nov 2014 23:18:54 +0100
-Message-ID: <3569506.z2X58Bcpdb@leonov>
-In-Reply-To: <1416314340-32688-1-git-send-email-marcin.kraglak@tieto.com>
-References: <1416314340-32688-1-git-send-email-marcin.kraglak@tieto.com>
+Subject: Re: [PATCH v2] android/pts: PTS tests for MAP on Android 5
+Date: Tue, 18 Nov 2014 23:18:29 +0100
+Message-ID: <1422486.1oARzx6D6g@leonov>
+In-Reply-To: <1416331187-12084-1-git-send-email-sebastian.chlad@tieto.com>
+References: <1416331187-12084-1-git-send-email-sebastian.chlad@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcin,
+Hi Sebastian,
 
-On Tuesday 18 of November 2014 13:39:00 Marcin Kraglak wrote:
+On Tuesday 18 of November 2014 18:19:47 Sebastian Chlad wrote:
 > ---
->  android/pics-iopt.txt | 2 +-
->  android/pts-iopt.txt  | 4 ++--
->  2 files changed, 3 insertions(+), 3 deletions(-)
+>  android/pts-map.txt | 7 +++----
+>  1 file changed, 3 insertions(+), 4 deletions(-)
 > 
-> diff --git a/android/pics-iopt.txt b/android/pics-iopt.txt
-> index 0b7446e..1276224 100644
-> --- a/android/pics-iopt.txt
-> +++ b/android/pics-iopt.txt
-> @@ -96,7 +96,7 @@ TSPC_support_HealthDeviceProfile_Sink	True (*)	
-Support
-> for: HDP TSPC_support_HealthDeviceProfile_Source	False		Support for: 
-HDP
->  							Role: Source
-> 
-> -TSPC_support_NewHandsFreeProfile_AG	False		Support for: HFP
-> +TSPC_support_NewHandsFreeProfile_AG	True		Support for: HFP
->  							Role: Audio gateway
-> 
->  TSPC_support_NewHandsFreeProfile_HF	False		Support for: HFP
-> diff --git a/android/pts-iopt.txt b/android/pts-iopt.txt
-> index aec40ed..f746b1c 100644
-> --- a/android/pts-iopt.txt
-> +++ b/android/pts-iopt.txt
+> diff --git a/android/pts-map.txt b/android/pts-map.txt
+> index 57cb317..e8092e2 100644
+> --- a/android/pts-map.txt
+> +++ b/android/pts-map.txt
 > @@ -1,8 +1,8 @@
->  PTS test results for IOPT
+>  PTS test results for MAP
 > 
 >  PTS version: 5.3
-> -Tested: 20-October-2014
+> -Tested: 15-October-2014
 > -Android version: 4.4.4
 > +Tested: 18-November-2014
 > +Android version: 5.0
 > 
 >  Results:
 >  PASS	test passed
+> @@ -69,8 +69,7 @@ TC_MSE_MMB_BV_18_I	N/A
+>  TC_MSE_MMB_BV_13_I	PASS
+>  TC_MSE_MMB_BV_14_I	PASS
+>  TC_MSE_MMB_BV_15_I	PASS
+> -TC_MSE_MMB_BV_16_I	PASS	Android MAP server bug, fix provided at
+> -				android-review.googlesource.com/#/c/82757
+> +TC_MSE_MMB_BV_16_I	PASS
+>  TC_MSE_MMD_BV_02_I	PASS
+>  TC_MSE_MMU_BV_02_I	PASS	At least one SMS must be present in inbox
+>  TC_MSE_MMU_BV_03_I	PASS
 
 Applied, thanks.
 
