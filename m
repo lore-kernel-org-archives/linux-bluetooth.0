@@ -1,49 +1,73 @@
 Return-Path: <cyrus@holtmann.org>
-From: Steven Walter <stevenrwalter@gmail.com>
-To: linux-kernel@vger.kernel.org,
-	linux-bluetooth@vger.kernel.org,
-	marcel@holtmann.org,
-	gustavo@padovan.org,
-	johan.hedberg@gmail.com
-Cc: Steven Walter <stevenrwalter@gmail.com>
-Subject: [PATCH] l2cap_core: automatically flushable packets aren't supported by LE-only devices
-Date: Tue, 18 Nov 2014 09:46:03 -0500
-Message-Id: <1416321963-17336-1-git-send-email-stevenrwalter@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <1416235257-12804-1-git-send-email-luiz.dentz@gmail.com>
+References: <1416235257-12804-1-git-send-email-luiz.dentz@gmail.com>
+Date: Tue, 18 Nov 2014 16:36:34 +0200
+Message-ID: <CABBYNZJi9zoVW-nYeNh19JYLALdwGLUqx61zqqts6G1iChAc-g@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 1/3] shared/queue: Simplify queue_remove_all
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The bluetooth spec states that automatically flushable packets may not
-be sent to a LE-only controller.  The code already supports
-non-automatically-flushable packets, but uses a bit in the controller
-feature field to determine whether to use them.  That bit is always zero
-for LE-only devices, so we need to check for the LE-only case explicitly.
----
- net/bluetooth/l2cap_core.c | 7 ++++---
- 1 file changed, 4 insertions(+), 3 deletions(-)
+Hi,
 
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 4af3821..29d9b9c 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -764,7 +764,7 @@ static void l2cap_send_cmd(struct l2cap_conn *conn, u8 ident, u8 code, u16 len,
- 	if (!skb)
- 		return;
- 
--	if (lmp_no_flush_capable(conn->hcon->hdev))
-+	if (lmp_no_flush_capable(conn->hcon->hdev) || !lmp_bredr_capable(conn->hcon->hdev))
- 		flags = ACL_START_NO_FLUSH;
- 	else
- 		flags = ACL_START;
-@@ -798,8 +798,9 @@ static void l2cap_do_send(struct l2cap_chan *chan, struct sk_buff *skb)
- 		return;
- 	}
- 
--	if (!test_bit(FLAG_FLUSHABLE, &chan->flags) &&
--	    lmp_no_flush_capable(hcon->hdev))
-+	if (!lmp_bredr_capable(hcon->hdev) ||
-+	    (!test_bit(FLAG_FLUSHABLE, &chan->flags) &&
-+	    lmp_no_flush_capable(hcon->hdev)))
- 		flags = ACL_START_NO_FLUSH;
- 	else
- 		flags = ACL_START;
+On Mon, Nov 17, 2014 at 4:40 PM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>
+> This makes use of queue_remove_if if possible.
+> ---
+>  src/shared/queue.c | 22 +++++-----------------
+>  1 file changed, 5 insertions(+), 17 deletions(-)
+>
+> diff --git a/src/shared/queue.c b/src/shared/queue.c
+> index 3ca3ca6..6bfe995 100644
+> --- a/src/shared/queue.c
+> +++ b/src/shared/queue.c
+> @@ -312,31 +312,19 @@ unsigned int queue_remove_all(struct queue *queue, queue_match_func_t function,
+>         entry = queue->head;
+>
+>         if (function) {
+> -               struct queue_entry *prev = NULL;
+> -
+>                 while (entry) {
+> -                       if (function(entry->data, user_data)) {
+> -                               struct queue_entry *tmp = entry;
+> -
+> -                               if (prev)
+> -                                       prev->next = entry->next;
+> -                               else
+> -                                       queue->head = entry->next;
+> -
+> -                               if (!entry->next)
+> -                                       queue->tail = prev;
+> +                       void *data;
+>
+> +                       data = queue_remove_if(queue, function, user_data);
+> +                       if (data) {
+>                                 entry = entry->next;
+>
+>                                 if (destroy)
+> -                                       destroy(tmp->data);
+> +                                       destroy(data);
+>
+> -                               free(tmp);
+>                                 count++;
+> -                       } else {
+> -                               prev = entry;
+> +                       } else
+>                                 entry = entry->next;
+> -                       }
+>                 }
+>
+>                 queue->entries -= count;
+> --
+> 1.9.3
+
+Pushed.
+
+
 -- 
-1.9.1
+Luiz Augusto von Dentz
