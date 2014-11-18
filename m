@@ -1,150 +1,202 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Tue, 18 Nov 2014 11:19:52 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: linville@tuxdriver.com
+Cc: linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: pull request: bluetooth-next 2014-11-18
+Message-ID: <20141118091952.GA14015@t440s.lan>
 MIME-Version: 1.0
-In-Reply-To: <1416263288-30530-3-git-send-email-szymon.janc@tieto.com>
-References: <1416263288-30530-1-git-send-email-szymon.janc@tieto.com>
-	<1416263288-30530-3-git-send-email-szymon.janc@tieto.com>
-Date: Tue, 18 Nov 2014 11:43:03 +0100
-Message-ID: <CAN_7+YY7TwdeEQnC=Re-UY81RHGzsF4q=WTzugvQb52dAqDEzw@mail.gmail.com>
-Subject: Re: [PATCH 03/16] android/hal-gatt: Implement client scan_filter_add_remove
-From: Lukasz Rymanowski <lukasz.rymanowski@gmail.com>
-To: Szymon Janc <szymon.janc@tieto.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="6TrnltStXW4iwmi0"
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Szymon,
 
-On Mon, Nov 17, 2014 at 11:27 PM, Szymon Janc <szymon.janc@tieto.com> wrote:
-> This adds required IPC message, HAL implementation and daemon stub
-> handler
-> ---
->  android/gatt.c     | 16 ++++++++++++++++
->  android/hal-gatt.c | 35 ++++++++++++++++++++++++++++++++---
->  android/hal-msg.h  | 17 +++++++++++++++++
->  3 files changed, 65 insertions(+), 3 deletions(-)
->
-> diff --git a/android/gatt.c b/android/gatt.c
-> index a441e4f..f104a2c 100644
-> --- a/android/gatt.c
-> +++ b/android/gatt.c
-> @@ -5553,6 +5553,19 @@ static void handle_client_scan_filter_setup(const void *buf, uint16_t len)
->                                         HAL_STATUS_UNSUPPORTED);
->  }
->
-> +static void handle_client_scan_filter_add_remove(const void *buf, uint16_t len)
-> +{
-> +       const struct hal_cmd_gatt_client_scan_filter_add_remove *cmd = buf;
-> +
-> +       DBG("client_if %u", cmd->client_if);
-> +
-> +       /* TODO */
-> +
-> +       ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_GATT,
-> +                               HAL_OP_GATT_CLIENT_SCAN_FILTER_ADD_REMOVE,
-> +                               HAL_STATUS_UNSUPPORTED);
-> +}
-> +
->  static const struct ipc_handler cmd_handlers[] = {
->         /* HAL_OP_GATT_CLIENT_REGISTER */
->         { handle_client_register, false,
-> @@ -5662,6 +5675,9 @@ static const struct ipc_handler cmd_handlers[] = {
->         /* HAL_OP_GATT_CLIENT_SCAN_FILTER_SETUP */
->         { handle_client_scan_filter_setup, false,
->                 sizeof(struct hal_cmd_gatt_client_scan_filter_setup) },
-> +       /* HAL_OP_GATT_CLIENT_SCAN_FILTER_ADD_REMOVE */
-> +       { handle_client_scan_filter_add_remove, true,
-> +               sizeof(struct hal_cmd_gatt_client_scan_filter_add_remove) },
->  };
->
->  static uint8_t read_by_group_type(const uint8_t *cmd, uint16_t cmd_len,
-> diff --git a/android/hal-gatt.c b/android/hal-gatt.c
-> index f4c3d31..3291d47 100644
-> --- a/android/hal-gatt.c
-> +++ b/android/hal-gatt.c
-> @@ -1345,11 +1345,40 @@ static bt_status_t scan_filter_add_remove(int client_if, int action,
->                                                 int data_len, char *p_data,
->                                                 int mask_len, char *p_mask)
->  {
-> -       DBG("");
-> +       char buf[IPC_MTU];
-> +       struct hal_cmd_gatt_client_scan_filter_add_remove *cmd = (void *) buf;
-> +       size_t cmd_len;
->
-> -       /* TODO */
-> +       if (!interface_ready())
-> +               return BT_STATUS_NOT_READY;
->
-> -       return BT_STATUS_UNSUPPORTED;
-> +       if (!p_uuid || !p_uuid_mask || !bd_addr)
-> +               return BT_STATUS_PARM_INVALID;
-> +
-> +       cmd_len = sizeof(*cmd) + data_len + mask_len;
-> +       if (cmd_len > IPC_MTU)
-> +               return BT_STATUS_FAIL;
-> +
-> +       cmd->client_if = client_if;
-> +       cmd->action = action;
-> +       cmd->filter_type = filt_type;
-> +       cmd->filter_index = filt_index;
-> +       cmd->company_id = company_id;
-> +       cmd->company_id_mask = company_id_mask;
-> +       memcpy(cmd->uuid, p_uuid, sizeof(*p_uuid));
-> +       memcpy(cmd->uuid_mask, p_uuid_mask, sizeof(*p_uuid_mask));
-> +       memcpy(cmd->address, bd_addr, sizeof(*bd_addr));
-> +       cmd->address_type = addr_type;
-> +
-> +       cmd->data_len = data_len;
-> +       memcpy(cmd->data_mask, p_data, data_len);
-> +
-> +       cmd->mask_len = mask_len;
-> +       memcpy(cmd->data_mask + data_len, p_mask, mask_len);
-> +
-> +       return hal_ipc_cmd(HAL_SERVICE_ID_GATT,
-> +                               HAL_OP_GATT_CLIENT_SCAN_FILTER_ADD_REMOVE,
-> +                               cmd_len, cmd, NULL, NULL, NULL);
->  }
->
->  static bt_status_t scan_filter_clear(int client_if, int filt_index)
-> diff --git a/android/hal-msg.h b/android/hal-msg.h
-> index c74c76b..94d0069 100644
-> --- a/android/hal-msg.h
-> +++ b/android/hal-msg.h
-> @@ -1044,6 +1044,23 @@ struct hal_cmd_gatt_client_scan_filter_setup {
->         int32_t found_timeout_cnt;
->  } __attribute__((packed));
->
-> +#define HAL_OP_GATT_CLIENT_SCAN_FILTER_ADD_REMOVE      0x025
-> +struct hal_cmd_gatt_client_scan_filter_add_remove {
-> +       int32_t client_if;
-> +       int32_t action;
-> +       int32_t filter_type;
-> +       int32_t filter_index;
-> +       int32_t company_id;
-> +       int32_t company_id_mask;
-> +       uint8_t uuid[16];
-> +       uint8_t uuid_mask[16];
-> +       uint8_t address[6];
-> +       uint8_t address_type;
-> +       int32_t data_len;
-> +       int32_t mask_len;
-> +       uint8_t data_mask[0];
+--6TrnltStXW4iwmi0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-Maybe comment here would be good saying  that first data_len bytes of
-data_mask[] is for data and so on?
-Or maybe some tlv could be used here?
+Hi John,
 
-> +} __attribute__((packed));
-> +
->  /* Handsfree client HAL API */
->
->  #define HAL_OP_HF_CLIENT_CONNECT               0x01
-> --
-> 1.9.3
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+Here's another bluetooth-next pull request for 3.19. We've got:
 
-\Łukasz
+ - Various fixes, cleanups and improvements to ieee802154/mac802154
+ - Support for a Broadcom BCM20702A1 variant
+ - Lots of lockdep fixes
+ - Fixed handling of LE CoC errors that should trigger SMP
+
+Please let me know if there are any issues pulling. Thanks.
+
+Johan
+
+---
+The following changes since commit 56b2c3eea398c772dd895dc62c18cbdd1ba127b1:
+
+  6lowpan: move skb_free from error paths in decompression (2014-11-06 22:09:48 +0100)
+
+are available in the git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git for-upstream
+
+for you to fetch changes up to a86c02ea38c53b695209b1181f9e2e18d73eb4e8:
+
+  Bluetooth: Add support for Broadcom BCM20702A1 variant (2014-11-18 08:32:14 +0100)
+
+----------------------------------------------------------------
+Alexander Aring (49):
+      Bluetooth: 6lowpan: fix skb_unshare behaviour
+      mac802154: move mac pib attributes into wpan_dev
+      mac802154: remove mac_params in sdata
+      ieee802154: rename wpan_phy_alloc
+      ieee802154: add cfg802154_registered_device list
+      ieee802154: add iftype to wpan_dev
+      ieee802154: add wpan_dev_list
+      ieee802154: sysfs add wpan_phy index and name
+      ieee802154: add new nl802154 header
+      ieee802154: add nl802154 framework
+      ieee802154: add wpan_phy dump support
+      ieee802154: add wpan_dev dump support
+      mac820154: don't set monitor dev_addr
+      ieee802154: netlink add rtnl lock
+      ieee802154: fix iface dump with lowpan
+      mac802154: protect address changes via ioctl
+      mac820154: move interface unregistration into iface
+      mac820154: rename sdata next to tmp
+      mac820154: move mutex locks out of loop
+      mac802154: add wpan_phy priv id
+      mac802154: change module description
+      mac802154: add ifname change notifier
+      ieee802154: cleanup cfg802154 intendation
+      ieee820154: add channel set support
+      ieee820154: remove valid page and channel checks
+      ieee820154: add pan_id setting support
+      ieee820154: add short_addr setting support
+      ieee820154: add backoff exponent setting support
+      at86rf230: remove invalid backoff exponent check
+      ieee820154: add max csma backoffs setting support
+      at86rf230: remove invalid max csma backoffs check
+      ieee820154: add max frame retries setting support
+      at86rf230: remove invalid max frame retries check
+      ieee820154: add lbt setting support
+      mac802154: add interframe spacing time handling
+      at86rf230: remove interframe spacing time workaround
+      mac802154: remove unused prototypes
+      at86rf230: fix commentation for symbol duration
+      mac802154: remove const for non pointer in driver-ops
+      mac802154: remove const for non pointer in cfg ops
+      mac802154: remove const for non pointer in rdev-ops
+      mac802154: remove deprecated linux-zigbee info
+      mac802154: use new nl802154 iftype types
+      mac802154: remove wpan_dev parameter in if_add
+      ieee802154: add new interface command
+      ieee802154: setting extended address while iface add
+      ieee802154: add del interface command
+      ieee802154: rename and move WPAN_NUM_ defines
+      ieee802154: fix byteorder for short address and panid
+
+Fabian Frederick (1):
+      Bluetooth: hidp: replace kzalloc/copy_from_user by memdup_user
+
+Fabio K (1):
+      Bluetooth: Add support for Broadcom BCM20702A1 variant
+
+Fugang Duan (1):
+      Bluetooth: hci-uart-ath: Correct the comments in this driver
+
+Jaganath Kanakkassery (1):
+      Bluetooth: Send mgmt_connected only if state is BT_CONFIG
+
+Johan Hedberg (20):
+      Bluetooth: Fix sparse warning in amp.c
+      Bluetooth: Fix mgmt connected notification
+      Bluetooth: 6lowpan: Remove unnecessary RCU callback
+      Bluetooth: Fix l2cap_sock_teardown_cb lockdep warning
+      Bluetooth: Remove unnecessary hci_dev_lock/unlock in smp.c
+      Bluetooth: Use proper nesting annotation for l2cap_chan lock
+      Bluetooth: Fix L2CAP socket lock nesting level
+      Bluetooth: Fix L2CAP nesting level initialization location
+      Bluetooth: Fix correct nesting for 6lowpan server channel
+      Bluetooth: Fix sending incorrect LE CoC PDU in BT_CONNECT2 state
+      Bluetooth: Add key preference parameter to smp_sufficient_security
+      Bluetooth: Trigger SMP for the appropriate LE CoC errors
+      Bluetooth: Convert LTK list to RCU
+      Bluetooth: Convert IRK list to RCU
+      Bluetooth: Remove unnecessary hdev locking in smp.c
+      Bluetooth: Add debug logs to help track locking issues
+      Bluetooth: Fix clearing remote OOB data through mgmt
+      Bluetooth: Fix BR/EDR-only address checks for remote OOB data
+      Bluetooth: Use shorter "rand" name for "randomizer"
+      Bluetooth: Call drain_workqueue() before resetting state
+
+ MAINTAINERS                        |   1 +
+ drivers/bluetooth/btusb.c          |   2 +
+ drivers/bluetooth/hci_ath.c        |   2 +-
+ drivers/net/ieee802154/at86rf230.c |  80 ++-
+ drivers/net/ieee802154/fakelb.c    |   3 -
+ include/linux/ieee802154.h         |  10 +
+ include/net/bluetooth/hci.h        |  12 +-
+ include/net/bluetooth/hci_core.h   |  16 +-
+ include/net/bluetooth/l2cap.h      |  15 +-
+ include/net/bluetooth/mgmt.h       |  12 +-
+ include/net/cfg802154.h            |  86 +++-
+ include/net/mac802154.h            |   3 +-
+ include/net/nl802154.h             | 122 +++++
+ net/bluetooth/6lowpan.c            |  21 +-
+ net/bluetooth/amp.c                |  25 +-
+ net/bluetooth/hci_core.c           | 112 ++--
+ net/bluetooth/hci_event.c          |  30 +-
+ net/bluetooth/hidp/core.c          |  10 +-
+ net/bluetooth/l2cap_core.c         |  35 +-
+ net/bluetooth/l2cap_sock.c         |  29 +-
+ net/bluetooth/mgmt.c               |  52 +-
+ net/bluetooth/smp.c                |  61 ++-
+ net/bluetooth/smp.h                |   9 +-
+ net/ieee802154/Makefile            |   2 +-
+ net/ieee802154/core.c              | 166 +++++-
+ net/ieee802154/core.h              |  17 +
+ net/ieee802154/ieee802154.h        |   2 +-
+ net/ieee802154/netlink.c           |   2 +-
+ net/ieee802154/nl-mac.c            |  23 +-
+ net/ieee802154/nl802154.c          | 957 +++++++++++++++++++++++++++++++++++
+ net/ieee802154/nl802154.h          |   7 +
+ net/ieee802154/rdev-ops.h          |  66 +++
+ net/ieee802154/sysfs.c             |  24 +
+ net/mac802154/cfg.c                | 165 +++++-
+ net/mac802154/driver-ops.h         |  46 +-
+ net/mac802154/ieee802154_i.h       |  38 +-
+ net/mac802154/iface.c              | 165 ++++--
+ net/mac802154/mac_cmd.c            |  36 +-
+ net/mac802154/main.c               |  54 +-
+ net/mac802154/mib.c                |  10 +-
+ net/mac802154/rx.c                 |  14 +-
+ net/mac802154/tx.c                 |   2 +-
+ net/mac802154/util.c               |  35 +-
+ 43 files changed, 2214 insertions(+), 365 deletions(-)
+ create mode 100644 include/net/nl802154.h
+ create mode 100644 net/ieee802154/nl802154.c
+ create mode 100644 net/ieee802154/nl802154.h
+
+
+--6TrnltStXW4iwmi0
+Content-Type: application/pgp-signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQIcBAEBAgAGBQJUaw84AAoJECQj9vv5qNQSw4kP/ifdpwsxh7tLoyhzj15ucelH
+cb5rpSJVM3wwQAWbnf+xAPofyUzkC0yJC+sMXZydw4R0zOtQEpomvhn8i4bDT3W9
+M+HWMk1HLlDnyZWmFHAXlSIG6DUtAy3RQxS3GsMqUwGhT/xmDtcCUdOD43iJXqor
+KE4eePPAHkVjhDJ701Xl8/wwxjR79H6k/r8VXOG9Jz8/8yyoMB+QG7klmF4Hu/G8
+CmOz2mynn/T3/zWhG930rro6Ho6/uyAcWrVwSHT4yP8BD0KKo5cOILL3gV4rPnh2
+YPUMPYf3ME/N4DC74GB8f87vxoDOvnmauecefrv7jnA8afabsK2EdjuFncRjXBZM
+J7q4OhvXKml6pMF6PalDmZ8WELGFNL0TKy7eaZbVvq7ra+dMncvBN3Vz4u+lqV/z
+bJma4UMRS+nEnm554lmL6LNz2pavJ9jrFWXNaFKatsp0SLe8Cp+bEGgjlnoYYdry
+2uxZzIqLKwG6jrCcpyVqYYpcFkljz+K992d3sl50dxGkbwLHbWZP6Wwwrtv8Ax7o
+MHIw/KIKfB4yL0sDperyi87FE5oriJ0/pf9HzfFApJoTDzmlSd8HLM4KbFTInRIr
+A0YM/8TNqJZBTYrkvaGUh4P7kdWUcfbg8fqvNI7KKH1XV0aIrmYy9wZROsZfpmJL
+MSS3OzMAJg60/MT6Qt4s
+=1ULF
+-----END PGP SIGNATURE-----
+
+--6TrnltStXW4iwmi0--
