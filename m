@@ -1,62 +1,136 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 8.1 \(1993\))
-Subject: Re: [PATCH] l2cap_core: automatically flushable packets aren't supported by LE-only devices
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1416321963-17336-1-git-send-email-stevenrwalter@gmail.com>
-Date: Wed, 19 Nov 2014 07:01:42 +0900
-Cc: linux-kernel <linux-kernel@vger.kernel.org>,
-	BlueZ development <linux-bluetooth@vger.kernel.org>,
-	"Gustavo F. Padovan" <gustavo@padovan.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>
-Message-Id: <106789BA-48C0-4428-BE3E-D0737F7A0641@holtmann.org>
-References: <1416321963-17336-1-git-send-email-stevenrwalter@gmail.com>
-To: Steven Walter <stevenrwalter@gmail.com>
-Sender: linux-kernel-owner@vger.kernel.org
+From: Szymon Janc <szymon.janc@tieto.com>
+To: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 14/14] android/handsfree-client: Implement codec negotiations
+Date: Tue, 18 Nov 2014 22:58:52 +0100
+Message-ID: <3758767.CHCAAQ9We3@leonov>
+In-Reply-To: <1415789377-20458-15-git-send-email-lukasz.rymanowski@tieto.com>
+References: <1415789377-20458-1-git-send-email-lukasz.rymanowski@tieto.com> <1415789377-20458-15-git-send-email-lukasz.rymanowski@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Steven,
+Hi Łukasz,
 
-> The bluetooth spec states that automatically flushable packets may not
-> be sent to a LE-only controller.  The code already supports
-> non-automatically-flushable packets, but uses a bit in the controller
-> feature field to determine whether to use them.  That bit is always zero
-> for LE-only devices, so we need to check for the LE-only case explicitly.
+On Wednesday 12 of November 2014 11:49:37 Lukasz Rymanowski wrote:
 > ---
-> net/bluetooth/l2cap_core.c | 7 ++++---
-> 1 file changed, 4 insertions(+), 3 deletions(-)
+>  android/handsfree-client.c | 62
+> ++++++++++++++++++++++++++++++++++++++++++++++ 1 file changed, 62
+> insertions(+)
 > 
-> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-> index 4af3821..29d9b9c 100644
-> --- a/net/bluetooth/l2cap_core.c
-> +++ b/net/bluetooth/l2cap_core.c
-> @@ -764,7 +764,7 @@ static void l2cap_send_cmd(struct l2cap_conn *conn, u8 ident, u8 code, u16 len,
-> 	if (!skb)
-> 		return;
+> diff --git a/android/handsfree-client.c b/android/handsfree-client.c
+> index 4338c11..74d1547 100644
+> --- a/android/handsfree-client.c
+> +++ b/android/handsfree-client.c
+> @@ -116,6 +116,7 @@ struct device {
+>  	struct hfp_hf *hf;
+>  	uint8_t state;
 > 
-> -	if (lmp_no_flush_capable(conn->hcon->hdev))
-> +	if (lmp_no_flush_capable(conn->hcon->hdev) || !lmp_bredr_capable(conn->hcon->hdev))
-> 		flags = ACL_START_NO_FLUSH;
-> 	else
-> 		flags = ACL_START;
-> @@ -798,8 +798,9 @@ static void l2cap_do_send(struct l2cap_chan *chan, struct sk_buff *skb)
-> 		return;
-> 	}
+> +	uint8_t negotiated_codec;
+>  	uint32_t features;
+>  	struct hfp_codec codecs[2];
 > 
-> -	if (!test_bit(FLAG_FLUSHABLE, &chan->flags) &&
-> -	    lmp_no_flush_capable(hcon->hdev))
-> +	if (!lmp_bredr_capable(hcon->hdev) ||
-> +	    (!test_bit(FLAG_FLUSHABLE, &chan->flags) &&
-> +	    lmp_no_flush_capable(hcon->hdev)))
-> 		flags = ACL_START_NO_FLUSH;
-> 	else
-> 		flags = ACL_START;
+> @@ -1034,6 +1035,66 @@ static void binp_cb(struct hfp_context *context, void
+> *user_data) sizeof(*ev) + ev->number_len, ev);
+>  }
+> 
+> +static bool is_codec_supported_localy(struct device *dev, uint8_t codec)
+> +{
+> +	int i;
+> +
+> +	for (i = 0; i < CODECS_COUNT; i++) {
+> +		if (dev->codecs[i].type != codec)
+> +			continue;
+> +
+> +		return dev->codecs[i].local_supported;
+> +	}
+> +
+> +	return false;
+> +}
+> +
+> +static void bcs_resp(enum hfp_result result, enum hfp_error cme_err,
+> +							void *user_data)
+> +{
+> +	DBG("%d", result);
 
-I do not think doing it this way is correct. I am actually surprised that it using fine right now, but I assume that is because all dual-mode controllers also support non-flushable packets.
+Shouldn't we handle error response?
 
-We should check the link type of the connection and if it is LE then we should always use non-flushable packets. The feature bits have really nothing to do with this. They only apply to the BR/EDR side of things. LE has its own supported feature bits.
+> +}
+> +
+> +static void bcs_cb(struct hfp_context *context, void *user_data)
+> +{
+> +	struct device *dev = user_data;
+> +	uint32_t codec;
 
-Regards
+unsigned int
 
-Marcel
+> +	char codecs_string[2 * CODECS_COUNT + 1];
+> +	char cmd[sizeof(codecs_string) + 7];
 
+Those really deserve some comment.
+
+> +
+> +	DBG("");
+> +
+> +	if (!context) {
+> +		error("hf-client: incorrect BCS response");
+> +		return;
+> +	}
+
+Not needed.
+
+> +
+> +	memset(cmd, 0, sizeof(cmd));
+> +
+> +	if (!hfp_context_get_number(context, &codec))
+> +		goto failed;
+> +
+> +	if (!is_codec_supported_localy(dev, codec))
+> +		goto failed;
+> +
+> +	sprintf(cmd, "AT+BCS=%d", codec);
+> +
+> +	dev->negotiated_codec = codec;
+> +
+> +	goto done;
+> +
+> +failed:
+
+I'd avoid this mixed labels jump, those make code hard to read.
+I'd make failed label handle only fail case. Just call hfp_hf_send_command 
+instead of those sprintfs. This will also make cmd not needed.
+
+> +	error("hf-client: Could not get codec");
+> +
+> +	strcpy(cmd, "AT+BCS=");
+> +
+> +	get_local_codecs_string(dev, codecs_string, sizeof(codecs_string));
+> +	strcat(cmd, codecs_string);
+
+maybe this is not really needed since hfp_hf_send_command accepts format 
+string?
+
+hfp_hf_send_command(dev->hf, bcs_resp, dev, "AT+BCS=%s", codecs_string);
+
+> +
+> +done:
+> +	hfp_hf_send_command(dev->hf, bcs_resp, dev, cmd);
+> +}
+> +
+>  static void slc_completed(struct device *dev)
+>  {
+>  	int i;
+> @@ -1064,6 +1125,7 @@ static void slc_completed(struct device *dev)
+>  	hfp_hf_register(dev->hf, cops_cb, "+COPS", dev, NULL);
+>  	hfp_hf_register(dev->hf, cnum_cb, "+CNUM", dev, NULL);
+>  	hfp_hf_register(dev->hf, binp_cb, "+BINP", dev, NULL);
+> +	hfp_hf_register(dev->hf, bcs_cb, "+BCS", dev, NULL);
+> 
+>  	if (!hfp_hf_send_command(dev->hf, cmd_complete_cb, NULL, "AT+COPS=3,0"))
+>  		info("hf-client: Could not send AT+COPS=3,0");
+
+-- 
+BR
+Szymon Janc
