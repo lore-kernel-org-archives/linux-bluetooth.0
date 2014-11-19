@@ -1,76 +1,95 @@
 Return-Path: <cyrus@holtmann.org>
-From: Chethan T N <chethan.tn@samsung.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Chethan T N <chethan.tn@samsung.com>
-Subject: [PATCH] audio/sink: Fix a2dp XCASE connection with BOSE headset
-Date: Wed, 19 Nov 2014 15:30:48 +0530
-Message-id: <1416391248-22656-1-git-send-email-chethan.tn@samsung.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+From: Amitkumar Karwar <akarwar@marvell.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: <marcel@holtmann.org>, Amitkumar Karwar <akarwar@marvell.com>,
+        Cathy Luo
+	<cluo@marvell.com>, Avinash Patil <patila@marvell.com>
+Subject: [PATCH 2/3] Bluetooth: btmrvl: add DT-bindings for gpio-gap
+Date: Wed, 19 Nov 2014 01:28:33 -0800
+Message-ID: <1416389314-6327-2-git-send-email-akarwar@marvell.com>
+In-Reply-To: <1416389314-6327-1-git-send-email-akarwar@marvell.com>
+References: <1416389314-6327-1-git-send-email-akarwar@marvell.com>
+MIME-Version: 1.0
+Content-Type: text/plain
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Some bluetooth headset (BOSE) initates the avdtp connection immideately
-after HFP connection is completed, so if application initates a2dp connection
-and since already avdtp connection is ongiong should return error EALREADY
+This can be used to have GPIO host wakeup method suitable for the
+platform and configurable GAP for host sleep handshake.
 
-bluetoothd[1215]: src/service.c:change_state() 0xb6f428a8: device XX:XX:XX:XX:XX:XX profile Hands-Free Audio Gateway state changed: disconnected -> connecting (0)
-bluetoothd[1215]: src/profile.c:record_cb() profile uuid 0000111e-0000-1000-8000-00805f9b34fb port uuid 0000111e-0000-1000-8000-00805f9b34fb
-bluetoothd[1215]: src/profile.c:ext_connect() Hands-Free Audio Gateway connected to XX:XX:XX:XX:XX:XX
-bluetoothd[1215]: src/service.c:change_state() 0xb6f428a8: device XX:XX:XX:XX:XX:XX profile Hands-Free Audio Gateway state changed: connecting -> connected (0)
-bluetoothd[1215]: src/device.c:device_profile_connected() Hands-Free Audio Gateway Success (0)
-bluetoothd[1215]: src/device.c:device_profile_connected() returning response to :1.113
-bluetoothd[1215]: /: org.freedesktop.DBus.ObjectManager.GetManagedObjects()
-bluetoothd[1215]: src/device.c:search_cb() XX:XX:XX:XX:XX:XX: No service update
-bluetoothd[1215]: src/device.c:device_svc_resolved() /org/bluez/hci0/dev_XX_XX_XX_XX_XX_XX err 0
-bluetoothd[1215]: profiles/audio/avdtp.c:avdtp_confirm_cb() AVDTP: incoming connect from XX:XX:XX:XX:XX:XX
-bluetoothd[1215]: profiles/audio/sink.c:sink_set_state() State changed /org/bluez/hci0/dev_XX_XX_XX_XX_XX_XX: SINK_STATE_DISCONNECTED -> SINK_STATE_CONNECTING
-bluetoothd[1215]: src/adapter.c:device_is_auto_accept() uuid 0000110d-0000-1000-8000-00805f9b34fb
-bluetoothd[1215]: src/adapter.c:device_is_auto_accept() Auto Authorization accepting for uuid 0000110d-0000-1000-8000-00805f9b34fb
-bluetoothd[1215]: profiles/audio/avdtp.c:avdtp_connect_cb() AVDTP: connected signaling channel to XX:XX:XX:XX:XX:XX
-bluetoothd[1215]: profiles/audio/avdtp.c:avdtp_connect_cb() AVDTP imtu=672, omtu=895
-bluetoothd[1215]: profiles/audio/avdtp.c:set_disconnect_timer() name : Bose
-bluetoothd[1215]: /: org.freedesktop.DBus.ObjectManager.GetManagedObjects()
-bluetoothd[1215]: /: org.freedesktop.DBus.ObjectManager.GetManagedObjects()
-bluetoothd[1215]: /org/bluez/hci0/dev_XX_XX_XX_XX_XX_XX: org.freedesktop.DBus.Properties.GetAll()
-bluetoothd[1215]: profiles/audio/avdtp.c:session_cb()
-bluetoothd[1215]: profiles/audio/avdtp.c:avdtp_parse_cmd() Received DISCOVER_CMD
-bluetoothd[1215]: /: org.freedesktop.DBus.ObjectManager.GetManagedObjects()
-bluetoothd[1215]: profiles/audio/avdtp.c:session_cb()
-bluetoothd[1215]: profiles/audio/avdtp.c:avdtp_parse_cmd() Received  GET_CAPABILITIES_CMD
-bluetoothd[1215]: profiles/audio/a2dp.c:endpoint_getcap_ind() Source 0xb6f46030: Get_Capability_Ind
-bluetoothd[1215]: profiles/audio/avdtp.c:session_cb()
-bluetoothd[1215]: profiles/audio/avdtp.c:avdtp_parse_cmd() Received SET_CONFIGURATION_CMD
-bluetoothd[1215]: profiles/audio/a2dp.c:endpoint_setconf_ind() Source 0xb6f46030: Set_Configuration_Ind
-bluetoothd[1215]: profiles/audio/avdtp.c:avdtp_ref() 0xb6f61c60: ref=1
-bluetoothd[1215]: profiles/audio/a2dp.c:setup_ref() 0xb6f622d8: ref=1
-bluetoothd[1215]: profiles/audio/media.c:media_adapter_get_player()
-bluetoothd[1215]: profiles/audio/media.c:media_set_sink_callback()
-bluetoothd[1215]: profiles/audio/media.c:media_endpoint_async_call() Calling SetConfiguration: name = :1.14 path = /MediaEndpoint/A2DPSource
-bluetoothd[1215]: /org/bluez/hci0: org.freedesktop.DBus.Properties.GetAll()
-bluetoothd[1215]: /org/bluez/hci0/dev_XX_XX_XX_XX_XX_XX: org.bluez.Device1.ConnectProfile()
-bluetoothd[1215]: src/device.c:connect_profiles() /org/bluez/hci0/dev_XX_XX_XX_XX_XX_XX 0000110b-0000-1000-8000-00805f9b34fb, client :1.113
-bluetoothd[1215]: profiles/audio/a2dp.c:a2dp_sink_connect() path /org/bluez/hci0/dev_XX_XX_XX_XX_XX_XX
-bluetoothd[1215]: profiles/audio/avdtp.c:avdtp_ref() 0xb6f61c60: ref=2
-bluetoothd[1215]: profiles/audio/sink.c:sink_connect() stream creation in progress
-bluetoothd[1215]: src/service.c:change_state() 0xb6f4ece0: device XX:XX:XX:XX:XX:XX profile a2dp-sink state changed: disconnected -> connecting (0)
-bluetoothd[1215]: profiles/audio/avdtp.c:session_cb()
+Signed-off-by: Amitkumar Karwar <akarwar@marvell.com>
+Signed-off-by: Cathy Luo <cluo@marvell.com>
+Signed-off-by: Avinash Patil <patila@marvell.com>
 ---
- profiles/audio/sink.c |    3 +++
- 1 file changed, 3 insertions(+)
+ Documentation/devicetree/bindings/btmrvl.txt |  7 +++++++
+ drivers/bluetooth/btmrvl_main.c              | 12 +++++++++---
+ 2 files changed, 16 insertions(+), 3 deletions(-)
 
-diff --git a/profiles/audio/sink.c b/profiles/audio/sink.c
-index da8992e..d512938 100644
---- a/profiles/audio/sink.c
-+++ b/profiles/audio/sink.c
-@@ -292,6 +292,9 @@ int sink_connect(struct btd_service *service)
- 	if (sink->connect_id > 0 || sink->disconnect_id > 0)
- 		return -EBUSY;
+diff --git a/Documentation/devicetree/bindings/btmrvl.txt b/Documentation/devicetree/bindings/btmrvl.txt
+index cdd5768..58f964b 100644
+--- a/Documentation/devicetree/bindings/btmrvl.txt
++++ b/Documentation/devicetree/bindings/btmrvl.txt
+@@ -10,8 +10,14 @@ Optional properties:
+   - btmrvl,cal-data : Calibration data downloaded to the device during
+ 		      initialization. This is an array of 28 values(u8).
  
-+	if (sink->state == SINK_STATE_CONNECTING)
-+		return -EALREADY;
++  - btmrvl,gpio-gap : gpio and gap (in msecs) combination to be
++		      configured.
 +
- 	if (sink->stream_state >= AVDTP_STATE_OPEN)
- 		return -EALREADY;
+ Example:
  
++GPIO pin 13 is configured as a wakeup source and GAP is set to 100 msecs
++in below example.
++
+ btmrvl {
+ 	compatible = "btmrvl,cfgdata";
+ 
+@@ -19,4 +25,5 @@ btmrvl {
+ 		0x37 0x01 0x1c 0x00 0xff 0xff 0xff 0xff 0x01 0x7f 0x04 0x02
+ 		0x00 0x00 0xba 0xce 0xc0 0xc6 0x2d 0x00 0x00 0x00 0x00 0x00
+ 		0x00 0x00 0xf0 0x00>;
++	btmrvl,gpio-gap = <0x0d64>;
+ };
+diff --git a/drivers/bluetooth/btmrvl_main.c b/drivers/bluetooth/btmrvl_main.c
+index 2909bca..e43c495 100644
+--- a/drivers/bluetooth/btmrvl_main.c
++++ b/drivers/bluetooth/btmrvl_main.c
+@@ -492,13 +492,18 @@ static int btmrvl_download_cal_data(struct btmrvl_private *priv,
+ 	return 0;
+ }
+ 
+-static int btmrvl_cal_data_dt(struct btmrvl_private *priv)
++static int btmrvl_check_device_tree(struct btmrvl_private *priv)
+ {
+ 	struct device_node *dt_node;
+ 	u8 cal_data[BT_CAL_HDR_LEN + BT_CAL_DATA_SIZE];
+ 	int ret;
++	u32 val;
+ 
+ 	for_each_compatible_node(dt_node, NULL, "btmrvl,cfgdata") {
++		ret = of_property_read_u32(dt_node, "btmrvl,gpio-gap", &val);
++		if (!ret)
++			priv->btmrvl_dev.gpio_gap = val;
++
+ 		ret = of_property_read_u8_array(dt_node, "btmrvl,cal-data",
+ 						cal_data + BT_CAL_HDR_LEN,
+ 						BT_CAL_DATA_SIZE);
+@@ -523,14 +528,15 @@ static int btmrvl_setup(struct hci_dev *hdev)
+ 
+ 	btmrvl_send_module_cfg_cmd(priv, MODULE_BRINGUP_REQ);
+ 
+-	btmrvl_cal_data_dt(priv);
++	priv->btmrvl_dev.gpio_gap = 0xffff;
++
++	btmrvl_check_device_tree(priv);
+ 
+ 	btmrvl_pscan_window_reporting(priv, 0x01);
+ 
+ 	priv->btmrvl_dev.psmode = 1;
+ 	btmrvl_enable_ps(priv);
+ 
+-	priv->btmrvl_dev.gpio_gap = 0xffff;
+ 	btmrvl_send_hscfg_cmd(priv);
+ 
+ 	return 0;
 -- 
-1.7.9.5
-
+1.8.1.4
