@@ -1,61 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: Marcin Kraglak <marcin.kraglak@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] android/gatt: Fix setting end handle
-Date: Wed, 19 Nov 2014 15:31:10 +0100
-Message-ID: <1671726.bR4nEh2CV5@uw000953>
-In-Reply-To: <1416404729-32570-1-git-send-email-marcin.kraglak@tieto.com>
-References: <1416404729-32570-1-git-send-email-marcin.kraglak@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+From: Vikrampal Yadav <vikram.pal@samsung.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: luiz.dentz@gmail.com, d.kasatkin@samsung.com,
+	vikram.pal@samsung.com, cpgs@samsung.com
+Subject: [PATCH] monitor: Fix the return value of l2cap_frame_get_le16()
+Date: Wed, 19 Nov 2014 20:07:30 +0530
+Message-id: <1416407850-13721-1-git-send-email-vikram.pal@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcin,
+The return value of l2cap_frame_get_le16() rectified.
+---
+ monitor/l2cap.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-On Wednesday 19 of November 2014 14:45:29 Marcin Kraglak wrote:
-> If found attribute was service attribute, range->end was always set
-> to 1, because gatt_db_attribute_get_service_handles return bool.
-> 
-> > ACL Data RX: Handle 8 flags 0x02 dlen 13
->       ATT: Find By Type Value Request (0x06) len 8
->         Handle range: 0x0002-0xffff
->         Attribute type: Primary Service (0x2800)
->           UUID: Device Information (0x180a)
-> < ACL Data TX: Handle 8 flags 0x00 dlen 9
->       ATT: Find By Type Value Response (0x07) len 4
->         Handle range: 0x0008-0x0001
-> ---
->  android/gatt.c | 6 +++---
->  1 file changed, 3 insertions(+), 3 deletions(-)
-> 
-> diff --git a/android/gatt.c b/android/gatt.c
-> index ddc1561..ea5cead 100644
-> --- a/android/gatt.c
-> +++ b/android/gatt.c
-> @@ -4532,15 +4532,15 @@ static void send_dev_complete_response(struct gatt_device *device,
->  
->  			range->start = gatt_db_attribute_get_handle(
->  								val->attrib);
-> -			range->end = range->start;
->  
->  			type = gatt_db_attribute_get_type(val->attrib);
->  			if (is_service(type))
-> -				range->end =
-> -					gatt_db_attribute_get_service_handles(
-> +				gatt_db_attribute_get_service_handles(
->  								val->attrib,
->  								NULL,
->  								&range->end);
-> +			else
-> +				range->end = range->start;
->  
->  			list = g_slist_append(list, range);
->  
-
-Applied, thanks. 
-
+diff --git a/monitor/l2cap.h b/monitor/l2cap.h
+index c14aeef..975f78a 100644
+--- a/monitor/l2cap.h
++++ b/monitor/l2cap.h
+@@ -92,7 +92,7 @@ static inline bool l2cap_frame_get_le16(struct l2cap_frame *frame,
+ 
+ 	l2cap_frame_pull(frame, frame, sizeof(*value));
+ 
+-	return 0;
++	return true;
+ }
+ 
+ static inline bool l2cap_frame_get_be32(struct l2cap_frame *frame,
 -- 
-Best regards, 
-Szymon Janc
+1.9.1
+
