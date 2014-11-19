@@ -1,11 +1,11 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1416252138-17477-3-git-send-email-armansito@chromium.org>
+In-Reply-To: <1416252138-17477-2-git-send-email-armansito@chromium.org>
 References: <1416252138-17477-1-git-send-email-armansito@chromium.org>
-	<1416252138-17477-3-git-send-email-armansito@chromium.org>
-Date: Wed, 19 Nov 2014 17:07:58 +0200
-Message-ID: <CABBYNZKOJ77dADvNv=wxwD6yfYciU9d8Dg5rCx5N8iCW1mjSCw@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 02/12] shared/att: Add bt_att_get_fd.
+	<1416252138-17477-2-git-send-email-armansito@chromium.org>
+Date: Wed, 19 Nov 2014 17:05:46 +0200
+Message-ID: <CABBYNZK6jjuhLwwHZYPSJGPqhMjXpm3VFMx2xfq5SOyeygjGJg@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 01/12] attrib/gattrib: Add g_attrib_get_att.
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: Arman Uguray <armansito@chromium.org>
 Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
@@ -16,55 +16,59 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 Hi Arman,
 
 On Mon, Nov 17, 2014 at 9:22 PM, Arman Uguray <armansito@chromium.org> wrote:
-> This patch adds a getter for a bt_att structure's underlying connection
-> file descriptor.
+> Added the g_attrib_get_att function which returns the underlying bt_att
+> structure associated with a GAttrib.
 > ---
->  src/shared/att.c | 8 ++++++++
->  src/shared/att.h | 1 +
->  2 files changed, 9 insertions(+)
+>  attrib/gattrib.c | 8 ++++++++
+>  attrib/gattrib.h | 3 +++
+>  2 files changed, 11 insertions(+)
 >
-> diff --git a/src/shared/att.c b/src/shared/att.c
-> index 2bc7682..264cece 100644
-> --- a/src/shared/att.c
-> +++ b/src/shared/att.c
-> @@ -907,6 +907,14 @@ void bt_att_unref(struct bt_att *att)
->         free(att);
+> diff --git a/attrib/gattrib.c b/attrib/gattrib.c
+> index ce7f7b3..a446ae6 100644
+> --- a/attrib/gattrib.c
+> +++ b/attrib/gattrib.c
+> @@ -166,6 +166,14 @@ GIOChannel *g_attrib_get_channel(GAttrib *attrib)
+>         return attrib->io;
 >  }
 >
-> +int bt_att_get_fd(struct bt_att *att)
+> +struct bt_att *g_attrib_get_att(GAttrib *attrib)
 > +{
-> +       if (!att)
-> +               return -1;
-
-It probably make sense to return -ENOTCONN since we are not setting
-any errno here.
-
-> +       return att->fd;
+> +       if (!attrib)
+> +               return NULL;
+> +
+> +       return attrib->att;
 > +}
 > +
->  bool bt_att_set_close_on_unref(struct bt_att *att, bool do_close)
+>  gboolean g_attrib_set_destroy_function(GAttrib *attrib, GDestroyNotify destroy,
+>                                                         gpointer user_data)
 >  {
->         if (!att || !att->io)
-> diff --git a/src/shared/att.h b/src/shared/att.h
-> index 99b5a5b..b946b18 100644
-> --- a/src/shared/att.h
-> +++ b/src/shared/att.h
-> @@ -33,6 +33,7 @@ struct bt_att *bt_att_new(int fd);
->  struct bt_att *bt_att_ref(struct bt_att *att);
->  void bt_att_unref(struct bt_att *att);
+> diff --git a/attrib/gattrib.h b/attrib/gattrib.h
+> index 2ed57c1..374bac2 100644
+> --- a/attrib/gattrib.h
+> +++ b/attrib/gattrib.h
+> @@ -31,6 +31,7 @@ extern "C" {
+>  #define GATTRIB_ALL_REQS 0xFE
+>  #define GATTRIB_ALL_HANDLES 0x0000
 >
-> +int bt_att_get_fd(struct bt_att *att);
->  bool bt_att_set_close_on_unref(struct bt_att *att, bool do_close);
+> +struct bt_att;  /* Forward declaration for compatibility */
+>  struct _GAttrib;
+>  typedef struct _GAttrib GAttrib;
 >
->  typedef void (*bt_att_response_func_t)(uint8_t opcode, const void *pdu,
+> @@ -47,6 +48,8 @@ void g_attrib_unref(GAttrib *attrib);
+>
+>  GIOChannel *g_attrib_get_channel(GAttrib *attrib);
+>
+> +struct bt_att *g_attrib_get_att(GAttrib *attrib);
+> +
+>  gboolean g_attrib_set_destroy_function(GAttrib *attrib,
+>                 GDestroyNotify destroy, gpointer user_data);
+>
 > --
 > 2.1.0.rc2.206.gedb03e5
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
+Im not following you here, why you want to expose bt_att via GAttrib,
+isn't it better to just have a g_attrib_get_fd if you just need to
+access the fd?
 
 
 -- 
