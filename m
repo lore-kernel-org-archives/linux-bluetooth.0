@@ -1,102 +1,78 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-Sender: armansito@google.com
-In-Reply-To: <20141119212751.GA6364@t440s.P-661HNU-F1>
-References: <CAHrH25TMxuHY3hqQQFWe+=5ghzc5rrEG2ED5sa410ddiJ-YuDA@mail.gmail.com>
-	<50181A20-3313-48C7-924B-05C67B975139@holtmann.org>
-	<CAHrH25T6tmUO2Zvsr=R7+yHwQE0_hY_sMt4UQAmCBMZBOH0PRQ@mail.gmail.com>
-	<ED9629AB-B978-49FE-A7D7-5D9E62642504@holtmann.org>
-	<CAHrH25Te4J6ospnJYA00mb1RofwHrS4=KD8LjmTLvo5Y4Jy8EQ@mail.gmail.com>
-	<CAHrH25S5X5UZJwH0JuoWGW70bDdO48iS8Ex5pF0K9Cd7JsRV8A@mail.gmail.com>
-	<7ED5AE30-EF53-47EA-A9CE-DD371CE10910@holtmann.org>
-	<CAHrH25QzAYG-uHgEJ2rBmpJ_RMgW9zZ0+WvwtY3Mo0zKUxgB9w@mail.gmail.com>
-	<20141119212751.GA6364@t440s.P-661HNU-F1>
-Date: Wed, 19 Nov 2014 14:20:10 -0800
-Message-ID: <CAHrH25Qds=wD87kT-_6f+RJP-MDVmjDSATa0qQmHKmHMUNv0iw@mail.gmail.com>
-Subject: Re: Handling EBUSY for LE connections.
+Date: Wed, 19 Nov 2014 13:48:32 -0800
+Message-ID: <CAHrH25Q2w48UX5Bi2qLq0uHfGsH+k2AzecXgfrn=QgZKoT1K4A@mail.gmail.com>
+Subject: RFC: Populating shared/gatt-client from storage.
 From: Arman Uguray <armansito@chromium.org>
-To: Arman Uguray <armansito@chromium.org>, Marcel Holtmann <marcel@holtmann.org>,
-	BlueZ development <linux-bluetooth@vger.kernel.org>, Jakub Pawlowski <jpawlowski@google.com>
+To: BlueZ development <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+Hi all,
 
-> On Wed, Nov 19, 2014 at 1:27 PM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
-> Hi Arman,
->
-> On Mon, Nov 17, 2014, Arman Uguray wrote:
->> >> I guess I'm seeking some programming advice now as a net/bluetooth
->> >> noob. So it looks like in l2cap_code.c:l2cap_chan_connect I want to
->> >> replace the call to "hci_connect_le" with some variant of
->> >> hci_conn_params_set. Based on my understanding, eventually if an ADV
->> >> report is received, hci_event.c:process_adv_report will handle
->> >> creating the connection for us (in hci_event.c:check_pending_le_conn).
->> >>
->> >> From here, what would be the best (and proper) way to propagate this
->> >> information and the newly created hci_conn structure to the l2cap
->> >> layer so that the l2cap_conn structure can be set up?
->> >
->> > that is a good question. I think Johan is a bit deeper in the code.
->> > Might worthwhile to jump on IRC and brainstorm with him on this.
->> >
->>
->> I'm pretty much always out of luck getting ahold of people on IRC, so
->> hopefully Johan will see this thread and respond eventually.
->>
->> > He has done connection creation for the slave side using direct
->> > advertising and that would have some similar logical handling. At
->> > least I think it does. And if not, we might first need a few
->> > cleanups to make the LE connection handling for L2CAP sockets more
->> > streamlined and easy to integrate.
->> >
->>
->> So, from looking at the code, I see that l2cap_sock_connect calls
->> l2cap_chan_connect, which internally creates the hci_conn via
->> hci_connect_le. If all goes well, l2cap_sock_connect simply sits and
->> waits until the socket state becomes BT_CONNECTED. So, I guess we may
->> want something similar to that. We could revise hci_connect_le so that
->> it automatically creates the temporary whitelist entry and listens for
->> AD. Or perhaps we could have an additional API that sends an LE Create
->> Connection that accepts an hci_conn instead of an hci_dev, which can
->> then be called from hci_event.c:check_pending_le_conn.
->>
->> Anyway, I think I have a rough idea of what needs to be done overall
->> but I'd appreciate Johan's input.
->
-> It sounds like you're pretty much on the right track. Creating a
-> temporary entry to the same list that's used for the usual passive
-> scanning based connections should work. All other code that deals with
-> notifying the l2cap_chan once we get the LE_Connection_Complete event
-> should already be there and do the right thing, so the only new thing
-> that should be needed at that point is to permanently remove the
-> temporary entry you added.
->
-> Anyway, this is what I *think* should work. Once you have some initial
-> patches ready it'll be easier to see how things really are :)
->
+In the case where bluez is bonded with a remote device we don't want
+to always perform service discovery, but instead to cache the
+attribute data permanently and just use that on reconnections.
+Currently shared/gatt-client automatically discovers all services when
+created (via bt_gatt_client_new) so we need to add support to populate
+a shared/gatt-client based on cached data in storage, since a
+bt_gatt_client instance acts as our in-memory attribute cache for the
+client role.
 
-I now have a few of questions before I start implementing anything:
+I initially thought about storing everything in INI format and loading
+things directly from a file, via some function like
+bt_gatt_client_new_from_storage. The biggest problem with this
+approach is parsing the INI format; since we don't want to pull in any
+external dependencies into shared/gatt (e.g. glib) we would possibly
+have to write our own key-value file parser for shared/ which seems
+like overkill. We could possibly invent some simpler blob format for
+shared/gatt-client but people brought to my attention on IRC that we
+may want to leave the exact storage format to the upper-layer, e.g.
+desktop and android versions of bluetoothd may want to use different
+formats for their attribute cache that's consistent with the platform.
 
-1. I'm confused about how the current code handles the case where
-hci_connect_le returns -EBUSY while handling an advertisement report.
-The code simply ignores the error and hci_conn object gets created, so
-the next time an advertisement report gets received and we call
-hci_connect_le, won't that just return early since
-hci_conn_hash_lookup_ba will return something? How will this actually
-ever get to adding the LE Create Connection request?
+So I decided to go with something generic instead. We would basically
+add functions to manually populate a gatt-client and mark the client
+as ready only after it's services have been populated. So we would
+have these API changes:
 
-2. The background scan code currently assigns ownership of the
-hci_conn structure to the hci_conn_params structure that triggered it.
-I guess it's OK if a reference is held both by the parameters AND the
-l2cap_conn structure if this is triggered by an L2CAP connect instead?
+1. A new argument to bt_gatt_client_new, to tell it not to perform
+discovery. Something like "bool discover_services".
 
-3. The background scan code currently passes BT_SECURITY_LOW to
-hci_connect_le, but we probably need a way to obtain the security
-level from the l2cap sock options in the l2cap connect case. What's
-the best way to pass this data along?
+    /* Don't perform discovery */
+    bt_gatt_client_new(att, mtu, false);
 
-> Johan
+This would basically just leave the structure in "init" state and not
+become ready.
 
-Thanks!
+2. We would then add a new structure to populate a gatt-client.
+
+    struct bt_gatt_populate { .. };  /* Probably something with a better name */
+
+    bool bt_gatt_populate_start(struct bt_gatt_populate *, struct
+bt_gatt_client *);
+    bool bt_gatt_populate_add_service(....)
+    bool bt_gatt_populate_add_characteristic(...)
+    bool bt_gatt_populate_add_descriptor(....)
+    bool bt_gatt_populate_add_include(....)
+    bool bt_gatt_populate_cancel(...)
+    bool bt_gatt_populate_commit(struct bt_gatt_populate *);
+
+The start function would tell gatt-client that it's being populated so
+it would prevent this from being called twice. All of the _add_*
+functions would create a temporary tree owned by the populate
+structure, using the same internal structures defined in
+shared/gatt-client.c. Calling bt_gatt_populate_commit would then pass
+the ownership of the services to the bt_gatt_client, and
+bt_gatt_client would perform the MTU exchange, subscribe to
+notifications from the "Service Changed" characteristic if one exists,
+mark itself as ready and invoke the ready handler.
+
+If the upper-layer wants to store the current contents of gatt-client,
+they can do so by iterating through its services and caching them to a
+file directly. This way, shared/gatt-client would remain agnostic to
+any storage format.
+
+Comments requested.
 Arman
