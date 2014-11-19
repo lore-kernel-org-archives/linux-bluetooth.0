@@ -1,133 +1,148 @@
 Return-Path: <cyrus@holtmann.org>
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Convert link keys list to use RCU
-Date: Wed, 19 Nov 2014 15:22:22 +0200
-Message-Id: <1416403342-14715-1-git-send-email-johan.hedberg@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+From: "Wu, JiangboX" <jiangbox.wu@intel.com>
+To: "marcel@holtmann.org" <marcel@holtmann.org>, "luiz.dentz@gmail.com"
+	<luiz.dentz@gmail.com>, "linux-bluetooth@vger.kernel.org"
+	<linux-bluetooth@vger.kernel.org>
+Subject: Does obexd support Multi-User
+Date: Wed, 19 Nov 2014 13:17:49 +0000
+Message-ID: <ACB402E679F3454EAE433BF5E93F4EAA01663F45@shsmsx102.ccr.corp.intel.com>
+Content-Type: multipart/alternative;
+	boundary="_000_ACB402E679F3454EAE433BF5E93F4EAA01663F45shsmsx102ccrcor_"
+MIME-Version: 1.0
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@intel.com>
+--_000_ACB402E679F3454EAE433BF5E93F4EAA01663F45shsmsx102ccrcor_
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 
-This patch converts the hdev->link_keys list to be protected through
-RCU, thereby eliminating the need to hold the hdev lock while accessing
-the list.
+Hi Marcel,
+         As I know the bluetoothd is running on root privilege level, obexd=
+ is running on app privilege level. The obexd is running on app privilege l=
+evel to support user can only transfer the user's own file. Maybe it has ot=
+her reasons.
+And if the OS has many users can run at the same time. For example. User A =
+named 'blob', User B named 'Alice', and the root. The three user run on OS =
+at the time. As mentioned before, can I say that 'blob' and 'Alice' will ha=
+ve its owner obexd daemon? That I mean multi-user. And does it be able to u=
+se independent?
+         For example, 'blob' use BlueZ to pair device A, and 'Alice' use Bl=
+ueZ to pair device B. Dose 'blob' can send/receive file from device A? and =
+'Alice' can send/receive file form device B? I test the usage case, and the=
+ result is that, 'blob' and 'Alice' can send file to device A and Device B =
+simultaneously. But it's have difference behavior in turn. Only one obexd c=
+an receive the OPP request, another will never get the OPP request.
+         Do you have any idea to support multi-user case by running differe=
+nt obexd daemon in the different users? If obexd don't support multi-user, =
+can you give me some sugguestions? Thanks. :)
 
-Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
----
- include/net/bluetooth/hci_core.h |  1 +
- net/bluetooth/hci_core.c         | 37 ++++++++++++++++++-------------------
- net/bluetooth/hci_event.c        |  4 ++--
- 3 files changed, 21 insertions(+), 21 deletions(-)
+Best regards
+Jiangbo
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index a805b3d97c0b..396c09840fdf 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -130,6 +130,7 @@ struct smp_irk {
- 
- struct link_key {
- 	struct list_head list;
-+	struct rcu_head rcu;
- 	bdaddr_t bdaddr;
- 	u8 type;
- 	u8 val[HCI_LINK_KEY_SIZE];
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index a67a4b8e4e1c..5c319a49a5a4 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -274,15 +274,13 @@ static const struct file_operations inquiry_cache_fops = {
- static int link_keys_show(struct seq_file *f, void *ptr)
- {
- 	struct hci_dev *hdev = f->private;
--	struct list_head *p, *n;
-+	struct link_key *key;
- 
--	hci_dev_lock(hdev);
--	list_for_each_safe(p, n, &hdev->link_keys) {
--		struct link_key *key = list_entry(p, struct link_key, list);
-+	rcu_read_lock();
-+	list_for_each_entry_rcu(key, &hdev->link_keys, list)
- 		seq_printf(f, "%pMR %u %*phN %u\n", &key->bdaddr, key->type,
- 			   HCI_LINK_KEY_SIZE, key->val, key->pin_len);
--	}
--	hci_dev_unlock(hdev);
-+	rcu_read_unlock();
- 
- 	return 0;
- }
-@@ -3101,15 +3099,11 @@ void hci_uuids_clear(struct hci_dev *hdev)
- 
- void hci_link_keys_clear(struct hci_dev *hdev)
- {
--	struct list_head *p, *n;
--
--	list_for_each_safe(p, n, &hdev->link_keys) {
--		struct link_key *key;
--
--		key = list_entry(p, struct link_key, list);
-+	struct link_key *key;
- 
--		list_del(p);
--		kfree(key);
-+	list_for_each_entry_rcu(key, &hdev->link_keys, list) {
-+		list_del_rcu(&key->list);
-+		kfree_rcu(key, rcu);
- 	}
- }
- 
-@@ -3137,9 +3131,14 @@ struct link_key *hci_find_link_key(struct hci_dev *hdev, bdaddr_t *bdaddr)
- {
- 	struct link_key *k;
- 
--	list_for_each_entry(k, &hdev->link_keys, list)
--		if (bacmp(bdaddr, &k->bdaddr) == 0)
-+	rcu_read_lock();
-+	list_for_each_entry_rcu(k, &hdev->link_keys, list) {
-+		if (bacmp(bdaddr, &k->bdaddr) == 0) {
-+			rcu_read_unlock();
- 			return k;
-+		}
-+	}
-+	rcu_read_unlock();
- 
- 	return NULL;
- }
-@@ -3290,7 +3289,7 @@ struct link_key *hci_add_link_key(struct hci_dev *hdev, struct hci_conn *conn,
- 		key = kzalloc(sizeof(*key), GFP_KERNEL);
- 		if (!key)
- 			return NULL;
--		list_add(&key->list, &hdev->link_keys);
-+		list_add_rcu(&key->list, &hdev->link_keys);
- 	}
- 
- 	BT_DBG("%s key for %pMR type %u", hdev->name, bdaddr, type);
-@@ -3383,8 +3382,8 @@ int hci_remove_link_key(struct hci_dev *hdev, bdaddr_t *bdaddr)
- 
- 	BT_DBG("%s removing %pMR", hdev->name, bdaddr);
- 
--	list_del(&key->list);
--	kfree(key);
-+	list_del_rcu(&key->list);
-+	kfree_rcu(key, rcu);
- 
- 	return 0;
- }
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 54680fd39608..bd0a80120665 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -3324,8 +3324,8 @@ static void hci_link_key_notify_evt(struct hci_dev *hdev, struct sk_buff *skb)
- 	 */
- 	if (key->type == HCI_LK_DEBUG_COMBINATION &&
- 	    !test_bit(HCI_KEEP_DEBUG_KEYS, &hdev->dev_flags)) {
--		list_del(&key->list);
--		kfree(key);
-+		list_del_rcu(&key->list);
-+		kfree_rcu(key, rcu);
- 	} else if (conn) {
- 		if (persistent)
- 			clear_bit(HCI_CONN_FLUSH_KEY, &conn->flags);
--- 
-2.1.0
 
+--_000_ACB402E679F3454EAE433BF5E93F4EAA01663F45shsmsx102ccrcor_
+Content-Type: text/html; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+
+<html xmlns:v=3D"urn:schemas-microsoft-com:vml" xmlns:o=3D"urn:schemas-micr=
+osoft-com:office:office" xmlns:w=3D"urn:schemas-microsoft-com:office:word" =
+xmlns:m=3D"http://schemas.microsoft.com/office/2004/12/omml" xmlns=3D"http:=
+//www.w3.org/TR/REC-html40">
+<head>
+<meta http-equiv=3D"Content-Type" content=3D"text/html; charset=3Dus-ascii"=
+>
+<meta name=3D"Generator" content=3D"Microsoft Word 14 (filtered medium)">
+<style><!--
+/* Font Definitions */
+@font-face
+	{font-family:Wingdings;
+	panose-1:5 0 0 0 0 0 0 0 0 0;}
+@font-face
+	{font-family:SimSun;
+	panose-1:2 1 6 0 3 1 1 1 1 1;}
+@font-face
+	{font-family:SimSun;
+	panose-1:2 1 6 0 3 1 1 1 1 1;}
+@font-face
+	{font-family:Calibri;
+	panose-1:2 15 5 2 2 2 4 3 2 4;}
+@font-face
+	{font-family:SimSun;
+	panose-1:2 1 6 0 3 1 1 1 1 1;}
+/* Style Definitions */
+p.MsoNormal, li.MsoNormal, div.MsoNormal
+	{margin:0cm;
+	margin-bottom:.0001pt;
+	text-align:justify;
+	text-justify:inter-ideograph;
+	font-size:10.5pt;
+	font-family:"Calibri","sans-serif";}
+a:link, span.MsoHyperlink
+	{mso-style-priority:99;
+	color:blue;
+	text-decoration:underline;}
+a:visited, span.MsoHyperlinkFollowed
+	{mso-style-priority:99;
+	color:purple;
+	text-decoration:underline;}
+span.EmailStyle17
+	{mso-style-type:personal-compose;
+	font-family:"Calibri","sans-serif";
+	color:windowtext;}
+.MsoChpDefault
+	{mso-style-type:export-only;}
+/* Page Definitions */
+@page WordSection1
+	{size:612.0pt 792.0pt;
+	margin:72.0pt 90.0pt 72.0pt 90.0pt;}
+div.WordSection1
+	{page:WordSection1;}
+--></style><!--[if gte mso 9]><xml>
+<o:shapedefaults v:ext=3D"edit" spidmax=3D"1026" />
+</xml><![endif]--><!--[if gte mso 9]><xml>
+<o:shapelayout v:ext=3D"edit">
+<o:idmap v:ext=3D"edit" data=3D"1" />
+</o:shapelayout></xml><![endif]-->
+</head>
+<body lang=3D"ZH-CN" link=3D"blue" vlink=3D"purple" style=3D"text-justify-t=
+rim:punctuation">
+<div class=3D"WordSection1">
+<p class=3D"MsoNormal"><span lang=3D"EN-US">Hi Marcel,<o:p></o:p></span></p=
+>
+<p class=3D"MsoNormal"><span lang=3D"EN-US">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&=
+nbsp;&nbsp;&nbsp; As I know the bluetoothd is running on root privilege lev=
+el, obexd is running on app privilege level. The obexd is running on app pr=
+ivilege level to support user can only transfer the user&#8217;s own file. =
+Maybe it
+ has other reasons.<o:p></o:p></span></p>
+<p class=3D"MsoNormal" style=3D"text-indent:21.0pt"><span lang=3D"EN-US">An=
+d if the OS has many users can run at the same time. For example. User A na=
+med &#8216;blob&#8217;, User B named &#8216;Alice&#8217;, and the root. The=
+ three user run on OS at the time. As mentioned before, can I
+ say that &#8216;blob&#8217; and &#8216;Alice&#8217; will have its owner ob=
+exd daemon? That I mean multi-user. And does it be able to use independent?=
+<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&=
+nbsp;&nbsp;&nbsp; For example, &#8216;blob&#8217; use BlueZ to pair device =
+A, and &#8216;Alice&#8217; use BlueZ to pair device B. Dose &#8216;blob&#82=
+17; can send/receive file from device A? and &#8216;Alice&#8217; can send/r=
+eceive file form device B? I test the usage case,
+ and the result is that, &#8216;blob&#8217; and &#8216;Alice&#8217; can sen=
+d file to device A and Device B simultaneously. But it&#8217;s have differe=
+nce behavior in turn. Only one obexd can receive the OPP request, another w=
+ill never get the OPP request.<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&=
+nbsp;&nbsp;&nbsp; Do you have any idea to support multi-user case by runnin=
+g different obexd daemon in the different users? If obexd don&#8217;t suppo=
+rt multi-user, can you give me some sugguestions? Thanks.
+</span><span lang=3D"EN-US" style=3D"font-family:Wingdings">J</span><span l=
+ang=3D"EN-US"><o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US"><o:p>&nbsp;</o:p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US">Best regards<o:p></o:p></span><=
+/p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US">Jiangbo<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US"><o:p>&nbsp;</o:p></span></p>
+</div>
+</body>
+</html>
+
+--_000_ACB402E679F3454EAE433BF5E93F4EAA01663F45shsmsx102ccrcor_--
