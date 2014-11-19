@@ -1,42 +1,26 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: Sebastian Chlad <sebastian.chlad@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] android/pts: PTS tests for A2DP on Android 5
-Date: Wed, 19 Nov 2014 21:14:26 +0100
-Message-ID: <9140330.F7RQZFAJgT@leonov>
-In-Reply-To: <1416397527-1266-1-git-send-email-sebastian.chlad@tieto.com>
-References: <1416397527-1266-1-git-send-email-sebastian.chlad@tieto.com>
+Date: Wed, 19 Nov 2014 21:47:16 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Vikrampal Yadav <vikram.pal@samsung.com>
+Cc: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com,
+	d.kasatkin@samsung.com, cpgs@samsung.com
+Subject: Re: [PATCH] monitor: Fix the return value of l2cap_frame_get_le16()
+Message-ID: <20141119194716.GA29861@t440s.P-661HNU-F1>
+References: <1416407850-13721-1-git-send-email-vikram.pal@samsung.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1416407850-13721-1-git-send-email-vikram.pal@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Sebastian,
+Hi Vikram,
 
-On Wednesday 19 of November 2014 12:45:27 Sebastian Chlad wrote:
+On Wed, Nov 19, 2014, Vikrampal Yadav wrote:
+> The return value of l2cap_frame_get_le16() rectified.
 > ---
->  android/pts-a2dp.txt | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/android/pts-a2dp.txt b/android/pts-a2dp.txt
-> index c3d04b2..92c3e15 100644
-> --- a/android/pts-a2dp.txt
-> +++ b/android/pts-a2dp.txt
-> @@ -1,8 +1,8 @@
->  PTS test results for A2DP
-> 
->  PTS version: 5.3
-> -Tested: 26-September-2014
-> -Android version: 4.4.4
-> +Tested: 19-November-2014
-> +Android version: 5.0
-> 
->  Results:
->  PASS	test passed
+>  monitor/l2cap.h | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
-Applied, thanks.
+Applied. Thanks.
 
--- 
-BR
-Szymon Janc
+Johan
