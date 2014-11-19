@@ -1,71 +1,61 @@
 Return-Path: <cyrus@holtmann.org>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: Marcin Kraglak <marcin.kraglak@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] android/gatt: Fix setting end handle
+Date: Wed, 19 Nov 2014 15:31:10 +0100
+Message-ID: <1671726.bR4nEh2CV5@uw000953>
+In-Reply-To: <1416404729-32570-1-git-send-email-marcin.kraglak@tieto.com>
+References: <1416404729-32570-1-git-send-email-marcin.kraglak@tieto.com>
 MIME-Version: 1.0
-In-Reply-To: <ACB402E679F3454EAE433BF5E93F4EAA01663F45@shsmsx102.ccr.corp.intel.com>
-References: <ACB402E679F3454EAE433BF5E93F4EAA01663F45@shsmsx102.ccr.corp.intel.com>
-Date: Wed, 19 Nov 2014 16:36:26 +0200
-Message-ID: <CABBYNZLWkYcbpMsaTJ6h93UcbtihVB2GkZdZb9XPQ0_3Xjcujg@mail.gmail.com>
-Subject: Re: Does obexd support Multi-User
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: "Wu, JiangboX" <jiangbox.wu@intel.com>
-Cc: "marcel@holtmann.org" <marcel@holtmann.org>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Marcin,
 
-On Wed, Nov 19, 2014 at 3:17 PM, Wu, JiangboX <jiangbox.wu@intel.com> wrote=
-:
-> Hi Marcel,
->
->          As I know the bluetoothd is running on root privilege level, obe=
-xd
-> is running on app privilege level. The obexd is running on app privilege
-> level to support user can only transfer the user=E2=80=99s own file. Mayb=
-e it has
-> other reasons.
->
-> And if the OS has many users can run at the same time. For example. User =
-A
-> named =E2=80=98blob=E2=80=99, User B named =E2=80=98Alice=E2=80=99, and t=
-he root. The three user run on OS
-> at the time. As mentioned before, can I say that =E2=80=98blob=E2=80=99 a=
-nd =E2=80=98Alice=E2=80=99 will
-> have its owner obexd daemon? That I mean multi-user. And does it be able =
-to
-> use independent?
->
->          For example, =E2=80=98blob=E2=80=99 use BlueZ to pair device A, =
-and =E2=80=98Alice=E2=80=99 use
-> BlueZ to pair device B. Dose =E2=80=98blob=E2=80=99 can send/receive file=
- from device A? and
-> =E2=80=98Alice=E2=80=99 can send/receive file form device B? I test the u=
-sage case, and the
-> result is that, =E2=80=98blob=E2=80=99 and =E2=80=98Alice=E2=80=99 can se=
-nd file to device A and Device B
-> simultaneously. But it=E2=80=99s have difference behavior in turn. Only o=
-ne obexd
-> can receive the OPP request, another will never get the OPP request.
->
->          Do you have any idea to support multi-user case by running
-> different obexd daemon in the different users? If obexd don=E2=80=99t sup=
-port
-> multi-user, can you give me some sugguestions? Thanks. J
+On Wednesday 19 of November 2014 14:45:29 Marcin Kraglak wrote:
+> If found attribute was service attribute, range->end was always set
+> to 1, because gatt_db_attribute_get_service_handles return bool.
+> 
+> > ACL Data RX: Handle 8 flags 0x02 dlen 13
+>       ATT: Find By Type Value Request (0x06) len 8
+>         Handle range: 0x0002-0xffff
+>         Attribute type: Primary Service (0x2800)
+>           UUID: Device Information (0x180a)
+> < ACL Data TX: Handle 8 flags 0x00 dlen 9
+>       ATT: Find By Type Value Response (0x07) len 4
+>         Handle range: 0x0008-0x0001
+> ---
+>  android/gatt.c | 6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
+> 
+> diff --git a/android/gatt.c b/android/gatt.c
+> index ddc1561..ea5cead 100644
+> --- a/android/gatt.c
+> +++ b/android/gatt.c
+> @@ -4532,15 +4532,15 @@ static void send_dev_complete_response(struct gatt_device *device,
+>  
+>  			range->start = gatt_db_attribute_get_handle(
+>  								val->attrib);
+> -			range->end = range->start;
+>  
+>  			type = gatt_db_attribute_get_type(val->attrib);
+>  			if (is_service(type))
+> -				range->end =
+> -					gatt_db_attribute_get_service_handles(
+> +				gatt_db_attribute_get_service_handles(
+>  								val->attrib,
+>  								NULL,
+>  								&range->end);
+> +			else
+> +				range->end = range->start;
+>  
+>  			list = g_slist_append(list, range);
+>  
 
-Yes obexd is capable of doing multi-user/multi-instance setups, what
-is not able to do is multi-seat if you need server role since there
-could be only 1 socket listening in the same channel/psm, for the
-client APIs there is no problem if user A connects to device X and
-user B to device Y they both can be connected simultaneously.
+Applied, thanks. 
 
-In terms of device management however you do have a problem, because
-in Bluetooth there is only one link-key per device and that is
-associated to the adapter, there is no user association and it makes
-no sense to do so because the remote device also generates a link-key
-as well, so if you want to restrict access of devices per user you
-need to do so before it reaches obexd using perhaps a D-Bus daemon
-hook to call a process that does keep track of which devices the user
-can access.
-
---=20
-Luiz Augusto von Dentz
+-- 
+Best regards, 
+Szymon Janc
