@@ -1,40 +1,46 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 19 Nov 2014 13:17:44 +0200
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: "Kirill A. Shutemov" <kirill@shutemov.name>
-Cc: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Chan-yeol Park <chanyeol.park@samsung.com>,
-	Kyungmin Park <kyungmin.park@samsung.com>,
-	linville@tuxdriver.com, linux-wireless@vger.kernel.org
-Subject: Re: pull request: bluetooth-next 2014-11-07
-Message-ID: <20141119111744.GA8153@t440s.lan>
-References: <20141118133459.GB27428@node.dhcp.inet.fi>
- <20141118180919.GA32128@t440s.P-661HNU-F1>
- <20141119110654.GA1894@node.dhcp.inet.fi>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20141119110654.GA1894@node.dhcp.inet.fi>
-Sender: linux-kernel-owner@vger.kernel.org
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] Bluetooth: Fix setting state back to TASK_RUNNING
+Date: Wed, 19 Nov 2014 13:16:41 +0200
+Message-Id: <1416395801-9062-1-git-send-email-johan.hedberg@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Kirill,
+From: Johan Hedberg <johan.hedberg@intel.com>
 
-On Wed, Nov 19, 2014, Kirill A. Shutemov wrote:
-> > From: Johan Hedberg <johan.hedberg@intel.com>
-> > Date: Tue, 18 Nov 2014 20:00:15 +0200
-> > Subject: [PATCH] Bluetooth: Fix setting state back to TASK_RUNNING
-> > 
-> > In __hci_cmd_sync_ev() and __hci_req_sync() if the hci_req_run() call
-> > fails and we return from the functions we should ensure that the state
-> > doesn't remain in TASK_INTERRUPTIBLE that we just set it to. This patch
-> > fixes missing calls to set_current_state(TASK_RUNNING) in both places.
-> > 
-> > Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
-> 
-> This patch helps -- warning is gone.
+In __hci_cmd_sync_ev() and __hci_req_sync() if the hci_req_run() call
+fails and we return from the functions we should ensure that the state
+doesn't remain in TASK_INTERRUPTIBLE that we just set it to. This patch
+fixes missing calls to set_current_state(TASK_RUNNING) in both places.
 
-Thanks! I've resent it to linux-bluetooth with the appropriate
-Reported-by/Tested-by credits. It'll be included in the next pull
-request for the bluetooth-next tree.
+Reported-by: Kirill A. Shutemov <kirill@shutemov.name>
+Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+Tested-by: Kirill A. Shutemov <kirill@shutemov.name>
+---
+ net/bluetooth/hci_core.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-Johan
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index d786958a1dec..a67a4b8e4e1c 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -1128,6 +1128,7 @@ struct sk_buff *__hci_cmd_sync_ev(struct hci_dev *hdev, u16 opcode, u32 plen,
+ 	err = hci_req_run(&req, hci_req_sync_complete);
+ 	if (err < 0) {
+ 		remove_wait_queue(&hdev->req_wait_q, &wait);
++		set_current_state(TASK_RUNNING);
+ 		return ERR_PTR(err);
+ 	}
+ 
+@@ -1196,6 +1197,7 @@ static int __hci_req_sync(struct hci_dev *hdev,
+ 		hdev->req_status = 0;
+ 
+ 		remove_wait_queue(&hdev->req_wait_q, &wait);
++		set_current_state(TASK_RUNNING);
+ 
+ 		/* ENODATA means the HCI request command queue is empty.
+ 		 * This can happen when a request with conditionals doesn't
+-- 
+2.1.0
+
