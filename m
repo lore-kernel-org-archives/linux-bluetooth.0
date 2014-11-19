@@ -1,81 +1,96 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcin Kraglak <marcin.kraglak@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 3/8] unit/test-gatt: Add /TP/GAR/CL/BV-05-C test
-Date: Wed, 19 Nov 2014 14:01:30 +0100
-Message-Id: <1416402095-5137-4-git-send-email-marcin.kraglak@tieto.com>
+Subject: [PATCH 2/8] tools/btgatt-client: Add read_multiple_cmd
+Date: Wed, 19 Nov 2014 14:01:29 +0100
+Message-Id: <1416402095-5137-3-git-send-email-marcin.kraglak@tieto.com>
 In-Reply-To: <1416402095-5137-1-git-send-email-marcin.kraglak@tieto.com>
 References: <1416402095-5137-1-git-send-email-marcin.kraglak@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Verify that a Generic Attribute Profile client can read multiple
-Characteristic Values selected by set of handles.
 ---
- unit/test-gatt.c | 44 ++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 44 insertions(+)
+ tools/btgatt-client.c | 60 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 60 insertions(+)
 
-diff --git a/unit/test-gatt.c b/unit/test-gatt.c
-index 9ded1f0..1c23ede 100644
---- a/unit/test-gatt.c
-+++ b/unit/test-gatt.c
-@@ -660,6 +660,44 @@ const struct test_step test_read_by_type_6 = {
- 	.expected_att_ecode = 0x0c,
- };
+diff --git a/tools/btgatt-client.c b/tools/btgatt-client.c
+index 7a1204f..ca84780 100644
+--- a/tools/btgatt-client.c
++++ b/tools/btgatt-client.c
+@@ -401,6 +401,65 @@ static void cmd_services(struct client *cli, char *cmd_str)
+ 		services_usage();
+ }
  
-+static void multiple_read_cb(bool success, uint8_t att_ecode,
++static void read_multiple_usage(void)
++{
++	printf("Usage: read-multiple <handle_1> <handle_2> ...\n");
++}
++
++static void read_multiple_cb(bool success, uint8_t att_ecode,
 +					const uint8_t *value, uint16_t length,
 +					void *user_data)
 +{
-+	struct context *context = user_data;
-+	const struct test_step *step = context->data->step;
++	int i;
 +
-+	g_assert(att_ecode == step->expected_att_ecode);
-+
-+	if (success) {
-+		g_assert(length == step->length);
-+		g_assert(memcmp(value, step->value, length) == 0);
++	if (!success) {
++		PRLOG("\nRead multiple request failed: 0x%02x\n", att_ecode);
++		return;
 +	}
 +
-+	context_quit(context);
++	printf("\nRead multiple value (%u bytes):", length);
++
++	for (i = 0; i < length; i++)
++		printf("%02x ", value[i]);
++
++	PRLOG("\n");
 +}
 +
-+static void test_multiple_read(struct context *context)
++static void cmd_read_multiple(struct client *cli, char *cmd_str)
 +{
-+	const struct test_step *step = context->data->step;
-+	uint16_t handles[2];
++	int argc = 0;
++	uint16_t *value;
++	char *argv[512];
++	int i;
++	char *endptr = NULL;
 +
-+	handles[0] = step->handle;
-+	handles[1] = step->end_handle;
++	if (!bt_gatt_client_is_ready(cli->gatt)) {
++		printf("GATT client not initialized\n");
++		return;
++	}
 +
-+	g_assert(bt_gatt_client_read_multiple(context->client, handles, 2,
-+						multiple_read_cb, context,
-+						NULL));
++	if (!parse_args(cmd_str, sizeof(argv), argv, &argc) || argc < 2) {
++		read_multiple_usage();
++		return;
++	}
++
++	value = malloc(sizeof(uint16_t) * argc);
++
++	for (i = 0; i < argc; i++) {
++		value[i] = strtol(argv[i], &endptr, 0);
++		if (endptr == argv[i] || *endptr != '\0' || !value[i]) {
++			printf("Invalid value byte: %s\n", argv[i]);
++			return;
++		}
++	}
++
++	if (!bt_gatt_client_read_multiple(cli->gatt, value, argc,
++						read_multiple_cb, NULL, NULL))
++		printf("Failed to initiate read multiple procedure\n");
++
++	free(value);
 +}
 +
-+const struct test_step test_multiple_read_1 = {
-+	.handle = 0x0003,
-+	.end_handle = 0x0007,
-+	.func = test_multiple_read,
-+	.value = read_data_1,
-+	.length = 0x03
-+};
-+
- static void read_by_type_cb(bool success, uint8_t att_ecode,
- 						struct bt_gatt_result *result,
- 						void *user_data)
-@@ -893,5 +931,11 @@ int main(int argc, char *argv[])
- 			raw_pdu(0x08, 0x01, 0x00, 0xff, 0xff, 0x0d, 0x2a),
- 			raw_pdu(0x01, 0x08, 0x0b, 0x00, 0x0c));
- 
-+	define_test_client("/TP/GAR/CL/BV-05-C", test_client, service_data_1,
-+			&test_multiple_read_1,
-+			SERVICE_DATA_1_PDU,
-+			raw_pdu(0x0e, 0x03, 0x00, 0x07, 0x00),
-+			raw_pdu(0x0f, 0x01, 0x02, 0x03));
-+
- 	return g_test_run();
- }
+ static void read_value_usage(void)
+ {
+ 	printf("Usage: read-value <value_handle>\n");
+@@ -873,6 +932,7 @@ static struct {
+ 				"\tRead a characteristic or descriptor value" },
+ 	{ "read-long-value", cmd_read_long_value,
+ 		"\tRead a long characteristic or desctriptor value" },
++	{ "read-multiple", cmd_read_multiple, "\tRead Multiple" },
+ 	{ "write-value", cmd_write_value,
+ 			"\tWrite a characteristic or descriptor value" },
+ 	{ "write-long-value", cmd_write_long_value,
 -- 
 1.9.3
 
