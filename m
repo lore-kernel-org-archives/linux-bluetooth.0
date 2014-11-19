@@ -1,53 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v2 00/15] android/handsfree-clien: Second set of HFP HF
-Date: Wed, 19 Nov 2014 15:09:12 +0100
-Message-ID: <8190720.HXmhygjjRF@uw000953>
-In-Reply-To: <1416390228-28330-1-git-send-email-lukasz.rymanowski@tieto.com>
-References: <1416390228-28330-1-git-send-email-lukasz.rymanowski@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Sender: linux-bluetooth-owner@vger.kernel.org
+Message-ID: <1416405776.9374.5.camel@sipsolutions.net>
+Subject: Re: [PATCH] Bluetooth: btmrvl add firmware dump support
+From: Johannes Berg <johannes@sipsolutions.net>
+To: Amitkumar Karwar <akarwar@marvell.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+ "marcel@holtmann.org" <marcel@holtmann.org>, Xinming Hu <huxm@marvell.com>,
+ Cathy Luo <cluo@marvell.com>,  Avinash Patil <patila@marvell.com>
+Date: Wed, 19 Nov 2014 15:02:56 +0100
+In-Reply-To: <5FF020A1CFFEEC49BD1E09530C4FF5951821E912D2@SC-VEXCH1.marvell.com>
+References: <1416403887-9271-1-git-send-email-akarwar@marvell.com>
+	 <1416404595.9374.4.camel@sipsolutions.net>
+	 <5FF020A1CFFEEC49BD1E09530C4FF5951821E912D2@SC-VEXCH1.marvell.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Łukasz,
+On Wed, 2014-11-19 at 05:58 -0800, Amitkumar Karwar wrote:
 
-On Wednesday 19 of November 2014 10:43:33 Lukasz Rymanowski wrote:
-> In this set all mising signaling part is implemented.
-> Tested on UPF 49 as well.
+> >The more intended use case for this was to trigger it when the driver
+> >detected a crash, but I guess a debugfs file works as well, just not
+> >sure when you'd want it.
 > 
-> SCO part will come in next set.
-> 
-> v2:
-> * Addressed Szymon comments
-> * Added patch fixing index type in IPC call action command (01/15)
-> 
-> Lukasz Rymanowski (15):
->   android/handsfree-client: Fix index type in call action command
->   android/handsfree-client: Add handle start/stop vr
->   android/handsfree-client: Add volume control handling
->   android/handsfree-client: Add handling dial command
->   android/handsfree-client: Add call action implementation
->   android/handsfree-client: Implement query current calls
->   android/handsfree-client: Add handling +CLCC
->   android/handsfree-client: Add support for +CIEV events
->   android/handsfree-client: Send indicators val we got during SLC setup
->   android/handsfree-client: Add support to get operator name
->   android/handsfree-client: Send to AG that we do support long name
->   android/handsfree-client: Retrieve subscriber number information
->   android/handsfree-client: Implement send DTMF codes
->   android/handsfree-client: Implement handling AT+BINP and +BINP
->   android/handsfree-client: Implement codec negotiations
-> 
->  android/hal-msg.h          |   2 +-
->  android/handsfree-client.c | 833 +++++++++++++++++++++++++++++++++++++++++++--
->  2 files changed, 802 insertions(+), 33 deletions(-)
-> 
+> When user encounters a case when firmware doesn't respond or got hang,
+> firmware dump can be triggered via debugfs command.
 
-Patch-set applied (with some small fixes), thanks.
+Sure, but do you want to hand-hold users through it? and do they even
+have debugfs?
 
--- 
-Best regards, 
-Szymon Janc
+At least for us we intentionally made this a general framework so if it
+crashes/hangs and we detect it we can automatically trigger it and
+collect it for bug reports.
+
+johannes
