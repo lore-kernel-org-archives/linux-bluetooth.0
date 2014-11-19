@@ -1,75 +1,95 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 19 Nov 2014 23:27:51 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Arman Uguray <armansito@chromium.org>
-Cc: Marcel Holtmann <marcel@holtmann.org>,
-	BlueZ development <linux-bluetooth@vger.kernel.org>,
-	Jakub Pawlowski <jpawlowski@google.com>
-Subject: Re: Handling EBUSY for LE connections.
-Message-ID: <20141119212751.GA6364@t440s.P-661HNU-F1>
-References: <CAHrH25TMxuHY3hqQQFWe+=5ghzc5rrEG2ED5sa410ddiJ-YuDA@mail.gmail.com>
- <50181A20-3313-48C7-924B-05C67B975139@holtmann.org>
- <CAHrH25T6tmUO2Zvsr=R7+yHwQE0_hY_sMt4UQAmCBMZBOH0PRQ@mail.gmail.com>
- <ED9629AB-B978-49FE-A7D7-5D9E62642504@holtmann.org>
- <CAHrH25Te4J6ospnJYA00mb1RofwHrS4=KD8LjmTLvo5Y4Jy8EQ@mail.gmail.com>
- <CAHrH25S5X5UZJwH0JuoWGW70bDdO48iS8Ex5pF0K9Cd7JsRV8A@mail.gmail.com>
- <7ED5AE30-EF53-47EA-A9CE-DD371CE10910@holtmann.org>
- <CAHrH25QzAYG-uHgEJ2rBmpJ_RMgW9zZ0+WvwtY3Mo0zKUxgB9w@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <CAHrH25QzAYG-uHgEJ2rBmpJ_RMgW9zZ0+WvwtY3Mo0zKUxgB9w@mail.gmail.com>
+In-Reply-To: <1416391248-22656-1-git-send-email-chethan.tn@samsung.com>
+References: <1416391248-22656-1-git-send-email-chethan.tn@samsung.com>
+Date: Wed, 19 Nov 2014 23:07:15 +0200
+Message-ID: <CABBYNZ+Em=viaSvukUzp3h0SwGWrxN9nVKTW0u2HdaGc8QU8Qg@mail.gmail.com>
+Subject: Re: [PATCH] audio/sink: Fix a2dp XCASE connection with BOSE headset
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Chethan T N <chethan.tn@samsung.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Arman,
+Hi,
 
-On Mon, Nov 17, 2014, Arman Uguray wrote:
-> >> I guess I'm seeking some programming advice now as a net/bluetooth
-> >> noob. So it looks like in l2cap_code.c:l2cap_chan_connect I want to
-> >> replace the call to "hci_connect_le" with some variant of
-> >> hci_conn_params_set. Based on my understanding, eventually if an ADV
-> >> report is received, hci_event.c:process_adv_report will handle
-> >> creating the connection for us (in hci_event.c:check_pending_le_conn).
-> >>
-> >> From here, what would be the best (and proper) way to propagate this
-> >> information and the newly created hci_conn structure to the l2cap
-> >> layer so that the l2cap_conn structure can be set up?
-> >
-> > that is a good question. I think Johan is a bit deeper in the code.
-> > Might worthwhile to jump on IRC and brainstorm with him on this.
-> >
-> 
-> I'm pretty much always out of luck getting ahold of people on IRC, so
-> hopefully Johan will see this thread and respond eventually.
-> 
-> > He has done connection creation for the slave side using direct
-> > advertising and that would have some similar logical handling. At
-> > least I think it does. And if not, we might first need a few
-> > cleanups to make the LE connection handling for L2CAP sockets more
-> > streamlined and easy to integrate.
-> >
-> 
-> So, from looking at the code, I see that l2cap_sock_connect calls
-> l2cap_chan_connect, which internally creates the hci_conn via
-> hci_connect_le. If all goes well, l2cap_sock_connect simply sits and
-> waits until the socket state becomes BT_CONNECTED. So, I guess we may
-> want something similar to that. We could revise hci_connect_le so that
-> it automatically creates the temporary whitelist entry and listens for
-> AD. Or perhaps we could have an additional API that sends an LE Create
-> Connection that accepts an hci_conn instead of an hci_dev, which can
-> then be called from hci_event.c:check_pending_le_conn.
-> 
-> Anyway, I think I have a rough idea of what needs to be done overall
-> but I'd appreciate Johan's input.
+On Wed, Nov 19, 2014 at 12:00 PM, Chethan T N <chethan.tn@samsung.com> wrote:
+> Some bluetooth headset (BOSE) initates the avdtp connection immideately
+> after HFP connection is completed, so if application initates a2dp connection
+> and since already avdtp connection is ongiong should return error EALREADY
+>
+> bluetoothd[1215]: src/service.c:change_state() 0xb6f428a8: device XX:XX:XX:XX:XX:XX profile Hands-Free Audio Gateway state changed: disconnected -> connecting (0)
+> bluetoothd[1215]: src/profile.c:record_cb() profile uuid 0000111e-0000-1000-8000-00805f9b34fb port uuid 0000111e-0000-1000-8000-00805f9b34fb
+> bluetoothd[1215]: src/profile.c:ext_connect() Hands-Free Audio Gateway connected to XX:XX:XX:XX:XX:XX
+> bluetoothd[1215]: src/service.c:change_state() 0xb6f428a8: device XX:XX:XX:XX:XX:XX profile Hands-Free Audio Gateway state changed: connecting -> connected (0)
+> bluetoothd[1215]: src/device.c:device_profile_connected() Hands-Free Audio Gateway Success (0)
+> bluetoothd[1215]: src/device.c:device_profile_connected() returning response to :1.113
+> bluetoothd[1215]: /: org.freedesktop.DBus.ObjectManager.GetManagedObjects()
+> bluetoothd[1215]: src/device.c:search_cb() XX:XX:XX:XX:XX:XX: No service update
+> bluetoothd[1215]: src/device.c:device_svc_resolved() /org/bluez/hci0/dev_XX_XX_XX_XX_XX_XX err 0
+> bluetoothd[1215]: profiles/audio/avdtp.c:avdtp_confirm_cb() AVDTP: incoming connect from XX:XX:XX:XX:XX:XX
+> bluetoothd[1215]: profiles/audio/sink.c:sink_set_state() State changed /org/bluez/hci0/dev_XX_XX_XX_XX_XX_XX: SINK_STATE_DISCONNECTED -> SINK_STATE_CONNECTING
+> bluetoothd[1215]: src/adapter.c:device_is_auto_accept() uuid 0000110d-0000-1000-8000-00805f9b34fb
+> bluetoothd[1215]: src/adapter.c:device_is_auto_accept() Auto Authorization accepting for uuid 0000110d-0000-1000-8000-00805f9b34fb
+> bluetoothd[1215]: profiles/audio/avdtp.c:avdtp_connect_cb() AVDTP: connected signaling channel to XX:XX:XX:XX:XX:XX
+> bluetoothd[1215]: profiles/audio/avdtp.c:avdtp_connect_cb() AVDTP imtu=672, omtu=895
+> bluetoothd[1215]: profiles/audio/avdtp.c:set_disconnect_timer() name : Bose
+> bluetoothd[1215]: /: org.freedesktop.DBus.ObjectManager.GetManagedObjects()
+> bluetoothd[1215]: /: org.freedesktop.DBus.ObjectManager.GetManagedObjects()
+> bluetoothd[1215]: /org/bluez/hci0/dev_XX_XX_XX_XX_XX_XX: org.freedesktop.DBus.Properties.GetAll()
+> bluetoothd[1215]: profiles/audio/avdtp.c:session_cb()
+> bluetoothd[1215]: profiles/audio/avdtp.c:avdtp_parse_cmd() Received DISCOVER_CMD
+> bluetoothd[1215]: /: org.freedesktop.DBus.ObjectManager.GetManagedObjects()
+> bluetoothd[1215]: profiles/audio/avdtp.c:session_cb()
+> bluetoothd[1215]: profiles/audio/avdtp.c:avdtp_parse_cmd() Received  GET_CAPABILITIES_CMD
+> bluetoothd[1215]: profiles/audio/a2dp.c:endpoint_getcap_ind() Source 0xb6f46030: Get_Capability_Ind
+> bluetoothd[1215]: profiles/audio/avdtp.c:session_cb()
+> bluetoothd[1215]: profiles/audio/avdtp.c:avdtp_parse_cmd() Received SET_CONFIGURATION_CMD
+> bluetoothd[1215]: profiles/audio/a2dp.c:endpoint_setconf_ind() Source 0xb6f46030: Set_Configuration_Ind
+> bluetoothd[1215]: profiles/audio/avdtp.c:avdtp_ref() 0xb6f61c60: ref=1
+> bluetoothd[1215]: profiles/audio/a2dp.c:setup_ref() 0xb6f622d8: ref=1
+> bluetoothd[1215]: profiles/audio/media.c:media_adapter_get_player()
+> bluetoothd[1215]: profiles/audio/media.c:media_set_sink_callback()
+> bluetoothd[1215]: profiles/audio/media.c:media_endpoint_async_call() Calling SetConfiguration: name = :1.14 path = /MediaEndpoint/A2DPSource
+> bluetoothd[1215]: /org/bluez/hci0: org.freedesktop.DBus.Properties.GetAll()
+> bluetoothd[1215]: /org/bluez/hci0/dev_XX_XX_XX_XX_XX_XX: org.bluez.Device1.ConnectProfile()
+> bluetoothd[1215]: src/device.c:connect_profiles() /org/bluez/hci0/dev_XX_XX_XX_XX_XX_XX 0000110b-0000-1000-8000-00805f9b34fb, client :1.113
+> bluetoothd[1215]: profiles/audio/a2dp.c:a2dp_sink_connect() path /org/bluez/hci0/dev_XX_XX_XX_XX_XX_XX
+> bluetoothd[1215]: profiles/audio/avdtp.c:avdtp_ref() 0xb6f61c60: ref=2
+> bluetoothd[1215]: profiles/audio/sink.c:sink_connect() stream creation in progress
+> bluetoothd[1215]: src/service.c:change_state() 0xb6f4ece0: device XX:XX:XX:XX:XX:XX profile a2dp-sink state changed: disconnected -> connecting (0)
+> bluetoothd[1215]: profiles/audio/avdtp.c:session_cb()
+> ---
+>  profiles/audio/sink.c |    3 +++
+>  1 file changed, 3 insertions(+)
+>
+> diff --git a/profiles/audio/sink.c b/profiles/audio/sink.c
+> index da8992e..d512938 100644
+> --- a/profiles/audio/sink.c
+> +++ b/profiles/audio/sink.c
+> @@ -292,6 +292,9 @@ int sink_connect(struct btd_service *service)
+>         if (sink->connect_id > 0 || sink->disconnect_id > 0)
+>                 return -EBUSY;
+>
+> +       if (sink->state == SINK_STATE_CONNECTING)
+> +               return -EALREADY;
 
-It sounds like you're pretty much on the right track. Creating a
-temporary entry to the same list that's used for the usual passive
-scanning based connections should work. All other code that deals with
-notifying the l2cap_chan once we get the LE_Connection_Complete event
-should already be there and do the right thing, so the only new thing
-that should be needed at that point is to permanently remove the
-temporary entry you added.
+We are not connected already so perhaps we should return -EBUSY so it
+behave like connect_id is set.
 
-Anyway, this is what I *think* should work. Once you have some initial
-patches ready it'll be easier to see how things really are :)
+>         if (sink->stream_state >= AVDTP_STATE_OPEN)
+>                 return -EALREADY;
+>
+> --
+> 1.7.9.5
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
-Johan
+
+
+-- 
+Luiz Augusto von Dentz
