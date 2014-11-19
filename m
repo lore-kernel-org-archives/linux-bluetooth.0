@@ -1,50 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
-From: Marcin Kraglak <marcin.kraglak@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] android/gatt: Fix setting end handle
-Date: Wed, 19 Nov 2014 14:45:29 +0100
-Message-Id: <1416404729-32570-1-git-send-email-marcin.kraglak@tieto.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Message-ID: <1416404595.9374.4.camel@sipsolutions.net>
+Subject: Re: [PATCH] Bluetooth: btmrvl add firmware dump support
+From: Johannes Berg <johannes@sipsolutions.net>
+To: Amitkumar Karwar <akarwar@marvell.com>
+Cc: linux-bluetooth@vger.kernel.org, marcel@holtmann.org, Xinming Hu
+	 <huxm@marvell.com>, Cathy Luo <cluo@marvell.com>, Avinash Patil
+	 <patila@marvell.com>
+Date: Wed, 19 Nov 2014 14:43:15 +0100
+In-Reply-To: <1416403887-9271-1-git-send-email-akarwar@marvell.com>
+References: <1416403887-9271-1-git-send-email-akarwar@marvell.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-If found attribute was service attribute, range->end was always set
-to 1, because gatt_db_attribute_get_service_handles return bool.
+On Wed, 2014-11-19 at 05:31 -0800, Amitkumar Karwar wrote:
 
-> ACL Data RX: Handle 8 flags 0x02 dlen 13
-      ATT: Find By Type Value Request (0x06) len 8
-        Handle range: 0x0002-0xffff
-        Attribute type: Primary Service (0x2800)
-          UUID: Device Information (0x180a)
-< ACL Data TX: Handle 8 flags 0x00 dlen 9
-      ATT: Find By Type Value Response (0x07) len 4
-        Handle range: 0x0008-0x0001
----
- android/gatt.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+> +static ssize_t btmrvl_fwdump_read(struct file *file, char __user *userbuf,
+> +				  size_t count, loff_t *ppos)
+> +{
+> +	struct btmrvl_private *priv = file->private_data;
+> +	ssize_t ret = 0;
+> +
+> +	btmrvl_firmware_dump(priv);
 
-diff --git a/android/gatt.c b/android/gatt.c
-index ddc1561..ea5cead 100644
---- a/android/gatt.c
-+++ b/android/gatt.c
-@@ -4532,15 +4532,15 @@ static void send_dev_complete_response(struct gatt_device *device,
- 
- 			range->start = gatt_db_attribute_get_handle(
- 								val->attrib);
--			range->end = range->start;
- 
- 			type = gatt_db_attribute_get_type(val->attrib);
- 			if (is_service(type))
--				range->end =
--					gatt_db_attribute_get_service_handles(
-+				gatt_db_attribute_get_service_handles(
- 								val->attrib,
- 								NULL,
- 								&range->end);
-+			else
-+				range->end = range->start;
- 
- 			list = g_slist_append(list, range);
- 
--- 
-1.9.3
+Might be better to do that on write.
 
+
+> +		fw_dump_len += (strlen("========Start dump ") +
+> +				strlen(entry->mem_name) +
+> +				strlen("========\n") +
+> +				(memory_size + 1) +
+> +				strlen("\n========End dump========\n"));
+
+I'd consider a binary file format.
+
+You also need the select in the Kconfig as I pointed out before.
+
+The more intended use case for this was to trigger it when the driver
+detected a crash, but I guess a debugfs file works as well, just not
+sure when you'd want it.
+
+johannes
