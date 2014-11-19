@@ -2,32 +2,92 @@ Return-Path: <cyrus@holtmann.org>
 From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH v2 03/15] android/handsfree-client: Add volume control handling
-Date: Wed, 19 Nov 2014 10:43:36 +0100
-Message-Id: <1416390228-28330-4-git-send-email-lukasz.rymanowski@tieto.com>
+Subject: [PATCH v2 02/15] android/handsfree-client: Add handle start/stop vr
+Date: Wed, 19 Nov 2014 10:43:35 +0100
+Message-Id: <1416390228-28330-3-git-send-email-lukasz.rymanowski@tieto.com>
 In-Reply-To: <1416390228-28330-1-git-send-email-lukasz.rymanowski@tieto.com>
 References: <1416390228-28330-1-git-send-email-lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+This patch implements start/stop voice recogniction command handling.
+It also introduce find_default_device which returns connected device.
+
+Note that for now we support only one device as this is HAL limitation
 ---
- android/handsfree-client.c | 71 ++++++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 69 insertions(+), 2 deletions(-)
+ android/handsfree-client.c | 106 +++++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 102 insertions(+), 4 deletions(-)
 
 diff --git a/android/handsfree-client.c b/android/handsfree-client.c
-index 8b016c6..9e856e3 100644
+index c576ae8..8b016c6 100644
 --- a/android/handsfree-client.c
 +++ b/android/handsfree-client.c
-@@ -391,10 +391,45 @@ done:
+@@ -135,6 +135,11 @@ static uint32_t hfp_hf_record_id = 0;
+ static struct queue *devices = NULL;
+ static GIOChannel *hfp_hf_server = NULL;
  
- static void handle_volume_control(const void *buf, uint16_t len)
++static struct device *find_default_device(void)
++{
++	return queue_peek_head(devices);
++}
++
+ static bool match_by_bdaddr(const void *data, const void *user_data)
+ {
+ 	const bdaddr_t *addr1 = data;
+@@ -293,18 +298,95 @@ static void handle_disconnect_audio(const void *buf, uint16_t len)
+ 					HAL_STATUS_UNSUPPORTED);
+ }
+ 
++static void cmd_complete_cb(enum hfp_result result, enum hfp_error cme_err,
++							void *user_data)
++{
++	struct hal_ev_hf_client_command_complete ev;
++
++	DBG("");
++
++	memset(&ev, 0, sizeof(ev));
++
++	switch (result) {
++	case HFP_RESULT_OK:
++		ev.type = HAL_HF_CLIENT_CMD_COMP_OK;
++		break;
++	case HFP_RESULT_NO_CARRIER:
++		ev.type = HAL_HF_CLIENT_CMD_COMP_ERR_NO_CARRIER;
++		break;
++	case HFP_RESULT_ERROR:
++		ev.type = HAL_HF_CLIENT_CMD_COMP_ERR;
++		break;
++	case HFP_RESULT_BUSY:
++		ev.type = HAL_HF_CLIENT_CMD_COMP_ERR_BUSY;
++		break;
++	case HFP_RESULT_NO_ANSWER:
++		ev.type = HAL_HF_CLIENT_CMD_COMP_ERR_NO_ANSWER;
++		break;
++	case HFP_RESULT_DELAYED:
++		ev.type = HAL_HF_CLIENT_CMD_COMP_ERR_DELAYED;
++		break;
++	case HFP_RESULT_BLACKLISTED:
++		ev.type = HAL_HF_CLIENT_CMD_COMP_ERR_BACKLISTED;
++		break;
++	case HFP_RESULT_CME_ERROR:
++		ev.type = HAL_HF_CLIENT_CMD_COMP_ERR_CME;
++		ev.cme = cme_err;
++		break;
++	default:
++		error("hf-client: Unknown error code %d", result);
++		ev.type = HAL_HF_CLIENT_CMD_COMP_ERR;
++		break;
++	}
++
++	ipc_send_notif(hal_ipc, HAL_SERVICE_ID_HANDSFREE_CLIENT,
++			HAL_EV_CLIENT_COMMAND_COMPLETE, sizeof(ev), &ev);
++}
++
+ static void handle_start_vr(const void *buf, uint16_t len)
  {
 -	DBG("Not Implemented");
-+	const struct hal_cmd_hf_client_volume_control *cmd = buf;
 +	struct device *dev;
 +	uint8_t status;
-+	uint8_t vol;
-+	bool ret;
 +
 +	DBG("");
 +
@@ -37,78 +97,70 @@ index 8b016c6..9e856e3 100644
 +		goto done;
 +	}
 +
-+	/* Volume is in the range 0-15. Make sure we send correct value
-+	 * to remote device
-+	 */
-+	vol = cmd->volume > 15 ? 15 : cmd->volume;
-+
-+	switch (cmd->type) {
-+	case HF_CLIENT_VOLUME_TYPE_SPEAKER:
-+		ret = hfp_hf_send_command(dev->hf, cmd_complete_cb, NULL,
-+							"AT+VGS=%u", vol);
-+		break;
-+	case HF_CLIENT_VOLUME_TYPE_MIC:
-+		ret = hfp_hf_send_command(dev->hf, cmd_complete_cb, NULL,
-+							"AT+VGM=%u", vol);
-+		break;
-+	default:
-+		ret = false;
-+		break;
-+	}
-+
-+	status = ret ? HAL_STATUS_SUCCESS : HAL_STATUS_FAILED;
++	if (hfp_hf_send_command(dev->hf, cmd_complete_cb, NULL, "AT+BVRA=1"))
++		status = HAL_STATUS_SUCCESS;
++	else
++		status = HAL_STATUS_FAILED;
 +
 +done:
  	ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_HANDSFREE_CLIENT,
- 					HAL_OP_HF_CLIENT_VOLUME_CONTROL,
--					HAL_STATUS_UNSUPPORTED);
-+					status);
+-			HAL_OP_HF_CLIENT_START_VR, HAL_STATUS_UNSUPPORTED);
++			HAL_OP_HF_CLIENT_START_VR, status);
  }
  
- static void handle_dial(const void *buf, uint16_t len)
-@@ -543,6 +578,36 @@ static void bvra_cb(struct hfp_context *context, void *user_data)
- 				HAL_EV_HF_CLIENT_VR_STATE, sizeof(ev), &ev);
+ static void handle_stop_vr(const void *buf, uint16_t len)
+ {
+-	DBG("Not Implemented");
++	struct device *dev;
++	uint8_t status;
++
++	DBG("");
++
++	dev = find_default_device();
++	if (!dev) {
++		status = HAL_STATUS_FAILED;
++		goto done;
++	}
++
++	if (hfp_hf_send_command(dev->hf, cmd_complete_cb, NULL, "AT+BVRA=0"))
++		status = HAL_STATUS_SUCCESS;
++	else
++		status = HAL_STATUS_FAILED;
++
++done:
+ 	ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_HANDSFREE_CLIENT,
+-			HAL_OP_HF_CLIENT_STOP_VR, HAL_STATUS_UNSUPPORTED);
++			HAL_OP_HF_CLIENT_STOP_VR, status);
  }
  
-+static void vgm_cb(struct hfp_context *context, void *user_data)
+ static void handle_volume_control(const void *buf, uint16_t len)
+@@ -447,6 +529,20 @@ static void get_local_codecs_string(struct device *dev, char *buf,
+ 	}
+ }
+ 
++static void bvra_cb(struct hfp_context *context, void *user_data)
 +{
-+	struct hal_ev_hf_client_volume_changed ev;
++	struct hal_ev_hf_client_vr_state ev;
 +	unsigned int val;
 +
-+	if (!hfp_context_get_number(context, &val) || val > 15)
++	if (!hfp_context_get_number(context, &val) || val > 1)
 +		return;
 +
-+	ev.type = HF_CLIENT_VOLUME_TYPE_MIC;
-+	ev.volume = val;
++	ev.state = val ? HAL_HF_CLIENT_VR_STARTED : HAL_HF_CLIENT_VR_STOPPED;
 +
 +	ipc_send_notif(hal_ipc, HAL_SERVICE_ID_HANDSFREE_CLIENT,
 +				HAL_EV_HF_CLIENT_VR_STATE, sizeof(ev), &ev);
 +}
 +
-+static void vgs_cb(struct hfp_context *context, void *user_data)
-+{
-+	struct hal_ev_hf_client_volume_changed ev;
-+	unsigned int val;
-+
-+	if (!hfp_context_get_number(context, &val) || val > 15)
-+		return;
-+
-+	ev.type = HF_CLIENT_VOLUME_TYPE_SPEAKER;
-+	ev.volume = val;
-+
-+	ipc_send_notif(hal_ipc, HAL_SERVICE_ID_HANDSFREE_CLIENT,
-+			HAL_EV_CLIENT_VOLUME_CHANGED, sizeof(ev), &ev);
-+}
-+
  static void slc_completed(struct device *dev)
  {
  	DBG("");
-@@ -555,6 +620,8 @@ static void slc_completed(struct device *dev)
+@@ -457,6 +553,8 @@ static void slc_completed(struct device *dev)
+ 	 * TODO: Notify Android with indicators, register unsolicited result
+ 	 * handlers
  	 */
- 
- 	hfp_hf_register(dev->hf, bvra_cb, "+BRVA", dev, NULL);
-+	hfp_hf_register(dev->hf, vgm_cb, "+VGM", dev, NULL);
-+	hfp_hf_register(dev->hf, vgs_cb, "+VGS", dev, NULL);
++
++	hfp_hf_register(dev->hf, bvra_cb, "+BRVA", dev, NULL);
  }
  
  static void slc_chld_cb(struct hfp_context *context, void *user_data)
