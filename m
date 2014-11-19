@@ -1,32 +1,25 @@
 Return-Path: <cyrus@holtmann.org>
-From: Vikrampal Yadav <vikram.pal@samsung.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: luiz.dentz@gmail.com, d.kasatkin@samsung.com,
-	vikram.pal@samsung.com, cpgs@samsung.com
-Subject: [PATCH] monitor: Fix the return value of l2cap_frame_get_le16()
-Date: Wed, 19 Nov 2014 20:07:30 +0530
-Message-id: <1416407850-13721-1-git-send-email-vikram.pal@samsung.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+From: Amitkumar Karwar <akarwar@marvell.com>
+To: Johannes Berg <johannes@sipsolutions.net>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        "marcel@holtmann.org" <marcel@holtmann.org>,
+        Xinming Hu <huxm@marvell.com>, Cathy Luo <cluo@marvell.com>,
+        Avinash Patil <patila@marvell.com>
+Date: Wed, 19 Nov 2014 06:17:21 -0800
+Subject: RE: [PATCH] Bluetooth: btmrvl add firmware dump support
+Message-ID: <5FF020A1CFFEEC49BD1E09530C4FF5951821E912D5@SC-VEXCH1.marvell.com>
+References: <1416403887-9271-1-git-send-email-akarwar@marvell.com>
+	 <1416404595.9374.4.camel@sipsolutions.net>
+	 <5FF020A1CFFEEC49BD1E09530C4FF5951821E912D2@SC-VEXCH1.marvell.com>
+ <1416405776.9374.5.camel@sipsolutions.net>
+In-Reply-To: <1416405776.9374.5.camel@sipsolutions.net>
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The return value of l2cap_frame_get_le16() rectified.
----
- monitor/l2cap.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/monitor/l2cap.h b/monitor/l2cap.h
-index c14aeef..975f78a 100644
---- a/monitor/l2cap.h
-+++ b/monitor/l2cap.h
-@@ -92,7 +92,7 @@ static inline bool l2cap_frame_get_le16(struct l2cap_frame *frame,
- 
- 	l2cap_frame_pull(frame, frame, sizeof(*value));
- 
--	return 0;
-+	return true;
- }
- 
- static inline bool l2cap_frame_get_be32(struct l2cap_frame *frame,
--- 
-1.9.1
-
+SGkgSm9oYW5uZXMsDQoNCj5TdXJlLCBidXQgZG8geW91IHdhbnQgdG8gaGFuZC1ob2xkIHVzZXJz
+IHRocm91Z2ggaXQ/IGFuZCBkbyB0aGV5IGV2ZW4NCj5oYXZlIGRlYnVnZnM/DQoNCk91ciBCVCBk
+cml2ZXIgaXMgdmVyeSB0aGluLiBJIHRoaW5rLCBkZWJ1Z2ZzIGNvbW1hbmQgd291bGQgYmUgY29u
+dmVuaWVudCBmb3Igbm93IGluc3RlYWQgb2YgaGF2aW5nDQphIGZyYW1ld29yayB0byBkZXRlY3Qg
+Y3Jhc2hlcy9oYW5ncy4gWWVzLiBUaGUgY3VzdG9tZXIgcGxhdGZvcm0gaGFzIGRlYnVnZnMgZW5h
+YmxlZC4NCg0KQmVzdCByZWdhcmRzLA0KQW1pdGt1bWFyDQo=
