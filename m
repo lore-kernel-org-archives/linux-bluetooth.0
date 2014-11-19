@@ -2,47 +2,37 @@ Return-Path: <cyrus@holtmann.org>
 From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
-Subject: [PATCH 3/3] android/client: Add av audio config callback
-Date: Wed, 19 Nov 2014 14:10:06 +0100
-Message-Id: <1416402606-31762-3-git-send-email-jakub.tyszkowski@tieto.com>
-In-Reply-To: <1416402606-31762-1-git-send-email-jakub.tyszkowski@tieto.com>
-References: <1416402606-31762-1-git-send-email-jakub.tyszkowski@tieto.com>
+Subject: [PATCH 1/3] android/hal-ipc-api: Add av callbacks for Android 5
+Date: Wed, 19 Nov 2014 14:10:04 +0100
+Message-Id: <1416402606-31762-1-git-send-email-jakub.tyszkowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This is Android 5 API callback.
+Android 5 adds audio configuration callback.
 ---
- android/client/if-av.c | 14 +++++++++++++-
- 1 file changed, 13 insertions(+), 1 deletion(-)
+ android/hal-ipc-api.txt | 9 +++++++++
+ 1 file changed, 9 insertions(+)
 
-diff --git a/android/client/if-av.c b/android/client/if-av.c
-index 8d1f69b..85c641b 100644
---- a/android/client/if-av.c
-+++ b/android/client/if-av.c
-@@ -50,10 +50,22 @@ static void audio_state(btav_audio_state_t state, bt_bdaddr_t *bd_addr)
- 					bt_bdaddr_t2str(bd_addr, last_addr));
- }
+diff --git a/android/hal-ipc-api.txt b/android/hal-ipc-api.txt
+index a5ec44b..9502a15 100644
+--- a/android/hal-ipc-api.txt
++++ b/android/hal-ipc-api.txt
+@@ -1098,6 +1098,15 @@ Notifications:
+ 		                         0x01 = Stopped
+ 		                         0x02 = Started
  
-+#if ANDROID_VERSION >= PLATFORM_VER(5, 0, 0)
-+static void audio_config(bt_bdaddr_t *bd_addr, uint32_t sample_rate,
-+							uint8_t channel_count) {
-+	haltest_info("%s: remote_addr=%s\n sample_rate=%d\n channel_count=%d\n",
-+				__func__, bt_bdaddr_t2str(bd_addr, last_addr),
-+				sample_rate, channel_count);
-+}
-+#endif
++	Opcode 0x83 - Audio Configuration notification
 +
- static btav_callbacks_t av_cbacks = {
- 	.size = sizeof(av_cbacks),
- 	.connection_state_cb = connection_state,
--	.audio_state_cb = audio_state
-+	.audio_state_cb = audio_state,
-+#if ANDROID_VERSION >= PLATFORM_VER(5, 0, 0)
-+	.audio_config_cb = audio_config,
-+#endif
- };
++		Notification parameters: Remote address (6 octets)
++					 Sample Rate in Hz (4 octets)
++					 Channel Count (1 octet)
++
++		Valid channel count: 0x01 = Mono
++		                     0x02 = Stereo
++
  
- /* init */
+ Bluetooth Health HAL (ID 7)
+ ===========================
 -- 
 1.9.1
 
