@@ -1,50 +1,71 @@
 Return-Path: <cyrus@holtmann.org>
-From: Steven Walter <stevenrwalter@gmail.com>
-To: marcel@holtmann.org,
-	gustavo@padovan.org,
-	johan.hedberg@gmail.com,
-	linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: Steven Walter <stevenrwalter@gmail.com>
-Subject: [PATCH v2] l2cap_core: automatically flushable packets aren't allowed on LE links
-Date: Wed, 19 Nov 2014 09:41:17 -0500
-Message-Id: <1416408077-26514-1-git-send-email-stevenrwalter@gmail.com>
-In-Reply-To: <106789BA-48C0-4428-BE3E-D0737F7A0641@holtmann.org>
-References: <106789BA-48C0-4428-BE3E-D0737F7A0641@holtmann.org>
+MIME-Version: 1.0
+In-Reply-To: <ACB402E679F3454EAE433BF5E93F4EAA01663F45@shsmsx102.ccr.corp.intel.com>
+References: <ACB402E679F3454EAE433BF5E93F4EAA01663F45@shsmsx102.ccr.corp.intel.com>
+Date: Wed, 19 Nov 2014 16:36:26 +0200
+Message-ID: <CABBYNZLWkYcbpMsaTJ6h93UcbtihVB2GkZdZb9XPQ0_3Xjcujg@mail.gmail.com>
+Subject: Re: Does obexd support Multi-User
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: "Wu, JiangboX" <jiangbox.wu@intel.com>
+Cc: "marcel@holtmann.org" <marcel@holtmann.org>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The bluetooth spec states that automatically flushable packets may not
-be sent over a LE-U link.
+Hi,
 
-Signed-off-by: Steven Walter <stevenrwalter@gmail.com>
----
- net/bluetooth/l2cap_core.c | 7 ++++---
- 1 file changed, 4 insertions(+), 3 deletions(-)
+On Wed, Nov 19, 2014 at 3:17 PM, Wu, JiangboX <jiangbox.wu@intel.com> wrote=
+:
+> Hi Marcel,
+>
+>          As I know the bluetoothd is running on root privilege level, obe=
+xd
+> is running on app privilege level. The obexd is running on app privilege
+> level to support user can only transfer the user=E2=80=99s own file. Mayb=
+e it has
+> other reasons.
+>
+> And if the OS has many users can run at the same time. For example. User =
+A
+> named =E2=80=98blob=E2=80=99, User B named =E2=80=98Alice=E2=80=99, and t=
+he root. The three user run on OS
+> at the time. As mentioned before, can I say that =E2=80=98blob=E2=80=99 a=
+nd =E2=80=98Alice=E2=80=99 will
+> have its owner obexd daemon? That I mean multi-user. And does it be able =
+to
+> use independent?
+>
+>          For example, =E2=80=98blob=E2=80=99 use BlueZ to pair device A, =
+and =E2=80=98Alice=E2=80=99 use
+> BlueZ to pair device B. Dose =E2=80=98blob=E2=80=99 can send/receive file=
+ from device A? and
+> =E2=80=98Alice=E2=80=99 can send/receive file form device B? I test the u=
+sage case, and the
+> result is that, =E2=80=98blob=E2=80=99 and =E2=80=98Alice=E2=80=99 can se=
+nd file to device A and Device B
+> simultaneously. But it=E2=80=99s have difference behavior in turn. Only o=
+ne obexd
+> can receive the OPP request, another will never get the OPP request.
+>
+>          Do you have any idea to support multi-user case by running
+> different obexd daemon in the different users? If obexd don=E2=80=99t sup=
+port
+> multi-user, can you give me some sugguestions? Thanks. J
 
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 4af3821..028fcc6 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -764,7 +764,7 @@ static void l2cap_send_cmd(struct l2cap_conn *conn, u8 ident, u8 code, u16 len,
- 	if (!skb)
- 		return;
- 
--	if (lmp_no_flush_capable(conn->hcon->hdev))
-+	if (lmp_no_flush_capable(conn->hcon->hdev) || (conn->hcon->type == LE_LINK))
- 		flags = ACL_START_NO_FLUSH;
- 	else
- 		flags = ACL_START;
-@@ -798,8 +798,9 @@ static void l2cap_do_send(struct l2cap_chan *chan, struct sk_buff *skb)
- 		return;
- 	}
- 
--	if (!test_bit(FLAG_FLUSHABLE, &chan->flags) &&
--	    lmp_no_flush_capable(hcon->hdev))
-+	if ((hcon->type == LE_LINK) ||
-+	    (!test_bit(FLAG_FLUSHABLE, &chan->flags) &&
-+	    lmp_no_flush_capable(hcon->hdev)))
- 		flags = ACL_START_NO_FLUSH;
- 	else
- 		flags = ACL_START;
--- 
-1.9.1
+Yes obexd is capable of doing multi-user/multi-instance setups, what
+is not able to do is multi-seat if you need server role since there
+could be only 1 socket listening in the same channel/psm, for the
+client APIs there is no problem if user A connects to device X and
+user B to device Y they both can be connected simultaneously.
+
+In terms of device management however you do have a problem, because
+in Bluetooth there is only one link-key per device and that is
+associated to the adapter, there is no user association and it makes
+no sense to do so because the remote device also generates a link-key
+as well, so if you want to restrict access of devices per user you
+need to do so before it reaches obexd using perhaps a D-Bus daemon
+hook to call a process that does keep track of which devices the user
+can access.
+
+--=20
+Luiz Augusto von Dentz
