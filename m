@@ -1,6 +1,6 @@
 Return-Path: <cyrus@holtmann.org>
-Message-id: <546C52CD.2030209@samsung.com>
-Date: Wed, 19 Nov 2014 17:20:29 +0900
+Message-id: <546C5241.6080903@samsung.com>
+Date: Wed, 19 Nov 2014 17:18:09 +0900
 From: Chan-yeol Park <chanyeol.park@samsung.com>
 MIME-version: 1.0
 To: "Kirill A. Shutemov" <kirill@shutemov.name>,
@@ -12,10 +12,10 @@ References: <20141118133459.GB27428@node.dhcp.inet.fi>
  <20141118180919.GA32128@t440s.P-661HNU-F1>
 In-reply-to: <20141118180919.GA32128@t440s.P-661HNU-F1>
 Content-type: text/plain; charset=windows-1252; format=flowed
-Sender: linux-wireless-owner@vger.kernel.org
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi
+Hi All
 
 On 11/19/2014 03:09 AM, Johan Hedberg wrote:
 > Hi Kirill,
@@ -77,11 +77,11 @@ On 11/19/2014 03:09 AM, Johan Hedberg wrote:
 > adapters (I have one for pretty much every Bluetooth version).
 >
 > Johan
-
 I agree I made a bug in the previous commit and I think we need to apply 
 Johan's patch.
 It is working fine on my machine.
 
 Thanks
 Chanyeol
+
 
