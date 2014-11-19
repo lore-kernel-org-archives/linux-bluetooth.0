@@ -1,101 +1,87 @@
 Return-Path: <cyrus@holtmann.org>
-From: Amitkumar Karwar <akarwar@marvell.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: <marcel@holtmann.org>, Amitkumar Karwar <akarwar@marvell.com>,
-        Cathy Luo
-	<cluo@marvell.com>, Avinash Patil <patila@marvell.com>
-Subject: [PATCH 1/3] Bluetooth: btmrvl: add DT bindings documentation
-Date: Wed, 19 Nov 2014 01:28:32 -0800
-Message-ID: <1416389314-6327-1-git-send-email-akarwar@marvell.com>
-MIME-Version: 1.0
-Content-Type: text/plain
+Message-id: <546C52CD.2030209@samsung.com>
+Date: Wed, 19 Nov 2014 17:20:29 +0900
+From: Chan-yeol Park <chanyeol.park@samsung.com>
+MIME-version: 1.0
+To: "Kirill A. Shutemov" <kirill@shutemov.name>,
+	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Kyungmin Park <kyungmin.park@samsung.com>,
+	linville@tuxdriver.com, linux-wireless@vger.kernel.org
+Subject: Re: pull request: bluetooth-next 2014-11-07
+References: <20141118133459.GB27428@node.dhcp.inet.fi>
+ <20141118180919.GA32128@t440s.P-661HNU-F1>
+In-reply-to: <20141118180919.GA32128@t440s.P-661HNU-F1>
+Content-type: text/plain; charset=windows-1252; format=flowed
+Sender: linux-wireless-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Calibration data can be downloaded through device tree method. This
-patch adds the documentation. Also, instead of searching device tree
-node by name using of_find_node_by_name() API, let's use
-for_each_compatible_node().
+Hi
 
-Signed-off-by: Amitkumar Karwar <akarwar@marvell.com>
-Signed-off-by: Cathy Luo <cluo@marvell.com>
-Signed-off-by: Avinash Patil <patila@marvell.com>
----
- Documentation/devicetree/bindings/btmrvl.txt | 22 ++++++++++++++++++++
- drivers/bluetooth/btmrvl_main.c              | 31 +++++++++++++---------------
- 2 files changed, 36 insertions(+), 17 deletions(-)
- create mode 100644 Documentation/devicetree/bindings/btmrvl.txt
+On 11/19/2014 03:09 AM, Johan Hedberg wrote:
+> Hi Kirill,
+>
+> On Tue, Nov 18, 2014, Kirill A. Shutemov wrote:
+>> On Fri, Nov 07, 2014 at 11:27:54AM +0200, Johan Hedberg wrote:
+>>> Chan-yeol Park (1):
+>>>        Bluetooth: Fix hci_sync missing wakeup interrupt
+>> Look like this commit causes problem for me:
+>>
+>> [    2.018671] ------------[ cut here ]------------
+>> [    2.022836] WARNING: CPU: 2 PID: 109 at /home/kas/git/public/linux/kernel/sched/core.c:7323 __might_sleep+0xbd/0xd0()
+>> [    2.023166] Freeing unused kernel memory: 944K (ffff880001b14000 - ffff880001c00000)
+>> [    2.030362] do not call blocking ops when !TASK_RUNNING; state=1 set at [<ffffffff819ab67b>] __hci_req_sync+0x7b/0x2a0
+>> [    2.034193] Modules linked in:
+>> [    2.036133] CPU: 2 PID: 109 Comm: kworker/u17:0 Not tainted 3.18.0-rc4-next-20141117-07404-g9dad2ab6df8b #66
+>> [    2.036383] Freeing unused kernel memory: 1404K (ffff8800020a1000 - ffff880002200000)
+>> [    2.038940] Hardware name: LENOVO 3460CC6/3460CC6, BIOS G6ET93WW (2.53 ) 02/04/2013
+>> [    2.040233] Workqueue: hci0 hci_power_on
+>> [    2.041517]  ffffffff81f51d50 ffff8800d3ecfb28 ffffffff81afc316 0000000000000000
+>> [    2.042811]  ffff8800d3ecfb78 ffff8800d3ecfb68 ffffffff810fc11a ffff880000000000
+>> [    2.042812]  ffffffff81f52a28 000000000000026d 0000000000000000 ffff8800d3ec9200
+>> [    2.042813] Call Trace:
+>> [    2.042818]  [<ffffffff81afc316>] dump_stack+0x4c/0x6e
+>> [    2.042821]  [<ffffffff810fc11a>] warn_slowpath_common+0x8a/0xc0
+>> [    2.042823]  [<ffffffff810fc196>] warn_slowpath_fmt+0x46/0x50
+>> [    2.042825]  [<ffffffff819ab67b>] ? __hci_req_sync+0x7b/0x2a0
+>> [    2.042827]  [<ffffffff819ab67b>] ? __hci_req_sync+0x7b/0x2a0
+>> [    2.042830]  [<ffffffff811295ed>] __might_sleep+0xbd/0xd0
+>> [    2.042832]  [<ffffffff81b04b8f>] mutex_lock_nested+0x2f/0x450
+>> [    2.042835]  [<ffffffff81b0812b>] ? _raw_spin_unlock+0x2b/0x50
+>> [    2.042837]  [<ffffffff81131db0>] ? wake_up_process+0x50/0x50
+>> [    2.042840]  [<ffffffff813b9ea1>] __create_file+0x71/0x2c0
+>> [    2.042842]  [<ffffffff813ba10f>] debugfs_create_file+0x1f/0x30
+>> [    2.042844]  [<ffffffff819ac461>] hci_dev_do_open+0x431/0xa70
+>> [    2.042846]  [<ffffffff8111a72c>] ? process_one_work+0x13c/0x810
+>> [    2.042847]  [<ffffffff819ad2b1>] hci_power_on+0x31/0x1e0
+>> [    2.042849]  [<ffffffff8111a7c8>] process_one_work+0x1d8/0x810
+>> [    2.042850]  [<ffffffff8111a72c>] ? process_one_work+0x13c/0x810
+>> [    2.042851]  [<ffffffff8111b2db>] worker_thread+0x6b/0x4b0
+>> [    2.042852]  [<ffffffff8111b270>] ? init_pwq+0xf0/0xf0
+>> [    2.042854]  [<ffffffff81120ef9>] kthread+0x119/0x130
+>> [    2.042855]  [<ffffffff8112923d>] ? finish_task_switch+0x4d/0x140
+>> [    2.042857]  [<ffffffff81120de0>] ? kthread_create_on_node+0x240/0x240
+>> [    2.042859]  [<ffffffff81b08cfc>] ret_from_fork+0x7c/0xb0
+>> [    2.042861]  [<ffffffff81120de0>] ? kthread_create_on_node+0x240/0x240
+>> [    2.042863] ---[ end trace 3a40e80ec4ca7159 ]---
+> At least one obvious bug that the patch in question seems to have is
+> that it fails to set the state back to TASK_RUNNING in case
+> hci_req_run() fails and we never call schedule_timeout(). This would
+> also seem to match the error you're getting.
+>
+> The attached patch fixes the missing set_current_state() calls - could
+> you please check if it fixes the issue for you? Out of curiosity, which
+> HW are you reproducing this with and are there any special steps
+> involved? Looking at the code it seems that at least some older
+> Bluetooth adapters could cause some hci_req_run() calls to return
+> ENODATA, however I wasn't able to get the warning with any of my own
+> adapters (I have one for pretty much every Bluetooth version).
+>
+> Johan
 
-diff --git a/Documentation/devicetree/bindings/btmrvl.txt b/Documentation/devicetree/bindings/btmrvl.txt
-new file mode 100644
-index 0000000..cdd5768
---- /dev/null
-+++ b/Documentation/devicetree/bindings/btmrvl.txt
-@@ -0,0 +1,22 @@
-+btmrvl
-+------
-+
-+Required properties:
-+
-+  - compatible : must be "btmrvl,cfgdata"
-+
-+Optional properties:
-+
-+  - btmrvl,cal-data : Calibration data downloaded to the device during
-+		      initialization. This is an array of 28 values(u8).
-+
-+Example:
-+
-+btmrvl {
-+	compatible = "btmrvl,cfgdata";
-+
-+	btmrvl,cal-data = /bits/ 8 <
-+		0x37 0x01 0x1c 0x00 0xff 0xff 0xff 0xff 0x01 0x7f 0x04 0x02
-+		0x00 0x00 0xba 0xce 0xc0 0xc6 0x2d 0x00 0x00 0x00 0x00 0x00
-+		0x00 0x00 0xf0 0x00>;
-+};
-diff --git a/drivers/bluetooth/btmrvl_main.c b/drivers/bluetooth/btmrvl_main.c
-index 1d7db20..2909bca 100644
---- a/drivers/bluetooth/btmrvl_main.c
-+++ b/drivers/bluetooth/btmrvl_main.c
-@@ -496,25 +496,22 @@ static int btmrvl_cal_data_dt(struct btmrvl_private *priv)
- {
- 	struct device_node *dt_node;
- 	u8 cal_data[BT_CAL_HDR_LEN + BT_CAL_DATA_SIZE];
--	const char name[] = "btmrvl_caldata";
--	const char property[] = "btmrvl,caldata";
- 	int ret;
- 
--	dt_node = of_find_node_by_name(NULL, name);
--	if (!dt_node)
--		return -ENODEV;
--
--	ret = of_property_read_u8_array(dt_node, property,
--					cal_data + BT_CAL_HDR_LEN,
--					BT_CAL_DATA_SIZE);
--	if (ret)
--		return ret;
--
--	BT_DBG("Use cal data from device tree");
--	ret = btmrvl_download_cal_data(priv, cal_data, BT_CAL_DATA_SIZE);
--	if (ret) {
--		BT_ERR("Fail to download calibrate data");
--		return ret;
-+	for_each_compatible_node(dt_node, NULL, "btmrvl,cfgdata") {
-+		ret = of_property_read_u8_array(dt_node, "btmrvl,cal-data",
-+						cal_data + BT_CAL_HDR_LEN,
-+						BT_CAL_DATA_SIZE);
-+		if (ret)
-+			return ret;
-+
-+		BT_DBG("Use cal data from device tree");
-+		ret = btmrvl_download_cal_data(priv, cal_data,
-+					       BT_CAL_DATA_SIZE);
-+		if (ret) {
-+			BT_ERR("Fail to download calibrate data");
-+			return ret;
-+		}
- 	}
- 
- 	return 0;
--- 
-1.8.1.4
+I agree I made a bug in the previous commit and I think we need to apply 
+Johan's patch.
+It is working fine on my machine.
+
+Thanks
+Chanyeol
+
