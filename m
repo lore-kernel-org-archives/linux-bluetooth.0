@@ -1,156 +1,170 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 19 Nov 2014 13:06:54 +0200
-From: "Kirill A. Shutemov" <kirill@shutemov.name>
-To: Johan Hedberg <johan.hedberg@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Chan-yeol Park <chanyeol.park@samsung.com>,
-	Kyungmin Park <kyungmin.park@samsung.com>,
-	linville@tuxdriver.com, linux-wireless@vger.kernel.org
-Subject: Re: pull request: bluetooth-next 2014-11-07
-Message-ID: <20141119110654.GA1894@node.dhcp.inet.fi>
-References: <20141118133459.GB27428@node.dhcp.inet.fi>
- <20141118180919.GA32128@t440s.P-661HNU-F1>
+Message-ID: <546C6BB9.4040705@gmail.com>
+Date: Wed, 19 Nov 2014 13:06:49 +0300
+From: Dmitry Tunin <hanipouspilot@gmail.com>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="9amGYk9869ThD9tj"
-In-Reply-To: <20141118180919.GA32128@t440s.P-661HNU-F1>
-Sender: linux-kernel-owner@vger.kernel.org
+To: Michel Memeteau - EKIMIA <contact@ekimia.fr>
+CC: Marcel Holtmann <marcel@holtmann.org>,
+ linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+ linux-kernel <linux-kernel@vger.kernel.org>,
+ linux-wireless <linux-wireless@vger.kernel.org>
+Subject: Re: [PATCH v3] ath3k: Add support of MCI 13d3:3408 bt device
+References: <CANoib0HW2umPpzzerYNq1fMMnkYxOa78o5X90-K=eNEnTGSO1w@mail.gmail.com> <F01422F2-5F7C-406A-A06B-2C2CE96B9E3A@holtmann.org> <546C3CCE.400@gmail.com> <CAKxAHQ4intUoy2qv9ftTJL_c2JN3kYn8bC_Jk9=93rvvXNE80Q@mail.gmail.com> <CAKxAHQ5wDG=Bi4bLUsN5A9r4Y82444Ysnuppy+8REf7qUh1nmg@mail.gmail.com>
+In-Reply-To: <CAKxAHQ5wDG=Bi4bLUsN5A9r4Y82444Ysnuppy+8REf7qUh1nmg@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+It seems that I am too stupid.
+It is neither AR3012 or AR3011 device.
+It is AR9565 with sflash.
+Probably it makes sense to do a separate section for these devices.
 
---9amGYk9869ThD9tj
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+But still
+{ USB_DEVICE(0x13d3, 0x3408), .driver_info = BTUSB_IGNORE },
+works better than
 
-On Tue, Nov 18, 2014 at 08:09:19PM +0200, Johan Hedberg wrote:
-> Hi Kirill,
-> 
-> On Tue, Nov 18, 2014, Kirill A. Shutemov wrote:
-> > On Fri, Nov 07, 2014 at 11:27:54AM +0200, Johan Hedberg wrote:
-> > > Chan-yeol Park (1):
-> > >       Bluetooth: Fix hci_sync missing wakeup interrupt
-> > 
-> > Look like this commit causes problem for me:
-> > 
-> > [    2.018671] ------------[ cut here ]------------
-> > [    2.022836] WARNING: CPU: 2 PID: 109 at /home/kas/git/public/linux/kernel/sched/core.c:7323 __might_sleep+0xbd/0xd0()
-> > [    2.023166] Freeing unused kernel memory: 944K (ffff880001b14000 - ffff880001c00000)
-> > [    2.030362] do not call blocking ops when !TASK_RUNNING; state=1 set at [<ffffffff819ab67b>] __hci_req_sync+0x7b/0x2a0
-> > [    2.034193] Modules linked in:
-> > [    2.036133] CPU: 2 PID: 109 Comm: kworker/u17:0 Not tainted 3.18.0-rc4-next-20141117-07404-g9dad2ab6df8b #66
-> > [    2.036383] Freeing unused kernel memory: 1404K (ffff8800020a1000 - ffff880002200000)
-> > [    2.038940] Hardware name: LENOVO 3460CC6/3460CC6, BIOS G6ET93WW (2.53 ) 02/04/2013
-> > [    2.040233] Workqueue: hci0 hci_power_on
-> > [    2.041517]  ffffffff81f51d50 ffff8800d3ecfb28 ffffffff81afc316 0000000000000000
-> > [    2.042811]  ffff8800d3ecfb78 ffff8800d3ecfb68 ffffffff810fc11a ffff880000000000
-> > [    2.042812]  ffffffff81f52a28 000000000000026d 0000000000000000 ffff8800d3ec9200
-> > [    2.042813] Call Trace:
-> > [    2.042818]  [<ffffffff81afc316>] dump_stack+0x4c/0x6e
-> > [    2.042821]  [<ffffffff810fc11a>] warn_slowpath_common+0x8a/0xc0
-> > [    2.042823]  [<ffffffff810fc196>] warn_slowpath_fmt+0x46/0x50
-> > [    2.042825]  [<ffffffff819ab67b>] ? __hci_req_sync+0x7b/0x2a0
-> > [    2.042827]  [<ffffffff819ab67b>] ? __hci_req_sync+0x7b/0x2a0
-> > [    2.042830]  [<ffffffff811295ed>] __might_sleep+0xbd/0xd0
-> > [    2.042832]  [<ffffffff81b04b8f>] mutex_lock_nested+0x2f/0x450
-> > [    2.042835]  [<ffffffff81b0812b>] ? _raw_spin_unlock+0x2b/0x50
-> > [    2.042837]  [<ffffffff81131db0>] ? wake_up_process+0x50/0x50
-> > [    2.042840]  [<ffffffff813b9ea1>] __create_file+0x71/0x2c0
-> > [    2.042842]  [<ffffffff813ba10f>] debugfs_create_file+0x1f/0x30
-> > [    2.042844]  [<ffffffff819ac461>] hci_dev_do_open+0x431/0xa70
-> > [    2.042846]  [<ffffffff8111a72c>] ? process_one_work+0x13c/0x810
-> > [    2.042847]  [<ffffffff819ad2b1>] hci_power_on+0x31/0x1e0
-> > [    2.042849]  [<ffffffff8111a7c8>] process_one_work+0x1d8/0x810
-> > [    2.042850]  [<ffffffff8111a72c>] ? process_one_work+0x13c/0x810
-> > [    2.042851]  [<ffffffff8111b2db>] worker_thread+0x6b/0x4b0
-> > [    2.042852]  [<ffffffff8111b270>] ? init_pwq+0xf0/0xf0
-> > [    2.042854]  [<ffffffff81120ef9>] kthread+0x119/0x130
-> > [    2.042855]  [<ffffffff8112923d>] ? finish_task_switch+0x4d/0x140
-> > [    2.042857]  [<ffffffff81120de0>] ? kthread_create_on_node+0x240/0x240
-> > [    2.042859]  [<ffffffff81b08cfc>] ret_from_fork+0x7c/0xb0
-> > [    2.042861]  [<ffffffff81120de0>] ? kthread_create_on_node+0x240/0x240
-> > [    2.042863] ---[ end trace 3a40e80ec4ca7159 ]---
-> 
-> At least one obvious bug that the patch in question seems to have is
-> that it fails to set the state back to TASK_RUNNING in case
-> hci_req_run() fails and we never call schedule_timeout(). This would
-> also seem to match the error you're getting.
-> 
-> The attached patch fixes the missing set_current_state() calls - could
-> you please check if it fixes the issue for you? Out of curiosity, which
-> HW are you reproducing this with and are there any special steps
-> involved? Looking at the code it seems that at least some older
-> Bluetooth adapters could cause some hci_req_run() calls to return
-> ENODATA, however I wasn't able to get the warning with any of my own
-> adapters (I have one for pretty much every Bluetooth version).
-> 
-> Johan
+{ USB_DEVICE(0x13d3, 0x3408), .driver_info = BTUSB_ATH3012 },
 
-> From a75be9ae3c163db6a812330b5b50079891e1f7bd Mon Sep 17 00:00:00 2001
-> From: Johan Hedberg <johan.hedberg@intel.com>
-> Date: Tue, 18 Nov 2014 20:00:15 +0200
-> Subject: [PATCH] Bluetooth: Fix setting state back to TASK_RUNNING
-> 
-> In __hci_cmd_sync_ev() and __hci_req_sync() if the hci_req_run() call
-> fails and we return from the functions we should ensure that the state
-> doesn't remain in TASK_INTERRUPTIBLE that we just set it to. This patch
-> fixes missing calls to set_current_state(TASK_RUNNING) in both places.
-> 
-> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+With the latter I have some issues with turning bt on and off.
 
-This patch helps -- warning is gone.
-
-Trace from btmon on 'hciconfig hci0 up' is attached.
-
--- 
- Kirill A. Shutemov
-
---9amGYk9869ThD9tj
-Content-Type: application/octet-stream
-Content-Disposition: attachment; filename=trace
-Content-Transfer-Encoding: base64
-
-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
-
---9amGYk9869ThD9tj--
+19.11.2014 12:40, Michel Memeteau - EKIMIA wrote:
+> Hi,
+>
+> I tried to understand why this "0x13d3, 0x3408" device support
+> wouldn't go in btusb as it's really close to IMC BT chip found in
+> Realtek Wifi devices which is on the path to go in btusb [1]
+>
+> then I guess there is a lot of code that could be shared to support
+> all IMC usb devices in the btusb module.
+>
+> Regards.
+>
+> [1] https://github.com/lwfinger/rtl8723au_bt/tree/new
+>
+>   <------------------------------------------------------------------------------------------------------------------>
+>   Michel Memeteau  - Directeur.
+>
+>   Notre Boutique Ordinateurs GNU/Linux : http://shop.ekimia.fr
+>   49 chemin de l'union 13720 La Bouilladisse - France.
+>   Fixe :  +33 (0) 972308334   Mobile : +33(0) 624808051
+>   <------------------------------------------------------------------------------------------------------------------>
+>
+>   2014-11-19 7:46 GMT+01:00 Dmitry Tunin <hanipouspilot@gmail.com>:
+>> Hi Marcel,
+>>
+>> Here is information from /sys/kernel/debug/usb/devices
+>>
+>> T:  Bus=01 Lev=02 Prnt=03 Port=00 Cnt=01 Dev#= 20 Spd=12 MxCh= 0
+>> D:  Ver= 1.10 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs= 1
+>> P:  Vendor=13d3 ProdID=3408 Rev= 0.02
+>> C:* #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
+>> A:  FirstIf#= 0 IfCount= 2 Cls=e0(wlcon) Sub=01 Prot=01
+>> I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+>> E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
+>> E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+>> E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+>> I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+>> E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+>> E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+>> I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+>> E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+>> E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+>> I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+>> E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+>> E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+>> I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+>> E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+>> E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+>> I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+>> E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+>> E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+>> I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+>> E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+>> E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+>>
+>>
+>> I hope this mail client is OK now.
+>>
+>> Add support for bluetooth MCI WB335 (AR9565) Wi-Fi+bt module.
+>> It is AR3011 device according to iProduct == 0.
+>> So btusb should be blacklisted
+>> I submitted a wrong patch before asif  it was an AR3012 device,
+>> but it works both ways. This is the right one.
+>>
+>> Signed-off-by: Dmitry Tunin<hanipouspilot@gmail.com>
+>>
+>> ---
+>>
+>> diff --git a/drivers/bluetooth/ath3k.c b/drivers/bluetooth/ath3k.c
+>> index d85ced2..3b53116 100644
+>> --- a/drivers/bluetooth/ath3k.c
+>> +++ b/drivers/bluetooth/ath3k.c
+>> @@ -69,6 +69,7 @@ static const struct usb_device_id ath3k_table[] = {
+>>       { USB_DEVICE(0x0CF3, 0x3002) },
+>>       { USB_DEVICE(0x0CF3, 0xE019) },
+>>       { USB_DEVICE(0x13d3, 0x3304) },
+>> +    { USB_DEVICE(0x13d3, 0x3408) },
+>>
+>>       /* Atheros AR9285 Malbec with sflash firmware */
+>>       { USB_DEVICE(0x03F0, 0x311D) },
+>> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+>> index edfc17b..bbf5c1c 100644
+>> --- a/drivers/bluetooth/btusb.c
+>> +++ b/drivers/bluetooth/btusb.c
+>> @@ -146,6 +146,7 @@ static const struct usb_device_id blacklist_table[] = {
+>>       { USB_DEVICE(0x0cf3, 0x3002), .driver_info = BTUSB_IGNORE },
+>>       { USB_DEVICE(0x0cf3, 0xe019), .driver_info = BTUSB_IGNORE },
+>>       { USB_DEVICE(0x13d3, 0x3304), .driver_info = BTUSB_IGNORE },
+>> +    { USB_DEVICE(0x13d3, 0x3408), .driver_info = BTUSB_IGNORE },
+>>
+>>       /* Atheros AR9285 Malbec with sflash firmware */
+>>       { USB_DEVICE(0x03f0, 0x311d), .driver_info = BTUSB_IGNORE },
+>>
+>>
+>> 19.11.2014 01:56, Marcel Holtmann wrote:
+>>> Hi Dmitry,
+>>>
+>>>> Add support for bluetooth MCI WB335 (AR9565) Wi-Fi+bt module.
+>>>> It is AR3011 device according to iProduct == 0.
+>>>> So btusb should be blacklisted
+>>>> I submitted a wrong patch before asif  it was an AR3012 device,
+>>>> but it works both ways. This is the right one.
+>>> include the device details from /sys/kernel/debug/usb/devices.
+>>>
+>>>> Signed-off-by: Dmitry Tunin <hanipouspilot@gmail.com>
+>>>> are */
+>>> No idea what this are */ is.
+>>>
+>>>> ---
+>>>>
+>>>> diff --git a/drivers/bluetooth/ath3k.c b/drivers/bluetooth/ath3k.c
+>>>> index d85ced2..3b53116 100644
+>>>> --- a/drivers/bluetooth/ath3k.c
+>>>> +++ b/drivers/bluetooth/ath3k.c
+>>>> @@ -69,6 +69,7 @@ static const struct usb_device_id ath3k_table[] = {
+>>>>    { USB_DEVICE(0x0CF3, 0x3002) },
+>>>>    { USB_DEVICE(0x0CF3, 0xE019) },
+>>>>    { USB_DEVICE(0x13d3, 0x3304) },
+>>>> + { USB_DEVICE(0x13d3, 0x3408) },
+>>>>
+>>>>    /* Atheros AR9285 Malbec with sflash firmware */
+>>>>    { USB_DEVICE(0x03F0, 0x311D) },
+>>>> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+>>>> index edfc17b..bbf5c1c 100644
+>>>> --- a/drivers/bluetooth/btusb.c
+>>>> +++ b/drivers/bluetooth/btusb.c
+>>>> @@ -146,6 +146,7 @@ static const struct usb_device_id blacklist_table[] = {
+>>>    { USB_DEVICE(0x0cf3, 0x3002), .driver_info = BTUSB_IGNORE },
+>>>>    { USB_DEVICE(0x0cf3, 0xe019), .driver_info = BTUSB_IGNORE },
+>>>>    { USB_DEVICE(0x13d3, 0x3304), .driver_info = BTUSB_IGNORE },
+>>>> + { USB_DEVICE(0x13d3, 0x3408), .driver_info = BTUSB_IGNORE },
+>>> Fix whitespace here or use a proper mail client.
+>>>
+>>> Regards
+>>>
+>>> Marcel
+>>>
+>> --
+>> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+>> the body of a message to majordomo@vger.kernel.org
+>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
