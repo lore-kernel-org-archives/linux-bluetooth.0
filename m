@@ -1,48 +1,55 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcin Kraglak <marcin.kraglak@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv2 9/9] unit/test-gatt: Add /TP/GAR/CL/BI-11-C test
-Date: Wed, 19 Nov 2014 12:26:33 +0100
-Message-Id: <1416396393-19997-10-git-send-email-marcin.kraglak@tieto.com>
+Subject: [PATCHv2 4/9] unit/test-gatt: Add /TP/GAR/CL/BV-03-C-2 test
+Date: Wed, 19 Nov 2014 12:26:28 +0100
+Message-Id: <1416396393-19997-5-git-send-email-marcin.kraglak@tieto.com>
 In-Reply-To: <1416396393-19997-1-git-send-email-marcin.kraglak@tieto.com>
 References: <1416396393-19997-1-git-send-email-marcin.kraglak@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Verify Generic Attribute Profile client behavior when the Read Using
-Characteristic UUID procedure fails due to insufficient encryption
-key size.
+Verify that a Generic Attribute Profile client can read
+a Characteristic Value selected by UUID using a 128-bit UUID.
 ---
- unit/test-gatt.c | 13 +++++++++++++
- 1 file changed, 13 insertions(+)
+ unit/test-gatt.c | 21 +++++++++++++++++++++
+ 1 file changed, 21 insertions(+)
 
 diff --git a/unit/test-gatt.c b/unit/test-gatt.c
-index 4265de1..9ded1f0 100644
+index 72cfbf6..8d5f3b3 100644
 --- a/unit/test-gatt.c
 +++ b/unit/test-gatt.c
-@@ -654,6 +654,12 @@ const struct test_step test_read_by_type_5 = {
- 	.expected_att_ecode = 0x05,
+@@ -160,6 +160,12 @@ static bt_uuid_t uuid_128 = {
+ 				0x80, 0x00, 0x00, 0x80, 0x5f, 0x9b, 0x34, 0xfb}
  };
  
-+const struct test_step test_read_by_type_6 = {
-+	.handle = 0x0001,
-+	.end_handle = 0xffff,
-+	.expected_att_ecode = 0x0c,
++static bt_uuid_t uuid_char_128 = {
++	.type = BT_UUID128,
++	.value.u128.data = {0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
++			0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f}
 +};
 +
- static void read_by_type_cb(bool success, uint8_t att_ecode,
- 						struct bt_gatt_result *result,
- 						void *user_data)
-@@ -880,5 +886,12 @@ int main(int argc, char *argv[])
- 			raw_pdu(0x08, 0x01, 0x00, 0xff, 0xff, 0x0d, 0x2a),
- 			raw_pdu(0x01, 0x08, 0x0b, 0x00, 0x05));
+ const bt_gatt_service_t service_1 = {
+ 	.primary = true,
+ 	.start_handle = 0x0001,
+@@ -807,5 +813,20 @@ int main(int argc, char *argv[])
+ 			raw_pdu(0x08, 0x0b, 0x00, 0xff, 0xff, 0x0d, 0x2a),
+ 			raw_pdu(0x01, 0x08, 0x0b, 0x00, 0x0a));
  
-+	define_test_att("/TP/GAR/CL/BI-11-C", test_read_by_type, &uuid_char_16,
-+			&test_read_by_type_6,
++	define_test_att("/TP/GAR/CL/BV-03-C-2", test_read_by_type,
++			&uuid_char_128, &test_read_by_type_1,
 +			raw_pdu(0x02, 0x00, 0x02),
 +			raw_pdu(0x03, 0x00, 0x02),
-+			raw_pdu(0x08, 0x01, 0x00, 0xff, 0xff, 0x0d, 0x2a),
-+			raw_pdu(0x01, 0x08, 0x0b, 0x00, 0x0c));
++			raw_pdu(0x08, 0x01, 0x00, 0xff, 0xff, 0x0f, 0x0e, 0x0d,
++					0x0c, 0x0b, 0x0a, 0x09, 0x08, 0x07,
++					0x06, 0x05, 0x04, 0x03, 0x02, 0x01,
++					0x00),
++			raw_pdu(0x09, 0x05, 0x0a, 0x00, 0x01, 0x02, 0x03),
++			raw_pdu(0x08, 0x0b, 0x00, 0xff, 0xff, 0x0f, 0x0e, 0x0d,
++					0x0c, 0x0b, 0x0a, 0x09, 0x08, 0x07,
++					0x06, 0x05, 0x04, 0x03, 0x02, 0x01,
++					0x00),
++			raw_pdu(0x01, 0x08, 0x0b, 0x00, 0x0a));
 +
  	return g_test_run();
  }
