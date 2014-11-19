@@ -1,167 +1,151 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcin Kraglak <marcin.kraglak@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv2 3/9] unit/test-gatt: Add /TP/GAR/CL/BV-03-C-1 test
-Date: Wed, 19 Nov 2014 12:26:27 +0100
-Message-Id: <1416396393-19997-4-git-send-email-marcin.kraglak@tieto.com>
+Subject: [PATCHv2 1/9] shared/gatt-helpers: Add read-by-type functionality
+Date: Wed, 19 Nov 2014 12:26:25 +0100
+Message-Id: <1416396393-19997-2-git-send-email-marcin.kraglak@tieto.com>
 In-Reply-To: <1416396393-19997-1-git-send-email-marcin.kraglak@tieto.com>
 References: <1416396393-19997-1-git-send-email-marcin.kraglak@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Verify that a Generic Attribute Profile client can read a
-Characteristic Value selected by UUID using a 16-bit UUID.
+This is exposed to allow client reading characteristic values
+with known uuid.
 ---
- unit/test-gatt.c | 74 +++++++++++++++++++++++++++++++++++++++++++++++++++++---
- 1 file changed, 70 insertions(+), 4 deletions(-)
+ src/shared/gatt-helpers.c | 105 ++++++++++++++++++++++++++++++++++++++++++++++
+ src/shared/gatt-helpers.h |   6 +++
+ 2 files changed, 111 insertions(+)
 
-diff --git a/unit/test-gatt.c b/unit/test-gatt.c
-index 9917ec9..72cfbf6 100644
---- a/unit/test-gatt.c
-+++ b/unit/test-gatt.c
-@@ -108,8 +108,8 @@ struct context {
- 		g_test_add_data_func(name, &data, function);		\
- 	} while (0)
- 
--#define define_test_att(name, function, bt_uuid, args...)		\
--	define_test(name, function, ATT, bt_uuid, NULL, NULL, args)
-+#define define_test_att(name, function, bt_uuid, test_step, args...)	\
-+	define_test(name, function, ATT, bt_uuid, NULL, test_step, args)
- 
- #define define_test_client(name, function, bt_services, test_step, args...)\
- 	define_test(name, function, CLIENT, NULL, bt_services, test_step, args)
-@@ -149,6 +149,11 @@ static bt_uuid_t uuid_16 = {
- 	.value.u16 = 0x1800
- };
- 
-+static bt_uuid_t uuid_char_16 = {
-+	.type = BT_UUID16,
-+	.value.u16 = 0x2a0d
-+};
-+
- static bt_uuid_t uuid_128 = {
- 	.type = BT_UUID128,
- 	.value.u128.data = {0x00, 0x00, 0x18, 0x0d, 0x00, 0x00, 0x10, 0x00,
-@@ -611,6 +616,54 @@ static void test_search_descs(gconstpointer data)
- 	execute_context(context);
+diff --git a/src/shared/gatt-helpers.c b/src/shared/gatt-helpers.c
+index 97e62fe..0c3fd34 100644
+--- a/src/shared/gatt-helpers.c
++++ b/src/shared/gatt-helpers.c
+@@ -1217,6 +1217,111 @@ bool bt_gatt_discover_characteristics(struct bt_att *att,
+ 	return true;
  }
  
-+const struct test_step test_read_by_type_1 = {
-+	.handle = 0x0001,
-+	.end_handle = 0xffff,
-+	.expected_att_ecode = 0x0a,
-+	.value = read_data_1,
-+	.length = 0x03
-+};
-+
-+static void read_by_type_cb(bool success, uint8_t att_ecode,
-+						struct bt_gatt_result *result,
-+						void *user_data)
++static void read_by_type_cb(uint8_t opcode, const void *pdu,
++					uint16_t length, void *user_data)
 +{
-+	struct context *context = user_data;
-+	const struct test_step *step = context->data->step;
-+	struct bt_gatt_iter iter;
++	struct discovery_op *op = user_data;
++	bool success;
++	uint8_t att_ecode = 0;
++	size_t data_length;
++	uint16_t last_handle;
 +
-+	g_assert(att_ecode == step->expected_att_ecode);
++	if (opcode == BT_ATT_OP_ERROR_RSP) {
++		att_ecode = process_error(pdu, length);
 +
-+	if (success) {
-+		uint16_t length, handle;
-+		const uint8_t *value;
++		if (att_ecode == BT_ATT_ERROR_ATTRIBUTE_NOT_FOUND &&
++							op->result_head)
++			success = true;
++		else
++			success = false;
 +
-+		g_assert(bt_gatt_iter_init(&iter, result));
-+		g_assert(bt_gatt_iter_next_read_by_type(&iter, &handle, &length,
-+								&value));
-+		g_assert(length == step->length);
-+		g_assert(!memcmp(value, step->value, length));
-+
-+		g_assert(!bt_gatt_iter_next_read_by_type(&iter, &handle,
-+							&length, &value));
++		goto done;
 +	}
 +
-+	context_quit(context);
++	if (opcode != BT_ATT_OP_READ_BY_TYPE_RSP || !pdu) {
++		success = false;
++		att_ecode = 0;
++		goto done;
++	}
++
++	data_length = ((uint8_t *) pdu)[0];
++	if (((length - 1) % data_length)) {
++		success = false;
++		att_ecode = 0;
++		goto done;
++	}
++
++	if (!result_append(opcode, pdu + 1, length - 1, data_length, op)) {
++		success = false;
++		att_ecode = 0;
++		goto done;
++	}
++
++	last_handle = get_le16(pdu + length - data_length);
++	if (last_handle != op->end_handle) {
++		uint8_t pdu[4 + get_uuid_len(&op->uuid)];
++
++		put_le16(last_handle + 1, pdu);
++		put_le16(op->end_handle, pdu + 2);
++		put_uuid_le(&op->uuid, pdu + 4);
++
++		if (bt_att_send(op->att, BT_ATT_OP_READ_BY_TYPE_REQ,
++						pdu, sizeof(pdu),
++						read_by_type_cb,
++						discovery_op_ref(op),
++						discovery_op_unref))
++			return;
++
++		discovery_op_unref(op);
++		success = false;
++		goto done;
++	}
++
++	success = true;
++
++done:
++	if (op->callback)
++		op->callback(success, att_ecode, success ? op->result_head :
++							NULL, op->user_data);
 +}
 +
-+static void test_read_by_type(gconstpointer data)
++bool bt_gatt_read_by_type(struct bt_att *att, uint16_t start, uint16_t end,
++					const bt_uuid_t *uuid,
++					bt_gatt_discovery_callback_t callback,
++					void *user_data,
++					bt_gatt_destroy_func_t destroy)
 +{
-+	struct context *context = create_context(512, data);
-+	const struct test_data *test_data = data;
-+	const struct test_step *step = context->data->step;
++	struct discovery_op *op;
++	uint8_t pdu[4 + get_uuid_len(uuid)];
 +
-+	g_assert(bt_gatt_read_by_type(context->att, step->handle,
-+					step->end_handle, test_data->uuid,
-+					read_by_type_cb, context, NULL));
++	if (!att || !uuid || uuid->type == BT_UUID_UNSPEC)
++		return false;
 +
-+	execute_context(context);
++	op = new0(struct discovery_op, 1);
++	if (!op)
++		return false;
++
++	op->att = att;
++	op->callback = callback;
++	op->user_data = user_data;
++	op->destroy = destroy;
++	op->end_handle = end;
++	op->uuid = *uuid;
++
++	put_le16(start, pdu);
++	put_le16(end, pdu + 2);
++	put_uuid_le(uuid, pdu + 4);
++
++	if (!bt_att_send(att, BT_ATT_OP_READ_BY_TYPE_REQ, pdu, sizeof(pdu),
++					read_by_type_cb, discovery_op_ref(op),
++					discovery_op_unref)) {
++		free(op);
++		return false;
++	}
++
++	return true;
 +}
 +
- int main(int argc, char *argv[])
+ static void discover_descs_cb(uint8_t opcode, const void *pdu,
+ 					uint16_t length, void *user_data)
  {
- 	g_test_init(&argc, &argv, NULL);
-@@ -631,7 +684,7 @@ int main(int argc, char *argv[])
- 	 * The test group objective is to verify Generic Attribute Profile
- 	 * Discovery of Services and Service Characteristics.
- 	 */
--	define_test_att("/TP/GAD/CL/BV-01-C", test_search_primary, NULL,
-+	define_test_att("/TP/GAD/CL/BV-01-C", test_search_primary, NULL, NULL,
- 			raw_pdu(0x02, 0x00, 0x02),
- 			raw_pdu(0x03, 0x00, 0x02),
- 			raw_pdu(0x10, 0x01, 0x00, 0xff, 0xff, 0x00, 0x28),
-@@ -647,6 +700,7 @@ int main(int argc, char *argv[])
- 			raw_pdu(0x01, 0x10, 0x97, 0x00, 0x0a));
- 
- 	define_test_att("/TP/GAD/CL/BV-02-C-1", test_search_primary, &uuid_16,
-+			NULL,
- 			raw_pdu(0x02, 0x00, 0x02),
- 			raw_pdu(0x03, 0x00, 0x02),
- 			raw_pdu(0x06, 0x01, 0x00, 0xff, 0xff, 0x00, 0x28, 0x00,
-@@ -657,6 +711,7 @@ int main(int argc, char *argv[])
- 			raw_pdu(0x01, 0x06, 0x08, 0x00, 0x0a));
- 
- 	define_test_att("/TP/GAD/CL/BV-02-C-2", test_search_primary, &uuid_128,
-+			NULL,
- 			raw_pdu(0x02, 0x00, 0x02),
- 			raw_pdu(0x03, 0x00, 0x02),
- 			raw_pdu(06, 0x01, 0x00, 0xff, 0xff, 0x00, 0x28, 0xfb,
-@@ -671,6 +726,7 @@ int main(int argc, char *argv[])
- 			raw_pdu(0x01, 0x06, 0x08, 0x00, 0x0a));
- 
- 	define_test_att("/TP/GAD/CL/BV-03-C", test_search_included, NULL,
-+			NULL,
- 			raw_pdu(0x02, 0x00, 0x02),
- 			raw_pdu(0x03, 0x00, 0x02),
- 			raw_pdu(0x08, 0x01, 0x00, 0xff, 0xff, 0x02, 0x28),
-@@ -694,6 +750,7 @@ int main(int argc, char *argv[])
- 			raw_pdu(0x01, 0x08, 0x06, 0x00, 0x0a));
- 
- 	define_test_att("/TP/GAD/CL/BV-04-C", test_search_chars, NULL,
-+			NULL,
- 			raw_pdu(0x02, 0x00, 0x02),
- 			raw_pdu(0x03, 0x00, 0x02),
- 			raw_pdu(0x08, 0x10, 0x00, 0x20, 0x00, 0x03, 0x28),
-@@ -707,7 +764,7 @@ int main(int argc, char *argv[])
- 			raw_pdu(0x08, 0x14, 0x00, 0x20, 0x00, 0x03, 0x28),
- 			raw_pdu(0x01, 0x08, 0x12, 0x00, 0x0a));
- 
--	define_test_att("/TP/GAD/CL/BV-06-C", test_search_descs, NULL,
-+	define_test_att("/TP/GAD/CL/BV-06-C", test_search_descs, NULL, NULL,
- 			raw_pdu(0x02, 0x00, 0x02),
- 			raw_pdu(0x03, 0x00, 0x02),
- 			raw_pdu(0x04, 0x13, 0x00, 0x16, 0x00),
-@@ -741,5 +798,14 @@ int main(int argc, char *argv[])
- 			raw_pdu(0x0a, 0x03, 0x00),
- 			raw_pdu(0x01, 0x0a, 0x03, 0x00, 0x08));
- 
-+	define_test_att("/TP/GAR/CL/BV-03-C-1", test_read_by_type,
-+			&uuid_char_16, &test_read_by_type_1,
-+			raw_pdu(0x02, 0x00, 0x02),
-+			raw_pdu(0x03, 0x00, 0x02),
-+			raw_pdu(0x08, 0x01, 0x00, 0xff, 0xff, 0x0d, 0x2a),
-+			raw_pdu(0x09, 0x05, 0x0a, 0x00, 0x01, 0x02, 0x03),
-+			raw_pdu(0x08, 0x0b, 0x00, 0xff, 0xff, 0x0d, 0x2a),
-+			raw_pdu(0x01, 0x08, 0x0b, 0x00, 0x0a));
+diff --git a/src/shared/gatt-helpers.h b/src/shared/gatt-helpers.h
+index 07c145d..2cc37c6 100644
+--- a/src/shared/gatt-helpers.h
++++ b/src/shared/gatt-helpers.h
+@@ -96,3 +96,9 @@ bool bt_gatt_discover_descriptors(struct bt_att *att,
+ 					bt_gatt_discovery_callback_t callback,
+ 					void *user_data,
+ 					bt_gatt_destroy_func_t destroy);
 +
- 	return g_test_run();
- }
++bool bt_gatt_read_by_type(struct bt_att *att, uint16_t start, uint16_t end,
++					const bt_uuid_t *uuid,
++					bt_gatt_discovery_callback_t callback,
++					void *user_data,
++					bt_gatt_destroy_func_t destroy);
 -- 
 1.9.3
 
