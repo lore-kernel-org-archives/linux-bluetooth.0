@@ -1,32 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-Date: Wed, 19 Nov 2014 12:52:16 +0100
-Message-ID: <CAHwR_AWwpJUOmF0E7XmsNu6pF1BxpPqtssXMt6FPJ5b+ftb4Ug@mail.gmail.com>
-Subject: [PATCH] hciattach: Send timeout increase to support CC2564B
-From: Jonas Rydow <jrydow@gmail.com>
+From: Sebastian Chlad <sebastian.chlad@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
+Cc: Sebastian Chlad <sebastian.chlad@tieto.com>
+Subject: [PATCH] android/pts: PTS tests for A2DP on Android 5
+Date: Wed, 19 Nov 2014 12:45:27 +0100
+Message-Id: <1416397527-1266-1-git-send-email-sebastian.chlad@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch increases the send timeout, which for the CC2564B caused
-HCI_VS_LE_Enable
-to timeout and fail.
 ---
- tools/hciattach_ti.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ android/pts-a2dp.txt | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/tools/hciattach_ti.c b/tools/hciattach_ti.c
-index 8322b45..3d231e2 100644
---- a/tools/hciattach_ti.c
-+++ b/tools/hciattach_ti.c
-@@ -253,7 +253,7 @@ static int brf_send_command_socket(int fd, struct
-bts_action_send *send_action)
-        rq.rparam = response;
-        rq.rlen   = sizeof(response);
+diff --git a/android/pts-a2dp.txt b/android/pts-a2dp.txt
+index c3d04b2..92c3e15 100644
+--- a/android/pts-a2dp.txt
++++ b/android/pts-a2dp.txt
+@@ -1,8 +1,8 @@
+ PTS test results for A2DP
+ 
+ PTS version: 5.3
+-Tested: 26-September-2014
+-Android version: 4.4.4
++Tested: 19-November-2014
++Android version: 5.0
+ 
+ Results:
+ PASS	test passed
+-- 
+1.8.5.3
 
--       if (hci_send_req(fd, &rq, 15) < 0) {
-+       if (hci_send_req(fd, &rq, 150) < 0) {
-                perror("Cannot send hci command to socket");
-                return -1;
-        }
