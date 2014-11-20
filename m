@@ -1,73 +1,49 @@
 Return-Path: <cyrus@holtmann.org>
-From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
-Subject: [PATCHv2 1/4] android/hal-ipc-api: Update HidHost with Android 5 API
-Date: Thu, 20 Nov 2014 12:18:48 +0100
-Message-Id: <1416482331-3766-1-git-send-email-jakub.tyszkowski@tieto.com>
+MIME-Version: 1.0
+In-Reply-To: <1416402095-5137-1-git-send-email-marcin.kraglak@tieto.com>
+References: <1416402095-5137-1-git-send-email-marcin.kraglak@tieto.com>
+Date: Thu, 20 Nov 2014 12:23:55 +0200
+Message-ID: <CABBYNZ+0TLcQjA-PSiYWcm5Shj6BdWJt0gdUG=OWQKSZJKJ+hQ@mail.gmail.com>
+Subject: Re: [PATCH 0/8] Implement Read Multiple in gatt-client
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Marcin Kraglak <marcin.kraglak@tieto.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- android/hal-ipc-api.txt | 38 ++++++++++++++++++++++++--------------
- 1 file changed, 24 insertions(+), 14 deletions(-)
+Hi Marcin,
 
-diff --git a/android/hal-ipc-api.txt b/android/hal-ipc-api.txt
-index 67a6205..efcd3cf 100644
---- a/android/hal-ipc-api.txt
-+++ b/android/hal-ipc-api.txt
-@@ -599,6 +599,23 @@ Commands and responses:
- 
- Notifications:
- 
-+	Status is common for many notifications and has fixed value range:
-+
-+		Status values: 0x00 = Ok
-+		               0x01 = Handshake - Device not ready
-+		               0x02 = Handshake - Invalid report ID
-+		               0x03 = Handshake - Transaction not SPT
-+		               0x04 = Handshake - Invalid parameter
-+		               0x05 = Handshake - Generic error
-+		               0x06 = General error
-+		               0x07 = SDP error
-+		               0x08 = Set protocol error
-+		               0x09 = Device database full
-+		               0x0a = Device type not supported
-+		               0x0b = No resources
-+		               0x0c = Authentication failed
-+		               0x0d = HDL
-+
- 	Opcode 0x81 - Connection State notification
- 
- 		Notification parameters: Remote address (6 octets)
-@@ -656,20 +673,13 @@ Notifications:
- 		Notification parameters: Remote address (6 octets)
- 		                         Status (1 octet)
- 
--		Valid status values: 0x00 = Ok
--		                     0x01 = Handshake - Device not ready
--		                     0x02 = Handshake - Invalid report ID
--		                     0x03 = Handshake - Transaction not SPT
--		                     0x04 = Handshake - Invalid parameter
--		                     0x05 = Handshake - Generic error
--		                     0x06 = General error
--		                     0x07 = SDP error
--		                     0x08 = Set protocol error
--		                     0x09 = Device database full
--		                     0x0a = Device type not supported
--		                     0x0b = No resources
--		                     0x0c = Authentication failed
--		                     0x0d = HDL
-+	Opcode 0x87 - Handshake notification
-+
-+		Notification parameters: Remote address (6 octets)
-+		                         Status (1 octet)
-+
-+		Only status values from 0x00 to 0x05 are valid as handshake
-+		status.
- 
- 
- Bluetooth PAN HAL (ID 4)
+On Wed, Nov 19, 2014 at 3:01 PM, Marcin Kraglak
+<marcin.kraglak@tieto.com> wrote:
+> This implementation is done in gatt-client and functionality
+> is exposed in btgatt-client tool.
+> This implementation was tested against PTS and corresponding
+> unit tests are added too.
+>
+> Comments are welcome
+>
+> Marcin Kraglak (8):
+>   shared/gatt-client: Implement Read Multiple request
+>   tools/btgatt-client: Add read_multiple_cmd
+>   unit/test-gatt: Add /TP/GAR/CL/BV-05-C test
+>   unit/test-gatt: Add /TP/GAR/CL/BI-18-C test
+>   unit/test-gatt: Add /TP/GAR/CL/BI-19-C test
+>   unit/test-gatt: Add /TP/GAR/CL/BI-20-C test
+>   unit/test-gatt: Add /TP/GAR/CL/BI-21-C test
+>   unit/test-gatt: Add /TP/GAR/CL/BI-22-C test
+>
+>  src/shared/gatt-client.c |  65 ++++++++++++++++++++++++++++
+>  src/shared/gatt-client.h |   7 +++
+>  tools/btgatt-client.c    |  60 ++++++++++++++++++++++++++
+>  unit/test-gatt.c         | 109 +++++++++++++++++++++++++++++++++++++++++++++++
+>  4 files changed, 241 insertions(+)
+>
+> --
+> 1.9.3
+
+Applied, thanks.
+
+
 -- 
-1.9.1
-
+Luiz Augusto von Dentz
