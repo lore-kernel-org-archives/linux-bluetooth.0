@@ -1,40 +1,173 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-Date: Thu, 20 Nov 2014 23:10:46 +0100
-Message-ID: <CANpMpoTWVCYjW_u+GPTu4AKYfA4Zvt-DYdRGbUDZzE6RMpgdSQ@mail.gmail.com>
-Subject: 
-From: =?UTF-8?Q?Gilles_Gr=C3=A9goire?= <gilles.gregoire@gmail.com>
-To: BlueZ development <linux-bluetooth@vger.kernel.org>
+In-Reply-To: <1416505902-29931-1-git-send-email-jpawlowski@google.com>
+References: <1416505902-29931-1-git-send-email-jpawlowski@google.com>
+Date: Thu, 20 Nov 2014 13:48:43 -0800
+Message-ID: <CAHrH25SocnRT0tQBHqPipmAU=Obq8U+PN27JZKcjPjmTaaK+qg@mail.gmail.com>
+Subject: Re: [PATCH v7 1/3] Bluetooth: add hci_restart_le_scan
+From: Arman Uguray <armansito@chromium.org>
+To: Jakub Pawlowski <jpawlowski@google.com>
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Jakub,
 
-I am trying to understand how a BLE connection is established between
-my embedded system and an Android phone. I am using bluez 5.9 on a
-3.12 kernel on this embedded system; with a CSR chipset.
+> On Thu, Nov 20, 2014 at 9:51 AM, Jakub Pawlowski <jpawlowski@google.com> wrote:
+> Currently there is no way to restart le scan. It's needed in
+> preparation for new service scan method. The way it work: it disable,
+> and then enable le scan on controller. During this restart special flag
+> is set to make sure we won't remove disable scan work from workqueue.
+>
+> Signed-off-by: Jakub Pawlowski <jpawlowski@google.com>
+> ---
+>  include/net/bluetooth/hci.h      |  1 +
+>  include/net/bluetooth/hci_core.h |  2 ++
+>  net/bluetooth/hci_core.c         | 42 ++++++++++++++++++++++++++++++++++++++++
+>  net/bluetooth/hci_event.c        |  9 ++++++---
+>  4 files changed, 51 insertions(+), 3 deletions(-)
+>
+> diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+> index e56f909..2f0bce2 100644
+> --- a/include/net/bluetooth/hci.h
+> +++ b/include/net/bluetooth/hci.h
+> @@ -203,6 +203,7 @@ enum {
+>         HCI_FAST_CONNECTABLE,
+>         HCI_BREDR_ENABLED,
+>         HCI_LE_SCAN_INTERRUPTED,
+> +       HCI_LE_SCAN_RESTARTING,
+>  };
+>
+>  /* A mask for the flags that are supposed to remain when a reset happens
+> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+> index 396c098..36211f9 100644
+> --- a/include/net/bluetooth/hci_core.h
+> +++ b/include/net/bluetooth/hci_core.h
+> @@ -337,6 +337,7 @@ struct hci_dev {
+>         unsigned long           dev_flags;
+>
+>         struct delayed_work     le_scan_disable;
+> +       struct delayed_work     le_scan_restart;
+>
+>         __s8                    adv_tx_power;
+>         __u8                    adv_data[HCI_MAX_AD_LENGTH];
+> @@ -1403,6 +1404,7 @@ int hci_update_random_address(struct hci_request *req, bool require_privacy,
+>                               u8 *own_addr_type);
+>  void hci_copy_identity_address(struct hci_dev *hdev, bdaddr_t *bdaddr,
+>                                u8 *bdaddr_type);
+> +void hci_restart_le_scan(struct hci_dev *hdev, unsigned long delay);
+>
+>  #define SCO_AIRMODE_MASK       0x0003
+>  #define SCO_AIRMODE_CVSD       0x0000
+> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+> index 5c319a4..858cf54 100644
+> --- a/net/bluetooth/hci_core.c
+> +++ b/net/bluetooth/hci_core.c
+> @@ -2557,6 +2557,7 @@ static int hci_dev_do_close(struct hci_dev *hdev)
+>                 cancel_delayed_work(&hdev->service_cache);
+>
+>         cancel_delayed_work_sync(&hdev->le_scan_disable);
+> +       cancel_delayed_work_sync(&hdev->le_scan_restart);
+>
+>         if (test_bit(HCI_MGMT, &hdev->dev_flags))
+>                 cancel_delayed_work_sync(&hdev->rpa_expired);
+> @@ -3851,6 +3852,8 @@ static void le_scan_disable_work(struct work_struct *work)
+>
+>         BT_DBG("%s", hdev->name);
+>
+> +       cancel_delayed_work_sync(&hdev->le_scan_restart);
+> +
+>         hci_req_init(&req, hdev);
+>
+>         hci_req_add_le_scan_disable(&req);
+> @@ -3860,6 +3863,44 @@ static void le_scan_disable_work(struct work_struct *work)
+>                 BT_ERR("Disable LE scanning request failed: err %d", err);
+>  }
+>
+> +void hci_restart_le_scan(struct hci_dev *hdev, unsigned long delay)
+> +{
+> +       queue_delayed_work(hdev->workqueue, &hdev->le_scan_restart, delay);
+> +}
 
-I set up bluetooth using:
-hciconfig hci0 reset
-hciconfig hci0 noscan
+Since you're exposing this as a public API, does it make sense to
+check here if a delayed work has already been scheduled? I.e. is it OK
+if this function gets called several times in succession with
+different delay values?
 
-Then, I use hcitool to set the advertisement and scan data, and I
-enable a connectable advertisement with
-hcitool -i hci0 cmd 0x08 0x000a 01
+> +
+> +static void le_scan_restart_work_complete(struct hci_dev *hdev, u8 status)
+> +{
+> +       clear_bit(HCI_LE_SCAN_RESTARTING, &hdev->dev_flags);
+> +
+> +       if (status)
+> +               BT_ERR("Failed to restart LE scanning: status %d", status);
+> +}
+> +
+> +static void le_scan_restart_work(struct work_struct *work)
+> +{
+> +       struct hci_dev *hdev = container_of(work, struct hci_dev,
+> +                                           le_scan_restart.work);
+> +       struct hci_request req;
+> +       struct hci_cp_le_set_scan_enable cp;
+> +       int err;
+> +
+> +       BT_DBG("%s", hdev->name);
+> +
+> +       hci_req_init(&req, hdev);
+> +
+> +       hci_req_add_le_scan_disable(&req);
+> +
+> +       memset(&cp, 0, sizeof(cp));
+> +       cp.enable = LE_SCAN_ENABLE;
+> +       hci_req_add(&req, HCI_OP_LE_SET_SCAN_ENABLE, sizeof(cp), &cp);
+> +
+> +       set_bit(HCI_LE_SCAN_RESTARTING, &hdev->dev_flags);
+> +
+> +       err = hci_req_run(&req, le_scan_restart_work_complete);
+> +       if (err)
+> +               BT_ERR("Disable LE scanning request failed: err %d", err);
+> +}
+> +
+>  static void set_random_addr(struct hci_request *req, bdaddr_t *rpa)
+>  {
+>         struct hci_dev *hdev = req->hdev;
+> @@ -4037,6 +4078,7 @@ struct hci_dev *hci_alloc_dev(void)
+>         INIT_DELAYED_WORK(&hdev->power_off, hci_power_off);
+>         INIT_DELAYED_WORK(&hdev->discov_off, hci_discov_off);
+>         INIT_DELAYED_WORK(&hdev->le_scan_disable, le_scan_disable_work);
+> +       INIT_DELAYED_WORK(&hdev->le_scan_restart, le_scan_restart_work);
+>
+>         skb_queue_head_init(&hdev->rx_q);
+>         skb_queue_head_init(&hdev->cmd_q);
+> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+> index bd0a801..ed4d5e1 100644
+> --- a/net/bluetooth/hci_event.c
+> +++ b/net/bluetooth/hci_event.c
+> @@ -1157,10 +1157,13 @@ static void hci_cc_le_set_scan_enable(struct hci_dev *hdev,
+>                                           d->last_adv_data_len, NULL, 0);
+>                 }
+>
+> -               /* Cancel this timer so that we don't try to disable scanning
+> -                * when it's already disabled.
+> +               /* If HCI_LE_SCAN_RESTARTING is set, don't cancel this timer,
+> +                * because we're just restarting scan. Otherwise cancel it so
+> +                * that we don't try to disable scanning when it's already
+> +                * disabled.
+>                  */
+> -               cancel_delayed_work(&hdev->le_scan_disable);
+> +               if (!test_bit(HCI_LE_SCAN_RESTARTING, &hdev->dev_flags))
+> +                       cancel_delayed_work(&hdev->le_scan_disable);
+>
+>                 clear_bit(HCI_LE_SCAN, &hdev->dev_flags);
+>
+> --
+> 2.1.0.rc2.206.gedb03e5
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
-I am _not_ using bluetoothd.
-
-With this simple setup, I can connect with an Android phone to my
-embedded system.
-I check it with:
-hcitool -i hci0 con
-
-Which reports one active connection.
-
-I had a look at the hciconfig and hcitool source code (the only tools
-I used to setup bluetooth), but could not find where a connection is
-accepted.
-
-My question is: where (in the code) is the connection accepted in the
-first place?
+Thanks,
+Arman
