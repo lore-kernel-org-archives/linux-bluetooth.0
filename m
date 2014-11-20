@@ -2,82 +2,90 @@ Return-Path: <cyrus@holtmann.org>
 From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
-Subject: [PATCHv2 3/4] android/hid: Support handshake message
-Date: Thu, 20 Nov 2014 12:18:50 +0100
-Message-Id: <1416482331-3766-3-git-send-email-jakub.tyszkowski@tieto.com>
+Subject: [PATCHv2 2/4] android/hal: Update HidHost HAL for Android 5
+Date: Thu, 20 Nov 2014 12:18:49 +0100
+Message-Id: <1416482331-3766-2-git-send-email-jakub.tyszkowski@tieto.com>
 In-Reply-To: <1416482331-3766-1-git-send-email-jakub.tyszkowski@tieto.com>
 References: <1416482331-3766-1-git-send-email-jakub.tyszkowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- android/hidhost.c | 32 ++++++++++++++++++++++++++++++--
- 1 file changed, 30 insertions(+), 2 deletions(-)
+ android/hal-hidhost.c | 11 +++++++++++
+ android/hal-msg.h     | 24 ++++++++++++++++++++++--
+ 2 files changed, 33 insertions(+), 2 deletions(-)
 
-diff --git a/android/hidhost.c b/android/hidhost.c
-index 657fa8f..75e895b 100644
---- a/android/hidhost.c
-+++ b/android/hidhost.c
-@@ -58,6 +58,7 @@
- #define L2CAP_PSM_HIDP_INTR	0x13
- 
- /* HID message types */
-+#define HID_MSG_HANDSHAKE	0x00
- #define HID_MSG_CONTROL		0x10
- #define HID_MSG_GET_REPORT	0x40
- #define HID_MSG_SET_REPORT	0x50
-@@ -65,6 +66,8 @@
- #define HID_MSG_SET_PROTOCOL	0x70
- #define HID_MSG_DATA		0xa0
- 
-+#define HID_MSG_TYPE_MASK	0xf0
-+
- /* HID data types */
- #define HID_DATA_TYPE_INPUT	0x01
- #define HID_DATA_TYPE_OUTPUT	0x02
-@@ -391,6 +394,22 @@ send:
- 	g_free(ev);
+diff --git a/android/hal-hidhost.c b/android/hal-hidhost.c
+index 58b0218..3cfc6b6 100644
+--- a/android/hal-hidhost.c
++++ b/android/hal-hidhost.c
+@@ -102,6 +102,16 @@ static void handle_virtual_unplug(void *buf, uint16_t len, int fd)
+ 								ev->status);
  }
  
-+static void bt_hid_notify_handshake(struct hid_device *dev, uint8_t *buf,
-+									int len)
++static void handle_handshake(void *buf, uint16_t len, int fd)
 +{
-+	struct hal_ev_hidhost_handshake ev;
++#if ANDROID_VERSION >= PLATFORM_VER(5, 0, 0)
++	struct hal_ev_hidhost_handshake *ev = buf;
 +
-+	bdaddr2android(&dev->dst, ev.bdaddr);
-+
-+	/* crop result code to handshake status range from HAL */
-+	ev.status = buf[0];
-+	if (ev.status > HAL_HIDHOST_HS_ERROR)
-+		ev.status = HAL_HIDHOST_HS_ERROR;
-+
-+	ipc_send_notif(hal_ipc, HAL_SERVICE_ID_HIDHOST,
-+				HAL_EV_HIDHOST_HANDSHAKE, sizeof(ev), &ev);
++	if (cbacks->handshake_cb)
++		cbacks->handshake_cb((bt_bdaddr_t *) ev->bdaddr, ev->status);
++#endif
 +}
 +
- static void bt_hid_notify_virtual_unplug(struct hid_device *dev,
- 							uint8_t *buf, int len)
- {
-@@ -441,8 +460,17 @@ static gboolean ctrl_io_watch_cb(GIOChannel *chan, gpointer data)
- 		break;
- 	}
+ /*
+  * handlers will be called from notification thread context,
+  * index in table equals to 'opcode - HAL_MINIMUM_EVENT'
+@@ -120,6 +130,7 @@ static const struct hal_ipc_handler ev_handlers[] = {
+ 	/* HAL_EV_HIDHOST_VIRTUAL_UNPLUG */
+ 	{ handle_virtual_unplug, false,
+ 				sizeof(struct hal_ev_hidhost_virtual_unplug) },
++	{ handle_handshake, false, sizeof(struct hal_ev_hidhost_handshake) },
+ };
  
--	if (buf[0] == (HID_MSG_CONTROL | HID_VIRTUAL_CABLE_UNPLUG))
--		bt_hid_notify_virtual_unplug(dev, buf, bread);
-+	switch (buf[0] & HID_MSG_TYPE_MASK) {
-+	case HID_MSG_HANDSHAKE:
-+		bt_hid_notify_handshake(dev, buf, bread);
-+		break;
-+	case HID_MSG_CONTROL:
-+		if ((buf[0] & !HID_MSG_TYPE_MASK) == HID_VIRTUAL_CABLE_UNPLUG)
-+			bt_hid_notify_virtual_unplug(dev, buf, bread);
-+		break;
-+	default:
-+		break;
-+	}
+ static bt_status_t hidhost_connect(bt_bdaddr_t *bd_addr)
+diff --git a/android/hal-msg.h b/android/hal-msg.h
+index c575938..ca512d4 100644
+--- a/android/hal-msg.h
++++ b/android/hal-msg.h
+@@ -1353,8 +1353,22 @@ struct hal_ev_hidhost_conn_state {
+ 	uint8_t state;
+ } __attribute__((packed));
  
- 	/* reset msg type request */
- 	dev->last_hid_msg = 0;
+-#define HAL_HIDHOST_STATUS_OK		0x00
+-#define HAL_HIDHOST_GENERAL_ERROR	0x06
++#define HAL_HIDHOST_STATUS_OK			0x00
++
++#define HAL_HIDHOST_HS_NOT_READY		0x01
++#define HAL_HIDHOST_HS_INVALID_RAPORT_ID	0x02
++#define HAL_HIDHOST_HS_TRANS_NOT_SUPPORTED	0x03
++#define HAL_HIDHOST_HS_INVALID_PARAM		0x04
++#define HAL_HIDHOST_HS_ERROR			0x05
++
++#define HAL_HIDHOST_GENERAL_ERROR		0x06
++#define HAL_HIDHOST_SDP_ERROR			0x07
++#define HAL_HIDHOST_PROTOCOL_ERROR		0x08
++#define HAL_HIDHOST_DB_ERROR			0x09
++#define HAL_HIDHOST_TOD_UNSUPPORTED_ERROR	0x0a
++#define HAL_HIDHOST_NO_RESOURCES_ERROR		0x0b
++#define HAL_HIDHOST_AUTH_FAILED_ERROR		0x0c
++#define HAL_HIDHOST_HDL_ERROR			0x0d
+ 
+ #define HAL_EV_HIDHOST_INFO			0x82
+ struct hal_ev_hidhost_info {
+@@ -1398,6 +1412,12 @@ struct hal_ev_hidhost_virtual_unplug {
+ 	uint8_t  status;
+ } __attribute__((packed));
+ 
++#define HAL_EV_HIDHOST_HANDSHAKE		0x87
++struct hal_ev_hidhost_handshake {
++	uint8_t  bdaddr[6];
++	uint8_t  status;
++} __attribute__((packed));
++
+ #define HAL_EV_PAN_CTRL_STATE			0x81
+ struct hal_ev_pan_ctrl_state {
+ 	uint8_t  state;
 -- 
 1.9.1
 
