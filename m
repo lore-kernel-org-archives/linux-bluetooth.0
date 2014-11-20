@@ -1,80 +1,83 @@
 Return-Path: <cyrus@holtmann.org>
-From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/6] android/client: Check if hex data is present in define
-Date: Thu, 20 Nov 2014 16:34:01 +0100
-Message-Id: <1416497645-6313-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCHv2 1/4] android/hal-ipc-api: Update HidHost with Android 5 API
+Date: Thu, 20 Nov 2014 16:23:30 +0100
+Message-ID: <10734439.oWi20QOpdz@uw000953>
+In-Reply-To: <1416482331-3766-1-git-send-email-jakub.tyszkowski@tieto.com>
+References: <1416482331-3766-1-git-send-email-jakub.tyszkowski@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Each hex data argument need to be checked before parsing. It was done in
-before parse argc check. Now it's integrated in GET_VERIFIER_HEX_STRING.
----
- android/client/if-gatt.c | 28 +++++++++-------------------
- 1 file changed, 9 insertions(+), 19 deletions(-)
+Hi Jakub,
 
-diff --git a/android/client/if-gatt.c b/android/client/if-gatt.c
-index 49ccebf..9d6fafd 100644
---- a/android/client/if-gatt.c
-+++ b/android/client/if-gatt.c
-@@ -116,9 +116,14 @@ const btgatt_interface_t *if_gatt = NULL;
- 		} \
- 	} while (0)
- 
--#define GET_VERIFY_HEX_STRING(n, v, l) \
-+#define GET_VERIFY_HEX_STRING(i, v, l) \
- 	do { \
- 		int ll;\
-+		const char *n = argv[i]; \
-+		if (argc <= i) { \
-+			haltest_error("No value specified\n"); \
-+			return; \
-+		} \
- 		if (n[0] != '0' || (n[1] != 'X' && n[1] != 'x')) { \
- 			haltest_error("Value must be hex string\n"); \
- 			return; \
-@@ -1366,13 +1371,7 @@ static void write_characteristic_p(int argc, const char **argv)
- 	}
- 	write_type = atoi(argv[5]);
- 
--	/* value */
--	if (argc <= 6) {
--		haltest_error("No value specified\n");
--		return;
--	}
--
--	GET_VERIFY_HEX_STRING(argv[6], value, len);
-+	GET_VERIFY_HEX_STRING(6, value, len);
- 
- 	/* auth_req */
- 	if (argc > 7)
-@@ -1984,8 +1983,7 @@ static void gatts_send_indication_p(int argc, const char *argv[])
- 	}
- 	confirm = atoi(argv[5]);
- 
--	if (argc > 6)
--		GET_VERIFY_HEX_STRING(argv[6], data, len);
-+	GET_VERIFY_HEX_STRING(6, data, len);
- 
- 	EXEC(if_gatt->server->send_indication, server_if, attr_handle, conn_id,
- 							len, confirm, data);
-@@ -2013,15 +2011,7 @@ static void gatts_send_response_p(int argc, const char *argv[])
- 	data.attr_value.auth_req = 0;
- 	data.attr_value.len = 0;
- 
--	if (argc > 7) {
--		GET_VERIFY_HEX_STRING(argv[7], data.attr_value.value,
--							data.attr_value.len);
--
--		if (data.attr_value.len == 0) {
--			haltest_error("Failed to parse response value");
--			return;
--		}
--	}
-+	GET_VERIFY_HEX_STRING(7, data.attr_value.value, data.attr_value.len);
- 
- 	haltest_info("conn_id %d, trans_id %d, status %d", conn_id, trans_id,
- 									status);
+On Thursday 20 of November 2014 12:18:48 Jakub Tyszkowski wrote:
+> ---
+>  android/hal-ipc-api.txt | 38 ++++++++++++++++++++++++--------------
+>  1 file changed, 24 insertions(+), 14 deletions(-)
+> 
+> diff --git a/android/hal-ipc-api.txt b/android/hal-ipc-api.txt
+> index 67a6205..efcd3cf 100644
+> --- a/android/hal-ipc-api.txt
+> +++ b/android/hal-ipc-api.txt
+> @@ -599,6 +599,23 @@ Commands and responses:
+>  
+>  Notifications:
+>  
+> +	Status is common for many notifications and has fixed value range:
+> +
+> +		Status values: 0x00 = Ok
+> +		               0x01 = Handshake - Device not ready
+> +		               0x02 = Handshake - Invalid report ID
+> +		               0x03 = Handshake - Transaction not SPT
+> +		               0x04 = Handshake - Invalid parameter
+> +		               0x05 = Handshake - Generic error
+> +		               0x06 = General error
+> +		               0x07 = SDP error
+> +		               0x08 = Set protocol error
+> +		               0x09 = Device database full
+> +		               0x0a = Device type not supported
+> +		               0x0b = No resources
+> +		               0x0c = Authentication failed
+> +		               0x0d = HDL
+> +
+>  	Opcode 0x81 - Connection State notification
+>  
+>  		Notification parameters: Remote address (6 octets)
+> @@ -656,20 +673,13 @@ Notifications:
+>  		Notification parameters: Remote address (6 octets)
+>  		                         Status (1 octet)
+>  
+> -		Valid status values: 0x00 = Ok
+> -		                     0x01 = Handshake - Device not ready
+> -		                     0x02 = Handshake - Invalid report ID
+> -		                     0x03 = Handshake - Transaction not SPT
+> -		                     0x04 = Handshake - Invalid parameter
+> -		                     0x05 = Handshake - Generic error
+> -		                     0x06 = General error
+> -		                     0x07 = SDP error
+> -		                     0x08 = Set protocol error
+> -		                     0x09 = Device database full
+> -		                     0x0a = Device type not supported
+> -		                     0x0b = No resources
+> -		                     0x0c = Authentication failed
+> -		                     0x0d = HDL
+> +	Opcode 0x87 - Handshake notification
+> +
+> +		Notification parameters: Remote address (6 octets)
+> +		                         Status (1 octet)
+> +
+> +		Only status values from 0x00 to 0x05 are valid as handshake
+> +		status.
+>  
+>  
+>  Bluetooth PAN HAL (ID 4)
+
+All patches applied, thanks. 
+
 -- 
-1.9.3
-
+Best regards, 
+Szymon Janc
