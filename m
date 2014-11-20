@@ -1,192 +1,101 @@
 Return-Path: <cyrus@holtmann.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 8.1 \(1993\))
-Subject: Re: [PATCH v2] Bluetooth: btmrvl add firmware dump support
+Subject: Re: [PATCH v3] Bluetooth: automatically flushable packets aren't allowed on LE links
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1416478065-5678-1-git-send-email-akarwar@marvell.com>
-Date: Thu, 20 Nov 2014 22:05:49 +0800
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>,
-	Johannes Berg <johannes@sipsolutions.net>,
-	Xinming Hu <huxm@marvell.com>, Cathy Luo <cluo@marvell.com>,
-	Avinash Patil <patila@marvell.com>
-Message-Id: <56E9D4AD-8014-4261-BEE8-11A40C206A42@holtmann.org>
-References: <1416478065-5678-1-git-send-email-akarwar@marvell.com>
-To: Amitkumar Karwar <akarwar@marvell.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <20141120113813.GA23288@t440s.lan>
+Date: Thu, 20 Nov 2014 21:50:18 +0800
+Cc: Steven Walter <stevenrwalter@gmail.com>,
+	"Gustavo F. Padovan" <gustavo@padovan.org>,
+	BlueZ development <linux-bluetooth@vger.kernel.org>,
+	linux-kernel@vger.kernel.org
+Message-Id: <80321467-10AB-489E-A47E-44B0ECEE4BE1@holtmann.org>
+References: <1416419951-27659-1-git-send-email-stevenrwalter@gmail.com> <20141120113813.GA23288@t440s.lan>
+To: Johan Hedberg <johan.hedberg@gmail.com>
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Amitkumar,
+Hi Johan,
 
-> This patch adds firmware dump support for marvell
-> bluetooth chipset. Currently only SD8897 is supported.
-> This is implemented based on dev_coredump, a new mechnism
-> introduced in kernel 3.18rc3
+>> The bluetooth spec states that automatically flushable packets may not
+>> be sent over a LE-U link.
+>> 
+>> Signed-off-by: Steven Walter <stevenrwalter@gmail.com>
+>> ---
+>> net/bluetooth/l2cap_core.c | 14 ++++++++------
+>> 1 file changed, 8 insertions(+), 6 deletions(-)
+>> 
+>> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+>> index 4af3821..7c4350f 100644
+>> --- a/net/bluetooth/l2cap_core.c
+>> +++ b/net/bluetooth/l2cap_core.c
+>> @@ -764,7 +764,7 @@ static void l2cap_send_cmd(struct l2cap_conn *conn, u8 ident, u8 code, u16 len,
+>> 	if (!skb)
+>> 		return;
+>> 
+>> -	if (lmp_no_flush_capable(conn->hcon->hdev))
+>> +	if (lmp_no_flush_capable(conn->hcon->hdev) || conn->hcon->type == LE_LINK)
+>> 		flags = ACL_START_NO_FLUSH;
+>> 	else
+>> 		flags = ACL_START;
+>> @@ -784,7 +784,7 @@ static bool __chan_is_moving(struct l2cap_chan *chan)
+>> static void l2cap_do_send(struct l2cap_chan *chan, struct sk_buff *skb)
+>> {
+>> 	struct hci_conn *hcon = chan->conn->hcon;
+>> -	u16 flags;
+>> +	u16 flags = ACL_START;
+>> 
+>> 	BT_DBG("chan %p, skb %p len %d priority %u", chan, skb, skb->len,
+>> 	       skb->priority);
+>> @@ -798,11 +798,13 @@ static void l2cap_do_send(struct l2cap_chan *chan, struct sk_buff *skb)
+>> 		return;
+>> 	}
+>> 
+>> -	if (!test_bit(FLAG_FLUSHABLE, &chan->flags) &&
+>> -	    lmp_no_flush_capable(hcon->hdev))
+>> +	if (hcon->type == LE_LINK) {
+>> +		/* LE-U does not support auto-flushing packets */
+>> 		flags = ACL_START_NO_FLUSH;
+>> -	else
+>> -		flags = ACL_START;
+>> +	} else if (!test_bit(FLAG_FLUSHABLE, &chan->flags) &&
+>> +		    lmp_no_flush_capable(hcon->hdev)) {
+>> +		flags = ACL_START_NO_FLUSH;
+>> +	}
 > 
-> Firmware dump can be trigger by
-> echo 1 > /sys/kernel/debug/bluetooth/hci*/config/fw_dump
-> and when the dump operation is completed, data can be read by
-> cat /sys/class/devcoredump/devcd*/data
-> 
-> We have prepared following script to divide fw memory
-> dump data into multiple files based on memory type.
-> 
-> [root]# cat btmrvl_split_dump_data.sh
-> #!/bin/bash
-> # usage: ./btmrvl_split_dump_data.sh dump_data
-> 
-> fw_dump_data=$1
-> 
-> mem_type="ITCM DTCM SQRAM APU CIU ICU MAC EXT7 EXT8 EXT9 EXT10 EXT11 EXT12 EXT13 EXTLAST"
-> 
-> for name in ${mem_type[@]}
-> do
->         sed -n "/Start dump $name/,/End dump/p" $fw_dump_data  > tmp.$name.log
->         if [ ! -s tmp.$name.log ]
->                 then
->                         rm -rf tmp.$name.log
->                 else
->                         # Remove the describle info "Start dump" and "End dump"
->                         sed '1d' tmp.$name.log | sed '$d' > /data/$name.log
->                         if [ -s /data/$name.log ]
->                         then
->                                 echo "generate /data/$name.log"
->                         else
->                                 sed '1d' tmp.$name.log | sed '$d' > /var/$name.log
->                                 echo "generate /var/$name.log"
->                         fi
->                         rm -rf tmp.$name.log
->         fi
-> done
-> 
-> Signed-off-by: Xinming Hu <huxm@marvell.com>
-> Signed-off-by: Cathy Luo <cluo@marvell.com>
-> Signed-off-by: Avinash Patil <patila@marvell.com>
-> Signed-off-by: Amitkumar Karwar <akarwar@marvell.com>
-> ---
-> v2: Addressed below comments from Johannes.
-> Add "select WANT_DEV_COREDUMP" in Kconfig
-> Use write debugfs command instead of read to trigger dump operation.
-> ---
-> drivers/bluetooth/Kconfig          |   1 +
-> drivers/bluetooth/btmrvl_debugfs.c |  30 ++++
-> drivers/bluetooth/btmrvl_drv.h     |  21 +++
-> drivers/bluetooth/btmrvl_main.c    |   9 ++
-> drivers/bluetooth/btmrvl_sdio.c    | 299 +++++++++++++++++++++++++++++++++++++
-> drivers/bluetooth/btmrvl_sdio.h    |   5 +
-> 6 files changed, 365 insertions(+)
-> 
-> diff --git a/drivers/bluetooth/Kconfig b/drivers/bluetooth/Kconfig
-> index 4547dc2..364f080 100644
-> --- a/drivers/bluetooth/Kconfig
-> +++ b/drivers/bluetooth/Kconfig
-> @@ -210,6 +210,7 @@ config BT_MRVL_SDIO
-> 	tristate "Marvell BT-over-SDIO driver"
-> 	depends on BT_MRVL && MMC
-> 	select FW_LOADER
-> +	select WANT_DEV_COREDUMP
-> 	help
-> 	  The driver for Marvell Bluetooth chipsets with SDIO interface.
-> 
-> diff --git a/drivers/bluetooth/btmrvl_debugfs.c b/drivers/bluetooth/btmrvl_debugfs.c
-> index 023d35e..53c83db 100644
-> --- a/drivers/bluetooth/btmrvl_debugfs.c
-> +++ b/drivers/bluetooth/btmrvl_debugfs.c
-> @@ -167,6 +167,34 @@ static const struct file_operations btmrvl_hscmd_fops = {
-> 	.llseek = default_llseek,
-> };
-> 
-> +static ssize_t btmrvl_fwdump_write(struct file *file, const char __user *ubuf,
-> +				   size_t count, loff_t *ppos)
-> +{
-> +	struct btmrvl_private *priv = file->private_data;
-> +	char buf[16];
-> +	long result, ret;
-> +
-> +	memset(buf, 0, sizeof(buf));
-> +
-> +	if (copy_from_user(&buf, ubuf, min_t(size_t, sizeof(buf) - 1, count)))
-> +		return -EFAULT;
-> +
-> +	ret = kstrtol(buf, 10, &result);
-> +	if (ret)
-> +		return ret;
+> I think Marcel was after just providing a clarifying code comment in
+> both places - having two branches of an if-statement doing exactly the
+> same thing looks a bit weird to me. To make thins completely clear I'd
+> suggest adding a simple helper function that you can call from both
+> places to get the needed flags, something like the following:
 
-I wonder why not use strtobool and check for the result being true.
+I am actually fine with just adding a comment explaining the complex if statement on why it is correct. It is just a helper for everybody to understand what and why it is done that way.
 
-> +
-> +	if (result)
-> +		btmrvl_firmware_dump(priv);
-> +
-> +	return count;
-> +}
-> +
-> +static const struct file_operations btmrvl_fwdump_fops = {
-> +	.write	= btmrvl_fwdump_write,
-> +	.open	= simple_open,
-> +	.llseek = default_llseek,
-> +};
-> +
-> void btmrvl_debugfs_init(struct hci_dev *hdev)
+> static u16 get_acl_flags(struct hci_conn *hcon, struct l2cap_chan *chan)
 > {
-> 	struct btmrvl_private *priv = hci_get_drvdata(hdev);
-> @@ -197,6 +225,8 @@ void btmrvl_debugfs_init(struct hci_dev *hdev)
-> 			    priv, &btmrvl_hscmd_fops);
-> 	debugfs_create_file("hscfgcmd", 0644, dbg->config_dir,
-> 			    priv, &btmrvl_hscfgcmd_fops);
-> +	debugfs_create_file("fw_dump", 0444, dbg->config_dir,
-> +			    priv, &btmrvl_fwdump_fops);
 
-Shouldn't this be 0200 actually? Since you can only write to it, right?
+If we do it with a helper functions, then it should only provide the l2cap_chan since we can get the hci_conn from there.
 
+> 	/* LE-U does not support auto-flushing packets */
+> 	if (hcon->type == LE_LINK)
+> 		return ACL_START_NO_FLUSH;
 > 
-> 	dbg->status_dir = debugfs_create_dir("status", hdev->debugfs);
-> 	debugfs_create_u8("curpsmode", 0444, dbg->status_dir,
-> diff --git a/drivers/bluetooth/btmrvl_drv.h b/drivers/bluetooth/btmrvl_drv.h
-> index 38ad662..389e6f1 100644
-> --- a/drivers/bluetooth/btmrvl_drv.h
-> +++ b/drivers/bluetooth/btmrvl_drv.h
-> @@ -22,6 +22,7 @@
-> #include <linux/kthread.h>
-> #include <linux/bitops.h>
-> #include <linux/slab.h>
-> +#include <linux/devcoredump.h>
-> #include <net/bluetooth/bluetooth.h>
+> 	/* If non-flushable packets are not supported don't request them */
+> 	if (!lmp_no_flush_capable(hcon->hdev))
+> 		 return ACL_START;
 > 
-> #define BTM_HEADER_LEN			4
-> @@ -32,6 +33,24 @@
-> /* Time to wait for command response in millisecond */
-> #define WAIT_UNTIL_CMD_RESP		5000
+> 	/* If the chan has requested auto-flushing go with that */
+> 	if (chan && test_bit(FLAG_FLUSHABLE, &chan->flags))
+> 		return ACL_START;
+
+This seems to be a bit too much. The FLAG_FLUSABLE is only settable if the controller supports it. I wonder why we need the LMP features check here in the first place. Can we not just trust the flag on the channel is set correctly and enforce it before setting the flag.
 > 
-> +enum rdwr_status {
-> +	RDWR_STATUS_SUCCESS = 0,
-> +	RDWR_STATUS_FAILURE = 1,
-> +	RDWR_STATUS_DONE = 2
-> +};
-> +
-> +#define FW_DUMP_MAX_NAME_LEN    8
-> +#define FW_DUMP_HOST_READY      0xEE
-> +#define FW_DUMP_DONE            0xFF
-> +#define FW_DUMP_READ_DONE       0xFE
-> +
-> +struct memory_type_mapping {
-> +	u8 mem_name[FW_DUMP_MAX_NAME_LEN];
-> +	u8 *mem_ptr;
-> +	u32 mem_size;
-> +	u8 done_flag;
-> +};
-> +
-> struct btmrvl_thread {
-> 	struct task_struct *task;
-> 	wait_queue_head_t wait_q;
-> @@ -81,6 +100,7 @@ struct btmrvl_private {
-> 				u8 *payload, u16 nb);
-> 	int (*hw_wakeup_firmware) (struct btmrvl_private *priv);
-> 	int (*hw_process_int_status) (struct btmrvl_private *priv);
-> +	void (*firmware_dump)(struct btmrvl_private *priv);
-
-While we can do this as a first step to get this merged, but I wonder if we might want to make this generic and just add a hdev->firmware_dump that drivers then can implement.
-
-We could actually add an option to Controller Configuration of the management interface and add a command to trigger the firmware dump. Something to think about. However just starting with a debugfs trigger via Bluetooth core might be a good idea no matter what. That why more drivers could start looking implementing this without having to duplicate the trigger.
+> 	/* Otherwise go with a non-flushable packet */
+>        return ACL_START_NO_FLUSH;
+> }
+> 
+> This way we'd avoid complex if-statements and can clearly document each
+> condition independently.
 
 Regards
 
