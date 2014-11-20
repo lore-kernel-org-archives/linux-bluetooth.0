@@ -1,168 +1,374 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH] android/README: Update documention with Android 5 info
-Date: Thu, 20 Nov 2014 18:24:55 +0100
-Message-Id: <1416504295-18224-1-git-send-email-szymon.janc@tieto.com>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 8.1 \(1993\))
+Subject: Re: [RESEND PATCH v3] Bluetooth: btmrvl add firmware dump support
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1416498414-9583-1-git-send-email-akarwar@marvell.com>
+Date: Fri, 21 Nov 2014 00:06:52 +0800
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>,
+	Johannes Berg <johannes@sipsolutions.net>,
+	Xinming Hu <huxm@marvell.com>, Cathy Luo <cluo@marvell.com>,
+	Avinash Patil <patila@marvell.com>
+Message-Id: <1596A22A-E632-4C05-9233-3907AE41EBCE@holtmann.org>
+References: <1416498414-9583-1-git-send-email-akarwar@marvell.com>
+To: Amitkumar Karwar <akarwar@marvell.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- android/README | 84 ++++++++++++++++++++++++++++++++++------------------------
- 1 file changed, 49 insertions(+), 35 deletions(-)
+Hi Amitkumar,
 
-diff --git a/android/README b/android/README
-index b1ac886..aa12e51 100644
---- a/android/README
-+++ b/android/README
-@@ -9,14 +9,13 @@ replacement to Android provided Bluetooth stack.
- More details about BlueZ for Android architecture and components can be found
- in android/hal-ipc-api.txt file.
- 
--Supported Android version: 4.4
-+Supported Android version: 4.4 KitKat and 5.0 Lollipop
- 
- 
- Building and running on Android
- ===============================
- 
--Steps needed to build and run Android Open Source Project 4.4 with
--integrated BlueZ.
-+Steps needed to build and run Android Open Source Project with integrated BlueZ.
- 
- 
- Build requirements
-@@ -30,11 +29,10 @@ is available at https://code.google.com/p/aosp-bluez.glib/
- 'external/bluetooth/sbc' directory. Library is build from Android.mk provided
- by BlueZ. SBC code is available at git://git.kernel.org/pub/scm/bluetooth/sbc
- 
--- Bionic support - Currently only 'master' branch available at
--https://android.googlesource.com/platform/bionic provides all required
--functionality and running BlueZ on release branch requires backporting missing
--features (currently epoll_create1 and ppoll calls for Android 4.4). Sample
--Bionic for Android 4.4 with all required features backported is available at
-+- Bionic support - Android 5.0 provides all required functionality. Running
-+BlueZ on Android 4.4 requires backporting missing features (epoll_create1 and
-+ppoll calls). Sample Bionic for Android 4.4 with all required features
-+backported is available at
- https://code.google.com/p/aosp-bluez.platform-bionic/
- 
- Runtime requirements
-@@ -49,29 +47,44 @@ import init.bluetooth.rc
- 
- For convenience examples are provided at:
- https://code.google.com/p/aosp-bluez.device-lge-mako/    (Nexus 4)
-+https://code.google.com/p/aosp-bluez.device-lge-ham/     (Nexus 5)
- https://code.google.com/p/aosp-bluez.device-asus-flo/    (Nexus 7 2013)
- 
-+Security-Enhanced Linux in Android
-+----------------------------------
-+
-+Since 5.0 release Android moved to full enforcement of SELinux. This requires
-+proper policy to be provided for all BlueZ for Android services (and services
-+interacting with BlueZ). Policies should be placed in external/selinux/ path.
-+
-+Required policy files are provided at <TBD>.
-+
-+For convenience sepolicy.git with all required policies is available at:
-+https://code.google.com/p/aosp-bluez.external-sepolicy/
- 
- Downloading and building
- ------------------------
- 
--Building for Android requires full Android AOSP source tree. Sample Android
--4.4 tree with all required components present is available at
-+Building for Android requires full Android AOSP source tree. Sample Android tree
-+with all required components present is available at
- http://code.google.com/p/aosp-bluez/
- 
--This tree provides support for Nexus4 (target aosp_mako-userdebug) and
--Nexus 7 2013 (target aosp_flo-userdebug). Tree does not provide binary blobs
--needed to run Android on supported devices. Those can be obtained from
-+This tree provides support for Nexus4 (mako), Nexus 5 (hammerhead) and
-+Nexus 7 2013 (flo, deb). Tree does not provide binary blobs needed to run
-+Android on supported devices. Those can be obtained from
- https://developers.google.com/android/nexus/drivers. Binary blobs needs to be
- unpacked (EULA acceptance required) into 'vendor' directory of Android tree.
- 
- Downloading:
--repo init -u https://code.google.com/p/aosp-bluez.platform-manifest -b kitkat
-+Android 5.0 - 'lollipop' branch
-+Android 4.4 - 'kitkat' branch
-+
-+repo init -u https://code.google.com/p/aosp-bluez.platform-manifest -b lollipop
- repo sync
- 
- Building:
- source build/envsetup.sh
--lunch aosp_mako-userdebug    or    lunch aosp_flo-userdebug
-+lunch aosp_<target>-userdebug
- make -j8
- 
- Flashing:
-@@ -263,21 +276,23 @@ initial     - only initial implementations is present, Android Framework is
-               able to initialize but most likely not able to use it
- not started - no implementation, Android Framework is not able to initialize it
- 
--Profile ID    HAL header         Status
-----------------------------------------
--core          bluetooth.h        complete
--a2dp          bt_av.h            complete
--gatt          bt_gatt.h          complete
--              bt_gatt_client.h   complete
--              bt_gatt_server.h   complete
--handsfree     bt_hf.h            complete
--hidhost       bt_hh.h            complete
--health        bt_hl.h            complete
--pan           bt_pan.h           complete
--avrcp         bt_rc.h            complete
--socket        bt_sock.h          complete
--hf_client     bt_hf_client.h     initial
--map_client    bt_mce.h           complete
-+Profile ID        HAL header         4.4 Status    5.0 status
-+-------------------------------------------------------------
-+core              bluetooth.h        complete      partial
-+a2dp              bt_av.h            complete      complete
-+gatt              bt_gatt.h          complete      partial
-+                  bt_gatt_client.h   complete      partial
-+                  bt_gatt_server.h   complete      partial
-+handsfree         bt_hf.h            complete      partial
-+hidhost           bt_hh.h            complete      complete
-+health            bt_hl.h            complete      complete
-+pan               bt_pan.h           complete      complete
-+avrcp             bt_rc.h            complete      complete
-+socket            bt_sock.h          complete      partial
-+handsfree_client  bt_hf_client.h     N/A           partial
-+map_client        bt_mce.h           N/A           complete
-+a2dp_sink         bt_av.h            N/A           partial
-+avrcp_ctrl        bt_rc.h            N/A           partial
- 
- 
- Implementation shortcomings
-@@ -344,11 +359,6 @@ methods:
- client->set_adv_data               missing kernel support for vendor data
- client->connect                    is_direct parameter is ignored
- 
--HAL HF Client
---------------
--
--Available on Android only when BLUEZ_EXTENSIONS flag set in BoardConfig.mk
--
- 
- Audio SCO HAL
- =============
-@@ -387,6 +397,10 @@ affect qualification or user experience. This section provides list of
- recommended Android fixes that are not part of latest AOSP release supported by
- BlueZ.
- 
-+For Android 5.0 Lollipop:
-+<TBD>
-+
-+For Android 4.4 KitKat:
- https://android-review.googlesource.com/82757
- https://android-review.googlesource.com/87670
- https://android-review.googlesource.com/88384
--- 
-1.9.1
+> This patch adds firmware dump support for marvell
+> bluetooth chipset. Currently only SD8897 is supported.
+> This is implemented based on dev_coredump, a new mechnism
+> introduced in kernel 3.18rc3
+> 
+> Firmware dump can be trigger by
+> echo 1 > /sys/kernel/debug/bluetooth/hci*/config/fw_dump
+> and when the dump operation is completed, data can be read by
+> cat /sys/class/devcoredump/devcd*/data
+> 
+> We have prepared following script to divide fw memory
+> dump data into multiple files based on memory type.
+> 
+> [root]# cat btmrvl_split_dump_data.sh
+> #!/bin/bash
+> # usage: ./btmrvl_split_dump_data.sh dump_data
+> 
+> fw_dump_data=$1
+> 
+> mem_type="ITCM DTCM SQRAM APU CIU ICU MAC EXT7 EXT8 EXT9 EXT10 EXT11 EXT12 EXT13 EXTLAST"
+> 
+> for name in ${mem_type[@]}
+> do
+>         sed -n "/Start dump $name/,/End dump/p" $fw_dump_data  > tmp.$name.log
+>         if [ ! -s tmp.$name.log ]
+>                 then
+>                         rm -rf tmp.$name.log
+>                 else
+>                         # Remove the describle info "Start dump" and "End dump"
+>                         sed '1d' tmp.$name.log | sed '$d' > /data/$name.log
+>                         if [ -s /data/$name.log ]
+>                         then
+>                                 echo "generate /data/$name.log"
+>                         else
+>                                 sed '1d' tmp.$name.log | sed '$d' > /var/$name.log
+>                                 echo "generate /var/$name.log"
+>                         fi
+>                         rm -rf tmp.$name.log
+>         fi
+> done
+> 
+> Signed-off-by: Xinming Hu <huxm@marvell.com>
+> Signed-off-by: Cathy Luo <cluo@marvell.com>
+> Signed-off-by: Avinash Patil <patila@marvell.com>
+> Signed-off-by: Amitkumar Karwar <akarwar@marvell.com>
+> Reviewed-by: Johannes Berg <johannes@sipsolutions.net>
+> Reviewed-by: Marcel Holtmann <marcel@holtmann.org>
+> ---
+> v2: Add "select WANT_DEV_COREDUMP" in Kconfig
+>    Use write debugfs command instead of read to trigger dump operation.
+> v3: Change fw_dump debugfs file permissions to write only
+>    Replace kstrtol with strtobool
+> ---
+> 
+> Signed-off-by: Amitkumar Karwar <akarwar@marvell.com>
+> ---
+> drivers/bluetooth/Kconfig          |   1 +
+> drivers/bluetooth/btmrvl_debugfs.c |  31 ++++
+> drivers/bluetooth/btmrvl_drv.h     |  21 +++
+> drivers/bluetooth/btmrvl_main.c    |   9 ++
+> drivers/bluetooth/btmrvl_sdio.c    | 299 +++++++++++++++++++++++++++++++++++++
+> drivers/bluetooth/btmrvl_sdio.h    |   5 +
+> 6 files changed, 366 insertions(+)
+> 
+> diff --git a/drivers/bluetooth/Kconfig b/drivers/bluetooth/Kconfig
+> index 4547dc2..364f080 100644
+> --- a/drivers/bluetooth/Kconfig
+> +++ b/drivers/bluetooth/Kconfig
+> @@ -210,6 +210,7 @@ config BT_MRVL_SDIO
+> 	tristate "Marvell BT-over-SDIO driver"
+> 	depends on BT_MRVL && MMC
+> 	select FW_LOADER
+> +	select WANT_DEV_COREDUMP
+> 	help
+> 	  The driver for Marvell Bluetooth chipsets with SDIO interface.
+> 
+> diff --git a/drivers/bluetooth/btmrvl_debugfs.c b/drivers/bluetooth/btmrvl_debugfs.c
+> index 023d35e..0118913 100644
+> --- a/drivers/bluetooth/btmrvl_debugfs.c
+> +++ b/drivers/bluetooth/btmrvl_debugfs.c
+> @@ -167,6 +167,35 @@ static const struct file_operations btmrvl_hscmd_fops = {
+> 	.llseek = default_llseek,
+> };
+> 
+> +static ssize_t btmrvl_fwdump_write(struct file *file, const char __user *ubuf,
+> +				   size_t count, loff_t *ppos)
+> +{
+> +	struct btmrvl_private *priv = file->private_data;
+> +	char buf[16];
+> +	bool result;
+> +
+> +	memset(buf, 0, sizeof(buf));
+> +
+> +	if (copy_from_user(&buf, ubuf, min_t(size_t, sizeof(buf) - 1, count)))
+> +		return -EFAULT;
+> +
+> +	if (strtobool(buf, &result))
+> +		return -EINVAL;
+> +
+> +	if (result)
+> +		btmrvl_firmware_dump(priv);
+> +	else
+> +		return -EINVAL;
+
+lets turn this around.
+
+	if (!result)
+		return -EINVAL;
+
+	btmrvl_firmware_dump(priv);
+
+Doing it this way makes it a lot easier to read.
+
+> +
+> +	return count;
+> +}
+> +
+> +static const struct file_operations btmrvl_fwdump_fops = {
+> +	.write	= btmrvl_fwdump_write,
+> +	.open	= simple_open,
+> +	.llseek = default_llseek,
+> +};
+> +
+> void btmrvl_debugfs_init(struct hci_dev *hdev)
+> {
+> 	struct btmrvl_private *priv = hci_get_drvdata(hdev);
+> @@ -197,6 +226,8 @@ void btmrvl_debugfs_init(struct hci_dev *hdev)
+> 			    priv, &btmrvl_hscmd_fops);
+> 	debugfs_create_file("hscfgcmd", 0644, dbg->config_dir,
+> 			    priv, &btmrvl_hscfgcmd_fops);
+> +	debugfs_create_file("fw_dump", 0200, dbg->config_dir,
+> +			    priv, &btmrvl_fwdump_fops);
+> 
+> 	dbg->status_dir = debugfs_create_dir("status", hdev->debugfs);
+> 	debugfs_create_u8("curpsmode", 0444, dbg->status_dir,
+> diff --git a/drivers/bluetooth/btmrvl_drv.h b/drivers/bluetooth/btmrvl_drv.h
+> index 38ad662..389e6f1 100644
+> --- a/drivers/bluetooth/btmrvl_drv.h
+> +++ b/drivers/bluetooth/btmrvl_drv.h
+> @@ -22,6 +22,7 @@
+> #include <linux/kthread.h>
+> #include <linux/bitops.h>
+> #include <linux/slab.h>
+> +#include <linux/devcoredump.h>
+
+I overlooked this before. Why does this include need to be in the header file?
+
+> #include <net/bluetooth/bluetooth.h>
+> 
+> #define BTM_HEADER_LEN			4
+> @@ -32,6 +33,24 @@
+> /* Time to wait for command response in millisecond */
+> #define WAIT_UNTIL_CMD_RESP		5000
+> 
+> +enum rdwr_status {
+> +	RDWR_STATUS_SUCCESS = 0,
+> +	RDWR_STATUS_FAILURE = 1,
+> +	RDWR_STATUS_DONE = 2
+> +};
+> +
+> +#define FW_DUMP_MAX_NAME_LEN    8
+> +#define FW_DUMP_HOST_READY      0xEE
+> +#define FW_DUMP_DONE            0xFF
+> +#define FW_DUMP_READ_DONE       0xFE
+> +
+> +struct memory_type_mapping {
+> +	u8 mem_name[FW_DUMP_MAX_NAME_LEN];
+> +	u8 *mem_ptr;
+> +	u32 mem_size;
+> +	u8 done_flag;
+> +};
+> +
+> struct btmrvl_thread {
+> 	struct task_struct *task;
+> 	wait_queue_head_t wait_q;
+> @@ -81,6 +100,7 @@ struct btmrvl_private {
+> 				u8 *payload, u16 nb);
+> 	int (*hw_wakeup_firmware) (struct btmrvl_private *priv);
+> 	int (*hw_process_int_status) (struct btmrvl_private *priv);
+> +	void (*firmware_dump)(struct btmrvl_private *priv);
+> 	spinlock_t driver_lock;		/* spinlock used by driver */
+> #ifdef CONFIG_DEBUG_FS
+> 	void *debugfs_data;
+> @@ -151,6 +171,7 @@ int btmrvl_send_hscfg_cmd(struct btmrvl_private *priv);
+> int btmrvl_enable_ps(struct btmrvl_private *priv);
+> int btmrvl_prepare_command(struct btmrvl_private *priv);
+> int btmrvl_enable_hs(struct btmrvl_private *priv);
+> +void btmrvl_firmware_dump(struct btmrvl_private *priv);
+> 
+> #ifdef CONFIG_DEBUG_FS
+> void btmrvl_debugfs_init(struct hci_dev *hdev);
+> diff --git a/drivers/bluetooth/btmrvl_main.c b/drivers/bluetooth/btmrvl_main.c
+> index bb0d2c2..90b1b44 100644
+> --- a/drivers/bluetooth/btmrvl_main.c
+> +++ b/drivers/bluetooth/btmrvl_main.c
+> @@ -22,6 +22,7 @@
+> #include <linux/of.h>
+> #include <net/bluetooth/bluetooth.h>
+> #include <net/bluetooth/hci_core.h>
+> +#include <linux/mmc/sdio_func.h>
+> 
+> #include "btmrvl_drv.h"
+> #include "btmrvl_sdio.h"
+> @@ -335,6 +336,14 @@ int btmrvl_prepare_command(struct btmrvl_private *priv)
+> 	return ret;
+> }
+> 
+> +void btmrvl_firmware_dump(struct btmrvl_private *priv)
+> +{
+> +	if (priv->firmware_dump)
+> +		priv->firmware_dump(priv);
+> +	else
+> +		BT_ERR("firmware dump error : not defined!\n");
+> +}
+
+Actually coming to think about it, it would be better to not expose the debugfs entry if the firmware_dump callback is not defined. Is it possible to change that code that way?
+
+> +
+> static int btmrvl_tx_pkt(struct btmrvl_private *priv, struct sk_buff *skb)
+> {
+> 	int ret = 0;
+> diff --git a/drivers/bluetooth/btmrvl_sdio.c b/drivers/bluetooth/btmrvl_sdio.c
+> index 550bce0..c76d8c8 100644
+> --- a/drivers/bluetooth/btmrvl_sdio.c
+> +++ b/drivers/bluetooth/btmrvl_sdio.c
+> @@ -33,6 +33,24 @@
+> 
+> #define VERSION "1.0"
+> 
+> +static struct memory_type_mapping mem_type_mapping_tbl[] = {
+> +	{"ITCM", NULL, 0, 0xF0},
+> +	{"DTCM", NULL, 0, 0xF1},
+> +	{"SQRAM", NULL, 0, 0xF2},
+> +	{"APU", NULL, 0, 0xF3},
+> +	{"CIU", NULL, 0, 0xF4},
+> +	{"ICU", NULL, 0, 0xF5},
+> +	{"MAC", NULL, 0, 0xF6},
+> +	{"EXT7", NULL, 0, 0xF7},
+> +	{"EXT8", NULL, 0, 0xF8},
+> +	{"EXT9", NULL, 0, 0xF9},
+> +	{"EXT10", NULL, 0, 0xFA},
+> +	{"EXT11", NULL, 0, 0xFB},
+> +	{"EXT12", NULL, 0, 0xFC},
+> +	{"EXT13", NULL, 0, 0xFD},
+> +	{"EXTLAST", NULL, 0, 0xFE},
+> +};
+> +
+> /* The btmrvl_sdio_remove() callback function is called
+>  * when user removes this module from kernel space or ejects
+>  * the card from the slot. The driver handles these 2 cases
+> @@ -122,6 +140,9 @@ static const struct btmrvl_sdio_card_reg btmrvl_reg_8897 = {
+> 	.int_read_to_clear = true,
+> 	.host_int_rsr = 0x01,
+> 	.card_misc_cfg = 0xcc,
+> +	.fw_dump_ctrl = 0xe2,
+> +	.fw_dump_start = 0xe3,
+> +	.fw_dump_end = 0xea,
+> };
+> 
+> static const struct btmrvl_sdio_device btmrvl_sdio_sd8688 = {
+> @@ -130,6 +151,7 @@ static const struct btmrvl_sdio_device btmrvl_sdio_sd8688 = {
+> 	.reg		= &btmrvl_reg_8688,
+> 	.support_pscan_win_report = false,
+> 	.sd_blksz_fw_dl	= 64,
+> +	.supports_fw_dump = false,
+> };
+> 
+> static const struct btmrvl_sdio_device btmrvl_sdio_sd8787 = {
+> @@ -138,6 +160,7 @@ static const struct btmrvl_sdio_device btmrvl_sdio_sd8787 = {
+> 	.reg		= &btmrvl_reg_87xx,
+> 	.support_pscan_win_report = false,
+> 	.sd_blksz_fw_dl	= 256,
+> +	.supports_fw_dump = false,
+> };
+> 
+> static const struct btmrvl_sdio_device btmrvl_sdio_sd8797 = {
+> @@ -146,6 +169,7 @@ static const struct btmrvl_sdio_device btmrvl_sdio_sd8797 = {
+> 	.reg		= &btmrvl_reg_87xx,
+> 	.support_pscan_win_report = false,
+> 	.sd_blksz_fw_dl	= 256,
+> +	.supports_fw_dump = false,
+> };
+> 
+> static const struct btmrvl_sdio_device btmrvl_sdio_sd8887 = {
+> @@ -154,6 +178,7 @@ static const struct btmrvl_sdio_device btmrvl_sdio_sd8887 = {
+> 	.reg		= &btmrvl_reg_8887,
+> 	.support_pscan_win_report = true,
+> 	.sd_blksz_fw_dl	= 256,
+> +	.supports_fw_dump = false,
+> };
+> 
+> static const struct btmrvl_sdio_device btmrvl_sdio_sd8897 = {
+> @@ -162,6 +187,7 @@ static const struct btmrvl_sdio_device btmrvl_sdio_sd8897 = {
+> 	.reg		= &btmrvl_reg_8897,
+> 	.support_pscan_win_report = true,
+> 	.sd_blksz_fw_dl	= 256,
+> +	.supports_fw_dump = true,
+> };
+> 
+> static const struct sdio_device_id btmrvl_sdio_ids[] = {
+> @@ -1080,6 +1106,277 @@ static int btmrvl_sdio_wakeup_fw(struct btmrvl_private *priv)
+> 	return ret;
+> }
+> 
+> +static void btmrvl_sdio_dump_regs(struct btmrvl_private *priv)
+> +{
+> +	struct btmrvl_sdio_card *card = priv->btmrvl_dev.card;
+> +	int ret = 0;
+> +	unsigned int reg, reg_start, reg_end;
+> +	char buf[256], *ptr;
+> +	u8 loop, func, data;
+> +	int MAX_LOOP = 2;
+> +
+> +	btmrvl_sdio_wakeup_fw(priv);
+> +	sdio_claim_host(card->func);
+> +
+> +	for (loop = 0; loop < MAX_LOOP; loop++) {
+> +		memset(buf, 0, sizeof(buf));
+> +		ptr = buf;
+> +
+> +		if (loop == 0) {
+> +			/* Read the registers of SDIO function0 */
+> +			func = loop;
+> +			reg_start = 0;
+> +			reg_end = 9;
+> +		} else {
+> +			func = 2;
+> +			reg_start = 0;
+> +			reg_end = 0x09;
+> +		}
+> +
+> +		ptr += sprintf(ptr, "SDIO Func%d (%#x-%#x): ",
+> +			       func, reg_start, reg_end);
+> +		for (reg = reg_start; reg <= reg_end; reg++) {
+> +			if (func == 0)
+> +				data = sdio_f0_readb(card->func, reg, &ret);
+> +			else
+> +				data = sdio_readb(card->func, reg, &ret);
+> +
+> +			if (!ret) {
+> +				ptr += sprintf(ptr, "%02x ", data);
+> +			} else {
+> +				ptr += sprintf(ptr, "ERR");
+> +				break;
+> +			}
+> +		}
+> +
+> +		BT_INFO("%s\n", buf);
+
+I do not think that BT_INFO etc. functions need the \n at the end. You might want to fix that in the code for all places.
+
+Regards
+
+Marcel
 
