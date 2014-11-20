@@ -7,9 +7,9 @@ CC: Johannes Berg <johannes@sipsolutions.net>, <marcel@holtmann.org>,
         Avinash Patil
 	<patila@marvell.com>,
         Amitkumar Karwar <akarwar@marvell.com>
-Subject: [RESEND PATCH v3] Bluetooth: btmrvl add firmware dump support
-Date: Thu, 20 Nov 2014 07:46:54 -0800
-Message-ID: <1416498414-9583-1-git-send-email-akarwar@marvell.com>
+Subject: [PATCH] Bluetooth: btmrvl add firmware dump support
+Date: Thu, 20 Nov 2014 07:44:30 -0800
+Message-ID: <1416498270-9500-1-git-send-email-akarwar@marvell.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 List-ID: <linux-bluetooth.vger.kernel.org>
