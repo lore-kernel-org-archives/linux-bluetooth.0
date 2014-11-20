@@ -3,8 +3,10 @@ From: Jakub Pawlowski <jpawlowski@google.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Jakub Pawlowski <jpawlowski@google.com>
 Subject: [PATCH v7 3/3] Bluetooth: start and stop service discovery
-Date: Thu, 20 Nov 2014 09:56:25 -0800
-Message-Id: <1416506185-30315-1-git-send-email-jpawlowski@google.com>
+Date: Thu, 20 Nov 2014 09:51:42 -0800
+Message-Id: <1416505902-29931-3-git-send-email-jpawlowski@google.com>
+In-Reply-To: <1416505902-29931-1-git-send-email-jpawlowski@google.com>
+References: <1416505902-29931-1-git-send-email-jpawlowski@google.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
