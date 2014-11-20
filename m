@@ -1,80 +1,91 @@
 Return-Path: <cyrus@holtmann.org>
-From: Amitkumar Karwar <akarwar@marvell.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-CC: BlueZ development <linux-bluetooth@vger.kernel.org>,
-        Johannes Berg
-	<johannes@sipsolutions.net>,
-        Xinming Hu <huxm@marvell.com>, Cathy Luo
-	<cluo@marvell.com>,
-        Avinash Patil <patila@marvell.com>
-Date: Thu, 20 Nov 2014 07:41:22 -0800
-Subject: RE: [PATCH v2] Bluetooth: btmrvl add firmware dump support
-Message-ID: <5FF020A1CFFEEC49BD1E09530C4FF5951821E916B6@SC-VEXCH1.marvell.com>
-References: <1416478065-5678-1-git-send-email-akarwar@marvell.com>
- <56E9D4AD-8014-4261-BEE8-11A40C206A42@holtmann.org>
-In-Reply-To: <56E9D4AD-8014-4261-BEE8-11A40C206A42@holtmann.org>
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
+From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH 2/6] android/client: Add Android 5.0 new value verifiers for gatt client
+Date: Thu, 20 Nov 2014 16:34:02 +0100
+Message-Id: <1416497645-6313-2-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+In-Reply-To: <1416497645-6313-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+References: <1416497645-6313-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+---
+ android/client/if-gatt.c | 62 ++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 62 insertions(+)
 
-Thanks for your review
+diff --git a/android/client/if-gatt.c b/android/client/if-gatt.c
+index 9d6fafd..c412d58 100644
+--- a/android/client/if-gatt.c
++++ b/android/client/if-gatt.c
+@@ -73,6 +73,68 @@ const btgatt_interface_t *if_gatt = NULL;
+ #define VERIFY_STATUS(n, v) VERIFY_INT_ARG(n, v, "No status specified\n")
+ #define VERIFY_OFFSET(n, v) VERIFY_INT_ARG(n, v, "No offset specified\n")
+ #define VERIFY_TEST_ARG(n, v) VERIFY_INT_ARG(n, v, "No test arg specified\n")
++#define VERIFY_ACTION(n, v) VERIFY_INT_ARG(n, v, "No action specified\n")
++#define VERIFY_FILT_TYPE(n, v) VERIFY_INT_ARG(n, v, "No filter specified\n")
++#define VERIFY_FILT_INDEX(n, v) VERIFY_INT_ARG(n, v, \
++						"No filter index specified\n")
++#define VERIFY_FEAT_SELN(n, v) VERIFY_INT_ARG(n, v, "No feat seln specified\n")
++#define VERIFY_LIST_LOGIC_TYPE(n, v) VERIFY_INT_ARG(n, v, \
++					"No list logic type specified\n")
++#define VERIFY_FILT_LOGIC_TYPE(n, v) VERIFY_INT_ARG(n, v, \
++					"No filt logic type specified\n")
++#define VERIFY_RSSI_HI_THR(n, v) VERIFY_INT_ARG(n, v, \
++					"No rssi hi threshold specified\n")
++#define VERIFY_RSSI_LOW_THR(n, v) VERIFY_INT_ARG(n, v, \
++						"No low threshold specified\n")
++#define VERIFY_DELY_MODE(n, v) VERIFY_INT_ARG(n, v, "No delay mode specified\n")
++#define VERIFY_FND_TIME(n, v) VERIFY_INT_ARG(n, v, "No found time specified\n")
++#define VERIFY_LOST_TIME(n, v) VERIFY_INT_ARG(n, v, "No lost time specified\n")
++#define VERIFY_FND_TIME_CNT(n, v) VERIFY_INT_ARG(n, v, \
++					"No found timer counter specified\n")
++#define VERIFY_COMP_ID(n, v) VERIFY_INT_ARG(n, v, "No company id specified\n")
++#define VERIFY_COMP_ID_MASK(n, v) VERIFY_INT_ARG(n, v, \
++						"No comp. id mask specified\n")
++#define VERIFY_DATA_LEN(n, v) VERIFY_INT_ARG(n, v, "No data len specified\n")
++#define VERIFY_MASK_LEN(n, v) VERIFY_INT_ARG(n, v, "No mask len specified\n")
++#define VERIFY_MIN_INTERVAL(n, v) VERIFY_INT_ARG(n, v, \
++						"No min interval specified\n")
++#define VERIFY_MAX_INTERVAL(n, v) VERIFY_INT_ARG(n, v, \
++						"No max interval specified\n")
++#define VERIFY_APPEARANCE(n, v) VERIFY_INT_ARG(n, v, "No apperance specified\n")
++#define VERIFY_MANUFACTURER_LEN(n, v) VERIFY_INT_ARG(n, v, \
++					"No manufacturer len specified\n")
++#define VERIFY_SERVICE_DATA_LEN(n, v) VERIFY_INT_ARG(n, v, \
++					"No service data len specified\n")
++#define VERIFY_SERVICE_UUID_LEN(n, v) VERIFY_INT_ARG(n, v, \
++					"No service uuid len specified\n")
++#define VERIFY_MTU(n, v) VERIFY_INT_ARG(n, v, "No mtu specified\n")
++#define VERIFY_LATENCY(n, v) VERIFY_INT_ARG(n, v, \
++						"No latency specified\n")
++#define VERIFY_TIMEOUT(n, v) VERIFY_INT_ARG(n, v, "No timeout specified\n")
++#define VERIFY_SCAN_INTERVAL(n, v) VERIFY_INT_ARG(n, v, \
++						"No scan interval specified\n")
++#define VERIFY_SCAN_WINDOW(n, v) VERIFY_INT_ARG(n, v, \
++						"No scan window specified\n")
++#define VERIFY_ADV_TYPE(n, v) VERIFY_INT_ARG(n, v, \
++					"No advertising type specified\n")
++#define VERIFY_CHNL_MAP(n, v) VERIFY_INT_ARG(n, v, \
++						"No channel map specified\n")
++#define VERIFY_TX_POWER(n, v) VERIFY_INT_ARG(n, v, \
++						"No tx power specified\n")
++#define VERIFY_TIMEOUT_S(n, v) VERIFY_INT_ARG(n, v, \
++						"No timeout in sec specified\n")
++#define VERIFY_BATCH_SCAN_FULL_MAX(n, v) VERIFY_INT_ARG(n, v, \
++					"No batch scan full max specified\n")
++#define VERIFY_BATCH_SCAN_TRUNC_MAX(n, v) VERIFY_INT_ARG(n, v, \
++					"No batch scan trunc max specified\n")
++#define VERIFY_BATCH_SCAN_NOTIFY_THR(n, v) VERIFY_INT_ARG(n, v, \
++				"No batch scan notify threshold specified\n")
++#define VERIFY_SCAN_MODE(n, v) VERIFY_INT_ARG(n, v, \
++						"No scan mode specified\n")
++#define VERIFY_ADDR_TYPE(n, v) VERIFY_INT_ARG(n, v, \
++						"No address type specified\n")
++#define VERIFY_DISCARD_RULE(n, v) VERIFY_INT_ARG(n, v, \
++						"No discard rule specified\n")
+ #define VERIFY_HANDLE(n, v) VERIFY_HEX_ARG(n, v, "No "#v" specified\n")
+ #define VERIFY_SERVICE_HANDLE(n, v) VERIFY_HANDLE(n, v)
+ 
+-- 
+1.9.3
 
->> +
->> +	ret =3D kstrtol(buf, 10, &result);
->> +	if (ret)
->> +		return ret;
->
->I wonder why not use strtobool and check for the result being true.
->
-
-Sure. We will change this in updated version.
-
->> +
->> +	if (result)
->> +		btmrvl_firmware_dump(priv);
->> +
->> +	return count;
->> +}
->> +
->> +static const struct file_operations btmrvl_fwdump_fops =3D {
->> +	.write	=3D btmrvl_fwdump_write,
->> +	.open	=3D simple_open,
->> +	.llseek =3D default_llseek,
->> +};
->> +
->> void btmrvl_debugfs_init(struct hci_dev *hdev) {
->> 	struct btmrvl_private *priv =3D hci_get_drvdata(hdev); @@ -197,6
->+225,8
->> @@ void btmrvl_debugfs_init(struct hci_dev *hdev)
->> 			    priv, &btmrvl_hscmd_fops);
->> 	debugfs_create_file("hscfgcmd", 0644, dbg->config_dir,
->> 			    priv, &btmrvl_hscfgcmd_fops);
->> +	debugfs_create_file("fw_dump", 0444, dbg->config_dir,
->> +			    priv, &btmrvl_fwdump_fops);
->
->Shouldn't this be 0200 actually? Since you can only write to it, right?
->
-
-Right.
-
->> 	int (*hw_process_int_status) (struct btmrvl_private *priv);
->> +	void (*firmware_dump)(struct btmrvl_private *priv);
->
->While we can do this as a first step to get this merged, but I wonder if
->we might want to make this generic and just add a hdev->firmware_dump
->that drivers then can implement.
->
->We could actually add an option to Controller Configuration of the
->management interface and add a command to trigger the firmware dump.
->Something to think about. However just starting with a debugfs trigger
->via Bluetooth core might be a good idea no matter what. That why more
->drivers could start looking implementing this without having to
->duplicate the trigger.
->
-
-Sounds good to me.
-
-Regards,
-Amitkumar
