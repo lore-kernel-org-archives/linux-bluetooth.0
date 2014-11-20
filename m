@@ -1,103 +1,51 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 8.1 \(1993\))
-Subject: Re: [PATCH v3] Bluetooth: automatically flushable packets aren't allowed on LE links
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20141120113813.GA23288@t440s.lan>
-Date: Thu, 20 Nov 2014 21:50:18 +0800
-Cc: Steven Walter <stevenrwalter@gmail.com>,
-	"Gustavo F. Padovan" <gustavo@padovan.org>,
-	BlueZ development <linux-bluetooth@vger.kernel.org>,
-	linux-kernel@vger.kernel.org
-Message-Id: <80321467-10AB-489E-A47E-44B0ECEE4BE1@holtmann.org>
-References: <1416419951-27659-1-git-send-email-stevenrwalter@gmail.com> <20141120113813.GA23288@t440s.lan>
-To: Johan Hedberg <johan.hedberg@gmail.com>
-Sender: linux-kernel-owner@vger.kernel.org
+Message-ID: <546DF03D.3030508@tieto.com>
+Date: Thu, 20 Nov 2014 14:44:29 +0100
+From: Tyszkowski Jakub <jakub.tyszkowski@tieto.com>
+MIME-Version: 1.0
+To: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 1/3] android/hal-ipc-api: Add av callbacks for Android
+ 5
+References: <1416402606-31762-1-git-send-email-jakub.tyszkowski@tieto.com>
+In-Reply-To: <1416402606-31762-1-git-send-email-jakub.tyszkowski@tieto.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+Hi,
 
->> The bluetooth spec states that automatically flushable packets may not
->> be sent over a LE-U link.
->> 
->> Signed-off-by: Steven Walter <stevenrwalter@gmail.com>
->> ---
->> net/bluetooth/l2cap_core.c | 14 ++++++++------
->> 1 file changed, 8 insertions(+), 6 deletions(-)
->> 
->> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
->> index 4af3821..7c4350f 100644
->> --- a/net/bluetooth/l2cap_core.c
->> +++ b/net/bluetooth/l2cap_core.c
->> @@ -764,7 +764,7 @@ static void l2cap_send_cmd(struct l2cap_conn *conn, u8 ident, u8 code, u16 len,
->> 	if (!skb)
->> 		return;
->> 
->> -	if (lmp_no_flush_capable(conn->hcon->hdev))
->> +	if (lmp_no_flush_capable(conn->hcon->hdev) || conn->hcon->type == LE_LINK)
->> 		flags = ACL_START_NO_FLUSH;
->> 	else
->> 		flags = ACL_START;
->> @@ -784,7 +784,7 @@ static bool __chan_is_moving(struct l2cap_chan *chan)
->> static void l2cap_do_send(struct l2cap_chan *chan, struct sk_buff *skb)
->> {
->> 	struct hci_conn *hcon = chan->conn->hcon;
->> -	u16 flags;
->> +	u16 flags = ACL_START;
->> 
->> 	BT_DBG("chan %p, skb %p len %d priority %u", chan, skb, skb->len,
->> 	       skb->priority);
->> @@ -798,11 +798,13 @@ static void l2cap_do_send(struct l2cap_chan *chan, struct sk_buff *skb)
->> 		return;
->> 	}
->> 
->> -	if (!test_bit(FLAG_FLUSHABLE, &chan->flags) &&
->> -	    lmp_no_flush_capable(hcon->hdev))
->> +	if (hcon->type == LE_LINK) {
->> +		/* LE-U does not support auto-flushing packets */
->> 		flags = ACL_START_NO_FLUSH;
->> -	else
->> -		flags = ACL_START;
->> +	} else if (!test_bit(FLAG_FLUSHABLE, &chan->flags) &&
->> +		    lmp_no_flush_capable(hcon->hdev)) {
->> +		flags = ACL_START_NO_FLUSH;
->> +	}
-> 
-> I think Marcel was after just providing a clarifying code comment in
-> both places - having two branches of an if-statement doing exactly the
-> same thing looks a bit weird to me. To make thins completely clear I'd
-> suggest adding a simple helper function that you can call from both
-> places to get the needed flags, something like the following:
+On 11/19/2014 02:10 PM, Jakub Tyszkowski wrote:
+> Android 5 adds audio configuration callback.
+> ---
+>   android/hal-ipc-api.txt | 9 +++++++++
+>   1 file changed, 9 insertions(+)
+>
+> diff --git a/android/hal-ipc-api.txt b/android/hal-ipc-api.txt
+> index a5ec44b..9502a15 100644
+> --- a/android/hal-ipc-api.txt
+> +++ b/android/hal-ipc-api.txt
+> @@ -1098,6 +1098,15 @@ Notifications:
+>   		                         0x01 = Stopped
+>   		                         0x02 = Started
+>
+> +	Opcode 0x83 - Audio Configuration notification
+> +
+> +		Notification parameters: Remote address (6 octets)
+> +					 Sample Rate in Hz (4 octets)
+> +					 Channel Count (1 octet)
+> +
+> +		Valid channel count: 0x01 = Mono
+> +		                     0x02 = Stereo
+> +
+>
+>   Bluetooth Health HAL (ID 7)
+>   ===========================
+>
 
-I am actually fine with just adding a comment explaining the complex if statement on why it is correct. It is just a helper for everybody to understand what and why it is done that way.
+Please ignore this whole set as it turn out that new callback is for 
+sink role only and sink role is implementing the same HAL interface.
 
-> static u16 get_acl_flags(struct hci_conn *hcon, struct l2cap_chan *chan)
-> {
+This case requires more elaborate documentation and different IPC code.
 
-If we do it with a helper functions, then it should only provide the l2cap_chan since we can get the hci_conn from there.
-
-> 	/* LE-U does not support auto-flushing packets */
-> 	if (hcon->type == LE_LINK)
-> 		return ACL_START_NO_FLUSH;
-> 
-> 	/* If non-flushable packets are not supported don't request them */
-> 	if (!lmp_no_flush_capable(hcon->hdev))
-> 		 return ACL_START;
-> 
-> 	/* If the chan has requested auto-flushing go with that */
-> 	if (chan && test_bit(FLAG_FLUSHABLE, &chan->flags))
-> 		return ACL_START;
-
-This seems to be a bit too much. The FLAG_FLUSABLE is only settable if the controller supports it. I wonder why we need the LMP features check here in the first place. Can we not just trust the flag on the channel is set correctly and enforce it before setting the flag.
-> 
-> 	/* Otherwise go with a non-flushable packet */
->        return ACL_START_NO_FLUSH;
-> }
-> 
-> This way we'd avoid complex if-statements and can clearly document each
-> condition independently.
-
-Regards
-
-Marcel
-
+Regards,
+Jakub
