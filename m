@@ -2,140 +2,59 @@ Return-Path: <cyrus@holtmann.org>
 From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH 7/8] shared/hfp: Improve handling AT commands
-Date: Thu, 20 Nov 2014 16:55:14 +0100
-Message-Id: <1416498915-19534-8-git-send-email-lukasz.rymanowski@tieto.com>
+Subject: [PATCH 4/8] unit/test-hfp: Add test for reading \rAT+X\r
+Date: Thu, 20 Nov 2014 16:55:11 +0100
+Message-Id: <1416498915-19534-5-git-send-email-lukasz.rymanowski@tieto.com>
 In-Reply-To: <1416498915-19534-1-git-send-email-lukasz.rymanowski@tieto.com>
 References: <1416498915-19534-1-git-send-email-lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch improves handling AT commands in cases:
-
-1. In ring buffer we have currupted commands like Y\rAT+X\r
-2. In ring buffer for some reason we have more than AT commands and all
-commands are unknow except the last one.
-
-In bith cases parser read data until first \r and then stop to read.
-This is fixed with this patch
 ---
- src/shared/hfp.c | 91 ++++++++++++++++++++++++++++++++++----------------------
- 1 file changed, 55 insertions(+), 36 deletions(-)
+ unit/test-hfp.c | 20 +++++++++++++++++++-
+ 1 file changed, 19 insertions(+), 1 deletion(-)
 
-diff --git a/src/shared/hfp.c b/src/shared/hfp.c
-index 41eae74..5a91d12 100644
---- a/src/shared/hfp.c
-+++ b/src/shared/hfp.c
-@@ -476,54 +476,73 @@ static void process_input(struct hfp_gw *hfp)
- 	char *str, *ptr;
- 	size_t len, count;
- 	bool free_ptr = false;
-+	bool read_again;
- 
--	str = ringbuf_peek(hfp->read_buf, 0, &len);
--	if (!str)
--		return;
-+	do {
-+		str = ringbuf_peek(hfp->read_buf, 0, &len);
-+		if (!str)
-+			return;
- 
--	ptr = memchr(str, '\r', len);
--	if (!ptr) {
--		char *str2;
--		size_t len2;
-+		ptr = memchr(str, '\r', len);
-+		if (!ptr) {
-+			char *str2;
-+			size_t len2;
- 
--		/*
--		 * If there is no more data in ringbuffer,
--		 * it's just an incomplete command.
--		 */
--		if (len == ringbuf_len(hfp->read_buf))
--			return;
-+			/*
-+			 * If there is no more data in ringbuffer,
-+			 * it's just an incomplete command.
-+			 */
-+			if (len == ringbuf_len(hfp->read_buf))
-+				return;
- 
--		str2 = ringbuf_peek(hfp->read_buf, len, &len2);
--		if (!str2)
--			return;
-+			str2 = ringbuf_peek(hfp->read_buf, len, &len2);
-+			if (!str2)
-+				return;
- 
--		ptr = memchr(str2, '\r', len2);
--		if (!ptr)
--			return;
-+			ptr = memchr(str2, '\r', len2);
-+			if (!ptr)
-+				return;
- 
--		*ptr = '\0';
-+			*ptr = '\0';
- 
--		count = len2 + len;
--		ptr = malloc(count);
--		if (!ptr)
--			return;
-+			count = len2 + len;
-+			ptr = malloc(count);
-+			if (!ptr)
-+				return;
- 
--		memcpy(ptr, str, len);
--		memcpy(ptr + len, str2, len2);
-+			memcpy(ptr, str, len);
-+			memcpy(ptr + len, str2, len2);
- 
--		free_ptr = true;
--		str = ptr;
--	} else {
--		count = ptr - str;
--		*ptr = '\0';
--	}
-+			free_ptr = true;
-+			str = ptr;
-+		} else {
-+			count = ptr - str;
-+			*ptr = '\0';
-+		}
-+
-+		if (!handle_at_command(hfp, str))
-+			/*
-+			 * Command is not handled that means that was some
-+			 * trash. Let's skip that and keep reading from ring
-+			 * buffer.
-+			 */
-+			read_again = true;
-+		else
-+			/*
-+			 * Command has been handled. If we are waiting for a
-+			 * result from upper layer, we can stop reading. If we
-+			 * already reply i.e. ERROR on unknown command, then we
-+			 * can keep reading ring buffer. Actually ring buffer
-+			 * should be empty but lets just look there.
-+			 */
-+			read_again = !hfp->result_pending;
- 
--	handle_at_command(hfp, str);
-+		ringbuf_drain(hfp->read_buf, count + 1);
- 
--	ringbuf_drain(hfp->read_buf, count + 1);
-+		if (free_ptr)
-+			free(ptr);
- 
--	if (free_ptr)
--		free(ptr);
-+	} while (read_again);
+diff --git a/unit/test-hfp.c b/unit/test-hfp.c
+index ef8a100..b22b8a5 100644
+--- a/unit/test-hfp.c
++++ b/unit/test-hfp.c
+@@ -453,6 +453,19 @@ static void check_string_2(struct hfp_context *result,
+ 	hfp_gw_send_result(context->hfp, HFP_RESULT_ERROR);
  }
  
- static void read_watch_destroy(void *user_data)
++static void check_string_3(struct hfp_context *result,
++				enum hfp_gw_cmd_type type, void *user_data)
++{
++	struct context *context = user_data;
++	const struct test_pdu *pdu;
++
++	pdu = &context->data->pdu_list[context->pdu_offset++];
++
++	g_assert(type == pdu->type);
++
++	hfp_gw_send_result(context->hfp, HFP_RESULT_ERROR);
++}
++
+ static void test_hf_init(gconstpointer data)
+ {
+ 	struct context *context = create_context(data);
+@@ -725,10 +738,15 @@ int main(int argc, char *argv[])
+ 									'\r'),
+ 			type_pdu(HFP_GW_CMD_TYPE_SET, 0),
+ 			data_end());
++	define_test("/hfp/test_corrupted_1", test_register, check_string_3,
++			raw_pdu('D', '\0'),
++			raw_pdu('\r', 'A', 'T', 'D', '\"', '0', '1', '2', '3',
++								'\"', '\r'),
++			type_pdu(HFP_GW_CMD_TYPE_SET, 0),
++			data_end());
+ 	define_test("/hfp/test_empty", test_fragmented, NULL,
+ 			raw_pdu('\r'),
+ 			data_end());
+-
+ 	define_hf_test("/hfp_hf/test_init", test_hf_init, NULL, NULL,
+ 			data_end());
+ 	define_hf_test("/hfp_hf/test_send_command_1", test_hf_send_command,
 -- 
 1.8.4
 
