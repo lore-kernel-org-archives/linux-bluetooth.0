@@ -1,51 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <546DF03D.3030508@tieto.com>
-Date: Thu, 20 Nov 2014 14:44:29 +0100
-From: Tyszkowski Jakub <jakub.tyszkowski@tieto.com>
-MIME-Version: 1.0
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/3] android/hal-ipc-api: Add av callbacks for Android
- 5
-References: <1416402606-31762-1-git-send-email-jakub.tyszkowski@tieto.com>
-In-Reply-To: <1416402606-31762-1-git-send-email-jakub.tyszkowski@tieto.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
+Subject: [PATCH 2/2] tools/gatt: Fix memory leak
+Date: Thu, 20 Nov 2014 15:13:15 +0200
+Message-Id: <1416489195-26477-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1416489195-26477-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1416489195-26477-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-On 11/19/2014 02:10 PM, Jakub Tyszkowski wrote:
-> Android 5 adds audio configuration callback.
-> ---
->   android/hal-ipc-api.txt | 9 +++++++++
->   1 file changed, 9 insertions(+)
->
-> diff --git a/android/hal-ipc-api.txt b/android/hal-ipc-api.txt
-> index a5ec44b..9502a15 100644
-> --- a/android/hal-ipc-api.txt
-> +++ b/android/hal-ipc-api.txt
-> @@ -1098,6 +1098,15 @@ Notifications:
->   		                         0x01 = Stopped
->   		                         0x02 = Started
->
-> +	Opcode 0x83 - Audio Configuration notification
-> +
-> +		Notification parameters: Remote address (6 octets)
-> +					 Sample Rate in Hz (4 octets)
-> +					 Channel Count (1 octet)
-> +
-> +		Valid channel count: 0x01 = Mono
-> +		                     0x02 = Stereo
-> +
->
->   Bluetooth Health HAL (ID 7)
->   ===========================
->
+Fixes following clang warning:
+...
+tools/btgatt-client.c:451:4: warning: Potential leak of memory pointed
+to by 'value'
+                        printf("Invalid value byte: %s\n", argv[i]);
+                        ^~~~~~
+...
+---
+ tools/btgatt-client.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-Please ignore this whole set as it turn out that new callback is for 
-sink role only and sink role is implementing the same HAL interface.
+diff --git a/tools/btgatt-client.c b/tools/btgatt-client.c
+index ca84780..dadfa37 100644
+--- a/tools/btgatt-client.c
++++ b/tools/btgatt-client.c
+@@ -449,6 +449,7 @@ static void cmd_read_multiple(struct client *cli, char *cmd_str)
+ 		value[i] = strtol(argv[i], &endptr, 0);
+ 		if (endptr == argv[i] || *endptr != '\0' || !value[i]) {
+ 			printf("Invalid value byte: %s\n", argv[i]);
++			free(value);
+ 			return;
+ 		}
+ 	}
+-- 
+1.9.1
 
-This case requires more elaborate documentation and different IPC code.
-
-Regards,
-Jakub
