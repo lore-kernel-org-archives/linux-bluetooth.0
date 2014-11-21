@@ -3,95 +3,65 @@ From: David Herrmann <dh.herrmann@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Benjamin Tissoires <benjamin.tissoires@redhat.com>,
 	Marcel Holtmann <marcel@holtmann.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>
-Subject: [PATCH 2/4] hog: break out the report retrieval in its own function
-Date: Fri, 21 Nov 2014 15:41:44 +0100
-Message-Id: <1416580906-22134-3-git-send-email-dh.herrmann@gmail.com>
-In-Reply-To: <1416580906-22134-1-git-send-email-dh.herrmann@gmail.com>
-References: <1416580906-22134-1-git-send-email-dh.herrmann@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	David Herrmann <dh.herrmann@gmail.com>
+Subject: [PATCH 0/4] Add GET/SET_REPORT support to HoG
+Date: Fri, 21 Nov 2014 15:41:42 +0100
+Message-Id: <1416580906-22134-1-git-send-email-dh.herrmann@gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Benjamin Tissoires <benjamin.tissoires@redhat.com>
+Hi
 
-HoG currently only implements UHID_OUTPUT. We need to also implement
-UHID_GET_REPORT and UHID_SET_REPORT. Break out the report retrieval
-to use this function in the two missing implementation.
----
- profiles/input/hog.c | 42 +++++++++++++++++++++++++-----------------
- 1 file changed, 25 insertions(+), 17 deletions(-)
+With linux-3.18 uhid will gain GET/SET_REPORT support. 3.18 isn't released, yet,
+but the uhid features are part of 3.18-rc5 so I think it's fine to rely on it.
+We can always revert it if it will not be released (for whatever reason..).
 
-diff --git a/profiles/input/hog.c b/profiles/input/hog.c
-index b9aba65..de7e583 100644
---- a/profiles/input/hog.c
-+++ b/profiles/input/hog.c
-@@ -327,15 +327,12 @@ static void output_written_cb(guint8 status, const guint8 *pdu,
- 	}
+Benjamin wrote these 4 patches about 2 months ago and I promised to fix a few
+bugs and send them upstream. I already feel bad for letting them rot for 2
+months.. sorry!
+
+Anyway, I fixed the ID tracking, some typos, and fixed handling of devices that
+dont send report IDs in GET_REPORT. Patches should be straightforward. The
+GET/SET_REPORT feature is important for nearly all non-standard HID device
+drivers. It's used to query and modify device behavior. With this in place, we
+should be able to use all the kernel hid drivers via uhid/hog.
+
+Benjamin has an example program to modify MS Arc Surface Touch mouse behavior,
+which needs these patches to query/modify the device. See:
+    https://github.com/bentiss/mstouchmouse/tree/WIP-USB
+(If you check it out, make sure to use the WIP-USB branch! You should also apply
+ the diff below, to make sure it works even if the report-ID is not prepended.)
+
+Works fine with my devices here!
+David
+
+
+diff --git a/set_touchmode.c b/set_touchmode.c
+index 7e5d59a..0e6f412 100644
+--- a/set_touchmode.c
++++ b/set_touchmode.c
+@@ -48,6 +48,11 @@ static int get_report(int fd, unsigned char id, ...
+     } else {
+         printf("Report data (%d):\n\t", id);
+         pr_buffer(buf, res);
++        /* prepend report-ID if not sent by device */
++        if (res > 0 && buf[0] != id) {
++            memmove(buf + 1, buf, (res >= len) ? (res - 1) : res);
++            buf[0] = id;
++        }
+     }
+     return res;
  }
- 
--static void forward_report(struct uhid_event *ev, void *user_data)
-+static struct report *find_report(struct hog_device *hogdev, uint8_t type, uint8_t id)
- {
--	struct hog_device *hogdev = user_data;
--	struct report *report, cmp;
-+	struct report cmp;
- 	GSList *l;
--	uint8_t *data;
--	int size;
- 
--	switch (ev->u.output.rtype) {
-+	switch (type) {
- 	case UHID_FEATURE_REPORT:
- 		cmp.type = HOG_REPORT_TYPE_FEATURE;
- 		break;
-@@ -346,25 +343,36 @@ static void forward_report(struct uhid_event *ev, void *user_data)
- 		cmp.type = HOG_REPORT_TYPE_INPUT;
- 		break;
- 	default:
--		return;
-+		return NULL;
- 	}
- 
--	cmp.id = 0;
-+	cmp.id = hogdev->has_report_id ? id : 0;
-+
-+	l = g_slist_find_custom(hogdev->reports, &cmp, report_cmp);
-+
-+	return l ? l->data : NULL;
-+}
-+
-+static void forward_report(struct uhid_event *ev, void *user_data)
-+{
-+	struct hog_device *hogdev = user_data;
-+	struct report *report;
-+	void *data;
-+	int size;
-+
-+	report = find_report(hogdev, ev->u.output.rtype, ev->u.output.data[0]);
-+	if (!report)
-+		return;
-+
- 	data = ev->u.output.data;
- 	size = ev->u.output.size;
- 	if (hogdev->has_report_id && size > 0) {
--		cmp.id = *data++;
-+		data++;
- 		--size;
- 	}
- 
--	l = g_slist_find_custom(hogdev->reports, &cmp, report_cmp);
--	if (!l)
--		return;
--
--	report = l->data;
--
--	DBG("Sending report type %d ID %d to device 0x%04X handle 0x%X",
--		cmp.type, cmp.id, hogdev->id, report->decl->value_handle);
-+	DBG("Sending report type %d ID %d to handle 0x%X", report->type,
-+				report->id, report->decl->value_handle);
- 
- 	if (hogdev->attrib == NULL)
- 		return;
+
+Benjamin Tissoires (4):
+  hog: import latest uhid.h definition
+  hog: break out the report retrieval in its own function
+  hog: implement get_report functionality
+  hog: implement set_report functionality
+
+ profiles/input/hog.c       | 204 +++++++++++++++++++++++++++++++++++++++++----
+ profiles/input/uhid_copy.h | 117 +++++++++++++++++++++++---
+ 2 files changed, 292 insertions(+), 29 deletions(-)
+
 -- 
 2.1.3
-
