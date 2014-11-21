@@ -1,90 +1,73 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <CAHrH25RdVd0DWRy8Z6sheHvhYQtCcPJdyg0_2aVSisSCcG4S-g@mail.gmail.com>
-References: <CANpMpoQoBhmprKEkrJrA1cdmwX=JvabtiJpm64hnxnR46MEFDA@mail.gmail.com>
-	<CAHrH25RdVd0DWRy8Z6sheHvhYQtCcPJdyg0_2aVSisSCcG4S-g@mail.gmail.com>
-Date: Fri, 21 Nov 2014 21:51:52 +0100
-Message-ID: <CAN_7+YZJCcJsrqHWgmoboKpEtOYZeVwLYj2n-N3iiy4x0UgbJg@mail.gmail.com>
-Subject: Re: Where in the code is a BLE connection accepted?
-From: Lukasz Rymanowski <lukasz.rymanowski@gmail.com>
-To: Arman Uguray <armansito@chromium.org>
-Cc: =?UTF-8?Q?Gilles_Gr=C3=A9goire?= <gilles.gregoire@gmail.com>,
-	BlueZ development <linux-bluetooth@vger.kernel.org>
+In-Reply-To: <B3953F7E-C8F3-45A2-A0E5-A24848E299DF@holtmann.org>
+References: <1412938157-70760-1-git-send-email-marcel@holtmann.org>
+	<CAD0=r8zAKR_iGcqyeRotDoshhAp=5U8SCcKJrr+GUsAsy-4TLQ@mail.gmail.com>
+	<B3953F7E-C8F3-45A2-A0E5-A24848E299DF@holtmann.org>
+Date: Fri, 21 Nov 2014 11:49:32 -0800
+Message-ID: <CAD0=r8wEVPdgEZAUKxD7eS2r0XzitRaSYFe9J4FhE320YCMg6w@mail.gmail.com>
+Subject: Re: [PATCH] doc: Add commands for Start Service Discovery and Stop
+ Service Discovery
+From: Jakub Pawlowski <jpawlowski@google.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
-Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Gilles,
-
-On Fri, Nov 21, 2014 at 8:12 PM, Arman Uguray <armansito@chromium.org> wrote:
-> Hi Gilles,
+On Mon, Oct 20, 2014 at 11:06 AM, Marcel Holtmann <marcel@holtmann.org> wro=
+te:
+> Hi Jakub,
 >
->> On Fri, Nov 21, 2014 at 12:03 AM, Gilles Grégoire <gilles.gregoire@gmail.com> wrote:
->> Hi,
+>> I think that RSSI_Threshold should be per UUID:
 >>
->> I am trying to understand how a BLE connection is established between
->> my embedded system and an Android phone. I am using bluez 5.9 on a
->> 3.12 kernel on this embedded system; with a CSR chipset.
->>
->> I set up bluetooth using:
->> hciconfig hci0 reset
->> hciconfig hci0 noscan
->>
->> Then, I use hcitool to set the advertisement and scan data, and I
->> enable a connectable advertisement with
->> hcitool -i hci0 cmd 0x08 0x000a 01
->>
->> I am _not_ using bluetoothd.
->>
->> With this simple setup, I can connect with an Android phone to my
->> embedded system.
->> I check it with:
->> hcitool -i hci0 con
->>
->> Which reports one active connection.
->>
->> I had a look at the hciconfig and hcitool source code (the only tools
->> I used to setup bluetooth), but could not find where a connection is
->> accepted.
->>
->> My question is: where (in the code) is the connection accepted in the
->> first place?
->>
->> Thanks!
->>
->> -- Gilles
->>
->> PS: my excuses for this repost. I realized that I forgot to set a
->> subject for the initial version of this e-mail sent on this list
->> yesterday.
->> --
->> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
->> the body of a message to majordomo@vger.kernel.org
->> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>> +       Command Parameters:     Address_Type (1 Octet)
+>> +                               Num_Filters (1 Octet)
+>> +                               Filter1 {
+>> +                                   RSSI_Threshold (1 Octet)
+>> +                                   UUID[i] (16 Octets)
+>> +                               }
+>> +                               Filter2 {}
+>> +                               ...
 >
-> If you're using just hcitool (and someone correct me if I'm wrong)
-> then the kernel will accept the connection but won't magically hand it
-> over to userland unless someone is listening for incoming connections.
-> For that you would have to create an L2CAP socket and listen on it.
-> Once a connection is accepted then you can use the returned socket
-> just as you would with any UNIX socket over which you can exchange
-> data.
+> I need a bit more reason for this. Stating it does not convince me ;)
 >
-> You can look at tools/btgatt-server.c for an example of listening for
-> incoming LE L2CAP connections on the ATT channel.
+> My take is that it is not needed for this one-shot discovering. Just sele=
+ct some good enough RSSI threshold and filter the rest later when you get T=
+X power information. Like with Start Discovery it will stop once it is done=
+ with the search. So next time around you can select a different RSSI thres=
+hold.
+>
+> Regards
+>
+> Marcel
 >
 
-Or you can use l2test if its possible for you. It would go probably like this:
+Let's say I'm scanning for two kinds services:
+- some security token, that needs to be very close to my machine
+- temperature sensor, with no particular interest in range
+- controller receives one packet from security token that advertise at
+very high TX power and is very close, so I specify very high rssi
+threshold
+- then the temperature sensor, that advertises on low power will not be rep=
+orted
 
-l2test -r -V le_public -J 4
+If I had rssi specified per UUID that won't be the case.
 
+I can also set the RSSI threshold at very low value to get notified
+about temperature sensor, but the I'll get a lot of  device found
+events about security token that will wake my application unnecessary.
+We want to avoid that, and that's why we're doing scan in kernel, and
+plan to move it to controller.
 
-> Thanks,
-> Arman
+So my patches right now define rssi threshold per UUID this like that:
 
-\Łukasz
+struct mgmt_uuid_filter {
+__s8 rssi;
+__u8 uuid[16];
+} __packed;
 
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+struct mgmt_cp_start_service_discovery {
+__u8 type;
+__le16 filter_count;
+struct mgmt_uuid_filter filter[0];
+} __packed;
