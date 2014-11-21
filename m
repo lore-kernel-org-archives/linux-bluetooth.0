@@ -1,32 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+From: Gowtham Anandha Babu <gowtham.ab@samsung.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] android/hidhost: Fix logical vs bitwise operation
-Date: Fri, 21 Nov 2014 11:48:50 +0200
-Message-Id: <1416563330-13822-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Cc: d.kasatkin@samsung.com, bharat.panda@samsung.com, cpgs@samsung.com,
+	Gowtham Anandha Babu <gowtham.ab@samsung.com>
+Subject: [PATCH] plugins/autopair: Provide descriptive error log
+Date: Fri, 21 Nov 2014 14:19:25 +0530
+Message-id: <1416559765-26427-2-git-send-email-gowtham.ab@samsung.com>
+In-reply-to: <1416559765-26427-1-git-send-email-gowtham.ab@samsung.com>
+References: <1416559765-26427-1-git-send-email-gowtham.ab@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-
-"buf[0] & !1" is always 0, should be bitwise operation.
+Add more description in error logging.
 ---
- android/hidhost.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ plugins/autopair.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/android/hidhost.c b/android/hidhost.c
-index 75e895b..b696563 100644
---- a/android/hidhost.c
-+++ b/android/hidhost.c
-@@ -465,7 +465,7 @@ static gboolean ctrl_io_watch_cb(GIOChannel *chan, gpointer data)
- 		bt_hid_notify_handshake(dev, buf, bread);
- 		break;
- 	case HID_MSG_CONTROL:
--		if ((buf[0] & !HID_MSG_TYPE_MASK) == HID_VIRTUAL_CABLE_UNPLUG)
-+		if ((buf[0] & ~HID_MSG_TYPE_MASK) == HID_VIRTUAL_CABLE_UNPLUG)
- 			bt_hid_notify_virtual_unplug(dev, buf, bread);
- 		break;
- 	default:
+diff --git a/plugins/autopair.c b/plugins/autopair.c
+index d63da93..43b0e00 100644
+--- a/plugins/autopair.c
++++ b/plugins/autopair.c
+@@ -172,8 +172,8 @@ static int autopair_init(void)
+ 	n = read(fd, &seed, sizeof(seed));
+ 	if (n < (ssize_t) sizeof(seed)) {
+ 		err = (n == -1) ? -errno : -EIO;
+-		error("Failed to read %zu bytes from /dev/urandom",
+-								sizeof(seed));
++		error("Failed to read %zu bytes from /dev/urandom: %s (%d)",
++					sizeof(seed), strerror(-err), -err);
+ 		close(fd);
+ 		return err;
+ 	}
 -- 
 1.9.1
 
