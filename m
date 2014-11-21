@@ -2,40 +2,130 @@ Return-Path: <cyrus@holtmann.org>
 From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
-Subject: [PATCH 0/4] Add a2dp sink role
-Date: Fri, 21 Nov 2014 16:13:51 +0100
-Message-Id: <1416582835-7712-1-git-send-email-jakub.tyszkowski@tieto.com>
+Subject: [PATCH] android/gatt: Fix transport mask for service start
+Date: Fri, 21 Nov 2014 16:15:39 +0100
+Message-Id: <1416582939-8123-1-git-send-email-jakub.tyszkowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-With Android 5 A2DP Sink role was introduced. Sink in Android uses the same
-HAL API as Source role does, but uses one more callback extending existing A2DP
-HAL.
+With Android 5 transport enum was changed to bit mask. With this change
+we use bit masks in daemon and for Kitkat we map enum to bit mask in
+hal.
+---
+ android/gatt.c     | 18 ++++++++----------
+ android/hal-gatt.c | 32 +++++++++++++++++++++++++++++++-
+ android/hal-msg.h  |  5 ++---
+ 3 files changed, 41 insertions(+), 14 deletions(-)
 
-Some IPC defines and structs are common for both roles but of course they
-have independent HALs and individual service IDs to work simultaneously.
-
-Jakub Tyszkowski (4):
-  android/hal-ipc-api: Extend a2dp hal API with A2DP Sink role
-  android/hal: Add HAL for A2DP Sink role
-  android/a2dp-sink: Add skeleton for a2dp sink daemon
-  android/hal: Add missing a2dp handler introduced in Android 5
-
- android/Android.mk      |   2 +
- android/Makefile.am     |   2 +
- android/a2dp-sink.c     |  84 +++++++++++++++++++++++++
- android/a2dp-sink.h     |  25 ++++++++
- android/hal-a2dp-sink.c | 163 ++++++++++++++++++++++++++++++++++++++++++++++++
- android/hal-a2dp.c      |  13 ++++
- android/hal-bluetooth.c |   3 +
- android/hal-ipc-api.txt |  12 +++-
- android/hal-msg.h       |  12 +++-
- android/hal.h           |   1 +
- 10 files changed, 314 insertions(+), 3 deletions(-)
- create mode 100644 android/a2dp-sink.c
- create mode 100644 android/a2dp-sink.h
- create mode 100644 android/hal-a2dp-sink.c
-
---
+diff --git a/android/gatt.c b/android/gatt.c
+index ea5cead..092473c 100644
+--- a/android/gatt.c
++++ b/android/gatt.c
+@@ -5263,30 +5263,28 @@ static void handle_server_start_service(const void *buf, uint16_t len)
+ 	struct gatt_db_attribute *attrib;
+ 	uint8_t status;
+ 
+-	DBG("");
++	DBG("transport 0x%02x", cmd->transport);
+ 
+ 	memset(&ev, 0, sizeof(ev));
+ 
++	if (cmd->transport == 0) {
++		status = HAL_STATUS_FAILED;
++		goto failed;
++	}
++
+ 	server = find_app_by_id(cmd->server_if);
+ 	if (!server) {
+ 		status = HAL_STATUS_FAILED;
+ 		goto failed;
+ 	}
+ 
+-	switch (cmd->transport) {
+-	case GATT_SERVER_TRANSPORT_BREDR:
+-	case GATT_SERVER_TRANSPORT_LE_BREDR:
++	if (cmd->transport & GATT_SERVER_TRANSPORT_BREDR_BIT) {
+ 		if (!add_service_sdp_record(cmd->service_handle)) {
+ 			status = HAL_STATUS_FAILED;
+ 			goto failed;
+ 		}
+-		break;
+-	case GATT_SERVER_TRANSPORT_LE:
+-		break;
+-	default:
+-		status = HAL_STATUS_FAILED;
+-		goto failed;
+ 	}
++	/* TODO: Handle BREDR only */
+ 
+ 	attrib = gatt_db_get_attribute(gatt_db, cmd->service_handle);
+ 	if (!attrib) {
+diff --git a/android/hal-gatt.c b/android/hal-gatt.c
+index ac4f367..ee6eb3a 100644
+--- a/android/hal-gatt.c
++++ b/android/hal-gatt.c
+@@ -1812,7 +1812,7 @@ static bt_status_t add_descriptor(int server_if, int service_handle,
+ 					sizeof(cmd), &cmd, NULL, NULL, NULL);
+ }
+ 
+-static bt_status_t start_service(int server_if, int service_handle,
++static bt_status_t start_service_real(int server_if, int service_handle,
+ 								int transport)
+ {
+ 	struct hal_cmd_gatt_server_start_service cmd;
+@@ -1829,6 +1829,36 @@ static bt_status_t start_service(int server_if, int service_handle,
+ 					sizeof(cmd), &cmd, NULL, NULL, NULL);
+ }
+ 
++#if ANDROID_VERSION >= PLATFORM_VER(5, 0, 0)
++static bt_status_t start_service(int server_if, int service_handle,
++								int transport)
++{
++	return start_service_real(server_if, service_handle, transport);
++}
++#else
++static bt_status_t start_service(int server_if, int service_handle,
++								int transport)
++{
++	int transport_mask = 0;
++
++	/* Android 5 changes transport enum to bit mask. */
++	switch (transport) {
++	case 0:
++		transport_mask = GATT_SERVER_TRANSPORT_LE_BIT;
++		break;
++	case 1:
++		transport_mask = GATT_SERVER_TRANSPORT_BREDR_BIT
++		break;
++	case 2:
++		transport_mask = GATT_SERVER_TRANSPORT_LE_BIT |
++						GATT_SERVER_TRANSPORT_BREDR_BIT;
++		break;
++	}
++
++	return start_service_real(server_if, service_handle, transport_mask);
++}
++#endif
++
+ static bt_status_t stop_service(int server_if, int service_handle)
+ {
+ 	struct hal_cmd_gatt_server_stop_service cmd;
+diff --git a/android/hal-msg.h b/android/hal-msg.h
+index 5396404..1cc4434 100644
+--- a/android/hal-msg.h
++++ b/android/hal-msg.h
+@@ -984,9 +984,8 @@ struct hal_cmd_gatt_server_add_descriptor {
+ 	int32_t permissions;
+ } __attribute__((packed));
+ 
+-#define GATT_SERVER_TRANSPORT_LE		0x00
+-#define GATT_SERVER_TRANSPORT_BREDR		0x01
+-#define GATT_SERVER_TRANSPORT_LE_BREDR		0x02
++#define GATT_SERVER_TRANSPORT_LE_BIT		0x01
++#define GATT_SERVER_TRANSPORT_BREDR_BIT		0x02
+ 
+ #define HAL_OP_GATT_SERVER_START_SERVICE	0x1f
+ struct hal_cmd_gatt_server_start_service {
+-- 
 1.9.1
 
