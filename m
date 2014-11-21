@@ -1,183 +1,253 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v2 2/2] android/client: Add gatt client callbacks support for Android 5.0
-Date: Fri, 21 Nov 2014 11:55:12 +0100
-Message-ID: <1843099.3W8UBH8U2A@uw000953>
-In-Reply-To: <1416240267-11215-2-git-send-email-grzegorz.kolodziejczyk@tieto.com>
-References: <1416240267-11215-1-git-send-email-grzegorz.kolodziejczyk@tieto.com> <1416240267-11215-2-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <CABD6X-J6bGF8m0nhUxPARX1ir2vbk4jrNey9WMBhgyCnPsjbxQ@mail.gmail.com>
+References: <1416459821-16478-1-git-send-email-armansito@chromium.org>
+	<1416459821-16478-2-git-send-email-armansito@chromium.org>
+	<CAHrH25SqeOydY6wPVKfX6mp5KtXa8Ki1My+P6=XspR1_NCuJDw@mail.gmail.com>
+	<CABD6X-J6bGF8m0nhUxPARX1ir2vbk4jrNey9WMBhgyCnPsjbxQ@mail.gmail.com>
+Date: Fri, 21 Nov 2014 12:22:01 +0200
+Message-ID: <CABBYNZL7o5oTrGEnkJwdtGArHwuxbfW6pSU9vVShUuE+QmTH4w@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 2/2] unit/test-gatt: Add SERVER and COEX test types
+ and MTU tests.
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Marcin Kraglak <marcin.kraglak@tieto.com>
+Cc: Arman Uguray <armansito@chromium.org>,
+	BlueZ development <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Grzegorz,
+Hi Marcin, Arman,
 
-On Monday 17 of November 2014 17:04:27 Grzegorz Kolodziejczyk wrote:
-> ---
->  android/client/if-gatt.c | 136 +++++++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 136 insertions(+)
-> 
-> diff --git a/android/client/if-gatt.c b/android/client/if-gatt.c
-> index 301262b..49ccebf 100644
-> --- a/android/client/if-gatt.c
-> +++ b/android/client/if-gatt.c
-> @@ -608,6 +608,126 @@ static void gattc_listen_cb(int status, int client_if)
->  								status);
->  }
->  
-> +#if ANDROID_VERSION >= PLATFORM_VER(5, 0, 0)
-> +/* Callback invoked when the MTU for a given connection changes */
-> +static void gattc_configure_mtu_cb(int conn_id, int status, int mtu)
-> +{
-> +	haltest_info("%s: conn_id=%d, status=%d, mtu=%d", __func__, conn_id,
-> +								status, mtu);
-> +}
-> +
-> +/* Callback invoked when a scan filter configuration command has completed */
-> +static void gattc_scan_filter_cfg_cb(int action, int client_if, int status,
-> +						int filt_type, int avbl_space)
-> +{
-> +	haltest_info("%s: action=%d, client_if=%d, status=%d, filt_type=%d"
-> +			", avbl_space=%d", __func__, action, client_if, status,
-> +			filt_type, avbl_space);
-> +}
-> +
-> +/* Callback invoked when scan param has been added, cleared, or deleted */
-> +static void gattc_scan_filter_param_cb(int action, int client_if, int status,
-> +								int avbl_space)
-> +{
-> +	haltest_info("%s: action=%d, client_if=%d, status=%d, avbl_space=%d",
-> +			__func__, action, client_if, status, avbl_space);
-> +}
-> +
-> +/* Callback invoked when a scan filter configuration command has completed */
-> +static void gattc_scan_filter_status_cb(int enable, int client_if, int status)
-> +{
-> +	haltest_info("%s: enable=%d, client_if=%d, status=%d", __func__,
-> +						enable, client_if, status);
-> +}
-> +
-> +/* Callback invoked when multi-adv enable operation has completed */
-> +static void gattc_multi_adv_enable_cb(int client_if, int status)
-> +{
-> +	haltest_info("%s: client_if=%d, status=%d", __func__, client_if,
-> +									status);
-> +}
-> +
-> +/* Callback invoked when multi-adv param update operation has completed */
-> +static void gattc_multi_adv_update_cb(int client_if, int status)
-> +{
-> +	haltest_info("%s: client_if=%d, status=%d", __func__, client_if,
-> +									status);
-> +}
-> +
-> +/* Callback invoked when multi-adv instance data set operation has completed */
-> +static void gattc_multi_adv_data_cb(int client_if, int status)
-> +{
-> +	haltest_info("%s: client_if=%d, status=%d", __func__, client_if,
-> +									status);
-> +}
-> +
-> +/* Callback invoked when multi-adv disable operation has completed */
-> +static void gattc_multi_adv_disable_cb(int client_if, int status)
-> +{
-> +	haltest_info("%s: client_if=%d, status=%d", __func__, client_if,
-> +									status);
-> +}
-> +
-> +/*
-> + * Callback notifying an application that a remote device connection is
-> + * currently congested and cannot receive any more data. An application should
-> + * avoid sending more data until a further callback is received indicating the
-> + * congestion status has been cleared.
-> + */
-> +static void gattc_congestion_cb(int conn_id, bool congested)
-> +{
-> +	haltest_info("%s: conn_id=%d, congested=%d", __func__, conn_id,
-> +								congested);
-> +}
-> +
-> +/* Callback invoked when batchscan storage config operation has completed */
-> +static void gattc_batchscan_cfg_storage_cb(int client_if, int status)
-> +{
-> +	haltest_info("%s: client_if=%d, status=%d", __func__, client_if,
-> +									status);
-> +}
-> +
-> +/* Callback invoked when batchscan enable / disable operation has completed */
-> +static void gattc_batchscan_enable_disable_cb(int action, int client_if,
-> +								int status)
-> +{
-> +	haltest_info("%s: action=%d, client_if=%d, status=%d", __func__, action,
-> +							client_if, status);
-> +}
-> +
-> +/* Callback invoked when batchscan reports are obtained */
-> +static void gattc_batchscan_reports_cb(int client_if, int status,
-> +					int report_format, int num_records,
-> +					int data_len, uint8_t* rep_data)
-> +{
-> +	/* BTGATT_MAX_ATTR_LEN = 600 */
-> +	char valbuf[600];
-> +
-> +	haltest_info("%s: client_if=%d, status=%d, report_format=%d"
-> +			", num_records=%d, data_len=%d, rep_data=%s", __func__,
-> +			client_if, status, report_format, num_records, data_len,
-> +			array2str(rep_data, data_len, valbuf, sizeof(valbuf)));
-> +}
-> +
-> +/* Callback invoked when batchscan storage threshold limit is crossed */
-> +static void gattc_batchscan_threshold_cb(int client_if)
-> +{
-> +	haltest_info("%s: client_if=%d", __func__, client_if);
-> +}
-> +
-> +/* Track ADV VSE callback invoked when tracked device is found or lost */
-> +static void gattc_track_adv_event_cb(int client_if, int filt_index,
-> +						int addr_type, bt_bdaddr_t* bda,
-> +						int adv_state)
-> +{
-> +	char buf[MAX_ADDR_STR_LEN];
-> +
-> +	haltest_info("%s, client_if=%d, filt_index=%d, addr_type=%d, bda=%s"
-> +			", adv_state=%d", __func__, client_if, filt_index,
-> +			addr_type, bt_bdaddr_t2str(bda, buf), adv_state);
-> +}
-> +#endif
-> +
->  static const btgatt_client_callbacks_t btgatt_client_callbacks = {
->  	.register_client_cb = gattc_register_client_cb,
->  	.scan_result_cb = gattc_scan_result_cb,
-> @@ -627,6 +747,22 @@ static const btgatt_client_callbacks_t btgatt_client_callbacks = {
->  	.execute_write_cb = gattc_execute_write_cb,
->  	.read_remote_rssi_cb = gattc_read_remote_rssi_cb,
->  	.listen_cb = gattc_listen_cb,
-> +#if ANDROID_VERSION >= PLATFORM_VER(5, 0, 0)
-> +	.configure_mtu_cb = gattc_configure_mtu_cb,
-> +	.scan_filter_cfg_cb = gattc_scan_filter_cfg_cb,
-> +	.scan_filter_param_cb = gattc_scan_filter_param_cb,
-> +	.scan_filter_status_cb = gattc_scan_filter_status_cb,
-> +	.multi_adv_enable_cb = gattc_multi_adv_enable_cb,
-> +	.multi_adv_update_cb = gattc_multi_adv_update_cb,
-> +	.multi_adv_data_cb = gattc_multi_adv_data_cb,
-> +	.multi_adv_disable_cb = gattc_multi_adv_disable_cb,
-> +	.congestion_cb = gattc_congestion_cb,
-> +	.batchscan_cfg_storage_cb = gattc_batchscan_cfg_storage_cb,
-> +	.batchscan_enb_disable_cb = gattc_batchscan_enable_disable_cb,
-> +	.batchscan_reports_cb = gattc_batchscan_reports_cb,
-> +	.batchscan_threshold_cb = gattc_batchscan_threshold_cb,
-> +	.track_adv_event_cb = gattc_track_adv_event_cb,
-> +#endif
->  };
->  
->  /* BT-GATT Server callbacks */
+On Fri, Nov 21, 2014 at 10:32 AM, Marcin Kraglak
+<marcin.kraglak@tieto.com> wrote:
+> Hi Arman,
+>
+> On 21 November 2014 00:54, Arman Uguray <armansito@chromium.org> wrote:
+>> Hi,
+>>
+>>> On Wed, Nov 19, 2014 at 9:03 PM, Arman Uguray <armansito@chromium.org> wrote:
+>>> This patch adds support for the following two features:
+>>>
+>>>   1. SERVER: The test context creates a bt_gatt_server.
+>>>   2. COEX: The test context creates a bt_gatt_server AND a bt_gatt_client.
+>>>
+>>> Also added 4 new test cases for the "Server Configuration" category, with two
+>>> new client-role and two new server-role tests which exercise the following:
+>>>
+>>> /TP/GAC/CL/BV-01-C:
+>>>   1. CLIENT test with incoming "Exchange MTU" request. bt_att automatically
+>>>   responds with "ERROR_NOT_SUPPORTED".
+>>>   2. COEX test. The "DUT" sends "Exchange MTU" request first and the "tester"
+>>>   sends it right after.
+>>>
+>>> /TP/GAC/SR/BV-01-C:
+>>>   1. SERVER test with incoming "Exchange MTU" request. No outgoing request.
+>>>   2. COEX test. The "tester" sends "Exchange MTU" request first and the "DUT"
+>>>   sends it right after.
+>>> ---
+>>>  unit/test-gatt.c | 101 +++++++++++++++++++++++++++++++++++++++++++++++++++----
+>>>  1 file changed, 95 insertions(+), 6 deletions(-)
+>>>
+>>> diff --git a/unit/test-gatt.c b/unit/test-gatt.c
+>>> index 900f5e3..7ab7780 100644
+>>> --- a/unit/test-gatt.c
+>>> +++ b/unit/test-gatt.c
+>>> @@ -40,6 +40,9 @@
+>>>  #include "src/shared/att.h"
+>>>  #include "src/shared/gatt-helpers.h"
+>>>  #include "src/shared/gatt-client.h"
+>>> +#include "src/shared/queue.h"
+>>> +#include "src/shared/gatt-db.h"
+>>> +#include "src/shared/gatt-server.h"
+>>>
+>>>  struct test_pdu {
+>>>         bool valid;
+>>> @@ -50,7 +53,8 @@ struct test_pdu {
+>>>  enum context_type {
+>>>         ATT,
+>>>         CLIENT,
+>>> -       SERVER
+>>> +       SERVER,
+>>> +       COEX
+>>>  };
+>>>
+>>>  struct gatt_service {
+>>> @@ -72,7 +76,9 @@ struct test_data {
+>>>  struct context {
+>>>         GMainLoop *main_loop;
+>>>         struct bt_gatt_client *client;
+>>> +       struct bt_gatt_server *server;
+>>>         struct bt_att *att;
+>>> +       struct gatt_db *db;
+>>>         guint source;
+>>>         guint process;
+>>>         int fd;
+>>> @@ -114,9 +120,13 @@ struct context {
+>>>  #define define_test_client(name, function, bt_services, test_step, args...)\
+>>>         define_test(name, function, CLIENT, NULL, bt_services, test_step, args)
+>>>
+>>> -#define SERVICE_DATA_1_PDU                                             \
+>>> -               raw_pdu(0x02, 0x00, 0x02),                              \
+>>> -               raw_pdu(0x03, 0x00, 0x02),                              \
+>>> +#define define_test_server(name, function, bt_services, test_step, args...)\
+>>> +       define_test(name, function, SERVER, NULL, bt_services, test_step, args)
+>>> +
+>>> +#define define_test_coex(name, function, bt_services, test_step, args...)\
+>>> +       define_test(name, function, COEX, NULL, bt_services, test_step, args)
+>>> +
+>>> +#define SERVICE_DATA_1_DISCOVERY_PDU                                   \
+>>>                 raw_pdu(0x10, 0x01, 0x00, 0xff, 0xff, 0x00, 0x28),      \
+>>>                 raw_pdu(0x11, 0x06, 0x01, 0x00, 0x04, 0x00, 0x01, 0x18),\
+>>>                 raw_pdu(0x10, 0x05, 0x00, 0xff, 0xff, 0x00, 0x28),      \
+>>> @@ -144,6 +154,11 @@ struct context {
+>>>                 raw_pdu(0x04, 0x08, 0x00, 0x08, 0x00),                  \
+>>>                 raw_pdu(0x05, 0x01, 0x08, 0x00, 0x01, 0x29)
+>>>
+>>> +#define SERVICE_DATA_1_PDU                                             \
+>>> +               raw_pdu(0x02, 0x00, 0x02),                              \
+>>> +               raw_pdu(0x03, 0x00, 0x02),                              \
+>>> +               SERVICE_DATA_1_DISCOVERY_PDU
+>>> +
+>>>  static bt_uuid_t uuid_16 = {
+>>>         .type = BT_UUID16,
+>>>         .value.u16 = 0x1800
+>>> @@ -282,11 +297,18 @@ static gboolean send_pdu(gpointer user_data)
+>>>
+>>>  static void context_process(struct context *context)
+>>>  {
+>>> +       /* Quit the context if we processed the last PDU */
+>>>         if (!context->data->pdu_list[context->pdu_offset].valid) {
+>>>                 context_quit(context);
+>>>                 return;
+>>>         }
+>>>
+>>> +       /* Skip the PDU, if it's empty */
+>>> +       if (!context->data->pdu_list[context->pdu_offset].size) {
+>>> +               context->pdu_offset++;
+>>> +               return;
+>>> +       }
+>>> +
+>>>         context->process = g_idle_add(send_pdu, context);
+>>>  }
+>>>
+>>> @@ -427,6 +449,7 @@ static struct context *create_context(uint16_t mtu, gconstpointer data)
+>>>         GIOChannel *channel;
+>>>         int err, sv[2];
+>>>         struct bt_att *att;
+>>> +       bool coex = false;
+>>>
+>>>         context->main_loop = g_main_loop_new(NULL, FALSE);
+>>>         g_assert(context->main_loop);
+>>> @@ -447,6 +470,22 @@ static struct context *create_context(uint16_t mtu, gconstpointer data)
+>>>
+>>>                 bt_gatt_exchange_mtu(context->att, mtu, NULL, NULL, NULL);
+>>>                 break;
+>>> +       case COEX:
+>>> +               coex = true;
+>>> +       case SERVER:
+>>> +               context->db = gatt_db_new();
+>>> +               g_assert(context->db);
+>>> +
+>>> +               context->server = bt_gatt_server_new(context->db, att, mtu);
+>>> +               g_assert(context->server);
+>>> +
+>>> +               if (g_test_verbose())
+>>> +                       bt_gatt_server_set_debug(context->server, print_debug,
+>>> +                                               "bt_gatt_server:", NULL);
+>>> +               if (!coex) {
+>>> +                       bt_att_unref(att);
+>>> +                       break;
+>>> +               }
+>>>         case CLIENT:
+>>>                 context->client = bt_gatt_client_new(att, mtu, NULL);
+>>>                 g_assert(context->client);
+>>> @@ -500,6 +539,8 @@ static void destroy_context(struct context *context)
+>>>                 g_source_remove(context->source);
+>>>
+>>>         bt_gatt_client_unref(context->client);
+>>> +       bt_gatt_server_unref(context->server);
+>>> +       gatt_db_destroy(context->db);
+>>>
+>>>         if (context->att)
+>>>                 bt_att_unref(context->att);
+>>> @@ -577,6 +618,22 @@ static void test_client(gconstpointer data)
+>>>         execute_context(context);
+>>>  }
+>>>
+>>> +static void test_server(gconstpointer data)
+>>> +{
+>>> +       struct context *context = create_context(512, data);
+>>> +       const struct test_pdu pdu = raw_pdu(0x02, 0x17, 0x00);
+>>> +       ssize_t len;
+>
+> Could we call process_context() here and define pdu in define_test_server?
+> It will be much easier to understand what test does.
+>>> +
+>>> +       len = write(context->fd, pdu.data, pdu.size);
+>>> +
+>>> +       if (g_test_verbose())
+>>> +               util_hexdump('<', pdu.data, len, test_debug, "GATT: ");
+>>> +
+>>> +       g_assert_cmpint(len, ==, pdu.size);
+>>> +
+>>> +       execute_context(context);
+>>> +}
+>>> +
+>>>  static void test_search_primary(gconstpointer data)
+>>>  {
+>>>         struct context *context = create_context(512, data);
+>>> @@ -708,11 +765,43 @@ int main(int argc, char *argv[])
+>>>          * Server Configuration
+>>>          *
+>>>          * The test group objective is to verify Generic Attribute Profile
+>>> -        * Server Configuration.
+>>> +        * Server Configuration. The tested configurations are:
+>>> +        *
+>>> +        *   1. Client-role only.
+>>> +        *   2. Server-role only.
+>>> +        *   3. Both roles with only bt_gatt_client.
+>>> +        *   4. Both roles with bt_gatt_client and bt_gatt_server (client
+>>> +        *      request first).
+>>> +        *   5. Both roles with bt_gatt_client and bt_gatt_server (server
+>>> +        *      response first).
+>>>          */
+>>>
+>>>         define_test_client("/TP/GAC/CL/BV-01-C", test_client, NULL, NULL,
+>>> -                               raw_pdu(0x02, 0x00, 0x02));
+>>> +                                               raw_pdu(0x02, 0x00, 0x02));
+>>> +
+>>> +       define_test_server("/TP/GAC/SR/BV-01-C", test_server, NULL, NULL,
+>>> +                                               raw_pdu(0x03, 0x00, 0x02));
+>>> +
+>>> +       define_test_client("/TP/GAC/CL/BV-01-C", test_client, NULL, NULL,
+>>> +                                       raw_pdu(0x02, 0x00, 0x02),
+>>> +                                       raw_pdu(0x02, 0x17, 0x00),
+>>> +                                       raw_pdu(0x01, 0x02, 0x00, 0x00, 0x06),
+>>> +                                       raw_pdu(0x03, 0x17, 0x00),
+>>> +                                       SERVICE_DATA_1_DISCOVERY_PDU);
+>>> +
+>>> +      define_test_coex("/TP/GAC/CL/BV-01-C", test_c lient, NULL, NULL,
+>>> +                                               raw_pdu(0x02, 0x00, 0x02),
+>>> +                                               raw_pdu(0x02, 0x17, 0x00),
+>>> +                                               raw_pdu(0x03, 0x00, 0x02),
+>>> +                                               raw_pdu(0x03, 0x17, 0x00),
+>>> +                                               SERVICE_DATA_1_DISCOVERY_PDU);
+>>> +
+>>> +       define_test_coex("/TP/GAC/SR/BV-01-C", test_server, NULL, NULL,
+>>> +                                               raw_pdu(0x03, 0x00, 0x02),
+>>> +                                               raw_pdu(),  /* wait */
+>>> +                                               raw_pdu(0x02, 0x00, 0x02),
+>>> +                                               raw_pdu(0x03, 0x17, 0x00),
+>>> +                                               SERVICE_DATA_1_DISCOVERY_PDU);
+>>>
+>
+> Maybe it is better to rename tests with coex, as these scenarios are
+> not defined in test spec.
 
-This patch is now applied, thanks.
-I've skipped patch 1 since I've already applied similar one from Jakub.
- 
+Yep, perhaps it is better to have this kind of tests in another file
+since this one is dedicated to tests from the TS.
+
 
 -- 
-Best regards, 
-Szymon Janc
+Luiz Augusto von Dentz
