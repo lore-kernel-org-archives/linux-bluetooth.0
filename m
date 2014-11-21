@@ -2,134 +2,96 @@ Return-Path: <cyrus@holtmann.org>
 From: Arman Uguray <armansito@chromium.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Arman Uguray <armansito@chromium.org>
-Subject: [PATCH Bluez v2 1/2] unit/test-gatt: Add /TP/GAC/SR/BV-01-C test case.
-Date: Fri, 21 Nov 2014 15:38:37 -0800
-Message-Id: <1416613119-1842-2-git-send-email-armansito@chromium.org>
+Subject: [PATCH Bluez v2 2/2] unit/test-gatt: Add /TP/GAD/SR/BV-01-C test case.
+Date: Fri, 21 Nov 2014 15:38:38 -0800
+Message-Id: <1416613119-1842-3-git-send-email-armansito@chromium.org>
 In-Reply-To: <1416613119-1842-1-git-send-email-armansito@chromium.org>
 References: <1416613119-1842-1-git-send-email-armansito@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch adds the server configuration server test case for
-bt_gatt_server.
+Added discovery test case /TP/GAD/SR/BV-01-C for bt_gatt_server.
 ---
- unit/test-gatt.c | 46 +++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 45 insertions(+), 1 deletion(-)
+ unit/test-gatt.c | 52 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 52 insertions(+)
 
 diff --git a/unit/test-gatt.c b/unit/test-gatt.c
-index 7923c8b..4fc5a84 100644
+index 4fc5a84..e416878 100644
 --- a/unit/test-gatt.c
 +++ b/unit/test-gatt.c
-@@ -40,6 +40,9 @@
- #include "src/shared/att.h"
- #include "src/shared/gatt-helpers.h"
- #include "src/shared/gatt-client.h"
-+#include "src/shared/queue.h"
-+#include "src/shared/gatt-db.h"
-+#include "src/shared/gatt-server.h"
- 
- struct test_pdu {
- 	bool valid;
-@@ -72,7 +75,9 @@ struct test_data {
- struct context {
- 	GMainLoop *main_loop;
- 	struct bt_gatt_client *client;
-+	struct bt_gatt_server *server;
- 	struct bt_att *att;
-+	struct gatt_db *db;
- 	guint source;
- 	guint process;
- 	int fd;
-@@ -114,6 +119,9 @@ struct context {
- #define define_test_client(name, function, bt_services, test_step, args...)\
- 	define_test(name, function, CLIENT, NULL, bt_services, test_step, args)
- 
-+#define define_test_server(name, function, bt_services, test_step, args...)\
-+	define_test(name, function, SERVER, NULL, bt_services, test_step, args)
-+
- #define SERVICE_DATA_1_PDU						\
- 		raw_pdu(0x02, 0x00, 0x02),				\
- 		raw_pdu(0x03, 0x00, 0x02),				\
-@@ -144,6 +152,8 @@ struct context {
- 		raw_pdu(0x04, 0x08, 0x00, 0x08, 0x00),			\
- 		raw_pdu(0x05, 0x01, 0x08, 0x00, 0x01, 0x29)
- 
-+#define SERVER_MTU_EXCHANGE_PDU raw_pdu(0x02, 0x17, 0x00)
-+
- static bt_uuid_t uuid_16 = {
- 	.type = BT_UUID16,
- 	.value.u16 = 0x1800
-@@ -282,6 +292,7 @@ static gboolean send_pdu(gpointer user_data)
- 
- static void context_process(struct context *context)
- {
-+	/* Quit the context if we processed the last PDU */
- 	if (!context->data->pdu_list[context->pdu_offset].valid) {
- 		context_quit(context);
- 		return;
-@@ -447,6 +458,18 @@ static struct context *create_context(uint16_t mtu, gconstpointer data)
- 
- 		bt_gatt_exchange_mtu(context->att, mtu, NULL, NULL, NULL);
- 		break;
-+	case SERVER:
-+		context->db = gatt_db_new();
-+		g_assert(context->db);
-+
-+		context->server = bt_gatt_server_new(context->db, att, mtu);
-+		g_assert(context->server);
-+
-+		if (g_test_verbose())
-+			bt_gatt_server_set_debug(context->server, print_debug,
-+						"bt_gatt_server:", NULL);
-+		bt_att_unref(att);
-+		break;
- 	case CLIENT:
- 		context->client = bt_gatt_client_new(att, mtu);
- 		g_assert(context->client);
-@@ -500,6 +523,8 @@ static void destroy_context(struct context *context)
- 		g_source_remove(context->source);
- 
- 	bt_gatt_client_unref(context->client);
-+	bt_gatt_server_unref(context->server);
-+	gatt_db_destroy(context->db);
- 
- 	if (context->att)
- 		bt_att_unref(context->att);
-@@ -577,6 +602,22 @@ static void test_client(gconstpointer data)
- 	execute_context(context);
+@@ -431,6 +431,42 @@ static void client_ready_cb(bool success, uint8_t att_ecode, void *user_data)
+ 	context_quit(context);
  }
  
-+static void test_server(gconstpointer data)
++static void populate_db(struct context *context)
 +{
-+	struct context *context = create_context(512, data);
-+	const struct test_pdu pdu = SERVER_MTU_EXCHANGE_PDU;
-+	ssize_t len;
++	struct gatt_db *db = context->db;
++	struct gatt_db_attribute *attr;
++	bt_uuid_t uuid;
++	uint128_t u128 = {
++		.data = { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08,
++				0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f }
++	};
 +
-+	len = write(context->fd, pdu.data, pdu.size);
++	/* Service 1 */
++	bt_uuid16_create(&uuid, 0x1800);
++	attr = gatt_db_add_service(db, &uuid, true, 5);
++	gatt_db_service_set_active(attr, true);
 +
-+	if (g_test_verbose())
-+		util_hexdump('<', pdu.data, len, test_debug, "GATT: ");
++	/* Service 2 */
++	bt_uuid16_create(&uuid, 0x1801);
++	attr = gatt_db_add_service(db, &uuid, true, 3);
++	gatt_db_service_set_active(attr, true);
 +
-+	g_assert_cmpint(len, ==, pdu.size);
++	/* Service 3 */
++	bt_uuid16_create(&uuid, 0x180f);
++	attr = gatt_db_add_service(db, &uuid, false, 5);
++	gatt_db_service_set_active(attr, true);
 +
-+	execute_context(context);
++	/* Service 4 */
++	bt_uuid16_create(&uuid, 0x180d);
++	attr = gatt_db_add_service(db, &uuid, true, 8);
++	gatt_db_service_set_active(attr, true);
++
++	/* Service 5 */
++	bt_uuid128_create(&uuid, u128);
++	attr = gatt_db_add_service(db, &uuid, true, 1);
++	gatt_db_service_set_active(attr, true);
 +}
 +
- static void test_search_primary(gconstpointer data)
+ static struct context *create_context(uint16_t mtu, gconstpointer data)
  {
- 	struct context *context = create_context(512, data);
-@@ -785,7 +826,10 @@ int main(int argc, char *argv[])
- 	 */
+ 	struct context *context = g_new0(struct context, 1);
+@@ -465,6 +501,8 @@ static struct context *create_context(uint16_t mtu, gconstpointer data)
+ 		context->server = bt_gatt_server_new(context->db, att, mtu);
+ 		g_assert(context->server);
  
- 	define_test_client("/TP/GAC/CL/BV-01-C", test_client, NULL, NULL,
--				raw_pdu(0x02, 0x00, 0x02));
-+						raw_pdu(0x02, 0x00, 0x02));
++		populate_db(context);
 +
-+	define_test_server("/TP/GAC/SR/BV-01-C", test_server, NULL, NULL,
-+						raw_pdu(0x03, 0x00, 0x02));
+ 		if (g_test_verbose())
+ 			bt_gatt_server_set_debug(context->server, print_debug,
+ 						"bt_gatt_server:", NULL);
+@@ -852,6 +890,20 @@ int main(int argc, char *argv[])
+ 			raw_pdu(0x10, 0x97, 0x00, 0xff, 0xff, 0x00, 0x28),
+ 			raw_pdu(0x01, 0x10, 0x97, 0x00, 0x0a));
  
- 	/*
- 	 * Discovery
++	define_test_server("/TP/GAD/SR/BV-01-C", test_server, NULL, NULL,
++			raw_pdu(0x03, 0x00, 0x02),
++			raw_pdu(0x10, 0x01, 0x00, 0xff, 0xff, 0x00, 0x28),
++			raw_pdu(0x11, 0x06, 0x01, 0x00, 0x05, 0x00, 0x00, 0x18,
++					0x06, 0x00, 0x08, 0x00, 0x01, 0x18,
++					0x0e, 0x00, 0x15, 0x00, 0x0d, 0x18),
++			raw_pdu(0x10, 0x16, 0x00, 0xff, 0xff, 0x00, 0x28),
++			raw_pdu(0x11, 0x14, 0x16, 0x00, 0x16, 0x00, 0x0f,
++					0x0e, 0x0d, 0x0c, 0x0b, 0x0a, 0x09,
++					0x08, 0x07, 0x06, 0x05, 0x04, 0x03,
++					0x02, 0x01, 0x00),
++			raw_pdu(0x10, 0x17, 0x00, 0xff, 0xff, 0x00, 0x28),
++			raw_pdu(0x01, 0x10, 0x17, 0x00, 0x0a));
++
+ 	define_test_att("/TP/GAD/CL/BV-02-C-1", test_search_primary, &uuid_16,
+ 			NULL,
+ 			raw_pdu(0x02, 0x00, 0x02),
 -- 
 2.1.0.rc2.206.gedb03e5
 
