@@ -1,52 +1,60 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <CAHrH25TwHi2pJzsBqKm-4tZWZ8jPfpnJcq415RG6zCmSbiGUpw@mail.gmail.com>
-References: <1416459821-16478-1-git-send-email-armansito@chromium.org>
-	<CAHrH25TwHi2pJzsBqKm-4tZWZ8jPfpnJcq415RG6zCmSbiGUpw@mail.gmail.com>
-Date: Fri, 21 Nov 2014 15:15:26 +0200
-Message-ID: <CABBYNZJnYyV2z+3rvT+56MGDqad3CTxUDHCyyFtM6Guuu05e-Q@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 1/2] shared/gatt-server: Fix bug in bt_gatt_server_unref.
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Arman Uguray <armansito@chromium.org>
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH 6/6] android/client: Add support for gattc scan_filter_enable
+Date: Fri, 21 Nov 2014 12:40:51 +0100
+Message-Id: <1416570051-18218-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Arman,
+---
+ android/client/if-gatt.c | 26 ++++++++++++++++++++++++++
+ 1 file changed, 26 insertions(+)
 
-On Fri, Nov 21, 2014 at 1:54 AM, Arman Uguray <armansito@chromium.org> wrote:
-> Hi,
->
->> On Wed, Nov 19, 2014 at 9:03 PM, Arman Uguray <armansito@chromium.org> wrote:
->> This patch adds a check for NULL argument in bt_gatt_server_unref.
->> ---
->>  src/shared/gatt-server.c | 3 +++
->>  1 file changed, 3 insertions(+)
->>
->> diff --git a/src/shared/gatt-server.c b/src/shared/gatt-server.c
->> index 2ef9269..ef91289 100644
->> --- a/src/shared/gatt-server.c
->> +++ b/src/shared/gatt-server.c
->> @@ -1215,6 +1215,9 @@ struct bt_gatt_server *bt_gatt_server_ref(struct bt_gatt_server *server)
->>
->>  void bt_gatt_server_unref(struct bt_gatt_server *server)
->>  {
->> +       if (!server)
->> +               return;
->> +
->>         if (__sync_sub_and_fetch(&server->ref_count, 1))
->>                 return;
->>
->> --
->> 2.1.0.rc2.206.gedb03e5
->>
->
-> ping.
-> --
-
-This one is applied, see the comments about 2/2.
-
-
+diff --git a/android/client/if-gatt.c b/android/client/if-gatt.c
+index c06a1a5..2b874c3 100644
+--- a/android/client/if-gatt.c
++++ b/android/client/if-gatt.c
+@@ -1761,6 +1761,31 @@ static void scan_filter_clear_p(int argc, const char **argv)
+ 
+ 	EXEC(if_gatt->client->scan_filter_clear, client_if, filt_index);
+ }
++
++/* scan filter enable */
++static void scan_filter_enable_c(int argc, const char **argv,
++					enum_func *enum_func, void **user)
++{
++	if (argc == 2) {
++		*user = client_if_str;
++		*enum_func = enum_one_string;
++	}
++}
++
++static void scan_filter_enable_p(int argc, const char **argv)
++{
++	int client_if;
++	int enable = 0;
++
++	RETURN_IF_NULL(if_gatt);
++	VERIFY_CLIENT_IF(2, client_if);
++
++	/* enable */
++	if (argc >= 4)
++		enable = atoi(argv[3]);
++
++	EXEC(if_gatt->client->scan_filter_clear, client_if, enable);
++}
+ #endif
+ 
+ /* get_device_type */
+@@ -1839,6 +1864,7 @@ static struct method client_methods[] = {
+ 			" [<p_uuid>] <p_uuid_mask> <addr> <addr_type>"
+ 			" <data_len> [<p_data>] <mask_len> [<p_mask>]"),
+ 	STD_METHODCH(scan_filter_clear, "<client_if> <filt_index>"),
++	STD_METHODCH(scan_filter_enable, "<client_if> [<enable>]"),
+ #else
+ 	STD_METHODCH(scan, "<client_if> [1|0]"),
+ 	STD_METHODCH(connect, "<client_if> <addr> [<is_direct>]"),
 -- 
-Luiz Augusto von Dentz
+1.9.3
+
