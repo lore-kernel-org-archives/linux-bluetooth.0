@@ -1,92 +1,122 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/6] android/client: Check if hex data is present in define
-Date: Fri, 21 Nov 2014 14:37:39 +0100
-Message-ID: <3082917.KM6LTQJ3Pf@uw000953>
-In-Reply-To: <1416497645-6313-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
-References: <1416497645-6313-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+From: Vikrampal Yadav <vikram.pal@samsung.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: luiz.dentz@gmail.com, d.kasatkin@samsung.com,
+	vikram.pal@samsung.com, cpgs@samsung.com
+Subject: [PATCH 7/7] monitor: Add AVRCP SetBrowsedPlayer support
+Date: Fri, 21 Nov 2014 19:17:45 +0530
+Message-id: <1416577665-21876-8-git-send-email-vikram.pal@samsung.com>
+In-reply-to: <1416577665-21876-1-git-send-email-vikram.pal@samsung.com>
+References: <1416577665-21876-1-git-send-email-vikram.pal@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Grzegorz,
+Support for decoding AVRCP SetBrowsedPlayer added in Bluetooth monitor.
+---
+ monitor/avctp.c | 86 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 85 insertions(+), 1 deletion(-)
 
-On Thursday 20 of November 2014 16:34:01 Grzegorz Kolodziejczyk wrote:
-> Each hex data argument need to be checked before parsing. It was done in
-> before parse argc check. Now it's integrated in GET_VERIFIER_HEX_STRING.
-> ---
->  android/client/if-gatt.c | 28 +++++++++-------------------
->  1 file changed, 9 insertions(+), 19 deletions(-)
-> 
-> diff --git a/android/client/if-gatt.c b/android/client/if-gatt.c
-> index 49ccebf..9d6fafd 100644
-> --- a/android/client/if-gatt.c
-> +++ b/android/client/if-gatt.c
-> @@ -116,9 +116,14 @@ const btgatt_interface_t *if_gatt = NULL;
->  		} \
->  	} while (0)
->  
-> -#define GET_VERIFY_HEX_STRING(n, v, l) \
-> +#define GET_VERIFY_HEX_STRING(i, v, l) \
->  	do { \
->  		int ll;\
-> +		const char *n = argv[i]; \
-> +		if (argc <= i) { \
-> +			haltest_error("No value specified\n"); \
-> +			return; \
-> +		} \
->  		if (n[0] != '0' || (n[1] != 'X' && n[1] != 'x')) { \
->  			haltest_error("Value must be hex string\n"); \
->  			return; \
-> @@ -1366,13 +1371,7 @@ static void write_characteristic_p(int argc, const char **argv)
->  	}
->  	write_type = atoi(argv[5]);
->  
-> -	/* value */
-> -	if (argc <= 6) {
-> -		haltest_error("No value specified\n");
-> -		return;
-> -	}
-> -
-> -	GET_VERIFY_HEX_STRING(argv[6], value, len);
-> +	GET_VERIFY_HEX_STRING(6, value, len);
->  
->  	/* auth_req */
->  	if (argc > 7)
-> @@ -1984,8 +1983,7 @@ static void gatts_send_indication_p(int argc, const char *argv[])
->  	}
->  	confirm = atoi(argv[5]);
->  
-> -	if (argc > 6)
-> -		GET_VERIFY_HEX_STRING(argv[6], data, len);
-> +	GET_VERIFY_HEX_STRING(6, data, len);
->  
->  	EXEC(if_gatt->server->send_indication, server_if, attr_handle, conn_id,
->  							len, confirm, data);
-> @@ -2013,15 +2011,7 @@ static void gatts_send_response_p(int argc, const char *argv[])
->  	data.attr_value.auth_req = 0;
->  	data.attr_value.len = 0;
->  
-> -	if (argc > 7) {
-> -		GET_VERIFY_HEX_STRING(argv[7], data.attr_value.value,
-> -							data.attr_value.len);
-> -
-> -		if (data.attr_value.len == 0) {
-> -			haltest_error("Failed to parse response value");
-> -			return;
-> -		}
-> -	}
-> +	GET_VERIFY_HEX_STRING(7, data.attr_value.value, data.attr_value.len);
->  
->  	haltest_info("conn_id %d, trans_id %d, status %d", conn_id, trans_id,
->  									status);
-> 
-
-All six patches applied, thanks.
-
+diff --git a/monitor/avctp.c b/monitor/avctp.c
+index af91ecc..0a1e92d 100644
+--- a/monitor/avctp.c
++++ b/monitor/avctp.c
+@@ -1637,11 +1637,95 @@ static bool avrcp_control_packet(struct avctp_frame *avctp_frame)
+ 	}
+ }
+ 
++static bool avrcp_set_browsed_player(struct avctp_frame *avctp_frame)
++{
++	struct l2cap_frame *frame = &avctp_frame->l2cap_frame;
++	uint32_t items;
++	uint16_t id, uids, charset;
++	uint8_t status, folders, indent = 2;
++
++	if (avctp_frame->hdr & 0x02)
++		goto response;
++
++	if (!l2cap_frame_get_be16(frame, &id))
++		return false;
++
++	print_field("%*cPlayerID: 0x%04x (%u)", indent, ' ', id, id);
++	return true;
++
++response:
++	if (!l2cap_frame_get_u8(frame, &status))
++		return false;
++
++	print_field("%*cStatus: 0x%02x (%s)", indent, ' ', status,
++							error2str(status));
++
++	if (!l2cap_frame_get_be16(frame, &uids))
++		return false;
++
++	print_field("%*cUIDCounter: 0x%04x (%u)", indent, ' ', uids, uids);
++
++	if (!l2cap_frame_get_be32(frame, &items))
++		return false;
++
++	print_field("%*cNumber of Items: 0x%08x (%u)", indent, ' ',
++								items, items);
++
++	if (!l2cap_frame_get_be16(frame, &charset))
++		return false;
++
++	print_field("%*cCharsetID: 0x%04x (%s)", indent, ' ', charset,
++							charset2str(charset));
++
++	if (!l2cap_frame_get_u8(frame, &folders))
++		return false;
++
++	print_field("%*cFolder Depth: 0x%02x (%u)", indent, ' ', folders,
++								folders);
++
++	for (; folders > 0; folders--) {
++		uint8_t len;
++
++		if (!l2cap_frame_get_u8(frame, &len))
++			return false;
++
++		printf("Folder: ");
++		for (; len > 0; len--) {
++			uint8_t c;
++
++			if (!l2cap_frame_get_u8(frame, &c))
++				return false;
++
++			printf("%1c", isprint(c) ? c : '.');
++		}
++		printf("\n");
++	}
++
++	return true;
++}
++
+ static bool avrcp_browsing_packet(struct avctp_frame *avctp_frame)
+ {
+ 	struct l2cap_frame *frame = &avctp_frame->l2cap_frame;
++	uint16_t len;
++	uint8_t pduid;
++
++	if (!l2cap_frame_get_u8(frame, &pduid))
++		return false;
++
++	if (!l2cap_frame_get_be16(frame, &len))
++		return false;
++
++	print_field("AVRCP: %s: len 0x%04x", pdu2str(pduid), len);
++
++	switch (pduid) {
++	case AVRCP_SET_BROWSED_PLAYER:
++		avrcp_set_browsed_player(avctp_frame);
++		break;
++	default:
++		packet_hexdump(frame->data, frame->size);
++	}
+ 
+-	packet_hexdump(frame->data, frame->size);
+ 	return true;
+ }
+ 
 -- 
-Best regards, 
-Szymon Janc
+1.9.1
+
