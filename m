@@ -1,171 +1,87 @@
 Return-Path: <cyrus@holtmann.org>
-From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
-Subject: [PATCH 3/4] android/a2dp-sink: Add skeleton for a2dp sink daemon
-Date: Fri, 21 Nov 2014 16:13:54 +0100
-Message-Id: <1416582835-7712-4-git-send-email-jakub.tyszkowski@tieto.com>
-In-Reply-To: <1416582835-7712-1-git-send-email-jakub.tyszkowski@tieto.com>
-References: <1416582835-7712-1-git-send-email-jakub.tyszkowski@tieto.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Fri, 21 Nov 2014 09:58:37 -0500
+From: Benjamin Tissoires <benjamin.tissoires@redhat.com>
+To: David Herrmann <dh.herrmann@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org, Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>
+Subject: Re: [PATCH 0/4] Add GET/SET_REPORT support to HoG
+Message-ID: <20141121145837.GA31671@mail.corp.redhat.com>
+References: <1416580906-22134-1-git-send-email-dh.herrmann@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+In-Reply-To: <1416580906-22134-1-git-send-email-dh.herrmann@gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This adds stubs for a2dp sink role in daemon. As Sink uses the same HAL
-API, daemon can use the same structs and defines as Source does.
----
- android/Android.mk  |  1 +
- android/Makefile.am |  1 +
- android/a2dp-sink.c | 84 +++++++++++++++++++++++++++++++++++++++++++++++++++++
- android/a2dp-sink.h | 25 ++++++++++++++++
- 4 files changed, 111 insertions(+)
- create mode 100644 android/a2dp-sink.c
- create mode 100644 android/a2dp-sink.h
+Hi David,
 
-diff --git a/android/Android.mk b/android/Android.mk
-index 70dbc42..1b7b8ef 100644
---- a/android/Android.mk
-+++ b/android/Android.mk
-@@ -46,6 +46,7 @@ LOCAL_SRC_FILES := \
- 	bluez/android/ipc.c \
- 	bluez/android/avdtp.c \
- 	bluez/android/a2dp.c \
-+	bluez/android/a2dp-sink.c \
- 	bluez/android/avctp.c \
- 	bluez/android/avrcp.c \
- 	bluez/android/avrcp-lib.c \
-diff --git a/android/Makefile.am b/android/Makefile.am
-index 58fe81a..e290740 100644
---- a/android/Makefile.am
-+++ b/android/Makefile.am
-@@ -36,6 +36,7 @@ android_bluetoothd_SOURCES = android/main.c \
- 				android/ipc.h android/ipc.c \
- 				android/avdtp.h android/avdtp.c \
- 				android/a2dp.h android/a2dp.c \
-+				android/a2dp-sink.h android/a2dp-sink.c \
- 				android/avctp.h android/avctp.c \
- 				android/avrcp.h android/avrcp.c \
- 				android/avrcp-lib.h android/avrcp-lib.c \
-diff --git a/android/a2dp-sink.c b/android/a2dp-sink.c
-new file mode 100644
-index 0000000..07508c0
---- /dev/null
-+++ b/android/a2dp-sink.c
-@@ -0,0 +1,84 @@
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2014  Intel Corporation. All rights reserved.
-+ *
-+ *
-+ *  This library is free software; you can redistribute it and/or
-+ *  modify it under the terms of the GNU Lesser General Public
-+ *  License as published by the Free Software Foundation; either
-+ *  version 2.1 of the License, or (at your option) any later version.
-+ *
-+ *  This library is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ *  Lesser General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU Lesser General Public
-+ *  License along with this library; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-+ *
-+ */
-+
-+#ifdef HAVE_CONFIG_H
-+#include <config.h>
-+#endif
-+
-+#include <stdbool.h>
-+#include <glib.h>
-+
-+#include "lib/bluetooth.h"
-+#include "hal-log.h"
-+#include "hal-msg.h"
-+#include "ipc.h"
-+#include "a2dp-sink.h"
-+
-+static struct ipc *hal_ipc = NULL;
-+
-+static void bt_a2dp_sink_connect(const void *buf, uint16_t len)
-+{
-+	/* TODO */
-+
-+	DBG("");
-+
-+	ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_A2DP_SINK, HAL_OP_A2DP_CONNECT,
-+							HAL_STATUS_UNSUPPORTED);
-+}
-+
-+static void bt_a2dp_sink_disconnect(const void *buf, uint16_t len)
-+{
-+	/* TODO */
-+
-+	DBG("");
-+
-+	ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_A2DP_SINK, HAL_OP_A2DP_DISCONNECT,
-+							HAL_STATUS_UNSUPPORTED);
-+}
-+
-+static const struct ipc_handler cmd_handlers[] = {
-+	/* HAL_OP_A2DP_CONNECT */
-+	{ bt_a2dp_sink_connect, false, sizeof(struct hal_cmd_a2dp_connect) },
-+	/* HAL_OP_A2DP_DISCONNECT */
-+	{ bt_a2dp_sink_disconnect, false,
-+				sizeof(struct hal_cmd_a2dp_disconnect) },
-+};
-+
-+bool bt_a2dp_sink_register(struct ipc *ipc, const bdaddr_t *addr, uint8_t mode)
-+{
-+	DBG("");
-+
-+	hal_ipc = ipc;
-+	ipc_register(hal_ipc, HAL_SERVICE_ID_A2DP_SINK, cmd_handlers,
-+						G_N_ELEMENTS(cmd_handlers));
-+
-+	return true;
-+}
-+
-+void bt_a2dp_sink_unregister(void)
-+{
-+	DBG("");
-+
-+	ipc_unregister(hal_ipc, HAL_SERVICE_ID_A2DP_SINK);
-+	hal_ipc = NULL;
-+}
-diff --git a/android/a2dp-sink.h b/android/a2dp-sink.h
-new file mode 100644
-index 0000000..d2c5ff4
---- /dev/null
-+++ b/android/a2dp-sink.h
-@@ -0,0 +1,25 @@
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2014  Intel Corporation. All rights reserved.
-+ *
-+ *
-+ *  This library is free software; you can redistribute it and/or
-+ *  modify it under the terms of the GNU Lesser General Public
-+ *  License as published by the Free Software Foundation; either
-+ *  version 2.1 of the License, or (at your option) any later version.
-+ *
-+ *  This library is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ *  Lesser General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU Lesser General Public
-+ *  License along with this library; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-+ *
-+ */
-+
-+bool bt_a2dp_sink_register(struct ipc *ipc, const bdaddr_t *addr, uint8_t mode);
-+void bt_a2dp_sink_unregister(void);
--- 
-1.9.1
+On Nov 21 2014 or thereabouts, David Herrmann wrote:
+> Hi
+> 
+> With linux-3.18 uhid will gain GET/SET_REPORT support. 3.18 isn't released, yet,
+> but the uhid features are part of 3.18-rc5 so I think it's fine to rely on it.
+> We can always revert it if it will not be released (for whatever reason..).
+> 
+> Benjamin wrote these 4 patches about 2 months ago and I promised to fix a few
+> bugs and send them upstream. I already feel bad for letting them rot for 2
+> months.. sorry!
 
+No problems from my side. As long as it gets applied in the end, that's
+fine (or at least that the features are implemented).
+
+> 
+> Anyway, I fixed the ID tracking, some typos, and fixed handling of devices that
+> dont send report IDs in GET_REPORT. Patches should be straightforward. The
+> GET/SET_REPORT feature is important for nearly all non-standard HID device
+> drivers. It's used to query and modify device behavior. With this in place, we
+> should be able to use all the kernel hid drivers via uhid/hog.
+
+Yay, thanks for that!
+
+> 
+> Benjamin has an example program to modify MS Arc Surface Touch mouse behavior,
+> which needs these patches to query/modify the device. See:
+>     https://github.com/bentiss/mstouchmouse/tree/WIP-USB
+> (If you check it out, make sure to use the WIP-USB branch! You should also apply
+>  the diff below, to make sure it works even if the report-ID is not prepended.)
+> 
+> Works fine with my devices here!
+> David
+> 
+> 
+> diff --git a/set_touchmode.c b/set_touchmode.c
+> index 7e5d59a..0e6f412 100644
+> --- a/set_touchmode.c
+> +++ b/set_touchmode.c
+> @@ -48,6 +48,11 @@ static int get_report(int fd, unsigned char id, ...
+>      } else {
+>          printf("Report data (%d):\n\t", id);
+>          pr_buffer(buf, res);
+> +        /* prepend report-ID if not sent by device */
+> +        if (res > 0 && buf[0] != id) {
+> +            memmove(buf + 1, buf, (res >= len) ? (res - 1) : res);
+> +            buf[0] = id;
+> +        }
+>      }
+>      return res;
+>  }
+
+Committed and pushed to the repo, so there will be no need to apply it
+now :)
+
+Cheers,
+Benjamin
+
+> 
+> Benjamin Tissoires (4):
+>   hog: import latest uhid.h definition
+>   hog: break out the report retrieval in its own function
+>   hog: implement get_report functionality
+>   hog: implement set_report functionality
+> 
+>  profiles/input/hog.c       | 204 +++++++++++++++++++++++++++++++++++++++++----
+>  profiles/input/uhid_copy.h | 117 +++++++++++++++++++++++---
+>  2 files changed, 292 insertions(+), 29 deletions(-)
+> 
+> -- 
+> 2.1.3
+> 
