@@ -2,54 +2,59 @@ Return-Path: <cyrus@holtmann.org>
 From: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
-Subject: [RFC 1/2] android/avrcp: Create avrcp-common.c|h files
-Date: Fri, 21 Nov 2014 12:14:54 +0200
-Message-Id: <1416564895-18577-1-git-send-email-ravikumar.veeramally@linux.intel.com>
+Subject: [RFC 2/2] android/avrcp: Initial support for AVRCP controller interface
+Date: Fri, 21 Nov 2014 12:14:55 +0200
+Message-Id: <1416564895-18577-2-git-send-email-ravikumar.veeramally@linux.intel.com>
+In-Reply-To: <1416564895-18577-1-git-send-email-ravikumar.veeramally@linux.intel.com>
+References: <1416564895-18577-1-git-send-email-ravikumar.veeramally@linux.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Keep the common code between avrcp target and controller roles
-in avrcp-common.c|h.
+Initial register and unregister service functionality provided.
+Either AVRCP target or controller role registered not both at
+a time.
 ---
- android/Android.mk     |   1 +
- android/Makefile.am    |   1 +
- android/avrcp-common.c | 171 +++++++++++++++++++++++++++++++++++++++++++++++++
- android/avrcp-common.h |  25 ++++++++
- android/avrcp.c        | 149 +++---------------------------------------
- 5 files changed, 207 insertions(+), 140 deletions(-)
- create mode 100644 android/avrcp-common.c
- create mode 100644 android/avrcp-common.h
+ android/Android.mk                |   1 +
+ android/Makefile.am               |   1 +
+ android/avrcp-ctrl.c              | 132 ++++++++++++++++++++++++++++++++++++++
+ android/{avrcp.h => avrcp-ctrl.h} |  11 ++--
+ android/avrcp.c                   |  11 ++++
+ android/avrcp.h                   |   1 +
+ android/main.c                    |  12 ++++
+ 7 files changed, 163 insertions(+), 6 deletions(-)
+ create mode 100644 android/avrcp-ctrl.c
+ copy android/{avrcp.h => avrcp-ctrl.h} (75%)
 
 diff --git a/android/Android.mk b/android/Android.mk
-index adc5255..34c6186 100644
+index 34c6186..73b65fe 100644
 --- a/android/Android.mk
 +++ b/android/Android.mk
-@@ -47,6 +47,7 @@ LOCAL_SRC_FILES := \
- 	bluez/android/avdtp.c \
- 	bluez/android/a2dp.c \
+@@ -49,6 +49,7 @@ LOCAL_SRC_FILES := \
  	bluez/android/avctp.c \
-+	bluez/android/avrcp-common.c \
+ 	bluez/android/avrcp-common.c \
  	bluez/android/avrcp.c \
++	bluez/android/avrcp-ctrl.c \
  	bluez/android/avrcp-lib.c \
  	bluez/android/pan.c \
+ 	bluez/android/handsfree.c \
 diff --git a/android/Makefile.am b/android/Makefile.am
-index 3787489..98b8a3a 100644
+index 98b8a3a..5a6f3ee 100644
 --- a/android/Makefile.am
 +++ b/android/Makefile.am
-@@ -37,6 +37,7 @@ android_bluetoothd_SOURCES = android/main.c \
- 				android/avdtp.h android/avdtp.c \
- 				android/a2dp.h android/a2dp.c \
+@@ -39,6 +39,7 @@ android_bluetoothd_SOURCES = android/main.c \
  				android/avctp.h android/avctp.c \
-+				android/avrcp-common.h android/avrcp-common.c \
+ 				android/avrcp-common.h android/avrcp-common.c \
  				android/avrcp.h android/avrcp.c \
++				android/avrcp-ctrl.h android/avrcp-ctrl.c \
  				android/avrcp-lib.h android/avrcp-lib.c \
  				android/socket.h android/socket.c \
-diff --git a/android/avrcp-common.c b/android/avrcp-common.c
+ 				android/pan.h android/pan.c \
+diff --git a/android/avrcp-ctrl.c b/android/avrcp-ctrl.c
 new file mode 100644
-index 0000000..e486b59
+index 0000000..ec247d2
 --- /dev/null
-+++ b/android/avrcp-common.c
-@@ -0,0 +1,171 @@
++++ b/android/avrcp-ctrl.c
+@@ -0,0 +1,132 @@
 +/*
 + *
 + *  BlueZ - Bluetooth protocol stack for Linux
@@ -82,364 +87,214 @@ index 0000000..e486b59
 +#include <errno.h>
 +#include <glib.h>
 +
++#include "btio/btio.h"
++#include "lib/bluetooth.h"
 +#include "lib/sdp.h"
 +#include "lib/sdp_lib.h"
 +#include "src/sdp-client.h"
++#include "src/shared/util.h"
 +#include "src/log.h"
 +
 +#include "avctp.h"
++#include "avrcp-lib.h"
++#include "hal-msg.h"
++#include "ipc-common.h"
++#include "ipc.h"
++#include "bluetooth.h"
++#include "avrcp.h"
++#include "avrcp-ctrl.h"
 +#include "avrcp-common.h"
++#include "utils.h"
 +
 +#define L2CAP_PSM_AVCTP 0x17
 +
-+sdp_record_t *avrcp_tg_record(uint16_t feature)
++#define AVRCP_FEATURE_CATEGORY_1        0x0001
++#define AVRCP_FEATURE_CATEGORY_2        0x0002
++#define AVRCP_FEATURE_CATEGORY_3        0x0004
++#define AVRCP_FEATURE_CATEGORY_4        0x0008
++
++static bdaddr_t adapter_addr;
++static uint32_t record_ct_id = 0;
++static struct ipc *hal_ipc = NULL;
++
++static void handle_send_passthrough(const void *buf, uint16_t len)
 +{
-+	sdp_list_t *svclass_id, *pfseq, *apseq, *root;
-+	uuid_t root_uuid, l2cap, avctp, avrtg;
-+	sdp_profile_desc_t profile[1];
-+	sdp_list_t *aproto_control, *proto_control[2];
-+	sdp_record_t *record;
-+	sdp_data_t *psm, *version, *features;
-+	uint16_t lp = L2CAP_PSM_AVCTP;
-+	uint16_t avrcp_ver = 0x0105, avctp_ver = 0x0104;
++	DBG("Not Implemented");
 +
-+	record = sdp_record_alloc();
-+	if (!record)
-+		return NULL;
-+
-+	sdp_uuid16_create(&root_uuid, PUBLIC_BROWSE_GROUP);
-+	root = sdp_list_append(NULL, &root_uuid);
-+	sdp_set_browse_groups(record, root);
-+
-+	/* Service Class ID List */
-+	sdp_uuid16_create(&avrtg, AV_REMOTE_TARGET_SVCLASS_ID);
-+	svclass_id = sdp_list_append(NULL, &avrtg);
-+	sdp_set_service_classes(record, svclass_id);
-+
-+	/* Protocol Descriptor List */
-+	sdp_uuid16_create(&l2cap, L2CAP_UUID);
-+	proto_control[0] = sdp_list_append(NULL, &l2cap);
-+	psm = sdp_data_alloc(SDP_UINT16, &lp);
-+	proto_control[0] = sdp_list_append(proto_control[0], psm);
-+	apseq = sdp_list_append(NULL, proto_control[0]);
-+
-+	sdp_uuid16_create(&avctp, AVCTP_UUID);
-+	proto_control[1] = sdp_list_append(NULL, &avctp);
-+	version = sdp_data_alloc(SDP_UINT16, &avctp_ver);
-+	proto_control[1] = sdp_list_append(proto_control[1], version);
-+	apseq = sdp_list_append(apseq, proto_control[1]);
-+
-+	aproto_control = sdp_list_append(NULL, apseq);
-+	sdp_set_access_protos(record, aproto_control);
-+
-+	/* Bluetooth Profile Descriptor List */
-+	sdp_uuid16_create(&profile[0].uuid, AV_REMOTE_PROFILE_ID);
-+	profile[0].version = avrcp_ver;
-+	pfseq = sdp_list_append(NULL, &profile[0]);
-+	sdp_set_profile_descs(record, pfseq);
-+
-+	features = sdp_data_alloc(SDP_UINT16, &feature);
-+	sdp_attr_add(record, SDP_ATTR_SUPPORTED_FEATURES, features);
-+
-+	sdp_set_info_attr(record, "AVRCP TG", NULL, NULL);
-+
-+	sdp_data_free(psm);
-+	sdp_data_free(version);
-+	sdp_list_free(proto_control[0], NULL);
-+	sdp_list_free(proto_control[1], NULL);
-+	sdp_list_free(apseq, NULL);
-+	sdp_list_free(aproto_control, NULL);
-+	sdp_list_free(pfseq, NULL);
-+	sdp_list_free(root, NULL);
-+	sdp_list_free(svclass_id, NULL);
-+
-+	return record;
++	ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_AVRCP_CTRL,
++					HAL_OP_AVRCP_CTRL_SEND_PASSTHROUGH,
++							HAL_STATUS_UNSUPPORTED);
 +}
 +
-+sdp_record_t *avrcp_ct_record(uint16_t feature)
++static const struct ipc_handler cmd_handlers[] = {
++	/* HAL_OP_AVRCP_CTRL_SEND_PASSTHROUGH */
++	{ handle_send_passthrough, false,
++			sizeof(struct hal_cmd_avrcp_ctrl_send_passthrough) },
++};
++
++bool bt_avrcp_ctrl_register(struct ipc *ipc, const bdaddr_t *addr, uint8_t mode)
 +{
-+	sdp_list_t *svclass_id, *pfseq, *apseq, *root;
-+	uuid_t root_uuid, l2cap, avctp, avrct, avrctr;
-+	sdp_profile_desc_t profile[1];
-+	sdp_list_t *aproto, *proto[2];
-+	sdp_record_t *record;
-+	sdp_data_t *psm, *version, *features;
-+	uint16_t lp = AVCTP_CONTROL_PSM;
-+	uint16_t avrcp_ver = 0x0105, avctp_ver = 0x0104;
++	sdp_record_t *rec;
++	uint16_t features;
 +
-+	record = sdp_record_alloc();
-+	if (!record)
-+		return NULL;
++	DBG("");
 +
-+	sdp_uuid16_create(&root_uuid, PUBLIC_BROWSE_GROUP);
-+	root = sdp_list_append(NULL, &root_uuid);
-+	sdp_set_browse_groups(record, root);
++	if (!bt_is_avrcp_registered()) {
++		error("avrcp-ctrl: avrcp target already registered");
++		return false;
++	}
 +
-+	/* Service Class ID List */
-+	sdp_uuid16_create(&avrct, AV_REMOTE_SVCLASS_ID);
-+	svclass_id = sdp_list_append(NULL, &avrct);
-+	sdp_uuid16_create(&avrctr, AV_REMOTE_CONTROLLER_SVCLASS_ID);
-+	svclass_id = sdp_list_append(svclass_id, &avrctr);
-+	sdp_set_service_classes(record, svclass_id);
++	bacpy(&adapter_addr, addr);
 +
-+	/* Protocol Descriptor List */
-+	sdp_uuid16_create(&l2cap, L2CAP_UUID);
-+	proto[0] = sdp_list_append(NULL, &l2cap);
-+	psm = sdp_data_alloc(SDP_UINT16, &lp);
-+	proto[0] = sdp_list_append(proto[0], psm);
-+	apseq = sdp_list_append(NULL, proto[0]);
++	features = AVRCP_FEATURE_CATEGORY_2 | AVRCP_FEATURE_CATEGORY_3 |
++						AVRCP_FEATURE_CATEGORY_4;
 +
-+	sdp_uuid16_create(&avctp, AVCTP_UUID);
-+	proto[1] = sdp_list_append(NULL, &avctp);
-+	version = sdp_data_alloc(SDP_UINT16, &avctp_ver);
-+	proto[1] = sdp_list_append(proto[1], version);
-+	apseq = sdp_list_append(apseq, proto[1]);
++	rec = avrcp_ct_record(features);
++	if (!rec) {
++		error("avrcp-ctrl: Failed to allocate AVRCP CT record");
++		goto fail;
++	}
 +
-+	aproto = sdp_list_append(NULL, apseq);
-+	sdp_set_access_protos(record, aproto);
++	if (bt_adapter_add_record(rec, 0) < 0) {
++		error("avrcp-ctrl: Failed to register AVRCP CT record");
++		sdp_record_free(rec);
++		goto fail;
++	}
++	record_ct_id = rec->handle;
 +
-+	/* Bluetooth Profile Descriptor List */
-+	sdp_uuid16_create(&profile[0].uuid, AV_REMOTE_PROFILE_ID);
-+	profile[0].version = avrcp_ver;
-+	pfseq = sdp_list_append(NULL, &profile[0]);
-+	sdp_set_profile_descs(record, pfseq);
++	hal_ipc = ipc;
 +
-+	features = sdp_data_alloc(SDP_UINT16, &feature);
-+	sdp_attr_add(record, SDP_ATTR_SUPPORTED_FEATURES, features);
++	ipc_register(hal_ipc, HAL_SERVICE_ID_AVRCP_CTRL, cmd_handlers,
++						G_N_ELEMENTS(cmd_handlers));
 +
-+	sdp_set_info_attr(record, "AVRCP CT", NULL, NULL);
-+
-+	free(psm);
-+	free(version);
-+	sdp_list_free(proto[0], NULL);
-+	sdp_list_free(proto[1], NULL);
-+	sdp_list_free(apseq, NULL);
-+	sdp_list_free(pfseq, NULL);
-+	sdp_list_free(aproto, NULL);
-+	sdp_list_free(root, NULL);
-+	sdp_list_free(svclass_id, NULL);
-+
-+	return record;
++	return true;
++fail:
++	return false;
 +}
-diff --git a/android/avrcp-common.h b/android/avrcp-common.h
-new file mode 100644
-index 0000000..a07105f
---- /dev/null
-+++ b/android/avrcp-common.h
-@@ -0,0 +1,25 @@
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
++
++void bt_avrcp_ctrl_unregister(void)
++{
++	DBG("");
++
++	ipc_unregister(hal_ipc, HAL_SERVICE_ID_AVRCP_CTRL);
++	hal_ipc = NULL;
++
++	bt_adapter_remove_record(record_ct_id);
++	record_ct_id = 0;
++}
++
++bool bt_is_avrcp_ctrl_registered(void)
++{
++	return (hal_ipc != NULL);
++}
+diff --git a/android/avrcp.h b/android/avrcp-ctrl.h
+similarity index 75%
+copy from android/avrcp.h
+copy to android/avrcp-ctrl.h
+index 11e79b7..72608e7 100644
+--- a/android/avrcp.h
++++ b/android/avrcp-ctrl.h
+@@ -2,7 +2,7 @@
+  *
+  *  BlueZ - Bluetooth protocol stack for Linux
+  *
+- *  Copyright (C) 2013-2014  Intel Corporation. All rights reserved.
 + *  Copyright (C) 2014  Intel Corporation. All rights reserved.
-+ *
-+ *
-+ *  This library is free software; you can redistribute it and/or
-+ *  modify it under the terms of the GNU Lesser General Public
-+ *  License as published by the Free Software Foundation; either
-+ *  version 2.1 of the License, or (at your option) any later version.
-+ *
-+ *  This library is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ *  Lesser General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU Lesser General Public
-+ *  License along with this library; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-+ *
-+ */
-+
-+sdp_record_t *avrcp_tg_record(uint16_t feature);
-+sdp_record_t *avrcp_ct_record(uint16_t feature);
+  *
+  *
+  *  This library is free software; you can redistribute it and/or
+@@ -21,8 +21,7 @@
+  *
+  */
+ 
+-bool bt_avrcp_register(struct ipc *ipc, const bdaddr_t *addr, uint8_t mode);
+-void bt_avrcp_unregister(void);
+-
+-void bt_avrcp_connect(const bdaddr_t *dst);
+-void bt_avrcp_disconnect(const bdaddr_t *dst);
++bool bt_avrcp_ctrl_register(struct ipc *ipc, const bdaddr_t *addr,
++								uint8_t mode);
++void bt_avrcp_ctrl_unregister(void);
++bool bt_is_avrcp_ctrl_registered(void);
 diff --git a/android/avrcp.c b/android/avrcp.c
-index a0d412d..d06ecc4 100644
+index d06ecc4..26f8d73 100644
 --- a/android/avrcp.c
 +++ b/android/avrcp.c
-@@ -45,6 +45,7 @@
- #include "ipc.h"
+@@ -46,6 +46,7 @@
  #include "bluetooth.h"
  #include "avrcp.h"
-+#include "avrcp-common.h"
+ #include "avrcp-common.h"
++#include "avrcp-ctrl.h"
  #include "utils.h"
  
  #define L2CAP_PSM_AVCTP 0x17
-@@ -382,144 +383,6 @@ static const struct ipc_handler cmd_handlers[] = {
- 	{ handle_set_volume, false, sizeof(struct hal_cmd_avrcp_set_volume) },
- };
- 
--static sdp_record_t *avrcp_tg_record(void)
--{
--	sdp_list_t *svclass_id, *pfseq, *apseq, *root;
--	uuid_t root_uuid, l2cap, avctp, avrtg;
--	sdp_profile_desc_t profile[1];
--	sdp_list_t *aproto_control, *proto_control[2];
--	sdp_record_t *record;
--	sdp_data_t *psm, *version, *features;
--	uint16_t lp = L2CAP_PSM_AVCTP;
--	uint16_t avrcp_ver = 0x0105, avctp_ver = 0x0104;
--	uint16_t feat = (AVRCP_FEATURE_CATEGORY_1 |
--					AVRCP_FEATURE_CATEGORY_2 |
--					AVRCP_FEATURE_CATEGORY_3 |
--					AVRCP_FEATURE_CATEGORY_4);
--
--	record = sdp_record_alloc();
--	if (!record)
--		return NULL;
--
--	sdp_uuid16_create(&root_uuid, PUBLIC_BROWSE_GROUP);
--	root = sdp_list_append(NULL, &root_uuid);
--	sdp_set_browse_groups(record, root);
--
--	/* Service Class ID List */
--	sdp_uuid16_create(&avrtg, AV_REMOTE_TARGET_SVCLASS_ID);
--	svclass_id = sdp_list_append(NULL, &avrtg);
--	sdp_set_service_classes(record, svclass_id);
--
--	/* Protocol Descriptor List */
--	sdp_uuid16_create(&l2cap, L2CAP_UUID);
--	proto_control[0] = sdp_list_append(NULL, &l2cap);
--	psm = sdp_data_alloc(SDP_UINT16, &lp);
--	proto_control[0] = sdp_list_append(proto_control[0], psm);
--	apseq = sdp_list_append(NULL, proto_control[0]);
--
--	sdp_uuid16_create(&avctp, AVCTP_UUID);
--	proto_control[1] = sdp_list_append(NULL, &avctp);
--	version = sdp_data_alloc(SDP_UINT16, &avctp_ver);
--	proto_control[1] = sdp_list_append(proto_control[1], version);
--	apseq = sdp_list_append(apseq, proto_control[1]);
--
--	aproto_control = sdp_list_append(NULL, apseq);
--	sdp_set_access_protos(record, aproto_control);
--
--	/* Bluetooth Profile Descriptor List */
--	sdp_uuid16_create(&profile[0].uuid, AV_REMOTE_PROFILE_ID);
--	profile[0].version = avrcp_ver;
--	pfseq = sdp_list_append(NULL, &profile[0]);
--	sdp_set_profile_descs(record, pfseq);
--
--	features = sdp_data_alloc(SDP_UINT16, &feat);
--	sdp_attr_add(record, SDP_ATTR_SUPPORTED_FEATURES, features);
--
--	sdp_set_info_attr(record, "AVRCP TG", NULL, NULL);
--
--	sdp_data_free(psm);
--	sdp_data_free(version);
--	sdp_list_free(proto_control[0], NULL);
--	sdp_list_free(proto_control[1], NULL);
--	sdp_list_free(apseq, NULL);
--	sdp_list_free(aproto_control, NULL);
--	sdp_list_free(pfseq, NULL);
--	sdp_list_free(root, NULL);
--	sdp_list_free(svclass_id, NULL);
--
--	return record;
--}
--
--static sdp_record_t *avrcp_ct_record(void)
--{
--	sdp_list_t *svclass_id, *pfseq, *apseq, *root;
--	uuid_t root_uuid, l2cap, avctp, avrct, avrctr;
--	sdp_profile_desc_t profile[1];
--	sdp_list_t *aproto, *proto[2];
--	sdp_record_t *record;
--	sdp_data_t *psm, *version, *features;
--	uint16_t lp = AVCTP_CONTROL_PSM;
--	uint16_t avrcp_ver = 0x0105, avctp_ver = 0x0104;
--	uint16_t feat = ( AVRCP_FEATURE_CATEGORY_1 |
--						AVRCP_FEATURE_CATEGORY_2 |
--						AVRCP_FEATURE_CATEGORY_3 |
--						AVRCP_FEATURE_CATEGORY_4);
--
--	record = sdp_record_alloc();
--	if (!record)
--		return NULL;
--
--	sdp_uuid16_create(&root_uuid, PUBLIC_BROWSE_GROUP);
--	root = sdp_list_append(NULL, &root_uuid);
--	sdp_set_browse_groups(record, root);
--
--	/* Service Class ID List */
--	sdp_uuid16_create(&avrct, AV_REMOTE_SVCLASS_ID);
--	svclass_id = sdp_list_append(NULL, &avrct);
--	sdp_uuid16_create(&avrctr, AV_REMOTE_CONTROLLER_SVCLASS_ID);
--	svclass_id = sdp_list_append(svclass_id, &avrctr);
--	sdp_set_service_classes(record, svclass_id);
--
--	/* Protocol Descriptor List */
--	sdp_uuid16_create(&l2cap, L2CAP_UUID);
--	proto[0] = sdp_list_append(NULL, &l2cap);
--	psm = sdp_data_alloc(SDP_UINT16, &lp);
--	proto[0] = sdp_list_append(proto[0], psm);
--	apseq = sdp_list_append(NULL, proto[0]);
--
--	sdp_uuid16_create(&avctp, AVCTP_UUID);
--	proto[1] = sdp_list_append(NULL, &avctp);
--	version = sdp_data_alloc(SDP_UINT16, &avctp_ver);
--	proto[1] = sdp_list_append(proto[1], version);
--	apseq = sdp_list_append(apseq, proto[1]);
--
--	aproto = sdp_list_append(NULL, apseq);
--	sdp_set_access_protos(record, aproto);
--
--	/* Bluetooth Profile Descriptor List */
--	sdp_uuid16_create(&profile[0].uuid, AV_REMOTE_PROFILE_ID);
--	profile[0].version = avrcp_ver;
--	pfseq = sdp_list_append(NULL, &profile[0]);
--	sdp_set_profile_descs(record, pfseq);
--
--	features = sdp_data_alloc(SDP_UINT16, &feat);
--	sdp_attr_add(record, SDP_ATTR_SUPPORTED_FEATURES, features);
--
--	sdp_set_info_attr(record, "AVRCP CT", NULL, NULL);
--
--	free(psm);
--	free(version);
--	sdp_list_free(proto[0], NULL);
--	sdp_list_free(proto[1], NULL);
--	sdp_list_free(apseq, NULL);
--	sdp_list_free(pfseq, NULL);
--	sdp_list_free(aproto, NULL);
--	sdp_list_free(root, NULL);
--	sdp_list_free(svclass_id, NULL);
--
--	return record;
--}
--
- static void avrcp_device_free(void *data)
- {
- 	struct avrcp_device *dev = data;
-@@ -1053,6 +916,7 @@ bool bt_avrcp_register(struct ipc *ipc, const bdaddr_t *addr, uint8_t mode)
- {
- 	GError *err = NULL;
- 	sdp_record_t *rec;
-+	uint16_t features;
+@@ -920,6 +921,11 @@ bool bt_avrcp_register(struct ipc *ipc, const bdaddr_t *addr, uint8_t mode)
  
  	DBG("");
  
-@@ -1069,7 +933,12 @@ bool bt_avrcp_register(struct ipc *ipc, const bdaddr_t *addr, uint8_t mode)
- 		return false;
- 	}
- 
--	rec = avrcp_tg_record();
-+	features = AVRCP_FEATURE_CATEGORY_1 |
-+					AVRCP_FEATURE_CATEGORY_2 |
-+					AVRCP_FEATURE_CATEGORY_3 |
-+					AVRCP_FEATURE_CATEGORY_4;
++	if (!bt_is_avrcp_ctrl_registered()) {
++		error("AVRCP: avrcp controller already registered");
++		return false;
++	}
 +
-+	rec = avrcp_tg_record(features);
- 	if (!rec) {
- 		error("Failed to allocate AVRCP TG record");
- 		goto fail;
-@@ -1082,7 +951,7 @@ bool bt_avrcp_register(struct ipc *ipc, const bdaddr_t *addr, uint8_t mode)
- 	}
- 	record_tg_id = rec->handle;
+ 	bacpy(&adapter_addr, addr);
  
--	rec = avrcp_ct_record();
-+	rec = avrcp_ct_record(features);
- 	if (!rec) {
- 		error("Failed to allocate AVRCP CT record");
- 		bt_adapter_remove_record(record_tg_id);
+ 	server = bt_io_listen(NULL, confirm_cb, NULL, NULL, &err,
+@@ -1040,3 +1046,8 @@ void bt_avrcp_disconnect(const bdaddr_t *dst)
+ 
+ 	avrcp_device_remove(dev);
+ }
++
++bool bt_is_avrcp_registered(void)
++{
++	return (hal_ipc != NULL);
++}
+diff --git a/android/avrcp.h b/android/avrcp.h
+index 11e79b7..4411d5c 100644
+--- a/android/avrcp.h
++++ b/android/avrcp.h
+@@ -26,3 +26,4 @@ void bt_avrcp_unregister(void);
+ 
+ void bt_avrcp_connect(const bdaddr_t *dst);
+ void bt_avrcp_disconnect(const bdaddr_t *dst);
++bool bt_is_avrcp_registered(void);
+diff --git a/android/main.c b/android/main.c
+index 58dd9ab..66203b7 100644
+--- a/android/main.c
++++ b/android/main.c
+@@ -64,6 +64,7 @@
+ #include "handsfree-client.h"
+ #include "map-client.h"
+ #include "utils.h"
++#include "avrcp-ctrl.h"
+ 
+ #define DEFAULT_VENDOR "BlueZ"
+ #define DEFAULT_MODEL "BlueZ for Android"
+@@ -208,6 +209,14 @@ static void service_register(const void *buf, uint16_t len)
+ 		}
+ 
+ 		break;
++	case HAL_SERVICE_ID_AVRCP_CTRL:
++		if (!bt_avrcp_ctrl_register(hal_ipc, &adapter_bdaddr,
++								m->mode)) {
++			status = HAL_STATUS_FAILED;
++			goto failed;
++		}
++
++		break;
+ 	case HAL_SERVICE_ID_HANDSFREE:
+ 		if (!bt_handsfree_register(hal_ipc, &adapter_bdaddr, m->mode,
+ 							m->max_clients)) {
+@@ -286,6 +295,9 @@ static bool unregister_service(uint8_t id)
+ 	case HAL_SERVICE_ID_AVRCP:
+ 		bt_avrcp_unregister();
+ 		break;
++	case HAL_SERVICE_ID_AVRCP_CTRL:
++		bt_avrcp_ctrl_unregister();
++		break;
+ 	case HAL_SERVICE_ID_HANDSFREE:
+ 		bt_handsfree_unregister();
+ 		break;
 -- 
 2.1.0
 
