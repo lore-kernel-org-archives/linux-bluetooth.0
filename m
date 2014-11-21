@@ -1,67 +1,111 @@
 Return-Path: <cyrus@holtmann.org>
-From: David Herrmann <dh.herrmann@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Benjamin Tissoires <benjamin.tissoires@redhat.com>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	David Herrmann <dh.herrmann@gmail.com>
-Subject: [PATCH 0/4] Add GET/SET_REPORT support to HoG
-Date: Fri, 21 Nov 2014 15:41:42 +0100
-Message-Id: <1416580906-22134-1-git-send-email-dh.herrmann@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <CAHrH25SxyYWhKEHSM_+Z2Ybrekf+fHWUpAYj-YxDrbC5OUp_+w@mail.gmail.com>
+References: <CAHrH25Q2w48UX5Bi2qLq0uHfGsH+k2AzecXgfrn=QgZKoT1K4A@mail.gmail.com>
+	<CAHrH25SxyYWhKEHSM_+Z2Ybrekf+fHWUpAYj-YxDrbC5OUp_+w@mail.gmail.com>
+Date: Fri, 21 Nov 2014 16:24:34 +0200
+Message-ID: <CABBYNZKnPw0-rX2X=DfSwL2FMRqM+c=uDHwh9trVMGZHxvaLgg@mail.gmail.com>
+Subject: Re: RFC: Populating shared/gatt-client from storage.
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Arman Uguray <armansito@chromium.org>
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi
+Hi Arman,
 
-With linux-3.18 uhid will gain GET/SET_REPORT support. 3.18 isn't released, yet,
-but the uhid features are part of 3.18-rc5 so I think it's fine to rely on it.
-We can always revert it if it will not be released (for whatever reason..).
+On Thu, Nov 20, 2014 at 5:08 AM, Arman Uguray <armansito@chromium.org> wrote:
+> Hi,
+>
+>> On Wed, Nov 19, 2014 at 1:48 PM, Arman Uguray <armansito@chromium.org> wrote:
+>> Hi all,
+>>
+>> In the case where bluez is bonded with a remote device we don't want
+>> to always perform service discovery, but instead to cache the
+>> attribute data permanently and just use that on reconnections.
+>> Currently shared/gatt-client automatically discovers all services when
+>> created (via bt_gatt_client_new) so we need to add support to populate
+>> a shared/gatt-client based on cached data in storage, since a
+>> bt_gatt_client instance acts as our in-memory attribute cache for the
+>> client role.
+>>
+>> I initially thought about storing everything in INI format and loading
+>> things directly from a file, via some function like
+>> bt_gatt_client_new_from_storage. The biggest problem with this
+>> approach is parsing the INI format; since we don't want to pull in any
+>> external dependencies into shared/gatt (e.g. glib) we would possibly
+>> have to write our own key-value file parser for shared/ which seems
+>> like overkill. We could possibly invent some simpler blob format for
+>> shared/gatt-client but people brought to my attention on IRC that we
+>> may want to leave the exact storage format to the upper-layer, e.g.
+>> desktop and android versions of bluetoothd may want to use different
+>> formats for their attribute cache that's consistent with the platform.
+>>
+>> So I decided to go with something generic instead. We would basically
+>> add functions to manually populate a gatt-client and mark the client
+>> as ready only after it's services have been populated. So we would
+>> have these API changes:
+>>
+>> 1. A new argument to bt_gatt_client_new, to tell it not to perform
+>> discovery. Something like "bool discover_services".
+>>
+>>     /* Don't perform discovery */
+>>     bt_gatt_client_new(att, mtu, false);
+>>
+>> This would basically just leave the structure in "init" state and not
+>> become ready.
+>>
+>> 2. We would then add a new structure to populate a gatt-client.
+>>
+>>     struct bt_gatt_populate { .. };  /* Probably something with a better name */
+>>
+>>     bool bt_gatt_populate_start(struct bt_gatt_populate *, struct
+>> bt_gatt_client *);
+>>     bool bt_gatt_populate_add_service(....)
+>>     bool bt_gatt_populate_add_characteristic(...)
+>>     bool bt_gatt_populate_add_descriptor(....)
+>>     bool bt_gatt_populate_add_include(....)
+>>     bool bt_gatt_populate_cancel(...)
+>>     bool bt_gatt_populate_commit(struct bt_gatt_populate *);
+>>
+>> The start function would tell gatt-client that it's being populated so
+>> it would prevent this from being called twice. All of the _add_*
+>> functions would create a temporary tree owned by the populate
+>> structure, using the same internal structures defined in
+>> shared/gatt-client.c. Calling bt_gatt_populate_commit would then pass
+>> the ownership of the services to the bt_gatt_client, and
+>> bt_gatt_client would perform the MTU exchange, subscribe to
+>> notifications from the "Service Changed" characteristic if one exists,
+>> mark itself as ready and invoke the ready handler.
+>>
+>> If the upper-layer wants to store the current contents of gatt-client,
+>> they can do so by iterating through its services and caching them to a
+>> file directly. This way, shared/gatt-client would remain agnostic to
+>> any storage format.
+>>
+>> Comments requested.
+>> Arman
 
-Benjamin wrote these 4 patches about 2 months ago and I promised to fix a few
-bugs and send them upstream. I already feel bad for letting them rot for 2
-months.. sorry!
+I discussed with Johan about this, perhaps we should reuse bt_gatt_db
+also for client which could simplify the API quite a bit, and remove
+the need of iterators. So basically each device would have a instance
+of bt_gatt_db which can be populated from the storage on init but more
+importantly we can keep it alive as longs as the device is paired so
+it became very similar to what we are already doing with
+bt_gatt_server. We probably gonna need to adapt a little bit
+bt_gatt_db, perhaps a reset is needed if service changes, etc, for the
+iterators we could probably replace with gatt_db_find_by_type then you
+pass the type you want: primary, secondary, etc, which in my opinion
+is a much simpler API. Also we could take advantage of
+gatt_db_attribute so that the read and write callbacks are registered
+by the core which takes care of invoking bt_gatt_client that way the
+interface between core and plugins could be done entirely with
+gatt_db_attribute.
 
-Anyway, I fixed the ID tracking, some typos, and fixed handling of devices that
-dont send report IDs in GET_REPORT. Patches should be straightforward. The
-GET/SET_REPORT feature is important for nearly all non-standard HID device
-drivers. It's used to query and modify device behavior. With this in place, we
-should be able to use all the kernel hid drivers via uhid/hog.
-
-Benjamin has an example program to modify MS Arc Surface Touch mouse behavior,
-which needs these patches to query/modify the device. See:
-    https://github.com/bentiss/mstouchmouse/tree/WIP-USB
-(If you check it out, make sure to use the WIP-USB branch! You should also apply
- the diff below, to make sure it works even if the report-ID is not prepended.)
-
-Works fine with my devices here!
-David
-
-
-diff --git a/set_touchmode.c b/set_touchmode.c
-index 7e5d59a..0e6f412 100644
---- a/set_touchmode.c
-+++ b/set_touchmode.c
-@@ -48,6 +48,11 @@ static int get_report(int fd, unsigned char id, ...
-     } else {
-         printf("Report data (%d):\n\t", id);
-         pr_buffer(buf, res);
-+        /* prepend report-ID if not sent by device */
-+        if (res > 0 && buf[0] != id) {
-+            memmove(buf + 1, buf, (res >= len) ? (res - 1) : res);
-+            buf[0] = id;
-+        }
-     }
-     return res;
- }
-
-Benjamin Tissoires (4):
-  hog: import latest uhid.h definition
-  hog: break out the report retrieval in its own function
-  hog: implement get_report functionality
-  hog: implement set_report functionality
-
- profiles/input/hog.c       | 204 +++++++++++++++++++++++++++++++++++++++++----
- profiles/input/uhid_copy.h | 117 +++++++++++++++++++++++---
- 2 files changed, 292 insertions(+), 29 deletions(-)
+What do you thing? It probably sets us back a little bit in terms of
+converting the core but I think it is worth it considering since it
+would align server and client db abstraction.
 
 -- 
-2.1.3
+Luiz Augusto von Dentz
