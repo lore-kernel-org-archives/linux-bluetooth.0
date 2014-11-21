@@ -1,51 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcin Kraglak <marcin.kraglak@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 6/6] android/client: Add get_connection_state command
-Date: Fri, 21 Nov 2014 12:16:43 +0100
-Message-Id: <1416568603-3666-6-git-send-email-marcin.kraglak@tieto.com>
+Subject: [PATCH 5/6] android/client: Print data from energy_info_cb
+Date: Fri, 21 Nov 2014 12:16:42 +0100
+Message-Id: <1416568603-3666-5-git-send-email-marcin.kraglak@tieto.com>
 In-Reply-To: <1416568603-3666-1-git-send-email-marcin.kraglak@tieto.com>
 References: <1416568603-3666-1-git-send-email-marcin.kraglak@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- android/client/if-bt.c | 15 +++++++++++++++
- 1 file changed, 15 insertions(+)
+ android/client/if-bt.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
 
 diff --git a/android/client/if-bt.c b/android/client/if-bt.c
-index 4648f99..b518177 100644
+index f74a56a..4648f99 100644
 --- a/android/client/if-bt.c
 +++ b/android/client/if-bt.c
-@@ -409,6 +409,20 @@ static void read_energy_info_p(int argc, const char **argv)
- 
- 	EXEC(if_bluetooth->read_energy_info);
- }
-+
-+#define get_connection_state_c complete_addr_c
-+
-+static void get_connection_state_p(int argc, const char **argv)
-+{
-+	bt_bdaddr_t addr;
-+
-+	RETURN_IF_NULL(if_bluetooth);
-+
-+	VERIFY_ADDR_ARG(2, &addr);
-+
-+	haltest_info("if_bluetooth->get_connection_state : %d\n",
-+				if_bluetooth->get_connection_state(&addr));
-+}
- #endif
- 
- static void disable_p(int argc, const char **argv)
-@@ -892,6 +906,7 @@ static struct method methods[] = {
+@@ -331,7 +331,12 @@ static void le_test_mode_cb(bt_status_t status, uint16_t num_packets)
  #if ANDROID_VERSION >= PLATFORM_VER(5, 0, 0)
- 	STD_METHODCH(create_bond, "<addr> [<transport>]"),
- 	STD_METHOD(read_energy_info),
-+	STD_METHODCH(get_connection_state, "<addr>"),
- #else
- 	STD_METHODCH(create_bond, "<addr>"),
+ static void energy_info_cb(bt_activity_energy_info *energy_info)
+ {
+-	haltest_info("%s\n", __func__);
++	haltest_info("%s status=%s\n, ctrl_state=0x%02X, tx_time=0x%jx,"
++			"rx_time=0x%jx, idle_time=0x%jx, energu_used=0x%jx\n",
++			__func__, bt_status_t2str(energy_info->status),
++			energy_info->ctrl_state, energy_info->tx_time,
++			energy_info->rx_time, energy_info->idle_time,
++			energy_info->energy_used);
+ }
  #endif
+ 
 -- 
 1.9.3
 
