@@ -1,48 +1,35 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-Date: Fri, 21 Nov 2014 09:03:44 +0100
-Message-ID: <CANpMpoQoBhmprKEkrJrA1cdmwX=JvabtiJpm64hnxnR46MEFDA@mail.gmail.com>
-Subject: Where in the code is a BLE connection accepted?
-From: =?UTF-8?Q?Gilles_Gr=C3=A9goire?= <gilles.gregoire@gmail.com>
+From: s.nageshmurt@samsung.com
 To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
+Cc: Sagar Nageshmurthy <s.nageshmurt@samsung.com>
+Subject: [PATCH 1/1] audio/media: Parse total number of tracks metadata
+Date: Fri, 21 Nov 2014 11:09:28 +0530
+Message-id: <1416548368-30935-1-git-send-email-s.nageshmurt@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+From: Sagar Nageshmurthy <s.nageshmurt@samsung.com>
 
-I am trying to understand how a BLE connection is established between
-my embedded system and an Android phone. I am using bluez 5.9 on a
-3.12 kernel on this embedded system; with a CSR chipset.
+Currently Bluez ignores NumberOfTracks metadata. Hence parse totalTracks
+key to update NumberOfTracks info.
+---
+ profiles/audio/media.c |    3 +++
+ 1 file changed, 3 insertions(+)
 
-I set up bluetooth using:
-hciconfig hci0 reset
-hciconfig hci0 noscan
+diff --git a/profiles/audio/media.c b/profiles/audio/media.c
+index ef7b910..66b75b3 100644
+--- a/profiles/audio/media.c
++++ b/profiles/audio/media.c
+@@ -1505,6 +1505,9 @@ static gboolean parse_player_metadata(struct media_player *mp,
+ 		} else if (strcasecmp(key, "mpris:length") == 0) {
+ 			if (!parse_int64_metadata(mp, "Duration", &var))
+ 				return FALSE;
++		} else if (strcasecmp(key, "xesam:totalTracks") == 0) {
++			if (!parse_int32_metadata(mp, "NumberOfTracks", &var))
++				return FALSE;
+ 		} else if (strcasecmp(key, "xesam:trackNumber") == 0) {
+ 			if (!parse_int32_metadata(mp, "TrackNumber", &var))
+ 				return FALSE;
+-- 
+1.7.9.5
 
-Then, I use hcitool to set the advertisement and scan data, and I
-enable a connectable advertisement with
-hcitool -i hci0 cmd 0x08 0x000a 01
-
-I am _not_ using bluetoothd.
-
-With this simple setup, I can connect with an Android phone to my
-embedded system.
-I check it with:
-hcitool -i hci0 con
-
-Which reports one active connection.
-
-I had a look at the hciconfig and hcitool source code (the only tools
-I used to setup bluetooth), but could not find where a connection is
-accepted.
-
-My question is: where (in the code) is the connection accepted in the
-first place?
-
-Thanks!
-
--- Gilles
-
-PS: my excuses for this repost. I realized that I forgot to set a
-subject for the initial version of this e-mail sent on this list
-yesterday.
