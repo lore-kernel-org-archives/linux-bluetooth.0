@@ -1,267 +1,243 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <CABBYNZL7o5oTrGEnkJwdtGArHwuxbfW6pSU9vVShUuE+QmTH4w@mail.gmail.com>
-References: <1416459821-16478-1-git-send-email-armansito@chromium.org>
-	<1416459821-16478-2-git-send-email-armansito@chromium.org>
-	<CAHrH25SqeOydY6wPVKfX6mp5KtXa8Ki1My+P6=XspR1_NCuJDw@mail.gmail.com>
-	<CABD6X-J6bGF8m0nhUxPARX1ir2vbk4jrNey9WMBhgyCnPsjbxQ@mail.gmail.com>
-	<CABBYNZL7o5oTrGEnkJwdtGArHwuxbfW6pSU9vVShUuE+QmTH4w@mail.gmail.com>
-Date: Fri, 21 Nov 2014 07:48:24 -0800
-Message-ID: <CAHrH25QbvLHTV1HQ+ie4okb6=v1ud=-rdq1WobYmCsmHR=m5VA@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 2/2] unit/test-gatt: Add SERVER and COEX test types
- and MTU tests.
+In-Reply-To: <CABBYNZKnPw0-rX2X=DfSwL2FMRqM+c=uDHwh9trVMGZHxvaLgg@mail.gmail.com>
+References: <CAHrH25Q2w48UX5Bi2qLq0uHfGsH+k2AzecXgfrn=QgZKoT1K4A@mail.gmail.com>
+	<CAHrH25SxyYWhKEHSM_+Z2Ybrekf+fHWUpAYj-YxDrbC5OUp_+w@mail.gmail.com>
+	<CABBYNZKnPw0-rX2X=DfSwL2FMRqM+c=uDHwh9trVMGZHxvaLgg@mail.gmail.com>
+Date: Fri, 21 Nov 2014 07:42:44 -0800
+Message-ID: <CAHrH25S6bhZ2wcoefFmC2=FrBpC__RFyr1mqeE9WhPREPsiuuw@mail.gmail.com>
+Subject: Re: RFC: Populating shared/gatt-client from storage.
 From: Arman Uguray <armansito@chromium.org>
 To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Marcin Kraglak <marcin.kraglak@tieto.com>,
-	BlueZ development <linux-bluetooth@vger.kernel.org>
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Luiz,
 
-> On Fri, Nov 21, 2014 at 2:22 AM, Luiz Augusto von Dentz <luiz.dentz@gmail.com> wrote:
-> Hi Marcin, Arman,
+> On Fri, Nov 21, 2014 at 6:24 AM, Luiz Augusto von Dentz <luiz.dentz@gmail.com> wrote:
+> Hi Arman,
 >
-> On Fri, Nov 21, 2014 at 10:32 AM, Marcin Kraglak
-> <marcin.kraglak@tieto.com> wrote:
->> Hi Arman,
+> On Thu, Nov 20, 2014 at 5:08 AM, Arman Uguray <armansito@chromium.org> wrote:
+>> Hi,
 >>
->> On 21 November 2014 00:54, Arman Uguray <armansito@chromium.org> wrote:
->>> Hi,
+>>> On Wed, Nov 19, 2014 at 1:48 PM, Arman Uguray <armansito@chromium.org> wrote:
+>>> Hi all,
 >>>
->>>> On Wed, Nov 19, 2014 at 9:03 PM, Arman Uguray <armansito@chromium.org> wrote:
->>>> This patch adds support for the following two features:
->>>>
->>>>   1. SERVER: The test context creates a bt_gatt_server.
->>>>   2. COEX: The test context creates a bt_gatt_server AND a bt_gatt_client.
->>>>
->>>> Also added 4 new test cases for the "Server Configuration" category, with two
->>>> new client-role and two new server-role tests which exercise the following:
->>>>
->>>> /TP/GAC/CL/BV-01-C:
->>>>   1. CLIENT test with incoming "Exchange MTU" request. bt_att automatically
->>>>   responds with "ERROR_NOT_SUPPORTED".
->>>>   2. COEX test. The "DUT" sends "Exchange MTU" request first and the "tester"
->>>>   sends it right after.
->>>>
->>>> /TP/GAC/SR/BV-01-C:
->>>>   1. SERVER test with incoming "Exchange MTU" request. No outgoing request.
->>>>   2. COEX test. The "tester" sends "Exchange MTU" request first and the "DUT"
->>>>   sends it right after.
->>>> ---
->>>>  unit/test-gatt.c | 101 +++++++++++++++++++++++++++++++++++++++++++++++++++----
->>>>  1 file changed, 95 insertions(+), 6 deletions(-)
->>>>
->>>> diff --git a/unit/test-gatt.c b/unit/test-gatt.c
->>>> index 900f5e3..7ab7780 100644
->>>> --- a/unit/test-gatt.c
->>>> +++ b/unit/test-gatt.c
->>>> @@ -40,6 +40,9 @@
->>>>  #include "src/shared/att.h"
->>>>  #include "src/shared/gatt-helpers.h"
->>>>  #include "src/shared/gatt-client.h"
->>>> +#include "src/shared/queue.h"
->>>> +#include "src/shared/gatt-db.h"
->>>> +#include "src/shared/gatt-server.h"
->>>>
->>>>  struct test_pdu {
->>>>         bool valid;
->>>> @@ -50,7 +53,8 @@ struct test_pdu {
->>>>  enum context_type {
->>>>         ATT,
->>>>         CLIENT,
->>>> -       SERVER
->>>> +       SERVER,
->>>> +       COEX
->>>>  };
->>>>
->>>>  struct gatt_service {
->>>> @@ -72,7 +76,9 @@ struct test_data {
->>>>  struct context {
->>>>         GMainLoop *main_loop;
->>>>         struct bt_gatt_client *client;
->>>> +       struct bt_gatt_server *server;
->>>>         struct bt_att *att;
->>>> +       struct gatt_db *db;
->>>>         guint source;
->>>>         guint process;
->>>>         int fd;
->>>> @@ -114,9 +120,13 @@ struct context {
->>>>  #define define_test_client(name, function, bt_services, test_step, args...)\
->>>>         define_test(name, function, CLIENT, NULL, bt_services, test_step, args)
->>>>
->>>> -#define SERVICE_DATA_1_PDU                                             \
->>>> -               raw_pdu(0x02, 0x00, 0x02),                              \
->>>> -               raw_pdu(0x03, 0x00, 0x02),                              \
->>>> +#define define_test_server(name, function, bt_services, test_step, args...)\
->>>> +       define_test(name, function, SERVER, NULL, bt_services, test_step, args)
->>>> +
->>>> +#define define_test_coex(name, function, bt_services, test_step, args...)\
->>>> +       define_test(name, function, COEX, NULL, bt_services, test_step, args)
->>>> +
->>>> +#define SERVICE_DATA_1_DISCOVERY_PDU                                   \
->>>>                 raw_pdu(0x10, 0x01, 0x00, 0xff, 0xff, 0x00, 0x28),      \
->>>>                 raw_pdu(0x11, 0x06, 0x01, 0x00, 0x04, 0x00, 0x01, 0x18),\
->>>>                 raw_pdu(0x10, 0x05, 0x00, 0xff, 0xff, 0x00, 0x28),      \
->>>> @@ -144,6 +154,11 @@ struct context {
->>>>                 raw_pdu(0x04, 0x08, 0x00, 0x08, 0x00),                  \
->>>>                 raw_pdu(0x05, 0x01, 0x08, 0x00, 0x01, 0x29)
->>>>
->>>> +#define SERVICE_DATA_1_PDU                                             \
->>>> +               raw_pdu(0x02, 0x00, 0x02),                              \
->>>> +               raw_pdu(0x03, 0x00, 0x02),                              \
->>>> +               SERVICE_DATA_1_DISCOVERY_PDU
->>>> +
->>>>  static bt_uuid_t uuid_16 = {
->>>>         .type = BT_UUID16,
->>>>         .value.u16 = 0x1800
->>>> @@ -282,11 +297,18 @@ static gboolean send_pdu(gpointer user_data)
->>>>
->>>>  static void context_process(struct context *context)
->>>>  {
->>>> +       /* Quit the context if we processed the last PDU */
->>>>         if (!context->data->pdu_list[context->pdu_offset].valid) {
->>>>                 context_quit(context);
->>>>                 return;
->>>>         }
->>>>
->>>> +       /* Skip the PDU, if it's empty */
->>>> +       if (!context->data->pdu_list[context->pdu_offset].size) {
->>>> +               context->pdu_offset++;
->>>> +               return;
->>>> +       }
->>>> +
->>>>         context->process = g_idle_add(send_pdu, context);
->>>>  }
->>>>
->>>> @@ -427,6 +449,7 @@ static struct context *create_context(uint16_t mtu, gconstpointer data)
->>>>         GIOChannel *channel;
->>>>         int err, sv[2];
->>>>         struct bt_att *att;
->>>> +       bool coex = false;
->>>>
->>>>         context->main_loop = g_main_loop_new(NULL, FALSE);
->>>>         g_assert(context->main_loop);
->>>> @@ -447,6 +470,22 @@ static struct context *create_context(uint16_t mtu, gconstpointer data)
->>>>
->>>>                 bt_gatt_exchange_mtu(context->att, mtu, NULL, NULL, NULL);
->>>>                 break;
->>>> +       case COEX:
->>>> +               coex = true;
->>>> +       case SERVER:
->>>> +               context->db = gatt_db_new();
->>>> +               g_assert(context->db);
->>>> +
->>>> +               context->server = bt_gatt_server_new(context->db, att, mtu);
->>>> +               g_assert(context->server);
->>>> +
->>>> +               if (g_test_verbose())
->>>> +                       bt_gatt_server_set_debug(context->server, print_debug,
->>>> +                                               "bt_gatt_server:", NULL);
->>>> +               if (!coex) {
->>>> +                       bt_att_unref(att);
->>>> +                       break;
->>>> +               }
->>>>         case CLIENT:
->>>>                 context->client = bt_gatt_client_new(att, mtu, NULL);
->>>>                 g_assert(context->client);
->>>> @@ -500,6 +539,8 @@ static void destroy_context(struct context *context)
->>>>                 g_source_remove(context->source);
->>>>
->>>>         bt_gatt_client_unref(context->client);
->>>> +       bt_gatt_server_unref(context->server);
->>>> +       gatt_db_destroy(context->db);
->>>>
->>>>         if (context->att)
->>>>                 bt_att_unref(context->att);
->>>> @@ -577,6 +618,22 @@ static void test_client(gconstpointer data)
->>>>         execute_context(context);
->>>>  }
->>>>
->>>> +static void test_server(gconstpointer data)
->>>> +{
->>>> +       struct context *context = create_context(512, data);
->>>> +       const struct test_pdu pdu = raw_pdu(0x02, 0x17, 0x00);
->>>> +       ssize_t len;
->>
->> Could we call process_context() here and define pdu in define_test_server?
->> It will be much easier to understand what test does.
->>>> +
->>>> +       len = write(context->fd, pdu.data, pdu.size);
->>>> +
->>>> +       if (g_test_verbose())
->>>> +               util_hexdump('<', pdu.data, len, test_debug, "GATT: ");
->>>> +
->>>> +       g_assert_cmpint(len, ==, pdu.size);
->>>> +
->>>> +       execute_context(context);
->>>> +}
->>>> +
->>>>  static void test_search_primary(gconstpointer data)
->>>>  {
->>>>         struct context *context = create_context(512, data);
->>>> @@ -708,11 +765,43 @@ int main(int argc, char *argv[])
->>>>          * Server Configuration
->>>>          *
->>>>          * The test group objective is to verify Generic Attribute Profile
->>>> -        * Server Configuration.
->>>> +        * Server Configuration. The tested configurations are:
->>>> +        *
->>>> +        *   1. Client-role only.
->>>> +        *   2. Server-role only.
->>>> +        *   3. Both roles with only bt_gatt_client.
->>>> +        *   4. Both roles with bt_gatt_client and bt_gatt_server (client
->>>> +        *      request first).
->>>> +        *   5. Both roles with bt_gatt_client and bt_gatt_server (server
->>>> +        *      response first).
->>>>          */
->>>>
->>>>         define_test_client("/TP/GAC/CL/BV-01-C", test_client, NULL, NULL,
->>>> -                               raw_pdu(0x02, 0x00, 0x02));
->>>> +                                               raw_pdu(0x02, 0x00, 0x02));
->>>> +
->>>> +       define_test_server("/TP/GAC/SR/BV-01-C", test_server, NULL, NULL,
->>>> +                                               raw_pdu(0x03, 0x00, 0x02));
->>>> +
->>>> +       define_test_client("/TP/GAC/CL/BV-01-C", test_client, NULL, NULL,
->>>> +                                       raw_pdu(0x02, 0x00, 0x02),
->>>> +                                       raw_pdu(0x02, 0x17, 0x00),
->>>> +                                       raw_pdu(0x01, 0x02, 0x00, 0x00, 0x06),
->>>> +                                       raw_pdu(0x03, 0x17, 0x00),
->>>> +                                       SERVICE_DATA_1_DISCOVERY_PDU);
->>>> +
->>>> +      define_test_coex("/TP/GAC/CL/BV-01-C", test_c lient, NULL, NULL,
->>>> +                                               raw_pdu(0x02, 0x00, 0x02),
->>>> +                                               raw_pdu(0x02, 0x17, 0x00),
->>>> +                                               raw_pdu(0x03, 0x00, 0x02),
->>>> +                                               raw_pdu(0x03, 0x17, 0x00),
->>>> +                                               SERVICE_DATA_1_DISCOVERY_PDU);
->>>> +
->>>> +       define_test_coex("/TP/GAC/SR/BV-01-C", test_server, NULL, NULL,
->>>> +                                               raw_pdu(0x03, 0x00, 0x02),
->>>> +                                               raw_pdu(),  /* wait */
->>>> +                                               raw_pdu(0x02, 0x00, 0x02),
->>>> +                                               raw_pdu(0x03, 0x17, 0x00),
->>>> +                                               SERVICE_DATA_1_DISCOVERY_PDU);
->>>>
->>
->> Maybe it is better to rename tests with coex, as these scenarios are
->> not defined in test spec.
+>>> In the case where bluez is bonded with a remote device we don't want
+>>> to always perform service discovery, but instead to cache the
+>>> attribute data permanently and just use that on reconnections.
+>>> Currently shared/gatt-client automatically discovers all services when
+>>> created (via bt_gatt_client_new) so we need to add support to populate
+>>> a shared/gatt-client based on cached data in storage, since a
+>>> bt_gatt_client instance acts as our in-memory attribute cache for the
+>>> client role.
+>>>
+>>> I initially thought about storing everything in INI format and loading
+>>> things directly from a file, via some function like
+>>> bt_gatt_client_new_from_storage. The biggest problem with this
+>>> approach is parsing the INI format; since we don't want to pull in any
+>>> external dependencies into shared/gatt (e.g. glib) we would possibly
+>>> have to write our own key-value file parser for shared/ which seems
+>>> like overkill. We could possibly invent some simpler blob format for
+>>> shared/gatt-client but people brought to my attention on IRC that we
+>>> may want to leave the exact storage format to the upper-layer, e.g.
+>>> desktop and android versions of bluetoothd may want to use different
+>>> formats for their attribute cache that's consistent with the platform.
+>>>
+>>> So I decided to go with something generic instead. We would basically
+>>> add functions to manually populate a gatt-client and mark the client
+>>> as ready only after it's services have been populated. So we would
+>>> have these API changes:
+>>>
+>>> 1. A new argument to bt_gatt_client_new, to tell it not to perform
+>>> discovery. Something like "bool discover_services".
+>>>
+>>>     /* Don't perform discovery */
+>>>     bt_gatt_client_new(att, mtu, false);
+>>>
+>>> This would basically just leave the structure in "init" state and not
+>>> become ready.
+>>>
+>>> 2. We would then add a new structure to populate a gatt-client.
+>>>
+>>>     struct bt_gatt_populate { .. };  /* Probably something with a better name */
+>>>
+>>>     bool bt_gatt_populate_start(struct bt_gatt_populate *, struct
+>>> bt_gatt_client *);
+>>>     bool bt_gatt_populate_add_service(....)
+>>>     bool bt_gatt_populate_add_characteristic(...)
+>>>     bool bt_gatt_populate_add_descriptor(....)
+>>>     bool bt_gatt_populate_add_include(....)
+>>>     bool bt_gatt_populate_cancel(...)
+>>>     bool bt_gatt_populate_commit(struct bt_gatt_populate *);
+>>>
+>>> The start function would tell gatt-client that it's being populated so
+>>> it would prevent this from being called twice. All of the _add_*
+>>> functions would create a temporary tree owned by the populate
+>>> structure, using the same internal structures defined in
+>>> shared/gatt-client.c. Calling bt_gatt_populate_commit would then pass
+>>> the ownership of the services to the bt_gatt_client, and
+>>> bt_gatt_client would perform the MTU exchange, subscribe to
+>>> notifications from the "Service Changed" characteristic if one exists,
+>>> mark itself as ready and invoke the ready handler.
+>>>
+>>> If the upper-layer wants to store the current contents of gatt-client,
+>>> they can do so by iterating through its services and caching them to a
+>>> file directly. This way, shared/gatt-client would remain agnostic to
+>>> any storage format.
+>>>
+>>> Comments requested.
+>>> Arman
 >
-> Yep, perhaps it is better to have this kind of tests in another file
-> since this one is dedicated to tests from the TS.
+> I discussed with Johan about this, perhaps we should reuse bt_gatt_db
+> also for client which could simplify the API quite a bit, and remove
+> the need of iterators. So basically each device would have a instance
+> of bt_gatt_db which can be populated from the storage on init but more
+> importantly we can keep it alive as longs as the device is paired so
+> it became very similar to what we are already doing with
+> bt_gatt_server. We probably gonna need to adapt a little bit
+> bt_gatt_db, perhaps a reset is needed if service changes, etc, for the
+> iterators we could probably replace with gatt_db_find_by_type then you
+> pass the type you want: primary, secondary, etc, which in my opinion
+> is a much simpler API. Also we could take advantage of
+> gatt_db_attribute so that the read and write callbacks are registered
+> by the core which takes care of invoking bt_gatt_client that way the
+> interface between core and plugins could be done entirely with
+> gatt_db_attribute.
+>
+> What do you thing? It probably sets us back a little bit in terms of
+> converting the core but I think it is worth it considering since it
+> would align server and client db abstraction.
 >
 
-I mostly wanted to reuse the code, which would be common to both kinds
-of tests. You're right in that the TS doesn't talk about this kind of
-test case but the core spec at least mentions a bi-directional MTU
-exchange at some point, so perhaps there's value in adding this as a
-case here. Either way, I'm fine with creating a new test file that
-performs non-TS test cases in general.
+I'm not against simplifying the iterators or perhaps making db and
+client look similar but I think that the current gatt_db API is too
+low-level for client usage. Every time a profile wants to iterate
+through characteristics, or query a characteristics descriptors, they
+are going to have to make multiple calls to read_by_type,
+find_information, etc, which will return partial information, then
+obtain the attribute values, decode and interpret them. I don't see
+this as a clean GATT abstraction. To be frank, if that's what we're
+going to end up doing, the new shared/ code won't be much of an
+improvement over attrib/ which at least provides this kind of
+abstraction.
 
->
+Also note that from the perspective of a user of gatt_db, this
+wouldn't make client/server cases consistent. A user of gatt_db
+registers services, characteristics, descriptors, not individual
+"attributes" so to say. The user is still dealing with a higher level
+abstraction, and functions like read_by_type, which map to ATT
+protocol operations, are only called by bt_gatt_server, so the user
+doesn't have to interact with them.
+
+So, I think we're going to need to stick with the iterators or if
+we're going to use gatt_db for pre-populating a bt_gatt_client or
+perhaps use one to store remote attributes in general, then we'll want
+to provide a similar abstraction for gatt_db, so that one can iterate
+through its services, characteristics, etc.
+
 > --
 > Luiz Augusto von Dentz
 
-Arman
+-Arman
+
+On Fri, Nov 21, 2014 at 6:24 AM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> Hi Arman,
+>
+> On Thu, Nov 20, 2014 at 5:08 AM, Arman Uguray <armansito@chromium.org> wrote:
+>> Hi,
+>>
+>>> On Wed, Nov 19, 2014 at 1:48 PM, Arman Uguray <armansito@chromium.org> wrote:
+>>> Hi all,
+>>>
+>>> In the case where bluez is bonded with a remote device we don't want
+>>> to always perform service discovery, but instead to cache the
+>>> attribute data permanently and just use that on reconnections.
+>>> Currently shared/gatt-client automatically discovers all services when
+>>> created (via bt_gatt_client_new) so we need to add support to populate
+>>> a shared/gatt-client based on cached data in storage, since a
+>>> bt_gatt_client instance acts as our in-memory attribute cache for the
+>>> client role.
+>>>
+>>> I initially thought about storing everything in INI format and loading
+>>> things directly from a file, via some function like
+>>> bt_gatt_client_new_from_storage. The biggest problem with this
+>>> approach is parsing the INI format; since we don't want to pull in any
+>>> external dependencies into shared/gatt (e.g. glib) we would possibly
+>>> have to write our own key-value file parser for shared/ which seems
+>>> like overkill. We could possibly invent some simpler blob format for
+>>> shared/gatt-client but people brought to my attention on IRC that we
+>>> may want to leave the exact storage format to the upper-layer, e.g.
+>>> desktop and android versions of bluetoothd may want to use different
+>>> formats for their attribute cache that's consistent with the platform.
+>>>
+>>> So I decided to go with something generic instead. We would basically
+>>> add functions to manually populate a gatt-client and mark the client
+>>> as ready only after it's services have been populated. So we would
+>>> have these API changes:
+>>>
+>>> 1. A new argument to bt_gatt_client_new, to tell it not to perform
+>>> discovery. Something like "bool discover_services".
+>>>
+>>>     /* Don't perform discovery */
+>>>     bt_gatt_client_new(att, mtu, false);
+>>>
+>>> This would basically just leave the structure in "init" state and not
+>>> become ready.
+>>>
+>>> 2. We would then add a new structure to populate a gatt-client.
+>>>
+>>>     struct bt_gatt_populate { .. };  /* Probably something with a better name */
+>>>
+>>>     bool bt_gatt_populate_start(struct bt_gatt_populate *, struct
+>>> bt_gatt_client *);
+>>>     bool bt_gatt_populate_add_service(....)
+>>>     bool bt_gatt_populate_add_characteristic(...)
+>>>     bool bt_gatt_populate_add_descriptor(....)
+>>>     bool bt_gatt_populate_add_include(....)
+>>>     bool bt_gatt_populate_cancel(...)
+>>>     bool bt_gatt_populate_commit(struct bt_gatt_populate *);
+>>>
+>>> The start function would tell gatt-client that it's being populated so
+>>> it would prevent this from being called twice. All of the _add_*
+>>> functions would create a temporary tree owned by the populate
+>>> structure, using the same internal structures defined in
+>>> shared/gatt-client.c. Calling bt_gatt_populate_commit would then pass
+>>> the ownership of the services to the bt_gatt_client, and
+>>> bt_gatt_client would perform the MTU exchange, subscribe to
+>>> notifications from the "Service Changed" characteristic if one exists,
+>>> mark itself as ready and invoke the ready handler.
+>>>
+>>> If the upper-layer wants to store the current contents of gatt-client,
+>>> they can do so by iterating through its services and caching them to a
+>>> file directly. This way, shared/gatt-client would remain agnostic to
+>>> any storage format.
+>>>
+>>> Comments requested.
+>>> Arman
+>
+> I discussed with Johan about this, perhaps we should reuse bt_gatt_db
+> also for client which could simplify the API quite a bit, and remove
+> the need of iterators. So basically each device would have a instance
+> of bt_gatt_db which can be populated from the storage on init but more
+> importantly we can keep it alive as longs as the device is paired so
+> it became very similar to what we are already doing with
+> bt_gatt_server. We probably gonna need to adapt a little bit
+> bt_gatt_db, perhaps a reset is needed if service changes, etc, for the
+> iterators we could probably replace with gatt_db_find_by_type then you
+> pass the type you want: primary, secondary, etc, which in my opinion
+> is a much simpler API. Also we could take advantage of
+> gatt_db_attribute so that the read and write callbacks are registered
+> by the core which takes care of invoking bt_gatt_client that way the
+> interface between core and plugins could be done entirely with
+> gatt_db_attribute.
+>
+> What do you thing? It probably sets us back a little bit in terms of
+> converting the core but I think it is worth it considering since it
+> would align server and client db abstraction.
+>
+> --
+> Luiz Augusto von Dentz
