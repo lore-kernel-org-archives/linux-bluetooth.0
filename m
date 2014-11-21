@@ -1,136 +1,255 @@
 Return-Path: <cyrus@holtmann.org>
-From: Gowtham Anandha Babu <gowtham.ab@samsung.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: d.kasatkin@samsung.com, bharat.panda@samsung.com, cpgs@samsung.com,
-	Gowtham Anandha Babu <gowtham.ab@samsung.com>
-Subject: [PATCH] tools/sdptool: Add support for MAP service
-Date: Fri, 21 Nov 2014 14:19:24 +0530
-Message-id: <1416559765-26427-1-git-send-email-gowtham.ab@samsung.com>
+MIME-Version: 1.0
+In-Reply-To: <CAHrH25SqeOydY6wPVKfX6mp5KtXa8Ki1My+P6=XspR1_NCuJDw@mail.gmail.com>
+References: <1416459821-16478-1-git-send-email-armansito@chromium.org>
+	<1416459821-16478-2-git-send-email-armansito@chromium.org>
+	<CAHrH25SqeOydY6wPVKfX6mp5KtXa8Ki1My+P6=XspR1_NCuJDw@mail.gmail.com>
+Date: Fri, 21 Nov 2014 09:32:18 +0100
+Message-ID: <CABD6X-J6bGF8m0nhUxPARX1ir2vbk4jrNey9WMBhgyCnPsjbxQ@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 2/2] unit/test-gatt: Add SERVER and COEX test types
+ and MTU tests.
+From: Marcin Kraglak <marcin.kraglak@tieto.com>
+To: Arman Uguray <armansito@chromium.org>
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Add support for MAP service in local SDP server.
+Hi Arman,
 
-The MAP MAS record captured in local SDP server:
+On 21 November 2014 00:54, Arman Uguray <armansito@chromium.org> wrote:
+> Hi,
+>
+>> On Wed, Nov 19, 2014 at 9:03 PM, Arman Uguray <armansito@chromium.org> wrote:
+>> This patch adds support for the following two features:
+>>
+>>   1. SERVER: The test context creates a bt_gatt_server.
+>>   2. COEX: The test context creates a bt_gatt_server AND a bt_gatt_client.
+>>
+>> Also added 4 new test cases for the "Server Configuration" category, with two
+>> new client-role and two new server-role tests which exercise the following:
+>>
+>> /TP/GAC/CL/BV-01-C:
+>>   1. CLIENT test with incoming "Exchange MTU" request. bt_att automatically
+>>   responds with "ERROR_NOT_SUPPORTED".
+>>   2. COEX test. The "DUT" sends "Exchange MTU" request first and the "tester"
+>>   sends it right after.
+>>
+>> /TP/GAC/SR/BV-01-C:
+>>   1. SERVER test with incoming "Exchange MTU" request. No outgoing request.
+>>   2. COEX test. The "tester" sends "Exchange MTU" request first and the "DUT"
+>>   sends it right after.
+>> ---
+>>  unit/test-gatt.c | 101 +++++++++++++++++++++++++++++++++++++++++++++++++++----
+>>  1 file changed, 95 insertions(+), 6 deletions(-)
+>>
+>> diff --git a/unit/test-gatt.c b/unit/test-gatt.c
+>> index 900f5e3..7ab7780 100644
+>> --- a/unit/test-gatt.c
+>> +++ b/unit/test-gatt.c
+>> @@ -40,6 +40,9 @@
+>>  #include "src/shared/att.h"
+>>  #include "src/shared/gatt-helpers.h"
+>>  #include "src/shared/gatt-client.h"
+>> +#include "src/shared/queue.h"
+>> +#include "src/shared/gatt-db.h"
+>> +#include "src/shared/gatt-server.h"
+>>
+>>  struct test_pdu {
+>>         bool valid;
+>> @@ -50,7 +53,8 @@ struct test_pdu {
+>>  enum context_type {
+>>         ATT,
+>>         CLIENT,
+>> -       SERVER
+>> +       SERVER,
+>> +       COEX
+>>  };
+>>
+>>  struct gatt_service {
+>> @@ -72,7 +76,9 @@ struct test_data {
+>>  struct context {
+>>         GMainLoop *main_loop;
+>>         struct bt_gatt_client *client;
+>> +       struct bt_gatt_server *server;
+>>         struct bt_att *att;
+>> +       struct gatt_db *db;
+>>         guint source;
+>>         guint process;
+>>         int fd;
+>> @@ -114,9 +120,13 @@ struct context {
+>>  #define define_test_client(name, function, bt_services, test_step, args...)\
+>>         define_test(name, function, CLIENT, NULL, bt_services, test_step, args)
+>>
+>> -#define SERVICE_DATA_1_PDU                                             \
+>> -               raw_pdu(0x02, 0x00, 0x02),                              \
+>> -               raw_pdu(0x03, 0x00, 0x02),                              \
+>> +#define define_test_server(name, function, bt_services, test_step, args...)\
+>> +       define_test(name, function, SERVER, NULL, bt_services, test_step, args)
+>> +
+>> +#define define_test_coex(name, function, bt_services, test_step, args...)\
+>> +       define_test(name, function, COEX, NULL, bt_services, test_step, args)
+>> +
+>> +#define SERVICE_DATA_1_DISCOVERY_PDU                                   \
+>>                 raw_pdu(0x10, 0x01, 0x00, 0xff, 0xff, 0x00, 0x28),      \
+>>                 raw_pdu(0x11, 0x06, 0x01, 0x00, 0x04, 0x00, 0x01, 0x18),\
+>>                 raw_pdu(0x10, 0x05, 0x00, 0xff, 0xff, 0x00, 0x28),      \
+>> @@ -144,6 +154,11 @@ struct context {
+>>                 raw_pdu(0x04, 0x08, 0x00, 0x08, 0x00),                  \
+>>                 raw_pdu(0x05, 0x01, 0x08, 0x00, 0x01, 0x29)
+>>
+>> +#define SERVICE_DATA_1_PDU                                             \
+>> +               raw_pdu(0x02, 0x00, 0x02),                              \
+>> +               raw_pdu(0x03, 0x00, 0x02),                              \
+>> +               SERVICE_DATA_1_DISCOVERY_PDU
+>> +
+>>  static bt_uuid_t uuid_16 = {
+>>         .type = BT_UUID16,
+>>         .value.u16 = 0x1800
+>> @@ -282,11 +297,18 @@ static gboolean send_pdu(gpointer user_data)
+>>
+>>  static void context_process(struct context *context)
+>>  {
+>> +       /* Quit the context if we processed the last PDU */
+>>         if (!context->data->pdu_list[context->pdu_offset].valid) {
+>>                 context_quit(context);
+>>                 return;
+>>         }
+>>
+>> +       /* Skip the PDU, if it's empty */
+>> +       if (!context->data->pdu_list[context->pdu_offset].size) {
+>> +               context->pdu_offset++;
+>> +               return;
+>> +       }
+>> +
+>>         context->process = g_idle_add(send_pdu, context);
+>>  }
+>>
+>> @@ -427,6 +449,7 @@ static struct context *create_context(uint16_t mtu, gconstpointer data)
+>>         GIOChannel *channel;
+>>         int err, sv[2];
+>>         struct bt_att *att;
+>> +       bool coex = false;
+>>
+>>         context->main_loop = g_main_loop_new(NULL, FALSE);
+>>         g_assert(context->main_loop);
+>> @@ -447,6 +470,22 @@ static struct context *create_context(uint16_t mtu, gconstpointer data)
+>>
+>>                 bt_gatt_exchange_mtu(context->att, mtu, NULL, NULL, NULL);
+>>                 break;
+>> +       case COEX:
+>> +               coex = true;
+>> +       case SERVER:
+>> +               context->db = gatt_db_new();
+>> +               g_assert(context->db);
+>> +
+>> +               context->server = bt_gatt_server_new(context->db, att, mtu);
+>> +               g_assert(context->server);
+>> +
+>> +               if (g_test_verbose())
+>> +                       bt_gatt_server_set_debug(context->server, print_debug,
+>> +                                               "bt_gatt_server:", NULL);
+>> +               if (!coex) {
+>> +                       bt_att_unref(att);
+>> +                       break;
+>> +               }
+>>         case CLIENT:
+>>                 context->client = bt_gatt_client_new(att, mtu, NULL);
+>>                 g_assert(context->client);
+>> @@ -500,6 +539,8 @@ static void destroy_context(struct context *context)
+>>                 g_source_remove(context->source);
+>>
+>>         bt_gatt_client_unref(context->client);
+>> +       bt_gatt_server_unref(context->server);
+>> +       gatt_db_destroy(context->db);
+>>
+>>         if (context->att)
+>>                 bt_att_unref(context->att);
+>> @@ -577,6 +618,22 @@ static void test_client(gconstpointer data)
+>>         execute_context(context);
+>>  }
+>>
+>> +static void test_server(gconstpointer data)
+>> +{
+>> +       struct context *context = create_context(512, data);
+>> +       const struct test_pdu pdu = raw_pdu(0x02, 0x17, 0x00);
+>> +       ssize_t len;
 
-Service Name: OBEX Message Access Server
-Service RecHandle: 0x1000e
-Service Class ID List:
-  "Message Access - MAS" (0x1132)
-Protocol Descriptor List:
-  "L2CAP" (0x0100)
-  "RFCOMM" (0x0003)
-    Channel: 17
-  "OBEX" (0x0008)
-Profile Descriptor List:
-  "Message Access" (0x1134)
-    Version: 0x0100
+Could we call process_context() here and define pdu in define_test_server?
+It will be much easier to understand what test does.
+>> +
+>> +       len = write(context->fd, pdu.data, pdu.size);
+>> +
+>> +       if (g_test_verbose())
+>> +               util_hexdump('<', pdu.data, len, test_debug, "GATT: ");
+>> +
+>> +       g_assert_cmpint(len, ==, pdu.size);
+>> +
+>> +       execute_context(context);
+>> +}
+>> +
+>>  static void test_search_primary(gconstpointer data)
+>>  {
+>>         struct context *context = create_context(512, data);
+>> @@ -708,11 +765,43 @@ int main(int argc, char *argv[])
+>>          * Server Configuration
+>>          *
+>>          * The test group objective is to verify Generic Attribute Profile
+>> -        * Server Configuration.
+>> +        * Server Configuration. The tested configurations are:
+>> +        *
+>> +        *   1. Client-role only.
+>> +        *   2. Server-role only.
+>> +        *   3. Both roles with only bt_gatt_client.
+>> +        *   4. Both roles with bt_gatt_client and bt_gatt_server (client
+>> +        *      request first).
+>> +        *   5. Both roles with bt_gatt_client and bt_gatt_server (server
+>> +        *      response first).
+>>          */
+>>
+>>         define_test_client("/TP/GAC/CL/BV-01-C", test_client, NULL, NULL,
+>> -                               raw_pdu(0x02, 0x00, 0x02));
+>> +                                               raw_pdu(0x02, 0x00, 0x02));
+>> +
+>> +       define_test_server("/TP/GAC/SR/BV-01-C", test_server, NULL, NULL,
+>> +                                               raw_pdu(0x03, 0x00, 0x02));
+>> +
+>> +       define_test_client("/TP/GAC/CL/BV-01-C", test_client, NULL, NULL,
+>> +                                       raw_pdu(0x02, 0x00, 0x02),
+>> +                                       raw_pdu(0x02, 0x17, 0x00),
+>> +                                       raw_pdu(0x01, 0x02, 0x00, 0x00, 0x06),
+>> +                                       raw_pdu(0x03, 0x17, 0x00),
+>> +                                       SERVICE_DATA_1_DISCOVERY_PDU);
+>> +
+>> +      define_test_coex("/TP/GAC/CL/BV-01-C", test_c lient, NULL, NULL,
+>> +                                               raw_pdu(0x02, 0x00, 0x02),
+>> +                                               raw_pdu(0x02, 0x17, 0x00),
+>> +                                               raw_pdu(0x03, 0x00, 0x02),
+>> +                                               raw_pdu(0x03, 0x17, 0x00),
+>> +                                               SERVICE_DATA_1_DISCOVERY_PDU);
+>> +
+>> +       define_test_coex("/TP/GAC/SR/BV-01-C", test_server, NULL, NULL,
+>> +                                               raw_pdu(0x03, 0x00, 0x02),
+>> +                                               raw_pdu(),  /* wait */
+>> +                                               raw_pdu(0x02, 0x00, 0x02),
+>> +                                               raw_pdu(0x03, 0x17, 0x00),
+>> +                                               SERVICE_DATA_1_DISCOVERY_PDU);
+>>
 
-Now we are able to do sdptool search/add/del/get
-for MAP service.
----
- tools/sdptool.c | 81 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 81 insertions(+)
+Maybe it is better to rename tests with coex, as these scenarios are
+not defined in test spec.
 
-diff --git a/tools/sdptool.c b/tools/sdptool.c
-index f3aebd2..17561b1 100644
---- a/tools/sdptool.c
-+++ b/tools/sdptool.c
-@@ -1916,6 +1916,86 @@ end:
- 	return ret;
- }
- 
-+static int add_map(sdp_session_t *session, svc_info_t *si)
-+{
-+	sdp_list_t *svclass_id, *pfseq, *apseq, *root;
-+	uuid_t root_uuid, map_uuid, l2cap_uuid, rfcomm_uuid, obex_uuid;
-+	sdp_profile_desc_t profile[1];
-+	sdp_list_t *aproto, *proto[3];
-+	sdp_record_t record;
-+	uint8_t chan = si->channel ? si->channel : 17;
-+	sdp_data_t *channel;
-+	uint8_t msg_formats[] = {0x0f};
-+	uint32_t supp_features[] = {0x0000007f};
-+	uint8_t dtd_msg = SDP_UINT8, dtd_sf = SDP_UINT32;
-+	sdp_data_t *smlist;
-+	sdp_data_t *sflist;
-+	int ret = 0;
-+
-+	memset(&record, 0, sizeof(sdp_record_t));
-+	record.handle = si->handle;
-+
-+	sdp_uuid16_create(&root_uuid, PUBLIC_BROWSE_GROUP);
-+	root = sdp_list_append(0, &root_uuid);
-+	sdp_set_browse_groups(&record, root);
-+
-+	sdp_uuid16_create(&map_uuid, MAP_MSE_SVCLASS_ID);
-+	svclass_id = sdp_list_append(0, &map_uuid);
-+	sdp_set_service_classes(&record, svclass_id);
-+
-+	sdp_uuid16_create(&profile[0].uuid, MAP_PROFILE_ID);
-+	profile[0].version = 0x0100;
-+	pfseq = sdp_list_append(0, profile);
-+	sdp_set_profile_descs(&record, pfseq);
-+
-+	sdp_uuid16_create(&l2cap_uuid, L2CAP_UUID);
-+	proto[0] = sdp_list_append(0, &l2cap_uuid);
-+	apseq = sdp_list_append(0, proto[0]);
-+
-+	sdp_uuid16_create(&rfcomm_uuid, RFCOMM_UUID);
-+	proto[1] = sdp_list_append(0, &rfcomm_uuid);
-+	channel = sdp_data_alloc(SDP_UINT8, &chan);
-+	proto[1] = sdp_list_append(proto[1], channel);
-+	apseq = sdp_list_append(apseq, proto[1]);
-+
-+	sdp_uuid16_create(&obex_uuid, OBEX_UUID);
-+	proto[2] = sdp_list_append(0, &obex_uuid);
-+	apseq = sdp_list_append(apseq, proto[2]);
-+
-+	aproto = sdp_list_append(0, apseq);
-+	sdp_set_access_protos(&record, aproto);
-+
-+	smlist = sdp_data_alloc(dtd_msg, msg_formats);
-+	sdp_attr_add(&record, SDP_ATTR_SUPPORTED_MESSAGE_TYPES, smlist);
-+
-+	sflist = sdp_data_alloc(dtd_sf, supp_features);
-+	sdp_attr_add(&record, SDP_ATTR_MAP_SUPPORTED_FEATURES, sflist);
-+
-+	sdp_set_info_attr(&record, "OBEX Message Access Server", 0, 0);
-+
-+	if (sdp_device_record_register(session, &interface, &record,
-+			SDP_RECORD_PERSIST) < 0) {
-+		printf("Service Record registration failed\n");
-+		ret = -1;
-+		goto end;
-+	}
-+
-+	printf("MAP service registered\n");
-+
-+end:
-+	sdp_data_free(channel);
-+	sdp_list_free(proto[0], 0);
-+	sdp_list_free(proto[1], 0);
-+	sdp_list_free(proto[2], 0);
-+	sdp_list_free(apseq, 0);
-+	sdp_list_free(pfseq, 0);
-+	sdp_list_free(aproto, 0);
-+	sdp_list_free(root, 0);
-+	sdp_list_free(svclass_id, 0);
-+
-+	return ret;
-+}
-+
- static int add_ftp(sdp_session_t *session, svc_info_t *si)
- {
- 	sdp_list_t *svclass_id, *pfseq, *apseq, *root;
-@@ -3547,6 +3627,7 @@ struct {
- 	{ "SAP",	SAP_SVCLASS_ID,			add_simaccess	},
- 	{ "PBAP",	PBAP_SVCLASS_ID,		add_pbap,	},
- 
-+	{ "MAP",	MAP_SVCLASS_ID,			add_map,	},
- 	{ "NAP",	NAP_SVCLASS_ID,			add_nap		},
- 	{ "GN",		GN_SVCLASS_ID,			add_gn		},
- 	{ "PANU",	PANU_SVCLASS_ID,		add_panu	},
--- 
-1.9.1
+>>         /*
+>>          * Discovery
+>> --
+>> 2.1.0.rc2.206.gedb03e5
+>>
+>
+> ping.
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
+BR
+Marcin
