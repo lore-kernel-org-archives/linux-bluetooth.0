@@ -4,211 +4,127 @@ To: linux-bluetooth@vger.kernel.org
 Cc: Benjamin Tissoires <benjamin.tissoires@redhat.com>,
 	Marcel Holtmann <marcel@holtmann.org>,
 	Johan Hedberg <johan.hedberg@gmail.com>
-Subject: [PATCH 1/4] hog: import latest uhid.h definition
-Date: Fri, 21 Nov 2014 15:41:43 +0100
-Message-Id: <1416580906-22134-2-git-send-email-dh.herrmann@gmail.com>
+Subject: [PATCH 4/4] hog: implement set_report functionality
+Date: Fri, 21 Nov 2014 15:41:46 +0100
+Message-Id: <1416580906-22134-5-git-send-email-dh.herrmann@gmail.com>
 In-Reply-To: <1416580906-22134-1-git-send-email-dh.herrmann@gmail.com>
 References: <1416580906-22134-1-git-send-email-dh.herrmann@gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Benjamin Tissoires <benjamin.tissoires@redhat.com>
 
-Kernel 3.18 ships a new API for uhid devices. This API is retro-compatible
-so we can keep the current symbols.
----
- profiles/input/uhid_copy.h | 117 ++++++++++++++++++++++++++++++++++++++++-----
- 1 file changed, 105 insertions(+), 12 deletions(-)
+When UHID_SET_REPORT is received, hog has to send the given value
+of the report to the device and send back the error code to the caller.
 
-diff --git a/profiles/input/uhid_copy.h b/profiles/input/uhid_copy.h
-index 23a6287..0ef73d4 100644
---- a/profiles/input/uhid_copy.h
-+++ b/profiles/input/uhid_copy.h
-@@ -21,35 +21,49 @@
- 
- #include <linux/input.h>
- #include <linux/types.h>
-+#include <linux/hid.h>
- 
- enum uhid_event_type {
--	UHID_CREATE,
-+	__UHID_LEGACY_CREATE,
- 	UHID_DESTROY,
- 	UHID_START,
- 	UHID_STOP,
- 	UHID_OPEN,
- 	UHID_CLOSE,
- 	UHID_OUTPUT,
--	UHID_OUTPUT_EV,			/* obsolete! */
--	UHID_INPUT,
--	UHID_FEATURE,
--	UHID_FEATURE_ANSWER,
-+	__UHID_LEGACY_OUTPUT_EV,
-+	__UHID_LEGACY_INPUT,
-+	UHID_GET_REPORT,
-+	UHID_GET_REPORT_REPLY,
-+	UHID_CREATE2,
-+	UHID_INPUT2,
-+	UHID_SET_REPORT,
-+	UHID_SET_REPORT_REPLY,
+This function has to be synchronous, so the answer is sent in
+set_report_cb().
+
+(David: Track reports and cancel them on timeouts. Also fix some
+        "get"->"set" typos.)
+---
+ profiles/input/hog.c | 76 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 76 insertions(+)
+
+diff --git a/profiles/input/hog.c b/profiles/input/hog.c
+index 25672a0..41da9f9 100644
+--- a/profiles/input/hog.c
++++ b/profiles/input/hog.c
+@@ -92,6 +92,8 @@ struct hog_device {
+ 	uint8_t			flags;
+ 	guint			getrep_att;
+ 	uint16_t		getrep_id;
++	guint			setrep_att;
++	uint16_t		setrep_id;
  };
  
--struct uhid_create_req {
-+struct uhid_create2_req {
- 	__u8 name[128];
- 	__u8 phys[64];
- 	__u8 uniq[64];
--	__u8 *rd_data;
- 	__u16 rd_size;
--
- 	__u16 bus;
- 	__u32 vendor;
- 	__u32 product;
- 	__u32 version;
- 	__u32 country;
-+	__u8 rd_data[HID_MAX_DESCRIPTOR_SIZE];
- } __attribute__((__packed__));
+ struct report {
+@@ -387,6 +389,79 @@ static void forward_report(struct uhid_event *ev, void *user_data)
+ 						data, size, NULL, NULL);
+ }
  
-+enum uhid_dev_flag {
-+	UHID_DEV_NUMBERED_FEATURE_REPORTS			= (1ULL << 0),
-+	UHID_DEV_NUMBERED_OUTPUT_REPORTS			= (1ULL << 1),
-+	UHID_DEV_NUMBERED_INPUT_REPORTS				= (1ULL << 2),
-+};
++static void set_report_cb(guint8 status, const guint8 *pdu,
++					guint16 plen, gpointer user_data)
++{
++	struct hog_device *hogdev = user_data;
++	struct uhid_event rsp;
++	int err;
 +
-+struct uhid_start_req {
-+	__u64 dev_flags;
-+};
++	hogdev->setrep_att = 0;
 +
- #define UHID_DATA_MAX 4096
++	memset(&rsp, 0, sizeof(rsp));
++	rsp.type = UHID_SET_REPORT_REPLY;
++	rsp.u.set_report_reply.id = hogdev->setrep_id;
++	rsp.u.set_report_reply.err = status;
++
++	if (status != 0)
++		error("Error setting Report value: %s", att_ecode2str(status));
++
++	err = bt_uhid_send(hogdev->uhid, &rsp);
++	if (err < 0)
++		error("bt_uhid_send: %s", strerror(-err));
++}
++
++static void set_report(struct uhid_event *ev, void *user_data)
++{
++	struct hog_device *hogdev = user_data;
++	struct report *report;
++	void *data;
++	int size;
++	int err;
++
++	/* uhid never sends reqs in parallel; if there's a req, it timed out */
++	if (hogdev->setrep_att) {
++		g_attrib_cancel(hogdev->attrib, hogdev->setrep_att);
++		hogdev->setrep_att = 0;
++	}
++
++	hogdev->setrep_id = ev->u.set_report.id;
++
++	report = find_report(hogdev, ev->u.set_report.rtype,
++							ev->u.set_report.rnum);
++	if (!report) {
++		err = ENOTSUP;
++		goto fail;
++	}
++
++	data = ev->u.set_report.data;
++	size = ev->u.set_report.size;
++	if (hogdev->has_report_id && size > 0) {
++		data++;
++		--size;
++	}
++
++	DBG("Sending report type %d ID %d to handle 0x%X", report->type,
++				report->id, report->decl->value_handle);
++
++	if (hogdev->attrib == NULL)
++		return;
++
++	hogdev->setrep_att = gatt_write_char(hogdev->attrib,
++						report->decl->value_handle,
++						data, size, set_report_cb,
++						hogdev);
++	if (!hogdev->setrep_att) {
++		err = ENOMEM;
++		goto fail;
++	}
++
++	return;
++fail:
++	/* cancel the request on failure */
++	set_report_cb(err, NULL, 0, hogdev);
++}
++
+ static void get_report_cb(guint8 status, const guint8 *pdu, guint16 len,
+ 							gpointer user_data)
+ {
+@@ -610,6 +685,7 @@ static void report_map_read_cb(guint8 status, const guint8 *pdu, guint16 plen,
+ 	}
  
- enum uhid_report_type {
-@@ -58,9 +72,9 @@ enum uhid_report_type {
- 	UHID_INPUT_REPORT,
- };
- 
--struct uhid_input_req {
--	__u8 data[UHID_DATA_MAX];
-+struct uhid_input2_req {
- 	__u16 size;
-+	__u8 data[UHID_DATA_MAX];
- } __attribute__((__packed__));
- 
- struct uhid_output_req {
-@@ -69,20 +83,83 @@ struct uhid_output_req {
- 	__u8 rtype;
- } __attribute__((__packed__));
- 
--/* Obsolete! Newer kernels will no longer send these events but instead convert
-- * it into raw output reports via UHID_OUTPUT. */
-+struct uhid_get_report_req {
-+	__u32 id;
-+	__u8 rnum;
-+	__u8 rtype;
-+} __attribute__((__packed__));
-+
-+struct uhid_get_report_reply_req {
-+	__u32 id;
-+	__u16 err;
-+	__u16 size;
-+	__u8 data[UHID_DATA_MAX];
-+} __attribute__((__packed__));
-+
-+struct uhid_set_report_req {
-+	__u32 id;
-+	__u8 rnum;
-+	__u8 rtype;
-+	__u16 size;
-+	__u8 data[UHID_DATA_MAX];
-+} __attribute__((__packed__));
-+
-+struct uhid_set_report_reply_req {
-+	__u32 id;
-+	__u16 err;
-+} __attribute__((__packed__));
-+
-+/*
-+ * Compat Layer
-+ * All these commands and requests are obsolete. You should avoid using them in
-+ * new code. We support them for backwards-compatibility, but you might not get
-+ * access to new feature in case you use them.
-+ */
-+
-+enum uhid_legacy_event_type {
-+	UHID_CREATE			= __UHID_LEGACY_CREATE,
-+	UHID_OUTPUT_EV			= __UHID_LEGACY_OUTPUT_EV,
-+	UHID_INPUT			= __UHID_LEGACY_INPUT,
-+	UHID_FEATURE			= UHID_GET_REPORT,
-+	UHID_FEATURE_ANSWER		= UHID_GET_REPORT_REPLY,
-+};
-+
-+/* Obsolete! Use UHID_CREATE2. */
-+struct uhid_create_req {
-+	__u8 name[128];
-+	__u8 phys[64];
-+	__u8 uniq[64];
-+	__u8 *rd_data;
-+	__u16 rd_size;
-+
-+	__u16 bus;
-+	__u32 vendor;
-+	__u32 product;
-+	__u32 version;
-+	__u32 country;
-+} __attribute__((__packed__));
-+
-+/* Obsolete! Use UHID_INPUT2. */
-+struct uhid_input_req {
-+	__u8 data[UHID_DATA_MAX];
-+	__u16 size;
-+} __attribute__((__packed__));
-+
-+/* Obsolete! Kernel uses UHID_OUTPUT exclusively now. */
- struct uhid_output_ev_req {
- 	__u16 type;
- 	__u16 code;
- 	__s32 value;
- } __attribute__((__packed__));
- 
-+/* Obsolete! Kernel uses ABI compatible UHID_GET_REPORT. */
- struct uhid_feature_req {
- 	__u32 id;
- 	__u8 rnum;
- 	__u8 rtype;
- } __attribute__((__packed__));
- 
-+/* Obsolete! Use ABI compatible UHID_GET_REPORT_REPLY. */
- struct uhid_feature_answer_req {
- 	__u32 id;
- 	__u16 err;
-@@ -90,6 +167,15 @@ struct uhid_feature_answer_req {
- 	__u8 data[UHID_DATA_MAX];
- } __attribute__((__packed__));
- 
-+/*
-+ * UHID Events
-+ * All UHID events from and to the kernel are encoded as "struct uhid_event".
-+ * The "type" field contains a UHID_* type identifier. All payload depends on
-+ * that type and can be accessed via ev->u.XYZ accordingly.
-+ * If user-space writes short events, they're extended with 0s by the kernel. If
-+ * the kernel writes short events, user-space shall extend them with 0s.
-+ */
-+
- struct uhid_event {
- 	__u32 type;
- 
-@@ -99,7 +185,14 @@ struct uhid_event {
- 		struct uhid_output_req output;
- 		struct uhid_output_ev_req output_ev;
- 		struct uhid_feature_req feature;
-+		struct uhid_get_report_req get_report;
- 		struct uhid_feature_answer_req feature_answer;
-+		struct uhid_get_report_reply_req get_report_reply;
-+		struct uhid_create2_req create2;
-+		struct uhid_input2_req input2;
-+		struct uhid_set_report_req set_report;
-+		struct uhid_set_report_reply_req set_report_reply;
-+		struct uhid_start_req start;
- 	} u;
- } __attribute__((__packed__));
+ 	bt_uhid_register(hogdev->uhid, UHID_OUTPUT, forward_report, hogdev);
++	bt_uhid_register(hogdev->uhid, UHID_SET_REPORT, set_report, hogdev);
+ 	bt_uhid_register(hogdev->uhid, UHID_GET_REPORT, get_report, hogdev);
+ }
  
 -- 
 2.1.3
