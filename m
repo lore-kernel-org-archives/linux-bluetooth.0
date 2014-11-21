@@ -1,300 +1,51 @@
 Return-Path: <cyrus@holtmann.org>
-From: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
-Subject: [RFC 2/2] android/avrcp: Initial support for AVRCP controller interface
-Date: Fri, 21 Nov 2014 12:14:55 +0200
-Message-Id: <1416564895-18577-2-git-send-email-ravikumar.veeramally@linux.intel.com>
-In-Reply-To: <1416564895-18577-1-git-send-email-ravikumar.veeramally@linux.intel.com>
-References: <1416564895-18577-1-git-send-email-ravikumar.veeramally@linux.intel.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Fri, 21 Nov 2014 12:08:18 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Arman Uguray <armansito@chromium.org>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	BlueZ development <linux-bluetooth@vger.kernel.org>,
+	Jakub Pawlowski <jpawlowski@google.com>
+Subject: Re: Handling EBUSY for LE connections.
+Message-ID: <20141121100818.GA25744@t440s.lan>
+References: <50181A20-3313-48C7-924B-05C67B975139@holtmann.org>
+ <CAHrH25T6tmUO2Zvsr=R7+yHwQE0_hY_sMt4UQAmCBMZBOH0PRQ@mail.gmail.com>
+ <ED9629AB-B978-49FE-A7D7-5D9E62642504@holtmann.org>
+ <CAHrH25Te4J6ospnJYA00mb1RofwHrS4=KD8LjmTLvo5Y4Jy8EQ@mail.gmail.com>
+ <CAHrH25S5X5UZJwH0JuoWGW70bDdO48iS8Ex5pF0K9Cd7JsRV8A@mail.gmail.com>
+ <7ED5AE30-EF53-47EA-A9CE-DD371CE10910@holtmann.org>
+ <CAHrH25QzAYG-uHgEJ2rBmpJ_RMgW9zZ0+WvwtY3Mo0zKUxgB9w@mail.gmail.com>
+ <20141119212751.GA6364@t440s.P-661HNU-F1>
+ <CAHrH25Qds=wD87kT-_6f+RJP-MDVmjDSATa0qQmHKmHMUNv0iw@mail.gmail.com>
+ <20141120093403.GA20651@t440s.lan>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20141120093403.GA20651@t440s.lan>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Initial register and unregister service functionality provided.
-Either AVRCP target or controller role registered not both at
-a time.
----
- android/Android.mk                |   1 +
- android/Makefile.am               |   1 +
- android/avrcp-ctrl.c              | 132 ++++++++++++++++++++++++++++++++++++++
- android/{avrcp.h => avrcp-ctrl.h} |  11 ++--
- android/avrcp.c                   |  11 ++++
- android/avrcp.h                   |   1 +
- android/main.c                    |  12 ++++
- 7 files changed, 163 insertions(+), 6 deletions(-)
- create mode 100644 android/avrcp-ctrl.c
- copy android/{avrcp.h => avrcp-ctrl.h} (75%)
+Hi Arman,
 
-diff --git a/android/Android.mk b/android/Android.mk
-index 34c6186..73b65fe 100644
---- a/android/Android.mk
-+++ b/android/Android.mk
-@@ -49,6 +49,7 @@ LOCAL_SRC_FILES := \
- 	bluez/android/avctp.c \
- 	bluez/android/avrcp-common.c \
- 	bluez/android/avrcp.c \
-+	bluez/android/avrcp-ctrl.c \
- 	bluez/android/avrcp-lib.c \
- 	bluez/android/pan.c \
- 	bluez/android/handsfree.c \
-diff --git a/android/Makefile.am b/android/Makefile.am
-index 98b8a3a..5a6f3ee 100644
---- a/android/Makefile.am
-+++ b/android/Makefile.am
-@@ -39,6 +39,7 @@ android_bluetoothd_SOURCES = android/main.c \
- 				android/avctp.h android/avctp.c \
- 				android/avrcp-common.h android/avrcp-common.c \
- 				android/avrcp.h android/avrcp.c \
-+				android/avrcp-ctrl.h android/avrcp-ctrl.c \
- 				android/avrcp-lib.h android/avrcp-lib.c \
- 				android/socket.h android/socket.c \
- 				android/pan.h android/pan.c \
-diff --git a/android/avrcp-ctrl.c b/android/avrcp-ctrl.c
-new file mode 100644
-index 0000000..ec247d2
---- /dev/null
-+++ b/android/avrcp-ctrl.c
-@@ -0,0 +1,132 @@
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2014  Intel Corporation. All rights reserved.
-+ *
-+ *
-+ *  This library is free software; you can redistribute it and/or
-+ *  modify it under the terms of the GNU Lesser General Public
-+ *  License as published by the Free Software Foundation; either
-+ *  version 2.1 of the License, or (at your option) any later version.
-+ *
-+ *  This library is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ *  Lesser General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU Lesser General Public
-+ *  License along with this library; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-+ *
-+ */
-+
-+#ifdef HAVE_CONFIG_H
-+#include <config.h>
-+#endif
-+
-+#include <stdlib.h>
-+#include <stdbool.h>
-+#include <errno.h>
-+#include <glib.h>
-+
-+#include "btio/btio.h"
-+#include "lib/bluetooth.h"
-+#include "lib/sdp.h"
-+#include "lib/sdp_lib.h"
-+#include "src/sdp-client.h"
-+#include "src/shared/util.h"
-+#include "src/log.h"
-+
-+#include "avctp.h"
-+#include "avrcp-lib.h"
-+#include "hal-msg.h"
-+#include "ipc-common.h"
-+#include "ipc.h"
-+#include "bluetooth.h"
-+#include "avrcp.h"
-+#include "avrcp-ctrl.h"
-+#include "avrcp-common.h"
-+#include "utils.h"
-+
-+#define L2CAP_PSM_AVCTP 0x17
-+
-+#define AVRCP_FEATURE_CATEGORY_1        0x0001
-+#define AVRCP_FEATURE_CATEGORY_2        0x0002
-+#define AVRCP_FEATURE_CATEGORY_3        0x0004
-+#define AVRCP_FEATURE_CATEGORY_4        0x0008
-+
-+static bdaddr_t adapter_addr;
-+static uint32_t record_ct_id = 0;
-+static struct ipc *hal_ipc = NULL;
-+
-+static void handle_send_passthrough(const void *buf, uint16_t len)
-+{
-+	DBG("Not Implemented");
-+
-+	ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_AVRCP_CTRL,
-+					HAL_OP_AVRCP_CTRL_SEND_PASSTHROUGH,
-+							HAL_STATUS_UNSUPPORTED);
-+}
-+
-+static const struct ipc_handler cmd_handlers[] = {
-+	/* HAL_OP_AVRCP_CTRL_SEND_PASSTHROUGH */
-+	{ handle_send_passthrough, false,
-+			sizeof(struct hal_cmd_avrcp_ctrl_send_passthrough) },
-+};
-+
-+bool bt_avrcp_ctrl_register(struct ipc *ipc, const bdaddr_t *addr, uint8_t mode)
-+{
-+	sdp_record_t *rec;
-+	uint16_t features;
-+
-+	DBG("");
-+
-+	if (!bt_is_avrcp_registered()) {
-+		error("avrcp-ctrl: avrcp target already registered");
-+		return false;
-+	}
-+
-+	bacpy(&adapter_addr, addr);
-+
-+	features = AVRCP_FEATURE_CATEGORY_2 | AVRCP_FEATURE_CATEGORY_3 |
-+						AVRCP_FEATURE_CATEGORY_4;
-+
-+	rec = avrcp_ct_record(features);
-+	if (!rec) {
-+		error("avrcp-ctrl: Failed to allocate AVRCP CT record");
-+		goto fail;
-+	}
-+
-+	if (bt_adapter_add_record(rec, 0) < 0) {
-+		error("avrcp-ctrl: Failed to register AVRCP CT record");
-+		sdp_record_free(rec);
-+		goto fail;
-+	}
-+	record_ct_id = rec->handle;
-+
-+	hal_ipc = ipc;
-+
-+	ipc_register(hal_ipc, HAL_SERVICE_ID_AVRCP_CTRL, cmd_handlers,
-+						G_N_ELEMENTS(cmd_handlers));
-+
-+	return true;
-+fail:
-+	return false;
-+}
-+
-+void bt_avrcp_ctrl_unregister(void)
-+{
-+	DBG("");
-+
-+	ipc_unregister(hal_ipc, HAL_SERVICE_ID_AVRCP_CTRL);
-+	hal_ipc = NULL;
-+
-+	bt_adapter_remove_record(record_ct_id);
-+	record_ct_id = 0;
-+}
-+
-+bool bt_is_avrcp_ctrl_registered(void)
-+{
-+	return (hal_ipc != NULL);
-+}
-diff --git a/android/avrcp.h b/android/avrcp-ctrl.h
-similarity index 75%
-copy from android/avrcp.h
-copy to android/avrcp-ctrl.h
-index 11e79b7..72608e7 100644
---- a/android/avrcp.h
-+++ b/android/avrcp-ctrl.h
-@@ -2,7 +2,7 @@
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-  *
-- *  Copyright (C) 2013-2014  Intel Corporation. All rights reserved.
-+ *  Copyright (C) 2014  Intel Corporation. All rights reserved.
-  *
-  *
-  *  This library is free software; you can redistribute it and/or
-@@ -21,8 +21,7 @@
-  *
-  */
- 
--bool bt_avrcp_register(struct ipc *ipc, const bdaddr_t *addr, uint8_t mode);
--void bt_avrcp_unregister(void);
--
--void bt_avrcp_connect(const bdaddr_t *dst);
--void bt_avrcp_disconnect(const bdaddr_t *dst);
-+bool bt_avrcp_ctrl_register(struct ipc *ipc, const bdaddr_t *addr,
-+								uint8_t mode);
-+void bt_avrcp_ctrl_unregister(void);
-+bool bt_is_avrcp_ctrl_registered(void);
-diff --git a/android/avrcp.c b/android/avrcp.c
-index d06ecc4..26f8d73 100644
---- a/android/avrcp.c
-+++ b/android/avrcp.c
-@@ -46,6 +46,7 @@
- #include "bluetooth.h"
- #include "avrcp.h"
- #include "avrcp-common.h"
-+#include "avrcp-ctrl.h"
- #include "utils.h"
- 
- #define L2CAP_PSM_AVCTP 0x17
-@@ -920,6 +921,11 @@ bool bt_avrcp_register(struct ipc *ipc, const bdaddr_t *addr, uint8_t mode)
- 
- 	DBG("");
- 
-+	if (!bt_is_avrcp_ctrl_registered()) {
-+		error("AVRCP: avrcp controller already registered");
-+		return false;
-+	}
-+
- 	bacpy(&adapter_addr, addr);
- 
- 	server = bt_io_listen(NULL, confirm_cb, NULL, NULL, &err,
-@@ -1040,3 +1046,8 @@ void bt_avrcp_disconnect(const bdaddr_t *dst)
- 
- 	avrcp_device_remove(dev);
- }
-+
-+bool bt_is_avrcp_registered(void)
-+{
-+	return (hal_ipc != NULL);
-+}
-diff --git a/android/avrcp.h b/android/avrcp.h
-index 11e79b7..4411d5c 100644
---- a/android/avrcp.h
-+++ b/android/avrcp.h
-@@ -26,3 +26,4 @@ void bt_avrcp_unregister(void);
- 
- void bt_avrcp_connect(const bdaddr_t *dst);
- void bt_avrcp_disconnect(const bdaddr_t *dst);
-+bool bt_is_avrcp_registered(void);
-diff --git a/android/main.c b/android/main.c
-index 58dd9ab..66203b7 100644
---- a/android/main.c
-+++ b/android/main.c
-@@ -64,6 +64,7 @@
- #include "handsfree-client.h"
- #include "map-client.h"
- #include "utils.h"
-+#include "avrcp-ctrl.h"
- 
- #define DEFAULT_VENDOR "BlueZ"
- #define DEFAULT_MODEL "BlueZ for Android"
-@@ -208,6 +209,14 @@ static void service_register(const void *buf, uint16_t len)
- 		}
- 
- 		break;
-+	case HAL_SERVICE_ID_AVRCP_CTRL:
-+		if (!bt_avrcp_ctrl_register(hal_ipc, &adapter_bdaddr,
-+								m->mode)) {
-+			status = HAL_STATUS_FAILED;
-+			goto failed;
-+		}
-+
-+		break;
- 	case HAL_SERVICE_ID_HANDSFREE:
- 		if (!bt_handsfree_register(hal_ipc, &adapter_bdaddr, m->mode,
- 							m->max_clients)) {
-@@ -286,6 +295,9 @@ static bool unregister_service(uint8_t id)
- 	case HAL_SERVICE_ID_AVRCP:
- 		bt_avrcp_unregister();
- 		break;
-+	case HAL_SERVICE_ID_AVRCP_CTRL:
-+		bt_avrcp_ctrl_unregister();
-+		break;
- 	case HAL_SERVICE_ID_HANDSFREE:
- 		bt_handsfree_unregister();
- 		break;
--- 
-2.1.0
+On Thu, Nov 20, 2014, Johan Hedberg wrote:
+> On Wed, Nov 19, 2014, Arman Uguray wrote:
+> > I now have a few of questions before I start implementing anything:
+> > 
+> > 1. I'm confused about how the current code handles the case where
+> > hci_connect_le returns -EBUSY while handling an advertisement report.
+> > The code simply ignores the error and hci_conn object gets created, so
+> > the next time an advertisement report gets received and we call
+> > hci_connect_le, won't that just return early since
+> > hci_conn_hash_lookup_ba will return something? How will this actually
+> > ever get to adding the LE Create Connection request?
+> 
+> Regarding advertising reports while there's a connect attempt in
+> progress, hci_connect_le() disables advertising before issuing
+> HCI_LE_Create_Conn so advertising should never be active while we're
+> trying to connect. Only once the connection times out or we're
+> successfully connected does advertising get re-enabled and we're ready
+> again to connect any other device that might be around.
 
+Sorry, you must have gotten quite confused by my bs here. I was
+obviously mixing advertising and scanning. My point still stands though:
+hci_connect_le also disables scanning for the connection attempt so no
+advertising reports should be coming while trying to connect.
+
+Johan
