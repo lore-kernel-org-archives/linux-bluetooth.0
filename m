@@ -1,80 +1,101 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <CAHrH25RdVd0DWRy8Z6sheHvhYQtCcPJdyg0_2aVSisSCcG4S-g@mail.gmail.com>
-References: <CANpMpoQoBhmprKEkrJrA1cdmwX=JvabtiJpm64hnxnR46MEFDA@mail.gmail.com>
-	<CAHrH25RdVd0DWRy8Z6sheHvhYQtCcPJdyg0_2aVSisSCcG4S-g@mail.gmail.com>
-Date: Sat, 22 Nov 2014 10:14:49 +0100
-Message-ID: <CANpMpoQ+6W3Tz9fmeNiH2wL9c15dSFVhzRA2Dv920VXXD99U1A@mail.gmail.com>
-Subject: Re: Where in the code is a BLE connection accepted?
-From: =?UTF-8?Q?Gilles_Gr=C3=A9goire?= <gilles.gregoire@gmail.com>
-To: Arman Uguray <armansito@chromium.org>
+In-Reply-To: <F3197FAF-D89E-4021-A1E8-C8D7DFC7ABD8@holtmann.org>
+References: <1412938157-70760-1-git-send-email-marcel@holtmann.org>
+	<CAD0=r8zAKR_iGcqyeRotDoshhAp=5U8SCcKJrr+GUsAsy-4TLQ@mail.gmail.com>
+	<B3953F7E-C8F3-45A2-A0E5-A24848E299DF@holtmann.org>
+	<CAD0=r8wEVPdgEZAUKxD7eS2r0XzitRaSYFe9J4FhE320YCMg6w@mail.gmail.com>
+	<F3197FAF-D89E-4021-A1E8-C8D7DFC7ABD8@holtmann.org>
+Date: Fri, 21 Nov 2014 19:19:49 -0800
+Message-ID: <CAD0=r8xF7PWKFcUicqDX8c15TWB3EYPyit8wgmcZacrNwvfmmA@mail.gmail.com>
+Subject: Re: [PATCH] doc: Add commands for Start Service Discovery and Stop
+ Service Discovery
+From: Jakub Pawlowski <jpawlowski@google.com>
+To: Marcel Holtmann <marcel@holtmann.org>
 Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
-Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Arman,
-
-2014-11-21 20:12 GMT+01:00 Arman Uguray <armansito@chromium.org>:
-> Hi Gilles,
+On Fri, Nov 21, 2014 at 6:16 PM, Marcel Holtmann <marcel@holtmann.org> wrot=
+e:
+> Hi Jakub,
 >
->> On Fri, Nov 21, 2014 at 12:03 AM, Gilles Grégoire <gilles.gregoire@gmail.com> wrote:
->> Hi,
+>>>> I think that RSSI_Threshold should be per UUID:
+>>>>
+>>>> +       Command Parameters:     Address_Type (1 Octet)
+>>>> +                               Num_Filters (1 Octet)
+>>>> +                               Filter1 {
+>>>> +                                   RSSI_Threshold (1 Octet)
+>>>> +                                   UUID[i] (16 Octets)
+>>>> +                               }
+>>>> +                               Filter2 {}
+>>>> +                               ...
+>>>
+>>> I need a bit more reason for this. Stating it does not convince me ;)
+>>>
+>>> My take is that it is not needed for this one-shot discovering. Just se=
+lect some good enough RSSI threshold and filter the rest later when you get=
+ TX power information. Like with Start Discovery it will stop once it is do=
+ne with the search. So next time around you can select a different RSSI thr=
+eshold.
 >>
->> I am trying to understand how a BLE connection is established between
->> my embedded system and an Android phone. I am using bluez 5.9 on a
->> 3.12 kernel on this embedded system; with a CSR chipset.
+>> Let's say I'm scanning for two kinds services:
+>> - some security token, that needs to be very close to my machine
+>> - temperature sensor, with no particular interest in range
+>> - controller receives one packet from security token that advertise at
+>> very high TX power and is very close, so I specify very high rssi
+>> threshold
+>> - then the temperature sensor, that advertises on low power will not be =
+reported
 >>
->> I set up bluetooth using:
->> hciconfig hci0 reset
->> hciconfig hci0 noscan
->>
->> Then, I use hcitool to set the advertisement and scan data, and I
->> enable a connectable advertisement with
->> hcitool -i hci0 cmd 0x08 0x000a 01
->>
->> I am _not_ using bluetoothd.
->>
->> With this simple setup, I can connect with an Android phone to my
->> embedded system.
->> I check it with:
->> hcitool -i hci0 con
->>
->> Which reports one active connection.
->>
->> I had a look at the hciconfig and hcitool source code (the only tools
->> I used to setup bluetooth), but could not find where a connection is
->> accepted.
->>
->> My question is: where (in the code) is the connection accepted in the
->> first place?
->>
->> Thanks!
->>
->> -- Gilles
->>
->> PS: my excuses for this repost. I realized that I forgot to set a
->> subject for the initial version of this e-mail sent on this list
->> yesterday.
->> --
->> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
->> the body of a message to majordomo@vger.kernel.org
->> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>> If I had rssi specified per UUID that won't be the case.
 >
-> If you're using just hcitool (and someone correct me if I'm wrong)
-> then the kernel will accept the connection but won't magically hand it
-> over to userland unless someone is listening for incoming connections.
-> For that you would have to create an L2CAP socket and listen on it.
-> Once a connection is accepted then you can use the returned socket
-> just as you would with any UNIX socket over which you can exchange
-> data.
+> I think having that is a good idea in general. Just not in the case of a =
+one-shot discovery trigger. We should do that for adding these UUID filters=
+ to the background scanning.
+>
+> The difference between discovery and background scanning is that during d=
+iscovery we are using active scanning (meaning scan responses will be reque=
+sted) and during background scanning we are using passive scanning.
+>
+> So my thinking is that you use the service discovery to find your device/=
+service now. You are actively looking for it at that point in time. In that=
+ case it really does not matter that you get a few false positives. You are=
+ actively using your radio to send scan requests anyway.
 
-This is exactly the kind of answer I was looking for. I could not find
-this information anywhere.
+Ok, I'll modify my patches so that start service discovery would get
+only one rssi value for all services.
 
-I still find this a bit surprising: when using an l2capSocket, I still
-have to listen() and accept() the connection. One would expect that
-without anyone accept()'ing, the connection is not accepted!
+>
+>>
+>> I can also set the RSSI threshold at very low value to get notified
+>> about temperature sensor, but the I'll get a lot of  device found
+>> events about security token that will wake my application unnecessary.
+>> We want to avoid that, and that's why we're doing scan in kernel, and
+>> plan to move it to controller.
+>>
+>> So my patches right now define rssi threshold per UUID this like that:
+>>
+>> struct mgmt_uuid_filter {
+>> __s8 rssi;
+>> __u8 uuid[16];
+>> } __packed;
+>>
+>> struct mgmt_cp_start_service_discovery {
+>> __u8 type;
+>> __le16 filter_count;
+>> struct mgmt_uuid_filter filter[0];
+>> } __packed;
+>
+> Add Start Service Discovery and Stop Service Discover is just the first s=
+tep to support your needs. That is for actively finding devices at a specif=
+ic point in time. For long time running background scanning we need to add =
+these UUID to the background scanning list. And there we add/remove them on=
+e by one and with that can make it depending on the RSSI.
 
-Thanks a lot,
--- Gilles
+Ok, but let's first get this short term scan in.
+>
+> Regards
+>
+> Marcel
+>
