@@ -1,101 +1,113 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <F3197FAF-D89E-4021-A1E8-C8D7DFC7ABD8@holtmann.org>
-References: <1412938157-70760-1-git-send-email-marcel@holtmann.org>
-	<CAD0=r8zAKR_iGcqyeRotDoshhAp=5U8SCcKJrr+GUsAsy-4TLQ@mail.gmail.com>
-	<B3953F7E-C8F3-45A2-A0E5-A24848E299DF@holtmann.org>
-	<CAD0=r8wEVPdgEZAUKxD7eS2r0XzitRaSYFe9J4FhE320YCMg6w@mail.gmail.com>
-	<F3197FAF-D89E-4021-A1E8-C8D7DFC7ABD8@holtmann.org>
-Date: Fri, 21 Nov 2014 19:19:49 -0800
-Message-ID: <CAD0=r8xF7PWKFcUicqDX8c15TWB3EYPyit8wgmcZacrNwvfmmA@mail.gmail.com>
-Subject: Re: [PATCH] doc: Add commands for Start Service Discovery and Stop
- Service Discovery
-From: Jakub Pawlowski <jpawlowski@google.com>
-To: Marcel Holtmann <marcel@holtmann.org>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 8.1 \(1993\))
+Subject: Re: RFC: Populating shared/gatt-client from storage.
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <CAHrH25R0C0-xBCTQOvAC=qnyZBFZxaahe_4ywQwNqv1dL9gFjQ@mail.gmail.com>
+Date: Sat, 22 Nov 2014 11:17:26 +0800
 Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+Message-Id: <B245A4EE-35B1-442A-AE5D-55DDF441AA12@holtmann.org>
+References: <CAHrH25Q2w48UX5Bi2qLq0uHfGsH+k2AzecXgfrn=QgZKoT1K4A@mail.gmail.com> <E774ECE7-226D-427D-8FFB-CB3BF8C41428@holtmann.org> <CAHrH25R0C0-xBCTQOvAC=qnyZBFZxaahe_4ywQwNqv1dL9gFjQ@mail.gmail.com>
+To: Arman Uguray <armansito@chromium.org>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Fri, Nov 21, 2014 at 6:16 PM, Marcel Holtmann <marcel@holtmann.org> wrot=
-e:
-> Hi Jakub,
->
->>>> I think that RSSI_Threshold should be per UUID:
->>>>
->>>> +       Command Parameters:     Address_Type (1 Octet)
->>>> +                               Num_Filters (1 Octet)
->>>> +                               Filter1 {
->>>> +                                   RSSI_Threshold (1 Octet)
->>>> +                                   UUID[i] (16 Octets)
->>>> +                               }
->>>> +                               Filter2 {}
->>>> +                               ...
->>>
->>> I need a bit more reason for this. Stating it does not convince me ;)
->>>
->>> My take is that it is not needed for this one-shot discovering. Just se=
-lect some good enough RSSI threshold and filter the rest later when you get=
- TX power information. Like with Start Discovery it will stop once it is do=
-ne with the search. So next time around you can select a different RSSI thr=
-eshold.
->>
->> Let's say I'm scanning for two kinds services:
->> - some security token, that needs to be very close to my machine
->> - temperature sensor, with no particular interest in range
->> - controller receives one packet from security token that advertise at
->> very high TX power and is very close, so I specify very high rssi
->> threshold
->> - then the temperature sensor, that advertises on low power will not be =
-reported
->>
->> If I had rssi specified per UUID that won't be the case.
->
-> I think having that is a good idea in general. Just not in the case of a =
-one-shot discovery trigger. We should do that for adding these UUID filters=
- to the background scanning.
->
-> The difference between discovery and background scanning is that during d=
-iscovery we are using active scanning (meaning scan responses will be reque=
-sted) and during background scanning we are using passive scanning.
->
-> So my thinking is that you use the service discovery to find your device/=
-service now. You are actively looking for it at that point in time. In that=
- case it really does not matter that you get a few false positives. You are=
- actively using your radio to send scan requests anyway.
+Hi Arman,
 
-Ok, I'll modify my patches so that start service discovery would get
-only one rssi value for all services.
+>>> In the case where bluez is bonded with a remote device we don't want
+>>> to always perform service discovery, but instead to cache the
+>>> attribute data permanently and just use that on reconnections.
+>>> Currently shared/gatt-client automatically discovers all services when
+>>> created (via bt_gatt_client_new) so we need to add support to populate
+>>> a shared/gatt-client based on cached data in storage, since a
+>>> bt_gatt_client instance acts as our in-memory attribute cache for the
+>>> client role.
+>>> 
+>>> I initially thought about storing everything in INI format and loading
+>>> things directly from a file, via some function like
+>>> bt_gatt_client_new_from_storage. The biggest problem with this
+>>> approach is parsing the INI format; since we don't want to pull in any
+>>> external dependencies into shared/gatt (e.g. glib) we would possibly
+>>> have to write our own key-value file parser for shared/ which seems
+>>> like overkill. We could possibly invent some simpler blob format for
+>>> shared/gatt-client but people brought to my attention on IRC that we
+>>> may want to leave the exact storage format to the upper-layer, e.g.
+>>> desktop and android versions of bluetoothd may want to use different
+>>> formats for their attribute cache that's consistent with the platform.
+>> 
+>> what we could do is just store the plain binary data. These are cache files and if you remove them, that just means next time we have to do full service discovery again.
+>> 
+>>> So I decided to go with something generic instead. We would basically
+>>> add functions to manually populate a gatt-client and mark the client
+>>> as ready only after it's services have been populated. So we would
+>>> have these API changes:
+>>> 
+>>> 1. A new argument to bt_gatt_client_new, to tell it not to perform
+>>> discovery. Something like "bool discover_services".
+>>> 
+>>>   /* Don't perform discovery */
+>>>   bt_gatt_client_new(att, mtu, false);
+>>> 
+>>> This would basically just leave the structure in "init" state and not
+>>> become ready.
+>> 
+>> Adding tons of parameters to a _new() is not really a good idea. I would always add a special _new_without_discovery() or something similar to our API. If we decide to go this route.
+>> 
+>>> 
+>>> 2. We would then add a new structure to populate a gatt-client.
+>>> 
+>>>   struct bt_gatt_populate { .. };  /* Probably something with a better name */
+>>> 
+>>>   bool bt_gatt_populate_start(struct bt_gatt_populate *, struct
+>>> bt_gatt_client *);
+>>>   bool bt_gatt_populate_add_service(....)
+>>>   bool bt_gatt_populate_add_characteristic(...)
+>>>   bool bt_gatt_populate_add_descriptor(....)
+>>>   bool bt_gatt_populate_add_include(....)
+>>>   bool bt_gatt_populate_cancel(...)
+>>>   bool bt_gatt_populate_commit(struct bt_gatt_populate *);
+>>> 
+>>> The start function would tell gatt-client that it's being populated so
+>>> it would prevent this from being called twice. All of the _add_*
+>>> functions would create a temporary tree owned by the populate
+>>> structure, using the same internal structures defined in
+>>> shared/gatt-client.c. Calling bt_gatt_populate_commit would then pass
+>>> the ownership of the services to the bt_gatt_client, and
+>>> bt_gatt_client would perform the MTU exchange, subscribe to
+>>> notifications from the "Service Changed" characteristic if one exists,
+>>> mark itself as ready and invoke the ready handler.
+>>> 
+>>> If the upper-layer wants to store the current contents of gatt-client,
+>>> they can do so by iterating through its services and caching them to a
+>>> file directly. This way, shared/gatt-client would remain agnostic to
+>>> any storage format.
+>> 
+>> One other way of doing something like this is doing it this way:
+>> 
+>>        struct bt_gatt_storage;
+>> 
+>>        struct bt_gatt_storage *bt_gatt_storage_new()
+>>        bt_gatt_storage_add_x
+>> 
+>>        struct bt_gatt_client *bt_gatt_client_from_storage(struct bt_gatt_storage);
+>> 
+>> I am not sure this is actually any better. It is just an idea, but we might want to just store plain binary data of cached services in a binary cached file. I think that we can have a binary storage format for the cached data and then we just point the bt_gatt_client_new_with_cahce() to that file and let it load if present. So the upper layers would just decide where that file is located.
+>> 
+> 
+> I think in the end the exact format of the data should be up to the
+> upper layer, whether its binary data or INI format. After some
+> discussions on IRC we decided that this storage could be represented
+> by shared/gatt-db, which already has these functions to add services,
+> characteristics, etc. But we would need to make shared/gatt-db provide
+> a client role abstraction as well, since it's more meant for the
+> server role at the moment.
+> 
+> This way bluetoothd could for example just read the INI file, create a
+> gatt_db and do something like bt_gatt_client_from_db(db, mtu);
 
->
->>
->> I can also set the RSSI threshold at very low value to get notified
->> about temperature sensor, but the I'll get a lot of  device found
->> events about security token that will wake my application unnecessary.
->> We want to avoid that, and that's why we're doing scan in kernel, and
->> plan to move it to controller.
->>
->> So my patches right now define rssi threshold per UUID this like that:
->>
->> struct mgmt_uuid_filter {
->> __s8 rssi;
->> __u8 uuid[16];
->> } __packed;
->>
->> struct mgmt_cp_start_service_discovery {
->> __u8 type;
->> __le16 filter_count;
->> struct mgmt_uuid_filter filter[0];
->> } __packed;
->
-> Add Start Service Discovery and Stop Service Discover is just the first s=
-tep to support your needs. That is for actively finding devices at a specif=
-ic point in time. For long time running background scanning we need to add =
-these UUID to the background scanning list. And there we add/remove them on=
-e by one and with that can make it depending on the RSSI.
+following up on my other email, then yes, we could have a bt_gatt_cache that is a collection of bt_gatt_db objects. That however is an implementation detail to me. I think it is important that we have a global concept of a cache. And as said, just having an in-memory cache will already solve 99% of the use cases where we want to avoid service discovery for already known devices. Only cold-boot would be an issue and honestly that is a penalty that I would happily accept for a first iteration. Which means we do not have to bother with file formats in the beginning.
 
-Ok, but let's first get this short term scan in.
->
-> Regards
->
-> Marcel
->
+Regards
+
+Marcel
+
