@@ -1,217 +1,62 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <5471CEA8.4030101@gmail.com>
-Date: Sun, 23 Nov 2014 15:10:16 +0300
-From: Dmitry Tunin <hanipouspilot@gmail.com>
-MIME-Version: 1.0
-To: Michel Memeteau - EKIMIA <contact@ekimia.fr>
-CC: Marcel Holtmann <marcel@holtmann.org>,
- linux-bluetooth <linux-bluetooth@vger.kernel.org>,
- linux-kernel <linux-kernel@vger.kernel.org>,
- linux-wireless <linux-wireless@vger.kernel.org>
-Subject: Re: [PATCH v3] ath3k: Add support of MCI 13d3:3408 bt device
-References: <CANoib0HW2umPpzzerYNq1fMMnkYxOa78o5X90-K=eNEnTGSO1w@mail.gmail.com> <F01422F2-5F7C-406A-A06B-2C2CE96B9E3A@holtmann.org> <546C3CCE.400@gmail.com> <CAKxAHQ4intUoy2qv9ftTJL_c2JN3kYn8bC_Jk9=93rvvXNE80Q@mail.gmail.com> <CAKxAHQ5wDG=Bi4bLUsN5A9r4Y82444Ysnuppy+8REf7qUh1nmg@mail.gmail.com> <546C6BB9.4040705@gmail.com>
-In-Reply-To: <546C6BB9.4040705@gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 8.1 \(1993\))
+Subject: Re: [PATCH] doc: Add commands for Start Service Discovery and Stop Service Discovery
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <CAD0=r8wdzUi3_kRB8vOvbTagTR=MQDwQ+wvpLV+=uaML2TNWuw@mail.gmail.com>
+Date: Sun, 23 Nov 2014 18:47:49 +0800
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
+Message-Id: <5AD84B87-F976-43D4-BC3A-A758FC5CC5C2@holtmann.org>
+References: <1412938157-70760-1-git-send-email-marcel@holtmann.org> <CAD0=r8zAKR_iGcqyeRotDoshhAp=5U8SCcKJrr+GUsAsy-4TLQ@mail.gmail.com> <B3953F7E-C8F3-45A2-A0E5-A24848E299DF@holtmann.org> <CAD0=r8wEVPdgEZAUKxD7eS2r0XzitRaSYFe9J4FhE320YCMg6w@mail.gmail.com> <F3197FAF-D89E-4021-A1E8-C8D7DFC7ABD8@holtmann.org> <CAD0=r8xF7PWKFcUicqDX8c15TWB3EYPyit8wgmcZacrNwvfmmA@mail.gmail.com> <CAD0=r8wdzUi3_kRB8vOvbTagTR=MQDwQ+wvpLV+=uaML2TNWuw@mail.gmail.com>
+To: Jakub Pawlowski <jpawlowski@google.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-After some testing on a few laptops it looks like the firmware loads always
-correctly only using AR3012 variant.
+Hi Jakub,
 
-So the correct patch follows
+>>>>>> I think that RSSI_Threshold should be per UUID:
+>>>>>> 
+>>>>>> +       Command Parameters:     Address_Type (1 Octet)
+>>>>>> +                               Num_Filters (1 Octet)
+>>>>>> +                               Filter1 {
+>>>>>> +                                   RSSI_Threshold (1 Octet)
+>>>>>> +                                   UUID[i] (16 Octets)
+>>>>>> +                               }
+>>>>>> +                               Filter2 {}
+>>>>>> +                               ...
+>>>>> 
+>>>>> I need a bit more reason for this. Stating it does not convince me ;)
+>>>>> 
+>>>>> My take is that it is not needed for this one-shot discovering. Just select some good enough RSSI threshold and filter the rest later when you get TX power information. Like with Start Discovery it will stop once it is done with the search. So next time around you can select a different RSSI threshold.
+>>>> 
+>>>> Let's say I'm scanning for two kinds services:
+>>>> - some security token, that needs to be very close to my machine
+>>>> - temperature sensor, with no particular interest in range
+>>>> - controller receives one packet from security token that advertise at
+>>>> very high TX power and is very close, so I specify very high rssi
+>>>> threshold
+>>>> - then the temperature sensor, that advertises on low power will not be reported
+>>>> 
+>>>> If I had rssi specified per UUID that won't be the case.
+>>> 
+>>> I think having that is a good idea in general. Just not in the case of a one-shot discovery trigger. We should do that for adding these UUID filters to the background scanning.
+>>> 
+>>> The difference between discovery and background scanning is that during discovery we are using active scanning (meaning scan responses will be requested) and during background scanning we are using passive scanning.
+>>> 
+>>> So my thinking is that you use the service discovery to find your device/service now. You are actively looking for it at that point in time. In that case it really does not matter that you get a few false positives. You are actively using your radio to send scan requests anyway.
+>> 
+>> Ok, I'll modify my patches so that start service discovery would get
+>> only one rssi value for all services.
+>> 
+> 
+> I just fixed my patches work as you described in doc/mgmt-api.txt
+> Writing it as you proposed made the code much simpler and cleaner. Thanks!
+> Can you please 'git am' this doc/mgmt.txt patch, or is there something
+> more to do ?
 
----
+I pushed the doc/mgmt-api.txt updates now.
 
-diff --git a/drivers/bluetooth/ath3k.c b/drivers/bluetooth/ath3k.c
-index d85ced2..086240c 100644
---- a/drivers/bluetooth/ath3k.c
-+++ b/drivers/bluetooth/ath3k.c
-@@ -105,6 +105,7 @@ static const struct usb_device_id ath3k_table[] = {
-      { USB_DEVICE(0x13d3, 0x3375) },
-      { USB_DEVICE(0x13d3, 0x3393) },
-      { USB_DEVICE(0x13d3, 0x3402) },
-+    { USB_DEVICE(0x13d3, 0x3408) },
-      { USB_DEVICE(0x13d3, 0x3432) },
+Regards
 
-      /* Atheros AR5BBU12 with sflash firmware */
-@@ -156,6 +157,7 @@ static const struct usb_device_id ath3k_blist_tbl[] = {
-      { USB_DEVICE(0x13d3, 0x3375), .driver_info = BTUSB_ATH3012 },
-      { USB_DEVICE(0x13d3, 0x3393), .driver_info = BTUSB_ATH3012 },
-      { USB_DEVICE(0x13d3, 0x3402), .driver_info = BTUSB_ATH3012 },
-+    { USB_DEVICE(0x13d3, 0x3408), .driver_info = BTUSB_ATH3012 },
-      { USB_DEVICE(0x13d3, 0x3432), .driver_info = BTUSB_ATH3012 },
+Marcel
 
-      /* Atheros AR5BBU22 with sflash firmware */
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index edfc17b..091c813 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -182,6 +182,7 @@ static const struct usb_device_id blacklist_table[] = {
-      { USB_DEVICE(0x13d3, 0x3375), .driver_info = BTUSB_ATH3012 },
-      { USB_DEVICE(0x13d3, 0x3393), .driver_info = BTUSB_ATH3012 },
-      { USB_DEVICE(0x13d3, 0x3402), .driver_info = BTUSB_ATH3012 },
-+    { USB_DEVICE(0x13d3, 0x3408), .driver_info = BTUSB_ATH3012 },
-      { USB_DEVICE(0x13d3, 0x3432), .driver_info = BTUSB_ATH3012 },
-
-      /* Atheros AR5BBU12 with sflash firmware */
-
---
-
-19.11.2014 13:06, Dmitry Tunin wrote:
-> It seems that I am too stupid.
-> It is neither AR3012 or AR3011 device.
-> It is AR9565 with sflash.
-> Probably it makes sense to do a separate section for these devices.
->
-> But still
-> { USB_DEVICE(0x13d3, 0x3408), .driver_info = BTUSB_IGNORE },
-> works better than
->
-> { USB_DEVICE(0x13d3, 0x3408), .driver_info = BTUSB_ATH3012 },
->
-> With the latter I have some issues with turning bt on and off.
->
-> 19.11.2014 12:40, Michel Memeteau - EKIMIA wrote:
->> Hi,
->>
->> I tried to understand why this "0x13d3, 0x3408" device support
->> wouldn't go in btusb as it's really close to IMC BT chip found in
->> Realtek Wifi devices which is on the path to go in btusb [1]
->>
->> then I guess there is a lot of code that could be shared to support
->> all IMC usb devices in the btusb module.
->>
->> Regards.
->>
->> [1] https://github.com/lwfinger/rtl8723au_bt/tree/new
->>
->> <------------------------------------------------------------------------------------------------------------------>
->>   Michel Memeteau  - Directeur.
->>
->>   Notre Boutique Ordinateurs GNU/Linux : http://shop.ekimia.fr
->>   49 chemin de l'union 13720 La Bouilladisse - France.
->>   Fixe :  +33 (0) 972308334   Mobile : +33(0) 624808051
->> <------------------------------------------------------------------------------------------------------------------>
->>
->>   2014-11-19 7:46 GMT+01:00 Dmitry Tunin <hanipouspilot@gmail.com>:
->>> Hi Marcel,
->>>
->>> Here is information from /sys/kernel/debug/usb/devices
->>>
->>> T:  Bus=01 Lev=02 Prnt=03 Port=00 Cnt=01 Dev#= 20 Spd=12 MxCh= 0
->>> D:  Ver= 1.10 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs= 1
->>> P:  Vendor=13d3 ProdID=3408 Rev= 0.02
->>> C:* #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
->>> A:  FirstIf#= 0 IfCount= 2 Cls=e0(wlcon) Sub=01 Prot=01
->>> I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
->>> E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
->>> E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
->>> E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
->>> I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
->>> E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
->>> E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
->>> I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
->>> E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
->>> E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
->>> I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
->>> E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
->>> E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
->>> I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
->>> E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
->>> E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
->>> I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
->>> E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
->>> E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
->>> I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
->>> E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
->>> E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
->>>
->>>
->>> I hope this mail client is OK now.
->>>
->>> Add support for bluetooth MCI WB335 (AR9565) Wi-Fi+bt module.
->>> It is AR3011 device according to iProduct == 0.
->>> So btusb should be blacklisted
->>> I submitted a wrong patch before asif  it was an AR3012 device,
->>> but it works both ways. This is the right one.
->>>
->>> Signed-off-by: Dmitry Tunin<hanipouspilot@gmail.com>
->>>
->>> ---
->>>
->>> diff --git a/drivers/bluetooth/ath3k.c b/drivers/bluetooth/ath3k.c
->>> index d85ced2..3b53116 100644
->>> --- a/drivers/bluetooth/ath3k.c
->>> +++ b/drivers/bluetooth/ath3k.c
->>> @@ -69,6 +69,7 @@ static const struct usb_device_id ath3k_table[] = {
->>>       { USB_DEVICE(0x0CF3, 0x3002) },
->>>       { USB_DEVICE(0x0CF3, 0xE019) },
->>>       { USB_DEVICE(0x13d3, 0x3304) },
->>> +    { USB_DEVICE(0x13d3, 0x3408) },
->>>
->>>       /* Atheros AR9285 Malbec with sflash firmware */
->>>       { USB_DEVICE(0x03F0, 0x311D) },
->>> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
->>> index edfc17b..bbf5c1c 100644
->>> --- a/drivers/bluetooth/btusb.c
->>> +++ b/drivers/bluetooth/btusb.c
->>> @@ -146,6 +146,7 @@ static const struct usb_device_id 
->>> blacklist_table[] = {
->>>       { USB_DEVICE(0x0cf3, 0x3002), .driver_info = BTUSB_IGNORE },
->>>       { USB_DEVICE(0x0cf3, 0xe019), .driver_info = BTUSB_IGNORE },
->>>       { USB_DEVICE(0x13d3, 0x3304), .driver_info = BTUSB_IGNORE },
->>> +    { USB_DEVICE(0x13d3, 0x3408), .driver_info = BTUSB_IGNORE },
->>>
->>>       /* Atheros AR9285 Malbec with sflash firmware */
->>>       { USB_DEVICE(0x03f0, 0x311d), .driver_info = BTUSB_IGNORE },
->>>
->>>
->>> 19.11.2014 01:56, Marcel Holtmann wrote:
->>>> Hi Dmitry,
->>>>
->>>>> Add support for bluetooth MCI WB335 (AR9565) Wi-Fi+bt module.
->>>>> It is AR3011 device according to iProduct == 0.
->>>>> So btusb should be blacklisted
->>>>> I submitted a wrong patch before asif  it was an AR3012 device,
->>>>> but it works both ways. This is the right one.
->>>> include the device details from /sys/kernel/debug/usb/devices.
->>>>
->>>>> Signed-off-by: Dmitry Tunin <hanipouspilot@gmail.com>
->>>>> are */
->>>> No idea what this are */ is.
->>>>
->>>>> ---
->>>>>
->>>>> diff --git a/drivers/bluetooth/ath3k.c b/drivers/bluetooth/ath3k.c
->>>>> index d85ced2..3b53116 100644
->>>>> --- a/drivers/bluetooth/ath3k.c
->>>>> +++ b/drivers/bluetooth/ath3k.c
->>>>> @@ -69,6 +69,7 @@ static const struct usb_device_id ath3k_table[] = {
->>>>>    { USB_DEVICE(0x0CF3, 0x3002) },
->>>>>    { USB_DEVICE(0x0CF3, 0xE019) },
->>>>>    { USB_DEVICE(0x13d3, 0x3304) },
->>>>> + { USB_DEVICE(0x13d3, 0x3408) },
->>>>>
->>>>>    /* Atheros AR9285 Malbec with sflash firmware */
->>>>>    { USB_DEVICE(0x03F0, 0x311D) },
->>>>> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
->>>>> index edfc17b..bbf5c1c 100644
->>>>> --- a/drivers/bluetooth/btusb.c
->>>>> +++ b/drivers/bluetooth/btusb.c
->>>>> @@ -146,6 +146,7 @@ static const struct usb_device_id 
->>>>> blacklist_table[] = {
->>>>    { USB_DEVICE(0x0cf3, 0x3002), .driver_info = BTUSB_IGNORE },
->>>>>    { USB_DEVICE(0x0cf3, 0xe019), .driver_info = BTUSB_IGNORE },
->>>>>    { USB_DEVICE(0x13d3, 0x3304), .driver_info = BTUSB_IGNORE },
->>>>> + { USB_DEVICE(0x13d3, 0x3408), .driver_info = BTUSB_IGNORE },
->>>> Fix whitespace here or use a proper mail client.
->>>>
->>>> Regards
->>>>
->>>> Marcel
->>>>
->>> -- 
->>> To unsubscribe from this list: send the line "unsubscribe 
->>> linux-bluetooth" in
->>> the body of a message to majordomo@vger.kernel.org
->>> More majordomo info at http://vger.kernel.org/majordomo-info.html
->
