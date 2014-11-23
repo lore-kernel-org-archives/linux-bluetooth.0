@@ -1,112 +1,214 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <CAD0=r8xF7PWKFcUicqDX8c15TWB3EYPyit8wgmcZacrNwvfmmA@mail.gmail.com>
-References: <1412938157-70760-1-git-send-email-marcel@holtmann.org>
-	<CAD0=r8zAKR_iGcqyeRotDoshhAp=5U8SCcKJrr+GUsAsy-4TLQ@mail.gmail.com>
-	<B3953F7E-C8F3-45A2-A0E5-A24848E299DF@holtmann.org>
-	<CAD0=r8wEVPdgEZAUKxD7eS2r0XzitRaSYFe9J4FhE320YCMg6w@mail.gmail.com>
-	<F3197FAF-D89E-4021-A1E8-C8D7DFC7ABD8@holtmann.org>
-	<CAD0=r8xF7PWKFcUicqDX8c15TWB3EYPyit8wgmcZacrNwvfmmA@mail.gmail.com>
-Date: Sun, 23 Nov 2014 00:04:07 -0800
-Message-ID: <CAD0=r8wdzUi3_kRB8vOvbTagTR=MQDwQ+wvpLV+=uaML2TNWuw@mail.gmail.com>
-Subject: Re: [PATCH] doc: Add commands for Start Service Discovery and Stop
- Service Discovery
 From: Jakub Pawlowski <jpawlowski@google.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+To: linux-bluetooth@vger.kernel.org
+Cc: Jakub Pawlowski <jpawlowski@google.com>
+Subject: [PATCH v5 3/3] mgmt-tester: Add service discovery test cases
+Date: Sat, 22 Nov 2014 23:50:38 -0800
+Message-Id: <1416729038-4486-3-git-send-email-jpawlowski@google.com>
+In-Reply-To: <1416729038-4486-1-git-send-email-jpawlowski@google.com>
+References: <1416729038-4486-1-git-send-email-jpawlowski@google.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Fri, Nov 21, 2014 at 7:19 PM, Jakub Pawlowski <jpawlowski@google.com> wr=
-ote:
-> On Fri, Nov 21, 2014 at 6:16 PM, Marcel Holtmann <marcel@holtmann.org> wr=
-ote:
->> Hi Jakub,
->>
->>>>> I think that RSSI_Threshold should be per UUID:
->>>>>
->>>>> +       Command Parameters:     Address_Type (1 Octet)
->>>>> +                               Num_Filters (1 Octet)
->>>>> +                               Filter1 {
->>>>> +                                   RSSI_Threshold (1 Octet)
->>>>> +                                   UUID[i] (16 Octets)
->>>>> +                               }
->>>>> +                               Filter2 {}
->>>>> +                               ...
->>>>
->>>> I need a bit more reason for this. Stating it does not convince me ;)
->>>>
->>>> My take is that it is not needed for this one-shot discovering. Just s=
-elect some good enough RSSI threshold and filter the rest later when you ge=
-t TX power information. Like with Start Discovery it will stop once it is d=
-one with the search. So next time around you can select a different RSSI th=
-reshold.
->>>
->>> Let's say I'm scanning for two kinds services:
->>> - some security token, that needs to be very close to my machine
->>> - temperature sensor, with no particular interest in range
->>> - controller receives one packet from security token that advertise at
->>> very high TX power and is very close, so I specify very high rssi
->>> threshold
->>> - then the temperature sensor, that advertises on low power will not be=
- reported
->>>
->>> If I had rssi specified per UUID that won't be the case.
->>
->> I think having that is a good idea in general. Just not in the case of a=
- one-shot discovery trigger. We should do that for adding these UUID filter=
-s to the background scanning.
->>
->> The difference between discovery and background scanning is that during =
-discovery we are using active scanning (meaning scan responses will be requ=
-ested) and during background scanning we are using passive scanning.
->>
->> So my thinking is that you use the service discovery to find your device=
-/service now. You are actively looking for it at that point in time. In tha=
-t case it really does not matter that you get a few false positives. You ar=
-e actively using your radio to send scan requests anyway.
->
-> Ok, I'll modify my patches so that start service discovery would get
-> only one rssi value for all services.
->
+Signed-off-by: Jakub Pawlowski <jpawlowski@google.com>
+---
+ tools/mgmt-tester.c | 176 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 176 insertions(+)
 
-I just fixed my patches work as you described in doc/mgmt-api.txt
-Writing it as you proposed made the code much simpler and cleaner. Thanks!
-Can you please 'git am' this doc/mgmt.txt patch, or is there something
-more to do ?
-I recently asked Johan and he said that it must happen before we can
-apply my patches (after my patches are ok, of course).
+diff --git a/tools/mgmt-tester.c b/tools/mgmt-tester.c
+index 7d14fe4..35d3f9c 100644
+--- a/tools/mgmt-tester.c
++++ b/tools/mgmt-tester.c
+@@ -1802,6 +1802,150 @@ static const struct generic_data stop_discovery_invalid_param_test_1 = {
+ 	.expect_len = sizeof(stop_discovery_bredrle_invalid_param),
+ };
+ 
++static const char start_service_discovery_invalid_param[] = { 0x00, 0x00, 0x00 };
++static const char start_service_discovery_invalid_resp[] = { 0x00 };
++static const char start_service_discovery_bredr_param[] = { 0x01, 0x00, 0x00, 0x00};
++static const char start_service_discovery_bredr_resp[] = { 0x01 };
++static const char start_service_discovery_le_param[] = { 0x06, 0x00, 0x01, 0x00,
++			0xfa, 0xfb, 0x34, 0x9b, 0x5f, 0x80, 0x00, 0x00,
++			0x80, 0x00, 0x10, 0x00, 0x00, 0x00, 0x00, 0x00 };
++static const char start_service_discovery_le_resp[] = { 0x06 };
++static const char start_service_discovery_bredrle_param[] = { 0x07, 0x00, 0x01, 0x00,
++			0xfa, 0xfb, 0x34, 0x9b, 0x5f, 0x80, 0x00, 0x00,
++			0x80, 0x00, 0x10, 0x00, 0x00, 0x00, 0x00, 0x00 };
++static const char start_service_discovery_bredrle_resp[] = { 0x07 };
++static const char start_service_discovery_valid_hci[] = { 0x01, 0x01 };
++static const char start_service_discovery_evt[] = { 0x07, 0x01 };
++static const char start_service_discovery_le_evt[] = { 0x06, 0x01 };
++
++static const struct generic_data start_service_discovery_not_powered_test_1 = {
++	.send_opcode = MGMT_OP_START_SERVICE_DISCOVERY,
++	.send_param = start_service_discovery_bredr_param,
++	.send_len = sizeof(start_service_discovery_bredr_param),
++	.expect_status = MGMT_STATUS_NOT_POWERED,
++	.expect_param = start_service_discovery_bredr_resp,
++	.expect_len = sizeof(start_service_discovery_bredr_resp),
++};
++
++static const struct generic_data start_service_discovery_invalid_param_test_1 = {
++	.setup_settings = settings_powered,
++	.send_opcode = MGMT_OP_START_SERVICE_DISCOVERY,
++	.send_param = start_service_discovery_invalid_param,
++	.send_len = sizeof(start_service_discovery_invalid_param),
++	.expect_status = MGMT_STATUS_INVALID_PARAMS,
++	.expect_param = start_service_discovery_invalid_resp,
++	.expect_len = sizeof(start_service_discovery_invalid_resp),
++};
++
++static const struct generic_data start_service_discovery_not_supported_test_1 = {
++	.setup_settings = settings_powered,
++	.send_opcode = MGMT_OP_START_SERVICE_DISCOVERY,
++	.send_param = start_service_discovery_le_param,
++	.send_len = sizeof(start_service_discovery_le_param),
++	.expect_status = MGMT_STATUS_REJECTED,
++	.expect_param = start_service_discovery_le_resp,
++	.expect_len = sizeof(start_service_discovery_le_resp),
++};
++
++static const struct generic_data start_service_discovery_valid_param_test_1 = {
++	.setup_settings = settings_powered_le,
++	.send_opcode = MGMT_OP_START_SERVICE_DISCOVERY,
++	.send_param = start_service_discovery_bredrle_param,
++	.send_len = sizeof(start_service_discovery_bredrle_param),
++	.expect_status = MGMT_STATUS_SUCCESS,
++	.expect_param = start_service_discovery_bredrle_resp,
++	.expect_len = sizeof(start_service_discovery_bredrle_resp),
++	.expect_hci_command = BT_HCI_CMD_LE_SET_SCAN_ENABLE,
++	.expect_hci_param = start_service_discovery_valid_hci,
++	.expect_hci_len = sizeof(start_service_discovery_valid_hci),
++	.expect_alt_ev = MGMT_EV_DISCOVERING,
++	.expect_alt_ev_param = start_service_discovery_evt,
++	.expect_alt_ev_len = sizeof(start_service_discovery_evt),
++};
++
++static const struct generic_data start_service_discovery_valid_param_test_2 = {
++	.setup_settings = settings_powered,
++	.send_opcode = MGMT_OP_START_SERVICE_DISCOVERY,
++	.send_param = start_service_discovery_le_param,
++	.send_len = sizeof(start_service_discovery_le_param),
++	.expect_status = MGMT_STATUS_SUCCESS,
++	.expect_param = start_service_discovery_le_resp,
++	.expect_len = sizeof(start_service_discovery_le_resp),
++	.expect_hci_command = BT_HCI_CMD_LE_SET_SCAN_ENABLE,
++	.expect_hci_param = start_service_discovery_valid_hci,
++	.expect_hci_len = sizeof(start_service_discovery_valid_hci),
++	.expect_alt_ev = MGMT_EV_DISCOVERING,
++	.expect_alt_ev_param = start_service_discovery_le_evt,
++	.expect_alt_ev_len = sizeof(start_service_discovery_le_evt),
++};
++
++static const char stop_service_discovery_bredrle_param[] = { 0x07 };
++static const char stop_service_discovery_bredrle_invalid_param[] = { 0x06 };
++static const char stop_service_discovery_valid_hci[] = { 0x00, 0x00 };
++static const char stop_service_discovery_evt[] = { 0x07, 0x00 };
++static const char stop_service_discovery_bredr_param[] = { 0x01 };
++static const char stop_service_discovery_bredr_discovering[] = { 0x01, 0x00 };
++static const char stop_service_discovery_inq_param[] = { 0x33, 0x8b, 0x9e, 0x08, 0x00 };
++
++static const struct generic_data stop_service_discovery_success_test_1 = {
++	.setup_settings = settings_powered_le,
++	.setup_send_opcode = MGMT_OP_START_SERVICE_DISCOVERY,
++	.setup_send_param = start_service_discovery_bredrle_param,
++	.setup_send_len = sizeof(start_service_discovery_bredrle_param),
++	.send_opcode = MGMT_OP_STOP_SERVICE_DISCOVERY,
++	.send_param = stop_service_discovery_bredrle_param,
++	.send_len = sizeof(stop_service_discovery_bredrle_param),
++	.expect_status = MGMT_STATUS_SUCCESS,
++	.expect_param = stop_service_discovery_bredrle_param,
++	.expect_len = sizeof(stop_service_discovery_bredrle_param),
++	.expect_hci_command = BT_HCI_CMD_LE_SET_SCAN_ENABLE,
++	.expect_hci_param = stop_service_discovery_valid_hci,
++	.expect_hci_len = sizeof(stop_service_discovery_valid_hci),
++	.expect_alt_ev = MGMT_EV_DISCOVERING,
++	.expect_alt_ev_param = stop_service_discovery_evt,
++	.expect_alt_ev_len = sizeof(stop_service_discovery_evt),
++};
++
++static const struct generic_data stop_service_discovery_bredr_success_test_1 = {
++	.setup_settings = settings_powered,
++	.setup_send_opcode = MGMT_OP_START_SERVICE_DISCOVERY,
++	.setup_send_param = start_service_discovery_bredr_param,
++	.setup_send_len = sizeof(start_service_discovery_bredr_param),
++	.send_opcode = MGMT_OP_STOP_SERVICE_DISCOVERY,
++	.send_param = stop_service_discovery_bredr_param,
++	.send_len = sizeof(stop_service_discovery_bredr_param),
++	.expect_status = MGMT_STATUS_SUCCESS,
++	.expect_param = stop_service_discovery_bredr_param,
++	.expect_len = sizeof(stop_service_discovery_bredr_param),
++	.expect_hci_command = BT_HCI_CMD_INQUIRY_CANCEL,
++	.expect_alt_ev = MGMT_EV_DISCOVERING,
++	.expect_alt_ev_param = stop_service_discovery_bredr_discovering,
++	.expect_alt_ev_len = sizeof(stop_service_discovery_bredr_discovering),
++};
++
++static const struct generic_data stop_service_discovery_rejected_test_1 = {
++	.setup_settings = settings_powered_le,
++	.send_opcode = MGMT_OP_STOP_SERVICE_DISCOVERY,
++	.send_param = stop_service_discovery_bredrle_param,
++	.send_len = sizeof(stop_service_discovery_bredrle_param),
++	.expect_status = MGMT_STATUS_REJECTED,
++	.expect_param = stop_service_discovery_bredrle_param,
++	.expect_len = sizeof(stop_service_discovery_bredrle_param),
++};
++
++static const struct generic_data stop_service_discovery_invalid_param_test_1 = {
++	.setup_settings = settings_powered_le,
++	.setup_send_opcode = MGMT_OP_START_SERVICE_DISCOVERY,
++	.setup_send_param = start_service_discovery_bredrle_param,
++	.setup_send_len = sizeof(start_service_discovery_bredrle_param),
++	.send_opcode = MGMT_OP_STOP_SERVICE_DISCOVERY,
++	.send_param = stop_service_discovery_bredrle_invalid_param,
++	.send_len = sizeof(stop_service_discovery_bredrle_invalid_param),
++	.expect_status = MGMT_STATUS_INVALID_PARAMS,
++	.expect_param = stop_service_discovery_bredrle_invalid_param,
++	.expect_len = sizeof(stop_service_discovery_bredrle_invalid_param),
++};
++
+ static const char set_dev_class_valid_param[] = { 0x01, 0x0c };
+ static const char set_dev_class_zero_rsp[] = { 0x00, 0x00, 0x00 };
+ static const char set_dev_class_valid_rsp[] = { 0x0c, 0x01, 0x00 };
+@@ -4568,6 +4712,38 @@ int main(int argc, char *argv[])
+ 				&stop_discovery_invalid_param_test_1,
+ 				setup_start_discovery, test_command_generic);
+ 
++	test_bredrle("Start Service Discovery - Not powered 1",
++				&start_service_discovery_not_powered_test_1,
++				NULL, test_command_generic);
++	test_bredrle("Start Service Discovery - Invalid parameters 1",
++				&start_service_discovery_invalid_param_test_1,
++				NULL, test_command_generic);
++	test_bredrle("Start Service Discovery - Not supported 1",
++				&start_service_discovery_not_supported_test_1,
++				NULL, test_command_generic);
++	test_bredrle("Start Service Discovery - Success 1",
++				&start_service_discovery_valid_param_test_1,
++				NULL, test_command_generic);
++	test_le("Start Service Discovery - Success 2",
++				&start_service_discovery_valid_param_test_2,
++				NULL, test_command_generic);
++
++	test_bredrle("Stop Service Discovery - Success 1",
++				&stop_service_discovery_success_test_1,
++				setup_start_discovery,
++				test_command_generic);
++	test_bredr("Stop Service Discovery - BR/EDR (Inquiry) Success 1",
++				&stop_service_discovery_bredr_success_test_1,
++				setup_start_discovery,
++				test_command_generic);
++	test_bredrle("Stop Service Discovery - Rejected 1",
++				&stop_service_discovery_rejected_test_1,
++				NULL, test_command_generic);
++	test_bredrle("Stop Service Discovery - Invalid parameters 1",
++				&stop_service_discovery_invalid_param_test_1,
++				setup_start_discovery,
++				test_command_generic);
++
+ 	test_bredrle("Set Device Class - Success 1",
+ 				&set_dev_class_valid_param_test_1,
+ 				NULL, test_command_generic);
+-- 
+2.1.0.rc2.206.gedb03e5
 
->>
->>>
->>> I can also set the RSSI threshold at very low value to get notified
->>> about temperature sensor, but the I'll get a lot of  device found
->>> events about security token that will wake my application unnecessary.
->>> We want to avoid that, and that's why we're doing scan in kernel, and
->>> plan to move it to controller.
->>>
->>> So my patches right now define rssi threshold per UUID this like that:
->>>
->>> struct mgmt_uuid_filter {
->>> __s8 rssi;
->>> __u8 uuid[16];
->>> } __packed;
->>>
->>> struct mgmt_cp_start_service_discovery {
->>> __u8 type;
->>> __le16 filter_count;
->>> struct mgmt_uuid_filter filter[0];
->>> } __packed;
->>
->> Add Start Service Discovery and Stop Service Discover is just the first =
-step to support your needs. That is for actively finding devices at a speci=
-fic point in time. For long time running background scanning we need to add=
- these UUID to the background scanning list. And there we add/remove them o=
-ne by one and with that can make it depending on the RSSI.
->
-> Ok, but let's first get this short term scan in.
->>
->> Regards
->>
->> Marcel
->>
