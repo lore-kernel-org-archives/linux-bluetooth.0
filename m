@@ -1,43 +1,98 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
+From: Arman Uguray <armansito@chromium.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: Arman Uguray <armansito@chromium.org>
+Subject: [PATCH BlueZ v3 2/2] unit/test-gatt: Add /TP/GAD/SR/BV-01-C test
+Date: Mon, 24 Nov 2014 12:05:53 -0800
+Message-Id: <1416859553-11027-3-git-send-email-armansito@chromium.org>
 In-Reply-To: <1416859553-11027-1-git-send-email-armansito@chromium.org>
 References: <1416859553-11027-1-git-send-email-armansito@chromium.org>
-Date: Mon, 24 Nov 2014 22:57:05 +0200
-Message-ID: <CABBYNZ+osKB3Muyq8=H9s3jm7yNrx4L-7JLUYBgQU4E6EAp_CA@mail.gmail.com>
-Subject: Re: [PATCH Bluez v3 0/2] unit/test-gatt: Add initial server role tests.
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Arman Uguray <armansito@chromium.org>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Arman,
+Verify that a Generic Attribute Profile server can support a search for
+all Primary Services it contains.
+---
+ unit/test-gatt.c | 52 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 52 insertions(+)
 
-On Mon, Nov 24, 2014 at 10:05 PM, Arman Uguray <armansito@chromium.org> wrote:
-> This patch set adds the "Server Configuration" and "Discover All Primary
-> Services" test cases using bt_gatt_server.
->
-> *v1: - Removed COEX test type for now.
->      - Added macro for the first incoming "Exchange MTU" request PDU for
->        server tests.
->
-> *v2: Fixed compile warning.
->
-> *v3: Added test case description from the TS to the commit messages.
->
-> Arman Uguray (2):
->   unit/test-gatt: Add /TP/GAC/SR/BV-01-C test
->   unit/test-gatt: Add /TP/GAD/SR/BV-01-C test
->
->  unit/test-gatt.c | 98 +++++++++++++++++++++++++++++++++++++++++++++++++++++++-
->  1 file changed, 97 insertions(+), 1 deletion(-)
->
-> --
-> 2.1.0.rc2.206.gedb03e5
-
-Applied, thanks.
-
-
+diff --git a/unit/test-gatt.c b/unit/test-gatt.c
+index 58885a4..84925af 100644
+--- a/unit/test-gatt.c
++++ b/unit/test-gatt.c
+@@ -431,6 +431,42 @@ static void client_ready_cb(bool success, uint8_t att_ecode, void *user_data)
+ 	context_quit(context);
+ }
+ 
++static void populate_db(struct context *context)
++{
++	struct gatt_db *db = context->db;
++	struct gatt_db_attribute *attr;
++	bt_uuid_t uuid;
++	uint128_t u128 = {
++		.data = { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08,
++				0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f }
++	};
++
++	/* Service 1 */
++	bt_uuid16_create(&uuid, 0x1800);
++	attr = gatt_db_add_service(db, &uuid, true, 5);
++	gatt_db_service_set_active(attr, true);
++
++	/* Service 2 */
++	bt_uuid16_create(&uuid, 0x1801);
++	attr = gatt_db_add_service(db, &uuid, true, 3);
++	gatt_db_service_set_active(attr, true);
++
++	/* Service 3 */
++	bt_uuid16_create(&uuid, 0x180f);
++	attr = gatt_db_add_service(db, &uuid, false, 5);
++	gatt_db_service_set_active(attr, true);
++
++	/* Service 4 */
++	bt_uuid16_create(&uuid, 0x180d);
++	attr = gatt_db_add_service(db, &uuid, true, 8);
++	gatt_db_service_set_active(attr, true);
++
++	/* Service 5 */
++	bt_uuid128_create(&uuid, u128);
++	attr = gatt_db_add_service(db, &uuid, true, 1);
++	gatt_db_service_set_active(attr, true);
++}
++
+ static struct context *create_context(uint16_t mtu, gconstpointer data)
+ {
+ 	struct context *context = g_new0(struct context, 1);
+@@ -465,6 +501,8 @@ static struct context *create_context(uint16_t mtu, gconstpointer data)
+ 		context->server = bt_gatt_server_new(context->db, att, mtu);
+ 		g_assert(context->server);
+ 
++		populate_db(context);
++
+ 		if (g_test_verbose())
+ 			bt_gatt_server_set_debug(context->server, print_debug,
+ 						"bt_gatt_server:", NULL);
+@@ -852,6 +890,20 @@ int main(int argc, char *argv[])
+ 			raw_pdu(0x10, 0x97, 0x00, 0xff, 0xff, 0x00, 0x28),
+ 			raw_pdu(0x01, 0x10, 0x97, 0x00, 0x0a));
+ 
++	define_test_server("/TP/GAD/SR/BV-01-C", test_server, NULL, NULL,
++			raw_pdu(0x03, 0x00, 0x02),
++			raw_pdu(0x10, 0x01, 0x00, 0xff, 0xff, 0x00, 0x28),
++			raw_pdu(0x11, 0x06, 0x01, 0x00, 0x05, 0x00, 0x00, 0x18,
++					0x06, 0x00, 0x08, 0x00, 0x01, 0x18,
++					0x0e, 0x00, 0x15, 0x00, 0x0d, 0x18),
++			raw_pdu(0x10, 0x16, 0x00, 0xff, 0xff, 0x00, 0x28),
++			raw_pdu(0x11, 0x14, 0x16, 0x00, 0x16, 0x00, 0x0f,
++					0x0e, 0x0d, 0x0c, 0x0b, 0x0a, 0x09,
++					0x08, 0x07, 0x06, 0x05, 0x04, 0x03,
++					0x02, 0x01, 0x00),
++			raw_pdu(0x10, 0x17, 0x00, 0xff, 0xff, 0x00, 0x28),
++			raw_pdu(0x01, 0x10, 0x17, 0x00, 0x0a));
++
+ 	define_test_att("/TP/GAD/CL/BV-02-C-1", test_search_primary, &uuid_16,
+ 			NULL,
+ 			raw_pdu(0x02, 0x00, 0x02),
 -- 
-Luiz Augusto von Dentz
+2.1.0.rc2.206.gedb03e5
+
