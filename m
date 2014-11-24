@@ -1,40 +1,69 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 24 Nov 2014 15:10:38 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Arman Uguray <armansito@chromium.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH BlueZ 1/2] shared/att: Directly close fd on ATT
- violations.
-Message-ID: <20141124131038.GA21565@t440s.ger.corp.intel.com>
-References: <1416613500-13315-1-git-send-email-armansito@chromium.org>
- <1416613500-13315-2-git-send-email-armansito@chromium.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1416613500-13315-2-git-send-email-armansito@chromium.org>
+From: Sagar Nageshmurthy <s.nageshmurt@samsung.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Sagar Nageshmurthy <s.nageshmurt@samsung.com>
+Subject: [PATCH 1/1] audio/a2dp: Fix Access session device only when its valid
+Date: Mon, 24 Nov 2014 18:11:40 +0530
+Message-id: <1416832900-16924-1-git-send-email-s.nageshmurt@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Arman,
+session will be NULL if A2DP connection fails because of NO REPLY
+from endpoint or if the configuration is aborted. Accessing session
+device in such a scenario leads to bluetoothd crash.
 
-On Fri, Nov 21, 2014, Arman Uguray wrote:
-> +	/*
-> +	 * Directly terminate the connection as required by the ATT protocol.
-> +	 * This should trigger an io disconnect event which will clean up the
-> +	 * io and notify the upper layer.
-> +	 */
-> +	close(att->fd);
-> +
->  	return false;
->  }
+(gdb) bt full
+0  avdtp_get_device (session=0x0) at profiles/audio/avdtp.c:3987
+No locals.
+1  0xb6f0e352 in auto_config (data=<value optimized out>)
+    at profiles/audio/a2dp.c:382
+        setup = 0xb7a4f230
+        dev = <value optimized out>
+2  0xb6f132f6 in config_cb (endpoint=<value optimized out>,
+    ret=<value optimized out>, size=<value optimized out>,
+    user_data=<value optimized out>) at profiles/audio/media.c:534
+        data = <value optimized out>
+3  0xb6f1398a in media_endpoint_cancel (endpoint=0xb7a43e78)
+    at profiles/audio/media.c:136
+        endpoint = 0xb7a43e78
+4  media_endpoint_cancel_all (endpoint=0xb7a43e78)
+    at profiles/audio/media.c:144
+No locals.
+5  0xb6f13e04 in clear_endpoint (endpoint=0xb7a43e78)
+    at profiles/audio/media.c:245
+No locals.
+6  0xb6f13f68 in endpoint_reply (call=<value optimized out>,
+    user_data=0xb7a4e538) at profiles/audio/media.c:275
+        request = 0xb7a4e538
+        endpoint = 0xb7a43e78
+        reply = 0xb7a3f560
+        err = {name = 0xb7a5de70 "org.freedesktop.DBus.Error.NoReply"
+---
+ profiles/audio/a2dp.c |    4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-Shouldn't you also set att->fd to -1 since its old value is now invalid?
-(similar to setting a pointer to NULL after freeing it)
+diff --git a/profiles/audio/a2dp.c b/profiles/audio/a2dp.c
+index c9dac9a..6b72f99 100644
+--- a/profiles/audio/a2dp.c
++++ b/profiles/audio/a2dp.c
+@@ -379,7 +379,7 @@ static void stream_state_changed(struct avdtp_stream *stream,
+ static gboolean auto_config(gpointer data)
+ {
+ 	struct a2dp_setup *setup = data;
+-	struct btd_device *dev = avdtp_get_device(setup->session);
++	struct btd_device *dev = NULL;
+ 	struct btd_service *service;
+ 
+ 	/* Check if configuration was aborted */
+@@ -389,6 +389,8 @@ static gboolean auto_config(gpointer data)
+ 	if (setup->err != NULL)
+ 		goto done;
+ 
++	dev = avdtp_get_device(setup->session);
++
+ 	avdtp_stream_add_cb(setup->session, setup->stream,
+ 				stream_state_changed, setup->sep);
+ 
+-- 
+1.7.9.5
 
-However, wouldn't the more correct thing to do be to use shutdown()
-instead of close()? That would guarantee that even in the case of
-duplicated fd's the connection would get terminated - close() can be
-considered to behave similar to an unref(), i.e. it invalidates the fd
-value but only does something to the connection (the same as shutdown)
-if there are no other references left.
-
-Johan
