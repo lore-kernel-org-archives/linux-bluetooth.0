@@ -1,87 +1,92 @@
 Return-Path: <cyrus@holtmann.org>
+From: Amitkumar Karwar <akarwar@marvell.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+CC: BlueZ development <linux-bluetooth@vger.kernel.org>,
+        Johannes Berg
+	<johannes@sipsolutions.net>,
+        Xinming Hu <huxm@marvell.com>, Cathy Luo
+	<cluo@marvell.com>,
+        Avinash Patil <patila@marvell.com>
+Date: Mon, 24 Nov 2014 01:55:45 -0800
+Subject: RE: [RESEND PATCH v3] Bluetooth: btmrvl add firmware dump support
+Message-ID: <5FF020A1CFFEEC49BD1E09530C4FF5951B15A83042@SC-VEXCH1.marvell.com>
+References: <1416498414-9583-1-git-send-email-akarwar@marvell.com>
+ <1596A22A-E632-4C05-9233-3907AE41EBCE@holtmann.org>
+In-Reply-To: <1596A22A-E632-4C05-9233-3907AE41EBCE@holtmann.org>
+Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
-In-Reply-To: <1416823882-15769-1-git-send-email-chethan.tn@samsung.com>
-References: <1416823882-15769-1-git-send-email-chethan.tn@samsung.com>
-Date: Mon, 24 Nov 2014 12:03:49 +0200
-Message-ID: <CABBYNZ+3L1Y683jWUryT7iPZZU+X0Zq8eWntdTxAJWheak1Kxw@mail.gmail.com>
-Subject: Re: [PATCH v2] audio/sink: Fix a2dp XCASE connection with BOSE headset
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Chethan T N <chethan.tn@samsung.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Marcel,
 
-On Mon, Nov 24, 2014 at 12:11 PM, Chethan T N <chethan.tn@samsung.com> wrote:
-> Some bluetooth headset (BOSE) initates the avdtp connection immideately
-> after HFP connection is completed, so if application initates a2dp connection
-> and since already avdtp connection is ongiong should return error EBUSY
->
-> bluetoothd[1215]: src/service.c:change_state() 0xb6f428a8: device XX:XX:XX:XX:XX:XX profile Hands-Free Audio Gateway state changed: disconnected -> connecting (0)
-> bluetoothd[1215]: src/profile.c:record_cb() profile uuid 0000111e-0000-1000-8000-00805f9b34fb port uuid 0000111e-0000-1000-8000-00805f9b34fb
-> bluetoothd[1215]: src/profile.c:ext_connect() Hands-Free Audio Gateway connected to XX:XX:XX:XX:XX:XX
-> bluetoothd[1215]: src/service.c:change_state() 0xb6f428a8: device XX:XX:XX:XX:XX:XX profile Hands-Free Audio Gateway state changed: connecting -> connected (0)
-> bluetoothd[1215]: src/device.c:device_profile_connected() Hands-Free Audio Gateway Success (0)
-> bluetoothd[1215]: src/device.c:device_profile_connected() returning response to :1.113
-> bluetoothd[1215]: /: org.freedesktop.DBus.ObjectManager.GetManagedObjects()
-> bluetoothd[1215]: src/device.c:search_cb() XX:XX:XX:XX:XX:XX: No service update
-> bluetoothd[1215]: src/device.c:device_svc_resolved() /org/bluez/hci0/dev_XX_XX_XX_XX_XX_XX err 0
-> bluetoothd[1215]: profiles/audio/avdtp.c:avdtp_confirm_cb() AVDTP: incoming connect from XX:XX:XX:XX:XX:XX
-> bluetoothd[1215]: profiles/audio/sink.c:sink_set_state() State changed /org/bluez/hci0/dev_XX_XX_XX_XX_XX_XX: SINK_STATE_DISCONNECTED -> SINK_STATE_CONNECTING
-> bluetoothd[1215]: src/adapter.c:device_is_auto_accept() uuid 0000110d-0000-1000-8000-00805f9b34fb
-> bluetoothd[1215]: src/adapter.c:device_is_auto_accept() Auto Authorization accepting for uuid 0000110d-0000-1000-8000-00805f9b34fb
-> bluetoothd[1215]: profiles/audio/avdtp.c:avdtp_connect_cb() AVDTP: connected signaling channel to XX:XX:XX:XX:XX:XX
-> bluetoothd[1215]: profiles/audio/avdtp.c:avdtp_connect_cb() AVDTP imtu=672, omtu=895
-> bluetoothd[1215]: profiles/audio/avdtp.c:set_disconnect_timer() name : Bose
-> bluetoothd[1215]: /: org.freedesktop.DBus.ObjectManager.GetManagedObjects()
-> bluetoothd[1215]: /: org.freedesktop.DBus.ObjectManager.GetManagedObjects()
-> bluetoothd[1215]: /org/bluez/hci0/dev_XX_XX_XX_XX_XX_XX: org.freedesktop.DBus.Properties.GetAll()
-> bluetoothd[1215]: profiles/audio/avdtp.c:session_cb()
-> bluetoothd[1215]: profiles/audio/avdtp.c:avdtp_parse_cmd() Received DISCOVER_CMD
-> bluetoothd[1215]: /: org.freedesktop.DBus.ObjectManager.GetManagedObjects()
-> bluetoothd[1215]: profiles/audio/avdtp.c:session_cb()
-> bluetoothd[1215]: profiles/audio/avdtp.c:avdtp_parse_cmd() Received  GET_CAPABILITIES_CMD
-> bluetoothd[1215]: profiles/audio/a2dp.c:endpoint_getcap_ind() Source 0xb6f46030: Get_Capability_Ind
-> bluetoothd[1215]: profiles/audio/avdtp.c:session_cb()
-> bluetoothd[1215]: profiles/audio/avdtp.c:avdtp_parse_cmd() Received SET_CONFIGURATION_CMD
-> bluetoothd[1215]: profiles/audio/a2dp.c:endpoint_setconf_ind() Source 0xb6f46030: Set_Configuration_Ind
-> bluetoothd[1215]: profiles/audio/avdtp.c:avdtp_ref() 0xb6f61c60: ref=1
-> bluetoothd[1215]: profiles/audio/a2dp.c:setup_ref() 0xb6f622d8: ref=1
-> bluetoothd[1215]: profiles/audio/media.c:media_adapter_get_player()
-> bluetoothd[1215]: profiles/audio/media.c:media_set_sink_callback()
-> bluetoothd[1215]: profiles/audio/media.c:media_endpoint_async_call() Calling SetConfiguration: name = :1.14 path = /MediaEndpoint/A2DPSource
-> bluetoothd[1215]: /org/bluez/hci0: org.freedesktop.DBus.Properties.GetAll()
-> bluetoothd[1215]: /org/bluez/hci0/dev_XX_XX_XX_XX_XX_XX: org.bluez.Device1.ConnectProfile()
-> bluetoothd[1215]: src/device.c:connect_profiles() /org/bluez/hci0/dev_XX_XX_XX_XX_XX_XX 0000110b-0000-1000-8000-00805f9b34fb, client :1.113
-> bluetoothd[1215]: profiles/audio/a2dp.c:a2dp_sink_connect() path /org/bluez/hci0/dev_XX_XX_XX_XX_XX_XX
-> bluetoothd[1215]: profiles/audio/avdtp.c:avdtp_ref() 0xb6f61c60: ref=2
-> bluetoothd[1215]: profiles/audio/sink.c:sink_connect() stream creation in progress
-> bluetoothd[1215]: src/service.c:change_state() 0xb6f4ece0: device XX:XX:XX:XX:XX:XX profile a2dp-sink state changed: disconnected -> connecting (0)
-> bluetoothd[1215]: profiles/audio/avdtp.c:session_cb()
-> ---
->  profiles/audio/sink.c |    3 +++
->  1 file changed, 3 insertions(+)
->
-> diff --git a/profiles/audio/sink.c b/profiles/audio/sink.c
-> index da8992e..f475709 100644
-> --- a/profiles/audio/sink.c
-> +++ b/profiles/audio/sink.c
-> @@ -292,6 +292,9 @@ int sink_connect(struct btd_service *service)
->         if (sink->connect_id > 0 || sink->disconnect_id > 0)
->                 return -EBUSY;
->
-> +       if (sink->state == SINK_STATE_CONNECTING)
-> +               return -EBUSY;
-> +
->         if (sink->stream_state >= AVDTP_STATE_OPEN)
->                 return -EALREADY;
->
-> --
-> 1.7.9.5
+Thanks for your comments.
 
-Ive already applied this one, might have forgotten to reply though.
+>> +
+>> +	if (result)
+>> +		btmrvl_firmware_dump(priv);
+>> +	else
+>> +		return -EINVAL;
+>
+>lets turn this around.
+>
+>	if (!result)
+>		return -EINVAL;
+>
+>	btmrvl_firmware_dump(priv);
+>
+>Doing it this way makes it a lot easier to read.
 
--- 
-Luiz Augusto von Dentz
+Sure. We will take care of this in updated version.
+
+>> a/drivers/bluetooth/btmrvl_drv.h b/drivers/bluetooth/btmrvl_drv.h
+>> index 38ad662..389e6f1 100644
+>> --- a/drivers/bluetooth/btmrvl_drv.h
+>> +++ b/drivers/bluetooth/btmrvl_drv.h
+>> @@ -22,6 +22,7 @@
+>> #include <linux/kthread.h>
+>> #include <linux/bitops.h>
+>> #include <linux/slab.h>
+>> +#include <linux/devcoredump.h>
+>
+>I overlooked this before. Why does this include need to be in the header
+>file?
+>
+
+We will move this check to btmrvl_sdio.c where "dev_coredumpv()" API has be=
+en used.
+
+>> #include "btmrvl_drv.h"
+>> #include "btmrvl_sdio.h"
+>> @@ -335,6 +336,14 @@ int btmrvl_prepare_command(struct btmrvl_private
+>*priv)
+>> 	return ret;
+>> }
+>>
+>> +void btmrvl_firmware_dump(struct btmrvl_private *priv) {
+>> +	if (priv->firmware_dump)
+>> +		priv->firmware_dump(priv);
+>> +	else
+>> +		BT_ERR("firmware dump error : not defined!\n"); }
+>
+>Actually coming to think about it, it would be better to not expose the
+>debugfs entry if the firmware_dump callback is not defined. Is it
+>possible to change that code that way?
+>
+
+Yes. This error message is redundant. We need to get rid of it to avoid exp=
+osing debugfs entry.
+
+>> +
+>> +		}
+>> +
+>> +		BT_INFO("%s\n", buf);
+>
+>I do not think that BT_INFO etc. functions need the \n at the end. You
+>might want to fix that in the code for all places.
+>
+
+We will prepare a separate patch to fix this in existing code and update fi=
+rmware dump support patch accordingly.
+
+Regards,
+Amitkumar
