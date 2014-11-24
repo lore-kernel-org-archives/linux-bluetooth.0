@@ -1,30 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
-From: Sebastian Chlad <sebastian.chlad@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Sebastian Chlad <sebastian.chlad@tieto.com>
-Subject: [PATCH 1/2] android/pts: Correct typo in AVDTP PICS file
-Date: Mon, 24 Nov 2014 14:30:38 +0100
-Message-Id: <1416835839-14761-1-git-send-email-sebastian.chlad@tieto.com>
+Date: Mon, 24 Nov 2014 15:10:38 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Arman Uguray <armansito@chromium.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH BlueZ 1/2] shared/att: Directly close fd on ATT
+ violations.
+Message-ID: <20141124131038.GA21565@t440s.ger.corp.intel.com>
+References: <1416613500-13315-1-git-send-email-armansito@chromium.org>
+ <1416613500-13315-2-git-send-email-armansito@chromium.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1416613500-13315-2-git-send-email-armansito@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- android/pics-avdtp.txt | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Hi Arman,
 
-diff --git a/android/pics-avdtp.txt b/android/pics-avdtp.txt
-index 0bcbfb9..ce7b259 100644
---- a/android/pics-avdtp.txt
-+++ b/android/pics-avdtp.txt
-@@ -116,7 +116,7 @@ TSPC_AVDTP_8_4	True		Signal identifier (M)
- Parameter Name	Selected	Description
- -------------------------------------------------------------------------------
- TSPC_AVDTP_9_1	True (*)	Establish signaling channel (O)
--TSPC_AVDTP_9_1	True (*)	Disconnect signaling channel (O)
-+TSPC_AVDTP_9_2	True (*)	Disconnect signaling channel (O)
- -------------------------------------------------------------------------------
- 
- 
--- 
-1.8.5.3
+On Fri, Nov 21, 2014, Arman Uguray wrote:
+> +	/*
+> +	 * Directly terminate the connection as required by the ATT protocol.
+> +	 * This should trigger an io disconnect event which will clean up the
+> +	 * io and notify the upper layer.
+> +	 */
+> +	close(att->fd);
+> +
+>  	return false;
+>  }
 
+Shouldn't you also set att->fd to -1 since its old value is now invalid?
+(similar to setting a pointer to NULL after freeing it)
+
+However, wouldn't the more correct thing to do be to use shutdown()
+instead of close()? That would guarantee that even in the case of
+duplicated fd's the connection would get terminated - close() can be
+considered to behave similar to an unref(), i.e. it invalidates the fd
+value but only does something to the connection (the same as shutdown)
+if there are no other references left.
+
+Johan
