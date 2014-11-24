@@ -1,106 +1,87 @@
 Return-Path: <cyrus@holtmann.org>
-From: Amitkumar Karwar <akarwar@marvell.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: Johannes Berg <johannes@sipsolutions.net>, <marcel@holtmann.org>,
-        Amitkumar Karwar <akarwar@marvell.com>
-Subject: [PATCH 1/2] Bluetooth: btmrvl: remove extra newline character
-Date: Mon, 24 Nov 2014 02:40:52 -0800
-Message-ID: <1416825653-32530-1-git-send-email-akarwar@marvell.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <1416823882-15769-1-git-send-email-chethan.tn@samsung.com>
+References: <1416823882-15769-1-git-send-email-chethan.tn@samsung.com>
+Date: Mon, 24 Nov 2014 12:03:49 +0200
+Message-ID: <CABBYNZ+3L1Y683jWUryT7iPZZU+X0Zq8eWntdTxAJWheak1Kxw@mail.gmail.com>
+Subject: Re: [PATCH v2] audio/sink: Fix a2dp XCASE connection with BOSE headset
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Chethan T N <chethan.tn@samsung.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-BT_INFO/BT_DBG etc. already takes care of adding a newline
-An extra newline character inside message is removed in this
-patch.
+Hi,
 
-Signed-off-by: Amitkumar Karwar <akarwar@marvell.com>
----
- drivers/bluetooth/btmrvl_main.c | 14 +++++++-------
- drivers/bluetooth/btmrvl_sdio.c |  4 ++--
- 2 files changed, 9 insertions(+), 9 deletions(-)
+On Mon, Nov 24, 2014 at 12:11 PM, Chethan T N <chethan.tn@samsung.com> wrote:
+> Some bluetooth headset (BOSE) initates the avdtp connection immideately
+> after HFP connection is completed, so if application initates a2dp connection
+> and since already avdtp connection is ongiong should return error EBUSY
+>
+> bluetoothd[1215]: src/service.c:change_state() 0xb6f428a8: device XX:XX:XX:XX:XX:XX profile Hands-Free Audio Gateway state changed: disconnected -> connecting (0)
+> bluetoothd[1215]: src/profile.c:record_cb() profile uuid 0000111e-0000-1000-8000-00805f9b34fb port uuid 0000111e-0000-1000-8000-00805f9b34fb
+> bluetoothd[1215]: src/profile.c:ext_connect() Hands-Free Audio Gateway connected to XX:XX:XX:XX:XX:XX
+> bluetoothd[1215]: src/service.c:change_state() 0xb6f428a8: device XX:XX:XX:XX:XX:XX profile Hands-Free Audio Gateway state changed: connecting -> connected (0)
+> bluetoothd[1215]: src/device.c:device_profile_connected() Hands-Free Audio Gateway Success (0)
+> bluetoothd[1215]: src/device.c:device_profile_connected() returning response to :1.113
+> bluetoothd[1215]: /: org.freedesktop.DBus.ObjectManager.GetManagedObjects()
+> bluetoothd[1215]: src/device.c:search_cb() XX:XX:XX:XX:XX:XX: No service update
+> bluetoothd[1215]: src/device.c:device_svc_resolved() /org/bluez/hci0/dev_XX_XX_XX_XX_XX_XX err 0
+> bluetoothd[1215]: profiles/audio/avdtp.c:avdtp_confirm_cb() AVDTP: incoming connect from XX:XX:XX:XX:XX:XX
+> bluetoothd[1215]: profiles/audio/sink.c:sink_set_state() State changed /org/bluez/hci0/dev_XX_XX_XX_XX_XX_XX: SINK_STATE_DISCONNECTED -> SINK_STATE_CONNECTING
+> bluetoothd[1215]: src/adapter.c:device_is_auto_accept() uuid 0000110d-0000-1000-8000-00805f9b34fb
+> bluetoothd[1215]: src/adapter.c:device_is_auto_accept() Auto Authorization accepting for uuid 0000110d-0000-1000-8000-00805f9b34fb
+> bluetoothd[1215]: profiles/audio/avdtp.c:avdtp_connect_cb() AVDTP: connected signaling channel to XX:XX:XX:XX:XX:XX
+> bluetoothd[1215]: profiles/audio/avdtp.c:avdtp_connect_cb() AVDTP imtu=672, omtu=895
+> bluetoothd[1215]: profiles/audio/avdtp.c:set_disconnect_timer() name : Bose
+> bluetoothd[1215]: /: org.freedesktop.DBus.ObjectManager.GetManagedObjects()
+> bluetoothd[1215]: /: org.freedesktop.DBus.ObjectManager.GetManagedObjects()
+> bluetoothd[1215]: /org/bluez/hci0/dev_XX_XX_XX_XX_XX_XX: org.freedesktop.DBus.Properties.GetAll()
+> bluetoothd[1215]: profiles/audio/avdtp.c:session_cb()
+> bluetoothd[1215]: profiles/audio/avdtp.c:avdtp_parse_cmd() Received DISCOVER_CMD
+> bluetoothd[1215]: /: org.freedesktop.DBus.ObjectManager.GetManagedObjects()
+> bluetoothd[1215]: profiles/audio/avdtp.c:session_cb()
+> bluetoothd[1215]: profiles/audio/avdtp.c:avdtp_parse_cmd() Received  GET_CAPABILITIES_CMD
+> bluetoothd[1215]: profiles/audio/a2dp.c:endpoint_getcap_ind() Source 0xb6f46030: Get_Capability_Ind
+> bluetoothd[1215]: profiles/audio/avdtp.c:session_cb()
+> bluetoothd[1215]: profiles/audio/avdtp.c:avdtp_parse_cmd() Received SET_CONFIGURATION_CMD
+> bluetoothd[1215]: profiles/audio/a2dp.c:endpoint_setconf_ind() Source 0xb6f46030: Set_Configuration_Ind
+> bluetoothd[1215]: profiles/audio/avdtp.c:avdtp_ref() 0xb6f61c60: ref=1
+> bluetoothd[1215]: profiles/audio/a2dp.c:setup_ref() 0xb6f622d8: ref=1
+> bluetoothd[1215]: profiles/audio/media.c:media_adapter_get_player()
+> bluetoothd[1215]: profiles/audio/media.c:media_set_sink_callback()
+> bluetoothd[1215]: profiles/audio/media.c:media_endpoint_async_call() Calling SetConfiguration: name = :1.14 path = /MediaEndpoint/A2DPSource
+> bluetoothd[1215]: /org/bluez/hci0: org.freedesktop.DBus.Properties.GetAll()
+> bluetoothd[1215]: /org/bluez/hci0/dev_XX_XX_XX_XX_XX_XX: org.bluez.Device1.ConnectProfile()
+> bluetoothd[1215]: src/device.c:connect_profiles() /org/bluez/hci0/dev_XX_XX_XX_XX_XX_XX 0000110b-0000-1000-8000-00805f9b34fb, client :1.113
+> bluetoothd[1215]: profiles/audio/a2dp.c:a2dp_sink_connect() path /org/bluez/hci0/dev_XX_XX_XX_XX_XX_XX
+> bluetoothd[1215]: profiles/audio/avdtp.c:avdtp_ref() 0xb6f61c60: ref=2
+> bluetoothd[1215]: profiles/audio/sink.c:sink_connect() stream creation in progress
+> bluetoothd[1215]: src/service.c:change_state() 0xb6f4ece0: device XX:XX:XX:XX:XX:XX profile a2dp-sink state changed: disconnected -> connecting (0)
+> bluetoothd[1215]: profiles/audio/avdtp.c:session_cb()
+> ---
+>  profiles/audio/sink.c |    3 +++
+>  1 file changed, 3 insertions(+)
+>
+> diff --git a/profiles/audio/sink.c b/profiles/audio/sink.c
+> index da8992e..f475709 100644
+> --- a/profiles/audio/sink.c
+> +++ b/profiles/audio/sink.c
+> @@ -292,6 +292,9 @@ int sink_connect(struct btd_service *service)
+>         if (sink->connect_id > 0 || sink->disconnect_id > 0)
+>                 return -EBUSY;
+>
+> +       if (sink->state == SINK_STATE_CONNECTING)
+> +               return -EBUSY;
+> +
+>         if (sink->stream_state >= AVDTP_STATE_OPEN)
+>                 return -EALREADY;
+>
+> --
+> 1.7.9.5
 
-diff --git a/drivers/bluetooth/btmrvl_main.c b/drivers/bluetooth/btmrvl_main.c
-index bb0d2c2..10973ac 100644
---- a/drivers/bluetooth/btmrvl_main.c
-+++ b/drivers/bluetooth/btmrvl_main.c
-@@ -42,7 +42,7 @@ void btmrvl_interrupt(struct btmrvl_private *priv)
- 	priv->adapter->int_count++;
- 
- 	if (priv->adapter->hs_state == HS_ACTIVATED) {
--		BT_DBG("BT: HS DEACTIVATED in ISR!\n");
-+		BT_DBG("BT: HS DEACTIVATED in ISR!");
- 		priv->adapter->hs_state = HS_DEACTIVATED;
- 	}
- 
-@@ -214,7 +214,7 @@ int btmrvl_send_module_cfg_cmd(struct btmrvl_private *priv, u8 subcmd)
- 
- 	ret = btmrvl_send_sync_cmd(priv, BT_CMD_MODULE_CFG_REQ, &subcmd, 1);
- 	if (ret)
--		BT_ERR("module_cfg_cmd(%x) failed\n", subcmd);
-+		BT_ERR("module_cfg_cmd(%x) failed", subcmd);
- 
- 	return ret;
- }
-@@ -250,7 +250,7 @@ int btmrvl_send_hscfg_cmd(struct btmrvl_private *priv)
- 
- 	ret = btmrvl_send_sync_cmd(priv, BT_CMD_HOST_SLEEP_CONFIG, param, 2);
- 	if (ret)
--		BT_ERR("HSCFG command failed\n");
-+		BT_ERR("HSCFG command failed");
- 
- 	return ret;
- }
-@@ -268,7 +268,7 @@ int btmrvl_enable_ps(struct btmrvl_private *priv)
- 
- 	ret = btmrvl_send_sync_cmd(priv, BT_CMD_AUTO_SLEEP_MODE, &param, 1);
- 	if (ret)
--		BT_ERR("PSMODE command failed\n");
-+		BT_ERR("PSMODE command failed");
- 
- 	return 0;
- }
-@@ -281,7 +281,7 @@ int btmrvl_enable_hs(struct btmrvl_private *priv)
- 
- 	ret = btmrvl_send_sync_cmd(priv, BT_CMD_HOST_SLEEP_ENABLE, NULL, 0);
- 	if (ret) {
--		BT_ERR("Host sleep enable command failed\n");
-+		BT_ERR("Host sleep enable command failed");
- 		return ret;
- 	}
- 
-@@ -328,7 +328,7 @@ int btmrvl_prepare_command(struct btmrvl_private *priv)
- 		} else {
- 			ret = priv->hw_wakeup_firmware(priv);
- 			priv->adapter->hs_state = HS_DEACTIVATED;
--			BT_DBG("BT: HS DEACTIVATED due to host activity!\n");
-+			BT_DBG("BT: HS DEACTIVATED due to host activity!");
- 		}
- 	}
- 
-@@ -493,7 +493,7 @@ static int btmrvl_download_cal_data(struct btmrvl_private *priv,
- 	ret = btmrvl_send_sync_cmd(priv, BT_CMD_LOAD_CONFIG_DATA, data,
- 				   BT_CAL_HDR_LEN + len);
- 	if (ret)
--		BT_ERR("Failed to download caibration data\n");
-+		BT_ERR("Failed to download caibration data");
- 
- 	return 0;
- }
-diff --git a/drivers/bluetooth/btmrvl_sdio.c b/drivers/bluetooth/btmrvl_sdio.c
-index 550bce0..416d792 100644
---- a/drivers/bluetooth/btmrvl_sdio.c
-+++ b/drivers/bluetooth/btmrvl_sdio.c
-@@ -764,8 +764,8 @@ static void btmrvl_sdio_interrupt(struct sdio_func *func)
- 
- 	card = sdio_get_drvdata(func);
- 	if (!card || !card->priv) {
--		BT_ERR("sbi_interrupt(%p) card or priv is "
--				"NULL, card=%p\n", func, card);
-+		BT_ERR("sbi_interrupt(%p) card or priv is NULL, card=%p",
-+		       func, card);
- 		return;
- 	}
- 
+Ive already applied this one, might have forgotten to reply though.
+
 -- 
-1.8.1.4
+Luiz Augusto von Dentz
