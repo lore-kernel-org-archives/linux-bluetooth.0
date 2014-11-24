@@ -1,46 +1,35 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v2] android/sco: Add sco helper lib
-Date: Mon, 24 Nov 2014 12:38:17 +0100
-Message-ID: <11159516.HObWJUiDMz@uw000953>
-In-Reply-To: <1416237398-6376-1-git-send-email-lukasz.rymanowski@tieto.com>
-References: <1416237398-6376-1-git-send-email-lukasz.rymanowski@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+From: yes@samsung.com
+To: linux-bluetooth@vger.kernel.org
+Cc: Anurag Biradar <biradar.a@samsung.com>
+Subject: [PATCH 1/1] audio/avrcp: Fix set absolute volume
+Date: Mon, 24 Nov 2014 16:41:43 +0530
+Message-id: <1416827503-17260-1-git-send-email-yes@samsung.com>
+In-reply-to: <yes@samsung.com>
+References: <yes@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Łukasz,
+From: Anurag Biradar <biradar.a@samsung.com>
 
-On Monday 17 of November 2014 16:16:38 Lukasz Rymanowski wrote:
-> This patch adds sco lib which gives means to create SCO object with
-> API to create listening socket, connect and disconnect.
-> 
-> This is going to be common code for HFP HF and HFP GW.
-> For now we support only one SCO at the time.
-> 
-> SCO listening socket is created once bt_sco_new() is called, but
-> SCO connection is possible only if confirm and connect callbacks are
-> registered.
-> 
-> Sco lib is not aware about voice settings. Those must be provided
-> on bt_sco_connect or in confirm callback.
-> 
-> This patch also adds this lib to Android build.
-> ---
-> v2:
-> * handled almost all Szymon comments
-> Not handled comment: Extend register callbacks with destroy and user_data is not
-> added. This is because we do not need it and also I'm not sure how it would be used.
-> These callbacks are used for both incoming and outgoing connection. And having common
-> user data for both probably does not make sense. So I would have to split it somehow
-> and this IMHO is overkill.
+Player object should be getting from target not from controller
+---
+ profiles/audio/avrcp.c |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Applied. Thanks.
+diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c
+index 5c3c4f9..be9cb56 100644
+--- a/profiles/audio/avrcp.c
++++ b/profiles/audio/avrcp.c
+@@ -1588,7 +1588,7 @@ static uint8_t avrcp_handle_set_absolute_volume(struct avrcp *session,
+ 						struct avrcp_header *pdu,
+ 						uint8_t transaction)
+ {
+-	struct avrcp_player *player = session->controller->player;
++	struct avrcp_player *player = target_get_player(session);
+ 	uint16_t len = ntohs(pdu->params_len);
+ 	uint8_t volume;
  
-
 -- 
-Best regards, 
-Szymon Janc
+1.7.9.5
+
