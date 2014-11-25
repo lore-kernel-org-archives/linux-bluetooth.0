@@ -1,103 +1,53 @@
 Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@gmail.com>
-To: Sebastian Chlad <sebastian.chlad@tieto.com>
+To: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] android/pts: L2CAP pts tests results on Android 5.0
-Date: Tue, 25 Nov 2014 22:00:40 +0100
-Message-ID: <1486688.GLIPfB8mFQ@athlon>
-In-Reply-To: <1416925715-9209-1-git-send-email-sebastian.chlad@tieto.com>
-References: <1416925715-9209-1-git-send-email-sebastian.chlad@tieto.com>
+Subject: Re: [PATCH 0/4] Add a2dp sink role
+Date: Tue, 25 Nov 2014 21:46:49 +0100
+Message-ID: <9026566.DbnoRd1nBe@athlon>
+In-Reply-To: <1416582835-7712-1-git-send-email-jakub.tyszkowski@tieto.com>
+References: <1416582835-7712-1-git-send-email-jakub.tyszkowski@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-HI Sebastian,
+Hi Jakub,
 
-On Tuesday 25 November 2014 15:28:35 Sebastian Chlad wrote:
-> ---
->  android/pts-l2cap.txt | 30 ++++++++++++++++--------------
->  1 file changed, 16 insertions(+), 14 deletions(-)
+On Friday 21 November 2014 16:13:51 Jakub Tyszkowski wrote:
+> With Android 5 A2DP Sink role was introduced. Sink in Android uses the same
+> HAL API as Source role does, but uses one more callback extending existing
+> A2DP HAL.
 > 
-> diff --git a/android/pts-l2cap.txt b/android/pts-l2cap.txt
-> index 9cd2875..f46bbbd 100644
-> --- a/android/pts-l2cap.txt
-> +++ b/android/pts-l2cap.txt
-> @@ -1,8 +1,8 @@
->  PTS test results for L2CAP
+> Some IPC defines and structs are common for both roles but of course they
+> have independent HALs and individual service IDs to work simultaneously.
 > 
->  PTS version: 5.3
-> -Tested: 24-October-2014
-> -Android version: 4.4.4
-> +Tested: 25-November-2014
-> +Android version: 5.0
->  Kernel version: 3.18
+> Jakub Tyszkowski (4):
+>   android/hal-ipc-api: Extend a2dp hal API with A2DP Sink role
+>   android/hal: Add HAL for A2DP Sink role
+>   android/a2dp-sink: Add skeleton for a2dp sink daemon
+>   android/hal: Add missing a2dp handler introduced in Android 5
 > 
->  Results:
-> @@ -41,10 +41,12 @@ TC_COS_IEX_BV_01_C	PASS	l2test -n -P 4113 <bdaddr>
->  TC_COS_IEX_BV_02_C	PASS
->  TC_COS_ECH_BV_01_C	PASS
->  TC_COS_ECH_BV_02_C	PASS	l2ping -c 1 <bdaddr>
-> -TC_COS_CFC_BV_01_C	INC	PTS issue #12728
-> -				l2test -y -N 1 -b 40 -V le_public <braddr>
-> -TC_COS_CFC_BV_02_C	INC	PTS issue #12728
-> -				l2test -y -N 1 -b 1 -V le_public <bdaddr>
-> +TC_COS_CFC_BV_01_C	PASS	l2test -y -N 1 -b 40 -V le_public <braddr>
-> +				Note: use Common.dll and ETS for L2CAP
-> +				from #12712
+>  android/Android.mk      |   2 +
+>  android/Makefile.am     |   2 +
+>  android/a2dp-sink.c     |  84 +++++++++++++++++++++++++
+>  android/a2dp-sink.h     |  25 ++++++++
+>  android/hal-a2dp-sink.c | 163
+> ++++++++++++++++++++++++++++++++++++++++++++++++ android/hal-a2dp.c      | 
+> 13 ++++
+>  android/hal-bluetooth.c |   3 +
+>  android/hal-ipc-api.txt |  12 +++-
+>  android/hal-msg.h       |  12 +++-
+>  android/hal.h           |   1 +
+>  10 files changed, 314 insertions(+), 3 deletions(-)
+>  create mode 100644 android/a2dp-sink.c
+>  create mode 100644 android/a2dp-sink.h
+>  create mode 100644 android/hal-a2dp-sink.c
+> 
+> --
+> 1.9.1
 
-Please keep "PTS issue #XXXXX" in same line as test name. (this makes 
-scripting easier)
-
-Also please keep original errata number (even if it was pointed to test with 
-ETS from other report).
-
-
-> +TC_COS_CFC_BV_02_C	PASS	l2test -y -N 1 -b 1 -V le_public <bdaddr>
-> +				Note: use Common.dll and ETS for L2CAP
-> +				from #12712
->  TC_COS_CFC_BV_03_C	PASS	l2test -u -V le_public <bdaddr>
->  TC_COS_CFC_BV_04_C	PASS	l2test -u -V le_public <bdaddr>
->  TC_COS_CFC_BV_05_C	PASS	l2test -m -V le_public <bdaddr>
-> @@ -95,8 +97,7 @@ TC_ERM_BV_02_C		PASS	l2test -r -X ertm -P 4113
->  TC_ERM_BV_03_C		PASS	l2test -r -X ertm -P 4113
->  TC_ERM_BV_05_C		PASS	l2test -x -X ertm -P 4113 -N 2 -Y 2
->  TC_ERM_BV_06_C		PASS	l2test -x -X ertm -P 4113 -N 2 -Y 2
-> -TC_ERM_BV_07_C		INC	PTS issue #12690
-> -				l2test -r -H 1000 -K 10000 -X ertm -P 4113
-> +TC_ERM_BV_07_C		PASS	l2test -r -H 1000 -K 10000 -X ertm -P 4113
->  TC_ERM_BV_08_C		PASS	l2test -x -X ertm -P 4113 -N 1
->  TC_ERM_BV_09_C		PASS	l2test -X ertm -P 4113
->  TC_ERM_BV_10_C		PASS	l2test -x -X ertm -P 4113 -N 1
-> @@ -111,8 +112,7 @@ TC_ERM_BV_18_C		PASS	l2test -x -X ertm -P 4113 
--N 1
->  TC_ERM_BV_19_C		PASS	l2test -x -X ertm -P 4113 -N 1
->  TC_ERM_BV_20_C		PASS	l2test -x -X ertm -P 4113 -N 1
->  TC_ERM_BV_21_C		PASS	l2test -x -X ertm -P 4113 -D 2000 -N 2
-> -TC_ERM_BV_22_C		INC	PTS issue #12690
-> -				l2test -r -H 1000 -K 5000 -X ertm -P 4113
-> +TC_ERM_BV_22_C		PASS	l2test -r -H 1000 -K 5000 -X ertm -P 4113
->  TC_ERM_BV_23_C		PASS	l2test -x -X ertm -P 4113 -N 2
->  TC_ERM_BI_01_C		N/A
->  TC_ERM_BI_02_C		PASS	l2test -X ertm -P 4113
-> @@ -173,10 +173,12 @@ TC_LE_CFC_BV_04_C	PASS	l2test -n -V le_public -P 
-241 
-> <braddr> TC_LE_CFC_BV_05_C	INC	PTS issue #12665
->  TC_LE_CFC_BV_06_C	INC	PTS issue #12711 #12729
->  				l2test -s -V le_public <braddr>
-> -TC_LE_CFC_BV_07_C	INC	PTS issue #12728
-> -				l2test -u -V le_public <braddr>
-> -TC_LE_CFC_BI_01_C	INC	PTS issue #12728 #12712
-> -				l2test -u -V le_public <bdaddr>
-> +TC_LE_CFC_BV_07_C	PASS	l2test -u -V le_public <braddr>
-> +				Note: use Common.dll and ETS for L2CAP
-> +				from #12712
-> +TC_LE_CFC_BI_01_C	PASS	l2test -u -V le_public <bdaddr>
-> +				Note: use Common.dll and ETS for L2CAP
-> +				from #12712
->  TC_LE_CFC_BV_08_C	PASS	l2test -n -V le_public -P 37 <braddr>
->  TC_LE_CFC_BV_09_C	PASS	l2test -n -V le_public -P 37 <braddr>
->  TC_LE_CFC_BV_16_C	PASS	l2test -n -V le_public -P 37 <braddr>
+All patches applied, thanks.
 
 -- 
 Szymon K. Janc
