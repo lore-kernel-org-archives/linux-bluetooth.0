@@ -1,146 +1,66 @@
 Return-Path: <cyrus@holtmann.org>
-From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH 3/5] android/handsfree-client: Implement audio connect/disconnect
-Date: Tue, 25 Nov 2014 11:47:26 +0100
-Message-Id: <1416912448-28177-4-git-send-email-lukasz.rymanowski@tieto.com>
-In-Reply-To: <1416912448-28177-1-git-send-email-lukasz.rymanowski@tieto.com>
-References: <1416912448-28177-1-git-send-email-lukasz.rymanowski@tieto.com>
+Subject: [PATCH 4/7] android/client: Add support for gattc conn_parameter_update cmd
+Date: Tue, 25 Nov 2014 11:13:13 +0100
+Message-Id: <1416910396-23174-4-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+In-Reply-To: <1416910396-23174-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+References: <1416910396-23174-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-In this patch also set_audio_state function has been moved
 ---
- android/handsfree-client.c | 100 +++++++++++++++++++++++++++++++++------------
- 1 file changed, 75 insertions(+), 25 deletions(-)
+ android/client/if-gatt.c | 30 ++++++++++++++++++++++++++++++
+ 1 file changed, 30 insertions(+)
 
-diff --git a/android/handsfree-client.c b/android/handsfree-client.c
-index 432b9a1..4118b7e 100644
---- a/android/handsfree-client.c
-+++ b/android/handsfree-client.c
-@@ -292,19 +292,89 @@ done:
- 			HAL_OP_HF_CLIENT_DISCONNECT, status);
- }
+diff --git a/android/client/if-gatt.c b/android/client/if-gatt.c
+index 9681bc2..eb54ddd 100644
+--- a/android/client/if-gatt.c
++++ b/android/client/if-gatt.c
+@@ -1857,6 +1857,34 @@ static void configure_mtu_p(int argc, const char **argv)
  
-+static bool connect_sco(struct device *dev)
-+{
-+	/* TODO: handle codec negotiation */
+ 	EXEC(if_gatt->client->configure_mtu, conn_id, mtu);
+ }
 +
-+	return bt_sco_connect(sco, &dev->bdaddr, 0);
++/* con parameter update */
++static void conn_parameter_update_c(int argc, const char **argv,
++					enum_func *enum_func, void **user)
++{
++	if (argc == 2) {
++		*user = last_addr;
++		*enum_func = enum_one_string;
++	}
 +}
 +
-+static void set_audio_state(struct device *dev, uint8_t state)
++static void conn_parameter_update_p(int argc, const char **argv)
 +{
-+	struct hal_ev_hf_client_audio_state ev;
-+	char address[18];
++	bt_bdaddr_t bd_addr;
++	int min_interval, max_interval;
++	int latency;
++	int timeout;
 +
-+	if (dev->audio_state == state)
-+		return;
++	RETURN_IF_NULL(if_gatt);
++	VERIFY_ADDR_ARG(2, &bd_addr);
++	VERIFY_MIN_INTERVAL(3, min_interval);
++	VERIFY_MAX_INTERVAL(4, max_interval);
++	VERIFY_LATENCY(5, latency);
++	VERIFY_TIMEOUT(6, timeout);
 +
-+	dev->audio_state = state;
-+
-+	ba2str(&dev->bdaddr, address);
-+	DBG("device %s audio state %u", address, state);
-+
-+	bdaddr2android(&dev->bdaddr, ev.bdaddr);
-+	ev.state = state;
-+
-+	ipc_send_notif(hal_ipc, HAL_SERVICE_ID_HANDSFREE_CLIENT,
-+				HAL_EV_HF_CLIENT_AUDIO_STATE, sizeof(ev), &ev);
++	EXEC(if_gatt->client->conn_parameter_update, &bd_addr, min_interval,
++						max_interval, latency, timeout);
 +}
-+
- static void handle_connect_audio(const void *buf, uint16_t len)
- {
--	DBG("Not Implemented");
-+	const struct hal_cmd_hf_client_connect_audio *cmd = (void *) buf;
-+	struct device *dev;
-+	uint8_t status;
-+	bdaddr_t bdaddr;
-+
-+	DBG("");
-+
-+	android2bdaddr(&cmd->bdaddr, &bdaddr);
-+
-+	dev = find_device(&bdaddr);
-+	if (!dev || dev->state != HAL_HF_CLIENT_CONN_STATE_SLC_CONNECTED ||
-+		dev->audio_state != HAL_HF_CLIENT_AUDIO_STATE_DISCONNECTED) {
-+		error("hf-client: Cannot create SCO, check SLC or audio state");
-+		status = HAL_STATUS_FAILED;
-+		goto done;
-+	}
-+
-+	if (connect_sco(dev)) {
-+		status = HAL_STATUS_SUCCESS;
-+		set_audio_state(dev, HAL_HF_CLIENT_AUDIO_STATE_CONNECTING);
-+	} else {
-+		status = HAL_STATUS_FAILED;
-+	}
-+
-+done:
- 	ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_HANDSFREE_CLIENT,
--			HAL_OP_HF_CLIENT_CONNECT_AUDIO, HAL_STATUS_UNSUPPORTED);
-+					HAL_OP_HF_CLIENT_CONNECT_AUDIO, status);
- }
+ #endif
  
- static void handle_disconnect_audio(const void *buf, uint16_t len)
- {
--	DBG("Not Implemented");
-+	const struct hal_cmd_hf_client_disconnect_audio *cmd = (void *) buf;
-+	struct device *dev;
-+	uint8_t status;
-+	bdaddr_t bdaddr;
-+
-+	DBG("");
-+
-+	android2bdaddr(&cmd->bdaddr, &bdaddr);
-+
-+	dev = find_device(&bdaddr);
-+	if (!dev ||
-+		dev->audio_state == HAL_HF_CLIENT_AUDIO_STATE_DISCONNECTED) {
-+		error("hf-client: Device not found or audio not connected");
-+		status = HAL_STATUS_FAILED;
-+		goto done;
-+	}
-+
-+	bt_sco_disconnect(sco);
-+	status = HAL_STATUS_SUCCESS;
-+
-+done:
- 	ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_HANDSFREE_CLIENT,
--					HAL_OP_HF_CLIENT_DISCONNECT_AUDIO,
--					HAL_STATUS_UNSUPPORTED);
-+				HAL_OP_HF_CLIENT_DISCONNECT_AUDIO, status);
- }
- 
- static void cmd_complete_cb(enum hfp_result result, enum hfp_error cme_err,
-@@ -2011,26 +2081,6 @@ static void cleanup_hfp_hf(void)
- 	}
- }
- 
--static void set_audio_state(struct device *dev, uint8_t state)
--{
--	struct hal_ev_hf_client_audio_state ev;
--	char address[18];
--
--	if (dev->audio_state == state)
--		return;
--
--	dev->audio_state = state;
--
--	ba2str(&dev->bdaddr, address);
--	DBG("device %s audio state %u", address, state);
--
--	bdaddr2android(&dev->bdaddr, ev.bdaddr);
--	ev.state = state;
--
--	ipc_send_notif(hal_ipc, HAL_SERVICE_ID_HANDSFREE_CLIENT,
--				HAL_EV_HF_CLIENT_AUDIO_STATE, sizeof(ev), &ev);
--}
--
- static bool confirm_sco_cb(const bdaddr_t *addr, uint16_t *voice_settings)
- {
- 	struct device *dev;
+ /* get_device_type */
+@@ -1941,6 +1969,8 @@ static struct method client_methods[] = {
+ 			" <appearance> [<manufacturer_data>] [<service_data>]"
+ 			" [<service_uuid>]"),
+ 	STD_METHODCH(configure_mtu, "<conn_id> <mtu>"),
++	STD_METHODCH(conn_parameter_update, "<bd_addr> <min_interval>"
++					" <max_interval> <latency> <timeout>"),
+ #else
+ 	STD_METHODCH(scan, "<client_if> [1|0]"),
+ 	STD_METHODCH(connect, "<client_if> <addr> [<is_direct>]"),
 -- 
-1.8.4
+1.9.3
 
