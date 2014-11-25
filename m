@@ -1,89 +1,52 @@
 Return-Path: <cyrus@holtmann.org>
-From: Rakesh M K <rakesh.mk@samsung.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Rakesh M K <rakesh.mk@samsung.com>
-Subject: [PATCH 1] src/profile: Add HSP default record for external profiles
-Date: Tue, 25 Nov 2014 17:08:28 +0530
-Message-id: <1416915508-27250-1-git-send-email-rakesh.mk@samsung.com>
+MIME-Version: 1.0
+In-Reply-To: <1416868537-2478-1-git-send-email-szymon.janc@tieto.com>
+References: <1416868537-2478-1-git-send-email-szymon.janc@tieto.com>
+Date: Tue, 25 Nov 2014 12:13:42 +0100
+Message-ID: <CAN_7+YaBXe2cg2iJL2nGkyBWr5Oh4PJ2raLjC4UsyzyssMaiJA@mail.gmail.com>
+Subject: Re: [PATCH] shared/io-glib: Fix not calling destroy callback
+From: Lukasz Rymanowski <lukasz.rymanowski@gmail.com>
+To: Szymon Janc <szymon.janc@tieto.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- src/profile.c |   47 +++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 47 insertions(+)
+Hi Szymon,
 
-diff --git a/src/profile.c b/src/profile.c
-index 252063b..6e272c4 100644
---- a/src/profile.c
-+++ b/src/profile.c
-@@ -153,6 +153,44 @@
- 		</attribute>						\
- 	</record>"
- 
-+#define HSP_AG_RECORD							\
-+	"<?xml version=\"1.0\" encoding=\"UTF-8\" ?>			\
-+	<record>							\
-+		<attribute id=\"0x0001\">				\
-+			<sequence>					\
-+				<uuid value=\"0x1112\" />		\
-+				<uuid value=\"0x1203\" />		\
-+			</sequence>					\
-+		</attribute>						\
-+		<attribute id=\"0x0004\">				\
-+			<sequence>					\
-+				<sequence>				\
-+					<uuid value=\"0x0100\" />	\
-+				</sequence>				\
-+				<sequence>				\
-+					<uuid value=\"0x0003\" />	\
-+					<uint8 value=\"0x%02x\" />	\
-+				</sequence>				\
-+			</sequence>					\
-+		</attribute>						\
-+		<attribute id=\"0x0005\">				\
-+			<sequence>					\
-+				<uuid value=\"0x1002\" />		\
-+			</sequence>					\
-+		</attribute>						\
-+		<attribute id=\"0x0009\">				\
-+			<sequence>					\
-+				<sequence>				\
-+					<uuid value=\"0x1108\" />	\
-+					<uint16 value=\"0x%04x\" />	\
-+				</sequence>				\
-+			</sequence>					\
-+		</attribute>						\
-+		<attribute id=\"0x0100\">				\
-+			<text value=\"%s\" />				\
-+		</attribute>						\
-+	</record>"
-+
- #define SPP_RECORD							\
- 	"<?xml version=\"1.0\" encoding=\"UTF-8\" ?>			\
- 	<record>							\
-@@ -1704,6 +1742,13 @@ static char *get_hfp_ag_record(struct ext_profile *ext, struct ext_io *l2cap,
- 						ext->name, ext->features);
- }
- 
-+static char *get_hsp_ag_record(struct ext_profile *ext, struct ext_io *l2cap,
-+							struct ext_io *rfcomm)
-+{
-+	return g_strdup_printf(HSP_AG_RECORD, rfcomm->chan, ext->version,
-+						ext->name);
-+}
-+
- static char *get_spp_record(struct ext_profile *ext, struct ext_io *l2cap,
- 							struct ext_io *rfcomm)
- {
-@@ -1913,6 +1958,8 @@ static struct default_settings {
- 		.channel	= HSP_AG_DEFAULT_CHANNEL,
- 		.authorize	= true,
- 		.auto_connect	= true,
-+		.get_record	= get_hsp_ag_record,
-+		.version	= 0x0102,
- 	}, {
- 		.uuid		= OBEX_OPP_UUID,
- 		.name		= "Object Push",
--- 
-1.7.9.5
+On Mon, Nov 24, 2014 at 11:35 PM, Szymon Janc <szymon.janc@tieto.com> wrote:
+> Destroy callback should be called also for G_IO_ERR | G_IO_NVAL
+> condition.
+> ---
+>  src/shared/io-glib.c | 6 ++++--
+>  1 file changed, 4 insertions(+), 2 deletions(-)
+>
+> diff --git a/src/shared/io-glib.c b/src/shared/io-glib.c
+> index af2ba4e..e9578e1 100644
+> --- a/src/shared/io-glib.c
+> +++ b/src/shared/io-glib.c
+> @@ -159,9 +159,11 @@ static gboolean watch_callback(GIOChannel *channel, GIOCondition cond,
+>                                                         gpointer user_data)
+>  {
+>         struct io_watch *watch = user_data;
+> -       bool result;
+> +       bool result, destroy;
+>
+> -       if (cond & (G_IO_ERR | G_IO_NVAL))
+> +       destroy = watch == watch->io->disconnect_watch;
+> +
+> +       if (!destroy && (cond & (G_IO_ERR | G_IO_NVAL)))
+>                 return FALSE;
+>
+Just tested this patch and it works for me.
+It also looks good to me.
 
+\Lukasz
+>         if (watch->callback)
+> --
+> 1.9.3
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
