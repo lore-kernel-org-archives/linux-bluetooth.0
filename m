@@ -1,91 +1,85 @@
 Return-Path: <cyrus@holtmann.org>
-From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 2/7] android/client: Add support for gattc set_adv_data cmd
-Date: Tue, 25 Nov 2014 11:13:11 +0100
-Message-Id: <1416910396-23174-2-git-send-email-grzegorz.kolodziejczyk@tieto.com>
-In-Reply-To: <1416910396-23174-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
-References: <1416910396-23174-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+Message-ID: <54745087.5020904@gmail.com>
+Date: Tue, 25 Nov 2014 12:48:55 +0300
+From: Dmitry Tunin <hanipouspilot@gmail.com>
+MIME-Version: 1.0
+To: linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+	linux-kernel <linux-kernel@vger.kernel.org>,
+	stable@vger.kernel.org
+Subject: [PATCH v6] ath3k: Add support of MCI 13d3:3408 bt device
+Content-Type: text/plain; charset=utf-8; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- android/client/if-gatt.c | 55 ++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 55 insertions(+)
+Add support for bluetooth MCI WB335 (AR9565) Wi-Fi+bt module.
+This bluetooth module requires loading patch and sysconfig by ath3k driver.
 
-diff --git a/android/client/if-gatt.c b/android/client/if-gatt.c
-index 112a49d..42dd119 100644
---- a/android/client/if-gatt.c
-+++ b/android/client/if-gatt.c
-@@ -1784,6 +1784,57 @@ static void scan_filter_enable_p(int argc, const char **argv)
- 
- 	EXEC(if_gatt->client->scan_filter_clear, client_if, enable);
- }
-+
-+/* set advertising data */
-+static void set_adv_data_c(int argc, const char **argv,
-+					enum_func *enum_func, void **user)
-+{
-+	if (argc == 2) {
-+		*user = client_if_str;
-+		*enum_func = enum_one_string;
-+	}
-+}
-+
-+static void set_adv_data_p(int argc, const char **argv)
-+{
-+	int client_if;
-+	bool set_scan_rsp;
-+	bool include_name, include_txpower;
-+	int min_interval, max_interval;
-+	int appearance;
-+	uint16_t manufacturer_len;
-+	uint8_t manufacturer_data[100];
-+	uint16_t service_data_len;
-+	uint8_t service_data[100];
-+	uint16_t service_uuid_len;
-+	uint8_t service_uuid[100];
-+
-+	RETURN_IF_NULL(if_gatt);
-+	VERIFY_CLIENT_IF(2, client_if);
-+
-+	/* set scan response */
-+	if (argc >= 4)
-+		set_scan_rsp = atoi(argv[3]);
-+	/* include name */
-+	if (argc >= 5)
-+		include_name = atoi(argv[4]);
-+	/* include txpower */
-+	if (argc >= 6)
-+		include_txpower = atoi(argv[5]);
-+
-+	VERIFY_MIN_INTERVAL(6, min_interval);
-+	VERIFY_MAX_INTERVAL(7, max_interval);
-+	VERIFY_APPEARANCE(8, appearance);
-+	GET_VERIFY_HEX_STRING(9, manufacturer_data, manufacturer_len);
-+	GET_VERIFY_HEX_STRING(10, service_data, service_data_len);
-+	GET_VERIFY_HEX_STRING(11, service_uuid, service_uuid_len);
-+
-+	EXEC(if_gatt->client->set_adv_data, client_if, set_scan_rsp,
-+		include_name, include_txpower, min_interval, max_interval,
-+		appearance, manufacturer_len, (char *) manufacturer_data,
-+		service_data_len, (char *) service_data, service_uuid_len,
-+		(char *) service_uuid);
-+}
- #endif
- 
- /* get_device_type */
-@@ -1863,6 +1914,10 @@ static struct method client_methods[] = {
- 			" [<p_data>] [<p_mask>]"),
- 	STD_METHODCH(scan_filter_clear, "<client_if> <filt_index>"),
- 	STD_METHODCH(scan_filter_enable, "<client_if> [<enable>]"),
-+	STD_METHODCH(set_adv_data, "<client_if> [<set_scan_rsp>] <include_name>"
-+			" [<include_txpower>] <min_interval> <max_interval>"
-+			" <appearance> [<manufacturer_data>] [<service_data>]"
-+			" [<service_uuid>]"),
- #else
- 	STD_METHODCH(scan, "<client_if> [1|0]"),
- 	STD_METHODCH(connect, "<client_if> <addr> [<is_direct>]"),
--- 
-1.9.3
+T:  Bus=01 Lev=02 Prnt=03 Port=00 Cnt=01 Dev#= 20 Spd=12   MxCh= 0
+D:  Ver= 1.10 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
+P:  Vendor=13d3 ProdID=3408 Rev= 0.02
+C:* #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
+A:  FirstIf#= 0 IfCount= 2 Cls=e0(wlcon) Sub=01 Prot=01
+I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
+E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+
+
+CC: stable@vger.kernel.org
+Signed-off-by: Dmitry Tunin <hanipouspilot@gmail.com>
+
+---
+
+diff --git a/drivers/bluetooth/ath3k.c b/drivers/bluetooth/ath3k.c
+index d85ced2..086240c 100644
+--- a/drivers/bluetooth/ath3k.c
++++ b/drivers/bluetooth/ath3k.c
+@@ -105,6 +105,7 @@ static const struct usb_device_id ath3k_table[] = {
+  	{ USB_DEVICE(0x13d3, 0x3375) },
+  	{ USB_DEVICE(0x13d3, 0x3393) },
+  	{ USB_DEVICE(0x13d3, 0x3402) },
++	{ USB_DEVICE(0x13d3, 0x3408) },
+  	{ USB_DEVICE(0x13d3, 0x3432) },
+
+  	/* Atheros AR5BBU12 with sflash firmware */
+@@ -156,6 +157,7 @@ static const struct usb_device_id ath3k_blist_tbl[] = {
+  	{ USB_DEVICE(0x13d3, 0x3375), .driver_info = BTUSB_ATH3012 },
+  	{ USB_DEVICE(0x13d3, 0x3393), .driver_info = BTUSB_ATH3012 },
+  	{ USB_DEVICE(0x13d3, 0x3402), .driver_info = BTUSB_ATH3012 },
++	{ USB_DEVICE(0x13d3, 0x3408), .driver_info = BTUSB_ATH3012 },
+  	{ USB_DEVICE(0x13d3, 0x3432), .driver_info = BTUSB_ATH3012 },
+
+  	/* Atheros AR5BBU22 with sflash firmware */
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index edfc17b..091c813 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -182,6 +182,7 @@ static const struct usb_device_id blacklist_table[] = {
+  	{ USB_DEVICE(0x13d3, 0x3375), .driver_info = BTUSB_ATH3012 },
+  	{ USB_DEVICE(0x13d3, 0x3393), .driver_info = BTUSB_ATH3012 },
+  	{ USB_DEVICE(0x13d3, 0x3402), .driver_info = BTUSB_ATH3012 },
++	{ USB_DEVICE(0x13d3, 0x3408), .driver_info = BTUSB_ATH3012 },
+  	{ USB_DEVICE(0x13d3, 0x3432), .driver_info = BTUSB_ATH3012 },
+
+  	/* Atheros AR5BBU12 with sflash firmware */
+
+--
 
