@@ -1,40 +1,86 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <CAK8d-aL+3eB4WZeqO1sv9p3440EVXQiqF6QiTU5YNAKAbZ7f-w@mail.gmail.com>
-References: <1416419951-27659-1-git-send-email-stevenrwalter@gmail.com>
- <20141120113813.GA23288@t440s.lan> <80321467-10AB-489E-A47E-44B0ECEE4BE1@holtmann.org>
- <CAK8d-aL+3eB4WZeqO1sv9p3440EVXQiqF6QiTU5YNAKAbZ7f-w@mail.gmail.com>
-From: Steven Walter <stevenrwalter@gmail.com>
-Date: Tue, 25 Nov 2014 09:53:52 -0500
-Message-ID: <CAK8d-a+MJBBLkU_=UQGKVmxnM-sYJ=pW7aj0XQ5aa5AuR2G_Wg@mail.gmail.com>
-Subject: Re: [PATCH v3] Bluetooth: automatically flushable packets aren't
- allowed on LE links
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: Johan Hedberg <johan.hedberg@gmail.com>, "Gustavo F. Padovan" <gustavo@padovan.org>,
-	BlueZ development <linux-bluetooth@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+From: Sebastian Chlad <sebastian.chlad@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Sebastian Chlad <sebastian.chlad@tieto.com>
+Subject: [PATCH] android/pts: L2CAP pts tests results on Android 5.0
+Date: Tue, 25 Nov 2014 15:28:35 +0100
+Message-Id: <1416925715-9209-1-git-send-email-sebastian.chlad@tieto.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Thu, Nov 20, 2014 at 10:51 AM, Steven Walter <stevenrwalter@gmail.com> wrote:
->> > I think Marcel was after just providing a clarifying code comment in
->> > both places - having two branches of an if-statement doing exactly the
->> > same thing looks a bit weird to me. To make thins completely clear I'd
->> > suggest adding a simple helper function that you can call from both
->> > places to get the needed flags, something like the following:
->>
->> I am actually fine with just adding a comment explaining the complex if
->> statement on why it is correct. It is just a helper for everybody to
->> understand what and why it is done that way.
->
->
-> Is the comment I added sufficient, or should I add one for the other if
-> condition as well?  To me, the second condition is pretty straightforward:
-> if the caller requested it and the hardware supports it, use NO_FLUSH.  The
-> relationship between FLUSH/NO_FLUSH and low-energy is much less clear and
-> more justifies a comment, in my opinion.
+---
+ android/pts-l2cap.txt | 30 ++++++++++++++++--------------
+ 1 file changed, 16 insertions(+), 14 deletions(-)
 
-Did a miss a reply to this?  How would you like the next iteration of
-the patch to look?
+diff --git a/android/pts-l2cap.txt b/android/pts-l2cap.txt
+index 9cd2875..f46bbbd 100644
+--- a/android/pts-l2cap.txt
++++ b/android/pts-l2cap.txt
+@@ -1,8 +1,8 @@
+ PTS test results for L2CAP
+ 
+ PTS version: 5.3
+-Tested: 24-October-2014
+-Android version: 4.4.4
++Tested: 25-November-2014
++Android version: 5.0
+ Kernel version: 3.18
+ 
+ Results:
+@@ -41,10 +41,12 @@ TC_COS_IEX_BV_01_C	PASS	l2test -n -P 4113 <bdaddr>
+ TC_COS_IEX_BV_02_C	PASS
+ TC_COS_ECH_BV_01_C	PASS
+ TC_COS_ECH_BV_02_C	PASS	l2ping -c 1 <bdaddr>
+-TC_COS_CFC_BV_01_C	INC	PTS issue #12728
+-				l2test -y -N 1 -b 40 -V le_public <braddr>
+-TC_COS_CFC_BV_02_C	INC	PTS issue #12728
+-				l2test -y -N 1 -b 1 -V le_public <bdaddr>
++TC_COS_CFC_BV_01_C	PASS	l2test -y -N 1 -b 40 -V le_public <braddr>
++				Note: use Common.dll and ETS for L2CAP
++				from #12712
++TC_COS_CFC_BV_02_C	PASS	l2test -y -N 1 -b 1 -V le_public <bdaddr>
++				Note: use Common.dll and ETS for L2CAP
++				from #12712
+ TC_COS_CFC_BV_03_C	PASS	l2test -u -V le_public <bdaddr>
+ TC_COS_CFC_BV_04_C	PASS	l2test -u -V le_public <bdaddr>
+ TC_COS_CFC_BV_05_C	PASS	l2test -m -V le_public <bdaddr>
+@@ -95,8 +97,7 @@ TC_ERM_BV_02_C		PASS	l2test -r -X ertm -P 4113
+ TC_ERM_BV_03_C		PASS	l2test -r -X ertm -P 4113
+ TC_ERM_BV_05_C		PASS	l2test -x -X ertm -P 4113 -N 2 -Y 2
+ TC_ERM_BV_06_C		PASS	l2test -x -X ertm -P 4113 -N 2 -Y 2
+-TC_ERM_BV_07_C		INC	PTS issue #12690
+-				l2test -r -H 1000 -K 10000 -X ertm -P 4113
++TC_ERM_BV_07_C		PASS	l2test -r -H 1000 -K 10000 -X ertm -P 4113
+ TC_ERM_BV_08_C		PASS	l2test -x -X ertm -P 4113 -N 1
+ TC_ERM_BV_09_C		PASS	l2test -X ertm -P 4113
+ TC_ERM_BV_10_C		PASS	l2test -x -X ertm -P 4113 -N 1
+@@ -111,8 +112,7 @@ TC_ERM_BV_18_C		PASS	l2test -x -X ertm -P 4113 -N 1
+ TC_ERM_BV_19_C		PASS	l2test -x -X ertm -P 4113 -N 1
+ TC_ERM_BV_20_C		PASS	l2test -x -X ertm -P 4113 -N 1
+ TC_ERM_BV_21_C		PASS	l2test -x -X ertm -P 4113 -D 2000 -N 2
+-TC_ERM_BV_22_C		INC	PTS issue #12690
+-				l2test -r -H 1000 -K 5000 -X ertm -P 4113
++TC_ERM_BV_22_C		PASS	l2test -r -H 1000 -K 5000 -X ertm -P 4113
+ TC_ERM_BV_23_C		PASS	l2test -x -X ertm -P 4113 -N 2
+ TC_ERM_BI_01_C		N/A
+ TC_ERM_BI_02_C		PASS	l2test -X ertm -P 4113
+@@ -173,10 +173,12 @@ TC_LE_CFC_BV_04_C	PASS	l2test -n -V le_public -P 241  <braddr>
+ TC_LE_CFC_BV_05_C	INC	PTS issue #12665
+ TC_LE_CFC_BV_06_C	INC	PTS issue #12711 #12729
+ 				l2test -s -V le_public <braddr>
+-TC_LE_CFC_BV_07_C	INC	PTS issue #12728
+-				l2test -u -V le_public <braddr>
+-TC_LE_CFC_BI_01_C	INC	PTS issue #12728 #12712
+-				l2test -u -V le_public <bdaddr>
++TC_LE_CFC_BV_07_C	PASS	l2test -u -V le_public <braddr>
++				Note: use Common.dll and ETS for L2CAP
++				from #12712
++TC_LE_CFC_BI_01_C	PASS	l2test -u -V le_public <bdaddr>
++				Note: use Common.dll and ETS for L2CAP
++				from #12712
+ TC_LE_CFC_BV_08_C	PASS	l2test -n -V le_public -P 37 <braddr>
+ TC_LE_CFC_BV_09_C	PASS	l2test -n -V le_public -P 37 <braddr>
+ TC_LE_CFC_BV_16_C	PASS	l2test -n -V le_public -P 37 <braddr>
 -- 
--Steven Walter <stevenrwalter@gmail.com>
+1.8.5.3
+
