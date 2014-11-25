@@ -1,304 +1,166 @@
 Return-Path: <cyrus@holtmann.org>
-From: Jakub Pawlowski <jpawlowski@google.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Jakub Pawlowski <jpawlowski@google.com>
-Subject: [PATCH v1 2/4] Extract generic_start_discovery and generic_stop_discovery in preparation for start_service_discovery and stop_service_discovery.
-Date: Tue, 25 Nov 2014 16:45:44 -0800
-Message-Id: <1416962746-19750-3-git-send-email-jpawlowski@google.com>
-In-Reply-To: <1416962746-19750-1-git-send-email-jpawlowski@google.com>
-References: <1416962746-19750-1-git-send-email-jpawlowski@google.com>
+MIME-Version: 1.0
+In-Reply-To: <001801d00890$30f352b0$92d9f810$@samsung.com>
+References: <1416559765-26427-1-git-send-email-gowtham.ab@samsung.com>
+	<001801d00890$30f352b0$92d9f810$@samsung.com>
+Date: Tue, 25 Nov 2014 23:52:07 +0200
+Message-ID: <CABBYNZL6Q5ODpOweWqQckYCjHD3gWkV+Rstj6vs6p0MmAiLO9A@mail.gmail.com>
+Subject: Re: [PATCH] tools/sdptool: Add support for MAP service
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Gowtham Anandha Babu <gowtham.ab@samsung.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	Dmitry Kasatkin <d.kasatkin@samsung.com>,
+	Bharat Panda <bharat.panda@samsung.com>, cpgs@samsung.com
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- net/bluetooth/mgmt.c | 102 ++++++++++++++++++++++++++++++++++-----------------
- 1 file changed, 68 insertions(+), 34 deletions(-)
+Hi,
 
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 9c4daf7..f2b80b7 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -3648,7 +3648,8 @@ static int remove_remote_oob_data(struct sock *sk, struct hci_dev *hdev,
- 	return err;
- }
- 
--static int mgmt_start_discovery_failed(struct hci_dev *hdev, u8 status)
-+static int mgmt_start_discovery_failed(struct hci_dev *hdev, u8 status,
-+				       int discovery_op)
- {
- 	struct pending_cmd *cmd;
- 	u8 type;
-@@ -3656,7 +3657,7 @@ static int mgmt_start_discovery_failed(struct hci_dev *hdev, u8 status)
- 
- 	hci_discovery_set_state(hdev, DISCOVERY_STOPPED);
- 
--	cmd = mgmt_pending_find(MGMT_OP_START_DISCOVERY, hdev);
-+	cmd = mgmt_pending_find(discovery_op, hdev);
- 	if (!cmd)
- 		return -ENOENT;
- 
-@@ -3669,7 +3670,8 @@ static int mgmt_start_discovery_failed(struct hci_dev *hdev, u8 status)
- 	return err;
- }
- 
--static void start_discovery_complete(struct hci_dev *hdev, u8 status)
-+static void generic_start_discovery_complete(struct hci_dev *hdev, u8 status,
-+					     int discovery_op)
- {
- 	unsigned long timeout = 0;
- 
-@@ -3677,7 +3679,7 @@ static void start_discovery_complete(struct hci_dev *hdev, u8 status)
- 
- 	if (status) {
- 		hci_dev_lock(hdev);
--		mgmt_start_discovery_failed(hdev, status);
-+		mgmt_start_discovery_failed(hdev, status, discovery_op);
- 		hci_dev_unlock(hdev);
- 		return;
- 	}
-@@ -3708,10 +3710,18 @@ static void start_discovery_complete(struct hci_dev *hdev, u8 status)
- 	queue_delayed_work(hdev->workqueue, &hdev->le_scan_disable, timeout);
- }
- 
--static int start_discovery(struct sock *sk, struct hci_dev *hdev,
--			   void *data, u16 len)
-+static void start_discovery_complete(struct hci_dev *hdev, u8 status)
-+{
-+	generic_start_discovery_complete(hdev, status, MGMT_OP_START_DISCOVERY);
-+}
-+
-+static int generic_start_discovery(struct sock *sk, struct hci_dev *hdev,
-+				   int discovery_op,
-+			void (*complete_cb)(struct hci_dev *hdev, u8 status),
-+				   u8 type,
-+				   struct mgmt_uuid_filter *serv_filters,
-+				   __le16 serv_filter_cnt)
- {
--	struct mgmt_cp_start_discovery *cp = data;
- 	struct pending_cmd *cmd;
- 	struct hci_cp_le_set_scan_param param_cp;
- 	struct hci_cp_le_set_scan_enable enable_cp;
-@@ -3727,30 +3737,30 @@ static int start_discovery(struct sock *sk, struct hci_dev *hdev,
- 	hci_dev_lock(hdev);
- 
- 	if (!hdev_is_powered(hdev)) {
--		err = cmd_status(sk, hdev->id, MGMT_OP_START_DISCOVERY,
-+		err = cmd_status(sk, hdev->id, discovery_op,
- 				 MGMT_STATUS_NOT_POWERED);
- 		goto failed;
- 	}
- 
- 	if (test_bit(HCI_PERIODIC_INQ, &hdev->dev_flags)) {
--		err = cmd_status(sk, hdev->id, MGMT_OP_START_DISCOVERY,
-+		err = cmd_status(sk, hdev->id, discovery_op,
- 				 MGMT_STATUS_BUSY);
- 		goto failed;
- 	}
- 
- 	if (hdev->discovery.state != DISCOVERY_STOPPED) {
--		err = cmd_status(sk, hdev->id, MGMT_OP_START_DISCOVERY,
-+		err = cmd_status(sk, hdev->id, discovery_op,
- 				 MGMT_STATUS_BUSY);
- 		goto failed;
- 	}
- 
--	cmd = mgmt_pending_add(sk, MGMT_OP_START_DISCOVERY, hdev, NULL, 0);
-+	cmd = mgmt_pending_add(sk, discovery_op, hdev, NULL, 0);
- 	if (!cmd) {
- 		err = -ENOMEM;
- 		goto failed;
- 	}
- 
--	hdev->discovery.type = cp->type;
-+	hdev->discovery.type = type;
- 
- 	hci_req_init(&req, hdev);
- 
-@@ -3758,14 +3768,14 @@ static int start_discovery(struct sock *sk, struct hci_dev *hdev,
- 	case DISCOV_TYPE_BREDR:
- 		status = mgmt_bredr_support(hdev);
- 		if (status) {
--			err = cmd_status(sk, hdev->id, MGMT_OP_START_DISCOVERY,
-+			err = cmd_status(sk, hdev->id, discovery_op,
- 					 status);
- 			mgmt_pending_remove(cmd);
- 			goto failed;
- 		}
- 
- 		if (test_bit(HCI_INQUIRY, &hdev->flags)) {
--			err = cmd_status(sk, hdev->id, MGMT_OP_START_DISCOVERY,
-+			err = cmd_status(sk, hdev->id, discovery_op,
- 					 MGMT_STATUS_BUSY);
- 			mgmt_pending_remove(cmd);
- 			goto failed;
-@@ -3783,7 +3793,7 @@ static int start_discovery(struct sock *sk, struct hci_dev *hdev,
- 	case DISCOV_TYPE_INTERLEAVED:
- 		status = mgmt_le_support(hdev);
- 		if (status) {
--			err = cmd_status(sk, hdev->id, MGMT_OP_START_DISCOVERY,
-+			err = cmd_status(sk, hdev->id, discovery_op,
- 					 status);
- 			mgmt_pending_remove(cmd);
- 			goto failed;
-@@ -3791,7 +3801,7 @@ static int start_discovery(struct sock *sk, struct hci_dev *hdev,
- 
- 		if (hdev->discovery.type == DISCOV_TYPE_INTERLEAVED &&
- 		    !test_bit(HCI_BREDR_ENABLED, &hdev->dev_flags)) {
--			err = cmd_status(sk, hdev->id, MGMT_OP_START_DISCOVERY,
-+			err = cmd_status(sk, hdev->id, discovery_op,
- 					 MGMT_STATUS_NOT_SUPPORTED);
- 			mgmt_pending_remove(cmd);
- 			goto failed;
-@@ -3805,7 +3815,7 @@ static int start_discovery(struct sock *sk, struct hci_dev *hdev,
- 			if (hci_conn_hash_lookup_state(hdev, LE_LINK,
- 						       BT_CONNECT)) {
- 				err = cmd_status(sk, hdev->id,
--						 MGMT_OP_START_DISCOVERY,
-+						 discovery_op,
- 						 MGMT_STATUS_REJECTED);
- 				mgmt_pending_remove(cmd);
- 				goto failed;
-@@ -3829,7 +3839,7 @@ static int start_discovery(struct sock *sk, struct hci_dev *hdev,
- 		 */
- 		err = hci_update_random_address(&req, true, &own_addr_type);
- 		if (err < 0) {
--			err = cmd_status(sk, hdev->id, MGMT_OP_START_DISCOVERY,
-+			err = cmd_status(sk, hdev->id, discovery_op,
- 					 MGMT_STATUS_FAILED);
- 			mgmt_pending_remove(cmd);
- 			goto failed;
-@@ -3850,13 +3860,13 @@ static int start_discovery(struct sock *sk, struct hci_dev *hdev,
- 		break;
- 
- 	default:
--		err = cmd_status(sk, hdev->id, MGMT_OP_START_DISCOVERY,
-+		err = cmd_status(sk, hdev->id, discovery_op,
- 				 MGMT_STATUS_INVALID_PARAMS);
- 		mgmt_pending_remove(cmd);
- 		goto failed;
- 	}
- 
--	err = hci_req_run(&req, start_discovery_complete);
-+	err = hci_req_run(&req, complete_cb);
- 	if (err < 0)
- 		mgmt_pending_remove(cmd);
- 	else
-@@ -3867,12 +3877,22 @@ failed:
- 	return err;
- }
- 
--static int mgmt_stop_discovery_failed(struct hci_dev *hdev, u8 status)
-+static int start_discovery(struct sock *sk, struct hci_dev *hdev,
-+			   void *data, u16 len)
-+{
-+	struct mgmt_cp_start_discovery *cp = data;
-+
-+	return generic_start_discovery(sk, hdev, MGMT_OP_START_DISCOVERY,
-+		start_discovery_complete, cp->type, NULL, 0);
-+}
-+
-+static int mgmt_stop_discovery_failed(struct hci_dev *hdev, u8 status,
-+				      int discovery_op)
- {
- 	struct pending_cmd *cmd;
- 	int err;
- 
--	cmd = mgmt_pending_find(MGMT_OP_STOP_DISCOVERY, hdev);
-+	cmd = mgmt_pending_find(discovery_op, hdev);
- 	if (!cmd)
- 		return -ENOENT;
- 
-@@ -3883,14 +3903,15 @@ static int mgmt_stop_discovery_failed(struct hci_dev *hdev, u8 status)
- 	return err;
- }
- 
--static void stop_discovery_complete(struct hci_dev *hdev, u8 status)
-+static void generic_stop_discovery_complete(struct hci_dev *hdev, u8 status,
-+					    int discovery_op)
- {
- 	BT_DBG("status %d", status);
- 
- 	hci_dev_lock(hdev);
- 
- 	if (status) {
--		mgmt_stop_discovery_failed(hdev, status);
-+		mgmt_stop_discovery_failed(hdev, status, discovery_op);
- 		goto unlock;
- 	}
- 
-@@ -3900,10 +3921,15 @@ unlock:
- 	hci_dev_unlock(hdev);
- }
- 
--static int stop_discovery(struct sock *sk, struct hci_dev *hdev, void *data,
--			  u16 len)
-+static void stop_discovery_complete(struct hci_dev *hdev, u8 status)
-+{
-+	generic_stop_discovery_complete(hdev, status, MGMT_OP_STOP_DISCOVERY);
-+}
-+
-+static int generic_stop_discovery(struct sock *sk, struct hci_dev *hdev,
-+				  __u8 type,
-+			void (*stop_discovery_cb)(struct hci_dev *, u8))
- {
--	struct mgmt_cp_stop_discovery *mgmt_cp = data;
- 	struct pending_cmd *cmd;
- 	struct hci_request req;
- 	int err;
-@@ -3914,15 +3940,14 @@ static int stop_discovery(struct sock *sk, struct hci_dev *hdev, void *data,
- 
- 	if (!hci_discovery_active(hdev)) {
- 		err = cmd_complete(sk, hdev->id, MGMT_OP_STOP_DISCOVERY,
--				   MGMT_STATUS_REJECTED, &mgmt_cp->type,
--				   sizeof(mgmt_cp->type));
-+				   MGMT_STATUS_REJECTED, &type, sizeof(type));
- 		goto unlock;
- 	}
- 
--	if (hdev->discovery.type != mgmt_cp->type) {
-+	if (hdev->discovery.type != type) {
- 		err = cmd_complete(sk, hdev->id, MGMT_OP_STOP_DISCOVERY,
--				   MGMT_STATUS_INVALID_PARAMS, &mgmt_cp->type,
--				   sizeof(mgmt_cp->type));
-+				   MGMT_STATUS_INVALID_PARAMS, &type,
-+				   sizeof(type));
- 		goto unlock;
- 	}
- 
-@@ -3936,7 +3961,7 @@ static int stop_discovery(struct sock *sk, struct hci_dev *hdev, void *data,
- 
- 	hci_stop_discovery(&req);
- 
--	err = hci_req_run(&req, stop_discovery_complete);
-+	err = hci_req_run(&req, stop_discovery_cb);
- 	if (!err) {
- 		hci_discovery_set_state(hdev, DISCOVERY_STOPPING);
- 		goto unlock;
-@@ -3947,7 +3972,7 @@ static int stop_discovery(struct sock *sk, struct hci_dev *hdev, void *data,
- 	/* If no HCI commands were sent we're done */
- 	if (err == -ENODATA) {
- 		err = cmd_complete(sk, hdev->id, MGMT_OP_STOP_DISCOVERY, 0,
--				   &mgmt_cp->type, sizeof(mgmt_cp->type));
-+				   &type, sizeof(type));
- 		hci_discovery_set_state(hdev, DISCOVERY_STOPPED);
- 	}
- 
-@@ -3956,6 +3981,15 @@ unlock:
- 	return err;
- }
- 
-+static int stop_discovery(struct sock *sk, struct hci_dev *hdev, void *data,
-+			  u16 len)
-+{
-+	struct mgmt_cp_stop_discovery *mgmt_cp = data;
-+
-+	return generic_stop_discovery(sk, hdev, mgmt_cp->type,
-+					stop_discovery_complete);
-+}
-+
- static int confirm_name(struct sock *sk, struct hci_dev *hdev, void *data,
- 			u16 len)
- {
+On Tue, Nov 25, 2014 at 11:14 AM, Gowtham Anandha Babu
+<gowtham.ab@samsung.com> wrote:
+> Hi,
+>
+>> -----Original Message-----
+>> From: Gowtham Anandha Babu [mailto:gowtham.ab@samsung.com]
+>> Sent: Friday, November 21, 2014 2:19 PM
+>> To: linux-bluetooth@vger.kernel.org
+>> Cc: d.kasatkin@samsung.com; bharat.panda@samsung.com;
+>> cpgs@samsung.com; Gowtham Anandha Babu
+>> Subject: [PATCH] tools/sdptool: Add support for MAP service
+>>
+>> Add support for MAP service in local SDP server.
+>>
+>> The MAP MAS record captured in local SDP server:
+>>
+>> Service Name: OBEX Message Access Server Service RecHandle: 0x1000e
+>> Service Class ID List:
+>>   "Message Access - MAS" (0x1132)
+>> Protocol Descriptor List:
+>>   "L2CAP" (0x0100)
+>>   "RFCOMM" (0x0003)
+>>     Channel: 17
+>>   "OBEX" (0x0008)
+>> Profile Descriptor List:
+>>   "Message Access" (0x1134)
+>>     Version: 0x0100
+>>
+>> Now we are able to do sdptool search/add/del/get for MAP service.
+>> ---
+>>  tools/sdptool.c | 81
+>> +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+>>  1 file changed, 81 insertions(+)
+>>
+>> diff --git a/tools/sdptool.c b/tools/sdptool.c index f3aebd2..17561b1
+> 100644
+>> --- a/tools/sdptool.c
+>> +++ b/tools/sdptool.c
+>> @@ -1916,6 +1916,86 @@ end:
+>>       return ret;
+>>  }
+>>
+>> +static int add_map(sdp_session_t *session, svc_info_t *si) {
+>> +     sdp_list_t *svclass_id, *pfseq, *apseq, *root;
+>> +     uuid_t root_uuid, map_uuid, l2cap_uuid, rfcomm_uuid, obex_uuid;
+>> +     sdp_profile_desc_t profile[1];
+>> +     sdp_list_t *aproto, *proto[3];
+>> +     sdp_record_t record;
+>> +     uint8_t chan = si->channel ? si->channel : 17;
+>> +     sdp_data_t *channel;
+>> +     uint8_t msg_formats[] = {0x0f};
+>> +     uint32_t supp_features[] = {0x0000007f};
+>> +     uint8_t dtd_msg = SDP_UINT8, dtd_sf = SDP_UINT32;
+>> +     sdp_data_t *smlist;
+>> +     sdp_data_t *sflist;
+>> +     int ret = 0;
+>> +
+>> +     memset(&record, 0, sizeof(sdp_record_t));
+>> +     record.handle = si->handle;
+>> +
+>> +     sdp_uuid16_create(&root_uuid, PUBLIC_BROWSE_GROUP);
+>> +     root = sdp_list_append(0, &root_uuid);
+>> +     sdp_set_browse_groups(&record, root);
+>> +
+>> +     sdp_uuid16_create(&map_uuid, MAP_MSE_SVCLASS_ID);
+>> +     svclass_id = sdp_list_append(0, &map_uuid);
+>> +     sdp_set_service_classes(&record, svclass_id);
+>> +
+>> +     sdp_uuid16_create(&profile[0].uuid, MAP_PROFILE_ID);
+>> +     profile[0].version = 0x0100;
+>> +     pfseq = sdp_list_append(0, profile);
+>> +     sdp_set_profile_descs(&record, pfseq);
+>> +
+>> +     sdp_uuid16_create(&l2cap_uuid, L2CAP_UUID);
+>> +     proto[0] = sdp_list_append(0, &l2cap_uuid);
+>> +     apseq = sdp_list_append(0, proto[0]);
+>> +
+>> +     sdp_uuid16_create(&rfcomm_uuid, RFCOMM_UUID);
+>> +     proto[1] = sdp_list_append(0, &rfcomm_uuid);
+>> +     channel = sdp_data_alloc(SDP_UINT8, &chan);
+>> +     proto[1] = sdp_list_append(proto[1], channel);
+>> +     apseq = sdp_list_append(apseq, proto[1]);
+>> +
+>> +     sdp_uuid16_create(&obex_uuid, OBEX_UUID);
+>> +     proto[2] = sdp_list_append(0, &obex_uuid);
+>> +     apseq = sdp_list_append(apseq, proto[2]);
+>> +
+>> +     aproto = sdp_list_append(0, apseq);
+>> +     sdp_set_access_protos(&record, aproto);
+>> +
+>> +     smlist = sdp_data_alloc(dtd_msg, msg_formats);
+>> +     sdp_attr_add(&record, SDP_ATTR_SUPPORTED_MESSAGE_TYPES,
+>> smlist);
+>> +
+>> +     sflist = sdp_data_alloc(dtd_sf, supp_features);
+>> +     sdp_attr_add(&record, SDP_ATTR_MAP_SUPPORTED_FEATURES,
+>> sflist);
+>> +
+>> +     sdp_set_info_attr(&record, "OBEX Message Access Server", 0, 0);
+>> +
+>> +     if (sdp_device_record_register(session, &interface, &record,
+>> +                     SDP_RECORD_PERSIST) < 0) {
+>> +             printf("Service Record registration failed\n");
+>> +             ret = -1;
+>> +             goto end;
+>> +     }
+>> +
+>> +     printf("MAP service registered\n");
+>> +
+>> +end:
+>> +     sdp_data_free(channel);
+>> +     sdp_list_free(proto[0], 0);
+>> +     sdp_list_free(proto[1], 0);
+>> +     sdp_list_free(proto[2], 0);
+>> +     sdp_list_free(apseq, 0);
+>> +     sdp_list_free(pfseq, 0);
+>> +     sdp_list_free(aproto, 0);
+>> +     sdp_list_free(root, 0);
+>> +     sdp_list_free(svclass_id, 0);
+>> +
+>> +     return ret;
+>> +}
+>> +
+>>  static int add_ftp(sdp_session_t *session, svc_info_t *si)  {
+>>       sdp_list_t *svclass_id, *pfseq, *apseq, *root; @@ -3547,6 +3627,7
+>> @@ struct {
+>>       { "SAP",        SAP_SVCLASS_ID,
+>>       add_simaccess   },
+>>       { "PBAP",       PBAP_SVCLASS_ID,                add_pbap,       },
+>>
+>> +     { "MAP",        MAP_SVCLASS_ID,                 add_map,
+>>       },
+>>       { "NAP",        NAP_SVCLASS_ID,                 add_nap
+>>               },
+>>       { "GN",         GN_SVCLASS_ID,                  add_gn
+>>       },
+>>       { "PANU",       PANU_SVCLASS_ID,                add_panu        },
+>> --
+>> 1.9.1
+>
+> Ping.
+
+Applied, thanks.
+
+
 -- 
-2.1.0.rc2.206.gedb03e5
-
+Luiz Augusto von Dentz
