@@ -1,48 +1,73 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 25 Nov 2014 11:32:56 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Jakub Pawlowski <jpawlowski@google.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v9 2/3] Bluetooth: Extract generic start and stop
- discovery
-Message-ID: <20141125093256.GB15104@t440s.ger.corp.intel.com>
-References: <1416728993-4189-1-git-send-email-jpawlowski@google.com>
- <1416728993-4189-2-git-send-email-jpawlowski@google.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1416728993-4189-2-git-send-email-jpawlowski@google.com>
+From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+Subject: [PATCH 1/5] android/handsfree-client: Add SCO to handsfree client
+Date: Tue, 25 Nov 2014 11:47:24 +0100
+Message-Id: <1416912448-28177-2-git-send-email-lukasz.rymanowski@tieto.com>
+In-Reply-To: <1416912448-28177-1-git-send-email-lukasz.rymanowski@tieto.com>
+References: <1416912448-28177-1-git-send-email-lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jakub,
+---
+ android/handsfree-client.c | 15 +++++++++++++++
+ 1 file changed, 15 insertions(+)
 
-On Sat, Nov 22, 2014, Jakub Pawlowski wrote:
-> This commit extract generic_start_discovery and generic_stop_discovery
-> in preparation for start and stop service discovery. The reason behind
-> that is that both functions will share big part of code, and it would
-> be much easier to maintain just one generic method.
-> 
-> Signed-off-by: Jakub Pawlowski <jpawlowski@google.com>
-> ---
->  net/bluetooth/mgmt.c | 89 +++++++++++++++++++++++++++++++++-------------------
->  1 file changed, 56 insertions(+), 33 deletions(-)
+diff --git a/android/handsfree-client.c b/android/handsfree-client.c
+index 283519f..9e67c7f 100644
+--- a/android/handsfree-client.c
++++ b/android/handsfree-client.c
+@@ -47,6 +47,7 @@
+ #include "bluetooth.h"
+ #include "hal-msg.h"
+ #include "handsfree-client.h"
++#include "sco.h"
+ 
+ #define HFP_HF_CHANNEL 7
+ 
+@@ -139,6 +140,8 @@ static uint32_t hfp_hf_record_id = 0;
+ static struct queue *devices = NULL;
+ static GIOChannel *hfp_hf_server = NULL;
+ 
++static struct bt_sco *sco = NULL;
++
+ static struct device *find_default_device(void)
+ {
+ 	return queue_peek_head(devices);
+@@ -1999,6 +2002,11 @@ static void cleanup_hfp_hf(void)
+ 		bt_adapter_remove_record(hfp_hf_record_id);
+ 		hfp_hf_record_id = 0;
+ 	}
++
++	if (sco) {
++		bt_sco_unref(sco);
++		sco = NULL;
++	}
+ }
+ 
+ bool bt_hf_client_register(struct ipc *ipc, const bdaddr_t *addr)
+@@ -2016,6 +2024,12 @@ bool bt_hf_client_register(struct ipc *ipc, const bdaddr_t *addr)
+ 	if (!enable_hf_client())
+ 		goto failed;
+ 
++	sco = bt_sco_new(addr);
++	if (!sco) {
++		error("hf-client: Cannot create SCO. HFP AG is in use ?");
++		goto failed;
++	}
++
+ 	hal_ipc = ipc;
+ 	ipc_register(hal_ipc, HAL_SERVICE_ID_HANDSFREE_CLIENT, cmd_handlers,
+ 						G_N_ELEMENTS(cmd_handlers));
+@@ -2023,6 +2037,7 @@ bool bt_hf_client_register(struct ipc *ipc, const bdaddr_t *addr)
+ 	return true;
+ 
+ failed:
++	cleanup_hfp_hf();
+ 	queue_destroy(devices, free);
+ 	devices = NULL;
+ 
+-- 
+1.8.4
 
-People's dislike of these generic* functions was previously pointed out
-but no good options were proposed, so let me give a try:
-
-Considering that we don't allow multiple concurrent stop or start
-discovery operations (the mgmt commands will return "busy" errors),
-couldn't we simply look up whatever pending start/discovery command
-there is and then use that to derive our response? I.e. instead of a
-single mgmt_pending_find (which we anyway need to do) there'd
-potentially be two such calls.
-
-Regarding Stop Service Discovery, I'm starting to doubt whether the
-whole thing is needed at all. It's exactly the same as Stop Discovery
-and you don't even attempt to check that the Stop Discovery/Stop Service
-Discovery matches the actual ongoing discovery type (i.e. your code
-would allow stopping a normal discovery with Stop Service Discovery and
-vice versa). So I'd propose to just drop the new method and reuse the
-existing Stop Discovery to stop either one of these two types.
-
-Johan
