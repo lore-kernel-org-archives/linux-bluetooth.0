@@ -1,160 +1,89 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1416912448-28177-3-git-send-email-lukasz.rymanowski@tieto.com>
-References: <1416912448-28177-1-git-send-email-lukasz.rymanowski@tieto.com>
-	<1416912448-28177-3-git-send-email-lukasz.rymanowski@tieto.com>
-Date: Tue, 25 Nov 2014 12:30:43 +0100
-Message-ID: <CAN_7+Ya7xhcix85DPHXnJZF+AimLBPCXU_Cxh5MGbbsDOBQ+sQ@mail.gmail.com>
-Subject: Re: [PATCH 2/5] android/handsfree-client: Add handle incoming SCO connection
-From: Lukasz Rymanowski <lukasz.rymanowski@gmail.com>
-To: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+From: Rakesh M K <rakesh.mk@samsung.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Rakesh M K <rakesh.mk@samsung.com>
+Subject: [PATCH 1] src/profile: Add HSP default record for external profiles
+Date: Tue, 25 Nov 2014 17:08:28 +0530
+Message-id: <1416915508-27250-1-git-send-email-rakesh.mk@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+---
+ src/profile.c |   47 +++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 47 insertions(+)
 
-On Tue, Nov 25, 2014 at 11:47 AM, Lukasz Rymanowski
-<lukasz.rymanowski@tieto.com> wrote:
-> ---
->  android/handsfree-client.c | 93 ++++++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 93 insertions(+)
->
-> diff --git a/android/handsfree-client.c b/android/handsfree-client.c
-> index 9e67c7f..432b9a1 100644
-> --- a/android/handsfree-client.c
-> +++ b/android/handsfree-client.c
-> @@ -116,6 +116,7 @@ struct device {
->         bdaddr_t bdaddr;
->         struct hfp_hf *hf;
->         uint8_t state;
-> +       uint8_t audio_state;
->
->         uint8_t negotiated_codec;
->         uint32_t features;
-> @@ -184,6 +185,7 @@ static struct device *device_create(const bdaddr_t *bdaddr)
->
->         bacpy(&dev->bdaddr, bdaddr);
->         dev->state = HAL_HF_CLIENT_CONN_STATE_DISCONNECTED;
-> +       dev->audio_state = HAL_HF_CLIENT_AUDIO_STATE_DISCONNECTED;
->
->         init_codecs(dev);
->
-> @@ -2009,6 +2011,93 @@ static void cleanup_hfp_hf(void)
->         }
->  }
->
-> +static void set_audio_state(struct device *dev, uint8_t state)
-> +{
-> +       struct hal_ev_hf_client_audio_state ev;
-> +       char address[18];
-> +
-> +       if (dev->audio_state == state)
-> +               return;
-> +
-> +       dev->audio_state = state;
-> +
-> +       ba2str(&dev->bdaddr, address);
-> +       DBG("device %s audio state %u", address, state);
-> +
-> +       bdaddr2android(&dev->bdaddr, ev.bdaddr);
-> +       ev.state = state;
-> +
-> +       ipc_send_notif(hal_ipc, HAL_SERVICE_ID_HANDSFREE_CLIENT,
-> +                               HAL_EV_HF_CLIENT_AUDIO_STATE, sizeof(ev), &ev);
-> +}
-> +
-> +static bool confirm_sco_cb(const bdaddr_t *addr, uint16_t *voice_settings)
-> +{
-> +       struct device *dev;
-> +
-> +       DBG("");
-> +
-> +       dev = find_device(addr);
-> +       if (!dev || dev->state != HAL_HF_CLIENT_CONN_STATE_SLC_CONNECTED) {
-> +               error("hf-client: No device or SLC not ready");
-> +               return false;
-> +       }
-> +
-> +       set_audio_state(dev, HAL_HF_CLIENT_AUDIO_STATE_CONNECTING);
-> +
-> +       if (!(codec_negotiation_supported(dev)))
-> +               *voice_settings = 0;
-> +       else if (dev->negotiated_codec != CODEC_ID_CVSD)
-> +               *voice_settings = BT_VOICE_TRANSPARENT;
-> +       else
-> +               *voice_settings = BT_VOICE_CVSD_16BIT;
-> +
-> +       return true;
-> +}
-> +
-> +static void connect_sco_cb(enum sco_status status, const bdaddr_t *addr)
-> +{
-> +       struct device *dev;
-> +       uint8_t audio_state;
-> +
-> +       DBG("SCO Status %u", status);
-> +
-> +       /* Device shall be there, just sanity check */
-> +       dev = find_device(addr);
-> +       if (!dev) {
-> +               error("hf-client: There is no device?");
-> +               return;
-> +       }
-> +
-> +       if (status != SCO_STATUS_OK) {
-> +               audio_state = HAL_HF_CLIENT_AUDIO_STATE_DISCONNECTED;
-> +               goto done;
-> +       }
-> +
-> +       if (dev->negotiated_codec == CODEC_ID_MSBC)
-> +               audio_state = HAL_HF_CLIENT_AUDIO_STATE_CONNECTED_MSBC;
-> +       else
-> +               audio_state = HAL_HF_CLIENT_AUDIO_STATE_CONNECTED;
-> +
-> +done:
-> +       set_audio_state(dev, audio_state);
-> +}
-> +
-> +static void disconnect_sco_cb(const bdaddr_t *addr)
-> +{
-> +       struct device *dev;
-> +
-> +       DBG("");
-> +
-> +       dev = get_device(addr);
+diff --git a/src/profile.c b/src/profile.c
+index 252063b..6e272c4 100644
+--- a/src/profile.c
++++ b/src/profile.c
+@@ -153,6 +153,44 @@
+ 		</attribute>						\
+ 	</record>"
+ 
++#define HSP_AG_RECORD							\
++	"<?xml version=\"1.0\" encoding=\"UTF-8\" ?>			\
++	<record>							\
++		<attribute id=\"0x0001\">				\
++			<sequence>					\
++				<uuid value=\"0x1112\" />		\
++				<uuid value=\"0x1203\" />		\
++			</sequence>					\
++		</attribute>						\
++		<attribute id=\"0x0004\">				\
++			<sequence>					\
++				<sequence>				\
++					<uuid value=\"0x0100\" />	\
++				</sequence>				\
++				<sequence>				\
++					<uuid value=\"0x0003\" />	\
++					<uint8 value=\"0x%02x\" />	\
++				</sequence>				\
++			</sequence>					\
++		</attribute>						\
++		<attribute id=\"0x0005\">				\
++			<sequence>					\
++				<uuid value=\"0x1002\" />		\
++			</sequence>					\
++		</attribute>						\
++		<attribute id=\"0x0009\">				\
++			<sequence>					\
++				<sequence>				\
++					<uuid value=\"0x1108\" />	\
++					<uint16 value=\"0x%04x\" />	\
++				</sequence>				\
++			</sequence>					\
++		</attribute>						\
++		<attribute id=\"0x0100\">				\
++			<text value=\"%s\" />				\
++		</attribute>						\
++	</record>"
++
+ #define SPP_RECORD							\
+ 	"<?xml version=\"1.0\" encoding=\"UTF-8\" ?>			\
+ 	<record>							\
+@@ -1704,6 +1742,13 @@ static char *get_hfp_ag_record(struct ext_profile *ext, struct ext_io *l2cap,
+ 						ext->name, ext->features);
+ }
+ 
++static char *get_hsp_ag_record(struct ext_profile *ext, struct ext_io *l2cap,
++							struct ext_io *rfcomm)
++{
++	return g_strdup_printf(HSP_AG_RECORD, rfcomm->chan, ext->version,
++						ext->name);
++}
++
+ static char *get_spp_record(struct ext_profile *ext, struct ext_io *l2cap,
+ 							struct ext_io *rfcomm)
+ {
+@@ -1913,6 +1958,8 @@ static struct default_settings {
+ 		.channel	= HSP_AG_DEFAULT_CHANNEL,
+ 		.authorize	= true,
+ 		.auto_connect	= true,
++		.get_record	= get_hsp_ag_record,
++		.version	= 0x0102,
+ 	}, {
+ 		.uuid		= OBEX_OPP_UUID,
+ 		.name		= "Object Push",
+-- 
+1.7.9.5
 
-Just noticed that It should be find_device() here. Will fix it in v2
-but I'm waiting for other comments.
-
-\Lukasz
-> +       if (!dev) {
-> +               error("hf-client: No device");
-> +               return;
-> +       }
-> +
-> +       set_audio_state(dev, HAL_HF_CLIENT_AUDIO_STATE_DISCONNECTED);
-> +}
-> +
->  bool bt_hf_client_register(struct ipc *ipc, const bdaddr_t *addr)
->  {
->         DBG("");
-> @@ -2030,6 +2119,10 @@ bool bt_hf_client_register(struct ipc *ipc, const bdaddr_t *addr)
->                 goto failed;
->         }
->
-> +       bt_sco_set_confirm_cb(sco, confirm_sco_cb);
-> +       bt_sco_set_connect_cb(sco, connect_sco_cb);
-> +       bt_sco_set_disconnect_cb(sco, disconnect_sco_cb);
-> +
->         hal_ipc = ipc;
->         ipc_register(hal_ipc, HAL_SERVICE_ID_HANDSFREE_CLIENT, cmd_handlers,
->                                                 G_N_ELEMENTS(cmd_handlers));
-> --
-> 1.8.4
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
