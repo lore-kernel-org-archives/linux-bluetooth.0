@@ -1,53 +1,54 @@
 Return-Path: <cyrus@holtmann.org>
-From: Gowtham Anandha Babu <gowtham.ab@samsung.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: d.kasatkin@samsung.com, bharat.panda@samsung.com, cpgs@samsung.com
-References: <1416559765-26427-1-git-send-email-gowtham.ab@samsung.com>
- <1416559765-26427-2-git-send-email-gowtham.ab@samsung.com>
-In-reply-to: <1416559765-26427-2-git-send-email-gowtham.ab@samsung.com>
-Subject: RE: [PATCH] plugins/autopair: Provide descriptive error log
-Date: Tue, 25 Nov 2014 14:44:18 +0530
-Message-id: <001901d00890$32d6b8b0$98842a10$@samsung.com>
-MIME-version: 1.0
-Content-type: text/plain; charset=us-ascii
-Sender: linux-bluetooth-owner@vger.kernel.org
+Message-ID: <54744242.8050209@gmail.com>
+Date: Tue, 25 Nov 2014 11:48:02 +0300
+From: Dmitry Tunin <hanipouspilot@gmail.com>
+MIME-Version: 1.0
+To: linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+ linux-kernel <linux-kernel@vger.kernel.org>,
+ stable@vger.kernel.org, Marcel Holtmann <marcel@holtmann.org>
+Subject: [PATCH v5] ath3k: Add support of MCI 13d3:3408 bt device
+Content-Type: text/plain; charset=utf-8; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Add support for bluetooth MCI WB335 (AR9565) Wi-Fi+bt module.
+This bluetooth module requires loading patch and sysconfig by ath3k driver.
 
-> -----Original Message-----
-> From: Gowtham Anandha Babu [mailto:gowtham.ab@samsung.com]
-> Sent: Friday, November 21, 2014 2:19 PM
-> To: linux-bluetooth@vger.kernel.org
-> Cc: d.kasatkin@samsung.com; bharat.panda@samsung.com;
-> cpgs@samsung.com; Gowtham Anandha Babu
-> Subject: [PATCH] plugins/autopair: Provide descriptive error log
-> 
-> Add more description in error logging.
-> ---
->  plugins/autopair.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/plugins/autopair.c b/plugins/autopair.c index
-d63da93..43b0e00
-> 100644
-> --- a/plugins/autopair.c
-> +++ b/plugins/autopair.c
-> @@ -172,8 +172,8 @@ static int autopair_init(void)
->  	n = read(fd, &seed, sizeof(seed));
->  	if (n < (ssize_t) sizeof(seed)) {
->  		err = (n == -1) ? -errno : -EIO;
-> -		error("Failed to read %zu bytes from /dev/urandom",
-> -
-sizeof(seed));
-> +		error("Failed to read %zu bytes from /dev/urandom: %s
-> (%d)",
-> +					sizeof(seed), strerror(-err), -err);
->  		close(fd);
->  		return err;
->  	}
-> --
-> 1.9.1
+CC: stable@vger.kernel.org
+Signed-off-by: Dmitry Tunin <hanipouspilot@gmail.com>
 
-Ping.
+---
 
+diff --git a/drivers/bluetooth/ath3k.c b/drivers/bluetooth/ath3k.c
+index d85ced2..086240c 100644
+--- a/drivers/bluetooth/ath3k.c
++++ b/drivers/bluetooth/ath3k.c
+@@ -105,6 +105,7 @@ static const struct usb_device_id ath3k_table[] = {
+  	{ USB_DEVICE(0x13d3, 0x3375) },
+  	{ USB_DEVICE(0x13d3, 0x3393) },
+  	{ USB_DEVICE(0x13d3, 0x3402) },
++	{ USB_DEVICE(0x13d3, 0x3408) },
+  	{ USB_DEVICE(0x13d3, 0x3432) },
+
+  	/* Atheros AR5BBU12 with sflash firmware */
+@@ -156,6 +157,7 @@ static const struct usb_device_id ath3k_blist_tbl[] = {
+  	{ USB_DEVICE(0x13d3, 0x3375), .driver_info = BTUSB_ATH3012 },
+  	{ USB_DEVICE(0x13d3, 0x3393), .driver_info = BTUSB_ATH3012 },
+  	{ USB_DEVICE(0x13d3, 0x3402), .driver_info = BTUSB_ATH3012 },
++	{ USB_DEVICE(0x13d3, 0x3408), .driver_info = BTUSB_ATH3012 },
+  	{ USB_DEVICE(0x13d3, 0x3432), .driver_info = BTUSB_ATH3012 },
+
+  	/* Atheros AR5BBU22 with sflash firmware */
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index edfc17b..091c813 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -182,6 +182,7 @@ static const struct usb_device_id blacklist_table[] = {
+  	{ USB_DEVICE(0x13d3, 0x3375), .driver_info = BTUSB_ATH3012 },
+  	{ USB_DEVICE(0x13d3, 0x3393), .driver_info = BTUSB_ATH3012 },
+  	{ USB_DEVICE(0x13d3, 0x3402), .driver_info = BTUSB_ATH3012 },
++	{ USB_DEVICE(0x13d3, 0x3408), .driver_info = BTUSB_ATH3012 },
+  	{ USB_DEVICE(0x13d3, 0x3432), .driver_info = BTUSB_ATH3012 },
+
+  	/* Atheros AR5BBU12 with sflash firmware */
+
+-- 
