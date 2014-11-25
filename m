@@ -1,50 +1,160 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] android/init: Update init script with proper selinux domain label
-Date: Tue, 25 Nov 2014 14:16:31 +0100
-Message-ID: <2625784.YzjpYWiJ5O@leonov>
-In-Reply-To: <1416578301-11341-1-git-send-email-jakub.tyszkowski@tieto.com>
-References: <1416578301-11341-1-git-send-email-jakub.tyszkowski@tieto.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+In-Reply-To: <1416912448-28177-3-git-send-email-lukasz.rymanowski@tieto.com>
+References: <1416912448-28177-1-git-send-email-lukasz.rymanowski@tieto.com>
+	<1416912448-28177-3-git-send-email-lukasz.rymanowski@tieto.com>
+Date: Tue, 25 Nov 2014 12:30:43 +0100
+Message-ID: <CAN_7+Ya7xhcix85DPHXnJZF+AimLBPCXU_Cxh5MGbbsDOBQ+sQ@mail.gmail.com>
+Subject: Re: [PATCH 2/5] android/handsfree-client: Add handle incoming SCO connection
+From: Lukasz Rymanowski <lukasz.rymanowski@gmail.com>
+To: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jakub,
+Hi,
 
-On Friday 21 of November 2014 14:58:21 Jakub Tyszkowski wrote:
-> This is to get rid of SEPolicy complain about service running without
-> defined policies.
+On Tue, Nov 25, 2014 at 11:47 AM, Lukasz Rymanowski
+<lukasz.rymanowski@tieto.com> wrote:
 > ---
->  android/init.bluetooth.rc | 2 ++
->  1 file changed, 2 insertions(+)
-> 
-> diff --git a/android/init.bluetooth.rc b/android/init.bluetooth.rc
-> index af62121..1815fac 100644
-> --- a/android/init.bluetooth.rc
-> +++ b/android/init.bluetooth.rc
-> @@ -25,6 +25,7 @@ service bluetoothd /system/bin/logwrapper
-> /system/bin/bluetoothd class main
->      # init does not yet support setting capabilities so run as root,
->      # bluetoothd drop uid to bluetooth with the right linux capabilities
-> +    seclabel u:r:bluetoothd:s0
->      group bluetooth
->      disabled
->      oneshot
-> @@ -33,6 +34,7 @@ service bluetoothd-snoop /system/bin/logwrapper
-> /system/bin/bluetoothd-snoop class main
->      # init does not yet support setting capabilities so run as root,
->      # bluetoothd-snoop drops unneeded linux capabilities
-> +    seclabel u:r:bluetoothd:s0
->      group nobody
->      disabled
->      oneshot
+>  android/handsfree-client.c | 93 ++++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 93 insertions(+)
+>
+> diff --git a/android/handsfree-client.c b/android/handsfree-client.c
+> index 9e67c7f..432b9a1 100644
+> --- a/android/handsfree-client.c
+> +++ b/android/handsfree-client.c
+> @@ -116,6 +116,7 @@ struct device {
+>         bdaddr_t bdaddr;
+>         struct hfp_hf *hf;
+>         uint8_t state;
+> +       uint8_t audio_state;
+>
+>         uint8_t negotiated_codec;
+>         uint32_t features;
+> @@ -184,6 +185,7 @@ static struct device *device_create(const bdaddr_t *bdaddr)
+>
+>         bacpy(&dev->bdaddr, bdaddr);
+>         dev->state = HAL_HF_CLIENT_CONN_STATE_DISCONNECTED;
+> +       dev->audio_state = HAL_HF_CLIENT_AUDIO_STATE_DISCONNECTED;
+>
+>         init_codecs(dev);
+>
+> @@ -2009,6 +2011,93 @@ static void cleanup_hfp_hf(void)
+>         }
+>  }
+>
+> +static void set_audio_state(struct device *dev, uint8_t state)
+> +{
+> +       struct hal_ev_hf_client_audio_state ev;
+> +       char address[18];
+> +
+> +       if (dev->audio_state == state)
+> +               return;
+> +
+> +       dev->audio_state = state;
+> +
+> +       ba2str(&dev->bdaddr, address);
+> +       DBG("device %s audio state %u", address, state);
+> +
+> +       bdaddr2android(&dev->bdaddr, ev.bdaddr);
+> +       ev.state = state;
+> +
+> +       ipc_send_notif(hal_ipc, HAL_SERVICE_ID_HANDSFREE_CLIENT,
+> +                               HAL_EV_HF_CLIENT_AUDIO_STATE, sizeof(ev), &ev);
+> +}
+> +
+> +static bool confirm_sco_cb(const bdaddr_t *addr, uint16_t *voice_settings)
+> +{
+> +       struct device *dev;
+> +
+> +       DBG("");
+> +
+> +       dev = find_device(addr);
+> +       if (!dev || dev->state != HAL_HF_CLIENT_CONN_STATE_SLC_CONNECTED) {
+> +               error("hf-client: No device or SLC not ready");
+> +               return false;
+> +       }
+> +
+> +       set_audio_state(dev, HAL_HF_CLIENT_AUDIO_STATE_CONNECTING);
+> +
+> +       if (!(codec_negotiation_supported(dev)))
+> +               *voice_settings = 0;
+> +       else if (dev->negotiated_codec != CODEC_ID_CVSD)
+> +               *voice_settings = BT_VOICE_TRANSPARENT;
+> +       else
+> +               *voice_settings = BT_VOICE_CVSD_16BIT;
+> +
+> +       return true;
+> +}
+> +
+> +static void connect_sco_cb(enum sco_status status, const bdaddr_t *addr)
+> +{
+> +       struct device *dev;
+> +       uint8_t audio_state;
+> +
+> +       DBG("SCO Status %u", status);
+> +
+> +       /* Device shall be there, just sanity check */
+> +       dev = find_device(addr);
+> +       if (!dev) {
+> +               error("hf-client: There is no device?");
+> +               return;
+> +       }
+> +
+> +       if (status != SCO_STATUS_OK) {
+> +               audio_state = HAL_HF_CLIENT_AUDIO_STATE_DISCONNECTED;
+> +               goto done;
+> +       }
+> +
+> +       if (dev->negotiated_codec == CODEC_ID_MSBC)
+> +               audio_state = HAL_HF_CLIENT_AUDIO_STATE_CONNECTED_MSBC;
+> +       else
+> +               audio_state = HAL_HF_CLIENT_AUDIO_STATE_CONNECTED;
+> +
+> +done:
+> +       set_audio_state(dev, audio_state);
+> +}
+> +
+> +static void disconnect_sco_cb(const bdaddr_t *addr)
+> +{
+> +       struct device *dev;
+> +
+> +       DBG("");
+> +
+> +       dev = get_device(addr);
 
-I think we should have separate policy for snoop service as it requires far 
-less permissions to run.
+Just noticed that It should be find_device() here. Will fix it in v2
+but I'm waiting for other comments.
 
--- 
-BR
-Szymon Janc
+\Lukasz
+> +       if (!dev) {
+> +               error("hf-client: No device");
+> +               return;
+> +       }
+> +
+> +       set_audio_state(dev, HAL_HF_CLIENT_AUDIO_STATE_DISCONNECTED);
+> +}
+> +
+>  bool bt_hf_client_register(struct ipc *ipc, const bdaddr_t *addr)
+>  {
+>         DBG("");
+> @@ -2030,6 +2119,10 @@ bool bt_hf_client_register(struct ipc *ipc, const bdaddr_t *addr)
+>                 goto failed;
+>         }
+>
+> +       bt_sco_set_confirm_cb(sco, confirm_sco_cb);
+> +       bt_sco_set_connect_cb(sco, connect_sco_cb);
+> +       bt_sco_set_disconnect_cb(sco, disconnect_sco_cb);
+> +
+>         hal_ipc = ipc;
+>         ipc_register(hal_ipc, HAL_SERVICE_ID_HANDSFREE_CLIENT, cmd_handlers,
+>                                                 G_N_ELEMENTS(cmd_handlers));
+> --
+> 1.8.4
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
