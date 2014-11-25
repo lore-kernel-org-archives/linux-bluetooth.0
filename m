@@ -1,181 +1,377 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@gmail.com>
-To: Szymon Janc <szymon.janc@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] android/README: Update documention with Android 5 info
-Date: Tue, 25 Nov 2014 20:34:43 +0100
-Message-ID: <1553382.UgcpDJgc5d@athlon>
-In-Reply-To: <1416504295-18224-1-git-send-email-szymon.janc@tieto.com>
-References: <1416504295-18224-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+In-Reply-To: <CABBYNZ+jVSGXYNwyZ687N0SFhdgVXbYDJTZp4mjVDzutuirPKQ@mail.gmail.com>
+References: <1416878384-18148-1-git-send-email-armansito@chromium.org>
+	<CABBYNZ+jVSGXYNwyZ687N0SFhdgVXbYDJTZp4mjVDzutuirPKQ@mail.gmail.com>
+Date: Tue, 25 Nov 2014 09:48:26 -0800
+Message-ID: <CAHrH25Tsh-2yd=NV5526f_=5R5zpPLM-xLPmQk-45c+nRj6Q=Q@mail.gmail.com>
+Subject: Re: [RFC BlueZ] shared/gatt-db: Add high-level functions for client
+From: Arman Uguray <armansito@chromium.org>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Thursday 20 November 2014 18:24:55 Szymon Janc wrote:
-> ---
->  android/README | 84
-> ++++++++++++++++++++++++++++++++++------------------------ 1 file changed,
-> 49 insertions(+), 35 deletions(-)
-> 
-> diff --git a/android/README b/android/README
-> index b1ac886..aa12e51 100644
-> --- a/android/README
-> +++ b/android/README
-> @@ -9,14 +9,13 @@ replacement to Android provided Bluetooth stack.
->  More details about BlueZ for Android architecture and components can be
-> found in android/hal-ipc-api.txt file.
-> 
-> -Supported Android version: 4.4
-> +Supported Android version: 4.4 KitKat and 5.0 Lollipop
-> 
-> 
->  Building and running on Android
->  ===============================
-> 
-> -Steps needed to build and run Android Open Source Project 4.4 with
-> -integrated BlueZ.
-> +Steps needed to build and run Android Open Source Project with integrated
-> BlueZ.
-> 
-> 
->  Build requirements
-> @@ -30,11 +29,10 @@ is available at
-> https://code.google.com/p/aosp-bluez.glib/ 'external/bluetooth/sbc'
-> directory. Library is build from Android.mk provided by BlueZ. SBC code is
-> available at git://git.kernel.org/pub/scm/bluetooth/sbc
-> 
-> -- Bionic support - Currently only 'master' branch available at
-> -https://android.googlesource.com/platform/bionic provides all required
-> -functionality and running BlueZ on release branch requires backporting
-> missing -features (currently epoll_create1 and ppoll calls for Android
-> 4.4). Sample -Bionic for Android 4.4 with all required features backported
-> is available at +- Bionic support - Android 5.0 provides all required
-> functionality. Running +BlueZ on Android 4.4 requires backporting missing
-> features (epoll_create1 and +ppoll calls). Sample Bionic for Android 4.4
-> with all required features +backported is available at
->  https://code.google.com/p/aosp-bluez.platform-bionic/
-> 
->  Runtime requirements
-> @@ -49,29 +47,44 @@ import init.bluetooth.rc
-> 
->  For convenience examples are provided at:
->  https://code.google.com/p/aosp-bluez.device-lge-mako/    (Nexus 4)
-> +https://code.google.com/p/aosp-bluez.device-lge-ham/     (Nexus 5)
->  https://code.google.com/p/aosp-bluez.device-asus-flo/    (Nexus 7 2013)
-> 
-> +Security-Enhanced Linux in Android
-> +----------------------------------
-> +
-> +Since 5.0 release Android moved to full enforcement of SELinux. This
-> requires +proper policy to be provided for all BlueZ for Android services
-> (and services +interacting with BlueZ). Policies should be placed in
-> external/selinux/ path. +
-> +Required policy files are provided at <TBD>.
-> +
-> +For convenience sepolicy.git with all required policies is available at:
-> +https://code.google.com/p/aosp-bluez.external-sepolicy/
-> 
->  Downloading and building
->  ------------------------
-> 
-> -Building for Android requires full Android AOSP source tree. Sample Android
-> -4.4 tree with all required components present is available at
-> +Building for Android requires full Android AOSP source tree. Sample Android
-> tree +with all required components present is available at
->  http://code.google.com/p/aosp-bluez/
-> 
-> -This tree provides support for Nexus4 (target aosp_mako-userdebug) and
-> -Nexus 7 2013 (target aosp_flo-userdebug). Tree does not provide binary
-> blobs -needed to run Android on supported devices. Those can be obtained
-> from +This tree provides support for Nexus4 (mako), Nexus 5 (hammerhead)
-> and +Nexus 7 2013 (flo, deb). Tree does not provide binary blobs needed to
-> run +Android on supported devices. Those can be obtained from
->  https://developers.google.com/android/nexus/drivers. Binary blobs needs to
-> be unpacked (EULA acceptance required) into 'vendor' directory of Android
-> tree.
-> 
->  Downloading:
-> -repo init -u https://code.google.com/p/aosp-bluez.platform-manifest -b
-> kitkat +Android 5.0 - 'lollipop' branch
-> +Android 4.4 - 'kitkat' branch
-> +
-> +repo init -u https://code.google.com/p/aosp-bluez.platform-manifest -b
-> lollipop repo sync
-> 
->  Building:
->  source build/envsetup.sh
-> -lunch aosp_mako-userdebug    or    lunch aosp_flo-userdebug
-> +lunch aosp_<target>-userdebug
->  make -j8
-> 
->  Flashing:
-> @@ -263,21 +276,23 @@ initial     - only initial implementations is present,
-> Android Framework is able to initialize but most likely not able to use it
-> not started - no implementation, Android Framework is not able to
-> initialize it
-> 
-> -Profile ID    HAL header         Status
-> ----------------------------------------
-> -core          bluetooth.h        complete
-> -a2dp          bt_av.h            complete
-> -gatt          bt_gatt.h          complete
-> -              bt_gatt_client.h   complete
-> -              bt_gatt_server.h   complete
-> -handsfree     bt_hf.h            complete
-> -hidhost       bt_hh.h            complete
-> -health        bt_hl.h            complete
-> -pan           bt_pan.h           complete
-> -avrcp         bt_rc.h            complete
-> -socket        bt_sock.h          complete
-> -hf_client     bt_hf_client.h     initial
-> -map_client    bt_mce.h           complete
-> +Profile ID        HAL header         4.4 Status    5.0 status
-> +-------------------------------------------------------------
-> +core              bluetooth.h        complete      partial
-> +a2dp              bt_av.h            complete      complete
-> +gatt              bt_gatt.h          complete      partial
-> +                  bt_gatt_client.h   complete      partial
-> +                  bt_gatt_server.h   complete      partial
-> +handsfree         bt_hf.h            complete      partial
-> +hidhost           bt_hh.h            complete      complete
-> +health            bt_hl.h            complete      complete
-> +pan               bt_pan.h           complete      complete
-> +avrcp             bt_rc.h            complete      complete
-> +socket            bt_sock.h          complete      partial
-> +handsfree_client  bt_hf_client.h     N/A           partial
-> +map_client        bt_mce.h           N/A           complete
-> +a2dp_sink         bt_av.h            N/A           partial
-> +avrcp_ctrl        bt_rc.h            N/A           partial
-> 
-> 
->  Implementation shortcomings
-> @@ -344,11 +359,6 @@ methods:
->  client->set_adv_data               missing kernel support for vendor data
->  client->connect                    is_direct parameter is ignored
-> 
-> -HAL HF Client
-> --------------
-> -
-> -Available on Android only when BLUEZ_EXTENSIONS flag set in BoardConfig.mk
-> -
-> 
->  Audio SCO HAL
->  =============
-> @@ -387,6 +397,10 @@ affect qualification or user experience. This section
-> provides list of recommended Android fixes that are not part of latest AOSP
-> release supported by BlueZ.
-> 
-> +For Android 5.0 Lollipop:
-> +<TBD>
-> +
-> +For Android 4.4 KitKat:
->  https://android-review.googlesource.com/82757
->  https://android-review.googlesource.com/87670
->  https://android-review.googlesource.com/88384
+Hi Luiz,
 
-Pushed (with typo in commit msg fixed).
+> On Tue, Nov 25, 2014 at 8:22 AM, Luiz Augusto von Dentz <luiz.dentz@gmail.com> wrote:
+> Hi Arman,
+>
+> On Tue, Nov 25, 2014 at 3:19 AM, Arman Uguray <armansito@chromium.org> wrote:
+>> This patch introduces foreach functions to gatt-db for enumerating
+>> service, characteristic, and decriptors stored in the database as
+>> gatt_db_attribute pointers. This patch also adds functions for
+>> extracting service, characteristic, and include declaration data out of
+>> matching attributes.
+>>
+>> This is in preparation for using gatt-db as the attribute cache in
+>> shared/gatt-client.
+>> ---
+>
+> At first glance it looked good but then I started thinking about it,
+> these would be called once bt_gatt_client ready callback is called but
+> what if we have callbacks for when an attribute is added/removed, at
+> the first time bt_gatt_client will cause every single attribute to be
+> notified since they are being added but then the next time it will
+> just notify if anything has changed so we don't need to reiterate in
+> every attribute.
+>
 
--- 
-Szymon K. Janc
-szymon.janc@gmail.com
+What is your exact concern, that these will be invoked too many times
+unnecessarily? As you said, we can have some general events when
+attributes are added/removed though for client a service added/removed
+would make more sense and at the time the service added event happens
+all of its attributes would have been inserted in the db. Either way I
+think it's useful to have these foreach functions. for instance, even
+with added/removed events the d-bus api implementation will need to
+enumerate all of the affected attributes to register/unregister
+objects. They will also be useful from within gatt-client during
+discovery.
+
+So I don't see any harm in having these. If they prove to be not that
+useful we can remove them eventually and these should at least get us
+going. Also, for services we could also add a foreach with match
+functions to allow iterating through say services within a certain
+handle range or those matching a certain UUID and so on. This way when
+the bt_gatt_client_service_changed callback gets called, the upper
+layer would only look through the services within the affected range.
+
+>>  src/shared/gatt-db.c | 219 +++++++++++++++++++++++++++++++++++++++++++++++++++
+>>  src/shared/gatt-db.h |  32 ++++++++
+>>  2 files changed, 251 insertions(+)
+>>
+>> diff --git a/src/shared/gatt-db.c b/src/shared/gatt-db.c
+>> index ab08c69..9bf06f6 100644
+>> --- a/src/shared/gatt-db.c
+>> +++ b/src/shared/gatt-db.c
+>> @@ -193,6 +193,29 @@ static int uuid_to_le(const bt_uuid_t *uuid, uint8_t *dst)
+>>         return bt_uuid_len(&uuid128);
+>>  }
+>>
+>> +static bool le_to_uuid(const uint8_t *src, size_t len, bt_uuid_t *uuid)
+>> +{
+>> +       uint128_t u128;
+>> +
+>> +       if (len == 2) {
+>> +               bt_uuid16_create(uuid, get_le16(src));
+>> +               return true;
+>> +       }
+>> +
+>> +       if (len == 4) {
+>> +               bt_uuid32_create(uuid, get_le32(src));
+>> +               return true;
+>> +       }
+>> +
+>> +       if (len != 16)
+>> +               return false;
+>> +
+>> +       bswap_128(src, &u128);
+>> +       bt_uuid128_create(uuid, u128);
+>> +
+>> +       return true;
+>> +}
+>> +
+>>  struct gatt_db_attribute *gatt_db_add_service(struct gatt_db *db,
+>>                                                 const bt_uuid_t *uuid,
+>>                                                 bool primary,
+>> @@ -665,6 +688,116 @@ void gatt_db_find_information(struct gatt_db *db, uint16_t start_handle,
+>>         queue_foreach(db->services, find_information, &data);
+>>  }
+>>
+>> +struct foreach_data {
+>> +       gatt_db_foreach_t func;
+>> +       void *user_data;
+>> +};
+>> +
+>> +static void foreach_service(void *data, void *user_data)
+>> +{
+>> +       struct gatt_db_service *service = data;
+>> +       struct foreach_data *foreach_data = user_data;
+>> +
+>> +       foreach_data->func(service->attributes[0], foreach_data->user_data);
+>> +}
+>> +
+>> +void gatt_db_foreach_service(struct gatt_db *db, gatt_db_foreach_t func,
+>> +                                                       void *user_data)
+>> +{
+>> +       struct foreach_data data;
+>> +
+>> +       if (!db || !func)
+>> +               return;
+>> +
+>> +       data.func = func;
+>> +       data.user_data = user_data;
+>> +
+>> +       queue_foreach(db->services, foreach_service, &data);
+>> +}
+>> +
+>> +void gatt_db_attribute_foreach_charac(struct gatt_db_attribute *attrib,
+>> +                                                       gatt_db_foreach_t func,
+>> +                                                       void *user_data)
+>> +{
+>> +       struct gatt_db_service *service;
+>> +       struct gatt_db_attribute *attr;
+>> +       uint16_t i;
+>> +
+>> +       if (!attrib || !func)
+>> +               return;
+>> +
+>> +       service = attrib->service;
+>> +
+>> +       for (i = 0; i < service->num_handles; i++) {
+>> +               attr = service->attributes[i];
+>> +               if (!attr)
+>> +                       continue;
+>> +
+>> +               if (bt_uuid_cmp(&characteristic_uuid, &attr->uuid))
+>> +                       continue;
+>> +
+>> +               func(attr, user_data);
+>> +       }
+>> +}
+>> +
+>> +void gatt_db_attribute_foreach_descr(struct gatt_db_attribute *attrib,
+>> +                                                       gatt_db_foreach_t func,
+>> +                                                       void *user_data)
+>> +{
+>> +       struct gatt_db_service *service;
+>> +       struct gatt_db_attribute *attr;
+>> +       uint16_t i;
+>> +
+>> +       if (!attrib || !func)
+>> +               return;
+>> +
+>> +       /* Return if this attribute is not a characteristic declaration */
+>> +       if (bt_uuid_cmp(&characteristic_uuid, &attrib->uuid))
+>> +               return;
+>> +
+>> +       service = attrib->service;
+>> +
+>> +       /* Start from the attribute following the value handle */
+>> +       i = attrib->handle - service->attributes[0]->handle + 2;
+>> +       for (; i < service->num_handles; i++) {
+>> +               attr = service->attributes[i];
+>> +               if (!attr)
+>> +                       continue;
+>> +
+>> +               /* Return if we reached the end of this characteristic */
+>> +               if (!bt_uuid_cmp(&characteristic_uuid, &attr->uuid) ||
+>> +                       !bt_uuid_cmp(&included_service_uuid, &attr->uuid))
+>> +                       return;
+>> +
+>> +               func(attr, user_data);
+>> +       }
+>> +}
+>> +
+>> +void gatt_db_attribute_foreach_incl(struct gatt_db_attribute *attrib,
+>> +                                                       gatt_db_foreach_t func,
+>> +                                                       void *user_data)
+>> +{
+>> +       struct gatt_db_service *service;
+>> +       struct gatt_db_attribute *attr;
+>> +       uint16_t i;
+>> +
+>> +       if (!attrib || !func)
+>> +               return;
+>> +
+>> +       service = attrib->service;
+>> +
+>> +       for (i = 0; i < service->num_handles; i++) {
+>> +               attr = service->attributes[i];
+>> +               if (!attr)
+>> +                       continue;
+>> +
+>> +               if (bt_uuid_cmp(&included_service_uuid, &attr->uuid))
+>> +                       continue;
+>> +
+>> +               func(attr, user_data);
+>> +       }
+>> +}
+>> +
+>>  static bool find_service_for_handle(const void *data, const void *user_data)
+>>  {
+>>         const struct gatt_db_service *service = data;
+>> @@ -769,6 +902,92 @@ bool gatt_db_attribute_get_service_handles(struct gatt_db_attribute *attrib,
+>>         return true;
+>>  }
+>>
+>> +bool gatt_db_attribute_get_service_data(struct gatt_db_attribute *attrib,
+>> +                                                       uint16_t *start_handle,
+>> +                                                       uint16_t *end_handle,
+>> +                                                       bool *primary,
+>> +                                                       bt_uuid_t *uuid)
+>> +{
+>> +       struct gatt_db_service *service;
+>> +       struct gatt_db_attribute *decl;
+>> +
+>> +       if (!attrib || !start_handle || !end_handle || !primary || !uuid)
+>> +               return false;
+>> +
+>> +       service = attrib->service;
+>> +       decl = service->attributes[0];
+>> +
+>> +       *start_handle = decl->handle;
+>> +       *end_handle = decl->handle + service->num_handles - 1;
+>> +       *primary = bt_uuid_cmp(&decl->uuid, &secondary_service_uuid);
+>> +
+>> +       /*
+>> +        * The service declaration attribute value is the 16 or 128 bit service
+>> +        * UUID.
+>> +        */
+>> +       return le_to_uuid(decl->value, decl->value_len, uuid);
+>> +}
+>> +
+>> +bool gatt_db_attribute_get_characteristic_data(struct gatt_db_attribute *attrib,
+>> +                                                       uint16_t *handle,
+>> +                                                       uint16_t *value_handle,
+>> +                                                       uint8_t *properties,
+>> +                                                       bt_uuid_t *uuid)
+>> +{
+>> +       if (!attrib || !handle || !value_handle || !properties || !uuid)
+>> +               return false;
+>> +
+>> +       if (bt_uuid_cmp(&characteristic_uuid, &attrib->uuid))
+>> +               return false;
+>> +
+>> +       /*
+>> +        * Characteristic declaration value:
+>> +        * 1 octet: Characteristic properties
+>> +        * 2 octets: Characteristic value handle
+>> +        * 2 or 16 octets: characteristic UUID
+>> +        */
+>> +       if (!attrib->value || (attrib->value_len != 5 &&
+>> +                                               attrib->value_len != 19))
+>> +               return false;
+>> +
+>> +       *handle = attrib->handle;
+>> +       *properties = attrib->value[0];
+>> +       *value_handle = get_le16(attrib->value + 1);
+>> +
+>> +       return le_to_uuid(attrib->value + 3, attrib->value_len - 3, uuid);
+>> +}
+>> +
+>> +bool gatt_db_attribute_get_include_data(struct gatt_db_attribute *attrib,
+>> +                                                       uint16_t *handle,
+>> +                                                       uint16_t *start_handle,
+>> +                                                       uint16_t *end_handle)
+>> +{
+>> +       if (!attrib || !handle || !start_handle || !end_handle)
+>> +               return false;
+>> +
+>> +       if (bt_uuid_cmp(&included_service_uuid, &attrib->uuid))
+>> +               return false;
+>> +
+>> +       /*
+>> +        * Include definition value:
+>> +        * 2 octets: start handle of included service
+>> +        * 2 octets: end handle of included service
+>> +        * optional 2 octets: 16-bit Bluetooth UUID
+>> +        */
+>> +       if (!attrib->value || attrib->value_len < 4 || attrib->value_len > 6)
+>> +               return false;
+>> +
+>> +       /*
+>> +        * We only return the handles since the UUID can be easily obtained
+>> +        * from the corresponding attribute.
+>> +        */
+>> +       *handle = attrib->handle;
+>> +       *start_handle = get_le16(attrib->value);
+>> +       *end_handle = get_le16(attrib->value + 2);
+>> +
+>> +       return true;
+>> +}
+>> +
+>>  bool gatt_db_attribute_get_permissions(struct gatt_db_attribute *attrib,
+>>                                                         uint32_t *permissions)
+>>  {
+>> diff --git a/src/shared/gatt-db.h b/src/shared/gatt-db.h
+>> index 9c71814..a87d7f9 100644
+>> --- a/src/shared/gatt-db.h
+>> +++ b/src/shared/gatt-db.h
+>> @@ -89,6 +89,21 @@ void gatt_db_find_information(struct gatt_db *db, uint16_t start_handle,
+>>                                                         struct queue *queue);
+>>
+>>
+>> +typedef void (*gatt_db_foreach_t)(struct gatt_db_attribute *attrib,
+>> +                                                       void *user_data);
+>> +void gatt_db_foreach_service(struct gatt_db *db, gatt_db_foreach_t func,
+>> +                                                       void *user_data);
+>> +void gatt_db_attribute_foreach_charac(struct gatt_db_attribute *attrib,
+>> +                                                       gatt_db_foreach_t func,
+>> +                                                       void *user_data);
+>> +void gatt_db_attribute_foreach_descr(struct gatt_db_attribute *attrib,
+>> +                                                       gatt_db_foreach_t func,
+>> +                                                       void *user_data);
+>> +void gatt_db_attribute_foreach_incl(struct gatt_db_attribute *attrib,
+>> +                                                       gatt_db_foreach_t func,
+>> +                                                       void *user_data);
+>> +
+>> +
+>>  struct gatt_db_attribute *gatt_db_get_attribute(struct gatt_db *db,
+>>                                                         uint16_t handle);
+>>
+>> @@ -103,6 +118,23 @@ bool gatt_db_attribute_get_service_handles(struct gatt_db_attribute *attrib,
+>>                                                 uint16_t *start_handle,
+>>                                                 uint16_t *end_handle);
+>>
+>> +bool gatt_db_attribute_get_service_data(struct gatt_db_attribute *attrib,
+>> +                                                       uint16_t *start_handle,
+>> +                                                       uint16_t *end_handle,
+>> +                                                       bool *primary,
+>> +                                                       bt_uuid_t *uuid);
+>> +
+>> +bool gatt_db_attribute_get_characteristic_data(struct gatt_db_attribute *attrib,
+>> +                                                       uint16_t *handle,
+>> +                                                       uint16_t *value_handle,
+>> +                                                       uint8_t *properties,
+>> +                                                       bt_uuid_t *uuid);
+>> +
+>> +bool gatt_db_attribute_get_include_data(struct gatt_db_attribute *attrib,
+>> +                                                       uint16_t *handle,
+>> +                                                       uint16_t *start_handle,
+>> +                                                       uint16_t *end_handle);
+>
+> This seems useful either way so I think we should start with these first.
+>
+>>  bool gatt_db_attribute_get_permissions(struct gatt_db_attribute *attrib,
+>>                                                         uint32_t *permissions);
+>>
+>> --
+>> 2.1.0.rc2.206.gedb03e5
+>>
+>> --
+>> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+>> the body of a message to majordomo@vger.kernel.org
+>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>
+>
+>
+> --
+> Luiz Augusto von Dentz
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+Arman
