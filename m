@@ -1,84 +1,181 @@
 Return-Path: <cyrus@holtmann.org>
+From: Szymon Janc <szymon.janc@gmail.com>
+To: Szymon Janc <szymon.janc@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] android/README: Update documention with Android 5 info
+Date: Tue, 25 Nov 2014 20:34:43 +0100
+Message-ID: <1553382.UgcpDJgc5d@athlon>
+In-Reply-To: <1416504295-18224-1-git-send-email-szymon.janc@tieto.com>
+References: <1416504295-18224-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
-In-Reply-To: <20141125093256.GB15104@t440s.ger.corp.intel.com>
-References: <1416728993-4189-1-git-send-email-jpawlowski@google.com>
-	<1416728993-4189-2-git-send-email-jpawlowski@google.com>
-	<20141125093256.GB15104@t440s.ger.corp.intel.com>
-Date: Tue, 25 Nov 2014 12:31:56 -0800
-Message-ID: <CAD0=r8z=L9gv5oNGc6nzouSL=yibjtwsQ1kyOBmw=JJ2qhS2+w@mail.gmail.com>
-Subject: Re: [PATCH v9 2/3] Bluetooth: Extract generic start and stop discovery
-From: Jakub Pawlowski <jpawlowski@google.com>
-To: Jakub Pawlowski <jpawlowski@google.com>,
-	BlueZ development <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="us-ascii"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Tue, Nov 25, 2014 at 1:32 AM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
-> Hi Jakub,
->
-> On Sat, Nov 22, 2014, Jakub Pawlowski wrote:
->> This commit extract generic_start_discovery and generic_stop_discovery
->> in preparation for start and stop service discovery. The reason behind
->> that is that both functions will share big part of code, and it would
->> be much easier to maintain just one generic method.
->>
->> Signed-off-by: Jakub Pawlowski <jpawlowski@google.com>
->> ---
->>  net/bluetooth/mgmt.c | 89 +++++++++++++++++++++++++++++++++-------------------
->>  1 file changed, 56 insertions(+), 33 deletions(-)
->
-> People's dislike of these generic* functions was previously pointed out
-> but no good options were proposed, so let me give a try:
->
-> Considering that we don't allow multiple concurrent stop or start
-> discovery operations (the mgmt commands will return "busy" errors),
-> couldn't we simply look up whatever pending start/discovery command
-> there is and then use that to derive our response? I.e. instead of a
-> single mgmt_pending_find (which we anyway need to do) there'd
-> potentially be two such calls.
->
-> Regarding Stop Service Discovery, I'm starting to doubt whether the
-> whole thing is needed at all. It's exactly the same as Stop Discovery
-> and you don't even attempt to check that the Stop Discovery/Stop Service
-> Discovery matches the actual ongoing discovery type (i.e. your code
-> would allow stopping a normal discovery with Stop Service Discovery and
-> vice versa). So I'd propose to just drop the new method and reuse the
-> existing Stop Discovery to stop either one of these two types.
+On Thursday 20 November 2014 18:24:55 Szymon Janc wrote:
+> ---
+>  android/README | 84
+> ++++++++++++++++++++++++++++++++++------------------------ 1 file changed,
+> 49 insertions(+), 35 deletions(-)
+> 
+> diff --git a/android/README b/android/README
+> index b1ac886..aa12e51 100644
+> --- a/android/README
+> +++ b/android/README
+> @@ -9,14 +9,13 @@ replacement to Android provided Bluetooth stack.
+>  More details about BlueZ for Android architecture and components can be
+> found in android/hal-ipc-api.txt file.
+> 
+> -Supported Android version: 4.4
+> +Supported Android version: 4.4 KitKat and 5.0 Lollipop
+> 
+> 
+>  Building and running on Android
+>  ===============================
+> 
+> -Steps needed to build and run Android Open Source Project 4.4 with
+> -integrated BlueZ.
+> +Steps needed to build and run Android Open Source Project with integrated
+> BlueZ.
+> 
+> 
+>  Build requirements
+> @@ -30,11 +29,10 @@ is available at
+> https://code.google.com/p/aosp-bluez.glib/ 'external/bluetooth/sbc'
+> directory. Library is build from Android.mk provided by BlueZ. SBC code is
+> available at git://git.kernel.org/pub/scm/bluetooth/sbc
+> 
+> -- Bionic support - Currently only 'master' branch available at
+> -https://android.googlesource.com/platform/bionic provides all required
+> -functionality and running BlueZ on release branch requires backporting
+> missing -features (currently epoll_create1 and ppoll calls for Android
+> 4.4). Sample -Bionic for Android 4.4 with all required features backported
+> is available at +- Bionic support - Android 5.0 provides all required
+> functionality. Running +BlueZ on Android 4.4 requires backporting missing
+> features (epoll_create1 and +ppoll calls). Sample Bionic for Android 4.4
+> with all required features +backported is available at
+>  https://code.google.com/p/aosp-bluez.platform-bionic/
+> 
+>  Runtime requirements
+> @@ -49,29 +47,44 @@ import init.bluetooth.rc
+> 
+>  For convenience examples are provided at:
+>  https://code.google.com/p/aosp-bluez.device-lge-mako/    (Nexus 4)
+> +https://code.google.com/p/aosp-bluez.device-lge-ham/     (Nexus 5)
+>  https://code.google.com/p/aosp-bluez.device-asus-flo/    (Nexus 7 2013)
+> 
+> +Security-Enhanced Linux in Android
+> +----------------------------------
+> +
+> +Since 5.0 release Android moved to full enforcement of SELinux. This
+> requires +proper policy to be provided for all BlueZ for Android services
+> (and services +interacting with BlueZ). Policies should be placed in
+> external/selinux/ path. +
+> +Required policy files are provided at <TBD>.
+> +
+> +For convenience sepolicy.git with all required policies is available at:
+> +https://code.google.com/p/aosp-bluez.external-sepolicy/
+> 
+>  Downloading and building
+>  ------------------------
+> 
+> -Building for Android requires full Android AOSP source tree. Sample Android
+> -4.4 tree with all required components present is available at
+> +Building for Android requires full Android AOSP source tree. Sample Android
+> tree +with all required components present is available at
+>  http://code.google.com/p/aosp-bluez/
+> 
+> -This tree provides support for Nexus4 (target aosp_mako-userdebug) and
+> -Nexus 7 2013 (target aosp_flo-userdebug). Tree does not provide binary
+> blobs -needed to run Android on supported devices. Those can be obtained
+> from +This tree provides support for Nexus4 (mako), Nexus 5 (hammerhead)
+> and +Nexus 7 2013 (flo, deb). Tree does not provide binary blobs needed to
+> run +Android on supported devices. Those can be obtained from
+>  https://developers.google.com/android/nexus/drivers. Binary blobs needs to
+> be unpacked (EULA acceptance required) into 'vendor' directory of Android
+> tree.
+> 
+>  Downloading:
+> -repo init -u https://code.google.com/p/aosp-bluez.platform-manifest -b
+> kitkat +Android 5.0 - 'lollipop' branch
+> +Android 4.4 - 'kitkat' branch
+> +
+> +repo init -u https://code.google.com/p/aosp-bluez.platform-manifest -b
+> lollipop repo sync
+> 
+>  Building:
+>  source build/envsetup.sh
+> -lunch aosp_mako-userdebug    or    lunch aosp_flo-userdebug
+> +lunch aosp_<target>-userdebug
+>  make -j8
+> 
+>  Flashing:
+> @@ -263,21 +276,23 @@ initial     - only initial implementations is present,
+> Android Framework is able to initialize but most likely not able to use it
+> not started - no implementation, Android Framework is not able to
+> initialize it
+> 
+> -Profile ID    HAL header         Status
+> ----------------------------------------
+> -core          bluetooth.h        complete
+> -a2dp          bt_av.h            complete
+> -gatt          bt_gatt.h          complete
+> -              bt_gatt_client.h   complete
+> -              bt_gatt_server.h   complete
+> -handsfree     bt_hf.h            complete
+> -hidhost       bt_hh.h            complete
+> -health        bt_hl.h            complete
+> -pan           bt_pan.h           complete
+> -avrcp         bt_rc.h            complete
+> -socket        bt_sock.h          complete
+> -hf_client     bt_hf_client.h     initial
+> -map_client    bt_mce.h           complete
+> +Profile ID        HAL header         4.4 Status    5.0 status
+> +-------------------------------------------------------------
+> +core              bluetooth.h        complete      partial
+> +a2dp              bt_av.h            complete      complete
+> +gatt              bt_gatt.h          complete      partial
+> +                  bt_gatt_client.h   complete      partial
+> +                  bt_gatt_server.h   complete      partial
+> +handsfree         bt_hf.h            complete      partial
+> +hidhost           bt_hh.h            complete      complete
+> +health            bt_hl.h            complete      complete
+> +pan               bt_pan.h           complete      complete
+> +avrcp             bt_rc.h            complete      complete
+> +socket            bt_sock.h          complete      partial
+> +handsfree_client  bt_hf_client.h     N/A           partial
+> +map_client        bt_mce.h           N/A           complete
+> +a2dp_sink         bt_av.h            N/A           partial
+> +avrcp_ctrl        bt_rc.h            N/A           partial
+> 
+> 
+>  Implementation shortcomings
+> @@ -344,11 +359,6 @@ methods:
+>  client->set_adv_data               missing kernel support for vendor data
+>  client->connect                    is_direct parameter is ignored
+> 
+> -HAL HF Client
+> --------------
+> -
+> -Available on Android only when BLUEZ_EXTENSIONS flag set in BoardConfig.mk
+> -
+> 
+>  Audio SCO HAL
+>  =============
+> @@ -387,6 +397,10 @@ affect qualification or user experience. This section
+> provides list of recommended Android fixes that are not part of latest AOSP
+> release supported by BlueZ.
+> 
+> +For Android 5.0 Lollipop:
+> +<TBD>
+> +
+> +For Android 4.4 KitKat:
+>  https://android-review.googlesource.com/82757
+>  https://android-review.googlesource.com/87670
+>  https://android-review.googlesource.com/88384
 
-Removing stop discovery is ok, I'll do that.
+Pushed (with typo in commit msg fixed).
 
-When it comes to starting discovery, the flow now is like that:
-
-1. The start_discovery or start_service_discovery is called
-2. generic_start_discovery is called
-    - insde it there is some processing, then mgmt_pending_add is called
-3. call to start_discovery_complete or
-start_serivce_discovery_complete is made when all requests to hci
-success
-4. generic_start_discovery_complete is called, somewhere internally it
-use mgmt_pending_find
-
-So you mean change that would remove generic_start_discovery_complete,
-and have only start_discovery_complete that gets proper opcode from
-call to mgmt_pending_find ? I'll do that.
-
-When it comes to generic_start_discovery, I don't think I can get rid
-of that, I need two different methods to know opcode that was passed,
-otherwise  I would need to somehow have opcode passed from
-mgmt_control, I don't want to touch that.
-
-The concern that Arman have is:
-"I'm not that big on calling these generic functions "generic_*".
-Let's try to come up with something better."
-but I couldn't come up with better  name.
-
-
-To sum up:
-I'll get rid of all generic functions except generic_start_discovery,
-but I'm willing to also get rid of it if there's easy way to somehow
-get opcode. Is that ok ?
-
-
->
-> Johan
+-- 
+Szymon K. Janc
+szymon.janc@gmail.com
