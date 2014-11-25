@@ -1,35 +1,54 @@
 Return-Path: <cyrus@holtmann.org>
+From: Szymon Janc <szymon.janc@gmail.com>
+To: Ruslan Mstoi <ruslan.mstoi@linux.intel.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] android/pts: PTS tests for ScPP on Android 5.0
+Date: Tue, 25 Nov 2014 22:02:35 +0100
+Message-ID: <1463697.5rzeOd4IPP@athlon>
+In-Reply-To: <1416924679-10396-1-git-send-email-ruslan.mstoi@linux.intel.com>
+References: <1416924679-10396-1-git-send-email-ruslan.mstoi@linux.intel.com>
 MIME-Version: 1.0
-In-Reply-To: <1416870232-16692-1-git-send-email-armansito@chromium.org>
-References: <1416870232-16692-1-git-send-email-armansito@chromium.org>
-Date: Tue, 25 Nov 2014 23:51:05 +0200
-Message-ID: <CABBYNZJXY5pzQDJhgr3CwvvzO=OjUPi=BqvrftAh4Aereof_LQ@mail.gmail.com>
-Subject: Re: [PATCH BlueZ v1 0/2] shared/gatt: Bug fixes.
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Arman Uguray <armansito@chromium.org>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="us-ascii"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Arman,
+Hi Ruslan,
 
-On Tue, Nov 25, 2014 at 1:03 AM, Arman Uguray <armansito@chromium.org> wrote:
-> *v1: Call io_shutdown instead of close(att->fd).
->
-> Arman Uguray (2):
->   shared/att: Call io_shutdown on ATT violations.
->   shared/gatt-client: Call ready_handler only in init.
->
->  src/shared/att.c         | 21 +++++++++++++--------
->  src/shared/gatt-client.c |  3 ++-
->  2 files changed, 15 insertions(+), 9 deletions(-)
->
-> --
-> 2.1.0.rc2.206.gedb03e5
+On Tuesday 25 November 2014 16:11:19 Ruslan Mstoi wrote:
+> ---
+>  android/pts-scpp.txt | 10 +++++-----
+>  1 file changed, 5 insertions(+), 5 deletions(-)
+> 
+> diff --git a/android/pts-scpp.txt b/android/pts-scpp.txt
+> index 30485ef..a7c65a2 100644
+> --- a/android/pts-scpp.txt
+> +++ b/android/pts-scpp.txt
+> @@ -1,8 +1,8 @@
+>  PTS test results for ScPP
+> 
+>  PTS version: 5.3
+> -Tested: 21-October-2014
+> -Android version: 4.4.4
+> +Tested: 25-November-2014
+> +Android version: 5.0
+> 
+>  Results:
+>  PASS	test passed
+> @@ -18,7 +18,7 @@ TC_SPDS_SC_BV_01_I	PASS	PTS issue #12119
+>  TC_SPDC_SC_BV_01_I	PASS	PTS issue #12119
+>  TC_SPDC_SC_BV_02_I	PASS	PTS issue #12119
+>  TC_SPDC_SC_BV_03_I	PASS	PTS issue #12119
+> -TC_SPWF_SC_BV_03_I	PASS	PTS issue #12119
+> -TC_SPCF_SC_BV_03_I	PASS	PTS issue #12119
+> -TC_SPNF_SC_BV_03_I	PASS	PTS issue #12119
+> +TC_SPWF_SC_BV_01_I	PASS	PTS issue #12119
+> +TC_SPCF_SC_BV_01_I	PASS	PTS issue #12119
+> +TC_SPNF_SC_BV_01_I	PASS	PTS issue #12119
+>  ---------------------------------------------------------------------------
+> ----
 
 Applied, thanks.
 
-
 -- 
-Luiz Augusto von Dentz
+Szymon K. Janc
+szymon.janc@gmail.com
