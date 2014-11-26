@@ -2,115 +2,152 @@ Return-Path: <cyrus@holtmann.org>
 From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
-Subject: [PATCH 2/4] android/gatt: Improve prepare write request response
-Date: Wed, 26 Nov 2014 09:47:38 +0100
-Message-Id: <1416991660-21828-2-git-send-email-jakub.tyszkowski@tieto.com>
-In-Reply-To: <1416991660-21828-1-git-send-email-jakub.tyszkowski@tieto.com>
-References: <1416991660-21828-1-git-send-email-jakub.tyszkowski@tieto.com>
+Subject: [PATCH 1/4] android/gatt: Unify read by type and read by group type
+Date: Wed, 26 Nov 2014 09:47:37 +0100
+Message-Id: <1416991660-21828-1-git-send-email-jakub.tyszkowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-According to spec we should response with value provided in the request.
-Helper function was not very helpfull in prepare write request. It was forcing
-another buffer copy and was overwriting reponse values with their own values,
-thus was removed.
+These two functions were veary similar but inconsisten in used error
+codes and freeing allocated data.
 ---
- android/gatt.c | 59 ++++++++++++++++++++++++++++++----------------------------
- 1 file changed, 31 insertions(+), 28 deletions(-)
+ android/gatt.c | 89 ++++++++++++++++++----------------------------------------
+ 1 file changed, 27 insertions(+), 62 deletions(-)
 
 diff --git a/android/gatt.c b/android/gatt.c
-index 6d79e61..84fdbe7 100644
+index 092473c..6d79e61 100644
 --- a/android/gatt.c
 +++ b/android/gatt.c
-@@ -4682,30 +4682,6 @@ static uint8_t check_device_permissions(struct gatt_device *device,
- 	return 0;
- }
+@@ -5895,71 +5895,27 @@ static const struct ipc_handler cmd_handlers[] = {
+ 		sizeof(struct hal_cmd_gatt_client_read_batchscan_reports) },
+ };
  
--static void fill_gatt_response(struct pending_request *request,
--					struct gatt_db_attribute *attrib,
--					uint16_t offset, uint8_t status,
--					uint16_t len, const uint8_t *data)
+-static uint8_t read_by_group_type(const uint8_t *cmd, uint16_t cmd_len,
+-						struct gatt_device *device)
 -{
--	request->attrib = attrib;
--	request->offset = offset;
--	request->length = len;
--	request->state = REQUEST_DONE;
--	request->error = status;
+-	uint16_t start, end;
+-	int len;
+-	bt_uuid_t uuid;
+-	struct queue *q;
 -
+-	len = dec_read_by_grp_req(cmd, cmd_len, &start, &end, &uuid);
 -	if (!len)
--		return;
+-		return ATT_ECODE_INVALID_PDU;
 -
--	request->value = malloc0(len);
--	if (!request->value) {
--		request->error = ATT_ECODE_INSUFF_RESOURCES;
+-	if (start > end || start == 0)
+-		return ATT_ECODE_INVALID_HANDLE;
 -
--		return;
+-	q = queue_new();
+-	if (!q)
+-		return ATT_ECODE_INSUFF_RESOURCES;
+-
+-	gatt_db_read_by_group_type(gatt_db, start, end, uuid, q);
+-
+-	if (queue_isempty(q)) {
+-		queue_destroy(q, NULL);
+-		return ATT_ECODE_ATTR_NOT_FOUND;
 -	}
 -
--	memcpy(request->value, data, len);
+-	while (queue_peek_head(q)) {
+-		struct gatt_db_attribute *attrib = queue_pop_head(q);
+-		struct pending_request *entry;
+-
+-		entry = new0(struct pending_request, 1);
+-		if (!entry) {
+-			queue_destroy(q, destroy_pending_request);
+-			return ATT_ECODE_UNLIKELY;
+-		}
+-
+-		entry->attrib = attrib;
+-		entry->state = REQUEST_INIT;
+-
+-		if (!queue_push_tail(device->pending_requests, entry)) {
+-			queue_remove_all(device->pending_requests, NULL, NULL,
+-						destroy_pending_request);
+-			free(entry);
+-			queue_destroy(q, NULL);
+-			return ATT_ECODE_UNLIKELY;
+-		}
+-	}
+-
+-	queue_destroy(q, NULL);
+-	process_dev_pending_requests(device, cmd[0]);
+-
+-	return 0;
 -}
 -
- static uint8_t err_to_att(int err)
+ static uint8_t read_by_type(const uint8_t *cmd, uint16_t cmd_len,
+ 						struct gatt_device *device)
  {
- 	if (!err || (err > 0 && err < UINT8_MAX))
-@@ -4728,8 +4704,23 @@ static void attribute_read_cb(struct gatt_db_attribute *attrib, int err,
- 	struct pending_request *resp_data = user_data;
- 	uint8_t error = err_to_att(err);
- 
--	fill_gatt_response(resp_data, attrib, resp_data->offset, error, length,
--									value);
-+	resp_data->attrib = attrib;
-+	resp_data->length = length;
-+	resp_data->error = error;
-+
-+	resp_data->state = REQUEST_DONE;
-+
-+	if (!length)
-+		return;
-+
-+	resp_data->value = malloc0(length);
-+	if (!resp_data->value) {
-+		resp_data->error = ATT_ECODE_INSUFF_RESOURCES;
-+
-+		return;
-+	}
-+
-+	memcpy(resp_data->value, value, length);
- }
- 
- static void read_requested_attributes(void *data, void *user_data)
-@@ -6299,7 +6290,10 @@ static void attribute_write_cb(struct gatt_db_attribute *attrib, int err,
+ 	uint16_t start, end;
+-	uint16_t len;
++	uint16_t len = 0;
+ 	bt_uuid_t uuid;
+ 	struct queue *q;
  
  	DBG("");
  
--	fill_gatt_response(data, attrib, data->offset, error, 0, NULL);
-+	data->attrib = attrib;
-+	data->error = error;
+-	len = dec_read_by_type_req(cmd, cmd_len, &start, &end, &uuid);
++	switch (cmd[0]) {
++	case ATT_OP_READ_BY_TYPE_REQ:
++		len = dec_read_by_type_req(cmd, cmd_len, &start, &end, &uuid);
++		break;
++	case ATT_OP_READ_BY_GROUP_REQ:
++		len = dec_read_by_grp_req(cmd, cmd_len, &start, &end, &uuid);
++		break;
++	default:
++		break;
++	}
 +
-+	data->state = REQUEST_DONE;
- }
+ 	if (!len)
+ 		return ATT_ECODE_INVALID_PDU;
  
- static uint8_t write_req_request(const uint8_t *cmd, uint16_t cmd_len,
-@@ -6400,9 +6394,18 @@ static uint8_t write_prep_request(const uint8_t *cmd, uint16_t cmd_len,
+@@ -5970,7 +5926,16 @@ static uint8_t read_by_type(const uint8_t *cmd, uint16_t cmd_len,
+ 	if (!q)
  		return ATT_ECODE_INSUFF_RESOURCES;
+ 
+-	gatt_db_read_by_type(gatt_db, start, end, uuid, q);
++	switch (cmd[0]) {
++	case ATT_OP_READ_BY_TYPE_REQ:
++		gatt_db_read_by_type(gatt_db, start, end, uuid, q);
++		break;
++	case ATT_OP_READ_BY_GROUP_REQ:
++		gatt_db_read_by_group_type(gatt_db, start, end, uuid, q);
++		break;
++	default:
++		break;
++	}
+ 
+ 	if (queue_isempty(q)) {
+ 		queue_destroy(q, NULL);
+@@ -5989,13 +5954,15 @@ static uint8_t read_by_type(const uint8_t *cmd, uint16_t cmd_len,
+ 
+ 		data->state = REQUEST_INIT;
+ 		data->attrib = attrib;
+-		if (!queue_push_tail(device->pending_requests, data))
++		if (!queue_push_tail(device->pending_requests, data)) {
+ 			free(data);
++			queue_destroy(q, NULL);
++			return ATT_ECODE_INSUFF_RESOURCES;
++		}
  	}
  
-+	data->value = g_memdup(value, vlen);
-+	data->length = vlen;
-+
- 	if (!gatt_db_attribute_write(attrib, 0, value, vlen, cmd[0],
--					&dev->bdaddr, attribute_write_cb, data))
-+					&dev->bdaddr, attribute_write_cb,
-+					data)) {
-+		queue_remove(dev->pending_requests, data);
-+		g_free(data->value);
-+		free(data);
-+
- 		return ATT_ECODE_UNLIKELY;
-+	}
+ 	queue_destroy(q, NULL);
+-
+-	process_dev_pending_requests(device, ATT_OP_READ_BY_TYPE_REQ);
++	process_dev_pending_requests(device, cmd[0]);
  
  	return 0;
  }
+@@ -6518,8 +6485,6 @@ static void att_handler(const uint8_t *ipdu, uint16_t len, gpointer user_data)
+ 
+ 	switch (ipdu[0]) {
+ 	case ATT_OP_READ_BY_GROUP_REQ:
+-		status = read_by_group_type(ipdu, len, dev);
+-		break;
+ 	case ATT_OP_READ_BY_TYPE_REQ:
+ 		status = read_by_type(ipdu, len, dev);
+ 		break;
 -- 
 1.9.1
 
