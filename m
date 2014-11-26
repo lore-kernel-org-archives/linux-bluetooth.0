@@ -1,24 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 8.1 \(1993\))
-Subject: Re: HFP 1.7
+Subject: Re: [PATCH v3] Bluetooth: automatically flushable packets aren't allowed on LE links
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <0b18e676c31643bca8deef0f6664d42d@CO2PR42MB187.048d.mgd.msft.net>
-Date: Wed, 26 Nov 2014 14:17:48 +0900
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <338FF115-61F9-40F9-B5B9-F964FF2A9BBE@holtmann.org>
-References: <0b18e676c31643bca8deef0f6664d42d@CO2PR42MB187.048d.mgd.msft.net>
-To: nimesh.chanchani@accenture.com
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <CAK8d-a+MJBBLkU_=UQGKVmxnM-sYJ=pW7aj0XQ5aa5AuR2G_Wg@mail.gmail.com>
+Date: Wed, 26 Nov 2014 14:16:47 +0900
+Cc: Johan Hedberg <johan.hedberg@gmail.com>,
+	"Gustavo F. Padovan" <gustavo@padovan.org>,
+	BlueZ development <linux-bluetooth@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Message-Id: <50D951D4-0A99-4D77-814C-D80A209B3D4F@holtmann.org>
+References: <1416419951-27659-1-git-send-email-stevenrwalter@gmail.com> <20141120113813.GA23288@t440s.lan> <80321467-10AB-489E-A47E-44B0ECEE4BE1@holtmann.org> <CAK8d-aL+3eB4WZeqO1sv9p3440EVXQiqF6QiTU5YNAKAbZ7f-w@mail.gmail.com> <CAK8d-a+MJBBLkU_=UQGKVmxnM-sYJ=pW7aj0XQ5aa5AuR2G_Wg@mail.gmail.com>
+To: Steven Walter <stevenrwalter@gmail.com>
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Nimesh,
+Hi Steven,
 
-> Was just curious if there is a list of differences between what's new in hfp 1.7 over hfp 1.6 .
+>>>> I think Marcel was after just providing a clarifying code comment in
+>>>> both places - having two branches of an if-statement doing exactly the
+>>>> same thing looks a bit weird to me. To make thins completely clear I'd
+>>>> suggest adding a simple helper function that you can call from both
+>>>> places to get the needed flags, something like the following:
+>>> 
+>>> I am actually fine with just adding a comment explaining the complex if
+>>> statement on why it is correct. It is just a helper for everybody to
+>>> understand what and why it is done that way.
+>> 
+>> 
+>> Is the comment I added sufficient, or should I add one for the other if
+>> condition as well?  To me, the second condition is pretty straightforward:
+>> if the caller requested it and the hardware supports it, use NO_FLUSH.  The
+>> relationship between FLUSH/NO_FLUSH and low-energy is much less clear and
+>> more justifies a comment, in my opinion.
 > 
-> Is supporting hfp 1.7 currently planned ?
+> Did a miss a reply to this?  How would you like the next iteration of
+> the patch to look?
 
-oFono has support for DDR feature of HFP 1.7 and the support for BR/EDR Secure Connections and complex topology handling is work in progress.
+can you just send a v4 and I have a look at it. I thing it is best to keep the original patch with the rather complicated if statement you had. And then add a comment in front of it, why it is that way and that it is correct this way.
 
 Regards
 
