@@ -2,34 +2,36 @@ Return-Path: <cyrus@holtmann.org>
 From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
-Subject: [PATCH 2/2] gattrib: Fix not changing the buffer size when mtu is reduced
-Date: Wed, 26 Nov 2014 09:45:51 +0100
-Message-Id: <1416991551-21617-2-git-send-email-jakub.tyszkowski@tieto.com>
-In-Reply-To: <1416991551-21617-1-git-send-email-jakub.tyszkowski@tieto.com>
-References: <1416991551-21617-1-git-send-email-jakub.tyszkowski@tieto.com>
+Subject: [PATCH 1/2] gattrib: Fix not setting att's mtu size in g_attrib_new()
+Date: Wed, 26 Nov 2014 09:45:50 +0100
+Message-Id: <1416991551-21617-1-git-send-email-jakub.tyszkowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Using larger buffer than mtu resulted in not sending the message at all
-as encode_pdu() in shared/att.c fails when provided data buffer is larger
-than current mtu.
+We were setting only the buffer in gattrib but att was left with the
+default value of 23 (LE transport layer defaults). For BREDR transport
+layer this may result in using smaller MTU than the minimum allowed (48).
+
+This was affecting cases when MTU Exchange was not supported by the
+remote device and defaults were used.
 ---
- attrib/gattrib.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ attrib/gattrib.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
 diff --git a/attrib/gattrib.c b/attrib/gattrib.c
-index a04a0ee..f20b4f9 100644
+index ce7f7b3..a04a0ee 100644
 --- a/attrib/gattrib.c
 +++ b/attrib/gattrib.c
-@@ -325,7 +325,7 @@ uint8_t *g_attrib_get_buffer(GAttrib *attrib, size_t *len)
- gboolean g_attrib_set_mtu(GAttrib *attrib, int mtu)
- {
- 	/* Clients of this expect a buffer to use. */
--	if (mtu > attrib->buflen) {
-+	if (mtu != attrib->buflen) {
- 		attrib->buf = g_realloc(attrib->buf, mtu);
- 		attrib->buflen = mtu;
- 	}
+@@ -83,6 +83,9 @@ GAttrib *g_attrib_new(GIOChannel *io, guint16 mtu)
+ 	if (!attr->att)
+ 		goto fail;
+ 
++	if (!bt_att_set_mtu(attr->att, mtu))
++		goto fail;
++
+ 	attr->buf = malloc0(mtu);
+ 	attr->buflen = mtu;
+ 	if (!attr->buf)
 -- 
 1.9.1
 
