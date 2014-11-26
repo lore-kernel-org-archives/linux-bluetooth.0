@@ -1,37 +1,112 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 8.1 \(1993\))
-Subject: Re: bluetooth related firmware loader spew on resume.
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1416996623.3171.7.camel@linux-0dmf.site>
-Date: Wed, 26 Nov 2014 23:05:20 +0900
-Cc: Takashi Iwai <tiwai@suse.de>, Dave Jones <davej@redhat.com>,
-	Linux Kernel <linux-kernel@vger.kernel.org>,
-	pgynther@google.com, linux-bluetooth@vger.kernel.org
-Message-Id: <0E1D95E7-64D2-4BEA-AFAA-4B119838F24E@holtmann.org>
-References: <20141111181228.GA27815@redhat.com> <s5hsih7xmgg.wl-tiwai@suse.de> <D19A9DA1-3706-4351-B2E9-25D5ABA662E7@holtmann.org> <s5h7fyijqc9.wl-tiwai@suse.de> <1416996623.3171.7.camel@linux-0dmf.site>
-To: Oliver Neukum <oneukum@suse.de>
-Sender: linux-kernel-owner@vger.kernel.org
+MIME-Version: 1.0
+In-Reply-To: <1417006173-19921-1-git-send-email-s.nageshmurt@samsung.com>
+References: <1417006173-19921-1-git-send-email-s.nageshmurt@samsung.com>
+Date: Wed, 26 Nov 2014 15:31:39 +0200
+Message-ID: <CABBYNZKVy7U=Ehq8OEscPyZyB=r602PUh9Lm620LjJ1bhyEUaA@mail.gmail.com>
+Subject: Re: [PATCH 1/1] audio/sink: Fix Update A2DP service state as
+ disconnected after signalling channel disconnection
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Sagar Nageshmurthy <s.nageshmurt@samsung.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Oliver,
+Hi,
 
->> In order to paper over this, we may also remember the failing firmware
->> and avoid loading it.  This might be an easer way than the endless
->> fight against UMH race...
-> 
-> 
-> the full fix would be to implement reset_resume() for btusb.
-> It seems to me that setup() should be split in two methods,
-> one to request the firmware from user space and the second
-> to transfer it to the device. reset_resume() would just need
-> to repeat the second operation.
+On Wed, Nov 26, 2014 at 2:49 PM, Sagar Nageshmurthy
+<s.nageshmurt@samsung.com> wrote:
+> Jan  1 05:43:29 daemon.debug bluetoothd[4492]: profiles/audio/avdtp.c:session_cb()
+> Jan  1 05:43:29 daemon.debug bluetoothd[4492]: profiles/audio/avdtp.c:avdtp_parse_resp() CLOSE request succeeded
+> Jan  1 05:43:29 daemon.debug bluetoothd[4492]: profiles/audio/avdtp.c:avdtp_sep_set_state() stream state changed: STREAMING -> CLOSING
+> Jan  1 05:43:29 daemon.debug bluetoothd[4492]: profiles/audio/a2dp.c:close_cfm() Source 0xb734b190: Close_Cfm
+> Jan  1 05:43:29 daemon.debug bluetoothd[4492]: profiles/audio/avdtp.c:avdtp_sep_set_state() stream state changed: CLOSING -> IDLE
+> Jan  1 05:43:29 daemon.debug bluetoothd[4492]: profiles/audio/media.c:media_adapter_get_player()
+> Jan  1 05:43:29 daemon.debug bluetoothd[4492]: profiles/audio/transport.c:media_transport_remove_owner() Transport /org/bluez/hci0/dev_BC_47_60_F5_88_89/fd1 Owner :1.14
+> Jan  1 05:43:29 daemon.debug bluetoothd[4492]: profiles/audio/transport.c:media_owner_free() Owner :1.14
+> Jan  1 05:43:29 daemon.debug bluetoothd[4492]: profiles/audio/transport.c:transport_set_state() State changed /org/bluez/hci0/dev_BC_47_60_F5_88_89/fd1: TRANSPORT_STATE_ACTIVE -> TRANSPORT_STATE_IDLE
+> Jan  1 05:43:29 daemon.debug bluetoothd[4492]: profiles/audio/a2dp.c:a2dp_sep_unlock() SEP 0xb734b190 unlocked
+> Jan  1 05:43:29 daemon.debug bluetoothd[4492]: profiles/audio/avdtp.c:avdtp_unref() 0xb7358900: ref=1
+> Jan  1 05:43:29 daemon.debug bluetoothd[4492]: src/service.c:change_state() 0xb7358100: device BC:47:60:F5:88:89 profile a2dp-sink state changed: disconnecting -> disconnected (0)
+>
+> 2014-01-01 05:43:29.915453 > ACL data: handle 12 flags 0x02 dlen 6
+>     L2CAP(d): cid 0x0042 len 2 [psm 25]
+>       AVDTP(s): Close rsp: transaction 5 nsp 0x00
+> 2014-01-01 05:43:29.916038 < ACL data: handle 12 flags 0x00 dlen 12
+>     L2CAP(s): Disconn req: dcid 0x0b43 scid 0x0043
+> 2014-01-01 05:43:29.916654 > ACL data: handle 12 flags 0x02 dlen 8
+>     L2CAP(d): cid 0x0041 len 4 [psm 3]
+>       RFCOMM(s): UA: cr 1 dlci 0 pf 1 ilen 0 fcs 0xd7
+> 2014-01-01 05:43:29.916797 < ACL data: handle 12 flags 0x00 dlen 12
+>     L2CAP(s): Disconn req: dcid 0x1701 scid 0x0041
+> 2014-01-01 05:43:29.917973 > ACL data: handle 12 flags 0x02 dlen 12
+>     L2CAP(s): Disconn req: dcid 0x0041 scid 0x1701
+> 2014-01-01 05:43:29.918107 < ACL data: handle 12 flags 0x00 dlen 12
+>     L2CAP(s): Disconn rsp: dcid 0x0041 scid 0x1701
+> 2014-01-01 05:43:29.921713 < ACL data: handle 12 flags 0x00 dlen 12
+>     L2CAP(s): Disconn req: dcid 0x5f40 scid 0x0040
+> 2014-01-01 05:43:29.922595 > HCI Event: Number of Completed Packets (0x13) plen 5
+>     handle 12 packets 2
+> 2014-01-01 05:43:29.924527 > HCI Event: Number of Completed Packets (0x13) plen 5
+>     handle 12 packets 2
+> 2014-01-01 05:43:29.928890 > HCI Event: Number of Completed Packets (0x13) plen 5
+>     handle 12 packets 2
+> 2014-01-01 05:43:29.951891 > ACL data: handle 12 flags 0x02 dlen 12
+>     L2CAP(s): Disconn rsp: dcid 0x1701 scid 0x0041
+> 2014-01-01 05:43:29.953093 > ACL data: handle 12 flags 0x02 dlen 12
+>     L2CAP(s): Disconn rsp: dcid 0x0b43 scid 0x0043
+> 2014-01-01 05:43:30.029197 > ACL data: handle 12 flags 0x02 dlen 12
+>     L2CAP(s): Disconn rsp: dcid 0x5f40 scid 0x0040
+> 2014-01-01 05:43:31.108839 < ACL data: handle 12 flags 0x00 dlen 12
+>     L2CAP(s): Disconn req: dcid 0x5a42 scid 0x0042
+> 2014-01-01 05:43:31.159232 > ACL data: handle 12 flags 0x02 dlen 12
+>     L2CAP(s): Disconn rsp: dcid 0x5a42 scid 0x0042
+> 2014-01-01 05:43:31.211347 < HCI Command: Disconnect (0x01|0x0006) plen 3
+>     handle 12 reason 0x13
+>     Reason: Remote User Terminated Connection
+> 2014-01-01 05:43:31.212105 > HCI Event: Command Status (0x0f) plen 4
+>     Disconnect (0x01|0x0006) status 0x00 ncmd 1
+> 2014-01-01 05:43:31.273439 > HCI Event: Number of Completed Packets (0x13) plen 5
+>     handle 12 packets 1
+> 2014-01-01 05:43:31.290860 > HCI Event: Disconn Complete (0x05) plen 4
+>     status 0x00 handle 12 reason 0x16
+>     Reason: Connection Terminated by Local Host
+> ---
+>  profiles/audio/sink.c |    4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+>
+> diff --git a/profiles/audio/sink.c b/profiles/audio/sink.c
+> index f475709..bd4c329 100644
+> --- a/profiles/audio/sink.c
+> +++ b/profiles/audio/sink.c
+> @@ -105,6 +105,8 @@ static void sink_set_state(struct sink *sink, sink_state_t new_state)
+>         if (new_state != SINK_STATE_DISCONNECTED)
+>                 return;
+>
+> +       btd_service_disconnecting_complete(service, 0);
+> +
+>         if (sink->session) {
+>                 avdtp_unref(sink->session);
+>                 sink->session = NULL;
+> @@ -147,8 +149,6 @@ static void stream_state_changed(struct avdtp_stream *stream,
+>
+>         switch (new_state) {
+>         case AVDTP_STATE_IDLE:
+> -               btd_service_disconnecting_complete(sink->service, 0);
+> -
+>                 if (sink->disconnect_id > 0) {
+>                         a2dp_cancel(sink->disconnect_id);
+>                         sink->disconnect_id = 0;
+> --
+> 1.7.9.5
 
-so when you do hci_register_dev, then hdev->setup is only called once. I really mean only once per lifetime of the hci_dev. So you would need to unregister the hci_dev first before hdev->setup will ever be called again. So I am not sure this is actually the problem here. The problem here is entirely within request_firmware() unless of course we run through the USB probe handlers again. Which I do not see happening here.
+Note sure what is the problem here, both places should notify the
+service has been disconnected but perhaps we never got to the point of
+having a stream? Or it is the sequence of events that is wrong? Btw,
+please follow HACKING document regarding submitting patch, you subject
+is way too long.
 
-And we have hdev->setup this way since normally the Bluetooth devices keep their firmware patches and not forget about them and suspend-resume cycles. If the USB device of course jumps of the bus during it then all bets are off anyway.
 
-Regards
-
-Marcel
-
+-- 
+Luiz Augusto von Dentz
