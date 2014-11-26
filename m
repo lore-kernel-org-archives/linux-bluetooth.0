@@ -1,32 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
-From: Ruslan Mstoi <ruslan.mstoi@linux.intel.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Ruslan Mstoi <ruslan.mstoi@linux.intel.com>
-Subject: [PATCH] android/pts: PTS tests for DIS on Android 5.0
-Date: Wed, 26 Nov 2014 16:37:36 +0200
-Message-Id: <1417012656-31674-1-git-send-email-ruslan.mstoi@linux.intel.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Message-ID: <1417012696.5928.12.camel@linux-0dmf.site>
+Subject: Re: bluetooth related firmware loader spew on resume.
+From: Oliver Neukum <oneukum@suse.de>
+To: Takashi Iwai <tiwai@suse.de>
+Cc: Marcel Holtmann <marcel@holtmann.org>, Dave Jones <davej@redhat.com>,
+ Linux Kernel <linux-kernel@vger.kernel.org>, pgynther@google.com,
+ linux-bluetooth@vger.kernel.org
+Date: Wed, 26 Nov 2014 15:38:16 +0100
+In-Reply-To: <s5hr3wqvxr6.wl-tiwai@suse.de>
+References: <20141111181228.GA27815@redhat.com>
+	 <s5hsih7xmgg.wl-tiwai@suse.de>
+	 <D19A9DA1-3706-4351-B2E9-25D5ABA662E7@holtmann.org>
+	 <s5h7fyijqc9.wl-tiwai@suse.de> <1416996623.3171.7.camel@linux-0dmf.site>
+	 <s5hlhmyxng0.wl-tiwai@suse.de> <1416998616.3171.13.camel@linux-0dmf.site>
+	 <s5hioi2xmf9.wl-tiwai@suse.de> <1417011800.5928.9.camel@linux-0dmf.site>
+	 <s5hr3wqvxr6.wl-tiwai@suse.de>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- android/pts-dis.txt | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+On Wed, 2014-11-26 at 15:31 +0100, Takashi Iwai wrote:
 
-diff --git a/android/pts-dis.txt b/android/pts-dis.txt
-index 215baa2..fb67687 100644
---- a/android/pts-dis.txt
-+++ b/android/pts-dis.txt
-@@ -1,8 +1,8 @@
- PTS test results for DIS
- 
- PTS version: 5.3
--Tested: 18-October-2014
--Android version: 4.4.4
-+Tested: 26-November-2014
-+Android version: 5.0
- 
- Results:
- PASS	test passed
--- 
-1.9.1
+> Yes, that's what I mentioned in my reply.  But, actually more puzzling
+> is that the WARNING shouldn't have been triggered at all.  That is,
+> something is still racy there, so we'd need to fix it.
 
+Did it trigger before khubd was replaced by a work queue?
+
+	Regards
+		Oliver
