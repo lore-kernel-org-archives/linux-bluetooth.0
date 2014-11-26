@@ -1,55 +1,81 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1416999764-15300-1-git-send-email-rakesh.mk@samsung.com>
-References: <1416999764-15300-1-git-send-email-rakesh.mk@samsung.com>
-Date: Wed, 26 Nov 2014 16:16:11 +0200
-Message-ID: <CABBYNZ+_oU6-VyZ-_3qiGB0cGTF-79PatRH+PVv+V8E4ZPUqPA@mail.gmail.com>
-Subject: Re: [PATCH 1] obexd: Fix crash while session shutdown
+In-Reply-To: <1416832900-16924-1-git-send-email-s.nageshmurt@samsung.com>
+References: <1416832900-16924-1-git-send-email-s.nageshmurt@samsung.com>
+Date: Wed, 26 Nov 2014 16:15:38 +0200
+Message-ID: <CABBYNZL7gqrX1Vnro5Kb+gOxv0omDcrg4HaAw3jCyyyeUroeLw@mail.gmail.com>
+Subject: Re: [PATCH 1/1] audio/a2dp: Fix Access session device only when its valid
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Rakesh M K <rakesh.mk@samsung.com>
+To: Sagar Nageshmurthy <s.nageshmurt@samsung.com>
 Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Sagar,
 
-On Wed, Nov 26, 2014 at 1:02 PM, Rakesh M K <rakesh.mk@samsung.com> wrote:
-> g_str_equal has been used for the session path compare
-> which is not NULL-safe. Used the g_strcmp0() for the NULL-Safe
-> string comparision.
+On Mon, Nov 24, 2014 at 2:41 PM, Sagar Nageshmurthy
+<s.nageshmurt@samsung.com> wrote:
+> session will be NULL if A2DP connection fails because of NO REPLY
+> from endpoint or if the configuration is aborted. Accessing session
+> device in such a scenario leads to bluetoothd crash.
 >
-> *#0 strcmp (p1=0x0, p2=0x7105c "/org/bluez/obex/client/session0")
-> *    at strcmp.c:38
-> *#1  0xb6e0cd0a in g_str_equal (v1=<value optimized out>,
-> *    v2=<value optimized out>) at ghash.c:1704
-> *#2  0x000264d8 in find_session (connection=<value optimized out>,
-> *    message=0x55b38, user_data=<value optimized out>)
-> *    at obexd/client/manager.c:162
-> *#3  remove_session (connection=<value optimized out>, message=0x55b38,
->     user_data=<value optimized out>) at obexd/client/manager.c:231
+> (gdb) bt full
+> 0  avdtp_get_device (session=0x0) at profiles/audio/avdtp.c:3987
+> No locals.
+> 1  0xb6f0e352 in auto_config (data=<value optimized out>)
+>     at profiles/audio/a2dp.c:382
+>         setup = 0xb7a4f230
+>         dev = <value optimized out>
+> 2  0xb6f132f6 in config_cb (endpoint=<value optimized out>,
+>     ret=<value optimized out>, size=<value optimized out>,
+>     user_data=<value optimized out>) at profiles/audio/media.c:534
+>         data = <value optimized out>
+> 3  0xb6f1398a in media_endpoint_cancel (endpoint=0xb7a43e78)
+>     at profiles/audio/media.c:136
+>         endpoint = 0xb7a43e78
+> 4  media_endpoint_cancel_all (endpoint=0xb7a43e78)
+>     at profiles/audio/media.c:144
+> No locals.
+> 5  0xb6f13e04 in clear_endpoint (endpoint=0xb7a43e78)
+>     at profiles/audio/media.c:245
+> No locals.
+> 6  0xb6f13f68 in endpoint_reply (call=<value optimized out>,
+>     user_data=0xb7a4e538) at profiles/audio/media.c:275
+>         request = 0xb7a4e538
+>         endpoint = 0xb7a43e78
+>         reply = 0xb7a3f560
+>         err = {name = 0xb7a5de70 "org.freedesktop.DBus.Error.NoReply"
 > ---
->  obexd/client/manager.c |    2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  profiles/audio/a2dp.c |    4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
 >
-> diff --git a/obexd/client/manager.c b/obexd/client/manager.c
-> index 8efe1f2..7ae111c 100644
-> --- a/obexd/client/manager.c
-> +++ b/obexd/client/manager.c
-> @@ -157,7 +157,7 @@ static struct obc_session *find_session(const char *path)
->         for (l = sessions; l; l = l->next) {
->                 struct obc_session *session = l->data;
+> diff --git a/profiles/audio/a2dp.c b/profiles/audio/a2dp.c
+> index c9dac9a..6b72f99 100644
+> --- a/profiles/audio/a2dp.c
+> +++ b/profiles/audio/a2dp.c
+> @@ -379,7 +379,7 @@ static void stream_state_changed(struct avdtp_stream *stream,
+>  static gboolean auto_config(gpointer data)
+>  {
+>         struct a2dp_setup *setup = data;
+> -       struct btd_device *dev = avdtp_get_device(setup->session);
+> +       struct btd_device *dev = NULL;
+>         struct btd_service *service;
 >
-> -               if (g_str_equal(obc_session_get_path(session), path) == TRUE)
-> +               if (g_strcmp0(obc_session_get_path(session), path) == 0)
->                         return session;
->         }
+>         /* Check if configuration was aborted */
+> @@ -389,6 +389,8 @@ static gboolean auto_config(gpointer data)
+>         if (setup->err != NULL)
+>                 goto done;
+>
+> +       dev = avdtp_get_device(setup->session);
+> +
+>         avdtp_stream_add_cb(setup->session, setup->stream,
+>                                 stream_state_changed, setup->sep);
 >
 > --
 > 1.7.9.5
 
 Applied, thanks.
-
 
 -- 
 Luiz Augusto von Dentz
