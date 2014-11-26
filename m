@@ -2,181 +2,130 @@ Return-Path: <cyrus@holtmann.org>
 From: Jakub Pawlowski <jpawlowski@google.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Jakub Pawlowski <jpawlowski@google.com>
-Subject: [PATCH v10 1/3] Bluetooth: add hci_restart_le_scan
-Date: Tue, 25 Nov 2014 16:48:16 -0800
-Message-Id: <1416962898-20067-1-git-send-email-jpawlowski@google.com>
+Subject: [PATCH v6 3/3] mgmt-tester: Add service discovery test cases
+Date: Tue, 25 Nov 2014 16:46:08 -0800
+Message-Id: <1416962768-19832-3-git-send-email-jpawlowski@google.com>
+In-Reply-To: <1416962768-19832-1-git-send-email-jpawlowski@google.com>
+References: <1416962768-19832-1-git-send-email-jpawlowski@google.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Currently there is no way to restart le scan. It's needed in
-preparation for new service scan method. The way it work: it disable,
-and then enable le scan on controller. During this restart special flag
-is set to make sure we won't remove disable scan work from workqueue.
-
 Signed-off-by: Jakub Pawlowski <jpawlowski@google.com>
 ---
- include/net/bluetooth/hci.h      |  8 +++++++
- include/net/bluetooth/hci_core.h |  4 ++++
- net/bluetooth/hci_core.c         | 49 +++++++++++++++++++++++++++++++++++++++-
- net/bluetooth/hci_event.c        |  9 +++++---
- 4 files changed, 66 insertions(+), 4 deletions(-)
+ tools/mgmt-tester.c | 93 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 93 insertions(+)
 
-diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index e56f909..a8784e6 100644
---- a/include/net/bluetooth/hci.h
-+++ b/include/net/bluetooth/hci.h
-@@ -205,6 +205,14 @@ enum {
- 	HCI_LE_SCAN_INTERRUPTED,
+diff --git a/tools/mgmt-tester.c b/tools/mgmt-tester.c
+index 7d14fe4..3c8c497 100644
+--- a/tools/mgmt-tester.c
++++ b/tools/mgmt-tester.c
+@@ -1802,6 +1802,83 @@ static const struct generic_data stop_discovery_invalid_param_test_1 = {
+ 	.expect_len = sizeof(stop_discovery_bredrle_invalid_param),
  };
  
-+/*
-+ * BR/EDR and/or LE discovery state flags: the flags defined here should
-+ * represent state of discovery
-+ */
-+enum {
-+	HCI_LE_SCAN_RESTARTING,
++static const char start_service_discovery_invalid_param[] = { 0x00, 0x00, 0x00, 0x00 };
++static const char start_service_discovery_invalid_resp[] = { 0x00 };
++static const char start_service_discovery_bredr_param[] = { 0x01, 0x00, 0x00, 0x00};
++static const char start_service_discovery_bredr_resp[] = { 0x01 };
++static const char start_service_discovery_le_param[] = { 0x06, 0x00, 0x01, 0x00,
++			0xfa, 0xfb, 0x34, 0x9b, 0x5f, 0x80, 0x00, 0x00,
++			0x80, 0x00, 0x10, 0x00, 0x00, 0x00, 0x00, 0x00 };
++static const char start_service_discovery_le_resp[] = { 0x06 };
++static const char start_service_discovery_bredrle_param[] = { 0x07, 0x00, 0x01, 0x00,
++			0xfa, 0xfb, 0x34, 0x9b, 0x5f, 0x80, 0x00, 0x00,
++			0x80, 0x00, 0x10, 0x00, 0x00, 0x00, 0x00, 0x00 };
++static const char start_service_discovery_bredrle_resp[] = { 0x07 };
++static const char start_service_discovery_valid_hci[] = { 0x01, 0x01 };
++static const char start_service_discovery_evt[] = { 0x07, 0x01 };
++static const char start_service_discovery_le_evt[] = { 0x06, 0x01 };
++
++static const struct generic_data start_service_discovery_not_powered_test_1 = {
++	.send_opcode = MGMT_OP_START_SERVICE_DISCOVERY,
++	.send_param = start_service_discovery_bredr_param,
++	.send_len = sizeof(start_service_discovery_bredr_param),
++	.expect_status = MGMT_STATUS_NOT_POWERED,
++	.expect_param = start_service_discovery_bredr_resp,
++	.expect_len = sizeof(start_service_discovery_bredr_resp),
 +};
 +
- /* A mask for the flags that are supposed to remain when a reset happens
-  * or the HCI device is closed.
-  */
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 396c098..7e10308 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -75,6 +75,7 @@ struct discovery_state {
- 	u32			last_adv_flags;
- 	u8			last_adv_data[HCI_MAX_AD_LENGTH];
- 	u8			last_adv_data_len;
-+	unsigned long		flags;
- };
- 
- struct hci_conn_hash {
-@@ -337,6 +338,7 @@ struct hci_dev {
- 	unsigned long		dev_flags;
- 
- 	struct delayed_work	le_scan_disable;
-+	struct delayed_work	le_scan_restart;
- 
- 	__s8			adv_tx_power;
- 	__u8			adv_data[HCI_MAX_AD_LENGTH];
-@@ -1326,6 +1328,7 @@ void hci_sock_dev_event(struct hci_dev *hdev, int event);
- #define DISCOV_INTERLEAVED_TIMEOUT	5120	/* msec */
- #define DISCOV_INTERLEAVED_INQUIRY_LEN	0x04
- #define DISCOV_BREDR_INQUIRY_LEN	0x08
-+#define DISCOV_LE_RESTART_DELAY		300	/* msec */
- 
- int mgmt_control(struct sock *sk, struct msghdr *msg, size_t len);
- int mgmt_new_settings(struct hci_dev *hdev);
-@@ -1403,6 +1406,7 @@ int hci_update_random_address(struct hci_request *req, bool require_privacy,
- 			      u8 *own_addr_type);
- void hci_copy_identity_address(struct hci_dev *hdev, bdaddr_t *bdaddr,
- 			       u8 *bdaddr_type);
-+void hci_restart_le_scan(struct hci_dev *hdev);
- 
- #define SCO_AIRMODE_MASK       0x0003
- #define SCO_AIRMODE_CVSD       0x0000
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 5c319a4..688e2ca 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -2557,6 +2557,7 @@ static int hci_dev_do_close(struct hci_dev *hdev)
- 		cancel_delayed_work(&hdev->service_cache);
- 
- 	cancel_delayed_work_sync(&hdev->le_scan_disable);
-+	cancel_delayed_work_sync(&hdev->le_scan_restart);
- 
- 	if (test_bit(HCI_MGMT, &hdev->dev_flags))
- 		cancel_delayed_work_sync(&hdev->rpa_expired);
-@@ -3851,13 +3852,58 @@ static void le_scan_disable_work(struct work_struct *work)
- 
- 	BT_DBG("%s", hdev->name);
- 
-+	cancel_delayed_work_sync(&hdev->le_scan_restart);
++static const struct generic_data start_service_discovery_invalid_param_test_1 = {
++	.setup_settings = settings_powered,
++	.send_opcode = MGMT_OP_START_SERVICE_DISCOVERY,
++	.send_param = start_service_discovery_invalid_param,
++	.send_len = sizeof(start_service_discovery_invalid_param),
++	.expect_status = MGMT_STATUS_INVALID_PARAMS,
++	.expect_param = start_service_discovery_invalid_resp,
++	.expect_len = sizeof(start_service_discovery_invalid_resp),
++};
 +
- 	hci_req_init(&req, hdev);
++static const struct generic_data start_service_discovery_not_supported_test_1 = {
++	.setup_settings = settings_powered,
++	.send_opcode = MGMT_OP_START_SERVICE_DISCOVERY,
++	.send_param = start_service_discovery_le_param,
++	.send_len = sizeof(start_service_discovery_le_param),
++	.expect_status = MGMT_STATUS_REJECTED,
++	.expect_param = start_service_discovery_le_resp,
++	.expect_len = sizeof(start_service_discovery_le_resp),
++};
++
++static const struct generic_data start_service_discovery_valid_param_test_1 = {
++	.setup_settings = settings_powered_le,
++	.send_opcode = MGMT_OP_START_SERVICE_DISCOVERY,
++	.send_param = start_service_discovery_bredrle_param,
++	.send_len = sizeof(start_service_discovery_bredrle_param),
++	.expect_status = MGMT_STATUS_SUCCESS,
++	.expect_param = start_service_discovery_bredrle_resp,
++	.expect_len = sizeof(start_service_discovery_bredrle_resp),
++	.expect_hci_command = BT_HCI_CMD_LE_SET_SCAN_ENABLE,
++	.expect_hci_param = start_service_discovery_valid_hci,
++	.expect_hci_len = sizeof(start_service_discovery_valid_hci),
++	.expect_alt_ev = MGMT_EV_DISCOVERING,
++	.expect_alt_ev_param = start_service_discovery_evt,
++	.expect_alt_ev_len = sizeof(start_service_discovery_evt),
++};
++
++static const struct generic_data start_service_discovery_valid_param_test_2 = {
++	.setup_settings = settings_powered,
++	.send_opcode = MGMT_OP_START_SERVICE_DISCOVERY,
++	.send_param = start_service_discovery_le_param,
++	.send_len = sizeof(start_service_discovery_le_param),
++	.expect_status = MGMT_STATUS_SUCCESS,
++	.expect_param = start_service_discovery_le_resp,
++	.expect_len = sizeof(start_service_discovery_le_resp),
++	.expect_hci_command = BT_HCI_CMD_LE_SET_SCAN_ENABLE,
++	.expect_hci_param = start_service_discovery_valid_hci,
++	.expect_hci_len = sizeof(start_service_discovery_valid_hci),
++	.expect_alt_ev = MGMT_EV_DISCOVERING,
++	.expect_alt_ev_param = start_service_discovery_le_evt,
++	.expect_alt_ev_len = sizeof(start_service_discovery_le_evt),
++};
++
+ static const char set_dev_class_valid_param[] = { 0x01, 0x0c };
+ static const char set_dev_class_zero_rsp[] = { 0x00, 0x00, 0x00 };
+ static const char set_dev_class_valid_rsp[] = { 0x0c, 0x01, 0x00 };
+@@ -4568,6 +4645,22 @@ int main(int argc, char *argv[])
+ 				&stop_discovery_invalid_param_test_1,
+ 				setup_start_discovery, test_command_generic);
  
- 	hci_req_add_le_scan_disable(&req);
- 
- 	err = hci_req_run(&req, le_scan_disable_work_complete);
- 	if (err)
--		BT_ERR("Disable LE scanning request failed: err %d", err);
-+		BT_ERR("Disable LE scan request failed: err %d", err);
-+}
++	test_bredrle("Start Service Discovery - Not powered 1",
++				&start_service_discovery_not_powered_test_1,
++				NULL, test_command_generic);
++	test_bredrle("Start Service Discovery - Invalid parameters 1",
++				&start_service_discovery_invalid_param_test_1,
++				NULL, test_command_generic);
++	test_bredrle("Start Service Discovery - Not supported 1",
++				&start_service_discovery_not_supported_test_1,
++				NULL, test_command_generic);
++	test_bredrle("Start Service Discovery - Success 1",
++				&start_service_discovery_valid_param_test_1,
++				NULL, test_command_generic);
++	test_le("Start Service Discovery - Success 2",
++				&start_service_discovery_valid_param_test_2,
++				NULL, test_command_generic);
 +
-+void hci_restart_le_scan(struct hci_dev *hdev)
-+{
-+	queue_delayed_work(hdev->workqueue, &hdev->le_scan_restart,
-+			   msecs_to_jiffies(DISCOV_LE_RESTART_DELAY));
-+}
-+
-+static void le_scan_restart_work_complete(struct hci_dev *hdev, u8 status)
-+{
-+	clear_bit(HCI_LE_SCAN_RESTARTING, &hdev->discovery.flags);
-+
-+	if (status)
-+		BT_ERR("Failed to restart LE scan: status %d", status);
-+}
-+
-+static void le_scan_restart_work(struct work_struct *work)
-+{
-+	struct hci_dev *hdev = container_of(work, struct hci_dev,
-+					    le_scan_restart.work);
-+	struct hci_request req;
-+	struct hci_cp_le_set_scan_enable cp;
-+	int err;
-+
-+	BT_DBG("%s", hdev->name);
-+
-+	/* If controller is not scanning we are done. */
-+	if (!test_bit(HCI_LE_SCAN, &hdev->dev_flags))
-+		return;
-+
-+	hci_req_init(&req, hdev);
-+
-+	hci_req_add_le_scan_disable(&req);
-+
-+	memset(&cp, 0, sizeof(cp));
-+	cp.enable = LE_SCAN_ENABLE;
-+	hci_req_add(&req, HCI_OP_LE_SET_SCAN_ENABLE, sizeof(cp), &cp);
-+
-+	set_bit(HCI_LE_SCAN_RESTARTING, &hdev->discovery.flags);
-+
-+	err = hci_req_run(&req, le_scan_restart_work_complete);
-+	if (err)
-+		BT_ERR("Restart LE scan request failed: err %d", err);
- }
- 
- static void set_random_addr(struct hci_request *req, bdaddr_t *rpa)
-@@ -4037,6 +4083,7 @@ struct hci_dev *hci_alloc_dev(void)
- 	INIT_DELAYED_WORK(&hdev->power_off, hci_power_off);
- 	INIT_DELAYED_WORK(&hdev->discov_off, hci_discov_off);
- 	INIT_DELAYED_WORK(&hdev->le_scan_disable, le_scan_disable_work);
-+	INIT_DELAYED_WORK(&hdev->le_scan_restart, le_scan_restart_work);
- 
- 	skb_queue_head_init(&hdev->rx_q);
- 	skb_queue_head_init(&hdev->cmd_q);
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index bd0a801..ee19656 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -1157,10 +1157,13 @@ static void hci_cc_le_set_scan_enable(struct hci_dev *hdev,
- 					  d->last_adv_data_len, NULL, 0);
- 		}
- 
--		/* Cancel this timer so that we don't try to disable scanning
--		 * when it's already disabled.
-+		/* If HCI_LE_SCAN_RESTARTING is set, don't cancel this timer,
-+		 * because we're just restarting scan. Otherwise cancel it so
-+		 * that we don't try to disable scanning when it's already
-+		 * disabled.
- 		 */
--		cancel_delayed_work(&hdev->le_scan_disable);
-+		if (!test_bit(HCI_LE_SCAN_RESTARTING, &hdev->discovery.flags))
-+			cancel_delayed_work(&hdev->le_scan_disable);
- 
- 		clear_bit(HCI_LE_SCAN, &hdev->dev_flags);
- 
+ 	test_bredrle("Set Device Class - Success 1",
+ 				&set_dev_class_valid_param_test_1,
+ 				NULL, test_command_generic);
 -- 
 2.1.0.rc2.206.gedb03e5
 
