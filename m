@@ -1,43 +1,55 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1417011395.5928.4.camel@linux-0dmf.site>
-Subject: Re: bluetooth related firmware loader spew on resume.
-From: Oliver Neukum <oneukum@suse.de>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: Takashi Iwai <tiwai@suse.de>, Dave Jones <davej@redhat.com>, Linux
- Kernel <linux-kernel@vger.kernel.org>, pgynther@google.com,
- linux-bluetooth@vger.kernel.org
-Date: Wed, 26 Nov 2014 15:16:35 +0100
-In-Reply-To: <0E1D95E7-64D2-4BEA-AFAA-4B119838F24E@holtmann.org>
-References: <20141111181228.GA27815@redhat.com>
-	 <s5hsih7xmgg.wl-tiwai@suse.de>
-	 <D19A9DA1-3706-4351-B2E9-25D5ABA662E7@holtmann.org>
-	 <s5h7fyijqc9.wl-tiwai@suse.de> <1416996623.3171.7.camel@linux-0dmf.site>
-	 <0E1D95E7-64D2-4BEA-AFAA-4B119838F24E@holtmann.org>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+MIME-Version: 1.0
+In-Reply-To: <1416999764-15300-1-git-send-email-rakesh.mk@samsung.com>
+References: <1416999764-15300-1-git-send-email-rakesh.mk@samsung.com>
+Date: Wed, 26 Nov 2014 16:16:11 +0200
+Message-ID: <CABBYNZ+_oU6-VyZ-_3qiGB0cGTF-79PatRH+PVv+V8E4ZPUqPA@mail.gmail.com>
+Subject: Re: [PATCH 1] obexd: Fix crash while session shutdown
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Rakesh M K <rakesh.mk@samsung.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Wed, 2014-11-26 at 23:05 +0900, Marcel Holtmann wrote:
-> Hi Oliver,
-> 
-> >> In order to paper over this, we may also remember the failing firmware
-> >> and avoid loading it.  This might be an easer way than the endless
-> >> fight against UMH race...
-> > 
-> > 
-> > the full fix would be to implement reset_resume() for btusb.
-> > It seems to me that setup() should be split in two methods,
-> > one to request the firmware from user space and the second
-> > to transfer it to the device. reset_resume() would just need
-> > to repeat the second operation.
-> 
-> so when you do hci_register_dev, then hdev->setup is only called once. I really mean only once per lifetime of the hci_dev. So you would need to unregister the hci_dev first before hdev->setup will ever be called again. So I am not sure this is actually the problem here. The problem here is entirely within request_firmware() unless of course we run through the USB probe handlers again. Which I do not see happening here.
+Hi,
 
-It seems most likely to me that probing is indeed done again.
-btusb does not implement reset_resume(). If power goes away
-as is usual on S3/4 the device is reenumerated. The original
-trace has a call to btusb_setup_bcm_patchram().
-What else could be happening?
+On Wed, Nov 26, 2014 at 1:02 PM, Rakesh M K <rakesh.mk@samsung.com> wrote:
+> g_str_equal has been used for the session path compare
+> which is not NULL-safe. Used the g_strcmp0() for the NULL-Safe
+> string comparision.
+>
+> *#0 strcmp (p1=0x0, p2=0x7105c "/org/bluez/obex/client/session0")
+> *    at strcmp.c:38
+> *#1  0xb6e0cd0a in g_str_equal (v1=<value optimized out>,
+> *    v2=<value optimized out>) at ghash.c:1704
+> *#2  0x000264d8 in find_session (connection=<value optimized out>,
+> *    message=0x55b38, user_data=<value optimized out>)
+> *    at obexd/client/manager.c:162
+> *#3  remove_session (connection=<value optimized out>, message=0x55b38,
+>     user_data=<value optimized out>) at obexd/client/manager.c:231
+> ---
+>  obexd/client/manager.c |    2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/obexd/client/manager.c b/obexd/client/manager.c
+> index 8efe1f2..7ae111c 100644
+> --- a/obexd/client/manager.c
+> +++ b/obexd/client/manager.c
+> @@ -157,7 +157,7 @@ static struct obc_session *find_session(const char *path)
+>         for (l = sessions; l; l = l->next) {
+>                 struct obc_session *session = l->data;
+>
+> -               if (g_str_equal(obc_session_get_path(session), path) == TRUE)
+> +               if (g_strcmp0(obc_session_get_path(session), path) == 0)
+>                         return session;
+>         }
+>
+> --
+> 1.7.9.5
 
-	Regards
-		Oliver
+Applied, thanks.
+
+
+-- 
+Luiz Augusto von Dentz
