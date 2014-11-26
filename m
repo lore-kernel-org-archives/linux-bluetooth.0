@@ -1,23 +1,27 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Wed, 26 Nov 2014 11:33:24 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Jaganath Kanakkassery <jaganath.k@samsung.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Fix error not returned if service is not supported
+Message-ID: <20141126093324.GB31813@t440s.lan>
+References: <1416831099-14791-1-git-send-email-jaganath.k@samsung.com>
 MIME-Version: 1.0
-Date: Wed, 26 Nov 2014 13:45:39 +0400
-Message-ID: <CAPd6Mmhxoh+W8L+d_Jxp-J-yvBOBSgFFjyi6moYuX+xSsCc7=w@mail.gmail.com>
-Subject: Bluetooth LE localizer
-From: Krutskikh Ivan <stein.hak@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1416831099-14791-1-git-send-email-jaganath.k@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi everyone,
+Hi Jaganath,
 
-I had this idea for some time right now but never managed to make it
-work. Let's say I have a typical office, a bunch of bluetooth le
-dongles (ones that are used to find missing car keys and such) and a
-small linux servers with bluetooth capabilities in every room. Can I
-passively (without having to push anything on le dongles) detect the
-location of every dongle in the office? What would the precision of
-such an approach? I would be happy with it narrowing to one room, but
-higher is better of course.
+On Mon, Nov 24, 2014, Jaganath Kanakkassery wrote:
+> Without this patch, error will not be returned if remote device does not
+> support the service and hence application will never get any response
+> for the connect request
+> ---
+>  src/profile.c |    3 +++
+>  1 file changed, 3 insertions(+)
 
-Thanks in advance!
+Applied. Thanks.
+
+Johan
