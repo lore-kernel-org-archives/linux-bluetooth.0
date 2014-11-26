@@ -1,43 +1,56 @@
 Return-Path: <cyrus@holtmann.org>
-From: Rakesh M K <rakesh.mk@samsung.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Rakesh M K <rakesh.mk@samsung.com>
-Subject: [PATCH 1] obexd: Fix crash while session shutdown
-Date: Wed, 26 Nov 2014 16:32:44 +0530
-Message-id: <1416999764-15300-1-git-send-email-rakesh.mk@samsung.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Message-ID: <1416998616.3171.13.camel@linux-0dmf.site>
+Subject: Re: bluetooth related firmware loader spew on resume.
+From: Oliver Neukum <oneukum@suse.de>
+To: Takashi Iwai <tiwai@suse.de>
+Cc: Marcel Holtmann <marcel@holtmann.org>, Dave Jones <davej@redhat.com>,
+ Linux Kernel <linux-kernel@vger.kernel.org>, pgynther@google.com,
+ linux-bluetooth@vger.kernel.org
+Date: Wed, 26 Nov 2014 11:43:36 +0100
+In-Reply-To: <s5hlhmyxng0.wl-tiwai@suse.de>
+References: <20141111181228.GA27815@redhat.com>
+	 <s5hsih7xmgg.wl-tiwai@suse.de>
+	 <D19A9DA1-3706-4351-B2E9-25D5ABA662E7@holtmann.org>
+	 <s5h7fyijqc9.wl-tiwai@suse.de> <1416996623.3171.7.camel@linux-0dmf.site>
+	 <s5hlhmyxng0.wl-tiwai@suse.de>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-g_str_equal has been used for the session path compare
-which is not NULL-safe. Used the g_strcmp0() for the NULL-Safe
-string comparision.
+On Wed, 2014-11-26 at 11:31 +0100, Takashi Iwai wrote:
+> At Wed, 26 Nov 2014 11:10:23 +0100,
+> Oliver Neukum wrote:
+> > 
+> > On Wed, 2014-11-26 at 09:52 +0100, Takashi Iwai wrote:
+> > > At Wed, 26 Nov 2014 14:15:27 +0900,
+> > 
+> > > In order to paper over this, we may also remember the failing firmware
+> > > and avoid loading it.  This might be an easer way than the endless
+> > > fight against UMH race...
+> > 
+> > Hi,
+> > 
+> > the full fix would be to implement reset_resume() for btusb.
+> > It seems to me that setup() should be split in two methods,
+> > one to request the firmware from user space and the second
+> > to transfer it to the device. reset_resume() would just need
+> > to repeat the second operation.
+> 
+> I'm not against it, but one slight drawback is that you'll have to
+> remember the firmware content to transfer by the driver itself in this
+> scenario.   In the firmware loader framework, the content is re-read
+> at resume so that the largish content isn't kept unnecessarily during
+> the whole operation. 
 
-*#0 strcmp (p1=0x0, p2=0x7105c "/org/bluez/obex/client/session0")
-*    at strcmp.c:38
-*#1  0xb6e0cd0a in g_str_equal (v1=<value optimized out>,
-*    v2=<value optimized out>) at ghash.c:1704
-*#2  0x000264d8 in find_session (connection=<value optimized out>,
-*    message=0x55b38, user_data=<value optimized out>)
-*    at obexd/client/manager.c:162
-*#3  remove_session (connection=<value optimized out>, message=0x55b38,
-    user_data=<value optimized out>) at obexd/client/manager.c:231
----
- obexd/client/manager.c |    2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+That isn't a drawback but an advantage. Firmware for devices that
+do power management needs to be in RAM. The right time to free it
+is in disconnect(). But why does that mean that the driver has to
+manage the firmware? Can't the firmware layer do it?
 
-diff --git a/obexd/client/manager.c b/obexd/client/manager.c
-index 8efe1f2..7ae111c 100644
---- a/obexd/client/manager.c
-+++ b/obexd/client/manager.c
-@@ -157,7 +157,7 @@ static struct obc_session *find_session(const char *path)
- 	for (l = sessions; l; l = l->next) {
- 		struct obc_session *session = l->data;
- 
--		if (g_str_equal(obc_session_get_path(session), path) == TRUE)
-+		if (g_strcmp0(obc_session_get_path(session), path) == 0)
- 			return session;
- 	}
- 
--- 
-1.7.9.5
+You just cannot keep a device operational seamlessly if you request
+firmware on resume. We could in theory use a notification queue
+running while user space is operational if you really want to save
+a little RAM.
 
+	Regards
+		Oliver
