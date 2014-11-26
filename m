@@ -1,28 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=windows-1252
-Mime-Version: 1.0 (Mac OS X Mail 8.1 \(1993\))
-Subject: Re: [PATCH v6] ath3k: Add support of MCI 13d3:3408 bt device
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <54758990.2050908@gmail.com>
-Date: Wed, 26 Nov 2014 17:50:55 +0900
-Cc: linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-	linux-kernel <linux-kernel@vger.kernel.org>,
-	stable@vger.kernel.org
-Message-Id: <4CFFA987-E3B3-49D4-ACBE-55CC7C3566BD@holtmann.org>
-References: <5474BA38.2070908@gmail.com> <C8849DFB-5159-4C62-A861-D393034E4895@holtmann.org> <54758990.2050908@gmail.com>
-To: Dmitry Tunin <hanipouspilot@gmail.com>
-Sender: linux-kernel-owner@vger.kernel.org
+From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
+Subject: [PATCH 4/4] android/gatt: Set proper MTU for BR/EDR link
+Date: Wed, 26 Nov 2014 09:47:40 +0100
+Message-Id: <1416991660-21828-4-git-send-email-jakub.tyszkowski@tieto.com>
+In-Reply-To: <1416991660-21828-1-git-send-email-jakub.tyszkowski@tieto.com>
+References: <1416991660-21828-1-git-send-email-jakub.tyszkowski@tieto.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Dmitry,
+Minimum mtu depends on transport layer and is larger for BREDR link.
+---
+ android/gatt.c | 10 ++++++----
+ 1 file changed, 6 insertions(+), 4 deletions(-)
 
-> I spent already hours on sending this fucking email. The patch works for me. And if someone else is interested in working of this device feel free and do it yourself.
-
-so you are blaming the maintainers. Thank you very much :(
-
-Maybe reading Documentation/SubmittingPatches and just following the steps in there would get you what you wanted. Others have successfully submitted tons and tons of patches.
-
-Regards
-
-Marcel
+diff --git a/android/gatt.c b/android/gatt.c
+index b9b3c7b..95ddba0 100644
+--- a/android/gatt.c
++++ b/android/gatt.c
+@@ -1439,7 +1439,7 @@ static void connect_cb(GIOChannel *io, GError *gerr, gpointer user_data)
+ 	uint32_t status;
+ 	GAttrib *attrib;
+ 	uint16_t mtu;
+-	uint16_t cid;
++	uint8_t dst_type;
+ 
+ 	if (dev->state != DEVICE_CONNECT_READY) {
+ 		error("gatt: Device not in a connecting state!?");
+@@ -1459,9 +1459,11 @@ static void connect_cb(GIOChannel *io, GError *gerr, gpointer user_data)
+ 		goto reply;
+ 	}
+ 
+-	if (!bt_io_get(io, &gerr, BT_IO_OPT_IMTU, &mtu, BT_IO_OPT_CID, &cid,
+-				BT_IO_OPT_INVALID) || cid == ATT_CID)
+-		mtu = ATT_DEFAULT_LE_MTU;
++	mtu = ATT_DEFAULT_LE_MTU;
++
++	if (bt_io_get(io, &gerr, BT_IO_OPT_DEST_TYPE, &dst_type,
++			BT_IO_OPT_INVALID) && (dst_type == BDADDR_BREDR))
++		mtu = ATT_DEFAULT_L2CAP_MTU;
+ 
+ 	attrib = g_attrib_new(io, mtu);
+ 	if (!attrib) {
+-- 
+1.9.1
 
