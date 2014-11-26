@@ -1,38 +1,26 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Wed, 26 Nov 2014 10:08:00 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Szymon Janc <szymon.janc@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] shared/io-glib: Fix not calling destroy callback
+Message-ID: <20141126080800.GB16861@t440s>
+References: <1416868537-2478-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
-In-Reply-To: <20141126080427.GA16861@t440s>
-References: <1416580906-22134-1-git-send-email-dh.herrmann@gmail.com>
-	<20141126080427.GA16861@t440s>
-Date: Wed, 26 Nov 2014 09:14:53 +0100
-Message-ID: <CANq1E4S1xOQpz_JfSkPgmXq1wCZ4RkyaO7gN=qf55FUdnswa_A@mail.gmail.com>
-Subject: Re: [PATCH 0/4] Add GET/SET_REPORT support to HoG
-From: David Herrmann <dh.herrmann@gmail.com>
-To: David Herrmann <dh.herrmann@gmail.com>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	Benjamin Tissoires <benjamin.tissoires@redhat.com>, Marcel Holtmann <marcel@holtmann.org>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1416868537-2478-1-git-send-email-szymon.janc@tieto.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi
+Hi Szymon,
 
-On Wed, Nov 26, 2014 at 9:04 AM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
-> Hi David,
->
-> On Fri, Nov 21, 2014, David Herrmann wrote:
->> Benjamin Tissoires (4):
->>   hog: import latest uhid.h definition
->>   hog: break out the report retrieval in its own function
->>   hog: implement get_report functionality
->>   hog: implement set_report functionality
->>
->>  profiles/input/hog.c       | 204 +++++++++++++++++++++++++++++++++++++++++----
->>  profiles/input/uhid_copy.h | 117 +++++++++++++++++++++++---
->>  2 files changed, 292 insertions(+), 29 deletions(-)
->
-> All these patches have been applied upstream. There was just a minor
-> thing I fixed myself with a follow-up patch where the code was doing an
-> unnecessary < 0 comparison of an unsigned value.
+On Mon, Nov 24, 2014, Szymon Janc wrote:
+> Destroy callback should be called also for G_IO_ERR | G_IO_NVAL
+> condition.
+> ---
+>  src/shared/io-glib.c | 6 ++++--
+>  1 file changed, 4 insertions(+), 2 deletions(-)
 
-Thanks, Johan!
+Applied. Thanks.
 
-David
+Johan
