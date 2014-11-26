@@ -2,215 +2,74 @@ Return-Path: <cyrus@holtmann.org>
 From: Arman Uguray <armansito@chromium.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Arman Uguray <armansito@chromium.org>
-Subject: [PATCH BlueZ 4/5] shared/gatt-db: Add gatt_db_insert_service function
-Date: Tue, 25 Nov 2014 21:26:48 -0800
-Message-Id: <1416979609-3056-5-git-send-email-armansito@chromium.org>
+Subject: [PATCH BlueZ 2/5] shared: Add function to insert element after entry
+Date: Tue, 25 Nov 2014 21:26:46 -0800
+Message-Id: <1416979609-3056-3-git-send-email-armansito@chromium.org>
 In-Reply-To: <1416979609-3056-1-git-send-email-armansito@chromium.org>
 References: <1416979609-3056-1-git-send-email-armansito@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch adds the gatt_db_insert_service function which inserts a
-service with a pre-defined handle into the database if the desired
-handle range is available.
-
-This is primarily meant to be used by gatt-client, since the handles
-in a client database need to perfectly match those returned from a
-remote server. This also allows client to handle "Service Changed"
-events in which a newly found service can be inserted at the correct
-location within the database.
+This patch adds queue_insert_after, which inserts the given "data"
+after the first occurence of element "entry" in a queue.
 ---
- src/shared/gatt-db.c | 122 ++++++++++++++++++++++++++++++++++++++++++++++-----
- src/shared/gatt-db.h |   6 +++
- 2 files changed, 117 insertions(+), 11 deletions(-)
+ src/shared/queue.c | 30 ++++++++++++++++++++++++++++++
+ src/shared/queue.h |  1 +
+ 2 files changed, 31 insertions(+)
 
-diff --git a/src/shared/gatt-db.c b/src/shared/gatt-db.c
-index 272ca31..b5edd24 100644
---- a/src/shared/gatt-db.c
-+++ b/src/shared/gatt-db.c
-@@ -30,6 +30,10 @@
- #include "src/shared/timeout.h"
- #include "src/shared/gatt-db.h"
- 
-+#ifndef MAX
-+#define MAX(a, b) ((a) > (b) ? (a) : (b))
-+#endif
-+
- #define MAX_CHAR_DECL_VALUE_LEN 19
- #define MAX_INCLUDED_VALUE_LEN 6
- #define ATTRIBUTE_TIMEOUT 1000
-@@ -216,27 +220,23 @@ static bool le_to_uuid(const uint8_t *src, size_t len, bt_uuid_t *uuid)
+diff --git a/src/shared/queue.c b/src/shared/queue.c
+index 5329a80..1373d0d 100644
+--- a/src/shared/queue.c
++++ b/src/shared/queue.c
+@@ -134,6 +134,36 @@ bool queue_push_head(struct queue *queue, void *data)
  	return true;
  }
  
--struct gatt_db_attribute *gatt_db_add_service(struct gatt_db *db,
--						const bt_uuid_t *uuid,
--						bool primary,
--						uint16_t num_handles)
-+static struct gatt_db_service *gatt_db_service_create(const bt_uuid_t *uuid,
-+							bool primary,
-+							uint16_t num_handles)
++bool queue_insert_after(struct queue *queue, void *entry, void *data)
++{
++	struct queue_entry *qentry = NULL, *tmp, *new_entry;
++
++	if (!queue)
++		return false;
++
++	for (tmp = queue->head; tmp; tmp = tmp->next)
++		if (tmp->data == entry)
++			qentry = tmp;
++
++	if (!qentry)
++		return false;
++
++	new_entry = new0(struct queue_entry, 1);
++	if (!new_entry)
++		return false;
++
++	new_entry->data = data;
++	new_entry->next = qentry->next;
++
++	if (!qentry->next)
++		queue->tail = new_entry;
++
++	qentry->next = new_entry;
++	queue->entries++;
++
++	return true;
++}
++
+ void *queue_pop_head(struct queue *queue)
  {
- 	struct gatt_db_service *service;
- 	const bt_uuid_t *type;
- 	uint8_t value[16];
- 	uint16_t len;
+ 	struct queue_entry *entry;
+diff --git a/src/shared/queue.h b/src/shared/queue.h
+index 709590b..6ddc889 100644
+--- a/src/shared/queue.h
++++ b/src/shared/queue.h
+@@ -32,6 +32,7 @@ void queue_destroy(struct queue *queue, queue_destroy_func_t destroy);
  
--	if (num_handles < 1 || (num_handles + db->next_handle) > UINT16_MAX)
--		return 0;
--
- 	service = new0(struct gatt_db_service, 1);
- 	if (!service)
--		return 0;
-+		return NULL;
- 
- 	service->attributes = new0(struct gatt_db_attribute *, num_handles);
- 	if (!service->attributes) {
- 		free(service);
--		return 0;
-+		return NULL;
- 	}
- 
- 	if (primary)
-@@ -249,12 +249,30 @@ struct gatt_db_attribute *gatt_db_add_service(struct gatt_db *db,
- 	service->attributes[0] = new_attribute(service, type, value, len);
- 	if (!service->attributes[0]) {
- 		gatt_db_service_destroy(service);
--		return 0;
-+		return NULL;
- 	}
- 
-+	return service;
-+}
-+
-+struct gatt_db_attribute *gatt_db_add_service(struct gatt_db *db,
-+						const bt_uuid_t *uuid,
-+						bool primary,
-+						uint16_t num_handles)
-+{
-+	struct gatt_db_service *service;
-+
-+	if (!db || num_handles < 1 ||
-+				(num_handles + db->next_handle) > UINT16_MAX)
-+		return NULL;
-+
-+	service = gatt_db_service_create(uuid, primary, num_handles);
-+	if (!service)
-+		return NULL;
-+
- 	if (!queue_push_tail(db->services, service)) {
- 		gatt_db_service_destroy(service);
--		return 0;
-+		return NULL;
- 	}
- 
- 	/* TODO now we get next handle from database. We should first look
-@@ -285,6 +303,88 @@ bool gatt_db_remove_service(struct gatt_db *db,
- 	return true;
- }
- 
-+struct insert_loc_data {
-+	struct gatt_db_service *cur;
-+	uint16_t start, end;
-+	bool fail;
-+	bool done;
-+};
-+
-+static void search_for_insert_loc(void *data, void *user_data)
-+{
-+	struct insert_loc_data *loc_data = user_data;
-+	struct gatt_db_service *service = data;
-+	uint16_t cur_start, cur_end;
-+
-+	if (loc_data->done)
-+		return;
-+
-+	cur_start = service->attributes[0]->handle;
-+	cur_end = service->attributes[0]->handle + service->num_handles - 1;
-+
-+	/* Abort if the requested range overlaps with an existing service. */
-+	if ((loc_data->start >= cur_start && loc_data->start <= cur_end) ||
-+		(loc_data->end >= cur_start && loc_data->end <= cur_end)) {
-+		loc_data->fail = true;
-+		loc_data->done = true;
-+		return;
-+	}
-+
-+	/* Check if this is where the service should be inserted. */
-+	if (loc_data->end < cur_start) {
-+		loc_data->done = true;
-+		return;
-+	}
-+
-+	loc_data->cur = service;
-+}
-+
-+struct gatt_db_attribute *gatt_db_insert_service(struct gatt_db *db,
-+							uint16_t handle,
-+							const bt_uuid_t *uuid,
-+							bool primary,
-+							uint16_t num_handles)
-+{
-+	struct insert_loc_data data;
-+	struct gatt_db_service *service;
-+
-+	if (!db || num_handles < 1 || handle + num_handles > UINT16_MAX)
-+		return NULL;
-+
-+	memset(&data, 0, sizeof(data));
-+
-+	data.start = handle;
-+	data.end = handle + num_handles - 1;
-+
-+	queue_foreach(db->services, search_for_insert_loc, &data);
-+
-+	if (data.fail)
-+		return NULL;
-+
-+	service = gatt_db_service_create(uuid, primary, num_handles);
-+	if (!service)
-+		return NULL;
-+
-+	if (data.cur) {
-+		if (!queue_insert_after(db->services, data.cur, service))
-+			goto fail;
-+	} else if (!queue_push_head(db->services, service)) {
-+			goto fail;
-+	}
-+
-+	service->attributes[0]->handle = handle;
-+	service->num_handles = num_handles;
-+
-+	/* Fast-forward next_handle if the new service was added to the end */
-+	db->next_handle = MAX(handle + num_handles + 1, db->next_handle);
-+
-+	return service->attributes[0];
-+
-+fail:
-+	gatt_db_service_destroy(service);
-+	return NULL;
-+}
-+
- static uint16_t get_attribute_index(struct gatt_db_service *service,
- 							int end_offset)
- {
-diff --git a/src/shared/gatt-db.h b/src/shared/gatt-db.h
-index 73bb8d9..4830cbd 100644
---- a/src/shared/gatt-db.h
-+++ b/src/shared/gatt-db.h
-@@ -35,6 +35,12 @@ struct gatt_db_attribute *gatt_db_add_service(struct gatt_db *db,
- bool gatt_db_remove_service(struct gatt_db *db,
- 					struct gatt_db_attribute *attrib);
- 
-+struct gatt_db_attribute *gatt_db_insert_service(struct gatt_db *db,
-+							uint16_t handle,
-+							const bt_uuid_t *uuid,
-+							bool primary,
-+							uint16_t num_handles);
-+
- typedef void (*gatt_db_read_t) (struct gatt_db_attribute *attrib,
- 					unsigned int id, uint16_t offset,
- 					uint8_t opcode, bdaddr_t *bdaddr,
+ bool queue_push_tail(struct queue *queue, void *data);
+ bool queue_push_head(struct queue *queue, void *data);
++bool queue_insert_after(struct queue *queue, void *entry, void *data);
+ void *queue_pop_head(struct queue *queue);
+ void *queue_peek_head(struct queue *queue);
+ void *queue_peek_tail(struct queue *queue);
 -- 
 2.2.0.rc0.207.ga3a616c
 
