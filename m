@@ -1,68 +1,183 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 8.1 \(1993\))
-Subject: Re: [PATCH v6] ath3k: Add support of MCI 13d3:3408 bt device
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <5474BA38.2070908@gmail.com>
-Date: Wed, 26 Nov 2014 14:05:39 +0900
-Cc: linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-	linux-kernel <linux-kernel@vger.kernel.org>,
-	stable@vger.kernel.org
-Message-Id: <C8849DFB-5159-4C62-A861-D393034E4895@holtmann.org>
-References: <5474BA38.2070908@gmail.com>
-To: Dmitry Tunin <hanipouspilot@gmail.com>
-Sender: linux-kernel-owner@vger.kernel.org
+From: Jakub Pawlowski <jpawlowski@google.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Jakub Pawlowski <jpawlowski@google.com>
+Subject: [PATCH v10 2/3] Bluetooth: Extract generic start and stop discovery
+Date: Tue, 25 Nov 2014 16:48:17 -0800
+Message-Id: <1416962898-20067-2-git-send-email-jpawlowski@google.com>
+In-Reply-To: <1416962898-20067-1-git-send-email-jpawlowski@google.com>
+References: <1416962898-20067-1-git-send-email-jpawlowski@google.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Dmitry,
+This commit extract generic_start_discovery and generic_stop_discovery
+in preparation for start and stop service discovery. The reason behind
+that is that both functions will share big part of code, and it would
+be much easier to maintain just one generic method.
 
-> Add support for bluetooth MCI WB335 (AR9565) Wi-Fi+bt module.
-> This bluetooth module requires loading patch and sysconfig by ath3k driver.
-> 
-> T:  Bus=01 Lev=02 Prnt=03 Port=00 Cnt=01 Dev#= 20 Spd=12   MxCh= 0
-> D:  Ver= 1.10 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-> P:  Vendor=13d3 ProdID=3408 Rev= 0.02
-> C:* #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
-> A:  FirstIf#= 0 IfCount= 2 Cls=e0(wlcon) Sub=01 Prot=01
-> I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
-> E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-> E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-> I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-> I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-> I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-> I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-> I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-> I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-> 
-> 
-> CC: stable@vger.kernel.org
-> Signed-off-by: Dmitry Tunin <hanipouspilot@gmail.com>
+Signed-off-by: Jakub Pawlowski <jpawlowski@google.com>
+---
+ net/bluetooth/mgmt.c | 47 +++++++++++++++++++++++++----------------------
+ 1 file changed, 25 insertions(+), 22 deletions(-)
 
-so you really need to make sure to send only one version. I now have two patches labeled as v6 and I have no idea which one is recent and which one I am suppose to apply.
-
-I tried applying this one, but it failed. Patches need to be based against bluetooth-next tree.
-
-Applying: ath3k: Add support of MCI 13d3:3408 bt device
-error: patch failed: drivers/bluetooth/ath3k.c:105
-error: drivers/bluetooth/ath3k.c: patch does not apply
-error: patch failed: drivers/bluetooth/btusb.c:182
-error: drivers/bluetooth/btusb.c: patch does not apply
-Patch failed at 0001 ath3k: Add support of MCI 13d3:3408 bt device
-
-Regards
-
-Marcel
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index cbeef5f..3e2ba4c 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -3675,7 +3675,8 @@ done:
+ 	return err;
+ }
+ 
+-static int mgmt_start_discovery_failed(struct hci_dev *hdev, u8 status)
++static int mgmt_start_discovery_failed(struct hci_dev *hdev, u8 status,
++				       u16 opcode)
+ {
+ 	struct pending_cmd *cmd;
+ 	u8 type;
+@@ -3683,7 +3684,7 @@ static int mgmt_start_discovery_failed(struct hci_dev *hdev, u8 status)
+ 
+ 	hci_discovery_set_state(hdev, DISCOVERY_STOPPED);
+ 
+-	cmd = mgmt_pending_find(MGMT_OP_START_DISCOVERY, hdev);
++	cmd = mgmt_pending_find(opcode, hdev);
+ 	if (!cmd)
+ 		return -ENOENT;
+ 
+@@ -3704,7 +3705,8 @@ static void start_discovery_complete(struct hci_dev *hdev, u8 status)
+ 
+ 	if (status) {
+ 		hci_dev_lock(hdev);
+-		mgmt_start_discovery_failed(hdev, status);
++		mgmt_start_discovery_failed(hdev, status,
++					    MGMT_OP_START_DISCOVERY);
+ 		hci_dev_unlock(hdev);
+ 		return;
+ 	}
+@@ -3735,8 +3737,8 @@ static void start_discovery_complete(struct hci_dev *hdev, u8 status)
+ 	queue_delayed_work(hdev->workqueue, &hdev->le_scan_disable, timeout);
+ }
+ 
+-static int start_discovery(struct sock *sk, struct hci_dev *hdev,
+-			   void *data, u16 len)
++static int generic_start_discovery(struct sock *sk, struct hci_dev *hdev,
++				   void *data, u16 len, u16 opcode)
+ {
+ 	struct mgmt_cp_start_discovery *cp = data;
+ 	struct pending_cmd *cmd;
+@@ -3754,27 +3756,27 @@ static int start_discovery(struct sock *sk, struct hci_dev *hdev,
+ 	hci_dev_lock(hdev);
+ 
+ 	if (!hdev_is_powered(hdev)) {
+-		err = cmd_complete(sk, hdev->id, MGMT_OP_START_DISCOVERY,
++		err = cmd_complete(sk, hdev->id, opcode,
+ 				   MGMT_STATUS_NOT_POWERED,
+ 				   &cp->type, sizeof(cp->type));
+ 		goto failed;
+ 	}
+ 
+ 	if (test_bit(HCI_PERIODIC_INQ, &hdev->dev_flags)) {
+-		err = cmd_complete(sk, hdev->id, MGMT_OP_START_DISCOVERY,
++		err = cmd_complete(sk, hdev->id, opcode,
+ 				   MGMT_STATUS_BUSY, &cp->type,
+ 				   sizeof(cp->type));
+ 		goto failed;
+ 	}
+ 
+ 	if (hdev->discovery.state != DISCOVERY_STOPPED) {
+-		err = cmd_complete(sk, hdev->id, MGMT_OP_START_DISCOVERY,
++		err = cmd_complete(sk, hdev->id, opcode,
+ 				   MGMT_STATUS_BUSY, &cp->type,
+ 				   sizeof(cp->type));
+ 		goto failed;
+ 	}
+ 
+-	cmd = mgmt_pending_add(sk, MGMT_OP_START_DISCOVERY, hdev, NULL, 0);
++	cmd = mgmt_pending_add(sk, opcode, hdev, NULL, 0);
+ 	if (!cmd) {
+ 		err = -ENOMEM;
+ 		goto failed;
+@@ -3788,16 +3790,14 @@ static int start_discovery(struct sock *sk, struct hci_dev *hdev,
+ 	case DISCOV_TYPE_BREDR:
+ 		status = mgmt_bredr_support(hdev);
+ 		if (status) {
+-			err = cmd_complete(sk, hdev->id,
+-					   MGMT_OP_START_DISCOVERY, status,
++			err = cmd_complete(sk, hdev->id, opcode, status,
+ 					   &cp->type, sizeof(cp->type));
+ 			mgmt_pending_remove(cmd);
+ 			goto failed;
+ 		}
+ 
+ 		if (test_bit(HCI_INQUIRY, &hdev->flags)) {
+-			err = cmd_complete(sk, hdev->id,
+-					   MGMT_OP_START_DISCOVERY,
++			err = cmd_complete(sk, hdev->id, opcode,
+ 					   MGMT_STATUS_BUSY, &cp->type,
+ 					   sizeof(cp->type));
+ 			mgmt_pending_remove(cmd);
+@@ -3816,8 +3816,7 @@ static int start_discovery(struct sock *sk, struct hci_dev *hdev,
+ 	case DISCOV_TYPE_INTERLEAVED:
+ 		status = mgmt_le_support(hdev);
+ 		if (status) {
+-			err = cmd_complete(sk, hdev->id,
+-					   MGMT_OP_START_DISCOVERY, status,
++			err = cmd_complete(sk, hdev->id, opcode, status,
+ 					   &cp->type, sizeof(cp->type));
+ 			mgmt_pending_remove(cmd);
+ 			goto failed;
+@@ -3825,8 +3824,7 @@ static int start_discovery(struct sock *sk, struct hci_dev *hdev,
+ 
+ 		if (hdev->discovery.type == DISCOV_TYPE_INTERLEAVED &&
+ 		    !test_bit(HCI_BREDR_ENABLED, &hdev->dev_flags)) {
+-			err = cmd_complete(sk, hdev->id,
+-					   MGMT_OP_START_DISCOVERY,
++			err = cmd_complete(sk, hdev->id, opcode,
+ 					   MGMT_STATUS_NOT_SUPPORTED,
+ 					   &cp->type, sizeof(cp->type));
+ 			mgmt_pending_remove(cmd);
+@@ -3840,8 +3838,7 @@ static int start_discovery(struct sock *sk, struct hci_dev *hdev,
+ 			 */
+ 			if (hci_conn_hash_lookup_state(hdev, LE_LINK,
+ 						       BT_CONNECT)) {
+-				err = cmd_complete(sk, hdev->id,
+-						   MGMT_OP_START_DISCOVERY,
++				err = cmd_complete(sk, hdev->id, opcode,
+ 						   MGMT_STATUS_REJECTED,
+ 						   &cp->type,
+ 						   sizeof(cp->type));
+@@ -3867,8 +3864,7 @@ static int start_discovery(struct sock *sk, struct hci_dev *hdev,
+ 		 */
+ 		err = hci_update_random_address(&req, true, &own_addr_type);
+ 		if (err < 0) {
+-			err = cmd_complete(sk, hdev->id,
+-					   MGMT_OP_START_DISCOVERY,
++			err = cmd_complete(sk, hdev->id, opcode,
+ 					   MGMT_STATUS_FAILED,
+ 					   &cp->type, sizeof(cp->type));
+ 			mgmt_pending_remove(cmd);
+@@ -3890,7 +3886,7 @@ static int start_discovery(struct sock *sk, struct hci_dev *hdev,
+ 		break;
+ 
+ 	default:
+-		err = cmd_complete(sk, hdev->id, MGMT_OP_START_DISCOVERY,
++		err = cmd_complete(sk, hdev->id, opcode,
+ 				   MGMT_STATUS_INVALID_PARAMS,
+ 				   &cp->type, sizeof(cp->type));
+ 		mgmt_pending_remove(cmd);
+@@ -3908,6 +3904,13 @@ failed:
+ 	return err;
+ }
+ 
++static int start_discovery(struct sock *sk, struct hci_dev *hdev,
++			   void *data, u16 len)
++{
++	return generic_start_discovery(sk, hdev, data, len,
++				       MGMT_OP_START_DISCOVERY);
++}
++
+ static int mgmt_stop_discovery_failed(struct hci_dev *hdev, u8 status)
+ {
+ 	struct pending_cmd *cmd;
+-- 
+2.1.0.rc2.206.gedb03e5
 
