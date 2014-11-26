@@ -2,79 +2,361 @@ Return-Path: <cyrus@holtmann.org>
 From: Arman Uguray <armansito@chromium.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Arman Uguray <armansito@chromium.org>
-Subject: [PATCH BlueZ v1 2/5] shared: Add function to insert element after entry
-Date: Wed, 26 Nov 2014 15:03:09 -0800
-Message-Id: <1417042992-10142-3-git-send-email-armansito@chromium.org>
+Subject: [PATCH BlueZ v1 1/5] shared/gatt-db: Add high-level functions for client
+Date: Wed, 26 Nov 2014 15:03:08 -0800
+Message-Id: <1417042992-10142-2-git-send-email-armansito@chromium.org>
 In-Reply-To: <1417042992-10142-1-git-send-email-armansito@chromium.org>
 References: <1417042992-10142-1-git-send-email-armansito@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch adds queue_insert_after, which inserts the given "data"
-after the first occurence of element "entry" in a queue.
----
- src/shared/queue.c | 35 +++++++++++++++++++++++++++++++++++
- src/shared/queue.h |  1 +
- 2 files changed, 36 insertions(+)
+This patch introduces foreach functions to gatt-db for enumerating
+service, characteristic, and decriptors stored in the database as
+gatt_db_attribute pointers. This patch also adds functions for
+extracting service, characteristic, and include declaration data out of
+matching attributes.
 
-diff --git a/src/shared/queue.c b/src/shared/queue.c
-index 5329a80..9efb665 100644
---- a/src/shared/queue.c
-+++ b/src/shared/queue.c
-@@ -134,6 +134,41 @@ bool queue_push_head(struct queue *queue, void *data)
- 	return true;
+This is in preparation for using gatt-db as the attribute cache in
+shared/gatt-client.
+---
+ src/shared/gatt-db.c | 249 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ src/shared/gatt-db.h |  42 +++++++++
+ 2 files changed, 291 insertions(+)
+
+diff --git a/src/shared/gatt-db.c b/src/shared/gatt-db.c
+index ab08c69..fe05595 100644
+--- a/src/shared/gatt-db.c
++++ b/src/shared/gatt-db.c
+@@ -193,6 +193,29 @@ static int uuid_to_le(const bt_uuid_t *uuid, uint8_t *dst)
+ 	return bt_uuid_len(&uuid128);
  }
  
-+bool queue_push_after(struct queue *queue, void *entry, void *data)
++static bool le_to_uuid(const uint8_t *src, size_t len, bt_uuid_t *uuid)
 +{
-+	struct queue_entry *qentry, *tmp, *new_entry;
++	uint128_t u128;
 +
-+	qentry = NULL;
-+
-+	if (!queue)
-+		return false;
-+
-+	for (tmp = queue->head; tmp; tmp = tmp->next) {
-+		if (tmp->data == entry) {
-+			qentry = tmp;
-+			break;
-+		}
++	if (len == 2) {
++		bt_uuid16_create(uuid, get_le16(src));
++		return true;
 +	}
 +
-+	if (!qentry)
++	if (len == 4) {
++		bt_uuid32_create(uuid, get_le32(src));
++		return true;
++	}
++
++	if (len != 16)
 +		return false;
 +
-+	new_entry = new0(struct queue_entry, 1);
-+	if (!new_entry)
-+		return false;
-+
-+	new_entry->data = data;
-+	new_entry->next = qentry->next;
-+
-+	if (!qentry->next)
-+		queue->tail = new_entry;
-+
-+	qentry->next = new_entry;
-+	queue->entries++;
++	bswap_128(src, &u128);
++	bt_uuid128_create(uuid, u128);
 +
 +	return true;
 +}
 +
- void *queue_pop_head(struct queue *queue)
- {
- 	struct queue_entry *entry;
-diff --git a/src/shared/queue.h b/src/shared/queue.h
-index 709590b..602b0ce 100644
---- a/src/shared/queue.h
-+++ b/src/shared/queue.h
-@@ -32,6 +32,7 @@ void queue_destroy(struct queue *queue, queue_destroy_func_t destroy);
+ struct gatt_db_attribute *gatt_db_add_service(struct gatt_db *db,
+ 						const bt_uuid_t *uuid,
+ 						bool primary,
+@@ -665,6 +688,125 @@ void gatt_db_find_information(struct gatt_db *db, uint16_t start_handle,
+ 	queue_foreach(db->services, find_information, &data);
+ }
  
- bool queue_push_tail(struct queue *queue, void *data);
- bool queue_push_head(struct queue *queue, void *data);
-+bool queue_push_after(struct queue *queue, void *entry, void *data);
- void *queue_pop_head(struct queue *queue);
- void *queue_peek_head(struct queue *queue);
- void *queue_peek_tail(struct queue *queue);
++void gatt_db_foreach_service(struct gatt_db *db, gatt_db_foreach_t func,
++							void *user_data)
++{
++	gatt_db_foreach_service_in_range(db, func, user_data, 0x0001, 0xffff);
++}
++
++struct foreach_data {
++	gatt_db_foreach_t func;
++	void *user_data;
++	uint16_t start, end;
++};
++
++static void foreach_service_in_range(void *data, void *user_data)
++{
++	struct gatt_db_service *service = data;
++	struct foreach_data *foreach_data = user_data;
++	uint16_t svc_start;
++
++	svc_start = get_handle_at_index(service, 0);
++
++	if (svc_start > foreach_data->end || svc_start < foreach_data->start)
++		return;
++
++	foreach_data->func(service->attributes[0], foreach_data->user_data);
++}
++
++void gatt_db_foreach_service_in_range(struct gatt_db *db,
++							gatt_db_foreach_t func,
++							void *user_data,
++							uint16_t start_handle,
++							uint16_t end_handle)
++{
++	struct foreach_data data;
++
++	if (!db || !func || start_handle > end_handle)
++		return;
++
++	data.func = func;
++	data.user_data = user_data;
++	data.start = start_handle;
++	data.end = end_handle;
++
++	queue_foreach(db->services, foreach_service_in_range, &data);
++}
++
++void gatt_db_service_foreach(struct gatt_db_attribute *attrib,
++							const bt_uuid_t *uuid,
++							gatt_db_foreach_t func,
++							void *user_data)
++{
++	struct gatt_db_service *service;
++	struct gatt_db_attribute *attr;
++	uint16_t i;
++
++	if (!attrib || !func)
++		return;
++
++	service = attrib->service;
++
++	for (i = 0; i < service->num_handles; i++) {
++		attr = service->attributes[i];
++		if (!attr)
++			continue;
++
++		if (uuid && bt_uuid_cmp(uuid, &attr->uuid))
++			continue;
++
++		func(attr, user_data);
++	}
++}
++
++void gatt_db_service_foreach_char(struct gatt_db_attribute *attrib,
++							gatt_db_foreach_t func,
++							void *user_data)
++{
++	gatt_db_service_foreach(attrib, &characteristic_uuid, func, user_data);
++}
++
++void gatt_db_service_foreach_desc(struct gatt_db_attribute *attrib,
++							gatt_db_foreach_t func,
++							void *user_data)
++{
++	struct gatt_db_service *service;
++	struct gatt_db_attribute *attr;
++	uint16_t i;
++
++	if (!attrib || !func)
++		return;
++
++	/* Return if this attribute is not a characteristic declaration */
++	if (bt_uuid_cmp(&characteristic_uuid, &attrib->uuid))
++		return;
++
++	service = attrib->service;
++
++	/* Start from the attribute following the value handle */
++	i = attrib->handle - service->attributes[0]->handle + 2;
++	for (; i < service->num_handles; i++) {
++		attr = service->attributes[i];
++		if (!attr)
++			continue;
++
++		/* Return if we reached the end of this characteristic */
++		if (!bt_uuid_cmp(&characteristic_uuid, &attr->uuid) ||
++			!bt_uuid_cmp(&included_service_uuid, &attr->uuid))
++			return;
++
++		func(attr, user_data);
++	}
++}
++
++void gatt_db_service_foreach_incl(struct gatt_db_attribute *attrib,
++							gatt_db_foreach_t func,
++							void *user_data)
++{
++	gatt_db_service_foreach(attrib, &included_service_uuid, func,
++								user_data);
++}
++
+ static bool find_service_for_handle(const void *data, const void *user_data)
+ {
+ 	const struct gatt_db_service *service = data;
+@@ -769,6 +911,113 @@ bool gatt_db_attribute_get_service_handles(struct gatt_db_attribute *attrib,
+ 	return true;
+ }
+ 
++bool gatt_db_attribute_get_service_data(struct gatt_db_attribute *attrib,
++							uint16_t *start_handle,
++							uint16_t *end_handle,
++							bool *primary,
++							bt_uuid_t *uuid)
++{
++	struct gatt_db_service *service;
++	struct gatt_db_attribute *decl;
++
++	if (!attrib)
++		return false;
++
++	service = attrib->service;
++	decl = service->attributes[0];
++
++	if (start_handle)
++		*start_handle = decl->handle;
++
++	if (end_handle)
++		*end_handle = decl->handle + service->num_handles - 1;
++
++	if (primary)
++		*primary = bt_uuid_cmp(&decl->uuid, &secondary_service_uuid);
++
++	if (!uuid)
++		return true;
++
++	/*
++	 * The service declaration attribute value is the 16 or 128 bit service
++	 * UUID.
++	 */
++	return le_to_uuid(decl->value, decl->value_len, uuid);
++}
++
++bool gatt_db_attribute_get_char_data(struct gatt_db_attribute *attrib,
++							uint16_t *handle,
++							uint16_t *value_handle,
++							uint8_t *properties,
++							bt_uuid_t *uuid)
++{
++	if (!attrib)
++		return false;
++
++	if (bt_uuid_cmp(&characteristic_uuid, &attrib->uuid))
++		return false;
++
++	/*
++	 * Characteristic declaration value:
++	 * 1 octet: Characteristic properties
++	 * 2 octets: Characteristic value handle
++	 * 2 or 16 octets: characteristic UUID
++	 */
++	if (!attrib->value || (attrib->value_len != 5 &&
++						attrib->value_len != 19))
++		return false;
++
++	if (handle)
++		*handle = attrib->handle;
++
++	if (properties)
++		*properties = attrib->value[0];
++
++	if (value_handle)
++		*value_handle = get_le16(attrib->value + 1);
++
++	if (!uuid)
++		return true;
++
++	return le_to_uuid(attrib->value + 3, attrib->value_len - 3, uuid);
++}
++
++bool gatt_db_attribute_get_incl_data(struct gatt_db_attribute *attrib,
++							uint16_t *handle,
++							uint16_t *start_handle,
++							uint16_t *end_handle)
++{
++	if (!attrib)
++		return false;
++
++	if (bt_uuid_cmp(&included_service_uuid, &attrib->uuid))
++		return false;
++
++	/*
++	 * Include definition value:
++	 * 2 octets: start handle of included service
++	 * 2 octets: end handle of included service
++	 * optional 2 octets: 16-bit Bluetooth UUID
++	 */
++	if (!attrib->value || attrib->value_len < 4 || attrib->value_len > 6)
++		return false;
++
++	/*
++	 * We only return the handles since the UUID can be easily obtained
++	 * from the corresponding attribute.
++	 */
++	if (handle)
++		*handle = attrib->handle;
++
++	if (start_handle)
++		*start_handle = get_le16(attrib->value);
++
++	if (end_handle)
++		*end_handle = get_le16(attrib->value + 2);
++
++	return true;
++}
++
+ bool gatt_db_attribute_get_permissions(struct gatt_db_attribute *attrib,
+ 							uint32_t *permissions)
+ {
+diff --git a/src/shared/gatt-db.h b/src/shared/gatt-db.h
+index 9c71814..c943ad2 100644
+--- a/src/shared/gatt-db.h
++++ b/src/shared/gatt-db.h
+@@ -89,6 +89,31 @@ void gatt_db_find_information(struct gatt_db *db, uint16_t start_handle,
+ 							struct queue *queue);
+ 
+ 
++typedef void (*gatt_db_foreach_t)(struct gatt_db_attribute *attrib,
++							void *user_data);
++void gatt_db_foreach_service(struct gatt_db *db, gatt_db_foreach_t func,
++							void *user_data);
++void gatt_db_foreach_service_in_range(struct gatt_db *db,
++							gatt_db_foreach_t func,
++							void *user_data,
++							uint16_t start_handle,
++							uint16_t end_handle);
++
++void gatt_db_service_foreach(struct gatt_db_attribute *attrib,
++							const bt_uuid_t *uuid,
++							gatt_db_foreach_t func,
++							void *user_data);
++void gatt_db_service_foreach_char(struct gatt_db_attribute *attrib,
++							gatt_db_foreach_t func,
++							void *user_data);
++void gatt_db_service_foreach_desc(struct gatt_db_attribute *attrib,
++							gatt_db_foreach_t func,
++							void *user_data);
++void gatt_db_service_foreach_incl(struct gatt_db_attribute *attrib,
++							gatt_db_foreach_t func,
++							void *user_data);
++
++
+ struct gatt_db_attribute *gatt_db_get_attribute(struct gatt_db *db,
+ 							uint16_t handle);
+ 
+@@ -103,6 +128,23 @@ bool gatt_db_attribute_get_service_handles(struct gatt_db_attribute *attrib,
+ 						uint16_t *start_handle,
+ 						uint16_t *end_handle);
+ 
++bool gatt_db_attribute_get_service_data(struct gatt_db_attribute *attrib,
++							uint16_t *start_handle,
++							uint16_t *end_handle,
++							bool *primary,
++							bt_uuid_t *uuid);
++
++bool gatt_db_attribute_get_char_data(struct gatt_db_attribute *attrib,
++							uint16_t *handle,
++							uint16_t *value_handle,
++							uint8_t *properties,
++							bt_uuid_t *uuid);
++
++bool gatt_db_attribute_get_incl_data(struct gatt_db_attribute *attrib,
++							uint16_t *handle,
++							uint16_t *start_handle,
++							uint16_t *end_handle);
++
+ bool gatt_db_attribute_get_permissions(struct gatt_db_attribute *attrib,
+ 							uint32_t *permissions);
+ 
 -- 
 2.2.0.rc0.207.ga3a616c
 
