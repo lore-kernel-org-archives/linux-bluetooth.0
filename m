@@ -1,56 +1,67 @@
 Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
-To: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/2] android/client: Add a2dp audio config callback
-Date: Thu, 27 Nov 2014 18:16:51 +0100
-Message-ID: <2687365.OAm2ReHCmt@uw000953>
-In-Reply-To: <1416818807-24433-1-git-send-email-jakub.tyszkowski@tieto.com>
-References: <1416818807-24433-1-git-send-email-jakub.tyszkowski@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+To: linux-bluetooth@vger.kernel.org
+Cc: Szymon Janc <szymon.janc@tieto.com>
+Subject: [PATCH 3/3] android/client: Add short option for printing version
+Date: Thu, 27 Nov 2014 18:04:40 +0100
+Message-Id: <1417107880-13118-3-git-send-email-szymon.janc@tieto.com>
+In-Reply-To: <1417107880-13118-1-git-send-email-szymon.janc@tieto.com>
+References: <1417107880-13118-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jakub,
+This makes haltest options consistent.
+---
+ android/client/haltest.c | 12 ++++--------
+ 1 file changed, 4 insertions(+), 8 deletions(-)
 
-On Monday 24 of November 2014 09:46:46 Jakub Tyszkowski wrote:
-> This is Android 5 API callback.
-> ---
->  android/client/if-av.c | 14 +++++++++++++-
->  1 file changed, 13 insertions(+), 1 deletion(-)
-> 
-> diff --git a/android/client/if-av.c b/android/client/if-av.c
-> index 8d1f69b..85c641b 100644
-> --- a/android/client/if-av.c
-> +++ b/android/client/if-av.c
-> @@ -50,10 +50,22 @@ static void audio_state(btav_audio_state_t state, bt_bdaddr_t *bd_addr)
->  					bt_bdaddr_t2str(bd_addr, last_addr));
->  }
->  
-> +#if ANDROID_VERSION >= PLATFORM_VER(5, 0, 0)
-> +static void audio_config(bt_bdaddr_t *bd_addr, uint32_t sample_rate,
-> +							uint8_t channel_count) {
-> +	haltest_info("%s: remote_addr=%s\n sample_rate=%d\n channel_count=%d\n",
-> +				__func__, bt_bdaddr_t2str(bd_addr, last_addr),
-> +				sample_rate, channel_count);
-> +}
-> +#endif
-> +
->  static btav_callbacks_t av_cbacks = {
->  	.size = sizeof(av_cbacks),
->  	.connection_state_cb = connection_state,
-> -	.audio_state_cb = audio_state
-> +	.audio_state_cb = audio_state,
-> +#if ANDROID_VERSION >= PLATFORM_VER(5, 0, 0)
-> +	.audio_config_cb = audio_config,
-> +#endif
->  };
->  
->  /* init */
-
-Both patches applied, thanks. 
-
+diff --git a/android/client/haltest.c b/android/client/haltest.c
+index 0eaa43d..d514122 100644
+--- a/android/client/haltest.c
++++ b/android/client/haltest.c
+@@ -338,14 +338,10 @@ static void usage(void)
+ 	printf("options:\n"
+ 		"\t-i  --ivi              Initialize only IVI interfaces\n"
+ 		"\t-n, --no-init          Don't initialize any interfaces\n"
+-		"\t    --version          Print version\n"
++		"\t-v  --version          Print version\n"
+ 		"\t-h, --help             Show help options\n");
+ }
+ 
+-enum {
+-	PRINT_VERSION = 1000
+-};
+-
+ static void print_version(void)
+ {
+ 	printf("haltest version %s\n", VERSION);
+@@ -355,7 +351,7 @@ static const struct option main_options[] = {
+ 	{ "no-init", no_argument, NULL, 'n' },
+ 	{ "ivi",     no_argument, NULL, 'i' },
+ 	{ "help",    no_argument, NULL, 'h' },
+-	{ "version", no_argument, NULL, PRINT_VERSION },
++	{ "version", no_argument, NULL, 'v' },
+ 	{ NULL }
+ };
+ 
+@@ -367,7 +363,7 @@ static void parse_command_line(int argc, char *argv[])
+ 	for (;;) {
+ 		int opt;
+ 
+-		opt = getopt_long(argc, argv, "inh", main_options, NULL);
++		opt = getopt_long(argc, argv, "inhv", main_options, NULL);
+ 		if (opt < 0)
+ 			break;
+ 
+@@ -381,7 +377,7 @@ static void parse_command_line(int argc, char *argv[])
+ 		case 'h':
+ 			usage();
+ 			exit(0);
+-		case PRINT_VERSION:
++		case 'v':
+ 			print_version();
+ 			exit(0);
+ 		default:
 -- 
-Best regards, 
-Szymon Janc
+1.9.1
+
