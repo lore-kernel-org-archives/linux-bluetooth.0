@@ -1,75 +1,29 @@
 Return-Path: <cyrus@holtmann.org>
-From: Sebastian Chlad <sebastian.chlad@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Sebastian Chlad <sebastian.chlad@tieto.com>
-Subject: [PATCH] android/pts: PTS tests for MPS on Android 5.0
-Date: Thu, 27 Nov 2014 17:05:58 +0100
-Message-Id: <1417104358-17992-1-git-send-email-sebastian.chlad@tieto.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+MIME-Version: 1.0
+References: <1416419951-27659-1-git-send-email-stevenrwalter@gmail.com>
+ <20141120113813.GA23288@t440s.lan> <80321467-10AB-489E-A47E-44B0ECEE4BE1@holtmann.org>
+ <CAK8d-aL+3eB4WZeqO1sv9p3440EVXQiqF6QiTU5YNAKAbZ7f-w@mail.gmail.com>
+ <CAK8d-a+MJBBLkU_=UQGKVmxnM-sYJ=pW7aj0XQ5aa5AuR2G_Wg@mail.gmail.com>
+ <50D951D4-0A99-4D77-814C-D80A209B3D4F@holtmann.org> <20141127101440.GA11656@t440s>
+From: Steven Walter <stevenrwalter@gmail.com>
+Date: Thu, 27 Nov 2014 15:06:36 +0000
+Message-ID: <CAK8d-aL8qZd21F73Tc2iOh=sAThvWzd+i3MnBJmYAv1xwuweFg@mail.gmail.com>
+Subject: Re: [PATCH v3] Bluetooth: automatically flushable packets aren't
+ allowed on LE links
+To: Marcel Holtmann <marcel@holtmann.org>, Steven Walter <stevenrwalter@gmail.com>,
+	"Gustavo F. Padovan" <gustavo@padovan.org>, BlueZ development <linux-bluetooth@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Content-Type: multipart/alternative; boundary=001a11c0d406a267720508d87dfb
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- android/pixit-mps.txt |  3 ++-
- android/pts-mps.txt   | 11 +++++++----
- 2 files changed, 9 insertions(+), 5 deletions(-)
+--001a11c0d406a267720508d87dfb
+Content-Type: text/plain; charset=UTF-8
 
-diff --git a/android/pixit-mps.txt b/android/pixit-mps.txt
-index 56f5122..462f683 100644
---- a/android/pixit-mps.txt
-+++ b/android/pixit-mps.txt
-@@ -5,6 +5,7 @@ PTS version: 5.3
- * - different than PTS defaults
- & - should be set to IUT Bluetooth address
- ^ - should be set accordingly
-+# - should be set according to the reported phone number's type
- 
- 		Required PIXIT settings
- -------------------------------------------------------------------------------
-@@ -34,7 +35,7 @@ TSPX_packet_type_sco					00A0
- TSPX_phone_number					1234567 (^)
- TSPX_phone_number_memory				1
- TSPX_phone_number_memory_invalid_index			9999
--TSPX_phone_number_type					129
-+TSPX_phone_number_type					145 (*#)
- TSPX_scan_all_memory_dial_locations			FALSE
- TSPX_second_phone_number				1234567 (^)
- TSPX_second_phone_type					129
-diff --git a/android/pts-mps.txt b/android/pts-mps.txt
-index 46d2510..4236a56 100644
---- a/android/pts-mps.txt
-+++ b/android/pts-mps.txt
-@@ -1,8 +1,8 @@
- PTS test results for MPS
- 
- PTS version: 5.3
--Tested: 20.10.2014
--Android version: 4.4.4
-+Tested: 27-November-2014
-+Android version: 5.0
- 
- Results:
- PASS	test passed
-@@ -11,6 +11,10 @@ INC	test is inconclusive
- N/A	test is disabled due to PICS setup
- NONE	test result is none
- 
-+Note: Do not use AOSP Music player. Use e.g. MortPlayer or Poweramp.
-+For full tests conformance, "Touch sounds" on IUT should be disbaled
-+(Settings > Sound&notification > Other sounds)
-+
- -------------------------------------------------------------------------------
- Test Name				Result	Notes
- -------------------------------------------------------------------------------
-@@ -46,8 +50,7 @@ TC_SRC_TG_HFAV_ACT_MD_BV_01_I		PASS
- TC_SRC_TG_HFAV_CLH_MD_BV_01_I		PASS
- TC_SRC_TG_HFAV_CLH_MD_BV_02_I		PASS
- TC_SRC_TG_HFAV_CLH_MD_BV_03_I		PASS
--TC_SRC_TG_HFAV_CLH_MD_BV_04_I		PASS	Do not use AOSP Music player.
--						Use e.g. MortPlayer or Poweramp
-+TC_SRC_TG_HFAV_CLH_MD_BV_04_I		PASS
- TC_SRC_TG_HFAV_CLH_MD_BV_05_I		PASS
- TC_SRC_TG_HFAV_CLH_MD_BV_06_I		PASS
- TC_PAIRING_HF_SNK_CT			N/A	Pairing helper for MD tests
--- 
-1.8.5.3
+Thanks!
 
+--001a11c0d406a267720508d87dfb
+Content-Type: text/html; charset=UTF-8
+
+<p dir="ltr">Thanks!</p>
+
+--001a11c0d406a267720508d87dfb--
