@@ -1,59 +1,62 @@
 Return-Path: <cyrus@holtmann.org>
+Message-ID: <5476D9C3.3040807@tieto.com>
+Date: Thu, 27 Nov 2014 08:58:59 +0100
+From: Tyszkowski Jakub <jakub.tyszkowski@tieto.com>
 MIME-Version: 1.0
-In-Reply-To: <1417026903-29469-1-git-send-email-rakesh.mk@samsung.com>
-References: <1417026903-29469-1-git-send-email-rakesh.mk@samsung.com>
-Date: Thu, 27 Nov 2014 09:44:29 +0100
-Message-ID: <CABBYNZK-SRe9bO+3Xmb2vdiJQd8qThAiZf9T6hD1nDgFLjoYgg@mail.gmail.com>
-Subject: Re: [PATCH] audio/avdtp: Session reset after linkloss
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Rakesh M K <rakesh.mk@samsung.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+To: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 4/4] android/gatt: Set proper MTU for BR/EDR link
+References: <1416991660-21828-1-git-send-email-jakub.tyszkowski@tieto.com> <1416991660-21828-4-git-send-email-jakub.tyszkowski@tieto.com> <20141126124412.GA9449@t440s.lan>
+In-Reply-To: <20141126124412.GA9449@t440s.lan>
+Content-Type: text/plain; charset=windows-1252; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Johan,
 
-On Wed, Nov 26, 2014 at 7:35 PM, Rakesh M K <rakesh.mk@samsung.com> wrote:
-> During link loss, previous AVDTP session is not freed due to wrong
-> session "ref" count. When ever the START_CMD received from the
-> remote headset, avdtp session ref count will be increased.
-> Because of this, new A2DP connection will fail.
-> This issue is handled with AVDTP session free in case of linkloss (EIO 5)
-> irrespective of ref count.
-> //If bluez receives START_CMD twice and ref count increased accordingly
-> Sep 19 13:54:46 localhost daemon.debug bluetoothd[661]: profiles/audio/avdtp.c:avdtp_parse_cmd() Received START_CMD
-> Sep 19 13:54:52 localhost daemon.debug bluetoothd[661]: profiles/audio/avdtp.c:avdtp_parse_cmd() Received START_CMD
-> //During session disconnection due to link loss, session is not freed.
-> Sep 19 13:54:59 localhost daemon.debug bluetoothd[661]: profiles/audio/avdtp.c:session_cb()
-> Sep 19 13:54:59 localhost daemon.debug bluetoothd[661]: profiles/audio/avdtp.c:connection_lost() Disconnected from 38:C0:96:29:74:23 with erro
-> //Since proevious session is not freed, new AVDTP connection request is refused.
-> Sep 19 13:55:18 localhost daemon.debug bluetoothd[661]: profiles/audio/avdtp.c:avdtp_confirm_cb() AVDTP: incoming connect from 38:C0:96:29:74:23
-> Sep 19 13:55:18 localhost daemon.err bluetoothd[661]: Refusing unexpected connect from 38:C0:96:29:74:23
-> ---
->  profiles/audio/avdtp.c |    2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+On 11/26/2014 01:44 PM, Johan Hedberg wrote:
+> Hi Jakub,
 >
-> diff --git a/profiles/audio/avdtp.c b/profiles/audio/avdtp.c
-> index ba5f0e5..b14e647 100644
-> --- a/profiles/audio/avdtp.c
-> +++ b/profiles/audio/avdtp.c
-> @@ -1157,7 +1157,7 @@ static void connection_lost(struct avdtp *session, int err)
+> On Wed, Nov 26, 2014, Jakub Tyszkowski wrote:
+>> Minimum mtu depends on transport layer and is larger for BREDR link.
+>> ---
+>>   android/gatt.c | 10 ++++++----
+>>   1 file changed, 6 insertions(+), 4 deletions(-)
+>>
+>> diff --git a/android/gatt.c b/android/gatt.c
+>> index b9b3c7b..95ddba0 100644
+>> --- a/android/gatt.c
+>> +++ b/android/gatt.c
+>> @@ -1439,7 +1439,7 @@ static void connect_cb(GIOChannel *io, GError *gerr, gpointer user_data)
+>>   	uint32_t status;
+>>   	GAttrib *attrib;
+>>   	uint16_t mtu;
+>> -	uint16_t cid;
+>> +	uint8_t dst_type;
+>>
+>>   	if (dev->state != DEVICE_CONNECT_READY) {
+>>   		error("gatt: Device not in a connecting state!?");
+>> @@ -1459,9 +1459,11 @@ static void connect_cb(GIOChannel *io, GError *gerr, gpointer user_data)
+>>   		goto reply;
+>>   	}
+>>
+>> -	if (!bt_io_get(io, &gerr, BT_IO_OPT_IMTU, &mtu, BT_IO_OPT_CID, &cid,
+>> -				BT_IO_OPT_INVALID) || cid == ATT_CID)
+>> -		mtu = ATT_DEFAULT_LE_MTU;
+>> +	mtu = ATT_DEFAULT_LE_MTU;
+>> +
+>> +	if (bt_io_get(io, &gerr, BT_IO_OPT_DEST_TYPE, &dst_type,
+>> +			BT_IO_OPT_INVALID) && (dst_type == BDADDR_BREDR))
+>> +		mtu = ATT_DEFAULT_L2CAP_MTU;
+>>
+>>   	attrib = g_attrib_new(io, mtu);
+>>   	if (!attrib) {
 >
->         avdtp_set_state(session, AVDTP_SESSION_STATE_DISCONNECTED);
->
-> -       if (session->ref > 0)
-> +       if (err != EIO && session->ref > 0) /* link loss*/
->                 return;
->
->         server->sessions = g_slist_remove(server->sessions, session);
-> --
-> 1.7.9.5
+> Isn't this a kernel or BtIO bug if we get the wrong MTU from bt_io_get?
 
-We need to find and fix the extra reference then, otherwise we may
-free the session while someone is holding the pointer which may lead
-to a crash.
+I guess You are right that something is wrong with this patch. I'll take 
+a look at this again. The issue I had might have already been fixed 
+somewhere else by other patches. Please ignore this one.
 
+Regards,
+Jakub
 
--- 
-Luiz Augusto von Dentz
