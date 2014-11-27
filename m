@@ -1,108 +1,55 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 27 Nov 2014 12:36:06 +0200
+Date: Thu, 27 Nov 2014 12:14:40 +0200
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: linville@tuxdriver.com
-Cc: linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: pull request: bluetooth-next 2014-11-27
-Message-ID: <20141127103606.GA11964@t440s>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: Steven Walter <stevenrwalter@gmail.com>,
+	"Gustavo F. Padovan" <gustavo@padovan.org>,
+	BlueZ development <linux-bluetooth@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v3] Bluetooth: automatically flushable packets aren't
+ allowed on LE links
+Message-ID: <20141127101440.GA11656@t440s>
+References: <1416419951-27659-1-git-send-email-stevenrwalter@gmail.com>
+ <20141120113813.GA23288@t440s.lan>
+ <80321467-10AB-489E-A47E-44B0ECEE4BE1@holtmann.org>
+ <CAK8d-aL+3eB4WZeqO1sv9p3440EVXQiqF6QiTU5YNAKAbZ7f-w@mail.gmail.com>
+ <CAK8d-a+MJBBLkU_=UQGKVmxnM-sYJ=pW7aj0XQ5aa5AuR2G_Wg@mail.gmail.com>
+ <50D951D4-0A99-4D77-814C-D80A209B3D4F@holtmann.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="W/nzBZO5zC0uMSeA"
-Sender: linux-kernel-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <50D951D4-0A99-4D77-814C-D80A209B3D4F@holtmann.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Hi Marcel,
 
---W/nzBZO5zC0uMSeA
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+On Wed, Nov 26, 2014, Marcel Holtmann wrote:
+> >>>> I think Marcel was after just providing a clarifying code comment in
+> >>>> both places - having two branches of an if-statement doing exactly the
+> >>>> same thing looks a bit weird to me. To make thins completely clear I'd
+> >>>> suggest adding a simple helper function that you can call from both
+> >>>> places to get the needed flags, something like the following:
+> >>> 
+> >>> I am actually fine with just adding a comment explaining the complex if
+> >>> statement on why it is correct. It is just a helper for everybody to
+> >>> understand what and why it is done that way.
+> >> 
+> >> 
+> >> Is the comment I added sufficient, or should I add one for the other if
+> >> condition as well?  To me, the second condition is pretty straightforward:
+> >> if the caller requested it and the hardware supports it, use NO_FLUSH.  The
+> >> relationship between FLUSH/NO_FLUSH and low-energy is much less clear and
+> >> more justifies a comment, in my opinion.
+> > 
+> > Did a miss a reply to this?  How would you like the next iteration of
+> > the patch to look?
+> 
+> can you just send a v4 and I have a look at it. I thing it is best to
+> keep the original patch with the rather complicated if statement you
+> had. And then add a comment in front of it, why it is that way and
+> that it is correct this way.
 
-Hi John,
-
-Here's one more bluetooth-next pull request for 3.19:
-
- - Minor cleanups for ieee802154 & mac802154
- - Fix for the kernel warning with !TASK_RUNNING reported by Kirill A.
-   Shutemov
- - Support for another ath3k device
- - Fix for tracking link key based security level
- - Device tree bindings for btmrvl + a state update fix
- - Fix for wrong ACL flags on LE links
-
-Please let me know if there are any issues pulling. Thanks.
+Since this is moving way too slow for such a trivial patch I went ahead
+and added the necessary comments myself and pushed the patch upstream
+(to bluetooth-next). So no need to send new revisions of this one.
 
 Johan
-
----
-The following changes since commit a86c02ea38c53b695209b1181f9e2e18d73eb4e8:
-
-  Bluetooth: Add support for Broadcom BCM20702A1 variant (2014-11-18 08:32:14 +0100)
-
-are available in the git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git for-upstream
-
-for you to fetch changes up to f6af675ef5489c69fc3d4faf8c6f477df3cbf8b9:
-
-  Bluetooth: Automatically flushable packets aren't allowed on LE links (2014-11-27 12:12:27 +0200)
-
-----------------------------------------------------------------
-Amitkumar Karwar (3):
-      Bluetooth: btmrvl: add DT bindings documentation
-      Bluetooth: btmrvl: add DT-bindings for gpio-gap
-      Bluetooth: btmrvl: update hs_state in interrupt handler
-
-Dmitry Tunin (1):
-      Bluetooth: ath3k: Add support of MCI 13d3:3408 bt device
-
-Johan Hedberg (3):
-      Bluetooth: Fix setting state back to TASK_RUNNING
-      Bluetooth: Fix setting conn->pending_sec_level value from link key
-      Bluetooth: Convert link keys list to use RCU
-
-Steven Walter (1):
-      Bluetooth: Automatically flushable packets aren't allowed on LE links
-
-Varka Bhadram (2):
-      ieee802154: fix spelling mistakes
-      mac802154: remove unnecessary if statement
-
- Documentation/devicetree/bindings/btmrvl.txt | 29 +++++++++++++++
- drivers/bluetooth/ath3k.c                    |  2 +
- drivers/bluetooth/btmrvl_main.c              | 51 +++++++++++++++-----------
- drivers/bluetooth/btusb.c                    |  1 +
- include/net/bluetooth/hci_core.h             |  1 +
- net/bluetooth/hci_core.c                     | 39 ++++++++++----------
- net/bluetooth/hci_event.c                    | 51 +++++++++++++++++++++-----
- net/bluetooth/l2cap_core.c                   | 14 +++++--
- net/ieee802154/6lowpan_rtnl.c                |  2 +-
- net/ieee802154/netlink.c                     |  2 +-
- net/ieee802154/nl-mac.c                      |  2 +-
- net/ieee802154/nl-phy.c                      |  2 +-
- net/mac802154/iface.c                        |  8 ++--
- 13 files changed, 143 insertions(+), 61 deletions(-)
- create mode 100644 Documentation/devicetree/bindings/btmrvl.txt
-
-
---W/nzBZO5zC0uMSeA
-Content-Type: application/pgp-signature
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1
-
-iQIcBAEBAgAGBQJUdv6WAAoJECQj9vv5qNQSPXQP/jckknbn5iFKfmmIGQ30cGZ2
-204iVLAt80f8s7k6Vv6+AJHq8P75vvuRjaNrIoOV5c9Liwax6jOEiuYNIIg5ln5e
-YqvrrB6fa5MmIVcbooWcs8zLVOEllOmZ7ThB+CmEPj2GDPqlXXgiB3JiNiyxuLwS
-jANFkMGuizt7tEW1V0/s+tjRTaxqERx2aWk8e1wXiP6XApFvlUJvU0vTZ6qArQ+9
-rh+au7+Zcjb/72e4akhAuL/rbhQS/7H1shVyGnzxRJxlGFNrAp1gDh3mJgMlFtmJ
-WHv5AfoNBoYjTnqRuSQEfhbD8tjS/0v1yK0v4KI42efdr/gkzINuRZRH+HqAXP6E
-thgmBfsL4jh/cu56bgux06tTJ91IWoJL+TujT5hEKOE0SqSCjB7gfyWjYz3/01Gf
-OMHcuwlWyo/bEZuuf/KxDNgw/6dMeK6COu61hf0gi++Fo+i0O32QWL1K/Zrr300x
-DtTHT2LPmjCbk06E0T55G8ezme6dsTZKIvU7Rb45V/FDR4kmf891J/gEn44WMPdk
-HBEDb5mblHyIRc48BysY6FkaDMF8Yq0QIqVU+1x0EyEbds4w0M7YYKxw+73Fycxu
-LzRWu3/N+jLlRGIuX1OQMJ3j2x0h+skoDpbTLc9IR9LW/ELb2OjjBj/JdQ5dUqsw
-C70ymmKUNL4RCue+D1Ws
-=rjl9
------END PGP SIGNATURE-----
-
---W/nzBZO5zC0uMSeA--
