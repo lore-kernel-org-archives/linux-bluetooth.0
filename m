@@ -1,142 +1,75 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
+From: Sebastian Chlad <sebastian.chlad@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH 2/3] android/client: Add option to initialize only IVI roles
-Date: Thu, 27 Nov 2014 18:04:39 +0100
-Message-Id: <1417107880-13118-2-git-send-email-szymon.janc@tieto.com>
-In-Reply-To: <1417107880-13118-1-git-send-email-szymon.janc@tieto.com>
-References: <1417107880-13118-1-git-send-email-szymon.janc@tieto.com>
+Cc: Sebastian Chlad <sebastian.chlad@tieto.com>
+Subject: [PATCH] android/pts: PTS tests for MPS on Android 5.0
+Date: Thu, 27 Nov 2014 17:05:58 +0100
+Message-Id: <1417104358-17992-1-git-send-email-sebastian.chlad@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This adds 'ivi' option for haltest. With this option only IVI roles
-will be initialized. Running haltest without options will initialize
-only non-ivi roles.
 ---
- android/client/haltest.c | 59 +++++++++++++++++++++++++++++++-----------------
- 1 file changed, 38 insertions(+), 21 deletions(-)
+ android/pixit-mps.txt |  3 ++-
+ android/pts-mps.txt   | 11 +++++++----
+ 2 files changed, 9 insertions(+), 5 deletions(-)
 
-diff --git a/android/client/haltest.c b/android/client/haltest.c
-index add1978..0eaa43d 100644
---- a/android/client/haltest.c
-+++ b/android/client/haltest.c
-@@ -336,7 +336,8 @@ static void usage(void)
- 		"Usage:\n");
- 	printf("\thaltest [options]\n");
- 	printf("options:\n"
--		"\t-n, --no-init          Don't call init for interfaces\n"
-+		"\t-i  --ivi              Initialize only IVI interfaces\n"
-+		"\t-n, --no-init          Don't initialize any interfaces\n"
- 		"\t    --version          Print version\n"
- 		"\t-h, --help             Show help options\n");
- }
-@@ -352,19 +353,21 @@ static void print_version(void)
+diff --git a/android/pixit-mps.txt b/android/pixit-mps.txt
+index 56f5122..462f683 100644
+--- a/android/pixit-mps.txt
++++ b/android/pixit-mps.txt
+@@ -5,6 +5,7 @@ PTS version: 5.3
+ * - different than PTS defaults
+ & - should be set to IUT Bluetooth address
+ ^ - should be set accordingly
++# - should be set according to the reported phone number's type
  
- static const struct option main_options[] = {
- 	{ "no-init", no_argument, NULL, 'n' },
-+	{ "ivi",     no_argument, NULL, 'i' },
- 	{ "help",    no_argument, NULL, 'h' },
- 	{ "version", no_argument, NULL, PRINT_VERSION },
- 	{ NULL }
- };
+ 		Required PIXIT settings
+ -------------------------------------------------------------------------------
+@@ -34,7 +35,7 @@ TSPX_packet_type_sco					00A0
+ TSPX_phone_number					1234567 (^)
+ TSPX_phone_number_memory				1
+ TSPX_phone_number_memory_invalid_index			9999
+-TSPX_phone_number_type					129
++TSPX_phone_number_type					145 (*#)
+ TSPX_scan_all_memory_dial_locations			FALSE
+ TSPX_second_phone_number				1234567 (^)
+ TSPX_second_phone_type					129
+diff --git a/android/pts-mps.txt b/android/pts-mps.txt
+index 46d2510..4236a56 100644
+--- a/android/pts-mps.txt
++++ b/android/pts-mps.txt
+@@ -1,8 +1,8 @@
+ PTS test results for MPS
  
- static bool no_init = false;
-+static bool ivi_only = false;
+ PTS version: 5.3
+-Tested: 20.10.2014
+-Android version: 4.4.4
++Tested: 27-November-2014
++Android version: 5.0
  
- static void parse_command_line(int argc, char *argv[])
- {
- 	for (;;) {
- 		int opt;
+ Results:
+ PASS	test passed
+@@ -11,6 +11,10 @@ INC	test is inconclusive
+ N/A	test is disabled due to PICS setup
+ NONE	test result is none
  
--		opt = getopt_long(argc, argv, "nh", main_options, NULL);
-+		opt = getopt_long(argc, argv, "inh", main_options, NULL);
- 		if (opt < 0)
- 			break;
- 
-@@ -372,6 +375,9 @@ static void parse_command_line(int argc, char *argv[])
- 		case 'n':
- 			no_init = true;
- 			break;
-+		case 'i':
-+			ivi_only = true;
-+			break;
- 		case 'h':
- 			usage();
- 			exit(0);
-@@ -386,23 +392,29 @@ static void parse_command_line(int argc, char *argv[])
- 	}
- }
- 
--static void init(void)
--{
--	static const char * const inames[] = {
--		BT_PROFILE_HANDSFREE_ID,
--		BT_PROFILE_ADVANCED_AUDIO_ID,
--		BT_PROFILE_AV_RC_ID,
--		BT_PROFILE_HEALTH_ID,
--		BT_PROFILE_HIDHOST_ID,
--		BT_PROFILE_PAN_ID,
--		BT_PROFILE_GATT_ID,
--		BT_PROFILE_SOCKETS_ID,
-+static const char * const interface_names[] = {
-+	BT_PROFILE_HANDSFREE_ID,
-+	BT_PROFILE_ADVANCED_AUDIO_ID,
-+	BT_PROFILE_AV_RC_ID,
-+	BT_PROFILE_HEALTH_ID,
-+	BT_PROFILE_HIDHOST_ID,
-+	BT_PROFILE_PAN_ID,
-+	BT_PROFILE_GATT_ID,
-+	BT_PROFILE_SOCKETS_ID,
-+	NULL
-+};
++Note: Do not use AOSP Music player. Use e.g. MortPlayer or Poweramp.
++For full tests conformance, "Touch sounds" on IUT should be disbaled
++(Settings > Sound&notification > Other sounds)
 +
-+static const char * const ivi_interface_inames[] = {
- #if ANDROID_VERSION >= PLATFORM_VER(5, 0, 0)
--		BT_PROFILE_HANDSFREE_CLIENT_ID,
--		BT_PROFILE_MAP_CLIENT_ID,
--		BT_PROFILE_AV_RC_CTRL_ID,
-+	BT_PROFILE_HANDSFREE_CLIENT_ID,
-+	BT_PROFILE_MAP_CLIENT_ID,
-+	BT_PROFILE_AV_RC_CTRL_ID,
- #endif
--	};
-+	NULL
-+};
-+
-+static void init(const char * const *inames)
-+{
- 	const struct method *m;
- 	const char *argv[4];
- 	char init_audio[] = "audio init";
-@@ -416,9 +428,10 @@ static void init(void)
- 
- 	m = get_interface_method("bluetooth", "get_profile_interface");
- 
--	for (i = 0; i < NELEM(inames); ++i) {
--		argv[2] = inames[i];
-+	while (*inames) {
-+		argv[2] = *inames;
- 		m->func(3, argv);
-+		inames++;
- 	}
- 
- 	/* Init what is available to init */
-@@ -437,8 +450,12 @@ int main(int argc, char **argv)
- 
- 	terminal_setup();
- 
--	if (!no_init)
--		init();
-+	if (!no_init) {
-+		if (ivi_only)
-+			init(ivi_interface_inames);
-+		else
-+			init(interface_names);
-+	}
- 
- 	history_restore(".haltest_history");
- 
+ -------------------------------------------------------------------------------
+ Test Name				Result	Notes
+ -------------------------------------------------------------------------------
+@@ -46,8 +50,7 @@ TC_SRC_TG_HFAV_ACT_MD_BV_01_I		PASS
+ TC_SRC_TG_HFAV_CLH_MD_BV_01_I		PASS
+ TC_SRC_TG_HFAV_CLH_MD_BV_02_I		PASS
+ TC_SRC_TG_HFAV_CLH_MD_BV_03_I		PASS
+-TC_SRC_TG_HFAV_CLH_MD_BV_04_I		PASS	Do not use AOSP Music player.
+-						Use e.g. MortPlayer or Poweramp
++TC_SRC_TG_HFAV_CLH_MD_BV_04_I		PASS
+ TC_SRC_TG_HFAV_CLH_MD_BV_05_I		PASS
+ TC_SRC_TG_HFAV_CLH_MD_BV_06_I		PASS
+ TC_PAIRING_HF_SNK_CT			N/A	Pairing helper for MD tests
 -- 
-1.9.1
+1.8.5.3
 
