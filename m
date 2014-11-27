@@ -1,162 +1,157 @@
 Return-Path: <cyrus@holtmann.org>
-From: Jakub Pawlowski <jpawlowski@google.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Jakub Pawlowski <jpawlowski@google.com>
-Subject: [PATCH v12 1/3] Bluetooth: add le_scan_restart
-Date: Thu, 27 Nov 2014 23:53:01 -0800
-Message-Id: <1417161184-17663-1-git-send-email-jpawlowski@google.com>
+From: Szymon Janc <szymon.janc@gmail.com>
+To: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 3/5] android/handsfree-client: Implement audio connect/disconnect
+Date: Thu, 27 Nov 2014 21:51:12 +0100
+Message-ID: <101224339.xf6gZFyOGS@athlon>
+In-Reply-To: <1416912448-28177-4-git-send-email-lukasz.rymanowski@tieto.com>
+References: <1416912448-28177-1-git-send-email-lukasz.rymanowski@tieto.com> <1416912448-28177-4-git-send-email-lukasz.rymanowski@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Currently there is no way to restart le scan. It's needed in
-preparation for new service scan method. The way it work: it disable,
-and then enable le scan on controller. During this restart special flag
-is set to make sure we won't remove disable scan work from workqueue.
+Hi Łukasz,
 
-Signed-off-by: Jakub Pawlowski <jpawlowski@google.com>
----
- include/net/bluetooth/hci_core.h | 10 ++++++++++
- net/bluetooth/hci_core.c         | 42 ++++++++++++++++++++++++++++++++++++++++
- net/bluetooth/hci_event.c        |  9 ++++++---
- 3 files changed, 58 insertions(+), 3 deletions(-)
+On Tuesday 25 November 2014 11:47:26 Lukasz Rymanowski wrote:
+> In this patch also set_audio_state function has been moved
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 396c098..dad62f4 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -56,6 +56,13 @@ struct inquiry_entry {
- 	struct inquiry_data	data;
- };
- 
-+/* BR/EDR and/or LE discovery state flags: the flags defined here should
-+ * represent state of discovery
-+ */
-+enum {
-+	HCI_LE_SCAN_RESTARTING,
-+};
-+
- struct discovery_state {
- 	int			type;
- 	enum {
-@@ -75,6 +82,7 @@ struct discovery_state {
- 	u32			last_adv_flags;
- 	u8			last_adv_data[HCI_MAX_AD_LENGTH];
- 	u8			last_adv_data_len;
-+	unsigned long		flags;
- };
- 
- struct hci_conn_hash {
-@@ -337,6 +345,7 @@ struct hci_dev {
- 	unsigned long		dev_flags;
- 
- 	struct delayed_work	le_scan_disable;
-+	struct delayed_work	le_scan_restart;
- 
- 	__s8			adv_tx_power;
- 	__u8			adv_data[HCI_MAX_AD_LENGTH];
-@@ -1326,6 +1335,7 @@ void hci_sock_dev_event(struct hci_dev *hdev, int event);
- #define DISCOV_INTERLEAVED_TIMEOUT	5120	/* msec */
- #define DISCOV_INTERLEAVED_INQUIRY_LEN	0x04
- #define DISCOV_BREDR_INQUIRY_LEN	0x08
-+#define DISCOV_LE_RESTART_DELAY		300	/* msec */
- 
- int mgmt_control(struct sock *sk, struct msghdr *msg, size_t len);
- int mgmt_new_settings(struct hci_dev *hdev);
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 5c319a4..2c74d21 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -2557,6 +2557,7 @@ static int hci_dev_do_close(struct hci_dev *hdev)
- 		cancel_delayed_work(&hdev->service_cache);
- 
- 	cancel_delayed_work_sync(&hdev->le_scan_disable);
-+	cancel_delayed_work_sync(&hdev->le_scan_restart);
- 
- 	if (test_bit(HCI_MGMT, &hdev->dev_flags))
- 		cancel_delayed_work_sync(&hdev->rpa_expired);
-@@ -3851,6 +3852,8 @@ static void le_scan_disable_work(struct work_struct *work)
- 
- 	BT_DBG("%s", hdev->name);
- 
-+	cancel_delayed_work_sync(&hdev->le_scan_restart);
-+
- 	hci_req_init(&req, hdev);
- 
- 	hci_req_add_le_scan_disable(&req);
-@@ -3860,6 +3863,44 @@ static void le_scan_disable_work(struct work_struct *work)
- 		BT_ERR("Disable LE scanning request failed: err %d", err);
- }
- 
-+static void le_scan_restart_work_complete(struct hci_dev *hdev, u8 status)
-+{
-+	clear_bit(HCI_LE_SCAN_RESTARTING, &hdev->discovery.flags);
-+
-+	if (status)
-+		BT_ERR("Failed to restart LE scan: status %d", status);
-+}
-+
-+static void le_scan_restart_work(struct work_struct *work)
-+{
-+	struct hci_dev *hdev = container_of(work, struct hci_dev,
-+					    le_scan_restart.work);
-+	struct hci_request req;
-+	struct hci_cp_le_set_scan_enable cp;
-+	int err;
-+
-+	BT_DBG("%s", hdev->name);
-+
-+	/* If controller is not scanning we are done. */
-+	if (!test_bit(HCI_LE_SCAN, &hdev->dev_flags))
-+		return;
-+
-+	hci_req_init(&req, hdev);
-+
-+	hci_req_add_le_scan_disable(&req);
-+
-+	memset(&cp, 0, sizeof(cp));
-+	cp.enable = LE_SCAN_ENABLE;
-+	cp.filter_dup = LE_SCAN_FILTER_DUP_ENABLE;
-+	hci_req_add(&req, HCI_OP_LE_SET_SCAN_ENABLE, sizeof(cp), &cp);
-+
-+	set_bit(HCI_LE_SCAN_RESTARTING, &hdev->discovery.flags);
-+
-+	err = hci_req_run(&req, le_scan_restart_work_complete);
-+	if (err)
-+		BT_ERR("Restart LE scan request failed: err %d", err);
-+}
-+
- static void set_random_addr(struct hci_request *req, bdaddr_t *rpa)
- {
- 	struct hci_dev *hdev = req->hdev;
-@@ -4037,6 +4078,7 @@ struct hci_dev *hci_alloc_dev(void)
- 	INIT_DELAYED_WORK(&hdev->power_off, hci_power_off);
- 	INIT_DELAYED_WORK(&hdev->discov_off, hci_discov_off);
- 	INIT_DELAYED_WORK(&hdev->le_scan_disable, le_scan_disable_work);
-+	INIT_DELAYED_WORK(&hdev->le_scan_restart, le_scan_restart_work);
- 
- 	skb_queue_head_init(&hdev->rx_q);
- 	skb_queue_head_init(&hdev->cmd_q);
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index bd0a801..ee19656 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -1157,10 +1157,13 @@ static void hci_cc_le_set_scan_enable(struct hci_dev *hdev,
- 					  d->last_adv_data_len, NULL, 0);
- 		}
- 
--		/* Cancel this timer so that we don't try to disable scanning
--		 * when it's already disabled.
-+		/* If HCI_LE_SCAN_RESTARTING is set, don't cancel this timer,
-+		 * because we're just restarting scan. Otherwise cancel it so
-+		 * that we don't try to disable scanning when it's already
-+		 * disabled.
- 		 */
--		cancel_delayed_work(&hdev->le_scan_disable);
-+		if (!test_bit(HCI_LE_SCAN_RESTARTING, &hdev->discovery.flags))
-+			cancel_delayed_work(&hdev->le_scan_disable);
- 
- 		clear_bit(HCI_LE_SCAN, &hdev->dev_flags);
- 
+One more thing: set_audio_state() was introduced in PATCH 2/5. Why not put it 
+in right place from beginning?
+
+> ---
+>  android/handsfree-client.c | 100
+> +++++++++++++++++++++++++++++++++------------ 1 file changed, 75
+> insertions(+), 25 deletions(-)
+> 
+> diff --git a/android/handsfree-client.c b/android/handsfree-client.c
+> index 432b9a1..4118b7e 100644
+> --- a/android/handsfree-client.c
+> +++ b/android/handsfree-client.c
+> @@ -292,19 +292,89 @@ done:
+>  			HAL_OP_HF_CLIENT_DISCONNECT, status);
+>  }
+> 
+> +static bool connect_sco(struct device *dev)
+> +{
+> +	/* TODO: handle codec negotiation */
+> +
+> +	return bt_sco_connect(sco, &dev->bdaddr, 0);
+> +}
+> +
+> +static void set_audio_state(struct device *dev, uint8_t state)
+> +{
+> +	struct hal_ev_hf_client_audio_state ev;
+> +	char address[18];
+> +
+> +	if (dev->audio_state == state)
+> +		return;
+> +
+> +	dev->audio_state = state;
+> +
+> +	ba2str(&dev->bdaddr, address);
+> +	DBG("device %s audio state %u", address, state);
+> +
+> +	bdaddr2android(&dev->bdaddr, ev.bdaddr);
+> +	ev.state = state;
+> +
+> +	ipc_send_notif(hal_ipc, HAL_SERVICE_ID_HANDSFREE_CLIENT,
+> +				HAL_EV_HF_CLIENT_AUDIO_STATE, sizeof(ev), &ev);
+> +}
+> +
+>  static void handle_connect_audio(const void *buf, uint16_t len)
+>  {
+> -	DBG("Not Implemented");
+> +	const struct hal_cmd_hf_client_connect_audio *cmd = (void *) buf;
+> +	struct device *dev;
+> +	uint8_t status;
+> +	bdaddr_t bdaddr;
+> +
+> +	DBG("");
+> +
+> +	android2bdaddr(&cmd->bdaddr, &bdaddr);
+> +
+> +	dev = find_device(&bdaddr);
+> +	if (!dev || dev->state != HAL_HF_CLIENT_CONN_STATE_SLC_CONNECTED ||
+> +		dev->audio_state != HAL_HF_CLIENT_AUDIO_STATE_DISCONNECTED) {
+> +		error("hf-client: Cannot create SCO, check SLC or audio state");
+> +		status = HAL_STATUS_FAILED;
+> +		goto done;
+> +	}
+> +
+> +	if (connect_sco(dev)) {
+> +		status = HAL_STATUS_SUCCESS;
+> +		set_audio_state(dev, HAL_HF_CLIENT_AUDIO_STATE_CONNECTING);
+> +	} else {
+> +		status = HAL_STATUS_FAILED;
+> +	}
+> +
+> +done:
+>  	ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_HANDSFREE_CLIENT,
+> -			HAL_OP_HF_CLIENT_CONNECT_AUDIO, HAL_STATUS_UNSUPPORTED);
+> +					HAL_OP_HF_CLIENT_CONNECT_AUDIO, status);
+>  }
+> 
+>  static void handle_disconnect_audio(const void *buf, uint16_t len)
+>  {
+> -	DBG("Not Implemented");
+> +	const struct hal_cmd_hf_client_disconnect_audio *cmd = (void *) buf;
+> +	struct device *dev;
+> +	uint8_t status;
+> +	bdaddr_t bdaddr;
+> +
+> +	DBG("");
+> +
+> +	android2bdaddr(&cmd->bdaddr, &bdaddr);
+> +
+> +	dev = find_device(&bdaddr);
+> +	if (!dev ||
+> +		dev->audio_state == HAL_HF_CLIENT_AUDIO_STATE_DISCONNECTED) {
+> +		error("hf-client: Device not found or audio not connected");
+> +		status = HAL_STATUS_FAILED;
+> +		goto done;
+> +	}
+> +
+> +	bt_sco_disconnect(sco);
+> +	status = HAL_STATUS_SUCCESS;
+> +
+> +done:
+>  	ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_HANDSFREE_CLIENT,
+> -					HAL_OP_HF_CLIENT_DISCONNECT_AUDIO,
+> -					HAL_STATUS_UNSUPPORTED);
+> +				HAL_OP_HF_CLIENT_DISCONNECT_AUDIO, status);
+>  }
+> 
+>  static void cmd_complete_cb(enum hfp_result result, enum hfp_error cme_err,
+> @@ -2011,26 +2081,6 @@ static void cleanup_hfp_hf(void)
+>  	}
+>  }
+> 
+> -static void set_audio_state(struct device *dev, uint8_t state)
+> -{
+> -	struct hal_ev_hf_client_audio_state ev;
+> -	char address[18];
+> -
+> -	if (dev->audio_state == state)
+> -		return;
+> -
+> -	dev->audio_state = state;
+> -
+> -	ba2str(&dev->bdaddr, address);
+> -	DBG("device %s audio state %u", address, state);
+> -
+> -	bdaddr2android(&dev->bdaddr, ev.bdaddr);
+> -	ev.state = state;
+> -
+> -	ipc_send_notif(hal_ipc, HAL_SERVICE_ID_HANDSFREE_CLIENT,
+> -				HAL_EV_HF_CLIENT_AUDIO_STATE, sizeof(ev), &ev);
+> -}
+> -
+>  static bool confirm_sco_cb(const bdaddr_t *addr, uint16_t *voice_settings)
+>  {
+>  	struct device *dev;
+
 -- 
-2.1.0
-
+Szymon K. Janc
+szymon.janc@gmail.com
