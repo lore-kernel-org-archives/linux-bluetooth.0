@@ -1,62 +1,35 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <5476D9C3.3040807@tieto.com>
-Date: Thu, 27 Nov 2014 08:58:59 +0100
-From: Tyszkowski Jakub <jakub.tyszkowski@tieto.com>
-MIME-Version: 1.0
-To: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 4/4] android/gatt: Set proper MTU for BR/EDR link
-References: <1416991660-21828-1-git-send-email-jakub.tyszkowski@tieto.com> <1416991660-21828-4-git-send-email-jakub.tyszkowski@tieto.com> <20141126124412.GA9449@t440s.lan>
-In-Reply-To: <20141126124412.GA9449@t440s.lan>
-Content-Type: text/plain; charset=windows-1252; format=flowed
+Date: Thu, 27 Nov 2014 04:27:55 +0000 (GMT)
+From: Sagar Nageshmurthy <s.nageshmurt@samsung.com>
+Subject: Re: [PATCH 1/1] audio/media: Parse total number of tracks metadata
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Reply-to: s.nageshmurt@samsung.com
+MIME-version: 1.0
+Content-type: text/plain; charset=windows-1252
+MIME-version: 1.0
+Message-id: <1635996696.223531417062475849.JavaMail.weblogic@epmlwas06b>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+UElORyAhDQoNCi0tLS0tLS0gT3JpZ2luYWwgTWVzc2FnZSAtLS0tLS0tDQpTZW5kZXIgOiBTYWdh
+ciBOYWdlc2htdXJ0aHk8cy5uYWdlc2htdXJ0QHNhbXN1bmcuY29tPiBTZW5pb3IgU29mdHdhcmUg
+RW5naW5lZXIvU1JJLUJhbmdhbG9yZS1TeXN0ZW0gJiBDb25uZWN0aXZpdHkvU2Ftc3VuZyBFbGVj
+dHJvbmljcw0KRGF0ZSA6IE5vdiAyMSwgMjAxNCAxMTowOSAoR01UKzA1OjMwKQ0KVGl0bGUgOiBb
+UEFUQ0ggMS8xXSBhdWRpby9tZWRpYTogUGFyc2UgdG90YWwgbnVtYmVyIG9mIHRyYWNrcyBtZXRh
+ZGF0YQ0KDQpGcm9tOiBTYWdhciBOYWdlc2htdXJ0aHkgDQoNCkN1cnJlbnRseSBCbHVleiBpZ25v
+cmVzIE51bWJlck9mVHJhY2tzIG1ldGFkYXRhLiBIZW5jZSBwYXJzZSB0b3RhbFRyYWNrcw0Ka2V5
+IHRvIHVwZGF0ZSBOdW1iZXJPZlRyYWNrcyBpbmZvLg0KLS0tDQpwcm9maWxlcy9hdWRpby9tZWRp
+YS5jIHwgICAgMyArKysNCjEgZmlsZSBjaGFuZ2VkLCAzIGluc2VydGlvbnMoKykNCg0KZGlmZiAt
+LWdpdCBhL3Byb2ZpbGVzL2F1ZGlvL21lZGlhLmMgYi9wcm9maWxlcy9hdWRpby9tZWRpYS5jDQpp
+bmRleCBlZjdiOTEwLi42NmI3NWIzIDEwMDY0NA0KLS0tIGEvcHJvZmlsZXMvYXVkaW8vbWVkaWEu
+Yw0KKysrIGIvcHJvZmlsZXMvYXVkaW8vbWVkaWEuYw0KQEAgLTE1MDUsNiArMTUwNSw5IEBAIHN0
+YXRpYyBnYm9vbGVhbiBwYXJzZV9wbGF5ZXJfbWV0YWRhdGEoc3RydWN0IG1lZGlhX3BsYXllciAq
+bXAsDQp9IGVsc2UgaWYgKHN0cmNhc2VjbXAoa2V5LCAibXByaXM6bGVuZ3RoIikgPT0gMCkgew0K
+aWYgKCFwYXJzZV9pbnQ2NF9tZXRhZGF0YShtcCwgIkR1cmF0aW9uIiwgJnZhcikpDQpyZXR1cm4g
+RkFMU0U7DQorIH0gZWxzZSBpZiAoc3RyY2FzZWNtcChrZXksICJ4ZXNhbTp0b3RhbFRyYWNrcyIp
+ID09IDApIHsNCisgaWYgKCFwYXJzZV9pbnQzMl9tZXRhZGF0YShtcCwgIk51bWJlck9mVHJhY2tz
+IiwgJnZhcikpDQorIHJldHVybiBGQUxTRTsNCn0gZWxzZSBpZiAoc3RyY2FzZWNtcChrZXksICJ4
+ZXNhbTp0cmFja051bWJlciIpID09IDApIHsNCmlmICghcGFyc2VfaW50MzJfbWV0YWRhdGEobXAs
+ICJUcmFja051bWJlciIsICZ2YXIpKQ0KcmV0dXJuIEZBTFNFOw0KLS0gDQoxLjcuOS41
 
-On 11/26/2014 01:44 PM, Johan Hedberg wrote:
-> Hi Jakub,
->
-> On Wed, Nov 26, 2014, Jakub Tyszkowski wrote:
->> Minimum mtu depends on transport layer and is larger for BREDR link.
->> ---
->>   android/gatt.c | 10 ++++++----
->>   1 file changed, 6 insertions(+), 4 deletions(-)
->>
->> diff --git a/android/gatt.c b/android/gatt.c
->> index b9b3c7b..95ddba0 100644
->> --- a/android/gatt.c
->> +++ b/android/gatt.c
->> @@ -1439,7 +1439,7 @@ static void connect_cb(GIOChannel *io, GError *gerr, gpointer user_data)
->>   	uint32_t status;
->>   	GAttrib *attrib;
->>   	uint16_t mtu;
->> -	uint16_t cid;
->> +	uint8_t dst_type;
->>
->>   	if (dev->state != DEVICE_CONNECT_READY) {
->>   		error("gatt: Device not in a connecting state!?");
->> @@ -1459,9 +1459,11 @@ static void connect_cb(GIOChannel *io, GError *gerr, gpointer user_data)
->>   		goto reply;
->>   	}
->>
->> -	if (!bt_io_get(io, &gerr, BT_IO_OPT_IMTU, &mtu, BT_IO_OPT_CID, &cid,
->> -				BT_IO_OPT_INVALID) || cid == ATT_CID)
->> -		mtu = ATT_DEFAULT_LE_MTU;
->> +	mtu = ATT_DEFAULT_LE_MTU;
->> +
->> +	if (bt_io_get(io, &gerr, BT_IO_OPT_DEST_TYPE, &dst_type,
->> +			BT_IO_OPT_INVALID) && (dst_type == BDADDR_BREDR))
->> +		mtu = ATT_DEFAULT_L2CAP_MTU;
->>
->>   	attrib = g_attrib_new(io, mtu);
->>   	if (!attrib) {
->
-> Isn't this a kernel or BtIO bug if we get the wrong MTU from bt_io_get?
-
-I guess You are right that something is wrong with this patch. I'll take 
-a look at this again. The issue I had might have already been fixed 
-somewhere else by other patches. Please ignore this one.
-
-Regards,
-Jakub
 
