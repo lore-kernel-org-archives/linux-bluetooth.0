@@ -1,90 +1,131 @@
 Return-Path: <cyrus@holtmann.org>
-From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
-Subject: [PATCH] android/doc: Update cts results for Android 5
-Date: Thu, 27 Nov 2014 12:22:36 +0100
-Message-Id: <1417087356-25455-1-git-send-email-jakub.tyszkowski@tieto.com>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH v2] android/client: Add support to read local le features
+Date: Thu, 27 Nov 2014 12:20:57 +0100
+Message-ID: <1482662.kF47smfGG4@uw000953>
+In-Reply-To: <1417080540-16430-1-git-send-email-lukasz.rymanowski@tieto.com>
+References: <1417080540-16430-1-git-send-email-lukasz.rymanowski@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Google decided to disable BLE tests in CTS due to some quality issues.
-Our tests shows that pure AOSP on Nexus devices was not passing.
-We need to rerun BLE section when it becomes available again.
----
- android/cts.txt | 46 +++++++++++++++++++++++-----------------------
- 1 file changed, 23 insertions(+), 23 deletions(-)
+Hi Łukasz,
 
-diff --git a/android/cts.txt b/android/cts.txt
-index 9a7f651..f679263 100644
---- a/android/cts.txt
-+++ b/android/cts.txt
-@@ -1,15 +1,16 @@
- Android Compatibility Test Suite results
- 
--Tested: 11-July-2014
--Android version: 4.4.4
--CTS version: 4.4 R3
-+Tested: 27-Nov-2014
-+Android version: 5.0
-+Kernel Version: 3.18
-+CTS version: 5.0 R1 (android-5.0.0_r7)
- 
- Note:
- CTS reliable write GATT tests require using CTS from master branch
- or https://android-review.googlesource.com/99354 applied.
- 
--(*) Due to bug in Bluedroid L2CAP implementation GATT server connect tests fails
--without modified Linux kernel. Patches for Linux and/or Bluedroid are still TBD.
-+(*) Tests are disabled due to CTS quality issues. Link for reference:
-+https://android.googlesource.com/platform/cts/+/0a62e4a0a9910101ccf2ccc43f6%5E!/
- 
- -------------------------------------------------------------------------------
- android.bluetooth.cts.BasicAdapterTest (automated tests)
-@@ -33,26 +34,25 @@ Test Name				Result	Notes
- -------------------------------------------------------------------------------
- Toggle Bluetooth			PASS
- BLE Client Test:
--	connect				PASS
--	discover service		PASS
--	read/write characteristic	PASS
--	reliable write			PASS
--	notify characteristic		PASS
--	read/write descriptor		PASS
--	read RSSI			PASS
--	disconnect			PASS
-+	connect				N/A	(*)
-+	discover service		N/A	(*)
-+	read/write characteristic	N/A	(*)
-+	reliable write			N/A	(*)
-+	notify characteristic		N/A	(*)
-+	read/write descriptor		N/A	(*)
-+	read RSSI			N/A	(*)
-+	disconnect			N/A	(*)
- BLE Server Test:
--	add service			PASS
--	connection			FAIL	(*) bluedroid issue.
--	read characteristic request	FAIL	(*)
--	write characteristic request	FAIL	(*)
--	read descriptor request		FAIL	(*)
--	write descriptor request	FAIL	(*)
--	reliable write			FAIL	(*)
--	disconnection			FAIL	(*)
-+	add service			N/A	(*)
-+	connection			N/A	(*)
-+	read characteristic request	N/A	(*)
-+	write characteristic request	N/A	(*)
-+	read descriptor request		N/A	(*)
-+	write descriptor request	N/A	(*)
-+	reliable write			N/A	(*)
-+	disconnection			N/A	(*)
- Insecure Client				PASS
--Insecure Server				PASS	Required kernel patch commit ID:
--						ba15a58b179ed76a7e887177f2b06de1
-+Insecure Server				PASS
- Secure Client				PASS
- Secure Server				PASS
- -------------------------------------------------------------------------------
+On Thursday 27 of November 2014 10:29:00 Lukasz Rymanowski wrote:
+> ---
+>  android/hal-utils.c | 68 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 68 insertions(+)
+> 
+> diff --git a/android/hal-utils.c b/android/hal-utils.c
+> index 05e8920..f18a82c 100644
+> --- a/android/hal-utils.c
+> +++ b/android/hal-utils.c
+> @@ -22,6 +22,7 @@
+>  
+>  #include <cutils/properties.h>
+>  
+> +#include "hal.h"
+>  #include "hal-utils.h"
+>  
+>  /*
+> @@ -116,6 +117,7 @@ INTMAP(bt_ssp_variant_t, -1, "(unknown)")
+>  	DELEMENT(BT_SSP_VARIANT_PASSKEY_NOTIFICATION),
+>  ENDMAP
+>  
+> +#if ANDROID_VERSION >= PLATFORM_VER(5, 0, 0)
+>  INTMAP(bt_property_type_t, -1, "(unknown)")
+>  	DELEMENT(BT_PROPERTY_BDNAME),
+>  	DELEMENT(BT_PROPERTY_BDADDR),
+> @@ -129,8 +131,26 @@ INTMAP(bt_property_type_t, -1, "(unknown)")
+>  	DELEMENT(BT_PROPERTY_REMOTE_FRIENDLY_NAME),
+>  	DELEMENT(BT_PROPERTY_REMOTE_RSSI),
+>  	DELEMENT(BT_PROPERTY_REMOTE_VERSION_INFO),
+> +	DELEMENT(BT_PROPERTY_LOCAL_LE_FEATURES),
+>  	DELEMENT(BT_PROPERTY_REMOTE_DEVICE_TIMESTAMP),
+>  ENDMAP
+> +#else
+> +INTMAP(bt_property_type_t, -1, "(unknown)")
+> +	DELEMENT(BT_PROPERTY_BDNAME),
+> +	DELEMENT(BT_PROPERTY_BDADDR),
+> +	DELEMENT(BT_PROPERTY_UUIDS),
+> +	DELEMENT(BT_PROPERTY_CLASS_OF_DEVICE),
+> +	DELEMENT(BT_PROPERTY_TYPE_OF_DEVICE),
+> +	DELEMENT(BT_PROPERTY_SERVICE_RECORD),
+> +	DELEMENT(BT_PROPERTY_ADAPTER_SCAN_MODE),
+> +	DELEMENT(BT_PROPERTY_ADAPTER_BONDED_DEVICES),
+> +	DELEMENT(BT_PROPERTY_ADAPTER_DISCOVERY_TIMEOUT),
+> +	DELEMENT(BT_PROPERTY_REMOTE_FRIENDLY_NAME),
+> +	DELEMENT(BT_PROPERTY_REMOTE_RSSI),
+> +	DELEMENT(BT_PROPERTY_REMOTE_VERSION_INFO),
+> +	DELEMENT(BT_PROPERTY_REMOTE_DEVICE_TIMESTAMP),
+> +ENDMAP
+> +#endif
+>  
+>  INTMAP(bt_cb_thread_evt, -1, "(unknown)")
+>  	DELEMENT(ASSOCIATE_JVM),
+> @@ -326,7 +346,55 @@ const char *btproperty2str(const bt_property_t *property)
+>  						rec->channel, rec->name);
+>  		}
+>  		break;
+> +#if ANDROID_VERSION >= PLATFORM_VER(5, 0, 0)
+> +	case BT_PROPERTY_LOCAL_LE_FEATURES:
+> +		{
+> +			bt_local_le_features_t *f = property->val;
+> +			int l;
+> +			uint16_t s;
+> +
+> +			l = sprintf(p, "{\n");
+> +			p += l;
+> +
+> +			l = sprintf(p, "Privacy supported: %s,\n",
+> +						f->local_privacy_enabled ?
+> +						"TRUE" : "FALSE");
+> +			p += l;
+> +
+> +			l = sprintf(p, "Num of advertising instances: %u,\n",
+> +							f->max_adv_instance);
+> +			p += l;
+> +
+> +			l = sprintf(p, "PRA offloading support: %s,\n",
+> +						f->rpa_offload_supported ?
+> +						"TRUE" : "FALSE");
+> +
+> +			p += l;
+>  
+> +			l = sprintf(p, "Num of offloaded IRKs: %u,\n",
+> +							f->max_irk_list_size);
+> +			p += l;
+> +
+> +			l = sprintf(p, "Num of offloaded scan filters: %u,\n",
+> +						f->max_adv_filter_supported);
+> +			p += l;
+> +
+> +			s = (f->scan_result_storage_size_hibyte << 8) +
+> +					f->scan_result_storage_size_lobyte;
+> +
+> +			l = sprintf(p, "Num of offloaded scan results: %u,\n",
+> +									s);
+> +			p += l;
+> +
+> +			l = sprintf(p, "Activity & energy report support: %s\n",
+> +					f->activity_energy_info_supported ?
+> +					"TRUE" : "FALSE");
+> +			p += l;
+> +
+> +			sprintf(p, "}");
+> +		}
+> +		break;
+> +#endif
+>  	default:
+>  		sprintf(p, "%p", property->val);
+>  	}
+> 
+
+Patch applied, thanks.
+
 -- 
-1.9.1
-
+Best regards, 
+Szymon Janc
