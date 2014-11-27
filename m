@@ -1,72 +1,86 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 27 Nov 2014 14:22:22 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Jakub Pawlowski <jpawlowski@google.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v11 1/3] Bluetooth: add hci_restart_le_scan
-Message-ID: <20141127122222.GA28057@t440s>
-References: <1417051767-19597-1-git-send-email-jpawlowski@google.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1417051767-19597-1-git-send-email-jpawlowski@google.com>
+From: Sebastian Chlad <sebastian.chlad@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Sebastian Chlad <sebastian.chlad@tieto.com>
+Subject: [PATCH v2] android/pts: L2CAP pts tests results on Android 5.0
+Date: Thu, 27 Nov 2014 12:42:47 +0100
+Message-Id: <1417088567-27484-1-git-send-email-sebastian.chlad@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jakub,
+---
+ android/pts-l2cap.txt | 26 ++++++++++++++++----------
+ 1 file changed, 16 insertions(+), 10 deletions(-)
 
-On Wed, Nov 26, 2014, Jakub Pawlowski wrote:
-> +/*
-> + * BR/EDR and/or LE discovery state flags: the flags defined here should
-> + * represent state of discovery
-> + */
-> +enum {
-> +	HCI_LE_SCAN_RESTARTING,
-> +};
+diff --git a/android/pts-l2cap.txt b/android/pts-l2cap.txt
+index 9cd2875..8ee9486 100644
+--- a/android/pts-l2cap.txt
++++ b/android/pts-l2cap.txt
+@@ -1,8 +1,8 @@
+ PTS test results for L2CAP
+ 
+ PTS version: 5.3
+-Tested: 24-October-2014
+-Android version: 4.4.4
++Tested: 25-November-2014
++Android version: 5.0
+ Kernel version: 3.18
+ 
+ Results:
+@@ -41,10 +41,14 @@ TC_COS_IEX_BV_01_C	PASS	l2test -n -P 4113 <bdaddr>
+ TC_COS_IEX_BV_02_C	PASS
+ TC_COS_ECH_BV_01_C	PASS
+ TC_COS_ECH_BV_02_C	PASS	l2ping -c 1 <bdaddr>
+-TC_COS_CFC_BV_01_C	INC	PTS issue #12728
++TC_COS_CFC_BV_01_C	PASS	PTS issue #12728
+ 				l2test -y -N 1 -b 40 -V le_public <braddr>
+-TC_COS_CFC_BV_02_C	INC	PTS issue #12728
++				Note: use Common.dll and ETS for L2CAP
++				from #12712
++TC_COS_CFC_BV_02_C	PASS	PTS issue #12728
+ 				l2test -y -N 1 -b 1 -V le_public <bdaddr>
++				Note: use Common.dll and ETS for L2CAP
++				from #12712
+ TC_COS_CFC_BV_03_C	PASS	l2test -u -V le_public <bdaddr>
+ TC_COS_CFC_BV_04_C	PASS	l2test -u -V le_public <bdaddr>
+ TC_COS_CFC_BV_05_C	PASS	l2test -m -V le_public <bdaddr>
+@@ -95,8 +99,7 @@ TC_ERM_BV_02_C		PASS	l2test -r -X ertm -P 4113
+ TC_ERM_BV_03_C		PASS	l2test -r -X ertm -P 4113
+ TC_ERM_BV_05_C		PASS	l2test -x -X ertm -P 4113 -N 2 -Y 2
+ TC_ERM_BV_06_C		PASS	l2test -x -X ertm -P 4113 -N 2 -Y 2
+-TC_ERM_BV_07_C		INC	PTS issue #12690
+-				l2test -r -H 1000 -K 10000 -X ertm -P 4113
++TC_ERM_BV_07_C		PASS	l2test -r -H 1000 -K 10000 -X ertm -P 4113
+ TC_ERM_BV_08_C		PASS	l2test -x -X ertm -P 4113 -N 1
+ TC_ERM_BV_09_C		PASS	l2test -X ertm -P 4113
+ TC_ERM_BV_10_C		PASS	l2test -x -X ertm -P 4113 -N 1
+@@ -111,8 +114,7 @@ TC_ERM_BV_18_C		PASS	l2test -x -X ertm -P 4113 -N 1
+ TC_ERM_BV_19_C		PASS	l2test -x -X ertm -P 4113 -N 1
+ TC_ERM_BV_20_C		PASS	l2test -x -X ertm -P 4113 -N 1
+ TC_ERM_BV_21_C		PASS	l2test -x -X ertm -P 4113 -D 2000 -N 2
+-TC_ERM_BV_22_C		INC	PTS issue #12690
+-				l2test -r -H 1000 -K 5000 -X ertm -P 4113
++TC_ERM_BV_22_C		PASS	l2test -r -H 1000 -K 5000 -X ertm -P 4113
+ TC_ERM_BV_23_C		PASS	l2test -x -X ertm -P 4113 -N 2
+ TC_ERM_BI_01_C		N/A
+ TC_ERM_BI_02_C		PASS	l2test -X ertm -P 4113
+@@ -173,10 +175,14 @@ TC_LE_CFC_BV_04_C	PASS	l2test -n -V le_public -P 241  <braddr>
+ TC_LE_CFC_BV_05_C	INC	PTS issue #12665
+ TC_LE_CFC_BV_06_C	INC	PTS issue #12711 #12729
+ 				l2test -s -V le_public <braddr>
+-TC_LE_CFC_BV_07_C	INC	PTS issue #12728
++TC_LE_CFC_BV_07_C	PASS	PTS issue #12728
+ 				l2test -u -V le_public <braddr>
+-TC_LE_CFC_BI_01_C	INC	PTS issue #12728 #12712
++				Note: use Common.dll and ETS for L2CAP
++				from #12712
++TC_LE_CFC_BI_01_C	PASS	PTS issue #12728 #12712
+ 				l2test -u -V le_public <bdaddr>
++				Note: use Common.dll and ETS for L2CAP
++				from #12712
+ TC_LE_CFC_BV_08_C	PASS	l2test -n -V le_public -P 37 <braddr>
+ TC_LE_CFC_BV_09_C	PASS	l2test -n -V le_public -P 37 <braddr>
+ TC_LE_CFC_BV_16_C	PASS	l2test -n -V le_public -P 37 <braddr>
+-- 
+1.8.5.3
 
-I think this enum should be as close as possible to the struct
-discovery_state definition, i.e. right before it in hci_core.h. The
-hci.h file should be strictly for HCI definitions only, but for
-historical reasons it also contains some implementation specific stuff.
-
-Also note that the net/ coding style doesn't use an empty first line for
-multi-line comments.
-
-> --- a/include/net/bluetooth/hci_core.h
-> +++ b/include/net/bluetooth/hci_core.h
-> @@ -75,6 +75,7 @@ struct discovery_state {
->  	u32			last_adv_flags;
->  	u8			last_adv_data[HCI_MAX_AD_LENGTH];
->  	u8			last_adv_data_len;
-> +	unsigned long		flags;
->  };
->  
->  struct hci_conn_hash {
-> @@ -337,6 +338,7 @@ struct hci_dev {
->  	unsigned long		dev_flags;
->  
->  	struct delayed_work	le_scan_disable;
-> +	struct delayed_work	le_scan_restart;
->  
->  	__s8			adv_tx_power;
->  	__u8			adv_data[HCI_MAX_AD_LENGTH];
-> @@ -1326,6 +1328,7 @@ void hci_sock_dev_event(struct hci_dev *hdev, int event);
->  #define DISCOV_INTERLEAVED_TIMEOUT	5120	/* msec */
->  #define DISCOV_INTERLEAVED_INQUIRY_LEN	0x04
->  #define DISCOV_BREDR_INQUIRY_LEN	0x08
-> +#define DISCOV_LE_RESTART_DELAY		300	/* msec */
->  
->  int mgmt_control(struct sock *sk, struct msghdr *msg, size_t len);
->  int mgmt_new_settings(struct hci_dev *hdev);
-> @@ -1403,6 +1406,7 @@ int hci_update_random_address(struct hci_request *req, bool require_privacy,
->  			      u8 *own_addr_type);
->  void hci_copy_identity_address(struct hci_dev *hdev, bdaddr_t *bdaddr,
->  			       u8 *bdaddr_type);
-> +void hci_restart_le_scan(struct hci_dev *hdev);
-
-When looking at your later patches (mainly 3/3) this
-hci_restart_le_scan() functionality is only accessed from within mgmt.c.
-I'd therefore suggest to simply have it all as part of mgmt.c (as static
-functions) and only later export it through hci_core.h if there really
-is a need.
-
-Johan
