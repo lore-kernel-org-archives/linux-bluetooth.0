@@ -2,11 +2,11 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@gmail.com>
 To: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 3/5] android/handsfree-client: Implement audio connect/disconnect
-Date: Thu, 27 Nov 2014 21:51:12 +0100
-Message-ID: <101224339.xf6gZFyOGS@athlon>
-In-Reply-To: <1416912448-28177-4-git-send-email-lukasz.rymanowski@tieto.com>
-References: <1416912448-28177-1-git-send-email-lukasz.rymanowski@tieto.com> <1416912448-28177-4-git-send-email-lukasz.rymanowski@tieto.com>
+Subject: Re: [PATCH 4/5] android/handsfree-client: Send AT+BCC to start codec negotiation
+Date: Thu, 27 Nov 2014 21:50:20 +0100
+Message-ID: <2142043.GSBL5JKzgO@athlon>
+In-Reply-To: <1416912448-28177-5-git-send-email-lukasz.rymanowski@tieto.com>
+References: <1416912448-28177-1-git-send-email-lukasz.rymanowski@tieto.com> <1416912448-28177-5-git-send-email-lukasz.rymanowski@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -14,143 +14,159 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Łukasz,
 
-On Tuesday 25 November 2014 11:47:26 Lukasz Rymanowski wrote:
-> In this patch also set_audio_state function has been moved
-
-One more thing: set_audio_state() was introduced in PATCH 2/5. Why not put it 
-in right place from beginning?
-
+On Tuesday 25 November 2014 11:47:27 Lukasz Rymanowski wrote:
+> With this patch we start codec negotation on audio connect if both sides
+> does support it.
+> 
+> This patch also moves cmd_complete_cb and codec_negotiation_supported
+> functions up in the file
 > ---
->  android/handsfree-client.c | 100
-> +++++++++++++++++++++++++++++++++------------ 1 file changed, 75
-> insertions(+), 25 deletions(-)
+>  android/handsfree-client.c | 107
+> +++++++++++++++++++++++---------------------- 1 file changed, 54
+> insertions(+), 53 deletions(-)
 > 
 > diff --git a/android/handsfree-client.c b/android/handsfree-client.c
-> index 432b9a1..4118b7e 100644
+> index 4118b7e..d942a21 100644
 > --- a/android/handsfree-client.c
 > +++ b/android/handsfree-client.c
-> @@ -292,19 +292,89 @@ done:
+> @@ -292,11 +292,63 @@ done:
 >  			HAL_OP_HF_CLIENT_DISCONNECT, status);
 >  }
 > 
-> +static bool connect_sco(struct device *dev)
+> +static void cmd_complete_cb(enum hfp_result result, enum hfp_error cme_err,
+> +							void *user_data)
 > +{
-> +	/* TODO: handle codec negotiation */
+> +	struct hal_ev_hf_client_command_complete ev;
 > +
-> +	return bt_sco_connect(sco, &dev->bdaddr, 0);
-> +}
+> +	DBG("");
+> +	memset(&ev, 0, sizeof(ev));
 > +
-> +static void set_audio_state(struct device *dev, uint8_t state)
-> +{
-> +	struct hal_ev_hf_client_audio_state ev;
-> +	char address[18];
-> +
-> +	if (dev->audio_state == state)
-> +		return;
-> +
-> +	dev->audio_state = state;
-> +
-> +	ba2str(&dev->bdaddr, address);
-> +	DBG("device %s audio state %u", address, state);
-> +
-> +	bdaddr2android(&dev->bdaddr, ev.bdaddr);
-> +	ev.state = state;
+> +	switch (result) {
+> +	case HFP_RESULT_OK:
+> +		ev.type = HAL_HF_CLIENT_CMD_COMP_OK;
+> +		break;
+> +	case HFP_RESULT_NO_CARRIER:
+> +		ev.type = HAL_HF_CLIENT_CMD_COMP_ERR_NO_CARRIER;
+> +		break;
+> +	case HFP_RESULT_ERROR:
+> +		ev.type = HAL_HF_CLIENT_CMD_COMP_ERR;
+> +		break;
+> +	case HFP_RESULT_BUSY:
+> +		ev.type = HAL_HF_CLIENT_CMD_COMP_ERR_BUSY;
+> +		break;
+> +	case HFP_RESULT_NO_ANSWER:
+> +		ev.type = HAL_HF_CLIENT_CMD_COMP_ERR_NO_ANSWER;
+> +		break;
+> +	case HFP_RESULT_DELAYED:
+> +		ev.type = HAL_HF_CLIENT_CMD_COMP_ERR_DELAYED;
+> +		break;
+> +	case HFP_RESULT_BLACKLISTED:
+> +		ev.type = HAL_HF_CLIENT_CMD_COMP_ERR_BACKLISTED;
+> +		break;
+> +	case HFP_RESULT_CME_ERROR:
+> +		ev.type = HAL_HF_CLIENT_CMD_COMP_ERR_CME;
+> +		ev.cme = cme_err;
+> +		break;
+> +	default:
+> +		error("hf-client: Unknown error code %d", result);
+> +		ev.type = HAL_HF_CLIENT_CMD_COMP_ERR;
+> +		break;
+> +	}
 > +
 > +	ipc_send_notif(hal_ipc, HAL_SERVICE_ID_HANDSFREE_CLIENT,
-> +				HAL_EV_HF_CLIENT_AUDIO_STATE, sizeof(ev), &ev);
+> +			HAL_EV_CLIENT_COMMAND_COMPLETE, sizeof(ev), &ev);
 > +}
 > +
->  static void handle_connect_audio(const void *buf, uint16_t len)
+> +static bool codec_negotiation_supported(struct device *dev)
+> +{
+> +	return (dev->features & HFP_AG_FEAT_CODEC) &&
+> +			(hfp_hf_features & HFP_HF_FEAT_CODEC);
+> +}
+> +
+>  static bool connect_sco(struct device *dev)
 >  {
-> -	DBG("Not Implemented");
-> +	const struct hal_cmd_hf_client_connect_audio *cmd = (void *) buf;
-> +	struct device *dev;
-> +	uint8_t status;
-> +	bdaddr_t bdaddr;
-> +
-> +	DBG("");
-> +
-> +	android2bdaddr(&cmd->bdaddr, &bdaddr);
-> +
-> +	dev = find_device(&bdaddr);
-> +	if (!dev || dev->state != HAL_HF_CLIENT_CONN_STATE_SLC_CONNECTED ||
-> +		dev->audio_state != HAL_HF_CLIENT_AUDIO_STATE_DISCONNECTED) {
-> +		error("hf-client: Cannot create SCO, check SLC or audio state");
-> +		status = HAL_STATUS_FAILED;
-> +		goto done;
-> +	}
-> +
-> +	if (connect_sco(dev)) {
-> +		status = HAL_STATUS_SUCCESS;
-> +		set_audio_state(dev, HAL_HF_CLIENT_AUDIO_STATE_CONNECTING);
-> +	} else {
-> +		status = HAL_STATUS_FAILED;
-> +	}
-> +
-> +done:
->  	ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_HANDSFREE_CLIENT,
-> -			HAL_OP_HF_CLIENT_CONNECT_AUDIO, HAL_STATUS_UNSUPPORTED);
-> +					HAL_OP_HF_CLIENT_CONNECT_AUDIO, status);
+> -	/* TODO: handle codec negotiation */
+> +	if (codec_negotiation_supported(dev))
+> +		return hfp_hf_send_command(dev->hf, cmd_complete_cb, NULL,
+> +								"AT+BCC");
+
+This looks strange. It would result in calling command complete callback 
+without pending AT command from framework. Shouldn't this be dedicated cb that 
+would handle (unlikely, but still..) error and set audio state back to 
+disconnected? Also we should handle case when AG replied OK but didn't open 
+SCO eg with timeout. This is to avoid getting stuck in connecting audio state.
+
+> 
+> -	return bt_sco_connect(sco, &dev->bdaddr, 0);
+> +	return bt_sco_connect(sco, &dev->bdaddr, BT_VOICE_CVSD_16BIT);
 >  }
 > 
->  static void handle_disconnect_audio(const void *buf, uint16_t len)
->  {
-> -	DBG("Not Implemented");
-> +	const struct hal_cmd_hf_client_disconnect_audio *cmd = (void *) buf;
-> +	struct device *dev;
-> +	uint8_t status;
-> +	bdaddr_t bdaddr;
-> +
-> +	DBG("");
-> +
-> +	android2bdaddr(&cmd->bdaddr, &bdaddr);
-> +
-> +	dev = find_device(&bdaddr);
-> +	if (!dev ||
-> +		dev->audio_state == HAL_HF_CLIENT_AUDIO_STATE_DISCONNECTED) {
-> +		error("hf-client: Device not found or audio not connected");
-> +		status = HAL_STATUS_FAILED;
-> +		goto done;
-> +	}
-> +
-> +	bt_sco_disconnect(sco);
-> +	status = HAL_STATUS_SUCCESS;
-> +
-> +done:
->  	ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_HANDSFREE_CLIENT,
-> -					HAL_OP_HF_CLIENT_DISCONNECT_AUDIO,
-> -					HAL_STATUS_UNSUPPORTED);
-> +				HAL_OP_HF_CLIENT_DISCONNECT_AUDIO, status);
+>  static void set_audio_state(struct device *dev, uint8_t state)
+> @@ -377,51 +429,6 @@ done:
+>  				HAL_OP_HF_CLIENT_DISCONNECT_AUDIO, status);
 >  }
 > 
->  static void cmd_complete_cb(enum hfp_result result, enum hfp_error cme_err,
-> @@ -2011,26 +2081,6 @@ static void cleanup_hfp_hf(void)
->  	}
->  }
-> 
-> -static void set_audio_state(struct device *dev, uint8_t state)
+> -static void cmd_complete_cb(enum hfp_result result, enum hfp_error cme_err,
+> -							void *user_data)
 > -{
-> -	struct hal_ev_hf_client_audio_state ev;
-> -	char address[18];
+> -	struct hal_ev_hf_client_command_complete ev;
 > -
-> -	if (dev->audio_state == state)
-> -		return;
+> -	DBG("");
 > -
-> -	dev->audio_state = state;
+> -	memset(&ev, 0, sizeof(ev));
 > -
-> -	ba2str(&dev->bdaddr, address);
-> -	DBG("device %s audio state %u", address, state);
-> -
-> -	bdaddr2android(&dev->bdaddr, ev.bdaddr);
-> -	ev.state = state;
+> -	switch (result) {
+> -	case HFP_RESULT_OK:
+> -		ev.type = HAL_HF_CLIENT_CMD_COMP_OK;
+> -		break;
+> -	case HFP_RESULT_NO_CARRIER:
+> -		ev.type = HAL_HF_CLIENT_CMD_COMP_ERR_NO_CARRIER;
+> -		break;
+> -	case HFP_RESULT_ERROR:
+> -		ev.type = HAL_HF_CLIENT_CMD_COMP_ERR;
+> -		break;
+> -	case HFP_RESULT_BUSY:
+> -		ev.type = HAL_HF_CLIENT_CMD_COMP_ERR_BUSY;
+> -		break;
+> -	case HFP_RESULT_NO_ANSWER:
+> -		ev.type = HAL_HF_CLIENT_CMD_COMP_ERR_NO_ANSWER;
+> -		break;
+> -	case HFP_RESULT_DELAYED:
+> -		ev.type = HAL_HF_CLIENT_CMD_COMP_ERR_DELAYED;
+> -		break;
+> -	case HFP_RESULT_BLACKLISTED:
+> -		ev.type = HAL_HF_CLIENT_CMD_COMP_ERR_BACKLISTED;
+> -		break;
+> -	case HFP_RESULT_CME_ERROR:
+> -		ev.type = HAL_HF_CLIENT_CMD_COMP_ERR_CME;
+> -		ev.cme = cme_err;
+> -		break;
+> -	default:
+> -		error("hf-client: Unknown error code %d", result);
+> -		ev.type = HAL_HF_CLIENT_CMD_COMP_ERR;
+> -		break;
+> -	}
 > -
 > -	ipc_send_notif(hal_ipc, HAL_SERVICE_ID_HANDSFREE_CLIENT,
-> -				HAL_EV_HF_CLIENT_AUDIO_STATE, sizeof(ev), &ev);
+> -			HAL_EV_CLIENT_COMMAND_COMPLETE, sizeof(ev), &ev);
 > -}
 > -
->  static bool confirm_sco_cb(const bdaddr_t *addr, uint16_t *voice_settings)
+>  static void handle_start_vr(const void *buf, uint16_t len)
 >  {
 >  	struct device *dev;
+> @@ -1653,12 +1660,6 @@ static void slc_brsf_cb(struct hfp_context *context,
+> void *user_data) dev->features = feat;
+>  }
+> 
+> -static bool codec_negotiation_supported(struct device *dev)
+> -{
+> -	return (dev->features & HFP_AG_FEAT_CODEC) &&
+> -			(hfp_hf_features & HFP_HF_FEAT_CODEC);
+> -}
+> -
+>  static void slc_brsf_resp(enum hfp_result result, enum hfp_error cme_err,
+>  							void *user_data)
+>  {
 
 -- 
 Szymon K. Janc
