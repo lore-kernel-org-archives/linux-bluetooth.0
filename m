@@ -1,32 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
-From: Ruslan Mstoi <ruslan.mstoi@linux.intel.com>
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Ruslan Mstoi <ruslan.mstoi@linux.intel.com>
-Subject: [PATCH] android/pts: PTS tests for SM on Android 5.0
-Date: Fri, 28 Nov 2014 17:49:39 +0200
-Message-Id: <1417189779-28757-1-git-send-email-ruslan.mstoi@linux.intel.com>
+Subject: [PATCH] unit/gatt: Fix using possible negative return value
+Date: Fri, 28 Nov 2014 17:04:28 +0200
+Message-Id: <1417187068-5530-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+
 ---
- android/pts-sm.txt | 4 ++--
+ unit/test-gatt.c | 4 ++--
  1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/android/pts-sm.txt b/android/pts-sm.txt
-index 8a38d32..456f67d 100644
---- a/android/pts-sm.txt
-+++ b/android/pts-sm.txt
-@@ -1,8 +1,8 @@
- PTS test results for SM
+diff --git a/unit/test-gatt.c b/unit/test-gatt.c
+index 703430c..af38e9f 100644
+--- a/unit/test-gatt.c
++++ b/unit/test-gatt.c
+@@ -648,11 +648,11 @@ static void test_server(gconstpointer data)
  
- PTS version: 5.3
--Tested: 20-October-2014
--Android version: 4.4.4
-+Tested: 28-November-2014
-+Android version: 5.0
- kernel version: 3.17
+ 	len = write(context->fd, pdu.data, pdu.size);
  
- Results:
++	g_assert_cmpint(len, ==, pdu.size);
++
+ 	if (g_test_verbose())
+ 		util_hexdump('<', pdu.data, len, test_debug, "GATT: ");
+ 
+-	g_assert_cmpint(len, ==, pdu.size);
+-
+ 	execute_context(context);
+ }
+ 
 -- 
 1.9.1
 
