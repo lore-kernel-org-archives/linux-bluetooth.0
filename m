@@ -1,162 +1,352 @@
 Return-Path: <cyrus@holtmann.org>
-From: Jakub Pawlowski <jpawlowski@google.com>
+From: Arman Uguray <armansito@chromium.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: Jakub Pawlowski <jpawlowski@google.com>
-Subject: [PATCH v13 1/3] Bluetooth: add le_scan_restart
-Date: Fri, 28 Nov 2014 15:50:45 -0800
-Message-Id: <1417218647-5362-1-git-send-email-jpawlowski@google.com>
+Cc: Arman Uguray <armansito@chromium.org>
+Subject: [PATCH BlueZ 7/8] unit/test-gatt: Use gatt-db for CLIENT tests
+Date: Fri, 28 Nov 2014 09:49:21 -0800
+Message-Id: <1417196962-3876-8-git-send-email-armansito@chromium.org>
+In-Reply-To: <1417196962-3876-1-git-send-email-armansito@chromium.org>
+References: <1417196962-3876-1-git-send-email-armansito@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Currently there is no way to restart le scan. It's needed in
-preparation for new service scan method. The way it work: it disable,
-and then enable le scan on controller. During this restart special flag
-is set to make sure we won't remove disable scan work from workqueue.
-
-Signed-off-by: Jakub Pawlowski <jpawlowski@google.com>
+This patch rewrites parts of unit/test-gatt that verify the contents
+of a shared/gatt-client to use the client's gatt-db instead of the
+service iterators.
 ---
- include/net/bluetooth/hci_core.h | 10 ++++++++++
- net/bluetooth/hci_core.c         | 42 ++++++++++++++++++++++++++++++++++++++++
- net/bluetooth/hci_event.c        |  9 ++++++---
- 3 files changed, 58 insertions(+), 3 deletions(-)
+ unit/test-gatt.c | 241 +++++++++++++++++++++++++++++++++++++------------------
+ 1 file changed, 162 insertions(+), 79 deletions(-)
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 396c098..dad62f4 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -56,6 +56,13 @@ struct inquiry_entry {
- 	struct inquiry_data	data;
+diff --git a/unit/test-gatt.c b/unit/test-gatt.c
+index 703430c..7c61083 100644
+--- a/unit/test-gatt.c
++++ b/unit/test-gatt.c
+@@ -56,10 +56,29 @@ enum context_type {
+ 	SERVER
  };
  
-+/* BR/EDR and/or LE discovery state flags: the flags defined here should
-+ * represent state of discovery
-+ */
-+enum {
-+	HCI_LE_SCAN_RESTARTING,
++struct gatt_desc {
++	uint16_t handle;
++	uint8_t uuid[16];
 +};
 +
- struct discovery_state {
- 	int			type;
- 	enum {
-@@ -75,6 +82,7 @@ struct discovery_state {
- 	u32			last_adv_flags;
- 	u8			last_adv_data[HCI_MAX_AD_LENGTH];
- 	u8			last_adv_data_len;
-+	unsigned long		flags;
++struct gatt_chrc {
++	uint16_t handle;
++	uint16_t value_handle;
++	uint8_t properties;
++	uint8_t uuid[16];
++
++	const struct gatt_desc *descs;
++	size_t num_descs;
++};
++
+ struct gatt_service {
+-	const bt_gatt_service_t *service;
+-	int num_chars;
+-	const bt_gatt_characteristic_t **chars;
++	bool primary;
++	uint16_t start_handle;
++	uint16_t end_handle;
++	uint8_t uuid[16];
++
++	const struct gatt_chrc **chars;
++	size_t num_chars;
  };
  
- struct hci_conn_hash {
-@@ -337,6 +345,7 @@ struct hci_dev {
- 	unsigned long		dev_flags;
+ struct test_data {
+@@ -67,7 +86,7 @@ struct test_data {
+ 	struct test_pdu *pdu_list;
+ 	enum context_type context_type;
+ 	bt_uuid_t *uuid;
+-	int num_services;
++	size_t num_services;
+ 	const struct gatt_service **services;
+ 	const void *step;
+ };
+@@ -176,23 +195,14 @@ static bt_uuid_t uuid_char_128 = {
+ 			0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f}
+ };
  
- 	struct delayed_work	le_scan_disable;
-+	struct delayed_work	le_scan_restart;
+-const bt_gatt_service_t service_1 = {
+-	.primary = true,
+-	.start_handle = 0x0001,
+-	.end_handle = 0x0004,
+-	.uuid = {0x00, 0x00, 0x18, 0x01, 0x00, 0x00, 0x10, 0x00,
+-			0x80, 0x00, 0x00, 0x80, 0x5f, 0x9b, 0x34, 0xfb}
+-};
+-
+-const bt_gatt_descriptor_t descriptor_1 = {
++const struct gatt_desc descriptor_1 = {
+ 	.handle = 0x0004,
+ 	.uuid = {0x00, 0x00, 0x29, 0x01, 0x00, 0x00, 0x10, 0x00,
+ 			0x80, 0x00, 0x00, 0x80, 0x5f, 0x9b, 0x34, 0xfb}
+ };
  
- 	__s8			adv_tx_power;
- 	__u8			adv_data[HCI_MAX_AD_LENGTH];
-@@ -1326,6 +1335,7 @@ void hci_sock_dev_event(struct hci_dev *hdev, int event);
- #define DISCOV_INTERLEAVED_TIMEOUT	5120	/* msec */
- #define DISCOV_INTERLEAVED_INQUIRY_LEN	0x04
- #define DISCOV_BREDR_INQUIRY_LEN	0x08
-+#define DISCOV_LE_RESTART_DELAY		300	/* msec */
+-const bt_gatt_characteristic_t characteristic_1 = {
+-	.start_handle = 0x0002,
+-	.end_handle = 0x0004,
++const struct gatt_chrc characteristic_1 = {
++	.handle = 0x0002,
+ 	.value_handle = 0x0003,
+ 	.properties = 0x02,
+ 	.uuid = {0x00, 0x00, 0x2a, 0x00, 0x00, 0x00, 0x10, 0x00,
+@@ -201,23 +211,14 @@ const bt_gatt_characteristic_t characteristic_1 = {
+ 	.num_descs = 1
+ };
  
- int mgmt_control(struct sock *sk, struct msghdr *msg, size_t len);
- int mgmt_new_settings(struct hci_dev *hdev);
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 5c319a4..2c74d21 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -2557,6 +2557,7 @@ static int hci_dev_do_close(struct hci_dev *hdev)
- 		cancel_delayed_work(&hdev->service_cache);
+-const bt_gatt_service_t service_2 = {
+-	.primary = true,
+-	.start_handle = 0x0005,
+-	.end_handle = 0x0008,
+-	.uuid = {0x00, 0x00, 0x18, 0x0d, 0x00, 0x00, 0x10, 0x00,
+-			0x80, 0x00, 0x00, 0x80, 0x5f, 0x9b, 0x34, 0xfb}
+-};
+-
+-const bt_gatt_descriptor_t descriptor_2 = {
++const struct gatt_desc descriptor_2 = {
+ 	.handle = 0x0008,
+ 	.uuid = {0x00, 0x00, 0x29, 0x01, 0x00, 0x00, 0x10, 0x00,
+ 			0x80, 0x00, 0x00, 0x80, 0x5f, 0x9b, 0x34, 0xfb}
+ };
  
- 	cancel_delayed_work_sync(&hdev->le_scan_disable);
-+	cancel_delayed_work_sync(&hdev->le_scan_restart);
+-const bt_gatt_characteristic_t characteristic_2 = {
+-	.start_handle = 0x0006,
+-	.end_handle = 0x0008,
++const struct gatt_chrc characteristic_2 = {
++	.handle = 0x0006,
+ 	.value_handle = 0x0007,
+ 	.properties = 0x02,
+ 	.uuid = {0x00, 0x00, 0x2a, 0x29, 0x00, 0x00, 0x10, 0x00,
+@@ -226,19 +227,27 @@ const bt_gatt_characteristic_t characteristic_2 = {
+ 	.num_descs = 1
+ };
  
- 	if (test_bit(HCI_MGMT, &hdev->dev_flags))
- 		cancel_delayed_work_sync(&hdev->rpa_expired);
-@@ -3851,6 +3852,8 @@ static void le_scan_disable_work(struct work_struct *work)
+-const bt_gatt_characteristic_t *characteristics_1[] = {&characteristic_1};
+-const bt_gatt_characteristic_t *characteristics_2[] = {&characteristic_2};
++const struct gatt_chrc *characteristics_1[] = {&characteristic_1};
++const struct gatt_chrc *characteristics_2[] = {&characteristic_2};
  
- 	BT_DBG("%s", hdev->name);
+ const struct gatt_service gatt_service_1 = {
+-	.service = &service_1,
+-	.num_chars = sizeof(characteristics_1) / sizeof(characteristics_1[0]),
+-	.chars = characteristics_1
++	.primary = true,
++	.start_handle = 0x0001,
++	.end_handle = 0x0004,
++	.uuid = {0x00, 0x00, 0x18, 0x01, 0x00, 0x00, 0x10, 0x00,
++			0x80, 0x00, 0x00, 0x80, 0x5f, 0x9b, 0x34, 0xfb},
++	.chars = characteristics_1,
++	.num_chars = sizeof(characteristics_1) / sizeof(characteristics_1[0])
+ };
  
-+	cancel_delayed_work_sync(&hdev->le_scan_restart);
-+
- 	hci_req_init(&req, hdev);
+ const struct gatt_service gatt_service_2 = {
+-	.service = &service_2,
+-	.num_chars = sizeof(characteristics_2) / sizeof(characteristics_2[0]),
+-	.chars = characteristics_2
++	.primary = true,
++	.start_handle = 0x0005,
++	.end_handle = 0x0008,
++	.uuid = {0x00, 0x00, 0x18, 0x0d, 0x00, 0x00, 0x10, 0x00,
++			0x80, 0x00, 0x00, 0x80, 0x5f, 0x9b, 0x34, 0xfb},
++	.chars = characteristics_2,
++	.num_chars = sizeof(characteristics_2) / sizeof(characteristics_2[0])
+ };
  
- 	hci_req_add_le_scan_disable(&req);
-@@ -3860,6 +3863,44 @@ static void le_scan_disable_work(struct work_struct *work)
- 		BT_ERR("Disable LE scanning request failed: err %d", err);
+ const struct gatt_service *service_data_1[] = {&gatt_service_1,
+@@ -343,36 +352,60 @@ static void print_debug(const char *str, void *user_data)
+ 	g_print("%s%s\n", prefix, str);
  }
  
-+static void le_scan_restart_work_complete(struct hci_dev *hdev, u8 status)
-+{
-+	clear_bit(HCI_LE_SCAN_RESTARTING, &hdev->discovery.flags);
-+
-+	if (status)
-+		BT_ERR("Failed to restart LE scan: status %d", status);
-+}
-+
-+static void le_scan_restart_work(struct work_struct *work)
-+{
-+	struct hci_dev *hdev = container_of(work, struct hci_dev,
-+					    le_scan_restart.work);
-+	struct hci_request req;
-+	struct hci_cp_le_set_scan_enable cp;
-+	int err;
-+
-+	BT_DBG("%s", hdev->name);
-+
-+	/* If controller is not scanning we are done. */
-+	if (!test_bit(HCI_LE_SCAN, &hdev->dev_flags))
-+		return;
-+
-+	hci_req_init(&req, hdev);
-+
-+	hci_req_add_le_scan_disable(&req);
-+
-+	memset(&cp, 0, sizeof(cp));
-+	cp.enable = LE_SCAN_ENABLE;
-+	cp.filter_dup = LE_SCAN_FILTER_DUP_ENABLE;
-+	hci_req_add(&req, HCI_OP_LE_SET_SCAN_ENABLE, sizeof(cp), &cp);
-+
-+	set_bit(HCI_LE_SCAN_RESTARTING, &hdev->discovery.flags);
-+
-+	err = hci_req_run(&req, le_scan_restart_work_complete);
-+	if (err)
-+		BT_ERR("Restart LE scan request failed: err %d", err);
-+}
-+
- static void set_random_addr(struct hci_request *req, bdaddr_t *rpa)
+-static void compare_service(const bt_gatt_service_t *a,
+-						const bt_gatt_service_t *b)
++static void assert_service(const struct gatt_service *a,
++						struct gatt_db_attribute *attr)
  {
- 	struct hci_dev *hdev = req->hdev;
-@@ -4037,6 +4078,7 @@ struct hci_dev *hci_alloc_dev(void)
- 	INIT_DELAYED_WORK(&hdev->power_off, hci_power_off);
- 	INIT_DELAYED_WORK(&hdev->discov_off, hci_discov_off);
- 	INIT_DELAYED_WORK(&hdev->le_scan_disable, le_scan_disable_work);
-+	INIT_DELAYED_WORK(&hdev->le_scan_restart, le_scan_restart_work);
+-	g_assert(a->primary && b->primary);
+-	g_assert(a->start_handle == b->start_handle);
+-	g_assert(a->end_handle == b->end_handle);
+-	g_assert(memcmp(a->uuid, b->uuid, sizeof(a->uuid)) == 0);
++	uint16_t start_handle, end_handle;
++	bool primary;
++	bt_uuid_t uuid;
++	uint128_t u128;
++
++	g_assert(gatt_db_attribute_get_service_data(attr, &start_handle,
++							&end_handle,
++							&primary, &uuid));
++
++	u128 = uuid.value.u128;
++
++	g_assert(a->primary && primary);
++	g_assert(a->start_handle == start_handle);
++	g_assert(a->end_handle == end_handle);
++	g_assert(memcmp(a->uuid, u128.data, sizeof(u128.data)) == 0);
+ }
  
- 	skb_queue_head_init(&hdev->rx_q);
- 	skb_queue_head_init(&hdev->cmd_q);
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index bd0a801..ee19656 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -1157,10 +1157,13 @@ static void hci_cc_le_set_scan_enable(struct hci_dev *hdev,
- 					  d->last_adv_data_len, NULL, 0);
- 		}
+-static void compare_descs(const bt_gatt_descriptor_t *a,
+-						const bt_gatt_descriptor_t *b)
++static void assert_chrc(const struct gatt_chrc *a,
++						struct gatt_db_attribute *attr)
+ {
+-	g_assert(a->handle == b->handle);
+-	g_assert(memcmp(a->uuid, b->uuid, sizeof(a->uuid)) == 0);
++	uint16_t handle, value_handle;
++	uint8_t properties;
++	bt_uuid_t uuid;
++	uint128_t u128;
++
++	g_assert(gatt_db_attribute_get_char_data(attr, &handle,
++							&value_handle,
++							&properties, &uuid));
++
++	u128 = uuid.value.u128;
++
++	g_assert(a->handle == handle);
++	g_assert(a->value_handle == value_handle);
++	g_assert(a->properties == properties);
++	g_assert(memcmp(a->uuid, u128.data, sizeof(u128.data)) == 0);
+ }
  
--		/* Cancel this timer so that we don't try to disable scanning
--		 * when it's already disabled.
-+		/* If HCI_LE_SCAN_RESTARTING is set, don't cancel this timer,
-+		 * because we're just restarting scan. Otherwise cancel it so
-+		 * that we don't try to disable scanning when it's already
-+		 * disabled.
- 		 */
--		cancel_delayed_work(&hdev->le_scan_disable);
-+		if (!test_bit(HCI_LE_SCAN_RESTARTING, &hdev->discovery.flags))
-+			cancel_delayed_work(&hdev->le_scan_disable);
+-static void compare_chars(const bt_gatt_characteristic_t *a,
+-					const bt_gatt_characteristic_t *b)
++static void assert_desc(const struct gatt_desc *a,
++						struct gatt_db_attribute *attr)
+ {
+-	unsigned int i;
++	uint16_t handle;
++	const bt_uuid_t *uuid;
++	uint128_t u128;
  
- 		clear_bit(HCI_LE_SCAN, &hdev->dev_flags);
+-	g_assert(a->start_handle == b->start_handle);
+-	g_assert(a->end_handle == b->end_handle);
+-	g_assert(a->properties == b->properties);
+-	g_assert(a->value_handle == b->value_handle);
+-	g_assert(a->num_descs == b->num_descs);
+-	g_assert(memcmp(a->uuid, b->uuid, sizeof(a->uuid)) == 0);
++	handle = gatt_db_attribute_get_handle(attr);
++	uuid = gatt_db_attribute_get_type(attr);
  
+-	for (i = 0; i < a->num_descs; i++)
+-		compare_descs(&a->descs[i], &b->descs[i]);
++	u128 = uuid->value.u128;
++
++	g_assert(a->handle == handle);
++	g_assert(memcmp(a->uuid, u128.data, sizeof(u128.data)) == 0);
+ }
+ 
+ typedef void (*test_step_t)(struct context *context);
+@@ -387,39 +420,89 @@ struct test_step {
+ 	uint16_t length;
+ };
+ 
++struct service_test_data {
++	const struct test_data *data;
++	size_t svc_index;
++	size_t chrc_index;
++	size_t desc_index;
++};
++
++static void compare_desc(struct gatt_db_attribute *attr, void *user_data)
++{
++	struct service_test_data *test_data = user_data;
++	const struct gatt_service *svc;
++	const struct gatt_chrc *chrc;
++
++	svc = test_data->data->services[test_data->svc_index];
++	chrc = svc->chars[test_data->chrc_index];
++	g_assert(test_data->desc_index < chrc->num_descs);
++
++	assert_desc(&chrc->descs[test_data->desc_index], attr);
++
++	test_data->desc_index++;
++}
++
++static void compare_chrc(struct gatt_db_attribute *attr, void *user_data)
++{
++	struct service_test_data *test_data = user_data;
++	const struct gatt_service *svc;
++	const struct gatt_chrc *chrc;
++
++	svc = test_data->data->services[test_data->svc_index];
++	g_assert(test_data->chrc_index < svc->num_chars);
++	chrc = svc->chars[test_data->chrc_index];
++
++	assert_chrc(chrc, attr);
++
++	test_data->desc_index = 0;
++
++	gatt_db_service_foreach_desc(attr, compare_desc, test_data);
++	g_assert(test_data->desc_index == chrc->num_descs);
++
++	test_data->chrc_index++;
++}
++
++static void compare_service(struct gatt_db_attribute *attr, void *user_data)
++{
++	struct service_test_data *test_data = user_data;
++	const struct gatt_service *svc;
++
++	g_assert(test_data->svc_index < test_data->data->num_services);
++	svc = test_data->data->services[test_data->svc_index];
++
++	assert_service(test_data->data->services[test_data->svc_index], attr);
++
++	test_data->chrc_index = 0;
++
++	gatt_db_service_foreach_char(attr, compare_chrc, test_data);
++	g_assert(test_data->chrc_index == svc->num_chars);
++
++	test_data->svc_index++;
++}
++
+ static void client_ready_cb(bool success, uint8_t att_ecode, void *user_data)
+ {
+ 	struct context *context = user_data;
+-	const struct test_data *data = context->data;
+-	struct bt_gatt_characteristic_iter char_iter;
+-	const bt_gatt_characteristic_t *charac;
+-	const bt_gatt_service_t *service;
+-	struct bt_gatt_service_iter iter;
+-	int i, j;
++	struct service_test_data test_data;
++	struct gatt_db *db;
+ 
+ 	g_assert(success);
+ 
+-	if (!data->services) {
++	test_data.data = context->data;
++	test_data.svc_index = 0;
++
++	if (!test_data.data->services) {
+ 		context_quit(context);
+ 		return;
+ 	}
+ 
+-	g_assert(bt_gatt_service_iter_init(&iter, context->client));
+-	for (i = 0; i < data->num_services; i++) {
+-		g_assert(bt_gatt_service_iter_next(&iter, &service));
+-		compare_service(service, data->services[i]->service);
+-		g_assert(bt_gatt_characteristic_iter_init(&char_iter, service));
+-
+-		for (j = 0; j < data->services[i]->num_chars; j++) {
+-			g_assert(bt_gatt_characteristic_iter_next(&char_iter,
+-								&charac));
+-			compare_chars(charac, data->services[i]->chars[j]);
+-		}
+-		g_assert(!bt_gatt_characteristic_iter_next(&char_iter,
+-								&charac));
+-	}
++	g_assert(context->client);
++
++	db = bt_gatt_client_get_db(context->client);
++	g_assert(db);
+ 
+-	g_assert(!bt_gatt_service_iter_next(&iter, &service));
++	gatt_db_foreach_service(db, compare_service, &test_data);
++	g_assert(test_data.svc_index == test_data.data->num_services);
+ 
+ 	if (context->data->step) {
+ 		const struct test_step *step = context->data->step;
 -- 
-2.1.0
+2.2.0.rc0.207.ga3a616c
 
