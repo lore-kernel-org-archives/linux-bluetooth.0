@@ -2,72 +2,76 @@ Return-Path: <cyrus@holtmann.org>
 From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH v2 1/5] android/handsfree-client: Add SCO to handsfree client
-Date: Fri, 28 Nov 2014 10:37:21 +0100
-Message-Id: <1417167445-29099-2-git-send-email-lukasz.rymanowski@tieto.com>
+Subject: [PATCH v2 4/5] android/handsfree-client: Send AT+BCC to start codec negotiation
+Date: Fri, 28 Nov 2014 10:37:24 +0100
+Message-Id: <1417167445-29099-5-git-send-email-lukasz.rymanowski@tieto.com>
 In-Reply-To: <1417167445-29099-1-git-send-email-lukasz.rymanowski@tieto.com>
 References: <1417167445-29099-1-git-send-email-lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+With this patch we start codec negotation on audio connect if both sides
+does support it.
+
+This patch also moves codec_negotiation_supported functions up in the
+file
 ---
- android/handsfree-client.c | 15 +++++++++++++++
- 1 file changed, 15 insertions(+)
+ android/handsfree-client.c | 26 ++++++++++++++++++--------
+ 1 file changed, 18 insertions(+), 8 deletions(-)
 
 diff --git a/android/handsfree-client.c b/android/handsfree-client.c
-index 283519f..9e67c7f 100644
+index fd68d78..9818a47 100644
 --- a/android/handsfree-client.c
 +++ b/android/handsfree-client.c
-@@ -47,6 +47,7 @@
- #include "bluetooth.h"
- #include "hal-msg.h"
- #include "handsfree-client.h"
-+#include "sco.h"
- 
- #define HFP_HF_CHANNEL 7
- 
-@@ -139,6 +140,8 @@ static uint32_t hfp_hf_record_id = 0;
- static struct queue *devices = NULL;
- static GIOChannel *hfp_hf_server = NULL;
- 
-+static struct bt_sco *sco = NULL;
-+
- static struct device *find_default_device(void)
- {
- 	return queue_peek_head(devices);
-@@ -1999,6 +2002,11 @@ static void cleanup_hfp_hf(void)
- 		bt_adapter_remove_record(hfp_hf_record_id);
- 		hfp_hf_record_id = 0;
- 	}
-+
-+	if (sco) {
-+		bt_sco_unref(sco);
-+		sco = NULL;
-+	}
+@@ -312,9 +312,26 @@ static void set_audio_state(struct device *dev, uint8_t state)
+ 				HAL_EV_HF_CLIENT_AUDIO_STATE, sizeof(ev), &ev);
  }
  
- bool bt_hf_client_register(struct ipc *ipc, const bdaddr_t *addr)
-@@ -2016,6 +2024,12 @@ bool bt_hf_client_register(struct ipc *ipc, const bdaddr_t *addr)
- 	if (!enable_hf_client())
- 		goto failed;
- 
-+	sco = bt_sco_new(addr);
-+	if (!sco) {
-+		error("hf-client: Cannot create SCO. HFP AG is in use ?");
-+		goto failed;
-+	}
++static void bcc_cb(enum hfp_result result, enum hfp_error cme_err,
++							void *user_data)
++{
++	struct device *dev = user_data;
 +
- 	hal_ipc = ipc;
- 	ipc_register(hal_ipc, HAL_SERVICE_ID_HANDSFREE_CLIENT, cmd_handlers,
- 						G_N_ELEMENTS(cmd_handlers));
-@@ -2023,6 +2037,7 @@ bool bt_hf_client_register(struct ipc *ipc, const bdaddr_t *addr)
- 	return true;
++	if (result != HFP_RESULT_OK)
++		set_audio_state(dev, HAL_HF_CLIENT_AUDIO_STATE_DISCONNECTED);
++}
++
++static bool codec_negotiation_supported(struct device *dev)
++{
++	return (dev->features & HFP_AG_FEAT_CODEC) &&
++			(hfp_hf_features & HFP_HF_FEAT_CODEC);
++}
++
+ static bool connect_sco(struct device *dev)
+ {
+-	/* TODO: handle codec negotiation */
++	if (codec_negotiation_supported(dev))
++		return hfp_hf_send_command(dev->hf, bcc_cb, dev,
++								"AT+BCC");
  
- failed:
-+	cleanup_hfp_hf();
- 	queue_destroy(devices, free);
- 	devices = NULL;
+ 	return bt_sco_connect(sco, &dev->bdaddr, BT_VOICE_CVSD_16BIT);
+ }
+@@ -383,7 +400,6 @@ static void cmd_complete_cb(enum hfp_result result, enum hfp_error cme_err,
+ 	struct hal_ev_hf_client_command_complete ev;
  
+ 	DBG("");
+-
+ 	memset(&ev, 0, sizeof(ev));
+ 
+ 	switch (result) {
+@@ -1653,12 +1669,6 @@ static void slc_brsf_cb(struct hfp_context *context, void *user_data)
+ 		dev->features = feat;
+ }
+ 
+-static bool codec_negotiation_supported(struct device *dev)
+-{
+-	return (dev->features & HFP_AG_FEAT_CODEC) &&
+-			(hfp_hf_features & HFP_HF_FEAT_CODEC);
+-}
+-
+ static void slc_brsf_resp(enum hfp_result result, enum hfp_error cme_err,
+ 							void *user_data)
+ {
 -- 
 1.8.4
 
