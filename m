@@ -2,149 +2,97 @@ Return-Path: <cyrus@holtmann.org>
 From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH v2 2/5] android/handsfree-client: Add handle incoming SCO connection
-Date: Fri, 28 Nov 2014 10:37:22 +0100
-Message-Id: <1417167445-29099-3-git-send-email-lukasz.rymanowski@tieto.com>
+Subject: [PATCH v2 3/5] android/handsfree-client: Implement audio connect/disconnect
+Date: Fri, 28 Nov 2014 10:37:23 +0100
+Message-Id: <1417167445-29099-4-git-send-email-lukasz.rymanowski@tieto.com>
 In-Reply-To: <1417167445-29099-1-git-send-email-lukasz.rymanowski@tieto.com>
 References: <1417167445-29099-1-git-send-email-lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- android/handsfree-client.c | 92 ++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 92 insertions(+)
+ android/handsfree-client.c | 60 ++++++++++++++++++++++++++++++++++++++++++----
+ 1 file changed, 55 insertions(+), 5 deletions(-)
 
 diff --git a/android/handsfree-client.c b/android/handsfree-client.c
-index 9e67c7f..be12d5e 100644
+index be12d5e..fd68d78 100644
 --- a/android/handsfree-client.c
 +++ b/android/handsfree-client.c
-@@ -116,6 +116,7 @@ struct device {
- 	bdaddr_t bdaddr;
- 	struct hfp_hf *hf;
- 	uint8_t state;
-+	uint8_t audio_state;
- 
- 	uint8_t negotiated_codec;
- 	uint32_t features;
-@@ -184,6 +185,7 @@ static struct device *device_create(const bdaddr_t *bdaddr)
- 
- 	bacpy(&dev->bdaddr, bdaddr);
- 	dev->state = HAL_HF_CLIENT_CONN_STATE_DISCONNECTED;
-+	dev->audio_state = HAL_HF_CLIENT_AUDIO_STATE_DISCONNECTED;
- 
- 	init_codecs(dev);
- 
-@@ -290,6 +292,26 @@ done:
- 			HAL_OP_HF_CLIENT_DISCONNECT, status);
+@@ -312,19 +312,69 @@ static void set_audio_state(struct device *dev, uint8_t state)
+ 				HAL_EV_HF_CLIENT_AUDIO_STATE, sizeof(ev), &ev);
  }
  
-+static void set_audio_state(struct device *dev, uint8_t state)
++static bool connect_sco(struct device *dev)
 +{
-+	struct hal_ev_hf_client_audio_state ev;
-+	char address[18];
++	/* TODO: handle codec negotiation */
 +
-+	if (dev->audio_state == state)
-+		return;
-+
-+	dev->audio_state = state;
-+
-+	ba2str(&dev->bdaddr, address);
-+	DBG("device %s audio state %u", address, state);
-+
-+	bdaddr2android(&dev->bdaddr, ev.bdaddr);
-+	ev.state = state;
-+
-+	ipc_send_notif(hal_ipc, HAL_SERVICE_ID_HANDSFREE_CLIENT,
-+				HAL_EV_HF_CLIENT_AUDIO_STATE, sizeof(ev), &ev);
++	return bt_sco_connect(sco, &dev->bdaddr, BT_VOICE_CVSD_16BIT);
 +}
 +
  static void handle_connect_audio(const void *buf, uint16_t len)
  {
- 	DBG("Not Implemented");
-@@ -2009,6 +2031,72 @@ static void cleanup_hfp_hf(void)
- 	}
- }
- 
-+static bool confirm_sco_cb(const bdaddr_t *addr, uint16_t *voice_settings)
-+{
+-	DBG("Not Implemented");
++	const struct hal_cmd_hf_client_connect_audio *cmd = (void *) buf;
 +	struct device *dev;
++	uint8_t status;
++	bdaddr_t bdaddr;
 +
 +	DBG("");
 +
-+	dev = find_device(addr);
-+	if (!dev || dev->state != HAL_HF_CLIENT_CONN_STATE_SLC_CONNECTED) {
-+		error("hf-client: No device or SLC not ready");
-+		return false;
-+	}
++	android2bdaddr(&cmd->bdaddr, &bdaddr);
 +
-+	set_audio_state(dev, HAL_HF_CLIENT_AUDIO_STATE_CONNECTING);
-+
-+	if (codec_negotiation_supported(dev) &&
-+			dev->negotiated_codec != CODEC_ID_CVSD)
-+		*voice_settings = BT_VOICE_TRANSPARENT;
-+	else
-+		*voice_settings = BT_VOICE_CVSD_16BIT;
-+
-+	return true;
-+}
-+
-+static void connect_sco_cb(enum sco_status status, const bdaddr_t *addr)
-+{
-+	struct device *dev;
-+	uint8_t audio_state;
-+
-+	DBG("SCO Status %u", status);
-+
-+	/* Device shall be there, just sanity check */
-+	dev = find_device(addr);
-+	if (!dev) {
-+		error("hf-client: There is no device?");
-+		return;
-+	}
-+
-+	if (status != SCO_STATUS_OK) {
-+		audio_state = HAL_HF_CLIENT_AUDIO_STATE_DISCONNECTED;
++	dev = find_device(&bdaddr);
++	if (!dev || dev->state != HAL_HF_CLIENT_CONN_STATE_SLC_CONNECTED ||
++		dev->audio_state != HAL_HF_CLIENT_AUDIO_STATE_DISCONNECTED) {
++		error("hf-client: Cannot create SCO, check SLC or audio state");
++		status = HAL_STATUS_FAILED;
 +		goto done;
 +	}
 +
-+	if (dev->negotiated_codec == CODEC_ID_MSBC)
-+		audio_state = HAL_HF_CLIENT_AUDIO_STATE_CONNECTED_MSBC;
-+	else
-+		audio_state = HAL_HF_CLIENT_AUDIO_STATE_CONNECTED;
++	if (connect_sco(dev)) {
++		status = HAL_STATUS_SUCCESS;
++		set_audio_state(dev, HAL_HF_CLIENT_AUDIO_STATE_CONNECTING);
++	} else {
++		status = HAL_STATUS_FAILED;
++	}
 +
 +done:
-+	set_audio_state(dev, audio_state);
-+}
-+
-+static void disconnect_sco_cb(const bdaddr_t *addr)
-+{
+ 	ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_HANDSFREE_CLIENT,
+-			HAL_OP_HF_CLIENT_CONNECT_AUDIO, HAL_STATUS_UNSUPPORTED);
++					HAL_OP_HF_CLIENT_CONNECT_AUDIO, status);
+ }
+ 
+ static void handle_disconnect_audio(const void *buf, uint16_t len)
+ {
+-	DBG("Not Implemented");
++	const struct hal_cmd_hf_client_disconnect_audio *cmd = (void *) buf;
 +	struct device *dev;
++	uint8_t status;
++	bdaddr_t bdaddr;
 +
 +	DBG("");
 +
-+	dev = find_device(addr);
-+	if (!dev) {
-+		error("hf-client: No device");
-+		return;
++	android2bdaddr(&cmd->bdaddr, &bdaddr);
++
++	dev = find_device(&bdaddr);
++	if (!dev ||
++		dev->audio_state == HAL_HF_CLIENT_AUDIO_STATE_DISCONNECTED) {
++		error("hf-client: Device not found or audio not connected");
++		status = HAL_STATUS_FAILED;
++		goto done;
 +	}
 +
-+	set_audio_state(dev, HAL_HF_CLIENT_AUDIO_STATE_DISCONNECTED);
-+}
++	bt_sco_disconnect(sco);
++	status = HAL_STATUS_SUCCESS;
 +
- bool bt_hf_client_register(struct ipc *ipc, const bdaddr_t *addr)
- {
- 	DBG("");
-@@ -2030,6 +2118,10 @@ bool bt_hf_client_register(struct ipc *ipc, const bdaddr_t *addr)
- 		goto failed;
- 	}
++done:
+ 	ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_HANDSFREE_CLIENT,
+-					HAL_OP_HF_CLIENT_DISCONNECT_AUDIO,
+-					HAL_STATUS_UNSUPPORTED);
++				HAL_OP_HF_CLIENT_DISCONNECT_AUDIO, status);
+ }
  
-+	bt_sco_set_confirm_cb(sco, confirm_sco_cb);
-+	bt_sco_set_connect_cb(sco, connect_sco_cb);
-+	bt_sco_set_disconnect_cb(sco, disconnect_sco_cb);
-+
- 	hal_ipc = ipc;
- 	ipc_register(hal_ipc, HAL_SERVICE_ID_HANDSFREE_CLIENT, cmd_handlers,
- 						G_N_ELEMENTS(cmd_handlers));
+ static void cmd_complete_cb(enum hfp_result result, enum hfp_error cme_err,
 -- 
 1.8.4
 
