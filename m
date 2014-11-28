@@ -2,218 +2,263 @@ Return-Path: <cyrus@holtmann.org>
 From: Arman Uguray <armansito@chromium.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Arman Uguray <armansito@chromium.org>
-Subject: [PATCH BlueZ 8/8] shared/gatt-client: Remove GATT structs and iterators
-Date: Fri, 28 Nov 2014 09:49:22 -0800
-Message-Id: <1417196962-3876-9-git-send-email-armansito@chromium.org>
+Subject: [PATCH BlueZ 6/8] tools/btgatt-client: Use gatt-db instead of iterators
+Date: Fri, 28 Nov 2014 09:49:20 -0800
+Message-Id: <1417196962-3876-7-git-send-email-armansito@chromium.org>
 In-Reply-To: <1417196962-3876-1-git-send-email-armansito@chromium.org>
 References: <1417196962-3876-1-git-send-email-armansito@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch removes the high-level structs and iterators used by
-shared/gatt-client in favor of gatt-db.
+btgatt-client now iterates services, characteristics, and descriptors
+of the shared/gatt-client using gatt-db instead of the iterators.
 ---
- src/shared/gatt-client.c | 88 ------------------------------------------------
- src/shared/gatt-client.h | 73 +++------------------------------------
- 2 files changed, 5 insertions(+), 156 deletions(-)
+ tools/btgatt-client.c | 175 +++++++++++++++++++++++---------------------------
+ 1 file changed, 79 insertions(+), 96 deletions(-)
 
-diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
-index a26f43a..4b1b90e 100644
---- a/src/shared/gatt-client.c
-+++ b/src/shared/gatt-client.c
-@@ -1641,94 +1641,6 @@ struct gatt_db *bt_gatt_client_get_db(struct bt_gatt_client *client)
- 	return client->db;
+diff --git a/tools/btgatt-client.c b/tools/btgatt-client.c
+index dadfa37..4a2b013 100644
+--- a/tools/btgatt-client.c
++++ b/tools/btgatt-client.c
+@@ -41,7 +41,9 @@
+ 
+ #include "monitor/mainloop.h"
+ #include "src/shared/util.h"
++#include "src/shared/queue.h"
+ #include "src/shared/att.h"
++#include "src/shared/gatt-db.h"
+ #include "src/shared/gatt-client.h"
+ 
+ #define ATT_CID 4
+@@ -159,118 +161,118 @@ static void client_destroy(struct client *cli)
+ 	bt_gatt_client_unref(cli->gatt);
  }
  
--bool bt_gatt_service_iter_init(struct bt_gatt_service_iter *iter,
--						struct bt_gatt_client *client)
--{
--	if (!iter || !client)
--		return false;
+-static void print_uuid(const uint8_t uuid[16])
++static void print_uuid(const bt_uuid_t *uuid)
+ {
+ 	char uuid_str[MAX_LEN_UUID_STR];
+-	bt_uuid_t tmp;
++	bt_uuid_t uuid128;
+ 
+-	tmp.type = BT_UUID128;
+-	memcpy(tmp.value.u128.data, uuid, 16 * sizeof(uint8_t));
+-	bt_uuid_to_string(&tmp, uuid_str, sizeof(uuid_str));
++	bt_uuid_to_uuid128(uuid, &uuid128);
++	bt_uuid_to_string(&uuid128, uuid_str, sizeof(uuid_str));
+ 
+ 	printf("%s\n", uuid_str);
+ }
+ 
+-static void print_service(const bt_gatt_service_t *service)
++static void print_incl(struct gatt_db_attribute *attr, void *user_data)
+ {
+-	struct bt_gatt_characteristic_iter iter;
+-	struct bt_gatt_incl_service_iter include_iter;
+-	const bt_gatt_characteristic_t *chrc;
+-	const bt_gatt_included_service_t *incl;
+-	size_t i;
 -
--	if (client->in_init || client->in_svc_chngd)
--		return false;
--
--	memset(iter, 0, sizeof(*iter));
--	iter->client = client;
--	iter->ptr = NULL;
--
--	return true;
--}
--
--bool bt_gatt_service_iter_next(struct bt_gatt_service_iter *iter,
--					const bt_gatt_service_t **service)
--{
--	/* TODO: Remove iterator functions */
--
--	return false;
--}
--
--bool bt_gatt_service_iter_next_by_handle(struct bt_gatt_service_iter *iter,
--					uint16_t start_handle,
--					const bt_gatt_service_t **service)
--{
--	while (bt_gatt_service_iter_next(iter, service)) {
--		if ((*service)->start_handle == start_handle)
--			return true;
+-	if (!bt_gatt_characteristic_iter_init(&iter, service)) {
+-		PRLOG("Failed to initialize characteristic iterator\n");
++	struct client *cli = user_data;
++	uint16_t handle, start, end;
++	struct gatt_db_attribute *service;
++	bt_uuid_t uuid;
++
++	if (!gatt_db_attribute_get_incl_data(attr, &handle, &start, &end))
+ 		return;
+-	}
+ 
+-	if (!bt_gatt_include_service_iter_init(&include_iter, service)) {
+-		PRLOG("Failed to initialize include service iterator\n");
++	service = gatt_db_get_attribute(bt_gatt_client_get_db(cli->gatt),
++									start);
++	if (!service)
++		return;
++
++	gatt_db_attribute_get_service_uuid(service, &uuid);
++
++	printf("\t  " COLOR_GREEN "include" COLOR_OFF " - handle: "
++					"0x%04x, - start: 0x%04x, end: 0x%04x,"
++					"uuid: ", handle, start, end);
++	print_uuid(&uuid);
++}
++
++static void print_desc(struct gatt_db_attribute *attr, void *user_data)
++{
++	printf("\t\t  " COLOR_MAGENTA "descr" COLOR_OFF
++					" - handle: 0x%04x, uuid: ",
++					gatt_db_attribute_get_handle(attr));
++	print_uuid(gatt_db_attribute_get_type(attr));
++}
++
++static void print_chrc(struct gatt_db_attribute *attr, void *user_data)
++{
++	uint16_t handle, value_handle;
++	uint8_t properties;
++	bt_uuid_t uuid;
++
++	if (!gatt_db_attribute_get_char_data(attr, &handle,
++								&value_handle,
++								&properties,
++								&uuid))
++		return;
++
++	printf("\t  " COLOR_YELLOW "charac" COLOR_OFF
++					" - start: 0x%04x, value: 0x%04x, "
++					"props: 0x%02x, uuid: ",
++					handle, value_handle, properties);
++	print_uuid(&uuid);
++
++	gatt_db_service_foreach_desc(attr, print_desc, NULL);
++}
++
++static void print_service(struct gatt_db_attribute *attr, void *user_data)
++{
++	struct client *cli = user_data;
++	uint16_t start, end;
++	bool primary;
++	bt_uuid_t uuid;
++
++	if (!gatt_db_attribute_get_service_data(attr, &start, &end, &primary,
++									&uuid))
+ 		return;
+-	}
+ 
+ 	printf(COLOR_RED "service" COLOR_OFF " - start: 0x%04x, "
+ 				"end: 0x%04x, type: %s, uuid: ",
+-				service->start_handle, service->end_handle,
+-				service->primary ? "primary" : "secondary");
+-	print_uuid(service->uuid);
++				start, end, primary ? "primary" : "secondary");
++	print_uuid(&uuid);
+ 
+-	while (bt_gatt_include_service_iter_next(&include_iter, &incl)) {
+-		printf("\t  " COLOR_GREEN "include" COLOR_OFF " - handle: "
+-					"0x%04x, - start: 0x%04x, end: 0x%04x,"
+-					"uuid: ", incl->handle,
+-					incl->start_handle, incl->end_handle);
+-		print_uuid(incl->uuid);
 -	}
 -
--	return false;
--}
+-	while (bt_gatt_characteristic_iter_next(&iter, &chrc)) {
+-		printf("\t  " COLOR_YELLOW "charac" COLOR_OFF
+-				" - start: 0x%04x, end: 0x%04x, "
+-				"value: 0x%04x, props: 0x%02x, uuid: ",
+-				chrc->start_handle,
+-				chrc->end_handle,
+-				chrc->value_handle,
+-				chrc->properties);
+-		print_uuid(chrc->uuid);
 -
--bool bt_gatt_service_iter_next_by_uuid(struct bt_gatt_service_iter *iter,
--					const uint8_t uuid[BT_GATT_UUID_SIZE],
--					const bt_gatt_service_t **service)
--{
--	while (bt_gatt_service_iter_next(iter, service)) {
--		if (memcmp((*service)->uuid, uuid, UUID_BYTES) == 0)
--			return true;
+-		for (i = 0; i < chrc->num_descs; i++) {
+-			printf("\t\t  " COLOR_MAGENTA "descr" COLOR_OFF
+-						" - handle: 0x%04x, uuid: ",
+-						chrc->descs[i].handle);
+-			print_uuid(chrc->descs[i].uuid);
+-		}
+-	}
++	gatt_db_service_foreach_incl(attr, print_incl, cli);
++	gatt_db_service_foreach_char(attr, print_chrc, NULL);
+ 
+ 	printf("\n");
+ }
+ 
+ static void print_services(struct client *cli)
+ {
+-	struct bt_gatt_service_iter iter;
+-	const bt_gatt_service_t *service;
+-
+-	if (!bt_gatt_service_iter_init(&iter, cli->gatt)) {
+-		PRLOG("Failed to initialize service iterator\n");
+-		return;
+-	}
++	struct gatt_db *db = bt_gatt_client_get_db(cli->gatt);
+ 
+ 	printf("\n");
+ 
+-	while (bt_gatt_service_iter_next(&iter, &service))
+-		print_service(service);
++	gatt_db_foreach_service(db, print_service, cli);
+ }
+ 
+ static void print_services_by_uuid(struct client *cli, const bt_uuid_t *uuid)
+ {
+-	struct bt_gatt_service_iter iter;
+-	const bt_gatt_service_t *service;
+-
+-	if (!bt_gatt_service_iter_init(&iter, cli->gatt)) {
+-		PRLOG("Failed to initialize service iterator\n");
+-		return;
+-	}
++	struct gatt_db *db = bt_gatt_client_get_db(cli->gatt);
+ 
+ 	printf("\n");
+ 
+-	while (bt_gatt_service_iter_next_by_uuid(&iter, uuid->value.u128.data,
+-								&service))
+-		print_service(service);
++	/* TODO: Filter by UUID */
++	gatt_db_foreach_service(db, print_service, cli);
+ }
+ 
+ static void print_services_by_handle(struct client *cli, uint16_t handle)
+ {
+-	struct bt_gatt_service_iter iter;
+-	const bt_gatt_service_t *service;
+-
+-	if (!bt_gatt_service_iter_init(&iter, cli->gatt)) {
+-		PRLOG("Failed to initialize service iterator\n");
+-		return;
+-	}
++	struct gatt_db *db = bt_gatt_client_get_db(cli->gatt);
+ 
+ 	printf("\n");
+ 
+-	while (bt_gatt_service_iter_next_by_handle(&iter, handle, &service))
+-		print_service(service);
++	/* TODO: Filter by handle */
++	gatt_db_foreach_service(db, print_service, cli);
+ }
+ 
+ static void ready_cb(bool success, uint8_t att_ecode, void *user_data)
+@@ -293,32 +295,13 @@ static void service_changed_cb(uint16_t start_handle, uint16_t end_handle,
+ 								void *user_data)
+ {
+ 	struct client *cli = user_data;
+-	struct bt_gatt_service_iter iter;
+-	const bt_gatt_service_t *service;
+-
+-	if (!bt_gatt_service_iter_init(&iter, cli->gatt)) {
+-		PRLOG("Failed to initialize service iterator\n");
+-		return;
+-	}
+ 
+ 	printf("\nService Changed handled - start: 0x%04x end: 0x%04x\n",
+ 						start_handle, end_handle);
+ 
+-	if (!bt_gatt_service_iter_next_by_handle(&iter, start_handle,
+-								&service)) {
+-		print_prompt();
+-		return;
 -	}
 -
--	return false;
--}
+-	print_service(service);
 -
--bool bt_gatt_characteristic_iter_init(struct bt_gatt_characteristic_iter *iter,
--					const bt_gatt_service_t *service)
--{
--	if (!iter || !service)
--		return false;
+-	while (bt_gatt_service_iter_next(&iter, &service)) {
+-		if (service->start_handle >= end_handle)
+-			break;
 -
--	memset(iter, 0, sizeof(*iter));
--	iter->service = (void *) service;
+-		print_service(service);
+-	}
 -
--	return true;
--}
--
--bool bt_gatt_characteristic_iter_next(struct bt_gatt_characteristic_iter *iter,
--					const bt_gatt_characteristic_t **chrc)
--{
--	/* TODO: Remove iterator functions */
--
--	return false;
--}
--
--bool bt_gatt_include_service_iter_init(struct bt_gatt_incl_service_iter *iter,
--					const bt_gatt_service_t *service)
--{
--	if (!iter || !service)
--		return false;
--
--	memset(iter, 0, sizeof(*iter));
--	iter->service = (void *) service;
--
--	return true;
--}
--
--bool bt_gatt_include_service_iter_next(struct bt_gatt_incl_service_iter *iter,
--					const bt_gatt_included_service_t **incl)
--{
--	/* TODO: Remove iterator functions */
--
--	return false;
--}
--
- struct read_op {
- 	bt_gatt_client_read_callback_t callback;
- 	void *user_data;
-diff --git a/src/shared/gatt-client.h b/src/shared/gatt-client.h
-index 0309e5e..235b9cb 100644
---- a/src/shared/gatt-client.h
-+++ b/src/shared/gatt-client.h
-@@ -38,6 +38,10 @@ typedef void (*bt_gatt_client_destroy_func_t)(void *user_data);
- typedef void (*bt_gatt_client_callback_t)(bool success, uint8_t att_ecode,
- 							void *user_data);
- typedef void (*bt_gatt_client_debug_func_t)(const char *str, void *user_data);
-+typedef void (*bt_gatt_client_read_callback_t)(bool success, uint8_t att_ecode,
-+					const uint8_t *value, uint16_t length,
-+					void *user_data);
-+
- typedef void (*bt_gatt_client_write_long_callback_t)(bool success,
- 					bool reliable_error, uint8_t att_ecode,
- 					void *user_data);
-@@ -51,6 +55,7 @@ typedef void (*bt_gatt_client_service_changed_callback_t)(uint16_t start_handle,
- 							uint16_t end_handle,
- 							void *user_data);
++	gatt_db_foreach_service_in_range(bt_gatt_client_get_db(cli->gatt),
++						print_service, cli,
++						start_handle, end_handle);
+ 	print_prompt();
+ }
  
-+
- bool bt_gatt_client_is_ready(struct bt_gatt_client *client);
- bool bt_gatt_client_set_ready_handler(struct bt_gatt_client *client,
- 					bt_gatt_client_callback_t callback,
-@@ -67,74 +72,6 @@ bool bt_gatt_client_set_debug(struct bt_gatt_client *client,
- 
- struct gatt_db *bt_gatt_client_get_db(struct bt_gatt_client *client);
- 
--typedef struct {
--	bool primary;
--	uint16_t start_handle;
--	uint16_t end_handle;
--	uint8_t uuid[BT_GATT_UUID_SIZE];
--} bt_gatt_service_t;
--
--typedef struct {
--	uint16_t handle;
--	uint8_t uuid[BT_GATT_UUID_SIZE];
--} bt_gatt_descriptor_t;
--
--typedef struct {
--	uint16_t start_handle;
--	uint16_t end_handle;
--	uint16_t value_handle;
--	uint8_t properties;
--	uint8_t uuid[BT_GATT_UUID_SIZE];
--	const bt_gatt_descriptor_t *descs;
--	size_t num_descs;
--} bt_gatt_characteristic_t;
--
--typedef struct {
--	uint16_t handle;
--	uint16_t start_handle;
--	uint16_t end_handle;
--	uint8_t uuid[BT_GATT_UUID_SIZE];
--} bt_gatt_included_service_t;
--
--struct bt_gatt_service_iter {
--	struct bt_gatt_client *client;
--	void *ptr;
--};
--
--struct bt_gatt_characteristic_iter {
--	void *service;
--	size_t pos;
--};
--
--struct bt_gatt_incl_service_iter {
--	void *service;
--	size_t pos;
--};
--
--bool bt_gatt_service_iter_init(struct bt_gatt_service_iter *iter,
--						struct bt_gatt_client *client);
--bool bt_gatt_service_iter_next(struct bt_gatt_service_iter *iter,
--					const bt_gatt_service_t **service);
--bool bt_gatt_service_iter_next_by_handle(struct bt_gatt_service_iter *iter,
--					uint16_t start_handle,
--					const bt_gatt_service_t **service);
--bool bt_gatt_service_iter_next_by_uuid(struct bt_gatt_service_iter *iter,
--					const uint8_t uuid[BT_GATT_UUID_SIZE],
--					const bt_gatt_service_t **service);
--
--bool bt_gatt_characteristic_iter_init(struct bt_gatt_characteristic_iter *iter,
--					const bt_gatt_service_t *service);
--bool bt_gatt_characteristic_iter_next(struct bt_gatt_characteristic_iter *iter,
--					const bt_gatt_characteristic_t **chrc);
--
--bool bt_gatt_include_service_iter_init(struct bt_gatt_incl_service_iter *iter,
--					const bt_gatt_service_t *service);
--bool bt_gatt_include_service_iter_next(struct bt_gatt_incl_service_iter *iter,
--					const bt_gatt_included_service_t **inc);
--
--typedef void (*bt_gatt_client_read_callback_t)(bool success, uint8_t att_ecode,
--					const uint8_t *value, uint16_t length,
--					void *user_data);
- 
- bool bt_gatt_client_read_value(struct bt_gatt_client *client,
- 					uint16_t value_handle,
 -- 
 2.2.0.rc0.207.ga3a616c
 
