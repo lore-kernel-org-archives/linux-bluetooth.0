@@ -1,63 +1,57 @@
 Return-Path: <cyrus@holtmann.org>
 From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 7/7] android/client: Add gatt server callbacks support for Android 5.0
-Date: Fri, 28 Nov 2014 09:22:05 +0100
-Message-Id: <1417162925-17511-7-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+Subject: [PATCH 5/7] android/client: Add support for gattc batchscan_dis_batch_scan cmd
+Date: Fri, 28 Nov 2014 09:22:03 +0100
+Message-Id: <1417162925-17511-5-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 In-Reply-To: <1417162925-17511-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 References: <1417162925-17511-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- android/client/if-gatt.c | 27 ++++++++++++++++++++++++++-
- 1 file changed, 26 insertions(+), 1 deletion(-)
+ android/client/if-gatt.c | 21 +++++++++++++++++++++
+ 1 file changed, 21 insertions(+)
 
 diff --git a/android/client/if-gatt.c b/android/client/if-gatt.c
-index b39a5ec..8593fd2 100644
+index cf55e96..df40f33 100644
 --- a/android/client/if-gatt.c
 +++ b/android/client/if-gatt.c
-@@ -982,6 +982,27 @@ static void gatts_response_confirmation_cb(int status, int handle)
- 	haltest_info("%s: status=%d handle=0x%x\n", __func__, status, handle);
+@@ -2086,6 +2086,26 @@ static void batchscan_enb_batch_scan_p(int argc, const char **argv)
+ 	EXEC(if_gatt->client->batchscan_enb_batch_scan, client_if, scan_mode,
+ 			scan_interval, scan_window, addr_type, discard_rule);
  }
- 
-+/**
-+ * Callback confirming that a notification or indication has been sent
-+ * to a remote device.
-+ */
-+static void gatts_indication_sent_cb(int conn_id, int status)
++
++/* batchscan disable */
++static void batchscan_dis_batch_scan_c(int argc, const char **argv,
++					enum_func *enum_func, void **user)
 +{
-+	haltest_info("%s: status=%d conn_id=%d", __func__, status, conn_id);
++	if (argc == 2) {
++		*user = client_if_str;
++		*enum_func = enum_one_string;
++	}
 +}
 +
-+/**
-+ * Callback notifying an application that a remote device connection is
-+ * currently congested and cannot receive any more data. An application
-+ * should avoid sending more data until a further callback is received
-+ * indicating the congestion status has been cleared.
-+ */
-+static void gatts_congestion_cb(int conn_id, bool congested)
++static void batchscan_dis_batch_scan_p(int argc, const char **argv)
 +{
-+	haltest_info("%s: conn_id=%d congested=%d", __func__, conn_id,
-+								congested);
-+}
++	int client_if;
 +
- static const btgatt_server_callbacks_t btgatt_server_callbacks = {
- 	.register_server_cb = gatts_register_server_cb,
- 	.connection_cb = gatts_connection_cb,
-@@ -995,7 +1016,11 @@ static const btgatt_server_callbacks_t btgatt_server_callbacks = {
- 	.request_read_cb = gatts_request_read_cb,
- 	.request_write_cb = gatts_request_write_cb,
- 	.request_exec_write_cb = gatts_request_exec_write_cb,
--	.response_confirmation_cb = gatts_response_confirmation_cb
-+	.response_confirmation_cb = gatts_response_confirmation_cb,
-+#if ANDROID_VERSION >= PLATFORM_VER(5, 0, 0)
-+	.indication_sent_cb = gatts_indication_sent_cb,
-+	.congestion_cb = gatts_congestion_cb,
-+#endif
- };
++	RETURN_IF_NULL(if_gatt);
++	VERIFY_CLIENT_IF(2, client_if);
++
++	EXEC(if_gatt->client->batchscan_dis_batch_scan, client_if);
++}
+ #endif
  
- static const btgatt_callbacks_t gatt_cbacks = {
+ /* get_device_type */
+@@ -2190,6 +2210,7 @@ static struct method client_methods[] = {
+ 	STD_METHODCH(batchscan_enb_batch_scan, "<client_if> <scan_mode>"
+ 			" <scan_interval> <scan_window> <addr_type>"
+ 			" <discard_rule>"),
++	STD_METHODCH(batchscan_dis_batch_scan, "<client_if>"),
+ #else
+ 	STD_METHODCH(scan, "<client_if> [1|0]"),
+ 	STD_METHODCH(connect, "<client_if> <addr> [<is_direct>]"),
 -- 
 1.9.3
 
