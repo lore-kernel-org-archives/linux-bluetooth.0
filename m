@@ -2,31 +2,29 @@ Return-Path: <cyrus@holtmann.org>
 From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH v2 5/5] android/README: Update status of HAL HFP HF implementation
-Date: Fri, 28 Nov 2014 10:37:25 +0100
-Message-Id: <1417167445-29099-6-git-send-email-lukasz.rymanowski@tieto.com>
-In-Reply-To: <1417167445-29099-1-git-send-email-lukasz.rymanowski@tieto.com>
-References: <1417167445-29099-1-git-send-email-lukasz.rymanowski@tieto.com>
+Subject: [PATCH v2 0/5] android/handsfree-client: Add SCO to HFP HF
+Date: Fri, 28 Nov 2014 10:37:20 +0100
+Message-Id: <1417167445-29099-1-git-send-email-lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- android/README | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Last missing piece to HFP HF implementation.
 
-diff --git a/android/README b/android/README
-index aa12e51..6e5c95a 100644
---- a/android/README
-+++ b/android/README
-@@ -289,7 +289,7 @@ health            bt_hl.h            complete      complete
- pan               bt_pan.h           complete      complete
- avrcp             bt_rc.h            complete      complete
- socket            bt_sock.h          complete      partial
--handsfree_client  bt_hf_client.h     N/A           partial
-+handsfree_client  bt_hf_client.h     N/A           complete
- map_client        bt_mce.h           N/A           complete
- a2dp_sink         bt_av.h            N/A           partial
- avrcp_ctrl        bt_rc.h            N/A           partial
+v2:
+* Handled Szymon comments
+* rebase and minor self review fixes in 2/5
+
+Lukasz Rymanowski (5):
+  android/handsfree-client: Add SCO to handsfree client
+  android/handsfree-client: Add handle incoming SCO connection
+  android/handsfree-client: Implement audio connect/disconnect
+  android/handsfree-client: Send AT+BCC to start codec negotiation
+  android/README: Update status of HAL HFP HF implementation
+
+ android/README             |   2 +-
+ android/handsfree-client.c | 191 ++++++++++++++++++++++++++++++++++++++++++---
+ 2 files changed, 180 insertions(+), 13 deletions(-)
+
 -- 
 1.8.4
 
