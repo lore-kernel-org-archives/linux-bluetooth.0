@@ -2,153 +2,161 @@ Return-Path: <cyrus@holtmann.org>
 From: Jakub Pawlowski <jpawlowski@google.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Jakub Pawlowski <jpawlowski@google.com>
-Subject: [PATCH v12 2/3] Bluetooth: Extract generic start and stop discovery
-Date: Thu, 27 Nov 2014 23:53:02 -0800
-Message-Id: <1417161184-17663-2-git-send-email-jpawlowski@google.com>
-In-Reply-To: <1417161184-17663-1-git-send-email-jpawlowski@google.com>
-References: <1417161184-17663-1-git-send-email-jpawlowski@google.com>
+Subject: [PATCH v12 1/3] Bluetooth: add le_scan_restart
+Date: Thu, 27 Nov 2014 23:53:01 -0800
+Message-Id: <1417161184-17663-1-git-send-email-jpawlowski@google.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This commit extract generic_start_discovery and generic_stop_discovery
-in preparation for start and stop service discovery. The reason behind
-that is that both functions will share big part of code, and it would
-be much easier to maintain just one generic method.
+Currently there is no way to restart le scan. It's needed in
+preparation for new service scan method. The way it work: it disable,
+and then enable le scan on controller. During this restart special flag
+is set to make sure we won't remove disable scan work from workqueue.
 
 Signed-off-by: Jakub Pawlowski <jpawlowski@google.com>
 ---
- net/bluetooth/mgmt.c | 39 ++++++++++++++++++++-------------------
- 1 file changed, 20 insertions(+), 19 deletions(-)
+ include/net/bluetooth/hci_core.h | 10 ++++++++++
+ net/bluetooth/hci_core.c         | 42 ++++++++++++++++++++++++++++++++++++++++
+ net/bluetooth/hci_event.c        |  9 ++++++---
+ 3 files changed, 58 insertions(+), 3 deletions(-)
 
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index cbeef5f..6740de0 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -3735,8 +3735,8 @@ static void start_discovery_complete(struct hci_dev *hdev, u8 status)
- 	queue_delayed_work(hdev->workqueue, &hdev->le_scan_disable, timeout);
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 396c098..dad62f4 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -56,6 +56,13 @@ struct inquiry_entry {
+ 	struct inquiry_data	data;
+ };
+ 
++/* BR/EDR and/or LE discovery state flags: the flags defined here should
++ * represent state of discovery
++ */
++enum {
++	HCI_LE_SCAN_RESTARTING,
++};
++
+ struct discovery_state {
+ 	int			type;
+ 	enum {
+@@ -75,6 +82,7 @@ struct discovery_state {
+ 	u32			last_adv_flags;
+ 	u8			last_adv_data[HCI_MAX_AD_LENGTH];
+ 	u8			last_adv_data_len;
++	unsigned long		flags;
+ };
+ 
+ struct hci_conn_hash {
+@@ -337,6 +345,7 @@ struct hci_dev {
+ 	unsigned long		dev_flags;
+ 
+ 	struct delayed_work	le_scan_disable;
++	struct delayed_work	le_scan_restart;
+ 
+ 	__s8			adv_tx_power;
+ 	__u8			adv_data[HCI_MAX_AD_LENGTH];
+@@ -1326,6 +1335,7 @@ void hci_sock_dev_event(struct hci_dev *hdev, int event);
+ #define DISCOV_INTERLEAVED_TIMEOUT	5120	/* msec */
+ #define DISCOV_INTERLEAVED_INQUIRY_LEN	0x04
+ #define DISCOV_BREDR_INQUIRY_LEN	0x08
++#define DISCOV_LE_RESTART_DELAY		300	/* msec */
+ 
+ int mgmt_control(struct sock *sk, struct msghdr *msg, size_t len);
+ int mgmt_new_settings(struct hci_dev *hdev);
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index 5c319a4..2c74d21 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -2557,6 +2557,7 @@ static int hci_dev_do_close(struct hci_dev *hdev)
+ 		cancel_delayed_work(&hdev->service_cache);
+ 
+ 	cancel_delayed_work_sync(&hdev->le_scan_disable);
++	cancel_delayed_work_sync(&hdev->le_scan_restart);
+ 
+ 	if (test_bit(HCI_MGMT, &hdev->dev_flags))
+ 		cancel_delayed_work_sync(&hdev->rpa_expired);
+@@ -3851,6 +3852,8 @@ static void le_scan_disable_work(struct work_struct *work)
+ 
+ 	BT_DBG("%s", hdev->name);
+ 
++	cancel_delayed_work_sync(&hdev->le_scan_restart);
++
+ 	hci_req_init(&req, hdev);
+ 
+ 	hci_req_add_le_scan_disable(&req);
+@@ -3860,6 +3863,44 @@ static void le_scan_disable_work(struct work_struct *work)
+ 		BT_ERR("Disable LE scanning request failed: err %d", err);
  }
  
--static int start_discovery(struct sock *sk, struct hci_dev *hdev,
--			   void *data, u16 len)
-+static int generic_start_discovery(struct sock *sk, struct hci_dev *hdev,
-+				   void *data, u16 len, u16 opcode)
- {
- 	struct mgmt_cp_start_discovery *cp = data;
- 	struct pending_cmd *cmd;
-@@ -3754,27 +3754,27 @@ static int start_discovery(struct sock *sk, struct hci_dev *hdev,
- 	hci_dev_lock(hdev);
- 
- 	if (!hdev_is_powered(hdev)) {
--		err = cmd_complete(sk, hdev->id, MGMT_OP_START_DISCOVERY,
-+		err = cmd_complete(sk, hdev->id, opcode,
- 				   MGMT_STATUS_NOT_POWERED,
- 				   &cp->type, sizeof(cp->type));
- 		goto failed;
- 	}
- 
- 	if (test_bit(HCI_PERIODIC_INQ, &hdev->dev_flags)) {
--		err = cmd_complete(sk, hdev->id, MGMT_OP_START_DISCOVERY,
-+		err = cmd_complete(sk, hdev->id, opcode,
- 				   MGMT_STATUS_BUSY, &cp->type,
- 				   sizeof(cp->type));
- 		goto failed;
- 	}
- 
- 	if (hdev->discovery.state != DISCOVERY_STOPPED) {
--		err = cmd_complete(sk, hdev->id, MGMT_OP_START_DISCOVERY,
-+		err = cmd_complete(sk, hdev->id, opcode,
- 				   MGMT_STATUS_BUSY, &cp->type,
- 				   sizeof(cp->type));
- 		goto failed;
- 	}
- 
--	cmd = mgmt_pending_add(sk, MGMT_OP_START_DISCOVERY, hdev, NULL, 0);
-+	cmd = mgmt_pending_add(sk, opcode, hdev, NULL, 0);
- 	if (!cmd) {
- 		err = -ENOMEM;
- 		goto failed;
-@@ -3788,16 +3788,14 @@ static int start_discovery(struct sock *sk, struct hci_dev *hdev,
- 	case DISCOV_TYPE_BREDR:
- 		status = mgmt_bredr_support(hdev);
- 		if (status) {
--			err = cmd_complete(sk, hdev->id,
--					   MGMT_OP_START_DISCOVERY, status,
-+			err = cmd_complete(sk, hdev->id, opcode, status,
- 					   &cp->type, sizeof(cp->type));
- 			mgmt_pending_remove(cmd);
- 			goto failed;
- 		}
- 
- 		if (test_bit(HCI_INQUIRY, &hdev->flags)) {
--			err = cmd_complete(sk, hdev->id,
--					   MGMT_OP_START_DISCOVERY,
-+			err = cmd_complete(sk, hdev->id, opcode,
- 					   MGMT_STATUS_BUSY, &cp->type,
- 					   sizeof(cp->type));
- 			mgmt_pending_remove(cmd);
-@@ -3816,8 +3814,7 @@ static int start_discovery(struct sock *sk, struct hci_dev *hdev,
- 	case DISCOV_TYPE_INTERLEAVED:
- 		status = mgmt_le_support(hdev);
- 		if (status) {
--			err = cmd_complete(sk, hdev->id,
--					   MGMT_OP_START_DISCOVERY, status,
-+			err = cmd_complete(sk, hdev->id, opcode, status,
- 					   &cp->type, sizeof(cp->type));
- 			mgmt_pending_remove(cmd);
- 			goto failed;
-@@ -3825,8 +3822,7 @@ static int start_discovery(struct sock *sk, struct hci_dev *hdev,
- 
- 		if (hdev->discovery.type == DISCOV_TYPE_INTERLEAVED &&
- 		    !test_bit(HCI_BREDR_ENABLED, &hdev->dev_flags)) {
--			err = cmd_complete(sk, hdev->id,
--					   MGMT_OP_START_DISCOVERY,
-+			err = cmd_complete(sk, hdev->id, opcode,
- 					   MGMT_STATUS_NOT_SUPPORTED,
- 					   &cp->type, sizeof(cp->type));
- 			mgmt_pending_remove(cmd);
-@@ -3840,8 +3836,7 @@ static int start_discovery(struct sock *sk, struct hci_dev *hdev,
- 			 */
- 			if (hci_conn_hash_lookup_state(hdev, LE_LINK,
- 						       BT_CONNECT)) {
--				err = cmd_complete(sk, hdev->id,
--						   MGMT_OP_START_DISCOVERY,
-+				err = cmd_complete(sk, hdev->id, opcode,
- 						   MGMT_STATUS_REJECTED,
- 						   &cp->type,
- 						   sizeof(cp->type));
-@@ -3867,8 +3862,7 @@ static int start_discovery(struct sock *sk, struct hci_dev *hdev,
- 		 */
- 		err = hci_update_random_address(&req, true, &own_addr_type);
- 		if (err < 0) {
--			err = cmd_complete(sk, hdev->id,
--					   MGMT_OP_START_DISCOVERY,
-+			err = cmd_complete(sk, hdev->id, opcode,
- 					   MGMT_STATUS_FAILED,
- 					   &cp->type, sizeof(cp->type));
- 			mgmt_pending_remove(cmd);
-@@ -3890,7 +3884,7 @@ static int start_discovery(struct sock *sk, struct hci_dev *hdev,
- 		break;
- 
- 	default:
--		err = cmd_complete(sk, hdev->id, MGMT_OP_START_DISCOVERY,
-+		err = cmd_complete(sk, hdev->id, opcode,
- 				   MGMT_STATUS_INVALID_PARAMS,
- 				   &cp->type, sizeof(cp->type));
- 		mgmt_pending_remove(cmd);
-@@ -3908,6 +3902,13 @@ failed:
- 	return err;
- }
- 
-+static int start_discovery(struct sock *sk, struct hci_dev *hdev,
-+			   void *data, u16 len)
++static void le_scan_restart_work_complete(struct hci_dev *hdev, u8 status)
 +{
-+	return generic_start_discovery(sk, hdev, data, len,
-+				       MGMT_OP_START_DISCOVERY);
++	clear_bit(HCI_LE_SCAN_RESTARTING, &hdev->discovery.flags);
++
++	if (status)
++		BT_ERR("Failed to restart LE scan: status %d", status);
 +}
 +
- static int mgmt_stop_discovery_failed(struct hci_dev *hdev, u8 status)
++static void le_scan_restart_work(struct work_struct *work)
++{
++	struct hci_dev *hdev = container_of(work, struct hci_dev,
++					    le_scan_restart.work);
++	struct hci_request req;
++	struct hci_cp_le_set_scan_enable cp;
++	int err;
++
++	BT_DBG("%s", hdev->name);
++
++	/* If controller is not scanning we are done. */
++	if (!test_bit(HCI_LE_SCAN, &hdev->dev_flags))
++		return;
++
++	hci_req_init(&req, hdev);
++
++	hci_req_add_le_scan_disable(&req);
++
++	memset(&cp, 0, sizeof(cp));
++	cp.enable = LE_SCAN_ENABLE;
++	cp.filter_dup = LE_SCAN_FILTER_DUP_ENABLE;
++	hci_req_add(&req, HCI_OP_LE_SET_SCAN_ENABLE, sizeof(cp), &cp);
++
++	set_bit(HCI_LE_SCAN_RESTARTING, &hdev->discovery.flags);
++
++	err = hci_req_run(&req, le_scan_restart_work_complete);
++	if (err)
++		BT_ERR("Restart LE scan request failed: err %d", err);
++}
++
+ static void set_random_addr(struct hci_request *req, bdaddr_t *rpa)
  {
- 	struct pending_cmd *cmd;
+ 	struct hci_dev *hdev = req->hdev;
+@@ -4037,6 +4078,7 @@ struct hci_dev *hci_alloc_dev(void)
+ 	INIT_DELAYED_WORK(&hdev->power_off, hci_power_off);
+ 	INIT_DELAYED_WORK(&hdev->discov_off, hci_discov_off);
+ 	INIT_DELAYED_WORK(&hdev->le_scan_disable, le_scan_disable_work);
++	INIT_DELAYED_WORK(&hdev->le_scan_restart, le_scan_restart_work);
+ 
+ 	skb_queue_head_init(&hdev->rx_q);
+ 	skb_queue_head_init(&hdev->cmd_q);
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index bd0a801..ee19656 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -1157,10 +1157,13 @@ static void hci_cc_le_set_scan_enable(struct hci_dev *hdev,
+ 					  d->last_adv_data_len, NULL, 0);
+ 		}
+ 
+-		/* Cancel this timer so that we don't try to disable scanning
+-		 * when it's already disabled.
++		/* If HCI_LE_SCAN_RESTARTING is set, don't cancel this timer,
++		 * because we're just restarting scan. Otherwise cancel it so
++		 * that we don't try to disable scanning when it's already
++		 * disabled.
+ 		 */
+-		cancel_delayed_work(&hdev->le_scan_disable);
++		if (!test_bit(HCI_LE_SCAN_RESTARTING, &hdev->discovery.flags))
++			cancel_delayed_work(&hdev->le_scan_disable);
+ 
+ 		clear_bit(HCI_LE_SCAN, &hdev->dev_flags);
+ 
 -- 
 2.1.0
 
