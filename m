@@ -2,130 +2,181 @@ Return-Path: <cyrus@holtmann.org>
 From: Jakub Pawlowski <jpawlowski@google.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Jakub Pawlowski <jpawlowski@google.com>
-Subject: [PATCH v7 3/3] mgmt-tester: Add service discovery test cases
-Date: Thu, 27 Nov 2014 23:54:34 -0800
-Message-Id: <1417161274-17710-3-git-send-email-jpawlowski@google.com>
+Subject: [PATCH v7 2/3] tools/btmgmt: service-find command
+Date: Thu, 27 Nov 2014 23:54:33 -0800
+Message-Id: <1417161274-17710-2-git-send-email-jpawlowski@google.com>
 In-Reply-To: <1417161274-17710-1-git-send-email-jpawlowski@google.com>
 References: <1417161274-17710-1-git-send-email-jpawlowski@google.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Add command for using MGMT_OP_START_SERVICE_DISCOVERY.
+
+Example usage:
+Find all low energy devices advertising service with UUID 'abcd'
+that have rssi higher than -60 dB
+btmgmt find-service -u abcd -r -60 -l
+
 Signed-off-by: Jakub Pawlowski <jpawlowski@google.com>
 ---
- tools/mgmt-tester.c | 93 +++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 93 insertions(+)
+ tools/btmgmt.c | 130 ++++++++++++++++++++++++++++++++++++++++++++++++++++-----
+ 1 file changed, 120 insertions(+), 10 deletions(-)
 
-diff --git a/tools/mgmt-tester.c b/tools/mgmt-tester.c
-index 7d14fe4..3c8c497 100644
---- a/tools/mgmt-tester.c
-+++ b/tools/mgmt-tester.c
-@@ -1802,6 +1802,83 @@ static const struct generic_data stop_discovery_invalid_param_test_1 = {
- 	.expect_len = sizeof(stop_discovery_bredrle_invalid_param),
- };
+diff --git a/tools/btmgmt.c b/tools/btmgmt.c
+index e227a1c..ac4d096 100644
+--- a/tools/btmgmt.c
++++ b/tools/btmgmt.c
+@@ -1547,6 +1547,125 @@ static void cmd_con(struct mgmt *mgmt, uint16_t index, int argc, char **argv)
+ 	}
+ }
  
-+static const char start_service_discovery_invalid_param[] = { 0x00, 0x00, 0x00, 0x00 };
-+static const char start_service_discovery_invalid_resp[] = { 0x00 };
-+static const char start_service_discovery_bredr_param[] = { 0x01, 0x00, 0x00, 0x00};
-+static const char start_service_discovery_bredr_resp[] = { 0x01 };
-+static const char start_service_discovery_le_param[] = { 0x06, 0x00, 0x01, 0x00,
-+			0xfa, 0xfb, 0x34, 0x9b, 0x5f, 0x80, 0x00, 0x00,
-+			0x80, 0x00, 0x10, 0x00, 0x00, 0x00, 0x00, 0x00 };
-+static const char start_service_discovery_le_resp[] = { 0x06 };
-+static const char start_service_discovery_bredrle_param[] = { 0x07, 0x00, 0x01, 0x00,
-+			0xfa, 0xfb, 0x34, 0x9b, 0x5f, 0x80, 0x00, 0x00,
-+			0x80, 0x00, 0x10, 0x00, 0x00, 0x00, 0x00, 0x00 };
-+static const char start_service_discovery_bredrle_resp[] = { 0x07 };
-+static const char start_service_discovery_valid_hci[] = { 0x01, 0x01 };
-+static const char start_service_discovery_evt[] = { 0x07, 0x01 };
-+static const char start_service_discovery_le_evt[] = { 0x06, 0x01 };
++static void find_service_rsp(uint8_t status, uint16_t len, const void *param,
++							void *user_data)
++{
++	if (status != 0) {
++		fprintf(stderr,
++			"Unable to start service discovery. status 0x%02x (%s)\n",
++			status, mgmt_errstr(status));
++		mainloop_quit();
++		return;
++	}
 +
-+static const struct generic_data start_service_discovery_not_powered_test_1 = {
-+	.send_opcode = MGMT_OP_START_SERVICE_DISCOVERY,
-+	.send_param = start_service_discovery_bredr_param,
-+	.send_len = sizeof(start_service_discovery_bredr_param),
-+	.expect_status = MGMT_STATUS_NOT_POWERED,
-+	.expect_param = start_service_discovery_bredr_resp,
-+	.expect_len = sizeof(start_service_discovery_bredr_resp),
++	printf("Service discovery started\n");
++	discovery = true;
++}
++
++static void find_service_usage(void)
++{
++	printf("Usage: btmgmt find-service -u UUID [-r RSSI_Threshold] [-l|-b]>\n");
++}
++
++static struct option find_service_options[] = {
++	{ "help",	no_argument, 0, 'h' },
++	{ "le-only",	no_argument, 0, 'l' },
++	{ "bredr-only",	no_argument, 0, 'b' },
++	{ "uuid",	required_argument, 0, 'u' },
++	{ "rssi",	required_argument, 0, 'r' },
++	{ 0, 0, 0, 0 }
 +};
 +
-+static const struct generic_data start_service_discovery_invalid_param_test_1 = {
-+	.setup_settings = settings_powered,
-+	.send_opcode = MGMT_OP_START_SERVICE_DISCOVERY,
-+	.send_param = start_service_discovery_invalid_param,
-+	.send_len = sizeof(start_service_discovery_invalid_param),
-+	.expect_status = MGMT_STATUS_INVALID_PARAMS,
-+	.expect_param = start_service_discovery_invalid_resp,
-+	.expect_len = sizeof(start_service_discovery_invalid_resp),
-+};
++static void uuid_to_uuid128(uuid_t *uuid128, const uuid_t *uuid)
++{
++	if (uuid->type == SDP_UUID16)
++		sdp_uuid16_to_uuid128(uuid128, uuid);
++	else if (uuid->type == SDP_UUID32)
++		sdp_uuid32_to_uuid128(uuid128, uuid);
++	else
++		memcpy(uuid128, uuid, sizeof(*uuid));
++}
 +
-+static const struct generic_data start_service_discovery_not_supported_test_1 = {
-+	.setup_settings = settings_powered,
-+	.send_opcode = MGMT_OP_START_SERVICE_DISCOVERY,
-+	.send_param = start_service_discovery_le_param,
-+	.send_len = sizeof(start_service_discovery_le_param),
-+	.expect_status = MGMT_STATUS_REJECTED,
-+	.expect_param = start_service_discovery_le_resp,
-+	.expect_len = sizeof(start_service_discovery_le_resp),
-+};
++static void cmd_find_service(struct mgmt *mgmt, uint16_t index, int argc,
++			     char **argv)
++{
++	struct mgmt_cp_start_service_discovery *cp;
++	uint8_t buf[sizeof(*cp) + 16];
++	int opt;
++	int total_size = sizeof(*cp) + 16;
++	uuid_t uuid;
++	uint128_t uint128;
++	uuid_t uuid128;
++	uint8_t type;
 +
-+static const struct generic_data start_service_discovery_valid_param_test_1 = {
-+	.setup_settings = settings_powered_le,
-+	.send_opcode = MGMT_OP_START_SERVICE_DISCOVERY,
-+	.send_param = start_service_discovery_bredrle_param,
-+	.send_len = sizeof(start_service_discovery_bredrle_param),
-+	.expect_status = MGMT_STATUS_SUCCESS,
-+	.expect_param = start_service_discovery_bredrle_resp,
-+	.expect_len = sizeof(start_service_discovery_bredrle_resp),
-+	.expect_hci_command = BT_HCI_CMD_LE_SET_SCAN_ENABLE,
-+	.expect_hci_param = start_service_discovery_valid_hci,
-+	.expect_hci_len = sizeof(start_service_discovery_valid_hci),
-+	.expect_alt_ev = MGMT_EV_DISCOVERING,
-+	.expect_alt_ev_param = start_service_discovery_evt,
-+	.expect_alt_ev_len = sizeof(start_service_discovery_evt),
-+};
++	if (index == MGMT_INDEX_NONE)
++		index = 0;
 +
-+static const struct generic_data start_service_discovery_valid_param_test_2 = {
-+	.setup_settings = settings_powered,
-+	.send_opcode = MGMT_OP_START_SERVICE_DISCOVERY,
-+	.send_param = start_service_discovery_le_param,
-+	.send_len = sizeof(start_service_discovery_le_param),
-+	.expect_status = MGMT_STATUS_SUCCESS,
-+	.expect_param = start_service_discovery_le_resp,
-+	.expect_len = sizeof(start_service_discovery_le_resp),
-+	.expect_hci_command = BT_HCI_CMD_LE_SET_SCAN_ENABLE,
-+	.expect_hci_param = start_service_discovery_valid_hci,
-+	.expect_hci_len = sizeof(start_service_discovery_valid_hci),
-+	.expect_alt_ev = MGMT_EV_DISCOVERING,
-+	.expect_alt_ev_param = start_service_discovery_le_evt,
-+	.expect_alt_ev_len = sizeof(start_service_discovery_le_evt),
-+};
++	cp = (void *) buf;
++	type = 0;
++	hci_set_bit(BDADDR_BREDR, &type);
++	hci_set_bit(BDADDR_LE_PUBLIC, &type);
++	hci_set_bit(BDADDR_LE_RANDOM, &type);
 +
- static const char set_dev_class_valid_param[] = { 0x01, 0x0c };
- static const char set_dev_class_zero_rsp[] = { 0x00, 0x00, 0x00 };
- static const char set_dev_class_valid_rsp[] = { 0x0c, 0x01, 0x00 };
-@@ -4568,6 +4645,22 @@ int main(int argc, char *argv[])
- 				&stop_discovery_invalid_param_test_1,
- 				setup_start_discovery, test_command_generic);
++	if (argc == 1) {
++		find_service_usage();
++		exit(EXIT_FAILURE);
++	}
++
++	while ((opt = getopt_long(argc, argv, "+lbu:r:p:h",
++				  find_service_options, NULL)) != -1) {
++		switch (opt) {
++		case 'l':
++			hci_clear_bit(BDADDR_BREDR, &type);
++			hci_set_bit(BDADDR_LE_PUBLIC, &type);
++			hci_set_bit(BDADDR_LE_RANDOM, &type);
++			break;
++		case 'b':
++			hci_set_bit(BDADDR_BREDR, &type);
++			hci_clear_bit(BDADDR_LE_PUBLIC, &type);
++			hci_clear_bit(BDADDR_LE_RANDOM, &type);
++			break;
++		case 'u':
++			if (bt_string2uuid(&uuid, optarg) < 0) {
++				printf("Invalid UUID: %s\n", optarg);
++				exit(EXIT_FAILURE);
++			}
++			uuid_to_uuid128(&uuid128, &uuid);
++			ntoh128((uint128_t *) uuid128.value.uuid128.data,
++				&uint128);
++			htob128(&uint128, (uint128_t *) cp->uuids);
++			break;
++		case 'r':
++			cp->rssi = atoi(optarg);
++			break;
++		case 'h':
++			find_service_usage();
++			exit(EXIT_SUCCESS);
++		default:
++			find_service_usage();
++			exit(EXIT_FAILURE);
++		}
++	}
++
++	argc -= optind;
++	argv += optind;
++	optind = 0;
++
++	if (argc > 0) {
++		find_service_usage();
++		exit(EXIT_FAILURE);
++	}
++
++	cp->type = type;
++	cp->uuid_count = 1;
++
++	if (mgmt_send(mgmt, MGMT_OP_START_SERVICE_DISCOVERY, index, total_size,
++		      cp, find_service_rsp, NULL, NULL) == 0) {
++		fprintf(stderr, "Unable to send start_service_discovery cmd\n");
++		exit(EXIT_FAILURE);
++	}
++}
++
+ static void find_rsp(uint8_t status, uint16_t len, const void *param,
+ 							void *user_data)
+ {
+@@ -2145,16 +2264,6 @@ static void cmd_unblock(struct mgmt *mgmt, uint16_t index, int argc,
+ 	}
+ }
  
-+	test_bredrle("Start Service Discovery - Not powered 1",
-+				&start_service_discovery_not_powered_test_1,
-+				NULL, test_command_generic);
-+	test_bredrle("Start Service Discovery - Invalid parameters 1",
-+				&start_service_discovery_invalid_param_test_1,
-+				NULL, test_command_generic);
-+	test_bredrle("Start Service Discovery - Not supported 1",
-+				&start_service_discovery_not_supported_test_1,
-+				NULL, test_command_generic);
-+	test_bredrle("Start Service Discovery - Success 1",
-+				&start_service_discovery_valid_param_test_1,
-+				NULL, test_command_generic);
-+	test_le("Start Service Discovery - Success 2",
-+				&start_service_discovery_valid_param_test_2,
-+				NULL, test_command_generic);
-+
- 	test_bredrle("Set Device Class - Success 1",
- 				&set_dev_class_valid_param_test_1,
- 				NULL, test_command_generic);
+-static void uuid_to_uuid128(uuid_t *uuid128, const uuid_t *uuid)
+-{
+-	if (uuid->type == SDP_UUID16)
+-		sdp_uuid16_to_uuid128(uuid128, uuid);
+-	else if (uuid->type == SDP_UUID32)
+-		sdp_uuid32_to_uuid128(uuid128, uuid);
+-	else
+-		memcpy(uuid128, uuid, sizeof(*uuid));
+-}
+-
+ static void cmd_add_uuid(struct mgmt *mgmt, uint16_t index, int argc,
+ 							char **argv)
+ {
+@@ -2978,6 +3087,7 @@ static struct {
+ 	{ "disconnect", cmd_disconnect, "Disconnect device"		},
+ 	{ "con",	cmd_con,	"List connections"		},
+ 	{ "find",	cmd_find,	"Discover nearby devices"	},
++	{ "find-service", cmd_find_service, "Discover nearby service"	},
+ 	{ "name",	cmd_name,	"Set local name"		},
+ 	{ "pair",	cmd_pair,	"Pair with a remote device"	},
+ 	{ "cancelpair",	cmd_cancel_pair,"Cancel pairing"		},
 -- 
 2.1.0
 
