@@ -1,57 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
 From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 2/7] android/client: Add support for gattc multi_adv_disable cmd
-Date: Fri, 28 Nov 2014 09:22:00 +0100
-Message-Id: <1417162925-17511-2-git-send-email-grzegorz.kolodziejczyk@tieto.com>
-In-Reply-To: <1417162925-17511-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
-References: <1417162925-17511-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+Subject: [PATCH] android/pts: PTS test for PAN on Android 5.0 and PTS 5.3
+Date: Fri, 28 Nov 2014 09:13:05 +0100
+Message-Id: <1417162385-17289-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- android/client/if-gatt.c | 21 +++++++++++++++++++++
- 1 file changed, 21 insertions(+)
+ android/pts-pan.txt | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/android/client/if-gatt.c b/android/client/if-gatt.c
-index 5072f91..89fa45f 100644
---- a/android/client/if-gatt.c
-+++ b/android/client/if-gatt.c
-@@ -2009,6 +2009,26 @@ static void multi_adv_set_inst_data_p(int argc, const char **argv)
- 		(char *) manufacturer_data, service_data_len,
- 		(char *) service_data, service_uuid_len, (char *) service_uuid);
- }
-+
-+/* multi advertising disable */
-+static void multi_adv_disable_c(int argc, const char **argv,
-+					enum_func *enum_func, void **user)
-+{
-+	if (argc == 2) {
-+		*user = client_if_str;
-+		*enum_func = enum_one_string;
-+	}
-+}
-+
-+static void multi_adv_disable_p(int argc, const char **argv)
-+{
-+	int client_if;
-+
-+	RETURN_IF_NULL(if_gatt);
-+	VERIFY_CLIENT_IF(2, client_if);
-+
-+	EXEC(if_gatt->client->multi_adv_disable, client_if);
-+}
- #endif
+diff --git a/android/pts-pan.txt b/android/pts-pan.txt
+index dac1dec..e95a82e 100644
+--- a/android/pts-pan.txt
++++ b/android/pts-pan.txt
+@@ -1,8 +1,8 @@
+ PTS test results for PAN
  
- /* get_device_type */
-@@ -2106,6 +2126,7 @@ static struct method client_methods[] = {
- 			" <include_name> [<include_txpower>] <appearance>"
- 			" [<manufacturer_data>] [<service_data>]"
- 			" [<service_uuid>]"),
-+	STD_METHODCH(multi_adv_disable, "<client_if>"),
- #else
- 	STD_METHODCH(scan, "<client_if> [1|0]"),
- 	STD_METHODCH(connect, "<client_if> <addr> [<is_direct>]"),
+ PTS version: 5.3
+-Tested: 17-October-2014
+-Android version: 4.4.4
++Tested: 17-November-2014
++Android version: 5.0
+ 
+ Results:
+ PASS	test passed
+@@ -54,7 +54,7 @@ TC_BNEP_PANU_BROADCAST_0_BV_04_C	N/A
+ TC_PANU_Ipv4_Autonet_BV_01_I		PASS	After DHCP request fail send
+ 						DHCP address request.
+ 						From IUT: send address request
+-						dhcpd -r 169.254.x.x bt-pan
++						dhcpcd -r 169.254.x.x bt-pan
+ TC_PANU_Ipv6_Autonet_BV_02_I		N/A
+ TC_PANU_IP_LLMNR_BV_01_I		N/A	SE #3558, TSE #4382, TCW #448
+ TC_PANU_IP_LLMNR_BV_02_I		N/A
 -- 
 1.9.3
 
