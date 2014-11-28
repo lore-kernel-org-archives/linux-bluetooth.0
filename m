@@ -2,76 +2,149 @@ Return-Path: <cyrus@holtmann.org>
 From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH v2 4/5] android/handsfree-client: Send AT+BCC to start codec negotiation
-Date: Fri, 28 Nov 2014 10:37:24 +0100
-Message-Id: <1417167445-29099-5-git-send-email-lukasz.rymanowski@tieto.com>
+Subject: [PATCH v2 2/5] android/handsfree-client: Add handle incoming SCO connection
+Date: Fri, 28 Nov 2014 10:37:22 +0100
+Message-Id: <1417167445-29099-3-git-send-email-lukasz.rymanowski@tieto.com>
 In-Reply-To: <1417167445-29099-1-git-send-email-lukasz.rymanowski@tieto.com>
 References: <1417167445-29099-1-git-send-email-lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-With this patch we start codec negotation on audio connect if both sides
-does support it.
-
-This patch also moves codec_negotiation_supported functions up in the
-file
 ---
- android/handsfree-client.c | 26 ++++++++++++++++++--------
- 1 file changed, 18 insertions(+), 8 deletions(-)
+ android/handsfree-client.c | 92 ++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 92 insertions(+)
 
 diff --git a/android/handsfree-client.c b/android/handsfree-client.c
-index fd68d78..9818a47 100644
+index 9e67c7f..be12d5e 100644
 --- a/android/handsfree-client.c
 +++ b/android/handsfree-client.c
-@@ -312,9 +312,26 @@ static void set_audio_state(struct device *dev, uint8_t state)
- 				HAL_EV_HF_CLIENT_AUDIO_STATE, sizeof(ev), &ev);
+@@ -116,6 +116,7 @@ struct device {
+ 	bdaddr_t bdaddr;
+ 	struct hfp_hf *hf;
+ 	uint8_t state;
++	uint8_t audio_state;
+ 
+ 	uint8_t negotiated_codec;
+ 	uint32_t features;
+@@ -184,6 +185,7 @@ static struct device *device_create(const bdaddr_t *bdaddr)
+ 
+ 	bacpy(&dev->bdaddr, bdaddr);
+ 	dev->state = HAL_HF_CLIENT_CONN_STATE_DISCONNECTED;
++	dev->audio_state = HAL_HF_CLIENT_AUDIO_STATE_DISCONNECTED;
+ 
+ 	init_codecs(dev);
+ 
+@@ -290,6 +292,26 @@ done:
+ 			HAL_OP_HF_CLIENT_DISCONNECT, status);
  }
  
-+static void bcc_cb(enum hfp_result result, enum hfp_error cme_err,
-+							void *user_data)
++static void set_audio_state(struct device *dev, uint8_t state)
 +{
-+	struct device *dev = user_data;
++	struct hal_ev_hf_client_audio_state ev;
++	char address[18];
 +
-+	if (result != HFP_RESULT_OK)
-+		set_audio_state(dev, HAL_HF_CLIENT_AUDIO_STATE_DISCONNECTED);
++	if (dev->audio_state == state)
++		return;
++
++	dev->audio_state = state;
++
++	ba2str(&dev->bdaddr, address);
++	DBG("device %s audio state %u", address, state);
++
++	bdaddr2android(&dev->bdaddr, ev.bdaddr);
++	ev.state = state;
++
++	ipc_send_notif(hal_ipc, HAL_SERVICE_ID_HANDSFREE_CLIENT,
++				HAL_EV_HF_CLIENT_AUDIO_STATE, sizeof(ev), &ev);
 +}
 +
-+static bool codec_negotiation_supported(struct device *dev)
-+{
-+	return (dev->features & HFP_AG_FEAT_CODEC) &&
-+			(hfp_hf_features & HFP_HF_FEAT_CODEC);
-+}
-+
- static bool connect_sco(struct device *dev)
+ static void handle_connect_audio(const void *buf, uint16_t len)
  {
--	/* TODO: handle codec negotiation */
-+	if (codec_negotiation_supported(dev))
-+		return hfp_hf_send_command(dev->hf, bcc_cb, dev,
-+								"AT+BCC");
- 
- 	return bt_sco_connect(sco, &dev->bdaddr, BT_VOICE_CVSD_16BIT);
+ 	DBG("Not Implemented");
+@@ -2009,6 +2031,72 @@ static void cleanup_hfp_hf(void)
+ 	}
  }
-@@ -383,7 +400,6 @@ static void cmd_complete_cb(enum hfp_result result, enum hfp_error cme_err,
- 	struct hal_ev_hf_client_command_complete ev;
  
++static bool confirm_sco_cb(const bdaddr_t *addr, uint16_t *voice_settings)
++{
++	struct device *dev;
++
++	DBG("");
++
++	dev = find_device(addr);
++	if (!dev || dev->state != HAL_HF_CLIENT_CONN_STATE_SLC_CONNECTED) {
++		error("hf-client: No device or SLC not ready");
++		return false;
++	}
++
++	set_audio_state(dev, HAL_HF_CLIENT_AUDIO_STATE_CONNECTING);
++
++	if (codec_negotiation_supported(dev) &&
++			dev->negotiated_codec != CODEC_ID_CVSD)
++		*voice_settings = BT_VOICE_TRANSPARENT;
++	else
++		*voice_settings = BT_VOICE_CVSD_16BIT;
++
++	return true;
++}
++
++static void connect_sco_cb(enum sco_status status, const bdaddr_t *addr)
++{
++	struct device *dev;
++	uint8_t audio_state;
++
++	DBG("SCO Status %u", status);
++
++	/* Device shall be there, just sanity check */
++	dev = find_device(addr);
++	if (!dev) {
++		error("hf-client: There is no device?");
++		return;
++	}
++
++	if (status != SCO_STATUS_OK) {
++		audio_state = HAL_HF_CLIENT_AUDIO_STATE_DISCONNECTED;
++		goto done;
++	}
++
++	if (dev->negotiated_codec == CODEC_ID_MSBC)
++		audio_state = HAL_HF_CLIENT_AUDIO_STATE_CONNECTED_MSBC;
++	else
++		audio_state = HAL_HF_CLIENT_AUDIO_STATE_CONNECTED;
++
++done:
++	set_audio_state(dev, audio_state);
++}
++
++static void disconnect_sco_cb(const bdaddr_t *addr)
++{
++	struct device *dev;
++
++	DBG("");
++
++	dev = find_device(addr);
++	if (!dev) {
++		error("hf-client: No device");
++		return;
++	}
++
++	set_audio_state(dev, HAL_HF_CLIENT_AUDIO_STATE_DISCONNECTED);
++}
++
+ bool bt_hf_client_register(struct ipc *ipc, const bdaddr_t *addr)
+ {
  	DBG("");
--
- 	memset(&ev, 0, sizeof(ev));
+@@ -2030,6 +2118,10 @@ bool bt_hf_client_register(struct ipc *ipc, const bdaddr_t *addr)
+ 		goto failed;
+ 	}
  
- 	switch (result) {
-@@ -1653,12 +1669,6 @@ static void slc_brsf_cb(struct hfp_context *context, void *user_data)
- 		dev->features = feat;
- }
- 
--static bool codec_negotiation_supported(struct device *dev)
--{
--	return (dev->features & HFP_AG_FEAT_CODEC) &&
--			(hfp_hf_features & HFP_HF_FEAT_CODEC);
--}
--
- static void slc_brsf_resp(enum hfp_result result, enum hfp_error cme_err,
- 							void *user_data)
- {
++	bt_sco_set_confirm_cb(sco, confirm_sco_cb);
++	bt_sco_set_connect_cb(sco, connect_sco_cb);
++	bt_sco_set_disconnect_cb(sco, disconnect_sco_cb);
++
+ 	hal_ipc = ipc;
+ 	ipc_register(hal_ipc, HAL_SERVICE_ID_HANDSFREE_CLIENT, cmd_handlers,
+ 						G_N_ELEMENTS(cmd_handlers));
 -- 
 1.8.4
 
