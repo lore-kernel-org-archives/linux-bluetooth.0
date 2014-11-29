@@ -5,334 +5,55 @@ Cc: linux-wpan@vger.kernel.org, kernel@pengutronix.de,
 	Alexander Aring <alex.aring@gmail.com>,
 	Jukka Rissanen <jukka.rissanen@linux.intel.com>,
 	Martin Townsend <mtownsend1973@gmail.com>
-Subject: [PATCH bluetooth-next 2/2] 6lowpan: add udp compression via nhc layer
-Date: Sat, 29 Nov 2014 15:24:42 +0100
-Message-Id: <1417271082-10068-3-git-send-email-alex.aring@gmail.com>
+Subject: [PATCH bluetooth-next 1/2] 6lowpan: add generic nhc layer interface
+Date: Sat, 29 Nov 2014 15:24:41 +0100
+Message-Id: <1417271082-10068-2-git-send-email-alex.aring@gmail.com>
 In-Reply-To: <1417271082-10068-1-git-send-email-alex.aring@gmail.com>
 References: <1417271082-10068-1-git-send-email-alex.aring@gmail.com>
-Sender: linux-wpan-owner@vger.kernel.org
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch move UDP header compression and uncompression into the
-generic 6LoWPAN nhc header compression layer. Moreover this patch
-activates the nhc layer compression in iphc compression and
-uncompression functions.
+This patch adds a generic next header compression layer interface. There
+exists various methods to do a header compression after 6LoWPAN header
+to save payload. This introduce a generic nhc header which allow a
+simple adding of a new header compression format instead of a static
+implementation inside the 6LoWPAN header compression and uncompression
+function.
 
 Signed-off-by: Alexander Aring <alex.aring@gmail.com>
 Cc: Jukka Rissanen <jukka.rissanen@linux.intel.com>
 Cc: Martin Townsend <mtownsend1973@gmail.com>
 ---
- net/6lowpan/Makefile  |   3 +-
- net/6lowpan/iphc.c    | 188 +++++++-------------------------------------------
- net/6lowpan/nhc.c     |   3 +-
- net/6lowpan/nhc.h     |   4 ++
- net/6lowpan/nhc_udp.c | 173 ++++++++++++++++++++++++++++++++++++++++++++++
- 5 files changed, 205 insertions(+), 166 deletions(-)
- create mode 100644 net/6lowpan/nhc_udp.c
+ net/6lowpan/Makefile |   4 +-
+ net/6lowpan/nhc.c    | 182 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ net/6lowpan/nhc.h    | 128 ++++++++++++++++++++++++++++++++++++
+ 3 files changed, 313 insertions(+), 1 deletion(-)
+ create mode 100644 net/6lowpan/nhc.c
+ create mode 100644 net/6lowpan/nhc.h
 
 diff --git a/net/6lowpan/Makefile b/net/6lowpan/Makefile
-index ba6bf47..172045e 100644
+index 415886b..ba6bf47 100644
 --- a/net/6lowpan/Makefile
 +++ b/net/6lowpan/Makefile
-@@ -2,4 +2,5 @@ obj-$(CONFIG_6LOWPAN) := 6lowpan.o
+@@ -1,3 +1,5 @@
+ obj-$(CONFIG_6LOWPAN) := 6lowpan.o
  
- 6lowpan-y := \
- 	iphc.o \
--	nhc.o
-+	nhc.o \
-+	nhc_udp.o
-diff --git a/net/6lowpan/iphc.c b/net/6lowpan/iphc.c
-index aced97d..40ed0aa 100644
---- a/net/6lowpan/iphc.c
-+++ b/net/6lowpan/iphc.c
-@@ -57,6 +57,8 @@
- #include <net/ipv6.h>
- #include <net/af_ieee802154.h>
- 
-+#include "nhc.h"
-+
- /* Uncompress address function for source and
-  * destination address(non-multicast).
-  *
-@@ -227,77 +229,6 @@ static int lowpan_uncompress_multicast_daddr(struct sk_buff *skb,
- 	return 0;
- }
- 
--static int uncompress_udp_header(struct sk_buff *skb, struct udphdr *uh)
--{
--	bool fail;
--	u8 tmp = 0, val = 0;
--
--	fail = lowpan_fetch_skb(skb, &tmp, sizeof(tmp));
--
--	if ((tmp & LOWPAN_NHC_UDP_MASK) == LOWPAN_NHC_UDP_ID) {
--		pr_debug("UDP header uncompression\n");
--		switch (tmp & LOWPAN_NHC_UDP_CS_P_11) {
--		case LOWPAN_NHC_UDP_CS_P_00:
--			fail |= lowpan_fetch_skb(skb, &uh->source,
--						 sizeof(uh->source));
--			fail |= lowpan_fetch_skb(skb, &uh->dest,
--						 sizeof(uh->dest));
--			break;
--		case LOWPAN_NHC_UDP_CS_P_01:
--			fail |= lowpan_fetch_skb(skb, &uh->source,
--						 sizeof(uh->source));
--			fail |= lowpan_fetch_skb(skb, &val, sizeof(val));
--			uh->dest = htons(val + LOWPAN_NHC_UDP_8BIT_PORT);
--			break;
--		case LOWPAN_NHC_UDP_CS_P_10:
--			fail |= lowpan_fetch_skb(skb, &val, sizeof(val));
--			uh->source = htons(val + LOWPAN_NHC_UDP_8BIT_PORT);
--			fail |= lowpan_fetch_skb(skb, &uh->dest,
--						 sizeof(uh->dest));
--			break;
--		case LOWPAN_NHC_UDP_CS_P_11:
--			fail |= lowpan_fetch_skb(skb, &val, sizeof(val));
--			uh->source = htons(LOWPAN_NHC_UDP_4BIT_PORT +
--					   (val >> 4));
--			uh->dest = htons(LOWPAN_NHC_UDP_4BIT_PORT +
--					 (val & 0x0f));
--			break;
--		default:
--			pr_debug("ERROR: unknown UDP format\n");
--			goto err;
--		}
--
--		pr_debug("uncompressed UDP ports: src = %d, dst = %d\n",
--			 ntohs(uh->source), ntohs(uh->dest));
--
--		/* checksum */
--		if (tmp & LOWPAN_NHC_UDP_CS_C) {
--			pr_debug_ratelimited("checksum elided currently not supported\n");
--			goto err;
--		} else {
--			fail |= lowpan_fetch_skb(skb, &uh->check,
--						 sizeof(uh->check));
--		}
--
--		/* UDP length needs to be infered from the lower layers
--		 * here, we obtain the hint from the remaining size of the
--		 * frame
--		 */
--		uh->len = htons(skb->len + sizeof(struct udphdr));
--		pr_debug("uncompressed UDP length: src = %d", ntohs(uh->len));
--	} else {
--		pr_debug("ERROR: unsupported NH format\n");
--		goto err;
--	}
--
--	if (fail)
--		goto err;
--
--	return 0;
--err:
--	return -EINVAL;
--}
--
- /* TTL uncompression values */
- static const u8 lowpan_ttl_values[] = { 0, 1, 64, 255 };
- 
-@@ -430,27 +361,9 @@ lowpan_header_decompress(struct sk_buff *skb, struct net_device *dev,
- 
- 	/* UDP data uncompression */
- 	if (iphc0 & LOWPAN_IPHC_NH_C) {
--		struct udphdr uh;
--		const int needed = sizeof(struct udphdr) + sizeof(hdr);
--
--		if (uncompress_udp_header(skb, &uh))
--			return -EINVAL;
--
--		/* replace the compressed UDP head by the uncompressed UDP
--		 * header
--		 */
--		err = skb_cow(skb, needed);
--		if (unlikely(err))
-+		err = lowpan_nhc_do_uncompression(skb, &hdr);
-+		if (err < 0)
- 			return err;
--
--		skb_push(skb, sizeof(struct udphdr));
--		skb_reset_transport_header(skb);
--		skb_copy_to_linear_data(skb, &uh, sizeof(struct udphdr));
--
--		raw_dump_table(__func__, "raw UDP header dump",
--			       (u8 *)&uh, sizeof(uh));
--
--		hdr.nexthdr = UIP_PROTO_UDP;
- 	} else {
- 		err = skb_cow(skb, sizeof(hdr));
- 		if (unlikely(err))
-@@ -503,79 +416,15 @@ static u8 lowpan_compress_addr_64(u8 **hc_ptr, u8 shift,
- 	return rol8(val, shift);
- }
- 
--static void compress_udp_header(u8 **hc_ptr, struct sk_buff *skb)
--{
--	struct udphdr *uh;
--	u8 tmp;
--
--	/* In the case of RAW sockets the transport header is not set by
--	 * the ip6 stack so we must set it ourselves
--	 */
--	if (skb->transport_header == skb->network_header)
--		skb_set_transport_header(skb, sizeof(struct ipv6hdr));
--
--	uh = udp_hdr(skb);
--
--	if (((ntohs(uh->source) & LOWPAN_NHC_UDP_4BIT_MASK) ==
--	     LOWPAN_NHC_UDP_4BIT_PORT) &&
--	    ((ntohs(uh->dest) & LOWPAN_NHC_UDP_4BIT_MASK) ==
--	     LOWPAN_NHC_UDP_4BIT_PORT)) {
--		pr_debug("UDP header: both ports compression to 4 bits\n");
--		/* compression value */
--		tmp = LOWPAN_NHC_UDP_CS_P_11;
--		lowpan_push_hc_data(hc_ptr, &tmp, sizeof(tmp));
--		/* source and destination port */
--		tmp = ntohs(uh->dest) - LOWPAN_NHC_UDP_4BIT_PORT +
--		      ((ntohs(uh->source) - LOWPAN_NHC_UDP_4BIT_PORT) << 4);
--		lowpan_push_hc_data(hc_ptr, &tmp, sizeof(tmp));
--	} else if ((ntohs(uh->dest) & LOWPAN_NHC_UDP_8BIT_MASK) ==
--			LOWPAN_NHC_UDP_8BIT_PORT) {
--		pr_debug("UDP header: remove 8 bits of dest\n");
--		/* compression value */
--		tmp = LOWPAN_NHC_UDP_CS_P_01;
--		lowpan_push_hc_data(hc_ptr, &tmp, sizeof(tmp));
--		/* source port */
--		lowpan_push_hc_data(hc_ptr, &uh->source, sizeof(uh->source));
--		/* destination port */
--		tmp = ntohs(uh->dest) - LOWPAN_NHC_UDP_8BIT_PORT;
--		lowpan_push_hc_data(hc_ptr, &tmp, sizeof(tmp));
--	} else if ((ntohs(uh->source) & LOWPAN_NHC_UDP_8BIT_MASK) ==
--			LOWPAN_NHC_UDP_8BIT_PORT) {
--		pr_debug("UDP header: remove 8 bits of source\n");
--		/* compression value */
--		tmp = LOWPAN_NHC_UDP_CS_P_10;
--		lowpan_push_hc_data(hc_ptr, &tmp, sizeof(tmp));
--		/* source port */
--		tmp = ntohs(uh->source) - LOWPAN_NHC_UDP_8BIT_PORT;
--		lowpan_push_hc_data(hc_ptr, &tmp, sizeof(tmp));
--		/* destination port */
--		lowpan_push_hc_data(hc_ptr, &uh->dest, sizeof(uh->dest));
--	} else {
--		pr_debug("UDP header: can't compress\n");
--		/* compression value */
--		tmp = LOWPAN_NHC_UDP_CS_P_00;
--		lowpan_push_hc_data(hc_ptr, &tmp, sizeof(tmp));
--		/* source port */
--		lowpan_push_hc_data(hc_ptr, &uh->source, sizeof(uh->source));
--		/* destination port */
--		lowpan_push_hc_data(hc_ptr, &uh->dest, sizeof(uh->dest));
--	}
--
--	/* checksum is always inline */
--	lowpan_push_hc_data(hc_ptr, &uh->check, sizeof(uh->check));
--
--	/* skip the UDP header */
--	skb_pull(skb, sizeof(struct udphdr));
--}
--
- int lowpan_header_compress(struct sk_buff *skb, struct net_device *dev,
- 			   unsigned short type, const void *_daddr,
- 			   const void *_saddr, unsigned int len)
- {
- 	u8 tmp, iphc0, iphc1, *hc_ptr;
-+	struct lowpan_nhc *nhc;
- 	struct ipv6hdr *hdr;
- 	u8 head[100] = {};
--	int addr_type;
-+	int ret, addr_type;
- 
- 	if (type != ETH_P_IPV6)
- 		return -EINVAL;
-@@ -652,11 +501,10 @@ int lowpan_header_compress(struct sk_buff *skb, struct net_device *dev,
- 
- 	/* NOTE: payload length is always compressed */
- 
--	/* Next Header is compress if UDP */
--	if (hdr->nexthdr == UIP_PROTO_UDP)
-+	nhc = lowpan_nhc_by_nexthdr(hdr->nexthdr);
-+	if (nhc)
- 		iphc0 |= LOWPAN_IPHC_NH_C;
--
--	if ((iphc0 & LOWPAN_IPHC_NH_C) == 0)
-+	else
- 		lowpan_push_hc_data(&hc_ptr, &hdr->nexthdr,
- 				    sizeof(hdr->nexthdr));
- 
-@@ -744,9 +592,9 @@ int lowpan_header_compress(struct sk_buff *skb, struct net_device *dev,
- 		}
- 	}
- 
--	/* UDP header compression */
--	if (hdr->nexthdr == UIP_PROTO_UDP)
--		compress_udp_header(&hc_ptr, skb);
-+	ret = lowpan_nhc_do_compression(nhc, skb, &hc_ptr, &iphc0);
-+	if (ret < 0)
-+		return ret;
- 
- 	head[0] = iphc0;
- 	head[1] = iphc1;
-@@ -764,4 +612,16 @@ int lowpan_header_compress(struct sk_buff *skb, struct net_device *dev,
- }
- EXPORT_SYMBOL_GPL(lowpan_header_compress);
- 
-+static int __init iphc_init(void)
-+{
-+	return lowpan_nhc_init();
-+}
-+
-+static void __exit iphc_cleanup(void)
-+{
-+	lowpan_nhc_cleanup();
-+}
-+
- MODULE_LICENSE("GPL");
-+module_init(iphc_init);
-+module_exit(iphc_cleanup);
+-6lowpan-y := iphc.o
++6lowpan-y := \
++	iphc.o \
++	nhc.o
 diff --git a/net/6lowpan/nhc.c b/net/6lowpan/nhc.c
-index e0b2bd1..fca7e4d 100644
---- a/net/6lowpan/nhc.c
-+++ b/net/6lowpan/nhc.c
-@@ -174,9 +174,10 @@ void lowpan_nhc_del(struct lowpan_nhc *nhc)
- 
- int lowpan_nhc_init(void)
- {
--	return 0;
-+	return lowpan_nhc_udp_init();
- }
- 
- void lowpan_nhc_cleanup(void)
- {
-+	lowpan_nhc_udp_cleanup();
- }
-diff --git a/net/6lowpan/nhc.h b/net/6lowpan/nhc.h
-index f83f06e..39a4fc0 100644
---- a/net/6lowpan/nhc.h
-+++ b/net/6lowpan/nhc.h
-@@ -125,4 +125,8 @@ int lowpan_nhc_init(void);
-  */
- void lowpan_nhc_cleanup(void);
- 
-+/* next header compressions */
-+int lowpan_nhc_udp_init(void);
-+void lowpan_nhc_udp_cleanup(void);
-+
- #endif /* __6LOWPAN_NHC_H */
-diff --git a/net/6lowpan/nhc_udp.c b/net/6lowpan/nhc_udp.c
 new file mode 100644
-index 0000000..6142539
+index 0000000..e0b2bd1
 --- /dev/null
-+++ b/net/6lowpan/nhc_udp.c
-@@ -0,0 +1,173 @@
-+/*	6LoWPAN IPv6 UDP compression
++++ b/net/6lowpan/nhc.c
+@@ -0,0 +1,182 @@
++/*
++ *	6LoWPAN next header compression
 + *
 + *
 + *	Authors:
-+ *	Alexander Aring	<aar@pengutronix.de>
-+ *
-+ *	Orignal written by:
-+ *	Alexander Smirnov <alex.bluesman.smirnov@gmail.com>
-+ *	Jon Smirl <jonsmirl@gmail.com>
++ *	Alexander Aring		<aar@pengutronix.de>
 + *
 + *	This program is free software; you can redistribute it and/or
 + *	modify it under the terms of the GNU General Public License
@@ -340,163 +61,309 @@ index 0000000..6142539
 + *	2 of the License, or (at your option) any later version.
 + */
 +
++#include <linux/netdevice.h>
++
++#include <net/ipv6.h>
++
 +#include "nhc.h"
 +
-+#define LOWPAN_NHC_UDP_IDLEN	1
++static struct rb_root rb_root = RB_ROOT;
++static struct lowpan_nhc *lowpan_nexthdr_nhcs[NEXTHDR_MAX];
 +
-+static int udp_uncompress(struct sk_buff *skb, size_t needed)
++static int lowpan_nhc_insert(struct lowpan_nhc *nhc)
 +{
-+	u8 tmp = 0, val = 0;
-+	struct udphdr uh;
-+	bool fail;
-+	int err;
++	struct rb_node **new = &rb_root.rb_node, *parent = NULL;
 +
-+	fail = lowpan_fetch_skb(skb, &tmp, sizeof(tmp));
++	/* Figure out where to put new node */
++	while (*new) {
++		struct lowpan_nhc *this = container_of(*new, struct lowpan_nhc,
++						       node);
++		int result, len_dif, len;
 +
-+	pr_debug("UDP header uncompression\n");
-+	switch (tmp & LOWPAN_NHC_UDP_CS_P_11) {
-+	case LOWPAN_NHC_UDP_CS_P_00:
-+		fail |= lowpan_fetch_skb(skb, &uh.source, sizeof(uh.source));
-+		fail |= lowpan_fetch_skb(skb, &uh.dest, sizeof(uh.dest));
-+		break;
-+	case LOWPAN_NHC_UDP_CS_P_01:
-+		fail |= lowpan_fetch_skb(skb, &uh.source, sizeof(uh.source));
-+		fail |= lowpan_fetch_skb(skb, &val, sizeof(val));
-+		uh.dest = htons(val + LOWPAN_NHC_UDP_8BIT_PORT);
-+		break;
-+	case LOWPAN_NHC_UDP_CS_P_10:
-+		fail |= lowpan_fetch_skb(skb, &val, sizeof(val));
-+		uh.source = htons(val + LOWPAN_NHC_UDP_8BIT_PORT);
-+		fail |= lowpan_fetch_skb(skb, &uh.dest, sizeof(uh.dest));
-+		break;
-+	case LOWPAN_NHC_UDP_CS_P_11:
-+		fail |= lowpan_fetch_skb(skb, &val, sizeof(val));
-+		uh.source = htons(LOWPAN_NHC_UDP_4BIT_PORT + (val >> 4));
-+		uh.dest = htons(LOWPAN_NHC_UDP_4BIT_PORT + (val & 0x0f));
-+		break;
-+	default:
-+		BUG();
++		len_dif = nhc->idlen - this->idlen;
++
++		if (nhc->idlen < this->idlen)
++			len = nhc->idlen;
++		else
++			len = this->idlen;
++
++		result = memcmp(nhc->id, this->id, len);
++		if (!result)
++			result = len_dif;
++
++		parent = *new;
++		if (result < 0)
++			new = &((*new)->rb_left);
++		else if (result > 0)
++			new = &((*new)->rb_right);
++		else
++			return -EEXIST;
 +	}
 +
-+	pr_debug("uncompressed UDP ports: src = %d, dst = %d\n",
-+		 ntohs(uh.source), ntohs(uh.dest));
++	/* Add new node and rebalance tree. */
++	rb_link_node(&nhc->node, parent, new);
++	rb_insert_color(&nhc->node, &rb_root);
 +
-+	/* checksum */
-+	if (tmp & LOWPAN_NHC_UDP_CS_C) {
-+		pr_debug_ratelimited("checksum elided currently not supported\n");
-+		fail = true;
++	return 0;
++}
++
++static void lowpan_nhc_remove(struct lowpan_nhc *nhc)
++{
++	rb_erase(&nhc->node, &rb_root);
++}
++
++struct lowpan_nhc *lowpan_nhc_by_nhcid(const struct sk_buff *skb)
++{
++	struct rb_node *node = rb_root.rb_node;
++	const u8 *nhcid_skb_ptr = skb->data;
++
++	while (node) {
++		struct lowpan_nhc *nhc = container_of(node, struct lowpan_nhc,
++						      node);
++		u8 nhcid_skb_ptr_masked[LOWPAN_NHC_MAX_ID_LEN];
++		int result, i;
++
++		if (nhcid_skb_ptr + nhc->idlen > skb->data + skb->len)
++			return NULL;
++
++		/* copy and mask afterwards the nhid value from skb */
++		memcpy(nhcid_skb_ptr_masked, nhcid_skb_ptr, nhc->idlen);
++		for (i = 0; i < nhc->idlen; i++)
++			nhcid_skb_ptr_masked[i] &= nhc->idmask[i];
++
++		result = memcmp(nhcid_skb_ptr_masked, nhc->id, nhc->idlen);
++		if (result < 0)
++			node = node->rb_left;
++		else if (result > 0)
++			node = node->rb_right;
++		else
++			return nhc;
++	}
++
++	return NULL;
++}
++
++struct lowpan_nhc *lowpan_nhc_by_nexthdr(u8 nexthdr)
++{
++	return lowpan_nexthdr_nhcs[nexthdr];
++}
++
++int lowpan_nhc_do_compression(struct lowpan_nhc *nhc, struct sk_buff *skb,
++			      u8 **hc_ptr, u8 *iphc0)
++{
++	int ret;
++
++	if (!nhc)
++		return 0;
++
++	ret = nhc->compress(skb, hc_ptr);
++	if (ret == 0)
++		*iphc0 |= LOWPAN_IPHC_NH_C;
++
++	return ret;
++}
++
++int lowpan_nhc_do_uncompression(struct sk_buff *skb, struct ipv6hdr *hdr)
++{
++	struct lowpan_nhc *nhc;
++	/* default dropping if nothing found */
++	int ret = -ENOTSUPP;
++
++	nhc = lowpan_nhc_by_nhcid(skb);
++	if (nhc) {
++		ret = nhc->uncompress(skb, sizeof(*hdr) + nhc->nexthdrlen);
++		if (ret == 0) {
++			hdr->nexthdr = nhc->nexthdr;
++			skb_reset_transport_header(skb);
++			raw_dump_table(__func__, "raw transport header dump",
++				       skb_transport_header(skb),
++				       nhc->nexthdrlen);
++		} else if (ret == -ENOTSUPP) {
++			netdev_warn(skb->dev, "received %s which is not supported for uncompression.\n",
++				    nhc->name);
++		}
 +	} else {
-+		fail |= lowpan_fetch_skb(skb, &uh.check, sizeof(uh.check));
++		netdev_warn(skb->dev, "received nhc which is not supported. Dropping.\n");
 +	}
 +
-+	if (fail)
++	return ret;
++}
++
++int lowpan_nhc_add(struct lowpan_nhc *nhc)
++{
++	int ret;
++
++	if (!nhc->idlen || !nhc->idsetup || !nhc->compress || !nhc->uncompress)
 +		return -EINVAL;
 +
-+	/* UDP length needs to be infered from the lower layers
-+	 * here, we obtain the hint from the remaining size of the
-+	 * frame
-+	 */
-+	uh.len = htons(skb->len + sizeof(struct udphdr));
-+	pr_debug("uncompressed UDP length: src = %d", ntohs(uh.len));
++	WARN_ONCE(nhc->idlen > LOWPAN_NHC_MAX_ID_LEN,
++		  "LOWPAN_NHC_MAX_ID_LEN should be updated to %d.\n",
++		  nhc->idlen);
 +
-+	/* replace the compressed UDP head by the uncompressed UDP
-+	 * header
-+	 */
-+	err = skb_cow(skb, needed);
-+	if (unlikely(err))
-+		return err;
++	nhc->idsetup(nhc);
 +
-+	skb_push(skb, sizeof(struct udphdr));
-+	skb_copy_to_linear_data(skb, &uh, sizeof(struct udphdr));
++	if (lowpan_nexthdr_nhcs[nhc->nexthdr])
++		return -EEXIST;
 +
++	ret = lowpan_nhc_insert(nhc);
++	if (ret < 0)
++		goto out;
++
++	lowpan_nexthdr_nhcs[nhc->nexthdr] = nhc;
++out:
++	return ret;
++}
++
++void lowpan_nhc_del(struct lowpan_nhc *nhc)
++{
++	lowpan_nhc_remove(nhc);
++	lowpan_nexthdr_nhcs[nhc->nexthdr] = NULL;
++
++	synchronize_net();
++}
++
++int lowpan_nhc_init(void)
++{
 +	return 0;
 +}
 +
-+static int udp_compress(struct sk_buff *skb, u8 **hc_ptr)
++void lowpan_nhc_cleanup(void)
 +{
-+	struct udphdr *uh;
-+	u8 tmp;
++}
+diff --git a/net/6lowpan/nhc.h b/net/6lowpan/nhc.h
+new file mode 100644
+index 0000000..f83f06e
+--- /dev/null
++++ b/net/6lowpan/nhc.h
+@@ -0,0 +1,128 @@
++#ifndef __6LOWPAN_NHC_H
++#define __6LOWPAN_NHC_H
 +
-+	/* In the case of RAW sockets the transport header is not set by
-+	 * the ip6 stack so we must set it ourselves
-+	 */
-+	if (skb->transport_header == skb->network_header)
-+		skb_set_transport_header(skb, sizeof(struct ipv6hdr));
++#include <linux/skbuff.h>
++#include <linux/rbtree.h>
 +
-+	uh = udp_hdr(skb);
++#include <net/6lowpan.h>
++#include <net/ipv6.h>
 +
-+	if (((ntohs(uh->source) & LOWPAN_NHC_UDP_4BIT_MASK) ==
-+	     LOWPAN_NHC_UDP_4BIT_PORT) &&
-+	    ((ntohs(uh->dest) & LOWPAN_NHC_UDP_4BIT_MASK) ==
-+	     LOWPAN_NHC_UDP_4BIT_PORT)) {
-+		pr_debug("UDP header: both ports compression to 4 bits\n");
-+		/* compression value */
-+		tmp = LOWPAN_NHC_UDP_CS_P_11;
-+		lowpan_push_hc_data(hc_ptr, &tmp, sizeof(tmp));
-+		/* source and destination port */
-+		tmp = ntohs(uh->dest) - LOWPAN_NHC_UDP_4BIT_PORT +
-+		      ((ntohs(uh->source) - LOWPAN_NHC_UDP_4BIT_PORT) << 4);
-+		lowpan_push_hc_data(hc_ptr, &tmp, sizeof(tmp));
-+	} else if ((ntohs(uh->dest) & LOWPAN_NHC_UDP_8BIT_MASK) ==
-+			LOWPAN_NHC_UDP_8BIT_PORT) {
-+		pr_debug("UDP header: remove 8 bits of dest\n");
-+		/* compression value */
-+		tmp = LOWPAN_NHC_UDP_CS_P_01;
-+		lowpan_push_hc_data(hc_ptr, &tmp, sizeof(tmp));
-+		/* source port */
-+		lowpan_push_hc_data(hc_ptr, &uh->source, sizeof(uh->source));
-+		/* destination port */
-+		tmp = ntohs(uh->dest) - LOWPAN_NHC_UDP_8BIT_PORT;
-+		lowpan_push_hc_data(hc_ptr, &tmp, sizeof(tmp));
-+	} else if ((ntohs(uh->source) & LOWPAN_NHC_UDP_8BIT_MASK) ==
-+			LOWPAN_NHC_UDP_8BIT_PORT) {
-+		pr_debug("UDP header: remove 8 bits of source\n");
-+		/* compression value */
-+		tmp = LOWPAN_NHC_UDP_CS_P_10;
-+		lowpan_push_hc_data(hc_ptr, &tmp, sizeof(tmp));
-+		/* source port */
-+		tmp = ntohs(uh->source) - LOWPAN_NHC_UDP_8BIT_PORT;
-+		lowpan_push_hc_data(hc_ptr, &tmp, sizeof(tmp));
-+		/* destination port */
-+		lowpan_push_hc_data(hc_ptr, &uh->dest, sizeof(uh->dest));
-+	} else {
-+		pr_debug("UDP header: can't compress\n");
-+		/* compression value */
-+		tmp = LOWPAN_NHC_UDP_CS_P_00;
-+		lowpan_push_hc_data(hc_ptr, &tmp, sizeof(tmp));
-+		/* source port */
-+		lowpan_push_hc_data(hc_ptr, &uh->source, sizeof(uh->source));
-+		/* destination port */
-+		lowpan_push_hc_data(hc_ptr, &uh->dest, sizeof(uh->dest));
++#define LOWPAN_NHC_MAX_ID_LEN	1
++
++/**
++ * LOWPAN_NHC - helper macro to generate nh id fields and lowpan_nhc struct
++ *
++ * @__nhc: variable name of the lowpan_nhc struct.
++ * @_name: const char * of common header compression name.
++ * @_nexthdr: ipv6 nexthdr field for the header compression.
++ * @_nexthdrlen: ipv6 nexthdr len for the reserved space.
++ * @_idsetup: callback to setup id and mask values.
++ * @_idlen: len for the next header id and mask, should be always the same.
++ * @_uncompress: callback for uncompression call.
++ * @_compress: callback for compression call.
++ */
++#define LOWPAN_NHC(__nhc, _name, _nexthdr,	\
++		   _nexthdrlen, _idsetup,	\
++		   _idlen, _uncompress,		\
++		   _compress)			\
++	static u8 __nhc##_val[_idlen];		\
++	static u8 __nhc##_mask[_idlen];		\
++	static struct lowpan_nhc __nhc = {	\
++		.name		= _name,	\
++		.nexthdr	= _nexthdr,	\
++		.nexthdrlen	= _nexthdrlen,	\
++		.id		= __nhc##_val,	\
++		.idmask		= __nhc##_mask,	\
++		.idlen		= _idlen,	\
++		.idsetup	= _idsetup,	\
++		.uncompress	= _uncompress,	\
++		.compress	= _compress,	\
 +	}
 +
-+	/* checksum is always inline */
-+	lowpan_push_hc_data(hc_ptr, &uh->check, sizeof(uh->check));
++/**
++ * struct lowpan_nhc - hold 6lowpan next hdr compression ifnformation
++ *
++ * @node: holder for the rbtree.
++ * @name: name of the specific next header compression
++ * @nexthdr: next header value of the protocol which should be compressed.
++ * @nexthdrlen: ipv6 nexthdr len for the reserved space.
++ * @id: array for nhc id. Note this need to be in network byteorder.
++ * @mask: array for nhc id mask. Note this need to be in network byteorder.
++ * @len: the length of the next header id and mask.
++ * @setup: callback to setup fill the next header id value and mask.
++ * @compress: callback to do the header compression.
++ * @uncompress: callback to do the header uncompression.
++ */
++struct lowpan_nhc {
++	struct rb_node	node;
++	const char	*name;
++	const u8	nexthdr;
++	const size_t	nexthdrlen;
++	u8		*id;
++	u8		*idmask;
++	const size_t	idlen;
 +
-+	/* skip the UDP header */
-+	skb_pull(skb, sizeof(struct udphdr));
++	void		(*idsetup)(struct lowpan_nhc *nhc);
++	int		(*uncompress)(struct sk_buff *skb, size_t needed);
++	int		(*compress)(struct sk_buff *skb, u8 **hc_ptr);
++};
 +
-+	return 0;
-+}
++/**
++ * lowpan_nhc_by_nhcid - returns the 6lowpan nhc by nhcid
++ *
++ * @skb: skb with skb->data which is pointed to 6lowpan nhc id.
++ */
++struct lowpan_nhc *lowpan_nhc_by_nhcid(const struct sk_buff *skb);
 +
-+static void udp_nhid_setup(struct lowpan_nhc *nhc)
-+{
-+	nhc->id[0] = LOWPAN_NHC_UDP_ID;
-+	nhc->idmask[0] = LOWPAN_NHC_UDP_MASK;
-+}
++/**
++ * lowpan_nhc_by_nexthdr - return the 6lowpan nhc by ipv6 nexthdr.
++ *
++ * @nexthdr: ipv6 nexthdr value.
++ */
++struct lowpan_nhc *lowpan_nhc_by_nexthdr(u8 nexthdr);
 +
-+LOWPAN_NHC(udp_nhc, "IPv6 UDP Header", NEXTHDR_UDP, sizeof(struct udphdr),
-+	   udp_nhid_setup, LOWPAN_NHC_UDP_IDLEN, udp_uncompress, udp_compress);
++/**
++ * lowpan_nhc_add - register a next header compression to framework
++ *
++ * @nhc: nhc which should be add.
++ */
++int lowpan_nhc_add(struct lowpan_nhc *nhc);
 +
-+int lowpan_nhc_udp_init(void)
-+{
-+	return lowpan_nhc_add(&udp_nhc);
-+}
++/**
++ * lowpan_nhc_del - delete a next header compression from framework
++ *
++ * @nhc: nhc which should be delete.
++ */
++void lowpan_nhc_del(struct lowpan_nhc *nhc);
 +
-+void lowpan_nhc_udp_cleanup(void)
-+{
-+	lowpan_nhc_del(&udp_nhc);
-+}
++/**
++ * lowpan_nhc_do_compression - wrapper for calling compress callback
++ *
++ * @nhc: 6LoWPAN nhc context, get by lowpan_search_nhc_*.
++ * @skb: skb of 6LoWPAN header to read nhc and replace header.
++ * @hc_ptr: pointer for 6LoWPAN header which should increment at the end of
++ *	    replaced header.
++ * @iphc0: First iphc byte, to set NHC bit.
++ */
++int lowpan_nhc_do_compression(struct lowpan_nhc *nhc, struct sk_buff *skb,
++			      u8 **hc_ptr, u8 *iphc0);
++
++/**
++ * lowpan_nhc_do_uncompression - wrapper for calling uncompress callback
++ *
++ * @skb: skb of 6LoWPAN header, skb->data should be pointed to nhc id value.
++ * @hdr: ipv6 header to set the according nexthdr value.
++ */
++int lowpan_nhc_do_uncompression(struct sk_buff *skb, struct ipv6hdr *hdr);
++
++/**
++ * lowpan_nhc_init - init all nhcs
++ */
++int lowpan_nhc_init(void);
++
++/**
++ * lowpan_nhc_cleanup - cleanup all registered nhcs
++ */
++void lowpan_nhc_cleanup(void);
++
++#endif /* __6LOWPAN_NHC_H */
 -- 
 2.1.3
 
