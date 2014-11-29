@@ -1,41 +1,46 @@
 Return-Path: <cyrus@holtmann.org>
-From: Alexander Aring <alex.aring@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: linux-wpan@vger.kernel.org, kernel@pengutronix.de,
-	Alexander Aring <alex.aring@gmail.com>,
-	Jukka Rissanen <jukka.rissanen@linux.intel.com>,
-	Martin Townsend <mtownsend1973@gmail.com>
-Subject: [PATCH bluetooth-next 0/2] 6lowpan: introduce nhc framework
-Date: Sat, 29 Nov 2014 15:24:40 +0100
-Message-Id: <1417271082-10068-1-git-send-email-alex.aring@gmail.com>
-Sender: linux-wpan-owner@vger.kernel.org
+MIME-Version: 1.0
+In-Reply-To: <20141128132747.GA12799@t440s.lan>
+References: <1417161184-17663-1-git-send-email-jpawlowski@google.com>
+	<1417161184-17663-3-git-send-email-jpawlowski@google.com>
+	<20141128132747.GA12799@t440s.lan>
+Date: Fri, 28 Nov 2014 16:47:37 -0800
+Message-ID: <CAD0=r8xHNy=DqsaZBWU90YdSteqgntdLVsuJMLxy+GNxQ+QUeA@mail.gmail.com>
+Subject: Re: [PATCH v12 3/3] Bluetooth: start and stop service discovery
+From: Jakub Pawlowski <jpawlowski@google.com>
+To: Jakub Pawlowski <jpawlowski@google.com>,
+	BlueZ development <linux-bluetooth@vger.kernel.org>, Marcel Holtmann <marcel@holtmann.org>
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch series introduce the next header compression framework. Currently
-we support udp compression/uncompression only. This framework allow to add new
-next header compression formats easily.
+On Fri, Nov 28, 2014 at 5:27 AM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
+> Hi Jakub,
+>
+> On Thu, Nov 27, 2014, Jakub Pawlowski wrote:
+>> This patch introduces start service discovery method. The reason
+>> behind that is to enable users to find specific services in range
+>> by UUID. Whole filtering is done in mgmt_device_found.
+>>
+>> Signed-off-by: Jakub Pawlowski <jpawlowski@google.com>
+>> ---
+>>  include/net/bluetooth/hci_core.h |   4 +
+>>  include/net/bluetooth/mgmt.h     |   9 ++
+>>  net/bluetooth/hci_core.c         |   5 +
+>>  net/bluetooth/mgmt.c             | 271 ++++++++++++++++++++++++++++++++++-----
+>>  4 files changed, 260 insertions(+), 29 deletions(-)
+>
+> With the exception of "stop service discovery" in the subject of this
+> patch that doesn't exist anymore, the patches are starting to look quite
+> good to me. Thank you for your patience with the many review rounds so
+> far!
+I fixed all commit names according to your guides.
+It's me that should be thankful you for your patience!
 
-If somebody wants to add a new header compression format and some information
-are missing while calling compression and uncompression callbacks. Please
-feel free to make framework changes according these callbacks.
-
-Cc: Jukka Rissanen <jukka.rissanen@linux.intel.com>
-Cc: Martin Townsend <mtownsend1973@gmail.com>
-
-Alexander Aring (2):
-  6lowpan: add generic nhc layer interface
-  6lowpan: add udp compression via nhc layer
-
- net/6lowpan/Makefile  |   5 +-
- net/6lowpan/iphc.c    | 188 +++++++-------------------------------------------
- net/6lowpan/nhc.c     | 183 ++++++++++++++++++++++++++++++++++++++++++++++++
- net/6lowpan/nhc.h     | 132 +++++++++++++++++++++++++++++++++++
- net/6lowpan/nhc_udp.c | 173 ++++++++++++++++++++++++++++++++++++++++++++++
- 5 files changed, 516 insertions(+), 165 deletions(-)
- create mode 100644 net/6lowpan/nhc.c
- create mode 100644 net/6lowpan/nhc.h
- create mode 100644 net/6lowpan/nhc_udp.c
-
--- 
-2.1.3
-
+> Btw, for consistency please try to formulate your commit message
+> subjects so that they start with a verb, e.g. "Add ...", "Implement
+> ...", "Fix ..." etc.
+>
+> I've asked Marcel to take one last review of your patches before we push
+> them upstream.
+>
+> Johan
