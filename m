@@ -2,11 +2,11 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: Sebastian Chlad <sebastian.chlad@tieto.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v2] android/pts: L2CAP pts tests results on Android 5.0
-Date: Mon, 01 Dec 2014 14:12:06 +0100
-Message-ID: <1935688.p3flNPh2kG@uw000953>
-In-Reply-To: <1417088567-27484-1-git-send-email-sebastian.chlad@tieto.com>
-References: <1417088567-27484-1-git-send-email-sebastian.chlad@tieto.com>
+Subject: Re: [PATCH] android/pts: PTS tests for MPS on Android 5.0
+Date: Mon, 01 Dec 2014 14:11:51 +0100
+Message-ID: <1751146.7Rz8IZ3x10@uw000953>
+In-Reply-To: <1417104358-17992-1-git-send-email-sebastian.chlad@tieto.com>
+References: <1417104358-17992-1-git-send-email-sebastian.chlad@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -14,80 +14,69 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Sebastian,
 
-On Thursday 27 of November 2014 12:42:47 Sebastian Chlad wrote:
+On Thursday 27 of November 2014 17:05:58 Sebastian Chlad wrote:
 > ---
->  android/pts-l2cap.txt | 26 ++++++++++++++++----------
->  1 file changed, 16 insertions(+), 10 deletions(-)
+>  android/pixit-mps.txt |  3 ++-
+>  android/pts-mps.txt   | 11 +++++++----
+>  2 files changed, 9 insertions(+), 5 deletions(-)
 > 
-> diff --git a/android/pts-l2cap.txt b/android/pts-l2cap.txt
-> index 9cd2875..8ee9486 100644
-> --- a/android/pts-l2cap.txt
-> +++ b/android/pts-l2cap.txt
+> diff --git a/android/pixit-mps.txt b/android/pixit-mps.txt
+> index 56f5122..462f683 100644
+> --- a/android/pixit-mps.txt
+> +++ b/android/pixit-mps.txt
+> @@ -5,6 +5,7 @@ PTS version: 5.3
+>  * - different than PTS defaults
+>  & - should be set to IUT Bluetooth address
+>  ^ - should be set accordingly
+> +# - should be set according to the reported phone number's type
+>  
+>  		Required PIXIT settings
+>  -------------------------------------------------------------------------------
+> @@ -34,7 +35,7 @@ TSPX_packet_type_sco					00A0
+>  TSPX_phone_number					1234567 (^)
+>  TSPX_phone_number_memory				1
+>  TSPX_phone_number_memory_invalid_index			9999
+> -TSPX_phone_number_type					129
+> +TSPX_phone_number_type					145 (*#)
+>  TSPX_scan_all_memory_dial_locations			FALSE
+>  TSPX_second_phone_number				1234567 (^)
+>  TSPX_second_phone_type					129
+> diff --git a/android/pts-mps.txt b/android/pts-mps.txt
+> index 46d2510..4236a56 100644
+> --- a/android/pts-mps.txt
+> +++ b/android/pts-mps.txt
 > @@ -1,8 +1,8 @@
->  PTS test results for L2CAP
+>  PTS test results for MPS
 >  
 >  PTS version: 5.3
-> -Tested: 24-October-2014
+> -Tested: 20.10.2014
 > -Android version: 4.4.4
-> +Tested: 25-November-2014
+> +Tested: 27-November-2014
 > +Android version: 5.0
->  Kernel version: 3.18
 >  
 >  Results:
-> @@ -41,10 +41,14 @@ TC_COS_IEX_BV_01_C	PASS	l2test -n -P 4113 <bdaddr>
->  TC_COS_IEX_BV_02_C	PASS
->  TC_COS_ECH_BV_01_C	PASS
->  TC_COS_ECH_BV_02_C	PASS	l2ping -c 1 <bdaddr>
-> -TC_COS_CFC_BV_01_C	INC	PTS issue #12728
-> +TC_COS_CFC_BV_01_C	PASS	PTS issue #12728
->  				l2test -y -N 1 -b 40 -V le_public <braddr>
-> -TC_COS_CFC_BV_02_C	INC	PTS issue #12728
-> +				Note: use Common.dll and ETS for L2CAP
-> +				from #12712
-> +TC_COS_CFC_BV_02_C	PASS	PTS issue #12728
->  				l2test -y -N 1 -b 1 -V le_public <bdaddr>
-> +				Note: use Common.dll and ETS for L2CAP
-> +				from #12712
->  TC_COS_CFC_BV_03_C	PASS	l2test -u -V le_public <bdaddr>
->  TC_COS_CFC_BV_04_C	PASS	l2test -u -V le_public <bdaddr>
->  TC_COS_CFC_BV_05_C	PASS	l2test -m -V le_public <bdaddr>
-> @@ -95,8 +99,7 @@ TC_ERM_BV_02_C		PASS	l2test -r -X ertm -P 4113
->  TC_ERM_BV_03_C		PASS	l2test -r -X ertm -P 4113
->  TC_ERM_BV_05_C		PASS	l2test -x -X ertm -P 4113 -N 2 -Y 2
->  TC_ERM_BV_06_C		PASS	l2test -x -X ertm -P 4113 -N 2 -Y 2
-> -TC_ERM_BV_07_C		INC	PTS issue #12690
-> -				l2test -r -H 1000 -K 10000 -X ertm -P 4113
-> +TC_ERM_BV_07_C		PASS	l2test -r -H 1000 -K 10000 -X ertm -P 4113
->  TC_ERM_BV_08_C		PASS	l2test -x -X ertm -P 4113 -N 1
->  TC_ERM_BV_09_C		PASS	l2test -X ertm -P 4113
->  TC_ERM_BV_10_C		PASS	l2test -x -X ertm -P 4113 -N 1
-> @@ -111,8 +114,7 @@ TC_ERM_BV_18_C		PASS	l2test -x -X ertm -P 4113 -N 1
->  TC_ERM_BV_19_C		PASS	l2test -x -X ertm -P 4113 -N 1
->  TC_ERM_BV_20_C		PASS	l2test -x -X ertm -P 4113 -N 1
->  TC_ERM_BV_21_C		PASS	l2test -x -X ertm -P 4113 -D 2000 -N 2
-> -TC_ERM_BV_22_C		INC	PTS issue #12690
-> -				l2test -r -H 1000 -K 5000 -X ertm -P 4113
-> +TC_ERM_BV_22_C		PASS	l2test -r -H 1000 -K 5000 -X ertm -P 4113
->  TC_ERM_BV_23_C		PASS	l2test -x -X ertm -P 4113 -N 2
->  TC_ERM_BI_01_C		N/A
->  TC_ERM_BI_02_C		PASS	l2test -X ertm -P 4113
-> @@ -173,10 +175,14 @@ TC_LE_CFC_BV_04_C	PASS	l2test -n -V le_public -P 241  <braddr>
->  TC_LE_CFC_BV_05_C	INC	PTS issue #12665
->  TC_LE_CFC_BV_06_C	INC	PTS issue #12711 #12729
->  				l2test -s -V le_public <braddr>
-> -TC_LE_CFC_BV_07_C	INC	PTS issue #12728
-> +TC_LE_CFC_BV_07_C	PASS	PTS issue #12728
->  				l2test -u -V le_public <braddr>
-> -TC_LE_CFC_BI_01_C	INC	PTS issue #12728 #12712
-> +				Note: use Common.dll and ETS for L2CAP
-> +				from #12712
-> +TC_LE_CFC_BI_01_C	PASS	PTS issue #12728 #12712
->  				l2test -u -V le_public <bdaddr>
-> +				Note: use Common.dll and ETS for L2CAP
-> +				from #12712
->  TC_LE_CFC_BV_08_C	PASS	l2test -n -V le_public -P 37 <braddr>
->  TC_LE_CFC_BV_09_C	PASS	l2test -n -V le_public -P 37 <braddr>
->  TC_LE_CFC_BV_16_C	PASS	l2test -n -V le_public -P 37 <braddr>
+>  PASS	test passed
+> @@ -11,6 +11,10 @@ INC	test is inconclusive
+>  N/A	test is disabled due to PICS setup
+>  NONE	test result is none
+>  
+> +Note: Do not use AOSP Music player. Use e.g. MortPlayer or Poweramp.
+> +For full tests conformance, "Touch sounds" on IUT should be disbaled
+> +(Settings > Sound&notification > Other sounds)
+> +
+>  -------------------------------------------------------------------------------
+>  Test Name				Result	Notes
+>  -------------------------------------------------------------------------------
+> @@ -46,8 +50,7 @@ TC_SRC_TG_HFAV_ACT_MD_BV_01_I		PASS
+>  TC_SRC_TG_HFAV_CLH_MD_BV_01_I		PASS
+>  TC_SRC_TG_HFAV_CLH_MD_BV_02_I		PASS
+>  TC_SRC_TG_HFAV_CLH_MD_BV_03_I		PASS
+> -TC_SRC_TG_HFAV_CLH_MD_BV_04_I		PASS	Do not use AOSP Music player.
+> -						Use e.g. MortPlayer or Poweramp
+> +TC_SRC_TG_HFAV_CLH_MD_BV_04_I		PASS
+>  TC_SRC_TG_HFAV_CLH_MD_BV_05_I		PASS
+>  TC_SRC_TG_HFAV_CLH_MD_BV_06_I		PASS
+>  TC_PAIRING_HF_SNK_CT			N/A	Pairing helper for MD tests
 > 
 
 Applied, thanks.
