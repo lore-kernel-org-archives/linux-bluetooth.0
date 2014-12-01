@@ -1,32 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
-To: Bruce Dubbs <bruce.dubbs@gmail.com>
-Cc: linux-bluetooth <linux-bluetooth@vger.kernel.org>
-Subject: Re: User question
-Date: Mon, 01 Dec 2014 14:21:28 +0100
-Message-ID: <1685281.NVOr2VMF8E@uw000953>
-In-Reply-To: <5474BF78.7020501@gmail.com>
-References: <5474BF78.7020501@gmail.com>
+To: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] android/pts: PTS tests for HID on Android 5.0
+Date: Mon, 01 Dec 2014 14:13:14 +0100
+Message-ID: <1848263.Xp3JhHlHRN@uw000953>
+In-Reply-To: <1417004916-31453-1-git-send-email-ravikumar.veeramally@linux.intel.com>
+References: <1417004916-31453-1-git-send-email-ravikumar.veeramally@linux.intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Bruce,
+Hi Ravi,
 
-On Tuesday 25 of November 2014 11:42:16 Bruce Dubbs wrote:
-> This appears to be a developer list.  Do you accept user level questions 
-> here?  If not, can you point me to a better place to ask?
+On Wednesday 26 of November 2014 14:28:36 Ravi kumar Veeramally wrote:
+> ---
+>  android/pts-hid.txt | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
 > 
-> I'm trying to get bluez to work in an LFS system and am getting errors. 
->   I'd like to get it fixed and document the issues for our community.
+> diff --git a/android/pts-hid.txt b/android/pts-hid.txt
+> index 817fc7f..62a79e1 100644
+> --- a/android/pts-hid.txt
+> +++ b/android/pts-hid.txt
+> @@ -1,8 +1,8 @@
+>  PTS test results for HID
+>  
+>  PTS version: 5.3
+> -Tested: 30-September-2014
+> -Android version: 4.4.4
+> +Tested: 26-November-2014
+> +Android version: 5.0
+>  
+>  Results:
+>  PASS	test passed
 > 
-> Thanks.
 
-The best way would be to just describe the issue here and provide logs.
-
-You may also join #bluez-users on irc.freenode.net and ask there
-(depending on your timezone you may not get the answer right a way:)
+Applied, thanks.
 
 -- 
 Best regards, 
