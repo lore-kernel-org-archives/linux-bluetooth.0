@@ -1,55 +1,74 @@
 Return-Path: <cyrus@holtmann.org>
-From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] android/pts: PTS tests for HOGP on Android 5.0
-Date: Mon,  1 Dec 2014 16:41:52 +0100
-Message-Id: <1417448512-20973-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+MIME-Version: 1.0
+In-Reply-To: <1417405863-8331-1-git-send-email-biradar.a@samsung.com>
+References: <1417405863-8331-1-git-send-email-biradar.a@samsung.com>
+Date: Mon, 1 Dec 2014 17:20:02 +0200
+Message-ID: <CABBYNZLmOWdKpLo-dgFkPt5ZVp-HfbyKo8ozmLTxwMnwnSze=A@mail.gmail.com>
+Subject: Re: [PATCH 1/1] pbap: Fix When MaxListCount header missing
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Anurag Biradar <biradar.a@samsung.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- android/pts-hogp.txt | 11 ++++++-----
- 1 file changed, 6 insertions(+), 5 deletions(-)
+Hi Anurag,
 
-diff --git a/android/pts-hogp.txt b/android/pts-hogp.txt
-index d86522d..98c14d8 100644
---- a/android/pts-hogp.txt
-+++ b/android/pts-hogp.txt
-@@ -1,8 +1,8 @@
- PTS test results for HoG
- 
- PTS version: 5.3
--Tested: 21-October-2014
--Android version: 4.4.4
-+Tested: 01-December-2014
-+Android version: 5.0
- 
- Results:
- PASS	test passed
-@@ -13,7 +13,8 @@ N/A	test is disabled due to PICS setup
- -------------------------------------------------------------------------------
- Test Name		Result	Notes
- -------------------------------------------------------------------------------
--TC_HGDS_HH_BV_01_I	PASS
-+TC_HGDS_HH_BV_01_I	PASS	PTS issue #12119
-+				This issue affects all PTS test cases
- TC_HGDS_HH_BV_02_I	PASS
- TC_HGDS_HH_BV_03_I	PASS
- TC_HGDS_HD_BV_01_I	N/A
-@@ -83,11 +84,11 @@ TC_HGCF_RH_BV_02_I	PASS	haltest: hidhost connect <addr>
- 				gattc get_characteristic 1 {1812,2,1}
- 				gattc get_descriptor 1 {1812,2,1} {2a4d,5}
- 				gattc write_descriptor 1 {1812,2,1} {2a4d,5}
--					{2902,0} 2 0x0000 0
-+					{2902,1} 2 0x0000 0
- 				gattc get_characteristic 1 {1812,5,1}
- 				gattc get_descriptor 1 {1812,5,1} {2a4d,4}
- 				gattc write_descriptor 1 {1812,5,1}
--					{2a4d,4} {2902,0} 2 0x0000 0
-+					{2a4d,4} {2902,1} 2 0x0000 0
- 				hidhost disconnect <addr>
- TC_HGCF_BH_BV_03_I	N/A
- TC_HGCF_BH_BV_04_I	N/A
+On Mon, Dec 1, 2014 at 5:51 AM, Anurag Biradar <biradar.a@samsung.com> wrote:
+> As per spec(5.3.4.4) when MaxListCount headser is missing then
+> PSE should assume MaxListCount value as MAX (65535)
+> ---
+>  obexd/plugins/pbap.c |   10 ++++++++--
+>  1 file changed, 8 insertions(+), 2 deletions(-)
+>
+> diff --git a/obexd/plugins/pbap.c b/obexd/plugins/pbap.c
+> index acac3aa..d3c1986 100644
+> --- a/obexd/plugins/pbap.c
+> +++ b/obexd/plugins/pbap.c
+> @@ -65,6 +65,8 @@
+>  #define PHONEBOOKSIZE_TAG      0X08
+>  #define NEWMISSEDCALLS_TAG     0X09
+>
+> +#define PBAP_MAXLISTCOUNT_MAX_VALUE 65535
+> +
+>  struct cache {
+>         gboolean valid;
+>         uint32_t index;
+> @@ -447,7 +449,7 @@ static struct apparam_field *parse_aparam(const uint8_t *buffer, uint32_t hlen)
+>  {
+>         GObexApparam *apparam;
+>         struct apparam_field *param;
+> -
+> +       gboolean bmaxlistCount = FALSE;
+>         apparam = g_obex_apparam_decode(buffer, hlen);
+>         if (apparam == NULL)
+>                 return NULL;
+> @@ -458,13 +460,17 @@ static struct apparam_field *parse_aparam(const uint8_t *buffer, uint32_t hlen)
+>         g_obex_apparam_get_uint8(apparam, SEARCHATTRIB_TAG,
+>                                                 &param->searchattrib);
+>         g_obex_apparam_get_uint8(apparam, FORMAT_TAG, &param->format);
+> -       g_obex_apparam_get_uint16(apparam, MAXLISTCOUNT_TAG,
+> +       bmaxlistCount = g_obex_apparam_get_uint16(apparam, MAXLISTCOUNT_TAG,
+>                                                 &param->maxlistcount);
+>         g_obex_apparam_get_uint16(apparam, LISTSTARTOFFSET_TAG,
+>                                                 &param->liststartoffset);
+>         g_obex_apparam_get_uint64(apparam, FILTER_TAG, &param->filter);
+>         param->searchval = g_obex_apparam_get_string(apparam, SEARCHVALUE_TAG);
+>
+> +       /* As per spec when client doesn't include MAXLISTCOUNT_TAG then it should be assume as
+> +         * Maximum value in vcardlisting 65535 */
+> +       if (bmaxlistCount == FALSE)
+> +               param->maxlistcount = PBAP_MAXLISTCOUNT_MAX_VALUE;
+>         DBG("o %x sa %x sv %s fil %" G_GINT64_MODIFIER "x for %x max %x off %x",
+>                         param->order, param->searchattrib, param->searchval,
+>                         param->filter, param->format, param->maxlistcount,
+> --
+> 1.7.9.5
+
+Applied, but please next time try to adhere to the coding style
+(doc/coding-style.txt), this time Ive fixed for you but I might not do
+it again.
+
+
 -- 
-1.9.3
-
+Luiz Augusto von Dentz
