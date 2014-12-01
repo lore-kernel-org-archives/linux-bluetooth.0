@@ -1,202 +1,89 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 1 Dec 2014 15:34:45 +0100
-From: Alexander Aring <alex.aring@gmail.com>
+From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: linux-wpan@vger.kernel.org, kernel@pengutronix.de,
-	Jukka Rissanen <jukka.rissanen@linux.intel.com>,
-	Martin Townsend <mtownsend1973@gmail.com>
-Subject: Re: [PATCHv2 bluetooth-next 1/2] 6lowpan: add generic nhc layer
- interface
-Message-ID: <20141201143441.GA996@omega>
-References: <1417295683-22682-1-git-send-email-alex.aring@gmail.com>
- <1417295683-22682-2-git-send-email-alex.aring@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-In-Reply-To: <1417295683-22682-2-git-send-email-alex.aring@gmail.com>
+Cc: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+Subject: [PATCH] android/bluetooth: Add support to read LE features by Android
+Date: Mon,  1 Dec 2014 15:18:00 +0100
+Message-Id: <1417443480-608-1-git-send-email-lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Sat, Nov 29, 2014 at 10:14:42PM +0100, Alexander Aring wrote:
-> This patch adds a generic next header compression layer interface. There
-> exists various methods to do a header compression after 6LoWPAN header
-> to save payload. This introduce a generic nhc header which allow a
-> simple adding of a new header compression format instead of a static
-> implementation inside the 6LoWPAN header compression and uncompression
-> function.
-> 
-> Signed-off-by: Alexander Aring <alex.aring@gmail.com>
-> Cc: Jukka Rissanen <jukka.rissanen@linux.intel.com>
-> Cc: Martin Townsend <mtownsend1973@gmail.com>
-> ---
->  net/6lowpan/Makefile |   2 +-
->  net/6lowpan/nhc.c    | 175 +++++++++++++++++++++++++++++++++++++++++++++++++++
->  net/6lowpan/nhc.h    | 130 ++++++++++++++++++++++++++++++++++++++
->  3 files changed, 306 insertions(+), 1 deletion(-)
->  create mode 100644 net/6lowpan/nhc.c
->  create mode 100644 net/6lowpan/nhc.h
-> 
-> diff --git a/net/6lowpan/Makefile b/net/6lowpan/Makefile
-> index 415886b..4215602 100644
-> --- a/net/6lowpan/Makefile
-> +++ b/net/6lowpan/Makefile
-> @@ -1,3 +1,3 @@
->  obj-$(CONFIG_6LOWPAN) := 6lowpan.o
->  
-> -6lowpan-y := iphc.o
-> +6lowpan-y := iphc.o nhc.o
-> diff --git a/net/6lowpan/nhc.c b/net/6lowpan/nhc.c
-> new file mode 100644
-> index 0000000..f64b244
-> --- /dev/null
-> +++ b/net/6lowpan/nhc.c
-> @@ -0,0 +1,175 @@
-> +/*
-> + *	6LoWPAN next header compression
-> + *
-> + *
-> + *	Authors:
-> + *	Alexander Aring		<aar@pengutronix.de>
-> + *
-> + *	This program is free software; you can redistribute it and/or
-> + *	modify it under the terms of the GNU General Public License
-> + *	as published by the Free Software Foundation; either version
-> + *	2 of the License, or (at your option) any later version.
-> + */
-> +
-> +#include <linux/netdevice.h>
-> +
-> +#include <net/ipv6.h>
-> +
-> +#include "nhc.h"
-> +
-> +static struct rb_root rb_root = RB_ROOT;
-> +static struct lowpan_nhc *lowpan_nexthdr_nhcs[NEXTHDR_MAX];
-> +
-> +static int lowpan_nhc_insert(struct lowpan_nhc *nhc)
-> +{
-> +	struct rb_node **new = &rb_root.rb_node, *parent = NULL;
-> +
-> +	/* Figure out where to put new node */
-> +	while (*new) {
-> +		struct lowpan_nhc *this = container_of(*new, struct lowpan_nhc,
-> +						       node);
-> +		int result, len_dif, len;
-> +
-> +		len_dif = nhc->idlen - this->idlen;
-> +
-> +		if (nhc->idlen < this->idlen)
-> +			len = nhc->idlen;
-> +		else
-> +			len = this->idlen;
-> +
-> +		result = memcmp(nhc->id, this->id, len);
-> +		if (!result)
-> +			result = len_dif;
-> +
-> +		parent = *new;
-> +		if (result < 0)
-> +			new = &((*new)->rb_left);
-> +		else if (result > 0)
-> +			new = &((*new)->rb_right);
-> +		else
-> +			return -EEXIST;
-> +	}
-> +
-> +	/* Add new node and rebalance tree. */
-> +	rb_link_node(&nhc->node, parent, new);
-> +	rb_insert_color(&nhc->node, &rb_root);
-> +
-> +	return 0;
-> +}
-> +
-> +static void lowpan_nhc_remove(struct lowpan_nhc *nhc)
-> +{
-> +	rb_erase(&nhc->node, &rb_root);
-> +}
-> +
-> +struct lowpan_nhc *lowpan_nhc_by_nhcid(const struct sk_buff *skb)
-> +{
-> +	struct rb_node *node = rb_root.rb_node;
-> +	const u8 *nhcid_skb_ptr = skb->data;
-> +
-> +	while (node) {
-> +		struct lowpan_nhc *nhc = container_of(node, struct lowpan_nhc,
-> +						      node);
-> +		u8 nhcid_skb_ptr_masked[LOWPAN_NHC_MAX_ID_LEN];
-> +		int result, i;
-> +
-> +		if (nhcid_skb_ptr + nhc->idlen > skb->data + skb->len)
-> +			return NULL;
-> +
-> +		/* copy and mask afterwards the nhid value from skb */
-> +		memcpy(nhcid_skb_ptr_masked, nhcid_skb_ptr, nhc->idlen);
-> +		for (i = 0; i < nhc->idlen; i++)
-> +			nhcid_skb_ptr_masked[i] &= nhc->idmask[i];
-> +
-> +		result = memcmp(nhcid_skb_ptr_masked, nhc->id, nhc->idlen);
-> +		if (result < 0)
-> +			node = node->rb_left;
-> +		else if (result > 0)
-> +			node = node->rb_right;
-> +		else
-> +			return nhc;
-> +	}
-> +
-> +	return NULL;
-> +}
-> +
-> +struct lowpan_nhc *lowpan_nhc_by_nexthdr(u8 nexthdr)
-> +{
-> +	return lowpan_nexthdr_nhcs[nexthdr];
-> +}
-> +
-> +int lowpan_nhc_do_compression(struct lowpan_nhc *nhc, struct sk_buff *skb,
-> +			      u8 **hc_ptr, u8 *iphc0)
-> +{
-> +	int ret;
-> +
-> +	if (!nhc)
-> +		return 0;
-> +
-> +	ret = nhc->compress(skb, hc_ptr);
-> +	if (ret == 0)
-> +		*iphc0 |= LOWPAN_IPHC_NH_C;
-> +
-> +	return ret;
-> +}
-> +
-> +int lowpan_nhc_do_uncompression(struct sk_buff *skb, struct ipv6hdr *hdr)
-> +{
-> +	struct lowpan_nhc *nhc;
-> +	/* default dropping if nothing found */
-> +	int ret = 0;
-> +
+This patch adds support to read LE features by Android framework.
+For now we set all to 0.
+---
+ android/bluetooth.c | 18 ++++++++++++++++++
+ android/hal-msg.h   |  1 +
+ 2 files changed, 19 insertions(+)
 
-this should be ret = -ENOENT; 
+diff --git a/android/bluetooth.c b/android/bluetooth.c
+index f79ca37..989f5d5 100644
+--- a/android/bluetooth.c
++++ b/android/bluetooth.c
+@@ -176,6 +176,7 @@ static struct {
+ 
+ 	char *name;
+ 
++	uint8_t le_features[8];
+ 	uint32_t current_settings;
+ 	uint32_t supported_settings;
+ 
+@@ -189,6 +190,7 @@ static struct {
+ 	.index = MGMT_INDEX_NONE,
+ 	.dev_class = 0,
+ 	.name = NULL,
++	.le_features = {0},
+ 	.current_settings = 0,
+ 	.supported_settings = 0,
+ 	.cur_discovery_type = SCAN_TYPE_NONE,
+@@ -3784,6 +3786,14 @@ static uint8_t get_adapter_discoverable_timeout(void)
+ 	return HAL_STATUS_SUCCESS;
+ }
+ 
++static uint8_t get_adapter_le_features(void)
++{
++	send_adapter_property(HAL_PROP_ADAPTER_LOCAL_LE_FEAT,
++					sizeof(adapter.le_features),
++					&adapter.le_features[0]);
++	return HAL_STATUS_SUCCESS;
++}
++
+ static void handle_get_adapter_prop_cmd(const void *buf, uint16_t len)
+ {
+ 	const struct hal_cmd_get_adapter_prop *cmd = buf;
+@@ -3817,6 +3827,9 @@ static void handle_get_adapter_prop_cmd(const void *buf, uint16_t len)
+ 	case HAL_PROP_ADAPTER_DISC_TIMEOUT:
+ 		status = get_adapter_discoverable_timeout();
+ 		break;
++	case HAL_PROP_ADAPTER_LOCAL_LE_FEAT:
++		status = get_adapter_le_features();
++		break;
+ 	default:
+ 		status = HAL_STATUS_FAILED;
+ 		break;
+@@ -3898,6 +3911,11 @@ static void get_adapter_properties(void)
+ 									uuids);
+ 	ev->num_props++;
+ 
++	size += fill_hal_prop(buf + size, HAL_PROP_ADAPTER_LOCAL_LE_FEAT,
++			sizeof(adapter.le_features), &adapter.le_features[0]);
++
++	ev->num_props++;
++
+ 	ipc_send_notif(hal_ipc, HAL_SERVICE_ID_BLUETOOTH,
+ 				HAL_EV_ADAPTER_PROPS_CHANGED, size, buf);
+ }
+diff --git a/android/hal-msg.h b/android/hal-msg.h
+index 33b53c5..67c6573 100644
+--- a/android/hal-msg.h
++++ b/android/hal-msg.h
+@@ -142,6 +142,7 @@ struct hal_prop_device_info {
+ 	uint16_t manufacturer;
+ } __attribute__((packed));
+ 
++#define HAL_PROP_ADAPTER_LOCAL_LE_FEAT		0x0d
+ #define HAL_PROP_DEVICE_TIMESTAMP		0xFF
+ 
+ #define HAL_ADAPTER_SCAN_MODE_NONE		0x00
+-- 
+1.8.4
 
-To avoid sending garbage to next higher layer. I changed this is here
-from -EINVAL to 0. Sorry some mistake is happend here, now it's real
-dropped afterwards.
-
-> +	nhc = lowpan_nhc_by_nhcid(skb);
-> +	if (nhc) {
-> +		ret = nhc->uncompress(skb, sizeof(*hdr) + nhc->nexthdrlen);
-> +		if (ret == 0) {
-> +			hdr->nexthdr = nhc->nexthdr;
-> +			skb_reset_transport_header(skb);
-> +			raw_dump_table(__func__, "raw transport header dump",
-> +				       skb_transport_header(skb),
-> +				       nhc->nexthdrlen);
-> +		} else if (ret == -ENOTSUPP) {
-> +			netdev_warn(skb->dev, "received %s which is not supported for uncompression.\n",
-> +				    nhc->name);
-> +		}
-> +	} else {
-> +		netdev_warn(skb->dev, "received nhc which is not supported. Dropping.\n");
-> +	}
-> +
-> +	return ret;
-> +}
-> +
-
-- Alex
