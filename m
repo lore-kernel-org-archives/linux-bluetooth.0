@@ -1,150 +1,186 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1417437183.2703.45.camel@jrissane-mobl.ger.corp.intel.com>
-Subject: Re: [PATCHv2 bluetooth-next 0/2] 6lowpan: introduce nhc framework
-From: Jukka Rissanen <jukka.rissanen@linux.intel.com>
-To: Alexander Aring <alex.aring@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org,
-	kernel@pengutronix.de, Martin Townsend <mtownsend1973@gmail.com>, Marcel
-	Holtmann <marcel@holtmann.org>
-Date: Mon, 01 Dec 2014 14:33:03 +0200
-In-Reply-To: <1417295683-22682-1-git-send-email-alex.aring@gmail.com>
-References: <1417295683-22682-1-git-send-email-alex.aring@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+From: Gowtham Anandha Babu <gowtham.ab@samsung.com>
+To: 'Luiz Augusto von Dentz' <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+References: <1417423638-29222-1-git-send-email-luiz.dentz@gmail.com>
+ <1417423638-29222-8-git-send-email-luiz.dentz@gmail.com>
+In-reply-to: <1417423638-29222-8-git-send-email-luiz.dentz@gmail.com>
+Subject: RE: [PATCH BlueZ 8/8] obexd/client: Add supported_features support
+Date: Mon, 01 Dec 2014 17:47:21 +0530
+Message-id: <003a01d00d60$d0424590$70c6d0b0$@samsung.com>
+MIME-version: 1.0
+Content-type: text/plain; charset=us-ascii
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Alex,
+Hi Luiz,
 
-On la, 2014-11-29 at 22:14 +0100, Alexander Aring wrote:
-> This patch series introduce the next header compression framework. Currently
-> we support udp compression/uncompression only. This framework allow to add new
-> next header compression formats easily.
+> -----Original Message-----
+> From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-
+> owner@vger.kernel.org] On Behalf Of Luiz Augusto von Dentz
+> Sent: Monday, December 01, 2014 2:17 PM
+> To: linux-bluetooth@vger.kernel.org
+> Subject: [PATCH BlueZ 8/8] obexd/client: Add supported_features support
 > 
-> If somebody wants to add a new header compression format and some information
-> are missing while calling compression and uncompression callbacks. Please
-> feel free to make framework changes according these callbacks.
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 > 
-> Note:
+> This adds supported_features support to obc_driver so driver can provide
+> this information when connecting.
 > 
-> If building 6lowpan_udp as module please make sure it's loaded before running
-> rfc6282 udp connection. If it's not loaded we send 6lowpan with raw udp header
-> and next header compression bit isn't set. Nevertheless if you use rfc6282
-> connection and 6lowpan_udp isn't loaded following will be printed:
+> This is required by PBAP 1.2 (page 48):
 > 
-> "ieee802154 wpan-phy0 wpan0: received nhc which is not supported. Dropping."
+>   'Mandatory if the PSE advertises a PbapSupportedFeatures attribute in
+>    its SDP record, else excluded.'
+> ---
+>  obexd/client/driver.h  |  1 +
+>  obexd/client/pbap.c    | 36 ++++++++++++++++++++++++++++++++++++
+>  obexd/client/session.c | 25 ++++++++++++++++++++++++-
+>  3 files changed, 61 insertions(+), 1 deletion(-)
 > 
-> changes since v2:
->  - make udp nhc as module as suggested by Marcel Holtmann
->  - fix comment header in nhc_udp.c
+> diff --git a/obexd/client/driver.h b/obexd/client/driver.h index
+> f1c0646..0112219 100644
+> --- a/obexd/client/driver.h
+> +++ b/obexd/client/driver.h
+> @@ -26,6 +26,7 @@ struct obc_driver {
+>  	const char *uuid;
+>  	void *target;
+>  	gsize target_len;
+> +	void *(*supported_features) (struct obc_session *session);
+>  	int (*probe) (struct obc_session *session);
+>  	void (*remove) (struct obc_session *session);  }; diff --git
+> a/obexd/client/pbap.c b/obexd/client/pbap.c index 812a7fb..57632b4
+> 100644
+> --- a/obexd/client/pbap.c
+> +++ b/obexd/client/pbap.c
+> @@ -76,6 +76,7 @@
+>  #define PRIMARY_COUNTER_TAG	0X0A
+>  #define SECONDARY_COUNTER_TAG	0X0B
+>  #define DATABASEID_TAG		0X0D
+> +#define SUPPORTED_FEATURES_TAG  0x10
 > 
-> I didn't make the lowpan_nhc declaration "const" because this will occur
-> issues with rb_node, id and idmask array. Which will manipulated during
-> runtime.
+>  #define DOWNLOAD_FEATURE	0x00000001
+>  #define BROWSE_FEATURE		0x00000002
+> @@ -1230,6 +1231,40 @@ static void parse_service_record(struct pbap_data
+> *pbap)
 > 
+>  }
+> 
+> +static void *pbap_supported_features(struct obc_session *session) {
+> +	const void *data;
+> +	uint16_t version;
+> +
+> +	/* Version */
+> +	data = obc_session_get_attribute(session,
+> SDP_ATTR_PFILE_DESC_LIST);
+> +	if (!data)
+> +		return NULL;
+> +
+> +	version = GPOINTER_TO_UINT(data);
+> +
+> +	if (version < 0x0102)
+> +		return NULL;
+> +
+> +	/* Supported Feature Bits */
+> +	data = obc_session_get_attribute(session,
+> +
+> 	SDP_ATTR_PBAP_SUPPORTED_FEATURES);
+> +	if (!data)
+> +		return NULL;
+> +
+> +	return g_obex_apparam_set_uint32(NULL,
+> SUPPORTED_FEATURES_TAG,
+> +						DOWNLOAD_FEATURE |
+> +						BROWSE_FEATURE |
+> +						DATABASEID_FEATURE |
+> +						FOLDER_VERSION_FEATURE
+> |
+> +						VCARD_SELECTING_FEATURE
+> |
+> +						ENHANCED_CALLS_FEATURE
+> |
+> +						UCI_FEATURE |
+> +						UID_FEATURE |
+> +						REFERENCING_FEATURE |
+> +						DEFAULT_IMAGE_FEATURE);
+> +}
+> +
+>  static int pbap_probe(struct obc_session *session)  {
+>  	struct pbap_data *pbap;
+> @@ -1274,6 +1309,7 @@ static struct obc_driver pbap = {
+>  	.uuid = PBAP_UUID,
+>  	.target = OBEX_PBAP_UUID,
+>  	.target_len = OBEX_PBAP_UUID_LEN,
+> +	.supported_features = pbap_supported_features,
+>  	.probe = pbap_probe,
+>  	.remove = pbap_remove
+>  };
+> diff --git a/obexd/client/session.c b/obexd/client/session.c index
+> 9bba6c6..d2ae4fd 100644
+> --- a/obexd/client/session.c
+> +++ b/obexd/client/session.c
+> @@ -345,6 +345,7 @@ static void transport_func(GIOChannel *io, GError
+> *err, gpointer user_data)
+>  	struct obc_driver *driver = session->driver;
+>  	struct obc_transport *transport = session->transport;
+>  	GObex *obex;
+> +	GObexApparam *apparam;
+>  	GObexTransportType type;
+>  	int tx_mtu = -1;
+>  	int rx_mtu = -1;
+> @@ -370,7 +371,29 @@ static void transport_func(GIOChannel *io, GError
+> *err, gpointer user_data)
+> 
+>  	g_io_channel_set_close_on_unref(io, TRUE);
+> 
+> -	if (driver->target != NULL)
+> +	apparam = NULL;
+> +
+> +	if (driver->supported_features)
+> +		apparam = driver->supported_features(session);
+> +
+> +	if (apparam) {
+> +		uint8_t buf[1024];
+> +		ssize_t len;
+> +
+> +		len = g_obex_apparam_encode(apparam, buf, sizeof(buf));
+> +		if (driver->target)
+> +			g_obex_connect(obex, connect_cb, callback, &err,
+> +					G_OBEX_HDR_TARGET,
+> +					driver->target, driver->target_len,
+> +					G_OBEX_HDR_APPARAM,
+> +					buf, len,
+> +					G_OBEX_HDR_INVALID);
+> +		else
+> +			g_obex_connect(obex, connect_cb, callback, &err,
+> +					G_OBEX_HDR_APPARAM, buf, len,
+> +					G_OBEX_HDR_INVALID);
+> +		g_obex_apparam_free(apparam);
+> +	} else if (driver->target)
+>  		g_obex_connect(obex, connect_cb, callback, &err,
+>  			G_OBEX_HDR_TARGET, driver->target, driver-
+> >target_len,
+>  			G_OBEX_HDR_INVALID);
+> --
+> 1.9.3
+> 
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth"
+in
+> the body of a message to majordomo@vger.kernel.org More majordomo
+> info at  http://vger.kernel.org/majordomo-info.html
 
 
-Tested it between two BT 6lowpan connections. If both ends load the
-6lowpan_udp module, then no issues. If only the other end has loaded the
-module, the other end (receiving end) crashed.
+
+I applied this patch locally and tested with PTS. 
+The PTS test case: TP/SSM/BV-09-C [PCE Shares PbapSupportedFeature bits] is
+failing.
+According to PBAP V1.2 Spec - Section 6.4 - OBEX Connect request format, the
+PbapSupportedFeatures 
+are shared during obex connect(after applying the this patch). 
+Still the above test case is failing.
+Am I mapping anything wrong?
 
 
-[  132.417733] (NULL net_device): received nhc which is not supported.
-Dropping.
-[  132.722432] skbuff: skb_under_panic: text:d19cb60c len:55 put:40
-head:cd923000 data:cd922fec tail:0xcd923023 end:0xcd923740 dev:<NULL>
-[  133.536256] ------------[ cut here ]------------
-[  133.537233] kernel BUG at 3.16+gitAUTOINC
-+f6af675ef5-r215/linux/net/core/skbuff.c:100!
-[  133.537233] invalid opcode: 0000 [#1] PREEMPT SMP 
-[  133.537233] Modules linked in: bluetooth_6lowpan 6lowpan nfc ecb
-btusb bluetooth rfkill snd_intel8x0 ohci_pci snd_ac97_codec ac97_bus
-parport_pc parport uvesafb
-[  133.537233] CPU: 0 PID: 327 Comm: kworker/u3:0 Not tainted
-3.17.0-bt6lowpan #1
-[  133.537233] Hardware name: innotek GmbH VirtualBox/VirtualBox, BIOS
-VirtualBox 12/01/2006
-[  133.537233] Workqueue: hci0 hci_rx_work [bluetooth]
-[  133.537233] task: c0170000 ti: cc7d0000 task.ti: cc7d0000
-[  133.537233] EIP: 0060:[<c1779838>] EFLAGS: 00010292 CPU: 0
-[  133.537233] EIP is at skb_panic+0x68/0x70
-[  133.537233] EAX: 0000007a EBX: cd923000 ECX: 00000000 EDX: 00000001
-[  133.537233] ESI: c1b2a11b EDI: 00000004 EBP: cc7d1c18 ESP: cc7d1be8
-[  133.537233]  DS: 007b ES: 007b FS: 00d8 GS: 0000 SS: 0068
-[  133.537233] CR0: 8005003b CR2: b76d9000 CR3: 0e1e5000 CR4: 000006d0
-[  133.537233] Stack:
-[  133.537233]  c1ba8748 c1982e68 d19cb60c 00000037 00000028 cd923000
-cd922fec cd923023
-[  133.537233]  cd923740 c1b2a11b cd914300 00000003 cc7d1c24 c1779881
-c1982e68 cc7d1c94
-[  133.537233]  d19cb60c c0304c48 00000003 00000008 cc7d1c40 00000003
-017d1c64 00000003
-[  133.537233] Call Trace:
-[  133.537233]  [<d19cb60c>] ? lowpan_header_decompress+0x26c/0x980
-[6lowpan]
-[  133.537233]  [<c1779881>] skb_push+0x41/0x50
-[  133.537233]  [<d19cb60c>] lowpan_header_decompress+0x26c/0x980
-[6lowpan]
-[  133.537233]  [<d19daeb4>] chan_recv_cb+0x244/0x3f0
-[bluetooth_6lowpan]
-[  133.537233]  [<d1738711>] l2cap_data_channel+0x8e1/0x980 [bluetooth]
-[  133.537233]  [<c10772d9>] ? sched_clock_local+0x49/0x180
-[  133.537233]  [<d173aa8f>] l2cap_recv_frame+0xbf/0x2ee0 [bluetooth]
-[  133.537233]  [<c100a7a8>] ? sched_clock+0x8/0x10
-[  133.537233]  [<c10772d9>] ? sched_clock_local+0x49/0x180
-[  133.537233]  [<c100a7a8>] ? sched_clock+0x8/0x10
-[  133.537233]  [<c10772d9>] ? sched_clock_local+0x49/0x180
-[  133.537233]  [<c107770f>] ? sched_clock_cpu+0x10f/0x160
-[  133.537233]  [<c10729cb>] ? get_parent_ip+0xb/0x40
-[  133.537233]  [<c1072a4b>] ? preempt_count_add+0x4b/0xa0
-[  133.537233]  [<c13e0112>] ? debug_smp_processor_id+0x12/0x20
-[  133.537233]  [<c108e584>] ? get_lock_stats+0x24/0x40
-[  133.537233]  [<c1090a34>] ? mark_held_locks+0x64/0x90
-[  133.537233]  [<c189dbfd>] ? __mutex_unlock_slowpath+0xcd/0x1b0
-[  133.537233]  [<c13e012f>] ? __this_cpu_preempt_check+0xf/0x20
-[  133.537233]  [<c1090b54>] ? trace_hardirqs_on_caller+0xf4/0x240
-[  133.537233]  [<c108e326>] ? trace_hardirqs_off_caller+0xb6/0x160
-[  133.537233]  [<d173ee19>] l2cap_recv_acldata+0x2f9/0x340 [bluetooth]
-[  133.537233]  [<d1709a93>] ? hci_rx_work+0x113/0x4a0 [bluetooth]
-[  133.537233]  [<d1709ce9>] hci_rx_work+0x369/0x4a0 [bluetooth]
-[  133.537233]  [<d1709a93>] ? hci_rx_work+0x113/0x4a0 [bluetooth]
-[  133.537233]  [<c1063203>] process_one_work+0x1b3/0x4e0
-[  133.537233]  [<c1063163>] ? process_one_work+0x113/0x4e0
-[  133.537233]  [<c10638c9>] worker_thread+0x39/0x440
-[  133.537233]  [<c1063890>] ? init_pwq+0xc0/0xc0
-[  133.537233]  [<c1067ce8>] kthread+0xa8/0xc0
-[  133.537233]  [<c1090cab>] ? trace_hardirqs_on+0xb/0x10
-[  133.537233]  [<c18a1741>] ret_from_kernel_thread+0x21/0x30
-[  133.537233]  [<c1067c40>] ? kthread_create_on_node+0x160/0x160
-[  133.537233] Code: 98 a8 00 00 00 89 54 24 10 89 5c 24 14 8b 40 5c 89
-4c 24 08 c7 04 24 48 87 ba c1 89 44 24 0c 8b 45 08 89 44 24 04 e8 b0 db
-11 00 <0f> 0b 8d b6 00 00 00 00 55 89 e5 83 ec 04 3e 8d 74 26 00 89 c1
-[  133.537233] EIP: [<c1779838>] skb_panic+0x68/0x70 SS:ESP
-0068:cc7d1be8
+Regards,
+Gowtham Anandha Babu
 
-
-Just wondering about how it works now. If the device does not have
-6lowpan_nhc module loaded, then UDP compressed packets are dropped. This
-feels wrong and is a kind of regression to the previous way of working,
-at least we need to auto-load the compression module.
-
-How the system works if there would be another way to compress UDP
-packets. User would need to know somehow what kind of packets it is
-suppose to send/receive and load corresponding module. I wonder if this
-kind of knowledge is really possible in practice. Should we always
-support the NHC defined in https://tools.ietf.org/html/rfc6282 and then
-have a way to load correct compression "plugin" if we get a packet with
-different compression scheme.
-
-If the system does not support https://tools.ietf.org/html/rfc6775 (like
-at the moment) there is no way to figure out what compression system the
-other end is using/supporting. In this respect, it would be nice if the
-current way of working would be automatically supported and user would
-not need to remember to select 6lowpan_nhc option when building the
-kernel.
-
-I like the way to support different compression algorithms, it just
-needs some fine tuning.
-
-
-Cheers,
-Jukka
