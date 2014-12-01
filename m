@@ -1,42 +1,100 @@
 Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
-To: Ruslan Mstoi <ruslan.mstoi@linux.intel.com>
+To: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] android/pts: PTS tests for DIS on Android 5.0
-Date: Mon, 01 Dec 2014 14:12:43 +0100
-Message-ID: <1471097.YA66c224ua@uw000953>
-In-Reply-To: <1417012656-31674-1-git-send-email-ruslan.mstoi@linux.intel.com>
-References: <1417012656-31674-1-git-send-email-ruslan.mstoi@linux.intel.com>
+Subject: Re: [PATCH] android/doc: Update cts results for Android 5
+Date: Mon, 01 Dec 2014 14:12:23 +0100
+Message-ID: <2180477.6DuRsHHx3K@uw000953>
+In-Reply-To: <1417087356-25455-1-git-send-email-jakub.tyszkowski@tieto.com>
+References: <1417087356-25455-1-git-send-email-jakub.tyszkowski@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Ruslan,
+Hi Jakub,
 
-On Wednesday 26 of November 2014 16:37:36 Ruslan Mstoi wrote:
+On Thursday 27 of November 2014 12:22:36 Jakub Tyszkowski wrote:
+> Google decided to disable BLE tests in CTS due to some quality issues.
+> Our tests shows that pure AOSP on Nexus devices was not passing.
+> We need to rerun BLE section when it becomes available again.
 > ---
->  android/pts-dis.txt | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+>  android/cts.txt | 46 +++++++++++++++++++++++-----------------------
+>  1 file changed, 23 insertions(+), 23 deletions(-)
 > 
-> diff --git a/android/pts-dis.txt b/android/pts-dis.txt
-> index 215baa2..fb67687 100644
-> --- a/android/pts-dis.txt
-> +++ b/android/pts-dis.txt
-> @@ -1,8 +1,8 @@
->  PTS test results for DIS
+> diff --git a/android/cts.txt b/android/cts.txt
+> index 9a7f651..f679263 100644
+> --- a/android/cts.txt
+> +++ b/android/cts.txt
+> @@ -1,15 +1,16 @@
+>  Android Compatibility Test Suite results
 >  
->  PTS version: 5.3
-> -Tested: 18-October-2014
+> -Tested: 11-July-2014
 > -Android version: 4.4.4
-> +Tested: 26-November-2014
+> -CTS version: 4.4 R3
+> +Tested: 27-Nov-2014
 > +Android version: 5.0
+> +Kernel Version: 3.18
+> +CTS version: 5.0 R1 (android-5.0.0_r7)
 >  
->  Results:
->  PASS	test passed
+>  Note:
+>  CTS reliable write GATT tests require using CTS from master branch
+>  or https://android-review.googlesource.com/99354 applied.
+>  
+> -(*) Due to bug in Bluedroid L2CAP implementation GATT server connect tests fails
+> -without modified Linux kernel. Patches for Linux and/or Bluedroid are still TBD.
+> +(*) Tests are disabled due to CTS quality issues. Link for reference:
+> +https://android.googlesource.com/platform/cts/+/0a62e4a0a9910101ccf2ccc43f6%5E!/
+>  
+>  -------------------------------------------------------------------------------
+>  android.bluetooth.cts.BasicAdapterTest (automated tests)
+> @@ -33,26 +34,25 @@ Test Name				Result	Notes
+>  -------------------------------------------------------------------------------
+>  Toggle Bluetooth			PASS
+>  BLE Client Test:
+> -	connect				PASS
+> -	discover service		PASS
+> -	read/write characteristic	PASS
+> -	reliable write			PASS
+> -	notify characteristic		PASS
+> -	read/write descriptor		PASS
+> -	read RSSI			PASS
+> -	disconnect			PASS
+> +	connect				N/A	(*)
+> +	discover service		N/A	(*)
+> +	read/write characteristic	N/A	(*)
+> +	reliable write			N/A	(*)
+> +	notify characteristic		N/A	(*)
+> +	read/write descriptor		N/A	(*)
+> +	read RSSI			N/A	(*)
+> +	disconnect			N/A	(*)
+>  BLE Server Test:
+> -	add service			PASS
+> -	connection			FAIL	(*) bluedroid issue.
+> -	read characteristic request	FAIL	(*)
+> -	write characteristic request	FAIL	(*)
+> -	read descriptor request		FAIL	(*)
+> -	write descriptor request	FAIL	(*)
+> -	reliable write			FAIL	(*)
+> -	disconnection			FAIL	(*)
+> +	add service			N/A	(*)
+> +	connection			N/A	(*)
+> +	read characteristic request	N/A	(*)
+> +	write characteristic request	N/A	(*)
+> +	read descriptor request		N/A	(*)
+> +	write descriptor request	N/A	(*)
+> +	reliable write			N/A	(*)
+> +	disconnection			N/A	(*)
+>  Insecure Client				PASS
+> -Insecure Server				PASS	Required kernel patch commit ID:
+> -						ba15a58b179ed76a7e887177f2b06de1
+> +Insecure Server				PASS
+>  Secure Client				PASS
+>  Secure Server				PASS
+>  -------------------------------------------------------------------------------
 > 
 
-Pushed, thanks.
+Applied. Thanks.
 
 -- 
 Best regards, 
