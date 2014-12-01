@@ -1,35 +1,54 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 8.1 \(1993\))
-Subject: Re: Adding Broadcom Support for BCM 20702AO of Fuijitsu Lifebook E751 with .driver_info = BTUSB_BCM_PATCHRAM },
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <547C2F76.80000@gmx.de>
-Date: Mon, 1 Dec 2014 11:37:59 +0100
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <CA52376B-12C5-4A2E-9922-616A722D1D54@holtmann.org>
-References: <547C2F76.80000@gmx.de>
-To: harv@gmx.de
+MIME-Version: 1.0
+In-Reply-To: <1417196962-3876-1-git-send-email-armansito@chromium.org>
+References: <1417196962-3876-1-git-send-email-armansito@chromium.org>
+Date: Mon, 1 Dec 2014 11:49:38 +0200
+Message-ID: <CABBYNZL9MYvD6XNYHH8CURt5-CL6c-8iM3J4a_oMnYUsyL2YFg@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 0/8] shared/gatt: Use gatt-db for client role.
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Arman Uguray <armansito@chromium.org>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Harvey,
+Hi Arman,
 
-> may I kindly ask to incorporate the bluetooth device of my Laptop
-> Fuijitsu Lifebook E751 to the list of devices supported through
-> loading firmware via
-> .driver_info = BTUSB_BCM_PATCHRAM ?
-> 
-> Output of usb-devices:
-> 
-> T:  Bus=02 Lev=02 Prnt=02 Port=03 Cnt=03 Dev#=  5 Spd=12  MxCh= 0
-> D:  Ver= 2.00 Cls=ff(vend.) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-> P:  Vendor=0489 ProdID=e031 Rev=01.12
-> S:  Manufacturer=Broadcom Corp
-> S:  Product=BCM20702A0
+On Fri, Nov 28, 2014 at 7:49 PM, Arman Uguray <armansito@chromium.org> wrote:
+> This patch set integrates shared/gatt-db into shared/gatt-client:
+>   1. shared/gatt-client's internal service_list structure has been
+>      removed entirely in favor of gatt-db.
+>   2. The high level structures defined in gatt-client.h
+>      (bt_gatt_service_t, bt_gatt_characteristic_t, bt_gatt_descriptor_t)
+>      and the corresponding iterator structures and functions have been
+>      removed.
+>   3. Code using the iterators (unit/test-gatt, tools/btgatt*) now access
+>      the client cache via gatt-client's gatt-db.
+>   4. Small bug fixes in gatt-db.
+>
+> Arman Uguray (8):
+>   shared/gatt-db: Fix bug in maximum handle check.
+>   shared/gatt-db: Add helper to get service handles.
+>   shared/gatt-client: Store services in gatt_db.
+>   shared/gatt-client: Use gatt_db in bt_gatt_register_notify
+>   tools/btgatt-server: Add the "services" command
+>   tools/btgatt-client: Use gatt-db instead of iterators
+>   unit/test-gatt: Use gatt-db for CLIENT tests
+>   shared/gatt-client: Remove GATT structs and iterators
+>
+>  src/shared/gatt-client.c | 1189 +++++++++++++++++++++-------------------------
+>  src/shared/gatt-client.h |   73 +--
+>  src/shared/gatt-db.c     |   41 +-
+>  tools/btgatt-client.c    |  175 +++----
+>  tools/btgatt-server.c    |   90 ++++
+>  unit/test-gatt.c         |  241 +++++++---
+>  6 files changed, 911 insertions(+), 898 deletions(-)
+>
+> --
+> 2.2.0.rc0.207.ga3a616c
 
-you need to send a patch adding the changes to the USB device table. The commit message should include the content of /sys/kernel/debug/usb/devices in the commit message and also instructions on how to get the firmware file needed for this hardware.
+Ive applied the first 2, please check the comments about the third.
 
-Regards
 
-Marcel
-
+-- 
+Luiz Augusto von Dentz
