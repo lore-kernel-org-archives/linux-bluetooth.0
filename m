@@ -2,88 +2,112 @@ Return-Path: <cyrus@holtmann.org>
 From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH] android/bluetooth: Add support to read LE features by Android
-Date: Mon,  1 Dec 2014 15:18:00 +0100
-Message-Id: <1417443480-608-1-git-send-email-lukasz.rymanowski@tieto.com>
+Subject: [PATCH 2/2] android/gatt: Add connectable flag to device found callback
+Date: Mon,  1 Dec 2014 15:10:13 +0100
+Message-Id: <1417443013-32230-2-git-send-email-lukasz.rymanowski@tieto.com>
+In-Reply-To: <1417443013-32230-1-git-send-email-lukasz.rymanowski@tieto.com>
+References: <1417443013-32230-1-git-send-email-lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch adds support to read LE features by Android framework.
-For now we set all to 0.
+GATT is interested in advertising event type. i.e if it is connectable
+or not. It is because GATT does not want to triggers connection to
+devices doing non-connectable advertising.
+This patch add such support.
 ---
- android/bluetooth.c | 18 ++++++++++++++++++
- android/hal-msg.h   |  1 +
- 2 files changed, 19 insertions(+)
+ android/bluetooth.c | 9 ++++++---
+ android/bluetooth.h | 3 ++-
+ android/gatt.c      | 6 +++++-
+ 3 files changed, 13 insertions(+), 5 deletions(-)
 
 diff --git a/android/bluetooth.c b/android/bluetooth.c
-index f79ca37..989f5d5 100644
+index d6cfc55..f79ca37 100644
 --- a/android/bluetooth.c
 +++ b/android/bluetooth.c
-@@ -176,6 +176,7 @@ static struct {
+@@ -1904,6 +1904,7 @@ static bool is_new_device(const struct device *dev, unsigned int flags,
  
- 	char *name;
- 
-+	uint8_t le_features[8];
- 	uint32_t current_settings;
- 	uint32_t supported_settings;
- 
-@@ -189,6 +190,7 @@ static struct {
- 	.index = MGMT_INDEX_NONE,
- 	.dev_class = 0,
- 	.name = NULL,
-+	.le_features = {0},
- 	.current_settings = 0,
- 	.supported_settings = 0,
- 	.cur_discovery_type = SCAN_TYPE_NONE,
-@@ -3784,6 +3786,14 @@ static uint8_t get_adapter_discoverable_timeout(void)
- 	return HAL_STATUS_SUCCESS;
- }
- 
-+static uint8_t get_adapter_le_features(void)
-+{
-+	send_adapter_property(HAL_PROP_ADAPTER_LOCAL_LE_FEAT,
-+					sizeof(adapter.le_features),
-+					&adapter.le_features[0]);
-+	return HAL_STATUS_SUCCESS;
-+}
-+
- static void handle_get_adapter_prop_cmd(const void *buf, uint16_t len)
+ static void update_found_device(const bdaddr_t *bdaddr, uint8_t bdaddr_type,
+ 					int8_t rssi, bool confirm,
++					bool connectable,
+ 					const uint8_t *data, uint8_t data_len)
  {
- 	const struct hal_cmd_get_adapter_prop *cmd = buf;
-@@ -3817,6 +3827,9 @@ static void handle_get_adapter_prop_cmd(const void *buf, uint16_t len)
- 	case HAL_PROP_ADAPTER_DISC_TIMEOUT:
- 		status = get_adapter_discoverable_timeout();
- 		break;
-+	case HAL_PROP_ADAPTER_LOCAL_LE_FEAT:
-+		status = get_adapter_le_features();
-+		break;
- 	default:
- 		status = HAL_STATUS_FAILED;
- 		break;
-@@ -3898,6 +3911,11 @@ static void get_adapter_properties(void)
- 									uuids);
- 	ev->num_props++;
+ 	struct eir_data eir;
+@@ -1951,7 +1952,7 @@ static void update_found_device(const bdaddr_t *bdaddr, uint8_t bdaddr_type,
+ 		}
  
-+	size += fill_hal_prop(buf + size, HAL_PROP_ADAPTER_LOCAL_LE_FEAT,
-+			sizeof(adapter.le_features), &adapter.le_features[0]);
-+
-+	ev->num_props++;
-+
- 	ipc_send_notif(hal_ipc, HAL_SERVICE_ID_BLUETOOTH,
- 				HAL_EV_ADAPTER_PROPS_CHANGED, size, buf);
+ 		gatt_device_found_cb(addr, addr_type, rssi, data_len, data,
+-								dev->le_bonded);
++						connectable, dev->le_bonded);
+ 	}
+ 
+ 	if (!dev->bredr_paired && !dev->le_paired)
+@@ -1987,6 +1988,7 @@ static void mgmt_device_found_event(uint16_t index, uint16_t length,
+ 	uint16_t eir_len;
+ 	uint32_t flags;
+ 	bool confirm_name;
++	bool connectable;
+ 	char addr[18];
+ 
+ 	if (length < sizeof(*ev)) {
+@@ -2013,9 +2015,10 @@ static void mgmt_device_found_event(uint16_t index, uint16_t length,
+ 				index, addr, ev->rssi, flags, eir_len);
+ 
+ 	confirm_name = flags & MGMT_DEV_FOUND_CONFIRM_NAME;
++	connectable = !(flags & MGMT_DEV_FOUND_NOT_CONNECTABLE);
+ 
+ 	update_found_device(&ev->addr.bdaddr, ev->addr.type, ev->rssi,
+-						confirm_name, eir, eir_len);
++				confirm_name, connectable, eir, eir_len);
  }
-diff --git a/android/hal-msg.h b/android/hal-msg.h
-index 33b53c5..67c6573 100644
---- a/android/hal-msg.h
-+++ b/android/hal-msg.h
-@@ -142,6 +142,7 @@ struct hal_prop_device_info {
- 	uint16_t manufacturer;
- } __attribute__((packed));
  
-+#define HAL_PROP_ADAPTER_LOCAL_LE_FEAT		0x0d
- #define HAL_PROP_DEVICE_TIMESTAMP		0xFF
+ static void mgmt_device_connected_event(uint16_t index, uint16_t length,
+@@ -2030,7 +2033,7 @@ static void mgmt_device_connected_event(uint16_t index, uint16_t length,
+ 		return;
+ 	}
  
- #define HAL_ADAPTER_SCAN_MODE_NONE		0x00
+-	update_found_device(&ev->addr.bdaddr, ev->addr.type, 0, false,
++	update_found_device(&ev->addr.bdaddr, ev->addr.type, 0, false, false,
+ 					&ev->eir[0], btohs(ev->eir_len));
+ 
+ 	hal_ev.status = HAL_STATUS_SUCCESS;
+diff --git a/android/bluetooth.h b/android/bluetooth.h
+index 4b7a70d..d09b6f2 100644
+--- a/android/bluetooth.h
++++ b/android/bluetooth.h
+@@ -42,7 +42,8 @@ void bt_adapter_remove_record(uint32_t handle);
+ 
+ typedef void (*bt_le_device_found)(const bdaddr_t *addr, uint8_t addr_type,
+ 					int rssi, uint16_t eir_len,
+-					const void *eir, bool bonded);
++					const void *eir, bool connectable,
++					bool bonded);
+ bool bt_le_register(bt_le_device_found cb);
+ void bt_le_unregister(void);
+ 
+diff --git a/android/gatt.c b/android/gatt.c
+index ce7dc62..a2cb632 100644
+--- a/android/gatt.c
++++ b/android/gatt.c
+@@ -1619,7 +1619,8 @@ static void bt_le_discovery_stop_cb(void)
+ 
+ static void le_device_found_handler(const bdaddr_t *addr, uint8_t addr_type,
+ 						int rssi, uint16_t eir_len,
+-						const void *eir, bool bonded)
++						const void *eir,
++						bool connectable, bool bonded)
+ {
+ 	uint8_t buf[IPC_MTU];
+ 	struct hal_ev_gatt_client_scan_result *ev = (void *) buf;
+@@ -1643,6 +1644,9 @@ static void le_device_found_handler(const bdaddr_t *addr, uint8_t addr_type,
+ 						sizeof(*ev) + ev->len, ev);
+ 
+ connect:
++	if (!connectable)
++		return;
++
+ 	/* We use auto connect feature from kernel if possible */
+ 	if (bt_kernel_conn_control())
+ 		return;
 -- 
 1.8.4
 
