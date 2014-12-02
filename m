@@ -1,167 +1,161 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1417513057-16037-2-git-send-email-gowtham.ab@samsung.com>
-References: <1417513057-16037-1-git-send-email-gowtham.ab@samsung.com>
-	<1417513057-16037-2-git-send-email-gowtham.ab@samsung.com>
-Date: Tue, 2 Dec 2014 12:51:37 +0200
-Message-ID: <CABBYNZKu8f+rSASsQ1vs4ovmJM9hT2n6XWw0MnMNkmj5bqGsoA@mail.gmail.com>
-Subject: Re: [PATCH 1/5] monitor/rfcomm.c: Add support for MSC frame decoding
+In-Reply-To: <CAHrH25RNoACmhTVQ+DTBPUDW19KhcE3pqybeQNaeB=DubSxyjA@mail.gmail.com>
+References: <1417196962-3876-1-git-send-email-armansito@chromium.org>
+	<1417196962-3876-4-git-send-email-armansito@chromium.org>
+	<CABBYNZ+16OLiVHB5msL7uXErhbKCR022J=jKbXNCsPeu-6uaZw@mail.gmail.com>
+	<CAHrH25TBYTioi7NXb6utMHqtzUhaFg_DvNRnRaEsUdLz_r3yow@mail.gmail.com>
+	<CABBYNZKRpgrdfFqKaeXwUSR6njnYaUFzfAE=gGX+JkVQ9yviNA@mail.gmail.com>
+	<CAHrH25Q3ZYB6PKoStwcG_gUSgR2BJHqt1_Wvf0ZPrK3NQ7mZrw@mail.gmail.com>
+	<ADB9F0AE-DABA-4530-8133-20437111A716@holtmann.org>
+	<CAHrH25RNoACmhTVQ+DTBPUDW19KhcE3pqybeQNaeB=DubSxyjA@mail.gmail.com>
+Date: Tue, 2 Dec 2014 12:46:45 +0200
+Message-ID: <CABBYNZJFYQXW0hrADBGj2j6TOxx1ZKSphvxx1=4oHjvLcGO9Gw@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 3/8] shared/gatt-client: Store services in gatt_db.
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Gowtham Anandha Babu <gowtham.ab@samsung.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	Dmitry Kasatkin <d.kasatkin@samsung.com>,
-	Bharat Panda <bharat.panda@samsung.com>, cpgs@samsung.com
+To: Arman Uguray <armansito@chromium.org>
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
-Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Gowtham,
+Hi Arman,
 
-On Tue, Dec 2, 2014 at 11:37 AM, Gowtham Anandha Babu
-<gowtham.ab@samsung.com> wrote:
-> Changes made to decode MSC frame in RFCOMM for btmon.
+On Mon, Dec 1, 2014 at 7:57 PM, Arman Uguray <armansito@chromium.org> wrote=
+:
+> Hi Marcel & Luiz,
 >
->       RFCOMM: Unnumbered Info with Header Check (UIH)(0xef)
->          Address: 0x01 cr 0 dlci 0x00
->          Control: 0xef poll/final 0
->          Length: 4
->          FCS: 0xaa
->          MCC Message type: Modem Status Command CMD(0x38)
->            Length: 2
->            dlci 32
->            fc 0 rtc 1 rtr 1 ic 0 dv 1
-> ---
->  monitor/rfcomm.c | 76 ++++++++++++++++++++++++++++++++++++++++++++++++++------
->  1 file changed, 69 insertions(+), 7 deletions(-)
+>> On Mon, Dec 1, 2014 at 9:19 AM, Marcel Holtmann <marcel@holtmann.org> wr=
+ote:
+>> Hi Arman,
+>>
+>>>>>>> This patch rewrites the service discovery logic inside
+>>>>>>> shared/gatt-client. The internal service_list structure has been
+>>>>>>> entirely removed and services are stored in a gatt_db instance.
+>>>>>>> Initially, gatt-client creates and owns the life-time of the gatt_d=
+b.
+>>>>>>
+>>>>>> Im trying to figure out the reason why you want to start with your o=
+wn
+>>>>>> gatt_db, is it because it lacks reference counting, if that is the
+>>>>>> case it should be trivial to add it.
+>>>>>>
+>>>>>
+>>>>> Initially, yes, the lack of reference counting is one reason, which I
+>>>>> was thinking of adding to gatt-db eventually. Though, what I had in
+>>>>> mind was that, the gatt-db would be created by gatt-client if you wan=
+t
+>>>>> it to perform discovery, otherwise if you construct it with gatt-db
+>>>>> then it wouldn't do discovery, which would address the permanent cach=
+e
+>>>>> case. So, we would have two "new" functions:
+>>>>>
+>>>>>   bt_gatt_client_new
+>>>>>   bt_gatt_client_new_from_db
+>>>>>
+>>>>> In the first case, if the upper layer wants to make the gatt-db
+>>>>> outlive the gatt-client, in the future they can just add a reference
+>>>>> to it and own it and in the next connection they can create the clien=
+t
+>>>>> using that same db instance. This is kind of a rough idea right now
+>>>>> but I think it makes sense.
+>>>>>
+>>>>> We can also keep both functions but have both accept a gatt-db as a
+>>>>> parameter. Not sure what's best here really.
+>>>>
+>>>> For unit test maybe we can have bt_gatt_client_new_default, iirc
+>>>> Marcel suggested something like this for naming, but for the core
+>>>> daemon it can create a empty db when pairing so even the initial
+>>>> discovery would use it. This comes back to the idea of having the
+>>>> callbacks in the db to attribute added/removed, with this logic we
+>>>> could start creating D-Bus objects by the time a services is
+>>>> discovered (provided we discover everything necessary) and not only
+>>>> when bt_gatt_client signals it is done discovering, actually with the
+>>>> current concept we could be spamming the bus a little too much since
+>>>> the objects would be created all at same time this would cause several
+>>>> InterfacesAdded signals in a row at the end of pairing.
+>>>>
+>>>
+>>> I don't know about "_default" naming but are we talking about something=
+ like:
+>>>
+>>>  bt_gatt_client_new(att, mtu, db)  /* Does discovery */
+>>>  bt_gatt_client_new_from_cache(att, mtu, db)  /* No discovery */
+>>>
+>>> So both functions get passed a db either way?
+>>
+>> actually we might just better only use bt_gatt_client_new() and provide =
+functionality to flush certain devices from the cache. In case we do want t=
+o trigger a discovery or re-discovery of devices.
+>>
+>> The cache should just work and do the right thing. We should be able set=
+ max cacheable service, devices etc. So lets just give the GATT client a ca=
+che to work with and that is it. Everything else is an implementation detai=
+l between the client and the cache.
+>>
+>> I prefer that every client has a cache attached to it (or allow NULL in =
+case we really want to run without a cache). If the cache is independent, i=
+t can easily do the right thing for us.
+>>
 >
-> diff --git a/monitor/rfcomm.c b/monitor/rfcomm.c
-> index b3db98b..969b29f 100644
-> --- a/monitor/rfcomm.c
-> +++ b/monitor/rfcomm.c
-> @@ -49,11 +49,24 @@ static char *cr_str[] = {
->         "CMD"
->  };
+> After our brief chat on IRC, please confirm that this is more or less
+> what we want:
 >
-> -#define CR_STR(type) cr_str[GET_CR(type)]
-> -#define GET_LEN8(length) ((length & 0xfe) >> 1)
-> -#define GET_LEN16(length) ((length & 0xfffe) >> 1)
-> -#define GET_CR(type)   ((type & 0x02) >> 1)
-> -#define GET_PF(ctr) (((ctr) >> 4) & 0x1)
-> +/* RFCOMM frame parsing macros */
-> +#define CR_STR(type)           cr_str[GET_CR(type)]
-> +#define GET_LEN8(length)       ((length & 0xfe) >> 1)
-> +#define GET_LEN16(length)      ((length & 0xfffe) >> 1)
-> +#define GET_CR(type)           ((type & 0x02) >> 1)
-> +#define GET_PF(ctr)            (((ctr) >> 4) & 0x1)
-> +
-> +/* MSC macros */
-> +#define GET_V24_FC(sigs)       ((sigs & 0x02) >> 1)
-> +#define GET_V24_RTC(sigs)      ((sigs & 0x04) >> 2)
-> +#define GET_V24_RTR(sigs)      ((sigs & 0x08) >> 3)
-> +#define GET_V24_IC(sigs)       ((sigs & 0x40) >> 6)
-> +#define GET_V24_DV(sigs)       ((sigs & 0x80) >> 7)
-> +
-> +#define GET_BRK_SIG1(sigs)     ((sigs & 0x02) >> 1)
-> +#define GET_BRK_SIG2(sigs)     ((sigs & 0x04) >> 2)
-> +#define GET_BRK_SIG3(sigs)     ((sigs & 0x08) >> 3)
-> +#define GET_BRK_SIG_LEN(sigs)  ((sigs & 0xf0) >> 4)
+>   bt_gatt_client_new(att, mtu, db) -> adds ref to db.
+>   bt_gatt_client_new(att, mtu, NULL) -> creates its own db
 >
->  struct rfcomm_lhdr {
->         uint8_t address;
-> @@ -63,6 +76,12 @@ struct rfcomm_lhdr {
->         uint8_t credits; /* only for UIH frame */
->  } __attribute__((packed));
->
-> +struct rfcomm_lmsc {
-> +       uint8_t dlci;
-> +       uint8_t v24_sig;
-> +       uint8_t break_sig;
-> +} __attribute__((packed));
-> +
->  struct rfcomm_lmcc {
->         uint8_t type;
->         uint16_t length;
-> @@ -92,6 +111,43 @@ static void print_rfcomm_hdr(struct rfcomm_frame *rfcomm_frame, uint8_t indent)
->         print_field("%*cFCS: 0x%2.2x", indent, ' ', hdr.fcs);
->  }
->
-> +static inline bool mcc_msc(struct rfcomm_frame *rfcomm_frame, uint8_t indent)
-> +{
-> +       struct l2cap_frame *frame = &rfcomm_frame->l2cap_frame;
-> +       struct rfcomm_lmsc msc;
-> +
-> +       if (!l2cap_frame_get_u8(frame, &msc.dlci))
-> +               return false;
-> +
-> +       print_field("%*cdlci %d ", indent, ' ', RFCOMM_GET_DLCI(msc.dlci));
-> +
-> +       if (!l2cap_frame_get_u8(frame, &msc.v24_sig))
-> +               return false;
-> +
-> +       /* v24 control signals */
-> +       print_field("%*cfc %d rtc %d rtr %d ic %d dv %d", indent, ' ',
-> +               GET_V24_FC(msc.v24_sig), GET_V24_RTC(msc.v24_sig),
-> +               GET_V24_RTR(msc.v24_sig), GET_V24_IC(msc.v24_sig),
-> +                                       GET_V24_DV(msc.v24_sig));
-> +
-> +       if (frame->size < 2)
-> +               goto done;
-> +
-> +       /* break signals (optional) */
-> +
-> +       if (!l2cap_frame_get_u8(frame, &msc.break_sig))
-> +               return false;
-> +
-> +       printf("%2.2x", msc.break_sig);
+> Either function might cause discovery based on whether or not the db
+> is empty. If it's empty, client always starts discovery, otherwise it
+> skips it.
 
-Im very suspicious the printf above will break indentation, you better
-add a frame that does exercise this code to make sure it is not
-happening.
+Sounds good. Sorry for not responding on IRC yesterday, I was away and
+only noticed today that you have been there.
 
-> +       print_field("%*cb1 %d b2 %d b3 %d len %d", indent, ' ',
-> +               GET_BRK_SIG1(msc.break_sig), GET_BRK_SIG2(msc.break_sig),
-> +               GET_BRK_SIG3(msc.break_sig), GET_BRK_SIG_LEN(msc.break_sig));
-> +
-> +done:
-> +       return true;
-> +}
-> +
->  struct mcc_data {
->         uint8_t type;
->         const char *str;
-> @@ -151,7 +207,13 @@ static inline bool mcc_frame(struct rfcomm_frame *rfcomm_frame, uint8_t indent)
->         print_field("%*cLength: %d", indent+2, ' ', mcc.length);
+>   bt_gatt_client_get_db -> returns db. This would be necessary if we
+> want to allow passing NULL to bt_gatt_client_new.
+
+Hmm, but if we pass NULL, which I suppose is to enable things like
+unit tests, why would we want to pull the db out of it? As I mention
+from the core we would probably create the db when pairing so we get
+notification regarding services changes from discovery, with this mind
+I guess if the client pass NULL this means the db would be internal.
+
+Btw, I guess we should associate a valid db if service changed CCC has
+been written or perhaps we clear the db if discovery is interrupted
+before that happens but I guess in some cases we may have a db without
+a service changed, in case we don't pair for example, in that case we
+need to rediscover the handles before letting any profile connect
+otherwise they may end up using invalid handles.
+
+> I think all of these are minor details that can be revised later, but
+> I still need something as a starting point.
 >
->         rfcomm_frame->mcc = mcc;
-> -       packet_hexdump(frame->data, frame->size);
-> +
-> +       switch (type) {
-> +       case RFCOMM_MSC:
-> +               return mcc_msc(rfcomm_frame, indent+2);
-> +       default:
-> +               packet_hexdump(frame->data, frame->size);
-> +       }
+> In addition, I'm thinking that gatt-db should have service added and
+> removed events that can be triggered by set_active and the clear
+> functions. Something like
 >
->         return true;
->  }
-> @@ -225,7 +287,7 @@ void rfcomm_packet(const struct l2cap_frame *frame)
+>   gatt_db_register_service_callbacks(db, added_cb, removed_cb);
 >
->         l2cap_frame_pull(&tmp_frame, l2cap_frame, l2cap_frame->size-1);
+> In the client case, added_cb would only be called once all attributes
+> belonging to the service have been discovered and inserted into the
+> db. Client would also communicate services that are affected by a
+> "Service Changed" indication via these callbacks. Either way, I
+> suggest adding the service callback mechanism in a later patch set.
+
+Sounds good, but we might have to introduce this before we start doing
+changing the core since this will probably be the preferable way the
+discovery interact with core.
+
+> Let me know of this makes sense to everyone.
 >
-> -       if(!l2cap_frame_get_u8(&tmp_frame, &hdr.fcs))
-> +       if (!l2cap_frame_get_u8(&tmp_frame, &hdr.fcs))
->                 goto fail;
+>> Regards
+>>
+>> Marcel
+>>
 >
->         /* Decoding frame type */
-> --
-> 1.9.1
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> Arman
 
 
 
--- 
+--=20
 Luiz Augusto von Dentz
