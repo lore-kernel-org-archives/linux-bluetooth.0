@@ -1,70 +1,130 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 2 Dec 2014 11:12:50 +0100
-From: Alexander Aring <alex.aring@gmail.com>
-To: Jukka Rissanen <jukka.rissanen@linux.intel.com>
-Cc: linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org,
-	kernel@pengutronix.de, Martin Townsend <mtownsend1973@gmail.com>,
-	Marcel Holtmann <marcel@holtmann.org>
-Subject: Re: [PATCHv2 bluetooth-next 0/2] 6lowpan: introduce nhc framework
-Message-ID: <20141202101246.GA5908@omega>
-References: <1417295683-22682-1-git-send-email-alex.aring@gmail.com>
- <1417437183.2703.45.camel@jrissane-mobl.ger.corp.intel.com>
- <20141201150132.GB996@omega>
- <1417512216.2703.63.camel@jrissane-mobl.ger.corp.intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-In-Reply-To: <1417512216.2703.63.camel@jrissane-mobl.ger.corp.intel.com>
+From: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
+Subject: [PATCH_v2 2/2] android/tester: Add AVRCP RegNotifPlayStatusChanged test case
+Date: Tue,  2 Dec 2014 11:53:13 +0200
+Message-Id: <1417513993-21189-2-git-send-email-ravikumar.veeramally@linux.intel.com>
+In-Reply-To: <1417513993-21189-1-git-send-email-ravikumar.veeramally@linux.intel.com>
+References: <1417513993-21189-1-git-send-email-ravikumar.veeramally@linux.intel.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Tue, Dec 02, 2014 at 11:23:36AM +0200, Jukka Rissanen wrote:
-...
-> 
-> I forgot to mention earlier that I think we need to support the case
-> where some clients are using different compression method than the other
-> (at the same time). What do you think?
-> 
->
+---
+ android/tester-avrcp.c | 62 ++++++++++++++++++++++++++++++++++++++++++++++++++
+ android/tester-main.h  |  5 ++++
+ 2 files changed, 67 insertions(+)
 
-_Currently_ I would to do the following:
+diff --git a/android/tester-avrcp.c b/android/tester-avrcp.c
+index 10cf1b6..41a5fd3 100644
+--- a/android/tester-avrcp.c
++++ b/android/tester-avrcp.c
+@@ -98,6 +98,12 @@ static struct emu_l2cap_cid_data sdp_data = {
+ 				0x58, 0x31, 0x00, 0x00, 0x04, 0x05, 0xFF, \
+ 							0xFF, 0xFF, 0xFF
+ 
++#define req_status_notif 0x00, 0x11, 0x0e, 0x03, 0x48, 0x00, 0x00, 0x19, \
++				0x58, 0x31, 0x00, 0x00, 0x05, 0x01, 0x00, \
++							0x00, 0x00, 0x00
++
++#define rsp_status_notif 0x00, 0x11, 0x0e, 0x0D, 0x48, 0x00, 0x00, 0x19, \
++				0x58, 0x31, 0x00, 0x00, 0x01, 0x01, 0x00
+ 
+ #define req_ele_attr 0x00, 0x11, 0x0e, 0x01, 0x48, 0x00, 0x00, 0x19, 0x58, \
+ 			0x20, 0x00, 0x00, 0x0D, 0x00, 0x00, 0x00, 0x00, \
+@@ -167,6 +173,14 @@ static void avrcp_cid_hook_cb(const void *data, uint16_t len, void *user_data)
+ 	case AVRCP_REGISTER_NOTIFICATION:
+ 		event = ((uint8_t *) data)[13];
+ 		switch (event) {
++		case 0x01:
++			step = g_new0(struct step, 1);
++			step->callback = CB_AVRCP_REG_NOTIF_RSP;
++			step->callback_result.play_status =
++							((uint8_t *) data)[14];
++			schedule_callback_verification(step);
++			break;
++
+ 		case 0x02:
+ 			step = g_new0(struct step, 1);
+ 			step->callback = CB_AVRCP_REG_NOTIF_RSP;
+@@ -359,6 +373,32 @@ static void avrcp_reg_notif_play_position_changed_rsp(void)
+ 	schedule_action_verification(step);
+ }
+ 
++static void avrcp_reg_notif_play_status_changed_req(void)
++{
++	struct test_data *data = tester_get_data();
++	struct bthost *bthost = hciemu_client_get_host(data->hciemu);
++	const struct iovec pdu = raw_pdu(req_status_notif);
++	struct step *step = g_new0(struct step, 1);
++
++	bthost_send_cid_v(bthost, avrcp_data.handle, avrcp_data.cid, &pdu, 1);
++	step->action_status = BT_STATUS_SUCCESS;
++	schedule_action_verification(step);
++}
++
++static void avrcp_reg_notif_play_status_changed_rsp(void)
++{
++	struct test_data *data = tester_get_data();
++	struct step *step = g_new0(struct step, 1);
++	btrc_register_notification_t reg;
++
++	reg.play_status = BTRC_PLAYSTATE_STOPPED;
++	step->action_status = data->if_avrcp->register_notification_rsp(
++						BTRC_EVT_PLAY_STATUS_CHANGED,
++					BTRC_NOTIFICATION_TYPE_CHANGED, &reg);
++
++	schedule_action_verification(step);
++}
++
+ static void avrcp_get_element_attributes_req(void)
+ {
+ 	struct test_data *data = tester_get_data();
+@@ -491,6 +531,28 @@ static struct test_case test_cases[] = {
+ 		ACTION_SUCCESS(bluetooth_disable_action, NULL),
+ 		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_OFF),
+ 	),
++	TEST_CASE_BREDRLE("AVRCP RegNotifPlayStatusChanged - Success",
++		ACTION_SUCCESS(bluetooth_enable_action, NULL),
++		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_ON),
++		ACTION_SUCCESS(emu_setup_powered_remote_action, NULL),
++		ACTION_SUCCESS(emu_set_ssp_mode_action, NULL),
++		ACTION_SUCCESS(set_default_ssp_request_handler, NULL),
++		ACTION_SUCCESS(emu_add_l2cap_server_action, &sdp_setup_data),
++		ACTION_SUCCESS(emu_add_l2cap_server_action, &a2dp_setup_data),
++		ACTION_SUCCESS(emu_add_l2cap_server_action, &avrcp_setup_data),
++		ACTION_SUCCESS(avrcp_connect_action, NULL),
++		CALLBACK_AV_CONN_STATE(CB_A2DP_CONN_STATE,
++					BTAV_CONNECTION_STATE_CONNECTING),
++		CALLBACK_AV_CONN_STATE(CB_A2DP_CONN_STATE,
++					BTAV_CONNECTION_STATE_CONNECTED),
++		ACTION_SUCCESS(avrcp_reg_notif_play_status_changed_req, NULL),
++		CALLBACK(CB_AVRCP_REG_NOTIF_REQ),
++		ACTION_SUCCESS(avrcp_reg_notif_play_status_changed_rsp, NULL),
++		CALLBACK_RC_REG_NOTIF_STATUS_CHANGED(CB_AVRCP_REG_NOTIF_RSP,
++									0x00),
++		ACTION_SUCCESS(bluetooth_disable_action, NULL),
++		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_OFF),
++	),
+ 	TEST_CASE_BREDRLE("AVRCP GetElementAttributes - Success",
+ 		ACTION_SUCCESS(bluetooth_enable_action, NULL),
+ 		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_ON),
+diff --git a/android/tester-main.h b/android/tester-main.h
+index 1a779a2..4407514 100644
+--- a/android/tester-main.h
++++ b/android/tester-main.h
+@@ -414,6 +414,11 @@ struct pdu_set {
+ 		.callback_result.song_position = cb_position, \
+ 	}
+ 
++#define CALLBACK_RC_REG_NOTIF_STATUS_CHANGED(cb, cb_status) { \
++		.callback = cb, \
++		.callback_result.play_status = cb_status, \
++	}
++
+ #define CALLBACK_RC_GET_ELEMENT_ATTRIBUTES(cb, cb_num_of_attrs, cb_attrs) { \
+ 		.callback = cb, \
+ 		.callback_result.num_of_attrs = cb_num_of_attrs, \
+-- 
+2.1.0
 
-
-Sending side:
-
-We have a mapping from nexthdr IPv6 field to the configurated (at the
-moment the defaults compression methods) next header compression.
-
-lowpan_compress -> nexthdr to nhc struct -> do nhc compression
-
-This is a 1:1 mapping for nexthdr as UDP we have RFC6282 UDP.
-
-_Maybe_ we can do some socket options settings in the future to have not
-always a 1:1 mapping. Sending sockopts to 6LoWPAN layer seems to be
-difficult, I don't know how much possible that is and the IPv6 agree
-with that. Otherwise we need some great idea to make allow different
-compression methods per socket. Currently a 1:1 seems to be okay.
-
-
-Receiving side:
-
-There we need to support everything what we can support. The next header
-compression id is a variable length of bitstring (that's why there is a
-complicated rbtree datastructure inside the nhc framework).
-
-This number is unique to each compression methods. It's some kind of n:1
-mapping e.g. (UDP RFC6282) to UDP and (UDP FOOBAR) to UDP.
-
-
-
-So sending side _can_ be optionally and receiving _should_ be implemented.
-
-I have a new series which makes both optionally. The reason is that we
-can register the NHC ID and print a warning which NHC ID isn't
-supported. So this beahviour is more "We know this NHC but we don't
-support compression and uncompression". This will print a warning and
-users have two options:
-
-1. Implement the nhc.
-
-2. Change network configuration to not do this nhc on other nodes.
-
-- Alex
