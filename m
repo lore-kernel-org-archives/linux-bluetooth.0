@@ -1,103 +1,72 @@
 Return-Path: <cyrus@holtmann.org>
-From: Gowtham Anandha Babu <gowtham.ab@samsung.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: d.kasatkin@samsung.com, bharat.panda@samsung.com, cpgs@samsung.com,
-	Gowtham Anandha Babu <gowtham.ab@samsung.com>
-Subject: [PATCH 4/5] monitor/rfcomm: Add support for PN frame decoding
-Date: Tue, 02 Dec 2014 15:07:36 +0530
-Message-id: <1417513057-16037-5-git-send-email-gowtham.ab@samsung.com>
-In-reply-to: <1417513057-16037-1-git-send-email-gowtham.ab@samsung.com>
-References: <1417513057-16037-1-git-send-email-gowtham.ab@samsung.com>
+MIME-Version: 1.0
+In-Reply-To: <1417423638-29222-1-git-send-email-luiz.dentz@gmail.com>
+References: <1417423638-29222-1-git-send-email-luiz.dentz@gmail.com>
+Date: Tue, 2 Dec 2014 11:39:30 +0200
+Message-ID: <CABBYNZKrb7YX7=fPDPqVnEKouGoyW+YZ2j_qE7ZAPzZYTDcaog@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 1/8] obexd/client: Add support for reading version
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Changes made to decode PN frame in RFCOMM for btmon.
+Hi,
 
-      RFCOMM: Unnumbered Info with Header Check (UIH)(0xef)
-         Address: 0x01 cr 0 dlci 0x00
-         Control: 0xef poll/final 0
-         Length: 10
-         FCS: 0xaa
-         MCC Message type: DLC Parameter Negotiation RSP(0x20)
-           Length: 8
-           dlci 32 frame_type 0 credit_flow 14 pri 39
-           ack_timer 0 frame_size 666 max_retrans 0 credits 7
----
- monitor/rfcomm.c | 47 +++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 47 insertions(+)
+On Mon, Dec 1, 2014 at 10:47 AM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>
+> This adds support for reading profile version via
+> SDP_ATTR_PFILE_DESC_LIST
+> ---
+>  obexd/client/bluetooth.c | 21 +++++++++++++++++++++
+>  1 file changed, 21 insertions(+)
+>
+> diff --git a/obexd/client/bluetooth.c b/obexd/client/bluetooth.c
+> index e89a92b..589d7a5 100644
+> --- a/obexd/client/bluetooth.c
+> +++ b/obexd/client/bluetooth.c
+> @@ -25,6 +25,7 @@
+>  #include <config.h>
+>  #endif
+>
+> +#include <stdlib.h>
+>  #include <errno.h>
+>  #include <inttypes.h>
+>
+> @@ -482,6 +483,26 @@ static const void *bluetooth_getattribute(guint id, int attribute_id)
+>                 if (session->sdp_record == NULL)
+>                         break;
+>
+> +               /* Read version since UUID is already known */
+> +               if (attribute_id == SDP_ATTR_PFILE_DESC_LIST) {
+> +                       sdp_list_t *descs;
+> +
+> +                       if (sdp_get_profile_descs(session->sdp_record,
+> +                                                               &descs) < 0)
+> +                               return NULL;
+> +
+> +                       if (descs && descs->data) {
+> +                               sdp_profile_desc_t *desc = descs->data;
+> +                               uint16_t version = desc->version;
+> +
+> +                               sdp_list_free(descs, free);
+> +
+> +                               return GINT_TO_POINTER(version);
+> +                       }
+> +
+> +                       return NULL;
+> +               }
+> +
+>                 data = sdp_data_get(session->sdp_record, attribute_id);
+>                 if (!data)
+>                         break;
+> --
+> 1.9.3
 
-diff --git a/monitor/rfcomm.c b/monitor/rfcomm.c
-index c934b3c..b448527 100644
---- a/monitor/rfcomm.c
-+++ b/monitor/rfcomm.c
-@@ -83,6 +83,12 @@ static char *cr_str[] = {
- /* RLS macro */
- #define GET_ERROR(err)		(err & 0x0f)
- 
-+/* PN macros */
-+#define GET_FRM_TYPE(ctrl)	((ctrl & 0x0f))
-+#define GET_CRT_FLOW(ctrl)	((ctrl & 0xf0) >> 4)
-+#define GET_PRIORITY(prio)	((prio & 0x3f))
-+#define GET_PN_DLCI(dlci)	((dlci & 0x3f))
-+
- struct rfcomm_lhdr {
- 	uint8_t address;
- 	uint8_t control;
-@@ -245,6 +251,45 @@ static inline bool mcc_rls(struct rfcomm_frame *rfcomm_frame, uint8_t indent)
- 	return true;
- }
- 
-+static inline bool mcc_pn(struct rfcomm_frame *rfcomm_frame, uint8_t indent)
-+{
-+	struct l2cap_frame *frame = &rfcomm_frame->l2cap_frame;
-+	struct rfcomm_pn pn;
-+
-+	/* rfcomm_pn struct is defined in rfcomm.h */
-+
-+	if (!l2cap_frame_get_u8(frame, &pn.dlci))
-+		return false;
-+
-+	if (!l2cap_frame_get_u8(frame, &pn.flow_ctrl))
-+		return false;
-+
-+	if (!l2cap_frame_get_u8(frame, &pn.priority))
-+		return false;
-+
-+	print_field("%*cdlci %d frame_type %d credit_flow %d pri %d", indent,
-+			' ', GET_PN_DLCI(pn.dlci), GET_FRM_TYPE(pn.flow_ctrl),
-+			GET_CRT_FLOW(pn.flow_ctrl), GET_PRIORITY(pn.priority));
-+
-+	if (!l2cap_frame_get_u8(frame, &pn.ack_timer))
-+		return false;
-+
-+	if (!l2cap_frame_get_be16(frame, &pn.mtu))
-+		return false;
-+
-+	if (!l2cap_frame_get_u8(frame, &pn.max_retrans))
-+		return false;
-+
-+	if (!l2cap_frame_get_u8(frame, &pn.credits))
-+		return false;
-+
-+	print_field("%*cack_timer %d frame_size %d max_retrans %d credits %d",
-+			indent, ' ', pn.ack_timer, __bswap_16(pn.mtu),
-+			pn.max_retrans, pn.credits);
-+
-+	return true;
-+}
-+
- 
- struct mcc_data {
- 	uint8_t type;
-@@ -313,6 +358,8 @@ static inline bool mcc_frame(struct rfcomm_frame *rfcomm_frame, uint8_t indent)
- 		return mcc_rpn(rfcomm_frame, indent+2);
- 	case RFCOMM_RLS:
- 		return mcc_rls(rfcomm_frame, indent+2);
-+	case RFCOMM_PN:
-+		return mcc_pn(rfcomm_frame, indent+2);
- 	default:
- 		packet_hexdump(frame->data, frame->size);
- 	}
+Pushed.
+
+
 -- 
-1.9.1
-
+Luiz Augusto von Dentz
