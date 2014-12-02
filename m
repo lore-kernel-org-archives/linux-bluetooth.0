@@ -1,72 +1,91 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1417423638-29222-1-git-send-email-luiz.dentz@gmail.com>
-References: <1417423638-29222-1-git-send-email-luiz.dentz@gmail.com>
-Date: Tue, 2 Dec 2014 11:39:30 +0200
-Message-ID: <CABBYNZKrb7YX7=fPDPqVnEKouGoyW+YZ2j_qE7ZAPzZYTDcaog@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 1/8] obexd/client: Add support for reading version
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+From: Gowtham Anandha Babu <gowtham.ab@samsung.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: d.kasatkin@samsung.com, bharat.panda@samsung.com, cpgs@samsung.com,
+	Gowtham Anandha Babu <gowtham.ab@samsung.com>
+Subject: [PATCH 3/5] monitor/rfcomm: Add support for RLS frame decoding
+Date: Tue, 02 Dec 2014 15:07:35 +0530
+Message-id: <1417513057-16037-4-git-send-email-gowtham.ab@samsung.com>
+In-reply-to: <1417513057-16037-1-git-send-email-gowtham.ab@samsung.com>
+References: <1417513057-16037-1-git-send-email-gowtham.ab@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Changes made to decode RLS frame in RFCOMM for btmon.
 
-On Mon, Dec 1, 2014 at 10:47 AM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->
-> This adds support for reading profile version via
-> SDP_ATTR_PFILE_DESC_LIST
-> ---
->  obexd/client/bluetooth.c | 21 +++++++++++++++++++++
->  1 file changed, 21 insertions(+)
->
-> diff --git a/obexd/client/bluetooth.c b/obexd/client/bluetooth.c
-> index e89a92b..589d7a5 100644
-> --- a/obexd/client/bluetooth.c
-> +++ b/obexd/client/bluetooth.c
-> @@ -25,6 +25,7 @@
->  #include <config.h>
->  #endif
->
-> +#include <stdlib.h>
->  #include <errno.h>
->  #include <inttypes.h>
->
-> @@ -482,6 +483,26 @@ static const void *bluetooth_getattribute(guint id, int attribute_id)
->                 if (session->sdp_record == NULL)
->                         break;
->
-> +               /* Read version since UUID is already known */
-> +               if (attribute_id == SDP_ATTR_PFILE_DESC_LIST) {
-> +                       sdp_list_t *descs;
-> +
-> +                       if (sdp_get_profile_descs(session->sdp_record,
-> +                                                               &descs) < 0)
-> +                               return NULL;
-> +
-> +                       if (descs && descs->data) {
-> +                               sdp_profile_desc_t *desc = descs->data;
-> +                               uint16_t version = desc->version;
-> +
-> +                               sdp_list_free(descs, free);
-> +
-> +                               return GINT_TO_POINTER(version);
-> +                       }
-> +
-> +                       return NULL;
-> +               }
-> +
->                 data = sdp_data_get(session->sdp_record, attribute_id);
->                 if (!data)
->                         break;
-> --
-> 1.9.3
+      RFCOMM: Unnumbered Info with Header Check (UIH)(0xef)
+         Address: 0x03 cr 1 dlci 0x00
+         Control: 0xef poll/final 0
+         Length: 4
+         FCS: 0x70
+         MCC Message type: Remote Line Status CMD(0x14)
+           Length: 2
+           dlci 32 error: 5
+---
+ monitor/rfcomm.c | 29 +++++++++++++++++++++++++++++
+ 1 file changed, 29 insertions(+)
 
-Pushed.
-
-
+diff --git a/monitor/rfcomm.c b/monitor/rfcomm.c
+index 5e5545c..c934b3c 100644
+--- a/monitor/rfcomm.c
++++ b/monitor/rfcomm.c
+@@ -80,6 +80,9 @@ static char *cr_str[] = {
+ #define GET_RPN_RTCI(io)	((io & 0x10) >> 4)
+ #define GET_RPN_RTCO(io)	((io & 0x20) >> 5)
+ 
++/* RLS macro */
++#define GET_ERROR(err)		(err & 0x0f)
++
+ struct rfcomm_lhdr {
+ 	uint8_t address;
+ 	uint8_t control;
+@@ -104,6 +107,12 @@ struct rfcomm_rpn {
+ 	uint16_t pm;
+ } __attribute__ ((packed));
+ 
++struct rfcomm_rls {
++	uint8_t dlci;
++	uint8_t error;
++} __attribute__((packed));
++
++
+ struct rfcomm_lmcc {
+ 	uint8_t type;
+ 	uint16_t length;
+@@ -219,6 +228,24 @@ done:
+ 	return true;
+ }
+ 
++static inline bool mcc_rls(struct rfcomm_frame *rfcomm_frame, uint8_t indent)
++{
++	struct l2cap_frame *frame = &rfcomm_frame->l2cap_frame;
++	struct rfcomm_rls rls;
++
++	if (!l2cap_frame_get_u8(frame, &rls.dlci))
++		return false;
++
++	if (!l2cap_frame_get_u8(frame, &rls.error))
++		return false;
++
++	print_field("%*cdlci %d error: %d", indent, ' ',
++			RFCOMM_GET_DLCI(rls.dlci), GET_ERROR(rls.error));
++
++	return true;
++}
++
++
+ struct mcc_data {
+ 	uint8_t type;
+ 	const char *str;
+@@ -284,6 +311,8 @@ static inline bool mcc_frame(struct rfcomm_frame *rfcomm_frame, uint8_t indent)
+ 		return mcc_msc(rfcomm_frame, indent+2);
+ 	case RFCOMM_RPN:
+ 		return mcc_rpn(rfcomm_frame, indent+2);
++	case RFCOMM_RLS:
++		return mcc_rls(rfcomm_frame, indent+2);
+ 	default:
+ 		packet_hexdump(frame->data, frame->size);
+ 	}
 -- 
-Luiz Augusto von Dentz
+1.9.1
+
