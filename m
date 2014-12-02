@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Johan Hedberg <johan.hedberg@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2] Bluetooth: Track both local and remote L2CAP fixed channel mask
-Date: Tue,  2 Dec 2014 10:09:26 +0200
-Message-Id: <1417507766-32616-1-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH] Bluetooth: Track both local and remote L2CAP fixed channel mask
+Date: Tue,  2 Dec 2014 10:00:40 +0200
+Message-Id: <1417507240-26820-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
@@ -22,8 +22,6 @@ conn->hs_enabled variable.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
-v2: Use "data + 1" instead of "&data[1]"
-
  include/net/bluetooth/l2cap.h |  4 ++--
  net/bluetooth/l2cap_core.c    | 37 ++++++++++++++++++-------------------
  2 files changed, 20 insertions(+), 21 deletions(-)
@@ -44,7 +42,7 @@ index 061e648052c8..d71dc3579354 100644
  	__u8			info_state;
  	__u8			info_ident;
 diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index c2d1489c228c..43349ed4c249 100644
+index c2d1489c228c..5262920a6052 100644
 --- a/net/bluetooth/l2cap_core.c
 +++ b/net/bluetooth/l2cap_core.c
 @@ -46,7 +46,6 @@
@@ -116,7 +114,7 @@ index c2d1489c228c..43349ed4c249 100644
  		rsp->result = cpu_to_le16(L2CAP_IR_SUCCESS);
 -		memcpy(rsp->data, l2cap_fixed_chan, sizeof(l2cap_fixed_chan));
 +		rsp->data[0] = conn->local_fixed_chan;
-+		memset(rsp->data + 1, 0, 7);
++		memset(&rsp->data[1], 0, 7);
  		l2cap_send_cmd(conn, cmd->ident, L2CAP_INFO_RSP, sizeof(buf),
  			       buf);
  	} else {
