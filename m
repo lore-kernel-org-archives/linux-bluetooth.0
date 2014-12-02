@@ -1,80 +1,47 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1417478382-37027-1-git-send-email-jamuraa@chromium.org>
-References: <1417478382-37027-1-git-send-email-jamuraa@chromium.org>
-Date: Tue, 2 Dec 2014 15:56:49 +0200
-Message-ID: <CABBYNZLxCheZsTXZ3GR5KSpdO3eLxjNzsftuOSXb6zjDUXtxow@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 1/2] shared/gatt-db: Use insert_service for add_service
+In-Reply-To: <1417500258-20694-1-git-send-email-biman.paul@samsung.com>
+References: <1417500258-20694-1-git-send-email-biman.paul@samsung.com>
+Date: Tue, 2 Dec 2014 15:54:52 +0200
+Message-ID: <CABBYNZLvFy2UGsi_f+y3pVTqtfY+TyWL==og+K5N7a10r3=fZg@mail.gmail.com>
+Subject: Re: [PATCHv2] core: Store Device information immediately after saving
+ LinkKey information
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Michael Janssen <jamuraa@chromium.org>
+To: Biman Paul <biman.paul@samsung.com>
 Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Michael,
+Hi,
 
-On Tue, Dec 2, 2014 at 1:59 AM, Michael Janssen <jamuraa@chromium.org> wrote:
-> gatt_db_add_service is the same as gatt_db_insert_service with little
-> change except not specifying the handle.  Reuse the code.
+On Tue, Dec 2, 2014 at 8:04 AM, Biman Paul <biman.paul@samsung.com> wrote:
+> If bluetooth is turned off while pairing is in progress, sometimes
+> Linkey information is present but device (Class of Device) information is missing.
+>
+> This patch stores the device information immediately after Linkkey
+> information is saved so that Class of Device information is stored.
 > ---
->  src/shared/gatt-db.c | 38 +++++++++-----------------------------
->  1 file changed, 9 insertions(+), 29 deletions(-)
+>  src/device.c |    1 +
+>  1 file changed, 1 insertion(+)
 >
-> diff --git a/src/shared/gatt-db.c b/src/shared/gatt-db.c
-> index b210376..2a35bae 100644
-> --- a/src/shared/gatt-db.c
-> +++ b/src/shared/gatt-db.c
-> @@ -258,35 +258,6 @@ static struct gatt_db_service *gatt_db_service_create(const bt_uuid_t *uuid,
->         return service;
->  }
+> diff --git a/src/device.c b/src/device.c
+> index 025743f..e9630ed 100644
+> --- a/src/device.c
+> +++ b/src/device.c
+> @@ -4031,6 +4031,7 @@ void btd_device_set_temporary(struct btd_device *device, gboolean temporary)
+>         } else {
+>                 if (device->bredr)
+>                         adapter_whitelist_add(device->adapter, device);
+> +               store_device_info(device);
+>         }
 >
-> -struct gatt_db_attribute *gatt_db_add_service(struct gatt_db *db,
-> -                                               const bt_uuid_t *uuid,
-> -                                               bool primary,
-> -                                               uint16_t num_handles)
-> -{
-> -       struct gatt_db_service *service;
-> -
-> -       if (!db || (num_handles + db->next_handle - 1) > UINT16_MAX)
-> -               return NULL;
-> -
-> -       service = gatt_db_service_create(uuid, primary, num_handles);
-> -       if (!service)
-> -               return NULL;
-> -
-> -       if (!queue_push_tail(db->services, service)) {
-> -               gatt_db_service_destroy(service);
-> -               return NULL;
-> -       }
-> -
-> -       /* TODO now we get next handle from database. We should first look
-> -        * for 'holes' between existing services first, and assign next_handle
-> -        * only if enough space was not found.
-> -        */
-> -       service->attributes[0]->handle = db->next_handle;
-> -       db->next_handle += num_handles;
-> -       service->num_handles = num_handles;
-> -
-> -       return service->attributes[0];
-> -}
->
->  bool gatt_db_remove_service(struct gatt_db *db,
->                                         struct gatt_db_attribute *attrib)
-> @@ -442,6 +413,15 @@ fail:
->         return NULL;
->  }
->
-> +struct gatt_db_attribute *gatt_db_add_service(struct gatt_db *db,
-> +                                               const bt_uuid_t *uuid,
-> +                                               bool primary,
-> +                                               uint16_t num_handles)
-> +{
-> +       return gatt_db_insert_service(db, db->next_handle, uuid, primary
-> +                                                               num_handles);
+>         device->temporary = temporary;
+> --
+> 1.7.9.5
 
-This one did not compile initially since there is a missing ','
-between primary and num_handles, I fixed that and applied both.
+Applied after changing the format to 50/72 as described in HACKING
+document, please follow that next time.
 
 
 -- 
