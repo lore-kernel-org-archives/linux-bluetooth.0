@@ -1,182 +1,216 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <547E3532.8060608@gmail.com>
-Date: Tue, 02 Dec 2014 15:54:58 -0600
-From: Bruce Dubbs <bruce.dubbs@gmail.com>
 MIME-Version: 1.0
-To: Szymon Janc <szymon.janc@tieto.com>
-CC: linux-bluetooth <linux-bluetooth@vger.kernel.org>
-Subject: Re: User question
-References: <5474BF78.7020501@gmail.com> <1685281.NVOr2VMF8E@uw000953>
-In-Reply-To: <1685281.NVOr2VMF8E@uw000953>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Sender: linux-bluetooth-owner@vger.kernel.org
+Sender: armansito@google.com
+In-Reply-To: <CABBYNZJ7LOOmTx_4xyBkET5zQr6bcA32dnNB6gubrDmzxw5OzA@mail.gmail.com>
+References: <1417196962-3876-1-git-send-email-armansito@chromium.org>
+	<1417196962-3876-4-git-send-email-armansito@chromium.org>
+	<CABBYNZ+16OLiVHB5msL7uXErhbKCR022J=jKbXNCsPeu-6uaZw@mail.gmail.com>
+	<CAHrH25TBYTioi7NXb6utMHqtzUhaFg_DvNRnRaEsUdLz_r3yow@mail.gmail.com>
+	<CABBYNZKRpgrdfFqKaeXwUSR6njnYaUFzfAE=gGX+JkVQ9yviNA@mail.gmail.com>
+	<CAHrH25Q3ZYB6PKoStwcG_gUSgR2BJHqt1_Wvf0ZPrK3NQ7mZrw@mail.gmail.com>
+	<ADB9F0AE-DABA-4530-8133-20437111A716@holtmann.org>
+	<CAHrH25RNoACmhTVQ+DTBPUDW19KhcE3pqybeQNaeB=DubSxyjA@mail.gmail.com>
+	<CABBYNZJFYQXW0hrADBGj2j6TOxx1ZKSphvxx1=4oHjvLcGO9Gw@mail.gmail.com>
+	<CABBYNZJ7LOOmTx_4xyBkET5zQr6bcA32dnNB6gubrDmzxw5OzA@mail.gmail.com>
+Date: Tue, 2 Dec 2014 11:35:02 -0800
+Message-ID: <CAHrH25RUigTasNdGy9ne16EvtxC7_pEdRj-bUnE=yNGwzuMqRA@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 3/8] shared/gatt-client: Store services in gatt_db.
+From: Arman Uguray <armansito@chromium.org>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Szymon Janc wrote:
-> Hi Bruce,
+Hi Luiz,
+
+> On Tue, Dec 2, 2014 at 7:12 AM, Luiz Augusto von Dentz <luiz.dentz@gmail.=
+com> wrote:
+> Hi Arman,
 >
-> On Tuesday 25 of November 2014 11:42:16 Bruce Dubbs wrote:
->> This appears to be a developer list.  Do you accept user level questions
->> here?  If not, can you point me to a better place to ask?
+> On Tue, Dec 2, 2014 at 12:46 PM, Luiz Augusto von Dentz
+> <luiz.dentz@gmail.com> wrote:
+>> Hi Arman,
 >>
->> I'm trying to get bluez to work in an LFS system and am getting errors.
->>    I'd like to get it fixed and document the issues for our community.
+>> On Mon, Dec 1, 2014 at 7:57 PM, Arman Uguray <armansito@chromium.org> wr=
+ote:
+>>> Hi Marcel & Luiz,
+>>>
+>>>> On Mon, Dec 1, 2014 at 9:19 AM, Marcel Holtmann <marcel@holtmann.org> =
+wrote:
+>>>> Hi Arman,
+>>>>
+>>>>>>>>> This patch rewrites the service discovery logic inside
+>>>>>>>>> shared/gatt-client. The internal service_list structure has been
+>>>>>>>>> entirely removed and services are stored in a gatt_db instance.
+>>>>>>>>> Initially, gatt-client creates and owns the life-time of the gatt=
+_db.
+>>>>>>>>
+>>>>>>>> Im trying to figure out the reason why you want to start with your=
+ own
+>>>>>>>> gatt_db, is it because it lacks reference counting, if that is the
+>>>>>>>> case it should be trivial to add it.
+>>>>>>>>
+>>>>>>>
+>>>>>>> Initially, yes, the lack of reference counting is one reason, which=
+ I
+>>>>>>> was thinking of adding to gatt-db eventually. Though, what I had in
+>>>>>>> mind was that, the gatt-db would be created by gatt-client if you w=
+ant
+>>>>>>> it to perform discovery, otherwise if you construct it with gatt-db
+>>>>>>> then it wouldn't do discovery, which would address the permanent ca=
+che
+>>>>>>> case. So, we would have two "new" functions:
+>>>>>>>
+>>>>>>>   bt_gatt_client_new
+>>>>>>>   bt_gatt_client_new_from_db
+>>>>>>>
+>>>>>>> In the first case, if the upper layer wants to make the gatt-db
+>>>>>>> outlive the gatt-client, in the future they can just add a referenc=
+e
+>>>>>>> to it and own it and in the next connection they can create the cli=
+ent
+>>>>>>> using that same db instance. This is kind of a rough idea right now
+>>>>>>> but I think it makes sense.
+>>>>>>>
+>>>>>>> We can also keep both functions but have both accept a gatt-db as a
+>>>>>>> parameter. Not sure what's best here really.
+>>>>>>
+>>>>>> For unit test maybe we can have bt_gatt_client_new_default, iirc
+>>>>>> Marcel suggested something like this for naming, but for the core
+>>>>>> daemon it can create a empty db when pairing so even the initial
+>>>>>> discovery would use it. This comes back to the idea of having the
+>>>>>> callbacks in the db to attribute added/removed, with this logic we
+>>>>>> could start creating D-Bus objects by the time a services is
+>>>>>> discovered (provided we discover everything necessary) and not only
+>>>>>> when bt_gatt_client signals it is done discovering, actually with th=
+e
+>>>>>> current concept we could be spamming the bus a little too much since
+>>>>>> the objects would be created all at same time this would cause sever=
+al
+>>>>>> InterfacesAdded signals in a row at the end of pairing.
+>>>>>>
+>>>>>
+>>>>> I don't know about "_default" naming but are we talking about somethi=
+ng like:
+>>>>>
+>>>>>  bt_gatt_client_new(att, mtu, db)  /* Does discovery */
+>>>>>  bt_gatt_client_new_from_cache(att, mtu, db)  /* No discovery */
+>>>>>
+>>>>> So both functions get passed a db either way?
+>>>>
+>>>> actually we might just better only use bt_gatt_client_new() and provid=
+e functionality to flush certain devices from the cache. In case we do want=
+ to trigger a discovery or re-discovery of devices.
+>>>>
+>>>> The cache should just work and do the right thing. We should be able s=
+et max cacheable service, devices etc. So lets just give the GATT client a =
+cache to work with and that is it. Everything else is an implementation det=
+ail between the client and the cache.
+>>>>
+>>>> I prefer that every client has a cache attached to it (or allow NULL i=
+n case we really want to run without a cache). If the cache is independent,=
+ it can easily do the right thing for us.
+>>>>
+>>>
+>>> After our brief chat on IRC, please confirm that this is more or less
+>>> what we want:
+>>>
+>>>   bt_gatt_client_new(att, mtu, db) -> adds ref to db.
+>>>   bt_gatt_client_new(att, mtu, NULL) -> creates its own db
+>>>
+>>> Either function might cause discovery based on whether or not the db
+>>> is empty. If it's empty, client always starts discovery, otherwise it
+>>> skips it.
 >>
->> Thanks.
+>> Sounds good. Sorry for not responding on IRC yesterday, I was away and
+>> only noticed today that you have been there.
+
+No worries. I haven't uploaded the next round yet until we have a good
+idea of what we want.
+
 >
-> The best way would be to just describe the issue here and provide logs.
+> I went ahead and implemented the reference counting for gatt_db, I
+> will try to be online later today in case you want some to discuss
+> more about this.
 >
-> You may also join #bluez-users on irc.freenode.net and ask there
-> (depending on your timezone you may not get the answer right a way:)
 
-Thanks you for the response.  I took a look at IRC but felt that the 
-data logs would be too much for IRC.
+Cool, I'll rebase and make the code work with ref counts.
 
-What I am trying to do is connect one computer to another via bluetooth. 
-  Both systems are running bluez-5.23 from Debian Jessie.
+>>>   bt_gatt_client_get_db -> returns db. This would be necessary if we
+>>> want to allow passing NULL to bt_gatt_client_new.
+>>
+>> Hmm, but if we pass NULL, which I suppose is to enable things like
+>> unit tests, why would we want to pull the db out of it? As I mention
+>> from the core we would probably create the db when pairing so we get
+>> notification regarding services changes from discovery, with this mind
+>> I guess if the client pass NULL this means the db would be internal.
+>>
 
-Both systems see each other, but I cannot connect.  This is a typical 
-session:
+I guess the idea with passing NULL is that you're basically saying
+"there is no existing database around for this device, create a new
+one and I'll get it from you later". So, if we allow passing NULL and
+having gatt-client create the db, then we would want to pull the db
+out of it, since we can't browse any of the handles or get events
+otherwise. I don't have a particular opinion on this; I think it's
+equally fine to disallow passing NULL and always have the upper layer
+instantiate the db. Then we wouldn't need the getter I guess.
 
-  # bluetoothctl
-[NEW] Controller AC:7B:A1:C0:2B:E0 debian [default]
-[NEW] Device 00:17:E9:94:61:AA BlueZ 5.23
-[NEW] Device 0D:D8:18:0D:AE:30 ZaggKeys Universal
-[bluetooth]# info 00:17:E9:94:61:AA
-Device 00:17:E9:94:61:AA
-         Name: BlueZ 5.23
-         Alias: BlueZ 5.23
-         Paired: yes
-         Trusted: yes
-         Blocked: no
-         Connected: no
-         LegacyPairing: no
-         UUID: A/V Remote Control Target
-(0000110c-0000-1000-8000-00805f9b34fb)
-         UUID: A/V Remote Control
-(0000110e-0000-1000-8000-00805f9b34fb)
-         UUID: PnP Information 
-(00001200-0000-1000-8000-00805f9b34fb)
-         UUID: Generic Access Profile 
-(00001800-0000-1000-8000-00805f9b34fb)
-         UUID: Generic Attribute Profile 
-(00001801-0000-1000-8000-00805f9b34fb)
-         Modalias: usb:v1D6Bp0246d0517
-[bluetooth]# connect 00:17:E9:94:61:AA
-Attempting to connect to 00:17:E9:94:61:AA
-[CHG] Device 00:17:E9:94:61:AA Connected: yes
-Failed to connect: org.bluez.Error.NotAvailable
-[CHG] Device 00:17:E9:94:61:AA Connected: no
-[bluetooth]#
+>> Btw, I guess we should associate a valid db if service changed CCC has
+>> been written or perhaps we clear the db if discovery is interrupted
+>> before that happens but I guess in some cases we may have a db without
+>> a service changed, in case we don't pair for example, in that case we
+>> need to rediscover the handles before letting any profile connect
+>> otherwise they may end up using invalid handles.
+>>
 
-I can get the ZaggKeys keyboard to connect.  But the result from the 
-other system running BlueZ 5.23 is similar to the above.
+Yeah, I think if we always require that a db is passed in to
+bt_gatt_client_new, then we can have the client make the correct
+decision. If there was no service changed characteristic for instance,
+then the upper layer may want to skip discovery and reuse the same db
+(with the assumption that the services won't change) or pass an empty
+db to have client discover everything.
 
-Other information:
+>>> I think all of these are minor details that can be revised later, but
+>>> I still need something as a starting point.
+>>>
+>>> In addition, I'm thinking that gatt-db should have service added and
+>>> removed events that can be triggered by set_active and the clear
+>>> functions. Something like
+>>>
+>>>   gatt_db_register_service_callbacks(db, added_cb, removed_cb);
+>>>
+>>> In the client case, added_cb would only be called once all attributes
+>>> belonging to the service have been discovered and inserted into the
+>>> db. Client would also communicate services that are affected by a
+>>> "Service Changed" indication via these callbacks. Either way, I
+>>> suggest adding the service callback mechanism in a later patch set.
+>>
+>> Sounds good, but we might have to introduce this before we start doing
+>> changing the core since this will probably be the preferable way the
+>> discovery interact with core.
+>>
 
-# dmesg|grep -i blue
-[    6.796472] toshiba_bluetooth: Detected Toshiba ACPI Bluetooth device 
-- installing RFKill handler
-[    6.796596] toshiba_bluetooth: Re-enabling Toshiba Bluetooth
-[    7.688297] Bluetooth: Core ver 2.19
-[    7.688427] Bluetooth: HCI device and connection manager initialized
-[    7.688496] Bluetooth: HCI socket layer initialized
-[    7.688558] Bluetooth: L2CAP socket layer initialized
-[    7.688626] Bluetooth: SCO socket layer initialized
-[    8.258758] Bluetooth: hci0: read Intel version: 370710018002030d00
-[    8.282937] bluetooth hci0: firmware: direct-loading firmware 
-intel/ibt-hw-37.7.10-fw-1.80.2.3.d.bseq
-[    8.282939] Bluetooth: hci0: Intel Bluetooth firmware file: 
-intel/ibt-hw-37.7.10-fw-1.80.2.3.d.bseq
-[    8.380858] Bluetooth: hci0: Intel Bluetooth firmware patch completed 
-and activated
-[   15.920484] Bluetooth: BNEP (Ethernet Emulation) ver 1.3
-[   15.921229] Bluetooth: BNEP filters: protocol multicast
-[   15.921826] Bluetooth: BNEP socket layer initialized
-------------------
+OK, sounds good to me. I might actually just add this into v1 of this set.
 
-# journalctl |grep blue
-Dec 02 03:04:46 debian kernel: toshiba_bluetooth: Detected Toshiba ACPI 
-Bluetooth device - installing RFKill handler
-Dec 02 03:04:46 debian kernel: toshiba_bluetooth: Re-enabling Toshiba 
-Bluetooth
-Dec 02 03:04:48 debian kernel: bluetooth hci0: firmware: direct-loading 
-firmware intel/ibt-hw-37.7.10-fw-1.80.2.3.d.bseq
-Dec 02 03:04:53 debian bluetoothd[735]: Bluetooth daemon 5.23
-Dec 02 03:04:55 debian bluetoothd[735]: Starting SDP server
-Dec 02 03:04:55 debian bluetoothd[735]: Bluetooth management interface 
-1.6 initialized
-Dec 02 03:04:56 debian bluetoothd[735]: Sap driver initialization failed.
-Dec 02 03:04:56 debian bluetoothd[735]: sap-server: Operation not 
-permitted (1)
-Dec 02 03:04:56 debian bluetoothd[735]: hci0 Load Connection Parameters 
-failed: Unknown Command (0x01)
+>>> Let me know of this makes sense to everyone.
+>>>
+>>>> Regards
+>>>>
+>>>> Marcel
+>>>>
+>>>
+>>> Arman
+>>
+>>
+>>
+>> --
+>> Luiz Augusto von Dentz
+>
+>
+>
+> --
+> Luiz Augusto von Dentz
 
-If I remove the device and start over, I get:
-
----------------------------
-# scan on
-Discovery started
-[CHG] Controller AC:7B:A1:C0:2B:E0 Discovering: yes
-[NEW] Device 00:17:E9:94:61:AA BlueZ 5.23
-[CHG] Device 00:17:E9:94:61:AA RSSI: -92
-[CHG] Device 00:17:E9:94:61:AA RSSI: -54
-[bluetooth]# devices
-Device 00:17:E9:94:61:AA BlueZ 5.23
-[CHG] Device 00:17:E9:94:61:AA RSSI: -68
-[CHG] Device 00:17:E9:94:61:AA RSSI: -57
-[bluetooth]# info 00:17:E9:94:61:AA
-Device 00:17:E9:94:61:AA
-         Name: BlueZ 5.23
-         Alias: BlueZ 5.23
-         Paired: no
-         Trusted: no
-         Blocked: no
-         Connected: no
-         LegacyPairing: no
-         UUID: Generic Access Profile 
-(00001800-0000-1000-8000-00805f9b34fb)
-         UUID: Generic Attribute Profile 
-(00001801-0000-1000-8000-00805f9b34fb)
-         UUID: A/V Remote Control
-(0000110e-0000-1000-8000-00805f9b34fb)
-         UUID: A/V Remote Control Target
-(0000110c-0000-1000-8000-00805f9b34fb)
-         Modalias: usb:v1D6Bp0246d0517
-[CHG] Controller AC:7B:A1:C0:2B:E0 Discoverable: no
-[bluetooth]# pair 00:17:E9:94:61:AA
-Attempting to pair with 00:17:E9:94:61:AA
-[CHG] Device 00:17:E9:94:61:AA Connected: yes
-Request confirmation
-[agent] Confirm passkey 870856 (yes/no): yes
-[bluetooth]# info 00:17:E9:94:61:AA
-Device 00:17:E9:94:61:AA
-         Name: BlueZ 5.23
-         Alias: BlueZ 5.23
-         Paired: no
-         Trusted: no
-         Blocked: no
-         Connected: yes
-         LegacyPairing: no
-         UUID: Generic Access Profile 
-(00001800-0000-1000-8000-00805f9b34fb)
-         UUID: Generic Attribute Profile 
-(00001801-0000-1000-8000-00805f9b34fb)
-         UUID: A/V Remote Control
-(0000110e-0000-1000-8000-00805f9b34fb)
-         UUID: A/V Remote Control Target
-(0000110c-0000-1000-8000-00805f9b34fb)
-         Modalias: usb:v1D6Bp0246d0517
-Failed to pair: org.bluez.Error.AuthenticationFailed
-[CHG] Device 00:17:E9:94:61:AA Connected: no
-
------------------
-
-Any help will be appreciated.
-
-   -- Bruce
-
-
-
-
-
+Thanks,
+Arman
