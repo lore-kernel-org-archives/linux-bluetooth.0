@@ -2,53 +2,31 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH 08/13] obexd: List all enum values in switch
-Date: Tue,  2 Dec 2014 18:28:33 +0100
-Message-Id: <1417541318-24259-8-git-send-email-szymon.janc@tieto.com>
+Subject: [PATCH 13/13] build: Enable -Wswitch-enum in maintainer mode
+Date: Tue,  2 Dec 2014 18:28:38 +0100
+Message-Id: <1417541318-24259-13-git-send-email-szymon.janc@tieto.com>
 In-Reply-To: <1417541318-24259-1-git-send-email-szymon.janc@tieto.com>
 References: <1417541318-24259-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-As described in coding style M10.
+This makes GCC verify if all enum values are listed in switch.
 ---
- obexd/client/map.c    | 2 ++
- obexd/plugins/vcard.c | 2 ++
- 2 files changed, 4 insertions(+)
+ acinclude.m4 | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/obexd/client/map.c b/obexd/client/map.c
-index 76cf055..e6c1073 100644
---- a/obexd/client/map.c
-+++ b/obexd/client/map.c
-@@ -1929,6 +1929,8 @@ static void map_handle_notification(struct map_event *event, void *user_data)
- 	case MAP_ET_MESSAGE_SHIFT:
- 		map_handle_folder_changed(map, event, event->folder);
- 		break;
-+	case MAP_ET_MEMORY_FULL:
-+	case MAP_ET_MEMORY_AVAILABLE:
- 	default:
- 		break;
- 	}
-diff --git a/obexd/plugins/vcard.c b/obexd/plugins/vcard.c
-index b36e4bf..aaa126b 100644
---- a/obexd/plugins/vcard.c
-+++ b/obexd/plugins/vcard.c
-@@ -574,6 +574,7 @@ static void vcard_printf_email(GString *vcards, uint8_t format,
- 		else if (format == FORMAT_VCARD30)
- 			category_string = "TYPE=INTERNET;TYPE=WORK";
- 		break;
-+	case FIELD_TYPE_OTHER:
- 	default:
- 		if (format == FORMAT_VCARD21)
- 			category_string = "INTERNET";
-@@ -616,6 +617,7 @@ static void vcard_printf_url(GString *vcards, uint8_t format,
- 		else if (format == FORMAT_VCARD30)
- 			category_string = "TYPE=INTERNET;TYPE=WORK";
- 		break;
-+	case FIELD_TYPE_OTHER:
- 	default:
- 		if (format == FORMAT_VCARD21)
- 			category_string = "INTERNET";
+diff --git a/acinclude.m4 b/acinclude.m4
+index 2065852..4c241bf 100644
+--- a/acinclude.m4
++++ b/acinclude.m4
+@@ -20,6 +20,7 @@ AC_DEFUN([COMPILER_FLAGS], [
+ 		with_cflags="$with_cflags -Wmissing-declarations"
+ 		with_cflags="$with_cflags -Wredundant-decls"
+ 		with_cflags="$with_cflags -Wcast-align"
++		with_cflags="$with_cflags -Wswitch-enum"
+ 		with_cflags="$with_cflags -DG_DISABLE_DEPRECATED"
+ 		with_cflags="$with_cflags -DGLIB_VERSION_MIN_REQUIRED=GLIB_VERSION_2_28"
+ 		with_cflags="$with_cflags -DGLIB_VERSION_MAX_ALLOWED=GLIB_VERSION_2_28"
 -- 
 1.9.1
 
