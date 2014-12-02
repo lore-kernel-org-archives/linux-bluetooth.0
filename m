@@ -1,41 +1,86 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <547E09A4.7090104@gmx.de>
-Date: Tue, 02 Dec 2014 19:49:08 +0100
-From: Harvey <harv@gmx.de>
-Reply-To: harv@gmx.de
-MIME-Version: 1.0
-To: Marcel Holtmann <marcel@holtmann.org>
-CC: linux-bluetooth@vger.kernel.org
-Subject: Re: Adding Broadcom Support for BCM 20702AO of Fuijitsu Lifebook
- E751 with .driver_info = BTUSB_BCM_PATCHRAM },
-References: <547C2F76.80000@gmx.de> <CA52376B-12C5-4A2E-9922-616A722D1D54@holtmann.org> <547C4D47.6010606@gmx.de> <1FB03768-38C7-4FDA-980A-C63BA5EE2DC2@holtmann.org> <547D817A.7010708@gmx.de> <3A403AB8-AE17-45E8-BABE-D41F8087AE18@holtmann.org> <547DC72E.8000308@gmx.de> <8967C48B-00C1-43E8-A8EC-C41642288122@holtmann.org>
+From: Heinrich Siebmanns <harv@gmx.de>
+To: linux-bluetooth@vger.kernel.org
+Cc: Heinrich Siebmanns <harv@gmx.de>
+Subject: [PATCH]     Bluetooth: Add support for Broadcom BCM20702A0 in Fuijitsu Lifebook E751
+Date: Tue,  2 Dec 2014 19:46:57 +0100
+Message-Id: <1417546017-25257-1-git-send-email-harv@gmx.de>
 In-Reply-To: <8967C48B-00C1-43E8-A8EC-C41642288122@holtmann.org>
-Content-Type: text/plain; charset=windows-1252
+References: <8967C48B-00C1-43E8-A8EC-C41642288122@holtmann.org>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
------BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+    This requires the flag BTUSB_BCM_PATCHRAM to work.
 
-Marcel,
+    Relevant details from /sys/kernel/debug/usb/devices:
 
-> please follow the guidelines from Documentation/SubmittingPatches.
-> Using git format-patch and git send-email gets you exactly what we
-> need.
+    T:  Bus=03 Lev=02 Prnt=02 Port=03 Cnt=02 Dev#=  4 Spd=12   MxCh= 0
+    D:  Ver= 2.00 Cls=ff(vend.) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
+    P:  Vendor=0489 ProdID=e031 Rev= 1.12
+    S:  Manufacturer=Broadcom Corp
+    S:  Product=BCM20702A0
+    S:  SerialNumber=3859F9CD2AEE
+    C:* #Ifs= 4 Cfg#= 1 Atr=e0 MxPwr=  0mA
+    I:* If#= 0 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
+    E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
+    E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+    E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+    I:* If#= 1 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
+    E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+    E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+    I:  If#= 1 Alt= 1 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
+    E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+    E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+    I:  If#= 1 Alt= 2 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
+    E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+    E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+    I:  If#= 1 Alt= 3 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
+    E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+    E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+    I:  If#= 1 Alt= 4 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
+    E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+    E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+    I:  If#= 1 Alt= 5 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
+    E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+    E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+    I:* If#= 2 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=ff Driver=(none)
+    E:  Ad=84(I) Atr=02(Bulk) MxPS=  32 Ivl=0ms
+    E:  Ad=04(O) Atr=02(Bulk) MxPS=  32 Ivl=0ms
+    I:* If#= 3 Alt= 0 #EPs= 0 Cls=fe(app. ) Sub=01 Prot=01 Driver=(none)
 
-Again, thanks for your guidance. I configured git, used git
-format-patch and tried to send it via git send-email. Hope this is
-going well as I had some trouble convincing git to get my mail out.
+    The firmware was extracted from a Windows 7 32-bit installation
+    and converted from 'hex' to 'hcd' for use in Linux.
 
-Please shoot me if something went wrong, as I said, this is my first try.
+    The firmware is named "BCM20702A0_001.001.024.0156.0204.hex"
+    and is located in "%SYSTEMROOT%\system32\drivers\"
+    (md5 d126e6c4e0e669d76c38cf9377f76b7f)
+    (sha1 145d1850b2785a953233b409e7ff77786927c7d2)
 
-Harvey
+    The same firmware file is also available as a download at
+    http://support.ts.fujitsu.com/Download/
+    contained in "FTS_WIDCOMMBluetoothSoftware_6309000_1072149.zip"
 
-- -- 
-I am root. If you see me laughing, you'd better have a backup!
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
+    'hcd' file should be placed at "brcm/BCM20702A0-0489-e031.hcd"
+    inside the firmware directory (e.g. "/lib/firmware")
 
-iEYEARECAAYFAlR+CZ4ACgkQi5aqmLBUSgmkXgCeIGxSxTb+bK6FchNKY+t+WASO
-MdIAmwZS+7pbyLJTtvTrh0vD1SO7hoWH
-=byYF
------END PGP SIGNATURE-----
+    Signed-off-by: Heinrich Siebmanns <harv@gmx.de>
+---
+ drivers/bluetooth/btusb.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 9efdace..33a92ec 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -108,6 +108,8 @@ static const struct usb_device_id btusb_table[] = {
+ 	{ USB_DEVICE(0x413c, 0x8197) },
+ 	{ USB_DEVICE(0x13d3, 0x3404),
+ 	  .driver_info = BTUSB_BCM_PATCHRAM },
++        { USB_DEVICE(0x0489, 0xe031),
++          .driver_info = BTUSB_BCM_PATCHRAM },
+ 
+ 	/* Foxconn - Hon Hai */
+ 	{ USB_VENDOR_AND_INTERFACE_INFO(0x0489, 0xff, 0x01, 0x01) },
+-- 
+2.1.3
+
