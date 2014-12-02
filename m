@@ -1,161 +1,70 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Tue, 2 Dec 2014 11:12:50 +0100
+From: Alexander Aring <alex.aring@gmail.com>
+To: Jukka Rissanen <jukka.rissanen@linux.intel.com>
+Cc: linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org,
+	kernel@pengutronix.de, Martin Townsend <mtownsend1973@gmail.com>,
+	Marcel Holtmann <marcel@holtmann.org>
+Subject: Re: [PATCHv2 bluetooth-next 0/2] 6lowpan: introduce nhc framework
+Message-ID: <20141202101246.GA5908@omega>
+References: <1417295683-22682-1-git-send-email-alex.aring@gmail.com>
+ <1417437183.2703.45.camel@jrissane-mobl.ger.corp.intel.com>
+ <20141201150132.GB996@omega>
+ <1417512216.2703.63.camel@jrissane-mobl.ger.corp.intel.com>
 MIME-Version: 1.0
-In-Reply-To: <CAHrH25RNoACmhTVQ+DTBPUDW19KhcE3pqybeQNaeB=DubSxyjA@mail.gmail.com>
-References: <1417196962-3876-1-git-send-email-armansito@chromium.org>
-	<1417196962-3876-4-git-send-email-armansito@chromium.org>
-	<CABBYNZ+16OLiVHB5msL7uXErhbKCR022J=jKbXNCsPeu-6uaZw@mail.gmail.com>
-	<CAHrH25TBYTioi7NXb6utMHqtzUhaFg_DvNRnRaEsUdLz_r3yow@mail.gmail.com>
-	<CABBYNZKRpgrdfFqKaeXwUSR6njnYaUFzfAE=gGX+JkVQ9yviNA@mail.gmail.com>
-	<CAHrH25Q3ZYB6PKoStwcG_gUSgR2BJHqt1_Wvf0ZPrK3NQ7mZrw@mail.gmail.com>
-	<ADB9F0AE-DABA-4530-8133-20437111A716@holtmann.org>
-	<CAHrH25RNoACmhTVQ+DTBPUDW19KhcE3pqybeQNaeB=DubSxyjA@mail.gmail.com>
-Date: Tue, 2 Dec 2014 12:46:45 +0200
-Message-ID: <CABBYNZJFYQXW0hrADBGj2j6TOxx1ZKSphvxx1=4oHjvLcGO9Gw@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 3/8] shared/gatt-client: Store services in gatt_db.
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Arman Uguray <armansito@chromium.org>
-Cc: Marcel Holtmann <marcel@holtmann.org>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=utf-8
+In-Reply-To: <1417512216.2703.63.camel@jrissane-mobl.ger.corp.intel.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Arman,
-
-On Mon, Dec 1, 2014 at 7:57 PM, Arman Uguray <armansito@chromium.org> wrote=
-:
-> Hi Marcel & Luiz,
+On Tue, Dec 02, 2014 at 11:23:36AM +0200, Jukka Rissanen wrote:
+...
+> 
+> I forgot to mention earlier that I think we need to support the case
+> where some clients are using different compression method than the other
+> (at the same time). What do you think?
+> 
 >
->> On Mon, Dec 1, 2014 at 9:19 AM, Marcel Holtmann <marcel@holtmann.org> wr=
-ote:
->> Hi Arman,
->>
->>>>>>> This patch rewrites the service discovery logic inside
->>>>>>> shared/gatt-client. The internal service_list structure has been
->>>>>>> entirely removed and services are stored in a gatt_db instance.
->>>>>>> Initially, gatt-client creates and owns the life-time of the gatt_d=
-b.
->>>>>>
->>>>>> Im trying to figure out the reason why you want to start with your o=
-wn
->>>>>> gatt_db, is it because it lacks reference counting, if that is the
->>>>>> case it should be trivial to add it.
->>>>>>
->>>>>
->>>>> Initially, yes, the lack of reference counting is one reason, which I
->>>>> was thinking of adding to gatt-db eventually. Though, what I had in
->>>>> mind was that, the gatt-db would be created by gatt-client if you wan=
-t
->>>>> it to perform discovery, otherwise if you construct it with gatt-db
->>>>> then it wouldn't do discovery, which would address the permanent cach=
-e
->>>>> case. So, we would have two "new" functions:
->>>>>
->>>>>   bt_gatt_client_new
->>>>>   bt_gatt_client_new_from_db
->>>>>
->>>>> In the first case, if the upper layer wants to make the gatt-db
->>>>> outlive the gatt-client, in the future they can just add a reference
->>>>> to it and own it and in the next connection they can create the clien=
-t
->>>>> using that same db instance. This is kind of a rough idea right now
->>>>> but I think it makes sense.
->>>>>
->>>>> We can also keep both functions but have both accept a gatt-db as a
->>>>> parameter. Not sure what's best here really.
->>>>
->>>> For unit test maybe we can have bt_gatt_client_new_default, iirc
->>>> Marcel suggested something like this for naming, but for the core
->>>> daemon it can create a empty db when pairing so even the initial
->>>> discovery would use it. This comes back to the idea of having the
->>>> callbacks in the db to attribute added/removed, with this logic we
->>>> could start creating D-Bus objects by the time a services is
->>>> discovered (provided we discover everything necessary) and not only
->>>> when bt_gatt_client signals it is done discovering, actually with the
->>>> current concept we could be spamming the bus a little too much since
->>>> the objects would be created all at same time this would cause several
->>>> InterfacesAdded signals in a row at the end of pairing.
->>>>
->>>
->>> I don't know about "_default" naming but are we talking about something=
- like:
->>>
->>>  bt_gatt_client_new(att, mtu, db)  /* Does discovery */
->>>  bt_gatt_client_new_from_cache(att, mtu, db)  /* No discovery */
->>>
->>> So both functions get passed a db either way?
->>
->> actually we might just better only use bt_gatt_client_new() and provide =
-functionality to flush certain devices from the cache. In case we do want t=
-o trigger a discovery or re-discovery of devices.
->>
->> The cache should just work and do the right thing. We should be able set=
- max cacheable service, devices etc. So lets just give the GATT client a ca=
-che to work with and that is it. Everything else is an implementation detai=
-l between the client and the cache.
->>
->> I prefer that every client has a cache attached to it (or allow NULL in =
-case we really want to run without a cache). If the cache is independent, i=
-t can easily do the right thing for us.
->>
->
-> After our brief chat on IRC, please confirm that this is more or less
-> what we want:
->
->   bt_gatt_client_new(att, mtu, db) -> adds ref to db.
->   bt_gatt_client_new(att, mtu, NULL) -> creates its own db
->
-> Either function might cause discovery based on whether or not the db
-> is empty. If it's empty, client always starts discovery, otherwise it
-> skips it.
 
-Sounds good. Sorry for not responding on IRC yesterday, I was away and
-only noticed today that you have been there.
+_Currently_ I would to do the following:
 
->   bt_gatt_client_get_db -> returns db. This would be necessary if we
-> want to allow passing NULL to bt_gatt_client_new.
 
-Hmm, but if we pass NULL, which I suppose is to enable things like
-unit tests, why would we want to pull the db out of it? As I mention
-from the core we would probably create the db when pairing so we get
-notification regarding services changes from discovery, with this mind
-I guess if the client pass NULL this means the db would be internal.
+Sending side:
 
-Btw, I guess we should associate a valid db if service changed CCC has
-been written or perhaps we clear the db if discovery is interrupted
-before that happens but I guess in some cases we may have a db without
-a service changed, in case we don't pair for example, in that case we
-need to rediscover the handles before letting any profile connect
-otherwise they may end up using invalid handles.
+We have a mapping from nexthdr IPv6 field to the configurated (at the
+moment the defaults compression methods) next header compression.
 
-> I think all of these are minor details that can be revised later, but
-> I still need something as a starting point.
->
-> In addition, I'm thinking that gatt-db should have service added and
-> removed events that can be triggered by set_active and the clear
-> functions. Something like
->
->   gatt_db_register_service_callbacks(db, added_cb, removed_cb);
->
-> In the client case, added_cb would only be called once all attributes
-> belonging to the service have been discovered and inserted into the
-> db. Client would also communicate services that are affected by a
-> "Service Changed" indication via these callbacks. Either way, I
-> suggest adding the service callback mechanism in a later patch set.
+lowpan_compress -> nexthdr to nhc struct -> do nhc compression
 
-Sounds good, but we might have to introduce this before we start doing
-changing the core since this will probably be the preferable way the
-discovery interact with core.
+This is a 1:1 mapping for nexthdr as UDP we have RFC6282 UDP.
 
-> Let me know of this makes sense to everyone.
->
->> Regards
->>
->> Marcel
->>
->
-> Arman
+_Maybe_ we can do some socket options settings in the future to have not
+always a 1:1 mapping. Sending sockopts to 6LoWPAN layer seems to be
+difficult, I don't know how much possible that is and the IPv6 agree
+with that. Otherwise we need some great idea to make allow different
+compression methods per socket. Currently a 1:1 seems to be okay.
+
+
+Receiving side:
+
+There we need to support everything what we can support. The next header
+compression id is a variable length of bitstring (that's why there is a
+complicated rbtree datastructure inside the nhc framework).
+
+This number is unique to each compression methods. It's some kind of n:1
+mapping e.g. (UDP RFC6282) to UDP and (UDP FOOBAR) to UDP.
 
 
 
---=20
-Luiz Augusto von Dentz
+So sending side _can_ be optionally and receiving _should_ be implemented.
+
+I have a new series which makes both optionally. The reason is that we
+can register the NHC ID and print a warning which NHC ID isn't
+supported. So this beahviour is more "We know this NHC but we don't
+support compression and uncompression". This will print a warning and
+users have two options:
+
+1. Implement the nhc.
+
+2. Change network configuration to not do this nhc on other nodes.
+
+- Alex
