@@ -1,106 +1,74 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] android/bluetooth: Add support to read LE features by Android
-Date: Wed, 03 Dec 2014 10:04:10 +0100
-Message-ID: <3501439.5pFPeTDH5C@uw000953>
-In-Reply-To: <1417443480-608-1-git-send-email-lukasz.rymanowski@tieto.com>
-References: <1417443480-608-1-git-send-email-lukasz.rymanowski@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] Bluetooth: Simplify Link Key Notification event handling logic
+Date: Wed,  3 Dec 2014 11:03:06 +0200
+Message-Id: <1417597386-24060-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Łukasz,
+From: Johan Hedberg <johan.hedberg@intel.com>
 
-On Monday 01 of December 2014 15:18:00 Lukasz Rymanowski wrote:
-> This patch adds support to read LE features by Android framework.
-> For now we set all to 0.
-> ---
->  android/bluetooth.c | 18 ++++++++++++++++++
->  android/hal-msg.h   |  1 +
->  2 files changed, 19 insertions(+)
-> 
-> diff --git a/android/bluetooth.c b/android/bluetooth.c
-> index f79ca37..989f5d5 100644
-> --- a/android/bluetooth.c
-> +++ b/android/bluetooth.c
-> @@ -176,6 +176,7 @@ static struct {
->  
->  	char *name;
->  
-> +	uint8_t le_features[8];
+When we get a Link Key Notification HCI event we should already have a
+hci_conn object. This should have been created either in the Connection
+Request event handler, the hci_connect_acl() function or the
+hci_cs_create_conn() function (if the request was not sent by the
+kernel).
 
-I'm still not sure how we get required info but I think we should construct
-this on-demand to avoid doubling state ie. local_privacy_enabled can be get
-from current_settings.
+Since the only case that we'd end up not having a hci_conn in the Link
+Key Notification event handler would be essentially broken hardware it's
+safe to simply bail out from the function if this happens.
 
->  	uint32_t current_settings;
->  	uint32_t supported_settings;
->  
-> @@ -189,6 +190,7 @@ static struct {
->  	.index = MGMT_INDEX_NONE,
->  	.dev_class = 0,
->  	.name = NULL,
-> +	.le_features = {0},
->  	.current_settings = 0,
->  	.supported_settings = 0,
->  	.cur_discovery_type = SCAN_TYPE_NONE,
-> @@ -3784,6 +3786,14 @@ static uint8_t get_adapter_discoverable_timeout(void)
->  	return HAL_STATUS_SUCCESS;
->  }
->  
-> +static uint8_t get_adapter_le_features(void)
-> +{
-> +	send_adapter_property(HAL_PROP_ADAPTER_LOCAL_LE_FEAT,
-> +					sizeof(adapter.le_features),
-> +					&adapter.le_features[0]);
-> +	return HAL_STATUS_SUCCESS;
-> +}
-> +
->  static void handle_get_adapter_prop_cmd(const void *buf, uint16_t len)
->  {
->  	const struct hal_cmd_get_adapter_prop *cmd = buf;
-> @@ -3817,6 +3827,9 @@ static void handle_get_adapter_prop_cmd(const void *buf, uint16_t len)
->  	case HAL_PROP_ADAPTER_DISC_TIMEOUT:
->  		status = get_adapter_discoverable_timeout();
->  		break;
-> +	case HAL_PROP_ADAPTER_LOCAL_LE_FEAT:
-> +		status = get_adapter_le_features();
-> +		break;
->  	default:
->  		status = HAL_STATUS_FAILED;
->  		break;
-> @@ -3898,6 +3911,11 @@ static void get_adapter_properties(void)
->  									uuids);
->  	ev->num_props++;
->  
-> +	size += fill_hal_prop(buf + size, HAL_PROP_ADAPTER_LOCAL_LE_FEAT,
-> +			sizeof(adapter.le_features), &adapter.le_features[0]);
+Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+---
+ net/bluetooth/hci_event.c | 25 ++++++++++++++-----------
+ 1 file changed, 14 insertions(+), 11 deletions(-)
 
-adapter.le_features instead of &adapter.le_features[0]
-
-> +
-> +	ev->num_props++;
-> +
->  	ipc_send_notif(hal_ipc, HAL_SERVICE_ID_BLUETOOTH,
->  				HAL_EV_ADAPTER_PROPS_CHANGED, size, buf);
->  }
-> diff --git a/android/hal-msg.h b/android/hal-msg.h
-> index 33b53c5..67c6573 100644
-> --- a/android/hal-msg.h
-> +++ b/android/hal-msg.h
-> @@ -142,6 +142,7 @@ struct hal_prop_device_info {
->  	uint16_t manufacturer;
->  } __attribute__((packed));
->  
-> +#define HAL_PROP_ADAPTER_LOCAL_LE_FEAT		0x0d
->  #define HAL_PROP_DEVICE_TIMESTAMP		0xFF
->  
->  #define HAL_ADAPTER_SCAN_MODE_NONE		0x00
-> 
-
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index bd0a80120665..d76d4f821189 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -3294,12 +3294,14 @@ static void hci_link_key_notify_evt(struct hci_dev *hdev, struct sk_buff *skb)
+ 	hci_dev_lock(hdev);
+ 
+ 	conn = hci_conn_hash_lookup_ba(hdev, ACL_LINK, &ev->bdaddr);
+-	if (conn) {
+-		hci_conn_hold(conn);
+-		conn->disc_timeout = HCI_DISCONN_TIMEOUT;
+-		hci_conn_drop(conn);
+-		conn_set_key(conn, ev->key_type, conn->pin_length);
+-	}
++	if (!conn)
++		goto unlock;
++
++	hci_conn_hold(conn);
++	conn->disc_timeout = HCI_DISCONN_TIMEOUT;
++	hci_conn_drop(conn);
++
++	conn_set_key(conn, ev->key_type, conn->pin_length);
+ 
+ 	if (!test_bit(HCI_MGMT, &hdev->dev_flags))
+ 		goto unlock;
+@@ -3326,13 +3328,14 @@ static void hci_link_key_notify_evt(struct hci_dev *hdev, struct sk_buff *skb)
+ 	    !test_bit(HCI_KEEP_DEBUG_KEYS, &hdev->dev_flags)) {
+ 		list_del_rcu(&key->list);
+ 		kfree_rcu(key, rcu);
+-	} else if (conn) {
+-		if (persistent)
+-			clear_bit(HCI_CONN_FLUSH_KEY, &conn->flags);
+-		else
+-			set_bit(HCI_CONN_FLUSH_KEY, &conn->flags);
++		goto unlock;
+ 	}
+ 
++	if (persistent)
++		clear_bit(HCI_CONN_FLUSH_KEY, &conn->flags);
++	else
++		set_bit(HCI_CONN_FLUSH_KEY, &conn->flags);
++
+ unlock:
+ 	hci_dev_unlock(hdev);
+ }
 -- 
-Best regards, 
-Szymon Janc
+2.1.0
+
