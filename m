@@ -2,349 +2,363 @@ Return-Path: <cyrus@holtmann.org>
 From: Arman Uguray <armansito@chromium.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Arman Uguray <armansito@chromium.org>
-Subject: [PATCH BlueZ v1 6/8] unit/test-gatt: Use gatt-db for CLIENT tests
-Date: Tue,  2 Dec 2014 16:12:41 -0800
-Message-Id: <1417565563-29239-7-git-send-email-armansito@chromium.org>
+Subject: [PATCH BlueZ v1 3/8] shared/gatt-client: Use gatt_db in bt_gatt_register_notify
+Date: Tue,  2 Dec 2014 16:12:38 -0800
+Message-Id: <1417565563-29239-4-git-send-email-armansito@chromium.org>
 In-Reply-To: <1417565563-29239-1-git-send-email-armansito@chromium.org>
 References: <1417565563-29239-1-git-send-email-armansito@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch rewrites parts of unit/test-gatt that verify the contents
-of a shared/gatt-client to use the client's gatt-db instead of the
-service iterators.
+This patch rewrites the notification/indication logic in gatt-client to
+use the internal gatt-db.
 ---
- unit/test-gatt.c | 239 +++++++++++++++++++++++++++++++++++++------------------
- 1 file changed, 160 insertions(+), 79 deletions(-)
+ src/shared/gatt-client.c | 203 ++++++++++++++++++++++++++++++++++-------------
+ 1 file changed, 147 insertions(+), 56 deletions(-)
 
-diff --git a/unit/test-gatt.c b/unit/test-gatt.c
-index 32bddac..12b1919 100644
---- a/unit/test-gatt.c
-+++ b/unit/test-gatt.c
-@@ -56,10 +56,29 @@ enum context_type {
- 	SERVER
+diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
+index c891516..4cd8770 100644
+--- a/src/shared/gatt-client.c
++++ b/src/shared/gatt-client.c
+@@ -45,27 +45,6 @@
+ #define GATT_SVC_UUID	0x1801
+ #define SVC_CHNGD_UUID	0x2a05
+ 
+-struct chrc_data {
+-	/* The public characteristic entry. */
+-	bt_gatt_characteristic_t chrc_external;
+-
+-	/* The private entries. */
+-	uint16_t ccc_handle;
+-	int notify_count;  /* Reference count of registered notify callbacks */
+-
+-	/* Internal non-const pointer to the descriptor array. We use this
+-	 * internally to modify/free the array, while we expose it externally
+-	 * using the const pointer "descs" field in bt_gatt_characteristic_t.
+-	 */
+-	bt_gatt_descriptor_t *descs;
+-
+-	/* Pending calls to register_notify are queued here so that they can be
+-	 * processed after a write that modifies the CCC descriptor.
+-	 */
+-	struct queue *reg_notify_queue;
+-	unsigned int ccc_write_id;
+-};
+-
+ struct bt_gatt_client {
+ 	struct bt_att *att;
+ 	int ref_count;
+@@ -97,6 +76,7 @@ struct bt_gatt_client {
+ 
+ 	/* List of registered disconnect/notification/indication callbacks */
+ 	struct queue *notify_list;
++	struct queue *notify_chrcs;
+ 	int next_reg_id;
+ 	unsigned int disc_id, notify_id, ind_id;
+ 	bool in_notify;
+@@ -111,13 +91,26 @@ struct bt_gatt_client {
+ 	bool in_svc_chngd;
  };
  
-+struct gatt_desc {
-+	uint16_t handle;
-+	uint8_t uuid[16];
-+};
-+
-+struct gatt_chrc {
-+	uint16_t handle;
++struct notify_chrc {
 +	uint16_t value_handle;
-+	uint8_t properties;
-+	uint8_t uuid[16];
++	uint16_t ccc_handle;
++	uint16_t properties;
++	int notify_count;  /* Reference count of registered notify callbacks */
 +
-+	const struct gatt_desc *descs;
-+	size_t num_descs;
++	/* Pending calls to register_notify are queued here so that they can be
++	 * processed after a write that modifies the CCC descriptor.
++	 */
++	struct queue *reg_notify_queue;
++	unsigned int ccc_write_id;
 +};
 +
- struct gatt_service {
--	const bt_gatt_service_t *service;
--	int num_chars;
--	const bt_gatt_characteristic_t **chars;
-+	bool primary;
-+	uint16_t start_handle;
-+	uint16_t end_handle;
-+	uint8_t uuid[16];
-+
-+	const struct gatt_chrc **chars;
-+	size_t num_chars;
- };
- 
- struct test_data {
-@@ -67,7 +86,7 @@ struct test_data {
- 	struct test_pdu *pdu_list;
- 	enum context_type context_type;
- 	bt_uuid_t *uuid;
--	int num_services;
-+	size_t num_services;
- 	const struct gatt_service **services;
- 	const void *step;
- };
-@@ -177,23 +196,14 @@ static bt_uuid_t uuid_char_128 = {
- 			0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f}
- };
- 
--const bt_gatt_service_t service_1 = {
--	.primary = true,
--	.start_handle = 0x0001,
--	.end_handle = 0x0004,
--	.uuid = {0x00, 0x00, 0x18, 0x01, 0x00, 0x00, 0x10, 0x00,
--			0x80, 0x00, 0x00, 0x80, 0x5f, 0x9b, 0x34, 0xfb}
--};
--
--const bt_gatt_descriptor_t descriptor_1 = {
-+const struct gatt_desc descriptor_1 = {
- 	.handle = 0x0004,
- 	.uuid = {0x00, 0x00, 0x29, 0x01, 0x00, 0x00, 0x10, 0x00,
- 			0x80, 0x00, 0x00, 0x80, 0x5f, 0x9b, 0x34, 0xfb}
- };
- 
--const bt_gatt_characteristic_t characteristic_1 = {
--	.start_handle = 0x0002,
--	.end_handle = 0x0004,
-+const struct gatt_chrc characteristic_1 = {
-+	.handle = 0x0002,
- 	.value_handle = 0x0003,
- 	.properties = 0x02,
- 	.uuid = {0x00, 0x00, 0x2a, 0x00, 0x00, 0x00, 0x10, 0x00,
-@@ -202,23 +212,14 @@ const bt_gatt_characteristic_t characteristic_1 = {
- 	.num_descs = 1
- };
- 
--const bt_gatt_service_t service_2 = {
--	.primary = true,
--	.start_handle = 0x0005,
--	.end_handle = 0x0008,
--	.uuid = {0x00, 0x00, 0x18, 0x0d, 0x00, 0x00, 0x10, 0x00,
--			0x80, 0x00, 0x00, 0x80, 0x5f, 0x9b, 0x34, 0xfb}
--};
--
--const bt_gatt_descriptor_t descriptor_2 = {
-+const struct gatt_desc descriptor_2 = {
- 	.handle = 0x0008,
- 	.uuid = {0x00, 0x00, 0x29, 0x01, 0x00, 0x00, 0x10, 0x00,
- 			0x80, 0x00, 0x00, 0x80, 0x5f, 0x9b, 0x34, 0xfb}
- };
- 
--const bt_gatt_characteristic_t characteristic_2 = {
--	.start_handle = 0x0006,
--	.end_handle = 0x0008,
-+const struct gatt_chrc characteristic_2 = {
-+	.handle = 0x0006,
- 	.value_handle = 0x0007,
- 	.properties = 0x02,
- 	.uuid = {0x00, 0x00, 0x2a, 0x29, 0x00, 0x00, 0x10, 0x00,
-@@ -227,19 +228,27 @@ const bt_gatt_characteristic_t characteristic_2 = {
- 	.num_descs = 1
- };
- 
--const bt_gatt_characteristic_t *characteristics_1[] = {&characteristic_1};
--const bt_gatt_characteristic_t *characteristics_2[] = {&characteristic_2};
-+const struct gatt_chrc *characteristics_1[] = {&characteristic_1};
-+const struct gatt_chrc *characteristics_2[] = {&characteristic_2};
- 
- const struct gatt_service gatt_service_1 = {
--	.service = &service_1,
--	.num_chars = sizeof(characteristics_1) / sizeof(characteristics_1[0]),
--	.chars = characteristics_1
-+	.primary = true,
-+	.start_handle = 0x0001,
-+	.end_handle = 0x0004,
-+	.uuid = {0x00, 0x00, 0x18, 0x01, 0x00, 0x00, 0x10, 0x00,
-+			0x80, 0x00, 0x00, 0x80, 0x5f, 0x9b, 0x34, 0xfb},
-+	.chars = characteristics_1,
-+	.num_chars = sizeof(characteristics_1) / sizeof(characteristics_1[0])
- };
- 
- const struct gatt_service gatt_service_2 = {
--	.service = &service_2,
--	.num_chars = sizeof(characteristics_2) / sizeof(characteristics_2[0]),
--	.chars = characteristics_2
-+	.primary = true,
-+	.start_handle = 0x0005,
-+	.end_handle = 0x0008,
-+	.uuid = {0x00, 0x00, 0x18, 0x0d, 0x00, 0x00, 0x10, 0x00,
-+			0x80, 0x00, 0x00, 0x80, 0x5f, 0x9b, 0x34, 0xfb},
-+	.chars = characteristics_2,
-+	.num_chars = sizeof(characteristics_2) / sizeof(characteristics_2[0])
- };
- 
- const struct gatt_service *service_data_1[] = {&gatt_service_1,
-@@ -344,36 +353,60 @@ static void print_debug(const char *str, void *user_data)
- 	g_print("%s%s\n", prefix, str);
+ struct notify_data {
+ 	struct bt_gatt_client *client;
+ 	bool removed;
+ 	bool invalid;
+ 	unsigned int id;
+ 	int ref_count;
+-	struct chrc_data *chrc;
++	struct notify_chrc *chrc;
+ 	bt_gatt_client_notify_id_callback_t callback;
+ 	bt_gatt_client_notify_callback_t notify;
+ 	void *user_data;
+@@ -144,6 +137,76 @@ static void notify_data_unref(void *data)
+ 	free(notify_data);
  }
  
--static void compare_service(const bt_gatt_service_t *a,
--						const bt_gatt_service_t *b)
-+static void assert_service(const struct gatt_service *a,
-+						struct gatt_db_attribute *attr)
- {
--	g_assert(a->primary && b->primary);
--	g_assert(a->start_handle == b->start_handle);
--	g_assert(a->end_handle == b->end_handle);
--	g_assert(memcmp(a->uuid, b->uuid, sizeof(a->uuid)) == 0);
-+	uint16_t start_handle, end_handle;
-+	bool primary;
++static void find_ccc(struct gatt_db_attribute *attr, void *user_data)
++{
++	struct gatt_db_attribute **ccc_ptr = user_data;
 +	bt_uuid_t uuid;
-+	uint128_t u128;
 +
-+	g_assert(gatt_db_attribute_get_service_data(attr, &start_handle,
-+							&end_handle,
-+							&primary, &uuid));
++	if (*ccc_ptr)
++		return;
 +
-+	u128 = uuid.value.u128;
++	bt_uuid16_create(&uuid, GATT_CLIENT_CHARAC_CFG_UUID);
 +
-+	g_assert(a->primary && primary);
-+	g_assert(a->start_handle == start_handle);
-+	g_assert(a->end_handle == end_handle);
-+	g_assert(memcmp(a->uuid, u128.data, sizeof(u128.data)) == 0);
- }
- 
--static void compare_descs(const bt_gatt_descriptor_t *a,
--						const bt_gatt_descriptor_t *b)
-+static void assert_chrc(const struct gatt_chrc *a,
-+						struct gatt_db_attribute *attr)
- {
--	g_assert(a->handle == b->handle);
--	g_assert(memcmp(a->uuid, b->uuid, sizeof(a->uuid)) == 0);
-+	uint16_t handle, value_handle;
++	if (bt_uuid_cmp(&uuid, gatt_db_attribute_get_type(attr)))
++		return;
++
++	*ccc_ptr = attr;
++}
++
++static struct notify_chrc *notify_chrc_create(struct bt_gatt_client *client,
++							uint16_t value_handle)
++{
++	struct gatt_db_attribute *attr, *ccc;
++	struct notify_chrc *chrc;
++	bt_uuid_t uuid;
 +	uint8_t properties;
-+	bt_uuid_t uuid;
-+	uint128_t u128;
 +
-+	g_assert(gatt_db_attribute_get_char_data(attr, &handle,
-+							&value_handle,
-+							&properties, &uuid));
++	/* Check that chrc_value_handle belongs to a known characteristic */
++	attr = gatt_db_get_attribute(client->db, value_handle - 1);
++	if (!attr)
++		return NULL;
 +
-+	u128 = uuid.value.u128;
++	bt_uuid16_create(&uuid, GATT_CHARAC_UUID);
++	if (bt_uuid_cmp(&uuid, gatt_db_attribute_get_type(attr)))
++		return NULL;
 +
-+	g_assert(a->handle == handle);
-+	g_assert(a->value_handle == value_handle);
-+	g_assert(a->properties == properties);
-+	g_assert(memcmp(a->uuid, u128.data, sizeof(u128.data)) == 0);
++	if (!gatt_db_attribute_get_char_data(attr, NULL, NULL,
++							&properties, NULL))
++			return NULL;
++
++	/* Find the CCC characteristic */
++	ccc = NULL;
++	gatt_db_service_foreach_desc(attr, find_ccc, &ccc);
++	if (!ccc)
++		return NULL;
++
++	chrc = new0(struct notify_chrc, 1);
++	if (!chrc)
++		return NULL;
++
++	chrc->reg_notify_queue = queue_new();
++	if (!chrc->reg_notify_queue) {
++		free(chrc);
++		return NULL;
++	}
++
++	chrc->value_handle = value_handle;
++	chrc->ccc_handle = gatt_db_attribute_get_handle(ccc);
++	chrc->properties = properties;
++
++	queue_push_tail(client->notify_chrcs, chrc);
++
++	return chrc;
++}
++
++static void notify_chrc_free(void *data)
++{
++	struct notify_chrc *chrc = data;
++
++	queue_destroy(chrc->reg_notify_queue, notify_data_unref);
++	free(chrc);
++}
++
+ static bool match_notify_data_id(const void *a, const void *b)
+ {
+ 	const struct notify_data *notify_data = a;
+@@ -174,7 +237,7 @@ struct handle_range {
+ static bool match_notify_data_handle_range(const void *a, const void *b)
+ {
+ 	const struct notify_data *notify_data = a;
+-	bt_gatt_characteristic_t *chrc = &notify_data->chrc->chrc_external;
++	struct notify_chrc *chrc = notify_data->chrc;
+ 	const struct handle_range *range = b;
+ 
+ 	return chrc->value_handle >= range->start &&
+@@ -184,7 +247,7 @@ static bool match_notify_data_handle_range(const void *a, const void *b)
+ static void mark_notify_data_invalid_if_in_range(void *data, void *user_data)
+ {
+ 	struct notify_data *notify_data = data;
+-	bt_gatt_characteristic_t *chrc = &notify_data->chrc->chrc_external;
++	struct notify_chrc *chrc = notify_data->chrc;
+ 	struct handle_range *range = user_data;
+ 
+ 	if (chrc->value_handle >= range->start &&
+@@ -192,6 +255,15 @@ static void mark_notify_data_invalid_if_in_range(void *data, void *user_data)
+ 		notify_data->invalid = true;
  }
  
--static void compare_chars(const bt_gatt_characteristic_t *a,
--					const bt_gatt_characteristic_t *b)
-+static void assert_desc(const struct gatt_desc *a,
-+						struct gatt_db_attribute *attr)
- {
--	unsigned int i;
-+	uint16_t handle;
-+	const bt_uuid_t *uuid;
-+	uint128_t u128;
++static bool match_notify_chrc_handle_range(const void *a, const void *b)
++{
++	const struct notify_chrc *chrc = a;
++	const struct handle_range *range = b;
 +
-+	handle = gatt_db_attribute_get_handle(attr);
-+	uuid = gatt_db_attribute_get_type(attr);
- 
--	g_assert(a->start_handle == b->start_handle);
--	g_assert(a->end_handle == b->end_handle);
--	g_assert(a->properties == b->properties);
--	g_assert(a->value_handle == b->value_handle);
--	g_assert(a->num_descs == b->num_descs);
--	g_assert(memcmp(a->uuid, b->uuid, sizeof(a->uuid)) == 0);
-+	u128 = uuid->value.u128;
- 
--	for (i = 0; i < a->num_descs; i++)
--		compare_descs(&a->descs[i], &b->descs[i]);
-+	g_assert(a->handle == handle);
-+	g_assert(memcmp(a->uuid, u128.data, sizeof(u128.data)) == 0);
++	return chrc->value_handle >= range->start &&
++					chrc->value_handle <= range->end;
++}
++
+ static void gatt_client_remove_all_notify_in_range(
+ 				struct bt_gatt_client *client,
+ 				uint16_t start_handle, uint16_t end_handle)
+@@ -213,6 +285,19 @@ static void gatt_client_remove_all_notify_in_range(
+ 						&range, notify_data_unref);
  }
  
- typedef void (*test_step_t)(struct context *context);
-@@ -388,39 +421,87 @@ struct test_step {
- 	uint16_t length;
- };
- 
-+struct service_test_data {
-+	const struct test_data *data;
-+	size_t svc_index;
-+	size_t chrc_index;
-+	size_t desc_index;
-+};
-+
-+static void compare_desc(struct gatt_db_attribute *attr, void *user_data)
++static void gatt_client_remove_notify_chrcs_in_range(
++				struct bt_gatt_client *client,
++				uint16_t start_handle, uint16_t end_handle)
 +{
-+	struct service_test_data *test_data = user_data;
-+	const struct gatt_service *svc;
-+	const struct gatt_chrc *chrc;
++	struct handle_range range;
 +
-+	svc = test_data->data->services[test_data->svc_index];
-+	chrc = svc->chars[test_data->chrc_index];
-+	g_assert(test_data->desc_index < chrc->num_descs);
++	range.start = start_handle;
++	range.end = end_handle;
 +
-+	assert_desc(&chrc->descs[test_data->desc_index], attr);
-+
-+	test_data->desc_index++;
++	queue_remove_all(client->notify_chrcs, match_notify_chrc_handle_range,
++						&range, notify_chrc_free);
 +}
 +
-+static void compare_chrc(struct gatt_db_attribute *attr, void *user_data)
-+{
-+	struct service_test_data *test_data = user_data;
-+	const struct gatt_service *svc;
-+	const struct gatt_chrc *chrc;
-+
-+	svc = test_data->data->services[test_data->svc_index];
-+	g_assert(test_data->chrc_index < svc->num_chars);
-+	chrc = svc->chars[test_data->chrc_index];
-+
-+	assert_chrc(chrc, attr);
-+
-+	test_data->desc_index = 0;
-+
-+	gatt_db_service_foreach_desc(attr, compare_desc, test_data);
-+	g_assert(test_data->desc_index == chrc->num_descs);
-+
-+	test_data->chrc_index++;
-+}
-+
-+static void compare_service(struct gatt_db_attribute *attr, void *user_data)
-+{
-+	struct service_test_data *test_data = user_data;
-+	const struct gatt_service *svc;
-+
-+	g_assert(test_data->svc_index < test_data->data->num_services);
-+	svc = test_data->data->services[test_data->svc_index];
-+
-+	assert_service(test_data->data->services[test_data->svc_index], attr);
-+
-+	test_data->chrc_index = 0;
-+
-+	gatt_db_service_foreach_char(attr, compare_chrc, test_data);
-+	g_assert(test_data->chrc_index == svc->num_chars);
-+
-+	test_data->svc_index++;
-+}
-+
- static void client_ready_cb(bool success, uint8_t att_ecode, void *user_data)
- {
- 	struct context *context = user_data;
--	const struct test_data *data = context->data;
--	struct bt_gatt_characteristic_iter char_iter;
--	const bt_gatt_characteristic_t *charac;
--	const bt_gatt_service_t *service;
--	struct bt_gatt_service_iter iter;
--	int i, j;
-+	struct service_test_data test_data;
+ struct discovery_op;
  
- 	g_assert(success);
+ typedef void (*discovery_op_complete_func_t)(struct discovery_op *op,
+@@ -993,6 +1078,8 @@ static void process_service_changed(struct bt_gatt_client *client,
+ 	/* Invalidate and remove all effected notify callbacks */
+ 	gatt_client_remove_all_notify_in_range(client, start_handle,
+ 								end_handle);
++	gatt_client_remove_notify_chrcs_in_range(client, start_handle,
++								end_handle);
  
--	if (!data->services) {
-+	test_data.data = context->data;
-+	test_data.svc_index = 0;
-+
-+	if (!test_data.data->services) {
- 		context_quit(context);
+ 	/* Remove all services that overlap the modified range since we'll
+ 	 * rediscover them
+@@ -1211,12 +1298,10 @@ static bool notify_data_write_ccc(struct notify_data *notify_data, bool enable,
+ 		/* Try to enable notifications and/or indications based on
+ 		 * whatever the characteristic supports.
+ 		 */
+-		if (notify_data->chrc->chrc_external.properties &
+-						BT_GATT_CHRC_PROP_NOTIFY)
++		if (notify_data->chrc->properties & BT_GATT_CHRC_PROP_NOTIFY)
+ 			pdu[2] = 0x01;
+ 
+-		if (notify_data->chrc->chrc_external.properties &
+-						BT_GATT_CHRC_PROP_INDICATE)
++		if (notify_data->chrc->properties & BT_GATT_CHRC_PROP_INDICATE)
+ 			pdu[2] |= 0x02;
+ 
+ 		if (!pdu[2])
+@@ -1327,7 +1412,7 @@ static void notify_handler(void *data, void *user_data)
+ 
+ 	value_handle = get_le16(pdu_data->pdu);
+ 
+-	if (notify_data->chrc->chrc_external.value_handle != value_handle)
++	if (notify_data->chrc->value_handle != value_handle)
  		return;
+ 
+ 	if (pdu_data->length > 2)
+@@ -1393,6 +1478,7 @@ static void bt_gatt_client_free(struct bt_gatt_client *client)
+ 	queue_destroy(client->svc_chngd_queue, free);
+ 	queue_destroy(client->long_write_queue, long_write_op_unref);
+ 	queue_destroy(client->notify_list, notify_data_unref);
++	queue_destroy(client->notify_chrcs, notify_chrc_free);
+ 
+ 	free(client);
+ }
+@@ -1444,6 +1530,10 @@ struct bt_gatt_client *bt_gatt_client_new(struct gatt_db *db,
+ 	if (!client->notify_list)
+ 		goto fail;
+ 
++	client->notify_chrcs = queue_new();
++	if (!client->notify_chrcs)
++		goto fail;
++
+ 	client->notify_id = bt_att_register(att, BT_ATT_OP_HANDLE_VAL_NOT,
+ 						notify_cb, client, NULL);
+ 	if (!client->notify_id)
+@@ -2374,6 +2464,14 @@ bool bt_gatt_client_write_long_value(struct bt_gatt_client *client,
+ 	return true;
+ }
+ 
++static bool match_notify_chrc_value_handle(const void *a, const void *b)
++{
++	const struct notify_chrc *chrc = a;
++	uint16_t value_handle = PTR_TO_UINT(b);
++
++	return chrc->value_handle == value_handle;
++}
++
+ bool bt_gatt_client_register_notify(struct bt_gatt_client *client,
+ 				uint16_t chrc_value_handle,
+ 				bt_gatt_client_notify_id_callback_t callback,
+@@ -2382,40 +2480,31 @@ bool bt_gatt_client_register_notify(struct bt_gatt_client *client,
+ 				bt_gatt_client_destroy_func_t destroy)
+ {
+ 	struct notify_data *notify_data;
+-	struct service_list *svc_data = NULL;
+-	struct chrc_data *chrc = NULL;
+-	struct bt_gatt_service_iter iter;
+-	const bt_gatt_service_t *service;
++	struct notify_chrc *chrc = NULL;
+ 
+-	if (!client || !chrc_value_handle || !callback)
++	if (!client || !client->db || !chrc_value_handle || !callback)
+ 		return false;
+ 
+ 	if (!bt_gatt_client_is_ready(client) || client->in_svc_chngd)
+ 		return false;
+ 
+-	/* Check that chrc_value_handle belongs to a known characteristic */
+-	if (!bt_gatt_service_iter_init(&iter, client))
+-		return false;
++	/* Check if a characteristic ref count has been started already */
++	chrc = queue_find(client->notify_chrcs, match_notify_chrc_value_handle,
++						UINT_TO_PTR(chrc_value_handle));
+ 
+-	while (bt_gatt_service_iter_next(&iter, &service)) {
+-		if (chrc_value_handle >= service->start_handle &&
+-				chrc_value_handle <= service->end_handle) {
+-			svc_data = (void *) service;
+-			break;
+-		}
+-	}
+-
+-	if (!svc_data)
+-		return false;
++	if (!chrc) {
++		/*
++		 * Create an entry if the characteristic is known and has a CCC
++		 * descriptor.
++		 */
++		chrc = notify_chrc_create(client, chrc_value_handle);
++		if (!chrc)
++			return false;
+ 
+-	/*
+-	 * TODO: Lookup characteristic and CCC in database. Add entries for each
+-	 * characteristic to a list on demand.
+-	 */
+-	return false;
++	}
+ 
+-	/* Check that the characteristic supports notifications/indications */
+-	if (!chrc || !chrc->ccc_handle || chrc->notify_count == INT_MAX)
++	/* Fail if we've hit the maximum allowed notify sessions */
++	if (chrc->notify_count == INT_MAX)
+ 		return false;
+ 
+ 	notify_data = new0(struct notify_data, 1);
+@@ -2430,7 +2519,8 @@ bool bt_gatt_client_register_notify(struct bt_gatt_client *client,
+ 	notify_data->user_data = user_data;
+ 	notify_data->destroy = destroy;
+ 
+-	/* If a write to the CCC descriptor is in progress, then queue this
++	/*
++	 * If a write to the CCC descriptor is in progress, then queue this
+ 	 * request.
+ 	 */
+ 	if (chrc->ccc_write_id) {
+@@ -2438,7 +2528,8 @@ bool bt_gatt_client_register_notify(struct bt_gatt_client *client,
+ 		return true;
  	}
  
--	g_assert(bt_gatt_service_iter_init(&iter, context->client));
--	for (i = 0; i < data->num_services; i++) {
--		g_assert(bt_gatt_service_iter_next(&iter, &service));
--		compare_service(service, data->services[i]->service);
--		g_assert(bt_gatt_characteristic_iter_init(&char_iter, service));
--
--		for (j = 0; j < data->services[i]->num_chars; j++) {
--			g_assert(bt_gatt_characteristic_iter_next(&char_iter,
--								&charac));
--			compare_chars(charac, data->services[i]->chars[j]);
--		}
--		g_assert(!bt_gatt_characteristic_iter_next(&char_iter,
--								&charac));
--	}
-+	g_assert(context->client);
-+	g_assert(context->client_db);
- 
--	g_assert(!bt_gatt_service_iter_next(&iter, &service));
-+	gatt_db_foreach_service(context->client_db, compare_service,
-+								&test_data);
-+	g_assert(test_data.svc_index == test_data.data->num_services);
- 
- 	if (context->data->step) {
- 		const struct test_step *step = context->data->step;
+-	/* If the ref count is not zero, then notifications are already enabled.
++	/*
++	 * If the ref count is not zero, then notifications are already enabled.
+ 	 */
+ 	if (chrc->notify_count > 0) {
+ 		complete_notify_request(notify_data);
 -- 
 2.2.0.rc0.207.ga3a616c
 
