@@ -1,42 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/2] android/client: Fix double initialize of bluetooth
-Date: Wed, 03 Dec 2014 09:14:48 +0100
-Message-ID: <13772873.ZZKrfl6tUA@uw000953>
-In-Reply-To: <1417002229-3354-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
-References: <1417002229-3354-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCHv2] bluetooth: Fix possible NULL dereference
+Date: Wed,  3 Dec 2014 10:08:19 +0200
+Message-Id: <1417594099-24947-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Grzegorz,
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-On Wednesday 26 of November 2014 12:43:48 Grzegorz Kolodziejczyk wrote:
-> Profile initialization loop should omit already initialized profiles
-> by process line command.
-> ---
->  android/client/haltest.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/android/client/haltest.c b/android/client/haltest.c
-> index add1978..f19e671 100644
-> --- a/android/client/haltest.c
-> +++ b/android/client/haltest.c
-> @@ -422,7 +422,7 @@ static void init(void)
->  	}
->  
->  	/* Init what is available to init */
-> -	for (i = 2; i < NELEM(interfaces) - 1; ++i) {
-> +	for (i = 3; i < NELEM(interfaces) - 1; ++i) {
->  		m = get_interface_method(interfaces[i]->name, "init");
->  		if (m != NULL)
->  			m->func(2, argv);
+conn might be NULL and would be dereferenced in conn_set_key()
+This fixes coverity issue:
 
-Both patches applied, thanks.
+...
+conn = hci_conn_hash_lookup_ba(hdev, ACL_LINK, &ev->bdaddr);
+>>>     CID: Dereference after null check  (FORWARD_NULL)
+>>>     Comparing "conn" to null implies that "conn" might be null.
+...
+---
+ net/bluetooth/hci_event.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index bd0a801..95f8057 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -3312,7 +3312,7 @@ static void hci_link_key_notify_evt(struct hci_dev *hdev, struct sk_buff *skb)
+ 	/* Update connection information since adding the key will have
+ 	 * fixed up the type in the case of changed combination keys.
+ 	 */
+-	if (ev->key_type == HCI_LK_CHANGED_COMBINATION)
++	if (conn && ev->key_type == HCI_LK_CHANGED_COMBINATION)
+ 		conn_set_key(conn, key->type, key->pin_len);
+ 
+ 	mgmt_new_link_key(hdev, key, persistent);
 -- 
-Best regards, 
-Szymon Janc
+1.9.1
+
