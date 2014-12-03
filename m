@@ -1,38 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=windows-1252
-Mime-Version: 1.0 (Mac OS X Mail 8.1 \(1993\))
-Subject: Re: [PATCH]     Bluetooth: Add support for Broadcom BCM20702A0 in Fuijitsu Lifebook E751
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <547EF951.8060007@gmx.de>
-Date: Wed, 3 Dec 2014 13:57:15 +0000
+From: Szymon Janc <szymon.janc@tieto.com>
+To: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <FF02FEDE-83A1-46E1-A863-65A4EF002073@holtmann.org>
-References: <8967C48B-00C1-43E8-A8EC-C41642288122@holtmann.org> <1417546017-25257-1-git-send-email-harv@gmx.de> <EC8200AB-98BA-4C4B-AC07-E6AA51DE284B@holtmann.org> <547EF951.8060007@gmx.de>
-To: harv@gmx.de
+Subject: Re: [PATCH v3 0/3] android/handsfree: Move to use bt_sco lib
+Date: Wed, 03 Dec 2014 14:24:21 +0100
+Message-ID: <2329972.r5790z6SD5@uw000953>
+In-Reply-To: <1417603346-6442-1-git-send-email-lukasz.rymanowski@tieto.com>
+References: <1417603346-6442-1-git-send-email-lukasz.rymanowski@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Harvey,
+Hi Łukasz,
 
->> Actually there is a generic catch all entry for vendor 0x0489
->> already.
->> 
->> /* Foxconn - Hon Hai */ { USB_VENDOR_AND_INTERFACE_INFO(0x0489,
->> 0xff, 0x01, 0x01) },
->> 
->> So I prefer that we enable BTUSB_BCM_PATCHRAM support in a generic
->> way instead of just for every single product id.
+On Wednesday 03 of December 2014 11:42:23 Lukasz Rymanowski wrote:
+> This set has couple of fixes plus patch moving sco handling to
+> bt_sco lib
 > 
-> I have seen the other patch from Wen-chien Jesse Sung that does
-> exactly this. But while I would prefer this way too I doubt that all
-> firmware files come from the same place as these are vendor specific
-> things. Mine i.e. was from a Fuijitsu support URL. So the commit
-> message can not provide sources for firmware download in these generic
-> way.
+> v2:
+> * Improve disconnect_sco()
+> * remove patch adding default to switch/case
+> * Patch for handling idle state can be removed because of improvement of
+> disconnect_sco()
+> 
+> v3:
+> * added patch for disconnect SCO to bt_sco lib. this is needed for following patch
+> 
+> Lukasz Rymanowski (3):
+>   android/sco: Fix for disconnect SCO
+>   android/handsfree: Use bt_sco lib in HFP AG code
+>   android/handsfree: Simplify codec selection
+> 
+>  android/handsfree.c | 185 +++++++++++++---------------------------------------
+>  android/sco.c       |  12 +---
+>  2 files changed, 47 insertions(+), 150 deletions(-)
+> 
 
-yes it can be in the commit message. Just clearly state what you are doing. Allowing for firmware download support does not mean that it is the same firmware. While you are enabling firmware download for the whole vendor class of the devices, the firmware extraction can be just described for a single product id. Just mention it in the commit message.
+All patches applied, thanks. 
 
-Regards
-
-Marcel
-
+-- 
+Best regards, 
+Szymon Janc
