@@ -1,57 +1,91 @@
 Return-Path: <cyrus@holtmann.org>
 From: Johan Hedberg <johan.hedberg@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 03/49] Bluetooth: Add SMP flag for SC and set it when necessary.
-Date: Wed,  3 Dec 2014 17:01:57 +0200
-Message-Id: <1417618963-18010-4-git-send-email-johan.hedberg@gmail.com>
-In-Reply-To: <1417618963-18010-1-git-send-email-johan.hedberg@gmail.com>
-References: <1417618963-18010-1-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH 00/49] Bluetooth: LE Secure Connections support
+Date: Wed,  3 Dec 2014 17:01:54 +0200
+Message-Id: <1417618963-18010-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@intel.com>
+Hi,
 
-This patch adds a new SMP flag for tracking whether Secure Connections
-is in use and sets the flag when both remote and local side have elected
-to use Secure Connections.
+First of all, appologies to all for this huge patch set. It's work from
+the past 6 months or so that wasn't releasable until the 4.2
+specification goes public. That happened just some moments ago:
 
-Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
----
- net/bluetooth/smp.c | 7 +++++++
- 1 file changed, 7 insertions(+)
+http://www.bluetooth.com/SiteCollectionDocuments/4-2/bluetooth4-2.aspx
 
-diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
-index bfa839eed89b..3808ade96d08 100644
---- a/net/bluetooth/smp.c
-+++ b/net/bluetooth/smp.c
-@@ -45,6 +45,7 @@ enum {
- 	SMP_FLAG_MITM_AUTH,
- 	SMP_FLAG_COMPLETE,
- 	SMP_FLAG_INITIATOR,
-+	SMP_FLAG_SC,
- };
- 
- struct smp_chan {
-@@ -973,6 +974,9 @@ static u8 smp_cmd_pairing_req(struct l2cap_conn *conn, struct sk_buff *skb)
- 
- 	build_pairing_cmd(conn, req, &rsp, auth);
- 
-+	if (rsp.auth_req & SMP_AUTH_SC)
-+		set_bit(SMP_FLAG_SC, &smp->flags);
-+
- 	key_size = min(req->max_key_size, rsp.max_key_size);
- 	if (check_enc_key_size(conn, key_size))
- 		return SMP_ENC_KEY_SIZE;
-@@ -1020,6 +1024,9 @@ static u8 smp_cmd_pairing_rsp(struct l2cap_conn *conn, struct sk_buff *skb)
- 
- 	auth = rsp->auth_req & AUTH_REQ_MASK(hdev);
- 
-+	if ((req->auth_req & SMP_AUTH_SC) && (auth & SMP_AUTH_SC))
-+		set_bit(SMP_FLAG_SC, &smp->flags);
-+
- 	/* If we need MITM check that it can be achieved */
- 	if (conn->hcon->pending_sec_level >= BT_SECURITY_HIGH) {
- 		u8 method;
--- 
-2.1.0
+I'm sending the patches to the mailing list mainly for reference since
+Marcel will probably directly merge them from my tree. Any issues/fixes
+etc should be done on top of them.
+
+Johan
+
+----------------------------------------------------------------
+Johan Hedberg (49):
+      Bluetooth: Add basic SMP defines for LE Secure Connections
+      Bluetooth: Make auth_req mask dependent on SC enabled or not
+      Bluetooth: Add SMP flag for SC and set it when necessary.
+      Bluetooth: Update SMP security level to/from auth_req for SC
+      Bluetooth: Add mgmt support for LE Secure Connections LTK types
+      Bluetooth: Set the correct security level for SC LTKs
+      Bluetooth: Use custom macro for testing BR/EDR SC enabled
+      Bluetooth: Add mgmt_set_secure_conn support for any LE adapter
+      Bluetooth: Update LTK lookup to correctly deal with SC LTKs
+      Bluetooth: Remove unused hci_find_ltk function
+      Bluetooth: Rename hci_find_ltk_by_addr to hci_find_ltk
+      Bluetooth: Set link key generation bit if necessary for LE SC
+      Bluetooth: Add basic support for AES-CMAC
+      Bluetooth: Add ECC library for LE Secure Connections
+      Bluetooth: Add basic support for sending our LE SC public key
+      Bluetooth: Add handler function for receiving LE SC public key
+      Bluetooth: Add support for sending LE SC Confirm value
+      Bluetooth: Add LE SC support for responding to Pairing Confirm PDU
+      Bluetooth: Add support for LE SC numeric comparison
+      Bluetooth: Add support for handling LE SC user response
+      Bluetooth: Add support for LE SC DHKey check PDU
+      Bluetooth: Add support for LE SC key generation
+      Bluetooth: Track authentication method in SMP context
+      Bluetooth: Add selection of the SC authentication method
+      Bluetooth: Detect SMP SC debug keys
+      Bluetooth: Add check for accidentally generating a debug key
+      Bluetooth: Set correct LTK type and authentication for SC
+      Bluetooth: Add support for SC just-works pairing
+      Bluetooth: Fix BR/EDR Link Key type when derived through LE SC
+      Bluetooth: Add passkey entry support for LE SC
+      Bluetooth: Fix DHKey Check sending order for slave role
+      Bluetooth: Add dummy handler for LE SC keypress notification
+      Bluetooth: Use debug keys for SMP when HCI_USE_DEBUG_KEYS is set
+      Bluetooth: Add hci_conn flag for new link key generation
+      Bluetooth: Add debugfs switch for forcing SMP over BR/EDR
+      Bluetooth: Add skeleton for BR/EDR SMP channel
+      Bluetooth: Add full SMP BR/EDR support
+      Bluetooth: Add SC-only mode support for SMP
+      Bluetooth: Unify remote OOB data functions
+      Bluetooth: Store address type with OOB data
+      Bluetooth: Add support for adding remote OOB data for LE
+      Bluetooth: Set SMP OOB flag if OOB data is available
+      Bluetooth: Add basic LE SC OOB support for remote OOB data
+      Bluetooth: Introduce SMP_DBG macro for low-level debuging
+      Bluetooth: Fix missing const declarations in SMP functions
+      Bluetooth: Organize SMP crypto functions to logical sections
+      Bluetooth: Fix SMP debug key handling
+      Bluetooth: Fix minor coding style issue in smp.c
+      Bluetooth: Fix false-positive "uninitialized" compiler warning
+
+ include/net/bluetooth/hci.h      |    1 +
+ include/net/bluetooth/hci_core.h |   23 +-
+ include/net/bluetooth/l2cap.h    |    2 +
+ include/net/bluetooth/mgmt.h     |    3 +
+ net/bluetooth/Kconfig            |    1 +
+ net/bluetooth/Makefile           |    2 +-
+ net/bluetooth/ecc.c              |  816 ++++++++++++++++++++
+ net/bluetooth/ecc.h              |   54 ++
+ net/bluetooth/hci_core.c         |  155 ++--
+ net/bluetooth/hci_event.c        |   23 +-
+ net/bluetooth/l2cap_core.c       |    4 +
+ net/bluetooth/mgmt.c             |   75 +-
+ net/bluetooth/smp.c              | 1543 +++++++++++++++++++++++++++++++++----
+ net/bluetooth/smp.h              |   51 +-
+ 14 files changed, 2509 insertions(+), 244 deletions(-)
 
