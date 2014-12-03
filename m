@@ -2,35 +2,45 @@ Return-Path: <cyrus@holtmann.org>
 From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH v3 3/3] android/handsfree: Simplify codec selection
-Date: Wed,  3 Dec 2014 11:42:26 +0100
-Message-Id: <1417603346-6442-4-git-send-email-lukasz.rymanowski@tieto.com>
+Subject: [PATCH v3 1/3] android/sco: Fix for disconnect SCO
+Date: Wed,  3 Dec 2014 11:42:24 +0100
+Message-Id: <1417603346-6442-2-git-send-email-lukasz.rymanowski@tieto.com>
 In-Reply-To: <1417603346-6442-1-git-send-email-lukasz.rymanowski@tieto.com>
 References: <1417603346-6442-1-git-send-email-lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Voice settings 0 is legacy, lets use BT_VOICE_CVSD_16BIT instead.
+We should just shutdown io and wait for disconnect callback in
+disconnect function, otherwise we might get some races e.g. when doing
+connect/disconnect SCO. This patch fix that.
 ---
- android/handsfree.c | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
+ android/sco.c | 12 +-----------
+ 1 file changed, 1 insertion(+), 11 deletions(-)
 
-diff --git a/android/handsfree.c b/android/handsfree.c
-index 5c19b6e..aeb933f 100644
---- a/android/handsfree.c
-+++ b/android/handsfree.c
-@@ -1011,9 +1011,8 @@ static bool connect_sco(struct hf_device *dev)
- {
- 	uint16_t voice_settings;
+diff --git a/android/sco.c b/android/sco.c
+index 7dd7013..e8ac685 100644
+--- a/android/sco.c
++++ b/android/sco.c
+@@ -310,18 +310,8 @@ void bt_sco_disconnect(struct bt_sco *sco)
+ 	if (!sco)
+ 		return;
  
--	if (!codec_negotiation_supported(dev))
--		voice_settings = 0;
--	else if (dev->negotiated_codec != CODEC_ID_CVSD)
-+	if (codec_negotiation_supported(dev) &&
-+			dev->negotiated_codec != CODEC_ID_CVSD)
- 		voice_settings = BT_VOICE_TRANSPARENT;
- 	else
- 		voice_settings = BT_VOICE_CVSD_16BIT;
+-	if (sco->watch) {
+-		g_source_remove(sco->watch);
+-		sco->watch = 0;
+-	}
+-
+-	if (sco->io) {
++	if (sco->io)
+ 		g_io_channel_shutdown(sco->io, TRUE, NULL);
+-		g_io_channel_unref(sco->io);
+-		sco->io = NULL;
+-	}
+-
+-	clear_remote_address(sco);
+ }
+ 
+ bool bt_sco_get_fd_and_mtu(struct bt_sco *sco, int *fd, uint16_t *mtu)
 -- 
 1.8.4
 
