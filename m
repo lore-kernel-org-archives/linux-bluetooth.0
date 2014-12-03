@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Johan Hedberg <johan.hedberg@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 13/49] Bluetooth: Add basic support for AES-CMAC
-Date: Wed,  3 Dec 2014 17:02:07 +0200
-Message-Id: <1417618963-18010-14-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH 11/49] Bluetooth: Rename hci_find_ltk_by_addr to hci_find_ltk
+Date: Wed,  3 Dec 2014 17:02:05 +0200
+Message-Id: <1417618963-18010-12-git-send-email-johan.hedberg@gmail.com>
 In-Reply-To: <1417618963-18010-1-git-send-email-johan.hedberg@gmail.com>
 References: <1417618963-18010-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,64 +11,95 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-Most of the LE Secure Connections SMP crypto functions build on top of
-the AES-CMAC function. This patch adds access to AES-CMAC in the kernel
-crypto subsystem by allocating a crypto_hash handle for it in a similar
-way that we have one for AES-CBC.
+Now that hci_find_ltk_by_addr is the only LTK lookup function there's no
+need to keep the long name anymore. This patch shortens the function
+name to simply hci_find_ltk.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- net/bluetooth/Kconfig |  1 +
- net/bluetooth/smp.c   | 10 ++++++++++
- 2 files changed, 11 insertions(+)
+ include/net/bluetooth/hci_core.h | 4 ++--
+ net/bluetooth/hci_core.c         | 6 +++---
+ net/bluetooth/hci_event.c        | 3 +--
+ net/bluetooth/smp.c              | 6 ++----
+ 4 files changed, 8 insertions(+), 11 deletions(-)
 
-diff --git a/net/bluetooth/Kconfig b/net/bluetooth/Kconfig
-index 5e97a8ff850b..29bcafc41adf 100644
---- a/net/bluetooth/Kconfig
-+++ b/net/bluetooth/Kconfig
-@@ -10,6 +10,7 @@ menuconfig BT
- 	select CRYPTO
- 	select CRYPTO_BLKCIPHER
- 	select CRYPTO_AES
-+	select CRYPTO_CMAC
- 	select CRYPTO_ECB
- 	select CRYPTO_SHA256
- 	help
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index b41969b561d8..90929641d0f0 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -924,8 +924,8 @@ struct link_key *hci_add_link_key(struct hci_dev *hdev, struct hci_conn *conn,
+ struct smp_ltk *hci_add_ltk(struct hci_dev *hdev, bdaddr_t *bdaddr,
+ 			    u8 addr_type, u8 type, u8 authenticated,
+ 			    u8 tk[16], u8 enc_size, __le16 ediv, __le64 rand);
+-struct smp_ltk *hci_find_ltk_by_addr(struct hci_dev *hdev, bdaddr_t *bdaddr,
+-				     u8 addr_type, u8 role);
++struct smp_ltk *hci_find_ltk(struct hci_dev *hdev, bdaddr_t *bdaddr,
++			     u8 addr_type, u8 role);
+ int hci_remove_ltk(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 bdaddr_type);
+ void hci_smp_ltks_clear(struct hci_dev *hdev);
+ int hci_remove_link_key(struct hci_dev *hdev, bdaddr_t *bdaddr);
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index cb9bc8e2c58d..6c3220e9484f 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -3185,8 +3185,8 @@ static u8 ltk_role(u8 type)
+ 	return HCI_ROLE_SLAVE;
+ }
+ 
+-struct smp_ltk *hci_find_ltk_by_addr(struct hci_dev *hdev, bdaddr_t *bdaddr,
+-				     u8 addr_type, u8 role)
++struct smp_ltk *hci_find_ltk(struct hci_dev *hdev, bdaddr_t *bdaddr,
++			     u8 addr_type, u8 role)
+ {
+ 	struct smp_ltk *k;
+ 
+@@ -3313,7 +3313,7 @@ struct smp_ltk *hci_add_ltk(struct hci_dev *hdev, bdaddr_t *bdaddr,
+ 	struct smp_ltk *key, *old_key;
+ 	u8 role = ltk_role(type);
+ 
+-	old_key = hci_find_ltk_by_addr(hdev, bdaddr, addr_type, role);
++	old_key = hci_find_ltk(hdev, bdaddr, addr_type, role);
+ 	if (old_key)
+ 		key = old_key;
+ 	else {
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 0058b545c5ed..34ecbf0b7e5b 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -4590,8 +4590,7 @@ static void hci_le_ltk_request_evt(struct hci_dev *hdev, struct sk_buff *skb)
+ 	if (conn == NULL)
+ 		goto not_found;
+ 
+-	ltk = hci_find_ltk_by_addr(hdev, &conn->dst, conn->dst_type,
+-				   conn->role);
++	ltk = hci_find_ltk(hdev, &conn->dst, conn->dst_type, conn->role);
+ 	if (!ltk)
+ 		goto not_found;
+ 
 diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
-index d993d7d4fcc8..4fed367da380 100644
+index 4ecbf2774fbd..0973e37073e2 100644
 --- a/net/bluetooth/smp.c
 +++ b/net/bluetooth/smp.c
-@@ -72,6 +72,7 @@ struct smp_chan {
- 	unsigned long	flags;
+@@ -1118,8 +1118,7 @@ static bool smp_ltk_encrypt(struct l2cap_conn *conn, u8 sec_level)
+ 	struct smp_ltk *key;
+ 	struct hci_conn *hcon = conn->hcon;
  
- 	struct crypto_blkcipher	*tfm_aes;
-+	struct crypto_hash	*tfm_cmac;
- };
+-	key = hci_find_ltk_by_addr(hcon->hdev, &hcon->dst, hcon->dst_type,
+-				   hcon->role);
++	key = hci_find_ltk(hcon->hdev, &hcon->dst, hcon->dst_type, hcon->role);
+ 	if (!key)
+ 		return false;
  
- static inline void swap_buf(const u8 *src, u8 *dst, size_t len)
-@@ -396,6 +397,7 @@ static void smp_chan_destroy(struct l2cap_conn *conn)
- 	kfree(smp->slave_csrk);
+@@ -1152,8 +1151,7 @@ bool smp_sufficient_security(struct hci_conn *hcon, u8 sec_level,
+ 	 */
+ 	if (key_pref == SMP_USE_LTK &&
+ 	    test_bit(HCI_CONN_STK_ENCRYPT, &hcon->flags) &&
+-	    hci_find_ltk_by_addr(hcon->hdev, &hcon->dst, hcon->dst_type,
+-				 hcon->role))
++	    hci_find_ltk(hcon->hdev, &hcon->dst, hcon->dst_type, hcon->role))
+ 		return false;
  
- 	crypto_free_blkcipher(smp->tfm_aes);
-+	crypto_free_hash(smp->tfm_cmac);
- 
- 	/* If pairing failed clean up any keys we might have */
- 	if (!complete) {
-@@ -861,6 +863,14 @@ static struct smp_chan *smp_chan_create(struct l2cap_conn *conn)
- 		return NULL;
- 	}
- 
-+	smp->tfm_cmac = crypto_alloc_hash("cmac(aes)", 0, CRYPTO_ALG_ASYNC);
-+	if (IS_ERR(smp->tfm_cmac)) {
-+		BT_ERR("Unable to create CMAC crypto context");
-+		crypto_free_blkcipher(smp->tfm_aes);
-+		kfree(smp);
-+		return NULL;
-+	}
-+
- 	smp->conn = conn;
- 	chan->data = smp;
- 
+ 	if (hcon->sec_level >= sec_level)
 -- 
 2.1.0
 
