@@ -2,117 +2,126 @@ Return-Path: <cyrus@holtmann.org>
 From: Steven Walter <stevenrwalter@gmail.com>
 To: linux-bluetooth@vger.kernel.org, armansito@chromium.org
 Cc: Steven Walter <stevenrwalter@gmail.com>
-Subject: [PATCH BlueZ 5/5] src/gatt-dbus: register desciptors after the characteristic they apply to
-Date: Wed,  3 Dec 2014 10:54:34 -0500
-Message-Id: <1417622074-20023-5-git-send-email-stevenrwalter@gmail.com>
+Subject: [PATCH BlueZ 4/5] tools/btgatt-server.c: publish the GattManager D-Bus services
+Date: Wed,  3 Dec 2014 10:54:33 -0500
+Message-Id: <1417622074-20023-4-git-send-email-stevenrwalter@gmail.com>
 In-Reply-To: <1417622074-20023-1-git-send-email-stevenrwalter@gmail.com>
 References: <CAK8d-aLtkB1RKm+HP92x45D7csVpPNHj--4SsOPG3aAcx9sj0Q@mail.gmail.com>
  <1417622074-20023-1-git-send-email-stevenrwalter@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Ordering of these entries in the attribute database matters
 ---
- src/gatt-dbus.c | 64 ++++++++++++++++++++++++++++++++++++++++++++++++++++-----
- 1 file changed, 59 insertions(+), 5 deletions(-)
+ Makefile.tools        |  5 +++--
+ tools/btgatt-server.c | 43 +++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 46 insertions(+), 2 deletions(-)
 
-diff --git a/src/gatt-dbus.c b/src/gatt-dbus.c
-index e61af15..39cc38a 100644
---- a/src/gatt-dbus.c
-+++ b/src/gatt-dbus.c
-@@ -374,8 +374,57 @@ static int register_external_service(struct external_service *esvc,
- 	return 0;
+diff --git a/Makefile.tools b/Makefile.tools
+index 7520ab5..f7335df 100644
+--- a/Makefile.tools
++++ b/Makefile.tools
+@@ -276,9 +276,10 @@ tools_btgatt_client_SOURCES = tools/btgatt-client.c src/uuid-helper.c
+ tools_btgatt_client_LDADD = src/libshared-mainloop.la \
+ 						lib/libbluetooth-internal.la
+ 
+-tools_btgatt_server_SOURCES = tools/btgatt-server.c src/uuid-helper.c
++tools_btgatt_server_SOURCES = tools/btgatt-server.c src/uuid-helper.c src/gatt-dbus.c src/gatt-dbus.h \
++			      src/error.c src/dbus-common.c src/log.c src/log.h
+ tools_btgatt_server_LDADD = lib/libbluetooth-internal.la src/libshared-glib.la \
+-						@GLIB_LIBS@
++						gdbus/libgdbus-internal.la @GLIB_LIBS@ @DBUS_LIBS@
+ 
+ EXTRA_DIST += tools/bdaddr.1
+ endif
+diff --git a/tools/btgatt-server.c b/tools/btgatt-server.c
+index fa07cfb..a0c87cf 100644
+--- a/tools/btgatt-server.c
++++ b/tools/btgatt-server.c
+@@ -31,6 +31,8 @@
+ #include <unistd.h>
+ #include <errno.h>
+ #include <glib.h>
++#include <dbus/dbus.h>
++#include <dbus/dbus-glib.h>
+ 
+ #include <bluetooth/bluetooth.h>
+ #include <bluetooth/hci.h>
+@@ -38,6 +40,9 @@
+ #include <bluetooth/l2cap.h>
+ #include "lib/uuid.h"
+ 
++#include "gdbus/gdbus.h"
++#include "src/log.h"
++#include "src/dbus-common.h"
+ #include "src/shared/util.h"
+ #include "src/shared/att.h"
+ #include "src/shared/queue.h"
+@@ -45,6 +50,8 @@
+ #include "src/shared/gatt-db.h"
+ #include "src/shared/gatt-server.h"
+ 
++#define BLUEZ_NAME "org.bluez"
++
+ #define UUID_GAP			0x1800
+ #define UUID_GATT			0x1801
+ #define UUID_HEART_RATE			0x180d
+@@ -942,6 +949,37 @@ static gboolean signal_cb(void *user_data)
+ 	return FALSE;
  }
  
-+static int add_char_desc(struct gatt_db_attribute *service,
-+			 GDBusProxy *proxy, const bt_uuid_t *uuid);
-+
-+static int add_desc_for_char (struct gatt_db_attribute *service,
-+			     DBusMessageIter *iter, GSList *proxies)
++static void disconnected_dbus(DBusConnection *conn, void *data)
 +{
-+	DBusMessageIter desc_iter;
-+	GDBusProxy *proxy = NULL;
-+	GSList *list = NULL;
-+	const char *path, *str;
-+	bt_uuid_t uuid;
-+
-+	dbus_message_iter_recurse(iter, &desc_iter);
-+
-+	do {
-+		DBusMessageIter iter2;
-+
-+		if (dbus_message_iter_get_arg_type(&desc_iter) != DBUS_TYPE_OBJECT_PATH)
-+			return -EINVAL;
-+
-+		dbus_message_iter_get_basic(&desc_iter, &path);
-+		/* Find the proxy matching path */
-+		for (list = proxies; list; list = g_slist_next(list)) {
-+			const char *iface;
-+			proxy = list->data;
-+			iface = g_dbus_proxy_get_interface(proxy);
-+			if (strcmp(iface, GATT_DESCRIPTOR_IFACE))
-+				continue;
-+			if (!strcmp(g_dbus_proxy_get_path(proxy), path))
-+				break;
-+		}
-+		if (!list) 
-+			return -EINVAL;
-+
-+		if (!g_dbus_proxy_get_property(proxy, "UUID", &iter2))
-+			return -EINVAL;
-+
-+		if (dbus_message_iter_get_arg_type(&iter2) != DBUS_TYPE_STRING)
-+			return -EINVAL;
-+
-+		dbus_message_iter_get_basic(&iter2, &str);
-+
-+		if (bt_string_to_uuid(&uuid, str) < 0)
-+			return -EINVAL;
-+
-+		add_char_desc(service, proxy, &uuid);
-+	} while (dbus_message_iter_next(&desc_iter));
++	info("Disconnected from D-Bus. Exiting.");
++	g_main_loop_quit(event_loop);
 +}
 +
- static int add_char(struct gatt_db_attribute *service,
--		    GDBusProxy *proxy, const bt_uuid_t *uuid)
-+		    GDBusProxy *proxy, const bt_uuid_t *uuid, GSList *proxies)
- {
- 	DBusMessageIter iter;
- 	struct btd_attribute *attr;
-@@ -417,6 +466,12 @@ static int add_char(struct gatt_db_attribute *service,
- 					   read_cb, write_cb, proxy);
- 	assert(res);
- 
-+	if (g_dbus_proxy_get_property(proxy, "Descriptors", &iter)) {
-+		int ret = add_desc_for_char(service, &iter, proxies);
-+		if (ret)
-+			return ret;
++static int connect_dbus(void)
++{
++	DBusConnection *conn;
++	DBusError err;
++
++	dbus_error_init(&err);
++
++	conn = g_dbus_setup_bus(DBUS_BUS_SYSTEM, BLUEZ_NAME, &err);
++	if (!conn) {
++		if (dbus_error_is_set(&err)) {
++			g_printerr("D-Bus setup failed: %s\n", err.message);
++			dbus_error_free(&err);
++			return -EIO;
++		}
++		return -EALREADY;
 +	}
 +
- 	return 0;
- }
++	set_dbus_connection(conn);
++
++	g_dbus_set_disconnect_function(conn, disconnected_dbus, NULL, NULL);
++	g_dbus_attach_object_manager(conn);
++
++	return 0;
++}
++
+ static struct server *server;
+ static uint16_t mtu = 0;
+ static bool hr_visible = false;
+@@ -1062,6 +1100,7 @@ int main(int argc, char *argv[])
+ 	GIOChannel *channel = g_io_channel_unix_new(fd);
+ 	g_io_add_watch(channel, G_IO_IN, new_connection_cb, NULL);
  
-@@ -442,7 +497,7 @@ static int register_external_characteristics(struct gatt_db_attribute *service,
- 		DBusMessageIter iter;
- 		bt_uuid_t uuid;
- 		const char *path, *iface, *str;
--		int ret;
-+		int ret = 0;
++	g_dbus_set_flags(G_DBUS_FLAG_ENABLE_EXPERIMENTAL);
+ 	event_loop = g_main_loop_new(NULL, FALSE);
  
- 		/* Mandatory property */
- 		if (!g_dbus_proxy_get_property(proxy, "UUID", &iter))
-@@ -460,9 +515,8 @@ static int register_external_characteristics(struct gatt_db_attribute *service,
- 		path = g_dbus_proxy_get_path(proxy);
+ 	server = new0(struct server, 1);
+@@ -1077,6 +1116,10 @@ int main(int argc, char *argv[])
+ 		return EXIT_FAILURE;
+ 	}
  
- 		if (!strcmp(GATT_CHR_IFACE, iface))
--			ret = add_char(service, proxy, &uuid);
--		else
--			ret = add_char_desc(service, proxy, &uuid);
-+			ret = add_char(service, proxy, &uuid, proxies);
-+		/* skip descriptors, they're added by add_char */
- 
- 		if (ret < 0)
- 			return ret;
++	connect_dbus();
++	gboolean result = gatt_dbus_manager_register(server->db);
++	assert(result);
++
+ 	channel = g_io_channel_unix_new(fileno(stdin));
+ 	int source = g_io_add_watch(channel, G_IO_IN | G_IO_ERR | G_IO_HUP,
+ 				prompt_read_cb, server);
 -- 
 1.9.1
 
