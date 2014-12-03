@@ -1,52 +1,92 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <CAHrH25SpiBdLvihtTsM58skwShOpFGGQGXiMwwnm45bv4uzW3A@mail.gmail.com>
-References: <CAK8d-aLtkB1RKm+HP92x45D7csVpPNHj--4SsOPG3aAcx9sj0Q@mail.gmail.com>
- <1417622074-20023-1-git-send-email-stevenrwalter@gmail.com>
- <1417622074-20023-3-git-send-email-stevenrwalter@gmail.com> <CAHrH25SpiBdLvihtTsM58skwShOpFGGQGXiMwwnm45bv4uzW3A@mail.gmail.com>
-From: Steven Walter <stevenrwalter@gmail.com>
-Date: Wed, 3 Dec 2014 12:24:05 -0500
-Message-ID: <CAK8d-aJvGHQHuWQYbXTLJp_Z9jitrCmBYuMaNRUoVwTixxCWaw@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 3/5] tools/btgatt-server.c: convert to glib mainloop
-To: Arman Uguray <armansito@chromium.org>
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 8.1 \(1993\))
+Subject: Re: [PATCH v4 2/2] Bluetooth: btmrvl add firmware dump support
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1416825653-32530-2-git-send-email-akarwar@marvell.com>
+Date: Wed, 3 Dec 2014 16:37:36 +0000
+Cc: linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+	Johannes Berg <johannes@sipsolutions.net>,
+	Xinming Hu <huxm@marvell.com>, Cathy Luo <cluo@marvell.com>,
+	Avinash Patil <patila@marvell.com>
+Message-Id: <58436E3C-356C-4BE3-B99B-7AB42999E9DF@holtmann.org>
+References: <1416825653-32530-1-git-send-email-akarwar@marvell.com> <1416825653-32530-2-git-send-email-akarwar@marvell.com>
+To: Amitkumar Karwar <akarwar@marvell.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Wed, Dec 3, 2014 at 11:17 AM, Arman Uguray <armansito@chromium.org> wrote:
-> Hi Steven,
->
->> On Wed, Dec 3, 2014 at 7:54 AM, Steven Walter <stevenrwalter@gmail.com> wrote:
->> Prep work for running gatt-dbus services
->> ---
->>  Makefile.tools        |   4 +-
->>  tools/btgatt-server.c | 136 ++++++++++++++++++++++++++------------------------
->>  2 files changed, 72 insertions(+), 68 deletions(-)
->>
->> diff --git a/Makefile.tools b/Makefile.tools
->> index ef4162b..7520ab5 100644
->> --- a/Makefile.tools
->> +++ b/Makefile.tools
->> @@ -277,8 +277,8 @@ tools_btgatt_client_LDADD = src/libshared-mainloop.la \
->>                                                 lib/libbluetooth-internal.la
->>
->>  tools_btgatt_server_SOURCES = tools/btgatt-server.c src/uuid-helper.c
->> -tools_btgatt_server_LDADD = src/libshared-mainloop.la \
->> -                                               lib/libbluetooth-internal.la
->> +tools_btgatt_server_LDADD = lib/libbluetooth-internal.la src/libshared-glib.la \
->> +                                               @GLIB_LIBS@
->>
->
-> I'm not sure if this is something that we want. We've been using
-> monitor/mainloop in the newer tools as its more lightweight than glib.
-> I also don't see how gatt-dbus really fits into the scope of this
-> tool.
+Hi Amitkumar,
 
-The problem is probably that I don't understand the scope of the tool.
-Given its generic name, I was thinking that one would use
-btgatt-server to expose any kind of GATT attribute, in-process or not.
-Would it make more sense for there to be a stand-alone tool for
-publishing the GattManager1 D-Bus service?
--- 
--Steven Walter <stevenrwalter@gmail.com>
+> This patch adds firmware dump support for marvell
+> bluetooth chipset. Currently only SD8897 is supported.
+> This is implemented based on dev_coredump, a new mechnism
+> introduced in kernel 3.18rc3
+> 
+> Firmware dump can be trigger by
+> echo 1 > /sys/kernel/debug/bluetooth/hci*/config/fw_dump
+> and when the dump operation is completed, data can be read by
+> cat /sys/class/devcoredump/devcd*/data
+> 
+> We have prepared following script to divide fw memory
+> dump data into multiple files based on memory type.
+> 
+> [root]# cat btmrvl_split_dump_data.sh
+> #!/bin/bash
+> # usage: ./btmrvl_split_dump_data.sh dump_data
+> 
+> fw_dump_data=$1
+> 
+> mem_type="ITCM DTCM SQRAM APU CIU ICU MAC EXT7 EXT8 EXT9 EXT10 EXT11 EXT12 EXT13 EXTLAST"
+> 
+> for name in ${mem_type[@]}
+> do
+>         sed -n "/Start dump $name/,/End dump/p" $fw_dump_data  > tmp.$name.log
+>         if [ ! -s tmp.$name.log ]
+>                 then
+>                         rm -rf tmp.$name.log
+>                 else
+>                         # Remove the describle info "Start dump" and "End dump"
+>                         sed '1d' tmp.$name.log | sed '$d' > /data/$name.log
+>                         if [ -s /data/$name.log ]
+>                         then
+>                                 echo "generate /data/$name.log"
+>                         else
+>                                 sed '1d' tmp.$name.log | sed '$d' > /var/$name.log
+>                                 echo "generate /var/$name.log"
+>                         fi
+>                         rm -rf tmp.$name.log
+>         fi
+> done
+> 
+> Signed-off-by: Xinming Hu <huxm@marvell.com>
+> Signed-off-by: Cathy Luo <cluo@marvell.com>
+> Signed-off-by: Avinash Patil <patila@marvell.com>
+> Reviewed-by: Johannes Berg <johannes@sipsolutions.net>
+> Reviewed-by: Marcel Holtmann <marcel@holtmann.org>
+> Signed-off-by: Amitkumar Karwar <akarwar@marvell.com>
+> ---
+> v4: Change if/else check to improve readability
+>    Move "#include <linux/devcoredump.h>" to btmrvl_sdio.c file.
+>    Don't expose debugfs entry by showing an error when the callback is
+>    not defined.
+>    BT_ERR/BT_INFO already takes care of newline. Remove extra "\n" in
+>    the message.
+> v3: Change fw_dump debugfs file permissions to write only
+>    Replace kstrtol with strtobool
+> v2: Add "select WANT_DEV_COREDUMP" in Kconfig
+>    Use write debugfs command instead of read to trigger dump operation.
+> ---
+> drivers/bluetooth/Kconfig          |   1 +
+> drivers/bluetooth/btmrvl_debugfs.c |  31 ++++
+> drivers/bluetooth/btmrvl_drv.h     |  20 +++
+> drivers/bluetooth/btmrvl_main.c    |   7 +
+> drivers/bluetooth/btmrvl_sdio.c    | 300 +++++++++++++++++++++++++++++++++++++
+> drivers/bluetooth/btmrvl_sdio.h    |   5 +
+> 6 files changed, 364 insertions(+)
+
+patch has been applied to bluetooth-next tree.
+
+Regards
+
+Marcel
+
