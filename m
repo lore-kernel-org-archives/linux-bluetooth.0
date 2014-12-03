@@ -1,81 +1,52 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <CABBYNZLJofos=6Q_ZpeGH72g3EcYC9645QCK=_=tADU3zG7abQ@mail.gmail.com>
+In-Reply-To: <CAHrH25SpiBdLvihtTsM58skwShOpFGGQGXiMwwnm45bv4uzW3A@mail.gmail.com>
 References: <CAK8d-aLtkB1RKm+HP92x45D7csVpPNHj--4SsOPG3aAcx9sj0Q@mail.gmail.com>
  <1417622074-20023-1-git-send-email-stevenrwalter@gmail.com>
- <1417622074-20023-2-git-send-email-stevenrwalter@gmail.com> <CABBYNZLJofos=6Q_ZpeGH72g3EcYC9645QCK=_=tADU3zG7abQ@mail.gmail.com>
+ <1417622074-20023-3-git-send-email-stevenrwalter@gmail.com> <CAHrH25SpiBdLvihtTsM58skwShOpFGGQGXiMwwnm45bv4uzW3A@mail.gmail.com>
 From: Steven Walter <stevenrwalter@gmail.com>
-Date: Wed, 3 Dec 2014 12:28:55 -0500
-Message-ID: <CAK8d-aJRBapUzKqBOG-S+UZxZ5P0ZGtDS_RdONpC7Y7HjyQc-Q@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 2/5] gdbus/client.c: don't assume the root object
- path is valid
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	Arman Uguray <armansito@chromium.org>
+Date: Wed, 3 Dec 2014 12:24:05 -0500
+Message-ID: <CAK8d-aJvGHQHuWQYbXTLJp_Z9jitrCmBYuMaNRUoVwTixxCWaw@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 3/5] tools/btgatt-server.c: convert to glib mainloop
+To: Arman Uguray <armansito@chromium.org>
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz
-
-On Wed, Dec 3, 2014 at 11:08 AM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
+On Wed, Dec 3, 2014 at 11:17 AM, Arman Uguray <armansito@chromium.org> wrote:
 > Hi Steven,
 >
-> On Wed, Dec 3, 2014 at 5:54 PM, Steven Walter <stevenrwalter@gmail.com> wrote:
->> We should look for objects at the path the client has registered, not
->> hard-coded at root.  In particular, python D-Bus objects will not
->> respond to requests directed at the root object path.
+>> On Wed, Dec 3, 2014 at 7:54 AM, Steven Walter <stevenrwalter@gmail.com> wrote:
+>> Prep work for running gatt-dbus services
 >> ---
->>  gdbus/client.c  | 2 +-
->>  src/gatt-dbus.c | 2 +-
->>  2 files changed, 2 insertions(+), 2 deletions(-)
+>>  Makefile.tools        |   4 +-
+>>  tools/btgatt-server.c | 136 ++++++++++++++++++++++++++------------------------
+>>  2 files changed, 72 insertions(+), 68 deletions(-)
 >>
->> diff --git a/gdbus/client.c b/gdbus/client.c
->> index eb68a0f..a270fc2 100644
->> --- a/gdbus/client.c
->> +++ b/gdbus/client.c
->> @@ -1115,7 +1115,7 @@ static void get_managed_objects(GDBusClient *client)
->>         if (client->get_objects_call != NULL)
->>                 return;
+>> diff --git a/Makefile.tools b/Makefile.tools
+>> index ef4162b..7520ab5 100644
+>> --- a/Makefile.tools
+>> +++ b/Makefile.tools
+>> @@ -277,8 +277,8 @@ tools_btgatt_client_LDADD = src/libshared-mainloop.la \
+>>                                                 lib/libbluetooth-internal.la
 >>
->> -       msg = dbus_message_new_method_call(client->service_name, "/",
->> +       msg = dbus_message_new_method_call(client->service_name, client->base_path,
->>                                         DBUS_INTERFACE_DBUS ".ObjectManager",
->>                                                         "GetManagedObjects");
->>         if (msg == NULL)
->> diff --git a/src/gatt-dbus.c b/src/gatt-dbus.c
->> index a04c38f..e61af15 100644
->> --- a/src/gatt-dbus.c
->> +++ b/src/gatt-dbus.c
->> @@ -524,7 +524,7 @@ static struct external_service *external_service_new(DBusConnection *conn,
->>         GDBusClient *client;
->>         const char *sender = dbus_message_get_sender(msg);
+>>  tools_btgatt_server_SOURCES = tools/btgatt-server.c src/uuid-helper.c
+>> -tools_btgatt_server_LDADD = src/libshared-mainloop.la \
+>> -                                               lib/libbluetooth-internal.la
+>> +tools_btgatt_server_LDADD = lib/libbluetooth-internal.la src/libshared-glib.la \
+>> +                                               @GLIB_LIBS@
 >>
->> -       client = g_dbus_client_new(conn, sender, "/");
->> +       client = g_dbus_client_new(conn, sender, path);
->>         if (!client)
->>                 return NULL;
->>
->> --
->> 1.9.1
 >
-> I remember the spec had something regarding '/' must be present and
-> the ObjectManager was only allowed on that because of that otherwise
-> the clients have to know before hand what path are available which is
-> the whole point of having ObjectManager to discover that.
+> I'm not sure if this is something that we want. We've been using
+> monitor/mainloop in the newer tools as its more lightweight than glib.
+> I also don't see how gatt-dbus really fits into the scope of this
+> tool.
 
-I don't read that in the spec.  The specs says:
-
-"The root of each sub-tree implements this interface so other
-applications can get all objects, interfaces and properties in a
-single method call."
-
-Note "sub-tree", not "the root tree."  The spec is also careful to
-talk about the ObjectManager's object path, not assuming that the path
-will be '/'.
-
-Regardless, we can always be less strict than the spec.  Since we have
-an object path, why wouldn't we use it?
+The problem is probably that I don't understand the scope of the tool.
+Given its generic name, I was thinking that one would use
+btgatt-server to expose any kind of GATT attribute, in-process or not.
+Would it make more sense for there to be a stand-alone tool for
+publishing the GattManager1 D-Bus service?
 -- 
 -Steven Walter <stevenrwalter@gmail.com>
