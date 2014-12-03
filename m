@@ -4,11 +4,12 @@ To: 'Luiz Augusto von Dentz' <luiz.dentz@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org,
 	'Dmitry Kasatkin' <d.kasatkin@samsung.com>, cpgs@samsung.com
 References: <1416577665-21876-1-git-send-email-vikram.pal@samsung.com>
- <CABBYNZJSxCADaEU5XLRaTUGY0AGu+8s_B+ojSAymszWiJNDNiw@mail.gmail.com>
-In-reply-to: <CABBYNZJSxCADaEU5XLRaTUGY0AGu+8s_B+ojSAymszWiJNDNiw@mail.gmail.com>
-Subject: RE: [PATCH 0/7] L2CAP control field + AVRCP browsing PDU parsing
-Date: Wed, 03 Dec 2014 12:38:52 +0530
-Message-id: <003e01d00ec8$0b325380$2196fa80$@samsung.com>
+ <1416577665-21876-2-git-send-email-vikram.pal@samsung.com>
+ <CABBYNZLhEKz3GQRg-NgwC=tEorV_ygV+FmR_65_r7Bx6tZzSxw@mail.gmail.com>
+In-reply-to: <CABBYNZLhEKz3GQRg-NgwC=tEorV_ygV+FmR_65_r7Bx6tZzSxw@mail.gmail.com>
+Subject: RE: [PATCH 1/7] monitor: Adjust for ERTM control bytes
+Date: Wed, 03 Dec 2014 12:35:44 +0530
+Message-id: <003d01d00ec7$976a6f00$c63f4d00$@samsung.com>
 MIME-version: 1.0
 Content-type: text/plain; charset=utf-8
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -18,40 +19,41 @@ Hi Luiz,
 
 > -----Original Message-----
 > From: Luiz Augusto von Dentz [mailto:luiz.dentz@gmail.com]
-> Sent: Friday, November 28, 2014 2:07 PM
+> Sent: Friday, November 28, 2014 2:08 PM
 > To: Vikrampal Yadav
 > Cc: linux-bluetooth@vger.kernel.org; Dmitry Kasatkin; cpgs@samsung.com
-> Subject: Re: [PATCH 0/7] L2CAP control field + AVRCP browsing PDU parsing
+> Subject: Re: [PATCH 1/7] monitor: Adjust for ERTM control bytes
 > 
 > Hi Vikram,
 > 
 > On Fri, Nov 21, 2014 at 3:47 PM, Vikrampal Yadav
 > <vikram.pal@samsung.com> wrote:
-> > Support for ERTM control bytes adjustment, parsing L2CAP extended
-> > control field and AVRCP SetBrowsedPlayer added in Bluetooth monitor.
+> > Adjustment for ERTM control bytes fixed.
+> > ---
+> >  monitor/l2cap.c | 3 +++
+> >  1 file changed, 3 insertions(+)
 > >
-> > Vikrampal Yadav (7):
-> >   monitor: Adjust for ERTM control bytes
-> >   monitor: Make the parameter name generic
-> >   monitor: Add functionality to store extented control in DB
-> >   monitor: Extract extended L2CAP extended control field
-> >   monitor: Add support for parsing L2CAP extended control field
-> >   monitor: Add support for parsing L2CAP control field
-> >   monitor: Add AVRCP SetBrowsedPlayer support
-> >
-> >  monitor/avctp.c |  86 +++++++++++++++++++-  monitor/l2cap.c | 242
-> > ++++++++++++++++++++++++++++++++++++++++++++++++++++++--
-> >  2 files changed, 322 insertions(+), 6 deletions(-)
-> >
+> > diff --git a/monitor/l2cap.c b/monitor/l2cap.c index ebdd20f..635b967
+> > 100644
+> > --- a/monitor/l2cap.c
+> > +++ b/monitor/l2cap.c
+> > @@ -2621,6 +2621,9 @@ static void l2cap_frame(uint16_t index, bool in,
+> uint16_t handle,
+> >                 connless_packet(index, in, handle, cid, data, size);
+> >                 break;
+> >         case 0x0003:
+> > +               /* Adjust for ERTM control bytes */
+> > +               data += 2;
+> > +               size -= 2;
+> >                 amp_packet(index, in, handle, cid, data, size);
+> >                 break;
+> >         case 0x0004:
 > > --
 > > 1.9.1
 > 
-> Sorry for the delay, this one got lost in my inbox, most patches seems to be
-> missing the output they generate, could you please add it.
+> What are those bytes, shouldn't they be printed?
 
-Most patches in this series are helper patches for the last patch in this series.
-The final patch actually prints the output which shows the work done by
-Other patches.
+These bytes are not being printed even in hcidump.
 > 
 > 
 > --
