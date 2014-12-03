@@ -1,74 +1,88 @@
 Return-Path: <cyrus@holtmann.org>
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Simplify Link Key Notification event handling logic
-Date: Wed,  3 Dec 2014 11:03:06 +0200
-Message-Id: <1417597386-24060-1-git-send-email-johan.hedberg@gmail.com>
+From: Vikrampal <vikram.pal@samsung.com>
+To: 'Luiz Augusto von Dentz' <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	'Dmitry Kasatkin' <d.kasatkin@samsung.com>, cpgs@samsung.com
+References: <1416577665-21876-1-git-send-email-vikram.pal@samsung.com>
+ <CABBYNZJSxCADaEU5XLRaTUGY0AGu+8s_B+ojSAymszWiJNDNiw@mail.gmail.com>
+ <003e01d00ec8$0b325380$2196fa80$@samsung.com>
+ <CABBYNZ+ZdgJMc3crttio_oo2KbeHNxu6xB+cpsWTfLfhLjB8yQ@mail.gmail.com>
+In-reply-to: <CABBYNZ+ZdgJMc3crttio_oo2KbeHNxu6xB+cpsWTfLfhLjB8yQ@mail.gmail.com>
+Subject: RE: [PATCH 0/7] L2CAP control field + AVRCP browsing PDU parsing
+Date: Wed, 03 Dec 2014 14:27:34 +0530
+Message-id: <005701d00ed7$32d17650$987462f0$@samsung.com>
+MIME-version: 1.0
+Content-type: text/plain; charset=utf-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@intel.com>
+Hi Luiz,
 
-When we get a Link Key Notification HCI event we should already have a
-hci_conn object. This should have been created either in the Connection
-Request event handler, the hci_connect_acl() function or the
-hci_cs_create_conn() function (if the request was not sent by the
-kernel).
+> -----Original Message-----
+> From: Luiz Augusto von Dentz [mailto:luiz.dentz@gmail.com]
+> Sent: Wednesday, December 03, 2014 1:32 PM
+> To: Vikrampal
+> Cc: linux-bluetooth@vger.kernel.org; Dmitry Kasatkin; cpgs@samsung.com
+> Subject: Re: [PATCH 0/7] L2CAP control field + AVRCP browsing PDU parsing
+> 
+> Hi Vikram,
+> 
+> On Wed, Dec 3, 2014 at 9:08 AM, Vikrampal <vikram.pal@samsung.com>
+> wrote:
+> > Hi Luiz,
+> >
+> >> -----Original Message-----
+> >> From: Luiz Augusto von Dentz [mailto:luiz.dentz@gmail.com]
+> >> Sent: Friday, November 28, 2014 2:07 PM
+> >> To: Vikrampal Yadav
+> >> Cc: linux-bluetooth@vger.kernel.org; Dmitry Kasatkin;
+> >> cpgs@samsung.com
+> >> Subject: Re: [PATCH 0/7] L2CAP control field + AVRCP browsing PDU
+> >> parsing
+> >>
+> >> Hi Vikram,
+> >>
+> >> On Fri, Nov 21, 2014 at 3:47 PM, Vikrampal Yadav
+> >> <vikram.pal@samsung.com> wrote:
+> >> > Support for ERTM control bytes adjustment, parsing L2CAP extended
+> >> > control field and AVRCP SetBrowsedPlayer added in Bluetooth monitor.
+> >> >
+> >> > Vikrampal Yadav (7):
+> >> >   monitor: Adjust for ERTM control bytes
+> >> >   monitor: Make the parameter name generic
+> >> >   monitor: Add functionality to store extented control in DB
+> >> >   monitor: Extract extended L2CAP extended control field
+> >> >   monitor: Add support for parsing L2CAP extended control field
+> >> >   monitor: Add support for parsing L2CAP control field
+> >> >   monitor: Add AVRCP SetBrowsedPlayer support
+> >> >
+> >> >  monitor/avctp.c |  86 +++++++++++++++++++-  monitor/l2cap.c | 242
+> >> > ++++++++++++++++++++++++++++++++++++++++++++++++++++++--
+> >> >  2 files changed, 322 insertions(+), 6 deletions(-)
+> >> >
+> >> > --
+> >> > 1.9.1
+> >>
+> >> Sorry for the delay, this one got lost in my inbox, most patches
+> >> seems to be missing the output they generate, could you please add it.
+> >
+> > Most patches in this series are helper patches for the last patch in this
+> series.
+> > The final patch actually prints the output which shows the work done
+> > by Other patches.
+> 
+> Actually from patch 4/7 onward they all print different output and I
+> remember commenting before that I want to see then in the patches so we
+> can avoid format errors, typos etc.
 
-Since the only case that we'd end up not having a hci_conn in the Link
-Key Notification event handler would be essentially broken hardware it's
-safe to simply bail out from the function if this happens.
+Oh! I have not pasted the output even in the final patch definition. I'm thinking
+that I've done that. My mistake! I'll paste the final output which will comprise the
+outputs from all the patches combined.
 
-Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
----
- net/bluetooth/hci_event.c | 25 ++++++++++++++-----------
- 1 file changed, 14 insertions(+), 11 deletions(-)
+> 
+> --
+> Luiz Augusto von Dentz
 
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index bd0a80120665..d76d4f821189 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -3294,12 +3294,14 @@ static void hci_link_key_notify_evt(struct hci_dev *hdev, struct sk_buff *skb)
- 	hci_dev_lock(hdev);
- 
- 	conn = hci_conn_hash_lookup_ba(hdev, ACL_LINK, &ev->bdaddr);
--	if (conn) {
--		hci_conn_hold(conn);
--		conn->disc_timeout = HCI_DISCONN_TIMEOUT;
--		hci_conn_drop(conn);
--		conn_set_key(conn, ev->key_type, conn->pin_length);
--	}
-+	if (!conn)
-+		goto unlock;
-+
-+	hci_conn_hold(conn);
-+	conn->disc_timeout = HCI_DISCONN_TIMEOUT;
-+	hci_conn_drop(conn);
-+
-+	conn_set_key(conn, ev->key_type, conn->pin_length);
- 
- 	if (!test_bit(HCI_MGMT, &hdev->dev_flags))
- 		goto unlock;
-@@ -3326,13 +3328,14 @@ static void hci_link_key_notify_evt(struct hci_dev *hdev, struct sk_buff *skb)
- 	    !test_bit(HCI_KEEP_DEBUG_KEYS, &hdev->dev_flags)) {
- 		list_del_rcu(&key->list);
- 		kfree_rcu(key, rcu);
--	} else if (conn) {
--		if (persistent)
--			clear_bit(HCI_CONN_FLUSH_KEY, &conn->flags);
--		else
--			set_bit(HCI_CONN_FLUSH_KEY, &conn->flags);
-+		goto unlock;
- 	}
- 
-+	if (persistent)
-+		clear_bit(HCI_CONN_FLUSH_KEY, &conn->flags);
-+	else
-+		set_bit(HCI_CONN_FLUSH_KEY, &conn->flags);
-+
- unlock:
- 	hci_dev_unlock(hdev);
- }
--- 
-2.1.0
+Regards,
+Vikram
 
