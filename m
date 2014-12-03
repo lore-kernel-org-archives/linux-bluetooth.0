@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Johan Hedberg <johan.hedberg@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 23/49] Bluetooth: Track authentication method in SMP context
-Date: Wed,  3 Dec 2014 17:02:17 +0200
-Message-Id: <1417618963-18010-24-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH 22/49] Bluetooth: Add support for LE SC key generation
+Date: Wed,  3 Dec 2014 17:02:16 +0200
+Message-Id: <1417618963-18010-23-git-send-email-johan.hedberg@gmail.com>
 In-Reply-To: <1417618963-18010-1-git-send-email-johan.hedberg@gmail.com>
 References: <1417618963-18010-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,106 +11,113 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-For Secure Connections we'll select the authentication method as soon as
-we receive the public key, but only use it later (both when actually
-triggering the method as well as when determining the quality of the
-resulting LTK). Store the method therefore in the SMP context.
+As the last step of the LE SC pairing process it's time to generate and
+distribute keys. The generation part is unique to LE SC and so this
+patch adds a dedicated function for it. We also clear the distribution
+bits for keys which are not distributed with LE SC, so that the code
+shared with legacy SMP will not go ahead and try to distribute them.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- net/bluetooth/smp.c | 32 +++++++++++++++++---------------
- 1 file changed, 17 insertions(+), 15 deletions(-)
+ net/bluetooth/smp.c | 57 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 57 insertions(+)
 
 diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
-index 816cbb63b68b..651963f26da0 100644
+index a759105b252c..816cbb63b68b 100644
 --- a/net/bluetooth/smp.c
 +++ b/net/bluetooth/smp.c
-@@ -79,6 +79,7 @@ struct smp_chan {
+@@ -77,6 +77,7 @@ struct smp_chan {
+ 	struct smp_ltk	*ltk;
+ 	struct smp_ltk	*slave_ltk;
  	struct smp_irk	*remote_irk;
- 	u8		*link_key;
++	u8		*link_key;
  	unsigned long	flags;
-+	u8		method;
  
  	/* Secure Connections variables */
- 	u8			local_pk[64];
-@@ -688,7 +689,6 @@ static int tk_request(struct l2cap_conn *conn, u8 remote_oob, u8 auth,
- 	struct hci_conn *hcon = conn->hcon;
- 	struct l2cap_chan *chan = conn->smp;
- 	struct smp_chan *smp = chan->data;
--	u8 method;
- 	u32 passkey = 0;
- 	int ret = 0;
+@@ -321,6 +322,22 @@ static int smp_e(struct crypto_blkcipher *tfm, const u8 *k, u8 *r)
+ 	return err;
+ }
  
-@@ -705,26 +705,28 @@ static int tk_request(struct l2cap_conn *conn, u8 remote_oob, u8 auth,
- 	 * table.
- 	 */
- 	if (!(auth & SMP_AUTH_MITM))
--		method = JUST_CFM;
-+		smp->method = JUST_CFM;
- 	else
--		method = get_auth_method(smp, local_io, remote_io);
-+		smp->method = get_auth_method(smp, local_io, remote_io);
++static int smp_h6(struct crypto_hash *tfm_cmac, const u8 w[16],
++		  const u8 key_id[4], u8 res[16])
++{
++	int err;
++
++	BT_DBG("w %16phN key_id %4phN", w, key_id);
++
++	err = aes_cmac(tfm_cmac, w, key_id, 4, res);
++	if (err)
++		return err;
++
++	BT_DBG("res %16phN", res);
++
++	return err;
++}
++
+ static int smp_ah(struct crypto_blkcipher *tfm, u8 irk[16], u8 r[3], u8 res[3])
+ {
+ 	u8 _res[16];
+@@ -594,6 +611,7 @@ static void smp_chan_destroy(struct l2cap_conn *conn)
  
- 	/* Don't confirm locally initiated pairing attempts */
--	if (method == JUST_CFM && test_bit(SMP_FLAG_INITIATOR, &smp->flags))
--		method = JUST_WORKS;
-+	if (smp->method == JUST_CFM && test_bit(SMP_FLAG_INITIATOR,
-+						&smp->flags))
-+		smp->method = JUST_WORKS;
+ 	kfree(smp->csrk);
+ 	kfree(smp->slave_csrk);
++	kfree(smp->link_key);
  
- 	/* Don't bother user space with no IO capabilities */
--	if (method == JUST_CFM && hcon->io_capability == HCI_IO_NO_INPUT_OUTPUT)
--		method = JUST_WORKS;
-+	if (smp->method == JUST_CFM &&
-+	    hcon->io_capability == HCI_IO_NO_INPUT_OUTPUT)
-+		smp->method = JUST_WORKS;
+ 	crypto_free_blkcipher(smp->tfm_aes);
+ 	crypto_free_hash(smp->tfm_cmac);
+@@ -907,6 +925,37 @@ static void smp_notify_keys(struct l2cap_conn *conn)
+ 		bacpy(&smp->slave_ltk->bdaddr, &hcon->dst);
+ 		mgmt_new_ltk(hdev, smp->slave_ltk, persistent);
+ 	}
++
++	if (smp->link_key) {
++		hci_add_link_key(hdev, smp->conn->hcon, &hcon->dst,
++				 smp->link_key, HCI_LK_AUTH_COMBINATION_P256,
++				 0, NULL);
++	}
++}
++
++static void sc_generate_link_key(struct smp_chan *smp)
++{
++	/* These constants are as specified in the core specification.
++	 * In ASCII they spell out to 'tmp1' and 'lebr'.
++	 */
++	const u8 tmp1[4] = { 0x31, 0x70, 0x6d, 0x74 };
++	const u8 lebr[4] = { 0x72, 0x62, 0x65, 0x6c };
++
++	smp->link_key = kzalloc(16, GFP_KERNEL);
++	if (!smp->link_key)
++		return;
++
++	if (smp_h6(smp->tfm_cmac, smp->tk, tmp1, smp->link_key)) {
++		kfree(smp->link_key);
++		smp->link_key = NULL;
++		return;
++	}
++
++	if (smp_h6(smp->tfm_cmac, smp->link_key, lebr, smp->link_key)) {
++		kfree(smp->link_key);
++		smp->link_key = NULL;
++		return;
++	}
+ }
  
- 	/* If Just Works, Continue with Zero TK */
--	if (method == JUST_WORKS) {
-+	if (smp->method == JUST_WORKS) {
- 		set_bit(SMP_FLAG_TK_VALID, &smp->flags);
- 		return 0;
+ static void smp_allow_key_dist(struct smp_chan *smp)
+@@ -951,6 +1000,14 @@ static void smp_distribute_keys(struct smp_chan *smp)
+ 		*keydist &= req->resp_key_dist;
  	}
  
- 	/* Not Just Works/Confirm results in MITM Authentication */
--	if (method != JUST_CFM) {
-+	if (smp->method != JUST_CFM) {
- 		set_bit(SMP_FLAG_MITM_AUTH, &smp->flags);
- 		if (hcon->pending_sec_level < BT_SECURITY_HIGH)
- 			hcon->pending_sec_level = BT_SECURITY_HIGH;
-@@ -733,15 +735,15 @@ static int tk_request(struct l2cap_conn *conn, u8 remote_oob, u8 auth,
- 	/* If both devices have Keyoard-Display I/O, the master
- 	 * Confirms and the slave Enters the passkey.
- 	 */
--	if (method == OVERLAP) {
-+	if (smp->method == OVERLAP) {
- 		if (hcon->role == HCI_ROLE_MASTER)
--			method = CFM_PASSKEY;
-+			smp->method = CFM_PASSKEY;
- 		else
--			method = REQ_PASSKEY;
-+			smp->method = REQ_PASSKEY;
- 	}
++	if (test_bit(SMP_FLAG_SC, &smp->flags)) {
++		if (*keydist & SMP_DIST_LINK_KEY)
++			sc_generate_link_key(smp);
++
++		/* Clear the keys which are generated but not distributed */
++		*keydist &= ~SMP_SC_NO_DIST;
++	}
++
+ 	BT_DBG("keydist 0x%x", *keydist);
  
- 	/* Generate random passkey. */
--	if (method == CFM_PASSKEY) {
-+	if (smp->method == CFM_PASSKEY) {
- 		memset(smp->tk, 0, sizeof(smp->tk));
- 		get_random_bytes(&passkey, sizeof(passkey));
- 		passkey %= 1000000;
-@@ -750,10 +752,10 @@ static int tk_request(struct l2cap_conn *conn, u8 remote_oob, u8 auth,
- 		set_bit(SMP_FLAG_TK_VALID, &smp->flags);
- 	}
- 
--	if (method == REQ_PASSKEY)
-+	if (smp->method == REQ_PASSKEY)
- 		ret = mgmt_user_passkey_request(hcon->hdev, &hcon->dst,
- 						hcon->type, hcon->dst_type);
--	else if (method == JUST_CFM)
-+	else if (smp->method == JUST_CFM)
- 		ret = mgmt_user_confirm_request(hcon->hdev, &hcon->dst,
- 						hcon->type, hcon->dst_type,
- 						passkey, 1);
+ 	if (*keydist & SMP_DIST_ENC_KEY) {
 -- 
 2.1.0
 
