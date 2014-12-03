@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Johan Hedberg <johan.hedberg@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 43/49] Bluetooth: Add basic LE SC OOB support for remote OOB data
-Date: Wed,  3 Dec 2014 17:02:37 +0200
-Message-Id: <1417618963-18010-44-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH 44/49] Bluetooth: Introduce SMP_DBG macro for low-level debuging
+Date: Wed,  3 Dec 2014 17:02:38 +0200
+Message-Id: <1417618963-18010-45-git-send-email-johan.hedberg@gmail.com>
 In-Reply-To: <1417618963-18010-1-git-send-email-johan.hedberg@gmail.com>
 References: <1417618963-18010-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,114 +11,201 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-This patch adds basic OOB pairing support when we've received the remote
-OOB data. This includes tracking the remote r value (in smp->rr) as well
-as doing the appropriate f4() call when needed. Previously the OOB rand
-would have been stored in smp->rrnd however these are actually two
-independent values so we need separate variables for them. Na/Nb in the
-spec maps to smp->prnd/rrnd and ra/rb maps to smp->rr with smp->pr to
-come once local OOB data is supported.
+The various inputs & outputs of the crypto functions as well as the
+values of the ECDH keys can be considered security sensitive. They
+should therefore not end up in dmesg by mistake. This patch introduces a
+new SMP_DBG macro which requires explicit compilation with -DDEBUG to be
+enabled. All crypto related data logs now use this macro instead of
+BT_DBG.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- net/bluetooth/smp.c | 38 ++++++++++++++++++++++++++++++++++++--
- 1 file changed, 36 insertions(+), 2 deletions(-)
+ net/bluetooth/smp.c | 68 +++++++++++++++++++++++++++++++----------------------
+ 1 file changed, 40 insertions(+), 28 deletions(-)
 
 diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
-index a38541d079f5..62ca2aaf72fa 100644
+index 62ca2aaf72fa..7839354592f4 100644
 --- a/net/bluetooth/smp.c
 +++ b/net/bluetooth/smp.c
-@@ -71,6 +71,7 @@ struct smp_chan {
- 	u8		rrnd[16]; /* SMP Pairing Random (remote) */
- 	u8		pcnf[16]; /* SMP Pairing Confirm */
- 	u8		tk[16]; /* SMP Temporary Key */
-+	u8		rr[16];
- 	u8		enc_key_size;
- 	u8		remote_key_dist;
- 	bdaddr_t	id_addr;
-@@ -599,7 +600,7 @@ static void build_pairing_cmd(struct l2cap_conn *conn,
- 		if (oob_data) {
- 			set_bit(SMP_FLAG_OOB, &smp->flags);
- 			oob_flag = SMP_OOB_PRESENT;
--			memcpy(smp->rrnd, oob_data->rand256, 16);
-+			memcpy(smp->rr, oob_data->rand256, 16);
- 			memcpy(smp->pcnf, oob_data->hash256, 16);
+@@ -32,6 +32,18 @@
+ #include "ecc.h"
+ #include "smp.h"
+ 
++/* Low-level debug macros to be used for stuff that we don't want
++ * accidentially in dmesg, i.e. the values of the various crypto keys
++ * and the inputs & outputs of crypto functions.
++ */
++#ifdef DEBUG
++#define SMP_DBG(fmt, ...) printk(KERN_DEBUG "%s: " fmt, __func__, \
++				 ##__VA_ARGS__)
++#else
++#define SMP_DBG(fmt, ...) no_printk(KERN_DEBUG "%s: " fmt, __func__, \
++				    ##__VA_ARGS__)
++#endif
++
+ #define SMP_ALLOW_CMD(smp, code)	set_bit(code, &smp->allow_cmd)
+ 
+ /* Keys which are not distributed with Secure Connections */
+@@ -154,8 +166,8 @@ static int aes_cmac(struct crypto_hash *tfm, const u8 k[16], const u8 *m,
+ 	swap_buf(k, tmp, 16);
+ 	swap_buf(m, msg_msb, len);
+ 
+-	BT_DBG("msg (len %zu) %*phN", len, len, m);
+-	BT_DBG("key %16phN", k);
++	SMP_DBG("msg (len %zu) %*phN", len, len, m);
++	SMP_DBG("key %16phN", k);
+ 
+ 	err = crypto_hash_setkey(tfm, tmp, 16);
+ 	if (err) {
+@@ -179,7 +191,7 @@ static int aes_cmac(struct crypto_hash *tfm, const u8 k[16], const u8 *m,
+ 
+ 	swap_buf(mac_msb, mac, 16);
+ 
+-	BT_DBG("mac %16phN", mac);
++	SMP_DBG("mac %16phN", mac);
+ 
+ 	return 0;
+ }
+@@ -190,9 +202,9 @@ static int smp_f4(struct crypto_hash *tfm_cmac, const u8 u[32], const u8 v[32],
+ 	u8 m[65];
+ 	int err;
+ 
+-	BT_DBG("u %32phN", u);
+-	BT_DBG("v %32phN", v);
+-	BT_DBG("x %16phN z %02x", x, z);
++	SMP_DBG("u %32phN", u);
++	SMP_DBG("v %32phN", v);
++	SMP_DBG("x %16phN z %02x", x, z);
+ 
+ 	m[0] = z;
+ 	memcpy(m + 1, v, 32);
+@@ -202,7 +214,7 @@ static int smp_f4(struct crypto_hash *tfm_cmac, const u8 u[32], const u8 v[32],
+ 	if (err)
+ 		return err;
+ 
+-	BT_DBG("res %16phN", res);
++	SMP_DBG("res %16phN", res);
+ 
+ 	return err;
+ }
+@@ -223,15 +235,15 @@ static int smp_f5(struct crypto_hash *tfm_cmac, u8 w[32], u8 n1[16], u8 n2[16],
+ 	u8 m[53], t[16];
+ 	int err;
+ 
+-	BT_DBG("w %32phN", w);
+-	BT_DBG("n1 %16phN n2 %16phN", n1, n2);
+-	BT_DBG("a1 %7phN a2 %7phN", a1, a2);
++	SMP_DBG("w %32phN", w);
++	SMP_DBG("n1 %16phN n2 %16phN", n1, n2);
++	SMP_DBG("a1 %7phN a2 %7phN", a1, a2);
+ 
+ 	err = aes_cmac(tfm_cmac, salt, w, 32, t);
+ 	if (err)
+ 		return err;
+ 
+-	BT_DBG("t %16phN", t);
++	SMP_DBG("t %16phN", t);
+ 
+ 	memcpy(m, length, 2);
+ 	memcpy(m + 2, a2, 7);
+@@ -246,7 +258,7 @@ static int smp_f5(struct crypto_hash *tfm_cmac, u8 w[32], u8 n1[16], u8 n2[16],
+ 	if (err)
+ 		return err;
+ 
+-	BT_DBG("mackey %16phN", mackey);
++	SMP_DBG("mackey %16phN", mackey);
+ 
+ 	m[52] = 1; /* Counter */
+ 
+@@ -254,7 +266,7 @@ static int smp_f5(struct crypto_hash *tfm_cmac, u8 w[32], u8 n1[16], u8 n2[16],
+ 	if (err)
+ 		return err;
+ 
+-	BT_DBG("ltk %16phN", ltk);
++	SMP_DBG("ltk %16phN", ltk);
+ 
+ 	return 0;
+ }
+@@ -267,9 +279,9 @@ static int smp_f6(struct crypto_hash *tfm_cmac, const u8 w[16],
+ 	u8 m[65];
+ 	int err;
+ 
+-	BT_DBG("w %16phN", w);
+-	BT_DBG("n1 %16phN n2 %16phN", n1, n2);
+-	BT_DBG("r %16phN io_cap %3phN a1 %7phN a2 %7phN", r, io_cap, a1, a2);
++	SMP_DBG("w %16phN", w);
++	SMP_DBG("n1 %16phN n2 %16phN", n1, n2);
++	SMP_DBG("r %16phN io_cap %3phN a1 %7phN a2 %7phN", r, io_cap, a1, a2);
+ 
+ 	memcpy(m, a2, 7);
+ 	memcpy(m + 7, a1, 7);
+@@ -293,9 +305,9 @@ static int smp_g2(struct crypto_hash *tfm_cmac, const u8 u[32], const u8 v[32],
+ 	u8 m[80], tmp[16];
+ 	int err;
+ 
+-	BT_DBG("u %32phN", u);
+-	BT_DBG("v %32phN", v);
+-	BT_DBG("x %16phN y %16phN", x, y);
++	SMP_DBG("u %32phN", u);
++	SMP_DBG("v %32phN", v);
++	SMP_DBG("x %16phN y %16phN", x, y);
+ 
+ 	memcpy(m, y, 16);
+ 	memcpy(m + 16, v, 32);
+@@ -308,7 +320,7 @@ static int smp_g2(struct crypto_hash *tfm_cmac, const u8 u[32], const u8 v[32],
+ 	*val = get_unaligned_le32(tmp);
+ 	*val %= 1000000;
+ 
+-	BT_DBG("val %06u", *val);
++	SMP_DBG("val %06u", *val);
+ 
+ 	return 0;
+ }
+@@ -357,13 +369,13 @@ static int smp_h6(struct crypto_hash *tfm_cmac, const u8 w[16],
+ {
+ 	int err;
+ 
+-	BT_DBG("w %16phN key_id %4phN", w, key_id);
++	SMP_DBG("w %16phN key_id %4phN", w, key_id);
+ 
+ 	err = aes_cmac(tfm_cmac, w, key_id, 4, res);
+ 	if (err)
+ 		return err;
+ 
+-	BT_DBG("res %16phN", res);
++	SMP_DBG("res %16phN", res);
+ 
+ 	return err;
+ }
+@@ -1742,9 +1754,9 @@ static u8 sc_send_public_key(struct smp_chan *smp)
  		}
- 
-@@ -1334,6 +1335,9 @@ static void sc_dhkey_check(struct smp_chan *smp)
- 	if (smp->method == REQ_PASSKEY || smp->method == DSP_PASSKEY)
- 		put_unaligned_le32(hcon->passkey_notify, r);
- 
-+	if (smp->method == REQ_OOB)
-+		memcpy(r, smp->rr, 16);
-+
- 	smp_f6(smp->tfm_cmac, smp->mackey, smp->prnd, smp->rrnd, r, io_cap,
- 	       local_addr, remote_addr, check.e);
- 
-@@ -1910,6 +1914,14 @@ static u8 smp_cmd_pairing_random(struct l2cap_conn *conn, struct sk_buff *skb)
- 	if (!test_bit(SMP_FLAG_SC, &smp->flags))
- 		return smp_random(smp);
- 
-+	if (smp->method == REQ_OOB) {
-+		if (!hcon->out)
-+			smp_send_cmd(conn, SMP_CMD_PAIRING_RANDOM,
-+				     sizeof(smp->prnd), smp->prnd);
-+		SMP_ALLOW_CMD(smp, SMP_CMD_DHKEY_CHECK);
-+		goto mackey_and_ltk;
-+	}
-+
- 	/* Passkey entry has special treatment */
- 	if (smp->method == REQ_PASSKEY || smp->method == DSP_PASSKEY)
- 		return sc_passkey_round(smp, SMP_CMD_PAIRING_RANDOM);
-@@ -1940,12 +1952,13 @@ static u8 smp_cmd_pairing_random(struct l2cap_conn *conn, struct sk_buff *skb)
- 		nb   = smp->prnd;
  	}
  
-+mackey_and_ltk:
- 	/* Generate MacKey and LTK */
- 	err = sc_mackey_and_ltk(smp, smp->mackey, smp->tk);
- 	if (err)
+-	BT_DBG("Local Public Key X: %32phN", smp->local_pk);
+-	BT_DBG("Local Public Key Y: %32phN", &smp->local_pk[32]);
+-	BT_DBG("Local Private Key:  %32phN", smp->local_sk);
++	SMP_DBG("Local Public Key X: %32phN", smp->local_pk);
++	SMP_DBG("Local Public Key Y: %32phN", &smp->local_pk[32]);
++	SMP_DBG("Local Private Key:  %32phN", smp->local_sk);
+ 
+ 	smp_send_cmd(smp->conn, SMP_CMD_PUBLIC_KEY, 64, smp->local_pk);
+ 
+@@ -2390,13 +2402,13 @@ static int smp_cmd_public_key(struct l2cap_conn *conn, struct sk_buff *skb)
+ 			return err;
+ 	}
+ 
+-	BT_DBG("Remote Public Key X: %32phN", smp->remote_pk);
+-	BT_DBG("Remote Public Key Y: %32phN", &smp->remote_pk[32]);
++	SMP_DBG("Remote Public Key X: %32phN", smp->remote_pk);
++	SMP_DBG("Remote Public Key Y: %32phN", &smp->remote_pk[32]);
+ 
+ 	if (!ecdh_shared_secret(smp->remote_pk, smp->local_sk, smp->dhkey))
  		return SMP_UNSPECIFIED;
  
--	if (smp->method == JUST_WORKS) {
-+	if (smp->method == JUST_WORKS || smp->method == REQ_OOB) {
- 		if (hcon->out) {
- 			sc_dhkey_check(smp);
- 			SMP_ALLOW_CMD(smp, SMP_CMD_DHKEY_CHECK);
-@@ -2314,6 +2327,9 @@ static u8 sc_select_method(struct smp_chan *smp)
- 	struct smp_cmd_pairing *local, *remote;
- 	u8 local_mitm, remote_mitm, local_io, remote_io, method;
+-	BT_DBG("DHKey %32phN", smp->dhkey);
++	SMP_DBG("DHKey %32phN", smp->dhkey);
  
-+	if (test_bit(SMP_FLAG_OOB, &smp->flags))
-+		return REQ_OOB;
-+
- 	/* The preq/prsp contain the raw Pairing Request/Response PDUs
- 	 * which are needed as inputs to some crypto functions. To get
- 	 * the "struct smp_cmd_pairing" from them we need to skip the
-@@ -2412,6 +2428,24 @@ static int smp_cmd_public_key(struct l2cap_conn *conn, struct sk_buff *skb)
- 		return sc_passkey_round(smp, SMP_CMD_PUBLIC_KEY);
- 	}
- 
-+	if (smp->method == REQ_OOB) {
-+		err = smp_f4(smp->tfm_cmac, smp->remote_pk, smp->remote_pk,
-+			     smp->rr, 0, cfm.confirm_val);
-+		if (err)
-+			return SMP_UNSPECIFIED;
-+
-+		if (memcmp(cfm.confirm_val, smp->pcnf, 16))
-+			return SMP_CONFIRM_FAILED;
-+
-+		if (hcon->out)
-+			smp_send_cmd(conn, SMP_CMD_PAIRING_RANDOM,
-+				     sizeof(smp->prnd), smp->prnd);
-+
-+		SMP_ALLOW_CMD(smp, SMP_CMD_PAIRING_RANDOM);
-+
-+		return 0;
-+	}
-+
- 	if (hcon->out)
- 		SMP_ALLOW_CMD(smp, SMP_CMD_PAIRING_CONFIRM);
+ 	set_bit(SMP_FLAG_REMOTE_PK, &smp->flags);
  
 -- 
 2.1.0
