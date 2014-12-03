@@ -1,97 +1,79 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/7] android/client: Add support for gattc multi_adv_set_inst_data cmd
-Date: Wed, 03 Dec 2014 09:22:19 +0100
-Message-ID: <2704867.Npi1VXrQLu@uw000953>
-In-Reply-To: <1417162925-17511-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
-References: <1417162925-17511-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <003d01d00ec7$976a6f00$c63f4d00$@samsung.com>
+References: <1416577665-21876-1-git-send-email-vikram.pal@samsung.com>
+	<1416577665-21876-2-git-send-email-vikram.pal@samsung.com>
+	<CABBYNZLhEKz3GQRg-NgwC=tEorV_ygV+FmR_65_r7Bx6tZzSxw@mail.gmail.com>
+	<003d01d00ec7$976a6f00$c63f4d00$@samsung.com>
+Date: Wed, 3 Dec 2014 10:20:39 +0200
+Message-ID: <CABBYNZK8F+2sSeBBK6LRyOGTZ9pMNt=RaXpu7Z8zBrHEjkTETg@mail.gmail.com>
+Subject: Re: [PATCH 1/7] monitor: Adjust for ERTM control bytes
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Vikrampal <vikram.pal@samsung.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	Dmitry Kasatkin <d.kasatkin@samsung.com>, cpgs@samsung.com
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Grzegorz,
+Hi Vikram,
 
-On Friday 28 of November 2014 09:21:59 Grzegorz Kolodziejczyk wrote:
-> ---
->  android/client/if-gatt.c | 51 ++++++++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 51 insertions(+)
-> 
-> diff --git a/android/client/if-gatt.c b/android/client/if-gatt.c
-> index fa17eb2..5072f91 100644
-> --- a/android/client/if-gatt.c
-> +++ b/android/client/if-gatt.c
-> @@ -1962,6 +1962,53 @@ static void multi_adv_update_p(int argc, const char **argv)
->  	EXEC(if_gatt->client->multi_adv_update, client_if, min_interval,
->  			max_interval, adv_type, chnl_map, tx_power, timeout_s);
->  }
-> +
-> +/* set advertising data */
-> +static void multi_adv_set_inst_data_c(int argc, const char **argv,
-> +					enum_func *enum_func, void **user)
-> +{
-> +	if (argc == 2) {
-> +		*user = client_if_str;
-> +		*enum_func = enum_one_string;
-> +	}
-> +}
-> +
-> +static void multi_adv_set_inst_data_p(int argc, const char **argv)
-> +{
-> +	int client_if;
-> +	bool set_scan_rsp;
-> +	bool include_name, include_txpower;
-> +	int appearance;
-> +	uint16_t manufacturer_len;
-> +	uint8_t manufacturer_data[100];
-> +	uint16_t service_data_len;
-> +	uint8_t service_data[100];
-> +	uint16_t service_uuid_len;
-> +	uint8_t service_uuid[100];
-> +
-> +	RETURN_IF_NULL(if_gatt);
-> +	VERIFY_CLIENT_IF(2, client_if);
-> +
-> +	/* set scan response */
-> +	if (argc >= 4)
-> +		set_scan_rsp = atoi(argv[3]);
-> +	/* include name */
-> +	if (argc >= 5)
-> +		include_name = atoi(argv[4]);
-> +	/* include txpower */
-> +	if (argc >= 6)
-> +		include_txpower = atoi(argv[5]);
-> +
-> +	VERIFY_APPEARANCE(6, appearance);
-> +	GET_VERIFY_HEX_STRING(7, manufacturer_data, manufacturer_len);
-> +	GET_VERIFY_HEX_STRING(8, service_data, service_data_len);
-> +	GET_VERIFY_HEX_STRING(9, service_uuid, service_uuid_len);
-> +
-> +	EXEC(if_gatt->client->multi_adv_set_inst_data, client_if, set_scan_rsp,
-> +		include_name, include_txpower, appearance, manufacturer_len,
-> +		(char *) manufacturer_data, service_data_len,
-> +		(char *) service_data, service_uuid_len, (char *) service_uuid);
-> +}
->  #endif
->  
->  /* get_device_type */
-> @@ -2055,6 +2102,10 @@ static struct method client_methods[] = {
->  	STD_METHODCH(multi_adv_update, "<client_if> <min_interval>"
->  			" <max_interval> <adv_type> <chnl_map> <tx_power>"
->  			" <timeout_s>"),
-> +	STD_METHODCH(multi_adv_set_inst_data, "<client_if> [<set_scan_rsp>]"
-> +			" <include_name> [<include_txpower>] <appearance>"
-> +			" [<manufacturer_data>] [<service_data>]"
-> +			" [<service_uuid>]"),
->  #else
->  	STD_METHODCH(scan, "<client_if> [1|0]"),
->  	STD_METHODCH(connect, "<client_if> <addr> [<is_direct>]"),
-> 
+On Wed, Dec 3, 2014 at 9:05 AM, Vikrampal <vikram.pal@samsung.com> wrote:
+> Hi Luiz,
+>
+>> -----Original Message-----
+>> From: Luiz Augusto von Dentz [mailto:luiz.dentz@gmail.com]
+>> Sent: Friday, November 28, 2014 2:08 PM
+>> To: Vikrampal Yadav
+>> Cc: linux-bluetooth@vger.kernel.org; Dmitry Kasatkin; cpgs@samsung.com
+>> Subject: Re: [PATCH 1/7] monitor: Adjust for ERTM control bytes
+>>
+>> Hi Vikram,
+>>
+>> On Fri, Nov 21, 2014 at 3:47 PM, Vikrampal Yadav
+>> <vikram.pal@samsung.com> wrote:
+>> > Adjustment for ERTM control bytes fixed.
+>> > ---
+>> >  monitor/l2cap.c | 3 +++
+>> >  1 file changed, 3 insertions(+)
+>> >
+>> > diff --git a/monitor/l2cap.c b/monitor/l2cap.c index ebdd20f..635b967
+>> > 100644
+>> > --- a/monitor/l2cap.c
+>> > +++ b/monitor/l2cap.c
+>> > @@ -2621,6 +2621,9 @@ static void l2cap_frame(uint16_t index, bool in,
+>> uint16_t handle,
+>> >                 connless_packet(index, in, handle, cid, data, size);
+>> >                 break;
+>> >         case 0x0003:
+>> > +               /* Adjust for ERTM control bytes */
+>> > +               data += 2;
+>> > +               size -= 2;
+>> >                 amp_packet(index, in, handle, cid, data, size);
+>> >                 break;
+>> >         case 0x0004:
+>> > --
+>> > 1.9.1
+>>
+>> What are those bytes, shouldn't they be printed?
+>
+> These bytes are not being printed even in hcidump.
 
-All patches applied (after fixing warning on KK in last patch), thanks.
+Which is probably wrong, this is the ERTM control bytes that should be
+parsed the same way regardless of the CID, hcidump apparently only
+parse ERTM control in case of Connection oriented channel and ignores
+the fact AMP Manager Channel also uses ERTM.
+
+>>
+>>
+>> --
+>> Luiz Augusto von Dentz
+>
+> Regards,
+> Vikram
+>
+
+
 
 -- 
-Best regards, 
-Szymon Janc
+Luiz Augusto von Dentz
