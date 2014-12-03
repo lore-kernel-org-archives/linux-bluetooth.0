@@ -2,128 +2,53 @@ Return-Path: <cyrus@holtmann.org>
 From: Arman Uguray <armansito@chromium.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Arman Uguray <armansito@chromium.org>
-Subject: [PATCH BlueZ v1 4/8] tools/btgatt-server: Add the "services" command
-Date: Tue,  2 Dec 2014 16:12:39 -0800
-Message-Id: <1417565563-29239-5-git-send-email-armansito@chromium.org>
+Subject: [PATCH BlueZ v1 1/8] shared/gatt-db: Add gatt_db_isempty.
+Date: Tue,  2 Dec 2014 16:12:36 -0800
+Message-Id: <1417565563-29239-2-git-send-email-armansito@chromium.org>
 In-Reply-To: <1417565563-29239-1-git-send-email-armansito@chromium.org>
 References: <1417565563-29239-1-git-send-email-armansito@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch adds the "services" command which displayes the currently
-stored services in the server database.
+Added the gatt_db_isempty function which returns true if the database
+is not populated with any services.
 ---
- tools/btgatt-server.c | 90 +++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 90 insertions(+)
+ src/shared/gatt-db.c | 8 ++++++++
+ src/shared/gatt-db.h | 2 ++
+ 2 files changed, 10 insertions(+)
 
-diff --git a/tools/btgatt-server.c b/tools/btgatt-server.c
-index 87b8067..a2a0ec9 100644
---- a/tools/btgatt-server.c
-+++ b/tools/btgatt-server.c
-@@ -883,6 +883,95 @@ static void cmd_heart_rate(struct server *server, char *cmd_str)
- 						pdu, 4, conf_cb, NULL, NULL);
+diff --git a/src/shared/gatt-db.c b/src/shared/gatt-db.c
+index b10db4a..238872c 100644
+--- a/src/shared/gatt-db.c
++++ b/src/shared/gatt-db.c
+@@ -205,6 +205,14 @@ void gatt_db_unref(struct gatt_db *db)
+ 	gatt_db_destroy(db);
  }
  
-+static void print_uuid(const bt_uuid_t *uuid)
++bool gatt_db_isempty(struct gatt_db *db)
 +{
-+	char uuid_str[MAX_LEN_UUID_STR];
-+	bt_uuid_t uuid128;
++	if (!db)
++		return true;
 +
-+	bt_uuid_to_uuid128(uuid, &uuid128);
-+	bt_uuid_to_string(&uuid128, uuid_str, sizeof(uuid_str));
-+
-+	printf("%s\n", uuid_str);
++	return queue_isempty(db->services);
 +}
 +
-+static void print_incl(struct gatt_db_attribute *attr, void *user_data)
-+{
-+	struct server *server = user_data;
-+	uint16_t handle, start, end;
-+	struct gatt_db_attribute *service;
-+	bt_uuid_t uuid;
-+
-+	if (!gatt_db_attribute_get_incl_data(attr, &handle, &start, &end))
-+		return;
-+
-+	service = gatt_db_get_attribute(server->db, start);
-+	if (!service)
-+		return;
-+
-+	gatt_db_attribute_get_service_uuid(service, &uuid);
-+
-+	printf("\t  " COLOR_GREEN "include" COLOR_OFF " - handle: "
-+					"0x%04x, - start: 0x%04x, end: 0x%04x,"
-+					"uuid: ", handle, start, end);
-+	print_uuid(&uuid);
-+}
-+
-+static void print_desc(struct gatt_db_attribute *attr, void *user_data)
-+{
-+	printf("\t\t  " COLOR_MAGENTA "descr" COLOR_OFF
-+					" - handle: 0x%04x, uuid: ",
-+					gatt_db_attribute_get_handle(attr));
-+	print_uuid(gatt_db_attribute_get_type(attr));
-+}
-+
-+static void print_chrc(struct gatt_db_attribute *attr, void *user_data)
-+{
-+	uint16_t handle, value_handle;
-+	uint8_t properties;
-+	bt_uuid_t uuid;
-+
-+	if (!gatt_db_attribute_get_char_data(attr, &handle,
-+								&value_handle,
-+								&properties,
-+								&uuid))
-+		return;
-+
-+	printf("\t  " COLOR_YELLOW "charac" COLOR_OFF
-+					" - start: 0x%04x, value: 0x%04x, "
-+					"props: 0x%02x, uuid: ",
-+					handle, value_handle, properties);
-+	print_uuid(&uuid);
-+
-+	gatt_db_service_foreach_desc(attr, print_desc, NULL);
-+}
-+
-+static void print_service(struct gatt_db_attribute *attr, void *user_data)
-+{
-+	struct server *server = user_data;
-+	uint16_t start, end;
-+	bool primary;
-+	bt_uuid_t uuid;
-+
-+	if (!gatt_db_attribute_get_service_data(attr, &start, &end, &primary,
-+									&uuid))
-+		return;
-+
-+	printf(COLOR_RED "service" COLOR_OFF " - start: 0x%04x, "
-+				"end: 0x%04x, type: %s, uuid: ",
-+				start, end, primary ? "primary" : "secondary");
-+	print_uuid(&uuid);
-+
-+	gatt_db_service_foreach_incl(attr, print_incl, server);
-+	gatt_db_service_foreach_char(attr, print_chrc, NULL);
-+
-+	printf("\n");
-+}
-+
-+static void cmd_services(struct server *server, char *cmd_str)
-+{
-+	gatt_db_foreach_service(server->db, print_service, server);
-+}
-+
- static void cmd_help(struct server *server, char *cmd_str);
+ static int uuid_to_le(const bt_uuid_t *uuid, uint8_t *dst)
+ {
+ 	bt_uuid_t uuid128;
+diff --git a/src/shared/gatt-db.h b/src/shared/gatt-db.h
+index 7018b14..5db9f9b 100644
+--- a/src/shared/gatt-db.h
++++ b/src/shared/gatt-db.h
+@@ -29,6 +29,8 @@ struct gatt_db *gatt_db_new(void);
+ struct gatt_db *gatt_db_ref(struct gatt_db *db);
+ void gatt_db_unref(struct gatt_db *db);
  
- typedef void (*command_func_t)(struct server *server, char *cmd_str);
-@@ -895,6 +984,7 @@ static struct {
- 	{ "help", cmd_help, "\tDisplay help message" },
- 	{ "notify", cmd_notify, "\tSend handle-value notification" },
- 	{ "heart-rate", cmd_heart_rate, "\tHide/Unhide Heart Rate Service" },
-+	{ "services", cmd_services, "\tEnumerate all services" },
- 	{ }
- };
- 
++bool gatt_db_isempty(struct gatt_db *db);
++
+ struct gatt_db_attribute *gatt_db_add_service(struct gatt_db *db,
+ 						const bt_uuid_t *uuid,
+ 						bool primary,
 -- 
 2.2.0.rc0.207.ga3a616c
 
