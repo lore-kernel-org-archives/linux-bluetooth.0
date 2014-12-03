@@ -1,62 +1,97 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 8.1 \(1993\))
-Subject: Re: [PATCH] bluetooth: Fix possible NULL dereference
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20141203081709.GA18422@t440s.lan>
-Date: Wed, 3 Dec 2014 08:31:39 +0000
-Cc: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>,
-	linux-bluetooth@vger.kernel.org
-Message-Id: <65B74F2C-215A-4ED1-922D-31B519EA5F56@holtmann.org>
-References: <1417592765-24836-1-git-send-email-Andrei.Emeltchenko.news@gmail.com> <1CCB1571-FD46-4F46-9106-2FAD1ABB3960@holtmann.org> <20141203081709.GA18422@t440s.lan>
-To: Johan Hedberg <johan.hedberg@gmail.com>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 1/7] android/client: Add support for gattc multi_adv_set_inst_data cmd
+Date: Wed, 03 Dec 2014 09:22:19 +0100
+Message-ID: <2704867.Npi1VXrQLu@uw000953>
+In-Reply-To: <1417162925-17511-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+References: <1417162925-17511-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+Hi Grzegorz,
 
->>> conn might be NULL and would be dereferenced in conn_set_key()
->>> ---
->>> net/bluetooth/hci_event.c | 2 +-
->>> 1 file changed, 1 insertion(+), 1 deletion(-)
->>> 
->>> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
->>> index bd0a801..95f8057 100644
->>> --- a/net/bluetooth/hci_event.c
->>> +++ b/net/bluetooth/hci_event.c
->>> @@ -3312,7 +3312,7 @@ static void hci_link_key_notify_evt(struct hci_dev *hdev, struct sk_buff *skb)
->>> 	/* Update connection information since adding the key will have
->>> 	 * fixed up the type in the case of changed combination keys.
->>> 	 */
->>> -	if (ev->key_type == HCI_LK_CHANGED_COMBINATION)
->>> +	if (conn && ev->key_type == HCI_LK_CHANGED_COMBINATION)
->>> 		conn_set_key(conn, key->type, key->pin_len);
->>> 
->>> 	mgmt_new_link_key(hdev, key, persistent);
->> 
->> the more important question is why we are considering link keys from
->> the controller for a device that we do not have a hci_conn object for.
->> 
->> If this is for security mode 3, then we should handle security mode 3
->> and then bail out of this function. Since security mode 3 means that
->> we never get SSP or SC based keys. It is legacy pairing and does not
->> need any special handling for debug keys or changed combination keys.
+On Friday 28 of November 2014 09:21:59 Grzegorz Kolodziejczyk wrote:
+> ---
+>  android/client/if-gatt.c | 51 ++++++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 51 insertions(+)
 > 
-> The existence of a hci_conn object in this case is not dependent on
-> whether we're in security mode 3 or not. The hci_conn should have either
-> way been created when we initiated the connection or received a
-> connection request (only speciality with sec mode 3 is when the conn
-> complete finally comes). So this particular fix is really only for a
-> coverity warning as far as I see (and some very broken controllers).
+> diff --git a/android/client/if-gatt.c b/android/client/if-gatt.c
+> index fa17eb2..5072f91 100644
+> --- a/android/client/if-gatt.c
+> +++ b/android/client/if-gatt.c
+> @@ -1962,6 +1962,53 @@ static void multi_adv_update_p(int argc, const char **argv)
+>  	EXEC(if_gatt->client->multi_adv_update, client_if, min_interval,
+>  			max_interval, adv_type, chnl_map, tx_power, timeout_s);
+>  }
+> +
+> +/* set advertising data */
+> +static void multi_adv_set_inst_data_c(int argc, const char **argv,
+> +					enum_func *enum_func, void **user)
+> +{
+> +	if (argc == 2) {
+> +		*user = client_if_str;
+> +		*enum_func = enum_one_string;
+> +	}
+> +}
+> +
+> +static void multi_adv_set_inst_data_p(int argc, const char **argv)
+> +{
+> +	int client_if;
+> +	bool set_scan_rsp;
+> +	bool include_name, include_txpower;
+> +	int appearance;
+> +	uint16_t manufacturer_len;
+> +	uint8_t manufacturer_data[100];
+> +	uint16_t service_data_len;
+> +	uint8_t service_data[100];
+> +	uint16_t service_uuid_len;
+> +	uint8_t service_uuid[100];
+> +
+> +	RETURN_IF_NULL(if_gatt);
+> +	VERIFY_CLIENT_IF(2, client_if);
+> +
+> +	/* set scan response */
+> +	if (argc >= 4)
+> +		set_scan_rsp = atoi(argv[3]);
+> +	/* include name */
+> +	if (argc >= 5)
+> +		include_name = atoi(argv[4]);
+> +	/* include txpower */
+> +	if (argc >= 6)
+> +		include_txpower = atoi(argv[5]);
+> +
+> +	VERIFY_APPEARANCE(6, appearance);
+> +	GET_VERIFY_HEX_STRING(7, manufacturer_data, manufacturer_len);
+> +	GET_VERIFY_HEX_STRING(8, service_data, service_data_len);
+> +	GET_VERIFY_HEX_STRING(9, service_uuid, service_uuid_len);
+> +
+> +	EXEC(if_gatt->client->multi_adv_set_inst_data, client_if, set_scan_rsp,
+> +		include_name, include_txpower, appearance, manufacturer_len,
+> +		(char *) manufacturer_data, service_data_len,
+> +		(char *) service_data, service_uuid_len, (char *) service_uuid);
+> +}
+>  #endif
+>  
+>  /* get_device_type */
+> @@ -2055,6 +2102,10 @@ static struct method client_methods[] = {
+>  	STD_METHODCH(multi_adv_update, "<client_if> <min_interval>"
+>  			" <max_interval> <adv_type> <chnl_map> <tx_power>"
+>  			" <timeout_s>"),
+> +	STD_METHODCH(multi_adv_set_inst_data, "<client_if> [<set_scan_rsp>]"
+> +			" <include_name> [<include_txpower>] <appearance>"
+> +			" [<manufacturer_data>] [<service_data>]"
+> +			" [<service_uuid>]"),
+>  #else
+>  	STD_METHODCH(scan, "<client_if> [1|0]"),
+>  	STD_METHODCH(connect, "<client_if> <addr> [<is_direct>]"),
 > 
-> As for security mode 3 connections we would still want to make a note of
-> the key type and PIN length.
 
-then please look through the whole function. We have if (conn) checks sprinkled all over it. This needs to be re-written to make it clean.
+All patches applied (after fixing warning on KK in last patch), thanks.
 
-All the handling for SSP or SC should not even be considered when we do not have hci_conn object. I would say, do the minimum if we do not have hci_conn object and bail out. And let the SSP and SC pieces be executed otherwise.
-
-Regards
-
-Marcel
-
+-- 
+Best regards, 
+Szymon Janc
