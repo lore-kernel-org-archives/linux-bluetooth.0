@@ -1,33 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Increment management interface revision
-Date: Wed,  3 Dec 2014 19:52:43 +0100
-Message-Id: <1417632763-34647-1-git-send-email-marcel@holtmann.org>
+Subject: [PATCH] Bluetooth: Increase minor version of core module
+Date: Wed,  3 Dec 2014 19:46:10 +0100
+Message-Id: <1417632370-31742-1-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch increments the management interface revision due to the
-addition of support for LE Secure Connection feature.
+With the addition of support for Bluetooth Low Energy Secure Connections
+feature, it makes sense to increase the minor version of the Bluetooth
+core module.
+
+The module version is not used anywhere, but it gives a nice extra
+hint for debugging purposes.
 
 Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- net/bluetooth/mgmt.c | 2 +-
+ net/bluetooth/af_bluetooth.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 1e73bead7dd9..77cf0ef0d8a3 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -35,7 +35,7 @@
- #include "smp.h"
+diff --git a/net/bluetooth/af_bluetooth.c b/net/bluetooth/af_bluetooth.c
+index 339c74ad4553..4ba15917da5e 100644
+--- a/net/bluetooth/af_bluetooth.c
++++ b/net/bluetooth/af_bluetooth.c
+@@ -31,7 +31,7 @@
+ #include <net/bluetooth/bluetooth.h>
+ #include <linux/proc_fs.h>
  
- #define MGMT_VERSION	1
--#define MGMT_REVISION	7
-+#define MGMT_REVISION	8
+-#define VERSION "2.19"
++#define VERSION "2.20"
  
- static const u16 mgmt_commands[] = {
- 	MGMT_OP_READ_INDEX_LIST,
+ /* Bluetooth sockets */
+ #define BT_MAX_PROTO	8
 -- 
 1.9.3
 
