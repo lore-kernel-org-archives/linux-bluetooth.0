@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Johan Hedberg <johan.hedberg@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 10/49] Bluetooth: Remove unused hci_find_ltk function
-Date: Wed,  3 Dec 2014 17:02:04 +0200
-Message-Id: <1417618963-18010-11-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH 09/49] Bluetooth: Update LTK lookup to correctly deal with SC LTKs
+Date: Wed,  3 Dec 2014 17:02:03 +0200
+Message-Id: <1417618963-18010-10-git-send-email-johan.hedberg@gmail.com>
 In-Reply-To: <1417618963-18010-1-git-send-email-johan.hedberg@gmail.com>
 References: <1417618963-18010-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,68 +11,98 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-Now that LTKs are always looked up based on bdaddr (with EDiv/Rand
-checks done after a successful lookup) the hci_find_ltk function is not
-needed anymore. This patch removes the function.
+LTKs derived from Secure Connections based pairing are symmetric, i.e.
+they should match both master and slave role. This patch updates the LTK
+lookup functions to ignore the desired role when dealing with SC LTKs.
+
+Furthermore, with Secure Connections the EDiv and Rand values are not
+used and should always be set to zero. This patch updates the LTK lookup
+to first use the bdaddr as key and then do the necessary verifications
+of EDiv and Rand based on whether the found LTK is for SC or not.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- include/net/bluetooth/hci_core.h |  2 --
- net/bluetooth/hci_core.c         | 28 ----------------------------
- 2 files changed, 30 deletions(-)
+ net/bluetooth/hci_core.c  | 30 +++++++++++++++++++++++-------
+ net/bluetooth/hci_event.c | 15 +++++++++++++--
+ 2 files changed, 36 insertions(+), 9 deletions(-)
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 7f08ea36d246..b41969b561d8 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -921,8 +921,6 @@ struct link_key *hci_find_link_key(struct hci_dev *hdev, bdaddr_t *bdaddr);
- struct link_key *hci_add_link_key(struct hci_dev *hdev, struct hci_conn *conn,
- 				  bdaddr_t *bdaddr, u8 *val, u8 type,
- 				  u8 pin_len, bool *persistent);
--struct smp_ltk *hci_find_ltk(struct hci_dev *hdev, __le16 ediv, __le64 rand,
--			     u8 role);
- struct smp_ltk *hci_add_ltk(struct hci_dev *hdev, bdaddr_t *bdaddr,
- 			    u8 addr_type, u8 type, u8 authenticated,
- 			    u8 tk[16], u8 enc_size, __le16 ediv, __le64 rand);
 diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index e091e8ffeb8e..cb9bc8e2c58d 100644
+index 2586e405adb3..e091e8ffeb8e 100644
 --- a/net/bluetooth/hci_core.c
 +++ b/net/bluetooth/hci_core.c
-@@ -3185,34 +3185,6 @@ static u8 ltk_role(u8 type)
- 	return HCI_ROLE_SLAVE;
- }
+@@ -3195,11 +3195,18 @@ struct smp_ltk *hci_find_ltk(struct hci_dev *hdev, __le16 ediv, __le64 rand,
+ 		if (k->ediv != ediv || k->rand != rand)
+ 			continue;
  
--struct smp_ltk *hci_find_ltk(struct hci_dev *hdev, __le16 ediv, __le64 rand,
--			     u8 role)
--{
--	struct smp_ltk *k;
--
--	rcu_read_lock();
--	list_for_each_entry_rcu(k, &hdev->long_term_keys, list) {
--		if (k->ediv != ediv || k->rand != rand)
+-		if (ltk_role(k->type) != role)
 -			continue;
--
--		if (smp_ltk_is_sc(k)) {
--			if (k->type == SMP_LTK_P256_DEBUG &&
--			    !test_bit(HCI_KEEP_DEBUG_KEYS, &hdev->dev_flags))
--				continue;
--			rcu_read_unlock();
--			return k;
--		}
--
--		if (ltk_role(k->type) == role) {
--			rcu_read_unlock();
--			return k;
--		}
--	}
--	rcu_read_unlock();
--
--	return NULL;
--}
--
- struct smp_ltk *hci_find_ltk_by_addr(struct hci_dev *hdev, bdaddr_t *bdaddr,
- 				     u8 addr_type, u8 role)
- {
++		if (smp_ltk_is_sc(k)) {
++			if (k->type == SMP_LTK_P256_DEBUG &&
++			    !test_bit(HCI_KEEP_DEBUG_KEYS, &hdev->dev_flags))
++				continue;
++			rcu_read_unlock();
++			return k;
++		}
+ 
+-		rcu_read_unlock();
+-		return k;
++		if (ltk_role(k->type) == role) {
++			rcu_read_unlock();
++			return k;
++		}
+ 	}
+ 	rcu_read_unlock();
+ 
+@@ -3213,9 +3220,18 @@ struct smp_ltk *hci_find_ltk_by_addr(struct hci_dev *hdev, bdaddr_t *bdaddr,
+ 
+ 	rcu_read_lock();
+ 	list_for_each_entry_rcu(k, &hdev->long_term_keys, list) {
+-		if (addr_type == k->bdaddr_type &&
+-		    bacmp(bdaddr, &k->bdaddr) == 0 &&
+-		    ltk_role(k->type) == role) {
++		if (addr_type != k->bdaddr_type || bacmp(bdaddr, &k->bdaddr))
++			continue;
++
++		if (smp_ltk_is_sc(k)) {
++			if (k->type == SMP_LTK_P256_DEBUG &&
++			    !test_bit(HCI_KEEP_DEBUG_KEYS, &hdev->dev_flags))
++				continue;
++			rcu_read_unlock();
++			return k;
++		}
++
++		if (ltk_role(k->type) == role) {
+ 			rcu_read_unlock();
+ 			return k;
+ 		}
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index f980fc46ea5e..0058b545c5ed 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -4590,10 +4590,21 @@ static void hci_le_ltk_request_evt(struct hci_dev *hdev, struct sk_buff *skb)
+ 	if (conn == NULL)
+ 		goto not_found;
+ 
+-	ltk = hci_find_ltk(hdev, ev->ediv, ev->rand, conn->role);
+-	if (ltk == NULL)
++	ltk = hci_find_ltk_by_addr(hdev, &conn->dst, conn->dst_type,
++				   conn->role);
++	if (!ltk)
+ 		goto not_found;
+ 
++	if (smp_ltk_is_sc(ltk)) {
++		/* With SC both EDiv and Rand are set to zero */
++		if (ev->ediv || ev->rand)
++			goto not_found;
++	} else {
++		/* For non-SC keys check that EDiv and Rand match */
++		if (ev->ediv != ltk->ediv || ev->rand != ltk->rand)
++			goto not_found;
++	}
++
+ 	memcpy(cp.ltk, ltk->val, sizeof(ltk->val));
+ 	cp.handle = cpu_to_le16(conn->handle);
+ 
 -- 
 2.1.0
 
