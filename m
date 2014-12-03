@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Johan Hedberg <johan.hedberg@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 37/49] Bluetooth: Add full SMP BR/EDR support
-Date: Wed,  3 Dec 2014 17:02:31 +0200
-Message-Id: <1417618963-18010-38-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH 36/49] Bluetooth: Add skeleton for BR/EDR SMP channel
+Date: Wed,  3 Dec 2014 17:02:30 +0200
+Message-Id: <1417618963-18010-37-git-send-email-johan.hedberg@gmail.com>
 In-Reply-To: <1417618963-18010-1-git-send-email-johan.hedberg@gmail.com>
 References: <1417618963-18010-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,367 +11,204 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-When doing SMP over BR/EDR some of the routines can be shared with the
-LE functionality whereas others needs to be split into their own BR/EDR
-specific branches. This patch implements the split of BR/EDR specific
-SMP code from the LE-only code, making sure SMP over BR/EDR works as
-specified.
+This patch adds the very basic code for creating and destroying SMP
+L2CAP channels for BR/EDR connections.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- net/bluetooth/l2cap_core.c |   4 +
- net/bluetooth/smp.c        | 230 ++++++++++++++++++++++++++++++++++++++++-----
- 2 files changed, 212 insertions(+), 22 deletions(-)
+ include/net/bluetooth/hci_core.h |  1 +
+ include/net/bluetooth/l2cap.h    |  2 +
+ net/bluetooth/smp.c              | 89 ++++++++++++++++++++++++++++++++--------
+ 3 files changed, 74 insertions(+), 18 deletions(-)
 
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 43349ed4c249..a8da7ea9c2c0 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -6967,6 +6967,10 @@ static struct l2cap_conn *l2cap_conn_add(struct hci_conn *hcon)
- 	    test_bit(HCI_HS_ENABLED, &hcon->hdev->dev_flags))
- 		conn->local_fixed_chan |= L2CAP_FC_A2MP;
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 42f9362a83c1..f39e65096b1f 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -306,6 +306,7 @@ struct hci_dev {
+ 	__u32			req_result;
  
-+	if (bredr_sc_enabled(hcon->hdev) &&
-+	    test_bit(HCI_LE_ENABLED, &hcon->hdev->dev_flags))
-+		conn->local_fixed_chan |= L2CAP_FC_SMP_BREDR;
-+
- 	mutex_init(&conn->ident_lock);
- 	mutex_init(&conn->chan_lock);
+ 	void			*smp_data;
++	void			*smp_bredr_data;
  
+ 	struct discovery_state	discovery;
+ 	struct hci_conn_hash	conn_hash;
+diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
+index d71dc3579354..eee3ef530e79 100644
+--- a/include/net/bluetooth/l2cap.h
++++ b/include/net/bluetooth/l2cap.h
+@@ -141,6 +141,7 @@ struct l2cap_conninfo {
+ #define L2CAP_FC_ATT		0x10
+ #define L2CAP_FC_SIG_LE		0x20
+ #define L2CAP_FC_SMP_LE		0x40
++#define L2CAP_FC_SMP_BREDR	0x80
+ 
+ /* L2CAP Control Field bit masks */
+ #define L2CAP_CTRL_SAR			0xC000
+@@ -255,6 +256,7 @@ struct l2cap_conn_rsp {
+ #define L2CAP_CID_ATT		0x0004
+ #define L2CAP_CID_LE_SIGNALING	0x0005
+ #define L2CAP_CID_SMP		0x0006
++#define L2CAP_CID_SMP_BREDR	0x0007
+ #define L2CAP_CID_DYN_START	0x0040
+ #define L2CAP_CID_DYN_END	0xffff
+ #define L2CAP_CID_LE_DYN_END	0x007f
 diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
-index 8c1b53f32f10..12294935d258 100644
+index 3aad5864a5e1..8c1b53f32f10 100644
 --- a/net/bluetooth/smp.c
 +++ b/net/bluetooth/smp.c
-@@ -915,11 +915,13 @@ static void smp_notify_keys(struct l2cap_conn *conn)
- 		mgmt_new_irk(hdev, smp->remote_irk);
- 		/* Now that user space can be considered to know the
- 		 * identity address track the connection based on it
--		 * from now on.
-+		 * from now on (assuming this is an LE link).
- 		 */
--		bacpy(&hcon->dst, &smp->remote_irk->bdaddr);
--		hcon->dst_type = smp->remote_irk->addr_type;
--		queue_work(hdev->workqueue, &conn->id_addr_update_work);
-+		if (hcon->type == LE_LINK) {
-+			bacpy(&hcon->dst, &smp->remote_irk->bdaddr);
-+			hcon->dst_type = smp->remote_irk->addr_type;
-+			queue_work(hdev->workqueue, &conn->id_addr_update_work);
-+		}
- 
- 		/* When receiving an indentity resolving key for
- 		 * a remote device that does not use a resolvable
-@@ -938,10 +940,20 @@ static void smp_notify_keys(struct l2cap_conn *conn)
- 		}
- 	}
- 
--	/* The LTKs and CSRKs should be persistent only if both sides
--	 * had the bonding bit set in their authentication requests.
--	 */
--	persistent = !!((req->auth_req & rsp->auth_req) & SMP_AUTH_BONDING);
-+	if (hcon->type == ACL_LINK) {
-+		if (hcon->key_type == HCI_LK_DEBUG_COMBINATION)
-+			persistent = false;
-+		else
-+			persistent = !test_bit(HCI_CONN_FLUSH_KEY,
-+					       &hcon->flags);
-+	} else {
-+		/* The LTKs and CSRKs should be persistent only if both sides
-+		 * had the bonding bit set in their authentication requests.
-+		 */
-+		persistent = !!((req->auth_req & rsp->auth_req) &
-+				SMP_AUTH_BONDING);
-+	}
-+
- 
- 	if (smp->csrk) {
- 		smp->csrk->bdaddr_type = hcon->dst_type;
-@@ -1057,6 +1069,35 @@ static void smp_allow_key_dist(struct smp_chan *smp)
- 		SMP_ALLOW_CMD(smp, SMP_CMD_SIGN_INFO);
- }
- 
-+static void sc_generate_ltk(struct smp_chan *smp)
-+{
-+	/* These constants are as specified in the core specification.
-+	 * In ASCII they spell out to 'tmp2' and 'brle'.
-+	 */
-+	const u8 tmp2[4] = { 0x32, 0x70, 0x6d, 0x74 };
-+	const u8 brle[4] = { 0x65, 0x6c, 0x72, 0x62 };
-+	struct hci_conn *hcon = smp->conn->hcon;
-+	struct hci_dev *hdev = hcon->hdev;
-+	struct link_key *key;
-+
-+	key = hci_find_link_key(hdev, &hcon->dst);
-+	if (!key) {
-+		BT_ERR("%s No Link Key found to generate LTK", hdev->name);
-+		return;
-+	}
-+
-+	if (key->type == HCI_LK_DEBUG_COMBINATION)
-+		set_bit(SMP_FLAG_DEBUG_KEY, &smp->flags);
-+
-+	if (smp_h6(smp->tfm_cmac, key->val, tmp2, smp->tk))
-+		return;
-+
-+	if (smp_h6(smp->tfm_cmac, smp->tk, brle, smp->tk))
-+		return;
-+
-+	sc_add_ltk(smp);
-+}
-+
- static void smp_distribute_keys(struct smp_chan *smp)
- {
- 	struct smp_cmd_pairing *req, *rsp;
-@@ -1086,8 +1127,10 @@ static void smp_distribute_keys(struct smp_chan *smp)
- 	}
- 
- 	if (test_bit(SMP_FLAG_SC, &smp->flags)) {
--		if (*keydist & SMP_DIST_LINK_KEY)
-+		if (hcon->type == LE_LINK && (*keydist & SMP_DIST_LINK_KEY))
- 			sc_generate_link_key(smp);
-+		if (hcon->type == ACL_LINK && (*keydist & SMP_DIST_ENC_KEY))
-+			sc_generate_ltk(smp);
- 
- 		/* Clear the keys which are generated but not distributed */
- 		*keydist &= ~SMP_SC_NO_DIST;
-@@ -1493,6 +1536,46 @@ unlock:
- 	return err;
- }
- 
-+static void build_bredr_pairing_cmd(struct smp_chan *smp,
-+				    struct smp_cmd_pairing *req,
-+				    struct smp_cmd_pairing *rsp)
-+{
-+	struct l2cap_conn *conn = smp->conn;
-+	struct hci_dev *hdev = conn->hcon->hdev;
-+	u8 local_dist = 0, remote_dist = 0;
-+
-+	if (test_bit(HCI_BONDABLE, &hdev->dev_flags)) {
-+		local_dist = SMP_DIST_ENC_KEY | SMP_DIST_SIGN;
-+		remote_dist = SMP_DIST_ENC_KEY | SMP_DIST_SIGN;
-+	}
-+
-+	if (test_bit(HCI_RPA_RESOLVING, &hdev->dev_flags))
-+		remote_dist |= SMP_DIST_ID_KEY;
-+
-+	if (test_bit(HCI_PRIVACY, &hdev->dev_flags))
-+		local_dist |= SMP_DIST_ID_KEY;
-+
-+	if (!rsp) {
-+		memset(req, 0, sizeof(*req));
-+
-+		req->init_key_dist   = local_dist;
-+		req->resp_key_dist   = remote_dist;
-+		req->max_key_size    = SMP_MAX_ENC_KEY_SIZE;
-+
-+		smp->remote_key_dist = remote_dist;
-+
-+		return;
-+	}
-+
-+	memset(rsp, 0, sizeof(*rsp));
-+
-+	rsp->max_key_size    = SMP_MAX_ENC_KEY_SIZE;
-+	rsp->init_key_dist   = req->init_key_dist & remote_dist;
-+	rsp->resp_key_dist   = req->resp_key_dist & local_dist;
-+
-+	smp->remote_key_dist = rsp->init_key_dist;
-+}
-+
- static u8 smp_cmd_pairing_req(struct l2cap_conn *conn, struct sk_buff *skb)
- {
- 	struct smp_cmd_pairing rsp, *req = (void *) skb->data;
-@@ -1529,6 +1612,31 @@ static u8 smp_cmd_pairing_req(struct l2cap_conn *conn, struct sk_buff *skb)
- 	memcpy(&smp->preq[1], req, sizeof(*req));
- 	skb_pull(skb, sizeof(*req));
- 
-+	/* SMP over BR/EDR requires special treatment */
-+	if (conn->hcon->type == ACL_LINK) {
-+		/* We must have a BR/EDR SC link */
-+		if (!test_bit(HCI_CONN_AES_CCM, &conn->hcon->flags))
-+			return SMP_CROSS_TRANSP_NOT_ALLOWED;
-+
-+		set_bit(SMP_FLAG_SC, &smp->flags);
-+
-+		build_bredr_pairing_cmd(smp, req, &rsp);
-+
-+		key_size = min(req->max_key_size, rsp.max_key_size);
-+		if (check_enc_key_size(conn, key_size))
-+			return SMP_ENC_KEY_SIZE;
-+
-+		/* Clear bits which are generated but not distributed */
-+		smp->remote_key_dist &= ~SMP_SC_NO_DIST;
-+
-+		smp->prsp[0] = SMP_CMD_PAIRING_RSP;
-+		memcpy(&smp->prsp[1], &rsp, sizeof(rsp));
-+		smp_send_cmd(conn, SMP_CMD_PAIRING_RSP, sizeof(rsp), &rsp);
-+
-+		smp_distribute_keys(smp);
-+		return 0;
-+	}
-+
- 	build_pairing_cmd(conn, req, &rsp, auth);
- 
- 	if (rsp.auth_req & SMP_AUTH_SC)
-@@ -1644,6 +1752,22 @@ static u8 smp_cmd_pairing_rsp(struct l2cap_conn *conn, struct sk_buff *skb)
- 
- 	auth = rsp->auth_req & AUTH_REQ_MASK(hdev);
- 
-+	smp->prsp[0] = SMP_CMD_PAIRING_RSP;
-+	memcpy(&smp->prsp[1], rsp, sizeof(*rsp));
-+
-+	/* Update remote key distribution in case the remote cleared
-+	 * some bits that we had enabled in our request.
-+	 */
-+	smp->remote_key_dist &= rsp->resp_key_dist;
-+
-+	/* For BR/EDR this means we're done and can start phase 3 */
-+	if (conn->hcon->type == ACL_LINK) {
-+		/* Clear bits which are generated but not distributed */
-+		smp->remote_key_dist &= ~SMP_SC_NO_DIST;
-+		smp_distribute_keys(smp);
-+		return 0;
-+	}
-+
- 	if ((req->auth_req & SMP_AUTH_SC) && (auth & SMP_AUTH_SC))
- 		set_bit(SMP_FLAG_SC, &smp->flags);
- 	else if (conn->hcon->pending_sec_level > BT_SECURITY_HIGH)
-@@ -1661,9 +1785,6 @@ static u8 smp_cmd_pairing_rsp(struct l2cap_conn *conn, struct sk_buff *skb)
- 
- 	get_random_bytes(smp->prnd, sizeof(smp->prnd));
- 
--	smp->prsp[0] = SMP_CMD_PAIRING_RSP;
--	memcpy(&smp->prsp[1], rsp, sizeof(*rsp));
--
- 	/* Update remote key distribution in case the remote cleared
- 	 * some bits that we had enabled in our request.
- 	 */
-@@ -2373,11 +2494,6 @@ static int smp_sig_channel(struct l2cap_chan *chan, struct sk_buff *skb)
- 	__u8 code, reason;
- 	int err = 0;
- 
--	if (hcon->type != LE_LINK) {
--		kfree_skb(skb);
--		return 0;
--	}
--
- 	if (skb->len < 1)
- 		return -EILSEQ;
- 
-@@ -2496,6 +2612,74 @@ static void smp_teardown_cb(struct l2cap_chan *chan, int err)
- 	l2cap_chan_put(chan);
- }
- 
-+static void bredr_pairing(struct l2cap_chan *chan)
-+{
-+	struct l2cap_conn *conn = chan->conn;
-+	struct hci_conn *hcon = conn->hcon;
-+	struct hci_dev *hdev = hcon->hdev;
-+	struct smp_cmd_pairing req;
-+	struct smp_chan *smp;
-+
-+	BT_DBG("chan %p", chan);
-+
-+	/* Only new pairings are interesting */
-+	if (!test_bit(HCI_CONN_NEW_LINK_KEY, &hcon->flags))
-+		return;
-+
-+	/* Don't bother if we're not encrypted */
-+	if (!test_bit(HCI_CONN_ENCRYPT, &hcon->flags))
-+		return;
-+
-+	/* Only master may initiate SMP over BR/EDR */
-+	if (hcon->role != HCI_ROLE_MASTER)
-+		return;
-+
-+	/* Secure Connections support must be enabled */
-+	if (!test_bit(HCI_SC_ENABLED, &hdev->dev_flags))
-+		return;
-+
-+	/* BR/EDR must use Secure Connections for SMP */
-+	if (!test_bit(HCI_CONN_AES_CCM, &hcon->flags) &&
-+	    !test_bit(HCI_FORCE_LESC, &hdev->dbg_flags))
-+		return;
-+
-+	/* If our LE support is not enabled don't do anything */
-+	if (!test_bit(HCI_LE_ENABLED, &hdev->dev_flags))
-+		return;
-+
-+	/* Don't bother if remote LE support is not enabled */
-+	if (!lmp_host_le_capable(hcon))
-+		return;
-+
-+	/* Remote must support SMP fixed chan for BR/EDR */
-+	if (!(conn->remote_fixed_chan & L2CAP_FC_SMP_BREDR))
-+		return;
-+
-+	/* Don't bother if SMP is already ongoing */
-+	if (chan->data)
-+		return;
-+
-+	smp = smp_chan_create(conn);
-+	if (!smp) {
-+		BT_ERR("%s unable to create SMP context for BR/EDR",
-+		       hdev->name);
-+		return;
-+	}
-+
-+	set_bit(SMP_FLAG_SC, &smp->flags);
-+
-+	BT_DBG("%s starting SMP over BR/EDR", hdev->name);
-+
-+	/* Prepare and send the BR/EDR SMP Pairing Request */
-+	build_bredr_pairing_cmd(smp, &req, NULL);
-+
-+	smp->preq[0] = SMP_CMD_PAIRING_REQ;
-+	memcpy(&smp->preq[1], &req, sizeof(req));
-+
-+	smp_send_cmd(conn, SMP_CMD_PAIRING_REQ, sizeof(req), &req);
-+	SMP_ALLOW_CMD(smp, SMP_CMD_PAIRING_RSP);
-+}
-+
- static void smp_resume_cb(struct l2cap_chan *chan)
- {
- 	struct smp_chan *smp = chan->data;
-@@ -2504,8 +2688,10 @@ static void smp_resume_cb(struct l2cap_chan *chan)
+@@ -2504,6 +2504,9 @@ static void smp_resume_cb(struct l2cap_chan *chan)
  
  	BT_DBG("chan %p", chan);
  
--	if (hcon->type == ACL_LINK)
-+	if (hcon->type == ACL_LINK) {
-+		bredr_pairing(chan);
- 		return;
-+	}
- 
++	if (hcon->type == ACL_LINK)
++		return;
++
  	if (!smp)
  		return;
-@@ -2521,23 +2707,23 @@ static void smp_resume_cb(struct l2cap_chan *chan)
- static void smp_ready_cb(struct l2cap_chan *chan)
- {
- 	struct l2cap_conn *conn = chan->conn;
-+	struct hci_conn *hcon = conn->hcon;
  
- 	BT_DBG("chan %p", chan);
- 
- 	conn->smp = chan;
- 	l2cap_chan_hold(chan);
-+
-+	if (hcon->type == ACL_LINK && test_bit(HCI_CONN_ENCRYPT, &hcon->flags))
-+		bredr_pairing(chan);
- }
+@@ -2527,10 +2530,14 @@ static void smp_ready_cb(struct l2cap_chan *chan)
  
  static int smp_recv_cb(struct l2cap_chan *chan, struct sk_buff *skb)
  {
--	struct hci_conn *hcon = chan->conn->hcon;
++	struct hci_conn *hcon = chan->conn->hcon;
  	int err;
  
  	BT_DBG("chan %p", chan);
  
--	if (hcon->type == ACL_LINK)
--		return -EOPNOTSUPP;
--
++	if (hcon->type == ACL_LINK)
++		return -EOPNOTSUPP;
++
  	err = smp_sig_channel(chan, skb);
  	if (err) {
  		struct smp_chan *smp = chan->data;
+@@ -2627,34 +2634,40 @@ static const struct l2cap_ops smp_root_chan_ops = {
+ 	.memcpy_fromiovec	= l2cap_chan_no_memcpy_fromiovec,
+ };
+ 
+-int smp_register(struct hci_dev *hdev)
++static struct l2cap_chan *smp_add_cid(struct hci_dev *hdev, u16 cid)
+ {
+ 	struct l2cap_chan *chan;
+ 	struct crypto_blkcipher	*tfm_aes;
+ 
+-	BT_DBG("%s", hdev->name);
++	if (cid == L2CAP_CID_SMP_BREDR) {
++		tfm_aes = NULL;
++		goto create_chan;
++	}
+ 
+ 	tfm_aes = crypto_alloc_blkcipher("ecb(aes)", 0, 0);
+ 	if (IS_ERR(tfm_aes)) {
+-		int err = PTR_ERR(tfm_aes);
+ 		BT_ERR("Unable to create crypto context");
+-		return err;
++		return ERR_PTR(PTR_ERR(tfm_aes));
+ 	}
+ 
++create_chan:
+ 	chan = l2cap_chan_create();
+ 	if (!chan) {
+ 		crypto_free_blkcipher(tfm_aes);
+-		return -ENOMEM;
++		return ERR_PTR(-ENOMEM);
+ 	}
+ 
+ 	chan->data = tfm_aes;
+ 
+-	l2cap_add_scid(chan, L2CAP_CID_SMP);
++	l2cap_add_scid(chan, cid);
+ 
+ 	l2cap_chan_set_defaults(chan);
+ 
+ 	bacpy(&chan->src, &hdev->bdaddr);
+-	chan->src_type = BDADDR_LE_PUBLIC;
++	if (cid == L2CAP_CID_SMP)
++		chan->src_type = BDADDR_LE_PUBLIC;
++	else
++		chan->src_type = BDADDR_BREDR;
+ 	chan->state = BT_LISTEN;
+ 	chan->mode = L2CAP_MODE_BASIC;
+ 	chan->imtu = L2CAP_DEFAULT_MTU;
+@@ -2663,20 +2676,14 @@ int smp_register(struct hci_dev *hdev)
+ 	/* Set correct nesting level for a parent/listening channel */
+ 	atomic_set(&chan->nesting, L2CAP_NESTING_PARENT);
+ 
+-	hdev->smp_data = chan;
+-
+-	return 0;
++	return chan;
+ }
+ 
+-void smp_unregister(struct hci_dev *hdev)
++static void smp_del_chan(struct l2cap_chan *chan)
+ {
+-	struct l2cap_chan *chan = hdev->smp_data;
+-	struct crypto_blkcipher *tfm_aes;
+-
+-	if (!chan)
+-		return;
++	struct crypto_blkcipher	*tfm_aes;
+ 
+-	BT_DBG("%s chan %p", hdev->name, chan);
++	BT_DBG("chan %p", chan);
+ 
+ 	tfm_aes = chan->data;
+ 	if (tfm_aes) {
+@@ -2684,6 +2691,52 @@ void smp_unregister(struct hci_dev *hdev)
+ 		crypto_free_blkcipher(tfm_aes);
+ 	}
+ 
+-	hdev->smp_data = NULL;
+ 	l2cap_chan_put(chan);
+ }
++
++int smp_register(struct hci_dev *hdev)
++{
++	struct l2cap_chan *chan;
++
++	BT_DBG("%s", hdev->name);
++
++	chan = smp_add_cid(hdev, L2CAP_CID_SMP);
++	if (IS_ERR(chan))
++		return PTR_ERR(chan);
++
++	hdev->smp_data = chan;
++
++	if (!lmp_sc_capable(hdev) &&
++	    !test_bit(HCI_FORCE_LESC, &hdev->dbg_flags))
++		return 0;
++
++	chan = smp_add_cid(hdev, L2CAP_CID_SMP_BREDR);
++	if (IS_ERR(chan)) {
++		int err = PTR_ERR(chan);
++		chan = hdev->smp_data;
++		hdev->smp_data = NULL;
++		smp_del_chan(chan);
++		return err;
++	}
++
++	hdev->smp_bredr_data = chan;
++
++	return 0;
++}
++
++void smp_unregister(struct hci_dev *hdev)
++{
++	struct l2cap_chan *chan;
++
++	if (hdev->smp_bredr_data) {
++		chan = hdev->smp_bredr_data;
++		hdev->smp_bredr_data = NULL;
++		smp_del_chan(chan);
++	}
++
++	if (hdev->smp_data) {
++		chan = hdev->smp_data;
++		hdev->smp_data = NULL;
++		smp_del_chan(chan);
++	}
++}
 -- 
 2.1.0
 
