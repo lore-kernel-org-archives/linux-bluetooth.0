@@ -1,236 +1,220 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-Sender: armansito@google.com
-In-Reply-To: <CAHrH25RUigTasNdGy9ne16EvtxC7_pEdRj-bUnE=yNGwzuMqRA@mail.gmail.com>
-References: <1417196962-3876-1-git-send-email-armansito@chromium.org>
-	<1417196962-3876-4-git-send-email-armansito@chromium.org>
-	<CABBYNZ+16OLiVHB5msL7uXErhbKCR022J=jKbXNCsPeu-6uaZw@mail.gmail.com>
-	<CAHrH25TBYTioi7NXb6utMHqtzUhaFg_DvNRnRaEsUdLz_r3yow@mail.gmail.com>
-	<CABBYNZKRpgrdfFqKaeXwUSR6njnYaUFzfAE=gGX+JkVQ9yviNA@mail.gmail.com>
-	<CAHrH25Q3ZYB6PKoStwcG_gUSgR2BJHqt1_Wvf0ZPrK3NQ7mZrw@mail.gmail.com>
-	<ADB9F0AE-DABA-4530-8133-20437111A716@holtmann.org>
-	<CAHrH25RNoACmhTVQ+DTBPUDW19KhcE3pqybeQNaeB=DubSxyjA@mail.gmail.com>
-	<CABBYNZJFYQXW0hrADBGj2j6TOxx1ZKSphvxx1=4oHjvLcGO9Gw@mail.gmail.com>
-	<CABBYNZJ7LOOmTx_4xyBkET5zQr6bcA32dnNB6gubrDmzxw5OzA@mail.gmail.com>
-	<CAHrH25RUigTasNdGy9ne16EvtxC7_pEdRj-bUnE=yNGwzuMqRA@mail.gmail.com>
-Date: Tue, 2 Dec 2014 16:15:25 -0800
-Message-ID: <CAHrH25Sk-tnXrNbpr6cq3qZQ07EdF2c3rCrrx0Ei10ePq0BawA@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 3/8] shared/gatt-client: Store services in gatt_db.
 From: Arman Uguray <armansito@chromium.org>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+To: linux-bluetooth@vger.kernel.org
+Cc: Arman Uguray <armansito@chromium.org>
+Subject: [PATCH BlueZ v1 7/8] shared/gatt-client: Remove GATT structs and iterators
+Date: Tue,  2 Dec 2014 16:12:42 -0800
+Message-Id: <1417565563-29239-8-git-send-email-armansito@chromium.org>
+In-Reply-To: <1417565563-29239-1-git-send-email-armansito@chromium.org>
+References: <1417565563-29239-1-git-send-email-armansito@chromium.org>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+This patch removes the high-level structs and iterators used by
+shared/gatt-client in favor of gatt-db.
+---
+ src/shared/gatt-client.c | 88 ------------------------------------------------
+ src/shared/gatt-client.h | 74 ++--------------------------------------
+ 2 files changed, 3 insertions(+), 159 deletions(-)
 
-> On Tue, Dec 2, 2014 at 11:35 AM, Arman Uguray <armansito@chromium.org> wr=
-ote:
-> Hi Luiz,
->
->> On Tue, Dec 2, 2014 at 7:12 AM, Luiz Augusto von Dentz <luiz.dentz@gmail=
-.com> wrote:
->> Hi Arman,
->>
->> On Tue, Dec 2, 2014 at 12:46 PM, Luiz Augusto von Dentz
->> <luiz.dentz@gmail.com> wrote:
->>> Hi Arman,
->>>
->>> On Mon, Dec 1, 2014 at 7:57 PM, Arman Uguray <armansito@chromium.org> w=
-rote:
->>>> Hi Marcel & Luiz,
->>>>
->>>>> On Mon, Dec 1, 2014 at 9:19 AM, Marcel Holtmann <marcel@holtmann.org>=
- wrote:
->>>>> Hi Arman,
->>>>>
->>>>>>>>>> This patch rewrites the service discovery logic inside
->>>>>>>>>> shared/gatt-client. The internal service_list structure has been
->>>>>>>>>> entirely removed and services are stored in a gatt_db instance.
->>>>>>>>>> Initially, gatt-client creates and owns the life-time of the gat=
-t_db.
->>>>>>>>>
->>>>>>>>> Im trying to figure out the reason why you want to start with you=
-r own
->>>>>>>>> gatt_db, is it because it lacks reference counting, if that is th=
-e
->>>>>>>>> case it should be trivial to add it.
->>>>>>>>>
->>>>>>>>
->>>>>>>> Initially, yes, the lack of reference counting is one reason, whic=
-h I
->>>>>>>> was thinking of adding to gatt-db eventually. Though, what I had i=
-n
->>>>>>>> mind was that, the gatt-db would be created by gatt-client if you =
-want
->>>>>>>> it to perform discovery, otherwise if you construct it with gatt-d=
-b
->>>>>>>> then it wouldn't do discovery, which would address the permanent c=
-ache
->>>>>>>> case. So, we would have two "new" functions:
->>>>>>>>
->>>>>>>>   bt_gatt_client_new
->>>>>>>>   bt_gatt_client_new_from_db
->>>>>>>>
->>>>>>>> In the first case, if the upper layer wants to make the gatt-db
->>>>>>>> outlive the gatt-client, in the future they can just add a referen=
-ce
->>>>>>>> to it and own it and in the next connection they can create the cl=
-ient
->>>>>>>> using that same db instance. This is kind of a rough idea right no=
-w
->>>>>>>> but I think it makes sense.
->>>>>>>>
->>>>>>>> We can also keep both functions but have both accept a gatt-db as =
-a
->>>>>>>> parameter. Not sure what's best here really.
->>>>>>>
->>>>>>> For unit test maybe we can have bt_gatt_client_new_default, iirc
->>>>>>> Marcel suggested something like this for naming, but for the core
->>>>>>> daemon it can create a empty db when pairing so even the initial
->>>>>>> discovery would use it. This comes back to the idea of having the
->>>>>>> callbacks in the db to attribute added/removed, with this logic we
->>>>>>> could start creating D-Bus objects by the time a services is
->>>>>>> discovered (provided we discover everything necessary) and not only
->>>>>>> when bt_gatt_client signals it is done discovering, actually with t=
-he
->>>>>>> current concept we could be spamming the bus a little too much sinc=
-e
->>>>>>> the objects would be created all at same time this would cause seve=
-ral
->>>>>>> InterfacesAdded signals in a row at the end of pairing.
->>>>>>>
->>>>>>
->>>>>> I don't know about "_default" naming but are we talking about someth=
-ing like:
->>>>>>
->>>>>>  bt_gatt_client_new(att, mtu, db)  /* Does discovery */
->>>>>>  bt_gatt_client_new_from_cache(att, mtu, db)  /* No discovery */
->>>>>>
->>>>>> So both functions get passed a db either way?
->>>>>
->>>>> actually we might just better only use bt_gatt_client_new() and provi=
-de functionality to flush certain devices from the cache. In case we do wan=
-t to trigger a discovery or re-discovery of devices.
->>>>>
->>>>> The cache should just work and do the right thing. We should be able =
-set max cacheable service, devices etc. So lets just give the GATT client a=
- cache to work with and that is it. Everything else is an implementation de=
-tail between the client and the cache.
->>>>>
->>>>> I prefer that every client has a cache attached to it (or allow NULL =
-in case we really want to run without a cache). If the cache is independent=
-, it can easily do the right thing for us.
->>>>>
->>>>
->>>> After our brief chat on IRC, please confirm that this is more or less
->>>> what we want:
->>>>
->>>>   bt_gatt_client_new(att, mtu, db) -> adds ref to db.
->>>>   bt_gatt_client_new(att, mtu, NULL) -> creates its own db
->>>>
->>>> Either function might cause discovery based on whether or not the db
->>>> is empty. If it's empty, client always starts discovery, otherwise it
->>>> skips it.
->>>
->>> Sounds good. Sorry for not responding on IRC yesterday, I was away and
->>> only noticed today that you have been there.
->
-> No worries. I haven't uploaded the next round yet until we have a good
-> idea of what we want.
->
->>
->> I went ahead and implemented the reference counting for gatt_db, I
->> will try to be online later today in case you want some to discuss
->> more about this.
->>
->
-> Cool, I'll rebase and make the code work with ref counts.
->
->>>>   bt_gatt_client_get_db -> returns db. This would be necessary if we
->>>> want to allow passing NULL to bt_gatt_client_new.
->>>
->>> Hmm, but if we pass NULL, which I suppose is to enable things like
->>> unit tests, why would we want to pull the db out of it? As I mention
->>> from the core we would probably create the db when pairing so we get
->>> notification regarding services changes from discovery, with this mind
->>> I guess if the client pass NULL this means the db would be internal.
->>>
->
-> I guess the idea with passing NULL is that you're basically saying
-> "there is no existing database around for this device, create a new
-> one and I'll get it from you later". So, if we allow passing NULL and
-> having gatt-client create the db, then we would want to pull the db
-> out of it, since we can't browse any of the handles or get events
-> otherwise. I don't have a particular opinion on this; I think it's
-> equally fine to disallow passing NULL and always have the upper layer
-> instantiate the db. Then we wouldn't need the getter I guess.
->
->>> Btw, I guess we should associate a valid db if service changed CCC has
->>> been written or perhaps we clear the db if discovery is interrupted
->>> before that happens but I guess in some cases we may have a db without
->>> a service changed, in case we don't pair for example, in that case we
->>> need to rediscover the handles before letting any profile connect
->>> otherwise they may end up using invalid handles.
->>>
->
-> Yeah, I think if we always require that a db is passed in to
-> bt_gatt_client_new, then we can have the client make the correct
-> decision. If there was no service changed characteristic for instance,
-> then the upper layer may want to skip discovery and reuse the same db
-> (with the assumption that the services won't change) or pass an empty
-> db to have client discover everything.
->
->>>> I think all of these are minor details that can be revised later, but
->>>> I still need something as a starting point.
->>>>
->>>> In addition, I'm thinking that gatt-db should have service added and
->>>> removed events that can be triggered by set_active and the clear
->>>> functions. Something like
->>>>
->>>>   gatt_db_register_service_callbacks(db, added_cb, removed_cb);
->>>>
->>>> In the client case, added_cb would only be called once all attributes
->>>> belonging to the service have been discovered and inserted into the
->>>> db. Client would also communicate services that are affected by a
->>>> "Service Changed" indication via these callbacks. Either way, I
->>>> suggest adding the service callback mechanism in a later patch set.
->>>
->>> Sounds good, but we might have to introduce this before we start doing
->>> changing the core since this will probably be the preferable way the
->>> discovery interact with core.
->>>
->
-> OK, sounds good to me. I might actually just add this into v1 of this set=
-.
->
+diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
+index 4cd8770..463de3b 100644
+--- a/src/shared/gatt-client.c
++++ b/src/shared/gatt-client.c
+@@ -1636,94 +1636,6 @@ bool bt_gatt_client_set_debug(struct bt_gatt_client *client,
+ 	return true;
+ }
+ 
+-bool bt_gatt_service_iter_init(struct bt_gatt_service_iter *iter,
+-						struct bt_gatt_client *client)
+-{
+-	if (!iter || !client)
+-		return false;
+-
+-	if (client->in_init || client->in_svc_chngd)
+-		return false;
+-
+-	memset(iter, 0, sizeof(*iter));
+-	iter->client = client;
+-	iter->ptr = NULL;
+-
+-	return true;
+-}
+-
+-bool bt_gatt_service_iter_next(struct bt_gatt_service_iter *iter,
+-					const bt_gatt_service_t **service)
+-{
+-	/* TODO: Remove iterator functions */
+-
+-	return false;
+-}
+-
+-bool bt_gatt_service_iter_next_by_handle(struct bt_gatt_service_iter *iter,
+-					uint16_t start_handle,
+-					const bt_gatt_service_t **service)
+-{
+-	while (bt_gatt_service_iter_next(iter, service)) {
+-		if ((*service)->start_handle == start_handle)
+-			return true;
+-	}
+-
+-	return false;
+-}
+-
+-bool bt_gatt_service_iter_next_by_uuid(struct bt_gatt_service_iter *iter,
+-					const uint8_t uuid[BT_GATT_UUID_SIZE],
+-					const bt_gatt_service_t **service)
+-{
+-	while (bt_gatt_service_iter_next(iter, service)) {
+-		if (memcmp((*service)->uuid, uuid, UUID_BYTES) == 0)
+-			return true;
+-	}
+-
+-	return false;
+-}
+-
+-bool bt_gatt_characteristic_iter_init(struct bt_gatt_characteristic_iter *iter,
+-					const bt_gatt_service_t *service)
+-{
+-	if (!iter || !service)
+-		return false;
+-
+-	memset(iter, 0, sizeof(*iter));
+-	iter->service = (void *) service;
+-
+-	return true;
+-}
+-
+-bool bt_gatt_characteristic_iter_next(struct bt_gatt_characteristic_iter *iter,
+-					const bt_gatt_characteristic_t **chrc)
+-{
+-	/* TODO: Remove iterator functions */
+-
+-	return false;
+-}
+-
+-bool bt_gatt_include_service_iter_init(struct bt_gatt_incl_service_iter *iter,
+-					const bt_gatt_service_t *service)
+-{
+-	if (!iter || !service)
+-		return false;
+-
+-	memset(iter, 0, sizeof(*iter));
+-	iter->service = (void *) service;
+-
+-	return true;
+-}
+-
+-bool bt_gatt_include_service_iter_next(struct bt_gatt_incl_service_iter *iter,
+-					const bt_gatt_included_service_t **incl)
+-{
+-	/* TODO: Remove iterator functions */
+-
+-	return false;
+-}
+-
+ struct read_op {
+ 	bt_gatt_client_read_callback_t callback;
+ 	void *user_data;
+diff --git a/src/shared/gatt-client.h b/src/shared/gatt-client.h
+index a09c3b8..984c23f 100644
+--- a/src/shared/gatt-client.h
++++ b/src/shared/gatt-client.h
+@@ -40,6 +40,9 @@ typedef void (*bt_gatt_client_destroy_func_t)(void *user_data);
+ typedef void (*bt_gatt_client_callback_t)(bool success, uint8_t att_ecode,
+ 							void *user_data);
+ typedef void (*bt_gatt_client_debug_func_t)(const char *str, void *user_data);
++typedef void (*bt_gatt_client_read_callback_t)(bool success, uint8_t att_ecode,
++					const uint8_t *value, uint16_t length,
++					void *user_data);
+ typedef void (*bt_gatt_client_write_long_callback_t)(bool success,
+ 					bool reliable_error, uint8_t att_ecode,
+ 					void *user_data);
+@@ -67,75 +70,6 @@ bool bt_gatt_client_set_debug(struct bt_gatt_client *client,
+ 					void *user_data,
+ 					bt_gatt_client_destroy_func_t destroy);
+ 
+-typedef struct {
+-	bool primary;
+-	uint16_t start_handle;
+-	uint16_t end_handle;
+-	uint8_t uuid[BT_GATT_UUID_SIZE];
+-} bt_gatt_service_t;
+-
+-typedef struct {
+-	uint16_t handle;
+-	uint8_t uuid[BT_GATT_UUID_SIZE];
+-} bt_gatt_descriptor_t;
+-
+-typedef struct {
+-	uint16_t start_handle;
+-	uint16_t end_handle;
+-	uint16_t value_handle;
+-	uint8_t properties;
+-	uint8_t uuid[BT_GATT_UUID_SIZE];
+-	const bt_gatt_descriptor_t *descs;
+-	size_t num_descs;
+-} bt_gatt_characteristic_t;
+-
+-typedef struct {
+-	uint16_t handle;
+-	uint16_t start_handle;
+-	uint16_t end_handle;
+-	uint8_t uuid[BT_GATT_UUID_SIZE];
+-} bt_gatt_included_service_t;
+-
+-struct bt_gatt_service_iter {
+-	struct bt_gatt_client *client;
+-	void *ptr;
+-};
+-
+-struct bt_gatt_characteristic_iter {
+-	void *service;
+-	size_t pos;
+-};
+-
+-struct bt_gatt_incl_service_iter {
+-	void *service;
+-	size_t pos;
+-};
+-
+-bool bt_gatt_service_iter_init(struct bt_gatt_service_iter *iter,
+-						struct bt_gatt_client *client);
+-bool bt_gatt_service_iter_next(struct bt_gatt_service_iter *iter,
+-					const bt_gatt_service_t **service);
+-bool bt_gatt_service_iter_next_by_handle(struct bt_gatt_service_iter *iter,
+-					uint16_t start_handle,
+-					const bt_gatt_service_t **service);
+-bool bt_gatt_service_iter_next_by_uuid(struct bt_gatt_service_iter *iter,
+-					const uint8_t uuid[BT_GATT_UUID_SIZE],
+-					const bt_gatt_service_t **service);
+-
+-bool bt_gatt_characteristic_iter_init(struct bt_gatt_characteristic_iter *iter,
+-					const bt_gatt_service_t *service);
+-bool bt_gatt_characteristic_iter_next(struct bt_gatt_characteristic_iter *iter,
+-					const bt_gatt_characteristic_t **chrc);
+-
+-bool bt_gatt_include_service_iter_init(struct bt_gatt_incl_service_iter *iter,
+-					const bt_gatt_service_t *service);
+-bool bt_gatt_include_service_iter_next(struct bt_gatt_incl_service_iter *iter,
+-					const bt_gatt_included_service_t **inc);
+-
+-typedef void (*bt_gatt_client_read_callback_t)(bool success, uint8_t att_ecode,
+-					const uint8_t *value, uint16_t length,
+-					void *user_data);
+-
+ bool bt_gatt_client_read_value(struct bt_gatt_client *client,
+ 					uint16_t value_handle,
+ 					bt_gatt_client_read_callback_t callback,
+@@ -146,8 +80,6 @@ bool bt_gatt_client_read_long_value(struct bt_gatt_client *client,
+ 					bt_gatt_client_read_callback_t callback,
+ 					void *user_data,
+ 					bt_gatt_client_destroy_func_t destroy);
+-
+-
+ bool bt_gatt_client_read_multiple(struct bt_gatt_client *client,
+ 					uint16_t *handles, uint8_t num_handles,
+ 					bt_gatt_client_read_callback_t callback,
+-- 
+2.2.0.rc0.207.ga3a616c
 
-I just sent out v1. Added a TODO for the service added/removed events
-which I'll send to the list in a separate patch set once this one is
-in.
-
->>>> Let me know of this makes sense to everyone.
->>>>
->>>>> Regards
->>>>>
->>>>> Marcel
->>>>>
->>>>
->>>> Arman
->>>
->>>
->>>
->>> --
->>> Luiz Augusto von Dentz
->>
->>
->>
->> --
->> Luiz Augusto von Dentz
->
-> Thanks,
-> Arman
-
-Thanks,
-Arman
