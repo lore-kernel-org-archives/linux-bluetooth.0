@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Johan Hedberg <johan.hedberg@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 34/49] Bluetooth: Add hci_conn flag for new link key generation
-Date: Wed,  3 Dec 2014 17:02:28 +0200
-Message-Id: <1417618963-18010-35-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH 33/49] Bluetooth: Use debug keys for SMP when HCI_USE_DEBUG_KEYS is set
+Date: Wed,  3 Dec 2014 17:02:27 +0200
+Message-Id: <1417618963-18010-34-git-send-email-johan.hedberg@gmail.com>
 In-Reply-To: <1417618963-18010-1-git-send-email-johan.hedberg@gmail.com>
 References: <1417618963-18010-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,49 +11,57 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-For LE Secure Connections we want to trigger cross transport key
-generation only if a new link key was actually created during the BR/EDR
-connection. This patch adds a new flag to track this information.
+The HCI_USE_DEBUG_KEYS flag is intended to force our side to always use
+debug keys for pairing. This means both BR/EDR SSP as well as SMP with
+LE Secure Connections. This patch updates the SMP code to use the debug
+keys instead of generating a random local key pair when the flag is set.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- include/net/bluetooth/hci_core.h | 1 +
- net/bluetooth/hci_event.c        | 3 +++
- 2 files changed, 4 insertions(+)
+ net/bluetooth/smp.c | 27 ++++++++++++++++++---------
+ 1 file changed, 18 insertions(+), 9 deletions(-)
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 90929641d0f0..42f9362a83c1 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -559,6 +559,7 @@ enum {
- 	HCI_CONN_AUTH_INITIATOR,
- 	HCI_CONN_DROP,
- 	HCI_CONN_PARAM_REMOVAL_PEND,
-+	HCI_CONN_NEW_LINK_KEY,
- };
+diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
+index 16bd15e04b85..3aad5864a5e1 100644
+--- a/net/bluetooth/smp.c
++++ b/net/bluetooth/smp.c
+@@ -1585,18 +1585,27 @@ static u8 smp_cmd_pairing_req(struct l2cap_conn *conn, struct sk_buff *skb)
  
- static inline bool hci_conn_ssp_enabled(struct hci_conn *conn)
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 34ecbf0b7e5b..c3d6390e3b7b 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -3249,6 +3249,8 @@ static void hci_link_key_request_evt(struct hci_dev *hdev, struct sk_buff *skb)
- 
- 	conn = hci_conn_hash_lookup_ba(hdev, ACL_LINK, &ev->bdaddr);
- 	if (conn) {
-+		clear_bit(HCI_CONN_NEW_LINK_KEY, &conn->flags);
+ static u8 sc_send_public_key(struct smp_chan *smp)
+ {
++	struct hci_dev *hdev = smp->conn->hcon->hdev;
 +
- 		if ((key->type == HCI_LK_UNAUTH_COMBINATION_P192 ||
- 		     key->type == HCI_LK_UNAUTH_COMBINATION_P256) &&
- 		    conn->auth_type != 0xff && (conn->auth_type & 0x01)) {
-@@ -3301,6 +3303,7 @@ static void hci_link_key_notify_evt(struct hci_dev *hdev, struct sk_buff *skb)
- 	conn->disc_timeout = HCI_DISCONN_TIMEOUT;
- 	hci_conn_drop(conn);
+ 	BT_DBG("");
  
-+	set_bit(HCI_CONN_NEW_LINK_KEY, &conn->flags);
- 	conn_set_key(conn, ev->key_type, conn->pin_length);
+-	while (true) {
+-		/* Generate local key pair for Secure Connections */
+-		if (!ecc_make_key(smp->local_pk, smp->local_sk))
+-			return SMP_UNSPECIFIED;
++	if (test_bit(HCI_USE_DEBUG_KEYS, &hdev->dev_flags)) {
++		BT_DBG("Using debug keys");
++		memcpy(smp->local_pk, debug_pk, 64);
++		memcpy(smp->local_sk, debug_sk, 32);
++		set_bit(SMP_FLAG_DEBUG_KEY, &smp->flags);
++	} else {
++		while (true) {
++			/* Generate local key pair for Secure Connections */
++			if (!ecc_make_key(smp->local_pk, smp->local_sk))
++				return SMP_UNSPECIFIED;
  
- 	if (!test_bit(HCI_MGMT, &hdev->dev_flags))
+-		/* This is unlikely, but we need to check that we didn't
+-		 * accidentially generate a debug key.
+-		 */
+-		if (memcmp(smp->local_sk, debug_sk, 32))
+-			break;
++			/* This is unlikely, but we need to check that
++			 * we didn't accidentially generate a debug key.
++			 */
++			if (memcmp(smp->local_sk, debug_sk, 32))
++				break;
++		}
+ 	}
+ 
+ 	BT_DBG("Local Public Key X: %32phN", smp->local_pk);
 -- 
 2.1.0
 
