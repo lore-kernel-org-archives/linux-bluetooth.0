@@ -1,8 +1,8 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-Date: Wed, 3 Dec 2014 16:51:16 -0800
-Message-ID: <CAPt0RYyJH9eYC=BPs0U6RR4JXj4UyM3jjnS+Sa8RStNPed6WYw@mail.gmail.com>
-Subject: packed structs in bluez code
+Date: Wed, 3 Dec 2014 15:28:12 -0800
+Message-ID: <CAPt0RYxF95U1KvU2-exkoJCwaYqdzg0P_kJmnO65oSKMVNmKxA@mail.gmail.com>
+Subject: Question about mgmt header files and shared-mainloop library
 From: Mona Attariyan <monattar@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset=UTF-8
@@ -10,9 +10,15 @@ Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi,
-I have a simple question. I'm wondering about all the packed structs
-in bluez (e.g. many examples in lib/hci.h). Is it to make sure that
-the size of the struct does not change due to padding based on the
-architecture?
+I'm using bluez mgmt API in a simple scan application. I've been
+including headers files like src/shared/mgmt.h and src/shared/util.h.
+Also the main bluez bluetooth library (libbluetooth.so) does not
+include the mgmt and mainloop stuff, so I've been linking against
+shared-mainloop.a. My question is why aren't these header files part
+of the public API? as in in lib directory or something that doesn't
+sound internal. Same question about the library. Why aren't mgmt stuff
+compiled into the main library?
+I appreciate it if anyone could shed some light into the reasoning
+behind this. Am I not supposed to be using these?
 
-Thanks,
+Thanks.
