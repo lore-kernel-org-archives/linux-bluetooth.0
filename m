@@ -1,34 +1,46 @@
 Return-Path: <cyrus@holtmann.org>
+MIME-Version: 1.0
+In-Reply-To: <1417518200-18428-2-git-send-email-lukasz.rymanowski@tieto.com>
+References: <1417518200-18428-1-git-send-email-lukasz.rymanowski@tieto.com>
+	<1417518200-18428-2-git-send-email-lukasz.rymanowski@tieto.com>
+Date: Wed, 3 Dec 2014 11:30:49 +0100
+Message-ID: <CAMudyAtJAfwHxXxFS4GpuYScap4+4JUbEGFeKPOaP6g-Ot8J_A@mail.gmail.com>
+Subject: Re: [PATCH 1/3] android/handsfree-client: Fix for correct audio state
 From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-To: linux-bluetooth@vger.kernel.org
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Cc: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH v3 0/3] android/handsfree: Move to use bt_sco lib
-Date: Wed,  3 Dec 2014 11:42:23 +0100
-Message-Id: <1417603346-6442-1-git-send-email-lukasz.rymanowski@tieto.com>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This set has couple of fixes plus patch moving sco handling to
-bt_sco lib
+Hi,
 
-v2:
-* Improve disconnect_sco()
-* remove patch adding default to switch/case
-* Patch for handling idle state can be removed because of improvement of
-disconnect_sco()
+On 2 December 2014 at 12:03, Lukasz Rymanowski
+<lukasz.rymanowski@tieto.com> wrote:
+> Disconnect audio state shall be set just after bt_sco_disconnect has
+> been called.
+> ---
+>  android/handsfree-client.c | 2 ++
+>  1 file changed, 2 insertions(+)
+>
+> diff --git a/android/handsfree-client.c b/android/handsfree-client.c
+> index 9818a47..b84ad79 100644
+> --- a/android/handsfree-client.c
+> +++ b/android/handsfree-client.c
+> @@ -387,6 +387,8 @@ static void handle_disconnect_audio(const void *buf, uint16_t len)
+>         }
+>
+>         bt_sco_disconnect(sco);
+> +       set_audio_state(dev, HAL_HF_CLIENT_AUDIO_STATE_DISCONNECTED);
+> +
 
-v3:
-* added patch for disconnect SCO to bt_sco lib. this is needed for following patch
+Ignore that patch. Correct fix shall be in sco.c Will send in separate patch.
 
-Lukasz Rymanowski (3):
-  android/sco: Fix for disconnect SCO
-  android/handsfree: Use bt_sco lib in HFP AG code
-  android/handsfree: Simplify codec selection
+\Lukasz
 
- android/handsfree.c | 185 +++++++++++++---------------------------------------
- android/sco.c       |  12 +---
- 2 files changed, 47 insertions(+), 150 deletions(-)
-
--- 
-1.8.4
-
+>         status = HAL_STATUS_SUCCESS;
+>
+>  done:
+> --
+> 1.8.4
+>
