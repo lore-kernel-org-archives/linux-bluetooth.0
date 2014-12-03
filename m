@@ -1,37 +1,90 @@
 Return-Path: <cyrus@holtmann.org>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 8.1 \(1993\))
+Subject: Re: [PATCH] Bluetooth: Add support for Broadcom BCM20702A0 variants firmware upload via BTUSB_BCM_PATCHRAM
 From: Marcel Holtmann <marcel@holtmann.org>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Increase minor version of core module
-Date: Wed,  3 Dec 2014 19:46:10 +0100
-Message-Id: <1417632370-31742-1-git-send-email-marcel@holtmann.org>
+In-Reply-To: <1417631542-23994-1-git-send-email-harv@gmx.de>
+Date: Wed, 3 Dec 2014 18:42:59 +0000
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <32E834F3-7C4C-451E-8A5B-39C29877DE6F@holtmann.org>
+References: <8967C48B-00C1-43E8-A8EC-C41642288122@holtmann.org> <1417631542-23994-1-git-send-email-harv@gmx.de>
+To: Heinrich Siebmanns <harv@gmx.de>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-With the addition of support for Bluetooth Low Energy Secure Connections
-feature, it makes sense to increase the minor version of the Bluetooth
-core module.
+Hi Heinrich,
 
-The module version is not used anywhere, but it gives a nice extra
-hint for debugging purposes.
+so I fixed the subject to say firmware download instead of upload. Just for reference, you download firmware into the device.
 
-Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
----
- net/bluetooth/af_bluetooth.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+> On Dec 3, 2014, at 18:32, Heinrich Siebmanns <harv@gmx.de> wrote:
+> 
+> This requires the flag BTUSB_BCM_PATCHRAM to work.
+> 
+> Relevant details from /sys/kernel/debug/usb/devices for my device:
+> 
+> T:  Bus=03 Lev=02 Prnt=02 Port=03 Cnt=02 Dev#=  4 Spd=12   MxCh= 0
+> D:  Ver= 2.00 Cls=ff(vend.) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
+> P:  Vendor=0489 ProdID=e031 Rev= 1.12
+> S:  Manufacturer=Broadcom Corp
+> S:  Product=BCM20702A0
+> S:  SerialNumber=3859F9CD2AEE
+> C:* #Ifs= 4 Cfg#= 1 Atr=e0 MxPwr=  0mA
+> I:* If#= 0 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
+> E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+> E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+> I:* If#= 1 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+> I:  If#= 1 Alt= 1 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+> I:  If#= 1 Alt= 2 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+> I:  If#= 1 Alt= 3 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+> I:  If#= 1 Alt= 4 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+> I:  If#= 1 Alt= 5 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+> I:* If#= 2 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=ff Driver=(none)
+> E:  Ad=84(I) Atr=02(Bulk) MxPS=  32 Ivl=0ms
+> E:  Ad=04(O) Atr=02(Bulk) MxPS=  32 Ivl=0ms
+> I:* If#= 3 Alt= 0 #EPs= 0 Cls=fe(app. ) Sub=01 Prot=01 Driver=(none)
+> 
+> The firmware was extracted from a Windows 7 32-bit installation
+> and converted from 'hex' to 'hcd' for use in Linux.
+> 
+> The firmware is named "BCM20702A0_001.001.024.0156.0204.hex"
+> and is located in "%SYSTEMROOT%\system32\drivers\"
+> (md5 d126e6c4e0e669d76c38cf9377f76b7f)
+> (sha1 145d1850b2785a953233b409e7ff77786927c7d2)
+> 
+> The firmware file is also available as a download at
+> http://support.ts.fujitsu.com/Download/
+> contained in "FTS_WIDCOMMBluetoothSoftware_6309000_1072149.zip"
+> 
+> Search for the file Win32/bcbtums-win7x86-brcm.inf in the archive,
+> look for the vendor and product ID of your adapter, see the section
+> 'devices' in that file to find out what device name it uses. See
+> the device entry in the inf file (in my case it was 'RAMUSBE031')
+> to find out which hex file you need to convert to hcd for upload
+> 
+> 'hcd' file should be placed at "brcm/BCM20702A0-0489-e031.hcd"
+> inside the firmware directory (e.g. "/lib/firmware")
+> 
+> Signed-off-by: Heinrich Siebmanns <harv@gmx.de>
+> ---
+> drivers/bluetooth/btusb.c | 3 ++-
+> 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/net/bluetooth/af_bluetooth.c b/net/bluetooth/af_bluetooth.c
-index 339c74ad4553..4ba15917da5e 100644
---- a/net/bluetooth/af_bluetooth.c
-+++ b/net/bluetooth/af_bluetooth.c
-@@ -31,7 +31,7 @@
- #include <net/bluetooth/bluetooth.h>
- #include <linux/proc_fs.h>
- 
--#define VERSION "2.19"
-+#define VERSION "2.20"
- 
- /* Bluetooth sockets */
- #define BT_MAX_PROTO	8
--- 
-1.9.3
+patch has been applied to bluetooth-next tree.
+
+Regards
+
+Marcel
 
