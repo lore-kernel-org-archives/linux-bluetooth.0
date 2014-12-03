@@ -1,78 +1,88 @@
 Return-Path: <cyrus@holtmann.org>
-From: Johan Hedberg <johan.hedberg@gmail.com>
+From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 01/49] Bluetooth: Add basic SMP defines for LE Secure Connections
-Date: Wed,  3 Dec 2014 17:01:55 +0200
-Message-Id: <1417618963-18010-2-git-send-email-johan.hedberg@gmail.com>
-In-Reply-To: <1417618963-18010-1-git-send-email-johan.hedberg@gmail.com>
-References: <1417618963-18010-1-git-send-email-johan.hedberg@gmail.com>
+Subject: [RFC] android/tester: Add disconnect A2DP steps to AVRCP test cases
+Date: Wed,  3 Dec 2014 15:54:58 +0100
+Message-Id: <1417618498-15530-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@intel.com>
-
-This patch adds basic SMP defines for commands, error codes and PDU
-definitions for the LE Secure Connections feature.
-
-Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+While teardown, services are unregistered (A2DP, AVRCP) and
+notification with a2dp link state comes. This can trigger an
+IPC error (handle notification on unregistered service) if
+service is unregistered and then notification wants to be handled
+by IPC. To avoid changing link state in teardown phase A2DP connection
+needs to be disconnected in test phase.
 ---
- net/bluetooth/smp.h | 25 ++++++++++++++++++++++++-
- 1 file changed, 24 insertions(+), 1 deletion(-)
+ android/tester-avrcp.c | 34 ++++++++++++++++------------------
+ 1 file changed, 16 insertions(+), 18 deletions(-)
 
-diff --git a/net/bluetooth/smp.h b/net/bluetooth/smp.h
-index f76083b85005..7c3c351909f5 100644
---- a/net/bluetooth/smp.h
-+++ b/net/bluetooth/smp.h
-@@ -50,10 +50,13 @@ struct smp_cmd_pairing {
- #define SMP_DIST_ENC_KEY	0x01
- #define SMP_DIST_ID_KEY		0x02
- #define SMP_DIST_SIGN		0x04
-+#define SMP_DIST_LINK_KEY	0x08
- 
- #define SMP_AUTH_NONE		0x00
- #define SMP_AUTH_BONDING	0x01
- #define SMP_AUTH_MITM		0x04
-+#define SMP_AUTH_SC		0x08
-+#define SMP_AUTH_KEYPRESS	0x10
- 
- #define SMP_CMD_PAIRING_CONFIRM	0x03
- struct smp_cmd_pairing_confirm {
-@@ -102,7 +105,23 @@ struct smp_cmd_security_req {
- 	__u8	auth_req;
- } __packed;
- 
--#define SMP_CMD_MAX		0x0b
-+#define SMP_CMD_PUBLIC_KEY	0x0c
-+struct smp_cmd_public_key {
-+	__u8	x[32];
-+	__u8	y[32];
-+} __packed;
-+
-+#define SMP_CMD_DHKEY_CHECK	0x0d
-+struct smp_cmd_dhkey_check {
-+	__u8	e[16];
-+} __packed;
-+
-+#define SMP_CMD_KEYPRESS_NOTIFY	0x0e
-+struct smp_cmd_keypress_notify {
-+	__u8	value;
-+} __packed;
-+
-+#define SMP_CMD_MAX		0x0e
- 
- #define SMP_PASSKEY_ENTRY_FAILED	0x01
- #define SMP_OOB_NOT_AVAIL		0x02
-@@ -114,6 +133,10 @@ struct smp_cmd_security_req {
- #define SMP_UNSPECIFIED			0x08
- #define SMP_REPEATED_ATTEMPTS		0x09
- #define SMP_INVALID_PARAMS		0x0a
-+#define SMP_DHKEY_CHECK_FAILED		0x0b
-+#define SMP_NUMERIC_COMP_FAILED		0x0c
-+#define SMP_BREDR_PAIRING_IN_PROGRESS	0x0d
-+#define SMP_CROSS_TRANSP_NOT_ALLOWED	0x0e
- 
- #define SMP_MIN_ENC_KEY_SIZE		7
- #define SMP_MAX_ENC_KEY_SIZE		16
+diff --git a/android/tester-avrcp.c b/android/tester-avrcp.c
+index 7c02ec2..7044bc8 100644
+--- a/android/tester-avrcp.c
++++ b/android/tester-avrcp.c
+@@ -341,24 +341,7 @@ static struct test_case test_cases[] = {
+ 	TEST_CASE_BREDRLE("AVRCP Init",
+ 		ACTION_SUCCESS(dummy_action, NULL),
+ 	),
+-	TEST_CASE_BREDRLE("AVRCP Connect - Success",
+-		ACTION_SUCCESS(bluetooth_enable_action, NULL),
+-		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_ON),
+-		ACTION_SUCCESS(emu_setup_powered_remote_action, NULL),
+-		ACTION_SUCCESS(emu_set_ssp_mode_action, NULL),
+-		ACTION_SUCCESS(set_default_ssp_request_handler, NULL),
+-		ACTION_SUCCESS(emu_add_l2cap_server_action, &sdp_setup_data),
+-		ACTION_SUCCESS(emu_add_l2cap_server_action, &a2dp_setup_data),
+-		ACTION_SUCCESS(emu_add_l2cap_server_action, &avrcp_setup_data),
+-		ACTION_SUCCESS(avrcp_connect_action, NULL),
+-		CALLBACK_AV_CONN_STATE(CB_A2DP_CONN_STATE,
+-					BTAV_CONNECTION_STATE_CONNECTING),
+-		CALLBACK_AV_CONN_STATE(CB_A2DP_CONN_STATE,
+-					BTAV_CONNECTION_STATE_CONNECTED),
+-		ACTION_SUCCESS(bluetooth_disable_action, NULL),
+-		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_OFF),
+-	),
+-	TEST_CASE_BREDRLE("AVRCP Disconnect - Success",
++	TEST_CASE_BREDRLE("AVRCP Connect/Disconnect - Success",
+ 		ACTION_SUCCESS(bluetooth_enable_action, NULL),
+ 		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_ON),
+ 		ACTION_SUCCESS(emu_setup_powered_remote_action, NULL),
+@@ -399,6 +382,11 @@ static struct test_case test_cases[] = {
+ 		ACTION_SUCCESS(avrcp_get_play_status_rsp, NULL),
+ 		CALLBACK_RC_PLAY_STATUS(CB_AVRCP_PLAY_STATUS_RSP, 0xbbbbbbbb,
+ 							0xaaaaaaaa, 0x00),
++		ACTION_SUCCESS(avrcp_disconnect_action, NULL),
++		CALLBACK_AV_CONN_STATE(CB_A2DP_CONN_STATE,
++					BTAV_CONNECTION_STATE_DISCONNECTING),
++		CALLBACK_AV_CONN_STATE(CB_A2DP_CONN_STATE,
++					BTAV_CONNECTION_STATE_DISCONNECTED),
+ 		ACTION_SUCCESS(bluetooth_disable_action, NULL),
+ 		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_OFF),
+ 	),
+@@ -421,6 +409,11 @@ static struct test_case test_cases[] = {
+ 		ACTION_SUCCESS(avrcp_reg_notif_track_changed_rsp, NULL),
+ 		CALLBACK_RC_REG_NOTIF_TRACK_CHANGED(CB_AVRCP_REG_NOTIF_RSP,
+ 							0xffffffffffffffff),
++		ACTION_SUCCESS(avrcp_disconnect_action, NULL),
++		CALLBACK_AV_CONN_STATE(CB_A2DP_CONN_STATE,
++					BTAV_CONNECTION_STATE_DISCONNECTING),
++		CALLBACK_AV_CONN_STATE(CB_A2DP_CONN_STATE,
++					BTAV_CONNECTION_STATE_DISCONNECTED),
+ 		ACTION_SUCCESS(bluetooth_disable_action, NULL),
+ 		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_OFF),
+ 	),
+@@ -443,6 +436,11 @@ static struct test_case test_cases[] = {
+ 		ACTION_SUCCESS(avrcp_get_element_attributes_rsp, NULL),
+ 		CALLBACK_RC_GET_ELEMENT_ATTRIBUTES(CB_AVRCP_GET_ATTR_RSP, 2,
+ 								ele_attrs),
++		ACTION_SUCCESS(avrcp_disconnect_action, NULL),
++		CALLBACK_AV_CONN_STATE(CB_A2DP_CONN_STATE,
++					BTAV_CONNECTION_STATE_DISCONNECTING),
++		CALLBACK_AV_CONN_STATE(CB_A2DP_CONN_STATE,
++					BTAV_CONNECTION_STATE_DISCONNECTED),
+ 		ACTION_SUCCESS(bluetooth_disable_action, NULL),
+ 		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_OFF),
+ 	),
 -- 
-2.1.0
+1.9.3
 
