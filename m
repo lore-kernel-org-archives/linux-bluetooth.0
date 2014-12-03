@@ -1,32 +1,62 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] bluetooth: Fix possible NULL dereference
-Date: Wed,  3 Dec 2014 09:46:05 +0200
-Message-Id: <1417592765-24836-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+From: Vikrampal <vikram.pal@samsung.com>
+To: 'Luiz Augusto von Dentz' <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	'Dmitry Kasatkin' <d.kasatkin@samsung.com>, cpgs@samsung.com
+References: <1416577665-21876-1-git-send-email-vikram.pal@samsung.com>
+ <CABBYNZJSxCADaEU5XLRaTUGY0AGu+8s_B+ojSAymszWiJNDNiw@mail.gmail.com>
+In-reply-to: <CABBYNZJSxCADaEU5XLRaTUGY0AGu+8s_B+ojSAymszWiJNDNiw@mail.gmail.com>
+Subject: RE: [PATCH 0/7] L2CAP control field + AVRCP browsing PDU parsing
+Date: Wed, 03 Dec 2014 12:38:52 +0530
+Message-id: <003e01d00ec8$0b325380$2196fa80$@samsung.com>
+MIME-version: 1.0
+Content-type: text/plain; charset=utf-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Hi Luiz,
 
-conn might be NULL and would be dereferenced in conn_set_key()
----
- net/bluetooth/hci_event.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+> -----Original Message-----
+> From: Luiz Augusto von Dentz [mailto:luiz.dentz@gmail.com]
+> Sent: Friday, November 28, 2014 2:07 PM
+> To: Vikrampal Yadav
+> Cc: linux-bluetooth@vger.kernel.org; Dmitry Kasatkin; cpgs@samsung.com
+> Subject: Re: [PATCH 0/7] L2CAP control field + AVRCP browsing PDU parsing
+> 
+> Hi Vikram,
+> 
+> On Fri, Nov 21, 2014 at 3:47 PM, Vikrampal Yadav
+> <vikram.pal@samsung.com> wrote:
+> > Support for ERTM control bytes adjustment, parsing L2CAP extended
+> > control field and AVRCP SetBrowsedPlayer added in Bluetooth monitor.
+> >
+> > Vikrampal Yadav (7):
+> >   monitor: Adjust for ERTM control bytes
+> >   monitor: Make the parameter name generic
+> >   monitor: Add functionality to store extented control in DB
+> >   monitor: Extract extended L2CAP extended control field
+> >   monitor: Add support for parsing L2CAP extended control field
+> >   monitor: Add support for parsing L2CAP control field
+> >   monitor: Add AVRCP SetBrowsedPlayer support
+> >
+> >  monitor/avctp.c |  86 +++++++++++++++++++-  monitor/l2cap.c | 242
+> > ++++++++++++++++++++++++++++++++++++++++++++++++++++++--
+> >  2 files changed, 322 insertions(+), 6 deletions(-)
+> >
+> > --
+> > 1.9.1
+> 
+> Sorry for the delay, this one got lost in my inbox, most patches seems to be
+> missing the output they generate, could you please add it.
 
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index bd0a801..95f8057 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -3312,7 +3312,7 @@ static void hci_link_key_notify_evt(struct hci_dev *hdev, struct sk_buff *skb)
- 	/* Update connection information since adding the key will have
- 	 * fixed up the type in the case of changed combination keys.
- 	 */
--	if (ev->key_type == HCI_LK_CHANGED_COMBINATION)
-+	if (conn && ev->key_type == HCI_LK_CHANGED_COMBINATION)
- 		conn_set_key(conn, key->type, key->pin_len);
- 
- 	mgmt_new_link_key(hdev, key, persistent);
--- 
-1.9.1
+Most patches in this series are helper patches for the last patch in this series.
+The final patch actually prints the output which shows the work done by
+Other patches.
+> 
+> 
+> --
+> Luiz Augusto von Dentz
+
+Regards,
+Vikram
 
