@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Johan Hedberg <johan.hedberg@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 25/49] Bluetooth: Detect SMP SC debug keys
-Date: Wed,  3 Dec 2014 17:02:19 +0200
-Message-Id: <1417618963-18010-26-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH 24/49] Bluetooth: Add selection of the SC authentication method
+Date: Wed,  3 Dec 2014 17:02:18 +0200
+Message-Id: <1417618963-18010-25-git-send-email-johan.hedberg@gmail.com>
 In-Reply-To: <1417618963-18010-1-git-send-email-johan.hedberg@gmail.com>
 References: <1417618963-18010-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,65 +11,145 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-We need to be able to detect if the remote side used a debug key for the
-pairing. This patch adds the debug key defines and sets a flag to
-indicate that a debug key was used. The debug private key (debug_sk) is
-also added in this patch but will only be used in a subsequent patch
-when local debug key support is implemented.
+This patch adds code to select the authentication method for Secure
+Connections based on the local and remote capabilities. A new
+DSP_PASSKEY method is also added for displaying the passkey - something
+that is not part of legacy SMP pairing.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- net/bluetooth/smp.c | 27 +++++++++++++++++++++++++++
- 1 file changed, 27 insertions(+)
+ net/bluetooth/smp.c | 74 +++++++++++++++++++++++++++++++++++++++++++++++++----
+ 1 file changed, 69 insertions(+), 5 deletions(-)
 
 diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
-index 8753d8120850..74b0489fea4f 100644
+index 651963f26da0..8753d8120850 100644
 --- a/net/bluetooth/smp.c
 +++ b/net/bluetooth/smp.c
-@@ -54,6 +54,7 @@ enum {
- 	SMP_FLAG_INITIATOR,
- 	SMP_FLAG_SC,
- 	SMP_FLAG_REMOTE_PK,
-+	SMP_FLAG_DEBUG_KEY,
+@@ -661,6 +661,7 @@ static void smp_failure(struct l2cap_conn *conn, u8 reason)
+ #define REQ_PASSKEY	0x02
+ #define CFM_PASSKEY	0x03
+ #define REQ_OOB		0x04
++#define DSP_PASSKEY	0x05
+ #define OVERLAP		0xFF
+ 
+ static const u8 gen_method[5][5] = {
+@@ -671,6 +672,14 @@ static const u8 gen_method[5][5] = {
+ 	{ CFM_PASSKEY, CFM_PASSKEY, REQ_PASSKEY, JUST_WORKS, OVERLAP     },
  };
  
- struct smp_chan {
-@@ -92,6 +93,29 @@ struct smp_chan {
- 	struct crypto_hash	*tfm_cmac;
- };
- 
-+/* These debug key values are defined in the SMP section of the core
-+ * specification. debug_pk is the public debug key and debug_sk the
-+ * private debug key.
-+ */
-+static const u8 debug_pk[64] = {
-+		0xe6, 0x9d, 0x35, 0x0e, 0x48, 0x01, 0x03, 0xcc,
-+		0xdb, 0xfd, 0xf4, 0xac, 0x11, 0x91, 0xf4, 0xef,
-+		0xb9, 0xa5, 0xf9, 0xe9, 0xa7, 0x83, 0x2c, 0x5e,
-+		0x2c, 0xbe, 0x97, 0xf2, 0xd2, 0x03, 0xb0, 0x20,
-+
-+		0x8b, 0xd2, 0x89, 0x15, 0xd0, 0x8e, 0x1c, 0x74,
-+		0x24, 0x30, 0xed, 0x8f, 0xc2, 0x45, 0x63, 0x76,
-+		0x5c, 0x15, 0x52, 0x5a, 0xbf, 0x9a, 0x32, 0x63,
-+		0x6d, 0xeb, 0x2a, 0x65, 0x49, 0x9c, 0x80, 0xdc,
++static const u8 sc_method[5][5] = {
++	{ JUST_WORKS,  JUST_CFM,    REQ_PASSKEY, JUST_WORKS, REQ_PASSKEY },
++	{ JUST_WORKS,  CFM_PASSKEY, REQ_PASSKEY, JUST_WORKS, CFM_PASSKEY },
++	{ DSP_PASSKEY, DSP_PASSKEY, REQ_PASSKEY, JUST_WORKS, DSP_PASSKEY },
++	{ JUST_WORKS,  JUST_CFM,    JUST_WORKS,  JUST_WORKS, JUST_CFM    },
++	{ DSP_PASSKEY, CFM_PASSKEY, REQ_PASSKEY, JUST_WORKS, CFM_PASSKEY },
 +};
 +
-+static const u8 debug_sk[32] = {
-+		0xbd, 0x1a, 0x3c, 0xcd, 0xa6, 0xb8, 0x99, 0x58,
-+		0x99, 0xb7, 0x40, 0xeb, 0x7b, 0x60, 0xff, 0x4a,
-+		0x50, 0x3f, 0x10, 0xd2, 0xe3, 0xb3, 0xc9, 0x74,
-+		0x38, 0x5f, 0xc5, 0xa3, 0xd4, 0xf6, 0x49, 0x3f,
-+};
-+
- static inline void swap_buf(const u8 *src, u8 *dst, size_t len)
+ static u8 get_auth_method(struct smp_chan *smp, u8 local_io, u8 remote_io)
  {
- 	size_t i;
-@@ -2000,6 +2024,9 @@ static int smp_cmd_public_key(struct l2cap_conn *conn, struct sk_buff *skb)
- 	else
- 		hcon->pending_sec_level = BT_SECURITY_FIPS;
+ 	/* If either side has unknown io_caps, use JUST_CFM (which gets
+@@ -680,6 +689,9 @@ static u8 get_auth_method(struct smp_chan *smp, u8 local_io, u8 remote_io)
+ 	    remote_io > SMP_IO_KEYBOARD_DISPLAY)
+ 		return JUST_CFM;
  
-+	if (!memcmp(debug_pk, smp->remote_pk, 64))
-+		set_bit(SMP_FLAG_DEBUG_KEY, &smp->flags);
++	if (test_bit(SMP_FLAG_SC, &smp->flags))
++		return sc_method[remote_io][local_io];
++
+ 	return gen_method[remote_io][local_io];
+ }
+ 
+@@ -1305,6 +1317,11 @@ static u8 smp_cmd_pairing_req(struct l2cap_conn *conn, struct sk_buff *skb)
+ 	memcpy(&smp->preq[1], req, sizeof(*req));
+ 	skb_pull(skb, sizeof(*req));
+ 
++	build_pairing_cmd(conn, req, &rsp, auth);
++
++	if (rsp.auth_req & SMP_AUTH_SC)
++		set_bit(SMP_FLAG_SC, &smp->flags);
++
+ 	if (conn->hcon->io_capability == HCI_IO_NO_INPUT_OUTPUT)
+ 		sec_level = BT_SECURITY_MEDIUM;
+ 	else
+@@ -1323,11 +1340,6 @@ static u8 smp_cmd_pairing_req(struct l2cap_conn *conn, struct sk_buff *skb)
+ 			return SMP_AUTH_REQUIREMENTS;
+ 	}
+ 
+-	build_pairing_cmd(conn, req, &rsp, auth);
+-
+-	if (rsp.auth_req & SMP_AUTH_SC)
+-		set_bit(SMP_FLAG_SC, &smp->flags);
+-
+ 	key_size = min(req->max_key_size, rsp.max_key_size);
+ 	if (check_enc_key_size(conn, key_size))
+ 		return SMP_ENC_KEY_SIZE;
+@@ -1901,12 +1913,54 @@ static int smp_cmd_sign_info(struct l2cap_conn *conn, struct sk_buff *skb)
+ 	return 0;
+ }
+ 
++static u8 sc_select_method(struct smp_chan *smp)
++{
++	struct l2cap_conn *conn = smp->conn;
++	struct hci_conn *hcon = conn->hcon;
++	struct smp_cmd_pairing *local, *remote;
++	u8 local_mitm, remote_mitm, local_io, remote_io, method;
++
++	/* The preq/prsp contain the raw Pairing Request/Response PDUs
++	 * which are needed as inputs to some crypto functions. To get
++	 * the "struct smp_cmd_pairing" from them we need to skip the
++	 * first byte which contains the opcode.
++	 */
++	if (hcon->out) {
++		local = (void *) &smp->preq[1];
++		remote = (void *) &smp->prsp[1];
++	} else {
++		local = (void *) &smp->prsp[1];
++		remote = (void *) &smp->preq[1];
++	}
++
++	local_io = local->io_capability;
++	remote_io = remote->io_capability;
++
++	local_mitm = (local->auth_req & SMP_AUTH_MITM);
++	remote_mitm = (remote->auth_req & SMP_AUTH_MITM);
++
++	/* If either side wants MITM, look up the method from the table,
++	 * otherwise use JUST WORKS.
++	 */
++	if (local_mitm || remote_mitm)
++		method = get_auth_method(smp, local_io, remote_io);
++	else
++		method = JUST_WORKS;
++
++	/* Don't confirm locally initiated pairing attempts */
++	if (method == JUST_CFM && test_bit(SMP_FLAG_INITIATOR, &smp->flags))
++		method = JUST_WORKS;
++
++	return method;
++}
++
+ static int smp_cmd_public_key(struct l2cap_conn *conn, struct sk_buff *skb)
+ {
+ 	struct smp_cmd_public_key *key = (void *) skb->data;
+ 	struct hci_conn *hcon = conn->hcon;
+ 	struct l2cap_chan *chan = conn->smp;
+ 	struct smp_chan *smp = chan->data;
++	struct hci_dev *hdev = hcon->hdev;
+ 	struct smp_cmd_pairing_confirm cfm;
+ 	int err;
+ 
+@@ -1936,6 +1990,16 @@ static int smp_cmd_public_key(struct l2cap_conn *conn, struct sk_buff *skb)
+ 
+ 	set_bit(SMP_FLAG_REMOTE_PK, &smp->flags);
+ 
++	smp->method = sc_select_method(smp);
++
++	BT_DBG("%s selected method 0x%02x", hdev->name, smp->method);
++
++	/* JUST_WORKS and JUST_CFM result in an unauthenticated key */
++	if (smp->method == JUST_WORKS || smp->method == JUST_CFM)
++		hcon->pending_sec_level = BT_SECURITY_MEDIUM;
++	else
++		hcon->pending_sec_level = BT_SECURITY_FIPS;
 +
  	/* The Initiating device waits for the non-initiating device to
  	 * send the confirm value.
