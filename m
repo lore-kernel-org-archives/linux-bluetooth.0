@@ -1,46 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] shared/hfp: Improve prefix comparing
+Date: Wed, 03 Dec 2014 11:06:40 +0100
+Message-ID: <2856408.IYG60yLa7R@uw000953>
+In-Reply-To: <1417518069-18289-1-git-send-email-lukasz.rymanowski@tieto.com>
+References: <1417518069-18289-1-git-send-email-lukasz.rymanowski@tieto.com>
 MIME-Version: 1.0
-In-Reply-To: <1417518200-18428-2-git-send-email-lukasz.rymanowski@tieto.com>
-References: <1417518200-18428-1-git-send-email-lukasz.rymanowski@tieto.com>
-	<1417518200-18428-2-git-send-email-lukasz.rymanowski@tieto.com>
-Date: Wed, 3 Dec 2014 11:30:49 +0100
-Message-ID: <CAMudyAtJAfwHxXxFS4GpuYScap4+4JUbEGFeKPOaP6g-Ot8J_A@mail.gmail.com>
-Subject: Re: [PATCH 1/3] android/handsfree-client: Fix for correct audio state
-From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Cc: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Łukasz,
 
-On 2 December 2014 at 12:03, Lukasz Rymanowski
-<lukasz.rymanowski@tieto.com> wrote:
-> Disconnect audio state shall be set just after bt_sco_disconnect has
-> been called.
+On Tuesday 02 of December 2014 12:01:09 Lukasz Rymanowski wrote:
 > ---
->  android/handsfree-client.c | 2 ++
->  1 file changed, 2 insertions(+)
->
-> diff --git a/android/handsfree-client.c b/android/handsfree-client.c
-> index 9818a47..b84ad79 100644
-> --- a/android/handsfree-client.c
-> +++ b/android/handsfree-client.c
-> @@ -387,6 +387,8 @@ static void handle_disconnect_audio(const void *buf, uint16_t len)
->         }
->
->         bt_sco_disconnect(sco);
-> +       set_audio_state(dev, HAL_HF_CLIENT_AUDIO_STATE_DISCONNECTED);
-> +
+>  src/shared/hfp.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/src/shared/hfp.c b/src/shared/hfp.c
+> index 5a91d12..ead082e 100644
+> --- a/src/shared/hfp.c
+> +++ b/src/shared/hfp.c
+> @@ -936,7 +936,7 @@ static bool match_handler_event_prefix(const void *a, const void *b)
+>  	const struct event_handler *handler = a;
+>  	const char *prefix = b;
+>  
+> -	if (memcmp(handler->prefix, prefix, strlen(prefix)))
+> +	if (strcmp(handler->prefix, prefix) != 0)
+>  		return false;
+>  
+>  	return true;
 
-Ignore that patch. Correct fix shall be in sco.c Will send in separate patch.
+Applied, thanks. 
 
-\Lukasz
-
->         status = HAL_STATUS_SUCCESS;
->
->  done:
-> --
-> 1.8.4
->
+-- 
+Best regards, 
+Szymon Janc
