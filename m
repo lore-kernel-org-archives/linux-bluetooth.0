@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Johan Hedberg <johan.hedberg@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 02/49] Bluetooth: Make auth_req mask dependent on SC enabled or not
-Date: Wed,  3 Dec 2014 17:01:56 +0200
-Message-Id: <1417618963-18010-3-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH 03/49] Bluetooth: Add SMP flag for SC and set it when necessary.
+Date: Wed,  3 Dec 2014 17:01:57 +0200
+Message-Id: <1417618963-18010-4-git-send-email-johan.hedberg@gmail.com>
 In-Reply-To: <1417618963-18010-1-git-send-email-johan.hedberg@gmail.com>
 References: <1417618963-18010-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,92 +11,47 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-If we haven't enabled SC support on our side we should use the same mask
-for the authentication requirement as we were using before SC support
-was added, otherwise we should use the extended mask for SC.
+This patch adds a new SMP flag for tracking whether Secure Connections
+is in use and sets the flag when both remote and local side have elected
+to use Secure Connections.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- net/bluetooth/smp.c | 17 ++++++++++-------
- 1 file changed, 10 insertions(+), 7 deletions(-)
+ net/bluetooth/smp.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
 diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
-index 069b76e03b57..bfa839eed89b 100644
+index bfa839eed89b..3808ade96d08 100644
 --- a/net/bluetooth/smp.c
 +++ b/net/bluetooth/smp.c
-@@ -35,8 +35,9 @@
+@@ -45,6 +45,7 @@ enum {
+ 	SMP_FLAG_MITM_AUTH,
+ 	SMP_FLAG_COMPLETE,
+ 	SMP_FLAG_INITIATOR,
++	SMP_FLAG_SC,
+ };
  
- #define SMP_TIMEOUT	msecs_to_jiffies(30000)
+ struct smp_chan {
+@@ -973,6 +974,9 @@ static u8 smp_cmd_pairing_req(struct l2cap_conn *conn, struct sk_buff *skb)
  
--#define AUTH_REQ_MASK   0x07
--#define KEY_DIST_MASK	0x07
-+#define AUTH_REQ_MASK(dev)	(test_bit(HCI_SC_ENABLED, &(dev)->dev_flags) ? \
-+				 0x1f : 0x07)
-+#define KEY_DIST_MASK		0x07
+ 	build_pairing_cmd(conn, req, &rsp, auth);
  
- enum {
- 	SMP_FLAG_TK_VALID,
-@@ -332,7 +333,7 @@ static void build_pairing_cmd(struct l2cap_conn *conn,
- 		req->max_key_size = SMP_MAX_ENC_KEY_SIZE;
- 		req->init_key_dist = local_dist;
- 		req->resp_key_dist = remote_dist;
--		req->auth_req = (authreq & AUTH_REQ_MASK);
-+		req->auth_req = (authreq & AUTH_REQ_MASK(hdev));
- 
- 		smp->remote_key_dist = remote_dist;
- 		return;
-@@ -343,7 +344,7 @@ static void build_pairing_cmd(struct l2cap_conn *conn,
- 	rsp->max_key_size = SMP_MAX_ENC_KEY_SIZE;
- 	rsp->init_key_dist = req->init_key_dist & remote_dist;
- 	rsp->resp_key_dist = req->resp_key_dist & local_dist;
--	rsp->auth_req = (authreq & AUTH_REQ_MASK);
-+	rsp->auth_req = (authreq & AUTH_REQ_MASK(hdev));
- 
- 	smp->remote_key_dist = rsp->init_key_dist;
- }
-@@ -942,7 +943,7 @@ static u8 smp_cmd_pairing_req(struct l2cap_conn *conn, struct sk_buff *skb)
- 		return SMP_UNSPECIFIED;
- 
- 	/* We didn't start the pairing, so match remote */
--	auth = req->auth_req & AUTH_REQ_MASK;
-+	auth = req->auth_req & AUTH_REQ_MASK(hdev);
- 
- 	if (!test_bit(HCI_BONDABLE, &hdev->dev_flags) &&
- 	    (auth & SMP_AUTH_BONDING))
-@@ -997,6 +998,7 @@ static u8 smp_cmd_pairing_rsp(struct l2cap_conn *conn, struct sk_buff *skb)
- 	struct smp_cmd_pairing *req, *rsp = (void *) skb->data;
- 	struct l2cap_chan *chan = conn->smp;
- 	struct smp_chan *smp = chan->data;
-+	struct hci_dev *hdev = conn->hcon->hdev;
- 	u8 key_size, auth;
- 	int ret;
- 
-@@ -1016,7 +1018,7 @@ static u8 smp_cmd_pairing_rsp(struct l2cap_conn *conn, struct sk_buff *skb)
++	if (rsp.auth_req & SMP_AUTH_SC)
++		set_bit(SMP_FLAG_SC, &smp->flags);
++
+ 	key_size = min(req->max_key_size, rsp.max_key_size);
  	if (check_enc_key_size(conn, key_size))
  		return SMP_ENC_KEY_SIZE;
+@@ -1020,6 +1024,9 @@ static u8 smp_cmd_pairing_rsp(struct l2cap_conn *conn, struct sk_buff *skb)
  
--	auth = rsp->auth_req & AUTH_REQ_MASK;
-+	auth = rsp->auth_req & AUTH_REQ_MASK(hdev);
+ 	auth = rsp->auth_req & AUTH_REQ_MASK(hdev);
  
++	if ((req->auth_req & SMP_AUTH_SC) && (auth & SMP_AUTH_SC))
++		set_bit(SMP_FLAG_SC, &smp->flags);
++
  	/* If we need MITM check that it can be achieved */
  	if (conn->hcon->pending_sec_level >= BT_SECURITY_HIGH) {
-@@ -1151,6 +1153,7 @@ static u8 smp_cmd_security_req(struct l2cap_conn *conn, struct sk_buff *skb)
- 	struct smp_cmd_security_req *rp = (void *) skb->data;
- 	struct smp_cmd_pairing cp;
- 	struct hci_conn *hcon = conn->hcon;
-+	struct hci_dev *hdev = hcon->hdev;
- 	struct smp_chan *smp;
- 	u8 sec_level, auth;
- 
-@@ -1162,7 +1165,7 @@ static u8 smp_cmd_security_req(struct l2cap_conn *conn, struct sk_buff *skb)
- 	if (hcon->role != HCI_ROLE_MASTER)
- 		return SMP_CMD_NOTSUPP;
- 
--	auth = rp->auth_req & AUTH_REQ_MASK;
-+	auth = rp->auth_req & AUTH_REQ_MASK(hdev);
- 
- 	if (hcon->io_capability == HCI_IO_NO_INPUT_OUTPUT)
- 		sec_level = BT_SECURITY_MEDIUM;
+ 		u8 method;
 -- 
 2.1.0
 
