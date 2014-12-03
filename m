@@ -1,39 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
-From: Arman Uguray <armansito@chromium.org>
+From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: Arman Uguray <armansito@chromium.org>
-Subject: [PATCH BlueZ v1 0/4] shared/gatt-db: Add service events.
-Date: Wed,  3 Dec 2014 11:32:24 -0800
-Message-Id: <1417635148-32546-1-git-send-email-armansito@chromium.org>
+Subject: [PATCH] Bluetooth: Increment management interface revision
+Date: Wed,  3 Dec 2014 19:52:43 +0100
+Message-Id: <1417632763-34647-1-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-*v1:
-   - Removed in_notify/need_notify_cleanup logic, since shared/queue has
-     been fixed to correctly handle queue_remove during a call to
-     queue_foreach.
+This patch increments the management interface revision due to the
+addition of support for LE Secure Connection feature.
 
-This patch set introduces service added/removed events to gatt-db.
-gatt-db now allows callbacks to be registered, which are called when a
-service is marked as active/inactive or when they get removed from the
-database.
+Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+---
+ net/bluetooth/mgmt.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Also included is a small fix to gatt-server so that it holds a reference
-to its associated gatt-db.
-
-Arman Uguray (4):
-  shared/gatt-server: Hold a reference to gatt-db.
-  shared/gatt-db: Add service added/removed events.
-  tools/btgatt-client: Observe service events.
-  TODO: gatt-db service events added.
-
- TODO                     |   7 --
- src/shared/gatt-db.c     | 168 ++++++++++++++++++++++++++++++++++++++++++-----
- src/shared/gatt-db.h     |  39 ++++++-----
- src/shared/gatt-server.c |   5 +-
- tools/btgatt-client.c    |  28 ++++++++
- 5 files changed, 207 insertions(+), 40 deletions(-)
-
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 1e73bead7dd9..77cf0ef0d8a3 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -35,7 +35,7 @@
+ #include "smp.h"
+ 
+ #define MGMT_VERSION	1
+-#define MGMT_REVISION	7
++#define MGMT_REVISION	8
+ 
+ static const u16 mgmt_commands[] = {
+ 	MGMT_OP_READ_INDEX_LIST,
 -- 
-2.2.0.rc0.207.ga3a616c
+1.9.3
 
