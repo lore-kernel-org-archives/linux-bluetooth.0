@@ -1,88 +1,146 @@
 Return-Path: <cyrus@holtmann.org>
 From: Jakub Pawlowski <jpawlowski@google.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Jakub Pawlowski <jpawlowski@google.com>,
-	Marcel Holtmann <marcel@holtmann.org>
-Subject: [RFC v3 3/6] Bluetooth: Add extra discovery fields for storing filter information
-Date: Thu,  4 Dec 2014 12:22:49 -0800
-Message-Id: <1417724573-28561-3-git-send-email-jpawlowski@google.com>
+Cc: Jakub Pawlowski <jpawlowski@google.com>
+Subject: [RFC v3 6/6] Bluetooth: Add service discovery filtering
+Date: Thu,  4 Dec 2014 12:22:53 -0800
+Message-Id: <1417724573-28561-7-git-send-email-jpawlowski@google.com>
 In-Reply-To: <1417724573-28561-1-git-send-email-jpawlowski@google.com>
 References: <1417724573-28561-1-git-send-email-jpawlowski@google.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-With the upcoming addition of support for Start Service Discovery, the
-discovery handling needs to filter on RSSI and UUID values. For that
-they need to be stored in the discovery handling. This patch adds the
-appropriate fields and also make sure they are reset when discovery
-has been stopped.
+This patch adds support for LE packet filtering when service discovery
+is running.
 
 Signed-off-by: Jakub Pawlowski <jpawlowski@google.com>
-Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- include/net/bluetooth/hci_core.h |  4 ++++
- net/bluetooth/hci_core.c         | 14 ++++++++++++++
- net/bluetooth/mgmt.c             |  2 ++
- 3 files changed, 20 insertions(+)
+ include/net/bluetooth/hci_core.h |  1 +
+ net/bluetooth/mgmt.c             | 92 +++++++++++++++++++++++++++++++++++++++-
+ 2 files changed, 92 insertions(+), 1 deletion(-)
 
 diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 1dae700..83ca58b 100644
+index ef57213..1e9e88e 100644
 --- a/include/net/bluetooth/hci_core.h
 +++ b/include/net/bluetooth/hci_core.h
-@@ -75,6 +75,9 @@ struct discovery_state {
- 	u32			last_adv_flags;
- 	u8			last_adv_data[HCI_MAX_AD_LENGTH];
- 	u8			last_adv_data_len;
-+	s8			rssi;
-+	u16			uuid_count;
-+	u8			(*uuids)[16];
- };
+@@ -508,6 +508,7 @@ int sco_recv_scodata(struct hci_conn *hcon, struct sk_buff *skb);
+ /* ----- Inquiry cache ----- */
+ #define INQUIRY_CACHE_AGE_MAX   (HZ*30)   /* 30 seconds */
+ #define INQUIRY_ENTRY_AGE_MAX   (HZ*60)   /* 60 seconds */
++#define DISCOV_LE_RESTART_DELAY		200	/* msec */
  
- struct hci_conn_hash {
-@@ -503,6 +506,7 @@ static inline void discovery_init(struct hci_dev *hdev)
- 	INIT_LIST_HEAD(&hdev->discovery.all);
- 	INIT_LIST_HEAD(&hdev->discovery.unknown);
- 	INIT_LIST_HEAD(&hdev->discovery.resolve);
-+	hdev->discovery.rssi = HCI_RSSI_INVALID;
- }
- 
- bool hci_discovery_active(struct hci_dev *hdev);
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index f001856..42f86dc 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -2052,6 +2052,20 @@ void hci_discovery_set_state(struct hci_dev *hdev, int state)
- 	case DISCOVERY_STOPPED:
- 		hci_update_background_scan(hdev);
- 
-+		/* Reset RSSI and UUID filters to ensure Start Discovery
-+		 * and Start Service Discovery operate properly no matter
-+		 * which one started the previous discovery.
-+		 *
-+		 * While the Start Discovery and Start Service Discovery
-+		 * operations will set proper values for RSSI and UUID
-+		 * count, it is important to actually free the allocated
-+		 * list of UUIDs here.
-+		 */
-+		hdev->discovery.rssi = HCI_RSSI_INVALID;
-+		hdev->discovery.uuid_count = 0;
-+		kfree(hdev->discovery.uuids);
-+		hdev->discovery.uuids = NULL;
-+
- 		if (old_state != DISCOVERY_STARTING)
- 			mgmt_discovering(hdev, 0);
- 		break;
+ static inline void discovery_init(struct hci_dev *hdev)
+ {
 diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 415ba41..b6a0f3e 100644
+index b0363851..66bff27 100644
 --- a/net/bluetooth/mgmt.c
 +++ b/net/bluetooth/mgmt.c
-@@ -3867,6 +3867,8 @@ static int start_discovery(struct sock *sk, struct hci_dev *hdev,
- 	}
+@@ -6908,6 +6908,83 @@ void mgmt_read_local_oob_data_complete(struct hci_dev *hdev, u8 *hash192,
+ 	mgmt_pending_remove(cmd);
+ }
  
- 	hdev->discovery.type = cp->type;
-+	hdev->discovery.rssi = HCI_RSSI_INVALID;
-+	hdev->discovery.uuid_count = 0;
++/* this is reversed hex representation of bluetooth base uuid. We need it for
++ * service uuid parsing in eir.
++ */
++static const u8 reverse_base_uuid[] = {
++			0xfb, 0x34, 0x9b, 0x5f, 0x80, 0x00, 0x00, 0x80,
++			0x00, 0x10, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
++};
++
++static bool cmp_filter_uuids(struct hci_dev *hdev, u8 uuid[16])
++{
++	int i;
++
++	for (i = 0; i < hdev->discovery.uuid_count; i++)
++		if (memcmp(hdev->discovery.uuids[i], uuid, 16) != 0)
++			return true;
++
++	return false;
++}
++
++static bool find_service_discov_match(struct hci_dev *hdev, u8 *eir, u8 eir_len)
++{
++	size_t offset;
++	u8 uuid[16];
++	int i;
++
++	offset = 0;
++	while (offset < eir_len) {
++		uint8_t field_len = eir[0];
++
++		/* Check for the end of EIR */
++		if (field_len == 0)
++			break;
++
++		if (offset + field_len > eir_len)
++			return -EINVAL;
++
++		switch (eir[1]) {
++		case EIR_UUID16_ALL:
++		case EIR_UUID16_SOME:
++			for (i = 0; i + 3 <= field_len; i += 2) {
++				memcpy(uuid, reverse_base_uuid, 16);
++				memcpy(uuid + 12, eir + i + 2, 2);
++				if (cmp_filter_uuids(hdev, uuid))
++					return true;
++			}
++			break;
++		case EIR_UUID32_ALL:
++		case EIR_UUID32_SOME:
++			for (i = 0; i + 5 <= field_len; i += 4) {
++				memcpy(uuid, reverse_base_uuid, 16);
++				memcpy(uuid + 12, eir + i + 2, 4);
++				if (cmp_filter_uuids(hdev, uuid))
++					return true;
++			}
++			break;
++		case EIR_UUID128_ALL:
++		case EIR_UUID128_SOME:
++			for (i = 0; i + 17 <= field_len; i += 16) {
++				memcpy(uuid, eir + i + 2, 16);
++				if (cmp_filter_uuids(hdev, uuid))
++					return true;
++			}
++			break;
++		}
++
++		offset += field_len + 1;
++		eir += field_len + 1;
++	}
++	return false;
++}
++
++static void restart_le_scan(struct hci_dev *hdev)
++{
++	queue_delayed_work(hdev->workqueue, &hdev->le_scan_restart,
++			   msecs_to_jiffies(DISCOV_LE_RESTART_DELAY));
++}
++
+ void mgmt_device_found(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
+ 		       u8 addr_type, u8 *dev_class, s8 rssi, u32 flags,
+ 		       u8 *eir, u16 eir_len, u8 *scan_rsp, u8 scan_rsp_len)
+@@ -6953,7 +7030,20 @@ void mgmt_device_found(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
+ 	ev->eir_len = cpu_to_le16(eir_len + scan_rsp_len);
+ 	ev_size = sizeof(*ev) + eir_len + scan_rsp_len;
  
- 	hci_req_init(&req, hdev);
+-	mgmt_event(MGMT_EV_DEVICE_FOUND, hdev, ev, ev_size, NULL);
++	if (hdev->discovery.rssi == 127 && hdev->discovery.uuid_count == 0) {
++		mgmt_event(MGMT_EV_DEVICE_FOUND, hdev, ev, ev_size, NULL);
++		return;
++	}
++
++	if (!find_service_discov_match(hdev, eir, eir_len))
++		return;
++
++	if (test_bit(HCI_LE_SCAN, &hdev->dev_flags))
++		restart_le_scan(hdev);
++
++	if (rssi >= hdev->discovery.rssi)
++		mgmt_event(MGMT_EV_DEVICE_FOUND, hdev, ev,
++			   ev_size, NULL);
+ }
  
+ void mgmt_remote_name(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
 -- 
 2.2.0.rc0.207.ga3a616c
+
