@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Jakub Pawlowski <jpawlowski@google.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Jakub Pawlowski <jpawlowski@google.com>
-Subject: [RFC v3 5/6] Bluetooth: add le_scan_restart
-Date: Thu,  4 Dec 2014 12:22:51 -0800
-Message-Id: <1417724573-28561-5-git-send-email-jpawlowski@google.com>
+Subject: [RFC v3 5/6] Bluetooth: Add le_scan_restart
+Date: Thu,  4 Dec 2014 12:22:52 -0800
+Message-Id: <1417724573-28561-6-git-send-email-jpawlowski@google.com>
 In-Reply-To: <1417724573-28561-1-git-send-email-jpawlowski@google.com>
 References: <1417724573-28561-1-git-send-email-jpawlowski@google.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
