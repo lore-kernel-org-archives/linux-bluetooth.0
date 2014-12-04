@@ -1,71 +1,49 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 3 Dec 2014 17:09:31 -0800
+Date: Wed, 3 Dec 2014 17:09:19 -0800
 From: Tedd Ho-Jeong An <tedd.an@intel.com>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Cc: "An, Tedd" <tedd.an@intel.com>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	Marcel Holtmann <marcel@holtmann.org>
-Subject: [RFC 2/3] Bluetooth: Add parameter to specify the firmware file
- extension
-Message-ID: <20141203170931.7ba80d6b@tedd-test>
+To: linux-bluetooth@vger.kernel.org
+Cc: tedd.an@intel.com, Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg
+ <johan.hedberg@gmail.com>
+Subject: [RFC 0/3] Add support for Intel Bluetooth bootloader device
+Message-ID: <20141203170919.775283a0@tedd-test>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
-Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Tedd Ho-Jeong An <tedd.an@intel.com>
 
-This patch add a parameter to specify the extension of firmware file,
-so differnt format of firmware file can be opened.
----
- drivers/bluetooth/btusb.c | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
+This set of patches adds support for Intel Bluetooth bootloader device.
+Compare to previous Intel Bluetooth device, this device is quite different
+in a few ways:
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index d88faab..0fa1c13 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -1290,17 +1290,17 @@ struct intel_version {
- } __packed;
- 
- static const struct firmware *btusb_setup_intel_get_fw(struct hci_dev *hdev,
--						       struct intel_version *ver)
-+					struct intel_version *ver, char *ext)
- {
- 	const struct firmware *fw;
- 	char fwname[64];
- 	int ret;
- 
- 	snprintf(fwname, sizeof(fwname),
--		 "intel/ibt-hw-%x.%x.%x-fw-%x.%x.%x.%x.%x.bseq",
-+		 "intel/ibt-hw-%x.%x.%x-fw-%x.%x.%x.%x.%x.%s",
- 		 ver->hw_platform, ver->hw_variant, ver->hw_revision,
- 		 ver->fw_variant,  ver->fw_revision, ver->fw_build_num,
--		 ver->fw_build_ww, ver->fw_build_yy);
-+		 ver->fw_build_ww, ver->fw_build_yy, ext);
- 
- 	ret = request_firmware(&fw, fwname, &hdev->dev);
- 	if (ret < 0) {
-@@ -1316,8 +1316,8 @@ static const struct firmware *btusb_setup_intel_get_fw(struct hci_dev *hdev,
- 		/* If the correct firmware patch file is not found, use the
- 		 * default firmware patch file instead
- 		 */
--		snprintf(fwname, sizeof(fwname), "intel/ibt-hw-%x.%x.bseq",
--			 ver->hw_platform, ver->hw_variant);
-+		snprintf(fwname, sizeof(fwname), "intel/ibt-hw-%x.%x.%s",
-+			 ver->hw_platform, ver->hw_variant, ext);
- 		if (request_firmware(&fw, fwname, &hdev->dev) < 0) {
- 			BT_ERR("%s failed to open default Intel fw file: %s",
- 			       hdev->name, fwname);
-@@ -1583,7 +1583,7 @@ static int btusb_setup_intel(struct hci_dev *hdev)
- 	 * If no patch file is found, allow the device to operate without
- 	 * a patch.
- 	 */
--	fw = btusb_setup_intel_get_fw(hdev, &ver);
-+	fw = btusb_setup_intel_get_fw(hdev, &ver, "bseq");
- 	if (!fw) {
- 		btusb_check_bdaddr_intel(hdev);
- 		return 0;
+1. Using bootloader (RAM)
+This device is RAM based so full size of Bluetooth operational firmware
+image has to be downloaded to the device in order to run as Bluetooth device.
+
+2. New firmware image file (.sfi)
+This device needs a different firmware image file, which size is about 500KB
+and the format is also different from previous generation of file (.bseq).
+
+The contents in the file has to be encaptulated by Intel_Sec_Send command.
+
+3. Use Bulk EP
+Since the size of firwmare image is big, using Control EP and Interrupt EP
+for downloading is not fast enough(takes about 15 seconds). So it uses
+Bulk EP to send and receive the data and downloading can be done under 2
+seconds.
+
+To do that, the driver has to re-route Intel_Sec_Send command to Bulk EP
+even if it is HCI command during the setup stage. For correspond event,
+it also re-route the event from Bulk EP to interrupt handler.
+
+
+Tedd Ho-Jeong An (3):
+  Bluetooth: Refactor Intel read version command
+  Bluetooth: Add parameter to specify the firmware file extension
+  Bluetooth: Add support Intel Bluetooth bootloader device
+
+ drivers/bluetooth/btusb.c | 462 ++++++++++++++++++++++++++++++++++++++++++----
+ 1 file changed, 428 insertions(+), 34 deletions(-)
+
 -- 
 1.9.1
-
