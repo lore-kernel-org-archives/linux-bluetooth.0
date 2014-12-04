@@ -1,207 +1,169 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [RFC BlueZ] shared/mgmt: Remove unnecessary code
-Date: Thu,  4 Dec 2014 17:53:39 +0200
-Message-Id: <1417708419-25772-1-git-send-email-luiz.dentz@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <1417608081-27926-3-git-send-email-gowtham.ab@samsung.com>
+References: <1417608081-27926-1-git-send-email-gowtham.ab@samsung.com>
+	<1417608081-27926-3-git-send-email-gowtham.ab@samsung.com>
+Date: Thu, 4 Dec 2014 16:18:20 +0100
+Message-ID: <CAA4A+aDGt89cqFVfdGc4vpRpH1kB9qf+Y5XonTvmXaJ9pBz9vg@mail.gmail.com>
+Subject: Re: [PATCH v1 2/5] monitor/rfcomm: Add support for RPN frame decoding
+From: Szymon Janc <szymon.janc@gmail.com>
+To: Gowtham Anandha Babu <gowtham.ab@samsung.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	d.kasatkin@samsung.com, bharat.panda@samsung.com, cpgs@samsung.com
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Gowtham,
 
-This flags were added because calling function like queue_foreach were
-not safe as the callbacks may remove or destroy the queue before
-returning but this has been fixed and it is now safe to do that.
----
- src/shared/mgmt.c | 89 +++++++------------------------------------------------
- 1 file changed, 11 insertions(+), 78 deletions(-)
+On Wed, Dec 3, 2014 at 1:01 PM, Gowtham Anandha Babu
+<gowtham.ab@samsung.com> wrote:
+> Changes made to decode RPN frame in RFCOMM for btmon.
+>
+>       RFCOMM: Unnumbered Info with Header Check (UIH)(0xef)
+>          Address: 0x03 cr 1 dlci 0x00
+>          Control: 0xef poll/final 0
+>          Length: 10
+>          FCS: 0x70
+>          MCC Message type: Remote Port Negotiation Command CMD(0x24)
+>            Length: 8
+>            dlci 32
+>            br 3 db 2 sb 0 p 0 pt 0 xi 0 xo 0
+>            rtri 0 rtro 0 rtci 0 rtco 0 xon 17 xoff 19
+>            pm 0x3f7f
+> ---
+>  monitor/rfcomm.c | 73 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 73 insertions(+)
+>
+> diff --git a/monitor/rfcomm.c b/monitor/rfcomm.c
+> index cd50c8c..62b52cc 100644
+> --- a/monitor/rfcomm.c
+> +++ b/monitor/rfcomm.c
+> @@ -63,6 +63,18 @@ static char *cr_str[] = {
+>  #define GET_V24_IC(sigs)       ((sigs & 0x40) >> 6)
+>  #define GET_V24_DV(sigs)       ((sigs & 0x80) >> 7)
+>
+> +/* RPN macros */
+> +#define GET_RPN_DB(parity)     (parity & 0x03)
+> +#define GET_RPN_SB(parity)     ((parity & 0x04) >> 2)
+> +#define GET_RPN_PARITY(parity) ((parity & 0x08) >> 3)
+> +#define GET_RPN_PTYPE(parity)  ((parity & 0x03) >> 3)
+> +#define GET_RPN_XIN(io)                (io & 0x01)
+> +#define GET_RPN_XOUT(io)       ((io & 0x02) >> 1)
+> +#define GET_RPN_RTRI(io)       ((io & 0x04) >> 2)
+> +#define GET_RPN_RTRO(io)       ((io & 0x08) >> 3)
+> +#define GET_RPN_RTCI(io)       ((io & 0x10) >> 4)
+> +#define GET_RPN_RTCO(io)       ((io & 0x20) >> 5)
+> +
+>  struct rfcomm_lhdr {
+>         uint8_t address;
+>         uint8_t control;
+> @@ -77,6 +89,16 @@ struct rfcomm_lmsc {
+>         uint8_t break_sig;
+>  } __attribute__((packed));
+>
+> +struct rfcomm_rpn {
+> +       uint8_t dlci;
+> +       uint8_t bit_rate;
+> +       uint8_t parity;
+> +       uint8_t io;
+> +       uint8_t xon;
+> +       uint8_t xoff;
+> +       uint16_t pm;
+> +} __attribute__ ((packed));
+> +
+>  struct rfcomm_lmcc {
+>         uint8_t type;
+>         uint16_t length;
+> @@ -138,6 +160,55 @@ done:
+>         return true;
+>  }
+>
+> +static inline bool mcc_rpn(struct rfcomm_frame *rfcomm_frame, uint8_t indent)
+> +{
+> +       struct l2cap_frame *frame = &rfcomm_frame->l2cap_frame;
+> +       struct rfcomm_rpn rpn;
+> +
+> +       if (!l2cap_frame_get_u8(frame, &rpn.dlci))
+> +               return false;
+> +
+> +       print_field("%*cdlci %d", indent, ' ', RFCOMM_GET_DLCI(rpn.dlci));
+> +
+> +       if (frame->size < 7)
+> +               goto done;
+> +
+> +       /* port value octets (optional) */
+> +
+> +       if (!l2cap_frame_get_u8(frame, &rpn.bit_rate))
+> +               return false;
+> +
+> +       if (!l2cap_frame_get_u8(frame, &rpn.parity))
+> +               return false;
+> +
+> +       if (!l2cap_frame_get_u8(frame, &rpn.io))
+> +               return false;
+> +
+> +       print_field("%*cbr %d db %d sb %d p %d pt %d xi %d xo %d", indent, ' ',
+> +               rpn.bit_rate, GET_RPN_DB(rpn.parity), GET_RPN_SB(rpn.parity),
+> +               GET_RPN_PARITY(rpn.parity), GET_RPN_PTYPE(rpn.parity),
+> +               GET_RPN_XIN(rpn.io), GET_RPN_XOUT(rpn.io));
+> +
+> +       if (!l2cap_frame_get_u8(frame, &rpn.xon))
+> +               return false;
+> +
+> +       if (!l2cap_frame_get_u8(frame, &rpn.xoff))
+> +               return false;
+> +
+> +       print_field("%*crtri %d rtro %d rtci %d rtco %d xon %d xoff %d",
+> +               indent, ' ', GET_RPN_RTRI(rpn.io), GET_RPN_RTRO(rpn.io),
+> +               GET_RPN_RTCI(rpn.io), GET_RPN_RTCO(rpn.io), rpn.xon,
+> +               rpn.xoff);
+> +
+> +       if (!l2cap_frame_get_be16(frame, &rpn.pm))
+> +               return false;
+> +
+> +       print_field("%*cpm 0x%04x", indent, ' ', __bswap_16(rpn.pm));
 
-diff --git a/src/shared/mgmt.c b/src/shared/mgmt.c
-index 5dae7a9..ec574c9 100644
---- a/src/shared/mgmt.c
-+++ b/src/shared/mgmt.c
-@@ -51,9 +51,6 @@ struct mgmt {
- 	struct queue *notify_list;
- 	unsigned int next_request_id;
- 	unsigned int next_notify_id;
--	bool need_notify_cleanup;
--	bool in_notify;
--	bool destroyed;
- 	void *buf;
- 	uint16_t len;
- 	mgmt_debug_func_t debug_callback;
-@@ -76,7 +73,6 @@ struct mgmt_notify {
- 	unsigned int id;
- 	uint16_t event;
- 	uint16_t index;
--	bool removed;
- 	mgmt_notify_func_t callback;
- 	mgmt_destroy_func_t destroy;
- 	void *user_data;
-@@ -135,22 +131,6 @@ static bool match_notify_index(const void *a, const void *b)
- 	return notify->index == index;
- }
- 
--static bool match_notify_removed(const void *a, const void *b)
--{
--	const struct mgmt_notify *notify = a;
--
--	return notify->removed;
--}
--
--static void mark_notify_removed(void *data , void *user_data)
--{
--	struct mgmt_notify *notify = data;
--	uint16_t index = PTR_TO_UINT(user_data);
--
--	if (notify->index == index || index == MGMT_INDEX_NONE)
--		notify->removed = true;
--}
--
- static void write_watch_destroy(void *user_data)
- {
- 	struct mgmt *mgmt = user_data;
-@@ -248,9 +228,6 @@ static void request_complete(struct mgmt *mgmt, uint8_t status,
- 		destroy_request(request);
- 	}
- 
--	if (mgmt->destroyed)
--		return;
--
- 	wakeup_writer(mgmt);
- }
- 
-@@ -266,9 +243,6 @@ static void notify_handler(void *data, void *user_data)
- 	struct mgmt_notify *notify = data;
- 	struct event_index *match = user_data;
- 
--	if (notify->removed)
--		return;
--
- 	if (notify->event != match->event)
- 		return;
- 
-@@ -286,28 +260,7 @@ static void process_notify(struct mgmt *mgmt, uint16_t event, uint16_t index,
- 	struct event_index match = { .event = event, .index = index,
- 					.length = length, .param = param };
- 
--	mgmt->in_notify = true;
--
- 	queue_foreach(mgmt->notify_list, notify_handler, &match);
--
--	mgmt->in_notify = false;
--
--	if (mgmt->need_notify_cleanup) {
--		queue_remove_all(mgmt->notify_list, match_notify_removed,
--							NULL, destroy_notify);
--		mgmt->need_notify_cleanup = false;
--	}
--}
--
--static void read_watch_destroy(void *user_data)
--{
--	struct mgmt *mgmt = user_data;
--
--	if (mgmt->destroyed) {
--		queue_destroy(mgmt->notify_list, NULL);
--		queue_destroy(mgmt->pending_list, NULL);
--		free(mgmt);
--	}
- }
- 
- static bool can_read_data(struct io *io, void *user_data)
-@@ -337,6 +290,8 @@ static bool can_read_data(struct io *io, void *user_data)
- 	if (bytes_read < length + MGMT_HDR_SIZE)
- 		return true;
- 
-+	mgmt_ref(mgmt);
-+
- 	switch (event) {
- 	case MGMT_EV_CMD_COMPLETE:
- 		cc = mgmt->buf + MGMT_HDR_SIZE;
-@@ -368,8 +323,7 @@ static bool can_read_data(struct io *io, void *user_data)
- 		break;
- 	}
- 
--	if (mgmt->destroyed)
--		return false;
-+	mgmt_unref(mgmt);
- 
- 	return true;
- }
-@@ -440,8 +394,7 @@ struct mgmt *mgmt_new(int fd)
- 		return NULL;
- 	}
- 
--	if (!io_set_read_handler(mgmt->io, can_read_data, mgmt,
--						read_watch_destroy)) {
-+	if (!io_set_read_handler(mgmt->io, can_read_data, mgmt, NULL)) {
- 		queue_destroy(mgmt->notify_list, NULL);
- 		queue_destroy(mgmt->pending_list, NULL);
- 		queue_destroy(mgmt->reply_queue, NULL);
-@@ -531,14 +484,11 @@ void mgmt_unref(struct mgmt *mgmt)
- 	free(mgmt->buf);
- 	mgmt->buf = NULL;
- 
--	if (!mgmt->in_notify) {
--		queue_destroy(mgmt->notify_list, NULL);
--		queue_destroy(mgmt->pending_list, NULL);
--		free(mgmt);
--		return;
--	}
-+	queue_destroy(mgmt->notify_list, NULL);
-+	queue_destroy(mgmt->pending_list, NULL);
-+	free(mgmt);
- 
--	mgmt->destroyed = true;
-+	return;
- }
- 
- bool mgmt_set_debug(struct mgmt *mgmt, mgmt_debug_func_t callback,
-@@ -774,14 +724,7 @@ bool mgmt_unregister(struct mgmt *mgmt, unsigned int id)
- 	if (!notify)
- 		return false;
- 
--	if (!mgmt->in_notify) {
--		destroy_notify(notify);
--		return true;
--	}
--
--	notify->removed = true;
--	mgmt->need_notify_cleanup = true;
--
-+	destroy_notify(notify);
- 	return true;
- }
- 
-@@ -790,12 +733,7 @@ bool mgmt_unregister_index(struct mgmt *mgmt, uint16_t index)
- 	if (!mgmt)
- 		return false;
- 
--	if (mgmt->in_notify) {
--		queue_foreach(mgmt->notify_list, mark_notify_removed,
--							UINT_TO_PTR(index));
--		mgmt->need_notify_cleanup = true;
--	} else
--		queue_remove_all(mgmt->notify_list, match_notify_index,
-+	queue_remove_all(mgmt->notify_list, match_notify_index,
- 					UINT_TO_PTR(index), destroy_notify);
- 
- 	return true;
-@@ -806,12 +744,7 @@ bool mgmt_unregister_all(struct mgmt *mgmt)
- 	if (!mgmt)
- 		return false;
- 
--	if (mgmt->in_notify) {
--		queue_foreach(mgmt->notify_list, mark_notify_removed,
--						UINT_TO_PTR(MGMT_INDEX_NONE));
--		mgmt->need_notify_cleanup = true;
--	} else
--		queue_remove_all(mgmt->notify_list, NULL, NULL, destroy_notify);
-+	queue_remove_all(mgmt->notify_list, NULL, NULL, destroy_notify);
- 
- 	return true;
- }
+This __bswap_16 is invalid since rpn.pm was already converted to host
+order by l2cap_frame_get_be16(). (It wouldn't work correctly on BE
+arch anyway).
+
+Also this was causing build problems under Android. If you are able to
+build-test under Android please do so. If not then at least point this
+in cover letter or patch comment that code was tested only under
+Linux).
+
+I've fixed this myself but please pay attention to this with any
+future submission.
+
+> +
+> +done:
+> +       return true;
+> +}
+> +
+>  struct mcc_data {
+>         uint8_t type;
+>         const char *str;
+> @@ -201,6 +272,8 @@ static inline bool mcc_frame(struct rfcomm_frame *rfcomm_frame, uint8_t indent)
+>         switch (type) {
+>         case RFCOMM_MSC:
+>                 return mcc_msc(rfcomm_frame, indent+2);
+> +       case RFCOMM_RPN:
+> +               return mcc_rpn(rfcomm_frame, indent+2);
+>         default:
+>                 packet_hexdump(frame->data, frame->size);
+>         }
+> --
+> 1.9.1
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+
+
 -- 
-1.9.3
-
+pozdrawiam
+Szymon K. Janc
+szymon.janc@gmail.com
