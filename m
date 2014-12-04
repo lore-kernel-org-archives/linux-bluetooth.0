@@ -1,43 +1,27 @@
 Return-Path: <cyrus@holtmann.org>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: linux-bluetooth@vger.kernel.org
-Subject: [RFC 2/6] Bluetooth: Add definitions for MGMT_OP_START_SERVICE_DISCOVERY
-Date: Thu,  4 Dec 2014 10:13:57 +0100
-Message-Id: <1417684441-103825-2-git-send-email-marcel@holtmann.org>
+Date: Thu, 4 Dec 2014 11:13:50 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] shared/crypto: Fix resource leak
+Message-ID: <20141204091350.GA761@t440s.lan>
+References: <1417683055-24584-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1417683055-24584-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Jakub Pawlowski <jpawlowski@google.com>
+Hi Andrei,
 
-This patch adds the opcode and structure for Start Service Discovery
-operation.
+On Thu, Dec 04, 2014, Andrei Emeltchenko wrote:
+> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> 
+> Fix leaking fd on exit
+> ---
+>  src/shared/crypto.c | 2 ++
+>  1 file changed, 2 insertions(+)
 
-Signed-off-by: Jakub Pawlowski <jpawlowski@google.com>
-Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
----
- include/net/bluetooth/mgmt.h | 9 +++++++++
- 1 file changed, 9 insertions(+)
+Applied. Thanks.
 
-diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
-index 9b382ea34fd9..95c34d5180fa 100644
---- a/include/net/bluetooth/mgmt.h
-+++ b/include/net/bluetooth/mgmt.h
-@@ -498,6 +498,15 @@ struct mgmt_cp_set_public_address {
- } __packed;
- #define MGMT_SET_PUBLIC_ADDRESS_SIZE	6
- 
-+#define MGMT_OP_START_SERVICE_DISCOVERY	0x003A
-+struct mgmt_cp_start_service_discovery {
-+	__u8 type;
-+	__s8 rssi;
-+	__le16 uuid_count;
-+	__u8 uuids[0][16];
-+} __packed;
-+#define MGMT_START_SERVICE_DISCOVERY_SIZE 4
-+
- #define MGMT_EV_CMD_COMPLETE		0x0001
- struct mgmt_ev_cmd_complete {
- 	__le16	opcode;
--- 
-1.9.3
-
+Johan
