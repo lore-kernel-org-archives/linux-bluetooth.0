@@ -1,76 +1,62 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <32156A77-A9BF-4542-8E26-61A398273B53@holtmann.org>
-References: <1417708419-25772-1-git-send-email-luiz.dentz@gmail.com>
-	<32156A77-A9BF-4542-8E26-61A398273B53@holtmann.org>
-Date: Thu, 4 Dec 2014 23:15:16 +0200
-Message-ID: <CABBYNZLbStqhwa3W+457Fj-dTL43mzE0+pfiBKzJA9FmEeVvEw@mail.gmail.com>
-Subject: Re: [RFC BlueZ] shared/mgmt: Remove unnecessary code
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+In-Reply-To: <B48B3F23-03FA-46D4-A999-3EF6835FF03E@holtmann.org>
+References: <1417689400-128063-5-git-send-email-marcel@holtmann.org>
+	<CAD0=r8zfKBdu8=ZJj9Z-OLVjyUJoZ3iZ6bVjhPL_sVzU3qZ61w@mail.gmail.com>
+	<B48B3F23-03FA-46D4-A999-3EF6835FF03E@holtmann.org>
+Date: Thu, 4 Dec 2014 12:26:25 -0800
+Message-ID: <CAD0=r8wOmN6xjdr3ejG5mgqrCAYCwsZeB=A0V7BjjkcQ8e2+hA@mail.gmail.com>
+Subject: Re: [RFC v2 5/7] Bluetooth: Add definitions for MGMT_OP_START_SERVICE_DISCOVERY
+From: Jakub Pawlowski <jpawlowski@google.com>
 To: Marcel Holtmann <marcel@holtmann.org>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
-
-On Thu, Dec 4, 2014 at 9:31 PM, Marcel Holtmann <marcel@holtmann.org> wrote=
-:
-> Hi Luiz,
+On Thu, Dec 4, 2014 at 11:27 AM, Marcel Holtmann <marcel@holtmann.org> wrot=
+e:
+> Hi Jakub,
 >
->> This flags were added because calling function like queue_foreach were
->> not safe as the callbacks may remove or destroy the queue before
->> returning but this has been fixed and it is now safe to do that.
->> ---
->> src/shared/mgmt.c | 89 +++++++------------------------------------------=
-------
->> 1 file changed, 11 insertions(+), 78 deletions(-)
+>>> This patch adds the opcode and structure for Start Service Discovery
+>>> operation.
+>>>
+>>> Signed-off-by: Jakub Pawlowski <jpawlowski@google.com>
+>>> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+>>> ---
+>>> include/net/bluetooth/mgmt.h | 9 +++++++++
+>>> 1 file changed, 9 insertions(+)
+>>>
+>>> diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.=
+h
+>>> index 9b382ea34fd9..95c34d5180fa 100644
+>>> --- a/include/net/bluetooth/mgmt.h
+>>> +++ b/include/net/bluetooth/mgmt.h
+>>> @@ -498,6 +498,15 @@ struct mgmt_cp_set_public_address {
+>>> } __packed;
+>>> #define MGMT_SET_PUBLIC_ADDRESS_SIZE   6
+>>>
+>>> +#define MGMT_OP_START_SERVICE_DISCOVERY        0x003A
+>>> +struct mgmt_cp_start_service_discovery {
+>>> +       __u8 type;
 >>
->> diff --git a/src/shared/mgmt.c b/src/shared/mgmt.c
->> index 5dae7a9..ec574c9 100644
->> --- a/src/shared/mgmt.c
->> +++ b/src/shared/mgmt.c
->> @@ -51,9 +51,6 @@ struct mgmt {
->>       struct queue *notify_list;
->>       unsigned int next_request_id;
->>       unsigned int next_notify_id;
->> -     bool need_notify_cleanup;
->> -     bool in_notify;
->> -     bool destroyed;
+>> Maybe we should get rid of type ? service discovery based on
+>> advertisement content makes sense only for LE
 >
-> this makes no sense to me. The handling he is for reentrant support. So a=
- lot of this handling is needed. You want to be able to remove notification=
-s handlers while in callback or the other way around. We know that this is =
-needed since years back we needed that with oFono and GLib. So just claimin=
-g queue_foreach has some magic fix is not going to do it.
+> this works perfectly fine for BR/EDR or BR/EDR + LE discovery. It is up t=
+o the call to decide what to do. And we have kept the type in place even fo=
+r commands that are currently only supported on one transport. It allows us=
+ to extend the API without breaking it.
 
-That not really magic fix, the queue now protects entries with a
-reference during callback calls (it is not yet applied though), it is
-a much more common protection for re-entrant code, or well at least
-more common than using one flag to tell it on callback, another to do
-the cleaning later and yet another one to tell the entry has been
-removed already. Note that destroyed flag was not really necessary to
-begin with and I could probably have it in a differen patch since it
-is just a case of using mgmt_ref/mgmt_unref to protect the region
-where callbacks can be called.
+Ok, that sounds reasonable.
 
-> Especially since some of the corner cases in mgmt.c might not be hit sinc=
-e bluetoothd does not exercise them. It does not mean they are not there.
+I've merged my filtering patch on top of your patches, then run
+everything and did some manual tests - all works great!
+I've just send updated patches.
 
-Im planning to add more unit tests for this as well, but given the
-pattern is pretty much known even src/shared/io-mainloop.c does a
-similar thing, from what I tested from mgmt-tester to android-tester
-none had regressions with these changes but perhaps they don't really
-exercise everything as you suggested.
+>
+> Regards
+>
+> Marcel
+>
 
-> I am also not really in favor of just hacking src/shared/queue.c without =
-considering the implications to ELL and how things are done. This is not a =
-playground for quickly hacking stuff together. The long term goal is to run=
- bluetoothd on top of ELL.
-
-That could learn how to protect entries and we could add the same unit
-tests which we already have in BlueZ.
-
-
---=20
-Luiz Augusto von Dentz
+I
