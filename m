@@ -1,38 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] shared/gatt: Fix NULL dereference
-Date: Thu,  4 Dec 2014 10:55:52 +0200
-Message-Id: <1417683352-24655-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCH] shared/crypto: Fix resource leak
+Date: Thu,  4 Dec 2014 10:50:55 +0200
+Message-Id: <1417683055-24584-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-The which is executed after checking (!op) is dereferencing op in
-function discovery_op_free().
+Fix leaking fd on exit
 ---
- src/shared/gatt-client.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ src/shared/crypto.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
-index 463de3b..96b5f1f 100644
---- a/src/shared/gatt-client.c
-+++ b/src/shared/gatt-client.c
-@@ -1101,11 +1101,12 @@ static void process_service_changed(struct bt_gatt_client *client,
- 		return;
- 	}
+diff --git a/src/shared/crypto.c b/src/shared/crypto.c
+index 12ca9a7..7f77674 100644
+--- a/src/shared/crypto.c
++++ b/src/shared/crypto.c
+@@ -594,6 +594,8 @@ static bool aes_cmac(struct bt_crypto *crypto, uint8_t key[16], uint8_t *msg,
  
-+	discovery_op_free(op);
+ 	swap_buf(out, res, 16);
+ 
++	close(fd);
 +
- fail:
- 	util_debug(client->debug_callback, client->debug_data,
- 					"Failed to initiate service discovery"
- 					" after Service Changed");
--	discovery_op_free(op);
+ 	return true;
  }
  
- static void service_changed_cb(uint16_t value_handle, const uint8_t *value,
 -- 
 1.9.1
 
