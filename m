@@ -1,66 +1,71 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: Johan Hedberg <johan.hedberg@gmail.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>, linux-bluetooth@vger.kernel.org
-Subject: Re: [RFC 1/6] Bluetooth: Add HCI_RSSI_INVALID for unknown RSSI value
-Date: Thu, 04 Dec 2014 14:57:02 +0100
-Message-ID: <4332080.UklC07rX7K@uw000953>
-In-Reply-To: <20141204120804.GA14367@t440s.lan>
-References: <1417684441-103825-1-git-send-email-marcel@holtmann.org> <1611731.nCHCGk9HKZ@uw000953> <20141204120804.GA14367@t440s.lan>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <CABBYNZ+jw2DoqJU92VLdTWG2Gz5u74eTvXROV+Gy3T3h7XdwOw@mail.gmail.com>
+References: <1417615733-7350-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+	<CABBYNZKRXORa_7d+aaFfw7HOHvG8MsNRQNu0gR8wvG3SuGwOPQ@mail.gmail.com>
+	<20141204081557.GA5790@aemeltch-MOBL1>
+	<CABBYNZ+jw2DoqJU92VLdTWG2Gz5u74eTvXROV+Gy3T3h7XdwOw@mail.gmail.com>
+Date: Thu, 4 Dec 2014 14:34:06 +0200
+Message-ID: <CABBYNZ+aPRzVuPmA4qjr0VzRRE6vUYGZrU01Kxgnp1DSaYJCcw@mail.gmail.com>
+Subject: Re: [PATCH 1/3] unit/gatt: Fix using possible negative return value
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+Hi Andrei,
 
-On Thursday 04 of December 2014 14:08:04 Johan Hedberg wrote:
-> Hi Szymon,
-> 
-> On Thu, Dec 04, 2014, Szymon Janc wrote:
-> > On Thursday 04 of December 2014 11:38:35 Marcel Holtmann wrote:
-> > > Hi Szymon,
-> > > 
-> > > >>>>> The Bluetooth core specification defines the value 127 as invalid for
-> > > >>>>> RSSI values. So instead of hard coding it, lets add a constant for it.
-> > > >>>>> 
-> > > >>>>> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
-> > > >>>>> ---
-> > > >>>>> include/net/bluetooth/hci.h | 1 +
-> > > >>>>> 1 file changed, 1 insertion(+)
-> > > >>>>> 
-> > > >>>>> diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-> > > >>>>> index 569c077778b6..b6f7be1eb919 100644
-> > > >>>>> --- a/include/net/bluetooth/hci.h
-> > > >>>>> +++ b/include/net/bluetooth/hci.h
-> > > >>>>> @@ -412,6 +412,7 @@ enum {
-> > > >>>>> 
-> > > >>>>> /* The core spec defines 127 as the "not available" value */
-> > > >>>>> #define HCI_TX_POWER_INVALID	127
-> > > >>>>> +#define HCI_RSSI_INVALID	127
-> > > >>>> 
-> > > >>>> Isn't that value depending on command, event, link and controller type?
-> > > >>> 
-> > > >>> we use it for the mgmt side of things and there it is whatever we want it to be.
-> > > >> 
-> > > >> At least for inquiry result (no RSSI) 0 is passed to mgmt_device_found() and that seems
-> > > >> to be used by userspace as RSSI unavailable.
-> > > > 
-> > > > Which is strange btw, since both for LE and BR/EDR this is legal RSSI value...
-> > > 
-> > > I checked for LE. There is clearly says 127 means RSSI not available.
-> > 
-> > I meant that 0 RSSI is legal for both LE and BR/EDR but it is used in mgmt device
-> > found event as 'RSSI not available'.
-> 
-> On adapters that generate such events you will never see any other type
-> of discovery results (because the HW isn't capable of it), so what the
-> value is doesn't really matter if all the events have the same one. For
-> consistency however we could change this from 0 to 127.
+On Thu, Dec 4, 2014 at 11:19 AM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> Hi Andrei,
+>
+> On Thu, Dec 4, 2014 at 10:15 AM, Andrei Emeltchenko
+> <Andrei.Emeltchenko.news@gmail.com> wrote:
+>> Hi Luiz,
+>>
+>> On Wed, Dec 03, 2014 at 08:35:41PM +0200, Luiz Augusto von Dentz wrote:
+>>> Hi Andrei,
+>>>
+>>> On Wed, Dec 3, 2014 at 4:08 PM, Andrei Emeltchenko
+>>> <Andrei.Emeltchenko.news@gmail.com> wrote:
+>>> > From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+>>> >
+>>> > ---
+>>> >  unit/test-gatt.c | 4 ++--
+>>> >  1 file changed, 2 insertions(+), 2 deletions(-)
+>>> >
+>>> > diff --git a/unit/test-gatt.c b/unit/test-gatt.c
+>>> > index 03a66b9..f20da91 100644
+>>> > --- a/unit/test-gatt.c
+>>> > +++ b/unit/test-gatt.c
+>>> > @@ -648,11 +648,11 @@ static void test_server(gconstpointer data)
+>>> >
+>>> >         len = write(context->fd, pdu.data, pdu.size);
+>>> >
+>>> > +       g_assert_cmpint(len, ==, pdu.size);
+>>> > +
+>>> >         if (g_test_verbose())
+>>> >                 util_hexdump('<', pdu.data, len, test_debug, "GATT: ");
+>>> >
+>>> > -       g_assert_cmpint(len, ==, pdu.size);
+>>> > -
+>>> >         execute_context(context);
+>>> >  }
+>>> >
+>>> > --
+>>> > 1.9.1
+>>>
+>>> What changes does this make?
+>>
+>> You do not use negative len in case of error in util_hexdump()
+>
+> Well then I guess this should be part of the path description.
 
-Wouldn't that affect on how daemon invalidate RSSI after discovery is finished?
-ie RSSI would change from 127 back to 0? At least on daemon side 0 RSSI was
-treated as special case.
+I went ahead and fixed the commit message and applied them, thanks.
+
 
 -- 
-Best regards, 
-Szymon Janc
+Luiz Augusto von Dentz
