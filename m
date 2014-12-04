@@ -1,58 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFC 3/6] Bluetooth: Simplify the error handling of Start Discovery command
-Date: Thu,  4 Dec 2014 10:13:58 +0100
-Message-Id: <1417684441-103825-3-git-send-email-marcel@holtmann.org>
+Subject: [RFC 2/6] Bluetooth: Add definitions for MGMT_OP_START_SERVICE_DISCOVERY
+Date: Thu,  4 Dec 2014 10:13:57 +0100
+Message-Id: <1417684441-103825-2-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The Start Discovery command has some complicated code when it comes
-to error handling. With the future introduction of Start Service
-Discovery simplifying this makes it easier to read.
+From: Jakub Pawlowski <jpawlowski@google.com>
 
+This patch adds the opcode and structure for Start Service Discovery
+operation.
+
+Signed-off-by: Jakub Pawlowski <jpawlowski@google.com>
 Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- net/bluetooth/mgmt.c | 18 +++++++-----------
- 1 file changed, 7 insertions(+), 11 deletions(-)
+ include/net/bluetooth/mgmt.h | 9 +++++++++
+ 1 file changed, 9 insertions(+)
 
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 77cf0ef0d8a3..f3296371a310 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -3771,14 +3771,8 @@ static int start_discovery(struct sock *sk, struct hci_dev *hdev,
- 		goto failed;
- 	}
+diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
+index 9b382ea34fd9..95c34d5180fa 100644
+--- a/include/net/bluetooth/mgmt.h
++++ b/include/net/bluetooth/mgmt.h
+@@ -498,6 +498,15 @@ struct mgmt_cp_set_public_address {
+ } __packed;
+ #define MGMT_SET_PUBLIC_ADDRESS_SIZE	6
  
--	if (test_bit(HCI_PERIODIC_INQ, &hdev->dev_flags)) {
--		err = cmd_complete(sk, hdev->id, MGMT_OP_START_DISCOVERY,
--				   MGMT_STATUS_BUSY, &cp->type,
--				   sizeof(cp->type));
--		goto failed;
--	}
--
--	if (hdev->discovery.state != DISCOVERY_STOPPED) {
-+	if (hdev->discovery.state != DISCOVERY_STOPPED ||
-+	    test_bit(HCI_PERIODIC_INQ, &hdev->dev_flags)) {
- 		err = cmd_complete(sk, hdev->id, MGMT_OP_START_DISCOVERY,
- 				   MGMT_STATUS_BUSY, &cp->type,
- 				   sizeof(cp->type));
-@@ -3909,10 +3903,12 @@ static int start_discovery(struct sock *sk, struct hci_dev *hdev,
- 	}
- 
- 	err = hci_req_run(&req, start_discovery_complete);
--	if (err < 0)
-+	if (err < 0) {
- 		mgmt_pending_remove(cmd);
--	else
--		hci_discovery_set_state(hdev, DISCOVERY_STARTING);
-+		goto failed;
-+	}
++#define MGMT_OP_START_SERVICE_DISCOVERY	0x003A
++struct mgmt_cp_start_service_discovery {
++	__u8 type;
++	__s8 rssi;
++	__le16 uuid_count;
++	__u8 uuids[0][16];
++} __packed;
++#define MGMT_START_SERVICE_DISCOVERY_SIZE 4
 +
-+	hci_discovery_set_state(hdev, DISCOVERY_STARTING);
- 
- failed:
- 	hci_dev_unlock(hdev);
+ #define MGMT_EV_CMD_COMPLETE		0x0001
+ struct mgmt_ev_cmd_complete {
+ 	__le16	opcode;
 -- 
 1.9.3
 
