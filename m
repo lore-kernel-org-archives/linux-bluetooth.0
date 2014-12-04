@@ -1,264 +1,163 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFC v2 3/7] Bluetooth: Split triggering of discovery commands into separate function
-Date: Thu,  4 Dec 2014 11:36:36 +0100
-Message-Id: <1417689400-128063-3-git-send-email-marcel@holtmann.org>
+Subject: [RFC v2 7/7] Bluetooth: Add support for Start Service Discovery command
+Date: Thu,  4 Dec 2014 11:36:40 +0100
+Message-Id: <1417689400-128063-7-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The actual process of compiling the correct HCI commands for triggering
-discovery is something that should be generic. So instead of mixing it
-into the Start Discover operation handling, split it out into its own
-function utilizing HCI request handling and just providing status in
-case of errors or invalid parameters.
+From: Jakub Pawlowski <jpawlowski@google.com>
 
+This patch adds support for the Start Service Discovery command. It
+does all the checks for command parameters and configured the discovery
+filter settings correctly. However the actual support for filtering
+will be added with another patch.
+
+Signed-off-by: Jakub Pawlowski <jpawlowski@google.com>
 Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- net/bluetooth/mgmt.c | 214 ++++++++++++++++++++++++---------------------------
- 1 file changed, 100 insertions(+), 114 deletions(-)
+ net/bluetooth/mgmt.c | 106 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 106 insertions(+)
 
 diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 311984fcac55..415ba4179326 100644
+index b6a0f3e6b719..b0363851b53a 100644
 --- a/net/bluetooth/mgmt.c
 +++ b/net/bluetooth/mgmt.c
-@@ -3686,6 +3686,103 @@ done:
+@@ -93,6 +93,7 @@ static const u16 mgmt_commands[] = {
+ 	MGMT_OP_READ_CONFIG_INFO,
+ 	MGMT_OP_SET_EXTERNAL_CONFIG,
+ 	MGMT_OP_SET_PUBLIC_ADDRESS,
++	MGMT_OP_START_SERVICE_DISCOVERY,
+ };
+ 
+ static const u16 mgmt_events[] = {
+@@ -3793,6 +3794,9 @@ static void start_discovery_complete(struct hci_dev *hdev, u8 status)
+ 	hci_dev_lock(hdev);
+ 
+ 	cmd = mgmt_pending_find(MGMT_OP_START_DISCOVERY, hdev);
++	if (!cmd)
++		cmd = mgmt_pending_find(MGMT_OP_START_SERVICE_DISCOVERY, hdev);
++
+ 	if (cmd) {
+ 		u8 type = hdev->discovery.type;
+ 
+@@ -3892,6 +3896,107 @@ failed:
  	return err;
  }
  
-+static bool trigger_discovery(struct hci_request *req, u8 *status)
++static int start_service_discovery(struct sock *sk, struct hci_dev *hdev,
++				   void *data, u16 len)
 +{
-+	struct hci_dev *hdev = req->hdev;
-+	struct hci_cp_le_set_scan_param param_cp;
-+	struct hci_cp_le_set_scan_enable enable_cp;
-+	struct hci_cp_inquiry inq_cp;
-+	/* General inquiry access code (GIAC) */
-+	u8 lap[3] = { 0x33, 0x8b, 0x9e };
-+	u8 own_addr_type;
++	struct mgmt_cp_start_service_discovery *cp = data;
++	struct pending_cmd *cmd;
++	struct hci_request req;
++	const u16 max_uuid_count = ((U16_MAX - sizeof(*cp)) / 16);
++	u16 uuid_count, expected_len;
++	u8 status;
 +	int err;
 +
-+	switch (hdev->discovery.type) {
-+	case DISCOV_TYPE_BREDR:
-+		*status = mgmt_bredr_support(hdev);
-+		if (*status)
-+			return false;
++	BT_DBG("%s", hdev->name);
 +
-+		if (test_bit(HCI_INQUIRY, &hdev->flags)) {
-+			*status = MGMT_STATUS_BUSY;
-+			return false;
-+		}
++	hci_dev_lock(hdev);
 +
-+		hci_inquiry_cache_flush(hdev);
-+
-+		memset(&inq_cp, 0, sizeof(inq_cp));
-+		memcpy(&inq_cp.lap, lap, sizeof(inq_cp.lap));
-+		inq_cp.length = DISCOV_BREDR_INQUIRY_LEN;
-+		hci_req_add(req, HCI_OP_INQUIRY, sizeof(inq_cp), &inq_cp);
-+		break;
-+
-+	case DISCOV_TYPE_LE:
-+	case DISCOV_TYPE_INTERLEAVED:
-+		*status = mgmt_le_support(hdev);
-+		if (*status)
-+			return false;
-+
-+		if (hdev->discovery.type == DISCOV_TYPE_INTERLEAVED &&
-+		    !test_bit(HCI_BREDR_ENABLED, &hdev->dev_flags)) {
-+			*status = MGMT_STATUS_NOT_SUPPORTED;
-+			return false;
-+		}
-+
-+		if (test_bit(HCI_LE_ADV, &hdev->dev_flags)) {
-+			/* Don't let discovery abort an outgoing
-+			 * connection attempt that's using directed
-+			 * advertising.
-+			 */
-+			if (hci_conn_hash_lookup_state(hdev, LE_LINK,
-+						       BT_CONNECT)) {
-+				*status = MGMT_STATUS_REJECTED;
-+				return false;
-+			}
-+
-+			disable_advertising(req);
-+		}
-+
-+		/* If controller is scanning, it means the background scanning
-+		 * is running. Thus, we should temporarily stop it in order to
-+		 * set the discovery scanning parameters.
-+		 */
-+		if (test_bit(HCI_LE_SCAN, &hdev->dev_flags))
-+			hci_req_add_le_scan_disable(req);
-+
-+		memset(&param_cp, 0, sizeof(param_cp));
-+
-+		/* All active scans will be done with either a resolvable
-+		 * private address (when privacy feature has been enabled)
-+		 * or unresolvable private address.
-+		 */
-+		err = hci_update_random_address(req, true, &own_addr_type);
-+		if (err < 0) {
-+			*status = MGMT_STATUS_FAILED;
-+			return false;
-+		}
-+
-+		param_cp.type = LE_SCAN_ACTIVE;
-+		param_cp.interval = cpu_to_le16(DISCOV_LE_SCAN_INT);
-+		param_cp.window = cpu_to_le16(DISCOV_LE_SCAN_WIN);
-+		param_cp.own_address_type = own_addr_type;
-+		hci_req_add(req, HCI_OP_LE_SET_SCAN_PARAM, sizeof(param_cp),
-+			    &param_cp);
-+
-+		memset(&enable_cp, 0, sizeof(enable_cp));
-+		enable_cp.enable = LE_SCAN_ENABLE;
-+		enable_cp.filter_dup = LE_SCAN_FILTER_DUP_ENABLE;
-+		hci_req_add(req, HCI_OP_LE_SET_SCAN_ENABLE, sizeof(enable_cp),
-+			    &enable_cp);
-+		break;
-+
-+	default:
-+		*status = MGMT_STATUS_INVALID_PARAMS;
-+		return false;
++	if (!hdev_is_powered(hdev)) {
++		err = cmd_complete(sk, hdev->id,
++				   MGMT_OP_START_SERVICE_DISCOVERY,
++				   MGMT_STATUS_NOT_POWERED,
++				   &cp->type, sizeof(cp->type));
++		goto failed;
 +	}
 +
-+	return true;
++	if (hdev->discovery.state != DISCOVERY_STOPPED ||
++	    test_bit(HCI_PERIODIC_INQ, &hdev->dev_flags)) {
++		err = cmd_complete(sk, hdev->id,
++				   MGMT_OP_START_SERVICE_DISCOVERY,
++				   MGMT_STATUS_BUSY, &cp->type,
++				   sizeof(cp->type));
++		goto failed;
++	}
++
++	uuid_count = __le16_to_cpu(cp->uuid_count);
++	if (uuid_count > max_uuid_count) {
++		BT_ERR("service_discovery: too big uuid_count value %u",
++		       uuid_count);
++		err = cmd_complete(sk, hdev->id,
++				   MGMT_OP_START_SERVICE_DISCOVERY,
++				   MGMT_STATUS_INVALID_PARAMS, &cp->type,
++				   sizeof(cp->type));
++		goto failed;
++	}
++
++	expected_len = sizeof(*cp) + uuid_count * 16;
++	if (expected_len != len) {
++		BT_ERR("service_discovery: expected %u bytes, got %u bytes",
++		       expected_len, len);
++		err = cmd_complete(sk, hdev->id,
++				   MGMT_OP_START_SERVICE_DISCOVERY,
++				   MGMT_STATUS_INVALID_PARAMS, &cp->type,
++				   sizeof(cp->type));
++		goto failed;
++	}
++
++	cmd = mgmt_pending_add(sk, MGMT_OP_START_SERVICE_DISCOVERY,
++			       hdev, NULL, 0);
++	if (!cmd) {
++		err = -ENOMEM;
++		goto failed;
++	}
++
++	hdev->discovery.type = cp->type;
++	hdev->discovery.rssi = cp->rssi;
++	hdev->discovery.uuid_count = uuid_count;
++
++	if (uuid_count > 0) {
++		hdev->discovery.uuids = kmemdup(cp->uuids, uuid_count * 16,
++						GFP_KERNEL);
++		if (!hdev->discovery.uuids) {
++			err = cmd_complete(sk, hdev->id,
++					   MGMT_OP_START_SERVICE_DISCOVERY,
++					   MGMT_STATUS_FAILED,
++					   &cp->type, sizeof(cp->type));
++			mgmt_pending_remove(cmd);
++			goto failed;
++		}
++	}
++
++	hci_req_init(&req, hdev);
++
++	if (!trigger_discovery(&req, &status)) {
++		err = cmd_complete(sk, hdev->id,
++				   MGMT_OP_START_SERVICE_DISCOVERY,
++				   status, &cp->type, sizeof(cp->type));
++		mgmt_pending_remove(cmd);
++		goto failed;
++	}
++
++	err = hci_req_run(&req, start_discovery_complete);
++	if (err < 0) {
++		mgmt_pending_remove(cmd);
++		goto failed;
++	}
++
++	hci_discovery_set_state(hdev, DISCOVERY_STARTING);
++
++failed:
++	hci_dev_unlock(hdev);
++	return err;
 +}
 +
- static void start_discovery_complete(struct hci_dev *hdev, u8 status)
+ static void stop_discovery_complete(struct hci_dev *hdev, u8 status)
  {
  	struct pending_cmd *cmd;
-@@ -3740,13 +3837,8 @@ static int start_discovery(struct sock *sk, struct hci_dev *hdev,
- {
- 	struct mgmt_cp_start_discovery *cp = data;
- 	struct pending_cmd *cmd;
--	struct hci_cp_le_set_scan_param param_cp;
--	struct hci_cp_le_set_scan_enable enable_cp;
--	struct hci_cp_inquiry inq_cp;
- 	struct hci_request req;
--	/* General inquiry access code (GIAC) */
--	u8 lap[3] = { 0x33, 0x8b, 0x9e };
--	u8 status, own_addr_type;
-+	u8 status;
- 	int err;
+@@ -5726,6 +5831,7 @@ static const struct mgmt_handler {
+ 	{ read_config_info,       false, MGMT_READ_CONFIG_INFO_SIZE },
+ 	{ set_external_config,    false, MGMT_SET_EXTERNAL_CONFIG_SIZE },
+ 	{ set_public_address,     false, MGMT_SET_PUBLIC_ADDRESS_SIZE },
++	{ start_service_discovery,true,  MGMT_START_SERVICE_DISCOVERY_SIZE },
+ };
  
- 	BT_DBG("%s", hdev->name);
-@@ -3778,115 +3870,9 @@ static int start_discovery(struct sock *sk, struct hci_dev *hdev,
- 
- 	hci_req_init(&req, hdev);
- 
--	switch (hdev->discovery.type) {
--	case DISCOV_TYPE_BREDR:
--		status = mgmt_bredr_support(hdev);
--		if (status) {
--			err = cmd_complete(sk, hdev->id,
--					   MGMT_OP_START_DISCOVERY, status,
--					   &cp->type, sizeof(cp->type));
--			mgmt_pending_remove(cmd);
--			goto failed;
--		}
--
--		if (test_bit(HCI_INQUIRY, &hdev->flags)) {
--			err = cmd_complete(sk, hdev->id,
--					   MGMT_OP_START_DISCOVERY,
--					   MGMT_STATUS_BUSY, &cp->type,
--					   sizeof(cp->type));
--			mgmt_pending_remove(cmd);
--			goto failed;
--		}
--
--		hci_inquiry_cache_flush(hdev);
--
--		memset(&inq_cp, 0, sizeof(inq_cp));
--		memcpy(&inq_cp.lap, lap, sizeof(inq_cp.lap));
--		inq_cp.length = DISCOV_BREDR_INQUIRY_LEN;
--		hci_req_add(&req, HCI_OP_INQUIRY, sizeof(inq_cp), &inq_cp);
--		break;
--
--	case DISCOV_TYPE_LE:
--	case DISCOV_TYPE_INTERLEAVED:
--		status = mgmt_le_support(hdev);
--		if (status) {
--			err = cmd_complete(sk, hdev->id,
--					   MGMT_OP_START_DISCOVERY, status,
--					   &cp->type, sizeof(cp->type));
--			mgmt_pending_remove(cmd);
--			goto failed;
--		}
--
--		if (hdev->discovery.type == DISCOV_TYPE_INTERLEAVED &&
--		    !test_bit(HCI_BREDR_ENABLED, &hdev->dev_flags)) {
--			err = cmd_complete(sk, hdev->id,
--					   MGMT_OP_START_DISCOVERY,
--					   MGMT_STATUS_NOT_SUPPORTED,
--					   &cp->type, sizeof(cp->type));
--			mgmt_pending_remove(cmd);
--			goto failed;
--		}
--
--		if (test_bit(HCI_LE_ADV, &hdev->dev_flags)) {
--			/* Don't let discovery abort an outgoing
--			 * connection attempt that's using directed
--			 * advertising.
--			 */
--			if (hci_conn_hash_lookup_state(hdev, LE_LINK,
--						       BT_CONNECT)) {
--				err = cmd_complete(sk, hdev->id,
--						   MGMT_OP_START_DISCOVERY,
--						   MGMT_STATUS_REJECTED,
--						   &cp->type,
--						   sizeof(cp->type));
--				mgmt_pending_remove(cmd);
--				goto failed;
--			}
--
--			disable_advertising(&req);
--		}
--
--		/* If controller is scanning, it means the background scanning
--		 * is running. Thus, we should temporarily stop it in order to
--		 * set the discovery scanning parameters.
--		 */
--		if (test_bit(HCI_LE_SCAN, &hdev->dev_flags))
--			hci_req_add_le_scan_disable(&req);
--
--		memset(&param_cp, 0, sizeof(param_cp));
--
--		/* All active scans will be done with either a resolvable
--		 * private address (when privacy feature has been enabled)
--		 * or unresolvable private address.
--		 */
--		err = hci_update_random_address(&req, true, &own_addr_type);
--		if (err < 0) {
--			err = cmd_complete(sk, hdev->id,
--					   MGMT_OP_START_DISCOVERY,
--					   MGMT_STATUS_FAILED,
--					   &cp->type, sizeof(cp->type));
--			mgmt_pending_remove(cmd);
--			goto failed;
--		}
--
--		param_cp.type = LE_SCAN_ACTIVE;
--		param_cp.interval = cpu_to_le16(DISCOV_LE_SCAN_INT);
--		param_cp.window = cpu_to_le16(DISCOV_LE_SCAN_WIN);
--		param_cp.own_address_type = own_addr_type;
--		hci_req_add(&req, HCI_OP_LE_SET_SCAN_PARAM, sizeof(param_cp),
--			    &param_cp);
--
--		memset(&enable_cp, 0, sizeof(enable_cp));
--		enable_cp.enable = LE_SCAN_ENABLE;
--		enable_cp.filter_dup = LE_SCAN_FILTER_DUP_ENABLE;
--		hci_req_add(&req, HCI_OP_LE_SET_SCAN_ENABLE, sizeof(enable_cp),
--			    &enable_cp);
--		break;
--
--	default:
-+	if (!trigger_discovery(&req, &status)) {
- 		err = cmd_complete(sk, hdev->id, MGMT_OP_START_DISCOVERY,
--				   MGMT_STATUS_INVALID_PARAMS,
--				   &cp->type, sizeof(cp->type));
-+				   status, &cp->type, sizeof(cp->type));
- 		mgmt_pending_remove(cmd);
- 		goto failed;
- 	}
+ int mgmt_control(struct sock *sk, struct msghdr *msg, size_t msglen)
 -- 
 1.9.3
 
