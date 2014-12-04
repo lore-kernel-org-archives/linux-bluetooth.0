@@ -1,83 +1,76 @@
 Return-Path: <cyrus@holtmann.org>
-From: Michael Janssen <jamuraa@chromium.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Michael Janssen <jamuraa@chromium.org>
-Subject: [RFC BlueZ] lib/uuid: Simplify BT base UUIDs when possible
-Date: Thu,  4 Dec 2014 13:56:52 -0800
-Message-Id: <1417730212-22785-1-git-send-email-jamuraa@chromium.org>
-Sender: linux-bluetooth-owner@vger.kernel.org
+MIME-Version: 1.0
+In-Reply-To: <32156A77-A9BF-4542-8E26-61A398273B53@holtmann.org>
+References: <1417708419-25772-1-git-send-email-luiz.dentz@gmail.com>
+	<32156A77-A9BF-4542-8E26-61A398273B53@holtmann.org>
+Date: Thu, 4 Dec 2014 23:15:16 +0200
+Message-ID: <CABBYNZLbStqhwa3W+457Fj-dTL43mzE0+pfiBKzJA9FmEeVvEw@mail.gmail.com>
+Subject: Re: [RFC BlueZ] shared/mgmt: Remove unnecessary code
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-When converting a UUID from string to bt_uuid_t, prefer using
-the 16-bit version when possible, which should generate shorter
-sequences by increasing the number of 16-bit types.
----
- lib/uuid.c       |  4 ++++
- unit/test-uuid.c | 22 +++++++++++++++++++---
- 2 files changed, 23 insertions(+), 3 deletions(-)
+Hi Marcel,
 
-diff --git a/lib/uuid.c b/lib/uuid.c
-index 5c3f986..d110b5e 100644
---- a/lib/uuid.c
-+++ b/lib/uuid.c
-@@ -238,6 +238,10 @@ static int bt_string_to_uuid128(bt_uuid_t *uuid, const char *string)
- 				&data3, &data4, &data5) != 6)
- 		return -EINVAL;
- 
-+	if (data0 <= 0xFFFF && data1 == 0x0000 && data2 == 0x1000 &&
-+	    data3 == 0x8000 && data4 == 0x0805f9bL && data5 == 0x34fb)
-+		return bt_uuid16_create(uuid, data0 & 0xFFFF);
-+
- 	data0 = htonl(data0);
- 	data1 = htons(data1);
- 	data2 = htons(data2);
-diff --git a/unit/test-uuid.c b/unit/test-uuid.c
-index 6c7e9d0..8647af9 100644
---- a/unit/test-uuid.c
-+++ b/unit/test-uuid.c
-@@ -46,9 +46,9 @@ static unsigned char uuid_base_binary[] = {
- 			0x80, 0x00, 0x00, 0x80, 0x5f, 0x9b, 0x34, 0xfb };
- 
- static struct uuid_test_data uuid_base = {
--	.str = "00000000-0000-1000-8000-00805f9b34fb",
--	.binary = uuid_base_binary,
--	.type = BT_UUID128,
-+	.str = "0000",
-+	.val16 = 0x0000,
-+	.type = BT_UUID16,
- 	.str128 = "00000000-0000-1000-8000-00805f9b34fb",
- 	.binary128 = uuid_base_binary,
- };
-@@ -93,6 +93,18 @@ static struct uuid_test_data uuid_32_2 = {
- 	.binary128 = uuid_32_binary,
- };
- 
-+static unsigned char uuid_128_binary[] = {
-+			0xF0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x10, 0x00,
-+			0x80, 0x00, 0x00, 0x80, 0x5f, 0x9b, 0x34, 0xfb };
-+
-+static struct uuid_test_data uuid_128 = {
-+	.str = "F0000000-0000-1000-8000-00805f9b34fb",
-+	.binary = uuid_128_binary,
-+	.type = BT_UUID128,
-+	.str128 = "F0000000-0000-1000-8000-00805f9b34fb",
-+	.binary128 = uuid_128_binary,
-+};
-+
- static void test_uuid(gconstpointer data)
- {
- 	const struct uuid_test_data *test_data = data;
-@@ -216,6 +228,10 @@ int main(int argc, char *argv[])
- 	g_test_add_data_func("/uuid/thritytwo2/str", &uuid_32_2, test_str);
- 	g_test_add_data_func("/uuid/thirtytwo2/cmp", &uuid_32_2, test_cmp);
- 
-+	g_test_add_data_func("/uuid/onetwentyeight", &uuid_128, test_uuid);
-+	g_test_add_data_func("/uuid/onetwentyeight/str", &uuid_128, test_str);
-+	g_test_add_data_func("/uuid/onetwentyeight/cmp", &uuid_128, test_cmp);
-+
- 	for (i = 0; malformed[i]; i++) {
- 		char *testpath;
- 
--- 
-2.2.0.rc0.207.ga3a616c
+On Thu, Dec 4, 2014 at 9:31 PM, Marcel Holtmann <marcel@holtmann.org> wrote=
+:
+> Hi Luiz,
+>
+>> This flags were added because calling function like queue_foreach were
+>> not safe as the callbacks may remove or destroy the queue before
+>> returning but this has been fixed and it is now safe to do that.
+>> ---
+>> src/shared/mgmt.c | 89 +++++++------------------------------------------=
+------
+>> 1 file changed, 11 insertions(+), 78 deletions(-)
+>>
+>> diff --git a/src/shared/mgmt.c b/src/shared/mgmt.c
+>> index 5dae7a9..ec574c9 100644
+>> --- a/src/shared/mgmt.c
+>> +++ b/src/shared/mgmt.c
+>> @@ -51,9 +51,6 @@ struct mgmt {
+>>       struct queue *notify_list;
+>>       unsigned int next_request_id;
+>>       unsigned int next_notify_id;
+>> -     bool need_notify_cleanup;
+>> -     bool in_notify;
+>> -     bool destroyed;
+>
+> this makes no sense to me. The handling he is for reentrant support. So a=
+ lot of this handling is needed. You want to be able to remove notification=
+s handlers while in callback or the other way around. We know that this is =
+needed since years back we needed that with oFono and GLib. So just claimin=
+g queue_foreach has some magic fix is not going to do it.
 
+That not really magic fix, the queue now protects entries with a
+reference during callback calls (it is not yet applied though), it is
+a much more common protection for re-entrant code, or well at least
+more common than using one flag to tell it on callback, another to do
+the cleaning later and yet another one to tell the entry has been
+removed already. Note that destroyed flag was not really necessary to
+begin with and I could probably have it in a differen patch since it
+is just a case of using mgmt_ref/mgmt_unref to protect the region
+where callbacks can be called.
+
+> Especially since some of the corner cases in mgmt.c might not be hit sinc=
+e bluetoothd does not exercise them. It does not mean they are not there.
+
+Im planning to add more unit tests for this as well, but given the
+pattern is pretty much known even src/shared/io-mainloop.c does a
+similar thing, from what I tested from mgmt-tester to android-tester
+none had regressions with these changes but perhaps they don't really
+exercise everything as you suggested.
+
+> I am also not really in favor of just hacking src/shared/queue.c without =
+considering the implications to ELL and how things are done. This is not a =
+playground for quickly hacking stuff together. The long term goal is to run=
+ bluetoothd on top of ELL.
+
+That could learn how to protect entries and we could add the same unit
+tests which we already have in BlueZ.
+
+
+--=20
+Luiz Augusto von Dentz
