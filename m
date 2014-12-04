@@ -1,27 +1,38 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 4 Dec 2014 11:13:50 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] shared/crypto: Fix resource leak
-Message-ID: <20141204091350.GA761@t440s.lan>
-References: <1417683055-24584-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1417683055-24584-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] shared/gatt: Fix NULL dereference
+Date: Thu,  4 Dec 2014 10:55:52 +0200
+Message-Id: <1417683352-24655-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-On Thu, Dec 04, 2014, Andrei Emeltchenko wrote:
-> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-> 
-> Fix leaking fd on exit
-> ---
->  src/shared/crypto.c | 2 ++
->  1 file changed, 2 insertions(+)
+The which is executed after checking (!op) is dereferencing op in
+function discovery_op_free().
+---
+ src/shared/gatt-client.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-Applied. Thanks.
+diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
+index 463de3b..96b5f1f 100644
+--- a/src/shared/gatt-client.c
++++ b/src/shared/gatt-client.c
+@@ -1101,11 +1101,12 @@ static void process_service_changed(struct bt_gatt_client *client,
+ 		return;
+ 	}
+ 
++	discovery_op_free(op);
++
+ fail:
+ 	util_debug(client->debug_callback, client->debug_data,
+ 					"Failed to initiate service discovery"
+ 					" after Service Changed");
+-	discovery_op_free(op);
+ }
+ 
+ static void service_changed_cb(uint16_t value_handle, const uint8_t *value,
+-- 
+1.9.1
 
-Johan
