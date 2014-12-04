@@ -1,56 +1,120 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1417689400-128063-5-git-send-email-marcel@holtmann.org>
-References: <1417689400-128063-5-git-send-email-marcel@holtmann.org>
-Date: Thu, 4 Dec 2014 09:31:47 -0800
-Message-ID: <CAD0=r8zfKBdu8=ZJj9Z-OLVjyUJoZ3iZ6bVjhPL_sVzU3qZ61w@mail.gmail.com>
-Subject: Re: [RFC v2 5/7] Bluetooth: Add definitions for MGMT_OP_START_SERVICE_DISCOVERY
-From: Jakub Pawlowski <jpawlowski@google.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+From: Michael Janssen <jamuraa@chromium.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: Michael Janssen <jamuraa@chromium.org>
+Subject: [PATCH BlueZ 2/2] Remove unused old test db structures
+Date: Thu,  4 Dec 2014 09:03:55 -0800
+Message-Id: <1417712635-12428-3-git-send-email-jamuraa@chromium.org>
+In-Reply-To: <1417712635-12428-1-git-send-email-jamuraa@chromium.org>
+References: <1417712635-12428-1-git-send-email-jamuraa@chromium.org>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Thu, Dec 4, 2014 at 2:36 AM, Marcel Holtmann <marcel@holtmann.org> wrote:
-> From: Jakub Pawlowski <jpawlowski@google.com>
->
-> This patch adds the opcode and structure for Start Service Discovery
-> operation.
->
-> Signed-off-by: Jakub Pawlowski <jpawlowski@google.com>
-> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
-> ---
->  include/net/bluetooth/mgmt.h | 9 +++++++++
->  1 file changed, 9 insertions(+)
->
-> diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
-> index 9b382ea34fd9..95c34d5180fa 100644
-> --- a/include/net/bluetooth/mgmt.h
-> +++ b/include/net/bluetooth/mgmt.h
-> @@ -498,6 +498,15 @@ struct mgmt_cp_set_public_address {
->  } __packed;
->  #define MGMT_SET_PUBLIC_ADDRESS_SIZE   6
->
-> +#define MGMT_OP_START_SERVICE_DISCOVERY        0x003A
-> +struct mgmt_cp_start_service_discovery {
-> +       __u8 type;
+---
+ unit/test-gatt.c | 83 --------------------------------------------------------
+ 1 file changed, 83 deletions(-)
 
-Maybe we should get rid of type ? service discovery based on
-advertisement content makes sense only for LE
+diff --git a/unit/test-gatt.c b/unit/test-gatt.c
+index ff3dbba..c3767dd 100644
+--- a/unit/test-gatt.c
++++ b/unit/test-gatt.c
+@@ -56,31 +56,6 @@ enum context_type {
+ 	SERVER
+ };
+ 
+-struct gatt_desc {
+-	uint16_t handle;
+-	uint8_t uuid[16];
+-};
+-
+-struct gatt_chrc {
+-	uint16_t handle;
+-	uint16_t value_handle;
+-	uint8_t properties;
+-	uint8_t uuid[16];
+-
+-	const struct gatt_desc *descs;
+-	size_t num_descs;
+-};
+-
+-struct gatt_service {
+-	bool primary;
+-	uint16_t start_handle;
+-	uint16_t end_handle;
+-	uint8_t uuid[16];
+-
+-	const struct gatt_chrc **chars;
+-	size_t num_chars;
+-};
+-
+ struct test_data {
+ 	char *test_name;
+ 	struct test_pdu *pdu_list;
+@@ -193,64 +168,6 @@ static bt_uuid_t uuid_char_128 = {
+ 			0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f}
+ };
+ 
+-const struct gatt_desc descriptor_1 = {
+-	.handle = 0x0004,
+-	.uuid = {0x00, 0x00, 0x29, 0x01, 0x00, 0x00, 0x10, 0x00,
+-			0x80, 0x00, 0x00, 0x80, 0x5f, 0x9b, 0x34, 0xfb}
+-};
+-
+-const struct gatt_chrc characteristic_1 = {
+-	.handle = 0x0002,
+-	.value_handle = 0x0003,
+-	.properties = 0x02,
+-	.uuid = {0x00, 0x00, 0x2a, 0x00, 0x00, 0x00, 0x10, 0x00,
+-			0x80, 0x00, 0x00, 0x80, 0x5f, 0x9b, 0x34, 0xfb},
+-	.descs = &descriptor_1,
+-	.num_descs = 1
+-};
+-
+-const struct gatt_desc descriptor_2 = {
+-	.handle = 0x0008,
+-	.uuid = {0x00, 0x00, 0x29, 0x01, 0x00, 0x00, 0x10, 0x00,
+-			0x80, 0x00, 0x00, 0x80, 0x5f, 0x9b, 0x34, 0xfb}
+-};
+-
+-const struct gatt_chrc characteristic_2 = {
+-	.handle = 0x0006,
+-	.value_handle = 0x0007,
+-	.properties = 0x02,
+-	.uuid = {0x00, 0x00, 0x2a, 0x29, 0x00, 0x00, 0x10, 0x00,
+-			0x80, 0x00, 0x00, 0x80, 0x5f, 0x9b, 0x34, 0xfb},
+-	.descs = &descriptor_2,
+-	.num_descs = 1
+-};
+-
+-const struct gatt_chrc *characteristics_1[] = {&characteristic_1};
+-const struct gatt_chrc *characteristics_2[] = {&characteristic_2};
+-
+-const struct gatt_service gatt_service_1 = {
+-	.primary = true,
+-	.start_handle = 0x0001,
+-	.end_handle = 0x0004,
+-	.uuid = {0x00, 0x00, 0x18, 0x01, 0x00, 0x00, 0x10, 0x00,
+-			0x80, 0x00, 0x00, 0x80, 0x5f, 0x9b, 0x34, 0xfb},
+-	.chars = characteristics_1,
+-	.num_chars = sizeof(characteristics_1) / sizeof(characteristics_1[0])
+-};
+-
+-const struct gatt_service gatt_service_2 = {
+-	.primary = true,
+-	.start_handle = 0x0005,
+-	.end_handle = 0x0008,
+-	.uuid = {0x00, 0x00, 0x18, 0x0d, 0x00, 0x00, 0x10, 0x00,
+-			0x80, 0x00, 0x00, 0x80, 0x5f, 0x9b, 0x34, 0xfb},
+-	.chars = characteristics_2,
+-	.num_chars = sizeof(characteristics_2) / sizeof(characteristics_2[0])
+-};
+-
+-const struct gatt_service *service_data_1[] = {&gatt_service_1,
+-							&gatt_service_2};
+-
+ static void test_debug(const char *str, void *user_data)
+ {
+ 	const char *prefix = user_data;
+-- 
+2.2.0.rc0.207.ga3a616c
 
-> +       __s8 rssi;
-> +       __le16 uuid_count;
-> +       __u8 uuids[0][16];
-> +} __packed;
-> +#define MGMT_START_SERVICE_DISCOVERY_SIZE 4
-> +
->  #define MGMT_EV_CMD_COMPLETE           0x0001
->  struct mgmt_ev_cmd_complete {
->         __le16  opcode;
-> --
-> 1.9.3
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
