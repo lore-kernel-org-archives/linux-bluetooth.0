@@ -1,58 +1,51 @@
 Return-Path: <cyrus@holtmann.org>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: linux-bluetooth@vger.kernel.org
-Subject: [RFC v2 1/7] Bluetooth: Simplify the error handling of Start Discovery command
-Date: Thu,  4 Dec 2014 11:36:34 +0100
-Message-Id: <1417689400-128063-1-git-send-email-marcel@holtmann.org>
-Sender: linux-bluetooth-owner@vger.kernel.org
+From: Szymon Janc <szymon.janc@tieto.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [RFC 1/6] Bluetooth: Add HCI_RSSI_INVALID for unknown RSSI value
+Date: Thu, 04 Dec 2014 11:25:10 +0100
+Message-ID: <1685574.sY4pTME6Ng@uw000953>
+In-Reply-To: <14329907.Jd9mZKriik@uw000953>
+References: <1417684441-103825-1-git-send-email-marcel@holtmann.org> <82B4FEE0-A5A7-4E7B-B526-F278C316DA76@holtmann.org> <14329907.Jd9mZKriik@uw000953>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The Start Discovery command has some complicated code when it comes
-to error handling. With the future introduction of Start Service
-Discovery simplifying this makes it easier to read.
+Hi,
 
-Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
----
- net/bluetooth/mgmt.c | 18 +++++++-----------
- 1 file changed, 7 insertions(+), 11 deletions(-)
+On Thursday 04 of December 2014 11:24:03 Szymon Janc wrote:
+> Hi Marcel,
+> 
+> On Thursday 04 of December 2014 11:13:08 Marcel Holtmann wrote:
+> > Hi Szymon,
+> > 
+> > >> The Bluetooth core specification defines the value 127 as invalid for
+> > >> RSSI values. So instead of hard coding it, lets add a constant for it.
+> > >> 
+> > >> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+> > >> ---
+> > >> include/net/bluetooth/hci.h | 1 +
+> > >> 1 file changed, 1 insertion(+)
+> > >> 
+> > >> diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+> > >> index 569c077778b6..b6f7be1eb919 100644
+> > >> --- a/include/net/bluetooth/hci.h
+> > >> +++ b/include/net/bluetooth/hci.h
+> > >> @@ -412,6 +412,7 @@ enum {
+> > >> 
+> > >> /* The core spec defines 127 as the "not available" value */
+> > >> #define HCI_TX_POWER_INVALID	127
+> > >> +#define HCI_RSSI_INVALID	127
+> > > 
+> > > Isn't that value depending on command, event, link and controller type?
+> > 
+> > we use it for the mgmt side of things and there it is whatever we want it to be.
+> 
+> At least for inquiry result (no RSSI) 0 is passed to mgmt_device_found() and that seems
+> to be used by userspace as RSSI unavailable.
 
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 77cf0ef0d8a3..f3296371a310 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -3771,14 +3771,8 @@ static int start_discovery(struct sock *sk, struct hci_dev *hdev,
- 		goto failed;
- 	}
- 
--	if (test_bit(HCI_PERIODIC_INQ, &hdev->dev_flags)) {
--		err = cmd_complete(sk, hdev->id, MGMT_OP_START_DISCOVERY,
--				   MGMT_STATUS_BUSY, &cp->type,
--				   sizeof(cp->type));
--		goto failed;
--	}
--
--	if (hdev->discovery.state != DISCOVERY_STOPPED) {
-+	if (hdev->discovery.state != DISCOVERY_STOPPED ||
-+	    test_bit(HCI_PERIODIC_INQ, &hdev->dev_flags)) {
- 		err = cmd_complete(sk, hdev->id, MGMT_OP_START_DISCOVERY,
- 				   MGMT_STATUS_BUSY, &cp->type,
- 				   sizeof(cp->type));
-@@ -3909,10 +3903,12 @@ static int start_discovery(struct sock *sk, struct hci_dev *hdev,
- 	}
- 
- 	err = hci_req_run(&req, start_discovery_complete);
--	if (err < 0)
-+	if (err < 0) {
- 		mgmt_pending_remove(cmd);
--	else
--		hci_discovery_set_state(hdev, DISCOVERY_STARTING);
-+		goto failed;
-+	}
-+
-+	hci_discovery_set_state(hdev, DISCOVERY_STARTING);
- 
- failed:
- 	hci_dev_unlock(hdev);
+Which is strange btw, since both for LE and BR/EDR this is legal RSSI value...
+
 -- 
-1.9.3
-
+Best regards, 
+Szymon Janc
