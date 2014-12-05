@@ -1,163 +1,103 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <20141015145000.GA26735@t440s.fdxtended.com>
-References: <CAB0Wyv=3HBi6wnStgjGFwg7HUODoYj3mZBVTnZnC+tb+Mipyxw@mail.gmail.com>
-	<20141015145000.GA26735@t440s.fdxtended.com>
-Date: Fri, 5 Dec 2014 17:32:11 +0800
-Message-ID: <CAB0WyvnOCKYXoCt8yRQRSP-_Jn8-y1kHVu88KrBsp9AXFw+-hA@mail.gmail.com>
-Subject: Re: BT-4.1 features (e.g. concurrent GAP operations) support
-From: "Min Jun,Xi" <xi.minjun@gmail.com>
-To: "Min Jun,Xi" <xi.minjun@gmail.com>, linux-bluetooth@vger.kernel.org
+In-Reply-To: <54758990.2050908@gmail.com>
+References: <5474BA38.2070908@gmail.com> <C8849DFB-5159-4C62-A861-D393034E4895@holtmann.org>
+ <54758990.2050908@gmail.com>
+From: Michel Memeteau - EKIMIA <contact@ekimia.fr>
+Date: Fri, 5 Dec 2014 10:18:54 +0100
+Message-ID: <CAKxAHQ7CYHOknoowYw8XVm-d_rkCxsKehVHz=+r9ek0AyQi60Q@mail.gmail.com>
+Subject: Re: [PATCH v6] ath3k: Add support of MCI 13d3:3408 bt device
+To: Dmitry Tunin <hanipouspilot@gmail.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>, linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+	linux-kernel <linux-kernel@vger.kernel.org>, stable@vger.kernel.org
 Content-Type: text/plain; charset=UTF-8
-Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Wed, Oct 15, 2014 at 10:50 PM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
-> Hi,
+Thanks for your work dimitry,
+
+I need to make AR9565 BT work with Kernel 3.13 on Ubuntu 14.04 so I'm
+really interrested in what you did.
+
+Regards.
+<------------------------------------------------------------------------------------------------------------------>
+Michel Memeteau  - Directeur.
+
+
+Notre Boutique Ordinateurs GNU/Linux : http://shop.ekimia.fr
+49 chemin de l'union 13720 La Bouilladisse - France.
+Fixe :  +33 (0) 972308334   Mobile : +33(0) 624808051
+<------------------------------------------------------------------------------------------------------------------>
+
+
+2014-11-26 9:04 GMT+01:00 Dmitry Tunin <hanipouspilot@gmail.com>:
+> Hi all,
 >
-> On Wed, Oct 15, 2014, Min Jun,Xi wrote:
->> Where can I find the latest BT-4.1 features support for
->> Bluetooth-subsystem and BlueZ?
+> I spent already hours on sending this fucking email. The patch works for me.
+> And if someone else is interested in working of this device feel free and do
+> it yourself.
 >
-> I don't think the detailed feature status is documented anywhere but the
-> code, so the most reliable way would be to get the latest user space and
-> kernel trees and experiment with them yourself.
 >
->> In the 4.1 features, I know connection-oriented channels has been supported;
+> 26.11.2014 08:05, Marcel Holtmann wrote:
 >>
->> I have one question about this new feature (Bluetooth Specification
->> Version 4.1[Vol 3] page 293 of 668, ): "2.2.2.5 Concurrent Operation
->> in Multiple GAP Roles"; this feature is very useful to support
->> mesh-like topology,
+>> Hi Dmitry,
 >>
->> From the description in chapter 2.2.2.5, the controller should support
->> operations in multiple GAP roles concurrently, and the host should
->> read the supported Link Layer States and State combinations from the
->> Controller before any procedures or modes are used.
-
-Sorry, I might not make it clear. The concurrent multiple GAP
-operations include more operations than "both scan and advertise
-at the same time " as you said.
-
-It should follow the Link Layer States and State combinations as BT4.1
-core spec or later.
-
-On page 33 of 174, BLUETOOTH SPECIFICATION Version 4.1 [Vol 6], it says that:
-
-1.1.1 State and Role Combination Restrictions
-The Link Layer may optionally support multiple state machines. If it
-does sup- port multiple state machines, then:
-• The Link Layer in the Connection State may operate in the Master
-Role and Slave Role at the same time.
-• The Link Layer in the Connection State operating in the Slave Role
-may have multiple connections.
-• The Link Layer in the Connection State operating in the Master Role
-may have multiple connections.
-• All other combinations of states and roles may also be supported.
-A Link Layer implementation is not required to support all the
-possible state combinations that are allowed by this specification.
-
-You can find more combinations that BT4.0 core spec doesn't allow.
-
+>>> Add support for bluetooth MCI WB335 (AR9565) Wi-Fi+bt module.
+>>> This bluetooth module requires loading patch and sysconfig by ath3k
+>>> driver.
+>>>
+>>> T:  Bus=01 Lev=02 Prnt=03 Port=00 Cnt=01 Dev#= 20 Spd=12   MxCh= 0
+>>> D:  Ver= 1.10 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
+>>> P:  Vendor=13d3 ProdID=3408 Rev= 0.02
+>>> C:* #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
+>>> A:  FirstIf#= 0 IfCount= 2 Cls=e0(wlcon) Sub=01 Prot=01
+>>> I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+>>> E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
+>>> E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+>>> E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+>>> I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+>>> E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+>>> E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+>>> I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+>>> E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+>>> E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+>>> I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+>>> E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+>>> E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+>>> I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+>>> E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+>>> E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+>>> I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+>>> E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+>>> E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+>>> I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+>>> E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+>>> E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+>>>
+>>>
+>>> CC: stable@vger.kernel.org
+>>> Signed-off-by: Dmitry Tunin <hanipouspilot@gmail.com>
 >>
->> Can anyone tell me if the bluetooth subsystem has supported the Link
->> Layer states and the States combinations? I am also looking for the
->> Controller support operations in multiple GAP roles concurrently, can
->> anyone know if CSR/Nordic/Broadcom has got the USB dongles which
->> supports concurrent operation and can used under Linux?
->
-> We don't specifically look at the controller supported states at the
-> moment but simply stick to what we know existing controllers to be
-> capable of. This means that you will be able to both scan and advertise
-> at the same time (i.e. act as central and peripheral). What we do limit
-> (since we don't know if HW that supports it) is new LE connection
-> creation when there already is an existing slave-role connection.
->
-Sorry, I didn't make it clear in my last mail
-
-
-I download the latest bluez (currently bluez-5.25) source code, and
-from hciconfig.c, we can see there's one sub-command called
-"lestates", which will detect and list all the supported link layer
-states for the specified HCI interface.
-
-Unfortunately,  the combinations are not updated following the 4.1 and
-4.2 core specs.
-
-At least from page 33 of 174, BLUETOOTH SPECIFICATION Version 4.1 [Vol
-6], it says that
-
-     1.1.1 State and Role Combination Restrictions
-     The Link Layer may optionally support multiple state machines. If
-it does sup- port multiple state machines, then:
-      • The Link Layer in the Connection State may operate in the
-Master Role and Slave Role at the same time.
-      • The Link Layer in the Connection State operating in the Slave
-Role may have multiple connections.
-      • The Link Layer in the Connection State operating in the Master
-Role may have multiple connections.
-      • All other combinations of states and roles may also be supported.
-     A Link Layer implementation is not required to support all the
-possible state combinations that are allowed by this specification.
-
-Compared the current state combinations listed in hciconfig.c (line 119-153):
-
-    static void print_le_states(uint64_t states)
-    {
-    int i;
-    const char *le_states[] = {
-    "Non-connectable Advertising State" ,
-    "Scannable Advertising State",
-    "Connectable Advertising State",
-    "Directed Advertising State",
-    "Passive Scanning State",
-    "Active Scanning State",
-    "Initiating State/Connection State in Master Role",
-    "Connection State in the Slave Role",
-    "Non-connectable Advertising State and Passive Scanning State combination",
-    "Scannable Advertising State and Passive Scanning State combination",
-    "Connectable Advertising State and Passive Scanning State combination",
-    "Directed Advertising State and Passive Scanning State combination",
-    "Non-connectable Advertising State and Active Scanning State combination",
-    "Scannable Advertising State and Active Scanning State combination",
-    "Connectable Advertising State and Active Scanning State combination",
-    "Directed Advertising State and Active Scanning State combination",
-    "Non-connectable Advertising State and Initiating State combination",
-    "Scannable Advertising State and Initiating State combination",
-    "Non-connectable Advertising State and Master Role combination",
-    "Scannable Advertising State and Master Role combination",
-    "Non-connectable Advertising State and Slave Role combination",
-    "Scannable Advertising State and Slave Role combination",
-    "Passive Scanning State and Initiating State combination",
-    "Active Scanning State and Initiating State combination",
-    "Passive Scanning State and Master Role combination",
-    "Active Scanning State and Master Role combination",
-    "Passive Scanning State and Slave Role combination",
-    "Active Scanning State and Slave Role combination",
-    "Initiating State and Master Role combination/Master Role and
-Master Role combination",
-    NULL
-    };
-
-the hciconfig command doesn't try to detect if the interface supports
-multiple state machines and if the interface supports following state
-combinations:
-      • The Link Layer in the Connection State may operate in the
-Master Role and Slave Role at the same time.
-      • The Link Layer in the Connection State operating in the Slave
-Role may have multiple connections.
-      • The Link Layer in the Connection State operating in the Master
-Role may have multiple connections.
-      • All other combinations of states and roles may also be supported.
-
-Based on this situation, I don't think what you said here is correct.
-The latest Bluez implementation doesn't follow Bluetooth 4.1 core spec
-to detect the LE device's capability.
-
-> Johan
-
-
-
--- 
-Best regards,
-Xi Minjun
+>>
+>> so you really need to make sure to send only one version. I now have two
+>> patches labeled as v6 and I have no idea which one is recent and which one I
+>> am suppose to apply.
+>>
+>> I tried applying this one, but it failed. Patches need to be based against
+>> bluetooth-next tree.
+>>
+>> Applying: ath3k: Add support of MCI 13d3:3408 bt device
+>> error: patch failed: drivers/bluetooth/ath3k.c:105
+>> error: drivers/bluetooth/ath3k.c: patch does not apply
+>> error: patch failed: drivers/bluetooth/btusb.c:182
+>> error: drivers/bluetooth/btusb.c: patch does not apply
+>> Patch failed at 0001 ath3k: Add support of MCI 13d3:3408 bt device
+>>
+>> Regards
+>>
+>> Marcel
+>>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth"
+> in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
