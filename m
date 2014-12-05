@@ -1,49 +1,64 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 5 Dec 2014 15:31:58 +0100
-From: Alexander Aring <alex.aring@gmail.com>
-To: Jukka Rissanen <jukka.rissanen@linux.intel.com>
-Cc: linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
-	linux-wpan@vger.kernel.org, martin.townsend@xsilon.com
-Subject: Re: 6lowpan next header compression framwork: module handling or not?
-Message-ID: <20141205143156.GC478@omega>
-References: <20141205124602.GB478@omega>
- <1417786926.32209.9.camel@jrissane-mobl.ger.corp.intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-In-Reply-To: <1417786926.32209.9.camel@jrissane-mobl.ger.corp.intel.com>
+From: Sebastian Chlad <sebastian.chlad@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Sebastian Chlad <sebastian.chlad@tieto.com>
+Subject: [PATCH] android/pts: GAP PTS test results for Android 5.0
+Date: Fri,  5 Dec 2014 14:49:14 +0100
+Message-Id: <1417787354-6603-1-git-send-email-sebastian.chlad@tieto.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jukka,
+---
+ android/pts-gap.txt | 15 +++++++++------
+ 1 file changed, 9 insertions(+), 6 deletions(-)
 
-On Fri, Dec 05, 2014 at 03:42:06PM +0200, Jukka Rissanen wrote:
-...
-> I am fine if the "default" being a module, as long as it is
-> automatically loaded. From the end user point of view, he/she should not
-> configure or do any magic in order to use 6lowpan.
-> 
+diff --git a/android/pts-gap.txt b/android/pts-gap.txt
+index 99a6a7d..c597258 100644
+--- a/android/pts-gap.txt
++++ b/android/pts-gap.txt
+@@ -1,8 +1,8 @@
+ PTS test results for GAP
+ 
+ PTS version: 5.3
+-Tested: 28-October-2014
+-Android version: 4.4.4
++Tested: 05-December-2014
++Android version: 5.0
+ Kernel version: 3.18
+ 
+ Results:
+@@ -94,7 +94,7 @@ TC_IDLE_NAMP_BV_01_C	PASS	possible to PASS using haltest following steps:
+ 				gattc - register client, connect to PTS, search
+ 				all services, get characteristic and then read
+ 				characteristic (name)
+-TC_IDLE_NAMP_BV_02_C	INC	PTS issue #12679
++TC_IDLE_NAMP_BV_02_C	PASS	PTS issue #12679
+ 				haltest: gatts connect
+ TC_CONN_NCON_BV_01_C	PASS	btmgmt connectable off
+ 				btmgmt advertising on
+@@ -174,8 +174,7 @@ TC_BOND_BON_BV_01_C	PASS	PTS issue #12503
+ 				To bond with PTS execute
+ 				btmgmt pair -t 0x01 -c 0x03 <PTS addr>
+ TC_BOND_BON_BV_02_C	PASS
+-TC_BOND_BON_BV_03_C	INC	PTS issue #12678
+-				Note: tiny chance to pass if PTS won't crash
++TC_BOND_BON_BV_03_C	PASS	PTS issue #12678
+ 				gattc register_client
+ 				gattc listen 1
+ TC_BOND_BON_BV_04_C	PASS	haltest: gattc_register_client
+@@ -338,7 +337,11 @@ TC_PRIV_CONN_BV_06_C	N/A
+ TC_PRIV_CONN_BV_07_C	N/A
+ TC_PRIV_CONN_BV_08_C	N/A
+ TC_PRIV_CONN_BV_09_C	N/A
+-TC_PRIV_CONN_BV_10_C	INC	PTS issue #12312
++TC_PRIV_CONN_BV_10_C	PASS	PTS issue #12312
++				Note: currently for this test following PIXITs
++				are required to be be changed:
++				TSPX_using_public_device_address: FALSE
++				TSPX_using_random_device_address: TRUE
+ TC_PRIV_CONN_BV_11_C	INC	PTS issue #12310, JIRA #BA-186
+ TC_ADV_BV_01_C		N/A
+ TC_ADV_BV_02_C		PASS	gattc register_client
+-- 
+1.8.5.3
 
-Seems that I am not a module linux guru. I don't know how I can
-implement such feature. The nhc compression module depends on 6lowpan.ko
-module but 6lowpan.ko can't depend on the nhc compression modules. If
-there would be some dependency then 6lowpan.ko would load the
-compression modules at module_init. Means some symbols are missing and
-"something" try to load the right modules to get these symbols.
-
-I tried to create such behaviour but failed. I don't know if this is
-really possible or I don't know how I can implement this behaviour.
-
-What I tried was to implement a "dummy" function, which seems to be also
-a hack in my opnion. This "dummy" function was implemented in the nhc module.
-
-void lowpan_nhc_rfc6282_udp_load(void) { }
-EXPORT_SYMBOL(lowpan_nhc_rfc6282_udp_load);
-
-Then lowpan_nhc_rfc6282_udp_load was called at module_init of 6lowpan.ko
-but I got some linking issues.
-
-
-Maybe I need some time to getting the idea how I can implement such
-behaviour without ugly hacks. Currently I don't know how I can implement
-something like that. Maybe the solution is easy.
-
-- Alex
