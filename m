@@ -1,107 +1,163 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 5/7] Bluetooth: Add framework for device found filtering based on UUID
-Date: Fri,  5 Dec 2014 10:55:57 +0100
-Message-Id: <1417773359-122811-5-git-send-email-marcel@holtmann.org>
+Subject: [PATCH 7/7] Bluetooth: Add support for Start Service Discovery command
+Date: Fri,  5 Dec 2014 10:55:59 +0100
+Message-Id: <1417773359-122811-7-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Using Start Service Discovery provides the option to specifiy a list
-of UUID that are used to filter out device found events. This patch
-provides the framework for hooking up the UUID filter.
+From: Jakub Pawlowski <jpawlowski@google.com>
 
+This patch adds support for the Start Service Discovery command. It
+does all the checks for command parameters and configured the discovery
+filter settings correctly. However the actual support for filtering
+will be added with another patch.
+
+Signed-off-by: Jakub Pawlowski <jpawlowski@google.com>
 Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- net/bluetooth/mgmt.c | 54 ++++++++++++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 52 insertions(+), 2 deletions(-)
+ net/bluetooth/mgmt.c | 106 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 106 insertions(+)
 
 diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 1715c91dfa28..e39190a51590 100644
+index be4219d8c07d..104c4cc921da 100644
 --- a/net/bluetooth/mgmt.c
 +++ b/net/bluetooth/mgmt.c
-@@ -6802,6 +6802,11 @@ void mgmt_read_local_oob_data_complete(struct hci_dev *hdev, u8 *hash192,
- 	mgmt_pending_remove(cmd);
+@@ -93,6 +93,7 @@ static const u16 mgmt_commands[] = {
+ 	MGMT_OP_READ_CONFIG_INFO,
+ 	MGMT_OP_SET_EXTERNAL_CONFIG,
+ 	MGMT_OP_SET_PUBLIC_ADDRESS,
++	MGMT_OP_START_SERVICE_DISCOVERY,
+ };
+ 
+ static const u16 mgmt_events[] = {
+@@ -3793,6 +3794,9 @@ static void start_discovery_complete(struct hci_dev *hdev, u8 status)
+ 	hci_dev_lock(hdev);
+ 
+ 	cmd = mgmt_pending_find(MGMT_OP_START_DISCOVERY, hdev);
++	if (!cmd)
++		cmd = mgmt_pending_find(MGMT_OP_START_SERVICE_DISCOVERY, hdev);
++
+ 	if (cmd) {
+ 		u8 type = hdev->discovery.type;
+ 
+@@ -3892,6 +3896,107 @@ failed:
+ 	return err;
  }
  
-+static bool eir_has_uuids(u8 *eir, u16 eir_len, u16 uuid_count, u8 (*uuids)[16])
++static int start_service_discovery(struct sock *sk, struct hci_dev *hdev,
++				   void *data, u16 len)
 +{
-+	return false;
++	struct mgmt_cp_start_service_discovery *cp = data;
++	struct pending_cmd *cmd;
++	struct hci_request req;
++	const u16 max_uuid_count = ((U16_MAX - sizeof(*cp)) / 16);
++	u16 uuid_count, expected_len;
++	u8 status;
++	int err;
++
++	BT_DBG("%s", hdev->name);
++
++	hci_dev_lock(hdev);
++
++	if (!hdev_is_powered(hdev)) {
++		err = cmd_complete(sk, hdev->id,
++				   MGMT_OP_START_SERVICE_DISCOVERY,
++				   MGMT_STATUS_NOT_POWERED,
++				   &cp->type, sizeof(cp->type));
++		goto failed;
++	}
++
++	if (hdev->discovery.state != DISCOVERY_STOPPED ||
++	    test_bit(HCI_PERIODIC_INQ, &hdev->dev_flags)) {
++		err = cmd_complete(sk, hdev->id,
++				   MGMT_OP_START_SERVICE_DISCOVERY,
++				   MGMT_STATUS_BUSY, &cp->type,
++				   sizeof(cp->type));
++		goto failed;
++	}
++
++	uuid_count = __le16_to_cpu(cp->uuid_count);
++	if (uuid_count > max_uuid_count) {
++		BT_ERR("service_discovery: too big uuid_count value %u",
++		       uuid_count);
++		err = cmd_complete(sk, hdev->id,
++				   MGMT_OP_START_SERVICE_DISCOVERY,
++				   MGMT_STATUS_INVALID_PARAMS, &cp->type,
++				   sizeof(cp->type));
++		goto failed;
++	}
++
++	expected_len = sizeof(*cp) + uuid_count * 16;
++	if (expected_len != len) {
++		BT_ERR("service_discovery: expected %u bytes, got %u bytes",
++		       expected_len, len);
++		err = cmd_complete(sk, hdev->id,
++				   MGMT_OP_START_SERVICE_DISCOVERY,
++				   MGMT_STATUS_INVALID_PARAMS, &cp->type,
++				   sizeof(cp->type));
++		goto failed;
++	}
++
++	cmd = mgmt_pending_add(sk, MGMT_OP_START_SERVICE_DISCOVERY,
++			       hdev, NULL, 0);
++	if (!cmd) {
++		err = -ENOMEM;
++		goto failed;
++	}
++
++	hdev->discovery.type = cp->type;
++	hdev->discovery.rssi = cp->rssi;
++	hdev->discovery.uuid_count = uuid_count;
++
++	if (uuid_count > 0) {
++		hdev->discovery.uuids = kmemdup(cp->uuids, uuid_count * 16,
++						GFP_KERNEL);
++		if (!hdev->discovery.uuids) {
++			err = cmd_complete(sk, hdev->id,
++					   MGMT_OP_START_SERVICE_DISCOVERY,
++					   MGMT_STATUS_FAILED,
++					   &cp->type, sizeof(cp->type));
++			mgmt_pending_remove(cmd);
++			goto failed;
++		}
++	}
++
++	hci_req_init(&req, hdev);
++
++	if (!trigger_discovery(&req, &status)) {
++		err = cmd_complete(sk, hdev->id,
++				   MGMT_OP_START_SERVICE_DISCOVERY,
++				   status, &cp->type, sizeof(cp->type));
++		mgmt_pending_remove(cmd);
++		goto failed;
++	}
++
++	err = hci_req_run(&req, start_discovery_complete);
++	if (err < 0) {
++		mgmt_pending_remove(cmd);
++		goto failed;
++	}
++
++	hci_discovery_set_state(hdev, DISCOVERY_STARTING);
++
++failed:
++	hci_dev_unlock(hdev);
++	return err;
 +}
 +
- void mgmt_device_found(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
- 		       u8 addr_type, u8 *dev_class, s8 rssi, u32 flags,
- 		       u8 *eir, u16 eir_len, u8 *scan_rsp, u8 scan_rsp_len)
-@@ -6809,6 +6814,7 @@ void mgmt_device_found(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
- 	char buf[512];
- 	struct mgmt_ev_device_found *ev = (void *) buf;
- 	size_t ev_size;
-+	bool match;
+ static void stop_discovery_complete(struct hci_dev *hdev, u8 status)
+ {
+ 	struct pending_cmd *cmd;
+@@ -5726,6 +5831,7 @@ static const struct mgmt_handler {
+ 	{ read_config_info,       false, MGMT_READ_CONFIG_INFO_SIZE },
+ 	{ set_external_config,    false, MGMT_SET_EXTERNAL_CONFIG_SIZE },
+ 	{ set_public_address,     false, MGMT_SET_PUBLIC_ADDRESS_SIZE },
++	{ start_service_discovery,true,  MGMT_START_SERVICE_DISCOVERY_SIZE },
+ };
  
- 	/* Don't send events for a non-kernel initiated discovery. With
- 	 * LE one exception is if we have pend_le_reports > 0 in which
-@@ -6843,15 +6849,59 @@ void mgmt_device_found(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
- 	ev->rssi = rssi;
- 	ev->flags = cpu_to_le32(flags);
- 
--	if (eir_len > 0)
-+	if (eir_len > 0) {
-+		/* When using service discovery and a list of UUID is
-+		 * provided, results with no matching UUID should be
-+		 * dropped. In case there is a match the result is
-+		 * kept and checking possible scan response data
-+		 * will be skipped.
-+		 */
-+		if (hdev->discovery.uuid_count > 0) {
-+			match = eir_has_uuids(eir, eir_len,
-+					      hdev->discovery.uuid_count,
-+					      hdev->discovery.uuids);
-+			if (!match)
-+				return;
-+		}
-+
-+		/* Copy EIR or advertising data into event */
- 		memcpy(ev->eir, eir, eir_len);
-+	} else {
-+		/* When using service discovery and a list of UUID is
-+		 * provided, results with empty EIR or advertising data
-+		 * should be dropped since they do not match any UUID.
-+		 */
-+		if (hdev->discovery.uuid_count > 0)
-+			return;
-+	}
- 
- 	if (dev_class && !eir_has_data_type(ev->eir, eir_len, EIR_CLASS_OF_DEV))
- 		eir_len = eir_append_data(ev->eir, eir_len, EIR_CLASS_OF_DEV,
- 					  dev_class, 3);
- 
--	if (scan_rsp_len > 0)
-+	if (scan_rsp_len > 0) {
-+		/* When using service discovery and a list of UUID is
-+		 * provided, results with no matching UUID should be
-+		 * dropped if there is no previous match from the
-+		 * advertising data.
-+		 */
-+		if (hdev->discovery.uuid_count > 0) {
-+			if (!match && !eir_has_uuids(scan_rsp, scan_rsp_len,
-+						     hdev->discovery.uuid_count,
-+						     hdev->discovery.uuids))
-+				return;
-+		}
-+
-+		/* Append scan response data to event */
- 		memcpy(ev->eir + eir_len, scan_rsp, scan_rsp_len);
-+	} else {
-+		/* When using service discovery and a list of UUID is
-+		 * provided, results with empty scan response and no
-+		 * previous matched advertising data should be dropped.
-+		 */
-+		if (hdev->discovery.uuid_count > 0 && !match)
-+			return;
-+	}
- 
- 	ev->eir_len = cpu_to_le16(eir_len + scan_rsp_len);
- 	ev_size = sizeof(*ev) + eir_len + scan_rsp_len;
+ int mgmt_control(struct sock *sk, struct msghdr *msg, size_t msglen)
 -- 
 1.9.3
 
