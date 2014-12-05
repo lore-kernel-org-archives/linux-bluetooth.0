@@ -1,121 +1,276 @@
 Return-Path: <cyrus@holtmann.org>
-From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH] doc/mgmt-api: Add support to add/remove advertising data instance
-Date: Fri,  5 Dec 2014 14:29:12 +0100
-Message-Id: <1417786152-19742-1-git-send-email-lukasz.rymanowski@tieto.com>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: Gowtham Anandha Babu <gowtham.ab@samsung.com>
+Cc: linux-bluetooth@vger.kernel.org, d.kasatkin@samsung.com,
+	bharat.panda@samsung.com, cpgs@samsung.com
+Subject: Re: [PATCH v1 2/5] monitor/rfcomm: Add support for RPN frame decoding
+Date: Fri, 05 Dec 2014 14:09:26 +0100
+Message-ID: <2762800.6Q9gSzEpbV@uw000953>
+In-Reply-To: <001801d0108b$d72fd880$858f8980$@samsung.com>
+References: <1417608081-27926-1-git-send-email-gowtham.ab@samsung.com> <7673489.WqmjzFoifH@uw000953> <001801d0108b$d72fd880$858f8980$@samsung.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Multi advertising is design for embedded devices having multiple GATT
-application running on it. Since Advertising data are size limited there
-is a need to have a way to make sure that each application will be
-advertised and in the same time visible for GATT Client application.
+Hi Gowtham,
 
-It has been noticed that there is many GATT clients doing filtering on
-Service UUIDs contained in advertising data.
+On Friday 05 of December 2014 18:32:51 Gowtham Anandha Babu wrote:
+> Hi Szymon,
+> 
+> > -----Original Message-----
+> > From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-
+> > owner@vger.kernel.org] On Behalf Of Szymon Janc
+> > Sent: Friday, December 05, 2014 4:57 PM
+> > To: Gowtham Anandha Babu
+> > Cc: linux-bluetooth@vger.kernel.org; d.kasatkin@samsung.com;
+> > bharat.panda@samsung.com; cpgs@samsung.com
+> > Subject: Re: [PATCH v1 2/5] monitor/rfcomm: Add support for RPN frame
+> > decoding
+> > 
+> > Hi Gowtham,
+> > 
+> > On Friday 05 of December 2014 16:40:52 Gowtham Anandha Babu wrote:
+> > > Hi Szymon,
+> > >
+> > > > -----Original Message-----
+> > > > From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-
+> > > > owner@vger.kernel.org] On Behalf Of Szymon Janc
+> > > > Sent: Friday, December 05, 2014 4:33 PM
+> > > > To: Gowtham Anandha Babu
+> > > > Cc: 'Szymon Janc'; linux-bluetooth@vger.kernel.org;
+> > > > d.kasatkin@samsung.com; bharat.panda@samsung.com;
+> > cpgs@samsung.com
+> > > > Subject: Re: [PATCH v1 2/5] monitor/rfcomm: Add support for RPN
+> > > > frame decoding
+> > > >
+> > > > Hi Gowtham,
+> > > >
+> > > > On Friday 05 of December 2014 16:14:20 Gowtham Anandha Babu wrote:
+> > > > > Hi Szymon,
+> > > > >
+> > > > > > -----Original Message-----
+> > > > > > From: linux-bluetooth-owner@vger.kernel.org
+> > > > > > [mailto:linux-bluetooth- owner@vger.kernel.org] On Behalf Of
+> > > > > > Szymon Janc
+> > > > > > Sent: Thursday, December 04, 2014 8:48 PM
+> > > > > > To: Gowtham Anandha Babu
+> > > > > > Cc: linux-bluetooth@vger.kernel.org; d.kasatkin@samsung.com;
+> > > > > > bharat.panda@samsung.com; cpgs@samsung.com
+> > > > > > Subject: Re: [PATCH v1 2/5] monitor/rfcomm: Add support for RPN
+> > > > > > frame decoding
+> > > > > >
+> > > > > > Hi Gowtham,
+> > > > > >
+> > > > > > On Wed, Dec 3, 2014 at 1:01 PM, Gowtham Anandha Babu
+> > > > > > <gowtham.ab@samsung.com> wrote:
+> > > > > > > Changes made to decode RPN frame in RFCOMM for btmon.
+> > > > > > >
+> > > > > > >       RFCOMM: Unnumbered Info with Header Check (UIH)(0xef)
+> > > > > > >          Address: 0x03 cr 1 dlci 0x00
+> > > > > > >          Control: 0xef poll/final 0
+> > > > > > >          Length: 10
+> > > > > > >          FCS: 0x70
+> > > > > > >          MCC Message type: Remote Port Negotiation Command
+> > > > CMD(0x24)
+> > > > > > >            Length: 8
+> > > > > > >            dlci 32
+> > > > > > >            br 3 db 2 sb 0 p 0 pt 0 xi 0 xo 0
+> > > > > > >            rtri 0 rtro 0 rtci 0 rtco 0 xon 17 xoff 19
+> > > > > > >            pm 0x3f7f
+> > > > > > > ---
+> > > > > > >  monitor/rfcomm.c | 73
+> > > > > > >
+> > > > ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+> > > > > > >  1 file changed, 73 insertions(+)
+> > > > > > >
+> > > > > > > diff --git a/monitor/rfcomm.c b/monitor/rfcomm.c index
+> > > > > > > cd50c8c..62b52cc 100644
+> > > > > > > --- a/monitor/rfcomm.c
+> > > > > > > +++ b/monitor/rfcomm.c
+> > > > > > > @@ -63,6 +63,18 @@ static char *cr_str[] = {
+> > > > > > >  #define GET_V24_IC(sigs)       ((sigs & 0x40) >> 6)
+> > > > > > >  #define GET_V24_DV(sigs)       ((sigs & 0x80) >> 7)
+> > > > > > >
+> > > > > > > +/* RPN macros */
+> > > > > > > +#define GET_RPN_DB(parity)     (parity & 0x03)
+> > > > > > > +#define GET_RPN_SB(parity)     ((parity & 0x04) >> 2)
+> > > > > > > +#define GET_RPN_PARITY(parity) ((parity & 0x08) >> 3) #define
+> > > > > > > +GET_RPN_PTYPE(parity)  ((parity & 0x03) >> 3)
+> > > > > > > +#define GET_RPN_XIN(io)                (io & 0x01)
+> > > > > > > +#define GET_RPN_XOUT(io)       ((io & 0x02) >> 1)
+> > > > > > > +#define GET_RPN_RTRI(io)       ((io & 0x04) >> 2)
+> > > > > > > +#define GET_RPN_RTRO(io)       ((io & 0x08) >> 3)
+> > > > > > > +#define GET_RPN_RTCI(io)       ((io & 0x10) >> 4)
+> > > > > > > +#define GET_RPN_RTCO(io)       ((io & 0x20) >> 5)
+> > > > > > > +
+> > > > > > >  struct rfcomm_lhdr {
+> > > > > > >         uint8_t address;
+> > > > > > >         uint8_t control;
+> > > > > > > @@ -77,6 +89,16 @@ struct rfcomm_lmsc {
+> > > > > > >         uint8_t break_sig;
+> > > > > > >  } __attribute__((packed));
+> > > > > > >
+> > > > > > > +struct rfcomm_rpn {
+> > > > > > > +       uint8_t dlci;
+> > > > > > > +       uint8_t bit_rate;
+> > > > > > > +       uint8_t parity;
+> > > > > > > +       uint8_t io;
+> > > > > > > +       uint8_t xon;
+> > > > > > > +       uint8_t xoff;
+> > > > > > > +       uint16_t pm;
+> > > > > > > +} __attribute__ ((packed));
+> > > > > > > +
+> > > > > > >  struct rfcomm_lmcc {
+> > > > > > >         uint8_t type;
+> > > > > > >         uint16_t length;
+> > > > > > > @@ -138,6 +160,55 @@ done:
+> > > > > > >         return true;
+> > > > > > >  }
+> > > > > > >
+> > > > > > > +static inline bool mcc_rpn(struct rfcomm_frame *rfcomm_frame,
+> > > > > > > +uint8_t
+> > > > > > > +indent) {
+> > > > > > > +       struct l2cap_frame *frame = &rfcomm_frame->l2cap_frame;
+> > > > > > > +       struct rfcomm_rpn rpn;
+> > > > > > > +
+> > > > > > > +       if (!l2cap_frame_get_u8(frame, &rpn.dlci))
+> > > > > > > +               return false;
+> > > > > > > +
+> > > > > > > +       print_field("%*cdlci %d", indent, ' ',
+> > > > > > > + RFCOMM_GET_DLCI(rpn.dlci));
+> > > > > > > +
+> > > > > > > +       if (frame->size < 7)
+> > > > > > > +               goto done;
+> > > > > > > +
+> > > > > > > +       /* port value octets (optional) */
+> > > > > > > +
+> > > > > > > +       if (!l2cap_frame_get_u8(frame, &rpn.bit_rate))
+> > > > > > > +               return false;
+> > > > > > > +
+> > > > > > > +       if (!l2cap_frame_get_u8(frame, &rpn.parity))
+> > > > > > > +               return false;
+> > > > > > > +
+> > > > > > > +       if (!l2cap_frame_get_u8(frame, &rpn.io))
+> > > > > > > +               return false;
+> > > > > > > +
+> > > > > > > +       print_field("%*cbr %d db %d sb %d p %d pt %d xi %d xo
+> > > > > > > + %d",
+> > > > > indent, '
+> > > > > > ',
+> > > > > > > +               rpn.bit_rate, GET_RPN_DB(rpn.parity),
+> > > > > GET_RPN_SB(rpn.parity),
+> > > > > > > +               GET_RPN_PARITY(rpn.parity),
+> > GET_RPN_PTYPE(rpn.parity),
+> > > > > > > +               GET_RPN_XIN(rpn.io), GET_RPN_XOUT(rpn.io));
+> > > > > > > +
+> > > > > > > +       if (!l2cap_frame_get_u8(frame, &rpn.xon))
+> > > > > > > +               return false;
+> > > > > > > +
+> > > > > > > +       if (!l2cap_frame_get_u8(frame, &rpn.xoff))
+> > > > > > > +               return false;
+> > > > > > > +
+> > > > > > > +       print_field("%*crtri %d rtro %d rtci %d rtco %d xon %d xoff
+> > %d",
+> > > > > > > +               indent, ' ', GET_RPN_RTRI(rpn.io), GET_RPN_RTRO(rpn.io),
+> > > > > > > +               GET_RPN_RTCI(rpn.io), GET_RPN_RTCO(rpn.io), rpn.xon,
+> > > > > > > +               rpn.xoff);
+> > > > > > > +
+> > > > > > > +       if (!l2cap_frame_get_be16(frame, &rpn.pm))
+> > > > > > > +               return false;
+> > > > > > > +
+> > > > > > > +       print_field("%*cpm 0x%04x", indent, ' ',
+> > > > > > > + __bswap_16(rpn.pm));
+> > > > > >
+> > > > > > This __bswap_16 is invalid since rpn.pm was already converted to
+> > > > > > host
+> > > > > order
+> > > > > > by l2cap_frame_get_be16(). (It wouldn't work correctly on BE
+> > > > > > arch
+> > > > anyway).
+> > > > > >
+> > > > > > Also this was causing build problems under Android. If you are
+> > > > > > able to
+> > > > > build-
+> > > > > > test under Android please do so. If not then at least point this
+> > > > > > in cover
+> > > > > letter
+> > > > > > or patch comment that code was tested only under Linux).
+> > > > > >
+> > > > > > I've fixed this myself but please pay attention to this with any
+> > > > > > future submission.
+> > > > > >
+> > > > >
+> > > > > Sure I will mention the tested platform details for future submission.
+> > > > >
+> > > > > Btw without __bswap_16(), rpn.pm and pn.mtu will be different from
+> > > > > the hcidump logs.
+> > > > >
+> > > > > This is captured by removing __bswap_16().
+> > > > >
+> > > > > Btmon log:
+> > > > >       RFCOMM: Unnumbered Info with Header Check (UIH)(0xef)
+> > > > >          Address: 0x03 cr 1 dlci 0x00
+> > > > >          Control: 0xef poll/final 0
+> > > > >          Length: 10
+> > > > >          FCS: 0x70
+> > > > >          MCC Message type: DLC Parameter Negotiation CMD(0x20)
+> > > > >            Length: 8
+> > > > >            dlci 6 frame_type 0 credit_flow 15 pri 3
+> > > > >            ack_timer 0 frame_size 32256 max_retrans 0 credits 1
+> > > > >
+> > > > > Hcidump log:
+> > > > >       RFCOMM(s): PN CMD: cr 1 dlci 0 pf 0 ilen 10 fcs 0x70 mcc_len 8
+> > > > >       dlci 6 frame_type 0 credit_flow 15 pri 3 ack_timer 0
+> > > > >       frame_size 126 max_retrans 0 credits 1
+> > > > >
+> > > > > The rpn.pm is fine. That may be printed without doing __bswap_16()
+> > also.
+> > > > >
+> > > > > But in the above PN frame, frame_size is different from actual
+> > > > > hcidump trace.
+> > > > > I cross checked with PTS logs, it was same as the hcidump trace.
+> > > > > So, if it is causing build problems under Android, use
+> > > > > l2cap_frame_get_le16()
+> > > > > Instead of l2cap_frame_get_be16() for pn.mtu.
+> > > > >
+> > > > > If we are consistent with hcidump, then replace the be16() by
+> > > > > le16() for both pn.mtu and rpn.pm.
+> > > > >
+> > > > > After replacing the le16() function:
+> > > > > Btmon logs looks like:
+> > > > >
+> > > > >       RFCOMM: Unnumbered Info with Header Check (UIH)(0xef)
+> > > > >          Address: 0x03 cr 1 dlci 0x00
+> > > > >          Control: 0xef poll/final 0
+> > > > >          Length: 10
+> > > > >          FCS: 0x70
+> > > > >          MCC Message type: DLC Parameter Negotiation CMD(0x20)
+> > > > >            Length: 8
+> > > > >            dlci 6 frame_type 0 credit_flow 15 pri 3
+> > > > >            ack_timer 0 frame_size 126 max_retrans 0 credits 1
+> > > > >
+> > > > > What do you think ?
+> > > >
+> > > > If value is LE then l2cap_frame_get_le16() should be used.
+> > > > (Same issue affects rpn.pm mcc_rpn(), right?)
+> > > >
+> > >
+> > > Yes you are right. We have to use l2cap_frame_get_le16() for fetching both
+> > rpn.pm and pn.mtu.
+> > > I hope it will not cause any Android build problem.
+> > 
+> > Should be fine, I'll try to build-test monitor patches on Android before they
+> > get applied anyway.
+> > 
+> 
+> Thanks for testing it in android.
+> As Luiz mentioned, the correct byte ordering for RFCOMM protocol is little endian.
+> Btw shall we submit patches on android? Right now we don’t have the setup for testing.
+> Probably someone should test it after submitting. Is that ok?
 
-Since this command is design for embedded devices, we allow to choose
-whether given data element shall be in advertising data or scan
-response.
+We have automated build system for this so no worries.
 
-This patch also enhance supported settings with multi advertising bit
-which indicates to user space that kernel supports that.
----
- doc/mgmt-api.txt | 72 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 72 insertions(+)
-
-diff --git a/doc/mgmt-api.txt b/doc/mgmt-api.txt
-index fed41a9..8a947f1 100644
---- a/doc/mgmt-api.txt
-+++ b/doc/mgmt-api.txt
-@@ -267,6 +267,7 @@ Read Controller Information Command
- 		12	Debug Keys
- 		13	Privacy
- 		14	Controller Configuration
-+		15	Multi Advertising
- 
- 	This command generates a Command Complete event on success or
- 	a Command Status event on failure.
-@@ -2214,6 +2215,77 @@ Start Service Discovery Command
- 				Invalid Index
- 
- 
-+Add Advertising Data Instance
-+=============================
-+
-+	Command Code:		0x003b
-+	Controller Index:	<controller id>
-+	Command Parameters:
-+				Flags (4 Octet)
-+				Num_Of_Data_Elements (1 Octet)
-+				Data_Element_1 {
-+					Flags (4 Octet)
-+					Type (1 Octet)
-+					Value_Length (1 Octet)
-+					Value (Variable)
-+				}
-+				Data_Element_2 { }
-+				...
-+
-+	Return Parameters:	Advertising_Instance_ID (2 Octets)
-+
-+	This command allows to set User Advertising Data Instance which are advertised
-+	in such manner so each element has its own advertising time slice then it
-+	expires and next item gets its advertising time slice.
-+
-+	Note that kernel has own instance which always gets its advertising time
-+	slice.
-+
-+	Note that maximum length of Advertising Data and Scan Response is
-+	specified to 31 bytes each.
-+
-+	Possible values Flags parameter are a bit-wise or of the following bits:
-+		0	Include Short Name
-+		1	Include TX Power
-+
-+	Possible values for Data Element Flags are a bit-wise or of the following
-+	bits:
-+		0	Force include into advertising data
-+		1	Force include into scan response
-+
-+	Possible values for the Type parameter are specified by Bluetooth SIG and can
-+	be found in Assigned Number section for Generic Access Profile.
-+
-+	This command can be used when the controller is not powered and
-+	all settings will be programmed once powered and advertising is enabled.
-+
-+	Provided advertising data instances are persistent over power down/up toggles.
-+
-+	Possible errors:	Not Supported
-+				Invalid Parameters
-+				Invalid Index
-+
-+
-+Remove Advertising Data Instance
-+================================
-+
-+	Command Code:		0x003c
-+	Controller Index:	<controller id>
-+	Command Parameters:	Advertising_Instance_ID (1 Octet)
-+	Return Parameters:
-+
-+	This command is use to remove user advertising instance created with
-+	Add User Advertising Instance
-+
-+	This command generates a Command Complete event on success or a
-+	Command Status event on failure.
-+
-+
-+	Possible errors:	Not Supported
-+				Invalid Parameters
-+				Invalid Index
-+
-+
- Command Complete Event
- ======================
- 
 -- 
-1.8.4
-
+Best regards, 
+Szymon Janc
