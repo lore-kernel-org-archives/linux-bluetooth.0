@@ -1,65 +1,50 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1417791601.32209.13.camel@jrissane-mobl.ger.corp.intel.com>
-Subject: Re: 6lowpan next header compression framwork: module handling or
- not?
-From: Jukka Rissanen <jukka.rissanen@linux.intel.com>
-To: Alexander Aring <alex.aring@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
-	linux-wpan@vger.kernel.org, martin.townsend@xsilon.com
-Date: Fri, 05 Dec 2014 17:00:01 +0200
-In-Reply-To: <20141205143156.GC478@omega>
-References: <20141205124602.GB478@omega>
-	 <1417786926.32209.9.camel@jrissane-mobl.ger.corp.intel.com>
-	 <20141205143156.GC478@omega>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+From: Sebastian Chlad <sebastian.chlad@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Sebastian Chlad <sebastian.chlad@tieto.com>
+Subject: [PATCH] android/pts: Update MAP PICS for Android 5.0
+Date: Fri,  5 Dec 2014 15:43:54 +0100
+Message-Id: <1417790634-11453-1-git-send-email-sebastian.chlad@tieto.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Alex,
+---
+ android/pics-map.txt | 4 ++--
+ android/pts-map.txt  | 4 ++--
+ 2 files changed, 4 insertions(+), 4 deletions(-)
 
-On pe, 2014-12-05 at 15:31 +0100, Alexander Aring wrote:
-> Hi Jukka,
-> 
-> On Fri, Dec 05, 2014 at 03:42:06PM +0200, Jukka Rissanen wrote:
-> ...
-> > I am fine if the "default" being a module, as long as it is
-> > automatically loaded. From the end user point of view, he/she should not
-> > configure or do any magic in order to use 6lowpan.
-> > 
-> 
-> Seems that I am not a module linux guru. I don't know how I can
-> implement such feature. The nhc compression module depends on 6lowpan.ko
-> module but 6lowpan.ko can't depend on the nhc compression modules. If
-> there would be some dependency then 6lowpan.ko would load the
-> compression modules at module_init. Means some symbols are missing and
-> "something" try to load the right modules to get these symbols.
-> 
-> I tried to create such behaviour but failed. I don't know if this is
-> really possible or I don't know how I can implement this behaviour.
-> 
-> What I tried was to implement a "dummy" function, which seems to be also
-> a hack in my opnion. This "dummy" function was implemented in the nhc module.
-> 
-> void lowpan_nhc_rfc6282_udp_load(void) { }
-> EXPORT_SYMBOL(lowpan_nhc_rfc6282_udp_load);
-> 
-> Then lowpan_nhc_rfc6282_udp_load was called at module_init of 6lowpan.ko
-> but I got some linking issues.
-> 
+diff --git a/android/pics-map.txt b/android/pics-map.txt
+index 3f783a9..500f690 100644
+--- a/android/pics-map.txt
++++ b/android/pics-map.txt
+@@ -109,10 +109,10 @@ TSPC_MAP_3_4a	True		MSE: SetMessageStatus (M)
+ TSPC_MAP_3_5	True		MSE: Notification Registration (M)
+ TSPC_MAP_3_5a	True		MSE: SetNotificationRegistration (M)
+ TSPC_MAP_3_6	False		MSE: Supported Message Types
+-TSPC_MAP_3_6a	False		MSE: EMAIL (C1)
++TSPC_MAP_3_6a	True		MSE: EMAIL (C1)
+ TSPC_MAP_3_6b	True		MSE: SMS_GSM (C1)
+ TSPC_MAP_3_6c	False		MSE: SMS_CDMA (C1)
+-TSPC_MAP_3_6d	False (*)	MSE: MMS (C1)
++TSPC_MAP_3_6d	True		MSE: MMS (C1)
+ TSPC_MAP_3_7	False		MSE: Instance Information (Not Supported)
+ TSPC_MAP_3_7a	False (*)	MSE: GetMASInstanceInformation (Not Supported)
+ TSPC_MAP_3_8	False		MSE: Extended MAP-Event-Report (Not Supported)
+diff --git a/android/pts-map.txt b/android/pts-map.txt
+index e8092e2..ebb5ab8 100644
+--- a/android/pts-map.txt
++++ b/android/pts-map.txt
+@@ -64,8 +64,8 @@ TC_MSE_MMB_BV_09_I	PASS
+ TC_MSE_MMB_BV_10_I	PASS
+ TC_MSE_MMB_BV_11_I	PASS
+ TC_MSE_MMB_BV_20_I	PASS
+-TC_MSE_MMB_BV_12_I	N/A
+-TC_MSE_MMB_BV_18_I	N/A
++TC_MSE_MMB_BV_12_I	NOT RUN (email)
++TC_MSE_MMB_BV_18_I	NOT RUN (mms)
+ TC_MSE_MMB_BV_13_I	PASS
+ TC_MSE_MMB_BV_14_I	PASS
+ TC_MSE_MMB_BV_15_I	PASS
+-- 
+1.8.5.3
 
-I am not an expert on kernel modules but perhaps one option could be the
-request_module() function that can load the desired module.
-
-http://lxr.free-electrons.com/source/kernel/kmod.c#L118
-
-
-> 
-> Maybe I need some time to getting the idea how I can implement such
-> behaviour without ugly hacks. Currently I don't know how I can implement
-> something like that. Maybe the solution is easy.
-> 
-> - Alex
-
-
-Cheers,
-Jukka
