@@ -1,59 +1,62 @@
 Return-Path: <cyrus@holtmann.org>
-From: Gowtham Anandha Babu <gowtham.ab@samsung.com>
-To: 'Andrei Emeltchenko' <Andrei.Emeltchenko.news@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-References: <1417772907-31708-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-reply-to: <1417772907-31708-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-Subject: RE: [RFC] monitor: Fix RFCOMM parity type mask
-Date: Fri, 05 Dec 2014 16:12:03 +0530
-Message-id: <000401d01078$1ea58bb0$5bf0a310$@samsung.com>
-MIME-version: 1.0
-Content-type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 8.1 \(1993\))
+Subject: Re: [RFC v2 5/7] Bluetooth: Add definitions for MGMT_OP_START_SERVICE_DISCOVERY
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <CAD0=r8wOmN6xjdr3ejG5mgqrCAYCwsZeB=A0V7BjjkcQ8e2+hA@mail.gmail.com>
+Date: Fri, 5 Dec 2014 11:10:20 +0100
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
+Message-Id: <9F440CCC-D45C-4967-8076-39B7E2E547C2@holtmann.org>
+References: <1417689400-128063-5-git-send-email-marcel@holtmann.org> <CAD0=r8zfKBdu8=ZJj9Z-OLVjyUJoZ3iZ6bVjhPL_sVzU3qZ61w@mail.gmail.com> <B48B3F23-03FA-46D4-A999-3EF6835FF03E@holtmann.org> <CAD0=r8wOmN6xjdr3ejG5mgqrCAYCwsZeB=A0V7BjjkcQ8e2+hA@mail.gmail.com>
+To: Jakub Pawlowski <jpawlowski@google.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+Hi Jakub,
 
-> -----Original Message-----
-> From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-
-> owner@vger.kernel.org] On Behalf Of Andrei Emeltchenko
-> Sent: Friday, December 05, 2014 3:18 PM
-> To: linux-bluetooth@vger.kernel.org
-> Subject: [RFC] monitor: Fix RFCOMM parity type mask
+>>>> This patch adds the opcode and structure for Start Service Discovery
+>>>> operation.
+>>>> 
+>>>> Signed-off-by: Jakub Pawlowski <jpawlowski@google.com>
+>>>> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+>>>> ---
+>>>> include/net/bluetooth/mgmt.h | 9 +++++++++
+>>>> 1 file changed, 9 insertions(+)
+>>>> 
+>>>> diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
+>>>> index 9b382ea34fd9..95c34d5180fa 100644
+>>>> --- a/include/net/bluetooth/mgmt.h
+>>>> +++ b/include/net/bluetooth/mgmt.h
+>>>> @@ -498,6 +498,15 @@ struct mgmt_cp_set_public_address {
+>>>> } __packed;
+>>>> #define MGMT_SET_PUBLIC_ADDRESS_SIZE   6
+>>>> 
+>>>> +#define MGMT_OP_START_SERVICE_DISCOVERY        0x003A
+>>>> +struct mgmt_cp_start_service_discovery {
+>>>> +       __u8 type;
+>>> 
+>>> Maybe we should get rid of type ? service discovery based on
+>>> advertisement content makes sense only for LE
+>> 
+>> this works perfectly fine for BR/EDR or BR/EDR + LE discovery. It is up to the call to decide what to do. And we have kept the type in place even for commands that are currently only supported on one transport. It allows us to extend the API without breaking it.
 > 
-> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> Ok, that sounds reasonable.
 > 
-> ---
->  monitor/rfcomm.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/monitor/rfcomm.c b/monitor/rfcomm.c index fe3afb7..71a2792
-> 100644
-> --- a/monitor/rfcomm.c
-> +++ b/monitor/rfcomm.c
-> @@ -67,7 +67,7 @@ static char *cr_str[] = {
->  #define GET_RPN_DB(parity)	(parity & 0x03)
->  #define GET_RPN_SB(parity)	((parity & 0x04) >> 2)
->  #define GET_RPN_PARITY(parity)	((parity & 0x08) >> 3)
-> -#define GET_RPN_PTYPE(parity)	((parity & 0x03) >> 3)
-> +#define GET_RPN_PTYPE(parity)	((parity & 0x10) >> 4)
->  #define GET_RPN_XIN(io)		(io & 0x01)
->  #define GET_RPN_XOUT(io)	((io & 0x02) >> 1)
->  #define GET_RPN_RTRI(io)	((io & 0x04) >> 2)
-> --
-> 1.9.1
-> 
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth"
-in
-> the body of a message to majordomo@vger.kernel.org More majordomo
-> info at  http://vger.kernel.org/majordomo-info.html
+> I've merged my filtering patch on top of your patches, then run
+> everything and did some manual tests - all works great!
+> I've just send updated patches.
 
+I did re-work your patches a little bit actually.
 
-I missed it during the implementation. Anyway, the parity type bits are in
-BIT5 and BIT6 as per the specification.
-So it will be 0x30 instead of 0x10.
+The filter should be applied independently on EIR, advertising data and/or scan response data. Running it over the combined data has the danger that if some device are broken it becomes hard to detect wrong scan response data. So I decided to run this manually. And I also decided to skip the scan response data in case we already found a match in the advertising data.
 
- Regards,
-Gowtham Anandha Babu
+There is also the funny case if either of this data is empty, then we should consider no matching and need to handle that one as well.
+
+You also had some uint8_t in there which I assume you copied from userspace code. We do not use that in kernel code and use u8 instead. So I fixed that as well. If I counted correctly, the the code also had one off-by-one for the EIR field length check. That should be fixed as well now.
+
+The only missing piece is now the LE restart handling. That is the one patch I have actually not yet looked at.
+
+Regards
+
+Marcel
 
