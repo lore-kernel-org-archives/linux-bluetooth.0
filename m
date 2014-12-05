@@ -1,38 +1,74 @@
 Return-Path: <cyrus@holtmann.org>
-From: Johan Hedberg <johan.hedberg@gmail.com>
+From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 00/10] Bluetooth: Fix mgmt cmd_complete events
-Date: Fri,  5 Dec 2014 13:35:59 +0200
-Message-Id: <1417779369-6428-1-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH] Bluetooth: Fix discovery filter when no RSSI is available
+Date: Fri,  5 Dec 2014 12:35:49 +0100
+Message-Id: <1417779349-4782-1-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+When no RSSI value is available then make sure that the result is
+filtered out when the RSSI threshold filter is active.
 
-This patch set introduces an optional callback that can be set for
-pending mgmt commands so that the generic places sending out these
-events (powering off and removing adapters) can send out correct events
-as specified in our mgmt-api.txt. A further benefit of having this
-callback is that we fix memory leaks caused by hci_conn pointers being
-stored as part of the pending command user data.
+This means that all Bluetooth 1.1 or earlier devices will not
+report any results when using a RSSI threshold filter.
 
-Johan
+Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+---
+ net/bluetooth/hci_event.c | 5 +++--
+ net/bluetooth/mgmt.c      | 9 ++++++++-
+ 2 files changed, 11 insertions(+), 3 deletions(-)
 
-----------------------------------------------------------------
-Johan Hedberg (10):
-      Bluetooth: Add callback to create proper cmd_complete events
-      Bluetooth: Store parameter length with pending mgmt commands
-      Bluetooth: Convert Disconnect mgmt command to use cmd_complete callback
-      Bluetooth: Use cmd_complete callback for authentication mgmt commands
-      Bluetooth: Convert Pair Device to use cmd_complete callback
-      Bluetooth: Convert Unpair Device to use cmd_complete callback
-      Bluetooth: Convert discovery commands to use cmd_complete callback
-      Bluetooth: Convert Get Clock Info to use cmd_complete callback
-      Bluetooth: Fix initializing hci_conn RSSI to invalid value
-      Bluetooth: Fix Get Conn Info to use cmd_complete callback
-
- net/bluetooth/hci_conn.c |   1 +
- net/bluetooth/mgmt.c     | 271 ++++++++++++++++++++++-----------------------
- 2 files changed, 136 insertions(+), 136 deletions(-)
-
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index f4e2a61bb6aa..527dfdc9d8c8 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -2043,13 +2043,14 @@ static void hci_inquiry_result_evt(struct hci_dev *hdev, struct sk_buff *skb)
+ 		data.pscan_mode		= info->pscan_mode;
+ 		memcpy(data.dev_class, info->dev_class, 3);
+ 		data.clock_offset	= info->clock_offset;
+-		data.rssi		= 0x00;
++		data.rssi		= HCI_RSSI_INVALID;
+ 		data.ssp_mode		= 0x00;
+ 
+ 		flags = hci_inquiry_cache_update(hdev, &data, false);
+ 
+ 		mgmt_device_found(hdev, &info->bdaddr, ACL_LINK, 0x00,
+-				  info->dev_class, 0, flags, NULL, 0, NULL, 0);
++				  info->dev_class, HCI_RSSI_INVALID,
++				  flags, NULL, 0, NULL, 0);
+ 	}
+ 
+ 	hci_dev_unlock(hdev);
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 74571a4b85ec..c52bcf47ef78 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -7015,9 +7015,12 @@ void mgmt_device_found(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
+ 	 * if such a RSSI threshold is specified. If a RSSI threshold has
+ 	 * been specified, then all results with a RSSI smaller than the
+ 	 * RSSI threshold will be dropped.
++	 *
++	 * For BR/EDR devices (pre 1.2) providing no RSSI during inquiry,
++	 * the results are also dropped.
+ 	 */
+ 	if (hdev->discovery.rssi != HCI_RSSI_INVALID &&
+-	    rssi < hdev->discovery.rssi)
++	    (rssi < hdev->discovery.rssi || rssi == HCI_RSSI_INVALID))
+ 		return;
+ 
+ 	/* Make sure that the buffer is big enough. The 5 extra bytes
+@@ -7028,6 +7031,10 @@ void mgmt_device_found(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
+ 
+ 	memset(buf, 0, sizeof(buf));
+ 
++	/* Reset invalid RSSI to 0 to keep backwards API compliance */
++	if (rssi == HCI_RSSI_INVALID)
++		rssi = 0;
++
+ 	bacpy(&ev->addr.bdaddr, bdaddr);
+ 	ev->addr.type = link_to_bdaddr(link_type, addr_type);
+ 	ev->rssi = rssi;
+-- 
+1.9.3
 
