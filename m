@@ -1,36 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 2/2] tools/gatt: Fix not checking malloc() failure
-Date: Fri,  5 Dec 2014 09:30:36 +0200
-Message-Id: <1417764636-28857-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1417764636-28857-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1417764636-28857-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: Sebastian Chlad <sebastian.chlad@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] android/pts: Tests results for RFCOMM for Android 5.0
+Date: Fri, 05 Dec 2014 08:19:24 +0100
+Message-ID: <1650750.Y9uWQb61Bq@uw000953>
+In-Reply-To: <1417690452-23331-1-git-send-email-sebastian.chlad@tieto.com>
+References: <1417690452-23331-1-git-send-email-sebastian.chlad@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Hi Sebastian,
 
-This follows standard practice elsewhere in this file.
----
- tools/btgatt-client.c | 4 ++++
- 1 file changed, 4 insertions(+)
+On Thursday 04 of December 2014 11:54:12 Sebastian Chlad wrote:
+> ---
+>  android/pts-rfcomm.txt | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/android/pts-rfcomm.txt b/android/pts-rfcomm.txt
+> index f80c54b..cf9497d 100644
+> --- a/android/pts-rfcomm.txt
+> +++ b/android/pts-rfcomm.txt
+> @@ -1,8 +1,8 @@
+>  PTS test results for RFCOMM
+>  
+>  PTS version: 5.3
+> -Tested: 13-October-2014
+> -Android version: 4.4.4
+> +Tested: 19-November-2014
+> +Android version: 5.0
+>  Kernel version: 3.19
+>  
+>  Results:
 
-diff --git a/tools/btgatt-client.c b/tools/btgatt-client.c
-index fe94ae8..01cfd93 100644
---- a/tools/btgatt-client.c
-+++ b/tools/btgatt-client.c
-@@ -458,6 +458,10 @@ static void cmd_read_multiple(struct client *cli, char *cmd_str)
- 	}
- 
- 	value = malloc(sizeof(uint16_t) * argc);
-+	if (!value) {
-+		printf("Failed to construct value\n");
-+		return;
-+	}
- 
- 	for (i = 0; i < argc; i++) {
- 		value[i] = strtol(argv[i], &endptr, 0);
+Applied, thanks. 
+
 -- 
-1.9.1
-
+Best regards, 
+Szymon Janc
