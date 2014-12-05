@@ -1,163 +1,88 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 7/7] Bluetooth: Add support for Start Service Discovery command
-Date: Fri,  5 Dec 2014 10:55:59 +0100
-Message-Id: <1417773359-122811-7-git-send-email-marcel@holtmann.org>
+Subject: [PATCH 3/7] Bluetooth: Add extra discovery fields for storing filter information
+Date: Fri,  5 Dec 2014 10:55:55 +0100
+Message-Id: <1417773359-122811-3-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Jakub Pawlowski <jpawlowski@google.com>
 
-This patch adds support for the Start Service Discovery command. It
-does all the checks for command parameters and configured the discovery
-filter settings correctly. However the actual support for filtering
-will be added with another patch.
+With the upcoming addition of support for Start Service Discovery, the
+discovery handling needs to filter on RSSI and UUID values. For that
+they need to be stored in the discovery handling. This patch adds the
+appropiate fields and also make sure they are reset when discovery
+has been stopped.
 
 Signed-off-by: Jakub Pawlowski <jpawlowski@google.com>
 Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- net/bluetooth/mgmt.c | 106 +++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 106 insertions(+)
+ include/net/bluetooth/hci_core.h |  4 ++++
+ net/bluetooth/hci_core.c         | 14 ++++++++++++++
+ net/bluetooth/mgmt.c             |  2 ++
+ 3 files changed, 20 insertions(+)
 
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index be4219d8c07d..104c4cc921da 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -93,6 +93,7 @@ static const u16 mgmt_commands[] = {
- 	MGMT_OP_READ_CONFIG_INFO,
- 	MGMT_OP_SET_EXTERNAL_CONFIG,
- 	MGMT_OP_SET_PUBLIC_ADDRESS,
-+	MGMT_OP_START_SERVICE_DISCOVERY,
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 1dae7001fc31..83ca58b9f4c1 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -75,6 +75,9 @@ struct discovery_state {
+ 	u32			last_adv_flags;
+ 	u8			last_adv_data[HCI_MAX_AD_LENGTH];
+ 	u8			last_adv_data_len;
++	s8			rssi;
++	u16			uuid_count;
++	u8			(*uuids)[16];
  };
  
- static const u16 mgmt_events[] = {
-@@ -3793,6 +3794,9 @@ static void start_discovery_complete(struct hci_dev *hdev, u8 status)
- 	hci_dev_lock(hdev);
- 
- 	cmd = mgmt_pending_find(MGMT_OP_START_DISCOVERY, hdev);
-+	if (!cmd)
-+		cmd = mgmt_pending_find(MGMT_OP_START_SERVICE_DISCOVERY, hdev);
-+
- 	if (cmd) {
- 		u8 type = hdev->discovery.type;
- 
-@@ -3892,6 +3896,107 @@ failed:
- 	return err;
+ struct hci_conn_hash {
+@@ -503,6 +506,7 @@ static inline void discovery_init(struct hci_dev *hdev)
+ 	INIT_LIST_HEAD(&hdev->discovery.all);
+ 	INIT_LIST_HEAD(&hdev->discovery.unknown);
+ 	INIT_LIST_HEAD(&hdev->discovery.resolve);
++	hdev->discovery.rssi = HCI_RSSI_INVALID;
  }
  
-+static int start_service_discovery(struct sock *sk, struct hci_dev *hdev,
-+				   void *data, u16 len)
-+{
-+	struct mgmt_cp_start_service_discovery *cp = data;
-+	struct pending_cmd *cmd;
-+	struct hci_request req;
-+	const u16 max_uuid_count = ((U16_MAX - sizeof(*cp)) / 16);
-+	u16 uuid_count, expected_len;
-+	u8 status;
-+	int err;
-+
-+	BT_DBG("%s", hdev->name);
-+
-+	hci_dev_lock(hdev);
-+
-+	if (!hdev_is_powered(hdev)) {
-+		err = cmd_complete(sk, hdev->id,
-+				   MGMT_OP_START_SERVICE_DISCOVERY,
-+				   MGMT_STATUS_NOT_POWERED,
-+				   &cp->type, sizeof(cp->type));
-+		goto failed;
-+	}
-+
-+	if (hdev->discovery.state != DISCOVERY_STOPPED ||
-+	    test_bit(HCI_PERIODIC_INQ, &hdev->dev_flags)) {
-+		err = cmd_complete(sk, hdev->id,
-+				   MGMT_OP_START_SERVICE_DISCOVERY,
-+				   MGMT_STATUS_BUSY, &cp->type,
-+				   sizeof(cp->type));
-+		goto failed;
-+	}
-+
-+	uuid_count = __le16_to_cpu(cp->uuid_count);
-+	if (uuid_count > max_uuid_count) {
-+		BT_ERR("service_discovery: too big uuid_count value %u",
-+		       uuid_count);
-+		err = cmd_complete(sk, hdev->id,
-+				   MGMT_OP_START_SERVICE_DISCOVERY,
-+				   MGMT_STATUS_INVALID_PARAMS, &cp->type,
-+				   sizeof(cp->type));
-+		goto failed;
-+	}
-+
-+	expected_len = sizeof(*cp) + uuid_count * 16;
-+	if (expected_len != len) {
-+		BT_ERR("service_discovery: expected %u bytes, got %u bytes",
-+		       expected_len, len);
-+		err = cmd_complete(sk, hdev->id,
-+				   MGMT_OP_START_SERVICE_DISCOVERY,
-+				   MGMT_STATUS_INVALID_PARAMS, &cp->type,
-+				   sizeof(cp->type));
-+		goto failed;
-+	}
-+
-+	cmd = mgmt_pending_add(sk, MGMT_OP_START_SERVICE_DISCOVERY,
-+			       hdev, NULL, 0);
-+	if (!cmd) {
-+		err = -ENOMEM;
-+		goto failed;
-+	}
-+
-+	hdev->discovery.type = cp->type;
-+	hdev->discovery.rssi = cp->rssi;
-+	hdev->discovery.uuid_count = uuid_count;
-+
-+	if (uuid_count > 0) {
-+		hdev->discovery.uuids = kmemdup(cp->uuids, uuid_count * 16,
-+						GFP_KERNEL);
-+		if (!hdev->discovery.uuids) {
-+			err = cmd_complete(sk, hdev->id,
-+					   MGMT_OP_START_SERVICE_DISCOVERY,
-+					   MGMT_STATUS_FAILED,
-+					   &cp->type, sizeof(cp->type));
-+			mgmt_pending_remove(cmd);
-+			goto failed;
-+		}
-+	}
-+
-+	hci_req_init(&req, hdev);
-+
-+	if (!trigger_discovery(&req, &status)) {
-+		err = cmd_complete(sk, hdev->id,
-+				   MGMT_OP_START_SERVICE_DISCOVERY,
-+				   status, &cp->type, sizeof(cp->type));
-+		mgmt_pending_remove(cmd);
-+		goto failed;
-+	}
-+
-+	err = hci_req_run(&req, start_discovery_complete);
-+	if (err < 0) {
-+		mgmt_pending_remove(cmd);
-+		goto failed;
-+	}
-+
-+	hci_discovery_set_state(hdev, DISCOVERY_STARTING);
-+
-+failed:
-+	hci_dev_unlock(hdev);
-+	return err;
-+}
-+
- static void stop_discovery_complete(struct hci_dev *hdev, u8 status)
- {
- 	struct pending_cmd *cmd;
-@@ -5726,6 +5831,7 @@ static const struct mgmt_handler {
- 	{ read_config_info,       false, MGMT_READ_CONFIG_INFO_SIZE },
- 	{ set_external_config,    false, MGMT_SET_EXTERNAL_CONFIG_SIZE },
- 	{ set_public_address,     false, MGMT_SET_PUBLIC_ADDRESS_SIZE },
-+	{ start_service_discovery,true,  MGMT_START_SERVICE_DISCOVERY_SIZE },
- };
+ bool hci_discovery_active(struct hci_dev *hdev);
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index f0018562b028..42f86dc3fb40 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -2052,6 +2052,20 @@ void hci_discovery_set_state(struct hci_dev *hdev, int state)
+ 	case DISCOVERY_STOPPED:
+ 		hci_update_background_scan(hdev);
  
- int mgmt_control(struct sock *sk, struct msghdr *msg, size_t msglen)
++		/* Reset RSSI and UUID filters to ensure Start Discovery
++		 * and Start Service Discovery operate properly no matter
++		 * which one started the previous discovery.
++		 *
++		 * While the Start Discovery and Start Service Discovery
++		 * operations will set proper values for RSSI and UUID
++		 * count, it is important to actually free the allocated
++		 * list of UUIDs here.
++		 */
++		hdev->discovery.rssi = HCI_RSSI_INVALID;
++		hdev->discovery.uuid_count = 0;
++		kfree(hdev->discovery.uuids);
++		hdev->discovery.uuids = NULL;
++
+ 		if (old_state != DISCOVERY_STARTING)
+ 			mgmt_discovering(hdev, 0);
+ 		break;
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 415ba4179326..b6a0f3e6b719 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -3867,6 +3867,8 @@ static int start_discovery(struct sock *sk, struct hci_dev *hdev,
+ 	}
+ 
+ 	hdev->discovery.type = cp->type;
++	hdev->discovery.rssi = HCI_RSSI_INVALID;
++	hdev->discovery.uuid_count = 0;
+ 
+ 	hci_req_init(&req, hdev);
+ 
 -- 
 1.9.3
 
