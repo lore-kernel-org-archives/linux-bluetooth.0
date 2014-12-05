@@ -1,103 +1,38 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <54758990.2050908@gmail.com>
-References: <5474BA38.2070908@gmail.com> <C8849DFB-5159-4C62-A861-D393034E4895@holtmann.org>
- <54758990.2050908@gmail.com>
-From: Michel Memeteau - EKIMIA <contact@ekimia.fr>
-Date: Fri, 5 Dec 2014 10:18:54 +0100
-Message-ID: <CAKxAHQ7CYHOknoowYw8XVm-d_rkCxsKehVHz=+r9ek0AyQi60Q@mail.gmail.com>
-Subject: Re: [PATCH v6] ath3k: Add support of MCI 13d3:3408 bt device
-To: Dmitry Tunin <hanipouspilot@gmail.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>, linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-	linux-kernel <linux-kernel@vger.kernel.org>, stable@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH 1/2] shared/gatt: Fix NULL dereference
+Date: Fri,  5 Dec 2014 09:30:35 +0200
+Message-Id: <1417764636-28857-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Thanks for your work dimitry,
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-I need to make AR9565 BT work with Kernel 3.13 on Ubuntu 14.04 so I'm
-really interrested in what you did.
+The which is executed after checking (!op) is dereferencing op in
+function discovery_op_free().
+---
+ src/shared/gatt-client.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-Regards.
-<------------------------------------------------------------------------------------------------------------------>
-Michel Memeteau  - Directeur.
+diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
+index 463de3b..96b5f1f 100644
+--- a/src/shared/gatt-client.c
++++ b/src/shared/gatt-client.c
+@@ -1101,11 +1101,12 @@ static void process_service_changed(struct bt_gatt_client *client,
+ 		return;
+ 	}
+ 
++	discovery_op_free(op);
++
+ fail:
+ 	util_debug(client->debug_callback, client->debug_data,
+ 					"Failed to initiate service discovery"
+ 					" after Service Changed");
+-	discovery_op_free(op);
+ }
+ 
+ static void service_changed_cb(uint16_t value_handle, const uint8_t *value,
+-- 
+1.9.1
 
-
-Notre Boutique Ordinateurs GNU/Linux : http://shop.ekimia.fr
-49 chemin de l'union 13720 La Bouilladisse - France.
-Fixe :  +33 (0) 972308334   Mobile : +33(0) 624808051
-<------------------------------------------------------------------------------------------------------------------>
-
-
-2014-11-26 9:04 GMT+01:00 Dmitry Tunin <hanipouspilot@gmail.com>:
-> Hi all,
->
-> I spent already hours on sending this fucking email. The patch works for me.
-> And if someone else is interested in working of this device feel free and do
-> it yourself.
->
->
-> 26.11.2014 08:05, Marcel Holtmann wrote:
->>
->> Hi Dmitry,
->>
->>> Add support for bluetooth MCI WB335 (AR9565) Wi-Fi+bt module.
->>> This bluetooth module requires loading patch and sysconfig by ath3k
->>> driver.
->>>
->>> T:  Bus=01 Lev=02 Prnt=03 Port=00 Cnt=01 Dev#= 20 Spd=12   MxCh= 0
->>> D:  Ver= 1.10 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
->>> P:  Vendor=13d3 ProdID=3408 Rev= 0.02
->>> C:* #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
->>> A:  FirstIf#= 0 IfCount= 2 Cls=e0(wlcon) Sub=01 Prot=01
->>> I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
->>> E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
->>> E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
->>> E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
->>> I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
->>> E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
->>> E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
->>> I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
->>> E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
->>> E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
->>> I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
->>> E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
->>> E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
->>> I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
->>> E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
->>> E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
->>> I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
->>> E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
->>> E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
->>> I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
->>> E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
->>> E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
->>>
->>>
->>> CC: stable@vger.kernel.org
->>> Signed-off-by: Dmitry Tunin <hanipouspilot@gmail.com>
->>
->>
->> so you really need to make sure to send only one version. I now have two
->> patches labeled as v6 and I have no idea which one is recent and which one I
->> am suppose to apply.
->>
->> I tried applying this one, but it failed. Patches need to be based against
->> bluetooth-next tree.
->>
->> Applying: ath3k: Add support of MCI 13d3:3408 bt device
->> error: patch failed: drivers/bluetooth/ath3k.c:105
->> error: drivers/bluetooth/ath3k.c: patch does not apply
->> error: patch failed: drivers/bluetooth/btusb.c:182
->> error: drivers/bluetooth/btusb.c: patch does not apply
->> Patch failed at 0001 ath3k: Add support of MCI 13d3:3408 bt device
->>
->> Regards
->>
->> Marcel
->>
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth"
-> in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
