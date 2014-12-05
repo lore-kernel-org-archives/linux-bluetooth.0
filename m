@@ -1,154 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
-From: Jakub Pawlowski <jpawlowski@google.com>
+From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: Jakub Pawlowski <jpawlowski@google.com>
-Subject: [RFC v4 1/2] Bluetooth: Add le_scan_restart
-Date: Fri,  5 Dec 2014 15:43:24 -0800
-Message-Id: <1417823005-10262-1-git-send-email-jpawlowski@google.com>
+Subject: [PATCH] Bluetooth: Check for force_lesc_support when enabling SMP over BR/EDR
+Date: Sat,  6 Dec 2014 00:35:45 +0100
+Message-Id: <1417822545-92322-1-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Currently there is no way to restart le scan, and it's needed in
-service scan method. The way it work: it disable, and then enable le
-scan on controller. During this restart special flag is set to make
-sure we won't remove disable scan work from workqueue.
+The SMP over BR/EDR support for cross-transport pairing should also be
+enabled when the debugfs setting force_lesc_support has been enabled.
 
-Signed-off-by: Jakub Pawlowski <jpawlowski@google.com>
+Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- include/net/bluetooth/hci_core.h |  9 +++++++++
- net/bluetooth/hci_core.c         | 42 ++++++++++++++++++++++++++++++++++++++++
- net/bluetooth/hci_event.c        |  9 ++++++---
- 3 files changed, 57 insertions(+), 3 deletions(-)
+ net/bluetooth/l2cap_core.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 3c78270..53e7975 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -56,6 +56,13 @@ struct inquiry_entry {
- 	struct inquiry_data	data;
- };
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index a8da7ea9c2c0..cc518eb48dc8 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -6967,8 +6967,9 @@ static struct l2cap_conn *l2cap_conn_add(struct hci_conn *hcon)
+ 	    test_bit(HCI_HS_ENABLED, &hcon->hdev->dev_flags))
+ 		conn->local_fixed_chan |= L2CAP_FC_A2MP;
  
-+/* BR/EDR and/or LE discovery state flags: the flags defined here should
-+ * represent state of discovery
-+ */
-+enum {
-+	HCI_LE_SCAN_RESTARTING,
-+};
-+
- struct discovery_state {
- 	int			type;
- 	enum {
-@@ -79,6 +86,7 @@ struct discovery_state {
- 	s8			rssi;
- 	u16			uuid_count;
- 	u8			(*uuids)[16];
-+	unsigned long		flags;
- };
+-	if (bredr_sc_enabled(hcon->hdev) &&
+-	    test_bit(HCI_LE_ENABLED, &hcon->hdev->dev_flags))
++	if (test_bit(HCI_LE_ENABLED, &hcon->hdev->dev_flags) &&
++	    (bredr_sc_enabled(hcon->hdev) ||
++	     test_bit(HCI_FORCE_LESC, &hcon->hdev->dbg_flags)))
+ 		conn->local_fixed_chan |= L2CAP_FC_SMP_BREDR;
  
- struct hci_conn_hash {
-@@ -343,6 +351,7 @@ struct hci_dev {
- 	unsigned long		dev_flags;
- 
- 	struct delayed_work	le_scan_disable;
-+	struct delayed_work	le_scan_restart;
- 
- 	__s8			adv_tx_power;
- 	__u8			adv_data[HCI_MAX_AD_LENGTH];
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 93f92a0..273311f 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -2624,6 +2624,7 @@ static int hci_dev_do_close(struct hci_dev *hdev)
- 		cancel_delayed_work(&hdev->service_cache);
- 
- 	cancel_delayed_work_sync(&hdev->le_scan_disable);
-+	cancel_delayed_work_sync(&hdev->le_scan_restart);
- 
- 	if (test_bit(HCI_MGMT, &hdev->dev_flags))
- 		cancel_delayed_work_sync(&hdev->rpa_expired);
-@@ -3892,6 +3893,8 @@ static void le_scan_disable_work(struct work_struct *work)
- 
- 	BT_DBG("%s", hdev->name);
- 
-+	cancel_delayed_work_sync(&hdev->le_scan_restart);
-+
- 	hci_req_init(&req, hdev);
- 
- 	hci_req_add_le_scan_disable(&req);
-@@ -3901,6 +3904,44 @@ static void le_scan_disable_work(struct work_struct *work)
- 		BT_ERR("Disable LE scanning request failed: err %d", err);
- }
- 
-+static void le_scan_restart_work_complete(struct hci_dev *hdev, u8 status)
-+{
-+	clear_bit(HCI_LE_SCAN_RESTARTING, &hdev->discovery.flags);
-+
-+	if (status)
-+		BT_ERR("Failed to restart LE scan: status %d", status);
-+}
-+
-+static void le_scan_restart_work(struct work_struct *work)
-+{
-+	struct hci_dev *hdev = container_of(work, struct hci_dev,
-+					    le_scan_restart.work);
-+	struct hci_request req;
-+	struct hci_cp_le_set_scan_enable cp;
-+	int err;
-+
-+	BT_DBG("%s", hdev->name);
-+
-+	/* If controller is not scanning we are done. */
-+	if (!test_bit(HCI_LE_SCAN, &hdev->dev_flags))
-+		return;
-+
-+	hci_req_init(&req, hdev);
-+
-+	hci_req_add_le_scan_disable(&req);
-+
-+	memset(&cp, 0, sizeof(cp));
-+	cp.enable = LE_SCAN_ENABLE;
-+	cp.filter_dup = LE_SCAN_FILTER_DUP_ENABLE;
-+	hci_req_add(&req, HCI_OP_LE_SET_SCAN_ENABLE, sizeof(cp), &cp);
-+
-+	set_bit(HCI_LE_SCAN_RESTARTING, &hdev->discovery.flags);
-+
-+	err = hci_req_run(&req, le_scan_restart_work_complete);
-+	if (err)
-+		BT_ERR("Restart LE scan request failed: err %d", err);
-+}
-+
- static void set_random_addr(struct hci_request *req, bdaddr_t *rpa)
- {
- 	struct hci_dev *hdev = req->hdev;
-@@ -4078,6 +4119,7 @@ struct hci_dev *hci_alloc_dev(void)
- 	INIT_DELAYED_WORK(&hdev->power_off, hci_power_off);
- 	INIT_DELAYED_WORK(&hdev->discov_off, hci_discov_off);
- 	INIT_DELAYED_WORK(&hdev->le_scan_disable, le_scan_disable_work);
-+	INIT_DELAYED_WORK(&hdev->le_scan_restart, le_scan_restart_work);
- 
- 	skb_queue_head_init(&hdev->rx_q);
- 	skb_queue_head_init(&hdev->cmd_q);
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 322abbb..cefb35d 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -1157,10 +1157,13 @@ static void hci_cc_le_set_scan_enable(struct hci_dev *hdev,
- 					  d->last_adv_data_len, NULL, 0);
- 		}
- 
--		/* Cancel this timer so that we don't try to disable scanning
--		 * when it's already disabled.
-+		/* If HCI_LE_SCAN_RESTARTING is set, don't cancel this timer,
-+		 * because we're just restarting scan. Otherwise cancel it so
-+		 * that we don't try to disable scanning when it's already
-+		 * disabled.
- 		 */
--		cancel_delayed_work(&hdev->le_scan_disable);
-+		if (!test_bit(HCI_LE_SCAN_RESTARTING, &hdev->discovery.flags))
-+			cancel_delayed_work(&hdev->le_scan_disable);
- 
- 		clear_bit(HCI_LE_SCAN, &hdev->dev_flags);
- 
+ 	mutex_init(&conn->ident_lock);
 -- 
-2.2.0.rc0.207.ga3a616c
+1.9.3
 
