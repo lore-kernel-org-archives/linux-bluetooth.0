@@ -1,36 +1,71 @@
 Return-Path: <cyrus@holtmann.org>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Check for force_lesc_support when enabling SMP over BR/EDR
-Date: Sat,  6 Dec 2014 00:35:45 +0100
-Message-Id: <1417822545-92322-1-git-send-email-marcel@holtmann.org>
+Date: Fri, 5 Dec 2014 14:14:17 -0500
+From: "John W. Linville" <linville@tuxdriver.com>
+To: linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: pull request: bluetooth-next 2014-12-05
+Message-ID: <20141205191416.GD28319@tuxdriver.com>
+References: <20141205125318.GA24487@t440s.lan>
+ <20141205164149.GA1087@t440s.P-661HNU-F1>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20141205164149.GA1087@t440s.P-661HNU-F1>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The SMP over BR/EDR support for cross-transport pairing should also be
-enabled when the debugfs setting force_lesc_support has been enabled.
+On Fri, Dec 05, 2014 at 06:41:49PM +0200, Johan Hedberg wrote:
+> Hi John,
+> 
+> Marcel had a couple more patches that were supposed to be in the pull
+> request, so here's a new one that supersedes the one I made earlier
+> today.
+> 
+> In addition to the previous one this contains two more cleanups to
+> mac802154 as well as support for some new HCI features from the
+> Bluetooth 4.2 specification.
+> 
+> From the original request:
+> 
+> "Here's what should be the last bluetooth-next pull request for 3.19.
+> It's rather large but the majority of it is the Low Energy Secure
+> Connections feature that's part of the Bluetooth 4.2 specification. The
+> specification went public only this week so we couldn't publish the
+> corresponding code before that. The code itself can nevertheless be
+> considered fairly mature as it's been in development for over 6 months
+> and gone through several interoperability test events.
+> 
+> Besides LE SC the pull request contains an important fix for command
+> complete events for mgmt sockets which also fixes some leaks of hci_conn
+> objects when powering off or unplugging Bluetooth adapters.
+> 
+> A smaller feature that's part of the pull request is service discovery
+> support. This is like normal device discovery except that devices not
+> matching specific UUIDs or strong enough RSSI are filtered out.
+> 
+> Other changes that the pull request contains are firmware dump support
+> to the btmrvl driver, firmware download support for Broadcom BCM20702A0
+> variants, as well as some coding style cleanups in 6lowpan &
+> ieee802154/mac802154 code."
+> 
+> Please let me know if there are any issues pulling. Thanks.
+> 
+> Johan
+> 
+> ---
+> The following changes since commit f6af675ef5489c69fc3d4faf8c6f477df3cbf8b9:
+> 
+>   Bluetooth: Automatically flushable packets aren't allowed on LE links (2014-11-27 12:12:27 +0200)
+> 
+> are available in the git repository at:
+> 
+>   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git for-upstream
+> 
+> for you to fetch changes up to 5a34bd5f5d8119def4feb1d2b4e3906b71059416:
+> 
+>   Bluetooth: Enable events for P-256 Public Key and DHKey commands (2014-12-05 18:17:49 +0200)
 
-Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
----
- net/bluetooth/l2cap_core.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+Pulling now...
 
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index a8da7ea9c2c0..cc518eb48dc8 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -6967,8 +6967,9 @@ static struct l2cap_conn *l2cap_conn_add(struct hci_conn *hcon)
- 	    test_bit(HCI_HS_ENABLED, &hcon->hdev->dev_flags))
- 		conn->local_fixed_chan |= L2CAP_FC_A2MP;
- 
--	if (bredr_sc_enabled(hcon->hdev) &&
--	    test_bit(HCI_LE_ENABLED, &hcon->hdev->dev_flags))
-+	if (test_bit(HCI_LE_ENABLED, &hcon->hdev->dev_flags) &&
-+	    (bredr_sc_enabled(hcon->hdev) ||
-+	     test_bit(HCI_FORCE_LESC, &hcon->hdev->dbg_flags)))
- 		conn->local_fixed_chan |= L2CAP_FC_SMP_BREDR;
- 
- 	mutex_init(&conn->ident_lock);
 -- 
-1.9.3
-
+John W. Linville		Someday the world will need a hero, and you
+linville@tuxdriver.com			might be all we have.  Be ready.
