@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Johan Hedberg <johan.hedberg@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 04/10] Bluetooth: Use cmd_complete callback for authentication mgmt commands
-Date: Fri,  5 Dec 2014 13:36:03 +0200
-Message-Id: <1417779369-6428-5-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH 05/10] Bluetooth: Convert Pair Device to use cmd_complete callback
+Date: Fri,  5 Dec 2014 13:36:04 +0200
+Message-Id: <1417779369-6428-6-git-send-email-johan.hedberg@gmail.com>
 In-Reply-To: <1417779369-6428-1-git-send-email-johan.hedberg@gmail.com>
 References: <1417779369-6428-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,116 +11,62 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-This patch converts the user confirmation & PIN code mgmt commands to
-take advantage of the new cmd_complete callback for pending mgmt
-commands. The patch also adds a new generic addr_cmd_complete() helper
-function to be used with commands that send a mgmt_addr_info response
-based on a mgmt_addr_info in the beginning of the command parameters.
+This patch converts the Pair Device mgmt command to use the new
+cmd_complete callback for pending mgmt commands. The already existing
+pairing_complete() function is exactly what's needed and doesn't need
+changing.
+
+In addition to getting the return parameters always right this patch
+actually fixes a reference counting bug and memory leak with the
+hci_conn that's attached to the pending mgmt command - something that
+would occur when powering off or unplugging the adapter while pairing is
+in progress.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- net/bluetooth/mgmt.c | 36 ++++++++++++++----------------------
- 1 file changed, 14 insertions(+), 22 deletions(-)
+ net/bluetooth/mgmt.c | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
 
 diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 81b2886f64b8..0fc3d6914ef0 100644
+index 0fc3d6914ef0..d3ee7285c303 100644
 --- a/net/bluetooth/mgmt.c
 +++ b/net/bluetooth/mgmt.c
-@@ -1492,6 +1492,12 @@ static void generic_cmd_complete(struct pending_cmd *cmd, u8 status)
- 		     cmd->param_len);
+@@ -3129,7 +3129,7 @@ void mgmt_smp_complete(struct hci_conn *conn, bool complete)
+ 
+ 	cmd = find_pairing(conn);
+ 	if (cmd)
+-		pairing_complete(cmd, status);
++		cmd->cmd_complete(cmd, status);
  }
  
-+static void addr_cmd_complete(struct pending_cmd *cmd, u8 status)
-+{
-+	cmd_complete(cmd->sk, cmd->index, cmd->opcode, status, cmd->param,
-+		     sizeof(struct mgmt_addr_info));
-+}
-+
- static u8 mgmt_bredr_support(struct hci_dev *hdev)
- {
- 	if (!lmp_bredr_capable(hdev))
-@@ -3032,6 +3038,8 @@ static int pin_code_reply(struct sock *sk, struct hci_dev *hdev, void *data,
- 		goto failed;
+ static void pairing_complete_cb(struct hci_conn *conn, u8 status)
+@@ -3142,7 +3142,7 @@ static void pairing_complete_cb(struct hci_conn *conn, u8 status)
+ 	if (!cmd)
+ 		BT_DBG("Unable to find a pending command");
+ 	else
+-		pairing_complete(cmd, mgmt_status(status));
++		cmd->cmd_complete(cmd, mgmt_status(status));
+ }
+ 
+ static void le_pairing_complete_cb(struct hci_conn *conn, u8 status)
+@@ -3158,7 +3158,7 @@ static void le_pairing_complete_cb(struct hci_conn *conn, u8 status)
+ 	if (!cmd)
+ 		BT_DBG("Unable to find a pending command");
+ 	else
+-		pairing_complete(cmd, mgmt_status(status));
++		cmd->cmd_complete(cmd, mgmt_status(status));
+ }
+ 
+ static int pair_device(struct sock *sk, struct hci_dev *hdev, void *data,
+@@ -3255,6 +3255,8 @@ static int pair_device(struct sock *sk, struct hci_dev *hdev, void *data,
+ 		goto unlock;
  	}
  
-+	cmd->cmd_complete = addr_cmd_complete;
++	cmd->cmd_complete = pairing_complete;
 +
- 	bacpy(&reply.bdaddr, &cp->addr.bdaddr);
- 	reply.pin_len = cp->pin_len;
- 	memcpy(reply.pin_code, cp->pin_code, sizeof(reply.pin_code));
-@@ -3363,6 +3371,8 @@ static int user_pairing_resp(struct sock *sk, struct hci_dev *hdev,
- 		goto done;
- 	}
- 
-+	cmd->cmd_complete = addr_cmd_complete;
-+
- 	/* Continue with pairing via HCI */
- 	if (hci_op == HCI_OP_USER_PASSKEY_REPLY) {
- 		struct hci_cp_user_passkey_reply cp;
-@@ -6544,18 +6554,12 @@ void mgmt_pin_code_reply_complete(struct hci_dev *hdev, bdaddr_t *bdaddr,
- 				  u8 status)
- {
- 	struct pending_cmd *cmd;
--	struct mgmt_rp_pin_code_reply rp;
- 
- 	cmd = mgmt_pending_find(MGMT_OP_PIN_CODE_REPLY, hdev);
- 	if (!cmd)
- 		return;
- 
--	bacpy(&rp.addr.bdaddr, bdaddr);
--	rp.addr.type = BDADDR_BREDR;
--
--	cmd_complete(cmd->sk, hdev->id, MGMT_OP_PIN_CODE_REPLY,
--		     mgmt_status(status), &rp, sizeof(rp));
--
-+	cmd->cmd_complete(cmd, mgmt_status(status));
- 	mgmt_pending_remove(cmd);
- }
- 
-@@ -6563,18 +6567,12 @@ void mgmt_pin_code_neg_reply_complete(struct hci_dev *hdev, bdaddr_t *bdaddr,
- 				      u8 status)
- {
- 	struct pending_cmd *cmd;
--	struct mgmt_rp_pin_code_reply rp;
- 
- 	cmd = mgmt_pending_find(MGMT_OP_PIN_CODE_NEG_REPLY, hdev);
- 	if (!cmd)
- 		return;
- 
--	bacpy(&rp.addr.bdaddr, bdaddr);
--	rp.addr.type = BDADDR_BREDR;
--
--	cmd_complete(cmd->sk, hdev->id, MGMT_OP_PIN_CODE_NEG_REPLY,
--		     mgmt_status(status), &rp, sizeof(rp));
--
-+	cmd->cmd_complete(cmd, mgmt_status(status));
- 	mgmt_pending_remove(cmd);
- }
- 
-@@ -6614,21 +6612,15 @@ static int user_pairing_resp_complete(struct hci_dev *hdev, bdaddr_t *bdaddr,
- 				      u8 opcode)
- {
- 	struct pending_cmd *cmd;
--	struct mgmt_rp_user_confirm_reply rp;
--	int err;
- 
- 	cmd = mgmt_pending_find(opcode, hdev);
- 	if (!cmd)
- 		return -ENOENT;
- 
--	bacpy(&rp.addr.bdaddr, bdaddr);
--	rp.addr.type = link_to_bdaddr(link_type, addr_type);
--	err = cmd_complete(cmd->sk, hdev->id, opcode, mgmt_status(status),
--			   &rp, sizeof(rp));
--
-+	cmd->cmd_complete(cmd, mgmt_status(status));
- 	mgmt_pending_remove(cmd);
- 
--	return err;
-+	return 0;
- }
- 
- int mgmt_user_confirm_reply_complete(struct hci_dev *hdev, bdaddr_t *bdaddr,
+ 	/* For LE, just connecting isn't a proof that the pairing finished */
+ 	if (cp->addr.type == BDADDR_BREDR) {
+ 		conn->connect_cfm_cb = pairing_complete_cb;
 -- 
 2.1.0
 
