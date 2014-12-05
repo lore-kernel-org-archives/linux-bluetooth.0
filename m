@@ -1,37 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+Date: Fri, 5 Dec 2014 13:46:05 +0100
+From: Alexander Aring <alex.aring@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv2] monitor: Fix RFCOMM parity type mask
-Date: Fri,  5 Dec 2014 14:48:27 +0200
-Message-Id: <1417783707-3519-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <000401d01078ea58bb0bf0a310samsung.com>
-References: <000401d01078ea58bb0bf0a310samsung.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Cc: marcel@holtmann.org, jukka.rissanen@linux.intel.com,
+	linux-wpan@vger.kernel.org, martin.townsend@xsilon.com
+Subject: 6lowpan next header compression framwork: module handling or not?
+Message-ID: <20141205124602.GB478@omega>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Hi,
 
-Fix RFCOMM RPN parity type bit according to Spec. GSM 07.10 version
-6.3.0. (PT1 - PT2 indicates the parity type).
----
-	*v2: Fixed parity type bits
+last patch series Jukka, told me to make default "loading" of some next
+header compression formats. I agree with that, so users don't need to
+extra loading some next header compression modules.
 
- monitor/rfcomm.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Per default we support some compression formats, that sounds good.
 
-diff --git a/monitor/rfcomm.c b/monitor/rfcomm.c
-index fe3afb7..4ba61c8 100644
---- a/monitor/rfcomm.c
-+++ b/monitor/rfcomm.c
-@@ -67,7 +67,7 @@ static char *cr_str[] = {
- #define GET_RPN_DB(parity)	(parity & 0x03)
- #define GET_RPN_SB(parity)	((parity & 0x04) >> 2)
- #define GET_RPN_PARITY(parity)	((parity & 0x08) >> 3)
--#define GET_RPN_PTYPE(parity)	((parity & 0x03) >> 3)
-+#define GET_RPN_PTYPE(parity)	((parity & 0x30) >> 4)
- #define GET_RPN_XIN(io)		(io & 0x01)
- #define GET_RPN_XOUT(io)	((io & 0x02) >> 1)
- #define GET_RPN_RTRI(io)	((io & 0x04) >> 2)
--- 
-1.9.1
 
+Before that Marcel told (I think if I understand it right) that he wants
+to have each nhc compression as separate module and users can do some
+modalias magic for autoloading.
+
+Currently I see no option to add support for both of them.
+
+If I do Jukka's default "loading" (not loading of module) I add nhc
+and all compression layers into the 6lowpan.ko module. While module_init
+of 6lowpan.ko we add all default nhc's. On module_exit we remove _all_
+registered nhc.
+
+Marcel idea with modules we have in each nhc compression format a module_init
+and a module_exit function. In these functions the nhc compression format will
+be added to the nhc framework and removed. With this solution I can't
+implement some "load all defaults nhc modules, while loading 6lowpan.ko
+module. Users need to do some configuration to make this default
+available at startup.
+
+
+What should I do now?
+
+- Alex
