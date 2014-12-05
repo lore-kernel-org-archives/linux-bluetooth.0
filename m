@@ -1,176 +1,63 @@
 Return-Path: <cyrus@holtmann.org>
 From: Johan Hedberg <johan.hedberg@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 10/10] Bluetooth: Fix Get Conn Info to use cmd_complete callback
-Date: Fri,  5 Dec 2014 13:42:57 +0200
-Message-Id: <1417779777-10550-1-git-send-email-johan.hedberg@gmail.com>
-In-Reply-To: <1417779369-6428-11-git-send-email-johan.hedberg@gmail.com>
-References: <1417779369-6428-11-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH] Bluetooth: Remove redundant reverse_base_uuid variable
+Date: Fri,  5 Dec 2014 13:40:01 +0200
+Message-Id: <1417779601-9394-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-This patch fixes the Get Connection Information mgmt command to take
-advantage of the new cmd_complete callback. This allows for great
-simplifications in the logic for constructing the cmd_complete event.
+The mgmt.c file already has a bluetooth_base_uuid variable which has the
+exact same value as the reverse_base_uuid one. This patch removes the
+redundant variable.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
-v2: Fixed s/status/hci_status/ in BT_DBG() call
+This should apply both before and after my cmd_complete patch set, but
+I've only tested it after it.
 
- net/bluetooth/mgmt.c | 84 +++++++++++++++++++++-------------------------------
- 1 file changed, 33 insertions(+), 51 deletions(-)
+ net/bluetooth/mgmt.c | 12 ++----------
+ 1 file changed, 2 insertions(+), 10 deletions(-)
 
 diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 8467d3552aa9..61a04a3de7ad 100644
+index 3bbc93ed4206..748454e20821 100644
 --- a/net/bluetooth/mgmt.c
 +++ b/net/bluetooth/mgmt.c
-@@ -5074,67 +5074,42 @@ static int load_long_term_keys(struct sock *sk, struct hci_dev *hdev,
- 	return err;
+@@ -6915,14 +6915,6 @@ void mgmt_read_local_oob_data_complete(struct hci_dev *hdev, u8 *hash192,
+ 	mgmt_pending_remove(cmd);
  }
  
--struct cmd_conn_lookup {
--	struct hci_conn *conn;
--	bool valid_tx_power;
--	u8 mgmt_status;
+-/* this is reversed hex representation of bluetooth base uuid. We need it for
+- * service uuid parsing in eir.
+- */
+-static const u8 reverse_base_uuid[] = {
+-			0xfb, 0x34, 0x9b, 0x5f, 0x80, 0x00, 0x00, 0x80,
+-			0x00, 0x10, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 -};
 -
--static void get_conn_info_complete(struct pending_cmd *cmd, void *data)
-+static void conn_info_cmd_complete(struct pending_cmd *cmd, u8 status)
+ static inline bool has_uuid(u8 *uuid, u16 uuid_count, u8 (*uuids)[16])
  {
--	struct cmd_conn_lookup *match = data;
--	struct mgmt_cp_get_conn_info *cp;
--	struct mgmt_rp_get_conn_info rp;
- 	struct hci_conn *conn = cmd->user_data;
-+	struct mgmt_rp_get_conn_info rp;
- 
--	if (conn != match->conn)
--		return;
--
--	cp = (struct mgmt_cp_get_conn_info *) cmd->param;
-+	memcpy(&rp.addr, cmd->param, sizeof(rp.addr));
- 
--	memset(&rp, 0, sizeof(rp));
--	bacpy(&rp.addr.bdaddr, &cp->addr.bdaddr);
--	rp.addr.type = cp->addr.type;
--
--	if (!match->mgmt_status) {
-+	if (status == MGMT_STATUS_SUCCESS) {
- 		rp.rssi = conn->rssi;
--
--		if (match->valid_tx_power) {
--			rp.tx_power = conn->tx_power;
--			rp.max_tx_power = conn->max_tx_power;
--		} else {
--			rp.tx_power = HCI_TX_POWER_INVALID;
--			rp.max_tx_power = HCI_TX_POWER_INVALID;
--		}
-+		rp.tx_power = conn->tx_power;
-+		rp.max_tx_power = conn->max_tx_power;
-+	} else {
-+		rp.rssi = HCI_RSSI_INVALID;
-+		rp.tx_power = HCI_TX_POWER_INVALID;
-+		rp.max_tx_power = HCI_TX_POWER_INVALID;
- 	}
- 
--	cmd_complete(cmd->sk, cmd->index, MGMT_OP_GET_CONN_INFO,
--		     match->mgmt_status, &rp, sizeof(rp));
-+	cmd_complete(cmd->sk, cmd->index, MGMT_OP_GET_CONN_INFO, status,
-+		     &rp, sizeof(rp));
- 
- 	hci_conn_drop(conn);
- 	hci_conn_put(conn);
--
--	mgmt_pending_remove(cmd);
- }
- 
--static void conn_info_refresh_complete(struct hci_dev *hdev, u8 status)
-+static void conn_info_refresh_complete(struct hci_dev *hdev, u8 hci_status)
- {
- 	struct hci_cp_read_rssi *cp;
-+	struct pending_cmd *cmd;
- 	struct hci_conn *conn;
--	struct cmd_conn_lookup match;
- 	u16 handle;
-+	u8 status;
- 
--	BT_DBG("status 0x%02x", status);
-+	BT_DBG("status 0x%02x", hci_status);
- 
- 	hci_dev_lock(hdev);
- 
--	/* TX power data is valid in case request completed successfully,
--	 * otherwise we assume it's not valid. At the moment we assume that
--	 * either both or none of current and max values are valid to keep code
--	 * simple.
--	 */
--	match.valid_tx_power = !status;
--
- 	/* Commands sent in request are either Read RSSI or Read Transmit Power
- 	 * Level so we check which one was last sent to retrieve connection
- 	 * handle.  Both commands have handle as first parameter so it's safe to
-@@ -5147,29 +5122,29 @@ static void conn_info_refresh_complete(struct hci_dev *hdev, u8 status)
- 	cp = hci_sent_cmd_data(hdev, HCI_OP_READ_RSSI);
- 	if (!cp) {
- 		cp = hci_sent_cmd_data(hdev, HCI_OP_READ_TX_POWER);
--		status = 0;
-+		status = MGMT_STATUS_SUCCESS;
-+	} else {
-+		status = mgmt_status(hci_status);
- 	}
- 
- 	if (!cp) {
--		BT_ERR("invalid sent_cmd in response");
-+		BT_ERR("invalid sent_cmd in conn_info response");
- 		goto unlock;
- 	}
- 
- 	handle = __le16_to_cpu(cp->handle);
- 	conn = hci_conn_hash_lookup_handle(hdev, handle);
- 	if (!conn) {
--		BT_ERR("unknown handle (%d) in response", handle);
-+		BT_ERR("unknown handle (%d) in conn_info response", handle);
- 		goto unlock;
- 	}
- 
--	match.conn = conn;
--	match.mgmt_status = mgmt_status(status);
-+	cmd = mgmt_pending_find_data(MGMT_OP_GET_CONN_INFO, hdev, conn);
-+	if (!cmd)
-+		goto unlock;
- 
--	/* Cache refresh is complete, now reply for mgmt request for given
--	 * connection only.
--	 */
--	mgmt_pending_foreach(MGMT_OP_GET_CONN_INFO, hdev,
--			     get_conn_info_complete, &match);
-+	cmd->cmd_complete(cmd, status);
-+	mgmt_pending_remove(cmd);
- 
- unlock:
- 	hci_dev_unlock(hdev);
-@@ -5215,6 +5190,12 @@ static int get_conn_info(struct sock *sk, struct hci_dev *hdev, void *data,
- 		goto unlock;
- 	}
- 
-+	if (mgmt_pending_find_data(MGMT_OP_GET_CONN_INFO, hdev, conn)) {
-+		err = cmd_complete(sk, hdev->id, MGMT_OP_GET_CONN_INFO,
-+				   MGMT_STATUS_BUSY, &rp, sizeof(rp));
-+		goto unlock;
-+	}
-+
- 	/* To avoid client trying to guess when to poll again for information we
- 	 * calculate conn info age as random value between min/max set in hdev.
- 	 */
-@@ -5270,6 +5251,7 @@ static int get_conn_info(struct sock *sk, struct hci_dev *hdev, void *data,
- 
- 		hci_conn_hold(conn);
- 		cmd->user_data = hci_conn_get(conn);
-+		cmd->cmd_complete = conn_info_cmd_complete;
- 
- 		conn->conn_info_timestamp = jiffies;
- 	} else {
+ 	int i;
+@@ -6954,7 +6946,7 @@ static bool eir_has_uuids(u8 *eir, u16 eir_len, u16 uuid_count, u8 (*uuids)[16])
+ 		case EIR_UUID16_ALL:
+ 		case EIR_UUID16_SOME:
+ 			for (i = 0; i + 3 <= field_len; i += 2) {
+-				memcpy(uuid, reverse_base_uuid, 16);
++				memcpy(uuid, bluetooth_base_uuid, 16);
+ 				uuid[13] = eir[i + 3];
+ 				uuid[12] = eir[i + 2];
+ 				if (has_uuid(uuid, uuid_count, uuids))
+@@ -6964,7 +6956,7 @@ static bool eir_has_uuids(u8 *eir, u16 eir_len, u16 uuid_count, u8 (*uuids)[16])
+ 		case EIR_UUID32_ALL:
+ 		case EIR_UUID32_SOME:
+ 			for (i = 0; i + 5 <= field_len; i += 4) {
+-				memcpy(uuid, reverse_base_uuid, 16);
++				memcpy(uuid, bluetooth_base_uuid, 16);
+ 				uuid[15] = eir[i + 5];
+ 				uuid[14] = eir[i + 4];
+ 				uuid[13] = eir[i + 3];
 -- 
 2.1.0
 
