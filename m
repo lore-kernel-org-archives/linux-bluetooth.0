@@ -1,42 +1,66 @@
 Return-Path: <cyrus@holtmann.org>
-From: Gowtham Anandha Babu <gowtham.ab@samsung.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: d.kasatkin@samsung.com, bharat.panda@samsung.com, cpgs@samsung.com,
-	Gowtham Anandha Babu <gowtham.ab@samsung.com>
-Subject: [PATCH ] monitor/rfcomm: Fix byte ordering issue
-Date: Fri, 05 Dec 2014 19:14:29 +0530
-Message-id: <1417787069-11163-1-git-send-email-gowtham.ab@samsung.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Message-ID: <1417786926.32209.9.camel@jrissane-mobl.ger.corp.intel.com>
+Subject: Re: 6lowpan next header compression framwork: module handling or
+ not?
+From: Jukka Rissanen <jukka.rissanen@linux.intel.com>
+To: Alexander Aring <alex.aring@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
+	linux-wpan@vger.kernel.org, martin.townsend@xsilon.com
+Date: Fri, 05 Dec 2014 15:42:06 +0200
+In-Reply-To: <20141205124602.GB478@omega>
+References: <20141205124602.GB478@omega>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The correct byte order for RFCOMM protocol is
-little endian.
----
- monitor/rfcomm.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+Hi Alex,
 
-diff --git a/monitor/rfcomm.c b/monitor/rfcomm.c
-index fe3afb7..e8dfdb5 100644
---- a/monitor/rfcomm.c
-+++ b/monitor/rfcomm.c
-@@ -218,7 +218,7 @@ static inline bool mcc_rpn(struct rfcomm_frame *rfcomm_frame, uint8_t indent)
- 		GET_RPN_RTCI(rpn.io), GET_RPN_RTCO(rpn.io), rpn.xon,
- 		rpn.xoff);
- 
--	if (!l2cap_frame_get_be16(frame, &rpn.pm))
-+	if (!l2cap_frame_get_le16(frame, &rpn.pm))
- 		return false;
- 
- 	print_field("%*cpm 0x%04x", indent, ' ', rpn.pm);
-@@ -267,7 +267,7 @@ static inline bool mcc_pn(struct rfcomm_frame *rfcomm_frame, uint8_t indent)
- 	if (!l2cap_frame_get_u8(frame, &pn.ack_timer))
- 		return false;
- 
--	if (!l2cap_frame_get_be16(frame, &pn.mtu))
-+	if (!l2cap_frame_get_le16(frame, &pn.mtu))
- 		return false;
- 
- 	if (!l2cap_frame_get_u8(frame, &pn.max_retrans))
--- 
-1.9.1
+On pe, 2014-12-05 at 13:46 +0100, Alexander Aring wrote:
+> Hi,
+> 
+> last patch series Jukka, told me to make default "loading" of some next
+> header compression formats. I agree with that, so users don't need to
+> extra loading some next header compression modules.
+> 
+> Per default we support some compression formats, that sounds good.
+> 
+> 
+> Before that Marcel told (I think if I understand it right) that he wants
+> to have each nhc compression as separate module and users can do some
+> modalias magic for autoloading.
+> 
+> Currently I see no option to add support for both of them.
+> 
+> If I do Jukka's default "loading" (not loading of module) I add nhc
+> and all compression layers into the 6lowpan.ko module. While module_init
+> of 6lowpan.ko we add all default nhc's. On module_exit we remove _all_
+> registered nhc.
+> 
+> Marcel idea with modules we have in each nhc compression format a module_init
+> and a module_exit function. In these functions the nhc compression format will
+> be added to the nhc framework and removed. With this solution I can't
+> implement some "load all defaults nhc modules, while loading 6lowpan.ko
+> module. Users need to do some configuration to make this default
+> available at startup.
 
+If there would be a "default" module that gets automatically loaded if
+no other module is used / configured, then both of these wished would be
+full filled.
+
+So my point was that the current way of compressing things i.e., the
+"default" would be used if no other compression method is
+found/configured (I probably expressed myself poorly in my previous
+mail ;)
+I am fine if the "default" being a module, as long as it is
+automatically loaded. From the end user point of view, he/she should not
+configure or do any magic in order to use 6lowpan.
+
+> 
+> 
+> What should I do now?
+> 
+> - Alex
+
+
+Cheers,
+Jukka
