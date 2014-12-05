@@ -1,62 +1,106 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 8.1 \(1993\))
-Subject: Re: [RFC v2 5/7] Bluetooth: Add definitions for MGMT_OP_START_SERVICE_DISCOVERY
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <CAD0=r8wOmN6xjdr3ejG5mgqrCAYCwsZeB=A0V7BjjkcQ8e2+hA@mail.gmail.com>
-Date: Fri, 5 Dec 2014 11:10:20 +0100
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
-Message-Id: <9F440CCC-D45C-4967-8076-39B7E2E547C2@holtmann.org>
-References: <1417689400-128063-5-git-send-email-marcel@holtmann.org> <CAD0=r8zfKBdu8=ZJj9Z-OLVjyUJoZ3iZ6bVjhPL_sVzU3qZ61w@mail.gmail.com> <B48B3F23-03FA-46D4-A999-3EF6835FF03E@holtmann.org> <CAD0=r8wOmN6xjdr3ejG5mgqrCAYCwsZeB=A0V7BjjkcQ8e2+hA@mail.gmail.com>
-To: Jakub Pawlowski <jpawlowski@google.com>
+Date: Fri, 5 Dec 2014 11:57:24 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: "Min Jun,Xi" <xi.minjun@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: BT-4.1 features (e.g. concurrent GAP operations) support
+Message-ID: <20141205095724.GA10410@t440s.lan>
+References: <CAB0Wyv=3HBi6wnStgjGFwg7HUODoYj3mZBVTnZnC+tb+Mipyxw@mail.gmail.com>
+ <20141015145000.GA26735@t440s.fdxtended.com>
+ <CAB0WyvnOCKYXoCt8yRQRSP-_Jn8-y1kHVu88KrBsp9AXFw+-hA@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+In-Reply-To: <CAB0WyvnOCKYXoCt8yRQRSP-_Jn8-y1kHVu88KrBsp9AXFw+-hA@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jakub,
+Hi,
 
->>>> This patch adds the opcode and structure for Start Service Discovery
->>>> operation.
->>>> 
->>>> Signed-off-by: Jakub Pawlowski <jpawlowski@google.com>
->>>> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
->>>> ---
->>>> include/net/bluetooth/mgmt.h | 9 +++++++++
->>>> 1 file changed, 9 insertions(+)
->>>> 
->>>> diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
->>>> index 9b382ea34fd9..95c34d5180fa 100644
->>>> --- a/include/net/bluetooth/mgmt.h
->>>> +++ b/include/net/bluetooth/mgmt.h
->>>> @@ -498,6 +498,15 @@ struct mgmt_cp_set_public_address {
->>>> } __packed;
->>>> #define MGMT_SET_PUBLIC_ADDRESS_SIZE   6
->>>> 
->>>> +#define MGMT_OP_START_SERVICE_DISCOVERY        0x003A
->>>> +struct mgmt_cp_start_service_discovery {
->>>> +       __u8 type;
->>> 
->>> Maybe we should get rid of type ? service discovery based on
->>> advertisement content makes sense only for LE
->> 
->> this works perfectly fine for BR/EDR or BR/EDR + LE discovery. It is up to the call to decide what to do. And we have kept the type in place even for commands that are currently only supported on one transport. It allows us to extend the API without breaking it.
+On Fri, Dec 05, 2014, Min Jun,Xi wrote:
+> At least from page 33 of 174, BLUETOOTH SPECIFICATION Version 4.1 [Vol
+> 6], it says that
 > 
-> Ok, that sounds reasonable.
+>      1.1.1 State and Role Combination Restrictions
+>      The Link Layer may optionally support multiple state machines. If
+> it does sup- port multiple state machines, then:
+>       • The Link Layer in the Connection State may operate in the
+> Master Role and Slave Role at the same time.
+>       • The Link Layer in the Connection State operating in the Slave
+> Role may have multiple connections.
+>       • The Link Layer in the Connection State operating in the Master
+> Role may have multiple connections.
+>       • All other combinations of states and roles may also be supported.
+>      A Link Layer implementation is not required to support all the
+> possible state combinations that are allowed by this specification.
 > 
-> I've merged my filtering patch on top of your patches, then run
-> everything and did some manual tests - all works great!
-> I've just send updated patches.
+> Compared the current state combinations listed in hciconfig.c (line 119-153):
+> 
+>     static void print_le_states(uint64_t states)
+>     {
+>     int i;
+>     const char *le_states[] = {
+>     "Non-connectable Advertising State" ,
+>     "Scannable Advertising State",
+>     "Connectable Advertising State",
+>     "Directed Advertising State",
+>     "Passive Scanning State",
+>     "Active Scanning State",
+>     "Initiating State/Connection State in Master Role",
+>     "Connection State in the Slave Role",
+>     "Non-connectable Advertising State and Passive Scanning State combination",
+>     "Scannable Advertising State and Passive Scanning State combination",
+>     "Connectable Advertising State and Passive Scanning State combination",
+>     "Directed Advertising State and Passive Scanning State combination",
+>     "Non-connectable Advertising State and Active Scanning State combination",
+>     "Scannable Advertising State and Active Scanning State combination",
+>     "Connectable Advertising State and Active Scanning State combination",
+>     "Directed Advertising State and Active Scanning State combination",
+>     "Non-connectable Advertising State and Initiating State combination",
+>     "Scannable Advertising State and Initiating State combination",
+>     "Non-connectable Advertising State and Master Role combination",
+>     "Scannable Advertising State and Master Role combination",
+>     "Non-connectable Advertising State and Slave Role combination",
+>     "Scannable Advertising State and Slave Role combination",
+>     "Passive Scanning State and Initiating State combination",
+>     "Active Scanning State and Initiating State combination",
+>     "Passive Scanning State and Master Role combination",
+>     "Active Scanning State and Master Role combination",
+>     "Passive Scanning State and Slave Role combination",
+>     "Active Scanning State and Slave Role combination",
+>     "Initiating State and Master Role combination/Master Role and
+> Master Role combination",
+>     NULL
+>     };
+> 
+> the hciconfig command doesn't try to detect if the interface supports
+> multiple state machines and if the interface supports following state
+> combinations:
+>       • The Link Layer in the Connection State may operate in the
+> Master Role and Slave Role at the same time.
+>       • The Link Layer in the Connection State operating in the Slave
+> Role may have multiple connections.
+>       • The Link Layer in the Connection State operating in the Master
+> Role may have multiple connections.
+>       • All other combinations of states and roles may also be supported.
 
-I did re-work your patches a little bit actually.
+I don't really see what hciconfig has to do with supporting or not
+supporting the states. What you've quoted is this tool's ability to read
+what the HW supports which indeed is missing decoding of the new states
+(patches for that are welcome :)
 
-The filter should be applied independently on EIR, advertising data and/or scan response data. Running it over the combined data has the danger that if some device are broken it becomes hard to detect wrong scan response data. So I decided to run this manually. And I also decided to skip the scan response data in case we already found a match in the advertising data.
+It has however nothing to do with supporting or not supporting the
+states. That's something that would happen completely on the kernel
+side.
 
-There is also the funny case if either of this data is empty, then we should consider no matching and need to handle that one as well.
+> Based on this situation, I don't think what you said here is correct.
+> The latest Bluez implementation doesn't follow Bluetooth 4.1 core spec
+> to detect the LE device's capability.
 
-You also had some uint8_t in there which I assume you copied from userspace code. We do not use that in kernel code and use u8 instead. So I fixed that as well. If I counted correctly, the the code also had one off-by-one for the EIR field length check. That should be fixed as well now.
+You might want to re-read what I said then. I never said that we act on
+the supported states value. We do read it and store it (in
+hdev->le_states) but that's all for now. That said, we should indeed add
+support for the new state combinations and allow the kernel to enter
+them when the hardware support is available (and again patches are
+welcome for that as well :)
 
-The only missing piece is now the LE restart handling. That is the one patch I have actually not yet looked at.
-
-Regards
-
-Marcel
-
+Johan
