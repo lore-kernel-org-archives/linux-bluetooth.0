@@ -1,56 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1417787069-11163-1-git-send-email-gowtham.ab@samsung.com>
-References: <1417787069-11163-1-git-send-email-gowtham.ab@samsung.com>
-Date: Fri, 5 Dec 2014 17:14:46 +0200
-Message-ID: <CABBYNZKre80wPrG9FxA8YkiD+_X4U9dD=6o-5n5jKJWxCoBLFQ@mail.gmail.com>
-Subject: Re: [PATCH ] monitor/rfcomm: Fix byte ordering issue
+In-Reply-To: <1417712635-12428-1-git-send-email-jamuraa@chromium.org>
+References: <1417712635-12428-1-git-send-email-jamuraa@chromium.org>
+Date: Fri, 5 Dec 2014 17:06:04 +0200
+Message-ID: <CABBYNZLjsOQsibvtWm=rc8E2k96U-=p-=Yk01rtg+bu_Pq3qmg@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 0/2] unit/gatt: Replace custom structs with gatt_db
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Gowtham Anandha Babu <gowtham.ab@samsung.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	Dmitry Kasatkin <d.kasatkin@samsung.com>,
-	Bharat Panda <bharat.panda@samsung.com>, cpgs@samsung.com
+To: Michael Janssen <jamuraa@chromium.org>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Gowtham,
+Hi Michael,
 
-On Fri, Dec 5, 2014 at 3:44 PM, Gowtham Anandha Babu
-<gowtham.ab@samsung.com> wrote:
-> The correct byte order for RFCOMM protocol is
-> little endian.
-> ---
->  monitor/rfcomm.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+On Thu, Dec 4, 2014 at 7:03 PM, Michael Janssen <jamuraa@chromium.org> wrote:
+> These patches replace the custom structs in test-gatt with building an
+> appropriate gatt_db and comparing the rebuilt client gatt_db with the source.
 >
-> diff --git a/monitor/rfcomm.c b/monitor/rfcomm.c
-> index fe3afb7..e8dfdb5 100644
-> --- a/monitor/rfcomm.c
-> +++ b/monitor/rfcomm.c
-> @@ -218,7 +218,7 @@ static inline bool mcc_rpn(struct rfcomm_frame *rfcomm_frame, uint8_t indent)
->                 GET_RPN_RTCI(rpn.io), GET_RPN_RTCO(rpn.io), rpn.xon,
->                 rpn.xoff);
+> This set replaces service_data_1 with a gatt_db made by make_service_1_db(),
+> which is still closely tied to the SERVICE_DATA_1_PDU.
 >
-> -       if (!l2cap_frame_get_be16(frame, &rpn.pm))
-> +       if (!l2cap_frame_get_le16(frame, &rpn.pm))
->                 return false;
+> Michael Janssen (2):
+>   unit/gatt: Use gatt_db for test data
+>   Remove unused old test db structures
 >
->         print_field("%*cpm 0x%04x", indent, ' ', rpn.pm);
-> @@ -267,7 +267,7 @@ static inline bool mcc_pn(struct rfcomm_frame *rfcomm_frame, uint8_t indent)
->         if (!l2cap_frame_get_u8(frame, &pn.ack_timer))
->                 return false;
+>  unit/test-gatt.c | 425 +++++++++++++++++++++++++++++--------------------------
+>  1 file changed, 226 insertions(+), 199 deletions(-)
 >
-> -       if (!l2cap_frame_get_be16(frame, &pn.mtu))
-> +       if (!l2cap_frame_get_le16(frame, &pn.mtu))
->                 return false;
->
->         if (!l2cap_frame_get_u8(frame, &pn.max_retrans))
 > --
-> 1.9.1
+> 2.2.0.rc0.207.ga3a616c
 
-Applied, thanks.
-
+Applied after changing add_char_with_value,
+gatt_db_service_add_characteristic returns you the value attribute so
+you can write directly to it.
 
 -- 
 Luiz Augusto von Dentz
