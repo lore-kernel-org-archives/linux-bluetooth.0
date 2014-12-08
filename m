@@ -1,113 +1,53 @@
 Return-Path: <cyrus@holtmann.org>
-From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+From: Jakub Pawlowski <jpawlowski@google.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH v2] android/handsfree-client: Decrease number of memcpy
-Date: Mon,  8 Dec 2014 14:56:30 +0100
-Message-Id: <1418046990-12279-1-git-send-email-lukasz.rymanowski@tieto.com>
+Cc: Jakub Pawlowski <jpawlowski@google.com>
+Subject: [PATCH] doc/adapter-api.txt: StartServiceDiscovery method.
+Date: Mon,  8 Dec 2014 14:47:19 +0100
+Message-Id: <1418046439-15725-1-git-send-email-jpawlowski@google.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Some string we can directly copy from context to IPC event struct.
----
- android/handsfree-client.c | 27 +++++++++++++--------------
- 1 file changed, 13 insertions(+), 14 deletions(-)
+This patch proposes new method, StartServiceDiscovery to D-Bus Adapter API for
+desktop bluetoothd. It will allow for rapid discovery of nearby devices that
+advertise services.
 
-diff --git a/android/handsfree-client.c b/android/handsfree-client.c
-index b32a038..a559505 100644
---- a/android/handsfree-client.c
-+++ b/android/handsfree-client.c
-@@ -85,6 +85,9 @@
- #define CODEC_ID_CVSD 0x01
- #define CODEC_ID_MSBC 0x02
+Signed-off-by: Jakub Pawlowski <jpawlowski@google.com>
+---
+ doc/adapter-api.txt | 20 ++++++++++++++++++++
+ 1 file changed, 20 insertions(+)
+
+diff --git a/doc/adapter-api.txt b/doc/adapter-api.txt
+index 74d235a..88533ed 100644
+--- a/doc/adapter-api.txt
++++ b/doc/adapter-api.txt
+@@ -22,6 +22,26 @@ Methods		void StartDiscovery()
+ 			Possible errors: org.bluez.Error.NotReady
+ 					 org.bluez.Error.Failed
  
-+#define MAX_NUMBER_LEN 33
-+#define MAX_OPERATOR_NAME_LEN 17
++		void StartServiceDiscovery(uint8 rssi, array{string} uuids)
 +
- enum hfp_indicator {
- 	HFP_INDICATOR_SERVICE = 0,
- 	HFP_INDICATOR_CALL,
-@@ -941,7 +944,6 @@ static void clcc_cb(struct hfp_context *context, void *user_data)
- 	uint8_t buf[IPC_MTU];
- 	struct hal_ev_hf_client_current_call *ev = (void *) buf;
- 	unsigned int val;
--	char number[33];
- 
- 	DBG("");
- 
-@@ -983,10 +985,9 @@ static void clcc_cb(struct hfp_context *context, void *user_data)
- 
- 	ev->multiparty = val;
- 
--	if (hfp_context_get_string(context, number, sizeof(number))) {
--		ev->number_len = strlen(number) + 1;
--		memcpy(ev->number, number, ev->number_len);
--	}
-+	if (hfp_context_get_string(context, (char *) &ev->number[0],
-+								MAX_NUMBER_LEN))
-+		ev->number_len = strlen((char *) ev->number) + 1;
- 
- 	ipc_send_notif(hal_ipc, HAL_SERVICE_ID_HANDSFREE_CLIENT,
- 					HAL_EV_HF_CLIENT_CURRENT_CALL,
-@@ -1023,7 +1024,6 @@ static void cnum_cb(struct hfp_context *context, void *user_data)
- {
- 	uint8_t buf[IPC_MTU];
- 	struct hal_ev_hf_client_subscriber_service_info *ev = (void *) buf;
--	char number[33];
- 	unsigned int service;
- 
- 	DBG("");
-@@ -1031,11 +1031,14 @@ static void cnum_cb(struct hfp_context *context, void *user_data)
- 	/* Alpha field is empty string, just skip it */
- 	hfp_context_skip_field(context);
- 
--	if (!hfp_context_get_string(context, number, sizeof(number))) {
-+	if (!hfp_context_get_string(context, (char *) &ev->name[0],
-+							MAX_NUMBER_LEN)) {
- 		error("hf-client: Could not get number");
- 		return;
- 	}
- 
-+	ev->name_len = strlen((char *) &ev->name[0]) + 1;
++			This method starts the device discovery session with
++			filtering by uuids, and rssi value. Use StopDiscovery to
++			release the sessions acquired.
 +
- 	/* Type is not used in Android */
- 	hfp_context_skip_field(context);
++			This method will use LE scan only.
++
++			Device that have RSSI bigger than rssi parameter, and
++			advertise at least one service from uuids array, is
++			conseidered filter match.
++
++			This process will start creating Device objects as new
++			devices matching criteria are discovered. It will also
++			emit PropertiesChanged signal for already existing
++			Device objects, with updated RSSI value.
++
++			Possible errors: org.bluez.Error.NotReady
++					 org.bluez.Error.Failed
++
+ 		void StopDiscovery()
  
-@@ -1045,9 +1048,6 @@ static void cnum_cb(struct hfp_context *context, void *user_data)
- 	if (!hfp_context_get_number(context, &service))
- 		return;
- 
--	ev->name_len = strlen(number) + 1;
--	memcpy(ev->name, number, ev->name_len);
--
- 	switch (service) {
- 	case 4:
- 		ev->type = HAL_HF_CLIENT_SUBSCR_TYPE_VOICE;
-@@ -1069,7 +1069,6 @@ static void cops_cb(struct hfp_context *context, void *user_data)
- {
- 	uint8_t buf[IPC_MTU];
- 	struct hal_ev_hf_client_operator_name *ev = (void *) buf;
--	char name[17];
- 	unsigned int format;
- 
- 	DBG("");
-@@ -1083,13 +1082,13 @@ static void cops_cb(struct hfp_context *context, void *user_data)
- 	if (format != 0)
- 		info("hf-client: Not correct string format in +COSP");
- 
--	if (!hfp_context_get_string(context, name, sizeof(name))) {
-+	if (!hfp_context_get_string(context, (char *) &ev->name[0],
-+						MAX_OPERATOR_NAME_LEN)) {
- 		error("hf-client: incorrect COPS response");
- 		return;
- 	}
- 
--	ev->name_len = strlen(name) + 1;
--	memcpy(ev->name, name, ev->name_len);
-+	ev->name_len = strlen((char *) &ev->name[0]) + 1;
- 
- 	ipc_send_notif(hal_ipc, HAL_SERVICE_ID_HANDSFREE_CLIENT,
- 					HAL_EV_HF_CLIENT_OPERATOR_NAME,
+ 			This method will cancel any previous StartDiscovery
 -- 
-1.8.4
+2.2.0.rc0.207.ga3a616c
 
