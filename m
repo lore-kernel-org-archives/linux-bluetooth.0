@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 10/12] unit/test-mgmt: Add /mgmt/unregister/2 test
-Date: Mon,  8 Dec 2014 18:05:14 +0200
-Message-Id: <1418054716-24231-11-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 08/12] unit/test-mgmt: Add /mgmt/event/2 test
+Date: Mon,  8 Dec 2014 18:05:12 +0200
+Message-Id: <1418054716-24231-9-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1418054716-24231-1-git-send-email-luiz.dentz@gmail.com>
 References: <1418054716-24231-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,36 +11,36 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This tests if mgmt_unregister_index can be called within event callback.
+This tests if multiple events can be received.
 ---
- unit/test-mgmt.c | 28 ++++++++++++++++++++++++++++
- 1 file changed, 28 insertions(+)
+ unit/test-mgmt.c | 20 ++++++++++++++++++++
+ 1 file changed, 20 insertions(+)
 
 diff --git a/unit/test-mgmt.c b/unit/test-mgmt.c
-index 8dcaa4b..8cd5565 100644
+index a610d1a..331ee42 100644
 --- a/unit/test-mgmt.c
 +++ b/unit/test-mgmt.c
-@@ -376,6 +376,32 @@ static void test_unregister_all(gconstpointer data)
+@@ -314,6 +314,9 @@ static void event_cb(uint16_t index, uint16_t length, const void *param,
+ {
+ 	struct context *context = user_data;
+ 
++	if (g_test_verbose())
++		printf("Event received\n");
++
+ 	context_quit(context);
+ }
+ 
+@@ -331,6 +334,22 @@ static void test_event(gconstpointer data)
  	execute_context(context);
  }
  
-+static void unregister_index_cb(uint16_t index, uint16_t length,
-+					const void *param, void *user_data)
-+{
-+	struct context *context = user_data;
-+
-+	mgmt_unregister_index(context->mgmt_client, index);
-+
-+	context_quit(context);
-+}
-+
-+static void test_unregister_index(gconstpointer data)
++static void test_event2(gconstpointer data)
 +{
 +	const struct command_test_data *test = data;
 +	struct context *context = create_context();
 +
 +	mgmt_register(context->mgmt_client, test->opcode, test->index,
-+					unregister_index_cb, context, NULL);
++						event_cb, context, NULL);
 +	mgmt_register(context->mgmt_client, test->opcode, test->index,
 +						event_cb, context, NULL);
 +
@@ -53,12 +53,11 @@ index 8dcaa4b..8cd5565 100644
  int main(int argc, char *argv[])
  {
  	g_test_init(&argc, &argv, NULL);
-@@ -393,6 +419,8 @@ int main(int argc, char *argv[])
+@@ -344,6 +363,7 @@ int main(int argc, char *argv[])
+ 								test_response);
  
- 	g_test_add_data_func("/mgmt/unregister/1", &event_test_1,
- 							test_unregister_all);
-+	g_test_add_data_func("/mgmt/unregister/2", &event_test_1,
-+							test_unregister_index);
+ 	g_test_add_data_func("/mgmt/event/1", &event_test_1, test_event);
++	g_test_add_data_func("/mgmt/event/2", &event_test_1, test_event2);
  
  	return g_test_run();
  }
