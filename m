@@ -1,115 +1,148 @@
 Return-Path: <cyrus@holtmann.org>
 From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 3/5] android/tester: remove not needed include of hal_msg.h
-Date: Mon,  8 Dec 2014 11:35:06 +0100
-Message-Id: <1418034908-1742-3-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+Subject: [PATCH 4/5] android/tester: move bthost.h include to tester-main.h
+Date: Mon,  8 Dec 2014 11:35:07 +0100
+Message-Id: <1418034908-1742-4-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 In-Reply-To: <1418034908-1742-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 References: <1418034908-1742-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-We shouldn't include header for one define. All test cases use internal
-defines for commands as adopted.
+bthost.h is used by all testers.
 ---
- android/tester-gatt.c | 17 ++++++++---------
- android/tester-main.c |  7 +++++--
- android/tester-main.h |  1 +
- 3 files changed, 14 insertions(+), 11 deletions(-)
+ android/tester-a2dp.c      | 1 -
+ android/tester-avrcp.c     | 1 -
+ android/tester-bluetooth.c | 1 -
+ android/tester-gatt.c      | 1 -
+ android/tester-hdp.c       | 1 -
+ android/tester-hidhost.c   | 1 -
+ android/tester-main.c      | 1 -
+ android/tester-main.h      | 1 +
+ android/tester-pan.c       | 1 -
+ android/tester-socket.c    | 1 -
+ 10 files changed, 1 insertion(+), 9 deletions(-)
 
+diff --git a/android/tester-a2dp.c b/android/tester-a2dp.c
+index 837477e..a2e7325 100644
+--- a/android/tester-a2dp.c
++++ b/android/tester-a2dp.c
+@@ -17,7 +17,6 @@
+ 
+ #include <stdbool.h>
+ 
+-#include "emulator/bthost.h"
+ #include "src/shared/util.h"
+ 
+ #include "tester-main.h"
+diff --git a/android/tester-avrcp.c b/android/tester-avrcp.c
+index 41a5fd3..3bda390 100644
+--- a/android/tester-avrcp.c
++++ b/android/tester-avrcp.c
+@@ -17,7 +17,6 @@
+ 
+ #include <stdbool.h>
+ 
+-#include "emulator/bthost.h"
+ #include "src/shared/util.h"
+ 
+ #include "tester-main.h"
+diff --git a/android/tester-bluetooth.c b/android/tester-bluetooth.c
+index 2be824d..6586a54 100644
+--- a/android/tester-bluetooth.c
++++ b/android/tester-bluetooth.c
+@@ -16,7 +16,6 @@
+  */
+ #include <stdbool.h>
+ 
+-#include "emulator/bthost.h"
+ #include "tester-main.h"
+ 
+ static struct queue *list; /* List of bluetooth test cases */
 diff --git a/android/tester-gatt.c b/android/tester-gatt.c
-index e750cb3..de2a7a7 100644
+index de2a7a7..d8021d7 100644
 --- a/android/tester-gatt.c
 +++ b/android/tester-gatt.c
-@@ -19,7 +19,6 @@
+@@ -17,7 +17,6 @@
  
- #include "emulator/bthost.h"
+ #include <stdbool.h>
+ 
+-#include "emulator/bthost.h"
  #include "tester-main.h"
--#include "hal-msg.h"
  #include "src/shared/util.h"
  
- #define ATT_HANDLE_SIZE	2
-@@ -48,6 +47,8 @@
+diff --git a/android/tester-hdp.c b/android/tester-hdp.c
+index ab7666d..195171d 100644
+--- a/android/tester-hdp.c
++++ b/android/tester-hdp.c
+@@ -17,7 +17,6 @@
  
- #define TRANS1_ID	1
+ #include <stdbool.h>
  
-+#define BT_TRANSPORT_UNKNOWN		0x00
-+
- #define GATT_SERVER_TRANSPORT_LE		0x01
- #define GATT_SERVER_TRANSPORT_BREDR		0x02
- #define GATT_SERVER_TRANSPORT_LE_BREDR		(0x01 | 0x02)
-@@ -1172,10 +1173,9 @@ static void gatt_client_connect_action(void)
- 	struct step *step = g_new0(struct step, 1);
+-#include "emulator/bthost.h"
+ #include "tester-main.h"
+ #include "android/utils.h"
  
- 	step->action_status = data->if_gatt->client->connect(
--							conn_data->app_id,
--							&emu_remote_bdaddr_val,
--							0,
--							BT_TRANSPORT_UNKNOWN);
-+						conn_data->app_id,
-+						&emu_remote_bdaddr_val, 0,
-+						BT_TRANSPORT_UNKNOWN);
+diff --git a/android/tester-hidhost.c b/android/tester-hidhost.c
+index 95befd9..6214b4f 100644
+--- a/android/tester-hidhost.c
++++ b/android/tester-hidhost.c
+@@ -17,7 +17,6 @@
  
- 	schedule_action_verification(step);
- }
-@@ -1405,10 +1405,9 @@ static void gatt_server_connect_action(void)
- 	struct step *step = g_new0(struct step, 1);
+ #include <stdbool.h>
  
- 	step->action_status = data->if_gatt->server->connect(
--							conn_data->app_id,
--							&emu_remote_bdaddr_val,
--							0,
--							BT_TRANSPORT_UNKNOWN);
-+						conn_data->app_id,
-+						&emu_remote_bdaddr_val, 0,
-+						BT_TRANSPORT_UNKNOWN);
+-#include "emulator/bthost.h"
+ #include "tester-main.h"
  
- 	schedule_action_verification(step);
- }
+ #include "android/utils.h"
 diff --git a/android/tester-main.c b/android/tester-main.c
-index 429838d..6339b3a 100644
+index 6339b3a..06730d2 100644
 --- a/android/tester-main.c
 +++ b/android/tester-main.c
-@@ -19,7 +19,6 @@
+@@ -17,7 +17,6 @@
+ #include <stdbool.h>
+ 
  #include "src/shared/util.h"
- #include "emulator/bthost.h"
+-#include "emulator/bthost.h"
  #include "tester-main.h"
--#include "hal-msg.h"
  
  #include "monitor/bt.h"
- 
-@@ -30,6 +29,8 @@ static gint scheduled_cbacks_num;
- #define EMULATOR_SIGNAL_TIMEOUT 2 /* in seconds */
- #define EMULATOR_SIGNAL "emulator_started"
- 
-+#define BT_TRANSPORT_UNKNOWN	0x00
-+
- static struct {
- 	uint16_t cb_num;
- 	const char *str;
-@@ -2916,7 +2917,9 @@ void bt_create_bond_action(void)
- 
- 	step->action_status =
- 			data->if_bluetooth->create_bond(action_data->addr,
--							BT_TRANSPORT_UNKNOWN);
-+						action_data->transport_type ?
-+						action_data->transport_type :
-+						BT_TRANSPORT_UNKNOWN);
- 
- 	schedule_action_verification(step);
- }
 diff --git a/android/tester-main.h b/android/tester-main.h
-index 4407514..474afbb 100644
+index 474afbb..ae65d72 100644
 --- a/android/tester-main.h
 +++ b/android/tester-main.h
-@@ -606,6 +606,7 @@ struct bt_action_data {
+@@ -41,6 +41,7 @@
+ #include "src/shared/mgmt.h"
+ #include "src/shared/queue.h"
+ #include "emulator/hciemu.h"
++#include "emulator/bthost.h"
  
- 	/*Connection params*/
- 	const uint8_t bearer_type;
-+	const uint8_t transport_type;
- };
+ #include <hardware/hardware.h>
+ #include <hardware/audio.h>
+diff --git a/android/tester-pan.c b/android/tester-pan.c
+index aff1980..1d07b22 100644
+--- a/android/tester-pan.c
++++ b/android/tester-pan.c
+@@ -17,7 +17,6 @@
  
- /* bthost's l2cap server setup parameters */
+ #include <stdbool.h>
+ 
+-#include "emulator/bthost.h"
+ #include "tester-main.h"
+ #include "android/utils.h"
+ 
+diff --git a/android/tester-socket.c b/android/tester-socket.c
+index c70d753..bd0260c 100644
+--- a/android/tester-socket.c
++++ b/android/tester-socket.c
+@@ -18,7 +18,6 @@
+ #include <fcntl.h>
+ #include <stdbool.h>
+ 
+-#include "emulator/bthost.h"
+ #include "tester-main.h"
+ 
+ static struct queue *list; /* List of socket test cases */
 -- 
 1.9.3
 
