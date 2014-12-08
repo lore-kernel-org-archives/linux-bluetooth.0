@@ -2,72 +2,33 @@ Return-Path: <cyrus@holtmann.org>
 From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
-Subject: [PATCH 1/5] android/gatt: Fix write confirm callback being not set
-Date: Mon,  8 Dec 2014 09:22:36 +0100
-Message-Id: <1418026960-21104-1-git-send-email-jakub.tyszkowski@tieto.com>
+Subject: [PATCH 2/5] android/gatt: Fix not confirming write commands in database
+Date: Mon,  8 Dec 2014 09:22:37 +0100
+Message-Id: <1418026960-21104-2-git-send-email-jakub.tyszkowski@tieto.com>
+In-Reply-To: <1418026960-21104-1-git-send-email-jakub.tyszkowski@tieto.com>
+References: <1418026960-21104-1-git-send-email-jakub.tyszkowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Currently this callback is required or previously registered write
-callback function wont be called.
+App will never confirm write command as commands dont need one but we
+still need to confirm in databasse. We confirm immediately.
 ---
- android/gatt.c | 22 +++++++++++-----------
- 1 file changed, 11 insertions(+), 11 deletions(-)
+ android/gatt.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
 diff --git a/android/gatt.c b/android/gatt.c
-index 7d1115e..4ad0ce9 100644
+index 4ad0ce9..cb87810 100644
 --- a/android/gatt.c
 +++ b/android/gatt.c
-@@ -6178,6 +6178,15 @@ static uint8_t find_by_type_request(const uint8_t *cmd, uint16_t cmd_len,
- 	return 0;
- }
+@@ -4904,6 +4904,8 @@ static void write_cb(struct gatt_db_attribute *attrib, unsigned int id,
  
-+static void write_confirm(struct gatt_db_attribute *attrib,
-+						int err, void *user_data)
-+{
-+	if (!err)
-+		return;
-+
-+	error("Error writting attribute %p", attrib);
-+}
-+
- static void write_cmd_request(const uint8_t *cmd, uint16_t cmd_len,
- 						struct gatt_device *dev)
- {
-@@ -6206,7 +6215,7 @@ static void write_cmd_request(const uint8_t *cmd, uint16_t cmd_len,
- 		return;
+ 	if (opcode == ATT_OP_WRITE_REQ || opcode == ATT_OP_PREP_WRITE_REQ)
+ 		ev->need_rsp = 0x01;
++	else
++		gatt_db_attribute_write_result(attrib, id, 0);
  
- 	gatt_db_attribute_write(attrib, 0, value, vlen, cmd[0], &dev->bdaddr,
--								NULL, NULL);
-+							write_confirm, NULL);
- }
- 
- static void write_signed_cmd_request(const uint8_t *cmd, uint16_t cmd_len,
-@@ -6278,7 +6287,7 @@ static void write_signed_cmd_request(const uint8_t *cmd, uint16_t cmd_len,
- 		/* Signature OK, proceed with write */
- 		bt_update_sign_counter(&dev->bdaddr, REMOTE_CSRK, r_sign_cnt);
- 		gatt_db_attribute_write(attrib, 0, value, vlen, cmd[0],
--						&dev->bdaddr, NULL, NULL);
-+					&dev->bdaddr, write_confirm, NULL);
- 	}
- }
- 
-@@ -6640,15 +6649,6 @@ static void device_name_read_cb(struct gatt_db_attribute *attrib,
- 								strlen(name));
- }
- 
--static void write_confirm(struct gatt_db_attribute *attrib,
--						int err, void *user_data)
--{
--	if (!err)
--		return;
--
--	error("Error writting attribute %p", attrib);
--}
--
- static void register_gap_service(void)
- {
- 	uint16_t start, end;
+ 	ev->length = len;
+ 	memcpy(ev->value, value, len);
 -- 
 1.9.1
 
