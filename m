@@ -1,83 +1,124 @@
 Return-Path: <cyrus@holtmann.org>
-From: Alexander Aring <alex.aring@gmail.com>
+From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: linux-wpan@vger.kernel.org,
-	kernel@pengutronix.de,
-	Alexander Aring <alex.aring@gmail.com>,
-	Jukka Rissanen <jukka.rissanen@linux.intel.com>,
-	Martin Townsend <mtownsend1973@gmail.com>,
-	Marcel Holtmann <marcel@holtmann.org>
-Subject: [PATCHv3 bluetooth-next 0/3] 6lowpan: introduce nhc framework
-Date: Mon,  8 Dec 2014 16:50:35 +0100
-Message-Id: <1418053838-8692-1-git-send-email-alex.aring@gmail.com>
+Cc: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+Subject: [PATCH v2] android/bluetooth: Add support to read Le features by Android
+Date: Mon,  8 Dec 2014 16:29:39 +0100
+Message-Id: <1418052579-21759-1-git-send-email-lukasz.rymanowski@tieto.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch series introduce the next header compression framework. Currently
-we support udp compression/uncompression only. This framework allow to add new
-next header compression formats easily.
+---
+ android/bluetooth.c | 48 ++++++++++++++++++++++++++++++++++++++++++++++++
+ android/hal-msg.h   |  1 +
+ 2 files changed, 49 insertions(+)
 
-If somebody wants to add a new header compression format and some information
-are missing while calling compression and uncompression callbacks. Please
-feel free to make framework changes according these callbacks.
-
-changes since v2:
- - make udp nhc as module as suggested by Marcel Holtmann
- - fix comment header in nhc_udp.c
-
-I didn't make the lowpan_nhc declaration "const" because this will occur
-issues with rb_node, id and idmask array. Which will manipulated during
-runtime.
-
-changes since v3:
- - add patch 3/3 for other known rfc6282 ipv6 extension headers compression
-   formats
- - add request_modules for loading nhc default compression format modules.
-   Which was suggested by Jukka Rissanen. Thanks, this is really working.
- - Add rtnl_lock for lowpan_nhc_add and del since we have no synced
-   request_modules call this could make trouble.
- - Move some handling out of nhc_do_compression and uncompression function.
-   The complete handling is now inside of iphc.c and nhc_do_compression and
-   uncompression functions is only a wrapper call for the callback.
- - rework some menuentries for Kconfig and compression format, they are
-   grouped by rfc now.
- - move some generic handling like "skb_pull(skb, nhc->nexthdrlen);" into
-   iphc.c. It would be great if we have something also for uncompression
-   for the skb_cow. But this isn't possible right now.
- - change warning if nhc was not found to "was not found" instead isn't
-   implemented. It isn't implemented if callbacks are NULL now.
- - small cleanups.
-
-Cc: Jukka Rissanen <jukka.rissanen@linux.intel.com>
-Cc: Martin Townsend <mtownsend1973@gmail.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>
-
-Alexander Aring (3):
-  6lowpan: add generic nhc layer interface
-  6lowpan: add udp compression via nhc layer
-  6lowpan: nhc: add other known rfc6282 compressions
-
- net/6lowpan/Kconfig             |  60 ++++++++++-
- net/6lowpan/Makefile            |  13 ++-
- net/6lowpan/iphc.c              | 223 +++++++++++-----------------------------
- net/6lowpan/nhc.c               | 140 +++++++++++++++++++++++++
- net/6lowpan/nhc.h               | 142 +++++++++++++++++++++++++
- net/6lowpan/nhc_rfc6282_dest.c  |  27 +++++
- net/6lowpan/nhc_rfc6282_frag.c  |  26 +++++
- net/6lowpan/nhc_rfc6282_hop.c   |  26 +++++
- net/6lowpan/nhc_rfc6282_ipv6.c  |  26 +++++
- net/6lowpan/nhc_rfc6282_mobil.c |  26 +++++
- net/6lowpan/nhc_rfc6282_route.c |  26 +++++
- net/6lowpan/nhc_rfc6282_udp.c   | 156 ++++++++++++++++++++++++++++
- 12 files changed, 724 insertions(+), 167 deletions(-)
- create mode 100644 net/6lowpan/nhc.c
- create mode 100644 net/6lowpan/nhc.h
- create mode 100644 net/6lowpan/nhc_rfc6282_dest.c
- create mode 100644 net/6lowpan/nhc_rfc6282_frag.c
- create mode 100644 net/6lowpan/nhc_rfc6282_hop.c
- create mode 100644 net/6lowpan/nhc_rfc6282_ipv6.c
- create mode 100644 net/6lowpan/nhc_rfc6282_mobil.c
- create mode 100644 net/6lowpan/nhc_rfc6282_route.c
- create mode 100644 net/6lowpan/nhc_rfc6282_udp.c
-
+diff --git a/android/bluetooth.c b/android/bluetooth.c
+index f79ca37..b40332b 100644
+--- a/android/bluetooth.c
++++ b/android/bluetooth.c
+@@ -176,6 +176,13 @@ static struct {
+ 
+ 	char *name;
+ 
++	uint8_t max_advert_instance;
++	uint8_t rpa_offload_supported;
++	uint8_t max_irk_list_size;
++	uint8_t max_scan_filters_supported;
++	uint16_t scan_result_storage_size;
++	uint8_t activity_energy_info_supported;
++
+ 	uint32_t current_settings;
+ 	uint32_t supported_settings;
+ 
+@@ -189,6 +196,12 @@ static struct {
+ 	.index = MGMT_INDEX_NONE,
+ 	.dev_class = 0,
+ 	.name = NULL,
++	.max_advert_instance = 0,
++	.rpa_offload_supported = 0,
++	.max_irk_list_size = 0,
++	.max_scan_filters_supported = 0,
++	.scan_result_storage_size = 0,
++	.activity_energy_info_supported = 0,
+ 	.current_settings = 0,
+ 	.supported_settings = 0,
+ 	.cur_discovery_type = SCAN_TYPE_NONE,
+@@ -3784,6 +3797,31 @@ static uint8_t get_adapter_discoverable_timeout(void)
+ 	return HAL_STATUS_SUCCESS;
+ }
+ 
++static void prepare_le_features(uint8_t *le_features)
++{
++	le_features[0] = adapter.current_settings & MGMT_SETTING_PRIVACY;
++	le_features[1] = adapter.max_advert_instance;
++	le_features[2] = adapter.rpa_offload_supported;
++	le_features[3] = adapter.max_irk_list_size;
++	le_features[4] = adapter.max_scan_filters_supported;
++	/* lo byte */
++	le_features[5] = adapter.scan_result_storage_size;
++	/* hi byte */
++	le_features[6] = adapter.scan_result_storage_size >> 8;
++	le_features[7] = adapter.activity_energy_info_supported;
++}
++
++static uint8_t get_adapter_le_features(void)
++{
++	uint8_t le_features[8];
++
++	prepare_le_features(le_features);
++
++	send_adapter_property(HAL_PROP_ADAPTER_LOCAL_LE_FEAT,
++					sizeof(le_features), le_features);
++	return HAL_STATUS_SUCCESS;
++}
++
+ static void handle_get_adapter_prop_cmd(const void *buf, uint16_t len)
+ {
+ 	const struct hal_cmd_get_adapter_prop *cmd = buf;
+@@ -3817,6 +3855,9 @@ static void handle_get_adapter_prop_cmd(const void *buf, uint16_t len)
+ 	case HAL_PROP_ADAPTER_DISC_TIMEOUT:
+ 		status = get_adapter_discoverable_timeout();
+ 		break;
++	case HAL_PROP_ADAPTER_LOCAL_LE_FEAT:
++		status = get_adapter_le_features();
++		break;
+ 	default:
+ 		status = HAL_STATUS_FAILED;
+ 		break;
+@@ -3837,6 +3878,7 @@ static void get_adapter_properties(void)
+ 	uint8_t bonded[g_slist_length(bonded_devices) * sizeof(bdaddr_t)];
+ 	uint128_t uuids[g_slist_length(adapter.uuids)];
+ 	uint8_t android_bdaddr[6];
++	uint8_t le_features[8];
+ 	uint8_t type, mode;
+ 	size_t size, i;
+ 	GSList *l;
+@@ -3898,6 +3940,12 @@ static void get_adapter_properties(void)
+ 									uuids);
+ 	ev->num_props++;
+ 
++	prepare_le_features(le_features);
++	size += fill_hal_prop(buf + size, HAL_PROP_ADAPTER_LOCAL_LE_FEAT,
++					sizeof(le_features), le_features);
++
++	ev->num_props++;
++
+ 	ipc_send_notif(hal_ipc, HAL_SERVICE_ID_BLUETOOTH,
+ 				HAL_EV_ADAPTER_PROPS_CHANGED, size, buf);
+ }
+diff --git a/android/hal-msg.h b/android/hal-msg.h
+index e0be314..9d38a9f 100644
+--- a/android/hal-msg.h
++++ b/android/hal-msg.h
+@@ -142,6 +142,7 @@ struct hal_prop_device_info {
+ 	uint16_t manufacturer;
+ } __attribute__((packed));
+ 
++#define HAL_PROP_ADAPTER_LOCAL_LE_FEAT		0x0d
+ #define HAL_PROP_DEVICE_TIMESTAMP		0xFF
+ 
+ #define HAL_ADAPTER_SCAN_MODE_NONE		0x00
 -- 
-2.1.3
+1.8.4
+
