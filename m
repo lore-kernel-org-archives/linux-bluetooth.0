@@ -1,291 +1,105 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: Mariusz Skamra <mariusz.skamra@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/1] android/pts: GATT PTS test results for Android 5.0
-Date: Mon, 08 Dec 2014 14:08:18 +0100
-Message-ID: <1582543.mGA6bymQrB@leonov>
-In-Reply-To: <1417793185-17030-1-git-send-email-mariusz.skamra@tieto.com>
-References: <1417793185-17030-1-git-send-email-mariusz.skamra@tieto.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+In-Reply-To: <54857AB3.4090309@tieto.com>
+References: <1418026960-21104-1-git-send-email-jakub.tyszkowski@tieto.com>
+	<1418026960-21104-3-git-send-email-jakub.tyszkowski@tieto.com>
+	<CABBYNZKn6uTjSZzPkWkLoy5Qqwtxiyaa2L5bz67RJMCabmYYRw@mail.gmail.com>
+	<CABBYNZKUXThYFoYqCnJUJSpsp4J-Gs0_sdvM1-vHkpOpHXnBdQ@mail.gmail.com>
+	<54856FE3.7030808@tieto.com>
+	<54857AB3.4090309@tieto.com>
+Date: Mon, 8 Dec 2014 13:02:59 +0200
+Message-ID: <CABBYNZKTkkN=EsfY3YYM7bGppXp10uYmURT62x-qQtBnYcDHXQ@mail.gmail.com>
+Subject: Re: [PATCH 3/5] android/gatt: Fix write commands being not handled
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Tyszkowski Jakub <jakub.tyszkowski@tieto.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Mariusz,
+Hi Jakub,
 
-On Friday 05 of December 2014 16:26:25 Mariusz Skamra wrote:
-> ---
->  android/pts-gatt.txt | 66
-> ++++++++++++++++++++++++++-------------------------- 1 file changed, 33
-> insertions(+), 33 deletions(-)
-> 
-> diff --git a/android/pts-gatt.txt b/android/pts-gatt.txt
-> index ea6a014..167a6dc 100644
-> --- a/android/pts-gatt.txt
-> +++ b/android/pts-gatt.txt
-> @@ -1,8 +1,8 @@
->  PTS test results for GATT
-> 
->  PTS version: 5.3
-> -Tested: 16-October-2014
-> -Android version: 4.4.4
-> +Tested: 05-December-2014
-> +Android version: 5.0
-> 
->  Results:
->  PASS	test passed
-> @@ -729,12 +729,12 @@ TC_GAW_CL_BI_36_C	PASS	haltest:
->  				gattc get_descriptor
->  				gattc write_descriptor 2 <long_value>
->  				gattc disconnect
-> -TC_GAW_SR_BV_01_C	PASS	haltest:
-> +TC_GAW_SR_BV_01_C	FAIL	haltest:
->  				gatts add_service
->  				gatts add_characteristic:
->  						<properties> 4 <permissions> 17
->  				gatts start_service
-> -TC_GAW_SR_BV_02_C	PASS	haltest:
-> +TC_GAW_SR_BV_02_C	FAIL	haltest:
->  				gatts add service
->  				gatts add_characteristics:
->  					<properties> 66 <permisions> 145
-> @@ -743,7 +743,7 @@ TC_GAW_SR_BV_02_C	PASS	haltest:
->  				gatts send_response: (twice)
->  				NOTE: gatts_request_write_cb shall be called
->  								 (verify it)
-> -TC_GAW_SR_BI_01_C	PASS	haltest:
-> +TC_GAW_SR_BI_01_C	FAIL	haltest:
->  				gatts add_service
->  				gatts add_characteristic:
->  						<properties> 68
-> @@ -783,7 +783,7 @@ TC_GAW_SR_BI_06_C	PASS	haltest:
->  						<properties> 10 <permissions> 17
->  				gatts start_service
->  				gatts send_response: <status> 12
-> -TC_GAW_SR_BV_05_C	PASS	haltest:
-> +TC_GAW_SR_BV_05_C	FAIL	haltest:
->  				gatts add_service
->  				gatts add_characteristic:
->  						<properties> 10 <permissions> 17
-> @@ -793,18 +793,18 @@ TC_GAW_SR_BV_05_C	PASS	haltest:
->  						repeat with correct offset
->  				gatts send_response:
->  						repeat with correct value
-> -TC_GAW_SR_BI_07_C	PASS	haltest:
-> +TC_GAW_SR_BI_07_C	FAIL	haltest:
->  				gatts add_service
->  				gatts add_characteristic:
->  						<properties> 10 <permissions> 17
->  				gatts start_service
->  				gatts send_response
-> -TC_GAW_SR_BI_08_C	PASS	haltest:
-> +TC_GAW_SR_BI_08_C	FAIL	haltest:
->  				gatts add_service
->  				gatts add_characteristic:
->  						<properties> 2 <permissions> 1
->  				gatts start_service
-> -TC_GAW_SR_BI_09_C	PASS	haltest:
-> +TC_GAW_SR_BI_09_C	FAIL	haltest:
->  				gatts add_service
->  				gatts add_characteristic:
->  						<properties> 10 <permissions> 17
-> @@ -813,7 +813,7 @@ TC_GAW_SR_BI_09_C	PASS	haltest:
->  						<data> value greater than MTU
->  						repeat with correct offset
->  				gatts send_response: <status> 7
-> -TC_GAW_SR_BI_11_C	PASS	haltest:
-> +TC_GAW_SR_BI_11_C	FAIL	haltest:
->  				gatts add_service
->  				gatts add_characteristic:
->  						<properties> 10 <permissions> 17
-> @@ -822,7 +822,7 @@ TC_GAW_SR_BI_11_C	PASS	haltest:
->  						<data> value greater than MTU
->  						repeat with correct offset
->  				gatts send_response: <status> 8
-> -TC_GAW_SR_BI_12_C	PASS	haltest:
-> +TC_GAW_SR_BI_12_C	FAIL	haltest:
->  				gatts add_service
->  				gatts add_characteristic:
->  						<properties> 10 <permissions> 17
-> @@ -831,7 +831,7 @@ TC_GAW_SR_BI_12_C	PASS	haltest:
->  						<data> value greater than MTU
->  						repeat with correct offset
->  				gatts send_response: <status> 5
-> -TC_GAW_SR_BI_13_C	PASS	haltest:
-> +TC_GAW_SR_BI_13_C	FAIL	haltest:
->  				gatts add_service
->  				gatts add_characteristic:
->  						<properties> 10 <permissions> 17
-> @@ -840,14 +840,14 @@ TC_GAW_SR_BI_13_C	PASS	haltest:
->  						<data> value greater than MTU
->  						repeat with correct offset
->  				gatts send_response: <status> 12
-> -TC_GAW_SR_BV_06_C	PASS	haltest:
-> +TC_GAW_SR_BV_06_C	FAIL	haltest:
->  				gatts add_service
->  				gatts add_characteristic:
->  						<properties> 10 <permissions> 17
->  				gatts start_service
->  				gatts send_response:
->  						repeat with correct value
-> -TC_GAW_SR_BV_10_C	PASS	haltest:
-> +TC_GAW_SR_BV_10_C	FAIL	haltest:
->  				gatts add_service
->  				gatts add_characteristic:
->  						<properties> 10 <permissions> 17
-> @@ -857,37 +857,37 @@ TC_GAW_SR_BV_10_C	PASS	haltest:
->  						repeat with correct offset
->  				gatts send_response:
->  						repeat with correct value
-> -TC_GAW_SR_BI_14_C	PASS	haltest:
-> +TC_GAW_SR_BI_14_C	FAIL	haltest:
->  				gatts add_service
->  				gatts add_characteristic:
->  						<properties> 10 <permissions> 17
->  				gatts start_service
->  				gatts send_response: <status> 1
-> -TC_GAW_SR_BI_15_C	PASS	haltest:
-> +TC_GAW_SR_BI_15_C	FAIL	haltest:
->  				gatts add_service
->  				gatts add_characteristic:
->  						<properties> 10 <permissions> 17
->  				gatts start_service
->  				gatts send_response: <status> 3
-> -TC_GAW_SR_BI_17_C	PASS	haltest:
-> +TC_GAW_SR_BI_17_C	FAIL	haltest:
->  				gatts add_service
->  				gatts add_characteristic:
->  						<properties> 10 <permissions> 17
->  				gatts start_service
->  				gatts send_response: <status> 8
-> -TC_GAW_SR_BI_18_C	PASS	haltest:
-> +TC_GAW_SR_BI_18_C	FAIL	haltest:
->  				gatts add_service
->  				gatts add_characteristic:
->  						<properties> 10 <permissions> 17
->  				gatts start_service
->  				gatts send_response: <status> 5
-> -TC_GAW_SR_BI_19_C	PASS	haltest:
-> +TC_GAW_SR_BI_19_C	FAIL	haltest:
->  				gatts add_service
->  				gatts add_characteristic:
->  						<properties> 10 <permissions> 17
->  				gatts start_service
->  				gatts send_response: <status> 12
-> -TC_GAW_SR_BV_07_C	PASS	haltest:
-> +TC_GAW_SR_BV_07_C	FAIL	haltest:
->  				gatts add_service
->  				gatts add_characteristic:
->  						<properties> 10 <permissions> 17
-> @@ -936,7 +936,7 @@ TC_GAW_SR_BI_24_C	PASS	haltest:
->  				gatts add_descriptor: <permmisions> 17
->  				gatts start_service
->  				gatts send_response: <status> 12
-> -TC_GAW_SR_BV_09_C	PASS	haltest:
-> +TC_GAW_SR_BV_09_C	FAIL	haltest:
->  				gatts add_service
->  				gatts add_characteristic:
->  						<properties> 10 <permissions> 17
-> @@ -947,20 +947,20 @@ TC_GAW_SR_BV_09_C	PASS	haltest:
->  						repeat with correct offset
->  				gatts send_response:
->  						repeat with correct value
-> -TC_GAW_SR_BI_25_C	PASS	haltest:
-> +TC_GAW_SR_BI_25_C	FAIL	haltest:
->  				gatts add_service
->  				gatts add_characteristic:
->  						<properties> 10 <permissions> 17
->  				gatts add_descriptor: <permmisions> 17
->  				gatts start_service
->  				gatts send_response: <status> 1
-> -TC_GAW_SR_BI_26_C	PASS	haltest:
-> +TC_GAW_SR_BI_26_C	FAIL	haltest:
->  				gatts add_service
->  				gatts add_characteristic:
->  						<properties> 10 <permissions> 17
->  				gatts add_descriptor: <permmisions> 1
->  				gatts start_service
-> -TC_GAW_SR_BI_27_C	PASS	haltest:
-> +TC_GAW_SR_BI_27_C	FAIL	haltest:
->  				gatts add_service
->  				gatts add_characteristic:
->  						<properties> 10 <permissions> 17
-> @@ -970,35 +970,35 @@ TC_GAW_SR_BI_27_C	PASS	haltest:
->  						<data> value greater than MTU
->  						repeat with correct offset
->  				gatts send_response: <status> 7
-> -TC_GAW_SR_BI_29_C	PASS	haltest:
-> +TC_GAW_SR_BI_29_C	FAIL	haltest:
->  				gatts add_service
->  				gatts add_characteristic:
->  						<properties> 10 <permissions> 17
->  				gatts add_descriptor: <permmisions> 17
->  				gatts start_service
->  				gatts send_response: <status> 8
-> -TC_GAW_SR_BI_30_C	PASS	haltest:
-> +TC_GAW_SR_BI_30_C	FAIL	haltest:
->  				gatts add_service
->  				gatts add_characteristic:
->  						<properties> 10 <permissions> 17
->  				gatts add_descriptor: <permmisions> 17
->  				gatts start_service
->  				gatts send_response: <status> 5
-> -TC_GAW_SR_BI_31_C	PASS	haltest:
-> +TC_GAW_SR_BI_31_C	FAIL	haltest:
->  				gatts add_service
->  				gatts add_characteristic:
->  						<properties> 10 <permissions> 17
->  				gatts add_descriptor: <permmisions> 17
->  				gatts start_service
->  				gatts send_response: <status> 12
-> -TC_GAW_SR_BI_32_C	PASS	haltest:
-> +TC_GAW_SR_BI_32_C	FAIL	haltest:
->  				gatts add_service
->  				gatts add_characteristic:
->  						<properties> 10 <permissions> 17
->  				gatts start_service
->  				gatts send_response
->  				gatts send_response: <status> 13
-> -TC_GAW_SR_BI_33_C	PASS	haltest:
-> +TC_GAW_SR_BI_33_C	FAIL	haltest:
->  				gatts add_service
->  				gatts add_characteristic:
->  						<properties> 10 <permissions> 17
-> @@ -1007,7 +1007,7 @@ TC_GAW_SR_BI_33_C	PASS	haltest:
->  						<data> value greater than MTU
->  						repeat with correct offset
->  				gatts send_response: <status> 13
-> -TC_GAW_SR_BI_34_C	PASS	haltest:
-> +TC_GAW_SR_BI_34_C	FAIL	haltest:
->  				gatts add_service
->  				gatts add_characteristic:
->  						<properties> 10 <permissions> 17
-> @@ -1015,7 +1015,7 @@ TC_GAW_SR_BI_34_C	PASS	haltest:
->  				gatts start_service
->  				gatts send_response
->  				gatts send_response: <status> 13
-> -TC_GAW_SR_BI_35_C	PASS	haltest:
-> +TC_GAW_SR_BI_35_C	FAIL	haltest:
->  				gatts add_service
->  				gatts add_characteristic:
->  						<properties> 10 <permissions> 17
-> @@ -1060,10 +1060,10 @@ TC_GAI_SR_BV_01_C	PASS	haltest:
->  				gatts start_service
->  				gatts add_service
->  				gatts start_service
-> -TC_GAS_CL_BV_01_C	PASS	haltest:
-> +TC_GAS_CL_BV_01_C	FAIL	haltest:
->  				gattc connect
->  				gattc disconnect
-> -TC_GAS_SR_BV_01_C	PASS	haltest:
-> +TC_GAS_SR_BV_01_C	FAIL	haltest:
->  				gatts add_service
->  				gatts add_chaaracteristic:
->  						<properties> 42 <permissions> 17
+On Mon, Dec 8, 2014 at 12:17 PM, Tyszkowski Jakub
+<jakub.tyszkowski@tieto.com> wrote:
+> Hi,
+>
+>
+> On 12/08/2014 10:31 AM, Tyszkowski Jakub wrote:
+>>
+>> Hi Luiz,
+>>
+>> On 12/08/2014 10:22 AM, Luiz Augusto von Dentz wrote:
+>>>
+>>> Hi Jakub,
+>>>
+>>> On Mon, Dec 8, 2014 at 10:55 AM, Luiz Augusto von Dentz
+>>> <luiz.dentz@gmail.com> wrote:
+>>>>
+>>>> Hi Jakub,
+>>>>
+>>>> On Mon, Dec 8, 2014 at 10:22 AM, Jakub Tyszkowski
+>>>> <jakub.tyszkowski@tieto.com> wrote:
+>>>>>
+>>>>> Registering for GATTRIB_ALL_REQS now means only requests and not
+>>>>> commands
+>>>>> or other type of att operations. Those needs their own handlers to be
+>>>>> registered.
+>>>>
+>>>>
+>>>> Is this something we break while with the internal changes to use
+>>>> bt_gatt* internally? Maybe we should have it fixed there instead since
+>>>> it perhaps breaks the core daemon as well. Going forward this code
+>>>> will transition to use bt_gatt* directly.
+>>>
+>>>
+>>> Looks like this code is to blame:
+>>>
+>>> opcode_match:
+>>>
+>>> if (opcode == BT_ATT_ALL_REQUESTS &&
+>>>     get_op_type(test_opcode) == ATT_OP_TYPE_REQ)
+>>> return true;
+>>>
+>>> Id say this turn BT_ATT_ALL_REQUESTS not that convenient for server
+>>> since, and looking at gatt-server.c you can clearly see how many
+>>> handlers we end up doing, perhaps we could something like this:
+>>>
+>>> diff --git a/src/shared/att.c b/src/shared/att.c
+>>> index bc01827..3b52607 100644
+>>> --- a/src/shared/att.c
+>>> +++ b/src/shared/att.c
+>>> @@ -661,7 +661,7 @@ struct notify_data {
+>>>   static bool opcode_match(uint8_t opcode, uint8_t test_opcode)
+>>>   {
+>>>          if (opcode == BT_ATT_ALL_REQUESTS &&
+>>> -                                   get_op_type(test_opcode) ==
+>>> ATT_OP_TYPE_REQ)
+>>> +                                   get_op_type(test_opcode) !=
+>>> ATT_OP_TYPE_RSP)
+>>>                  return true;
+>
+>
+> If we do that, we are still left with other stuff like indications or even
+> confirmations which would still be quite quirky for using *ALL_REQESTS in
+> name.
 
-Applied, thanks.
+Perhaps we check ATT_OP_TYPE_CMD in addition to ATT_OP_TYPE_REQ.
+
+>>>
+>>>          return opcode == test_opcode;
+>>>
+>> Yeap, that's the line. I assumed that this change was intended and we
+>> should make the daemon compatible with this new semantic.
+>> I've looked through the code where ALL_REQUESTS is used and I think
+>> there is no other place affected by this.
+>>
+>> Regards
+>
+>
+> Regards
+>
+
+
 
 -- 
-BR
-Szymon Janc
+Luiz Augusto von Dentz
