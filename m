@@ -1,75 +1,53 @@
 Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 01/13] doc/coding-style: Update 'enum as switch variable' section
-Date: Mon, 08 Dec 2014 14:25:43 +0100
-Message-ID: <3276600.cJOmr3QuCF@leonov>
-In-Reply-To: <1417541318-24259-1-git-send-email-szymon.janc@tieto.com>
-References: <1417541318-24259-1-git-send-email-szymon.janc@tieto.com>
+To: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH RESEND 2/2] android/handsfree-client: Trivial fix typo
+Date: Mon, 08 Dec 2014 14:18:12 +0100
+Message-ID: <2349425.bF4snaIfs3@leonov>
+In-Reply-To: <1418035656-17285-2-git-send-email-lukasz.rymanowski@tieto.com>
+References: <1418035656-17285-1-git-send-email-lukasz.rymanowski@tieto.com> <1418035656-17285-2-git-send-email-lukasz.rymanowski@tieto.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Tuesday 02 of December 2014 18:28:26 Szymon Janc wrote:
-> Since GCC has option (-Wswitch-enum) that ensure all enum values are
-> handled inside switch it is no longer necessary to forbit default in
-> such case.
-> ---
->  doc/coding-style.txt | 24 ++++++++++++++++++------
->  1 file changed, 18 insertions(+), 6 deletions(-)
-> 
-> diff --git a/doc/coding-style.txt b/doc/coding-style.txt
-> index 59df64a..b3fbd2e 100644
-> --- a/doc/coding-style.txt
-> +++ b/doc/coding-style.txt
-> @@ -175,10 +175,11 @@ enum animal_type {
->  M10: Enum as switch variable
->  ============================
-> 
-> -If the variable of a switch is an enum, you must not include a default in
-> -switch body. The reason for this is: If later on you modify the enum by
-> adding -a new type, and forget to change the switch accordingly, the
-> compiler will -complain the new added type hasn't been handled.
-> +If the variable of a switch is an enum, you must include all values in
-> +switch body even if providing default. This is enforced by compiler option
-> +enabling extra warning in such case. The reason for this is to ensure that
-> if +later on enum is modified and one forget to change the switch
-> accordingly, the +compiler will complain the new added type hasn't been
-> handled.
-> 
->  Example:
-> 
-> @@ -190,7 +191,7 @@ enum animal_type {
-> 
->  enum animal_type t;
-> 
-> -switch (t) {
-> +switch (t) { // OK
->  case ANIMAL_TYPE_FOUR_LEGS:
->  	...
->  	break;
-> @@ -200,7 +201,18 @@ case ANIMAL_TYPE_EIGHT_LEGS:
->  case ANIMAL_TYPE_TWO_LEGS:
->  	...
->  	break;
-> -default:  // wrong
-> +default:
-> +	break;
-> +}
-> +
-> +switch (t) { // Wrong
-> +case ANIMAL_TYPE_FOUR_LEGS:
-> +	...
-> +	break;
-> +case ANIMAL_TYPE_TWO_LEGS:
-> +	...
-> +	break;
-> +default:
->  	break;
->  }
+Hi Łukasz,
 
-Pushed.
+On Monday 08 of December 2014 11:47:36 Lukasz Rymanowski wrote:
+> ---
+>  android/hal-msg.h          | 2 +-
+>  android/handsfree-client.c | 2 +-
+>  2 files changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/android/hal-msg.h b/android/hal-msg.h
+> index d43cdbe..3cf2d85 100644
+> --- a/android/hal-msg.h
+> +++ b/android/hal-msg.h
+> @@ -2226,7 +2226,7 @@ struct hal_ev_hf_client_call_waiting {
+>  } __attribute__((packed));
+> 
+>  #define HAL_HF_CLIENT_DIRECTION_OUTGOING	0x00
+> -#define HAL_HF_CLIENT_DIRECTION_INCOMIGN	0x01
+> +#define HAL_HF_CLIENT_DIRECTION_INCOMING	0x01
+> 
+>  #define HAL_HF_CLIENT_CALL_STATE_ACTIVE			0x00
+>  #define HAL_HF_CLIENT_CALL_STATE_HELD			0x01
+> diff --git a/android/handsfree-client.c b/android/handsfree-client.c
+> index 3eb8517..007ac32 100644
+> --- a/android/handsfree-client.c
+> +++ b/android/handsfree-client.c
+> @@ -954,7 +954,7 @@ static void clcc_cb(struct hfp_context *context, void
+> *user_data) ev->index = val;
+> 
+>  	if (!hfp_context_get_number(context, &val) ||
+> -				val > HAL_HF_CLIENT_DIRECTION_INCOMIGN) {
+> +				val > HAL_HF_CLIENT_DIRECTION_INCOMING) {
+>  		error("hf-client: Could not get direction");
+>  		return;
+>  	}
+
+This patch is now applied, thanks.
 
 -- 
 BR
