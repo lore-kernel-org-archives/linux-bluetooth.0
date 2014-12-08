@@ -1,53 +1,76 @@
 Return-Path: <cyrus@holtmann.org>
-From: Jakub Pawlowski <jpawlowski@google.com>
+From: Szymon Janc <szymon.janc@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Jakub Pawlowski <jpawlowski@google.com>
-Subject: [PATCH] doc/adapter-api.txt: StartServiceDiscovery method.
-Date: Mon,  8 Dec 2014 14:47:19 +0100
-Message-Id: <1418046439-15725-1-git-send-email-jpawlowski@google.com>
+Subject: Re: [PATCH 01/13] doc/coding-style: Update 'enum as switch variable' section
+Date: Mon, 08 Dec 2014 14:25:43 +0100
+Message-ID: <3276600.cJOmr3QuCF@leonov>
+In-Reply-To: <1417541318-24259-1-git-send-email-szymon.janc@tieto.com>
+References: <1417541318-24259-1-git-send-email-szymon.janc@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch proposes new method, StartServiceDiscovery to D-Bus Adapter API for
-desktop bluetoothd. It will allow for rapid discovery of nearby devices that
-advertise services.
+On Tuesday 02 of December 2014 18:28:26 Szymon Janc wrote:
+> Since GCC has option (-Wswitch-enum) that ensure all enum values are
+> handled inside switch it is no longer necessary to forbit default in
+> such case.
+> ---
+>  doc/coding-style.txt | 24 ++++++++++++++++++------
+>  1 file changed, 18 insertions(+), 6 deletions(-)
+> 
+> diff --git a/doc/coding-style.txt b/doc/coding-style.txt
+> index 59df64a..b3fbd2e 100644
+> --- a/doc/coding-style.txt
+> +++ b/doc/coding-style.txt
+> @@ -175,10 +175,11 @@ enum animal_type {
+>  M10: Enum as switch variable
+>  ============================
+> 
+> -If the variable of a switch is an enum, you must not include a default in
+> -switch body. The reason for this is: If later on you modify the enum by
+> adding -a new type, and forget to change the switch accordingly, the
+> compiler will -complain the new added type hasn't been handled.
+> +If the variable of a switch is an enum, you must include all values in
+> +switch body even if providing default. This is enforced by compiler option
+> +enabling extra warning in such case. The reason for this is to ensure that
+> if +later on enum is modified and one forget to change the switch
+> accordingly, the +compiler will complain the new added type hasn't been
+> handled.
+> 
+>  Example:
+> 
+> @@ -190,7 +191,7 @@ enum animal_type {
+> 
+>  enum animal_type t;
+> 
+> -switch (t) {
+> +switch (t) { // OK
+>  case ANIMAL_TYPE_FOUR_LEGS:
+>  	...
+>  	break;
+> @@ -200,7 +201,18 @@ case ANIMAL_TYPE_EIGHT_LEGS:
+>  case ANIMAL_TYPE_TWO_LEGS:
+>  	...
+>  	break;
+> -default:  // wrong
+> +default:
+> +	break;
+> +}
+> +
+> +switch (t) { // Wrong
+> +case ANIMAL_TYPE_FOUR_LEGS:
+> +	...
+> +	break;
+> +case ANIMAL_TYPE_TWO_LEGS:
+> +	...
+> +	break;
+> +default:
+>  	break;
+>  }
 
-Signed-off-by: Jakub Pawlowski <jpawlowski@google.com>
----
- doc/adapter-api.txt | 20 ++++++++++++++++++++
- 1 file changed, 20 insertions(+)
+Pushed.
 
-diff --git a/doc/adapter-api.txt b/doc/adapter-api.txt
-index 74d235a..88533ed 100644
---- a/doc/adapter-api.txt
-+++ b/doc/adapter-api.txt
-@@ -22,6 +22,26 @@ Methods		void StartDiscovery()
- 			Possible errors: org.bluez.Error.NotReady
- 					 org.bluez.Error.Failed
- 
-+		void StartServiceDiscovery(uint8 rssi, array{string} uuids)
-+
-+			This method starts the device discovery session with
-+			filtering by uuids, and rssi value. Use StopDiscovery to
-+			release the sessions acquired.
-+
-+			This method will use LE scan only.
-+
-+			Device that have RSSI bigger than rssi parameter, and
-+			advertise at least one service from uuids array, is
-+			conseidered filter match.
-+
-+			This process will start creating Device objects as new
-+			devices matching criteria are discovered. It will also
-+			emit PropertiesChanged signal for already existing
-+			Device objects, with updated RSSI value.
-+
-+			Possible errors: org.bluez.Error.NotReady
-+					 org.bluez.Error.Failed
-+
- 		void StopDiscovery()
- 
- 			This method will cancel any previous StartDiscovery
 -- 
-2.2.0.rc0.207.ga3a616c
-
+BR
+Szymon Janc
