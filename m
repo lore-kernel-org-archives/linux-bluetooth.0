@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 12/12] shared/mgmt: Remove unnecessary code
-Date: Mon,  8 Dec 2014 18:05:16 +0200
-Message-Id: <1418054716-24231-13-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 11/12] unit/test-mgmt: Add /mgmt/destroy/1 test
+Date: Mon,  8 Dec 2014 18:05:15 +0200
+Message-Id: <1418054716-24231-12-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1418054716-24231-1-git-send-email-luiz.dentz@gmail.com>
 References: <1418054716-24231-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,198 +11,63 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This flags were added because calling function like queue_foreach were
-not safe as the callbacks may remove or destroy the queue before
-returning but this has been fixed and it is now safe to do that.
+This tests if mgmt_unref can be called within event callback.
 ---
- src/shared/mgmt.c | 89 +++++++------------------------------------------------
- 1 file changed, 11 insertions(+), 78 deletions(-)
+ unit/test-mgmt.c | 29 +++++++++++++++++++++++++++++
+ 1 file changed, 29 insertions(+)
 
-diff --git a/src/shared/mgmt.c b/src/shared/mgmt.c
-index e576990..2eff029 100644
---- a/src/shared/mgmt.c
-+++ b/src/shared/mgmt.c
-@@ -52,9 +52,6 @@ struct mgmt {
- 	struct queue *notify_list;
- 	unsigned int next_request_id;
- 	unsigned int next_notify_id;
--	bool need_notify_cleanup;
--	bool in_notify;
--	bool destroyed;
- 	void *buf;
- 	uint16_t len;
- 	mgmt_debug_func_t debug_callback;
-@@ -77,7 +74,6 @@ struct mgmt_notify {
- 	unsigned int id;
- 	uint16_t event;
- 	uint16_t index;
--	bool removed;
- 	mgmt_notify_func_t callback;
- 	mgmt_destroy_func_t destroy;
- 	void *user_data;
-@@ -136,22 +132,6 @@ static bool match_notify_index(const void *a, const void *b)
- 	return notify->index == index;
+diff --git a/unit/test-mgmt.c b/unit/test-mgmt.c
+index 8cd5565..c67678b 100644
+--- a/unit/test-mgmt.c
++++ b/unit/test-mgmt.c
+@@ -386,6 +386,17 @@ static void unregister_index_cb(uint16_t index, uint16_t length,
+ 	context_quit(context);
  }
  
--static bool match_notify_removed(const void *a, const void *b)
--{
--	const struct mgmt_notify *notify = a;
--
--	return notify->removed;
--}
--
--static void mark_notify_removed(void *data , void *user_data)
--{
--	struct mgmt_notify *notify = data;
--	uint16_t index = PTR_TO_UINT(user_data);
--
--	if (notify->index == index || index == MGMT_INDEX_NONE)
--		notify->removed = true;
--}
--
- static void write_watch_destroy(void *user_data)
- {
- 	struct mgmt *mgmt = user_data;
-@@ -259,9 +239,6 @@ static void request_complete(struct mgmt *mgmt, uint8_t status,
- 		destroy_request(request);
- 	}
- 
--	if (mgmt->destroyed)
--		return;
--
- 	wakeup_writer(mgmt);
- }
- 
-@@ -277,9 +254,6 @@ static void notify_handler(void *data, void *user_data)
- 	struct mgmt_notify *notify = data;
- 	struct event_index *match = user_data;
- 
--	if (notify->removed)
--		return;
--
- 	if (notify->event != match->event)
- 		return;
- 
-@@ -297,28 +271,7 @@ static void process_notify(struct mgmt *mgmt, uint16_t event, uint16_t index,
- 	struct event_index match = { .event = event, .index = index,
- 					.length = length, .param = param };
- 
--	mgmt->in_notify = true;
--
- 	queue_foreach(mgmt->notify_list, notify_handler, &match);
--
--	mgmt->in_notify = false;
--
--	if (mgmt->need_notify_cleanup) {
--		queue_remove_all(mgmt->notify_list, match_notify_removed,
--							NULL, destroy_notify);
--		mgmt->need_notify_cleanup = false;
--	}
--}
--
--static void read_watch_destroy(void *user_data)
--{
--	struct mgmt *mgmt = user_data;
--
--	if (mgmt->destroyed) {
--		queue_destroy(mgmt->notify_list, NULL);
--		queue_destroy(mgmt->pending_list, NULL);
--		free(mgmt);
--	}
- }
- 
- static bool can_read_data(struct io *io, void *user_data)
-@@ -348,6 +301,8 @@ static bool can_read_data(struct io *io, void *user_data)
- 	if (bytes_read < length + MGMT_HDR_SIZE)
- 		return true;
- 
-+	mgmt_ref(mgmt);
++static void destroy_cb(uint16_t index, uint16_t length, const void *param,
++							void *user_data)
++{
++	struct context *context = user_data;
 +
- 	switch (event) {
- 	case MGMT_EV_CMD_COMPLETE:
- 		cc = mgmt->buf + MGMT_HDR_SIZE;
-@@ -379,8 +334,7 @@ static bool can_read_data(struct io *io, void *user_data)
- 		break;
- 	}
- 
--	if (mgmt->destroyed)
--		return false;
-+	mgmt_unref(mgmt);
- 
- 	return true;
- }
-@@ -451,8 +405,7 @@ struct mgmt *mgmt_new(int fd)
- 		return NULL;
- 	}
- 
--	if (!io_set_read_handler(mgmt->io, can_read_data, mgmt,
--						read_watch_destroy)) {
-+	if (!io_set_read_handler(mgmt->io, can_read_data, mgmt, NULL)) {
- 		queue_destroy(mgmt->notify_list, NULL);
- 		queue_destroy(mgmt->pending_list, NULL);
- 		queue_destroy(mgmt->reply_queue, NULL);
-@@ -543,14 +496,11 @@ void mgmt_unref(struct mgmt *mgmt)
- 	free(mgmt->buf);
- 	mgmt->buf = NULL;
- 
--	if (!mgmt->in_notify) {
--		queue_destroy(mgmt->notify_list, NULL);
--		queue_destroy(mgmt->pending_list, NULL);
--		free(mgmt);
--		return;
--	}
-+	queue_destroy(mgmt->notify_list, NULL);
-+	queue_destroy(mgmt->pending_list, NULL);
-+	free(mgmt);
- 
--	mgmt->destroyed = true;
-+	return;
++	mgmt_unref(context->mgmt_client);
++	context->mgmt_client = NULL;
++
++	context_quit(context);
++}
++
+ static void test_unregister_index(gconstpointer data)
+ {
+ 	const struct command_test_data *test = data;
+@@ -402,6 +413,22 @@ static void test_unregister_index(gconstpointer data)
+ 	execute_context(context);
  }
  
- bool mgmt_set_debug(struct mgmt *mgmt, mgmt_debug_func_t callback,
-@@ -796,14 +746,7 @@ bool mgmt_unregister(struct mgmt *mgmt, unsigned int id)
- 	if (!notify)
- 		return false;
++static void test_destroy(gconstpointer data)
++{
++	const struct command_test_data *test = data;
++	struct context *context = create_context();
++
++	mgmt_register(context->mgmt_client, test->opcode, test->index,
++					destroy_cb, context, NULL);
++	mgmt_register(context->mgmt_client, test->opcode, test->index,
++						event_cb, context, NULL);
++
++	g_assert_cmpint(write(context->fd, test->cmd_data, test->cmd_size), ==,
++								test->cmd_size);
++
++	execute_context(context);
++}
++
+ int main(int argc, char *argv[])
+ {
+ 	g_test_init(&argc, &argv, NULL);
+@@ -422,5 +449,7 @@ int main(int argc, char *argv[])
+ 	g_test_add_data_func("/mgmt/unregister/2", &event_test_1,
+ 							test_unregister_index);
  
--	if (!mgmt->in_notify) {
--		destroy_notify(notify);
--		return true;
--	}
--
--	notify->removed = true;
--	mgmt->need_notify_cleanup = true;
--
-+	destroy_notify(notify);
- 	return true;
- }
- 
-@@ -812,12 +755,7 @@ bool mgmt_unregister_index(struct mgmt *mgmt, uint16_t index)
- 	if (!mgmt)
- 		return false;
- 
--	if (mgmt->in_notify) {
--		queue_foreach(mgmt->notify_list, mark_notify_removed,
--							UINT_TO_PTR(index));
--		mgmt->need_notify_cleanup = true;
--	} else
--		queue_remove_all(mgmt->notify_list, match_notify_index,
-+	queue_remove_all(mgmt->notify_list, match_notify_index,
- 					UINT_TO_PTR(index), destroy_notify);
- 
- 	return true;
-@@ -828,12 +766,7 @@ bool mgmt_unregister_all(struct mgmt *mgmt)
- 	if (!mgmt)
- 		return false;
- 
--	if (mgmt->in_notify) {
--		queue_foreach(mgmt->notify_list, mark_notify_removed,
--						UINT_TO_PTR(MGMT_INDEX_NONE));
--		mgmt->need_notify_cleanup = true;
--	} else
--		queue_remove_all(mgmt->notify_list, NULL, NULL, destroy_notify);
-+	queue_remove_all(mgmt->notify_list, NULL, NULL, destroy_notify);
- 
- 	return true;
++	g_test_add_data_func("/mgmt/destroy/1", &event_test_1, test_destroy);
++
+ 	return g_test_run();
  }
 -- 
 1.9.3
