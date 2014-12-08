@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 02/12] unit/test-queue: Add /queue/foreach_remove test
-Date: Mon,  8 Dec 2014 18:05:06 +0200
-Message-Id: <1418054716-24231-3-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 01/12] build: Add coverage support
+Date: Mon,  8 Dec 2014 18:05:05 +0200
+Message-Id: <1418054716-24231-2-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1418054716-24231-1-git-send-email-luiz.dentz@gmail.com>
 References: <1418054716-24231-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,51 +11,95 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This tests queue_remove from queue_foreach callback.
+Coverage is enabled with --enable-maintainer-mode, 2 new targets are
+added 'coverage' and 'clean-coverage', the first generate the reports
+using lcov and depend on the second to cleanup previous generated
+reports and .gcda files.
 ---
- unit/test-queue.c | 22 ++++++++++++++++++++++
- 1 file changed, 22 insertions(+)
+ .gitignore   |  4 ++++
+ Makefile.am  | 17 +++++++++++++++++
+ acinclude.m4 |  4 ++++
+ configure.ac |  4 ++++
+ 4 files changed, 29 insertions(+)
 
-diff --git a/unit/test-queue.c b/unit/test-queue.c
-index f72f2e6..6261612 100644
---- a/unit/test-queue.c
-+++ b/unit/test-queue.c
-@@ -78,6 +78,27 @@ static void test_foreach_destroy(void)
- 	queue_foreach(queue, foreach_destroy, queue);
- }
+diff --git a/.gitignore b/.gitignore
+index 484f41f..a0c9389 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -3,6 +3,8 @@
+ *.lo
+ *.la
+ *.so
++*.gcno
++*.gcda
+ .deps
+ .libs
+ .dirstamp
+@@ -27,7 +29,9 @@ stamp-h1
+ autom4te.cache
+ test-driver
+ test-suite.log
++coverage.info
  
-+static void foreach_remove(void *data, void *user_data)
-+{
-+	struct queue *queue = user_data;
-+
-+	g_assert(queue_remove(queue, data));
-+}
-+
-+static void test_foreach_remove(void)
-+{
-+	struct queue *queue;
-+
-+	queue = queue_new();
-+	g_assert(queue != NULL);
-+
-+	queue_push_tail(queue, UINT_TO_PTR(1));
-+	queue_push_tail(queue, UINT_TO_PTR(2));
-+
-+	queue_foreach(queue, foreach_remove, queue);
-+	queue_destroy(queue, NULL);
-+}
-+
- static void foreach_remove_all(void *data, void *user_data)
- {
- 	struct queue *queue = user_data;
-@@ -177,6 +198,7 @@ int main(int argc, char *argv[])
++coverage
+ lib/bluez.pc
+ lib/bluetooth
+ src/builtin.h
+diff --git a/Makefile.am b/Makefile.am
+index c506122..a5d3d8b 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -442,5 +442,22 @@ lib/bluetooth/%.h: lib/%.h
+ 	$(AM_V_at)$(MKDIR_P) lib/bluetooth
+ 	$(AM_V_GEN)$(LN_S) -f "$(abs_top_builddir)"/$< $@
  
- 	g_test_add_func("/queue/basic", test_basic);
- 	g_test_add_func("/queue/foreach_destroy", test_foreach_destroy);
-+	g_test_add_func("/queue/foreach_remove", test_foreach_remove);
- 	g_test_add_func("/queue/foreach_remove_all", test_foreach_remove_all);
- 	g_test_add_func("/queue/destroy_remove", test_destroy_remove);
- 	g_test_add_func("/queue/push_after", test_push_after);
++if MAINTAINER_MODE
++clean-coverage:
++	-find $(top_builddir) -name "*.gcno" -delete
++	-find $(top_builddir) -name "*.gcda" -delete
++	@lcov --directory $(top_builddir) --zerocounters
++	$(RM) -r coverage $(top_builddir)/coverage.info
++
++coverage: check
++	@lcov --compat-libtool --directory $(top_builddir) --capture \
++				--output-file $(top_builddir)/coverage.info
++	$(AM_V_at)$(MKDIR_P) coverage
++	@genhtml -o coverage/ $(top_builddir)/coverage.info
++
++clean-local: clean-coverage
++	$(RM) -r lib/bluetooth
++else
+ clean-local:
+ 	$(RM) -r lib/bluetooth
++endif
+diff --git a/acinclude.m4 b/acinclude.m4
+index 2065852..afc7c6d 100644
+--- a/acinclude.m4
++++ b/acinclude.m4
+@@ -51,6 +51,10 @@ AC_DEFUN([MISC_FLAGS], [
+ 			misc_ldflags="$misc_ldflags -pie"
+ 		fi
+ 	])
++	if (test "$USE_MAINTAINER_MODE" = "yes"); then
++		misc_cflags="$misc_cflags --coverage"
++		misc_ldflags="$misc_ldflags --coverage"
++	fi
+ 	AC_SUBST([MISC_CFLAGS], $misc_cflags)
+ 	AC_SUBST([MISC_LDFLAGS], $misc_ldflags)
+ ])
+diff --git a/configure.ac b/configure.ac
+index 6533cab..455ed7a 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -274,4 +274,8 @@ fi
+ AC_DEFINE_UNQUOTED(ANDROID_STORAGEDIR, "${storagedir}/android",
+ 			[Directory for the Android daemon storage files])
+ 
++if (test "$USE_MAINTAINER_MODE" = "yes"); then
++	AC_CHECK_PROG([LCOV], [lcov], [yes], AC_MSG_ERROR(lcov is required))
++fi
++
+ AC_OUTPUT(Makefile src/bluetoothd.8 lib/bluez.pc)
 -- 
 1.9.3
 
