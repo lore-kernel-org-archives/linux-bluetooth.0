@@ -1,124 +1,74 @@
 Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
-To: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+To: Sebastian Chlad <sebastian.chlad@tieto.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH RESEND 1/2] android/handsfree-client: Decrease number of memcpy
-Date: Mon, 08 Dec 2014 14:17:30 +0100
-Message-ID: <6035901.riHTshJ6fR@leonov>
-In-Reply-To: <1418035656-17285-1-git-send-email-lukasz.rymanowski@tieto.com>
-References: <1418035656-17285-1-git-send-email-lukasz.rymanowski@tieto.com>
+Subject: Re: [PATCH] android/pts: GAP PTS test results for Android 5.0
+Date: Mon, 08 Dec 2014 14:06:28 +0100
+Message-ID: <1752340.zfeeGKvYfF@leonov>
+In-Reply-To: <1417787354-6603-1-git-send-email-sebastian.chlad@tieto.com>
+References: <1417787354-6603-1-git-send-email-sebastian.chlad@tieto.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset="us-ascii"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Łukasz,
+Hi Sebastian,
 
-On Monday 08 of December 2014 11:47:35 Lukasz Rymanowski wrote:
-> Some string we can directly copy from context to IPC event struct.
+On Friday 05 of December 2014 14:49:14 Sebastian Chlad wrote:
 > ---
->  android/handsfree-client.c | 27 +++++++++++++--------------
->  1 file changed, 13 insertions(+), 14 deletions(-)
+>  android/pts-gap.txt | 15 +++++++++------
+>  1 file changed, 9 insertions(+), 6 deletions(-)
 > 
-> diff --git a/android/handsfree-client.c b/android/handsfree-client.c
-> index f7a03cc..3eb8517 100644
-> --- a/android/handsfree-client.c
-> +++ b/android/handsfree-client.c
-> @@ -85,6 +85,9 @@
->  #define CODEC_ID_CVSD 0x01
->  #define CODEC_ID_MSBC 0x02
+> diff --git a/android/pts-gap.txt b/android/pts-gap.txt
+> index 99a6a7d..c597258 100644
+> --- a/android/pts-gap.txt
+> +++ b/android/pts-gap.txt
+> @@ -1,8 +1,8 @@
+>  PTS test results for GAP
 > 
-> +#define MAX_NUMBER_LEN 33
-> +#define MAX_OPERATOR_NAME_LEN 17
-> +
->  enum hfp_indicator {
->  	HFP_INDICATOR_SERVICE = 0,
->  	HFP_INDICATOR_CALL,
-> @@ -938,7 +941,6 @@ static void clcc_cb(struct hfp_context *context, void
-> *user_data) uint8_t buf[IPC_MTU];
->  	struct hal_ev_hf_client_current_call *ev = (void *) buf;
->  	unsigned int val;
-> -	char number[33];
+>  PTS version: 5.3
+> -Tested: 28-October-2014
+> -Android version: 4.4.4
+> +Tested: 05-December-2014
+> +Android version: 5.0
+>  Kernel version: 3.18
 > 
->  	DBG("");
-> 
-> @@ -980,10 +982,9 @@ static void clcc_cb(struct hfp_context *context, void
-> *user_data)
-> 
->  	ev->multiparty = val;
-> 
-> -	if (hfp_context_get_string(context, number, sizeof(number))) {
-> -		ev->number_len = strlen(number) + 1;
-> -		memcpy(ev->number, number, ev->number_len);
-> -	}
-> +	if (hfp_context_get_string(context, (char *) &ev->number[0],
-> +								MAX_NUMBER_LEN))
-> +		ev->number_len = strlen((char *) ev->number) + 1;
-> 
->  	ipc_send_notif(hal_ipc, HAL_SERVICE_ID_HANDSFREE_CLIENT,
->  					HAL_EV_HF_CLIENT_CURRENT_CALL,
-> @@ -1020,7 +1021,6 @@ static void cnum_cb(struct hfp_context *context, void
-> *user_data) {
->  	uint8_t buf[IPC_MTU];
->  	struct hal_ev_hf_client_subscriber_service_info *ev = (void *) buf;
-> -	char number[33];
->  	unsigned int service;
-> 
->  	DBG("");
-> @@ -1028,11 +1028,14 @@ static void cnum_cb(struct hfp_context *context,
-> void *user_data) /* Alpha field is empty string, just skip it */
->  	hfp_context_skip_field(context);
-> 
-> -	if (!hfp_context_get_string(context, number, sizeof(number))) {
-> +	if (!hfp_context_get_string(context, (char *) &ev->name[0],
-> +							MAX_NUMBER_LEN)) {
->  		error("hf-client: Could not get number");
->  		return;
->  	}
-> 
-> +	ev->name_len = strlen((char *) &ev->name[0]) + 1;
-> +
->  	/* Type is not used in Android */
->  	hfp_context_skip_field(context);
-> 
-> @@ -1042,9 +1045,6 @@ static void cnum_cb(struct hfp_context *context, void
-> *user_data) if (!hfp_context_get_number(context, &service))
->  		return;
-> 
-> -	ev->name_len = strlen(number) + 1;
-> -	memcpy(ev->name, number, ev->name_len);
-> -
->  	switch (service) {
->  	case 4:
->  		ev->type = HAL_HF_CLIENT_SUBSCR_TYPE_VOICE;
-> @@ -1066,7 +1066,6 @@ static void cops_cb(struct hfp_context *context, void
-> *user_data) {
->  	uint8_t buf[IPC_MTU];
->  	struct hal_ev_hf_client_operator_name *ev = (void *) buf;
-> -	char name[17];
->  	unsigned int format;
-> 
->  	DBG("");
-> @@ -1080,13 +1079,13 @@ static void cops_cb(struct hfp_context *context,
-> void *user_data) if (format != 0)
->  		info("hf-client: Not correct string format in +COSP");
-> 
-> -	if (!hfp_context_get_string(context, name, sizeof(name))) {
-> +	if (!hfp_context_get_string(context,(char *) &ev->name[0] ,
+>  Results:
+> @@ -94,7 +94,7 @@ TC_IDLE_NAMP_BV_01_C	PASS	possible to PASS using 
+haltest
+> following steps: gattc - register client, connect to PTS, search
+>  				all services, get characteristic and then read
+>  				characteristic (name)
+> -TC_IDLE_NAMP_BV_02_C	INC	PTS issue #12679
+> +TC_IDLE_NAMP_BV_02_C	PASS	PTS issue #12679
+>  				haltest: gatts connect
+>  TC_CONN_NCON_BV_01_C	PASS	btmgmt connectable off
+>  				btmgmt advertising on
+> @@ -174,8 +174,7 @@ TC_BOND_BON_BV_01_C	PASS	PTS issue #12503
+>  				To bond with PTS execute
+>  				btmgmt pair -t 0x01 -c 0x03 <PTS addr>
+>  TC_BOND_BON_BV_02_C	PASS
+> -TC_BOND_BON_BV_03_C	INC	PTS issue #12678
+> -				Note: tiny chance to pass if PTS won't crash
+> +TC_BOND_BON_BV_03_C	PASS	PTS issue #12678
+>  				gattc register_client
+>  				gattc listen 1
+>  TC_BOND_BON_BV_04_C	PASS	haltest: gattc_register_client
+> @@ -338,7 +337,11 @@ TC_PRIV_CONN_BV_06_C	N/A
+>  TC_PRIV_CONN_BV_07_C	N/A
+>  TC_PRIV_CONN_BV_08_C	N/A
+>  TC_PRIV_CONN_BV_09_C	N/A
+> -TC_PRIV_CONN_BV_10_C	INC	PTS issue #12312
+> +TC_PRIV_CONN_BV_10_C	PASS	PTS issue #12312
+> +				Note: currently for this test following PIXITs
+> +				are required to be be changed:
+> +				TSPX_using_public_device_address: FALSE
+> +				TSPX_using_random_device_address: TRUE
+>  TC_PRIV_CONN_BV_11_C	INC	PTS issue #12310, JIRA #BA-186
+>  TC_ADV_BV_01_C		N/A
+>  TC_ADV_BV_02_C		PASS	gattc register_client
 
-Some coding style issues here (no space after comma and space before comma).
-
-> +						MAX_OPERATOR_NAME_LEN)) {
->  		error("hf-client: incorrect COPS response");
->  		return;
->  	}
-> 
-> -	ev->name_len = strlen(name) + 1;
-> -	memcpy(ev->name, name, ev->name_len);
-> +	ev->name_len = strlen((char *) &ev->name[0]) + 1;
-> 
->  	ipc_send_notif(hal_ipc, HAL_SERVICE_ID_HANDSFREE_CLIENT,
->  					HAL_EV_HF_CLIENT_OPERATOR_NAME,
+Applied, thanks.
 
 -- 
 BR
