@@ -1,116 +1,209 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH] android/socket: Add support for dynamic MAP record
-Date: Mon,  8 Dec 2014 17:47:07 +0100
-Message-Id: <1418057227-29987-1-git-send-email-szymon.janc@tieto.com>
+Subject: [PATCH BlueZ 12/12] shared/mgmt: Remove unnecessary code
+Date: Mon,  8 Dec 2014 18:05:16 +0200
+Message-Id: <1418054716-24231-13-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <1418054716-24231-1-git-send-email-luiz.dentz@gmail.com>
+References: <1418054716-24231-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Android 5.0 uses service name (sic!) for defining instance ID and
-supported message types. Name passed is in format of "XXYYname"
-where XX is hex coded instance and YY is hex coded message types
-mask.
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This patch adds new mode for Socket HAL in which daemon tries to
-extract instance ID and message types from service name.
+This flags were added because calling function like queue_foreach were
+not safe as the callbacks may remove or destroy the queue before
+returning but this has been fixed and it is now safe to do that.
 ---
- android/hal-bluetooth.c |  7 ++++++-
- android/hal-msg.h       |  3 +++
- android/socket.c        | 29 +++++++++++++++++++++++++++--
- 3 files changed, 36 insertions(+), 3 deletions(-)
+ src/shared/mgmt.c | 89 +++++++------------------------------------------------
+ 1 file changed, 11 insertions(+), 78 deletions(-)
 
-diff --git a/android/hal-bluetooth.c b/android/hal-bluetooth.c
-index fac6b6f..f8e3e53 100644
---- a/android/hal-bluetooth.c
-+++ b/android/hal-bluetooth.c
-@@ -539,9 +539,14 @@ static int init(bt_callbacks_t *callbacks)
+diff --git a/src/shared/mgmt.c b/src/shared/mgmt.c
+index e576990..2eff029 100644
+--- a/src/shared/mgmt.c
++++ b/src/shared/mgmt.c
+@@ -52,9 +52,6 @@ struct mgmt {
+ 	struct queue *notify_list;
+ 	unsigned int next_request_id;
+ 	unsigned int next_notify_id;
+-	bool need_notify_cleanup;
+-	bool in_notify;
+-	bool destroyed;
+ 	void *buf;
+ 	uint16_t len;
+ 	mgmt_debug_func_t debug_callback;
+@@ -77,7 +74,6 @@ struct mgmt_notify {
+ 	unsigned int id;
+ 	uint16_t event;
+ 	uint16_t index;
+-	bool removed;
+ 	mgmt_notify_func_t callback;
+ 	mgmt_destroy_func_t destroy;
+ 	void *user_data;
+@@ -136,22 +132,6 @@ static bool match_notify_index(const void *a, const void *b)
+ 	return notify->index == index;
+ }
+ 
+-static bool match_notify_removed(const void *a, const void *b)
+-{
+-	const struct mgmt_notify *notify = a;
+-
+-	return notify->removed;
+-}
+-
+-static void mark_notify_removed(void *data , void *user_data)
+-{
+-	struct mgmt_notify *notify = data;
+-	uint16_t index = PTR_TO_UINT(user_data);
+-
+-	if (notify->index == index || index == MGMT_INDEX_NONE)
+-		notify->removed = true;
+-}
+-
+ static void write_watch_destroy(void *user_data)
+ {
+ 	struct mgmt *mgmt = user_data;
+@@ -259,9 +239,6 @@ static void request_complete(struct mgmt *mgmt, uint8_t status,
+ 		destroy_request(request);
  	}
  
- 	cmd.service_id = HAL_SERVICE_ID_SOCKET;
--	cmd.mode = HAL_MODE_DEFAULT;
- 	cmd.max_clients = 1;
+-	if (mgmt->destroyed)
+-		return;
+-
+ 	wakeup_writer(mgmt);
+ }
  
-+#if ANDROID_VERSION >= PLATFORM_VER(5, 0, 0)
-+	cmd.mode = HAL_MODE_SOCKET_DYNAMIC_MAP;
-+#else
-+	cmd.mode = HAL_MODE_DEFAULT;
-+#endif
+@@ -277,9 +254,6 @@ static void notify_handler(void *data, void *user_data)
+ 	struct mgmt_notify *notify = data;
+ 	struct event_index *match = user_data;
+ 
+-	if (notify->removed)
+-		return;
+-
+ 	if (notify->event != match->event)
+ 		return;
+ 
+@@ -297,28 +271,7 @@ static void process_notify(struct mgmt *mgmt, uint16_t event, uint16_t index,
+ 	struct event_index match = { .event = event, .index = index,
+ 					.length = length, .param = param };
+ 
+-	mgmt->in_notify = true;
+-
+ 	queue_foreach(mgmt->notify_list, notify_handler, &match);
+-
+-	mgmt->in_notify = false;
+-
+-	if (mgmt->need_notify_cleanup) {
+-		queue_remove_all(mgmt->notify_list, match_notify_removed,
+-							NULL, destroy_notify);
+-		mgmt->need_notify_cleanup = false;
+-	}
+-}
+-
+-static void read_watch_destroy(void *user_data)
+-{
+-	struct mgmt *mgmt = user_data;
+-
+-	if (mgmt->destroyed) {
+-		queue_destroy(mgmt->notify_list, NULL);
+-		queue_destroy(mgmt->pending_list, NULL);
+-		free(mgmt);
+-	}
+ }
+ 
+ static bool can_read_data(struct io *io, void *user_data)
+@@ -348,6 +301,8 @@ static bool can_read_data(struct io *io, void *user_data)
+ 	if (bytes_read < length + MGMT_HDR_SIZE)
+ 		return true;
+ 
++	mgmt_ref(mgmt);
 +
- 	status = hal_ipc_cmd(HAL_SERVICE_ID_CORE, HAL_OP_REGISTER_MODULE,
- 					sizeof(cmd), &cmd, NULL, NULL, NULL);
- 	if (status != BT_STATUS_SUCCESS) {
-diff --git a/android/hal-msg.h b/android/hal-msg.h
-index 33b53c5..81d5b2e 100644
---- a/android/hal-msg.h
-+++ b/android/hal-msg.h
-@@ -266,6 +266,9 @@ struct hal_rsp_get_connection_state {
+ 	switch (event) {
+ 	case MGMT_EV_CMD_COMPLETE:
+ 		cc = mgmt->buf + MGMT_HDR_SIZE;
+@@ -379,8 +334,7 @@ static bool can_read_data(struct io *io, void *user_data)
+ 		break;
+ 	}
  
- /* Bluetooth Socket HAL api */
+-	if (mgmt->destroyed)
+-		return false;
++	mgmt_unref(mgmt);
  
-+#define HAL_MODE_SOCKET_DEFAULT		HAL_MODE_DEFAULT
-+#define HAL_MODE_SOCKET_DYNAMIC_MAP	0x01
-+
- #define HAL_SOCK_RFCOMM		0x01
- #define HAL_SOCK_SCO		0x02
- #define HAL_SOCK_L2CAP		0x03
-diff --git a/android/socket.c b/android/socket.c
-index 7200071..6e2fd9d 100644
---- a/android/socket.c
-+++ b/android/socket.c
-@@ -90,6 +90,8 @@ static struct ipc *hal_ipc = NULL;
+ 	return true;
+ }
+@@ -451,8 +405,7 @@ struct mgmt *mgmt_new(int fd)
+ 		return NULL;
+ 	}
  
- static bdaddr_t adapter_addr;
+-	if (!io_set_read_handler(mgmt->io, can_read_data, mgmt,
+-						read_watch_destroy)) {
++	if (!io_set_read_handler(mgmt->io, can_read_data, mgmt, NULL)) {
+ 		queue_destroy(mgmt->notify_list, NULL);
+ 		queue_destroy(mgmt->pending_list, NULL);
+ 		queue_destroy(mgmt->reply_queue, NULL);
+@@ -543,14 +496,11 @@ void mgmt_unref(struct mgmt *mgmt)
+ 	free(mgmt->buf);
+ 	mgmt->buf = NULL;
  
-+static uint8_t hal_mode = HAL_MODE_SOCKET_DEFAULT;
-+
- static const uint8_t zero_uuid[16] = { 0 };
+-	if (!mgmt->in_notify) {
+-		queue_destroy(mgmt->notify_list, NULL);
+-		queue_destroy(mgmt->pending_list, NULL);
+-		free(mgmt);
+-		return;
+-	}
++	queue_destroy(mgmt->notify_list, NULL);
++	queue_destroy(mgmt->pending_list, NULL);
++	free(mgmt);
  
- /* Simple list of RFCOMM connected sockets */
-@@ -314,10 +316,31 @@ static sdp_record_t *create_mas_record(uint8_t chan, const char *svc_name)
- {
- 	sdp_list_t *seq;
- 	sdp_profile_desc_t profile[1];
--	uint8_t minst = DEFAULT_MAS_INSTANCE;
--	uint8_t mtype = DEFAULT_MAS_MSG_TYPE;
-+	uint8_t minst, mtype;
- 	sdp_record_t *record;
- 	uuid_t uuid;
-+	int cnt, ret;
-+
-+	switch (hal_mode) {
-+	case HAL_MODE_SOCKET_DYNAMIC_MAP:
-+		/*
-+		 * Service name for MAP is passed as XXYYname
-+		 * XX - instance
-+		 * YY - message type
-+		 */
-+		ret = sscanf(svc_name, "%02hhx%02hhx%n", &minst, &mtype, &cnt);
-+		if (ret != 2 || cnt != 4)
-+			return NULL;
-+
-+		svc_name += 4;
-+		break;
-+	case HAL_MODE_SOCKET_DEFAULT:
-+		minst = DEFAULT_MAS_INSTANCE;
-+		mtype = DEFAULT_MAS_MSG_TYPE;
-+		break;
-+	default:
-+		return NULL;
-+	}
+-	mgmt->destroyed = true;
++	return;
+ }
  
- 	sdp_uuid16_create(&uuid, MAP_MSE_SVCLASS_ID);
+ bool mgmt_set_debug(struct mgmt *mgmt, mgmt_debug_func_t callback,
+@@ -796,14 +746,7 @@ bool mgmt_unregister(struct mgmt *mgmt, unsigned int id)
+ 	if (!notify)
+ 		return false;
  
-@@ -1148,6 +1171,8 @@ void bt_socket_register(struct ipc *ipc, const bdaddr_t *addr, uint8_t mode)
+-	if (!mgmt->in_notify) {
+-		destroy_notify(notify);
+-		return true;
+-	}
+-
+-	notify->removed = true;
+-	mgmt->need_notify_cleanup = true;
+-
++	destroy_notify(notify);
+ 	return true;
+ }
  
- 	DBG("");
+@@ -812,12 +755,7 @@ bool mgmt_unregister_index(struct mgmt *mgmt, uint16_t index)
+ 	if (!mgmt)
+ 		return false;
  
-+	hal_mode = mode;
-+
- 	/*
- 	 * make sure channels assigned for profiles are reserved and not used
- 	 * for app services
+-	if (mgmt->in_notify) {
+-		queue_foreach(mgmt->notify_list, mark_notify_removed,
+-							UINT_TO_PTR(index));
+-		mgmt->need_notify_cleanup = true;
+-	} else
+-		queue_remove_all(mgmt->notify_list, match_notify_index,
++	queue_remove_all(mgmt->notify_list, match_notify_index,
+ 					UINT_TO_PTR(index), destroy_notify);
+ 
+ 	return true;
+@@ -828,12 +766,7 @@ bool mgmt_unregister_all(struct mgmt *mgmt)
+ 	if (!mgmt)
+ 		return false;
+ 
+-	if (mgmt->in_notify) {
+-		queue_foreach(mgmt->notify_list, mark_notify_removed,
+-						UINT_TO_PTR(MGMT_INDEX_NONE));
+-		mgmt->need_notify_cleanup = true;
+-	} else
+-		queue_remove_all(mgmt->notify_list, NULL, NULL, destroy_notify);
++	queue_remove_all(mgmt->notify_list, NULL, NULL, destroy_notify);
+ 
+ 	return true;
+ }
 -- 
 1.9.3
 
