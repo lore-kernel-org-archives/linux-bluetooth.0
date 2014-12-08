@@ -1,211 +1,173 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <5485F8FB.7090206@gmail.com>
-References: <5474BF78.7020501@gmail.com>
-	<1685281.NVOr2VMF8E@uw000953>
-	<547E3532.8060608@gmail.com>
-	<5485F8FB.7090206@gmail.com>
-Date: Tue, 9 Dec 2014 00:36:36 +0200
-Message-ID: <CABBYNZLTD_AktAVFYtSQuJkCUx7sh5yzJeCsKypeB7GcoTtV6Q@mail.gmail.com>
-Subject: Re: User question
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Bruce Dubbs <bruce.dubbs@gmail.com>
-Cc: Szymon Janc <szymon.janc@tieto.com>,
-	linux-bluetooth <linux-bluetooth@vger.kernel.org>
+In-Reply-To: <CABBYNZJ7c3dxwFH3qY3CfDqS=oQXL4Wmh1fvNpn2oU5X_C0y8w@mail.gmail.com>
+References: <1418026960-21104-1-git-send-email-jakub.tyszkowski@tieto.com>
+	<1418026960-21104-3-git-send-email-jakub.tyszkowski@tieto.com>
+	<CABBYNZKn6uTjSZzPkWkLoy5Qqwtxiyaa2L5bz67RJMCabmYYRw@mail.gmail.com>
+	<CABBYNZKUXThYFoYqCnJUJSpsp4J-Gs0_sdvM1-vHkpOpHXnBdQ@mail.gmail.com>
+	<54856FE3.7030808@tieto.com>
+	<54857AB3.4090309@tieto.com>
+	<CABBYNZKTkkN=EsfY3YYM7bGppXp10uYmURT62x-qQtBnYcDHXQ@mail.gmail.com>
+	<CAHrH25Rj1vLbgCek0BaYxD+-cb4HDyB7XL3qP=ujGkuYRJSAYg@mail.gmail.com>
+	<CABBYNZJ7c3dxwFH3qY3CfDqS=oQXL4Wmh1fvNpn2oU5X_C0y8w@mail.gmail.com>
+Date: Mon, 8 Dec 2014 14:20:35 -0800
+Message-ID: <CAHrH25SZfeRKQMm8zcG=tDKoh8D0N8XFububW2VC8OAYOqsy-w@mail.gmail.com>
+Subject: Re: [PATCH 3/5] android/gatt: Fix write commands being not handled
+From: Arman Uguray <armansito@chromium.org>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: Tyszkowski Jakub <jakub.tyszkowski@tieto.com>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Bruce,
+Hi Luiz,
 
-On Mon, Dec 8, 2014 at 9:16 PM, Bruce Dubbs <bruce.dubbs@gmail.com> wrote:
-> Is no one interested in helping?
+On Mon, Dec 8, 2014 at 2:08 PM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> Hi Arman,
 >
->   -- Bruce
->
-> Bruce Dubbs wrote:
+> On Mon, Dec 8, 2014 at 9:50 PM, Arman Uguray <armansito@chromium.org> wrote:
+>> Hi Luiz & Jakub,
 >>
->> Szymon Janc wrote:
+>>> On Mon, Dec 8, 2014 at 3:02 AM, Luiz Augusto von Dentz <luiz.dentz@gmail.com> wrote:
+>>> Hi Jakub,
 >>>
->>> Hi Bruce,
->>>
->>> On Tuesday 25 of November 2014 11:42:16 Bruce Dubbs wrote:
+>>> On Mon, Dec 8, 2014 at 12:17 PM, Tyszkowski Jakub
+>>> <jakub.tyszkowski@tieto.com> wrote:
+>>>> Hi,
 >>>>
->>>> This appears to be a developer list.  Do you accept user level questions
->>>> here?  If not, can you point me to a better place to ask?
 >>>>
->>>> I'm trying to get bluez to work in an LFS system and am getting errors.
->>>>    I'd like to get it fixed and document the issues for our community.
->
->
->>> The best way would be to just describe the issue here and provide logs.
+>>>> On 12/08/2014 10:31 AM, Tyszkowski Jakub wrote:
+>>>>>
+>>>>> Hi Luiz,
+>>>>>
+>>>>> On 12/08/2014 10:22 AM, Luiz Augusto von Dentz wrote:
+>>>>>>
+>>>>>> Hi Jakub,
+>>>>>>
+>>>>>> On Mon, Dec 8, 2014 at 10:55 AM, Luiz Augusto von Dentz
+>>>>>> <luiz.dentz@gmail.com> wrote:
+>>>>>>>
+>>>>>>> Hi Jakub,
+>>>>>>>
+>>>>>>> On Mon, Dec 8, 2014 at 10:22 AM, Jakub Tyszkowski
+>>>>>>> <jakub.tyszkowski@tieto.com> wrote:
+>>>>>>>>
+>>>>>>>> Registering for GATTRIB_ALL_REQS now means only requests and not
+>>>>>>>> commands
+>>>>>>>> or other type of att operations. Those needs their own handlers to be
+>>>>>>>> registered.
+>>>>>>>
+>>>>>>>
+>>>>>>> Is this something we break while with the internal changes to use
+>>>>>>> bt_gatt* internally? Maybe we should have it fixed there instead since
+>>>>>>> it perhaps breaks the core daemon as well. Going forward this code
+>>>>>>> will transition to use bt_gatt* directly.
+>>>>>>
+>>>>>>
+>>>>>> Looks like this code is to blame:
+>>>>>>
+>>>>>> opcode_match:
+>>>>>>
+>>>>>> if (opcode == BT_ATT_ALL_REQUESTS &&
+>>>>>>     get_op_type(test_opcode) == ATT_OP_TYPE_REQ)
+>>>>>> return true;
+>>>>>>
+>>>>>> Id say this turn BT_ATT_ALL_REQUESTS not that convenient for server
+>>>>>> since, and looking at gatt-server.c you can clearly see how many
+>>>>>> handlers we end up doing, perhaps we could something like this:
+>>>>>>
+>>>>>> diff --git a/src/shared/att.c b/src/shared/att.c
+>>>>>> index bc01827..3b52607 100644
+>>>>>> --- a/src/shared/att.c
+>>>>>> +++ b/src/shared/att.c
+>>>>>> @@ -661,7 +661,7 @@ struct notify_data {
+>>>>>>   static bool opcode_match(uint8_t opcode, uint8_t test_opcode)
+>>>>>>   {
+>>>>>>          if (opcode == BT_ATT_ALL_REQUESTS &&
+>>>>>> -                                   get_op_type(test_opcode) ==
+>>>>>> ATT_OP_TYPE_REQ)
+>>>>>> +                                   get_op_type(test_opcode) !=
+>>>>>> ATT_OP_TYPE_RSP)
+>>>>>>                  return true;
+>>>>
+>>>>
+>>>> If we do that, we are still left with other stuff like indications or even
+>>>> confirmations which would still be quite quirky for using *ALL_REQESTS in
+>>>> name.
 >>>
->>> You may also join #bluez-users on irc.freenode.net and ask there
->>> (depending on your timezone you may not get the answer right a way:)
+>>> Perhaps we check ATT_OP_TYPE_CMD in addition to ATT_OP_TYPE_REQ.
+>>>
+>>>>>>
+>>>>>>          return opcode == test_opcode;
+>>>>>>
+>>>>> Yeap, that's the line. I assumed that this change was intended and we
+>>>>> should make the daemon compatible with this new semantic.
+>>>>> I've looked through the code where ALL_REQUESTS is used and I think
+>>>>> there is no other place affected by this.
+>>>>>
+>>
+>> The change in bt_att was really done to make GAttrib's ALL_REQUESTS
+>> behavior work, otherwise we wouldn't have added it. In general, new
+>> code should just register individual handler functions for the
+>> specific opcodes it wants to handle. This leads to cleaner code, and
+>> avoids the kind of huge switch/if statements you end up needing with
+>> an ALL_* handler.
 >
+> I would classify a command as a request as well which apparently is
+> not the case anymore, anyway the problem is that ALL_REQUESTS was
+> create to map to GAttrib but we end up with something different thus
+> breaking Android code.
+
+Oh OK, if the GAttrib code groups commands under the ALL_REQUESTS flag
+then bt_att should respect that for compatibility, at least until we
+remove the dependencies. So feel free to make the fix to bt_att so
+that it works with commands as well.
+
+> ... For new code you actually should not register
+> handler yourself, except as a client for notifications and
+> indications, since bt_gatt_server should take care of those but I
+> agree that is probably cleaner to have each handler registered
+> separately.
 >
->> Thanks you for the response.  I took a look at IRC but felt that the
->> data logs would be too much for IRC.
->>
->> What I am trying to do is connect one computer to another via bluetooth.
->>   Both systems are running bluez-5.23 from Debian Jessie.
->>
->> Both systems see each other, but I cannot connect.  This is a typical
->> session:
->>
->>   # bluetoothctl
->> [NEW] Controller AC:7B:A1:C0:2B:E0 debian [default]
->> [NEW] Device 00:17:E9:94:61:AA BlueZ 5.23
->> [NEW] Device 0D:D8:18:0D:AE:30 ZaggKeys Universal
->> [bluetooth]# info 00:17:E9:94:61:AA
->> Device 00:17:E9:94:61:AA
->>          Name: BlueZ 5.23
->>          Alias: BlueZ 5.23
->>          Paired: yes
->>          Trusted: yes
->>          Blocked: no
->>          Connected: no
->>          LegacyPairing: no
->>          UUID: A/V Remote Control Target
->> (0000110c-0000-1000-8000-00805f9b34fb)
->>          UUID: A/V Remote Control
->> (0000110e-0000-1000-8000-00805f9b34fb)
->>          UUID: PnP Information (00001200-0000-1000-8000-00805f9b34fb)
->>          UUID: Generic Access Profile
->> (00001800-0000-1000-8000-00805f9b34fb)
->>          UUID: Generic Attribute Profile
->> (00001801-0000-1000-8000-00805f9b34fb)
->>          Modalias: usb:v1D6Bp0246d0517
->> [bluetooth]# connect 00:17:E9:94:61:AA
->> Attempting to connect to 00:17:E9:94:61:AA
->> [CHG] Device 00:17:E9:94:61:AA Connected: yes
->> Failed to connect: org.bluez.Error.NotAvailable
->> [CHG] Device 00:17:E9:94:61:AA Connected: no
->> [bluetooth]#
 
-Interesting, it looks like it is a remote controller (AVRCP) not a
-real keyboard (HID), iirc AVRCP does not have auto connect flag, that
-is probably is why connect fails but ConnectProfile should work.
+Sorry, that's exactly what I meant. In general if new code needs to
+handle specific opcodes then they should register a special handler
+for it, except they won't need to for most things since bt_gatt_server
+already does it as you said :)
 
->> I can get the ZaggKeys keyboard to connect.  But the result from the
->> other system running BlueZ 5.23 is similar to the above.
->>
->> Other information:
->>
->> # dmesg|grep -i blue
->> [    6.796472] toshiba_bluetooth: Detected Toshiba ACPI Bluetooth device
->> - installing RFKill handler
->> [    6.796596] toshiba_bluetooth: Re-enabling Toshiba Bluetooth
->> [    7.688297] Bluetooth: Core ver 2.19
->> [    7.688427] Bluetooth: HCI device and connection manager initialized
->> [    7.688496] Bluetooth: HCI socket layer initialized
->> [    7.688558] Bluetooth: L2CAP socket layer initialized
->> [    7.688626] Bluetooth: SCO socket layer initialized
->> [    8.258758] Bluetooth: hci0: read Intel version: 370710018002030d00
->> [    8.282937] bluetooth hci0: firmware: direct-loading firmware
->> intel/ibt-hw-37.7.10-fw-1.80.2.3.d.bseq
->> [    8.282939] Bluetooth: hci0: Intel Bluetooth firmware file:
->> intel/ibt-hw-37.7.10-fw-1.80.2.3.d.bseq
->> [    8.380858] Bluetooth: hci0: Intel Bluetooth firmware patch completed
->> and activated
->> [   15.920484] Bluetooth: BNEP (Ethernet Emulation) ver 1.3
->> [   15.921229] Bluetooth: BNEP filters: protocol multicast
->> [   15.921826] Bluetooth: BNEP socket layer initialized
->> ------------------
->>
->> # journalctl |grep blue
->> Dec 02 03:04:46 debian kernel: toshiba_bluetooth: Detected Toshiba ACPI
->> Bluetooth device - installing RFKill handler
->> Dec 02 03:04:46 debian kernel: toshiba_bluetooth: Re-enabling Toshiba
->> Bluetooth
->> Dec 02 03:04:48 debian kernel: bluetooth hci0: firmware: direct-loading
->> firmware intel/ibt-hw-37.7.10-fw-1.80.2.3.d.bseq
->> Dec 02 03:04:53 debian bluetoothd[735]: Bluetooth daemon 5.23
->> Dec 02 03:04:55 debian bluetoothd[735]: Starting SDP server
->> Dec 02 03:04:55 debian bluetoothd[735]: Bluetooth management interface
->> 1.6 initialized
->> Dec 02 03:04:56 debian bluetoothd[735]: Sap driver initialization failed.
->> Dec 02 03:04:56 debian bluetoothd[735]: sap-server: Operation not
->> permitted (1)
->> Dec 02 03:04:56 debian bluetoothd[735]: hci0 Load Connection Parameters
->> failed: Unknown Command (0x01)
->>
->> If I remove the device and start over, I get:
->>
->> ---------------------------
->> # scan on
->> Discovery started
->> [CHG] Controller AC:7B:A1:C0:2B:E0 Discovering: yes
->> [NEW] Device 00:17:E9:94:61:AA BlueZ 5.23
->> [CHG] Device 00:17:E9:94:61:AA RSSI: -92
->> [CHG] Device 00:17:E9:94:61:AA RSSI: -54
->> [bluetooth]# devices
->> Device 00:17:E9:94:61:AA BlueZ 5.23
->> [CHG] Device 00:17:E9:94:61:AA RSSI: -68
->> [CHG] Device 00:17:E9:94:61:AA RSSI: -57
->> [bluetooth]# info 00:17:E9:94:61:AA
->> Device 00:17:E9:94:61:AA
->>          Name: BlueZ 5.23
->>          Alias: BlueZ 5.23
->>          Paired: no
->>          Trusted: no
->>          Blocked: no
->>          Connected: no
->>          LegacyPairing: no
->>          UUID: Generic Access Profile
->> (00001800-0000-1000-8000-00805f9b34fb)
->>          UUID: Generic Attribute Profile
->> (00001801-0000-1000-8000-00805f9b34fb)
->>          UUID: A/V Remote Control
->> (0000110e-0000-1000-8000-00805f9b34fb)
->>          UUID: A/V Remote Control Target
->> (0000110c-0000-1000-8000-00805f9b34fb)
->>          Modalias: usb:v1D6Bp0246d0517
->> [CHG] Controller AC:7B:A1:C0:2B:E0 Discoverable: no
->> [bluetooth]# pair 00:17:E9:94:61:AA
->> Attempting to pair with 00:17:E9:94:61:AA
->> [CHG] Device 00:17:E9:94:61:AA Connected: yes
->> Request confirmation
->> [agent] Confirm passkey 870856 (yes/no): yes
->> [bluetooth]# info 00:17:E9:94:61:AA
->> Device 00:17:E9:94:61:AA
->>          Name: BlueZ 5.23
->>          Alias: BlueZ 5.23
->>          Paired: no
->>          Trusted: no
->>          Blocked: no
->>          Connected: yes
->>          LegacyPairing: no
->>          UUID: Generic Access Profile
->> (00001800-0000-1000-8000-00805f9b34fb)
->>          UUID: Generic Attribute Profile
->> (00001801-0000-1000-8000-00805f9b34fb)
->>          UUID: A/V Remote Control
->> (0000110e-0000-1000-8000-00805f9b34fb)
->>          UUID: A/V Remote Control Target
->> (0000110c-0000-1000-8000-00805f9b34fb)
->>          Modalias: usb:v1D6Bp0246d0517
->> Failed to pair: org.bluez.Error.AuthenticationFailed
->> [CHG] Device 00:17:E9:94:61:AA Connected: no
->>
->> -----------------
->>
->> Any help will be appreciated.
->>
->>    -- Bruce
->>
->>
->>
->>
->>
+>> So for notifications/indications, you should really just register a
+>> handler with the associated opcodes.
 >
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth"
-> in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> Yep, that should really be the only handlers outside bt_gatt_server scope.
+>
 
+Right. Actually, in the future, for incoming notifications/indications
+new code should use bt_gatt_client_register_notify. This automatically
+writes to the remote CCC (does reference counting so that
+notifications don't accidentally get disabled), sets its own handler
+with bt_att for notifications and indications and automatically sends
+out a confirmation for the latter. So I guess new code generally won't
+need to ever directly call bt_att_register as long as they use
+bt_gatt_client/bt_gatt_server.
 
+>> As a note: bt_att doesn't allow registering handlers for incoming
+>> response PDUs. Instead, those are propagated to the upper layer via
+>> the callback passed to bt_att_send when the request was originally
+>> sent out. Basically, you don't get to know about a response unless you
+>> sent out the request in the first place (and AFAIK this is the case
+>> with GAttrib as well).
+>
+> I guess we were discussing how to get the same behavior as in GAttrib
+> ALL_REQUESTS, this would probably be removed once we transition to
+> bt_gatt_server.
+>
 
--- 
-Luiz Augusto von Dentz
+I think so. I think it's basically just for backwards compatibility to
+keep GAttrib working and we can remove it in the future. We should
+probably add a note in shared/att-types.h to discourage new code from
+using it.
+
+Thanks,
+Arman
