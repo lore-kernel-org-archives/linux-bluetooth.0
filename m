@@ -1,148 +1,131 @@
 Return-Path: <cyrus@holtmann.org>
 From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 4/5] android/tester: move bthost.h include to tester-main.h
-Date: Mon,  8 Dec 2014 11:35:07 +0100
-Message-Id: <1418034908-1742-4-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+Subject: [PATCH 2/5] android/tester: put gatt callback declaration in right place
+Date: Mon,  8 Dec 2014 11:35:05 +0100
+Message-Id: <1418034908-1742-2-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 In-Reply-To: <1418034908-1742-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 References: <1418034908-1742-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-bthost.h is used by all testers.
+Gatt callback declaration should be defined after their definitions.
+This is the adopted style.
 ---
- android/tester-a2dp.c      | 1 -
- android/tester-avrcp.c     | 1 -
- android/tester-bluetooth.c | 1 -
- android/tester-gatt.c      | 1 -
- android/tester-hdp.c       | 1 -
- android/tester-hidhost.c   | 1 -
- android/tester-main.c      | 1 -
- android/tester-main.h      | 1 +
- android/tester-pan.c       | 1 -
- android/tester-socket.c    | 1 -
- 10 files changed, 1 insertion(+), 9 deletions(-)
+ android/tester-main.c | 86 +++++++++++++++++++++++++--------------------------
+ 1 file changed, 43 insertions(+), 43 deletions(-)
 
-diff --git a/android/tester-a2dp.c b/android/tester-a2dp.c
-index 837477e..a2e7325 100644
---- a/android/tester-a2dp.c
-+++ b/android/tester-a2dp.c
-@@ -17,7 +17,6 @@
- 
- #include <stdbool.h>
- 
--#include "emulator/bthost.h"
- #include "src/shared/util.h"
- 
- #include "tester-main.h"
-diff --git a/android/tester-avrcp.c b/android/tester-avrcp.c
-index 41a5fd3..3bda390 100644
---- a/android/tester-avrcp.c
-+++ b/android/tester-avrcp.c
-@@ -17,7 +17,6 @@
- 
- #include <stdbool.h>
- 
--#include "emulator/bthost.h"
- #include "src/shared/util.h"
- 
- #include "tester-main.h"
-diff --git a/android/tester-bluetooth.c b/android/tester-bluetooth.c
-index 2be824d..6586a54 100644
---- a/android/tester-bluetooth.c
-+++ b/android/tester-bluetooth.c
-@@ -16,7 +16,6 @@
-  */
- #include <stdbool.h>
- 
--#include "emulator/bthost.h"
- #include "tester-main.h"
- 
- static struct queue *list; /* List of bluetooth test cases */
-diff --git a/android/tester-gatt.c b/android/tester-gatt.c
-index de2a7a7..d8021d7 100644
---- a/android/tester-gatt.c
-+++ b/android/tester-gatt.c
-@@ -17,7 +17,6 @@
- 
- #include <stdbool.h>
- 
--#include "emulator/bthost.h"
- #include "tester-main.h"
- #include "src/shared/util.h"
- 
-diff --git a/android/tester-hdp.c b/android/tester-hdp.c
-index ab7666d..195171d 100644
---- a/android/tester-hdp.c
-+++ b/android/tester-hdp.c
-@@ -17,7 +17,6 @@
- 
- #include <stdbool.h>
- 
--#include "emulator/bthost.h"
- #include "tester-main.h"
- #include "android/utils.h"
- 
-diff --git a/android/tester-hidhost.c b/android/tester-hidhost.c
-index 95befd9..6214b4f 100644
---- a/android/tester-hidhost.c
-+++ b/android/tester-hidhost.c
-@@ -17,7 +17,6 @@
- 
- #include <stdbool.h>
- 
--#include "emulator/bthost.h"
- #include "tester-main.h"
- 
- #include "android/utils.h"
 diff --git a/android/tester-main.c b/android/tester-main.c
-index 6339b3a..06730d2 100644
+index 8f3bc3c..429838d 100644
 --- a/android/tester-main.c
 +++ b/android/tester-main.c
-@@ -17,7 +17,6 @@
- #include <stdbool.h>
+@@ -1650,6 +1650,27 @@ static void gattc_notif_cb(int conn_id, btgatt_notify_params_t *p_data)
+ 	schedule_callback_verification(step);
+ }
  
- #include "src/shared/util.h"
--#include "emulator/bthost.h"
- #include "tester-main.h"
++static const btgatt_client_callbacks_t btgatt_client_callbacks = {
++	.register_client_cb = gattc_register_client_cb,
++	.scan_result_cb = gattc_scan_result_cb,
++	.open_cb = gattc_connect_cb,
++	.close_cb = gattc_disconnect_cb,
++	.search_complete_cb = gattc_search_complete_cb,
++	.search_result_cb = gattc_search_result_cb,
++	.get_characteristic_cb = gattc_get_characteristic_cb,
++	.get_descriptor_cb = gattc_get_descriptor_cb,
++	.get_included_service_cb = gattc_get_included_service_cb,
++	.register_for_notification_cb = gattc_register_for_notification_cb,
++	.notify_cb = gattc_notif_cb,
++	.read_characteristic_cb = gattc_read_characteristic_cb,
++	.write_characteristic_cb = gattc_write_characteristic_cb,
++	.read_descriptor_cb = gattc_read_descriptor_cb,
++	.write_descriptor_cb = gattc_write_descriptor_cb,
++	.execute_write_cb = NULL,
++	.read_remote_rssi_cb = NULL,
++	.listen_cb = gattc_listen_cb
++};
++
+ static void gatts_register_server_cb(int status, int server_if,
+ 							bt_uuid_t *app_uuid)
+ {
+@@ -1862,6 +1883,28 @@ static void gatts_request_write_cb(int conn_id, int trans_id, bt_bdaddr_t *bda,
+ 	schedule_callback_verification(step);
+ }
  
- #include "monitor/bt.h"
-diff --git a/android/tester-main.h b/android/tester-main.h
-index 474afbb..ae65d72 100644
---- a/android/tester-main.h
-+++ b/android/tester-main.h
-@@ -41,6 +41,7 @@
- #include "src/shared/mgmt.h"
- #include "src/shared/queue.h"
- #include "emulator/hciemu.h"
-+#include "emulator/bthost.h"
++static const btgatt_server_callbacks_t btgatt_server_callbacks = {
++	.register_server_cb = gatts_register_server_cb,
++	.connection_cb = gatts_connection_cb,
++	.service_added_cb = gatts_service_added_cb,
++	.included_service_added_cb = gatts_included_service_added_cb,
++	.characteristic_added_cb = gatts_characteristic_added_cb,
++	.descriptor_added_cb = gatts_descriptor_added_cb,
++	.service_started_cb = gatts_service_started_cb,
++	.service_stopped_cb = gatts_service_stopped_cb,
++	.service_deleted_cb = gatts_service_deleted_cb,
++	.request_read_cb = gatts_request_read_cb,
++	.request_write_cb = gatts_request_write_cb,
++	.request_exec_write_cb = NULL,
++	.response_confirmation_cb = NULL
++};
++
++static const btgatt_callbacks_t btgatt_callbacks = {
++	.size = sizeof(btgatt_callbacks),
++	.client = &btgatt_client_callbacks,
++	.server = &btgatt_server_callbacks
++};
++
+ static void pan_control_state_cb(btpan_control_state_t state, int local_role,
+ 					bt_status_t error, const char *ifname)
+ {
+@@ -1989,49 +2032,6 @@ static btrc_callbacks_t btavrcp_callbacks = {
+ 	.get_element_attr_cb = avrcp_get_element_attr_cb,
+ };
  
- #include <hardware/hardware.h>
- #include <hardware/audio.h>
-diff --git a/android/tester-pan.c b/android/tester-pan.c
-index aff1980..1d07b22 100644
---- a/android/tester-pan.c
-+++ b/android/tester-pan.c
-@@ -17,7 +17,6 @@
- 
- #include <stdbool.h>
- 
--#include "emulator/bthost.h"
- #include "tester-main.h"
- #include "android/utils.h"
- 
-diff --git a/android/tester-socket.c b/android/tester-socket.c
-index c70d753..bd0260c 100644
---- a/android/tester-socket.c
-+++ b/android/tester-socket.c
-@@ -18,7 +18,6 @@
- #include <fcntl.h>
- #include <stdbool.h>
- 
--#include "emulator/bthost.h"
- #include "tester-main.h"
- 
- static struct queue *list; /* List of socket test cases */
+-static const btgatt_client_callbacks_t btgatt_client_callbacks = {
+-	.register_client_cb = gattc_register_client_cb,
+-	.scan_result_cb = gattc_scan_result_cb,
+-	.open_cb = gattc_connect_cb,
+-	.close_cb = gattc_disconnect_cb,
+-	.search_complete_cb = gattc_search_complete_cb,
+-	.search_result_cb = gattc_search_result_cb,
+-	.get_characteristic_cb = gattc_get_characteristic_cb,
+-	.get_descriptor_cb = gattc_get_descriptor_cb,
+-	.get_included_service_cb = gattc_get_included_service_cb,
+-	.register_for_notification_cb = gattc_register_for_notification_cb,
+-	.notify_cb = gattc_notif_cb,
+-	.read_characteristic_cb = gattc_read_characteristic_cb,
+-	.write_characteristic_cb = gattc_write_characteristic_cb,
+-	.read_descriptor_cb = gattc_read_descriptor_cb,
+-	.write_descriptor_cb = gattc_write_descriptor_cb,
+-	.execute_write_cb = NULL,
+-	.read_remote_rssi_cb = NULL,
+-	.listen_cb = gattc_listen_cb
+-};
+-
+-static const btgatt_server_callbacks_t btgatt_server_callbacks = {
+-	.register_server_cb = gatts_register_server_cb,
+-	.connection_cb = gatts_connection_cb,
+-	.service_added_cb = gatts_service_added_cb,
+-	.included_service_added_cb = gatts_included_service_added_cb,
+-	.characteristic_added_cb = gatts_characteristic_added_cb,
+-	.descriptor_added_cb = gatts_descriptor_added_cb,
+-	.service_started_cb = gatts_service_started_cb,
+-	.service_stopped_cb = gatts_service_stopped_cb,
+-	.service_deleted_cb = gatts_service_deleted_cb,
+-	.request_read_cb = gatts_request_read_cb,
+-	.request_write_cb = gatts_request_write_cb,
+-	.request_exec_write_cb = NULL,
+-	.response_confirmation_cb = NULL
+-};
+-
+-static const btgatt_callbacks_t btgatt_callbacks = {
+-	.size = sizeof(btgatt_callbacks),
+-	.client = &btgatt_client_callbacks,
+-	.server = &btgatt_server_callbacks
+-};
+-
+ static bool setup_base(struct test_data *data)
+ {
+ 	const hw_module_t *module;
 -- 
 1.9.3
 
