@@ -1,187 +1,120 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1411599462-8680-1-git-send-email-scott@netsplit.com>
-References: <1411599462-8680-1-git-send-email-scott@netsplit.com>
-Date: Mon, 8 Dec 2014 23:57:30 +0200
-Message-ID: <CABBYNZ+JEUQ8wtT+sNOBj0=dv=Z6-wUCoZ=x6qreoXfvTv4aAw@mail.gmail.com>
-Subject: Re: [PATCH] core: add D-Bus property for TxPower
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Scott James Remnant <scott@netsplit.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	"keybuk@chromium.org" <keybuk@chromium.org>
+In-Reply-To: <CABBYNZKTkkN=EsfY3YYM7bGppXp10uYmURT62x-qQtBnYcDHXQ@mail.gmail.com>
+References: <1418026960-21104-1-git-send-email-jakub.tyszkowski@tieto.com>
+	<1418026960-21104-3-git-send-email-jakub.tyszkowski@tieto.com>
+	<CABBYNZKn6uTjSZzPkWkLoy5Qqwtxiyaa2L5bz67RJMCabmYYRw@mail.gmail.com>
+	<CABBYNZKUXThYFoYqCnJUJSpsp4J-Gs0_sdvM1-vHkpOpHXnBdQ@mail.gmail.com>
+	<54856FE3.7030808@tieto.com>
+	<54857AB3.4090309@tieto.com>
+	<CABBYNZKTkkN=EsfY3YYM7bGppXp10uYmURT62x-qQtBnYcDHXQ@mail.gmail.com>
+Date: Mon, 8 Dec 2014 11:50:26 -0800
+Message-ID: <CAHrH25Rj1vLbgCek0BaYxD+-cb4HDyB7XL3qP=ujGkuYRJSAYg@mail.gmail.com>
+Subject: Re: [PATCH 3/5] android/gatt: Fix write commands being not handled
+From: Arman Uguray <armansito@chromium.org>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: Tyszkowski Jakub <jakub.tyszkowski@tieto.com>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Scott,
+Hi Luiz & Jakub,
 
-On Thu, Sep 25, 2014 at 1:57 AM, Scott James Remnant <scott@netsplit.com> wrote:
-> This is presented as a raw property rather than a parsed "PathLoss"
-> property because in the case of many devices, this specific field will
-> not be present and instead the TX power will have to be parsed from
-> manufacturer-specific data anyway.
+> On Mon, Dec 8, 2014 at 3:02 AM, Luiz Augusto von Dentz <luiz.dentz@gmail.com> wrote:
+> Hi Jakub,
 >
-> It's better therefore to document the Path Loss equation rather than
-> hide it.
+> On Mon, Dec 8, 2014 at 12:17 PM, Tyszkowski Jakub
+> <jakub.tyszkowski@tieto.com> wrote:
+>> Hi,
+>>
+>>
+>> On 12/08/2014 10:31 AM, Tyszkowski Jakub wrote:
+>>>
+>>> Hi Luiz,
+>>>
+>>> On 12/08/2014 10:22 AM, Luiz Augusto von Dentz wrote:
+>>>>
+>>>> Hi Jakub,
+>>>>
+>>>> On Mon, Dec 8, 2014 at 10:55 AM, Luiz Augusto von Dentz
+>>>> <luiz.dentz@gmail.com> wrote:
+>>>>>
+>>>>> Hi Jakub,
+>>>>>
+>>>>> On Mon, Dec 8, 2014 at 10:22 AM, Jakub Tyszkowski
+>>>>> <jakub.tyszkowski@tieto.com> wrote:
+>>>>>>
+>>>>>> Registering for GATTRIB_ALL_REQS now means only requests and not
+>>>>>> commands
+>>>>>> or other type of att operations. Those needs their own handlers to be
+>>>>>> registered.
+>>>>>
+>>>>>
+>>>>> Is this something we break while with the internal changes to use
+>>>>> bt_gatt* internally? Maybe we should have it fixed there instead since
+>>>>> it perhaps breaks the core daemon as well. Going forward this code
+>>>>> will transition to use bt_gatt* directly.
+>>>>
+>>>>
+>>>> Looks like this code is to blame:
+>>>>
+>>>> opcode_match:
+>>>>
+>>>> if (opcode == BT_ATT_ALL_REQUESTS &&
+>>>>     get_op_type(test_opcode) == ATT_OP_TYPE_REQ)
+>>>> return true;
+>>>>
+>>>> Id say this turn BT_ATT_ALL_REQUESTS not that convenient for server
+>>>> since, and looking at gatt-server.c you can clearly see how many
+>>>> handlers we end up doing, perhaps we could something like this:
+>>>>
+>>>> diff --git a/src/shared/att.c b/src/shared/att.c
+>>>> index bc01827..3b52607 100644
+>>>> --- a/src/shared/att.c
+>>>> +++ b/src/shared/att.c
+>>>> @@ -661,7 +661,7 @@ struct notify_data {
+>>>>   static bool opcode_match(uint8_t opcode, uint8_t test_opcode)
+>>>>   {
+>>>>          if (opcode == BT_ATT_ALL_REQUESTS &&
+>>>> -                                   get_op_type(test_opcode) ==
+>>>> ATT_OP_TYPE_REQ)
+>>>> +                                   get_op_type(test_opcode) !=
+>>>> ATT_OP_TYPE_RSP)
+>>>>                  return true;
+>>
+>>
+>> If we do that, we are still left with other stuff like indications or even
+>> confirmations which would still be quite quirky for using *ALL_REQESTS in
+>> name.
+>
+> Perhaps we check ATT_OP_TYPE_CMD in addition to ATT_OP_TYPE_REQ.
+>
+>>>>
+>>>>          return opcode == test_opcode;
+>>>>
+>>> Yeap, that's the line. I assumed that this change was intended and we
+>>> should make the daemon compatible with this new semantic.
+>>> I've looked through the code where ALL_REQUESTS is used and I think
+>>> there is no other place affected by this.
+>>>
 
-Im trying to understand your reasoning here, so TxPower is better
-because is what you can get from manufacturer data? If we have RSSI
-and Tx Power we could just do the math and expose as PathLoss don't
-we?
+The change in bt_att was really done to make GAttrib's ALL_REQUESTS
+behavior work, otherwise we wouldn't have added it. In general, new
+code should just register individual handler functions for the
+specific opcodes it wants to handle. This leads to cleaner code, and
+avoids the kind of huge switch/if statements you end up needing with
+an ALL_* handler.
 
-> ---
->  doc/device-api.txt | 12 ++++++++++++
->  src/adapter.c      |  6 ++++--
->  src/device.c       | 41 +++++++++++++++++++++++++++++++++++++++++
->  src/device.h       |  1 +
->  4 files changed, 58 insertions(+), 2 deletions(-)
->
-> diff --git a/doc/device-api.txt b/doc/device-api.txt
-> index 86d8af8..68388e9 100644
-> --- a/doc/device-api.txt
-> +++ b/doc/device-api.txt
-> @@ -193,3 +193,15 @@ Properties string Address [readonly]
->
->                         Received Signal Strength Indicator of the remote
->                         device (inquiry or advertising).
-> +
-> +               int16 TxPower [readonly, optional]
-> +
-> +                       Transmission power claimed by the remote device
-> +                       (inquiry or advertising). Many devices may not make
-> +                       this available at all, or may incorporate this data
-> +                       into a manufacturer or service-specific field instead.
-> +
-> +                       However the remote transmission power is obtained,
-> +                       path loss can be calculated by the equation:
-> +
-> +                               Path Loss = Tx Power - RSSI
-> diff --git a/src/adapter.c b/src/adapter.c
-> index 92ee1a0..1b44dc5 100644
-> --- a/src/adapter.c
-> +++ b/src/adapter.c
-> @@ -1585,16 +1585,17 @@ static int compare_sender(gconstpointer a, gconstpointer b)
->         return g_strcmp0(client->owner, sender);
->  }
->
-> -static void invalidate_rssi(gpointer a)
-> +static void invalidate_inquiry_data(gpointer a)
->  {
->         struct btd_device *dev = a;
->
->         device_set_rssi(dev, 0);
-> +       device_set_tx_power(dev, 127);
->  }
->
->  static void discovery_cleanup(struct btd_adapter *adapter)
->  {
-> -       g_slist_free_full(adapter->discovery_found, invalidate_rssi);
-> +       g_slist_free_full(adapter->discovery_found, invalidate_inquiry_data);
->         adapter->discovery_found = NULL;
->  }
->
-> @@ -4715,6 +4716,7 @@ static void update_found_devices(struct btd_adapter *adapter,
->
->         device_set_legacy(dev, legacy);
->         device_set_rssi(dev, rssi);
-> +       device_set_tx_power(dev, eir_data.tx_power);
->
->         if (eir_data.appearance != 0)
->                 device_set_appearance(dev, eir_data.appearance);
-> diff --git a/src/device.c b/src/device.c
-> index 875a5c5..d4ebf4f 100644
-> --- a/src/device.c
-> +++ b/src/device.c
-> @@ -219,6 +219,7 @@ struct btd_device {
->
->         bool            legacy;
->         int8_t          rssi;
-> +       int8_t          tx_power;
->
->         GIOChannel      *att_io;
->         guint           cleanup_id;
-> @@ -812,6 +813,28 @@ static gboolean dev_property_exists_rssi(const GDBusPropertyTable *property,
->         return TRUE;
->  }
->
-> +static gboolean dev_property_get_tx_power(const GDBusPropertyTable *property,
-> +                                       DBusMessageIter *iter, void *data)
-> +{
-> +       struct btd_device *dev = data;
-> +       dbus_int16_t val = dev->tx_power;
-> +
-> +       dbus_message_iter_append_basic(iter, DBUS_TYPE_INT16, &val);
-> +
-> +       return TRUE;
-> +}
-> +
-> +static gboolean dev_property_exists_tx_power(const GDBusPropertyTable *property,
-> +                                                               void *data)
-> +{
-> +       struct btd_device *dev = data;
-> +
-> +       if (dev->tx_power == 127)
-> +               return FALSE;
-> +
-> +       return TRUE;
-> +}
-> +
->  static gboolean dev_property_get_trusted(const GDBusPropertyTable *property,
->                                         DBusMessageIter *iter, void *data)
->  {
-> @@ -1957,6 +1980,8 @@ static const GDBusPropertyTable device_properties[] = {
->         { "Blocked", "b", dev_property_get_blocked, dev_property_set_blocked },
->         { "LegacyPairing", "b", dev_property_get_legacy },
->         { "RSSI", "n", dev_property_get_rssi, NULL, dev_property_exists_rssi },
-> +       { "TxPower", "n", dev_property_get_tx_power, NULL,
-> +                                               dev_property_exists_tx_power },
->         { "Connected", "b", dev_property_get_connected },
->         { "UUIDs", "as", dev_property_get_uuids },
->         { "Modalias", "s", dev_property_get_modalias, NULL,
-> @@ -4107,6 +4132,22 @@ void device_set_rssi(struct btd_device *device, int8_t rssi)
->                                                 DEVICE_INTERFACE, "RSSI");
->  }
->
-> +void device_set_tx_power(struct btd_device *device, int8_t tx_power)
-> +{
-> +       if (!device)
-> +               return;
-> +
-> +       if (device->tx_power == tx_power)
-> +               return;
-> +
-> +       DBG("tx_power %d", tx_power);
-> +
-> +       device->tx_power = tx_power;
-> +
-> +       g_dbus_emit_property_changed(dbus_conn, device->path,
-> +                                               DEVICE_INTERFACE, "TxPower");
-> +}
-> +
->  static gboolean start_discovery(gpointer user_data)
->  {
->         struct btd_device *device = user_data;
-> diff --git a/src/device.h b/src/device.h
-> index 2e0473e..b568593 100644
-> --- a/src/device.h
-> +++ b/src/device.h
-> @@ -88,6 +88,7 @@ void btd_device_set_trusted(struct btd_device *device, gboolean trusted);
->  void device_set_bonded(struct btd_device *device, uint8_t bdaddr_type);
->  void device_set_legacy(struct btd_device *device, bool legacy);
->  void device_set_rssi(struct btd_device *device, int8_t rssi);
-> +void device_set_tx_power(struct btd_device *device, int8_t tx_power);
->  bool btd_device_is_connected(struct btd_device *dev);
->  uint8_t btd_device_get_bdaddr_type(struct btd_device *dev);
->  bool device_is_retrying(struct btd_device *device);
-> --
-> 2.1.0.rc2.206.gedb03e5
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+So for notifications/indications, you should really just register a
+handler with the associated opcodes.
 
+As a note: bt_att doesn't allow registering handlers for incoming
+response PDUs. Instead, those are propagated to the upper layer via
+the callback passed to bt_att_send when the request was originally
+sent out. Basically, you don't get to know about a response unless you
+sent out the request in the first place (and AFAIK this is the case
+with GAttrib as well).
 
-
--- 
-Luiz Augusto von Dentz
+Cheers,
+Arman
