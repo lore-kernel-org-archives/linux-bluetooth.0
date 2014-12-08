@@ -1,34 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
-From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
-Subject: [PATCH 2/5] android/gatt: Fix not confirming write commands in database
-Date: Mon,  8 Dec 2014 09:22:37 +0100
-Message-Id: <1418026960-21104-2-git-send-email-jakub.tyszkowski@tieto.com>
-In-Reply-To: <1418026960-21104-1-git-send-email-jakub.tyszkowski@tieto.com>
-References: <1418026960-21104-1-git-send-email-jakub.tyszkowski@tieto.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Mon, 8 Dec 2014 09:22:20 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth: Fix generation of non-resolvable private
+ addresses
+Message-ID: <20141208072220.GA20485@t440s>
+References: <1417979597-27993-1-git-send-email-marcel@holtmann.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1417979597-27993-1-git-send-email-marcel@holtmann.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-App will never confirm write command as commands dont need one but we
-still need to confirm in databasse. We confirm immediately.
----
- android/gatt.c | 2 ++
- 1 file changed, 2 insertions(+)
+Hi Marcel,
 
-diff --git a/android/gatt.c b/android/gatt.c
-index 4ad0ce9..cb87810 100644
---- a/android/gatt.c
-+++ b/android/gatt.c
-@@ -4904,6 +4904,8 @@ static void write_cb(struct gatt_db_attribute *attrib, unsigned int id,
- 
- 	if (opcode == ATT_OP_WRITE_REQ || opcode == ATT_OP_PREP_WRITE_REQ)
- 		ev->need_rsp = 0x01;
-+	else
-+		gatt_db_attribute_write_result(attrib, id, 0);
- 
- 	ev->length = len;
- 	memcpy(ev->value, value, len);
--- 
-1.9.1
+On Sun, Dec 07, 2014, Marcel Holtmann wrote:
+> When the host decides to use a non-resolvable private address, it
+> must ensure that this generated address does not match the public
+> address of the controller. Add an extra check to ensure this required
+> behavior.
+> 
+> In addition rename the variable from urpa to nrpa and fix all of the
+> comments in the code that use the term unresolvable instead of the
+> term non-resolvable as used in the Bluetooth specification.
+> 
+> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+> ---
+>  net/bluetooth/hci_conn.c |  2 +-
+>  net/bluetooth/hci_core.c | 24 ++++++++++++++++++------
+>  net/bluetooth/mgmt.c     |  2 +-
+>  3 files changed, 20 insertions(+), 8 deletions(-)
 
+Applied to bluetooth-next. Thanks.
+
+Johan
