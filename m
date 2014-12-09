@@ -2,53 +2,72 @@ Return-Path: <cyrus@holtmann.org>
 From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH 07/25] android/bluetooth: Add API to check if device is bonding
-Date: Tue,  9 Dec 2014 16:11:29 +0100
-Message-Id: <1418137907-16981-8-git-send-email-lukasz.rymanowski@tieto.com>
+Subject: [PATCH 06/25] android/gatt: Add paired cb to gatt.c
+Date: Tue,  9 Dec 2014 16:11:28 +0100
+Message-Id: <1418137907-16981-7-git-send-email-lukasz.rymanowski@tieto.com>
 In-Reply-To: <1418137907-16981-1-git-send-email-lukasz.rymanowski@tieto.com>
 References: <1418137907-16981-1-git-send-email-lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Some modules like GATT might be interested in information about ongoing
-bonding on device. It can be useful e.g. to take decision if GATT can do
-service search or should wait until bonding is done.
+This will be required in order to register for Service Changed on remote
+device
 ---
- android/bluetooth.c | 11 +++++++++++
- android/bluetooth.h |  1 +
- 2 files changed, 12 insertions(+)
+ android/gatt.c | 27 +++++++++++++++++++++++++++
+ 1 file changed, 27 insertions(+)
 
-diff --git a/android/bluetooth.c b/android/bluetooth.c
-index 7c4adb8..6e678e4 100644
---- a/android/bluetooth.c
-+++ b/android/bluetooth.c
-@@ -1765,6 +1765,17 @@ void bt_paired_unregister(bt_paired_device_cb cb)
- 	queue_remove(paired_cb_list, cb);
+diff --git a/android/gatt.c b/android/gatt.c
+index 9c2260c..4c16ce6 100644
+--- a/android/gatt.c
++++ b/android/gatt.c
+@@ -6957,6 +6957,24 @@ static bool start_listening(void)
+ 	return true;
  }
  
-+bool bt_is_pairing(const bdaddr_t *addr)
++static void gatt_paired_cb(const bdaddr_t *addr, uint8_t type)
 +{
-+	struct device *dev;
++	struct gatt_device *dev;
++	char address[18];
 +
-+	dev = find_device(addr);
++	dev = find_device_by_addr(addr);
 +	if (!dev)
-+		return false;
++		return;
 +
-+	return dev->pairing;
++	if (dev->bdaddr_type != type)
++		return;
++
++	ba2str(addr, address);
++	DBG("Paired device %s", address);
++
++	/* Find Service Changed and register for it.*/
 +}
 +
- static bool rssi_above_threshold(int old, int new)
+ static void gatt_unpaired_cb(const bdaddr_t *addr, uint8_t type)
  {
- 	/* only 8 dBm or more */
-diff --git a/android/bluetooth.h b/android/bluetooth.h
-index 8e0e6e2..884aed3 100644
---- a/android/bluetooth.h
-+++ b/android/bluetooth.h
-@@ -94,3 +94,4 @@ void bt_unpaired_unregister(bt_unpaired_device_cb cb);
- typedef void (*bt_paired_device_cb)(const bdaddr_t *addr, uint8_t type);
- bool bt_paired_register(bt_paired_device_cb cb);
- void bt_paired_unregister(bt_paired_device_cb cb);
-+bool bt_is_pairing(const bdaddr_t *addr);
+ 	struct gatt_device *dev;
+@@ -6980,6 +6998,11 @@ bool bt_gatt_register(struct ipc *ipc, const bdaddr_t *addr)
+ {
+ 	DBG("");
+ 
++	if (!bt_paired_register(gatt_paired_cb)) {
++		error("gatt: Could not register paired callback");
++		return false;
++	}
++
+ 	if (!bt_unpaired_register(gatt_unpaired_cb)) {
+ 		error("gatt: Could not register unpaired callback");
+ 		return false;
+@@ -7029,6 +7052,10 @@ bool bt_gatt_register(struct ipc *ipc, const bdaddr_t *addr)
+ 	return true;
+ 
+ failed:
++
++	bt_paired_unregister(gatt_paired_cb);
++	bt_unpaired_unregister(gatt_unpaired_cb);
++
+ 	queue_destroy(gatt_apps, NULL);
+ 	gatt_apps = NULL;
+ 
 -- 
 1.8.4
 
