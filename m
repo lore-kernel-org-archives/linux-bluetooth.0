@@ -2,129 +2,177 @@ Return-Path: <cyrus@holtmann.org>
 From: Arman Uguray <armansito@chromium.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Arman Uguray <armansito@chromium.org>
-Subject: [PATCH BlueZ 07/15] core: device: Use bt_att_register_disconnect.
-Date: Mon,  8 Dec 2014 16:40:47 -0800
-Message-Id: <1418085655-7304-8-git-send-email-armansito@chromium.org>
+Subject: [PATCH BlueZ 06/15] shared/gatt-db: Add UUID arg to foreach_service
+Date: Mon,  8 Dec 2014 16:40:46 -0800
+Message-Id: <1418085655-7304-7-git-send-email-armansito@chromium.org>
 In-Reply-To: <1418085655-7304-1-git-send-email-armansito@chromium.org>
 References: <1418085655-7304-1-git-send-email-armansito@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-btd_device is now notified of ATT channel disconnections by registering
-a disconnect handler with bt_att instead of setting up an io watch with
-the GIOChannel.
+This patch adds the "uuid" argument to gatt_db_foreach_service, which
+invokes the callback for a service only if "uuid" is NULL or if it
+matches the GATT service UUID.
 ---
- src/device.c | 34 +++++++++++++++++++++-------------
- 1 file changed, 21 insertions(+), 13 deletions(-)
+ src/shared/gatt-db.c  | 19 ++++++++++++++++---
+ src/shared/gatt-db.h  |  6 ++++--
+ tools/btgatt-client.c |  9 ++++-----
+ tools/btgatt-server.c |  2 +-
+ unit/test-gatt.c      |  4 ++--
+ 5 files changed, 27 insertions(+), 13 deletions(-)
 
-diff --git a/src/device.c b/src/device.c
-index e9630ed..b31e98d 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -46,6 +46,8 @@
- #include "log.h"
+diff --git a/src/shared/gatt-db.c b/src/shared/gatt-db.c
+index 379b4ad..98fb8a0 100644
+--- a/src/shared/gatt-db.c
++++ b/src/shared/gatt-db.c
+@@ -996,14 +996,17 @@ void gatt_db_find_information(struct gatt_db *db, uint16_t start_handle,
+ 	queue_foreach(db->services, find_information, &data);
+ }
  
- #include "src/shared/util.h"
-+#include "src/shared/att.h"
-+#include "src/shared/gatt-client.h"
- #include "btio/btio.h"
- #include "lib/uuid.h"
- #include "lib/mgmt.h"
-@@ -203,6 +205,9 @@ struct btd_device {
- 	GSList		*attios_offline;
- 	guint		attachid;		/* Attrib server attach */
+-void gatt_db_foreach_service(struct gatt_db *db, gatt_db_attribute_cb_t func,
+-							void *user_data)
++void gatt_db_foreach_service(struct gatt_db *db, const bt_uuid_t *uuid,
++						gatt_db_attribute_cb_t func,
++						void *user_data)
+ {
+-	gatt_db_foreach_service_in_range(db, func, user_data, 0x0001, 0xffff);
++	gatt_db_foreach_service_in_range(db, uuid, func, user_data, 0x0001,
++									0xffff);
+ }
  
-+	struct bt_att *att;	/* The new ATT transport */
-+	unsigned int att_disconn_id;
-+
- 	struct bearer_state bredr_state;
- 	struct bearer_state le_state;
- 
-@@ -221,7 +226,6 @@ struct btd_device {
- 	int8_t		rssi;
- 
- 	GIOChannel	*att_io;
--	guint		cleanup_id;
- 	guint		store_id;
+ struct foreach_data {
+ 	gatt_db_attribute_cb_t func;
++	const bt_uuid_t *uuid;
+ 	void *user_data;
+ 	uint16_t start, end;
  };
+@@ -1013,16 +1016,25 @@ static void foreach_service_in_range(void *data, void *user_data)
+ 	struct gatt_db_service *service = data;
+ 	struct foreach_data *foreach_data = user_data;
+ 	uint16_t svc_start;
++	bt_uuid_t uuid;
  
-@@ -466,10 +470,9 @@ static void attio_cleanup(struct btd_device *device)
- 		device->attachid = 0;
- 	}
+ 	svc_start = get_handle_at_index(service, 0);
  
--	if (device->cleanup_id) {
--		g_source_remove(device->cleanup_id);
--		device->cleanup_id = 0;
--	}
-+	if (device->att_disconn_id)
-+		bt_att_unregister_disconnect(device->att,
-+							device->att_disconn_id);
+ 	if (svc_start > foreach_data->end || svc_start < foreach_data->start)
+ 		return;
  
- 	if (device->att_io) {
- 		g_io_channel_shutdown(device->att_io, FALSE, NULL);
-@@ -477,6 +480,11 @@ static void attio_cleanup(struct btd_device *device)
- 		device->att_io = NULL;
- 	}
- 
-+	if (device->att) {
-+		bt_att_unref(device->att);
-+		device->att = NULL;
++	if (foreach_data->uuid) {
++		gatt_db_attribute_get_service_uuid(service->attributes[0],
++									&uuid);
++		if (bt_uuid_cmp(&uuid, foreach_data->uuid))
++			return;
 +	}
 +
- 	if (device->attrib) {
- 		GAttrib *attrib = device->attrib;
- 		device->attrib = NULL;
-@@ -3401,8 +3409,7 @@ static void attio_disconnected(gpointer data, gpointer user_data)
- 		attio->dcfunc(attio->user_data);
+ 	foreach_data->func(service->attributes[0], foreach_data->user_data);
  }
  
--static gboolean attrib_disconnected_cb(GIOChannel *io, GIOCondition cond,
--							gpointer user_data)
-+static void att_disconnected_cb(void *user_data)
+ void gatt_db_foreach_service_in_range(struct gatt_db *db,
++						const bt_uuid_t *uuid,
+ 						gatt_db_attribute_cb_t func,
+ 						void *user_data,
+ 						uint16_t start_handle,
+@@ -1034,6 +1046,7 @@ void gatt_db_foreach_service_in_range(struct gatt_db *db,
+ 		return;
+ 
+ 	data.func = func;
++	data.uuid = uuid;
+ 	data.user_data = user_data;
+ 	data.start = start_handle;
+ 	data.end = end_handle;
+diff --git a/src/shared/gatt-db.h b/src/shared/gatt-db.h
+index b9f12e3..e5fe6bb 100644
+--- a/src/shared/gatt-db.h
++++ b/src/shared/gatt-db.h
+@@ -105,9 +105,11 @@ void gatt_db_find_information(struct gatt_db *db, uint16_t start_handle,
+ typedef void (*gatt_db_attribute_cb_t)(struct gatt_db_attribute *attrib,
+ 							void *user_data);
+ 
+-void gatt_db_foreach_service(struct gatt_db *db, gatt_db_attribute_cb_t func,
+-							void *user_data);
++void gatt_db_foreach_service(struct gatt_db *db, const bt_uuid_t *uuid,
++						gatt_db_attribute_cb_t func,
++						void *user_data);
+ void gatt_db_foreach_service_in_range(struct gatt_db *db,
++						const bt_uuid_t *uuid,
+ 						gatt_db_attribute_cb_t func,
+ 						void *user_data,
+ 						uint16_t start_handle,
+diff --git a/tools/btgatt-client.c b/tools/btgatt-client.c
+index fe94ae8..015142d 100644
+--- a/tools/btgatt-client.c
++++ b/tools/btgatt-client.c
+@@ -288,15 +288,14 @@ static void print_services(struct client *cli)
  {
- 	struct btd_device *device = user_data;
- 	int sock, err = 0;
-@@ -3413,7 +3420,7 @@ static gboolean attrib_disconnected_cb(GIOChannel *io, GIOCondition cond,
- 	if (device->browse)
- 		goto done;
+ 	printf("\n");
  
--	sock = g_io_channel_unix_get_fd(io);
-+	sock = bt_att_get_fd(device->att);
- 	len = sizeof(err);
- 	getsockopt(sock, SOL_SOCKET, SO_ERROR, &err, &len);
- 
-@@ -3436,8 +3443,6 @@ static gboolean attrib_disconnected_cb(GIOChannel *io, GIOCondition cond,
- 
- done:
- 	attio_cleanup(device);
--
--	return FALSE;
+-	gatt_db_foreach_service(cli->db, print_service, cli);
++	gatt_db_foreach_service(cli->db, NULL, print_service, cli);
  }
  
- static void register_all_services(struct browse_req *req, GSList *services)
-@@ -3656,7 +3661,7 @@ bool device_attach_attrib(struct btd_device *dev, GIOChannel *io)
- 	}
+ static void print_services_by_uuid(struct client *cli, const bt_uuid_t *uuid)
+ {
+ 	printf("\n");
  
- 	if (cid == ATT_CID)
--		mtu = ATT_DEFAULT_LE_MTU;
-+		mtu = BT_ATT_DEFAULT_LE_MTU;
+-	/* TODO: Filter by UUID */
+-	gatt_db_foreach_service(cli->db, print_service, cli);
++	gatt_db_foreach_service(cli->db, uuid, print_service, cli);
+ }
  
- 	attrib = g_attrib_new(io, mtu);
- 	if (!attrib) {
-@@ -3672,8 +3677,11 @@ bool device_attach_attrib(struct btd_device *dev, GIOChannel *io)
- 	}
+ static void print_services_by_handle(struct client *cli, uint16_t handle)
+@@ -304,7 +303,7 @@ static void print_services_by_handle(struct client *cli, uint16_t handle)
+ 	printf("\n");
  
- 	dev->attrib = attrib;
--	dev->cleanup_id = g_io_add_watch(io, G_IO_HUP,
--					attrib_disconnected_cb, dev);
-+	dev->att = bt_att_ref(g_attrib_get_att(attrib));
-+
-+	dev->att_disconn_id = bt_att_register_disconnect(dev->att,
-+						att_disconnected_cb, dev, NULL);
-+	bt_att_set_close_on_unref(dev->att, true);
+ 	/* TODO: Filter by handle */
+-	gatt_db_foreach_service(cli->db, print_service, cli);
++	gatt_db_foreach_service(cli->db, NULL, print_service, cli);
+ }
  
- 	/*
- 	 * Remove the device from the connect_list and give the passive
+ static void ready_cb(bool success, uint8_t att_ecode, void *user_data)
+@@ -331,7 +330,7 @@ static void service_changed_cb(uint16_t start_handle, uint16_t end_handle,
+ 	printf("\nService Changed handled - start: 0x%04x end: 0x%04x\n",
+ 						start_handle, end_handle);
+ 
+-	gatt_db_foreach_service_in_range(cli->db, print_service, cli,
++	gatt_db_foreach_service_in_range(cli->db, NULL, print_service, cli,
+ 						start_handle, end_handle);
+ 	print_prompt();
+ }
+diff --git a/tools/btgatt-server.c b/tools/btgatt-server.c
+index a2a0ec9..1a9b9fb 100644
+--- a/tools/btgatt-server.c
++++ b/tools/btgatt-server.c
+@@ -969,7 +969,7 @@ static void print_service(struct gatt_db_attribute *attr, void *user_data)
+ 
+ static void cmd_services(struct server *server, char *cmd_str)
+ {
+-	gatt_db_foreach_service(server->db, print_service, server);
++	gatt_db_foreach_service(server->db, NULL, print_service, server);
+ }
+ 
+ static void cmd_help(struct server *server, char *cmd_str);
+diff --git a/unit/test-gatt.c b/unit/test-gatt.c
+index 3ce3d80..2f3f26a 100644
+--- a/unit/test-gatt.c
++++ b/unit/test-gatt.c
+@@ -414,7 +414,7 @@ static void match_services(struct gatt_db_attribute *client_serv_attr,
+ 	serv_test_data.match = client_serv_attr;
+ 	serv_test_data.found = false;
+ 
+-	gatt_db_foreach_service(source_db,
++	gatt_db_foreach_service(source_db, NULL,
+ 					find_matching_service, &serv_test_data);
+ 
+ 	g_assert(serv_test_data.found);
+@@ -434,7 +434,7 @@ static void client_ready_cb(bool success, uint8_t att_ecode, void *user_data)
+ 	g_assert(context->client);
+ 	g_assert(context->client_db);
+ 
+-	gatt_db_foreach_service(context->client_db, match_services,
++	gatt_db_foreach_service(context->client_db, NULL, match_services,
+ 						context->data->source_db);
+ 
+ 	if (context->data->step) {
 -- 
 2.2.0.rc0.207.ga3a616c
 
