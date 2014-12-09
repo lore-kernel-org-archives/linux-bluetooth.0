@@ -2,347 +2,348 @@ Return-Path: <cyrus@holtmann.org>
 From: Arman Uguray <armansito@chromium.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Arman Uguray <armansito@chromium.org>
-Subject: [PATCH BlueZ 11/15] core: Introduce gatt-callbacks
-Date: Mon,  8 Dec 2014 16:40:51 -0800
-Message-Id: <1418085655-7304-12-git-send-email-armansito@chromium.org>
+Subject: [PATCH BlueZ 12/15] profiles/gatt: Don't handle GATT service.
+Date: Mon,  8 Dec 2014 16:40:52 -0800
+Message-Id: <1418085655-7304-13-git-send-email-armansito@chromium.org>
 In-Reply-To: <1418085655-7304-1-git-send-email-armansito@chromium.org>
 References: <1418085655-7304-1-git-send-email-armansito@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch introduces src/gatt-callbacks.h. This defines API functions
-to get notified of bt_gatt_client related events, such as ready,
-service removed, and disconnects. These callbacks are parallel to the
-existing attio.h functions and will provide a temporary alternative
-during the transition from attrib/ to shared/gatt.
+ATT MTU exchange and handling of indications from the "Service Changed"
+characteristic are now handled by shared/gatt-client, so this profile
+should only deal with the GAP service.
 ---
- Makefile.am          |   1 +
- src/device.c         | 162 +++++++++++++++++++++++++++++++++++++++++++++++----
- src/gatt-callbacks.h |  36 ++++++++++++
- 3 files changed, 188 insertions(+), 11 deletions(-)
- create mode 100644 src/gatt-callbacks.h
+ profiles/gatt/gas.c | 251 ++--------------------------------------------------
+ 1 file changed, 5 insertions(+), 246 deletions(-)
 
-diff --git a/Makefile.am b/Makefile.am
-index c506122..ad2c336 100644
---- a/Makefile.am
-+++ b/Makefile.am
-@@ -182,6 +182,7 @@ src_bluetoothd_SOURCES = $(builtin_sources) \
- 			src/gatt-dbus.h src/gatt-dbus.c \
- 			src/gatt.h src/gatt.c \
- 			src/device.h src/device.c src/attio.h \
-+			src/gatt-callbacks.h \
- 			src/dbus-common.c src/dbus-common.h \
- 			src/eir.h src/eir.c
- src_bluetoothd_LDADD = lib/libbluetooth-internal.la \
-diff --git a/src/device.c b/src/device.c
-index 0bfac1e..4b42580 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -59,6 +59,7 @@
- #include "attrib/gattrib.h"
- #include "attio.h"
- #include "device.h"
-+#include "gatt-callbacks.h"
- #include "profile.h"
- #include "service.h"
- #include "dbus-common.h"
-@@ -145,6 +146,14 @@ struct attio_data {
- 	gpointer user_data;
+diff --git a/profiles/gatt/gas.c b/profiles/gatt/gas.c
+index b51b4a8..9d5d31e 100644
+--- a/profiles/gatt/gas.c
++++ b/profiles/gatt/gas.c
+@@ -52,12 +52,8 @@
+ struct gas {
+ 	struct btd_device *device;
+ 	struct att_range gap;	/* GAP Primary service range */
+-	struct att_range gatt;	/* GATT Primary service range */
+ 	GAttrib *attrib;
+ 	guint attioid;
+-	guint changed_ind;
+-	uint16_t changed_handle;
+-	uint16_t mtu;
  };
  
-+struct gatt_cb_data {
-+	unsigned int id;
-+	btd_gatt_client_ready_t ready_func;
-+	btd_gatt_service_removed_t svc_removed_func;
-+	btd_gatt_disconnect_t disconn_func;
-+	void *user_data;
-+};
-+
- struct svc_callback {
- 	unsigned int id;
- 	guint idle_id;
-@@ -222,6 +231,8 @@ struct btd_device {
- 	 */
- 	struct gatt_db *client_db;		/* GATT client cache */
- 	struct bt_gatt_client *gatt_client;	/* GATT client implementation */
-+	GSList		*gatt_callbacks;
-+	unsigned int	next_gatt_cb_id;
- 
- 	struct bearer_state bredr_state;
- 	struct bearer_state le_state;
-@@ -559,6 +570,7 @@ static void device_free(gpointer user_data)
- 	g_slist_free_full(device->attios, g_free);
- 	g_slist_free_full(device->attios_offline, g_free);
- 	g_slist_free_full(device->svc_callbacks, svc_dev_remove);
-+	g_slist_free_full(device->gatt_callbacks, g_free);
- 
- 	attio_cleanup(device);
- 
-@@ -2439,6 +2451,21 @@ static gint prim_attr_cmp(gconstpointer a, gconstpointer b)
- 	return !(prim->range.start == start && prim->range.end == end);
+ static GSList *devices = NULL;
+@@ -80,68 +76,6 @@ static int cmp_device(gconstpointer a, gconstpointer b)
+ 	return (gas->device == device ? 0 : -1);
  }
  
-+struct svc_removed_data {
-+	struct gatt_db_attribute *attr;
-+	struct bt_gatt_client *client;
-+};
-+
-+static void notify_gatt_service_removed(gpointer data, gpointer user_data)
-+{
-+	struct gatt_cb_data *cb = data;
-+	struct svc_removed_data *rm_data = user_data;
-+
-+	if (cb->svc_removed_func)
-+		cb->svc_removed_func(rm_data->client, rm_data->attr,
-+								cb->user_data);
-+}
-+
- static void gatt_service_removed(struct gatt_db_attribute *attr,
- 								void *user_data)
- {
-@@ -2446,6 +2473,7 @@ static void gatt_service_removed(struct gatt_db_attribute *attr,
- 	GSList *l;
- 	struct gatt_primary *prim;
- 	uint16_t start, end;
-+	struct svc_removed_data data;
- 
- 	if (!bt_gatt_client_is_ready(device->gatt_client))
- 		return;
-@@ -2469,13 +2497,19 @@ static void gatt_service_removed(struct gatt_db_attribute *attr,
- 
- 	store_services(device);
- 
--	/*
--	 * TODO: Notify the profiles somehow. It may be sufficient for each
--	 * profile to register a service_removed handler.
--	 */
+-static void write_ctp_handle(struct btd_device *device, uint16_t uuid,
+-					uint16_t handle)
+-{
+-	char *filename, group[6], value[7];
+-	GKeyFile *key_file;
+-	char *data;
+-	gsize length = 0;
 -
- 	g_dbus_emit_property_changed(dbus_conn, device->path,
- 						DEVICE_INTERFACE, "UUIDs");
-+
-+	data.attr = attr;
-+	data.client = device->gatt_client;
-+
-+	g_slist_foreach(device->gatt_callbacks, notify_gatt_service_removed,
-+									&data);
-+
-+	/*
-+	 * TODO: Remove profiles matching this UUID if no other GATT services
-+	 * with the same UUID exist.
-+	 */
- }
- 
- static struct btd_device *device_new(struct btd_adapter *adapter,
-@@ -3560,6 +3594,16 @@ static void attio_disconnected(gpointer data, gpointer user_data)
- 		attio->dcfunc(attio->user_data);
- }
- 
-+static void gatt_disconnected(gpointer data, gpointer user_data)
-+{
-+	struct gatt_cb_data *gatt_data = data;
-+
-+	DBG("");
-+
-+	if (gatt_data->disconn_func)
-+		gatt_data->disconn_func(gatt_data->user_data);
-+}
-+
- static void att_disconnected_cb(void *user_data)
+-	filename = btd_device_get_storage_path(device, "gatt");
+-	if (!filename) {
+-		warn("Unable to get gatt storage path for device");
+-		return;
+-	}
+-
+-	key_file = g_key_file_new();
+-	g_key_file_load_from_file(key_file, filename, 0, NULL);
+-
+-	snprintf(group, sizeof(group), "%hu", uuid);
+-	snprintf(value, sizeof(value), "0x%4.4X", handle);
+-	g_key_file_set_string(key_file, group, "Value", value);
+-
+-	data = g_key_file_to_data(key_file, &length, NULL);
+-	if (length > 0) {
+-		create_file(filename, S_IRUSR | S_IWUSR);
+-		g_file_set_contents(filename, data, length, NULL);
+-	}
+-
+-	g_free(data);
+-	g_free(filename);
+-	g_key_file_free(key_file);
+-}
+-
+-static int read_ctp_handle(struct btd_device *device, uint16_t uuid,
+-					uint16_t *value)
+-{
+-	char *filename, group[6];
+-	GKeyFile *key_file;
+-	char *str;
+-	int err = 0;
+-
+-	filename = btd_device_get_storage_path(device, "gatt");
+-	if (!filename) {
+-		warn("Unable to get gatt storage path for device");
+-		return -ENOENT;
+-	}
+-
+-	snprintf(group, sizeof(group), "%hu", uuid);
+-
+-	key_file = g_key_file_new();
+-	g_key_file_load_from_file(key_file, filename, 0, NULL);
+-
+-	str = g_key_file_get_string(key_file, group, "Value", NULL);
+-	if (str == NULL || sscanf(str, "%hx", value) != 1)
+-		err = -ENOENT;
+-
+-	g_free(str);
+-	g_free(filename);
+-	g_key_file_free(key_file);
+-
+-	return err;
+-}
+-
+ static void gap_appearance_cb(guint8 status, const guint8 *pdu, guint16 plen,
+ 							gpointer user_data)
  {
- 	struct btd_device *device = user_data;
-@@ -3578,6 +3622,7 @@ static void att_disconnected_cb(void *user_data)
- 	DBG("%s (%d)", strerror(err), err);
- 
- 	g_slist_foreach(device->attios, attio_disconnected, NULL);
-+	g_slist_foreach(device->gatt_callbacks, gatt_disconnected, NULL);
- 
- 	if (!device_get_auto_connect(device)) {
- 		DBG("Automatic connection disabled");
-@@ -3651,7 +3696,15 @@ static void register_gatt_services(struct browse_req *req)
- 
- 	device_probe_profiles(device, req->profiles_added);
- 
--	if (device->attios == NULL && device->attios_offline == NULL)
-+	/*
-+	 * TODO: This check seems unnecessary. We may not always want to cleanup
-+	 * the connection since there will always be built-in plugins who want
-+	 * to interact with remote GATT services. Even if we didn't have those,
-+	 * the GATT D-Bus API will need to interact with these, so we should
-+	 * later remove this check entirely.
-+	 */
-+	if (device->attios == NULL && device->attios_offline == NULL &&
-+						device->gatt_callbacks == NULL)
- 		attio_cleanup(device);
- 
- 	device_svc_resolved(device, device->bdaddr_type, 0);
-@@ -3661,6 +3714,18 @@ static void register_gatt_services(struct browse_req *req)
- 	browse_request_free(req);
+@@ -176,163 +110,12 @@ done:
+ 	att_data_list_free(list);
  }
  
-+static void notify_gatt_client_ready(gpointer data, gpointer user_data)
-+{
-+	struct gatt_cb_data *gatt_data = data;
-+	struct btd_device *device = user_data;
-+
-+	DBG("");
-+
-+	if (gatt_data->ready_func)
-+		gatt_data->ready_func(device->gatt_client, device->client_db,
-+							gatt_data->user_data);
-+}
-+
- static void gatt_client_ready_cb(bool success, uint8_t att_ecode,
- 								void *user_data)
+-static void indication_cb(const uint8_t *pdu, uint16_t len, gpointer user_data)
+-{
+-	uint8_t bdaddr_type;
+-	struct gas *gas = user_data;
+-	uint16_t start, end, olen;
+-	size_t plen;
+-	uint8_t *opdu;
+-
+-	if (len < 7) { /* 1-byte opcode + 2-byte handle + 4 range */
+-		error("Malformed ATT notification");
+-		return;
+-	}
+-
+-	start = get_le16(&pdu[3]);
+-	end = get_le16(&pdu[5]);
+-
+-	DBG("Service Changed start: 0x%04X end: 0x%04X", start, end);
+-
+-	/* Confirming indication received */
+-	opdu = g_attrib_get_buffer(gas->attrib, &plen);
+-	olen = enc_confirmation(opdu, plen);
+-	g_attrib_send(gas->attrib, 0, opdu, olen, NULL, NULL, NULL);
+-
+-	bdaddr_type = btd_device_get_bdaddr_type(gas->device);
+-	if (!device_is_bonded(gas->device, bdaddr_type)) {
+-		DBG("Ignoring Service Changed: device is not bonded");
+-		return;
+-	}
+-
+-	btd_device_gatt_set_service_changed(gas->device, start, end);
+-}
+-
+-static void ccc_written_cb(guint8 status, const guint8 *pdu, guint16 plen,
+-							gpointer user_data)
+-{
+-	struct gas *gas = user_data;
+-
+-	if (status) {
+-		error("Write Service Changed CCC failed: %s",
+-						att_ecode2str(status));
+-		return;
+-	}
+-
+-	DBG("Service Changed indications enabled");
+-
+-	gas->changed_ind = g_attrib_register(gas->attrib, ATT_OP_HANDLE_IND,
+-						gas->changed_handle,
+-						indication_cb, gas, NULL);
+-
+-	write_ctp_handle(gas->device, GATT_CHARAC_SERVICE_CHANGED,
+-					gas->changed_handle);
+-}
+-
+-static void write_ccc(GAttrib *attrib, uint16_t handle, gpointer user_data)
+-{
+-	uint8_t value[2];
+-
+-	put_le16(GATT_CLIENT_CHARAC_CFG_IND_BIT, value);
+-	gatt_write_char(attrib, handle, value, sizeof(value), ccc_written_cb,
+-								user_data);
+-}
+-
+-static void discover_ccc_cb(uint8_t status, GSList *descs, void *user_data)
+-{
+-	struct gas *gas = user_data;
+-	struct gatt_desc *desc;
+-
+-	if (status != 0) {
+-		error("Discover Service Changed CCC failed: %s",
+-							att_ecode2str(status));
+-		return;
+-	}
+-
+-	/* There will be only one descriptor on list and it will be CCC */
+-	desc = descs->data;
+-
+-	DBG("CCC: 0x%04x", desc->handle);
+-	write_ccc(gas->attrib, desc->handle, user_data);
+-}
+-
+-static void gatt_characteristic_cb(uint8_t status, GSList *characteristics,
+-								void *user_data)
+-{
+-	struct gas *gas = user_data;
+-	struct gatt_char *chr;
+-	uint16_t start, end;
+-	bt_uuid_t uuid;
+-
+-	if (status) {
+-		error("Discover Service Changed handle: %s", att_ecode2str(status));
+-		return;
+-	}
+-
+-	chr = characteristics->data;
+-
+-	start = chr->value_handle + 1;
+-	end = gas->gatt.end;
+-
+-	if (start > end) {
+-		error("Inconsistent database: Service Changed CCC missing");
+-		return;
+-	}
+-
+-	gas->changed_handle = chr->value_handle;
+-
+-	bt_uuid16_create(&uuid, GATT_CLIENT_CHARAC_CFG_UUID);
+-
+-	gatt_discover_desc(gas->attrib, start, end, &uuid, discover_ccc_cb,
+-									gas);
+-}
+-
+-static void exchange_mtu_cb(guint8 status, const guint8 *pdu, guint16 plen,
+-							gpointer user_data)
+-{
+-	struct gas *gas = user_data;
+-	uint16_t rmtu;
+-
+-	if (status) {
+-		error("MTU exchange: %s", att_ecode2str(status));
+-		return;
+-	}
+-
+-	if (!dec_mtu_resp(pdu, plen, &rmtu)) {
+-		error("MTU exchange: protocol error");
+-		return;
+-	}
+-
+-	gas->mtu = MIN(rmtu, gas->mtu);
+-	if (g_attrib_set_mtu(gas->attrib, gas->mtu))
+-		DBG("MTU exchange succeeded: %d", gas->mtu);
+-	else
+-		DBG("MTU exchange failed");
+-}
+-
+ static void attio_connected_cb(GAttrib *attrib, gpointer user_data)
  {
-@@ -3689,11 +3754,9 @@ static void gatt_client_ready_cb(bool success, uint8_t att_ecode,
- 	if (device->browse)
- 		register_gatt_services(device->browse);
+ 	struct gas *gas = user_data;
+-	GIOChannel *io;
+-	GError *gerr = NULL;
+-	uint16_t cid, imtu;
+ 	uint16_t app;
  
+ 	gas->attrib = g_attrib_ref(attrib);
+-	io = g_attrib_get_channel(attrib);
+-
+-	if (bt_io_get(io, &gerr, BT_IO_OPT_IMTU, &imtu,
+-				BT_IO_OPT_CID, &cid, BT_IO_OPT_INVALID) &&
+-							cid == ATT_CID) {
+-		gatt_exchange_mtu(gas->attrib, imtu, exchange_mtu_cb, gas);
+-		gas->mtu = imtu;
+-		DBG("MTU Exchange: Requesting %d", imtu);
+-	}
+-
+-	if (gerr) {
+-		error("Could not acquire att imtu and cid: %s", gerr->message);
+-		g_error_free(gerr);
+-	}
+ 
+ 	if (device_get_appearance(gas->device, &app) < 0) {
+ 		bt_uuid_t uuid;
+@@ -345,43 +128,23 @@ static void attio_connected_cb(GAttrib *attrib, gpointer user_data)
+ 	}
+ 
+ 	/* TODO: Read other GAP characteristics - See Core spec page 1739 */
+-
 -	/*
--	 * TODO: Change attio callbacks to accept a gatt-client instead of a
--	 * GAttrib.
+-	 * When re-connecting <<Service Changed>> handle and characteristic
+-	 * value doesn't need to read again: known information from the
+-	 * previous interaction.
 -	 */
- 	g_slist_foreach(device->attios, attio_connected, device->attrib);
-+	g_slist_foreach(device->gatt_callbacks, notify_gatt_client_ready,
-+									device);
+-	if (gas->changed_handle == 0) {
+-		bt_uuid_t uuid;
+-
+-		bt_uuid16_create(&uuid, GATT_CHARAC_SERVICE_CHANGED);
+-
+-		gatt_discover_char(gas->attrib, gas->gatt.start, gas->gatt.end,
+-					&uuid, gatt_characteristic_cb, gas);
+-	}
  }
  
- static void gatt_client_service_changed(uint16_t start_handle,
-@@ -5080,7 +5143,8 @@ gboolean btd_device_remove_attio_callback(struct btd_device *device, guint id)
- 
- 	g_free(attio);
- 
--	if (device->attios != NULL || device->attios_offline != NULL)
-+	if (device->attios != NULL || device->attios_offline != NULL ||
-+						device->gatt_callbacks != NULL)
- 		return TRUE;
- 
- 	attio_cleanup(device);
-@@ -5088,6 +5152,82 @@ gboolean btd_device_remove_attio_callback(struct btd_device *device, guint id)
- 	return TRUE;
- }
- 
-+unsigned int btd_device_add_gatt_callbacks(struct btd_device *device,
-+			btd_gatt_client_ready_t ready_func,
-+			btd_gatt_service_removed_t service_removed_func,
-+			btd_gatt_disconnect_t disconnect_func,
-+			void *user_data)
-+{
-+	struct gatt_cb_data *gatt_data;
-+
-+	gatt_data = new0(struct gatt_cb_data, 1);
-+	if (!gatt_data)
-+		return 0;
-+
-+	if (device->next_gatt_cb_id < 1)
-+		device->next_gatt_cb_id = 1;
-+
-+	device_set_auto_connect(device, TRUE);
-+
-+	gatt_data->id = device->next_gatt_cb_id++;
-+	gatt_data->ready_func = ready_func;
-+	gatt_data->svc_removed_func = service_removed_func;
-+	gatt_data->disconn_func = disconnect_func;
-+	gatt_data->user_data = user_data;
-+
-+	/*
-+	 * TODO: The connection might be incoming from attrib-server (see
-+	 * btd_device_add_attio_callback). I don't think this is a good place to
-+	 * attach the GAttrib to the device. We should come up with a more
-+	 * unified flow for attaching the GAttrib, bt_att, and bt_gatt_client
-+	 * for incoming and outgoing connections.
-+	 */
-+	device->gatt_callbacks = g_slist_append(device->gatt_callbacks,
-+								gatt_data);
-+
-+	if (ready_func && bt_gatt_client_is_ready(device->gatt_client))
-+		ready_func(device->gatt_client, device->client_db, user_data);
-+
-+	return gatt_data->id;
-+}
-+
-+static int gatt_cb_id_cmp(gconstpointer a, gconstpointer b)
-+{
-+	const struct gatt_cb_data *gatt_data = a;
-+	guint id = GPOINTER_TO_UINT(b);
-+
-+	return gatt_data->id - id;
-+}
-+
-+bool btd_device_remove_gatt_callbacks(struct btd_device *device,
-+							unsigned int id)
-+{
-+	struct gatt_cb_data *gatt_data;
-+	GSList *l;
-+
-+	l = g_slist_find_custom(device->gatt_callbacks, GUINT_TO_POINTER(id),
-+								gatt_cb_id_cmp);
-+	if (!l)
-+		return false;
-+
-+	gatt_data = l->data;
-+	device->gatt_callbacks = g_slist_remove(device->gatt_callbacks,
-+								gatt_data);
-+	free(gatt_data);
-+
-+	/*
-+	 * TODO: Consider removing this check and avoiding cleanup as it seems
-+	 * unnecessary.
-+	 */
-+	if (device->attios != NULL || device->attios_offline != NULL ||
-+						device->gatt_callbacks != NULL)
-+		return true;
-+
-+	attio_cleanup(device);
-+
-+	return true;
-+}
-+
- void btd_device_set_pnpid(struct btd_device *device, uint16_t source,
- 			uint16_t vendor, uint16_t product, uint16_t version)
+ static void attio_disconnected_cb(gpointer user_data)
  {
-diff --git a/src/gatt-callbacks.h b/src/gatt-callbacks.h
-new file mode 100644
-index 0000000..2ac1800
---- /dev/null
-+++ b/src/gatt-callbacks.h
-@@ -0,0 +1,36 @@
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2014  Google Inc.
-+ *
-+ *
-+ *  This library is free software; you can redistribute it and/or
-+ *  modify it under the terms of the GNU Lesser General Public
-+ *  License as published by the Free Software Foundation; either
-+ *  version 2.1 of the License, or (at your option) any later version.
-+ *
-+ *  This library is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ *  Lesser General Public License for more details.
-+ */
-+
-+#include <stdint.h>
-+#include <stdbool.h>
-+
-+typedef void (*btd_gatt_client_ready_t) (struct bt_gatt_client *client,
-+							struct gatt_db *db,
-+							void *user_data);
-+typedef void (*btd_gatt_service_removed_t) (struct bt_gatt_client *client,
-+					struct gatt_db_attribute *attrib,
-+					void *user_data);
-+typedef void (*btd_gatt_disconnect_t) (void *user_data);
-+
-+unsigned int btd_device_add_gatt_callbacks(struct btd_device *device,
-+			btd_gatt_client_ready_t ready_func,
-+			btd_gatt_service_removed_t service_removed_func,
-+			btd_gatt_disconnect_t disconnect_func,
-+			void *user_data);
-+bool btd_device_remove_gatt_callbacks(struct btd_device *device,
-+							unsigned int id);
+ 	struct gas *gas = user_data;
+ 
+-	g_attrib_unregister(gas->attrib, gas->changed_ind);
+-	gas->changed_ind = 0;
+-
+ 	g_attrib_unref(gas->attrib);
+ 	gas->attrib = NULL;
+ }
+ 
+-static int gas_register(struct btd_device *device, struct att_range *gap,
+-						struct att_range *gatt)
++static int gas_register(struct btd_device *device, struct att_range *gap)
+ {
+ 	struct gas *gas;
+ 
+ 	gas = g_new0(struct gas, 1);
+ 	gas->gap.start = gap->start;
+ 	gas->gap.end = gap->end;
+-	gas->gatt.start = gatt->start;
+-	gas->gatt.end = gatt->end;
+ 
+ 	gas->device = btd_device_ref(device);
+ 
+@@ -391,9 +154,6 @@ static int gas_register(struct btd_device *device, struct att_range *gap,
+ 						attio_connected_cb,
+ 						attio_disconnected_cb, gas);
+ 
+-	read_ctp_handle(gas->device, GATT_CHARAC_SERVICE_CHANGED,
+-					&gas->changed_handle);
+-
+ 	return 0;
+ }
+ 
+@@ -414,17 +174,16 @@ static void gas_unregister(struct btd_device *device)
+ static int gatt_driver_probe(struct btd_service *service)
+ {
+ 	struct btd_device *device = btd_service_get_device(service);
+-	struct gatt_primary *gap, *gatt;
++	struct gatt_primary *gap;
+ 
+ 	gap = btd_device_get_primary(device, GAP_UUID);
+-	gatt = btd_device_get_primary(device, GATT_UUID);
+ 
+-	if (gap == NULL || gatt == NULL) {
+-		error("GAP and GATT are mandatory");
++	if (gap == NULL) {
++		error("GAP service is mandatory");
+ 		return -EINVAL;
+ 	}
+ 
+-	return gas_register(device, &gap->range, &gatt->range);
++	return gas_register(device, &gap->range);
+ }
+ 
+ static void gatt_driver_remove(struct btd_service *service)
 -- 
 2.2.0.rc0.207.ga3a616c
 
