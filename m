@@ -2,124 +2,101 @@ Return-Path: <cyrus@holtmann.org>
 From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH 05/25] android/bluetooth: Add possibility to register for bonded event
-Date: Tue,  9 Dec 2014 16:11:27 +0100
-Message-Id: <1418137907-16981-6-git-send-email-lukasz.rymanowski@tieto.com>
+Subject: [PATCH 04/25] android/hog: Minor coding style fixes
+Date: Tue,  9 Dec 2014 16:11:26 +0100
+Message-Id: <1418137907-16981-5-git-send-email-lukasz.rymanowski@tieto.com>
 In-Reply-To: <1418137907-16981-1-git-send-email-lukasz.rymanowski@tieto.com>
 References: <1418137907-16981-1-git-send-email-lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Some modules might be interested in fact that device has been bonded.
-This patch allows to register for that event
-
-Note that callback is called only on success bonding.
 ---
- android/bluetooth.c | 37 +++++++++++++++++++++++++++++++++++++
- android/bluetooth.h |  4 ++++
- 2 files changed, 41 insertions(+)
+ android/hog.c | 24 ++++++++++++++++--------
+ 1 file changed, 16 insertions(+), 8 deletions(-)
 
-diff --git a/android/bluetooth.c b/android/bluetooth.c
-index 5652d82..7c4adb8 100644
---- a/android/bluetooth.c
-+++ b/android/bluetooth.c
-@@ -221,6 +221,7 @@ static struct ipc *hal_ipc = NULL;
- static bool kernel_conn_control = false;
+diff --git a/android/hog.c b/android/hog.c
+index edee73f..872f4a5 100644
+--- a/android/hog.c
++++ b/android/hog.c
+@@ -221,7 +221,8 @@ static void report_reference_cb(guint8 status, const guint8 *pdu,
+ static void external_report_reference_cb(guint8 status, const guint8 *pdu,
+ 					guint16 plen, gpointer user_data);
  
- static struct queue *unpaired_cb_list = NULL;
-+static struct queue *paired_cb_list = NULL;
- 
- static void get_device_android_addr(struct device *dev, uint8_t *addr)
+-static void discover_external_cb(uint8_t status, GSList *descs, void *user_data)
++static void discover_external_cb(uint8_t status, GSList *descs,
++							void *user_data)
  {
-@@ -896,7 +897,14 @@ static void update_bond_state(struct device *dev, uint8_t status,
- 						HAL_BOND_STATE_BONDING);
+ 	struct bt_hog *hog = user_data;
  
- 	send_bond_state_change(dev, status, new_bond);
-+}
-+
-+static void send_paired_notification(void *data, void *user_data)
-+{
-+	bt_paired_device_cb cb = data;
-+	struct device *dev = user_data;
- 
-+	cb(&dev->bdaddr, dev->bdaddr_type);
+@@ -253,7 +254,8 @@ static void discover_external(GAttrib *attrib, uint16_t start, uint16_t end,
+ 								user_data);
  }
  
- static void update_device_state(struct device *dev, uint8_t addr_type,
-@@ -1744,6 +1752,19 @@ void bt_unpaired_unregister(bt_unpaired_device_cb cb)
- 	queue_remove(unpaired_cb_list, cb);
- }
- 
-+bool bt_paired_register(bt_paired_device_cb cb)
-+{
-+	if (queue_find(paired_cb_list, match_by_value, cb))
-+		return false;
-+
-+	return queue_push_head(paired_cb_list, cb);
-+}
-+
-+void bt_paired_unregister(bt_paired_device_cb cb)
-+{
-+	queue_remove(paired_cb_list, cb);
-+}
-+
- static bool rssi_above_threshold(int old, int new)
+-static void discover_report_cb(uint8_t status, GSList *descs, void *user_data)
++static void discover_report_cb(uint8_t status, GSList *descs,
++							void *user_data)
  {
- 	/* only 8 dBm or more */
-@@ -4279,6 +4300,9 @@ static void pair_device_complete(uint8_t status, uint16_t length,
- 	 */
- 	update_device_state(dev, rp->addr.type, status_mgmt2hal(status), false,
- 								!status, false);
-+
-+	if (status == MGMT_STATUS_SUCCESS)
-+		queue_foreach(paired_cb_list, send_paired_notification, dev);
+ 	struct report *report = user_data;
+ 	struct bt_hog *hog = report->hog;
+@@ -399,7 +401,8 @@ static int report_cmp(gconstpointer a, gconstpointer b)
+ 	return ra->id - rb->id;
  }
  
- static uint8_t select_device_bearer(struct device *dev)
-@@ -5234,6 +5258,14 @@ bool bt_bluetooth_register(struct ipc *ipc, uint8_t mode)
+-static struct report *find_report(struct bt_hog *hog, uint8_t type, uint8_t id)
++static struct report *find_report(struct bt_hog *hog, uint8_t type,
++								uint8_t id)
+ {
+ 	struct report cmp;
+ 	GSList *l;
+@@ -499,8 +502,8 @@ done:
+ 		error("bt_uhid_send: %s", strerror(-err));
+ }
+ 
+-static bool get_descriptor_item_info(uint8_t *buf, ssize_t blen, ssize_t *len,
+-								bool *is_long)
++static bool get_descriptor_item_info(uint8_t *buf, ssize_t blen,
++						ssize_t *len, bool *is_long)
+ {
+ 	if (!blen)
  		return false;
- 	}
- 
-+	paired_cb_list = queue_new();
-+	if (!paired_cb_list) {
-+		error("Cannot allocate queue for paired callbacks");
-+		queue_destroy(unpaired_cb_list, NULL);
-+		unpaired_cb_list = NULL;
-+		return false;
-+	}
-+
- 	missing_settings = adapter.current_settings ^
- 						adapter.supported_settings;
- 
-@@ -5301,6 +5333,8 @@ bool bt_bluetooth_register(struct ipc *ipc, uint8_t mode)
- failed:
- 	queue_destroy(unpaired_cb_list, NULL);
- 	unpaired_cb_list = NULL;
-+	queue_destroy(paired_cb_list, NULL);
-+	paired_cb_list = NULL;
- 
- 	return false;
+@@ -696,7 +699,8 @@ static void proto_mode_read_cb(guint8 status, const guint8 *pdu, guint16 plen,
+ 		DBG("HoG is operating in Report Protocol Mode");
  }
-@@ -5320,4 +5354,7 @@ void bt_bluetooth_unregister(void)
  
- 	queue_destroy(unpaired_cb_list, NULL);
- 	unpaired_cb_list = NULL;
+-static void char_discovered_cb(uint8_t status, GSList *chars, void *user_data)
++static void char_discovered_cb(uint8_t status, GSList *chars,
++								void *user_data)
+ {
+ 	struct bt_hog *hog = user_data;
+ 	struct gatt_primary *primary = hog->primary;
+@@ -827,13 +831,16 @@ void bt_hog_unref(struct bt_hog *hog)
+ 	if (!hog)
+ 		return;
+ 
++	DBG("ref %d", hog->ref_count - 1);
 +
-+	queue_destroy(paired_cb_list, NULL);
-+	paired_cb_list = NULL;
+ 	if (__sync_sub_and_fetch(&hog->ref_count, 1))
+ 		return;
+ 
+ 	hog_free(hog);
  }
-diff --git a/android/bluetooth.h b/android/bluetooth.h
-index 8970559..8e0e6e2 100644
---- a/android/bluetooth.h
-+++ b/android/bluetooth.h
-@@ -90,3 +90,7 @@ void bt_auto_connect_remove(const bdaddr_t *addr);
- typedef void (*bt_unpaired_device_cb)(const bdaddr_t *addr, uint8_t type);
- bool bt_unpaired_register(bt_unpaired_device_cb cb);
- void bt_unpaired_unregister(bt_unpaired_device_cb cb);
-+
-+typedef void (*bt_paired_device_cb)(const bdaddr_t *addr, uint8_t type);
-+bool bt_paired_register(bt_paired_device_cb cb);
-+void bt_paired_unregister(bt_paired_device_cb cb);
+ 
+-static void find_included_cb(uint8_t status, GSList *services, void *user_data)
++static void find_included_cb(uint8_t status, GSList *services,
++							void *user_data)
+ {
+ 	struct bt_hog *hog = user_data;
+ 	struct gatt_included *include;
+@@ -881,7 +888,8 @@ static void find_included_cb(uint8_t status, GSList *services, void *user_data)
+ 						char_discovered_cb, hog);
+ }
+ 
+-static void hog_attach_scpp(struct bt_hog *hog, struct gatt_primary *primary)
++static void hog_attach_scpp(struct bt_hog *hog,
++						struct gatt_primary *primary)
+ {
+ 	if (hog->scpp) {
+ 		bt_scpp_attach(hog->scpp, hog->attrib);
 -- 
 1.8.4
 
