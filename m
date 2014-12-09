@@ -1,49 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1418115110-25335-1-git-send-email-jakub.tyszkowski@tieto.com>
-References: <1418115110-25335-1-git-send-email-jakub.tyszkowski@tieto.com>
-Date: Tue, 9 Dec 2014 12:05:01 +0200
-Message-ID: <CABBYNZ+au2U8UPe_0di2R=NHhnCtwXrYfCL=7EeEBZ6cJaq__g@mail.gmail.com>
-Subject: Re: [PATCHv2 1/5] shared/att: Handle commands under
- BT_ATT_ALL_REQUESTS op group type
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] android/build: Enable multilib build for bluetooth.default
+Date: Tue,  9 Dec 2014 11:45:07 +0200
+Message-Id: <1418118307-13170-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jakub,
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-On Tue, Dec 9, 2014 at 10:51 AM, Jakub Tyszkowski
-<jakub.tyszkowski@tieto.com> wrote:
-> This is needed for backward compatibility with gattrib.
-> ---
->  src/shared/att.c | 6 ++++--
->  1 file changed, 4 insertions(+), 2 deletions(-)
->
-> diff --git a/src/shared/att.c b/src/shared/att.c
-> index ee425d8..3181b36 100644
-> --- a/src/shared/att.c
-> +++ b/src/shared/att.c
-> @@ -666,8 +666,10 @@ struct notify_data {
->
->  static bool opcode_match(uint8_t opcode, uint8_t test_opcode)
->  {
-> -       if (opcode == BT_ATT_ALL_REQUESTS &&
-> -                                   get_op_type(test_opcode) == ATT_OP_TYPE_REQ)
-> +       enum att_op_type op_type = get_op_type(test_opcode);
-> +
-> +       if (opcode == BT_ATT_ALL_REQUESTS && (op_type == ATT_OP_TYPE_REQ ||
-> +                                               op_type == ATT_OP_TYPE_CMD))
->                 return true;
->
->         return opcode == test_opcode;
-> --
-> 1.9.1
+---
+ android/Android.mk | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Applied, thanks.
-
-
+diff --git a/android/Android.mk b/android/Android.mk
+index 9ee2fc9..2b90cee 100644
+--- a/android/Android.mk
++++ b/android/Android.mk
+@@ -154,7 +154,7 @@ LOCAL_SHARED_LIBRARIES := \
+ LOCAL_CFLAGS := $(BLUEZ_COMMON_CFLAGS)
+ 
+ LOCAL_MODULE := bluetooth.default
+-LOCAL_MODULE_PATH := $(TARGET_OUT_SHARED_LIBRARIES)/hw
++LOCAL_MODULE_RELATIVE_PATH := hw
+ LOCAL_MODULE_TAGS := optional
+ LOCAL_MODULE_CLASS := SHARED_LIBRARIES
+ LOCAL_REQUIRED_MODULES := bluetoothd bluetoothd-snoop init.bluetooth.rc
 -- 
-Luiz Augusto von Dentz
+2.1.0
+
