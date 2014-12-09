@@ -1,112 +1,89 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1418133949.32209.58.camel@jrissane-mobl.ger.corp.intel.com>
-Subject: Re: [PATCHv3 bluetooth-next 3/3] 6lowpan: nhc: add other known
- rfc6282 compressions
-From: Jukka Rissanen <jukka.rissanen@linux.intel.com>
-To: Alexander Aring <alex.aring@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org,
-	kernel@pengutronix.de, Martin Townsend <mtownsend1973@gmail.com>
-Date: Tue, 09 Dec 2014 16:05:49 +0200
-In-Reply-To: <20141209115250.GA32681@omega>
-References: <1418053838-8692-1-git-send-email-alex.aring@gmail.com>
-	 <1418053838-8692-4-git-send-email-alex.aring@gmail.com>
-	 <1418124496.32209.47.camel@jrissane-mobl.ger.corp.intel.com>
-	 <20141209115250.GA32681@omega>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+From: Gowtham Anandha Babu <gowtham.ab@samsung.com>
+To: 'Szymon Janc' <szymon.janc@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org, d.kasatkin@samsung.com,
+	bharat.panda@samsung.com, cpgs@samsung.com
+References: <1418129488-12353-1-git-send-email-gowtham.ab@samsung.com>
+ <157571858.6JfrHtjm1y@leonov>
+In-reply-to: <157571858.6JfrHtjm1y@leonov>
+Subject: RE: [PATCH ] android/socket: Add PBAP supported features bits
+Date: Tue, 09 Dec 2014 19:16:58 +0530
+Message-id: <000a01d013b6$a4fd1750$eef745f0$@samsung.com>
+MIME-version: 1.0
+Content-type: text/plain; charset=us-ascii
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Alex,
+Hi Szymon,
 
-On ti, 2014-12-09 at 12:52 +0100, Alexander Aring wrote:
-> Hi Jukka,
+> -----Original Message-----
+> From: Szymon Janc [mailto:szymon.janc@tieto.com]
+> Sent: Tuesday, December 09, 2014 6:54 PM
+> To: Gowtham Anandha Babu
+> Cc: linux-bluetooth@vger.kernel.org; d.kasatkin@samsung.com;
+> bharat.panda@samsung.com; cpgs@samsung.com
+> Subject: Re: [PATCH ] android/socket: Add PBAP supported features bits
 > 
-> On Tue, Dec 09, 2014 at 01:28:16PM +0200, Jukka Rissanen wrote:
-> > Hi Alex,
-> > 
-> > the module unloading caused some issues in the receiving end.
-> > 
-> > I tried this:
-> > * setup bluetooth 6lowpan connection
-> > * transfer some UDP data
-> > * unload the nhc_rfc6282_udp module (in one peer only, the other still
-> > had udp nhc module loaded)
-> > * try to send more data
-> > 
-> > This caused kernel crash in peer that had udp module unloaded:
-> > 
-> > 
+> Hi Gowtham,
 > 
-> mhh, okay. I don't know why this happens also the log gave me not much
-> information, but thanks anyway.
+> On Tuesday 09 of December 2014 18:21:27 Gowtham Anandha Babu wrote:
+> > Add PBAP supported features in sdp record.
 > 
-> Maybe this is a global issue with bluetooth 6LoWPAN error handling.
-> 
-> Can you simple do something like this:
-> 
-> diff --git a/net/6lowpan/iphc.c b/net/6lowpan/iphc.c
-> index 32ffec6..2228dce 100644
-> --- a/net/6lowpan/iphc.c
-> +++ b/net/6lowpan/iphc.c
-> @@ -425,6 +425,8 @@ lowpan_header_decompress(struct sk_buff *skb, struct net_device *dev,
->                         return -EINVAL;
->         }
->  
-> +       return -EINVAL;
-> +
->         /* UDP data uncompression */
->         if (iphc0 & LOWPAN_IPHC_NH_C) {
->                 struct udphdr uh;
-> 
-> 
-> based on current bluetooth-next/master without the NHC framework.
-> 
-> This should be working, maybe you never hit any error while calling
-> lowpan_header_decompress function. It's simple testing the error
-> handling not more.
+> Isn't that a 1.2 feature? (AOSP supports only 1.1).
 
-Hmm, I get the same crash here also without this patchset. So something
-goes wrong if <0 code is returned.
+Yes, this one is 1.2 feature. Then, I have to wait till 1.2 release.
+Btw, Right now in android, 
+Server (PBAP-PSE and MAP-MAS) records are getting added.
+What happened to client(PBAP-PCE and MAP-MNS) records?
+Will it be added only after implementing them?
+Am I right?
 
 > 
-> Do this please on one node, the other node should send some 6LoWPAN IPHC
-> packets to check if the error handling working there.
+> Same goes with MAP.
 > 
+> > ---
+> >  android/socket.c | 6 ++++++
+> >  1 file changed, 6 insertions(+)
+> >
+> > diff --git a/android/socket.c b/android/socket.c index
+> > 2b836e9..f2cfd07 100644
+> > --- a/android/socket.c
+> > +++ b/android/socket.c
+> > @@ -58,6 +58,8 @@
+> >  /* Hardcoded MAP stuff needed for MAS SMS Instance.*/
+> >  #define DEFAULT_MAS_INSTANCE	0x00
+> >
+> > +#define DEFAULT_PBAP_SUPPORTED_FEATURES 0x00000003
+> > +
+> >  #define MAP_MSG_TYPE_SMS_GSM	0x02
+> >  #define MAP_MSG_TYPE_SMS_CDMA	0x04
+> >  #define DEFAULT_MAS_MSG_TYPE	(MAP_MSG_TYPE_SMS_GSM |
+> MAP_MSG_TYPE_SMS_CDMA)
+> > @@ -287,6 +289,7 @@ static sdp_record_t *create_pbap_record(uint8_t
+> > chan, const char *svc_name) sdp_list_t *seq;
+> >  	sdp_profile_desc_t profile[1];
+> >  	uint8_t formats = 0x01;
+> > +	uint8_t supft = DEFAULT_PBAP_SUPPORTED_FEATURES;
+> >  	sdp_record_t *record;
+> >  	uuid_t uuid;
+> >
+> > @@ -304,6 +307,9 @@ static sdp_record_t *create_pbap_record(uint8_t
+> > chan, const char *svc_name) sdp_attr_add_new(record,
+> > SDP_ATTR_SUPPORTED_REPOSITORIES, SDP_UINT8, &formats);
+> >
+> > +	sdp_attr_add_new(record,
+> SDP_ATTR_PBAP_SUPPORTED_FEATURES, SDP_UINT32,
+> > +								&supft);
+> > +
+> >  	sdp_list_free(seq, NULL);
+> >
+> >  	return record;
 > 
-> 
-> 
-> 
-> Another issue is that I see that skb->dev isn't set before calling
-> lowpan_header_decompress. Because inside your log is a "NULL":
-> 
-> (NULL net_device): received unknown nhc id which was not found.
-> 
-> Can you change that? That skb->dev is set to before calling
-> lowpan_header_decompress.
+> --
+> BR
+> Szymon Janc
 
-I am setting the skb->dev after the call to lowpan_header_decompress().
-And anyway the skb->dev is only used when printing the err.
-Actually should we replace the skb->dev in lowpan_header_decompress()
-with plain dev as that is given to the function as a parameter. 
 
-> 
-> 
-> btw: 802154 has also issues with that the dev is a wpan interface but
-> should be a lowpan interface. It's a complicated issue because we
-> support more than one lowpan interface at the same time for _one_ wpan
-> interface. I will change that later because this has not any useful usecase
-> at the moment. The new behaviour is then _one_ wpan interface -> _one_ lowpan
-> interface.
-> 
-> First we need to know if global error handling is working there. Another
-> solution for the NULL string would be "don't using netdev_foo printouts,
-> but then nobody knows which interface has this issue.
-> 
-> - Alex
-
-
-Cheers,
-Jukka
-
+Regards,
+Gowtham Anandha Babu
 
