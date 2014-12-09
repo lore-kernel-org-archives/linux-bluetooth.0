@@ -2,78 +2,116 @@ Return-Path: <cyrus@holtmann.org>
 From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH 10/25] android/hog: Cancel all GATT operations on disconnect
-Date: Tue,  9 Dec 2014 16:11:32 +0100
-Message-Id: <1418137907-16981-11-git-send-email-lukasz.rymanowski@tieto.com>
+Subject: [PATCH 08/25] android/gatt: Improve LE connection after pair
+Date: Tue,  9 Dec 2014 16:11:30 +0100
+Message-Id: <1418137907-16981-9-git-send-email-lukasz.rymanowski@tieto.com>
 In-Reply-To: <1418137907-16981-1-git-send-email-lukasz.rymanowski@tieto.com>
 References: <1418137907-16981-1-git-send-email-lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch makes sure that HOG cancels its GATT requests before
-removing his attrib reference.
+With this patch, GATT keeps ATT connection for 30 sec during bonding,
+and once bonding is completed GATT starts service search.
 
-However some request might not be possible to cancel. It will be handled
-in following patches
+It is needed for example when user choose HOG device from Settings
+Application. So far scenario looks like that:
+
+1. Bonding started
+2. GATT Service search
+3. Bonding ended and LE connection dropped
+4. Initiated connection to HOG device
+
+Now it looks like that:
+
+1. Bonding Started
+2. Bonding Ended
+3. GATT Search Service
+4. Connect to HOG device on existing LE connection
 ---
- android/hog.c | 23 ++++++++++++++++++++++-
- 1 file changed, 22 insertions(+), 1 deletion(-)
+ android/gatt.c | 42 ++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 40 insertions(+), 2 deletions(-)
 
-diff --git a/android/hog.c b/android/hog.c
-index 95b7cb0..80bcc2e 100644
---- a/android/hog.c
-+++ b/android/hog.c
-@@ -111,6 +111,19 @@ struct report {
- 	uint8_t			*value;
- };
+diff --git a/android/gatt.c b/android/gatt.c
+index 4c16ce6..c28d6d2 100644
+--- a/android/gatt.c
++++ b/android/gatt.c
+@@ -70,6 +70,7 @@
+ #define GATT_PERM_WRITE_SIGNED_MITM	0x00020000
+ #define GATT_PERM_NONE			0x10000000
  
-+struct gatt_request {
-+	unsigned int req_id;
-+	struct bt_hog *hog;
-+	void *user_data;
-+};
-+
-+static void destroy_gatt_req(struct gatt_request *req)
++#define GATT_PAIR_CONN_TIMEOUT 30
+ #define GATT_CONN_TIMEOUT 2
+ 
+ static const uint8_t BLUETOOTH_UUID[] = {
+@@ -1392,6 +1393,17 @@ static void send_app_connect_notifications(void *data, void *user_data)
+ 		send_app_connect_notify(conn, con_data->status);
+ }
+ 
++static struct app_connection *find_conn_without_app(struct gatt_device *dev)
 +{
-+	queue_remove(req->hog->gatt_op, req);
-+	bt_hog_unref(req->hog);
-+	free(req);
++	struct app_connection conn_match;
++
++	conn_match.device = dev;
++	conn_match.app = NULL;
++
++	return queue_find(app_connections, match_connection_by_device_and_app,
++								&conn_match);
 +}
 +
- static void report_value_cb(const guint8 *pdu, guint16 len, gpointer user_data)
+ static struct app_connection *find_conn(const bdaddr_t *addr, int32_t app_id)
  {
- 	struct report *report = user_data;
-@@ -774,6 +787,13 @@ static void report_free(void *data)
- 	g_free(report);
- }
+ 	struct app_connection conn_match;
+@@ -1525,7 +1537,22 @@ reply:
+ 		if (!conn)
+ 			return;
  
-+static void cancel_gatt_req(struct gatt_request *req)
-+{
-+	DBG("Canceling ID %u", req->req_id);
-+	if (g_attrib_cancel(req->hog->attrib, req->req_id))
-+		destroy_gatt_req(req);
-+}
+-		search_dev_for_srvc(conn, NULL);
++		if (bt_is_pairing(&dev->bdaddr))
++			/*
++			 * If there is bonding ongoing lets wait for paired
++			 * callback. Once we get that we can start search
++			 * services
++			 */
++			conn->timeout_id = g_timeout_add_seconds(
++						GATT_PAIR_CONN_TIMEOUT,
++						connection_timeout, conn);
++		else
++			/*
++			 * There is no ongoing bonding, lets search for primary
++			 * services
++			 *
++			 */
++			search_dev_for_srvc(conn, NULL);
+ 	}
+ 
+ 	data.dev = dev;
+@@ -6961,6 +6988,7 @@ static void gatt_paired_cb(const bdaddr_t *addr, uint8_t type)
+ {
+ 	struct gatt_device *dev;
+ 	char address[18];
++	struct app_connection *conn;
+ 
+ 	dev = find_device_by_addr(addr);
+ 	if (!dev)
+@@ -6972,7 +7000,17 @@ static void gatt_paired_cb(const bdaddr_t *addr, uint8_t type)
+ 	ba2str(addr, address);
+ 	DBG("Paired device %s", address);
+ 
+-	/* Find Service Changed and register for it.*/
++	/* conn without app is internal one used for search primary services */
++	conn = find_conn_without_app(dev);
++	if (!conn)
++		return;
 +
- static void hog_free(void *data)
- {
- 	struct bt_hog *hog = data;
-@@ -789,7 +809,7 @@ static void hog_free(void *data)
- 	g_slist_free_full(hog->reports, report_free);
- 	g_free(hog->name);
- 	g_free(hog->primary);
--	queue_destroy(hog->gatt_op, NULL);
-+	queue_destroy(hog->gatt_op, (void *) destroy_gatt_req);
- 	g_free(hog);
++	if (conn->timeout_id > 0) {
++		g_source_remove(conn->timeout_id);
++		conn->timeout_id = 0;
++	}
++
++	search_dev_for_srvc(conn, NULL);
  }
  
-@@ -1101,6 +1121,7 @@ void bt_hog_detach(struct bt_hog *hog)
- 	if (hog->bas)
- 		bt_bas_detach(hog->bas);
- 
-+	queue_foreach(hog->gatt_op, (void *) cancel_gatt_req, NULL);
- 	g_attrib_unref(hog->attrib);
- 	hog->attrib = NULL;
- }
+ static void gatt_unpaired_cb(const bdaddr_t *addr, uint8_t type)
 -- 
 1.8.4
 
