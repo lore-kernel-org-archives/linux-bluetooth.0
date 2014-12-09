@@ -1,89 +1,105 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 9 Dec 2014 20:02:10 +0100
-From: Pavel Machek <pavel@ucw.cz>
-To: pali.rohar@gmail.com, sre@debian.org, sre@ring0.de,
-	kernel list <linux-kernel@vger.kernel.org>,
-	linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
-	linux-omap@vger.kernel.org, tony@atomide.com, khilman@kernel.org,
-	aaro.koskinen@iki.fi, freemangordon@abv.bg, marcel@holtmann.org,
-	gustavo@padovan.org, johan.hedberg@gmail.com,
-	linux-bluetooth@vger.kernel.org
-Subject: __hci_cmd_sync() not suitable for nokia h4p
-Message-ID: <20141209190210.GA15641@amd>
+Date: Tue, 9 Dec 2014 19:42:52 +0100
+From: Alexander Aring <alex.aring@gmail.com>
+To: Jukka Rissanen <jukka.rissanen@linux.intel.com>
+Cc: linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org,
+	kernel@pengutronix.de, Martin Townsend <mtownsend1973@gmail.com>
+Subject: Re: [PATCHv3 bluetooth-next 3/3] 6lowpan: nhc: add other known
+ rfc6282 compressions
+Message-ID: <20141209184250.GB32681@omega>
+References: <1418053838-8692-1-git-send-email-alex.aring@gmail.com>
+ <1418053838-8692-4-git-send-email-alex.aring@gmail.com>
+ <1418124496.32209.47.camel@jrissane-mobl.ger.corp.intel.com>
+ <20141209115250.GA32681@omega>
+ <1418133949.32209.58.camel@jrissane-mobl.ger.corp.intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
+In-Reply-To: <1418133949.32209.58.camel@jrissane-mobl.ger.corp.intel.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi!
+Hi Jukka,
 
-Major problem with Nokia H4P driver was, that it uses custom functions
-instead of __hci_cmd_sync().
+On Tue, Dec 09, 2014 at 04:05:49PM +0200, Jukka Rissanen wrote:
+> Hi Alex,
+> 
+> On ti, 2014-12-09 at 12:52 +0100, Alexander Aring wrote:
+> > Hi Jukka,
+> > 
+> > On Tue, Dec 09, 2014 at 01:28:16PM +0200, Jukka Rissanen wrote:
+> > > Hi Alex,
+> > > 
+> > > the module unloading caused some issues in the receiving end.
+> > > 
+> > > I tried this:
+> > > * setup bluetooth 6lowpan connection
+> > > * transfer some UDP data
+> > > * unload the nhc_rfc6282_udp module (in one peer only, the other still
+> > > had udp nhc module loaded)
+> > > * try to send more data
+> > > 
+> > > This caused kernel crash in peer that had udp module unloaded:
+> > > 
+> > > 
+> > 
+> > mhh, okay. I don't know why this happens also the log gave me not much
+> > information, but thanks anyway.
+> > 
+> > Maybe this is a global issue with bluetooth 6LoWPAN error handling.
+> > 
+> > Can you simple do something like this:
+> > 
+> > diff --git a/net/6lowpan/iphc.c b/net/6lowpan/iphc.c
+> > index 32ffec6..2228dce 100644
+> > --- a/net/6lowpan/iphc.c
+> > +++ b/net/6lowpan/iphc.c
+> > @@ -425,6 +425,8 @@ lowpan_header_decompress(struct sk_buff *skb, struct net_device *dev,
+> >                         return -EINVAL;
+> >         }
+> >  
+> > +       return -EINVAL;
+> > +
+> >         /* UDP data uncompression */
+> >         if (iphc0 & LOWPAN_IPHC_NH_C) {
+> >                 struct udphdr uh;
+> > 
+> > 
+> > based on current bluetooth-next/master without the NHC framework.
+> > 
+> > This should be working, maybe you never hit any error while calling
+> > lowpan_header_decompress function. It's simple testing the error
+> > handling not more.
+> 
+> Hmm, I get the same crash here also without this patchset. So something
+> goes wrong if <0 code is returned.
+> 
 
-To recap, code was something like this: (You can see ifdefs with old
-code and my new replacements).
+Okay, do you already working on it?
 
-....
-	len = sizeof(*neg_cmd) + sizeof(*neg_hdr) + H4_TYPE_SIZE;
-#undef OLD 
-#ifdef OLD
-	skb = bt_skb_alloc(len, GFP_KERNEL);
-	if (!skb)
-		return -ENOMEM;
+> > 
+> > Do this please on one node, the other node should send some 6LoWPAN IPHC
+> > packets to check if the error handling working there.
+> > 
+> > 
+> > 
+> > 
+> > 
+> > Another issue is that I see that skb->dev isn't set before calling
+> > lowpan_header_decompress. Because inside your log is a "NULL":
+> > 
+> > (NULL net_device): received unknown nhc id which was not found.
+> > 
+> > Can you change that? That skb->dev is set to before calling
+> > lowpan_header_decompress.
+> 
+> I am setting the skb->dev after the call to lowpan_header_decompress().
+> And anyway the skb->dev is only used when printing the err.
+> Actually should we replace the skb->dev in lowpan_header_decompress()
+> with plain dev as that is given to the function as a parameter. 
+> 
 
-	memset(skb->data, 0x00, len);
-	*skb_put(skb, 1) = H4_NEG_PKT;
-	neg_hdr = (struct hci_h4p_neg_hdr *)skb_put(skb, sizeof(*neg_hdr));
-	neg_cmd = (struct hci_h4p_neg_cmd *)skb_put(skb, sizeof(*neg_cmd));
-	neg_hdr->dlen = sizeof(*neg_cmd);
-#else      
-	struct {
-		struct hci_h4p_neg_cmd neg_cmd;
-	} data;
+Ok, how we introduce this now? You wanna add this do the patch series for
+fixing the above issue, or should I add it to my patch series for
+introduce nhc framework?
 
-	memset(&data, 0, len-1);
-	neg_cmd = &data.neg_cmd;
-#endif
-
-	neg_cmd->ack = H4P_NEG_REQ;
-	neg_cmd->baud = cpu_to_le16(BT_BAUDRATE_DIVIDER/MAX_BAUD_RATE);
-	neg_cmd->proto = H4P_PROTO_BYTE;
-	neg_cmd->sys_clk = cpu_to_le16(sysclk);
-
-	hci_h4p_change_speed(info, INIT_SPEED);
-
-	printk("Setting up packet\n");
-	hci_h4p_set_rts(info, 1);
-	info->init_error = 0;
-	init_completion(&info->init_completion);
-	printk("skb_queue_tail\n");
-
-#ifdef OLD
-	skb_queue_tail(&info->txq, skb);
-
-	spin_lock_irqsave(&info->lock, flags);
-	hci_h4p_outb(info, UART_IER, hci_h4p_inb(info, UART_IER) |
-		     UART_IER_THRI);
-	spin_unlock_irqrestore(&info->lock, flags);
-#else
-	printk("hci_cmd_sync\n");
-//	set_bit(HCI_RUNNING, &info->hdev->flags);
-
-	info->initing = 2;
-	
-	skb = __hci_cmd_sync(info->hdev, H4_NEG_PKT << 8, sizeof(*neg_cmd), ((void *) &data), 20);
-
-...but there's problem with __hci_cmd_sync(): the packet it produces
-is one byte too long; for initialization, I can work around that with
-<< 8, so the added zero is at the begining (and device will be still
-initialized), but that is a) an extreme hack, b) only works for first
-packet and c) means that __hci_cmd_sync() will not recognize the
-reply, meaning it does not really help.
-
-Are there different variants of the protocol I should switch to? Any
-ideas? Should I forget about __hci_cmd_sync()?
-
-Best regards,
-									Pavel
--- 
-(english) http://www.livejournal.com/~pavelmachek
-(cesky, pictures) http://atrey.karlin.mff.cuni.cz/~pavel/picture/horses/blog.html
+- Alex
