@@ -1,43 +1,117 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 9 Dec 2014 17:50:17 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Arman Uguray <armansito@chromium.org>
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCH BlueZ 07/15] core: device: Use bt_att_register_disconnect.
-Message-ID: <20141209155017.GA23597@t440s.P-661HNU-F1>
-References: <1418085655-7304-1-git-send-email-armansito@chromium.org>
- <1418085655-7304-8-git-send-email-armansito@chromium.org>
- <20141209080756.GA4214@t440s.lan>
- <CAHrH25TMKQQFe0QejpRJ61Biy4PqXX5g_Gj01zid=AW8upMOrQ@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <CAHrH25TMKQQFe0QejpRJ61Biy4PqXX5g_Gj01zid=AW8upMOrQ@mail.gmail.com>
+In-Reply-To: <1418137907-16981-5-git-send-email-lukasz.rymanowski@tieto.com>
+References: <1418137907-16981-1-git-send-email-lukasz.rymanowski@tieto.com>
+	<1418137907-16981-5-git-send-email-lukasz.rymanowski@tieto.com>
+Date: Tue, 9 Dec 2014 16:37:03 +0100
+Message-ID: <CAMudyAuW_cT6_kTDPVddjaQsTEAtedf9Qg5_REYOgTubvC8yXw@mail.gmail.com>
+Subject: Re: [PATCH 04/25] android/hog: Minor coding style fixes
+From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Cc: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Arman,
+Hi,
 
-On Tue, Dec 09, 2014, Arman Uguray wrote:
-> > On Tue, Dec 9, 2014 at 12:07 AM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
-> > Hi Arman,
-> >
-> > On Mon, Dec 08, 2014, Arman Uguray wrote:
-> >> +     dev->att = bt_att_ref(g_attrib_get_att(attrib));
-> >
-> > I'd expect a function called "get" to return a new reference, so the
-> > extra ref() shouldn't be needed.
-> >
-> 
-> I see it mostly as a raw getter and adding ref semantics to it seems
-> confusing to me. Unless we call it g_attrib_get_att_ref or something
-> to that end.
+On 9 December 2014 at 16:11, Lukasz Rymanowski
+<lukasz.rymanowski@tieto.com> wrote:
+> ---
+>  android/hog.c | 24 ++++++++++++++++--------
+>  1 file changed, 16 insertions(+), 8 deletions(-)
+>
+> diff --git a/android/hog.c b/android/hog.c
+> index edee73f..872f4a5 100644
+> --- a/android/hog.c
+> +++ b/android/hog.c
+> @@ -221,7 +221,8 @@ static void report_reference_cb(guint8 status, const guint8 *pdu,
+>  static void external_report_reference_cb(guint8 status, const guint8 *pdu,
+>                                         guint16 plen, gpointer user_data);
+>
+> -static void discover_external_cb(uint8_t status, GSList *descs, void *user_data)
+> +static void discover_external_cb(uint8_t status, GSList *descs,
+> +                                                       void *user_data)
+>  {
+>         struct bt_hog *hog = user_data;
+>
+> @@ -253,7 +254,8 @@ static void discover_external(GAttrib *attrib, uint16_t start, uint16_t end,
+>                                                                 user_data);
+>  }
+>
+> -static void discover_report_cb(uint8_t status, GSList *descs, void *user_data)
+> +static void discover_report_cb(uint8_t status, GSList *descs,
+> +                                                       void *user_data)
+>  {
+>         struct report *report = user_data;
+>         struct bt_hog *hog = report->hog;
+> @@ -399,7 +401,8 @@ static int report_cmp(gconstpointer a, gconstpointer b)
+>         return ra->id - rb->id;
+>  }
+>
+> -static struct report *find_report(struct bt_hog *hog, uint8_t type, uint8_t id)
+> +static struct report *find_report(struct bt_hog *hog, uint8_t type,
+> +                                                               uint8_t id)
+>  {
+>         struct report cmp;
+>         GSList *l;
+> @@ -499,8 +502,8 @@ done:
+>                 error("bt_uhid_send: %s", strerror(-err));
+>  }
+>
+> -static bool get_descriptor_item_info(uint8_t *buf, ssize_t blen, ssize_t *len,
+> -                                                               bool *is_long)
+> +static bool get_descriptor_item_info(uint8_t *buf, ssize_t blen,
+> +                                               ssize_t *len, bool *is_long)
+>  {
+>         if (!blen)
+>                 return false;
+> @@ -696,7 +699,8 @@ static void proto_mode_read_cb(guint8 status, const guint8 *pdu, guint16 plen,
+>                 DBG("HoG is operating in Report Protocol Mode");
+>  }
+>
+> -static void char_discovered_cb(uint8_t status, GSList *chars, void *user_data)
+> +static void char_discovered_cb(uint8_t status, GSList *chars,
+> +                                                               void *user_data)
+>  {
+>         struct bt_hog *hog = user_data;
+>         struct gatt_primary *primary = hog->primary;
+> @@ -827,13 +831,16 @@ void bt_hog_unref(struct bt_hog *hog)
+>         if (!hog)
+>                 return;
+>
+> +       DBG("ref %d", hog->ref_count - 1);
+> +
+>         if (__sync_sub_and_fetch(&hog->ref_count, 1))
+>                 return;
+>
+>         hog_free(hog);
+>  }
+>
+> -static void find_included_cb(uint8_t status, GSList *services, void *user_data)
+> +static void find_included_cb(uint8_t status, GSList *services,
+> +                                                       void *user_data)
+>  {
+>         struct bt_hog *hog = user_data;
+>         struct gatt_included *include;
+> @@ -881,7 +888,8 @@ static void find_included_cb(uint8_t status, GSList *services, void *user_data)
+>                                                 char_discovered_cb, hog);
+>  }
+>
+> -static void hog_attach_scpp(struct bt_hog *hog, struct gatt_primary *primary)
+> +static void hog_attach_scpp(struct bt_hog *hog,
+> +                                               struct gatt_primary *primary)
+>  {
+>         if (hog->scpp) {
+>                 bt_scpp_attach(hog->scpp, hog->attrib);
+> --
+> 1.8.4
+>
 
-Could be that this is also just because of me spending too much time
-looking at kernel code. There pretty much everywhere foo_ref() is called
-foo_get() and foo_unref() is called foo_put(). I thought this was the
-common behavior for user space *get() functions too, but looking now I
-could only find agent_get() following this practice. The most annoying
-thing about your code was really the nested function calls so whatever
-solution gets rid of that is a step towards the better.
+Seems like this patch can be ignored. Looks like my editor just
+incorrectly shows me 80 bound. It does not take font width into
+account correctly.
+Thanks Szymon for pointing it out. Hope that other patches are not
+broked due to this.
 
-Johan
+\Lukasz
