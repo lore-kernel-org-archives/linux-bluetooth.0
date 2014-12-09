@@ -1,31 +1,104 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 8.1 \(1993\))
+MIME-Version: 1.0
+In-Reply-To: <2C5137D7-3544-4417-8087-C661DB7457E8@holtmann.org>
+References: <20141209060540.GA31748@jamse-laptop>
+	<23EE54B8-7A99-40A6-AF69-6976E30DF9C9@holtmann.org>
+	<CAMEJZcEueo_bDQ01RNgzauXd13SAn+Untg_Vfx6Hx9aVqipY5A@mail.gmail.com>
+	<2C5137D7-3544-4417-8087-C661DB7457E8@holtmann.org>
+Date: Tue, 9 Dec 2014 09:09:47 +0200
+Message-ID: <CAMEJZcGgiDXdpDTJ2C7xO8EwjdRoys42KOXhD5n_jNNWbpeeKA@mail.gmail.com>
 Subject: Re: [PATCH] Add USB device 04ca:3010 as Athoros AR3012
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <CAMEJZcGgiDXdpDTJ2C7xO8EwjdRoys42KOXhD5n_jNNWbpeeKA@mail.gmail.com>
-Date: Tue, 9 Dec 2014 08:20:26 +0100
+From: Janne Heikkinen <janne.m.heikkinen@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
 Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <016769DD-7227-4DA4-A08B-5F29A2651623@holtmann.org>
-References: <20141209060540.GA31748@jamse-laptop> <23EE54B8-7A99-40A6-AF69-6976E30DF9C9@holtmann.org> <CAMEJZcEueo_bDQ01RNgzauXd13SAn+Untg_Vfx6Hx9aVqipY5A@mail.gmail.com> <2C5137D7-3544-4417-8087-C661DB7457E8@holtmann.org> <CAMEJZcGgiDXdpDTJ2C7xO8EwjdRoys42KOXhD5n_jNNWbpeeKA@mail.gmail.com>
-To: Janne Heikkinen <janne.m.heikkinen@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: multipart/mixed; boundary=047d7b873d5e75e8190509c33a83
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Janne,
+--047d7b873d5e75e8190509c33a83
+Content-Type: text/plain; charset=UTF-8
 
->>> Subject: [PATCH] Add USB device 04ca:3010 as Athoros AR3012
->> 
->> the subject needs a Bluetooth: prefix.
-> ...
->> This is not a patch that I can apply with git am. Your mail client mangled all the spacing. Use git format-path and git send-email.
-> 
-> I'll try sending output of git format-patch as attachment.
-> <0001-Bluetooth-Add-USB-device-04ca-3010-as-Athoros-AR3012.patch>
+Hi Marcel,
 
-I really have no idea why using git send-email is so complicated. And in general I do not accept patches that come via attachments. They are really hard to review. Anyway, in this case I applied the patch to bluetooth-next tree.
+On Tue, Dec 9, 2014 at 8:55 AM, Marcel Holtmann <marcel@holtmann.org> wrote:
 
-Regards
+>> Subject: [PATCH] Add USB device 04ca:3010 as Athoros AR3012
+>
+> the subject needs a Bluetooth: prefix.
+...
+> This is not a patch that I can apply with git am. Your mail client mangled all the spacing. Use git format-path and git send-email.
 
-Marcel
+I'll try sending output of git format-patch as attachment.
 
+--047d7b873d5e75e8190509c33a83
+Content-Type: text/x-patch; charset=US-ASCII;
+	name="0001-Bluetooth-Add-USB-device-04ca-3010-as-Athoros-AR3012.patch"
+Content-Disposition: attachment;
+	filename="0001-Bluetooth-Add-USB-device-04ca-3010-as-Athoros-AR3012.patch"
+Content-Transfer-Encoding: base64
+X-Attachment-Id: f_i3gxg2he0
+
+RnJvbSBjZmQ1YzZkNTMwNjcwMTAyNjU3NTJkOWRlMzllNWRmMGViZmU1OThhIE1vbiBTZXAgMTcg
+MDA6MDA6MDAgMjAwMQpGcm9tOiBKYW5uZSBIZWlra2luZW4gPGphbm5lLm0uaGVpa2tpbmVuQGdt
+YWlsLmNvbT4KRGF0ZTogVHVlLCA5IERlYyAyMDE0IDA3OjQ0OjUxICswMjAwClN1YmplY3Q6IFtQ
+QVRDSF0gQmx1ZXRvb3RoOiBBZGQgVVNCIGRldmljZSAwNGNhOjMwMTAgYXMgQXRob3JvcyBBUjMw
+MTIKCkFzdXMgWDU1M01BIGhhcyBVU0IgZGV2aWNlIDA0Y2E6MzAxMCB0aGF0IGlzIEF0aG9yb3Mg
+QVIzMDEyCm9yIGNvbXBhdGlibGUuCgpEZXZpY2UgZnJvbSAvc3lzL2tlcm5lbC9kZWJ1Zy91c2Iv
+ZGV2aWNlczoKClQ6ICBCdXM9MDEgTGV2PTAyIFBybnQ9MDIgUG9ydD0wMyBDbnQ9MDIgRGV2Iz0g
+MjcgU3BkPTEyICAgTXhDaD0gMApEOiAgVmVyPSAxLjEwIENscz1lMCh3bGNvbikgU3ViPTAxIFBy
+b3Q9MDEgTXhQUz02NCAjQ2Zncz0gIDEKUDogIFZlbmRvcj0wNGNhIFByb2RJRD0zMDEwIFJldj0g
+MC4wMgpDOiogI0lmcz0gMiBDZmcjPSAxIEF0cj1lMCBNeFB3cj0xMDBtQQpBOiAgRmlyc3RJZiM9
+IDAgSWZDb3VudD0gMiBDbHM9ZTAod2xjb24pIFN1Yj0wMSBQcm90PTAxCkk6KiBJZiM9IDAgQWx0
+PSAwICNFUHM9IDMgQ2xzPWUwKHdsY29uKSBTdWI9MDEgUHJvdD0wMSBEcml2ZXI9YnR1c2IKRTog
+IEFkPTgxKEkpIEF0cj0wMyhJbnQuKSBNeFBTPSAgMTYgSXZsPTFtcwpFOiAgQWQ9ODIoSSkgQXRy
+PTAyKEJ1bGspIE14UFM9ICA2NCBJdmw9MG1zCkU6ICBBZD0wMihPKSBBdHI9MDIoQnVsaykgTXhQ
+Uz0gIDY0IEl2bD0wbXMKSToqIElmIz0gMSBBbHQ9IDAgI0VQcz0gMiBDbHM9ZTAod2xjb24pIFN1
+Yj0wMSBQcm90PTAxIERyaXZlcj1idHVzYgpFOiAgQWQ9ODMoSSkgQXRyPTAxKElzb2MpIE14UFM9
+ICAgMCBJdmw9MW1zCkU6ICBBZD0wMyhPKSBBdHI9MDEoSXNvYykgTXhQUz0gICAwIEl2bD0xbXMK
+STogIElmIz0gMSBBbHQ9IDEgI0VQcz0gMiBDbHM9ZTAod2xjb24pIFN1Yj0wMSBQcm90PTAxIERy
+aXZlcj1idHVzYgpFOiAgQWQ9ODMoSSkgQXRyPTAxKElzb2MpIE14UFM9ICAgOSBJdmw9MW1zCkU6
+ICBBZD0wMyhPKSBBdHI9MDEoSXNvYykgTXhQUz0gICA5IEl2bD0xbXMKSTogIElmIz0gMSBBbHQ9
+IDIgI0VQcz0gMiBDbHM9ZTAod2xjb24pIFN1Yj0wMSBQcm90PTAxIERyaXZlcj1idHVzYgpFOiAg
+QWQ9ODMoSSkgQXRyPTAxKElzb2MpIE14UFM9ICAxNyBJdmw9MW1zCkU6ICBBZD0wMyhPKSBBdHI9
+MDEoSXNvYykgTXhQUz0gIDE3IEl2bD0xbXMKSTogIElmIz0gMSBBbHQ9IDMgI0VQcz0gMiBDbHM9
+ZTAod2xjb24pIFN1Yj0wMSBQcm90PTAxIERyaXZlcj1idHVzYgpFOiAgQWQ9ODMoSSkgQXRyPTAx
+KElzb2MpIE14UFM9ICAyNSBJdmw9MW1zCkU6ICBBZD0wMyhPKSBBdHI9MDEoSXNvYykgTXhQUz0g
+IDI1IEl2bD0xbXMKSTogIElmIz0gMSBBbHQ9IDQgI0VQcz0gMiBDbHM9ZTAod2xjb24pIFN1Yj0w
+MSBQcm90PTAxIERyaXZlcj1idHVzYgpFOiAgQWQ9ODMoSSkgQXRyPTAxKElzb2MpIE14UFM9ICAz
+MyBJdmw9MW1zCkU6ICBBZD0wMyhPKSBBdHI9MDEoSXNvYykgTXhQUz0gIDMzIEl2bD0xbXMKSTog
+IElmIz0gMSBBbHQ9IDUgI0VQcz0gMiBDbHM9ZTAod2xjb24pIFN1Yj0wMSBQcm90PTAxIERyaXZl
+cj1idHVzYgpFOiAgQWQ9ODMoSSkgQXRyPTAxKElzb2MpIE14UFM9ICA0OSBJdmw9MW1zCkU6ICBB
+ZD0wMyhPKSBBdHI9MDEoSXNvYykgTXhQUz0gIDQ5IEl2bD0xbXMKClNpZ25lZC1vZmYtYnk6IEph
+bm5lIEhlaWtraW5lbiA8amFubmUubS5oZWlra2luZW5AZ21haWwuY29tPgotLS0KIGRyaXZlcnMv
+Ymx1ZXRvb3RoL2F0aDNrLmMgfCAyICsrCiBkcml2ZXJzL2JsdWV0b290aC9idHVzYi5jIHwgMSAr
+CiAyIGZpbGVzIGNoYW5nZWQsIDMgaW5zZXJ0aW9ucygrKQoKZGlmZiAtLWdpdCBhL2RyaXZlcnMv
+Ymx1ZXRvb3RoL2F0aDNrLmMgYi9kcml2ZXJzL2JsdWV0b290aC9hdGgzay5jCmluZGV4IGQ4NWNl
+ZDIuLjc0ZGQyN2EgMTAwNjQ0Ci0tLSBhL2RyaXZlcnMvYmx1ZXRvb3RoL2F0aDNrLmMKKysrIGIv
+ZHJpdmVycy9ibHVldG9vdGgvYXRoM2suYwpAQCAtODYsNiArODYsNyBAQCBzdGF0aWMgY29uc3Qg
+c3RydWN0IHVzYl9kZXZpY2VfaWQgYXRoM2tfdGFibGVbXSA9IHsKIAl7IFVTQl9ERVZJQ0UoMHgw
+NENBLCAweDMwMDcpIH0sCiAJeyBVU0JfREVWSUNFKDB4MDRDQSwgMHgzMDA4KSB9LAogCXsgVVNC
+X0RFVklDRSgweDA0Q0EsIDB4MzAwYikgfSwKKwl7IFVTQl9ERVZJQ0UoMHgwNENBLCAweDMwMTAp
+IH0sCiAJeyBVU0JfREVWSUNFKDB4MDkzMCwgMHgwMjE5KSB9LAogCXsgVVNCX0RFVklDRSgweDA5
+MzAsIDB4MDIyMCkgfSwKIAl7IFVTQl9ERVZJQ0UoMHgwOTMwLCAweDAyMjcpIH0sCkBAIC0xMzcs
+NiArMTM4LDcgQEAgc3RhdGljIGNvbnN0IHN0cnVjdCB1c2JfZGV2aWNlX2lkIGF0aDNrX2JsaXN0
+X3RibFtdID0gewogCXsgVVNCX0RFVklDRSgweDA0Y2EsIDB4MzAwNyksIC5kcml2ZXJfaW5mbyA9
+IEJUVVNCX0FUSDMwMTIgfSwKIAl7IFVTQl9ERVZJQ0UoMHgwNGNhLCAweDMwMDgpLCAuZHJpdmVy
+X2luZm8gPSBCVFVTQl9BVEgzMDEyIH0sCiAJeyBVU0JfREVWSUNFKDB4MDRjYSwgMHgzMDBiKSwg
+LmRyaXZlcl9pbmZvID0gQlRVU0JfQVRIMzAxMiB9LAorCXsgVVNCX0RFVklDRSgweDA0Y2EsIDB4
+MzAxMCksIC5kcml2ZXJfaW5mbyA9IEJUVVNCX0FUSDMwMTIgfSwKIAl7IFVTQl9ERVZJQ0UoMHgw
+OTMwLCAweDAyMTkpLCAuZHJpdmVyX2luZm8gPSBCVFVTQl9BVEgzMDEyIH0sCiAJeyBVU0JfREVW
+SUNFKDB4MDkzMCwgMHgwMjIwKSwgLmRyaXZlcl9pbmZvID0gQlRVU0JfQVRIMzAxMiB9LAogCXsg
+VVNCX0RFVklDRSgweDA5MzAsIDB4MDIyNyksIC5kcml2ZXJfaW5mbyA9IEJUVVNCX0FUSDMwMTIg
+fSwKZGlmZiAtLWdpdCBhL2RyaXZlcnMvYmx1ZXRvb3RoL2J0dXNiLmMgYi9kcml2ZXJzL2JsdWV0
+b290aC9idHVzYi5jCmluZGV4IGVkZmMxN2IuLmVkYmQzNjUgMTAwNjQ0Ci0tLSBhL2RyaXZlcnMv
+Ymx1ZXRvb3RoL2J0dXNiLmMKKysrIGIvZHJpdmVycy9ibHVldG9vdGgvYnR1c2IuYwpAQCAtMTYz
+LDYgKzE2Myw3IEBAIHN0YXRpYyBjb25zdCBzdHJ1Y3QgdXNiX2RldmljZV9pZCBibGFja2xpc3Rf
+dGFibGVbXSA9IHsKIAl7IFVTQl9ERVZJQ0UoMHgwNGNhLCAweDMwMDcpLCAuZHJpdmVyX2luZm8g
+PSBCVFVTQl9BVEgzMDEyIH0sCiAJeyBVU0JfREVWSUNFKDB4MDRjYSwgMHgzMDA4KSwgLmRyaXZl
+cl9pbmZvID0gQlRVU0JfQVRIMzAxMiB9LAogCXsgVVNCX0RFVklDRSgweDA0Y2EsIDB4MzAwYiks
+IC5kcml2ZXJfaW5mbyA9IEJUVVNCX0FUSDMwMTIgfSwKKwl7IFVTQl9ERVZJQ0UoMHgwNGNhLCAw
+eDMwMTApLCAuZHJpdmVyX2luZm8gPSBCVFVTQl9BVEgzMDEyIH0sCiAJeyBVU0JfREVWSUNFKDB4
+MDkzMCwgMHgwMjE5KSwgLmRyaXZlcl9pbmZvID0gQlRVU0JfQVRIMzAxMiB9LAogCXsgVVNCX0RF
+VklDRSgweDA5MzAsIDB4MDIyMCksIC5kcml2ZXJfaW5mbyA9IEJUVVNCX0FUSDMwMTIgfSwKIAl7
+IFVTQl9ERVZJQ0UoMHgwOTMwLCAweDAyMjcpLCAuZHJpdmVyX2luZm8gPSBCVFVTQl9BVEgzMDEy
+IH0sCi0tIAoxLjkuMQoK
+--047d7b873d5e75e8190509c33a83--
