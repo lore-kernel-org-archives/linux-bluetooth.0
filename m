@@ -2,116 +2,53 @@ Return-Path: <cyrus@holtmann.org>
 From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH 08/25] android/gatt: Improve LE connection after pair
-Date: Tue,  9 Dec 2014 16:11:30 +0100
-Message-Id: <1418137907-16981-9-git-send-email-lukasz.rymanowski@tieto.com>
+Subject: [PATCH 07/25] android/bluetooth: Add API to check if device is bonding
+Date: Tue,  9 Dec 2014 16:11:29 +0100
+Message-Id: <1418137907-16981-8-git-send-email-lukasz.rymanowski@tieto.com>
 In-Reply-To: <1418137907-16981-1-git-send-email-lukasz.rymanowski@tieto.com>
 References: <1418137907-16981-1-git-send-email-lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-With this patch, GATT keeps ATT connection for 30 sec during bonding,
-and once bonding is completed GATT starts service search.
-
-It is needed for example when user choose HOG device from Settings
-Application. So far scenario looks like that:
-
-1. Bonding started
-2. GATT Service search
-3. Bonding ended and LE connection dropped
-4. Initiated connection to HOG device
-
-Now it looks like that:
-
-1. Bonding Started
-2. Bonding Ended
-3. GATT Search Service
-4. Connect to HOG device on existing LE connection
+Some modules like GATT might be interested in information about ongoing
+bonding on device. It can be useful e.g. to take decision if GATT can do
+service search or should wait until bonding is done.
 ---
- android/gatt.c | 42 ++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 40 insertions(+), 2 deletions(-)
+ android/bluetooth.c | 11 +++++++++++
+ android/bluetooth.h |  1 +
+ 2 files changed, 12 insertions(+)
 
-diff --git a/android/gatt.c b/android/gatt.c
-index 4c16ce6..c28d6d2 100644
---- a/android/gatt.c
-+++ b/android/gatt.c
-@@ -70,6 +70,7 @@
- #define GATT_PERM_WRITE_SIGNED_MITM	0x00020000
- #define GATT_PERM_NONE			0x10000000
- 
-+#define GATT_PAIR_CONN_TIMEOUT 30
- #define GATT_CONN_TIMEOUT 2
- 
- static const uint8_t BLUETOOTH_UUID[] = {
-@@ -1392,6 +1393,17 @@ static void send_app_connect_notifications(void *data, void *user_data)
- 		send_app_connect_notify(conn, con_data->status);
+diff --git a/android/bluetooth.c b/android/bluetooth.c
+index 7c4adb8..6e678e4 100644
+--- a/android/bluetooth.c
++++ b/android/bluetooth.c
+@@ -1765,6 +1765,17 @@ void bt_paired_unregister(bt_paired_device_cb cb)
+ 	queue_remove(paired_cb_list, cb);
  }
  
-+static struct app_connection *find_conn_without_app(struct gatt_device *dev)
++bool bt_is_pairing(const bdaddr_t *addr)
 +{
-+	struct app_connection conn_match;
++	struct device *dev;
 +
-+	conn_match.device = dev;
-+	conn_match.app = NULL;
++	dev = find_device(addr);
++	if (!dev)
++		return false;
 +
-+	return queue_find(app_connections, match_connection_by_device_and_app,
-+								&conn_match);
++	return dev->pairing;
 +}
 +
- static struct app_connection *find_conn(const bdaddr_t *addr, int32_t app_id)
+ static bool rssi_above_threshold(int old, int new)
  {
- 	struct app_connection conn_match;
-@@ -1525,7 +1537,22 @@ reply:
- 		if (!conn)
- 			return;
- 
--		search_dev_for_srvc(conn, NULL);
-+		if (bt_is_pairing(&dev->bdaddr))
-+			/*
-+			 * If there is bonding ongoing lets wait for paired
-+			 * callback. Once we get that we can start search
-+			 * services
-+			 */
-+			conn->timeout_id = g_timeout_add_seconds(
-+						GATT_PAIR_CONN_TIMEOUT,
-+						connection_timeout, conn);
-+		else
-+			/*
-+			 * There is no ongoing bonding, lets search for primary
-+			 * services
-+			 *
-+			 */
-+			search_dev_for_srvc(conn, NULL);
- 	}
- 
- 	data.dev = dev;
-@@ -6961,6 +6988,7 @@ static void gatt_paired_cb(const bdaddr_t *addr, uint8_t type)
- {
- 	struct gatt_device *dev;
- 	char address[18];
-+	struct app_connection *conn;
- 
- 	dev = find_device_by_addr(addr);
- 	if (!dev)
-@@ -6972,7 +7000,17 @@ static void gatt_paired_cb(const bdaddr_t *addr, uint8_t type)
- 	ba2str(addr, address);
- 	DBG("Paired device %s", address);
- 
--	/* Find Service Changed and register for it.*/
-+	/* conn without app is internal one used for search primary services */
-+	conn = find_conn_without_app(dev);
-+	if (!conn)
-+		return;
-+
-+	if (conn->timeout_id > 0) {
-+		g_source_remove(conn->timeout_id);
-+		conn->timeout_id = 0;
-+	}
-+
-+	search_dev_for_srvc(conn, NULL);
- }
- 
- static void gatt_unpaired_cb(const bdaddr_t *addr, uint8_t type)
+ 	/* only 8 dBm or more */
+diff --git a/android/bluetooth.h b/android/bluetooth.h
+index 8e0e6e2..884aed3 100644
+--- a/android/bluetooth.h
++++ b/android/bluetooth.h
+@@ -94,3 +94,4 @@ void bt_unpaired_unregister(bt_unpaired_device_cb cb);
+ typedef void (*bt_paired_device_cb)(const bdaddr_t *addr, uint8_t type);
+ bool bt_paired_register(bt_paired_device_cb cb);
+ void bt_paired_unregister(bt_paired_device_cb cb);
++bool bt_is_pairing(const bdaddr_t *addr);
 -- 
 1.8.4
 
