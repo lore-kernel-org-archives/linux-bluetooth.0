@@ -2,135 +2,71 @@ Return-Path: <cyrus@holtmann.org>
 From: Arman Uguray <armansito@chromium.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Arman Uguray <armansito@chromium.org>
-Subject: [PATCH BlueZ v1 02/12] shared/att: Add err argument to disconnect cb
-Date: Tue,  9 Dec 2014 15:00:55 -0800
-Message-Id: <1418166065-21055-3-git-send-email-armansito@chromium.org>
-In-Reply-To: <1418166065-21055-1-git-send-email-armansito@chromium.org>
-References: <1418166065-21055-1-git-send-email-armansito@chromium.org>
+Subject: [PATCH BlueZ v1 00/12] core: Use shared/gatt-client
+Date: Tue,  9 Dec 2014 15:00:53 -0800
+Message-Id: <1418166065-21055-1-git-send-email-armansito@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch adds an "int err" argument to the disconnect callback.
-shared/att obtains the value of SO_ERROR option for the underlying
-fd and passes it to the callbacks.
----
- src/shared/att.c         | 23 ++++++++++++++++++-----
- src/shared/att.h         |  2 +-
- src/shared/gatt-client.c |  2 +-
- tools/btgatt-client.c    |  4 ++--
- tools/btgatt-server.c    |  4 ++--
- 5 files changed, 24 insertions(+), 11 deletions(-)
+*v1:
+  - Addressed comments by Johan and Luiz.
 
-diff --git a/src/shared/att.c b/src/shared/att.c
-index 26b6c5b..99bbb6c 100644
---- a/src/shared/att.c
-+++ b/src/shared/att.c
-@@ -536,29 +536,42 @@ static void wakeup_writer(struct bt_att *att)
- static void disconn_handler(void *data, void *user_data)
- {
- 	struct att_disconn *disconn = data;
-+	int err = PTR_TO_INT(user_data);
- 
- 	if (disconn->removed)
- 		return;
- 
- 	if (disconn->callback)
--		disconn->callback(disconn->user_data);
-+		disconn->callback(err, disconn->user_data);
- }
- 
- static bool disconnect_cb(struct io *io, void *user_data)
- {
- 	struct bt_att *att = user_data;
-+	int err;
-+	socklen_t len;
- 
--	io_destroy(att->io);
--	att->io = NULL;
-+	len = sizeof(err);
-+
-+	if (getsockopt(att->fd, SOL_SOCKET, SO_ERROR, &err, &len) < 0) {
-+		util_debug(att->debug_callback, att->debug_data,
-+					"Failed to obtain disconnect error: %s",
-+					strerror(errno));
-+		err = 0;
-+	}
- 
- 	util_debug(att->debug_callback, att->debug_data,
--						"Physical link disconnected");
-+					"Physical link disconnected: %s",
-+					strerror(err));
-+
-+	io_destroy(att->io);
-+	att->io = NULL;
- 
- 	bt_att_cancel_all(att);
- 
- 	bt_att_ref(att);
- 	att->in_disconn = true;
--	queue_foreach(att->disconn_list, disconn_handler, NULL);
-+	queue_foreach(att->disconn_list, disconn_handler, INT_TO_PTR(err));
- 	att->in_disconn = false;
- 
- 	if (att->need_disconn_cleanup) {
-diff --git a/src/shared/att.h b/src/shared/att.h
-index 99b5a5b..cd00a1e 100644
---- a/src/shared/att.h
-+++ b/src/shared/att.h
-@@ -43,7 +43,7 @@ typedef void (*bt_att_destroy_func_t)(void *user_data);
- typedef void (*bt_att_debug_func_t)(const char *str, void *user_data);
- typedef void (*bt_att_timeout_func_t)(unsigned int id, uint8_t opcode,
- 							void *user_data);
--typedef void (*bt_att_disconnect_func_t)(void *user_data);
-+typedef void (*bt_att_disconnect_func_t)(int err, void *user_data);
- 
- bool bt_att_set_debug(struct bt_att *att, bt_att_debug_func_t callback,
- 				void *user_data, bt_att_destroy_func_t destroy);
-diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
-index 463de3b..33ed633 100644
---- a/src/shared/gatt-client.c
-+++ b/src/shared/gatt-client.c
-@@ -1483,7 +1483,7 @@ static void bt_gatt_client_free(struct bt_gatt_client *client)
- 	free(client);
- }
- 
--static void att_disconnect_cb(void *user_data)
-+static void att_disconnect_cb(int err, void *user_data)
- {
- 	struct bt_gatt_client *client = user_data;
- 	bool in_init = client->in_init;
-diff --git a/tools/btgatt-client.c b/tools/btgatt-client.c
-index 015142d..e2e0537 100644
---- a/tools/btgatt-client.c
-+++ b/tools/btgatt-client.c
-@@ -74,9 +74,9 @@ static void print_prompt(void)
- 	fflush(stdout);
- }
- 
--static void att_disconnect_cb(void *user_data)
-+static void att_disconnect_cb(int err, void *user_data)
- {
--	printf("Device disconnected\n");
-+	printf("Device disconnected: %s\n", strerror(err));
- 
- 	mainloop_quit();
- }
-diff --git a/tools/btgatt-server.c b/tools/btgatt-server.c
-index 1a9b9fb..f6ad8c3 100644
---- a/tools/btgatt-server.c
-+++ b/tools/btgatt-server.c
-@@ -101,9 +101,9 @@ static void print_prompt(void)
- 	fflush(stdout);
- }
- 
--static void att_disconnect_cb(void *user_data)
-+static void att_disconnect_cb(int err, void *user_data)
- {
--	printf("Device disconnected\n");
-+	printf("Device disconnected: %s\n", strerror(err));
- 
- 	mainloop_quit();
- }
+
+This patch set integrates shared/gatt-client into bluetoothd. The following
+items have been tackled here:
+
+  1. src/device now uses shared/gatt-client to perform service discovery. State
+  updates such as disconnections, service changed events, etc. are done using
+  callback APIs of the new shared framework and attrib/gatt is no longer used to
+  perform GATT operations directly. A GAttrib instance is maintained for
+  backwards compatibility with profiles that haven't been converted yet.
+
+  2. A new gatt-callbacks API has been added which mirrors the attio APIs for
+  shared/gatt-client. Profiles/plugins are notified using these APIs when the
+  bearer disconnects, when services change, and when gatt-client is ready.
+
+  3. The profiles/gatt plugin has been rewritten. Since the GATT service is
+  handled by shared/gatt-client, this profile no longer deals with service
+  changed events performs out of place MTU exchanges, which used to get
+  performed in an arbitrary order. The profile has been renamed to profiles/gap
+  as it now only deals with the GAP service, and reads the "Appearance" and
+  "Device Name" characteristics using the new shared stack.
+
+Arman Uguray (12):
+  attrib/gattrib: Add g_attrib_get_att.
+  shared/att: Add err argument to disconnect cb
+  shared/gatt-client: Set op->success correctly
+  core: device: Use bt_att_register_disconnect.
+  core: device: Use shared/gatt-client for GATT.
+  core: Rename device_attach_attrib
+  core: Use gatt_db service callbacks
+  core: Introduce gatt-callbacks
+  profiles/gatt: Don't handle GATT service.
+  profiles/gatt: Rename profile to gap.
+  profiles/gap: Rewrite using bt_gatt_client.
+  profiles/gap: Add Google copyright.
+
+ Makefile.am              |   1 +
+ Makefile.plugins         |   4 +-
+ attrib/gattrib.c         |   8 +
+ attrib/gattrib.h         |   3 +
+ profiles/gap/gas.c       | 322 +++++++++++++++++++++++++
+ profiles/gatt/gas.c      | 457 ------------------------------------
+ src/attrib-server.c      |   2 +-
+ src/device.c             | 598 +++++++++++++++++++++++++++++++++--------------
+ src/device.h             |   2 +-
+ src/gatt-callbacks.h     |  36 +++
+ src/shared/att-types.h   |   3 +-
+ src/shared/att.c         |  23 +-
+ src/shared/att.h         |   2 +-
+ src/shared/gatt-client.c |   6 +-
+ tools/btgatt-client.c    |   4 +-
+ tools/btgatt-server.c    |   4 +-
+ 16 files changed, 832 insertions(+), 643 deletions(-)
+ create mode 100644 profiles/gap/gas.c
+ delete mode 100644 profiles/gatt/gas.c
+ create mode 100644 src/gatt-callbacks.h
+
 -- 
 2.2.0.rc0.207.ga3a616c
 
