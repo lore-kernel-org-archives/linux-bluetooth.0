@@ -2,329 +2,200 @@ Return-Path: <cyrus@holtmann.org>
 From: Arman Uguray <armansito@chromium.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Arman Uguray <armansito@chromium.org>
-Subject: [PATCH BlueZ 14/15] profiles/gap: Rewrite using bt_gatt_client.
-Date: Mon,  8 Dec 2014 16:40:54 -0800
-Message-Id: <1418085655-7304-15-git-send-email-armansito@chromium.org>
+Subject: [PATCH BlueZ 10/15] core: Use gatt_db service callbacks
+Date: Mon,  8 Dec 2014 16:40:50 -0800
+Message-Id: <1418085655-7304-11-git-send-email-armansito@chromium.org>
 In-Reply-To: <1418085655-7304-1-git-send-email-armansito@chromium.org>
 References: <1418085655-7304-1-git-send-email-armansito@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch rewrites the GAP profile to use the shared GATT stack instead
-of GAttrib. The profile now also handles the Device Name characteristic.
----
- profiles/gap/gas.c | 225 +++++++++++++++++++++++++++++++++++++++--------------
- 1 file changed, 166 insertions(+), 59 deletions(-)
+This patch integrates the gatt_db service callbacks into btd_device.
+Based on the event, the device objects UUIDs list is updated and
+profiles are probed for new services.
 
-diff --git a/profiles/gap/gas.c b/profiles/gap/gas.c
-index a4028dd..7b28437 100644
---- a/profiles/gap/gas.c
-+++ b/profiles/gap/gas.c
-@@ -19,6 +19,7 @@
- #include <config.h>
- #endif
- 
-+#include <ctype.h>
- #include <stdbool.h>
- #include <stdlib.h>
- #include <sys/types.h>
-@@ -36,30 +37,34 @@
- #include "src/profile.h"
- #include "src/service.h"
- #include "src/shared/util.h"
--#include "attrib/att.h"
--#include "attrib/gattrib.h"
--#include "src/attio.h"
--#include "attrib/gatt.h"
- #include "src/log.h"
- #include "src/textfile.h"
-+#include "src/shared/att.h"
-+#include "src/shared/queue.h"
-+#include "src/shared/gatt-db.h"
-+#include "src/shared/gatt-client.h"
-+#include "src/gatt-callbacks.h"
- 
- /* Generic Attribute/Access Service */
- struct gas {
- 	struct btd_device *device;
--	struct att_range gap;	/* GAP Primary service range */
--	GAttrib *attrib;
--	guint attioid;
-+	struct gatt_db *db;
-+	struct bt_gatt_client *client;
-+	uint16_t start_handle, end_handle;
-+	unsigned int gatt_cb_id;
- };
- 
- static GSList *devices;
- 
- static void gas_free(struct gas *gas)
- {
--	if (gas->attioid)
--		btd_device_remove_attio_callback(gas->device, gas->attioid);
-+	if (gas->gatt_cb_id)
-+		btd_device_remove_gatt_callbacks(gas->device,
-+							gas->gatt_cb_id);
- 
--	g_attrib_unref(gas->attrib);
- 	btd_device_unref(gas->device);
-+	gatt_db_unref(gas->db);
-+	bt_gatt_client_unref(gas->client);
- 	g_free(gas);
+There is currently no mechanism to tell a profile that a service has
+been removed, however profiles can use the gatt_db callbacks to make
+necessary updates in the future.
+---
+ src/device.c | 143 ++++++++++++++++++++++++++++++++++++++++++++++++-----------
+ 1 file changed, 117 insertions(+), 26 deletions(-)
+
+diff --git a/src/device.c b/src/device.c
+index 09df701..0bfac1e 100644
+--- a/src/device.c
++++ b/src/device.c
+@@ -2365,6 +2365,119 @@ static void load_att_info(struct btd_device *device, const char *local,
+ 	free(prim_uuid);
  }
  
-@@ -71,83 +76,193 @@ static int cmp_device(gconstpointer a, gconstpointer b)
- 	return gas->device == device ? 0 : -1;
- }
- 
--static void gap_appearance_cb(guint8 status, const guint8 *pdu, guint16 plen,
--							gpointer user_data)
-+static char *name2utf8(const uint8_t *name, uint8_t len)
++static void device_register_primaries(struct btd_device *device,
++						GSList *prim_list, int psm)
 +{
-+	char utf8_name[HCI_MAX_NAME_LENGTH + 2];
-+	int i;
++	device->primaries = g_slist_concat(device->primaries, prim_list);
++}
 +
-+	if (g_utf8_validate((const char *) name, len, NULL))
-+		return g_strndup((char *) name, len);
++static void add_primary(struct gatt_db_attribute *attr, void *user_data)
++{
++	GSList **new_services = user_data;
++	struct gatt_primary *prim;
++	bt_uuid_t uuid;
 +
-+	memset(utf8_name, 0, sizeof(utf8_name));
-+	strncpy(utf8_name, (char *) name, len);
-+
-+	/* Assume ASCII, and replace all non-ASCII with spaces */
-+	for (i = 0; utf8_name[i] != '\0'; i++) {
-+		if (!isascii(utf8_name[i]))
-+			utf8_name[i] = ' ';
++	prim = g_new0(struct gatt_primary, 1);
++	if (!prim) {
++		DBG("Failed to allocate gatt_primary structure");
++		return;
 +	}
 +
-+	/* Remove leading and trailing whitespace characters */
-+	g_strstrip(utf8_name);
++	gatt_db_attribute_get_service_handles(attr, &prim->range.start,
++							&prim->range.end);
++	gatt_db_attribute_get_service_uuid(attr, &uuid);
++	bt_uuid_to_string(&uuid, prim->uuid, sizeof(prim->uuid));
 +
-+	return g_strdup(utf8_name);
++	*new_services = g_slist_append(*new_services, prim);
 +}
 +
-+static void read_device_name_cb(bool success, uint8_t att_ecode,
-+					const uint8_t *value, uint16_t length,
-+					void *user_data)
- {
- 	struct gas *gas = user_data;
--	struct att_data_list *list =  NULL;
--	uint16_t app;
--	uint8_t *atval;
-+	char *name = name2utf8(value, length);
- 
--	if (status != 0) {
--		error("Read characteristics by UUID failed: %s",
--				att_ecode2str(status));
-+	DBG("GAP Device Name: %s", name);
++static void store_services(struct btd_device *device);
 +
-+	btd_device_device_set_name(gas->device, name);
-+}
-+
-+static void handle_device_name(struct gas *gas, uint16_t value_handle)
++static void gatt_service_added(struct gatt_db_attribute *attr, void *user_data)
 +{
-+	if (!bt_gatt_client_read_long_value(gas->client, value_handle, 0,
-+						read_device_name_cb, gas, NULL))
-+		DBG("Failed to send request to read device name");
++	struct btd_device *device = user_data;
++	struct gatt_primary *prim;
++	GSList *new_service = NULL;
++	GSList *profiles_added = NULL;
++	uint16_t start, end;
++
++	if (!bt_gatt_client_is_ready(device->gatt_client))
++		return;
++
++	gatt_db_attribute_get_service_handles(attr, &start, &end);
++
++	DBG("GATT service added - start: 0x%04x, end: 0x%04x", start, end);
++
++	/*
++	 * TODO: Remove the primaries list entirely once all profiles use
++	 * shared/gatt.
++	 */
++	add_primary(attr, &new_service);
++	if (!new_service)
++		return;
++
++	device_register_primaries(device, new_service, -1);
++
++	prim = new_service->data;
++	profiles_added = g_slist_append(profiles_added, g_strdup(prim->uuid));
++
++	device_probe_profiles(device, profiles_added);
++
++	store_services(device);
++
++	g_slist_free_full(profiles_added, g_free);
 +}
 +
-+static void read_appearance_cb(bool success, uint8_t att_ecode,
-+					const uint8_t *value, uint16_t length,
-+					void *user_data)
++static gint prim_attr_cmp(gconstpointer a, gconstpointer b)
 +{
-+	struct gas *gas = user_data;
-+	uint16_t appearance;
++	const struct gatt_primary *prim = a;
++	const struct gatt_db_attribute *attr = b;
++	uint16_t start, end;
 +
-+	if (!success) {
-+		DBG("Reading appearance failed with ATT error: %u", att_ecode);
- 		return;
- 	}
- 
--	list = dec_read_by_type_resp(pdu, plen);
--	if (list == NULL)
-+	/* The appearance value is a 16-bit unsigned integer */
-+	if (length != 2) {
-+		DBG("Malformed appearance value");
- 		return;
--
--	if (list->len != 4) {
--		error("GAP Appearance value: invalid data");
--		goto done;
- 	}
- 
--	atval = list->data[0] + 2; /* skip handle value */
--	app = get_le16(atval);
-+	appearance = get_le16(value);
- 
--	DBG("GAP Appearance: 0x%04x", app);
-+	DBG("GAP Appearance: 0x%04x", appearance);
- 
--	device_set_appearance(gas->device, app);
-+	device_set_appearance(gas->device, appearance);
-+}
- 
--done:
--	att_data_list_free(list);
-+static void handle_appearance(struct gas *gas, uint16_t value_handle)
-+{
-+	if (!bt_gatt_client_read_value(gas->client, value_handle,
-+						read_appearance_cb, gas, NULL))
-+		DBG("Failed to send request to read appearance");
- }
- 
--static void attio_connected_cb(GAttrib *attrib, gpointer user_data)
-+static bool uuid_cmp(uint16_t u16, const bt_uuid_t *uuid)
-+{
-+	bt_uuid_t lhs;
++	gatt_db_attribute_get_service_handles(attr, &start, &end);
 +
-+	bt_uuid16_create(&lhs, u16);
-+
-+	return bt_uuid_cmp(&lhs, uuid) == 0;
++	return !(prim->range.start == start && prim->range.end == end);
 +}
 +
-+static void handle_characteristic(struct gatt_db_attribute *attr,
++static void gatt_service_removed(struct gatt_db_attribute *attr,
 +								void *user_data)
- {
- 	struct gas *gas = user_data;
--	uint16_t app;
-+	uint16_t value_handle;
-+	bt_uuid_t uuid;
-+
-+	if (!gatt_db_attribute_get_char_data(attr, NULL, &value_handle, NULL,
-+								&uuid)) {
-+		error("Failed to obtain characteristic data");
-+		return;
-+	}
- 
--	gas->attrib = g_attrib_ref(attrib);
-+	if (uuid_cmp(GATT_CHARAC_DEVICE_NAME, &uuid))
-+		handle_device_name(gas, value_handle);
-+	else if (uuid_cmp(GATT_CHARAC_APPEARANCE, &uuid))
-+		handle_appearance(gas, value_handle);
-+	else {
-+		char uuid_str[MAX_LEN_UUID_STR];
- 
--	if (device_get_appearance(gas->device, &app) < 0) {
--		bt_uuid_t uuid;
-+		/* TODO: Support peripheral privacy feature */
- 
--		bt_uuid16_create(&uuid, GATT_CHARAC_APPEARANCE);
-+		bt_uuid_to_string(&uuid, uuid_str, sizeof(uuid_str));
-+		DBG("Unsupported characteristic: %s", uuid_str);
-+	}
-+}
-+
-+static void handle_service(struct gatt_db_attribute *attr, void *user_data)
 +{
-+	struct gas *gas = user_data;
- 
--		gatt_read_char_by_uuid(gas->attrib, gas->gap.start,
--						gas->gap.end, &uuid,
--						gap_appearance_cb, gas);
-+	if (gas->start_handle) {
-+		error("More than one GAP service exists on device");
-+		return;
- 	}
- 
--	/* TODO: Read other GAP characteristics - See Core spec page 1739 */
-+	gatt_db_attribute_get_service_handles(attr, &gas->start_handle,
-+							&gas->end_handle);
-+	gatt_db_service_foreach_char(attr, handle_characteristic, gas);
- }
- 
--static void attio_disconnected_cb(gpointer user_data)
-+static void handle_gap_service(struct gas *gas)
-+{
-+	bt_uuid_t uuid;
-+
-+	bt_string_to_uuid(&uuid, GAP_UUID);
-+
-+	gatt_db_foreach_service(gas->db, &uuid, handle_service, gas);
-+}
-+
-+static void gatt_client_ready_cb(struct bt_gatt_client *client,
-+					struct gatt_db *db, void *user_data)
- {
- 	struct gas *gas = user_data;
- 
--	g_attrib_unref(gas->attrib);
--	gas->attrib = NULL;
-+	gas->client = bt_gatt_client_ref(client);
-+	gas->db = gatt_db_ref(db);
-+
-+	handle_gap_service(gas);
- }
- 
--static int gas_register(struct btd_device *device, struct att_range *gap)
-+static void gatt_client_disconn_cb(void *user_data)
-+{
-+	struct gas *gas = user_data;
-+
-+	gatt_db_unref(gas->db);
-+	bt_gatt_client_unref(gas->client);
-+
-+	gas->db = NULL;
-+	gas->client = NULL;
-+}
-+
-+static int gas_register(struct btd_device *device)
- {
- 	struct gas *gas;
++	struct btd_device *device = user_data;
 +	GSList *l;
++	struct gatt_primary *prim;
++	uint16_t start, end;
++
++	if (!bt_gatt_client_is_ready(device->gatt_client))
++		return;
++
++	gatt_db_attribute_get_service_handles(attr, &start, &end);
++
++	DBG("GATT service removed - start: 0x%04x, end: 0x%04x", start, end);
++
++	/* Remove the corresponding gatt_primary */
++	l = g_slist_find_custom(device->primaries, attr, prim_attr_cmp);
++	if (!l)
++		return;
++
++	prim = l->data;
++	device->primaries = g_slist_delete_link(device->primaries, l);
++
++	/* Remove the corresponding UUIDs entry */
++	l = g_slist_find_custom(device->uuids, prim->uuid, bt_uuid_strcmp);
++	device->uuids = g_slist_delete_link(device->uuids, l);
++	g_free(prim);
++
++	store_services(device);
 +
 +	/*
-+	 * There can't be more than one instance of the GAP service on the same
-+	 * device.
++	 * TODO: Notify the profiles somehow. It may be sufficient for each
++	 * profile to register a service_removed handler.
 +	 */
-+	l = g_slist_find_custom(devices, device, cmp_device);
-+	if (l)
-+		return 0;
- 
- 	gas = g_new0(struct gas, 1);
--	gas->gap.start = gap->start;
--	gas->gap.end = gap->end;
- 
- 	gas->device = btd_device_ref(device);
--
- 	devices = g_slist_append(devices, gas);
- 
--	gas->attioid = btd_device_add_attio_callback(device,
--						attio_connected_cb,
--						attio_disconnected_cb, gas);
-+	/*
-+	 * Simply register the callbacks. We will perform initialization during
-+	 * the ready callback once the gatt-client has been initialized for this
-+	 * device.
-+	 *
-+	 * Here we don't register the service removed handler since the
-+	 * GAP service is mandatory and should not get removed while the device
-+	 * is connected.
-+	 */
-+	gas->gatt_cb_id = btd_device_add_gatt_callbacks(device,
-+							gatt_client_ready_cb,
-+							NULL,
-+							gatt_client_disconn_cb,
-+							gas);
- 
- 	return 0;
- }
-@@ -169,16 +284,8 @@ static void gas_unregister(struct btd_device *device)
- static int gap_driver_probe(struct btd_service *service)
++
++	g_dbus_emit_property_changed(dbus_conn, device->path,
++						DEVICE_INTERFACE, "UUIDs");
++}
++
+ static struct btd_device *device_new(struct btd_adapter *adapter,
+ 				const char *address)
  {
- 	struct btd_device *device = btd_service_get_device(service);
--	struct gatt_primary *gap;
--
--	gap = btd_device_get_primary(device, GAP_UUID);
--
--	if (gap == NULL) {
--		error("GAP service is mandatory");
--		return -EINVAL;
--	}
+@@ -2405,6 +2518,10 @@ static struct btd_device *device_new(struct btd_adapter *adapter,
+ 	device->adapter = adapter;
+ 	device->temporary = TRUE;
  
--	return gas_register(device, &gap->range);
-+	return gas_register(device);
++	gatt_db_register(device->client_db, gatt_service_added,
++							gatt_service_removed,
++							device, NULL);
++
+ 	return btd_device_ref(device);
  }
  
- static void gap_driver_remove(struct btd_service *service)
+@@ -3264,12 +3381,6 @@ static GSList *device_services_from_record(struct btd_device *device,
+ 	return prim_list;
+ }
+ 
+-static void device_register_primaries(struct btd_device *device,
+-						GSList *prim_list, int psm)
+-{
+-	device->primaries = g_slist_concat(device->primaries, prim_list);
+-}
+-
+ static void search_cb(sdp_list_t *recs, int err, gpointer user_data)
+ {
+ 	struct browse_req *req = user_data;
+@@ -3515,26 +3626,6 @@ static void send_le_browse_response(struct browse_req *req)
+ 	g_dbus_send_reply(dbus_conn, msg, DBUS_TYPE_INVALID);
+ }
+ 
+-static void add_primary(struct gatt_db_attribute *attr, void *user_data)
+-{
+-	struct gatt_primary *prim;
+-	GSList **services = user_data;
+-	bt_uuid_t uuid;
+-
+-	prim = g_new0(struct gatt_primary, 1);
+-	if (!prim) {
+-		DBG("Failed to allocate gatt_primary structure");
+-		return;
+-	}
+-
+-	gatt_db_attribute_get_service_handles(attr, &prim->range.start,
+-							&prim->range.end);
+-	gatt_db_attribute_get_service_uuid(attr, &uuid);
+-	bt_uuid_to_string(&uuid, prim->uuid, sizeof(prim->uuid));
+-
+-	*services = g_slist_append(*services, prim);
+-}
+-
+ static void register_gatt_services(struct browse_req *req)
+ {
+ 	struct btd_device *device = req->device;
 -- 
 2.2.0.rc0.207.ga3a616c
 
