@@ -2,98 +2,78 @@ Return-Path: <cyrus@holtmann.org>
 From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH 19/25] android/dis: Add queue to keep track on GATT operations
-Date: Tue,  9 Dec 2014 16:11:41 +0100
-Message-Id: <1418137907-16981-20-git-send-email-lukasz.rymanowski@tieto.com>
+Subject: [PATCH 18/25] android/bas: Add guard to GATT callbacks
+Date: Tue,  9 Dec 2014 16:11:40 +0100
+Message-Id: <1418137907-16981-19-git-send-email-lukasz.rymanowski@tieto.com>
 In-Reply-To: <1418137907-16981-1-git-send-email-lukasz.rymanowski@tieto.com>
 References: <1418137907-16981-1-git-send-email-lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-With this patch GATT operation queue has been added together with
-canceling ongoing GATT operations on disconnect
 ---
- android/dis.c | 29 +++++++++++++++++++++++++++++
- 1 file changed, 29 insertions(+)
+ android/bas.c | 21 +++++++++++++++++++++
+ 1 file changed, 21 insertions(+)
 
-diff --git a/android/dis.c b/android/dis.c
-index 0a2a18e..2f4a3b9 100644
---- a/android/dis.c
-+++ b/android/dis.c
-@@ -33,6 +33,7 @@
- 
- #include "lib/uuid.h"
- #include "src/shared/util.h"
-+#include "src/shared/queue.h"
- 
- #include "attrib/gattrib.h"
- #include "attrib/att.h"
-@@ -53,6 +54,7 @@ struct bt_dis {
- 	struct gatt_primary	*primary;	/* Primary details */
- 	bt_dis_notify		notify;
- 	void			*notify_data;
-+	struct queue		*gatt_op;
- };
- 
- struct characteristic {
-@@ -60,11 +62,25 @@ struct characteristic {
- 	struct bt_dis		*d;	/* deviceinfo where the char belongs */
- };
- 
-+struct gatt_request {
-+	unsigned int req_id;
-+	struct bt_dis *dis;
-+	void *user_data;
-+};
-+
-+static void destroy_gatt_req(struct gatt_request *req)
-+{
-+	queue_remove(req->dis->gatt_op, req);
-+	bt_dis_unref(req->dis);
-+	free(req);
-+}
-+
- static void dis_free(struct bt_dis *dis)
- {
- 	bt_dis_detach(dis);
- 
- 	g_free(dis->primary);
-+	queue_destroy(dis->gatt_op, (void *) destroy_gatt_req);
- 	g_free(dis);
+diff --git a/android/bas.c b/android/bas.c
+index 8dcf4af..49ec8a5 100644
+--- a/android/bas.c
++++ b/android/bas.c
+@@ -225,6 +225,15 @@ static void discover_desc(struct bt_bas *bas, GAttrib *attrib,
+ 	free(req);
  }
  
-@@ -76,6 +92,12 @@ struct bt_dis *bt_dis_new(void *primary)
- 	if (!dis)
- 		return NULL;
- 
-+	dis->gatt_op = queue_new();
-+	if (!dis->gatt_op) {
-+		dis_free(dis);
-+		return NULL;
-+	}
-+
- 	if (primary)
- 		dis->primary = g_memdup(primary, sizeof(*dis->primary));
- 
-@@ -179,11 +201,18 @@ bool bt_dis_attach(struct bt_dis *dis, void *attrib)
- 	return true;
- }
- 
-+static void cancel_gatt_req(struct gatt_request *req)
++static bool bas_is_connected(struct bt_bas *bas)
 +{
-+	if (g_attrib_cancel(req->dis->attrib, req->req_id))
-+		destroy_gatt_req(req);
++	if (bas && bas->attrib)
++		return true;
++
++	info("bas: BAS is not connected");
++	return false;
 +}
 +
- void bt_dis_detach(struct bt_dis *dis)
+ static void value_cb(const guint8 *pdu, guint16 len, gpointer user_data)
  {
- 	if (!dis->attrib)
+ 	DBG("Battery Level at %u", pdu[ATT_NOTIFICATION_HEADER_SIZE]);
+@@ -238,6 +247,9 @@ static void ccc_written_cb(guint8 status, const guint8 *pdu,
+ 
+ 	destroy_gatt_req(req);
+ 
++	if (!bas_is_connected(bas))
++		return;
++
+ 	if (status != 0) {
+ 		error("Write Scan Refresh CCC failed: %s",
+ 						att_ecode2str(status));
+@@ -269,6 +281,9 @@ static void ccc_read_cb(guint8 status, const guint8 *pdu, guint16 len,
+ 
+ 	destroy_gatt_req(req);
+ 
++	if (!bas_is_connected(bas))
++		return;
++
+ 	if (status != 0) {
+ 		error("Error reading CCC value: %s", att_ecode2str(status));
  		return;
+@@ -286,6 +301,9 @@ static void discover_descriptor_cb(uint8_t status, GSList *descs,
  
-+	queue_foreach(dis->gatt_op, (void *) cancel_gatt_req, NULL);
- 	g_attrib_unref(dis->attrib);
- 	dis->attrib = NULL;
- }
+ 	destroy_gatt_req(req);
+ 
++	if (!bas_is_connected(bas))
++		return;
++
+ 	if (status != 0) {
+ 		error("Discover descriptors failed: %s", att_ecode2str(status));
+ 		return;
+@@ -308,6 +326,9 @@ static void bas_discovered_cb(uint8_t status, GSList *chars, void *user_data)
+ 
+ 	destroy_gatt_req(req);
+ 
++	if (!bas_is_connected(bas))
++		return;
++
+ 	if (status) {
+ 		error("Battery: %s", att_ecode2str(status));
+ 		return;
 -- 
 1.8.4
 
