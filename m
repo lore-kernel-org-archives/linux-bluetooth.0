@@ -2,33 +2,34 @@ Return-Path: <cyrus@holtmann.org>
 From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
-Subject: [PATCHv2 3/5] android/gatt: Fix not confirming write commands in database
-Date: Tue,  9 Dec 2014 09:51:48 +0100
-Message-Id: <1418115110-25335-3-git-send-email-jakub.tyszkowski@tieto.com>
-In-Reply-To: <1418115110-25335-1-git-send-email-jakub.tyszkowski@tieto.com>
-References: <1418115110-25335-1-git-send-email-jakub.tyszkowski@tieto.com>
+Subject: [PATCHv2 1/5] shared/att: Handle commands under BT_ATT_ALL_REQUESTS op group type
+Date: Tue,  9 Dec 2014 09:51:46 +0100
+Message-Id: <1418115110-25335-1-git-send-email-jakub.tyszkowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-App will never confirm write command as commands dont need one but we
-still need to confirm in databasse. We confirm immediately.
+This is needed for backward compatibility with gattrib.
 ---
- android/gatt.c | 2 ++
- 1 file changed, 2 insertions(+)
+ src/shared/att.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
-diff --git a/android/gatt.c b/android/gatt.c
-index 841f08c..536a7fe 100644
---- a/android/gatt.c
-+++ b/android/gatt.c
-@@ -4904,6 +4904,8 @@ static void write_cb(struct gatt_db_attribute *attrib, unsigned int id,
+diff --git a/src/shared/att.c b/src/shared/att.c
+index ee425d8..3181b36 100644
+--- a/src/shared/att.c
++++ b/src/shared/att.c
+@@ -666,8 +666,10 @@ struct notify_data {
  
- 	if (opcode == ATT_OP_WRITE_REQ || opcode == ATT_OP_PREP_WRITE_REQ)
- 		ev->need_rsp = 0x01;
-+	else
-+		gatt_db_attribute_write_result(attrib, id, 0);
+ static bool opcode_match(uint8_t opcode, uint8_t test_opcode)
+ {
+-	if (opcode == BT_ATT_ALL_REQUESTS &&
+-				    get_op_type(test_opcode) == ATT_OP_TYPE_REQ)
++	enum att_op_type op_type = get_op_type(test_opcode);
++
++	if (opcode == BT_ATT_ALL_REQUESTS && (op_type == ATT_OP_TYPE_REQ ||
++						op_type == ATT_OP_TYPE_CMD))
+ 		return true;
  
- 	ev->length = len;
- 	memcpy(ev->value, value, len);
+ 	return opcode == test_opcode;
 -- 
 1.9.1
 
