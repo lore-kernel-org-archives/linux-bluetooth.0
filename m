@@ -2,151 +2,161 @@ Return-Path: <cyrus@holtmann.org>
 From: Michael Janssen <jamuraa@chromium.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Michael Janssen <jamuraa@chromium.org>
-Subject: [PATCH BlueZ v2 3/8] unit/gatt: Use source db for server_tests
-Date: Tue,  9 Dec 2014 15:08:35 -0800
-Message-Id: <1418166520-32993-4-git-send-email-jamuraa@chromium.org>
+Subject: [PATCH BlueZ v2 1/8] lib/uuid: Simplify BT base UUIDs when possible
+Date: Tue,  9 Dec 2014 15:08:33 -0800
+Message-Id: <1418166520-32993-2-git-send-email-jamuraa@chromium.org>
 In-Reply-To: <1418166520-32993-1-git-send-email-jamuraa@chromium.org>
 References: <1418166520-32993-1-git-send-email-jamuraa@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Use the passed-in gatt_db for server tests instead of populating
-with the same db every time.
+When converting a UUID from string to bt_uuid_t, prefer using
+the 16-bit version when possible, which should generate shorter
+sequences by increasing the number of 16-bit types.
 ---
- unit/test-gatt.c | 70 +++++++++++++-------------------------------------------
- 1 file changed, 16 insertions(+), 54 deletions(-)
+ lib/uuid.c       | 17 +++++++++++++++--
+ unit/test-uuid.c | 52 ++++++++++++++++++++++++++++++++++++++++++++++++----
+ 2 files changed, 63 insertions(+), 6 deletions(-)
 
-diff --git a/unit/test-gatt.c b/unit/test-gatt.c
-index c23b4c4..336bd6e 100644
---- a/unit/test-gatt.c
-+++ b/unit/test-gatt.c
-@@ -450,42 +450,6 @@ static void client_ready_cb(bool success, uint8_t att_ecode, void *user_data)
- 	context_quit(context);
+diff --git a/lib/uuid.c b/lib/uuid.c
+index 186a7e6..29d4239 100644
+--- a/lib/uuid.c
++++ b/lib/uuid.c
+@@ -190,6 +190,17 @@ static inline int is_uuid128(const char *string)
+ 			string[23] == '-');
  }
  
--static void populate_db(struct context *context)
--{
--	struct gatt_db *db = context->server_db;
--	struct gatt_db_attribute *attr;
--	bt_uuid_t uuid;
--	uint128_t u128 = {
--		.data = { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08,
--				0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f }
--	};
--
--	/* Service 1 */
--	bt_uuid16_create(&uuid, 0x1800);
--	attr = gatt_db_add_service(db, &uuid, true, 5);
--	gatt_db_service_set_active(attr, true);
--
--	/* Service 2 */
--	bt_uuid16_create(&uuid, 0x1801);
--	attr = gatt_db_add_service(db, &uuid, true, 3);
--	gatt_db_service_set_active(attr, true);
--
--	/* Service 3 */
--	bt_uuid16_create(&uuid, 0x180f);
--	attr = gatt_db_add_service(db, &uuid, false, 5);
--	gatt_db_service_set_active(attr, true);
--
--	/* Service 4 */
--	bt_uuid16_create(&uuid, 0x180d);
--	attr = gatt_db_add_service(db, &uuid, true, 8);
--	gatt_db_service_set_active(attr, true);
--
--	/* Service 5 */
--	bt_uuid128_create(&uuid, u128);
--	attr = gatt_db_add_service(db, &uuid, true, 1);
--	gatt_db_service_set_active(attr, true);
--}
--
- static struct context *create_context(uint16_t mtu, gconstpointer data)
++static inline int is_base_uuid128(const char *string)
++{
++	uint16_t uuid;
++	char dummy;
++	if (!is_uuid128(string))
++		return 0;
++
++	return sscanf(string, "0000%04hx-0000-1000-8000-00805%1[fF]9%1[bB]34%1[fF]%1[bB]",
++				&uuid, &dummy, &dummy, &dummy, &dummy) == 5;
++}
++
+ static inline int is_uuid32(const char *string)
  {
- 	struct context *context = g_new0(struct context, 1);
-@@ -514,15 +478,13 @@ static struct context *create_context(uint16_t mtu, gconstpointer data)
- 		bt_gatt_exchange_mtu(context->att, mtu, NULL, NULL, NULL);
- 		break;
- 	case SERVER:
--		context->server_db = gatt_db_new();
-+		context->server_db = gatt_db_ref(test_data->source_db);
- 		g_assert(context->server_db);
+ 	return (strlen(string) == 8 || strlen(string) == 10);
+@@ -206,7 +217,7 @@ static int bt_string_to_uuid16(bt_uuid_t *uuid, const char *string)
+ 	char *endptr = NULL;
  
- 		context->server = bt_gatt_server_new(context->server_db, att,
- 									mtu);
- 		g_assert(context->server);
+ 	u16 = strtol(string, &endptr, 16);
+-	if (endptr && *endptr == '\0') {
++	if (endptr && (*endptr == '\0' || *endptr == '-')) {
+ 		bt_uuid16_create(uuid, u16);
+ 		return 0;
+ 	}
+@@ -261,7 +272,9 @@ static int bt_string_to_uuid128(bt_uuid_t *uuid, const char *string)
  
--		populate_db(context);
--
- 		if (g_test_verbose())
- 			bt_gatt_server_set_debug(context->server, print_debug,
- 						"bt_gatt_server:", NULL);
-@@ -718,7 +680,7 @@ static struct gatt_db *make_service_data_1_db(void)
- 	struct gatt_db_attribute *serv_att, *chrc_att;
- 	bt_uuid_t uuid;
+ int bt_string_to_uuid(bt_uuid_t *uuid, const char *string)
+ {
+-	if (is_uuid128(string))
++	if (is_base_uuid128(string))
++		return bt_string_to_uuid16(uuid, string + 4);
++	else if (is_uuid128(string))
+ 		return bt_string_to_uuid128(uuid, string);
+ 	else if (is_uuid32(string))
+ 		return bt_string_to_uuid32(uuid, string);
+diff --git a/unit/test-uuid.c b/unit/test-uuid.c
+index 49ea031..d7ee54d 100644
+--- a/unit/test-uuid.c
++++ b/unit/test-uuid.c
+@@ -46,9 +46,9 @@ static unsigned char uuid_base_binary[] = {
+ 			0x80, 0x00, 0x00, 0x80, 0x5f, 0x9b, 0x34, 0xfb };
  
--	bt_string_to_uuid(&uuid, GATT_UUID);
-+	bt_uuid16_create(&uuid, 0x1801);
- 	serv_att = gatt_db_insert_service(db, 0x0001, &uuid, true, 4);
+ static struct uuid_test_data uuid_base = {
+-	.str = "00000000-0000-1000-8000-00805f9b34fb",
+-	.binary = uuid_base_binary,
+-	.type = BT_UUID128,
++	.str = "0000",
++	.val16 = 0x0000,
++	.type = BT_UUID16,
+ 	.str128 = "00000000-0000-1000-8000-00805f9b34fb",
+ 	.binary128 = uuid_base_binary,
+ };
+@@ -93,6 +93,18 @@ static struct uuid_test_data uuid_32_2 = {
+ 	.binary128 = uuid_32_binary,
+ };
  
- 	bt_uuid16_create(&uuid, GATT_CHARAC_DEVICE_NAME);
-@@ -727,7 +689,9 @@ static struct gatt_db *make_service_data_1_db(void)
- 
- 	add_user_description(chrc_att, "Device Name", false);
- 
--	bt_string_to_uuid(&uuid, HEART_RATE_UUID);
-+	gatt_db_service_set_active(serv_att, true);
++static unsigned char uuid_128_binary[] = {
++			0xF0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x10, 0x00,
++			0x80, 0x00, 0x00, 0x80, 0x5f, 0x9b, 0x34, 0xfb };
 +
-+	bt_uuid16_create(&uuid, 0x180d);
- 	serv_att = gatt_db_insert_service(db, 0x0005, &uuid, true, 4);
- 
- 	bt_uuid16_create(&uuid, GATT_CHARAC_MANUFACTURER_NAME_STRING);
-@@ -738,6 +702,8 @@ static struct gatt_db *make_service_data_1_db(void)
- 
- 	add_user_description(chrc_att, "Manufacturer Name", false);
- 
-+	gatt_db_service_set_active(serv_att, true);
++static struct uuid_test_data uuid_128 = {
++	.str = "F0000000-0000-1000-8000-00805f9b34fb",
++	.binary = uuid_128_binary,
++	.type = BT_UUID128,
++	.str128 = "F0000000-0000-1000-8000-00805f9b34fb",
++	.binary128 = uuid_128_binary,
++};
 +
- 	return db;
+ static void test_uuid(gconstpointer data)
+ {
+ 	const struct uuid_test_data *test_data = data;
+@@ -164,6 +176,26 @@ static void test_cmp(gconstpointer data)
+ 	g_assert(bt_uuid_cmp(&uuid1, &uuid2) == 0);
  }
  
-@@ -978,8 +944,9 @@ int main(int argc, char *argv[])
- 	define_test_client("/TP/GAC/CL/BV-01-C", test_client, NULL, NULL,
- 						raw_pdu(0x02, 0x00, 0x02));
++static const struct uuid_test_data compress[] = {
++	{
++		.str = "00001234-0000-1000-8000-00805f9b34fb",
++		.type = BT_UUID16,
++		.val16 = 0x1234,
++	}, {
++		.str = "0000FFFF-0000-1000-8000-00805f9b34fb",
++		.type = BT_UUID16,
++		.val16 = 0xFFFF,
++	}, {
++		.str = "0000FFFF-0000-1000-8000-00805F9B34FB",
++		.type = BT_UUID16,
++		.val16 = 0xFFFF,
++	}, {
++		.str = "F0000000-0000-1000-8000-00805f9b34fb",
++		.type = BT_UUID128,
++		.binary = uuid_128_binary,
++	},
++};
++
+ static const char *malformed[] = {
+ 	"0",
+ 	"01",
+@@ -193,7 +225,7 @@ static void test_malformed(gconstpointer data)
  
--	define_test_server("/TP/GAC/SR/BV-01-C", test_server, NULL, NULL,
--						raw_pdu(0x03, 0x00, 0x02));
-+	define_test_server("/TP/GAC/SR/BV-01-C", test_server, service_db_1,
-+					NULL,
-+					raw_pdu(0x03, 0x00, 0x02));
+ int main(int argc, char *argv[])
+ {
+-	int i;
++	size_t i;
  
- 	/*
- 	 * Discovery
-@@ -1002,19 +969,14 @@ int main(int argc, char *argv[])
- 			raw_pdu(0x10, 0x97, 0x00, 0xff, 0xff, 0x00, 0x28),
- 			raw_pdu(0x01, 0x10, 0x97, 0x00, 0x0a));
+ 	g_test_init(&argc, &argv, NULL);
  
--	define_test_server("/TP/GAD/SR/BV-01-C", test_server, NULL, NULL,
-+	define_test_server("/TP/GAD/SR/BV-01-C", test_server, service_db_1,
-+			NULL,
- 			raw_pdu(0x03, 0x00, 0x02),
- 			raw_pdu(0x10, 0x01, 0x00, 0xff, 0xff, 0x00, 0x28),
--			raw_pdu(0x11, 0x06, 0x01, 0x00, 0x05, 0x00, 0x00, 0x18,
--					0x06, 0x00, 0x08, 0x00, 0x01, 0x18,
--					0x0e, 0x00, 0x15, 0x00, 0x0d, 0x18),
--			raw_pdu(0x10, 0x16, 0x00, 0xff, 0xff, 0x00, 0x28),
--			raw_pdu(0x11, 0x14, 0x16, 0x00, 0x16, 0x00, 0x0f,
--					0x0e, 0x0d, 0x0c, 0x0b, 0x0a, 0x09,
--					0x08, 0x07, 0x06, 0x05, 0x04, 0x03,
--					0x02, 0x01, 0x00),
--			raw_pdu(0x10, 0x17, 0x00, 0xff, 0xff, 0x00, 0x28),
--			raw_pdu(0x01, 0x10, 0x17, 0x00, 0x0a));
-+			raw_pdu(0x11, 0x06, 0x01, 0x00, 0x04, 0x00, 0x01, 0x18,
-+					0x05, 0x00, 0x08, 0x00, 0x0d, 0x18),
-+			raw_pdu(0x10, 0x06, 0x00, 0xff, 0xff, 0x00, 0x28),
-+			raw_pdu(0x01, 0x10, 0x06, 0x00, 0x0a));
+@@ -217,6 +249,10 @@ int main(int argc, char *argv[])
+ 	g_test_add_data_func("/uuid/thritytwo2/str", &uuid_32_2, test_str);
+ 	g_test_add_data_func("/uuid/thirtytwo2/cmp", &uuid_32_2, test_cmp);
  
- 	define_test_att("/TP/GAD/CL/BV-02-C-1", test_search_primary, &uuid_16,
- 			NULL,
++	g_test_add_data_func("/uuid/onetwentyeight", &uuid_128, test_uuid);
++	g_test_add_data_func("/uuid/onetwentyeight/str", &uuid_128, test_str);
++	g_test_add_data_func("/uuid/onetwentyeight/cmp", &uuid_128, test_cmp);
++
+ 	for (i = 0; malformed[i]; i++) {
+ 		char *testpath;
+ 
+@@ -225,5 +261,13 @@ int main(int argc, char *argv[])
+ 		g_free(testpath);
+ 	}
+ 
++	for (i = 0; i < (sizeof(compress) / sizeof(compress[0])); i++) {
++		char *testpath;
++		testpath = g_strdup_printf("/uuid/compress/%s",
++							compress[i].str);
++		g_test_add_data_func(testpath, compress + i, test_uuid);
++		g_free(testpath);
++	}
++
+ 	return g_test_run();
+ }
 -- 
 2.2.0.rc0.207.ga3a616c
 
