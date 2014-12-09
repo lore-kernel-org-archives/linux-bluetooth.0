@@ -1,31 +1,25 @@
 Return-Path: <cyrus@holtmann.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 8.1 \(1993\))
-Subject: Re: Question about mgmt header files and shared-mainloop library
+Subject: Re: [PATCH] Add USB device 04ca:3010 as Athoros AR3012
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <CAPt0RYxF95U1KvU2-exkoJCwaYqdzg0P_kJmnO65oSKMVNmKxA@mail.gmail.com>
-Date: Tue, 9 Dec 2014 07:13:05 +0100
+In-Reply-To: <20141209060540.GA31748@jamse-laptop>
+Date: Tue, 9 Dec 2014 07:12:04 +0100
 Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <37A4BD1B-EB5A-49F7-93E5-E2C1AEC8C7DA@holtmann.org>
-References: <CAPt0RYxF95U1KvU2-exkoJCwaYqdzg0P_kJmnO65oSKMVNmKxA@mail.gmail.com>
-To: Mona Attariyan <monattar@gmail.com>
+Message-Id: <23EE54B8-7A99-40A6-AF69-6976E30DF9C9@holtmann.org>
+References: <20141209060540.GA31748@jamse-laptop>
+To: Janne Heikkinen <janne.m.heikkinen@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Mona,
+Hi Janne,
 
-> I'm using bluez mgmt API in a simple scan application. I've been
-> including headers files like src/shared/mgmt.h and src/shared/util.h.
-> Also the main bluez bluetooth library (libbluetooth.so) does not
-> include the mgmt and mainloop stuff, so I've been linking against
-> shared-mainloop.a. My question is why aren't these header files part
-> of the public API? as in in lib directory or something that doesn't
-> sound internal. Same question about the library. Why aren't mgmt stuff
-> compiled into the main library?
-> I appreciate it if anyone could shed some light into the reasoning
-> behind this. Am I not supposed to be using these?
+> On Dec 9, 2014, at 07:05, Janne Heikkinen <janne.m.heikkinen@gmail.com> wrote:
+> 
+> Asus X553MA has USB device 04ca:3010 that is Athoros AR3012
+> or compatible.
 
-there are not meant to be a public API. Even libbluetooth is no longer installed by default actually.
+please include the device section from /sys/kernel/debug/usb/devices in the commit message.
 
 Regards
 
