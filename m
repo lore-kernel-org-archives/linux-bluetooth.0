@@ -2,63 +2,78 @@ Return-Path: <cyrus@holtmann.org>
 From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH 09/25] android/hog: Add support to track gatt operations
-Date: Tue,  9 Dec 2014 16:11:31 +0100
-Message-Id: <1418137907-16981-10-git-send-email-lukasz.rymanowski@tieto.com>
+Subject: [PATCH 10/25] android/hog: Cancel all GATT operations on disconnect
+Date: Tue,  9 Dec 2014 16:11:32 +0100
+Message-Id: <1418137907-16981-11-git-send-email-lukasz.rymanowski@tieto.com>
 In-Reply-To: <1418137907-16981-1-git-send-email-lukasz.rymanowski@tieto.com>
 References: <1418137907-16981-1-git-send-email-lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+This patch makes sure that HOG cancels its GATT requests before
+removing his attrib reference.
+
+However some request might not be possible to cancel. It will be handled
+in following patches
 ---
- android/hog.c | 10 ++++++++++
- 1 file changed, 10 insertions(+)
+ android/hog.c | 23 ++++++++++++++++++++++-
+ 1 file changed, 22 insertions(+), 1 deletion(-)
 
 diff --git a/android/hog.c b/android/hog.c
-index 872f4a5..95b7cb0 100644
+index 95b7cb0..80bcc2e 100644
 --- a/android/hog.c
 +++ b/android/hog.c
-@@ -45,6 +45,7 @@
- #include "lib/uuid.h"
- #include "src/shared/util.h"
- #include "src/shared/uhid.h"
-+#include "src/shared/queue.h"
- 
- #include "attrib/att.h"
- #include "attrib/gattrib.h"
-@@ -96,6 +97,7 @@ struct bt_hog {
- 	struct bt_dis		*dis;
- 	struct bt_bas		*bas;
- 	GSList			*instances;
-+	struct queue		*gatt_op;
+@@ -111,6 +111,19 @@ struct report {
+ 	uint8_t			*value;
  };
  
- struct report {
-@@ -787,6 +789,7 @@ static void hog_free(void *data)
++struct gatt_request {
++	unsigned int req_id;
++	struct bt_hog *hog;
++	void *user_data;
++};
++
++static void destroy_gatt_req(struct gatt_request *req)
++{
++	queue_remove(req->hog->gatt_op, req);
++	bt_hog_unref(req->hog);
++	free(req);
++}
++
+ static void report_value_cb(const guint8 *pdu, guint16 len, gpointer user_data)
+ {
+ 	struct report *report = user_data;
+@@ -774,6 +787,13 @@ static void report_free(void *data)
+ 	g_free(report);
+ }
+ 
++static void cancel_gatt_req(struct gatt_request *req)
++{
++	DBG("Canceling ID %u", req->req_id);
++	if (g_attrib_cancel(req->hog->attrib, req->req_id))
++		destroy_gatt_req(req);
++}
++
+ static void hog_free(void *data)
+ {
+ 	struct bt_hog *hog = data;
+@@ -789,7 +809,7 @@ static void hog_free(void *data)
  	g_slist_free_full(hog->reports, report_free);
  	g_free(hog->name);
  	g_free(hog->primary);
-+	queue_destroy(hog->gatt_op, NULL);
+-	queue_destroy(hog->gatt_op, NULL);
++	queue_destroy(hog->gatt_op, (void *) destroy_gatt_req);
  	g_free(hog);
  }
  
-@@ -799,9 +802,16 @@ struct bt_hog *bt_hog_new(const char *name, uint16_t vendor, uint16_t product,
- 	if (!hog)
- 		return NULL;
+@@ -1101,6 +1121,7 @@ void bt_hog_detach(struct bt_hog *hog)
+ 	if (hog->bas)
+ 		bt_bas_detach(hog->bas);
  
-+	hog->gatt_op = queue_new();
-+	if (!hog->gatt_op) {
-+		hog_free(hog);
-+		return NULL;
-+	}
-+
- 	hog->uhid = bt_uhid_new_default();
- 	if (!hog->uhid) {
- 		hog_free(hog);
-+		queue_destroy(hog->gatt_op, NULL);
- 		return NULL;
- 	}
- 
++	queue_foreach(hog->gatt_op, (void *) cancel_gatt_req, NULL);
+ 	g_attrib_unref(hog->attrib);
+ 	hog->attrib = NULL;
+ }
 -- 
 1.8.4
 
