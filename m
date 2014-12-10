@@ -1,214 +1,112 @@
 Return-Path: <cyrus@holtmann.org>
-From: Jaganath Kanakkassery <jaganath.k@samsung.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Jaganath Kanakkassery <jaganath.k@samsung.com>
-Subject: [PATCH] Bluetooth: Fix missing hci_dev_lock/unlock
-Date: Wed, 10 Dec 2014 15:01:36 +0530
-Message-id: <1418203896-21580-1-git-send-email-jaganath.k@samsung.com>
+MIME-Version: 1.0
+In-Reply-To: <CABBYNZKP9eF4WwDGjthjZFK4G-GzTK1AsK_zG9DbiEOBtBjONw@mail.gmail.com>
+References: <1418137907-16981-1-git-send-email-lukasz.rymanowski@tieto.com>
+	<CABBYNZL=N5qKL1QUy7-P_+om-3+g+Bh9jxMg2g-FzQsK5C+-hA@mail.gmail.com>
+	<CAMudyAsSvmfFePh9jYvf0Y4cQ-HJywmJ9dXoTrw=MP6y-f=PNA@mail.gmail.com>
+	<CABBYNZLK9dPbLAsMM7AHmU4NxLPU2pjVWr8v+Wh_WOCAX2WZFg@mail.gmail.com>
+	<CAMudyAtRonR+z_Y4om-KQeXtqKt6bTJzs7a+VDW_PBkjXXd2VA@mail.gmail.com>
+	<CABBYNZ+iZ=73ML=AnLOeWBRL2yRpymE_wKM2GODV=986JU_tgA@mail.gmail.com>
+	<CAMudyAtbm+r2n3CktFwkfh=W5_SQoSNEVKR8CKVP61GnBHQBHA@mail.gmail.com>
+	<CABBYNZKP9eF4WwDGjthjZFK4G-GzTK1AsK_zG9DbiEOBtBjONw@mail.gmail.com>
+Date: Wed, 10 Dec 2014 10:27:27 +0100
+Message-ID: <CAMudyAtSEooUF=GVL6NYchkaumKcV8oQw59DYRuGqc-=6n5+6g@mail.gmail.com>
+Subject: Re: [PATCH 00/25] android/gatt: Fix HOG connect/disconnect
+From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-mgmt_pending_remove() should be called with hci_dev_lock protection
-and this patch fixes the same in the missing places.
+Hi Luiz,
 
-Without this patch there is a chance of invalid memory access while
-accessing the mgmt_pending list like below
+On 10 December 2014 at 10:25, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> Hi Lukasz,
+>
+> On Wed, Dec 10, 2014 at 11:20 AM, Lukasz Rymanowski
+> <lukasz.rymanowski@tieto.com> wrote:
+>> Hi Luiz,
+>>
+>> On 10 December 2014 at 09:56, Luiz Augusto von Dentz
+>> <luiz.dentz@gmail.com> wrote:
+>>> Hi Lukasz,
+>>>
+>>> On Wed, Dec 10, 2014 at 10:53 AM, Lukasz Rymanowski
+>>> <lukasz.rymanowski@tieto.com> wrote:
+>>>> Hi Luiz,
+>>>>
+>>>> On 10 December 2014 at 09:46, Luiz Augusto von Dentz
+>>>> <luiz.dentz@gmail.com> wrote:
+>>>>> Hi Lukasz,
+>>>>>
+>>>>> On Wed, Dec 10, 2014 at 10:38 AM, Lukasz Rymanowski
+>>>>> <lukasz.rymanowski@tieto.com> wrote:
+>>>>>> Hi Luiz,
+>>>>>>
+>>>>>> On 10 December 2014 at 08:23, Luiz Augusto von Dentz
+>>>>>> <luiz.dentz@gmail.com> wrote:
+>>>>>>> Hi Lukasz,
+>>>>>>>
+>>>>>>> On Tue, Dec 9, 2014 at 5:11 PM, Lukasz Rymanowski
+>>>>>>> <lukasz.rymanowski@tieto.com> wrote:
+>>>>>>>> When testing HOG against PTS we got failing testes if devices were
+>>>>>>>> not bonded before the test.
+>>>>>>>> With those patches this issue is not valid anymore.
+>>>>>>>>
+>>>>>>>> This set address couple of issues:
+>>>>>>>> * Some minor fixes found during work on those patches (first 4 patches)
+>>>>>>>>
+>>>>>>>> * Changed GATT behaviour during dedicated bonding. Now GATT will not start
+>>>>>>>> search services until bonding is done. That fixes PTS connection issue
+>>>>>>>> (patches 5-8)
+>>>>>>>>
+>>>>>>>> * Tracking of GATT operations in hog/dis/bas/scpp. After I solved PTS
+>>>>>>>> connection issue I could very easily observe many of crashes in BfA when
+>>>>>>>> disconnecting HOG during service search session. This is because HOG
+>>>>>>>> talks directly to gattrib and clear his attrib instance on HOG disconnect
+>>>>>>>> even there are ongoing GATT operations. Patches 9 - 25 solve this issue.
+>>>>>>>
+>>>>>>> I remember applying a patch from Arman that should have fixed the
+>>>>>>> problem above: shared/att: cancel_all before calling disconnect cb. In
+>>>>>>> any if that doesn't really solve the problem the client should cancel
+>>>>>>> their pending operations before releasing its reference which means no
+>>>>>>> callback should be called after that.
+>>>>>>
+>>>>>> This is problem above bt_att, but It might be worth to consider such
+>>>>>> scenario in shared/gatt.
+>>>>>> Anyway, In Android  attrib is used by HOG and also GATT with all the
+>>>>>> applications above. GATT controls registered clients so if one client
+>>>>>> unregister we should not see the problem. But if HOG and GATT  have
+>>>>>> ongoing gatt operations and in this point of time  we disconnect HOG,
+>>>>>> we should not break ongoing  gatt operations for GATT (Android apps).
+>>>>>> Note that link LE link can be still up because of some other GATT
+>>>>>> application so no disconnect_cb will be called by shared/add. Thats
+>>>>>> why attrib client should take care for its operations
+>>>>>
+>>>>> Yep, but that why I said you should probably cancel any operations,
+>>>>> which seems you did, but then why you keep checking for disconnected
+>>>>> in the callbacks? There looks like there another bug going on.
+>>>>
+>>>> Canceling operation might not succeed, in that case callback will be
+>>>> called anyway but unfortunately e.g. hog->attrib will be not valid
+>>>> anymore and that's we need that additional check.
+>>>
+>>> Not succeed? bt_att_cancel should always succeed except if we cannot
+>>> find the id.
+>>
+>> Just checked bt_att code and indeed, after calling cancel we should be
+>> sure that callback will not be called.
+>> However, I've seen something else during testing. That might be other
+>> bug then. Will look into it probably tomorrow.
+>
+> Yep, it might be another bug or perhaps one operation that was not
+> canceled for some reason.
 
-bluetoothd:  392] [0] Backtrace:
-bluetoothd:  392] [0] [<c04ec770>] (pending_eir_or_class+0x0/0x68) from [<c04f1830>] (add_uuid+0x34/0x1c4)
-bluetoothd:  392] [0] [<c04f17fc>] (add_uuid+0x0/0x1c4) from [<c04f3cc4>] (mgmt_control+0x204/0x274)
-bluetoothd:  392] [0] [<c04f3ac0>] (mgmt_control+0x0/0x274) from [<c04f609c>] (hci_sock_sendmsg+0x80/0x308)
-bluetoothd:  392] [0] [<c04f601c>] (hci_sock_sendmsg+0x0/0x308) from [<c03d4d68>] (sock_aio_write+0x144/0x174)
-bluetoothd:  392] [0]  r8:00000000 r7 7c1be90 r6 7c1be18 r5:00000017 r4 a90ea80
-bluetoothd:  392] [0] [<c03d4c24>] (sock_aio_write+0x0/0x174) from [<c00e2d4c>] (do_sync_write+0xb0/0xe0)
-bluetoothd:  392] [0] [<c00e2c9c>] (do_sync_write+0x0/0xe0) from [<c00e371c>] (vfs_write+0x134/0x13c)
-bluetoothd:  392] [0]  r8:00000000 r7 7c1bf70 r6:beeca5c8 r5:00000017 r4 7c05900
-bluetoothd:  392] [0] [<c00e35e8>] (vfs_write+0x0/0x13c) from [<c00e3910>] (sys_write+0x44/0x70)
-bluetoothd:  392] [0]  r8:00000000 r7:00000004 r6:00000017 r5:beeca5c8 r4 7c05900
-bluetoothd:  392] [0] [<c00e38cc>] (sys_write+0x0/0x70) from [<c000e3c0>] (ret_fast_syscall+0x0/0x30)
-bluetoothd:  392] [0]  r9 7c1a000 r8:c000e568 r6:400b5f10 r5:403896d8 r4:beeca604
-bluetoothd:  392] [0] Code: e28cc00c e152000c 0a00000f e3a00001 (e1d210b8)
-bluetoothd:  392] [0] ---[ end trace 67b6ac67435864c4 ]---
-bluetoothd:  392] [0] Kernel panic - not syncing: Fatal exception
+Agree
 
-Signed-off-by: Jaganath Kanakkassery <jaganath.k@samsung.com>
----
- net/bluetooth/hci_core.c  |    2 ++
- net/bluetooth/hci_event.c |   22 ++++++++++++++++++++--
- net/bluetooth/mgmt.c      |   18 ++++++++++++------
- 3 files changed, 34 insertions(+), 8 deletions(-)
-
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 96e7321..ecd7c01 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -3083,7 +3083,9 @@ static void hci_power_on(struct work_struct *work)
- 
- 	err = hci_dev_do_open(hdev);
- 	if (err < 0) {
-+		hci_dev_lock(hdev);
- 		mgmt_set_powered_failed(hdev, err);
-+		hci_dev_unlock(hdev);
- 		return;
- 	}
- 
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 322abbb..baa6c96 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -257,6 +257,8 @@ static void hci_cc_write_auth_enable(struct hci_dev *hdev, struct sk_buff *skb)
- 	if (!sent)
- 		return;
- 
-+	hci_dev_lock(hdev);
-+
- 	if (!status) {
- 		__u8 param = *((__u8 *) sent);
- 
-@@ -268,6 +270,8 @@ static void hci_cc_write_auth_enable(struct hci_dev *hdev, struct sk_buff *skb)
- 
- 	if (test_bit(HCI_MGMT, &hdev->dev_flags))
- 		mgmt_auth_enable_complete(hdev, status);
-+
-+	hci_dev_unlock(hdev);
- }
- 
- static void hci_cc_write_encrypt_mode(struct hci_dev *hdev, struct sk_buff *skb)
-@@ -443,6 +447,8 @@ static void hci_cc_write_ssp_mode(struct hci_dev *hdev, struct sk_buff *skb)
- 	if (!sent)
- 		return;
- 
-+	hci_dev_lock(hdev);
-+
- 	if (!status) {
- 		if (sent->mode)
- 			hdev->features[1][0] |= LMP_HOST_SSP;
-@@ -458,6 +464,8 @@ static void hci_cc_write_ssp_mode(struct hci_dev *hdev, struct sk_buff *skb)
- 		else
- 			clear_bit(HCI_SSP_ENABLED, &hdev->dev_flags);
- 	}
-+
-+	hci_dev_unlock(hdev);
- }
- 
- static void hci_cc_write_sc_support(struct hci_dev *hdev, struct sk_buff *skb)
-@@ -471,6 +479,8 @@ static void hci_cc_write_sc_support(struct hci_dev *hdev, struct sk_buff *skb)
- 	if (!sent)
- 		return;
- 
-+	hci_dev_lock(hdev);
-+
- 	if (!status) {
- 		if (sent->support)
- 			hdev->features[1][0] |= LMP_HOST_SC;
-@@ -486,6 +496,8 @@ static void hci_cc_write_sc_support(struct hci_dev *hdev, struct sk_buff *skb)
- 		else
- 			clear_bit(HCI_SC_ENABLED, &hdev->dev_flags);
- 	}
-+
-+	hci_dev_unlock(hdev);
- }
- 
- static void hci_cc_read_local_version(struct hci_dev *hdev, struct sk_buff *skb)
-@@ -1172,9 +1184,11 @@ static void hci_cc_le_set_scan_enable(struct hci_dev *hdev,
- 		 * re-enable it again if necessary.
- 		 */
- 		if (test_and_clear_bit(HCI_LE_SCAN_INTERRUPTED,
--				       &hdev->dev_flags))
-+				       &hdev->dev_flags)) {
-+			hci_dev_lock(hdev);
- 			hci_discovery_set_state(hdev, DISCOVERY_STOPPED);
--		else if (!test_bit(HCI_LE_ADV, &hdev->dev_flags) &&
-+			hci_dev_unlock(hdev);
-+		} else if (!test_bit(HCI_LE_ADV, &hdev->dev_flags) &&
- 			 hdev->discovery.state == DISCOVERY_FINDING)
- 			mgmt_reenable_advertising(hdev);
- 
-@@ -1278,6 +1292,8 @@ static void hci_cc_write_le_host_supported(struct hci_dev *hdev,
- 	if (!sent)
- 		return;
- 
-+	hci_dev_lock(hdev);
-+
- 	if (sent->le) {
- 		hdev->features[1][0] |= LMP_HOST_LE;
- 		set_bit(HCI_LE_ENABLED, &hdev->dev_flags);
-@@ -1291,6 +1307,8 @@ static void hci_cc_write_le_host_supported(struct hci_dev *hdev,
- 		hdev->features[1][0] |= LMP_HOST_LE_BREDR;
- 	else
- 		hdev->features[1][0] &= ~LMP_HOST_LE_BREDR;
-+
-+	hci_dev_unlock(hdev);
- }
- 
- static void hci_cc_set_adv_param(struct hci_dev *hdev, struct sk_buff *skb)
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 44b20de..16ac037 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -2199,12 +2199,14 @@ static void le_enable_complete(struct hci_dev *hdev, u8 status)
- {
- 	struct cmd_lookup match = { NULL, hdev };
- 
-+	hci_dev_lock(hdev);
-+
- 	if (status) {
- 		u8 mgmt_err = mgmt_status(status);
- 
- 		mgmt_pending_foreach(MGMT_OP_SET_LE, hdev, cmd_status_rsp,
- 				     &mgmt_err);
--		return;
-+		goto unlock;
- 	}
- 
- 	mgmt_pending_foreach(MGMT_OP_SET_LE, hdev, settings_rsp, &match);
-@@ -2222,17 +2224,16 @@ static void le_enable_complete(struct hci_dev *hdev, u8 status)
- 	if (test_bit(HCI_LE_ENABLED, &hdev->dev_flags)) {
- 		struct hci_request req;
- 
--		hci_dev_lock(hdev);
--
- 		hci_req_init(&req, hdev);
- 		update_adv_data(&req);
- 		update_scan_rsp_data(&req);
- 		hci_req_run(&req, NULL);
- 
- 		hci_update_background_scan(hdev);
--
--		hci_dev_unlock(hdev);
- 	}
-+
-+unlock:
-+	hci_dev_unlock(hdev);
- }
- 
- static int set_le(struct sock *sk, struct hci_dev *hdev, void *data, u16 len)
-@@ -4279,12 +4280,14 @@ static void set_advertising_complete(struct hci_dev *hdev, u8 status)
- {
- 	struct cmd_lookup match = { NULL, hdev };
- 
-+	hci_dev_lock(hdev);
-+
- 	if (status) {
- 		u8 mgmt_err = mgmt_status(status);
- 
- 		mgmt_pending_foreach(MGMT_OP_SET_ADVERTISING, hdev,
- 				     cmd_status_rsp, &mgmt_err);
--		return;
-+		goto unlock;
- 	}
- 
- 	if (test_bit(HCI_LE_ADV, &hdev->dev_flags))
-@@ -4299,6 +4302,9 @@ static void set_advertising_complete(struct hci_dev *hdev, u8 status)
- 
- 	if (match.sk)
- 		sock_put(match.sk);
-+
-+unlock:
-+	hci_dev_unlock(hdev);
- }
- 
- static int set_advertising(struct sock *sk, struct hci_dev *hdev, void *data,
--- 
-1.7.9.5
-
+\Lukasz
+>
+> --
+> Luiz Augusto von Dentz
