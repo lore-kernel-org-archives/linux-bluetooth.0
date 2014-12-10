@@ -1,65 +1,88 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1418129488-12353-2-git-send-email-gowtham.ab@samsung.com>
-References: <1418129488-12353-1-git-send-email-gowtham.ab@samsung.com>
-	<1418129488-12353-2-git-send-email-gowtham.ab@samsung.com>
-Date: Wed, 10 Dec 2014 09:27:32 +0200
-Message-ID: <CABBYNZLox+KR_PeB8LiW5WDvSCNwU6XG1vPFQqwM4pXQFtRe2Q@mail.gmail.com>
-Subject: Re: [PATCH ] android/socket: Add MAP supported features bits
+In-Reply-To: <1418137907-16981-1-git-send-email-lukasz.rymanowski@tieto.com>
+References: <1418137907-16981-1-git-send-email-lukasz.rymanowski@tieto.com>
+Date: Wed, 10 Dec 2014 09:23:50 +0200
+Message-ID: <CABBYNZL=N5qKL1QUy7-P_+om-3+g+Bh9jxMg2g-FzQsK5C+-hA@mail.gmail.com>
+Subject: Re: [PATCH 00/25] android/gatt: Fix HOG connect/disconnect
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Gowtham Anandha Babu <gowtham.ab@samsung.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	Dmitry Kasatkin <d.kasatkin@samsung.com>,
-	Bharat Panda <bharat.panda@samsung.com>, cpgs@samsung.com
+To: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Gowtham,
+Hi Lukasz,
 
-On Tue, Dec 9, 2014 at 2:51 PM, Gowtham Anandha Babu
-<gowtham.ab@samsung.com> wrote:
-> Add MAP supported features in sdp record.
-> ---
->  android/socket.c | 5 +++++
->  1 file changed, 5 insertions(+)
+On Tue, Dec 9, 2014 at 5:11 PM, Lukasz Rymanowski
+<lukasz.rymanowski@tieto.com> wrote:
+> When testing HOG against PTS we got failing testes if devices were
+> not bonded before the test.
+> With those patches this issue is not valid anymore.
 >
-> diff --git a/android/socket.c b/android/socket.c
-> index f2cfd07..d89c8c2 100644
-> --- a/android/socket.c
-> +++ b/android/socket.c
-> @@ -58,6 +58,7 @@
->  /* Hardcoded MAP stuff needed for MAS SMS Instance.*/
->  #define DEFAULT_MAS_INSTANCE   0x00
+> This set address couple of issues:
+> * Some minor fixes found during work on those patches (first 4 patches)
 >
-> +#define DEFAULT_MAP_SUPPORTED_FEATURES 0x0000001f
->  #define DEFAULT_PBAP_SUPPORTED_FEATURES 0x00000003
+> * Changed GATT behaviour during dedicated bonding. Now GATT will not start
+> search services until bonding is done. That fixes PTS connection issue
+> (patches 5-8)
 >
->  #define MAP_MSG_TYPE_SMS_GSM   0x02
-> @@ -321,6 +322,7 @@ static sdp_record_t *create_mas_record(uint8_t chan, const char *svc_name)
->         sdp_profile_desc_t profile[1];
->         uint8_t minst = DEFAULT_MAS_INSTANCE;
->         uint8_t mtype = DEFAULT_MAS_MSG_TYPE;
-> +       uint8_t supft = DEFAULT_MAP_SUPPORTED_FEATURES;
->         sdp_record_t *record;
->         uuid_t uuid;
+> * Tracking of GATT operations in hog/dis/bas/scpp. After I solved PTS
+> connection issue I could very easily observe many of crashes in BfA when
+> disconnecting HOG during service search session. This is because HOG
+> talks directly to gattrib and clear his attrib instance on HOG disconnect
+> even there are ongoing GATT operations. Patches 9 - 25 solve this issue.
+
+I remember applying a patch from Arman that should have fixed the
+problem above: shared/att: cancel_all before calling disconnect cb. In
+any if that doesn't really solve the problem the client should cancel
+their pending operations before releasing its reference which means no
+callback should be called after that.
+
+> Lukasz Rymanowski (25):
+>   android/bluetooth: Minor typo fix
+>   android/bluetooth: Minor fix, add missing NULL assignment
+>   android/gatt: Fix for setting conn timeout
+>   android/hog: Minor coding style fixes
+>   android/bluetooth: Add possibility to register for bonded event
+>   android/gatt: Add paired cb to gatt.c
+>   android/bluetooth: Add API to check if device is bonding
+>   android/gatt: Improve LE connection after pair
+>   android/hog: Add support to track gatt operations
+>   android/hog: Cancel all GATT operations on disconnect
+>   android/hog: Add guards to the callbacks
+>   android/hog: Keep track on primary and include service search
+>   android/hog: Keep track on discover characteristic and descriptors
+>   android/hog: Keep track on read/write char and descr
+>   android/bas: Add queue to keep track on GATT operations
+>   android/bas: Keep track read/write GATT operations
+>   android/bas: Keep track on discover characteristic and descriptor
+>   android/bas: Add guard to GATT callbacks
+>   android/dis: Add queue to keep track on GATT operations
+>   android/dis: Keep track on discover and read characteristic
+>   android/dis: Add guard for GATT callbacks
+>   android/scpp: Add queue to keep GATT operations
+>   android/scpp: Keep track on discover characteristic and descriptor
+>   android/scpp: Keep track on write operation
+>   android/scpp: Add guard for GATT callbacks
 >
-> @@ -339,6 +341,9 @@ static sdp_record_t *create_mas_record(uint8_t chan, const char *svc_name)
->         sdp_attr_add_new(record, SDP_ATTR_SUPPORTED_MESSAGE_TYPES, SDP_UINT8,
->                                                                         &mtype);
+>  android/bas.c       | 192 +++++++++++++++++++++++--
+>  android/bluetooth.c |  52 ++++++-
+>  android/bluetooth.h |   5 +
+>  android/dis.c       | 123 +++++++++++++++-
+>  android/gatt.c      |  70 ++++++++-
+>  android/hog.c       | 401 +++++++++++++++++++++++++++++++++++++++++++++-------
+>  android/scpp.c      | 171 ++++++++++++++++++++--
+>  7 files changed, 932 insertions(+), 82 deletions(-)
 >
-> +       sdp_attr_add_new(record, SDP_ATTR_MAP_SUPPORTED_FEATURES, SDP_UINT32,
-> +                                                                       &supft);
-> +
->         sdp_list_free(seq, NULL);
->
->         return record;
 > --
-> 1.9.1
+> 1.8.4
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
-I recall supported features being introduced in 1.2, in that case it
-is probably not required to add it to the record since Android only
-support 1.1.
 
 
 -- 
