@@ -1,124 +1,56 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
+From: Mariusz Skamra <mariusz.skamra@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] android/socket: Add support for dynamic MAP record
-Date: Wed, 10 Dec 2014 14:32:34 +0100
-Message-ID: <2042341.U6dAk6S04b@leonov>
-In-Reply-To: <1418057227-29987-1-git-send-email-szymon.janc@tieto.com>
-References: <1418057227-29987-1-git-send-email-szymon.janc@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Cc: Mariusz Skamra <mariusz.skamra@tieto.com>
+Subject: [PATCH] android/gatt: Fix missing error response to find by type value request
+Date: Wed, 10 Dec 2014 14:31:19 +0100
+Message-Id: <1418218279-17642-1-git-send-email-mariusz.skamra@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Monday 08 of December 2014 17:47:07 Szymon Janc wrote:
-> Android 5.0 uses service name (sic!) for defining instance ID and
-> supported message types. Name passed is in format of "XXYYname"
-> where XX is hex coded instance and YY is hex coded message types
-> mask.
-> 
-> This patch adds new mode for Socket HAL in which daemon tries to
-> extract instance ID and message types from service name.
-> ---
->  android/hal-bluetooth.c |  7 ++++++-
->  android/hal-msg.h       |  3 +++
->  android/socket.c        | 29 +++++++++++++++++++++++++++--
->  3 files changed, 36 insertions(+), 3 deletions(-)
-> 
-> diff --git a/android/hal-bluetooth.c b/android/hal-bluetooth.c
-> index fac6b6f..f8e3e53 100644
-> --- a/android/hal-bluetooth.c
-> +++ b/android/hal-bluetooth.c
-> @@ -539,9 +539,14 @@ static int init(bt_callbacks_t *callbacks)
->  	}
-> 
->  	cmd.service_id = HAL_SERVICE_ID_SOCKET;
-> -	cmd.mode = HAL_MODE_DEFAULT;
->  	cmd.max_clients = 1;
-> 
-> +#if ANDROID_VERSION >= PLATFORM_VER(5, 0, 0)
-> +	cmd.mode = HAL_MODE_SOCKET_DYNAMIC_MAP;
-> +#else
-> +	cmd.mode = HAL_MODE_DEFAULT;
-> +#endif
-> +
->  	status = hal_ipc_cmd(HAL_SERVICE_ID_CORE, HAL_OP_REGISTER_MODULE,
->  					sizeof(cmd), &cmd, NULL, NULL, NULL);
->  	if (status != BT_STATUS_SUCCESS) {
-> diff --git a/android/hal-msg.h b/android/hal-msg.h
-> index 33b53c5..81d5b2e 100644
-> --- a/android/hal-msg.h
-> +++ b/android/hal-msg.h
-> @@ -266,6 +266,9 @@ struct hal_rsp_get_connection_state {
-> 
->  /* Bluetooth Socket HAL api */
-> 
-> +#define HAL_MODE_SOCKET_DEFAULT		HAL_MODE_DEFAULT
-> +#define HAL_MODE_SOCKET_DYNAMIC_MAP	0x01
-> +
->  #define HAL_SOCK_RFCOMM		0x01
->  #define HAL_SOCK_SCO		0x02
->  #define HAL_SOCK_L2CAP		0x03
-> diff --git a/android/socket.c b/android/socket.c
-> index 7200071..6e2fd9d 100644
-> --- a/android/socket.c
-> +++ b/android/socket.c
-> @@ -90,6 +90,8 @@ static struct ipc *hal_ipc = NULL;
-> 
->  static bdaddr_t adapter_addr;
-> 
-> +static uint8_t hal_mode = HAL_MODE_SOCKET_DEFAULT;
-> +
->  static const uint8_t zero_uuid[16] = { 0 };
-> 
->  /* Simple list of RFCOMM connected sockets */
-> @@ -314,10 +316,31 @@ static sdp_record_t *create_mas_record(uint8_t chan,
-> const char *svc_name) {
->  	sdp_list_t *seq;
->  	sdp_profile_desc_t profile[1];
-> -	uint8_t minst = DEFAULT_MAS_INSTANCE;
-> -	uint8_t mtype = DEFAULT_MAS_MSG_TYPE;
-> +	uint8_t minst, mtype;
->  	sdp_record_t *record;
->  	uuid_t uuid;
-> +	int cnt, ret;
-> +
-> +	switch (hal_mode) {
-> +	case HAL_MODE_SOCKET_DYNAMIC_MAP:
-> +		/*
-> +		 * Service name for MAP is passed as XXYYname
-> +		 * XX - instance
-> +		 * YY - message type
-> +		 */
-> +		ret = sscanf(svc_name, "%02hhx%02hhx%n", &minst, &mtype, &cnt);
-> +		if (ret != 2 || cnt != 4)
-> +			return NULL;
-> +
-> +		svc_name += 4;
-> +		break;
-> +	case HAL_MODE_SOCKET_DEFAULT:
-> +		minst = DEFAULT_MAS_INSTANCE;
-> +		mtype = DEFAULT_MAS_MSG_TYPE;
-> +		break;
-> +	default:
-> +		return NULL;
-> +	}
-> 
->  	sdp_uuid16_create(&uuid, MAP_MSE_SVCLASS_ID);
-> 
-> @@ -1148,6 +1171,8 @@ void bt_socket_register(struct ipc *ipc, const
-> bdaddr_t *addr, uint8_t mode)
-> 
->  	DBG("");
-> 
-> +	hal_mode = mode;
-> +
->  	/*
->  	 * make sure channels assigned for profiles are reserved and not used
->  	 * for app services
+This patch fixes Find By Type Value Request issue.
+When the attribute queue is empty, error response should be sent.
+---
+ android/gatt.c | 12 +++++++++++-
+ 1 file changed, 11 insertions(+), 1 deletion(-)
 
-Pushed.
-
+diff --git a/android/gatt.c b/android/gatt.c
+index b2ce9c1..484775a 100644
+--- a/android/gatt.c
++++ b/android/gatt.c
+@@ -4546,7 +4546,6 @@ static void send_dev_complete_response(struct gatt_device *device,
+ 			if ((val->length != val->filter_vlen) ||
+ 				memcmp(val->value, val->filter_value,
+ 								val->length)) {
+-
+ 				destroy_pending_request(val);
+ 				val = queue_pop_head(device->pending_requests);
+ 				continue;
+@@ -6172,6 +6171,9 @@ static uint8_t find_by_type_request(const uint8_t *cmd, uint16_t cmd_len,
+ 	struct queue *q;
+ 	bt_uuid_t uuid;
+ 	uint16_t len;
++	size_t mtu;
++	uint8_t *rsp = g_attrib_get_buffer(device->attrib, &mtu);
++
+ 
+ 	DBG("");
+ 
+@@ -6189,6 +6191,14 @@ static uint8_t find_by_type_request(const uint8_t *cmd, uint16_t cmd_len,
+ 
+ 	gatt_db_find_by_type(gatt_db, start, end, &uuid, q);
+ 
++	if (queue_isempty(q)) {
++		len = enc_error_resp(ATT_OP_FIND_BY_TYPE_REQ, start,
++					ATT_ECODE_ATTR_NOT_FOUND, rsp, mtu);
++		g_attrib_send(device->attrib, 0, rsp, len, NULL, NULL, NULL);
++		queue_destroy(q, NULL);
++		return 0;
++	}
++
+ 	while (queue_peek_head(q)) {
+ 		struct gatt_db_attribute *attrib = queue_pop_head(q);
+ 		struct pending_request *data;
 -- 
-BR
-Szymon Janc
+1.9.1
+
