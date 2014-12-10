@@ -1,111 +1,65 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1418166520-32993-7-git-send-email-jamuraa@chromium.org>
-References: <1418166520-32993-1-git-send-email-jamuraa@chromium.org>
-	<1418166520-32993-7-git-send-email-jamuraa@chromium.org>
-Date: Wed, 10 Dec 2014 10:03:16 +0200
-Message-ID: <CABBYNZ+WrW0Wa5jOhnWAPjL1RdJV4VW4dA9fqzAGpNit2VsxaQ@mail.gmail.com>
-Subject: Re: [PATCH BlueZ v2 6/8] shared/gatt-db: Add gatt_db_find_by_type_value
+In-Reply-To: <1418129488-12353-2-git-send-email-gowtham.ab@samsung.com>
+References: <1418129488-12353-1-git-send-email-gowtham.ab@samsung.com>
+	<1418129488-12353-2-git-send-email-gowtham.ab@samsung.com>
+Date: Wed, 10 Dec 2014 09:27:32 +0200
+Message-ID: <CABBYNZLox+KR_PeB8LiW5WDvSCNwU6XG1vPFQqwM4pXQFtRe2Q@mail.gmail.com>
+Subject: Re: [PATCH ] android/socket: Add MAP supported features bits
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Michael Janssen <jamuraa@chromium.org>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+To: Gowtham Anandha Babu <gowtham.ab@samsung.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	Dmitry Kasatkin <d.kasatkin@samsung.com>,
+	Bharat Panda <bharat.panda@samsung.com>, cpgs@samsung.com
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Michael,
+Hi Gowtham,
 
-On Wed, Dec 10, 2014 at 1:08 AM, Michael Janssen <jamuraa@chromium.org> wrote:
-> Added to support the GATT discovery of services by UUID.
-> Currently only works for values which are stored within the attribute
-> structure (not callback-based).
+On Tue, Dec 9, 2014 at 2:51 PM, Gowtham Anandha Babu
+<gowtham.ab@samsung.com> wrote:
+> Add MAP supported features in sdp record.
 > ---
->  src/shared/gatt-db.c | 27 +++++++++++++++++++++++++++
->  src/shared/gatt-db.h |  7 +++++++
->  2 files changed, 34 insertions(+)
+>  android/socket.c | 5 +++++
+>  1 file changed, 5 insertions(+)
 >
-> diff --git a/src/shared/gatt-db.c b/src/shared/gatt-db.c
-> index 98fb8a0..b261ca4 100644
-> --- a/src/shared/gatt-db.c
-> +++ b/src/shared/gatt-db.c
-> @@ -853,6 +853,8 @@ struct find_by_type_value_data {
->         bt_uuid_t uuid;
->         uint16_t start_handle;
->         uint16_t end_handle;
-> +       const void *value;
-> +       size_t value_len;
->  };
+> diff --git a/android/socket.c b/android/socket.c
+> index f2cfd07..d89c8c2 100644
+> --- a/android/socket.c
+> +++ b/android/socket.c
+> @@ -58,6 +58,7 @@
+>  /* Hardcoded MAP stuff needed for MAS SMS Instance.*/
+>  #define DEFAULT_MAS_INSTANCE   0x00
 >
->  static void find_by_type(void *data, void *user_data)
-> @@ -878,6 +880,12 @@ static void find_by_type(void *data, void *user_data)
->                 if (bt_uuid_cmp(&search_data->uuid, &attribute->uuid))
->                         continue;
+> +#define DEFAULT_MAP_SUPPORTED_FEATURES 0x0000001f
+>  #define DEFAULT_PBAP_SUPPORTED_FEATURES 0x00000003
 >
-> +               /* TODO: fix for read-callback based attributes */
-> +               if (search_data->value && memcmp(attribute->value,
-> +                                                       search_data->value,
-> +                                                       search_data->value_len))
-> +                       continue;
-> +
->                 queue_push_tail(search_data->queue, attribute);
->         }
->  }
-> @@ -897,6 +905,25 @@ void gatt_db_find_by_type(struct gatt_db *db, uint16_t start_handle,
->         queue_foreach(db->services, find_by_type, &data);
->  }
+>  #define MAP_MSG_TYPE_SMS_GSM   0x02
+> @@ -321,6 +322,7 @@ static sdp_record_t *create_mas_record(uint8_t chan, const char *svc_name)
+>         sdp_profile_desc_t profile[1];
+>         uint8_t minst = DEFAULT_MAS_INSTANCE;
+>         uint8_t mtype = DEFAULT_MAS_MSG_TYPE;
+> +       uint8_t supft = DEFAULT_MAP_SUPPORTED_FEATURES;
+>         sdp_record_t *record;
+>         uuid_t uuid;
 >
-> +void gatt_db_find_by_type_value(struct gatt_db *db, uint16_t start_handle,
-> +                                                       uint16_t end_handle,
-> +                                                       const bt_uuid_t *type,
-> +                                                       const void *value,
-> +                                                       size_t value_len,
-> +                                                       struct queue *queue)
-> +{
-> +       struct find_by_type_value_data data;
-> +
-> +       data.uuid = *type;
-> +       data.start_handle = start_handle;
-> +       data.end_handle = end_handle;
-> +       data.queue = queue;
-> +       data.value = value;
-> +       data.value_len = value_len;
-> +
-> +       queue_foreach(db->services, find_by_type, &data);
-> +}
-> +
->  struct read_by_type_data {
->         struct queue *queue;
->         bt_uuid_t uuid;
-> diff --git a/src/shared/gatt-db.h b/src/shared/gatt-db.h
-> index e5fe6bb..22e60d5 100644
-> --- a/src/shared/gatt-db.h
-> +++ b/src/shared/gatt-db.h
-> @@ -92,6 +92,13 @@ void gatt_db_find_by_type(struct gatt_db *db, uint16_t start_handle,
->                                                         const bt_uuid_t *type,
->                                                         struct queue *queue);
+> @@ -339,6 +341,9 @@ static sdp_record_t *create_mas_record(uint8_t chan, const char *svc_name)
+>         sdp_attr_add_new(record, SDP_ATTR_SUPPORTED_MESSAGE_TYPES, SDP_UINT8,
+>                                                                         &mtype);
 >
-> +void gatt_db_find_by_type_value(struct gatt_db *db, uint16_t start_handle,
-> +                                                       uint16_t end_handle,
-> +                                                       const bt_uuid_t *type,
-> +                                                       const void *value,
-> +                                                       size_t value_len,
-> +                                                       struct queue *queue);
+> +       sdp_attr_add_new(record, SDP_ATTR_MAP_SUPPORTED_FEATURES, SDP_UINT32,
+> +                                                                       &supft);
 > +
-
-We actually have plans to replace this API that expose queues with
-callback based thus avoid having to iterate twice.
-
->  void gatt_db_read_by_type(struct gatt_db *db, uint16_t start_handle,
->                                                         uint16_t end_handle,
->                                                         const bt_uuid_t type,
+>         sdp_list_free(seq, NULL);
+>
+>         return record;
 > --
-> 2.2.0.rc0.207.ga3a616c
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> 1.9.1
 
+I recall supported features being introduced in 1.2, in that case it
+is probably not required to add it to the record since Android only
+support 1.1.
 
 
 -- 
