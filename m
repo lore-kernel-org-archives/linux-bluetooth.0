@@ -1,125 +1,159 @@
 Return-Path: <cyrus@holtmann.org>
-From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH v3] android/bluetooth: Add support to read Le features by Android
-Date: Wed, 10 Dec 2014 13:45:41 +0100
-Message-Id: <1418215541-10478-1-git-send-email-lukasz.rymanowski@tieto.com>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 4/5] android/tester: move bthost.h include to tester-main.h
+Date: Wed, 10 Dec 2014 13:45:36 +0100
+Message-ID: <7505525.rtnczLme6q@leonov>
+In-Reply-To: <1418034908-1742-4-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+References: <1418034908-1742-1-git-send-email-grzegorz.kolodziejczyk@tieto.com> <1418034908-1742-4-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
-*v3 Fix for setting Privacy Enable flag. 
- android/bluetooth.c | 48 ++++++++++++++++++++++++++++++++++++++++++++++++
- android/hal-msg.h   |  1 +
- 2 files changed, 49 insertions(+)
+Hi Grzegorz,
 
-diff --git a/android/bluetooth.c b/android/bluetooth.c
-index f79ca37..48ca231 100644
---- a/android/bluetooth.c
-+++ b/android/bluetooth.c
-@@ -176,6 +176,13 @@ static struct {
- 
- 	char *name;
- 
-+	uint8_t max_advert_instance;
-+	uint8_t rpa_offload_supported;
-+	uint8_t max_irk_list_size;
-+	uint8_t max_scan_filters_supported;
-+	uint16_t scan_result_storage_size;
-+	uint8_t activity_energy_info_supported;
-+
- 	uint32_t current_settings;
- 	uint32_t supported_settings;
- 
-@@ -189,6 +196,12 @@ static struct {
- 	.index = MGMT_INDEX_NONE,
- 	.dev_class = 0,
- 	.name = NULL,
-+	.max_advert_instance = 0,
-+	.rpa_offload_supported = 0,
-+	.max_irk_list_size = 0,
-+	.max_scan_filters_supported = 0,
-+	.scan_result_storage_size = 0,
-+	.activity_energy_info_supported = 0,
- 	.current_settings = 0,
- 	.supported_settings = 0,
- 	.cur_discovery_type = SCAN_TYPE_NONE,
-@@ -3784,6 +3797,31 @@ static uint8_t get_adapter_discoverable_timeout(void)
- 	return HAL_STATUS_SUCCESS;
- }
- 
-+static void prepare_le_features(uint8_t *le_features)
-+{
-+	le_features[0] = !!(adapter.current_settings & MGMT_SETTING_PRIVACY);
-+	le_features[1] = adapter.max_advert_instance;
-+	le_features[2] = adapter.rpa_offload_supported;
-+	le_features[3] = adapter.max_irk_list_size;
-+	le_features[4] = adapter.max_scan_filters_supported;
-+	/* lo byte */
-+	le_features[5] = adapter.scan_result_storage_size;
-+	/* hi byte */
-+	le_features[6] = adapter.scan_result_storage_size >> 8;
-+	le_features[7] = adapter.activity_energy_info_supported;
-+}
-+
-+static uint8_t get_adapter_le_features(void)
-+{
-+	uint8_t le_features[8];
-+
-+	prepare_le_features(le_features);
-+
-+	send_adapter_property(HAL_PROP_ADAPTER_LOCAL_LE_FEAT,
-+					sizeof(le_features), le_features);
-+	return HAL_STATUS_SUCCESS;
-+}
-+
- static void handle_get_adapter_prop_cmd(const void *buf, uint16_t len)
- {
- 	const struct hal_cmd_get_adapter_prop *cmd = buf;
-@@ -3817,6 +3855,9 @@ static void handle_get_adapter_prop_cmd(const void *buf, uint16_t len)
- 	case HAL_PROP_ADAPTER_DISC_TIMEOUT:
- 		status = get_adapter_discoverable_timeout();
- 		break;
-+	case HAL_PROP_ADAPTER_LOCAL_LE_FEAT:
-+		status = get_adapter_le_features();
-+		break;
- 	default:
- 		status = HAL_STATUS_FAILED;
- 		break;
-@@ -3837,6 +3878,7 @@ static void get_adapter_properties(void)
- 	uint8_t bonded[g_slist_length(bonded_devices) * sizeof(bdaddr_t)];
- 	uint128_t uuids[g_slist_length(adapter.uuids)];
- 	uint8_t android_bdaddr[6];
-+	uint8_t le_features[8];
- 	uint8_t type, mode;
- 	size_t size, i;
- 	GSList *l;
-@@ -3898,6 +3940,12 @@ static void get_adapter_properties(void)
- 									uuids);
- 	ev->num_props++;
- 
-+	prepare_le_features(le_features);
-+	size += fill_hal_prop(buf + size, HAL_PROP_ADAPTER_LOCAL_LE_FEAT,
-+					sizeof(le_features), le_features);
-+
-+	ev->num_props++;
-+
- 	ipc_send_notif(hal_ipc, HAL_SERVICE_ID_BLUETOOTH,
- 				HAL_EV_ADAPTER_PROPS_CHANGED, size, buf);
- }
-diff --git a/android/hal-msg.h b/android/hal-msg.h
-index e0be314..9d38a9f 100644
---- a/android/hal-msg.h
-+++ b/android/hal-msg.h
-@@ -142,6 +142,7 @@ struct hal_prop_device_info {
- 	uint16_t manufacturer;
- } __attribute__((packed));
- 
-+#define HAL_PROP_ADAPTER_LOCAL_LE_FEAT		0x0d
- #define HAL_PROP_DEVICE_TIMESTAMP		0xFF
- 
- #define HAL_ADAPTER_SCAN_MODE_NONE		0x00
+On Monday 08 of December 2014 11:35:07 Grzegorz Kolodziejczyk wrote:
+> bthost.h is used by all testers.
+> ---
+>  android/tester-a2dp.c      | 1 -
+>  android/tester-avrcp.c     | 1 -
+>  android/tester-bluetooth.c | 1 -
+>  android/tester-gatt.c      | 1 -
+>  android/tester-hdp.c       | 1 -
+>  android/tester-hidhost.c   | 1 -
+>  android/tester-main.c      | 1 -
+>  android/tester-main.h      | 1 +
+>  android/tester-pan.c       | 1 -
+>  android/tester-socket.c    | 1 -
+>  10 files changed, 1 insertion(+), 9 deletions(-)
+> 
+> diff --git a/android/tester-a2dp.c b/android/tester-a2dp.c
+> index 837477e..a2e7325 100644
+> --- a/android/tester-a2dp.c
+> +++ b/android/tester-a2dp.c
+> @@ -17,7 +17,6 @@
+> 
+>  #include <stdbool.h>
+> 
+> -#include "emulator/bthost.h"
+>  #include "src/shared/util.h"
+> 
+>  #include "tester-main.h"
+> diff --git a/android/tester-avrcp.c b/android/tester-avrcp.c
+> index 41a5fd3..3bda390 100644
+> --- a/android/tester-avrcp.c
+> +++ b/android/tester-avrcp.c
+> @@ -17,7 +17,6 @@
+> 
+>  #include <stdbool.h>
+> 
+> -#include "emulator/bthost.h"
+>  #include "src/shared/util.h"
+> 
+>  #include "tester-main.h"
+> diff --git a/android/tester-bluetooth.c b/android/tester-bluetooth.c
+> index 2be824d..6586a54 100644
+> --- a/android/tester-bluetooth.c
+> +++ b/android/tester-bluetooth.c
+> @@ -16,7 +16,6 @@
+>   */
+>  #include <stdbool.h>
+> 
+> -#include "emulator/bthost.h"
+>  #include "tester-main.h"
+> 
+>  static struct queue *list; /* List of bluetooth test cases */
+> diff --git a/android/tester-gatt.c b/android/tester-gatt.c
+> index de2a7a7..d8021d7 100644
+> --- a/android/tester-gatt.c
+> +++ b/android/tester-gatt.c
+> @@ -17,7 +17,6 @@
+> 
+>  #include <stdbool.h>
+> 
+> -#include "emulator/bthost.h"
+>  #include "tester-main.h"
+>  #include "src/shared/util.h"
+> 
+> diff --git a/android/tester-hdp.c b/android/tester-hdp.c
+> index ab7666d..195171d 100644
+> --- a/android/tester-hdp.c
+> +++ b/android/tester-hdp.c
+> @@ -17,7 +17,6 @@
+> 
+>  #include <stdbool.h>
+> 
+> -#include "emulator/bthost.h"
+>  #include "tester-main.h"
+>  #include "android/utils.h"
+> 
+> diff --git a/android/tester-hidhost.c b/android/tester-hidhost.c
+> index 95befd9..6214b4f 100644
+> --- a/android/tester-hidhost.c
+> +++ b/android/tester-hidhost.c
+> @@ -17,7 +17,6 @@
+> 
+>  #include <stdbool.h>
+> 
+> -#include "emulator/bthost.h"
+>  #include "tester-main.h"
+> 
+>  #include "android/utils.h"
+> diff --git a/android/tester-main.c b/android/tester-main.c
+> index 6339b3a..06730d2 100644
+> --- a/android/tester-main.c
+> +++ b/android/tester-main.c
+> @@ -17,7 +17,6 @@
+>  #include <stdbool.h>
+> 
+>  #include "src/shared/util.h"
+> -#include "emulator/bthost.h"
+>  #include "tester-main.h"
+> 
+>  #include "monitor/bt.h"
+> diff --git a/android/tester-main.h b/android/tester-main.h
+> index 474afbb..ae65d72 100644
+> --- a/android/tester-main.h
+> +++ b/android/tester-main.h
+> @@ -41,6 +41,7 @@
+>  #include "src/shared/mgmt.h"
+>  #include "src/shared/queue.h"
+>  #include "emulator/hciemu.h"
+> +#include "emulator/bthost.h"
+> 
+>  #include <hardware/hardware.h>
+>  #include <hardware/audio.h>
+> diff --git a/android/tester-pan.c b/android/tester-pan.c
+> index aff1980..1d07b22 100644
+> --- a/android/tester-pan.c
+> +++ b/android/tester-pan.c
+> @@ -17,7 +17,6 @@
+> 
+>  #include <stdbool.h>
+> 
+> -#include "emulator/bthost.h"
+>  #include "tester-main.h"
+>  #include "android/utils.h"
+> 
+> diff --git a/android/tester-socket.c b/android/tester-socket.c
+> index c70d753..bd0260c 100644
+> --- a/android/tester-socket.c
+> +++ b/android/tester-socket.c
+> @@ -18,7 +18,6 @@
+>  #include <fcntl.h>
+>  #include <stdbool.h>
+> 
+> -#include "emulator/bthost.h"
+>  #include "tester-main.h"
+> 
+>  static struct queue *list; /* List of socket test cases */
+
+We should do opposite. I'd prefer headers to not include other headers if 
+possible. C files should include what is needed for compilation (especially 
+when it is internal header).
+
 -- 
-1.8.4
-
+BR
+Szymon Janc
