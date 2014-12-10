@@ -2,50 +2,45 @@ Return-Path: <cyrus@holtmann.org>
 From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
-Subject: [PATCH 2/3] android/gatt: Fix execute write request still pending
-Date: Wed, 10 Dec 2014 10:57:07 +0100
-Message-Id: <1418205428-6122-2-git-send-email-jakub.tyszkowski@tieto.com>
-In-Reply-To: <1418205428-6122-1-git-send-email-jakub.tyszkowski@tieto.com>
-References: <1418205428-6122-1-git-send-email-jakub.tyszkowski@tieto.com>
+Subject: [PATCH 1/3] android/pts: Update gatt server results
+Date: Wed, 10 Dec 2014 10:57:06 +0100
+Message-Id: <1418205428-6122-1-git-send-email-jakub.tyszkowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-For execute write no write callback is called thus we have to change its
-state directly in app's response handler.
-
-This fixes not sending execute write responses in TC_GAW_SR_BI_07_C.
+Patches fixing this issues were already merged.
 ---
- android/gatt.c | 10 ++++++++++
- 1 file changed, 10 insertions(+)
+ android/pts-gatt.txt | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/android/gatt.c b/android/gatt.c
-index ac45ffc..f39a66b 100644
---- a/android/gatt.c
-+++ b/android/gatt.c
-@@ -5530,6 +5530,8 @@ static void handle_server_send_response(const void *buf, uint16_t len)
- 	}
- 
- 	if (transaction->opcode == ATT_OP_EXEC_WRITE_REQ) {
-+		struct pending_request *req;
-+
- 		conn->wait_execute_write = false;
- 
- 		/* Check for execute response from all server applications */
-@@ -5537,6 +5539,14 @@ static void handle_server_send_response(const void *buf, uint16_t len)
- 			goto done;
- 
- 		/*
-+		 * This is usually done through db write callback but for
-+		 * execute write we dont have the attribute or handle to call
-+		 * gatt_db_attribute_write().
-+		 */
-+		req = queue_peek_head(conn->device->pending_requests);
-+		req->state = REQUEST_DONE;
-+
-+		/*
- 		 * FIXME: Handle situation when not all server applications
- 		 * respond with a success.
- 		 */
+diff --git a/android/pts-gatt.txt b/android/pts-gatt.txt
+index 167a6dc..43e1c8a 100644
+--- a/android/pts-gatt.txt
++++ b/android/pts-gatt.txt
+@@ -729,12 +729,12 @@ TC_GAW_CL_BI_36_C	PASS	haltest:
+ 				gattc get_descriptor
+ 				gattc write_descriptor 2 <long_value>
+ 				gattc disconnect
+-TC_GAW_SR_BV_01_C	FAIL	haltest:
++TC_GAW_SR_BV_01_C	PASS	haltest:
+ 				gatts add_service
+ 				gatts add_characteristic:
+ 						<properties> 4 <permissions> 17
+ 				gatts start_service
+-TC_GAW_SR_BV_02_C	FAIL	haltest:
++TC_GAW_SR_BV_02_C	PASS	haltest:
+ 				gatts add service
+ 				gatts add_characteristics:
+ 					<properties> 66 <permisions> 145
+@@ -743,7 +743,7 @@ TC_GAW_SR_BV_02_C	FAIL	haltest:
+ 				gatts send_response: (twice)
+ 				NOTE: gatts_request_write_cb shall be called
+ 								 (verify it)
+-TC_GAW_SR_BI_01_C	FAIL	haltest:
++TC_GAW_SR_BI_01_C	PASS	haltest:
+ 				gatts add_service
+ 				gatts add_characteristic:
+ 						<properties> 68
 -- 
 1.9.1
 
