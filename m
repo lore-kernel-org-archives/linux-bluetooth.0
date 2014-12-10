@@ -1,10 +1,11 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1418166520-32993-1-git-send-email-jamuraa@chromium.org>
+In-Reply-To: <1418166520-32993-7-git-send-email-jamuraa@chromium.org>
 References: <1418166520-32993-1-git-send-email-jamuraa@chromium.org>
-Date: Wed, 10 Dec 2014 10:08:16 +0200
-Message-ID: <CABBYNZ+rkWVGF2c340xSohLqrkQriK2fDgVkgqVe1AMZP5Bbyw@mail.gmail.com>
-Subject: Re: [PATCH BlueZ v2 0/8] Define TS-approved "small database"
+	<1418166520-32993-7-git-send-email-jamuraa@chromium.org>
+Date: Wed, 10 Dec 2014 10:03:16 +0200
+Message-ID: <CABBYNZ+WrW0Wa5jOhnWAPjL1RdJV4VW4dA9fqzAGpNit2VsxaQ@mail.gmail.com>
+Subject: Re: [PATCH BlueZ v2 6/8] shared/gatt-db: Add gatt_db_find_by_type_value
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: Michael Janssen <jamuraa@chromium.org>
 Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
@@ -15,61 +16,95 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 Hi Michael,
 
 On Wed, Dec 10, 2014 at 1:08 AM, Michael Janssen <jamuraa@chromium.org> wrote:
-> This patch set's main goal is to add the small source database as defined
-> by page 24 of the GATT Test Spec.
+> Added to support the GATT discovery of services by UUID.
+> Currently only works for values which are stored within the attribute
+> structure (not callback-based).
+> ---
+>  src/shared/gatt-db.c | 27 +++++++++++++++++++++++++++
+>  src/shared/gatt-db.h |  7 +++++++
+>  2 files changed, 34 insertions(+)
 >
-> It also adds improvements to bt_string_to_uuid to ease defined service UUID
-> strings, and some minor simplification of the existing test data.
+> diff --git a/src/shared/gatt-db.c b/src/shared/gatt-db.c
+> index 98fb8a0..b261ca4 100644
+> --- a/src/shared/gatt-db.c
+> +++ b/src/shared/gatt-db.c
+> @@ -853,6 +853,8 @@ struct find_by_type_value_data {
+>         bt_uuid_t uuid;
+>         uint16_t start_handle;
+>         uint16_t end_handle;
+> +       const void *value;
+> +       size_t value_len;
+>  };
 >
-> Finally it allows the test database used by the IUT to be switched.
+>  static void find_by_type(void *data, void *user_data)
+> @@ -878,6 +880,12 @@ static void find_by_type(void *data, void *user_data)
+>                 if (bt_uuid_cmp(&search_data->uuid, &attribute->uuid))
+>                         continue;
 >
-> v1 -> v2:
->   * Refactor UUID compaction patch
->   * Add some tests for compaction
->   * Add Service Discovery by UUID
->   * Add /TP/GAD/SR/BV-02-C test
+> +               /* TODO: fix for read-callback based attributes */
+> +               if (search_data->value && memcmp(attribute->value,
+> +                                                       search_data->value,
+> +                                                       search_data->value_len))
+> +                       continue;
+> +
+>                 queue_push_tail(search_data->queue, attribute);
+>         }
+>  }
+> @@ -897,6 +905,25 @@ void gatt_db_find_by_type(struct gatt_db *db, uint16_t start_handle,
+>         queue_foreach(db->services, find_by_type, &data);
+>  }
 >
-> Michael Janssen (8):
->   lib/uuid: Simplify BT base UUIDs when possible
->   unit/gatt: Define repeated MTU PDUs.
->   unit/gatt: Use source db for server_tests
->   unit/gatt: Add test spec "small test database"
->   unit/gatt: minor fix for test PDUs
->   shared/gatt-db: Add gatt_db_find_by_type_value
->   shared/gatt-server: support Discover by UUID
->   unit/gatt: Add /TP/GAD/SR/BV-02-C test
+> +void gatt_db_find_by_type_value(struct gatt_db *db, uint16_t start_handle,
+> +                                                       uint16_t end_handle,
+> +                                                       const bt_uuid_t *type,
+> +                                                       const void *value,
+> +                                                       size_t value_len,
+> +                                                       struct queue *queue)
+> +{
+> +       struct find_by_type_value_data data;
+> +
+> +       data.uuid = *type;
+> +       data.start_handle = start_handle;
+> +       data.end_handle = end_handle;
+> +       data.queue = queue;
+> +       data.value = value;
+> +       data.value_len = value_len;
+> +
+> +       queue_foreach(db->services, find_by_type, &data);
+> +}
+> +
+>  struct read_by_type_data {
+>         struct queue *queue;
+>         bt_uuid_t uuid;
+> diff --git a/src/shared/gatt-db.h b/src/shared/gatt-db.h
+> index e5fe6bb..22e60d5 100644
+> --- a/src/shared/gatt-db.h
+> +++ b/src/shared/gatt-db.h
+> @@ -92,6 +92,13 @@ void gatt_db_find_by_type(struct gatt_db *db, uint16_t start_handle,
+>                                                         const bt_uuid_t *type,
+>                                                         struct queue *queue);
 >
->  lib/uuid.c               |  17 ++-
->  src/shared/gatt-db.c     |  27 +++++
->  src/shared/gatt-db.h     |   7 ++
->  src/shared/gatt-server.c | 107 +++++++++++++++++
->  unit/test-gatt.c         | 295 +++++++++++++++++++++++++++++++++--------------
->  unit/test-uuid.c         |  52 ++++++++-
->  6 files changed, 410 insertions(+), 95 deletions(-)
->
+> +void gatt_db_find_by_type_value(struct gatt_db *db, uint16_t start_handle,
+> +                                                       uint16_t end_handle,
+> +                                                       const bt_uuid_t *type,
+> +                                                       const void *value,
+> +                                                       size_t value_len,
+> +                                                       struct queue *queue);
+> +
+
+We actually have plans to replace this API that expose queues with
+callback based thus avoid having to iterate twice.
+
+>  void gatt_db_read_by_type(struct gatt_db *db, uint16_t start_handle,
+>                                                         uint16_t end_handle,
+>                                                         const bt_uuid_t type,
 > --
 > 2.2.0.rc0.207.ga3a616c
-
-Patches 1-5 are applied, please not that I have to fix the following
-in the first patch:
-
-WARNING:LINE_SPACING: Missing a blank line after declarations
-#13: FILE: lib/uuid.c:197:
-+ char dummy;
-+ if (!is_uuid128(string))
-
-WARNING:LONG_LINE: line over 80 characters
-#16: FILE: lib/uuid.c:200:
-+ return sscanf(string,
-"0000%04hx-0000-1000-8000-00805%1[fF]9%1[bB]34%1[fF]%1[bB]",
-
-WARNING:LINE_SPACING: Missing a blank line after declarations
-#132: FILE: unit/test-uuid.c:266:
-+ char *testpath;
-+ testpath = g_strdup_printf("/uuid/compress/%s",
-
-In case you are wondering this is the output of checkpatch.pl that you
-can find in the kernel tree.
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
 
 
