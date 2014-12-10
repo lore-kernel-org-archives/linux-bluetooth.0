@@ -1,49 +1,65 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 00/13] Simplify notification handling
-Date: Wed, 10 Dec 2014 16:16:57 +0200
-Message-Id: <1418221031-4379-1-git-send-email-luiz.dentz@gmail.com>
+Cc: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+Subject: [PATCH 4/4] android/bluetooth: Enable LE privacy mode on BfA startup
+Date: Wed, 10 Dec 2014 15:16:14 +0100
+Message-Id: <1418220974-12287-5-git-send-email-lukasz.rymanowski@tieto.com>
+In-Reply-To: <1418220974-12287-1-git-send-email-lukasz.rymanowski@tieto.com>
+References: <1418220974-12287-1-git-send-email-lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Lets follow Android Lollipop behaviour and enable privacy on
+startup.
+---
+ android/bluetooth.c | 26 ++++++++++++++++++++++++++
+ 1 file changed, 26 insertions(+)
 
-This attempts to simplify notification handling by making queue_foreach
-safe from entry removals during callback. In addition to that a couples
-there are a couple of new unit test to emulate removal during event
-callback and because of that Ive also included the coverage support again
-since I used it to check what part of the code is being exercised.
-
-v2: Make coverage target depend on lcov to be present and update test
-coverage.
-
-Luiz Augusto von Dentz (13):
-  build: Add coverage support
-  unit/test-queue: Add /queue/foreach_remove test
-  unit/test-queue: Add /queue/foreach_remove_backward test
-  shared/queue: Add reference counting to entries
-  unit/test-mgmt: Add /mgmt/response/1 test
-  unit/test-mgmt: Add /mgmt/response/2 test
-  unit/test-mgmt: Add /mgmt/event/1 test
-  unit/test-mgmt: Add /mgmt/event/2 test
-  unit/test-mgmt: Add /mgmt/unregister/1 test
-  unit/test-mgmt: Add /mgmt/unregister/2 test
-  unit/test-mgmt: Add /mgmt/destroy/1 test
-  shared/mgmt: Remove unnecessary code
-  doc: Update mgmt-tester test coverage
-
- .gitignore            |   4 +
- Makefile.am           |  20 +++++
- acinclude.m4          |   4 +
- configure.ac          |   5 ++
- doc/test-coverage.txt |   4 +-
- src/shared/mgmt.c     |  89 +++-----------------
- src/shared/queue.c    |  77 +++++++++++-------
- unit/test-mgmt.c      | 220 +++++++++++++++++++++++++++++++++++++++++++++++++-
- unit/test-queue.c     |  46 +++++++++++
- 9 files changed, 356 insertions(+), 113 deletions(-)
-
+diff --git a/android/bluetooth.c b/android/bluetooth.c
+index 1d5d26d..c0c5137 100644
+--- a/android/bluetooth.c
++++ b/android/bluetooth.c
+@@ -3413,6 +3413,28 @@ static void clear_auto_connect_list(void)
+ 	error("Could not clear auto connect list");
+ }
+ 
++static void set_privacy_complete(uint8_t status, uint16_t length,
++					const void *param, void *user_data)
++{
++	if (status != MGMT_STATUS_SUCCESS)
++		error("Failed to set privacy mode: %s (0x%02x)",
++						mgmt_errstr(status), status);
++}
++
++static void set_privacy(void)
++{
++	struct mgmt_cp_set_privacy cp;
++
++	cp.privacy = 0x01;
++	memcpy(cp.irk, adapter.irk, sizeof(adapter.irk));
++
++	if (mgmt_send(mgmt_if, MGMT_OP_SET_PRIVACY, adapter.index, sizeof(cp),
++				&cp, set_privacy_complete, NULL, NULL) > 0)
++		return;
++
++	error("Could not set privacy mode");
++}
++
+ static void read_info_complete(uint8_t status, uint16_t length,
+ 					const void *param, void *user_data)
+ {
+@@ -3487,6 +3509,10 @@ static void read_info_complete(uint8_t status, uint16_t length,
+ 	if (missing_settings & MGMT_SETTING_BONDABLE)
+ 		set_mode(MGMT_OP_SET_BONDABLE, 0x01);
+ 
++	if ((adapter.supported_settings & MGMT_SETTING_LE) &&
++			(missing_settings & MGMT_SETTING_PRIVACY))
++		set_privacy();
++
+ 	load_devices_info(cb);
+ 	load_devices_cache();
+ 
 -- 
-1.9.3
+1.8.4
 
