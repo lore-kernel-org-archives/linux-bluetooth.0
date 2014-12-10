@@ -1,138 +1,96 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1418212574.32209.78.camel@jrissane-mobl.ger.corp.intel.com>
-Subject: Re: [PATCHv3 bluetooth-next 3/3] 6lowpan: nhc: add other known
- rfc6282 compressions
-From: Jukka Rissanen <jukka.rissanen@linux.intel.com>
-To: Alexander Aring <alex.aring@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org,
-	kernel@pengutronix.de, Martin Townsend <mtownsend1973@gmail.com>
-Date: Wed, 10 Dec 2014 13:56:14 +0200
-In-Reply-To: <1418202242.32209.65.camel@jrissane-mobl.ger.corp.intel.com>
-References: <1418053838-8692-1-git-send-email-alex.aring@gmail.com>
-	 <1418053838-8692-4-git-send-email-alex.aring@gmail.com>
-	 <1418124496.32209.47.camel@jrissane-mobl.ger.corp.intel.com>
-	 <20141209115250.GA32681@omega>
-	 <1418133949.32209.58.camel@jrissane-mobl.ger.corp.intel.com>
-	 <20141209184250.GB32681@omega>
-	 <1418202242.32209.65.camel@jrissane-mobl.ger.corp.intel.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+From: Gowtham Anandha Babu <gowtham.ab@samsung.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: d.kasatkin@samsung.com, bharat.panda@samsung.com, cpgs@samsung.com,
+	Gowtham Anandha Babu <gowtham.ab@samsung.com>
+Subject: [PATCH  3/3] monitor/packet: Fix possbile checkpatch errors
+Date: Wed, 10 Dec 2014 17:16:48 +0530
+Message-id: <1418212008-8594-4-git-send-email-gowtham.ab@samsung.com>
+In-reply-to: <1418212008-8594-1-git-send-email-gowtham.ab@samsung.com>
+References: <1418212008-8594-1-git-send-email-gowtham.ab@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On ke, 2014-12-10 at 11:04 +0200, Jukka Rissanen wrote:
-> Hi Alex,
-> 
-> On ti, 2014-12-09 at 19:42 +0100, Alexander Aring wrote:
-> > Hi Jukka,
-> > 
-> > On Tue, Dec 09, 2014 at 04:05:49PM +0200, Jukka Rissanen wrote:
-> > > Hi Alex,
-> > > 
-> > > On ti, 2014-12-09 at 12:52 +0100, Alexander Aring wrote:
-> > > > Hi Jukka,
-> > > > 
-> > > > On Tue, Dec 09, 2014 at 01:28:16PM +0200, Jukka Rissanen wrote:
-> > > > > Hi Alex,
-> > > > > 
-> > > > > the module unloading caused some issues in the receiving end.
-> > > > > 
-> > > > > I tried this:
-> > > > > * setup bluetooth 6lowpan connection
-> > > > > * transfer some UDP data
-> > > > > * unload the nhc_rfc6282_udp module (in one peer only, the other still
-> > > > > had udp nhc module loaded)
-> > > > > * try to send more data
-> > > > > 
-> > > > > This caused kernel crash in peer that had udp module unloaded:
-> > > > > 
-> > > > > 
-> > > > 
-> > > > mhh, okay. I don't know why this happens also the log gave me not much
-> > > > information, but thanks anyway.
-> > > > 
-> > > > Maybe this is a global issue with bluetooth 6LoWPAN error handling.
-> > > > 
-> > > > Can you simple do something like this:
-> > > > 
-> > > > diff --git a/net/6lowpan/iphc.c b/net/6lowpan/iphc.c
-> > > > index 32ffec6..2228dce 100644
-> > > > --- a/net/6lowpan/iphc.c
-> > > > +++ b/net/6lowpan/iphc.c
-> > > > @@ -425,6 +425,8 @@ lowpan_header_decompress(struct sk_buff *skb, struct net_device *dev,
-> > > >                         return -EINVAL;
-> > > >         }
-> > > >  
-> > > > +       return -EINVAL;
-> > > > +
-> > > >         /* UDP data uncompression */
-> > > >         if (iphc0 & LOWPAN_IPHC_NH_C) {
-> > > >                 struct udphdr uh;
-> > > > 
-> > > > 
-> > > > based on current bluetooth-next/master without the NHC framework.
-> > > > 
-> > > > This should be working, maybe you never hit any error while calling
-> > > > lowpan_header_decompress function. It's simple testing the error
-> > > > handling not more.
-> > > 
-> > > Hmm, I get the same crash here also without this patchset. So something
-> > > goes wrong if <0 code is returned.
-> > > 
-> > 
-> > Okay, do you already working on it?
-> 
-> Yes, I will investigate this.
+---
+ monitor/packet.c | 16 ++++++++--------
+ 1 file changed, 8 insertions(+), 8 deletions(-)
 
-Found the problem, in bt 6lowpan the skb that was freed was still used
-by network stack. I will send a patch for this soon.
-
-> 
-> > 
-> > > > 
-> > > > Do this please on one node, the other node should send some 6LoWPAN IPHC
-> > > > packets to check if the error handling working there.
-> > > > 
-> > > > 
-> > > > 
-> > > > 
-> > > > 
-> > > > Another issue is that I see that skb->dev isn't set before calling
-> > > > lowpan_header_decompress. Because inside your log is a "NULL":
-> > > > 
-> > > > (NULL net_device): received unknown nhc id which was not found.
-> > > > 
-> > > > Can you change that? That skb->dev is set to before calling
-> > > > lowpan_header_decompress.
-> > > 
-> > > I am setting the skb->dev after the call to lowpan_header_decompress().
-> > > And anyway the skb->dev is only used when printing the err.
-> > > Actually should we replace the skb->dev in lowpan_header_decompress()
-> > > with plain dev as that is given to the function as a parameter. 
-> > > 
-> > 
-> > Ok, how we introduce this now? You wanna add this do the patch series for
-> > fixing the above issue, or should I add it to my patch series for
-> > introduce nhc framework?
-> 
-> I am fine with either. If you have time, please go ahead and send a
-> patch or I can do it also after figuring what is causing the crash.
-
-After second though, can you do the change as actually what I had in
-mind was to change the
-
-      netdev_warn(skb->dev, ...)
-to
-      netdev_warn(dev, ...)
-
-and that code is part of patch 2 of your patchset.
-
-Another thing I noticed is that we need to rate limit the output as now
-it might be that the warning is printed for every udp packet which is
-way too much.
-
-
-Cheers,
-Jukka
-
+diff --git a/monitor/packet.c b/monitor/packet.c
+index 87b97ad..ebff682 100644
+--- a/monitor/packet.c
++++ b/monitor/packet.c
+@@ -1052,7 +1052,7 @@ static void print_voice_setting(uint16_t setting)
+ 		str = "Linear";
+ 		break;
+ 	case 0x01:
+-		str ="u-law";
++		str = "u-law";
+ 		break;
+ 	case 0x02:
+ 		str = "A-law";
+@@ -1096,7 +1096,7 @@ static void print_voice_setting(uint16_t setting)
+ 		str = "CVSD";
+ 		break;
+ 	case 0x01:
+-		str ="u-law";
++		str = "u-law";
+ 		break;
+ 	case 0x02:
+ 		str = "A-law";
+@@ -2184,7 +2184,7 @@ static void print_channel_map(const uint8_t *map)
+ 
+ 			if (count > 1) {
+ 				print_field("  Channel %u-%u",
+-						start, start + count - 1 );
++						start, start + count - 1);
+ 				count = 0;
+ 			} else if (count > 0) {
+ 				print_field("  Channel %u", start);
+@@ -2575,7 +2575,7 @@ static const struct {
+ 					LE_STATE_MASTER_SLAVE	},
+ 	{ 39, LE_STATE_CONN_SLAVE | LE_STATE_HIGH_DIRECT_ADV |
+ 					LE_STATE_SLAVE_SLAVE	},
+-	{ 40, LE_STATE_CONN_SLAVE| LE_STATE_LOW_DIRECT_ADV |
++	{ 40, LE_STATE_CONN_SLAVE | LE_STATE_LOW_DIRECT_ADV |
+ 					LE_STATE_SLAVE_SLAVE	},
+ 	{ 41, LE_STATE_INITIATING | LE_STATE_CONN_SLAVE |
+ 					LE_STATE_MASTER_SLAVE	},
+@@ -2643,7 +2643,7 @@ static void print_le_channel_map(const uint8_t *map)
+ 
+ 			if (count > 1) {
+ 				print_field("  Channel %u-%u",
+-						start, start + count - 1 );
++						start, start + count - 1);
+ 				count = 0;
+ 			} else if (count > 0) {
+ 				print_field("  Channel %u", start);
+@@ -3900,7 +3900,7 @@ static void create_logic_link_cmd(const void *data, uint8_t size)
+ 
+ static void accept_logic_link_cmd(const void *data, uint8_t size)
+ {
+-        const struct bt_hci_cmd_accept_logic_link *cmd = data;
++	const struct bt_hci_cmd_accept_logic_link *cmd = data;
+ 
+ 	print_phy_handle(cmd->phy_handle);
+ 	print_flow_spec("TX", cmd->tx_flow_spec);
+@@ -3924,7 +3924,7 @@ static void logic_link_cancel_cmd(const void *data, uint8_t size)
+ 
+ static void logic_link_cancel_rsp(const void *data, uint8_t size)
+ {
+-        const struct bt_hci_rsp_logic_link_cancel *rsp = data;
++	const struct bt_hci_rsp_logic_link_cancel *rsp = data;
+ 
+ 	print_status(rsp->status);
+ 	print_phy_handle(rsp->phy_handle);
+@@ -8039,7 +8039,7 @@ void packet_hci_event(struct timeval *tv, uint16_t index,
+ 	sprintf(extra_str, "(0x%2.2x) plen %d", hdr->evt, hdr->plen);
+ 
+ 	print_packet(tv, index, '>', event_color, "HCI Event",
+-                                                        event_str, extra_str);
++						event_str, extra_str);
+ 
+ 	if (!event_data || !event_data->func) {
+ 		packet_hexdump(data, size);
+-- 
+1.9.1
 
