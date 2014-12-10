@@ -1,56 +1,88 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/3] android/pts: Update gatt server results
-Date: Wed, 10 Dec 2014 13:08:37 +0100
-Message-ID: <3435670.ZCaihIrASd@leonov>
-In-Reply-To: <1418205428-6122-1-git-send-email-jakub.tyszkowski@tieto.com>
-References: <1418205428-6122-1-git-send-email-jakub.tyszkowski@tieto.com>
+Date: Wed, 10 Dec 2014 13:04:56 +0100
+From: Alexander Aring <alex.aring@gmail.com>
+To: Jukka Rissanen <jukka.rissanen@linux.intel.com>
+Cc: linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org,
+	kernel@pengutronix.de, Martin Townsend <mtownsend1973@gmail.com>
+Subject: Re: [PATCHv3 bluetooth-next 3/3] 6lowpan: nhc: add other known
+ rfc6282 compressions
+Message-ID: <20141210120453.GA24018@omega>
+References: <1418053838-8692-1-git-send-email-alex.aring@gmail.com>
+ <1418053838-8692-4-git-send-email-alex.aring@gmail.com>
+ <1418124496.32209.47.camel@jrissane-mobl.ger.corp.intel.com>
+ <20141209115250.GA32681@omega>
+ <1418133949.32209.58.camel@jrissane-mobl.ger.corp.intel.com>
+ <20141209184250.GB32681@omega>
+ <1418202242.32209.65.camel@jrissane-mobl.ger.corp.intel.com>
+ <1418212574.32209.78.camel@jrissane-mobl.ger.corp.intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=utf-8
+In-Reply-To: <1418212574.32209.78.camel@jrissane-mobl.ger.corp.intel.com>
+Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jakub,
+Hi Jukka,
 
-On Wednesday 10 of December 2014 10:57:06 Jakub Tyszkowski wrote:
-> Patches fixing this issues were already merged.
-> ---
->  android/pts-gatt.txt | 6 +++---
->  1 file changed, 3 insertions(+), 3 deletions(-)
+On Wed, Dec 10, 2014 at 01:56:14PM +0200, Jukka Rissanen wrote:
 > 
-> diff --git a/android/pts-gatt.txt b/android/pts-gatt.txt
-> index 167a6dc..43e1c8a 100644
-> --- a/android/pts-gatt.txt
-> +++ b/android/pts-gatt.txt
-> @@ -729,12 +729,12 @@ TC_GAW_CL_BI_36_C	PASS	haltest:
->  				gattc get_descriptor
->  				gattc write_descriptor 2 <long_value>
->  				gattc disconnect
-> -TC_GAW_SR_BV_01_C	FAIL	haltest:
-> +TC_GAW_SR_BV_01_C	PASS	haltest:
->  				gatts add_service
->  				gatts add_characteristic:
->  						<properties> 4 <permissions> 17
->  				gatts start_service
-> -TC_GAW_SR_BV_02_C	FAIL	haltest:
-> +TC_GAW_SR_BV_02_C	PASS	haltest:
->  				gatts add service
->  				gatts add_characteristics:
->  					<properties> 66 <permisions> 145
-> @@ -743,7 +743,7 @@ TC_GAW_SR_BV_02_C	FAIL	haltest:
->  				gatts send_response: (twice)
->  				NOTE: gatts_request_write_cb shall be called
->  								 (verify it)
-> -TC_GAW_SR_BI_01_C	FAIL	haltest:
-> +TC_GAW_SR_BI_01_C	PASS	haltest:
->  				gatts add_service
->  				gatts add_characteristic:
->  						<properties> 68
+> Found the problem, in bt 6lowpan the skb that was freed was still used
+> by network stack. I will send a patch for this soon.
+> 
 
-Applied, thanks.
+ok.
 
--- 
-BR
-Szymon Janc
+> > 
+> > > 
+> > > > > 
+> > > > > Do this please on one node, the other node should send some 6LoWPAN IPHC
+> > > > > packets to check if the error handling working there.
+> > > > > 
+> > > > > 
+> > > > > 
+> > > > > 
+> > > > > 
+> > > > > Another issue is that I see that skb->dev isn't set before calling
+> > > > > lowpan_header_decompress. Because inside your log is a "NULL":
+> > > > > 
+> > > > > (NULL net_device): received unknown nhc id which was not found.
+> > > > > 
+> > > > > Can you change that? That skb->dev is set to before calling
+> > > > > lowpan_header_decompress.
+> > > > 
+> > > > I am setting the skb->dev after the call to lowpan_header_decompress().
+> > > > And anyway the skb->dev is only used when printing the err.
+> > > > Actually should we replace the skb->dev in lowpan_header_decompress()
+> > > > with plain dev as that is given to the function as a parameter. 
+> > > > 
+> > > 
+> > > Ok, how we introduce this now? You wanna add this do the patch series for
+> > > fixing the above issue, or should I add it to my patch series for
+> > > introduce nhc framework?
+> > 
+> > I am fine with either. If you have time, please go ahead and send a
+> > patch or I can do it also after figuring what is causing the crash.
+> 
+> After second though, can you do the change as actually what I had in
+> mind was to change the
+> 
+>       netdev_warn(skb->dev, ...)
+> to
+>       netdev_warn(dev, ...)
+> 
+> and that code is part of patch 2 of your patchset.
+> 
+> Another thing I noticed is that we need to rate limit the output as now
+> it might be that the warning is printed for every udp packet which is
+> way too much.
+> 
+
+ok. Or maybe simple remove the output, or make it only visable on
+debugging. I don't really know what's the best notice for use that the
+packet was dropping because invalid/unsupported packets.
+
+I will do it to ratelimit and add patches for the netdev_warn(dev, ...)
+thing. Currently I am working a little bit on the 802154 branch again.
+
+I will start this work when you are done with the above fix.
+
+- Alex
