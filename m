@@ -2,63 +2,72 @@ Return-Path: <cyrus@holtmann.org>
 From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH v2 4/4] android/bluetooth: Enable LE privacy mode on BfA startup
-Date: Wed, 10 Dec 2014 15:47:03 +0100
-Message-Id: <1418222823-13749-5-git-send-email-lukasz.rymanowski@tieto.com>
+Subject: [PATCH v2 3/4] android/bluetooth: Load IRK on adapter start
+Date: Wed, 10 Dec 2014 15:47:02 +0100
+Message-Id: <1418222823-13749-4-git-send-email-lukasz.rymanowski@tieto.com>
 In-Reply-To: <1418222823-13749-1-git-send-email-lukasz.rymanowski@tieto.com>
 References: <1418222823-13749-1-git-send-email-lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Lets follow Android Lollipop behaviour and enable privacy on
-startup.
+If IRK is not found it will be generated
 ---
- android/bluetooth.c | 26 ++++++++++++++++++++++++++
- 1 file changed, 26 insertions(+)
+ android/bluetooth.c | 29 +++++++++++++++++++++++++++++
+ 1 file changed, 29 insertions(+)
 
 diff --git a/android/bluetooth.c b/android/bluetooth.c
-index aba2b97..298133e 100644
+index 8865eac..aba2b97 100644
 --- a/android/bluetooth.c
 +++ b/android/bluetooth.c
-@@ -3413,6 +3413,28 @@ static void clear_auto_connect_list(void)
- 	error("Could not clear auto connect list");
+@@ -294,6 +294,22 @@ static void store_adapter_config(void)
+ 	g_key_file_free(key_file);
  }
  
-+static void set_privacy_complete(uint8_t status, uint16_t length,
-+					const void *param, void *user_data)
++static void generate_irk(void)
 +{
-+	if (status != MGMT_STATUS_SUCCESS)
-+		error("Failed to set privacy mode: %s (0x%02x)",
-+						mgmt_errstr(status), status);
++	int i;
++
++	srand(time(NULL));
++
++	/* Need to generate 16 octets */
++	for (i = 0; i < 16; i += 4) {
++		int a = rand();
++
++		memcpy(&adapter.irk[i], &a, 4);
++	}
++
++	store_adapter_config();
 +}
 +
-+static void set_privacy(void)
-+{
-+	struct mgmt_cp_set_privacy cp;
-+
-+	cp.privacy = 0x01;
-+	memcpy(cp.irk, adapter.irk, sizeof(adapter.irk));
-+
-+	if (mgmt_send(mgmt_if, MGMT_OP_SET_PRIVACY, adapter.index, sizeof(cp),
-+				&cp, set_privacy_complete, NULL, NULL) > 0)
-+		return;
-+
-+	error("Could not set privacy mode");
-+}
-+
- static void read_info_complete(uint8_t status, uint16_t length,
- 					const void *param, void *user_data)
+ static void load_adapter_config(void)
  {
-@@ -3487,6 +3509,10 @@ static void read_info_complete(uint8_t status, uint16_t length,
- 	if (missing_settings & MGMT_SETTING_BONDABLE)
- 		set_mode(MGMT_OP_SET_BONDABLE, 0x01);
+ 	GError *gerr = NULL;
+@@ -306,6 +322,7 @@ static void load_adapter_config(void)
+ 	str = g_key_file_get_string(key_file, "General", "Address", NULL);
+ 	if (!str) {
+ 		g_key_file_free(key_file);
++		generate_irk();
+ 		return;
+ 	}
  
-+	if ((adapter.supported_settings & MGMT_SETTING_LE) &&
-+			(missing_settings & MGMT_SETTING_PRIVACY))
-+		set_privacy();
+@@ -321,6 +338,18 @@ static void load_adapter_config(void)
+ 		g_clear_error(&gerr);
+ 	}
+ 
++	str = g_key_file_get_string(key_file, "General", "IRK", NULL);
++	if (str) {
++		int i;
 +
- 	load_devices_info(cb);
- 	load_devices_cache();
++		for (i = 0; i < 16; i++)
++			sscanf(str + (i * 2), "%02hhX", &adapter.irk[i]);
++
++		g_free(str);
++	} else {
++		generate_irk();
++	}
++
+ 	g_key_file_free(key_file);
+ }
  
 -- 
 1.8.4
