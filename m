@@ -2,73 +2,43 @@ Return-Path: <cyrus@holtmann.org>
 From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH 3/4] android/bluetooth: Load IRK on adapter start
-Date: Wed, 10 Dec 2014 15:16:13 +0100
-Message-Id: <1418220974-12287-4-git-send-email-lukasz.rymanowski@tieto.com>
+Subject: [PATCH 2/4] android/bluetooth: Store IRK when storing adapter config
+Date: Wed, 10 Dec 2014 15:16:12 +0100
+Message-Id: <1418220974-12287-3-git-send-email-lukasz.rymanowski@tieto.com>
 In-Reply-To: <1418220974-12287-1-git-send-email-lukasz.rymanowski@tieto.com>
 References: <1418220974-12287-1-git-send-email-lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-If IRK is not found it will be generated
 ---
- android/bluetooth.c | 29 +++++++++++++++++++++++++++++
- 1 file changed, 29 insertions(+)
+ android/bluetooth.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
 diff --git a/android/bluetooth.c b/android/bluetooth.c
-index 8865eac..1d5d26d 100644
+index e9c5be1..8865eac 100644
 --- a/android/bluetooth.c
 +++ b/android/bluetooth.c
-@@ -294,6 +294,22 @@ static void store_adapter_config(void)
- 	g_key_file_free(key_file);
- }
- 
-+static void generate_irk(void)
-+{
+@@ -263,6 +263,8 @@ static void store_adapter_config(void)
+ 	gsize length = 0;
+ 	char addr[18];
+ 	char *data;
++	char key_str[33];
 +	int i;
-+
-+	srand(time(NULL));
-+
-+	/* Need to generate 16 octets */
-+	for (i = 0; i < 16; i =+ 4) {
-+		int a = rand();
-+
-+		memcpy(&adapter.irk[i], &a, 4);
-+	}
-+
-+	store_adapter_config();
-+}
-+
- static void load_adapter_config(void)
- {
- 	GError *gerr = NULL;
-@@ -306,6 +322,7 @@ static void load_adapter_config(void)
- 	str = g_key_file_get_string(key_file, "General", "Address", NULL);
- 	if (!str) {
- 		g_key_file_free(key_file);
-+		generate_irk();
- 		return;
- 	}
  
-@@ -321,6 +338,18 @@ static void load_adapter_config(void)
- 		g_clear_error(&gerr);
- 	}
+ 	key_file = g_key_file_new();
  
-+	str = g_key_file_get_string(key_file, "General", "IRK", NULL);
-+	if (str) {
-+		int i;
-+
-+		for (i = 0; i < 16; i++)
-+			sscanf(str + (i * 2), "%02hhX", &adapter.irk[i]);
-+
-+		g_free(str);
-+	} else {
-+		generate_irk();
-+	}
-+
- 	g_key_file_free(key_file);
- }
+@@ -279,6 +281,11 @@ static void store_adapter_config(void)
+ 	g_key_file_set_integer(key_file, "General", "DiscoverableTimeout",
+ 						adapter.discoverable_timeout);
  
++	for (i = 0; i < 16; i++)
++		sprintf(key_str + (i * 2), "%2.2X", adapter.irk[i]);
++
++	g_key_file_set_string(key_file, "General", "IRK", key_str);
++
+ 	data = g_key_file_to_data(key_file, &length, NULL);
+ 
+ 	g_file_set_contents(SETTINGS_FILE, data, length, NULL);
 -- 
 1.8.4
 
