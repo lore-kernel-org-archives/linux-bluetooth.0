@@ -2,66 +2,80 @@ Return-Path: <cyrus@holtmann.org>
 From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH v3 4/4] android/bluetooth: Enable LE privacy mode on BfA startup
-Date: Wed, 10 Dec 2014 20:15:48 +0100
-Message-Id: <1418238948-30800-5-git-send-email-lukasz.rymanowski@tieto.com>
+Subject: [PATCH v3 3/4] android/bluetooth: Load IRK on adapter start
+Date: Wed, 10 Dec 2014 20:15:47 +0100
+Message-Id: <1418238948-30800-4-git-send-email-lukasz.rymanowski@tieto.com>
 In-Reply-To: <1418238948-30800-1-git-send-email-lukasz.rymanowski@tieto.com>
 References: <1418238948-30800-1-git-send-email-lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Lets follow Android Lollipop behaviour and enable privacy on
-startup.
+If IRK is not found it will be generated
 ---
- android/bluetooth.c | 29 +++++++++++++++++++++++++++++
- 1 file changed, 29 insertions(+)
+ android/bluetooth.c | 30 ++++++++++++++++++++++++++++++
+ 1 file changed, 30 insertions(+)
 
 diff --git a/android/bluetooth.c b/android/bluetooth.c
-index 4c359d0..54e3d97 100644
+index 410fa9d..4c359d0 100644
 --- a/android/bluetooth.c
 +++ b/android/bluetooth.c
-@@ -3423,6 +3423,32 @@ static void clear_auto_connect_list(void)
- 	error("Could not clear auto connect list");
+@@ -39,6 +39,7 @@
+ #include "lib/sdp.h"
+ #include "lib/mgmt.h"
+ #include "lib/uuid.h"
++#include "src/shared/crypto.h"
+ #include "src/shared/util.h"
+ #include "src/shared/mgmt.h"
+ #include "src/shared/queue.h"
+@@ -303,6 +304,22 @@ static void store_adapter_config(void)
+ 	g_key_file_free(key_file);
  }
  
-+static void set_privacy_complete(uint8_t status, uint16_t length,
-+					const void *param, void *user_data)
++static void generate_irk(void)
 +{
-+	if (status != MGMT_STATUS_SUCCESS)
-+		error("Failed to set privacy mode: %s (0x%02x)",
-+						mgmt_errstr(status), status);
-+}
++	struct bt_crypto *c;
 +
-+static void set_privacy(void)
-+{
-+	struct mgmt_cp_set_privacy cp;
-+
-+	if (!local_irk_is_valid())
-+		goto failed;
-+
-+	cp.privacy = 0x01;
-+	memcpy(cp.irk, adapter.irk, sizeof(adapter.irk));
-+
-+	if (mgmt_send(mgmt_if, MGMT_OP_SET_PRIVACY, adapter.index, sizeof(cp),
-+				&cp, set_privacy_complete, NULL, NULL) > 0)
++	c = bt_crypto_new();
++	if (!c) {
++		error("Could not create bt crypto and generate IRK");
 +		return;
++	}
 +
-+failed:
-+	error("Could not set privacy mode");
++	bt_crypto_random_bytes(c, adapter.irk, 16);
++	bt_crypto_unref(c);
++
++	store_adapter_config();
 +}
 +
- static void read_info_complete(uint8_t status, uint16_t length,
- 					const void *param, void *user_data)
+ static void load_adapter_config(void)
  {
-@@ -3497,6 +3523,9 @@ static void read_info_complete(uint8_t status, uint16_t length,
- 	if (missing_settings & MGMT_SETTING_BONDABLE)
- 		set_mode(MGMT_OP_SET_BONDABLE, 0x01);
+ 	GError *gerr = NULL;
+@@ -315,6 +332,7 @@ static void load_adapter_config(void)
+ 	str = g_key_file_get_string(key_file, "General", "Address", NULL);
+ 	if (!str) {
+ 		g_key_file_free(key_file);
++		generate_irk();
+ 		return;
+ 	}
  
-+	if (missing_settings & MGMT_SETTING_PRIVACY)
-+		set_privacy();
+@@ -330,6 +348,18 @@ static void load_adapter_config(void)
+ 		g_clear_error(&gerr);
+ 	}
+ 
++	str = g_key_file_get_string(key_file, "General", "IRK", NULL);
++	if (str) {
++		int i;
 +
- 	load_devices_info(cb);
- 	load_devices_cache();
++		for (i = 0; i < 16; i++)
++			sscanf(str + (i * 2), "%02hhX", &adapter.irk[i]);
++
++		g_free(str);
++	} else {
++		generate_irk();
++	}
++
+ 	g_key_file_free(key_file);
+ }
  
 -- 
 1.8.4
