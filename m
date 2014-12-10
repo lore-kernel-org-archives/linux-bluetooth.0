@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 05/13] unit/test-mgmt: Add /mgmt/response/1 test
-Date: Wed, 10 Dec 2014 16:21:03 +0200
-Message-Id: <1418221271-7034-3-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH v2 04/13] shared/queue: Add reference counting to entries
+Date: Wed, 10 Dec 2014 16:21:02 +0200
+Message-Id: <1418221271-7034-2-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1418221271-7034-1-git-send-email-luiz.dentz@gmail.com>
 References: <1418221271-7034-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,157 +11,182 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This tests if a success response can be received.
+This makes queue_foreach much more efficient when tracking if the next
+entry was remove by the callback.
 ---
- unit/test-mgmt.c | 52 ++++++++++++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 50 insertions(+), 2 deletions(-)
+ src/shared/queue.c | 77 ++++++++++++++++++++++++++++++++++--------------------
+ 1 file changed, 48 insertions(+), 29 deletions(-)
 
-diff --git a/unit/test-mgmt.c b/unit/test-mgmt.c
-index f9dcb00..ead088c 100644
---- a/unit/test-mgmt.c
-+++ b/unit/test-mgmt.c
-@@ -46,11 +46,14 @@ struct context {
- enum action {
- 	ACTION_PASSED,
- 	ACTION_IGNORE,
-+	ACTION_RESPOND,
- };
+diff --git a/src/shared/queue.c b/src/shared/queue.c
+index 9efb665..a5155e7 100644
+--- a/src/shared/queue.c
++++ b/src/shared/queue.c
+@@ -29,6 +29,7 @@
+ #include "src/shared/queue.h"
  
- struct handler {
- 	const void *cmd_data;
- 	uint16_t cmd_size;
-+	const void *rsp_data;
-+	uint16_t rsp_size;
- 	bool match_prefix;
- 	enum action action;
+ struct queue_entry {
++	int ref_count;
+ 	void *data;
+ 	struct queue_entry *next;
  };
-@@ -67,7 +70,7 @@ static void context_quit(struct context *context)
- 	g_main_loop_quit(context->main_loop);
+@@ -83,6 +84,37 @@ void queue_destroy(struct queue *queue, queue_destroy_func_t destroy)
+ 	queue_unref(queue);
  }
  
--static void check_actions(struct context *context,
-+static void check_actions(struct context *context, int fd,
- 					const void *data, uint16_t size)
++static struct queue_entry *queue_entry_ref(struct queue_entry *entry)
++{
++	if (!entry)
++		return NULL;
++
++	__sync_fetch_and_add(&entry->ref_count, 1);
++
++	return entry;
++}
++
++static void queue_entry_unref(struct queue_entry *entry)
++{
++	if (__sync_sub_and_fetch(&entry->ref_count, 1))
++		return;
++
++	free(entry);
++}
++
++static struct queue_entry *queue_entry_new(void *data)
++{
++	struct queue_entry *entry;
++
++	entry = new0(struct queue_entry, 1);
++	if (!entry)
++		return NULL;
++
++	entry->data = data;
++
++	return queue_entry_ref(entry);
++}
++
+ bool queue_push_tail(struct queue *queue, void *data)
  {
- 	GList *list;
-@@ -75,6 +78,7 @@ static void check_actions(struct context *context,
- 	for (list = g_list_first(context->handler_list); list;
- 						list = g_list_next(list)) {
- 		struct handler *handler = list->data;
-+		int ret;
+ 	struct queue_entry *entry;
+@@ -90,13 +122,10 @@ bool queue_push_tail(struct queue *queue, void *data)
+ 	if (!queue)
+ 		return false;
  
- 		if (handler->match_prefix) {
- 			if (size < handler->cmd_size)
-@@ -91,6 +95,10 @@ static void check_actions(struct context *context,
- 		case ACTION_PASSED:
- 			context_quit(context);
- 			return;
-+		case ACTION_RESPOND:
-+			ret = write(fd, handler->rsp_data, handler->rsp_size);
-+			g_assert(ret >= 0);
-+			return;
- 		case ACTION_IGNORE:
- 			return;
+-	entry = new0(struct queue_entry, 1);
++	entry = queue_entry_new(data);
+ 	if (!entry)
+ 		return false;
+ 
+-	entry->data = data;
+-	entry->next = NULL;
+-
+ 	if (queue->tail)
+ 		queue->tail->next = entry;
+ 
+@@ -117,11 +146,10 @@ bool queue_push_head(struct queue *queue, void *data)
+ 	if (!queue)
+ 		return false;
+ 
+-	entry = new0(struct queue_entry, 1);
++	entry = queue_entry_new(data);
+ 	if (!entry)
+ 		return false;
+ 
+-	entry->data = data;
+ 	entry->next = queue->head;
+ 
+ 	queue->head = entry;
+@@ -153,11 +181,10 @@ bool queue_push_after(struct queue *queue, void *entry, void *data)
+ 	if (!qentry)
+ 		return false;
+ 
+-	new_entry = new0(struct queue_entry, 1);
++	new_entry = queue_entry_new(data);
+ 	if (!new_entry)
+ 		return false;
+ 
+-	new_entry->data = data;
+ 	new_entry->next = qentry->next;
+ 
+ 	if (!qentry->next)
+@@ -187,7 +214,7 @@ void *queue_pop_head(struct queue *queue)
+ 
+ 	data = entry->data;
+ 
+-	free(entry);
++	queue_entry_unref(entry);
+ 	queue->entries--;
+ 
+ 	return data;
+@@ -209,17 +236,6 @@ void *queue_peek_tail(struct queue *queue)
+ 	return queue->tail->data;
+ }
+ 
+-static bool queue_find_entry(struct queue *queue, const void *data)
+-{
+-	struct queue_entry *entry;
+-
+-	for (entry = queue->head; entry; entry = entry->next)
+-		if (entry == data)
+-			return true;
+-
+-	return false;
+-}
+-
+ void queue_foreach(struct queue *queue, queue_foreach_func_t function,
+ 							void *user_data)
+ {
+@@ -233,15 +249,18 @@ void queue_foreach(struct queue *queue, queue_foreach_func_t function,
+ 		return;
+ 
+ 	queue_ref(queue);
+-	while (entry && queue->ref_count > 1) {
+-		struct queue_entry *tmp = entry;
++	while (entry && queue->head && queue->ref_count > 1) {
++		struct queue_entry *next;
+ 
+-		entry = tmp->next;
++		queue_entry_ref(entry);
+ 
+-		function(tmp->data, user_data);
++		function(entry->data, user_data);
+ 
+-		if (!queue_find_entry(queue, entry))
+-			break;
++		next = entry->next;
++
++		queue_entry_unref(entry);
++
++		entry = next;
+ 	}
+ 	queue_unref(queue);
+ }
+@@ -289,7 +308,7 @@ bool queue_remove(struct queue *queue, void *data)
+ 		if (!entry->next)
+ 			queue->tail = prev;
+ 
+-		free(entry);
++		queue_entry_unref(entry);
+ 		queue->entries--;
+ 
+ 		return true;
+@@ -322,7 +341,7 @@ void *queue_remove_if(struct queue *queue, queue_match_func_t function,
+ 
+ 			data = entry->data;
+ 
+-			free(entry);
++			queue_entry_unref(entry);
+ 			queue->entries--;
+ 
+ 			return data;
+@@ -374,7 +393,7 @@ unsigned int queue_remove_all(struct queue *queue, queue_match_func_t function,
+ 			if (destroy)
+ 				destroy(tmp->data);
+ 
+-			free(tmp);
++			queue_entry_unref(tmp);
+ 			count++;
  		}
-@@ -117,7 +125,7 @@ static gboolean server_handler(GIOChannel *channel, GIOCondition cond,
- 	if (result < 0)
- 		return FALSE;
- 
--	check_actions(context, buf, result);
-+	check_actions(context, fd, buf, result);
- 
- 	return TRUE;
- }
-@@ -176,12 +184,15 @@ static void execute_context(struct context *context)
- 
- static void add_action(struct context *context,
- 				const void *cmd_data, uint16_t cmd_size,
-+				const void *rsp_data, uint16_t rsp_size,
- 				bool match_prefix, enum action action)
- {
- 	struct handler *handler = g_new0(struct handler, 1);
- 
- 	handler->cmd_data = cmd_data;
- 	handler->cmd_size = cmd_size;
-+	handler->rsp_data = rsp_data;
-+	handler->rsp_size = rsp_size;
- 	handler->match_prefix = match_prefix;
- 	handler->action = action;
- 
-@@ -195,16 +206,23 @@ struct command_test_data {
- 	const void *param;
- 	const void *cmd_data;
- 	uint16_t cmd_size;
-+	const void *rsp_data;
-+	uint16_t rsp_size;
- };
- 
- static const unsigned char read_version_command[] =
- 				{ 0x01, 0x00, 0xff, 0xff, 0x00, 0x00 };
-+static const unsigned char read_version_response[] =
-+				{ 0x01, 0x00, 0xff, 0xff, 0x06, 0x00,
-+				0x01, 0x00, 0x00, 0x01, 0x06, 0x00 };
- 
- static const struct command_test_data command_test_1 = {
- 	.opcode = MGMT_OP_READ_VERSION,
- 	.index = MGMT_INDEX_NONE,
- 	.cmd_data = read_version_command,
- 	.cmd_size = sizeof(read_version_command),
-+	.rsp_data = read_version_response,
-+	.rsp_size = sizeof(read_version_response),
- };
- 
- static const unsigned char read_info_command[] =
-@@ -223,6 +241,7 @@ static void test_command(gconstpointer data)
- 	struct context *context = create_context();
- 
- 	add_action(context, test->cmd_data, test->cmd_size,
-+						test->rsp_data, test->rsp_size,
- 						false, ACTION_PASSED);
- 
- 	mgmt_send(context->mgmt_client, test->opcode, test->index,
-@@ -232,6 +251,32 @@ static void test_command(gconstpointer data)
- 	execute_context(context);
- }
- 
-+static void success_cb(uint8_t status, uint16_t length, const void *param,
-+							void *user_data)
-+{
-+	struct context *context = user_data;
-+
-+	g_assert_cmpint(status, ==, MGMT_STATUS_SUCCESS);
-+
-+	context_quit(context);
-+}
-+
-+static void test_response(gconstpointer data)
-+{
-+	const struct command_test_data *test = data;
-+	struct context *context = create_context();
-+
-+	add_action(context, test->cmd_data, test->cmd_size,
-+						test->rsp_data, test->rsp_size,
-+						false, ACTION_RESPOND);
-+
-+	mgmt_send(context->mgmt_client, test->opcode, test->index,
-+					test->length, test->param,
-+					success_cb, context, NULL);
-+
-+	execute_context(context);
-+}
-+
- int main(int argc, char *argv[])
- {
- 	g_test_init(&argc, &argv, NULL);
-@@ -239,5 +284,8 @@ int main(int argc, char *argv[])
- 	g_test_add_data_func("/mgmt/command/1", &command_test_1, test_command);
- 	g_test_add_data_func("/mgmt/command/2", &command_test_2, test_command);
- 
-+	g_test_add_data_func("/mgmt/response/1", &command_test_1,
-+								test_response);
-+
- 	return g_test_run();
- }
+ 	}
 -- 
 1.9.3
 
