@@ -1,74 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: Mariusz Skamra <mariusz.skamra@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] android/gatt: Fix missing error response to find by type value request
-Date: Wed, 10 Dec 2014 14:46:36 +0100
-Message-ID: <50652425.n1muTnz4U1@leonov>
-In-Reply-To: <1418218279-17642-1-git-send-email-mariusz.skamra@tieto.com>
-References: <1418218279-17642-1-git-send-email-mariusz.skamra@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Date: Wed, 10 Dec 2014 13:39:28 +0000 (GMT)
+From: JAGANATH KANAKKASSERY <jaganath.k@samsung.com>
+Subject: Re: Re: [PATCH] Bluetooth: Fix missing hci_dev_lock/unlock
+To: Marcel Holtmann <marcel@holtmann.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Reply-to: jaganath.k@samsung.com
+MIME-version: 1.0
+Content-type: text/plain; charset=windows-1252
+MIME-version: 1.0
+Message-id: <485053008.62831418218767707.JavaMail.weblogic@epmlwas05a>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Mariusz,
+SGkgTWFyY2VsIGFuZCBKb2hhbiwNCg0KPj4+Pj4gCWVyciA9IGhjaV9kZXZfZG9fb3BlbihoZGV2
+KTsNCj4+Pj4+IAlpZiAoZXJyIDwgMCkgew0KPj4+Pj4gKwkJaGNpX2Rldl9sb2NrKGhkZXYpOw0K
+Pj4+Pj4gCQltZ210X3NldF9wb3dlcmVkX2ZhaWxlZChoZGV2LCBlcnIpOw0KPj4+Pj4gKwkJaGNp
+X2Rldl91bmxvY2soaGRldik7DQo+Pj4+PiAJCXJldHVybjsNCj4+Pj4+IAl9DQo+Pj4gDQo+Pj4+
+IEkgd29uZGVyIGlzIHNvbWUgb2YgdGhlIG1nbXRfIGZ1bmN0aW9uIHNob3VsZCBqdXN0IHRha2Ug
+dGhlIGhjaV9kZXYNCj4+Pj4gbG9jay4gQXJlIHRoZXJlIGNhc2VzIHdoZXJlIHdlIGRvbid0IHdh
+bnQgdGhlbSB0byB0YWtlIHRoZSBsb29rPw0KPj4+IA0KPj4+IFRoZXJlIGFyZSBtYW55IG1nbXRf
+ZnVuY3Rpb25zIGNhbGxlZCBmcm9tIGhjaV9ldmVudC5jIHdoaWNoIGRvbid0DQo+Pj4gcmVxdWly
+ZSBsb2NrLiAgWW91IHByZWZlciBtb3ZpbmcgdGhlIGxvY2sgaW5zaWRlDQo+Pj4gbWdtdF9zZXRf
+cG93ZXJlZF9mYWlsZWQoKT8NCj4+IA0KPj4gVGhpcyBzaG91bGQgYmUga2VwdCBjb25zaXN0ZW50
+IGltby4gRWl0aGVyIGFsbCBtZ210XyogZnVuY3Rpb25zIGNhbGxlZA0KPj4gZnJvbSBoY2lfY29y
+ZS9ldmVudC5jIHNob3VsZCBiZSByZXNwb25zaWJsZSBmb3IgdGFraW5nIHRoZSBsb2NrDQo+PiB0
+aGVtc2VsdmVzIG9yIG5vbmUgc2hvdWxkIGJlLiBJIHRoaW5rIHJpZ2h0IG5vdyB0aGUgZ2VuZXJh
+bCBydWxlIGlzIHRoYXQNCj4+IGhjaV9jb3JlL2V2ZW50LmMgdGFrZSB0aGUgbG9jayBmaXJzdCwg
+YW5kIHRoaXMgaXMgbWFpbmx5IGJlY2F1c2UgYSBsb3QNCj4+IG9mIGNvZGUgdGhhdCBuZWVkZWQg
+Y2FsbGluZyBpbnRvIG1nbXQuYyB3YXMgYWxyZWFkeSBob2xkaW5nIHRoZSBsb2NrLg0KPj4gSS5l
+LiBtb3ZpbmcgdGhlIHRha2luZyBpbnRvIG1nbXQuYyB3b3VsZCBmb3IgbWFueSBwbGFjZXMgaGF2
+ZSByZXF1aXJlZA0KPj4gYXdrd2FyZCBsb29raW5nIGhkZXZfdW5sb2NrKCk7IG1nbXRfZm9vKCk7
+IGhkZXZfbG9jaygpOyBjb25zdHJ1Y3Rpb25zLg0KPg0KPndlIGNvdWxkIGFsc28gcmVuYW1lIHNv
+bWUgdG8gX19tZ210X2ZvbyB3aGljaCBtZWFucyB0aGV5IGFyZSBub3QgdGFraW5nDQo+dGhlIGxv
+Y2sgYW5kIG90aGVycyB0byBtZ210X2JhciB3aGljaCB0YWtlIHRoZSBsb2NrIGJ5IHRoZW1zZWx2
+ZXMuIEFuZCB0aGVuDQo+c2VlIGlmIHRoZXkgYWN0dWFsbHkgaGF2ZSB2YXJpYXRpb25zIHdoZXJl
+IHdlIHdvdWxkIG5lZWQgYm90aC4NCg0KSSBoYXZlIHJhaXNlZCB0aGUgc3BsaXQgcGF0Y2ggc2V0
+cyBhbmQgZml4ZWQgY29kaW5nIHZpb2xhdGlvbiBhcyB3ZWxsLiBSZW5hbWluZyBvZg0KbWdtdC4g
+ZnVuY3Rpb25zIGNhbiBiZSBkb25lIG9uIHRvcCBvZiB0aGlzIGlmIHJlcXVpcmVkLg0KDQoNClRo
+YW5rcywNCkphZ2FuYXRo
 
-On Wednesday 10 of December 2014 14:31:19 Mariusz Skamra wrote:
-> This patch fixes Find By Type Value Request issue.
-> When the attribute queue is empty, error response should be sent.
-> ---
->  android/gatt.c | 12 +++++++++++-
->  1 file changed, 11 insertions(+), 1 deletion(-)
-> 
-> diff --git a/android/gatt.c b/android/gatt.c
-> index b2ce9c1..484775a 100644
-> --- a/android/gatt.c
-> +++ b/android/gatt.c
-> @@ -4546,7 +4546,6 @@ static void send_dev_complete_response(struct
-> gatt_device *device, if ((val->length != val->filter_vlen) ||
->  				memcmp(val->value, val->filter_value,
->  								val->length)) {
-> -
 
-Coding style fixes should be in separate patch.
-
->  				destroy_pending_request(val);
->  				val = queue_pop_head(device->pending_requests);
->  				continue;
-> @@ -6172,6 +6171,9 @@ static uint8_t find_by_type_request(const uint8_t
-> *cmd, uint16_t cmd_len, struct queue *q;
->  	bt_uuid_t uuid;
->  	uint16_t len;
-> +	size_t mtu;
-> +	uint8_t *rsp = g_attrib_get_buffer(device->attrib, &mtu);
-> +
-> 
-
-Double empty line.
-
->  	DBG("");
-> 
-> @@ -6189,6 +6191,14 @@ static uint8_t find_by_type_request(const uint8_t
-> *cmd, uint16_t cmd_len,
-> 
->  	gatt_db_find_by_type(gatt_db, start, end, &uuid, q);
-> 
-> +	if (queue_isempty(q)) {
-
-You could also move mtu and rsp declarations here.
-
-> +		len = enc_error_resp(ATT_OP_FIND_BY_TYPE_REQ, start,
-> +					ATT_ECODE_ATTR_NOT_FOUND, rsp, mtu);
-> +		g_attrib_send(device->attrib, 0, rsp, len, NULL, NULL, NULL);
-> +		queue_destroy(q, NULL);
-> +		return 0;
-> +	}
-> +
->  	while (queue_peek_head(q)) {
->  		struct gatt_db_attribute *attrib = queue_pop_head(q);
->  		struct pending_request *data;
-
--- 
-BR
-Szymon Janc
