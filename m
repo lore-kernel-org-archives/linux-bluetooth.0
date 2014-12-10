@@ -1,41 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv2 2/2] android/build: Add libcutils to LOCAL_SHARED_LIBRARIES for haltest
-Date: Wed, 10 Dec 2014 10:58:10 +0200
-Message-Id: <1418201890-8255-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1418201890-8255-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1418201890-8255-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv2 1/2] android/build: Fix including wrong log include header for bluetoothd
+Date: Wed, 10 Dec 2014 10:58:09 +0200
+Message-Id: <1418201890-8255-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Fixes build error for Nexus 9.
+Fixes build for Nexus 9.
 ...
 aarch64-linux-android/bin/ld:
-out/target/product/flounder/obj/EXECUTABLES/haltest_intermediates/bluez/android/hal-utils.o:
-undefined reference to symbol 'property_get'
+out/target/product/flounder/obj/EXECUTABLES/bluetoothd-main_intermediates/bluez/android/a2dp-sink.o:
+undefined reference to symbol '__android_log_print'
 ...
 ---
- android/Android.mk | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ android/a2dp-sink.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/android/Android.mk b/android/Android.mk
-index 2b90cee..c1505c8 100644
---- a/android/Android.mk
-+++ b/android/Android.mk
-@@ -203,7 +203,9 @@ LOCAL_C_INCLUDES += \
+diff --git a/android/a2dp-sink.c b/android/a2dp-sink.c
+index 07508c0..7c1e1a0 100644
+--- a/android/a2dp-sink.c
++++ b/android/a2dp-sink.c
+@@ -29,7 +29,7 @@
+ #include <glib.h>
  
- LOCAL_CFLAGS := $(BLUEZ_COMMON_CFLAGS) -Wno-declaration-after-statement
- 
--LOCAL_SHARED_LIBRARIES := libhardware
-+LOCAL_SHARED_LIBRARIES := \
-+	libhardware \
-+	libcutils \
- 
- LOCAL_MODULE_PATH := $(TARGET_OUT_OPTIONAL_EXECUTABLES)
- LOCAL_MODULE_TAGS := debug
+ #include "lib/bluetooth.h"
+-#include "hal-log.h"
++#include "src/log.h"
+ #include "hal-msg.h"
+ #include "ipc.h"
+ #include "a2dp-sink.h"
 -- 
 2.1.0
 
