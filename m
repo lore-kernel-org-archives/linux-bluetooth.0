@@ -1,94 +1,119 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <CABBYNZ+iZ=73ML=AnLOeWBRL2yRpymE_wKM2GODV=986JU_tgA@mail.gmail.com>
-References: <1418137907-16981-1-git-send-email-lukasz.rymanowski@tieto.com>
-	<CABBYNZL=N5qKL1QUy7-P_+om-3+g+Bh9jxMg2g-FzQsK5C+-hA@mail.gmail.com>
-	<CAMudyAsSvmfFePh9jYvf0Y4cQ-HJywmJ9dXoTrw=MP6y-f=PNA@mail.gmail.com>
-	<CABBYNZLK9dPbLAsMM7AHmU4NxLPU2pjVWr8v+Wh_WOCAX2WZFg@mail.gmail.com>
-	<CAMudyAtRonR+z_Y4om-KQeXtqKt6bTJzs7a+VDW_PBkjXXd2VA@mail.gmail.com>
-	<CABBYNZ+iZ=73ML=AnLOeWBRL2yRpymE_wKM2GODV=986JU_tgA@mail.gmail.com>
-Date: Wed, 10 Dec 2014 10:20:23 +0100
-Message-ID: <CAMudyAtbm+r2n3CktFwkfh=W5_SQoSNEVKR8CKVP61GnBHQBHA@mail.gmail.com>
-Subject: Re: [PATCH 00/25] android/gatt: Fix HOG connect/disconnect
-From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-bluetooth-owner@vger.kernel.org
+Message-ID: <1418202242.32209.65.camel@jrissane-mobl.ger.corp.intel.com>
+Subject: Re: [PATCHv3 bluetooth-next 3/3] 6lowpan: nhc: add other known
+ rfc6282 compressions
+From: Jukka Rissanen <jukka.rissanen@linux.intel.com>
+To: Alexander Aring <alex.aring@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org,
+	kernel@pengutronix.de, Martin Townsend <mtownsend1973@gmail.com>
+Date: Wed, 10 Dec 2014 11:04:02 +0200
+In-Reply-To: <20141209184250.GB32681@omega>
+References: <1418053838-8692-1-git-send-email-alex.aring@gmail.com>
+	 <1418053838-8692-4-git-send-email-alex.aring@gmail.com>
+	 <1418124496.32209.47.camel@jrissane-mobl.ger.corp.intel.com>
+	 <20141209115250.GA32681@omega>
+	 <1418133949.32209.58.camel@jrissane-mobl.ger.corp.intel.com>
+	 <20141209184250.GB32681@omega>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+Hi Alex,
 
-On 10 December 2014 at 09:56, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> Hi Lukasz,
->
-> On Wed, Dec 10, 2014 at 10:53 AM, Lukasz Rymanowski
-> <lukasz.rymanowski@tieto.com> wrote:
->> Hi Luiz,
->>
->> On 10 December 2014 at 09:46, Luiz Augusto von Dentz
->> <luiz.dentz@gmail.com> wrote:
->>> Hi Lukasz,
->>>
->>> On Wed, Dec 10, 2014 at 10:38 AM, Lukasz Rymanowski
->>> <lukasz.rymanowski@tieto.com> wrote:
->>>> Hi Luiz,
->>>>
->>>> On 10 December 2014 at 08:23, Luiz Augusto von Dentz
->>>> <luiz.dentz@gmail.com> wrote:
->>>>> Hi Lukasz,
->>>>>
->>>>> On Tue, Dec 9, 2014 at 5:11 PM, Lukasz Rymanowski
->>>>> <lukasz.rymanowski@tieto.com> wrote:
->>>>>> When testing HOG against PTS we got failing testes if devices were
->>>>>> not bonded before the test.
->>>>>> With those patches this issue is not valid anymore.
->>>>>>
->>>>>> This set address couple of issues:
->>>>>> * Some minor fixes found during work on those patches (first 4 patches)
->>>>>>
->>>>>> * Changed GATT behaviour during dedicated bonding. Now GATT will not start
->>>>>> search services until bonding is done. That fixes PTS connection issue
->>>>>> (patches 5-8)
->>>>>>
->>>>>> * Tracking of GATT operations in hog/dis/bas/scpp. After I solved PTS
->>>>>> connection issue I could very easily observe many of crashes in BfA when
->>>>>> disconnecting HOG during service search session. This is because HOG
->>>>>> talks directly to gattrib and clear his attrib instance on HOG disconnect
->>>>>> even there are ongoing GATT operations. Patches 9 - 25 solve this issue.
->>>>>
->>>>> I remember applying a patch from Arman that should have fixed the
->>>>> problem above: shared/att: cancel_all before calling disconnect cb. In
->>>>> any if that doesn't really solve the problem the client should cancel
->>>>> their pending operations before releasing its reference which means no
->>>>> callback should be called after that.
->>>>
->>>> This is problem above bt_att, but It might be worth to consider such
->>>> scenario in shared/gatt.
->>>> Anyway, In Android  attrib is used by HOG and also GATT with all the
->>>> applications above. GATT controls registered clients so if one client
->>>> unregister we should not see the problem. But if HOG and GATT  have
->>>> ongoing gatt operations and in this point of time  we disconnect HOG,
->>>> we should not break ongoing  gatt operations for GATT (Android apps).
->>>> Note that link LE link can be still up because of some other GATT
->>>> application so no disconnect_cb will be called by shared/add. Thats
->>>> why attrib client should take care for its operations
->>>
->>> Yep, but that why I said you should probably cancel any operations,
->>> which seems you did, but then why you keep checking for disconnected
->>> in the callbacks? There looks like there another bug going on.
->>
->> Canceling operation might not succeed, in that case callback will be
->> called anyway but unfortunately e.g. hog->attrib will be not valid
->> anymore and that's we need that additional check.
->
-> Not succeed? bt_att_cancel should always succeed except if we cannot
-> find the id.
+On ti, 2014-12-09 at 19:42 +0100, Alexander Aring wrote:
+> Hi Jukka,
+> 
+> On Tue, Dec 09, 2014 at 04:05:49PM +0200, Jukka Rissanen wrote:
+> > Hi Alex,
+> > 
+> > On ti, 2014-12-09 at 12:52 +0100, Alexander Aring wrote:
+> > > Hi Jukka,
+> > > 
+> > > On Tue, Dec 09, 2014 at 01:28:16PM +0200, Jukka Rissanen wrote:
+> > > > Hi Alex,
+> > > > 
+> > > > the module unloading caused some issues in the receiving end.
+> > > > 
+> > > > I tried this:
+> > > > * setup bluetooth 6lowpan connection
+> > > > * transfer some UDP data
+> > > > * unload the nhc_rfc6282_udp module (in one peer only, the other still
+> > > > had udp nhc module loaded)
+> > > > * try to send more data
+> > > > 
+> > > > This caused kernel crash in peer that had udp module unloaded:
+> > > > 
+> > > > 
+> > > 
+> > > mhh, okay. I don't know why this happens also the log gave me not much
+> > > information, but thanks anyway.
+> > > 
+> > > Maybe this is a global issue with bluetooth 6LoWPAN error handling.
+> > > 
+> > > Can you simple do something like this:
+> > > 
+> > > diff --git a/net/6lowpan/iphc.c b/net/6lowpan/iphc.c
+> > > index 32ffec6..2228dce 100644
+> > > --- a/net/6lowpan/iphc.c
+> > > +++ b/net/6lowpan/iphc.c
+> > > @@ -425,6 +425,8 @@ lowpan_header_decompress(struct sk_buff *skb, struct net_device *dev,
+> > >                         return -EINVAL;
+> > >         }
+> > >  
+> > > +       return -EINVAL;
+> > > +
+> > >         /* UDP data uncompression */
+> > >         if (iphc0 & LOWPAN_IPHC_NH_C) {
+> > >                 struct udphdr uh;
+> > > 
+> > > 
+> > > based on current bluetooth-next/master without the NHC framework.
+> > > 
+> > > This should be working, maybe you never hit any error while calling
+> > > lowpan_header_decompress function. It's simple testing the error
+> > > handling not more.
+> > 
+> > Hmm, I get the same crash here also without this patchset. So something
+> > goes wrong if <0 code is returned.
+> > 
+> 
+> Okay, do you already working on it?
 
-Just checked bt_att code and indeed, after calling cancel we should be
-sure that callback will not be called.
-However, I've seen something else during testing. That might be other
-bug then. Will look into it probably tomorrow.
+Yes, I will investigate this.
 
-\Lukasz
+> 
+> > > 
+> > > Do this please on one node, the other node should send some 6LoWPAN IPHC
+> > > packets to check if the error handling working there.
+> > > 
+> > > 
+> > > 
+> > > 
+> > > 
+> > > Another issue is that I see that skb->dev isn't set before calling
+> > > lowpan_header_decompress. Because inside your log is a "NULL":
+> > > 
+> > > (NULL net_device): received unknown nhc id which was not found.
+> > > 
+> > > Can you change that? That skb->dev is set to before calling
+> > > lowpan_header_decompress.
+> > 
+> > I am setting the skb->dev after the call to lowpan_header_decompress().
+> > And anyway the skb->dev is only used when printing the err.
+> > Actually should we replace the skb->dev in lowpan_header_decompress()
+> > with plain dev as that is given to the function as a parameter. 
+> > 
+> 
+> Ok, how we introduce this now? You wanna add this do the patch series for
+> fixing the above issue, or should I add it to my patch series for
+> introduce nhc framework?
+
+I am fine with either. If you have time, please go ahead and send a
+patch or I can do it also after figuring what is causing the crash.
+
+
+Cheers,
+Jukka
+
+
