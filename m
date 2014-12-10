@@ -1,35 +1,68 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-Date: Wed, 10 Dec 2014 13:00:06 -0800
-Message-ID: <CAHrH25SS2x2fRc+av+dzQ=KvHiueHBFGAVKLrPC2+_baj5QFDQ@mail.gmail.com>
-Subject: D-Bus API for GATT Connect/Disconnect
-From: Arman Uguray <armansito@chromium.org>
-To: BlueZ development <linux-bluetooth@vger.kernel.org>
-Cc: Jonathan Dixon <joth@google.com>
-Content-Type: text/plain; charset=UTF-8
+From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+Subject: [PATCH v3 4/4] android/bluetooth: Enable LE privacy mode on BfA startup
+Date: Wed, 10 Dec 2014 20:15:48 +0100
+Message-Id: <1418238948-30800-5-git-send-email-lukasz.rymanowski@tieto.com>
+In-Reply-To: <1418238948-30800-1-git-send-email-lukasz.rymanowski@tieto.com>
+References: <1418238948-30800-1-git-send-email-lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi all,
+Lets follow Android Lollipop behaviour and enable privacy on
+startup.
+---
+ android/bluetooth.c | 29 +++++++++++++++++++++++++++++
+ 1 file changed, 29 insertions(+)
 
-For GATT, applications using bluetoothd currently need to use
-Device1.Connect and Device1.Disconnect when they want to initiate a
-connection to a peripheral, though these functions are really
-primarily meant for UI usage. BlueZ already has a D-Bus API for BR/EDR
-profiles such as ConnectProfile/DisconnectProfile and the
-ProfileManager API which is more geared towards applications and I
-think we'll need something for GATT as well. The basic features that
-I'm thinking of are:
+diff --git a/android/bluetooth.c b/android/bluetooth.c
+index 4c359d0..54e3d97 100644
+--- a/android/bluetooth.c
++++ b/android/bluetooth.c
+@@ -3423,6 +3423,32 @@ static void clear_auto_connect_list(void)
+ 	error("Could not clear auto connect list");
+ }
+ 
++static void set_privacy_complete(uint8_t status, uint16_t length,
++					const void *param, void *user_data)
++{
++	if (status != MGMT_STATUS_SUCCESS)
++		error("Failed to set privacy mode: %s (0x%02x)",
++						mgmt_errstr(status), status);
++}
++
++static void set_privacy(void)
++{
++	struct mgmt_cp_set_privacy cp;
++
++	if (!local_irk_is_valid())
++		goto failed;
++
++	cp.privacy = 0x01;
++	memcpy(cp.irk, adapter.irk, sizeof(adapter.irk));
++
++	if (mgmt_send(mgmt_if, MGMT_OP_SET_PRIVACY, adapter.index, sizeof(cp),
++				&cp, set_privacy_complete, NULL, NULL) > 0)
++		return;
++
++failed:
++	error("Could not set privacy mode");
++}
++
+ static void read_info_complete(uint8_t status, uint16_t length,
+ 					const void *param, void *user_data)
+ {
+@@ -3497,6 +3523,9 @@ static void read_info_complete(uint8_t status, uint16_t length,
+ 	if (missing_settings & MGMT_SETTING_BONDABLE)
+ 		set_mode(MGMT_OP_SET_BONDABLE, 0x01);
+ 
++	if (missing_settings & MGMT_SETTING_PRIVACY)
++		set_privacy();
++
+ 	load_devices_info(cb);
+ 	load_devices_cache();
+ 
+-- 
+1.8.4
 
-   1. Sessions per D-Bus connection that provide a reference count for
-the ACL connection.
-   2. Correctly handling the reference count if the connection was
-initiated via Device1.Connect or via auto-connect.
-   3. This would be GATT only at first but it could perhaps expand to
-connection-oriented channels eventually?
-
-I don't really have an RFC API proposal at this point but I wanted to
-get this discussion going. What would make most sense here?
-
-Thanks,
-Arman
