@@ -1,36 +1,99 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/2] android/build: Add liblog to LOCAL_SHARED_LIBRARIES for bluetoothd
-Date: Wed, 10 Dec 2014 10:39:42 +0200
-Message-Id: <1418200783-13414-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+From: Gowtham Anandha Babu <gowtham.ab@samsung.com>
+To: 'Luiz Augusto von Dentz' <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	'Dmitry Kasatkin' <d.kasatkin@samsung.com>,
+	'Bharat Panda' <bharat.panda@samsung.com>, cpgs@samsung.com
+References: <1418129488-12353-1-git-send-email-gowtham.ab@samsung.com>
+ <1418129488-12353-2-git-send-email-gowtham.ab@samsung.com>
+ <CABBYNZLox+KR_PeB8LiW5WDvSCNwU6XG1vPFQqwM4pXQFtRe2Q@mail.gmail.com>
+In-reply-to: <CABBYNZLox+KR_PeB8LiW5WDvSCNwU6XG1vPFQqwM4pXQFtRe2Q@mail.gmail.com>
+Subject: RE: [PATCH ] android/socket: Add MAP supported features bits
+Date: Wed, 10 Dec 2014 14:06:07 +0530
+Message-id: <000a01d01454$5d1092c0$1731b840$@samsung.com>
+MIME-version: 1.0
+Content-type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Hi Luiz,
 
-Fixes build for Nexus 9.
-...
-aarch64-linux-android/bin/ld:
-out/target/product/flounder/obj/EXECUTABLES/bluetoothd-main_intermediates/bluez/android/a2dp-sink.o:
-undefined reference to symbol '__android_log_print'
-...
----
- android/Android.mk | 1 +
- 1 file changed, 1 insertion(+)
+> -----Original Message-----
+> From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-
+> owner@vger.kernel.org] On Behalf Of Luiz Augusto von Dentz
+> Sent: Wednesday, December 10, 2014 12:58 PM
+> To: Gowtham Anandha Babu
+> Cc: linux-bluetooth@vger.kernel.org; Dmitry Kasatkin; Bharat Panda;
+> cpgs@samsung.com
+> Subject: Re: [PATCH ] android/socket: Add MAP supported features bits
+> 
+> Hi Gowtham,
+> 
+> On Tue, Dec 9, 2014 at 2:51 PM, Gowtham Anandha Babu
+> <gowtham.ab@samsung.com> wrote:
+> > Add MAP supported features in sdp record.
+> > ---
+> >  android/socket.c | 5 +++++
+> >  1 file changed, 5 insertions(+)
+> >
+> > diff --git a/android/socket.c b/android/socket.c index
+> > f2cfd07..d89c8c2 100644
+> > --- a/android/socket.c
+> > +++ b/android/socket.c
+> > @@ -58,6 +58,7 @@
+> >  /* Hardcoded MAP stuff needed for MAS SMS Instance.*/
+> >  #define DEFAULT_MAS_INSTANCE   0x00
+> >
+> > +#define DEFAULT_MAP_SUPPORTED_FEATURES 0x0000001f
+> >  #define DEFAULT_PBAP_SUPPORTED_FEATURES 0x00000003
+> >
+> >  #define MAP_MSG_TYPE_SMS_GSM   0x02
+> > @@ -321,6 +322,7 @@ static sdp_record_t *create_mas_record(uint8_t
+> chan, const char *svc_name)
+> >         sdp_profile_desc_t profile[1];
+> >         uint8_t minst = DEFAULT_MAS_INSTANCE;
+> >         uint8_t mtype = DEFAULT_MAS_MSG_TYPE;
+> > +       uint8_t supft = DEFAULT_MAP_SUPPORTED_FEATURES;
+> >         sdp_record_t *record;
+> >         uuid_t uuid;
+> >
+> > @@ -339,6 +341,9 @@ static sdp_record_t *create_mas_record(uint8_t
+> chan, const char *svc_name)
+> >         sdp_attr_add_new(record, SDP_ATTR_SUPPORTED_MESSAGE_TYPES,
+> SDP_UINT8,
+> >
+> > &mtype);
+> >
+> > +       sdp_attr_add_new(record, SDP_ATTR_MAP_SUPPORTED_FEATURES,
+> SDP_UINT32,
+> > +
+> > + &supft);
+> > +
+> >         sdp_list_free(seq, NULL);
+> >
+> >         return record;
+> > --
+> > 1.9.1
+> 
+> I recall supported features being introduced in 1.2, in that case it is probably
+> not required to add it to the record since Android only support 1.1.
+> 
 
-diff --git a/android/Android.mk b/android/Android.mk
-index 2b90cee..6547eb0 100644
---- a/android/Android.mk
-+++ b/android/Android.mk
-@@ -98,6 +98,7 @@ LOCAL_CFLAGS := $(BLUEZ_COMMON_CFLAGS)
- 
- LOCAL_SHARED_LIBRARIES := \
- 	libglib \
-+	liblog \
- 
- LOCAL_STATIC_LIBRARIES := \
- 	bluetooth-headers \
--- 
-2.1.0
+Yes, this one is 1.2 feature. Then, I have to wait till 1.2 implementation.
+Btw, Right now in android,
+Server (PBAP-PSE and MAP-MAS) records are added to SDP.
+What happened to client(PBAP-PCE and MAP-MNS) records?
+Will it be added only after implementing them?
+
+> 
+> --
+> Luiz Augusto von Dentz
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org More majordomo
+> info at  http://vger.kernel.org/majordomo-info.html
+
+
+Regards,
+Gowtham Anandha Babu
 
