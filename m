@@ -1,61 +1,49 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 02/13] unit/test-queue: Add /queue/foreach_remove test
-Date: Wed, 10 Dec 2014 16:16:59 +0200
-Message-Id: <1418221031-4379-3-git-send-email-luiz.dentz@gmail.com>
-In-Reply-To: <1418221031-4379-1-git-send-email-luiz.dentz@gmail.com>
-References: <1418221031-4379-1-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH v2 00/13] Simplify notification handling
+Date: Wed, 10 Dec 2014 16:16:57 +0200
+Message-Id: <1418221031-4379-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This tests queue_remove from queue_foreach callback.
----
- unit/test-queue.c | 22 ++++++++++++++++++++++
- 1 file changed, 22 insertions(+)
+This attempts to simplify notification handling by making queue_foreach
+safe from entry removals during callback. In addition to that a couples
+there are a couple of new unit test to emulate removal during event
+callback and because of that Ive also included the coverage support again
+since I used it to check what part of the code is being exercised.
 
-diff --git a/unit/test-queue.c b/unit/test-queue.c
-index f72f2e6..6261612 100644
---- a/unit/test-queue.c
-+++ b/unit/test-queue.c
-@@ -78,6 +78,27 @@ static void test_foreach_destroy(void)
- 	queue_foreach(queue, foreach_destroy, queue);
- }
- 
-+static void foreach_remove(void *data, void *user_data)
-+{
-+	struct queue *queue = user_data;
-+
-+	g_assert(queue_remove(queue, data));
-+}
-+
-+static void test_foreach_remove(void)
-+{
-+	struct queue *queue;
-+
-+	queue = queue_new();
-+	g_assert(queue != NULL);
-+
-+	queue_push_tail(queue, UINT_TO_PTR(1));
-+	queue_push_tail(queue, UINT_TO_PTR(2));
-+
-+	queue_foreach(queue, foreach_remove, queue);
-+	queue_destroy(queue, NULL);
-+}
-+
- static void foreach_remove_all(void *data, void *user_data)
- {
- 	struct queue *queue = user_data;
-@@ -177,6 +198,7 @@ int main(int argc, char *argv[])
- 
- 	g_test_add_func("/queue/basic", test_basic);
- 	g_test_add_func("/queue/foreach_destroy", test_foreach_destroy);
-+	g_test_add_func("/queue/foreach_remove", test_foreach_remove);
- 	g_test_add_func("/queue/foreach_remove_all", test_foreach_remove_all);
- 	g_test_add_func("/queue/destroy_remove", test_destroy_remove);
- 	g_test_add_func("/queue/push_after", test_push_after);
+v2: Make coverage target depend on lcov to be present and update test
+coverage.
+
+Luiz Augusto von Dentz (13):
+  build: Add coverage support
+  unit/test-queue: Add /queue/foreach_remove test
+  unit/test-queue: Add /queue/foreach_remove_backward test
+  shared/queue: Add reference counting to entries
+  unit/test-mgmt: Add /mgmt/response/1 test
+  unit/test-mgmt: Add /mgmt/response/2 test
+  unit/test-mgmt: Add /mgmt/event/1 test
+  unit/test-mgmt: Add /mgmt/event/2 test
+  unit/test-mgmt: Add /mgmt/unregister/1 test
+  unit/test-mgmt: Add /mgmt/unregister/2 test
+  unit/test-mgmt: Add /mgmt/destroy/1 test
+  shared/mgmt: Remove unnecessary code
+  doc: Update mgmt-tester test coverage
+
+ .gitignore            |   4 +
+ Makefile.am           |  20 +++++
+ acinclude.m4          |   4 +
+ configure.ac          |   5 ++
+ doc/test-coverage.txt |   4 +-
+ src/shared/mgmt.c     |  89 +++-----------------
+ src/shared/queue.c    |  77 +++++++++++-------
+ unit/test-mgmt.c      | 220 +++++++++++++++++++++++++++++++++++++++++++++++++-
+ unit/test-queue.c     |  46 +++++++++++
+ 9 files changed, 356 insertions(+), 113 deletions(-)
+
 -- 
 1.9.3
 
