@@ -1,51 +1,46 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/5] android/tester: Add missing AVRCP cb_table entries
-Date: Wed, 10 Dec 2014 13:43:57 +0100
-Message-ID: <1658533.bR5FcK4maG@leonov>
-In-Reply-To: <1418034908-1742-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
-References: <1418034908-1742-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 8.1 \(1993\))
+Subject: Re: [PATCH] Bluetooth: Fix missing hci_dev_lock/unlock
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20141210123752.GA30555@t440s.lan>
+Date: Wed, 10 Dec 2014 13:41:38 +0100
+Cc: JAGANATH KANAKKASSERY <jaganath.k@samsung.com>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Message-Id: <77B96975-22E2-403D-BE3B-A3D12D3E77E4@holtmann.org>
+References: <935145568.61511418213470087.JavaMail.weblogic@epmlwas05a> <20141210123752.GA30555@t440s.lan>
+To: Johan Hedberg <johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Grzegorz,
+Hi Johan,
 
-On Monday 08 of December 2014 11:35:04 Grzegorz Kolodziejczyk wrote:
-> cb_table should be filled simultaneously with expected bt_callbacks
-> enum. Without this, debug logs can cause errors.
-> ---
->  android/tester-main.c | 8 ++++++++
->  1 file changed, 8 insertions(+)
+>>>> 	err = hci_dev_do_open(hdev);
+>>>> 	if (err < 0) {
+>>>> +		hci_dev_lock(hdev);
+>>>> 		mgmt_set_powered_failed(hdev, err);
+>>>> +		hci_dev_unlock(hdev);
+>>>> 		return;
+>>>> 	}
+>> 
+>>> I wonder is some of the mgmt_ function should just take the hci_dev
+>>> lock. Are there cases where we don't want them to take the look?
+>> 
+>> There are many mgmt_functions called from hci_event.c which don't
+>> require lock.  You prefer moving the lock inside
+>> mgmt_set_powered_failed()?
 > 
-> diff --git a/android/tester-main.c b/android/tester-main.c
-> index 33ef3ce..8f3bc3c 100644
-> --- a/android/tester-main.c
-> +++ b/android/tester-main.c
-> @@ -68,6 +68,14 @@ static struct {
->  	DBG_CB(CB_A2DP_CONN_STATE),
->  	DBG_CB(CB_A2DP_AUDIO_STATE),
-> 
-> +	/* AVRCP */
-> +	DBG_CB(CB_AVRCP_PLAY_STATUS_REQ),
-> +	DBG_CB(CB_AVRCP_PLAY_STATUS_RSP),
-> +	DBG_CB(CB_AVRCP_REG_NOTIF_REQ),
-> +	DBG_CB(CB_AVRCP_REG_NOTIF_RSP),
-> +	DBG_CB(CB_AVRCP_GET_ATTR_REQ),
-> +	DBG_CB(CB_AVRCP_GET_ATTR_RSP),
-> +
->  	/* Gatt client */
->  	DBG_CB(CB_GATTC_REGISTER_CLIENT),
->  	DBG_CB(CB_GATTC_SCAN_RESULT),
+> This should be kept consistent imo. Either all mgmt_* functions called
+> from hci_core/event.c should be responsible for taking the lock
+> themselves or none should be. I think right now the general rule is that
+> hci_core/event.c take the lock first, and this is mainly because a lot
+> of code that needed calling into mgmt.c was already holding the lock.
+> I.e. moving the taking into mgmt.c would for many places have required
+> awkward looking hdev_unlock(); mgmt_foo(); hdev_lock(); constructions.
 
-Patches 1-3 are now applied, thanks.
+we could also rename some to __mgmt_foo which means they are not taking the lock and others to mgmt_bar which take the lock by themselves. And then see if they actually have variations where we would need both.
 
-Please remember that commit message should start from capital letter. I've 
-fixed this for those patches.
+Regards
 
--- 
-BR
-Szymon Janc
+Marcel
+
