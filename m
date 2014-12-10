@@ -1,51 +1,100 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 8.1 \(1993\))
-Subject: Re: [RFC v2 4/4] Bluetooth: Add support Intel Bluetooth bootloader device
+Subject: Re: [RFC v2 3/4] Bluetooth: Set file extension to SFI file for bootloader mode
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <D0ACDE57.44B1%tedd.an@intel.com>
-Date: Wed, 10 Dec 2014 12:31:56 +0100
+In-Reply-To: <D0ACC2F7.4394%tedd.an@intel.com>
+Date: Wed, 10 Dec 2014 12:25:39 +0100
 Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
 	Johan Hedberg <johan.hedberg@gmail.com>
-Message-Id: <B196DBB9-21EF-41B9-8079-968BED72C356@holtmann.org>
-References: <20141208152500.6fef57ae@tedd-test> <91440EF0-0729-4962-AFC6-56E322B48183@holtmann.org> <D0ACDE57.44B1%tedd.an@intel.com>
+Message-Id: <8AF5F60E-D558-4D41-A758-0ADD4685BD12@holtmann.org>
+References: <20141208152454.2985e44d@tedd-test> <0013894E-DDEA-4A97-8047-E2D4BC7AEDE1@holtmann.org> <D0ACC2F7.4394%tedd.an@intel.com>
 To: "An, Tedd" <tedd.an@intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Tedd,
 
->>> +/*
->>> + * Send Intel Reset command to the device to enable the operational
->>> firmware.
->>> + * Because the device will not send CC event for Intel Reset command,
->>> + * the command is sent with btusb_send_frame() instead of
->>> __hci_cmd_sync() so
->>> + * the host won't wait for event.
->>> + */
+>>> This patch sets extension for firmware file to SFI if the device mode
+>>> is bootloader.
+>>> 
+>>> Signed-off-by: Tedd Ho-Jeong An <tedd.an@intel.com>
+>>> ---
+>>> drivers/bluetooth/btusb.c | 12 ++++++++++++
+>>> 1 file changed, 12 insertions(+)
+>>> 
+>>> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+>>> index b3ce85f..0c6eb333 100644
+>>> --- a/drivers/bluetooth/btusb.c
+>>> +++ b/drivers/bluetooth/btusb.c
+>>> @@ -1336,6 +1336,7 @@ struct intel_version {
+>>> 
+>>> enum {
+>>> 	INTEL_FW_MODE_OP,
+>>> +	INTEL_FW_MODE_BL,
+>>> };
+>>> 
+>>> static const struct firmware *btusb_setup_intel_get_fw(struct hci_dev
+>>> *hdev,
+>>> @@ -1397,6 +1398,17 @@ static const struct firmware
+>>> *btusb_setup_intel_get_fw(struct hci_dev *hdev,
+>>> 			return NULL;
+>>> 		}
+>>> 		strncpy(ext, "bseq", 4);
+>>> +	} else if (fw_mode == INTEL_FW_MODE_BL) {
+>>> +		/* If fw_variant is 0x23, the device is already running in
+>>> +		 * operational mode, so no need to download the firmware
+>>> +		 */
+>>> +		if (ver->fw_variant == 0x23) {
+>>> +			BT_INFO("%s: Intel device is running in operation mode",
+>>> +				hdev->name);
+>>> +			btusb_check_bdaddr_intel(hdev);
+>>> +			return NULL;
+>>> +		}
+>>> +		strncpy(ext, "sfi", 3);
+>>> 	} else {
+>>> 		BT_ERR("%s: Invalid Intel firmware type: %d",
+>>> 		       hdev->name, fw_mode);
 >> 
->> Why :(
->> 
->> These are the things that does frustrate me sometimes. Is it too much to
->> ask from the bootloader to acknowledge that it received the command and
->> only then go and reset everything in the device.
->> 
->> I mean you start using a well defined transport protocol and then you
->> start violating it whenever you please because it is some tiny shortcut.
->> It means that the host stack now has to do extra work and we can never
->> tell when the device actually does a reset or if something fails. I mean
->> how would we know if some of the firmware verification fails?
+>> I think you also want to skip looking for ROM patches. I know that in
+>> theory you can ROM patch the RAM firmware, but that seems a bit pointless
+>> here since the whole firmware has just been downloaded. So I would prefer
+>> if we only request the extra configuration based on the hw info. Or is
+>> there some reason to do it otherwise.
 > 
-> I knew that you won¹t like it. :)
-> This is currently on discussion and this implementation is based on the
-> current spec and firmware design.
-> I will update you in a few days.
+> Actually we need to run ROM patching routine (using bseq) even after
+> running with RAM firmware, in order to update the device specific
+> configuration parameter (like BDDATA from 7260 and 7265). So we need to
+> separate here to distinguish between call from ROM patch flow and call
+> from RAM patch flow.
 
-if you go through the Bluetooth specification, then every HCI command sends a HCI command status event (or command complete) before doing its execution. Even commands like HCI Reset do this.
+you had that part in your comments and that is fine. However are we expecting only settings or also actual ROM patches on top of the RAM firmware.
 
-If you have to deal with UART chips that change the baudrate even the vendor specific commands are pretty clear that the HCI command status event comes via the old baudrate and only after that the new baudrate can be assumed.
+The settings would be fine by just looking for the hw version information and could stay the same even if the firmware has been updated to a new version.
 
-I think it is just good practice to send the HCI command status event here and only after sending it out to do the reset and have the new firmware run. And I realize that internally there is some fun with the USB endpoints and making sure the host got this event. However that is better than the host guessing since if anything goes wrong, the host can not recover from this.
+> Regarding fw_variant, when the device is running on bootloader mode, it is
+> 0x06 which needs to download the firmeware. If it is 0x23, it is running
+> with RAM firmware, so it can skip the firmware downloading.
+
+Got that part as well. What I am looking for is to avoid confusing comments in dmesg when the ROM patching firmware is not found since we only have settings. My current understanding is that when we are new devices, then we load, the firmware, lock for settings file based on hw version (skip the first file with the fill hw and sw version) and be done.
+
+>> In addition, I think we want to build the firmware name solely based on
+>> the hw info from the device. Or does the fw information provide details
+>> about the bootloader version now. And we would need different firmware
+>> files depending on which bootloader version is running.
+> 
+> If we use the hw info only for firmware name, it cannot support multiple
+> SKUs from same product family, for example, new ROM spinned module after
+> releasing to customer like 7260.
+
+But the ROM module would not boot up in bootloader mode? It would be the same as the existing ROM modules and just go through the ROM patching. For these we will require the full set of hw and sw version information to find the right firmware.
+
+For the pure RAM chips that boot up in bootloader mode it should be enough to just look for the hw version information to find a firmware. The only reason to include sw details would be if we have to load different firmware based on the bootloader version (since that is the sw we would see at this point).
+
+> If you concern about weird long firmware file name, we can do something
+> simpler but it needs something more than hw info.
+
+It is not the length of the files. It is the quantity of the files. For ROM chips there is no other way than keeping. You need all the details to pick the right firmware. For RAM chips however we should only include enough to pick the right firmware.
 
 Regards
 
