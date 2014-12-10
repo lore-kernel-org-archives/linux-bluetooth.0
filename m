@@ -1,46 +1,142 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 8.1 \(1993\))
-Subject: Re: [PATCH] Bluetooth: Fix missing hci_dev_lock/unlock
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20141210123752.GA30555@t440s.lan>
-Date: Wed, 10 Dec 2014 13:41:38 +0100
-Cc: JAGANATH KANAKKASSERY <jaganath.k@samsung.com>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Message-Id: <77B96975-22E2-403D-BE3B-A3D12D3E77E4@holtmann.org>
-References: <935145568.61511418213470087.JavaMail.weblogic@epmlwas05a> <20141210123752.GA30555@t440s.lan>
-To: Johan Hedberg <johan.hedberg@gmail.com>
+From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
+Subject: [PATCH 3/3] android/pts: Update gatt serwer results
+Date: Wed, 10 Dec 2014 13:40:51 +0100
+Message-Id: <1418215251-24018-3-git-send-email-jakub.tyszkowski@tieto.com>
+In-Reply-To: <1418215251-24018-1-git-send-email-jakub.tyszkowski@tieto.com>
+References: <1418215251-24018-1-git-send-email-jakub.tyszkowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+---
+ android/pts-gatt.txt | 30 +++++++++++++++---------------
+ 1 file changed, 15 insertions(+), 15 deletions(-)
 
->>>> 	err = hci_dev_do_open(hdev);
->>>> 	if (err < 0) {
->>>> +		hci_dev_lock(hdev);
->>>> 		mgmt_set_powered_failed(hdev, err);
->>>> +		hci_dev_unlock(hdev);
->>>> 		return;
->>>> 	}
->> 
->>> I wonder is some of the mgmt_ function should just take the hci_dev
->>> lock. Are there cases where we don't want them to take the look?
->> 
->> There are many mgmt_functions called from hci_event.c which don't
->> require lock.  You prefer moving the lock inside
->> mgmt_set_powered_failed()?
-> 
-> This should be kept consistent imo. Either all mgmt_* functions called
-> from hci_core/event.c should be responsible for taking the lock
-> themselves or none should be. I think right now the general rule is that
-> hci_core/event.c take the lock first, and this is mainly because a lot
-> of code that needed calling into mgmt.c was already holding the lock.
-> I.e. moving the taking into mgmt.c would for many places have required
-> awkward looking hdev_unlock(); mgmt_foo(); hdev_lock(); constructions.
-
-we could also rename some to __mgmt_foo which means they are not taking the lock and others to mgmt_bar which take the lock by themselves. And then see if they actually have variations where we would need both.
-
-Regards
-
-Marcel
+diff --git a/android/pts-gatt.txt b/android/pts-gatt.txt
+index 43e1c8a..d1cf981 100644
+--- a/android/pts-gatt.txt
++++ b/android/pts-gatt.txt
+@@ -783,7 +783,7 @@ TC_GAW_SR_BI_06_C	PASS	haltest:
+ 						<properties> 10 <permissions> 17
+ 				gatts start_service
+ 				gatts send_response: <status> 12
+-TC_GAW_SR_BV_05_C	FAIL	haltest:
++TC_GAW_SR_BV_05_C	PASS	haltest:
+ 				gatts add_service
+ 				gatts add_characteristic:
+ 						<properties> 10 <permissions> 17
+@@ -793,18 +793,18 @@ TC_GAW_SR_BV_05_C	FAIL	haltest:
+ 						repeat with correct offset
+ 				gatts send_response:
+ 						repeat with correct value
+-TC_GAW_SR_BI_07_C	FAIL	haltest:
++TC_GAW_SR_BI_07_C	PASS	haltest:
+ 				gatts add_service
+ 				gatts add_characteristic:
+ 						<properties> 10 <permissions> 17
+ 				gatts start_service
+ 				gatts send_response
+-TC_GAW_SR_BI_08_C	FAIL	haltest:
++TC_GAW_SR_BI_08_C	PASS	haltest:
+ 				gatts add_service
+ 				gatts add_characteristic:
+ 						<properties> 2 <permissions> 1
+ 				gatts start_service
+-TC_GAW_SR_BI_09_C	FAIL	haltest:
++TC_GAW_SR_BI_09_C	PASS	haltest:
+ 				gatts add_service
+ 				gatts add_characteristic:
+ 						<properties> 10 <permissions> 17
+@@ -813,7 +813,7 @@ TC_GAW_SR_BI_09_C	FAIL	haltest:
+ 						<data> value greater than MTU
+ 						repeat with correct offset
+ 				gatts send_response: <status> 7
+-TC_GAW_SR_BI_11_C	FAIL	haltest:
++TC_GAW_SR_BI_11_C	PASS	haltest:
+ 				gatts add_service
+ 				gatts add_characteristic:
+ 						<properties> 10 <permissions> 17
+@@ -822,7 +822,7 @@ TC_GAW_SR_BI_11_C	FAIL	haltest:
+ 						<data> value greater than MTU
+ 						repeat with correct offset
+ 				gatts send_response: <status> 8
+-TC_GAW_SR_BI_12_C	FAIL	haltest:
++TC_GAW_SR_BI_12_C	PASS	haltest:
+ 				gatts add_service
+ 				gatts add_characteristic:
+ 						<properties> 10 <permissions> 17
+@@ -831,7 +831,7 @@ TC_GAW_SR_BI_12_C	FAIL	haltest:
+ 						<data> value greater than MTU
+ 						repeat with correct offset
+ 				gatts send_response: <status> 5
+-TC_GAW_SR_BI_13_C	FAIL	haltest:
++TC_GAW_SR_BI_13_C	PASS	haltest:
+ 				gatts add_service
+ 				gatts add_characteristic:
+ 						<properties> 10 <permissions> 17
+@@ -840,14 +840,14 @@ TC_GAW_SR_BI_13_C	FAIL	haltest:
+ 						<data> value greater than MTU
+ 						repeat with correct offset
+ 				gatts send_response: <status> 12
+-TC_GAW_SR_BV_06_C	FAIL	haltest:
++TC_GAW_SR_BV_06_C	PASS	haltest:
+ 				gatts add_service
+ 				gatts add_characteristic:
+ 						<properties> 10 <permissions> 17
+ 				gatts start_service
+ 				gatts send_response:
+ 						repeat with correct value
+-TC_GAW_SR_BV_10_C	FAIL	haltest:
++TC_GAW_SR_BV_10_C	PASS	haltest:
+ 				gatts add_service
+ 				gatts add_characteristic:
+ 						<properties> 10 <permissions> 17
+@@ -857,37 +857,37 @@ TC_GAW_SR_BV_10_C	FAIL	haltest:
+ 						repeat with correct offset
+ 				gatts send_response:
+ 						repeat with correct value
+-TC_GAW_SR_BI_14_C	FAIL	haltest:
++TC_GAW_SR_BI_14_C	PASS	haltest:
+ 				gatts add_service
+ 				gatts add_characteristic:
+ 						<properties> 10 <permissions> 17
+ 				gatts start_service
+ 				gatts send_response: <status> 1
+-TC_GAW_SR_BI_15_C	FAIL	haltest:
++TC_GAW_SR_BI_15_C	PASS	haltest:
+ 				gatts add_service
+ 				gatts add_characteristic:
+ 						<properties> 10 <permissions> 17
+ 				gatts start_service
+ 				gatts send_response: <status> 3
+-TC_GAW_SR_BI_17_C	FAIL	haltest:
++TC_GAW_SR_BI_17_C	PASS	haltest:
+ 				gatts add_service
+ 				gatts add_characteristic:
+ 						<properties> 10 <permissions> 17
+ 				gatts start_service
+ 				gatts send_response: <status> 8
+-TC_GAW_SR_BI_18_C	FAIL	haltest:
++TC_GAW_SR_BI_18_C	PASS	haltest:
+ 				gatts add_service
+ 				gatts add_characteristic:
+ 						<properties> 10 <permissions> 17
+ 				gatts start_service
+ 				gatts send_response: <status> 5
+-TC_GAW_SR_BI_19_C	FAIL	haltest:
++TC_GAW_SR_BI_19_C	PASS	haltest:
+ 				gatts add_service
+ 				gatts add_characteristic:
+ 						<properties> 10 <permissions> 17
+ 				gatts start_service
+ 				gatts send_response: <status> 12
+-TC_GAW_SR_BV_07_C	FAIL	haltest:
++TC_GAW_SR_BV_07_C	PASS	haltest:
+ 				gatts add_service
+ 				gatts add_characteristic:
+ 						<properties> 10 <permissions> 17
+-- 
+1.9.1
 
