@@ -1,40 +1,41 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <20141210081858.GA13749@t440s.lan>
-References: <1418114425-22455-1-git-send-email-lukasz.rymanowski@tieto.com>
-	<CAMudyAstnmV4JCxc8=7RrBnhGZ=XEH7fgysbkw53uCRTvHx0Xg@mail.gmail.com>
-	<20141210081858.GA13749@t440s.lan>
-Date: Wed, 10 Dec 2014 09:40:51 +0100
-Message-ID: <CAMudyAuvTA7yAevLB62bfrt4kaGkS=j=yUCq+fos50_RFkMM=Q@mail.gmail.com>
-Subject: Re: [PATCH 1/2] attrib/gatt.c: Fix for attrib ref
-From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-To: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH 2/2] android/build: Add libcutils to LOCAL_SHARED_LIBRARIES for haltest
+Date: Wed, 10 Dec 2014 10:39:43 +0200
+Message-Id: <1418200783-13414-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1418200783-13414-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1418200783-13414-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi  Johan,
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-On 10 December 2014 at 09:18, Johan Hedberg <johan.hedberg@gmail.com> wrote:
-> Hi Lukasz,
->
-> On Tue, Dec 09, 2014, Lukasz Rymanowski wrote:
->> On 9 December 2014 at 09:40, Lukasz Rymanowski
->> <lukasz.rymanowski@tieto.com> wrote:
->> > This patch makes sure that attrib instance will not disappear while
->> > reading characteristic
->>
->> Just noticed that there is small issue in the commit msg. Should be
->> "attrib/gatt" instead of "attrib/gatt.c" :) Please fix when pushing or
->> let me know so I will send v2.
->
-> I fixed the commit message myself.
-Thanks
+Fixes build error for Nexus 9.
+...
+aarch64-linux-android/bin/ld:
+out/target/product/flounder/obj/EXECUTABLES/haltest_intermediates/bluez/android/hal-utils.o:
+undefined reference to symbol 'property_get'
+...
+---
+ android/Android.mk | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-\Lukasz
+diff --git a/android/Android.mk b/android/Android.mk
+index 6547eb0..b538d3f 100644
+--- a/android/Android.mk
++++ b/android/Android.mk
+@@ -204,7 +204,9 @@ LOCAL_C_INCLUDES += \
+ 
+ LOCAL_CFLAGS := $(BLUEZ_COMMON_CFLAGS) -Wno-declaration-after-statement
+ 
+-LOCAL_SHARED_LIBRARIES := libhardware
++LOCAL_SHARED_LIBRARIES := \
++	libhardware \
++	libcutils \
+ 
+ LOCAL_MODULE_PATH := $(TARGET_OUT_OPTIONAL_EXECUTABLES)
+ LOCAL_MODULE_TAGS := debug
+-- 
+2.1.0
 
- Both patches are now upstream.
-> Thanks.
->
-> Johan
