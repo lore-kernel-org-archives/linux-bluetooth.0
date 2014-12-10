@@ -1,56 +1,119 @@
 Return-Path: <cyrus@holtmann.org>
-From: Mariusz Skamra <mariusz.skamra@tieto.com>
+From: Jaganath Kanakkassery <jaganath.k@samsung.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Mariusz Skamra <mariusz.skamra@tieto.com>
-Subject: [PATCH] android/gatt: Fix missing error response to find by type value request
-Date: Wed, 10 Dec 2014 14:31:19 +0100
-Message-Id: <1418218279-17642-1-git-send-email-mariusz.skamra@tieto.com>
+Cc: Jaganath Kanakkassery <jaganath.k@samsung.com>
+Subject: [PATCH 2/2] Bluetooth: Fix missing hci_dev_lock/unlock in hci_event
+Date: Wed, 10 Dec 2014 18:58:41 +0530
+Message-id: <1418218121-5802-2-git-send-email-jaganath.k@samsung.com>
+In-reply-to: <1418218121-5802-1-git-send-email-jaganath.k@samsung.com>
+References: <1418218121-5802-1-git-send-email-jaganath.k@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch fixes Find By Type Value Request issue.
-When the attribute queue is empty, error response should be sent.
----
- android/gatt.c | 12 +++++++++++-
- 1 file changed, 11 insertions(+), 1 deletion(-)
+mgmt_pending_remove() should be called with hci_dev_lock protection and
+all hci_event.c functions which calls mgmt_complete() (which eventually
+calls mgmt_pending_remove()) should hold the lock.
+So this patch fixes the same
 
-diff --git a/android/gatt.c b/android/gatt.c
-index b2ce9c1..484775a 100644
---- a/android/gatt.c
-+++ b/android/gatt.c
-@@ -4546,7 +4546,6 @@ static void send_dev_complete_response(struct gatt_device *device,
- 			if ((val->length != val->filter_vlen) ||
- 				memcmp(val->value, val->filter_value,
- 								val->length)) {
--
- 				destroy_pending_request(val);
- 				val = queue_pop_head(device->pending_requests);
- 				continue;
-@@ -6172,6 +6171,9 @@ static uint8_t find_by_type_request(const uint8_t *cmd, uint16_t cmd_len,
- 	struct queue *q;
- 	bt_uuid_t uuid;
- 	uint16_t len;
-+	size_t mtu;
-+	uint8_t *rsp = g_attrib_get_buffer(device->attrib, &mtu);
+Signed-off-by: Jaganath Kanakkassery <jaganath.k@samsung.com>
+---
+ net/bluetooth/hci_event.c |   25 ++++++++++++++++++++++---
+ 1 file changed, 22 insertions(+), 3 deletions(-)
+
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 322abbb..b15d37c 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -257,6 +257,8 @@ static void hci_cc_write_auth_enable(struct hci_dev *hdev, struct sk_buff *skb)
+ 	if (!sent)
+ 		return;
+ 
++	hci_dev_lock(hdev);
 +
+ 	if (!status) {
+ 		__u8 param = *((__u8 *) sent);
  
- 	DBG("");
+@@ -268,6 +270,8 @@ static void hci_cc_write_auth_enable(struct hci_dev *hdev, struct sk_buff *skb)
  
-@@ -6189,6 +6191,14 @@ static uint8_t find_by_type_request(const uint8_t *cmd, uint16_t cmd_len,
- 
- 	gatt_db_find_by_type(gatt_db, start, end, &uuid, q);
- 
-+	if (queue_isempty(q)) {
-+		len = enc_error_resp(ATT_OP_FIND_BY_TYPE_REQ, start,
-+					ATT_ECODE_ATTR_NOT_FOUND, rsp, mtu);
-+		g_attrib_send(device->attrib, 0, rsp, len, NULL, NULL, NULL);
-+		queue_destroy(q, NULL);
-+		return 0;
-+	}
+ 	if (test_bit(HCI_MGMT, &hdev->dev_flags))
+ 		mgmt_auth_enable_complete(hdev, status);
 +
- 	while (queue_peek_head(q)) {
- 		struct gatt_db_attribute *attrib = queue_pop_head(q);
- 		struct pending_request *data;
++	hci_dev_unlock(hdev);
+ }
+ 
+ static void hci_cc_write_encrypt_mode(struct hci_dev *hdev, struct sk_buff *skb)
+@@ -443,6 +447,8 @@ static void hci_cc_write_ssp_mode(struct hci_dev *hdev, struct sk_buff *skb)
+ 	if (!sent)
+ 		return;
+ 
++	hci_dev_lock(hdev);
++
+ 	if (!status) {
+ 		if (sent->mode)
+ 			hdev->features[1][0] |= LMP_HOST_SSP;
+@@ -458,6 +464,8 @@ static void hci_cc_write_ssp_mode(struct hci_dev *hdev, struct sk_buff *skb)
+ 		else
+ 			clear_bit(HCI_SSP_ENABLED, &hdev->dev_flags);
+ 	}
++
++	hci_dev_unlock(hdev);
+ }
+ 
+ static void hci_cc_write_sc_support(struct hci_dev *hdev, struct sk_buff *skb)
+@@ -471,6 +479,8 @@ static void hci_cc_write_sc_support(struct hci_dev *hdev, struct sk_buff *skb)
+ 	if (!sent)
+ 		return;
+ 
++	hci_dev_lock(hdev);
++
+ 	if (!status) {
+ 		if (sent->support)
+ 			hdev->features[1][0] |= LMP_HOST_SC;
+@@ -486,6 +496,8 @@ static void hci_cc_write_sc_support(struct hci_dev *hdev, struct sk_buff *skb)
+ 		else
+ 			clear_bit(HCI_SC_ENABLED, &hdev->dev_flags);
+ 	}
++
++	hci_dev_unlock(hdev);
+ }
+ 
+ static void hci_cc_read_local_version(struct hci_dev *hdev, struct sk_buff *skb)
+@@ -1172,11 +1184,14 @@ static void hci_cc_le_set_scan_enable(struct hci_dev *hdev,
+ 		 * re-enable it again if necessary.
+ 		 */
+ 		if (test_and_clear_bit(HCI_LE_SCAN_INTERRUPTED,
+-				       &hdev->dev_flags))
++				       &hdev->dev_flags)) {
++			hci_dev_lock(hdev);
+ 			hci_discovery_set_state(hdev, DISCOVERY_STOPPED);
+-		else if (!test_bit(HCI_LE_ADV, &hdev->dev_flags) &&
+-			 hdev->discovery.state == DISCOVERY_FINDING)
++			hci_dev_unlock(hdev);
++		} else if (!test_bit(HCI_LE_ADV, &hdev->dev_flags) &&
++			 hdev->discovery.state == DISCOVERY_FINDING) {
+ 			mgmt_reenable_advertising(hdev);
++		}
+ 
+ 		break;
+ 
+@@ -1278,6 +1293,8 @@ static void hci_cc_write_le_host_supported(struct hci_dev *hdev,
+ 	if (!sent)
+ 		return;
+ 
++	hci_dev_lock(hdev);
++
+ 	if (sent->le) {
+ 		hdev->features[1][0] |= LMP_HOST_LE;
+ 		set_bit(HCI_LE_ENABLED, &hdev->dev_flags);
+@@ -1291,6 +1308,8 @@ static void hci_cc_write_le_host_supported(struct hci_dev *hdev,
+ 		hdev->features[1][0] |= LMP_HOST_LE_BREDR;
+ 	else
+ 		hdev->features[1][0] &= ~LMP_HOST_LE_BREDR;
++
++	hci_dev_unlock(hdev);
+ }
+ 
+ static void hci_cc_set_adv_param(struct hci_dev *hdev, struct sk_buff *skb)
 -- 
-1.9.1
+1.7.9.5
 
