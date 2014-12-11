@@ -1,60 +1,56 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Thu, 11 Dec 2014 09:36:59 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Alan Au <alan.au@netcommwireless.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: Unable to make subsequent BLE connections
+Message-ID: <20141211073659.GA14258@t440s.P-661HNU-F1>
+References: <5488D75C.2010700@netcommwireless.com>
 MIME-Version: 1.0
-In-Reply-To: <1658533.bR5FcK4maG@leonov>
-References: <1418034908-1742-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
-	<1658533.bR5FcK4maG@leonov>
-Date: Thu, 11 Dec 2014 09:50:42 +0100
-Message-ID: <CAMv5Gbf_+_5-TdgaUCntSCfBB9ifCdz89sWxEQUiL+RNtO=voA@mail.gmail.com>
-Subject: Re: [PATCH 1/5] android/tester: Add missing AVRCP cb_table entries
-From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
-To: Szymon Janc <szymon.janc@tieto.com>
-Cc: linux-bluetooth <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <5488D75C.2010700@netcommwireless.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Szymon,
+Hi Alan,
 
-On 10 December 2014 at 13:43, Szymon Janc <szymon.janc@tieto.com> wrote:
-> Hi Grzegorz,
->
-> On Monday 08 of December 2014 11:35:04 Grzegorz Kolodziejczyk wrote:
->> cb_table should be filled simultaneously with expected bt_callbacks
->> enum. Without this, debug logs can cause errors.
->> ---
->>  android/tester-main.c | 8 ++++++++
->>  1 file changed, 8 insertions(+)
->>
->> diff --git a/android/tester-main.c b/android/tester-main.c
->> index 33ef3ce..8f3bc3c 100644
->> --- a/android/tester-main.c
->> +++ b/android/tester-main.c
->> @@ -68,6 +68,14 @@ static struct {
->>       DBG_CB(CB_A2DP_CONN_STATE),
->>       DBG_CB(CB_A2DP_AUDIO_STATE),
->>
->> +     /* AVRCP */
->> +     DBG_CB(CB_AVRCP_PLAY_STATUS_REQ),
->> +     DBG_CB(CB_AVRCP_PLAY_STATUS_RSP),
->> +     DBG_CB(CB_AVRCP_REG_NOTIF_REQ),
->> +     DBG_CB(CB_AVRCP_REG_NOTIF_RSP),
->> +     DBG_CB(CB_AVRCP_GET_ATTR_REQ),
->> +     DBG_CB(CB_AVRCP_GET_ATTR_RSP),
->> +
->>       /* Gatt client */
->>       DBG_CB(CB_GATTC_REGISTER_CLIENT),
->>       DBG_CB(CB_GATTC_SCAN_RESULT),
->
-> Patches 1-3 are now applied, thanks.
->
-> Please remember that commit message should start from capital letter. I've
-> fixed this for those patches.
+On Thu, Dec 11, 2014, Alan Au wrote:
+> I'm connecting to a BLE oximeter device. The first couple of connects
+> succeed. But after that the connection always fails. I have tried with both
+> gatttool and with my own code. hcidump shows that the "LE Start Encryption"
+> command fails with  "PIN or Key Missing". If I delete the pairing (that was
+> created by the earlier successful connection) then subsequent connects will
+> succeed for a few times again.
+> 
+> I analysed the hcidumps of successful and failed connects. In the failed
+> case, it looks to me like bluez is not sending out an SMP PairingRequest in
+> response to an SMP SecurityRequest from the slave. I can see in the kernel
+> code that smp_cmd_security_req() does not send out the PairingRequest if it
+> finds an LTK. But is that correct? Should it not try to pair anyway because
+> the remote device is requesting it and may have deleted the earlier bonding.
 
-I'll try to remember.
->
-> --
-> BR
-> Szymon Janc
+According to the SMP specification "The Security Request command is used
+by the slave to request that the master initiates security with the
+requested security properties". That doesn't talk about always sending a
+Pairing Request but initiating security, which makes sense since there'd
+otherwise be no other way for the slave to request the connection to be
+encrypted with a shared LTK.
 
-BR
-Grzegorz Kolodziejczyk
+So sounds like your device is for whatever reason (maybe it's broken)
+loosing its pairing information after some time. Even though our
+behavior with the Security Request should be correct we could consider
+the reaction to the "PIN or Key Missing" error. There's a table in
+section 2.4.4.2 of the SMP specification (page 2321 of core spec 4.2)
+that explains the allowed behavior in this scenario. However, if bonding
+was performed (which I suspect it was) the table only gives the option
+of notifying the user of the failure (which is what we do right now).
+
+> I can provide the detailed hcidumps if anyone needs that.
+
+Sure, but preferably with btmon instead of hcidump. Please include the
+original pairing procedure in addition to the failure so that we can see
+whether bonding was performed or not (otoh since you say that you had at
+least a second successful connection it sounds like you must have done
+bonding).
+
+Johan
