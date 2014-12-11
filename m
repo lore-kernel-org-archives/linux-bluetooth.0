@@ -1,56 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 11 Dec 2014 09:36:59 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Alan Au <alan.au@netcommwireless.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: Unable to make subsequent BLE connections
-Message-ID: <20141211073659.GA14258@t440s.P-661HNU-F1>
-References: <5488D75C.2010700@netcommwireless.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <5488D75C.2010700@netcommwireless.com>
+Date: Thu, 11 Dec 2014 07:31:22 +0000 (GMT)
+From: JAGANATH KANAKKASSERY <jaganath.k@samsung.com>
+Subject: Re: Re: [PATCH 2/2] Bluetooth: Fix missing hci_dev_lock/unlock in
+ hci_event
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Reply-to: jaganath.k@samsung.com
+MIME-version: 1.0
+Content-type: text/plain; charset=windows-1252
+MIME-version: 1.0
+Message-id: <1053497007.103491418283082270.JavaMail.weblogic@epmlwas05a>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Alan,
+SGkgTWFyY2VsLA0KDQo+PiBzdGF0aWMgdm9pZCBoY2lfY2NfcmVhZF9sb2NhbF92ZXJzaW9uKHN0
+cnVjdCBoY2lfZGV2ICpoZGV2LCBzdHJ1Y3Qgc2tfYnVmZiAqc2tiKQ0KPj4gQEAgLTExNzIsMTEg
+KzExODQsMTQgQEAgc3RhdGljIHZvaWQgaGNpX2NjX2xlX3NldF9zY2FuX2VuYWJsZShzdHJ1Y3Qg
+aGNpX2RldiAqaGRldiwNCj4+IAkJICogcmUtZW5hYmxlIGl0IGFnYWluIGlmIG5lY2Vzc2FyeS4N
+Cj4+IAkJICovDQo+PiAJCWlmICh0ZXN0X2FuZF9jbGVhcl9iaXQoSENJX0xFX1NDQU5fSU5URVJS
+VVBURUQsDQo+Pi0JCQkJICAgICAgICZoZGV2LT5kZXZfZmxhZ3MpKQ0KPj4gKwkJCQkgICAgICAg
+JmhkZXYtPmRldl9mbGFncykpIHsNCj4+ICsJCQloY2lfZGV2X2xvY2soaGRldik7DQo+PiAJCQlo
+Y2lfZGlzY292ZXJ5X3NldF9zdGF0ZShoZGV2LCBESVNDT1ZFUllfU1RPUFBFRCk7DQo+PiAtCQll
+bHNlIGlmICghdGVzdF9iaXQoSENJX0xFX0FEViwgJmhkZXYtPmRldl9mbGFncykgJiYNCj4+IC0J
+CQkgaGRldi0+ZGlzY292ZXJ5LnN0YXRlID09IERJU0NPVkVSWV9GSU5ESU5HKQ0KPj4gKwkJCWhj
+aV9kZXZfdW5sb2NrKGhkZXYpOw0KPj4gKwkJfSBlbHNlIGlmICghdGVzdF9iaXQoSENJX0xFX0FE
+ViwgJmhkZXYtPmRldl9mbGFncykgJiYNCj4+ICsJCQkgaGRldi0+ZGlzY292ZXJ5LnN0YXRlID09
+IERJU0NPVkVSWV9GSU5ESU5HKSB7DQo+DQo+dGhlIGluZGVudGF0aW9uIGlzIHN0aWxsIHZpb2xh
+dGluZyB0aGUgY29kaW5nIHN0eWxlIGhlcmUuIEl0IG5lZWRzIHRvIGFsaWduIHdpdGggIXRlc3Rf
+Yml0LiBTYW1lIGFzIGJlZm9yZS4NCg0KSSBoYXZlIHJhaXNlZCBhIG5ldyBwYXRjaCBhZnRlciBm
+aXhpbmcgaXQuIFBseiBjaGVjay4NCg0KVGhhbmtzLA0KSmFnYW5hdGg=
 
-On Thu, Dec 11, 2014, Alan Au wrote:
-> I'm connecting to a BLE oximeter device. The first couple of connects
-> succeed. But after that the connection always fails. I have tried with both
-> gatttool and with my own code. hcidump shows that the "LE Start Encryption"
-> command fails with  "PIN or Key Missing". If I delete the pairing (that was
-> created by the earlier successful connection) then subsequent connects will
-> succeed for a few times again.
-> 
-> I analysed the hcidumps of successful and failed connects. In the failed
-> case, it looks to me like bluez is not sending out an SMP PairingRequest in
-> response to an SMP SecurityRequest from the slave. I can see in the kernel
-> code that smp_cmd_security_req() does not send out the PairingRequest if it
-> finds an LTK. But is that correct? Should it not try to pair anyway because
-> the remote device is requesting it and may have deleted the earlier bonding.
 
-According to the SMP specification "The Security Request command is used
-by the slave to request that the master initiates security with the
-requested security properties". That doesn't talk about always sending a
-Pairing Request but initiating security, which makes sense since there'd
-otherwise be no other way for the slave to request the connection to be
-encrypted with a shared LTK.
-
-So sounds like your device is for whatever reason (maybe it's broken)
-loosing its pairing information after some time. Even though our
-behavior with the Security Request should be correct we could consider
-the reaction to the "PIN or Key Missing" error. There's a table in
-section 2.4.4.2 of the SMP specification (page 2321 of core spec 4.2)
-that explains the allowed behavior in this scenario. However, if bonding
-was performed (which I suspect it was) the table only gives the option
-of notifying the user of the failure (which is what we do right now).
-
-> I can provide the detailed hcidumps if anyone needs that.
-
-Sure, but preferably with btmon instead of hcidump. Please include the
-original pairing procedure in addition to the failure so that we can see
-whether bonding was performed or not (otoh since you say that you had at
-least a second successful connection it sounds like you must have done
-bonding).
-
-Johan
