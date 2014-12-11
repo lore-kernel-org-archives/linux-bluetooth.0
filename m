@@ -1,33 +1,73 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 11 Dec 2014 07:31:22 +0000 (GMT)
-From: JAGANATH KANAKKASSERY <jaganath.k@samsung.com>
-Subject: Re: Re: [PATCH 2/2] Bluetooth: Fix missing hci_dev_lock/unlock in
- hci_event
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Reply-to: jaganath.k@samsung.com
-MIME-version: 1.0
-Content-type: text/plain; charset=windows-1252
-MIME-version: 1.0
-Message-id: <1053497007.103491418283082270.JavaMail.weblogic@epmlwas05a>
+MIME-Version: 1.0
+In-Reply-To: <CAPt0RYw6qC8N4muqbqbLcMN3yqF+w6210jww_sL7NoJsbpo6KQ@mail.gmail.com>
+References: <CAPt0RYxF95U1KvU2-exkoJCwaYqdzg0P_kJmnO65oSKMVNmKxA@mail.gmail.com>
+	<37A4BD1B-EB5A-49F7-93E5-E2C1AEC8C7DA@holtmann.org>
+	<CAPt0RYw6qC8N4muqbqbLcMN3yqF+w6210jww_sL7NoJsbpo6KQ@mail.gmail.com>
+Date: Wed, 10 Dec 2014 22:50:17 -0800
+Message-ID: <CAHrH25R0UN1N0X6KHUo2cD0m=Z3-Nyn=wVhYSi6Y7R=zHpX3DA@mail.gmail.com>
+Subject: Re: Question about mgmt header files and shared-mainloop library
+From: Arman Uguray <armansito@chromium.org>
+To: Mona Attariyan <monattar@gmail.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+	BlueZ development <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-SGkgTWFyY2VsLA0KDQo+PiBzdGF0aWMgdm9pZCBoY2lfY2NfcmVhZF9sb2NhbF92ZXJzaW9uKHN0
-cnVjdCBoY2lfZGV2ICpoZGV2LCBzdHJ1Y3Qgc2tfYnVmZiAqc2tiKQ0KPj4gQEAgLTExNzIsMTEg
-KzExODQsMTQgQEAgc3RhdGljIHZvaWQgaGNpX2NjX2xlX3NldF9zY2FuX2VuYWJsZShzdHJ1Y3Qg
-aGNpX2RldiAqaGRldiwNCj4+IAkJICogcmUtZW5hYmxlIGl0IGFnYWluIGlmIG5lY2Vzc2FyeS4N
-Cj4+IAkJICovDQo+PiAJCWlmICh0ZXN0X2FuZF9jbGVhcl9iaXQoSENJX0xFX1NDQU5fSU5URVJS
-VVBURUQsDQo+Pi0JCQkJICAgICAgICZoZGV2LT5kZXZfZmxhZ3MpKQ0KPj4gKwkJCQkgICAgICAg
-JmhkZXYtPmRldl9mbGFncykpIHsNCj4+ICsJCQloY2lfZGV2X2xvY2soaGRldik7DQo+PiAJCQlo
-Y2lfZGlzY292ZXJ5X3NldF9zdGF0ZShoZGV2LCBESVNDT1ZFUllfU1RPUFBFRCk7DQo+PiAtCQll
-bHNlIGlmICghdGVzdF9iaXQoSENJX0xFX0FEViwgJmhkZXYtPmRldl9mbGFncykgJiYNCj4+IC0J
-CQkgaGRldi0+ZGlzY292ZXJ5LnN0YXRlID09IERJU0NPVkVSWV9GSU5ESU5HKQ0KPj4gKwkJCWhj
-aV9kZXZfdW5sb2NrKGhkZXYpOw0KPj4gKwkJfSBlbHNlIGlmICghdGVzdF9iaXQoSENJX0xFX0FE
-ViwgJmhkZXYtPmRldl9mbGFncykgJiYNCj4+ICsJCQkgaGRldi0+ZGlzY292ZXJ5LnN0YXRlID09
-IERJU0NPVkVSWV9GSU5ESU5HKSB7DQo+DQo+dGhlIGluZGVudGF0aW9uIGlzIHN0aWxsIHZpb2xh
-dGluZyB0aGUgY29kaW5nIHN0eWxlIGhlcmUuIEl0IG5lZWRzIHRvIGFsaWduIHdpdGggIXRlc3Rf
-Yml0LiBTYW1lIGFzIGJlZm9yZS4NCg0KSSBoYXZlIHJhaXNlZCBhIG5ldyBwYXRjaCBhZnRlciBm
-aXhpbmcgaXQuIFBseiBjaGVjay4NCg0KVGhhbmtzLA0KSmFnYW5hdGg=
+Hi Mona & Marcel,
 
+(Bottom posting, following linux-bluetooth convention)
 
+> On Wed, Dec 10, 2014 at 10:28 PM, Mona Attariyan <monattar@gmail.com> wrote:
+> Hi Marcel,
+> Does that mean that one shouldn't be using these APIs? (src/shared/*.h
+> ?) How can I use
+> the mgmt sockets then?
+>
+> Thanks,
+>
+> On Mon, Dec 8, 2014 at 10:13 PM, Marcel Holtmann <marcel@holtmann.org> wrote:
+>> Hi Mona,
+>>
+>>> I'm using bluez mgmt API in a simple scan application. I've been
+>>> including headers files like src/shared/mgmt.h and src/shared/util.h.
+>>> Also the main bluez bluetooth library (libbluetooth.so) does not
+>>> include the mgmt and mainloop stuff, so I've been linking against
+>>> shared-mainloop.a. My question is why aren't these header files part
+>>> of the public API? as in in lib directory or something that doesn't
+>>> sound internal. Same question about the library. Why aren't mgmt stuff
+>>> compiled into the main library?
+>>> I appreciate it if anyone could shed some light into the reasoning
+>>> behind this. Am I not supposed to be using these?
+>>
+>> there are not meant to be a public API. Even libbluetooth is no longer installed by default actually.
+>>
+>> Regards
+>>
+>> Marcel
+>>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+Yes, these are really meant as internal tools, though I see no reason
+why you couldn't just take the source code and use it to build your
+simple application. The code in shared/ already gets bundled into
+static libraries (libshared-mainloop & libshared-glib) which should
+already make that process easy. In general you technically don't need
+something like libbluetooth, since you already have access to the
+sources.
+
+Marcel, as a side note, I was actually the one who suggested that Mona
+use the shared code directly. It seems like she's working on a project
+with high resource constraints so they want to avoid pulling in
+glib/bluetoothd if they can. I think for very simple LE peripherals,
+it's actually reasonable to build a small application using only
+libshared-mainloop on top of a recent kernel version. To that end, it
+might be interesting to explore options for making this more easily
+available for developers (e.g. through configure flags).
+
+Cheers,
+Arman
