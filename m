@@ -1,42 +1,119 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <37A4BD1B-EB5A-49F7-93E5-E2C1AEC8C7DA@holtmann.org>
-References: <CAPt0RYxF95U1KvU2-exkoJCwaYqdzg0P_kJmnO65oSKMVNmKxA@mail.gmail.com>
-	<37A4BD1B-EB5A-49F7-93E5-E2C1AEC8C7DA@holtmann.org>
-Date: Wed, 10 Dec 2014 22:28:33 -0800
-Message-ID: <CAPt0RYw6qC8N4muqbqbLcMN3yqF+w6210jww_sL7NoJsbpo6KQ@mail.gmail.com>
-Subject: Re: Question about mgmt header files and shared-mainloop library
-From: Mona Attariyan <monattar@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
+From: Jaganath Kanakkassery <jaganath.k@samsung.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Jaganath Kanakkassery <jaganath.k@samsung.com>
+Subject: [PATCH 2/2 v1] Bluetooth: Fix missing hci_dev_lock/unlock in hci_event
+Date: Thu, 11 Dec 2014 11:43:13 +0530
+Message-id: <1418278393-26981-2-git-send-email-jaganath.k@samsung.com>
+In-reply-to: <1418278393-26981-1-git-send-email-jaganath.k@samsung.com>
+References: <1418278393-26981-1-git-send-email-jaganath.k@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
-Does that mean that one shouldn't be using these APIs? (src/shared/*.h
-?) How can I use
-the mgmt sockets then?
+mgmt_pending_remove() should be called with hci_dev_lock protection and
+all hci_event.c functions which calls mgmt_complete() (which eventually
+calls mgmt_pending_remove()) should hold the lock.
+So this patch fixes the same
 
-Thanks,
+Signed-off-by: Jaganath Kanakkassery <jaganath.k@samsung.com>
+---
+ net/bluetooth/hci_event.c |   25 ++++++++++++++++++++++---
+ 1 file changed, 22 insertions(+), 3 deletions(-)
 
-On Mon, Dec 8, 2014 at 10:13 PM, Marcel Holtmann <marcel@holtmann.org> wrote:
-> Hi Mona,
->
->> I'm using bluez mgmt API in a simple scan application. I've been
->> including headers files like src/shared/mgmt.h and src/shared/util.h.
->> Also the main bluez bluetooth library (libbluetooth.so) does not
->> include the mgmt and mainloop stuff, so I've been linking against
->> shared-mainloop.a. My question is why aren't these header files part
->> of the public API? as in in lib directory or something that doesn't
->> sound internal. Same question about the library. Why aren't mgmt stuff
->> compiled into the main library?
->> I appreciate it if anyone could shed some light into the reasoning
->> behind this. Am I not supposed to be using these?
->
-> there are not meant to be a public API. Even libbluetooth is no longer installed by default actually.
->
-> Regards
->
-> Marcel
->
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 322abbb..5255f26 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -257,6 +257,8 @@ static void hci_cc_write_auth_enable(struct hci_dev *hdev, struct sk_buff *skb)
+ 	if (!sent)
+ 		return;
+ 
++	hci_dev_lock(hdev);
++
+ 	if (!status) {
+ 		__u8 param = *((__u8 *) sent);
+ 
+@@ -268,6 +270,8 @@ static void hci_cc_write_auth_enable(struct hci_dev *hdev, struct sk_buff *skb)
+ 
+ 	if (test_bit(HCI_MGMT, &hdev->dev_flags))
+ 		mgmt_auth_enable_complete(hdev, status);
++
++	hci_dev_unlock(hdev);
+ }
+ 
+ static void hci_cc_write_encrypt_mode(struct hci_dev *hdev, struct sk_buff *skb)
+@@ -443,6 +447,8 @@ static void hci_cc_write_ssp_mode(struct hci_dev *hdev, struct sk_buff *skb)
+ 	if (!sent)
+ 		return;
+ 
++	hci_dev_lock(hdev);
++
+ 	if (!status) {
+ 		if (sent->mode)
+ 			hdev->features[1][0] |= LMP_HOST_SSP;
+@@ -458,6 +464,8 @@ static void hci_cc_write_ssp_mode(struct hci_dev *hdev, struct sk_buff *skb)
+ 		else
+ 			clear_bit(HCI_SSP_ENABLED, &hdev->dev_flags);
+ 	}
++
++	hci_dev_unlock(hdev);
+ }
+ 
+ static void hci_cc_write_sc_support(struct hci_dev *hdev, struct sk_buff *skb)
+@@ -471,6 +479,8 @@ static void hci_cc_write_sc_support(struct hci_dev *hdev, struct sk_buff *skb)
+ 	if (!sent)
+ 		return;
+ 
++	hci_dev_lock(hdev);
++
+ 	if (!status) {
+ 		if (sent->support)
+ 			hdev->features[1][0] |= LMP_HOST_SC;
+@@ -486,6 +496,8 @@ static void hci_cc_write_sc_support(struct hci_dev *hdev, struct sk_buff *skb)
+ 		else
+ 			clear_bit(HCI_SC_ENABLED, &hdev->dev_flags);
+ 	}
++
++	hci_dev_unlock(hdev);
+ }
+ 
+ static void hci_cc_read_local_version(struct hci_dev *hdev, struct sk_buff *skb)
+@@ -1172,11 +1184,14 @@ static void hci_cc_le_set_scan_enable(struct hci_dev *hdev,
+ 		 * re-enable it again if necessary.
+ 		 */
+ 		if (test_and_clear_bit(HCI_LE_SCAN_INTERRUPTED,
+-				       &hdev->dev_flags))
++				       &hdev->dev_flags)) {
++			hci_dev_lock(hdev);
+ 			hci_discovery_set_state(hdev, DISCOVERY_STOPPED);
+-		else if (!test_bit(HCI_LE_ADV, &hdev->dev_flags) &&
+-			 hdev->discovery.state == DISCOVERY_FINDING)
++			hci_dev_unlock(hdev);
++		} else if (!test_bit(HCI_LE_ADV, &hdev->dev_flags) &&
++			   hdev->discovery.state == DISCOVERY_FINDING) {
+ 			mgmt_reenable_advertising(hdev);
++		}
+ 
+ 		break;
+ 
+@@ -1278,6 +1293,8 @@ static void hci_cc_write_le_host_supported(struct hci_dev *hdev,
+ 	if (!sent)
+ 		return;
+ 
++	hci_dev_lock(hdev);
++
+ 	if (sent->le) {
+ 		hdev->features[1][0] |= LMP_HOST_LE;
+ 		set_bit(HCI_LE_ENABLED, &hdev->dev_flags);
+@@ -1291,6 +1308,8 @@ static void hci_cc_write_le_host_supported(struct hci_dev *hdev,
+ 		hdev->features[1][0] |= LMP_HOST_LE_BREDR;
+ 	else
+ 		hdev->features[1][0] &= ~LMP_HOST_LE_BREDR;
++
++	hci_dev_unlock(hdev);
+ }
+ 
+ static void hci_cc_set_adv_param(struct hci_dev *hdev, struct sk_buff *skb)
+-- 
+1.7.9.5
+
