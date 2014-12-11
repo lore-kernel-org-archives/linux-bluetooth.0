@@ -1,256 +1,137 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH 1/3] android: Add native support for Android logger
-Date: Thu, 11 Dec 2014 17:42:28 +0100
-Message-Id: <1418316150-2660-1-git-send-email-szymon.janc@tieto.com>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 8.1 \(1993\))
+Subject: Re: [PATCH v2] doc/adapter-api.txt: StartServiceDiscovery method.
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <CAHrH25RzOXdJ9es+PZ+PAvjn3kUYFdQ1nvsxStuLLmpso9f73g@mail.gmail.com>
+Date: Thu, 11 Dec 2014 17:07:09 +0100
+Cc: Jakub Pawlowski <jpawlowski@google.com>,
+	BlueZ development <linux-bluetooth@vger.kernel.org>
+Message-Id: <5BCE56B6-FE77-4CD3-ADC1-BC40DD39DA56@holtmann.org>
+References: <1418305513-4327-1-git-send-email-jpawlowski@google.com> <CAHrH25RzOXdJ9es+PZ+PAvjn3kUYFdQ1nvsxStuLLmpso9f73g@mail.gmail.com>
+To: Arman Uguray <armansito@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Lollipop enabled SELinux in enforcing mode but doesn't provide
-proper policy for logwrapper. All AOSP native services were converted
-to not use logwrapper at all so we should follow the same.
+Hi Arman,
 
-On Android Lollipop we handle logging by sending data to Android
-logd over socket. On Android KitKat logs are written directly to
-/dev/log/system.
+>> On Thu, Dec 11, 2014 at 5:45 AM, Jakub Pawlowski <jpawlowski@google.com> wrote:
+>> This patch proposes new method, StartServiceDiscovery to D-Bus Adapter API for
+>> desktop bluetoothd. It will allow for rapid discovery of nearby devices that
+>> advertise services.
+>> 
+>> Signed-off-by: Jakub Pawlowski <jpawlowski@google.com>
+> 
+> Omit "signed-off by" please.
+> 
+>> ---
+>> doc/adapter-api.txt | 38 ++++++++++++++++++++++++++++++++++++++
+>> 1 file changed, 38 insertions(+)
+>> 
+>> diff --git a/doc/adapter-api.txt b/doc/adapter-api.txt
+>> index 74d235a..198a35a 100644
+>> --- a/doc/adapter-api.txt
+>> +++ b/doc/adapter-api.txt
+>> @@ -22,6 +22,44 @@ Methods              void StartDiscovery()
+>>                        Possible errors: org.bluez.Error.NotReady
+>>                                         org.bluez.Error.Failed
+>> 
+>> +               void StartServiceDiscovery(string mode, dict filter)
+>> +
+> 
+> I mentioned this before during the mgmt API patches (though I didn't
+> feel strongly about it) and I'm mentioning it now (this time I feel
+> more strongly) that I don't like the term "ServiceDiscovery" here. It
+> makes me immediately think of ATT/SDP, which is not what this API
+> doing. What's more, I can easily imagine that we potentially extend
+> this API to filter by other types of parameters, such as the
+> manufacturer data field for instance, so maybe it's better to rename
+> this to something more generic like "RequestDevice" or
+> "ScanDevicesWithFilter" (or something along those lines).
+> 
+> The behavior of this API with respect to simultaneous use by multiple
+> applications should be defined here as well. When more than one
+> application calls this, is the behavior basically "adding a new UUID
+> filter to the ongoing scan"?
+> 
+> Also, earlier we were talking about a one-shot API that would return
+> the object paths of devices that the application is particularly
+> concerned with. Is that the approach we should take here? Or are we
+> basically saying that applications should rely on InterfacesAdded
+> signals and then do their additional filtering on top of that based on
+> Device properties?
 
-Nice addition over logwrapper is that now we have proper tags for
-messages levels like debug, info, error etc.
----
- android/Android.mk |   2 +-
- android/log.c      | 208 +++++++++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 209 insertions(+), 1 deletion(-)
- create mode 100644 android/log.c
+I think that can be achieved by something simple like DiscoverDevices which will return an array of device objects. It is more for the simple application that knows exactly what it is looking for.
 
-diff --git a/android/Android.mk b/android/Android.mk
-index c1505c8..17349bf 100644
---- a/android/Android.mk
-+++ b/android/Android.mk
-@@ -58,7 +58,7 @@ LOCAL_SRC_FILES := \
- 	bluez/android/sco.c \
- 	bluez/profiles/health/mcap.c \
- 	bluez/android/map-client.c \
--	bluez/src/log.c \
-+	bluez/android/log.c \
- 	bluez/src/shared/mgmt.c \
- 	bluez/src/shared/util.c \
- 	bluez/src/shared/queue.c \
-diff --git a/android/log.c b/android/log.c
-new file mode 100644
-index 0000000..f7454ac
---- /dev/null
-+++ b/android/log.c
-@@ -0,0 +1,208 @@
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2014  Intel Corporation. All rights reserved.
-+ *
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-+ *
-+ */
-+#ifdef HAVE_CONFIG_H
-+#include <config.h>
-+#endif
-+
-+#include <fcntl.h>
-+#include <stdio.h>
-+#include <unistd.h>
-+#include <stdbool.h>
-+#include <sys/uio.h>
-+#include <sys/types.h>
-+#include <sys/socket.h>
-+#include <sys/un.h>
-+
-+#include <glib.h>
-+
-+#include "src/log.h"
-+
-+#define LOG_TAG "bluetoothd"
-+
-+#define LOG_DEBUG 3
-+#define LOG_INFO 4
-+#define LOG_WARN 5
-+#define LOG_ERR 6
-+
-+#define LOG_ID_SYSTEM 3
-+
-+static int log_fd = -1;
-+static bool legacy_log = false;
-+
-+static void android_log(unsigned char level, const char *fmt, va_list ap)
-+{
-+	struct iovec vec[7];
-+	uint32_t sec, nsec;
-+	uint8_t id = LOG_ID_SYSTEM;
-+	uint16_t pid; /* Android logd expects only 2 bytes for PID */
-+	int cnt = 0;
-+	char *msg;
-+
-+	if (log_fd < 0)
-+		return;
-+
-+	msg = g_strdup_vprintf(fmt, ap);
-+
-+	if (!legacy_log) {
-+		struct timespec ts;
-+
-+		pid = getpid();
-+
-+		clock_gettime(CLOCK_REALTIME, &ts);
-+		sec = ts.tv_sec;
-+		nsec = ts.tv_nsec;
-+
-+		vec[0].iov_base = &id;
-+		vec[0].iov_len = sizeof(id);
-+		vec[1].iov_base = &pid;
-+		vec[1].iov_len = sizeof(pid);
-+		vec[2].iov_base = &sec;
-+		vec[2].iov_len = sizeof(sec);
-+		vec[3].iov_base = &nsec;
-+		vec[3].iov_len = sizeof(nsec);
-+
-+		cnt = 4;
-+	}
-+
-+	vec[cnt + 0].iov_base = &level;
-+	vec[cnt + 0].iov_len = sizeof(level);
-+	vec[cnt + 1].iov_base = LOG_TAG;
-+	vec[cnt + 1].iov_len = sizeof(LOG_TAG);
-+	vec[cnt + 2].iov_base  = msg;
-+	vec[cnt + 2].iov_len  = strlen(msg) + 1;
-+
-+	cnt += 3;
-+
-+	writev(log_fd, vec, cnt);
-+
-+	g_free(msg);
-+}
-+
-+void info(const char *format, ...)
-+{
-+	va_list ap;
-+
-+	va_start(ap, format);
-+
-+	android_log(LOG_INFO, format, ap);
-+
-+	va_end(ap);
-+}
-+
-+void warn(const char *format, ...)
-+{
-+	va_list ap;
-+
-+	va_start(ap, format);
-+
-+	android_log(LOG_WARN, format, ap);
-+
-+	va_end(ap);
-+}
-+
-+void error(const char *format, ...)
-+{
-+	va_list ap;
-+
-+	va_start(ap, format);
-+
-+	android_log(LOG_ERR, format, ap);
-+
-+	va_end(ap);
-+}
-+
-+void btd_debug(const char *format, ...)
-+{
-+	va_list ap;
-+
-+	va_start(ap, format);
-+
-+	android_log(LOG_DEBUG, format, ap);
-+
-+	va_end(ap);
-+}
-+
-+static bool init_legacy_log(void)
-+{
-+	log_fd = open("/dev/log/system", O_WRONLY);
-+	if (log_fd < 0)
-+		return false;
-+
-+	legacy_log = true;
-+
-+	return true;
-+}
-+
-+static bool init_logd(void)
-+{
-+	struct sockaddr_un addr;
-+
-+	log_fd = socket(PF_UNIX, SOCK_DGRAM | SOCK_CLOEXEC, 0);
-+	if (log_fd < 0)
-+		return false;
-+
-+	if (fcntl(log_fd, F_SETFL, O_NONBLOCK) < 0)
-+		goto failed;
-+
-+	memset(&addr, 0, sizeof(addr));
-+	addr.sun_family = AF_UNIX;
-+	strcpy(addr.sun_path, "/dev/socket/logdw");
-+
-+	if (connect(log_fd, (struct sockaddr *)&addr, sizeof(addr)) < 0)
-+		goto failed;
-+
-+	return true;
-+
-+failed:
-+	close(log_fd);
-+	log_fd = -1;
-+
-+	return false;
-+}
-+
-+extern struct btd_debug_desc __start___debug[];
-+extern struct btd_debug_desc __stop___debug[];
-+
-+void __btd_log_init(const char *debug, int detach)
-+{
-+	if (!init_logd() && !init_legacy_log())
-+		return;
-+
-+	if (debug) {
-+		struct btd_debug_desc *desc;
-+
-+		for (desc = __start___debug; desc < __stop___debug; desc++)
-+			desc->flags |= BTD_DEBUG_FLAG_PRINT;
-+	}
-+
-+	info("Bluetooth daemon %s", VERSION);
-+}
-+
-+void __btd_log_cleanup(void)
-+{
-+	if (log_fd < 0)
-+		return;
-+
-+	close(log_fd);
-+	log_fd = -1;
-+}
--- 
-1.9.1
+The only real difference is that StartDiscovery and alike will keep running until it is stopped, while a one-shot trigger will just stop once devices are found or when it has been cancelled.
+
+If a DiscoverDevices is enough for your use case, then I say, lets go that direction. It is simpler and a lot easier. Per each application we could allow one DiscoverDevices running at the same time. When called from multiple application then bluetoothd will take care of combining the filter and multiplexing it. The DiscoverDevices will run until it finds at least one device with the matching filter parameters or CancelDiscoverDevices is called. Then the caller can decide to run it again or connect to that found device.
+
+>> +                       This method starts the device discovery session with
+>> +                       filtering by uuids, and rssi or pathloss value. Use
+>> +                       StopDiscovery to release the sessions acquired.
+>> +
+> 
+> You should document the behavior of this method if StartDiscovery was
+> called earlier. Does it just fail in that case or is it a no-op?
+> 
+>> +                       mode parameter:
+>> +                               "LE" - le only scan
+>> +                               "BR/EDR" - br/edr inquiry
+>> +                               "INTERLEAVED" - interleaved scan
+> 
+> This parameter looks to MGMT-like. Why do we need an "interlaved"
+> flag? Should an application care about which technology is being used?
+> Should this just be automatically determined by bluetoothd?
+
+I think we want to call it Bearer or Transport. And it should essentially be specified "le" or "bredr" or "auto" as possible modes. The interleaved / auto should be assumed by just leaving the parameter out.
+
+> 
+>> +
+>> +                       Parameters that can be set in filter dictionary include
+>> +                       the following:
+>> +
+>> +                               string UUID : filtered service UUID (required)
+
+We obviously want a list of UUIDs so this should be an array{string}.
+
+>> +                               string RSSI : RSSI threshold value (optional)
+
+RSSI should be a int16 like we have with the other properties.
+ 
+>> +                               string pathloss : Pathloss threshold value
+>> +                                                   (optional)
+
+And Pathloss should also be int16 if it needs to be signed or uint8/byte if it doesn't. I would need to look this up again.
+
+>> +
+>> +                       When a device is found that advertise UUID, it will be
+>> +                       reported if:
+>> +                       - pathloss and RSSI are both empty
+>> +                       - only pathloss param is set, device advertise TX pwer,
+>> +                         and computed pathloss is less than pathloss param,
+>> +                       - only RSSI param is set, and received RSSI is higher
+>> +                         than RSSI param,
+>> +                       - both pathloss and RSSI is set. Then if TX power is
+>> +                         advertised, pathloss condition must be met, otherwise
+>> +                         RSSI condition must be met.
+
+Personally I would say either RSSI or Pathloss can be specified. If both are specified, then an error will be returned. Obviously devices without TX Power field will be ignored.
+
+>> +
+>> +                       This process will start creating Device objects as new
+>> +                       devices matching criteria are discovered. It will also
+>> +                       emit PropertiesChanged signal for already existing
+>> +                       Device objects, with updated RSSI value.
+>> +
+>> +                       Possible errors: org.bluez.Error.NotReady
+>> +                                        org.bluez.Error.Failed
+>> +
+>>                void StopDiscovery()
+>> 
+>>                        This method will cancel any previous StartDiscovery
+
+Regards
+
+Marcel
 
