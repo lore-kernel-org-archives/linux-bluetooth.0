@@ -1,44 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: Mariusz Skamra <mariusz.skamra@tieto.com>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 8.1 \(1993\))
+Subject: Re: [PATCH 0/3] Bluetooth: hci_conn related fixes
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1418327146-15899-1-git-send-email-johan.hedberg@gmail.com>
+Date: Thu, 11 Dec 2014 21:00:46 +0100
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] android/pts: Update of GATT test results
-Date: Thu, 11 Dec 2014 21:22:09 +0100
-Message-ID: <1982230.McuceiQxxW@leonov>
-In-Reply-To: <1418307395-22214-1-git-send-email-mariusz.skamra@tieto.com>
-References: <1418307395-22214-1-git-send-email-mariusz.skamra@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Message-Id: <6E1E9926-9B62-4631-A83A-3B5F69F1358D@holtmann.org>
+References: <1418327146-15899-1-git-send-email-johan.hedberg@gmail.com>
+To: Johan Hedberg <johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Mariusz,
+Hi Johan,
 
-On Thursday 11 of December 2014 15:16:35 Mariusz Skamra wrote:
-> ---
->  android/pts-gatt.txt | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+> This set of patches contains fixes for various issues introduced by the
+> generic cmd_complete callback mechanism for pending mgmt commands.
 > 
-> diff --git a/android/pts-gatt.txt b/android/pts-gatt.txt
-> index d1cf981..5993f05 100644
-> --- a/android/pts-gatt.txt
-> +++ b/android/pts-gatt.txt
-> @@ -1060,10 +1060,10 @@ TC_GAI_SR_BV_01_C	PASS	haltest:
->  				gatts start_service
->  				gatts add_service
->  				gatts start_service
-> -TC_GAS_CL_BV_01_C	FAIL	haltest:
-> +TC_GAS_CL_BV_01_C	PASS	haltest:
->  				gattc connect
->  				gattc disconnect
-> -TC_GAS_SR_BV_01_C	FAIL	haltest:
-> +TC_GAS_SR_BV_01_C	PASS	haltest:
->  				gatts add_service
->  				gatts add_chaaracteristic:
->  						<properties> 42 <permissions> 17
+> Johan
+> 
+> ----------------------------------------------------------------
+> Johan Hedberg (3):
+>      Bluetooth: Fix calling hci_conn_put too early
+>      Bluetooth: Fix incorrect pending cmd removal in pairing_complete()
+>      Bluetooth: Fix notifying mgmt power off before flushing connection list
+> 
+> net/bluetooth/hci_core.c | 14 ++++++--------
+> net/bluetooth/mgmt.c     | 42 +++++++++++++++++++++++++++---------------
+> 2 files changed, 33 insertions(+), 23 deletions(-)
 
-Applied, thanks.
+all 3 patches have been applied to bluetooth-next tree.
 
--- 
-BR
-Szymon Janc
+Regards
+
+Marcel
+
