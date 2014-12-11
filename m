@@ -1,1153 +1,233 @@
 Return-Path: <cyrus@holtmann.org>
+Message-ID: <548A2ACB.3080508@netcommwireless.com>
+Date: Fri, 12 Dec 2014 10:37:47 +1100
+From: Alan Au <alan.au@netcommwireless.com>
 MIME-Version: 1.0
-In-Reply-To: <1418327617-26951-2-git-send-email-jamuraa@chromium.org>
-References: <1418327617-26951-1-git-send-email-jamuraa@chromium.org>
-	<1418327617-26951-2-git-send-email-jamuraa@chromium.org>
-Date: Thu, 11 Dec 2014 15:51:32 -0800
-Message-ID: <CAHrH25TyGbTWGLOhzCr-Za46ULMUmWuH9XfZ6y+QTDCSqdFqXw@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 1/3] shared/queue: enable early terminate foreach
-From: Arman Uguray <armansito@chromium.org>
-To: Michael Janssen <jamuraa@chromium.org>
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+To: Johan Hedberg <johan.hedberg@gmail.com>
+CC: <linux-bluetooth@vger.kernel.org>
+Subject: Re: Unable to make subsequent BLE connections
+References: <5488D75C.2010700@netcommwireless.com> <20141211073659.GA14258@t440s.P-661HNU-F1>
+In-Reply-To: <20141211073659.GA14258@t440s.P-661HNU-F1>
+Content-Type: text/plain; charset="windows-1252"; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Michael,
+Hi Johan,
 
-I just did a general pass over the shared/gatt bits, the rest is up to Luiz.
+On 11/12/14 18:36, Johan Hedberg wrote:
+> Hi Alan,
+>
+> On Thu, Dec 11, 2014, Alan Au wrote:
+>> I'm connecting to a BLE oximeter device. The first couple of connects
+>> succeed. But after that the connection always fails. I have tried with both
+>> gatttool and with my own code. hcidump shows that the "LE Start Encryption"
+>> command fails with  "PIN or Key Missing". If I delete the pairing (that was
+>> created by the earlier successful connection) then subsequent connects will
+>> succeed for a few times again.
+>>
+>> I analysed the hcidumps of successful and failed connects. In the failed
+>> case, it looks to me like bluez is not sending out an SMP PairingRequest in
+>> response to an SMP SecurityRequest from the slave. I can see in the kernel
+>> code that smp_cmd_security_req() does not send out the PairingRequest if it
+>> finds an LTK. But is that correct? Should it not try to pair anyway because
+>> the remote device is requesting it and may have deleted the earlier bonding.
+> According to the SMP specification "The Security Request command is used
+> by the slave to request that the master initiates security with the
+> requested security properties". That doesn't talk about always sending a
+> Pairing Request but initiating security, which makes sense since there'd
+> otherwise be no other way for the slave to request the connection to be
+> encrypted with a shared LTK.
 
-> On Thu, Dec 11, 2014 at 11:53 AM, Michael Janssen <jamuraa@chromium.org> wrote:
-> Redefines the callback for queue_foreach to return a boolean indicating
-> whether to continue with the iteration.  When the function returns
-> false, the iteration is terminated.
->
-> This allows for functions where only part of the contents of the queue
-> need to be examined or touched to be efficient.
-> ---
->  android/bluetooth.c      |  4 ++-
->  android/gatt.c           | 48 ++++++++++++++++++++++------------
->  android/handsfree.c      |  9 ++++---
->  android/health.c         | 36 ++++++++++++++-----------
->  android/tester-main.c    | 32 +++++++++++++++++------
->  emulator/hciemu.c        |  3 ++-
->  monitor/keys.c           |  9 +++----
->  src/shared/att.c         | 21 ++++++++++-----
->  src/shared/gatt-client.c | 14 ++++++----
->  src/shared/gatt-db.c     | 68 +++++++++++++++++++++++-------------------------
->  src/shared/hci.c         |  4 ++-
->  src/shared/mgmt.c        | 13 +++++----
->  src/shared/queue.c       |  3 ++-
->  src/shared/queue.h       |  2 +-
->  src/shared/uhid.c        |  6 +++--
->  unit/test-queue.c        |  6 +++--
->  16 files changed, 169 insertions(+), 109 deletions(-)
->
-> diff --git a/android/bluetooth.c b/android/bluetooth.c
-> index 6443cfe..5298fb6 100644
-> --- a/android/bluetooth.c
-> +++ b/android/bluetooth.c
-> @@ -4427,12 +4427,14 @@ failed:
->                                                                         status);
->  }
->
-> -static void send_unpaired_notification(void *data, void *user_data)
-> +static bool send_unpaired_notification(void *data, void *user_data)
->  {
->         bt_unpaired_device_cb cb = data;
->         struct mgmt_addr_info *addr = user_data;
->
->         cb(&addr->bdaddr, addr->type);
-> +
-> +       return true;
->  }
->
->  static void unpair_device_complete(uint8_t status, uint16_t length,
-> diff --git a/android/gatt.c b/android/gatt.c
-> index 37bd6de..8d6a939 100644
-> --- a/android/gatt.c
-> +++ b/android/gatt.c
-> @@ -886,19 +886,21 @@ static void send_app_connect_notify(struct app_connection *connection,
->                 send_server_connection_notify(connection, !status);
->  }
->
-> -static void disconnect_notify_by_device(void *data, void *user_data)
-> +static bool disconnect_notify_by_device(void *data, void *user_data)
->  {
->         struct app_connection *conn = data;
->         struct gatt_device *dev = user_data;
->
->         if (dev != conn->device || !conn->app)
-> -               return;
-> +               return true;
->
->         if (dev->state == DEVICE_CONNECTED)
->                 send_app_disconnect_notify(conn, GATT_SUCCESS);
->         else if (dev->state == DEVICE_CONNECT_INIT ||
->                                         dev->state == DEVICE_CONNECT_READY)
->                 send_app_connect_notify(conn, GATT_FAILURE);
-> +
-> +       return true;
->  }
->
->  static void destroy_connection(void *data)
-> @@ -1142,7 +1144,7 @@ static struct service *create_service(uint8_t id, bool primary, char *uuid,
->         return s;
->  }
->
-> -static void send_client_primary_notify(void *data, void *user_data)
-> +static bool send_client_primary_notify(void *data, void *user_data)
->  {
->         struct hal_ev_gatt_client_search_result ev;
->         struct service *p = data;
-> @@ -1150,7 +1152,7 @@ static void send_client_primary_notify(void *data, void *user_data)
->
->         /* In service queue we will have also included services */
->         if (!p->primary)
-> -               return;
-> +               return true;
->
->         ev.conn_id  = conn_id;
->         element_id_to_hal_srvc_id(&p->id, 1, &ev.srvc_id);
-> @@ -1159,6 +1161,8 @@ static void send_client_primary_notify(void *data, void *user_data)
->
->         ipc_send_notif(hal_ipc, HAL_SERVICE_ID_GATT,
->                         HAL_EV_GATT_CLIENT_SEARCH_RESULT, sizeof(ev), &ev);
-> +
-> +       return true;
->  }
->
->  static void send_client_search_complete_notify(int32_t status, int32_t conn_id)
-> @@ -1394,13 +1398,15 @@ struct connect_data {
->         int32_t status;
->  };
->
-> -static void send_app_connect_notifications(void *data, void *user_data)
-> +static bool send_app_connect_notifications(void *data, void *user_data)
->  {
->         struct app_connection *conn = data;
->         struct connect_data *con_data = user_data;
->
->         if (conn->device == con_data->dev)
->                 send_app_connect_notify(conn, con_data->status);
-> +
-> +       return true;
->  }
->
->  static struct app_connection *find_conn(const bdaddr_t *addr, int32_t app_id)
-> @@ -1430,19 +1436,21 @@ static struct app_connection *find_conn(const bdaddr_t *addr, int32_t app_id)
->                                                                 &conn_match);
->  }
->
-> -static void create_app_connection(void *data, void *user_data)
-> +static bool create_app_connection(void *data, void *user_data)
->  {
->         struct gatt_device *dev = user_data;
->         struct gatt_app *app;
->
->         app = find_app_by_id(PTR_TO_INT(data));
->         if (!app)
-> -               return;
-> +               return true;
->
->         DBG("Autoconnect application id=%d", app->id);
->
->         if (!find_conn(&dev->bdaddr, PTR_TO_INT(data)))
->                 create_connection(dev, app);
-> +
-> +       return true;
->  }
->
->  static void ind_handler(const uint8_t *cmd, uint16_t cmd_len,
-> @@ -1944,13 +1952,15 @@ static void remove_autoconnect_device(struct gatt_device *dev)
->         device_unref(dev);
->  }
->
-> -static void clear_autoconnect_devices(void *data, void *user_data)
-> +static bool clear_autoconnect_devices(void *data, void *user_data)
->  {
->         struct gatt_device *dev = data;
->
->         if (queue_remove(dev->autoconnect_apps, user_data))
->                 if (queue_isempty(dev->autoconnect_apps))
->                         remove_autoconnect_device(dev);
-> +
-> +       return true;
->  }
->
->  static uint8_t unregister_app(int client_if)
-> @@ -4768,7 +4778,7 @@ static void attribute_read_cb(struct gatt_db_attribute *attrib, int err,
->         memcpy(resp_data->value, value, length);
->  }
->
-> -static void read_requested_attributes(void *data, void *user_data)
-> +static bool read_requested_attributes(void *data, void *user_data)
->  {
->         struct pending_request *resp_data = data;
->         struct request_processing_data *process_data = user_data;
-> @@ -4780,7 +4790,7 @@ static void read_requested_attributes(void *data, void *user_data)
->         if (!attrib) {
->                 resp_data->error = ATT_ECODE_ATTR_NOT_FOUND;
->                 resp_data->state = REQUEST_DONE;
-> -               return;
-> +               return true;
->         }
->
->         gatt_db_attribute_get_permissions(attrib, &permissions);
-> @@ -4798,7 +4808,7 @@ static void read_requested_attributes(void *data, void *user_data)
->         if (error != 0) {
->                 resp_data->error = error;
->                 resp_data->state = REQUEST_DONE;
-> -               return;
-> +               return true;
->         }
->
->         resp_data->state = REQUEST_PENDING;
-> @@ -4806,6 +4816,8 @@ static void read_requested_attributes(void *data, void *user_data)
->         gatt_db_attribute_read(attrib, resp_data->offset, process_data->opcode,
->                                         &process_data->device->bdaddr,
->                                         attribute_read_cb, resp_data);
-> +
-> +       return true;
->  }
->
->  static void process_dev_pending_requests(struct gatt_device *device,
-> @@ -5109,7 +5121,7 @@ failed:
->                                 HAL_OP_GATT_SERVER_ADD_DESCRIPTOR, status);
->  }
->
-> -static void notify_service_change(void *data, void *user_data)
-> +static bool notify_service_change(void *data, void *user_data)
->  {
->         struct att_range range;
->         struct gatt_db_attribute *attrib = user_data;
-> @@ -5118,9 +5130,11 @@ static void notify_service_change(void *data, void *user_data)
->
->         /* In case of db error */
->         if (!range.end)
-> -               return;
-> +               return true;
->
->         notify_att_range_change(data, &range);
-> +
-> +       return true;
->  }
->
->  static sdp_record_t *get_sdp_record(uuid_t *uuid, uint16_t start, uint16_t end,
-> @@ -6515,21 +6529,21 @@ static uint8_t write_prep_request(const uint8_t *cmd, uint16_t cmd_len,
->         return 0;
->  }
->
-> -static void send_server_write_execute_notify(void *data, void *user_data)
-> +static bool send_server_write_execute_notify(void *data, void *user_data)
->  {
->         struct hal_ev_gatt_server_request_exec_write *ev = user_data;
->         struct pending_trans_data *transaction;
->         struct app_connection *conn = data;
->
->         if (!conn->wait_execute_write)
-> -               return;
-> +               return true;
->
->         ev->conn_id = conn->id;
->
->         transaction = conn_add_transact(conn, ATT_OP_EXEC_WRITE_REQ, NULL, 0);
->         if (!transaction) {
->                 conn->wait_execute_write = false;
-> -               return;
-> +               return true;
->         }
->
->         ev->trans_id = transaction->id;
-> @@ -6537,6 +6551,8 @@ static void send_server_write_execute_notify(void *data, void *user_data)
->         ipc_send_notif(hal_ipc, HAL_SERVICE_ID_GATT,
->                                 HAL_EV_GATT_SERVER_REQUEST_EXEC_WRITE,
->                                 sizeof(*ev), ev);
-> +
-> +       return true;
->  }
->
->  static uint8_t write_execute_request(const uint8_t *cmd, uint16_t cmd_len,
-> diff --git a/android/handsfree.c b/android/handsfree.c
-> index 7fbe64b..48d280b 100644
-> --- a/android/handsfree.c
-> +++ b/android/handsfree.c
-> @@ -1986,7 +1986,7 @@ static void update_indicator(struct hf_device *dev, int ind, uint8_t val)
->         hfp_gw_send_info(dev->gw, "+CIEV: %u,%u", ind + 1, val);
->  }
->
-> -static void device_status_notif(void *data, void *user_data)
-> +static bool device_status_notif(void *data, void *user_data)
->  {
->         struct hf_device *dev = data;
->         struct hal_cmd_handsfree_device_status_notif *cmd = user_data;
-> @@ -1995,6 +1995,8 @@ static void device_status_notif(void *data, void *user_data)
->         update_indicator(dev, IND_ROAM, cmd->type);
->         update_indicator(dev, IND_SIGNAL, cmd->signal);
->         update_indicator(dev, IND_BATTCHG, cmd->battery);
-> +
-> +       return true;
->  }
->
->  static void handle_device_status_notif(const void *buf, uint16_t len)
-> @@ -2433,7 +2435,7 @@ static void phone_state_idle(struct hf_device *dev, int num_active,
->         }
->  }
->
-> -static void phone_state_change(void *data, void *user_data)
-> +static bool phone_state_change(void *data, void *user_data)
->  {
->         struct hf_device *dev = data;
->         struct hal_cmd_handsfree_phone_state_change *cmd = user_data;
-> @@ -2457,13 +2459,14 @@ static void phone_state_change(void *data, void *user_data)
->                 DBG("unhandled new state %u (current state %u)", cmd->state,
->                                                         dev->setup_state);
->
-> -               return;
-> +               return true;
->         }
->
->         dev->num_active = cmd->num_active;
->         dev->num_held = cmd->num_held;
->         dev->setup_state = cmd->state;
->
-> +       return true;
->  }
->
->  static void handle_phone_state_change(const void *buf, uint16_t len)
-> diff --git a/android/health.c b/android/health.c
-> index 75811aa..54085a7 100644
-> --- a/android/health.c
-> +++ b/android/health.c
-> @@ -313,13 +313,13 @@ struct channel_search {
->         struct health_channel *channel;
->  };
->
-> -static void device_search_channel(void *data, void *user_data)
-> +static bool device_search_channel(void *data, void *user_data)
->  {
->         struct health_device *dev = data;
->         struct channel_search *search = user_data;
->
->         if (search->channel)
-> -               return;
-> +               return false;
->
->         if (search->channel_id)
->                 search->channel = queue_find(dev->channels, match_channel_by_id,
-> @@ -328,17 +328,21 @@ static void device_search_channel(void *data, void *user_data)
->                 search->channel = queue_find(dev->channels,
->                                                 match_channel_by_mdl,
->                                                 search->mdl);
-> +
-> +       return true;
->  }
->
-> -static void app_search_channel(void *data, void *user_data)
-> +static bool app_search_channel(void *data, void *user_data)
->  {
->         struct health_app *app = data;
->         struct channel_search *search = user_data;
->
->         if (search->channel)
-> -               return;
-> +               return false;
->
->         queue_foreach(app->devices, device_search_channel, search);
-> +
-> +       return true;
->  }
->
->  static struct health_channel *search_channel_by_id(uint16_t id)
-> @@ -374,15 +378,14 @@ struct mcl_search {
->         struct health_device *dev;
->  };
->
-> -static void app_search_dev(void *data, void *user_data)
-> +static bool app_search_dev(void *data, void *user_data)
->  {
->         struct health_app *app = data;
->         struct mcl_search *search = user_data;
->
-> -       if (search->dev)
-> -               return;
-> -
->         search->dev = queue_find(app->devices, match_dev_by_mcl, search->mcl);
-> +
-> +       return !search->dev;
->  }
->
->  static struct health_device *search_dev_by_mcl(struct mcap_mcl *mcl)
-> @@ -404,17 +407,18 @@ struct app_search {
->         struct health_app *app;
->  };
->
-> -static void app_search_mdep(void *data, void *user_data)
-> +static bool app_search_mdep(void *data, void *user_data)
->  {
->         struct health_app *app = data;
->         struct app_search *search = user_data;
->
-> -       if (search->app)
-> -               return;
-> -
->         if (queue_find(app->mdeps, match_mdep_by_id,
-> -                                               INT_TO_PTR(search->mdepid)))
-> +                                               INT_TO_PTR(search->mdepid))) {
->                 search->app = app;
-> +               return false;
-> +       }
-> +
-> +       return true;
->  }
->
->  static struct health_app *search_app_by_mdepid(uint8_t mdepid)
-> @@ -661,7 +665,7 @@ static void free_hdp_list(void *list)
->         sdp_list_free(hdp_list, (sdp_free_func_t)sdp_data_free);
->  }
->
-> -static void register_features(void *data, void *user_data)
-> +static bool register_features(void *data, void *user_data)
->  {
->         struct mdep_cfg *mdep = data;
->         sdp_list_t **sup_features = user_data;
-> @@ -671,7 +675,7 @@ static void register_features(void *data, void *user_data)
->
->         hdp_feature = mdeps_to_sdp_features(mdep);
->         if (!hdp_feature)
-> -               return;
-> +               return true;
->
->         if (!*sup_features) {
->                 *sup_features = sdp_list_append(NULL, hdp_feature);
-> @@ -682,6 +686,8 @@ static void register_features(void *data, void *user_data)
->                 sdp_list_free(hdp_feature,
->                                         (sdp_free_func_t)sdp_data_free);
->         }
-> +
-> +       return true;
->  }
->
->  static int register_service_sup_features(sdp_record_t *rec,
-> diff --git a/android/tester-main.c b/android/tester-main.c
-> index 6339b3a..33a6808 100644
-> --- a/android/tester-main.c
-> +++ b/android/tester-main.c
-> @@ -3046,60 +3046,76 @@ static void tester_testcases_cleanup(void)
->         remove_pan_tests();
->  }
->
-> -static void add_bluetooth_tests(void *data, void *user_data)
-> +static bool add_bluetooth_tests(void *data, void *user_data)
->  {
->         struct test_case *tc = data;
->
->         test(tc, setup, generic_test_function, teardown);
-> +
-> +       return true;
->  }
->
-> -static void add_socket_tests(void *data, void *user_data)
-> +static bool add_socket_tests(void *data, void *user_data)
->  {
->         struct test_case *tc = data;
->
->         test(tc, setup_socket, generic_test_function, teardown);
-> +
-> +       return true;
->  }
->
-> -static void add_hidhost_tests(void *data, void *user_data)
-> +static bool add_hidhost_tests(void *data, void *user_data)
->  {
->         struct test_case *tc = data;
->
->         test(tc, setup_hidhost, generic_test_function, teardown);
-> +
-> +       return true;
->  }
->
-> -static void add_pan_tests(void *data, void *user_data)
-> +static bool add_pan_tests(void *data, void *user_data)
->  {
->         struct test_case *tc = data;
->
->         test(tc, setup_pan, generic_test_function, teardown);
-> +
-> +       return true;
->  }
->
-> -static void add_hdp_tests(void *data, void *user_data)
-> +static bool add_hdp_tests(void *data, void *user_data)
->  {
->         struct test_case *tc = data;
->
->         test(tc, setup_hdp, generic_test_function, teardown);
-> +
-> +       return true;
->  }
->
-> -static void add_a2dp_tests(void *data, void *user_data)
-> +static bool add_a2dp_tests(void *data, void *user_data)
->  {
->         struct test_case *tc = data;
->
->         test(tc, setup_a2dp, generic_test_function, teardown);
-> +
-> +       return true;
->  }
->
-> -static void add_avrcp_tests(void *data, void *user_data)
-> +static bool add_avrcp_tests(void *data, void *user_data)
->  {
->         struct test_case *tc = data;
->
->         test(tc, setup_avrcp, generic_test_function, teardown);
-> +
-> +       return true;
->  }
->
-> -static void add_gatt_tests(void *data, void *user_data)
-> +static bool add_gatt_tests(void *data, void *user_data)
->  {
->         struct test_case *tc = data;
->
->         test(tc, setup_gatt, generic_test_function, teardown);
-> +
-> +       return true;
->  }
->
->  int main(int argc, char *argv[])
-> diff --git a/emulator/hciemu.c b/emulator/hciemu.c
-> index c5bfa77..c1ab868 100644
-> --- a/emulator/hciemu.c
-> +++ b/emulator/hciemu.c
-> @@ -77,7 +77,7 @@ struct run_data {
->         uint8_t len;
->  };
->
-> -static void run_command_hook(void *data, void *user_data)
-> +static bool run_command_hook(void *data, void *user_data)
->  {
->         struct hciemu_command_hook *hook = data;
->         struct run_data *run_data = user_data;
-> @@ -85,6 +85,7 @@ static void run_command_hook(void *data, void *user_data)
->         if (hook->function)
->                 hook->function(run_data->opcode, run_data->data,
->                                         run_data->len, hook->user_data);
-> +       return true;
->  }
->
->  static void master_command_callback(uint16_t opcode,
-> diff --git a/monitor/keys.c b/monitor/keys.c
-> index 4ccef22..1d19b33 100644
-> --- a/monitor/keys.c
-> +++ b/monitor/keys.c
-> @@ -106,22 +106,21 @@ struct resolve_data {
->         uint8_t ident_type;
->  };
->
-> -static void try_resolve_irk(void *data, void *user_data)
-> +static bool try_resolve_irk(void *data, void *user_data)
->  {
->         struct irk_data *irk = data;
->         struct resolve_data *result = user_data;
->         uint8_t local_hash[3];
->
-> -       if (result->found)
-> -               return;
-> -
->         bt_crypto_ah(crypto, irk->key, result->addr + 3, local_hash);
->
->         if (!memcmp(result->addr, local_hash, 3)) {
-> -               result->found = true;
->                 memcpy(result->ident, irk->addr, 6);
-> +               result->found = true;
->                 result->ident_type = irk->addr_type;
-> +               return false;
->         }
-> +       return true;
->  }
->
->  bool keys_resolve_identity(const uint8_t addr[6], uint8_t ident[6],
-> diff --git a/src/shared/att.c b/src/shared/att.c
-> index 26b6c5b..71138d8 100644
-> --- a/src/shared/att.c
-> +++ b/src/shared/att.c
-> @@ -247,11 +247,13 @@ static bool match_notify_removed(const void *a, const void *b)
->         return notify->removed;
->  }
->
-> -static void mark_notify_removed(void *data, void *user_data)
-> +static bool mark_notify_removed(void *data, void *user_data)
->  {
->         struct att_notify *notify = data;
->
->         notify->removed = true;
-> +
-> +       return true;
->  }
->
->  struct att_disconn {
-> @@ -287,11 +289,12 @@ static bool match_disconn_removed(const void *a, const void *b)
->         return disconn->removed;
->  }
->
-> -static void mark_disconn_removed(void *data, void *user_data)
-> +static bool mark_disconn_removed(void *data, void *user_data)
->  {
->         struct att_disconn *disconn = data;
->
->         disconn->removed = true;
+That makes sense and I agree that bluez does appear to be conforming to 
+this aspect of the spec.
 
-New line before return.
+>
+> So sounds like your device is for whatever reason (maybe it's broken)
+> loosing its pairing information after some time. Even though our
+> behavior with the Security Request should be correct we could consider
+> the reaction to the "PIN or Key Missing" error. There's a table in
+> section 2.4.4.2 of the SMP specification (page 2321 of core spec 4.2)
+> that explains the allowed behavior in this scenario. However, if bonding
+> was performed (which I suspect it was) the table only gives the option
+> of notifying the user of the failure (which is what we do right now).
 
-> +       return true;
->  }
->
->  static bool encode_pdu(struct att_send_op *op, const void *pdu,
-> @@ -533,15 +536,17 @@ static void wakeup_writer(struct bt_att *att)
->         att->writer_active = true;
->  }
->
-> -static void disconn_handler(void *data, void *user_data)
-> +static bool disconn_handler(void *data, void *user_data)
->  {
->         struct att_disconn *disconn = data;
->
->         if (disconn->removed)
-> -               return;
-> +               return true;
->
->         if (disconn->callback)
->                 disconn->callback(disconn->user_data);
-> +
-> +       return true;
->  }
->
->  static bool disconnect_cb(struct io *io, void *user_data)
-> @@ -675,22 +680,24 @@ static bool opcode_match(uint8_t opcode, uint8_t test_opcode)
->         return opcode == test_opcode;
->  }
->
-> -static void notify_handler(void *data, void *user_data)
-> +static bool notify_handler(void *data, void *user_data)
->  {
->         struct att_notify *notify = data;
->         struct notify_data *not_data = user_data;
->
->         if (notify->removed)
-> -               return;
-> +               return true;
->
->         if (!opcode_match(notify->opcode, not_data->opcode))
-> -               return;
-> +               return true;
->
->         not_data->handler_found = true;
->
->         if (notify->callback)
->                 notify->callback(not_data->opcode, not_data->pdu,
->                                         not_data->pdu_len, notify->user_data);
-> +
-> +       return true;
->  }
->
->  static void respond_not_supported(struct bt_att *att, uint8_t opcode)
-> diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
-> index 463de3b..047de22 100644
-> --- a/src/shared/gatt-client.c
-> +++ b/src/shared/gatt-client.c
-> @@ -244,7 +244,7 @@ static bool match_notify_data_handle_range(const void *a, const void *b)
->                                         chrc->value_handle <= range->end;
->  }
->
-> -static void mark_notify_data_invalid_if_in_range(void *data, void *user_data)
-> +static bool mark_notify_data_invalid_if_in_range(void *data, void *user_data)
->  {
->         struct notify_data *notify_data = data;
->         struct notify_chrc *chrc = notify_data->chrc;
-> @@ -253,6 +253,7 @@ static void mark_notify_data_invalid_if_in_range(void *data, void *user_data)
->         if (chrc->value_handle >= range->start &&
->                                         chrc->value_handle <= range->end)
->                 notify_data->invalid = true;
+Yep, it may very well be an issue with the device.
 
-New line before return.
+>
+>> I can provide the detailed hcidumps if anyone needs that.
+> Sure, but preferably with btmon instead of hcidump. Please include the
+> original pairing procedure in addition to the failure so that we can see
+> whether bonding was performed or not (otoh since you say that you had at
+> least a second successful connection it sounds like you must have done
+> bonding).
 
-> +       return true;
->  }
->
->  static bool match_notify_chrc_handle_range(const void *a, const void *b)
-> @@ -1400,7 +1401,7 @@ static void complete_unregister_notify(void *data)
->         notify_data_write_ccc(notify_data, false, disable_ccc_callback);
->  }
->
-> -static void notify_handler(void *data, void *user_data)
-> +static bool notify_handler(void *data, void *user_data)
->  {
->         struct notify_data *notify_data = data;
->         struct pdu_data *pdu_data = user_data;
-> @@ -1408,12 +1409,12 @@ static void notify_handler(void *data, void *user_data)
->         const uint8_t *value = NULL;
->
->         if (notify_data->removed)
-> -               return;
-> +               return true;
->
->         value_handle = get_le16(pdu_data->pdu);
->
->         if (notify_data->chrc->value_handle != value_handle)
-> -               return;
-> +               return true;
->
->         if (pdu_data->length > 2)
->                 value = pdu_data->pdu + 2;
-> @@ -1421,6 +1422,8 @@ static void notify_handler(void *data, void *user_data)
->         if (notify_data->notify)
->                 notify_data->notify(value_handle, value, pdu_data->length - 2,
->                                                         notify_data->user_data);
-> +
-> +       return true;
->  }
->
->  static void notify_cb(uint8_t opcode, const void *pdu, uint16_t length,
-> @@ -1849,12 +1852,13 @@ static void read_long_op_unref(void *data)
->         free(op);
->  }
->
-> -static void append_blob(void *data, void *user_data)
-> +static bool append_blob(void *data, void *user_data)
->  {
->         struct blob *blob = data;
->         uint8_t *value = user_data;
->
->         memcpy(value + blob->offset, blob->data, blob->length);
-> +       return true;
->  }
->
->  static void complete_read_long_op(struct read_long_op *op, bool success,
-> diff --git a/src/shared/gatt-db.c b/src/shared/gatt-db.c
-> index 98fb8a0..0e3acf2 100644
-> --- a/src/shared/gatt-db.c
-> +++ b/src/shared/gatt-db.c
-> @@ -215,7 +215,7 @@ struct notify_data {
->         bool added;
->  };
->
-> -static void handle_notify(void *data, void *user_data)
-> +static bool handle_notify(void *data, void *user_data)
->  {
->         struct notify *notify = data;
->         struct notify_data *notify_data = user_data;
-> @@ -224,6 +224,7 @@ static void handle_notify(void *data, void *user_data)
->                 notify->service_added(notify_data->attr, notify->user_data);
->         else
->                 notify->service_removed(notify_data->attr, notify->user_data);
+Here's the dump of a successful connection. Then a failed one. The one 
+thing I did notice is that the device requests no bonding. The local 
+host then negotiates bonding in the actual pairing request. That's for 
+the successful case. For the failed case, the device also requests no 
+bonding. Not sure if that has any bearing (I'll comb the spec again to 
+see what it says about this situation). Please let me know if you can 
+draw any conclusions from the data or need anything further.
 
-New line before return.
+Successful Connection
+===============
 
-> +       return true;
->  }
->
->  static void notify_service_changed(struct gatt_db *db,
-> @@ -448,35 +449,30 @@ struct insert_loc_data {
->         struct gatt_db_service *cur;
->         uint16_t start, end;
->         bool fail;
-> -       bool done;
->  };
->
-> -static void search_for_insert_loc(void *data, void *user_data)
-> +static bool search_for_insert_loc(void *data, void *user_data)
->  {
->         struct insert_loc_data *loc_data = user_data;
->         struct gatt_db_service *service = data;
->         uint16_t cur_start, cur_end;
->
-> -       if (loc_data->done)
-> -               return;
-> -
->         gatt_db_service_get_handles(service, &cur_start, &cur_end);
->
->         /* Abort if the requested range overlaps with an existing service. */
->         if ((loc_data->start >= cur_start && loc_data->start <= cur_end) ||
->                 (loc_data->end >= cur_start && loc_data->end <= cur_end)) {
->                 loc_data->fail = true;
-> -               loc_data->done = true;
-> -               return;
-> +               return false;
->         }
->
->         /* Check if this is where the service should be inserted. */
->         if (loc_data->end < cur_start) {
-> -               loc_data->done = true;
-> -               return;
-> +               return false;
->         }
->
->         loc_data->cur = service;
-> +       return true;
->  }
->
->  struct gatt_db_attribute *gatt_db_insert_service(struct gatt_db *db,
-> @@ -788,47 +784,42 @@ struct read_by_group_type_data {
->         uint16_t start_handle;
->         uint16_t end_handle;
->         uint16_t uuid_size;
-> -       bool stop_search;
->  };
->
-> -static void read_by_group_type(void *data, void *user_data)
-> +static bool read_by_group_type(void *data, void *user_data)
->  {
->         struct read_by_group_type_data *search_data = user_data;
->         struct gatt_db_service *service = data;
->         uint16_t grp_start, grp_end;
->
->         if (!service->active)
-> -               return;
-> -
-> -       /* Don't want more results as they have different size */
-> -       if (search_data->stop_search)
-> -               return;
-> +               return true;
->
->         if (bt_uuid_cmp(&search_data->uuid, &service->attributes[0]->uuid))
-> -               return;
-> +               return true;
->
->         grp_start = service->attributes[0]->handle;
->         grp_end = grp_start + service->num_handles - 1;
->
->         if (grp_end < search_data->start_handle ||
->                                 grp_start > search_data->end_handle)
-> -               return;
-> +               return true;
->
->         if (service->attributes[0]->handle < search_data->start_handle ||
->                 service->attributes[0]->handle > search_data->end_handle)
-> -               return;
-> +               return true;
->
->         /* Remember size of uuid */
->         if (!search_data->uuid_size) {
->                 search_data->uuid_size = service->attributes[0]->value_len;
->         } else if (search_data->uuid_size !=
->                                         service->attributes[0]->value_len) {
-> -               /* Don't want more results. This is last */
-> -               search_data->stop_search = true;
-> -               return;
-> +               /* Don't want more results (size differs). This is last */
-> +               return false;
->         }
->
->         queue_push_tail(search_data->queue, service->attributes[0]);
-> +       return true;
->  }
->
->  void gatt_db_read_by_group_type(struct gatt_db *db, uint16_t start_handle,
-> @@ -843,7 +834,6 @@ void gatt_db_read_by_group_type(struct gatt_db *db, uint16_t start_handle,
->         data.end_handle = end_handle;
->         data.queue = queue;
->         data.uuid_size = 0;
-> -       data.stop_search = false;
->
->         queue_foreach(db->services, read_by_group_type, &data);
->  }
-> @@ -855,7 +845,7 @@ struct find_by_type_value_data {
->         uint16_t end_handle;
->  };
->
-> -static void find_by_type(void *data, void *user_data)
-> +static bool find_by_type(void *data, void *user_data)
->  {
->         struct find_by_type_value_data *search_data = user_data;
->         struct gatt_db_service *service = data;
-> @@ -863,7 +853,7 @@ static void find_by_type(void *data, void *user_data)
->         int i;
->
->         if (!service->active)
-> -               return;
-> +               return true;
->
->         for (i = 0; i < service->num_handles; i++) {
->                 attribute = service->attributes[i];
-> @@ -880,6 +870,7 @@ static void find_by_type(void *data, void *user_data)
->
->                 queue_push_tail(search_data->queue, attribute);
->         }
+< HCI Command: LE Create Connection (0x08|0x000d) plen 25 [hci0] 59.296413
+         Scan interval: 60.000 msec (0x0060)
+         Scan window: 30.000 msec (0x0030)
+         Filter policy: White list is not used (0x00)
+         Peer address type: Public (0x00)
+         Peer address: 00:1C:05:FF:F0:30 (OUI 00-1C-05)
+         Own address type: Public (0x00)
+         Min connection interval: 50.00 msec (0x0028)
+         Max connection interval: 70.00 msec (0x0038)
+         Connection latency: 0x0000
+         Supervision timeout: 420 msec (0x002a)
+         Min connection length: 0.000 msec (0x0000)
+         Max connection length: 0.000 msec (0x0000)
+ > HCI Event: Command Status (0x0f) plen 4 [hci0] 59.298413
+       LE Create Connection (0x08|0x000d) ncmd 2
+         Status: Success (0x00)
+ > HCI Event: LE Meta Event (0x3e) plen 19 [hci0] 59.974382
+       LE Connection Complete (0x01)
+         Status: Success (0x00)
+         Handle: 16
+         Role: Master (0x00)
+         Peer address type: Public (0x00)
+         Peer address: 00:1C:05:FF:F0:30 (OUI 00-1C-05)
+         Connection interval: 67.50 msec (0x0036)
+         Connection latency: 0.00 msec (0x0000)
+         Supervision timeout: 420 msec (0x002a)
+         Master clock accuracy: 0x00
+@ Device Connected: 00:1C:05:FF:F0:30 (1) flags 0x0000
+ > ACL Data RX: Handle 16 flags 0x02 dlen 6 [hci0] 60.078538
+       SMP: Security Request (0x0b) len 1
+         Authentication requirement: No bonding - No MITM (0x00)
+< ACL Data TX: Handle 16 flags 0x00 dlen 11 [hci0] 60.078851
+       SMP: Pairing Request (0x01) len 6
+         IO capability: NoInputNoOutput (0x03)
+         OOB data: Authentication data not present (0x00)
+         Authentication requirement: Bonding - No MITM (0x01)
+         Max encryption key size: 16
+         Initiator key distribution: <none> (0x00)
+         Responder key distribution: EncKey (0x01)
+ > HCI Event: Number of Completed Packets (0x13) plen 5 [hci0] 60.146413
+         Num handles: 1
+         Handle: 16
+         Count: 1
+ > ACL Data RX: Handle 16 flags 0x02 dlen 11 [hci0] 60.213038
+       SMP: Pairing Response (0x02) len 6
+         IO capability: NoInputNoOutput (0x03)
+         OOB data: Authentication data not present (0x00)
+         Authentication requirement: Bonding - No MITM (0x01)
+         Max encryption key size: 16
+         Initiator key distribution: <none> (0x00)
+         Responder key distribution: EncKey (0x01)
+< ACL Data TX: Handle 16 flags 0x00 dlen 21 [hci0] 60.213663
+       SMP: Pairing Confirm (0x03) len 16
+         Confim value: ccd21e4e59474336a01e180f6a65c37e
+ > HCI Event: Number of Completed Packets (0x13) plen 5 [hci0] 60.281413
+         Num handles: 1
+         Handle: 16
+         Count: 1
+ > ACL Data RX: Handle 16 flags 0x02 dlen 21 [hci0] 60.348038
+       SMP: Pairing Confirm (0x03) len 16
+         Confim value: 14c7fe2cb506ced2298be45d03f3e800
+< ACL Data TX: Handle 16 flags 0x00 dlen 21 [hci0] 60.348319
+       SMP: Pairing Random (0x04) len 16
+         Random value: 61f4f3ca92d349923f52f0fc5fba4d9b
+ > HCI Event: Number of Completed Packets (0x13) plen 5 [hci0] 60.416444
+         Num handles: 1
+         Handle: 16
+         Count: 1
+ > ACL Data RX: Handle 16 flags 0x02 dlen 21 [hci0] 60.483038
+       SMP: Pairing Random (0x04) len 16
+         Random value: 4af6c7906f2eddd99a2a9ee94e3597ec
+< HCI Command: LE Start Encryption (0x08|0x0019) plen 28 [hci0] 60.483601
+         Handle: 16
+         Random number: 0x0000000000000000
+         Encrypted diversifier: 0x0000
+         Long term key: df94c4102b030cfbbc2e12f8ebca01ba
+ > HCI Event: Command Status (0x0f) plen 4 [hci0] 60.485413
+       LE Start Encryption (0x08|0x0019) ncmd 2
+         Status: Success (0x00)
+ > HCI Event: Encryption Change (0x08) plen 4 [hci0] 60.753413
+         Status: Success (0x00)
+         Handle: 16
+         Encryption: Enabled with AES-CCM (0x01)
+ > ACL Data RX: Handle 16 flags 0x02 dlen 21 [hci0] 60.820413
+       SMP: Encryption Information (0x06) len 16
+         Long term key: 080b10bacd048f5bd98e72fb1ae5527b
+ > ACL Data RX: Handle 16 flags 0x02 dlen 15 [hci0] 60.821194
+       SMP: Master Identification (0x07) len 10
+         EDIV: 0x5256
+         Rand: 0xa38007f54be58be6
+@ New Long Term Key: 00:1C:05:FF:F0:30 (1) Master
 
-New line before return.
 
-> +       return true;
->  }
->
->  void gatt_db_find_by_type(struct gatt_db *db, uint16_t start_handle,
-> @@ -904,7 +895,7 @@ struct read_by_type_data {
->         uint16_t end_handle;
->  };
->
-> -static void read_by_type(void *data, void *user_data)
-> +static bool read_by_type(void *data, void *user_data)
->  {
->         struct read_by_type_data *search_data = user_data;
->         struct gatt_db_service *service = data;
-> @@ -912,7 +903,7 @@ static void read_by_type(void *data, void *user_data)
->         int i;
->
->         if (!service->active)
-> -               return;
-> +               return true;
->
->         for (i = 0; i < service->num_handles; i++) {
->                 attribute = service->attributes[i];
-> @@ -923,13 +914,15 @@ static void read_by_type(void *data, void *user_data)
->                         continue;
->
->                 if (attribute->handle > search_data->end_handle)
-> -                       return;
-> +                       return true;
->
->                 if (bt_uuid_cmp(&search_data->uuid, &attribute->uuid))
->                         continue;
->
->                 queue_push_tail(search_data->queue, attribute);
->         }
-> +
-> +       return true;
->  }
->
->  void gatt_db_read_by_type(struct gatt_db *db, uint16_t start_handle,
-> @@ -953,7 +946,7 @@ struct find_information_data {
->         uint16_t end_handle;
->  };
->
-> -static void find_information(void *data, void *user_data)
-> +static bool find_information(void *data, void *user_data)
->  {
->         struct find_information_data *search_data = user_data;
->         struct gatt_db_service *service = data;
-> @@ -961,12 +954,12 @@ static void find_information(void *data, void *user_data)
->         int i;
->
->         if (!service->active)
-> -               return;
-> +               return true;
->
->         /* Check if service is in range */
->         if ((service->attributes[0]->handle + service->num_handles - 1) <
->                                                 search_data->start_handle)
-> -               return;
-> +               return true;
->
->         for (i = 0; i < service->num_handles; i++) {
->                 attribute = service->attributes[i];
-> @@ -977,10 +970,12 @@ static void find_information(void *data, void *user_data)
->                         continue;
->
->                 if (attribute->handle > search_data->end_handle)
-> -                       return;
-> +                       return true;
->
->                 queue_push_tail(search_data->queue, attribute);
->         }
-> +
-> +       return true;
->  }
->
->  void gatt_db_find_information(struct gatt_db *db, uint16_t start_handle,
-> @@ -1011,7 +1006,7 @@ struct foreach_data {
->         uint16_t start, end;
->  };
->
-> -static void foreach_service_in_range(void *data, void *user_data)
-> +static bool foreach_service_in_range(void *data, void *user_data)
->  {
->         struct gatt_db_service *service = data;
->         struct foreach_data *foreach_data = user_data;
-> @@ -1021,16 +1016,17 @@ static void foreach_service_in_range(void *data, void *user_data)
->         svc_start = get_handle_at_index(service, 0);
->
->         if (svc_start > foreach_data->end || svc_start < foreach_data->start)
-> -               return;
-> +               return true;
->
->         if (foreach_data->uuid) {
->                 gatt_db_attribute_get_service_uuid(service->attributes[0],
->                                                                         &uuid);
->                 if (bt_uuid_cmp(&uuid, foreach_data->uuid))
-> -                       return;
-> +                       return true;
->         }
->
->         foreach_data->func(service->attributes[0], foreach_data->user_data);
-> +       return true;
->  }
->
->  void gatt_db_foreach_service_in_range(struct gatt_db *db,
-> diff --git a/src/shared/hci.c b/src/shared/hci.c
-> index 9ab8c6e..529c0af 100644
-> --- a/src/shared/hci.c
-> +++ b/src/shared/hci.c
-> @@ -202,7 +202,7 @@ done:
->         wakeup_writer(hci);
->  }
->
-> -static void process_notify(void *data, void *user_data)
-> +static bool process_notify(void *data, void *user_data)
->  {
->         struct bt_hci_evt_hdr *hdr = user_data;
->         struct evt *evt = data;
-> @@ -210,6 +210,8 @@ static void process_notify(void *data, void *user_data)
->         if (evt->event == hdr->evt)
->                 evt->callback(user_data + sizeof(struct bt_hci_evt_hdr),
->                                                 hdr->plen, evt->user_data);
-> +
-> +       return true;
->  }
->
->  static void process_event(struct bt_hci *hci, const void *data, size_t size)
-> diff --git a/src/shared/mgmt.c b/src/shared/mgmt.c
-> index 43351e2..96d9901 100644
-> --- a/src/shared/mgmt.c
-> +++ b/src/shared/mgmt.c
-> @@ -142,13 +142,15 @@ static bool match_notify_removed(const void *a, const void *b)
->         return notify->removed;
->  }
->
-> -static void mark_notify_removed(void *data , void *user_data)
-> +static bool mark_notify_removed(void *data , void *user_data)
->  {
->         struct mgmt_notify *notify = data;
->         uint16_t index = PTR_TO_UINT(user_data);
->
->         if (notify->index == index || index == MGMT_INDEX_NONE)
->                 notify->removed = true;
-> +
-> +       return true;
->  }
->
->  static void write_watch_destroy(void *user_data)
-> @@ -278,23 +280,24 @@ struct event_index {
->         const void *param;
->  };
->
-> -static void notify_handler(void *data, void *user_data)
-> +static bool notify_handler(void *data, void *user_data)
->  {
->         struct mgmt_notify *notify = data;
->         struct event_index *match = user_data;
->
->         if (notify->removed)
-> -               return;
-> +               return true;
->
->         if (notify->event != match->event)
-> -               return;
-> +               return true;
->
->         if (notify->index != match->index && notify->index != MGMT_INDEX_NONE)
-> -               return;
-> +               return true;
->
->         if (notify->callback)
->                 notify->callback(match->index, match->length, match->param,
->                                                         notify->user_data);
-> +       return true;
->  }
->
->  static void process_notify(struct mgmt *mgmt, uint16_t event, uint16_t index,
-> diff --git a/src/shared/queue.c b/src/shared/queue.c
-> index 9efb665..1ac3680 100644
-> --- a/src/shared/queue.c
-> +++ b/src/shared/queue.c
-> @@ -238,7 +238,8 @@ void queue_foreach(struct queue *queue, queue_foreach_func_t function,
->
->                 entry = tmp->next;
->
-> -               function(tmp->data, user_data);
-> +               if (!function(tmp->data, user_data))
-> +                       break;
->
->                 if (!queue_find_entry(queue, entry))
->                         break;
-> diff --git a/src/shared/queue.h b/src/shared/queue.h
-> index 602b0ce..06aa512 100644
-> --- a/src/shared/queue.h
-> +++ b/src/shared/queue.h
-> @@ -37,7 +37,7 @@ void *queue_pop_head(struct queue *queue);
->  void *queue_peek_head(struct queue *queue);
->  void *queue_peek_tail(struct queue *queue);
->
-> -typedef void (*queue_foreach_func_t)(void *data, void *user_data);
-> +typedef bool (*queue_foreach_func_t)(void *data, void *user_data);
->
->  void queue_foreach(struct queue *queue, queue_foreach_func_t function,
->                                                         void *user_data);
-> diff --git a/src/shared/uhid.c b/src/shared/uhid.c
-> index f7ad0cb..8528f2d 100644
-> --- a/src/shared/uhid.c
-> +++ b/src/shared/uhid.c
-> @@ -63,16 +63,18 @@ static void uhid_free(struct bt_uhid *uhid)
->         free(uhid);
->  }
->
-> -static void notify_handler(void *data, void *user_data)
-> +static bool notify_handler(void *data, void *user_data)
->  {
->         struct uhid_notify *notify = data;
->         struct uhid_event *ev = user_data;
->
->         if (notify->event != ev->type)
-> -               return;
-> +               return true;
->
->         if (notify->func)
->                 notify->func(ev, notify->user_data);
-> +
-> +       return true;
->  }
->
->  static bool uhid_read_handler(struct io *io, void *user_data)
-> diff --git a/unit/test-queue.c b/unit/test-queue.c
-> index f72f2e6..7ae3358 100644
-> --- a/unit/test-queue.c
-> +++ b/unit/test-queue.c
-> @@ -58,11 +58,12 @@ static void test_basic(void)
->         queue_destroy(queue, NULL);
->  }
->
-> -static void foreach_destroy(void *data, void *user_data)
-> +static bool foreach_destroy(void *data, void *user_data)
->  {
->         struct queue *queue = user_data;
->
->         queue_destroy(queue, NULL);
-> +       return true;
->  }
->
->  static void test_foreach_destroy(void)
-> @@ -78,11 +79,12 @@ static void test_foreach_destroy(void)
->         queue_foreach(queue, foreach_destroy, queue);
->  }
->
-> -static void foreach_remove_all(void *data, void *user_data)
-> +static bool foreach_remove_all(void *data, void *user_data)
->  {
->         struct queue *queue = user_data;
->
->         queue_remove_all(queue, NULL, NULL, NULL);
-> +       return true;
->  }
->
->  static void test_foreach_remove_all(void)
-> --
-> 2.2.0.rc0.207.ga3a616c
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+Failed Connection
+===========
 
-Cheers,
-Arman
+< HCI Command: LE Create Connection (0x08|0x000d) plen 25 [hci0] 209.031177
+         Scan interval: 60.000 msec (0x0060)
+         Scan window: 30.000 msec (0x0030)
+         Filter policy: White list is not used (0x00)
+         Peer address type: Public (0x00)
+         Peer address: 00:1C:05:FF:F0:30 (OUI 00-1C-05)
+         Own address type: Public (0x00)
+         Min connection interval: 50.00 msec (0x0028)
+         Max connection interval: 70.00 msec (0x0038)
+         Connection latency: 0x0000
+         Supervision timeout: 420 msec (0x002a)
+         Min connection length: 0.000 msec (0x0000)
+         Max connection length: 0.000 msec (0x0000)
+ > HCI Event: Command Status (0x0f) plen 4 [hci0] 209.033427
+       LE Create Connection (0x08|0x000d) ncmd 2
+         Status: Success (0x00)
+ > HCI Event: LE Meta Event (0x3e) plen 19 [hci0] 209.835396
+       LE Connection Complete (0x01)
+         Status: Success (0x00)
+         Handle: 16
+         Role: Master (0x00)
+         Peer address type: Public (0x00)
+         Peer address: 00:1C:05:FF:F0:30 (OUI 00-1C-05)
+         Connection interval: 67.50 msec (0x0036)
+         Connection latency: 0.00 msec (0x0000)
+         Supervision timeout: 420 msec (0x002a)
+         Master clock accuracy: 0x00
+@ Device Connected: 00:1C:05:FF:F0:30 (1) flags 0x0000
+ > ACL Data RX: Handle 16 flags 0x02 dlen 6 [hci0] 210.005927
+       SMP: Security Request (0x0b) len 1
+         Authentication requirement: No bonding - No MITM (0x00)
+< HCI Command: LE Start Encryption (0x08|0x0019) plen 28 [hci0] 210.007802
+         Handle: 16
+         Random number: 0xa38007f54be58be6
+         Encrypted diversifier: 0x5256
+         Long term key: 080b10bacd048f5bd98e72fb1ae5527b
+ > HCI Event: Command Status (0x0f) plen 4 [hci0] 210.009427
+       LE Start Encryption (0x08|0x0019) ncmd 2
+         Status: Success (0x00)
+ > HCI Event: Encryption Change (0x08) plen 4 [hci0] 210.142427
+         Status: PIN or Key Missing (0x06)
+         Handle: 16
+         Encryption: Disabled (0x00)
+< HCI Command: Disconnect (0x01|0x0006) plen 3 [hci0] 210.142677
+         Handle: 16
+         Reason: Authentication Failure (0x05)
+ > HCI Event: Command Status (0x0f) plen 4 [hci0] 210.144427
+       Disconnect (0x01|0x0006) ncmd 2
+         Status: Success (0x00)
+ > HCI Event: Disconnect Complete (0x05) plen 4 [hci0] 210.209427
+         Status: Success (0x00)
+         Handle: 16
+         Reason: Connection Terminated By Local Host (0x16)
+@ Device Disconnected: 00:1C:05:FF:F0:30 (1) reason 0
+
+Alan
+
+> Johan
+
+
+______________________________________________________________________
+This communication contains information which may be confidential or privileged. The information is intended solely for the use of the individual or entity named above.  If you are not the intended recipient, be aware that any disclosure, copying, distribution or use of the contents of this information is prohibited.  If you have received this communication in error, please notify me by telephone immediately.
+______________________________________________________________________
