@@ -1,31 +1,140 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 8.1 \(1993\))
-Subject: Re: Firmware load fails in 3.18.0
+Subject: Re: [RFC v2 3/4] Bluetooth: Set file extension to SFI file for bootloader mode
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <54884879.8010903@googlemail.com>
-Date: Thu, 11 Dec 2014 13:55:03 +0100
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <707EFA17-C59D-404C-9334-3B3D6A9D383D@holtmann.org>
-References: <54884879.8010903@googlemail.com>
-To: Chris Clayton <chris2553@googlemail.com>
+In-Reply-To: <D0ADC6E9.1287%tedd.an@intel.com>
+Date: Thu, 11 Dec 2014 13:53:37 +0100
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>
+Message-Id: <ED23DA45-B0F5-44D4-B3DA-77C5B0976E31@holtmann.org>
+References: <20141208152454.2985e44d@tedd-test> <0013894E-DDEA-4A97-8047-E2D4BC7AEDE1@holtmann.org> <D0ACC2F7.4394%tedd.an@intel.com> <8AF5F60E-D558-4D41-A758-0ADD4685BD12@holtmann.org> <D0ADC6E9.1287%tedd.an@intel.com>
+To: "An, Tedd" <tedd.an@intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Chris,
+Hi Tedd,
 
-> In trying to diagnose a problem with bluetooth-audio on my laptop, I've spotted that the firmware is failing to load.
-> The bluetooth related output from dmesg is:
+>>>>> This patch sets extension for firmware file to SFI if the device mode
+>>>>> is bootloader.
+>>>>> 
+>>>>> Signed-off-by: Tedd Ho-Jeong An <tedd.an@intel.com>
+>>>>> ---
+>>>>> drivers/bluetooth/btusb.c | 12 ++++++++++++
+>>>>> 1 file changed, 12 insertions(+)
+>>>>> 
+>>>>> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+>>>>> index b3ce85f..0c6eb333 100644
+>>>>> --- a/drivers/bluetooth/btusb.c
+>>>>> +++ b/drivers/bluetooth/btusb.c
+>>>>> @@ -1336,6 +1336,7 @@ struct intel_version {
+>>>>> 
+>>>>> enum {
+>>>>> 	INTEL_FW_MODE_OP,
+>>>>> +	INTEL_FW_MODE_BL,
+>>>>> };
+>>>>> 
+>>>>> static const struct firmware *btusb_setup_intel_get_fw(struct hci_dev
+>>>>> *hdev,
+>>>>> @@ -1397,6 +1398,17 @@ static const struct firmware
+>>>>> *btusb_setup_intel_get_fw(struct hci_dev *hdev,
+>>>>> 			return NULL;
+>>>>> 		}
+>>>>> 		strncpy(ext, "bseq", 4);
+>>>>> +	} else if (fw_mode == INTEL_FW_MODE_BL) {
+>>>>> +		/* If fw_variant is 0x23, the device is already running in
+>>>>> +		 * operational mode, so no need to download the firmware
+>>>>> +		 */
+>>>>> +		if (ver->fw_variant == 0x23) {
+>>>>> +			BT_INFO("%s: Intel device is running in operation mode",
+>>>>> +				hdev->name);
+>>>>> +			btusb_check_bdaddr_intel(hdev);
+>>>>> +			return NULL;
+>>>>> +		}
+>>>>> +		strncpy(ext, "sfi", 3);
+>>>>> 	} else {
+>>>>> 		BT_ERR("%s: Invalid Intel firmware type: %d",
+>>>>> 		       hdev->name, fw_mode);
+>>>> 
+>>>> I think you also want to skip looking for ROM patches. I know that in
+>>>> theory you can ROM patch the RAM firmware, but that seems a bit
+>>>> pointless
+>>>> here since the whole firmware has just been downloaded. So I would
+>>>> prefer
+>>>> if we only request the extra configuration based on the hw info. Or is
+>>>> there some reason to do it otherwise.
+>>> 
+>>> Actually we need to run ROM patching routine (using bseq) even after
+>>> running with RAM firmware, in order to update the device specific
+>>> configuration parameter (like BDDATA from 7260 and 7265). So we need to
+>>> separate here to distinguish between call from ROM patch flow and call
+>>> from RAM patch flow.
+>> 
+>> you had that part in your comments and that is fine. However are we
+>> expecting only settings or also actual ROM patches on top of the RAM
+>> firmware.
 > 
-> [    0.426890] Bluetooth: Core ver 2.19
-> [    0.426986] Bluetooth: HCI device and connection manager initialized
-> [    0.427038] Bluetooth: HCI socket layer initialized
-> [    0.427087] Bluetooth: L2CAP socket layer initialized
-> [    0.427137] Bluetooth: SCO socket layer initialized
-> [    1.017575] Bluetooth: hci0: read Intel version: 3707100180012d0d00
-> [    1.017602] bluetooth hci0: Direct firmware load for intel/ibt-hw-37.7.10-fw-1.80.1.2d.d.bseq failed with error -2
+> It will be settings only.
+> 
+>> 
+>> The settings would be fine by just looking for the hw version information
+>> and could stay the same even if the firmware has been updated to a new
+>> version.
+> 
+> I got your point. For setting, hw info should be good enough as you
+> suggested, like we have a default .bseq file.
+> 
+>> 
+>>> Regarding fw_variant, when the device is running on bootloader mode, it
+>>> is
+>>> 0x06 which needs to download the firmeware. If it is 0x23, it is running
+>>> with RAM firmware, so it can skip the firmware downloading.
+>> 
+>> Got that part as well. What I am looking for is to avoid confusing
+>> comments in dmesg when the ROM patching firmware is not found since we
+>> only have settings. My current understanding is that when we are new
+>> devices, then we load, the firmware, lock for settings file based on hw
+>> version (skip the first file with the fill hw and sw version) and be done.
+>> 
+>>>> In addition, I think we want to build the firmware name solely based on
+>>>> the hw info from the device. Or does the fw information provide details
+>>>> about the bootloader version now. And we would need different firmware
+>>>> files depending on which bootloader version is running.
+>>> 
+>>> If we use the hw info only for firmware name, it cannot support multiple
+>>> SKUs from same product family, for example, new ROM spinned module after
+>>> releasing to customer like 7260.
+>> 
+>> But the ROM module would not boot up in bootloader mode? It would be the
+>> same as the existing ROM modules and just go through the ROM patching.
+>> For these we will require the full set of hw and sw version information
+>> to find the right firmware.
+>> 
+>> For the pure RAM chips that boot up in bootloader mode it should be
+>> enough to just look for the hw version information to find a firmware.
+>> The only reason to include sw details would be if we have to load
+>> different firmware based on the bootloader version (since that is the sw
+>> we would see at this point).
+>> 
+>>> If you concern about weird long firmware file name, we can do something
+>>> simpler but it needs something more than hw info.
+>> 
+>> It is not the length of the files. It is the quantity of the files. For
+>> ROM chips there is no other way than keeping. You need all the details to
+>> pick the right firmware. For RAM chips however we should only include
+>> enough to pick the right firmware.
+>> 
+>> Regards
+>> 
+>> Marcel
+> 
+> I think, for summary, when new device power up in bootloader mode, it will
+> look for full firmware file (.sfi) with hw and sw info. After downloading
+> the firmware, it will look for setting file (.bseq) with hw info only.
 
-this is pretty much clear. The filesystem where the firmware is located is not yet mounted. Build the btusb.ko driver has a module.
+this means that picking of the RAM firmware will depend on a) hardware version and b) bootloader version. My question was if not just the hardware version would be enough.
+
+Would make it easier from a file perspective for the user. You get two files with the same basename. One is the actual firmware. The other one is the setting.
 
 Regards
 
