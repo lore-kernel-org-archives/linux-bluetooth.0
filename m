@@ -1,44 +1,59 @@
 Return-Path: <cyrus@holtmann.org>
-From: Michael Janssen <jamuraa@chromium.org>
+From: Johan Hedberg <johan.hedberg@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Michael Janssen <jamuraa@chromium.org>
-Subject: [PATCH BlueZ 0/3] foreach early termination
-Date: Thu, 11 Dec 2014 11:53:34 -0800
-Message-Id: <1418327617-26951-1-git-send-email-jamuraa@chromium.org>
+Subject: [PATCH 3/3] Bluetooth: Fix notifying mgmt power off before flushing connection list
+Date: Thu, 11 Dec 2014 21:45:46 +0200
+Message-Id: <1418327146-15899-4-git-send-email-johan.hedberg@gmail.com>
+In-Reply-To: <1418327146-15899-1-git-send-email-johan.hedberg@gmail.com>
+References: <1418327146-15899-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch set enables the early termination of iteration when using the
-foreach functions provided by gatt_db and queue.  This makes it possible to
-make some iterations more efficient.
+From: Johan Hedberg <johan.hedberg@intel.com>
 
-Michael Janssen (3):
-  shared/queue: enable early terminate foreach
-  unit/test-queue: add test for early termination
-  shared/gatt-db: enable foreach early termination
+This patch moves the mgmt_powered() notification earlier in the
+hci_dev_do_close() function. This way the correct "not powered" error
+gets passed to any pending mgmt commands. Without the patch the pending
+commands would instead get a misleading "disconnected" response when
+powering down the adapter.
 
- android/bluetooth.c      |  4 ++-
- android/gatt.c           | 48 ++++++++++++++++++++----------
- android/handsfree.c      |  9 ++++--
- android/health.c         | 36 +++++++++++++----------
- android/tester-main.c    | 32 +++++++++++++++-----
- emulator/hciemu.c        |  3 +-
- monitor/keys.c           |  9 +++---
- src/shared/att.c         | 21 ++++++++-----
- src/shared/gatt-client.c | 22 +++++++-------
- src/shared/gatt-db.c     | 76 +++++++++++++++++++++++-------------------------
- src/shared/gatt-db.h     |  2 +-
- src/shared/hci.c         |  4 ++-
- src/shared/mgmt.c        | 13 +++++----
- src/shared/queue.c       |  3 +-
- src/shared/queue.h       |  2 +-
- src/shared/uhid.c        |  6 ++--
- tools/btgatt-client.c    | 32 +++++++++++++-------
- tools/btgatt-server.c    | 24 ++++++++++-----
- unit/test-gatt.c         | 32 ++++++++++----------
- unit/test-queue.c        | 33 +++++++++++++++++++--
- 20 files changed, 260 insertions(+), 151 deletions(-)
+Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+---
+ net/bluetooth/hci_core.c | 14 ++++++--------
+ 1 file changed, 6 insertions(+), 8 deletions(-)
 
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index cc60465ea774..5dcacf9607e4 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -2634,6 +2634,12 @@ static int hci_dev_do_close(struct hci_dev *hdev)
+ 	drain_workqueue(hdev->workqueue);
+ 
+ 	hci_dev_lock(hdev);
++
++	if (!test_and_clear_bit(HCI_AUTO_OFF, &hdev->dev_flags)) {
++		if (hdev->dev_type == HCI_BREDR)
++			mgmt_powered(hdev, 0);
++	}
++
+ 	hci_inquiry_cache_flush(hdev);
+ 	hci_pend_le_actions_clear(hdev);
+ 	hci_conn_hash_flush(hdev);
+@@ -2681,14 +2687,6 @@ static int hci_dev_do_close(struct hci_dev *hdev)
+ 	hdev->flags &= BIT(HCI_RAW);
+ 	hdev->dev_flags &= ~HCI_PERSISTENT_MASK;
+ 
+-	if (!test_and_clear_bit(HCI_AUTO_OFF, &hdev->dev_flags)) {
+-		if (hdev->dev_type == HCI_BREDR) {
+-			hci_dev_lock(hdev);
+-			mgmt_powered(hdev, 0);
+-			hci_dev_unlock(hdev);
+-		}
+-	}
+-
+ 	/* Controller radio is available but is currently powered down */
+ 	hdev->amp_status = AMP_STATUS_POWERED_DOWN;
+ 
 -- 
-2.2.0.rc0.207.ga3a616c
+2.1.0
 
