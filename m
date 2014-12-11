@@ -1,32 +1,45 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 8.1 \(1993\))
-Subject: Re: [PATCH v2] Bluetooth: Fix missing hci_dev_lock/unlock in hci_event
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1418304495-15334-1-git-send-email-jaganath.k@samsung.com>
-Date: Thu, 11 Dec 2014 15:10:13 +0100
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <2CC901F3-1B75-48DB-B916-2DE3FA6C091A@holtmann.org>
-References: <1418304495-15334-1-git-send-email-jaganath.k@samsung.com>
-To: Jaganath Kanakkassery <jaganath.k@samsung.com>
+From: Mariusz Skamra <mariusz.skamra@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Mariusz Skamra <mariusz.skamra@tieto.com>
+Subject: [PATCH] android/gatt: Add callback for test command
+Date: Thu, 11 Dec 2014 15:05:06 +0100
+Message-Id: <1418306706-21479-1-git-send-email-mariusz.skamra@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jaganath,
+It is needed in new gattrib. Without callback command won't be send.
+---
+ android/gatt.c | 9 ++++++++-
+ 1 file changed, 8 insertions(+), 1 deletion(-)
 
-> mgmt_pending_remove() should be called with hci_dev_lock protection and
-> all hci_event.c functions which calls mgmt_complete() (which eventually
-> calls mgmt_pending_remove()) should hold the lock.
-> So this patch fixes the same
-> 
-> Signed-off-by: Jaganath Kanakkassery <jaganath.k@samsung.com>
-> ---
-> net/bluetooth/hci_event.c |   20 ++++++++++++++++++++
-> 1 file changed, 20 insertions(+)
-
-patch has been applied to bluetooth-next tree.
-
-Regards
-
-Marcel
+diff --git a/android/gatt.c b/android/gatt.c
+index 8a81852..1b38a51 100644
+--- a/android/gatt.c
++++ b/android/gatt.c
+@@ -4053,6 +4053,12 @@ failed:
+ 				HAL_OP_GATT_CLIENT_SET_ADV_DATA, status);
+ }
+ 
++static void test_command_result(guint8 status, const guint8 *pdu,
++					guint16 len, gpointer user_data)
++{
++	DBG("status: %d", status);
++}
++
+ static uint8_t test_read_write(bdaddr_t *bdaddr, bt_uuid_t *uuid, uint16_t op,
+ 						uint16_t u2,uint16_t u3,
+ 						uint16_t u4, uint16_t u5)
+@@ -4114,7 +4120,8 @@ static uint8_t test_read_write(bdaddr_t *bdaddr, bt_uuid_t *uuid, uint16_t op,
+ 	if (!length)
+ 		return HAL_STATUS_FAILED;
+ 
+-	g_attrib_send(dev->attrib, 0, pdu, length, NULL, NULL, NULL);
++	g_attrib_send(dev->attrib, 0, pdu, length, test_command_result, NULL,
++									NULL);
+ 
+ 	return HAL_STATUS_SUCCESS;
+ }
+-- 
+1.9.1
 
