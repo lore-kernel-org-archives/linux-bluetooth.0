@@ -1,71 +1,52 @@
 Return-Path: <cyrus@holtmann.org>
-From: Jakub Pawlowski <jpawlowski@google.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Jakub Pawlowski <jpawlowski@google.com>
-Subject: [PATCH v2] doc/adapter-api.txt: StartServiceDiscovery method.
-Date: Thu, 11 Dec 2014 05:45:13 -0800
-Message-Id: <1418305513-4327-1-git-send-email-jpawlowski@google.com>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: Mariusz Skamra <mariusz.skamra@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCHv2] android/gatt: Fix missing error response to find by type value request
+Date: Thu, 11 Dec 2014 14:30:36 +0100
+Message-ID: <1502650.D3eWmbCRKv@uw000953>
+In-Reply-To: <1418222421-6049-1-git-send-email-mariusz.skamra@tieto.com>
+References: <1418222421-6049-1-git-send-email-mariusz.skamra@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch proposes new method, StartServiceDiscovery to D-Bus Adapter API for
-desktop bluetoothd. It will allow for rapid discovery of nearby devices that
-advertise services.
+Hi Mariusz,
 
-Signed-off-by: Jakub Pawlowski <jpawlowski@google.com>
----
- doc/adapter-api.txt | 38 ++++++++++++++++++++++++++++++++++++++
- 1 file changed, 38 insertions(+)
+On Wednesday 10 of December 2014 15:40:21 Mariusz Skamra wrote:
+> This patch fixes Find By Type Value Request issue.
+> When the attribute queue is empty, error response should be sent.
+> ---
+>  android/gatt.c | 11 +++++++++++
+>  1 file changed, 11 insertions(+)
+> 
+> diff --git a/android/gatt.c b/android/gatt.c
+> index b2ce9c1..58bc22d 100644
+> --- a/android/gatt.c
+> +++ b/android/gatt.c
+> @@ -6189,6 +6189,17 @@ static uint8_t find_by_type_request(const uint8_t *cmd, uint16_t cmd_len,
+>  
+>  	gatt_db_find_by_type(gatt_db, start, end, &uuid, q);
+>  
+> +	if (queue_isempty(q)) {
+> +		size_t mtu;
+> +		uint8_t *rsp = g_attrib_get_buffer(device->attrib, &mtu);
+> +
+> +		len = enc_error_resp(ATT_OP_FIND_BY_TYPE_REQ, start,
+> +					ATT_ECODE_ATTR_NOT_FOUND, rsp, mtu);
+> +		g_attrib_send(device->attrib, 0, rsp, len, NULL, NULL, NULL);
+> +		queue_destroy(q, NULL);
+> +		return 0;
+> +	}
+> +
+>  	while (queue_peek_head(q)) {
+>  		struct gatt_db_attribute *attrib = queue_pop_head(q);
+>  		struct pending_request *data;
+> 
 
-diff --git a/doc/adapter-api.txt b/doc/adapter-api.txt
-index 74d235a..198a35a 100644
---- a/doc/adapter-api.txt
-+++ b/doc/adapter-api.txt
-@@ -22,6 +22,44 @@ Methods		void StartDiscovery()
- 			Possible errors: org.bluez.Error.NotReady
- 					 org.bluez.Error.Failed
- 
-+		void StartServiceDiscovery(string mode, dict filter)
-+
-+			This method starts the device discovery session with
-+			filtering by uuids, and rssi or pathloss value. Use
-+			StopDiscovery to release the sessions acquired.
-+
-+			mode parameter:
-+				"LE" - le only scan
-+				"BR/EDR" - br/edr inquiry
-+				"INTERLEAVED" - interleaved scan
-+
-+ 			Parameters that can be set in filter dictionary include
-+ 			the following:
-+
-+				string UUID : filtered service UUID (required)
-+				string RSSI : RSSI threshold value (optional)
-+				string pathloss : Pathloss threshold value
-+						    (optional)
-+
-+			When a device is found that advertise UUID, it will be
-+			reported if:
-+			- pathloss and RSSI are both empty
-+			- only pathloss param is set, device advertise TX pwer, 
-+			  and computed pathloss is less than pathloss param,
-+			- only RSSI param is set, and received RSSI is higher
-+			  than RSSI param,
-+			- both pathloss and RSSI is set. Then if TX power is
-+			  advertised, pathloss condition must be met, otherwise
-+			  RSSI condition must be met.
-+
-+			This process will start creating Device objects as new
-+			devices matching criteria are discovered. It will also
-+			emit PropertiesChanged signal for already existing
-+			Device objects, with updated RSSI value.
-+
-+			Possible errors: org.bluez.Error.NotReady
-+					 org.bluez.Error.Failed
-+
- 		void StopDiscovery()
- 
- 			This method will cancel any previous StartDiscovery
+Patch applied, thanks.
+
 -- 
-2.2.0.rc0.207.ga3a616c
-
+Best regards, 
+Szymon Janc
