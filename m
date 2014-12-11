@@ -1,120 +1,79 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1418305513-4327-1-git-send-email-jpawlowski@google.com>
-References: <1418305513-4327-1-git-send-email-jpawlowski@google.com>
-Date: Thu, 11 Dec 2014 07:48:02 -0800
-Message-ID: <CAHrH25RzOXdJ9es+PZ+PAvjn3kUYFdQ1nvsxStuLLmpso9f73g@mail.gmail.com>
-Subject: Re: [PATCH v2] doc/adapter-api.txt: StartServiceDiscovery method.
-From: Arman Uguray <armansito@chromium.org>
-To: Jakub Pawlowski <jpawlowski@google.com>
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
+In-Reply-To: <20141211100158.GA21139@t440s.P-661HNU-F1>
+References: <CAHrH25SS2x2fRc+av+dzQ=KvHiueHBFGAVKLrPC2+_baj5QFDQ@mail.gmail.com>
+	<20141211100158.GA21139@t440s.P-661HNU-F1>
+Date: Thu, 11 Dec 2014 07:35:19 -0800
+Message-ID: <CAHrH25SNwui=yFdEOg7=7xp3guwLgisSAgjs58D8478--uWS2A@mail.gmail.com>
+Subject: Re: D-Bus API for GATT Connect/Disconnect
+From: Arman Uguray <armansito@google.com>
+To: Arman Uguray <armansito@chromium.org>,
+	BlueZ development <linux-bluetooth@vger.kernel.org>,
+	Jonathan Dixon <joth@google.com>
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jakub,
+Hi Johan,
 
-> On Thu, Dec 11, 2014 at 5:45 AM, Jakub Pawlowski <jpawlowski@google.com> wrote:
-> This patch proposes new method, StartServiceDiscovery to D-Bus Adapter API for
-> desktop bluetoothd. It will allow for rapid discovery of nearby devices that
-> advertise services.
+> On Thu, Dec 11, 2014 at 2:01 AM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
+> Hi Arman,
 >
-> Signed-off-by: Jakub Pawlowski <jpawlowski@google.com>
-
-Omit "signed-off by" please.
-
-> ---
->  doc/adapter-api.txt | 38 ++++++++++++++++++++++++++++++++++++++
->  1 file changed, 38 insertions(+)
+> On Wed, Dec 10, 2014, Arman Uguray wrote:
+>> For GATT, applications using bluetoothd currently need to use
+>> Device1.Connect and Device1.Disconnect when they want to initiate a
+>> connection to a peripheral, though these functions are really
+>> primarily meant for UI usage. BlueZ already has a D-Bus API for BR/EDR
+>> profiles such as ConnectProfile/DisconnectProfile and the
+>> ProfileManager API which is more geared towards applications and I
+>> think we'll need something for GATT as well. The basic features that
+>> I'm thinking of are:
+>>
+>>    1. Sessions per D-Bus connection that provide a reference count for
+>> the ACL connection.
+>>    2. Correctly handling the reference count if the connection was
+>> initiated via Device1.Connect or via auto-connect.
+>>    3. This would be GATT only at first but it could perhaps expand to
+>> connection-oriented channels eventually?
+>>
+>> I don't really have an RFC API proposal at this point but I wanted to
+>> get this discussion going. What would make most sense here?
 >
-> diff --git a/doc/adapter-api.txt b/doc/adapter-api.txt
-> index 74d235a..198a35a 100644
-> --- a/doc/adapter-api.txt
-> +++ b/doc/adapter-api.txt
-> @@ -22,6 +22,44 @@ Methods              void StartDiscovery()
->                         Possible errors: org.bluez.Error.NotReady
->                                          org.bluez.Error.Failed
+> I have nothing to directly contradict what Marcel already replied, but
+> I'm curious why you've omitted the kernel-managed passive scanning based
+> connection establishment from the description of the issue. I'd expect
+> that to be the principal way of connecting to peripheral devices, I'd
+> also expect this to work in the same way for bluetoothd-external
+> applications as it does for bluetoothd plugins: the application declares
+> its support for a UUID and bluetoothd then adds devices supporting the
+> UUID to the kernel-side connect list.
 >
-> +               void StartServiceDiscovery(string mode, dict filter)
-> +
 
-I mentioned this before during the mgmt API patches (though I didn't
-feel strongly about it) and I'm mentioning it now (this time I feel
-more strongly) that I don't like the term "ServiceDiscovery" here. It
-makes me immediately think of ATT/SDP, which is not what this API
-doing. What's more, I can easily imagine that we potentially extend
-this API to filter by other types of parameters, such as the
-manufacturer data field for instance, so maybe it's better to rename
-this to something more generic like "RequestDevice" or
-"ScanDevicesWithFilter" (or something along those lines).
+I didn't specifically mention the passive scanning as I generally
+pooled it under "auto-connect". But yes, that definitely counts. In
+fact, most of the problems that I run into with connection behavior
+stem from bluetoothd not properly managing which devices should remain
+in the kernel-side connect list, such as calling
+device_set_auto_connect with TRUE in add_attio_callbacks and never
+setting it to FALSE on remove_attio_callbacks, or having this logic
+work for even the most mundane profiles/plugins such as profiles/gatt
+or for profiles that may not be immediately in use to warrant
+auto-connections (such as profiles/heartrate).
 
-The behavior of this API with respect to simultaneous use by multiple
-applications should be defined here as well. When more than one
-application calls this, is the behavior basically "adding a new UUID
-filter to the ongoing scan"?
+So this API suggestion would definitely address that case as well, I
+just used auto-connect as the term for it :) But as you say, passive
+background-scanning based connections will especially apply to all
+outgoing connections as we move forward with the previous fixes to
+L2CAP connect that we discussed earlier (which I didn't get around do
+write any patches for yet).
 
-Also, earlier we were talking about a one-shot API that would return
-the object paths of devices that the application is particularly
-concerned with. Is that the approach we should take here? Or are we
-basically saying that applications should rely on InterfacesAdded
-signals and then do their additional filtering on top of that based on
-Device properties?
+I'm hoping to revise how auto-connect should work for internal
+plugins, by perhaps adding a flag to btd_device_add_attio_callbacks
+(and btd_device_add_gatt_callbacks that I proposed in an earlier patch
+set) that indicates whether this should enable auto-connect and keep a
+reference count in btd_device to determine when it should be disabled
+(when a service gets removed via "Service Changed" for instance).
 
-> +                       This method starts the device discovery session with
-> +                       filtering by uuids, and rssi or pathloss value. Use
-> +                       StopDiscovery to release the sessions acquired.
-> +
+> Johan
 
-You should document the behavior of this method if StartDiscovery was
-called earlier. Does it just fail in that case or is it a no-op?
-
-> +                       mode parameter:
-> +                               "LE" - le only scan
-> +                               "BR/EDR" - br/edr inquiry
-> +                               "INTERLEAVED" - interleaved scan
-
-This parameter looks to MGMT-like. Why do we need an "interlaved"
-flag? Should an application care about which technology is being used?
-Should this just be automatically determined by bluetoothd?
-
-> +
-> +                       Parameters that can be set in filter dictionary include
-> +                       the following:
-> +
-> +                               string UUID : filtered service UUID (required)
-> +                               string RSSI : RSSI threshold value (optional)
-> +                               string pathloss : Pathloss threshold value
-> +                                                   (optional)
-> +
-> +                       When a device is found that advertise UUID, it will be
-> +                       reported if:
-> +                       - pathloss and RSSI are both empty
-> +                       - only pathloss param is set, device advertise TX pwer,
-> +                         and computed pathloss is less than pathloss param,
-> +                       - only RSSI param is set, and received RSSI is higher
-> +                         than RSSI param,
-> +                       - both pathloss and RSSI is set. Then if TX power is
-> +                         advertised, pathloss condition must be met, otherwise
-> +                         RSSI condition must be met.
-> +
-> +                       This process will start creating Device objects as new
-> +                       devices matching criteria are discovered. It will also
-> +                       emit PropertiesChanged signal for already existing
-> +                       Device objects, with updated RSSI value.
-> +
-> +                       Possible errors: org.bluez.Error.NotReady
-> +                                        org.bluez.Error.Failed
-> +
->                 void StopDiscovery()
->
->                         This method will cancel any previous StartDiscovery
-> --
-> 2.2.0.rc0.207.ga3a616c
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-
-Thanks,
 Arman
