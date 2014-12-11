@@ -1,87 +1,71 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: Mariusz Skamra <mariusz.skamra@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 2/2] android/gatt: Fix service changed indication
-Date: Thu, 11 Dec 2014 15:04:25 +0100
-Message-ID: <1579282.ut8dIPG2PD@uw000953>
-In-Reply-To: <1418299620-7524-2-git-send-email-mariusz.skamra@tieto.com>
-References: <1418299620-7524-1-git-send-email-mariusz.skamra@tieto.com> <1418299620-7524-2-git-send-email-mariusz.skamra@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+From: Jakub Pawlowski <jpawlowski@google.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Jakub Pawlowski <jpawlowski@google.com>
+Subject: [PATCH v2] doc/adapter-api.txt: StartServiceDiscovery method.
+Date: Thu, 11 Dec 2014 05:45:13 -0800
+Message-Id: <1418305513-4327-1-git-send-email-jpawlowski@google.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Mariusz,
+This patch proposes new method, StartServiceDiscovery to D-Bus Adapter API for
+desktop bluetoothd. It will allow for rapid discovery of nearby devices that
+advertise services.
 
-On Thursday 11 of December 2014 13:07:00 Mariusz Skamra wrote:
-> This patch fixes the service changed indication issue.
-> Without confirmation callback indications were not sent.
-> Dummy ignore_confirmation_cb is used for this purpose.
-> ---
->  android/gatt.c | 16 +++++++++-------
->  1 file changed, 9 insertions(+), 7 deletions(-)
-> 
-> diff --git a/android/gatt.c b/android/gatt.c
-> index 6d3bcd7..8a81852 100644
-> --- a/android/gatt.c
-> +++ b/android/gatt.c
-> @@ -1017,6 +1017,12 @@ static void send_exchange_mtu_request(struct gatt_device *device)
->  		device_unref(device);
->  }
->  
-> +static void ignore_confirmation_cb(guint8 status, const guint8 *pdu,
-> +						guint16 len, gpointer user_data)
-> +{
-> +	/* Ignored. */
-> +}
-> +
->  static void notify_att_range_change(struct gatt_device *dev,
->  							struct att_range *range)
->  {
-> @@ -1025,6 +1031,7 @@ static void notify_att_range_change(struct gatt_device *dev,
->  	uint16_t ccc;
->  	uint8_t *pdu;
->  	size_t mtu;
-> +	GAttribResultFunc confirmation_cb = NULL;
->  
->  	handle = gatt_db_attribute_get_handle(service_changed_attrib);
->  	if (!handle)
-> @@ -1044,6 +1051,7 @@ static void notify_att_range_change(struct gatt_device *dev,
->  	case 0x0002:
->  		length = enc_indication(handle, (uint8_t *) range,
->  						sizeof(*range), pdu, mtu);
-> +		confirmation_cb = ignore_confirmation_cb;
->  		break;
->  	default:
->  		/* 0xfff4 reserved for future use */
-> @@ -1051,7 +1059,7 @@ static void notify_att_range_change(struct gatt_device *dev,
->  	}
->  
->  	if (length)
-> -		g_attrib_send(dev->attrib, 0, pdu, length, NULL, NULL, NULL);
-> +		g_attrib_send(dev->attrib, 0, pdu, length, confirmation_cb, NULL, NULL);
+Signed-off-by: Jakub Pawlowski <jpawlowski@google.com>
+---
+ doc/adapter-api.txt | 38 ++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 38 insertions(+)
 
-Line over 80 characters.
-
->  }
->  
->  static struct app_connection *create_connection(struct gatt_device *device,
-> @@ -5432,12 +5440,6 @@ failed:
->  				HAL_OP_GATT_SERVER_DELETE_SERVICE, status);
->  }
->  
-> -static void ignore_confirmation_cb(guint8 status, const guint8 *pdu,
-> -						guint16 len, gpointer user_data)
-> -{
-> -	/* Ignored. */
-> -}
-> -
->  static void handle_server_send_indication(const void *buf, uint16_t len)
->  {
->  	const struct hal_cmd_gatt_server_send_indication *cmd = buf;
-> 
-
+diff --git a/doc/adapter-api.txt b/doc/adapter-api.txt
+index 74d235a..198a35a 100644
+--- a/doc/adapter-api.txt
++++ b/doc/adapter-api.txt
+@@ -22,6 +22,44 @@ Methods		void StartDiscovery()
+ 			Possible errors: org.bluez.Error.NotReady
+ 					 org.bluez.Error.Failed
+ 
++		void StartServiceDiscovery(string mode, dict filter)
++
++			This method starts the device discovery session with
++			filtering by uuids, and rssi or pathloss value. Use
++			StopDiscovery to release the sessions acquired.
++
++			mode parameter:
++				"LE" - le only scan
++				"BR/EDR" - br/edr inquiry
++				"INTERLEAVED" - interleaved scan
++
++ 			Parameters that can be set in filter dictionary include
++ 			the following:
++
++				string UUID : filtered service UUID (required)
++				string RSSI : RSSI threshold value (optional)
++				string pathloss : Pathloss threshold value
++						    (optional)
++
++			When a device is found that advertise UUID, it will be
++			reported if:
++			- pathloss and RSSI are both empty
++			- only pathloss param is set, device advertise TX pwer, 
++			  and computed pathloss is less than pathloss param,
++			- only RSSI param is set, and received RSSI is higher
++			  than RSSI param,
++			- both pathloss and RSSI is set. Then if TX power is
++			  advertised, pathloss condition must be met, otherwise
++			  RSSI condition must be met.
++
++			This process will start creating Device objects as new
++			devices matching criteria are discovered. It will also
++			emit PropertiesChanged signal for already existing
++			Device objects, with updated RSSI value.
++
++			Possible errors: org.bluez.Error.NotReady
++					 org.bluez.Error.Failed
++
+ 		void StopDiscovery()
+ 
+ 			This method will cancel any previous StartDiscovery
 -- 
-Best regards, 
-Szymon Janc
+2.2.0.rc0.207.ga3a616c
+
