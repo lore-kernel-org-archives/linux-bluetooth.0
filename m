@@ -1,104 +1,117 @@
 Return-Path: <cyrus@holtmann.org>
-From: Mariusz Skamra <mariusz.skamra@tieto.com>
+From: Jakub Pawlowski <jpawlowski@google.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Mariusz Skamra <mariusz.skamra@tieto.com>
-Subject: [PATCH 1/2] android/gatt: Fix find_info_handle function
-Date: Thu, 11 Dec 2014 13:06:59 +0100
-Message-Id: <1418299620-7524-1-git-send-email-mariusz.skamra@tieto.com>
+Cc: Jakub Pawlowski <jpawlowski@google.com>
+Subject: [PATCH v5 3/3] Bluetooth: Add restarting to service discovery
+Date: Thu, 11 Dec 2014 02:26:14 -0800
+Message-Id: <1418293574-25095-3-git-send-email-jpawlowski@google.com>
+In-Reply-To: <1418293574-25095-1-git-send-email-jpawlowski@google.com>
+References: <1418293574-25095-1-git-send-email-jpawlowski@google.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Server can contain attributes with 128-bit attribute types
----
- android/gatt.c | 44 ++++++++++++++++++++++++++++++++++----------
- 1 file changed, 34 insertions(+), 10 deletions(-)
+When using LE_SCAN_FILTER_DUP_ENABLE, some controllers would send
+advertising report from each LE device only once. That means that we
+don't get any updates on RSSI value, and makes Service Discovery very
+slow. This patch adds restarting scan when in Service Discovery, and
+device with filtered uuid is found, but it's not in RSSI range to send
+event yet. This way if device moves into range, we will quickly get RSSI
+update.
 
-diff --git a/android/gatt.c b/android/gatt.c
-index 58bc22d..6d3bcd7 100644
---- a/android/gatt.c
-+++ b/android/gatt.c
-@@ -6101,11 +6101,12 @@ static uint8_t find_info_handle(const uint8_t *cmd, uint16_t cmd_len,
- 						uint8_t *rsp, size_t rsp_size,
- 						uint16_t *length)
- {
--	struct queue *q;
-+	struct gatt_db_attribute *attrib;
-+	struct queue *q, *temp;
- 	struct att_data_list *adl;
- 	int iterator = 0;
- 	uint16_t start, end;
--	uint16_t len;
-+	uint16_t len, queue_len;
+Signed-off-by: Jakub Pawlowski <jpawlowski@google.com>
+---
+ include/net/bluetooth/hci_core.h |  1 +
+ net/bluetooth/mgmt.c             | 37 ++++++++++++++++++++++++++++++++++++-
+ 2 files changed, 37 insertions(+), 1 deletion(-)
+
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 1c137ab..cee7cc6 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -1359,6 +1359,7 @@ void hci_sock_dev_event(struct hci_dev *hdev, int event);
+ #define DISCOV_INTERLEAVED_TIMEOUT	5120	/* msec */
+ #define DISCOV_INTERLEAVED_INQUIRY_LEN	0x04
+ #define DISCOV_BREDR_INQUIRY_LEN	0x08
++#define DISCOV_LE_RESTART_DELAY		200	/* msec */
  
- 	DBG("");
- 
-@@ -6127,17 +6128,39 @@ static uint8_t find_info_handle(const uint8_t *cmd, uint16_t cmd_len,
- 		return ATT_ECODE_ATTR_NOT_FOUND;
- 	}
- 
--	len = queue_length(q);
--	adl = att_data_list_alloc(len, 2 * sizeof(uint16_t));
--	if (!adl) {
-+	temp = queue_new();
-+	if (!temp) {
- 		queue_destroy(q, NULL);
-+		return ATT_ECODE_UNLIKELY;
-+	}
-+
-+	attrib = queue_peek_head(q);
-+	/* UUIDS can be only 128 bit and 16 bit */
-+	len = bt_uuid_len(gatt_db_attribute_get_type(attrib));
-+	if (len != 2 && len != 16) {
-+		queue_destroy(q, NULL);
-+		queue_destroy(temp, NULL);
-+		return ATT_ECODE_UNLIKELY;
-+	}
-+
-+	while (attrib && bt_uuid_len(gatt_db_attribute_get_type(attrib)) == len) {
-+		queue_push_tail(temp, queue_pop_head(q));
-+		attrib = queue_peek_head(q);
-+	}
-+
-+	queue_destroy(q, NULL);
-+
-+	queue_len = queue_length(temp);
-+	adl = att_data_list_alloc(queue_len, len + sizeof(uint16_t));
-+	if (!adl) {
-+		queue_destroy(temp, NULL);
- 		return ATT_ECODE_INSUFF_RESOURCES;
- 	}
- 
--	while (queue_peek_head(q)) {
-+	while (queue_peek_head(temp)) {
- 		uint8_t *value;
- 		const bt_uuid_t *type;
--		struct gatt_db_attribute *attrib = queue_pop_head(q);
-+		struct gatt_db_attribute *attrib = queue_pop_head(temp);
- 		uint16_t handle;
- 
- 		type = gatt_db_attribute_get_type(attrib);
-@@ -6148,17 +6171,18 @@ static uint8_t find_info_handle(const uint8_t *cmd, uint16_t cmd_len,
- 
- 		handle = gatt_db_attribute_get_handle(attrib);
- 		put_le16(handle, value);
--		memcpy(&value[2], &type->value.u16, bt_uuid_len(type));
-+		memcpy(&value[2], &type->value, len);
- 	}
- 
--	len = enc_find_info_resp(ATT_FIND_INFO_RESP_FMT_16BIT, adl, rsp,
-+	len = enc_find_info_resp(len == 2 ? ATT_FIND_INFO_RESP_FMT_16BIT :
-+					ATT_FIND_INFO_RESP_FMT_128BIT, adl, rsp,
- 								rsp_size);
- 	if (!len)
- 		return ATT_ECODE_UNLIKELY;
- 
- 	*length = len;
- 	att_data_list_free(adl);
--	queue_destroy(q, free);
-+	queue_destroy(temp, NULL);
- 
- 	return 0;
+ int mgmt_control(struct sock *sk, struct msghdr *msg, size_t len);
+ int mgmt_new_settings(struct hci_dev *hdev);
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index b17bb65..27b1cc6 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -7013,6 +7013,16 @@ static bool eir_has_uuids(u8 *eir, u16 eir_len, u16 uuid_count, u8 (*uuids)[16])
+ 	return false;
  }
+ 
++static void restart_le_scan(struct hci_dev *hdev)
++{
++	/* If controller is not scanning we are done. */
++	if (!test_bit(HCI_LE_SCAN, &hdev->dev_flags))
++		return;
++
++	queue_delayed_work(hdev->workqueue, &hdev->le_scan_restart,
++			   msecs_to_jiffies(DISCOV_LE_RESTART_DELAY));
++}
++
+ void mgmt_device_found(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
+ 		       u8 addr_type, u8 *dev_class, s8 rssi, u32 flags,
+ 		       u8 *eir, u16 eir_len, u8 *scan_rsp, u8 scan_rsp_len)
+@@ -7042,7 +7052,8 @@ void mgmt_device_found(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
+ 	 * the results are also dropped.
+ 	 */
+ 	if (hdev->discovery.rssi != HCI_RSSI_INVALID &&
+-	    (rssi < hdev->discovery.rssi || rssi == HCI_RSSI_INVALID))
++	    (rssi == HCI_RSSI_INVALID || (rssi < hdev->discovery.rssi &&
++	    !test_bit(HCI_QUIRK_STRICT_DUPLICATE_FILTER, &hdev->quirks)))
+ 		return;
+ 
+ 	/* Make sure that the buffer is big enough. The 5 extra bytes
+@@ -7082,6 +7093,14 @@ void mgmt_device_found(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
+ 					      hdev->discovery.uuids);
+ 			if (!match)
+ 				return;
++
++			/* we have service match. If duplicate filtering doesn't
++			 * honour RSSI hanges, restart scan to make sure we'll
++			 * get RSSI updates
++			 */
++			if (test_bit(HCI_QUIRK_STRICT_DUPLICATE_FILTER,
++				     &hdev->quirks))
++				restart_le_scan(hdev);
+ 		}
+ 
+ 		/* Copy EIR or advertising data into event */
+@@ -7110,6 +7129,14 @@ void mgmt_device_found(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
+ 						     hdev->discovery.uuid_count,
+ 						     hdev->discovery.uuids))
+ 				return;
++
++			/* we have service match. If duplicate filtering doesn't
++			 * honour RSSI hanges, restart scan to make sure we'll
++			 * get RSSI updates
++			 */
++			if (test_bit(HCI_QUIRK_STRICT_DUPLICATE_FILTER,
++				     &hdev->quirks))
++				restart_le_scan(hdev);
+ 		}
+ 
+ 		/* Append scan response data to event */
+@@ -7123,6 +7150,14 @@ void mgmt_device_found(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
+ 			return;
+ 	}
+ 
++	/* Check again wether RSSI value doesn't meet Service Discovery
++	 * threshold. This might evaluate to true only if
++	 * HCI_QUIRK_STRICT_DUPLICATE_FILTER is set.
++	 */
++	if (hdev->discovery.rssi != HCI_RSSI_INVALID &&
++	    rssi < hdev->discovery.rssi)
++		return;
++
+ 	ev->eir_len = cpu_to_le16(eir_len + scan_rsp_len);
+ 	ev_size = sizeof(*ev) + eir_len + scan_rsp_len;
+ 
 -- 
-1.9.1
+2.2.0.rc0.207.ga3a616c
 
