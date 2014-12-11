@@ -1,52 +1,117 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: Mariusz Skamra <mariusz.skamra@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCHv2] android/gatt: Fix missing error response to find by type value request
-Date: Thu, 11 Dec 2014 14:30:36 +0100
-Message-ID: <1502650.D3eWmbCRKv@uw000953>
-In-Reply-To: <1418222421-6049-1-git-send-email-mariusz.skamra@tieto.com>
-References: <1418222421-6049-1-git-send-email-mariusz.skamra@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+From: Jaganath Kanakkassery <jaganath.k@samsung.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Jaganath Kanakkassery <jaganath.k@samsung.com>
+Subject: [PATCH v2] Bluetooth: Fix missing hci_dev_lock/unlock in hci_event
+Date: Thu, 11 Dec 2014 18:58:15 +0530
+Message-id: <1418304495-15334-1-git-send-email-jaganath.k@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Mariusz,
+mgmt_pending_remove() should be called with hci_dev_lock protection and
+all hci_event.c functions which calls mgmt_complete() (which eventually
+calls mgmt_pending_remove()) should hold the lock.
+So this patch fixes the same
 
-On Wednesday 10 of December 2014 15:40:21 Mariusz Skamra wrote:
-> This patch fixes Find By Type Value Request issue.
-> When the attribute queue is empty, error response should be sent.
-> ---
->  android/gatt.c | 11 +++++++++++
->  1 file changed, 11 insertions(+)
-> 
-> diff --git a/android/gatt.c b/android/gatt.c
-> index b2ce9c1..58bc22d 100644
-> --- a/android/gatt.c
-> +++ b/android/gatt.c
-> @@ -6189,6 +6189,17 @@ static uint8_t find_by_type_request(const uint8_t *cmd, uint16_t cmd_len,
->  
->  	gatt_db_find_by_type(gatt_db, start, end, &uuid, q);
->  
-> +	if (queue_isempty(q)) {
-> +		size_t mtu;
-> +		uint8_t *rsp = g_attrib_get_buffer(device->attrib, &mtu);
-> +
-> +		len = enc_error_resp(ATT_OP_FIND_BY_TYPE_REQ, start,
-> +					ATT_ECODE_ATTR_NOT_FOUND, rsp, mtu);
-> +		g_attrib_send(device->attrib, 0, rsp, len, NULL, NULL, NULL);
-> +		queue_destroy(q, NULL);
-> +		return 0;
-> +	}
-> +
->  	while (queue_peek_head(q)) {
->  		struct gatt_db_attribute *attrib = queue_pop_head(q);
->  		struct pending_request *data;
-> 
+Signed-off-by: Jaganath Kanakkassery <jaganath.k@samsung.com>
+---
+ net/bluetooth/hci_event.c |   20 ++++++++++++++++++++
+ 1 file changed, 20 insertions(+)
 
-Patch applied, thanks.
-
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 322abbb..39a5c8a 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -257,6 +257,8 @@ static void hci_cc_write_auth_enable(struct hci_dev *hdev, struct sk_buff *skb)
+ 	if (!sent)
+ 		return;
+ 
++	hci_dev_lock(hdev);
++
+ 	if (!status) {
+ 		__u8 param = *((__u8 *) sent);
+ 
+@@ -268,6 +270,8 @@ static void hci_cc_write_auth_enable(struct hci_dev *hdev, struct sk_buff *skb)
+ 
+ 	if (test_bit(HCI_MGMT, &hdev->dev_flags))
+ 		mgmt_auth_enable_complete(hdev, status);
++
++	hci_dev_unlock(hdev);
+ }
+ 
+ static void hci_cc_write_encrypt_mode(struct hci_dev *hdev, struct sk_buff *skb)
+@@ -443,6 +447,8 @@ static void hci_cc_write_ssp_mode(struct hci_dev *hdev, struct sk_buff *skb)
+ 	if (!sent)
+ 		return;
+ 
++	hci_dev_lock(hdev);
++
+ 	if (!status) {
+ 		if (sent->mode)
+ 			hdev->features[1][0] |= LMP_HOST_SSP;
+@@ -458,6 +464,8 @@ static void hci_cc_write_ssp_mode(struct hci_dev *hdev, struct sk_buff *skb)
+ 		else
+ 			clear_bit(HCI_SSP_ENABLED, &hdev->dev_flags);
+ 	}
++
++	hci_dev_unlock(hdev);
+ }
+ 
+ static void hci_cc_write_sc_support(struct hci_dev *hdev, struct sk_buff *skb)
+@@ -471,6 +479,8 @@ static void hci_cc_write_sc_support(struct hci_dev *hdev, struct sk_buff *skb)
+ 	if (!sent)
+ 		return;
+ 
++	hci_dev_lock(hdev);
++
+ 	if (!status) {
+ 		if (sent->support)
+ 			hdev->features[1][0] |= LMP_HOST_SC;
+@@ -486,6 +496,8 @@ static void hci_cc_write_sc_support(struct hci_dev *hdev, struct sk_buff *skb)
+ 		else
+ 			clear_bit(HCI_SC_ENABLED, &hdev->dev_flags);
+ 	}
++
++	hci_dev_unlock(hdev);
+ }
+ 
+ static void hci_cc_read_local_version(struct hci_dev *hdev, struct sk_buff *skb)
+@@ -1135,6 +1147,8 @@ static void hci_cc_le_set_scan_enable(struct hci_dev *hdev,
+ 	if (!cp)
+ 		return;
+ 
++	hci_dev_lock(hdev);
++
+ 	switch (cp->enable) {
+ 	case LE_SCAN_ENABLE:
+ 		set_bit(HCI_LE_SCAN, &hdev->dev_flags);
+@@ -1184,6 +1198,8 @@ static void hci_cc_le_set_scan_enable(struct hci_dev *hdev,
+ 		BT_ERR("Used reserved LE_Scan_Enable param %d", cp->enable);
+ 		break;
+ 	}
++
++	hci_dev_unlock(hdev);
+ }
+ 
+ static void hci_cc_le_read_white_list_size(struct hci_dev *hdev,
+@@ -1278,6 +1294,8 @@ static void hci_cc_write_le_host_supported(struct hci_dev *hdev,
+ 	if (!sent)
+ 		return;
+ 
++	hci_dev_lock(hdev);
++
+ 	if (sent->le) {
+ 		hdev->features[1][0] |= LMP_HOST_LE;
+ 		set_bit(HCI_LE_ENABLED, &hdev->dev_flags);
+@@ -1291,6 +1309,8 @@ static void hci_cc_write_le_host_supported(struct hci_dev *hdev,
+ 		hdev->features[1][0] |= LMP_HOST_LE_BREDR;
+ 	else
+ 		hdev->features[1][0] &= ~LMP_HOST_LE_BREDR;
++
++	hci_dev_unlock(hdev);
+ }
+ 
+ static void hci_cc_set_adv_param(struct hci_dev *hdev, struct sk_buff *skb)
 -- 
-Best regards, 
-Szymon Janc
+1.7.9.5
+
