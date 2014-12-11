@@ -1,86 +1,115 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: Mariusz Skamra <mariusz.skamra@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/2] android/gatt: Fix service changed indication
-Date: Thu, 11 Dec 2014 18:55:16 +0100
-Message-ID: <3935797.Wmi3EvObn2@leonov>
-In-Reply-To: <1418316834-26886-1-git-send-email-mariusz.skamra@tieto.com>
-References: <1418316834-26886-1-git-send-email-mariusz.skamra@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
+Subject: [PATCH 2/2] android/pts: Update gatt server status
+Date: Thu, 11 Dec 2014 18:16:53 +0100
+Message-Id: <1418318213-23944-2-git-send-email-jakub.tyszkowski@tieto.com>
+In-Reply-To: <1418318213-23944-1-git-send-email-jakub.tyszkowski@tieto.com>
+References: <1418318213-23944-1-git-send-email-jakub.tyszkowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Mariusz,
+---
+ android/pts-gatt.txt | 22 +++++++++++-----------
+ 1 file changed, 11 insertions(+), 11 deletions(-)
 
-On Thursday 11 of December 2014 17:53:53 Mariusz Skamra wrote:
-> This patch fixes the service changed indication issue.
-> Without confirmation callback indications were not sent.
-> Dummy ignore_confirmation_cb is used for this purpose.
-> ---
->  android/gatt.c | 17 ++++++++++-------
->  1 file changed, 10 insertions(+), 7 deletions(-)
-> 
-> diff --git a/android/gatt.c b/android/gatt.c
-> index 58bc22d..c4e3497 100644
-> --- a/android/gatt.c
-> +++ b/android/gatt.c
-> @@ -1017,6 +1017,12 @@ static void send_exchange_mtu_request(struct
-> gatt_device *device) device_unref(device);
->  }
-> 
-> +static void ignore_confirmation_cb(guint8 status, const guint8 *pdu,
-> +					guint16 len, gpointer user_data)
-> +{
-> +	/* Ignored. */
-> +}
-> +
->  static void notify_att_range_change(struct gatt_device *dev,
->  							struct att_range *range)
->  {
-> @@ -1025,6 +1031,7 @@ static void notify_att_range_change(struct gatt_device
-> *dev, uint16_t ccc;
->  	uint8_t *pdu;
->  	size_t mtu;
-> +	GAttribResultFunc confirmation_cb = NULL;
-> 
->  	handle = gatt_db_attribute_get_handle(service_changed_attrib);
->  	if (!handle)
-> @@ -1044,6 +1051,7 @@ static void notify_att_range_change(struct gatt_device
-> *dev, case 0x0002:
->  		length = enc_indication(handle, (uint8_t *) range,
->  						sizeof(*range), pdu, mtu);
-> +		confirmation_cb = ignore_confirmation_cb;
->  		break;
->  	default:
->  		/* 0xfff4 reserved for future use */
-> @@ -1051,7 +1059,8 @@ static void notify_att_range_change(struct gatt_device
-> *dev, }
-> 
->  	if (length)
-> -		g_attrib_send(dev->attrib, 0, pdu, length, NULL, NULL, NULL);
-> +		g_attrib_send(dev->attrib, 0, pdu, length,
-> +						confirmation_cb, NULL, NULL);
->  }
-> 
->  static struct app_connection *create_connection(struct gatt_device *device,
-> @@ -5432,12 +5441,6 @@ failed:
->  				HAL_OP_GATT_SERVER_DELETE_SERVICE, status);
->  }
-> 
-> -static void ignore_confirmation_cb(guint8 status, const guint8 *pdu,
-> -						guint16 len, gpointer user_data)
-> -{
-> -	/* Ignored. */
-> -}
-> -
->  static void handle_server_send_indication(const void *buf, uint16_t len)
->  {
->  	const struct hal_cmd_gatt_server_send_indication *cmd = buf;
-
-Both patches applied, thanks.
-
+diff --git a/android/pts-gatt.txt b/android/pts-gatt.txt
+index d1cf981..c418282 100644
+--- a/android/pts-gatt.txt
++++ b/android/pts-gatt.txt
+@@ -936,7 +936,7 @@ TC_GAW_SR_BI_24_C	PASS	haltest:
+ 				gatts add_descriptor: <permmisions> 17
+ 				gatts start_service
+ 				gatts send_response: <status> 12
+-TC_GAW_SR_BV_09_C	FAIL	haltest:
++TC_GAW_SR_BV_09_C	PASS	haltest:
+ 				gatts add_service
+ 				gatts add_characteristic:
+ 						<properties> 10 <permissions> 17
+@@ -947,20 +947,20 @@ TC_GAW_SR_BV_09_C	FAIL	haltest:
+ 						repeat with correct offset
+ 				gatts send_response:
+ 						repeat with correct value
+-TC_GAW_SR_BI_25_C	FAIL	haltest:
++TC_GAW_SR_BI_25_C	PASS	haltest:
+ 				gatts add_service
+ 				gatts add_characteristic:
+ 						<properties> 10 <permissions> 17
+ 				gatts add_descriptor: <permmisions> 17
+ 				gatts start_service
+ 				gatts send_response: <status> 1
+-TC_GAW_SR_BI_26_C	FAIL	haltest:
++TC_GAW_SR_BI_26_C	PASS	haltest:
+ 				gatts add_service
+ 				gatts add_characteristic:
+ 						<properties> 10 <permissions> 17
+ 				gatts add_descriptor: <permmisions> 1
+ 				gatts start_service
+-TC_GAW_SR_BI_27_C	FAIL	haltest:
++TC_GAW_SR_BI_27_C	PASS	haltest:
+ 				gatts add_service
+ 				gatts add_characteristic:
+ 						<properties> 10 <permissions> 17
+@@ -970,35 +970,35 @@ TC_GAW_SR_BI_27_C	FAIL	haltest:
+ 						<data> value greater than MTU
+ 						repeat with correct offset
+ 				gatts send_response: <status> 7
+-TC_GAW_SR_BI_29_C	FAIL	haltest:
++TC_GAW_SR_BI_29_C	PASS	haltest:
+ 				gatts add_service
+ 				gatts add_characteristic:
+ 						<properties> 10 <permissions> 17
+ 				gatts add_descriptor: <permmisions> 17
+ 				gatts start_service
+ 				gatts send_response: <status> 8
+-TC_GAW_SR_BI_30_C	FAIL	haltest:
++TC_GAW_SR_BI_30_C	PASS	haltest:
+ 				gatts add_service
+ 				gatts add_characteristic:
+ 						<properties> 10 <permissions> 17
+ 				gatts add_descriptor: <permmisions> 17
+ 				gatts start_service
+ 				gatts send_response: <status> 5
+-TC_GAW_SR_BI_31_C	FAIL	haltest:
++TC_GAW_SR_BI_31_C	PASS	haltest:
+ 				gatts add_service
+ 				gatts add_characteristic:
+ 						<properties> 10 <permissions> 17
+ 				gatts add_descriptor: <permmisions> 17
+ 				gatts start_service
+ 				gatts send_response: <status> 12
+-TC_GAW_SR_BI_32_C	FAIL	haltest:
++TC_GAW_SR_BI_32_C	PASS	haltest:
+ 				gatts add_service
+ 				gatts add_characteristic:
+ 						<properties> 10 <permissions> 17
+ 				gatts start_service
+ 				gatts send_response
+ 				gatts send_response: <status> 13
+-TC_GAW_SR_BI_33_C	FAIL	haltest:
++TC_GAW_SR_BI_33_C	PASS	haltest:
+ 				gatts add_service
+ 				gatts add_characteristic:
+ 						<properties> 10 <permissions> 17
+@@ -1007,7 +1007,7 @@ TC_GAW_SR_BI_33_C	FAIL	haltest:
+ 						<data> value greater than MTU
+ 						repeat with correct offset
+ 				gatts send_response: <status> 13
+-TC_GAW_SR_BI_34_C	FAIL	haltest:
++TC_GAW_SR_BI_34_C	PASS	haltest:
+ 				gatts add_service
+ 				gatts add_characteristic:
+ 						<properties> 10 <permissions> 17
+@@ -1015,7 +1015,7 @@ TC_GAW_SR_BI_34_C	FAIL	haltest:
+ 				gatts start_service
+ 				gatts send_response
+ 				gatts send_response: <status> 13
+-TC_GAW_SR_BI_35_C	FAIL	haltest:
++TC_GAW_SR_BI_35_C	PASS	haltest:
+ 				gatts add_service
+ 				gatts add_characteristic:
+ 						<properties> 10 <permissions> 17
 -- 
-BR
-Szymon Janc
+1.9.1
+
