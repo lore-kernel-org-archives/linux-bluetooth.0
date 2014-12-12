@@ -1,110 +1,80 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 12 Dec 2014 13:14:53 +0100
-From: Pavel Machek <pavel@ucw.cz>
-To: Sebastian Reichel <sre@kernel.org>
-Cc: Marcel Holtmann <marcel@holtmann.org>,
-	Pali =?iso-8859-1?Q?Roh=E1r?= <pali.rohar@gmail.com>,
-	kernel list <linux-kernel@vger.kernel.org>,
-	linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
-	Linux OMAP Mailing List <linux-omap@vger.kernel.org>,
-	Tony Lindgren <tony@atomide.com>, khilman@kernel.org,
-	Aaro Koskinen <aaro.koskinen@iki.fi>,
-	=?utf-8?B?0JjQstCw0LnQu9C+INCU0LjQvNC40YLRgNC+0LI=?= <ivo.g.dimitrov.75@gmail.com>,
-	"Gustavo F. Padovan" <gustavo@padovan.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	linux-bluetooth@vger.kernel.org
-Subject: Re: __hci_cmd_sync() not suitable for nokia h4p
-Message-ID: <20141212121453.GA31659@amd>
-References: <20141209190210.GA15641@amd>
- <304050AD-DB11-4A2B-A1F7-8B1BBB5F04F0@holtmann.org>
- <20141209201328.GA18003@amd>
- <7EFD3C33-E503-4FB6-BCCF-52836080ABD6@holtmann.org>
- <20141210131519.GA14748@amd>
- <EE1A4B9D-30D5-4BD9-9A43-532619494A0C@holtmann.org>
- <20141211221306.GA2905@amd>
- <20141212011504.GA16599@earth.universe>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20141212011504.GA16599@earth.universe>
+In-Reply-To: <1418382690-9741-1-git-send-email-s.nageshmurt@samsung.com>
+References: <1418382690-9741-1-git-send-email-s.nageshmurt@samsung.com>
+Date: Fri, 12 Dec 2014 14:09:55 +0200
+Message-ID: <CABBYNZLthL6K2UgbmDq0nfAf56xei1t-9_cVDDqU19Qq=1i7yg@mail.gmail.com>
+Subject: Re: [PATCH 1/1] audio/sink: Fix crash when err is NULL
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Sagar Nageshmurthy <s.nageshmurt@samsung.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi!
+Hi Sagar,
+
+On Fri, Dec 12, 2014 at 1:11 PM, Sagar Nageshmurthy
+<s.nageshmurt@samsung.com> wrote:
+> When a2dp connection fails because of IO error setup error can be NULL
+> if the err is already handled by finalize_resume(setup).
+>
+> (gdb) p *(struct a2dp_setup *)0xb6f98150
+> $8 = {session = 0xb6c12000, sep = 0xb6c49d30, rsep = 0x0, stream = 0x0,
+>           err = 0x0, setconf_cb = 0, caps = 0x0, reconfigure = 17,
+>             start = -1225164896, cb = 0xb6d70288, ref = 16}
+>
+> (gdb) bt
+> 0 0xb6f92108 in ?? ()
+> 1 0xb6efcd88 in finalize_config (data=0xb6f98150)
+>     at profiles/audio/a2dp.c:222
+> 2 0xb6f004a8 in handle_unanswered_req (session=0xb6f9a650,
+>     sep=<value optimized out>, state=AVDTP_STATE_IDLE)
+>     at profiles/audio/avdtp.c:967
+> 3 avdtp_sep_set_state (session=0xb6f9a650, sep=<value optimized out>,
+>     state=AVDTP_STATE_IDLE) at profiles/audio/avdtp.c:1163
+> 4 0xb6e16fb8 in g_slist_foreach (list=<value optimized out>,
+>     func=0xb6f005e5 <release_stream>, user_data=0xb6f9a650) at gslist.c:840
+>
+> daemon.debug : src/device.c:device_profile_connected() a2dp-sink Input/output error (5)
+> daemon.debug : profiles/audio/a2dp.c:abort_cfm() Source 0xb6f8fba8: Abort_Cfm
+> daemon.debug : profiles/audio/a2dp.c:setup_unref() 0xb6f98150: ref=1
+> daemon.err : No reply to Open request
+> daemon.debug : profiles/audio/a2dp.c:open_cfm() Source 0xb6f8fba8: Open_Cfm
+
+That is weird, we actually set an error on handle_unanswered_req it
+should never be NULL under this circumstances, it is also weird that
+you got an error to a2dp-sink I wonder if there were in fact 2 stream
+ongoing? Also if you check the setup reference it says it is 1 but gdb
+says it is 16 so I wonder what is going on here, maybe some memory
+corruption?
+
+> ---
+>  profiles/audio/sink.c |    2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/profiles/audio/sink.c b/profiles/audio/sink.c
+> index f475709..7fa9430 100644
+> --- a/profiles/audio/sink.c
+> +++ b/profiles/audio/sink.c
+> @@ -191,7 +191,7 @@ static void stream_setup_complete(struct avdtp *session, struct a2dp_sep *sep,
+>
+>         avdtp_unref(sink->session);
+>         sink->session = NULL;
+> -       if (avdtp_error_category(err) == AVDTP_ERRNO
+> +       if (err && avdtp_error_category(err) == AVDTP_ERRNO
+>                                 && avdtp_error_posix_errno(err) != EHOSTDOWN)
+>                 btd_service_connecting_complete(sink->service, -EAGAIN);
+>         else
+> --
+> 1.7.9.5
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
 
-> > I have created provisional device tree binding, and the driver still
-> > works.
-> 
-> I don't have time to look at the code now, but I have some comments
-> regarding the binding.
 
-> >  
-> >  &uart2 {
-> > +        compatible = "brcm,uart,bcm2048";
-> 
-> This does not look correct. The uart should not be overwritten. The
-> current h4p driver indeed implements a driver for the serial port,
-> but that's a) linux specific and does not belong in the DT and b)
-> should probably be changed in the mainline kernel.
-
-Yes, bettter solution is needed here. But see the code, I don't see
-how b) would be implemented.
-
-> >  	interrupts-extended = <&intc 73 &omap3_pmx_core OMAP3_UART2_RX>;
-> >  	pinctrl-names = "default";
-> >  	pinctrl-0 = <&uart2_pins>;
-> > +	device {
-> > +		  compatible = "brcm,bcm2048";
-> > +		  uart = <&uart2>;
-> 
-> You don't need a phandle to the parent device.
-
-Ok.
-
-> > +		  reset-gpios = <&gpio3 27 GPIO_ACTIVE_HIGH>; /* want 91 */
-> > +		  host-wakeup-gpios = <&gpio4 5 GPIO_ACTIVE_HIGH>; /* want 101 */
-> 
-> The host-wakeup should be mapped as irq, gpio2irq conversion
-> will happen ;)
-
-Why? It is accessed as gpio, too.
-
-> > +		  chip-type = <3>;
-> 
-> This should be set in the driver based on the compatible
-> value and not via DT data.
-
-Ok
-
-> > +		  clocks = <&uart2_fck>, <&uart2_ick>;
-> > +		  clock-names = "fck", "ick";
-> 
-> These clocks you defined belong to the uart device and not to the
-> uart slave (bluetooth) device.
-
-Ok. Why are they only needed in the bluetooth case?
-
-> > +		  bt-sysclk = <2>;
-> 
-> I think this should be mapped cleanly in DT by adding a new clock
-> to the DTS file:
-> 
-> vctcxo_clock: clock  {
->     compatible = "fixed-clock";
->     #clock-cells = <0>;
->     clock-frequency = <38400000>;
-> };
-
-No. It seems that this selects baud rate during the chip init. I guess
-I can just remove that one.
-
-> Then the bluetooth device can reference its clock device:
-> 
-> clocks = <&vctcxo_clock>;
-> 
-> The same clock reference should be added to the wl1251 DT node :)
-
-Feel free to do that, but I don't see how this one helps...?
-									Pavel
 -- 
-(english) http://www.livejournal.com/~pavelmachek
-(cesky, pictures) http://atrey.karlin.mff.cuni.cz/~pavel/picture/horses/blog.html
+Luiz Augusto von Dentz
