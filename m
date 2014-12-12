@@ -1,57 +1,82 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Fri, 12 Dec 2014 10:51:54 +0100
+From: Pavel Machek <pavel@ucw.cz>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: Pali =?iso-8859-1?Q?Roh=E1r?= <pali.rohar@gmail.com>,
+	Sebastian Reichel <sre@debian.org>,
+	Sebastian Reichel <sre@ring0.de>,
+	kernel list <linux-kernel@vger.kernel.org>,
+	linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
+	Linux OMAP Mailing List <linux-omap@vger.kernel.org>,
+	Tony Lindgren <tony@atomide.com>, khilman@kernel.org,
+	Aaro Koskinen <aaro.koskinen@iki.fi>,
+	=?utf-8?B?0JjQstCw0LnQu9C+INCU0LjQvNC40YLRgNC+0LI=?= <ivo.g.dimitrov.75@gmail.com>,
+	"Gustavo F. Padovan" <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: __hci_cmd_sync() not suitable for nokia h4p
+Message-ID: <20141212095153.GB2905@amd>
+References: <20141209190210.GA15641@amd>
+ <304050AD-DB11-4A2B-A1F7-8B1BBB5F04F0@holtmann.org>
+ <20141209201328.GA18003@amd>
+ <7EFD3C33-E503-4FB6-BCCF-52836080ABD6@holtmann.org>
+ <20141210131519.GA14748@amd>
+ <EE1A4B9D-30D5-4BD9-9A43-532619494A0C@holtmann.org>
+ <20141211221306.GA2905@amd>
+ <CAA1630D-1A2E-4D3D-9BBC-2EE86256D58B@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1418327617-26951-1-git-send-email-jamuraa@chromium.org>
-References: <1418327617-26951-1-git-send-email-jamuraa@chromium.org>
-Date: Fri, 12 Dec 2014 12:11:17 +0200
-Message-ID: <CABBYNZL93iapV+_HyHsf80te47WxEWOe36aKkM80WH_TyBoO-A@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 0/3] foreach early termination
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Michael Janssen <jamuraa@chromium.org>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <CAA1630D-1A2E-4D3D-9BBC-2EE86256D58B@holtmann.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Michael,
+Hi!
 
-On Thu, Dec 11, 2014 at 9:53 PM, Michael Janssen <jamuraa@chromium.org> wrote:
-> This patch set enables the early termination of iteration when using the
-> foreach functions provided by gatt_db and queue.  This makes it possible to
-> make some iterations more efficient.
+> >>>> What needs to be done is the bring up of the device including the proper UART settings and speed and then just run the firmware downloads. All firmware files on the Nokia devices where just HCI commands with vendor specific details. Some from CSR, some from Broadcom and some from TI. You can actually decode them if you really want to. Shouldn't be that hard.
+> >>>> 
+> >>> 
+> >>> Speed changes at the end of firmware load, but I guess that's detail?
+> >>> Anyway, patch would look like this.
+> >> 
+> >> You should really look into providing hdev->setup() callback. That is normally the callback where you want to load the firmware.
+> >> 
+> > 
+> > I can provide setup() callback and load firmware from there.
+> > 
+> > I have created provisional device tree binding, and the driver still
+> > works.
+> > 
+> > Some time ago you mentioned that with the "big" issues fixed, you'd be
+> > willing to take it into the tree. What way forward do you see? Would
+> > it make sense to re-enable the driver in staging, so that "big"
+> > changes could be applied, followed by renames?
+> 
+> If the driver is clean, there is no point in taking it through staging. It can be cleaned up and then merged all together.
 >
-> Michael Janssen (3):
->   shared/queue: enable early terminate foreach
->   unit/test-queue: add test for early termination
->   shared/gatt-db: enable foreach early termination
->
->  android/bluetooth.c      |  4 ++-
->  android/gatt.c           | 48 ++++++++++++++++++++----------
->  android/handsfree.c      |  9 ++++--
->  android/health.c         | 36 +++++++++++++----------
->  android/tester-main.c    | 32 +++++++++++++++-----
->  emulator/hciemu.c        |  3 +-
->  monitor/keys.c           |  9 +++---
->  src/shared/att.c         | 21 ++++++++-----
->  src/shared/gatt-client.c | 22 +++++++-------
->  src/shared/gatt-db.c     | 76 +++++++++++++++++++++++-------------------------
->  src/shared/gatt-db.h     |  2 +-
->  src/shared/hci.c         |  4 ++-
->  src/shared/mgmt.c        | 13 +++++----
->  src/shared/queue.c       |  3 +-
->  src/shared/queue.h       |  2 +-
->  src/shared/uhid.c        |  6 ++--
->  tools/btgatt-client.c    | 32 +++++++++++++-------
->  tools/btgatt-server.c    | 24 ++++++++++-----
->  unit/test-gatt.c         | 32 ++++++++++----------
->  unit/test-queue.c        | 33 +++++++++++++++++++--
->  20 files changed, 260 insertions(+), 151 deletions(-)
->
-> --
-> 2.2.0.rc0.207.ga3a616c
 
-Overall it seems to make sense to have early termination, but I would
-like to first push my set that make foreach safe from removal/destroy.
+Ok, so you can revert a4102f90e87cfaa3fdbed6fdf469b23f0eeb4bfd in your
+tree, and I can post patches against that?
 
+> I think the important part is to focus on the N900 derivative with
+>the Broadcom chip inside. And just ignore all the rest. So start
+>small and do not try to carry the N770, N800, N810 hacks over.
 
+Well, I did remove non-relevant firmware loaders, and I can remove the
+switches for different firmware loaders, too, but spending time
+removing support for different hardware does not sound quite right.
+
+> However you might want to check Neil Brown's patches for TTY-slave
+>devices he just posted. Maybe the N900 devices should be exposed as
+>TTY and we just attach N_HCI line discipline to it. If all the GPIO
+>wiggling can be done automatically at TTY open, then that should be
+>the way to go. I also send an email about using the new unconfigured
+>stage to get this done cleanly.
+
+I seen them, but they don't help, I'm afraid. The GPIOs are used for
+power saving, and they are used in various places including the serial
+irq handler.
+
+Best regards,
+									Pavel
 -- 
-Luiz Augusto von Dentz
+(english) http://www.livejournal.com/~pavelmachek
+(cesky, pictures) http://atrey.karlin.mff.cuni.cz/~pavel/picture/horses/blog.html
