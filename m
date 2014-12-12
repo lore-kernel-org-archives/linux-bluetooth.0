@@ -1,86 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <413E9611-A092-49CB-B86A-AD4D866D2064@holtmann.org>
-References: <1418337865-3596-1-git-send-email-toshik@chromium.org>
-	<413E9611-A092-49CB-B86A-AD4D866D2064@holtmann.org>
-Date: Fri, 12 Dec 2014 10:52:38 -0800
-Message-ID: <CALMyts4yk8_0OxAB340zpfSeYYpoQ91+bPwv1bcNp79w9Baavg@mail.gmail.com>
-Subject: Re: [PATCH] Bluetooth: btusb: support public address configuration
- for ath3012
-From: Toshi Kikuchi <toshik@chromium.org>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: multipart/alternative; boundary=001a113f97ac980310050a09653a
+From: Michael Janssen <jamuraa@chromium.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: Michael Janssen <jamuraa@chromium.org>
+Subject: [PATCH BlueZ v2 0/3] foreach early termination
+Date: Fri, 12 Dec 2014 10:44:21 -0800
+Message-Id: <1418409864-26119-1-git-send-email-jamuraa@chromium.org>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
---001a113f97ac980310050a09653a
-Content-Type: text/plain; charset=UTF-8
+This patch set enables the early termination of iteration when using the
+foreach functions provided by gatt_db and queue.  This makes it possible to
+make some iterations more efficient.
 
-Hi Marcel,
+v1 -> v2:
+  * Rebase
+  * Minor formatting fixes (thanks Arman)
 
-> +     buf[0] = 0x01;
-> > +     buf[1] = 0x01;
-> > +     buf[2] = 0x00;
-> > +     buf[3] = 0x06;
->
-> is this the length of the BD_ADDR data, then using sizeof(bdaddr_t) like
-> the Marvell one does.
->
+Michael Janssen (3):
+  shared/queue: enable early terminate foreach
+  unit/test-queue: add test for early termination
+  shared/gatt-db: enable foreach early termination
 
-Yes, we can do that.
+ android/bluetooth.c      |  4 ++-
+ android/gatt.c           | 48 +++++++++++++++++++----------
+ android/handsfree.c      |  9 ++++--
+ android/health.c         | 36 +++++++++++++---------
+ android/tester-main.c    | 32 ++++++++++++++-----
+ emulator/hciemu.c        |  3 +-
+ monitor/keys.c           | 10 +++---
+ src/shared/att.c         | 22 ++++++++-----
+ src/shared/gatt-client.c | 25 +++++++++------
+ src/shared/gatt-db.c     | 80 +++++++++++++++++++++++++-----------------------
+ src/shared/gatt-db.h     |  2 +-
+ src/shared/hci.c         |  4 ++-
+ src/shared/mgmt.c        |  8 +++--
+ src/shared/queue.c       |  3 +-
+ src/shared/queue.h       |  2 +-
+ src/shared/uhid.c        |  6 ++--
+ tools/btgatt-client.c    | 32 +++++++++++++------
+ tools/btgatt-server.c    | 24 ++++++++++-----
+ unit/test-gatt.c         | 35 ++++++++++++---------
+ unit/test-queue.c        | 44 +++++++++++++++++++++++---
+ 20 files changed, 278 insertions(+), 151 deletions(-)
 
+-- 
+2.2.0.rc0.207.ga3a616c
 
-> Also can we make sure that this changes the address only temporary.
-> Meaning after a power cycle the original address comes back. This feature
-> is not designed to permanently change the BD_ADDR.
-
-
-Yes. that's how it works. The change doesn't persist after a power cycle.
-
-
-> > +     if (id->driver_info & BTUSB_ATH3012) {
-> > +             hdev->set_bdaddr = btusb_set_bdaddr_ath3012;
-> > +     }
-> > +
->
-> For single lines, we do not use { }.
-
-
-Right. I'll send out a fixed version shortly.
-
-Thanks,
-Toshi
-
---001a113f97ac980310050a09653a
-Content-Type: text/html; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-
-<div dir=3D"ltr">Hi Marcel,<br><div class=3D"gmail_extra"><br><div class=3D=
-"gmail_quote"><blockquote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;=
-border-left:1px #ccc solid;padding-left:1ex"><span class=3D"">&gt; +=C2=A0 =
-=C2=A0 =C2=A0buf[0] =3D 0x01;<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0buf[1] =3D 0x01;<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0buf[2] =3D 0x00;<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0buf[3] =3D 0x06;<br>
-<br>
-</span>is this the length of the BD_ADDR data, then using sizeof(bdaddr_t) =
-like the Marvell one does.<br></blockquote><div><br></div><div>Yes, we can =
-do that.</div><div>=C2=A0</div><blockquote class=3D"gmail_quote" style=3D"m=
-argin:0 0 0 .8ex;border-left:1px #ccc solid;padding-left:1ex">Also can we m=
-ake sure that this changes the address only temporary. Meaning after a powe=
-r cycle the original address comes back. This feature is not designed to pe=
-rmanently change the BD_ADDR.</blockquote><div><br></div><div>Yes. that&#39=
-;s how it works. The change doesn&#39;t persist after a power cycle.=C2=A0<=
-/div><div>=C2=A0</div><blockquote class=3D"gmail_quote" style=3D"margin:0 0=
- 0 .8ex;border-left:1px #ccc solid;padding-left:1ex"><span class=3D"">
-&gt; +=C2=A0 =C2=A0 =C2=A0if (id-&gt;driver_info &amp; BTUSB_ATH3012) {<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0hdev-&gt;set_bdaddr =
-=3D btusb_set_bdaddr_ath3012;<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0}<br>
-&gt; +<br>
-<br>
-</span>For single lines, we do not use { }.</blockquote><div><br></div><div=
->Right. I&#39;ll send out a fixed version shortly.</div><div><br></div><div=
->Thanks,</div><div>Toshi</div></div></div></div>
-
---001a113f97ac980310050a09653a--
