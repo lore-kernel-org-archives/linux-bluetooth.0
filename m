@@ -1,37 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Thu, 11 Dec 2014 22:03:18 -0800
 From: Tristan Lelong <tristan@lelong.xyz>
-To: marcel@holtmann.org, gustavo@padovan.org, johan.hedberg@gmail.com
-Cc: linux-bluetooth@vger.kernel.org,
-	Tristan Lelong <tristan@lelong.xyz>
-Subject: [PATCH 0/2] BCSP Link Establishment in kernel
-Date: Thu, 11 Dec 2014 23:14:36 -0800
-Message-Id: <1418368478-13956-1-git-send-email-tristan@lelong.xyz>
-Sender: linux-bluetooth-owner@vger.kernel.org
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: BCSP line discipline
+Message-ID: <20141212060318.GA5095@dunderer>
+References: <20141211044836.GA21771@dunderer>
+ <D5F4F93F-8C6D-4B10-AEDB-7DD59C0E6E6C@holtmann.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <D5F4F93F-8C6D-4B10-AEDB-7DD59C0E6E6C@holtmann.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+On Thu, Dec 11, 2014 at 01:50:28PM +0100, Marcel Holtmann wrote:
+> 
+> have you read my comment about creating a new hciattach:
+> 
+> http://permalink.gmane.org/gmane.linux.bluez.kernel/50483
+> 
+> And with that also the options we have for device / address configuration these days:
+> 
+> http://permalink.gmane.org/gmane.linux.bluez.kernel/50716
+> 
 
-This serie of patch will add the link establishment protocol for BCSP into
-the kernel rather than having to handle in userland before switching discipline
-and make the TX window size configurable.
+Now I did, I am currently not able to do tests (no HW just my laptop), but that was really instructive.
 
-These patches might not be ready for direct submission to the kernel mainline, but this is a first request for comment/review.
+> In summary, the whole handling of BCSP should move into the kernel. The kernel can bring up the device as unconfigured, then you use HCI User Channel to change the baud rate, then run it as configured.
 
-Thanks,
+Glad to hear that I wasn't wrong on that.
 
-Regards
+> 
+> So just send your patches and then we see.
 
-Tristan Lelong (2):
-  hci_bcsp: Add LE protocol on kernel side
-  bcsp: Change tx window size in configuration
+I cleaned the patches and will send you the first version for review, but I need to do a little bit of testing just in case the cleaning broke something.
+I'll be submitting the v2 next week when I'll be able to access some hardware.
+The "unclean" patches were tested on a 921600 baud link for 12 hours straight with multiple connect/disconnect.
 
- drivers/bluetooth/Kconfig        |   7 ++
- drivers/bluetooth/hci_bcsp.c     | 203 +++++++++++++++++++++++++++++++--------
- drivers/bluetooth/hci_ldisc.c    |   5 +
- include/net/bluetooth/hci_core.h |   2 +
- net/bluetooth/hci_core.c         |   6 +-
- 5 files changed, 182 insertions(+), 41 deletions(-)
-
--- 
-2.1.1
-
+Thanks
