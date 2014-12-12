@@ -1,41 +1,55 @@
 Return-Path: <cyrus@holtmann.org>
-From: Johan Hedberg <johan.hedberg@gmail.com>
+From: Sagar Nageshmurthy <s.nageshmurt@samsung.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Fix enabling BR/EDR SC when powering on
-Date: Fri, 12 Dec 2014 13:30:11 +0200
-Message-Id: <1418383811-15178-1-git-send-email-johan.hedberg@gmail.com>
+Cc: Sagar Nageshmurthy <s.nageshmurt@samsung.com>
+Subject: [PATCH 1/1] audio/sink: Fix crash when err is NULL
+Date: Fri, 12 Dec 2014 16:41:30 +0530
+Message-id: <1418382690-9741-1-git-send-email-s.nageshmurt@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@intel.com>
+When a2dp connection fails because of IO error setup error can be NULL
+if the err is already handled by finalize_resume(setup).
 
-If we're in the AUTO_OFF stage the powered_update_hci() function is
-responsible for doing the updates to the HCI state that were not done
-during the actual mgmt command handlers. One of the updates needing done
-is for BR/EDR SC support. This patch adds the missing HCI command for SC
-support to the powered_update_hci() function.
+(gdb) p *(struct a2dp_setup *)0xb6f98150
+$8 = {session = 0xb6c12000, sep = 0xb6c49d30, rsep = 0x0, stream = 0x0,
+	  err = 0x0, setconf_cb = 0, caps = 0x0, reconfigure = 17,
+	    start = -1225164896, cb = 0xb6d70288, ref = 16}
 
-Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+(gdb) bt
+0 0xb6f92108 in ?? ()
+1 0xb6efcd88 in finalize_config (data=0xb6f98150)
+    at profiles/audio/a2dp.c:222
+2 0xb6f004a8 in handle_unanswered_req (session=0xb6f9a650,
+    sep=<value optimized out>, state=AVDTP_STATE_IDLE)
+    at profiles/audio/avdtp.c:967
+3 avdtp_sep_set_state (session=0xb6f9a650, sep=<value optimized out>,
+    state=AVDTP_STATE_IDLE) at profiles/audio/avdtp.c:1163
+4 0xb6e16fb8 in g_slist_foreach (list=<value optimized out>,
+    func=0xb6f005e5 <release_stream>, user_data=0xb6f9a650) at gslist.c:840
+
+daemon.debug : src/device.c:device_profile_connected() a2dp-sink Input/output error (5)
+daemon.debug : profiles/audio/a2dp.c:abort_cfm() Source 0xb6f8fba8: Abort_Cfm
+daemon.debug : profiles/audio/a2dp.c:setup_unref() 0xb6f98150: ref=1
+daemon.err : No reply to Open request
+daemon.debug : profiles/audio/a2dp.c:open_cfm() Source 0xb6f8fba8: Open_Cfm
 ---
- net/bluetooth/mgmt.c | 5 +++++
- 1 file changed, 5 insertions(+)
+ profiles/audio/sink.c |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index b0782668cd22..23a0ca5a4737 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -6097,6 +6097,11 @@ static int powered_update_hci(struct hci_dev *hdev)
- 		hci_req_add(&req, HCI_OP_WRITE_SSP_MODE, 1, &ssp);
- 	}
+diff --git a/profiles/audio/sink.c b/profiles/audio/sink.c
+index f475709..7fa9430 100644
+--- a/profiles/audio/sink.c
++++ b/profiles/audio/sink.c
+@@ -191,7 +191,7 @@ static void stream_setup_complete(struct avdtp *session, struct a2dp_sep *sep,
  
-+	if (bredr_sc_enabled(hdev) && !lmp_host_sc_capable(hdev)) {
-+		u8 sc = 0x01;
-+		hci_req_add(&req, HCI_OP_WRITE_SC_SUPPORT, sizeof(sc), &sc);
-+	}
-+
- 	if (test_bit(HCI_LE_ENABLED, &hdev->dev_flags) &&
- 	    lmp_bredr_capable(hdev)) {
- 		struct hci_cp_write_le_host_supported cp;
+ 	avdtp_unref(sink->session);
+ 	sink->session = NULL;
+-	if (avdtp_error_category(err) == AVDTP_ERRNO
++	if (err && avdtp_error_category(err) == AVDTP_ERRNO
+ 				&& avdtp_error_posix_errno(err) != EHOSTDOWN)
+ 		btd_service_connecting_complete(sink->service, -EAGAIN);
+ 	else
 -- 
-2.1.0
+1.7.9.5
 
