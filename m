@@ -1,67 +1,86 @@
 Return-Path: <cyrus@holtmann.org>
+MIME-Version: 1.0
+In-Reply-To: <413E9611-A092-49CB-B86A-AD4D866D2064@holtmann.org>
+References: <1418337865-3596-1-git-send-email-toshik@chromium.org>
+	<413E9611-A092-49CB-B86A-AD4D866D2064@holtmann.org>
+Date: Fri, 12 Dec 2014 10:52:38 -0800
+Message-ID: <CALMyts4yk8_0OxAB340zpfSeYYpoQ91+bPwv1bcNp79w9Baavg@mail.gmail.com>
+Subject: Re: [PATCH] Bluetooth: btusb: support public address configuration
+ for ath3012
 From: Toshi Kikuchi <toshik@chromium.org>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2] Bluetooth: btusb: support public address configuration for ath3012
-Date: Fri, 12 Dec 2014 10:58:05 -0800
-Message-Id: <1418410685-29882-1-git-send-email-toshik@chromium.org>
-Sender: linux-bluetooth-owner@vger.kernel.org
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: multipart/alternative; boundary=001a113f97ac980310050a09653a
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Set hdev->set_bdaddr handler for ath3012. It sends the vendor specific HCI
-command to change the public address. The change doesn't persist across
-power cycle.
+--001a113f97ac980310050a09653a
+Content-Type: text/plain; charset=UTF-8
 
-Signed-off-by: Toshi Kikuchi <toshik@chromium.org>
----
- drivers/bluetooth/btusb.c | 28 ++++++++++++++++++++++++++++
- 1 file changed, 28 insertions(+)
+Hi Marcel,
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index edfc17b..2b84392 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -1935,6 +1935,31 @@ static int btusb_set_bdaddr_bcm(struct hci_dev *hdev, const bdaddr_t *bdaddr)
- 	return 0;
- }
- 
-+static int btusb_set_bdaddr_ath3012(struct hci_dev *hdev,
-+				    const bdaddr_t *bdaddr)
-+{
-+	struct sk_buff *skb;
-+	u8 buf[10];
-+	long ret;
-+
-+	buf[0] = 0x01;
-+	buf[1] = 0x01;
-+	buf[2] = 0x00;
-+	buf[3] = sizeof(bdaddr_t);
-+	memcpy(buf + 4, bdaddr, sizeof(bdaddr_t));
-+
-+	skb = __hci_cmd_sync(hdev, 0xfc0b, sizeof(buf), buf, HCI_INIT_TIMEOUT);
-+	if (IS_ERR(skb)) {
-+		ret = PTR_ERR(skb);
-+		BT_ERR("%s: Change address command failed (%ld)",
-+		       hdev->name, ret);
-+		return ret;
-+	}
-+	kfree_skb(skb);
-+
-+	return 0;
-+}
-+
- static int btusb_probe(struct usb_interface *intf,
- 		       const struct usb_device_id *id)
- {
-@@ -2047,6 +2072,9 @@ static int btusb_probe(struct usb_interface *intf,
- 	if (id->driver_info & BTUSB_INTEL_BOOT)
- 		set_bit(HCI_QUIRK_RAW_DEVICE, &hdev->quirks);
- 
-+	if (id->driver_info & BTUSB_ATH3012)
-+		hdev->set_bdaddr = btusb_set_bdaddr_ath3012;
-+
- 	/* Interface numbers are hardcoded in the specification */
- 	data->isoc = usb_ifnum_to_if(data->udev, 1);
- 
--- 
-2.2.0.rc0.207.ga3a616c
+> +     buf[0] = 0x01;
+> > +     buf[1] = 0x01;
+> > +     buf[2] = 0x00;
+> > +     buf[3] = 0x06;
+>
+> is this the length of the BD_ADDR data, then using sizeof(bdaddr_t) like
+> the Marvell one does.
+>
 
+Yes, we can do that.
+
+
+> Also can we make sure that this changes the address only temporary.
+> Meaning after a power cycle the original address comes back. This feature
+> is not designed to permanently change the BD_ADDR.
+
+
+Yes. that's how it works. The change doesn't persist after a power cycle.
+
+
+> > +     if (id->driver_info & BTUSB_ATH3012) {
+> > +             hdev->set_bdaddr = btusb_set_bdaddr_ath3012;
+> > +     }
+> > +
+>
+> For single lines, we do not use { }.
+
+
+Right. I'll send out a fixed version shortly.
+
+Thanks,
+Toshi
+
+--001a113f97ac980310050a09653a
+Content-Type: text/html; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+
+<div dir=3D"ltr">Hi Marcel,<br><div class=3D"gmail_extra"><br><div class=3D=
+"gmail_quote"><blockquote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;=
+border-left:1px #ccc solid;padding-left:1ex"><span class=3D"">&gt; +=C2=A0 =
+=C2=A0 =C2=A0buf[0] =3D 0x01;<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0buf[1] =3D 0x01;<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0buf[2] =3D 0x00;<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0buf[3] =3D 0x06;<br>
+<br>
+</span>is this the length of the BD_ADDR data, then using sizeof(bdaddr_t) =
+like the Marvell one does.<br></blockquote><div><br></div><div>Yes, we can =
+do that.</div><div>=C2=A0</div><blockquote class=3D"gmail_quote" style=3D"m=
+argin:0 0 0 .8ex;border-left:1px #ccc solid;padding-left:1ex">Also can we m=
+ake sure that this changes the address only temporary. Meaning after a powe=
+r cycle the original address comes back. This feature is not designed to pe=
+rmanently change the BD_ADDR.</blockquote><div><br></div><div>Yes. that&#39=
+;s how it works. The change doesn&#39;t persist after a power cycle.=C2=A0<=
+/div><div>=C2=A0</div><blockquote class=3D"gmail_quote" style=3D"margin:0 0=
+ 0 .8ex;border-left:1px #ccc solid;padding-left:1ex"><span class=3D"">
+&gt; +=C2=A0 =C2=A0 =C2=A0if (id-&gt;driver_info &amp; BTUSB_ATH3012) {<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0hdev-&gt;set_bdaddr =
+=3D btusb_set_bdaddr_ath3012;<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0}<br>
+&gt; +<br>
+<br>
+</span>For single lines, we do not use { }.</blockquote><div><br></div><div=
+>Right. I&#39;ll send out a fixed version shortly.</div><div><br></div><div=
+>Thanks,</div><div>Toshi</div></div></div></div>
+
+--001a113f97ac980310050a09653a--
