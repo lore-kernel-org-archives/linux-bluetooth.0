@@ -1,461 +1,67 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <CAJLTA8ie8AqKC80obA3TQ-4OCEnLe=z5m81qFw+CZ5gGG7BdZA@mail.gmail.com>
-References: <1418327617-26951-1-git-send-email-jamuraa@chromium.org>
-	<1418327617-26951-4-git-send-email-jamuraa@chromium.org>
-	<CAHrH25QTF0ue-WEuAMqtLwPi6cXSVZRp8uGHOUyq1xpKxg_3rA@mail.gmail.com>
-	<CAJLTA8ie8AqKC80obA3TQ-4OCEnLe=z5m81qFw+CZ5gGG7BdZA@mail.gmail.com>
-Date: Fri, 12 Dec 2014 11:37:31 -0800
-Message-ID: <CAHrH25T4QMV8KcbpXyXStmL6r_ypLLW+a5DVOHY734uPqZbjLw@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 3/3] shared/gatt-db: enable foreach early termination
-From: Arman Uguray <armansito@chromium.org>
-To: Michael Janssen <jamuraa@chromium.org>
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+From: Toshi Kikuchi <toshik@chromium.org>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH v2] Bluetooth: btusb: support public address configuration for ath3012
+Date: Fri, 12 Dec 2014 10:58:05 -0800
+Message-Id: <1418410685-29882-1-git-send-email-toshik@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Michael,
+Set hdev->set_bdaddr handler for ath3012. It sends the vendor specific HCI
+command to change the public address. The change doesn't persist across
+power cycle.
 
-On Fri, Dec 12, 2014 at 7:27 AM, Michael Janssen <jamuraa@chromium.org> wrote:
-> Hi Arman,
->
-> On Thu, Dec 11, 2014 at 3:58 PM, Arman Uguray <armansito@chromium.org> wrote:
->> Hi Michael,
->>
->>> On Thu, Dec 11, 2014 at 11:53 AM, Michael Janssen <jamuraa@chromium.org> wrote:
->>> Adds early termination to the iteration callbacks used in
->>> gatt-db.  Returning false from a callback will terminate the iteration.
->>> ---
->>>  src/shared/gatt-client.c |  8 +++-----
->>>  src/shared/gatt-db.c     | 10 ++++++----
->>>  src/shared/gatt-db.h     |  2 +-
->>>  tools/btgatt-client.c    | 32 ++++++++++++++++++++++----------
->>>  tools/btgatt-server.c    | 24 ++++++++++++++++--------
->>>  unit/test-gatt.c         | 32 +++++++++++++++++---------------
->>>  6 files changed, 65 insertions(+), 43 deletions(-)
->>>
->>> diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
->>> index 047de22..fcf2965 100644
->>> --- a/src/shared/gatt-client.c
->>> +++ b/src/shared/gatt-client.c
->>> @@ -137,20 +137,18 @@ static void notify_data_unref(void *data)
->>>         free(notify_data);
->>>  }
->>>
->>> -static void find_ccc(struct gatt_db_attribute *attr, void *user_data)
->>> +static bool find_ccc(struct gatt_db_attribute *attr, void *user_data)
->>>  {
->>>         struct gatt_db_attribute **ccc_ptr = user_data;
->>>         bt_uuid_t uuid;
->>>
->>> -       if (*ccc_ptr)
->>> -               return;
->>> -
->>>         bt_uuid16_create(&uuid, GATT_CLIENT_CHARAC_CFG_UUID);
->>>
->>>         if (bt_uuid_cmp(&uuid, gatt_db_attribute_get_type(attr)))
->>> -               return;
->>> +               return true;
->>>
->>>         *ccc_ptr = attr;
->>
->> New line before return.
->>
->>> +       return false;
->>>  }
->>>
->>>  static struct notify_chrc *notify_chrc_create(struct bt_gatt_client *client,
->>> diff --git a/src/shared/gatt-db.c b/src/shared/gatt-db.c
->>> index 0e3acf2..1d78b37 100644
->>> --- a/src/shared/gatt-db.c
->>> +++ b/src/shared/gatt-db.c
->>> @@ -1025,8 +1025,8 @@ static bool foreach_service_in_range(void *data, void *user_data)
->>>                         return true;
->>>         }
->>>
->>> -       foreach_data->func(service->attributes[0], foreach_data->user_data);
->>> -       return true;
->>> +       return foreach_data->func(service->attributes[0],
->>> +                                               foreach_data->user_data);
->>>  }
->>>
->>>  void gatt_db_foreach_service_in_range(struct gatt_db *db,
->>> @@ -1072,7 +1072,8 @@ void gatt_db_service_foreach(struct gatt_db_attribute *attrib,
->>>                 if (uuid && bt_uuid_cmp(uuid, &attr->uuid))
->>>                         continue;
->>>
->>> -               func(attr, user_data);
->>> +               if (!func(attr, user_data))
->>> +                       return;
->>>         }
->>>  }
->>>
->>> @@ -1112,7 +1113,8 @@ void gatt_db_service_foreach_desc(struct gatt_db_attribute *attrib,
->>>                         !bt_uuid_cmp(&included_service_uuid, &attr->uuid))
->>>                         return;
->>>
->>> -               func(attr, user_data);
->>> +               if (!func(attr, user_data))
->>> +                       return;
->>>         }
->>>  }
->>>
->>> diff --git a/src/shared/gatt-db.h b/src/shared/gatt-db.h
->>> index e5fe6bb..4ecaf6a 100644
->>> --- a/src/shared/gatt-db.h
->>> +++ b/src/shared/gatt-db.h
->>> @@ -102,7 +102,7 @@ void gatt_db_find_information(struct gatt_db *db, uint16_t start_handle,
->>>                                                         struct queue *queue);
->>>
->>>
->>> -typedef void (*gatt_db_attribute_cb_t)(struct gatt_db_attribute *attrib,
->>> +typedef bool (*gatt_db_attribute_cb_t)(struct gatt_db_attribute *attrib,
->>>                                                         void *user_data);
->>>
->>>  void gatt_db_foreach_service(struct gatt_db *db, const bt_uuid_t *uuid,
->>> diff --git a/tools/btgatt-client.c b/tools/btgatt-client.c
->>> index 015142d..5da72f8 100644
->>> --- a/tools/btgatt-client.c
->>> +++ b/tools/btgatt-client.c
->>> @@ -114,14 +114,18 @@ static void log_service_event(struct gatt_db_attribute *attr, const char *str)
->>>                                                                 start, end);
->>>  }
->>>
->>> -static void service_added_cb(struct gatt_db_attribute *attr, void *user_data)
->>> +static bool service_added_cb(struct gatt_db_attribute *attr, void *user_data)
->>>  {
->>>         log_service_event(attr, "Service Added");
->>> +
->>> +       return true;
->>>  }
->>
->> It doesn't make sense for service added/removed callbacks to return
->> bool as the return value is meaningless. Perhaps you should add a new
->> callback definition for added/removed which has a void return value
->> instead of reusing gatt_db_attribute_cb_t.
->
-> In the typical usage I've seen, a false return from a notifying
-> callback like this would be a shortcut to removing the notification -
-> maybe we could do the same here?
->
+Signed-off-by: Toshi Kikuchi <toshik@chromium.org>
+---
+ drivers/bluetooth/btusb.c | 28 ++++++++++++++++++++++++++++
+ 1 file changed, 28 insertions(+)
 
-I don't like overloading the meaning of the return value in that case
-or at least I prefer to be consistend with bt_att_register,
-mgmt_register, and alike which don't have that behavior. I'd rather
-just add a gatt_db_service_changed_t typedef. Though I'll let Luiz
-comment on this as well.
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index edfc17b..2b84392 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -1935,6 +1935,31 @@ static int btusb_set_bdaddr_bcm(struct hci_dev *hdev, const bdaddr_t *bdaddr)
+ 	return 0;
+ }
+ 
++static int btusb_set_bdaddr_ath3012(struct hci_dev *hdev,
++				    const bdaddr_t *bdaddr)
++{
++	struct sk_buff *skb;
++	u8 buf[10];
++	long ret;
++
++	buf[0] = 0x01;
++	buf[1] = 0x01;
++	buf[2] = 0x00;
++	buf[3] = sizeof(bdaddr_t);
++	memcpy(buf + 4, bdaddr, sizeof(bdaddr_t));
++
++	skb = __hci_cmd_sync(hdev, 0xfc0b, sizeof(buf), buf, HCI_INIT_TIMEOUT);
++	if (IS_ERR(skb)) {
++		ret = PTR_ERR(skb);
++		BT_ERR("%s: Change address command failed (%ld)",
++		       hdev->name, ret);
++		return ret;
++	}
++	kfree_skb(skb);
++
++	return 0;
++}
++
+ static int btusb_probe(struct usb_interface *intf,
+ 		       const struct usb_device_id *id)
+ {
+@@ -2047,6 +2072,9 @@ static int btusb_probe(struct usb_interface *intf,
+ 	if (id->driver_info & BTUSB_INTEL_BOOT)
+ 		set_bit(HCI_QUIRK_RAW_DEVICE, &hdev->quirks);
+ 
++	if (id->driver_info & BTUSB_ATH3012)
++		hdev->set_bdaddr = btusb_set_bdaddr_ath3012;
++
+ 	/* Interface numbers are hardcoded in the specification */
+ 	data->isoc = usb_ifnum_to_if(data->udev, 1);
+ 
+-- 
+2.2.0.rc0.207.ga3a616c
 
->>>
->>> -static void service_removed_cb(struct gatt_db_attribute *attr, void *user_data)
->>> +static bool service_removed_cb(struct gatt_db_attribute *attr, void *user_data)
->>>  {
->>>         log_service_event(attr, "Service Removed");
->>> +
->>> +       return true;
->>>  }
->>>
->>>  static struct client *client_create(int fd, uint16_t mtu)
->>> @@ -211,7 +215,7 @@ static void print_uuid(const bt_uuid_t *uuid)
->>>         printf("%s\n", uuid_str);
->>>  }
->>>
->>> -static void print_incl(struct gatt_db_attribute *attr, void *user_data)
->>> +static bool print_incl(struct gatt_db_attribute *attr, void *user_data)
->>>  {
->>>         struct client *cli = user_data;
->>>         uint16_t handle, start, end;
->>> @@ -219,11 +223,11 @@ static void print_incl(struct gatt_db_attribute *attr, void *user_data)
->>>         bt_uuid_t uuid;
->>>
->>>         if (!gatt_db_attribute_get_incl_data(attr, &handle, &start, &end))
->>> -               return;
->>> +               return true;
->>>
->>>         service = gatt_db_get_attribute(cli->db, start);
->>>         if (!service)
->>> -               return;
->>> +               return true;
->>>
->>>         gatt_db_attribute_get_service_uuid(service, &uuid);
->>>
->>> @@ -231,17 +235,21 @@ static void print_incl(struct gatt_db_attribute *attr, void *user_data)
->>>                                         "0x%04x, - start: 0x%04x, end: 0x%04x,"
->>>                                         "uuid: ", handle, start, end);
->>>         print_uuid(&uuid);
->>> +
->>> +       return true;
->>>  }
->>>
->>> -static void print_desc(struct gatt_db_attribute *attr, void *user_data)
->>> +static bool print_desc(struct gatt_db_attribute *attr, void *user_data)
->>>  {
->>>         printf("\t\t  " COLOR_MAGENTA "descr" COLOR_OFF
->>>                                         " - handle: 0x%04x, uuid: ",
->>>                                         gatt_db_attribute_get_handle(attr));
->>>         print_uuid(gatt_db_attribute_get_type(attr));
->>> +
->>> +       return true;
->>>  }
->>>
->>> -static void print_chrc(struct gatt_db_attribute *attr, void *user_data)
->>> +static bool print_chrc(struct gatt_db_attribute *attr, void *user_data)
->>>  {
->>>         uint16_t handle, value_handle;
->>>         uint8_t properties;
->>> @@ -251,7 +259,7 @@ static void print_chrc(struct gatt_db_attribute *attr, void *user_data)
->>>                                                                 &value_handle,
->>>                                                                 &properties,
->>>                                                                 &uuid))
->>> -               return;
->>> +               return true;
->>>
->>>         printf("\t  " COLOR_YELLOW "charac" COLOR_OFF
->>>                                         " - start: 0x%04x, value: 0x%04x, "
->>> @@ -260,9 +268,11 @@ static void print_chrc(struct gatt_db_attribute *attr, void *user_data)
->>>         print_uuid(&uuid);
->>>
->>>         gatt_db_service_foreach_desc(attr, print_desc, NULL);
->>> +
->>> +       return true;
->>>  }
->>>
->>> -static void print_service(struct gatt_db_attribute *attr, void *user_data)
->>> +static bool print_service(struct gatt_db_attribute *attr, void *user_data)
->>>  {
->>>         struct client *cli = user_data;
->>>         uint16_t start, end;
->>> @@ -271,7 +281,7 @@ static void print_service(struct gatt_db_attribute *attr, void *user_data)
->>>
->>>         if (!gatt_db_attribute_get_service_data(attr, &start, &end, &primary,
->>>                                                                         &uuid))
->>> -               return;
->>> +               return true;
->>>
->>>         printf(COLOR_RED "service" COLOR_OFF " - start: 0x%04x, "
->>>                                 "end: 0x%04x, type: %s, uuid: ",
->>> @@ -282,6 +292,8 @@ static void print_service(struct gatt_db_attribute *attr, void *user_data)
->>>         gatt_db_service_foreach_char(attr, print_chrc, NULL);
->>>
->>>         printf("\n");
->>> +
->>> +       return true;
->>>  }
->>>
->>>  static void print_services(struct client *cli)
->>> diff --git a/tools/btgatt-server.c b/tools/btgatt-server.c
->>> index 1a9b9fb..4533636 100644
->>> --- a/tools/btgatt-server.c
->>> +++ b/tools/btgatt-server.c
->>> @@ -894,7 +894,7 @@ static void print_uuid(const bt_uuid_t *uuid)
->>>         printf("%s\n", uuid_str);
->>>  }
->>>
->>> -static void print_incl(struct gatt_db_attribute *attr, void *user_data)
->>> +static bool print_incl(struct gatt_db_attribute *attr, void *user_data)
->>>  {
->>>         struct server *server = user_data;
->>>         uint16_t handle, start, end;
->>> @@ -902,11 +902,11 @@ static void print_incl(struct gatt_db_attribute *attr, void *user_data)
->>>         bt_uuid_t uuid;
->>>
->>>         if (!gatt_db_attribute_get_incl_data(attr, &handle, &start, &end))
->>> -               return;
->>> +               return true;
->>>
->>>         service = gatt_db_get_attribute(server->db, start);
->>>         if (!service)
->>> -               return;
->>> +               return true;
->>>
->>>         gatt_db_attribute_get_service_uuid(service, &uuid);
->>>
->>> @@ -914,17 +914,21 @@ static void print_incl(struct gatt_db_attribute *attr, void *user_data)
->>>                                         "0x%04x, - start: 0x%04x, end: 0x%04x,"
->>>                                         "uuid: ", handle, start, end);
->>>         print_uuid(&uuid);
->>> +
->>> +       return true;
->>>  }
->>>
->>> -static void print_desc(struct gatt_db_attribute *attr, void *user_data)
->>> +static bool print_desc(struct gatt_db_attribute *attr, void *user_data)
->>>  {
->>>         printf("\t\t  " COLOR_MAGENTA "descr" COLOR_OFF
->>>                                         " - handle: 0x%04x, uuid: ",
->>>                                         gatt_db_attribute_get_handle(attr));
->>>         print_uuid(gatt_db_attribute_get_type(attr));
->>> +
->>> +       return true;
->>>  }
->>>
->>> -static void print_chrc(struct gatt_db_attribute *attr, void *user_data)
->>> +static bool print_chrc(struct gatt_db_attribute *attr, void *user_data)
->>>  {
->>>         uint16_t handle, value_handle;
->>>         uint8_t properties;
->>> @@ -934,7 +938,7 @@ static void print_chrc(struct gatt_db_attribute *attr, void *user_data)
->>>                                                                 &value_handle,
->>>                                                                 &properties,
->>>                                                                 &uuid))
->>> -               return;
->>> +               return true;
->>>
->>>         printf("\t  " COLOR_YELLOW "charac" COLOR_OFF
->>>                                         " - start: 0x%04x, value: 0x%04x, "
->>> @@ -943,9 +947,11 @@ static void print_chrc(struct gatt_db_attribute *attr, void *user_data)
->>>         print_uuid(&uuid);
->>>
->>>         gatt_db_service_foreach_desc(attr, print_desc, NULL);
->>> +
->>> +       return true;
->>>  }
->>>
->>> -static void print_service(struct gatt_db_attribute *attr, void *user_data)
->>> +static bool print_service(struct gatt_db_attribute *attr, void *user_data)
->>>  {
->>>         struct server *server = user_data;
->>>         uint16_t start, end;
->>> @@ -954,7 +960,7 @@ static void print_service(struct gatt_db_attribute *attr, void *user_data)
->>>
->>>         if (!gatt_db_attribute_get_service_data(attr, &start, &end, &primary,
->>>                                                                         &uuid))
->>> -               return;
->>> +               return true;
->>>
->>>         printf(COLOR_RED "service" COLOR_OFF " - start: 0x%04x, "
->>>                                 "end: 0x%04x, type: %s, uuid: ",
->>> @@ -965,6 +971,8 @@ static void print_service(struct gatt_db_attribute *attr, void *user_data)
->>>         gatt_db_service_foreach_char(attr, print_chrc, NULL);
->>>
->>>         printf("\n");
->>> +
->>> +       return true;
->>>  }
->>>
->>>  static void cmd_services(struct server *server, char *cmd_str)
->>> diff --git a/unit/test-gatt.c b/unit/test-gatt.c
->>> index 5f5ad1b..4d891d9 100644
->>> --- a/unit/test-gatt.c
->>> +++ b/unit/test-gatt.c
->>> @@ -313,19 +313,17 @@ static bool matching_desc_data(struct gatt_db_attribute *a,
->>>         return a_handle == b_handle && !bt_uuid_cmp(a_uuid, b_uuid);
->>>  }
->>>
->>> -static void find_matching_desc(struct gatt_db_attribute *source_desc_attr,
->>> +static bool find_matching_desc(struct gatt_db_attribute *source_desc_attr,
->>>                                                                 void *user_data)
->>>  {
->>>         struct db_attribute_test_data *desc_test_data = user_data;
->>>
->>> -       if (desc_test_data->found)
->>> -               return;
->>> -
->>>         desc_test_data->found = matching_desc_data(desc_test_data->match,
->>>                                                         source_desc_attr);
->>> +       return !desc_test_data->found;
->>>  }
->>>
->>> -static void match_descs(struct gatt_db_attribute *client_desc_attr,
->>> +static bool match_descs(struct gatt_db_attribute *client_desc_attr,
->>>                                                                 void *user_data)
->>>  {
->>>         struct gatt_db_attribute *source_char_attr = user_data;
->>> @@ -338,6 +336,7 @@ static void match_descs(struct gatt_db_attribute *client_desc_attr,
->>>                                                         &desc_test_data);
->>>
->>>         g_assert(desc_test_data.found);
->>> +       return true;
->>>  }
->>>
->>>  static bool matching_char_data(struct gatt_db_attribute *a,
->>> @@ -357,23 +356,23 @@ static bool matching_char_data(struct gatt_db_attribute *a,
->>>                                                 !bt_uuid_cmp(&a_uuid, &b_uuid);
->>>  }
->>>
->>> -static void find_matching_char(struct gatt_db_attribute *source_char_attr,
->>> +static bool find_matching_char(struct gatt_db_attribute *source_char_attr,
->>>                                                                 void *user_data)
->>>  {
->>>         struct db_attribute_test_data *char_test_data = user_data;
->>>
->>> -       if (char_test_data->found)
->>> -               return;
->>> -
->>>         if (matching_char_data(char_test_data->match, source_char_attr)) {
->>>
->>>                 gatt_db_service_foreach_desc(char_test_data->match, match_descs,
->>>                                                         source_char_attr);
->>>                 char_test_data->found = true;
->>> +               return false;
->>>         }
->>> +
->>> +       return true;
->>>  }
->>>
->>> -static void match_chars(struct gatt_db_attribute *client_char_attr,
->>> +static bool match_chars(struct gatt_db_attribute *client_char_attr,
->>>                                                                 void *user_data)
->>>  {
->>>         struct gatt_db_attribute *source_serv_attr = user_data;
->>> @@ -386,6 +385,8 @@ static void match_chars(struct gatt_db_attribute *client_char_attr,
->>>                                                         &char_test_data);
->>>
->>>         g_assert(char_test_data.found);
->>> +
->>> +       return true;
->>>  }
->>>
->>>  static bool matching_service_data(struct gatt_db_attribute *a,
->>> @@ -404,22 +405,22 @@ static bool matching_service_data(struct gatt_db_attribute *a,
->>>                                                 !bt_uuid_cmp(&a_uuid, &b_uuid);
->>>  }
->>>
->>> -static void find_matching_service(struct gatt_db_attribute *source_serv_attr,
->>> +static bool find_matching_service(struct gatt_db_attribute *source_serv_attr,
->>>                                                                 void *user_data)
->>>  {
->>>         struct db_attribute_test_data *serv_test_data = user_data;
->>>
->>> -       if (serv_test_data->found)
->>> -               return;
->>> -
->>>         if (matching_service_data(serv_test_data->match, source_serv_attr)) {
->>>                 gatt_db_service_foreach_char(serv_test_data->match, match_chars,
->>>                                                         source_serv_attr);
->>>                 serv_test_data->found = true;
->>> +               return false;
->>>         }
->>> +
->>> +       return true;
->>>  }
->>>
->>> -static void match_services(struct gatt_db_attribute *client_serv_attr,
->>> +static bool match_services(struct gatt_db_attribute *client_serv_attr,
->>>                                                                 void *user_data)
->>>  {
->>>         struct gatt_db *source_db = user_data;
->>> @@ -432,6 +433,7 @@ static void match_services(struct gatt_db_attribute *client_serv_attr,
->>>                                         find_matching_service, &serv_test_data);
->>>
->>>         g_assert(serv_test_data.found);
->>> +       return true;
->>>  }
->>>
->>>  static void client_ready_cb(bool success, uint8_t att_ecode, void *user_data)
->>> --
->>> 2.2.0.rc0.207.ga3a616c
->>>
->>> --
->>> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
->>> the body of a message to majordomo@vger.kernel.org
->>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->>
->> Cheers,
->> Arman
->
-> Thanks,
-> Mike
-
-Cheers,
-Arman
