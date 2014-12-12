@@ -1,35 +1,41 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1418383818.2470.17.camel@sipsolutions.net>
-Subject: Re: [PATCH v4 2/2] Bluetooth: btmrvl add firmware dump support
-From: Johannes Berg <johannes@sipsolutions.net>
-To: Amitkumar Karwar <akarwar@marvell.com>
-Cc: linux-bluetooth@vger.kernel.org, marcel@holtmann.org, Xinming Hu
-	 <huxm@marvell.com>, Cathy Luo <cluo@marvell.com>, Avinash Patil
-	 <patila@marvell.com>
-Date: Fri, 12 Dec 2014 12:30:18 +0100
-In-Reply-To: <1416825653-32530-2-git-send-email-akarwar@marvell.com>
-References: <1416825653-32530-1-git-send-email-akarwar@marvell.com>
-	 <1416825653-32530-2-git-send-email-akarwar@marvell.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] Bluetooth: Fix enabling BR/EDR SC when powering on
+Date: Fri, 12 Dec 2014 13:30:11 +0200
+Message-Id: <1418383811-15178-1-git-send-email-johan.hedberg@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Mon, 2014-11-24 at 02:40 -0800, Amitkumar Karwar wrote:
-> From: Xinming Hu <huxm@marvell.com>
-> 
-> This patch adds firmware dump support for marvell
-> bluetooth chipset. Currently only SD8897 is supported.
-> This is implemented based on dev_coredump, a new mechnism
-> introduced in kernel 3.18rc3
-> 
-> Firmware dump can be trigger by
-> echo 1 > /sys/kernel/debug/bluetooth/hci*/config/fw_dump
-> and when the dump operation is completed, data can be read by
-> cat /sys/class/devcoredump/devcd*/data
+From: Johan Hedberg <johan.hedberg@intel.com>
 
-If anyone still cares - this looks fine to me from devcoredump usage.
+If we're in the AUTO_OFF stage the powered_update_hci() function is
+responsible for doing the updates to the HCI state that were not done
+during the actual mgmt command handlers. One of the updates needing done
+is for BR/EDR SC support. This patch adds the missing HCI command for SC
+support to the powered_update_hci() function.
 
-Personally I would've picked a binary format, but the devcoredump
-framework is intentionally payload agnostic.
+Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+---
+ net/bluetooth/mgmt.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-johannes
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index b0782668cd22..23a0ca5a4737 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -6097,6 +6097,11 @@ static int powered_update_hci(struct hci_dev *hdev)
+ 		hci_req_add(&req, HCI_OP_WRITE_SSP_MODE, 1, &ssp);
+ 	}
+ 
++	if (bredr_sc_enabled(hdev) && !lmp_host_sc_capable(hdev)) {
++		u8 sc = 0x01;
++		hci_req_add(&req, HCI_OP_WRITE_SC_SUPPORT, sizeof(sc), &sc);
++	}
++
+ 	if (test_bit(HCI_LE_ENABLED, &hdev->dev_flags) &&
+ 	    lmp_bredr_capable(hdev)) {
+ 		struct hci_cp_write_le_host_supported cp;
+-- 
+2.1.0
+
