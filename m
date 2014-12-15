@@ -1,33 +1,87 @@
 Return-Path: <cyrus@holtmann.org>
-From: Michael Janssen <jamuraa@chromium.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Michael Janssen <jamuraa@chromium.org>
-Subject: [PATCH BlueZ 0/5] Add const access to linked list for efficiency
-Date: Mon, 15 Dec 2014 17:03:31 -0800
-Message-Id: <1418691816-40271-1-git-send-email-jamuraa@chromium.org>
+MIME-Version: 1.0
+In-Reply-To: <1418657356-18967-1-git-send-email-armansito@chromium.org>
+References: <1418657356-18967-1-git-send-email-armansito@chromium.org>
+Date: Mon, 15 Dec 2014 22:13:51 +0200
+Message-ID: <CABBYNZLDL5zAoiC+XzkUUFfT-wZ9EbzbtGRf9ibCm_=C_LMsew@mail.gmail.com>
+Subject: Re: [PATCH BlueZ v2 00/12] core: Use shared/gatt-client
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Arman Uguray <armansito@chromium.org>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-In many cases, queue_foreach is being used to find a specific item not easily
-locatable using queue_find or can be finished early.  This set adds
-queue_get_entries which gives a method for manual iteration of the queue.
+Hi Arman,
 
-The other patches use this feature to improve efficiency of some iterations.
+On Mon, Dec 15, 2014 at 5:29 PM, Arman Uguray <armansito@chromium.org> wrote:
+> *v2:
+>   - Rebased
+>
+> *v1:
+>   - Addressed comments by Johan and Luiz.
+>
+>
+> This patch set integrates shared/gatt-client into bluetoothd. The following
+> items have been tackled here:
+>
+>   1. src/device now uses shared/gatt-client to perform service discovery. State
+>   updates such as disconnections, service changed events, etc. are done using
+>   callback APIs of the new shared framework and attrib/gatt is no longer used to
+>   perform GATT operations directly. A GAttrib instance is maintained for
+>   backwards compatibility with profiles that haven't been converted yet.
+>
+>   2. A new gatt-callbacks API has been added which mirrors the attio APIs for
+>   shared/gatt-client. Profiles/plugins are notified using these APIs when the
+>   bearer disconnects, when services change, and when gatt-client is ready.
+>
+>   3. The profiles/gatt plugin has been rewritten. Since the GATT service is
+>   handled by shared/gatt-client, this profile no longer deals with service
+>   changed events performs out of place MTU exchanges, which used to get
+>   performed in an arbitrary order. The profile has been renamed to profiles/gap
+>   as it now only deals with the GAP service, and reads the "Appearance" and
+>   "Device Name" characteristics using the new shared stack.
+>
+> Arman Uguray (12):
+>   attrib/gattrib: Add g_attrib_get_att.
+>   shared/att: Add err argument to disconnect cb
+>   shared/gatt-client: Set op->success correctly
+>   core: device: Use bt_att_register_disconnect.
+>   core: device: Use shared/gatt-client for GATT.
+>   core: Rename device_attach_attrib
+>   core: Use gatt_db service callbacks
+>   core: Introduce gatt-callbacks
+>   profiles/gatt: Don't handle GATT service.
+>   profiles/gatt: Rename profile to gap.
+>   profiles/gap: Rewrite using bt_gatt_client.
+>   profiles/gap: Add Google copyright.
+>
+>  Makefile.am              |   1 +
+>  Makefile.plugins         |   4 +-
+>  attrib/gattrib.c         |   8 +
+>  attrib/gattrib.h         |   3 +
+>  profiles/gap/gas.c       | 322 +++++++++++++++++++++++++
+>  profiles/gatt/gas.c      | 457 ------------------------------------
+>  src/attrib-server.c      |   2 +-
+>  src/device.c             | 598 +++++++++++++++++++++++++++++++++--------------
+>  src/device.h             |   2 +-
+>  src/gatt-callbacks.h     |  36 +++
+>  src/shared/att-types.h   |   3 +-
+>  src/shared/att.c         |  25 +-
+>  src/shared/att.h         |   2 +-
+>  src/shared/gatt-client.c |   6 +-
+>  tools/btgatt-client.c    |   4 +-
+>  tools/btgatt-server.c    |   4 +-
+>  16 files changed, 834 insertions(+), 643 deletions(-)
+>  create mode 100644 profiles/gap/gas.c
+>  delete mode 100644 profiles/gatt/gas.c
+>  create mode 100644 src/gatt-callbacks.h
+>
+> --
+> 2.2.0.rc0.207.ga3a616c
 
-Michael Janssen (5):
-  shared/queue: Add queue_get_entries
-  shared/queue: clarify queue_match_func_t arguments
-  android/health: improve search efficiency
-  monitor/keys: use queue_find over queue_foreach
-  shared/gatt-db: manual iteration when appopriate
+Patches 1-7 are now applied, thanks. Lets work out the rest.
 
- android/health.c     | 153 +++++++++++++++++++++------------------------------
- monitor/keys.c       |  37 ++++---------
- src/shared/gatt-db.c | 150 ++++++++++++++++++++------------------------------
- src/shared/queue.c   |  14 +++--
- src/shared/queue.h   |  10 +++-
- 5 files changed, 151 insertions(+), 213 deletions(-)
 
 -- 
-2.2.0.rc0.207.ga3a616c
-
+Luiz Augusto von Dentz
