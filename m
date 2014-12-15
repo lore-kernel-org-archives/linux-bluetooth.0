@@ -1,84 +1,247 @@
 Return-Path: <cyrus@holtmann.org>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 1/3] android/hal-utils: Refactor btproperty2str
+Date: Mon, 15 Dec 2014 12:41:32 +0100
+Message-ID: <3808601.9y7vXeRVl7@uw000953>
+In-Reply-To: <1417107880-13118-1-git-send-email-szymon.janc@tieto.com>
+References: <1417107880-13118-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
-In-Reply-To: <1418166065-21055-1-git-send-email-armansito@chromium.org>
-References: <1418166065-21055-1-git-send-email-armansito@chromium.org>
-Date: Mon, 15 Dec 2014 13:48:02 +0200
-Message-ID: <CABBYNZJRgPE-ektzjsSGbfcsPZ1PUajexzBq5qzqqKYvqctGog@mail.gmail.com>
-Subject: Re: [PATCH BlueZ v1 00/12] core: Use shared/gatt-client
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Arman Uguray <armansito@chromium.org>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Arman,
+On Thursday 27 of November 2014 18:04:38 Szymon Janc wrote:
+> This function grown to big. Factor out more complex properties to
+> separate helper functions.
+> ---
+>  android/hal-utils.c | 168 ++++++++++++++++++++++++----------------------------
+>  1 file changed, 76 insertions(+), 92 deletions(-)
+> 
+> diff --git a/android/hal-utils.c b/android/hal-utils.c
+> index f18a82c..3c640b7 100644
+> --- a/android/hal-utils.c
+> +++ b/android/hal-utils.c
+> @@ -258,8 +258,77 @@ const char *bdaddr2str(const bt_bdaddr_t *bd_addr)
+>  	return bt_bdaddr_t2str(bd_addr, buf);
+>  }
+>  
+> +static void bonded_devices2string(char *str, void *prop, int prop_len)
+> +{
+> +	int count = prop_len / sizeof(bt_bdaddr_t);
+> +	bt_bdaddr_t *addr = prop;
+> +
+> +	strcat(str, "{");
+> +
+> +	while (count--) {
+> +		strcat(str, bdaddr2str(addr));
+> +		if (count)
+> +			strcat(str, ", ");
+> +		addr++;
+> +	}
+> +
+> +	strcat(str, "}");
+> +}
+> +
+> +static void uuids2string(char *str, void *prop, int prop_len)
+> +{
+> +	int count = prop_len / sizeof(bt_uuid_t);
+> +	bt_uuid_t *uuid = prop;
+> +
+> +	strcat(str, "{");
+> +
+> +	while (count--) {
+> +		strcat(str, btuuid2str(uuid->uu));
+> +		if (count)
+> +			strcat(str, ", ");
+> +		uuid++;
+> +	}
+> +
+> +	strcat(str, "}");
+> +}
+> +
+> +#if ANDROID_VERSION >= PLATFORM_VER(5, 0, 0)
+> +static void local_le_feat2string(char *str, const bt_local_le_features_t *f)
+> +{
+> +	uint16_t scan_num;
+> +
+> +	str += sprintf(str, "{\n");
+> +
+> +	str += sprintf(str, "Privacy supported: %s,\n",
+> +				f->local_privacy_enabled ? "TRUE" : "FALSE");
+> +
+> +	str += sprintf(str, "Num of advertising instances: %u,\n",
+> +							f->max_adv_instance);
+> +
+> +	str += sprintf(str, "PRA offloading support: %s,\n",
+> +				f->rpa_offload_supported ? "TRUE" : "FALSE");
+> +
+> +	str += sprintf(str, "Num of offloaded IRKs: %u,\n",
+> +							f->max_irk_list_size);
+> +
+> +	str += sprintf(str, "Num of offloaded scan filters: %u,\n",
+> +						f->max_adv_filter_supported);
+> +
+> +	scan_num = (f->scan_result_storage_size_hibyte << 8) +
+> +					f->scan_result_storage_size_lobyte;
+> +
+> +	str += sprintf(str, "Num of offloaded scan results: %u,\n", scan_num);
+> +
+> +	str += sprintf(str, "Activity & energy report support: %s\n",
+> +			f->activity_energy_info_supported ? "TRUE" : "FALSE");
+> +
+> +	sprintf(str, "}");
+> +}
+> +#endif
+> +
+>  const char *btproperty2str(const bt_property_t *property)
+>  {
+> +	bt_service_record_t *rec;
+>  	static char buf[4096];
+>  	char *p;
+>  
+> @@ -273,130 +342,45 @@ const char *btproperty2str(const bt_property_t *property)
+>  		snprintf(p, property->len + 1, "%s",
+>  					((bt_bdname_t *) property->val)->name);
+>  		break;
+> -
+>  	case BT_PROPERTY_BDADDR:
+>  		sprintf(p, "%s", bdaddr2str((bt_bdaddr_t *) property->val));
+>  		break;
+> -
+>  	case BT_PROPERTY_CLASS_OF_DEVICE:
+>  		sprintf(p, "%06x", *((int *) property->val));
+>  		break;
+> -
+>  	case BT_PROPERTY_TYPE_OF_DEVICE:
+>  		sprintf(p, "%s", bt_device_type_t2str(
+> -				*((bt_device_type_t *) property->val)));
+> +					*((bt_device_type_t *) property->val)));
+>  		break;
+> -
+>  	case BT_PROPERTY_REMOTE_RSSI:
+>  		sprintf(p, "%d", *((char *) property->val));
+>  		break;
+> -
+>  	case BT_PROPERTY_ADAPTER_SCAN_MODE:
+>  		sprintf(p, "%s",
+>  			bt_scan_mode_t2str(*((bt_scan_mode_t *) property->val)));
+>  		break;
+> -
+>  	case BT_PROPERTY_ADAPTER_DISCOVERY_TIMEOUT:
+>  		sprintf(p, "%d", *((int *) property->val));
+>  		break;
+> -
+>  	case BT_PROPERTY_ADAPTER_BONDED_DEVICES:
+> -		{
+> -			int count = property->len / sizeof(bt_bdaddr_t);
+> -			char *ptr = property->val;
+> -
+> -			strcat(p, "{");
+> -
+> -			while (count--) {
+> -				strcat(p, bdaddr2str((bt_bdaddr_t *) ptr));
+> -				if (count)
+> -					strcat(p, ", ");
+> -				ptr += sizeof(bt_bdaddr_t);
+> -			}
+> -
+> -			strcat(p, "}");
+> -
+> -		}
+> +		bonded_devices2string(p, property->val, property->len);
+>  		break;
+> -
+>  	case BT_PROPERTY_UUIDS:
+> -		{
+> -			int count = property->len / sizeof(bt_uuid_t);
+> -			uint8_t *ptr = property->val;
+> -
+> -			strcat(p, "{");
+> -
+> -			while (count--) {
+> -				strcat(p, btuuid2str(ptr));
+> -				if (count)
+> -					strcat(p, ", ");
+> -				ptr += sizeof(bt_uuid_t);
+> -			}
+> -
+> -			strcat(p, "}");
+> -
+> -		}
+> +		uuids2string(p, property->val, property->len);
+>  		break;
+> -
+>  	case BT_PROPERTY_SERVICE_RECORD:
+> -		{
+> -			bt_service_record_t *rec = property->val;
+> -
+> -			sprintf(p, "{%s, %d, %s}", btuuid2str(rec->uuid.uu),
+> +		rec = property->val;
+> +		sprintf(p, "{%s, %d, %s}", btuuid2str(rec->uuid.uu),
+>  						rec->channel, rec->name);
+> -		}
+>  		break;
+>  #if ANDROID_VERSION >= PLATFORM_VER(5, 0, 0)
+>  	case BT_PROPERTY_LOCAL_LE_FEATURES:
+> -		{
+> -			bt_local_le_features_t *f = property->val;
+> -			int l;
+> -			uint16_t s;
+> -
+> -			l = sprintf(p, "{\n");
+> -			p += l;
+> -
+> -			l = sprintf(p, "Privacy supported: %s,\n",
+> -						f->local_privacy_enabled ?
+> -						"TRUE" : "FALSE");
+> -			p += l;
+> -
+> -			l = sprintf(p, "Num of advertising instances: %u,\n",
+> -							f->max_adv_instance);
+> -			p += l;
+> -
+> -			l = sprintf(p, "PRA offloading support: %s,\n",
+> -						f->rpa_offload_supported ?
+> -						"TRUE" : "FALSE");
+> -
+> -			p += l;
+> -
+> -			l = sprintf(p, "Num of offloaded IRKs: %u,\n",
+> -							f->max_irk_list_size);
+> -			p += l;
+> -
+> -			l = sprintf(p, "Num of offloaded scan filters: %u,\n",
+> -						f->max_adv_filter_supported);
+> -			p += l;
+> -
+> -			s = (f->scan_result_storage_size_hibyte << 8) +
+> -					f->scan_result_storage_size_lobyte;
+> -
+> -			l = sprintf(p, "Num of offloaded scan results: %u,\n",
+> -									s);
+> -			p += l;
+> -
+> -			l = sprintf(p, "Activity & energy report support: %s\n",
+> -					f->activity_energy_info_supported ?
+> -					"TRUE" : "FALSE");
+> -			p += l;
+> -
+> -			sprintf(p, "}");
+> -		}
+> +		local_le_feat2string(p, property->val);
+>  		break;
+>  #endif
+>  	default:
+>  		sprintf(p, "%p", property->val);
+> +		break;
+>  	}
+>  
+>  	return buf;
+> 
 
-On Wed, Dec 10, 2014 at 1:00 AM, Arman Uguray <armansito@chromium.org> wrote:
-> *v1:
->   - Addressed comments by Johan and Luiz.
->
->
-> This patch set integrates shared/gatt-client into bluetoothd. The following
-> items have been tackled here:
->
->   1. src/device now uses shared/gatt-client to perform service discovery. State
->   updates such as disconnections, service changed events, etc. are done using
->   callback APIs of the new shared framework and attrib/gatt is no longer used to
->   perform GATT operations directly. A GAttrib instance is maintained for
->   backwards compatibility with profiles that haven't been converted yet.
->
->   2. A new gatt-callbacks API has been added which mirrors the attio APIs for
->   shared/gatt-client. Profiles/plugins are notified using these APIs when the
->   bearer disconnects, when services change, and when gatt-client is ready.
->
->   3. The profiles/gatt plugin has been rewritten. Since the GATT service is
->   handled by shared/gatt-client, this profile no longer deals with service
->   changed events performs out of place MTU exchanges, which used to get
->   performed in an arbitrary order. The profile has been renamed to profiles/gap
->   as it now only deals with the GAP service, and reads the "Appearance" and
->   "Device Name" characteristics using the new shared stack.
->
-> Arman Uguray (12):
->   attrib/gattrib: Add g_attrib_get_att.
->   shared/att: Add err argument to disconnect cb
->   shared/gatt-client: Set op->success correctly
->   core: device: Use bt_att_register_disconnect.
->   core: device: Use shared/gatt-client for GATT.
->   core: Rename device_attach_attrib
->   core: Use gatt_db service callbacks
->   core: Introduce gatt-callbacks
->   profiles/gatt: Don't handle GATT service.
->   profiles/gatt: Rename profile to gap.
->   profiles/gap: Rewrite using bt_gatt_client.
->   profiles/gap: Add Google copyright.
->
->  Makefile.am              |   1 +
->  Makefile.plugins         |   4 +-
->  attrib/gattrib.c         |   8 +
->  attrib/gattrib.h         |   3 +
->  profiles/gap/gas.c       | 322 +++++++++++++++++++++++++
->  profiles/gatt/gas.c      | 457 ------------------------------------
->  src/attrib-server.c      |   2 +-
->  src/device.c             | 598 +++++++++++++++++++++++++++++++++--------------
->  src/device.h             |   2 +-
->  src/gatt-callbacks.h     |  36 +++
->  src/shared/att-types.h   |   3 +-
->  src/shared/att.c         |  23 +-
->  src/shared/att.h         |   2 +-
->  src/shared/gatt-client.c |   6 +-
->  tools/btgatt-client.c    |   4 +-
->  tools/btgatt-server.c    |   4 +-
->  16 files changed, 832 insertions(+), 643 deletions(-)
->  create mode 100644 profiles/gap/gas.c
->  delete mode 100644 profiles/gatt/gas.c
->  create mode 100644 src/gatt-callbacks.h
->
-> --
-> 2.2.0.rc0.207.ga3a616c
-
-Looks like you will need to rebase this set do not apply anymore.
-
+Pushed.
 
 -- 
-Luiz Augusto von Dentz
+Best regards, 
+Szymon Janc
