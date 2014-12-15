@@ -1,247 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/3] android/hal-utils: Refactor btproperty2str
-Date: Mon, 15 Dec 2014 12:41:32 +0100
-Message-ID: <3808601.9y7vXeRVl7@uw000953>
-In-Reply-To: <1417107880-13118-1-git-send-email-szymon.janc@tieto.com>
-References: <1417107880-13118-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <1418637547-20848-2-git-send-email-lukasz.rymanowski@tieto.com>
+References: <1418637547-20848-1-git-send-email-lukasz.rymanowski@tieto.com>
+	<1418637547-20848-2-git-send-email-lukasz.rymanowski@tieto.com>
+Date: Mon, 15 Dec 2014 13:06:27 +0200
+Message-ID: <CABBYNZJ0zuRc9+cW=sz-vEyxHYiWH4XLJ=VJpwE-2ZNg5mjJzg@mail.gmail.com>
+Subject: Re: [PATCH 1/5] attrib/gatt: Fix minor coding style
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Thursday 27 of November 2014 18:04:38 Szymon Janc wrote:
-> This function grown to big. Factor out more complex properties to
-> separate helper functions.
-> ---
->  android/hal-utils.c | 168 ++++++++++++++++++++++++----------------------------
->  1 file changed, 76 insertions(+), 92 deletions(-)
-> 
-> diff --git a/android/hal-utils.c b/android/hal-utils.c
-> index f18a82c..3c640b7 100644
-> --- a/android/hal-utils.c
-> +++ b/android/hal-utils.c
-> @@ -258,8 +258,77 @@ const char *bdaddr2str(const bt_bdaddr_t *bd_addr)
->  	return bt_bdaddr_t2str(bd_addr, buf);
->  }
->  
-> +static void bonded_devices2string(char *str, void *prop, int prop_len)
-> +{
-> +	int count = prop_len / sizeof(bt_bdaddr_t);
-> +	bt_bdaddr_t *addr = prop;
-> +
-> +	strcat(str, "{");
-> +
-> +	while (count--) {
-> +		strcat(str, bdaddr2str(addr));
-> +		if (count)
-> +			strcat(str, ", ");
-> +		addr++;
-> +	}
-> +
-> +	strcat(str, "}");
-> +}
-> +
-> +static void uuids2string(char *str, void *prop, int prop_len)
-> +{
-> +	int count = prop_len / sizeof(bt_uuid_t);
-> +	bt_uuid_t *uuid = prop;
-> +
-> +	strcat(str, "{");
-> +
-> +	while (count--) {
-> +		strcat(str, btuuid2str(uuid->uu));
-> +		if (count)
-> +			strcat(str, ", ");
-> +		uuid++;
-> +	}
-> +
-> +	strcat(str, "}");
-> +}
-> +
-> +#if ANDROID_VERSION >= PLATFORM_VER(5, 0, 0)
-> +static void local_le_feat2string(char *str, const bt_local_le_features_t *f)
-> +{
-> +	uint16_t scan_num;
-> +
-> +	str += sprintf(str, "{\n");
-> +
-> +	str += sprintf(str, "Privacy supported: %s,\n",
-> +				f->local_privacy_enabled ? "TRUE" : "FALSE");
-> +
-> +	str += sprintf(str, "Num of advertising instances: %u,\n",
-> +							f->max_adv_instance);
-> +
-> +	str += sprintf(str, "PRA offloading support: %s,\n",
-> +				f->rpa_offload_supported ? "TRUE" : "FALSE");
-> +
-> +	str += sprintf(str, "Num of offloaded IRKs: %u,\n",
-> +							f->max_irk_list_size);
-> +
-> +	str += sprintf(str, "Num of offloaded scan filters: %u,\n",
-> +						f->max_adv_filter_supported);
-> +
-> +	scan_num = (f->scan_result_storage_size_hibyte << 8) +
-> +					f->scan_result_storage_size_lobyte;
-> +
-> +	str += sprintf(str, "Num of offloaded scan results: %u,\n", scan_num);
-> +
-> +	str += sprintf(str, "Activity & energy report support: %s\n",
-> +			f->activity_energy_info_supported ? "TRUE" : "FALSE");
-> +
-> +	sprintf(str, "}");
-> +}
-> +#endif
-> +
->  const char *btproperty2str(const bt_property_t *property)
->  {
-> +	bt_service_record_t *rec;
->  	static char buf[4096];
->  	char *p;
->  
-> @@ -273,130 +342,45 @@ const char *btproperty2str(const bt_property_t *property)
->  		snprintf(p, property->len + 1, "%s",
->  					((bt_bdname_t *) property->val)->name);
->  		break;
-> -
->  	case BT_PROPERTY_BDADDR:
->  		sprintf(p, "%s", bdaddr2str((bt_bdaddr_t *) property->val));
->  		break;
-> -
->  	case BT_PROPERTY_CLASS_OF_DEVICE:
->  		sprintf(p, "%06x", *((int *) property->val));
->  		break;
-> -
->  	case BT_PROPERTY_TYPE_OF_DEVICE:
->  		sprintf(p, "%s", bt_device_type_t2str(
-> -				*((bt_device_type_t *) property->val)));
-> +					*((bt_device_type_t *) property->val)));
->  		break;
-> -
->  	case BT_PROPERTY_REMOTE_RSSI:
->  		sprintf(p, "%d", *((char *) property->val));
->  		break;
-> -
->  	case BT_PROPERTY_ADAPTER_SCAN_MODE:
->  		sprintf(p, "%s",
->  			bt_scan_mode_t2str(*((bt_scan_mode_t *) property->val)));
->  		break;
-> -
->  	case BT_PROPERTY_ADAPTER_DISCOVERY_TIMEOUT:
->  		sprintf(p, "%d", *((int *) property->val));
->  		break;
-> -
->  	case BT_PROPERTY_ADAPTER_BONDED_DEVICES:
-> -		{
-> -			int count = property->len / sizeof(bt_bdaddr_t);
-> -			char *ptr = property->val;
-> -
-> -			strcat(p, "{");
-> -
-> -			while (count--) {
-> -				strcat(p, bdaddr2str((bt_bdaddr_t *) ptr));
-> -				if (count)
-> -					strcat(p, ", ");
-> -				ptr += sizeof(bt_bdaddr_t);
-> -			}
-> -
-> -			strcat(p, "}");
-> -
-> -		}
-> +		bonded_devices2string(p, property->val, property->len);
->  		break;
-> -
->  	case BT_PROPERTY_UUIDS:
-> -		{
-> -			int count = property->len / sizeof(bt_uuid_t);
-> -			uint8_t *ptr = property->val;
-> -
-> -			strcat(p, "{");
-> -
-> -			while (count--) {
-> -				strcat(p, btuuid2str(ptr));
-> -				if (count)
-> -					strcat(p, ", ");
-> -				ptr += sizeof(bt_uuid_t);
-> -			}
-> -
-> -			strcat(p, "}");
-> -
-> -		}
-> +		uuids2string(p, property->val, property->len);
->  		break;
-> -
->  	case BT_PROPERTY_SERVICE_RECORD:
-> -		{
-> -			bt_service_record_t *rec = property->val;
-> -
-> -			sprintf(p, "{%s, %d, %s}", btuuid2str(rec->uuid.uu),
-> +		rec = property->val;
-> +		sprintf(p, "{%s, %d, %s}", btuuid2str(rec->uuid.uu),
->  						rec->channel, rec->name);
-> -		}
->  		break;
->  #if ANDROID_VERSION >= PLATFORM_VER(5, 0, 0)
->  	case BT_PROPERTY_LOCAL_LE_FEATURES:
-> -		{
-> -			bt_local_le_features_t *f = property->val;
-> -			int l;
-> -			uint16_t s;
-> -
-> -			l = sprintf(p, "{\n");
-> -			p += l;
-> -
-> -			l = sprintf(p, "Privacy supported: %s,\n",
-> -						f->local_privacy_enabled ?
-> -						"TRUE" : "FALSE");
-> -			p += l;
-> -
-> -			l = sprintf(p, "Num of advertising instances: %u,\n",
-> -							f->max_adv_instance);
-> -			p += l;
-> -
-> -			l = sprintf(p, "PRA offloading support: %s,\n",
-> -						f->rpa_offload_supported ?
-> -						"TRUE" : "FALSE");
-> -
-> -			p += l;
-> -
-> -			l = sprintf(p, "Num of offloaded IRKs: %u,\n",
-> -							f->max_irk_list_size);
-> -			p += l;
-> -
-> -			l = sprintf(p, "Num of offloaded scan filters: %u,\n",
-> -						f->max_adv_filter_supported);
-> -			p += l;
-> -
-> -			s = (f->scan_result_storage_size_hibyte << 8) +
-> -					f->scan_result_storage_size_lobyte;
-> -
-> -			l = sprintf(p, "Num of offloaded scan results: %u,\n",
-> -									s);
-> -			p += l;
-> -
-> -			l = sprintf(p, "Activity & energy report support: %s\n",
-> -					f->activity_energy_info_supported ?
-> -					"TRUE" : "FALSE");
-> -			p += l;
-> -
-> -			sprintf(p, "}");
-> -		}
-> +		local_le_feat2string(p, property->val);
->  		break;
->  #endif
->  	default:
->  		sprintf(p, "%p", property->val);
-> +		break;
->  	}
->  
->  	return buf;
-> 
+Hi Lukasz,
 
-Pushed.
+On Mon, Dec 15, 2014 at 11:59 AM, Lukasz Rymanowski
+<lukasz.rymanowski@tieto.com> wrote:
+> ---
+>  attrib/gattrib.c | 1 -
+>  1 file changed, 1 deletion(-)
+>
+> diff --git a/attrib/gattrib.c b/attrib/gattrib.c
+> index 7fe7647..3ce6748 100644
+> --- a/attrib/gattrib.c
+> +++ b/attrib/gattrib.c
+> @@ -224,7 +224,6 @@ static void attrib_callback_result(uint8_t opcode, const void *pdu,
+>         free(buf);
+>  }
+>
+> -
+>  static void attrib_callback_notify(uint8_t opcode, const void *pdu,
+>                                         uint16_t length, void *user_data)
+>  {
+> --
+> 1.8.4
+
+Applied just this one, lets see what directions we should go with the
+rest of the set.
+
 
 -- 
-Best regards, 
-Szymon Janc
+Luiz Augusto von Dentz
