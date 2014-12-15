@@ -1,47 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ] build: Fix enabling coverage
-Date: Mon, 15 Dec 2014 10:33:48 -0200
-Message-Id: <1418646828-15057-1-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 3/3] shared/gatt-client: Use queue_remove_if
+Date: Mon, 15 Dec 2014 10:13:19 -0200
+Message-Id: <1418645599-20169-4-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <1418645599-20169-1-git-send-email-luiz.dentz@gmail.com>
+References: <1418645599-20169-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Since MISC_FLAGS now checks for enable_coverage to add --coverage flag
-the check for lcov needs happen before before it otherwise make coverage
-doesn't work.
+This make use of queue_remove_if instead of queue_find + queue_remove
+whenever possible.
 ---
- configure.ac | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
+ src/shared/gatt-client.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-diff --git a/configure.ac b/configure.ac
-index a70d55a..0acd734 100644
---- a/configure.ac
-+++ b/configure.ac
-@@ -32,6 +32,11 @@ m4_ifdef([AC_LIBTOOL_TAGS], [AC_LIBTOOL_TAGS([])])
- AC_DISABLE_STATIC
- AC_PROG_LIBTOOL
+diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
+index e523085..27aef44 100644
+--- a/src/shared/gatt-client.c
++++ b/src/shared/gatt-client.c
+@@ -2414,7 +2414,7 @@ bool bt_gatt_client_unregister_notify(struct bt_gatt_client *client,
+ 	if (!client || !id)
+ 		return false;
  
-+if (test "$USE_MAINTAINER_MODE" = "yes"); then
-+	AC_CHECK_PROG(enable_coverage, [lcov], [yes], [no])
-+fi
-+AM_CONDITIONAL(COVERAGE, test "${enable_coverage}" = "yes")
-+
- MISC_FLAGS
+-	notify_data = queue_find(client->notify_list, match_notify_data_id,
++	notify_data = queue_remove_if(client->notify_list, match_notify_data_id,
+ 							UINT_TO_PTR(id));
+ 	if (!notify_data)
+ 		return false;
+@@ -2422,7 +2422,6 @@ bool bt_gatt_client_unregister_notify(struct bt_gatt_client *client,
+ 	assert(notify_data->chrc->notify_count > 0);
+ 	assert(!notify_data->chrc->ccc_write_id);
  
- AC_ARG_ENABLE(threads, AC_HELP_STRING([--enable-threads],
-@@ -274,9 +279,4 @@ fi
- AC_DEFINE_UNQUOTED(ANDROID_STORAGEDIR, "${storagedir}/android",
- 			[Directory for the Android daemon storage files])
- 
--if (test "$USE_MAINTAINER_MODE" = "yes"); then
--	AC_CHECK_PROG(enable_coverage, [lcov], [yes], [no])
--fi
--AM_CONDITIONAL(COVERAGE, test "${enable_coverage}" = "yes")
--
- AC_OUTPUT(Makefile src/bluetoothd.8 lib/bluez.pc)
+-	queue_remove(client->notify_list, notify_data);
+ 	complete_unregister_notify(notify_data);
+ 	return true;
+ }
 -- 
 1.9.3
 
