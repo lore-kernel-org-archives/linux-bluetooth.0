@@ -1,111 +1,47 @@
 Return-Path: <cyrus@holtmann.org>
-From: Gowtham Anandha Babu <gowtham.ab@samsung.com>
-To: 'Luiz Augusto von Dentz' <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	'Dmitry Kasatkin' <d.kasatkin@samsung.com>,
-	'Bharat Panda' <bharat.panda@samsung.com>, cpgs@samsung.com
-References: <1418212008-8594-1-git-send-email-gowtham.ab@samsung.com>
- <1418212008-8594-2-git-send-email-gowtham.ab@samsung.com>
- <CABBYNZJrV1viDu62Ndr2Davv_52tKmByLwNtQqSRUXN0j1mZww@mail.gmail.com>
-In-reply-to: <CABBYNZJrV1viDu62Ndr2Davv_52tKmByLwNtQqSRUXN0j1mZww@mail.gmail.com>
-Subject: RE: [PATCH 1/3] monitor/packet: Fix ERROR CODES as per core_v4.2
-Date: Mon, 15 Dec 2014 18:43:15 +0530
-Message-id: <003501d01868$fbab5740$f30205c0$@samsung.com>
-MIME-version: 1.0
-Content-type: text/plain; charset=utf-8
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ] build: Fix enabling coverage
+Date: Mon, 15 Dec 2014 10:33:48 -0200
+Message-Id: <1418646828-15057-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-> -----Original Message-----
-> From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-
-> owner@vger.kernel.org] On Behalf Of Luiz Augusto von Dentz
-> Sent: Thursday, December 11, 2014 5:49 PM
-> To: Gowtham Anandha Babu
-> Cc: linux-bluetooth@vger.kernel.org; Dmitry Kasatkin; Bharat Panda;
-> cpgs@samsung.com
-> Subject: Re: [PATCH 1/3] monitor/packet: Fix ERROR CODES as per core_v4.2
-> 
-> Hi Gowtham,
-> 
-> On Wed, Dec 10, 2014 at 1:46 PM, Gowtham Anandha Babu
-> <gowtham.ab@samsung.com> wrote:
-> > Modified the error codes as per core V4.2, Vol 2, Part D.
-> > ---
-> >  monitor/packet.c | 7 ++++---
-> >  1 file changed, 4 insertions(+), 3 deletions(-)
-> >
-> > diff --git a/monitor/packet.c b/monitor/packet.c index
-> > 885c4b1..87b97ad 100644
-> > --- a/monitor/packet.c
-> > +++ b/monitor/packet.c
-> > @@ -317,9 +317,10 @@ static const struct {
-> >         { 0x1b, "SCO Offset Rejected"                                   },
-> >         { 0x1c, "SCO Interval Rejected"                                 },
-> >         { 0x1d, "SCO Air Mode Rejected"                                 },
-> > -       { 0x1e, "Invalid LMP Parameters"                                },
-> > +       { 0x1e, "Invalid LMP Parameters / Invalid LL Parameters"        },
-> >         { 0x1f, "Unspecified Error"                                     },
-> > -       { 0x20, "Unsupported LMP Parameter Value"                       },
-> > +       { 0x20, "Unsupported LMP Parameter Value / "
-> > +               "Unsupported LL Parameter Value"                        },
-> 
-> Perhaps just having LMP/LL instead of duplicating the whole string is a better
-> idea, usually the spec would not change a meaning of an error or is LL LE
-> specific?
+Since MISC_FLAGS now checks for enable_coverage to add --coverage flag
+the check for lcov needs happen before before it otherwise make coverage
+doesn't work.
+---
+ configure.ac | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
-Here LMP refers to LMP PDU, LL refers to LL control PDU.
-I think changing it into LMP/LL is also a good idea.
-But, It's safer to follow the specification.
-What do you think?
-
-> 
-> >         { 0x21, "Role Change Not Allowed"                               },
-> >         { 0x22, "LMP Response Timeout / LL Response Timeout"            },
-> >         { 0x23, "LMP Error Transaction Collision"                       },
-> > @@ -346,7 +347,7 @@ static const struct {
-> >         { 0x38, "Host Busy - Pairing"                                   },
-> >         { 0x39, "Connection Rejected due to No Suitable Channel Found"  },
-> >         { 0x3a, "Controller Busy"                                       },
-> > -       { 0x3b, "Unacceptable Connection Interval"                      },
-> > +       { 0x3b, "Unacceptable Connection Parameters"                    },
-> 
-> This as well need a bit more explanation, when this has changed or perhaps
-> we got it wrong to begin with?
-
-It is mentioned in (Errata ID: 5660).
-https://www.bluetooth.org/errata/errata_view.cfm?errata_id=5660 (Requires Login).
-
-Description of that errata:
-The title of 2.56 is "Unacceptable Connection Parameters (0x3B)".
-
-However, the text begins "The Unacceptable Connection IntervalParameters error code" (sic). HCI 7.1.6 (Disconnect Command) refers to "Unacceptable Connection Interval error code (0x3B)". Volume 6 has two references to "error code 0x3B (Unacceptable Connection Parameters)".
-
-I propose we change the text of 2.56 and of 7.16 to "Unacceptable Connection Parameters".
-
-> 
-> >         { 0x3c, "Directed Advertising Timeout"                          },
-> >         { 0x3d, "Connection Terminated due to MIC Failure"              },
-> >         { 0x3e, "Connection Failed to be Established"                   },
-> > --
-> > 1.9.1
-> >
-> > --
-> > To unsubscribe from this list: send the line "unsubscribe
-> > linux-bluetooth" in the body of a message to majordomo@vger.kernel.org
-> > More majordomo info at  http://vger.kernel.org/majordomo-info.html
-> 
-> 
-> 
-> --
-> Luiz Augusto von Dentz
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org More majordomo
-> info at  http://vger.kernel.org/majordomo-info.html
-
-
-Regards,
-Gowtham Anandha Babu
+diff --git a/configure.ac b/configure.ac
+index a70d55a..0acd734 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -32,6 +32,11 @@ m4_ifdef([AC_LIBTOOL_TAGS], [AC_LIBTOOL_TAGS([])])
+ AC_DISABLE_STATIC
+ AC_PROG_LIBTOOL
+ 
++if (test "$USE_MAINTAINER_MODE" = "yes"); then
++	AC_CHECK_PROG(enable_coverage, [lcov], [yes], [no])
++fi
++AM_CONDITIONAL(COVERAGE, test "${enable_coverage}" = "yes")
++
+ MISC_FLAGS
+ 
+ AC_ARG_ENABLE(threads, AC_HELP_STRING([--enable-threads],
+@@ -274,9 +279,4 @@ fi
+ AC_DEFINE_UNQUOTED(ANDROID_STORAGEDIR, "${storagedir}/android",
+ 			[Directory for the Android daemon storage files])
+ 
+-if (test "$USE_MAINTAINER_MODE" = "yes"); then
+-	AC_CHECK_PROG(enable_coverage, [lcov], [yes], [no])
+-fi
+-AM_CONDITIONAL(COVERAGE, test "${enable_coverage}" = "yes")
+-
+ AC_OUTPUT(Makefile src/bluetoothd.8 lib/bluez.pc)
+-- 
+1.9.3
 
