@@ -1,53 +1,49 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 15 Dec 2014 13:24:11 -0500
-From: "John W. Linville" <linville@tuxdriver.com>
-To: linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: pull request: bluetooth 2014-12-12
-Message-ID: <20141215182409.GF21190@tuxdriver.com>
-References: <20141212174435.GA22678@t440s.P-661HNU-F1>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20141212174435.GA22678@t440s.P-661HNU-F1>
+In-Reply-To: <1415351073-4362-1-git-send-email-chao.jie.gu@intel.com>
+References: <1415351073-4362-1-git-send-email-chao.jie.gu@intel.com>
+Date: Mon, 15 Dec 2014 08:41:05 -0800
+Message-ID: <CAHrH25T6BccZaza2SJvWLL70FQWoEXWkAmRcE=5cfE-WGkcUew@mail.gmail.com>
+Subject: Re: [PATCH v5 0/3] support signed write command
+From: Arman Uguray <armansito@chromium.org>
+To: Gu Chaojie <chao.jie.gu@intel.com>
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Fri, Dec 12, 2014 at 07:44:35PM +0200, Johan Hedberg wrote:
-> Hi John,
-> 
-> These fixes are intended for 3.19, note that the tree to pull from is
-> bluetooth-next (unlike the subject implies). I'd have normally done a
-> pull request from bluetooth.git, but since these fixes for 3.19 is all
-> we have so far I thought it's simpler if you just pull from our -next
-> tree. The patches consist of:
-> 
->  - Coccinelle warning fix
->  - hci_dev_lock/unlock fixes
->  - Fixes for pending mgmt command handling
->  - Fixes for properly following the force_lesc_support switch
->  - Fix for a Microsoft branded Broadcom adapter
->  - New device id for Atheros AR3012
->  - Fix for BR/EDR Secure Connections enabling
-> 
-> Please let me know if there are any issues pulling. Thanks.
-> 
-> Johan
-> 
-> ---
-> The following changes since commit 5a34bd5f5d8119def4feb1d2b4e3906b71059416:
-> 
->   Bluetooth: Enable events for P-256 Public Key and DHKey commands (2014-12-05 18:17:49 +0200)
-> 
-> are available in the git repository at:
-> 
->   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git for-upstream
-> 
-> for you to fetch changes up to 9845904fd489288bcf693642c1b31cc463c0b660:
-> 
->   Bluetooth: Fix mgmt response status when removing adapter (2014-12-12 13:20:12 +0100)
+Hi all,
 
-Pulling now...
+> On Fri, Nov 7, 2014 at 1:04 AM, Gu Chaojie <chao.jie.gu@intel.com> wrote:
+> * This patch set give user dedicated command to set CSRK option and seperate from signed write command implementation in the previous patch
+> * Remove the valid_csrk flag, use struct signed_write_info make implementation more clear and simple
+> * signed_counter will initialize when CSRK be set, remove signed_counter initialization in bt_att_new procedure.
+>
+> Gu Chaojie (3):
+>   shared/att.c:Add signed command outgoing and CSRK function
+>   shared/gatt-client:Add CSRK part to support signed write
+>   tools/btgatt-client:Add signed write with CSRK option
+>
+>  src/shared/att-types.h   |   3 +
+>  src/shared/att.c         | 146 ++++++++++++++++++++++++++++++++++++++++++++++-
+>  src/shared/att.h         |  12 ++++
+>  src/shared/gatt-client.c |  21 +++++--
+>  src/shared/gatt-client.h |   4 ++
+>  tools/btgatt-client.c    |  69 +++++++++++++++++++++-
+>  6 files changed, 245 insertions(+), 10 deletions(-)
+>
+> --
+> 1.9.1
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
--- 
-John W. Linville		Someday the world will need a hero, and you
-linville@tuxdriver.com			might be all we have.  Be ready.
+Sending a gentle ping on these patches, since they haven't received a
+lot of attention for a couple of months. What's the status of Signed
+Writes here? These will be more relevant for Android now than they
+will initially be for desktop.
+
+Thanks,
+Arman
