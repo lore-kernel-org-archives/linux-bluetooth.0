@@ -1,120 +1,86 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <CAMudyAuWjeTtX2hUWXEyoXcE6NPtannAO+XfKChXjg6wsK+siw@mail.gmail.com>
-References: <1418637547-20848-1-git-send-email-lukasz.rymanowski@tieto.com>
-	<1418637547-20848-4-git-send-email-lukasz.rymanowski@tieto.com>
-	<CABBYNZKWPJaeLgvpLzvYWggXtQpd84jS-u1mbHrpCww7ijpviw@mail.gmail.com>
-	<BCF85539-54B4-40E0-A641-872EF8E660E8@holtmann.org>
-	<CABBYNZ+TQNsvp-oY=gUgaNvr3sOPX2_p1WK47UL8gLz9JDWhew@mail.gmail.com>
-	<CAMudyAuWjeTtX2hUWXEyoXcE6NPtannAO+XfKChXjg6wsK+siw@mail.gmail.com>
-Date: Mon, 15 Dec 2014 07:56:31 -0800
-Message-ID: <CAHrH25RNQADkTEnCEEkp3y0ZwyuBsTiFXk7qLVO4PHMKqXNuQg@mail.gmail.com>
-Subject: Re: [PATCH 3/5] shared/gatt: Add bt_send_att_with_id functions
-From: Arman Uguray <armansito@google.com>
-To: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>, Marcel Holtmann <marcel@holtmann.org>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+In-Reply-To: <CABBYNZLSVbfVHr8HXzrDr2PpgMjxcpAbQeRTg7e1zT2Mm4dPuw@mail.gmail.com>
+References: <1418166065-21055-1-git-send-email-armansito@chromium.org>
+	<1418166065-21055-7-git-send-email-armansito@chromium.org>
+	<CABBYNZLSVbfVHr8HXzrDr2PpgMjxcpAbQeRTg7e1zT2Mm4dPuw@mail.gmail.com>
+Date: Mon, 15 Dec 2014 07:40:13 -0800
+Message-ID: <CAHrH25QzNyDtocCXkm27otmS3d4GhT79fnYmuT=c29cfa4AVXg@mail.gmail.com>
+Subject: Re: [PATCH BlueZ v1 06/12] core: Rename device_attach_attrib
+From: Arman Uguray <armansito@chromium.org>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Lukasz,
+Hi Luiz,
 
-> On Mon, Dec 15, 2014 at 3:05 AM, Lukasz Rymanowski <lukasz.rymanowski@tieto.com> wrote:
-> Hi Marcel, Luiz,
+> On Mon, Dec 15, 2014 at 3:51 AM, Luiz Augusto von Dentz <luiz.dentz@gmail.com> wrote:
+> Hi Arman,
 >
-> On 15 December 2014 at 12:00, Luiz Augusto von Dentz
-> <luiz.dentz@gmail.com> wrote:
->> Hi Marcel,
+> On Wed, Dec 10, 2014 at 1:00 AM, Arman Uguray <armansito@chromium.org> wrote:
+>> This patch renames the device_attach_attrib function to
+>> device_attach_att_transport to remove ambiguities arise from the word
+>> "attrib".
+>> ---
+>>  src/attrib-server.c | 2 +-
+>>  src/device.c        | 4 ++--
+>>  src/device.h        | 2 +-
+>>  3 files changed, 4 insertions(+), 4 deletions(-)
 >>
->> On Mon, Dec 15, 2014 at 12:53 PM, Marcel Holtmann <marcel@holtmann.org> wrote:
->>> Hi Luiz,
->>>
->>>
->>>>> With this patch it is possible to send ATT request with a given id
->>>>> request. It might be useful for ATT user for example to keep track of
->>>>> the GATT request which requires more then one ATT request e.g. search
->>>>> services
->>>>> ---
->>>>> src/shared/att.c | 26 ++++++++++++++++++++++++++
->>>>> src/shared/att.h |  6 ++++++
->>>>> 2 files changed, 32 insertions(+)
->>>>>
->>>>> diff --git a/src/shared/att.c b/src/shared/att.c
->>>>> index 2a131e0..f51f893 100644
->>>>> --- a/src/shared/att.c
->>>>> +++ b/src/shared/att.c
->>>>> @@ -1083,6 +1083,32 @@ static unsigned int send_att(struct bt_att *att, struct att_send_op *op)
->>>>>        return op->id;
->>>>> }
->>>>>
->>>>> +unsigned int bt_att_send_with_id(struct bt_att *att, unsigned int id,
->>>>> +                                       uint8_t opcode, const void *pdu,
->>>>> +                                       uint16_t length,
->>>>> +                                       bt_att_response_func_t callback,
->>>>> +                                       void *user_data,
->>>>> +                                       bt_att_destroy_func_t destroy)
->>>>> +{
->>>>> +       struct att_send_op *op;
->>>>> +
->>>>> +       if (!att || !att->io)
->>>>> +               return 0;
->>>>
->>>> I guess we need to check for invalid id here, or we can do the
->>>> opposite and let 0 id be used for self assign an id so bt_att_send
->>>> could just bt_att_send_with_id so we reuse more code.
->>>>
->>>>> +       op = create_att_send_op(opcode, pdu, length, att->mtu, callback,
->>>>> +                                                       user_data, destroy);
->>>>> +       if (!op)
->>>>> +               return 0;
->>>>>
->>>>> +       /*
->>>>> +        * TODO: Some verification might be needed here. For now we
->>>>> +        * believe that user know what he is doing.
->>>>> +        */
->>>>> +       op->id = id;
->>>>
->>>> I think we should prevent multiple entries using the same id and Im
->>>> also not sure why this is not being queue like the rest of operations?
->>>
->>> or we are not doing this at all since this sounds like a crazy API.
->>>
->>> If the caller wants to keep track of something, then it can keep track of it, but we are not allowing the caller to mess with internals.
+>> diff --git a/src/attrib-server.c b/src/attrib-server.c
+>> index 6571577..e73850d 100644
+>> --- a/src/attrib-server.c
+>> +++ b/src/attrib-server.c
+>> @@ -1300,7 +1300,7 @@ static void connect_event(GIOChannel *io, GError *gerr, void *user_data)
+>>         if (!device)
+>>                 return;
 >>
->> Well this is done internally so the caller can cancel operations such
->> as discovery, we could add another id but the caller would have no
->> idea the id has changed perhaps we could add an id mapping between
->> gatt and att so the id on gatt won't change but the att id would, but
->> with that we would need to change gattrib to do the same.
+>> -       device_attach_attrib(device, io);
+>> +       device_attach_att_transport(device, io);
+>>  }
+>>
+>>  static gboolean register_core_services(struct gatt_server *server)
+>> diff --git a/src/device.c b/src/device.c
+>> index bb80409..3bd3939 100644
+>> --- a/src/device.c
+>> +++ b/src/device.c
+>> @@ -3637,7 +3637,7 @@ static void gatt_client_init(struct btd_device *device)
+>>         DBG("gatt-client created");
+>>  }
+>>
+>> -bool device_attach_attrib(struct btd_device *dev, GIOChannel *io)
+>> +bool device_attach_att_transport(struct btd_device *dev, GIOChannel *io)
+>>  {
+>>         GError *gerr = NULL;
+>>         GAttrib *attrib;
+>> @@ -3725,7 +3725,7 @@ static void att_connect_cb(GIOChannel *io, GError *gerr, gpointer user_data)
+>>                 goto done;
+>>         }
+>>
+>> -       if (!device_attach_attrib(device, io))
+>> +       if (!device_attach_att_transport(device, io))
+>>                 goto done;
+>>
+>>         if (attcb->success)
+>> diff --git a/src/device.h b/src/device.h
+>> index 2e0473e..10c4951 100644
+>> --- a/src/device.h
+>> +++ b/src/device.h
+>> @@ -69,7 +69,7 @@ struct gatt_primary *btd_device_get_primary(struct btd_device *device,
+>>  GSList *btd_device_get_primaries(struct btd_device *device);
+>>  void btd_device_gatt_set_service_changed(struct btd_device *device,
+>>                                                 uint16_t start, uint16_t end);
+>> -bool device_attach_attrib(struct btd_device *dev, GIOChannel *io);
+>> +bool device_attach_att_transport(struct btd_device *dev, GIOChannel *io);
 >
-> ...and attrib/gatt.c is state less so it's not that easy to add that
-> tracking there ...
-
-I agree with Marcel here, in that it's probably better for the upper
-layer to keep track of which ATT request id maps to the overall
-operation at a given time. This is something that shared/gatt-helpers
-should be doing also but isn't, then again this hasn't hurt things
-that much so far, and all of those functions just return bool anyway.
-Generally you need this id to cancel an on-going operation in the case
-of a protocol error, and this is generally better served by something
-like bt_att_cancel_all already, where you just want to stop
-everything.
-
-Eitherway, maybe keep track of the operation states in GAttrib? It
-seems like your patch set is mainly addressing the fact that the id
-returned by g_attrib_* becomes invalid, so it sounds like the fix
-generally belongs in attrib/gatt?
-
+> Lets call device_attach_att and drop the transport suffix.
 >
-> \Lukasz
->>
->>
->> --
->> Luiz Augusto von Dentz
+>
 > --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> Luiz Augusto von Dentz
 
-Cheers,
-Arman
+I forgot to include this in v2, so I'll upload v3 for this one patch.
+
+-Arman
