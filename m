@@ -1,143 +1,273 @@
 Return-Path: <cyrus@holtmann.org>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH v2 1/3] android: Add native support for Android logger
+Date: Mon, 15 Dec 2014 17:05:59 +0100
+Message-ID: <3508130.3dy2inJSYm@uw000953>
+In-Reply-To: <1418652475-19842-1-git-send-email-szymon.janc@tieto.com>
+References: <1418652475-19842-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
-In-Reply-To: <CAHrH25RNQADkTEnCEEkp3y0ZwyuBsTiFXk7qLVO4PHMKqXNuQg@mail.gmail.com>
-References: <1418637547-20848-1-git-send-email-lukasz.rymanowski@tieto.com>
-	<1418637547-20848-4-git-send-email-lukasz.rymanowski@tieto.com>
-	<CABBYNZKWPJaeLgvpLzvYWggXtQpd84jS-u1mbHrpCww7ijpviw@mail.gmail.com>
-	<BCF85539-54B4-40E0-A641-872EF8E660E8@holtmann.org>
-	<CABBYNZ+TQNsvp-oY=gUgaNvr3sOPX2_p1WK47UL8gLz9JDWhew@mail.gmail.com>
-	<CAMudyAuWjeTtX2hUWXEyoXcE6NPtannAO+XfKChXjg6wsK+siw@mail.gmail.com>
-	<CAHrH25RNQADkTEnCEEkp3y0ZwyuBsTiFXk7qLVO4PHMKqXNuQg@mail.gmail.com>
-Date: Mon, 15 Dec 2014 17:28:44 +0100
-Message-ID: <CAMudyAtRufOJJ4_m639OeW6CxduPOHZce5JKMdGddzkZczpH6w@mail.gmail.com>
-Subject: Re: [PATCH 3/5] shared/gatt: Add bt_send_att_with_id functions
-From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-To: Arman Uguray <armansito@google.com>
-Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Arman,
+On Monday 15 of December 2014 15:07:53 Szymon Janc wrote:
+> Lollipop enabled SELinux in enforcing mode but doesn't provide
+> proper policy for logwrapper. All AOSP native services were converted
+> to not use logwrapper at all so we should follow the same.
+> 
+> On Android Lollipop we handle logging by sending data to Android
+> logd over socket. On Android KitKat logs are written directly to
+> /dev/log/system.
+> 
+> Nice addition over logwrapper is that now we have proper tags for
+> messages levels like debug, info, error etc.
+> ---
+> V2: - don't depend on glib on Android
+>     - use structure for logd header (make code easier to read)
+>     - reduce getpid calls
+> 
+>  android/Android.mk |   2 +-
+>  android/log.c      | 213 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  2 files changed, 214 insertions(+), 1 deletion(-)
+>  create mode 100644 android/log.c
+> 
+> diff --git a/android/Android.mk b/android/Android.mk
+> index c1505c8..17349bf 100644
+> --- a/android/Android.mk
+> +++ b/android/Android.mk
+> @@ -58,7 +58,7 @@ LOCAL_SRC_FILES := \
+>  	bluez/android/sco.c \
+>  	bluez/profiles/health/mcap.c \
+>  	bluez/android/map-client.c \
+> -	bluez/src/log.c \
+> +	bluez/android/log.c \
+>  	bluez/src/shared/mgmt.c \
+>  	bluez/src/shared/util.c \
+>  	bluez/src/shared/queue.c \
+> diff --git a/android/log.c b/android/log.c
+> new file mode 100644
+> index 0000000..09d226a
+> --- /dev/null
+> +++ b/android/log.c
+> @@ -0,0 +1,213 @@
+> +/*
+> + *
+> + *  BlueZ - Bluetooth protocol stack for Linux
+> + *
+> + *  Copyright (C) 2014  Intel Corporation. All rights reserved.
+> + *
+> + *
+> + *  This program is free software; you can redistribute it and/or modify
+> + *  it under the terms of the GNU General Public License as published by
+> + *  the Free Software Foundation; either version 2 of the License, or
+> + *  (at your option) any later version.
+> + *
+> + *  This program is distributed in the hope that it will be useful,
+> + *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+> + *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+> + *  GNU General Public License for more details.
+> + *
+> + *  You should have received a copy of the GNU General Public License
+> + *  along with this program; if not, write to the Free Software
+> + *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+> + *
+> + */
+> +#ifdef HAVE_CONFIG_H
+> +#include <config.h>
+> +#endif
+> +
+> +#include <fcntl.h>
+> +#include <stdio.h>
+> +#include <unistd.h>
+> +#include <stdbool.h>
+> +#include <time.h>
+> +#include <sys/uio.h>
+> +#include <sys/types.h>
+> +#include <sys/socket.h>
+> +#include <sys/un.h>
+> +
+> +#include "src/log.h"
+> +
+> +#define LOG_TAG "bluetoothd"
+> +
+> +#define LOG_DEBUG 3
+> +#define LOG_INFO 4
+> +#define LOG_WARN 5
+> +#define LOG_ERR 6
+> +
+> +#define LOG_ID_SYSTEM 3
+> +
+> +struct logd_header {
+> +	uint8_t id;
+> +	uint16_t pid; /* Android logd expects only 2 bytes for PID */
+> +	uint32_t sec;
+> +	uint32_t nsec;
+> +} __attribute__ ((packed));
+> +
+> +static int log_fd = -1;
+> +static bool legacy_log = false;
+> +
+> +static void android_log(unsigned char level, const char *fmt, va_list ap)
+> +{
+> +	struct logd_header header;
+> +	struct iovec vec[4];
+> +	int cnt = 0;
+> +	char *msg;
+> +	static pid_t pid = 0;
+> +
+> +	if (log_fd < 0)
+> +		return;
+> +
+> +	/* no need to call getpid all the time since we don't fork */
+> +	if (!pid)
+> +		pid = getpid();
+> +
+> +	if (vasprintf(&msg, fmt, ap) < 0)
+> +		return;
+> +
+> +	if (!legacy_log) {
+> +		struct timespec ts;
+> +
+> +		clock_gettime(CLOCK_REALTIME, &ts);
+> +
+> +		header.id = LOG_ID_SYSTEM;
+> +		header.pid = pid;
+> +		header.sec = ts.tv_sec;
+> +		header.nsec = ts.tv_nsec;
+> +
+> +		vec[0].iov_base = &header;
+> +		vec[0].iov_len = sizeof(header);
+> +
+> +		cnt += 1;
+> +	}
+> +
+> +	vec[cnt + 0].iov_base = &level;
+> +	vec[cnt + 0].iov_len = sizeof(level);
+> +	vec[cnt + 1].iov_base = LOG_TAG;
+> +	vec[cnt + 1].iov_len = sizeof(LOG_TAG);
+> +	vec[cnt + 2].iov_base  = msg;
+> +	vec[cnt + 2].iov_len  = strlen(msg) + 1;
+> +
+> +	cnt += 3;
+> +
+> +	writev(log_fd, vec, cnt);
+> +
+> +	free(msg);
+> +}
+> +
+> +void info(const char *format, ...)
+> +{
+> +	va_list ap;
+> +
+> +	va_start(ap, format);
+> +
+> +	android_log(LOG_INFO, format, ap);
+> +
+> +	va_end(ap);
+> +}
+> +
+> +void warn(const char *format, ...)
+> +{
+> +	va_list ap;
+> +
+> +	va_start(ap, format);
+> +
+> +	android_log(LOG_WARN, format, ap);
+> +
+> +	va_end(ap);
+> +}
+> +
+> +void error(const char *format, ...)
+> +{
+> +	va_list ap;
+> +
+> +	va_start(ap, format);
+> +
+> +	android_log(LOG_ERR, format, ap);
+> +
+> +	va_end(ap);
+> +}
+> +
+> +void btd_debug(const char *format, ...)
+> +{
+> +	va_list ap;
+> +
+> +	va_start(ap, format);
+> +
+> +	android_log(LOG_DEBUG, format, ap);
+> +
+> +	va_end(ap);
+> +}
+> +
+> +static bool init_legacy_log(void)
+> +{
+> +	log_fd = open("/dev/log/system", O_WRONLY);
+> +	if (log_fd < 0)
+> +		return false;
+> +
+> +	legacy_log = true;
+> +
+> +	return true;
+> +}
+> +
+> +static bool init_logd(void)
+> +{
+> +	struct sockaddr_un addr;
+> +
+> +	log_fd = socket(PF_UNIX, SOCK_DGRAM | SOCK_CLOEXEC, 0);
+> +	if (log_fd < 0)
+> +		return false;
+> +
+> +	if (fcntl(log_fd, F_SETFL, O_NONBLOCK) < 0)
+> +		goto failed;
+> +
+> +	memset(&addr, 0, sizeof(addr));
+> +	addr.sun_family = AF_UNIX;
+> +	strcpy(addr.sun_path, "/dev/socket/logdw");
+> +
+> +	if (connect(log_fd, (struct sockaddr *)&addr, sizeof(addr)) < 0)
+> +		goto failed;
+> +
+> +	return true;
+> +
+> +failed:
+> +	close(log_fd);
+> +	log_fd = -1;
+> +
+> +	return false;
+> +}
+> +
+> +extern struct btd_debug_desc __start___debug[];
+> +extern struct btd_debug_desc __stop___debug[];
+> +
+> +void __btd_log_init(const char *debug, int detach)
+> +{
+> +	if (!init_logd() && !init_legacy_log())
+> +		return;
+> +
+> +	if (debug) {
+> +		struct btd_debug_desc *desc;
+> +
+> +		for (desc = __start___debug; desc < __stop___debug; desc++)
+> +			desc->flags |= BTD_DEBUG_FLAG_PRINT;
+> +	}
+> +
+> +	info("Bluetooth daemon %s", VERSION);
+> +}
+> +
+> +void __btd_log_cleanup(void)
+> +{
+> +	if (log_fd < 0)
+> +		return;
+> +
+> +	close(log_fd);
+> +	log_fd = -1;
+> +}
+> 
 
-On 15 December 2014 at 16:56, Arman Uguray <armansito@google.com> wrote:
-> Hi Lukasz,
->
->> On Mon, Dec 15, 2014 at 3:05 AM, Lukasz Rymanowski <lukasz.rymanowski@tieto.com> wrote:
->> Hi Marcel, Luiz,
->>
->> On 15 December 2014 at 12:00, Luiz Augusto von Dentz
->> <luiz.dentz@gmail.com> wrote:
->>> Hi Marcel,
->>>
->>> On Mon, Dec 15, 2014 at 12:53 PM, Marcel Holtmann <marcel@holtmann.org> wrote:
->>>> Hi Luiz,
->>>>
->>>>
->>>>>> With this patch it is possible to send ATT request with a given id
->>>>>> request. It might be useful for ATT user for example to keep track of
->>>>>> the GATT request which requires more then one ATT request e.g. search
->>>>>> services
->>>>>> ---
->>>>>> src/shared/att.c | 26 ++++++++++++++++++++++++++
->>>>>> src/shared/att.h |  6 ++++++
->>>>>> 2 files changed, 32 insertions(+)
->>>>>>
->>>>>> diff --git a/src/shared/att.c b/src/shared/att.c
->>>>>> index 2a131e0..f51f893 100644
->>>>>> --- a/src/shared/att.c
->>>>>> +++ b/src/shared/att.c
->>>>>> @@ -1083,6 +1083,32 @@ static unsigned int send_att(struct bt_att *att, struct att_send_op *op)
->>>>>>        return op->id;
->>>>>> }
->>>>>>
->>>>>> +unsigned int bt_att_send_with_id(struct bt_att *att, unsigned int id,
->>>>>> +                                       uint8_t opcode, const void *pdu,
->>>>>> +                                       uint16_t length,
->>>>>> +                                       bt_att_response_func_t callback,
->>>>>> +                                       void *user_data,
->>>>>> +                                       bt_att_destroy_func_t destroy)
->>>>>> +{
->>>>>> +       struct att_send_op *op;
->>>>>> +
->>>>>> +       if (!att || !att->io)
->>>>>> +               return 0;
->>>>>
->>>>> I guess we need to check for invalid id here, or we can do the
->>>>> opposite and let 0 id be used for self assign an id so bt_att_send
->>>>> could just bt_att_send_with_id so we reuse more code.
->>>>>
->>>>>> +       op = create_att_send_op(opcode, pdu, length, att->mtu, callback,
->>>>>> +                                                       user_data, destroy);
->>>>>> +       if (!op)
->>>>>> +               return 0;
->>>>>>
->>>>>> +       /*
->>>>>> +        * TODO: Some verification might be needed here. For now we
->>>>>> +        * believe that user know what he is doing.
->>>>>> +        */
->>>>>> +       op->id = id;
->>>>>
->>>>> I think we should prevent multiple entries using the same id and Im
->>>>> also not sure why this is not being queue like the rest of operations?
->>>>
->>>> or we are not doing this at all since this sounds like a crazy API.
->>>>
->>>> If the caller wants to keep track of something, then it can keep track of it, but we are not allowing the caller to mess with internals.
->>>
->>> Well this is done internally so the caller can cancel operations such
->>> as discovery, we could add another id but the caller would have no
->>> idea the id has changed perhaps we could add an id mapping between
->>> gatt and att so the id on gatt won't change but the att id would, but
->>> with that we would need to change gattrib to do the same.
->>
->> ...and attrib/gatt.c is state less so it's not that easy to add that
->> tracking there ...
->
-> I agree with Marcel here, in that it's probably better for the upper
-> layer to keep track of which ATT request id maps to the overall
-> operation at a given time. This is something that shared/gatt-helpers
-> should be doing also but isn't, then again this hasn't hurt things
-> that much so far, and all of those functions just return bool anyway.
-> Generally you need this id to cancel an on-going operation in the case
-> of a protocol error, and this is generally better served by something
-> like bt_att_cancel_all already, where you just want to stop
-> everything.
->
-> Eitherway, maybe keep track of the operation states in GAttrib? It
-> seems like your patch set is mainly addressing the fact that the id
-> returned by g_attrib_* becomes invalid, so it sounds like the fix
-> generally belongs in attrib/gatt?
+Applied.
 
-Yes, fix belongs to attrib/gatt, but to solve it you need to cover two things.
-One thing is to have request id tracked by attrib/gatt and second thing
-is to let user of gattrib information about ongoing request id.
-Without that problem is still there
-because user of gatrrib is out of control of ongoing att request
-because of outdated request id.
-Unless we reuse existing req_id what is done in this set but is not welcome
-
-Anyway, after discussion on IRC we decide to remove gattrib from
-Android GATT and HOG and start use gatt-client.
-We need to do it anyway so instead of fixing gattrib we move to gatt/client.
-
-\Łukasz
-
-
-
->
->>
->> \Lukasz
->>>
->>>
->>> --
->>> Luiz Augusto von Dentz
->> --
->> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
->> the body of a message to majordomo@vger.kernel.org
->> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->
-> Cheers,
-> Arman
+-- 
+Best regards, 
+Szymon Janc
