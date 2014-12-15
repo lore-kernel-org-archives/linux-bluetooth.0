@@ -1,11 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1418166065-21055-7-git-send-email-armansito@chromium.org>
+In-Reply-To: <1418166065-21055-1-git-send-email-armansito@chromium.org>
 References: <1418166065-21055-1-git-send-email-armansito@chromium.org>
-	<1418166065-21055-7-git-send-email-armansito@chromium.org>
-Date: Mon, 15 Dec 2014 13:51:52 +0200
-Message-ID: <CABBYNZLSVbfVHr8HXzrDr2PpgMjxcpAbQeRTg7e1zT2Mm4dPuw@mail.gmail.com>
-Subject: Re: [PATCH BlueZ v1 06/12] core: Rename device_attach_attrib
+Date: Mon, 15 Dec 2014 13:48:02 +0200
+Message-ID: <CABBYNZJRgPE-ektzjsSGbfcsPZ1PUajexzBq5qzqqKYvqctGog@mail.gmail.com>
+Subject: Re: [PATCH BlueZ v1 00/12] core: Use shared/gatt-client
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: Arman Uguray <armansito@chromium.org>
 Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
@@ -16,62 +15,69 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 Hi Arman,
 
 On Wed, Dec 10, 2014 at 1:00 AM, Arman Uguray <armansito@chromium.org> wrote:
-> This patch renames the device_attach_attrib function to
-> device_attach_att_transport to remove ambiguities arise from the word
-> "attrib".
-> ---
->  src/attrib-server.c | 2 +-
->  src/device.c        | 4 ++--
->  src/device.h        | 2 +-
->  3 files changed, 4 insertions(+), 4 deletions(-)
+> *v1:
+>   - Addressed comments by Johan and Luiz.
 >
-> diff --git a/src/attrib-server.c b/src/attrib-server.c
-> index 6571577..e73850d 100644
-> --- a/src/attrib-server.c
-> +++ b/src/attrib-server.c
-> @@ -1300,7 +1300,7 @@ static void connect_event(GIOChannel *io, GError *gerr, void *user_data)
->         if (!device)
->                 return;
 >
-> -       device_attach_attrib(device, io);
-> +       device_attach_att_transport(device, io);
->  }
+> This patch set integrates shared/gatt-client into bluetoothd. The following
+> items have been tackled here:
 >
->  static gboolean register_core_services(struct gatt_server *server)
-> diff --git a/src/device.c b/src/device.c
-> index bb80409..3bd3939 100644
-> --- a/src/device.c
-> +++ b/src/device.c
-> @@ -3637,7 +3637,7 @@ static void gatt_client_init(struct btd_device *device)
->         DBG("gatt-client created");
->  }
+>   1. src/device now uses shared/gatt-client to perform service discovery. State
+>   updates such as disconnections, service changed events, etc. are done using
+>   callback APIs of the new shared framework and attrib/gatt is no longer used to
+>   perform GATT operations directly. A GAttrib instance is maintained for
+>   backwards compatibility with profiles that haven't been converted yet.
 >
-> -bool device_attach_attrib(struct btd_device *dev, GIOChannel *io)
-> +bool device_attach_att_transport(struct btd_device *dev, GIOChannel *io)
->  {
->         GError *gerr = NULL;
->         GAttrib *attrib;
-> @@ -3725,7 +3725,7 @@ static void att_connect_cb(GIOChannel *io, GError *gerr, gpointer user_data)
->                 goto done;
->         }
+>   2. A new gatt-callbacks API has been added which mirrors the attio APIs for
+>   shared/gatt-client. Profiles/plugins are notified using these APIs when the
+>   bearer disconnects, when services change, and when gatt-client is ready.
 >
-> -       if (!device_attach_attrib(device, io))
-> +       if (!device_attach_att_transport(device, io))
->                 goto done;
+>   3. The profiles/gatt plugin has been rewritten. Since the GATT service is
+>   handled by shared/gatt-client, this profile no longer deals with service
+>   changed events performs out of place MTU exchanges, which used to get
+>   performed in an arbitrary order. The profile has been renamed to profiles/gap
+>   as it now only deals with the GAP service, and reads the "Appearance" and
+>   "Device Name" characteristics using the new shared stack.
 >
->         if (attcb->success)
-> diff --git a/src/device.h b/src/device.h
-> index 2e0473e..10c4951 100644
-> --- a/src/device.h
-> +++ b/src/device.h
-> @@ -69,7 +69,7 @@ struct gatt_primary *btd_device_get_primary(struct btd_device *device,
->  GSList *btd_device_get_primaries(struct btd_device *device);
->  void btd_device_gatt_set_service_changed(struct btd_device *device,
->                                                 uint16_t start, uint16_t end);
-> -bool device_attach_attrib(struct btd_device *dev, GIOChannel *io);
-> +bool device_attach_att_transport(struct btd_device *dev, GIOChannel *io);
+> Arman Uguray (12):
+>   attrib/gattrib: Add g_attrib_get_att.
+>   shared/att: Add err argument to disconnect cb
+>   shared/gatt-client: Set op->success correctly
+>   core: device: Use bt_att_register_disconnect.
+>   core: device: Use shared/gatt-client for GATT.
+>   core: Rename device_attach_attrib
+>   core: Use gatt_db service callbacks
+>   core: Introduce gatt-callbacks
+>   profiles/gatt: Don't handle GATT service.
+>   profiles/gatt: Rename profile to gap.
+>   profiles/gap: Rewrite using bt_gatt_client.
+>   profiles/gap: Add Google copyright.
+>
+>  Makefile.am              |   1 +
+>  Makefile.plugins         |   4 +-
+>  attrib/gattrib.c         |   8 +
+>  attrib/gattrib.h         |   3 +
+>  profiles/gap/gas.c       | 322 +++++++++++++++++++++++++
+>  profiles/gatt/gas.c      | 457 ------------------------------------
+>  src/attrib-server.c      |   2 +-
+>  src/device.c             | 598 +++++++++++++++++++++++++++++++++--------------
+>  src/device.h             |   2 +-
+>  src/gatt-callbacks.h     |  36 +++
+>  src/shared/att-types.h   |   3 +-
+>  src/shared/att.c         |  23 +-
+>  src/shared/att.h         |   2 +-
+>  src/shared/gatt-client.c |   6 +-
+>  tools/btgatt-client.c    |   4 +-
+>  tools/btgatt-server.c    |   4 +-
+>  16 files changed, 832 insertions(+), 643 deletions(-)
+>  create mode 100644 profiles/gap/gas.c
+>  delete mode 100644 profiles/gatt/gas.c
+>  create mode 100644 src/gatt-callbacks.h
+>
+> --
+> 2.2.0.rc0.207.ga3a616c
 
-Lets call device_attach_att and drop the transport suffix.
+Looks like you will need to rebase this set do not apply anymore.
 
 
 -- 
