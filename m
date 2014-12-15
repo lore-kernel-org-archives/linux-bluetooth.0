@@ -1,62 +1,101 @@
 Return-Path: <cyrus@holtmann.org>
-From: Arman Uguray <armansito@chromium.org>
+From: Szymon Janc <szymon.janc@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Arman Uguray <armansito@chromium.org>
-Subject: [PATCH BlueZ v2 01/12] attrib/gattrib: Add g_attrib_get_att.
-Date: Mon, 15 Dec 2014 07:29:05 -0800
-Message-Id: <1418657356-18967-2-git-send-email-armansito@chromium.org>
-In-Reply-To: <1418657356-18967-1-git-send-email-armansito@chromium.org>
-References: <1418657356-18967-1-git-send-email-armansito@chromium.org>
+Cc: Szymon Janc <szymon.janc@tieto.com>
+Subject: [PATCH v2 2/3] android/snoop: Use common logging API
+Date: Mon, 15 Dec 2014 15:07:54 +0100
+Message-Id: <1418652475-19842-2-git-send-email-szymon.janc@tieto.com>
+In-Reply-To: <1418652475-19842-1-git-send-email-szymon.janc@tieto.com>
+References: <1418652475-19842-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Added the g_attrib_get_att function which returns the underlying bt_att
-structure associated with a GAttrib.
+This allows to log without logwrapper.
 ---
- attrib/gattrib.c | 8 ++++++++
- attrib/gattrib.h | 3 +++
- 2 files changed, 11 insertions(+)
+ android/Android.mk         |  1 +
+ android/Makefile.am        |  4 ++--
+ android/bluetoothd-snoop.c | 14 ++++++++++++--
+ 3 files changed, 15 insertions(+), 4 deletions(-)
 
-diff --git a/attrib/gattrib.c b/attrib/gattrib.c
-index 3ce6748..ab43f84 100644
---- a/attrib/gattrib.c
-+++ b/attrib/gattrib.c
-@@ -169,6 +169,14 @@ GIOChannel *g_attrib_get_channel(GAttrib *attrib)
- 	return attrib->io;
+diff --git a/android/Android.mk b/android/Android.mk
+index 17349bf..c1a9eff 100644
+--- a/android/Android.mk
++++ b/android/Android.mk
+@@ -447,6 +447,7 @@ LOCAL_SRC_FILES := \
+ 	bluez/android/bluetoothd-snoop.c \
+ 	bluez/monitor/mainloop.c \
+ 	bluez/src/shared/btsnoop.c \
++	bluez/android/log.c \
+ 
+ LOCAL_C_INCLUDES := \
+ 	$(LOCAL_PATH)/bluez \
+diff --git a/android/Makefile.am b/android/Makefile.am
+index 6d74c05..ac9c360 100644
+--- a/android/Makefile.am
++++ b/android/Makefile.am
+@@ -11,8 +11,8 @@ android_system_emulator_LDADD = src/libshared-mainloop.la
+ 
+ noinst_PROGRAMS += android/bluetoothd-snoop
+ 
+-android_bluetoothd_snoop_SOURCES = android/bluetoothd-snoop.c
+-android_bluetoothd_snoop_LDADD = src/libshared-mainloop.la
++android_bluetoothd_snoop_SOURCES = android/bluetoothd-snoop.c src/log.c
++android_bluetoothd_snoop_LDADD = src/libshared-mainloop.la @GLIB_LIBS@
+ 
+ noinst_PROGRAMS += android/bluetoothd
+ 
+diff --git a/android/bluetoothd-snoop.c b/android/bluetoothd-snoop.c
+index dc34869..776dca7 100644
+--- a/android/bluetoothd-snoop.c
++++ b/android/bluetoothd-snoop.c
+@@ -25,7 +25,6 @@
+ #include <config.h>
+ #endif
+ 
+-#include <stdio.h>
+ #include <ctype.h>
+ #include <stdlib.h>
+ #include <unistd.h>
+@@ -39,6 +38,7 @@
+ 
+ #include "monitor/mainloop.h"
+ #include "src/shared/btsnoop.h"
++#include "src/log.h"
+ 
+ #define DEFAULT_SNOOP_FILE "/sdcard/btsnoop_hci.log"
+ 
+@@ -218,6 +218,10 @@ int main(int argc, char *argv[])
+ 	const char *path;
+ 	sigset_t mask;
+ 
++	__btd_log_init(NULL, 0);
++
++	DBG("");
++
+ 	set_capabilities();
+ 
+ 	if (argc > 1)
+@@ -237,13 +241,19 @@ int main(int argc, char *argv[])
+ 		rename(DEFAULT_SNOOP_FILE, DEFAULT_SNOOP_FILE ".old");
+ 
+ 	if (open_monitor(path) < 0) {
+-		printf("Failed to start bluetoothd_snoop\n");
++		error("bluetoothd_snoop: start failed");
+ 		return EXIT_FAILURE;
+ 	}
+ 
++	info("bluetoothd_snoop: started");
++
+ 	mainloop_run();
+ 
+ 	close_monitor();
+ 
++	info("bluetoothd_snoop: stopped");
++
++	__btd_log_cleanup();
++
+ 	return EXIT_SUCCESS;
  }
- 
-+struct bt_att *g_attrib_get_att(GAttrib *attrib)
-+{
-+	if (!attrib)
-+		return NULL;
-+
-+	return attrib->att;
-+}
-+
- gboolean g_attrib_set_destroy_function(GAttrib *attrib, GDestroyNotify destroy,
- 							gpointer user_data)
- {
-diff --git a/attrib/gattrib.h b/attrib/gattrib.h
-index 2ed57c1..374bac2 100644
---- a/attrib/gattrib.h
-+++ b/attrib/gattrib.h
-@@ -31,6 +31,7 @@ extern "C" {
- #define GATTRIB_ALL_REQS 0xFE
- #define GATTRIB_ALL_HANDLES 0x0000
- 
-+struct bt_att;  /* Forward declaration for compatibility */
- struct _GAttrib;
- typedef struct _GAttrib GAttrib;
- 
-@@ -47,6 +48,8 @@ void g_attrib_unref(GAttrib *attrib);
- 
- GIOChannel *g_attrib_get_channel(GAttrib *attrib);
- 
-+struct bt_att *g_attrib_get_att(GAttrib *attrib);
-+
- gboolean g_attrib_set_destroy_function(GAttrib *attrib,
- 		GDestroyNotify destroy, gpointer user_data);
- 
 -- 
-2.2.0.rc0.207.ga3a616c
+1.9.1
 
