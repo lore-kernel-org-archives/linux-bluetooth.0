@@ -2,11 +2,11 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@gmail.com>
 To: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v3 4/4] android/bluetooth: Enable LE privacy mode on BfA startup
-Date: Tue, 16 Dec 2014 22:37:22 +0100
-Message-ID: <2944887.ToNmaQstia@athlon>
-In-Reply-To: <1418238948-30800-5-git-send-email-lukasz.rymanowski@tieto.com>
-References: <1418238948-30800-1-git-send-email-lukasz.rymanowski@tieto.com> <1418238948-30800-5-git-send-email-lukasz.rymanowski@tieto.com>
+Subject: Re: [PATCH v3 1/4] android/bluetooth: Start keep IRK for adapter
+Date: Tue, 16 Dec 2014 22:36:02 +0100
+Message-ID: <3420102.WxxDUE4Adk@athlon>
+In-Reply-To: <1418238948-30800-2-git-send-email-lukasz.rymanowski@tieto.com>
+References: <1418238948-30800-1-git-send-email-lukasz.rymanowski@tieto.com> <1418238948-30800-2-git-send-email-lukasz.rymanowski@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -14,61 +14,37 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Łukasz,
 
-On Wednesday 10 December 2014 20:15:48 Lukasz Rymanowski wrote:
-> Lets follow Android Lollipop behaviour and enable privacy on
-> startup.
+On Wednesday 10 December 2014 20:15:45 Lukasz Rymanowski wrote:
 > ---
->  android/bluetooth.c | 29 +++++++++++++++++++++++++++++
->  1 file changed, 29 insertions(+)
+>  android/bluetooth.c | 3 +++
+>  1 file changed, 3 insertions(+)
 > 
 > diff --git a/android/bluetooth.c b/android/bluetooth.c
-> index 4c359d0..54e3d97 100644
+> index 48ca231..e9c5be1 100644
 > --- a/android/bluetooth.c
 > +++ b/android/bluetooth.c
-> @@ -3423,6 +3423,32 @@ static void clear_auto_connect_list(void)
->  	error("Could not clear auto connect list");
->  }
+> @@ -176,6 +176,8 @@ static struct {
 > 
-> +static void set_privacy_complete(uint8_t status, uint16_t length,
-> +					const void *param, void *user_data)
-> +{
-> +	if (status != MGMT_STATUS_SUCCESS)
-> +		error("Failed to set privacy mode: %s (0x%02x)",
-> +						mgmt_errstr(status), status);
-> +}
-> +
-> +static void set_privacy(void)
-> +{
-> +	struct mgmt_cp_set_privacy cp;
-> +
-> +	if (!local_irk_is_valid())
-> +		goto failed;
-> +
-> +	cp.privacy = 0x01;
-> +	memcpy(cp.irk, adapter.irk, sizeof(adapter.irk));
-> +
-> +	if (mgmt_send(mgmt_if, MGMT_OP_SET_PRIVACY, adapter.index, sizeof(cp),
-> +				&cp, set_privacy_complete, NULL, NULL) > 0)
-> +		return;
-> +
-> +failed:
-> +	error("Could not set privacy mode");
-> +}
-> +
->  static void read_info_complete(uint8_t status, uint16_t length,
->  					const void *param, void *user_data)
->  {
-> @@ -3497,6 +3523,9 @@ static void read_info_complete(uint8_t status,
-> uint16_t length, if (missing_settings & MGMT_SETTING_BONDABLE)
->  		set_mode(MGMT_OP_SET_BONDABLE, 0x01);
+>  	char *name;
 > 
-> +	if (missing_settings & MGMT_SETTING_PRIVACY)
-> +		set_privacy();
+> +	uint8_t irk[16];
 > +
->  	load_devices_info(cb);
->  	load_devices_cache();
+>  	uint8_t max_advert_instance;
+>  	uint8_t rpa_offload_supported;
+>  	uint8_t max_irk_list_size;
+> @@ -196,6 +198,7 @@ static struct {
+>  	.index = MGMT_INDEX_NONE,
+>  	.dev_class = 0,
+>  	.name = NULL,
+> +	.irk = {0},
+>  	.max_advert_instance = 0,
+>  	.rpa_offload_supported = 0,
+>  	.max_irk_list_size = 0,
 
-Shouldn't we first configure a static random address?
+I don't think we need to keep IRK in memory.
+
+I'd just try to load it (if not present generate and store) and provide it to 
+kernel.
 
 -- 
 Szymon K. Janc
