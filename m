@@ -1,65 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1418645599-20169-1-git-send-email-luiz.dentz@gmail.com>
-References: <1418645599-20169-1-git-send-email-luiz.dentz@gmail.com>
-Date: Tue, 16 Dec 2014 14:28:34 +0200
-Message-ID: <CABBYNZL1G2LgNFfYxcX5pR=cmdA3XBLqb97bSgSHhmieKsfTJw@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 1/3] shared/att: Use queue_remove_if
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
+Subject: [PATCH 2/2] android/gatt: Report error on invalid value length for CCC descriptor
+Date: Tue, 16 Dec 2014 13:02:37 +0100
+Message-Id: <1418731357-8531-2-git-send-email-jakub.tyszkowski@tieto.com>
+In-Reply-To: <1418731357-8531-1-git-send-email-jakub.tyszkowski@tieto.com>
+References: <1418731357-8531-1-git-send-email-jakub.tyszkowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+For application services, characteristics and descriptors it's user app's
+responsibility to verify value length but for embeded ones we need to do
+this in daemon. This is checked in TC_GAW_SR_BI_34_C and PTS tries to
+write to embeded CCC descritor if no other descriptors are added by the
+apps. It is expected by PTS for us to be more strict about value length
+controll.
+---
+ android/gatt.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
-On Mon, Dec 15, 2014 at 2:13 PM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->
-> This make use of queue_remove_if instead of queue_find + queue_remove
-> whenever possible.
-> ---
->  src/shared/att.c | 6 ++----
->  1 file changed, 2 insertions(+), 4 deletions(-)
->
-> diff --git a/src/shared/att.c b/src/shared/att.c
-> index 447863d..ba3d204 100644
-> --- a/src/shared/att.c
-> +++ b/src/shared/att.c
-> @@ -978,12 +978,11 @@ bool bt_att_unregister_disconnect(struct bt_att *att, unsigned int id)
->         if (!att || !id)
->                 return false;
->
-> -       disconn = queue_find(att->disconn_list, match_disconn_id,
-> +       disconn = queue_remove_if(att->disconn_list, match_disconn_id,
->                                                         UINT_TO_PTR(id));
->         if (!disconn)
->                 return false;
->
-> -       queue_remove(att->disconn_list, disconn);
->         destroy_att_disconn(disconn);
->         return true;
->  }
-> @@ -1196,12 +1195,11 @@ bool bt_att_unregister(struct bt_att *att, unsigned int id)
->         if (!att || !id)
->                 return false;
->
-> -       notify = queue_find(att->notify_list, match_notify_id,
-> +       notify = queue_remove_if(att->notify_list, match_notify_id,
->                                                         UINT_TO_PTR(id));
->         if (!notify)
->                 return false;
->
-> -       queue_remove(att->notify_list, notify);
->         destroy_att_notify(notify);
->         return true;
->  }
-> --
-> 1.9.3
-
-Pushed.
-
-
+diff --git a/android/gatt.c b/android/gatt.c
+index 1e2627b..5f2f1c4 100644
+--- a/android/gatt.c
++++ b/android/gatt.c
+@@ -6958,6 +6958,13 @@ static void gatt_srvc_change_write_cb(struct gatt_db_attribute *attrib,
+ 		return;
+ 	}
+ 
++	/* No more than 2 octets are expected */
++	if (len > 2) {
++		gatt_db_attribute_write_result(attrib, id,
++						ATT_ECODE_INVAL_ATTR_VALUE_LEN);
++		return;
++	}
++
+ 	/* Set services changed indication value */
+ 	bt_store_gatt_ccc(bdaddr, *value);
+ 
 -- 
-Luiz Augusto von Dentz
+1.9.1
+
