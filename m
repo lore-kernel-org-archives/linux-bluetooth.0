@@ -1,11 +1,14 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcin Kraglak <marcin.kraglak@tieto.com>
 To: linux-bluetooth@vger.kernel.org
+Cc: Marcin Kraglak <mkraglak@localhost.localdomain>
 Subject: [PATCH] attrib: Fix Read Blob error responses
-Date: Tue, 16 Dec 2014 08:51:35 +0100
-Message-Id: <1418716295-13447-1-git-send-email-marcin.kraglak@tieto.com>
+Date: Tue, 16 Dec 2014 08:47:25 +0100
+Message-Id: <1418716045-13307-1-git-send-email-marcin.kraglak@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
+
+From: Marcin Kraglak <mkraglak@localhost.localdomain>
 
 Read blob response with offset equal to value length should return
 zero length value intead of Invalid Offset Error.
