@@ -1,77 +1,72 @@
 Return-Path: <cyrus@holtmann.org>
-From: Sebastian Chlad <sebastian.chlad@tieto.com>
+MIME-Version: 1.0
+Date: Tue, 16 Dec 2014 09:32:22 +0100
+Message-ID: <CAHwR_AWn-_-=u8RVZpV8pZ-P1JeZx3oKuhZgE8j-na8c-7KXGw@mail.gmail.com>
+Subject: [PATCH] hciattach: Big endian support for various TI chips.
+From: Jonas Rydow <jrydow@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Sebastian Chlad <sebastian.chlad@tieto.com>
-Subject: [PATCH] android/pts: MAP testing against PTS 6.0
-Date: Tue, 16 Dec 2014 11:45:29 +0100
-Message-Id: <1418726729-25030-1-git-send-email-sebastian.chlad@tieto.com>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+The firmware files from TI and the loading of firmware are designed to
+work on little endian machines. This patch adds support to load the
+firmware on big endian hosts as well as on little endian hosts.
 ---
- android/pics-map.txt  | 6 +++---
- android/pixit-map.txt | 2 +-
- android/pts-map.txt   | 6 +++---
- 3 files changed, 7 insertions(+), 7 deletions(-)
+tools/hciattach_ti.c | 9 +++++++++
+ 1 file changed, 9 insertions(+)
 
-diff --git a/android/pics-map.txt b/android/pics-map.txt
-index 3f783a9..093aae1 100644
---- a/android/pics-map.txt
-+++ b/android/pics-map.txt
-@@ -1,6 +1,6 @@
- MAP PICS for the PTS tool.
- 
--PTS version: 5.3
-+PTS version: 6.0
- 
- * - different than PTS defaults
- # - not yet implemented/supported
-@@ -111,8 +111,8 @@ TSPC_MAP_3_5a	True		MSE: SetNotificationRegistration (M)
- TSPC_MAP_3_6	False		MSE: Supported Message Types
- TSPC_MAP_3_6a	False		MSE: EMAIL (C1)
- TSPC_MAP_3_6b	True		MSE: SMS_GSM (C1)
--TSPC_MAP_3_6c	False		MSE: SMS_CDMA (C1)
--TSPC_MAP_3_6d	False (*)	MSE: MMS (C1)
-+TSPC_MAP_3_6c	True (*)	MSE: SMS_CDMA (C1)
-+TSPC_MAP_3_6d	True		MSE: MMS (C1)
- TSPC_MAP_3_7	False		MSE: Instance Information (Not Supported)
- TSPC_MAP_3_7a	False (*)	MSE: GetMASInstanceInformation (Not Supported)
- TSPC_MAP_3_8	False		MSE: Extended MAP-Event-Report (Not Supported)
-diff --git a/android/pixit-map.txt b/android/pixit-map.txt
-index c8c130c..a7626dd 100644
---- a/android/pixit-map.txt
-+++ b/android/pixit-map.txt
-@@ -1,6 +1,6 @@
- MAP PIXIT for the PTS tool.
- 
--PTS version: 5.3
-+PTS version: 6.0
- 
- * - different than PTS defaults
- & - should be set to IUT Bluetooth address
-diff --git a/android/pts-map.txt b/android/pts-map.txt
-index e8092e2..6ca984e 100644
---- a/android/pts-map.txt
-+++ b/android/pts-map.txt
-@@ -1,7 +1,7 @@
- PTS test results for MAP
- 
--PTS version: 5.3
--Tested: 18-November-2014
-+PTS version: 6.0
-+Tested: 11-December-2014
- Android version: 5.0
- 
- Results:
-@@ -65,7 +65,7 @@ TC_MSE_MMB_BV_10_I	PASS
- TC_MSE_MMB_BV_11_I	PASS
- TC_MSE_MMB_BV_20_I	PASS
- TC_MSE_MMB_BV_12_I	N/A
--TC_MSE_MMB_BV_18_I	N/A
-+TC_MSE_MMB_BV_18_I	PASS
- TC_MSE_MMB_BV_13_I	PASS
- TC_MSE_MMB_BV_14_I	PASS
- TC_MSE_MMB_BV_15_I	PASS
--- 
-1.8.5.3
+diff --git a/tools/hciattach_ti.c b/tools/hciattach_ti.c
+index 8322b45..555fe5e 100644
+--- a/tools/hciattach_ti.c
++++ b/tools/hciattach_ti.c
+@@ -124,6 +124,8 @@ static FILE *bts_load_script(const char
+*file_name, uint32_t *version)
+         perror("can't read firmware file");
+         goto errclose;
+     }
++    header.magic = htobl(header.magic);
++    header.version = htobl(header.version);
 
+     if (header.magic != FILE_HEADER_MAGIC) {
+         fprintf(stderr, "%s not a legal TI firmware file\n", file_name);
+@@ -153,6 +155,9 @@ static unsigned long bts_fetch_action(FILE *fp,
+unsigned char *action_buf,
+     if (1 != fread(&action_hdr, sizeof(struct bts_action), 1, fp))
+         return 0;
+
++    action_hdr.type = htobs(action_hdr.type);
++    action_hdr.size = htobs(action_hdr.size);
++
+     if (action_hdr.size > buf_size) {
+         fprintf(stderr, "bts_next_action: not enough space to read
+next action\n");
+         return 0;
+@@ -241,6 +246,7 @@ static int brf_send_command_socket(int fd, struct
+bts_action_send *send_action)
+ {
+     char response[1024] = {0};
+     hci_command_hdr *cmd = (hci_command_hdr *) send_action->data;
++    cmd->opcode = htobs(cmd->opcode);
+     uint16_t opcode = cmd->opcode;
+
+     struct hci_request rq;
+@@ -331,10 +337,13 @@ static int brf_do_action(uint16_t brf_type,
+uint8_t *brf_action, long brf_size,
+         break;
+     case ACTION_SERIAL:
+         DPRINTF("S");
++        ((struct bts_action_serial *) brf_action)->baud =
+htobl(((struct bts_action_serial *) brf_action)->baud);
++        ((struct bts_action_serial *) brf_action)->flow_control =
+htobl(((struct bts_action_serial *) brf_action)->flow_control);
+         ret = brf_set_serial_params((struct bts_action_serial *)
+brf_action, fd, speed, ti);
+         break;
+     case ACTION_DELAY:
+         DPRINTF("D");
++        ((struct bts_action_delay *) brf_action)->msec =
+htobl(((struct bts_action_delay *) brf_action)->msec);
+         brf_delay((struct bts_action_delay *) brf_action);
+         break;
+     case ACTION_REMARKS:
