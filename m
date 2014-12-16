@@ -1,36 +1,79 @@
 Return-Path: <cyrus@holtmann.org>
-From: Marcin Kraglak <marcin.kraglak@tieto.com>
+From: Michael Janssen <jamuraa@chromium.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: Marcin Kraglak <mkraglak@localhost.localdomain>
-Subject: [PATCH] attrib: Fix Read Blob error responses
-Date: Tue, 16 Dec 2014 08:47:25 +0100
-Message-Id: <1418716045-13307-1-git-send-email-marcin.kraglak@tieto.com>
+Cc: Michael Janssen <jamuraa@chromium.org>
+Subject: [PATCH BlueZ 1/5] shared/queue: Add queue_get_entries
+Date: Mon, 15 Dec 2014 17:03:32 -0800
+Message-Id: <1418691816-40271-2-git-send-email-jamuraa@chromium.org>
+In-Reply-To: <1418691816-40271-1-git-send-email-jamuraa@chromium.org>
+References: <1418691816-40271-1-git-send-email-jamuraa@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Marcin Kraglak <mkraglak@localhost.localdomain>
-
-Read blob response with offset equal to value length should return
-zero length value intead of Invalid Offset Error.
-Found during qualification test case TC/GAR/SR/BV-08-C Read behind
-Long Characteristic Descriptor.
+Function which is useful for iterating through entries with complex
+search parameters and terminating the searches early.
 ---
- src/attrib-server.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ src/shared/queue.c | 14 ++++++++------
+ src/shared/queue.h |  8 ++++++++
+ 2 files changed, 16 insertions(+), 6 deletions(-)
 
-diff --git a/src/attrib-server.c b/src/attrib-server.c
-index 6571577..69e6cdc 100644
---- a/src/attrib-server.c
-+++ b/src/attrib-server.c
-@@ -856,7 +856,7 @@ static uint16_t read_blob(struct gatt_channel *channel, uint16_t handle,
+diff --git a/src/shared/queue.c b/src/shared/queue.c
+index a5155e7..ccf2f07 100644
+--- a/src/shared/queue.c
++++ b/src/shared/queue.c
+@@ -28,12 +28,6 @@
+ #include "src/shared/util.h"
+ #include "src/shared/queue.h"
  
- 	a = l->data;
+-struct queue_entry {
+-	int ref_count;
+-	void *data;
+-	struct queue_entry *next;
+-};
+-
+ struct queue {
+ 	int ref_count;
+ 	struct queue_entry *head;
+@@ -401,6 +395,14 @@ unsigned int queue_remove_all(struct queue *queue, queue_match_func_t function,
+ 	return count;
+ }
  
--	if (a->len <= offset)
-+	if (a->len < offset)
- 		return enc_error_resp(ATT_OP_READ_BLOB_REQ, handle,
- 					ATT_ECODE_INVALID_OFFSET, pdu, len);
++const struct queue_entry *queue_get_entries(struct queue *queue)
++{
++	if (!queue)
++		return NULL;
++
++	return queue->head;
++}
++
+ unsigned int queue_length(struct queue *queue)
+ {
+ 	if (!queue)
+diff --git a/src/shared/queue.h b/src/shared/queue.h
+index 602b0ce..0d5a9a5 100644
+--- a/src/shared/queue.h
++++ b/src/shared/queue.h
+@@ -27,6 +27,12 @@ typedef void (*queue_destroy_func_t)(void *data);
  
+ struct queue;
+ 
++struct queue_entry {
++	int ref_count;
++	void *data;
++	struct queue_entry *next;
++};
++
+ struct queue *queue_new(void);
+ void queue_destroy(struct queue *queue, queue_destroy_func_t destroy);
+ 
+@@ -53,5 +59,7 @@ void *queue_remove_if(struct queue *queue, queue_match_func_t function,
+ unsigned int queue_remove_all(struct queue *queue, queue_match_func_t function,
+ 				void *user_data, queue_destroy_func_t destroy);
+ 
++const struct queue_entry *queue_get_entries(struct queue *queue);
++
+ unsigned int queue_length(struct queue *queue);
+ bool queue_isempty(struct queue *queue);
 -- 
-1.9.3
+2.2.0.rc0.207.ga3a616c
 
