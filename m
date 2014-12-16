@@ -1,34 +1,96 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 16 Dec 2014 13:43:30 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Jakub Pawlowski <jpawlowski@google.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v5 1/3] Bluetooth: Add lock for HCI_OP_SCAN_ENABLE command
-Message-ID: <20141216114330.GA4618@t440s.lan>
-References: <1418293574-25095-1-git-send-email-jpawlowski@google.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1418293574-25095-1-git-send-email-jpawlowski@google.com>
+In-Reply-To: <1418290185-4617-1-git-send-email-lukasz.rymanowski@tieto.com>
+References: <1418290185-4617-1-git-send-email-lukasz.rymanowski@tieto.com>
+Date: Tue, 16 Dec 2014 12:11:06 +0100
+Message-ID: <CAMudyAuA+1nKYJ6Mn7CzU_5H8WK33T51LfFxKY54-CbEn=+Lkw@mail.gmail.com>
+Subject: Re: [PATCH v2 1/2] android/gatt: Remove discoverable flag from device
+ found callback
+From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jakub,
+Hi,
 
-On Thu, Dec 11, 2014, Jakub Pawlowski wrote:
-> This patch introduces new lock, that need to be acquired if you want
-> to use HCI_OP_SCAN_ENABLE in a series of request. Next patch introduces
-> le restarting that would have race condition without that.
+On 11 December 2014 at 10:29, Lukasz Rymanowski
+<lukasz.rymanowski@tieto.com> wrote:
+> Android is interested in all of the Scan Responses. Also the ones which
+> are set as non discoverable. It is in order to support
+> Observer\Broadcaster mode. Therefore discoverable flag can be removed
+> from the device found callback. This patch does it.
+> ---
 
-This is not really the way that locks are typically used and will likely
-result in bugs in the long run. Each lock should have a well defined
-piece of data that it protects and the lock/unlock pair should cover a
-clear and contiguous section of code. Neither one of these principles
-seems to fulfilled by your design.
+ping
 
-As an example, your code would be stuck with the lock if you powered off
-the adapter while holding it (since the HCI request callbacks would not
-get called). So you'll need to find a different kind of solution here.
-It seems to me like you're looking for some sort of state tracking,
-which is something locking shouldn't be mixed with.
-
-Johan.
+>  android/bluetooth.c | 5 +----
+>  android/bluetooth.h | 3 +--
+>  android/gatt.c      | 5 ++---
+>  3 files changed, 4 insertions(+), 9 deletions(-)
+>
+> diff --git a/android/bluetooth.c b/android/bluetooth.c
+> index 6443cfe..44bfe4d 100644
+> --- a/android/bluetooth.c
+> +++ b/android/bluetooth.c
+> @@ -1946,12 +1946,9 @@ static void update_found_device(const bdaddr_t *bdaddr, uint8_t bdaddr_type,
+>
+>         /* Notify Gatt if its registered for LE events */
+>         if (bdaddr_type != BDADDR_BREDR && gatt_device_found_cb) {
+> -               bool discoverable;
+>                 bdaddr_t *addr;
+>                 uint8_t addr_type;
+>
+> -               discoverable = eir.flags & (EIR_LIM_DISC | EIR_GEN_DISC);
+> -
+>                 /*
+>                  * If RPA is set it means that IRK was received and ID address
+>                  * is being used. Android Framework is still using old RPA and
+> @@ -1967,7 +1964,7 @@ static void update_found_device(const bdaddr_t *bdaddr, uint8_t bdaddr_type,
+>                 }
+>
+>                 gatt_device_found_cb(addr, addr_type, rssi, data_len, data,
+> -                                               discoverable, dev->le_bonded);
+> +                                                               dev->le_bonded);
+>         }
+>
+>         if (!dev->bredr_paired && !dev->le_paired)
+> diff --git a/android/bluetooth.h b/android/bluetooth.h
+> index 8970559..4b7a70d 100644
+> --- a/android/bluetooth.h
+> +++ b/android/bluetooth.h
+> @@ -42,8 +42,7 @@ void bt_adapter_remove_record(uint32_t handle);
+>
+>  typedef void (*bt_le_device_found)(const bdaddr_t *addr, uint8_t addr_type,
+>                                         int rssi, uint16_t eir_len,
+> -                                       const void *eir, bool discoverable,
+> -                                       bool bonded);
+> +                                       const void *eir, bool bonded);
+>  bool bt_le_register(bt_le_device_found cb);
+>  void bt_le_unregister(void);
+>
+> diff --git a/android/gatt.c b/android/gatt.c
+> index b2ce9c1..519e347 100644
+> --- a/android/gatt.c
+> +++ b/android/gatt.c
+> @@ -1648,15 +1648,14 @@ static void bt_le_discovery_stop_cb(void)
+>
+>  static void le_device_found_handler(const bdaddr_t *addr, uint8_t addr_type,
+>                                                 int rssi, uint16_t eir_len,
+> -                                               const void *eir,
+> -                                               bool discoverable, bool bonded)
+> +                                               const void *eir, bool bonded)
+>  {
+>         uint8_t buf[IPC_MTU];
+>         struct hal_ev_gatt_client_scan_result *ev = (void *) buf;
+>         struct gatt_device *dev;
+>         char bda[18];
+>
+> -       if (!scanning || (!discoverable && !bonded))
+> +       if (!scanning)
+>                 goto connect;
+>
+>         ba2str(addr, bda);
+> --
+> 1.8.4
+>
