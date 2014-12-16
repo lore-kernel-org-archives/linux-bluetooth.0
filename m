@@ -1,28 +1,60 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 16 Dec 2014 14:31:33 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Gowtham Anandha Babu <gowtham.ab@samsung.com>
-Cc: linux-bluetooth@vger.kernel.org, d.kasatkin@samsung.com,
-	bharat.panda@samsung.com, cpgs@samsung.com
-Subject: Re: [PATCH] monitor/l2cap: Fix buffer overflow issue
-Message-ID: <20141216123133.GA9035@t440s.lan>
-References: <1418651954-15378-1-git-send-email-gowtham.ab@samsung.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1418651954-15378-1-git-send-email-gowtham.ab@samsung.com>
+In-Reply-To: <1418646828-15057-1-git-send-email-luiz.dentz@gmail.com>
+References: <1418646828-15057-1-git-send-email-luiz.dentz@gmail.com>
+Date: Tue, 16 Dec 2014 14:28:52 +0200
+Message-ID: <CABBYNZJzMYJdCQj6LCt5jyHgnv=j_81-rigM4mPLYo92XTCPGg@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] build: Fix enabling coverage
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Gowtham,
+Hi,
 
-On Mon, Dec 15, 2014, Gowtham Anandha Babu wrote:
-> String copy function overflows destination buffer.
-> 	strcat(str, "LinkKey ");
-> 	^~~~~~~~~~~~~~~~~~~~~~~
+On Mon, Dec 15, 2014 at 2:33 PM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>
+> Since MISC_FLAGS now checks for enable_coverage to add --coverage flag
+> the check for lcov needs happen before before it otherwise make coverage
+> doesn't work.
 > ---
->  monitor/l2cap.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  configure.ac | 10 +++++-----
+>  1 file changed, 5 insertions(+), 5 deletions(-)
+>
+> diff --git a/configure.ac b/configure.ac
+> index a70d55a..0acd734 100644
+> --- a/configure.ac
+> +++ b/configure.ac
+> @@ -32,6 +32,11 @@ m4_ifdef([AC_LIBTOOL_TAGS], [AC_LIBTOOL_TAGS([])])
+>  AC_DISABLE_STATIC
+>  AC_PROG_LIBTOOL
+>
+> +if (test "$USE_MAINTAINER_MODE" = "yes"); then
+> +       AC_CHECK_PROG(enable_coverage, [lcov], [yes], [no])
+> +fi
+> +AM_CONDITIONAL(COVERAGE, test "${enable_coverage}" = "yes")
+> +
+>  MISC_FLAGS
+>
+>  AC_ARG_ENABLE(threads, AC_HELP_STRING([--enable-threads],
+> @@ -274,9 +279,4 @@ fi
+>  AC_DEFINE_UNQUOTED(ANDROID_STORAGEDIR, "${storagedir}/android",
+>                         [Directory for the Android daemon storage files])
+>
+> -if (test "$USE_MAINTAINER_MODE" = "yes"); then
+> -       AC_CHECK_PROG(enable_coverage, [lcov], [yes], [no])
+> -fi
+> -AM_CONDITIONAL(COVERAGE, test "${enable_coverage}" = "yes")
+> -
+>  AC_OUTPUT(Makefile src/bluetoothd.8 lib/bluez.pc)
+> --
+> 1.9.3
 
-Applied. Thanks.
+Pushed.
 
-Johan
+
+-- 
+Luiz Augusto von Dentz
