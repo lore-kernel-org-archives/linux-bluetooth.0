@@ -1,105 +1,49 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Wed, 17 Dec 2014 22:09:22 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth: Fix bug with filter in service discovery
+ optimization
+Message-ID: <20141217200922.GA11039@t440s.P-661HNU-F1>
+References: <1418836688-77018-1-git-send-email-marcel@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <CAHrH25R4x5+3nVfSgY+mmDSD=_ANOmzE_SAwwV17+qXhurW__Q@mail.gmail.com>
-References: <1418782038-10999-1-git-send-email-armansito@chromium.org>
-	<1418782038-10999-7-git-send-email-armansito@chromium.org>
-	<CABBYNZLWYxDJQ3P=80OVMZpgqD0LV0ihW2VGAnthNevYGJPfOg@mail.gmail.com>
-	<CAHrH25R4x5+3nVfSgY+mmDSD=_ANOmzE_SAwwV17+qXhurW__Q@mail.gmail.com>
-Date: Wed, 17 Dec 2014 18:19:36 -0200
-Message-ID: <CABBYNZLG_swsQt0jBqb4YXZ4q_TSmNYeTqRVH_et1W+jQG+HWQ@mail.gmail.com>
-Subject: Re: [PATCH BlueZ v4 06/10] core: device: Add getters for GATT db and client
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Arman Uguray <armansito@chromium.org>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=utf-8
+In-Reply-To: <1418836688-77018-1-git-send-email-marcel@holtmann.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Arman,
+Hi Marcel,
 
-On Wed, Dec 17, 2014 at 3:45 PM, Arman Uguray <armansito@chromium.org> wrote:
-> Hi Luiz,
->
->> On Wed, Dec 17, 2014 at 4:39 AM, Luiz Augusto von Dentz <luiz.dentz@gmail.com> wrote:
->> Hi Arman,
->>
->> On Wed, Dec 17, 2014 at 4:07 AM, Arman Uguray <armansito@chromium.org> wrote:
->>> This patch adds btd_device_get_gatt_db and btd_device_get_gatt_client
->>> functions.
->>> ---
->>>  src/device.c | 16 ++++++++++++++++
->>>  src/device.h |  2 ++
->>>  2 files changed, 18 insertions(+)
->>>
->>> diff --git a/src/device.c b/src/device.c
->>> index 64591d0..854d9f3 100644
->>> --- a/src/device.c
->>> +++ b/src/device.c
->>> @@ -4844,6 +4844,22 @@ GSList *btd_device_get_primaries(struct btd_device *device)
->>>         return device->primaries;
->>>  }
->>>
->>> +struct gatt_db *btd_device_get_gatt_db(struct btd_device *device)
->>> +{
->>> +       if (!device)
->>> +               return NULL;
->>> +
->>> +       return device->db;
->>> +}
->>
->> I guess the db can be get from the gatt_client, also perhaps we should
->> return a reference otherwise it should be const.
->>
->
-> I think I'll keep this getter but make things const. My idea here is
-> that the gatt_db will outlive the connection and if the device is
-> bonded it won't get cleared. So it might still be useful.
+On Wed, Dec 17, 2014, Marcel Holtmann wrote:
+> The optimization for filtering out extended inquiry results, advertising
+> reports or scan response data based on provided UUID list has a logic
+> bug. In case no match is found in the advertising data, the scan
+> response is ignored and not checked against the filter. This will lead
+> to events being filtered wrongly.
+> 
+> Change the code to actually only drop the events when the scan response
+> data is not present. If it is present, it needs to be checked against
+> the provided filter.
+> 
+> The patch is a bit more complex than it needs to be. That is because
+> it also fixes this compiler warning that some gcc versions produce.
+> 
+>   CC      net/bluetooth/mgmt.o
+> net/bluetooth/mgmt.c: In function ‘mgmt_device_found’:
+> net/bluetooth/mgmt.c:7028:7: warning: ‘match’ may be used uninitialized in this function [-Wmaybe-uninitialized]
+>   bool match;
+>        ^
+> 
+> It seems that gcc can not clearly figure out the context of the match
+> variable. So just change the branches for the extended inquiry response
+> and advertising data around so that it is clear.
+> 
+> Reported-by: Geert Uytterhoeven <geert@linux-m68k.org>
+> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+> ---
+>  net/bluetooth/mgmt.c | 14 +++++++++-----
+>  1 file changed, 9 insertions(+), 5 deletions(-)
 
-Sure no problem, Im just not sure if the driver would be interested in
-the db without the client and as it is const it should not be possible
-to register callbacks, actually const for the client perhaps is not a
-good idea either for the same reason.
+Applied to the bluetooth.git tree. Thanks.
 
->>> +struct bt_gatt_client *btd_device_get_gatt_client(struct btd_device *device)
->>> +{
->>> +       if (!device)
->>> +               return NULL;
->>> +
->>> +       return device->client;
->>> +}
->>> +
->>>  void btd_device_gatt_set_service_changed(struct btd_device *device,
->>>                                                 uint16_t start, uint16_t end)
->>>  {
->>> diff --git a/src/device.h b/src/device.h
->>> index 487bd27..a7fefee 100644
->>> --- a/src/device.h
->>> +++ b/src/device.h
->>> @@ -67,6 +67,8 @@ const sdp_record_t *btd_device_get_record(struct btd_device *device,
->>>  struct gatt_primary *btd_device_get_primary(struct btd_device *device,
->>>                                                         const char *uuid);
->>>  GSList *btd_device_get_primaries(struct btd_device *device);
->>> +struct gatt_db *btd_device_get_gatt_db(struct btd_device *device);
->>> +struct bt_gatt_client *btd_device_get_gatt_client(struct btd_device *device);
->>>  void btd_device_gatt_set_service_changed(struct btd_device *device,
->>>                                                 uint16_t start, uint16_t end);
->>>  bool device_attach_att(struct btd_device *dev, GIOChannel *io);
->>> --
->>> 2.2.0.rc0.207.ga3a616c
->>>
->>> --
->>> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
->>> the body of a message to majordomo@vger.kernel.org
->>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->>
->>
->>
->> --
->> Luiz Augusto von Dentz
->
-> Arman
-
-
-
--- 
-Luiz Augusto von Dentz
+Johan
