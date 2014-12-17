@@ -1,34 +1,63 @@
 Return-Path: <cyrus@holtmann.org>
-From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
+From: Gowtham Anandha Babu <gowtham.ab@samsung.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFC] android/map-client: Don't check if interface is ready on init
-Date: Wed, 17 Dec 2014 11:58:15 +0100
-Message-Id: <1418813900-29056-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+Cc: d.kasatkin@samsung.com, bharat.panda@samsung.com, cpgs@samsung.com,
+	Gowtham Anandha Babu <gowtham.ab@samsung.com>
+Subject: [PATCH] monitor/rfcomm: Add support for decoding Test command
+Date: Wed, 17 Dec 2014 15:22:41 +0530
+Message-id: <1418809961-28354-1-git-send-email-gowtham.ab@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Map client don't have possibility to clean up its interface, only way to
-change it is to overwrite. Service also can be unregistered but
-interface doesn't change. This situation cause call to unregistered
-service with set interface.
+          RFCOMM: Unnumbered Info with Header Check (UIH)(0xef)
+             Address: 0x01 cr 0 dlci 0x00
+             Control: 0xef poll/final 0
+             Length: 6
+             FCS: 0xaa
+             MCC Message type: Test Command RSP(0x08)
+               Length: 4
+               Test Data: 0x 5f 54 65 73
 ---
- android/hal-map-client.c | 3 ---
- 1 file changed, 3 deletions(-)
+ monitor/rfcomm.c | 19 +++++++++++++++++++
+ 1 file changed, 19 insertions(+)
 
-diff --git a/android/hal-map-client.c b/android/hal-map-client.c
-index 6c927d4..6fbf894 100644
---- a/android/hal-map-client.c
-+++ b/android/hal-map-client.c
-@@ -119,9 +119,6 @@ static bt_status_t init(btmce_callbacks_t *callbacks)
+diff --git a/monitor/rfcomm.c b/monitor/rfcomm.c
+index 7d22fa0..be215a1 100644
+--- a/monitor/rfcomm.c
++++ b/monitor/rfcomm.c
+@@ -146,6 +146,23 @@ static void print_rfcomm_hdr(struct rfcomm_frame *rfcomm_frame, uint8_t indent)
+ 	print_field("%*cFCS: 0x%2.2x", indent, ' ', hdr.fcs);
+ }
  
- 	DBG("");
++static inline bool mcc_test(struct rfcomm_frame *rfcomm_frame, uint8_t indent)
++{
++	struct l2cap_frame *frame = &rfcomm_frame->l2cap_frame;
++	uint8_t data;
++
++	printf("%*cTest Data: 0x ", indent, ' ');
++
++	while (frame->size > 1) {
++		if (!l2cap_frame_get_u8(frame, &data))
++			return false;
++		printf("%2.2x ", data);
++	}
++
++	printf("\n");
++	return true;
++}
++
+ static inline bool mcc_msc(struct rfcomm_frame *rfcomm_frame, uint8_t indent)
+ {
+ 	struct l2cap_frame *frame = &rfcomm_frame->l2cap_frame;
+@@ -358,6 +375,8 @@ static inline bool mcc_frame(struct rfcomm_frame *rfcomm_frame, uint8_t indent)
+ 	rfcomm_frame->mcc = mcc;
  
--	if (interface_ready())
--		return BT_STATUS_DONE;
--
- 	cbs = callbacks;
- 
- 	hal_ipc_register(HAL_SERVICE_ID_MAP_CLIENT, ev_handlers,
+ 	switch (type) {
++	case RFCOMM_TEST:
++		return mcc_test(rfcomm_frame, indent+10);
+ 	case RFCOMM_MSC:
+ 		return mcc_msc(rfcomm_frame, indent+2);
+ 	case RFCOMM_RPN:
 -- 
-1.9.3
+1.9.1
 
