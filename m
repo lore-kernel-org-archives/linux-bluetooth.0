@@ -2,30 +2,29 @@ Return-Path: <cyrus@holtmann.org>
 From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH v2 11/19] android/hog: Keep track on read/write char and descr
-Date: Wed, 17 Dec 2014 16:49:09 +0100
-Message-Id: <1418831357-23100-12-git-send-email-lukasz.rymanowski@tieto.com>
+Subject: [PATCH v2 10/19] android/hog: Keep track on discover characteristic and descriptors
+Date: Wed, 17 Dec 2014 16:49:08 +0100
+Message-Id: <1418831357-23100-11-git-send-email-lukasz.rymanowski@tieto.com>
 In-Reply-To: <1418831357-23100-1-git-send-email-lukasz.rymanowski@tieto.com>
 References: <1418831357-23100-1-git-send-email-lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- android/hog.c | 111 +++++++++++++++++++++++++++++++++++++++++++++++-----------
- 1 file changed, 91 insertions(+), 20 deletions(-)
+ android/hog.c | 93 +++++++++++++++++++++++++++++++++++++++++++++++------------
+ 1 file changed, 74 insertions(+), 19 deletions(-)
 
 diff --git a/android/hog.c b/android/hog.c
-index 766b66a..bb770c8 100644
+index 66b117d..766b66a 100644
 --- a/android/hog.c
 +++ b/android/hog.c
 @@ -147,6 +147,48 @@ static void destroy_gatt_req(struct gatt_request *req)
  	free(req);
  }
  
-+static void write_char(struct bt_hog *hog, GAttrib *attrib, uint16_t handle,
-+					const uint8_t *value, size_t vlen,
-+					GAttribResultFunc func,
-+					gpointer user_data)
++static void discover_desc(struct bt_hog *hog, GAttrib *attrib,
++				uint16_t start, uint16_t end, gatt_cb_t func,
++				gpointer user_data)
 +{
 +	struct gatt_request *req;
 +	unsigned int id;
@@ -34,18 +33,19 @@ index 766b66a..bb770c8 100644
 +	if (!req)
 +		return;
 +
-+	id = gatt_write_char(attrib, handle, value, vlen, func, req);
-+
++	id = gatt_discover_desc(attrib, start, end, NULL, func, req);
 +	if (set_and_store_gatt_req(hog, req, id))
 +		return;
 +
-+	error("hog: Could not read char");
++	error("hog: Could not discover descriptors");
 +	g_attrib_cancel(attrib, id);
 +	free(req);
 +}
 +
-+static void read_char(struct bt_hog *hog, GAttrib *attrib, uint16_t handle,
-+				GAttribResultFunc func, gpointer user_data)
++static void discover_char(struct bt_hog *hog, GAttrib *attrib,
++						uint16_t start, uint16_t end,
++						bt_uuid_t *uuid, gatt_cb_t func,
++						gpointer user_data)
 +{
 +	struct gatt_request *req;
 +	unsigned int id;
@@ -54,22 +54,59 @@ index 766b66a..bb770c8 100644
 +	if (!req)
 +		return;
 +
-+	id = gatt_read_char(attrib, handle, func, req);
++	id = gatt_discover_char(attrib, start, end, uuid, func, req);
 +
 +	if (set_and_store_gatt_req(hog, req, id))
 +		return;
 +
-+	error("hog: Could not read char");
++	error("hog: Could not discover characteristic");
 +	g_attrib_cancel(attrib, id);
 +	free(req);
 +}
 +
- static void discover_desc(struct bt_hog *hog, GAttrib *attrib,
- 				uint16_t start, uint16_t end, gatt_cb_t func,
- 				gpointer user_data)
-@@ -274,9 +316,12 @@ static void report_value_cb(const guint8 *pdu, guint16 len, gpointer user_data)
- static void report_ccc_written_cb(guint8 status, const guint8 *pdu,
- 					guint16 plen, gpointer user_data)
+ static void discover_primary(struct bt_hog *hog, GAttrib *attrib,
+ 						bt_uuid_t *uuid, gatt_cb_t func,
+ 						gpointer user_data)
+@@ -303,7 +345,10 @@ static void external_report_reference_cb(guint8 status, const guint8 *pdu,
+ 
+ static void discover_external_cb(uint8_t status, GSList *descs, void *user_data)
+ {
+-	struct bt_hog *hog = user_data;
++	struct gatt_request *req = user_data;
++	struct bt_hog *hog = req->user_data;
++
++	destroy_gatt_req(req);
+ 
+ 	if (status != 0) {
+ 		error("Discover external descriptors failed: %s",
+@@ -315,12 +360,14 @@ static void discover_external_cb(uint8_t status, GSList *descs, void *user_data)
+ 		struct gatt_desc *desc = descs->data;
+ 
+ 		gatt_read_char(hog->attrib, desc->handle,
+-					external_report_reference_cb, hog);
++						external_report_reference_cb,
++						hog);
+ 	}
+ }
+ 
+-static void discover_external(GAttrib *attrib, uint16_t start, uint16_t end,
+-							gpointer user_data)
++static void discover_external(struct bt_hog *hog, GAttrib *attrib,
++						uint16_t start, uint16_t end,
++						gpointer user_data)
+ {
+ 	bt_uuid_t uuid;
+ 
+@@ -329,15 +376,18 @@ static void discover_external(GAttrib *attrib, uint16_t start, uint16_t end,
+ 
+ 	bt_uuid16_create(&uuid, GATT_EXTERNAL_REPORT_REFERENCE);
+ 
+-	gatt_discover_desc(attrib, start, end, NULL, discover_external_cb,
++	discover_desc(hog, attrib, start, end, discover_external_cb,
+ 								user_data);
+ }
+ 
+ static void discover_report_cb(uint8_t status, GSList *descs, void *user_data)
  {
 -	struct report *report = user_data;
 +	struct gatt_request *req = user_data;
@@ -79,219 +116,124 @@ index 766b66a..bb770c8 100644
 +	destroy_gatt_req(req);
 +
  	if (status != 0) {
- 		error("Write report characteristic descriptor failed: %s",
+ 		error("Discover report descriptors failed: %s",
  							att_ecode2str(status));
-@@ -291,33 +336,40 @@ static void report_ccc_written_cb(guint8 status, const guint8 *pdu,
- 	DBG("Report characteristic descriptor written: notifications enabled");
+@@ -359,14 +409,14 @@ static void discover_report_cb(uint8_t status, GSList *descs, void *user_data)
+ 	}
  }
  
--static void write_ccc(GAttrib *attrib, uint16_t handle, void *user_data)
-+static void write_ccc(struct bt_hog *hog, GAttrib *attrib, uint16_t handle,
-+							void *user_data)
- {
- 	uint8_t value[2];
- 
- 	put_le16(GATT_CLIENT_CHARAC_CFG_NOTIF_BIT, value);
- 
--	gatt_write_char(attrib, handle, value, sizeof(value),
-+	write_char(hog, attrib, handle, value, sizeof(value),
- 					report_ccc_written_cb, user_data);
- }
- 
- static void ccc_read_cb(guint8 status, const guint8 *pdu, guint16 len,
+-static void discover_report(GAttrib *attrib, uint16_t start, uint16_t end,
++static void discover_report(struct bt_hog *hog, GAttrib *attrib,
++						uint16_t start, uint16_t end,
  							gpointer user_data)
  {
--	struct report *report = user_data;
-+	struct gatt_request *req = user_data;
-+	struct report *report = req->user_data;
-+
-+	destroy_gatt_req(req);
- 
- 	if (status != 0) {
- 		error("Error reading CCC value: %s", att_ecode2str(status));
+ 	if (start > end)
  		return;
- 	}
  
--	write_ccc(report->hog->attrib, report->ccc_handle, report);
-+	write_ccc(report->hog, report->hog->attrib, report->ccc_handle, report);
+-	gatt_discover_desc(attrib, start, end, NULL, discover_report_cb,
+-								user_data);
++	discover_desc(hog, attrib, start, end, discover_report_cb, user_data);
  }
  
- static void report_reference_cb(guint8 status, const guint8 *pdu,
- 					guint16 plen, gpointer user_data)
- {
--	struct report *report = user_data;
-+	struct gatt_request *req = user_data;
-+	struct report *report = req->user_data;
-+
-+	destroy_gatt_req(req);
- 
- 	if (status != 0) {
- 		error("Read Report Reference descriptor failed: %s",
-@@ -336,7 +388,7 @@ static void report_reference_cb(guint8 status, const guint8 *pdu,
- 
- 	/* Enable notifications only for Input Reports */
- 	if (report->type == HOG_REPORT_TYPE_INPUT)
--		gatt_read_char(report->hog->attrib, report->ccc_handle,
-+		read_char(report->hog, report->hog->attrib, report->ccc_handle,
- 							ccc_read_cb, report);
- }
- 
-@@ -359,7 +411,7 @@ static void discover_external_cb(uint8_t status, GSList *descs, void *user_data)
- 	for ( ; descs; descs = descs->next) {
- 		struct gatt_desc *desc = descs->data;
- 
--		gatt_read_char(hog->attrib, desc->handle,
-+		read_char(hog, hog->attrib, desc->handle,
- 						external_report_reference_cb,
- 						hog);
- 	}
-@@ -402,7 +454,7 @@ static void discover_report_cb(uint8_t status, GSList *descs, void *user_data)
- 			report->ccc_handle = desc->handle;
- 			break;
- 		case GATT_REPORT_REFERENCE:
--			gatt_read_char(hog->attrib, desc->handle,
-+			read_char(hog, hog->attrib, desc->handle,
- 						report_reference_cb, report);
- 			break;
- 		}
-@@ -422,7 +474,10 @@ static void discover_report(struct bt_hog *hog, GAttrib *attrib,
  static void report_read_cb(guint8 status, const guint8 *pdu, guint16 len,
- 							gpointer user_data)
+@@ -403,11 +453,14 @@ static struct report *report_new(struct bt_hog *hog, struct gatt_char *chr)
+ static void external_service_char_cb(uint8_t status, GSList *chars,
+ 								void *user_data)
  {
--	struct report *report = user_data;
+-	struct bt_hog *hog = user_data;
 +	struct gatt_request *req = user_data;
-+	struct report *report = req->user_data;
-+
++	struct bt_hog *hog = req->user_data;
+ 	struct gatt_primary *primary = hog->primary;
+ 	struct report *report;
+ 	GSList *l;
+ 
 +	destroy_gatt_req(req);
- 
++
  	if (status != 0) {
- 		error("Error reading Report value: %s", att_ecode2str(status));
-@@ -445,7 +500,7 @@ static struct report *report_new(struct bt_hog *hog, struct gatt_char *chr)
- 	report->decl = g_memdup(chr, sizeof(*chr));
- 	hog->reports = g_slist_append(hog->reports, report);
- 
--	gatt_read_char(hog->attrib, chr->value_handle, report_read_cb, report);
-+	read_char(hog, hog->attrib, chr->value_handle, report_read_cb, report);
- 
- 	return report;
+ 		const char *str = att_ecode2str(status);
+ 		DBG("Discover external service characteristic failed: %s", str);
+@@ -427,7 +480,7 @@ static void external_service_char_cb(uint8_t status, GSList *chars,
+ 		report = report_new(hog, chr);
+ 		start = chr->value_handle + 1;
+ 		end = (next ? next->handle - 1 : primary->range.end);
+-		discover_report(hog->attrib, start, end, report);
++		discover_report(hog, hog->attrib, start, end, report);
+ 	}
  }
-@@ -487,10 +542,13 @@ static void external_service_char_cb(uint8_t status, GSList *chars,
- static void external_report_reference_cb(guint8 status, const guint8 *pdu,
- 					guint16 plen, gpointer user_data)
- {
--	struct bt_hog *hog = user_data;
-+	struct gatt_request *req = user_data;
-+	struct bt_hog *hog = req->user_data;
- 	uint16_t uuid16;
- 	bt_uuid_t uuid;
  
-+	destroy_gatt_req(req);
-+
- 	if (status != 0) {
- 		error("Read External Report Reference descriptor failed: %s",
- 							att_ecode2str(status));
-@@ -547,6 +605,10 @@ static struct report *find_report(struct bt_hog *hog, uint8_t type, uint8_t id)
- static void output_written_cb(guint8 status, const guint8 *pdu,
- 					guint16 plen, gpointer user_data)
- {
-+	struct gatt_request *req = user_data;
-+
-+	destroy_gatt_req(req);
-+
- 	if (status != 0) {
- 		error("Write output report failed: %s", att_ecode2str(status));
- 		return;
-@@ -593,7 +655,7 @@ static void forward_report(struct uhid_event *ev, void *user_data)
+@@ -458,11 +511,10 @@ static void external_report_reference_cb(guint8 status, const guint8 *pdu,
  		return;
  
- 	if (report->decl->properties & GATT_CHR_PROP_WRITE)
--		gatt_write_char(hog->attrib, report->decl->value_handle,
-+		write_char(hog, hog->attrib, report->decl->value_handle,
- 				data, size, output_written_cb, hog);
- 	else if (report->decl->properties & GATT_CHR_PROP_WRITE_WITHOUT_RESP)
- 		gatt_write_cmd(hog->attrib, report->decl->value_handle,
-@@ -696,7 +758,8 @@ static char *item2string(char *str, uint8_t *buf, uint8_t len)
- static void report_map_read_cb(guint8 status, const guint8 *pdu, guint16 plen,
- 							gpointer user_data)
+ 	bt_uuid16_create(&uuid, uuid16);
+-	gatt_discover_char(hog->attrib, 0x0001, 0xffff, &uuid,
++	discover_char(hog, hog->attrib, 0x0001, 0xffff, &uuid,
+ 					external_service_char_cb, hog);
+ }
+ 
+-
+ static int report_cmp(gconstpointer a, gconstpointer b)
+ {
+ 	const struct report *ra = a, *rb = b;
+@@ -778,7 +830,8 @@ static void proto_mode_read_cb(guint8 status, const guint8 *pdu, guint16 plen,
+ 
+ static void char_discovered_cb(uint8_t status, GSList *chars, void *user_data)
  {
 -	struct bt_hog *hog = user_data;
 +	struct gatt_request *req = user_data;
 +	struct bt_hog *hog = req->user_data;
- 	uint8_t value[HOG_REPORT_MAP_MAX_SIZE];
- 	struct uhid_event ev;
- 	ssize_t vlen;
-@@ -704,6 +767,8 @@ static void report_map_read_cb(guint8 status, const guint8 *pdu, guint16 plen,
- 	int i, err;
- 	GError *gerr = NULL;
+ 	struct gatt_primary *primary = hog->primary;
+ 	bt_uuid_t report_uuid, report_map_uuid, info_uuid;
+ 	bt_uuid_t proto_mode_uuid, ctrlpt_uuid;
+@@ -786,6 +839,8 @@ static void char_discovered_cb(uint8_t status, GSList *chars, void *user_data)
+ 	GSList *l;
+ 	uint16_t info_handle = 0, proto_mode_handle = 0;
  
 +	destroy_gatt_req(req);
 +
  	if (status != 0) {
- 		error("Report Map read failed: %s", att_ecode2str(status));
- 		return;
-@@ -774,10 +839,13 @@ static void report_map_read_cb(guint8 status, const guint8 *pdu, guint16 plen,
- static void info_read_cb(guint8 status, const guint8 *pdu, guint16 plen,
- 							gpointer user_data)
- {
--	struct bt_hog *hog = user_data;
-+	struct gatt_request *req = user_data;
-+	struct bt_hog *hog = req->user_data;
- 	uint8_t value[HID_INFO_SIZE];
- 	ssize_t vlen;
+ 		const char *str = att_ecode2str(status);
+ 		DBG("Discover all characteristics failed: %s", str);
+@@ -816,11 +871,11 @@ static void char_discovered_cb(uint8_t status, GSList *chars, void *user_data)
  
-+	destroy_gatt_req(req);
-+
- 	if (status != 0) {
- 		error("HID Information read failed: %s",
- 						att_ecode2str(status));
-@@ -801,10 +869,13 @@ static void info_read_cb(guint8 status, const guint8 *pdu, guint16 plen,
- static void proto_mode_read_cb(guint8 status, const guint8 *pdu, guint16 plen,
- 							gpointer user_data)
- {
--	struct bt_hog *hog = user_data;
-+	struct gatt_request *req = user_data;
-+	struct bt_hog *hog = req->user_data;
- 	uint8_t value;
- 	ssize_t vlen;
- 
-+	destroy_gatt_req(req);
-+
- 	if (status != 0) {
- 		error("Protocol Mode characteristic read failed: %s",
- 							att_ecode2str(status));
-@@ -873,7 +944,7 @@ static void char_discovered_cb(uint8_t status, GSList *chars, void *user_data)
+ 		if (bt_uuid_cmp(&uuid, &report_uuid) == 0) {
  			report = report_new(hog, chr);
- 			discover_report(hog, hog->attrib, start, end, report);
+-			discover_report(hog->attrib, start, end, report);
++			discover_report(hog, hog->attrib, start, end, report);
  		} else if (bt_uuid_cmp(&uuid, &report_map_uuid) == 0) {
--			gatt_read_char(hog->attrib, chr->value_handle,
-+			read_char(hog, hog->attrib, chr->value_handle,
+ 			gatt_read_char(hog->attrib, chr->value_handle,
  						report_map_read_cb, hog);
- 			discover_external(hog, hog->attrib, start, end, hog);
+-			discover_external(hog->attrib, start, end, hog);
++			discover_external(hog, hog->attrib, start, end, hog);
  		} else if (bt_uuid_cmp(&uuid, &info_uuid) == 0)
-@@ -886,12 +957,12 @@ static void char_discovered_cb(uint8_t status, GSList *chars, void *user_data)
+ 			info_handle = chr->value_handle;
+ 		else if (bt_uuid_cmp(&uuid, &proto_mode_uuid) == 0)
+@@ -975,7 +1030,7 @@ static void find_included_cb(uint8_t status, GSList *services, void *user_data)
+ 	memcpy(hog->primary->uuid, include->uuid, sizeof(include->uuid));
+ 	memcpy(&hog->primary->range, &include->range, sizeof(include->range));
  
- 	if (proto_mode_handle) {
- 		hog->proto_mode_handle = proto_mode_handle;
--		gatt_read_char(hog->attrib, proto_mode_handle,
-+		read_char(hog, hog->attrib, proto_mode_handle,
- 						proto_mode_read_cb, hog);
+-	gatt_discover_char(hog->attrib, hog->primary->range.start,
++	discover_char(hog, hog->attrib, hog->primary->range.start,
+ 						hog->primary->range.end, NULL,
+ 						char_discovered_cb, hog);
+ }
+@@ -1034,7 +1089,7 @@ static void hog_attach_hog(struct bt_hog *hog, struct gatt_primary *primary)
+ 
+ 	if (!hog->primary) {
+ 		hog->primary = g_memdup(primary, sizeof(*primary));
+-		gatt_discover_char(hog->attrib, primary->range.start,
++		discover_char(hog, hog->attrib, primary->range.start,
+ 						primary->range.end, NULL,
+ 						char_discovered_cb, hog);
+ 		return;
+@@ -1135,7 +1190,7 @@ bool bt_hog_attach(struct bt_hog *hog, void *gatt)
  	}
  
- 	if (info_handle)
--		gatt_read_char(hog->attrib, info_handle, info_read_cb, hog);
-+		read_char(hog, hog->attrib, info_handle, info_read_cb, hog);
- }
- 
- static void report_free(void *data)
-@@ -1278,7 +1349,7 @@ int bt_hog_send_report(struct bt_hog *hog, void *data, size_t size, int type)
- 	DBG("hog: Write report, handle 0x%X", report->decl->value_handle);
- 
- 	if (report->decl->properties & GATT_CHR_PROP_WRITE)
--		gatt_write_char(hog->attrib, report->decl->value_handle,
-+		write_char(hog, hog->attrib, report->decl->value_handle,
- 				data, size, output_written_cb, hog);
- 
- 	if (report->decl->properties & GATT_CHR_PROP_WRITE_WITHOUT_RESP)
+ 	if (hog->reports == NULL) {
+-		gatt_discover_char(hog->attrib, primary->range.start,
++		discover_char(hog, hog->attrib, primary->range.start,
+ 						primary->range.end, NULL,
+ 						char_discovered_cb, hog);
+ 		return true;
 -- 
 1.8.4
 
