@@ -1,90 +1,54 @@
 Return-Path: <cyrus@holtmann.org>
 From: Gowtham Anandha Babu <gowtham.ab@samsung.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: d.kasatkin@samsung.com, bharat.panda@samsung.com, cpgs@samsung.com
-References: <1418809961-28354-1-git-send-email-gowtham.ab@samsung.com>
-In-reply-to: <1418809961-28354-1-git-send-email-gowtham.ab@samsung.com>
-Subject: RE: [PATCH] monitor/rfcomm: Add support for decoding Test command
-Date: Wed, 17 Dec 2014 17:31:32 +0530
-Message-id: <000501d019f1$443178d0$cc946a70$@samsung.com>
-MIME-version: 1.0
-Content-type: text/plain; charset=us-ascii
+Cc: d.kasatkin@samsung.com, bharat.panda@samsung.com, cpgs@samsung.com,
+	Gowtham Anandha Babu <gowtham.ab@samsung.com>
+Subject: [PATCH 2/2] parser/rfcomm: Add support for decoding Test command
+Date: Wed, 17 Dec 2014 17:29:45 +0530
+Message-id: <1418817585-26816-3-git-send-email-gowtham.ab@samsung.com>
+In-reply-to: <1418817585-26816-1-git-send-email-gowtham.ab@samsung.com>
+References: <1418817585-26816-1-git-send-email-gowtham.ab@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi, 
+< ACL data: handle 75 flags 0x00 dlen 14
+    L2CAP(d): cid 0x0040 len 10 [psm 3]
+      RFCOMM(s): TEST RSP: cr 0 dlci 0 pf 0 ilen 6 fcs 0xaa mcc_len 4
+        Test data: 0x 5f 54 65 73
+---
+ tools/parser/rfcomm.c | 12 +++++++++++-
+ 1 file changed, 11 insertions(+), 1 deletion(-)
 
-> -----Original Message-----
-> From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-
-> owner@vger.kernel.org] On Behalf Of Gowtham Anandha Babu
-> Sent: Wednesday, December 17, 2014 3:23 PM
-> To: linux-bluetooth@vger.kernel.org
-> Cc: d.kasatkin@samsung.com; bharat.panda@samsung.com;
-> cpgs@samsung.com; Gowtham Anandha Babu
-> Subject: [PATCH] monitor/rfcomm: Add support for decoding Test command
-> 
->           RFCOMM: Unnumbered Info with Header Check (UIH)(0xef)
->              Address: 0x01 cr 0 dlci 0x00
->              Control: 0xef poll/final 0
->              Length: 6
->              FCS: 0xaa
->              MCC Message type: Test Command RSP(0x08)
->                Length: 4
->                Test Data: 0x 5f 54 65 73
-> ---
->  monitor/rfcomm.c | 19 +++++++++++++++++++
->  1 file changed, 19 insertions(+)
-> 
-> diff --git a/monitor/rfcomm.c b/monitor/rfcomm.c index 7d22fa0..be215a1
-> 100644
-> --- a/monitor/rfcomm.c
-> +++ b/monitor/rfcomm.c
-> @@ -146,6 +146,23 @@ static void print_rfcomm_hdr(struct rfcomm_frame
-> *rfcomm_frame, uint8_t indent)
->  	print_field("%*cFCS: 0x%2.2x", indent, ' ', hdr.fcs);  }
-> 
-> +static inline bool mcc_test(struct rfcomm_frame *rfcomm_frame, uint8_t
-> +indent) {
-> +	struct l2cap_frame *frame = &rfcomm_frame->l2cap_frame;
-> +	uint8_t data;
-> +
-> +	printf("%*cTest Data: 0x ", indent, ' ');
-> +
-> +	while (frame->size > 1) {
-> +		if (!l2cap_frame_get_u8(frame, &data))
-> +			return false;
-> +		printf("%2.2x ", data);
-> +	}
-> +
-> +	printf("\n");
-> +	return true;
-> +}
-> +
->  static inline bool mcc_msc(struct rfcomm_frame *rfcomm_frame, uint8_t
-> indent)  {
->  	struct l2cap_frame *frame = &rfcomm_frame->l2cap_frame; @@ -
-> 358,6 +375,8 @@ static inline bool mcc_frame(struct rfcomm_frame
-> *rfcomm_frame, uint8_t indent)
->  	rfcomm_frame->mcc = mcc;
-> 
->  	switch (type) {
-> +	case RFCOMM_TEST:
-> +		return mcc_test(rfcomm_frame, indent+10);
->  	case RFCOMM_MSC:
->  		return mcc_msc(rfcomm_frame, indent+2);
->  	case RFCOMM_RPN:
-> --
-> 1.9.1
-> 
-
-Please ignore this one, I have uploaded a new set.
-
-Regards,
-Gowtham Anandha Babu
-
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth"
-in
-> the body of a message to majordomo@vger.kernel.org More majordomo
-> info at  http://vger.kernel.org/majordomo-info.html
+diff --git a/tools/parser/rfcomm.c b/tools/parser/rfcomm.c
+index acf8d66..ea8dfad 100644
+--- a/tools/parser/rfcomm.c
++++ b/tools/parser/rfcomm.c
+@@ -69,6 +69,17 @@ static inline void mcc_test(int level, uint8_t *ptr, int len,
+ 	printf("TEST %s: ", CR_STR(mcc_head));
+ 	print_rfcomm_hdr(head, ptr, len);
+ 	print_mcc(mcc_head);
++
++	p_indent(level, 0);
++	printf("%*cTest data: 0x ", level, ' ');
++
++	while (len > 1) {
++		printf("%2.2x ", (uint8_t)*ptr);
++		len--;
++		ptr++;
++	}
++
++	printf("\n");
+ }
+ static inline void mcc_fcon(int level, uint8_t *ptr, int len,
+ 				long_frame_head *head, mcc_long_frame_head *mcc_head)
+@@ -208,7 +219,6 @@ static inline void mcc_frame(int level, struct frame *frm, long_frame_head *head
+ 	switch (mcc_head.type.type) {
+ 	case TEST:
+ 		mcc_test(level, frm->ptr, frm->len, head, &mcc_head);
+-		raw_dump(level, frm); 
+ 		break;
+ 	case FCON:
+ 		mcc_fcon(level, frm->ptr, frm->len, head, &mcc_head);
+-- 
+1.9.1
 
