@@ -1,43 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
 From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 4/5] android/tester: Set action status to fail if no l2cap data is given
-Date: Wed, 17 Dec 2014 11:58:19 +0100
-Message-Id: <1418813900-29056-5-git-send-email-grzegorz.kolodziejczyk@tieto.com>
-In-Reply-To: <1418813900-29056-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
-References: <1418813900-29056-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+Subject: [RFC] android/map-client: Don't check if interface is ready on init
+Date: Wed, 17 Dec 2014 11:58:15 +0100
+Message-Id: <1418813900-29056-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-No status set in zeroized step mean that this status is SUCCESS (value
-0). If no data is present while setting l2cap server, status should be
-set to FAIL.
+Map client don't have possibility to clean up its interface, only way to
+change it is to overwrite. Service also can be unregistered but
+interface doesn't change. This situation cause call to unregistered
+service with set interface.
 ---
- android/tester-main.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ android/hal-map-client.c | 3 ---
+ 1 file changed, 3 deletions(-)
 
-diff --git a/android/tester-main.c b/android/tester-main.c
-index 33bdc69..19b2cb9 100644
---- a/android/tester-main.c
-+++ b/android/tester-main.c
-@@ -2645,7 +2645,8 @@ void emu_add_l2cap_server_action(void)
+diff --git a/android/hal-map-client.c b/android/hal-map-client.c
+index 6c927d4..6fbf894 100644
+--- a/android/hal-map-client.c
++++ b/android/hal-map-client.c
+@@ -119,9 +119,6 @@ static bt_status_t init(btmce_callbacks_t *callbacks)
  
- 	if (!l2cap_data) {
- 		tester_warn("Invalid l2cap_data params");
--		return;
-+		step->action_status = BT_STATUS_FAIL;
-+		goto done;
- 	}
+ 	DBG("");
  
- 	bthost = hciemu_client_get_host(data->hciemu);
-@@ -2655,6 +2656,7 @@ void emu_add_l2cap_server_action(void)
+-	if (interface_ready())
+-		return BT_STATUS_DONE;
+-
+ 	cbs = callbacks;
  
- 	step->action_status = BT_STATUS_SUCCESS;
- 
-+done:
- 	schedule_action_verification(step);
- }
- 
+ 	hal_ipc_register(HAL_SERVICE_ID_MAP_CLIENT, ev_handlers,
 -- 
 1.9.3
 
