@@ -1,134 +1,87 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH 1/3] android/handsfree: Add initial support for configure WBS commmand
-Date: Wed, 17 Dec 2014 15:53:31 +0100
-Message-Id: <1418828013-12385-1-git-send-email-szymon.janc@tieto.com>
+MIME-Version: 1.0
+In-Reply-To: <20141216114330.GA4618@t440s.lan>
+References: <1418293574-25095-1-git-send-email-jpawlowski@google.com>
+	<20141216114330.GA4618@t440s.lan>
+Date: Wed, 17 Dec 2014 15:44:22 +0100
+Message-ID: <CAD0=r8wnLW6tpbf3EvaPmd=wXKgSzW8tf_4Lr4pft5A2JU2XLA@mail.gmail.com>
+Subject: Re: [PATCH v5 1/3] Bluetooth: Add lock for HCI_OP_SCAN_ENABLE command
+From: Jakub Pawlowski <jpawlowski@google.com>
+To: Jakub Pawlowski <jpawlowski@google.com>,
+	BlueZ development <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This adds required IPC message and handler for configure WBS command.
----
- android/hal-handsfree.c | 17 ++++++++++++++---
- android/hal-ipc-api.txt | 12 ++++++++++++
- android/hal-msg.h       | 10 ++++++++++
- android/handsfree.c     | 21 +++++++++++++++++++++
- 4 files changed, 57 insertions(+), 3 deletions(-)
+On Tue, Dec 16, 2014 at 12:43 PM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
+> Hi Jakub,
+>
+> On Thu, Dec 11, 2014, Jakub Pawlowski wrote:
+>> This patch introduces new lock, that need to be acquired if you want
+>> to use HCI_OP_SCAN_ENABLE in a series of request. Next patch introduces
+>> le restarting that would have race condition without that.
+>
+> This is not really the way that locks are typically used and will likely
+> result in bugs in the long run. Each lock should have a well defined
+> piece of data that it protects and the lock/unlock pair should cover a
+> clear and contiguous section of code. Neither one of these principles
+> seems to fulfilled by your design.
+>
+> As an example, your code would be stuck with the lock if you powered off
+> the adapter while holding it (since the HCI request callbacks would not
+> get called). So you'll need to find a different kind of solution here.
+> It seems to me like you're looking for some sort of state tracking,
+> which is something locking shouldn't be mixed with.
+>
+> Johan.
 
-diff --git a/android/hal-handsfree.c b/android/hal-handsfree.c
-index 2c638e6..279b26a 100644
---- a/android/hal-handsfree.c
-+++ b/android/hal-handsfree.c
-@@ -832,11 +832,22 @@ static void cleanup(void)
- #if ANDROID_VERSION >= PLATFORM_VER(5, 0, 0)
- static bt_status_t configure_wbs(bt_bdaddr_t *bd_addr, bthf_wbs_config_t config)
- {
--	/* TODO: implement */
-+	struct hal_cmd_handsfree_configure_wbs cmd;
- 
--	DBG("");
-+	DBG("%u", config);
-+
-+	if (!interface_ready())
-+		return BT_STATUS_NOT_READY;
- 
--	return BT_STATUS_UNSUPPORTED;
-+	if (!bd_addr)
-+		return BT_STATUS_PARM_INVALID;
-+
-+	memcpy(cmd.bdaddr, bd_addr, sizeof(cmd.bdaddr));
-+	cmd.config = config;
-+
-+	return hal_ipc_cmd(HAL_SERVICE_ID_HANDSFREE,
-+					HAL_OP_HANDSFREE_CONFIGURE_WBS,
-+					sizeof(cmd), &cmd, NULL, NULL, NULL);
- }
- #endif
- 
-diff --git a/android/hal-ipc-api.txt b/android/hal-ipc-api.txt
-index 01490fa..f15c12e 100644
---- a/android/hal-ipc-api.txt
-+++ b/android/hal-ipc-api.txt
-@@ -955,6 +955,18 @@ Commands and responses:
- 
- 		In case of an error, the error response will be returned.
- 
-+	Opcode 0x0f - Configure WBS command/response
-+
-+		Command parameters: Remote address (6 octets)
-+		                    Config (1 octet)
-+		Response parameters: <none>
-+
-+		Valid config values: 0x00 = None
-+		                     0x01 = No
-+		                     0x02 = Yes
-+
-+		In case of an error, the error response will be returned.
-+
- Notifications:
- 
- 	Opcode 0x81 - Connection State notification
-diff --git a/android/hal-msg.h b/android/hal-msg.h
-index 88b0c52..ecc1150 100644
---- a/android/hal-msg.h
-+++ b/android/hal-msg.h
-@@ -624,6 +624,16 @@ struct hal_cmd_handsfree_phone_state_change {
- 	uint8_t number[0];
- } __attribute__((packed));
- 
-+#define HAL_HANDSFREE_WBS_NONE			0x00
-+#define HAL_HANDSFREE_WBS_NO			0x01
-+#define HAL_HANDSFREE_WBS_YES			0x02
-+
-+#define HAL_OP_HANDSFREE_CONFIGURE_WBS		0x0F
-+struct hal_cmd_handsfree_configure_wbs {
-+	uint8_t bdaddr[6];
-+	uint8_t config;
-+} __attribute__((packed));
-+
- /* AVRCP TARGET HAL API */
- 
- #define HAL_AVRCP_PLAY_STATUS_STOPPED	0x00
-diff --git a/android/handsfree.c b/android/handsfree.c
-index 7fbe64b..da89623 100644
---- a/android/handsfree.c
-+++ b/android/handsfree.c
-@@ -2496,6 +2496,24 @@ failed:
- 				HAL_OP_HANDSFREE_PHONE_STATE_CHANGE, status);
- }
- 
-+static void handle_configure_wbs(const void *buf, uint16_t len)
-+{
-+	const struct hal_cmd_handsfree_configure_wbs *cmd = buf;
-+	uint8_t status;
-+
-+	switch (cmd->config) {
-+	case HAL_HANDSFREE_WBS_NONE:
-+	case HAL_HANDSFREE_WBS_NO:
-+	case HAL_HANDSFREE_WBS_YES:
-+	default:
-+		status = HAL_STATUS_FAILED;
-+		break;
-+	}
-+
-+	ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_HANDSFREE,
-+					HAL_OP_HANDSFREE_CONFIGURE_WBS, status);
-+}
-+
- static const struct ipc_handler cmd_handlers[] = {
- 	/* HAL_OP_HANDSFREE_CONNECT */
- 	{ handle_connect, false,
-@@ -2537,6 +2555,9 @@ static const struct ipc_handler cmd_handlers[] = {
- 	/* HAL_OP_HANDSFREE_PHONE_STATE_CHANGE */
- 	{ handle_phone_state_change, true,
- 		sizeof(struct hal_cmd_handsfree_phone_state_change) },
-+	/* HAL_OP_HANDSFREE_CONFIGURE_WBS */
-+	{ handle_configure_wbs, false,
-+		sizeof(struct hal_cmd_handsfree_configure_wbs) },
- };
- 
- static sdp_record_t *headset_ag_record(void)
--- 
-1.9.1
+Hi Johan,
 
+So I previously submitted this patch with new flag,
+HCI_SCAN_RESTARTING that could be set on &hdev->flags, but Marcel
+pointed that it'll also have race conditions.
+I was thinking about it for some time, and I came with this solution:
+
+Right now when you run queue of requests with hci_req_run, there's
+only one callback at end, that can be accessed as req.complete.
+
+I want to add ability to have callbacks when this queue is running,
+after each operation, not only at end of it. This way I would be able
+to set some special flag and then unset it right when it's needed,
+only for disabling and enabling scan to modify
+hci_cc_le_set_scan_enable behaviour properly.
+
+(I assume that when I have queue of hci operations and I run
+hci_req_run it can't be interrupted with other queue of operations for
+one controller, is that right ?)
+
+
+When it comes to hanges in code:
+currently in hci_req_cmd_complete (
+http://git.kernel.org/cgit/linux/kernel/git/bluetooth/bluetooth.git/tree/net/bluetooth/hci_core.c#n5357
+) there's this piece of code:
+
+/* If this was the last command in a request the complete
+* callback would be found in hdev->sent_cmd instead of the
+* command queue (hdev->cmd_q).
+*/
+if (hdev->sent_cmd) {
+req_complete = bt_cb(hdev->sent_cmd)->req.complete;
+
+if (req_complete) {
+/* We must set the complete callback to NULL to
+* avoid calling the callback more than once if
+* this function gets called again.
+*/
+bt_cb(hdev->sent_cmd)->req.complete = NULL;
+
+goto call_complete;
+}
+}
+
+I want to modify it so that callback can be called after each
+operation, or add some new kind of operation that would only run
+callback.
+
+What do you think about this solution ? You know this code better,
+maybe you know simpler way ?
