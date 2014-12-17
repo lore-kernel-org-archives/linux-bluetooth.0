@@ -3,8 +3,8 @@ From: Jakub Pawlowski <jpawlowski@google.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Jakub Pawlowski <jpawlowski@google.com>
 Subject: [PATCH v4] doc/adapter-api.txt: StartFilteredDiscovery method.
-Date: Wed, 17 Dec 2014 22:13:30 +0100
-Message-Id: <1418850810-31655-1-git-send-email-jpawlowski@google.com>
+Date: Wed, 17 Dec 2014 22:12:47 +0100
+Message-Id: <1418850767-31602-1-git-send-email-jpawlowski@google.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
@@ -14,14 +14,14 @@ devices that advertise services.
 
 Signed-off-by: Jakub Pawlowski <jpawlowski@google.com>
 ---
- doc/adapter-api.txt | 40 ++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 40 insertions(+)
+ doc/adapter-api.txt | 34 ++++++++++++++++++++++++++++++++++
+ 1 file changed, 34 insertions(+)
 
 diff --git a/doc/adapter-api.txt b/doc/adapter-api.txt
-index 74d235a..e07c74c 100644
+index 74d235a..7e688ef 100644
 --- a/doc/adapter-api.txt
 +++ b/doc/adapter-api.txt
-@@ -22,6 +22,46 @@ Methods		void StartDiscovery()
+@@ -22,6 +22,40 @@ Methods		void StartDiscovery()
  			Possible errors: org.bluez.Error.NotReady
  					 org.bluez.Error.Failed
  
@@ -32,12 +32,7 @@ index 74d235a..e07c74c 100644
 +			StopDiscovery to release the sessions acquired.
 +
 +			transport parameter:
-+				"auto"	- interleaved scan, default value. It
-+					  will cause a BR/EDR & LE interleaved
-+					  scan on dual-mode controllers, on
-+					  single-mode (LE-only/BREDR-only)
-+					  controllers it will work on whatever
-+					  the controller supports.
++				"auto"	- interleaved scan, default value
 +				"bredr"	- br/edr inquiry
 +				"le"	- le only scan
 +
@@ -63,7 +58,6 @@ index 74d235a..e07c74c 100644
 +
 +			Possible errors: org.bluez.Error.NotReady
 +					 org.bluez.Error.Failed
-+					 org.bluez.Error.InvalidArguments
 +
  		void StopDiscovery()
  
