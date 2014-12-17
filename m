@@ -1,28 +1,95 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 17 Dec 2014 14:36:13 +0100
-From: Veseli Veseljko <veseljko75@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: Re: ShanWan Sixaxis PS3 controller
-Message-ID: <20141217133613.GA18280@ubuntu.localnet>
-References: <20141216172421.GA12748@ubuntu.localnet>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20141216172421.GA12748@ubuntu.localnet>
+In-Reply-To: <1418782038-10999-1-git-send-email-armansito@chromium.org>
+References: <1418782038-10999-1-git-send-email-armansito@chromium.org>
+Date: Wed, 17 Dec 2014 15:22:58 +0200
+Message-ID: <CABBYNZLR9hspbD7KndGbNxzqjLi9A6DZSBrizr9hE5KB8rmRWw@mail.gmail.com>
+Subject: Re: [PATCH BlueZ v4 00/10] core: Use shared/gatt-client
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Arman Uguray <armansito@chromium.org>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Tuesday, 2014-12-16, at 18:24:21 +0100, Veseli Veseljko wrote:
-> I have a Sony PS3 Sixaxis compatible controller made by ShanWan. Is it
-> possible to make it work with bluez sixaxis plugin? I tried it on
-> Ubuntu 14.10 running Linux kernel 3.16 and bluez 5.20, compiled with
-> sixaxis option.
+Hi Arman,
 
-I added some DBGs into "/profiles/input/server.c" code and I found
-out that when dev_is_sixaxis is run, both vendor ID and product ID for
-this controller are 0x0000.
+On Wed, Dec 17, 2014 at 4:07 AM, Arman Uguray <armansito@chromium.org> wrote:
+> *v4:
+>   - Removed gatt-callbacks in favor of using btd_profile probe and remove
+>     functions. Added the new btd_profile function "accept" to notify profiles
+>     that gatt-client is ready.
+>
+>   - Using device_remove_profile to unregister btd_service's when services are
+>     removed from the client database. This happens on Service Changed events and
+>     on disconnection if the device is not bonded.
+>
+>   - Removed immediated disconnection logic that triggers when no attio callbacks
+>     are registered after probe.
+>
+>   - Other minor fixes to shared/gatt and shared/att.
+>
+> *v3:
+>   - Renamed device_attach_att_transport to device_attach_att.
+>
+> *v2:
+>   - Rebased.
+>
+> *v1:
+>   - Addressed comments by Johan and Luiz.
+>
+>
+> This patch set integrates shared/gatt-client into bluetoothd. The following
+> items have been tackled here:
+>
+>   1. src/device now uses shared/gatt-client to perform service discovery. State
+>   updates such as disconnections, service changed events, etc. are done using
+>   callback APIs of the new shared framework and attrib/gatt is no longer used to
+>   perform GATT operations directly. A GAttrib instance is maintained for
+>   backwards compatibility with profiles that haven't been converted yet.
+>
+>   2. A new gatt-callbacks API has been added which mirrors the attio APIs for
+>   shared/gatt-client. Profiles/plugins are notified using these APIs when the
+>   bearer disconnects, when services change, and when gatt-client is ready.
+>
+>   3. The profiles/gatt plugin has been rewritten. Since the GATT service is
+>   handled by shared/gatt-client, this profile no longer deals with service
+>   changed events performs out of place MTU exchanges, which used to get
+>   performed in an arbitrary order. The profile has been renamed to profiles/gap
+>   as it now only deals with the GAP service, and reads the "Appearance" and
+>   "Device Name" characteristics using the new shared stack.
+>
+> Arman Uguray (10):
+>   shared/att: Guard against invalid ref in callbacks
+>   shared/gatt-client: Guard against invalid access
+>   core: service: Add start & end handle fields
+>   core: profile: Add accept function
+>   core: device: Don't disconnect if attios not set
+>   core: device: Add getters for GATT db and client
+>   core: device: Make profile calls in GATT events
+>   profiles/gatt: Don't handle GATT service.
+>   profiles/gatt: Rename profile to gap.
+>   profiles/gap: Rewrite using bt_gatt_client.
+>
+>  Makefile.plugins         |   4 +-
+>  profiles/gap/gas.c       | 338 +++++++++++++++++++++++++++++++++++
+>  profiles/gatt/gas.c      | 457 -----------------------------------------------
+>  src/device.c             | 285 +++++++++++++++++++++++------
+>  src/device.h             |   2 +
+>  src/profile.h            |   2 +
+>  src/service.c            |  56 ++++++
+>  src/service.h            |   9 +
+>  src/shared/att.c         |   5 +
+>  src/shared/gatt-client.c |  34 ++--
+>  10 files changed, 663 insertions(+), 529 deletions(-)
+>  create mode 100644 profiles/gap/gas.c
+>  delete mode 100644 profiles/gatt/gas.c
+>
+> --
+> 2.2.0.rc0.207.ga3a616c
 
-Any ideas?
+Ive applied 1-4, please check the comments for the remaining set.
 
-Best regards,
 
-Veseljko
+-- 
+Luiz Augusto von Dentz
