@@ -1,67 +1,217 @@
 Return-Path: <cyrus@holtmann.org>
-From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH v2 00/19]  android/gatt: Fix HOG connect/disconnect
-Date: Wed, 17 Dec 2014 16:48:58 +0100
-Message-Id: <1418831357-23100-1-git-send-email-lukasz.rymanowski@tieto.com>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 8.1 \(1993\))
+Subject: Re: [PATCH 1/2] attrib/gattrib: Add track for internal request id
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1418829975-17375-2-git-send-email-lukasz.rymanowski@tieto.com>
+Date: Wed, 17 Dec 2014 16:44:38 +0100
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <0B0F7F54-5DA6-4744-8694-1E798B5B7427@holtmann.org>
+References: <1418829975-17375-1-git-send-email-lukasz.rymanowski@tieto.com> <1418829975-17375-2-git-send-email-lukasz.rymanowski@tieto.com>
+To: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-When testing HOG against PTS we got failing testes if devices were
-not bonded before the test.
-With those patches this issue is not valid anymore.
+Hi Lukasz,
 
-This set address couple of issues:
-* Some minor fixes found during work on those patches (first 2 patches)
+> If user provides req_id to the g_attrib_send, he assume that req_id
+> should be used for transaction.
+> With this patch, gattrib  keeps track on user requested req_id and
+> actual pending req_id which allow to e.g. cancel correct transaction
+> when user request it.
+> ---
+> attrib/gattrib.c | 100 +++++++++++++++++++++++++++++++++++++++++++++++++++++--
+> 1 file changed, 98 insertions(+), 2 deletions(-)
+> 
+> diff --git a/attrib/gattrib.c b/attrib/gattrib.c
+> index ab43f84..c75866b 100644
+> --- a/attrib/gattrib.c
+> +++ b/attrib/gattrib.c
+> @@ -51,10 +51,12 @@ struct _GAttrib {
+> 	struct queue *callbacks;
+> 	uint8_t *buf;
+> 	int buflen;
+> +	struct queue *track_ids;
+> };
+> 
+> 
+> struct attrib_callbacks {
+> +	unsigned int id;
+> 	GAttribResultFunc result_func;
+> 	GAttribNotifyFunc notify_func;
+> 	GDestroyNotify destroy_func;
+> @@ -63,6 +65,60 @@ struct attrib_callbacks {
+> 	uint16_t notify_handle;
+> };
+> 
+> +struct id_pair {
+> +	unsigned int org_id;
+> +	unsigned int pend_id;
+> +};
+> +
+> +
+> +static bool find_with_pend_id(const void *data, const void *user_data)
+> +{
+> +	const struct id_pair *p = data;
+> +	unsigned int pending = PTR_TO_INT(user_data);
 
-* Changed GATT behaviour during dedicated bonding. Now GATT will not start
-search services until bonding is done. That fixes PTS connection issue
-(patches 3-6)
+PTR_TO_UINT.
 
-* Tracking of GATT operations in hog/dis/bas/scpp. After I solved PTS
-connection issue I could very easily observe many of crashes in BfA when
-disconnecting HOG during service search session. This is because HOG
-talks directly to gattrib and clear his attrib instance on HOG disconnect
-even there are ongoing GATT operations. Patches 7 - 19 solve this issue
+> +
+> +	return (p->pend_id == pending);
+> +}
+> +
+> +static bool find_with_org_id(const void *data, const void *user_data)
+> +{
+> +	const struct id_pair *p = data;
+> +	unsigned int orig_id = PTR_TO_INT(user_data);
 
+PTR_TO_UINT.
 
-v2: 
-* Remove couple of not needed patches
-* Note that this series should go on top of: [PATCH 0/2] attrib/gattrib: Add tracking request id
-* some minor self review cleanups
+> +
+> +	return (p->org_id == orig_id);
+> +}
+> +
+> +static void remove_stored_ids(GAttrib *attrib, unsigned int pending_id)
+> +{
+> +	struct id_pair *p;
+> +
+> +	p = queue_remove_if(attrib->track_ids, find_with_pend_id,
+> +						INT_TO_PTR(pending_id));
 
+UINT_TO_PTR.
 
-Lukasz Rymanowski (19):
-  android/bluetooth: Minor typo fix
-  android/bluetooth: Minor fix, add missing NULL assignment
-  android/bluetooth: Add possibility to register for bonded event
-  android/gatt: Add paired cb to gatt.c
-  android/bluetooth: Add API to check if device is bonding
-  android/gatt: Improve LE connection after pair
-  android/hog: Add support to track gatt operations
-  android/hog: Cancel all GATT operations on disconnect
-  android/hog: Keep track on primary and include service search
-  android/hog: Keep track on discover characteristic and descriptors
-  android/hog: Keep track on read/write char and descr
-  android/bas: Add queue to keep track on GATT operations
-  android/bas: Keep track read/write GATT operations
-  android/bas: Keep track on discover characteristic and descriptor
-  android/dis: Add queue to keep track on GATT operations
-  android/dis: Keep track on discover and read characteristic
-  android/scpp: Add queue to keep GATT operations
-  android/scpp: Keep track on discover characteristic and descriptor
-  android/scpp: Keep track on write operation
+> +
+> +	free(p);
+> +}
+> +
+> +static void store_id(GAttrib *attrib, unsigned int org_id,
+> +							unsigned int pend_id)
+> +{
+> +	struct id_pair *t;
+> +
+> +	t = queue_find(attrib->track_ids, find_with_org_id, INT_TO_PTR(org_id));
 
- android/bas.c       | 171 ++++++++++++++++++++++++++--
- android/bluetooth.c |  52 ++++++++-
- android/bluetooth.h |   5 +
- android/dis.c       | 108 +++++++++++++++++-
- android/gatt.c      |  67 ++++++++++-
- android/hog.c       | 322 ++++++++++++++++++++++++++++++++++++++++++++--------
- android/scpp.c      | 150 ++++++++++++++++++++++--
- 7 files changed, 801 insertions(+), 74 deletions(-)
+UINT_TO_PTR.
 
--- 
-1.8.4
+> +	if (t) {
+> +		t->pend_id = pend_id;
+> +		return;
+> +	}
+> +
+> +	t = new0(struct id_pair, 1);
+> +	if (!t)
+> +		return;
+> +
+> +	t->org_id = org_id;
+> +	t->pend_id = pend_id;
+> +
+> +	if (!queue_push_tail(attrib->track_ids, t))
+> +		free(t);
+> +}
+> +
+> GAttrib *g_attrib_new(GIOChannel *io, guint16 mtu)
+> {
+> 	gint fd;
+> @@ -95,6 +151,10 @@ GAttrib *g_attrib_new(GIOChannel *io, guint16 mtu)
+> 	if (!attr->callbacks)
+> 		goto fail;
+> 
+> +	attr->track_ids = queue_new();
+> +	if (!attr->track_ids)
+> +		goto fail;
+> +
+> 	return g_attrib_ref(attr);
+> 
+> fail:
+> @@ -153,6 +213,7 @@ void g_attrib_unref(GAttrib *attrib)
+> 	bt_att_unref(attrib->att);
+> 
+> 	queue_destroy(attrib->callbacks, attrib_callbacks_destroy);
+> +	queue_destroy(attrib->track_ids, free);
+> 
+> 	free(attrib->buf);
+> 
+> @@ -229,6 +290,8 @@ static void attrib_callback_result(uint8_t opcode, const void *pdu,
+> 	if (cb->result_func)
+> 		cb->result_func(status, buf, length + 1, cb->user_data);
+> 
+> +	remove_stored_ids(cb->parent, cb->id);
+> +
+> 	free(buf);
+> }
+> 
+> @@ -282,18 +345,49 @@ guint g_attrib_send(GAttrib *attrib, guint id, const guint8 *pdu, guint16 len,
+> 		queue_push_head(attrib->callbacks, cb);
+> 		response_cb = attrib_callback_result;
+> 		destroy_cb = attrib_callbacks_remove;
+> +
+> 	}
+> 
+> -	return bt_att_send(attrib->att, pdu[0], (void *)pdu + 1, len - 1,
+> +	cb->id = bt_att_send(attrib->att, pdu[0], (void *) pdu + 1, len - 1,
+> 						response_cb, cb, destroy_cb);
+> +
+> +	if (id == 0)
+> +		return cb->id;
+> +
+> +	/*
+> +	 * If user what us to use given id, lets keep track on that so we give
+> +	 * user a possibility to cancel ongoing request
+> +	 */
+> +	store_id(attrib, id, cb->id);
+> +	return id;
+> +}
+> +
+> +static unsigned int get_id(GAttrib *attrib, guint id)
+> +{
+> +	struct id_pair *p;
+> +	unsigned int result = id;
+> +
+> +	p = queue_remove_if(attrib->track_ids, find_with_org_id,
+> +							INT_TO_PTR(id));
+
+UINT_TO_PTR.
+
+> +	if (!p)
+> +		return id;
+> +
+> +	result = p->pend_id;
+> +	free(p);
+> +
+> +	return result;
+> }
+> 
+> gboolean g_attrib_cancel(GAttrib *attrib, guint id)
+> {
+> +	unsigned int pend_id;
+> +
+> 	if (!attrib)
+> 		return FALSE;
+> 
+> -	return bt_att_cancel(attrib->att, id);
+> +	pend_id = get_id(attrib, id);
+
+If you only have a single her for get_id, why not just include it in g_attrib_cancel. It is not that the wrap is by any means complex.
+
+Actually the get_id code is broken since it returns id and not error out if it is not found. Meaning you will try to cancel something else. And that might be a valid id from some user bt_att user.
+
+> +
+> +	return bt_att_cancel(attrib->att, pend_id);
+> }
+> 
+> gboolean g_attrib_cancel_all(GAttrib *attrib)
+> @@ -301,6 +395,8 @@ gboolean g_attrib_cancel_all(GAttrib *attrib)
+> 	if (!attrib)
+> 		return FALSE;
+> 
+> +	queue_remove_all(attrib->track_ids, NULL, NULL, free);
+> +
+> 	return bt_att_cancel_all(attrib->att);
+
+And I think you need to replace this bt_att_cancel_all with just canceling the ids in the queue. Since otherwise you have the same problem as before. It could be just luck that g_attrib_cancel_all has only been used in cases where it does not matter.
+
+Regards
+
+Marcel
 
