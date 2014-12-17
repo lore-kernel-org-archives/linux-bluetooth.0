@@ -1,67 +1,73 @@
 Return-Path: <cyrus@holtmann.org>
-From: Jakub Pawlowski <jpawlowski@google.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Jakub Pawlowski <jpawlowski@google.com>
-Subject: [PATCH v4] doc/adapter-api.txt: StartFilteredDiscovery method.
-Date: Wed, 17 Dec 2014 22:12:47 +0100
-Message-Id: <1418850767-31602-1-git-send-email-jpawlowski@google.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Wed, 17 Dec 2014 22:46:14 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: davem@davemloft.net
+Cc: netdev@vger.kernel.org, linux-wireless@vger.kernel.org,
+	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: pull request: bluetooth 2014-12-17
+Message-ID: <20141217204614.GA15480@t440s.P-661HNU-F1>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="sm4nu43k4a2Rpi4c"
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch proposes new method, StartFilteredDiscovery to D-Bus Adapter
-API for desktop bluetoothd. It will allow for rapid discovery of nearby
-devices that advertise services.
 
-Signed-off-by: Jakub Pawlowski <jpawlowski@google.com>
+--sm4nu43k4a2Rpi4c
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+
+Hi Dave,
+
+Here's the first direct (i.e. skipping the wireless tree) bluetooth pull
+request for you, intended for 3.19. It's just one patch: a fix from
+Marcel for for remote service discovery filtering which also fixes a
+'used uninitialized' compiler warning.
+
+Please let me know if there are any issues pulling. Thanks.
+
+Johan
+
 ---
- doc/adapter-api.txt | 34 ++++++++++++++++++++++++++++++++++
- 1 file changed, 34 insertions(+)
+The following changes since commit 65891feac27e26115dc4cce881743a1ac33372df:
 
-diff --git a/doc/adapter-api.txt b/doc/adapter-api.txt
-index 74d235a..7e688ef 100644
---- a/doc/adapter-api.txt
-+++ b/doc/adapter-api.txt
-@@ -22,6 +22,40 @@ Methods		void StartDiscovery()
- 			Possible errors: org.bluez.Error.NotReady
- 					 org.bluez.Error.Failed
- 
-+		void StartFilteredDiscovery(dict filter, string transport)
-+
-+			This method starts the device discovery session with
-+			filtering by uuids, and rssi or pathloss value. Use
-+			StopDiscovery to release the sessions acquired.
-+
-+			transport parameter:
-+				"auto"	- interleaved scan, default value
-+				"bredr"	- br/edr inquiry
-+				"le"	- le only scan
-+
-+ 			Parameters that can be set in filter dictionary include
-+ 			the following:
-+
-+			array{string} UUIDs : filtered service UUIDs (required)
-+			int16 RSSI	: RSSI threshold value (optional)
-+			uint16 pathloss	: Pathloss threshold value (optional)
-+
-+			When a device is found that advertise any UUID from
-+			UUIDs, it will be reported if:
-+			- pathloss and RSSI are both empty,
-+			- only pathloss param is set, device advertise TX pwer, 
-+			  and computed pathloss is less than pathloss param,
-+			- only RSSI param is set, and received RSSI is higher
-+			  than RSSI param,
-+
-+			This process will start creating Device objects as new
-+			devices matching criteria are discovered. It will also
-+			emit PropertiesChanged signal for already existing
-+			Device objects, with updated RSSI value.
-+
-+			Possible errors: org.bluez.Error.NotReady
-+					 org.bluez.Error.Failed
-+
- 		void StopDiscovery()
- 
- 			This method will cancel any previous StartDiscovery
--- 
-2.1.0
+  net: Disallow providing non zero VLAN ID for NIC drivers FDB add flow (2014-12-16 15:41:19 -0500)
 
+are available in the git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git for-upstream
+
+for you to fetch changes up to ea8ae2516ac43028a01c40b58ffa80d3b0afb802:
+
+  Bluetooth: Fix bug with filter in service discovery optimization (2014-12-17 22:03:49 +0200)
+
+----------------------------------------------------------------
+Marcel Holtmann (1):
+      Bluetooth: Fix bug with filter in service discovery optimization
+
+ net/bluetooth/mgmt.c | 14 +++++++++-----
+ 1 file changed, 9 insertions(+), 5 deletions(-)
+
+
+--sm4nu43k4a2Rpi4c
+Content-Type: application/pgp-signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQIcBAEBAgAGBQJUkeuWAAoJECQj9vv5qNQSG0wQAKs/rxSc+p+v15Cl93vjjNDX
+kQGKomzrD8FYbFul7wFs63zB50yPR3enQr/93TyxDq5vMj+AD623sOBAUoYPsaSu
+SebzOrGFnsOjhHTLNH++luQSQFu/8mzJbZRILJCgbADVZ3j9AHleIiLkkzE/E7vX
+izGLu8MQl2hZsDU34JD4wPOSXHCO1TU4jrLipn2zit6MNe7ul165NfFeNjRtmnP8
+6s9eh6SwMRWILQT/Rm55/kTD9GfwF+IPj3JPu56QJG3flqF0OUHtRvHMl+ZrMa4J
+yGfI9ARhm9LW1l676Feg8OeqCQsE4Typ8xMUgPjaO9KoaJsqHJ8cnx96iGBbUTVQ
+OdeYYeFbjdIQkM702bPo69hwezIzcOBK6KBdc2s4WaAtUNC1+F0KoFciFhMuLeLy
+OVcqFcHsVon2DEpKwB9DBTNcr1uL2ATmMUunZIbeuIZYEMLQZdNnQjau2fSPchxV
++cmP/jdKUR/wP4XoffUEhyn//fc9WMSwtfiajqubBb/MCTRgfAQxHq0JsIVa2qpo
+C0K2Nw2QL1XWXmr3xbxeTNT78M9G4iPqs5AcYH6llpfRruY2pY0P09JOjMMOvgin
+Zx9iJ9TsHJmQNufBsAwxkyM8vrmqUiO3w7H/E6J0M7a1rB2YNFDmu9rmNJwMLSXQ
+0fRuNgxzF4GaFKQiPzlY
+=JkT0
+-----END PGP SIGNATURE-----
+
+--sm4nu43k4a2Rpi4c--
