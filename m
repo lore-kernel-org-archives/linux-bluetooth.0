@@ -2,169 +2,77 @@ Return-Path: <cyrus@holtmann.org>
 From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH v2 09/19] android/hog: Keep track on primary and include service search
-Date: Wed, 17 Dec 2014 16:49:07 +0100
-Message-Id: <1418831357-23100-10-git-send-email-lukasz.rymanowski@tieto.com>
+Subject: [PATCH v2 08/19] android/hog: Cancel all GATT operations on disconnect
+Date: Wed, 17 Dec 2014 16:49:06 +0100
+Message-Id: <1418831357-23100-9-git-send-email-lukasz.rymanowski@tieto.com>
 In-Reply-To: <1418831357-23100-1-git-send-email-lukasz.rymanowski@tieto.com>
 References: <1418831357-23100-1-git-send-email-lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+This patch makes sure that HOG cancels its GATT requests before
+removing his attrib reference.
+
+However some request might not be possible to cancel. It will be handled
+in following patches
 ---
- android/hog.c | 88 +++++++++++++++++++++++++++++++++++++++++++++++++++++------
- 1 file changed, 80 insertions(+), 8 deletions(-)
+ android/hog.c | 22 +++++++++++++++++++++-
+ 1 file changed, 21 insertions(+), 1 deletion(-)
 
 diff --git a/android/hog.c b/android/hog.c
-index 0e0eafe..66b117d 100644
+index b87fd2f..0e0eafe 100644
 --- a/android/hog.c
 +++ b/android/hog.c
-@@ -117,6 +117,29 @@ struct gatt_request {
- 	void *user_data;
+@@ -111,6 +111,19 @@ struct report {
+ 	uint8_t			*value;
  };
  
-+static struct gatt_request *create_request(struct bt_hog *hog,
-+							void *user_data)
-+{
-+	struct gatt_request *req;
-+
-+	req = new0(struct gatt_request, 1);
-+	if (!req)
-+		return NULL;
-+
-+	req->user_data = user_data;
-+	req->hog = bt_hog_ref(hog);
-+
-+	return req;
-+}
-+
-+static bool set_and_store_gatt_req(struct bt_hog *hog,
-+						struct gatt_request *req,
-+						unsigned int id)
-+{
-+	req->id = id;
-+	return queue_push_head(hog->gatt_op, req);
-+}
-+
- static void destroy_gatt_req(struct gatt_request *req)
- {
- 	queue_remove(req->hog->gatt_op, req);
-@@ -124,6 +147,48 @@ static void destroy_gatt_req(struct gatt_request *req)
- 	free(req);
- }
- 
-+static void discover_primary(struct bt_hog *hog, GAttrib *attrib,
-+						bt_uuid_t *uuid, gatt_cb_t func,
-+						gpointer user_data)
-+{
-+	struct gatt_request *req;
++struct gatt_request {
 +	unsigned int id;
++	struct bt_hog *hog;
++	void *user_data;
++};
 +
-+	req = create_request(hog, user_data);
-+	if (!req)
-+		return;
-+
-+	id = gatt_discover_primary(attrib, uuid, func, req);
-+
-+	if (set_and_store_gatt_req(hog, req, id))
-+		return;
-+
-+	error("hog: Could not send discover primary");
-+	g_attrib_cancel(attrib, id);
-+	free(req);
-+}
-+
-+static void find_included(struct bt_hog *hog, GAttrib *attrib,
-+					uint16_t start, uint16_t end,
-+					gatt_cb_t func, gpointer user_data)
++static void destroy_gatt_req(struct gatt_request *req)
 +{
-+	struct gatt_request *req;
-+	unsigned int id;
-+
-+	req = create_request(hog, user_data);
-+	if (!req)
-+		return;
-+
-+	id = gatt_find_included(attrib, start, end, func, req);
-+
-+	if (set_and_store_gatt_req(hog, req, id))
-+		return;
-+
-+	error("Could not find included");
-+	g_attrib_cancel(attrib, id);
++	queue_remove(req->hog->gatt_op, req);
++	bt_hog_unref(req->hog);
 +	free(req);
 +}
 +
  static void report_value_cb(const guint8 *pdu, guint16 len, gpointer user_data)
  {
  	struct report *report = user_data;
-@@ -864,12 +929,15 @@ void bt_hog_unref(struct bt_hog *hog)
- 
- static void find_included_cb(uint8_t status, GSList *services, void *user_data)
- {
--	struct bt_hog *hog = user_data;
-+	struct gatt_request *req = user_data;
-+	struct bt_hog *hog = req->user_data;
- 	struct gatt_included *include;
- 	GSList *l;
- 
- 	DBG("");
- 
-+	destroy_gatt_req(req);
-+
- 	if (hog->primary)
- 		return;
- 
-@@ -895,8 +963,10 @@ static void find_included_cb(uint8_t status, GSList *services, void *user_data)
- 		for (l = services; l; l = l->next) {
- 			include = l->data;
- 
--			gatt_find_included(hog->attrib, include->range.start,
--				include->range.end, find_included_cb, hog);
-+			find_included(hog, hog->attrib,
-+					include->range.start,
-+					include->range.end, find_included_cb,
-+					hog);
- 		}
- 		return;
- 	}
-@@ -981,12 +1051,15 @@ static void hog_attach_hog(struct bt_hog *hog, struct gatt_primary *primary)
- 
- static void primary_cb(uint8_t status, GSList *services, void *user_data)
- {
--	struct bt_hog *hog = user_data;
-+	struct gatt_request *req = user_data;
-+	struct bt_hog *hog = req->user_data;
- 	struct gatt_primary *primary;
- 	GSList *l;
- 
- 	DBG("");
- 
-+	destroy_gatt_req(req);
-+
- 	if (status) {
- 		const char *str = att_ecode2str(status);
- 		DBG("Discover primary failed: %s", str);
-@@ -1026,9 +1099,8 @@ static void primary_cb(uint8_t status, GSList *services, void *user_data)
- 	for (l = services; l; l = l->next) {
- 		primary = l->data;
- 
--		gatt_find_included(hog->attrib, primary->range.start,
--				primary->range.end, find_included_cb,
--				hog);
-+		find_included(hog, hog->attrib, primary->range.start,
-+				primary->range.end, find_included_cb, hog);
- 	}
+@@ -770,6 +783,12 @@ static void report_free(void *data)
+ 	g_free(report);
  }
  
-@@ -1043,7 +1115,7 @@ bool bt_hog_attach(struct bt_hog *hog, void *gatt)
- 	hog->attrib = g_attrib_ref(gatt);
++static void cancel_gatt_req(struct gatt_request *req)
++{
++	if (g_attrib_cancel(req->hog->attrib, req->id))
++		destroy_gatt_req(req);
++}
++
+ static void hog_free(void *data)
+ {
+ 	struct bt_hog *hog = data;
+@@ -785,7 +804,7 @@ static void hog_free(void *data)
+ 	g_slist_free_full(hog->reports, report_free);
+ 	g_free(hog->name);
+ 	g_free(hog->primary);
+-	queue_destroy(hog->gatt_op, NULL);
++	queue_destroy(hog->gatt_op, (void *) destroy_gatt_req);
+ 	g_free(hog);
+ }
  
- 	if (!primary) {
--		gatt_discover_primary(hog->attrib, NULL, primary_cb, hog);
-+		discover_primary(hog, hog->attrib, NULL, primary_cb, hog);
- 		return true;
- 	}
+@@ -1093,6 +1112,7 @@ void bt_hog_detach(struct bt_hog *hog)
+ 	if (hog->bas)
+ 		bt_bas_detach(hog->bas);
  
++	queue_foreach(hog->gatt_op, (void *) cancel_gatt_req, NULL);
+ 	g_attrib_unref(hog->attrib);
+ 	hog->attrib = NULL;
+ }
 -- 
 1.8.4
 
