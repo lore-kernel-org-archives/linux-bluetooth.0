@@ -1,102 +1,121 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: Sebastian Chlad <sebastian.chlad@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] android/pts: Re-test of MPS on PTS 6.0
-Date: Thu, 18 Dec 2014 09:49:54 +0100
-Message-ID: <1425106.ODNSSV1gp9@uw000953>
-In-Reply-To: <1418385503-2268-1-git-send-email-sebastian.chlad@tieto.com>
-References: <1418385503-2268-1-git-send-email-sebastian.chlad@tieto.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <CABBYNZLG_swsQt0jBqb4YXZ4q_TSmNYeTqRVH_et1W+jQG+HWQ@mail.gmail.com>
+References: <1418782038-10999-1-git-send-email-armansito@chromium.org>
+	<1418782038-10999-7-git-send-email-armansito@chromium.org>
+	<CABBYNZLWYxDJQ3P=80OVMZpgqD0LV0ihW2VGAnthNevYGJPfOg@mail.gmail.com>
+	<CAHrH25R4x5+3nVfSgY+mmDSD=_ANOmzE_SAwwV17+qXhurW__Q@mail.gmail.com>
+	<CABBYNZLG_swsQt0jBqb4YXZ4q_TSmNYeTqRVH_et1W+jQG+HWQ@mail.gmail.com>
+Date: Wed, 17 Dec 2014 14:01:04 -0800
+Message-ID: <CAHrH25RZuKJt9a95cjpX=GxVeTeeJXT8_-dUQP8JsMLhYY-0PQ@mail.gmail.com>
+Subject: Re: [PATCH BlueZ v4 06/10] core: device: Add getters for GATT db and client
+From: Arman Uguray <armansito@chromium.org>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Sebastian,
+Hi Luiz,
 
-On Friday 12 of December 2014 12:58:23 Sebastian Chlad wrote:
-> ---
->  android/pics-mps.txt  |  2 +-
->  android/pixit-mps.txt |  2 +-
->  android/pts-mps.txt   | 13 ++++++++-----
->  3 files changed, 10 insertions(+), 7 deletions(-)
-> 
-> diff --git a/android/pics-mps.txt b/android/pics-mps.txt
-> index ab937a6..29b82a9 100644
-> --- a/android/pics-mps.txt
-> +++ b/android/pics-mps.txt
-> @@ -1,6 +1,6 @@
->  MPS PICS for the PTS tool.
->  
-> -PTS version: 5.3
-> +PTS version: 6.0
->  
->  * - different than PTS defaults
->  # - not yet implemented/supported
-> diff --git a/android/pixit-mps.txt b/android/pixit-mps.txt
-> index 462f683..86511bd 100644
-> --- a/android/pixit-mps.txt
-> +++ b/android/pixit-mps.txt
-> @@ -1,6 +1,6 @@
->  MPS PIXIT for the PTS tool.
->  
-> -PTS version: 5.3
-> +PTS version: 6.0
->  
->  * - different than PTS defaults
->  & - should be set to IUT Bluetooth address
-> diff --git a/android/pts-mps.txt b/android/pts-mps.txt
-> index 4236a56..46efd3c 100644
-> --- a/android/pts-mps.txt
-> +++ b/android/pts-mps.txt
-> @@ -1,7 +1,7 @@
->  PTS test results for MPS
->  
-> -PTS version: 5.3
-> -Tested: 27-November-2014
-> +PTS version: 6.0
-> +Tested: 11-December-2014
->  Android version: 5.0
->  
->  Results:
-> @@ -18,7 +18,8 @@ For full tests conformance, "Touch sounds" on IUT should be disbaled
->  -------------------------------------------------------------------------------
->  Test Name				Result	Notes
->  -------------------------------------------------------------------------------
-> -TC_AG_SRC_HFAV_ACT_SD_BV_01_I		PASS
-> +TC_AG_PSE_HFPB_CTH_SD_BV_01_I		PASS
-> +TC_AG_SRC_HFAV_ACT_SD_BV_01_I		INC	JIRA issue #BA-295
->  TC_AG_SRC_HFAV_ACT_SD_BV_02_I		PASS
->  TC_AG_SRC_HFAV_ACT_SD_BV_03_I		PASS
->  TC_AG_SRC_HFAV_CLH_SD_BV_01_I		PASS
-> @@ -26,7 +27,7 @@ TC_AG_SRC_HFAV_CLH_SD_BV_02_I		N/A
->  TC_AG_SRC_HFAV_CLH_SD_BV_03_I		PASS
->  TC_AG_SRC_HFAV_CLH_SD_BV_04_I		PASS
->  TC_AG_SRC_HFAV_CLH_SD_BV_05_I		PASS
-> -TC_AG_SRC_HFAV_CLH_SD_BV_06_I		PASS
-> +TC_AG_SRC_HFAV_CLH_SD_BV_06_I		INC	JIRA issue #BA-296
->  TC_AVP_CTH_SD_BI_01_I			PASS
->  TC_AVP_CTH_SD_BI_02_I			PASS
->  TC_HF_SNK_HFAV_ACT_SD_BV_01_I		N/A
-> @@ -46,11 +47,13 @@ TC_HF_SNK_CT_HFAV_CLH_MD_BV_04_I	N/A
->  TC_HF_SNK_CT_HFAV_CLH_MD_BV_05_I	N/A
->  TC_HF_SNK_CT_HFAV_CLH_MD_BV_06_I	N/A
->  TC_SDP_CTH_SD_BV_01_I			PASS
-> +TC_SNK_PCE_AVO_ACT_SD_BV_01_I		N/A
-> +TC_SRC_PSE_AVO_ACT_SD_BV_01_I		PASS
->  TC_SRC_TG_HFAV_ACT_MD_BV_01_I		PASS
->  TC_SRC_TG_HFAV_CLH_MD_BV_01_I		PASS
->  TC_SRC_TG_HFAV_CLH_MD_BV_02_I		PASS
->  TC_SRC_TG_HFAV_CLH_MD_BV_03_I		PASS
-> -TC_SRC_TG_HFAV_CLH_MD_BV_04_I		PASS
-> +TC_SRC_TG_HFAV_CLH_MD_BV_04_I		FAIL	JIRA issue #BA-294
->  TC_SRC_TG_HFAV_CLH_MD_BV_05_I		PASS
->  TC_SRC_TG_HFAV_CLH_MD_BV_06_I		PASS
->  TC_PAIRING_HF_SNK_CT			N/A	Pairing helper for MD tests
-> 
+> On Wed, Dec 17, 2014 at 12:19 PM, Luiz Augusto von Dentz <luiz.dentz@gmail.com> wrote:
+> Hi Arman,
+>
+> On Wed, Dec 17, 2014 at 3:45 PM, Arman Uguray <armansito@chromium.org> wrote:
+>> Hi Luiz,
+>>
+>>> On Wed, Dec 17, 2014 at 4:39 AM, Luiz Augusto von Dentz <luiz.dentz@gmail.com> wrote:
+>>> Hi Arman,
+>>>
+>>> On Wed, Dec 17, 2014 at 4:07 AM, Arman Uguray <armansito@chromium.org> wrote:
+>>>> This patch adds btd_device_get_gatt_db and btd_device_get_gatt_client
+>>>> functions.
+>>>> ---
+>>>>  src/device.c | 16 ++++++++++++++++
+>>>>  src/device.h |  2 ++
+>>>>  2 files changed, 18 insertions(+)
+>>>>
+>>>> diff --git a/src/device.c b/src/device.c
+>>>> index 64591d0..854d9f3 100644
+>>>> --- a/src/device.c
+>>>> +++ b/src/device.c
+>>>> @@ -4844,6 +4844,22 @@ GSList *btd_device_get_primaries(struct btd_device *device)
+>>>>         return device->primaries;
+>>>>  }
+>>>>
+>>>> +struct gatt_db *btd_device_get_gatt_db(struct btd_device *device)
+>>>> +{
+>>>> +       if (!device)
+>>>> +               return NULL;
+>>>> +
+>>>> +       return device->db;
+>>>> +}
+>>>
+>>> I guess the db can be get from the gatt_client, also perhaps we should
+>>> return a reference otherwise it should be const.
+>>>
+>>
+>> I think I'll keep this getter but make things const. My idea here is
+>> that the gatt_db will outlive the connection and if the device is
+>> bonded it won't get cleared. So it might still be useful.
+>
+> Sure no problem, Im just not sure if the driver would be interested in
+> the db without the client and as it is const it should not be possible
+> to register callbacks, actually const for the client perhaps is not a
+> good idea either for the same reason.
+>
 
-Applied, thanks.
+That's a good point. I guess I'll leave this one in like this though.
+Eventually when we have a better, more centralized in-memory cache
+that holds all the gatt-db's then profiles can get it from there.
+Until then, they can get it from btd_device if they want to.
 
--- 
-Best regards, 
-Szymon Janc
+>>>> +struct bt_gatt_client *btd_device_get_gatt_client(struct btd_device *device)
+>>>> +{
+>>>> +       if (!device)
+>>>> +               return NULL;
+>>>> +
+>>>> +       return device->client;
+>>>> +}
+>>>> +
+>>>>  void btd_device_gatt_set_service_changed(struct btd_device *device,
+>>>>                                                 uint16_t start, uint16_t end)
+>>>>  {
+>>>> diff --git a/src/device.h b/src/device.h
+>>>> index 487bd27..a7fefee 100644
+>>>> --- a/src/device.h
+>>>> +++ b/src/device.h
+>>>> @@ -67,6 +67,8 @@ const sdp_record_t *btd_device_get_record(struct btd_device *device,
+>>>>  struct gatt_primary *btd_device_get_primary(struct btd_device *device,
+>>>>                                                         const char *uuid);
+>>>>  GSList *btd_device_get_primaries(struct btd_device *device);
+>>>> +struct gatt_db *btd_device_get_gatt_db(struct btd_device *device);
+>>>> +struct bt_gatt_client *btd_device_get_gatt_client(struct btd_device *device);
+>>>>  void btd_device_gatt_set_service_changed(struct btd_device *device,
+>>>>                                                 uint16_t start, uint16_t end);
+>>>>  bool device_attach_att(struct btd_device *dev, GIOChannel *io);
+>>>> --
+>>>> 2.2.0.rc0.207.ga3a616c
+>>>>
+>>>> --
+>>>> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+>>>> the body of a message to majordomo@vger.kernel.org
+>>>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>>>
+>>>
+>>>
+>>> --
+>>> Luiz Augusto von Dentz
+>>
+>> Arman
+>
+>
+>
+> --
+> Luiz Augusto von Dentz
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+Arman
