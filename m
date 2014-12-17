@@ -3,52 +3,63 @@ From: Gowtham Anandha Babu <gowtham.ab@samsung.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: d.kasatkin@samsung.com, bharat.panda@samsung.com, cpgs@samsung.com,
 	Gowtham Anandha Babu <gowtham.ab@samsung.com>
-Subject: [PATCH 2/2] parser/rfcomm: Add support for decoding Test command
-Date: Wed, 17 Dec 2014 17:29:45 +0530
-Message-id: <1418817585-26816-3-git-send-email-gowtham.ab@samsung.com>
+Subject: [PATCH 1/2] monitor/rfcomm: Add support for decoding Test command
+Date: Wed, 17 Dec 2014 17:29:44 +0530
+Message-id: <1418817585-26816-2-git-send-email-gowtham.ab@samsung.com>
 In-reply-to: <1418817585-26816-1-git-send-email-gowtham.ab@samsung.com>
 References: <1418817585-26816-1-git-send-email-gowtham.ab@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-< ACL data: handle 75 flags 0x00 dlen 14
-    L2CAP(d): cid 0x0040 len 10 [psm 3]
-      RFCOMM(s): TEST RSP: cr 0 dlci 0 pf 0 ilen 6 fcs 0xaa mcc_len 4
-        Test data: 0x 5f 54 65 73
+          RFCOMM: Unnumbered Info with Header Check (UIH)(0xef)
+             Address: 0x01 cr 0 dlci 0x00
+             Control: 0xef poll/final 0
+             Length: 6
+             FCS: 0xaa
+             MCC Message type: Test Command RSP(0x08)
+               Length: 4
+               Test Data: 0x 5f 54 65 73
 ---
- tools/parser/rfcomm.c | 12 +++++++++++-
- 1 file changed, 11 insertions(+), 1 deletion(-)
+ monitor/rfcomm.c | 19 +++++++++++++++++++
+ 1 file changed, 19 insertions(+)
 
-diff --git a/tools/parser/rfcomm.c b/tools/parser/rfcomm.c
-index acf8d66..ea8dfad 100644
---- a/tools/parser/rfcomm.c
-+++ b/tools/parser/rfcomm.c
-@@ -69,6 +69,17 @@ static inline void mcc_test(int level, uint8_t *ptr, int len,
- 	printf("TEST %s: ", CR_STR(mcc_head));
- 	print_rfcomm_hdr(head, ptr, len);
- 	print_mcc(mcc_head);
+diff --git a/monitor/rfcomm.c b/monitor/rfcomm.c
+index 7d22fa0..be215a1 100644
+--- a/monitor/rfcomm.c
++++ b/monitor/rfcomm.c
+@@ -146,6 +146,23 @@ static void print_rfcomm_hdr(struct rfcomm_frame *rfcomm_frame, uint8_t indent)
+ 	print_field("%*cFCS: 0x%2.2x", indent, ' ', hdr.fcs);
+ }
+ 
++static inline bool mcc_test(struct rfcomm_frame *rfcomm_frame, uint8_t indent)
++{
++	struct l2cap_frame *frame = &rfcomm_frame->l2cap_frame;
++	uint8_t data;
 +
-+	p_indent(level, 0);
-+	printf("%*cTest data: 0x ", level, ' ');
++	printf("%*cTest Data: 0x ", indent, ' ');
 +
-+	while (len > 1) {
-+		printf("%2.2x ", (uint8_t)*ptr);
-+		len--;
-+		ptr++;
++	while (frame->size > 1) {
++		if (!l2cap_frame_get_u8(frame, &data))
++			return false;
++		printf("%2.2x ", data);
 +	}
 +
 +	printf("\n");
- }
- static inline void mcc_fcon(int level, uint8_t *ptr, int len,
- 				long_frame_head *head, mcc_long_frame_head *mcc_head)
-@@ -208,7 +219,6 @@ static inline void mcc_frame(int level, struct frame *frm, long_frame_head *head
- 	switch (mcc_head.type.type) {
- 	case TEST:
- 		mcc_test(level, frm->ptr, frm->len, head, &mcc_head);
--		raw_dump(level, frm); 
- 		break;
- 	case FCON:
- 		mcc_fcon(level, frm->ptr, frm->len, head, &mcc_head);
++	return true;
++}
++
+ static inline bool mcc_msc(struct rfcomm_frame *rfcomm_frame, uint8_t indent)
+ {
+ 	struct l2cap_frame *frame = &rfcomm_frame->l2cap_frame;
+@@ -358,6 +375,8 @@ static inline bool mcc_frame(struct rfcomm_frame *rfcomm_frame, uint8_t indent)
+ 	rfcomm_frame->mcc = mcc;
+ 
+ 	switch (type) {
++	case RFCOMM_TEST:
++		return mcc_test(rfcomm_frame, indent+10);
+ 	case RFCOMM_MSC:
+ 		return mcc_msc(rfcomm_frame, indent+2);
+ 	case RFCOMM_RPN:
 -- 
 1.9.1
 
