@@ -2,98 +2,119 @@ Return-Path: <cyrus@holtmann.org>
 From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH v2 15/19] android/dis: Add queue to keep track on GATT operations
-Date: Wed, 17 Dec 2014 16:49:13 +0100
-Message-Id: <1418831357-23100-16-git-send-email-lukasz.rymanowski@tieto.com>
+Subject: [PATCH v2 14/19] android/bas: Keep track on discover characteristic and descriptor
+Date: Wed, 17 Dec 2014 16:49:12 +0100
+Message-Id: <1418831357-23100-15-git-send-email-lukasz.rymanowski@tieto.com>
 In-Reply-To: <1418831357-23100-1-git-send-email-lukasz.rymanowski@tieto.com>
 References: <1418831357-23100-1-git-send-email-lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-With this patch GATT operation queue has been added together with
-canceling ongoing GATT operations on disconnect
 ---
- android/dis.c | 29 +++++++++++++++++++++++++++++
- 1 file changed, 29 insertions(+)
+ android/bas.c | 56 ++++++++++++++++++++++++++++++++++++++++++++++++++++----
+ 1 file changed, 52 insertions(+), 4 deletions(-)
 
-diff --git a/android/dis.c b/android/dis.c
-index 0a2a18e..8a103b7 100644
---- a/android/dis.c
-+++ b/android/dis.c
-@@ -33,6 +33,7 @@
+diff --git a/android/bas.c b/android/bas.c
+index 87402c1..e5e9837 100644
+--- a/android/bas.c
++++ b/android/bas.c
+@@ -183,6 +183,48 @@ static void read_char(struct bt_bas *bas, GAttrib *attrib, uint16_t handle,
+ 	free(req);
+ }
  
- #include "lib/uuid.h"
- #include "src/shared/util.h"
-+#include "src/shared/queue.h"
- 
- #include "attrib/gattrib.h"
- #include "attrib/att.h"
-@@ -53,6 +54,7 @@ struct bt_dis {
- 	struct gatt_primary	*primary;	/* Primary details */
- 	bt_dis_notify		notify;
- 	void			*notify_data;
-+	struct queue		*gatt_op;
- };
- 
- struct characteristic {
-@@ -60,11 +62,25 @@ struct characteristic {
- 	struct bt_dis		*d;	/* deviceinfo where the char belongs */
- };
- 
-+struct gatt_request {
-+	unsigned int id;
-+	struct bt_dis *dis;
-+	void *user_data;
-+};
-+
-+static void destroy_gatt_req(struct gatt_request *req)
++static void discover_char(struct bt_bas *bas, GAttrib *attrib,
++						uint16_t start, uint16_t end,
++						bt_uuid_t *uuid, gatt_cb_t func,
++						gpointer user_data)
 +{
-+	queue_remove(req->dis->gatt_op, req);
-+	bt_dis_unref(req->dis);
++	struct gatt_request *req;
++	unsigned int id;
++
++	req = create_request(bas, user_data);
++	if (!req)
++		return;
++
++	id = gatt_discover_char(attrib, start, end, uuid, func, req);
++
++	if (set_and_store_gatt_req(bas, req, id))
++		return;
++
++	error("bas: Could not discover characteristic");
++	g_attrib_cancel(attrib, id);
 +	free(req);
 +}
 +
- static void dis_free(struct bt_dis *dis)
- {
- 	bt_dis_detach(dis);
- 
- 	g_free(dis->primary);
-+	queue_destroy(dis->gatt_op, (void *) destroy_gatt_req);
- 	g_free(dis);
- }
- 
-@@ -76,6 +92,12 @@ struct bt_dis *bt_dis_new(void *primary)
- 	if (!dis)
- 		return NULL;
- 
-+	dis->gatt_op = queue_new();
-+	if (!dis->gatt_op) {
-+		dis_free(dis);
-+		return NULL;
-+	}
-+
- 	if (primary)
- 		dis->primary = g_memdup(primary, sizeof(*dis->primary));
- 
-@@ -179,11 +201,18 @@ bool bt_dis_attach(struct bt_dis *dis, void *attrib)
- 	return true;
- }
- 
-+static void cancel_gatt_req(struct gatt_request *req)
++static void discover_desc(struct bt_bas *bas, GAttrib *attrib,
++				uint16_t start, uint16_t end, bt_uuid_t *uuid,
++				gatt_cb_t func, gpointer user_data)
 +{
-+	if (g_attrib_cancel(req->dis->attrib, req->id))
-+		destroy_gatt_req(req);
++	struct gatt_request *req;
++	unsigned int id;
++
++	req = create_request(bas, user_data);
++	if (!req)
++		return;
++
++	id = gatt_discover_desc(attrib, start, end, uuid, func, req);
++	if (set_and_store_gatt_req(bas, req, id))
++		return;
++
++	error("bas: Could not discover descriptor");
++	g_attrib_cancel(attrib, id);
++	free(req);
 +}
 +
- void bt_dis_detach(struct bt_dis *dis)
+ static void value_cb(const guint8 *pdu, guint16 len, gpointer user_data)
  {
- 	if (!dis->attrib)
- 		return;
+ 	DBG("Battery Level at %u", pdu[ATT_NOTIFICATION_HEADER_SIZE]);
+@@ -238,9 +280,12 @@ static void ccc_read_cb(guint8 status, const guint8 *pdu, guint16 len,
+ static void discover_descriptor_cb(uint8_t status, GSList *descs,
+ 								void *user_data)
+ {
+-	struct bt_bas *bas = user_data;
++	struct gatt_request *req = user_data;
++	struct bt_bas *bas = req->user_data;
+ 	struct gatt_desc *desc;
  
-+	queue_foreach(dis->gatt_op, (void *) cancel_gatt_req, NULL);
- 	g_attrib_unref(dis->attrib);
- 	dis->attrib = NULL;
++	destroy_gatt_req(req);
++
+ 	if (status != 0) {
+ 		error("Discover descriptors failed: %s", att_ecode2str(status));
+ 		return;
+@@ -255,11 +300,14 @@ static void discover_descriptor_cb(uint8_t status, GSList *descs,
+ 
+ static void bas_discovered_cb(uint8_t status, GSList *chars, void *user_data)
+ {
+-	struct bt_bas *bas = user_data;
++	struct gatt_request *req = user_data;
++	struct bt_bas *bas = req->user_data;
+ 	struct gatt_char *chr;
+ 	uint16_t start, end;
+ 	bt_uuid_t uuid;
+ 
++	destroy_gatt_req(req);
++
+ 	if (status) {
+ 		error("Battery: %s", att_ecode2str(status));
+ 		return;
+@@ -275,7 +323,7 @@ static void bas_discovered_cb(uint8_t status, GSList *chars, void *user_data)
+ 
+ 	bt_uuid16_create(&uuid, GATT_CLIENT_CHARAC_CFG_UUID);
+ 
+-	gatt_discover_desc(bas->attrib, start, end, &uuid,
++	discover_desc(bas, bas->attrib, start, end, &uuid,
+ 						discover_descriptor_cb, bas);
  }
+ 
+@@ -289,7 +337,7 @@ bool bt_bas_attach(struct bt_bas *bas, void *attrib)
+ 	if (bas->handle > 0)
+ 		return true;
+ 
+-	gatt_discover_char(bas->attrib, bas->primary->range.start,
++	discover_char(bas, bas->attrib, bas->primary->range.start,
+ 					bas->primary->range.end, NULL,
+ 					bas_discovered_cb, bas);
+ 
 -- 
 1.8.4
 
