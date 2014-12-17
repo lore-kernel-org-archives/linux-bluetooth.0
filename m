@@ -2,163 +2,95 @@ Return-Path: <cyrus@holtmann.org>
 From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH v2 18/19] android/scpp: Keep track on discover characteristic and descriptor
-Date: Wed, 17 Dec 2014 16:49:16 +0100
-Message-Id: <1418831357-23100-19-git-send-email-lukasz.rymanowski@tieto.com>
+Subject: [PATCH v2 17/19] android/scpp: Add queue to keep GATT operations
+Date: Wed, 17 Dec 2014 16:49:15 +0100
+Message-Id: <1418831357-23100-18-git-send-email-lukasz.rymanowski@tieto.com>
 In-Reply-To: <1418831357-23100-1-git-send-email-lukasz.rymanowski@tieto.com>
 References: <1418831357-23100-1-git-send-email-lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+With this patch SCPP gets queue to track GATT operations and also cancel
+requests on SCPP disconnect
 ---
- android/scpp.c | 88 ++++++++++++++++++++++++++++++++++++++++++++++++++++++----
- 1 file changed, 82 insertions(+), 6 deletions(-)
+ android/scpp.c | 29 +++++++++++++++++++++++++++++
+ 1 file changed, 29 insertions(+)
 
 diff --git a/android/scpp.c b/android/scpp.c
-index 69bb717..8087ada 100644
+index 9d8bb10..69bb717 100644
 --- a/android/scpp.c
 +++ b/android/scpp.c
-@@ -75,6 +75,73 @@ static void destroy_gatt_req(struct gatt_request *req)
- 	free(req);
- }
+@@ -35,6 +35,7 @@
  
-+static struct gatt_request *create_request(struct bt_scpp *scpp,
-+							void *user_data)
-+{
-+	struct gatt_request *req;
-+
-+	DBG("");
-+
-+	req = new0(struct gatt_request, 1);
-+	if (!req)
-+		return NULL;
-+
-+	req->user_data = user_data;
-+	req->scpp = bt_scpp_ref(scpp);
-+
-+	return req;
-+}
-+
-+static bool set_and_store_gatt_req(struct bt_scpp *scpp,
-+						struct gatt_request *req,
-+						unsigned int id)
-+{
-+	req->id = id;
-+	return queue_push_head(scpp->gatt_op, req);
-+}
-+
-+static void discover_char(struct bt_scpp *scpp, GAttrib *attrib,
-+						uint16_t start, uint16_t end,
-+						bt_uuid_t *uuid, gatt_cb_t func,
-+						gpointer user_data)
-+{
-+	struct gatt_request *req;
+ #include "lib/uuid.h"
+ #include "src/shared/util.h"
++#include "src/shared/queue.h"
+ 
+ #include "attrib/att.h"
+ #include "attrib/gattrib.h"
+@@ -58,13 +59,28 @@ struct bt_scpp {
+ 	uint16_t iwhandle;
+ 	uint16_t refresh_handle;
+ 	guint refresh_cb_id;
++	struct queue *gatt_op;
+ };
+ 
++struct gatt_request {
 +	unsigned int id;
++	struct bt_scpp *scpp;
++	void *user_data;
++};
 +
-+	req = create_request(scpp, user_data);
-+	if (!req)
-+		return;
-+
-+	id = gatt_discover_char(attrib, start, end, uuid, func, req);
-+
-+	if (set_and_store_gatt_req(scpp, req, id))
-+		return;
-+
-+	error("scpp: Could not discover characteristic");
-+	g_attrib_cancel(attrib, id);
-+	free(req);
-+}
-+
-+static void discover_desc(struct bt_scpp *scpp, GAttrib *attrib,
-+				uint16_t start, uint16_t end, bt_uuid_t *uuid,
-+				gatt_cb_t func, gpointer user_data)
++static void destroy_gatt_req(struct gatt_request *req)
 +{
-+	struct gatt_request *req;
-+	unsigned int id;
-+
-+	req = create_request(scpp, user_data);
-+	if (!req)
-+		return;
-+
-+	id = gatt_discover_desc(attrib, start, end, uuid, func, req);
-+	if (set_and_store_gatt_req(scpp, req, id))
-+		return;
-+
-+	error("scpp: Could not discover descriptor");
-+	g_attrib_cancel(attrib, id);
++	queue_remove(req->scpp->gatt_op, req);
++	bt_scpp_unref(req->scpp);
 +	free(req);
 +}
 +
  static void scpp_free(struct bt_scpp *scan)
  {
  	bt_scpp_detach(scan);
-@@ -154,7 +221,10 @@ static void refresh_value_cb(const uint8_t *pdu, uint16_t len,
- static void ccc_written_cb(guint8 status, const guint8 *pdu,
- 					guint16 plen, gpointer user_data)
- {
--	struct bt_scpp *scan = user_data;
-+	struct gatt_request *req = user_data;
-+	struct bt_scpp *scan = req->user_data;
-+
-+	destroy_gatt_req(req);
  
- 	if (status != 0) {
- 		error("Write Scan Refresh CCC failed: %s",
-@@ -200,11 +270,14 @@ static void discover_descriptor_cb(uint8_t status, GSList *descs,
- static void refresh_discovered_cb(uint8_t status, GSList *chars,
- 								void *user_data)
- {
--	struct bt_scpp *scan = user_data;
-+	struct gatt_request *req = user_data;
-+	struct bt_scpp *scan = req->user_data;
- 	struct gatt_char *chr;
- 	uint16_t start, end;
- 	bt_uuid_t uuid;
- 
-+	destroy_gatt_req(req);
-+
- 	if (status) {
- 		error("Scan Refresh %s", att_ecode2str(status));
- 		return;
-@@ -229,15 +302,18 @@ static void refresh_discovered_cb(uint8_t status, GSList *chars,
- 
- 	bt_uuid16_create(&uuid, GATT_CLIENT_CHARAC_CFG_UUID);
- 
--	gatt_discover_desc(scan->attrib, start, end, &uuid,
-+	discover_desc(scan, scan->attrib, start, end, &uuid,
- 					discover_descriptor_cb, user_data);
+ 	g_free(scan->primary);
++	queue_destroy(scan->gatt_op, (void *) destroy_gatt_req);
+ 	g_free(scan);
  }
  
- static void iwin_discovered_cb(uint8_t status, GSList *chars, void *user_data)
- {
--	struct bt_scpp *scan = user_data;
-+	struct gatt_request *req = user_data;
-+	struct bt_scpp *scan = req->user_data;
- 	struct gatt_char *chr;
+@@ -79,6 +95,12 @@ struct bt_scpp *bt_scpp_new(void *primary)
+ 	scan->interval = SCAN_INTERVAL;
+ 	scan->window = SCAN_WINDOW;
  
-+	destroy_gatt_req(req);
++	scan->gatt_op = queue_new();
++	if (!scan->gatt_op) {
++		scpp_free(scan);
++		return NULL;
++	}
 +
- 	if (status) {
- 		error("Discover Scan Interval Window: %s",
- 						att_ecode2str(status));
-@@ -267,7 +343,7 @@ bool bt_scpp_attach(struct bt_scpp *scan, void *attrib)
- 								scan->window);
- 	else {
- 		bt_uuid16_create(&iwin_uuid, SCAN_INTERVAL_WIN_UUID);
--		gatt_discover_char(scan->attrib, scan->primary->range.start,
-+		discover_char(scan, scan->attrib, scan->primary->range.start,
- 					scan->primary->range.end, &iwin_uuid,
- 					iwin_discovered_cb, scan);
+ 	if (primary)
+ 		scan->primary = g_memdup(primary, sizeof(*scan->primary));
+ 
+@@ -264,6 +286,12 @@ bool bt_scpp_attach(struct bt_scpp *scan, void *attrib)
+ 	return true;
+ }
+ 
++static void cancel_gatt_req(struct gatt_request *req)
++{
++	if (g_attrib_cancel(req->scpp->attrib, req->id))
++		destroy_gatt_req(req);
++}
++
+ void bt_scpp_detach(struct bt_scpp *scan)
+ {
+ 	if (!scan || !scan->attrib)
+@@ -274,6 +302,7 @@ void bt_scpp_detach(struct bt_scpp *scan)
+ 		scan->refresh_cb_id = 0;
  	}
-@@ -278,7 +354,7 @@ bool bt_scpp_attach(struct bt_scpp *scan, void *attrib)
- 				refresh_value_cb, scan, NULL);
- 	else {
- 		bt_uuid16_create(&refresh_uuid, SCAN_REFRESH_UUID);
--		gatt_discover_char(scan->attrib, scan->primary->range.start,
-+		discover_char(scan, scan->attrib, scan->primary->range.start,
- 					scan->primary->range.end, &refresh_uuid,
- 					refresh_discovered_cb, scan);
- 	}
+ 
++	queue_foreach(scan->gatt_op, (void *) cancel_gatt_req, NULL);
+ 	g_attrib_unref(scan->attrib);
+ 	scan->attrib = NULL;
+ }
 -- 
 1.8.4
 
