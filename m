@@ -1,146 +1,264 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <CABBYNZK+7EsbGe49hYVOcrnrkcce-Ok06RG3XzSvvRpremr=hw@mail.gmail.com>
-References: <1418782038-10999-1-git-send-email-armansito@chromium.org>
-	<1418782038-10999-6-git-send-email-armansito@chromium.org>
-	<CABBYNZJB4NZuKwQ-r64Te03QwSHi50quQ=Ka4UBhFLcORuufgw@mail.gmail.com>
-	<CAHrH25QZ=MGsY0UmiNL8pTA+3JS0E4dko485ZnTNmR_uGM93gg@mail.gmail.com>
-	<CABBYNZK+7EsbGe49hYVOcrnrkcce-Ok06RG3XzSvvRpremr=hw@mail.gmail.com>
-Date: Wed, 17 Dec 2014 13:58:35 -0800
-Message-ID: <CAHrH25TQRwg9Xi9iKcnsc_OsjdNx2eAbYbJQf7iGx9J83HWS9g@mail.gmail.com>
-Subject: Re: [PATCH BlueZ v4 05/10] core: device: Don't disconnect if attios
- not set
-From: Arman Uguray <armansito@chromium.org>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date: Wed, 17 Dec 2014 22:55:59 +0100
+Message-ID: <CAN_7+YaDAmt=LHy4Pj7KP--0-=ZYugBEiSdu7eTXmiJTNpo6hQ@mail.gmail.com>
+Subject: Re: [PATCH 1/2] attrib/gattrib: Add track for internal request id
+From: Lukasz Rymanowski <lukasz.rymanowski@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
-Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+Hi Marcel,
 
-On Wed, Dec 17, 2014 at 12:00 PM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> Hi Arman,
+On Wed, Dec 17, 2014 at 4:44 PM, Marcel Holtmann <marcel@holtmann.org> wrote:
+> Hi Lukasz,
 >
-> On Wed, Dec 17, 2014 at 3:42 PM, Arman Uguray <armansito@chromium.org> wrote:
->> Hi Luiz,
+>> If user provides req_id to the g_attrib_send, he assume that req_id
+>> should be used for transaction.
+>> With this patch, gattrib  keeps track on user requested req_id and
+>> actual pending req_id which allow to e.g. cancel correct transaction
+>> when user request it.
+>> ---
+>> attrib/gattrib.c | 100 +++++++++++++++++++++++++++++++++++++++++++++++++++++--
+>> 1 file changed, 98 insertions(+), 2 deletions(-)
 >>
->>> On Wed, Dec 17, 2014 at 5:08 AM, Luiz Augusto von Dentz <luiz.dentz@gmail.com> wrote:
->>> Hi Arman,
->>>
->>> On Wed, Dec 17, 2014 at 4:07 AM, Arman Uguray <armansito@chromium.org> wrote:
->>>> Currently there is no way for external applications to claim ownership
->>>> on a GATT connection and as profiles move away from attio.h it doesn't
->>>> make much sense to immediately disconnect if no attio callbacks have
->>>> been set after probing the profiles (as this will always immediately
->>>> disconnect the device). This patch removes this logic from btd_device.
->>>
->>> I was thinking that if no driver accepts the connection we should
->>> disconnect but it doesn't look like you had done anything in this
->>> direction, for external client using the D-Bus API maybe we need some
->>> method for registering client making only the services with clients
->>> visible.
->>>
+>> diff --git a/attrib/gattrib.c b/attrib/gattrib.c
+>> index ab43f84..c75866b 100644
+>> --- a/attrib/gattrib.c
+>> +++ b/attrib/gattrib.c
+>> @@ -51,10 +51,12 @@ struct _GAttrib {
+>>       struct queue *callbacks;
+>>       uint8_t *buf;
+>>       int buflen;
+>> +     struct queue *track_ids;
+>> };
 >>
->> I discussed how to make this possible for external applications on the
->> mailing list with Marcel and Johan by extending the Profile API
->> concept to GATT (org.bluez.GattProfile1 or sorts) but this will only
->> happen down the line.
 >>
->> For profiles, maybe btd_device can choose to disconnect if no profile
->> returned success during probing? Then again, we end up having a
->> mundane profile like GAP behave like the rest of the profiles this
->> way.
+>> struct attrib_callbacks {
+>> +     unsigned int id;
+>>       GAttribResultFunc result_func;
+>>       GAttribNotifyFunc notify_func;
+>>       GDestroyNotify destroy_func;
+>> @@ -63,6 +65,60 @@ struct attrib_callbacks {
+>>       uint16_t notify_handle;
+>> };
+>>
+>> +struct id_pair {
+>> +     unsigned int org_id;
+>> +     unsigned int pend_id;
+>> +};
+>> +
+>> +
+>> +static bool find_with_pend_id(const void *data, const void *user_data)
+>> +{
+>> +     const struct id_pair *p = data;
+>> +     unsigned int pending = PTR_TO_INT(user_data);
 >
-> Im not really following here, probing stage is to detect a driver can
-> be used and on success we create a service instance so it happen only
-> once, accept in the other hand would be triggered every time the
-> device connects. Anyway my comments was regarding the fact that we
-> need to detect if there are multiple clients for the same profile we
-> would need to do some conflict resolution, since we cannot track D-Bus
-> client right now I think it is better to not expose services which
-> have built-in driver such as HoG, etc, later once we introduce
-> org.bluez.GattProfile1 or similar we may favor external apps if that
-> makes more sense.
+> PTR_TO_UINT.
 >
->> For now, I figured we can remove this logic and keep the device
->> connected (since the user called Connect, it seems reasonable to make
->> the assumption that they want the device to be connected). In the
->> future, we'll want to revisit this and perhaps combine btd_profile and
->> GattProfile1 state to determine auto-connect, keeping the connection
->> alive, and so on.
+>> +
+>> +     return (p->pend_id == pending);
+>> +}
+>> +
+>> +static bool find_with_org_id(const void *data, const void *user_data)
+>> +{
+>> +     const struct id_pair *p = data;
+>> +     unsigned int orig_id = PTR_TO_INT(user_data);
 >
-> Well in case of classic if the user call Connect and there is no
-> driver matching/probed we don't attempt to connect at all, except to
-> update the services, but with LE it is much more common that we got
-> connected by the remote via advertising and passive scanning, thus it
-> would look like as an incoming connection, and then we could request
-> each probed driver to accept the connection.
+> PTR_TO_UINT.
 >
->> Though initially I still want to have the basic doc/gatt-api.txt
->> implemented before we go down the GattProfile path. I'm open to
->> suggestions in general though.
+>> +
+>> +     return (p->org_id == orig_id);
+>> +}
+>> +
+>> +static void remove_stored_ids(GAttrib *attrib, unsigned int pending_id)
+>> +{
+>> +     struct id_pair *p;
+>> +
+>> +     p = queue_remove_if(attrib->track_ids, find_with_pend_id,
+>> +                                             INT_TO_PTR(pending_id));
 >
-> I guess it is fine to leave it for later but we should keep in mind
-> what we gonna do about conflicting clients, I figure this patch might
-> actually be necessary since we cannot track D-Bus clients we may keep
-> the connection even if no driver accepts it.
+> UINT_TO_PTR.
 >
+>> +
+>> +     free(p);
+>> +}
+>> +
+>> +static void store_id(GAttrib *attrib, unsigned int org_id,
+>> +                                                     unsigned int pend_id)
+>> +{
+>> +     struct id_pair *t;
+>> +
+>> +     t = queue_find(attrib->track_ids, find_with_org_id, INT_TO_PTR(org_id));
+>
+> UINT_TO_PTR.
+>
+>> +     if (t) {
+>> +             t->pend_id = pend_id;
+>> +             return;
+>> +     }
+>> +
+>> +     t = new0(struct id_pair, 1);
+>> +     if (!t)
+>> +             return;
+>> +
+>> +     t->org_id = org_id;
+>> +     t->pend_id = pend_id;
+>> +
+>> +     if (!queue_push_tail(attrib->track_ids, t))
+>> +             free(t);
+>> +}
+>> +
+>> GAttrib *g_attrib_new(GIOChannel *io, guint16 mtu)
+>> {
+>>       gint fd;
+>> @@ -95,6 +151,10 @@ GAttrib *g_attrib_new(GIOChannel *io, guint16 mtu)
+>>       if (!attr->callbacks)
+>>               goto fail;
+>>
+>> +     attr->track_ids = queue_new();
+>> +     if (!attr->track_ids)
+>> +             goto fail;
+>> +
+>>       return g_attrib_ref(attr);
+>>
+>> fail:
+>> @@ -153,6 +213,7 @@ void g_attrib_unref(GAttrib *attrib)
+>>       bt_att_unref(attrib->att);
+>>
+>>       queue_destroy(attrib->callbacks, attrib_callbacks_destroy);
+>> +     queue_destroy(attrib->track_ids, free);
+>>
+>>       free(attrib->buf);
+>>
+>> @@ -229,6 +290,8 @@ static void attrib_callback_result(uint8_t opcode, const void *pdu,
+>>       if (cb->result_func)
+>>               cb->result_func(status, buf, length + 1, cb->user_data);
+>>
+>> +     remove_stored_ids(cb->parent, cb->id);
+>> +
+>>       free(buf);
+>> }
+>>
+>> @@ -282,18 +345,49 @@ guint g_attrib_send(GAttrib *attrib, guint id, const guint8 *pdu, guint16 len,
+>>               queue_push_head(attrib->callbacks, cb);
+>>               response_cb = attrib_callback_result;
+>>               destroy_cb = attrib_callbacks_remove;
+>> +
+>>       }
+>>
+>> -     return bt_att_send(attrib->att, pdu[0], (void *)pdu + 1, len - 1,
+>> +     cb->id = bt_att_send(attrib->att, pdu[0], (void *) pdu + 1, len - 1,
+>>                                               response_cb, cb, destroy_cb);
+>> +
+>> +     if (id == 0)
+>> +             return cb->id;
+>> +
+>> +     /*
+>> +      * If user what us to use given id, lets keep track on that so we give
+>> +      * user a possibility to cancel ongoing request
+>> +      */
+>> +     store_id(attrib, id, cb->id);
+>> +     return id;
+>> +}
+>> +
+>> +static unsigned int get_id(GAttrib *attrib, guint id)
+>> +{
+>> +     struct id_pair *p;
+>> +     unsigned int result = id;
+>> +
+>> +     p = queue_remove_if(attrib->track_ids, find_with_org_id,
+>> +                                                     INT_TO_PTR(id));
+>
+> UINT_TO_PTR.
+>
+>> +     if (!p)
+>> +             return id;
+>> +
+>> +     result = p->pend_id;
+>> +     free(p);
+>> +
+>> +     return result;
+>> }
+>>
+>> gboolean g_attrib_cancel(GAttrib *attrib, guint id)
+>> {
+>> +     unsigned int pend_id;
+>> +
+>>       if (!attrib)
+>>               return FALSE;
+>>
+>> -     return bt_att_cancel(attrib->att, id);
+>> +     pend_id = get_id(attrib, id);
+>
+> If you only have a single her for get_id, why not just include it in g_attrib_cancel. It is not that the wrap is by any means complex.
 
-As we discussed on IRC, I'm leaving this patch in. We'll regulate
-conflicts between external apps and internal profiles by not exporing
-claimed services.
+Ok,
 
->>
->>>> ---
->>>>  src/device.c | 8 --------
->>>>  1 file changed, 8 deletions(-)
->>>>
->>>> diff --git a/src/device.c b/src/device.c
->>>> index e8bdc18..64591d0 100644
->>>> --- a/src/device.c
->>>> +++ b/src/device.c
->>>> @@ -3642,9 +3642,6 @@ static void register_gatt_services(struct browse_req *req)
->>>>
->>>>         device_probe_profiles(device, req->profiles_added);
->>>>
->>>> -       if (device->attios == NULL && device->attios_offline == NULL)
->>>> -               attio_cleanup(device);
->>>> -
->>>>         device_svc_resolved(device, device->bdaddr_type, 0);
->>>>
->>>>         store_services(device);
->>>> @@ -5069,11 +5066,6 @@ gboolean btd_device_remove_attio_callback(struct btd_device *device, guint id)
->>>>
->>>>         g_free(attio);
->>>>
->>>> -       if (device->attios != NULL || device->attios_offline != NULL)
->>>> -               return TRUE;
->>>> -
->>>> -       attio_cleanup(device);
->>>> -
->>>>         return TRUE;
->>>>  }
->>>>
->>>> --
->>>> 2.2.0.rc0.207.ga3a616c
->>>>
->>>> --
->>>> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
->>>> the body of a message to majordomo@vger.kernel.org
->>>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->>>
->>>
->>>
->>> --
->>> Luiz Augusto von Dentz
->>
->> Arman
 >
+> Actually the get_id code is broken since it returns id and not error out if it is not found. Meaning you will try to cancel something else. And that might be a valid id from some user bt_att user.
+
+One thing is that bt_att can be shared, second thing is that gattrib
+in our case is shared. In this patch we solve only the issue of having
+shared gattrib.
+Idea is that it is gattrib user responsible for tracking its requests
+id's and on profile disconnect cancel only the ones he holds. GAttrib
+just needs to make sure that request id, which is given to user, is
+valid during whole gattrib operation. Even if GAttrib does some
+internal additional ATT request. Note that internal request comes form
+helper attrib/gatt.c. Check second patch for more details.
+
+When it comes to get_id(),  the only problem here is if e.g. there is
+user calling g_attrib_send(id = 1) and in the same time some other
+user don't care about id but gets id = 1. So when user cancel request
+id = 1  we always cancel request for first user. I will put comment in
+the code about this issue.
+However, please note that request_id different than 0 is used only in
+attrib/gatt.c and in the way that above is not possible.
+
+Also, this fix is temporary as we are working on removing gattrib from
+Android GATT/HOG, but it will just take longer then expected,
+therefore we need this fix for smooth HOG operations on Android.
+
 >
+>> +
+>> +     return bt_att_cancel(attrib->att, pend_id);
+>> }
+>>
+>> gboolean g_attrib_cancel_all(GAttrib *attrib)
+>> @@ -301,6 +395,8 @@ gboolean g_attrib_cancel_all(GAttrib *attrib)
+>>       if (!attrib)
+>>               return FALSE;
+>>
+>> +     queue_remove_all(attrib->track_ids, NULL, NULL, free);
+>> +
+>>       return bt_att_cancel_all(attrib->att);
+>
+> And I think you need to replace this bt_att_cancel_all with just canceling the ids in the queue. Since otherwise you have the same problem as before. It could be just luck that g_attrib_cancel_all has only been used in cases where it does not matter.
+
+As wrote above, for now we track id;s only in case g_attrib_send( id
+!=0 ). Actually I can easily extend it and keep all the ids. It would
+look like this:
+
+a) in case of g_attrib_send (id == 0) we keep pair (pend_id, pend_id)
+b) in case of g_attrib_send (id != 0) we keep pair ( id, pend_id)
+
+Then in g_attrib_cancel_all(), for each pair we do
+bt_att_cancel(pend_id).  Anyway, still he might hit issue I described
+above for get_id()
+
+Should I go this way?
+
+\Lukasz
+
+>
+> Regards
+>
+> Marcel
 >
 > --
-> Luiz Augusto von Dentz
-
-Arman
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
