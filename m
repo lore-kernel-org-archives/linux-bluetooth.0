@@ -1,80 +1,90 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1418782038-10999-7-git-send-email-armansito@chromium.org>
-References: <1418782038-10999-1-git-send-email-armansito@chromium.org>
-	<1418782038-10999-7-git-send-email-armansito@chromium.org>
-Date: Wed, 17 Dec 2014 14:39:59 +0200
-Message-ID: <CABBYNZLWYxDJQ3P=80OVMZpgqD0LV0ihW2VGAnthNevYGJPfOg@mail.gmail.com>
-Subject: Re: [PATCH BlueZ v4 06/10] core: device: Add getters for GATT db and client
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Arman Uguray <armansito@chromium.org>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+From: Gowtham Anandha Babu <gowtham.ab@samsung.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: d.kasatkin@samsung.com, bharat.panda@samsung.com, cpgs@samsung.com
+References: <1418809961-28354-1-git-send-email-gowtham.ab@samsung.com>
+In-reply-to: <1418809961-28354-1-git-send-email-gowtham.ab@samsung.com>
+Subject: RE: [PATCH] monitor/rfcomm: Add support for decoding Test command
+Date: Wed, 17 Dec 2014 17:31:32 +0530
+Message-id: <000501d019f1$443178d0$cc946a70$@samsung.com>
+MIME-version: 1.0
+Content-type: text/plain; charset=us-ascii
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Arman,
+Hi, 
 
-On Wed, Dec 17, 2014 at 4:07 AM, Arman Uguray <armansito@chromium.org> wrote:
-> This patch adds btd_device_get_gatt_db and btd_device_get_gatt_client
-> functions.
+> -----Original Message-----
+> From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-
+> owner@vger.kernel.org] On Behalf Of Gowtham Anandha Babu
+> Sent: Wednesday, December 17, 2014 3:23 PM
+> To: linux-bluetooth@vger.kernel.org
+> Cc: d.kasatkin@samsung.com; bharat.panda@samsung.com;
+> cpgs@samsung.com; Gowtham Anandha Babu
+> Subject: [PATCH] monitor/rfcomm: Add support for decoding Test command
+> 
+>           RFCOMM: Unnumbered Info with Header Check (UIH)(0xef)
+>              Address: 0x01 cr 0 dlci 0x00
+>              Control: 0xef poll/final 0
+>              Length: 6
+>              FCS: 0xaa
+>              MCC Message type: Test Command RSP(0x08)
+>                Length: 4
+>                Test Data: 0x 5f 54 65 73
 > ---
->  src/device.c | 16 ++++++++++++++++
->  src/device.h |  2 ++
->  2 files changed, 18 insertions(+)
->
-> diff --git a/src/device.c b/src/device.c
-> index 64591d0..854d9f3 100644
-> --- a/src/device.c
-> +++ b/src/device.c
-> @@ -4844,6 +4844,22 @@ GSList *btd_device_get_primaries(struct btd_device *device)
->         return device->primaries;
->  }
->
-> +struct gatt_db *btd_device_get_gatt_db(struct btd_device *device)
-> +{
-> +       if (!device)
-> +               return NULL;
+>  monitor/rfcomm.c | 19 +++++++++++++++++++
+>  1 file changed, 19 insertions(+)
+> 
+> diff --git a/monitor/rfcomm.c b/monitor/rfcomm.c index 7d22fa0..be215a1
+> 100644
+> --- a/monitor/rfcomm.c
+> +++ b/monitor/rfcomm.c
+> @@ -146,6 +146,23 @@ static void print_rfcomm_hdr(struct rfcomm_frame
+> *rfcomm_frame, uint8_t indent)
+>  	print_field("%*cFCS: 0x%2.2x", indent, ' ', hdr.fcs);  }
+> 
+> +static inline bool mcc_test(struct rfcomm_frame *rfcomm_frame, uint8_t
+> +indent) {
+> +	struct l2cap_frame *frame = &rfcomm_frame->l2cap_frame;
+> +	uint8_t data;
 > +
-> +       return device->db;
-> +}
-
-I guess the db can be get from the gatt_client, also perhaps we should
-return a reference otherwise it should be const.
-
-> +struct bt_gatt_client *btd_device_get_gatt_client(struct btd_device *device)
-> +{
-> +       if (!device)
-> +               return NULL;
+> +	printf("%*cTest Data: 0x ", indent, ' ');
 > +
-> +       return device->client;
+> +	while (frame->size > 1) {
+> +		if (!l2cap_frame_get_u8(frame, &data))
+> +			return false;
+> +		printf("%2.2x ", data);
+> +	}
+> +
+> +	printf("\n");
+> +	return true;
 > +}
 > +
->  void btd_device_gatt_set_service_changed(struct btd_device *device,
->                                                 uint16_t start, uint16_t end)
->  {
-> diff --git a/src/device.h b/src/device.h
-> index 487bd27..a7fefee 100644
-> --- a/src/device.h
-> +++ b/src/device.h
-> @@ -67,6 +67,8 @@ const sdp_record_t *btd_device_get_record(struct btd_device *device,
->  struct gatt_primary *btd_device_get_primary(struct btd_device *device,
->                                                         const char *uuid);
->  GSList *btd_device_get_primaries(struct btd_device *device);
-> +struct gatt_db *btd_device_get_gatt_db(struct btd_device *device);
-> +struct bt_gatt_client *btd_device_get_gatt_client(struct btd_device *device);
->  void btd_device_gatt_set_service_changed(struct btd_device *device,
->                                                 uint16_t start, uint16_t end);
->  bool device_attach_att(struct btd_device *dev, GIOChannel *io);
+>  static inline bool mcc_msc(struct rfcomm_frame *rfcomm_frame, uint8_t
+> indent)  {
+>  	struct l2cap_frame *frame = &rfcomm_frame->l2cap_frame; @@ -
+> 358,6 +375,8 @@ static inline bool mcc_frame(struct rfcomm_frame
+> *rfcomm_frame, uint8_t indent)
+>  	rfcomm_frame->mcc = mcc;
+> 
+>  	switch (type) {
+> +	case RFCOMM_TEST:
+> +		return mcc_test(rfcomm_frame, indent+10);
+>  	case RFCOMM_MSC:
+>  		return mcc_msc(rfcomm_frame, indent+2);
+>  	case RFCOMM_RPN:
 > --
-> 2.2.0.rc0.207.ga3a616c
->
+> 1.9.1
+> 
+
+Please ignore this one, I have uploaded a new set.
+
+Regards,
+Gowtham Anandha Babu
+
 > --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth"
+in
+> the body of a message to majordomo@vger.kernel.org More majordomo
+> info at  http://vger.kernel.org/majordomo-info.html
 
-
-
--- 
-Luiz Augusto von Dentz
