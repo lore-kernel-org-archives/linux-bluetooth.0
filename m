@@ -1,73 +1,105 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 17 Dec 2014 22:46:14 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org, linux-wireless@vger.kernel.org,
-	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: pull request: bluetooth 2014-12-17
-Message-ID: <20141217204614.GA15480@t440s.P-661HNU-F1>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="sm4nu43k4a2Rpi4c"
-Sender: linux-kernel-owner@vger.kernel.org
+In-Reply-To: <CAHrH25R4x5+3nVfSgY+mmDSD=_ANOmzE_SAwwV17+qXhurW__Q@mail.gmail.com>
+References: <1418782038-10999-1-git-send-email-armansito@chromium.org>
+	<1418782038-10999-7-git-send-email-armansito@chromium.org>
+	<CABBYNZLWYxDJQ3P=80OVMZpgqD0LV0ihW2VGAnthNevYGJPfOg@mail.gmail.com>
+	<CAHrH25R4x5+3nVfSgY+mmDSD=_ANOmzE_SAwwV17+qXhurW__Q@mail.gmail.com>
+Date: Wed, 17 Dec 2014 18:19:36 -0200
+Message-ID: <CABBYNZLG_swsQt0jBqb4YXZ4q_TSmNYeTqRVH_et1W+jQG+HWQ@mail.gmail.com>
+Subject: Re: [PATCH BlueZ v4 06/10] core: device: Add getters for GATT db and client
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Arman Uguray <armansito@chromium.org>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Hi Arman,
 
---sm4nu43k4a2Rpi4c
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+On Wed, Dec 17, 2014 at 3:45 PM, Arman Uguray <armansito@chromium.org> wrote:
+> Hi Luiz,
+>
+>> On Wed, Dec 17, 2014 at 4:39 AM, Luiz Augusto von Dentz <luiz.dentz@gmail.com> wrote:
+>> Hi Arman,
+>>
+>> On Wed, Dec 17, 2014 at 4:07 AM, Arman Uguray <armansito@chromium.org> wrote:
+>>> This patch adds btd_device_get_gatt_db and btd_device_get_gatt_client
+>>> functions.
+>>> ---
+>>>  src/device.c | 16 ++++++++++++++++
+>>>  src/device.h |  2 ++
+>>>  2 files changed, 18 insertions(+)
+>>>
+>>> diff --git a/src/device.c b/src/device.c
+>>> index 64591d0..854d9f3 100644
+>>> --- a/src/device.c
+>>> +++ b/src/device.c
+>>> @@ -4844,6 +4844,22 @@ GSList *btd_device_get_primaries(struct btd_device *device)
+>>>         return device->primaries;
+>>>  }
+>>>
+>>> +struct gatt_db *btd_device_get_gatt_db(struct btd_device *device)
+>>> +{
+>>> +       if (!device)
+>>> +               return NULL;
+>>> +
+>>> +       return device->db;
+>>> +}
+>>
+>> I guess the db can be get from the gatt_client, also perhaps we should
+>> return a reference otherwise it should be const.
+>>
+>
+> I think I'll keep this getter but make things const. My idea here is
+> that the gatt_db will outlive the connection and if the device is
+> bonded it won't get cleared. So it might still be useful.
 
-Hi Dave,
+Sure no problem, Im just not sure if the driver would be interested in
+the db without the client and as it is const it should not be possible
+to register callbacks, actually const for the client perhaps is not a
+good idea either for the same reason.
 
-Here's the first direct (i.e. skipping the wireless tree) bluetooth pull
-request for you, intended for 3.19. It's just one patch: a fix from
-Marcel for for remote service discovery filtering which also fixes a
-'used uninitialized' compiler warning.
+>>> +struct bt_gatt_client *btd_device_get_gatt_client(struct btd_device *device)
+>>> +{
+>>> +       if (!device)
+>>> +               return NULL;
+>>> +
+>>> +       return device->client;
+>>> +}
+>>> +
+>>>  void btd_device_gatt_set_service_changed(struct btd_device *device,
+>>>                                                 uint16_t start, uint16_t end)
+>>>  {
+>>> diff --git a/src/device.h b/src/device.h
+>>> index 487bd27..a7fefee 100644
+>>> --- a/src/device.h
+>>> +++ b/src/device.h
+>>> @@ -67,6 +67,8 @@ const sdp_record_t *btd_device_get_record(struct btd_device *device,
+>>>  struct gatt_primary *btd_device_get_primary(struct btd_device *device,
+>>>                                                         const char *uuid);
+>>>  GSList *btd_device_get_primaries(struct btd_device *device);
+>>> +struct gatt_db *btd_device_get_gatt_db(struct btd_device *device);
+>>> +struct bt_gatt_client *btd_device_get_gatt_client(struct btd_device *device);
+>>>  void btd_device_gatt_set_service_changed(struct btd_device *device,
+>>>                                                 uint16_t start, uint16_t end);
+>>>  bool device_attach_att(struct btd_device *dev, GIOChannel *io);
+>>> --
+>>> 2.2.0.rc0.207.ga3a616c
+>>>
+>>> --
+>>> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+>>> the body of a message to majordomo@vger.kernel.org
+>>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>>
+>>
+>>
+>> --
+>> Luiz Augusto von Dentz
+>
+> Arman
 
-Please let me know if there are any issues pulling. Thanks.
-
-Johan
-
----
-The following changes since commit 65891feac27e26115dc4cce881743a1ac33372df:
-
-  net: Disallow providing non zero VLAN ID for NIC drivers FDB add flow (2014-12-16 15:41:19 -0500)
-
-are available in the git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git for-upstream
-
-for you to fetch changes up to ea8ae2516ac43028a01c40b58ffa80d3b0afb802:
-
-  Bluetooth: Fix bug with filter in service discovery optimization (2014-12-17 22:03:49 +0200)
-
-----------------------------------------------------------------
-Marcel Holtmann (1):
-      Bluetooth: Fix bug with filter in service discovery optimization
-
- net/bluetooth/mgmt.c | 14 +++++++++-----
- 1 file changed, 9 insertions(+), 5 deletions(-)
 
 
---sm4nu43k4a2Rpi4c
-Content-Type: application/pgp-signature
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1
-
-iQIcBAEBAgAGBQJUkeuWAAoJECQj9vv5qNQSG0wQAKs/rxSc+p+v15Cl93vjjNDX
-kQGKomzrD8FYbFul7wFs63zB50yPR3enQr/93TyxDq5vMj+AD623sOBAUoYPsaSu
-SebzOrGFnsOjhHTLNH++luQSQFu/8mzJbZRILJCgbADVZ3j9AHleIiLkkzE/E7vX
-izGLu8MQl2hZsDU34JD4wPOSXHCO1TU4jrLipn2zit6MNe7ul165NfFeNjRtmnP8
-6s9eh6SwMRWILQT/Rm55/kTD9GfwF+IPj3JPu56QJG3flqF0OUHtRvHMl+ZrMa4J
-yGfI9ARhm9LW1l676Feg8OeqCQsE4Typ8xMUgPjaO9KoaJsqHJ8cnx96iGBbUTVQ
-OdeYYeFbjdIQkM702bPo69hwezIzcOBK6KBdc2s4WaAtUNC1+F0KoFciFhMuLeLy
-OVcqFcHsVon2DEpKwB9DBTNcr1uL2ATmMUunZIbeuIZYEMLQZdNnQjau2fSPchxV
-+cmP/jdKUR/wP4XoffUEhyn//fc9WMSwtfiajqubBb/MCTRgfAQxHq0JsIVa2qpo
-C0K2Nw2QL1XWXmr3xbxeTNT78M9G4iPqs5AcYH6llpfRruY2pY0P09JOjMMOvgin
-Zx9iJ9TsHJmQNufBsAwxkyM8vrmqUiO3w7H/E6J0M7a1rB2YNFDmu9rmNJwMLSXQ
-0fRuNgxzF4GaFKQiPzlY
-=JkT0
------END PGP SIGNATURE-----
-
---sm4nu43k4a2Rpi4c--
+-- 
+Luiz Augusto von Dentz
