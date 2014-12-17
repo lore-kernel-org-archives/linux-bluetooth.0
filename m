@@ -1,101 +1,29 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Wed, 17 Dec 2014 01:23:51 -0800
+From: Tristan Lelong <tristan@lelong.xyz>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: "Gustavo F. Padovan" <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 1/2] hci_bcsp: Add LE protocol on kernel side
+Message-ID: <20141217092351.GA9734@lenderer>
+References: <1418368478-13956-1-git-send-email-tristan@lelong.xyz>
+ <1418368478-13956-2-git-send-email-tristan@lelong.xyz>
+ <0E818206-73C3-476C-BB9D-7CC686ED7FEC@holtmann.org>
+ <20141213062623.GA3058@localhost.localdomain>
 MIME-Version: 1.0
-In-Reply-To: <CABBYNZJB4NZuKwQ-r64Te03QwSHi50quQ=Ka4UBhFLcORuufgw@mail.gmail.com>
-References: <1418782038-10999-1-git-send-email-armansito@chromium.org>
-	<1418782038-10999-6-git-send-email-armansito@chromium.org>
-	<CABBYNZJB4NZuKwQ-r64Te03QwSHi50quQ=Ka4UBhFLcORuufgw@mail.gmail.com>
-Date: Wed, 17 Dec 2014 09:42:39 -0800
-Message-ID: <CAHrH25QZ=MGsY0UmiNL8pTA+3JS0E4dko485ZnTNmR_uGM93gg@mail.gmail.com>
-Subject: Re: [PATCH BlueZ v4 05/10] core: device: Don't disconnect if attios
- not set
-From: Arman Uguray <armansito@chromium.org>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20141213062623.GA3058@localhost.localdomain>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+Hi,
 
-> On Wed, Dec 17, 2014 at 5:08 AM, Luiz Augusto von Dentz <luiz.dentz@gmail.com> wrote:
-> Hi Arman,
->
-> On Wed, Dec 17, 2014 at 4:07 AM, Arman Uguray <armansito@chromium.org> wrote:
->> Currently there is no way for external applications to claim ownership
->> on a GATT connection and as profiles move away from attio.h it doesn't
->> make much sense to immediately disconnect if no attio callbacks have
->> been set after probing the profiles (as this will always immediately
->> disconnect the device). This patch removes this logic from btd_device.
->
-> I was thinking that if no driver accepts the connection we should
-> disconnect but it doesn't look like you had done anything in this
-> direction, for external client using the D-Bus API maybe we need some
-> method for registering client making only the services with clients
-> visible.
->
+I took care of all the comments and started to test the patch.
+I probably need to modify some code on the userland side for better testing.
 
-I discussed how to make this possible for external applications on the
-mailing list with Marcel and Johan by extending the Profile API
-concept to GATT (org.bluez.GattProfile1 or sorts) but this will only
-happen down the line.
+I have a bug to fix already, probably caused by the cleanup of the patch.
 
-For profiles, maybe btd_device can choose to disconnect if no profile
-returned success during probing? Then again, we end up having a
-mundane profile like GAP behave like the rest of the profiles this
-way.
+I'll do this and resubmit the patch once fully tested and working.
 
-For now, I figured we can remove this logic and keep the device
-connected (since the user called Connect, it seems reasonable to make
-the assumption that they want the device to be connected). In the
-future, we'll want to revisit this and perhaps combine btd_profile and
-GattProfile1 state to determine auto-connect, keeping the connection
-alive, and so on.
-
-Though initially I still want to have the basic doc/gatt-api.txt
-implemented before we go down the GattProfile path. I'm open to
-suggestions in general though.
-
->> ---
->>  src/device.c | 8 --------
->>  1 file changed, 8 deletions(-)
->>
->> diff --git a/src/device.c b/src/device.c
->> index e8bdc18..64591d0 100644
->> --- a/src/device.c
->> +++ b/src/device.c
->> @@ -3642,9 +3642,6 @@ static void register_gatt_services(struct browse_req *req)
->>
->>         device_probe_profiles(device, req->profiles_added);
->>
->> -       if (device->attios == NULL && device->attios_offline == NULL)
->> -               attio_cleanup(device);
->> -
->>         device_svc_resolved(device, device->bdaddr_type, 0);
->>
->>         store_services(device);
->> @@ -5069,11 +5066,6 @@ gboolean btd_device_remove_attio_callback(struct btd_device *device, guint id)
->>
->>         g_free(attio);
->>
->> -       if (device->attios != NULL || device->attios_offline != NULL)
->> -               return TRUE;
->> -
->> -       attio_cleanup(device);
->> -
->>         return TRUE;
->>  }
->>
->> --
->> 2.2.0.rc0.207.ga3a616c
->>
->> --
->> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
->> the body of a message to majordomo@vger.kernel.org
->> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->
->
->
-> --
-> Luiz Augusto von Dentz
-
-Arman
+Best regards
