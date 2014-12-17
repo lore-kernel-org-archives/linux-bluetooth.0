@@ -2,63 +2,116 @@ Return-Path: <cyrus@holtmann.org>
 From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH v2 07/19] android/hog: Add support to track gatt operations
-Date: Wed, 17 Dec 2014 16:49:05 +0100
-Message-Id: <1418831357-23100-8-git-send-email-lukasz.rymanowski@tieto.com>
+Subject: [PATCH v2 06/19] android/gatt: Improve LE connection after pair
+Date: Wed, 17 Dec 2014 16:49:04 +0100
+Message-Id: <1418831357-23100-7-git-send-email-lukasz.rymanowski@tieto.com>
 In-Reply-To: <1418831357-23100-1-git-send-email-lukasz.rymanowski@tieto.com>
 References: <1418831357-23100-1-git-send-email-lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- android/hog.c | 10 ++++++++++
- 1 file changed, 10 insertions(+)
+With this patch, GATT keeps ATT connection for 30 sec during bonding,
+and once bonding is completed GATT starts service search.
 
-diff --git a/android/hog.c b/android/hog.c
-index edee73f..b87fd2f 100644
---- a/android/hog.c
-+++ b/android/hog.c
-@@ -45,6 +45,7 @@
- #include "lib/uuid.h"
- #include "src/shared/util.h"
- #include "src/shared/uhid.h"
-+#include "src/shared/queue.h"
+It is needed for example when user choose HOG device from Settings
+Application. So far scenario looks like that:
+
+1. Bonding started
+2. GATT Service search
+3. Bonding ended and LE connection dropped
+4. Initiated connection to HOG device
+
+Now it looks like that:
+
+1. Bonding Started
+2. Bonding Ended
+3. GATT Search Service
+4. Connect to HOG device on existing LE connection
+---
+ android/gatt.c | 42 ++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 40 insertions(+), 2 deletions(-)
+
+diff --git a/android/gatt.c b/android/gatt.c
+index c47e948..a19c907 100644
+--- a/android/gatt.c
++++ b/android/gatt.c
+@@ -70,6 +70,7 @@
+ #define GATT_PERM_WRITE_SIGNED_MITM	0x00020000
+ #define GATT_PERM_NONE			0x10000000
  
- #include "attrib/att.h"
- #include "attrib/gattrib.h"
-@@ -96,6 +97,7 @@ struct bt_hog {
- 	struct bt_dis		*dis;
- 	struct bt_bas		*bas;
- 	GSList			*instances;
-+	struct queue		*gatt_op;
- };
++#define GATT_PAIR_CONN_TIMEOUT 30
+ #define GATT_CONN_TIMEOUT 2
  
- struct report {
-@@ -783,6 +785,7 @@ static void hog_free(void *data)
- 	g_slist_free_full(hog->reports, report_free);
- 	g_free(hog->name);
- 	g_free(hog->primary);
-+	queue_destroy(hog->gatt_op, NULL);
- 	g_free(hog);
+ static const uint8_t BLUETOOTH_UUID[] = {
+@@ -1404,6 +1405,17 @@ static void send_app_connect_notifications(void *data, void *user_data)
+ 		send_app_connect_notify(conn, con_data->status);
  }
  
-@@ -795,9 +798,16 @@ struct bt_hog *bt_hog_new(const char *name, uint16_t vendor, uint16_t product,
- 	if (!hog)
- 		return NULL;
- 
-+	hog->gatt_op = queue_new();
-+	if (!hog->gatt_op) {
-+		hog_free(hog);
-+		return NULL;
-+	}
++static struct app_connection *find_conn_without_app(struct gatt_device *dev)
++{
++	struct app_connection conn_match;
 +
- 	hog->uhid = bt_uhid_new_default();
- 	if (!hog->uhid) {
- 		hog_free(hog);
-+		queue_destroy(hog->gatt_op, NULL);
- 		return NULL;
++	conn_match.device = dev;
++	conn_match.app = NULL;
++
++	return queue_find(app_connections, match_connection_by_device_and_app,
++								&conn_match);
++}
++
+ static struct app_connection *find_conn(const bdaddr_t *addr, int32_t app_id)
+ {
+ 	struct app_connection conn_match;
+@@ -1561,7 +1573,22 @@ reply:
+ 		if (!conn)
+ 			return;
+ 
+-		search_dev_for_srvc(conn, NULL);
++		if (bt_is_pairing(&dev->bdaddr))
++			/*
++			 * If there is bonding ongoing lets wait for paired
++			 * callback. Once we get that we can start search
++			 * services
++			 */
++			conn->timeout_id = g_timeout_add_seconds(
++						GATT_PAIR_CONN_TIMEOUT,
++						connection_timeout, conn);
++		else
++			/*
++			 * There is no ongoing bonding, lets search for primary
++			 * services
++			 *
++			 */
++			search_dev_for_srvc(conn, NULL);
  	}
  
+ 	data.dev = dev;
+@@ -7041,6 +7068,7 @@ static void gatt_paired_cb(const bdaddr_t *addr, uint8_t type)
+ {
+ 	struct gatt_device *dev;
+ 	char address[18];
++	struct app_connection *conn;
+ 
+ 	dev = find_device_by_addr(addr);
+ 	if (!dev)
+@@ -7052,7 +7080,17 @@ static void gatt_paired_cb(const bdaddr_t *addr, uint8_t type)
+ 	ba2str(addr, address);
+ 	DBG("Paired device %s", address);
+ 
+-	/* Find Service Changed and register for it.*/
++	/* conn without app is internal one used for search primary services */
++	conn = find_conn_without_app(dev);
++	if (!conn)
++		return;
++
++	if (conn->timeout_id > 0) {
++		g_source_remove(conn->timeout_id);
++		conn->timeout_id = 0;
++	}
++
++	search_dev_for_srvc(conn, NULL);
+ }
+ 
+ static void gatt_unpaired_cb(const bdaddr_t *addr, uint8_t type)
 -- 
 1.8.4
 
