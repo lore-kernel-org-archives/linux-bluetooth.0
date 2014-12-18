@@ -1,55 +1,69 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: Veseli Veseljko <veseljko75@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: ShanWan Sixaxis PS3 controller
-Date: Thu, 18 Dec 2014 12:24:59 +0100
-Message-ID: <1432274.34ricBdst7@uw000953>
-In-Reply-To: <20141217133613.GA18280@ubuntu.localnet>
-References: <20141216172421.GA12748@ubuntu.localnet> <20141217133613.GA18280@ubuntu.localnet>
+Message-ID: <c1f3352bed1f1a2985a5111a077134a5.squirrel@www.codeaurora.org>
+In-Reply-To: <87388d2tbn.fsf@purkki.adurom.net>
+References: <87388d2tbn.fsf@purkki.adurom.net>
+Date: Thu, 18 Dec 2014 12:55:23 +0200
+Subject: Re: changes to Linux wireless maintenance
+From: "Kalle Valo" <kvalo@codeaurora.org>
+To: "John W. Linville" <linville@tuxdriver.com>
+Cc: linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+	linux-nfc@ml01.01.org, "David S. Miller" <davem@davemloft.net>,
+	"Kalle Valo" <kvalo@codeaurora.org>, lwn@lwn.net
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=US-ASCII
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Veseli,
+John W. Linville wrote:
 
-On Wednesday 17 of December 2014 14:36:13 Veseli Veseljko wrote:
-> On Tuesday, 2014-12-16, at 18:24:21 +0100, Veseli Veseljko wrote:
-> > I have a Sony PS3 Sixaxis compatible controller made by ShanWan. Is it
-> > possible to make it work with bluez sixaxis plugin? I tried it on
-> > Ubuntu 14.10 running Linux kernel 3.16 and bluez 5.20, compiled with
-> > sixaxis option.
-> 
-> I added some DBGs into "/profiles/input/server.c" code and I found
-> out that when dev_is_sixaxis is run, both vendor ID and product ID for
-> this controller are 0x0000.
-> 
-> Any ideas?
+> Nevertheless, I think it is time for some changes.  I have been
+> the wireless maintainer for a long time, and I personally would
+> like to develop in a different direction.  Plus, I think that Linux
+> will benefit from having some fresh blood involved in more of the
+> maintenance duties.  I will be stepping aside to let that happen.
 
-Typically DS3 should be handled like this:
+Thanks to you both the Linux wireless subsystem as well as the wireless
+community has improved so much from what you started. You will be missed.
+Thank you for all your efforts and I hope you still hang around :)
 
-1. make sure you don't have sixad/qtsixa installed as it was reported that it
-   conflicted with sixpair plugin (udev rules)
-2. make sure you have sixaxis plugin installed - this plugin depends on udev
-   so it is not builin into bluetoothd but loaded on start from
-   /usr/lib/bluetooth/plugins 
-3. plug it into USB (don't press PS button yet)
-   you should see something like "sixaxis: compatible device connected: ...."
-   in bluetoothd logs
-4. unplug it
-5. press PS button
+> As for the wireless driver patches, I have asked Kalle Valo
+> to handle patch review and merge duties for everything under the
+> drivers/net/wireless directory.  This will now include not only the ath
+> patches he already manages, but other drivers that don't have trees
+> such as mwifiex, rt2x00, rtlwifi, and others.  For consistency, the
+> iwlwifi tree will also be merged through Kalle's new tree.  I expect
+> that Kalle will announce any relevant details in a follow-up message.
 
-Device should now connect and you should be asked (in bluetoothctl or UI) to
-authorize connection. After that you should be able to reconnect without need
-of pluging it with USB first.
+I have created two trees, wireless-drivers and wireless-drivers-next:
 
-This was mostly tested with genuine controllers. There were reports that some
-of clone devices doesn't behave exactly the same ie. use different pid/vid or
-don't report correct BT address over USB. Making them work would probably
-require some extra work, but I don't have any of those clone devices.
+https://git.kernel.org/cgit/linux/kernel/git/kvalo/wireless-drivers.git/
+
+https://git.kernel.org/cgit/linux/kernel/git/kvalo/wireless-drivers-next.git/
+
+The trees work similarly like John's wireless and wireless-next trees, the
+former only for important bugfixes to -rc releases and the latter for the
+rest going to the next release.
+
+I still need to ask both linux-next and kbuild maintainers to add these
+trees to their list of trees to test from, but I hope that to happen in
+the next few days.
+
+There's no need to CC me on the patches, I can pick the patches from the
+mailing list. Actually in the future I'm hoping to use patchwork[1] for
+managing patches, but my access request is still pending in helpdesk's
+queue. I'll send a separate email once I start using patchwork. For the
+time being I just use email to apply patches.
+
+For ath6kl and ath10k there will be no changes. I will maintain ath.git
+tree separately and just periodically merge that tree to
+wireless-drivers-next.
+
+I'll try to make this transition period as smooth as possible but some
+glitches might happen, like missing patches and so on. So please keep your
+eyes open and let me know if you spot any problems or I missed something.
+
+Kalle
+
+[1] https://patchwork.kernel.org/project/linux-wireless/list/
 
 
--- 
-Best regards, 
-Szymon Janc
