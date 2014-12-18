@@ -1,26 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 18 Dec 2014 15:32:59 -0500 (EST)
-Message-Id: <20141218.153259.1434707913030906643.davem@davemloft.net>
-To: johan.hedberg@gmail.com
-Cc: netdev@vger.kernel.org, linux-wireless@vger.kernel.org,
-	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: pull request: bluetooth 2014-12-17
-From: David Miller <davem@davemloft.net>
-In-Reply-To: <20141217204614.GA15480@t440s.P-661HNU-F1>
-References: <20141217204614.GA15480@t440s.P-661HNU-F1>
-Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
-Sender: netdev-owner@vger.kernel.org
+Date: Thu, 18 Dec 2014 21:10:43 +0100
+From: Pavel Machek <pavel@ucw.cz>
+To: Oliver Neukum <oneukum@suse.de>
+Cc: pali.rohar@gmail.com, sre@debian.org, sre@ring0.de,
+	kernel list <linux-kernel@vger.kernel.org>,
+	linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
+	linux-omap@vger.kernel.org, tony@atomide.com, khilman@kernel.org,
+	aaro.koskinen@iki.fi, ivo.g.dimitrov.75@gmail.com,
+	linux-bluetooth@vger.kernel.org, marcel@holtmann.org
+Subject: Re: bluetooth: Add hci_h4p driver
+Message-ID: <20141218201043.GA15240@amd>
+References: <20141213223727.GA13894@amd>
+ <1418637710.4443.11.camel@linux-0dmf.site>
+ <20141218193153.GA27832@amd>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20141218193153.GA27832@amd>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@gmail.com>
-Date: Wed, 17 Dec 2014 22:46:14 +0200
-
-> Here's the first direct (i.e. skipping the wireless tree) bluetooth pull
-> request for you, intended for 3.19. It's just one patch: a fix from
-> Marcel for for remote service discovery filtering which also fixes a
-> 'used uninitialized' compiler warning.
+Hi!
+On Thu 2014-12-18 20:31:53, Pavel Machek wrote:
+> Hi!
 > 
-> Please let me know if there are any issues pulling. Thanks.
+> > > +	h4p_simple_send_frame(info, skb);
+> > > +
+> > > +	if (!wait_for_completion_interruptible_timeout(&info->init_completion,
+> > > +						       msecs_to_jiffies(1000))) {
+> > > +		printk("h4p: negotiation did not return\n");
+> > 
+> > Memory leak in the error case
+> 
+> And memory leak in the normal case, too, no? Fixed.
 
-Pulled, thanks Johan.
+Actually, no, h4p_simple_send_frame passes skb to network stack, and
+it should free it as neccessary.
+
+								Pavel
+								
+-- 
+(english) http://www.livejournal.com/~pavelmachek
+(cesky, pictures) http://atrey.karlin.mff.cuni.cz/~pavel/picture/horses/blog.html
