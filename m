@@ -1,67 +1,52 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 18 Dec 2014 20:31:53 +0100
-From: Pavel Machek <pavel@ucw.cz>
-To: Oliver Neukum <oneukum@suse.de>
-Cc: pali.rohar@gmail.com, sre@debian.org, sre@ring0.de,
-	kernel list <linux-kernel@vger.kernel.org>,
-	linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
-	linux-omap@vger.kernel.org, tony@atomide.com, khilman@kernel.org,
-	aaro.koskinen@iki.fi, ivo.g.dimitrov.75@gmail.com,
-	linux-bluetooth@vger.kernel.org, marcel@holtmann.org
-Subject: Re: bluetooth: Add hci_h4p driver
-Message-ID: <20141218193153.GA27832@amd>
-References: <20141213223727.GA13894@amd>
- <1418637710.4443.11.camel@linux-0dmf.site>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH v3 1/7] android/map-client: Don't check if interface is ready on init
+Date: Thu, 18 Dec 2014 18:42:02 +0100
+Message-ID: <2532647.79vsq0TZis@uw000953>
+In-Reply-To: <1418824897-25342-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+References: <1418824897-25342-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1418637710.4443.11.camel@linux-0dmf.site>
+Content-Type: text/plain; charset="utf-8"
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi!
+Hi Grzegorz,
 
-> > +	h4p_simple_send_frame(info, skb);
-> > +
-> > +	if (!wait_for_completion_interruptible_timeout(&info->init_completion,
-> > +						       msecs_to_jiffies(1000))) {
-> > +		printk("h4p: negotiation did not return\n");
+On Wednesday 17 of December 2014 15:01:31 Grzegorz Kolodziejczyk wrote:
+> Map client don't have possibility to clean up its interface, only way to
+> change it is to overwrite. Service also can be unregistered but
+> interface doesn't change. This situation cause call to unregistered
+> service with set interface.
+> ---
+>  android/hal-map-client.c | 10 ++++++++--
+>  1 file changed, 8 insertions(+), 2 deletions(-)
 > 
-> Memory leak in the error case
+> diff --git a/android/hal-map-client.c b/android/hal-map-client.c
+> index 6c927d4..adf04fc 100644
+> --- a/android/hal-map-client.c
+> +++ b/android/hal-map-client.c
+> @@ -119,8 +119,14 @@ static bt_status_t init(btmce_callbacks_t *callbacks)
+>  
+>  	DBG("");
+>  
+> -	if (interface_ready())
+> -		return BT_STATUS_DONE;
+> +	/*
+> +	 * Interface ready check was removed because there is no cleanup
+> +	 * function to unregister and clear callbacks. MAP client testers may
+> +	 * restart bluetooth, unregister this profile and try to reuse it.
+> +	 * This situation make service unregistered but callbacks are still
+> +	 * set - interface is ready. On android devices there is no need to
+> +	 * re-init MAP client profile while bluetooth is loaded.
+> +	 */
+>  
+>  	cbs = callbacks;
+>  
 
-And memory leak in the normal case, too, no? Fixed.
-
-> > +	case H4_ACL_PKT:
-> > +		acl_hdr = (struct hci_acl_hdr *)skb->data;
-> > +		retval = le16_to_cpu(acl_hdr->dlen);
-> 
-> Could you explain, why only this needs endianness converted?
-
-This one is 16 bit, the others I checked are 8 bit.
-
-> > +static void h4p_rx_tasklet(unsigned long data)
-> > +{
-> > +	u8 byte;
-> > +	struct h4p_info *info = (struct h4p_info *)data;
-> > +
-> > +	BT_DBG("tasklet woke up");
-> > +	BT_DBG("rx_tasklet woke up");
-> 
-> Isn't this a bit redundant?
-
-Fixed.
-
-> > +	struct sk_buff *skb;
-> > +	struct h4p_info *info = (struct h4p_info *)data;
-> > +
-> > +	BT_DBG("tasklet woke up");
-> > +	BT_DBG("tx_tasklet woke up");
-> 
-> Doubled?
-
-Fixed.
-
-Thanks,
-									Pavel
+All patches applied (with some minor style fixes here and there), thanks. 
 
 -- 
-(english) http://www.livejournal.com/~pavelmachek
-(cesky, pictures) http://atrey.karlin.mff.cuni.cz/~pavel/picture/horses/blog.html
+Best regards, 
+Szymon Janc
