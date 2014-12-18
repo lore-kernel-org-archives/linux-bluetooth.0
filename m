@@ -1,66 +1,51 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-Reply-To: sedat.dilek@gmail.com
-In-Reply-To: <20141217155951.GA3144@tuxdriver.com>
-References: <20141217155951.GA3144@tuxdriver.com>
-Date: Thu, 18 Dec 2014 16:13:31 +0100
-Message-ID: <CA+icZUWsv4ZR1LN09=r-g525Wyreo1HNNzUKgXnq6cSt6QXcqw@mail.gmail.com>
-Subject: Re: changes to Linux wireless maintenance
-From: Sedat Dilek <sedat.dilek@gmail.com>
-To: "John W. Linville" <linville@tuxdriver.com>
-Cc: wireless <linux-wireless@vger.kernel.org>,
-	linux-bluetooth@vger.kernel.org, linux-nfc@ml01.01.org,
-	"David S. Miller" <davem@davemloft.net>,
-	Kalle Valo <kvalo@codeaurora.org>, lwn@lwn.net
-Content-Type: text/plain; charset=UTF-8
+Message-ID: <1418911535.2876.25.camel@jrissane-mobl.ger.corp.intel.com>
+Subject: Re: [PATCH] Bluetooth: 6lowpan: Do not free skb when packet is
+ dropped
+From: Jukka Rissanen <jukka.rissanen@linux.intel.com>
+To: linux-bluetooth@vger.kernel.org
+Date: Thu, 18 Dec 2014 16:05:35 +0200
+In-Reply-To: <1418213993-24884-1-git-send-email-jukka.rissanen@linux.intel.com>
+References: <1418213993-24884-1-git-send-email-jukka.rissanen@linux.intel.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Wed, Dec 17, 2014 at 4:59 PM, John W. Linville
-<linville@tuxdriver.com> wrote:
-> Greetings,
->
-> Almost 9 years ago, Jeff Garzik wrote a message on LKML detailing
-> the sad state of wireless LANs in the Linux world.  The point of his
-> message was "So... there it is.  We suck.  There's hope.  No Luke
-> Skywalker in sight.":
->
->         https://lkml.org/lkml/2006/1/5/671
->
-> Shortly thereafter, I became the maintainer for wireless LANs in the
-> Linux kernel:
->
->         https://lkml.org/lkml/2006/1/18/377
->
-...
+Ping.
 
-Hmm, I remember testing the eraly iwlwifi stuff because I wanted that
-damn bith running on my HP nc6400 notebook these days (iwl3945).
+On ke, 2014-12-10 at 14:19 +0200, Jukka Rissanen wrote:
+> If we need to drop the message because of some error in the
+> compression etc, then do not free the skb as that is done
+> automatically in other part of networking stack.
+> 
+> Signed-off-by: Jukka Rissanen <jukka.rissanen@linux.intel.com>
+> ---
+>  net/bluetooth/6lowpan.c | 1 -
+>  1 file changed, 1 deletion(-)
+> 
+> diff --git a/net/bluetooth/6lowpan.c b/net/bluetooth/6lowpan.c
+> index bdcaefd..ca5b4ec 100644
+> --- a/net/bluetooth/6lowpan.c
+> +++ b/net/bluetooth/6lowpan.c
+> @@ -390,7 +390,6 @@ static int recv_pkt(struct sk_buff *skb, struct net_device *dev,
+>  
+>  drop:
+>  	dev->stats.rx_dropped++;
+> -	kfree_skb(skb);
+>  	return NET_RX_DROP;
+>  }
+>  
 
-Following the wireless ML made a real fun for me and I will allways
-associate "linux-wireless" with "John W. Linville".
-So life is change, I had some hurtful/wretched experiences the last two years.
-Anyway, thanks and my best wishes with any other projects :-).
 
-> The mac80211, bluetooth, and nfc trees have fed through me for some
-> time.  I am now asking these trees to send pull request directly to
-> David Miller.  Since these trees are managed through git, my hope is
-> that they will not place any significant burden on Dave.
->
-> As for the wireless driver patches, I have asked Kalle Valo
-> to handle patch review and merge duties for everything under the
-> drivers/net/wireless directory.  This will now include not only the ath
-> patches he already manages, but other drivers that don't have trees
-> such as mwifiex, rt2x00, rtlwifi, and others.  For consistency, the
-> iwlwifi tree will also be merged through Kalle's new tree.  I expect
-> that Kalle will announce any relevant details in a follow-up message.
->
+This patch should be applied at least in bluetooth-next. I have not seen
+any errors in earlier kernels as we never seem to go to this branch but
+because of Alex's ip header compression patches (that are still
+pending), this error branch will be hit quite easily in the future. The
+patch could be applied also to earlier kernels just in case.
 
-Hmm, not sure why mac80211 stuff should not go via wireless trees?
-If I remember testing early wireless stuff I pulled this order...
 
-mac80211 -> wireless -> net (Git trees)
+Cheers,
+Jukka
 
-Can you explain why mac80211 separate from wireless stuff?
 
-- Sedat -
