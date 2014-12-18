@@ -2,216 +2,174 @@ Return-Path: <cyrus@holtmann.org>
 From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH v2 3/3] attrib/gattrib: Add tracking all the internal request id
-Date: Thu, 18 Dec 2014 14:46:07 +0100
-Message-Id: <1418910367-19792-4-git-send-email-lukasz.rymanowski@tieto.com>
+Subject: [PATCH v2 2/3] attrib/gatt: Fix for search services
+Date: Thu, 18 Dec 2014 14:46:06 +0100
+Message-Id: <1418910367-19792-3-git-send-email-lukasz.rymanowski@tieto.com>
 In-Reply-To: <1418910367-19792-1-git-send-email-lukasz.rymanowski@tieto.com>
 References: <1418910367-19792-1-git-send-email-lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-With this patch gattrib track all the pending request id's to bt_att.
-When doing g_attrib_cancel_all, only those own by gattrib will be
-canceled.
----
- attrib/gattrib.c | 95 ++++++++++++++++++++++++--------------------------------
- 1 file changed, 41 insertions(+), 54 deletions(-)
+This patch adds means to reuse ATT request id for GATT operations
+which might need more then one ATT request for complete GATT operation.
+E.g discover primary\included services and discover
+characteristics/descriptors
 
-diff --git a/attrib/gattrib.c b/attrib/gattrib.c
-index f986a77..5709d84 100644
---- a/attrib/gattrib.c
-+++ b/attrib/gattrib.c
-@@ -54,9 +54,13 @@ struct _GAttrib {
- 	struct queue *track_ids;
- };
+This is needed for the user of gattib, to make sure that ATT request id he
+holds is valid during whole GATT operation.
+
+So far, it could happen that gattrib did additional ATT request without
+user knowledge which leads to situation that user had outdated ATT
+request id.
+
+Note that request id is used by the user for canceling request.
+---
+ attrib/gatt.c | 43 ++++++++++++++++++++++++++++++++-----------
+ 1 file changed, 32 insertions(+), 11 deletions(-)
+
+diff --git a/attrib/gatt.c b/attrib/gatt.c
+index b4be25a..aafd3f7 100644
+--- a/attrib/gatt.c
++++ b/attrib/gatt.c
+@@ -41,6 +41,7 @@
+ struct discover_primary {
+ 	int ref;
+ 	GAttrib *attrib;
++	unsigned int id;
+ 	bt_uuid_t uuid;
+ 	GSList *primaries;
+ 	gatt_cb_t cb;
+@@ -50,6 +51,7 @@ struct discover_primary {
+ /* Used for the Included Services Discovery (ISD) procedure */
+ struct included_discovery {
+ 	GAttrib		*attrib;
++	unsigned int	id;
+ 	int		refs;
+ 	int		err;
+ 	uint16_t	end_handle;
+@@ -66,6 +68,7 @@ struct included_uuid_query {
+ struct discover_char {
+ 	int ref;
+ 	GAttrib *attrib;
++	unsigned int id;
+ 	bt_uuid_t *uuid;
+ 	uint16_t end;
+ 	GSList *characteristics;
+@@ -76,6 +79,7 @@ struct discover_char {
+ struct discover_desc {
+ 	int ref;
+ 	GAttrib *attrib;
++	unsigned int id;
+ 	bt_uuid_t *uuid;
+ 	uint16_t end;
+ 	GSList *descriptors;
+@@ -258,7 +262,7 @@ static void primary_by_uuid_cb(guint8 status, const guint8 *ipdu,
+ 	if (oplen == 0)
+ 		goto done;
  
-+struct id_pair {
-+	unsigned int org_id;
-+	unsigned int pend_id;
-+};
+-	g_attrib_send(dp->attrib, 0, buf, oplen, primary_by_uuid_cb,
++	g_attrib_send(dp->attrib, dp->id, buf, oplen, primary_by_uuid_cb,
+ 			discover_primary_ref(dp), discover_primary_unref);
+ 	return;
  
- struct attrib_callbacks {
--	unsigned int id;
-+	struct id_pair *id;
- 	GAttribResultFunc result_func;
- 	GAttribNotifyFunc notify_func;
- 	GDestroyNotify destroy_func;
-@@ -65,20 +69,6 @@ struct attrib_callbacks {
- 	uint16_t notify_handle;
- };
+@@ -327,7 +331,7 @@ static void primary_all_cb(guint8 status, const guint8 *ipdu, guint16 iplen,
+ 		guint16 oplen = encode_discover_primary(end + 1, 0xffff, NULL,
+ 								buf, buflen);
  
--struct id_pair {
--	unsigned int org_id;
--	unsigned int pend_id;
--};
--
--
--static bool find_with_pend_id(const void *data, const void *user_data)
--{
--	const struct id_pair *p = data;
--	unsigned int pending = PTR_TO_UINT(user_data);
--
--	return (p->pend_id == pending);
--}
--
- static bool find_with_org_id(const void *data, const void *user_data)
- {
- 	const struct id_pair *p = data;
-@@ -87,37 +77,22 @@ static bool find_with_org_id(const void *data, const void *user_data)
- 	return (p->org_id == orig_id);
- }
+-		g_attrib_send(dp->attrib, 0, buf, oplen, primary_all_cb,
++		g_attrib_send(dp->attrib, dp->id, buf, oplen, primary_all_cb,
+ 						discover_primary_ref(dp),
+ 						discover_primary_unref);
  
--static void remove_stored_ids(GAttrib *attrib, unsigned int pending_id)
--{
--	struct id_pair *p;
--
--	p = queue_remove_if(attrib->track_ids, find_with_pend_id,
--						UINT_TO_PTR(pending_id));
--
--	free(p);
--}
--
--static void store_id(GAttrib *attrib, unsigned int org_id,
-+static struct id_pair *store_id(GAttrib *attrib, unsigned int org_id,
- 							unsigned int pend_id)
- {
- 	struct id_pair *t;
+@@ -365,9 +369,11 @@ guint gatt_discover_primary(GAttrib *attrib, bt_uuid_t *uuid, gatt_cb_t func,
+ 	} else
+ 		cb = primary_all_cb;
  
--	t = queue_find(attrib->track_ids, find_with_org_id,
--							UINT_TO_PTR(org_id));
--	if (t) {
--		t->pend_id = pend_id;
--		return;
--	}
--
- 	t = new0(struct id_pair, 1);
- 	if (!t)
--		return;
-+		return NULL;
- 
- 	t->org_id = org_id;
- 	t->pend_id = pend_id;
- 
--	if (!queue_push_tail(attrib->track_ids, t))
--		free(t);
-+	if (queue_push_tail(attrib->track_ids, t))
-+		return t;
+-	return g_attrib_send(attrib, 0, buf, plen, cb,
++	dp->id = g_attrib_send(attrib, 0, buf, plen, cb,
+ 					discover_primary_ref(dp),
+ 					discover_primary_unref);
 +
-+	return NULL;
++	return dp->id;
  }
  
- GAttrib *g_attrib_new(GIOChannel *io, guint16 mtu)
-@@ -185,6 +160,9 @@ static void attrib_callbacks_destroy(void *data)
- 	if (cb->destroy_func)
- 		cb->destroy_func(cb->user_data);
+ static void resolve_included_uuid_cb(uint8_t status, const uint8_t *pdu,
+@@ -422,7 +428,7 @@ static guint resolve_included_uuid(struct included_discovery *isd,
+ 	query->isd = isd_ref(isd);
+ 	query->included = incl;
  
-+	if (queue_remove(cb->parent->track_ids, cb->id))
-+		free(cb->id);
+-	return g_attrib_send(isd->attrib, 0, buf, oplen,
++	return g_attrib_send(isd->attrib, query->isd->id, buf, oplen,
+ 				resolve_included_uuid_cb, query,
+ 				inc_query_free);
+ }
+@@ -459,8 +465,17 @@ static guint find_included(struct included_discovery *isd, uint16_t start)
+ 	oplen = enc_read_by_type_req(start, isd->end_handle, &uuid,
+ 							buf, buflen);
+ 
+-	return g_attrib_send(isd->attrib, 0, buf, oplen, find_included_cb,
++	/* If id != 0 it means we are in the middle of include search */
++	if (isd->id)
++		return g_attrib_send(isd->attrib, isd->id, buf, oplen,
++				find_included_cb, isd_ref(isd),
++				(GDestroyNotify) isd_unref);
 +
- 	free(data);
++	/* This is first call from the gattrib user */
++	isd->id = g_attrib_send(isd->attrib, 0, buf, oplen, find_included_cb,
+ 				isd_ref(isd), (GDestroyNotify) isd_unref);
++
++	return isd->id;
  }
  
-@@ -291,8 +269,6 @@ static void attrib_callback_result(uint8_t opcode, const void *pdu,
- 	if (cb->result_func)
- 		cb->result_func(status, buf, length + 1, cb->user_data);
+ static void find_included_cb(uint8_t status, const uint8_t *pdu, uint16_t len,
+@@ -599,8 +614,9 @@ static void char_discovered_cb(guint8 status, const guint8 *ipdu, guint16 iplen,
+ 		if (oplen == 0)
+ 			return;
  
--	remove_stored_ids(cb->parent, cb->id);
--
- 	free(buf);
- }
+-		g_attrib_send(dc->attrib, 0, buf, oplen, char_discovered_cb,
+-				discover_char_ref(dc), discover_char_unref);
++		g_attrib_send(dc->attrib, dc->id, buf, oplen,
++				char_discovered_cb, discover_char_ref(dc),
++				discover_char_unref);
  
-@@ -328,6 +304,7 @@ guint g_attrib_send(GAttrib *attrib, guint id, const guint8 *pdu, guint16 len,
- 	struct attrib_callbacks *cb = NULL;
- 	bt_att_response_func_t response_cb = NULL;
- 	bt_att_destroy_func_t destroy_cb = NULL;
-+	unsigned int pend_id;
- 
- 	if (!attrib)
- 		return 0;
-@@ -349,32 +326,36 @@ guint g_attrib_send(GAttrib *attrib, guint id, const guint8 *pdu, guint16 len,
- 
+ 		return;
  	}
+@@ -636,8 +652,10 @@ guint gatt_discover_char(GAttrib *attrib, uint16_t start, uint16_t end,
+ 	dc->end = end;
+ 	dc->uuid = g_memdup(uuid, sizeof(bt_uuid_t));
  
--	cb->id = bt_att_send(attrib->att, pdu[0], (void *) pdu + 1, len - 1,
-+	pend_id = bt_att_send(attrib->att, pdu[0], (void *) pdu + 1, len - 1,
- 						response_cb, cb, destroy_cb);
- 
--	if (id == 0)
--		return cb->id;
-+	/*
-+	 * We store here pair as it is easier to handle it in response and in
-+	 * case where user request us to use specific id request - see below.
-+	 */
-+	if (id == 0) {
-+		cb->id = store_id(attrib, pend_id, pend_id);
-+		return pend_id;
-+	}
- 
- 	/*
- 	 * If user what us to use given id, lets keep track on that so we give
- 	 * user a possibility to cancel ongoing request.
- 	 */
--	store_id(attrib, id, cb->id);
-+	cb->id = store_id(attrib, id, pend_id);
- 	return id;
- }
- 
- gboolean g_attrib_cancel(GAttrib *attrib, guint id)
- {
- 	struct id_pair *p;
--	unsigned int pend_id;
- 
- 	if (!attrib)
- 		return FALSE;
- 
- 	/*
--	 * Let's try to find actual pending request id on the tracking id queue.
--	 * If there is no such it means it is not tracked id and we can cancel
--	 * it.
-+	 * If request belongs to gattrib and is not yet done it has to be on
-+	 * the tracking id queue
- 	 *
- 	 * FIXME: It can happen that on the queue there is id_pair with
- 	 * given id which was provided by the user. In the same time it might
-@@ -386,14 +367,18 @@ gboolean g_attrib_cancel(GAttrib *attrib, guint id)
- 	 */
- 	p = queue_remove_if(attrib->track_ids, find_with_org_id,
- 							UINT_TO_PTR(id));
--	if (p) {
--		pend_id = p->pend_id;
--		free(p);
--	} else {
--		pend_id = id;
--	}
-+	if (!p)
-+		return FALSE;
- 
--	return bt_att_cancel(attrib->att, pend_id);
-+	return bt_att_cancel(attrib->att, p->pend_id);
-+}
+-	return g_attrib_send(attrib, 0, buf, plen, char_discovered_cb,
++	dc->id = g_attrib_send(attrib, 0, buf, plen, char_discovered_cb,
+ 				discover_char_ref(dc), discover_char_unref);
 +
-+static void cancel_request(void *data, void *user_data)
-+{
-+	struct id_pair *p = data;
-+	GAttrib *attrib = user_data;
++	return dc->id;
+ }
+ 
+ guint gatt_read_char_by_uuid(GAttrib *attrib, uint16_t start, uint16_t end,
+@@ -1017,8 +1035,9 @@ static void desc_discovered_cb(guint8 status, const guint8 *ipdu,
+ 		if (oplen == 0)
+ 			return;
+ 
+-		g_attrib_send(dd->attrib, 0, buf, oplen, desc_discovered_cb,
+-				discover_desc_ref(dd), discover_desc_unref);
++		g_attrib_send(dd->attrib, dd->id, buf, oplen,
++				desc_discovered_cb, discover_desc_ref(dd),
++				discover_desc_unref);
+ 
+ 		return;
+ 	}
+@@ -1051,8 +1070,10 @@ guint gatt_discover_desc(GAttrib *attrib, uint16_t start, uint16_t end,
+ 	dd->end = end;
+ 	dd->uuid = g_memdup(uuid, sizeof(bt_uuid_t));
+ 
+-	return g_attrib_send(attrib, 0, buf, plen, desc_discovered_cb,
++	dd->id = g_attrib_send(attrib, 0, buf, plen, desc_discovered_cb,
+ 				discover_desc_ref(dd), discover_desc_unref);
 +
-+	bt_att_cancel(attrib->att, p->pend_id);
++	return dd->id;
  }
  
- gboolean g_attrib_cancel_all(GAttrib *attrib)
-@@ -401,9 +386,11 @@ gboolean g_attrib_cancel_all(GAttrib *attrib)
- 	if (!attrib)
- 		return FALSE;
- 
-+	/* Cancel only request which belongs to gattrib */
-+	queue_foreach(attrib->track_ids, cancel_request, attrib);
- 	queue_remove_all(attrib->track_ids, NULL, NULL, free);
- 
--	return bt_att_cancel_all(attrib->att);
-+	return TRUE;
- }
- 
- guint g_attrib_register(GAttrib *attrib, guint8 opcode, guint16 handle,
+ guint gatt_write_cmd(GAttrib *attrib, uint16_t handle, const uint8_t *value,
 -- 
 1.8.4
 
