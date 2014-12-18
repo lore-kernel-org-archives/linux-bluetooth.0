@@ -1,51 +1,217 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1418911535.2876.25.camel@jrissane-mobl.ger.corp.intel.com>
-Subject: Re: [PATCH] Bluetooth: 6lowpan: Do not free skb when packet is
- dropped
-From: Jukka Rissanen <jukka.rissanen@linux.intel.com>
+From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Date: Thu, 18 Dec 2014 16:05:35 +0200
-In-Reply-To: <1418213993-24884-1-git-send-email-jukka.rissanen@linux.intel.com>
-References: <1418213993-24884-1-git-send-email-jukka.rissanen@linux.intel.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+Cc: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+Subject: [PATCH v2 3/3] attrib/gattrib: Add tracking all the internal request id
+Date: Thu, 18 Dec 2014 14:46:07 +0100
+Message-Id: <1418910367-19792-4-git-send-email-lukasz.rymanowski@tieto.com>
+In-Reply-To: <1418910367-19792-1-git-send-email-lukasz.rymanowski@tieto.com>
+References: <1418910367-19792-1-git-send-email-lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Ping.
+With this patch gattrib track all the pending request id's to bt_att.
+When doing g_attrib_cancel_all, only those own by gattrib will be
+canceled.
+---
+ attrib/gattrib.c | 95 ++++++++++++++++++++++++--------------------------------
+ 1 file changed, 41 insertions(+), 54 deletions(-)
 
-On ke, 2014-12-10 at 14:19 +0200, Jukka Rissanen wrote:
-> If we need to drop the message because of some error in the
-> compression etc, then do not free the skb as that is done
-> automatically in other part of networking stack.
-> 
-> Signed-off-by: Jukka Rissanen <jukka.rissanen@linux.intel.com>
-> ---
->  net/bluetooth/6lowpan.c | 1 -
->  1 file changed, 1 deletion(-)
-> 
-> diff --git a/net/bluetooth/6lowpan.c b/net/bluetooth/6lowpan.c
-> index bdcaefd..ca5b4ec 100644
-> --- a/net/bluetooth/6lowpan.c
-> +++ b/net/bluetooth/6lowpan.c
-> @@ -390,7 +390,6 @@ static int recv_pkt(struct sk_buff *skb, struct net_device *dev,
->  
->  drop:
->  	dev->stats.rx_dropped++;
-> -	kfree_skb(skb);
->  	return NET_RX_DROP;
->  }
->  
-
-
-This patch should be applied at least in bluetooth-next. I have not seen
-any errors in earlier kernels as we never seem to go to this branch but
-because of Alex's ip header compression patches (that are still
-pending), this error branch will be hit quite easily in the future. The
-patch could be applied also to earlier kernels just in case.
-
-
-Cheers,
-Jukka
-
+diff --git a/attrib/gattrib.c b/attrib/gattrib.c
+index f986a77..5709d84 100644
+--- a/attrib/gattrib.c
++++ b/attrib/gattrib.c
+@@ -54,9 +54,13 @@ struct _GAttrib {
+ 	struct queue *track_ids;
+ };
+ 
++struct id_pair {
++	unsigned int org_id;
++	unsigned int pend_id;
++};
+ 
+ struct attrib_callbacks {
+-	unsigned int id;
++	struct id_pair *id;
+ 	GAttribResultFunc result_func;
+ 	GAttribNotifyFunc notify_func;
+ 	GDestroyNotify destroy_func;
+@@ -65,20 +69,6 @@ struct attrib_callbacks {
+ 	uint16_t notify_handle;
+ };
+ 
+-struct id_pair {
+-	unsigned int org_id;
+-	unsigned int pend_id;
+-};
+-
+-
+-static bool find_with_pend_id(const void *data, const void *user_data)
+-{
+-	const struct id_pair *p = data;
+-	unsigned int pending = PTR_TO_UINT(user_data);
+-
+-	return (p->pend_id == pending);
+-}
+-
+ static bool find_with_org_id(const void *data, const void *user_data)
+ {
+ 	const struct id_pair *p = data;
+@@ -87,37 +77,22 @@ static bool find_with_org_id(const void *data, const void *user_data)
+ 	return (p->org_id == orig_id);
+ }
+ 
+-static void remove_stored_ids(GAttrib *attrib, unsigned int pending_id)
+-{
+-	struct id_pair *p;
+-
+-	p = queue_remove_if(attrib->track_ids, find_with_pend_id,
+-						UINT_TO_PTR(pending_id));
+-
+-	free(p);
+-}
+-
+-static void store_id(GAttrib *attrib, unsigned int org_id,
++static struct id_pair *store_id(GAttrib *attrib, unsigned int org_id,
+ 							unsigned int pend_id)
+ {
+ 	struct id_pair *t;
+ 
+-	t = queue_find(attrib->track_ids, find_with_org_id,
+-							UINT_TO_PTR(org_id));
+-	if (t) {
+-		t->pend_id = pend_id;
+-		return;
+-	}
+-
+ 	t = new0(struct id_pair, 1);
+ 	if (!t)
+-		return;
++		return NULL;
+ 
+ 	t->org_id = org_id;
+ 	t->pend_id = pend_id;
+ 
+-	if (!queue_push_tail(attrib->track_ids, t))
+-		free(t);
++	if (queue_push_tail(attrib->track_ids, t))
++		return t;
++
++	return NULL;
+ }
+ 
+ GAttrib *g_attrib_new(GIOChannel *io, guint16 mtu)
+@@ -185,6 +160,9 @@ static void attrib_callbacks_destroy(void *data)
+ 	if (cb->destroy_func)
+ 		cb->destroy_func(cb->user_data);
+ 
++	if (queue_remove(cb->parent->track_ids, cb->id))
++		free(cb->id);
++
+ 	free(data);
+ }
+ 
+@@ -291,8 +269,6 @@ static void attrib_callback_result(uint8_t opcode, const void *pdu,
+ 	if (cb->result_func)
+ 		cb->result_func(status, buf, length + 1, cb->user_data);
+ 
+-	remove_stored_ids(cb->parent, cb->id);
+-
+ 	free(buf);
+ }
+ 
+@@ -328,6 +304,7 @@ guint g_attrib_send(GAttrib *attrib, guint id, const guint8 *pdu, guint16 len,
+ 	struct attrib_callbacks *cb = NULL;
+ 	bt_att_response_func_t response_cb = NULL;
+ 	bt_att_destroy_func_t destroy_cb = NULL;
++	unsigned int pend_id;
+ 
+ 	if (!attrib)
+ 		return 0;
+@@ -349,32 +326,36 @@ guint g_attrib_send(GAttrib *attrib, guint id, const guint8 *pdu, guint16 len,
+ 
+ 	}
+ 
+-	cb->id = bt_att_send(attrib->att, pdu[0], (void *) pdu + 1, len - 1,
++	pend_id = bt_att_send(attrib->att, pdu[0], (void *) pdu + 1, len - 1,
+ 						response_cb, cb, destroy_cb);
+ 
+-	if (id == 0)
+-		return cb->id;
++	/*
++	 * We store here pair as it is easier to handle it in response and in
++	 * case where user request us to use specific id request - see below.
++	 */
++	if (id == 0) {
++		cb->id = store_id(attrib, pend_id, pend_id);
++		return pend_id;
++	}
+ 
+ 	/*
+ 	 * If user what us to use given id, lets keep track on that so we give
+ 	 * user a possibility to cancel ongoing request.
+ 	 */
+-	store_id(attrib, id, cb->id);
++	cb->id = store_id(attrib, id, pend_id);
+ 	return id;
+ }
+ 
+ gboolean g_attrib_cancel(GAttrib *attrib, guint id)
+ {
+ 	struct id_pair *p;
+-	unsigned int pend_id;
+ 
+ 	if (!attrib)
+ 		return FALSE;
+ 
+ 	/*
+-	 * Let's try to find actual pending request id on the tracking id queue.
+-	 * If there is no such it means it is not tracked id and we can cancel
+-	 * it.
++	 * If request belongs to gattrib and is not yet done it has to be on
++	 * the tracking id queue
+ 	 *
+ 	 * FIXME: It can happen that on the queue there is id_pair with
+ 	 * given id which was provided by the user. In the same time it might
+@@ -386,14 +367,18 @@ gboolean g_attrib_cancel(GAttrib *attrib, guint id)
+ 	 */
+ 	p = queue_remove_if(attrib->track_ids, find_with_org_id,
+ 							UINT_TO_PTR(id));
+-	if (p) {
+-		pend_id = p->pend_id;
+-		free(p);
+-	} else {
+-		pend_id = id;
+-	}
++	if (!p)
++		return FALSE;
+ 
+-	return bt_att_cancel(attrib->att, pend_id);
++	return bt_att_cancel(attrib->att, p->pend_id);
++}
++
++static void cancel_request(void *data, void *user_data)
++{
++	struct id_pair *p = data;
++	GAttrib *attrib = user_data;
++
++	bt_att_cancel(attrib->att, p->pend_id);
+ }
+ 
+ gboolean g_attrib_cancel_all(GAttrib *attrib)
+@@ -401,9 +386,11 @@ gboolean g_attrib_cancel_all(GAttrib *attrib)
+ 	if (!attrib)
+ 		return FALSE;
+ 
++	/* Cancel only request which belongs to gattrib */
++	queue_foreach(attrib->track_ids, cancel_request, attrib);
+ 	queue_remove_all(attrib->track_ids, NULL, NULL, free);
+ 
+-	return bt_att_cancel_all(attrib->att);
++	return TRUE;
+ }
+ 
+ guint g_attrib_register(GAttrib *attrib, guint8 opcode, guint16 handle,
+-- 
+1.8.4
 
