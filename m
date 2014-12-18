@@ -1,97 +1,87 @@
 Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
-To: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+To: Sebastian Chlad <sebastian.chlad@tieto.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v2 1/2] android/gatt: Remove discoverable flag from device found callback
-Date: Thu, 18 Dec 2014 10:05:49 +0100
-Message-ID: <4493539.SvR4e9GtP0@uw000953>
-In-Reply-To: <1418290185-4617-1-git-send-email-lukasz.rymanowski@tieto.com>
-References: <1418290185-4617-1-git-send-email-lukasz.rymanowski@tieto.com>
+Subject: Re: [PATCH] android/pts: MAP testing against PTS 6.0
+Date: Thu, 18 Dec 2014 09:50:12 +0100
+Message-ID: <56759074.4Nqdhg0IsY@uw000953>
+In-Reply-To: <1418726729-25030-1-git-send-email-sebastian.chlad@tieto.com>
+References: <1418726729-25030-1-git-send-email-sebastian.chlad@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Łukasz,
+Hi Sebastian,
 
-On Thursday 11 of December 2014 10:29:44 Lukasz Rymanowski wrote:
-> Android is interested in all of the Scan Responses. Also the ones which
-> are set as non discoverable. It is in order to support
-> Observer\Broadcaster mode. Therefore discoverable flag can be removed
-> from the device found callback. This patch does it.
+On Tuesday 16 of December 2014 11:45:29 Sebastian Chlad wrote:
 > ---
->  android/bluetooth.c | 5 +----
->  android/bluetooth.h | 3 +--
->  android/gatt.c      | 5 ++---
->  3 files changed, 4 insertions(+), 9 deletions(-)
+>  android/pics-map.txt  | 6 +++---
+>  android/pixit-map.txt | 2 +-
+>  android/pts-map.txt   | 6 +++---
+>  3 files changed, 7 insertions(+), 7 deletions(-)
 > 
-> diff --git a/android/bluetooth.c b/android/bluetooth.c
-> index 6443cfe..44bfe4d 100644
-> --- a/android/bluetooth.c
-> +++ b/android/bluetooth.c
-> @@ -1946,12 +1946,9 @@ static void update_found_device(const bdaddr_t *bdaddr, uint8_t bdaddr_type,
+> diff --git a/android/pics-map.txt b/android/pics-map.txt
+> index 3f783a9..093aae1 100644
+> --- a/android/pics-map.txt
+> +++ b/android/pics-map.txt
+> @@ -1,6 +1,6 @@
+>  MAP PICS for the PTS tool.
 >  
->  	/* Notify Gatt if its registered for LE events */
->  	if (bdaddr_type != BDADDR_BREDR && gatt_device_found_cb) {
-> -		bool discoverable;
->  		bdaddr_t *addr;
->  		uint8_t addr_type;
+> -PTS version: 5.3
+> +PTS version: 6.0
 >  
-> -		discoverable = eir.flags & (EIR_LIM_DISC | EIR_GEN_DISC);
-> -
->  		/*
->  		 * If RPA is set it means that IRK was received and ID address
->  		 * is being used. Android Framework is still using old RPA and
-> @@ -1967,7 +1964,7 @@ static void update_found_device(const bdaddr_t *bdaddr, uint8_t bdaddr_type,
->  		}
+>  * - different than PTS defaults
+>  # - not yet implemented/supported
+> @@ -111,8 +111,8 @@ TSPC_MAP_3_5a	True		MSE: SetNotificationRegistration (M)
+>  TSPC_MAP_3_6	False		MSE: Supported Message Types
+>  TSPC_MAP_3_6a	False		MSE: EMAIL (C1)
+>  TSPC_MAP_3_6b	True		MSE: SMS_GSM (C1)
+> -TSPC_MAP_3_6c	False		MSE: SMS_CDMA (C1)
+> -TSPC_MAP_3_6d	False (*)	MSE: MMS (C1)
+> +TSPC_MAP_3_6c	True (*)	MSE: SMS_CDMA (C1)
+> +TSPC_MAP_3_6d	True		MSE: MMS (C1)
+>  TSPC_MAP_3_7	False		MSE: Instance Information (Not Supported)
+>  TSPC_MAP_3_7a	False (*)	MSE: GetMASInstanceInformation (Not Supported)
+>  TSPC_MAP_3_8	False		MSE: Extended MAP-Event-Report (Not Supported)
+> diff --git a/android/pixit-map.txt b/android/pixit-map.txt
+> index c8c130c..a7626dd 100644
+> --- a/android/pixit-map.txt
+> +++ b/android/pixit-map.txt
+> @@ -1,6 +1,6 @@
+>  MAP PIXIT for the PTS tool.
 >  
->  		gatt_device_found_cb(addr, addr_type, rssi, data_len, data,
-> -						discoverable, dev->le_bonded);
-> +								dev->le_bonded);
->  	}
+> -PTS version: 5.3
+> +PTS version: 6.0
 >  
->  	if (!dev->bredr_paired && !dev->le_paired)
-> diff --git a/android/bluetooth.h b/android/bluetooth.h
-> index 8970559..4b7a70d 100644
-> --- a/android/bluetooth.h
-> +++ b/android/bluetooth.h
-> @@ -42,8 +42,7 @@ void bt_adapter_remove_record(uint32_t handle);
+>  * - different than PTS defaults
+>  & - should be set to IUT Bluetooth address
+> diff --git a/android/pts-map.txt b/android/pts-map.txt
+> index e8092e2..6ca984e 100644
+> --- a/android/pts-map.txt
+> +++ b/android/pts-map.txt
+> @@ -1,7 +1,7 @@
+>  PTS test results for MAP
 >  
->  typedef void (*bt_le_device_found)(const bdaddr_t *addr, uint8_t addr_type,
->  					int rssi, uint16_t eir_len,
-> -					const void *eir, bool discoverable,
-> -					bool bonded);
-> +					const void *eir, bool bonded);
->  bool bt_le_register(bt_le_device_found cb);
->  void bt_le_unregister(void);
+> -PTS version: 5.3
+> -Tested: 18-November-2014
+> +PTS version: 6.0
+> +Tested: 11-December-2014
+>  Android version: 5.0
 >  
-> diff --git a/android/gatt.c b/android/gatt.c
-> index b2ce9c1..519e347 100644
-> --- a/android/gatt.c
-> +++ b/android/gatt.c
-> @@ -1648,15 +1648,14 @@ static void bt_le_discovery_stop_cb(void)
->  
->  static void le_device_found_handler(const bdaddr_t *addr, uint8_t addr_type,
->  						int rssi, uint16_t eir_len,
-> -						const void *eir,
-> -						bool discoverable, bool bonded)
-> +						const void *eir, bool bonded)
->  {
->  	uint8_t buf[IPC_MTU];
->  	struct hal_ev_gatt_client_scan_result *ev = (void *) buf;
->  	struct gatt_device *dev;
->  	char bda[18];
->  
-> -	if (!scanning || (!discoverable && !bonded))
-> +	if (!scanning)
->  		goto connect;
->  
->  	ba2str(addr, bda);
+>  Results:
+> @@ -65,7 +65,7 @@ TC_MSE_MMB_BV_10_I	PASS
+>  TC_MSE_MMB_BV_11_I	PASS
+>  TC_MSE_MMB_BV_20_I	PASS
+>  TC_MSE_MMB_BV_12_I	N/A
+> -TC_MSE_MMB_BV_18_I	N/A
+> +TC_MSE_MMB_BV_18_I	PASS
+>  TC_MSE_MMB_BV_13_I	PASS
+>  TC_MSE_MMB_BV_14_I	PASS
+>  TC_MSE_MMB_BV_15_I	PASS
 > 
 
-This patch is now applied, thanks.
-
-Second needs to be rebased.
+Applied, thanks.
 
 -- 
 Best regards, 
