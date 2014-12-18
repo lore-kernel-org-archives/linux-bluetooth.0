@@ -1,150 +1,55 @@
 Return-Path: <cyrus@holtmann.org>
-From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH v4] android/bluetooth: Enable LE privacy mode on BfA startup
-Date: Thu, 18 Dec 2014 12:28:48 +0100
-Message-Id: <1418902128-15766-1-git-send-email-lukasz.rymanowski@tieto.com>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: Veseli Veseljko <veseljko75@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: ShanWan Sixaxis PS3 controller
+Date: Thu, 18 Dec 2014 12:24:59 +0100
+Message-ID: <1432274.34ricBdst7@uw000953>
+In-Reply-To: <20141217133613.GA18280@ubuntu.localnet>
+References: <20141216172421.GA12748@ubuntu.localnet> <20141217133613.GA18280@ubuntu.localnet>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Lets follow Android Lollipop behaviour and enable privacy on
-startup.
----
-v4: Rework all patches so now we have all in one. Because we set privacy always
-we don't need to keep local irk in struct adapter. This is also way we could remove
-some patches comparing to previous patch version.
+Hi Veseli,
 
- android/bluetooth.c | 102 ++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 102 insertions(+)
+On Wednesday 17 of December 2014 14:36:13 Veseli Veseljko wrote:
+> On Tuesday, 2014-12-16, at 18:24:21 +0100, Veseli Veseljko wrote:
+> > I have a Sony PS3 Sixaxis compatible controller made by ShanWan. Is it
+> > possible to make it work with bluez sixaxis plugin? I tried it on
+> > Ubuntu 14.10 running Linux kernel 3.16 and bluez 5.20, compiled with
+> > sixaxis option.
+> 
+> I added some DBGs into "/profiles/input/server.c" code and I found
+> out that when dev_is_sixaxis is run, both vendor ID and product ID for
+> this controller are 0x0000.
+> 
+> Any ideas?
 
-diff --git a/android/bluetooth.c b/android/bluetooth.c
-index 48085e9..ba4cf67 100644
---- a/android/bluetooth.c
-+++ b/android/bluetooth.c
-@@ -39,6 +39,7 @@
- #include "lib/sdp.h"
- #include "lib/mgmt.h"
- #include "lib/uuid.h"
-+#include "src/shared/crypto.h"
- #include "src/shared/util.h"
- #include "src/shared/mgmt.h"
- #include "src/shared/queue.h"
-@@ -3371,6 +3372,103 @@ static void clear_auto_connect_list(void)
- 	error("Could not clear auto connect list");
- }
- 
-+static void set_privacy_complete(uint8_t status, uint16_t length,
-+					const void *param, void *user_data)
-+{
-+	if (status != MGMT_STATUS_SUCCESS)
-+		error("Failed to set privacy mode: %s (0x%02x)",
-+						mgmt_errstr(status), status);
-+}
-+
-+static void store_local_irk(const uint8_t *irk)
-+{
-+	GKeyFile *key_file;
-+	char key_str[33];
-+	int i;
-+	gsize length = 0;
-+	char *data;
-+
-+	key_file = g_key_file_new();
-+	if (!g_key_file_load_from_file(key_file, SETTINGS_FILE, 0, NULL)) {
-+		g_key_file_free(key_file);
-+		return;
-+	}
-+
-+	for (i = 0; i < 16; i++)
-+		sprintf(key_str + (i * 2), "%2.2X", irk[i]);
-+
-+	g_key_file_set_string(key_file, "General", "IRK", key_str);
-+
-+	data = g_key_file_to_data(key_file, &length, NULL);
-+	g_file_set_contents(SETTINGS_FILE, data, length, NULL);
-+	g_free(data);
-+
-+	g_key_file_free(key_file);
-+}
-+
-+static bool generate_irk(uint8_t *irk)
-+{
-+	struct bt_crypto *c;
-+
-+	c = bt_crypto_new();
-+	if (!c) {
-+		error("Could not create bt crypto and generate IRK");
-+		return false;
-+	}
-+
-+	bt_crypto_random_bytes(c, irk, 16);
-+	bt_crypto_unref(c);
-+
-+	store_local_irk(irk);
-+
-+	return true;
-+}
-+
-+static bool get_local_irk(uint8_t *irk)
-+{
-+	GKeyFile *key_file;
-+	char *str;
-+
-+	key_file = g_key_file_new();
-+	if (!g_key_file_load_from_file(key_file, SETTINGS_FILE, 0, NULL))
-+		goto done;
-+
-+	str = g_key_file_get_string(key_file, "General", "IRK", NULL);
-+	if (str) {
-+		int i;
-+
-+		for (i = 0; i < 16; i++)
-+			sscanf(str + (i * 2), "%02hhX", &irk[i]);
-+
-+		g_free(str);
-+		g_key_file_free(key_file);
-+
-+		return true;
-+	}
-+
-+done:
-+	g_key_file_free(key_file);
-+
-+	return generate_irk(irk);
-+}
-+
-+static void set_privacy(void)
-+{
-+	struct mgmt_cp_set_privacy cp;
-+
-+	if (!get_local_irk(cp.irk))
-+		goto failed;
-+
-+	cp.privacy = 0x01;
-+
-+	if (mgmt_send(mgmt_if, MGMT_OP_SET_PRIVACY, adapter.index, sizeof(cp),
-+				&cp, set_privacy_complete, NULL, NULL) > 0)
-+		return;
-+
-+failed:
-+	error("Could not set privacy mode");
-+}
-+
- static void read_info_complete(uint8_t status, uint16_t length,
- 					const void *param, void *user_data)
- {
-@@ -3445,6 +3543,10 @@ static void read_info_complete(uint8_t status, uint16_t length,
- 	if (missing_settings & MGMT_SETTING_BONDABLE)
- 		set_mode(MGMT_OP_SET_BONDABLE, 0x01);
- 
-+	/* TODO: Consider static random for LE only devices */
-+	if (missing_settings & MGMT_SETTING_PRIVACY)
-+		set_privacy();
-+
- 	load_devices_info(cb);
- 	load_devices_cache();
- 
+Typically DS3 should be handled like this:
+
+1. make sure you don't have sixad/qtsixa installed as it was reported that it
+   conflicted with sixpair plugin (udev rules)
+2. make sure you have sixaxis plugin installed - this plugin depends on udev
+   so it is not builin into bluetoothd but loaded on start from
+   /usr/lib/bluetooth/plugins 
+3. plug it into USB (don't press PS button yet)
+   you should see something like "sixaxis: compatible device connected: ...."
+   in bluetoothd logs
+4. unplug it
+5. press PS button
+
+Device should now connect and you should be asked (in bluetoothctl or UI) to
+authorize connection. After that you should be able to reconnect without need
+of pluging it with USB first.
+
+This was mostly tested with genuine controllers. There were reports that some
+of clone devices doesn't behave exactly the same ie. use different pid/vid or
+don't report correct BT address over USB. Making them work would probably
+require some extra work, but I don't have any of those clone devices.
+
+
 -- 
-1.8.4
-
+Best regards, 
+Szymon Janc
