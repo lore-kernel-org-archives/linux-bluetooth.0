@@ -1,54 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
-To: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
+To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCHv2] android/gatt: Report error on invalid value length for CCC descriptor
-Date: Fri, 19 Dec 2014 14:10:27 +0100
-Message-ID: <1628793.GPknzIAUmx@uw000953>
-In-Reply-To: <1418971814-24965-1-git-send-email-jakub.tyszkowski@tieto.com>
-References: <1418971814-24965-1-git-send-email-jakub.tyszkowski@tieto.com>
+Subject: Re: [PATCH] android/gatt: Fix possible NULL dereference
+Date: Fri, 19 Dec 2014 14:10:06 +0100
+Message-ID: <1449847.FzcL4bpd4a@uw000953>
+In-Reply-To: <1418992228-4070-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1418992228-4070-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jakub,
+Hi Andrei,
 
-On Friday 19 of December 2014 07:50:14 Jakub Tyszkowski wrote:
-> For application services, characteristics and descriptors it's user
-> app's responsibility to verify value length but for embeded ones we
-> need to do this in daemon. This is checked in TC_GAW_SR_BI_34_C and
-> PTS tries to write to embeded CCC descritor if no other descriptors
-> are added by the apps. It is expected by PTS for us to be more strict
-> about value length controll.
+On Friday 19 of December 2014 14:30:28 Andrei Emeltchenko wrote:
+> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> 
+> Fixes warnings:
+> ...
+> Pointer 'req' returned from call to function 'queue_peek_head'
+> may be NULL and will be dereferenced
+> ...
 > ---
->  android/gatt.c | 9 ++++++++-
->  1 file changed, 8 insertions(+), 1 deletion(-)
+>  android/gatt.c | 3 +++
+>  1 file changed, 3 insertions(+)
 > 
 > diff --git a/android/gatt.c b/android/gatt.c
-> index 0258d91..76df029 100644
+> index 6828f2f..2534836 100644
 > --- a/android/gatt.c
 > +++ b/android/gatt.c
-> @@ -6961,8 +6961,15 @@ static void gatt_srvc_change_write_cb(struct gatt_db_attribute *attrib,
->  		return;
->  	}
->  
-> +	/* 2 octets are expected as CCC value */
-> +	if (len != 2) {
-> +		gatt_db_attribute_write_result(attrib, id,
-> +						ATT_ECODE_INVAL_ATTR_VALUE_LEN);
-> +		return;
-> +	}
+> @@ -5561,6 +5561,9 @@ static void handle_server_send_response(const void *buf, uint16_t len)
+>  		 * gatt_db_attribute_write().
+>  		 */
+>  		req = queue_peek_head(conn->device->pending_requests);
+> +		if (!req)
+> +			goto done;
 > +
->  	/* Set services changed indication value */
-> -	bt_store_gatt_ccc(bdaddr, *value);
-> +	bt_store_gatt_ccc(bdaddr, get_le16(value));
->  
->  	gatt_db_attribute_write_result(attrib, id, 0);
->  }
+>  		/* Cast status to uint8_t, due to (byte) cast in java layer. */
+>  		req->error = err_to_att((uint8_t) cmd->status);
+>  		req->state = REQUEST_DONE;
 > 
 
-Applied, thanks.
+Patch applied, thanks.
 
 -- 
 Best regards, 
