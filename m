@@ -1,174 +1,96 @@
 Return-Path: <cyrus@holtmann.org>
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/2] Bluetooth: Split hci_update_page_scan into two functions
-Date: Fri, 19 Dec 2014 13:40:19 +0200
-Message-Id: <1418989220-4066-1-git-send-email-johan.hedberg@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+From: Szymon Janc <szymon.janc@tieto.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: Artem Rakhov <arakhov@chromium.org>, "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: GATT connection without BlueZ installed
+Date: Fri, 19 Dec 2014 11:56:44 +0100
+Message-ID: <6792779.8nghumUoO3@uw000953>
+In-Reply-To: <8AB9692B-357D-4649-A62F-E770A78848FD@holtmann.org>
+References: <CAD81oNYnfe-5r8hDOqP86CTCRG8iaTt7HexzMOBSsSqcy8Z1NA@mail.gmail.com> <8AB9692B-357D-4649-A62F-E770A78848FD@holtmann.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@intel.com>
+Hi Artem, Marcel,
 
-To keep the parameter list and its semantics clear it makes sense to
-split the hci_update_page_scan function into two separate functions: one
-taking a hci_dev and another taking a hci_request. The one taking a
-hci_dev constructs its own hci_request and then calls the other
-function.
+On Friday 19 of December 2014 11:20:25 Marcel Holtmann wrote:
+> Hi Artem,
+> 
+> > I'm testing GATT connection: running btgatt-server on one machine and
+> > btgatt-client on the other one. Server machine doesn't have BlueZ
+> > installed, just kernel part of Bluetooth stack is present. However, I
+> > still use btgatt-server and btmgmt from tools/ on this machine.
+> > 
+> > Connection does not initiate correctly.
+> > 
+> > Server is stuck on listening:
+> > "Started listening on ATT channel. Waiting for connections"
+> > This means that bind() and listen() on socket are successful, but
+> > accept() didn't finish. It doesn't see the incoming connection.
+> > 
+> > Client initiates MTU exchange, but doesn't receive anything in response:
+> > btgatt-client: Opening L2CAP LE connection on ATT channel:
+> > src: 00:00:00:00:00:00
+> > dest: 24:0A:64:5A:AF:1B
+> > Connecting to device... Done
+> > [GATT client]# att: ATT op 0x02
+> > [GATT client]# att: < 02 17 00
+> > ...
+> > [GATT client]# att: Operation timed out: 0x02
+> > 
+> > btmon from the server:
+> >> HCI Event: LE Meta Event (0x3e) plen 19                                              [hci0] 82.760084
+> >      LE Connection Complete (0x01)
+> >        Status: Success (0x00)
+> >        Handle: 32
+> >        Role: Slave (0x01)
+> >        Peer address type: Public (0x00)
+> >        Peer address: 3C:77:E6:60:5C:B2 (OUI 3C-77-E6)
+> >        Connection interval: 67.50 msec (0x0036)
+> >        Connection latency: 0.00 msec (0x0000)
+> >        Supervision timeout: 420 msec (0x002a)
+> >        Master clock accuracy: 0x00
+> > @ Device Connected: 3C:77:E6:60:5C:B2 (1) flags 0x0000
+> >> ACL Data RX: Handle 32 flags 0x02 dlen 7                                             [hci0] 83.051725
+> >      ATT: Exchange MTU Request (0x02) len 2
+> >        Client RX MTU: 23
+> >> HCI Event: Vendor (0xff) plen 7                                                     [hci0] 115.115106
+> >        82 12 95 40 10 36 59                             ...@.6Y
+> >> HCI Event: Disconnect Complete (0x05) plen 4                                        [hci0] 115.116099
+> >        Status: Success (0x00)
+> >        Handle: 32
+> >        Reason: Remote User Terminated Connection (0x13)
+> > @ Device Disconnected: 3C:77:E6:60:5C:B2 (1) reason 3
+> > 
+> > When I change the roles (so that server runs btgatt-client, and on the
+> > other machine I stop bluetoothd and run btgatt-server), the connection
+> > works fine.
+> > When I use completely different software setup (BlueZ installed on
+> > both, but bluetoothd stopped), everything also works fine, which makes
+> > me believe that this is not a hardware problem.
+> > Kernel is 3.10 on server, 3.8 on client.
+> > 
+> > Does anyone have any clues why accept() could not succeed on the server?
+> 
+> I assume it is because bluetoothd does a bit more extended setup. Please keep in mind that mgmt settings are remembering during power down/up cycles. Might want to run btmgmt info and compare with how bluetoothd sets up the controller compared to your own setup.
+> 
+> Any chance you decode the vendor event into something meaningful. It might tell you why the connection gets disconnected. Might be a hint as well.
+> 
+> One other area of checking what is different would be debugfs /sys/kernel/debug/bluetooth/hci0/ since that gives you a bit of insights on some of the states of the state.
+> 
+> Regards
+> 
+> Marcel
 
-Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
----
- include/net/bluetooth/hci_core.h |  3 ++-
- net/bluetooth/hci_core.c         | 17 ++++++++++++-----
- net/bluetooth/hci_event.c        |  4 ++--
- net/bluetooth/mgmt.c             | 16 ++++++++--------
- 4 files changed, 24 insertions(+), 16 deletions(-)
+I recall similar problem with BfA on Nexus 4 and 7.
+Things (in our case smp pairing) were working nicely on Nexus5 (Broadcom) but
+failed on N4/N7 (Qualcomm) where we didn't get any data from chip if device
+was peripheral.
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 3c7827005c25..664451a64d72 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -1306,7 +1306,8 @@ bool hci_req_pending(struct hci_dev *hdev);
- void hci_req_add_le_scan_disable(struct hci_request *req);
- void hci_req_add_le_passive_scan(struct hci_request *req);
- 
--void hci_update_page_scan(struct hci_dev *hdev, struct hci_request *req);
-+void hci_update_page_scan(struct hci_dev *hdev);
-+void __hci_update_page_scan(struct hci_request *req);
- 
- struct sk_buff *__hci_cmd_sync(struct hci_dev *hdev, u16 opcode, u32 plen,
- 			       const void *param, u32 timeout);
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 5dcacf9607e4..3aa9015a8858 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -5787,8 +5787,9 @@ static bool disconnected_whitelist_entries(struct hci_dev *hdev)
- 	return false;
- }
- 
--void hci_update_page_scan(struct hci_dev *hdev, struct hci_request *req)
-+void __hci_update_page_scan(struct hci_request *req)
- {
-+	struct hci_dev *hdev = req->hdev;
- 	u8 scan;
- 
- 	if (!test_bit(HCI_BREDR_ENABLED, &hdev->dev_flags))
-@@ -5812,8 +5813,14 @@ void hci_update_page_scan(struct hci_dev *hdev, struct hci_request *req)
- 	if (test_bit(HCI_DISCOVERABLE, &hdev->dev_flags))
- 		scan |= SCAN_INQUIRY;
- 
--	if (req)
--		hci_req_add(req, HCI_OP_WRITE_SCAN_ENABLE, 1, &scan);
--	else
--		hci_send_cmd(hdev, HCI_OP_WRITE_SCAN_ENABLE, 1, &scan);
-+	hci_req_add(req, HCI_OP_WRITE_SCAN_ENABLE, 1, &scan);
-+}
-+
-+void hci_update_page_scan(struct hci_dev *hdev)
-+{
-+	struct hci_request req;
-+
-+	hci_req_init(&req, hdev);
-+	__hci_update_page_scan(&req);
-+	hci_req_run(&req, NULL);
- }
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 39a5c8a01726..65f4ec8945a4 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -2127,7 +2127,7 @@ static void hci_conn_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
- 			hci_send_cmd(hdev, HCI_OP_READ_REMOTE_FEATURES,
- 				     sizeof(cp), &cp);
- 
--			hci_update_page_scan(hdev, NULL);
-+			hci_update_page_scan(hdev);
- 		}
- 
- 		/* Set packet type for incoming connection */
-@@ -2308,7 +2308,7 @@ static void hci_disconn_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
- 		if (test_bit(HCI_CONN_FLUSH_KEY, &conn->flags))
- 			hci_remove_link_key(hdev, &conn->dst);
- 
--		hci_update_page_scan(hdev, NULL);
-+		hci_update_page_scan(hdev);
- 	}
- 
- 	params = hci_conn_params_lookup(hdev, &conn->dst, conn->dst_type);
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 693ce8bcd06e..f86f3ec684ba 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -1566,7 +1566,7 @@ static void set_discoverable_complete(struct hci_dev *hdev, u8 status)
- 	 * entries.
- 	 */
- 	hci_req_init(&req, hdev);
--	hci_update_page_scan(hdev, &req);
-+	__hci_update_page_scan(&req);
- 	update_class(&req);
- 	hci_req_run(&req, NULL);
- 
-@@ -1813,7 +1813,7 @@ static void set_connectable_complete(struct hci_dev *hdev, u8 status)
- 
- 	if (conn_changed || discov_changed) {
- 		new_settings(hdev, cmd->sk);
--		hci_update_page_scan(hdev, NULL);
-+		hci_update_page_scan(hdev);
- 		if (discov_changed)
- 			mgmt_update_adv_data(hdev);
- 		hci_update_background_scan(hdev);
-@@ -1847,7 +1847,7 @@ static int set_connectable_update_settings(struct hci_dev *hdev,
- 		return err;
- 
- 	if (changed) {
--		hci_update_page_scan(hdev, NULL);
-+		hci_update_page_scan(hdev);
- 		hci_update_background_scan(hdev);
- 		return new_settings(hdev, sk);
- 	}
-@@ -4697,7 +4697,7 @@ static int set_bredr(struct sock *sk, struct hci_dev *hdev, void *data, u16 len)
- 	hci_req_init(&req, hdev);
- 
- 	write_fast_connectable(&req, false);
--	hci_update_page_scan(hdev, &req);
-+	__hci_update_page_scan(&req);
- 
- 	/* Since only the advertising data flags will change, there
- 	 * is no need to update the scan response data.
-@@ -5473,7 +5473,7 @@ static int add_device(struct sock *sk, struct hci_dev *hdev,
- 		if (err)
- 			goto unlock;
- 
--		hci_update_page_scan(hdev, NULL);
-+		hci_update_page_scan(hdev);
- 
- 		goto added;
- 	}
-@@ -5556,7 +5556,7 @@ static int remove_device(struct sock *sk, struct hci_dev *hdev,
- 				goto unlock;
- 			}
- 
--			hci_update_page_scan(hdev, NULL);
-+			hci_update_page_scan(hdev);
- 
- 			device_removed(sk, hdev, &cp->addr.bdaddr,
- 				       cp->addr.type);
-@@ -5607,7 +5607,7 @@ static int remove_device(struct sock *sk, struct hci_dev *hdev,
- 			kfree(b);
- 		}
- 
--		hci_update_page_scan(hdev, NULL);
-+		hci_update_page_scan(hdev);
- 
- 		list_for_each_entry_safe(p, tmp, &hdev->le_conn_params, list) {
- 			if (p->auto_connect == HCI_AUTO_CONN_DISABLED)
-@@ -6139,7 +6139,7 @@ static int powered_update_hci(struct hci_dev *hdev)
- 
- 	if (lmp_bredr_capable(hdev)) {
- 		write_fast_connectable(&req, false);
--		hci_update_page_scan(hdev, &req);
-+		__hci_update_page_scan(&req);
- 		update_class(&req);
- 		update_name(&req);
- 		update_eir(&req);
+It seems to turned out to be a chip issue which was fixed with firmware update.
+Unfortunately I don't remember exact Android (or firmware) versions but it was
+around 4.4 release.
+
 -- 
-2.1.0
-
+Best regards, 
+Szymon Janc
