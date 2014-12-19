@@ -1,59 +1,56 @@
 Return-Path: <cyrus@holtmann.org>
-From: Arman Uguray <armansito@chromium.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Arman Uguray <armansito@chromium.org>
-Subject: [PATCH BlueZ v5 0/7] core: Use shared/gatt-client
-Date: Thu, 18 Dec 2014 17:24:32 -0800
-Message-Id: <1418952279-16452-1-git-send-email-armansito@chromium.org>
+MIME-Version: 1.0
+In-Reply-To: <1418910367-19792-1-git-send-email-lukasz.rymanowski@tieto.com>
+References: <1418910367-19792-1-git-send-email-lukasz.rymanowski@tieto.com>
+Date: Thu, 18 Dec 2014 22:13:19 -0200
+Message-ID: <CABBYNZL+gir-CE5Loa6xK=s7+wSkRKV+R2-U940+17mwXczb6g@mail.gmail.com>
+Subject: Re: [PATCH v2 0/3] attrib/gattrib: Add tracking request id
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-*v5:
-  - Made probing a bit smarter, so that profiles are only probed once when
-    necessary and they are removed if they no longer valid after non-bonded
-    discovery.
+Hi Lukasz,
 
-*v4:
-  - Removed gatt-callbacks in favor of using btd_profile probe and remove
-    functions. Added the new btd_profile function "accept" to notify profiles
-    that gatt-client is ready.
+On Thu, Dec 18, 2014 at 11:46 AM, Lukasz Rymanowski
+<lukasz.rymanowski@tieto.com> wrote:
+> With this set, gattrib is tracking it's internal request id.
+> This is important for the user of gattrib, as now user is sure that request id
+> he has is valid during whole gattrib operation. Even gattrib is doing more then one
+> ATT request.
+>
+> v1: Track only user defined request id's.
+> v2: Handle Marcel's comments to patch 01 and added patch 03\03 which add
+> support to track all the gattrib requests. So now if gattrib user does cancel_all
+> only gattrib request will be canceled. This is needed as bt_att is shared.
+>
+> First two patches help us to solve issues in Android, third one is not needed by
+> Android but for normal BlueZ.
+>
+>
+> Lukasz Rymanowski (2):
+>   attrib/gattrib: Add track for internal request id
+>   attrib/gatt: Fix for search services
+>
+> *** BLURB HERE ***
+>
+> Lukasz Rymanowski (3):
+>   attrib/gattrib: Add track for request ids
+>   attrib/gatt: Fix for search services
+>   attrib/gattrib: Add tracking all the internal request id
+>
+>  attrib/gatt.c    | 43 ++++++++++++++++++-------
+>  attrib/gattrib.c | 95 ++++++++++++++++++++++++++++++++++++++++++++++++++++++--
+>  2 files changed, 124 insertions(+), 14 deletions(-)
+>
+> --
+> 1.8.4
 
-  - Using device_remove_profile to unregister btd_service's when services are
-    removed from the client database. This happens on Service Changed events and
-    on disconnection if the device is not bonded.
+Applied, please make sure you run make check next time patch 3/3 had a
+few problem that I had to fix before pushing.
 
-  - Removed immediated disconnection logic that triggers when no attio callbacks
-    are registered after probe.
-
-  - Other minor fixes to shared/gatt and shared/att.
-
-*v3:
-  - Renamed device_attach_att_transport to device_attach_att.
-
-*v2:
-  - Rebased.
-
-*v1:
-  - Addressed comments by Johan and Luiz.
-
-Arman Uguray (7):
-  core: device: Don't disconnect if attios not set
-  core: device: Add getters for GATT db and client
-  core: device: Make profile calls in GATT events
-  profiles/gatt: Don't handle GATT service.
-  profiles/gatt: Rename profile to gap.
-  profiles/gap: Rewrite using bt_gatt_client.
-  profiles/gap: Add Google copyright.
-
- Makefile.plugins    |   4 +-
- profiles/gap/gas.c  | 339 ++++++++++++++++++++++++++++++++++++++
- profiles/gatt/gas.c | 457 ----------------------------------------------------
- src/device.c        | 390 +++++++++++++++++++++++++++++++++++++-------
- src/device.h        |   2 +
- 5 files changed, 676 insertions(+), 516 deletions(-)
- create mode 100644 profiles/gap/gas.c
- delete mode 100644 profiles/gatt/gas.c
 
 -- 
-2.2.0.rc0.207.ga3a616c
-
+Luiz Augusto von Dentz
