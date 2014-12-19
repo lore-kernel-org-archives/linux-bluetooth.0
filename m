@@ -1,47 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] emulator: Remove dead code
-Date: Fri, 19 Dec 2014 15:03:13 +0200
-Message-Id: <1418994193-7070-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <1418817585-26816-1-git-send-email-gowtham.ab@samsung.com>
+References: <1418817585-26816-1-git-send-email-gowtham.ab@samsung.com>
+Date: Fri, 19 Dec 2014 11:01:45 -0200
+Message-ID: <CABBYNZKp+g72uSoHrAduYAfGpHX69Fmcv6_FbQZ9aKeR-d-2Vw@mail.gmail.com>
+Subject: Re: [PATCH 0/2] rfcomm: Add Test command decoding implementation
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Gowtham Anandha Babu <gowtham.ab@samsung.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	Dmitry Kasatkin <d.kasatkin@samsung.com>,
+	Bharat Panda <bharat.panda@samsung.com>, cpgs@samsung.com
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Hi Gowtham,
 
-Remove logically dead code and fix magic numbers
----
- emulator/le.c | 11 ++---------
- 1 file changed, 2 insertions(+), 9 deletions(-)
+On Wed, Dec 17, 2014 at 9:59 AM, Gowtham Anandha Babu
+<gowtham.ab@samsung.com> wrote:
+> Add support for decoding RFCOMM Test command in
+> monitor and tools/parser.
+>
+> Gowtham Anandha Babu (2):
+>   monitor/rfcomm: Add support for decoding Test command
+>   parser/rfcomm: Add support for decoding Test command
+>
+>  monitor/rfcomm.c      | 19 +++++++++++++++++++
+>  tools/parser/rfcomm.c | 12 +++++++++++-
+>  2 files changed, 30 insertions(+), 1 deletion(-)
+>
+> --
+> 1.9.1
 
-diff --git a/emulator/le.c b/emulator/le.c
-index 91cf31c..ec486a9 100644
---- a/emulator/le.c
-+++ b/emulator/le.c
-@@ -1279,21 +1279,14 @@ static void cmd_le_write_default_data_length(struct bt_le *hci,
- 	tx_time = le16_to_cpu(cmd->tx_time);
- 
- 	/* Valid range for suggested max TX octets is 0x001b to 0x00fb */
--	if (tx_len < 0x001b || tx_len > 0x00fb) {
-+	if (tx_len < DEFAULT_TX_LEN || tx_len > MAX_TX_LEN) {
- 		cmd_status(hci, BT_HCI_ERR_INVALID_PARAMETERS,
- 				BT_HCI_CMD_LE_WRITE_DEFAULT_DATA_LENGTH);
- 		return;
- 	}
- 
- 	/* Valid range for suggested max TX time is 0x0148 to 0x0848 */
--	if (tx_time < 0x0148 || tx_time > 0x0848) {
--		cmd_status(hci, BT_HCI_ERR_INVALID_PARAMETERS,
--				BT_HCI_CMD_LE_WRITE_DEFAULT_DATA_LENGTH);
--		return;
--	}
--
--	/* Suggested max TX len and time shall be less or equal supported */
--	if (tx_len > MAX_TX_LEN || tx_time > MAX_TX_TIME) {
-+	if (tx_time < DEFAULT_TX_TIME || tx_time > MAX_TX_TIME) {
- 		cmd_status(hci, BT_HCI_ERR_INVALID_PARAMETERS,
- 				BT_HCI_CMD_LE_WRITE_DEFAULT_DATA_LENGTH);
- 		return;
+Applied, thanks.
+
+
 -- 
-2.1.0
-
+Luiz Augusto von Dentz
