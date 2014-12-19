@@ -1,44 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
-From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
-Subject: [PATCHv2] android/gatt: Report error on invalid value length for CCC descriptor
-Date: Fri, 19 Dec 2014 07:50:14 +0100
-Message-Id: <1418971814-24965-1-git-send-email-jakub.tyszkowski@tieto.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+From: Al Viro <viro@ZenIV.linux.org.uk>
+To: David Miller <davem@davemloft.net>
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+	netdev@vger.kernel.org,
+	linux-bluetooth@vger.kernel.org
+Subject: [PATCH 2/3] cmtp: cmtp_add_connection() should verify that it's dealing with l2cap socket
+Date: Fri, 19 Dec 2014 06:20:58 +0000
+Message-Id: <1418970059-32486-2-git-send-email-viro@ZenIV.linux.org.uk>
+In-Reply-To: <20141219061801.GU22149@ZenIV.linux.org.uk>
+References: <20141219061801.GU22149@ZenIV.linux.org.uk>
+Sender: Al Viro <viro@ftp.linux.org.uk>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-For application services, characteristics and descriptors it's user
-app's responsibility to verify value length but for embeded ones we
-need to do this in daemon. This is checked in TC_GAW_SR_BI_34_C and
-PTS tries to write to embeded CCC descritor if no other descriptors
-are added by the apps. It is expected by PTS for us to be more strict
-about value length controll.
+From: Al Viro <viro@zeniv.linux.org.uk>
+
+... rather than relying on ciptool(8) never passing it anything else.  Give
+it e.g. an AF_UNIX connected socket (from socketpair(2)) and it'll oops,
+trying to evaluate &l2cap_pi(sock->sk)->chan->dst...
+
+Signed-off-by: Al Viro <viro@zeniv.linux.org.uk>
 ---
- android/gatt.c | 9 ++++++++-
- 1 file changed, 8 insertions(+), 1 deletion(-)
+ net/bluetooth/cmtp/core.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/android/gatt.c b/android/gatt.c
-index 0258d91..76df029 100644
---- a/android/gatt.c
-+++ b/android/gatt.c
-@@ -6961,8 +6961,15 @@ static void gatt_srvc_change_write_cb(struct gatt_db_attribute *attrib,
- 		return;
- 	}
+diff --git a/net/bluetooth/cmtp/core.c b/net/bluetooth/cmtp/core.c
+index 67fe5e8..fd57db8 100644
+--- a/net/bluetooth/cmtp/core.c
++++ b/net/bluetooth/cmtp/core.c
+@@ -333,6 +333,8 @@ int cmtp_add_connection(struct cmtp_connadd_req *req, struct socket *sock)
+ 	int i, err;
  
-+	/* 2 octets are expected as CCC value */
-+	if (len != 2) {
-+		gatt_db_attribute_write_result(attrib, id,
-+						ATT_ECODE_INVAL_ATTR_VALUE_LEN);
-+		return;
-+	}
-+
- 	/* Set services changed indication value */
--	bt_store_gatt_ccc(bdaddr, *value);
-+	bt_store_gatt_ccc(bdaddr, get_le16(value));
+ 	BT_DBG("");
++	if (!l2cap_is_socket(sock))
++		return -EBADFD;
  
- 	gatt_db_attribute_write_result(attrib, id, 0);
- }
+ 	session = kzalloc(sizeof(struct cmtp_session), GFP_KERNEL);
+ 	if (!session)
 -- 
-1.9.1
-
+2.1.3
