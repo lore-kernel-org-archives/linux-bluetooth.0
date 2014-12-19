@@ -1,45 +1,41 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Fri, 19 Dec 2014 06:18:01 +0000
 From: Al Viro <viro@ZenIV.linux.org.uk>
 To: David Miller <davem@davemloft.net>
-Cc: Marcel Holtmann <marcel@holtmann.org>,
-	netdev@vger.kernel.org,
+Cc: Marcel Holtmann <marcel@holtmann.org>, netdev@vger.kernel.org,
 	linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/3] bluetooth: hidp_connection_add() unsafe use of l2cap_pi()
-Date: Fri, 19 Dec 2014 06:20:57 +0000
-Message-Id: <1418970059-32486-1-git-send-email-viro@ZenIV.linux.org.uk>
-In-Reply-To: <20141219061801.GU22149@ZenIV.linux.org.uk>
-References: <20141219061801.GU22149@ZenIV.linux.org.uk>
+Subject: [patches] a bunch of old bluetooth fixes
+Message-ID: <20141219061801.GU22149@ZenIV.linux.org.uk>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 Sender: Al Viro <viro@ftp.linux.org.uk>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Al Viro <viro@zeniv.linux.org.uk>
+	This stuff has been sitting in my queue since March; basically,
+several places in net/bluetooth assume that they are dealing with
+l2cap sockets, while it is possible to get an arbitrary socket to those.
+Results are not pretty.
+	* HIDPCONNADD gets an arbitrary user-supplied socket; the code
+it calls (hidp_connection_add()) verifies that the socket is l2cap one,
+but before doing so it finds l2cap_pi(ctrl_sock->sk)->chan.  It's not
+that big a deal (it's only 5 words past the end of struct sock), but
+it's trivial to avoid and, in theory, we might end up oopsing here if
+we are very unlucky and it happens to hit an unmapped page just past
+the actual object ctrl_sock->sk sits in.
+	* CMTP counterpart of that doesn't validate the socket at all.
+It proceeds to
+        s = __cmtp_get_session(&l2cap_pi(sock->sk)->chan->dst);
+which can very easily oops - here ->chan is already garbage and we
+proceed to dereference that.  As with HIDP, one needs CAP_NET_ADMIN to
+trigger that, but it's really a clear bug.  The only sanity check we
+do is verifying that nsock->sk->sk_state is equal to BT_CONNECTED,
+which is not unique to bluetooth, to put it mildly.  It's just 1,
+so a TCP_ESTABLISHED tcp socket will pass that check just fune.
+The fix is trivial...
+	* BNEP situation is identical to CMTP one.
 
-it's OK after we'd verified the sockets, but not before that.
+I've sent these patches back then (March 10), but they seem to have fallen
+through the cracks.  The bugs are still there and the fixes still apply.
+If you would prefer me to resend them after -rc1, just tell...
 
-Signed-off-by: Al Viro <viro@zeniv.linux.org.uk>
----
- net/bluetooth/hidp/core.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
-
-diff --git a/net/bluetooth/hidp/core.c b/net/bluetooth/hidp/core.c
-index cc25d0b..07348e1 100644
---- a/net/bluetooth/hidp/core.c
-+++ b/net/bluetooth/hidp/core.c
-@@ -1314,13 +1314,14 @@ int hidp_connection_add(struct hidp_connadd_req *req,
- {
- 	struct hidp_session *session;
- 	struct l2cap_conn *conn;
--	struct l2cap_chan *chan = l2cap_pi(ctrl_sock->sk)->chan;
-+	struct l2cap_chan *chan;
- 	int ret;
- 
- 	ret = hidp_verify_sockets(ctrl_sock, intr_sock);
- 	if (ret)
- 		return ret;
- 
-+	chan = l2cap_pi(ctrl_sock->sk)->chan;
- 	conn = NULL;
- 	l2cap_chan_lock(chan);
- 	if (chan->conn)
--- 
-2.1.3
+Anyway, patches follow
