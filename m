@@ -1,51 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 19 Dec 2014 12:43:53 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 4/4] Bluetooth: Fix Add Device to wait for HCI before
- sending cmd_complete
-Message-ID: <20141219104353.GA23588@t440s.lan>
-References: <1418981017-10462-1-git-send-email-johan.hedberg@gmail.com>
- <1418981017-10462-5-git-send-email-johan.hedberg@gmail.com>
- <C462E3B8-977F-4E80-A4C1-86C213B020F2@holtmann.org>
- <20141219101329.GA17821@t440s.lan>
- <97AAB736-9A24-4FC6-BDAC-60F376389399@holtmann.org>
-MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <97AAB736-9A24-4FC6-BDAC-60F376389399@holtmann.org>
+Mime-Version: 1.0 (Mac OS X Mail 8.1 \(1993\))
+Subject: Re: [PATCH 4/4] Bluetooth: Fix Add Device to wait for HCI before sending cmd_complete
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20141219101329.GA17821@t440s.lan>
+Date: Fri, 19 Dec 2014 11:37:35 +0100
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <97AAB736-9A24-4FC6-BDAC-60F376389399@holtmann.org>
+References: <1418981017-10462-1-git-send-email-johan.hedberg@gmail.com> <1418981017-10462-5-git-send-email-johan.hedberg@gmail.com> <C462E3B8-977F-4E80-A4C1-86C213B020F2@holtmann.org> <20141219101329.GA17821@t440s.lan>
+To: Johan Hedberg <johan.hedberg@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hi Johan,
 
-On Fri, Dec 19, 2014, Marcel Holtmann wrote:
-> >>> +	err = hci_req_run(&req, add_device_complete);
-> >>> +	if (err < 0) {
-> >>> +		if (err == -ENODATA) {
-> >>> +			cmd->cmd_complete(cmd, MGMT_STATUS_SUCCESS);
-> >>> +			err = 0;
-> >>> +		}
-> >>> +		mgmt_pending_remove(cmd);
-> >>> +	}
-> >> 
-> >> But this command should also work when the controller is powered down.
-> >> Who is doing these checks now?
-> > 
-> > That's covered by the ENODATA check. hci_update_background_scan() bails
-> > out without doing anything if the hdev is powered off, leaving the
-> > hci_request empty.
+>>> +	err = hci_req_run(&req, add_device_complete);
+>>> +	if (err < 0) {
+>>> +		if (err == -ENODATA) {
+>>> +			cmd->cmd_complete(cmd, MGMT_STATUS_SUCCESS);
+>>> +			err = 0;
+>>> +		}
+>>> +		mgmt_pending_remove(cmd);
+>>> +	}
+>> 
+>> But this command should also work when the controller is powered down.
+>> Who is doing these checks now?
 > 
-> we have never done it like that in mgmt commands, or have we?
-> 
-> I think a shortcut check with is_powered and leaving the function
-> might be a bit more clearer to understand. Or at least a command that
-> explain this. Since I clearly missed it.
+> That's covered by the ENODATA check. hci_update_background_scan() bails
+> out without doing anything if the hdev is powered off, leaving the
+> hci_request empty.
 
-It'd need to be a code comment since we do still have to call
-hci_conn_params_set() which may or may not end up adding something to
-the hci_request. Or then we need to completely redesign these functions
-to clearly split the various list updates from code that may send HCI
-commands (but the amount of needed patches is already exploding so I'd
-rather not go there yet).
+we have never done it like that in mgmt commands, or have we?
 
-Johan
+I think a shortcut check with is_powered and leaving the function might be a bit more clearer to understand. Or at least a command that explain this. Since I clearly missed it.
+
+Regards
+
+Marcel
+
