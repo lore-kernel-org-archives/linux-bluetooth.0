@@ -1,38 +1,51 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <549403DF.4040404@jollamobile.com>
-Date: Fri, 19 Dec 2014 12:54:23 +0200
-From: Hannu Mallat <hannu.mallat@jollamobile.com>
-MIME-Version: 1.0
+Date: Fri, 19 Dec 2014 12:43:53 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
 To: Marcel Holtmann <marcel@holtmann.org>
-CC: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] gdbus: use caller's bus name in polkit authorization
- check
-References: <1415879499-920-1-git-send-email-hannu.mallat@jollamobile.com> <E76B9C62-EBB2-4D6F-9918-A4D85C101332@holtmann.org>
-In-Reply-To: <E76B9C62-EBB2-4D6F-9918-A4D85C101332@holtmann.org>
-Content-Type: text/plain; charset=windows-1252; format=flowed
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 4/4] Bluetooth: Fix Add Device to wait for HCI before
+ sending cmd_complete
+Message-ID: <20141219104353.GA23588@t440s.lan>
+References: <1418981017-10462-1-git-send-email-johan.hedberg@gmail.com>
+ <1418981017-10462-5-git-send-email-johan.hedberg@gmail.com>
+ <C462E3B8-977F-4E80-A4C1-86C213B020F2@holtmann.org>
+ <20141219101329.GA17821@t440s.lan>
+ <97AAB736-9A24-4FC6-BDAC-60F376389399@holtmann.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <97AAB736-9A24-4FC6-BDAC-60F376389399@holtmann.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Marcel,
 
-> so I wrote this code in 2009 as it seems. I can not even judge if my
-> code is correct or your change is the correct one. It has been too
-> long ago. You would need to convince me which one is the correct
-> behavior when it comes to PolicyKit.
+On Fri, Dec 19, 2014, Marcel Holtmann wrote:
+> >>> +	err = hci_req_run(&req, add_device_complete);
+> >>> +	if (err < 0) {
+> >>> +		if (err == -ENODATA) {
+> >>> +			cmd->cmd_complete(cmd, MGMT_STATUS_SUCCESS);
+> >>> +			err = 0;
+> >>> +		}
+> >>> +		mgmt_pending_remove(cmd);
+> >>> +	}
+> >> 
+> >> But this command should also work when the controller is powered down.
+> >> Who is doing these checks now?
+> > 
+> > That's covered by the ENODATA check. hci_update_background_scan() bails
+> > out without doing anything if the hdev is powered off, leaving the
+> > hci_request empty.
+> 
+> we have never done it like that in mgmt commands, or have we?
+> 
+> I think a shortcut check with is_powered and leaving the function
+> might be a bit more clearer to understand. Or at least a command that
+> explain this. Since I clearly missed it.
 
-quoting polkit documentation for subject struct,
+It'd need to be a code comment since we do still have to call
+hci_conn_params_set() which may or may not end up adding something to
+the hci_request. Or then we need to completely redesign these functions
+to clearly split the various list updates from code that may send HCI
+commands (but the amount of needed patches is already exploding so I'd
+rather not go there yet).
 
-     "This struct describes subjects such as UNIX processes. It is
-     typically used to check if a given process is authorized for
-     an action."
-
-so as far as I can see, the struct should describe the caller of
-the D-Bus method, not bluetoothd itself, if the idea is to limit certain
-methods to authorized callers only.
-
-In the end I don't know if polkit offers much over D-Bus daemon based
-authorization, and I chose not to use polkit for my needs, but wanted to
-point out the issue nevertheless if someone else might face the same
-problem.
-
-BR,
-H.
+Johan
