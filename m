@@ -1,72 +1,57 @@
 Return-Path: <cyrus@holtmann.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 8.1 \(1993\))
-Subject: Re: [PATCH 2/4] Bluetooth: Add hci_request parameter to hci_update_background_scan
+Subject: Re: [patches] a bunch of old bluetooth fixes
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20141219101934.GC17821@t440s.lan>
-Date: Fri, 19 Dec 2014 11:33:10 +0100
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <E0CDF939-6500-48C6-A05A-EA12A0FD11A4@holtmann.org>
-References: <1418981017-10462-1-git-send-email-johan.hedberg@gmail.com> <1418981017-10462-3-git-send-email-johan.hedberg@gmail.com> <3DBBCAB1-FDA2-4CE1-B8B7-3684F6548C04@holtmann.org> <20141219101934.GC17821@t440s.lan>
-To: Johan Hedberg <johan.hedberg@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <B0609FEE-1CE5-4618-A0B6-B2B82B1EC74D@holtmann.org>
+Date: Fri, 19 Dec 2014 11:30:38 +0100
+Cc: Network Development <netdev@vger.kernel.org>,
+	BlueZ development <linux-bluetooth@vger.kernel.org>
+Message-Id: <07BDA2A2-1560-4F78-A0B2-FC25E312CACE@holtmann.org>
+References: <20141219061801.GU22149@ZenIV.linux.org.uk> <B0609FEE-1CE5-4618-A0B6-B2B82B1EC74D@holtmann.org>
+To: Al Viro <viro@ZenIV.linux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>
+Sender: netdev-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+Hi Dave,
 
->>> Many places using hci_update_background_scan() try to synchronize
->>> whatever they're doing with the help of hci_request callbacks. However,
->>> since the hci_update_background_scan() function hasn't so far accepted a
->>> hci_request pointer any commands triggered by it have been left out by
->>> the synchronization. This patch an extra parameter to the function to
->>> fix the issue. This there are also many places where there is no
->>> existing hci_request context, the parameter is made optional, i.e. by
->>> passing NULL hci_update_background_scan() uses its own request and a
->>> dummy callback.
->>> 
->>> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
->>> ---
->>> include/net/bluetooth/hci_core.h |  2 +-
->>> net/bluetooth/hci_conn.c         |  2 +-
->>> net/bluetooth/hci_core.c         | 33 ++++++++++++++++++++-------------
->>> net/bluetooth/hci_event.c        |  4 ++--
->>> net/bluetooth/mgmt.c             | 19 +++++++++----------
->>> 5 files changed, 33 insertions(+), 27 deletions(-)
->>> 
->>> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
->>> index 75aaae07037f..d89a359c83ea 100644
->>> --- a/include/net/bluetooth/hci_core.h
->>> +++ b/include/net/bluetooth/hci_core.h
->>> @@ -940,7 +940,7 @@ struct hci_conn_params *hci_pend_le_action_lookup(struct list_head *list,
->>> 						  bdaddr_t *addr,
->>> 						  u8 addr_type);
->>> 
->>> -void hci_update_background_scan(struct hci_dev *hdev);
->>> +void hci_update_background_scan(struct hci_dev *hdev, struct hci_request *req);
+>> 	This stuff has been sitting in my queue since March; basically,
+>> several places in net/bluetooth assume that they are dealing with
+>> l2cap sockets, while it is possible to get an arbitrary socket to those.
+>> Results are not pretty.
+>> 	* HIDPCONNADD gets an arbitrary user-supplied socket; the code
+>> it calls (hidp_connection_add()) verifies that the socket is l2cap one,
+>> but before doing so it finds l2cap_pi(ctrl_sock->sk)->chan.  It's not
+>> that big a deal (it's only 5 words past the end of struct sock), but
+>> it's trivial to avoid and, in theory, we might end up oopsing here if
+>> we are very unlucky and it happens to hit an unmapped page just past
+>> the actual object ctrl_sock->sk sits in.
+>> 	* CMTP counterpart of that doesn't validate the socket at all.
+>> It proceeds to
+>>       s = __cmtp_get_session(&l2cap_pi(sock->sk)->chan->dst);
+>> which can very easily oops - here ->chan is already garbage and we
+>> proceed to dereference that.  As with HIDP, one needs CAP_NET_ADMIN to
+>> trigger that, but it's really a clear bug.  The only sanity check we
+>> do is verifying that nsock->sk->sk_state is equal to BT_CONNECTED,
+>> which is not unique to bluetooth, to put it mildly.  It's just 1,
+>> so a TCP_ESTABLISHED tcp socket will pass that check just fune.
+>> The fix is trivial...
+>> 	* BNEP situation is identical to CMTP one.
 >> 
->> this goes a bit against what we done otherwise in the code base. We
->> normally only give the hci_request pointer since that always provides
->> the hci_dev as well.
->> 
->> I have the feeling that we might better split this into two functions.
->> One just taking hci_dev and the other just taking hci_request. Or we
->> have to make all callers create a hci_request context in the first
->> place.
+>> I've sent these patches back then (March 10), but they seem to have fallen
+>> through the cracks.  The bugs are still there and the fixes still apply.
+>> If you would prefer me to resend them after -rc1, just tell...
 > 
-> My change is consistent with hci_update_page_scan() so I suppose that
-> needs fixing too.
+> they must have really fallen through the cracks since I do not even remember them.
+> 
+> My take is that these should all go in before -rc1 and preferable also make it into stable. While you need CAP_NET_ADMIN capability, there are clear stupid bugs on our side.
+> 
+> Dave, we can prepare a pull request for these or do you want to take them directly into net tree?
 
-you are correct on that. However you are also tipping the balance on that one with the other patch. Where it used to be 1 of them took the parameter, now all but 2 take not the parameter. So I get the feeling it warrants a course of direction now.
+and in case you decide to take them directly.
 
-> I still feel like this "optional parameter" approach isn't too
-> convoluted, but if you insist I think I'd rather split this into two
-> functions. Requiring all places to initialize a hci_request and do
-> hci_req_run would be quite a lot of duplicated boiler-plate code for
-> little benefit.
-
-I think that using two functions as outlined in the other patch might be a good idea.
-
-The advantage then is really that if ever one becomes no longer needed, we can easily see that and remove it then. Because I have the slight feeling that slowly we will have more and more proper hci_request context anyway.
+Acked-by: Marcel Holtmann <marcel@holtmann.org>
 
 Regards
 
