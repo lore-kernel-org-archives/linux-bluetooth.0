@@ -1,42 +1,46 @@
 Return-Path: <cyrus@holtmann.org>
-From: Gowtham Anandha Babu <gowtham.ab@samsung.com>
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: d.kasatkin@samsung.com, bharat.panda@samsung.com, cpgs@samsung.com,
-	Gowtham Anandha Babu <gowtham.ab@samsung.com>
-Subject: [PATCH] src/att: Fix usage of memory after it is freed.
-Date: Fri, 19 Dec 2014 19:31:28 +0530
-Message-id: <1418997688-16691-1-git-send-email-gowtham.ab@samsung.com>
+Subject: [PATCH] android/gatt: Fix memory leak
+Date: Fri, 19 Dec 2014 15:50:20 +0200
+Message-Id: <1418997020-7293-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-warning: Use of memory after it is freed
-	respond_not_supported(att, opcode);
-	^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
----
- src/shared/att.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-diff --git a/src/shared/att.c b/src/shared/att.c
-index 4be0652..a98909e 100644
---- a/src/shared/att.c
-+++ b/src/shared/att.c
-@@ -692,14 +692,14 @@ static void handle_notify(struct bt_att *att, uint8_t opcode, uint8_t *pdu,
+---
+ android/gatt.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/android/gatt.c b/android/gatt.c
+index 2534836..6248f07 100644
+--- a/android/gatt.c
++++ b/android/gatt.c
+@@ -6129,6 +6129,7 @@ static uint8_t find_info_handle(const uint8_t *cmd, uint16_t cmd_len,
+ 	int iterator = 0;
+ 	uint16_t start, end;
+ 	uint16_t len, queue_len;
++	uint8_t ret = 0;
  
- 	queue_foreach(att->notify_list, notify_handler, &data);
+ 	DBG("");
  
--	bt_att_unref(att);
--
- 	/*
- 	 * If this was a request and no handler was registered for it, respond
- 	 * with "Not Supported"
- 	 */
- 	if (!data.handler_found && get_op_type(opcode) == ATT_OP_TYPE_REQ)
- 		respond_not_supported(att, opcode);
-+
-+	bt_att_unref(att);
+@@ -6206,13 +6207,13 @@ static uint8_t find_info_handle(const uint8_t *cmd, uint16_t cmd_len,
+ 					ATT_FIND_INFO_RESP_FMT_128BIT, adl, rsp,
+ 								rsp_size);
+ 	if (!len)
+-		return ATT_ECODE_UNLIKELY;
++		ret = ATT_ECODE_UNLIKELY;
+ 
+ 	*length = len;
+ 	att_data_list_free(adl);
+ 	queue_destroy(temp, NULL);
+ 
+-	return 0;
++	return ret;
  }
  
- static bool can_read_data(struct io *io, void *user_data)
+ static uint8_t find_by_type_request(const uint8_t *cmd, uint16_t cmd_len,
 -- 
-1.9.1
+2.1.0
 
