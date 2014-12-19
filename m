@@ -1,68 +1,162 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 19 Dec 2014 12:19:34 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 2/4] Bluetooth: Add hci_request parameter to
- hci_update_background_scan
-Message-ID: <20141219101934.GC17821@t440s.lan>
-References: <1418981017-10462-1-git-send-email-johan.hedberg@gmail.com>
- <1418981017-10462-3-git-send-email-johan.hedberg@gmail.com>
- <3DBBCAB1-FDA2-4CE1-B8B7-3684F6548C04@holtmann.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <3DBBCAB1-FDA2-4CE1-B8B7-3684F6548C04@holtmann.org>
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] android/gatt: Simplify gatt_db_attribute_get_permissions()
+Date: Fri, 19 Dec 2014 12:18:29 +0200
+Message-Id: <1418984309-29896-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1971447.3gPWfdfUJW@uw000953>
+References: <1971447.3gPWfdfUJW@uw000953>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-On Fri, Dec 19, 2014, Marcel Holtmann wrote:
-> > Many places using hci_update_background_scan() try to synchronize
-> > whatever they're doing with the help of hci_request callbacks. However,
-> > since the hci_update_background_scan() function hasn't so far accepted a
-> > hci_request pointer any commands triggered by it have been left out by
-> > the synchronization. This patch an extra parameter to the function to
-> > fix the issue. This there are also many places where there is no
-> > existing hci_request context, the parameter is made optional, i.e. by
-> > passing NULL hci_update_background_scan() uses its own request and a
-> > dummy callback.
-> > 
-> > Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
-> > ---
-> > include/net/bluetooth/hci_core.h |  2 +-
-> > net/bluetooth/hci_conn.c         |  2 +-
-> > net/bluetooth/hci_core.c         | 33 ++++++++++++++++++++-------------
-> > net/bluetooth/hci_event.c        |  4 ++--
-> > net/bluetooth/mgmt.c             | 19 +++++++++----------
-> > 5 files changed, 33 insertions(+), 27 deletions(-)
-> > 
-> > diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-> > index 75aaae07037f..d89a359c83ea 100644
-> > --- a/include/net/bluetooth/hci_core.h
-> > +++ b/include/net/bluetooth/hci_core.h
-> > @@ -940,7 +940,7 @@ struct hci_conn_params *hci_pend_le_action_lookup(struct list_head *list,
-> > 						  bdaddr_t *addr,
-> > 						  u8 addr_type);
-> > 
-> > -void hci_update_background_scan(struct hci_dev *hdev);
-> > +void hci_update_background_scan(struct hci_dev *hdev, struct hci_request *req);
-> 
-> this goes a bit against what we done otherwise in the code base. We
-> normally only give the hci_request pointer since that always provides
-> the hci_dev as well.
-> 
-> I have the feeling that we might better split this into two functions.
-> One just taking hci_dev and the other just taking hci_request. Or we
-> have to make all callers create a hci_request context in the first
-> place.
+Condition checks inside gatt_db_attribute_get_permissions() do not make
+sense. Simplify function.
+---
+ android/gatt.c           | 10 +++++-----
+ src/shared/gatt-db.c     | 10 ++--------
+ src/shared/gatt-db.h     |  3 +--
+ src/shared/gatt-server.c | 20 ++++----------------
+ 4 files changed, 12 insertions(+), 31 deletions(-)
 
-My change is consistent with hci_update_page_scan() so I suppose that
-needs fixing too.
+diff --git a/android/gatt.c b/android/gatt.c
+index 169f6db..6828f2f 100644
+--- a/android/gatt.c
++++ b/android/gatt.c
+@@ -4790,7 +4790,7 @@ static void read_requested_attributes(void *data, void *user_data)
+ 		return;
+ 	}
+ 
+-	gatt_db_attribute_get_permissions(attrib, &permissions);
++	permissions = gatt_db_attribute_get_permissions(attrib);
+ 
+ 	/*
+ 	 * Check if it is attribute we didn't declare permissions, like service
+@@ -6311,7 +6311,7 @@ static void write_cmd_request(const uint8_t *cmd, uint16_t cmd_len,
+ 	if (!attrib)
+ 		return;
+ 
+-	gatt_db_attribute_get_permissions(attrib, &permissions);
++	permissions = gatt_db_attribute_get_permissions(attrib);
+ 
+ 	if (check_device_permissions(dev, cmd[0], permissions))
+ 		return;
+@@ -6359,7 +6359,7 @@ static void write_signed_cmd_request(const uint8_t *cmd, uint16_t cmd_len,
+ 	if (!attrib)
+ 		return;
+ 
+-	gatt_db_attribute_get_permissions(attrib, &permissions);
++	permissions = gatt_db_attribute_get_permissions(attrib);
+ 
+ 	if (check_device_permissions(dev, cmd[0], permissions))
+ 		return;
+@@ -6430,7 +6430,7 @@ static uint8_t write_req_request(const uint8_t *cmd, uint16_t cmd_len,
+ 	if (!attrib)
+ 		return ATT_ECODE_ATTR_NOT_FOUND;
+ 
+-	gatt_db_attribute_get_permissions(attrib, &permissions);
++	permissions = gatt_db_attribute_get_permissions(attrib);
+ 
+ 	error = check_device_permissions(dev, cmd[0], permissions);
+ 	if (error)
+@@ -6486,7 +6486,7 @@ static uint8_t write_prep_request(const uint8_t *cmd, uint16_t cmd_len,
+ 	if (!attrib)
+ 		return ATT_ECODE_ATTR_NOT_FOUND;
+ 
+-	gatt_db_attribute_get_permissions(attrib, &permissions);
++	permissions = gatt_db_attribute_get_permissions(attrib);
+ 
+ 	error = check_device_permissions(dev, cmd[0], permissions);
+ 	if (error)
+diff --git a/src/shared/gatt-db.c b/src/shared/gatt-db.c
+index bb60904..4b91ae6 100644
+--- a/src/shared/gatt-db.c
++++ b/src/shared/gatt-db.c
+@@ -1301,15 +1301,9 @@ bool gatt_db_attribute_get_incl_data(const struct gatt_db_attribute *attrib,
+ 	return true;
+ }
+ 
+-bool gatt_db_attribute_get_permissions(const struct gatt_db_attribute *attrib,
+-							uint32_t *permissions)
++uint32_t gatt_db_attribute_get_permissions(const struct gatt_db_attribute *attrib)
+ {
+-	if (!attrib || !permissions)
+-		return false;
+-
+-	*permissions = attrib->permissions;
+-
+-	return true;
++	return attrib->permissions;
+ }
+ 
+ static void pending_read_result(struct pending_read *p, int err,
+diff --git a/src/shared/gatt-db.h b/src/shared/gatt-db.h
+index e5fe6bb..1379aae 100644
+--- a/src/shared/gatt-db.h
++++ b/src/shared/gatt-db.h
+@@ -171,8 +171,7 @@ bool gatt_db_attribute_get_incl_data(const struct gatt_db_attribute *attrib,
+ 							uint16_t *start_handle,
+ 							uint16_t *end_handle);
+ 
+-bool gatt_db_attribute_get_permissions(const struct gatt_db_attribute *attrib,
+-							uint32_t *permissions);
++uint32_t gatt_db_attribute_get_permissions(const struct gatt_db_attribute *attrib);
+ 
+ typedef void (*gatt_db_attribute_read_t) (struct gatt_db_attribute *attrib,
+ 						int err, const uint8_t *value,
+diff --git a/src/shared/gatt-server.c b/src/shared/gatt-server.c
+index 00f36fd..f9e412d 100644
+--- a/src/shared/gatt-server.c
++++ b/src/shared/gatt-server.c
+@@ -389,10 +389,7 @@ static void process_read_by_type(struct async_read_op *op)
+ 		return;
+ 	}
+ 
+-	if (!gatt_db_attribute_get_permissions(attr, &perm)) {
+-		ecode = BT_ATT_ERROR_UNLIKELY;
+-		goto error;
+-	}
++	perm = gatt_db_attribute_get_permissions(attr);
+ 
+ 	/*
+ 	 * Check for the READ access permission. Encryption,
+@@ -697,10 +694,7 @@ static void write_cb(uint8_t opcode, const void *pdu,
+ 				(opcode == BT_ATT_OP_WRITE_REQ) ? "Req" : "Cmd",
+ 				handle);
+ 
+-	if (!gatt_db_attribute_get_permissions(attr, &perm)) {
+-		ecode = BT_ATT_ERROR_INVALID_HANDLE;
+-		goto error;
+-	}
++	perm = gatt_db_attribute_get_permissions(attr);
+ 
+ 	if (!(perm & BT_ATT_PERM_WRITE)) {
+ 		ecode = BT_ATT_ERROR_WRITE_NOT_PERMITTED;
+@@ -813,10 +807,7 @@ static void handle_read_req(struct bt_gatt_server *server, uint8_t opcode,
+ 			opcode == BT_ATT_OP_READ_BLOB_REQ ? "Blob " : "",
+ 			handle);
+ 
+-	if (!gatt_db_attribute_get_permissions(attr, &perm)) {
+-		ecode = BT_ATT_ERROR_INVALID_HANDLE;
+-		goto error;
+-	}
++	perm = gatt_db_attribute_get_permissions(attr);
+ 
+ 	if (perm && !(perm & BT_ATT_PERM_READ)) {
+ 		ecode = BT_ATT_ERROR_READ_NOT_PERMITTED;
+@@ -919,10 +910,7 @@ static void prep_write_cb(uint8_t opcode, const void *pdu,
+ 	util_debug(server->debug_callback, server->debug_data,
+ 				"Prep Write Req - handle: 0x%04x", handle);
+ 
+-	if (!gatt_db_attribute_get_permissions(attr, &perm)) {
+-		ecode = BT_ATT_ERROR_INVALID_HANDLE;
+-		goto error;
+-	}
++	perm = gatt_db_attribute_get_permissions(attr);
+ 
+ 	/*
+ 	 * TODO: The "Prepare Write" request requires security permission checks
+-- 
+2.1.0
 
-I still feel like this "optional parameter" approach isn't too
-convoluted, but if you insist I think I'd rather split this into two
-functions. Requiring all places to initialize a hci_request and do
-hci_req_run would be quite a lot of duplicated boiler-plate code for
-little benefit.
-
-Johan
