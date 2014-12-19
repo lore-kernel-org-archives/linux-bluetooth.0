@@ -1,57 +1,81 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 8.1 \(1993\))
-Subject: Re: [patches] a bunch of old bluetooth fixes
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <B0609FEE-1CE5-4618-A0B6-B2B82B1EC74D@holtmann.org>
-Date: Fri, 19 Dec 2014 13:57:35 +0100
-Cc: Network Development <netdev@vger.kernel.org>,
-	BlueZ development <linux-bluetooth@vger.kernel.org>
-Message-Id: <015D7FD4-F115-4046-8016-D155912D8FEF@holtmann.org>
-References: <20141219061801.GU22149@ZenIV.linux.org.uk> <B0609FEE-1CE5-4618-A0B6-B2B82B1EC74D@holtmann.org>
-To: Al Viro <viro@ZenIV.linux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>
+MIME-Version: 1.0
+In-Reply-To: <1418831357-23100-1-git-send-email-lukasz.rymanowski@tieto.com>
+References: <1418831357-23100-1-git-send-email-lukasz.rymanowski@tieto.com>
+Date: Fri, 19 Dec 2014 10:57:01 -0200
+Message-ID: <CABBYNZJ5u+tCXC=LyMwiTKN0s7KxcUnbcT+BxmDqKQmTAMiTMQ@mail.gmail.com>
+Subject: Re: [PATCH v2 00/19] android/gatt: Fix HOG connect/disconnect
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Dave,
+Hi Lukasz,
 
->> 	This stuff has been sitting in my queue since March; basically,
->> several places in net/bluetooth assume that they are dealing with
->> l2cap sockets, while it is possible to get an arbitrary socket to those.
->> Results are not pretty.
->> 	* HIDPCONNADD gets an arbitrary user-supplied socket; the code
->> it calls (hidp_connection_add()) verifies that the socket is l2cap one,
->> but before doing so it finds l2cap_pi(ctrl_sock->sk)->chan.  It's not
->> that big a deal (it's only 5 words past the end of struct sock), but
->> it's trivial to avoid and, in theory, we might end up oopsing here if
->> we are very unlucky and it happens to hit an unmapped page just past
->> the actual object ctrl_sock->sk sits in.
->> 	* CMTP counterpart of that doesn't validate the socket at all.
->> It proceeds to
->>       s = __cmtp_get_session(&l2cap_pi(sock->sk)->chan->dst);
->> which can very easily oops - here ->chan is already garbage and we
->> proceed to dereference that.  As with HIDP, one needs CAP_NET_ADMIN to
->> trigger that, but it's really a clear bug.  The only sanity check we
->> do is verifying that nsock->sk->sk_state is equal to BT_CONNECTED,
->> which is not unique to bluetooth, to put it mildly.  It's just 1,
->> so a TCP_ESTABLISHED tcp socket will pass that check just fune.
->> The fix is trivial...
->> 	* BNEP situation is identical to CMTP one.
->> 
->> I've sent these patches back then (March 10), but they seem to have fallen
->> through the cracks.  The bugs are still there and the fixes still apply.
->> If you would prefer me to resend them after -rc1, just tell...
-> 
-> they must have really fallen through the cracks since I do not even remember them.
-> 
-> My take is that these should all go in before -rc1 and preferable also make it into stable. While you need CAP_NET_ADMIN capability, there are clear stupid bugs on our side.
-> 
-> Dave, we can prepare a pull request for these or do you want to take them directly into net tree?
+On Wed, Dec 17, 2014 at 1:48 PM, Lukasz Rymanowski
+<lukasz.rymanowski@tieto.com> wrote:
+> When testing HOG against PTS we got failing testes if devices were
+> not bonded before the test.
+> With those patches this issue is not valid anymore.
+>
+> This set address couple of issues:
+> * Some minor fixes found during work on those patches (first 2 patches)
+>
+> * Changed GATT behaviour during dedicated bonding. Now GATT will not start
+> search services until bonding is done. That fixes PTS connection issue
+> (patches 3-6)
+>
+> * Tracking of GATT operations in hog/dis/bas/scpp. After I solved PTS
+> connection issue I could very easily observe many of crashes in BfA when
+> disconnecting HOG during service search session. This is because HOG
+> talks directly to gattrib and clear his attrib instance on HOG disconnect
+> even there are ongoing GATT operations. Patches 7 - 19 solve this issue
+>
+>
+> v2:
+> * Remove couple of not needed patches
+> * Note that this series should go on top of: [PATCH 0/2] attrib/gattrib: Add tracking request id
+> * some minor self review cleanups
+>
+>
+> Lukasz Rymanowski (19):
+>   android/bluetooth: Minor typo fix
+>   android/bluetooth: Minor fix, add missing NULL assignment
+>   android/bluetooth: Add possibility to register for bonded event
+>   android/gatt: Add paired cb to gatt.c
+>   android/bluetooth: Add API to check if device is bonding
+>   android/gatt: Improve LE connection after pair
+>   android/hog: Add support to track gatt operations
+>   android/hog: Cancel all GATT operations on disconnect
+>   android/hog: Keep track on primary and include service search
+>   android/hog: Keep track on discover characteristic and descriptors
+>   android/hog: Keep track on read/write char and descr
+>   android/bas: Add queue to keep track on GATT operations
+>   android/bas: Keep track read/write GATT operations
+>   android/bas: Keep track on discover characteristic and descriptor
+>   android/dis: Add queue to keep track on GATT operations
+>   android/dis: Keep track on discover and read characteristic
+>   android/scpp: Add queue to keep GATT operations
+>   android/scpp: Keep track on discover characteristic and descriptor
+>   android/scpp: Keep track on write operation
+>
+>  android/bas.c       | 171 ++++++++++++++++++++++++++--
+>  android/bluetooth.c |  52 ++++++++-
+>  android/bluetooth.h |   5 +
+>  android/dis.c       | 108 +++++++++++++++++-
+>  android/gatt.c      |  67 ++++++++++-
+>  android/hog.c       | 322 ++++++++++++++++++++++++++++++++++++++++++++--------
+>  android/scpp.c      | 150 ++++++++++++++++++++++--
+>  7 files changed, 801 insertions(+), 74 deletions(-)
+>
+> --
+> 1.8.4
 
-never mind that. We have another bug in 6LoWPAN with wrongly freeing a skb. I took all 3 of Al's patches now and I will ask Johan to send you a pull request for the whole set for net tree inclusion.
+Applied, thanks. I took the opportunity and synchronized the
+implementation with profiles/input/hog.c
 
-Regards
 
-Marcel
-
+-- 
+Luiz Augusto von Dentz
