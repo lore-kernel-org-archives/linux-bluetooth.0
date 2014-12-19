@@ -1,142 +1,162 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/3] android/handsfree: Add initial support for configure WBS commmand
-Date: Fri, 19 Dec 2014 14:31:33 +0100
-Message-ID: <3945025.Q1StLrMxgl@uw000953>
-In-Reply-To: <1418828013-12385-1-git-send-email-szymon.janc@tieto.com>
-References: <1418828013-12385-1-git-send-email-szymon.janc@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+From: Gowtham Anandha Babu <gowtham.ab@samsung.com>
+To: 'Luiz Augusto von Dentz' <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	'Dmitry Kasatkin' <d.kasatkin@samsung.com>,
+	'Bharat Panda' <bharat.panda@samsung.com>, cpgs@samsung.com
+References: <1418212008-8594-1-git-send-email-gowtham.ab@samsung.com>
+ <1418212008-8594-2-git-send-email-gowtham.ab@samsung.com>
+ <CABBYNZJrV1viDu62Ndr2Davv_52tKmByLwNtQqSRUXN0j1mZww@mail.gmail.com>
+ <003501d01868$fbab5740$f30205c0$@samsung.com>
+ <000001d019c2$3452b610$9cf82230$@samsung.com>
+In-reply-to: <000001d019c2$3452b610$9cf82230$@samsung.com>
+Subject: RE: [PATCH 1/3] monitor/packet: Fix ERROR CODES as per core_v4.2
+Date: Fri, 19 Dec 2014 18:46:00 +0530
+Message-id: <001001d01b8d$fb88ce50$f29a6af0$@samsung.com>
+MIME-version: 1.0
+Content-type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Wednesday 17 of December 2014 15:53:31 Szymon Janc wrote:
-> This adds required IPC message and handler for configure WBS command.
-> ---
->  android/hal-handsfree.c | 17 ++++++++++++++---
->  android/hal-ipc-api.txt | 12 ++++++++++++
->  android/hal-msg.h       | 10 ++++++++++
->  android/handsfree.c     | 21 +++++++++++++++++++++
->  4 files changed, 57 insertions(+), 3 deletions(-)
-> 
-> diff --git a/android/hal-handsfree.c b/android/hal-handsfree.c
-> index 2c638e6..279b26a 100644
-> --- a/android/hal-handsfree.c
-> +++ b/android/hal-handsfree.c
-> @@ -832,11 +832,22 @@ static void cleanup(void)
->  #if ANDROID_VERSION >= PLATFORM_VER(5, 0, 0)
->  static bt_status_t configure_wbs(bt_bdaddr_t *bd_addr, bthf_wbs_config_t config)
->  {
-> -	/* TODO: implement */
-> +	struct hal_cmd_handsfree_configure_wbs cmd;
->  
-> -	DBG("");
-> +	DBG("%u", config);
-> +
-> +	if (!interface_ready())
-> +		return BT_STATUS_NOT_READY;
->  
-> -	return BT_STATUS_UNSUPPORTED;
-> +	if (!bd_addr)
-> +		return BT_STATUS_PARM_INVALID;
-> +
-> +	memcpy(cmd.bdaddr, bd_addr, sizeof(cmd.bdaddr));
-> +	cmd.config = config;
-> +
-> +	return hal_ipc_cmd(HAL_SERVICE_ID_HANDSFREE,
-> +					HAL_OP_HANDSFREE_CONFIGURE_WBS,
-> +					sizeof(cmd), &cmd, NULL, NULL, NULL);
->  }
->  #endif
->  
-> diff --git a/android/hal-ipc-api.txt b/android/hal-ipc-api.txt
-> index 01490fa..f15c12e 100644
-> --- a/android/hal-ipc-api.txt
-> +++ b/android/hal-ipc-api.txt
-> @@ -955,6 +955,18 @@ Commands and responses:
->  
->  		In case of an error, the error response will be returned.
->  
-> +	Opcode 0x0f - Configure WBS command/response
-> +
-> +		Command parameters: Remote address (6 octets)
-> +		                    Config (1 octet)
-> +		Response parameters: <none>
-> +
-> +		Valid config values: 0x00 = None
-> +		                     0x01 = No
-> +		                     0x02 = Yes
-> +
-> +		In case of an error, the error response will be returned.
-> +
->  Notifications:
->  
->  	Opcode 0x81 - Connection State notification
-> diff --git a/android/hal-msg.h b/android/hal-msg.h
-> index 88b0c52..ecc1150 100644
-> --- a/android/hal-msg.h
-> +++ b/android/hal-msg.h
-> @@ -624,6 +624,16 @@ struct hal_cmd_handsfree_phone_state_change {
->  	uint8_t number[0];
->  } __attribute__((packed));
->  
-> +#define HAL_HANDSFREE_WBS_NONE			0x00
-> +#define HAL_HANDSFREE_WBS_NO			0x01
-> +#define HAL_HANDSFREE_WBS_YES			0x02
-> +
-> +#define HAL_OP_HANDSFREE_CONFIGURE_WBS		0x0F
-> +struct hal_cmd_handsfree_configure_wbs {
-> +	uint8_t bdaddr[6];
-> +	uint8_t config;
-> +} __attribute__((packed));
-> +
->  /* AVRCP TARGET HAL API */
->  
->  #define HAL_AVRCP_PLAY_STATUS_STOPPED	0x00
-> diff --git a/android/handsfree.c b/android/handsfree.c
-> index 7fbe64b..da89623 100644
-> --- a/android/handsfree.c
-> +++ b/android/handsfree.c
-> @@ -2496,6 +2496,24 @@ failed:
->  				HAL_OP_HANDSFREE_PHONE_STATE_CHANGE, status);
->  }
->  
-> +static void handle_configure_wbs(const void *buf, uint16_t len)
-> +{
-> +	const struct hal_cmd_handsfree_configure_wbs *cmd = buf;
-> +	uint8_t status;
-> +
-> +	switch (cmd->config) {
-> +	case HAL_HANDSFREE_WBS_NONE:
-> +	case HAL_HANDSFREE_WBS_NO:
-> +	case HAL_HANDSFREE_WBS_YES:
-> +	default:
-> +		status = HAL_STATUS_FAILED;
-> +		break;
-> +	}
-> +
-> +	ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_HANDSFREE,
-> +					HAL_OP_HANDSFREE_CONFIGURE_WBS, status);
-> +}
-> +
->  static const struct ipc_handler cmd_handlers[] = {
->  	/* HAL_OP_HANDSFREE_CONNECT */
->  	{ handle_connect, false,
-> @@ -2537,6 +2555,9 @@ static const struct ipc_handler cmd_handlers[] = {
->  	/* HAL_OP_HANDSFREE_PHONE_STATE_CHANGE */
->  	{ handle_phone_state_change, true,
->  		sizeof(struct hal_cmd_handsfree_phone_state_change) },
-> +	/* HAL_OP_HANDSFREE_CONFIGURE_WBS */
-> +	{ handle_configure_wbs, false,
-> +		sizeof(struct hal_cmd_handsfree_configure_wbs) },
->  };
->  
->  static sdp_record_t *headset_ag_record(void)
-> 
+Ping.
 
-Pushed (with some minor changes).
+> -----Original Message-----
+> From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-
+> owner@vger.kernel.org] On Behalf Of Gowtham Anandha Babu
+> Sent: Wednesday, December 17, 2014 11:55 AM
+> To: 'Luiz Augusto von Dentz'
+> Cc: linux-bluetooth@vger.kernel.org; 'Dmitry Kasatkin'; 'Bharat Panda';
+> cpgs@samsung.com
+> Subject: RE: [PATCH 1/3] monitor/packet: Fix ERROR CODES as per core_v4.2
+> 
+> Hi Luiz,
+> 
+> > -----Original Message-----
+> > From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-
+> > owner@vger.kernel.org] On Behalf Of Gowtham Anandha Babu
+> > Sent: Monday, December 15, 2014 6:43 PM
+> > To: 'Luiz Augusto von Dentz'
+> > Cc: linux-bluetooth@vger.kernel.org; 'Dmitry Kasatkin'; 'Bharat
+> > Panda'; cpgs@samsung.com
+> > Subject: RE: [PATCH 1/3] monitor/packet: Fix ERROR CODES as per
+> > core_v4.2
+> >
+> > Hi Luiz,
+> >
+> > > -----Original Message-----
+> > > From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-
+> > > owner@vger.kernel.org] On Behalf Of Luiz Augusto von Dentz
+> > > Sent: Thursday, December 11, 2014 5:49 PM
+> > > To: Gowtham Anandha Babu
+> > > Cc: linux-bluetooth@vger.kernel.org; Dmitry Kasatkin; Bharat Panda;
+> > > cpgs@samsung.com
+> > > Subject: Re: [PATCH 1/3] monitor/packet: Fix ERROR CODES as per
+> > > core_v4.2
+> > >
+> > > Hi Gowtham,
+> > >
+> > > On Wed, Dec 10, 2014 at 1:46 PM, Gowtham Anandha Babu
+> > > <gowtham.ab@samsung.com> wrote:
+> > > > Modified the error codes as per core V4.2, Vol 2, Part D.
+> > > > ---
+> > > >  monitor/packet.c | 7 ++++---
+> > > >  1 file changed, 4 insertions(+), 3 deletions(-)
+> > > >
+> > > > diff --git a/monitor/packet.c b/monitor/packet.c index
+> > > > 885c4b1..87b97ad 100644
+> > > > --- a/monitor/packet.c
+> > > > +++ b/monitor/packet.c
+> > > > @@ -317,9 +317,10 @@ static const struct {
+> > > >         { 0x1b, "SCO Offset Rejected"                                   },
+> > > >         { 0x1c, "SCO Interval Rejected"                                 },
+> > > >         { 0x1d, "SCO Air Mode Rejected"                                 },
+> > > > -       { 0x1e, "Invalid LMP Parameters"                                },
+> > > > +       { 0x1e, "Invalid LMP Parameters / Invalid LL Parameters"        },
+> > > >         { 0x1f, "Unspecified Error"                                     },
+> > > > -       { 0x20, "Unsupported LMP Parameter Value"                       },
+> > > > +       { 0x20, "Unsupported LMP Parameter Value / "
+> > > > +               "Unsupported LL Parameter Value"                        },
+> > >
+> > > Perhaps just having LMP/LL instead of duplicating the whole string
+> > > is a better idea, usually the spec would not change a meaning of an
+> > > error or is LL LE specific?
+> >
+> > Here LMP refers to LMP PDU, LL refers to LL control PDU.
+> > I think changing it into LMP/LL is also a good idea.
+> > But, It's safer to follow the specification.
+> > What do you think?
+> >
+> > >
+> > > >         { 0x21, "Role Change Not Allowed"                               },
+> > > >         { 0x22, "LMP Response Timeout / LL Response Timeout"            },
+> > > >         { 0x23, "LMP Error Transaction Collision"                       },
+> > > > @@ -346,7 +347,7 @@ static const struct {
+> > > >         { 0x38, "Host Busy - Pairing"                                   },
+> > > >         { 0x39, "Connection Rejected due to No Suitable Channel Found"  },
+> > > >         { 0x3a, "Controller Busy"                                       },
+> > > > -       { 0x3b, "Unacceptable Connection Interval"                      },
+> > > > +       { 0x3b, "Unacceptable Connection Parameters"                    },
+> > >
+> > > This as well need a bit more explanation, when this has changed or
+> > > perhaps we got it wrong to begin with?
+> >
+> > It is mentioned in (Errata ID: 5660).
+> > https://www.bluetooth.org/errata/errata_view.cfm?errata_id=5660
+> > (Requires Login).
+> >
+> > Description of that errata:
+> > The title of 2.56 is "Unacceptable Connection Parameters (0x3B)".
+> >
+> > However, the text begins "The Unacceptable Connection
+> > IntervalParameters error code" (sic). HCI 7.1.6 (Disconnect Command)
+> > refers to "Unacceptable Connection Interval error code (0x3B)". Volume
+> > 6 has two references to "error code 0x3B (Unacceptable Connection
+> Parameters)".
+> >
+> > I propose we change the text of 2.56 and of 7.16 to "Unacceptable
+> > Connection Parameters".
+> 
+> Please let me know, if you need more details.
+> 
+> >
+> > >
+> > > >         { 0x3c, "Directed Advertising Timeout"                          },
+> > > >         { 0x3d, "Connection Terminated due to MIC Failure"              },
+> > > >         { 0x3e, "Connection Failed to be Established"                   },
+> > > > --
+> > > > 1.9.1
+> > > >
+> > > > --
+> > > > To unsubscribe from this list: send the line "unsubscribe
+> > > > linux-bluetooth" in the body of a message to
+> > > > majordomo@vger.kernel.org More majordomo info at
+> > > > http://vger.kernel.org/majordomo-info.html
+> > >
+> > >
+> > >
+> > > --
+> > > Luiz Augusto von Dentz
+> > > --
+> > > To unsubscribe from this list: send the line "unsubscribe
+> > > linux-bluetooth" in the body of a message to
+> > > majordomo@vger.kernel.org More majordomo info at
+> > > http://vger.kernel.org/majordomo-info.html
+> >
+> >
+> > Regards,
+> > Gowtham Anandha Babu
+> >
+> > --
+> > To unsubscribe from this list: send the line "unsubscribe
+> > linux-bluetooth" in the body of a message to majordomo@vger.kernel.org
+> > More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> 
+> Regards,
+> Gowtham Anandha Babu
+> 
+> 
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org More majordomo
+> info at  http://vger.kernel.org/majordomo-info.html
 
--- 
-Best regards, 
-Szymon Janc
