@@ -1,37 +1,41 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] android/gatt: Fix possible NULL dereference
-Date: Fri, 19 Dec 2014 14:30:28 +0200
-Message-Id: <1418992228-4070-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] shared/gap: Fix memory leak in gap
+Date: Fri, 19 Dec 2014 13:29:39 +0100
+Message-ID: <3389986.jiWvF7HSzQ@uw000953>
+In-Reply-To: <1418991181-3826-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1418991181-3826-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Hi Andrei,
 
-Fixes warnings:
-...
-Pointer 'req' returned from call to function 'queue_peek_head'
-may be NULL and will be dereferenced
-...
----
- android/gatt.c | 3 +++
- 1 file changed, 3 insertions(+)
+On Friday 19 of December 2014 14:13:01 Andrei Emeltchenko wrote:
+> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> 
+> Allocated irk memory was never assigned.
+> ---
+>  src/shared/gap.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/src/shared/gap.c b/src/shared/gap.c
+> index 19059e8..3536c1c 100644
+> --- a/src/shared/gap.c
+> +++ b/src/shared/gap.c
+> @@ -276,5 +276,5 @@ bool bt_gap_add_peer_irk(struct bt_gap *gap, uint8_t addr_type,
+>  	memcpy(irk->addr, addr, 6);
+>  	memcpy(irk->key, key, 16);
+>  
+> -	return true;
+> +	return queue_push_tail(gap->irk_list, irk);
+>  }
 
-diff --git a/android/gatt.c b/android/gatt.c
-index 6828f2f..2534836 100644
---- a/android/gatt.c
-+++ b/android/gatt.c
-@@ -5561,6 +5561,9 @@ static void handle_server_send_response(const void *buf, uint16_t len)
- 		 * gatt_db_attribute_write().
- 		 */
- 		req = queue_peek_head(conn->device->pending_requests);
-+		if (!req)
-+			goto done;
-+
- 		/* Cast status to uint8_t, due to (byte) cast in java layer. */
- 		req->error = err_to_att((uint8_t) cmd->status);
- 		req->state = REQUEST_DONE;
+For sanity this should free irk if push failed.
+
 -- 
-2.1.0
-
+Best regards, 
+Szymon Janc
