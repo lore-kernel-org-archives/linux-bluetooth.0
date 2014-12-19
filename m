@@ -1,41 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 19 Dec 2014 06:18:01 +0000
-From: Al Viro <viro@ZenIV.linux.org.uk>
-To: David Miller <davem@davemloft.net>
-Cc: Marcel Holtmann <marcel@holtmann.org>, netdev@vger.kernel.org,
-	linux-bluetooth@vger.kernel.org
-Subject: [patches] a bunch of old bluetooth fixes
-Message-ID: <20141219061801.GU22149@ZenIV.linux.org.uk>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Sender: Al Viro <viro@ftp.linux.org.uk>
+From: Arman Uguray <armansito@chromium.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: Arman Uguray <armansito@chromium.org>
+Subject: [PATCH BlueZ v5 7/7] profiles/gap: Add Google copyright.
+Date: Thu, 18 Dec 2014 17:24:39 -0800
+Message-Id: <1418952279-16452-8-git-send-email-armansito@chromium.org>
+In-Reply-To: <1418952279-16452-1-git-send-email-armansito@chromium.org>
+References: <1418952279-16452-1-git-send-email-armansito@chromium.org>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-	This stuff has been sitting in my queue since March; basically,
-several places in net/bluetooth assume that they are dealing with
-l2cap sockets, while it is possible to get an arbitrary socket to those.
-Results are not pretty.
-	* HIDPCONNADD gets an arbitrary user-supplied socket; the code
-it calls (hidp_connection_add()) verifies that the socket is l2cap one,
-but before doing so it finds l2cap_pi(ctrl_sock->sk)->chan.  It's not
-that big a deal (it's only 5 words past the end of struct sock), but
-it's trivial to avoid and, in theory, we might end up oopsing here if
-we are very unlucky and it happens to hit an unmapped page just past
-the actual object ctrl_sock->sk sits in.
-	* CMTP counterpart of that doesn't validate the socket at all.
-It proceeds to
-        s = __cmtp_get_session(&l2cap_pi(sock->sk)->chan->dst);
-which can very easily oops - here ->chan is already garbage and we
-proceed to dereference that.  As with HIDP, one needs CAP_NET_ADMIN to
-trigger that, but it's really a clear bug.  The only sanity check we
-do is verifying that nsock->sk->sk_state is equal to BT_CONNECTED,
-which is not unique to bluetooth, to put it mildly.  It's just 1,
-so a TCP_ESTABLISHED tcp socket will pass that check just fune.
-The fix is trivial...
-	* BNEP situation is identical to CMTP one.
+Added Google Inc. to the copyright comment since the profile has been
+mostly rewritten.
+---
+ profiles/gap/gas.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-I've sent these patches back then (March 10), but they seem to have fallen
-through the cracks.  The bugs are still there and the fixes still apply.
-If you would prefer me to resend them after -rc1, just tell...
+diff --git a/profiles/gap/gas.c b/profiles/gap/gas.c
+index 5702e47..87892d7 100644
+--- a/profiles/gap/gas.c
++++ b/profiles/gap/gas.c
+@@ -3,6 +3,7 @@
+  *  BlueZ - Bluetooth protocol stack for Linux
+  *
+  *  Copyright (C) 2012  Instituto Nokia de Tecnologia - INdT
++ *  Copyright (C) 2014  Google Inc.
+  *
+  *  This program is free software; you can redistribute it and/or modify
+  *  it under the terms of the GNU General Public License as published by
+-- 
+2.2.0.rc0.207.ga3a616c
 
-Anyway, patches follow
