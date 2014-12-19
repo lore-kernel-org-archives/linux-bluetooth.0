@@ -2,348 +2,507 @@ Return-Path: <cyrus@holtmann.org>
 From: Arman Uguray <armansito@chromium.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Arman Uguray <armansito@chromium.org>
-Subject: [PATCH BlueZ v5 4/7] profiles/gatt: Don't handle GATT service.
-Date: Thu, 18 Dec 2014 17:24:36 -0800
-Message-Id: <1418952279-16452-5-git-send-email-armansito@chromium.org>
+Subject: [PATCH BlueZ v5 3/7] core: device: Make profile calls in GATT events
+Date: Thu, 18 Dec 2014 17:24:35 -0800
+Message-Id: <1418952279-16452-4-git-send-email-armansito@chromium.org>
 In-Reply-To: <1418952279-16452-1-git-send-email-armansito@chromium.org>
 References: <1418952279-16452-1-git-send-email-armansito@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-ATT MTU exchange and handling of indications from the "Service Changed"
-characteristic are now handled by shared/gatt-client, so this profile
-should only deal with the GAP service.
----
- profiles/gatt/gas.c | 251 ++--------------------------------------------------
- 1 file changed, 5 insertions(+), 246 deletions(-)
+This patch correctly integrates all profile calls into the various GATT
+client events (ready, service-added, service-removed) so that profiles
+can perform the necessary updates. The major changes introduced in this
+this patch are:
 
-diff --git a/profiles/gatt/gas.c b/profiles/gatt/gas.c
-index b51b4a8..9d5d31e 100644
---- a/profiles/gatt/gas.c
-+++ b/profiles/gatt/gas.c
-@@ -52,12 +52,8 @@
- struct gas {
- 	struct btd_device *device;
- 	struct att_range gap;	/* GAP Primary service range */
--	struct att_range gatt;	/* GATT Primary service range */
- 	GAttrib *attrib;
- 	guint attioid;
--	guint changed_ind;
--	uint16_t changed_handle;
--	uint16_t mtu;
- };
- 
- static GSList *devices = NULL;
-@@ -80,68 +76,6 @@ static int cmp_device(gconstpointer a, gconstpointer b)
- 	return (gas->device == device ? 0 : -1);
+  1. Added new profile probe/remove functions for GATT services, which
+     operate on a btd_device's client db and initialize btd_service
+     instances with start & end handles:
+        - device_probe_gatt_profiles
+        - device_probe_gatt_profile
+        - device_remove_gatt_profile
+        - device_accept_gatt_profiles
+
+  2. device_probe_gatt_profiles is called after service discovery on all
+     profiles for new services and any stale services are removed from
+     the profiles.
+
+  3. device_accept_gatt_profiles is called to notify profiles of a new
+     connection when the gatt-client becomes ready. This is call
+     immediately after a probe, if the probe was done for a newly found
+     service after a "Service Changed" event.
+
+  4. device_probe_gatt_profile is called when a new GATT service is
+     added to the db.
+
+  5. device_remove_gatt_profile is called when a GATT service is removed
+     from the db.
+---
+ src/device.c | 366 +++++++++++++++++++++++++++++++++++++++++++++++++++--------
+ 1 file changed, 317 insertions(+), 49 deletions(-)
+
+diff --git a/src/device.c b/src/device.c
+index 854d9f3..cfc5894 100644
+--- a/src/device.c
++++ b/src/device.c
+@@ -292,6 +292,27 @@ static GSList *find_service_with_state(GSList *list,
+ 	return NULL;
  }
  
--static void write_ctp_handle(struct btd_device *device, uint16_t uuid,
--					uint16_t handle)
--{
--	char *filename, group[6], value[7];
--	GKeyFile *key_file;
--	char *data;
--	gsize length = 0;
--
--	filename = btd_device_get_storage_path(device, "gatt");
--	if (!filename) {
--		warn("Unable to get gatt storage path for device");
--		return;
--	}
--
--	key_file = g_key_file_new();
--	g_key_file_load_from_file(key_file, filename, 0, NULL);
--
--	snprintf(group, sizeof(group), "%hu", uuid);
--	snprintf(value, sizeof(value), "0x%4.4X", handle);
--	g_key_file_set_string(key_file, group, "Value", value);
--
--	data = g_key_file_to_data(key_file, &length, NULL);
--	if (length > 0) {
--		create_file(filename, S_IRUSR | S_IWUSR);
--		g_file_set_contents(filename, data, length, NULL);
--	}
--
--	g_free(data);
--	g_free(filename);
--	g_key_file_free(key_file);
--}
--
--static int read_ctp_handle(struct btd_device *device, uint16_t uuid,
--					uint16_t *value)
--{
--	char *filename, group[6];
--	GKeyFile *key_file;
--	char *str;
--	int err = 0;
--
--	filename = btd_device_get_storage_path(device, "gatt");
--	if (!filename) {
--		warn("Unable to get gatt storage path for device");
--		return -ENOENT;
--	}
--
--	snprintf(group, sizeof(group), "%hu", uuid);
--
--	key_file = g_key_file_new();
--	g_key_file_load_from_file(key_file, filename, 0, NULL);
--
--	str = g_key_file_get_string(key_file, group, "Value", NULL);
--	if (str == NULL || sscanf(str, "%hx", value) != 1)
--		err = -ENOENT;
--
--	g_free(str);
--	g_free(filename);
--	g_key_file_free(key_file);
--
--	return err;
--}
--
- static void gap_appearance_cb(guint8 status, const guint8 *pdu, guint16 plen,
- 							gpointer user_data)
++static GSList *find_service_with_gatt_handles(GSList *list,
++							uint16_t start_handle,
++							uint16_t end_handle)
++{
++	GSList *l;
++	uint16_t svc_start, svc_end;
++
++	for (l = list; l != NULL; l = g_slist_next(l)) {
++		struct btd_service *service = l->data;
++
++		if (!btd_service_get_gatt_handles(service, &svc_start,
++								&svc_end))
++			continue;
++
++		if (svc_start == start_handle && svc_end == end_handle)
++			return l;
++	}
++
++	return NULL;
++}
++
+ static void update_technologies(GKeyFile *file, struct btd_device *dev)
  {
-@@ -176,163 +110,12 @@ done:
- 	att_data_list_free(list);
+ 	const char *list[2];
+@@ -2390,15 +2411,265 @@ static void add_primary(struct gatt_db_attribute *attr, void *user_data)
+ 	*new_services = g_slist_append(*new_services, prim);
  }
  
--static void indication_cb(const uint8_t *pdu, uint16_t len, gpointer user_data)
--{
--	uint8_t bdaddr_type;
--	struct gas *gas = user_data;
--	uint16_t start, end, olen;
--	size_t plen;
--	uint8_t *opdu;
--
--	if (len < 7) { /* 1-byte opcode + 2-byte handle + 4 range */
--		error("Malformed ATT notification");
--		return;
--	}
--
--	start = get_le16(&pdu[3]);
--	end = get_le16(&pdu[5]);
--
--	DBG("Service Changed start: 0x%04X end: 0x%04X", start, end);
--
--	/* Confirming indication received */
--	opdu = g_attrib_get_buffer(gas->attrib, &plen);
--	olen = enc_confirmation(opdu, plen);
--	g_attrib_send(gas->attrib, 0, opdu, olen, NULL, NULL, NULL);
--
--	bdaddr_type = btd_device_get_bdaddr_type(gas->device);
--	if (!device_is_bonded(gas->device, bdaddr_type)) {
--		DBG("Ignoring Service Changed: device is not bonded");
--		return;
--	}
--
--	btd_device_gatt_set_service_changed(gas->device, start, end);
--}
--
--static void ccc_written_cb(guint8 status, const guint8 *pdu, guint16 plen,
--							gpointer user_data)
--{
--	struct gas *gas = user_data;
--
--	if (status) {
--		error("Write Service Changed CCC failed: %s",
--						att_ecode2str(status));
--		return;
--	}
--
--	DBG("Service Changed indications enabled");
--
--	gas->changed_ind = g_attrib_register(gas->attrib, ATT_OP_HANDLE_IND,
--						gas->changed_handle,
--						indication_cb, gas, NULL);
--
--	write_ctp_handle(gas->device, GATT_CHARAC_SERVICE_CHANGED,
--					gas->changed_handle);
--}
--
--static void write_ccc(GAttrib *attrib, uint16_t handle, gpointer user_data)
--{
--	uint8_t value[2];
--
--	put_le16(GATT_CLIENT_CHARAC_CFG_IND_BIT, value);
--	gatt_write_char(attrib, handle, value, sizeof(value), ccc_written_cb,
--								user_data);
--}
--
--static void discover_ccc_cb(uint8_t status, GSList *descs, void *user_data)
--{
--	struct gas *gas = user_data;
--	struct gatt_desc *desc;
--
--	if (status != 0) {
--		error("Discover Service Changed CCC failed: %s",
--							att_ecode2str(status));
--		return;
--	}
--
--	/* There will be only one descriptor on list and it will be CCC */
--	desc = descs->data;
--
--	DBG("CCC: 0x%04x", desc->handle);
--	write_ccc(gas->attrib, desc->handle, user_data);
--}
--
--static void gatt_characteristic_cb(uint8_t status, GSList *characteristics,
--								void *user_data)
--{
--	struct gas *gas = user_data;
--	struct gatt_char *chr;
--	uint16_t start, end;
--	bt_uuid_t uuid;
--
--	if (status) {
--		error("Discover Service Changed handle: %s", att_ecode2str(status));
--		return;
--	}
--
--	chr = characteristics->data;
--
--	start = chr->value_handle + 1;
--	end = gas->gatt.end;
--
--	if (start > end) {
--		error("Inconsistent database: Service Changed CCC missing");
--		return;
--	}
--
--	gas->changed_handle = chr->value_handle;
--
--	bt_uuid16_create(&uuid, GATT_CLIENT_CHARAC_CFG_UUID);
--
--	gatt_discover_desc(gas->attrib, start, end, &uuid, discover_ccc_cb,
--									gas);
--}
--
--static void exchange_mtu_cb(guint8 status, const guint8 *pdu, guint16 plen,
--							gpointer user_data)
--{
--	struct gas *gas = user_data;
--	uint16_t rmtu;
--
--	if (status) {
--		error("MTU exchange: %s", att_ecode2str(status));
--		return;
--	}
--
--	if (!dec_mtu_resp(pdu, plen, &rmtu)) {
--		error("MTU exchange: protocol error");
--		return;
--	}
--
--	gas->mtu = MIN(rmtu, gas->mtu);
--	if (g_attrib_set_mtu(gas->attrib, gas->mtu))
--		DBG("MTU exchange succeeded: %d", gas->mtu);
--	else
--		DBG("MTU exchange failed");
--}
--
- static void attio_connected_cb(GAttrib *attrib, gpointer user_data)
++static void device_add_uuids(struct btd_device *device, GSList *uuids)
++{
++	GSList *l;
++
++	for (l = uuids; l != NULL; l = g_slist_next(l)) {
++		GSList *match = g_slist_find_custom(device->uuids, l->data,
++							bt_uuid_strcmp);
++		if (match)
++			continue;
++
++		device->uuids = g_slist_insert_sorted(device->uuids,
++						g_strdup(l->data),
++						bt_uuid_strcmp);
++	}
++
++	g_dbus_emit_property_changed(dbus_conn, device->path,
++						DEVICE_INTERFACE, "UUIDs");
++}
++
+ static void store_services(struct btd_device *device);
+ 
++struct gatt_probe_data {
++	struct btd_device *dev;
++	bool all_services;
++	GSList *uuids;
++	struct gatt_db_attribute *cur_attr;
++	char cur_uuid[MAX_LEN_UUID_STR];
++	uint16_t start_handle, end_handle;
++	GSList *valid_services;
++};
++
++static bool device_match_profile(struct btd_device *device,
++					struct btd_profile *profile,
++					GSList *uuids)
++{
++	if (profile->remote_uuid == NULL)
++		return false;
++
++	if (g_slist_find_custom(uuids, profile->remote_uuid,
++							bt_uuid_strcmp) == NULL)
++		return false;
++
++	return true;
++}
++
++static void dev_probe_gatt(struct btd_profile *p, void *user_data)
++{
++	struct gatt_probe_data *data = user_data;
++	struct btd_service *service;
++
++	if (p->device_probe == NULL)
++		return;
++
++	if (!p->remote_uuid || bt_uuid_strcmp(p->remote_uuid, data->cur_uuid))
++		return;
++
++	service = service_create_gatt(data->dev, p, data->start_handle,
++							data->end_handle);
++	if (!service)
++		return;
++
++	if (service_probe(service) < 0) {
++		btd_service_unref(service);
++		return;
++	}
++
++	data->dev->services = g_slist_append(data->dev->services, service);
++
++	if (data->all_services)
++		data->valid_services = g_slist_append(data->valid_services,
++								service);
++}
++
++static bool match_existing_service(struct gatt_probe_data *data)
++{
++	struct btd_device *dev = data->dev;
++	struct btd_service *service;
++	struct btd_profile *profile;
++	uint16_t start, end;
++	GSList *l, *tmp;
++
++	/*
++	 * Check if the profiles should be probed for the service in the
++	 * database.
++	 */
++	for (l = dev->services; l != NULL;) {
++		service = l->data;
++		profile = btd_service_get_profile(service);
++
++		/* If this is local or non-GATT based service, then skip. */
++		if (!profile->remote_uuid ||
++			!btd_service_get_gatt_handles(service, &start, &end)) {
++			l = g_slist_next(l);
++			continue;
++		}
++
++		/* Skip this service if the handle ranges don't overlap. */
++		if (start > data->end_handle || end < data->start_handle) {
++			l = g_slist_next(l);
++			continue;
++		}
++
++		/*
++		 * If there is an exact match, then there's no need to probe the
++		 * profiles. An exact match is when the service handles AND the
++		 * service UUID match.
++		 */
++		if (start == data->start_handle && end == data->end_handle &&
++			!bt_uuid_strcmp(profile->remote_uuid, data->cur_uuid)) {
++			if (data->all_services)
++				data->valid_services = g_slist_append(
++						data->valid_services, service);
++			return true;
++		}
++
++		/*
++		 * The handles overlap but there is no exact match. This means
++		 * that the service is no longer valid. Remove it.
++		 *
++		 * TODO: The following code is fairly inefficient, especially
++		 * when we consider all the extra searches that we're already
++		 * doing. Consider changing the services list to a GList.
++		 */
++		tmp = l->next;
++		dev->services = g_slist_delete_link(dev->services, l);
++		dev->pending = g_slist_remove(dev->pending, service);
++		service_remove(service);
++
++		l = tmp;
++	}
++
++	/* No match found */
++	return false;
++}
++
++static void dev_probe_gatt_profile(struct gatt_db_attribute *attr,
++							void *user_data)
++{
++	struct gatt_probe_data *data = user_data;
++	bt_uuid_t uuid;
++	GSList *l;
++
++	gatt_db_attribute_get_service_data(attr, &data->start_handle,
++							&data->end_handle, NULL,
++							&uuid);
++	bt_uuid_to_string(&uuid, data->cur_uuid, sizeof(data->cur_uuid));
++
++	data->cur_attr = attr;
++
++	/* Don't probe the profiles if a matching service already exists. */
++	if (!match_existing_service(data))
++		btd_profile_foreach(dev_probe_gatt, data);
++
++	if (data->all_services) {
++		data->uuids = g_slist_append(data->uuids,
++						g_strdup(data->cur_uuid));
++		return;
++	}
++
++	l = g_slist_append(l, g_strdup(data->cur_uuid));
++	device_add_uuids(data->dev, l);
++}
++
++static void device_probe_gatt_profile(struct btd_device *device,
++						struct gatt_db_attribute *attr)
++{
++	struct gatt_probe_data data;
++
++	memset(&data, 0, sizeof(data));
++
++	data.dev = device;
++
++	dev_probe_gatt_profile(attr, &data);
++	g_slist_free_full(data.uuids, g_free);
++}
++
++static void remove_invalid_services(struct gatt_probe_data *data)
++{
++	struct btd_device *dev = data->dev;
++	struct btd_service *service;
++	GSList *l, *tmp;
++
++	for (l = dev->services; l != NULL;) {
++		service = l->data;
++
++		if (g_slist_find(data->valid_services, service)) {
++			l = g_slist_next(l);
++			continue;
++		}
++
++		/* Service no longer valid, so remove it */
++		tmp = l->next;
++		dev->services = g_slist_delete_link(dev->services, l);
++		dev->pending = g_slist_remove(dev->pending, service);
++		service_remove(service);
++
++		l = tmp;
++	}
++}
++
++static void device_probe_gatt_profiles(struct btd_device *device)
++{
++	struct gatt_probe_data data;
++	char addr[18];
++
++	ba2str(&device->bdaddr, addr);
++
++	if (device->blocked) {
++		DBG("Skipping profiles for blocked device %s", addr);
++		return;
++	}
++
++	memset(&data, 0, sizeof(data));
++
++	data.dev = device;
++	data.all_services = true;
++
++	gatt_db_foreach_service(device->db, NULL, dev_probe_gatt_profile,
++									&data);
++	device_add_uuids(device, data.uuids);
++	g_slist_free_full(data.uuids, g_free);
++
++	remove_invalid_services(&data);
++	g_slist_free(data.valid_services);
++}
++
++static void device_accept_gatt_profiles(struct btd_device *device)
++{
++	GSList *l;
++
++	for (l = device->services; l != NULL; l = g_slist_next(l))
++		service_accept(l->data);
++}
++
++static void device_remove_gatt_profile(struct btd_device *device,
++						struct gatt_db_attribute *attr)
++{
++	uint16_t start, end;
++	struct btd_service *service;
++	GSList *l;
++
++	gatt_db_attribute_get_service_handles(attr, &start, &end);
++
++	l = find_service_with_gatt_handles(device->services, start, end);
++	if (!l)
++		return;
++
++	service = l->data;
++	device->services = g_slist_delete_link(device->services, l);
++	device->pending = g_slist_remove(device->pending, service);
++	service_remove(service);
++}
++
+ static void gatt_service_added(struct gatt_db_attribute *attr, void *user_data)
  {
- 	struct gas *gas = user_data;
--	GIOChannel *io;
--	GError *gerr = NULL;
--	uint16_t cid, imtu;
- 	uint16_t app;
+ 	struct btd_device *device = user_data;
+-	struct gatt_primary *prim;
+ 	GSList *new_service = NULL;
+-	GSList *profiles_added = NULL;
+ 	uint16_t start, end;
++	GSList *l;
  
- 	gas->attrib = g_attrib_ref(attrib);
--	io = g_attrib_get_channel(attrib);
+ 	if (!bt_gatt_client_is_ready(device->client))
+ 		return;
+@@ -2417,14 +2688,13 @@ static void gatt_service_added(struct gatt_db_attribute *attr, void *user_data)
+ 
+ 	device_register_primaries(device, new_service, -1);
+ 
+-	prim = new_service->data;
+-	profiles_added = g_slist_append(profiles_added, g_strdup(prim->uuid));
++	device_probe_gatt_profile(device, attr);
+ 
+-	device_probe_profiles(device, profiles_added);
++	l = find_service_with_gatt_handles(device->services, start, end);
++	if (l)
++		service_accept(l->data);
+ 
+ 	store_services(device);
 -
--	if (bt_io_get(io, &gerr, BT_IO_OPT_IMTU, &imtu,
--				BT_IO_OPT_CID, &cid, BT_IO_OPT_INVALID) &&
--							cid == ATT_CID) {
--		gatt_exchange_mtu(gas->attrib, imtu, exchange_mtu_cb, gas);
--		gas->mtu = imtu;
--		DBG("MTU Exchange: Requesting %d", imtu);
+-	g_slist_free_full(profiles_added, g_free);
+ }
+ 
+ static gint prim_attr_cmp(gconstpointer a, gconstpointer b)
+@@ -2438,6 +2708,14 @@ static gint prim_attr_cmp(gconstpointer a, gconstpointer b)
+ 	return !(prim->range.start == start && prim->range.end == end);
+ }
+ 
++static gint prim_uuid_cmp(gconstpointer a, gconstpointer b)
++{
++	const struct gatt_primary *prim = a;
++	const char *uuid = b;
++
++	return bt_uuid_strcmp(prim->uuid, uuid);
++}
++
+ static void gatt_service_removed(struct gatt_db_attribute *attr,
+ 								void *user_data)
+ {
+@@ -2461,20 +2739,32 @@ static void gatt_service_removed(struct gatt_db_attribute *attr,
+ 	prim = l->data;
+ 	device->primaries = g_slist_delete_link(device->primaries, l);
+ 
+-	/* Remove the corresponding UUIDs entry */
+-	l = g_slist_find_custom(device->uuids, prim->uuid, bt_uuid_strcmp);
+-	device->uuids = g_slist_delete_link(device->uuids, l);
+-	g_free(prim);
+-
+-	store_services(device);
++	/*
++	 * If this happend since the db was cleared for a non-bonded device,
++	 * then don't remove the btd_service just yet. We do this so that we can
++	 * avoid re-probing the profile if the same GATT service is found on the
++	 * device on re-connection. However, if the device is marked as
++	 * temporary, then we remove it anyway.
++	 */
++	if (device->client || device->temporary == TRUE)
++		device_remove_gatt_profile(device, attr);
+ 
+ 	/*
+-	 * TODO: Notify the profiles somehow. It may be sufficient for each
+-	 * profile to register a service_removed handler.
++	 * Remove the corresponding UUIDs entry, only if this is the last
++	 * service with this UUID.
+ 	 */
++	l = g_slist_find_custom(device->uuids, prim->uuid, bt_uuid_strcmp);
+ 
+-	g_dbus_emit_property_changed(dbus_conn, device->path,
++	if (!g_slist_find_custom(device->primaries, prim->uuid,
++							prim_uuid_cmp)) {
++		device->uuids = g_slist_delete_link(device->uuids, l);
++		g_dbus_emit_property_changed(dbus_conn, device->path,
+ 						DEVICE_INTERFACE, "UUIDs");
++	}
++
++	g_free(prim);
++
++	store_services(device);
+ }
+ 
+ static struct btd_device *device_new(struct btd_adapter *adapter,
+@@ -2975,20 +3265,6 @@ GSList *btd_device_get_uuids(struct btd_device *device)
+ 	return device->uuids;
+ }
+ 
+-static bool device_match_profile(struct btd_device *device,
+-					struct btd_profile *profile,
+-					GSList *uuids)
+-{
+-	if (profile->remote_uuid == NULL)
+-		return false;
+-
+-	if (g_slist_find_custom(uuids, profile->remote_uuid,
+-							bt_uuid_strcmp) == NULL)
+-		return false;
+-
+-	return true;
+-}
+-
+ struct probe_data {
+ 	struct btd_device *dev;
+ 	GSList *uuids;
+@@ -3065,7 +3341,6 @@ void device_remove_profile(gpointer a, gpointer b)
+ void device_probe_profiles(struct btd_device *device, GSList *uuids)
+ {
+ 	struct probe_data d = { device, uuids };
+-	GSList *l;
+ 	char addr[18];
+ 
+ 	ba2str(&device->bdaddr, addr);
+@@ -3080,19 +3355,7 @@ void device_probe_profiles(struct btd_device *device, GSList *uuids)
+ 	btd_profile_foreach(dev_probe, &d);
+ 
+ add_uuids:
+-	for (l = uuids; l != NULL; l = g_slist_next(l)) {
+-		GSList *match = g_slist_find_custom(device->uuids, l->data,
+-							bt_uuid_strcmp);
+-		if (match)
+-			continue;
+-
+-		device->uuids = g_slist_insert_sorted(device->uuids,
+-						g_strdup(l->data),
+-						bt_uuid_strcmp);
 -	}
 -
--	if (gerr) {
--		error("Could not acquire att imtu and cid: %s", gerr->message);
--		g_error_free(gerr);
--	}
+-	g_dbus_emit_property_changed(dbus_conn, device->path,
+-						DEVICE_INTERFACE, "UUIDs");
++	device_add_uuids(device, uuids);
+ }
  
- 	if (device_get_appearance(gas->device, &app) < 0) {
- 		bt_uuid_t uuid;
-@@ -345,43 +128,23 @@ static void attio_connected_cb(GAttrib *attrib, gpointer user_data)
- 	}
+ static void store_sdp_record(GKeyFile *key_file, sdp_record_t *rec)
+@@ -3412,6 +3675,13 @@ static void search_cb(sdp_list_t *recs, int err, gpointer user_data)
+ 	if (primaries)
+ 		device_register_primaries(device, primaries, ATT_PSM);
  
- 	/* TODO: Read other GAP characteristics - See Core spec page 1739 */
--
++	/*
++	 * TODO: The btd_service instances for GATT services need to be
++	 * initialized with the service handles. Eventually this code should
++	 * perform ATT protocol service discovery over the ATT PSM to obtain
++	 * the full list of services and populate a client-role gatt_db over
++	 * BR/EDR.
++	 */
+ 	device_probe_profiles(device, req->profiles_added);
+ 
+ 	/* Propagate services changes */
+@@ -3640,7 +3910,7 @@ static void register_gatt_services(struct browse_req *req)
+ 
+ 	device_register_primaries(device, services, -1);
+ 
+-	device_probe_profiles(device, req->profiles_added);
++	device_probe_gatt_profiles(device);
+ 
+ 	device_svc_resolved(device, device->bdaddr_type, 0);
+ 
+@@ -3675,10 +3945,8 @@ static void gatt_client_ready_cb(bool success, uint8_t att_ecode,
+ 	if (device->browse)
+ 		register_gatt_services(device->browse);
+ 
 -	/*
--	 * When re-connecting <<Service Changed>> handle and characteristic
--	 * value doesn't need to read again: known information from the
--	 * previous interaction.
+-	 * TODO: Change attio callbacks to accept a gatt-client instead of a
+-	 * GAttrib.
 -	 */
--	if (gas->changed_handle == 0) {
--		bt_uuid_t uuid;
--
--		bt_uuid16_create(&uuid, GATT_CHARAC_SERVICE_CHANGED);
--
--		gatt_discover_char(gas->attrib, gas->gatt.start, gas->gatt.end,
--					&uuid, gatt_characteristic_cb, gas);
--	}
++	device_accept_gatt_profiles(device);
++
+ 	g_slist_foreach(device->attios, attio_connected, device->attrib);
  }
  
- static void attio_disconnected_cb(gpointer user_data)
- {
- 	struct gas *gas = user_data;
- 
--	g_attrib_unregister(gas->attrib, gas->changed_ind);
--	gas->changed_ind = 0;
--
- 	g_attrib_unref(gas->attrib);
- 	gas->attrib = NULL;
- }
- 
--static int gas_register(struct btd_device *device, struct att_range *gap,
--						struct att_range *gatt)
-+static int gas_register(struct btd_device *device, struct att_range *gap)
- {
- 	struct gas *gas;
- 
- 	gas = g_new0(struct gas, 1);
- 	gas->gap.start = gap->start;
- 	gas->gap.end = gap->end;
--	gas->gatt.start = gatt->start;
--	gas->gatt.end = gatt->end;
- 
- 	gas->device = btd_device_ref(device);
- 
-@@ -391,9 +154,6 @@ static int gas_register(struct btd_device *device, struct att_range *gap,
- 						attio_connected_cb,
- 						attio_disconnected_cb, gas);
- 
--	read_ctp_handle(gas->device, GATT_CHARAC_SERVICE_CHANGED,
--					&gas->changed_handle);
--
- 	return 0;
- }
- 
-@@ -414,17 +174,16 @@ static void gas_unregister(struct btd_device *device)
- static int gatt_driver_probe(struct btd_service *service)
- {
- 	struct btd_device *device = btd_service_get_device(service);
--	struct gatt_primary *gap, *gatt;
-+	struct gatt_primary *gap;
- 
- 	gap = btd_device_get_primary(device, GAP_UUID);
--	gatt = btd_device_get_primary(device, GATT_UUID);
- 
--	if (gap == NULL || gatt == NULL) {
--		error("GAP and GATT are mandatory");
-+	if (gap == NULL) {
-+		error("GAP service is mandatory");
- 		return -EINVAL;
- 	}
- 
--	return gas_register(device, &gap->range, &gatt->range);
-+	return gas_register(device, &gap->range);
- }
- 
- static void gatt_driver_remove(struct btd_service *service)
 -- 
 2.2.0.rc0.207.ga3a616c
 
