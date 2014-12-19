@@ -1,41 +1,155 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 8.1 \(1993\))
-Subject: Re: [PATCH 0/4] Bluetooth: Add/Remove Device completion through hci_request
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1419020763-9139-1-git-send-email-johan.hedberg@gmail.com>
-Date: Fri, 19 Dec 2014 22:22:31 +0100
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <A051E96C-5B33-460E-B2CA-FDB1DF33F0AA@holtmann.org>
-References: <1419020763-9139-1-git-send-email-johan.hedberg@gmail.com>
-To: Johan Hedberg <johan.hedberg@gmail.com>
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] Bluetooth: Move hci_update_page_scan to hci_request.c
+Date: Fri, 19 Dec 2014 23:18:22 +0200
+Message-Id: <1419023902-16725-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+From: Johan Hedberg <johan.hedberg@intel.com>
 
-> Here's a second attempt at this set, now rebased against the changes
-> with hci_request.{c,h}.
-> 
-> Johan
-> 
-> ----------------------------------------------------------------
-> Johan Hedberg (4):
->      Bluetooth: Add hci_request support for hci_update_background_scan
->      Bluetooth: Fix Remove Device to wait for HCI before sending cmd_complete
->      Bluetooth: Fix Add Device to wait for HCI before sending cmd_complete
->      Bluetooth: Add return parameter to cmd_complete callbacks
-> 
-> include/net/bluetooth/hci_core.h |   4 -
-> net/bluetooth/hci_core.c         | 147 ----------------------
-> net/bluetooth/hci_request.c      |  96 ++++++++++++++
-> net/bluetooth/hci_request.h      |   3 +
-> net/bluetooth/mgmt.c             | 254 +++++++++++++++++++++++++++++---------
-> 5 files changed, 298 insertions(+), 206 deletions(-)
+This is a left-over from the patch that created hci_request.c. The
+hci_update_page_scan functions should have been moved from hci_core.c
+there.
 
-all 4 patches have been applied to bluetooth-next tree.
+Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+---
+ net/bluetooth/hci_core.c    | 56 ---------------------------------------------
+ net/bluetooth/hci_request.c | 56 +++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 56 insertions(+), 56 deletions(-)
 
-Regards
-
-Marcel
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index ee2096c7ec2c..9790a0108e69 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -5253,59 +5253,3 @@ static void hci_cmd_work(struct work_struct *work)
+ 		}
+ 	}
+ }
+-
+-static bool disconnected_whitelist_entries(struct hci_dev *hdev)
+-{
+-	struct bdaddr_list *b;
+-
+-	list_for_each_entry(b, &hdev->whitelist, list) {
+-		struct hci_conn *conn;
+-
+-		conn = hci_conn_hash_lookup_ba(hdev, ACL_LINK, &b->bdaddr);
+-		if (!conn)
+-			return true;
+-
+-		if (conn->state != BT_CONNECTED && conn->state != BT_CONFIG)
+-			return true;
+-	}
+-
+-	return false;
+-}
+-
+-void __hci_update_page_scan(struct hci_request *req)
+-{
+-	struct hci_dev *hdev = req->hdev;
+-	u8 scan;
+-
+-	if (!test_bit(HCI_BREDR_ENABLED, &hdev->dev_flags))
+-		return;
+-
+-	if (!hdev_is_powered(hdev))
+-		return;
+-
+-	if (mgmt_powering_down(hdev))
+-		return;
+-
+-	if (test_bit(HCI_CONNECTABLE, &hdev->dev_flags) ||
+-	    disconnected_whitelist_entries(hdev))
+-		scan = SCAN_PAGE;
+-	else
+-		scan = SCAN_DISABLED;
+-
+-	if (test_bit(HCI_PSCAN, &hdev->flags) == !!(scan & SCAN_PAGE))
+-		return;
+-
+-	if (test_bit(HCI_DISCOVERABLE, &hdev->dev_flags))
+-		scan |= SCAN_INQUIRY;
+-
+-	hci_req_add(req, HCI_OP_WRITE_SCAN_ENABLE, 1, &scan);
+-}
+-
+-void hci_update_page_scan(struct hci_dev *hdev)
+-{
+-	struct hci_request req;
+-
+-	hci_req_init(&req, hdev);
+-	__hci_update_page_scan(&req);
+-	hci_req_run(&req, NULL);
+-}
+diff --git a/net/bluetooth/hci_request.c b/net/bluetooth/hci_request.c
+index e49f682f1550..5e64ea70a106 100644
+--- a/net/bluetooth/hci_request.c
++++ b/net/bluetooth/hci_request.c
+@@ -396,6 +396,62 @@ int hci_update_random_address(struct hci_request *req, bool require_privacy,
+ 	return 0;
+ }
+ 
++static bool disconnected_whitelist_entries(struct hci_dev *hdev)
++{
++	struct bdaddr_list *b;
++
++	list_for_each_entry(b, &hdev->whitelist, list) {
++		struct hci_conn *conn;
++
++		conn = hci_conn_hash_lookup_ba(hdev, ACL_LINK, &b->bdaddr);
++		if (!conn)
++			return true;
++
++		if (conn->state != BT_CONNECTED && conn->state != BT_CONFIG)
++			return true;
++	}
++
++	return false;
++}
++
++void __hci_update_page_scan(struct hci_request *req)
++{
++	struct hci_dev *hdev = req->hdev;
++	u8 scan;
++
++	if (!test_bit(HCI_BREDR_ENABLED, &hdev->dev_flags))
++		return;
++
++	if (!hdev_is_powered(hdev))
++		return;
++
++	if (mgmt_powering_down(hdev))
++		return;
++
++	if (test_bit(HCI_CONNECTABLE, &hdev->dev_flags) ||
++	    disconnected_whitelist_entries(hdev))
++		scan = SCAN_PAGE;
++	else
++		scan = SCAN_DISABLED;
++
++	if (test_bit(HCI_PSCAN, &hdev->flags) == !!(scan & SCAN_PAGE))
++		return;
++
++	if (test_bit(HCI_DISCOVERABLE, &hdev->dev_flags))
++		scan |= SCAN_INQUIRY;
++
++	hci_req_add(req, HCI_OP_WRITE_SCAN_ENABLE, 1, &scan);
++}
++
++void hci_update_page_scan(struct hci_dev *hdev)
++{
++	struct hci_request req;
++
++	hci_req_init(&req, hdev);
++	__hci_update_page_scan(&req);
++	hci_req_run(&req, NULL);
++}
++
+ /* This function controls the background scanning based on hdev->pend_le_conns
+  * list. If there are pending LE connection we start the background scanning,
+  * otherwise we stop it.
+-- 
+2.1.0
 
