@@ -1,82 +1,68 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Fri, 19 Dec 2014 12:19:34 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 2/4] Bluetooth: Add hci_request parameter to
+ hci_update_background_scan
+Message-ID: <20141219101934.GC17821@t440s.lan>
+References: <1418981017-10462-1-git-send-email-johan.hedberg@gmail.com>
+ <1418981017-10462-3-git-send-email-johan.hedberg@gmail.com>
+ <3DBBCAB1-FDA2-4CE1-B8B7-3684F6548C04@holtmann.org>
+MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 8.1 \(1993\))
-Subject: Re: GATT connection without BlueZ installed
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <CAD81oNYnfe-5r8hDOqP86CTCRG8iaTt7HexzMOBSsSqcy8Z1NA@mail.gmail.com>
-Date: Fri, 19 Dec 2014 11:20:25 +0100
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Message-Id: <8AB9692B-357D-4649-A62F-E770A78848FD@holtmann.org>
-References: <CAD81oNYnfe-5r8hDOqP86CTCRG8iaTt7HexzMOBSsSqcy8Z1NA@mail.gmail.com>
-To: Artem Rakhov <arakhov@chromium.org>
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <3DBBCAB1-FDA2-4CE1-B8B7-3684F6548C04@holtmann.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Artem,
+Hi Marcel,
 
-> I'm testing GATT connection: running btgatt-server on one machine and
-> btgatt-client on the other one. Server machine doesn't have BlueZ
-> installed, just kernel part of Bluetooth stack is present. However, I
-> still use btgatt-server and btmgmt from tools/ on this machine.
+On Fri, Dec 19, 2014, Marcel Holtmann wrote:
+> > Many places using hci_update_background_scan() try to synchronize
+> > whatever they're doing with the help of hci_request callbacks. However,
+> > since the hci_update_background_scan() function hasn't so far accepted a
+> > hci_request pointer any commands triggered by it have been left out by
+> > the synchronization. This patch an extra parameter to the function to
+> > fix the issue. This there are also many places where there is no
+> > existing hci_request context, the parameter is made optional, i.e. by
+> > passing NULL hci_update_background_scan() uses its own request and a
+> > dummy callback.
+> > 
+> > Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+> > ---
+> > include/net/bluetooth/hci_core.h |  2 +-
+> > net/bluetooth/hci_conn.c         |  2 +-
+> > net/bluetooth/hci_core.c         | 33 ++++++++++++++++++++-------------
+> > net/bluetooth/hci_event.c        |  4 ++--
+> > net/bluetooth/mgmt.c             | 19 +++++++++----------
+> > 5 files changed, 33 insertions(+), 27 deletions(-)
+> > 
+> > diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+> > index 75aaae07037f..d89a359c83ea 100644
+> > --- a/include/net/bluetooth/hci_core.h
+> > +++ b/include/net/bluetooth/hci_core.h
+> > @@ -940,7 +940,7 @@ struct hci_conn_params *hci_pend_le_action_lookup(struct list_head *list,
+> > 						  bdaddr_t *addr,
+> > 						  u8 addr_type);
+> > 
+> > -void hci_update_background_scan(struct hci_dev *hdev);
+> > +void hci_update_background_scan(struct hci_dev *hdev, struct hci_request *req);
 > 
-> Connection does not initiate correctly.
+> this goes a bit against what we done otherwise in the code base. We
+> normally only give the hci_request pointer since that always provides
+> the hci_dev as well.
 > 
-> Server is stuck on listening:
-> "Started listening on ATT channel. Waiting for connections"
-> This means that bind() and listen() on socket are successful, but
-> accept() didn't finish. It doesn't see the incoming connection.
-> 
-> Client initiates MTU exchange, but doesn't receive anything in response:
-> btgatt-client: Opening L2CAP LE connection on ATT channel:
-> src: 00:00:00:00:00:00
-> dest: 24:0A:64:5A:AF:1B
-> Connecting to device... Done
-> [GATT client]# att: ATT op 0x02
-> [GATT client]# att: < 02 17 00
-> ...
-> [GATT client]# att: Operation timed out: 0x02
-> 
-> btmon from the server:
->> HCI Event: LE Meta Event (0x3e) plen 19                                              [hci0] 82.760084
->      LE Connection Complete (0x01)
->        Status: Success (0x00)
->        Handle: 32
->        Role: Slave (0x01)
->        Peer address type: Public (0x00)
->        Peer address: 3C:77:E6:60:5C:B2 (OUI 3C-77-E6)
->        Connection interval: 67.50 msec (0x0036)
->        Connection latency: 0.00 msec (0x0000)
->        Supervision timeout: 420 msec (0x002a)
->        Master clock accuracy: 0x00
-> @ Device Connected: 3C:77:E6:60:5C:B2 (1) flags 0x0000
->> ACL Data RX: Handle 32 flags 0x02 dlen 7                                             [hci0] 83.051725
->      ATT: Exchange MTU Request (0x02) len 2
->        Client RX MTU: 23
->> HCI Event: Vendor (0xff) plen 7                                                     [hci0] 115.115106
->        82 12 95 40 10 36 59                             ...@.6Y
->> HCI Event: Disconnect Complete (0x05) plen 4                                        [hci0] 115.116099
->        Status: Success (0x00)
->        Handle: 32
->        Reason: Remote User Terminated Connection (0x13)
-> @ Device Disconnected: 3C:77:E6:60:5C:B2 (1) reason 3
-> 
-> When I change the roles (so that server runs btgatt-client, and on the
-> other machine I stop bluetoothd and run btgatt-server), the connection
-> works fine.
-> When I use completely different software setup (BlueZ installed on
-> both, but bluetoothd stopped), everything also works fine, which makes
-> me believe that this is not a hardware problem.
-> Kernel is 3.10 on server, 3.8 on client.
-> 
-> Does anyone have any clues why accept() could not succeed on the server?
+> I have the feeling that we might better split this into two functions.
+> One just taking hci_dev and the other just taking hci_request. Or we
+> have to make all callers create a hci_request context in the first
+> place.
 
-I assume it is because bluetoothd does a bit more extended setup. Please keep in mind that mgmt settings are remembering during power down/up cycles. Might want to run btmgmt info and compare with how bluetoothd sets up the controller compared to your own setup.
+My change is consistent with hci_update_page_scan() so I suppose that
+needs fixing too.
 
-Any chance you decode the vendor event into something meaningful. It might tell you why the connection gets disconnected. Might be a hint as well.
+I still feel like this "optional parameter" approach isn't too
+convoluted, but if you insist I think I'd rather split this into two
+functions. Requiring all places to initialize a hci_request and do
+hci_req_run would be quite a lot of duplicated boiler-plate code for
+little benefit.
 
-One other area of checking what is different would be debugfs /sys/kernel/debug/bluetooth/hci0/ since that gives you a bit of insights on some of the states of the state.
-
-Regards
-
-Marcel
-
+Johan
