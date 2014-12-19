@@ -1,67 +1,54 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <CABBYNZL+gir-CE5Loa6xK=s7+wSkRKV+R2-U940+17mwXczb6g@mail.gmail.com>
-References: <1418910367-19792-1-git-send-email-lukasz.rymanowski@tieto.com>
-	<CABBYNZL+gir-CE5Loa6xK=s7+wSkRKV+R2-U940+17mwXczb6g@mail.gmail.com>
-Date: Fri, 19 Dec 2014 11:05:26 +0100
-Message-ID: <CAMudyAu0aaJD8JhCXg7TBC+49eaWG0Stwtv7u9LtgSZj1xePVA@mail.gmail.com>
-Subject: Re: [PATCH v2 0/3] attrib/gattrib: Add tracking request id
-From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 8.1 \(1993\))
+Subject: Re: [PATCH 2/4] Bluetooth: Add hci_request parameter to hci_update_background_scan
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1418981017-10462-3-git-send-email-johan.hedberg@gmail.com>
+Date: Fri, 19 Dec 2014 11:03:44 +0100
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <3DBBCAB1-FDA2-4CE1-B8B7-3684F6548C04@holtmann.org>
+References: <1418981017-10462-1-git-send-email-johan.hedberg@gmail.com> <1418981017-10462-3-git-send-email-johan.hedberg@gmail.com>
+To: Johan Hedberg <johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+Hi Johan,
 
-On 19 December 2014 at 01:13, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> Hi Lukasz,
->
-> On Thu, Dec 18, 2014 at 11:46 AM, Lukasz Rymanowski
-> <lukasz.rymanowski@tieto.com> wrote:
->> With this set, gattrib is tracking it's internal request id.
->> This is important for the user of gattrib, as now user is sure that request id
->> he has is valid during whole gattrib operation. Even gattrib is doing more then one
->> ATT request.
->>
->> v1: Track only user defined request id's.
->> v2: Handle Marcel's comments to patch 01 and added patch 03\03 which add
->> support to track all the gattrib requests. So now if gattrib user does cancel_all
->> only gattrib request will be canceled. This is needed as bt_att is shared.
->>
->> First two patches help us to solve issues in Android, third one is not needed by
->> Android but for normal BlueZ.
->>
->>
->> Lukasz Rymanowski (2):
->>   attrib/gattrib: Add track for internal request id
->>   attrib/gatt: Fix for search services
->>
->> *** BLURB HERE ***
->>
->> Lukasz Rymanowski (3):
->>   attrib/gattrib: Add track for request ids
->>   attrib/gatt: Fix for search services
->>   attrib/gattrib: Add tracking all the internal request id
->>
->>  attrib/gatt.c    | 43 ++++++++++++++++++-------
->>  attrib/gattrib.c | 95 ++++++++++++++++++++++++++++++++++++++++++++++++++++++--
->>  2 files changed, 124 insertions(+), 14 deletions(-)
->>
->> --
->> 1.8.4
->
-> Applied, please make sure you run make check next time patch 3/3 had a
-> few problem that I had to fix before pushing.
+> Many places using hci_update_background_scan() try to synchronize
+> whatever they're doing with the help of hci_request callbacks. However,
+> since the hci_update_background_scan() function hasn't so far accepted a
+> hci_request pointer any commands triggered by it have been left out by
+> the synchronization. This patch an extra parameter to the function to
+> fix the issue. This there are also many places where there is no
+> existing hci_request context, the parameter is made optional, i.e. by
+> passing NULL hci_update_background_scan() uses its own request and a
+> dummy callback.
+> 
+> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+> ---
+> include/net/bluetooth/hci_core.h |  2 +-
+> net/bluetooth/hci_conn.c         |  2 +-
+> net/bluetooth/hci_core.c         | 33 ++++++++++++++++++++-------------
+> net/bluetooth/hci_event.c        |  4 ++--
+> net/bluetooth/mgmt.c             | 19 +++++++++----------
+> 5 files changed, 33 insertions(+), 27 deletions(-)
+> 
+> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+> index 75aaae07037f..d89a359c83ea 100644
+> --- a/include/net/bluetooth/hci_core.h
+> +++ b/include/net/bluetooth/hci_core.h
+> @@ -940,7 +940,7 @@ struct hci_conn_params *hci_pend_le_action_lookup(struct list_head *list,
+> 						  bdaddr_t *addr,
+> 						  u8 addr_type);
+> 
+> -void hci_update_background_scan(struct hci_dev *hdev);
+> +void hci_update_background_scan(struct hci_dev *hdev, struct hci_request *req);
 
-Ah damn, sorry about that. I just check and indeed make check is very
-convenient. I see the issue and your fix is good.
+this goes a bit against what we done otherwise in the code base. We normally only give the hci_request pointer since that always provides the hci_dev as well.
 
-Thanks
-\Łukasz
->
->
-> --
-> Luiz Augusto von Dentz
+I have the feeling that we might better split this into two functions. One just taking hci_dev and the other just taking hci_request. Or we have to make all callers create a hci_request context in the first place.
+
+Regards
+
+Marcel
+
