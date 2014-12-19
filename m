@@ -1,46 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+From: Gowtham Anandha Babu <gowtham.ab@samsung.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] android/gatt: Fix memory leak
-Date: Fri, 19 Dec 2014 15:50:20 +0200
-Message-Id: <1418997020-7293-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Cc: d.kasatkin@samsung.com, bharat.panda@samsung.com, cpgs@samsung.com,
+	Gowtham Anandha Babu <gowtham.ab@samsung.com>
+Subject: [PATCH] profiles/hog: Remove dead code
+Date: Fri, 19 Dec 2014 19:20:54 +0530
+Message-id: <1418997054-16603-1-git-send-email-gowtham.ab@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-
+warning: Value stored to 'attrib' is never read
+		attrib = report->hogdev->attrib;
+		^        ~~~~~~~~~~~~~~~~~~~~~~
 ---
- android/gatt.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+ profiles/input/hog.c | 1 -
+ 1 file changed, 1 deletion(-)
 
-diff --git a/android/gatt.c b/android/gatt.c
-index 2534836..6248f07 100644
---- a/android/gatt.c
-+++ b/android/gatt.c
-@@ -6129,6 +6129,7 @@ static uint8_t find_info_handle(const uint8_t *cmd, uint16_t cmd_len,
- 	int iterator = 0;
- 	uint16_t start, end;
- 	uint16_t len, queue_len;
-+	uint8_t ret = 0;
- 
- 	DBG("");
- 
-@@ -6206,13 +6207,13 @@ static uint8_t find_info_handle(const uint8_t *cmd, uint16_t cmd_len,
- 					ATT_FIND_INFO_RESP_FMT_128BIT, adl, rsp,
- 								rsp_size);
- 	if (!len)
--		return ATT_ECODE_UNLIKELY;
-+		ret = ATT_ECODE_UNLIKELY;
- 
- 	*length = len;
- 	att_data_list_free(adl);
- 	queue_destroy(temp, NULL);
- 
--	return 0;
-+	return ret;
- }
- 
- static uint8_t find_by_type_request(const uint8_t *cmd, uint16_t cmd_len,
+diff --git a/profiles/input/hog.c b/profiles/input/hog.c
+index fb51663..74351f3 100644
+--- a/profiles/input/hog.c
++++ b/profiles/input/hog.c
+@@ -221,7 +221,6 @@ static void discover_descriptor_cb(uint8_t status, GSList *descs,
+ 		switch (desc->uuid16) {
+ 		case GATT_CLIENT_CHARAC_CFG_UUID:
+ 			report = user_data;
+-			attrib = report->hogdev->attrib;
+ 			write_ccc(desc->handle, report);
+ 			break;
+ 		case GATT_REPORT_REFERENCE:
 -- 
-2.1.0
+1.9.1
 
