@@ -2,383 +2,380 @@ Return-Path: <cyrus@holtmann.org>
 From: Arman Uguray <armansito@chromium.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Arman Uguray <armansito@chromium.org>
-Subject: [PATCH BlueZ 07/17] core: gatt: Implement GattCharacteristic1.StartNotify
-Date: Fri, 19 Dec 2014 13:35:55 -0800
-Message-Id: <1419024965-10375-8-git-send-email-armansito@chromium.org>
+Subject: [PATCH BlueZ 06/17] core: gatt: Implement GattDescriptor1.ReadValue
+Date: Fri, 19 Dec 2014 13:35:54 -0800
+Message-Id: <1419024965-10375-7-git-send-email-armansito@chromium.org>
 In-Reply-To: <1419024965-10375-1-git-send-email-armansito@chromium.org>
 References: <1419024965-10375-1-git-send-email-armansito@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch implements the StartNotify method of
-org.bluez.GattCharacteristic1. Each call to StartNotify assigns a
-session to the D-Bus sender which internally registers a unique
-notify handler with the bt_gatt_client. Each received notification
-or indication causes a PropertiesChanged signal to be emitted for the
-"Value" property.
-
-The notify handler gets automatically unregistered when sender
-disconnects from D-Bus.
+This patch implements the ReadValue method of org.bluez.GattDescriptor1
+and exposes the "Value" property based on what was cached during the
+most recent read. The property is hidden if the value is unknown.
 ---
- src/gatt-client.c | 272 +++++++++++++++++++++++++++++++++++++++++++++++++++---
- 1 file changed, 259 insertions(+), 13 deletions(-)
+ src/gatt-client.c | 266 ++++++++++++++++++++++++++++++++++++------------------
+ 1 file changed, 177 insertions(+), 89 deletions(-)
 
 diff --git a/src/gatt-client.c b/src/gatt-client.c
-index 9cbe32d..a29eea9 100644
+index 1c4ea51..9cbe32d 100644
 --- a/src/gatt-client.c
 +++ b/src/gatt-client.c
-@@ -80,6 +80,9 @@ struct characteristic {
- 	size_t value_len;
- 
- 	struct queue *descs;
+@@ -87,6 +87,11 @@ struct descriptor {
+ 	uint16_t handle;
+ 	bt_uuid_t uuid;
+ 	char *path;
 +
-+	bool notifying;
-+	struct queue *notify_clients;
++	bool in_read;
++	bool value_known;
++	uint8_t *value;
++	size_t value_len;
  };
  
- struct descriptor {
-@@ -236,15 +239,20 @@ static bool resize_value_buffer(size_t new_len, uint8_t **value, size_t *len)
- static void update_value_property(const uint8_t *value, size_t len,
- 					uint8_t **cur_value, size_t *cur_len,
- 					bool *value_known,
--					const char *path, const char *iface)
-+					const char *path, const char *iface,
-+					bool notify_if_same)
- {
- 	/*
- 	 * If the value is the same, then only updated it if wasn't previously
- 	 * known.
- 	 */
- 	if (*value_known && *cur_len == len &&
--			!memcmp(*cur_value, value, sizeof(uint8_t) * len))
-+			!memcmp(*cur_value, value, sizeof(uint8_t) * len)) {
-+		if (notify_if_same)
-+			goto notify;
-+
- 		return;
-+	}
- 
- 	if (resize_value_buffer(len, cur_value, cur_len)) {
- 		*value_known = true;
-@@ -261,6 +269,7 @@ static void update_value_property(const uint8_t *value, size_t len,
- 		*value_known = false;
- 	}
- 
-+notify:
- 	g_dbus_emit_property_changed(btd_get_dbus_connection(), path, iface,
- 								"Value");
- }
-@@ -274,7 +283,9 @@ static void async_dbus_op_free(void *data)
- {
- 	struct async_dbus_op *op = data;
- 
--	dbus_message_unref(op->msg);
-+	if (op->msg)
-+		dbus_message_unref(op->msg);
-+
- 	free(op);
- }
- 
-@@ -311,7 +322,7 @@ static void desc_read_long_cb(bool success, uint8_t att_ecode,
- 
- 	update_value_property(value, length, &desc->value, &desc->value_len,
- 						&desc->value_known, desc->path,
--						GATT_DESCRIPTOR_IFACE);
-+						GATT_DESCRIPTOR_IFACE, false);
- 
- 	reply = g_dbus_create_reply(op->msg, DBUS_TYPE_INVALID);
- 	if (!reply) {
-@@ -489,12 +500,8 @@ static gboolean characteristic_property_get_notifying(
- 					const GDBusPropertyTable *property,
+ static DBusMessage *gatt_error_read_not_permitted(DBusMessage *msg)
+@@ -177,22 +182,176 @@ static gboolean descriptor_property_get_characteristic(
+ static gboolean descriptor_property_get_value(const GDBusPropertyTable *property,
  					DBusMessageIter *iter, void *data)
  {
--	dbus_bool_t notifying = FALSE;
--
--	/*
--	 * TODO: Return the correct value here once StartNotify and StopNotify
--	 * methods are implemented.
--	 */
-+	struct characteristic *chrc = data;
-+	dbus_bool_t notifying = chrc->notifying ? TRUE : FALSE;
++	struct descriptor *desc = data;
+ 	DBusMessageIter array;
++	size_t i;
  
- 	dbus_message_iter_append_basic(iter, DBUS_TYPE_BOOLEAN, &notifying);
+ 	dbus_message_iter_open_container(iter, DBUS_TYPE_ARRAY, "y", &array);
  
-@@ -564,7 +571,8 @@ static void chrc_read_long_cb(bool success, uint8_t att_ecode,
+-	/* TODO: Implement this once the value is cached */
++	if (desc->value_known) {
++		for (i = 0; i < desc->value_len; i++)
++			dbus_message_iter_append_basic(&array, DBUS_TYPE_BYTE,
++							desc->value + i);
++	}
  
- 	update_value_property(value, length, &chrc->value, &chrc->value_len,
- 						&chrc->value_known, chrc->path,
--						GATT_CHARACTERISTIC_IFACE);
-+						GATT_CHARACTERISTIC_IFACE,
-+						false);
+ 	dbus_message_iter_close_container(iter, &array);
  
- 	reply = g_dbus_create_reply(op->msg, DBUS_TYPE_INVALID);
- 	if (!reply) {
-@@ -614,11 +622,241 @@ static DBusMessage *characteristic_write_value(DBusConnection *conn,
- 	return btd_error_failed(msg, "Not implemented");
+ 	return TRUE;
  }
  
-+struct notify_client {
-+	struct characteristic *chrc;
-+	int ref_count;
-+	char *owner;
-+	guint watch;
-+	unsigned int notify_id;
++static gboolean descriptor_property_value_exists(
++					const GDBusPropertyTable *property,
++					void *data)
++{
++	struct descriptor *desc = data;
++
++	return desc->value_known ? TRUE : FALSE;
++}
++
++static bool resize_value_buffer(size_t new_len, uint8_t **value, size_t *len)
++{
++	uint8_t *ptr;
++
++	if (*len == new_len)
++		return true;
++
++	if (!new_len) {
++		free(*value);
++		*value = NULL;
++		*len = 0;
++
++		return true;
++	}
++
++	ptr = realloc(*value, sizeof(uint8_t) * new_len);
++	if (!ptr)
++		return false;
++
++	*value = ptr;
++	*len = new_len;
++
++	return true;
++}
++
++static void update_value_property(const uint8_t *value, size_t len,
++					uint8_t **cur_value, size_t *cur_len,
++					bool *value_known,
++					const char *path, const char *iface)
++{
++	/*
++	 * If the value is the same, then only updated it if wasn't previously
++	 * known.
++	 */
++	if (*value_known && *cur_len == len &&
++			!memcmp(*cur_value, value, sizeof(uint8_t) * len))
++		return;
++
++	if (resize_value_buffer(len, cur_value, cur_len)) {
++		*value_known = true;
++		memcpy(*cur_value, value, sizeof(uint8_t) * len);
++	} else {
++		/*
++		 * Failed to resize the buffer. Since we don't want to show a
++		 * stale value, if the value was previously known then free and
++		 * hide it.
++		 */
++		free(*cur_value);
++		*cur_value = NULL;
++		*cur_len = 0;
++		*value_known = false;
++	}
++
++	g_dbus_emit_property_changed(btd_get_dbus_connection(), path, iface,
++								"Value");
++}
++
++struct async_dbus_op {
++	DBusMessage *msg;
++	void *data;
 +};
 +
-+static void notify_client_free(struct notify_client *client)
++static void async_dbus_op_free(void *data)
 +{
-+	DBG("owner %s", client->owner);
-+
-+	g_dbus_remove_watch(btd_get_dbus_connection(), client->watch);
-+	free(client->owner);
-+	free(client);
-+}
-+
-+static void notify_client_unref(void *data)
-+{
-+	struct notify_client *client = data;
-+
-+	DBG("owner %s", client->owner);
-+
-+	if (__sync_sub_and_fetch(&client->ref_count, 1))
-+		return;
-+
-+	notify_client_free(client);
-+}
-+
-+static struct notify_client *notify_client_ref(struct notify_client *client)
-+{
-+	DBG("owner %s", client->owner);
-+
-+	__sync_fetch_and_add(&client->ref_count, 1);
-+
-+	return client;
-+}
-+
-+static bool match_notifying(const void *a, const void *b)
-+{
-+	const struct notify_client *client = a;
-+
-+	return !!client->notify_id;
-+}
-+
-+static void update_notifying(struct characteristic *chrc)
-+{
-+	if (!chrc->notifying)
-+		return;
-+
-+	if (queue_find(chrc->notify_clients, match_notifying, NULL))
-+		return;
-+
-+	chrc->notifying = false;
-+
-+	g_dbus_emit_property_changed(btd_get_dbus_connection(), chrc->path,
-+						GATT_CHARACTERISTIC_IFACE,
-+						"Notifying");
-+}
-+
-+static void notify_client_disconnect(DBusConnection *conn, void *user_data)
-+{
-+	struct notify_client *client = user_data;
-+	struct characteristic *chrc = client->chrc;
-+	struct bt_gatt_client *gatt = chrc->service->client->gatt;
-+
-+	DBG("owner %s", client->owner);
-+
-+	queue_remove(chrc->notify_clients, client);
-+	bt_gatt_client_unregister_notify(gatt, client->notify_id);
-+
-+	update_notifying(chrc);
-+
-+	notify_client_unref(client);
-+}
-+
-+static struct notify_client *notify_client_create(struct characteristic *chrc,
-+							const char *owner)
-+{
-+	struct notify_client *client;
-+
-+	client = new0(struct notify_client, 1);
-+	if (!client)
-+		return NULL;
-+
-+	client->chrc = chrc;
-+	client->owner = strdup(owner);
-+	if (!client->owner) {
-+		free(client);
-+		return NULL;
-+	}
-+
-+	client->watch = g_dbus_add_disconnect_watch(btd_get_dbus_connection(),
-+						owner, notify_client_disconnect,
-+						client, NULL);
-+	if (!client->watch) {
-+		free(client->owner);
-+		free(client);
-+		return NULL;
-+	}
-+
-+	return notify_client_ref(client);
-+}
-+
-+static bool match_notify_sender(const void *a, const void *b)
-+{
-+	const struct notify_client *client = a;
-+	const char *sender = b;
-+
-+	return strcmp(client->owner, sender) == 0;
-+}
-+
-+static void notify_cb(uint16_t value_handle, const uint8_t *value,
-+					uint16_t length, void *user_data)
-+{
-+	struct async_dbus_op *op = user_data;
-+	struct notify_client *client = op->data;
-+	struct characteristic *chrc = client->chrc;
-+
-+	/*
-+	 * Even if the value didn't change, we want to send a PropertiesChanged
-+	 * signal so that we propagate the notification/indication to
-+	 * applications.
-+	 */
-+	update_value_property(value, length, &chrc->value, &chrc->value_len,
-+						&chrc->value_known, chrc->path,
-+						GATT_CHARACTERISTIC_IFACE,
-+						true);
-+}
-+
-+static void register_notify_cb(unsigned int id, uint16_t att_ecode,
-+								void *user_data)
-+{
-+	struct async_dbus_op *op = user_data;
-+	struct notify_client *client = op->data;
-+	struct characteristic *chrc = client->chrc;
-+	DBusMessage *reply;
-+
-+	/* Make sure that an interim disconnect did not remove the client */
-+	if (!queue_find(chrc->notify_clients, NULL, client)) {
-+		bt_gatt_client_unregister_notify(chrc->service->client->gatt,
-+									id);
-+		notify_client_unref(client);
-+
-+		reply = btd_error_failed(op->msg,
-+						"Characteristic not available");
-+		goto done;
-+	}
-+
-+	/*
-+	 * Drop the reference count that we added when registering the callback.
-+	 */
-+	notify_client_unref(client);
-+
-+	if (!id) {
-+		queue_remove(chrc->notify_clients, client);
-+		notify_client_free(client);
-+
-+		reply = create_gatt_dbus_error(op->msg, att_ecode);
-+
-+		goto done;
-+	}
-+
-+	client->notify_id = id;
-+
-+	if (!chrc->notifying) {
-+		chrc->notifying = true;
-+		g_dbus_emit_property_changed(btd_get_dbus_connection(),
-+					chrc->path, GATT_CHARACTERISTIC_IFACE,
-+					"Notifying");
-+	}
-+
-+	reply = g_dbus_create_reply(op->msg, DBUS_TYPE_INVALID);
-+
-+done:
-+	if (reply)
-+		g_dbus_send_message(btd_get_dbus_connection(), reply);
-+	else
-+		error("Failed to construct D-Bus message reply");
++	struct async_dbus_op *op = data;
 +
 +	dbus_message_unref(op->msg);
-+	op->msg = NULL;
++	free(op);
 +}
 +
- static DBusMessage *characteristic_start_notify(DBusConnection *conn,
++static void message_append_byte_array(DBusMessage *msg, const uint8_t *bytes,
++								size_t len)
++{
++	DBusMessageIter iter, array;
++	size_t i;
++
++	dbus_message_iter_init_append(msg, &iter);
++	dbus_message_iter_open_container(&iter, DBUS_TYPE_ARRAY, "y", &array);
++
++	for (i = 0; i < len; i++)
++		dbus_message_iter_append_basic(&array, DBUS_TYPE_BYTE,
++								bytes + i);
++
++	dbus_message_iter_close_container(&iter, &array);
++}
++
++static void desc_read_long_cb(bool success, uint8_t att_ecode,
++					const uint8_t *value, uint16_t length,
++					void *user_data)
++{
++	struct async_dbus_op *op = user_data;
++	struct descriptor *desc = op->data;
++	DBusMessage *reply;
++
++	desc->in_read = false;
++
++	if (!success) {
++		reply = create_gatt_dbus_error(op->msg, att_ecode);
++		goto done;
++	}
++
++	update_value_property(value, length, &desc->value, &desc->value_len,
++						&desc->value_known, desc->path,
++						GATT_DESCRIPTOR_IFACE);
++
++	reply = g_dbus_create_reply(op->msg, DBUS_TYPE_INVALID);
++	if (!reply) {
++		error("Failed to allocate D-Bus message reply");
++		return;
++	}
++
++	message_append_byte_array(reply, value, length);
++
++done:
++	g_dbus_send_message(btd_get_dbus_connection(), reply);
++}
++
+ static DBusMessage *descriptor_read_value(DBusConnection *conn,
  					DBusMessage *msg, void *user_data)
  {
 -	/* TODO: Implement */
 -	return btd_error_failed(msg, "Not implemented");
-+	struct characteristic *chrc = user_data;
-+	struct bt_gatt_client *gatt = chrc->service->client->gatt;
-+	const char *sender = dbus_message_get_sender(msg);
++	struct descriptor *desc = user_data;
++	struct bt_gatt_client *gatt = desc->chrc->service->client->gatt;
 +	struct async_dbus_op *op;
-+	struct notify_client *client;
 +
-+	if (!(chrc->props & BT_GATT_CHRC_PROP_NOTIFY ||
-+				chrc->props & BT_GATT_CHRC_PROP_INDICATE))
-+		return btd_error_not_supported(msg);
-+
-+	/* Each client can only have one active notify session. */
-+	client = queue_find(chrc->notify_clients, match_notify_sender, sender);
-+	if (client)
-+		return client->notify_id ?
-+				btd_error_failed(msg, "Already notifying") :
-+				btd_error_in_progress(msg);
-+
-+	client = notify_client_create(chrc, sender);
-+	if (!client)
-+		return btd_error_failed(msg, "Failed allocate notify session");
++	if (desc->in_read)
++		return btd_error_in_progress(msg);
 +
 +	op = new0(struct async_dbus_op, 1);
-+	if (!op) {
-+		notify_client_unref(client);
++	if (!op)
 +		return btd_error_failed(msg, "Failed to initialize request");
++
++	op->msg = dbus_message_ref(msg);
++	op->data = desc;
++
++	if (bt_gatt_client_read_long_value(gatt, desc->handle, 0,
++							desc_read_long_cb, op,
++							async_dbus_op_free)) {
++		desc->in_read = true;
++		return NULL;
 +	}
 +
-+	/*
-+	 * Add to the ref count so that a disconnect during register won't free
-+	 * the client instance.
-+	 */
-+	op->data = notify_client_ref(client);
-+	op->msg = dbus_message_ref(msg);
-+
-+	queue_push_tail(chrc->notify_clients, client);
-+
-+	if (bt_gatt_client_register_notify(gatt, chrc->value_handle,
-+						register_notify_cb, notify_cb,
-+						op, async_dbus_op_free))
-+		return NULL;
-+
-+	queue_remove(chrc->notify_clients, client);
 +	async_dbus_op_free(op);
 +
-+	/* Directly free the client */
-+	notify_client_free(client);
-+
-+	return btd_error_failed(msg, "Failed to register notify session");
++	return btd_error_failed(msg, "Failed to send read request");
  }
  
- static DBusMessage *characteristic_stop_notify(DBusConnection *conn,
-@@ -702,6 +940,13 @@ static struct characteristic *characteristic_create(
+ static DBusMessage *descriptor_write_value(DBusConnection *conn,
+@@ -205,7 +364,8 @@ static DBusMessage *descriptor_write_value(DBusConnection *conn,
+ static const GDBusPropertyTable descriptor_properties[] = {
+ 	{ "UUID", "s", descriptor_property_get_uuid },
+ 	{ "Characteristic", "o", descriptor_property_get_characteristic },
+-	{ "Value", "ay", descriptor_property_get_value },
++	{ "Value", "ay", descriptor_property_get_value, NULL,
++					descriptor_property_value_exists },
+ 	{ }
+ };
+ 
+@@ -221,6 +381,7 @@ static void descriptor_free(void *data)
+ {
+ 	struct descriptor *desc = data;
+ 
++	free(desc->value);
+ 	g_free(desc->path);
+ 	free(desc);
+ }
+@@ -386,105 +547,32 @@ static gboolean characteristic_property_get_flags(
+ 	return TRUE;
+ }
+ 
+-struct chrc_dbus_op {
+-	struct characteristic *chrc;
+-	DBusMessage *msg;
+-};
+-
+-static void chrc_dbus_op_free(void *data)
+-{
+-	struct chrc_dbus_op *op = data;
+-
+-	dbus_message_unref(op->msg);
+-	free(op);
+-}
+-
+-static bool chrc_resize_value(struct characteristic *chrc, size_t new_size)
+-{
+-	uint8_t *ptr;
+-
+-	if (chrc->value_len == new_size)
+-		return true;
+-
+-	if (!new_size) {
+-		free(chrc->value);
+-		chrc->value = NULL;
+-		chrc->value_len = 0;
+-
+-		return true;
+-	}
+-
+-	ptr = realloc(chrc->value, sizeof(uint8_t) * new_size);
+-	if (!ptr)
+-		return false;
+-
+-	chrc->value = ptr;
+-	chrc->value_len = new_size;
+-
+-	return true;
+-}
+-
+ static void chrc_read_long_cb(bool success, uint8_t att_ecode,
+ 					const uint8_t *value, uint16_t length,
+ 					void *user_data)
+ {
+-	struct chrc_dbus_op *op = user_data;
+-	struct characteristic *chrc = op->chrc;
+-	DBusMessageIter iter, array;
++	struct async_dbus_op *op = user_data;
++	struct characteristic *chrc = op->data;
+ 	DBusMessage *reply;
+ 
+-	op->chrc->in_read = false;
++	chrc->in_read = false;
+ 
+ 	if (!success) {
+ 		reply = create_gatt_dbus_error(op->msg, att_ecode);
+ 		goto done;
+ 	}
+ 
+-	/*
+-	 * If the value is the same, then only update it if it wasn't previously
+-	 * known.
+-	 */
+-	if (chrc->value_known && chrc->value_len == length &&
+-			!memcmp(chrc->value, value, sizeof(uint8_t) * length))
+-		goto reply;
+-
+-	if (!chrc_resize_value(chrc, length)) {
+-		/*
+-		 * Failed to resize the buffer. Since we don't want to show a
+-		 * stale value, if the value was previously known, then free and
+-		 * hide it.
+-		 */
+-		free(chrc->value);
+-		chrc->value = NULL;
+-		chrc->value_len = 0;
+-		chrc->value_known = false;
+-
+-		goto changed_signal;
+-	}
+-
+-	chrc->value_known = true;
+-	memcpy(chrc->value, value, sizeof(uint8_t) * length);
+-
+-changed_signal:
+-	g_dbus_emit_property_changed(btd_get_dbus_connection(), chrc->path,
+-						GATT_CHARACTERISTIC_IFACE,
+-						"Value");
++	update_value_property(value, length, &chrc->value, &chrc->value_len,
++						&chrc->value_known, chrc->path,
++						GATT_CHARACTERISTIC_IFACE);
+ 
+-reply:
+ 	reply = g_dbus_create_reply(op->msg, DBUS_TYPE_INVALID);
+ 	if (!reply) {
+ 		error("Failed to allocate D-Bus message reply");
+ 		return;
+ 	}
+ 
+-	dbus_message_iter_init_append(reply, &iter);
+-	dbus_message_iter_open_container(&iter, DBUS_TYPE_ARRAY, "y", &array);
+-
+-	for (i = 0; i < length; i++)
+-		dbus_message_iter_append_basic(&array, DBUS_TYPE_BYTE,
+-								value + i);
+-
+-	dbus_message_iter_close_container(&iter, &array);
++	message_append_byte_array(reply, value, length);
+ 
+ done:
+ 	g_dbus_send_message(btd_get_dbus_connection(), reply);
+@@ -495,26 +583,26 @@ static DBusMessage *characteristic_read_value(DBusConnection *conn,
+ {
+ 	struct characteristic *chrc = user_data;
+ 	struct bt_gatt_client *gatt = chrc->service->client->gatt;
+-	struct chrc_dbus_op *op;
++	struct async_dbus_op *op;
+ 
+ 	if (chrc->in_read)
+ 		return btd_error_in_progress(msg);
+ 
+-	op = new0(struct chrc_dbus_op, 1);
++	op = new0(struct async_dbus_op, 1);
+ 	if (!op)
+ 		return btd_error_failed(msg, "Failed to initialize request");
+ 
+-	op->chrc = chrc;
+ 	op->msg = dbus_message_ref(msg);
++	op->data = chrc;
+ 
+ 	if (bt_gatt_client_read_long_value(gatt, chrc->value_handle, 0,
+ 							chrc_read_long_cb, op,
+-							chrc_dbus_op_free)) {
++							async_dbus_op_free)) {
+ 		chrc->in_read = true;
  		return NULL;
  	}
  
-+	chrc->notify_clients = queue_new();
-+	if (!chrc->notify_clients) {
-+		queue_destroy(chrc->descs, NULL);
-+		free(chrc);
-+		return NULL;
-+	}
-+
- 	chrc->service = service;
+-	chrc_dbus_op_free(op);
++	async_dbus_op_free(op);
  
- 	gatt_db_attribute_get_char_data(attr, &chrc->handle,
-@@ -735,6 +980,7 @@ static void unregister_characteristic(void *data)
- 
- 	DBG("Removing GATT characteristic: %s", chrc->path);
- 
-+	queue_remove_all(chrc->notify_clients, NULL, NULL, notify_client_unref);
- 	queue_remove_all(chrc->descs, NULL, NULL, unregister_descriptor);
- 
- 	g_dbus_unregister_interface(btd_get_dbus_connection(), chrc->path,
+ 	return btd_error_failed(msg, "Failed to send read request");
+ }
 -- 
 2.2.0.rc0.207.ga3a616c
 
