@@ -1,155 +1,71 @@
 Return-Path: <cyrus@holtmann.org>
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Move hci_update_page_scan to hci_request.c
-Date: Fri, 19 Dec 2014 23:18:22 +0200
-Message-Id: <1419023902-16725-1-git-send-email-johan.hedberg@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <1418952279-16452-1-git-send-email-armansito@chromium.org>
+References: <1418952279-16452-1-git-send-email-armansito@chromium.org>
+Date: Fri, 19 Dec 2014 19:00:25 -0200
+Message-ID: <CABBYNZKYA_t48rPVQ-WJ1AKKgixN1LJXCtrCmAZt+_ci_+mdjQ@mail.gmail.com>
+Subject: Re: [PATCH BlueZ v5 0/7] core: Use shared/gatt-client
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Arman Uguray <armansito@chromium.org>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@intel.com>
+Hi Arman,
 
-This is a left-over from the patch that created hci_request.c. The
-hci_update_page_scan functions should have been moved from hci_core.c
-there.
+On Thu, Dec 18, 2014 at 11:24 PM, Arman Uguray <armansito@chromium.org> wrote:
+> *v5:
+>   - Made probing a bit smarter, so that profiles are only probed once when
+>     necessary and they are removed if they no longer valid after non-bonded
+>     discovery.
+>
+> *v4:
+>   - Removed gatt-callbacks in favor of using btd_profile probe and remove
+>     functions. Added the new btd_profile function "accept" to notify profiles
+>     that gatt-client is ready.
+>
+>   - Using device_remove_profile to unregister btd_service's when services are
+>     removed from the client database. This happens on Service Changed events and
+>     on disconnection if the device is not bonded.
+>
+>   - Removed immediated disconnection logic that triggers when no attio callbacks
+>     are registered after probe.
+>
+>   - Other minor fixes to shared/gatt and shared/att.
+>
+> *v3:
+>   - Renamed device_attach_att_transport to device_attach_att.
+>
+> *v2:
+>   - Rebased.
+>
+> *v1:
+>   - Addressed comments by Johan and Luiz.
+>
+> Arman Uguray (7):
+>   core: device: Don't disconnect if attios not set
+>   core: device: Add getters for GATT db and client
+>   core: device: Make profile calls in GATT events
+>   profiles/gatt: Don't handle GATT service.
+>   profiles/gatt: Rename profile to gap.
+>   profiles/gap: Rewrite using bt_gatt_client.
+>   profiles/gap: Add Google copyright.
+>
+>  Makefile.plugins    |   4 +-
+>  profiles/gap/gas.c  | 339 ++++++++++++++++++++++++++++++++++++++
+>  profiles/gatt/gas.c | 457 ----------------------------------------------------
+>  src/device.c        | 390 +++++++++++++++++++++++++++++++++++++-------
+>  src/device.h        |   2 +
+>  5 files changed, 676 insertions(+), 516 deletions(-)
+>  create mode 100644 profiles/gap/gas.c
+>  delete mode 100644 profiles/gatt/gas.c
+>
+> --
+> 2.2.0.rc0.207.ga3a616c
 
-Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
----
- net/bluetooth/hci_core.c    | 56 ---------------------------------------------
- net/bluetooth/hci_request.c | 56 +++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 56 insertions(+), 56 deletions(-)
+Applied, thanks.
 
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index ee2096c7ec2c..9790a0108e69 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -5253,59 +5253,3 @@ static void hci_cmd_work(struct work_struct *work)
- 		}
- 	}
- }
--
--static bool disconnected_whitelist_entries(struct hci_dev *hdev)
--{
--	struct bdaddr_list *b;
--
--	list_for_each_entry(b, &hdev->whitelist, list) {
--		struct hci_conn *conn;
--
--		conn = hci_conn_hash_lookup_ba(hdev, ACL_LINK, &b->bdaddr);
--		if (!conn)
--			return true;
--
--		if (conn->state != BT_CONNECTED && conn->state != BT_CONFIG)
--			return true;
--	}
--
--	return false;
--}
--
--void __hci_update_page_scan(struct hci_request *req)
--{
--	struct hci_dev *hdev = req->hdev;
--	u8 scan;
--
--	if (!test_bit(HCI_BREDR_ENABLED, &hdev->dev_flags))
--		return;
--
--	if (!hdev_is_powered(hdev))
--		return;
--
--	if (mgmt_powering_down(hdev))
--		return;
--
--	if (test_bit(HCI_CONNECTABLE, &hdev->dev_flags) ||
--	    disconnected_whitelist_entries(hdev))
--		scan = SCAN_PAGE;
--	else
--		scan = SCAN_DISABLED;
--
--	if (test_bit(HCI_PSCAN, &hdev->flags) == !!(scan & SCAN_PAGE))
--		return;
--
--	if (test_bit(HCI_DISCOVERABLE, &hdev->dev_flags))
--		scan |= SCAN_INQUIRY;
--
--	hci_req_add(req, HCI_OP_WRITE_SCAN_ENABLE, 1, &scan);
--}
--
--void hci_update_page_scan(struct hci_dev *hdev)
--{
--	struct hci_request req;
--
--	hci_req_init(&req, hdev);
--	__hci_update_page_scan(&req);
--	hci_req_run(&req, NULL);
--}
-diff --git a/net/bluetooth/hci_request.c b/net/bluetooth/hci_request.c
-index e49f682f1550..5e64ea70a106 100644
---- a/net/bluetooth/hci_request.c
-+++ b/net/bluetooth/hci_request.c
-@@ -396,6 +396,62 @@ int hci_update_random_address(struct hci_request *req, bool require_privacy,
- 	return 0;
- }
- 
-+static bool disconnected_whitelist_entries(struct hci_dev *hdev)
-+{
-+	struct bdaddr_list *b;
-+
-+	list_for_each_entry(b, &hdev->whitelist, list) {
-+		struct hci_conn *conn;
-+
-+		conn = hci_conn_hash_lookup_ba(hdev, ACL_LINK, &b->bdaddr);
-+		if (!conn)
-+			return true;
-+
-+		if (conn->state != BT_CONNECTED && conn->state != BT_CONFIG)
-+			return true;
-+	}
-+
-+	return false;
-+}
-+
-+void __hci_update_page_scan(struct hci_request *req)
-+{
-+	struct hci_dev *hdev = req->hdev;
-+	u8 scan;
-+
-+	if (!test_bit(HCI_BREDR_ENABLED, &hdev->dev_flags))
-+		return;
-+
-+	if (!hdev_is_powered(hdev))
-+		return;
-+
-+	if (mgmt_powering_down(hdev))
-+		return;
-+
-+	if (test_bit(HCI_CONNECTABLE, &hdev->dev_flags) ||
-+	    disconnected_whitelist_entries(hdev))
-+		scan = SCAN_PAGE;
-+	else
-+		scan = SCAN_DISABLED;
-+
-+	if (test_bit(HCI_PSCAN, &hdev->flags) == !!(scan & SCAN_PAGE))
-+		return;
-+
-+	if (test_bit(HCI_DISCOVERABLE, &hdev->dev_flags))
-+		scan |= SCAN_INQUIRY;
-+
-+	hci_req_add(req, HCI_OP_WRITE_SCAN_ENABLE, 1, &scan);
-+}
-+
-+void hci_update_page_scan(struct hci_dev *hdev)
-+{
-+	struct hci_request req;
-+
-+	hci_req_init(&req, hdev);
-+	__hci_update_page_scan(&req);
-+	hci_req_run(&req, NULL);
-+}
-+
- /* This function controls the background scanning based on hdev->pend_le_conns
-  * list. If there are pending LE connection we start the background scanning,
-  * otherwise we stop it.
+
 -- 
-2.1.0
-
+Luiz Augusto von Dentz
