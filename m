@@ -1,70 +1,112 @@
 Return-Path: <cyrus@holtmann.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 8.1 \(1993\))
-Subject: Re: [PATCH 1/4] Bluetooth: Move struct hci_request definition higher up in hci_core.h
+Subject: Re: bluetooth: Add hci_h4p driver
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1418981017-10462-2-git-send-email-johan.hedberg@gmail.com>
-Date: Fri, 19 Dec 2014 11:00:11 +0100
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <0B9AB68C-9A0A-4767-9909-56EBDB2CEA36@holtmann.org>
-References: <1418981017-10462-1-git-send-email-johan.hedberg@gmail.com> <1418981017-10462-2-git-send-email-johan.hedberg@gmail.com>
-To: Johan Hedberg <johan.hedberg@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <20141219095000.GA24703@amd>
+Date: Fri, 19 Dec 2014 10:58:35 +0100
+Cc: =?utf-8?Q?Pali_Roh=C3=A1r?= <pali.rohar@gmail.com>,
+	Sebastian Reichel <sre@debian.org>,
+	Sebastian Reichel <sre@ring0.de>,
+	kernel list <linux-kernel@vger.kernel.org>,
+	linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
+	linux-omap <linux-omap@vger.kernel.org>,
+	Tony Lindgren <tony@atomide.com>, khilman@kernel.org,
+	Aaro Koskinen <aaro.koskinen@iki.fi>,
+	Ivaylo Dimitrov <ivo.g.dimitrov.75@gmail.com>,
+	linux-bluetooth@vger.kernel.org
+Message-Id: <7DC7F8DF-CBC7-47CE-8B6F-5BA19ADBB3B6@holtmann.org>
+References: <20141213223727.GA13894@amd> <97C706D6-765B-446A-8180-600F5FB6C68B@holtmann.org> <20141219095000.GA24703@amd>
+To: Pavel Machek <pavel@ucw.cz>
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+Hi Pavel,
 
-> We'll soon start using struct hci_request as a parameter to several more
-> functions in hci_core.h. To avoid compiler warnings of an undefined
-> struct the definition needs to be moved higher up in the file. This
-> patch moves it to the end of the block where several other structs are
-> also defined.
+>> And you want to set the QUIRK_INVALID_BADDR. At least you want to do that in the final submission.
+>> 
 > 
-> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
-> ---
-> include/net/bluetooth/hci_core.h | 20 ++++++++++----------
-> 1 file changed, 10 insertions(+), 10 deletions(-)
-> 
-> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-> index 3c7827005c25..75aaae07037f 100644
-> --- a/include/net/bluetooth/hci_core.h
-> +++ b/include/net/bluetooth/hci_core.h
-> @@ -479,6 +479,16 @@ struct hci_conn_params {
-> 	struct hci_conn *conn;
-> };
-> 
-> +struct hci_request {
-> +	struct hci_dev		*hdev;
-> +	struct sk_buff_head	cmd_q;
-> +
-> +	/* If something goes wrong when building the HCI request, the error
-> +	 * value is stored in this field.
-> +	 */
-> +	int			err;
-> +};
-> +
-> extern struct list_head hci_dev_list;
-> extern struct list_head hci_cb_list;
-> extern rwlock_t hci_dev_list_lock;
-> @@ -1284,16 +1294,6 @@ static inline int hci_check_conn_params(u16 min, u16 max, u16 latency,
-> int hci_register_cb(struct hci_cb *hcb);
-> int hci_unregister_cb(struct hci_cb *hcb);
-> 
-> -struct hci_request {
-> -	struct hci_dev		*hdev;
-> -	struct sk_buff_head	cmd_q;
-> -
-> -	/* If something goes wrong when building the HCI request, the error
-> -	 * value is stored in this field.
-> -	 */
-> -	int			err;
-> -};
-> -
-> void hci_req_init(struct hci_request *req, struct hci_dev *hdev);
-> int hci_req_run(struct hci_request *req, hci_req_complete_t complete);
-> void hci_req_add(struct hci_request *req, u16 opcode, u32 plen,
+> Ok, I found out that I can do it and result works, provided that I do
+> hciconfig hci0 up/down first.
 
-any reason to not move these along with the data structure? They actually do belong together.
+that should not be the case. Actually hciconfig uses old ioctl. A full Bluetooth system running bluetoothd (from BlueZ 5) will never use any old ioctl. Only an old system (BlueZ 4) will use ioctl.
+
+> I have trouble understanding... h4p_hci_open() seems to be called as
+> soon as I insmod the driver. Who does that? Is it some kind of udev
+> magic?
+
+As soon as you do hci_register_dev, it will bring up the device and run the basic initialization. That is needed to get the address, version information and features. Otherwise the mgmt interface can not work. We need basic information about the device.
+
+So what the kernel will do internally when you find a device is bring it up, get the basics and then bring it back down (in case nobody uses it). See hci_power_on work.
+
+> ...
+>>> +#include "hci_h4p.h"
+>>> +
+>>> +#define BT_DBG(a...) do {} while(0)
+>> 
+>> Why is this needed? BT_DBG is hooked up with dynamic debug.
+> ...
+> 
+> I did all the changes as requested. Thanks. I did't see harm in
+> include guards, but I removed them; it is not important.
+
+There is no harm in including the guards. We just don't do it for internal files. And thus if anyone tries to be sneaky and build circular inclusion they will fall flat on their faces. That is the only reason.
+
+> 
+>>> +	if (info->rx_count == 0) {
+>>> +		/* H4+ devices should always send word aligned packets */
+>>> +		if (!(info->rx_skb->len % 2))
+>>> +			info->garbage_bytes++;
+>>> +		h4p_recv_frame(info, info->rx_skb);
+>> 
+>> The h4p_recv_frame should maybe done inline here since it only handles 2 exception packets. Also to make it easy, just leave the function if (info->rx_count).
+>> 
+>> This packet processing feels like a bit of spaghetti code. I think that is better handled in a proper function that goes through it and not with many tiny sub functions.
+>> 
+> 
+> Well, CodingStyle says something about functions that should be kept
+> short... And when manually inlined, the inner function would have to
+> be made less readable, as it uses return to shortcut processing. 
+
+It also should not make me have to follow 3 functions to figure out what it is actually doing.
+
+> 
+> 
+> To use __hci_cmd_sync()
+> 
+>>> +
+>>> +	SET_HCIDEV_DEV(hdev, info->dev);
+>>> +
+>>> +	if (hci_register_dev(hdev) >= 0)
+>>> +		return 0;
+>>> +
+>>> +	dev_err(info->dev, "hci_register failed %s.\n", hdev->name);
+>>> +	hci_free_dev(info->hdev);
+>>> +	return -ENODEV;
+>>> +}
+>> 
+>> And normally this is folded into the probe handling and not in a
+>> separate function.
+> 
+> The probe function is too long, already...
+
+Have you compared it to other functions. Normally probe() functions in general are all pretty long since they have to do tons of stuff. Having all in one function means you can read through it at once.
+
+> 
+>>> +#include <linux/delay.h>
+>>> +#include <linux/clk.h>
+>>> +
+>>> +#include <linux/io.h>
+>>> +
+>>> +#include "hci_h4p.h"
+>> 
+>> Why is this a separate file? And if so, why not all UART specific details are in this file. Including bunch of the defines you have in the header.
+>> 
+> 
+> Well, you wanted less global functions, so I moved some as inlines to
+> headers. I guess I can merge nokia_core and nokia_uart if really wanted.
+
+Would this become easier when some of the OMAP specific stuff is moved out of this driver? If that is possible.
 
 Regards
 
