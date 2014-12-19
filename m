@@ -1,36 +1,38 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 2/2] tools/gatt: Fix not checking malloc() failure
-Date: Fri, 19 Dec 2014 11:25:24 +0200
-Message-Id: <1418981124-19877-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1418981124-19877-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1418981124-19877-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCH 1/2] shared/gatt: Fix NULL dereference
+Date: Fri, 19 Dec 2014 11:25:23 +0200
+Message-Id: <1418981124-19877-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-This follows standard practice elsewhere in this file.
+The which is executed after checking (!op) is dereferencing op in
+function discovery_op_free().
 ---
- tools/btgatt-client.c | 4 ++++
- 1 file changed, 4 insertions(+)
+ src/shared/gatt-client.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/tools/btgatt-client.c b/tools/btgatt-client.c
-index e2e0537..62c4d3e 100644
---- a/tools/btgatt-client.c
-+++ b/tools/btgatt-client.c
-@@ -457,6 +457,10 @@ static void cmd_read_multiple(struct client *cli, char *cmd_str)
+diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
+index f7a90d1..c9fb05d 100644
+--- a/src/shared/gatt-client.c
++++ b/src/shared/gatt-client.c
+@@ -1075,11 +1075,12 @@ static void process_service_changed(struct bt_gatt_client *client,
+ 		return;
  	}
  
- 	value = malloc(sizeof(uint16_t) * argc);
-+	if (!value) {
-+		printf("Failed to construct value\n");
-+		return;
-+	}
++	discovery_op_free(op);
++
+ fail:
+ 	util_debug(client->debug_callback, client->debug_data,
+ 					"Failed to initiate service discovery"
+ 					" after Service Changed");
+-	discovery_op_free(op);
+ }
  
- 	for (i = 0; i < argc; i++) {
- 		value[i] = strtol(argv[i], &endptr, 0);
+ static void service_changed_cb(uint16_t value_handle, const uint8_t *value,
 -- 
 2.1.0
 
