@@ -1,33 +1,62 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Sat, 20 Dec 2014 23:02:12 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: Create debugfs directory for each connection
- handle
-Message-ID: <20141220210212.GA20741@t440s.P-661HNU-F1>
-References: <1419092021-32209-1-git-send-email-marcel@holtmann.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1419092021-32209-1-git-send-email-marcel@holtmann.org>
+Message-ID: <1419108192.27548.7.camel@x220>
+Subject: Re: [PATCH]  bluetooth: Add hci_h4p driver
+From: Paul Bolle <pebolle@tiscali.nl>
+To: Pavel Machek <pavel@ucw.cz>
+Cc: pali.rohar@gmail.com, sre@debian.org, sre@ring0.de, kernel list
+	 <linux-kernel@vger.kernel.org>, linux-arm-kernel
+	 <linux-arm-kernel@lists.infradead.org>, linux-omap@vger.kernel.org,
+	tony@atomide.com, khilman@kernel.org, aaro.koskinen@iki.fi,
+	ivo.g.dimitrov.75@gmail.com, linux-bluetooth@vger.kernel.org,
+	marcel@holtmann.org
+Date: Sat, 20 Dec 2014 21:43:12 +0100
+In-Reply-To: <20141220202314.GA8484@amd>
+References: <20141213223727.GA13894@amd> <20141220202314.GA8484@amd>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Pavel,
 
-On Sat, Dec 20, 2014, Marcel Holtmann wrote:
-> For every internal representation of a Bluetooth connection which is
-> identified by hci_conn, create a debugfs directory with the handle
-> number as directory name.
-> 
-> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
-> ---
->  include/net/bluetooth/hci_core.h |  1 +
->  net/bluetooth/hci_conn.c         |  3 +++
->  net/bluetooth/hci_debugfs.c      | 12 ++++++++++++
->  net/bluetooth/hci_debugfs.h      |  1 +
->  net/bluetooth/hci_event.c        |  5 +++++
->  5 files changed, 22 insertions(+)
+On Sat, 2014-12-20 at 21:23 +0100, Pavel Machek wrote:
+> --- a/drivers/bluetooth/Kconfig
+> +++ b/drivers/bluetooth/Kconfig
+> @@ -243,4 +243,13 @@ config BT_WILINK
+>  	  Say Y here to compile support for Texas Instrument's WiLink7 driver
+>  	  into the kernel or say M to compile it as module (btwilink).
+>  
+> +config BT_NOKIA_H4P
+> +	tristate "HCI driver with H4 Nokia extensions"
+> +	help
+> +	  Bluetooth HCI driver with H4 extensions.  This driver provides
+> +	  support for H4+ Bluetooth chip with vendor-specific H4 extensions.
+> +
+> +	  Say Y here to compile support for h4 extended devices into the kernel
+> +	  or say M to compile it as module (btnokia_h4p).
 
-Applied to bluetooth-next. Thanks.
+Will this module be called btnokia_h4p or ...
 
-Johan
+> +
+>  endmenu
+> diff --git a/drivers/bluetooth/Makefile b/drivers/bluetooth/Makefile
+> index 9fe8a87..624ef3fc 100644
+> --- a/drivers/bluetooth/Makefile
+> +++ b/drivers/bluetooth/Makefile
+> @@ -31,4 +31,7 @@ hci_uart-$(CONFIG_BT_HCIUART_ATH3K)	+= hci_ath.o
+>  hci_uart-$(CONFIG_BT_HCIUART_3WIRE)	+= hci_h5.o
+>  hci_uart-objs				:= $(hci_uart-y)
+>  
+> +obj-$(CONFIG_BT_NOKIA_H4P)      += nokia_h4p.o
+
+... nokia_h4p?
+
+> +nokia_h4p-objs := nokia_core.o nokia_fw.o nokia_uart.o
+> +
+>  ccflags-y += -D__CHECK_ENDIAN__
+
+Or did I miss some make magic here?
+
+Thanks,
+
+
+Paul Bolle
