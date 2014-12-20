@@ -1,69 +1,82 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <549697F0.8090506@broadcom.com>
-Date: Sun, 21 Dec 2014 10:50:40 +0100
-From: Arend van Spriel <arend@broadcom.com>
-MIME-Version: 1.0
-To: Kalle Valo <kvalo@codeaurora.org>
-CC: "John W. Linville" <linville@tuxdriver.com>,
-	<linux-wireless@vger.kernel.org>,
-	<linux-bluetooth@vger.kernel.org>, <linux-nfc@ml01.01.org>,
-	"David S. Miller" <davem@davemloft.net>, <lwn@lwn.net>
-Subject: Re: changes to Linux wireless maintenance
-References: <87388d2tbn.fsf@purkki.adurom.net> <c1f3352bed1f1a2985a5111a077134a5.squirrel@www.codeaurora.org>
-In-Reply-To: <c1f3352bed1f1a2985a5111a077134a5.squirrel@www.codeaurora.org>
-Content-Type: text/plain; charset="ISO-8859-1"; format=flowed
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 8.1 \(1993\))
+Subject: Re: bluetooth: Add hci_h4p driver
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20141220154850.GA28390@amd>
+Date: Sun, 21 Dec 2014 00:39:31 +0100
+Cc: =?utf-8?Q?Pali_Roh=C3=A1r?= <pali.rohar@gmail.com>,
+	Sebastian Reichel <sre@debian.org>,
+	Sebastian Reichel <sre@ring0.de>,
+	kernel list <linux-kernel@vger.kernel.org>,
+	linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
+	linux-omap <linux-omap@vger.kernel.org>,
+	Tony Lindgren <tony@atomide.com>, khilman@kernel.org,
+	Aaro Koskinen <aaro.koskinen@iki.fi>,
+	Ivaylo Dimitrov <ivo.g.dimitrov.75@gmail.com>,
+	linux-bluetooth@vger.kernel.org
+Message-Id: <5AC947DA-87BA-48B7-ABB8-7663B3D3E844@holtmann.org>
+References: <20141213223727.GA13894@amd> <97C706D6-765B-446A-8180-600F5FB6C68B@holtmann.org> <20141219095000.GA24703@amd> <7DC7F8DF-CBC7-47CE-8B6F-5BA19ADBB3B6@holtmann.org> <20141220154850.GA28390@amd>
+To: Pavel Machek <pavel@ucw.cz>
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On 12/18/14 11:55, Kalle Valo wrote:
-> John W. Linville wrote:
->
->> Nevertheless, I think it is time for some changes.  I have been
->> the wireless maintainer for a long time, and I personally would
->> like to develop in a different direction.  Plus, I think that Linux
->> will benefit from having some fresh blood involved in more of the
->> maintenance duties.  I will be stepping aside to let that happen.
->
-> Thanks to you both the Linux wireless subsystem as well as the wireless
-> community has improved so much from what you started. You will be missed.
-> Thank you for all your efforts and I hope you still hang around :)
+Hi Pavel,
 
-Congrats with your maintainer role.
+>>> I have trouble understanding... h4p_hci_open() seems to be called as
+>>> soon as I insmod the driver. Who does that? Is it some kind of udev
+>>> magic?
+>> 
+>> As soon as you do hci_register_dev, it will bring up the device and run the basic initialization. That is needed to get the address, version information and features. Otherwise the mgmt interface can not work. We need basic information about the device.
+>> 
+>> So what the kernel will do internally when you find a device is bring it up, get the basics and then bring it back down (in case nobody uses it). See hci_power_on work.
+>> 
+> 
+> Aha, slightly unexpected, but it matches observations. Good.
 
->> As for the wireless driver patches, I have asked Kalle Valo
->> to handle patch review and merge duties for everything under the
->> drivers/net/wireless directory.  This will now include not only the ath
->> patches he already manages, but other drivers that don't have trees
->> such as mwifiex, rt2x00, rtlwifi, and others.  For consistency, the
->> iwlwifi tree will also be merged through Kalle's new tree.  I expect
->> that Kalle will announce any relevant details in a follow-up message.
->
-> I have created two trees, wireless-drivers and wireless-drivers-next:
->
-> https://git.kernel.org/cgit/linux/kernel/git/kvalo/wireless-drivers.git/
->
-> https://git.kernel.org/cgit/linux/kernel/git/kvalo/wireless-drivers-next.git/
->
-> The trees work similarly like John's wireless and wireless-next trees, the
-> former only for important bugfixes to -rc releases and the latter for the
-> rest going to the next release.
+we are at Bluetooth 4.2 specification now. Thinks got a lot more complicated these days.
 
-So are you dropping the wireless-testing tree? From earlier IRC 
-discussion I figured that tree was still in demand.
+> 
+>>> To use __hci_cmd_sync()
+>>> 
+>>>>> +
+>>>>> +	SET_HCIDEV_DEV(hdev, info->dev);
+>>>>> +
+>>>>> +	if (hci_register_dev(hdev) >= 0)
+>>>>> +		return 0;
+>>>>> +
+>>>>> +	dev_err(info->dev, "hci_register failed %s.\n", hdev->name);
+>>>>> +	hci_free_dev(info->hdev);
+>>>>> +	return -ENODEV;
+>>>>> +}
+>>>> 
+>>>> And normally this is folded into the probe handling and not in a
+>>>> separate function.
+>>> 
+>>> The probe function is too long, already...
+>> 
+>> Have you compared it to other functions. Normally probe() functions in general are all pretty long since they have to do tons of stuff. Having all in one function means you can read through it at once.
+>> 
+> 
+> Ok.
+> 
+>>>>> +#include "hci_h4p.h"
+>>>> 
+>>>> Why is this a separate file? And if so, why not all UART specific details are in this file. Including bunch of the defines you have in the header.
+>>>> 
+>>> 
+>>> Well, you wanted less global functions, so I moved some as inlines to
+>>> headers. I guess I can merge nokia_core and nokia_uart if really wanted.
+>> 
+>> Would this become easier when some of the OMAP specific stuff is moved out of this driver? If that is possible.
+>> 
+> 
+> Yes, I can investigate further cleanups. But original plan was to
+> merge it and then clean up the rest. Could we do that, please?
 
-> I still need to ask both linux-next and kbuild maintainers to add these
-> trees to their list of trees to test from, but I hope that to happen in
-> the next few days.
->
-> There's no need to CC me on the patches, I can pick the patches from the
-> mailing list. Actually in the future I'm hoping to use patchwork[1] for
-> managing patches, but my access request is still pending in helpdesk's
-> queue. I'll send a separate email once I start using patchwork. For the
-> time being I just use email to apply patches.
+You need to fix all these small details. There are tons of whitespace damages, indentation issues, trailing whitespaces and what not. Even if they were in the original driver to begin this, they can not be in a driver submitted these days.
 
-I see. I used to send patches To: the maintainer and Cc: the mailing 
-list following SubmittingPatches documentation. I can change my workflow 
-so let me know if I should.
+Regards
 
-Regards,
-Arend
+Marcel
+
