@@ -1,14 +1,14 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2] Bluetooth: Remove duplicate constant for RFCOMM PSM
-Date: Sat, 20 Dec 2014 18:00:41 +0100
-Message-Id: <1419094841-41659-1-git-send-email-marcel@holtmann.org>
+Subject: [PATCH] Bluetooth: Remove duplicate constant for RFCOMM PSM
+Date: Sat, 20 Dec 2014 17:59:31 +0100
+Message-Id: <1419094771-41539-1-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 The RFCOMM_PSM constant is actually a duplicate. So remove it and
-use the L2CAP_PSM_RFCOMM constant instead.
+use the L2CAP_PSM_RFCOMM contant instead.
 
 Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 ---
