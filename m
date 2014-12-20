@@ -1,56 +1,41 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Sat, 20 Dec 2014 10:16:21 +0200
+Date: Sat, 20 Dec 2014 09:52:20 +0200
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Arman Uguray <armansito@chromium.org>
+To: Marcel Holtmann <marcel@holtmann.org>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH BlueZ 09/17] core: gatt: Expose charac. extended
- properties.
-Message-ID: <20141220081621.GA27857@t440s.P-661HNU-F1>
-References: <1419024965-10375-1-git-send-email-armansito@chromium.org>
- <1419024965-10375-10-git-send-email-armansito@chromium.org>
+Subject: Re: [PATCH] Bluetooth: Support static address when BR/EDR has been
+ disabled
+Message-ID: <20141220075220.GA26855@t440s.P-661HNU-F1>
+References: <1419026735-24536-1-git-send-email-marcel@holtmann.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1419024965-10375-10-git-send-email-armansito@chromium.org>
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <1419026735-24536-1-git-send-email-marcel@holtmann.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Arman,
+Hi Marcel,
 
-On Fri, Dec 19, 2014, Arman Uguray wrote:
-> @@ -521,12 +537,12 @@ static struct {
->  	{ BT_GATT_CHRC_PROP_INDICATE,		"indicate" },
->  	{ BT_GATT_CHRC_PROP_AUTH,		"authenticated-signed-writes" },
->  	{ BT_GATT_CHRC_PROP_EXT_PROP,		"extended-properties" },
-> -	{ },
->  	/* Extended Properties */
->  	{ BT_GATT_CHRC_EXT_PROP_RELIABLE_WRITE,	"reliable-write" },
->  	{ BT_GATT_CHRC_EXT_PROP_WRITABLE_AUX,	"writable-auxiliaries" },
->  	{ }
->  };
-> +static const int ext_props_index = 8;
->  
->  static gboolean characteristic_property_get_flags(
->  					const GDBusPropertyTable *property,
-> @@ -534,21 +550,18 @@ static gboolean characteristic_property_get_flags(
->  {
->  	struct characteristic *chrc = data;
->  	DBusMessageIter array;
-> +	uint16_t props;
->  	int i;
->  
->  	dbus_message_iter_open_container(iter, DBUS_TYPE_ARRAY, "s", &array);
->  
->  	for (i = 0; properties[i].str; i++) {
-> -		if (chrc->props & properties[i].prop)
-> +		props = i < ext_props_index ? chrc->props : chrc->ext_props;
-> +		if (props & properties[i].prop)
->  			dbus_message_iter_append_basic(&array, DBUS_TYPE_STRING,
->  							&properties[i].str);
+On Fri, Dec 19, 2014, Marcel Holtmann wrote:
+> Every BR/EDR/LE dual-mode controller requires to have a public address
+> and so far that has become the identity address and own address. The
+> only way to change that behavior was with a force_static_address
+> debugfs option.
+> 
+> However the host can actually disable the BR/EDR part of a dual-mode
+> controller and turn into a single mode LE controller. In that case
+> it makes perfect sense for a host to use a chosen static address
+> instead of the public address.
+> 
+> So if the host disables BR/EDR and configures a static address, then
+> that static address is used as identity address and own address. If
+> the host does not configure a static address, then the public address
+> is used as before.
+> 
+> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+> ---
+>  net/bluetooth/hci_core.c    | 8 +++++++-
+>  net/bluetooth/hci_request.c | 8 +++++++-
+>  2 files changed, 14 insertions(+), 2 deletions(-)
 
-This looks quite brittle to me with the hard-coded index and extra logic
-in the for-loop. Couldn't you just put the extended properties in their
-own array and have a separate for-loop for that?  Also, you could use
-the NELEM() macro instead of checking for non-NULL string. You wouldn't
-then need an empty element at the end of th array.
+Applied to bluetooth-next. Thanks.
 
 Johan
