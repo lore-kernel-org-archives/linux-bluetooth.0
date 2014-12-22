@@ -1,40 +1,49 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Mon, 22 Dec 2014 13:32:56 +0200
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] android/tester: Fix wrong check
-Date: Mon, 22 Dec 2014 13:37:36 +0200
-Message-Id: <1419248256-31061-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: Re: [PATCH 1/2] shared/gatt: Fix NULL dereference
+Message-ID: <20141222113251.GA25294@aemeltch-MOBL1>
+References: <1418981124-19877-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1418981124-19877-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+ping
 
-Fixes typo mixing exp_inst with rec_inst.
----
- android/tester-main.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/android/tester-main.c b/android/tester-main.c
-index 8b6a117..336a9a8 100644
---- a/android/tester-main.c
-+++ b/android/tester-main.c
-@@ -507,14 +507,14 @@ static bool match_mas_inst(btmce_mas_instance_t *exp_inst,
- 		return 0;
- 	}
- 
--	if (exp_inst->scn && (exp_inst->scn != exp_inst->scn)) {
-+	if (exp_inst->scn && (exp_inst->scn != rec_inst->scn)) {
- 		tester_debug("MAS inst. [%d] scn missmatch %d vs %d", inst_num,
- 						rec_inst->scn, exp_inst->scn);
- 		return 0;
- 	}
- 
- 	if (exp_inst->msg_types &&
--			(exp_inst->msg_types != exp_inst->msg_types)) {
-+			(exp_inst->msg_types != rec_inst->msg_types)) {
- 		tester_debug("Mas inst. [%d] mesg type missmatch %d vs %d",
- 					inst_num, rec_inst->scn, exp_inst->scn);
- 		return 0;
--- 
-2.1.0
-
+On Fri, Dec 19, 2014 at 11:25:23AM +0200, Andrei Emeltchenko wrote:
+> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> 
+> The which is executed after checking (!op) is dereferencing op in
+> function discovery_op_free().
+> ---
+>  src/shared/gatt-client.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+> 
+> diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
+> index f7a90d1..c9fb05d 100644
+> --- a/src/shared/gatt-client.c
+> +++ b/src/shared/gatt-client.c
+> @@ -1075,11 +1075,12 @@ static void process_service_changed(struct bt_gatt_client *client,
+>  		return;
+>  	}
+>  
+> +	discovery_op_free(op);
+> +
+>  fail:
+>  	util_debug(client->debug_callback, client->debug_data,
+>  					"Failed to initiate service discovery"
+>  					" after Service Changed");
+> -	discovery_op_free(op);
+>  }
+>  
+>  static void service_changed_cb(uint16_t value_handle, const uint8_t *value,
+> -- 
+> 2.1.0
+> 
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
