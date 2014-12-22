@@ -1,34 +1,74 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] shared/hfp: Remove dead code
-Date: Mon, 22 Dec 2014 15:16:51 +0200
-Message-Id: <1419254211-6211-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] android/scpp: Fix using freed memory
+Date: Mon, 22 Dec 2014 14:13:53 +0100
+Message-ID: <3155639.Ajs76qMxjk@leonov>
+In-Reply-To: <1419248953-31147-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1419248953-31147-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Hi Andrei,
 
-Remove dead code since free_tmp initialized to false.
----
- src/shared/hfp.c | 4 ----
- 1 file changed, 4 deletions(-)
+On Monday 22 of December 2014 13:49:13 Andrei Emeltchenko wrote:
+> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> 
+> Fixes use after free memory bug.
+> req is assigned to user_data and then freed with destroy_gatt_req(req)
+> ---
+>  android/scpp.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/android/scpp.c b/android/scpp.c
+> index 77f48cd..9f60c9f 100644
+> --- a/android/scpp.c
+> +++ b/android/scpp.c
+> @@ -301,8 +301,6 @@ static void refresh_discovered_cb(uint8_t status, GSList
+> *chars, uint16_t start, end;
+>  	bt_uuid_t uuid;
+> 
+> -	destroy_gatt_req(req);
+> -
+>  	if (status) {
+>  		error("Scan Refresh %s", att_ecode2str(status));
+>  		return;
+> @@ -329,6 +327,8 @@ static void refresh_discovered_cb(uint8_t status, GSList
+> *chars,
+> 
+>  	discover_desc(scan, scan->attrib, start, end, &uuid,
+>  					discover_descriptor_cb, user_data);
+> +
+> +	destroy_gatt_req(req);
+>  }
+> 
+>  static void iwin_discovered_cb(uint8_t status, GSList *chars, void
+> *user_data)
 
-diff --git a/src/shared/hfp.c b/src/shared/hfp.c
-index 9d937a5..05a8563 100644
---- a/src/shared/hfp.c
-+++ b/src/shared/hfp.c
-@@ -1192,10 +1192,6 @@ static void hf_process_input(struct hfp_hf *hfp)
- 	if (len == ringbuf_len(hfp->read_buf))
- 		goto done;
+This patch doesn't fix the bug (actually it introduces some memleaks).
+
+>From what I see in code gatt_request is packing userdata passed to 
+discover_desc() so I think fix should be like:
+
+--- a/android/scpp.c
++++ b/android/scpp.c
+@@ -328,7 +328,7 @@ static void refresh_discovered_cb(uint8_t status, GSList 
+*chars,
+        bt_uuid16_create(&uuid, GATT_CLIENT_CHARAC_CFG_UUID);
  
--	/* If we are here second time for some reason, that is wrong */
--	if (free_tmp)
--		goto done;
--
- 	str2 = ringbuf_peek(hfp->read_buf, len, &len2);
- 	if (!str2)
- 		goto done;
--- 
-2.1.0
+        discover_desc(scan, scan->attrib, start, end, &uuid,
+-                                       discover_descriptor_cb, user_data);
++                                       discover_descriptor_cb, scan);
 
+
+Although here scan and userdata seems reluctant (since req is already holding 
+sccp instance).
+
+I'd wait for Luiz to comment on this since he wrote most of the scpp code.
+
+-- 
+BR
+Szymon Janc
