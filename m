@@ -1,78 +1,45 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 22 Dec 2014 13:59:13 +0200
-From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] emulator: Fix magic numbers and remove dead code
-Message-ID: <20141222115912.GC25294@aemeltch-MOBL1>
-References: <1418993645-6921-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <041CE110-B8DA-47BF-8E7F-F206054DD815@holtmann.org>
+Date: Mon, 22 Dec 2014 13:56:01 +0200
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCHv2] shared/gap: Fix memory leak in gap
+Message-ID: <20141222115600.GB25294@aemeltch-MOBL1>
+References: <1418992653-6704-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <041CE110-B8DA-47BF-8E7F-F206054DD815@holtmann.org>
+In-Reply-To: <1418992653-6704-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Fri, Dec 19, 2014 at 02:06:53PM +0100, Marcel Holtmann wrote:
-> Hi Andrei,
-> 
-> > From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-> > 
-> > Removes logically dead code since conditions were already checked in the
-> > previous statements.
-> 
-> this should be two patches.
+ping
 
-So can I just remove second check and leave all this magic intouch?
-
-Best regards 
-Andrei Emeltchenko 
-
+On Fri, Dec 19, 2014 at 02:37:33PM +0200, Andrei Emeltchenko wrote:
+> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 > 
-> > ---
-> > emulator/le.c | 11 ++---------
-> > 1 file changed, 2 insertions(+), 9 deletions(-)
-> > 
-> > diff --git a/emulator/le.c b/emulator/le.c
-> > index 30daa63..91cf31c 100644
-> > --- a/emulator/le.c
-> > +++ b/emulator/le.c
-> > @@ -1236,21 +1236,14 @@ static void cmd_le_set_data_length(struct bt_le *hci,
-> > 	}
-> > 
-> > 	/* Valid range for suggested max TX octets is 0x001b to 0x00fb */
-> > -	if (tx_len < 0x001b || tx_len > 0x00fb) {
-> > +	if (tx_len < DEFAULT_TX_LEN || tx_len > MAX_TX_LEN) {
+> Allocated irk memory was never assigned.
+> ---
+>  src/shared/gap.c | 5 +++++
+>  1 file changed, 5 insertions(+)
 > 
-> MAX_TX_LEN is our max value. It just happens to be the same max for the parameter. So I would keep the magic numbers here unless we introduce official constants for default, min, max ranges somewhere else.
+> diff --git a/src/shared/gap.c b/src/shared/gap.c
+> index 19059e8..cc48a02 100644
+> --- a/src/shared/gap.c
+> +++ b/src/shared/gap.c
+> @@ -276,5 +276,10 @@ bool bt_gap_add_peer_irk(struct bt_gap *gap, uint8_t addr_type,
+>  	memcpy(irk->addr, addr, 6);
+>  	memcpy(irk->key, key, 16);
+>  
+> +	if (!queue_push_tail(gap->irk_list, irk)) {
+> +		free(irk);
+> +		return false;
+> +	}
+> +
+>  	return true;
+>  }
+> -- 
+> 2.1.0
 > 
-> > 		cmd_status(hci, BT_HCI_ERR_INVALID_PARAMETERS,
-> > 					BT_HCI_CMD_LE_SET_DATA_LENGTH);
-> > 		return;
-> > 	}
-> > 
-> > 	/* Valid range for suggested max TX time is 0x0148 to 0x0848 */
-> > -	if (tx_time < 0x0148 || tx_time > 0x0848) {
-> > -		cmd_status(hci, BT_HCI_ERR_INVALID_PARAMETERS,
-> > -					BT_HCI_CMD_LE_SET_DATA_LENGTH);
-> > -		return;
-> > -	}
-> > -
-> > -	/* Max TX len and time shall be less or equal supported */
-> 
-> And this check is just by accident the same as the other one before. The one before is checking the max allowed values from the specification.
-> 
-> This one is checking our max values. It just happens to be the same. Since this is an emulator and not real code that is heavy optimized, we should instead have hci->le_max_tx_time and hci->le_max_tx_len and assigned to our max value and then check against that.
-> 
-> We do exactly the same for white list size and resolving list size.
-> 
-> > -	if (tx_len > MAX_TX_LEN || tx_time > MAX_TX_TIME) {
-> > +	if (tx_time < DEFAULT_TX_TIME || tx_time > MAX_TX_TIME) {
-> > 		cmd_status(hci, BT_HCI_ERR_INVALID_PARAMETERS,
-> > 					BT_HCI_CMD_LE_SET_DATA_LENGTH);
-> > 		return;
-> 
-> Regards
-> 
-> Marcel
-> 
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
