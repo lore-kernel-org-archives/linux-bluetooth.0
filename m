@@ -1,42 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] android/scpp: Fix using freed memory
-Date: Mon, 22 Dec 2014 13:49:13 +0200
-Message-Id: <1419248953-31147-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCH] android/tester: Fix wrong check
+Date: Mon, 22 Dec 2014 13:37:36 +0200
+Message-Id: <1419248256-31061-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Fixes use after free memory bug.
-req is assigned to user_data and then freed with destroy_gatt_req(req)
+Fixes typo mixing exp_inst with rec_inst.
 ---
- android/scpp.c | 4 ++--
+ android/tester-main.c | 4 ++--
  1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/android/scpp.c b/android/scpp.c
-index 77f48cd..9f60c9f 100644
---- a/android/scpp.c
-+++ b/android/scpp.c
-@@ -301,8 +301,6 @@ static void refresh_discovered_cb(uint8_t status, GSList *chars,
- 	uint16_t start, end;
- 	bt_uuid_t uuid;
+diff --git a/android/tester-main.c b/android/tester-main.c
+index 8b6a117..336a9a8 100644
+--- a/android/tester-main.c
++++ b/android/tester-main.c
+@@ -507,14 +507,14 @@ static bool match_mas_inst(btmce_mas_instance_t *exp_inst,
+ 		return 0;
+ 	}
  
--	destroy_gatt_req(req);
--
- 	if (status) {
- 		error("Scan Refresh %s", att_ecode2str(status));
- 		return;
-@@ -329,6 +327,8 @@ static void refresh_discovered_cb(uint8_t status, GSList *chars,
+-	if (exp_inst->scn && (exp_inst->scn != exp_inst->scn)) {
++	if (exp_inst->scn && (exp_inst->scn != rec_inst->scn)) {
+ 		tester_debug("MAS inst. [%d] scn missmatch %d vs %d", inst_num,
+ 						rec_inst->scn, exp_inst->scn);
+ 		return 0;
+ 	}
  
- 	discover_desc(scan, scan->attrib, start, end, &uuid,
- 					discover_descriptor_cb, user_data);
-+
-+	destroy_gatt_req(req);
- }
- 
- static void iwin_discovered_cb(uint8_t status, GSList *chars, void *user_data)
+ 	if (exp_inst->msg_types &&
+-			(exp_inst->msg_types != exp_inst->msg_types)) {
++			(exp_inst->msg_types != rec_inst->msg_types)) {
+ 		tester_debug("Mas inst. [%d] mesg type missmatch %d vs %d",
+ 					inst_num, rec_inst->scn, exp_inst->scn);
+ 		return 0;
 -- 
 2.1.0
 
