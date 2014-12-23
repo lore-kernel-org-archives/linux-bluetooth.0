@@ -1,124 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH] android: Provide SELinux policy files
-Date: Tue, 23 Dec 2014 12:48:23 +0100
-Message-Id: <1419335303-3982-1-git-send-email-szymon.janc@tieto.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Mon, 22 Dec 2014 19:01:42 -0800
+From: Tedd Ho-Jeong An <tedd.an@intel.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Cc: "An, Tedd" <tedd.an@intel.com>, Johan Hedberg <johan.hedberg@gmail.com>,
+ Marcel Holtmann <marcel@holtmann.org>
+Subject: [PATCH] Bluetooth: Cancel the hci_request timeout if it received
+ expected event
+Message-ID: <20141222190142.59176a26@tedd-test>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This adds required policy files and updates documentation with more
-SELinux information.
+From: Tedd Ho-Jeong An <tedd.an@intel.com>
+
+This patch cancels the hci_request timeout work if the expected event
+is recevied.
+
+Signed-off-by: Tedd Ho-Jeong An <tedd.an@intel.com>
 ---
- android/README              |  7 ++++++-
- android/bluetoothd.te       | 47 +++++++++++++++++++++++++++++++++++++++++++++
- android/bluetoothd_snoop.te | 17 ++++++++++++++++
- 3 files changed, 70 insertions(+), 1 deletion(-)
- create mode 100644 android/bluetoothd.te
- create mode 100644 android/bluetoothd_snoop.te
+ net/bluetooth/hci_event.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/android/README b/android/README
-index b2864de..7b1f126 100644
---- a/android/README
-+++ b/android/README
-@@ -57,7 +57,9 @@ Since 5.0 release Android moved to full enforcement of SELinux. This requires
- proper policy to be provided for all BlueZ for Android services (and services
- interacting with BlueZ). Policies should be placed in external/selinux/ path.
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 39a5c8a..9d18470 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -4855,6 +4855,9 @@ void hci_event_packet(struct hci_dev *hdev, struct sk_buff *skb)
+ 		struct hci_command_hdr *cmd_hdr = (void *) hdev->sent_cmd->data;
+ 		u16 opcode = __le16_to_cpu(cmd_hdr->opcode);
  
--Required policy files are provided at <TBD>.
-+Required policy files are provided at:
-+bluetoothd.te
-+bluetoothd_snoop.te
++		if (opcode != HCI_OP_NOP)
++			cancel_delayed_work(&hdev->cmd_timer);
++
+ 		hci_req_cmd_complete(hdev, opcode, 0);
+ 	}
  
- For convenience sepolicy.git with all required policies is available at:
- https://code.google.com/p/aosp-bluez.external-sepolicy/
-@@ -176,6 +178,9 @@ will break at e.g. g_free() function without prior callers. It's possible to
- have proper library installed automatically by appropriate entry in Android.mk,
- see https://code.google.com/p/aosp-bluez.glib/ for an example.
- 
-+When running with valgrind SElinux needs to be set into permissive mode. This
-+can be done by executing 'setenforce 0' from root shell.
-+
- 
- Enabling BlueZ debugs
- ---------------------
-diff --git a/android/bluetoothd.te b/android/bluetoothd.te
-new file mode 100644
-index 0000000..532bfbb
---- /dev/null
-+++ b/android/bluetoothd.te
-@@ -0,0 +1,47 @@
-+type bluetoothd, domain;
-+type bluetoothd_exec, exec_type, file_type;
-+type bluetoothd_main_exec, exec_type, file_type;
-+
-+# Start bluetoothd from init
-+init_daemon_domain(bluetoothd)
-+
-+# Data file accesses
-+allow bluetoothd bluetooth_data_file:dir w_dir_perms;
-+allow bluetoothd bluetooth_data_file:notdevfile_class_set create_file_perms;
-+
-+allow bluetoothd self:capability { setuid net_admin net_bind_service net_raw };
-+allow bluetoothd kernel:system module_request;
-+
-+# TODO: this may be romoved for userbuild where we don't use bluetoothd_wrapper
-+allow bluetoothd bluetoothd_main_exec:file { execute execute_no_trans read open };
-+
-+# IPC socket communication
-+allow bluetoothd self:socket { create_socket_perms accept listen setopt getopt };
-+
-+# Allow clients to use a socket provided by the bluetooth app.
-+allow bluetoothd { bluetooth mediaserver }:unix_stream_socket connectto;
-+
-+# Allow system app to use sockets and fds
-+allow bluetooth bluetoothd:fd use;
-+allow bluetooth bluetoothd:unix_stream_socket rw_socket_perms;
-+
-+# Allow user bluetooth apps to use sockets and fds
-+allow bluetoothdomain bluetoothd:fd use;
-+allow bluetoothdomain bluetoothd:unix_stream_socket { getopt setopt getattr read write ioctl shutdown };
-+
-+# Other domains that can create and use bluetooth sockets.
-+allow bluetoothdomain self:socket create_socket_perms;
-+
-+#This we might should put to mediaserver.te ?
-+allow mediaserver bluetoothd:fd use;
-+allow mediaserver bluetoothd:socket rw_socket_perms;
-+
-+# needs /system/bin/log access
-+allow bluetoothd devpts:chr_file rw_file_perms;
-+
-+# access to uhid device
-+allow bluetoothd uhid_device:chr_file rw_file_perms;
-+
-+# tethering
-+allow bluetoothd self:udp_socket create_socket_perms;
-+allow bluetoothd self:tcp_socket { create ioctl };
-diff --git a/android/bluetoothd_snoop.te b/android/bluetoothd_snoop.te
-new file mode 100644
-index 0000000..ef817b5
---- /dev/null
-+++ b/android/bluetoothd_snoop.te
-@@ -0,0 +1,17 @@
-+type bluetoothd_snoop, domain;
-+type bluetoothd_snoop_exec, exec_type, file_type;
-+
-+# Start bluetoothd_snoop from init
-+init_daemon_domain(bluetoothd_snoop)
-+
-+# directory search and read caps
-+allow bluetoothd_snoop self:capability dac_read_search;
-+# use raw and packet sockets caps
-+allow bluetoothd_snoop self:capability net_raw;
-+
-+# monitor socket access
-+allow bluetoothd_snoop self:socket { create bind setopt read };
-+
-+# sdcard access
-+allow bluetoothd_snoop fuse:dir w_dir_perms;
-+allow bluetoothd_snoop fuse:file create_file_perms;
 -- 
-1.9.3
-
+1.9.1
