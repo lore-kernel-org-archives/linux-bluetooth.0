@@ -1,71 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 8.1 \(1993\))
+Subject: Re: [PATCH] Bluetooth: Cancel the hci_request timeout if it received expected event
 From: Marcel Holtmann <marcel@holtmann.org>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Fix controller configuration with HCI_QUIRK_INVALID_BDADDR
-Date: Tue, 23 Dec 2014 23:10:48 +0100
-Message-Id: <1419372648-5111-1-git-send-email-marcel@holtmann.org>
+In-Reply-To: <D0BEFBBC.573B%tedd.an@intel.com>
+Date: Tue, 23 Dec 2014 12:37:33 -0800
+Cc: Johan Hedberg <johan.hedberg@intel.com>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Message-Id: <5116F06D-DD91-46A3-A64E-7E42A97EADF5@holtmann.org>
+References: <20141222190142.59176a26@tedd-test> <20141223185511.GA5686@t440s.P-661HNU-F1> <D0BEFBBC.573B%tedd.an@intel.com>
+To: "An, Tedd" <tedd.an@intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-When controllers set the HCI_QUIRK_INVALID_BDADDR flag, it is required
-by userspace to program a valid public Bluetooth device address into
-the controller before it can be used.
+Hi Tedd,
 
-After successful address configuration, the internal state changes and
-the controller runs the complete initialization procedure. However one
-small difference is that this is no longer the HCI_SETUP stage. The
-HCI_SETUP stage is only valid during initial controller setup. In this
-case the stack runs the initialization as part of the HCI_CONFIG stage.
+>>> This patch cancels the hci_request timeout work if the expected event
+>>> is recevied.
+>> 
+>> The timer you're canceling isn't hci_request specific, so I'm not sure
+>> why you're making that reference here? You might want to provide some
+>> more detailed explanation in the commit message.
+> 
+> When the command is sent with __hci_cmd_sync_ev() and expected event is
+> other than Command_Complete or
+> Command_Status, especially, vendor specific event (0xFF), the function
+> returns the skb filled with
+> event parameters properly, but there is tx timeout error because the
+> cmd_timer is not canceled.
 
-The controller version information, default name and supported commands
-are only stored during HCI_SETUP. While these information are static,
-they are not read initially when HCI_QUIRK_INVALID_BDADDR is set. So
-when running in HCI_CONFIG state, these information need to be updated
-as well.
+the cmd_timer is protecting the cmd_q and with that is doing exactly the right thing here. It is here for handling cmd_status and cmd_complete events and with that updating ncmd and HCI command flow control. So we can not just cancel the timer here.
 
-This especially impacts Bluetooth 4.1 and later controllers using
-extended feature pages and second event mask page.
+It seems that __hci_cmd_sync_ev is actually not used at all at the moment. However it works just fine when you get the interim cmd_status as done by all HCI commands. The problem is that you are not seeing the cmd_status and thus you have problems here. But we can not just ignore the missing cmd_status. If we do, then ncmd is out of date and HCI flow control is broken at that point.
 
-Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
-Cc: stable@vger.kernel.org # 3.17.x
----
- net/bluetooth/hci_event.c | 9 ++++++---
- 1 file changed, 6 insertions(+), 3 deletions(-)
+With that said, we can neither use __hci_cmd_sync nor __hci_cmd_sync_ev for Bluetooth controllers that do not obey the HCI command flow control. So sending commands via cmd_q is not an option here.
 
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index eed44c643c0c..7926fd1d13de 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -244,7 +244,8 @@ static void hci_cc_read_local_name(struct hci_dev *hdev, struct sk_buff *skb)
- 	if (rp->status)
- 		return;
- 
--	if (test_bit(HCI_SETUP, &hdev->dev_flags))
-+	if (test_bit(HCI_SETUP, &hdev->dev_flags) ||
-+	    test_bit(HCI_CONFIG, &hdev->dev_flags))
- 		memcpy(hdev->dev_name, rp->name, HCI_MAX_NAME_LENGTH);
- }
- 
-@@ -511,7 +512,8 @@ static void hci_cc_read_local_version(struct hci_dev *hdev, struct sk_buff *skb)
- 	if (rp->status)
- 		return;
- 
--	if (test_bit(HCI_SETUP, &hdev->dev_flags)) {
-+	if (test_bit(HCI_SETUP, &hdev->dev_flags) ||
-+	    test_bit(HCI_CONFIG, &hdev->dev_flags)) {
- 		hdev->hci_ver = rp->hci_ver;
- 		hdev->hci_rev = __le16_to_cpu(rp->hci_rev);
- 		hdev->lmp_ver = rp->lmp_ver;
-@@ -530,7 +532,8 @@ static void hci_cc_read_local_commands(struct hci_dev *hdev,
- 	if (rp->status)
- 		return;
- 
--	if (test_bit(HCI_SETUP, &hdev->dev_flags))
-+	if (test_bit(HCI_SETUP, &hdev->dev_flags) ||
-+	    test_bit(HCI_CONFIG, &hdev->dev_flags))
- 		memcpy(hdev->commands, rp->commands, sizeof(hdev->commands));
- }
- 
--- 
-2.1.0
+The only way I am thinking of being able to work around such behavior is by introducing separate functionality to handle it. So we might need __hci_cmd_raw_sync and __hci_cmd_raw_sync_ev that allows scheduling on raw_q and skipping cmd_complete and cmd_status processing. This however would mean that __hci_cmd_raw_sync can never return data from cmd_complete events (meaning it is actually not _sync in the sense of returning data, even while the name would suggest it).
+
+Regards
+
+Marcel
 
