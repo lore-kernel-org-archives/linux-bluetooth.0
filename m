@@ -1,67 +1,68 @@
 Return-Path: <cyrus@holtmann.org>
 From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [[RFC] 2/2] android/avrcp-ctrl: Add support for Send Pass Through command in daemon
-Date: Tue, 23 Dec 2014 15:48:06 +0100
-Message-Id: <1419346086-26687-3-git-send-email-grzegorz.kolodziejczyk@tieto.com>
-In-Reply-To: <1419346086-26687-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
-References: <1419346086-26687-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+Subject: [PATCH] android/client: Fix Send Pass Through command
+Date: Tue, 23 Dec 2014 15:29:23 +0100
+Message-Id: <1419344963-25331-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Parameter should be checked if it's given with (argc is lower than
+expected). Third parameter can be auto completed with cached bluetooth
+addresses.
 ---
- android/avrcp-ctrl.c | 28 +++++++++++++++++++++++++++-
- 1 file changed, 27 insertions(+), 1 deletion(-)
+ android/client/if-rc-ctrl.c | 16 +++++++++-------
+ 1 file changed, 9 insertions(+), 7 deletions(-)
 
-diff --git a/android/avrcp-ctrl.c b/android/avrcp-ctrl.c
-index 31a9d7f..1dd9d84 100644
---- a/android/avrcp-ctrl.c
-+++ b/android/avrcp-ctrl.c
-@@ -34,6 +34,7 @@
- 
- #include "avctp.h"
- #include "avrcp-common.h"
-+#include "avrcp-lib.h"
- #include "avrcp-ctrl.h"
- #include "bluetooth.h"
- 
-@@ -42,10 +43,35 @@ static struct ipc *hal_ipc = NULL;
- 
- static void handle_send_passthrough(const void *buf, uint16_t len)
- {
-+	const struct hal_cmd_avrcp_ctrl_send_passthrough *cmd = buf;
-+	struct avrcp_device *dev;
-+	uint8_t status;
-+	bdaddr_t *addr;
-+
- 	DBG("");
- 
-+	dev = get_avrcp_device(strtoba((char *)cmd->bdaddr));
-+	if (!dev) {
-+		error("RC device not connected");
-+		status = HAL_STATUS_NOT_READY;
-+		goto done;
-+	}
-+
-+	/* TODO check if ctrl is supported - since we check if service is
-+	 * registered before accesing it from hal? */
-+
-+	if (avrcp_send_passthrough(dev->session, cmd->key_state,
-+						cmd->key_code) < 0) {
-+		error("RC cannot send passthrough");
-+		status = HAL_STATUS_FAILED;
-+		goto done;
-+	}
-+
-+	status = HAL_STATUS_SUCCESS;
-+
-+done:
- 	ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_AVRCP_CTRL,
--			HAL_OP_AVRCP_CTRL_SEND_PASSTHROUGH, HAL_STATUS_FAILED);
-+				HAL_OP_AVRCP_CTRL_SEND_PASSTHROUGH, status);
+diff --git a/android/client/if-rc-ctrl.c b/android/client/if-rc-ctrl.c
+index 52573a0..3980764 100644
+--- a/android/client/if-rc-ctrl.c
++++ b/android/client/if-rc-ctrl.c
+@@ -67,10 +67,13 @@ static void cleanup_p(int argc, const char **argv)
  }
  
- static const struct ipc_handler cmd_handlers[] = {
+ /* send_pass_through_cmd */
+-
+ static void send_pass_through_cmd_c(int argc, const char **argv,
+ 					enum_func *enum_func, void **user)
+ {
++	if (argc == 3) {
++		*user = NULL;
++		*enum_func = enum_devices;
++	}
+ }
+ 
+ static void send_pass_through_cmd_p(int argc, const char **argv)
+@@ -81,15 +84,15 @@ static void send_pass_through_cmd_p(int argc, const char **argv)
+ 	RETURN_IF_NULL(if_rc);
+ 	VERIFY_ADDR_ARG(2, &addr);
+ 
+-	if (argc <= 4) {
+-		haltest_error("No key code specified");
++	if (argc < 4) {
++		haltest_error("No key code specified\n");
+ 		return;
+ 	}
+ 
+ 	key_code = (uint8_t) atoi(argv[3]);
+ 
+-	if (argc <= 5) {
+-		haltest_error("No key state specified");
++	if (argc < 5) {
++		haltest_error("No key state specified\n");
+ 		return;
+ 	}
+ 
+@@ -100,8 +103,7 @@ static void send_pass_through_cmd_p(int argc, const char **argv)
+ 
+ static struct method methods[] = {
+ 	STD_METHOD(init),
+-	STD_METHODCH(send_pass_through_cmd,
+-					"<bd_addr> <key_code> <key_state>"),
++	STD_METHODCH(send_pass_through_cmd, "<bd_addr> <key_code> <key_state>"),
+ 	STD_METHOD(cleanup),
+ 	END_METHOD
+ };
 -- 
 1.9.3
 
