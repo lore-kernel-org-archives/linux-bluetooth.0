@@ -1,42 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Wed, 24 Dec 2014 20:37:37 +0200
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Fix accepting connections when not using mgmt
-Date: Wed, 24 Dec 2014 20:38:19 +0200
-Message-Id: <1419446299-21530-1-git-send-email-johan.hedberg@gmail.com>
+To: Pali =?iso-8859-1?Q?Roh=E1r?= <pali.rohar@gmail.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+	Gustavo Padovan <gustavo@padovan.org>,
+	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: 3.19-rc1 refuse connection from bluetooth headset
+Message-ID: <20141224183737.GA21428@t440s.P-661HNU-DI-F1>
+References: <201412241815.12922@pali>
+ <20141224173652.GA16667@t440s.P-661HNU-DI-F1>
+ <201412241932.27264@pali>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <201412241932.27264@pali>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@intel.com>
+Hi Pali,
 
-When connectable mode is enabled (page scan on) through some non-mgmt
-method the HCI_CONNECTABLE flag will not be set. For backwards
-compatibility with user space versions not using mgmt we should not
-require HCI_CONNECTABLE to be set if HCI_MGMT is not set.
+On Wed, Dec 24, 2014, Pali Roh·r wrote:
+> > Could you try the attached patch? I think the reason might be
+> > the dependence on the HCI_CONNECTABLE flag that's only set if
+> > the page scan was enabled through mgmt (which wouldn't be the
+> > case with BlueZ 4.98).
+> > 
+> > Johan
+> 
+> Hi Johan! Thanks for quick reply. Your patch fixes my problem and 
+> auto-connection of my bluetooth headset is working again. Will 
+> you forward patch to mainline kernel?
 
-Reported-and-tested-by: Pali Roh√°r <pali.rohar@gmail.com>
-Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
-Cc: stable@vger.kernel.org # 3.17+
----
- net/bluetooth/hci_event.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+Yes, we'll tag it from 3.17.x onwards where this was introduced.
 
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index c03d4b09caa3..898dfd7ceeee 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -2197,7 +2197,8 @@ static void hci_conn_request_evt(struct hci_dev *hdev, struct sk_buff *skb)
- 		return;
- 	}
- 
--	if (!test_bit(HCI_CONNECTABLE, &hdev->dev_flags) &&
-+	if (test_bit(HCI_MGMT, &hdev->dev_flags) &&
-+	    !test_bit(HCI_CONNECTABLE, &hdev->dev_flags) &&
- 	    !hci_bdaddr_list_lookup(&hdev->whitelist, &ev->bdaddr,
- 				    BDADDR_BREDR)) {
- 		    hci_reject_conn(hdev, &ev->bdaddr);
--- 
-2.1.0
-
+Johan
