@@ -1,45 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
+Content-Type: text/plain; charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 8.1 \(1993\))
+Subject: Re: [PATCH v2] Bluetooth: Fix accepting connections when not using mgmt
 From: Marcel Holtmann <marcel@holtmann.org>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/4] Bluetooth: Introduce HCI_QUIRK_BROKEN_LOCAL_COMMANDS constant
-Date: Fri, 26 Dec 2014 04:42:31 +0100
-Message-Id: <1419565354-49553-1-git-send-email-marcel@holtmann.org>
+In-Reply-To: <1419446591-22129-1-git-send-email-johan.hedberg@gmail.com>
+Date: Wed, 24 Dec 2014 11:03:34 -0800
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <DBDEB65A-C9BB-4C8F-B09A-EAF0B6417C25@holtmann.org>
+References: <1419446591-22129-1-git-send-email-johan.hedberg@gmail.com>
+To: Johan Hedberg <johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Some controllers advertise support for Bluetooth 1.2 specification,
-but they do not support the HCI Read Local Supported Commands command.
+Hi Johan,
 
-If that is the case, then the driver can quirk the behavior and force
-the core to skip this command. This will allow removing vendor specific
-checks out of the core.
+> When connectable mode is enabled (page scan on) through some non-mgmt
+> method the HCI_CONNECTABLE flag will not be set. For backwards
+> compatibility with user space versions not using mgmt we should not
+> require HCI_CONNECTABLE to be set if HCI_MGMT is not set.
+> 
+> Reported-and-tested-by: Pali Rohár <pali.rohar@gmail.com>
+> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+> Cc: stable@vger.kernel.org # 3.17+
+> ---
+> v2: Add clarifying code comment
+> 
+> net/bluetooth/hci_event.c | 7 ++++++-
+> 1 file changed, 6 insertions(+), 1 deletion(-)
 
-Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
----
- include/net/bluetooth/hci.h | 10 ++++++++++
- 1 file changed, 10 insertions(+)
+patch has been applied bluetooth tree.
 
-diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index f39926ee06f7..1849a437f6e1 100644
---- a/include/net/bluetooth/hci.h
-+++ b/include/net/bluetooth/hci.h
-@@ -102,6 +102,16 @@ enum {
- 	 */
- 	HCI_QUIRK_FIXUP_BUFFER_SIZE,
- 
-+	/* When this quirk is set, then the HCI Read Local Supported
-+	 * Commands command is not supported. In general Bluetooth 1.2
-+	 * and later controllers should support this command. However
-+	 * some controllers indicate Bluetooth 1.2 support, but do
-+	 * not support this command.
-+	 *
-+	 * This quirk must be set before hci_register_dev is called.
-+	 */
-+	HCI_QUIRK_BROKEN_LOCAL_COMMANDS,
-+
- 	/* When this quirk is set, then no stored link key handling
- 	 * is performed. This is mainly due to the fact that the
- 	 * HCI Delete Stored Link Key command is advertised, but
--- 
-2.1.0
+Regards
+
+Marcel
 
