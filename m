@@ -1,31 +1,29 @@
 Return-Path: <cyrus@holtmann.org>
-From: Mariusz Skamra <mariusz.skamra@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Mariusz Skamra <mariusz.skamra@tieto.com>
-Subject: [PATCH 1/2] tools: Fix comparison between signed and unsigned integer
-Date: Sat, 27 Dec 2014 00:31:23 +0100
-Message-Id: <1419636684-7158-1-git-send-email-mariusz.skamra@tieto.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Fri, 26 Dec 2014 18:24:30 -0500 (EST)
+Message-Id: <20141226.182430.414166965645130117.davem@davemloft.net>
+To: johan.hedberg@gmail.com
+Cc: netdev@vger.kernel.org, linux-bluetooth@vger.kernel.org
+Subject: Re: pull request: bluetooth 2014-12-26
+From: David Miller <davem@davemloft.net>
+In-Reply-To: <20141226181539.GA27027@t440s.P-661HNU-F1>
+References: <20141226181539.GA27027@t440s.P-661HNU-F1>
+Mime-Version: 1.0
+Content-Type: Text/Plain; charset=us-ascii
+Sender: netdev-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-len is non-negative here, so we can safely cast it to size_t.
----
- tools/bluemoon.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+From: Johan Hedberg <johan.hedberg@gmail.com>
+Date: Fri, 26 Dec 2014 20:15:39 +0200
 
-diff --git a/tools/bluemoon.c b/tools/bluemoon.c
-index c785472..0f32d63 100644
---- a/tools/bluemoon.c
-+++ b/tools/bluemoon.c
-@@ -767,7 +767,7 @@ static void analyze_firmware(const char *path)
- 	printf("\n");
- 
- 
--	if (len != le32_to_cpu(css->size) * 4) {
-+	if ((size_t) len != le32_to_cpu(css->size) * 4) {
- 		fprintf(stderr, "CSS.size does not match file length\n");
- 		goto done;
- 	}
--- 
-1.9.1
+> Here's one more bluetooth pull request for 3.19. We've got two fixes:
+> 
+>  - Fix for accepting connections with old user space versions of BlueZ
+>  - Fix for Bluetooth controllers that don't have a public address
+> 
+> Both of these are regressions that were introduced in 3.17, so the
+> appropriate Cc: stable annotations are provided.
+> 
+> Please let me know if there are any issues pulling. Thanks.
 
+
+Pulled, thanks Johan.
