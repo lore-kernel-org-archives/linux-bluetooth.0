@@ -1,29 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 26 Dec 2014 18:24:30 -0500 (EST)
-Message-Id: <20141226.182430.414166965645130117.davem@davemloft.net>
-To: johan.hedberg@gmail.com
-Cc: netdev@vger.kernel.org, linux-bluetooth@vger.kernel.org
-Subject: Re: pull request: bluetooth 2014-12-26
-From: David Miller <davem@davemloft.net>
-In-Reply-To: <20141226181539.GA27027@t440s.P-661HNU-F1>
-References: <20141226181539.GA27027@t440s.P-661HNU-F1>
-Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
-Sender: netdev-owner@vger.kernel.org
+Date: Fri, 26 Dec 2014 20:35:31 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 1/4] Bluetooth: Introduce HCI_QUIRK_BROKEN_LOCAL_COMMANDS
+ constant
+Message-ID: <20141226183531.GA30720@t440s.P-661HNU-F1>
+References: <1419565354-49553-1-git-send-email-marcel@holtmann.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1419565354-49553-1-git-send-email-marcel@holtmann.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@gmail.com>
-Date: Fri, 26 Dec 2014 20:15:39 +0200
+Hi Marcel,
 
-> Here's one more bluetooth pull request for 3.19. We've got two fixes:
+On Fri, Dec 26, 2014, Marcel Holtmann wrote:
+> Some controllers advertise support for Bluetooth 1.2 specification,
+> but they do not support the HCI Read Local Supported Commands command.
 > 
->  - Fix for accepting connections with old user space versions of BlueZ
->  - Fix for Bluetooth controllers that don't have a public address
+> If that is the case, then the driver can quirk the behavior and force
+> the core to skip this command. This will allow removing vendor specific
+> checks out of the core.
 > 
-> Both of these are regressions that were introduced in 3.17, so the
-> appropriate Cc: stable annotations are provided.
-> 
-> Please let me know if there are any issues pulling. Thanks.
+> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+> ---
+>  include/net/bluetooth/hci.h | 10 ++++++++++
+>  1 file changed, 10 insertions(+)
 
+All four patches in this set have been applied to bluetooth-next.
+Thanks.
 
-Pulled, thanks Johan.
+Johan
