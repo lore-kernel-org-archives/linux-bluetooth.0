@@ -1,33 +1,78 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 26 Dec 2014 20:35:31 +0200
+Date: Fri, 26 Dec 2014 20:15:39 +0200
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/4] Bluetooth: Introduce HCI_QUIRK_BROKEN_LOCAL_COMMANDS
- constant
-Message-ID: <20141226183531.GA30720@t440s.P-661HNU-F1>
-References: <1419565354-49553-1-git-send-email-marcel@holtmann.org>
+To: davem@davemloft.net
+Cc: netdev@vger.kernel.org, linux-bluetooth@vger.kernel.org
+Subject: pull request: bluetooth 2014-12-26
+Message-ID: <20141226181539.GA27027@t440s.P-661HNU-F1>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1419565354-49553-1-git-send-email-marcel@holtmann.org>
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="2fHTh5uZTiUOsy+g"
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
 
-On Fri, Dec 26, 2014, Marcel Holtmann wrote:
-> Some controllers advertise support for Bluetooth 1.2 specification,
-> but they do not support the HCI Read Local Supported Commands command.
-> 
-> If that is the case, then the driver can quirk the behavior and force
-> the core to skip this command. This will allow removing vendor specific
-> checks out of the core.
-> 
-> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
-> ---
->  include/net/bluetooth/hci.h | 10 ++++++++++
->  1 file changed, 10 insertions(+)
+--2fHTh5uZTiUOsy+g
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-All four patches in this set have been applied to bluetooth-next.
-Thanks.
+Hi Dave,
+
+Here's one more bluetooth pull request for 3.19. We've got two fixes:
+
+ - Fix for accepting connections with old user space versions of BlueZ
+ - Fix for Bluetooth controllers that don't have a public address
+
+Both of these are regressions that were introduced in 3.17, so the
+appropriate Cc: stable annotations are provided.
+
+Please let me know if there are any issues pulling. Thanks.
 
 Johan
+
+---
+The following changes since commit 71bb99a02b32b4cc4265118e85f6035ca72923f0:
+
+  Bluetooth: bnep: bnep_add_connection() should verify that it's dealing with l2cap socket (2014-12-19 13:48:27 +0100)
+
+are available in the git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git for-upstream
+
+for you to fetch changes up to 6a8fc95c87110a466ee81675b41170b963f82bdb:
+
+  Bluetooth: Fix accepting connections when not using mgmt (2014-12-24 20:02:00 +0100)
+
+----------------------------------------------------------------
+Johan Hedberg (1):
+      Bluetooth: Fix accepting connections when not using mgmt
+
+Marcel Holtmann (1):
+      Bluetooth: Fix controller configuration with HCI_QUIRK_INVALID_BDADDR
+
+ net/bluetooth/hci_event.c | 16 ++++++++++++----
+ 1 file changed, 12 insertions(+), 4 deletions(-)
+
+
+--2fHTh5uZTiUOsy+g
+Content-Type: application/pgp-signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQIcBAEBAgAGBQJUnaXLAAoJECQj9vv5qNQS2nwP/jhh2/zhKwyKgrUfpihyvBmG
+5X/aET9N5BA7WXZR3JdqlNobb0fUWYSN5Jl6UpaYO5BSReeGMCHm76qMkou17lkB
+uUTA9ouRcI4KNA4seL0ZOwvhdJfIC2EUnQeDq7EkWeSqT+Jlz/T+0pdP6ZWEtxZX
+Vyt+rvdvMKgaTagMyWea0wcOebVBFTAwTPaD84Q/zFSU2oK4zz6QUyfqX1v50WLb
+jH5B8Aau6YX7llZzrHLVMCltCoD9hcC9/Iox77qywwveSu8p3y4rNXDnOzLdAH8o
+fdObOsuMsLdesMJpQucm606zBrXsycFmNsLP01yMHp+ZSZGLTPSu+kEDuq2MwYGP
+8UOvvhg1nidAFa2Qgt6VV6NcvsSer4MhBAIlBCar8WewobZccQ2Tc772JD8z3kzE
+rYgiUWjh2wmXJK0qYeLmkp9lMOoIV25JvMfQQ10S2GUEVOx5+HCw2/NwGMec/Ug3
+JekGJKXZE1RhELPgehOUWoq8sn+88NTiNN75UZq1KeWBcr5YlnZ3erkTkybkg9kW
+OK3+1TnIRopCglrvHj2cxXdu8hHgej53TjjfnPTG/dIAcL/37RyjpgwshOZiOtlG
+UQ/wLx9DHIBq90MsOU0aCNzWS/IXgYc5Yfp6V+LEFxgmrz3OdKkUV4xqvApOxJzc
+44D4JYAvE6JrxzIsMVuf
+=6iKU
+-----END PGP SIGNATURE-----
+
+--2fHTh5uZTiUOsy+g--
