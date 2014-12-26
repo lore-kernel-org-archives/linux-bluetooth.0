@@ -1,52 +1,47 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 3/4] Bluetooth: btusb: Set the HCI_QUIRK_BROKEN_LOCAL_COMMANDS quirk
-Date: Fri, 26 Dec 2014 04:42:33 +0100
-Message-Id: <1419565354-49553-3-git-send-email-marcel@holtmann.org>
+Subject: [PATCH 4/4] Bluetooth: Remove BlueFritz! specific check from initialization
+Date: Fri, 26 Dec 2014 04:42:34 +0100
+Message-Id: <1419565354-49553-4-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The AVM BlueFritz! 2.0 USB dongles do not support the HCI command for
-reading the local supported commands. So set this quirk to let the
-core know about it.
+The AVM BlueFritz! USB controllers had a special handling in the
+Bluetooth core when it comes to reading the supported commands.
+
+Both drivers now set the HCI_QUIRK_BROKEN_LOCAL_COMMANDS and with
+that it is no longer needed to look for vendor specific details.
 
 Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- drivers/bluetooth/btusb.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+ net/bluetooth/hci_core.c | 12 +++++++++---
+ 1 file changed, 9 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index c926835aec37..f051a93c6cad 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -49,6 +49,7 @@ static struct usb_driver btusb_driver;
- #define BTUSB_INTEL_BOOT	0x200
- #define BTUSB_BCM_PATCHRAM	0x400
- #define BTUSB_MARVELL		0x800
-+#define BTUSB_AVM		0x1000
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index 47f0311d1006..5ef5221c1813 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -623,10 +623,16 @@ static void hci_init2_req(struct hci_request *req, unsigned long opt)
+ 	if (lmp_le_capable(hdev))
+ 		le_setup(req);
  
- static const struct usb_device_id btusb_table[] = {
- 	/* Generic Bluetooth USB device */
-@@ -85,7 +86,7 @@ static const struct usb_device_id btusb_table[] = {
- 	{ USB_DEVICE(0x05ac, 0x8281) },
+-	/* AVM Berlin (31), aka "BlueFRITZ!", doesn't support the read
+-	 * local supported commands HCI command.
++	/* All Bluetooth 1.2 and later controllers should support the
++	 * HCI command for reading the local supported commands.
++	 *
++	 * Unfortunately some controllers indicate Bluetooth 1.2 support,
++	 * but do not have support for this command. If that is the case,
++	 * the driver can quirk the behavior and skip reading the local
++	 * supported commands.
+ 	 */
+-	if (hdev->manufacturer != 31 && hdev->hci_ver > BLUETOOTH_VER_1_1)
++	if (hdev->hci_ver > BLUETOOTH_VER_1_1 &&
++	    !test_bit(HCI_QUIRK_BROKEN_LOCAL_COMMANDS, &hdev->quirks))
+ 		hci_req_add(req, HCI_OP_READ_LOCAL_COMMANDS, 0, NULL);
  
- 	/* AVM BlueFRITZ! USB v2.0 */
--	{ USB_DEVICE(0x057c, 0x3800) },
-+	{ USB_DEVICE(0x057c, 0x3800), .driver_info = BTUSB_AVM },
- 
- 	/* Bluetooth Ultraport Module from IBM */
- 	{ USB_DEVICE(0x04bf, 0x030a) },
-@@ -2080,6 +2081,9 @@ static int btusb_probe(struct usb_interface *intf,
- 	if (id->driver_info & BTUSB_MARVELL)
- 		hdev->set_bdaddr = btusb_set_bdaddr_marvell;
- 
-+	if (id->driver_info & BTUSB_AVM)
-+		set_bit(HCI_QUIRK_BROKEN_LOCAL_COMMANDS, &hdev->quirks);
-+
- 	if (id->driver_info & BTUSB_INTEL_BOOT)
- 		set_bit(HCI_QUIRK_RAW_DEVICE, &hdev->quirks);
- 
+ 	if (lmp_ssp_capable(hdev)) {
 -- 
 2.1.0
 
