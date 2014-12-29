@@ -1,44 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
+From: Thomas Petazzoni <thomas.petazzoni@free-electrons.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [RFC] build: Enable -Wformat -Wformat-security in maintainer mode
-Date: Mon, 29 Dec 2014 13:49:22 +0100
-Message-Id: <1419857362-23502-1-git-send-email-szymon.janc@tieto.com>
+Cc: Thomas Petazzoni <thomas.petazzoni@free-electrons.com>
+Subject: [PATCH bluez-utils] Link mcaptest with -lrt
+Date: Mon, 29 Dec 2014 13:38:39 +0100
+Message-Id: <1419856719-30526-1-git-send-email-thomas.petazzoni@free-electrons.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-__attribute__((format(printf))) doesn't seem to catch missing format
-string in function call ie.
+The mcaptest tool uses the profiles/health/mcap.c source file, which
+calls clock_getres(). This function is defined in librt, so mcaptest
+should be linked against librt, otherwise one gets link failures such
+as:
 
-char *p = "foo";
+ld: profiles/health/mcap.o: undefined reference to symbol 'clock_getres@@GLIBC_2.2.5'
+ld: note: 'clock_getres@@GLIBC_2.2.5' is defined in DSO [...]/sysroot/lib64/librt.so.1 so try adding it to the linker command line
+[...]/sysroot/lib64/librt.so.1: could not read symbols: Invalid operation
+collect2: error: ld returned 1 exit status
+Makefile:4184: recipe for target 'tools/mcaptest' failed
 
-printf(p);
-vs
-printf("%s", p);
-
-Enabling -Wformat -Wformat-security warns in such case.
+Signed-off-by: Thomas Petazzoni <thomas.petazzoni@free-electrons.com>
 ---
+ Makefile.tools | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-This should allow to early catch bugs like those fixed in
-patch "Add missing format specifiers in src/error.c" sent by
-Mariusz.
-
- acinclude.m4 | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/acinclude.m4 b/acinclude.m4
-index 960d54c..bc39c6d 100644
---- a/acinclude.m4
-+++ b/acinclude.m4
-@@ -21,6 +21,7 @@ AC_DEFUN([COMPILER_FLAGS], [
- 		with_cflags="$with_cflags -Wredundant-decls"
- 		with_cflags="$with_cflags -Wcast-align"
- 		with_cflags="$with_cflags -Wswitch-enum"
-+		with_cflags="$with_cflags -Wformat -Wformat-security"
- 		with_cflags="$with_cflags -DG_DISABLE_DEPRECATED"
- 		with_cflags="$with_cflags -DGLIB_VERSION_MIN_REQUIRED=GLIB_VERSION_2_28"
- 		with_cflags="$with_cflags -DGLIB_VERSION_MAX_ALLOWED=GLIB_VERSION_2_28"
+diff --git a/Makefile.tools b/Makefile.tools
+index bc827fe..178b773 100644
+--- a/Makefile.tools
++++ b/Makefile.tools
+@@ -195,7 +195,7 @@ tools_mcaptest_SOURCES = tools/mcaptest.c \
+ 				btio/btio.h btio/btio.c \
+ 				src/log.c src/log.h \
+ 				profiles/health/mcap.h profiles/health/mcap.c
+-tools_mcaptest_LDADD = lib/libbluetooth-internal.la @GLIB_LIBS@
++tools_mcaptest_LDADD = lib/libbluetooth-internal.la @GLIB_LIBS@ -lrt
+ 
+ dist_man_MANS += tools/hciattach.1 tools/hciconfig.1 \
+ 			tools/hcitool.1 tools/hcidump.1 \
 -- 
-1.9.3
+2.1.0
 
