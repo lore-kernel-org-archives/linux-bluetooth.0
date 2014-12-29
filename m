@@ -1,41 +1,64 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 29 Dec 2014 23:22:19 +0100
-From: Thomas Petazzoni <thomas.petazzoni@free-electrons.com>
+From: Szymon Janc <szymon.janc@tieto.com>
 To: Marcel Holtmann <marcel@holtmann.org>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH bluez-utils] Link mcaptest with -lrt
-Message-ID: <20141229232219.622fd4d8@free-electrons.com>
-In-Reply-To: <B9CBBBC9-712D-4E23-8023-84DBE3BDE635@holtmann.org>
-References: <1419856719-30526-1-git-send-email-thomas.petazzoni@free-electrons.com>
-	<B9CBBBC9-712D-4E23-8023-84DBE3BDE635@holtmann.org>
+Subject: Re: [RFC] build: Enable -Wformat -Wformat-security in maintainer mode
+Date: Mon, 29 Dec 2014 19:11:03 +0100
+Message-ID: <1739197.NJi8TVCMF6@leonov>
+In-Reply-To: <DB100955-4134-4A34-A293-21B10D1B494C@holtmann.org>
+References: <1419857362-23502-1-git-send-email-szymon.janc@tieto.com> <DB100955-4134-4A34-A293-21B10D1B494C@holtmann.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset="us-ascii"
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Dear Marcel Holtmann,
+Hi Marcel,
 
-On Mon, 29 Dec 2014 09:40:04 -0800, Marcel Holtmann wrote:
-> Hi Thomas,
+On Monday 29 of December 2014 09:42:46 Marcel Holtmann wrote:
+> Hi Szymon,
 > 
-> > The mcaptest tool uses the profiles/health/mcap.c source file, which
-> > calls clock_getres(). This function is defined in librt, so mcaptest
-> > should be linked against librt, otherwise one gets link failures such
-> > as:
+> > __attribute__((format(printf))) doesn't seem to catch missing format
+> > string in function call ie.
 > > 
-> > ld: profiles/health/mcap.o: undefined reference to symbol 'clock_getres@@GLIBC_2.2.5'
-> > ld: note: 'clock_getres@@GLIBC_2.2.5' is defined in DSO [...]/sysroot/lib64/librt.so.1 so try adding it to the linker command line
-> > [...]/sysroot/lib64/librt.so.1: could not read symbols: Invalid operation
-> > collect2: error: ld returned 1 exit status
-> > Makefile:4184: recipe for target 'tools/mcaptest' failed
+> > char *p = "foo";
+> > 
+> > printf(p);
+> > vs
+> > printf("%s", p);
+> > 
+> > Enabling -Wformat -Wformat-security warns in such case.
+> > ---
+> > 
+> > This should allow to early catch bugs like those fixed in
+> > patch "Add missing format specifiers in src/error.c" sent by
+> > Mariusz.
+> > 
+> > acinclude.m4 | 1 +
+> > 1 file changed, 1 insertion(+)
+> > 
+> > diff --git a/acinclude.m4 b/acinclude.m4
+> > index 960d54c..bc39c6d 100644
+> > --- a/acinclude.m4
+> > +++ b/acinclude.m4
+> > @@ -21,6 +21,7 @@ AC_DEFUN([COMPILER_FLAGS], [
+> > 
+> > 		with_cflags="$with_cflags -Wredundant-decls"
+> > 		with_cflags="$with_cflags -Wcast-align"
+> > 		with_cflags="$with_cflags -Wswitch-enum"
+> > 
+> > +		with_cflags="$with_cflags -Wformat -Wformat-security"
+> > 
+> > 		with_cflags="$with_cflags -DG_DISABLE_DEPRECATED"
+> > 		with_cflags="$with_cflags -
+DGLIB_VERSION_MIN_REQUIRED=GLIB_VERSION_2_28"
+> > 		with_cflags="$with_cflags -
+DGLIB_VERSION_MAX_ALLOWED=GLIB_VERSION_2_28"
 > 
-> the manpage clearly states to only link against -lrt when using glibc
-> versions before 2.17. If we want to support older glibc, then this
-> might need to be conditional via a configure test.
+> no objections from my side. However I had gcc versions where this one was
+> enabled by default.
 
-Ah, yes, indeed. v2 of the patch follows. Thanks for the review!
+It looks like Ubuntu 13.04 and newer enable format-security by default.
+Maybe some other distros do the same, yet at least F20 doesn't.
 
-Thomas
 -- 
-Thomas Petazzoni, CTO, Free Electrons
-Embedded Linux, Kernel and Android engineering
-http://free-electrons.com
+BR
+Szymon Janc
