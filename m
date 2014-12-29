@@ -1,60 +1,41 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Mon, 29 Dec 2014 23:22:19 +0100
 From: Thomas Petazzoni <thomas.petazzoni@free-electrons.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Marcel Holtmann <marcel@holtmann.org>,
-	Thomas Petazzoni <thomas.petazzoni@free-electrons.com>
-Subject: [PATCHv2] Link mcaptest with -lrt when needed
-Date: Mon, 29 Dec 2014 23:22:54 +0100
-Message-Id: <1419891774-21158-1-git-send-email-thomas.petazzoni@free-electrons.com>
-In-Reply-To: <20141229232219.622fd4d8@free-electrons.com>
-References: <20141229232219.622fd4d8@free-electrons.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH bluez-utils] Link mcaptest with -lrt
+Message-ID: <20141229232219.622fd4d8@free-electrons.com>
+In-Reply-To: <B9CBBBC9-712D-4E23-8023-84DBE3BDE635@holtmann.org>
+References: <1419856719-30526-1-git-send-email-thomas.petazzoni@free-electrons.com>
+	<B9CBBBC9-712D-4E23-8023-84DBE3BDE635@holtmann.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The mcaptest tool uses the profiles/health/mcap.c source file, which
-calls clock_getres(). This function is defined in librt in some C
-libraries, so mcaptest should be linked against librt when needed,
-otherwise one gets link failures such as:
+Dear Marcel Holtmann,
 
-ld: profiles/health/mcap.o: undefined reference to symbol 'clock_getres@@GLIBC_2.2.5'
-ld: note: 'clock_getres@@GLIBC_2.2.5' is defined in DSO [...]/sysroot/lib64/librt.so.1 so try adding it to the linker command line
-[...]/sysroot/lib64/librt.so.1: could not read symbols: Invalid operation
-collect2: error: ld returned 1 exit status
-Makefile:4184: recipe for target 'tools/mcaptest' failed
+On Mon, 29 Dec 2014 09:40:04 -0800, Marcel Holtmann wrote:
+> Hi Thomas,
+> 
+> > The mcaptest tool uses the profiles/health/mcap.c source file, which
+> > calls clock_getres(). This function is defined in librt, so mcaptest
+> > should be linked against librt, otherwise one gets link failures such
+> > as:
+> > 
+> > ld: profiles/health/mcap.o: undefined reference to symbol 'clock_getres@@GLIBC_2.2.5'
+> > ld: note: 'clock_getres@@GLIBC_2.2.5' is defined in DSO [...]/sysroot/lib64/librt.so.1 so try adding it to the linker command line
+> > [...]/sysroot/lib64/librt.so.1: could not read symbols: Invalid operation
+> > collect2: error: ld returned 1 exit status
+> > Makefile:4184: recipe for target 'tools/mcaptest' failed
+> 
+> the manpage clearly states to only link against -lrt when using glibc
+> versions before 2.17. If we want to support older glibc, then this
+> might need to be conditional via a configure test.
 
-Signed-off-by: Thomas Petazzoni <thomas.petazzoni@free-electrons.com>
----
- Makefile.tools | 2 +-
- configure.ac   | 5 +++++
- 2 files changed, 6 insertions(+), 1 deletion(-)
+Ah, yes, indeed. v2 of the patch follows. Thanks for the review!
 
-diff --git a/Makefile.tools b/Makefile.tools
-index bc827fe..fef3db5 100644
---- a/Makefile.tools
-+++ b/Makefile.tools
-@@ -195,7 +195,7 @@ tools_mcaptest_SOURCES = tools/mcaptest.c \
- 				btio/btio.h btio/btio.c \
- 				src/log.c src/log.h \
- 				profiles/health/mcap.h profiles/health/mcap.c
--tools_mcaptest_LDADD = lib/libbluetooth-internal.la @GLIB_LIBS@
-+tools_mcaptest_LDADD = lib/libbluetooth-internal.la @GLIB_LIBS@ @RT_LIBS@
- 
- dist_man_MANS += tools/hciattach.1 tools/hciconfig.1 \
- 			tools/hcitool.1 tools/hcidump.1 \
-diff --git a/configure.ac b/configure.ac
-index 4739c10..b0afba6 100644
---- a/configure.ac
-+++ b/configure.ac
-@@ -54,6 +54,11 @@ AC_CHECK_LIB(pthread, pthread_create, dummy=yes,
- AC_CHECK_LIB(dl, dlopen, dummy=yes,
- 			AC_MSG_ERROR(dynamic linking loader is required))
- 
-+AC_SEARCH_LIBS([clock_getres], [rt],
-+			[test "$ac_cv_search_clock_getres" = "none required" ||
-+			RT_LIBS=$ac_cv_search_clock_getres])
-+AC_SUBST([RT_LIBS])
-+
- PKG_CHECK_MODULES(GLIB, glib-2.0 >= 2.28, dummy=yes,
- 				AC_MSG_ERROR(GLib >= 2.28 is required))
- AC_SUBST(GLIB_CFLAGS)
+Thomas
 -- 
-2.1.0
+Thomas Petazzoni, CTO, Free Electrons
+Embedded Linux, Kernel and Android engineering
+http://free-electrons.com
