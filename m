@@ -1,10 +1,11 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1419636684-7158-1-git-send-email-mariusz.skamra@tieto.com>
+In-Reply-To: <1419636684-7158-2-git-send-email-mariusz.skamra@tieto.com>
 References: <1419636684-7158-1-git-send-email-mariusz.skamra@tieto.com>
-Date: Mon, 29 Dec 2014 15:49:57 -0200
-Message-ID: <CABBYNZKL7oM_7un+-x1ZYHYaMkPDx5+JS3h=csoCL_zeF+sgHw@mail.gmail.com>
-Subject: Re: [PATCH 1/2] tools: Fix comparison between signed and unsigned integer
+	<1419636684-7158-2-git-send-email-mariusz.skamra@tieto.com>
+Date: Mon, 29 Dec 2014 15:49:19 -0200
+Message-ID: <CABBYNZLywKAkXEaWbFBQiKBeCBfWhegEdhbpp7z7dVYTiOcK4w@mail.gmail.com>
+Subject: Re: [PATCH 2/2] Add missing format specifiers in src/error.c
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: Mariusz Skamra <mariusz.skamra@tieto.com>
 Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
@@ -16,28 +17,37 @@ Hi Mariusz,
 
 On Fri, Dec 26, 2014 at 9:31 PM, Mariusz Skamra
 <mariusz.skamra@tieto.com> wrote:
-> len is non-negative here, so we can safely cast it to size_t.
 > ---
->  tools/bluemoon.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  src/error.c | 5 +++--
+>  1 file changed, 3 insertions(+), 2 deletions(-)
 >
-> diff --git a/tools/bluemoon.c b/tools/bluemoon.c
-> index c785472..0f32d63 100644
-> --- a/tools/bluemoon.c
-> +++ b/tools/bluemoon.c
-> @@ -767,7 +767,7 @@ static void analyze_firmware(const char *path)
->         printf("\n");
+> diff --git a/src/error.c b/src/error.c
+> index a80c1ab..ae227b6 100644
+> --- a/src/error.c
+> +++ b/src/error.c
+> @@ -40,7 +40,7 @@ DBusMessage *btd_error_invalid_args(DBusMessage *msg)
+>  DBusMessage *btd_error_invalid_args_str(DBusMessage *msg, const char *str)
+>  {
+>         return g_dbus_create_error(msg, ERROR_INTERFACE ".InvalidArguments",
+> -                                                                       str);
+> +                                       "%s", str);
+>  }
 >
+>  DBusMessage *btd_error_busy(DBusMessage *msg)
+> @@ -99,7 +99,8 @@ DBusMessage *btd_error_not_authorized(DBusMessage *msg)
 >
-> -       if (len != le32_to_cpu(css->size) * 4) {
-> +       if ((size_t) len != le32_to_cpu(css->size) * 4) {
->                 fprintf(stderr, "CSS.size does not match file length\n");
->                 goto done;
->         }
+>  DBusMessage *btd_error_not_permitted(DBusMessage *msg, const char *str)
+>  {
+> -       return g_dbus_create_error(msg, ERROR_INTERFACE ".NotPermitted", str);
+> +       return g_dbus_create_error(msg, ERROR_INTERFACE ".NotPermitted",
+> +                                       "%s", str);
+>  }
+>
+>  DBusMessage *btd_error_no_such_adapter(DBusMessage *msg)
 > --
 > 1.9.1
 
-It seems this has been fixed already.
+Applied, thanks.
 
 
 -- 
