@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Johan Hedberg <johan.hedberg@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 2/3] Bluetooth: Add legacy SMP tests
-Date: Tue, 30 Dec 2014 09:50:40 +0200
-Message-Id: <1419925841-27185-3-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH 1/3] Bluetooth: Add skeleton for SMP self-tests
+Date: Tue, 30 Dec 2014 09:50:39 +0200
+Message-Id: <1419925841-27185-2-git-send-email-johan.hedberg@gmail.com>
 In-Reply-To: <1419925841-27185-1-git-send-email-johan.hedberg@gmail.com>
 References: <1419925841-27185-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,123 +11,130 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-This patch adds self-tests for legacy SMP crypto functions. The sample
-data has been taken from the core specification.
+This patch adds the initial skeleton and kernel config option for SMP
+self-tests.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- net/bluetooth/smp.c | 95 +++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 95 insertions(+)
+ net/bluetooth/Kconfig    |  7 +++++++
+ net/bluetooth/selftest.c |  7 +++++++
+ net/bluetooth/smp.c      | 39 +++++++++++++++++++++++++++++++++++++++
+ net/bluetooth/smp.h      | 13 +++++++++++++
+ 4 files changed, 66 insertions(+)
 
+diff --git a/net/bluetooth/Kconfig b/net/bluetooth/Kconfig
+index 8d3b607a72be..7de74635a110 100644
+--- a/net/bluetooth/Kconfig
++++ b/net/bluetooth/Kconfig
+@@ -84,4 +84,11 @@ config BT_SELFTEST_ECDH
+ 	  Run test cases for ECDH cryptographic functionality used by the
+ 	  Bluetooth Low Energy Secure Connections feature.
+ 
++config BT_SELFTEST_SMP
++	bool "SMP test cases"
++	depends on BT_LE && BT_SELFTEST
++	help
++	  Run test cases for SMP cryptographic functionality, including both
++	  legacy SMP as well as the Secure Connections features.
++
+ source "drivers/bluetooth/Kconfig"
+diff --git a/net/bluetooth/selftest.c b/net/bluetooth/selftest.c
+index b9cb33cd45d7..a7602b3d0b0d 100644
+--- a/net/bluetooth/selftest.c
++++ b/net/bluetooth/selftest.c
+@@ -22,8 +22,10 @@
+ */
+ 
+ #include <net/bluetooth/bluetooth.h>
++#include <net/bluetooth/hci_core.h>
+ 
+ #include "ecc.h"
++#include "smp.h"
+ #include "selftest.h"
+ 
+ #if IS_ENABLED(CONFIG_BT_SELFTEST_ECDH)
+@@ -195,7 +197,12 @@ static int __init run_selftest(void)
+ 	BT_INFO("Starting self testing");
+ 
+ 	err = test_ecdh();
++	if (err)
++		goto done;
+ 
++	err = bt_selftest_smp();
++
++done:
+ 	BT_INFO("Finished self testing");
+ 
+ 	return err;
 diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
-index b47528d66a5f..f76c6d02b5b8 100644
+index 9025e177d278..b47528d66a5f 100644
 --- a/net/bluetooth/smp.c
 +++ b/net/bluetooth/smp.c
-@@ -3025,9 +3025,104 @@ void smp_unregister(struct hci_dev *hdev)
- 
- #if IS_ENABLED(CONFIG_BT_SELFTEST_SMP)
- 
-+static int __init test_ah(struct crypto_blkcipher *tfm_aes)
+@@ -3022,3 +3022,42 @@ void smp_unregister(struct hci_dev *hdev)
+ 		smp_del_chan(chan);
+ 	}
+ }
++
++#if IS_ENABLED(CONFIG_BT_SELFTEST_SMP)
++
++static int __init run_selftests(struct crypto_blkcipher *tfm_aes,
++				struct crypto_hash *tfm_cmac)
 +{
-+	const u8 irk[16] = {
-+			0x9b, 0x7d, 0x39, 0x0a, 0xa6, 0x10, 0x10, 0x34,
-+			0x05, 0xad, 0xc8, 0x57, 0xa3, 0x34, 0x02, 0xec };
-+	const u8 r[3] = { 0x94, 0x81, 0x70 };
-+	const u8 exp[3] = { 0xaa, 0xfb, 0x0d };
-+	u8 res[3];
-+	int err;
-+
-+	err = smp_ah(tfm_aes, irk, r, res);
-+	if (err)
-+		return err;
-+
-+	if (memcmp(res, exp, 3))
-+		return -EINVAL;
++	BT_INFO("SMP test passed");
 +
 +	return 0;
 +}
 +
-+static int __init test_c1(struct crypto_blkcipher *tfm_aes)
++int __init bt_selftest_smp(void)
 +{
-+	const u8 k[16] = {
-+			0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+			0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
-+	const u8 r[16] = {
-+			0xe0, 0x2e, 0x70, 0xc6, 0x4e, 0x27, 0x88, 0x63,
-+			0x0e, 0x6f, 0xad, 0x56, 0x21, 0xd5, 0x83, 0x57 };
-+	const u8 preq[7] = { 0x01, 0x01, 0x00, 0x00, 0x10, 0x07, 0x07 };
-+	const u8 pres[7] = { 0x02, 0x03, 0x00, 0x00, 0x08, 0x00, 0x05 };
-+	const u8 _iat = 0x01;
-+	const u8 _rat = 0x00;
-+	const bdaddr_t ra = { { 0xb6, 0xb5, 0xb4, 0xb3, 0xb2, 0xb1 } };
-+	const bdaddr_t ia = { { 0xa6, 0xa5, 0xa4, 0xa3, 0xa2, 0xa1 } };
-+	const u8 exp[16] = {
-+			0x86, 0x3b, 0xf1, 0xbe, 0xc5, 0x4d, 0xa7, 0xd2,
-+			0xea, 0x88, 0x89, 0x87, 0xef, 0x3f, 0x1e, 0x1e };
-+	u8 res[16];
++	struct crypto_blkcipher *tfm_aes;
++	struct crypto_hash *tfm_cmac;
 +	int err;
 +
-+	err = smp_c1(tfm_aes, k, r, preq, pres, _iat, &ia, _rat, &ra, res);
-+	if (err)
-+		return err;
++	tfm_aes = crypto_alloc_blkcipher("ecb(aes)", 0, CRYPTO_ALG_ASYNC);
++	if (IS_ERR(tfm_aes)) {
++		BT_ERR("Unable to create ECB crypto context");
++		return PTR_ERR(tfm_aes);
++	}
 +
-+	if (memcmp(res, exp, 16))
-+		return -EINVAL;
++	tfm_cmac = crypto_alloc_hash("cmac(aes)", 0, CRYPTO_ALG_ASYNC);
++	if (IS_ERR(tfm_cmac)) {
++		BT_ERR("Unable to create CMAC crypto context");
++		crypto_free_blkcipher(tfm_aes);
++		return PTR_ERR(tfm_cmac);
++	}
 +
-+	return 0;
++	err = run_selftests(tfm_aes, tfm_cmac);
++
++	crypto_free_hash(tfm_cmac);
++	crypto_free_blkcipher(tfm_aes);
++
++	return err;
 +}
 +
-+static int __init test_s1(struct crypto_blkcipher *tfm_aes)
-+{
-+	const u8 k[16] = {
-+			0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+			0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
-+	const u8 r1[16] = {
-+			0x88, 0x77, 0x66, 0x55, 0x44, 0x33, 0x22, 0x11 };
-+	const u8 r2[16] = {
-+			0x00, 0xff, 0xee, 0xdd, 0xcc, 0xbb, 0xaa, 0x99 };
-+	const u8 exp[16] = {
-+			0x62, 0xa0, 0x6d, 0x79, 0xae, 0x16, 0x42, 0x5b,
-+			0x9b, 0xf4, 0xb0, 0xe8, 0xf0, 0xe1, 0x1f, 0x9a };
-+	u8 res[16];
-+	int err;
-+
-+	err = smp_s1(tfm_aes, k, r1, r2, res);
-+	if (err)
-+		return err;
-+
-+	if (memcmp(res, exp, 16))
-+		return -EINVAL;
-+
-+	return 0;
-+}
-+
- static int __init run_selftests(struct crypto_blkcipher *tfm_aes,
- 				struct crypto_hash *tfm_cmac)
- {
-+	int err;
-+
-+	err = test_ah(tfm_aes);
-+	if (err) {
-+		BT_ERR("smp_ah test failed");
-+		return err;
-+	}
-+
-+	err = test_c1(tfm_aes);
-+	if (err) {
-+		BT_ERR("smp_c1 test failed");
-+		return err;
-+	}
-+
-+	err = test_s1(tfm_aes);
-+	if (err) {
-+		BT_ERR("smp_s1 test failed");
-+		return err;
-+	}
-+
- 	BT_INFO("SMP test passed");
++#endif
+diff --git a/net/bluetooth/smp.h b/net/bluetooth/smp.h
+index 3296bf42ae80..60c5b73fcb4b 100644
+--- a/net/bluetooth/smp.h
++++ b/net/bluetooth/smp.h
+@@ -192,4 +192,17 @@ int smp_generate_rpa(struct hci_dev *hdev, const u8 irk[16], bdaddr_t *rpa);
+ int smp_register(struct hci_dev *hdev);
+ void smp_unregister(struct hci_dev *hdev);
  
- 	return 0;
++#if IS_ENABLED(CONFIG_BT_SELFTEST_SMP)
++
++int bt_selftest_smp(void);
++
++#else
++
++static inline int bt_selftest_smp(void)
++{
++	return 0;
++}
++
++#endif
++
+ #endif /* __SMP_H */
 -- 
 2.1.0
 
