@@ -1,41 +1,45 @@
 Return-Path: <cyrus@holtmann.org>
-From: Michael Janssen <jamuraa@chromium.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Michael Janssen <jamuraa@chromium.org>
-Subject: [PATCH BlueZ 00/14] Add TS Large Database, more server tests.
-Date: Tue, 30 Dec 2014 16:32:18 -0800
-Message-Id: <1419985952-18334-1-git-send-email-jamuraa@chromium.org>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 8.1 \(1993\))
+Subject: Re: PROBLEM: 0489:e062 [Sony VAIO SVF1531C5E] Bluetooth adapter does not see BT devices
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <54A2D333.7090607@gmail.com>
+Date: Tue, 30 Dec 2014 11:09:52 -0800
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <FB8B7DF3-D835-4270-8932-BAED0DA050BE@holtmann.org>
+References: <54A2D333.7090607@gmail.com>
+To: Miguel Barrio Orsikowsky <megamik@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patchset reworks the way that GATT test databases are defined,
-defines a "large database" as defined by the test spec, adds a set
-of new tests from the test spec.
+Hi Miguel,
 
-It also includes some minor cleanup.
+> [1.] One line summary of the problem:
+> 
+> 0489:e062 [Sony VAIO SVF1531C5E] Bluetooth adapter does not see BT devices
+> 
+> [2.] Full description of the problem/report:
+> 
+> The Bluetooth adapter is detected and apparently working but, when executing "hcitool scan", the device list is always empty: it cannot see any BT device around.
+> 
+> But, if I boot into Windows just before booting into Linux, the adapter works perfectly and it sees all BT devices. It seems Windows driver is performing some activation to the BT adapter.
+> 
+> Test case:
+> Step 1: power on the Sony VAIO SVF1531C5E and boot into Linux.
+> Step 2: while having around one or more devices with BT enabled and visible, type "hcitool scan" and wait for a few seconds just to see that nothing gets listed.
+> Step 4: reboot the laptop and boot into a Windows partition (mine is Windows 8.1 x64).
+> Step 5: wait until it is completely booted, then just reboot into Linux again.
+> Step 6: while having around one or more devices with BT enabled and visible, type "hcitool scan" and wait for a few seconds just to see all of your devices correctly listed this time. You will be able to pair and use them later without any issue.
+> 
+> [3.] Keywords (i.e., modules, networking, kernel):
+> 
+> [4.] Kernel version (from /proc/version):
+> 
+> Linux version 3.19.0-031900rc2-generic (apw@tangerine) (gcc version 4.6.3 (Ubuntu/Linaro 4.6.3-1ubuntu5) ) #201412290135 SMP Mon Dec 29 01:36:54 UTC 2014
 
-Michael Janssen (14):
-  shared/gatt-db: Add gatt_db_find_by_type_value
-  shared/gatt-server: support Discover by UUID
-  unit/gatt: Bugfix small database construction
-  unit/gatt: Add add_desc_with_value function
-  unit/gatt: Rework service db definitions
-  unit/gatt: Add Test Spec Large Database 1
-  unit/gatt: Comment cleanup
-  unit/gatt: Add /TP/GAD/SR/BV-02-C test
-  unit/gatt: Add /TP/GAD/SR/BV-03-C test
-  unit/gatt: Add /TP/GAD/SR/BV-04-C test
-  unit/gatt: Add clarifying note about dup tests.
-  unit/gatt: Add /TP/GAD/SR/BV-06-C test
-  unit/gatt: Add /TP/GAR/SR/BV-01-C test
-  unit/gatt: Add /TP/GAR/SR/BI-02-C test
+just include the content of /sys/kernel/debug/usb/devices for this adapter. I assume it is connected via USB.
 
- src/shared/gatt-db.c     |  27 ++
- src/shared/gatt-db.h     |   7 +
- src/shared/gatt-server.c | 107 +++++++
- unit/test-gatt.c         | 808 +++++++++++++++++++++++++++++++++++++++--------
- 4 files changed, 812 insertions(+), 137 deletions(-)
+Regards
 
--- 
-2.2.0.rc0.207.ga3a616c
+Marcel
 
