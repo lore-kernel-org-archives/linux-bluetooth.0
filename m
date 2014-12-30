@@ -1,28 +1,38 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Tue, 30 Dec 2014 09:49:12 +0200
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 0/3] Bluetooth: Add SMP self-tests (try number 4)
-Date: Tue, 30 Dec 2014 09:50:38 +0200
-Message-Id: <1419925841-27185-1-git-send-email-johan.hedberg@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [RFC 1/2] Bluetooth: Add support for self testing framework
+Message-ID: <20141230074912.GA27230@t440s.P-661HNU-F1>
+References: <1419914916-27051-1-git-send-email-marcel@holtmann.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1419914916-27051-1-git-send-email-marcel@holtmann.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Marcel,
 
-Now that we went with Marcel's RFC approach, here's an updated set of
-the SMP tests reworked to match the new design.
+On Mon, Dec 29, 2014, Marcel Holtmann wrote:
+> This add support for the Bluetooth self testing framework that allows
+> running certain test cases of sample data to ensure correctness of its
+> basic functionality.
+> 
+> With this patch only the basic framework will be added. It contains
+> the build magic that allows running this at module loading time or
+> at late_initcall stage when built into the kernel image.
+> 
+> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+> ---
+>  net/bluetooth/Kconfig        | 13 ++++++++++
+>  net/bluetooth/Makefile       |  2 ++
+>  net/bluetooth/af_bluetooth.c |  6 +++++
+>  net/bluetooth/selftest.c     | 62 ++++++++++++++++++++++++++++++++++++++++++++
+>  net/bluetooth/selftest.h     | 45 ++++++++++++++++++++++++++++++++
+>  5 files changed, 128 insertions(+)
+>  create mode 100644 net/bluetooth/selftest.c
+>  create mode 100644 net/bluetooth/selftest.h
+
+Both of these patches have been applied to bluetooth-next. Thanks.
 
 Johan
-
-----------------------------------------------------------------
-Johan Hedberg (3):
-      Bluetooth: Add skeleton for SMP self-tests
-      Bluetooth: Add legacy SMP tests
-      Bluetooth: Add LE Secure Connections tests for SMP
-
- net/bluetooth/Kconfig    |   7 +
- net/bluetooth/selftest.c |   7 +
- net/bluetooth/smp.c      | 320 +++++++++++++++++++++++++++++++++++++++++++++
- net/bluetooth/smp.h      |  13 ++
- 4 files changed, 347 insertions(+)
-
