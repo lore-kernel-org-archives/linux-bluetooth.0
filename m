@@ -2,92 +2,92 @@ Return-Path: <cyrus@holtmann.org>
 From: Michael Janssen <jamuraa@chromium.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Michael Janssen <jamuraa@chromium.org>
-Subject: [PATCH BlueZ 08/14] unit/gatt: Add /TP/GAD/SR/BV-02-C test
-Date: Tue, 30 Dec 2014 16:32:26 -0800
-Message-Id: <1419985952-18334-9-git-send-email-jamuraa@chromium.org>
+Subject: [PATCH BlueZ 01/14] shared/gatt-db: Add gatt_db_find_by_type_value
+Date: Tue, 30 Dec 2014 16:32:19 -0800
+Message-Id: <1419985952-18334-2-git-send-email-jamuraa@chromium.org>
 In-Reply-To: <1419985952-18334-1-git-send-email-jamuraa@chromium.org>
 References: <1419985952-18334-1-git-send-email-jamuraa@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Verify that a Generic Attribute Profile server can support discovery of
-all particular Primary Services selected by service UUID, using 16-bit
-UUIDs, and using 128-bit UUIDs where supported.
-
-128-bit tests will be added once the larger databases with 128-bit UUIDs
-are added.
+Added to support the GATT discovery of services by UUID.
+Currently only works for values which are stored within the attribute
+structure (not callback-based).
 ---
- unit/test-gatt.c | 57 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 57 insertions(+)
+ src/shared/gatt-db.c | 27 +++++++++++++++++++++++++++
+ src/shared/gatt-db.h |  7 +++++++
+ 2 files changed, 34 insertions(+)
 
-diff --git a/unit/test-gatt.c b/unit/test-gatt.c
-index 6e075f6..fbccb18 100644
---- a/unit/test-gatt.c
-+++ b/unit/test-gatt.c
-@@ -1509,6 +1509,63 @@ int main(int argc, char *argv[])
- 					0x18, 0x00, 0x00),
- 			raw_pdu(0x01, 0x06, 0x18, 0x00, 0x0a));
+diff --git a/src/shared/gatt-db.c b/src/shared/gatt-db.c
+index d2cdacc..bef1308 100644
+--- a/src/shared/gatt-db.c
++++ b/src/shared/gatt-db.c
+@@ -830,6 +830,8 @@ struct find_by_type_value_data {
+ 	bt_uuid_t uuid;
+ 	uint16_t start_handle;
+ 	uint16_t end_handle;
++	const void *value;
++	size_t value_len;
+ };
  
-+	define_test_server("/TP/GAD/SR/BV-02-C/exists-16/small", test_server,
-+			ts_small_db, NULL,
-+			raw_pdu(0x03, 0x00, 0x02),
-+			raw_pdu(0x06, 0x01, 0x00, 0xff, 0xff, 0x00, 0x28, 0x00,
-+				0x18),
-+			raw_pdu(0x07, 0x10, 0xf0, 0x17, 0xf0),
-+			raw_pdu(0x06, 0x18, 0xf0, 0xff, 0xff, 0x00, 0x28, 0x00,
-+				0x18),
-+			raw_pdu(0x01, 0x06, 0x18, 0xf0, 0x0a));
+ static void find_by_type(void *data, void *user_data)
+@@ -855,6 +857,12 @@ static void find_by_type(void *data, void *user_data)
+ 		if (bt_uuid_cmp(&search_data->uuid, &attribute->uuid))
+ 			continue;
+ 
++		/* TODO: fix for read-callback based attributes */
++		if (search_data->value && memcmp(attribute->value,
++							search_data->value,
++							search_data->value_len))
++			continue;
 +
-+	define_test_server("/TP/GAD/SR/BV-02-C/exists-16/large-1", test_server,
-+			ts_large_db_1, NULL,
-+			raw_pdu(0x03, 0x00, 0x02),
-+			raw_pdu(0x06, 0x01, 0x00, 0xff, 0xff, 0x00, 0x28, 0x0b,
-+				0xa0),
-+			raw_pdu(0x07, 0x30, 0x00, 0x32, 0x00, 0x50, 0x00, 0x52,
-+				0x00, 0x60, 0x00, 0x6b, 0x00, 0x70, 0x00, 0x76,
-+				0x00, 0x80, 0x00, 0x85, 0x00),
-+			raw_pdu(0x06, 0x86, 0x00, 0xff, 0xff, 0x00, 0x28, 0x0b,
-+				0xa0),
-+			raw_pdu(0x01, 0x06, 0x86, 0x00, 0x0a));
+ 		queue_push_tail(search_data->queue, attribute);
+ 	}
+ }
+@@ -874,6 +882,25 @@ void gatt_db_find_by_type(struct gatt_db *db, uint16_t start_handle,
+ 	queue_foreach(db->services, find_by_type, &data);
+ }
+ 
++void gatt_db_find_by_type_value(struct gatt_db *db, uint16_t start_handle,
++							uint16_t end_handle,
++							const bt_uuid_t *type,
++							const void *value,
++							size_t value_len,
++							struct queue *queue)
++{
++	struct find_by_type_value_data data;
 +
-+	define_test_server("/TP/GAD/SR/BV-02-C/missing-16/small", test_server,
-+			ts_small_db, NULL,
-+			raw_pdu(0x03, 0x00, 0x02),
-+			raw_pdu(0x06, 0x01, 0x00, 0xff, 0xff, 0x00, 0x28, 0x01,
-+				0x18),
-+			raw_pdu(0x01, 0x06, 0x01, 0x00, 0x0a));
++	data.uuid = *type;
++	data.start_handle = start_handle;
++	data.end_handle = end_handle;
++	data.queue = queue;
++	data.value = value;
++	data.value_len = value_len;
 +
-+	define_test_server("/TP/GAD/SR/BV-02-C/missing-16/large-1", test_server,
-+			ts_large_db_1, NULL,
-+			raw_pdu(0x03, 0x00, 0x02),
-+			raw_pdu(0x06, 0x01, 0x00, 0xff, 0xff, 0x00, 0x28, 0x0f,
-+				0xf0),
-+			raw_pdu(0x01, 0x06, 0x01, 0x00, 0x0a));
++	queue_foreach(db->services, find_by_type, &data);
++}
 +
-+	define_test_server("/TP/GAD/SR/BV-02-C/exists-128/large-1", test_server,
-+			ts_large_db_1, NULL,
-+			raw_pdu(0x03, 0x00, 0x02),
-+			raw_pdu(0x06, 0x01, 0x00, 0xff, 0xff, 0x00, 0x28, 0xef,
-+				0xcd, 0xab, 0x89, 0x67, 0x45, 0x23, 0x01, 0x00,
-+				0x00, 0x00, 0x00, 0x0c, 0xa0, 0x00, 0x00),
-+			raw_pdu(0x07, 0x90, 0x00, 0x96, 0x00, 0xc0, 0x00, 0xdd,
-+				0x00),
-+			raw_pdu(0x06, 0xde, 0x00, 0xff, 0xff, 0x00, 0x28, 0xef,
-+				0xcd, 0xab, 0x89, 0x67, 0x45, 0x23, 0x01, 0x00,
-+				0x00, 0x00, 0x00, 0x0c, 0xa0, 0x00, 0x00),
-+			raw_pdu(0x01, 0x06, 0xde, 0x00, 0x0a));
+ struct read_by_type_data {
+ 	struct queue *queue;
+ 	bt_uuid_t uuid;
+diff --git a/src/shared/gatt-db.h b/src/shared/gatt-db.h
+index f188944..9281671 100644
+--- a/src/shared/gatt-db.h
++++ b/src/shared/gatt-db.h
+@@ -93,6 +93,13 @@ void gatt_db_find_by_type(struct gatt_db *db, uint16_t start_handle,
+ 							const bt_uuid_t *type,
+ 							struct queue *queue);
+ 
++void gatt_db_find_by_type_value(struct gatt_db *db, uint16_t start_handle,
++							uint16_t end_handle,
++							const bt_uuid_t *type,
++							const void *value,
++							size_t value_len,
++							struct queue *queue);
 +
-+	define_test_server("/TP/GAD/SR/BV-02-C/missing-128/large-1",
-+			test_server, ts_large_db_1, NULL,
-+			raw_pdu(0x03, 0x00, 0x02),
-+			raw_pdu(0x06, 0x01, 0x00, 0xff, 0xff, 0x00, 0x28, 0xff,
-+				0xcd, 0xab, 0x89, 0x67, 0x45, 0x23, 0x01, 0x00,
-+				0x00, 0x00, 0x00, 0x0c, 0xa0, 0x00, 0x00),
-+			raw_pdu(0x01, 0x06, 0x01, 0x00, 0x0a));
-+
- 	define_test_att("/TP/GAD/CL/BV-03-C", test_search_included, NULL,
- 			NULL,
- 			MTU_EXCHANGE_CLIENT_PDUS,
+ void gatt_db_read_by_type(struct gatt_db *db, uint16_t start_handle,
+ 							uint16_t end_handle,
+ 							const bt_uuid_t type,
 -- 
 2.2.0.rc0.207.ga3a616c
 
