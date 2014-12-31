@@ -1,147 +1,49 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <54A3F213.20106@gmail.com>
-Date: Wed, 31 Dec 2014 13:54:43 +0100
-From: Miguel Barrio Orsikowsky <megamik@gmail.com>
-MIME-Version: 1.0
-To: Marcel Holtmann <marcel@holtmann.org>
-CC: linux-bluetooth@vger.kernel.org
-Subject: Re: PROBLEM: 0489:e062 [Sony VAIO SVF1531C5E] Bluetooth adapter does
- not see BT devices
-References: <54A2D333.7090607@gmail.com> <FB8B7DF3-D835-4270-8932-BAED0DA050BE@holtmann.org> <54A3DD1B.4040100@gmail.com> <F1981414-E281-4925-9C71-7310F538219F@holtmann.org>
-In-Reply-To: <F1981414-E281-4925-9C71-7310F538219F@holtmann.org>
-Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 8.1 \(1993\))
+Subject: Re: [PATCH 1/4] Bluetooth: btmrvl: fix race issue while stopping main thread
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <5FF020A1CFFEEC49BD1E09530C4FF5951B16178D67@SC-VEXCH1.marvell.com>
+Date: Wed, 31 Dec 2014 04:03:48 -0800
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>,
+	Avinash Patil <patila@marvell.com>,
+	Cathy Luo <cluo@marvell.com>, Marc Yang <yangyang@marvell.com>
+Message-Id: <1D6FD319-3F82-4CDD-AAEB-9FA50820208F@holtmann.org>
+References: <1420024442-12137-1-git-send-email-akarwar@marvell.com> <B54F0CE9-1DE7-4985-851A-CD7E06AB7DA8@holtmann.org> <5FF020A1CFFEEC49BD1E09530C4FF5951B16178D67@SC-VEXCH1.marvell.com>
+To: Amitkumar Karwar <akarwar@marvell.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-El 31/12/14 a las 12:31, Marcel Holtmann escribió:
-> Hi Miguel,
->
->>>> [1.] One line summary of the problem:
->>>>
->>>> 0489:e062 [Sony VAIO SVF1531C5E] Bluetooth adapter does not see BT devices
->>>>
->>>> [2.] Full description of the problem/report:
->>>>
->>>> The Bluetooth adapter is detected and apparently working but, when executing "hcitool scan", the device list is always empty: it cannot see any BT device around.
->>>>
->>>> But, if I boot into Windows just before booting into Linux, the adapter works perfectly and it sees all BT devices. It seems Windows driver is performing some activation to the BT adapter.
->>>>
->>>> Test case:
->>>> Step 1: power on the Sony VAIO SVF1531C5E and boot into Linux.
->>>> Step 2: while having around one or more devices with BT enabled and visible, type "hcitool scan" and wait for a few seconds just to see that nothing gets listed.
->>>> Step 4: reboot the laptop and boot into a Windows partition (mine is Windows 8.1 x64).
->>>> Step 5: wait until it is completely booted, then just reboot into Linux again.
->>>> Step 6: while having around one or more devices with BT enabled and visible, type "hcitool scan" and wait for a few seconds just to see all of your devices correctly listed this time. You will be able to pair and use them later without any issue.
->>>>
->>>> [3.] Keywords (i.e., modules, networking, kernel):
->>>>
->>>> [4.] Kernel version (from /proc/version):
->>>>
->>>> Linux version 3.19.0-031900rc2-generic (apw@tangerine) (gcc version 4.6.3 (Ubuntu/Linaro 4.6.3-1ubuntu5) ) #201412290135 SMP Mon Dec 29 01:36:54 UTC 2014
->>> just include the content of /sys/kernel/debug/usb/devices for this adapter. I assume it is connected via USB.
->> Yes, it is integrated and connected via USB:
->>
->> T:  Bus=01 Lev=01 Prnt=01 Port=03 Cnt=01 Dev#=  2 Spd=12   MxCh= 0
->> D:  Ver= 2.00 Cls=ff(vend.) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
->> P:  Vendor=0489 ProdID=e062 Rev= 1.12
->> S:  Manufacturer=Broadcom Corp
->> S:  Product=BCM43142A0
->> S:  SerialNumber=3C77E6DC7494
->> C:* #Ifs= 4 Cfg#= 1 Atr=e0 MxPwr=  0mA
->> I:* If#= 0 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
->> E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
->> E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
->> E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
->> I:* If#= 1 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
->> E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
->> E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
->> I:  If#= 1 Alt= 1 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
->> E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
->> E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
->> I:  If#= 1 Alt= 2 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
->> E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
->> E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
->> I:  If#= 1 Alt= 3 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
->> E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
->> E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
->> I:  If#= 1 Alt= 4 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
->> E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
->> E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
->> I:  If#= 1 Alt= 5 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
->> E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
->> E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
->> I:* If#= 2 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=ff Driver=(none)
->> E:  Ad=84(I) Atr=02(Bulk) MxPS=  32 Ivl=0ms
->> E:  Ad=04(O) Atr=02(Bulk) MxPS=  32 Ivl=0ms
->> I:* If#= 3 Alt= 0 #EPs= 0 Cls=fe(app. ) Sub=01 Prot=01 Driver=(none)
-> this one is listed as loading firmware patches if they are provided.
->
->          /* Foxconn - Hon Hai */
->          { USB_VENDOR_AND_INTERFACE_INFO(0x0489, 0xff, 0x01, 0x01),
->            .driver_info = BTUSB_BCM_PATCHRAM },
->
-> The only thing you have to do find the right *.hcd file and put under /lib/firmware/brcm/ so it can be loaded. I bet if you call dmesg and look at the log of the driver it will even mention something about the firmware file.
->
-> Some of the Broadcom dongles are pretty much broken. They will not work when you do not patch the firmware to fix their bugs.
->
-I have done the following:
+Hi Amitkumar,
 
-1. dmesg | grep Bluetooth. This reveals the name of the firmware patch 
-needed:
+>>> btmrvl_remove_card() calls kthread_stop() to stop the main thread, but
+>>> kthread_should_stop() is checked when all the activities are done in
+>>> the main thread before sleeping.
+>>> We will have kthread_should_stop() check as soon as main thread is
+>>> woken up. This fixes a crash issue caused due to an invalid memory
+>>> access while unnecessarily processing interrupts after card removal.
+>>> 
+>>> Signed-off-by: Avinash Patil <patila@marvell.com>
+>>> Signed-off-by: Cathy Luo <cluo@marvell.com>
+>>> Signed-off-by: Amitkumar Karwar <akarwar@marvell.com>
+>> 
+>> I can not apply the patches like this. I assume that Avinash wrote the
+>> patch and with that he should be listed as patch author. So the email
+>> needs a proper From: line that allows git am to pick this up properly.
+>> 
+>> Same applies to the other 3 patches.
+>> 
+> 
+> Do you mean the patch author's Signed-off should be always first? In that case I'll change signed off sequence accordingly and send updated version.
+> All 4 patches are written by me.
 
-[   15.825275] Bluetooth: hci0: BCM: patch brcm/BCM43142A0-0489-e062.hcd 
-not found
+the first Signed-off-by is the patch author. This means all the other should be Reviewed-by lines.
 
-2. Mounted the Windows 8.1 x64 partition into /mnt
+The chain of Signed-off-by lines shows on who took a patch and submitting along the chain towards upstream. That means the author is the first one. Then I would be the second and so on.
 
-3. find /mnt -iname '*brcm.inf'. This leads to '/mnt/Program 
-Files/WIDCOMM/Bluetooth Software/bin/bcbtums-win8x64-brcm.inf', viewed 
-it and located the E062 string which leads to the file 
-BCM43142A0_001.001.011.0161.0182.hex:
+If someone else wrote the patch, then he/she is first, if you then take it and submit it to linux-bluetooth that means you add a Signed-off-by since you send it. However the author stays the same and the first Signed-off-by is still the authors.
 
-...
-%BRCM43142BtAdapter.DeviceDesc%=BlueRAMUSBE062, 
-USB\VID_0489&PID_E062       ; Sony 43142A0 combo
-...
-;;;;;;;;;;;;;RAMUSBE062;;;;;;;;;;;;;;;;;
+Regards
 
-[RAMUSBE062.CopyList]
-bcbtums.sys
-btwampfl.sys
-BCM43142A0_001.001.011.0161.0182.hex
-...
+Marcel
 
-4. find /mnt -name 'BCM43142A0_001.001.011.0161.0182.hex'. Copied the 
-'/mnt/Program Files/WIDCOMM/Bluetooth 
-Software/bin/BCM43142A0_001.001.011.0161.0182.hex' file into my home dir.
-
-5. Downloaded and compiled hex2hcd (https://github.com/jessesung/hex2hcd 
-<https://github.com/jessesung/hex2hcd>). Executed it against the 
-BCM43142A0_001.001.011.0161.0182.hex file to get the 
-BCM43142A0-0489-e062.hcd as requested by the dmesg message, and put it 
-in /lib/firmare/brcm.
-
-6. Reboot.
-
-7. Now dmesg does not show the error "patch 
-brcm/BCM43142A0-0489-e062.hcd not found", but the BT adapter is not even 
-recognized ("hcitool scan" shows No such device), and dmesg shows this 
-error in addition to the "hci0 command 0x1001 tx timeout" one:
-
-[   26.265214] Bluetooth: hci0: HCI_OP_READ_LOCAL_VERSION failed (-110)
-
-8. I rebooted into Linux again (no Windows this time), and the BT 
-adapter is now recognized and fully working ("hcitool scan" shows all 
-the BT devices around). Dmesg shows no errors this time but this two new 
-messages:
-
-[   15.107318] Bluetooth: hci0: BCM: patching hci_ver=06 hci_rev=00b6 
-lmp_ver=06 lmp_subver=210b
-[   15.567138] Bluetooth: hci0: BCM: firmware hci_ver=06 hci_rev=00b6 
-lmp_ver=06 lmp_subver=210b
-
-Thus, there is no need to boot Windows before Linux if the .hcd file is 
-present, but you still need to boot Linux twice in order for the BT 
-adapter to work properly:
-
-Regards,
-Miguel.
