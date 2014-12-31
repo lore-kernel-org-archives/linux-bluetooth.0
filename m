@@ -2,53 +2,49 @@ Return-Path: <cyrus@holtmann.org>
 From: Michael Janssen <jamuraa@chromium.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Michael Janssen <jamuraa@chromium.org>
-Subject: [PATCH BlueZ 09/14] unit/gatt: Add /TP/GAD/SR/BV-03-C test
-Date: Tue, 30 Dec 2014 16:32:27 -0800
-Message-Id: <1419985952-18334-10-git-send-email-jamuraa@chromium.org>
+Subject: [PATCH BlueZ 07/14] unit/gatt: Comment cleanup
+Date: Tue, 30 Dec 2014 16:32:25 -0800
+Message-Id: <1419985952-18334-8-git-send-email-jamuraa@chromium.org>
 In-Reply-To: <1419985952-18334-1-git-send-email-jamuraa@chromium.org>
 References: <1419985952-18334-1-git-send-email-jamuraa@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Verify that a Generic Attribute Profile server can support a search for
-all Included Services in a specified handle range.
 ---
- unit/test-gatt.c | 22 ++++++++++++++++++++++
- 1 file changed, 22 insertions(+)
+ unit/test-gatt.c | 19 +++++++++----------
+ 1 file changed, 9 insertions(+), 10 deletions(-)
 
 diff --git a/unit/test-gatt.c b/unit/test-gatt.c
-index fbccb18..4412219 100644
+index 647dd4e..6e075f6 100644
 --- a/unit/test-gatt.c
 +++ b/unit/test-gatt.c
-@@ -1589,6 +1589,28 @@ int main(int argc, char *argv[])
- 			raw_pdu(0x08, 0x06, 0x00, 0xff, 0xff, 0x02, 0x28),
- 			raw_pdu(0x01, 0x08, 0x06, 0x00, 0x0a));
+@@ -866,17 +866,16 @@ static struct gatt_db *make_service_data_1_db(void)
+ /*
+  * Defined Test database 1:
+  * Tiny database fits into a single minimum sized-pdu.
+- * Satisfies:
+- * 3. At least one primary seervice at the MAX handle
+- * For each / all databases:
+- * X 7. at least one service uuid with multiple instances
+- * X 8. Some simple services, some with included services
+- * X 9. an instance where handle of included service comes before the including
++ * Satisfies requirements:
++ * 3. At least one primary service at the MAX handle
++ * 7. at least one service uuid with multiple instances
++ * 8. Some simple services, some with included services
++ * 9. an instance where handle of included service comes before the including
+  * service
+- * X 11. Simple characteristics (no desc) and complex characteristics
+- *       (multiple descriptors)
+- * X 12. Instances of complex chars with 16-bit and 128-bit uuids
+- * (although not in scrambled order)
++ * 11. Simple characteristics (no desc) and complex characteristics
++ *     (multiple descriptors)
++ * 12. Instances of complex chars with 16-bit and 128-bit uuids
++ *     (although not in scrambled order)
+  */
  
-+	define_test_server("/TP/GAD/SR/BV-03-C/small", test_server,
-+			ts_small_db, NULL,
-+			raw_pdu(0x03, 0x00, 0x02),
-+			raw_pdu(0x08, 0x01, 0x00, 0xff, 0xff, 0x02, 0x28),
-+			raw_pdu(0x09, 0x08, 0x11, 0xf0, 0x01, 0x00, 0x10, 0x00,
-+					0x0a, 0x18),
-+			raw_pdu(0x08, 0x12, 0xf0, 0xff, 0xff, 0x02, 0x28),
-+			raw_pdu(0x01, 0x08, 0x12, 0xf0, 0x0a));
-+
-+	define_test_server("/TP/GAD/SR/BV-03-C/large-1", test_server,
-+			ts_large_db_1, NULL,
-+			raw_pdu(0x03, 0x00, 0x02),
-+			raw_pdu(0x08, 0x01, 0x00, 0xff, 0xff, 0x02, 0x28),
-+			raw_pdu(0x09, 0x08, 0x02, 0x00, 0x80, 0x00, 0x85, 0x00,
-+				0x0b, 0xa0, 0x21, 0x00, 0x01, 0x00, 0x06, 0x00,
-+				0x0d, 0xa0),
-+			raw_pdu(0x08, 0x22, 0x00, 0xff, 0xff, 0x02, 0x28),
-+			raw_pdu(0x09, 0x08, 0x91, 0x00, 0x01, 0x00, 0x06, 0x00,
-+				0x0d, 0xa0),
-+			raw_pdu(0x08, 0x92, 0x00, 0xff, 0xff, 0x02, 0x28),
-+			raw_pdu(0x01, 0x08, 0x92, 0x00, 0x0a));
-+
- 	define_test_att("/TP/GAD/CL/BV-04-C", test_search_chars, NULL,
- 			NULL,
- 			MTU_EXCHANGE_CLIENT_PDUS,
+ static struct gatt_db *make_test_spec_small_db(void)
 -- 
 2.2.0.rc0.207.ga3a616c
 
