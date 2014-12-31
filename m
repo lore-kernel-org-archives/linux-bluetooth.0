@@ -2,93 +2,71 @@ Return-Path: <cyrus@holtmann.org>
 From: Michael Janssen <jamuraa@chromium.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Michael Janssen <jamuraa@chromium.org>
-Subject: [PATCH BlueZ 04/14] unit/gatt: Add add_desc_with_value function
-Date: Tue, 30 Dec 2014 16:32:22 -0800
-Message-Id: <1419985952-18334-5-git-send-email-jamuraa@chromium.org>
+Subject: [PATCH BlueZ 10/14] unit/gatt: Add /TP/GAD/SR/BV-04-C test
+Date: Tue, 30 Dec 2014 16:32:28 -0800
+Message-Id: <1419985952-18334-11-git-send-email-jamuraa@chromium.org>
 In-Reply-To: <1419985952-18334-1-git-send-email-jamuraa@chromium.org>
 References: <1419985952-18334-1-git-send-email-jamuraa@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This function mirrors add_char_with_value and deduplicates some repeated
-code from convenience functions.
+Verify that a Generic Attribute Profile server can support a search for
+all characteristics of a specified Service, and report all of those
+characteristics.
 ---
- unit/test-gatt.c | 43 +++++++++++++++++++++----------------------
- 1 file changed, 21 insertions(+), 22 deletions(-)
+ unit/test-gatt.c | 39 +++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 39 insertions(+)
 
 diff --git a/unit/test-gatt.c b/unit/test-gatt.c
-index bee8f37..4f5857f 100644
+index 4412219..24f5695 100644
 --- a/unit/test-gatt.c
 +++ b/unit/test-gatt.c
-@@ -660,47 +660,46 @@ static struct gatt_db_attribute *add_char_with_value(struct gatt_db *db,
- 	return attrib;
- }
+@@ -1625,6 +1625,45 @@ int main(int argc, char *argv[])
+ 			raw_pdu(0x08, 0x14, 0x00, 0x20, 0x00, 0x03, 0x28),
+ 			raw_pdu(0x01, 0x08, 0x12, 0x00, 0x0a));
  
-+static struct gatt_db_attribute *
-+add_desc_with_value(struct gatt_db_attribute *att, bt_uuid_t *uuid,
-+				uint32_t att_perms, const uint8_t *value,
-+				size_t len)
-+{
-+	struct gatt_db_attribute *desc_att;
++	define_test_server("/TP/GAD/SR/BV-04-C/small/1", test_server,
++			ts_small_db, NULL,
++			raw_pdu(0x03, 0x00, 0x02),
++			raw_pdu(0x08, 0x10, 0xf0, 0x17, 0xf0, 0x03, 0x28),
++			raw_pdu(0x09, 0x07, 0x12, 0xf0, 0x02, 0x13, 0xf0, 0x00,
++					0x2a),
++			raw_pdu(0x08, 0x13, 0xf0, 0x17, 0xf0, 0x03, 0x28),
++			raw_pdu(0x09, 0x15, 0x14, 0xf0, 0x02, 0x15, 0xf0, 0xef,
++					0xcd, 0xab, 0x89, 0x67, 0x45, 0x23,
++					0x01, 0x00, 0x00, 0x00, 0x00, 0x09,
++					0xb0, 0x00, 0x00),
++			raw_pdu(0x08, 0x15, 0xf0, 0x17, 0xf0, 0x03, 0x28),
++			raw_pdu(0x09, 0x07, 0x16, 0xf0, 0x02, 0x17, 0xf0, 0x01,
++					0x2a),
++			raw_pdu(0x08, 0x17, 0xf0, 0x17, 0xf0, 0x03, 0x28),
++			raw_pdu(0x01, 0x08, 0x17, 0xf0, 0x0a));
 +
-+	desc_att = gatt_db_service_add_descriptor(att, uuid, att_perms, NULL,
-+								NULL, NULL);
++	define_test_server("/TP/GAD/SR/BV-04-C/small/2", test_server,
++			ts_small_db, NULL,
++			raw_pdu(0x03, 0x00, 0x02),
++			raw_pdu(0x08, 0x01, 0x00, 0x0f, 0x00, 0x03, 0x28),
++			raw_pdu(0x09, 0x07, 0x02, 0x00, 0x02, 0x03, 0x00, 0x29,
++					0x2a),
++			raw_pdu(0x08, 0x03, 0x00, 0x0f, 0x00, 0x03, 0x28),
++			raw_pdu(0x01, 0x08, 0x03, 0x00, 0x0a));
 +
-+	gatt_db_attribute_write(desc_att, 0, value, len, 0x00, NULL,
-+							att_write_cb, NULL);
++	define_test_server("/TP/GAD/SR/BV-04-C/large-1", test_server,
++			ts_large_db_1, NULL,
++			raw_pdu(0x03, 0x00, 0x02),
++			raw_pdu(0x08, 0x20, 0x00, 0x29, 0x00, 0x03, 0x28),
++			raw_pdu(0x09, 0x07, 0x22, 0x00, 0x02, 0x23, 0x00, 0x01,
++				0xb0, 0x24, 0x00, 0x0a, 0x25, 0x00, 0x02, 0xb0,
++				0x26, 0x00, 0x08, 0x27, 0x00, 0x02, 0xb0),
++			raw_pdu(0x08, 0x27, 0x00, 0x29, 0x00, 0x03, 0x28),
++			raw_pdu(0x09, 0x07, 0x28, 0x00, 0x08, 0x29, 0x00, 0x03,
++				0xb0),
++			raw_pdu(0x08, 0x29, 0x00, 0x29, 0x00, 0x03, 0x28),
++			raw_pdu(0x01, 0x08, 0x29, 0x00, 0x0a));
 +
-+	return desc_att;
-+}
-+
- static struct gatt_db_attribute *add_ccc(struct gatt_db_attribute *chrc_att,
- 								bool writable)
- {
--	struct gatt_db_attribute *desc_att;
- 	bt_uuid_t uuid;
--	uint32_t permissions = BT_ATT_PERM_READ;
- 	uint16_t tmp;
- 
--	if (writable)
--		permissions |= BT_ATT_PERM_WRITE;
--
- 	bt_uuid16_create(&uuid, GATT_CLIENT_CHARAC_CFG_UUID);
--	desc_att = gatt_db_service_add_descriptor(chrc_att, &uuid, permissions,
--							NULL, NULL, NULL);
--
- 	tmp = 0x0000;
--	gatt_db_attribute_write(desc_att, 0, (uint8_t *)&tmp, sizeof(uint16_t),
--						0x00, NULL, att_write_cb, NULL);
- 
--	return desc_att;
-+	return add_desc_with_value(chrc_att, &uuid,
-+					BT_ATT_PERM_READ | BT_ATT_PERM_WRITE,
-+					(uint8_t *)&tmp, sizeof(tmp));
- }
- 
- static struct gatt_db_attribute *
- add_user_description(struct gatt_db_attribute *chrc_att, const char *desc,
- 								bool writable)
- {
--	struct gatt_db_attribute *desc_att;
- 	bt_uuid_t uuid;
--	uint32_t permissions = BT_ATT_PERM_READ;
--
--	if (writable)
--		permissions |= BT_ATT_PERM_WRITE;
- 
- 	bt_uuid16_create(&uuid, GATT_CHARAC_USER_DESC_UUID);
--	desc_att = gatt_db_service_add_descriptor(chrc_att, &uuid, permissions,
--							NULL, NULL, NULL);
- 
--	gatt_db_attribute_write(desc_att, 0, (uint8_t *)desc, strlen(desc),
--						0x00, NULL, att_write_cb, NULL);
--
--	return desc_att;
-+	return add_desc_with_value(chrc_att, &uuid, 0x03, (uint8_t *)desc,
-+						strlen(desc));
- }
- 
- 
+ 	define_test_att("/TP/GAD/CL/BV-06-C", test_search_descs, NULL, NULL,
+ 			MTU_EXCHANGE_CLIENT_PDUS,
+ 			raw_pdu(0x04, 0x13, 0x00, 0x16, 0x00),
 -- 
 2.2.0.rc0.207.ga3a616c
 
