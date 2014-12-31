@@ -1,188 +1,382 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 31 Dec 2014 09:25:49 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org, linux-bluetooth@vger.kernel.org
-Subject: pull request: bluetooth-next 2014-12-31
-Message-ID: <20141231072549.GA11458@t440s.P-661HNU-F1>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="d6Gm4EdcadzBjdND"
+From: Michael Janssen <jamuraa@chromium.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: Michael Janssen <jamuraa@chromium.org>
+Subject: [PATCH BlueZ 06/14] unit/gatt: Add Test Spec Large Database 1
+Date: Tue, 30 Dec 2014 16:32:24 -0800
+Message-Id: <1419985952-18334-7-git-send-email-jamuraa@chromium.org>
+In-Reply-To: <1419985952-18334-1-git-send-email-jamuraa@chromium.org>
+References: <1419985952-18334-1-git-send-email-jamuraa@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-
---d6Gm4EdcadzBjdND
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-
-Hi Dave,
-
-Here's the first batch of bluetooth patches for 3.20.
-
- - Cleanups & fixes to ieee802154  drivers
- - Fix synchronization of mgmt commands with respective HCI commands
- - Add self-tests for LE pairing crypto functionality
- - Remove 'BlueFritz!' specific handling from core using a new quirk flag
- - Public address configuration support for ath3012
- - Refactor debugfs support into a dedicated file
- - Initial support for LE Data Length Extension feature from Bluetooth 4.2
-
-Please let me know if there are any issues pulling. Thanks.
-
-Johan
-
+Adds a large GATT database definition and initial service discovery test
+which satisfies a number of the requirements from the GATT Test Spec
+Document.
 ---
-The following changes since commit 86c8fc4bbe14b8950e62d379bb57722427ad3d67:
+ unit/test-gatt.c | 323 ++++++++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 322 insertions(+), 1 deletion(-)
 
-  Merge tag 'mac80211-for-davem-2014-12-18' of git://git.kernel.org/pub/scm/linux/kernel/git/jberg/mac80211 (2014-12-18 15:33:49 -0500)
+diff --git a/unit/test-gatt.c b/unit/test-gatt.c
+index 169fbd3..647dd4e 100644
+--- a/unit/test-gatt.c
++++ b/unit/test-gatt.c
+@@ -152,6 +152,31 @@ struct context {
+ 		raw_pdu(0x11, 0x06, 0x10, 0xF0, 0x17, 0xF0, 0x00, 0x18,	\
+ 				0xFF, 0xFF, 0xFF, 0xFF, 0x0a, 0x18)
+ 
++#define PRIMARY_DISC_LARGE_DB_1						\
++		raw_pdu(0x10, 0x01, 0x00, 0xff, 0xff, 0x00, 0x28),	\
++		raw_pdu(0x11, 0x06, 0x10, 0x00, 0x13, 0x00, 0x01, 0x18,	\
++			0x20, 0x00, 0x29, 0x00, 0x0A, 0xA0,		\
++			0x30, 0x00, 0x32, 0x00, 0x0B, 0xA0),		\
++		raw_pdu(0x10, 0x33, 0x00, 0xff, 0xff, 0x00, 0x28),	\
++		raw_pdu(0x11, 0x06, 0x40, 0x00, 0x46, 0x00, 0x00, 0x18,	\
++			0x50, 0x00, 0x52, 0x00, 0x0B, 0xA0,		\
++			0x60, 0x00, 0x6B, 0x00, 0x0B, 0xA0),		\
++		raw_pdu(0x10, 0x6C, 0x00, 0xff, 0xff, 0x00, 0x28),	\
++		raw_pdu(0x11, 0x06, 0x70, 0x00, 0x76, 0x00, 0x0B, 0xA0,	\
++			0x80, 0x00, 0x85, 0x00, 0x0B, 0xA0),		\
++		raw_pdu(0x10, 0x86, 0x00, 0xff, 0xff, 0x00, 0x28),	\
++		raw_pdu(0x11, 0x14, 0x90, 0x00, 0x96, 0x00,		\
++			0xef, 0xcd, 0xab, 0x89, 0x67, 0x45, 0x23, 0x01,	\
++			0x00, 0x00, 0x00, 0x00, 0x0C, 0xA0, 0x00, 0x00),\
++		raw_pdu(0x10, 0x97, 0x00, 0xff, 0xff, 0x00, 0x28),	\
++		raw_pdu(0x11, 0x06, 0xa0, 0x00, 0xb1, 0x00, 0x0f, 0xa0),\
++		raw_pdu(0x10, 0xb2, 0x00, 0xff, 0xff, 0x00, 0x28),	\
++		raw_pdu(0x11, 0x14, 0xC0, 0x00, 0xDD, 0x00,		\
++			0xef, 0xcd, 0xab, 0x89, 0x67, 0x45, 0x23, 0x01,	\
++			0x00, 0x00, 0x00, 0x00, 0x0C, 0xA0, 0x00, 0x00),\
++		raw_pdu(0x10, 0xde, 0x00, 0xff, 0xff, 0x00, 0x28),	\
++		raw_pdu(0x01, 0x10, 0xde, 0x00, 0x0a)
++
+ #define SECONDARY_DISC_SMALL_DB						\
+ 		raw_pdu(0x10, 0x01, 0x00, 0xff, 0xff, 0x01, 0x28),	\
+ 		raw_pdu(0x11, 0x06, 0x01, 0x00, 0x0F, 0x00, 0x0a, 0x18),\
+@@ -883,6 +908,296 @@ static struct gatt_db *make_test_spec_small_db(void)
+ 	return make_db(specs);
+ }
+ 
++/*
++ * Defined Test database 2:
++ * Large Database with 128-bit services at the end
++ * Satisfies requirements:
++ * 4. at least one primary service without any include or characteristic
++ *    at the max handle.
++ * 6. at least one secondary service
++ * 7. at least one each of 16-bit and 128-bit UUID with multiple instances
++ * 8. some simple services, some some with included services
++ * 9. one instance where an included service comes before the including
++ * 10. one or more services with both 16-bit and 128-bit service UUIDs
++ * 11. simple and complex characteristics
++ * 12. complex chars with 16-bit and 128-bit uuids
++ */
++
++static struct gatt_db *make_test_spec_large_db_1(void)
++{
++	const struct att_handle_spec specs[] = {
++		PRIMARY_SERVICE(0x0080, "a00b", 6),
++		CHARACTERISTIC(0xb008, BT_ATT_PERM_READ | BT_ATT_PERM_WRITE,
++					BT_GATT_CHRC_PROP_READ |
++					BT_GATT_CHRC_PROP_WRITE,
++					0x08),
++		DESCRIPTOR(0xb015, BT_ATT_PERM_READ | BT_ATT_PERM_WRITE, 0x01),
++		DESCRIPTOR(0xb016, BT_ATT_PERM_READ | BT_ATT_PERM_WRITE, 0x02),
++		DESCRIPTOR(0xb017, BT_ATT_PERM_READ | BT_ATT_PERM_WRITE |
++						BT_ATT_PERM_ENCRYPT, 0x03),
++
++		SECONDARY_SERVICE(0x0001, "a00d", 6),
++		INCLUDE(0x0080),
++		CHARACTERISTIC(0xb00c, BT_ATT_PERM_READ, BT_GATT_CHRC_PROP_READ,
++									0x0C),
++		CHARACTERISTIC(0000b00b-0000-0000-0123-456789abcdef,
++				BT_ATT_PERM_READ, BT_GATT_CHRC_PROP_READ, 0x0B),
++
++		PRIMARY_SERVICE(0x0010, GATT_UUID, 4),
++		CHARACTERISTIC(GATT_CHARAC_SERVICE_CHANGED, BT_ATT_PERM_READ,
++						BT_GATT_CHRC_PROP_INDICATE,
++						0x01, 0x00, 0xFF, 0xFF),
++		DESCRIPTOR(GATT_CLIENT_CHARAC_CFG_UUID,
++					BT_ATT_PERM_READ | BT_ATT_PERM_WRITE,
++					0x00, 0x00),
++
++		PRIMARY_SERVICE(0x0020, "a00a", 10),
++		INCLUDE(0x0001),
++		CHARACTERISTIC(0xb001, BT_ATT_PERM_READ, BT_GATT_CHRC_PROP_READ,
++									0x01),
++		CHARACTERISTIC_STR(0xb002, BT_ATT_PERM_READ | BT_ATT_PERM_WRITE,
++						BT_GATT_CHRC_PROP_READ |
++						BT_GATT_CHRC_PROP_WRITE,
++						"11111222223333344444555556666677777888889999900000111112222233333444445555566666777778888899999000001111122222333334444455555666667777788888999990000011111222223333344444555556666677777888889999900000111112222233333444445555566666777778888899999000001111122222333334444455555666667777788888999990000011111222223333344444555556666677777888889999900000111112222233333444445555566666777778888899999000001111122222333334444455555666667777788888999990000011111222223333344444555556666677777888889999900000111112222233"),
++		CHARACTERISTIC_STR(0xb002, BT_ATT_PERM_WRITE,
++							BT_GATT_CHRC_PROP_WRITE,
++			"11111222223333344444555556666677777888889999900000"),
++		CHARACTERISTIC(0xb003, BT_ATT_PERM_WRITE,
++						BT_GATT_CHRC_PROP_WRITE, 0x03),
++
++		PRIMARY_SERVICE(0x0030, "a00b", 3),
++		CHARACTERISTIC(0xb007, BT_ATT_PERM_WRITE,
++						BT_GATT_CHRC_PROP_WRITE, 0x07),
++
++		PRIMARY_SERVICE(0x0040, GAP_UUID, 7),
++		CHARACTERISTIC_STR(GATT_CHARAC_DEVICE_NAME, BT_ATT_PERM_READ,
++					BT_GATT_CHRC_PROP_READ,
++					"Test Database"),
++		CHARACTERISTIC(GATT_CHARAC_APPEARANCE, BT_ATT_PERM_READ,
++						BT_GATT_CHRC_PROP_READ, 17),
++		CHARACTERISTIC(GATT_CHARAC_PERIPHERAL_PREF_CONN,
++				BT_ATT_PERM_READ, BT_GATT_CHRC_PROP_READ,
++				0x64, 0x00, 0xC8, 0x00, 0x00, 0x00, 0x07, 0xD0),
++
++		PRIMARY_SERVICE(0x0050, "a00b", 3),
++		CHARACTERISTIC(0xb006, BT_ATT_PERM_READ | BT_ATT_PERM_WRITE,
++					BT_GATT_CHRC_PROP_READ |
++					BT_GATT_CHRC_PROP_WRITE |
++					BT_GATT_CHRC_PROP_WRITE_WITHOUT_RESP |
++					BT_GATT_CHRC_PROP_NOTIFY |
++					BT_GATT_CHRC_PROP_INDICATE, 0x06),
++
++		PRIMARY_SERVICE(0x0060, "a00b", 12),
++		CHARACTERISTIC(0xb004, BT_ATT_PERM_READ | BT_ATT_PERM_WRITE,
++			BT_GATT_CHRC_PROP_READ | BT_GATT_CHRC_PROP_WRITE, 0x04),
++		CHARACTERISTIC(0xb004, BT_ATT_PERM_READ | BT_ATT_PERM_WRITE,
++			BT_GATT_CHRC_PROP_READ | BT_GATT_CHRC_PROP_WRITE, 0x04),
++		DESCRIPTOR(GATT_SERVER_CHARAC_CFG_UUID,
++					BT_ATT_PERM_READ | BT_ATT_PERM_WRITE,
++					0x00, 0x00),
++		CHARACTERISTIC(0xb004, 0, 0, 0x04),
++		DESCRIPTOR(0xb012, 0, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77,
++				0x88, 0x99, 0x00, 0x11, 0x22, 0x33, 0x44, 0x55,
++				0x66, 0x77, 0x88, 0x99, 0x00, 0x11, 0x22, 0x33,
++				0x44, 0x55, 0x66, 0x77, 0x88, 0x99, 0x00, 0x11,
++				0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0x99,
++				0x00, 0x11, 0x22, 0x33),
++		CHARACTERISTIC(0xb004, BT_ATT_PERM_READ, BT_GATT_CHRC_PROP_READ,
++									0x04),
++		DESCRIPTOR(0xb012, BT_ATT_PERM_READ, 0x11, 0x22, 0x33, 0x44,
++				0x55, 0x66, 0x77, 0x88, 0x99, 0x00, 0x11, 0x22,
++				0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0x99, 0x00,
++				0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88,
++				0x99, 0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66,
++				0x77, 0x88, 0x99, 0x00, 0x11, 0x22, 0x33),
++
++		PRIMARY_SERVICE(0x0070, "a00b", 7),
++		CHARACTERISTIC(0xb005, BT_ATT_PERM_READ | BT_ATT_PERM_WRITE,
++						BT_GATT_CHRC_PROP_READ |
++						BT_GATT_CHRC_PROP_WRITE |
++						BT_GATT_CHRC_PROP_EXT_PROP,
++						0x05),
++		DESCRIPTOR(GATT_CHARAC_EXT_PROPER_UUID, BT_ATT_PERM_READ, 0x03,
++									0x00),
++		DESCRIPTOR_STR(GATT_CHARAC_USER_DESC_UUID,
++					BT_ATT_PERM_READ | BT_ATT_PERM_WRITE,
++					"ABCDEFGHIJKLMNOPQRSTUVWXYZ"),
++		DESCRIPTOR(GATT_CHARAC_FMT_UUID, 0x04, 0x00, 0x01, 0x30, 0x01,
++								0x11, 0x31),
++		DESCRIPTOR(0000d5d4-0000-0000-0123-456789abcdef,
++							BT_ATT_PERM_READ, 0x44),
++
++		/* 0x0080 service defined earlier, included in 0x0001 */
++
++		PRIMARY_SERVICE(0x0090, "0000a00c-0000-0000-0123-456789abcdef",
++									7),
++		INCLUDE(0x0001),
++		CHARACTERISTIC(0000b009-0000-0000-0123-456789abcdef,
++					BT_ATT_PERM_READ | BT_ATT_PERM_WRITE,
++					BT_GATT_CHRC_PROP_READ |
++					BT_GATT_CHRC_PROP_WRITE |
++					BT_GATT_CHRC_PROP_EXT_PROP, 0x09),
++		DESCRIPTOR(GATT_CHARAC_EXT_PROPER_UUID, BT_ATT_PERM_READ, 0x01,
++									0x00),
++		DESCRIPTOR(0000d9d2-0000-0000-0123-456789abcdef,
++				BT_ATT_PERM_READ | BT_ATT_PERM_WRITE, 0x22),
++		DESCRIPTOR(0000d9d3-0000-0000-0123-456789abcdef,
++						BT_ATT_PERM_WRITE, 0x33),
++
++		PRIMARY_SERVICE(0x00a0, "a00f", 18),
++		CHARACTERISTIC_STR(0xb00e, BT_ATT_PERM_READ,
++					BT_GATT_CHRC_PROP_READ, "Length is "),
++		DESCRIPTOR(GATT_CHARAC_FMT_UUID, BT_ATT_PERM_READ, 0x19, 0x00,
++						0x00, 0x30, 0x01, 0x00, 0x00),
++		CHARACTERISTIC(0xb00f, BT_ATT_PERM_READ | BT_ATT_PERM_WRITE,
++						BT_GATT_CHRC_PROP_READ |
++						BT_GATT_CHRC_PROP_WRITE, 0x65),
++		DESCRIPTOR(GATT_CHARAC_FMT_UUID, BT_ATT_PERM_READ, 0x04, 0x00,
++						0x01, 0x27, 0x01, 0x01, 0x00),
++		CHARACTERISTIC(0xb006, BT_ATT_PERM_READ | BT_ATT_PERM_WRITE,
++						BT_GATT_CHRC_PROP_READ |
++						BT_GATT_CHRC_PROP_WRITE,
++						0x34, 0x12),
++		DESCRIPTOR(GATT_CHARAC_FMT_UUID, BT_ATT_PERM_READ, 0x06, 0x00,
++						0x10, 0x27, 0x01, 0x02, 0x00),
++		CHARACTERISTIC(0xb007, BT_ATT_PERM_READ | BT_ATT_PERM_WRITE,
++						BT_GATT_CHRC_PROP_READ |
++						BT_GATT_CHRC_PROP_WRITE,
++						0x04, 0x03, 0x02, 0x01),
++		DESCRIPTOR(GATT_CHARAC_FMT_UUID, BT_ATT_PERM_READ, 0x08, 0x00,
++						0x17, 0x27, 0x01, 0x03, 0x00),
++		CHARACTERISTIC(0xb010, BT_ATT_PERM_READ, BT_GATT_CHRC_PROP_READ,
++					0x65, 0x34, 0x12, 0x04, 0x03, 0x02,
++					0x01),
++		DESCRIPTOR(GATT_CHARAC_AGREG_FMT_UUID, BT_ATT_PERM_READ, 0xA6,
++						0x00, 0xa9, 0x00, 0xac, 0x00),
++		CHARACTERISTIC(0xb011, BT_ATT_PERM_READ | BT_ATT_PERM_WRITE,
++						BT_GATT_CHRC_PROP_READ |
++						BT_GATT_CHRC_PROP_AUTH, 0x012),
++
++		PRIMARY_SERVICE(0x00C0, "0000a00c-0000-0000-0123-456789abcdef",
++									30),
++		CHARACTERISTIC(0xb00a, BT_ATT_PERM_READ, BT_GATT_CHRC_PROP_READ,
++									0x0A),
++		CHARACTERISTIC_STR(0xb002, BT_ATT_PERM_READ | BT_ATT_PERM_WRITE,
++						BT_GATT_CHRC_PROP_READ |
++						BT_GATT_CHRC_PROP_WRITE,
++						"111112222233333444445"),
++		DESCRIPTOR(0xb012, BT_ATT_PERM_READ | BT_ATT_PERM_WRITE,
++				0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88,
++				0x99, 0x00, 0x12, 0x34, 0x56, 0x78, 0x90, 0x11),
++		CHARACTERISTIC_STR(0xb002, BT_ATT_PERM_READ | BT_ATT_PERM_WRITE,
++						BT_GATT_CHRC_PROP_READ |
++						BT_GATT_CHRC_PROP_WRITE,
++						"2222233333444445555566"),
++		DESCRIPTOR(0xb013, BT_ATT_PERM_READ | BT_ATT_PERM_WRITE,
++				0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88,
++				0x99, 0x00, 0x12, 0x34, 0x56, 0x78, 0x90, 0x11,
++				0x22),
++		CHARACTERISTIC_STR(0xb002, BT_ATT_PERM_READ | BT_ATT_PERM_WRITE,
++						BT_GATT_CHRC_PROP_READ |
++						BT_GATT_CHRC_PROP_WRITE,
++						"33333444445555566666777"),
++		DESCRIPTOR(0xb014, BT_ATT_PERM_READ | BT_ATT_PERM_WRITE,
++				0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88,
++				0x99, 0x00, 0x12, 0x34, 0x56, 0x78, 0x90, 0x11,
++				0x22, 0x33),
++		CHARACTERISTIC(0xb002, BT_ATT_PERM_READ | BT_ATT_PERM_WRITE,
++						BT_GATT_CHRC_PROP_READ |
++						BT_GATT_CHRC_PROP_WRITE,
++						0x11, 0x22, 0x33, 0x44, 0x55,
++						0x66, 0x77, 0x88, 0x99, 0x00,
++						0x11, 0x22, 0x33, 0x44, 0x55,
++						0x66, 0x77, 0x88, 0x99, 0x00,
++						0x11, 0x22, 0x33, 0x44, 0x55,
++						0x66, 0x77, 0x88, 0x99, 0x00,
++						0x11, 0x22, 0x33, 0x44, 0x55,
++						0x66, 0x77, 0x88, 0x99, 0x00,
++						0x11, 0x22, 0x33),
++		DESCRIPTOR(0xb012, BT_ATT_PERM_READ | BT_ATT_PERM_WRITE,
++				0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88,
++				0x99, 0x00, 0x12, 0x34, 0x56, 0x78, 0x90, 0x12,
++				0x34, 0x56, 0x78, 0x90, 0x12, 0x34, 0x56, 0x78,
++				0x90, 0x12, 0x34, 0x56, 0x78, 0x90, 0x11, 0x22,
++				0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0x99, 0x00,
++				0x11, 0x22, 0x33),
++		CHARACTERISTIC(0xb002, BT_ATT_PERM_READ | BT_ATT_PERM_WRITE,
++						BT_GATT_CHRC_PROP_READ |
++						BT_GATT_CHRC_PROP_WRITE,
++						0x11, 0x22, 0x33, 0x44, 0x55,
++						0x66, 0x77, 0x88, 0x99, 0x00,
++						0x11, 0x22, 0x33, 0x44, 0x55,
++						0x66, 0x77, 0x88, 0x99, 0x00,
++						0x11, 0x22, 0x33, 0x44, 0x55,
++						0x66, 0x77, 0x88, 0x99, 0x00,
++						0x11, 0x22, 0x33, 0x44, 0x55,
++						0x66, 0x77, 0x88, 0x99, 0x00,
++						0x11, 0x22, 0x33, 0x44),
++		DESCRIPTOR(0xb013, BT_ATT_PERM_READ | BT_ATT_PERM_WRITE,
++				0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88,
++				0x99, 0x00, 0x12, 0x34, 0x56, 0x78, 0x90, 0x12,
++				0x34, 0x56, 0x78, 0x90, 0x12, 0x34, 0x56, 0x78,
++				0x90, 0x12, 0x34, 0x56, 0x78, 0x90, 0x11, 0x22,
++				0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0x99, 0x00,
++				0x11, 0x22, 0x33, 0x44),
++		CHARACTERISTIC(0xb002, BT_ATT_PERM_READ | BT_ATT_PERM_WRITE,
++						BT_GATT_CHRC_PROP_READ |
++						BT_GATT_CHRC_PROP_WRITE,
++						0x11, 0x22, 0x33, 0x44, 0x55,
++						0x66, 0x77, 0x88, 0x99, 0x00,
++						0x11, 0x22, 0x33, 0x44, 0x55,
++						0x66, 0x77, 0x88, 0x99, 0x00,
++						0x11, 0x22, 0x33, 0x44, 0x55,
++						0x66, 0x77, 0x88, 0x99, 0x00,
++						0x11, 0x22, 0x33, 0x44, 0x55,
++						0x66, 0x77, 0x88, 0x99, 0x00,
++						0x11, 0x22, 0x33, 0x44, 0x55),
++		DESCRIPTOR(0xb014, BT_ATT_PERM_READ | BT_ATT_PERM_WRITE,
++				0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88,
++				0x99, 0x00, 0x12, 0x34, 0x56, 0x78, 0x90, 0x12,
++				0x34, 0x56, 0x78, 0x90, 0x12, 0x34, 0x56, 0x78,
++				0x90, 0x12, 0x34, 0x56, 0x78, 0x90, 0x11, 0x22,
++				0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0x99, 0x00,
++				0x11, 0x22, 0x33, 0x44, 0x55),
++		CHARACTERISTIC_STR(0xb002, BT_ATT_PERM_READ | BT_ATT_PERM_WRITE,
++						BT_GATT_CHRC_PROP_READ |
++						BT_GATT_CHRC_PROP_WRITE,
++						"1111122222333334444455555666667777788888999"),
++		DESCRIPTOR(0xb012, BT_ATT_PERM_READ | BT_ATT_PERM_WRITE,
++				0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88,
++				0x99, 0x00, 0x12, 0x34, 0x56, 0x78, 0x90, 0x12,
++				0x34, 0x56, 0x78, 0x90, 0x12, 0x34, 0x56, 0x78,
++				0x90, 0x12, 0x34, 0x56, 0x78, 0x90, 0x11, 0x22,
++				0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0x99, 0x00,
++				0x11, 0x22, 0x33),
++		CHARACTERISTIC_STR(0xb002, BT_ATT_PERM_READ | BT_ATT_PERM_WRITE,
++						BT_GATT_CHRC_PROP_READ |
++						BT_GATT_CHRC_PROP_WRITE,
++						"22222333334444455555666667777788888999990000"),
++		DESCRIPTOR(0xb013, BT_ATT_PERM_READ | BT_ATT_PERM_WRITE,
++				0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88,
++				0x99, 0x00, 0x12, 0x34, 0x56, 0x78, 0x90, 0x12,
++				0x34, 0x56, 0x78, 0x90, 0x12, 0x34, 0x56, 0x78,
++				0x90, 0x12, 0x34, 0x56, 0x78, 0x90, 0x11, 0x22,
++				0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0x99, 0x00,
++				0x11, 0x22, 0x33, 0x44),
++		CHARACTERISTIC_STR(0xb002, BT_ATT_PERM_READ | BT_ATT_PERM_WRITE,
++						BT_GATT_CHRC_PROP_READ |
++						BT_GATT_CHRC_PROP_WRITE,
++						"333334444455555666667777788888999990000011111"),
++		DESCRIPTOR(0xb014, BT_ATT_PERM_READ | BT_ATT_PERM_WRITE,
++				0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88,
++				0x99, 0x00, 0x12, 0x34, 0x56, 0x78, 0x90, 0x12,
++				0x34, 0x56, 0x78, 0x90, 0x12, 0x34, 0x56, 0x78,
++				0x90, 0x12, 0x34, 0x56, 0x78, 0x90, 0x11, 0x22,
++				0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0x99, 0x00,
++				0x11, 0x22, 0x33, 0x44, 0x55),
++		{ }
++	};
++
++	return make_db(specs);
++}
++
+ static void test_client(gconstpointer data)
+ {
+ 	struct context *context = create_context(512, data);
+@@ -1104,12 +1419,13 @@ static void test_read_by_type(gconstpointer data)
+ 
+ int main(int argc, char *argv[])
+ {
+-	struct gatt_db *service_db_1, *ts_small_db;
++	struct gatt_db *service_db_1, *ts_small_db, *ts_large_db_1;
+ 
+ 	g_test_init(&argc, &argv, NULL);
+ 
+ 	service_db_1 = make_service_data_1_db();
+ 	ts_small_db = make_test_spec_small_db();
++	ts_large_db_1 = make_test_spec_large_db_1();
+ 
+ 	/*
+ 	 * Server Configuration
+@@ -1165,6 +1481,11 @@ int main(int argc, char *argv[])
+ 			raw_pdu(0x03, 0x00, 0x02),
+ 			PRIMARY_DISC_SMALL_DB);
+ 
++	define_test_server("/TP/GAD/SR/BV-01-C-large-1", test_server,
++			ts_large_db_1, NULL,
++			raw_pdu(0x03, 0x00, 0x02),
++			PRIMARY_DISC_LARGE_DB_1);
++
+ 	define_test_att("/TP/GAD/CL/BV-02-C-1", test_search_primary, &uuid_16,
+ 			NULL,
+ 			MTU_EXCHANGE_CLIENT_PDUS,
+-- 
+2.2.0.rc0.207.ga3a616c
 
-are available in the git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git for-upstream
-
-for you to fetch changes up to e64b4fb66cc428cef0a62ea899b671c1aad05f3a:
-
-  Bluetooth: Add timing information to ECDH test case runs (2014-12-30 10:32:11 +0200)
-
-----------------------------------------------------------------
-Alexander Aring (11):
-      nl802154: introduce cca mode enums
-      ieee802154: rework cca setting
-      nl802154: introduce support for cca settings
-      at86rf230: add reset state cca handling
-      at86rf230: remove if branch
-      at86rf230: make at86rf230_async_error inline
-      at86rf230: fix context pointer handling
-      at86rf230: remove unnecessary assign
-      at86rf230: cleanup check on trac status
-      mac802154: iface: check concurrent ifaces
-      ieee802154: iface: move multiple node type check
-
-Andrey Yurovsky (2):
-      at86rf230: fix register read for part version
-      at86rf230: remove version check for AT86RF212
-
-Johan Hedberg (12):
-      Bluetooth: Split hci_update_page_scan into two functions
-      Bluetooth: Split hci_request helpers to hci_request.[ch]
-      Bluetooth: Add hci_request support for hci_update_background_scan
-      Bluetooth: Fix Remove Device to wait for HCI before sending cmd_complete
-      Bluetooth: Fix Add Device to wait for HCI before sending cmd_complete
-      Bluetooth: Add return parameter to cmd_complete callbacks
-      Bluetooth: Move hci_update_page_scan to hci_request.c
-      Bluetooth: Fix const declarations for smp_f5 and smp_f6
-      Bluetooth: Add support for ECDH test cases
-      Bluetooth: Add skeleton for SMP self-tests
-      Bluetooth: Add legacy SMP tests
-      Bluetooth: Add LE Secure Connections tests for SMP
-
-Jukka Rissanen (1):
-      Bluetooth: 6lowpan: Add IPSP PSM value
-
-Marcel Holtmann (17):
-      Bluetooth: Support static address when BR/EDR has been disabled
-      Bluetooth: Add skeleton functions for debugfs creation
-      Bluetooth: Move common debugfs file creation into hci_debugfs.c
-      Bluetooth: Move BR/EDR debugfs file creation into hci_debugfs.c
-      Bluetooth: Move LE debugfs file creation into hci_debugfs.c
-      Bluetooth: Add structures for LE Data Length Extension feature
-      Bluetooth: Enable basics for LE Data Length Extension feature
-      Bluetooth: Store default and maximum LE data length settings
-      Bluetooth: Create debugfs directory for each connection handle
-      Bluetooth: Remove duplicate constant for RFCOMM PSM
-      Bluetooth: Introduce HCI_QUIRK_BROKEN_LOCAL_COMMANDS constant
-      Bluetooth: bfusb: Set the HCI_QUIRK_BROKEN_LOCAL_COMMANDS quirk
-      Bluetooth: btusb: Set the HCI_QUIRK_BROKEN_LOCAL_COMMANDS quirk
-      Bluetooth: Remove BlueFritz! specific check from initialization
-      Bluetooth: Add support for self testing framework
-      Bluetooth: Add timing information to SMP test case runs
-      Bluetooth: Add timing information to ECDH test case runs
-
-Stefan Schmidt (6):
-      ieee802154/at86rf230: Remove unneeded blank lines
-      ieee802154/at86rf230: Align to opening parenthesis
-      ieee802154/at86rf230: Fix typo unkown -> unknown
-      ieee802154/cc2520: Remove extra blank lines
-      ieee802154/mrf24j40: Fix typo begining -> beginning
-      ieee802154/mrf24j40: Fix alignment of parenthesis
-
-Toshi Kikuchi (1):
-      Bluetooth: btusb: support public address configuration for ath3012
-
-Varka Bhadram (3):
-      cc2520: use devm_kzalloc(.., sizeof(*pointer), ..) pattern
-      cc2520: remove 'ret' goto label
-      cc2520: fix zero perm_extended_addr address
-
-Wolfram Sang (1):
-      net: ieee802154: don't use devm_pinctrl_get_select_default() in probe
-
- drivers/bluetooth/bfusb.c          |    2 +
- drivers/bluetooth/btusb.c          |   34 +-
- drivers/net/ieee802154/at86rf230.c |   80 +-
- drivers/net/ieee802154/cc2520.c    |   27 +-
- drivers/net/ieee802154/mrf24j40.c  |    6 +-
- include/net/bluetooth/hci.h        |   53 ++
- include/net/bluetooth/hci_core.h   |   35 +-
- include/net/bluetooth/l2cap.h      |    1 +
- include/net/bluetooth/rfcomm.h     |    2 -
- include/net/cfg802154.h            |   10 +-
- include/net/ieee802154_netdev.h    |    4 +-
- include/net/mac802154.h            |    5 +-
- include/net/nl802154.h             |   45 +-
- net/bluetooth/Kconfig              |   27 +
- net/bluetooth/Makefile             |    4 +-
- net/bluetooth/af_bluetooth.c       |    6 +
- net/bluetooth/hci_conn.c           |    4 +
- net/bluetooth/hci_core.c           | 1640 +----------------------------------
- net/bluetooth/hci_debugfs.c        | 1076 +++++++++++++++++++++++
- net/bluetooth/hci_debugfs.h        |   26 +
- net/bluetooth/hci_event.c          |   71 +-
- net/bluetooth/hci_request.c        |  555 ++++++++++++
- net/bluetooth/hci_request.h        |   54 ++
- net/bluetooth/mgmt.c               |  265 ++++--
- net/bluetooth/rfcomm/core.c        |    4 +-
- net/bluetooth/selftest.c           |  244 ++++++
- net/bluetooth/selftest.h           |   45 +
- net/bluetooth/smp.c                |  335 ++++++-
- net/bluetooth/smp.h                |   13 +
- net/ieee802154/nl-mac.c            |    4 +-
- net/ieee802154/nl802154.c          |   46 +-
- net/ieee802154/rdev-ops.h          |    7 +
- net/ieee802154/sysfs.c             |    2 +-
- net/mac802154/cfg.c                |   21 +
- net/mac802154/driver-ops.h         |    5 +-
- net/mac802154/iface.c              |  100 ++-
- net/mac802154/mac_cmd.c            |    6 +-
- 37 files changed, 3084 insertions(+), 1780 deletions(-)
- create mode 100644 net/bluetooth/hci_debugfs.c
- create mode 100644 net/bluetooth/hci_debugfs.h
- create mode 100644 net/bluetooth/hci_request.c
- create mode 100644 net/bluetooth/hci_request.h
- create mode 100644 net/bluetooth/selftest.c
- create mode 100644 net/bluetooth/selftest.h
-
-
---d6Gm4EdcadzBjdND
-Content-Type: application/pgp-signature
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1
-
-iQIcBAEBAgAGBQJUo6T9AAoJECQj9vv5qNQSHykQAKlS5/+Ia/ca6JlDj+hJVnge
-+u3RnoI+x7VfXw/k2HsqnBQPd+r/RdiTfxU5e4ynuvIZvyg6rNsnJiNl3NA0AeKz
-CCUbMJEGEqUIvTWzb5roADJtB0QsBrJYwv9cI8vqF3ZTmCIKL2mddgaQ+FSNG3eE
-Qzn3fnOb1LyfuyyHwRzD9hqlizmvhie9L0Tp0cp56O3UDR8E9Wlb+44iuoatuCG4
-KSLAOP/UoGlgpMxMysAZgQcWoMXYrAg86YAAaAnxhgd1MHkt2AMIwTWLKX+aG8fv
-h/spIkA1Q3UlDmUTvLbTEjtokNdwotWYcIXJTGJtbam01b6+x7tvFhvev9VhWeVB
-gjBfOjz4T5IKBg25gVkHclOVF+YvNR+1K+U+JQPEUCG6FuS8vYDOHs7aYNMxYDdE
-XQfNNPuBz7wG2DXU0VFySTYWlflt6IU1nn/dyU+f8I965YxXeH4MIpYrjvEypQAQ
-eeH2Wl+LcTyMC4GC9q6EqUlsdl/pfPXyTXV9AdqcJwFL4NtF0pcBzdJ7gM8ps0H5
-q11gnRTo4JYspHLTC+qXDyUP+ddr6fk5B/56et6rTQjm1Ky/rdMOweZUQVfoLw7k
-Yshi0g3M5cvjwYHN2xwn3mgAQfdmS/U32G+pv+PPTVbpYoNBTZ2PkucpbPoaB0JZ
-/hBsnyZ+ZS8LeO/2wg2P
-=vZpi
------END PGP SIGNATURE-----
-
---d6Gm4EdcadzBjdND--
