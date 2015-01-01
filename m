@@ -1,43 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
 From: Amitkumar Karwar <akarwar@marvell.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: <marcel@holtmann.org>, <patila@marvell.com>, Cathy Luo <cluo@marvell.com>,
-        Marc Yang <yangyang@marvell.com>,
-        Amitkumar Karwar <akarwar@marvell.com>
-Subject: [PATCH v2 1/4] Bluetooth: btmrvl: fix race issue while stopping main thread
-Date: Thu, 1 Jan 2015 00:13:39 -0800
-Message-ID: <1420100022-4134-1-git-send-email-akarwar@marvell.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+CC: BlueZ development <linux-bluetooth@vger.kernel.org>,
+        Avinash Patil
+	<patila@marvell.com>, Cathy Luo <cluo@marvell.com>,
+        Marc Yang
+	<yangyang@marvell.com>
+Date: Thu, 1 Jan 2015 00:11:16 -0800
+Subject: RE: [PATCH 1/4] Bluetooth: btmrvl: fix race issue while stopping
+ main thread
+Message-ID: <5FF020A1CFFEEC49BD1E09530C4FF5951B16178D82@SC-VEXCH1.marvell.com>
+References: <1420024442-12137-1-git-send-email-akarwar@marvell.com>
+ <B54F0CE9-1DE7-4985-851A-CD7E06AB7DA8@holtmann.org>
+ <5FF020A1CFFEEC49BD1E09530C4FF5951B16178D67@SC-VEXCH1.marvell.com>
+ <1D6FD319-3F82-4CDD-AAEB-9FA50820208F@holtmann.org>
+In-Reply-To: <1D6FD319-3F82-4CDD-AAEB-9FA50820208F@holtmann.org>
+Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
-Content-Type: text/plain
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-btmrvl_remove_card() calls kthread_stop() to stop the main thread,
-but kthread_should_stop() is checked when all the activities are done
-in the main thread before sleeping.
-We will have kthread_should_stop() check as soon as main thread is
-woken up. This fixes a crash issue caused due to an invalid memory
-access while unnecessarily processing interrupts after card removal.
+Hi Marcel,
 
-Signed-off-by: Amitkumar Karwar <akarwar@marvell.com>
----
- drivers/bluetooth/btmrvl_main.c | 5 +++++
- 1 file changed, 5 insertions(+)
+>
+>the first Signed-off-by is the patch author. This means all the other
+>should be Reviewed-by lines.
+>
+>The chain of Signed-off-by lines shows on who took a patch and
+>submitting along the chain towards upstream. That means the author is
+>the first one. Then I would be the second and so on.
+>
+>If someone else wrote the patch, then he/she is first, if you then take
+>it and submit it to linux-bluetooth that means you add a Signed-off-by
+>since you send it. However the author stays the same and the first
+>Signed-off-by is still the authors.
+>
 
-diff --git a/drivers/bluetooth/btmrvl_main.c b/drivers/bluetooth/btmrvl_main.c
-index 30939c9..e3f5711 100644
---- a/drivers/bluetooth/btmrvl_main.c
-+++ b/drivers/bluetooth/btmrvl_main.c
-@@ -616,6 +616,11 @@ static int btmrvl_service_main_thread(void *data)
- 
- 		BT_DBG("main_thread woke up");
- 
-+		if (kthread_should_stop()) {
-+			BT_DBG("main_thread: break from main thread");
-+			break;
-+		}
-+
- 		spin_lock_irqsave(&priv->driver_lock, flags);
- 		if (adapter->int_count) {
- 			adapter->int_count = 0;
--- 
-1.8.1.4
+Got it. Thanks for the explanation. I will send v2 series after removing re=
+dundant Signed-off-by.
+
+Best regards,
+Amit
