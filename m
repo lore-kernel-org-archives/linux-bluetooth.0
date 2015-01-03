@@ -1,54 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
-From: James Cloos <cloos@jhcloos.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: Keeping hci interface powered
-Date: Sat, 03 Jan 2015 19:27:40 -0500
-Message-ID: <m3oaqfl79f.fsf@carbon.jhcloos.org>
+Date: Sat, 3 Jan 2015 22:33:41 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 1/3] Bluetooth: Remove dead code for manufacturer inquiry
+ mode quirks
+Message-ID: <20150103203341.GA19817@t440s.P-661HNU-F1>
+References: <1420270520-32581-1-git-send-email-marcel@holtmann.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1420270520-32581-1-git-send-email-marcel@holtmann.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-I recently assembled a box for htpc duties, including a bluetooth
-keyboard.
+Hi Marcel,
 
-It mostly works, except that the hci interface continually powers down.
+On Fri, Jan 02, 2015, Marcel Holtmann wrote:
+> There are some old Bluetooth modules from Silicon Wave and Broadcom
+> which support Inquiry Result with RSSI, but do not advertise it. The
+> core has quirks in the code to enable that inquiry mode. However as
+> it stands right now, that code is not even executed since entering
+> the function to determine which inquiry mode requires that the device
+> has the feature bit for Inquiry Result with RSSI set in the first
+> place. So this makes this dead code that hasn't work for a long
+> time.
+> 
+> In conclusion, just remove these extra quirks and simplify the setup
+> of the inquiry mode to be inline and with that a lot easier to read
+> and understand.
+> 
+> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+> ---
+>  net/bluetooth/hci_core.c | 50 +++++++++++-------------------------------------
+>  1 file changed, 11 insertions(+), 39 deletions(-)
 
-I suspect every time the keyboard powers down,the hci does, too.
+All three patches in this set have been applied to bluetooth-next.
+Thanks.
 
-How can I prevent that?
-
-I want the hci always to be powered, so that the keyboard can reconnect
-every time I hit a key.
-
-As it is, whenever I want to use it, I have to ssh in from another
-system, run bluetoothctl and therein run power on and connect $MAC.
-
-You can imagine how frustrating that is.
-
-The box has a Gigabyte F2A88XN-WIFI board, which came with a laptop-
-style mini-pcie card with an intel 7260 802.11n on the pcie and an
-8087:07dc bluetooth on the usb.
-
-bluetoothctl show says:
-
-Controller 80:86:xx:xx:xx:xx
-	Name: BlueZ 5.27
-	Alias: BlueZ 5.27
-	Class: 0x000104
-	Powered: yes
-	Discoverable: no
-	Pairable: yes
-	UUID: PnP Information           (00001200-0000-1000-8000-00805f9b34fb)
-	UUID: Generic Access Profile    (00001800-0000-1000-8000-00805f9b34fb)
-	UUID: Generic Attribute Profile (00001801-0000-1000-8000-00805f9b34fb)
-	UUID: A/V Remote Control        (0000110e-0000-1000-8000-00805f9b34fb)
-	UUID: A/V Remote Control Target (0000110c-0000-1000-8000-00805f9b34fb)
-	Modalias: usb:v1D6Bp0246d051B
-	Discovering: no
-
-Thanks,
-
--JimC
--- 
-James Cloos <cloos@jhcloos.com>         OpenPGP: 0x997A9F17ED7DAEA6
+Johan
