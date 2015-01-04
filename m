@@ -1,69 +1,65 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1419985952-18334-1-git-send-email-jamuraa@chromium.org>
-References: <1419985952-18334-1-git-send-email-jamuraa@chromium.org>
-Date: Mon, 5 Jan 2015 10:59:26 -0200
-Message-ID: <CABBYNZKqoqSow2EfT52OdTgSipcN9GzwTFzYOGMGUf4Z2eowPQ@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 00/14] Add TS Large Database, more server tests.
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Michael Janssen <jamuraa@chromium.org>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-bluetooth-owner@vger.kernel.org
+From: Rickard Strandqvist <rickard_strandqvist@spectrumdigital.se>
+To: Marcel Holtmann <marcel@holtmann.org>,
+	Gustavo Padovan <gustavo@padovan.org>
+Cc: Rickard Strandqvist <rickard_strandqvist@spectrumdigital.se>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-bluetooth@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] bluetooth: Remove unused function
+Date: Sun,  4 Jan 2015 16:55:14 +0100
+Message-Id: <1420386914-12885-1-git-send-email-rickard_strandqvist@spectrumdigital.se>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Michael,
+Remove the function hci_conn_change_link_key() that is not used anywhere.
 
-On Tue, Dec 30, 2014 at 10:32 PM, Michael Janssen <jamuraa@chromium.org> wrote:
-> This patchset reworks the way that GATT test databases are defined,
-> defines a "large database" as defined by the test spec, adds a set
-> of new tests from the test spec.
->
-> It also includes some minor cleanup.
->
-> Michael Janssen (14):
->   shared/gatt-db: Add gatt_db_find_by_type_value
->   shared/gatt-server: support Discover by UUID
->   unit/gatt: Bugfix small database construction
->   unit/gatt: Add add_desc_with_value function
->   unit/gatt: Rework service db definitions
->   unit/gatt: Add Test Spec Large Database 1
->   unit/gatt: Comment cleanup
->   unit/gatt: Add /TP/GAD/SR/BV-02-C test
->   unit/gatt: Add /TP/GAD/SR/BV-03-C test
->   unit/gatt: Add /TP/GAD/SR/BV-04-C test
->   unit/gatt: Add clarifying note about dup tests.
->   unit/gatt: Add /TP/GAD/SR/BV-06-C test
->   unit/gatt: Add /TP/GAR/SR/BV-01-C test
->   unit/gatt: Add /TP/GAR/SR/BI-02-C test
->
->  src/shared/gatt-db.c     |  27 ++
->  src/shared/gatt-db.h     |   7 +
->  src/shared/gatt-server.c | 107 +++++++
->  unit/test-gatt.c         | 808 +++++++++++++++++++++++++++++++++++++++--------
->  4 files changed, 812 insertions(+), 137 deletions(-)
->
-> --
-> 2.2.0.rc0.207.ga3a616c
+This was partially found by using a static code analysis program called cppcheck.
 
-I went ahead and applied patches 3-5, patch 6/14 does not apply:
+Signed-off-by: Rickard Strandqvist <rickard_strandqvist@spectrumdigital.se>
+---
+ include/net/bluetooth/hci_core.h |    1 -
+ net/bluetooth/hci_conn.c         |   15 ---------------
+ 2 files changed, 16 deletions(-)
 
-Applying: unit/gatt: Add Test Spec Large Database 1
-WARNING:LONG_LINE: line over 80 characters
-#91: FILE: unit/test-gatt.c:961:
-+ "11111222223333344444555556666677777888889999900000111112222233333444445555566666777778888899999000001111122222333334444455555666667777788888999990000011111222223333344444555556666677777888889999900000111112222233333444445555566666777778888899999000001111122222333334444455555666667777788888999990000011111222223333344444555556666677777888889999900000111112222233333444445555566666777778888899999000001111122222333334444455555666667777788888999990000011111222223333344444555556666677777888889999900000111112222233"),
-
-WARNING:LONG_LINE: line over 80 characters
-#295: FILE: unit/test-gatt.c:1165:
-+ "1111122222333334444455555666667777788888999"),
-
-WARNING:LONG_LINE: line over 80 characters
-#306: FILE: unit/test-gatt.c:1176:
-+ "22222333334444455555666667777788888999990000"),
-
-WARNING:LONG_LINE: line over 80 characters
-#317: FILE: unit/test-gatt.c:1187:
-+ "333334444455555666667777788888999990000011111"),
-
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 37ff1ae..a922163 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -728,7 +728,6 @@ int hci_conn_check_link_mode(struct hci_conn *conn);
+ int hci_conn_check_secure(struct hci_conn *conn, __u8 sec_level);
+ int hci_conn_security(struct hci_conn *conn, __u8 sec_level, __u8 auth_type,
+ 		      bool initiator);
+-int hci_conn_change_link_key(struct hci_conn *conn);
+ int hci_conn_switch_role(struct hci_conn *conn, __u8 role);
+ 
+ void hci_conn_enter_active_mode(struct hci_conn *conn, __u8 force_active);
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+index b9517bd..1fc18b6 100644
+--- a/net/bluetooth/hci_conn.c
++++ b/net/bluetooth/hci_conn.c
+@@ -1075,21 +1075,6 @@ int hci_conn_check_secure(struct hci_conn *conn, __u8 sec_level)
+ }
+ EXPORT_SYMBOL(hci_conn_check_secure);
+ 
+-/* Change link key */
+-int hci_conn_change_link_key(struct hci_conn *conn)
+-{
+-	BT_DBG("hcon %p", conn);
+-
+-	if (!test_and_set_bit(HCI_CONN_AUTH_PEND, &conn->flags)) {
+-		struct hci_cp_change_conn_link_key cp;
+-		cp.handle = cpu_to_le16(conn->handle);
+-		hci_send_cmd(conn->hdev, HCI_OP_CHANGE_CONN_LINK_KEY,
+-			     sizeof(cp), &cp);
+-	}
+-
+-	return 0;
+-}
+-
+ /* Switch role */
+ int hci_conn_switch_role(struct hci_conn *conn, __u8 role)
+ {
 -- 
-Luiz Augusto von Dentz
+1.7.10.4
