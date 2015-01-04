@@ -1,41 +1,54 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 8.1 \(1993\))
-Subject: Re: Keeping hci interface powered
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <m3oaqfl79f.fsf@carbon.jhcloos.org>
-Date: Sat, 3 Jan 2015 17:40:06 -0800
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <D043D131-E9F8-43C1-8671-0EACAE810420@holtmann.org>
-References: <m3oaqfl79f.fsf@carbon.jhcloos.org>
-To: James Cloos <cloos@jhcloos.com>
+From: James Cloos <cloos@jhcloos.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: Keeping hci interface powered
+Date: Sat, 03 Jan 2015 19:27:40 -0500
+Message-ID: <m3oaqfl79f.fsf@carbon.jhcloos.org>
+MIME-Version: 1.0
+Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi James,
+I recently assembled a box for htpc duties, including a bluetooth
+keyboard.
 
-> I recently assembled a box for htpc duties, including a bluetooth
-> keyboard.
-> 
-> It mostly works, except that the hci interface continually powers down.
-> 
-> I suspect every time the keyboard powers down,the hci does, too.
-> 
-> How can I prevent that?
-> 
-> I want the hci always to be powered, so that the keyboard can reconnect
-> every time I hit a key.
-> 
-> As it is, whenever I want to use it, I have to ssh in from another
-> system, run bluetoothctl and therein run power on and connect $MAC.
+It mostly works, except that the hci interface continually powers down.
 
-it should not do that at all. Once a controller is powered that should stay until you tell it otherwise.
+I suspect every time the keyboard powers down,the hci does, too.
 
-However what might happen is that the whole machine goes to sleep and the Bluetooth controllers gets kicked off the USB bus. That is something we can't do anything about. So check dmesg and look for USB disconnects.
+How can I prevent that?
 
-You can also check with btmon what happens when the keyboard disconnects. If the controller goes away it will tell you as well.
+I want the hci always to be powered, so that the keyboard can reconnect
+every time I hit a key.
 
-Regards
+As it is, whenever I want to use it, I have to ssh in from another
+system, run bluetoothctl and therein run power on and connect $MAC.
 
-Marcel
+You can imagine how frustrating that is.
 
+The box has a Gigabyte F2A88XN-WIFI board, which came with a laptop-
+style mini-pcie card with an intel 7260 802.11n on the pcie and an
+8087:07dc bluetooth on the usb.
+
+bluetoothctl show says:
+
+Controller 80:86:xx:xx:xx:xx
+	Name: BlueZ 5.27
+	Alias: BlueZ 5.27
+	Class: 0x000104
+	Powered: yes
+	Discoverable: no
+	Pairable: yes
+	UUID: PnP Information           (00001200-0000-1000-8000-00805f9b34fb)
+	UUID: Generic Access Profile    (00001800-0000-1000-8000-00805f9b34fb)
+	UUID: Generic Attribute Profile (00001801-0000-1000-8000-00805f9b34fb)
+	UUID: A/V Remote Control        (0000110e-0000-1000-8000-00805f9b34fb)
+	UUID: A/V Remote Control Target (0000110c-0000-1000-8000-00805f9b34fb)
+	Modalias: usb:v1D6Bp0246d051B
+	Discovering: no
+
+Thanks,
+
+-JimC
+-- 
+James Cloos <cloos@jhcloos.com>         OpenPGP: 0x997A9F17ED7DAEA6
