@@ -1,65 +1,68 @@
 Return-Path: <cyrus@holtmann.org>
-From: Rickard Strandqvist <rickard_strandqvist@spectrumdigital.se>
-To: Marcel Holtmann <marcel@holtmann.org>,
-	Gustavo Padovan <gustavo@padovan.org>
-Cc: Rickard Strandqvist <rickard_strandqvist@spectrumdigital.se>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-bluetooth@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] bluetooth: Remove unused function
-Date: Sun,  4 Jan 2015 16:55:14 +0100
-Message-Id: <1420386914-12885-1-git-send-email-rickard_strandqvist@spectrumdigital.se>
+Message-ID: <54A956DC.2050100@cschramm.eu>
+Date: Sun, 04 Jan 2015 16:06:04 +0100
+From: Christopher Schramm <blueman@cschramm.eu>
+MIME-Version: 1.0
+To: linux-bluetooth@vger.kernel.org
+CC: blueman@ml.mate-desktop.org
+Content-Type: text/plain; charset=utf-8
+Subject: Services connected in BlueZ 5
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Remove the function hci_conn_change_link_key() that is not used anywhere.
+Hi guys,
 
-This was partially found by using a static code analysis program called cppcheck.
+I'm maintaining blueman, a DE-independent bluetooth manager. It was
+orphaned for some time, keeping it with deprecated APIs, e.g. BlueZ and
+NetworkManager. Together with a handful of awesome contributors we
+revived the development and are bringing blueman back to most distributions.
 
-Signed-off-by: Rickard Strandqvist <rickard_strandqvist@spectrumdigital.se>
----
- include/net/bluetooth/hci_core.h |    1 -
- net/bluetooth/hci_conn.c         |   15 ---------------
- 2 files changed, 16 deletions(-)
+We finally need to finish the migration to BlueZ 5 and I'm a little
+stuck with the services. The original blueman code heavily relied on the
+dbus Interfaces provided by BlueZ 4 for serial, network, input, and
+audio services. Those parts are ported to abstract service classes now
+which detect services based on UUIDs (here's the commit [1] for those
+curious; note we're currently supporting both BlueZ 4 and 5 for one
+major version (2.0) of blueman).
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 37ff1ae..a922163 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -728,7 +728,6 @@ int hci_conn_check_link_mode(struct hci_conn *conn);
- int hci_conn_check_secure(struct hci_conn *conn, __u8 sec_level);
- int hci_conn_security(struct hci_conn *conn, __u8 sec_level, __u8 auth_type,
- 		      bool initiator);
--int hci_conn_change_link_key(struct hci_conn *conn);
- int hci_conn_switch_role(struct hci_conn *conn, __u8 role);
- 
- void hci_conn_enter_active_mode(struct hci_conn *conn, __u8 force_active);
-diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index b9517bd..1fc18b6 100644
---- a/net/bluetooth/hci_conn.c
-+++ b/net/bluetooth/hci_conn.c
-@@ -1075,21 +1075,6 @@ int hci_conn_check_secure(struct hci_conn *conn, __u8 sec_level)
- }
- EXPORT_SYMBOL(hci_conn_check_secure);
- 
--/* Change link key */
--int hci_conn_change_link_key(struct hci_conn *conn)
--{
--	BT_DBG("hcon %p", conn);
--
--	if (!test_and_set_bit(HCI_CONN_AUTH_PEND, &conn->flags)) {
--		struct hci_cp_change_conn_link_key cp;
--		cp.handle = cpu_to_le16(conn->handle);
--		hci_send_cmd(conn->hdev, HCI_OP_CHANGE_CONN_LINK_KEY,
--			     sizeof(cp), &cp);
--	}
--
--	return 0;
--}
--
- /* Switch role */
- int hci_conn_switch_role(struct hci_conn *conn, __u8 role)
- {
--- 
-1.7.10.4
+I know there are basically two ways to connect to services in BlueZ 5:
+Device.Connect and Device.ConnectProfile.
+
+I really like the idea of listing all services available and supported
+and let the user connect to specific ones. The problem with this is I
+did not find a way to detect if a given service is connected or not. So
+I switched back to the generic Device.Connect method [2]. I think this
+method and the Device.Connected property are pretty awkward, since not
+all services are handled. E.g. from my experience a NAP service does not
+get connected by Device.Connect, but if you connect the specific NAP
+service Device.Connected gets set. Neither we as developers, nor the
+users seem to have an indicator for which services are actually
+connected and which are not.
+
+I also experienced issues with Device.Connect for my test devices: If I
+call it on one of my Android devices which provides some audio service I
+get "No such file or directory". If I call it on a Logitech mouse I get
+"Input/output error". I can only connect to them right after pairing
+sometimes. These problems did not show up in BlueZ 4 and I think it was
+much better when testing with Device.ConnectProfile.
+
+So, is there any way to determine a specific service's connection state
+in BlueZ 5? If not, ConnectProfile / DisconnectProfile seem pretty
+useless, since one is left in the dark, so the only valid way would be
+using Connect and hope all services desired by the user get connected
+which is pretty unsatisfying. Can you confirm the awkward behavior of
+Device.Connect and Device.Connected e.g. in conjunction with a network
+service?
+
+I appreciate any help and feedback. If you're curious, please take a
+look at our BlueZ 5 ticket [3] and feel free to contribute.
+
+Regards
+Christopher Schramm
+
+[1]
+https://github.com/blueman-project/blueman/commit/ad8aaf5253546b697115d64ab06a1575ec9ac1e6
+[2]
+https://github.com/blueman-project/blueman/commit/e03f1ab3eac396df813a0161529a6c3823d5ccb4
+[3]
+https://github.com/blueman-project/blueman/issues/13#issuecomment-59015346
