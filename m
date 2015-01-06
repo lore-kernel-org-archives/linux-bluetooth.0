@@ -1,14 +1,14 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <CABBYNZJ3KeXizYxbd27BNQHf-NMOWmBy41UPruqcn13qU_n_aQ@mail.gmail.com>
+In-Reply-To: <CABBYNZKktaMVZwyPYxJbV4E-pejecCT6DwNCc698JNSziNYq2Q@mail.gmail.com>
 References: <1420509816-1376-1-git-send-email-armansito@chromium.org>
-	<1420509816-1376-3-git-send-email-armansito@chromium.org>
-	<CABBYNZKcYim_Vprd6970=9edFRAhGHLf0LOBDHtL5ViCYB4rFA@mail.gmail.com>
-	<CAHrH25THziR=s-jL9BxC1AJ=9vEDg-EhYk9Ade=ZjmYzNt0yjw@mail.gmail.com>
-	<CABBYNZJ3KeXizYxbd27BNQHf-NMOWmBy41UPruqcn13qU_n_aQ@mail.gmail.com>
-Date: Tue, 6 Jan 2015 13:49:51 -0800
-Message-ID: <CAHrH25Sfr_k1e6UzEO66JBXU4ReU8GYibYEejWECxBZtMh_KGA@mail.gmail.com>
-Subject: Re: [PATCH BlueZ v1 2/8] core: gatt: Implement GattCharacteristic1.StartNotify
+	<1420509816-1376-5-git-send-email-armansito@chromium.org>
+	<CABBYNZLXB9TTGQGjwHP=5QOL5og+1g8sbSLP5PDnqaGEk+wzVA@mail.gmail.com>
+	<CAHrH25Qaf+-yj1TgQJ1Mnn2mr+CYCB_WnV+CH7uPzRjoWS=7bA@mail.gmail.com>
+	<CABBYNZKktaMVZwyPYxJbV4E-pejecCT6DwNCc698JNSziNYq2Q@mail.gmail.com>
+Date: Tue, 6 Jan 2015 13:44:40 -0800
+Message-ID: <CAHrH25RaFazotfWq2pcKs6Da-yTsBhpkNvTTo0BPY9uJBmHqKw@mail.gmail.com>
+Subject: Re: [PATCH BlueZ v1 4/8] shared/gatt-db: Add truncate argument to write
 From: Arman Uguray <armansito@chromium.org>
 To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
@@ -18,376 +18,265 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Luiz,
 
-> On Tue, Jan 6, 2015 at 12:54 PM, Luiz Augusto von Dentz <luiz.dentz@gmail.com> wrote:
+> On Tue, Jan 6, 2015 at 12:45 PM, Luiz Augusto von Dentz <luiz.dentz@gmail.com> wrote:
 > Hi Arman,
 >
-> On Tue, Jan 6, 2015 at 4:56 PM, Arman Uguray <armansito@chromium.org> wrote:
+> On Tue, Jan 6, 2015 at 4:58 PM, Arman Uguray <armansito@chromium.org> wrote:
 >> Hi Luiz,
 >>
->>> On Tue, Jan 6, 2015 at 4:33 AM, Luiz Augusto von Dentz <luiz.dentz@gmail.com> wrote:
+>>> On Tue, Jan 6, 2015 at 5:09 AM, Luiz Augusto von Dentz <luiz.dentz@gmail.com> wrote:
 >>> Hi Arman,
 >>>
 >>> On Tue, Jan 6, 2015 at 12:03 AM, Arman Uguray <armansito@chromium.org> wrote:
->>>> This patch implements the StartNotify method of
->>>> org.bluez.GattCharacteristic1. Each call to StartNotify assigns a
->>>> session to the D-Bus sender which internally registers a unique
->>>> notify handler with the bt_gatt_client. Each received notification
->>>> or indication causes a PropertiesChanged signal to be emitted for the
->>>> "Value" property.
->>>>
->>>> The notify handler gets automatically unregistered when sender
->>>> disconnects from D-Bus.
->>>
->>> I recall we discussed removing not implementing StartNofify in favor
->>> of an API where the application can register for notification rather
->>> than enabling it on every connection, furthermore CCC is currently
->>> being exposed via GattDescriptor1 which might conflict with this.
->>>
->>
->> I'm not sure about removing StartNotify/StopNotify just yet. My
->> intention is to first get everything specified in doc/gatt-api.txt
->> implemented and see how it works (since the API is experimental, I
->> think this is OK). And once we have a GattProfile1 API we can remove
->> these. I think that StartNotify/StopNotify addresses most use cases
->> for now, and I want to at least support those platforms that have
->> already developed against doc/gatt-api.txt (ChromiumOS, Tizen, etc)
->> behind the experimental flag.
->
-> Well I considerer enabling notifications across connection too
-> important to be ignored, in fact this is the very reason CCC is
-> persistent so the client configure it once and can start receiving
-> notification since the beginning of the connection, with StartNotify
-> we cannot do that because the objects are destroyed on disconnect.
->
-
-Oh, I agree that this doesn't address that particular case, I just
-wanted to keep the methods though since the API is experimental.
-Anyway, I suppose I'll go ahead and remove StartNotify/StopNotify from
-the API doc and work on a proposal for GattProfile1. I'll place the
-new interfaces inside doc/gatt-api.txt.
-
->> GattDescriptor1 won't be an issue since GattDescriptor1.WriteValue
->> will fail with Error.NotSupported if called on a CCC descriptor.
->
-> I guess we should hide it then, or you do expect anyone to read it?
->
-
-I think it's better to export it and prevent writing to it than hiding
-it, since it won't hurt anybody. Some applications may be interested
-in reading it, though they should probably use
-GattCharacteristic1.Notifying instead. I'm not super opinionated on
-this but I prefer exporting it so that developers can clearly see that
-this descriptor exists on the other end.
-
->>
+>>>> This patch adds the "truncate" argument to gatt_db_attribute_write. This
+>>>> allows users to specify if the cached value should be truncated when the
+>>>> write value length is shorter than what is stored in the database. This
+>>>> allows client code to correctly store a remote attribute value when the
+>>>> database is used as a client-role cache.
 >>>> ---
->>>>  src/gatt-client.c | 255 ++++++++++++++++++++++++++++++++++++++++++++++++++++--
->>>>  1 file changed, 246 insertions(+), 9 deletions(-)
+>>>>  android/gatt.c           | 17 +++++++++--------
+>>>>  src/gatt-client.c        |  6 +++---
+>>>>  src/shared/gatt-db.c     | 18 ++++++++++++++++--
+>>>>  src/shared/gatt-db.h     |  1 +
+>>>>  src/shared/gatt-server.c |  6 ++++--
+>>>>  tools/btgatt-server.c    |  8 ++++----
+>>>>  unit/test-gatt.c         |  6 +++---
+>>>>  7 files changed, 40 insertions(+), 22 deletions(-)
 >>>>
->>>> diff --git a/src/gatt-client.c b/src/gatt-client.c
->>>> index 8bbb03d..5c030ee 100644
->>>> --- a/src/gatt-client.c
->>>> +++ b/src/gatt-client.c
->>>> @@ -87,6 +87,9 @@ struct characteristic {
->>>>         bool in_write;
+>>>> diff --git a/android/gatt.c b/android/gatt.c
+>>>> index 3a35bd6..7f765e0 100644
+>>>> --- a/android/gatt.c
+>>>> +++ b/android/gatt.c
+>>>> @@ -6349,7 +6349,7 @@ static void write_cmd_request(const uint8_t *cmd, uint16_t cmd_len,
+>>>>                 return;
 >>>>
->>>>         struct queue *descs;
->>>> +
->>>> +       bool notifying;
->>>> +       struct queue *notify_clients;
->>>>  };
->>>>
->>>>  struct descriptor {
->>>> @@ -230,7 +233,9 @@ static void async_dbus_op_free(void *data)
->>>>  {
->>>>         struct async_dbus_op *op = data;
->>>>
->>>> -       dbus_message_unref(op->msg);
->>>> +       if (op->msg)
->>>> +               dbus_message_unref(op->msg);
->>>> +
->>>>         free(op);
+>>>>         gatt_db_attribute_write(attrib, 0, value, vlen, cmd[0], &dev->bdaddr,
+>>>> -                                                       write_confirm, NULL);
+>>>> +                                               false, write_confirm, NULL);
 >>>>  }
 >>>>
->>>> @@ -674,12 +679,8 @@ static gboolean characteristic_value_exists(const GDBusPropertyTable *property,
->>>>  static gboolean characteristic_get_notifying(const GDBusPropertyTable *property,
->>>>                                         DBusMessageIter *iter, void *data)
->>>>  {
->>>> -       dbus_bool_t notifying = FALSE;
->>>> -
->>>> -       /*
->>>> -        * TODO: Return the correct value here once StartNotify and StopNotify
->>>> -        * methods are implemented.
->>>> -        */
->>>> +       struct characteristic *chrc = data;
->>>> +       dbus_bool_t notifying = chrc->notifying ? TRUE : FALSE;
->>>>
->>>>         dbus_message_iter_append_basic(iter, DBUS_TYPE_BOOLEAN, &notifying);
->>>>
->>>> @@ -895,11 +896,239 @@ done_async:
->>>>         return NULL;
+>>>>  static void write_signed_cmd_request(const uint8_t *cmd, uint16_t cmd_len,
+>>>> @@ -6421,7 +6421,8 @@ static void write_signed_cmd_request(const uint8_t *cmd, uint16_t cmd_len,
+>>>>                 /* Signature OK, proceed with write */
+>>>>                 bt_update_sign_counter(&dev->bdaddr, REMOTE_CSRK, r_sign_cnt);
+>>>>                 gatt_db_attribute_write(attrib, 0, value, vlen, cmd[0],
+>>>> -                                       &dev->bdaddr, write_confirm, NULL);
+>>>> +                                                       &dev->bdaddr, false,
+>>>> +                                                       write_confirm, NULL);
+>>>>         }
 >>>>  }
 >>>>
->>>> +struct notify_client {
->>>> +       struct characteristic *chrc;
->>>> +       int ref_count;
->>>> +       char *owner;
->>>> +       guint watch;
->>>> +       unsigned int notify_id;
->>>> +};
->>>> +
->>>> +static void notify_client_free(struct notify_client *client)
->>>> +{
->>>> +       DBG("owner %s", client->owner);
->>>> +
->>>> +       g_dbus_remove_watch(btd_get_dbus_connection(), client->watch);
->>>> +       free(client->owner);
->>>> +       free(client);
->>>> +}
->>>> +
->>>> +static void notify_client_unref(void *data)
->>>> +{
->>>> +       struct notify_client *client = data;
->>>> +
->>>> +       DBG("owner %s", client->owner);
->>>> +
->>>> +       if (__sync_sub_and_fetch(&client->ref_count, 1))
->>>> +               return;
->>>> +
->>>> +       notify_client_free(client);
->>>> +}
->>>> +
->>>> +static struct notify_client *notify_client_ref(struct notify_client *client)
->>>> +{
->>>> +       DBG("owner %s", client->owner);
->>>> +
->>>> +       __sync_fetch_and_add(&client->ref_count, 1);
->>>> +
->>>> +       return client;
->>>> +}
->>>> +
->>>> +static bool match_notifying(const void *a, const void *b)
->>>> +{
->>>> +       const struct notify_client *client = a;
->>>> +
->>>> +       return !!client->notify_id;
->>>> +}
->>>> +
->>>> +static void update_notifying(struct characteristic *chrc)
->>>> +{
->>>> +       if (!chrc->notifying)
->>>> +               return;
->>>> +
->>>> +       if (queue_find(chrc->notify_clients, match_notifying, NULL))
->>>> +               return;
->>>> +
->>>> +       chrc->notifying = false;
->>>> +
->>>> +       g_dbus_emit_property_changed(btd_get_dbus_connection(), chrc->path,
->>>> +                                               GATT_CHARACTERISTIC_IFACE,
->>>> +                                               "Notifying");
->>>> +}
->>>> +
->>>> +static void notify_client_disconnect(DBusConnection *conn, void *user_data)
->>>> +{
->>>> +       struct notify_client *client = user_data;
->>>> +       struct characteristic *chrc = client->chrc;
->>>> +       struct bt_gatt_client *gatt = chrc->service->client->gatt;
->>>> +
->>>> +       DBG("owner %s", client->owner);
->>>> +
->>>> +       queue_remove(chrc->notify_clients, client);
->>>> +       bt_gatt_client_unregister_notify(gatt, client->notify_id);
->>>> +
->>>> +       update_notifying(chrc);
->>>> +
->>>> +       notify_client_unref(client);
->>>> +}
->>>> +
->>>> +static struct notify_client *notify_client_create(struct characteristic *chrc,
->>>> +                                                       const char *owner)
->>>> +{
->>>> +       struct notify_client *client;
->>>> +
->>>> +       client = new0(struct notify_client, 1);
->>>> +       if (!client)
->>>> +               return NULL;
->>>> +
->>>> +       client->chrc = chrc;
->>>> +       client->owner = strdup(owner);
->>>> +       if (!client->owner) {
->>>> +               free(client);
->>>> +               return NULL;
->>>> +       }
->>>> +
->>>> +       client->watch = g_dbus_add_disconnect_watch(btd_get_dbus_connection(),
->>>> +                                               owner, notify_client_disconnect,
->>>> +                                               client, NULL);
->>>> +       if (!client->watch) {
->>>> +               free(client->owner);
->>>> +               free(client);
->>>> +               return NULL;
->>>> +       }
->>>> +
->>>> +       return notify_client_ref(client);
->>>> +}
->>>> +
->>>> +static bool match_notify_sender(const void *a, const void *b)
->>>> +{
->>>> +       const struct notify_client *client = a;
->>>> +       const char *sender = b;
->>>> +
->>>> +       return strcmp(client->owner, sender) == 0;
->>>> +}
->>>> +
->>>> +static void notify_cb(uint16_t value_handle, const uint8_t *value,
->>>> +                                       uint16_t length, void *user_data)
->>>> +{
->>>> +       struct async_dbus_op *op = user_data;
->>>> +       struct notify_client *client = op->data;
->>>> +       struct characteristic *chrc = client->chrc;
->>>> +
->>>> +       /*
->>>> +        * Even if the value didn't change, we want to send a PropertiesChanged
->>>> +        * signal so that we propagate the notification/indication to
->>>> +        * applications.
->>>> +        */
->>>> +       gatt_db_attribute_write(chrc->attr, 0, value, length, 0, NULL,
->>>> +                                               write_characteristic_cb, chrc);
->>>> +}
->>>> +
->>>> +static void register_notify_cb(unsigned int id, uint16_t att_ecode,
->>>> +                                                               void *user_data)
->>>> +{
->>>> +       struct async_dbus_op *op = user_data;
->>>> +       struct notify_client *client = op->data;
->>>> +       struct characteristic *chrc = client->chrc;
->>>> +       DBusMessage *reply;
->>>> +
->>>> +       /* Make sure that an interim disconnect did not remove the client */
->>>> +       if (!queue_find(chrc->notify_clients, NULL, client)) {
->>>> +               bt_gatt_client_unregister_notify(chrc->service->client->gatt,
->>>> +                                                                       id);
->>>> +               notify_client_unref(client);
->>>> +
->>>> +               reply = btd_error_failed(op->msg,
->>>> +                                               "Characteristic not available");
->>>> +               goto done;
->>>> +       }
->>>> +
->>>> +       /*
->>>> +        * Drop the reference count that we added when registering the callback.
->>>> +        */
->>>> +       notify_client_unref(client);
->>>> +
->>>> +       if (!id) {
->>>> +               queue_remove(chrc->notify_clients, client);
->>>> +               notify_client_free(client);
->>>> +
->>>> +               reply = create_gatt_dbus_error(op->msg, att_ecode);
->>>> +
->>>> +               goto done;
->>>> +       }
->>>> +
->>>> +       client->notify_id = id;
->>>> +
->>>> +       if (!chrc->notifying) {
->>>> +               chrc->notifying = true;
->>>> +               g_dbus_emit_property_changed(btd_get_dbus_connection(),
->>>> +                                       chrc->path, GATT_CHARACTERISTIC_IFACE,
->>>> +                                       "Notifying");
->>>> +       }
->>>> +
->>>> +       reply = g_dbus_create_reply(op->msg, DBUS_TYPE_INVALID);
->>>> +
->>>> +done:
->>>> +       if (reply)
->>>> +               g_dbus_send_message(btd_get_dbus_connection(), reply);
->>>> +       else
->>>> +               error("Failed to construct D-Bus message reply");
->>>> +
->>>> +       dbus_message_unref(op->msg);
->>>> +       op->msg = NULL;
->>>> +}
->>>> +
->>>>  static DBusMessage *characteristic_start_notify(DBusConnection *conn,
->>>>                                         DBusMessage *msg, void *user_data)
->>>>  {
->>>> -       /* TODO: Implement */
->>>> -       return btd_error_failed(msg, "Not implemented");
->>>> +       struct characteristic *chrc = user_data;
->>>> +       struct bt_gatt_client *gatt = chrc->service->client->gatt;
->>>> +       const char *sender = dbus_message_get_sender(msg);
->>>> +       struct async_dbus_op *op;
->>>> +       struct notify_client *client;
->>>> +
->>>> +       if (!(chrc->props & BT_GATT_CHRC_PROP_NOTIFY ||
->>>> +                               chrc->props & BT_GATT_CHRC_PROP_INDICATE))
->>>> +               return btd_error_not_supported(msg);
->>>> +
->>>> +       /* Each client can only have one active notify session. */
->>>> +       client = queue_find(chrc->notify_clients, match_notify_sender, sender);
->>>> +       if (client)
->>>> +               return client->notify_id ?
->>>> +                               btd_error_failed(msg, "Already notifying") :
->>>> +                               btd_error_in_progress(msg);
->>>> +
->>>> +       client = notify_client_create(chrc, sender);
->>>> +       if (!client)
->>>> +               return btd_error_failed(msg, "Failed allocate notify session");
->>>> +
->>>> +       op = new0(struct async_dbus_op, 1);
->>>> +       if (!op) {
->>>> +               notify_client_unref(client);
->>>> +               return btd_error_failed(msg, "Failed to initialize request");
->>>> +       }
->>>> +
->>>> +       /*
->>>> +        * Add to the ref count so that a disconnect during register won't free
->>>> +        * the client instance.
->>>> +        */
->>>> +       op->data = notify_client_ref(client);
->>>> +       op->msg = dbus_message_ref(msg);
->>>> +
->>>> +       queue_push_tail(chrc->notify_clients, client);
->>>> +
->>>> +       if (bt_gatt_client_register_notify(gatt, chrc->value_handle,
->>>> +                                               register_notify_cb, notify_cb,
->>>> +                                               op, async_dbus_op_free))
->>>> +               return NULL;
->>>> +
->>>> +       queue_remove(chrc->notify_clients, client);
->>>> +       async_dbus_op_free(op);
->>>> +
->>>> +       /* Directly free the client */
->>>> +       notify_client_free(client);
->>>> +
->>>> +       return btd_error_failed(msg, "Failed to register notify session");
->>>>  }
->>>>
->>>>  static DBusMessage *characteristic_stop_notify(DBusConnection *conn,
->>>> @@ -992,6 +1221,13 @@ static struct characteristic *characteristic_create(
->>>>                 return NULL;
+>>>> @@ -6481,8 +6482,8 @@ static uint8_t write_req_request(const uint8_t *cmd, uint16_t cmd_len,
 >>>>         }
 >>>>
->>>> +       chrc->notify_clients = queue_new();
->>>> +       if (!chrc->notify_clients) {
->>>> +               queue_destroy(chrc->descs, NULL);
->>>> +               free(chrc);
->>>> +               return NULL;
->>>> +       }
+>>>>         if (!gatt_db_attribute_write(attrib, 0, value, vlen, cmd[0],
+>>>> -                                       &dev->bdaddr, attribute_write_cb,
+>>>> -                                       data)) {
+>>>> +                                               &dev->bdaddr, false,
+>>>> +                                               attribute_write_cb, data)) {
+>>>>                 queue_remove(dev->pending_requests, data);
+>>>>                 free(data);
+>>>>                 return ATT_ECODE_UNLIKELY;
+>>>> @@ -6541,8 +6542,8 @@ static uint8_t write_prep_request(const uint8_t *cmd, uint16_t cmd_len,
+>>>>         data->length = vlen;
+>>>>
+>>>>         if (!gatt_db_attribute_write(attrib, offset, value, vlen, cmd[0],
+>>>> -                                       &dev->bdaddr, attribute_write_cb,
+>>>> -                                       data)) {
+>>>> +                                               &dev->bdaddr, false,
+>>>> +                                               attribute_write_cb, data)) {
+>>>>                 queue_remove(dev->pending_requests, data);
+>>>>                 g_free(data->value);
+>>>>                 free(data);
+>>>> @@ -6805,7 +6806,7 @@ static void register_gap_service(void)
+>>>>                 value = cpu_to_le16(APPEARANCE_GENERIC_PHONE);
+>>>>                 gatt_db_attribute_write(gap_srvc_data.appear, 0,
+>>>>                                                 (void *) &value, sizeof(value),
+>>>> -                                               ATT_OP_WRITE_REQ, NULL,
+>>>> +                                               ATT_OP_WRITE_REQ, NULL, false,
+>>>>                                                 write_confirm, NULL);
+>>>>         }
+>>>>
+>>>> @@ -6822,7 +6823,7 @@ static void register_gap_service(void)
+>>>>                 value = PERIPHERAL_PRIVACY_DISABLE;
+>>>>                 gatt_db_attribute_write(gap_srvc_data.priv, 0,
+>>>>                                                 &value, sizeof(value),
+>>>> -                                               ATT_OP_WRITE_REQ, NULL,
+>>>> +                                               ATT_OP_WRITE_REQ, NULL, false,
+>>>>                                                 write_confirm, NULL);
+>>>>         }
+>>>>
+>>>> diff --git a/src/gatt-client.c b/src/gatt-client.c
+>>>> index 1edbafc..79e1d26 100644
+>>>> --- a/src/gatt-client.c
+>>>> +++ b/src/gatt-client.c
+>>>> @@ -349,7 +349,7 @@ static void desc_read_cb(bool success, uint8_t att_ecode,
+>>>>                 return;
+>>>>         }
+>>>>
+>>>> -       gatt_db_attribute_write(desc->attr, 0, value, length, 0, NULL,
+>>>> +       gatt_db_attribute_write(desc->attr, 0, value, length, 0, NULL, true,
+>>>>                                                 write_descriptor_cb, desc);
+>>>>
+>>>>         /*
+>>>> @@ -764,7 +764,7 @@ static void chrc_read_cb(bool success, uint8_t att_ecode, const uint8_t *value,
+>>>>         }
+>>>>
+>>>>         gatt_db_attribute_write(chrc->attr, 0, value, length, op->offset, NULL,
+>>>> -                                               write_characteristic_cb, chrc);
+>>>> +                                       true, write_characteristic_cb, chrc);
+>>>
+>>>
+>>> I think it would be better to have some means to truncate the value
+>>> separately, e.g. gatt_db_attribute_truncate.
+>>>
+>>
+>> Would this just truncate the value to the specified length? Or would
+>> we want a "set_value" function that works like write but truncates it
+>> if needed?
+>
+> Maybe a reset would be enough so once we start read operation we reset
+> the current value, how about it?
+>
+
+Sounds good to me.
+
+>>>>         /*
+>>>>          * If the value length is exactly MTU-1, then we may not have read the
+>>>> @@ -1020,7 +1020,7 @@ static void notify_cb(uint16_t value_handle, const uint8_t *value,
+>>>>          * signal so that we propagate the notification/indication to
+>>>>          * applications.
+>>>>          */
+>>>> -       gatt_db_attribute_write(chrc->attr, 0, value, length, 0, NULL,
+>>>> +       gatt_db_attribute_write(chrc->attr, 0, value, length, 0, NULL, true,
+>>>>                                                 write_characteristic_cb, chrc);
+>>>>  }
+>>>>
+>>>> diff --git a/src/shared/gatt-db.c b/src/shared/gatt-db.c
+>>>> index 74c3e70..87e77d1 100644
+>>>> --- a/src/shared/gatt-db.c
+>>>> +++ b/src/shared/gatt-db.c
+>>>> @@ -1440,9 +1440,24 @@ static bool write_timeout(void *user_data)
+>>>>         return false;
+>>>>  }
+>>>>
+>>>> +static bool should_resize_value(struct gatt_db_attribute *attrib, size_t len,
+>>>> +                                                               uint16_t offset,
+>>>> +                                                               bool truncate)
+>>>> +{
+>>>> +       unsigned diff;
 >>>> +
->>>>         chrc->service = service;
+>>>> +       if (!attrib->value || offset >= attrib->value_len)
+>>>> +               return true;
+>>>> +
+>>>> +       diff = attrib->value_len - offset;
+>>>> +
+>>>> +       return truncate ? len != diff : len > diff;
+>>>> +}
+>>>> +
+>>>>  bool gatt_db_attribute_write(struct gatt_db_attribute *attrib, uint16_t offset,
+>>>>                                         const uint8_t *value, size_t len,
+>>>>                                         uint8_t opcode, bdaddr_t *bdaddr,
+>>>> +                                       bool truncate,
+>>>>                                         gatt_db_attribute_write_t func,
+>>>>                                         void *user_data)
+>>>>  {
+>>>> @@ -1471,8 +1486,7 @@ bool gatt_db_attribute_write(struct gatt_db_attribute *attrib, uint16_t offset,
+>>>>         }
 >>>>
->>>>         gatt_db_attribute_get_char_data(attr, &chrc->handle,
->>>> @@ -1027,6 +1263,7 @@ static void unregister_characteristic(void *data)
+>>>>         /* For values stored in db allocate on demand */
+>>>> -       if (!attrib->value || offset >= attrib->value_len ||
+>>>> -                               len > (unsigned) (attrib->value_len - offset)) {
+>>>> +       if (should_resize_value(attrib, len, offset, truncate)) {
+>>>>                 void *buf;
 >>>>
->>>>         DBG("Removing GATT characteristic: %s", chrc->path);
+>>>>                 buf = realloc(attrib->value, len + offset);
+>>>> diff --git a/src/shared/gatt-db.h b/src/shared/gatt-db.h
+>>>> index f188944..2467852 100644
+>>>> --- a/src/shared/gatt-db.h
+>>>> +++ b/src/shared/gatt-db.h
+>>>> @@ -193,6 +193,7 @@ typedef void (*gatt_db_attribute_write_t) (struct gatt_db_attribute *attrib,
+>>>>  bool gatt_db_attribute_write(struct gatt_db_attribute *attrib, uint16_t offset,
+>>>>                                         const uint8_t *value, size_t len,
+>>>>                                         uint8_t opcode, bdaddr_t *bdaddr,
+>>>> +                                       bool truncate,
+>>>>                                         gatt_db_attribute_write_t func,
+>>>>                                         void *user_data);
 >>>>
->>>> +       queue_remove_all(chrc->notify_clients, NULL, NULL, notify_client_unref);
->>>>         queue_remove_all(chrc->descs, NULL, NULL, unregister_descriptor);
+>>>> diff --git a/src/shared/gatt-server.c b/src/shared/gatt-server.c
+>>>> index 00f36fd..2af7cf1 100644
+>>>> --- a/src/shared/gatt-server.c
+>>>> +++ b/src/shared/gatt-server.c
+>>>> @@ -723,7 +723,8 @@ static void write_cb(uint8_t opcode, const void *pdu,
+>>>>         server->pending_write_op = op;
 >>>>
->>>>         g_dbus_unregister_interface(btd_get_dbus_connection(), chrc->path,
+>>>>         if (gatt_db_attribute_write(attr, 0, pdu + 2, length - 2, opcode,
+>>>> -                                               NULL, write_complete_cb, op))
+>>>> +                                                       NULL, false,
+>>>> +                                                       write_complete_cb, op))
+>>>>                 return;
+>>>>
+>>>>         if (op)
+>>>> @@ -1008,7 +1009,8 @@ static void exec_next_prep_write(struct bt_gatt_server *server,
+>>>>         status = gatt_db_attribute_write(attr, next->offset,
+>>>>                                                 next->value, next->length,
+>>>>                                                 BT_ATT_OP_EXEC_WRITE_REQ, NULL,
+>>>> -                                               exec_write_complete_cb, server);
+>>>> +                                               false, exec_write_complete_cb,
+>>>> +                                               server);
+>>>>
+>>>>         prep_write_data_destroy(next);
+>>>>
+>>>> diff --git a/tools/btgatt-server.c b/tools/btgatt-server.c
+>>>> index f6ad8c3..393a071 100644
+>>>> --- a/tools/btgatt-server.c
+>>>> +++ b/tools/btgatt-server.c
+>>>> @@ -446,8 +446,8 @@ static void populate_gap_service(struct server *server)
+>>>>         gatt_db_attribute_write(tmp, 0, (void *) &appearance,
+>>>>                                                         sizeof(appearance),
+>>>>                                                         BT_ATT_OP_WRITE_REQ,
+>>>> -                                                       NULL, confirm_write,
+>>>> -                                                       NULL);
+>>>> +                                                       NULL, true,
+>>>> +                                                       confirm_write, NULL);
+>>>>
+>>>>         gatt_db_service_set_active(service, true);
+>>>>  }
+>>>> @@ -514,8 +514,8 @@ static void populate_hr_service(struct server *server)
+>>>>                                                 NULL, NULL, server);
+>>>>         gatt_db_attribute_write(body, 0, (void *) &body_loc, sizeof(body_loc),
+>>>>                                                         BT_ATT_OP_WRITE_REQ,
+>>>> -                                                       NULL, confirm_write,
+>>>> -                                                       NULL);
+>>>> +                                                       NULL, true,
+>>>> +                                                       confirm_write, NULL);
+>>>>
+>>>>         /* HR Control Point Characteristic */
+>>>>         bt_uuid16_create(&uuid, UUID_HEART_RATE_CTRL);
+>>>> diff --git a/unit/test-gatt.c b/unit/test-gatt.c
+>>>> index 169fbd3..7a5081d 100644
+>>>> --- a/unit/test-gatt.c
+>>>> +++ b/unit/test-gatt.c
+>>>> @@ -654,8 +654,8 @@ static struct gatt_db_attribute *add_char_with_value(struct gatt_db *db,
+>>>>
+>>>>         g_assert(attrib != NULL);
+>>>>
+>>>> -       gatt_db_attribute_write(attrib, 0, value, len, 0x00, NULL, att_write_cb,
+>>>> -                                                                       NULL);
+>>>> +       gatt_db_attribute_write(attrib, 0, value, len, 0x00, NULL, true,
+>>>> +                                                       att_write_cb, NULL);
+>>>>
+>>>>         return attrib;
+>>>>  }
+>>>> @@ -670,7 +670,7 @@ add_desc_with_value(struct gatt_db_attribute *att, bt_uuid_t *uuid,
+>>>>         desc_att = gatt_db_service_add_descriptor(att, uuid, att_perms, NULL,
+>>>>                                                                 NULL, NULL);
+>>>>
+>>>> -       gatt_db_attribute_write(desc_att, 0, value, len, 0x00, NULL,
+>>>> +       gatt_db_attribute_write(desc_att, 0, value, len, 0x00, NULL, true,
+>>>>                                                         att_write_cb, NULL);
+>>>>
+>>>>         return desc_att;
 >>>> --
 >>>> 2.2.0.rc0.207.ga3a616c
 >>>>
@@ -409,4 +298,5 @@ this descriptor exists on the other end.
 > --
 > Luiz Augusto von Dentz
 
+Cheers,
 Arman
