@@ -1,52 +1,72 @@
 Return-Path: <cyrus@holtmann.org>
-From: Gilbert Gao <Gilbert.Gao@Qisda.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: RE: BlueZ question about HID profile
-Date: Tue, 6 Jan 2015 02:25:32 +0000
-Message-ID: <7FF7EC0D6ACE2E4297FA998A42F07AD6195AF433@QS-MBX02.benq.corp.com>
-References: <m3oaqfl79f.fsf@carbon.jhcloos.org>
- <D043D131-E9F8-43C1-8671-0EACAE810420@holtmann.org>
- <m361cklxwo.fsf@carbon.jhcloos.org>
- <C5CDA647-8415-44F3-9F89-0D596D76498F@holtmann.org>
- <m3zj9wkfsw.fsf@carbon.jhcloos.org>
- <7FF7EC0D6ACE2E4297FA998A42F07AD6195AF357@QS-MBX02.benq.corp.com>
- <E1E9C166-A11C-4A76-8B60-BF168C918F2B@holtmann.org>
-In-Reply-To: <E1E9C166-A11C-4A76-8B60-BF168C918F2B@holtmann.org>
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
+From: Arman Uguray <armansito@chromium.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: Arman Uguray <armansito@chromium.org>
+Subject: [PATCH BlueZ v1 8/8] doc/gatt-api.txt: Update error names
+Date: Mon,  5 Jan 2015 18:03:36 -0800
+Message-Id: <1420509816-1376-9-git-send-email-armansito@chromium.org>
+In-Reply-To: <1420509816-1376-1-git-send-email-armansito@chromium.org>
+References: <1420509816-1376-1-git-send-email-armansito@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Dear Marcel,
+Updated possible error names that can be returned from
+ReadValue/WriteValue methods to match those currently returned from the
+experimental implementation.
+---
+ doc/gatt-api.txt | 12 ++++--------
+ 1 file changed, 4 insertions(+), 8 deletions(-)
 
-Thank you very much!
-But now I'm not very clear about BlueZ HID implementation.
-Could you help to point out how to modify for a HID device role or any sample code?
+diff --git a/doc/gatt-api.txt b/doc/gatt-api.txt
+index f7125a2..bfeaf6d 100644
+--- a/doc/gatt-api.txt
++++ b/doc/gatt-api.txt
+@@ -75,9 +75,8 @@ Methods		array{byte} ReadValue()
+ 
+ 			Possible Errors: org.bluez.Error.Failed
+ 					 org.bluez.Error.InProgress
+-					 org.bluez.Error.ReadNotPermitted
++					 org.bluez.Error.NotPermitted
+ 					 org.bluez.Error.NotAuthorized
+-					 org.bluez.Error.NotPaired
+ 					 org.bluez.Error.NotSupported
+ 
+ 		void WriteValue(array{byte} value)
+@@ -87,10 +86,9 @@ Methods		array{byte} ReadValue()
+ 
+ 			Possible Errors: org.bluez.Error.Failed
+ 					 org.bluez.Error.InProgress
+-					 org.bluez.Error.WriteNotPermitted
++					 org.bluez.Error.NotPermitted
+ 					 org.bluez.Error.InvalidValueLength
+ 					 org.bluez.Error.NotAuthorized
+-					 org.bluez.Error.NotPaired
+ 					 org.bluez.Error.NotSupported
+ 
+ 		void StartNotify()
+@@ -175,9 +173,8 @@ Methods		array{byte} ReadValue()
+ 
+ 			Possible Errors: org.bluez.Error.Failed
+ 					 org.bluez.Error.InProgress
+-					 org.bluez.Error.ReadNotPermitted
++					 org.bluez.Error.NotPermitted
+ 					 org.bluez.Error.NotAuthorized
+-					 org.bluez.Error.NotPaired
+ 					 org.bluez.Error.NotSupported
+ 
+ 		void WriteValue(array{byte} value)
+@@ -187,10 +184,9 @@ Methods		array{byte} ReadValue()
+ 
+ 			Possible Errors: org.bluez.Error.Failed
+ 					 org.bluez.Error.InProgress
+-					 org.bluez.Error.WriteNotPermitted
++					 org.bluez.Error.NotPermitted
+ 					 org.bluez.Error.InvalidValueLength
+ 					 org.bluez.Error.NotAuthorized
+-					 org.bluez.Error.NotPaired
+ 					 org.bluez.Error.NotSupported
+ 
+ Properties	string UUID [read-only]
+-- 
+2.2.0.rc0.207.ga3a616c
 
-Best Regards,
-Gilbert
-
------Original Message-----
-From: Marcel Holtmann [mailto:marcel@holtmann.org]
-Sent: Tuesday, January 06, 2015 9:38 AM
-To: Gilbert Gao
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: BlueZ question about HID profile
-
-Hi Gilbert,
-
-> Here is an emergent question about BlueZ feature:
-> I read the doc "supported-features.txt", which says BlueZ supports HID host.
-> And my question is whether HID device is supported?
-> Or can I use BlueZ HID profile to implement the Bluetooth HID device such as a Bluetooth mouse or keyboard?
-
-it should be pretty simple to implement a HID device role. There have been external projects in the past that did this. The reason why this is not in BlueZ is mainly due to the fact that we would need to get the input events from some kind of source. So if you have that figured out, then it should be simple to provided HID device role.
-
-Regards
-
-Marcel
-
-
-**********************Confidentiality Notice************************
-The opinions and views expressed in this e-mail are solely those of the author and do not necessarily represent our company and its affiliates. If this e-mail is not originally intended for you, or received by you in error, do not disclose its content to anyone and delete it immediately. This e-mail may contain information that is legally privileged, confidential or exempt from disclosure.
