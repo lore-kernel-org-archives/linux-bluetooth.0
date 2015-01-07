@@ -2,126 +2,71 @@ Return-Path: <cyrus@holtmann.org>
 From: Vikrampal Yadav <vikram.pal@samsung.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: luiz.dentz@gmail.com, vikram.pal@samsung.com, cpgs@samsung.com
-Subject: [PATCH 6/6] monitor: Add AVRCP SetBrowsedPlayer support
-Date: Wed, 07 Jan 2015 13:53:20 +0530
-Message-id: <1420619000-24211-7-git-send-email-vikram.pal@samsung.com>
+Subject: [PATCH 5/6] monitor: Add support for parsing L2CAP control field
+Date: Wed, 07 Jan 2015 13:53:19 +0530
+Message-id: <1420619000-24211-6-git-send-email-vikram.pal@samsung.com>
 In-reply-to: <1420619000-24211-1-git-send-email-vikram.pal@samsung.com>
 References: <1420619000-24211-1-git-send-email-vikram.pal@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Support for decoding AVRCP SetBrowsedPlayer added in Bluetooth monitor.
-
-Channel: 65 len 12 ctrl 0x0102 [PSM 27 mode 3] {chan 1}
-      I-frame: Unsegmented TxSeq 1 ReqSeq 1
-      AVCTP Browsing: Command: type 0x00 label 0 PID 0x110e
-        AVRCP: SetBrowsedPlayer: len 0x0002
-          PlayerID: 0x0001 (1)
+Support for parsing L2CAP control field added.
 ---
- monitor/avctp.c | 86 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 85 insertions(+), 1 deletion(-)
+ monitor/l2cap.c | 34 ++++++++++++++++++++++++++++++++++
+ 1 file changed, 34 insertions(+)
 
-diff --git a/monitor/avctp.c b/monitor/avctp.c
-index af91ecc..0a1e92d 100644
---- a/monitor/avctp.c
-+++ b/monitor/avctp.c
-@@ -1637,11 +1637,95 @@ static bool avrcp_control_packet(struct avctp_frame *avctp_frame)
- 	}
+diff --git a/monitor/l2cap.c b/monitor/l2cap.c
+index 17104e2..19cb0a2 100644
+--- a/monitor/l2cap.c
++++ b/monitor/l2cap.c
+@@ -416,6 +416,38 @@ static void l2cap_ctrl_ext_parse(struct l2cap_frame *frame, uint32_t ctrl)
+ 		printf(" F-bit");
  }
  
-+static bool avrcp_set_browsed_player(struct avctp_frame *avctp_frame)
++static void l2cap_ctrl_parse(struct l2cap_frame *frame, uint32_t ctrl)
 +{
-+	struct l2cap_frame *frame = &avctp_frame->l2cap_frame;
-+	uint32_t items;
-+	uint16_t id, uids, charset;
-+	uint8_t status, folders, indent = 2;
++	printf("      %s:",
++			ctrl & L2CAP_CTRL_FRAME_TYPE ? "S-frame" : "I-frame");
 +
-+	if (avctp_frame->hdr & 0x02)
-+		goto response;
++	if (ctrl & 0x01) {
++		printf(" %s",
++			supervisory2str((ctrl & L2CAP_CTRL_SUPERVISE_MASK) >>
++						L2CAP_CTRL_SUPER_SHIFT));
 +
-+	if (!l2cap_frame_get_be16(frame, &id))
-+		return false;
++		if (ctrl & L2CAP_CTRL_POLL)
++			printf(" P-bit");
++	} else {
++		uint8_t sar = (ctrl & L2CAP_CTRL_SAR_MASK) >> L2CAP_CTRL_SAR_SHIFT;
++		printf(" %s", sar2str(sar));
++		if (sar == L2CAP_SAR_START) {
++			uint16_t len;
 +
-+	print_field("%*cPlayerID: 0x%04x (%u)", indent, ' ', id, id);
-+	return true;
++			if (!l2cap_frame_get_le16(frame, &len))
++				return;
 +
-+response:
-+	if (!l2cap_frame_get_u8(frame, &status))
-+		return false;
-+
-+	print_field("%*cStatus: 0x%02x (%s)", indent, ' ', status,
-+							error2str(status));
-+
-+	if (!l2cap_frame_get_be16(frame, &uids))
-+		return false;
-+
-+	print_field("%*cUIDCounter: 0x%04x (%u)", indent, ' ', uids, uids);
-+
-+	if (!l2cap_frame_get_be32(frame, &items))
-+		return false;
-+
-+	print_field("%*cNumber of Items: 0x%08x (%u)", indent, ' ',
-+								items, items);
-+
-+	if (!l2cap_frame_get_be16(frame, &charset))
-+		return false;
-+
-+	print_field("%*cCharsetID: 0x%04x (%s)", indent, ' ', charset,
-+							charset2str(charset));
-+
-+	if (!l2cap_frame_get_u8(frame, &folders))
-+		return false;
-+
-+	print_field("%*cFolder Depth: 0x%02x (%u)", indent, ' ', folders,
-+								folders);
-+
-+	for (; folders > 0; folders--) {
-+		uint8_t len;
-+
-+		if (!l2cap_frame_get_u8(frame, &len))
-+			return false;
-+
-+		printf("Folder: ");
-+		for (; len > 0; len--) {
-+			uint8_t c;
-+
-+			if (!l2cap_frame_get_u8(frame, &c))
-+				return false;
-+
-+			printf("%1c", isprint(c) ? c : '.');
++			printf(" (len %d)", len);
 +		}
-+		printf("\n");
++		printf(" TxSeq %d", (ctrl & L2CAP_CTRL_TXSEQ_MASK) >> L2CAP_CTRL_TXSEQ_SHIFT);
 +	}
 +
-+	return true;
++	printf(" ReqSeq %d", (ctrl & L2CAP_CTRL_REQSEQ_MASK) >> L2CAP_CTRL_REQSEQ_SHIFT);
++
++	if (ctrl & L2CAP_CTRL_FINAL)
++		printf(" F-bit");
 +}
 +
- static bool avrcp_browsing_packet(struct avctp_frame *avctp_frame)
- {
- 	struct l2cap_frame *frame = &avctp_frame->l2cap_frame;
-+	uint16_t len;
-+	uint8_t pduid;
-+
-+	if (!l2cap_frame_get_u8(frame, &pduid))
-+		return false;
-+
-+	if (!l2cap_frame_get_be16(frame, &len))
-+		return false;
-+
-+	print_field("AVRCP: %s: len 0x%04x", pdu2str(pduid), len);
-+
-+	switch (pduid) {
-+	case AVRCP_SET_BROWSED_PLAYER:
-+		avrcp_set_browsed_player(avctp_frame);
-+		break;
-+	default:
-+		packet_hexdump(frame->data, frame->size);
-+	}
+ #define MAX_INDEX 16
  
--	packet_hexdump(frame->data, frame->size);
- 	return true;
- }
+ struct index_data {
+@@ -2907,6 +2939,8 @@ static void l2cap_frame(uint16_t index, bool in, uint16_t handle,
+ 						" [PSM %d mode %d] {chan %d}",
+ 						cid, size, ctrl16, frame.psm,
+ 						frame.mode, frame.chan);
++
++				l2cap_ctrl_parse(&frame, ctrl16);
+ 			}
  
+ 			printf("\n");
 -- 
 1.9.1
 
