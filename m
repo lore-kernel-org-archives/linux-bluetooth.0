@@ -2,156 +2,106 @@ Return-Path: <cyrus@holtmann.org>
 From: Vikrampal Yadav <vikram.pal@samsung.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: luiz.dentz@gmail.com, vikram.pal@samsung.com, cpgs@samsung.com
-Subject: [PATCH 4/6] monitor: Add support for parsing L2CAP extended control
- field
-Date: Wed, 07 Jan 2015 13:53:18 +0530
-Message-id: <1420619000-24211-5-git-send-email-vikram.pal@samsung.com>
+Subject: [PATCH 3/6] monitor: Extract extended L2CAP extended control field
+Date: Wed, 07 Jan 2015 13:53:17 +0530
+Message-id: <1420619000-24211-4-git-send-email-vikram.pal@samsung.com>
 In-reply-to: <1420619000-24211-1-git-send-email-vikram.pal@samsung.com>
 References: <1420619000-24211-1-git-send-email-vikram.pal@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Support for parsing L2CAP extended control field added.
+Support for extracting extended L2CAP extended control field.
 ---
- monitor/l2cap.c | 111 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 111 insertions(+)
+ monitor/l2cap.c | 60 +++++++++++++++++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 58 insertions(+), 2 deletions(-)
 
 diff --git a/monitor/l2cap.c b/monitor/l2cap.c
-index 5f135b0..17104e2 100644
+index c0bc9a8..5f135b0 100644
 --- a/monitor/l2cap.c
 +++ b/monitor/l2cap.c
-@@ -44,6 +44,48 @@
- #include "avctp.h"
- #include "rfcomm.h"
- 
-+/* L2CAP Control Field bit masks */
-+#define L2CAP_CTRL_SAR_MASK		0xC000
-+#define L2CAP_CTRL_REQSEQ_MASK		0x3F00
-+#define L2CAP_CTRL_TXSEQ_MASK		0x007E
-+#define L2CAP_CTRL_SUPERVISE_MASK	0x000C
-+
-+#define L2CAP_CTRL_RETRANS		0x0080
-+#define L2CAP_CTRL_FINAL		0x0080
-+#define L2CAP_CTRL_POLL			0x0010
-+#define L2CAP_CTRL_FRAME_TYPE		0x0001 /* I- or S-Frame */
-+
-+#define L2CAP_CTRL_TXSEQ_SHIFT		1
-+#define L2CAP_CTRL_SUPER_SHIFT		2
-+#define L2CAP_CTRL_REQSEQ_SHIFT		8
-+#define L2CAP_CTRL_SAR_SHIFT		14
-+
-+#define L2CAP_EXT_CTRL_TXSEQ_MASK	0xFFFC0000
-+#define L2CAP_EXT_CTRL_SAR_MASK		0x00030000
-+#define L2CAP_EXT_CTRL_SUPERVISE_MASK	0x00030000
-+#define L2CAP_EXT_CTRL_REQSEQ_MASK	0x0000FFFC
-+
-+#define L2CAP_EXT_CTRL_POLL		0x00040000
-+#define L2CAP_EXT_CTRL_FINAL		0x00000002
-+#define L2CAP_EXT_CTRL_FRAME_TYPE	0x00000001 /* I- or S-Frame */
-+
-+#define L2CAP_EXT_CTRL_REQSEQ_SHIFT	2
-+#define L2CAP_EXT_CTRL_SAR_SHIFT	16
-+#define L2CAP_EXT_CTRL_SUPER_SHIFT	16
-+#define L2CAP_EXT_CTRL_TXSEQ_SHIFT	18
-+
-+/* L2CAP Supervisory Function */
-+#define L2CAP_SUPER_RR		0x00
-+#define L2CAP_SUPER_REJ		0x01
-+#define L2CAP_SUPER_RNR		0x02
-+#define L2CAP_SUPER_SREJ	0x03
-+
-+/* L2CAP Segmentation and Reassembly */
-+#define L2CAP_SAR_UNSEGMENTED 	0x00
-+#define L2CAP_SAR_START		0x01
-+#define L2CAP_SAR_END		0x02
-+#define L2CAP_SAR_CONTINUE	0x03
-+
- #define MAX_CHAN 64
- 
- struct chan_data {
-@@ -307,6 +349,73 @@ static uint8_t get_ext_ctrl(const struct l2cap_frame *frame)
- 	return 0;
+@@ -282,6 +282,31 @@ static void assign_ext_ctrl(const struct l2cap_frame *frame,
+ 	}
  }
  
-+static char *sar2str(uint8_t sar)
++static uint8_t get_ext_ctrl(const struct l2cap_frame *frame)
 +{
-+	switch (sar) {
-+	case L2CAP_SAR_UNSEGMENTED:
-+		return "Unsegmented";
-+	case L2CAP_SAR_START:
-+		return "Start";
-+	case L2CAP_SAR_END:
-+		return "End";
-+	case L2CAP_SAR_CONTINUE:
-+		return "Continuation";
-+	default:
-+		return "Bad SAR";
-+	}
-+}
++	int i;
 +
-+static char *supervisory2str(uint8_t supervisory)
-+{
-+	switch (supervisory) {
-+	case L2CAP_SUPER_RR:
-+		return "Receiver Ready (RR)";
-+	case L2CAP_SUPER_REJ:
-+		return "Reject (REJ)";
-+	case L2CAP_SUPER_RNR:
-+		return "Receiver Not Ready (RNR)";
-+	case L2CAP_SUPER_SREJ:
-+		return "Select Reject (SREJ)";
-+	default:
-+		return "Bad Supervisory";
-+	}
-+}
++	for (i = 0; i < MAX_CHAN; i++) {
++		if (chan_list[i].index != frame->index &&
++						chan_list[i].ctrlid == 0)
++			continue;
 +
-+static void l2cap_ctrl_ext_parse(struct l2cap_frame *frame, uint32_t ctrl)
-+{
-+	printf("      %s:",
-+		ctrl & L2CAP_EXT_CTRL_FRAME_TYPE ? "S-frame" : "I-frame");
++		if (chan_list[i].handle != frame->handle &&
++					chan_list[i].ctrlid != frame->index)
++			continue;
 +
-+	if (ctrl & L2CAP_EXT_CTRL_FRAME_TYPE) {
-+		printf(" %s",
-+		supervisory2str((ctrl & L2CAP_EXT_CTRL_SUPERVISE_MASK) >>
-+						L2CAP_EXT_CTRL_SUPER_SHIFT));
-+
-+		if (ctrl & L2CAP_EXT_CTRL_POLL)
-+			printf(" P-bit");
-+	} else {
-+		uint8_t sar = (ctrl & L2CAP_EXT_CTRL_SAR_MASK) >>
-+						L2CAP_EXT_CTRL_SAR_SHIFT;
-+		printf(" %s", sar2str(sar));
-+		if (sar == L2CAP_SAR_START) {
-+			uint16_t len;
-+
-+			if (!l2cap_frame_get_le16(frame, &len))
-+				return;
-+
-+			printf(" (len %d)", len);
++		if (frame->in) {
++			if (chan_list[i].scid == frame->cid)
++				return chan_list[i].ext_ctrl;
++		} else {
++			if (chan_list[i].dcid == frame->cid)
++				return chan_list[i].ext_ctrl;
 +		}
-+		printf(" TxSeq %d", (ctrl & L2CAP_EXT_CTRL_TXSEQ_MASK) >>
-+						L2CAP_EXT_CTRL_TXSEQ_SHIFT);
 +	}
 +
-+	printf(" ReqSeq %d", (ctrl & L2CAP_EXT_CTRL_REQSEQ_MASK) >>
-+						L2CAP_EXT_CTRL_REQSEQ_SHIFT);
-+
-+	if (ctrl & L2CAP_EXT_CTRL_FINAL)
-+		printf(" F-bit");
++	return 0;
 +}
 +
  #define MAX_INDEX 16
  
  struct index_data {
-@@ -2786,6 +2895,8 @@ static void l2cap_frame(uint16_t index, bool in, uint16_t handle,
- 						" [PSM %d mode %d] {chan %d}",
- 						cid, size, ctrl32, frame.psm,
- 						frame.mode, frame.chan);
+@@ -2721,6 +2746,9 @@ static void l2cap_frame(uint16_t index, bool in, uint16_t handle,
+ 			uint16_t cid, const void *data, uint16_t size)
+ {
+ 	struct l2cap_frame frame;
++	uint32_t ctrl32 = 0;
++	uint16_t ctrl16 = 0;
++	uint8_t ext_ctrl;
+ 
+ 	switch (cid) {
+ 	case 0x0001:
+@@ -2745,10 +2773,38 @@ static void l2cap_frame(uint16_t index, bool in, uint16_t handle,
+ 	default:
+ 		l2cap_frame_init(&frame, index, in, handle, cid, data, size);
+ 
+-		print_indent(6, COLOR_CYAN, "Channel:", "", COLOR_OFF,
+-				" %d len %d [PSM %d mode %d] {chan %d}",
++		if (frame.mode > 0) {
++			ext_ctrl = get_ext_ctrl(&frame);
 +
-+				l2cap_ctrl_ext_parse(&frame, ctrl32);
- 			} else {
- 				if (!l2cap_frame_get_le16(&frame, &ctrl16))
- 					return;
++			if (ext_ctrl) {
++				if (!l2cap_frame_get_le32(&frame, &ctrl32))
++					return;
++
++				print_indent(6, COLOR_CYAN, "Channel:", "",
++						COLOR_OFF, " %d len %d"
++						" ext_ctrl 0x%8.8x"
++						" [PSM %d mode %d] {chan %d}",
++						cid, size, ctrl32, frame.psm,
++						frame.mode, frame.chan);
++			} else {
++				if (!l2cap_frame_get_le16(&frame, &ctrl16))
++					return;
++
++				print_indent(6, COLOR_CYAN, "Channel:", "",
++						COLOR_OFF, " %d len %d"
++						" ctrl 0x%4.4x"
++						" [PSM %d mode %d] {chan %d}",
++						cid, size, ctrl16, frame.psm,
++						frame.mode, frame.chan);
++			}
++
++			printf("\n");
++		} else {
++			print_indent(6, COLOR_CYAN, "Channel:", "", COLOR_OFF,
++					" %d len %d [PSM %d mode %d] {chan %d}",
+ 						cid, size, frame.psm,
+ 						frame.mode, frame.chan);
++		}
+ 
+ 		switch (frame.psm) {
+ 		case 0x0001:
 -- 
 1.9.1
 
