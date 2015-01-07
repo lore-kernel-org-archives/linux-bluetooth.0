@@ -1,328 +1,120 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <CAHrH25TTd02N-yJzcye=AQ41if7Xg-fZ2PT8k7C4ruHsDW8N3A@mail.gmail.com>
-References: <1420509816-1376-1-git-send-email-armansito@chromium.org>
-	<1420509816-1376-5-git-send-email-armansito@chromium.org>
-	<CABBYNZLXB9TTGQGjwHP=5QOL5og+1g8sbSLP5PDnqaGEk+wzVA@mail.gmail.com>
-	<CAHrH25Qaf+-yj1TgQJ1Mnn2mr+CYCB_WnV+CH7uPzRjoWS=7bA@mail.gmail.com>
-	<CABBYNZKktaMVZwyPYxJbV4E-pejecCT6DwNCc698JNSziNYq2Q@mail.gmail.com>
-	<CAHrH25RaFazotfWq2pcKs6Da-yTsBhpkNvTTo0BPY9uJBmHqKw@mail.gmail.com>
-	<CAHrH25TTd02N-yJzcye=AQ41if7Xg-fZ2PT8k7C4ruHsDW8N3A@mail.gmail.com>
-Date: Wed, 7 Jan 2015 10:41:49 -0200
-Message-ID: <CABBYNZLVGpt6qKJAMt68gzTOMYxf_e_=b5XLDjC5Jr5TM11EUA@mail.gmail.com>
-Subject: Re: [PATCH BlueZ v1 4/8] shared/gatt-db: Add truncate argument to write
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Arman Uguray <armansito@chromium.org>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+From: kernel@gkr.i24.cc
+To: BlueZ development <linux-bluetooth@vger.kernel.org>
+Cc: Gordon Kramer <kernel@gkr.i24.cc>
+Subject: [PATCH v4] hid2hci add CSR 8510 A10 support
+Date: Wed,  7 Jan 2015 11:10:17 +0100
+Message-Id: <1420625417-9282-1-git-send-email-kernel@gkr.i24.cc>
+In-Reply-To: <20150107091248.GA11467@t440s.lan>
+References: <20150107091248.GA11467@t440s.lan>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Arman,
+From: Gordon Kramer <kernel@gkr.i24.cc>
 
-On Tue, Jan 6, 2015 at 8:09 PM, Arman Uguray <armansito@chromium.org> wrote:
-> Hi Luiz,
->
->> On Tue, Jan 6, 2015 at 1:44 PM, Arman Uguray <armansito@chromium.org> wrote:
->> Hi Luiz,
->>
->>> On Tue, Jan 6, 2015 at 12:45 PM, Luiz Augusto von Dentz <luiz.dentz@gmail.com> wrote:
->>> Hi Arman,
->>>
->>> On Tue, Jan 6, 2015 at 4:58 PM, Arman Uguray <armansito@chromium.org> wrote:
->>>> Hi Luiz,
->>>>
->>>>> On Tue, Jan 6, 2015 at 5:09 AM, Luiz Augusto von Dentz <luiz.dentz@gmail.com> wrote:
->>>>> Hi Arman,
->>>>>
->>>>> On Tue, Jan 6, 2015 at 12:03 AM, Arman Uguray <armansito@chromium.org> wrote:
->>>>>> This patch adds the "truncate" argument to gatt_db_attribute_write. This
->>>>>> allows users to specify if the cached value should be truncated when the
->>>>>> write value length is shorter than what is stored in the database. This
->>>>>> allows client code to correctly store a remote attribute value when the
->>>>>> database is used as a client-role cache.
->>>>>> ---
->>>>>>  android/gatt.c           | 17 +++++++++--------
->>>>>>  src/gatt-client.c        |  6 +++---
->>>>>>  src/shared/gatt-db.c     | 18 ++++++++++++++++--
->>>>>>  src/shared/gatt-db.h     |  1 +
->>>>>>  src/shared/gatt-server.c |  6 ++++--
->>>>>>  tools/btgatt-server.c    |  8 ++++----
->>>>>>  unit/test-gatt.c         |  6 +++---
->>>>>>  7 files changed, 40 insertions(+), 22 deletions(-)
->>>>>>
->>>>>> diff --git a/android/gatt.c b/android/gatt.c
->>>>>> index 3a35bd6..7f765e0 100644
->>>>>> --- a/android/gatt.c
->>>>>> +++ b/android/gatt.c
->>>>>> @@ -6349,7 +6349,7 @@ static void write_cmd_request(const uint8_t *cmd, uint16_t cmd_len,
->>>>>>                 return;
->>>>>>
->>>>>>         gatt_db_attribute_write(attrib, 0, value, vlen, cmd[0], &dev->bdaddr,
->>>>>> -                                                       write_confirm, NULL);
->>>>>> +                                               false, write_confirm, NULL);
->>>>>>  }
->>>>>>
->>>>>>  static void write_signed_cmd_request(const uint8_t *cmd, uint16_t cmd_len,
->>>>>> @@ -6421,7 +6421,8 @@ static void write_signed_cmd_request(const uint8_t *cmd, uint16_t cmd_len,
->>>>>>                 /* Signature OK, proceed with write */
->>>>>>                 bt_update_sign_counter(&dev->bdaddr, REMOTE_CSRK, r_sign_cnt);
->>>>>>                 gatt_db_attribute_write(attrib, 0, value, vlen, cmd[0],
->>>>>> -                                       &dev->bdaddr, write_confirm, NULL);
->>>>>> +                                                       &dev->bdaddr, false,
->>>>>> +                                                       write_confirm, NULL);
->>>>>>         }
->>>>>>  }
->>>>>>
->>>>>> @@ -6481,8 +6482,8 @@ static uint8_t write_req_request(const uint8_t *cmd, uint16_t cmd_len,
->>>>>>         }
->>>>>>
->>>>>>         if (!gatt_db_attribute_write(attrib, 0, value, vlen, cmd[0],
->>>>>> -                                       &dev->bdaddr, attribute_write_cb,
->>>>>> -                                       data)) {
->>>>>> +                                               &dev->bdaddr, false,
->>>>>> +                                               attribute_write_cb, data)) {
->>>>>>                 queue_remove(dev->pending_requests, data);
->>>>>>                 free(data);
->>>>>>                 return ATT_ECODE_UNLIKELY;
->>>>>> @@ -6541,8 +6542,8 @@ static uint8_t write_prep_request(const uint8_t *cmd, uint16_t cmd_len,
->>>>>>         data->length = vlen;
->>>>>>
->>>>>>         if (!gatt_db_attribute_write(attrib, offset, value, vlen, cmd[0],
->>>>>> -                                       &dev->bdaddr, attribute_write_cb,
->>>>>> -                                       data)) {
->>>>>> +                                               &dev->bdaddr, false,
->>>>>> +                                               attribute_write_cb, data)) {
->>>>>>                 queue_remove(dev->pending_requests, data);
->>>>>>                 g_free(data->value);
->>>>>>                 free(data);
->>>>>> @@ -6805,7 +6806,7 @@ static void register_gap_service(void)
->>>>>>                 value = cpu_to_le16(APPEARANCE_GENERIC_PHONE);
->>>>>>                 gatt_db_attribute_write(gap_srvc_data.appear, 0,
->>>>>>                                                 (void *) &value, sizeof(value),
->>>>>> -                                               ATT_OP_WRITE_REQ, NULL,
->>>>>> +                                               ATT_OP_WRITE_REQ, NULL, false,
->>>>>>                                                 write_confirm, NULL);
->>>>>>         }
->>>>>>
->>>>>> @@ -6822,7 +6823,7 @@ static void register_gap_service(void)
->>>>>>                 value = PERIPHERAL_PRIVACY_DISABLE;
->>>>>>                 gatt_db_attribute_write(gap_srvc_data.priv, 0,
->>>>>>                                                 &value, sizeof(value),
->>>>>> -                                               ATT_OP_WRITE_REQ, NULL,
->>>>>> +                                               ATT_OP_WRITE_REQ, NULL, false,
->>>>>>                                                 write_confirm, NULL);
->>>>>>         }
->>>>>>
->>>>>> diff --git a/src/gatt-client.c b/src/gatt-client.c
->>>>>> index 1edbafc..79e1d26 100644
->>>>>> --- a/src/gatt-client.c
->>>>>> +++ b/src/gatt-client.c
->>>>>> @@ -349,7 +349,7 @@ static void desc_read_cb(bool success, uint8_t att_ecode,
->>>>>>                 return;
->>>>>>         }
->>>>>>
->>>>>> -       gatt_db_attribute_write(desc->attr, 0, value, length, 0, NULL,
->>>>>> +       gatt_db_attribute_write(desc->attr, 0, value, length, 0, NULL, true,
->>>>>>                                                 write_descriptor_cb, desc);
->>>>>>
->>>>>>         /*
->>>>>> @@ -764,7 +764,7 @@ static void chrc_read_cb(bool success, uint8_t att_ecode, const uint8_t *value,
->>>>>>         }
->>>>>>
->>>>>>         gatt_db_attribute_write(chrc->attr, 0, value, length, op->offset, NULL,
->>>>>> -                                               write_characteristic_cb, chrc);
->>>>>> +                                       true, write_characteristic_cb, chrc);
->>>>>
->>>>>
->>>>> I think it would be better to have some means to truncate the value
->>>>> separately, e.g. gatt_db_attribute_truncate.
->>>>>
->>>>
->>>> Would this just truncate the value to the specified length? Or would
->>>> we want a "set_value" function that works like write but truncates it
->>>> if needed?
->>>
->>> Maybe a reset would be enough so once we start read operation we reset
->>> the current value, how about it?
->>>
->>
->> Sounds good to me.
->>
->
-> Sorry to break the flow, but it looks like I don't fully understand
-> what you meant by "once we start read operation we reset the current
-> value". Do you mean we call gatt_db_attribute_truncate after we call
-> gatt_db_attribute_write? Or we do something in gatt_db_attribute_read?
+add a new method "csr2" to hid2hci that sends a control message
+to the usb device which switches the Cambridge Silicon Radio 8510 A10
+as used in Sitecom CNT-524
 
-I was thinking in gatt_db_attribute_reset followed by
-gatt_db_attribute_write, obviously we should only reset for the first
-time if the value cannot be read all at once.
+fixes: https://bugzilla.kernel.org/show_bug.cgi?id=69181
+---
 
->>>>>>         /*
->>>>>>          * If the value length is exactly MTU-1, then we may not have read the
->>>>>> @@ -1020,7 +1020,7 @@ static void notify_cb(uint16_t value_handle, const uint8_t *value,
->>>>>>          * signal so that we propagate the notification/indication to
->>>>>>          * applications.
->>>>>>          */
->>>>>> -       gatt_db_attribute_write(chrc->attr, 0, value, length, 0, NULL,
->>>>>> +       gatt_db_attribute_write(chrc->attr, 0, value, length, 0, NULL, true,
->>>>>>                                                 write_characteristic_cb, chrc);
->>>>>>  }
->>>>>>
->>>>>> diff --git a/src/shared/gatt-db.c b/src/shared/gatt-db.c
->>>>>> index 74c3e70..87e77d1 100644
->>>>>> --- a/src/shared/gatt-db.c
->>>>>> +++ b/src/shared/gatt-db.c
->>>>>> @@ -1440,9 +1440,24 @@ static bool write_timeout(void *user_data)
->>>>>>         return false;
->>>>>>  }
->>>>>>
->>>>>> +static bool should_resize_value(struct gatt_db_attribute *attrib, size_t len,
->>>>>> +                                                               uint16_t offset,
->>>>>> +                                                               bool truncate)
->>>>>> +{
->>>>>> +       unsigned diff;
->>>>>> +
->>>>>> +       if (!attrib->value || offset >= attrib->value_len)
->>>>>> +               return true;
->>>>>> +
->>>>>> +       diff = attrib->value_len - offset;
->>>>>> +
->>>>>> +       return truncate ? len != diff : len > diff;
->>>>>> +}
->>>>>> +
->>>>>>  bool gatt_db_attribute_write(struct gatt_db_attribute *attrib, uint16_t offset,
->>>>>>                                         const uint8_t *value, size_t len,
->>>>>>                                         uint8_t opcode, bdaddr_t *bdaddr,
->>>>>> +                                       bool truncate,
->>>>>>                                         gatt_db_attribute_write_t func,
->>>>>>                                         void *user_data)
->>>>>>  {
->>>>>> @@ -1471,8 +1486,7 @@ bool gatt_db_attribute_write(struct gatt_db_attribute *attrib, uint16_t offset,
->>>>>>         }
->>>>>>
->>>>>>         /* For values stored in db allocate on demand */
->>>>>> -       if (!attrib->value || offset >= attrib->value_len ||
->>>>>> -                               len > (unsigned) (attrib->value_len - offset)) {
->>>>>> +       if (should_resize_value(attrib, len, offset, truncate)) {
->>>>>>                 void *buf;
->>>>>>
->>>>>>                 buf = realloc(attrib->value, len + offset);
->>>>>> diff --git a/src/shared/gatt-db.h b/src/shared/gatt-db.h
->>>>>> index f188944..2467852 100644
->>>>>> --- a/src/shared/gatt-db.h
->>>>>> +++ b/src/shared/gatt-db.h
->>>>>> @@ -193,6 +193,7 @@ typedef void (*gatt_db_attribute_write_t) (struct gatt_db_attribute *attrib,
->>>>>>  bool gatt_db_attribute_write(struct gatt_db_attribute *attrib, uint16_t offset,
->>>>>>                                         const uint8_t *value, size_t len,
->>>>>>                                         uint8_t opcode, bdaddr_t *bdaddr,
->>>>>> +                                       bool truncate,
->>>>>>                                         gatt_db_attribute_write_t func,
->>>>>>                                         void *user_data);
->>>>>>
->>>>>> diff --git a/src/shared/gatt-server.c b/src/shared/gatt-server.c
->>>>>> index 00f36fd..2af7cf1 100644
->>>>>> --- a/src/shared/gatt-server.c
->>>>>> +++ b/src/shared/gatt-server.c
->>>>>> @@ -723,7 +723,8 @@ static void write_cb(uint8_t opcode, const void *pdu,
->>>>>>         server->pending_write_op = op;
->>>>>>
->>>>>>         if (gatt_db_attribute_write(attr, 0, pdu + 2, length - 2, opcode,
->>>>>> -                                               NULL, write_complete_cb, op))
->>>>>> +                                                       NULL, false,
->>>>>> +                                                       write_complete_cb, op))
->>>>>>                 return;
->>>>>>
->>>>>>         if (op)
->>>>>> @@ -1008,7 +1009,8 @@ static void exec_next_prep_write(struct bt_gatt_server *server,
->>>>>>         status = gatt_db_attribute_write(attr, next->offset,
->>>>>>                                                 next->value, next->length,
->>>>>>                                                 BT_ATT_OP_EXEC_WRITE_REQ, NULL,
->>>>>> -                                               exec_write_complete_cb, server);
->>>>>> +                                               false, exec_write_complete_cb,
->>>>>> +                                               server);
->>>>>>
->>>>>>         prep_write_data_destroy(next);
->>>>>>
->>>>>> diff --git a/tools/btgatt-server.c b/tools/btgatt-server.c
->>>>>> index f6ad8c3..393a071 100644
->>>>>> --- a/tools/btgatt-server.c
->>>>>> +++ b/tools/btgatt-server.c
->>>>>> @@ -446,8 +446,8 @@ static void populate_gap_service(struct server *server)
->>>>>>         gatt_db_attribute_write(tmp, 0, (void *) &appearance,
->>>>>>                                                         sizeof(appearance),
->>>>>>                                                         BT_ATT_OP_WRITE_REQ,
->>>>>> -                                                       NULL, confirm_write,
->>>>>> -                                                       NULL);
->>>>>> +                                                       NULL, true,
->>>>>> +                                                       confirm_write, NULL);
->>>>>>
->>>>>>         gatt_db_service_set_active(service, true);
->>>>>>  }
->>>>>> @@ -514,8 +514,8 @@ static void populate_hr_service(struct server *server)
->>>>>>                                                 NULL, NULL, server);
->>>>>>         gatt_db_attribute_write(body, 0, (void *) &body_loc, sizeof(body_loc),
->>>>>>                                                         BT_ATT_OP_WRITE_REQ,
->>>>>> -                                                       NULL, confirm_write,
->>>>>> -                                                       NULL);
->>>>>> +                                                       NULL, true,
->>>>>> +                                                       confirm_write, NULL);
->>>>>>
->>>>>>         /* HR Control Point Characteristic */
->>>>>>         bt_uuid16_create(&uuid, UUID_HEART_RATE_CTRL);
->>>>>> diff --git a/unit/test-gatt.c b/unit/test-gatt.c
->>>>>> index 169fbd3..7a5081d 100644
->>>>>> --- a/unit/test-gatt.c
->>>>>> +++ b/unit/test-gatt.c
->>>>>> @@ -654,8 +654,8 @@ static struct gatt_db_attribute *add_char_with_value(struct gatt_db *db,
->>>>>>
->>>>>>         g_assert(attrib != NULL);
->>>>>>
->>>>>> -       gatt_db_attribute_write(attrib, 0, value, len, 0x00, NULL, att_write_cb,
->>>>>> -                                                                       NULL);
->>>>>> +       gatt_db_attribute_write(attrib, 0, value, len, 0x00, NULL, true,
->>>>>> +                                                       att_write_cb, NULL);
->>>>>>
->>>>>>         return attrib;
->>>>>>  }
->>>>>> @@ -670,7 +670,7 @@ add_desc_with_value(struct gatt_db_attribute *att, bt_uuid_t *uuid,
->>>>>>         desc_att = gatt_db_service_add_descriptor(att, uuid, att_perms, NULL,
->>>>>>                                                                 NULL, NULL);
->>>>>>
->>>>>> -       gatt_db_attribute_write(desc_att, 0, value, len, 0x00, NULL,
->>>>>> +       gatt_db_attribute_write(desc_att, 0, value, len, 0x00, NULL, true,
->>>>>>                                                         att_write_cb, NULL);
->>>>>>
->>>>>>         return desc_att;
->>>>>> --
->>>>>> 2.2.0.rc0.207.ga3a616c
->>>>>>
->>>>>> --
->>>>>> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
->>>>>> the body of a message to majordomo@vger.kernel.org
->>>>>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->>>>>
->>>>>
->>>>>
->>>>> --
->>>>> Luiz Augusto von Dentz
->>>>
->>>> Cheers,
->>>> Arman
->>>
->>>
->>>
->>> --
->>> Luiz Augusto von Dentz
->>
->> Cheers,
->> Arman
->
-> Thanks,
-> Arman
+Notes:
+    4th version, coding style corrections from Johan Hedberg and Anderson Lizardo, resend
 
+ tools/hid2hci.1 |  2 +-
+ tools/hid2hci.c | 51 ++++++++++++++++++++++++++++++++++++++++++++++++++-
+ 2 files changed, 51 insertions(+), 2 deletions(-)
 
-
+diff --git a/tools/hid2hci.1 b/tools/hid2hci.1
+index 8c5d520..c6876a3 100644
+--- a/tools/hid2hci.1
++++ b/tools/hid2hci.1
+@@ -32,7 +32,7 @@ mode and back.
+ .B --mode= [hid, hci]
+ Sets the mode to switch the device into
+ .TP
+-.B --method= [csr, logitech-hid, dell]
++.B --method= [csr, csr2, logitech-hid, dell]
+ Which vendor method to use for switching the device.
+ .TP
+ .B --devpath=
+diff --git a/tools/hid2hci.c b/tools/hid2hci.c
+index a183bfa..49dcada 100644
+--- a/tools/hid2hci.c
++++ b/tools/hid2hci.c
+@@ -119,6 +119,52 @@ static int usb_switch_csr(int fd, enum mode mode)
+ 	return err;
+ }
+ 
++static int usb_switch_csr2(int fd, enum mode mode)
++{
++	int err;
++	struct usbfs_disconnect disconnect;
++	uint8_t report[] = {
++		0x01, 0x05, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
++	};
++
++	switch (mode) {
++	case HCI:
++		/* send report as is */
++		disconnect.interface = 0;
++		disconnect.flags = USBFS_DISCONNECT_EXCEPT_DRIVER;
++		strcpy(disconnect.driver, "usbfs");
++
++		if (ioctl(fd, USBFS_IOCTL_DISCONNECT, &disconnect) < 0) {
++			fprintf(stderr, "Can't claim interface: %s (%d)\n",
++				strerror(errno), errno);
++			return -1;
++		}
++
++		/* Set_report request with 
++		 * report id: 0x01, report type: feature (0x03) 
++		 * on interface 0
++		 */
++		err = control_message(fd,
++				      USB_ENDPOINT_OUT | USB_TYPE_CLASS |
++				      USB_RECIP_INTERFACE,
++				      USB_REQ_SET_CONFIGURATION,
++				      0x01 | (0x03 << 8),
++				      0, report, sizeof(report), 5000);
++		/* unable to detect whether the previous state 
++		 * already was HCI (EALREADY)  
++		 */
++		break;
++	case HID:
++		/* currently unknown how to switch to HID */
++		fprintf(stderr,
++			"csr2: Switching to hid mode is not implemented\n");
++		err = -1;
++		break;
++	}
++
++	return err;
++}
++
+ static int hid_logitech_send_report(int fd, const char *buf, size_t size)
+ {
+ 	struct hiddev_report_info rinfo;
+@@ -258,7 +304,7 @@ static void usage(const char *error)
+ 	printf("Usage: hid2hci [options]\n"
+ 		"  --mode=       mode to switch to [hid|hci] (default hci)\n"
+ 		"  --devpath=    sys device path\n"
+-		"  --method=     method to use to switch [csr|logitech-hid|dell]\n"
++		"  --method=     method to use to switch [csr|csr2|logitech-hid|dell]\n"
+ 		"  --help\n\n");
+ }
+ 
+@@ -311,6 +357,9 @@ int main(int argc, char *argv[])
+ 			if (!strcmp(optarg, "csr")) {
+ 				method = METHOD_CSR;
+ 				usb_switch = usb_switch_csr;
++			} else if (!strcmp(optarg, "csr2")) {
++				method = METHOD_CSR;
++				usb_switch = usb_switch_csr2;
+ 			} else if (!strcmp(optarg, "logitech-hid")) {
+ 				method = METHOD_LOGITECH_HID;
+ 			} else if (!strcmp(optarg, "dell")) {
 -- 
-Luiz Augusto von Dentz
+1.9.1
+
