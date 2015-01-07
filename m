@@ -2,36 +2,48 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH 2/2] shared/queue: Fix NULL data handling in queue_remove_all
-Date: Wed,  7 Jan 2015 17:26:03 +0100
-Message-Id: <1420647963-5469-2-git-send-email-szymon.janc@tieto.com>
-In-Reply-To: <1420647963-5469-1-git-send-email-szymon.janc@tieto.com>
-References: <1420647963-5469-1-git-send-email-szymon.janc@tieto.com>
+Subject: [PATCH 1/2] unit/test-queue: Extend /queue/remove_all with NULL data checks
+Date: Wed,  7 Jan 2015 17:26:02 +0100
+Message-Id: <1420647963-5469-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-queue_remove_if returns data so we must check entries count to detect
-if entry was removed (with NULL data) or not found.
+queue_remove_all should correctly handle NULL data.
 ---
- src/shared/queue.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ unit/test-queue.c | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
 
-diff --git a/src/shared/queue.c b/src/shared/queue.c
-index d94b34d..3507ed1 100644
---- a/src/shared/queue.c
-+++ b/src/shared/queue.c
-@@ -362,9 +362,10 @@ unsigned int queue_remove_all(struct queue *queue, queue_match_func_t function,
- 	if (function) {
- 		while (entry) {
- 			void *data;
-+			unsigned int entries = queue->entries;
+diff --git a/unit/test-queue.c b/unit/test-queue.c
+index 15c79bd..12319b0 100644
+--- a/unit/test-queue.c
++++ b/unit/test-queue.c
+@@ -222,6 +222,11 @@ static bool match_int(const void *a, const void *b)
+ 	return i == j;
+ }
  
- 			data = queue_remove_if(queue, function, user_data);
--			if (!data)
-+			if (entries == queue->entries)
- 				break;
++static bool match_ptr(const void *a, const void *b)
++{
++	return a == b;
++}
++
+ static void test_remove_all(void)
+ {
+ 	struct queue *queue;
+@@ -234,6 +239,14 @@ static void test_remove_all(void)
+ 	g_assert(queue_remove_all(queue, match_int, INT_TO_PTR(10), NULL) == 1);
+ 	g_assert(queue_isempty(queue));
  
- 			if (destroy)
++	g_assert(queue_push_tail(queue, NULL));
++	g_assert(queue_remove_all(queue, match_ptr, NULL, NULL) == 1);
++	g_assert(queue_isempty(queue));
++
++	g_assert(queue_push_tail(queue, UINT_TO_PTR(0)));
++	g_assert(queue_remove_all(queue, match_int, UINT_TO_PTR(0), NULL) == 1);
++	g_assert(queue_isempty(queue));
++
+ 	queue_destroy(queue, NULL);
+ }
+ 
 -- 
 1.9.1
 
