@@ -2,11 +2,11 @@ Return-Path: <cyrus@holtmann.org>
 From: Gowtham Anandha Babu <gowtham.ab@samsung.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: d.kasatkin@samsung.com, bharat.panda@samsung.com, cpgs@samsung.com
-References: <1418997688-16691-1-git-send-email-gowtham.ab@samsung.com>
-In-reply-to: <1418997688-16691-1-git-send-email-gowtham.ab@samsung.com>
-Subject: RE: [PATCH] src/att: Fix usage of memory after it is freed.
-Date: Wed, 07 Jan 2015 15:26:02 +0530
-Message-id: <001c01d02a60$26466900$72d33b00$@samsung.com>
+References: <1418997054-16603-1-git-send-email-gowtham.ab@samsung.com>
+In-reply-to: <1418997054-16603-1-git-send-email-gowtham.ab@samsung.com>
+Subject: RE: [PATCH] profiles/hog: Remove dead code
+Date: Wed, 07 Jan 2015 15:25:01 +0530
+Message-id: <001501d02a60$02573100$07059300$@samsung.com>
 MIME-version: 1.0
 Content-type: text/plain; charset=us-ascii
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -17,44 +17,32 @@ Ping.
 > -----Original Message-----
 > From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-
 > owner@vger.kernel.org] On Behalf Of Gowtham Anandha Babu
-> Sent: Friday, December 19, 2014 7:31 PM
+> Sent: Friday, December 19, 2014 7:21 PM
 > To: linux-bluetooth@vger.kernel.org
 > Cc: d.kasatkin@samsung.com; bharat.panda@samsung.com;
 > cpgs@samsung.com; Gowtham Anandha Babu
-> Subject: [PATCH] src/att: Fix usage of memory after it is freed.
+> Subject: [PATCH] profiles/hog: Remove dead code
 > 
-> warning: Use of memory after it is freed
-> 	respond_not_supported(att, opcode);
-> 	^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+> warning: Value stored to 'attrib' is never read
+> 		attrib = report->hogdev->attrib;
+> 		^        ~~~~~~~~~~~~~~~~~~~~~~
 > ---
->  src/shared/att.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+>  profiles/input/hog.c | 1 -
+>  1 file changed, 1 deletion(-)
 > 
-> diff --git a/src/shared/att.c b/src/shared/att.c index 4be0652..a98909e
-> 100644
-> --- a/src/shared/att.c
-> +++ b/src/shared/att.c
-> @@ -692,14 +692,14 @@ static void handle_notify(struct bt_att *att,
-uint8_t
-> opcode, uint8_t *pdu,
-> 
->  	queue_foreach(att->notify_list, notify_handler, &data);
-> 
-> -	bt_att_unref(att);
-> -
->  	/*
->  	 * If this was a request and no handler was registered for it,
-respond
->  	 * with "Not Supported"
->  	 */
->  	if (!data.handler_found && get_op_type(opcode) ==
-> ATT_OP_TYPE_REQ)
->  		respond_not_supported(att, opcode);
-> +
-> +	bt_att_unref(att);
->  }
-> 
->  static bool can_read_data(struct io *io, void *user_data)
+> diff --git a/profiles/input/hog.c b/profiles/input/hog.c index
+> fb51663..74351f3 100644
+> --- a/profiles/input/hog.c
+> +++ b/profiles/input/hog.c
+> @@ -221,7 +221,6 @@ static void discover_descriptor_cb(uint8_t status,
+> GSList *descs,
+>  		switch (desc->uuid16) {
+>  		case GATT_CLIENT_CHARAC_CFG_UUID:
+>  			report = user_data;
+> -			attrib = report->hogdev->attrib;
+>  			write_ccc(desc->handle, report);
+>  			break;
+>  		case GATT_REPORT_REFERENCE:
 > --
 > 1.9.1
 > 
