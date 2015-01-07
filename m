@@ -1,12 +1,12 @@
 Return-Path: <cyrus@holtmann.org>
 From: Gowtham Anandha Babu <gowtham.ab@samsung.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: d.kasatkin@samsung.com, bharat.panda@samsung.com, cpgs@samsung.com
-References: <1418997054-16603-1-git-send-email-gowtham.ab@samsung.com>
-In-reply-to: <1418997054-16603-1-git-send-email-gowtham.ab@samsung.com>
-Subject: RE: [PATCH] profiles/hog: Remove dead code
-Date: Wed, 07 Jan 2015 15:25:01 +0530
-Message-id: <001501d02a60$02573100$07059300$@samsung.com>
+Cc: bharat.panda@samsung.com, cpgs@samsung.com
+References: <1418995940-16166-1-git-send-email-gowtham.ab@samsung.com>
+In-reply-to: <1418995940-16166-1-git-send-email-gowtham.ab@samsung.com>
+Subject: RE: [PATCH] tools/bccmd: Remove dead code
+Date: Wed, 07 Jan 2015 15:24:34 +0530
+Message-id: <001401d02a5f$f4248c40$dc6da4c0$@samsung.com>
 MIME-version: 1.0
 Content-type: text/plain; charset=us-ascii
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -17,32 +17,31 @@ Ping.
 > -----Original Message-----
 > From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-
 > owner@vger.kernel.org] On Behalf Of Gowtham Anandha Babu
-> Sent: Friday, December 19, 2014 7:21 PM
+> Sent: Friday, December 19, 2014 7:02 PM
 > To: linux-bluetooth@vger.kernel.org
 > Cc: d.kasatkin@samsung.com; bharat.panda@samsung.com;
 > cpgs@samsung.com; Gowtham Anandha Babu
-> Subject: [PATCH] profiles/hog: Remove dead code
+> Subject: [PATCH] tools/bccmd: Remove dead code
 > 
-> warning: Value stored to 'attrib' is never read
-> 		attrib = report->hogdev->attrib;
-> 		^        ~~~~~~~~~~~~~~~~~~~~~~
+> warning: Value stored to 'handle' is never read
+>         handle = array[0] | (array[1] << 8);
+>         ^        ~~~~~~~~~~~~~~~~~~~~~~~~~~
 > ---
->  profiles/input/hog.c | 1 -
+>  tools/bccmd.c | 1 -
 >  1 file changed, 1 deletion(-)
 > 
-> diff --git a/profiles/input/hog.c b/profiles/input/hog.c index
-> fb51663..74351f3 100644
-> --- a/profiles/input/hog.c
-> +++ b/profiles/input/hog.c
-> @@ -221,7 +221,6 @@ static void discover_descriptor_cb(uint8_t status,
-> GSList *descs,
->  		switch (desc->uuid16) {
->  		case GATT_CLIENT_CHARAC_CFG_UUID:
->  			report = user_data;
-> -			attrib = report->hogdev->attrib;
->  			write_ccc(desc->handle, report);
->  			break;
->  		case GATT_REPORT_REFERENCE:
+> diff --git a/tools/bccmd.c b/tools/bccmd.c index 4649ad5..2646660 100644
+> --- a/tools/bccmd.c
+> +++ b/tools/bccmd.c
+> @@ -279,7 +279,6 @@ static int cmd_keylen(int transport, int argc, char
+> *argv[])
+>  	if (err < 0)
+>  		return -1;
+> 
+> -	handle = array[0] | (array[1] << 8);
+>  	keylen = array[2] | (array[3] << 8);
+> 
+>  	printf("Crypt key length: %d bit\n", keylen * 8);
 > --
 > 1.9.1
 > 
