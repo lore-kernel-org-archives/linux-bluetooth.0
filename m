@@ -1,51 +1,62 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 8.1 \(1993\))
-Subject: Re: [PATCH] Bluetooth: Add support for yet another BCM20702A0 variant (0489:e031)
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1420663834-16333-1-git-send-email-tiwai@suse.de>
-Date: Wed, 7 Jan 2015 15:15:49 -0800
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>,
-	"Gustavo F. Padovan" <gustavo@padovan.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>
-Message-Id: <A5EDFACF-25C0-4102-8C17-1913B9EA905D@holtmann.org>
-References: <1420663834-16333-1-git-send-email-tiwai@suse.de>
-To: Takashi Iwai <tiwai@suse.de>
+MIME-Version: 1.0
+In-Reply-To: <1420647963-5469-1-git-send-email-szymon.janc@tieto.com>
+References: <1420647963-5469-1-git-send-email-szymon.janc@tieto.com>
+Date: Wed, 7 Jan 2015 20:38:44 -0200
+Message-ID: <CABBYNZ+j52_K0cE22VTbRWU_gcbTPhwJ8G+UoFuSSuu4fNgZyw@mail.gmail.com>
+Subject: Re: [PATCH 1/2] unit/test-queue: Extend /queue/remove_all with NULL
+ data checks
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Szymon Janc <szymon.janc@tieto.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Takashi,
+Hi Szymon,
 
-> 0489:e031 needs BTUSB_BCM_PATCHRAM, too.
-
-for the ones that require patching, we prefer to include the instructions on how to get the firmware into the commit log.
-
-Also please include /sys/kernel/debug/usb/devices section for this. It is good to have them for reference.
-
-> Bugzilla: https://bugzilla.opensuse.org/show_bug.cgi?id=911311
-> Cc: <stable@vger.kernel.org>
-> Signed-off-by: Takashi Iwai <tiwai@suse.de>
+On Wed, Jan 7, 2015 at 2:26 PM, Szymon Janc <szymon.janc@tieto.com> wrote:
+> queue_remove_all should correctly handle NULL data.
 > ---
-> drivers/bluetooth/btusb.c | 2 ++
-> 1 file changed, 2 insertions(+)
-> 
-> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-> index 19cf2cf22e87..a6f8182e6d3a 100644
-> --- a/drivers/bluetooth/btusb.c
-> +++ b/drivers/bluetooth/btusb.c
-> @@ -108,6 +108,8 @@ static const struct usb_device_id btusb_table[] = {
-> 	{ USB_DEVICE(0x413c, 0x8197) },
-> 	{ USB_DEVICE(0x13d3, 0x3404),
-> 	  .driver_info = BTUSB_BCM_PATCHRAM },
-> +	{ USB_DEVICE(0x13d3, 0xe031),
-> +	  .driver_info = BTUSB_BCM_PATCHRAM },
+>  unit/test-queue.c | 13 +++++++++++++
+>  1 file changed, 13 insertions(+)
+>
+> diff --git a/unit/test-queue.c b/unit/test-queue.c
+> index 15c79bd..12319b0 100644
+> --- a/unit/test-queue.c
+> +++ b/unit/test-queue.c
+> @@ -222,6 +222,11 @@ static bool match_int(const void *a, const void *b)
+>         return i == j;
+>  }
+>
+> +static bool match_ptr(const void *a, const void *b)
+> +{
+> +       return a == b;
+> +}
+> +
+>  static void test_remove_all(void)
+>  {
+>         struct queue *queue;
+> @@ -234,6 +239,14 @@ static void test_remove_all(void)
+>         g_assert(queue_remove_all(queue, match_int, INT_TO_PTR(10), NULL) == 1);
+>         g_assert(queue_isempty(queue));
+>
+> +       g_assert(queue_push_tail(queue, NULL));
+> +       g_assert(queue_remove_all(queue, match_ptr, NULL, NULL) == 1);
+> +       g_assert(queue_isempty(queue));
+> +
+> +       g_assert(queue_push_tail(queue, UINT_TO_PTR(0)));
+> +       g_assert(queue_remove_all(queue, match_int, UINT_TO_PTR(0), NULL) == 1);
+> +       g_assert(queue_isempty(queue));
+> +
+>         queue_destroy(queue, NULL);
+>  }
+>
+> --
+> 1.9.1
 
-I wonder if we should just start using USB_VENDOR_AND_INTERFACE_INFO() for this one like we have done for other Broadcom based Bluetooth dongles.
+Applied, thanks.
 
-> 	/* Foxconn - Hon Hai */
-> 	{ USB_VENDOR_AND_INTERFACE_INFO(0x0489, 0xff, 0x01, 0x01),
 
-Regards
-
-Marcel
-
+-- 
+Luiz Augusto von Dentz
