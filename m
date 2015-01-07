@@ -1,62 +1,66 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1420647963-5469-1-git-send-email-szymon.janc@tieto.com>
-References: <1420647963-5469-1-git-send-email-szymon.janc@tieto.com>
-Date: Wed, 7 Jan 2015 20:38:44 -0200
-Message-ID: <CABBYNZ+j52_K0cE22VTbRWU_gcbTPhwJ8G+UoFuSSuu4fNgZyw@mail.gmail.com>
-Subject: Re: [PATCH 1/2] unit/test-queue: Extend /queue/remove_all with NULL
- data checks
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Szymon Janc <szymon.janc@tieto.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+From: kernel@gkr.i24.cc
+To: Johan Hedberg <johan.hedberg@gmail.com>
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>,
+	Gordon Kramer <kernel@gkr.i24.cc>
+Subject: [PATCH v5 2/2] use const uint_8* for pointer in control_message
+Date: Wed,  7 Jan 2015 23:04:00 +0100
+Message-Id: <1420668240-5100-3-git-send-email-kernel@gkr.i24.cc>
+In-Reply-To: <1420668240-5100-1-git-send-email-kernel@gkr.i24.cc>
+References: <20150107203159.GA4571@t440s.P-661HNU-F1>
+ <1420668240-5100-1-git-send-email-kernel@gkr.i24.cc>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Szymon,
+From: Gordon Kramer <kernel@gkr.i24.cc>
 
-On Wed, Jan 7, 2015 at 2:26 PM, Szymon Janc <szymon.janc@tieto.com> wrote:
-> queue_remove_all should correctly handle NULL data.
-> ---
->  unit/test-queue.c | 13 +++++++++++++
->  1 file changed, 13 insertions(+)
->
-> diff --git a/unit/test-queue.c b/unit/test-queue.c
-> index 15c79bd..12319b0 100644
-> --- a/unit/test-queue.c
-> +++ b/unit/test-queue.c
-> @@ -222,6 +222,11 @@ static bool match_int(const void *a, const void *b)
->         return i == j;
->  }
->
-> +static bool match_ptr(const void *a, const void *b)
-> +{
-> +       return a == b;
-> +}
-> +
->  static void test_remove_all(void)
->  {
->         struct queue *queue;
-> @@ -234,6 +239,14 @@ static void test_remove_all(void)
->         g_assert(queue_remove_all(queue, match_int, INT_TO_PTR(10), NULL) == 1);
->         g_assert(queue_isempty(queue));
->
-> +       g_assert(queue_push_tail(queue, NULL));
-> +       g_assert(queue_remove_all(queue, match_ptr, NULL, NULL) == 1);
-> +       g_assert(queue_isempty(queue));
-> +
-> +       g_assert(queue_push_tail(queue, UINT_TO_PTR(0)));
-> +       g_assert(queue_remove_all(queue, match_int, UINT_TO_PTR(0), NULL) == 1);
-> +       g_assert(queue_isempty(queue));
-> +
->         queue_destroy(queue, NULL);
->  }
->
-> --
-> 1.9.1
+change control_message signature
+requires const void* usbfs_ctrltransfer for ioctl
+use uint8 * in usb_switch_dell
+---
+ tools/hid2hci.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-Applied, thanks.
-
-
+diff --git a/tools/hid2hci.c b/tools/hid2hci.c
+index 3eedf4e..033fcfd 100644
+--- a/tools/hid2hci.c
++++ b/tools/hid2hci.c
+@@ -59,7 +59,7 @@ struct usbfs_ctrltransfer {
+ 	uint16_t wIndex;
+ 	uint16_t wLength;
+ 	uint32_t timeout;	/* in milliseconds */
+-	void *data;		/* pointer to data */
++	const void *data;	/* pointer to data */
+ };
+ 
+ 
+@@ -77,7 +77,7 @@ struct usbfs_disconnect{
+ 
+ static int control_message(int fd, int requesttype, int request,
+ 					int value, int index,
+-					char *bytes, int size, int timeout)
++					const uint8_t *bytes, int size, int timeout)
+ {
+ 	struct usbfs_ctrltransfer transfer;
+ 
+@@ -123,7 +123,7 @@ static int usb_switch_csr2(int fd, enum mode mode)
+ {
+ 	int err = 0;
+ 	struct usbfs_disconnect disconnect;
+-	char report[] = {
++	const uint8_t report[] = {
+ 		0x01, 0x05, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+ 	};
+ 
+@@ -226,7 +226,7 @@ out:
+ 
+ static int usb_switch_dell(int fd, enum mode mode)
+ {
+-	char report[] = { 0x7f, 0x00, 0x00, 0x00 };
++	uint8_t report[] = { 0x7f, 0x00, 0x00, 0x00 };
+ 	struct usbfs_disconnect disconnect;
+ 	int err;
+ 
 -- 
-Luiz Augusto von Dentz
+1.9.1
+
