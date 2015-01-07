@@ -1,142 +1,127 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1420619000-24211-7-git-send-email-vikram.pal@samsung.com>
-References: <1420619000-24211-1-git-send-email-vikram.pal@samsung.com>
-	<1420619000-24211-7-git-send-email-vikram.pal@samsung.com>
-Date: Wed, 7 Jan 2015 11:24:46 -0200
-Message-ID: <CABBYNZ+pMGqYxbF9WxsE_VS9LD=M0ta4Ejxgw4svyprbURG4XQ@mail.gmail.com>
-Subject: Re: [PATCH 6/6] monitor: Add AVRCP SetBrowsedPlayer support
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Vikrampal Yadav <vikram.pal@samsung.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	cpgs@samsung.com
-Content-Type: text/plain; charset=UTF-8
+From: Jakub Pawlowski <jpawlowski@google.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Jakub Pawlowski <jpawlowski@google.com>
+Subject: [PATCH v6 3/3] Bluetooth: Add restarting to service discovery
+Date: Wed,  7 Jan 2015 05:10:54 -0800
+Message-Id: <1420636254-25626-3-git-send-email-jpawlowski@google.com>
+In-Reply-To: <1420636254-25626-1-git-send-email-jpawlowski@google.com>
+References: <1420636254-25626-1-git-send-email-jpawlowski@google.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Vikram,
+When using LE_SCAN_FILTER_DUP_ENABLE, some controllers would send
+advertising report from each LE device only once. That means that we
+don't get any updates on RSSI value, and makes Service Discovery very
+slow. This patch adds restarting scan when in Service Discovery, and
+device with filtered uuid is found, but it's not in RSSI range to send
+event yet. This way if device moves into range, we will quickly get RSSI
+update.
 
-On Wed, Jan 7, 2015 at 6:23 AM, Vikrampal Yadav <vikram.pal@samsung.com> wrote:
-> Support for decoding AVRCP SetBrowsedPlayer added in Bluetooth monitor.
->
-> Channel: 65 len 12 ctrl 0x0102 [PSM 27 mode 3] {chan 1}
->       I-frame: Unsegmented TxSeq 1 ReqSeq 1
->       AVCTP Browsing: Command: type 0x00 label 0 PID 0x110e
->         AVRCP: SetBrowsedPlayer: len 0x0002
->           PlayerID: 0x0001 (1)
+Signed-off-by: Jakub Pawlowski <jpawlowski@google.com>
+---
+ include/net/bluetooth/hci_core.h |  1 +
+ net/bluetooth/mgmt.c             | 43 ++++++++++++++++++++++++++++++++++++----
+ 2 files changed, 40 insertions(+), 4 deletions(-)
 
-Can you please add the response frame as well.
-
-> ---
->  monitor/avctp.c | 86 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++-
->  1 file changed, 85 insertions(+), 1 deletion(-)
->
-> diff --git a/monitor/avctp.c b/monitor/avctp.c
-> index af91ecc..0a1e92d 100644
-> --- a/monitor/avctp.c
-> +++ b/monitor/avctp.c
-> @@ -1637,11 +1637,95 @@ static bool avrcp_control_packet(struct avctp_frame *avctp_frame)
->         }
->  }
->
-> +static bool avrcp_set_browsed_player(struct avctp_frame *avctp_frame)
-> +{
-> +       struct l2cap_frame *frame = &avctp_frame->l2cap_frame;
-> +       uint32_t items;
-> +       uint16_t id, uids, charset;
-> +       uint8_t status, folders, indent = 2;
-> +
-> +       if (avctp_frame->hdr & 0x02)
-> +               goto response;
-> +
-> +       if (!l2cap_frame_get_be16(frame, &id))
-> +               return false;
-> +
-> +       print_field("%*cPlayerID: 0x%04x (%u)", indent, ' ', id, id);
-> +       return true;
-> +
-> +response:
-> +       if (!l2cap_frame_get_u8(frame, &status))
-> +               return false;
-> +
-> +       print_field("%*cStatus: 0x%02x (%s)", indent, ' ', status,
-> +                                                       error2str(status));
-> +
-> +       if (!l2cap_frame_get_be16(frame, &uids))
-> +               return false;
-> +
-> +       print_field("%*cUIDCounter: 0x%04x (%u)", indent, ' ', uids, uids);
-> +
-> +       if (!l2cap_frame_get_be32(frame, &items))
-> +               return false;
-> +
-> +       print_field("%*cNumber of Items: 0x%08x (%u)", indent, ' ',
-> +                                                               items, items);
-> +
-> +       if (!l2cap_frame_get_be16(frame, &charset))
-> +               return false;
-> +
-> +       print_field("%*cCharsetID: 0x%04x (%s)", indent, ' ', charset,
-> +                                                       charset2str(charset));
-> +
-> +       if (!l2cap_frame_get_u8(frame, &folders))
-> +               return false;
-> +
-> +       print_field("%*cFolder Depth: 0x%02x (%u)", indent, ' ', folders,
-> +                                                               folders);
-> +
-> +       for (; folders > 0; folders--) {
-> +               uint8_t len;
-> +
-> +               if (!l2cap_frame_get_u8(frame, &len))
-> +                       return false;
-> +
-> +               printf("Folder: ");
-> +               for (; len > 0; len--) {
-> +                       uint8_t c;
-> +
-> +                       if (!l2cap_frame_get_u8(frame, &c))
-> +                               return false;
-> +
-> +                       printf("%1c", isprint(c) ? c : '.');
-> +               }
-> +               printf("\n");
-> +       }
-> +
-> +       return true;
-> +}
-> +
->  static bool avrcp_browsing_packet(struct avctp_frame *avctp_frame)
->  {
->         struct l2cap_frame *frame = &avctp_frame->l2cap_frame;
-> +       uint16_t len;
-> +       uint8_t pduid;
-> +
-> +       if (!l2cap_frame_get_u8(frame, &pduid))
-> +               return false;
-> +
-> +       if (!l2cap_frame_get_be16(frame, &len))
-> +               return false;
-> +
-> +       print_field("AVRCP: %s: len 0x%04x", pdu2str(pduid), len);
-> +
-> +       switch (pduid) {
-> +       case AVRCP_SET_BROWSED_PLAYER:
-> +               avrcp_set_browsed_player(avctp_frame);
-> +               break;
-> +       default:
-> +               packet_hexdump(frame->data, frame->size);
-> +       }
->
-> -       packet_hexdump(frame->data, frame->size);
->         return true;
->  }
->
-> --
-> 1.9.1
->
-
-
-
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 2ea1f46..2408208 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -1325,6 +1325,7 @@ void hci_sock_dev_event(struct hci_dev *hdev, int event);
+ #define DISCOV_INTERLEAVED_TIMEOUT	5120	/* msec */
+ #define DISCOV_INTERLEAVED_INQUIRY_LEN	0x04
+ #define DISCOV_BREDR_INQUIRY_LEN	0x08
++#define DISCOV_LE_RESTART_DELAY		200	/* msec */
+ 
+ int mgmt_control(struct sock *sk, struct msghdr *msg, size_t len);
+ int mgmt_new_settings(struct hci_dev *hdev);
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 6b3f553..cd9bc51 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -7160,6 +7160,16 @@ static bool eir_has_uuids(u8 *eir, u16 eir_len, u16 uuid_count, u8 (*uuids)[16])
+ 	return false;
+ }
+ 
++static void restart_le_scan(struct hci_dev *hdev)
++{
++	/* If controller is not scanning we are done. */
++	if (!test_bit(HCI_LE_SCAN, &hdev->dev_flags))
++		return;
++
++	queue_delayed_work(hdev->workqueue, &hdev->le_scan_restart,
++			   msecs_to_jiffies(DISCOV_LE_RESTART_DELAY));
++}
++
+ void mgmt_device_found(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
+ 		       u8 addr_type, u8 *dev_class, s8 rssi, u32 flags,
+ 		       u8 *eir, u16 eir_len, u8 *scan_rsp, u8 scan_rsp_len)
+@@ -7189,7 +7199,8 @@ void mgmt_device_found(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
+ 	 * the results are also dropped.
+ 	 */
+ 	if (hdev->discovery.rssi != HCI_RSSI_INVALID &&
+-	    (rssi < hdev->discovery.rssi || rssi == HCI_RSSI_INVALID))
++	    (rssi == HCI_RSSI_INVALID || (rssi < hdev->discovery.rssi &&
++	    !test_bit(HCI_QUIRK_STRICT_DUPLICATE_FILTER, &hdev->quirks))))
+ 		return;
+ 
+ 	/* Make sure that the buffer is big enough. The 5 extra bytes
+@@ -7223,12 +7234,20 @@ void mgmt_device_found(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
+ 		 * kept and checking possible scan response data
+ 		 * will be skipped.
+ 		 */
+-		if (hdev->discovery.uuid_count > 0)
++		if (hdev->discovery.uuid_count > 0) {
+ 			match = eir_has_uuids(eir, eir_len,
+ 					      hdev->discovery.uuid_count,
+ 					      hdev->discovery.uuids);
+-		else
++			/* we have service match. If duplicate filtering doesn't
++			 * honour RSSI hanges, restart scan to make sure we'll
++			 * get RSSI updates
++			 */
++			if (match && test_bit(HCI_QUIRK_STRICT_DUPLICATE_FILTER,
++					      &hdev->quirks))
++				restart_le_scan(hdev);
++		} else {
+ 			match = true;
++		}
+ 
+ 		if (!match && !scan_rsp_len)
+ 			return;
+@@ -7261,7 +7280,15 @@ void mgmt_device_found(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
+ 						     hdev->discovery.uuid_count,
+ 						     hdev->discovery.uuids))
+ 				return;
+-		}
++
++			/* we have service match. If duplicate filtering doesn't
++			 * honour RSSI hanges, restart scan to make sure we'll
++			 * get RSSI updates
++			 */
++			if (test_bit(HCI_QUIRK_STRICT_DUPLICATE_FILTER,
++				     &hdev->quirks))
++				restart_le_scan(hdev);
++			}
+ 
+ 		/* Append scan response data to event */
+ 		memcpy(ev->eir + eir_len, scan_rsp, scan_rsp_len);
+@@ -7274,6 +7301,14 @@ void mgmt_device_found(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
+ 			return;
+ 	}
+ 
++	/* Check again wether RSSI value doesn't meet Service Discovery
++	 * threshold. This might evaluate to true only if
++	 * HCI_QUIRK_STRICT_DUPLICATE_FILTER is set.
++	 */
++	if (hdev->discovery.rssi != HCI_RSSI_INVALID &&
++	    rssi < hdev->discovery.rssi)
++		return;
++
+ 	ev->eir_len = cpu_to_le16(eir_len + scan_rsp_len);
+ 	ev_size = sizeof(*ev) + eir_len + scan_rsp_len;
+ 
 -- 
-Luiz Augusto von Dentz
+2.2.0.rc0.207.ga3a616c
+
