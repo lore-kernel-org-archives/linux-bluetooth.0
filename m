@@ -1,58 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 7 Jan 2015 22:31:59 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: kernel@gkr.i24.cc
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCH v4] hid2hci add CSR 8510 A10 support
-Message-ID: <20150107203159.GA4571@t440s.P-661HNU-F1>
-References: <20150107091248.GA11467@t440s.lan>
- <1420625417-9282-1-git-send-email-kernel@gkr.i24.cc>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-In-Reply-To: <1420625417-9282-1-git-send-email-kernel@gkr.i24.cc>
+In-Reply-To: <1419920868-4637-1-git-send-email-s.syam@samsung.com>
+References: <1419920868-4637-1-git-send-email-s.syam@samsung.com>
+Date: Thu, 8 Jan 2015 01:34:43 +0530
+Message-ID: <CAFBvHifqO=3F0HdewPO1j0v5g=-N25CW_9+3mnef7nFdJPeqVQ@mail.gmail.com>
+Subject: Re: [PATCH 1/1] tools/bluemoon: Remove dead code
+From: Syam Sidhardhan <syamsidhardh@gmail.com>
+To: Syam Sidhardhan <s.syam@samsung.com>
+Cc: User Name <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Gordon,
+Hi,
 
-On Wed, Jan 07, 2015, kernel@gkr.i24.cc wrote:
-> add a new method "csr2" to hid2hci that sends a control message
-> to the usb device which switches the Cambridge Silicon Radio 8510 A10
-> as used in Sitecom CNT-524
-> 
-> fixes: https://bugzilla.kernel.org/show_bug.cgi?id=69181
+On Tue, Dec 30, 2014 at 11:57 AM, Syam Sidhardhan <s.syam@samsung.com> wrote:
+> return statement never get executed after goto.
 > ---
-> 
-> Notes:
->     4th version, coding style corrections from Johan Hedberg and Anderson Lizardo, resend
-> 
->  tools/hid2hci.1 |  2 +-
->  tools/hid2hci.c | 51 ++++++++++++++++++++++++++++++++++++++++++++++++++-
->  2 files changed, 51 insertions(+), 2 deletions(-)
+>  tools/bluemoon.c |    1 -
+>  1 file changed, 1 deletion(-)
+>
+> diff --git a/tools/bluemoon.c b/tools/bluemoon.c
+> index 1fd516a..663d1f9 100644
+> --- a/tools/bluemoon.c
+> +++ b/tools/bluemoon.c
+> @@ -776,7 +776,6 @@ static void analyze_firmware(const char *path)
+>         if (len != st.st_size) {
+>                 fprintf(stderr, "Failed to read complete firmware file\n");
+>                 goto done;
+> -               return;
+>         }
+>
+>         if ((size_t) len < sizeof(*css)) {
+> --
 
-I was about to apply this but it doesn't compile:
-
-make --no-print-directory all-am
-  CC       tools/hid2hci.o
-tools/hid2hci.c: In function ‘usb_switch_csr2’:
-tools/hid2hci.c:152:14: error: pointer targets in passing argument 6 of ‘control_message’ differ in signedness [-Werror=pointer-sign]
-           0, report, sizeof(report), 5000);
-              ^
-tools/hid2hci.c:78:12: note: expected ‘char *’ but argument is of type ‘uint8_t *’
- static int control_message(int fd, int requesttype, int request,
-            ^
-tools/hid2hci.c:124:6: error: ‘err’ may be used uninitialized in this function [-Werror=maybe-uninitialized]
-  int err;
-      ^
-cc1: all warnings being treated as errors
-
-Please use ./configure --enable-maintainer-mode to verify that the build
-is clean (or ./bootstrap-configure && make).
-
-> +	uint8_t report[] = {
-> +		0x01, 0x05, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
-> +	};
-
-Minor improvement: you might want to declare this as const.
-
-Johan
+ping
