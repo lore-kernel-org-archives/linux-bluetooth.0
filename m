@@ -2,70 +2,72 @@ Return-Path: <cyrus@holtmann.org>
 From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
-Subject: [PATCH 03/11] android/tester: Support remote sending pdu from fragments
-Date: Thu,  8 Jan 2015 10:17:41 +0100
-Message-Id: <1420708669-32600-3-git-send-email-jakub.tyszkowski@tieto.com>
+Subject: [PATCH 02/11] android/tester: Add macro improving pdu send procedure
+Date: Thu,  8 Jan 2015 10:17:40 +0100
+Message-Id: <1420708669-32600-2-git-send-email-jakub.tyszkowski@tieto.com>
 In-Reply-To: <1420708669-32600-1-git-send-email-jakub.tyszkowski@tieto.com>
 References: <1420708669-32600-1-git-send-email-jakub.tyszkowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This handles multiple iovectors instead of one assembled pdu.
+As of now when we want to send response from remote device, we compose
+pdu from handle and value, which are then copied into fixed size pdu
+with predefined header. With this macro we will be able to pass up to
+3 iovectors which are then send without additional copying. It also
+quite generic and can be used to any other kind of data processing nad
+not only for sending pdus.
 ---
- android/tester-gatt.c | 31 +++++++++++++++++++++++++++++--
- 1 file changed, 29 insertions(+), 2 deletions(-)
+ android/tester-gatt.c |  2 +-
+ android/tester-main.h | 13 +++++++++++--
+ 2 files changed, 12 insertions(+), 3 deletions(-)
 
 diff --git a/android/tester-gatt.c b/android/tester-gatt.c
-index 610c1b4..a8dbd35 100644
+index f4d22fd..610c1b4 100644
 --- a/android/tester-gatt.c
 +++ b/android/tester-gatt.c
-@@ -1704,17 +1704,44 @@ static void gatt_remote_send_raw_pdu_action(void)
- 	struct bthost *bthost = hciemu_client_get_host(data->hciemu);
+@@ -1079,7 +1079,7 @@ static void gatt_att_pdu_modify(void)
+ {
+ 	struct test_data *data = tester_get_data();
  	struct step *current_data_step = queue_peek_head(data->steps);
- 	struct iovec *pdu = current_data_step->set_data;
-+	struct iovec *pdu2 = current_data_step->set_data_2;
-+	struct iovec *pdu3 = current_data_step->set_data_3;
+-	struct iovec *store_pdu = current_data_step->set_data_to;
++	struct iovec *store_pdu = current_data_step->set_data_2;
  	struct step *step = g_new0(struct step, 1);
- 
- 	if (cid_data.handle && cid_data.cid) {
--		bthost_send_cid_v(bthost, cid_data.handle, cid_data.cid,
--									pdu, 1);
-+		struct iovec rsp[3];
-+		size_t len = 0;
-+
-+		if (!pdu) {
-+			step->action_status = BT_STATUS_FAIL;
-+			goto done;
-+		}
-+
-+		rsp[0].iov_base = pdu->iov_base;
-+		rsp[0].iov_len = pdu->iov_len;
-+		len++;
-+
-+		if (pdu2) {
-+			rsp[1].iov_base = pdu2->iov_base;
-+			rsp[1].iov_len = pdu2->iov_len;
-+			len++;
-+		}
-+
-+		if (pdu3) {
-+			rsp[2].iov_base = pdu3->iov_base;
-+			rsp[2].iov_len = pdu3->iov_len;
-+			len++;
-+		}
-+
-+		bthost_send_cid_v(bthost, cid_data.handle, cid_data.cid, rsp,
-+									len);
- 		step->action_status = BT_STATUS_SUCCESS;
- 	} else {
- 		tester_debug("No connection set up");
- 		step->action_status = BT_STATUS_FAIL;
+ 	unsigned char *raw_pdu = store_pdu->iov_base;
+ 	int set_data_len = current_data_step->set_data_len;
+diff --git a/android/tester-main.h b/android/tester-main.h
+index 7fe73fe..e35feec 100644
+--- a/android/tester-main.h
++++ b/android/tester-main.h
+@@ -68,10 +68,18 @@ struct pdu_set {
+ 		.action_status = status, \
+ 		.action = modif_fun, \
+ 		.set_data = from, \
+-		.set_data_to = to, \
++		.set_data_2 = to, \
+ 		.set_data_len = len, \
  	}
  
-+done:
- 	schedule_action_verification(step);
- }
++#define PROCESS_DATA(status, proc_fun, data1, data2, data3) { \
++		.action_status = status, \
++		.action = proc_fun, \
++		.set_data = data1, \
++		.set_data_2 = data2, \
++		.set_data_3 = data3, \
++	}
++
+ #define ACTION(status, act_fun, data_set) { \
+ 		.action_status = status, \
+ 		.action = act_fun, \
+@@ -706,7 +714,8 @@ struct step {
+ 	struct bt_callback_data callback_result;
  
+ 	void *set_data;
+-	void *set_data_to;
++	void *set_data_2;
++	void *set_data_3;
+ 	int set_data_len;
+ 
+ 	uint16_t *store_srvc_handle;
 -- 
 1.9.1
 
