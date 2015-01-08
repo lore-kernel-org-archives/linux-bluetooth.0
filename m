@@ -1,105 +1,53 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Thu, 8 Jan 2015 16:20:53 +0200
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCHv2] shared/gap: Fix memory leak in gap
+Message-ID: <20150108142051.GC7114@aemeltch-MOBL1>
+References: <1418992653-6704-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <20141222115600.GB25294@aemeltch-MOBL1>
+MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 8.1 \(1993\))
-Subject: Re: [PATCHv4 bluetooth-next 0/3] 6lowpan: introduce nhc framework
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1420720298-1995-1-git-send-email-alex.aring@gmail.com>
-Date: Thu, 8 Jan 2015 11:06:15 -0800
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>,
-	linux-wpan@vger.kernel.org, kernel@pengutronix.de,
-	Jukka Rissanen <jukka.rissanen@linux.intel.com>,
-	Martin Townsend <mtownsend1973@gmail.com>
-Message-Id: <BD3A316F-B094-419D-B2EC-EF6D980A692A@holtmann.org>
-References: <1420720298-1995-1-git-send-email-alex.aring@gmail.com>
-To: Alexander Aring <alex.aring@gmail.com>
+In-Reply-To: <20141222115600.GB25294@aemeltch-MOBL1>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Alex,
+ping
 
-> This patch series introduce the next header compression framework. Currently
-> we support udp compression/uncompression only. This framework allow to add new
-> next header compression formats easily.
+On Mon, Dec 22, 2014 at 01:56:01PM +0200, Andrei Emeltchenko wrote:
+> ping
 > 
-> If somebody wants to add a new header compression format and some information
-> are missing while calling compression and uncompression callbacks. Please
-> feel free to make framework changes according these callbacks.
-> 
-> changes since v2:
-> - make udp nhc as module as suggested by Marcel Holtmann
-> - fix comment header in nhc_udp.c
-> 
-> I didn't make the lowpan_nhc declaration "const" because this will occur
-> issues with rb_node, id and idmask array. Which will manipulated during
-> runtime.
-> 
-> changes since v3:
-> - add patch 3/3 for other known rfc6282 ipv6 extension headers compression
->   formats
-> - add request_modules for loading nhc default compression format modules.
->   Which was suggested by Jukka Rissanen. Thanks, this is really working.
-> - Add rtnl_lock for lowpan_nhc_add and del since we have no synced
->   request_modules call this could make trouble.
-> - Move some handling out of nhc_do_compression and uncompression function.
->   The complete handling is now inside of iphc.c and nhc_do_compression and
->   uncompression functions is only a wrapper call for the callback.
-> - rework some menuentries for Kconfig and compression format, they are
->   grouped by rfc now.
-> - move some generic handling like "skb_pull(skb, nhc->nexthdrlen);" into
->   iphc.c. It would be great if we have something also for uncompression
->   for the skb_cow. But this isn't possible right now.
-> - change warning if nhc was not found to "was not found" instead isn't
->   implemented. It isn't implemented if callbacks are NULL now.
-> - small cleanups.
-> 
-> changes since v4:
-> - add spinlock for to prevent nhc from deletion while using. This can occur
->   if nhc module is unloading while compression/uncompression.
-> - move nhc handling for nhc compression/uncompression completely into
->   nhc_do_compression/nhc_do_uncompression.
-> 
-> Note about locking:
-> 
-> We have now a spinlock nhc_lowpan_lock which prevents manipulating the nhc
-> datastructures while using it. On receiving side it's easy to handle, at the
-> end we check if 6lowpan nh compressed flag is set and run uncompression.
-> On the other hand the transmit side is complicated, we check if next_hdr field
-> is registrated and run some other compression routines, at least we do the
-> finally nhc compression which depends on the first check if next_hdr was
-> registrated. The kernel will crash if we remove the using module between
-> "next_hdr check" and "do nhc compression", the lock will prevent that now.
-> 
-> Now in the transmit path exist a little window to remove a lowpan_nhc while
-> compression. This is exactly the part between "check if we support" and
-> "doing compression". This is a very unlikely case, if this occurs we drop
-> the packet while compression. Don't know how to better deal with that right
-> now. I will try to search a better solution later.
-> 
-> Cc: Jukka Rissanen <jukka.rissanen@linux.intel.com>
-> Cc: Martin Townsend <mtownsend1973@gmail.com>
-> Cc: Marcel Holtmann <marcel@holtmann.org>
-> 
-> Alexander Aring (3):
->  6lowpan: add generic nhc layer interface
->  6lowpan: add udp compression via nhc layer
->  6lowpan: nhc: add other known rfc6282 compressions
-> 
-> net/6lowpan/Kconfig             |  60 +++++++++-
-> net/6lowpan/Makefile            |  13 ++-
-> net/6lowpan/iphc.c              | 200 ++++++---------------------------
-> net/6lowpan/nhc.c               | 241 ++++++++++++++++++++++++++++++++++++++++
-> net/6lowpan/nhc.h               | 146 ++++++++++++++++++++++++
-> net/6lowpan/nhc_rfc6282_dest.c  |  27 +++++
-> net/6lowpan/nhc_rfc6282_frag.c  |  26 +++++
-> net/6lowpan/nhc_rfc6282_hop.c   |  26 +++++
-> net/6lowpan/nhc_rfc6282_ipv6.c  |  26 +++++
-> net/6lowpan/nhc_rfc6282_mobil.c |  26 +++++
-> net/6lowpan/nhc_rfc6282_route.c |  26 +++++
-> net/6lowpan/nhc_rfc6282_udp.c   | 156 ++++++++++++++++++++++++++
-
-can we please remove the _rfc6282 from the filenames. RFCs get update and thus change numbers. I do not want to carry RFC numbers in filenames around. There is also almost no precedence in the kernel source code that would justify doing this.
-
-Regards
-
-Marcel
-
+> On Fri, Dec 19, 2014 at 02:37:33PM +0200, Andrei Emeltchenko wrote:
+> > From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> > 
+> > Allocated irk memory was never assigned.
+> > ---
+> >  src/shared/gap.c | 5 +++++
+> >  1 file changed, 5 insertions(+)
+> > 
+> > diff --git a/src/shared/gap.c b/src/shared/gap.c
+> > index 19059e8..cc48a02 100644
+> > --- a/src/shared/gap.c
+> > +++ b/src/shared/gap.c
+> > @@ -276,5 +276,10 @@ bool bt_gap_add_peer_irk(struct bt_gap *gap, uint8_t addr_type,
+> >  	memcpy(irk->addr, addr, 6);
+> >  	memcpy(irk->key, key, 16);
+> >  
+> > +	if (!queue_push_tail(gap->irk_list, irk)) {
+> > +		free(irk);
+> > +		return false;
+> > +	}
+> > +
+> >  	return true;
+> >  }
+> > -- 
+> > 2.1.0
+> > 
+> > --
+> > To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> > the body of a message to majordomo@vger.kernel.org
+> > More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
