@@ -1,73 +1,183 @@
 Return-Path: <cyrus@holtmann.org>
-From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
-Subject: [PATCH 02/11] android/tester: Add macro improving pdu send procedure
-Date: Thu,  8 Jan 2015 10:17:40 +0100
-Message-Id: <1420708669-32600-2-git-send-email-jakub.tyszkowski@tieto.com>
-In-Reply-To: <1420708669-32600-1-git-send-email-jakub.tyszkowski@tieto.com>
-References: <1420708669-32600-1-git-send-email-jakub.tyszkowski@tieto.com>
+From: Vikrampal <vikram.pal@samsung.com>
+To: 'Luiz Augusto von Dentz' <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org, cpgs@samsung.com
+References: <1420619000-24211-1-git-send-email-vikram.pal@samsung.com>
+ <1420619000-24211-7-git-send-email-vikram.pal@samsung.com>
+ <CABBYNZ+pMGqYxbF9WxsE_VS9LD=M0ta4Ejxgw4svyprbURG4XQ@mail.gmail.com>
+In-reply-to: 
+Subject: RE: [PATCH 6/6] monitor: Add AVRCP SetBrowsedPlayer support
+Date: Thu, 08 Jan 2015 14:35:22 +0530
+Message-id: <009d01d02b22$3ca96040$b5fc20c0$@samsung.com>
+MIME-version: 1.0
+Content-type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-As of now when we want to send response from remote device, we compose
-pdu from handle and value, which are then copied into fixed size pdu
-with predefined header. With this macro we will be able to pass up to
-3 iovectors which are then send without additional copying. It also
-quite generic and can be used to any other kind of data processing nad
-not only for sending pdus.
----
- android/tester-gatt.c |  2 +-
- android/tester-main.h | 13 +++++++++++--
- 2 files changed, 12 insertions(+), 3 deletions(-)
+Hi Luiz,
 
-diff --git a/android/tester-gatt.c b/android/tester-gatt.c
-index f4d22fd..610c1b4 100644
---- a/android/tester-gatt.c
-+++ b/android/tester-gatt.c
-@@ -1079,7 +1079,7 @@ static void gatt_att_pdu_modify(void)
- {
- 	struct test_data *data = tester_get_data();
- 	struct step *current_data_step = queue_peek_head(data->steps);
--	struct iovec *store_pdu = current_data_step->set_data_to;
-+	struct iovec *store_pdu = current_data_step->set_data_2;
- 	struct step *step = g_new0(struct step, 1);
- 	unsigned char *raw_pdu = store_pdu->iov_base;
- 	int set_data_len = current_data_step->set_data_len;
-diff --git a/android/tester-main.h b/android/tester-main.h
-index 7fe73fe..e35feec 100644
---- a/android/tester-main.h
-+++ b/android/tester-main.h
-@@ -68,10 +68,18 @@ struct pdu_set {
- 		.action_status = status, \
- 		.action = modif_fun, \
- 		.set_data = from, \
--		.set_data_to = to, \
-+		.set_data_2 = to, \
- 		.set_data_len = len, \
- 	}
- 
-+#define PROCESS_DATA(status, proc_fun, data1, data2, data3) { \
-+		.action_status = status, \
-+		.action = proc_fun, \
-+		.set_data = data1, \
-+		.set_data_2 = data2, \
-+		.set_data_3 = data3, \
-+	}
-+
- #define ACTION(status, act_fun, data_set) { \
- 		.action_status = status, \
- 		.action = act_fun, \
-@@ -706,7 +714,8 @@ struct step {
- 	struct bt_callback_data callback_result;
- 
- 	void *set_data;
--	void *set_data_to;
-+	void *set_data_2;
-+	void *set_data_3;
- 	int set_data_len;
- 
- 	uint16_t *store_srvc_handle;
--- 
-1.9.1
+> -----Original Message-----
+> From: Vikrampal [mailto:vikram.pal@samsung.com]
+> Sent: Thursday, January 08, 2015 2:17 PM
+> To: 'Luiz Augusto von Dentz'
+> Cc: 'linux-bluetooth@vger.kernel.org'; 'cpgs@samsung.com'
+> Subject: RE: [PATCH 6/6] monitor: Add AVRCP SetBrowsedPlayer support
+> 
+> Hi Luiz,
+> 
+> > -----Original Message-----
+> > From: Luiz Augusto von Dentz [mailto:luiz.dentz@gmail.com]
+> > Sent: Wednesday, January 07, 2015 6:55 PM
+> > To: Vikrampal Yadav
+> > Cc: linux-bluetooth@vger.kernel.org; cpgs@samsung.com
+> > Subject: Re: [PATCH 6/6] monitor: Add AVRCP SetBrowsedPlayer support
+> >
+> > Hi Vikram,
+> >
+> > On Wed, Jan 7, 2015 at 6:23 AM, Vikrampal Yadav
+> > <vikram.pal@samsung.com> wrote:
+> > > Support for decoding AVRCP SetBrowsedPlayer added in Bluetooth
+> > monitor.
+> > >
+> > > Channel: 65 len 12 ctrl 0x0102 [PSM 27 mode 3] {chan 1}
+> > >       I-frame: Unsegmented TxSeq 1 ReqSeq 1
+> > >       AVCTP Browsing: Command: type 0x00 label 0 PID 0x110e
+> > >         AVRCP: SetBrowsedPlayer: len 0x0002
+> > >           PlayerID: 0x0001 (1)
+> >
+> > Can you please add the response frame as well.
+> 
+> I couldn't find any response, not even in hcidump.
+
+I'm using MecApp tool for validating it.
+> 
+> >
+> > > ---
+> > >  monitor/avctp.c | 86
+> > > ++++++++++++++++++++++++++++++++++++++++++++++++++++++++-
+> > >  1 file changed, 85 insertions(+), 1 deletion(-)
+> > >
+> > > diff --git a/monitor/avctp.c b/monitor/avctp.c index
+> > > af91ecc..0a1e92d
+> > > 100644
+> > > --- a/monitor/avctp.c
+> > > +++ b/monitor/avctp.c
+> > > @@ -1637,11 +1637,95 @@ static bool avrcp_control_packet(struct
+> > avctp_frame *avctp_frame)
+> > >         }
+> > >  }
+> > >
+> > > +static bool avrcp_set_browsed_player(struct avctp_frame
+> > > +*avctp_frame) {
+> > > +       struct l2cap_frame *frame = &avctp_frame->l2cap_frame;
+> > > +       uint32_t items;
+> > > +       uint16_t id, uids, charset;
+> > > +       uint8_t status, folders, indent = 2;
+> > > +
+> > > +       if (avctp_frame->hdr & 0x02)
+> > > +               goto response;
+> > > +
+> > > +       if (!l2cap_frame_get_be16(frame, &id))
+> > > +               return false;
+> > > +
+> > > +       print_field("%*cPlayerID: 0x%04x (%u)", indent, ' ', id, id);
+> > > +       return true;
+> > > +
+> > > +response:
+> > > +       if (!l2cap_frame_get_u8(frame, &status))
+> > > +               return false;
+> > > +
+> > > +       print_field("%*cStatus: 0x%02x (%s)", indent, ' ', status,
+> > > +
+> > > + error2str(status));
+> > > +
+> > > +       if (!l2cap_frame_get_be16(frame, &uids))
+> > > +               return false;
+> > > +
+> > > +       print_field("%*cUIDCounter: 0x%04x (%u)", indent, ' ', uids,
+> > > + uids);
+> > > +
+> > > +       if (!l2cap_frame_get_be32(frame, &items))
+> > > +               return false;
+> > > +
+> > > +       print_field("%*cNumber of Items: 0x%08x (%u)", indent, ' ',
+> > > +
+> > > + items, items);
+> > > +
+> > > +       if (!l2cap_frame_get_be16(frame, &charset))
+> > > +               return false;
+> > > +
+> > > +       print_field("%*cCharsetID: 0x%04x (%s)", indent, ' ',
+> > > + charset,
+> > > +
+> > > + charset2str(charset));
+> > > +
+> > > +       if (!l2cap_frame_get_u8(frame, &folders))
+> > > +               return false;
+> > > +
+> > > +       print_field("%*cFolder Depth: 0x%02x (%u)", indent, ' ',
+> > > + folders,
+> > > +
+> > > + folders);
+> > > +
+> > > +       for (; folders > 0; folders--) {
+> > > +               uint8_t len;
+> > > +
+> > > +               if (!l2cap_frame_get_u8(frame, &len))
+> > > +                       return false;
+> > > +
+> > > +               printf("Folder: ");
+> > > +               for (; len > 0; len--) {
+> > > +                       uint8_t c;
+> > > +
+> > > +                       if (!l2cap_frame_get_u8(frame, &c))
+> > > +                               return false;
+> > > +
+> > > +                       printf("%1c", isprint(c) ? c : '.');
+> > > +               }
+> > > +               printf("\n");
+> > > +       }
+> > > +
+> > > +       return true;
+> > > +}
+> > > +
+> > >  static bool avrcp_browsing_packet(struct avctp_frame *avctp_frame)  {
+> > >         struct l2cap_frame *frame = &avctp_frame->l2cap_frame;
+> > > +       uint16_t len;
+> > > +       uint8_t pduid;
+> > > +
+> > > +       if (!l2cap_frame_get_u8(frame, &pduid))
+> > > +               return false;
+> > > +
+> > > +       if (!l2cap_frame_get_be16(frame, &len))
+> > > +               return false;
+> > > +
+> > > +       print_field("AVRCP: %s: len 0x%04x", pdu2str(pduid), len);
+> > > +
+> > > +       switch (pduid) {
+> > > +       case AVRCP_SET_BROWSED_PLAYER:
+> > > +               avrcp_set_browsed_player(avctp_frame);
+> > > +               break;
+> > > +       default:
+> > > +               packet_hexdump(frame->data, frame->size);
+> > > +       }
+> > >
+> > > -       packet_hexdump(frame->data, frame->size);
+> > >         return true;
+> > >  }
+> > >
+> > > --
+> > > 1.9.1
+> > >
+> >
+> >
+> >
+> > --
+> > Luiz Augusto von Dentz
+> 
+> Regards,
+> Vikram
+
+Regards,
+Vikram
 
