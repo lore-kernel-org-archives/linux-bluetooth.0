@@ -1,45 +1,320 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 8 Jan 2015 16:19:11 +0200
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+From: Alexander Aring <alex.aring@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] android/gatt: Fix dead code warnings
-Message-ID: <20150108141909.GA7114@aemeltch-MOBL1>
-References: <1418981080-19796-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1418981080-19796-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Cc: linux-wpan@vger.kernel.org, kernel@pengutronix.de,
+	Alexander Aring <alex.aring@gmail.com>,
+	Jukka Rissanen <jukka.rissanen@linux.intel.com>,
+	Martin Townsend <mtownsend1973@gmail.com>
+Subject: [PATCHv4 bluetooth-next 3/3] 6lowpan: nhc: add other known rfc6282 compressions
+Date: Thu,  8 Jan 2015 13:31:38 +0100
+Message-Id: <1420720298-1995-4-git-send-email-alex.aring@gmail.com>
+In-Reply-To: <1420720298-1995-1-git-send-email-alex.aring@gmail.com>
+References: <1420720298-1995-1-git-send-email-alex.aring@gmail.com>
+Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-ping
+This patch adds other known rfc6282 compression formats to the nhc
+framework. These compression formats are known but not implemented yet.
+For now this is useful to printout a warning which compression format
+isn't supported.
 
-On Fri, Dec 19, 2014 at 11:24:40AM +0200, Andrei Emeltchenko wrote:
-> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-> 
-> gatt_db_attribute_get_permissions() used everywhere without check since
-> those conditions are checked already.
-> ---
->  android/gatt.c | 3 +--
->  1 file changed, 1 insertion(+), 2 deletions(-)
-> 
-> diff --git a/android/gatt.c b/android/gatt.c
-> index 0258d91..169f6db 100644
-> --- a/android/gatt.c
-> +++ b/android/gatt.c
-> @@ -6311,8 +6311,7 @@ static void write_cmd_request(const uint8_t *cmd, uint16_t cmd_len,
->  	if (!attrib)
->  		return;
->  
-> -	if (!gatt_db_attribute_get_permissions(attrib, &permissions))
-> -		return;
-> +	gatt_db_attribute_get_permissions(attrib, &permissions);
->  
->  	if (check_device_permissions(dev, cmd[0], permissions))
->  		return;
-> -- 
-> 2.1.0
-> 
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+Signed-off-by: Alexander Aring <alex.aring@gmail.com>
+Cc: Jukka Rissanen <jukka.rissanen@linux.intel.com>
+Cc: Martin Townsend <mtownsend1973@gmail.com>
+---
+ net/6lowpan/Kconfig             | 44 +++++++++++++++++++++++++++++++++++++++++
+ net/6lowpan/Makefile            |  6 ++++++
+ net/6lowpan/iphc.c              |  6 ++++++
+ net/6lowpan/nhc_rfc6282_dest.c  | 27 +++++++++++++++++++++++++
+ net/6lowpan/nhc_rfc6282_frag.c  | 26 ++++++++++++++++++++++++
+ net/6lowpan/nhc_rfc6282_hop.c   | 26 ++++++++++++++++++++++++
+ net/6lowpan/nhc_rfc6282_ipv6.c  | 26 ++++++++++++++++++++++++
+ net/6lowpan/nhc_rfc6282_mobil.c | 26 ++++++++++++++++++++++++
+ net/6lowpan/nhc_rfc6282_route.c | 26 ++++++++++++++++++++++++
+ 9 files changed, 213 insertions(+)
+ create mode 100644 net/6lowpan/nhc_rfc6282_dest.c
+ create mode 100644 net/6lowpan/nhc_rfc6282_frag.c
+ create mode 100644 net/6lowpan/nhc_rfc6282_hop.c
+ create mode 100644 net/6lowpan/nhc_rfc6282_ipv6.c
+ create mode 100644 net/6lowpan/nhc_rfc6282_mobil.c
+ create mode 100644 net/6lowpan/nhc_rfc6282_route.c
+
+diff --git a/net/6lowpan/Kconfig b/net/6lowpan/Kconfig
+index e576164..391b73a 100644
+--- a/net/6lowpan/Kconfig
++++ b/net/6lowpan/Kconfig
+@@ -18,3 +18,47 @@ config 6LOWPAN_NHC_RFC6282_UDP
+ 	default y
+ 	---help---
+ 	  6LoWPAN IPv6 UDP Header compression according to RFC6282.
++
++config 6LOWPAN_NHC_RFC6282_DEST
++	tristate "Destination Options Header Support"
++	depends on 6LOWPAN_NHC_RFC6282
++	default y
++	---help---
++	  6LoWPAN IPv6 Destination Options Header compression according to
++	  RFC6282.
++
++config 6LOWPAN_NHC_RFC6282_FRAG
++	tristate "Fragment Header Support"
++	depends on 6LOWPAN_NHC_RFC6282
++	default y
++	---help---
++	  6LoWPAN IPv6 Fragment Header compression according to RFC6282.
++
++config 6LOWPAN_NHC_RFC6282_HOP
++	tristate "Hop-by-Hop Options Header Support"
++	depends on 6LOWPAN_NHC_RFC6282
++	default y
++	---help---
++	  6LoWPAN IPv6 Hop-by-Hop Options Header compression according to
++	  RFC6282.
++
++config 6LOWPAN_NHC_RFC6282_IPV6
++	tristate "IPv6 Header Support"
++	depends on 6LOWPAN_NHC_RFC6282
++	default y
++	---help---
++	  6LoWPAN IPv6 Header compression according to RFC6282.
++
++config 6LOWPAN_NHC_RFC6282_MOBIL
++	tristate "Mobility Header Support"
++	depends on 6LOWPAN_NHC_RFC6282
++	default y
++	---help---
++	  6LoWPAN IPv6 Mobility Header compression according to RFC6282.
++
++config 6LOWPAN_NHC_RFC6282_ROUTE
++	tristate "Routing Header Support"
++	depends on 6LOWPAN_NHC_RFC6282
++	default y
++	---help---
++	  6LoWPAN IPv6 Routing Header compression according to RFC6282.
+diff --git a/net/6lowpan/Makefile b/net/6lowpan/Makefile
+index 9593f48..5466fe5 100644
+--- a/net/6lowpan/Makefile
++++ b/net/6lowpan/Makefile
+@@ -4,3 +4,9 @@ obj-$(CONFIG_6LOWPAN) += 6lowpan.o
+ 
+ #rfc6282 nhc
+ obj-$(CONFIG_6LOWPAN_NHC_RFC6282_UDP) += nhc_rfc6282_udp.o
++obj-$(CONFIG_6LOWPAN_NHC_RFC6282_DEST) += nhc_rfc6282_dest.o
++obj-$(CONFIG_6LOWPAN_NHC_RFC6282_FRAG) += nhc_rfc6282_frag.o
++obj-$(CONFIG_6LOWPAN_NHC_RFC6282_HOP) += nhc_rfc6282_hop.o
++obj-$(CONFIG_6LOWPAN_NHC_RFC6282_IPV6) += nhc_rfc6282_ipv6.o
++obj-$(CONFIG_6LOWPAN_NHC_RFC6282_MOBIL) += nhc_rfc6282_mobil.o
++obj-$(CONFIG_6LOWPAN_NHC_RFC6282_ROUTE) += nhc_rfc6282_route.o
+diff --git a/net/6lowpan/iphc.c b/net/6lowpan/iphc.c
+index f58fab9..0db6c11 100644
+--- a/net/6lowpan/iphc.c
++++ b/net/6lowpan/iphc.c
+@@ -613,6 +613,12 @@ EXPORT_SYMBOL_GPL(lowpan_header_compress);
+ 
+ static int __init lowpan_module_init(void)
+ {
++	request_module_nowait("nhc_rfc6282_dest");
++	request_module_nowait("nhc_rfc6282_frag");
++	request_module_nowait("nhc_rfc6282_hop");
++	request_module_nowait("nhc_rfc6282_ipv6");
++	request_module_nowait("nhc_rfc6282_mobil");
++	request_module_nowait("nhc_rfc6282_route");
+ 	request_module_nowait("nhc_rfc6282_udp");
+ 
+ 	return 0;
+diff --git a/net/6lowpan/nhc_rfc6282_dest.c b/net/6lowpan/nhc_rfc6282_dest.c
+new file mode 100644
+index 0000000..6306907
+--- /dev/null
++++ b/net/6lowpan/nhc_rfc6282_dest.c
+@@ -0,0 +1,27 @@
++/*
++ *	6LoWPAN IPv6 Destination Options Header compression according to
++ *	RFC6282
++ *
++ *	This program is free software; you can redistribute it and/or
++ *	modify it under the terms of the GNU General Public License
++ *	as published by the Free Software Foundation; either version
++ *	2 of the License, or (at your option) any later version.
++ */
++
++#include "nhc.h"
++
++#define LOWPAN_NHC_DEST_IDLEN	1
++#define LOWPAN_NHC_DEST_ID_0	0xe6
++#define LOWPAN_NHC_DEST_MASK_0	0xfe
++
++static void dest_nhid_setup(struct lowpan_nhc *nhc)
++{
++	nhc->id[0] = LOWPAN_NHC_DEST_ID_0;
++	nhc->idmask[0] = LOWPAN_NHC_DEST_MASK_0;
++}
++
++LOWPAN_NHC(nhc_dest, "RFC6282 Destination Options", NEXTHDR_DEST, 0,
++	   dest_nhid_setup, LOWPAN_NHC_DEST_IDLEN, NULL, NULL);
++
++module_lowpan_nhc(nhc_dest);
++MODULE_LICENSE("GPL");
+diff --git a/net/6lowpan/nhc_rfc6282_frag.c b/net/6lowpan/nhc_rfc6282_frag.c
+new file mode 100644
+index 0000000..1ca80ab
+--- /dev/null
++++ b/net/6lowpan/nhc_rfc6282_frag.c
+@@ -0,0 +1,26 @@
++/*
++ *	6LoWPAN IPv6 Fragment Header compression according to RFC6282
++ *
++ *	This program is free software; you can redistribute it and/or
++ *	modify it under the terms of the GNU General Public License
++ *	as published by the Free Software Foundation; either version
++ *	2 of the License, or (at your option) any later version.
++ */
++
++#include "nhc.h"
++
++#define LOWPAN_NHC_FRAG_IDLEN	1
++#define LOWPAN_NHC_FRAG_ID_0	0xe4
++#define LOWPAN_NHC_FRAG_MASK_0	0xfe
++
++static void frag_nhid_setup(struct lowpan_nhc *nhc)
++{
++	nhc->id[0] = LOWPAN_NHC_FRAG_ID_0;
++	nhc->idmask[0] = LOWPAN_NHC_FRAG_MASK_0;
++}
++
++LOWPAN_NHC(nhc_frag, "RFC6282 Fragment", NEXTHDR_FRAGMENT, 0,
++	   frag_nhid_setup, LOWPAN_NHC_FRAG_IDLEN, NULL, NULL);
++
++module_lowpan_nhc(nhc_frag);
++MODULE_LICENSE("GPL");
+diff --git a/net/6lowpan/nhc_rfc6282_hop.c b/net/6lowpan/nhc_rfc6282_hop.c
+new file mode 100644
+index 0000000..c4fa968
+--- /dev/null
++++ b/net/6lowpan/nhc_rfc6282_hop.c
+@@ -0,0 +1,26 @@
++/*
++ *	6LoWPAN IPv6 Hop-by-Hop Options Header compression according to RFC6282
++ *
++ *	This program is free software; you can redistribute it and/or
++ *	modify it under the terms of the GNU General Public License
++ *	as published by the Free Software Foundation; either version
++ *	2 of the License, or (at your option) any later version.
++ */
++
++#include "nhc.h"
++
++#define LOWPAN_NHC_HOP_IDLEN	1
++#define LOWPAN_NHC_HOP_ID_0	0xe0
++#define LOWPAN_NHC_HOP_MASK_0	0xfe
++
++static void hop_nhid_setup(struct lowpan_nhc *nhc)
++{
++	nhc->id[0] = LOWPAN_NHC_HOP_ID_0;
++	nhc->idmask[0] = LOWPAN_NHC_HOP_MASK_0;
++}
++
++LOWPAN_NHC(nhc_hop, "RFC6282 Hop-by-Hop Options", NEXTHDR_HOP, 0,
++	   hop_nhid_setup, LOWPAN_NHC_HOP_IDLEN, NULL, NULL);
++
++module_lowpan_nhc(nhc_hop);
++MODULE_LICENSE("GPL");
+diff --git a/net/6lowpan/nhc_rfc6282_ipv6.c b/net/6lowpan/nhc_rfc6282_ipv6.c
+new file mode 100644
+index 0000000..306295f
+--- /dev/null
++++ b/net/6lowpan/nhc_rfc6282_ipv6.c
+@@ -0,0 +1,26 @@
++/*
++ *	6LoWPAN IPv6 Header compression according to RFC6282
++ *
++ *	This program is free software; you can redistribute it and/or
++ *	modify it under the terms of the GNU General Public License
++ *	as published by the Free Software Foundation; either version
++ *	2 of the License, or (at your option) any later version.
++ */
++
++#include "nhc.h"
++
++#define LOWPAN_NHC_IPV6_IDLEN	1
++#define LOWPAN_NHC_IPV6_ID_0	0xee
++#define LOWPAN_NHC_IPV6_MASK_0	0xfe
++
++static void ipv6_nhid_setup(struct lowpan_nhc *nhc)
++{
++	nhc->id[0] = LOWPAN_NHC_IPV6_ID_0;
++	nhc->idmask[0] = LOWPAN_NHC_IPV6_MASK_0;
++}
++
++LOWPAN_NHC(nhc_ipv6, "RFC6282 IPv6", NEXTHDR_IPV6, 0, ipv6_nhid_setup,
++	   LOWPAN_NHC_IPV6_IDLEN, NULL, NULL);
++
++module_lowpan_nhc(nhc_ipv6);
++MODULE_LICENSE("GPL");
+diff --git a/net/6lowpan/nhc_rfc6282_mobil.c b/net/6lowpan/nhc_rfc6282_mobil.c
+new file mode 100644
+index 0000000..b2ed933
+--- /dev/null
++++ b/net/6lowpan/nhc_rfc6282_mobil.c
+@@ -0,0 +1,26 @@
++/*
++ *	6LoWPAN IPv6 Mobility Header compression according to RFC6282
++ *
++ *	This program is free software; you can redistribute it and/or
++ *	modify it under the terms of the GNU General Public License
++ *	as published by the Free Software Foundation; either version
++ *	2 of the License, or (at your option) any later version.
++ */
++
++#include "nhc.h"
++
++#define LOWPAN_NHC_MOBIL_IDLEN	1
++#define LOWPAN_NHC_MOBIL_ID_0	0xe8
++#define LOWPAN_NHC_MOBIL_MASK_0	0xfe
++
++static void mobil_nhid_setup(struct lowpan_nhc *nhc)
++{
++	nhc->id[0] = LOWPAN_NHC_MOBIL_ID_0;
++	nhc->idmask[0] = LOWPAN_NHC_MOBIL_MASK_0;
++}
++
++LOWPAN_NHC(nhc_mobil, "RFC6282 Mobility", NEXTHDR_MOBILITY, 0,
++	   mobil_nhid_setup, LOWPAN_NHC_MOBIL_IDLEN, NULL, NULL);
++
++module_lowpan_nhc(nhc_mobil);
++MODULE_LICENSE("GPL");
+diff --git a/net/6lowpan/nhc_rfc6282_route.c b/net/6lowpan/nhc_rfc6282_route.c
+new file mode 100644
+index 0000000..f4b065a
+--- /dev/null
++++ b/net/6lowpan/nhc_rfc6282_route.c
+@@ -0,0 +1,26 @@
++/*
++ *	6LoWPAN IPv6 Routing Header compression according to RFC6282
++ *
++ *	This program is free software; you can redistribute it and/or
++ *	modify it under the terms of the GNU General Public License
++ *	as published by the Free Software Foundation; either version
++ *	2 of the License, or (at your option) any later version.
++ */
++
++#include "nhc.h"
++
++#define LOWPAN_NHC_ROUTE_IDLEN	1
++#define LOWPAN_NHC_ROUTE_ID_0	0xe2
++#define LOWPAN_NHC_ROUTE_MASK_0	0xfe
++
++static void route_nhid_setup(struct lowpan_nhc *nhc)
++{
++	nhc->id[0] = LOWPAN_NHC_ROUTE_ID_0;
++	nhc->idmask[0] = LOWPAN_NHC_ROUTE_MASK_0;
++}
++
++LOWPAN_NHC(nhc_route, "RFC6282 Routing", NEXTHDR_ROUTING, 0, route_nhid_setup,
++	   LOWPAN_NHC_ROUTE_IDLEN, NULL, NULL);
++
++module_lowpan_nhc(nhc_route);
++MODULE_LICENSE("GPL");
+-- 
+2.2.1
+
