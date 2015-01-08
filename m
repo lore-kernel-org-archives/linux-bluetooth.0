@@ -1,62 +1,30 @@
 Return-Path: <cyrus@holtmann.org>
-From: Arman Uguray <armansito@chromium.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Arman Uguray <armansito@chromium.org>
-Subject: [PATCH BlueZ v2 00/14] Implmenet doc/gatt-api.txt for client
-Date: Wed,  7 Jan 2015 21:48:14 -0800
-Message-Id: <1420696108-29699-1-git-send-email-armansito@chromium.org>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 8.1 \(1993\))
+Subject: Re: [PATCH v2 1/2] Bluetooth: btmrvl: use msecs_to_jiffies within macro definition
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1420609016-24947-1-git-send-email-akarwar@marvell.com>
+Date: Wed, 7 Jan 2015 21:39:02 -0800
+Cc: linux-bluetooth@vger.kernel.org, Cathy Luo <cluo@marvell.com>
+Message-Id: <4F7353B7-5B42-4362-855F-4473C7EF2262@holtmann.org>
+References: <1420609016-24947-1-git-send-email-akarwar@marvell.com>
+To: Amitkumar Karwar <akarwar@marvell.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-*v2: This set addresses comments by Luiz and includes several bug fixes:
-  - Make shared/gatt-client read/write procedures cancelable. Have exported
-    characteristics and descriptors keep track of their operations and cancel
-    them when free'd.
-  - Fix bug in attribute value caching by truncating the value before setting
-    it.
-  - Expose extended properties in the GattCharacteristic1.Flags property.
-  - Hande Service Changed events.
-  - Fix bug in profile probing that created a btd_service for each GATT service
-    as opposed to once per UUID (mostly due to a misunderstanding).
-  - Fix crash introduced by recent gatt_db_find_by_type refactor.
-  - Fix incorrect behavior caused by using gatt_db_service_set_active to mark
-    services as claimed.
+Hi Amitkumar,
 
-*v1: Picking up remaining patches from before the holidays:
-  - Rebased on top of Luiz's modifications.
-  - Fixed small bugs that appeared after the merge.
-  - Addressed some of the initial comments.
-  - Added StartNotify/StopNotify. I left these methods as they are.
-    I'm planning to address the issue with potentially missed
-    notifications in a GattProfile1 API.
+> This change improves readability and fixes allignment problem.
+> 
+> Signed-off-by: Amitkumar Karwar <akarwar@marvell.com>
+> ---
+> drivers/bluetooth/btmrvl_drv.h  | 4 ++--
+> drivers/bluetooth/btmrvl_main.c | 6 +++---
+> 2 files changed, 5 insertions(+), 5 deletions(-)
 
-Arman Uguray (14):
-  core: gatt: Expose charac. extended properties.
-  shared/gatt-client: Make read/write cancelable
-  shared/gatt-client: Make long-write cancelable
-  core: gatt: Cancel pending reads/writes
-  shared/gatt-db: Add gatt_db_attribute_reset
-  core: gatt: Reset value in db when caching
-  core: gatt: Issue long write for reliable-write
-  core: gatt: Handle Service Changed.
-  core: device: Fix GATT profile probing
-  profiles/gap: Fix probe/accept behavior.
-  core: service: Remove GATT handle logic
-  shared/gatt-db: Fix crash in gatt_db_find_by_type
-  shared/gatt-db: Add "claimed" field to services
-  core: gatt: Use "claimed" instead of "active"
+patch has been applied to bluetooth-next tree.
 
- profiles/gap/gas.c       | 124 +++++++------
- src/device.c             | 183 +++++++------------
- src/gatt-client.c        | 359 ++++++++++++++++++++++++++-----------
- src/service.c            |  38 ----
- src/service.h            |   7 -
- src/shared/gatt-client.c | 458 ++++++++++++++++++++++++++++++++++-------------
- src/shared/gatt-client.h |  16 +-
- src/shared/gatt-db.c     |  39 ++++
- src/shared/gatt-db.h     |   6 +
- 9 files changed, 781 insertions(+), 449 deletions(-)
+Regards
 
--- 
-2.2.0.rc0.207.ga3a616c
+Marcel
 
