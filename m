@@ -1,5 +1,5 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 8 Jan 2015 21:24:52 +0100
+Date: Thu, 8 Jan 2015 21:08:22 +0100
 From: Alexander Aring <alex.aring@gmail.com>
 To: Stefan Schmidt <s.schmidt@samsung.com>
 Cc: 'Marcel Holtmann' <marcel@holtmann.org>,
@@ -8,7 +8,7 @@ Cc: 'Marcel Holtmann' <marcel@holtmann.org>,
 	'Jukka Rissanen' <jukka.rissanen@linux.intel.com>,
 	'Martin Townsend' <mtownsend1973@gmail.com>
 Subject: Re: [PATCHv4 bluetooth-next 0/3] 6lowpan: introduce nhc framework
-Message-ID: <20150108202451.GA30680@omega>
+Message-ID: <20150108200821.GC2046@omega>
 References: <1420720298-1995-1-git-send-email-alex.aring@gmail.com>
  <BD3A316F-B094-419D-B2EC-EF6D980A692A@holtmann.org>
  <058601d02b77$f3f47050$dbdd50f0$@samsung.com>
@@ -69,8 +69,8 @@ On Thu, Jan 08, 2015 at 09:04:43PM +0100, Alexander Aring wrote:
 > Is that okay for everybody?
 > 
 
-Another idea, we drop the rfc6282 and replace it with "iphc", so we
-should have then some little word which describes from which RFC the
-compression comes from like "nhc_iphc_udp.ko" or "nhc_ghc_udp.ko".
+We can also put all udp compression formats into the nhc_udp.c file. But
+then all udp compressions are handled by one module then. We should not
+do that, because we can handle it per module.
 
 - Alex
