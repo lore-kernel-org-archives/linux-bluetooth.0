@@ -1,125 +1,127 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 9 Jan 2015 14:55:55 +0100
-From: Alexander Aring <alex.aring@gmail.com>
-To: Stefan Schmidt <s.schmidt@samsung.com>
-Cc: 'Marcel Holtmann' <marcel@holtmann.org>,
-	'BlueZ development' <linux-bluetooth@vger.kernel.org>,
-	linux-wpan@vger.kernel.org, kernel@pengutronix.de,
-	'Jukka Rissanen' <jukka.rissanen@linux.intel.com>,
-	'Martin Townsend' <mtownsend1973@gmail.com>
-Subject: Re: [PATCHv4 bluetooth-next 0/3] 6lowpan: introduce nhc framework
-Message-ID: <20150109135552.GA8115@omega>
-References: <1420720298-1995-1-git-send-email-alex.aring@gmail.com>
- <BD3A316F-B094-419D-B2EC-EF6D980A692A@holtmann.org>
- <058601d02b77$f3f47050$dbdd50f0$@samsung.com>
- <20150108200443.GB2046@omega>
- <05f001d02c0c$ede01620$c9a04260$@samsung.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-In-Reply-To: <05f001d02c0c$ede01620$c9a04260$@samsung.com>
+From: Jakub Pawlowski <jpawlowski@google.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Jakub Pawlowski <jpawlowski@google.com>
+Subject: [PATCH v7 2/2] Bluetooth: Add restarting to service discovery
+Date: Fri,  9 Jan 2015 05:46:16 -0800
+Message-Id: <1420811176-31658-2-git-send-email-jpawlowski@google.com>
+In-Reply-To: <1420811176-31658-1-git-send-email-jpawlowski@google.com>
+References: <1420811176-31658-1-git-send-email-jpawlowski@google.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+When using LE_SCAN_FILTER_DUP_ENABLE, some controllers would send
+advertising report from each LE device only once. That means that we
+don't get any updates on RSSI value, and makes Service Discovery very
+slow. This patch adds restarting scan when in Service Discovery, and
+device with filtered uuid is found, but it's not in RSSI range to send
+event yet. This way if device moves into range, we will quickly get RSSI
+update.
 
-On Fri, Jan 09, 2015 at 01:05:22PM +0000, Stefan Schmidt wrote:
-> Hello.
-> 
-> On 08/01/15 21:04, Alexander Aring wrote:
-> >Hi,
-> >
-> >On Thu, Jan 08, 2015 at 07:18:57PM +0000, Stefan Schmidt wrote:
-> >...
-> >>>>net/6lowpan/nhc.h               | 146 ++++++++++++++++++++++++
-> >>>>net/6lowpan/nhc_rfc6282_dest.c  |  27 +++++
-> >>>>net/6lowpan/nhc_rfc6282_frag.c  |  26 +++++
-> >>>>net/6lowpan/nhc_rfc6282_hop.c   |  26 +++++
-> >>>>net/6lowpan/nhc_rfc6282_ipv6.c  |  26 +++++
-> >>>>net/6lowpan/nhc_rfc6282_mobil.c |  26 +++++
-> >>>>net/6lowpan/nhc_rfc6282_route.c |  26 +++++
-> >>>>net/6lowpan/nhc_rfc6282_udp.c   | 156 ++++++++++++++++++++++++++
-> >>>
-> >>>can we please remove the _rfc6282 from the filenames. RFCs get update and
-> >>>thus change numbers. I do not want to carry RFC numbers in filenames
-> >>>around. There is also almost no precedence in the kernel source code that
-> >>>would justify doing this.
-> >>
-> >>They look indeed quite ugly in the filename. :)
-> >>
-> >>Moving them as a comment and starting point into the file should be
-> >>enough.
-> >>Maybe we can also rename nhc_mobil to nhc_mobility. The other
-> >>abbreviations
-> >>are clear in my opinion but for mobil I actually opened the rfc to look
-> >>what
-> >>you mean here.
-> >>
-> >
-> >For the rfc6282 thing:
-> >
-> >Currently there exists two RFCs which describes an UDP compression. It's
-> >rfc6282 (the well known 6LoWPAN IPHC compression RFC) and RFC7400 which
-> >was pointed out by Martin Townsend [0].
-> 
-> November 2014, thats really new.
-> 
-> >We need to clarify how we should deal with multiple definitions for a
-> >compression format. On receiving side we should always support what we
-> >can which is decided by the variable nhcid length. While on transmit...
-> >we need still some configuration interface (my dreams are to decide the
-> >compression methods per socket, don't know how possible that is).
-> 
-> As a general rule we should try to accept, identify and uncompress as many
-> formats for the incoming side. For the sending side this decision is very
-> unlikely to be made by the application but instead it is made by the system
-> configurator / platform. Thus in my eyes it makes more sense to have the
-> configure options either via netlink or sysfs but not over the socket
-> interface.
-> 
+Signed-off-by: Jakub Pawlowski <jpawlowski@google.com>
+---
+ include/net/bluetooth/hci_core.h |  1 +
+ net/bluetooth/mgmt.c             | 43 ++++++++++++++++++++++++++++++++++++----
+ 2 files changed, 40 insertions(+), 4 deletions(-)
 
-yes, this is the next part which is also more easier than the per socket
-interface. To make this just per socket is more granularity than have a
-"global setting" for this. Maybe we can handle this in one net namespace
-configuration, but this also seems after the a step to introduce a netlink
-configuration framework. I already talked with Jukka and he also agree For
-a netlink interface (this was in some previous series).
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index add94f6..86c1bd7 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -1327,6 +1327,7 @@ void hci_sock_dev_event(struct hci_dev *hdev, int event);
+ #define DISCOV_INTERLEAVED_TIMEOUT	5120	/* msec */
+ #define DISCOV_INTERLEAVED_INQUIRY_LEN	0x04
+ #define DISCOV_BREDR_INQUIRY_LEN	0x08
++#define DISCOV_LE_RESTART_DELAY		200	/* msec */
+ 
+ int mgmt_control(struct sock *sk, struct msghdr *msg, size_t len);
+ int mgmt_new_settings(struct hci_dev *hdev);
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 9f295cd..6c6a50a 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -7165,6 +7165,16 @@ static bool eir_has_uuids(u8 *eir, u16 eir_len, u16 uuid_count, u8 (*uuids)[16])
+ 	return false;
+ }
+ 
++static void restart_le_scan(struct hci_dev *hdev)
++{
++	/* If controller is not scanning we are done. */
++	if (!test_bit(HCI_LE_SCAN, &hdev->dev_flags))
++		return;
++
++	queue_delayed_work(hdev->workqueue, &hdev->le_scan_restart,
++			   msecs_to_jiffies(DISCOV_LE_RESTART_DELAY));
++}
++
+ void mgmt_device_found(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
+ 		       u8 addr_type, u8 *dev_class, s8 rssi, u32 flags,
+ 		       u8 *eir, u16 eir_len, u8 *scan_rsp, u8 scan_rsp_len)
+@@ -7194,7 +7204,8 @@ void mgmt_device_found(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
+ 	 * the results are also dropped.
+ 	 */
+ 	if (hdev->discovery.rssi != HCI_RSSI_INVALID &&
+-	    (rssi < hdev->discovery.rssi || rssi == HCI_RSSI_INVALID))
++	    (rssi == HCI_RSSI_INVALID || (rssi < hdev->discovery.rssi &&
++	    !test_bit(HCI_QUIRK_STRICT_DUPLICATE_FILTER, &hdev->quirks))))
+ 		return;
+ 
+ 	/* Make sure that the buffer is big enough. The 5 extra bytes
+@@ -7228,12 +7239,20 @@ void mgmt_device_found(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
+ 		 * kept and checking possible scan response data
+ 		 * will be skipped.
+ 		 */
+-		if (hdev->discovery.uuid_count > 0)
++		if (hdev->discovery.uuid_count > 0) {
+ 			match = eir_has_uuids(eir, eir_len,
+ 					      hdev->discovery.uuid_count,
+ 					      hdev->discovery.uuids);
+-		else
++			/* we have service match. If duplicate filtering doesn't
++			 * honour RSSI hanges, restart scan to make sure we'll
++			 * get RSSI updates
++			 */
++			if (match && test_bit(HCI_QUIRK_STRICT_DUPLICATE_FILTER,
++					      &hdev->quirks))
++				restart_le_scan(hdev);
++		} else {
+ 			match = true;
++		}
+ 
+ 		if (!match && !scan_rsp_len)
+ 			return;
+@@ -7266,7 +7285,15 @@ void mgmt_device_found(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
+ 						     hdev->discovery.uuid_count,
+ 						     hdev->discovery.uuids))
+ 				return;
+-		}
++
++			/* we have service match. If duplicate filtering doesn't
++			 * honour RSSI hanges, restart scan to make sure we'll
++			 * get RSSI updates
++			 */
++			if (test_bit(HCI_QUIRK_STRICT_DUPLICATE_FILTER,
++				     &hdev->quirks))
++				restart_le_scan(hdev);
++			}
+ 
+ 		/* Append scan response data to event */
+ 		memcpy(ev->eir + eir_len, scan_rsp, scan_rsp_len);
+@@ -7279,6 +7306,14 @@ void mgmt_device_found(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
+ 			return;
+ 	}
+ 
++	/* Check again wether RSSI value doesn't meet Service Discovery
++	 * threshold. This might evaluate to true only if
++	 * HCI_QUIRK_STRICT_DUPLICATE_FILTER is set.
++	 */
++	if (hdev->discovery.rssi != HCI_RSSI_INVALID &&
++	    rssi < hdev->discovery.rssi)
++		return;
++
+ 	ev->eir_len = cpu_to_le16(eir_len + scan_rsp_len);
+ 	ev_size = sizeof(*ev) + eir_len + scan_rsp_len;
+ 
+-- 
+2.2.0.rc0.207.ga3a616c
 
-> >For the handling I thought that we have then two UDP nhc modules, both
-> >can be loaded (at the moment _only_ one UDP nhc compressression should
-> >implement the compress methods, both should implement uncompression
-> >methods).
-> >
-> >I can rename it to nhc_udp.c for the standard compression methods
-> >according to rfc6282, I am fine with that. But later there exists then
-> >an another compression module with the naming "nhc_ghc_udp.c" or
-> >something else. So we have "nhc_udp.ko" and "nhc_ghc_udp.ko".
-> >Is that okay for everybody?
-> 
-> It would be ok for me. nhc_udp is the earlier spec and thus has a shorter
-> name while we need to distinguish for later specs and add the ghc for it. In
-> a later mail you mentioned using _iphc_ and _ghc_ I would avoid that because
-> GHC is just plugged into NHC and thus is also a under the IPHC umbrella of
-> compressions. :)
-> 
-
-ok.
-
-> >Maybe I should also add some modinfo information, which containing the
-> >nhc->name.
-> 
-> Maybe. For what would it be used? Having a human readable description would
-> make sense for the configure interface in some cases I would say.
-> 
-
-For `modinfo $NHC_MODULE`.
-
-> >For the nexthdr names:
-> >
-> >I will try to change it according to the NEXTHDR IPv6 defines [1], so also
-> >the linux IPv6 guys knows what it is.
-> 
-> That looks good to me.
->
-
-ok.
-
-- Alex
