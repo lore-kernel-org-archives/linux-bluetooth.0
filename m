@@ -1,83 +1,69 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1420806105.2557.11.camel@jrissane-mobl.ger.corp.intel.com>
-Subject: Re: [PATCHv4 bluetooth-next 0/3] 6lowpan: introduce nhc framework
-From: Jukka Rissanen <jukka.rissanen@linux.intel.com>
-To: Alexander Aring <alex.aring@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org,
-	kernel@pengutronix.de, Martin Townsend <mtownsend1973@gmail.com>, Marcel
-	Holtmann <marcel@holtmann.org>
-Date: Fri, 09 Jan 2015 14:21:45 +0200
-In-Reply-To: <1420720298-1995-1-git-send-email-alex.aring@gmail.com>
-References: <1420720298-1995-1-git-send-email-alex.aring@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+MIME-Version: 1.0
+In-Reply-To: <20150109102628.GA19211@t440s.lan>
+References: <1420636254-25626-1-git-send-email-jpawlowski@google.com>
+	<1420636254-25626-2-git-send-email-jpawlowski@google.com>
+	<20150109102628.GA19211@t440s.lan>
+Date: Fri, 9 Jan 2015 12:22:47 +0100
+Message-ID: <CAD0=r8w1_mtsjmO4=Giz0+Q43Q3wpq0sSdtFnH--A3Ne-chAPQ@mail.gmail.com>
+Subject: Re: [PATCH v6 2/3] Bluetooth: Add le_scan_restart
+From: Jakub Pawlowski <jpawlowski@google.com>
+To: Jakub Pawlowski <jpawlowski@google.com>,
+	BlueZ development <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Alex,
+Hi Johan,
 
-On to, 2015-01-08 at 13:31 +0100, Alexander Aring wrote:
-> This patch series introduce the next header compression framework. Currently
-> we support udp compression/uncompression only. This framework allow to add new
-> next header compression formats easily.
-> 
-> If somebody wants to add a new header compression format and some information
-> are missing while calling compression and uncompression callbacks. Please
-> feel free to make framework changes according these callbacks.
-> 
-> changes since v2:
->  - make udp nhc as module as suggested by Marcel Holtmann
->  - fix comment header in nhc_udp.c
-> 
-> I didn't make the lowpan_nhc declaration "const" because this will occur
-> issues with rb_node, id and idmask array. Which will manipulated during
-> runtime.
-> 
-> changes since v3:
->  - add patch 3/3 for other known rfc6282 ipv6 extension headers compression
->    formats
->  - add request_modules for loading nhc default compression format modules.
->    Which was suggested by Jukka Rissanen. Thanks, this is really working.
->  - Add rtnl_lock for lowpan_nhc_add and del since we have no synced
->    request_modules call this could make trouble.
->  - Move some handling out of nhc_do_compression and uncompression function.
->    The complete handling is now inside of iphc.c and nhc_do_compression and
->    uncompression functions is only a wrapper call for the callback.
->  - rework some menuentries for Kconfig and compression format, they are
->    grouped by rfc now.
->  - move some generic handling like "skb_pull(skb, nhc->nexthdrlen);" into
->    iphc.c. It would be great if we have something also for uncompression
->    for the skb_cow. But this isn't possible right now.
->  - change warning if nhc was not found to "was not found" instead isn't
->    implemented. It isn't implemented if callbacks are NULL now.
->  - small cleanups.
-> 
-> changes since v4:
->  - add spinlock for to prevent nhc from deletion while using. This can occur
->    if nhc module is unloading while compression/uncompression.
->  - move nhc handling for nhc compression/uncompression completely into
->    nhc_do_compression/nhc_do_uncompression.
-> 
-> Note about locking:
-> 
-> We have now a spinlock nhc_lowpan_lock which prevents manipulating the nhc
-> datastructures while using it. On receiving side it's easy to handle, at the
-> end we check if 6lowpan nh compressed flag is set and run uncompression.
-> On the other hand the transmit side is complicated, we check if next_hdr field
-> is registrated and run some other compression routines, at least we do the
-> finally nhc compression which depends on the first check if next_hdr was
-> registrated. The kernel will crash if we remove the using module between
-> "next_hdr check" and "do nhc compression", the lock will prevent that now.
-> 
-> Now in the transmit path exist a little window to remove a lowpan_nhc while
-> compression. This is exactly the part between "check if we support" and
-> "doing compression". This is a very unlikely case, if this occurs we drop
-> the packet while compression. Don't know how to better deal with that right
-> now. I will try to search a better solution later.
-> 
+On Fri, Jan 9, 2015 at 11:26 AM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
+> Hi Jakub,
+>
+> On Wed, Jan 07, 2015, Jakub Pawlowski wrote:
+>> -             cancel_delayed_work(&hdev->le_scan_disable);
+>> +             if (!bt_cb(hdev->sent_cmd)->req.marker)
+>> +                     cancel_delayed_work(&hdev->le_scan_disable);
+>>
+>>               clear_bit(HCI_LE_SCAN, &hdev->dev_flags);
+>
+> Modifying the generic HCI request framework for this single purpose
+> doesn't make much sense to me. Also, the details of the bt_cb(skb)->req
+> struct are considered an implementation detail of the HCI request
+> specific handling and should not be directly touched by other code.
 
-tried v4 shortly with Bluetooth and see no issues. Waiting next version
-before giving final ack.
+Description of cb field of skbuff says it can be used by every layer:
+" @cb: Control buffer. Free for use by every layer. Put private vars
+here" ( http://lxr.free-electrons.com/source/include/linux/skbuff.h#L445
+)
+I fought I can just add something there, and use it.
+I agree that this field doesn't fit struct hci_req_ctrl , but that was
+only place where there are free bits, otherwise the struct gets too
+big and don't fit cb field.
 
+>
+> It looks to me like this marker has the same purpose as the flag you had
+> in some earlier revision of this set? For such a use-case a flag would
+> still be the best option.
 
-Cheers,
-Jukka
+Yes, it have same meaning as this eariler version flag. The problem
+with flag was that I can't set it when I create request, it need to be
+set when the request is being executed, otherwise I can get race
+condition. In case of this marker field, there is no option to have
+race condition.
+
+> However, I'm wondering whether we can remove
+> the need for this completely. Can't you just let the code cancel the
+> delayed work and the re-schedule it again once the scanning gets
+> re-enabled (with some extra code decrease the timeout some appropriate
+> amount for each time scanning gets restarted).
+
+1. I can't get remaining time from workqueue, so I'll have to remember
+when it was started.
+2. When I do restart I'll still need some flag to know wether it was
+my internal restart, or wether someone just stopped and then started
+the scan, so I'll still need some flag, and way to set it.
+
+I have one more idea on how to make it work, I'll send patch soon.
+
+>
+> Johan
