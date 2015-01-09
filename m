@@ -1,75 +1,87 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <CAD0=r8w1_mtsjmO4=Giz0+Q43Q3wpq0sSdtFnH--A3Ne-chAPQ@mail.gmail.com>
-References: <1420636254-25626-1-git-send-email-jpawlowski@google.com>
-	<1420636254-25626-2-git-send-email-jpawlowski@google.com>
-	<20150109102628.GA19211@t440s.lan>
-	<CAD0=r8w1_mtsjmO4=Giz0+Q43Q3wpq0sSdtFnH--A3Ne-chAPQ@mail.gmail.com>
-Date: Fri, 9 Jan 2015 14:45:25 +0100
-Message-ID: <CAD0=r8x+S66CBbRdv5K9EqX=8K9NqbidmtSbB1kp+s-h8DMNvw@mail.gmail.com>
-Subject: Re: [PATCH v6 2/3] Bluetooth: Add le_scan_restart
-From: Jakub Pawlowski <jpawlowski@google.com>
-To: Jakub Pawlowski <jpawlowski@google.com>,
-	BlueZ development <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-bluetooth-owner@vger.kernel.org
+From: Stefan Schmidt <s.schmidt@samsung.com>
+To: 'Alexander Aring' <alex.aring@gmail.com>
+Cc: 'Marcel Holtmann' <marcel@holtmann.org>,
+ 'BlueZ development' <linux-bluetooth@vger.kernel.org>,
+ linux-wpan@vger.kernel.org, kernel@pengutronix.de,
+ 'Jukka Rissanen' <jukka.rissanen@linux.intel.com>,
+ 'Martin Townsend' <mtownsend1973@gmail.com>
+References: <1420720298-1995-1-git-send-email-alex.aring@gmail.com>
+ <BD3A316F-B094-419D-B2EC-EF6D980A692A@holtmann.org>
+ <058601d02b77$f3f47050$dbdd50f0$@samsung.com> <20150108200443.GB2046@omega>
+ <20150108200821.GC2046@omega>
+In-reply-to: <20150108200821.GC2046@omega>
+Subject: Re: [PATCHv4 bluetooth-next 0/3] 6lowpan: introduce nhc framework
+Date: Fri, 09 Jan 2015 13:06:51 +0000
+Message-id: <05f101d02c0d$227c8fd0$6775af70$@samsung.com>
+MIME-version: 1.0
+Content-type: text/plain; format=flowed; charset=utf-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Fri, Jan 9, 2015 at 12:22 PM, Jakub Pawlowski <jpawlowski@google.com> wrote:
-> Hi Johan,
->
-> On Fri, Jan 9, 2015 at 11:26 AM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
->> Hi Jakub,
->>
->> On Wed, Jan 07, 2015, Jakub Pawlowski wrote:
->>> -             cancel_delayed_work(&hdev->le_scan_disable);
->>> +             if (!bt_cb(hdev->sent_cmd)->req.marker)
->>> +                     cancel_delayed_work(&hdev->le_scan_disable);
->>>
->>>               clear_bit(HCI_LE_SCAN, &hdev->dev_flags);
->>
->> Modifying the generic HCI request framework for this single purpose
->> doesn't make much sense to me. Also, the details of the bt_cb(skb)->req
->> struct are considered an implementation detail of the HCI request
->> specific handling and should not be directly touched by other code.
->
-> Description of cb field of skbuff says it can be used by every layer:
-> " @cb: Control buffer. Free for use by every layer. Put private vars
-> here" ( http://lxr.free-electrons.com/source/include/linux/skbuff.h#L445
-> )
-> I fought I can just add something there, and use it.
-> I agree that this field doesn't fit struct hci_req_ctrl , but that was
-> only place where there are free bits, otherwise the struct gets too
-> big and don't fit cb field.
->
->>
->> It looks to me like this marker has the same purpose as the flag you had
->> in some earlier revision of this set? For such a use-case a flag would
->> still be the best option.
->
-> Yes, it have same meaning as this eariler version flag. The problem
-> with flag was that I can't set it when I create request, it need to be
-> set when the request is being executed, otherwise I can get race
-> condition. In case of this marker field, there is no option to have
-> race condition.
->
->> However, I'm wondering whether we can remove
->> the need for this completely. Can't you just let the code cancel the
->> delayed work and the re-schedule it again once the scanning gets
->> re-enabled (with some extra code decrease the timeout some appropriate
->> amount for each time scanning gets restarted).
->
-> 1. I can't get remaining time from workqueue, so I'll have to remember
-> when it was started.
-> 2. When I do restart I'll still need some flag to know wether it was
-> my internal restart, or wether someone just stopped and then started
-> the scan, so I'll still need some flag, and way to set it.
->
-> I have one more idea on how to make it work, I'll send patch soon.
->
+Hello.
 
-Ok I figured out how you wanted it, it's much simpler now, I'll send
-patches now.
-Thanks!
+On 08/01/15 21:08, Alexander Aring wrote:
+> On Thu, Jan 08, 2015 at 09:04:43PM +0100, Alexander Aring wrote:
+>> Hi,
 >>
->> Johan
+>> On Thu, Jan 08, 2015 at 07:18:57PM +0000, Stefan Schmidt wrote:
+>> ...
+>>>>> net/6lowpan/nhc.h               | 146 ++++++++++++++++++++++++
+>>>>> net/6lowpan/nhc_rfc6282_dest.c  |  27 +++++
+>>>>> net/6lowpan/nhc_rfc6282_frag.c  |  26 +++++
+>>>>> net/6lowpan/nhc_rfc6282_hop.c   |  26 +++++
+>>>>> net/6lowpan/nhc_rfc6282_ipv6.c  |  26 +++++
+>>>>> net/6lowpan/nhc_rfc6282_mobil.c |  26 +++++
+>>>>> net/6lowpan/nhc_rfc6282_route.c |  26 +++++
+>>>>> net/6lowpan/nhc_rfc6282_udp.c   | 156 ++++++++++++++++++++++++++
+>>>>
+>>>> can we please remove the _rfc6282 from the filenames. RFCs get update
+>>>> and
+>>>> thus change numbers. I do not want to carry RFC numbers in filenames
+>>>> around. There is also almost no precedence in the kernel source code
+>>>> that
+>>>> would justify doing this.
+>>>
+>>> They look indeed quite ugly in the filename. :)
+>>>
+>>> Moving them as a comment and starting point into the file should be
+>>> enough.
+>>> Maybe we can also rename nhc_mobil to nhc_mobility. The other
+>>> abbreviations
+>>> are clear in my opinion but for mobil I actually opened the rfc to look
+>>> what
+>>> you mean here.
+>>>
+>>
+>> For the rfc6282 thing:
+>>
+>> Currently there exists two RFCs which describes an UDP compression. It's
+>> rfc6282 (the well known 6LoWPAN IPHC compression RFC) and RFC7400 which
+>> was pointed out by Martin Townsend [0].
+>>
+>> We need to clarify how we should deal with multiple definitions for a
+>> compression format. On receiving side we should always support what we
+>> can which is decided by the variable nhcid length. While on transmit...
+>> we need still some configuration interface (my dreams are to decide the
+>> compression methods per socket, don't know how possible that is).
+>>
+>> For the handling I thought that we have then two UDP nhc modules, both
+>> can be loaded (at the moment _only_ one UDP nhc compressression should
+>> implement the compress methods, both should implement uncompression
+>> methods).
+>>
+>> I can rename it to nhc_udp.c for the standard compression methods
+>> according to rfc6282, I am fine with that. But later there exists then
+>> an another compression module with the naming "nhc_ghc_udp.c" or
+>> something else. So we have "nhc_udp.ko" and "nhc_ghc_udp.ko".
+>> Is that okay for everybody?
+>>
+>
+> We can also put all udp compression formats into the nhc_udp.c file. But
+> then all udp compressions are handled by one module then. We should not
+> do that, because we can handle it per module.
+
+I would keep them all in different modules for now.
+
+regards
+Stefan Schmidt
