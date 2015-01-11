@@ -1,58 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 5/5] Bluetooth: Process result of HCI Delete Stored Link Key command
-Date: Sun, 11 Jan 2015 13:44:25 -0800
-Message-Id: <1421012665-4842-5-git-send-email-marcel@holtmann.org>
+Subject: [PATCH 1/5] Bluetooth: Add defintions for HCI Read Stored Link Key command
+Date: Sun, 11 Jan 2015 13:44:21 -0800
+Message-Id: <1421012665-4842-1-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-When the HCI Delete Stored Link Key command completes, then update the
-value of current stored keys in hci_dev structure.
+This patch adds the missing commmand structure and command complete
+structure for the HCI Read Store Link Key command.
 
 Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- net/bluetooth/hci_event.c | 20 ++++++++++++++++++++
- 1 file changed, 20 insertions(+)
+ include/net/bluetooth/hci.h | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
 
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 09dde59ddeec..702769fb9b4e 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -232,6 +232,22 @@ static void hci_cc_read_stored_link_key(struct hci_dev *hdev,
- 	}
- }
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+index d0bca316b43b..91cd9d302cd0 100644
+--- a/include/net/bluetooth/hci.h
++++ b/include/net/bluetooth/hci.h
+@@ -855,6 +855,17 @@ struct hci_cp_set_event_flt {
+ #define HCI_CONN_SETUP_AUTO_OFF	0x01
+ #define HCI_CONN_SETUP_AUTO_ON	0x02
  
-+static void hci_cc_delete_stored_link_key(struct hci_dev *hdev,
-+					  struct sk_buff *skb)
-+{
-+	struct hci_rp_delete_stored_link_key *rp = (void *)skb->data;
++#define HCI_OP_READ_STORED_LINK_KEY	0x0c0d
++struct hci_cp_read_stored_link_key {
++	bdaddr_t bdaddr;
++	__u8     read_all;
++} __packed;
++struct hci_rp_read_stored_link_key {
++	__u8     status;
++	__u8     max_keys;
++	__u8     num_keys;
++} __packed;
 +
-+	BT_DBG("%s status 0x%2.2x", hdev->name, rp->status);
-+
-+	if (rp->status)
-+		return;
-+
-+	if (rp->num_keys <= hdev->stored_num_keys)
-+		hdev->stored_num_keys -= rp->num_keys;
-+	else
-+		hdev->stored_num_keys = 0;
-+}
-+
- static void hci_cc_write_local_name(struct hci_dev *hdev, struct sk_buff *skb)
- {
- 	__u8 status = *((__u8 *) skb->data);
-@@ -2736,6 +2752,10 @@ static void hci_cmd_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
- 		hci_cc_read_stored_link_key(hdev, skb);
- 		break;
- 
-+	case HCI_OP_DELETE_STORED_LINK_KEY:
-+		hci_cc_delete_stored_link_key(hdev, skb);
-+		break;
-+
- 	case HCI_OP_WRITE_LOCAL_NAME:
- 		hci_cc_write_local_name(hdev, skb);
- 		break;
+ #define HCI_OP_DELETE_STORED_LINK_KEY	0x0c12
+ struct hci_cp_delete_stored_link_key {
+ 	bdaddr_t bdaddr;
 -- 
 2.1.0
 
