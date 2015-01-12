@@ -1,52 +1,96 @@
 Return-Path: <cyrus@holtmann.org>
 From: Gowtham Anandha Babu <gowtham.ab@samsung.com>
-To: 'Luiz Augusto von Dentz' <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	'Dmitry Kasatkin' <d.kasatkin@samsung.com>,
-	'Bharat Panda' <bharat.panda@samsung.com>, cpgs@samsung.com
-References: <1418212008-8594-1-git-send-email-gowtham.ab@samsung.com>
- <1418212008-8594-2-git-send-email-gowtham.ab@samsung.com>
- <CABBYNZJrV1viDu62Ndr2Davv_52tKmByLwNtQqSRUXN0j1mZww@mail.gmail.com>
- <003501d01868$fbab5740$f30205c0$@samsung.com>
- <000001d019c2$3452b610$9cf82230$@samsung.com>
- <001001d01b8d$fb88ce50$f29a6af0$@samsung.com>
- <001401d02b2c$e9dfad50$bd9f07f0$@samsung.com>
- <CABBYNZ+LCW9zjJh-Bc4QsJ_VT2FuzjJH7sAyZhp8+d2BcOEYGQ@mail.gmail.com>
-In-reply-to: <CABBYNZ+LCW9zjJh-Bc4QsJ_VT2FuzjJH7sAyZhp8+d2BcOEYGQ@mail.gmail.com>
-Subject: RE: [PATCH 1/3] monitor/packet: Fix ERROR CODES as per core_v4.2
-Date: Mon, 12 Jan 2015 17:54:58 +0530
-Message-id: <001301d02e62$d3900c50$7ab024f0$@samsung.com>
-MIME-version: 1.0
-Content-type: text/plain; charset=UTF-8
+To: linux-bluetooth@vger.kernel.org
+Cc: bharat.panda@samsung.com, cpgs@samsung.com,
+	Gowtham Anandha Babu <gowtham.ab@samsung.com>
+Subject: [PATCH  3/3] monitor/packet: Fix possbile checkpatch errors
+Date: Mon, 12 Jan 2015 17:38:31 +0530
+Message-id: <1421064511-25894-4-git-send-email-gowtham.ab@samsung.com>
+In-reply-to: <1421064511-25894-1-git-send-email-gowtham.ab@samsung.com>
+References: <1421064511-25894-1-git-send-email-gowtham.ab@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+---
+ monitor/packet.c | 16 ++++++++--------
+ 1 file changed, 8 insertions(+), 8 deletions(-)
 
-> -----Original Message-----
-> From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-
-> owner@vger.kernel.org] On Behalf Of Luiz Augusto von Dentz
-> Sent: Monday, January 12, 2015 5:35 PM
-> To: Gowtham Anandha Babu
-> Cc: linux-bluetooth@vger.kernel.org; Dmitry Kasatkin; Bharat Panda;
-> cpgs@samsung.com
-> Subject: Re: [PATCH 1/3] monitor/packet: Fix ERROR CODES as per core_v4.2
-> 
-> Hi Gowtham,
-> 
-> On Thu, Jan 8, 2015 at 8:21 AM, Gowtham Anandha Babu
-> <gowtham.ab@samsung.com> wrote:
-> > Ping.
-> 
-> Could you please resend this set.
-
-I have just resent this patch set.
-
-Regards,
-Gowtham Anandha Babu
-
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org More majordomo
-> info at  http://vger.kernel.org/majordomo-info.html
+diff --git a/monitor/packet.c b/monitor/packet.c
+index 87b97ad..ebff682 100644
+--- a/monitor/packet.c
++++ b/monitor/packet.c
+@@ -1052,7 +1052,7 @@ static void print_voice_setting(uint16_t setting)
+ 		str = "Linear";
+ 		break;
+ 	case 0x01:
+-		str ="u-law";
++		str = "u-law";
+ 		break;
+ 	case 0x02:
+ 		str = "A-law";
+@@ -1096,7 +1096,7 @@ static void print_voice_setting(uint16_t setting)
+ 		str = "CVSD";
+ 		break;
+ 	case 0x01:
+-		str ="u-law";
++		str = "u-law";
+ 		break;
+ 	case 0x02:
+ 		str = "A-law";
+@@ -2184,7 +2184,7 @@ static void print_channel_map(const uint8_t *map)
+ 
+ 			if (count > 1) {
+ 				print_field("  Channel %u-%u",
+-						start, start + count - 1 );
++						start, start + count - 1);
+ 				count = 0;
+ 			} else if (count > 0) {
+ 				print_field("  Channel %u", start);
+@@ -2575,7 +2575,7 @@ static const struct {
+ 					LE_STATE_MASTER_SLAVE	},
+ 	{ 39, LE_STATE_CONN_SLAVE | LE_STATE_HIGH_DIRECT_ADV |
+ 					LE_STATE_SLAVE_SLAVE	},
+-	{ 40, LE_STATE_CONN_SLAVE| LE_STATE_LOW_DIRECT_ADV |
++	{ 40, LE_STATE_CONN_SLAVE | LE_STATE_LOW_DIRECT_ADV |
+ 					LE_STATE_SLAVE_SLAVE	},
+ 	{ 41, LE_STATE_INITIATING | LE_STATE_CONN_SLAVE |
+ 					LE_STATE_MASTER_SLAVE	},
+@@ -2643,7 +2643,7 @@ static void print_le_channel_map(const uint8_t *map)
+ 
+ 			if (count > 1) {
+ 				print_field("  Channel %u-%u",
+-						start, start + count - 1 );
++						start, start + count - 1);
+ 				count = 0;
+ 			} else if (count > 0) {
+ 				print_field("  Channel %u", start);
+@@ -3900,7 +3900,7 @@ static void create_logic_link_cmd(const void *data, uint8_t size)
+ 
+ static void accept_logic_link_cmd(const void *data, uint8_t size)
+ {
+-        const struct bt_hci_cmd_accept_logic_link *cmd = data;
++	const struct bt_hci_cmd_accept_logic_link *cmd = data;
+ 
+ 	print_phy_handle(cmd->phy_handle);
+ 	print_flow_spec("TX", cmd->tx_flow_spec);
+@@ -3924,7 +3924,7 @@ static void logic_link_cancel_cmd(const void *data, uint8_t size)
+ 
+ static void logic_link_cancel_rsp(const void *data, uint8_t size)
+ {
+-        const struct bt_hci_rsp_logic_link_cancel *rsp = data;
++	const struct bt_hci_rsp_logic_link_cancel *rsp = data;
+ 
+ 	print_status(rsp->status);
+ 	print_phy_handle(rsp->phy_handle);
+@@ -8039,7 +8039,7 @@ void packet_hci_event(struct timeval *tv, uint16_t index,
+ 	sprintf(extra_str, "(0x%2.2x) plen %d", hdr->evt, hdr->plen);
+ 
+ 	print_packet(tv, index, '>', event_color, "HCI Event",
+-                                                        event_str, extra_str);
++						event_str, extra_str);
+ 
+ 	if (!event_data || !event_data->func) {
+ 		packet_hexdump(data, size);
+-- 
+1.9.1
 
