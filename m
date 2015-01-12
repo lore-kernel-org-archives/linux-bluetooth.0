@@ -1,40 +1,58 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH 1/4] tools/hcitool: Fix help message for lecup
-Date: Mon, 12 Jan 2015 17:19:37 +0100
-Message-Id: <1421079580-26470-1-git-send-email-szymon.janc@tieto.com>
+From: Vikrampal <vikram.pal@samsung.com>
+To: 'Luiz Augusto von Dentz' <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org, cpgs@samsung.com
+References: <1420619000-24211-1-git-send-email-vikram.pal@samsung.com>
+ <CABBYNZ+5EHXEL8H7+pgnJWNih72fu_k2Qu6tJ9G7eQCfyJD-_A@mail.gmail.com>
+In-reply-to: <CABBYNZ+5EHXEL8H7+pgnJWNih72fu_k2Qu6tJ9G7eQCfyJD-_A@mail.gmail.com>
+Subject: RE: [PATCH 0/6] L2CAP control field + AVRCP browsing PDU parsing
+Date: Mon, 12 Jan 2015 18:13:56 +0530
+Message-id: <00dd01d02e65$7c6ff130$754fd390$@samsung.com>
+MIME-version: 1.0
+Content-type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Command options don't support short options and long options require
-equal mark.
----
- tools/hcitool.c | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
+Hi Luiz,
 
-diff --git a/tools/hcitool.c b/tools/hcitool.c
-index 0bd416f..cbd32f3 100644
---- a/tools/hcitool.c
-+++ b/tools/hcitool.c
-@@ -3296,11 +3296,11 @@ static const char *lecup_help =
- 	"Usage:\n"
- 	"\tlecup <handle> <min> <max> <latency> <timeout>\n"
- 	"\tOptions:\n"
--	"\t    -H, --handle <0xXXXX>  LE connection handle\n"
--	"\t    -m, --min <interval>   Range: 0x0006 to 0x0C80\n"
--	"\t    -M, --max <interval>   Range: 0x0006 to 0x0C80\n"
--	"\t    -l, --latency <range>  Slave latency. Range: 0x0000 to 0x03E8\n"
--	"\t    -t, --timeout  <time>  N * 10ms. Range: 0x000A to 0x0C80\n"
-+	"\t    --handle=<0xXXXX>  LE connection handle\n"
-+	"\t    --min=<interval>   Range: 0x0006 to 0x0C80\n"
-+	"\t    --max=<interval>   Range: 0x0006 to 0x0C80\n"
-+	"\t    --latency=<range>  Slave latency. Range: 0x0000 to 0x03E8\n"
-+	"\t    --timeout=<time>   N * 10ms. Range: 0x000A to 0x0C80\n"
- 	"\n\t min/max range: 7.5ms to 4s. Multiply factor: 1.25ms"
- 	"\n\t timeout range: 100ms to 32.0s. Larger than max interval\n";
- 
--- 
-1.9.1
+> -----Original Message-----
+> From: Luiz Augusto von Dentz [mailto:luiz.dentz@gmail.com]
+> Sent: Monday, January 12, 2015 6:04 PM
+> To: Vikrampal Yadav
+> Cc: linux-bluetooth@vger.kernel.org; cpgs@samsung.com
+> Subject: Re: [PATCH 0/6] L2CAP control field + AVRCP browsing PDU parsing
+> 
+> Hi Vikram,
+> 
+> On Wed, Jan 7, 2015 at 6:23 AM, Vikrampal Yadav
+> <vikram.pal@samsung.com> wrote:
+> > Support for parsing L2CAP extended control field and AVRCP
+> > SetBrowsedPlayer added in Bluetooth monitor.
+> >
+> > Vikrampal Yadav (6):
+> >   monitor: Make the parameter name generic
+> >   monitor: Add functionality to store extented control in DB
+> >   monitor: Extract extended L2CAP extended control field
+> >   monitor: Add support for parsing L2CAP extended control field
+> >   monitor: Add support for parsing L2CAP control field
+> >   monitor: Add AVRCP SetBrowsedPlayer support
+> >
+> >  monitor/avctp.c |  86 +++++++++++++++++++-  monitor/l2cap.c | 239
+> > ++++++++++++++++++++++++++++++++++++++++++++++++++++++--
+> >  2 files changed, 319 insertions(+), 6 deletions(-)
+> >
+> > --
+> > 1.9.1
+> 
+> Applied, thanks. Please make sure you follow the coding style, I had to fix a
+> few lines that were over 80 columns.
+> 
+> 
+> --
+> Luiz Augusto von Dentz
+
+Thanks! I surely will take care.
+
+Regards,
+Vikram
 
