@@ -1,29 +1,35 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 12 Jan 2015 21:58:07 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v2 1/5] Bluetooth: Add defintions for HCI Read Stored
- Link Key command
-Message-ID: <20150112195807.GA23564@t440s.lan>
-References: <1421083288-22345-1-git-send-email-marcel@holtmann.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1421083288-22345-1-git-send-email-marcel@holtmann.org>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH v2 4/5] Bluetooth: Add missing response structure for HCI Delete Stored Link Key
+Date: Mon, 12 Jan 2015 09:21:27 -0800
+Message-Id: <1421083288-22345-4-git-send-email-marcel@holtmann.org>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+This patch adds this missing structure for processing the result of the
+HCI Delete Stored Link Key command.
 
-On Mon, Jan 12, 2015, Marcel Holtmann wrote:
-> This patch adds the missing commmand structure and command complete
-> structure for the HCI Read Store Link Key command.
-> 
-> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
-> ---
->  include/net/bluetooth/hci.h | 11 +++++++++++
->  1 file changed, 11 insertions(+)
+Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+---
+ include/net/bluetooth/hci.h | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-All five patches in this set have been applied to bluetooth-next.
-Thanks.
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+index 91cd9d302cd0..8e54f825153c 100644
+--- a/include/net/bluetooth/hci.h
++++ b/include/net/bluetooth/hci.h
+@@ -871,6 +871,10 @@ struct hci_cp_delete_stored_link_key {
+ 	bdaddr_t bdaddr;
+ 	__u8     delete_all;
+ } __packed;
++struct hci_rp_delete_stored_link_key {
++	__u8     status;
++	__u8     num_keys;
++} __packed;
+ 
+ #define HCI_MAX_NAME_LENGTH		248
+ 
+-- 
+2.1.0
 
-Johan
