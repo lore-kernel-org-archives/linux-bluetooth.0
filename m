@@ -1,47 +1,85 @@
 Return-Path: <cyrus@holtmann.org>
-From: Marcel Holtmann <marcel@holtmann.org>
+From: Gowtham Anandha Babu <gowtham.ab@samsung.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Use %llu for printing duration details of selftests
-Date: Mon, 12 Jan 2015 23:09:48 -0800
-Message-Id: <1421132988-19922-1-git-send-email-marcel@holtmann.org>
+Cc: bharat.panda@samsung.com, cpgs@samsung.com
+References: <1420466575-14615-1-git-send-email-gowtham.ab@samsung.com>
+In-reply-to: <1420466575-14615-1-git-send-email-gowtham.ab@samsung.com>
+Subject: RE: [PATCH] Bluetooth: Remove dead code
+Date: Tue, 13 Jan 2015 12:22:58 +0530
+Message-id: <000401d02efd$92b05e60$b8111b20$@samsung.com>
+MIME-version: 1.0
+Content-type: text/plain; charset=us-ascii
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The duration variable for the selftests is unsigned long long and with
-that use %llu instead of %lld when printing the results.
 
-Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
----
- net/bluetooth/selftest.c | 2 +-
- net/bluetooth/smp.c      | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/net/bluetooth/selftest.c b/net/bluetooth/selftest.c
-index 9c67315172cf..378f4064952c 100644
---- a/net/bluetooth/selftest.c
-+++ b/net/bluetooth/selftest.c
-@@ -184,7 +184,7 @@ static int __init test_ecdh(void)
- 	delta = ktime_sub(rettime, calltime);
- 	duration = (unsigned long long) ktime_to_ns(delta) >> 10;
- 
--	BT_INFO("ECDH test passed in %lld usecs", duration);
-+	BT_INFO("ECDH test passed in %llu usecs", duration);
- 
- 	return 0;
- }
-diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
-index 96c7d51a2753..379654e70e6f 100644
---- a/net/bluetooth/smp.c
-+++ b/net/bluetooth/smp.c
-@@ -3387,7 +3387,7 @@ static int __init run_selftests(struct crypto_blkcipher *tfm_aes,
- 	delta = ktime_sub(rettime, calltime);
- 	duration = (unsigned long long) ktime_to_ns(delta) >> 10;
- 
--	BT_INFO("SMP test passed in %lld usecs", duration);
-+	BT_INFO("SMP test passed in %llu usecs", duration);
- 
- 	return 0;
- }
--- 
-2.1.0
+Ping.
+
+> -----Original Message-----
+> From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-
+> owner@vger.kernel.org] On Behalf Of Gowtham Anandha Babu
+> Sent: Monday, January 05, 2015 7:33 PM
+> To: linux-bluetooth@vger.kernel.org
+> Cc: bharat.panda@samsung.com; cpgs@samsung.com; Gowtham Anandha
+> Babu
+> Subject: [PATCH] Bluetooth: Remove dead code
+> 
+> Variable 'controller' is assigned a value that is never used.
+> Identified by cppcheck tool.
+> 
+> Signed-off-by: Gowtham Anandha Babu <gowtham.ab@samsung.com>
+> ---
+>  net/bluetooth/cmtp/capi.c | 6 ------
+>  1 file changed, 6 deletions(-)
+> 
+> diff --git a/net/bluetooth/cmtp/capi.c b/net/bluetooth/cmtp/capi.c index
+> 1ca8a87..75bd2c4 100644
+> --- a/net/bluetooth/cmtp/capi.c
+> +++ b/net/bluetooth/cmtp/capi.c
+> @@ -253,8 +253,6 @@ static void cmtp_recv_interopmsg(struct
+> cmtp_session *session, struct sk_buff *s
+>  			if (skb->len < CAPI_MSG_BASELEN + 15)
+>  				break;
+> 
+> -			controller = CAPIMSG_U32(skb->data,
+> CAPI_MSG_BASELEN + 10);
+> -
+>  			if (!info && ctrl) {
+>  				int len = min_t(uint,
+> CAPI_MANUFACTURER_LEN,
+>  						skb-
+> >data[CAPI_MSG_BASELEN + 14]); @@ -270,8 +268,6 @@ static void
+> cmtp_recv_interopmsg(struct cmtp_session *session, struct sk_buff *s
+>  			if (skb->len < CAPI_MSG_BASELEN + 32)
+>  				break;
+> 
+> -			controller = CAPIMSG_U32(skb->data,
+> CAPI_MSG_BASELEN + 12);
+> -
+>  			if (!info && ctrl) {
+>  				ctrl->version.majorversion =
+> CAPIMSG_U32(skb->data, CAPI_MSG_BASELEN + 16);
+>  				ctrl->version.minorversion =
+> CAPIMSG_U32(skb->data, CAPI_MSG_BASELEN + 20); @@ -285,8 +281,6
+> @@ static void cmtp_recv_interopmsg(struct cmtp_session *session, struct
+> sk_buff *s
+>  			if (skb->len < CAPI_MSG_BASELEN + 17)
+>  				break;
+> 
+> -			controller = CAPIMSG_U32(skb->data,
+> CAPI_MSG_BASELEN + 12);
+> -
+>  			if (!info && ctrl) {
+>  				int len = min_t(uint, CAPI_SERIAL_LEN,
+>  						skb-
+> >data[CAPI_MSG_BASELEN + 16]);
+> --
+> 1.9.1
+> 
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth"
+in
+> the body of a message to majordomo@vger.kernel.org More majordomo
+> info at  http://vger.kernel.org/majordomo-info.html
 
