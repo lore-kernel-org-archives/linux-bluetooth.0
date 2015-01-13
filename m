@@ -1,59 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 13 Jan 2015 13:33:39 +0100
-From: Phoebe Buckheister <phoebe.buckheister@itwm.fraunhofer.de>
-To: Alexander Aring <alex.aring@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org,
-        kernel@pengutronix.de, marcel@holtmann.org, werner@almesberger.net,
-        mkl@pengutronix.de
-Subject: Re: [RFC bluetooth-next 1/2] af_ieee802154: fix struct
- ieee802154_addr_sa size
-Message-ID: <20150113133339.0272b42f@zoidberg>
-In-Reply-To: <1420929206-5771-2-git-send-email-alex.aring@gmail.com>
-References: <1420929206-5771-1-git-send-email-alex.aring@gmail.com>
-	<1420929206-5771-2-git-send-email-alex.aring@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+Subject: [PATCH] shared/gatt-client: Fix callback type in struct write_op
+Date: Tue, 13 Jan 2015 12:16:18 +0100
+Message-Id: <1421147778-22432-1-git-send-email-lukasz.rymanowski@tieto.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Callback type in struct write_op should be bt_gatt_client_callback_t as
+that type is provided by user in bt_gatt_client_write_value()
+---
+ src/shared/gatt-client.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-On Sat, 10 Jan 2015 23:33:25 +0100
-Alexander Aring <alex.aring@gmail.com> wrote:
+diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
+index 3042a6c..8acc752 100644
+--- a/src/shared/gatt-client.c
++++ b/src/shared/gatt-client.c
+@@ -1975,7 +1975,7 @@ bool bt_gatt_client_write_without_response(struct bt_gatt_client *client,
+ }
+ 
+ struct write_op {
+-	bt_gatt_result_callback_t callback;
++	bt_gatt_client_callback_t callback;
+ 	void *user_data;
+ 	bt_gatt_destroy_func_t destroy;
+ };
+-- 
+1.8.4
 
-> The structure "ieee802154_addr_sa" need to fit into the u8 sa_data[14]
-> from struct sockaddr, because there is a casting of "struct sockaddr"
-> and "struct ieee802154_sockaddr".
-> 
-> I tested a compiling with a 32 bit system and detected that the
-> "struct ieee802154_sockaddr", which contains the ieee802154_addr_sa
-> structure, has a size of 20 bytes. The "struct sockaddr" has a size
-> of 16 bytes. This doesn't fit together and some buffers are
-> overflows. This patch changes the "addr_type" type definition from
-> "int" to "u8". After this change it will be fits together.
-
-Do look at how Unix domain sockets handle the problem. Also, IPv6
-addresses exceed sizeof(struct sockaddr) quite significantly. Casting
-pointers isn't a problem, only if we *ever* store our addrs to a struct
-sockaddr will we have a problem.
-
-Perhaps I am missing something, but from what I can tell, i think the
-code is safe at least in that regard.
-
-> Signed-off-by: Alexander Aring <alex.aring@gmail.com>
-> ---
->  include/net/af_ieee802154.h | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/include/net/af_ieee802154.h b/include/net/af_ieee802154.h
-> index 7d38e2f..3652269 100644
-> --- a/include/net/af_ieee802154.h
-> +++ b/include/net/af_ieee802154.h
-> @@ -33,7 +33,7 @@ enum {
->  #define IEEE802154_ADDR_LEN	8
->  
->  struct ieee802154_addr_sa {
-> -	int addr_type;
-> +	u8 addr_type;
->  	u16 pan_id;
->  	union {
->  		u8 hwaddr[IEEE802154_ADDR_LEN];
