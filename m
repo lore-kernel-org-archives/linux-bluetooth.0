@@ -1,43 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1421141528-32053-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1421141528-32053-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-Date: Tue, 13 Jan 2015 15:39:37 -0200
-Message-ID: <CABBYNZ+qe2ivohzpE_8baa1ys=Ngdmzeprna27CwWB=OLrP2wA@mail.gmail.com>
-Subject: Re: [PATCH] shared/gatt: Fix typo in request_create check
+In-Reply-To: <1421147778-22432-1-git-send-email-lukasz.rymanowski@tieto.com>
+References: <1421147778-22432-1-git-send-email-lukasz.rymanowski@tieto.com>
+Date: Tue, 13 Jan 2015 14:14:48 -0200
+Message-ID: <CABBYNZKZUU7QarPf5ShaR=yO1h+xoYbzxED68Pt53J8EfHH6cA@mail.gmail.com>
+Subject: Re: [PATCH] shared/gatt-client: Fix callback type in struct write_op
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+Hi Lukasz,
 
-On Tue, Jan 13, 2015 at 7:32 AM, Andrei Emeltchenko
-<Andrei.Emeltchenko.news@gmail.com> wrote:
-> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
->
-> Fixes typo, check for req instead of client.
+On Tue, Jan 13, 2015 at 9:16 AM, Lukasz Rymanowski
+<lukasz.rymanowski@tieto.com> wrote:
+> Callback type in struct write_op should be bt_gatt_client_callback_t as
+> that type is provided by user in bt_gatt_client_write_value()
 > ---
 >  src/shared/gatt-client.c | 2 +-
 >  1 file changed, 1 insertion(+), 1 deletion(-)
 >
 > diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
-> index 2c14c3a..42dc504 100644
+> index 3042a6c..8acc752 100644
 > --- a/src/shared/gatt-client.c
 > +++ b/src/shared/gatt-client.c
-> @@ -1895,7 +1895,7 @@ unsigned int bt_gatt_client_read_multiple(struct bt_gatt_client *client,
->                 return 0;
+> @@ -1975,7 +1975,7 @@ bool bt_gatt_client_write_without_response(struct bt_gatt_client *client,
+>  }
 >
->         req = request_create(client);
-> -       if (!client) {
-> +       if (!req) {
->                 free(op);
->                 return 0;
->         }
+>  struct write_op {
+> -       bt_gatt_result_callback_t callback;
+> +       bt_gatt_client_callback_t callback;
+>         void *user_data;
+>         bt_gatt_destroy_func_t destroy;
+>  };
 > --
-> 2.1.0
+> 1.8.4
 
 Applied, thanks.
 
