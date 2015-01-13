@@ -1,98 +1,161 @@
 Return-Path: <cyrus@holtmann.org>
-From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 3/4] android/pan: Change PAN record and name it as NAP record
-Date: Tue, 13 Jan 2015 15:30:52 +0100
-Message-Id: <1421159453-5535-3-git-send-email-grzegorz.kolodziejczyk@tieto.com>
-In-Reply-To: <1421159453-5535-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
-References: <1421159453-5535-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 01/11] android/tester: Use uint16_t for handles
+Date: Tue, 13 Jan 2015 14:48:44 +0100
+Message-ID: <5620633.L9LTxfBoZk@uw000953>
+In-Reply-To: <1420708669-32600-1-git-send-email-jakub.tyszkowski@tieto.com>
+References: <1420708669-32600-1-git-send-email-jakub.tyszkowski@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Current sdp record which is registering is NAP record it should be named
-correctly.
----
- android/pan.c | 24 ++++++++++++------------
- 1 file changed, 12 insertions(+), 12 deletions(-)
+Hi Jakub,
 
-diff --git a/android/pan.c b/android/pan.c
-index 714e926..e401001 100644
---- a/android/pan.c
-+++ b/android/pan.c
-@@ -710,10 +710,10 @@ static const struct ipc_handler cmd_handlers[] = {
- 	{ bt_pan_disconnect, false, sizeof(struct hal_cmd_pan_disconnect) },
- };
- 
--static sdp_record_t *pan_record(void)
-+static sdp_record_t *nap_record(void)
- {
- 	sdp_list_t *svclass, *pfseq, *apseq, *root, *aproto;
--	uuid_t root_uuid, pan, l2cap, bnep;
-+	uuid_t root_uuid, nap, l2cap, bnep;
- 	sdp_profile_desc_t profile[1];
- 	sdp_list_t *proto[2];
- 	sdp_data_t *v, *p;
-@@ -732,8 +732,8 @@ static sdp_record_t *pan_record(void)
- 	record->attrlist = NULL;
- 	record->pattern = NULL;
- 
--	sdp_uuid16_create(&pan, NAP_SVCLASS_ID);
--	svclass = sdp_list_append(NULL, &pan);
-+	sdp_uuid16_create(&nap, NAP_SVCLASS_ID);
-+	svclass = sdp_list_append(NULL, &nap);
- 	sdp_set_service_classes(record, svclass);
- 
- 	sdp_uuid16_create(&profile[0].uuid, NAP_PROFILE_ID);
-@@ -787,41 +787,41 @@ static sdp_record_t *pan_record(void)
- 
- bool bt_pan_register(struct ipc *ipc, const bdaddr_t *addr, uint8_t mode)
- {
--	sdp_record_t *rec;
-+	sdp_record_t *nap_rec;
- 	int err;
- 
- 	DBG("");
- 
- 	bacpy(&adapter_addr, addr);
- 
--	rec = pan_record();
--	if (!rec) {
-+	nap_rec = nap_record();
-+	if (!nap_rec) {
- 		error("Failed to allocate PAN record");
- 		return false;
- 	}
- 
--	if (bt_adapter_add_record(rec, SVC_HINT_NETWORKING) < 0) {
-+	if (bt_adapter_add_record(nap_rec, SVC_HINT_NETWORKING) < 0) {
- 		error("Failed to register PAN record");
--		sdp_record_free(rec);
-+		sdp_record_free(nap_rec);
- 		return false;
- 	}
- 
- 	err = bnep_init();
- 	if (err < 0) {
- 		error("bnep init failed");
--		bt_adapter_remove_record(rec->handle);
-+		bt_adapter_remove_record(nap_rec->handle);
- 		return false;
- 	}
- 
- 	err = register_nap_server();
- 	if (err < 0) {
- 		error("Failed to register NAP");
--		bt_adapter_remove_record(rec->handle);
-+		bt_adapter_remove_record(nap_rec->handle);
- 		bnep_cleanup();
- 		return false;
- 	}
- 
--	nap_rec_id = rec->handle;
-+	nap_rec_id = nap_rec->handle;
- 
- 	hal_ipc = ipc;
- 	ipc_register(hal_ipc, HAL_SERVICE_ID_PAN, cmd_handlers,
+On Thursday 08 of January 2015 10:17:39 Jakub Tyszkowski wrote:
+> Handles are only 2 bytes in size. We should use uint16_t to be able to
+> safely cast iovec with such handle to uint16_t and vice versa.
+> ---
+>  android/tester-gatt.c | 28 ++++++++++++++--------------
+>  android/tester-main.h | 16 ++++++++--------
+>  2 files changed, 22 insertions(+), 22 deletions(-)
+> 
+> diff --git a/android/tester-gatt.c b/android/tester-gatt.c
+> index f6b0492..f4d22fd 100644
+> --- a/android/tester-gatt.c
+> +++ b/android/tester-gatt.c
+> @@ -81,9 +81,9 @@
+>  
+>  static struct queue *list; /* List of gatt test cases */
+>  
+> -static int srvc1_handle;
+> -static int inc_srvc1_handle;
+> -static int char1_handle;
+> +static uint16_t srvc1_handle;
+> +static uint16_t inc_srvc1_handle;
+> +static uint16_t char1_handle;
+>  
+>  struct set_att_data {
+>  	char *to;
+> @@ -92,7 +92,7 @@ struct set_att_data {
+>  };
+>  
+>  struct att_write_req_data {
+> -	int *attr_handle;
+> +	uint16_t *attr_handle;
+>  	uint8_t *value;
+>  };
+>  
+> @@ -189,12 +189,12 @@ struct add_service_data {
+>  
+>  struct add_included_service_data {
+>  	int app_id;
+> -	int *inc_srvc_handle;
+> -	int *srvc_handle;
+> +	uint16_t *inc_srvc_handle;
+> +	uint16_t *srvc_handle;
+>  };
+>  struct add_char_data {
+>  	int app_id;
+> -	int *srvc_handle;
+> +	uint16_t *srvc_handle;
+>  	bt_uuid_t *uuid;
+>  	int properties;
+>  	int permissions;
+> @@ -202,30 +202,30 @@ struct add_char_data {
+>  
+>  struct add_desc_data {
+>  	int app_id;
+> -	int *srvc_handle;
+> +	uint16_t *srvc_handle;
+>  	bt_uuid_t *uuid;
+>  	int permissions;
+>  };
+>  
+>  struct start_srvc_data {
+>  	int app_id;
+> -	int *srvc_handle;
+> +	uint16_t *srvc_handle;
+>  	int transport;
+>  };
+>  
+>  struct stop_srvc_data {
+>  	int app_id;
+> -	int *srvc_handle;
+> +	uint16_t *srvc_handle;
+>  };
+>  
+>  struct delete_srvc_data {
+>  	int app_id;
+> -	int *srvc_handle;
+> +	uint16_t *srvc_handle;
+>  };
+>  
+>  struct send_indication_data {
+>  	int app_id;
+> -	int *attr_handle;
+> +	uint16_t *attr_handle;
+>  	int conn_id;
+>  	int len;
+>  	int confirm;
+> @@ -531,7 +531,7 @@ static struct add_service_data add_sec_service_data_1 = {
+>  	.num_handles = 1
+>  };
+>  
+> -static int srvc_bad_handle = -1;
+> +static uint16_t srvc_bad_handle = 0xffff;
+>  
+>  static struct add_included_service_data add_inc_service_data_1 = {
+>  	.app_id = APP1_ID,
+> @@ -634,7 +634,7 @@ static struct delete_srvc_data delete_bad_srvc_data_1 = {
+>  	.srvc_handle = &srvc_bad_handle
+>  };
+>  
+> -static int srvc_indication_handle_1 = 0x01;
+> +static uint16_t srvc_indication_handle_1 = 0x01;
+>  
+>  static struct send_indication_data send_indication_data_1 = {
+>  	.app_id = APP1_ID,
+> diff --git a/android/tester-main.h b/android/tester-main.h
+> index dc1a2bb..7fe73fe 100644
+> --- a/android/tester-main.h
+> +++ b/android/tester-main.h
+> @@ -651,11 +651,11 @@ struct bt_callback_data {
+>  	int offset;
+>  	bool is_long;
+>  	int connected;
+> -	int *attr_handle;
+> -	int *srvc_handle;
+> -	int *inc_srvc_handle;
+> -	int *char_handle;
+> -	int *desc_handle;
+> +	uint16_t *attr_handle;
+> +	uint16_t *srvc_handle;
+> +	uint16_t *inc_srvc_handle;
+> +	uint16_t *char_handle;
+> +	uint16_t *desc_handle;
+>  	btgatt_srvc_id_t *service;
+>  	btgatt_gatt_id_t *characteristic;
+>  	btgatt_gatt_id_t *descriptor;
+> @@ -709,9 +709,9 @@ struct step {
+>  	void *set_data_to;
+>  	int set_data_len;
+>  
+> -	int *store_srvc_handle;
+> -	int *store_char_handle;
+> -	int *store_desc_handle;
+> +	uint16_t *store_srvc_handle;
+> +	uint16_t *store_char_handle;
+> +	uint16_t *store_desc_handle;
+>  };
+>  
+>  struct test_case {
+> 
+
+Patches 1-5 applied, thanks.
+
 -- 
-1.9.3
-
+Best regards, 
+Szymon Janc
