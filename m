@@ -1,85 +1,85 @@
 Return-Path: <cyrus@holtmann.org>
-From: Gowtham Anandha Babu <gowtham.ab@samsung.com>
+From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: bharat.panda@samsung.com, cpgs@samsung.com
-References: <1420466575-14615-1-git-send-email-gowtham.ab@samsung.com>
-In-reply-to: <1420466575-14615-1-git-send-email-gowtham.ab@samsung.com>
-Subject: RE: [PATCH] Bluetooth: Remove dead code
-Date: Tue, 13 Jan 2015 12:22:58 +0530
-Message-id: <000401d02efd$92b05e60$b8111b20$@samsung.com>
-MIME-version: 1.0
-Content-type: text/plain; charset=us-ascii
+Subject: [PATCH] Bluetooth: Move Delete Stored Link Key to 4th phase of initialization
+Date: Mon, 12 Jan 2015 22:47:22 -0800
+Message-Id: <1421131642-7284-1-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+This moves the execution of Delete Stored Link Key command to the
+hci_init4_req phase. No actual code has been changed. The command
+is just executed at a later stage of the initialization.
 
+Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+---
+ net/bluetooth/hci_core.c | 46 +++++++++++++++++++++++-----------------------
+ 1 file changed, 23 insertions(+), 23 deletions(-)
 
-Ping.
-
-> -----Original Message-----
-> From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-
-> owner@vger.kernel.org] On Behalf Of Gowtham Anandha Babu
-> Sent: Monday, January 05, 2015 7:33 PM
-> To: linux-bluetooth@vger.kernel.org
-> Cc: bharat.panda@samsung.com; cpgs@samsung.com; Gowtham Anandha
-> Babu
-> Subject: [PATCH] Bluetooth: Remove dead code
-> 
-> Variable 'controller' is assigned a value that is never used.
-> Identified by cppcheck tool.
-> 
-> Signed-off-by: Gowtham Anandha Babu <gowtham.ab@samsung.com>
-> ---
->  net/bluetooth/cmtp/capi.c | 6 ------
->  1 file changed, 6 deletions(-)
-> 
-> diff --git a/net/bluetooth/cmtp/capi.c b/net/bluetooth/cmtp/capi.c index
-> 1ca8a87..75bd2c4 100644
-> --- a/net/bluetooth/cmtp/capi.c
-> +++ b/net/bluetooth/cmtp/capi.c
-> @@ -253,8 +253,6 @@ static void cmtp_recv_interopmsg(struct
-> cmtp_session *session, struct sk_buff *s
->  			if (skb->len < CAPI_MSG_BASELEN + 15)
->  				break;
-> 
-> -			controller = CAPIMSG_U32(skb->data,
-> CAPI_MSG_BASELEN + 10);
-> -
->  			if (!info && ctrl) {
->  				int len = min_t(uint,
-> CAPI_MANUFACTURER_LEN,
->  						skb-
-> >data[CAPI_MSG_BASELEN + 14]); @@ -270,8 +268,6 @@ static void
-> cmtp_recv_interopmsg(struct cmtp_session *session, struct sk_buff *s
->  			if (skb->len < CAPI_MSG_BASELEN + 32)
->  				break;
-> 
-> -			controller = CAPIMSG_U32(skb->data,
-> CAPI_MSG_BASELEN + 12);
-> -
->  			if (!info && ctrl) {
->  				ctrl->version.majorversion =
-> CAPIMSG_U32(skb->data, CAPI_MSG_BASELEN + 16);
->  				ctrl->version.minorversion =
-> CAPIMSG_U32(skb->data, CAPI_MSG_BASELEN + 20); @@ -285,8 +281,6
-> @@ static void cmtp_recv_interopmsg(struct cmtp_session *session, struct
-> sk_buff *s
->  			if (skb->len < CAPI_MSG_BASELEN + 17)
->  				break;
-> 
-> -			controller = CAPIMSG_U32(skb->data,
-> CAPI_MSG_BASELEN + 12);
-> -
->  			if (!info && ctrl) {
->  				int len = min_t(uint, CAPI_SERIAL_LEN,
->  						skb-
-> >data[CAPI_MSG_BASELEN + 16]);
-> --
-> 1.9.1
-> 
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth"
-in
-> the body of a message to majordomo@vger.kernel.org More majordomo
-> info at  http://vger.kernel.org/majordomo-info.html
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index 96572a48948e..c04197347c90 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -739,29 +739,6 @@ static void hci_init3_req(struct hci_request *req, unsigned long opt)
+ 		hci_req_add(req, HCI_OP_READ_STORED_LINK_KEY, sizeof(cp), &cp);
+ 	}
+ 
+-	/* Some Broadcom based Bluetooth controllers do not support the
+-	 * Delete Stored Link Key command. They are clearly indicating its
+-	 * absence in the bit mask of supported commands.
+-	 *
+-	 * Check the supported commands and only if the the command is marked
+-	 * as supported send it. If not supported assume that the controller
+-	 * does not have actual support for stored link keys which makes this
+-	 * command redundant anyway.
+-	 *
+-	 * Some controllers indicate that they support handling deleting
+-	 * stored link keys, but they don't. The quirk lets a driver
+-	 * just disable this command.
+-	 */
+-	if (hdev->commands[6] & 0x80 &&
+-	    !test_bit(HCI_QUIRK_BROKEN_STORED_LINK_KEY, &hdev->quirks)) {
+-		struct hci_cp_delete_stored_link_key cp;
+-
+-		bacpy(&cp.bdaddr, BDADDR_ANY);
+-		cp.delete_all = 0x01;
+-		hci_req_add(req, HCI_OP_DELETE_STORED_LINK_KEY,
+-			    sizeof(cp), &cp);
+-	}
+-
+ 	if (hdev->commands[5] & 0x10)
+ 		hci_setup_link_policy(req);
+ 
+@@ -853,6 +830,29 @@ static void hci_init4_req(struct hci_request *req, unsigned long opt)
+ {
+ 	struct hci_dev *hdev = req->hdev;
+ 
++	/* Some Broadcom based Bluetooth controllers do not support the
++	 * Delete Stored Link Key command. They are clearly indicating its
++	 * absence in the bit mask of supported commands.
++	 *
++	 * Check the supported commands and only if the the command is marked
++	 * as supported send it. If not supported assume that the controller
++	 * does not have actual support for stored link keys which makes this
++	 * command redundant anyway.
++	 *
++	 * Some controllers indicate that they support handling deleting
++	 * stored link keys, but they don't. The quirk lets a driver
++	 * just disable this command.
++	 */
++	if (hdev->commands[6] & 0x80 &&
++	    !test_bit(HCI_QUIRK_BROKEN_STORED_LINK_KEY, &hdev->quirks)) {
++		struct hci_cp_delete_stored_link_key cp;
++
++		bacpy(&cp.bdaddr, BDADDR_ANY);
++		cp.delete_all = 0x01;
++		hci_req_add(req, HCI_OP_DELETE_STORED_LINK_KEY,
++			    sizeof(cp), &cp);
++	}
++
+ 	/* Set event mask page 2 if the HCI command for it is supported */
+ 	if (hdev->commands[22] & 0x04)
+ 		hci_set_event_mask_page_2(req);
+-- 
+2.1.0
 
