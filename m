@@ -1,10 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1421147778-22432-1-git-send-email-lukasz.rymanowski@tieto.com>
-References: <1421147778-22432-1-git-send-email-lukasz.rymanowski@tieto.com>
-Date: Tue, 13 Jan 2015 14:14:48 -0200
-Message-ID: <CABBYNZKZUU7QarPf5ShaR=yO1h+xoYbzxED68Pt53J8EfHH6cA@mail.gmail.com>
-Subject: Re: [PATCH] shared/gatt-client: Fix callback type in struct write_op
+In-Reply-To: <1421138488-2512-1-git-send-email-lukasz.rymanowski@tieto.com>
+References: <1421138488-2512-1-git-send-email-lukasz.rymanowski@tieto.com>
+Date: Tue, 13 Jan 2015 14:14:19 -0200
+Message-ID: <CABBYNZJRar7eR6u_64Sgqf481sJBYOUBRYeAc61_oFF4kuUcUg@mail.gmail.com>
+Subject: Re: [PATCH] shared/gatt-db: Fix crash on find by type search
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
@@ -14,27 +14,39 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Lukasz,
 
-On Tue, Jan 13, 2015 at 9:16 AM, Lukasz Rymanowski
+On Tue, Jan 13, 2015 at 6:41 AM, Lukasz Rymanowski
 <lukasz.rymanowski@tieto.com> wrote:
-> Callback type in struct write_op should be bt_gatt_client_callback_t as
-> that type is provided by user in bt_gatt_client_write_value()
+> Make sure all fields in search data are set.
+> Without this patch we got:
+>
+> ==29603== Conditional jump or move depends on uninitialised value(s)
+> ==29603==    at 0x409689: find_by_type (gatt-db.c:866)
+> ==29603==    by 0x40C1A7: queue_foreach (queue.c:251)
+> ==29603==    by 0x40A341: gatt_db_find_by_type (gatt-db.c:889)
+> ==29603==    by 0x408E8C: init_complete (gatt-client.c:1225)
+> ==29603==    by 0x4073B5: discover_descs_cb (gatt-client.c:690)
+> ==29603==    by 0x40CB1C: discover_descs_cb (gatt-helpers.c:1453)
+> ==29603==    by 0x405445: can_read_data (att.c:600)
+> ==29603==    by 0x40B097: io_callback (io-mainloop.c:123)
+> ==29603==    by 0x40BA3B: mainloop_run (mainloop.c:142)
+> ==29603==    by 0x401FD7: main (btgatt-client.c:1269)
 > ---
->  src/shared/gatt-client.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  src/shared/gatt-db.c | 2 ++
+>  1 file changed, 2 insertions(+)
 >
-> diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
-> index 3042a6c..8acc752 100644
-> --- a/src/shared/gatt-client.c
-> +++ b/src/shared/gatt-client.c
-> @@ -1975,7 +1975,7 @@ bool bt_gatt_client_write_without_response(struct bt_gatt_client *client,
->  }
+> diff --git a/src/shared/gatt-db.c b/src/shared/gatt-db.c
+> index 9a9cadc..13aa5e4 100644
+> --- a/src/shared/gatt-db.c
+> +++ b/src/shared/gatt-db.c
+> @@ -880,6 +880,8 @@ void gatt_db_find_by_type(struct gatt_db *db, uint16_t start_handle,
+>  {
+>         struct find_by_type_value_data data;
 >
->  struct write_op {
-> -       bt_gatt_result_callback_t callback;
-> +       bt_gatt_client_callback_t callback;
->         void *user_data;
->         bt_gatt_destroy_func_t destroy;
->  };
+> +       memset(&data, 0, sizeof(data));
+> +
+>         data.uuid = *type;
+>         data.start_handle = start_handle;
+>         data.end_handle = end_handle;
 > --
 > 1.8.4
 
