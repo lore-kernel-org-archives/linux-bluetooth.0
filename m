@@ -1,32 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
-From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH] shared/gatt-client: Fix callback type in struct write_op
-Date: Tue, 13 Jan 2015 12:16:18 +0100
-Message-Id: <1421147778-22432-1-git-send-email-lukasz.rymanowski@tieto.com>
+Subject: [PATCHv2 1/2] android/gatt: Fix dead code warnings
+Date: Tue, 13 Jan 2015 12:09:18 +0200
+Message-Id: <1421143759-32586-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <2133713.7aeGTCSDGs@uw000953>
+References: <2133713.7aeGTCSDGs@uw000953>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Callback type in struct write_op should be bt_gatt_client_callback_t as
-that type is provided by user in bt_gatt_client_write_value()
----
- src/shared/gatt-client.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
-index 3042a6c..8acc752 100644
---- a/src/shared/gatt-client.c
-+++ b/src/shared/gatt-client.c
-@@ -1975,7 +1975,7 @@ bool bt_gatt_client_write_without_response(struct bt_gatt_client *client,
- }
+gatt_db_attribute_get_permissions() used everywhere without check since
+those conditions are checked already.
+---
+ android/gatt.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/android/gatt.c b/android/gatt.c
+index b749705..8542f45 100644
+--- a/android/gatt.c
++++ b/android/gatt.c
+@@ -6355,8 +6355,7 @@ static void write_cmd_request(const uint8_t *cmd, uint16_t cmd_len,
+ 	if (!attrib)
+ 		return;
  
- struct write_op {
--	bt_gatt_result_callback_t callback;
-+	bt_gatt_client_callback_t callback;
- 	void *user_data;
- 	bt_gatt_destroy_func_t destroy;
- };
+-	if (!gatt_db_attribute_get_permissions(attrib, &permissions))
+-		return;
++	gatt_db_attribute_get_permissions(attrib, &permissions);
+ 
+ 	if (check_device_permissions(dev, cmd[0], permissions))
+ 		return;
 -- 
-1.8.4
+2.1.0
 
