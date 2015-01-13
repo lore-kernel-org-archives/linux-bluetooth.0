@@ -1,40 +1,46 @@
 Return-Path: <cyrus@holtmann.org>
-From: Arman Uguray <armansito@chromium.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Arman Uguray <armansito@chromium.org>
-Subject: [PATCH BlueZ v3 0/8] Implement doc/gatt-api.txt for client
-Date: Tue, 13 Jan 2015 19:30:59 -0800
-Message-Id: <1421206267-26369-1-git-send-email-armansito@chromium.org>
+MIME-Version: 1.0
+In-Reply-To: <1421141528-32053-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1421141528-32053-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Date: Tue, 13 Jan 2015 15:39:37 -0200
+Message-ID: <CABBYNZ+qe2ivohzpE_8baa1ys=Ngdmzeprna27CwWB=OLrP2wA@mail.gmail.com>
+Subject: Re: [PATCH] shared/gatt: Fix typo in request_create check
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-*v3:
-  - Fixed broken GATT service UUID management in its own patch.
-  - Other small fixes.
+Hi Andrei,
 
-Arman Uguray (8):
-  shared/gatt-db: Add service getter by UUID
-  core: device: Fix GATT profile probing
-  core: device: Fix broken GATT UUID management
-  profiles/gap: Fix probe/accept behavior.
-  core: service: Remove GATT handle logic
-  shared/gatt-db: Add "claimed" field to services
-  core: gatt: Use "claimed" instead of "active"
-  doc/gatt-api.txt: Update error names
+On Tue, Jan 13, 2015 at 7:32 AM, Andrei Emeltchenko
+<Andrei.Emeltchenko.news@gmail.com> wrote:
+> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+>
+> Fixes typo, check for req instead of client.
+> ---
+>  src/shared/gatt-client.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
+> index 2c14c3a..42dc504 100644
+> --- a/src/shared/gatt-client.c
+> +++ b/src/shared/gatt-client.c
+> @@ -1895,7 +1895,7 @@ unsigned int bt_gatt_client_read_multiple(struct bt_gatt_client *client,
+>                 return 0;
+>
+>         req = request_create(client);
+> -       if (!client) {
+> +       if (!req) {
+>                 free(op);
+>                 return 0;
+>         }
+> --
+> 2.1.0
 
- doc/gatt-api.txt     |  12 +-
- plugins/sixaxis.c    |   2 +-
- profiles/gap/gas.c   | 127 +++++++------
- src/adapter.c        |   8 +-
- src/device.c         | 498 +++++++++++++++++++++++++++++----------------------
- src/device.h         |   6 +-
- src/gatt-client.c    |   9 +-
- src/service.c        |  38 ----
- src/service.h        |   7 -
- src/shared/gatt-db.c |  46 +++++
- src/shared/gatt-db.h |   7 +
- 11 files changed, 428 insertions(+), 332 deletions(-)
+Applied, thanks.
+
 
 -- 
-2.2.0.rc0.207.ga3a616c
-
+Luiz Augusto von Dentz
