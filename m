@@ -2,174 +2,302 @@ Return-Path: <cyrus@holtmann.org>
 From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH 2/2] tools/btgatt-client: Add prepare and execute write
-Date: Wed, 14 Jan 2015 09:17:24 +0100
-Message-Id: <1421223444-9374-2-git-send-email-lukasz.rymanowski@tieto.com>
-In-Reply-To: <1421223444-9374-1-git-send-email-lukasz.rymanowski@tieto.com>
-References: <1421223444-9374-1-git-send-email-lukasz.rymanowski@tieto.com>
+Subject: [PATCH 1/2] shared/gatt-client: Add write prepare and execute
+Date: Wed, 14 Jan 2015 09:17:23 +0100
+Message-Id: <1421223444-9374-1-git-send-email-lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- tools/btgatt-client.c | 138 ++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 138 insertions(+)
+For Android we need explicit write prepare and execute commands in GATT
+client. This patch adds that.
 
-diff --git a/tools/btgatt-client.c b/tools/btgatt-client.c
-index 62c4d3e..1cfeaba 100644
---- a/tools/btgatt-client.c
-+++ b/tools/btgatt-client.c
-@@ -831,6 +831,140 @@ static void cmd_write_long_value(struct client *cli, char *cmd_str)
- 	free(value);
+Note that till now prepare and execute has been used only in long write.
+
+This patch makes sure that long write is not proceeded when prepare write
+has been called. Instead long write commands will be queued and
+once write execute command is done, queued long write requests will be
+proceeded.
+
+It does not work in other way. Meaning, when long write is ongoing,
+prepare write will not be proceeded nor queued. This feature can be
+added later on if really needed.
+
+Conflicts:
+	src/shared/gatt-client.c
+---
+ src/shared/gatt-client.c | 215 ++++++++++++++++++++++++++++++++++++++++++++++-
+ src/shared/gatt-client.h |  11 +++
+ 2 files changed, 225 insertions(+), 1 deletion(-)
+
+diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
+index 1acd34f..c7c29cf 100644
+--- a/src/shared/gatt-client.c
++++ b/src/shared/gatt-client.c
+@@ -75,6 +75,8 @@ struct bt_gatt_client {
+ 	struct queue *long_write_queue;
+ 	bool in_long_write;
+ 
++	bool in_prep_write;
++
+ 	/* List of registered disconnect/notification/indication callbacks */
+ 	struct queue *notify_list;
+ 	struct queue *notify_chrcs;
+@@ -2172,6 +2174,7 @@ unsigned int bt_gatt_client_write_without_response(
  }
  
-+static void write_prepare_usage(void)
+ struct write_op {
++	struct bt_gatt_client *client;
+ 	bt_gatt_client_callback_t callback;
+ 	void *user_data;
+ 	bt_gatt_destroy_func_t destroy;
+@@ -2524,7 +2527,7 @@ unsigned int bt_gatt_client_write_long_value(struct bt_gatt_client *client,
+ 	req->destroy = long_write_op_free;
+ 	req->long_write = true;
+ 
+-	if (client->in_long_write) {
++	if (client->in_long_write || client->in_prep_write) {
+ 		queue_push_tail(client->long_write_queue, req);
+ 		return req->id;
+ 	}
+@@ -2557,6 +2560,216 @@ unsigned int bt_gatt_client_write_long_value(struct bt_gatt_client *client,
+ 	return req->id;
+ }
+ 
++struct prep_write_op {
++	bt_gatt_client_write_long_callback_t callback;
++	void *user_data;
++	bt_gatt_destroy_func_t destroy;
++	uint8_t *pdu;
++	uint16_t pdu_len;
++};
++
++static void destroy_prep_write_op(void *data)
 +{
-+	printf("Usage: write-prepare <value_handle> <offset> <value>\n"
-+				"e.g.:\n"
-+				"\twrite-prepare 0x0001 00 01 00\n");
++	struct prep_write_op *op = data;
++
++	if (op->destroy)
++		op->destroy(op->user_data);
++
++	free(op->pdu);
++	free(op);
 +}
 +
-+static void cmd_write_prepare(struct client *cli, char *cmd_str)
++static void prep_write_cb(uint8_t opcode, const void *pdu, uint16_t length,
++								void *user_data)
 +{
-+	int i;
-+	char *argvbuf[516];
-+	char **argv = argvbuf;
-+	int argc = 0;
-+	uint16_t handle;
-+	uint16_t offset;
-+	char *endptr = NULL;
-+	unsigned int length;
-+	uint8_t *value = NULL;
++	struct request *req = user_data;
++	struct prep_write_op *op = req->data;
++	bool success;
++	uint8_t att_ecode;
++	bool reliable_error;
 +
-+	if (!bt_gatt_client_is_ready(cli->gatt)) {
-+		printf("GATT client not initialized\n");
-+		return;
-+	}
-+
-+	if (!parse_args(cmd_str, 514, argv, &argc)) {
-+		printf("Too many arguments\n");
-+		write_value_usage();
-+		return;
-+	}
-+
-+	if (argc < 3) {
-+		write_prepare_usage();
-+		return;
-+	}
-+
-+	handle = strtol(argv[0], &endptr, 0);
-+	if (!endptr || *endptr != '\0' || !handle) {
-+		printf("Invalid handle: %s\n", argv[0]);
-+		return;
-+	}
-+
-+	endptr = NULL;
-+	offset = strtol(argv[1], &endptr, 0);
-+	if (!endptr || *endptr != '\0' || errno == ERANGE) {
-+		printf("Invalid offset: %s\n", argv[1]);
-+		return;
-+	}
-+
-+	/*
-+	 * First two arguments are handle and offset. What remains is the value
-+	 * length
-+	 */
-+	length = argc - 2;
-+
-+	if (length == 0)
++	if (opcode == BT_ATT_OP_ERROR_RSP) {
++		success = false;
++		reliable_error = false;
++		att_ecode = process_error(pdu, length);
 +		goto done;
-+
-+	if (length > UINT16_MAX) {
-+		printf("Write value too long\n");
-+		return;
 +	}
 +
-+	value = malloc(length);
-+	if (!value) {
-+		printf("Failed to allocate memory for value\n");
-+		return;
++	if (opcode != BT_ATT_OP_PREP_WRITE_RSP) {
++		success = false;
++		reliable_error = false;
++		att_ecode = 0;
++		goto done;
 +	}
 +
-+	for (i = 2; i < argc; i++) {
-+		if (strlen(argv[i]) != 2) {
-+			printf("Invalid value byte: %s\n", argv[i]);
-+			free(value);
-+			return;
-+		}
-+
-+		value[i-2] = strtol(argv[i], &endptr, 0);
-+		if (endptr == argv[i] || *endptr != '\0' || errno == ERANGE) {
-+			printf("Invalid value byte: %s\n", argv[i]);
-+			free(value);
-+			return;
-+		}
++	if (!pdu || length != op->pdu_len ||
++					memcmp(pdu, op->pdu, op->pdu_len)) {
++		success = false;
++		reliable_error = true;
++		att_ecode = 0;
++		goto done;
 +	}
++
++	success = true;
++	reliable_error = false;
++	att_ecode = 0;
 +
 +done:
-+	if (!bt_gatt_client_prepare_write(cli->gatt, handle, offset, value,
-+						length, write_long_cb, NULL,
-+						NULL))
-+		printf("Failed to proceed prepare write\n");
-+
-+	free(value);
++	if (op->callback)
++		op->callback(success, reliable_error, att_ecode, op->user_data);
 +}
 +
-+static void write_execute_usage(void)
++unsigned int bt_gatt_client_prepare_write(struct bt_gatt_client *client,
++				uint16_t value_handle, uint16_t offset,
++				uint8_t *value, uint16_t length,
++				bt_gatt_client_write_long_callback_t callback,
++				void *user_data,
++				bt_gatt_client_destroy_func_t destroy)
 +{
-+	printf("Usage: write-execute <execute>\n"
-+				"e.g.:\n"
-+				"\twrite-execute 1\n");
++	struct request *req;
++	struct prep_write_op *op;
++	uint8_t pdu[4 + length];
++
++	if (!client)
++		return 0;
++
++	if (client->in_long_write)
++		return 0;
++
++	op = new0(struct prep_write_op, 1);
++	if (!op)
++		return 0;
++
++	req = request_create(client);
++	if (!req) {
++		free(op);
++		return 0;
++	}
++
++	op->callback = callback;
++	op->user_data = user_data;
++	op->destroy = destroy;
++
++	req->data = op;
++	req->destroy = destroy_prep_write_op;
++
++	put_le16(value_handle, pdu);
++	put_le16(offset, pdu + 2);
++	memcpy(pdu + 4, value, length);
++
++	/*
++	 * Before sending command we need to remember pdu as we need to validate
++	 * it in the response. Store handle, offset and value. Therefore
++	 * increase length by 4 (handle + offset) as we need it in couple places
++	 * below
++	 */
++	length += 4;
++
++	op->pdu = malloc(length);
++	if (!op->pdu) {
++		op->destroy = NULL;
++		request_unref(req);
++		return 0;
++	}
++
++	memcpy(op->pdu, pdu, length);
++	op->pdu_len = length;
++
++	/* Now we are ready to send command */
++	req->att_id = bt_att_send(client->att, BT_ATT_OP_PREP_WRITE_REQ, pdu,
++					sizeof(pdu), prep_write_cb, req,
++					request_unref);
++	if (!req->att_id) {
++		op->destroy = NULL;
++		request_unref(req);
++		return 0;
++	}
++
++	client->in_prep_write = true;
++
++	return req->id;
 +}
 +
-+static void cmd_write_execute(struct client *cli, char *cmd_str)
++static void exec_write_cb(uint8_t opcode, const void *pdu, uint16_t length,
++								void *user_data)
 +{
-+	char *argvbuf[516];
-+	char **argv = argvbuf;
-+	int argc = 0;
-+	char *endptr = NULL;
-+	bool execute;
++	struct request *req = user_data;
++	struct write_op *op = req->data;
++	bool success;
++	uint8_t att_ecode;
 +
-+	if (!bt_gatt_client_is_ready(cli->gatt)) {
-+		printf("GATT client not initialized\n");
-+		return;
++	if (opcode == BT_ATT_OP_ERROR_RSP) {
++		success = false;
++		att_ecode = process_error(pdu, length);
++		goto done;
 +	}
 +
-+	if (!parse_args(cmd_str, 514, argv, &argc)) {
-+		printf("Too many arguments\n");
-+		write_value_usage();
-+		return;
++	if (opcode != BT_ATT_OP_EXEC_WRITE_RSP || pdu || length) {
++		success = false;
++		att_ecode = 0;
++		goto done;
 +	}
 +
-+	if (argc < 1) {
-+		write_execute_usage();
-+		return;
-+	}
++	success = true;
++	att_ecode = 0;
 +
-+	execute = !!strtol(argv[0], &endptr, 0);
-+	if (!endptr || *endptr != '\0') {
-+		printf("Invalid execute: %s\n", argv[0]);
-+		return;
-+	}
++done:
++	if (op->callback)
++		op->callback(success, att_ecode, op->user_data);
 +
-+	if (!bt_gatt_client_write_execute(cli->gatt, execute, write_cb,
-+								NULL, NULL))
-+		printf("Failed to proceed write execute\n");
++	op->client->in_prep_write = false;
++
++	start_next_long_write(op->client);
 +}
 +
- static void register_notify_usage(void)
++unsigned int bt_gatt_client_write_execute(struct bt_gatt_client *client,
++					bool execute,
++					bt_gatt_client_callback_t callback,
++					void *user_data,
++					bt_gatt_client_destroy_func_t destroy)
++{
++	struct request *req;
++	struct write_op *op;
++	uint8_t pdu;
++
++	if (!client)
++		return false;
++
++	if (client->in_long_write || !client->in_prep_write)
++		return false;
++
++	op = new0(struct write_op, 1);
++	if (!op)
++		return false;
++
++	req = request_create(client);
++	if (!req) {
++		free(op);
++		return 0;
++	}
++
++	op->client = client;
++	op->callback = callback;
++	op->user_data = user_data;
++	op->destroy = destroy;
++
++	pdu = execute ? 0x01 : 0x00;
++
++	req->data = op;
++	req->destroy = destroy_write_op;
++
++	req->att_id = bt_att_send(client->att, BT_ATT_OP_EXEC_WRITE_REQ, &pdu,
++						sizeof(pdu), exec_write_cb,
++						req, request_unref);
++	if (!req->att_id) {
++		op->destroy = NULL;
++		request_unref(req);
++		return 0;
++	}
++
++	return req->att_id;
++}
++
+ static bool match_notify_chrc_value_handle(const void *a, const void *b)
  {
- 	printf("Usage: register-notify <chrc value handle>\n");
-@@ -955,6 +1089,10 @@ static struct {
- 			"\tWrite a characteristic or descriptor value" },
- 	{ "write-long-value", cmd_write_long_value,
- 			"Write long characteristic or descriptor value" },
-+	{ "write-prepare", cmd_write_prepare,
-+			"Write prepare characteristic or descriptor value" },
-+	{ "write-execute", cmd_write_execute,
-+			"Execute already prepared write" },
- 	{ "register-notify", cmd_register_notify,
- 			"\tSubscribe to not/ind from a characteristic" },
- 	{ "unregister-notify", cmd_unregister_notify,
+ 	const struct notify_chrc *chrc = a;
+diff --git a/src/shared/gatt-client.h b/src/shared/gatt-client.h
+index 9a00feb..45c02c8 100644
+--- a/src/shared/gatt-client.h
++++ b/src/shared/gatt-client.h
+@@ -109,6 +109,17 @@ unsigned int bt_gatt_client_write_long_value(struct bt_gatt_client *client,
+ 				bt_gatt_client_write_long_callback_t callback,
+ 				void *user_data,
+ 				bt_gatt_client_destroy_func_t destroy);
++unsigned int bt_gatt_client_prepare_write(struct bt_gatt_client *client,
++				uint16_t value_handle, uint16_t offset,
++				uint8_t *value, uint16_t length,
++				bt_gatt_client_write_long_callback_t callback,
++				void *user_data,
++				bt_gatt_client_destroy_func_t destroy);
++unsigned int bt_gatt_client_write_execute(struct bt_gatt_client *client,
++					bool execute,
++					bt_gatt_client_callback_t callback,
++					void *user_data,
++					bt_gatt_client_destroy_func_t destroy);
+ 
+ bool bt_gatt_client_register_notify(struct bt_gatt_client *client,
+ 				uint16_t chrc_value_handle,
 -- 
 1.8.4
 
