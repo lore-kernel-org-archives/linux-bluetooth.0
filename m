@@ -1,30 +1,72 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 14 Jan 2015 10:02:18 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: btusb: Add internal recv_event callback for
- event processing
-Message-ID: <20150114080218.GA19106@t440s.P-661HNU-F1>
-References: <1421099470-21771-1-git-send-email-marcel@holtmann.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1421099470-21771-1-git-send-email-marcel@holtmann.org>
+From: Arman Uguray <armansito@chromium.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: Arman Uguray <armansito@chromium.org>
+Subject: [PATCH BlueZ v3 8/8] doc/gatt-api.txt: Update error names
+Date: Tue, 13 Jan 2015 19:31:07 -0800
+Message-Id: <1421206267-26369-9-git-send-email-armansito@chromium.org>
+In-Reply-To: <1421206267-26369-1-git-send-email-armansito@chromium.org>
+References: <1421206267-26369-1-git-send-email-armansito@chromium.org>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Updated possible error names that can be returned from
+ReadValue/WriteValue methods to match those currently returned from the
+experimental implementation.
+---
+ doc/gatt-api.txt | 12 ++++--------
+ 1 file changed, 4 insertions(+), 8 deletions(-)
 
-On Mon, Jan 12, 2015, Marcel Holtmann wrote:
-> Some new upcoming drivers need to process HCI events or take extra
-> actions based on them before handing the event to the Bluetooth core
-> for processing. The new recv_event callback allows exactly such an
-> internal behavior.
-> 
-> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
-> ---
->  drivers/bluetooth/btusb.c | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
+diff --git a/doc/gatt-api.txt b/doc/gatt-api.txt
+index f7125a2..bfeaf6d 100644
+--- a/doc/gatt-api.txt
++++ b/doc/gatt-api.txt
+@@ -75,9 +75,8 @@ Methods		array{byte} ReadValue()
+ 
+ 			Possible Errors: org.bluez.Error.Failed
+ 					 org.bluez.Error.InProgress
+-					 org.bluez.Error.ReadNotPermitted
++					 org.bluez.Error.NotPermitted
+ 					 org.bluez.Error.NotAuthorized
+-					 org.bluez.Error.NotPaired
+ 					 org.bluez.Error.NotSupported
+ 
+ 		void WriteValue(array{byte} value)
+@@ -87,10 +86,9 @@ Methods		array{byte} ReadValue()
+ 
+ 			Possible Errors: org.bluez.Error.Failed
+ 					 org.bluez.Error.InProgress
+-					 org.bluez.Error.WriteNotPermitted
++					 org.bluez.Error.NotPermitted
+ 					 org.bluez.Error.InvalidValueLength
+ 					 org.bluez.Error.NotAuthorized
+-					 org.bluez.Error.NotPaired
+ 					 org.bluez.Error.NotSupported
+ 
+ 		void StartNotify()
+@@ -175,9 +173,8 @@ Methods		array{byte} ReadValue()
+ 
+ 			Possible Errors: org.bluez.Error.Failed
+ 					 org.bluez.Error.InProgress
+-					 org.bluez.Error.ReadNotPermitted
++					 org.bluez.Error.NotPermitted
+ 					 org.bluez.Error.NotAuthorized
+-					 org.bluez.Error.NotPaired
+ 					 org.bluez.Error.NotSupported
+ 
+ 		void WriteValue(array{byte} value)
+@@ -187,10 +184,9 @@ Methods		array{byte} ReadValue()
+ 
+ 			Possible Errors: org.bluez.Error.Failed
+ 					 org.bluez.Error.InProgress
+-					 org.bluez.Error.WriteNotPermitted
++					 org.bluez.Error.NotPermitted
+ 					 org.bluez.Error.InvalidValueLength
+ 					 org.bluez.Error.NotAuthorized
+-					 org.bluez.Error.NotPaired
+ 					 org.bluez.Error.NotSupported
+ 
+ Properties	string UUID [read-only]
+-- 
+2.2.0.rc0.207.ga3a616c
 
-Applied to bluetooth-next. Thanks.
-
-Johan
