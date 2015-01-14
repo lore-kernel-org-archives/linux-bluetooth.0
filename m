@@ -1,46 +1,65 @@
 Return-Path: <cyrus@holtmann.org>
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Fix valid Identity Address check
-Date: Wed, 14 Jan 2015 20:51:37 +0200
-Message-Id: <1421261497-11211-1-git-send-email-johan.hedberg@gmail.com>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 8.1 \(1993\))
+Subject: Re: [PATCH] Bluetooth: Add opcode parameter to hci_req_complete_t callback
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20150114081546.GD19106@t440s.P-661HNU-F1>
+Date: Wed, 14 Jan 2015 09:53:49 -0800
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <E99042C6-60DD-4810-8924-7F41CF76FB8A@holtmann.org>
+References: <1421013044-8613-1-git-send-email-marcel@holtmann.org> <20150112092404.GA4548@t440s.lan> <82D39EC7-4302-4C2B-A295-0FDC7B3C0EBC@holtmann.org> <20150114081546.GD19106@t440s.P-661HNU-F1>
+To: Johan Hedberg <johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@intel.com>
+Hi Johan,
 
-According to the Bluetooth core specification valid identity addresses
-are either Public Device Addresses or Static Random Addresses. IRKs
-received with any other type of address should be discarded since we
-cannot assume to know the permanent identity of the peer device.
+>>>> When hci_req_run() calls its provided complete function and one of the
+>>>> HCI commands in the sequence fails, then provide the opcode of failing
+>>>> command. In case of success HCI_OP_NOP is provided since all commands
+>>>> completed.
+>>>> 
+>>>> This patch fixes the prototype of hci_req_complete_t and all its users.
+>>>> 
+>>>> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+>>>> ---
+>>>> include/net/bluetooth/bluetooth.h |  2 +-
+>>>> net/bluetooth/hci_conn.c          |  2 +-
+>>>> net/bluetooth/hci_core.c          |  9 ++++----
+>>>> net/bluetooth/hci_request.c       |  3 ++-
+>>>> net/bluetooth/mgmt.c              | 44 ++++++++++++++++++++++-----------------
+>>>> 5 files changed, 34 insertions(+), 26 deletions(-)
+>>> 
+>>> Applied to bluetooth-next. Thanks.
+>>> 
+>>> Would it make sense to also change the return value of the callback from
+>>> void to bool. That way the callback could let the request handling code
+>>> know whether to proceed even after a single command failure or to abort
+>>> the request.
+>> 
+>> do we need this actually? Is there a case where we can continue if one
+>> of the commands fails.
+> 
+> I was mainly thinking of the various quirks we have for not issuing
+> certain commands for adapters that don't properly support them - another
+> way would be to simply ignore the errors from failing commands and
+> proceed with the init sequence anyway. But you're right, this may not be
+> a very useful feature.
 
-This patch fixes a missing check for the Identity Address when receiving
-the Identity Address Information SMP PDU.
+initially we did ignore failing commands if we did not consider them crucial. I think that was a big mistake. Actually having controller init fail and people having to dig out why these vendors screwed it up is a good idea. That way we know exactly what is going on. So I really want to keep it that way.
 
-Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
-Cc: stable@vger.kernel.org # 3.16+
----
- net/bluetooth/smp.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+>> I think what we actually need is to have a way to revert the actions
+>> taken by an earlier command. So if a command in sequence configured
+>> something, we might want to revert that action when a later command
+>> fails.
+> 
+> In theory sounds like a nice feature, but doubt this will work out very
+> well in the end, at least not in a generic way. If an HCI command fails
+> there's no guarantee that the "undo" HCI command wont fail too.
 
-diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
-index 379654e70e6f..04e49f8f0982 100644
---- a/net/bluetooth/smp.c
-+++ b/net/bluetooth/smp.c
-@@ -2305,8 +2305,12 @@ static int smp_cmd_ident_addr_info(struct l2cap_conn *conn,
- 	 * implementations are not known of and in order to not over
- 	 * complicate our implementation, simply pretend that we never
- 	 * received an IRK for such a device.
-+	 *
-+	 * The Identity Address must also be a Static Random or Public
-+	 * Address, which hci_is_identity_address() checks for.
- 	 */
--	if (!bacmp(&info->bdaddr, BDADDR_ANY)) {
-+	if (!bacmp(&info->bdaddr, BDADDR_ANY) ||
-+	    !hci_is_identity_address(&info->bdaddr, info->addr_type)) {
- 		BT_ERR("Ignoring IRK with no identity address");
- 		goto distribute;
- 	}
--- 
-2.1.0
+Agreed. You can not convert all of it. However we could worst case just reset the whole stack. Which is a feature that we need anyway to handle the Hardware Error event.
+
+Regards
+
+Marcel
 
