@@ -1,36 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 8.1 \(1993\))
+Subject: Re: [PATCH] Bluetooth: Fix valid Identity Address check
 From: Marcel Holtmann <marcel@holtmann.org>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Show device address type for L2CAP debugfs entries
-Date: Wed, 14 Jan 2015 13:44:21 -0800
-Message-Id: <1421271861-7212-1-git-send-email-marcel@holtmann.org>
+In-Reply-To: <1421261497-11211-1-git-send-email-johan.hedberg@gmail.com>
+Date: Wed, 14 Jan 2015 13:22:26 -0800
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <5DB20ABA-36C8-4064-9B2D-C60FFC02AD0A@holtmann.org>
+References: <1421261497-11211-1-git-send-email-johan.hedberg@gmail.com>
+To: Johan Hedberg <johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The devices address types are BR/EDR Public, LE Public and LE Random and
-any of these three is valid for L2CAP connections. So show the correct
-type in the debugfs list.
+Hi Johan,
 
-Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
----
- net/bluetooth/l2cap_core.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+> According to the Bluetooth core specification valid identity addresses
+> are either Public Device Addresses or Static Random Addresses. IRKs
+> received with any other type of address should be discarded since we
+> cannot assume to know the permanent identity of the peer device.
+> 
+> This patch fixes a missing check for the Identity Address when receiving
+> the Identity Address Information SMP PDU.
+> 
+> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+> Cc: stable@vger.kernel.org # 3.16+
+> ---
+> net/bluetooth/smp.c | 6 +++++-
+> 1 file changed, 5 insertions(+), 1 deletion(-)
 
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 11029b212874..4e7477d34eb8 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -7527,8 +7527,8 @@ static int l2cap_debugfs_show(struct seq_file *f, void *p)
- 	read_lock(&chan_list_lock);
- 
- 	list_for_each_entry(c, &chan_list, global_l) {
--		seq_printf(f, "%pMR %pMR %d %d 0x%4.4x 0x%4.4x %d %d %d %d\n",
--			   &c->src, &c->dst,
-+		seq_printf(f, "%pMR (%u) %pMR (%u) %d %d 0x%4.4x 0x%4.4x %d %d %d %d\n",
-+			   &c->src, c->src_type, &c->dst, c->dst_type,
- 			   c->state, __le16_to_cpu(c->psm),
- 			   c->scid, c->dcid, c->imtu, c->omtu,
- 			   c->sec_level, c->mode);
--- 
-2.1.0
+patch has been applied to bluetooth-next tree.
+
+Regards
+
+Marcel
 
