@@ -1,65 +1,335 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 8.1 \(1993\))
-Subject: Re: [PATCH] Bluetooth: Add opcode parameter to hci_req_complete_t callback
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20150114081546.GD19106@t440s.P-661HNU-F1>
-Date: Wed, 14 Jan 2015 09:53:49 -0800
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <E99042C6-60DD-4810-8924-7F41CF76FB8A@holtmann.org>
-References: <1421013044-8613-1-git-send-email-marcel@holtmann.org> <20150112092404.GA4548@t440s.lan> <82D39EC7-4302-4C2B-A295-0FDC7B3C0EBC@holtmann.org> <20150114081546.GD19106@t440s.P-661HNU-F1>
-To: Johan Hedberg <johan.hedberg@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <CABBYNZKGuUa8AFo53QTs6Un=uGN0=jH63x4in=k+5uu55OqSAA@mail.gmail.com>
+References: <1421223444-9374-1-git-send-email-lukasz.rymanowski@tieto.com>
+	<CABBYNZKGuUa8AFo53QTs6Un=uGN0=jH63x4in=k+5uu55OqSAA@mail.gmail.com>
+Date: Wed, 14 Jan 2015 14:52:01 +0100
+Message-ID: <CAMudyAuDt+apnn5e+PO+3cGokoL9Hw_tc=KrEM5dBmXMDm4kig@mail.gmail.com>
+Subject: Re: [PATCH 1/2] shared/gatt-client: Add write prepare and execute
+From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+Hi Luiz,
 
->>>> When hci_req_run() calls its provided complete function and one of the
->>>> HCI commands in the sequence fails, then provide the opcode of failing
->>>> command. In case of success HCI_OP_NOP is provided since all commands
->>>> completed.
->>>> 
->>>> This patch fixes the prototype of hci_req_complete_t and all its users.
->>>> 
->>>> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
->>>> ---
->>>> include/net/bluetooth/bluetooth.h |  2 +-
->>>> net/bluetooth/hci_conn.c          |  2 +-
->>>> net/bluetooth/hci_core.c          |  9 ++++----
->>>> net/bluetooth/hci_request.c       |  3 ++-
->>>> net/bluetooth/mgmt.c              | 44 ++++++++++++++++++++++-----------------
->>>> 5 files changed, 34 insertions(+), 26 deletions(-)
->>> 
->>> Applied to bluetooth-next. Thanks.
->>> 
->>> Would it make sense to also change the return value of the callback from
->>> void to bool. That way the callback could let the request handling code
->>> know whether to proceed even after a single command failure or to abort
->>> the request.
->> 
->> do we need this actually? Is there a case where we can continue if one
->> of the commands fails.
-> 
-> I was mainly thinking of the various quirks we have for not issuing
-> certain commands for adapters that don't properly support them - another
-> way would be to simply ignore the errors from failing commands and
-> proceed with the init sequence anyway. But you're right, this may not be
-> a very useful feature.
+On 14 January 2015 at 13:56, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> Hi Lukasz,
+>
+> On Wed, Jan 14, 2015 at 6:17 AM, Lukasz Rymanowski
+> <lukasz.rymanowski@tieto.com> wrote:
+>> For Android we need explicit write prepare and execute commands in GATT
+>> client. This patch adds that.
+>>
+>> Note that till now prepare and execute has been used only in long write.
+>>
+>> This patch makes sure that long write is not proceeded when prepare write
+>> has been called. Instead long write commands will be queued and
+>> once write execute command is done, queued long write requests will be
+>> proceeded.
+>>
+>> It does not work in other way. Meaning, when long write is ongoing,
+>> prepare write will not be proceeded nor queued. This feature can be
+>> added later on if really needed.
+>>
+>> Conflicts:
+>>         src/shared/gatt-client.c
+>> ---
+>>  src/shared/gatt-client.c | 215 ++++++++++++++++++++++++++++++++++++++++++++++-
+>>  src/shared/gatt-client.h |  11 +++
+>>  2 files changed, 225 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
+>> index 1acd34f..c7c29cf 100644
+>> --- a/src/shared/gatt-client.c
+>> +++ b/src/shared/gatt-client.c
+>> @@ -75,6 +75,8 @@ struct bt_gatt_client {
+>>         struct queue *long_write_queue;
+>>         bool in_long_write;
+>>
+>> +       bool in_prep_write;
+>> +
+>>         /* List of registered disconnect/notification/indication callbacks */
+>>         struct queue *notify_list;
+>>         struct queue *notify_chrcs;
+>> @@ -2172,6 +2174,7 @@ unsigned int bt_gatt_client_write_without_response(
+>>  }
+>>
+>>  struct write_op {
+>> +       struct bt_gatt_client *client;
+>>         bt_gatt_client_callback_t callback;
+>>         void *user_data;
+>>         bt_gatt_destroy_func_t destroy;
+>> @@ -2524,7 +2527,7 @@ unsigned int bt_gatt_client_write_long_value(struct bt_gatt_client *client,
+>>         req->destroy = long_write_op_free;
+>>         req->long_write = true;
+>>
+>> -       if (client->in_long_write) {
+>> +       if (client->in_long_write || client->in_prep_write) {
+>>                 queue_push_tail(client->long_write_queue, req);
+>>                 return req->id;
+>>         }
+>> @@ -2557,6 +2560,216 @@ unsigned int bt_gatt_client_write_long_value(struct bt_gatt_client *client,
+>>         return req->id;
+>>  }
+>>
+>> +struct prep_write_op {
+>> +       bt_gatt_client_write_long_callback_t callback;
+>> +       void *user_data;
+>> +       bt_gatt_destroy_func_t destroy;
+>> +       uint8_t *pdu;
+>> +       uint16_t pdu_len;
+>> +};
+>> +
+>> +static void destroy_prep_write_op(void *data)
+>> +{
+>> +       struct prep_write_op *op = data;
+>> +
+>> +       if (op->destroy)
+>> +               op->destroy(op->user_data);
+>> +
+>> +       free(op->pdu);
+>> +       free(op);
+>> +}
+>> +
+>> +static void prep_write_cb(uint8_t opcode, const void *pdu, uint16_t length,
+>> +                                                               void *user_data)
+>> +{
+>> +       struct request *req = user_data;
+>> +       struct prep_write_op *op = req->data;
+>> +       bool success;
+>> +       uint8_t att_ecode;
+>> +       bool reliable_error;
+>> +
+>> +       if (opcode == BT_ATT_OP_ERROR_RSP) {
+>> +               success = false;
+>> +               reliable_error = false;
+>> +               att_ecode = process_error(pdu, length);
+>> +               goto done;
+>> +       }
+>> +
+>> +       if (opcode != BT_ATT_OP_PREP_WRITE_RSP) {
+>> +               success = false;
+>> +               reliable_error = false;
+>> +               att_ecode = 0;
+>> +               goto done;
+>> +       }
+>> +
+>> +       if (!pdu || length != op->pdu_len ||
+>> +                                       memcmp(pdu, op->pdu, op->pdu_len)) {
+>> +               success = false;
+>> +               reliable_error = true;
+>> +               att_ecode = 0;
+>> +               goto done;
+>> +       }
+>> +
+>> +       success = true;
+>> +       reliable_error = false;
+>> +       att_ecode = 0;
+>> +
+>> +done:
+>> +       if (op->callback)
+>> +               op->callback(success, reliable_error, att_ecode, op->user_data);
+>> +}
+>> +
+>> +unsigned int bt_gatt_client_prepare_write(struct bt_gatt_client *client,
+>> +                               uint16_t value_handle, uint16_t offset,
+>> +                               uint8_t *value, uint16_t length,
+>> +                               bt_gatt_client_write_long_callback_t callback,
+>> +                               void *user_data,
+>> +                               bt_gatt_client_destroy_func_t destroy)
+>> +{
+>> +       struct request *req;
+>> +       struct prep_write_op *op;
+>> +       uint8_t pdu[4 + length];
+>> +
+>> +       if (!client)
+>> +               return 0;
+>> +
+>> +       if (client->in_long_write)
+>> +               return 0;
+>> +
+>> +       op = new0(struct prep_write_op, 1);
+>> +       if (!op)
+>> +               return 0;
+>> +
+>> +       req = request_create(client);
+>> +       if (!req) {
+>> +               free(op);
+>> +               return 0;
+>> +       }
+>> +
+>> +       op->callback = callback;
+>> +       op->user_data = user_data;
+>> +       op->destroy = destroy;
+>> +
+>> +       req->data = op;
+>> +       req->destroy = destroy_prep_write_op;
+>> +
+>> +       put_le16(value_handle, pdu);
+>> +       put_le16(offset, pdu + 2);
+>> +       memcpy(pdu + 4, value, length);
+>> +
+>> +       /*
+>> +        * Before sending command we need to remember pdu as we need to validate
+>> +        * it in the response. Store handle, offset and value. Therefore
+>> +        * increase length by 4 (handle + offset) as we need it in couple places
+>> +        * below
+>> +        */
+>> +       length += 4;
+>> +
+>> +       op->pdu = malloc(length);
+>> +       if (!op->pdu) {
+>> +               op->destroy = NULL;
+>> +               request_unref(req);
+>> +               return 0;
+>> +       }
+>> +
+>> +       memcpy(op->pdu, pdu, length);
+>> +       op->pdu_len = length;
+>> +
+>> +       /* Now we are ready to send command */
+>> +       req->att_id = bt_att_send(client->att, BT_ATT_OP_PREP_WRITE_REQ, pdu,
+>> +                                       sizeof(pdu), prep_write_cb, req,
+>> +                                       request_unref);
+>> +       if (!req->att_id) {
+>> +               op->destroy = NULL;
+>> +               request_unref(req);
+>> +               return 0;
+>> +       }
+>> +
+>> +       client->in_prep_write = true;
+>> +
+>> +       return req->id;
+>> +}
+>> +
+>> +static void exec_write_cb(uint8_t opcode, const void *pdu, uint16_t length,
+>> +                                                               void *user_data)
+>> +{
+>> +       struct request *req = user_data;
+>> +       struct write_op *op = req->data;
+>> +       bool success;
+>> +       uint8_t att_ecode;
+>> +
+>> +       if (opcode == BT_ATT_OP_ERROR_RSP) {
+>> +               success = false;
+>> +               att_ecode = process_error(pdu, length);
+>> +               goto done;
+>> +       }
+>> +
+>> +       if (opcode != BT_ATT_OP_EXEC_WRITE_RSP || pdu || length) {
+>> +               success = false;
+>> +               att_ecode = 0;
+>> +               goto done;
+>> +       }
+>> +
+>> +       success = true;
+>> +       att_ecode = 0;
+>> +
+>> +done:
+>> +       if (op->callback)
+>> +               op->callback(success, att_ecode, op->user_data);
+>> +
+>> +       op->client->in_prep_write = false;
+>> +
+>> +       start_next_long_write(op->client);
+>> +}
+>> +
+>> +unsigned int bt_gatt_client_write_execute(struct bt_gatt_client *client,
+>> +                                       bool execute,
+>> +                                       bt_gatt_client_callback_t callback,
+>> +                                       void *user_data,
+>> +                                       bt_gatt_client_destroy_func_t destroy)
+>> +{
+>> +       struct request *req;
+>> +       struct write_op *op;
+>> +       uint8_t pdu;
+>> +
+>> +       if (!client)
+>> +               return false;
+>> +
+>> +       if (client->in_long_write || !client->in_prep_write)
+>> +               return false;
+>> +
+>> +       op = new0(struct write_op, 1);
+>> +       if (!op)
+>> +               return false;
+>> +
+>> +       req = request_create(client);
+>> +       if (!req) {
+>> +               free(op);
+>> +               return 0;
+>> +       }
+>> +
+>> +       op->client = client;
+>> +       op->callback = callback;
+>> +       op->user_data = user_data;
+>> +       op->destroy = destroy;
+>> +
+>> +       pdu = execute ? 0x01 : 0x00;
+>> +
+>> +       req->data = op;
+>> +       req->destroy = destroy_write_op;
+>> +
+>> +       req->att_id = bt_att_send(client->att, BT_ATT_OP_EXEC_WRITE_REQ, &pdu,
+>> +                                               sizeof(pdu), exec_write_cb,
+>> +                                               req, request_unref);
+>> +       if (!req->att_id) {
+>> +               op->destroy = NULL;
+>> +               request_unref(req);
+>> +               return 0;
+>> +       }
+>> +
+>> +       return req->att_id;
+>> +}
+>> +
+>>  static bool match_notify_chrc_value_handle(const void *a, const void *b)
+>>  {
+>>         const struct notify_chrc *chrc = a;
+>> diff --git a/src/shared/gatt-client.h b/src/shared/gatt-client.h
+>> index 9a00feb..45c02c8 100644
+>> --- a/src/shared/gatt-client.h
+>> +++ b/src/shared/gatt-client.h
+>> @@ -109,6 +109,17 @@ unsigned int bt_gatt_client_write_long_value(struct bt_gatt_client *client,
+>>                                 bt_gatt_client_write_long_callback_t callback,
+>>                                 void *user_data,
+>>                                 bt_gatt_client_destroy_func_t destroy);
+>> +unsigned int bt_gatt_client_prepare_write(struct bt_gatt_client *client,
+>> +                               uint16_t value_handle, uint16_t offset,
+>> +                               uint8_t *value, uint16_t length,
+>> +                               bt_gatt_client_write_long_callback_t callback,
+>> +                               void *user_data,
+>> +                               bt_gatt_client_destroy_func_t destroy);
+>> +unsigned int bt_gatt_client_write_execute(struct bt_gatt_client *client,
+>> +                                       bool execute,
+>> +                                       bt_gatt_client_callback_t callback,
+>> +                                       void *user_data,
+>> +                                       bt_gatt_client_destroy_func_t destroy);
+>
+> I think it is better to leave execute flag to be handled internally by
+> bt_gatt_client_cancel (which seems already handle that).
 
-initially we did ignore failing commands if we did not consider them crucial. I think that was a big mistake. Actually having controller init fail and people having to dig out why these vendors screwed it up is a good idea. That way we know exactly what is going on. So I really want to keep it that way.
+Ah I see that bt_gatt_client_cancel send write execute 0x00 if there
+was ongoing long write.
+Maybe we could consider do same when does prepare write "manulay"
 
->> I think what we actually need is to have a way to revert the actions
->> taken by an earlier command. So if a command in sequence configured
->> something, we might want to revert that action when a later command
->> fails.
-> 
-> In theory sounds like a nice feature, but doubt this will work out very
-> well in the end, at least not in a generic way. If an HCI command fails
-> there's no guarantee that the "undo" HCI command wont fail too.
+However I would keep write_execute with execute flag as it is now.
+Android has API for that and it just makes things easy. Otherwise,
+Android GATT part would have to keep track on the req_id of prepared
+writes in order to use it when application does write execute 0x00. Is
+that fine?
 
-Agreed. You can not convert all of it. However we could worst case just reset the whole stack. Which is a feature that we need anyway to handle the Hardware Error event.
+BTW. What happens in case we have really long write. Then in between
+prepare writes user sends regular write request and  then user cancel
+that regular write before long write is finished?
 
-Regards
-
-Marcel
-
+BR
+\Lukasz
+>
+>
+>
+> --
+> Luiz Augusto von Dentz
