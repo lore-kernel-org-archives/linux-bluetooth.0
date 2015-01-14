@@ -2,127 +2,168 @@ Return-Path: <cyrus@holtmann.org>
 From: Jakub Pawlowski <jpawlowski@google.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Jakub Pawlowski <jpawlowski@google.com>
-Subject: [PATCH v8 2/2] Bluetooth: Add restarting to service discovery
-Date: Wed, 14 Jan 2015 05:09:45 -0800
-Message-Id: <1421240985-28944-2-git-send-email-jpawlowski@google.com>
-In-Reply-To: <1421240985-28944-1-git-send-email-jpawlowski@google.com>
-References: <1421240985-28944-1-git-send-email-jpawlowski@google.com>
+Subject: [PATCH v8 1/2] Bluetooth: Add le_scan_restart
+Date: Wed, 14 Jan 2015 05:09:44 -0800
+Message-Id: <1421240985-28944-1-git-send-email-jpawlowski@google.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-When using LE_SCAN_FILTER_DUP_ENABLE, some controllers would send
-advertising report from each LE device only once. That means that we
-don't get any updates on RSSI value, and makes Service Discovery very
-slow. This patch adds restarting scan when in Service Discovery, and
-device with filtered uuid is found, but it's not in RSSI range to send
-event yet. This way if device moves into range, we will quickly get RSSI
-update.
+Currently there is no way to restart le scan, and it's needed in
+service scan method. The way it work: it disable, and then enable le
+scan on controller.
 
 Signed-off-by: Jakub Pawlowski <jpawlowski@google.com>
 ---
- include/net/bluetooth/hci_core.h |  1 +
- net/bluetooth/mgmt.c             | 44 ++++++++++++++++++++++++++++++++++++----
- 2 files changed, 41 insertions(+), 4 deletions(-)
+ include/net/bluetooth/hci_core.h |  3 +++
+ net/bluetooth/hci_core.c         | 52 ++++++++++++++++++++++++++++++++++++++++
+ net/bluetooth/mgmt.c             |  7 +++++-
+ 3 files changed, 61 insertions(+), 1 deletion(-)
 
 diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 2339057..63cb0e8 100644
+index 1f21fe4..2339057 100644
 --- a/include/net/bluetooth/hci_core.h
 +++ b/include/net/bluetooth/hci_core.h
-@@ -1329,6 +1329,7 @@ void hci_sock_dev_event(struct hci_dev *hdev, int event);
- #define DISCOV_INTERLEAVED_TIMEOUT	5120	/* msec */
- #define DISCOV_INTERLEAVED_INQUIRY_LEN	0x04
- #define DISCOV_BREDR_INQUIRY_LEN	0x08
-+#define DISCOV_LE_RESTART_DELAY		200	/* msec */
+@@ -79,6 +79,7 @@ struct discovery_state {
+ 	s8			rssi;
+ 	u16			uuid_count;
+ 	u8			(*uuids)[16];
++	long			scan_end;
+ };
  
- int mgmt_control(struct sock *sk, struct msghdr *msg, size_t len);
- int mgmt_new_settings(struct hci_dev *hdev);
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 847c055b..658eb61 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -7171,6 +7171,16 @@ static bool eir_has_uuids(u8 *eir, u16 eir_len, u16 uuid_count, u8 (*uuids)[16])
- 	return false;
+ struct hci_conn_hash {
+@@ -351,6 +352,7 @@ struct hci_dev {
+ 	unsigned long		dev_flags;
+ 
+ 	struct delayed_work	le_scan_disable;
++	struct delayed_work	le_scan_restart;
+ 
+ 	__s8			adv_tx_power;
+ 	__u8			adv_data[HCI_MAX_AD_LENGTH];
+@@ -527,6 +529,7 @@ static inline void hci_discovery_filter_clear(struct hci_dev *hdev)
+ 	hdev->discovery.uuid_count = 0;
+ 	kfree(hdev->discovery.uuids);
+ 	hdev->discovery.uuids = NULL;
++	hdev->discovery.scan_end = 0;
  }
  
-+static void restart_le_scan(struct hci_dev *hdev)
+ bool hci_discovery_active(struct hci_dev *hdev);
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index c041973..813cdbf 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -1616,6 +1616,7 @@ static int hci_dev_do_close(struct hci_dev *hdev)
+ 		cancel_delayed_work(&hdev->service_cache);
+ 
+ 	cancel_delayed_work_sync(&hdev->le_scan_disable);
++	cancel_delayed_work_sync(&hdev->le_scan_restart);
+ 
+ 	if (test_bit(HCI_MGMT, &hdev->dev_flags))
+ 		cancel_delayed_work_sync(&hdev->rpa_expired);
+@@ -2790,12 +2791,15 @@ static void le_scan_disable_work_complete(struct hci_dev *hdev, u8 status,
+ 
+ 	switch (hdev->discovery.type) {
+ 	case DISCOV_TYPE_LE:
++		hdev->discovery.scan_end = 0;
+ 		hci_dev_lock(hdev);
+ 		hci_discovery_set_state(hdev, DISCOVERY_STOPPED);
+ 		hci_dev_unlock(hdev);
+ 		break;
+ 
+ 	case DISCOV_TYPE_INTERLEAVED:
++		hdev->discovery.scan_end = 0;
++
+ 		hci_req_init(&req, hdev);
+ 
+ 		memset(&cp, 0, sizeof(cp));
+@@ -2827,6 +2831,8 @@ static void le_scan_disable_work(struct work_struct *work)
+ 
+ 	BT_DBG("%s", hdev->name);
+ 
++	cancel_delayed_work_sync(&hdev->le_scan_restart);
++
+ 	hci_req_init(&req, hdev);
+ 
+ 	hci_req_add_le_scan_disable(&req);
+@@ -2836,6 +2842,51 @@ static void le_scan_disable_work(struct work_struct *work)
+ 		BT_ERR("Disable LE scanning request failed: err %d", err);
+ }
+ 
++static void le_scan_restart_work_complete(struct hci_dev *hdev, u8 status,
++					  u16 opcode)
 +{
++	BT_DBG("%s", hdev->name);
++	if (status) {
++		BT_ERR("Failed to restart LE scan: status %d", status);
++	} else if (test_bit(HCI_QUIRK_STRICT_DUPLICATE_FILTER, &hdev->quirks) &&
++		 hdev->discovery.scan_end != 0) {
++		long timeout = hdev->discovery.scan_end - jiffies;
++
++		if (timeout < 0)
++			timeout = 0;
++		queue_delayed_work(hdev->workqueue,
++				   &hdev->le_scan_disable, timeout);
++	}
++}
++
++static void le_scan_restart_work(struct work_struct *work)
++{
++	struct hci_dev *hdev = container_of(work, struct hci_dev,
++					    le_scan_restart.work);
++	struct hci_request req;
++	struct hci_cp_le_set_scan_enable cp;
++	int err;
++
++	BT_DBG("%s", hdev->name);
++
 +	/* If controller is not scanning we are done. */
 +	if (!test_bit(HCI_LE_SCAN, &hdev->dev_flags))
 +		return;
 +
-+	queue_delayed_work(hdev->workqueue, &hdev->le_scan_restart,
-+			   msecs_to_jiffies(DISCOV_LE_RESTART_DELAY));
++	hci_req_init(&req, hdev);
++
++	hci_req_add_le_scan_disable(&req);
++
++	memset(&cp, 0, sizeof(cp));
++	cp.enable = LE_SCAN_ENABLE;
++	cp.filter_dup = LE_SCAN_FILTER_DUP_ENABLE;
++	hci_req_add(&req, HCI_OP_LE_SET_SCAN_ENABLE, sizeof(cp), &cp);
++
++	err = hci_req_run(&req, le_scan_restart_work_complete);
++	if (err)
++		BT_ERR("Restart LE scan request failed: err %d", err);
 +}
 +
- void mgmt_device_found(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
- 		       u8 addr_type, u8 *dev_class, s8 rssi, u32 flags,
- 		       u8 *eir, u16 eir_len, u8 *scan_rsp, u8 scan_rsp_len)
-@@ -7200,7 +7210,9 @@ void mgmt_device_found(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
- 	 * the results are also dropped.
- 	 */
- 	if (hdev->discovery.rssi != HCI_RSSI_INVALID &&
--	    (rssi < hdev->discovery.rssi || rssi == HCI_RSSI_INVALID))
-+	    (rssi == HCI_RSSI_INVALID ||
-+	    (rssi < hdev->discovery.rssi && !test_bit(
-+			HCI_QUIRK_STRICT_DUPLICATE_FILTER, &hdev->quirks))))
- 		return;
+ /* Copy the Identity Address of the controller.
+  *
+  * If the controller has a public BD_ADDR, then by default use that one.
+@@ -2931,6 +2982,7 @@ struct hci_dev *hci_alloc_dev(void)
+ 	INIT_DELAYED_WORK(&hdev->power_off, hci_power_off);
+ 	INIT_DELAYED_WORK(&hdev->discov_off, hci_discov_off);
+ 	INIT_DELAYED_WORK(&hdev->le_scan_disable, le_scan_disable_work);
++	INIT_DELAYED_WORK(&hdev->le_scan_restart, le_scan_restart_work);
  
- 	/* Make sure that the buffer is big enough. The 5 extra bytes
-@@ -7234,12 +7246,20 @@ void mgmt_device_found(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
- 		 * kept and checking possible scan response data
- 		 * will be skipped.
- 		 */
--		if (hdev->discovery.uuid_count > 0)
-+		if (hdev->discovery.uuid_count > 0) {
- 			match = eir_has_uuids(eir, eir_len,
- 					      hdev->discovery.uuid_count,
- 					      hdev->discovery.uuids);
--		else
-+			/* we have service match. If duplicate filtering doesn't
-+			 * honour RSSI hanges, restart scan to make sure we'll
-+			 * get RSSI updates
-+			 */
-+			if (match && test_bit(HCI_QUIRK_STRICT_DUPLICATE_FILTER,
-+					      &hdev->quirks))
-+				restart_le_scan(hdev);
-+		} else {
- 			match = true;
-+		}
- 
- 		if (!match && !scan_rsp_len)
- 			return;
-@@ -7272,7 +7292,15 @@ void mgmt_device_found(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
- 						     hdev->discovery.uuid_count,
- 						     hdev->discovery.uuids))
- 				return;
--		}
-+
-+			/* we have service match. If duplicate filtering doesn't
-+			 * honour RSSI hanges, restart scan to make sure we'll
-+			 * get RSSI updates
-+			 */
-+			if (test_bit(HCI_QUIRK_STRICT_DUPLICATE_FILTER,
-+				     &hdev->quirks))
-+				restart_le_scan(hdev);
-+			}
- 
- 		/* Append scan response data to event */
- 		memcpy(ev->eir + eir_len, scan_rsp, scan_rsp_len);
-@@ -7285,6 +7313,14 @@ void mgmt_device_found(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
- 			return;
+ 	skb_queue_head_init(&hdev->rx_q);
+ 	skb_queue_head_init(&hdev->cmd_q);
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index e531da8..847c055b 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -3878,9 +3878,14 @@ static void start_discovery_complete(struct hci_dev *hdev, u8 status,
+ 		break;
  	}
  
-+	/* Check again wether RSSI value doesn't meet Service Discovery
-+	 * threshold. This might evaluate to true only if
-+	 * HCI_QUIRK_STRICT_DUPLICATE_FILTER is set.
-+	 */
-+	if (hdev->discovery.rssi != HCI_RSSI_INVALID &&
-+	    rssi < hdev->discovery.rssi)
-+		return;
+-	if (timeout)
++	if (timeout) {
++		if (hdev->discovery.uuid_count > 0 &&
++		    test_bit(HCI_QUIRK_STRICT_DUPLICATE_FILTER, &hdev->quirks))
++			hdev->discovery.scan_end = jiffies + timeout;
 +
- 	ev->eir_len = cpu_to_le16(eir_len + scan_rsp_len);
- 	ev_size = sizeof(*ev) + eir_len + scan_rsp_len;
+ 		queue_delayed_work(hdev->workqueue,
+ 				   &hdev->le_scan_disable, timeout);
++	}
  
+ unlock:
+ 	hci_dev_unlock(hdev);
 -- 
 2.2.0.rc0.207.ga3a616c
 
