@@ -1,702 +1,765 @@
 Return-Path: <cyrus@holtmann.org>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2] Bluetooth: btusb: Add firmware loading for Intel Snowfield Peak devices
-Date: Wed, 14 Jan 2015 12:11:35 -0800
-Message-Id: <1421266295-20251-1-git-send-email-marcel@holtmann.org>
+MIME-Version: 1.0
+In-Reply-To: <CABBYNZKQx=J6MK_6-OakEooMMffV9FOoMAWJmHJWzWDPzi9D1Q@mail.gmail.com>
+References: <1421206267-26369-1-git-send-email-armansito@chromium.org>
+	<1421206267-26369-4-git-send-email-armansito@chromium.org>
+	<CABBYNZKQx=J6MK_6-OakEooMMffV9FOoMAWJmHJWzWDPzi9D1Q@mail.gmail.com>
+Date: Wed, 14 Jan 2015 11:38:25 -0800
+Message-ID: <CAHrH25SjH76kxroqg6Lg31uHeasTo_+4pPzSaZ77ouwV4suDDQ@mail.gmail.com>
+Subject: Re: [PATCH BlueZ v3 3/8] core: device: Fix broken GATT UUID management
+From: Arman Uguray <armansito@chromium.org>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The Intel Snowfield Peak devices do not come with Bluetooth firmware
-loaded and thus require a full download of the operational Bluetooth
-firmware when the device is connected via USB.
+Hi Luiz,
 
-Snowfield Peak devices start with a bootloader mode that only accepts
-a very limited set of HCI commands. The supported commands are enough
-to identify the hardware and select the right firmware to load.
+> On Wed, Jan 14, 2015 at 5:17 AM, Luiz Augusto von Dentz <luiz.dentz@gmail.com> wrote:
+> Hi Arman,
+>
+> On Wed, Jan 14, 2015 at 1:31 AM, Arman Uguray <armansito@chromium.org> wrote:
+>> This patch fixes the broken GATT UUID management, which incorrectly
+>> remove valid UUIDs during the GATT profile probe process. This is
+>> achieved by splitting UUIDs obtained via GATT and SDP into their own
+>> lists that are internal to btd_device.
+>> ---
+>>  plugins/sixaxis.c |   2 +-
+>>  src/adapter.c     |   8 +-
+>>  src/device.c      | 367 +++++++++++++++++++++++++++++++++++-------------------
+>>  src/device.h      |   6 +-
+>>  4 files changed, 248 insertions(+), 135 deletions(-)
+>>
+>> diff --git a/plugins/sixaxis.c b/plugins/sixaxis.c
+>> index ac53ba9..0a4e3d8 100644
+>> --- a/plugins/sixaxis.c
+>> +++ b/plugins/sixaxis.c
+>> @@ -289,7 +289,7 @@ static bool setup_device(int fd, int index, struct btd_adapter *adapter)
+>>
+>>         device = btd_adapter_get_device(adapter, &device_bdaddr, BDADDR_BREDR);
+>>
+>> -       if (g_slist_find_custom(btd_device_get_uuids(device), HID_UUID,
+>> +       if (g_slist_find_custom(btd_device_get_sdp_uuids(device), HID_UUID,
+>>                                                 (GCompareFunc)strcasecmp)) {
+>>                 DBG("device %s already known, skipping", device_addr);
+>>                 return true;
+>> diff --git a/src/adapter.c b/src/adapter.c
+>> index d7e2550..379a80b 100644
+>> --- a/src/adapter.c
+>> +++ b/src/adapter.c
+>> @@ -2912,9 +2912,13 @@ static void load_devices(struct btd_adapter *adapter)
+>>
+>>                 /* TODO: register services from pre-loaded list of primaries */
+>>
+>> -               list = btd_device_get_uuids(device);
+>> +               list = btd_device_get_sdp_uuids(device);
+>>                 if (list)
+>> -                       device_probe_profiles(device, list);
+>> +                       device_probe_profiles(device, list, false);
+>> +
+>> +               list = btd_device_get_gatt_uuids(device);
+>> +               if (list)
+>> +                       device_probe_profiles(device, list, true);
+>>
+>>  device_exist:
+>>                 if (key_info) {
+>> diff --git a/src/device.c b/src/device.c
+>> index 4f702ba..9d1a480 100644
+>> --- a/src/device.c
+>> +++ b/src/device.c
+>> @@ -193,7 +193,8 @@ struct btd_device {
+>>         uint16_t        appearance;
+>>         char            *modalias;
+>>         struct btd_adapter      *adapter;
+>> -       GSList          *uuids;
+>> +       GSList          *sdp_uuids;
+>> +       GSList          *gatt_uuids;
+>>         GSList          *primaries;             /* List of primary services */
+>>         GSList          *services;              /* List of btd_service */
+>>         GSList          *pending;               /* Pending services */
+>> @@ -335,6 +336,28 @@ static void update_technologies(GKeyFile *file, struct btd_device *dev)
+>>                                                                 list, len);
+>>  }
+>>
+>> +static char **store_service_uuids(GKeyFile *key_file, gchar *key, GSList *uuids)
+>> +{
+>> +       GSList *l;
+>> +       char **array;
+>> +       int i;
+>> +
+>> +       if (!uuids) {
+>> +               g_key_file_remove_key(key_file, "General", key, NULL);
+>> +               return NULL;
+>> +       }
+>> +
+>> +       array = g_new0(char *, g_slist_length(uuids) + 1);
+>> +
+>> +       for (i = 0, l = uuids; l; l = g_slist_next(l), i++)
+>> +               array[i] = l->data;
+>> +
+>> +       g_key_file_set_string_list(key_file, "General", key,
+>> +                                               (const char **)array, i);
+>> +
+>> +       return array;
+>> +}
+>> +
+>>  static gboolean store_device_info_cb(gpointer user_data)
+>>  {
+>>         struct btd_device *device = user_data;
+>> @@ -344,7 +367,7 @@ static gboolean store_device_info_cb(gpointer user_data)
+>>         char device_addr[18];
+>>         char *str;
+>>         char class[9];
+>> -       char **uuids = NULL;
+>> +       char **sdp_uuids, **gatt_uuids;
+>>         gsize length = 0;
+>>
+>>         device->store_id = 0;
+>> @@ -387,18 +410,10 @@ static gboolean store_device_info_cb(gpointer user_data)
+>>         g_key_file_set_boolean(key_file, "General", "Blocked",
+>>                                                         device->blocked);
+>>
+>> -       if (device->uuids) {
+>> -               GSList *l;
+>> -               int i;
+>> -
+>> -               uuids = g_new0(char *, g_slist_length(device->uuids) + 1);
+>> -               for (i = 0, l = device->uuids; l; l = g_slist_next(l), i++)
+>> -                       uuids[i] = l->data;
+>> -               g_key_file_set_string_list(key_file, "General", "Services",
+>> -                                               (const char **)uuids, i);
+>> -       } else {
+>> -               g_key_file_remove_key(key_file, "General", "Services", NULL);
+>> -       }
+>> +       sdp_uuids = store_service_uuids(key_file, "SDPServices",
+>> +                                                       device->sdp_uuids);
+>> +       gatt_uuids = store_service_uuids(key_file, "GATTServices",
+>> +                                                       device->gatt_uuids);
+>
+> This change is not backward compatible which mean existing storage
+> will not load properly if we change the storage fields, furthermore I
+> think it is better to store the UUIDs per bearer_state since service
+> discovered flag is stored there it seem logical to couple UUIDs founds
+> there as well.
+>
 
-Previous patches to the btusb driver allow overwriting the handling
-for bulk receive endpoint packets and HCI events processing. The
-firmware loading makes heavy use of these new internal callbacks.
+You're right, I'm aware that this is not backwards compatible. I
+didn't build any migration mechanism from the UUIDs field to the new
+fields to sort of initiate this discussion with you. I'm still trying
+to figure out how to resolve the current format. See my comments
+below.
 
-This patch also introduces additional internal states to track if the
-device is in bootloader or operational mode. This allows for correct
-feedback about the firmware loading procedure.
+>>         if (device->vendor_src) {
+>>                 g_key_file_set_integer(key_file, "DeviceID", "Source",
+>> @@ -420,7 +435,8 @@ static gboolean store_device_info_cb(gpointer user_data)
+>>         g_free(str);
+>>
+>>         g_key_file_free(key_file);
+>> -       g_free(uuids);
+>> +       g_free(sdp_uuids);
+>> +       g_free(gatt_uuids);
+>>
+>>         return FALSE;
+>>  }
+>> @@ -574,7 +590,8 @@ static void device_free(gpointer user_data)
+>>         btd_gatt_client_destroy(device->client_dbus);
+>>         device->client_dbus = NULL;
+>>
+>> -       g_slist_free_full(device->uuids, g_free);
+>> +       g_slist_free_full(device->sdp_uuids, g_free);
+>> +       g_slist_free_full(device->gatt_uuids, g_free);
+>>         g_slist_free_full(device->primaries, g_free);
+>>         g_slist_free_full(device->attios, g_free);
+>>         g_slist_free_full(device->attios_offline, g_free);
+>> @@ -988,22 +1005,43 @@ static gboolean dev_property_get_uuids(const GDBusPropertyTable *property,
+>>  {
+>>         struct btd_device *dev = data;
+>>         DBusMessageIter entry;
+>> -       GSList *l;
+>> +       GHashTable *uuids = NULL;
+>> +       GSList *sl;
+>> +       GList *keys, *l;
+>>
+>>         dbus_message_iter_open_container(iter, DBUS_TYPE_ARRAY,
+>>                                 DBUS_TYPE_STRING_AS_STRING, &entry);
+>>
+>> -       if (dev->bredr_state.svc_resolved || dev->le_state.svc_resolved)
+>> -               l = dev->uuids;
+>> -       else if (dev->eir_uuids)
+>> -               l = dev->eir_uuids;
+>> -       else
+>> -               l = dev->uuids;
+>> +       if (!dev->bredr_state.svc_resolved && dev->le_state.svc_resolved &&
+>> +                                                       dev->eir_uuids) {
+>> +               for (sl = dev->eir_uuids; sl; sl = g_slist_next(sl))
+>> +                       dbus_message_iter_append_basic(&entry, DBUS_TYPE_STRING,
+>> +                                                               &sl->data);
+>> +
+>> +               goto done;
+>> +       }
+>> +
+>> +       /* Insert GATT and SDP UUIDs into a set to prevent any duplicates */
+>> +       uuids = g_hash_table_new(g_str_hash, bt_uuid_strcmp);
+>>
+>> -       for (; l != NULL; l = l->next)
+>> +       for (sl = dev->sdp_uuids; sl; sl = g_slist_next(sl))
+>> +               g_hash_table_add(uuids, sl->data);
+>> +
+>> +       for (sl = dev->gatt_uuids; sl; sl = g_slist_next(sl))
+>> +               g_hash_table_add(uuids, sl->data);
+>> +
+>> +       /* Obtain a list of UUIDs and sort it */
+>> +       keys = g_hash_table_get_keys(uuids);
+>> +       keys = g_list_sort(keys, bt_uuid_strcmp);
+>> +
+>> +       for (l = keys; l; l = g_list_next(l))
+>>                 dbus_message_iter_append_basic(&entry, DBUS_TYPE_STRING,
+>> -                                                       &l->data);
+>> +                                                               &l->data);
+>> +
+>> +       g_list_free(keys);
+>> +       g_hash_table_destroy(uuids);
+>>
+>> +done:
+>>         dbus_message_iter_close_container(iter, &entry);
+>>
+>>         return TRUE;
+>> @@ -1130,7 +1168,8 @@ int device_unblock(struct btd_device *device, gboolean silent,
+>>         if (!silent) {
+>>                 g_dbus_emit_property_changed(dbus_conn, device->path,
+>>                                                 DEVICE_INTERFACE, "Blocked");
+>> -               device_probe_profiles(device, device->uuids);
+>> +               device_probe_profiles(device, device->sdp_uuids, false);
+>> +               device_probe_profiles(device, device->gatt_uuids, true);
+>>         }
+>>
+>>         return 0;
+>> @@ -2165,6 +2204,66 @@ failed:
+>>         return str;
+>>  }
+>>
+>> +static bool device_add_uuid(GSList **uuids, const char *uuid)
+>> +{
+>> +       if (g_slist_find_custom(*uuids, uuid, bt_uuid_strcmp))
+>> +               return false;
+>> +
+>> +       *uuids = g_slist_insert_sorted(*uuids, g_strdup(uuid), bt_uuid_strcmp);
+>> +
+>> +       return true;
+>> +}
+>> +
+>> +static bool device_add_uuids(struct btd_device *device, GSList **uuids,
+>> +                                                       GSList *new_uuids)
+>> +{
+>> +       GSList *l;
+>> +       bool changed = false;
+>> +
+>> +       for (l = new_uuids; l; l = g_slist_next(l)) {
+>> +               if (device_add_uuid(uuids, l->data))
+>> +                       changed = true;
+>> +       }
+>> +
+>> +       if (changed)
+>> +               g_dbus_emit_property_changed(dbus_conn, device->path,
+>> +                                               DEVICE_INTERFACE, "UUIDs");
+>> +
+>> +       return changed;
+>> +}
+>> +
+>> +static bool device_add_sdp_uuid(struct btd_device *device, const char *uuid)
+>> +{
+>> +       return device_add_uuid(&device->sdp_uuids, uuid);
+>> +}
+>> +
+>> +static bool device_add_sdp_uuids(struct btd_device *device, GSList *uuids)
+>> +{
+>> +       return device_add_uuids(device, &device->sdp_uuids, uuids);
+>> +}
+>> +
+>> +static bool device_add_gatt_uuid(struct btd_device *device, const char *uuid)
+>> +{
+>> +       return device_add_uuid(&device->gatt_uuids, uuid);
+>> +}
+>> +
+>> +static bool device_add_gatt_uuids(struct btd_device *device, GSList *uuids)
+>> +{
+>> +       return device_add_uuids(device, &device->gatt_uuids, uuids);
+>> +}
+>> +
+>> +static void device_remove_gatt_uuid(struct btd_device *device, const char *uuid)
+>> +{
+>> +       GSList *l;
+>> +
+>> +       l = g_slist_find_custom(device->gatt_uuids, uuid, bt_uuid_strcmp);
+>> +       if (!l)
+>> +               return;
+>> +
+>> +       g_free(l->data);
+>> +       device->gatt_uuids = g_slist_delete_link(device->gatt_uuids, l);
+>> +}
+>> +
+>>  static void load_info(struct btd_device *device, const char *local,
+>>                         const char *peer, GKeyFile *key_file)
+>>  {
+>> @@ -2254,30 +2353,40 @@ next:
+>>         if (blocked)
+>>                 device_block(device, FALSE);
+>>
+>> -       /* Load device profile list */
+>> -       uuids = g_key_file_get_string_list(key_file, "General", "Services",
+>> -                                               NULL, NULL);
+>> +       /* Load classic device profile list */
+>> +       uuids = g_key_file_get_string_list(key_file, "General", "SDPServices",
+>> +                                                               NULL, NULL);
+>>         if (uuids) {
+>>                 char **uuid;
+>>
+>> -               for (uuid = uuids; *uuid; uuid++) {
+>> -                       GSList *match;
+>> +               for (uuid = uuids; *uuid; uuid++)
+>> +                       device_add_sdp_uuid(device, *uuid);
+>>
+>> -                       match = g_slist_find_custom(device->uuids, *uuid,
+>> -                                                       bt_uuid_strcmp);
+>> -                       if (match)
+>> -                               continue;
+>> -
+>> -                       device->uuids = g_slist_insert_sorted(device->uuids,
+>> -                                                               g_strdup(*uuid),
+>> -                                                               bt_uuid_strcmp);
+>> -               }
+>>                 g_strfreev(uuids);
+>>
+>>                 /* Discovered services restored from storage */
+>>                 device->bredr_state.svc_resolved = true;
+>>         }
+>>
+>> +       /* Load GATT-based device profile list */
+>> +       uuids = g_key_file_get_string_list(key_file, "General", "GATTServices",
+>> +                                                               NULL, NULL);
+>> +       if (uuids) {
+>> +               char **uuid;
+>> +
+>> +               for (uuid = uuids; *uuid; uuid++)
+>> +                       device_add_gatt_uuid(device, *uuid);
+>> +
+>> +               g_strfreev(uuids);
+>> +
+>> +               /*
+>> +                * TODO: The GATT-based service UUIDs have been restored from
+>> +                * storage but we don't have a populated gatt-db yet. Here we
+>> +                * should mark le_state.svc_resolved as true, if we're bonded
+>> +                * and we have a populated gatt_db.
+>> +                */
+>> +       }
+>> +
+>>         /* Load device id */
+>>         source = g_key_file_get_integer(key_file, "DeviceID", "Source", NULL);
+>>         if (source) {
+>> @@ -2411,34 +2520,13 @@ static void add_primary(struct gatt_db_attribute *attr, void *user_data)
+>>         *new_services = g_slist_append(*new_services, prim);
+>>  }
+>>
+>> -static void device_add_uuids(struct btd_device *device, GSList *uuids)
+>> -{
+>> -       GSList *l;
+>> -       bool changed = false;
+>> -
+>> -       for (l = uuids; l != NULL; l = g_slist_next(l)) {
+>> -               GSList *match = g_slist_find_custom(device->uuids, l->data,
+>> -                                                       bt_uuid_strcmp);
+>> -               if (match)
+>> -                       continue;
+>> -
+>> -               changed = true;
+>> -               device->uuids = g_slist_insert_sorted(device->uuids,
+>> -                                               g_strdup(l->data),
+>> -                                               bt_uuid_strcmp);
+>> -       }
+>> -
+>> -       if (changed)
+>> -               g_dbus_emit_property_changed(dbus_conn, device->path,
+>> -                                               DEVICE_INTERFACE, "UUIDs");
+>> -}
+>> -
+>>  static void store_services(struct btd_device *device);
+>>
+>>  struct gatt_probe_data {
+>>         struct btd_device *dev;
+>>         bool all_services;
+>> -       GSList *uuids;
+>> +       GSList *new_uuids;
+>> +       GSList *old_uuids;
+>>         struct gatt_db_attribute *cur_attr;
+>>         char cur_uuid[MAX_LEN_UUID_STR];
+>>  };
+>> @@ -2488,20 +2576,31 @@ static void dev_probe_gatt_profile(struct gatt_db_attribute *attr,
+>>  {
+>>         struct gatt_probe_data *data = user_data;
+>>         bt_uuid_t uuid;
+>> -       GSList *l = NULL;
+>> +       gpointer dup_uuid;
+>>
+>>         gatt_db_attribute_get_service_uuid(attr, &uuid);
+>>         bt_uuid_to_string(&uuid, data->cur_uuid, sizeof(data->cur_uuid));
+>>
+>>         data->cur_attr = attr;
+>>
+>> -       /*
+>> -        * If we're probing for all services, store the UUID since device->uuids
+>> -        * was cleared.
+>> -        */
+>> -       if (data->all_services)
+>> -               data->uuids = g_slist_append(data->uuids,
+>> +       if (data->all_services) {
+>> +               GSList *l;
+>> +
+>> +               /*
+>> +                * Check if the service is already in the old UUIDs list. If so,
+>> +                * remove it.
+>> +                */
+>> +               l = g_slist_find_custom(data->old_uuids, data->cur_uuid,
+>> +                                                               bt_uuid_strcmp);
+>> +               if (l) {
+>> +                       g_free(l->data);
+>> +                       data->old_uuids = g_slist_delete_link(data->old_uuids,
+>> +                                                                       l);
+>> +               } else {
+>> +                       data->new_uuids = g_slist_append(data->new_uuids,
+>>                                                 g_strdup(data->cur_uuid));
+>> +               }
+>> +       }
+>>
+>>         /* Don't probe the profiles if a matching service already exists. */
+>>         if (find_service_with_uuid(data->dev->services, data->cur_uuid))
+>> @@ -2512,8 +2611,14 @@ static void dev_probe_gatt_profile(struct gatt_db_attribute *attr,
+>>         if (data->all_services)
+>>                 return;
+>>
+>> -       l = g_slist_append(l, g_strdup(data->cur_uuid));
+>> -       device_add_uuids(data->dev, l);
+>> +       dup_uuid = g_strdup(data->cur_uuid);
+>> +       if (!device_add_gatt_uuid(data->dev, dup_uuid)) {
+>> +               g_free(dup_uuid);
+>> +               return;
+>> +       }
+>> +
+>> +       g_dbus_emit_property_changed(dbus_conn, data->dev->path,
+>> +                                               DEVICE_INTERFACE, "UUIDs");
+>>  }
+>>
+>>  static void device_probe_gatt_profile(struct btd_device *device,
+>> @@ -2526,33 +2631,25 @@ static void device_probe_gatt_profile(struct btd_device *device,
+>>         data.dev = device;
+>>
+>>         dev_probe_gatt_profile(attr, &data);
+>> -       g_slist_free_full(data.uuids, g_free);
+>>  }
+>>
+>>  static void remove_invalid_services(struct gatt_probe_data *data)
+>>  {
+>>         struct btd_device *dev = data->dev;
+>>         struct btd_service *service;
+>> -       struct btd_profile *profile;
+>> -       GSList *l, *tmp;
+>> +       GSList *l, *svc;
+>>
+>> -       for (l = dev->services; l != NULL;) {
+>> -               service = l->data;
+>> -               profile = btd_service_get_profile(service);
+>> +       for (l = data->old_uuids; l; l = g_slist_next(l)) {
+>> +               device_remove_gatt_uuid(dev, l->data);
+>>
+>> -               if (g_slist_find_custom(dev->uuids, profile->remote_uuid,
+>> -                                                       bt_uuid_strcmp)) {
+>> -                       l = g_slist_next(l);
+>> +               svc = find_service_with_uuid(dev->services, l->data);
+>> +               if (!svc)
+>>                         continue;
+>> -               }
+>>
+>> -               /* Service no longer valid, so remove it */
+>> -               tmp = l->next;
+>> -               dev->services = g_slist_delete_link(dev->services, l);
+>> +               service = svc->data;
+>> +               dev->services = g_slist_delete_link(dev->services, svc);
+>>                 dev->pending = g_slist_remove(dev->pending, service);
+>>                 service_remove(service);
+>> -
+>> -               l = tmp;
+>>         }
+>>  }
+>>
+>> @@ -2560,6 +2657,7 @@ static void device_probe_gatt_profiles(struct btd_device *device)
+>>  {
+>>         struct gatt_probe_data data;
+>>         char addr[18];
+>> +       GSList *l;
+>>
+>>         ba2str(&device->bdaddr, addr);
+>>
+>> @@ -2573,23 +2671,24 @@ static void device_probe_gatt_profiles(struct btd_device *device)
+>>         data.dev = device;
+>>         data.all_services = true;
+>>
+>> +       /* Copy current list of GATT UUIDs */
+>> +       for (l = device->gatt_uuids; l; l = g_slist_next(l))
+>> +               data.old_uuids = g_slist_append(data.old_uuids,
+>> +                                                       g_strdup(l->data));
+>>
+>>         gatt_db_foreach_service(device->db, NULL, dev_probe_gatt_profile,
+>>                                                                         &data);
+>>
+>> -       /*
+>> -        * Clear the UUIDs list
+>> -        *
+>> -        * FIXME: The management of UUIDs here iss currently broken, as clearing
+>> -        * the entire list here will likely remove UUIDs that shouldn't be
+>> -        * removed (e.g. those obtained via SDP for a dual-mode device).
+>> -        */
+>> -       g_slist_free_full(device->uuids, g_free);
+>> -       device->uuids = NULL;
+>> +       /* Whatever remains in data.old_uuids is stale and should be removed */
+>> +       remove_invalid_services(&data);
+>>
+>> -       device_add_uuids(device, data.uuids);
+>> -       g_slist_free_full(data.uuids, g_free);
+>> +       /* Update the list with new UUIDs */
+>> +       if (!device_add_gatt_uuids(device, data.new_uuids) && data.old_uuids)
+>> +               g_dbus_emit_property_changed(dbus_conn, device->path,
+>> +                                               DEVICE_INTERFACE, "UUIDs");
+>>
+>> -       remove_invalid_services(&data);
+>> +       g_slist_free_full(data.new_uuids, g_free);
+>> +       g_slist_free_full(data.old_uuids, g_free);
+>>  }
+>>
+>>  static void device_accept_gatt_profiles(struct btd_device *device)
+>> @@ -2675,46 +2774,39 @@ static gint prim_attr_cmp(gconstpointer a, gconstpointer b)
+>>         return !(prim->range.start == start && prim->range.end == end);
+>>  }
+>>
+>> -static gint prim_uuid_cmp(gconstpointer a, gconstpointer b)
+>> -{
+>> -       const struct gatt_primary *prim = a;
+>> -       const char *uuid = b;
+>> -
+>> -       return bt_uuid_strcmp(prim->uuid, uuid);
+>> -}
+>> -
+>>  static void gatt_service_removed(struct gatt_db_attribute *attr,
+>>                                                                 void *user_data)
+>>  {
+>>         struct btd_device *device = user_data;
+>>         GSList *l;
+>> -       struct gatt_primary *prim;
+>>         uint16_t start, end;
+>> +       bt_uuid_t uuid;
+>> +       char uuid_str[MAX_LEN_UUID_STR];
+>>
+>>         if (!bt_gatt_client_is_ready(device->client))
+>>                 return;
+>>
+>> -       gatt_db_attribute_get_service_handles(attr, &start, &end);
+>> +       gatt_db_attribute_get_service_data(attr, &start, &end, NULL, &uuid);
+>>
+>>         DBG("start: 0x%04x, end: 0x%04x", start, end);
+>>
+>>         /* Remove the corresponding gatt_primary */
+>>         l = g_slist_find_custom(device->primaries, attr, prim_attr_cmp);
+>> -       if (!l)
+>> -               return;
+>> +       if (l) {
+>> +               g_free(l->data);
+>> +               device->primaries = g_slist_delete_link(device->primaries, l);
+>> +       }
+>>
+>> -       prim = l->data;
+>> -       device->primaries = g_slist_delete_link(device->primaries, l);
+>> +       bt_uuid_to_string(&uuid, uuid_str, sizeof(uuid_str));
+>>
+>>         /* Get the UUID entry to be removed below */
+>> -       l = g_slist_find_custom(device->uuids, prim->uuid, bt_uuid_strcmp);
+>> +       l = g_slist_find_custom(device->gatt_uuids, uuid_str, bt_uuid_strcmp);
+>>
+>>         /*
+>>          * Remove the corresponding UUIDs entry and the profile, only if this
+>>          * is the last service with this UUID.
+>>          */
+>> -       if (!g_slist_find_custom(device->primaries, prim->uuid,
+>> -                                                       prim_uuid_cmp)) {
+>> +       if (!gatt_db_get_service_with_uuid(device->db, &uuid)) {
+>>                 /*
+>>                  * If this happened since the db was cleared for a non-bonded
+>>                  * device, then don't remove the btd_service just yet. We do
+>> @@ -2727,13 +2819,11 @@ static void gatt_service_removed(struct gatt_db_attribute *attr,
+>>                         device_remove_gatt_profile(device, attr);
+>>
+>>                 g_free(l->data);
+>> -               device->uuids = g_slist_delete_link(device->uuids, l);
+>> +               device->gatt_uuids = g_slist_delete_link(device->gatt_uuids, l);
+>>                 g_dbus_emit_property_changed(dbus_conn, device->path,
+>>                                                 DEVICE_INTERFACE, "UUIDs");
+>>         }
+>>
+>> -       g_free(prim);
+>> -
+>>         store_device_info(device);
+>>
+>>         btd_gatt_client_service_removed(device->client_dbus, attr);
+>> @@ -2988,8 +3078,13 @@ void device_merge_duplicate(struct btd_device *dev, struct btd_device *dup)
+>>         dev->trusted = dup->trusted;
+>>         dev->blocked = dup->blocked;
+>>
+>> -       for (l = dup->uuids; l; l = g_slist_next(l))
+>> -               dev->uuids = g_slist_append(dev->uuids, g_strdup(l->data));
+>> +       for (l = dup->sdp_uuids; l; l = g_slist_next(l))
+>> +               dev->sdp_uuids = g_slist_append(dev->sdp_uuids,
+>> +                                                       g_strdup(l->data));
+>> +
+>> +       for (l = dup->gatt_uuids; l; l = g_slist_next(l))
+>> +               dev->gatt_uuids = g_slist_append(dev->gatt_uuids,
+>> +                                                       g_strdup(l->data));
+>>
+>>         if (dev->name[0] == '\0')
+>>                 strcpy(dev->name, dup->name);
+>> @@ -3240,9 +3335,14 @@ static gboolean record_has_uuid(const sdp_record_t *rec,
+>>         return FALSE;
+>>  }
+>>
+>> -GSList *btd_device_get_uuids(struct btd_device *device)
+>> +GSList *btd_device_get_sdp_uuids(struct btd_device *device)
+>>  {
+>> -       return device->uuids;
+>> +       return device->sdp_uuids;
+>> +}
+>> +
+>> +GSList *btd_device_get_gatt_uuids(struct btd_device *device)
+>> +{
+>> +       return device->gatt_uuids;
+>>  }
+>>
+>>  struct probe_data {
+>> @@ -3280,7 +3380,8 @@ void device_probe_profile(gpointer a, gpointer b)
+>>         if (profile->device_probe == NULL)
+>>                 return;
+>>
+>> -       if (!device_match_profile(device, profile, device->uuids))
+>> +       if (!device_match_profile(device, profile, device->sdp_uuids) &&
+>> +               !device_match_profile(device, profile, device->gatt_uuids))
+>>                 return;
+>>
+>>         service = service_create(device, profile);
+>> @@ -3318,7 +3419,8 @@ void device_remove_profile(gpointer a, gpointer b)
+>>         service_remove(service);
+>>  }
+>>
+>> -void device_probe_profiles(struct btd_device *device, GSList *uuids)
+>> +void device_probe_profiles(struct btd_device *device, GSList *uuids,
+>> +                                                               bool gatt)
+>>  {
+>>         struct probe_data d = { device, uuids };
+>>         char addr[18];
+>> @@ -3335,7 +3437,10 @@ void device_probe_profiles(struct btd_device *device, GSList *uuids)
+>>         btd_profile_foreach(dev_probe, &d);
+>>
+>>  add_uuids:
+>> -       device_add_uuids(device, uuids);
+>> +       if (gatt)
+>> +               device_add_gatt_uuids(device, uuids);
+>> +       else
+>> +               device_add_sdp_uuids(device, uuids);
+>>  }
+>>
+>>  static void store_sdp_record(GKeyFile *key_file, sdp_record_t *rec)
+>> @@ -3431,7 +3536,7 @@ static int update_record(struct browse_req *req, const char *uuid,
+>>         req->records = sdp_list_append(req->records, sdp_copy_record(rec));
+>>
+>>         /* Check if UUID is duplicated */
+>> -       l = g_slist_find_custom(req->device->uuids, uuid, bt_uuid_strcmp);
+>> +       l = g_slist_find_custom(req->device->sdp_uuids, uuid, bt_uuid_strcmp);
+>>         if (l == NULL) {
+>>                 l = g_slist_find_custom(req->profiles_added, uuid,
+>>                                                         bt_uuid_strcmp);
+>> @@ -3662,7 +3767,7 @@ static void search_cb(sdp_list_t *recs, int err, gpointer user_data)
+>>          * the full list of services and populate a client-role gatt_db over
+>>          * BR/EDR.
+>>          */
+>> -       device_probe_profiles(device, req->profiles_added);
+>> +       device_probe_profiles(device, req->profiles_added, false);
+>>
+>>         /* Propagate services changes */
+>>         g_dbus_emit_property_changed(dbus_conn, req->device->path,
+>> @@ -3927,6 +4032,8 @@ static void gatt_client_ready_cb(bool success, uint8_t att_ecode,
+>>
+>>         if (device->browse)
+>>                 register_gatt_services(device->browse);
+>> +       else
+>> +               device_probe_gatt_profiles(device);
+>>
+>>         device_accept_gatt_profiles(device);
+>>
+>> @@ -5127,13 +5234,13 @@ void btd_device_add_uuid(struct btd_device *device, const char *uuid)
+>>         GSList *uuid_list;
+>>         char *new_uuid;
+>>
+>> -       if (g_slist_find_custom(device->uuids, uuid, bt_uuid_strcmp))
+>> +       if (g_slist_find_custom(device->sdp_uuids, uuid, bt_uuid_strcmp))
+>>                 return;
+>>
+>>         new_uuid = g_strdup(uuid);
+>>         uuid_list = g_slist_append(NULL, new_uuid);
+>>
+>> -       device_probe_profiles(device, uuid_list);
+>> +       device_probe_profiles(device, uuid_list, false);
+>>
+>>         g_free(new_uuid);
+>>         g_slist_free(uuid_list);
+>> diff --git a/src/device.h b/src/device.h
+>> index a7fefee..f250bfa 100644
+>> --- a/src/device.h
+>> +++ b/src/device.h
+>> @@ -60,8 +60,10 @@ struct device_addr_type {
+>>  };
+>>
+>>  int device_addr_type_cmp(gconstpointer a, gconstpointer b);
+>> -GSList *btd_device_get_uuids(struct btd_device *device);
+>> -void device_probe_profiles(struct btd_device *device, GSList *profiles);
+>> +GSList *btd_device_get_sdp_uuids(struct btd_device *device);
+>> +GSList *btd_device_get_gatt_uuids(struct btd_device *device);
+>> +void device_probe_profiles(struct btd_device *device, GSList *profiles,
+>> +                                                               bool gatt);
+>
+> Id leave this API as it is for now and internally classify the UUIDs,
+> the classification function can be used when loading from the storage
+> that way we don't need to break the storage format.
+>
 
-Output from /sys/kernel/debug/usb/devices for this device:
+Well, I'm just not sure how to do that classification. Especially in
+the case of device_probe_profiles, which gets passed in a list of
+UUIDs and the case where the UUIDs get loaded from storage, I don't
+know how we can figure out which ones are LE and which ones are
+BR/EDR, unless we do something complicated/inefficient like going
+through the gatt-db and see if there's a matching service for each
+UUID but this still becomes a problem when we load the UUIDs before
+having done discovery (i.e. there's no populated gatt-db).
 
-T:  Bus=02 Lev=02 Prnt=02 Port=05 Cnt=01 Dev#=  3 Spd=12   MxCh= 0
-D:  Ver= 2.01 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-P:  Vendor=8087 ProdID=0a2b Rev= 0.01
-C:* #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
-I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=81(I) Atr=03(Int.) MxPS=  64 Ivl=1ms
-E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+>>  const sdp_record_t *btd_device_get_record(struct btd_device *device,
+>>                                                 const char *uuid);
+>>  struct gatt_primary *btd_device_get_primary(struct btd_device *device,
+>> --
+>> 2.2.0.rc0.207.ga3a616c
+>>
+>> --
+>> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+>> the body of a message to majordomo@vger.kernel.org
+>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>
+>
+>
+> --
+> Luiz Augusto von Dentz
 
-Based-on-patch-by: Tedd Ho-Jeong An <tedd.an@intel.com>.
-Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
----
- drivers/bluetooth/btusb.c | 579 +++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 576 insertions(+), 3 deletions(-)
-
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 4a6495ab9726..b42446d3a3da 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -28,7 +28,7 @@
- #include <net/bluetooth/bluetooth.h>
- #include <net/bluetooth/hci_core.h>
- 
--#define VERSION "0.6"
-+#define VERSION "0.7"
- 
- static bool disable_scofix;
- static bool force_scofix;
-@@ -50,6 +50,7 @@ static struct usb_driver btusb_driver;
- #define BTUSB_BCM_PATCHRAM	0x400
- #define BTUSB_MARVELL		0x800
- #define BTUSB_SWAVE		0x1000
-+#define BTUSB_INTEL_NEW		0x2000
- 
- static const struct usb_device_id btusb_table[] = {
- 	/* Generic Bluetooth USB device */
-@@ -256,6 +257,7 @@ static const struct usb_device_id blacklist_table[] = {
- 	/* Intel Bluetooth device */
- 	{ USB_DEVICE(0x8087, 0x07dc), .driver_info = BTUSB_INTEL },
- 	{ USB_DEVICE(0x8087, 0x0a2a), .driver_info = BTUSB_INTEL },
-+	{ USB_DEVICE(0x8087, 0x0a2b), .driver_info = BTUSB_INTEL_NEW },
- 
- 	/* Marvell device */
- 	{ USB_DEVICE(0x1286, 0x2044), .driver_info = BTUSB_MARVELL },
-@@ -271,6 +273,10 @@ static const struct usb_device_id blacklist_table[] = {
- #define BTUSB_ISOC_RUNNING	2
- #define BTUSB_SUSPENDING	3
- #define BTUSB_DID_ISO_RESUME	4
-+#define BTUSB_BOOTLOADER	5
-+#define BTUSB_DOWNLOADING	6
-+#define BTUSB_BOOTING		7
-+#define BTUSB_FIRMWARE_FAILED	8
- 
- struct btusb_data {
- 	struct hci_dev       *hdev;
-@@ -1295,6 +1301,26 @@ struct intel_version {
- 	u8 fw_patch_num;
- } __packed;
- 
-+struct intel_boot_params {
-+	__u8     status;
-+	__u8     otp_format;
-+	__u8     otp_content;
-+	__u8     otp_patch;
-+	__le16   dev_revid;
-+	__u8     secure_boot;
-+	__u8     key_from_hdr;
-+	__u8     key_type;
-+	__u8     otp_lock;
-+	__u8     api_lock;
-+	__u8     debug_lock;
-+	bdaddr_t otp_bdaddr;
-+	__u8     min_fw_build_nn;
-+	__u8     min_fw_build_cw;
-+	__u8     min_fw_build_yy;
-+	__u8     limited_cce;
-+	__u8     unlocked_state;
-+} __packed;
-+
- static const struct firmware *btusb_setup_intel_get_fw(struct hci_dev *hdev,
- 						       struct intel_version *ver)
- {
-@@ -1703,6 +1729,541 @@ exit_mfg_deactivate:
- 	return 0;
- }
- 
-+static int inject_cmd_complete(struct hci_dev *hdev, __u16 opcode)
-+{
-+	struct sk_buff *skb;
-+	struct hci_event_hdr *hdr;
-+	struct hci_ev_cmd_complete *evt;
-+
-+	skb = bt_skb_alloc(sizeof(*hdr) + sizeof(*evt) + 1, GFP_ATOMIC);
-+	if (!skb)
-+		return -ENOMEM;
-+
-+	hdr = (struct hci_event_hdr *)skb_put(skb, sizeof(*hdr));
-+	hdr->evt = HCI_EV_CMD_COMPLETE;
-+	hdr->plen = sizeof(*evt) + 1;
-+
-+	evt = (struct hci_ev_cmd_complete *)skb_put(skb, sizeof(*evt));
-+	evt->ncmd = 0x01;
-+	evt->opcode = cpu_to_le16(opcode);
-+
-+	*skb_put(skb, 1) = 0x00;
-+
-+	bt_cb(skb)->pkt_type = HCI_EVENT_PKT;
-+
-+	return hci_recv_frame(hdev, skb);
-+}
-+
-+static int btusb_recv_bulk_intel(struct btusb_data *data, void *buffer,
-+				 int count)
-+{
-+	/* When the device is in bootloader mode, then it can send
-+	 * events via the bulk endpoint. These events are treated the
-+	 * same way as the ones received from the interrupt endpoint.
-+	 */
-+	if (test_bit(BTUSB_BOOTLOADER, &data->flags))
-+		return btusb_recv_intr(data, buffer, count);
-+
-+	return btusb_recv_bulk(data, buffer, count);
-+}
-+
-+static int btusb_recv_event_intel(struct hci_dev *hdev, struct sk_buff *skb)
-+{
-+	struct btusb_data *data = hci_get_drvdata(hdev);
-+
-+	if (test_bit(BTUSB_BOOTLOADER, &data->flags)) {
-+		struct hci_event_hdr *hdr = (void *)skb->data;
-+
-+		/* When the firmware loading completes the device sends
-+		 * out a vendor specific event indicating the result of
-+		 * the firmware loading.
-+		 */
-+		if (skb->len == 7 && hdr->evt == 0xff && hdr->plen == 0x05 &&
-+		    skb->data[2] == 0x06) {
-+			if (skb->data[3] != 0x00)
-+				test_bit(BTUSB_FIRMWARE_FAILED, &data->flags);
-+
-+			if (test_and_clear_bit(BTUSB_DOWNLOADING, &data->flags))
-+				wake_up_interruptible(&hdev->req_wait_q);
-+		}
-+
-+		/* When switching to the operational firmware the device
-+		 * sends a vendor specific event indicating that the bootup
-+		 * completed.
-+		 */
-+		if (skb->len == 9 && hdr->evt == 0xff && hdr->plen == 0x07 &&
-+		    skb->data[2] == 0x02) {
-+			if (test_and_clear_bit(BTUSB_BOOTING, &data->flags))
-+				wake_up_interruptible(&hdev->req_wait_q);
-+		}
-+	}
-+
-+	return hci_recv_frame(hdev, skb);
-+}
-+
-+static int btusb_send_frame_intel(struct hci_dev *hdev, struct sk_buff *skb)
-+{
-+	struct btusb_data *data = hci_get_drvdata(hdev);
-+	struct urb *urb;
-+
-+	BT_DBG("%s", hdev->name);
-+
-+	if (!test_bit(HCI_RUNNING, &hdev->flags))
-+		return -EBUSY;
-+
-+	switch (bt_cb(skb)->pkt_type) {
-+	case HCI_COMMAND_PKT:
-+		if (test_bit(BTUSB_BOOTLOADER, &data->flags)) {
-+			struct hci_command_hdr *cmd = (void *)skb->data;
-+			__u16 opcode = le16_to_cpu(cmd->opcode);
-+
-+			/* When in bootloader mode and the command 0xfc09
-+			 * is received, it needs to be send down the
-+			 * bulk endpoint. So allocate a bulk URB instead.
-+			 */
-+			if (opcode == 0xfc09)
-+				urb = alloc_bulk_urb(hdev, skb);
-+			else
-+				urb = alloc_ctrl_urb(hdev, skb);
-+
-+			/* When the 0xfc01 command is issued to boot into
-+			 * the operational firmware, it will actually not
-+			 * send a command complete event. To keep the flow
-+			 * control working inject that event here.
-+			 */
-+			if (opcode == 0xfc01)
-+				inject_cmd_complete(hdev, opcode);
-+		} else {
-+			urb = alloc_ctrl_urb(hdev, skb);
-+		}
-+		if (IS_ERR(urb))
-+			return PTR_ERR(urb);
-+
-+		hdev->stat.cmd_tx++;
-+		return submit_or_queue_tx_urb(hdev, urb);
-+
-+	case HCI_ACLDATA_PKT:
-+		urb = alloc_bulk_urb(hdev, skb);
-+		if (IS_ERR(urb))
-+			return PTR_ERR(urb);
-+
-+		hdev->stat.acl_tx++;
-+		return submit_or_queue_tx_urb(hdev, urb);
-+
-+	case HCI_SCODATA_PKT:
-+		if (hci_conn_num(hdev, SCO_LINK) < 1)
-+			return -ENODEV;
-+
-+		urb = alloc_isoc_urb(hdev, skb);
-+		if (IS_ERR(urb))
-+			return PTR_ERR(urb);
-+
-+		hdev->stat.sco_tx++;
-+		return submit_tx_urb(hdev, urb);
-+	}
-+
-+	return -EILSEQ;
-+}
-+
-+static int btusb_intel_secure_send(struct hci_dev *hdev, u8 fragment_type,
-+				   u32 plen, const void *param)
-+{
-+	while (plen > 0) {
-+		struct sk_buff *skb;
-+		u8 cmd_param[253], fragment_len = (plen > 252) ? 252 : plen;
-+
-+		cmd_param[0] = fragment_type;
-+		memcpy(cmd_param + 1, param, fragment_len);
-+
-+		skb = __hci_cmd_sync(hdev, 0xfc09, fragment_len + 1,
-+				     cmd_param, HCI_INIT_TIMEOUT);
-+		if (IS_ERR(skb))
-+			return PTR_ERR(skb);
-+
-+		kfree_skb(skb);
-+
-+		plen -= fragment_len;
-+		param += fragment_len;
-+	}
-+
-+	return 0;
-+}
-+
-+static void btusb_intel_version_info(struct hci_dev *hdev,
-+				     struct intel_version *ver)
-+{
-+	const char *variant;
-+
-+	switch (ver->fw_variant) {
-+	case 0x06:
-+		variant = "Bootloader";
-+		break;
-+	case 0x23:
-+		variant = "Firmware";
-+		break;
-+	default:
-+		return;
-+	}
-+
-+	BT_INFO("%s: %s revision %u.%u build %u week %u %u", hdev->name,
-+		variant, ver->fw_revision >> 4, ver->fw_revision & 0x0f,
-+		ver->fw_build_num, ver->fw_build_ww, 2000 + ver->fw_build_yy);
-+}
-+
-+static int btusb_setup_intel_new(struct hci_dev *hdev)
-+{
-+	static const u8 reset_param[] = { 0x00, 0x01, 0x00, 0x01,
-+					  0x00, 0x08, 0x04, 0x00 };
-+	struct btusb_data *data = hci_get_drvdata(hdev);
-+	struct sk_buff *skb;
-+	struct intel_version *ver;
-+	struct intel_boot_params *params;
-+	const struct firmware *fw;
-+	const u8 *fw_ptr;
-+	char fwname[64];
-+	ktime_t calltime, delta, rettime;
-+	unsigned long long duration;
-+	int err;
-+
-+	BT_DBG("%s", hdev->name);
-+
-+	calltime = ktime_get();
-+
-+	/* Read the Intel version information to determine if the device
-+	 * is in bootloader mode or if it already has operational firmware
-+	 * loaded.
-+	 */
-+	skb = __hci_cmd_sync(hdev, 0xfc05, 0, NULL, HCI_INIT_TIMEOUT);
-+	if (IS_ERR(skb)) {
-+		BT_ERR("%s: Reading Intel version information failed (%ld)",
-+		       hdev->name, PTR_ERR(skb));
-+		return PTR_ERR(skb);
-+	}
-+
-+	if (skb->len != sizeof(*ver)) {
-+		BT_ERR("%s: Intel version event size mismatch", hdev->name);
-+		kfree_skb(skb);
-+		return -EILSEQ;
-+	}
-+
-+	ver = (struct intel_version *)skb->data;
-+	if (ver->status) {
-+		BT_ERR("%s: Intel version command failure (%02x)",
-+		       hdev->name, ver->status);
-+		err = -bt_to_errno(ver->status);
-+		kfree_skb(skb);
-+		return err;
-+	}
-+
-+	/* The hardware platform number has a fixed value of 0x37 and
-+	 * for now only accept this single value.
-+	 */
-+	if (ver->hw_platform != 0x37) {
-+		BT_ERR("%s: Unsupported Intel hardware platform (%u)",
-+		       hdev->name, ver->hw_platform);
-+		kfree_skb(skb);
-+		return -EINVAL;
-+	}
-+
-+	btusb_intel_version_info(hdev, ver);
-+
-+	/* The firmware variant determines if the device is in bootloader
-+	 * mode or is running operational firmware. The value 0x06 identifies
-+	 * the bootloader and the value 0x23 identifies the operational
-+	 * firmware.
-+	 *
-+	 * When the operational firmware is already present, then only
-+	 * the check for valid Bluetooth device address is needed. This
-+	 * determines if the device will be added as configured or
-+	 * unconfigured controller.
-+	 *
-+	 * It is not possible to use the Secure Boot Parameters in this
-+	 * case since that command is only available in bootloader mode.
-+	 */
-+	if (ver->fw_variant == 0x23) {
-+		kfree_skb(skb);
-+		clear_bit(BTUSB_BOOTLOADER, &data->flags);
-+		btusb_check_bdaddr_intel(hdev);
-+		return 0;
-+	}
-+
-+	/* If the device is not in bootloader mode, then the only possible
-+	 * choice is to return an error and abort the device initialization.
-+	 */
-+	if (ver->fw_variant != 0x06) {
-+		BT_ERR("%s: Unsupported Intel firmware variant (%u)",
-+		       hdev->name, ver->fw_variant);
-+		kfree_skb(skb);
-+		return -ENODEV;
-+	}
-+
-+	/* With the Intel bootloader only the hardware variant and hardware
-+	 * revision are important to select the right firmware to load. The
-+	 * first attempt is to load a specific firmware that matches the
-+	 * hardware variant and hardware revision.
-+	 */
-+	snprintf(fwname, sizeof(fwname), "intel/ibt-%u-%u.sfi",
-+		 ver->hw_variant, ver->hw_revision);
-+
-+	err = request_firmware(&fw, fwname, &hdev->dev);
-+	if (err < 0) {
-+		if (err != -ENOENT) {
-+			BT_ERR("%s: Failed to load Intel firmware file (%d)",
-+			       hdev->name, err);
-+			kfree_skb(skb);
-+			return err;
-+		}
-+
-+		/* If the specific firmware is not available, look for a
-+		 * generic firmware for that hardware variant.
-+		 */
-+		snprintf(fwname, sizeof(fwname), "intel/ibt-%u.sfi",
-+			 ver->hw_variant);
-+
-+		err = request_firmware(&fw, fwname, &hdev->dev);
-+		if (err < 0) {
-+			BT_ERR("%s: Failed to load Intel firmware file (%d)",
-+			       hdev->name, err);
-+			kfree_skb(skb);
-+			return err;
-+		}
-+
-+		BT_INFO("%s: Found generic firmware: %s", hdev->name, fwname);
-+	} else {
-+		BT_INFO("%s: Found firmware: %s", hdev->name, fwname);
-+	}
-+
-+	kfree_skb(skb);
-+
-+	if (fw->size < 644) {
-+		BT_ERR("%s: Invalid size of firmware file (%zu)",
-+		       hdev->name, fw->size);
-+		err = -EBADF;
-+		goto done;
-+	}
-+
-+	/* Read the secure boot parameters to identify the operating
-+	 * details of the bootloader.
-+	 */
-+	skb = __hci_cmd_sync(hdev, 0xfc0d, 0, NULL, HCI_INIT_TIMEOUT);
-+	if (IS_ERR(skb)) {
-+		BT_ERR("%s: Reading Intel boot parameters failed (%ld)",
-+		       hdev->name, PTR_ERR(skb));
-+		err = PTR_ERR(skb);
-+		goto done;
-+	}
-+
-+	if (skb->len != sizeof(*params)) {
-+		BT_ERR("%s: Intel boot parameters size mismatch", hdev->name);
-+		kfree_skb(skb);
-+		err = -EILSEQ;
-+		goto done;
-+	}
-+
-+	params = (struct intel_boot_params *)skb->data;
-+	if (params->status) {
-+		BT_ERR("%s: Intel boot parameters command failure (%02x)",
-+		       hdev->name, params->status);
-+		err = -bt_to_errno(params->status);
-+		kfree_skb(skb);
-+		goto done;
-+	}
-+
-+	BT_INFO("%s: Device revision is %u", hdev->name,
-+		le16_to_cpu(params->dev_revid));
-+
-+	BT_INFO("%s: Secure boot is %s", hdev->name,
-+		params->secure_boot ? "enabled" : "disabled");
-+
-+	BT_INFO("%s: Minimum firmware build %u week %u %u", hdev->name,
-+		params->min_fw_build_nn, params->min_fw_build_cw,
-+		2000 + params->min_fw_build_yy);
-+
-+	/* It is required that every single firmware fragment is acknowledged
-+	 * with a command complete event. If the boot parameters indicate
-+	 * that this bootloader does not send them, then abort the setup.
-+	 */
-+	if (params->limited_cce != 0x00) {
-+		BT_ERR("%s: Unsupported Intel firmware loading method (%u)",
-+		       hdev->name, params->limited_cce);
-+		kfree_skb(skb);
-+		err = -EINVAL;
-+		goto done;
-+	}
-+
-+	/* If the OTP has no valid Bluetooth device address, then there will
-+	 * also be no valid address for the operational firmware.
-+	 */
-+	if (!bacmp(&params->otp_bdaddr, BDADDR_ANY)) {
-+		BT_INFO("%s: No device address configured", hdev->name);
-+		set_bit(HCI_QUIRK_INVALID_BDADDR, &hdev->quirks);
-+	}
-+
-+	kfree_skb(skb);
-+
-+	set_bit(BTUSB_DOWNLOADING, &data->flags);
-+
-+	/* Start the firmware download transaction with the Init fragment
-+	 * represented by the 128 bytes of CSS header.
-+	 */
-+	err = btusb_intel_secure_send(hdev, 0x00, 128, fw->data);
-+	if (err < 0) {
-+		BT_ERR("%s: Failed to send firmware header (%d)",
-+		       hdev->name, err);
-+		goto done;
-+	}
-+
-+	/* Send the 256 bytes of public key information from the firmware
-+	 * as the PKey fragment.
-+	 */
-+	err = btusb_intel_secure_send(hdev, 0x03, 256, fw->data + 128);
-+	if (err < 0) {
-+		BT_ERR("%s: Failed to send firmware public key (%d)",
-+		       hdev->name, err);
-+		goto done;
-+	}
-+
-+	/* Send the 256 bytes of signature information from the firmware
-+	 * as the Sign fragment.
-+	 */
-+	err = btusb_intel_secure_send(hdev, 0x02, 256, fw->data + 388);
-+	if (err < 0) {
-+		BT_ERR("%s: Failed to send firmware signature (%d)",
-+		       hdev->name, err);
-+		goto done;
-+	}
-+
-+	fw_ptr = fw->data + 644;
-+
-+	while (fw_ptr - fw->data < fw->size) {
-+		struct hci_command_hdr *cmd = (void *)fw_ptr;
-+		u8 cmd_len;
-+
-+		cmd_len = sizeof(*cmd) + cmd->plen;
-+
-+		/* Send each command from the firmware data buffer as
-+		 * a single Data fragment.
-+		 */
-+		err = btusb_intel_secure_send(hdev, 0x01, cmd_len, fw_ptr);
-+		if (err < 0) {
-+			BT_ERR("%s: Failed to send firmware data (%d)",
-+			       hdev->name, err);
-+			goto done;
-+		}
-+
-+		fw_ptr += cmd_len;
-+	}
-+
-+	/* Before switching the device into operational mode and with that
-+	 * booting the loaded firmware, wait for the bootloader notification
-+	 * that all fragments have been successfully received.
-+	 *
-+	 * When the event processing receives the notification, then this
-+	 * flag will be cleared. So just in case that happens really quickly,
-+	 * check it first before adding the wait queue.
-+	 */
-+	if (test_bit(BTUSB_DOWNLOADING, &data->flags)) {
-+		DECLARE_WAITQUEUE(wait, current);
-+		signed long timeout;
-+
-+		BT_INFO("%s: Waiting for firmware download to complete",
-+			hdev->name);
-+
-+		add_wait_queue(&hdev->req_wait_q, &wait);
-+		set_current_state(TASK_INTERRUPTIBLE);
-+
-+		/* The firmware loading should not take longer than 5 seconds
-+		 * and thus just timeout if that happens and fail the setup
-+		 * of this device.
-+		 */
-+		timeout = schedule_timeout(msecs_to_jiffies(5000));
-+
-+		remove_wait_queue(&hdev->req_wait_q, &wait);
-+
-+		if (signal_pending(current)) {
-+			BT_ERR("%s: Firmware loading interrupted", hdev->name);
-+			err = -EINTR;
-+			goto done;
-+		}
-+
-+		if (!timeout) {
-+			BT_ERR("%s: Firmware loading timeout", hdev->name);
-+			err = -ETIMEDOUT;
-+			goto done;
-+		}
-+	}
-+
-+	if (test_bit(BTUSB_FIRMWARE_FAILED, &data->flags)) {
-+		BT_ERR("%s: Firmware loading failed", hdev->name);
-+		err = -ENOEXEC;
-+		goto done;
-+	}
-+
-+	rettime = ktime_get();
-+	delta = ktime_sub(rettime, calltime);
-+	duration = (unsigned long long) ktime_to_ns(delta) >> 10;
-+
-+	BT_INFO("%s: Firmware loaded in %llu usecs", hdev->name, duration);
-+
-+done:
-+	release_firmware(fw);
-+
-+	if (err < 0)
-+		return err;
-+
-+	calltime = ktime_get();
-+
-+	set_bit(BTUSB_BOOTING, &data->flags);
-+
-+	skb = __hci_cmd_sync(hdev, 0xfc01, sizeof(reset_param), reset_param,
-+			     HCI_INIT_TIMEOUT);
-+	if (IS_ERR(skb))
-+		return PTR_ERR(skb);
-+
-+	kfree_skb(skb);
-+
-+	/* The bootloader will not indicate when the device is ready. This
-+	 * is done by the operational firmware sending bootup notification.
-+	 */
-+	if (test_bit(BTUSB_BOOTING, &data->flags)) {
-+		DECLARE_WAITQUEUE(wait, current);
-+		signed long timeout;
-+
-+		BT_INFO("%s: Waiting for device to boot", hdev->name);
-+
-+		add_wait_queue(&hdev->req_wait_q, &wait);
-+		set_current_state(TASK_INTERRUPTIBLE);
-+
-+		/* Booting into operational firmware should not take
-+		 * longer than 1 second. However if that happens, then
-+		 * just fail the setup since something went wrong.
-+		 */
-+		timeout = schedule_timeout(msecs_to_jiffies(1000));
-+
-+		remove_wait_queue(&hdev->req_wait_q, &wait);
-+
-+		if (signal_pending(current)) {
-+			BT_ERR("%s: Device boot interrupted", hdev->name);
-+			return -EINTR;
-+		}
-+
-+		if (!timeout) {
-+			BT_ERR("%s: Device boot timeout", hdev->name);
-+			return -ETIMEDOUT;
-+		}
-+	}
-+
-+	rettime = ktime_get();
-+	delta = ktime_sub(rettime, calltime);
-+	duration = (unsigned long long) ktime_to_ns(delta) >> 10;
-+
-+	BT_INFO("%s: Device booted in %llu usecs", hdev->name, duration);
-+
-+	clear_bit(BTUSB_BOOTLOADER, &data->flags);
-+
-+	return 0;
-+}
-+
- static int btusb_set_bdaddr_intel(struct hci_dev *hdev, const bdaddr_t *bdaddr)
- {
- 	struct sk_buff *skb;
-@@ -2049,8 +2610,14 @@ static int btusb_probe(struct usb_interface *intf,
- 	init_usb_anchor(&data->isoc_anchor);
- 	spin_lock_init(&data->rxlock);
- 
--	data->recv_event = hci_recv_frame;
--	data->recv_bulk = btusb_recv_bulk;
-+	if (id->driver_info & BTUSB_INTEL_NEW) {
-+		data->recv_event = btusb_recv_event_intel;
-+		data->recv_bulk = btusb_recv_bulk_intel;
-+		set_bit(BTUSB_BOOTLOADER, &data->flags);
-+	} else {
-+		data->recv_event = hci_recv_frame;
-+		data->recv_bulk = btusb_recv_bulk;
-+	}
- 
- 	hdev = hci_alloc_dev();
- 	if (!hdev)
-@@ -2083,6 +2650,12 @@ static int btusb_probe(struct usb_interface *intf,
- 		hdev->set_bdaddr = btusb_set_bdaddr_intel;
- 	}
- 
-+	if (id->driver_info & BTUSB_INTEL_NEW) {
-+		hdev->send = btusb_send_frame_intel;
-+		hdev->setup = btusb_setup_intel_new;
-+		hdev->set_bdaddr = btusb_set_bdaddr_intel;
-+	}
-+
- 	if (id->driver_info & BTUSB_MARVELL)
- 		hdev->set_bdaddr = btusb_set_bdaddr_marvell;
- 
--- 
-2.1.0
-
+Thanks,
+Arman
