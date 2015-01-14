@@ -1,30 +1,29 @@
 Return-Path: <cyrus@holtmann.org>
-From: Gowtham Anandha Babu <gowtham.ab@samsung.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: bharat.panda@samsung.com, cpgs@samsung.com,
-	Gowtham Anandha Babu <gowtham.ab@samsung.com>
-Subject: [PATCH  0/3] Fix memory issue and trivial code cleaup
-Date: Wed, 14 Jan 2015 15:27:35 +0530
-Message-id: <1421229458-11207-1-git-send-email-gowtham.ab@samsung.com>
+Date: Wed, 14 Jan 2015 11:21:08 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Gowtham Anandha Babu <gowtham.ab@samsung.com>
+Cc: linux-bluetooth@vger.kernel.org, bharat.panda@samsung.com,
+	cpgs@samsung.com
+Subject: Re: [PATCH] Bluetooth: Remove dead code
+Message-ID: <20150114092108.GA30198@t440s.lan>
+References: <1420466575-14615-1-git-send-email-gowtham.ab@samsung.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1420466575-14615-1-git-send-email-gowtham.ab@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-In gatt-client and gatt-helpers, the variables are accessed
-even after it is freed. Making the unref at appropriate
-places solved the issues.
+Hi Gowtham,
 
-In tools, removed dead code warnings.
+On Mon, Jan 05, 2015, Gowtham Anandha Babu wrote:
+> Variable 'controller' is assigned a value that is never used.
+> Identified by cppcheck tool.
+> 
+> Signed-off-by: Gowtham Anandha Babu <gowtham.ab@samsung.com>
+> ---
+>  net/bluetooth/cmtp/capi.c | 6 ------
+>  1 file changed, 6 deletions(-)
 
-Gowtham Anandha Babu (3):
-  shared/gatt-helpers: Fix usage of freed memory
-  shared/gatt-client: Fix usage of freed memory
-  tools/hciattach_ath3k: Remove dead code warnings
+Applied to bluetooth-next. Thanks.
 
- src/shared/gatt-client.c  | 23 +++++++++++------------
- src/shared/gatt-helpers.c | 25 ++++++++++++++++---------
- tools/hciattach_ath3k.c   | 11 +----------
- 3 files changed, 28 insertions(+), 31 deletions(-)
-
--- 
-1.9.1
-
+Johan
