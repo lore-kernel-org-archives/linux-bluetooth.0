@@ -1,29 +1,29 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 15 Jan 2015 22:11:34 +0200
+Date: Thu, 15 Jan 2015 22:01:46 +0200
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Arman Uguray <armansito@chromium.org>
+To: Marcel Holtmann <marcel@holtmann.org>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH BlueZ 1/3] core: device: Fix connect bearer selection
-Message-ID: <20150115201134.GA22093@t440s.P-661HNU-F1>
-References: <1421293935-24092-1-git-send-email-armansito@chromium.org>
+Subject: Re: [PATCH v2] Bluetooth: Add paranoid check for existing LE and
+ BR/EDR SMP channels
+Message-ID: <20150115200146.GA13149@t440s.P-661HNU-F1>
+References: <1421337861-22334-1-git-send-email-marcel@holtmann.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1421293935-24092-1-git-send-email-armansito@chromium.org>
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <1421337861-22334-1-git-send-email-marcel@holtmann.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Arman,
+Hi Marcel,
 
-On Wed, Jan 14, 2015, Arman Uguray wrote:
-> For dual-mode devices created from storage, trying to connect without
-> a scan sometimes causes the incorrect bearer to be connected. This
-> patch modifies device.c:select_conn_bearer so that it simply returns the
-> stored bdaddr_type of a device if neither bredr nor le have been seen
-> in a while.
+On Thu, Jan 15, 2015, Marcel Holtmann wrote:
+> When the SMP channels have been already registered, then print out a
+> clear WARN_ON message that something went wrong. Also unregister the
+> existing channels in this case before trying to register new ones.
+> 
+> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 > ---
->  src/device.c | 3 +++
->  1 file changed, 3 insertions(+)
+>  net/bluetooth/smp.c | 12 ++++++++++++
+>  1 file changed, 12 insertions(+)
 
-All three patches in this set have been applied. Thanks.
+Applied to bluetooth-next. Thanks.
 
 Johan
