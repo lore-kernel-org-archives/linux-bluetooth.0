@@ -1,33 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 8.1 \(1993\))
-Subject: Re: [PATCH 1/2] Bluetooth: Add helpers for src/dst bdaddr type conversion
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1421320005-26037-1-git-send-email-johan.hedberg@gmail.com>
-Date: Thu, 15 Jan 2015 07:58:59 -0800
+Date: Thu, 15 Jan 2015 13:07:15 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
 Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <9B28AC56-7E2F-4FCC-A4B5-083C52085C4A@holtmann.org>
-References: <1421320005-26037-1-git-send-email-johan.hedberg@gmail.com>
-To: Johan Hedberg <johan.hedberg@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Subject: Re: [PATCH 1/3] Bluetooth: Fix LE SMP channel source address and
+ source address type
+Message-ID: <20150115110715.GA26087@t440s.lan>
+References: <1421278991-4169-1-git-send-email-marcel@holtmann.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1421278991-4169-1-git-send-email-marcel@holtmann.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+Hi Marcel,
 
-> The current bdaddr_type() usage in l2cap_core.c is a bit funny in that
-> it's always passed a hci_conn + a hci_conn member. Because of this only
-> the hci_conn is really needed. Since the second parameter is always
-> either hcon->src_type or hcon->dst type this patch adds two helper
-> functions for each purpose: bdaddr_src_type() and bdaddr_dst_type().
+On Wed, Jan 14, 2015, Marcel Holtmann wrote:
+> The source address and source address type of the LE SMP channel can
+> either be the public address of the controller or the static random
+> address configured by the host.
 > 
-> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+> Right now the public address is used for the LE SMP channel and
+> obviously that is not correct if the controller operates with the
+> configured static random address.
+> 
+> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 > ---
-> net/bluetooth/l2cap_core.c | 34 ++++++++++++++++++++++------------
-> 1 file changed, 22 insertions(+), 12 deletions(-)
+>  net/bluetooth/smp.c | 27 +++++++++++++++++++++++----
+>  1 file changed, 23 insertions(+), 4 deletions(-)
 
-patch has been applied to bluetooth-next tree.
+All three patches in this set have been applied to bluetooth-next.
+Thanks.
 
-Regards
-
-Marcel
-
+Johan
