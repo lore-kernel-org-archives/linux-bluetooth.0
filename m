@@ -1,51 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 8.1 \(1993\))
+Subject: Re: [PATCH 2/2] Bluetooth: Fix lookup of fixed channels by local bdaddr
 From: Marcel Holtmann <marcel@holtmann.org>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2] Bluetooth: Add paranoid check for existing LE and BR/EDR SMP channels
-Date: Thu, 15 Jan 2015 08:04:21 -0800
-Message-Id: <1421337861-22334-1-git-send-email-marcel@holtmann.org>
+In-Reply-To: <1421320005-26037-2-git-send-email-johan.hedberg@gmail.com>
+Date: Thu, 15 Jan 2015 07:59:21 -0800
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <88D40788-F79D-426C-91C2-C5E1C792F828@holtmann.org>
+References: <1421320005-26037-1-git-send-email-johan.hedberg@gmail.com> <1421320005-26037-2-git-send-email-johan.hedberg@gmail.com>
+To: Johan Hedberg <johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-When the SMP channels have been already registered, then print out a
-clear WARN_ON message that something went wrong. Also unregister the
-existing channels in this case before trying to register new ones.
+Hi Johan,
 
-Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
----
- net/bluetooth/smp.c | 12 ++++++++++++
- 1 file changed, 12 insertions(+)
+> The comparing of chan->src should always be done against the local
+> identity address, represented by hcon->src and hcon->src_type. This
+> patch modifies l2cap_global_fixed_chan() to take the full hci_conn so
+> that we can easily compare against hcon->src and hcon->src_type.
+> 
+> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+> ---
+> net/bluetooth/l2cap_core.c | 15 +++++++--------
+> 1 file changed, 7 insertions(+), 8 deletions(-)
 
-diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
-index 08a9314f3ca7..37d9180bfe1c 100644
---- a/net/bluetooth/smp.c
-+++ b/net/bluetooth/smp.c
-@@ -3072,6 +3072,12 @@ int smp_register(struct hci_dev *hdev)
- 	if (!lmp_le_capable(hdev))
- 		return 0;
- 
-+	if (WARN_ON(hdev->smp_data)) {
-+		chan = hdev->smp_data;
-+		hdev->smp_data = NULL;
-+		smp_del_chan(chan);
-+	}
-+
- 	chan = smp_add_cid(hdev, L2CAP_CID_SMP);
- 	if (IS_ERR(chan))
- 		return PTR_ERR(chan);
-@@ -3091,6 +3097,12 @@ int smp_register(struct hci_dev *hdev)
- 		return 0;
- 	}
- 
-+	if (WARN_ON(hdev->smp_bredr_data)) {
-+		chan = hdev->smp_bredr_data;
-+		hdev->smp_bredr_data = NULL;
-+		smp_del_chan(chan);
-+	}
-+
- 	chan = smp_add_cid(hdev, L2CAP_CID_SMP_BREDR);
- 	if (IS_ERR(chan)) {
- 		int err = PTR_ERR(chan);
--- 
-2.1.0
+patch has been applied to bluetooth-next tree.
+
+Regards
+
+Marcel
 
