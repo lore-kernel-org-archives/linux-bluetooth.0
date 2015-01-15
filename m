@@ -1,435 +1,227 @@
 Return-Path: <cyrus@holtmann.org>
-From: Sagar Nageshmurthy <s.nageshmurt@samsung.com>
+From: Sebastian Chlad <sebastian.chlad@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-References: <1421313753-3696-1-git-send-email-s.nageshmurt@samsung.com>
-In-reply-to: <1421313753-3696-1-git-send-email-s.nageshmurt@samsung.com>
-Subject: RE: [PATCH 1/1] media: Add properties watch for MPRIS TrackList and
- Playlist interfaces
-Date: Thu, 15 Jan 2015 15:31:00 +0530
-Message-id: <00b401d030aa$2d017c30$87047490$@samsung.com>
-MIME-version: 1.0
-Content-type: text/plain; charset=us-ascii
+Cc: Sebastian Chlad <sebastian.chlad@tieto.com>
+Subject: [PATCH v2] android/pts: Update PTS files for A2DP
+Date: Thu, 15 Jan 2015 10:52:26 +0100
+Message-Id: <1421315546-1117-1-git-send-email-sebastian.chlad@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz, 
-
-We have started with the implementation of MPRIS TrackList and Playlists
-interfaces. Please review the approach followed and let us know your
-comments. 
-
-Regards,
-Sagar N
-
------Original Message-----
-From: Sagar Nageshmurthy [mailto:s.nageshmurt@samsung.com] 
-Sent: Thursday, January 15, 2015 2:53 PM
-To: linux-bluetooth@vger.kernel.org
-Cc: Sagar Nageshmurthy
-Subject: [PATCH 1/1] media: Add properties watch for MPRIS TrackList and
-Playlist interfaces
-
-Parse TrackList properties (Tracks, CanEditTracks) and Playlists properties
-(PlaylistCount, Orderings, ActivePlaylist) according to MPRIS spec.
+Updated PICS, PIXITs and PTS tests results for A2DP.
+PTS version 6.0. Android version 5.0
 ---
- profiles/audio/media.c |  323
-+++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 318 insertions(+), 5 deletions(-)
+ android/pics-a2dp.txt  | 91 ++++++++++++++++++++++++++++++++++++++++++++++----
+ android/pixit-a2dp.txt |  6 ++--
+ android/pts-a2dp.txt   |  9 +++--
+ 3 files changed, 93 insertions(+), 13 deletions(-)
 
-diff --git a/profiles/audio/media.c b/profiles/audio/media.c index
-ef7b910..73698ca 100644
---- a/profiles/audio/media.c
-+++ b/profiles/audio/media.c
-@@ -53,6 +53,8 @@
- #define MEDIA_INTERFACE "org.bluez.Media1"
- #define MEDIA_ENDPOINT_INTERFACE "org.bluez.MediaEndpoint1"
- #define MEDIA_PLAYER_INTERFACE "org.mpris.MediaPlayer2.Player"
-+#define MEDIA_PLAYER_TRACKLIST_INTERFACE "org.mpris.MediaPlayer2.TrackList"
-+#define MEDIA_PLAYER_PLAYLISTS_INTERFACE "org.mpris.MediaPlayer2.Playlists"
+diff --git a/android/pics-a2dp.txt b/android/pics-a2dp.txt
+index adac664..f184cb8 100644
+--- a/android/pics-a2dp.txt
++++ b/android/pics-a2dp.txt
+@@ -1,6 +1,6 @@
+ A2DP PICS for the PTS tool.
  
- #define REQUEST_TIMEOUT (3 * 1000)		/* 3 seconds */
+-PTS version: 5.3
++PTS version: 6.0
  
-@@ -95,7 +97,9 @@ struct media_player {
- 	GHashTable		*settings;	/* Player settings */
- 	GHashTable		*track;		/* Player current track */
- 	guint			watch;
--	guint			properties_watch;
-+	guint			player_properties_watch;
-+	guint			tracklist_properties_watch;
-+	guint			playlists_properties_watch;
- 	guint			seek_watch;
- 	char			*status;
- 	uint32_t		position;
-@@ -948,7 +952,9 @@ static void media_player_free(gpointer data)
- 	}
+ * - different than PTS defaults
+ # - not yet implemented/supported
+@@ -8,6 +8,18 @@ PTS version: 5.3
+ M - mandatory if such role selected
+ O - optional
  
- 	g_dbus_remove_watch(conn, mp->watch);
--	g_dbus_remove_watch(conn, mp->properties_watch);
-+	g_dbus_remove_watch(conn, mp->player_properties_watch);
-+	g_dbus_remove_watch(conn, mp->tracklist_properties_watch);
-+	g_dbus_remove_watch(conn, mp->playlists_properties_watch);
- 	g_dbus_remove_watch(conn, mp->seek_watch);
++		Profile Version
++-------------------------------------------------------------------------------
++Parameter Name	Selected	Description
++-------------------------------------------------------------------------------
++TSPC_A2DP_0_1	False		A2DP 1.0
++TSPC_A2DP_0_1	False		A2DP 1.2
++TSPC_A2DP_0_1	True (*)	A2DP 1.3
++-------------------------------------------------------------------------------
++C.1: It is mandatory to select one of the profile versions.
++-------------------------------------------------------------------------------
++
++
+ 		Roles
+ -------------------------------------------------------------------------------
+ Parameter Name	Selected	Description
+@@ -38,10 +50,16 @@ TSPC_A2DP_2_11	False		SRC: SBC Configurations in 16 KHz sampling (O)
+ TSPC_A2DP_2_12	False		SRC: SBC Configurations in 32 KHz sampling (O)
+ TSPC_A2DP_2_13	True		SRC: SBC Configurations in 44.1 KHz sampling
+ 					(C.1)
+-TSPC_A2DP_2_14	False (*)	SRC: SBC Configurations in 48 KHz sampling
++TSPC_A2DP_2_14	True		SRC: SBC Configurations in 48 KHz sampling
+ 					(C.1)
++TSPC_A2DP_2_15	False		SRC: Delay Reporting (C.2)
++TSPC_A2DP_2_16	False		SRC video playback via Bluetooth VDP (C.3)
++TSPC_A2DP_2_17	False		SRC video playback on a local video
++					display (C.3)
+ -------------------------------------------------------------------------------
+ C.1: At least one of the values shall be supported.
++C.2: Mandatory if A2DP 0/3 AND (2/16 OR 2/17) is supported, otherwise excluded.
++C.3: Optional to support if A2DP 0/3 is supported, otherwise excluded.
+ -------------------------------------------------------------------------------
  
- 	if (mp->track)
-@@ -1685,7 +1691,268 @@ static gboolean parse_player_properties(struct
-media_player *mp,
- 	return TRUE;
- }
  
--static gboolean properties_changed(DBusConnection *connection, DBusMessage
-*msg,
-+static gboolean set_playlistcount(struct media_player *mp,
-+							DBusMessageIter
-*iter)
-+{
-+	uint32_t playlist_count;
-+
-+	if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_UINT32)
-+		return FALSE;
-+
-+	dbus_message_iter_get_basic(iter, &playlist_count);
-+
-+	/* TODO Add a struct member to hold playlist info */
-+	DBG("Playlist Count = %d", playlist_count);
-+
-+	return TRUE;
-+}
-+
-+static gboolean set_orderings(struct media_player *mp, DBusMessageIter 
-+*iter) {
-+	DBusMessageIter entry;
-+	int ctype;
-+
-+	ctype = dbus_message_iter_get_arg_type(iter);
-+	if (ctype != DBUS_TYPE_ARRAY)
-+		return FALSE;
-+
-+	dbus_message_iter_recurse(iter, &entry);
-+
-+	while ((ctype = dbus_message_iter_get_arg_type(&entry)) !=
-+							DBUS_TYPE_INVALID) {
-+		const char *ordering;
-+
-+		if (ctype != DBUS_TYPE_STRING)
-+			return FALSE;
-+
-+		dbus_message_iter_get_basic(&entry, &ordering);
-+		/* TODO Add a struct member to hold playlist info */
-+		DBG("%s", ordering);
-+		dbus_message_iter_next(&entry);
-+	}
-+
-+	return TRUE;
-+}
-+
-+static gboolean set_activeplaylist(struct media_player *mp,
-+							DBusMessageIter
-*iter)
-+{
-+	dbus_bool_t value;
-+	DBusMessageIter entry;
-+
-+	if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_STRUCT)
-+		return FALSE;
-+
-+	dbus_message_iter_recurse(iter, &entry);
-+
-+	dbus_message_iter_get_basic(&entry, &value);
-+	DBG("Active %s", value ? "TRUE" : "FALSE");
-+
-+	if (value) {
-+		char *playlist_id = NULL;
-+		char *playlist_name = NULL;
-+		char *playlist_icon = NULL;
-+		DBusMessageIter playlist_iter;
-+
-+		dbus_message_iter_next(&entry);
-+		if (dbus_message_iter_get_arg_type(&entry) !=
-DBUS_TYPE_STRUCT)
-+			return FALSE;
-+
-+		dbus_message_iter_recurse(&entry, &playlist_iter);
-+
-+		if (dbus_message_iter_get_arg_type(&playlist_iter) !=
-+
-DBUS_TYPE_OBJECT_PATH)
-+			return FALSE;
-+
-+		/* TODO Add a struct member to hold playlist info */
-+		dbus_message_iter_get_basic(&playlist_iter, &playlist_id);
-+		DBG("Playlist Id %s", playlist_id);
-+
-+		dbus_message_iter_next(&playlist_iter);
-+
-+		if (dbus_message_iter_get_arg_type(&playlist_iter) !=
-+							DBUS_TYPE_STRING)
-+			return FALSE;
-+
-+		dbus_message_iter_get_basic(&playlist_iter, &playlist_name);
-+		DBG("Playlist Name %s", playlist_name);
-+
-+		dbus_message_iter_next(&playlist_iter);
-+		if (dbus_message_iter_get_arg_type(&playlist_iter) !=
-+							DBUS_TYPE_STRING)
-+			return FALSE;
-+
-+		dbus_message_iter_get_basic(&playlist_iter, &playlist_icon);
-+		DBG("Playlist Icon %s", playlist_icon);
-+	}
-+
-+	return TRUE;
-+}
-+
-+static gboolean set_playlist_property(struct media_player *mp, const char
-*key,
-+							DBusMessageIter
-*entry)
-+{
-+	DBusMessageIter var;
-+
-+	if (dbus_message_iter_get_arg_type(entry) != DBUS_TYPE_VARIANT)
-+		return FALSE;
-+
-+	dbus_message_iter_recurse(entry, &var);
-+
-+	if (strcasecmp(key, "PlaylistCount") == 0)
-+		return set_playlistcount(mp, &var);
-+
-+	if (strcasecmp(key, "Orderings") == 0)
-+		return set_orderings(mp, &var);
-+
-+	if (strcasecmp(key, "ActivePlaylist") == 0)
-+		return set_activeplaylist(mp, &var);
-+
-+	DBG("%s not supported, ignoring", key);
-+
-+	return TRUE;
-+}
-+
-+
-+static gboolean parse_playlists_properties(struct media_player *mp,
-+							DBusMessageIter
-*iter)
-+{
-+	DBusMessageIter dict;
-+	int ctype;
-+
-+	ctype = dbus_message_iter_get_arg_type(iter);
-+	if (ctype != DBUS_TYPE_ARRAY)
-+		return FALSE;
-+
-+	dbus_message_iter_recurse(iter, &dict);
-+
-+	while ((ctype = dbus_message_iter_get_arg_type(&dict)) !=
-+							DBUS_TYPE_INVALID) {
-+		DBusMessageIter entry;
-+		const char *key;
-+
-+		if (ctype != DBUS_TYPE_DICT_ENTRY)
-+			return FALSE;
-+
-+		dbus_message_iter_recurse(&dict, &entry);
-+
-+		if (dbus_message_iter_get_arg_type(&entry) !=
-DBUS_TYPE_STRING)
-+			return FALSE;
-+
-+		dbus_message_iter_get_basic(&entry, &key);
-+		dbus_message_iter_next(&entry);
-+
-+		if (set_playlist_property(mp, key, &entry) == FALSE)
-+			return FALSE;
-+
-+		dbus_message_iter_next(&dict);
-+	}
-+
-+	return TRUE;
-+}
-+
-+static gboolean set_tracks(struct media_player *mp, DBusMessageIter 
-+*iter) {
-+	DBusMessageIter entry;
-+	int ctype;
-+
-+	ctype = dbus_message_iter_get_arg_type(iter);
-+	if (ctype != DBUS_TYPE_ARRAY)
-+		return FALSE;
-+
-+	dbus_message_iter_recurse(iter, &entry);
-+
-+	while ((ctype = dbus_message_iter_get_arg_type(&entry)) !=
-+				DBUS_TYPE_INVALID) {
-+		const char *track_id;
-+
-+		if (ctype != DBUS_TYPE_OBJECT_PATH)
-+			return FALSE;
-+
-+		dbus_message_iter_get_basic(&entry, &track_id);
-+		/* TODO Add a struct member to hold playlist info */
-+		DBG("%s", track_id);
-+		dbus_message_iter_next(&entry);
-+	}
-+
-+	return TRUE;
-+}
-+
-+static gboolean set_canedittracks(struct media_player *mp,
-+				DBusMessageIter *iter)
-+{
-+	dbus_bool_t value;
-+
-+	if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_BOOLEAN)
-+		return FALSE;
-+
-+	dbus_message_iter_get_basic(iter, &value);
-+
-+	/* TODO Add a struct member to hold info */
-+	DBG("Value = %s", value ? "TRUE" : "FALSE");
-+
-+	return TRUE;
-+}
-+
-+static gboolean set_tracklist_property(struct media_player *mp, const char
-*key,
-+							DBusMessageIter
-*entry)
-+{
-+	DBusMessageIter var;
-+
-+	if (dbus_message_iter_get_arg_type(entry) != DBUS_TYPE_VARIANT)
-+		return FALSE;
-+
-+	dbus_message_iter_recurse(entry, &var);
-+
-+	if (strcasecmp(key, "Tracks") == 0)
-+		return set_tracks(mp, &var);
-+
-+	if (strcasecmp(key, "CanEditTracks") == 0)
-+		return set_canedittracks(mp, &var);
-+
-+	DBG("%s not supported, ignoring", key);
-+
-+	return TRUE;
-+}
-+
-+static gboolean parse_tracklist_properties(struct media_player *mp,
-+							DBusMessageIter
-*iter)
-+{
-+	DBusMessageIter dict;
-+	int ctype;
-+
-+	ctype = dbus_message_iter_get_arg_type(iter);
-+	if (ctype != DBUS_TYPE_ARRAY)
-+		return FALSE;
-+
-+	dbus_message_iter_recurse(iter, &dict);
-+
-+	while ((ctype = dbus_message_iter_get_arg_type(&dict)) !=
-+							DBUS_TYPE_INVALID) {
-+		DBusMessageIter entry;
-+		const char *key;
-+
-+		if (ctype != DBUS_TYPE_DICT_ENTRY)
-+			return FALSE;
-+
-+		dbus_message_iter_recurse(&dict, &entry);
-+		if (dbus_message_iter_get_arg_type(&entry) !=
-DBUS_TYPE_STRING)
-+			return FALSE;
-+
-+		dbus_message_iter_get_basic(&entry, &key);
-+		dbus_message_iter_next(&entry);
-+
-+		if (set_tracklist_property(mp, key, &entry) == FALSE)
-+			return FALSE;
-+
-+		dbus_message_iter_next(&dict);
-+	}
-+
-+	return TRUE;
-+}
-+
-+static gboolean player_properties_changed(DBusConnection *connection,
-+							DBusMessage *msg,
- 							void *user_data)
- {
- 	struct media_player *mp = user_data;
-@@ -1702,6 +1969,42 @@ static gboolean properties_changed(DBusConnection
-*connection, DBusMessage *msg,
- 	return TRUE;
- }
+@@ -49,8 +67,39 @@ C.1: At least one of the values shall be supported.
+ -------------------------------------------------------------------------------
+ Parameter Name	Selected	Description
+ -------------------------------------------------------------------------------
+-TSPC_A2DP_3_1	True		SRC: SBC encoder Codec (M)
+-TSPC_A2DP_3_2	True (*)	SRC: Additional encoder Codec (O)
++TSPC_A2DP_3_1	True		SRC: SBC encoder (M)
++TSPC_A2DP_3_1a	False		SRC: Encode and Forward SBC Audio Stream (O)
++TSPC_A2DP_3_2	False		SRC: Optional codec (O)
++TSPC_A2DP_3_3	False		SRC: MPEG-1,2 Audio decoder (C.1)
++TSPC_A2DP_3_4	False		SRC: MPEG-1,2 Audio encoder (C.1)
++TSPC_A2DP_3_5	False		SRC: MPEG-2,4 AAC decoder (C.1)
++TSPC_A2DP_3_6	False		SRC: MPEG-2,4 AAC encoder (C.1)
++TSPC_A2DP_3_7	False		SRC: ATRAC family decoder (C.1)
++TSPC_A2DP_3_8	False		SRC: ATRAC family encoder (C.1)
++-------------------------------------------------------------------------------
++C.1: At least one of the implementations shall be supported if 12/2 (Optional
++	codec) is supported, else excluded.
++-------------------------------------------------------------------------------
++
++
++		Supported Codec Features in SRC
++-------------------------------------------------------------------------------
++Parameter Name	Selected	Description
++-------------------------------------------------------------------------------
++TSPC_A2DP_3a_1	True 		SRC: Channel Mode - Mono (M)
++TSPC_A2DP_3a_2	True (*)	SRC: Channel Mode - Dual Channel (C.1)
++TSPC_A2DP_3a_3	True (*)	SRC: Channel Mode - Stereo (C.1)
++TSPC_A2DP_3a_4	True (*)	SRC: Channel Mode - Joint Stereo (C.1)
++TSPC_A2DP_3a_5	True		SRC: Block Length 4 (M)
++TSPC_A2DP_3a_6	True		SRC: Block Length 8 (M)
++TSPC_A2DP_3a_7	True		SRC: Block Length 12 (M)
++TSPC_A2DP_3a_8	True		SRC: Block Length 16 (M)
++TSPC_A2DP_3a_9	True (*)	SRC: Subbands - 4 (O)
++TSPC_A2DP_3a_10	True		SRC: Subbands - 8 (M)
++TSPC_A2DP_3a_11	True (*)	SRC: Allocation - SNR (O)
++TSPC_A2DP_3a_12	True		SRC: Allocation - Loudness (M)
++-------------------------------------------------------------------------------
++C.1: At least one of the values shall be supported.
+ -------------------------------------------------------------------------------
  
-+static gboolean tracklist_properties_changed(DBusConnection *connection,
-+							DBusMessage *msg,
-+							void *user_data)
-+{
-+	struct media_player *mp = user_data;
-+	DBusMessageIter iter;
+ 
+@@ -73,6 +122,9 @@ TSPC_A2DP_4_11	False		SNK: SBC Configurations in 16 KHz sampling (O)
+ TSPC_A2DP_4_12	False		SNK: SBC Configurations in 32 KHz sampling (O)
+ TSPC_A2DP_4_13	False (*)	SNK: SBC Configurations in 44.1 KHz sampling (M)
+ TSPC_A2DP_4_14	False (*)	SNK: SBC Configurations in 48 KHz sampling (M)
++TSPC_A2DP_4_15	False		SNK: Delay Reporting (C.1)
++-------------------------------------------------------------------------------
++C.1: Mandatory to support if A2DP 0/3 is supported, otherwise excluded.
+ -------------------------------------------------------------------------------
+ 
+ 
+@@ -80,7 +132,32 @@ TSPC_A2DP_4_14	False (*)	SNK: SBC Configurations in 48 KHz sampling (M)
+ -------------------------------------------------------------------------------
+ Parameter Name	Selected	Description
+ -------------------------------------------------------------------------------
+-TSPC_A2DP_5_1	False (*)	SNK: SBC decoder Codec (M)
+-TSPC_A2DP_5_2	False		SNK: Additional decoder Coded (O)
+-TSPC_ALL	False		Enable all test cases when set to False.
++TSPC_A2DP_5_1	False (*)	SNK: SBC decoder (M)
++TSPC_A2DP_5_1a	False		SNK: Decode and Forward SBC Audio Stream (O)
++TSPC_A2DP_5_2	False		SNK: Optional codec decoder (O)
++TSPC_A2DP_5_3	False		SNK: MPEG-1,2 Audio (C.1)
++TSPC_A2DP_5_4	False		SNK: MPEG-2,4 AAC (C.1)
++TSPC_A2DP_5_5	False		SNK: ATRAC family (C.1)
++-------------------------------------------------------------------------------
++C.1: At least one codec shall be supported if Table 13/2 (Optional codec
++	decoder) is supported, otherwise excluded.
++-------------------------------------------------------------------------------
 +
-+	DBG("sender=%s path=%s", mp->sender, mp->path);
 +
-+	dbus_message_iter_init(msg, &iter);
-+
-+	dbus_message_iter_next(&iter);
-+
-+	parse_tracklist_properties(mp, &iter);
-+
-+	return TRUE;
-+}
-+
-+static gboolean playlists_properties_changed(DBusConnection *connection,
-+							DBusMessage *msg,
-+							void *user_data)
-+{
-+	struct media_player *mp = user_data;
-+	DBusMessageIter iter;
-+
-+	DBG("sender=%s path=%s", mp->sender, mp->path);
-+
-+	dbus_message_iter_init(msg, &iter);
-+
-+	dbus_message_iter_next(&iter);
-+
-+	parse_playlists_properties(mp, &iter);
-+
-+	return TRUE;
-+}
-+
- static gboolean position_changed(DBusConnection *connection, DBusMessage
-*msg,
- 							void *user_data)
- {
-@@ -1734,9 +2037,19 @@ static struct media_player
-*media_player_create(struct media_adapter *adapter,
- 	mp->watch = g_dbus_add_disconnect_watch(conn, sender,
- 						media_player_exit, mp,
- 						NULL);
--	mp->properties_watch = g_dbus_add_properties_watch(conn, sender,
-+	mp->player_properties_watch = g_dbus_add_properties_watch(conn, 
-+sender,
- 						path,
-MEDIA_PLAYER_INTERFACE,
--						properties_changed,
-+						player_properties_changed,
-+						mp, NULL);
-+	mp->tracklist_properties_watch = g_dbus_add_properties_watch(conn,
-+						sender, path,
-+
-MEDIA_PLAYER_TRACKLIST_INTERFACE,
-+
-tracklist_properties_changed,
-+						mp, NULL);
-+	mp->playlists_properties_watch = g_dbus_add_properties_watch(conn,
-+						sender,	path,
-+
-MEDIA_PLAYER_PLAYLISTS_INTERFACE,
-+
-playlists_properties_changed,
- 						mp, NULL);
- 	mp->seek_watch = g_dbus_add_signal_watch(conn, sender,
- 						path,
-MEDIA_PLAYER_INTERFACE,
---
-1.7.9.5
++		Supported Codec Features in SNK
++-------------------------------------------------------------------------------
++Parameter Name	Selected	Description
++-------------------------------------------------------------------------------
++TSPC_A2DP_5a_1	False (*)	SNK: Channel Mode - Mono (M)
++TSPC_A2DP_5a_2	False (*)	SNK: Channel Mode - Dual Channel (M)
++TSPC_A2DP_5a_3	False (*)	SNK: Channel Mode - Stereo (M)
++TSPC_A2DP_5a_4	False (*)	SNK: Channel Mode - Joint Stereo (M)
++TSPC_A2DP_5a_5	False (*)	SNK: Block Length 4 (M)
++TSPC_A2DP_5a_6	False (*)	SNK: Block Length 8 (M)
++TSPC_A2DP_5a_7	False (*)	SNK: Block Length 12 (M)
++TSPC_A2DP_5a_8	False (*)	SNK: Block Length 16 (M)
++TSPC_A2DP_5a_9	False (*)	SNK: Subbands - 4 (M)
++TSPC_A2DP_5a_10	False (*)	SNK: Subbands - 8 (M)
++TSPC_A2DP_5a_11	False (*)	SNK: Allocation - SNR (M)
++TSPC_A2DP_5a_12	False (*)	SNK: Allocation - Loudness (M)
+ -------------------------------------------------------------------------------
+diff --git a/android/pixit-a2dp.txt b/android/pixit-a2dp.txt
+index 3e26eac..62a9b43 100644
+--- a/android/pixit-a2dp.txt
++++ b/android/pixit-a2dp.txt
+@@ -1,6 +1,6 @@
+ A2DP PIXIT for the PTS tool.
+ 
+-PTS version: 5.3
++PTS version: 6.0
+ 
+ * - different than PTS defaults
+ & - should be set to IUT Bluetooth address
+@@ -10,7 +10,7 @@ Required PIXIT settings
+ -------------------------------------------------------------------------------
+ Parameter Name			Value
+ -------------------------------------------------------------------------------
+-TSPX_security_enabled		FALSE
++TSPX_security_enabled		TRUE
+ TSPX_bd_addr_iut		112233445566 (*&)
+ TSPX_SRC_class_of_device	080418
+ TSPX_SNK_class_of_device	04041C
+@@ -20,7 +20,7 @@ TSPX_time_guard			300000
+ TSPX_use_implicit_send		TRUE
+ TSPX_media_directory		C:\Program Files\Bluetooth SIG\Bluetooth PTS\
+ 					bin\audio (#)
+-TSPX_no_avrcp			TRUE
++TSPX_no_avrcp			FALSE
+ TSPX_auth_password		0000
+ TSPX_auth_user_id		PTS
+ TSPX_rfcomm_channel		8
+diff --git a/android/pts-a2dp.txt b/android/pts-a2dp.txt
+index 92c3e15..500c631 100644
+--- a/android/pts-a2dp.txt
++++ b/android/pts-a2dp.txt
+@@ -1,7 +1,7 @@
+ PTS test results for A2DP
+ 
+-PTS version: 5.3
+-Tested: 19-November-2014
++PTS version: 6.0
++Tested: 14-January-2015
+ Android version: 5.0
+ 
+ Results:
+@@ -15,7 +15,7 @@ N/A	test is disabled due to PICS setup
+ Test Name		Result	Notes
+ -------------------------------------------------------------------------------
+ TC_SRC_CC_BV_09_I	PASS	Start streaming
+-TC_SRC_CC_BV_10_I	N/A
++TC_SRC_CC_BV_10_I	PASS
+ TC_SRC_REL_BV_01_I	PASS	Connect to PTS from IUT. When requested
+ 				disconnect from IUT
+ TC_SRC_REL_BV_02_I	PASS
+@@ -24,12 +24,15 @@ TC_SRC_SET_BV_02_I	PASS
+ TC_SRC_SET_BV_03_I	PASS	Start streaming
+ TC_SRC_SET_BV_04_I	PASS	Start streaming
+ TC_SRC_SET_BV_05_I	PASS	IUT must be moved out of range
++				JIRA issue BA-314
+ TC_SRC_SET_BV_06_I	PASS	IUT must be moved out of range
+ TC_SRC_SUS_BV_01_I	PASS	Stop streaming
+ TC_SRC_SUS_BV_02_I	PASS
+ TC_SRC_SDP_BV_01_I	PASS
+ TC_SRC_AS_BV_01_I	PASS	Requires checking if the output on the IUT is
+ 				correct
++TC_SRC_AS_BV_02_I	N/A
++TC_SRC_AS_BV_03_I	N/A
+ -------------------------------------------------------------------------------
+ 
+ 
+-- 
+1.9.3
 
