@@ -1,58 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 16 Jan 2015 12:47:45 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Jakub Pawlowski <jpawlowski@google.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v8 1/2] Bluetooth: Add le_scan_restart
-Message-ID: <20150116104745.GA1630@t440s.lan>
-References: <1421240985-28944-1-git-send-email-jpawlowski@google.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1421240985-28944-1-git-send-email-jpawlowski@google.com>
+From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH 1/2] android/pts: Update AVDTP pics, pixits for PTS 6.0
+Date: Fri, 16 Jan 2015 11:25:12 +0100
+Message-Id: <1421403913-16197-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jakub,
+This patch updates pics and pixits for PTS 6.0
+---
+ android/pics-avdtp.txt  | 2 +-
+ android/pixit-avdtp.txt | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
-On Wed, Jan 14, 2015, Jakub Pawlowski wrote:
-> +static void le_scan_restart_work_complete(struct hci_dev *hdev, u8 status,
-> +					  u16 opcode)
-> +{
-> +	BT_DBG("%s", hdev->name);
-> +	if (status) {
-> +		BT_ERR("Failed to restart LE scan: status %d", status);
-> +	} else if (test_bit(HCI_QUIRK_STRICT_DUPLICATE_FILTER, &hdev->quirks) &&
-> +		 hdev->discovery.scan_end != 0) {
-> +		long timeout = hdev->discovery.scan_end - jiffies;
+diff --git a/android/pics-avdtp.txt b/android/pics-avdtp.txt
+index ce7b259..191eaa4 100644
+--- a/android/pics-avdtp.txt
++++ b/android/pics-avdtp.txt
+@@ -1,6 +1,6 @@
+ AVDTP PICS for the PTS tool.
+ 
+-PTS version: 5.3
++PTS version: 6.0
+ 
+ * - different than PTS defaults
+ # - not yet implemented/supported
+diff --git a/android/pixit-avdtp.txt b/android/pixit-avdtp.txt
+index b548ffe..c4b7ed8 100644
+--- a/android/pixit-avdtp.txt
++++ b/android/pixit-avdtp.txt
+@@ -1,6 +1,6 @@
+ AVDTP PIXIT for the PTS tool.
+ 
+-PTS version: 5.3
++PTS version: 6.0
+ 
+ * - different than PTS defaults
+ & - should be set to IUT Bluetooth address
+-- 
+1.9.3
 
-To make this consistent with the coding style, could you please format
-it as:
-
-	if (status) {
-		BT_ERR(...);
-		return;
-	}
-
-	if (!test_bit(DUP_FILT) || !hdev->discovery_scan_end)
-		return;
-
-	timeout = ...;
-
-> +static void le_scan_restart_work(struct work_struct *work)
-> +{
-> +	struct hci_dev *hdev = container_of(work, struct hci_dev,
-> +					    le_scan_restart.work);
-> +	struct hci_request req;
-> +	struct hci_cp_le_set_scan_enable cp;
-> +	int err;
-> +
-> +	BT_DBG("%s", hdev->name);
-> +
-> +	/* If controller is not scanning we are done. */
-> +	if (!test_bit(HCI_LE_SCAN, &hdev->dev_flags))
-> +		return;
-
-Shouldn't you also make sure to cancel this delayed work wherever the
-code clears the HCI_LE_SCAN flag? (i.e. in hci_event.c)
-
-Johan
