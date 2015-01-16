@@ -1,172 +1,69 @@
 Return-Path: <cyrus@holtmann.org>
+MIME-Version: 1.0
+In-Reply-To: <20150116104745.GA1630@t440s.lan>
+References: <1421240985-28944-1-git-send-email-jpawlowski@google.com>
+	<20150116104745.GA1630@t440s.lan>
+Date: Fri, 16 Jan 2015 13:11:31 +0100
+Message-ID: <CAD0=r8wGXWiD4fxN5CnsDz9t1+oFCno4j8Et5Zt=5kvpO4ZNng@mail.gmail.com>
+Subject: Re: [PATCH v8 1/2] Bluetooth: Add le_scan_restart
 From: Jakub Pawlowski <jpawlowski@google.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Jakub Pawlowski <jpawlowski@google.com>
-Subject: [PATCH v9 1/2] Bluetooth: Add le_scan_restart
-Date: Fri, 16 Jan 2015 04:19:53 -0800
-Message-Id: <1421410794-16856-1-git-send-email-jpawlowski@google.com>
+To: Jakub Pawlowski <jpawlowski@google.com>,
+	BlueZ development <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Currently there is no way to restart le scan, and it's needed in
-service scan method. The way it work: it disable, and then enable le
-scan on controller.
+Hi Johan,
 
-Signed-off-by: Jakub Pawlowski <jpawlowski@google.com>
----
- include/net/bluetooth/hci_core.h |  3 +++
- net/bluetooth/hci_core.c         | 55 ++++++++++++++++++++++++++++++++++++++++
- net/bluetooth/mgmt.c             |  7 ++++-
- 3 files changed, 64 insertions(+), 1 deletion(-)
+On Fri, Jan 16, 2015 at 11:47 AM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
+> Hi Jakub,
+>
+> On Wed, Jan 14, 2015, Jakub Pawlowski wrote:
+>> +static void le_scan_restart_work_complete(struct hci_dev *hdev, u8 status,
+>> +                                       u16 opcode)
+>> +{
+>> +     BT_DBG("%s", hdev->name);
+>> +     if (status) {
+>> +             BT_ERR("Failed to restart LE scan: status %d", status);
+>> +     } else if (test_bit(HCI_QUIRK_STRICT_DUPLICATE_FILTER, &hdev->quirks) &&
+>> +              hdev->discovery.scan_end != 0) {
+>> +             long timeout = hdev->discovery.scan_end - jiffies;
+>
+> To make this consistent with the coding style, could you please format
+> it as:
+>
+>         if (status) {
+>                 BT_ERR(...);
+>                 return;
+>         }
+>
+>         if (!test_bit(DUP_FILT) || !hdev->discovery_scan_end)
+>                 return;
+>
+>         timeout = ...;
+>
+>> +static void le_scan_restart_work(struct work_struct *work)
+>> +{
+>> +     struct hci_dev *hdev = container_of(work, struct hci_dev,
+>> +                                         le_scan_restart.work);
+>> +     struct hci_request req;
+>> +     struct hci_cp_le_set_scan_enable cp;
+>> +     int err;
+>> +
+>> +     BT_DBG("%s", hdev->name);
+>> +
+>> +     /* If controller is not scanning we are done. */
+>> +     if (!test_bit(HCI_LE_SCAN, &hdev->dev_flags))
+>> +             return;
+>
+> Shouldn't you also make sure to cancel this delayed work wherever the
+> code clears the HCI_LE_SCAN flag? (i.e. in hci_event.c)
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 7777124..1d172bf 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -79,6 +79,7 @@ struct discovery_state {
- 	s8			rssi;
- 	u16			uuid_count;
- 	u8			(*uuids)[16];
-+	long			scan_end;
- };
- 
- struct hci_conn_hash {
-@@ -351,6 +352,7 @@ struct hci_dev {
- 	unsigned long		dev_flags;
- 
- 	struct delayed_work	le_scan_disable;
-+	struct delayed_work	le_scan_restart;
- 
- 	__s8			adv_tx_power;
- 	__u8			adv_data[HCI_MAX_AD_LENGTH];
-@@ -527,6 +529,7 @@ static inline void hci_discovery_filter_clear(struct hci_dev *hdev)
- 	hdev->discovery.uuid_count = 0;
- 	kfree(hdev->discovery.uuids);
- 	hdev->discovery.uuids = NULL;
-+	hdev->discovery.scan_end = 0;
- }
- 
- bool hci_discovery_active(struct hci_dev *hdev);
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 34c17a0..07fc610 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -1614,6 +1614,7 @@ static int hci_dev_do_close(struct hci_dev *hdev)
- 		cancel_delayed_work(&hdev->service_cache);
- 
- 	cancel_delayed_work_sync(&hdev->le_scan_disable);
-+	cancel_delayed_work_sync(&hdev->le_scan_restart);
- 
- 	if (test_bit(HCI_MGMT, &hdev->dev_flags))
- 		cancel_delayed_work_sync(&hdev->rpa_expired);
-@@ -2790,12 +2791,15 @@ static void le_scan_disable_work_complete(struct hci_dev *hdev, u8 status,
- 
- 	switch (hdev->discovery.type) {
- 	case DISCOV_TYPE_LE:
-+		hdev->discovery.scan_end = 0;
- 		hci_dev_lock(hdev);
- 		hci_discovery_set_state(hdev, DISCOVERY_STOPPED);
- 		hci_dev_unlock(hdev);
- 		break;
- 
- 	case DISCOV_TYPE_INTERLEAVED:
-+		hdev->discovery.scan_end = 0;
-+
- 		hci_req_init(&req, hdev);
- 
- 		memset(&cp, 0, sizeof(cp));
-@@ -2827,6 +2831,8 @@ static void le_scan_disable_work(struct work_struct *work)
- 
- 	BT_DBG("%s", hdev->name);
- 
-+	cancel_delayed_work_sync(&hdev->le_scan_restart);
-+
- 	hci_req_init(&req, hdev);
- 
- 	hci_req_add_le_scan_disable(&req);
-@@ -2836,6 +2842,54 @@ static void le_scan_disable_work(struct work_struct *work)
- 		BT_ERR("Disable LE scanning request failed: err %d", err);
- }
- 
-+static void le_scan_restart_work_complete(struct hci_dev *hdev, u8 status,
-+					  u16 opcode)
-+{
-+	BT_DBG("%s", hdev->name);
-+	if (status) {
-+		BT_ERR("Failed to restart LE scan: status %d", status);
-+		return;
-+	}
-+
-+	if (!test_bit(HCI_QUIRK_STRICT_DUPLICATE_FILTER, &hdev->quirks) ||
-+	    !hdev->discovery.scan_end) {
-+		long timeout = hdev->discovery.scan_end - jiffies;
-+
-+		if (timeout < 0)
-+			timeout = 0;
-+		queue_delayed_work(hdev->workqueue,
-+				   &hdev->le_scan_disable, timeout);
-+	}
-+}
-+
-+static void le_scan_restart_work(struct work_struct *work)
-+{
-+	struct hci_dev *hdev = container_of(work, struct hci_dev,
-+					    le_scan_restart.work);
-+	struct hci_request req;
-+	struct hci_cp_le_set_scan_enable cp;
-+	int err;
-+
-+	BT_DBG("%s", hdev->name);
-+
-+	/* If controller is not scanning we are done. */
-+	if (!test_bit(HCI_LE_SCAN, &hdev->dev_flags))
-+		return;
-+
-+	hci_req_init(&req, hdev);
-+
-+	hci_req_add_le_scan_disable(&req);
-+
-+	memset(&cp, 0, sizeof(cp));
-+	cp.enable = LE_SCAN_ENABLE;
-+	cp.filter_dup = LE_SCAN_FILTER_DUP_ENABLE;
-+	hci_req_add(&req, HCI_OP_LE_SET_SCAN_ENABLE, sizeof(cp), &cp);
-+
-+	err = hci_req_run(&req, le_scan_restart_work_complete);
-+	if (err)
-+		BT_ERR("Restart LE scan request failed: err %d", err);
-+}
-+
- /* Copy the Identity Address of the controller.
-  *
-  * If the controller has a public BD_ADDR, then by default use that one.
-@@ -2931,6 +2985,7 @@ struct hci_dev *hci_alloc_dev(void)
- 	INIT_DELAYED_WORK(&hdev->power_off, hci_power_off);
- 	INIT_DELAYED_WORK(&hdev->discov_off, hci_discov_off);
- 	INIT_DELAYED_WORK(&hdev->le_scan_disable, le_scan_disable_work);
-+	INIT_DELAYED_WORK(&hdev->le_scan_restart, le_scan_restart_work);
- 
- 	skb_queue_head_init(&hdev->rx_q);
- 	skb_queue_head_init(&hdev->cmd_q);
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index f5c4d2e..c2b5f8a 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -3878,9 +3878,14 @@ static void start_discovery_complete(struct hci_dev *hdev, u8 status,
- 		break;
- 	}
- 
--	if (timeout)
-+	if (timeout) {
-+		if (hdev->discovery.uuid_count > 0 &&
-+		    test_bit(HCI_QUIRK_STRICT_DUPLICATE_FILTER, &hdev->quirks))
-+			hdev->discovery.scan_end = jiffies + timeout;
-+
- 		queue_delayed_work(hdev->workqueue,
- 				   &hdev->le_scan_disable, timeout);
-+	}
- 
- unlock:
- 	hci_dev_unlock(hdev);
--- 
-2.2.0.rc0.207.ga3a616c
+le_scan_restart_work  checks wether HCI_LE_SCAN is set to make sure it
+won't accidentally 'restart' the scan when it's disabled.
+Or did you wanted to cancel this delayed work to make the code faster ?
+This cancel would be executed only if the DEDUPLICATION quirk is set,
+so it shouldn't be a gain in speed.
 
+>
+> Johan
