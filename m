@@ -1,52 +1,20 @@
 Return-Path: <cyrus@holtmann.org>
-From: Rick Dunn <rick@rickdunn.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: 
-Date: Fri, 16 Jan 2015 16:44:32 -0500
-Message-Id: <1421444673-6301-1-git-send-email-rick@rickdunn.com>
+From: Joseph McLaughlin <JMcLaughlin@cybexintl.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: BLE peripheral with GATT DBus API
+Date: Fri, 16 Jan 2015 18:50:10 +0000
+Message-ID: <D0DEC78F.16D94%jmclaughlin@cybexintl.com>
+Content-Type: text/plain; charset="Windows-1252"
+MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Hi:
 
-Please add upstream to support the sub BT chip on the combo card...
+I’m trying to use BlueZ to implement a GATT server (peripheral) that will host a couple of custom BLE services with a multitude of characteristics each.  I was hoping to use the GATT Dbus API with BlueZ, but  I see from this post: http://article.gmane.org/gmane.linux.bluez.kernel/54715 that as of a few months ago, the GATT Dbus API is not quite ready.  Is this still the case with the latest BlueZ (5.27 as of now)?  I’m assuming so since I don’t see the API documentation in the doc folder.
 
-/sys/kernel/debug/usb/devices
-T:  Bus=03 Lev=01 Prnt=01 Port=06 Cnt=03 Dev#=  5 Spd=12   MxCh= 0
-D:  Ver= 2.00 Cls=ff(vend.) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-P:  Vendor=0b05 ProdID=17cf Rev= 1.12
-S:  Manufacturer=Broadcom Corp
-S:  Product=BCM20702A0
-S:  SerialNumber=54271E3298CD
-C:* #Ifs= 4 Cfg#= 1 Atr=e0 MxPwr=  0mA
-I:* If#= 0 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
-E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
-E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-I:* If#= 1 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-I:  If#= 1 Alt= 1 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-I:  If#= 1 Alt= 2 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-I:  If#= 1 Alt= 3 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-I:  If#= 1 Alt= 4 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-I:  If#= 1 Alt= 5 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-I:* If#= 2 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=ff Driver=(none)
-E:  Ad=84(I) Atr=02(Bulk) MxPS=  32 Ivl=0ms
-E:  Ad=04(O) Atr=02(Bulk) MxPS=  32 Ivl=0ms
-I:* If#= 3 Alt= 0 #EPs= 0 Cls=fe(app. ) Sub=01 Prot=01 Driver=(none)
+The recommendation from that post was to use the gatt_service_add() API.  If this is still the recommended approach until the Dbus API is ready, can you expand a little bit more on how I would do this?  For example, do I need to figure out how to add a plugin, or can I create an external application that simply calls gatt_service_add().  Can I use the BlueZ stack as is, or do I need to hack it up a bit?  There were some “online examples" referred to in the previous post.  Any idea where I can find those?
 
+Thanks,
 
-Firmware is extracted from the latest Broadcom BCM4352 WIndows driver
-by extracting the zip and searching the .hex file names for '17cf' ..
-the hex file must then be converted to hcd format
-
+Joe McLaughlin
