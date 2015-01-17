@@ -1,39 +1,78 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 8.1 \(1993\))
+Message-ID: <54BA906C.2060609@gmail.com>
+Date: Sat, 17 Jan 2015 19:40:12 +0300
+From: Dmitry Tunin <hanipouspilot@gmail.com>
+MIME-Version: 1.0
+To: Marcel Holtmann <marcel@holtmann.org>
+CC: linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+ linux-kernel <linux-kernel@vger.kernel.org>,
+ "stable@vger.kernel.org" <stable@vger.kernel.org>
 Subject: Re: [PATCH] ath3k: Add support of AR3012 bluetooth 13d3:3423 device
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <54BA1CC9.8060601@gmail.com>
-Date: Sat, 17 Jan 2015 10:59:43 -0800
-Cc: linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-	linux-kernel <linux-kernel@vger.kernel.org>,
-	"stable@vger.kernel.org" <stable@vger.kernel.org>
-Message-Id: <F80A6947-61FA-46A1-8742-51129F4E18C3@holtmann.org>
-References: <54B98679.5060104@gmail.com> <2E4EB7E1-D16C-4633-8E86-337D42190298@holtmann.org> <54BA1CC9.8060601@gmail.com>
-To: Dmitry Tunin <hanipouspilot@gmail.com>
-Sender: linux-kernel-owner@vger.kernel.org
+References: <54B98679.5060104@gmail.com> <2E4EB7E1-D16C-4633-8E86-337D42190298@holtmann.org>
+In-Reply-To: <2E4EB7E1-D16C-4633-8E86-337D42190298@holtmann.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Dmitry,
+Marcel,
 
-please do not top post on this mailing list.
+This patch ckeanly applies both to bluetooth-next and mainline linux tree.
 
-> This patch is against git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git
-> Or is it another branch?
-> 
-> I pulled it again, but still no changes. Why it can be?
-
-it neither applies with git am, nor manually running patch.
-
-checking file drivers/bluetooth/ath3k.c
-Hunk #1 FAILED at 108.
-Hunk #2 FAILED at 162.
-2 out of 2 hunks FAILED
-checking file drivers/bluetooth/btusb.c
-Hunk #1 FAILED at 189.
-1 out of 1 hunk FAILED
-
-Regards
-
-Marcel
-
+17.01.2015 07:32, Marcel Holtmann пишет:
+> Hi Dmitry,
+>
+>> Add support of 13d3:3423 device.
+>>
+>> BugLink: https://bugs.launchpad.net/bugs/1411193
+>>
+>> ---
+>>
+>> T: Bus=01 Lev=02 Prnt=03 Port=00 Cnt=01 Dev#= 5 Spd=12 MxCh= 0
+>> D: Ver= 1.10 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs= 1
+>> P: Vendor=13d3 ProdID=3423 Rev= 0.01
+>> C:* #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
+>> A: FirstIf#= 0 IfCount= 2 Cls=e0(wlcon) Sub=01 Prot=01
+>> I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+>> E: Ad=81(I) Atr=03(Int.) MxPS= 16 Ivl=1ms
+>> E: Ad=82(I) Atr=02(Bulk) MxPS= 64 Ivl=0ms
+>> E: Ad=02(O) Atr=02(Bulk) MxPS= 64 Ivl=0ms
+>> I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+>> E: Ad=83(I) Atr=01(Isoc) MxPS= 0 Ivl=1ms
+>> E: Ad=03(O) Atr=01(Isoc) MxPS= 0 Ivl=1ms
+>> I: If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+>> E: Ad=83(I) Atr=01(Isoc) MxPS= 9 Ivl=1ms
+>> E: Ad=03(O) Atr=01(Isoc) MxPS= 9 Ivl=1ms
+>> I: If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+>> E: Ad=83(I) Atr=01(Isoc) MxPS= 17 Ivl=1ms
+>> E: Ad=03(O) Atr=01(Isoc) MxPS= 17 Ivl=1ms
+>> I: If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+>> E: Ad=83(I) Atr=01(Isoc) MxPS= 25 Ivl=1ms
+>> E: Ad=03(O) Atr=01(Isoc) MxPS= 25 Ivl=1ms
+>> I: If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+>> E: Ad=83(I) Atr=01(Isoc) MxPS= 33 Ivl=1ms
+>> E: Ad=03(O) Atr=01(Isoc) MxPS= 33 Ivl=1ms
+>> I: If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+>> E: Ad=83(I) Atr=01(Isoc) MxPS= 49 Ivl=1ms
+>> E: Ad=03(O) Atr=01(Isoc) MxPS= 49 Ivl=1ms
+>>
+>> Signed-off-by: Dmitry Tunin <hanipouspilot@gmail.com>
+>> Cc: stable@vger.kernel.org
+>> ---
+>> drivers/bluetooth/ath3k.c | 2 ++
+>> drivers/bluetooth/btusb.c | 1 +
+>> 2 files changed, 3 insertions(+)
+>
+> your patch does not apply cleanly:
+>
+> Applying: ath3k: Add support of AR3012 bluetooth 13d3:3423 device
+> error: patch failed: drivers/bluetooth/ath3k.c:108
+> error: drivers/bluetooth/ath3k.c: patch does not apply
+> error: patch failed: drivers/bluetooth/btusb.c:189
+> error: drivers/bluetooth/btusb.c: patch does not apply
+> Patch failed at 0001 ath3k: Add support of AR3012 bluetooth 13d3:3423 device
+>
+> Please send patches that can be applied against bluetooth-next tree.
+>
+> Regards
+>
+> Marcel
+>
