@@ -3,15 +3,11 @@ From: Dmitry Tunin <hanipouspilot@gmail.com>
 To: linux-bluetooth <linux-bluetooth@vger.kernel.org>
 Cc: linux-kernel <linux-kernel@vger.kernel.org>,
 	Dmitry Tunin <hanipouspilot@gmail.com>, stable@vger.kernel.org
-Subject: [PATCH v2] ath3k: Add support of AR3012 bluetooth 13d3:3423 device
-Date: Sun, 18 Jan 2015 00:16:51 +0300
-Message-Id: <1421529411-25385-1-git-send-email-hanipouspilot@gmail.com>
+Subject: [PATCH] ath3k: Add support of AR3012 bluetooth 13d3:3423 device
+Date: Sun, 18 Jan 2015 00:15:17 +0300
+Message-Id: <1421529317-25075-1-git-send-email-hanipouspilot@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
-
-Add support of 13d3:3423 device.
-
-BugLink: https://bugs.launchpad.net/bugs/1411193 
 
 T: Bus=01 Lev=02 Prnt=03 Port=00 Cnt=01 Dev#= 5 Spd=12 MxCh= 0
 D: Ver= 1.10 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs= 1
