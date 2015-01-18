@@ -1,21 +1,41 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <54BB91A6.1010109@gmail.com>
-Date: Sun, 18 Jan 2015 13:57:42 +0300
-From: Dmitry Tunin <hanipouspilot@gmail.com>
+References: <54A956DC.2050100@cschramm.eu>
+From: Jakub Sitnicki <jsitnicki@gmail.com>
+To: Christopher Schramm <blueman@cschramm.eu>
+Cc: linux-bluetooth@vger.kernel.org, blueman@ml.mate-desktop.org
+Subject: Re: Services connected in BlueZ 5
+In-reply-to: <54A956DC.2050100@cschramm.eu>
+Date: Sun, 18 Jan 2015 11:34:19 +0100
+Message-ID: <87k30kgyxg.fsf@frog.home>
 MIME-Version: 1.0
-To: Marcel Holtmann <marcel@holtmann.org>
-CC: linux-bluetooth <linux-bluetooth@vger.kernel.org>,
- linux-kernel <linux-kernel@vger.kernel.org>,
- "stable@vger.kernel.org" <stable@vger.kernel.org>
-Subject: Re: [PATCH] ath3k: Add support of AR3012 bluetooth 13d3:3423 device
-References: <54B98679.5060104@gmail.com> <2E4EB7E1-D16C-4633-8E86-337D42190298@holtmann.org> <54BA906C.2060609@gmail.com> <54BACD9D.6010303@gmail.com>
-In-Reply-To: <54BACD9D.6010303@gmail.com>
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The Thunderbird client after update to 31.3.0 adds extra Space symbols at some lines for some reason.
-Before the update it was OK, when properly set up not to wrap lines.
+Hi Christopher,
 
-In my initial patch at 234 is an extra Space before Tab.
+On Sun, Jan 04, 2015 at 04:06 PM CET, Christopher Schramm wrote:
+> So, is there any way to determine a specific service's connection state
+> in BlueZ 5? If not, ConnectProfile / DisconnectProfile seem pretty
+> useless, since one is left in the dark, so the only valid way would be
+> using Connect and hope all services desired by the user get connected
+> which is pretty unsatisfying. Can you confirm the awkward behavior of
+> Device.Connect and Device.Connected e.g. in conjunction with a network
+> service?
 
-I will use git for good now. 
+While I can't definitely confirm that it is not possible to check if
+specific service is connected because I'm not a developer in this
+project, I would say that this note from Device1.DisconnectProfile() API
+docs suggests it:
+
+> There is *no connection tracking* for a profile, so as long as the
+> profile is registered this [DisconnectProfile()] will always succeed.
+
+Also, in case you haven't already seen it, I think you might find
+interesting a part of the discussion of this patchset from some time ago
+(regarding the need to show in UI which services are connected):
+
+http://thread.gmane.org/gmane.linux.bluez.kernel/36507
+
+Hope this helps,
+Jakub
