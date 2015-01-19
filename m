@@ -1,377 +1,194 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+From: Sagar Nageshmurthy <s.nageshmurt@samsung.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFC BlueZ] core/device: Cleanup device_svc_resolved code
-Date: Mon, 19 Jan 2015 15:55:42 +0200
-Message-Id: <1421675742-20120-1-git-send-email-luiz.dentz@gmail.com>
+Cc: Sagar Nageshmurthy <s.nageshmurt@samsung.com>
+Subject: [PATCH 1/1] media: Add properties watch for MPRIS TrackList interface
+Date: Mon, 19 Jan 2015 19:17:40 +0530
+Message-id: <1421675260-21180-1-git-send-email-s.nageshmurt@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-
-This split device_svc_resolved into 2 parts with the later
-browse_request_complete actually calling browse_request_free.
+Parse below MediaPlayer2.TrackList properties according to MPRIS spec:
+- Tracks
+- CanEditTracks
 ---
- src/device.c | 269 ++++++++++++++++++++++++++++-------------------------------
- 1 file changed, 126 insertions(+), 143 deletions(-)
+ profiles/audio/media.c |  128 ++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 128 insertions(+)
 
-diff --git a/src/device.c b/src/device.c
-index 63babc2..59e4dea 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -1664,17 +1664,134 @@ static DBusMessage *disconnect_profile(DBusConnection *conn, DBusMessage *msg,
- 	return btd_error_failed(msg, strerror(-err));
+diff --git a/profiles/audio/media.c b/profiles/audio/media.c
+index ef7b910..6053c7a 100644
+--- a/profiles/audio/media.c
++++ b/profiles/audio/media.c
+@@ -53,6 +53,7 @@
+ #define MEDIA_INTERFACE "org.bluez.Media1"
+ #define MEDIA_ENDPOINT_INTERFACE "org.bluez.MediaEndpoint1"
+ #define MEDIA_PLAYER_INTERFACE "org.mpris.MediaPlayer2.Player"
++#define MEDIA_PLAYER_TRACKLIST_INTERFACE "org.mpris.MediaPlayer2.TrackList"
+ 
+ #define REQUEST_TIMEOUT (3 * 1000)		/* 3 seconds */
+ 
+@@ -96,6 +97,7 @@ struct media_player {
+ 	GHashTable		*track;		/* Player current track */
+ 	guint			watch;
+ 	guint			properties_watch;
++	guint			tracklist_watch;
+ 	guint			seek_watch;
+ 	char			*status;
+ 	uint32_t		position;
+@@ -949,6 +951,7 @@ static void media_player_free(gpointer data)
+ 
+ 	g_dbus_remove_watch(conn, mp->watch);
+ 	g_dbus_remove_watch(conn, mp->properties_watch);
++	g_dbus_remove_watch(conn, mp->tracklist_watch);
+ 	g_dbus_remove_watch(conn, mp->seek_watch);
+ 
+ 	if (mp->track)
+@@ -1685,6 +1688,108 @@ static gboolean parse_player_properties(struct media_player *mp,
+ 	return TRUE;
  }
  
-+static void store_services(struct btd_device *device)
++static gboolean set_tracks(struct media_player *mp, DBusMessageIter *iter)
 +{
-+	struct btd_adapter *adapter = device->adapter;
-+	char filename[PATH_MAX];
-+	char src_addr[18], dst_addr[18];
-+	uuid_t uuid;
-+	char *prim_uuid;
-+	GKeyFile *key_file;
-+	GSList *l;
-+	char *data;
-+	gsize length = 0;
++	DBusMessageIter entry;
++	int ctype;
 +
-+	if (device_address_is_private(device)) {
-+		warn("Can't store services for private addressed device %s",
-+								device->path);
-+		return;
++	ctype = dbus_message_iter_get_arg_type(iter);
++	if (ctype != DBUS_TYPE_ARRAY)
++		return FALSE;
++
++	dbus_message_iter_recurse(iter, &entry);
++
++	while ((ctype = dbus_message_iter_get_arg_type(&entry)) !=
++				DBUS_TYPE_INVALID) {
++		const char *track_id;
++
++		if (ctype != DBUS_TYPE_OBJECT_PATH)
++			return FALSE;
++
++		dbus_message_iter_get_basic(&entry, &track_id);
++
++		/* TODO: Add a struct member to hold tracklist info */
++		DBG("%s", track_id);
++
++		dbus_message_iter_next(&entry);
 +	}
 +
-+	sdp_uuid16_create(&uuid, GATT_PRIM_SVC_UUID);
-+	prim_uuid = bt_uuid2string(&uuid);
-+	if (prim_uuid == NULL)
-+		return;
-+
-+	ba2str(btd_adapter_get_address(adapter), src_addr);
-+	ba2str(&device->bdaddr, dst_addr);
-+
-+	snprintf(filename, PATH_MAX, STORAGEDIR "/%s/%s/attributes", src_addr,
-+								dst_addr);
-+	key_file = g_key_file_new();
-+
-+	for (l = device->primaries; l; l = l->next) {
-+		struct gatt_primary *primary = l->data;
-+		char handle[6], uuid_str[33];
-+		int i;
-+
-+		sprintf(handle, "%hu", primary->range.start);
-+
-+		bt_string2uuid(&uuid, primary->uuid);
-+		sdp_uuid128_to_uuid(&uuid);
-+
-+		switch (uuid.type) {
-+		case SDP_UUID16:
-+			sprintf(uuid_str, "%4.4X", uuid.value.uuid16);
-+			break;
-+		case SDP_UUID32:
-+			sprintf(uuid_str, "%8.8X", uuid.value.uuid32);
-+			break;
-+		case SDP_UUID128:
-+			for (i = 0; i < 16; i++)
-+				sprintf(uuid_str + (i * 2), "%2.2X",
-+						uuid.value.uuid128.data[i]);
-+			break;
-+		default:
-+			uuid_str[0] = '\0';
-+		}
-+
-+		g_key_file_set_string(key_file, handle, "UUID", prim_uuid);
-+		g_key_file_set_string(key_file, handle, "Value", uuid_str);
-+		g_key_file_set_integer(key_file, handle, "EndGroupHandle",
-+					primary->range.end);
-+	}
-+
-+	data = g_key_file_to_data(key_file, &length, NULL);
-+	if (length > 0) {
-+		create_file(filename, S_IRUSR | S_IWUSR);
-+		g_file_set_contents(filename, data, length, NULL);
-+	}
-+
-+	free(prim_uuid);
-+	g_free(data);
-+	g_key_file_free(key_file);
++	return TRUE;
 +}
 +
-+static void browse_request_complete(struct browse_req *req, uint8_t bdaddr_type,
-+									int err)
++static gboolean set_canedittracks(struct media_player *mp,
++							DBusMessageIter *iter)
 +{
-+	struct btd_device *dev = req->device;
-+	DBusMessage *reply = NULL;
++	dbus_bool_t value;
 +
-+	if (!req->msg)
-+		goto done;
++	if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_BOOLEAN)
++		return FALSE;
 +
-+	if (dbus_message_is_method_call(req->msg, DEVICE_INTERFACE, "Pair")) {
-+		if (!device_is_paired(dev, bdaddr_type)) {
-+			reply = btd_error_failed(req->msg, "Not paired");
-+			goto done;
-+		}
++	dbus_message_iter_get_basic(iter, &value);
 +
-+		if (dev->pending_paired) {
-+			g_dbus_emit_property_changed(dbus_conn, dev->path,
-+						DEVICE_INTERFACE, "Paired");
-+			dev->pending_paired = false;
-+		}
++	/* TODO: Add a struct member to hold tracklist info */
++	DBG("Value = %s", value ? "TRUE" : "FALSE");
 +
-+		/* Disregard browse errors in case of Pair */
-+		reply = g_dbus_create_reply(req->msg, DBUS_TYPE_INVALID);
-+		goto done;
-+	}
-+
-+	if (err) {
-+		reply = btd_error_failed(req->msg, strerror(-err));
-+		goto done;
-+	}
-+
-+	if (dbus_message_is_method_call(req->msg, DEVICE_INTERFACE, "Connect"))
-+		reply = dev_connect(dbus_conn, req->msg, dev);
-+	else if (dbus_message_is_method_call(req->msg, DEVICE_INTERFACE,
-+							"ConnectProfile"))
-+		reply = connect_profile(dbus_conn, req->msg, dev);
-+	else
-+		reply = g_dbus_create_reply(req->msg, DBUS_TYPE_INVALID);
-+
-+done:
-+	if (reply)
-+		g_dbus_send_message(dbus_conn, reply);
-+
-+	browse_request_free(req);
++	return TRUE;
 +}
 +
- static void device_svc_resolved(struct btd_device *dev, uint8_t bdaddr_type,
- 								int err)
++static gboolean set_tracklist_property(struct media_player *mp, const char *key,
++							DBusMessageIter *entry)
++{
++	DBusMessageIter var;
++
++	if (dbus_message_iter_get_arg_type(entry) != DBUS_TYPE_VARIANT)
++		return FALSE;
++
++	dbus_message_iter_recurse(entry, &var);
++
++	if (strcasecmp(key, "Tracks") == 0)
++		return set_tracks(mp, &var);
++
++	if (strcasecmp(key, "CanEditTracks") == 0)
++		return set_canedittracks(mp, &var);
++
++	DBG("%s not supported, ignoring", key);
++
++	return TRUE;
++}
++
++static gboolean parse_tracklist_properties(struct media_player *mp,
++							DBusMessageIter *iter)
++{
++	DBusMessageIter dict;
++	int ctype;
++
++	ctype = dbus_message_iter_get_arg_type(iter);
++	if (ctype != DBUS_TYPE_ARRAY)
++		return FALSE;
++
++	dbus_message_iter_recurse(iter, &dict);
++
++	while ((ctype = dbus_message_iter_get_arg_type(&dict)) !=
++							DBUS_TYPE_INVALID) {
++		DBusMessageIter entry;
++		const char *key;
++
++		if (ctype != DBUS_TYPE_DICT_ENTRY)
++			return FALSE;
++
++		dbus_message_iter_recurse(&dict, &entry);
++		if (dbus_message_iter_get_arg_type(&entry) != DBUS_TYPE_STRING)
++			return FALSE;
++
++		dbus_message_iter_get_basic(&entry, &key);
++		dbus_message_iter_next(&entry);
++
++		if (set_tracklist_property(mp, key, &entry) == FALSE)
++			return FALSE;
++
++		dbus_message_iter_next(&dict);
++	}
++
++	return TRUE;
++}
++
+ static gboolean properties_changed(DBusConnection *connection, DBusMessage *msg,
+ 							void *user_data)
  {
- 	struct bearer_state *state = get_state(dev, bdaddr_type);
--	DBusMessage *reply;
- 	struct browse_req *req = dev->browse;
- 
- 	DBG("%s err %d", dev->path, err);
- 
- 	state->svc_resolved = true;
--	dev->browse = NULL;
- 
- 	/* Disconnection notification can happen before this function
- 	 * gets called, so don't set svc_refreshed for a disconnected
-@@ -1708,34 +1825,14 @@ static void device_svc_resolved(struct btd_device *dev, uint8_t bdaddr_type,
- 	if (!dev->temporary)
- 		store_device_info(dev);
- 
--	if (!req || !req->msg)
--		return;
--
--	if (dbus_message_is_method_call(req->msg, DEVICE_INTERFACE,
--								"Pair")) {
--		g_dbus_send_reply(dbus_conn, req->msg, DBUS_TYPE_INVALID);
--		return;
--	}
-+	if (bdaddr_type != BDADDR_BREDR && err == 0)
-+		store_services(dev);
- 
--	if (err) {
--		reply = btd_error_failed(req->msg, strerror(-err));
--		g_dbus_send_message(dbus_conn, reply);
--		return;
--	}
--
--	if (dbus_message_is_method_call(req->msg, DEVICE_INTERFACE, "Connect"))
--		reply = dev_connect(dbus_conn, req->msg, dev);
--	else if (dbus_message_is_method_call(req->msg, DEVICE_INTERFACE,
--							"ConnectProfile"))
--		reply = connect_profile(dbus_conn, req->msg, dev);
--	else
-+	if (!req)
- 		return;
- 
--	dbus_message_unref(req->msg);
--	req->msg = NULL;
--
--	if (reply)
--		g_dbus_send_message(dbus_conn, reply);
-+	dev->browse = NULL;
-+	browse_request_complete(req, bdaddr_type, err);
+@@ -1702,6 +1807,24 @@ static gboolean properties_changed(DBusConnection *connection, DBusMessage *msg,
+ 	return TRUE;
  }
  
- static struct bonding_req *bonding_request_new(DBusMessage *msg,
-@@ -2438,8 +2535,6 @@ static void device_add_uuids(struct btd_device *device, GSList *uuids)
- 						DEVICE_INTERFACE, "UUIDs");
- }
- 
--static void store_services(struct btd_device *device);
--
- struct gatt_probe_data {
- 	struct btd_device *dev;
- 	bool all_services;
-@@ -3641,7 +3736,6 @@ static void search_cb(sdp_list_t *recs, int err, gpointer user_data)
- 
- send_reply:
- 	device_svc_resolved(device, BDADDR_BREDR, err);
--	browse_request_free(req);
- }
- 
- static void browse_cb(sdp_list_t *recs, int err, gpointer user_data)
-@@ -3677,79 +3771,6 @@ done:
- 	search_cb(recs, err, user_data);
- }
- 
--static void store_services(struct btd_device *device)
--{
--	struct btd_adapter *adapter = device->adapter;
--	char filename[PATH_MAX];
--	char src_addr[18], dst_addr[18];
--	uuid_t uuid;
--	char *prim_uuid;
--	GKeyFile *key_file;
--	GSList *l;
--	char *data;
--	gsize length = 0;
--
--	if (device_address_is_private(device)) {
--		warn("Can't store services for private addressed device %s",
--								device->path);
--		return;
--	}
--
--	sdp_uuid16_create(&uuid, GATT_PRIM_SVC_UUID);
--	prim_uuid = bt_uuid2string(&uuid);
--	if (prim_uuid == NULL)
--		return;
--
--	ba2str(btd_adapter_get_address(adapter), src_addr);
--	ba2str(&device->bdaddr, dst_addr);
--
--	snprintf(filename, PATH_MAX, STORAGEDIR "/%s/%s/attributes", src_addr,
--								dst_addr);
--	key_file = g_key_file_new();
--
--	for (l = device->primaries; l; l = l->next) {
--		struct gatt_primary *primary = l->data;
--		char handle[6], uuid_str[33];
--		int i;
--
--		sprintf(handle, "%hu", primary->range.start);
--
--		bt_string2uuid(&uuid, primary->uuid);
--		sdp_uuid128_to_uuid(&uuid);
--
--		switch (uuid.type) {
--		case SDP_UUID16:
--			sprintf(uuid_str, "%4.4X", uuid.value.uuid16);
--			break;
--		case SDP_UUID32:
--			sprintf(uuid_str, "%8.8X", uuid.value.uuid32);
--			break;
--		case SDP_UUID128:
--			for (i = 0; i < 16; i++)
--				sprintf(uuid_str + (i * 2), "%2.2X",
--						uuid.value.uuid128.data[i]);
--			break;
--		default:
--			uuid_str[0] = '\0';
--		}
--
--		g_key_file_set_string(key_file, handle, "UUID", prim_uuid);
--		g_key_file_set_string(key_file, handle, "Value", uuid_str);
--		g_key_file_set_integer(key_file, handle, "EndGroupHandle",
--					primary->range.end);
--	}
--
--	data = g_key_file_to_data(key_file, &length, NULL);
--	if (length > 0) {
--		create_file(filename, S_IRUSR | S_IWUSR);
--		g_file_set_contents(filename, data, length, NULL);
--	}
--
--	free(prim_uuid);
--	g_free(data);
--	g_key_file_free(key_file);
--}
--
- static bool device_get_auto_connect(struct btd_device *device)
++static gboolean tracklist_properties_changed(DBusConnection *connection,
++							DBusMessage *msg,
++							void *user_data)
++{
++	struct media_player *mp = user_data;
++	DBusMessageIter iter;
++
++	DBG("sender=%s path=%s", mp->sender, mp->path);
++
++	dbus_message_iter_init(msg, &iter);
++
++	dbus_message_iter_next(&iter);
++
++	parse_tracklist_properties(mp, &iter);
++
++	return TRUE;
++}
++
+ static gboolean position_changed(DBusConnection *connection, DBusMessage *msg,
+ 							void *user_data)
  {
- 	if (device->disable_auto_connect)
-@@ -3811,36 +3832,6 @@ done:
- 	attio_cleanup(device);
- }
- 
--static void send_le_browse_response(struct browse_req *req)
--{
--	struct btd_device *dev = req->device;
--	struct bearer_state *state = &dev->le_state;
--	DBusMessage *reply, *msg = req->msg;
--
--	if (!msg)
--		return;
--
--	if (!dbus_message_is_method_call(msg, DEVICE_INTERFACE, "Pair")) {
--		reply = btd_error_failed(msg, "Service discovery failed");
--		g_dbus_send_message(dbus_conn, reply);
--		return;
--	}
--
--	if (!state->paired) {
--		reply = btd_error_failed(msg, "Not paired");
--		g_dbus_send_message(dbus_conn, reply);
--		return;
--	}
--
--	if (!dev->bredr_state.paired && dev->pending_paired) {
--		g_dbus_emit_property_changed(dbus_conn, dev->path,
--						DEVICE_INTERFACE, "Paired");
--		dev->pending_paired = false;
--	}
--
--	g_dbus_send_reply(dbus_conn, msg, DBUS_TYPE_INVALID);
--}
--
- static void register_gatt_services(struct browse_req *req)
- {
- 	struct btd_device *device = req->device;
-@@ -3866,10 +3857,6 @@ static void register_gatt_services(struct browse_req *req)
- 	device_probe_gatt_profiles(device);
- 
- 	device_svc_resolved(device, device->bdaddr_type, 0);
--
--	store_services(device);
--
--	browse_request_free(req);
- }
- 
- static void gatt_client_ready_cb(bool success, uint8_t att_ecode,
-@@ -3883,9 +3870,8 @@ static void gatt_client_ready_cb(bool success, uint8_t att_ecode,
- 		if (device->browse) {
- 			struct browse_req *req = device->browse;
- 
--			send_le_browse_response(req);
- 			device->browse = NULL;
--			browse_request_free(req);
-+			browse_request_complete(req, device->bdaddr_type, -EIO);
- 		}
- 
- 		return;
-@@ -4153,9 +4139,8 @@ static void att_browse_error_cb(const GError *gerr, gpointer user_data)
- 	struct btd_device *device = attcb->user_data;
- 	struct browse_req *req = device->browse;
- 
--	send_le_browse_response(req);
- 	device->browse = NULL;
--	browse_request_free(req);
-+	browse_request_complete(req, device->bdaddr_type, -ECONNABORTED);
- }
- 
- static void att_browse_cb(gpointer user_data)
-@@ -4216,8 +4201,6 @@ static int device_browse_gatt(struct btd_device *device, DBusMessage *msg)
- 		 * request as resolved.
- 		 */
- 		device_svc_resolved(device, device->bdaddr_type, 0);
--		device->browse = NULL;
--		browse_request_free(req);
- 		return 0;
- 	}
- 
+@@ -1738,6 +1861,11 @@ static struct media_player *media_player_create(struct media_adapter *adapter,
+ 						path, MEDIA_PLAYER_INTERFACE,
+ 						properties_changed,
+ 						mp, NULL);
++	mp->tracklist_watch = g_dbus_add_properties_watch(conn,
++						sender, path,
++						MEDIA_PLAYER_TRACKLIST_INTERFACE,
++						tracklist_properties_changed,
++						mp, NULL);
+ 	mp->seek_watch = g_dbus_add_signal_watch(conn, sender,
+ 						path, MEDIA_PLAYER_INTERFACE,
+ 						"Seeked", position_changed,
 -- 
-1.9.3
+1.7.9.5
 
