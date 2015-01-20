@@ -1,46 +1,70 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCHv2 1/2] android/gatt: Fix dead code warnings
-Date: Tue, 20 Jan 2015 11:48:44 +0100
-Message-ID: <15128566.9dWrIPmtnj@uw000953>
-In-Reply-To: <1421143759-32586-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <2133713.7aeGTCSDGs@uw000953> <1421143759-32586-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+From: Gowtham Anandha Babu <gowtham.ab@samsung.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: bharat.panda@samsung.com, cpgs@samsung.com
+References: <1421229458-11207-1-git-send-email-gowtham.ab@samsung.com>
+ <1421229458-11207-4-git-send-email-gowtham.ab@samsung.com>
+In-reply-to: <1421229458-11207-4-git-send-email-gowtham.ab@samsung.com>
+Subject: RE: [PATCH  3/3] tools/hciattach_ath3k: Remove dead code warnings
+Date: Tue, 20 Jan 2015 15:05:33 +0530
+Message-id: <001501d03494$7a6be580$6f43b080$@samsung.com>
+MIME-version: 1.0
+Content-type: text/plain; charset=us-ascii
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+Ping.
 
-On Tuesday 13 of January 2015 12:09:18 Andrei Emeltchenko wrote:
-> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> -----Original Message-----
+> From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-
+> owner@vger.kernel.org] On Behalf Of Gowtham Anandha Babu
+> Sent: Wednesday, January 14, 2015 3:28 PM
+> To: linux-bluetooth@vger.kernel.org
+> Cc: bharat.panda@samsung.com; cpgs@samsung.com; Gowtham Anandha
+> Babu
+> Subject: [PATCH 3/3] tools/hciattach_ath3k: Remove dead code warnings
 > 
-> gatt_db_attribute_get_permissions() used everywhere without check since
-> those conditions are checked already.
+> tools/hciattach_ath3k.c:848:3: warning: Value stored to 'err' is never
+read
+>                 err = 0;
+>                 ^     ~
+> tools/hciattach_ath3k.c:852:3: warning: Value stored to 'err' is never
+read
+>                 err = 0;
+>                 ^     ~
 > ---
->  android/gatt.c | 3 +--
->  1 file changed, 1 insertion(+), 2 deletions(-)
+>  tools/hciattach_ath3k.c | 11 +----------
+>  1 file changed, 1 insertion(+), 10 deletions(-)
 > 
-> diff --git a/android/gatt.c b/android/gatt.c
-> index b749705..8542f45 100644
-> --- a/android/gatt.c
-> +++ b/android/gatt.c
-> @@ -6355,8 +6355,7 @@ static void write_cmd_request(const uint8_t *cmd, uint16_t cmd_len,
->  	if (!attrib)
->  		return;
->  
-> -	if (!gatt_db_attribute_get_permissions(attrib, &permissions))
-> -		return;
-> +	gatt_db_attribute_get_permissions(attrib, &permissions);
->  
->  	if (check_device_permissions(dev, cmd[0], permissions))
->  		return;
+> diff --git a/tools/hciattach_ath3k.c b/tools/hciattach_ath3k.c index
+> 23208c6..d31732e 100644
+> --- a/tools/hciattach_ath3k.c
+> +++ b/tools/hciattach_ath3k.c
+> @@ -840,17 +840,8 @@ static int ath_ps_download(int fd)
+>  		goto download_cmplete;
+>  	}
 > 
+> -	/*
+> -	 * It is not necessary that Patch file be available,
+> -	 * continue with PS Operations if patch file is not available.
+> -	 */
+> -	if (patch_file[0] == '\0')
+> -		err = 0;
+> -
+>  	stream = fopen(patch_file, "r");
+> -	if (!stream)
+> -		err = 0;
+> -	else {
+> +	if(stream) {
+>  		patch_count = ps_patch_download(fd, stream);
+>  		fclose(stream);
+> 
+> --
+> 1.9.1
+> 
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth"
+in
+> the body of a message to majordomo@vger.kernel.org More majordomo
+> info at  http://vger.kernel.org/majordomo-info.html
 
-Both patches applied, thanks.
-
--- 
-Best regards, 
-Szymon Janc
