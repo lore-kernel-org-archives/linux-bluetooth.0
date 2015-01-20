@@ -1,79 +1,74 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <54BEDA4E.30708@esd-dev.be>
-Date: Tue, 20 Jan 2015 23:44:30 +0100
-From: =?UTF-8?B?TWF0aGlldSBPY2HDsWE=?= <mo@esd-dev.be>
+Date: Tue, 20 Jan 2015 22:49:22 +0100
+From: Pavel Machek <pavel@ucw.cz>
+To: pali.rohar@gmail.com, sre@debian.org, sre@ring0.de,
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-omap@vger.kernel.org, tony@atomide.com, khilman@kernel.org,
+	aaro.koskinen@iki.fi, ivo.g.dimitrov.75@gmail.com,
+	linux-bluetooth@vger.kernel.org, marcel@holtmann.org
+Subject: Re: [PATCH] bluetooth: Add hci_h4p driver
+Message-ID: <20150120214922.GA21262@amd>
+References: <20141223130219.GA5731@amd>
+ <20150120082850.GA27162@t440s.lan>
 MIME-Version: 1.0
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-CC: linux-bluetooth@vger.kernel.org
-Subject: Re: Notify problem in gatt plugin
-References: <54BD2EBC.7040207@esd-dev.be> <CABBYNZLeCn1UypeiJ3p8PEZQffeHcpcjz5QDPzURMx4XCy2Dfw@mail.gmail.com>
-In-Reply-To: <CABBYNZLeCn1UypeiJ3p8PEZQffeHcpcjz5QDPzURMx4XCy2Dfw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20150120082850.GA27162@t440s.lan>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+On Tue 2015-01-20 10:28:50, Johan Hedberg wrote:
+> Hi Pavel,
+> 
+> On Tue, Dec 23, 2014, Pavel Machek wrote:
+> > +	while (1) {
+> > +		int cmd, len;
+> > +
+> > +		fw_pos += cmd_len;
+> > +
+> > +		if (fw_pos >= fw_entry->size)
+> > +			break;
+> > +
+> > +		if (fw_pos + 2 > fw_entry->size) {
+> > +			dev_err(info->dev, "Corrupted firmware image\n");
+> > +			err = -EMSGSIZE;
+> > +			break;
+> > +		}
+> > +
+> > +		cmd_len = fw_entry->data[fw_pos++];
+> > +		cmd_len += fw_entry->data[fw_pos++] << 8;
+> > +		if (cmd_len == 0)
+> > +			break;
+> > +
+> > +		if (fw_pos + cmd_len > fw_entry->size) {
+> > +			dev_err(info->dev, "Corrupted firmware image\n");
+> > +			err = -EMSGSIZE;
+> > +			break;
+> > +		}
+> > +
+> > +		/* Skip first two packets */
+> > +		if (++num <= 2)
+> > +			continue;
+> > +
+> > +		/* Note that this is timing-critical. If sending packets takes too
+> > +		 * long, initialization will fail.
+> > +		 */
+> > +		cmd = fw_entry->data[fw_pos+1];
+> > +		cmd += fw_entry->data[fw_pos+2] << 8;
+> > +		len = fw_entry->data[fw_pos+3];
+> > +
+> > +		skb = __hci_cmd_sync(info->hdev, cmd, len, fw_entry->data+fw_pos+4, 500);
+> > +		if (IS_ERR(skb)) {
+> > +			dev_err(info->dev, "...sending cmd %x len %d failed %ld\n",
+> > +				cmd, len, PTR_ERR(skb));
+> > +			err = -EIO;
+> > +			break;
+> > +		}
+> > +	}
+> 
+> Looks like the code is leaking skb when __hci_cmd_sync() succeeds.
 
-Le 20/01/2015 10:30, Luiz Augusto von Dentz a écrit :
-> Hi Mathieu,
->
-> On Mon, Jan 19, 2015 at 6:20 PM, Mathieu Ocaña <mo@esd-dev.be> wrote:
->> Hello,
->>
->> I'm currently working on a plugin to implement a GATT peripheral. Based on
->> the plugins/gatt-example and the profiles/alert/server, I finally got
->> something which works: read, write, with dbus signaling.
->> But, notifications doesn't work...
->> All seems ok until the call to "g_attrib_send()".
->>
->>>> static void attio_connected_cb(GAttrib *attrib, gpointer user_data)
->>>> {
->>>>    [...]
->>>>    len = enc_notification(p_adapter->batterylevel_chr.level_hnd_value,
->>>>                      nd->value, nd->len, pdu, len);
->>>>    [...]
->>>>    ret = g_attrib_send(attrib, 0, pdu, len, destroy_notify_callback,
->>>> cb, NULL);
->>>>    return;
->>>> }
->>
->> The parameters passed to g_attrib_send seems valid, I have verified the pdu,
->> len and user_data, but I'm not sure to understand well all the fields of
->> "attrib" (struct _GAttrib). Moreover the return value is 0.
->>
->> Some extra details:
->> - the destroy_notify_callback is not called (maybe normal as the
->> notification is not succesfully sent).
->> - in g_attrib_send, the call to bt_att_send() return 0. After this point my
->> understanding of the source code became a little bit fuzzy.
-> You might not be connected then so perhaps there is a bug in attio
-> callback. Which version are you using?
-I'm using the v5.27. I see no signs of disconnection in the debug 
-messages, but I will explore this lead.
-For now I use a Nordic dongle & software (master panel monitor) for my 
-tests and the connection seems ok (even if the notificatons are not 
-sent, the read/write operation are performed witout problem). But when I 
-use gatttool I'm disconnected constantly after 5-15s, (in this case the 
-debug log tells me it).
-I have not yet tested with a BT LE-enabled smartphone, but if I'm also 
-disconnected, maybe the two problems are related.
+Fixed, thanks!
+									Pavel
 
->>> It would be great if someone could suggest me a fix or a workaround.
->> I have also developped some extensions for the function gatt_service_add(),
->> such as the support of static value characteristic, and the descriptors for
->> presentation format, valid range and user description.
->>> Before submitting this patch, I want to know which is the patch policy for
->>> the bluez project? (validation test to perform, etc.).
-> It is documented in Submitting patches section in the HACKING:
-> https://git.kernel.org/cgit/bluetooth/bluez.git/tree/HACKING
-Ok, I had totally forgotten this file. According to the coding 
-standards, I've some modifications to do.
-The answer is maybe obvious, but if I modify the behavior of the 
-function gatt_service_add(), I should also patch the profiles and 
-plugins which use it, accordingly?
-
-Thank for your answer,
-
---
-Mathieu OCAÑA
-
+-- 
+(english) http://www.livejournal.com/~pavelmachek
+(cesky, pictures) http://atrey.karlin.mff.cuni.cz/~pavel/picture/horses/blog.html
