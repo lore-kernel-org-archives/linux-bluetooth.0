@@ -1,74 +1,49 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 20 Jan 2015 22:49:22 +0100
-From: Pavel Machek <pavel@ucw.cz>
-To: pali.rohar@gmail.com, sre@debian.org, sre@ring0.de,
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-omap@vger.kernel.org, tony@atomide.com, khilman@kernel.org,
-	aaro.koskinen@iki.fi, ivo.g.dimitrov.75@gmail.com,
-	linux-bluetooth@vger.kernel.org, marcel@holtmann.org
-Subject: Re: [PATCH] bluetooth: Add hci_h4p driver
-Message-ID: <20150120214922.GA21262@amd>
-References: <20141223130219.GA5731@amd>
- <20150120082850.GA27162@t440s.lan>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20150120082850.GA27162@t440s.lan>
+In-Reply-To: <1421465191-1494-1-git-send-email-armansito@chromium.org>
+References: <1421465191-1494-1-git-send-email-armansito@chromium.org>
+Date: Tue, 20 Jan 2015 12:16:06 -0800
+Message-ID: <CAHrH25RSoXhqBHGgLQR6CnBwS5TL29nG8G7uNqQOcyCcM6pemw@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 0/2] core: device: GATT fixes
+From: Arman Uguray <armansito@chromium.org>
+To: BlueZ development <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Tue 2015-01-20 10:28:50, Johan Hedberg wrote:
-> Hi Pavel,
-> 
-> On Tue, Dec 23, 2014, Pavel Machek wrote:
-> > +	while (1) {
-> > +		int cmd, len;
-> > +
-> > +		fw_pos += cmd_len;
-> > +
-> > +		if (fw_pos >= fw_entry->size)
-> > +			break;
-> > +
-> > +		if (fw_pos + 2 > fw_entry->size) {
-> > +			dev_err(info->dev, "Corrupted firmware image\n");
-> > +			err = -EMSGSIZE;
-> > +			break;
-> > +		}
-> > +
-> > +		cmd_len = fw_entry->data[fw_pos++];
-> > +		cmd_len += fw_entry->data[fw_pos++] << 8;
-> > +		if (cmd_len == 0)
-> > +			break;
-> > +
-> > +		if (fw_pos + cmd_len > fw_entry->size) {
-> > +			dev_err(info->dev, "Corrupted firmware image\n");
-> > +			err = -EMSGSIZE;
-> > +			break;
-> > +		}
-> > +
-> > +		/* Skip first two packets */
-> > +		if (++num <= 2)
-> > +			continue;
-> > +
-> > +		/* Note that this is timing-critical. If sending packets takes too
-> > +		 * long, initialization will fail.
-> > +		 */
-> > +		cmd = fw_entry->data[fw_pos+1];
-> > +		cmd += fw_entry->data[fw_pos+2] << 8;
-> > +		len = fw_entry->data[fw_pos+3];
-> > +
-> > +		skb = __hci_cmd_sync(info->hdev, cmd, len, fw_entry->data+fw_pos+4, 500);
-> > +		if (IS_ERR(skb)) {
-> > +			dev_err(info->dev, "...sending cmd %x len %d failed %ld\n",
-> > +				cmd, len, PTR_ERR(skb));
-> > +			err = -EIO;
-> > +			break;
-> > +		}
-> > +	}
-> 
-> Looks like the code is leaking skb when __hci_cmd_sync() succeeds.
+> On Fri, Jan 16, 2015 at 7:26 PM, Arman Uguray <armansito@chromium.org> wrote:
+> This patch fixes the following:
+>
+>   1. Bugs in GATT service browsing code-path that caused GAttrib-based
+>   profiles to not work and caused D-Bus calls to "Pair" and/or "Connect"
+>   to hang.
+>
+>   2. Reintroduced invalid service removal. This patch is the similar as
+>   the one I submitted previously: it splits the UUID list into SDP and
+>   GATT based lists and introduces new storage entries, except this patch
+>   also includes a very simple migration mechanism from the existing
+>   storage format to the new one.
+>
+>   The migration works by loading the UUIDs from the "Services" field and
+>   delaying profile probing until connection establishment. Once a
+>   connection is established and service discovery is performed, we
+>   simply store the UUIDs in their new grouping and probe the profiles
+>   and remove the previous entries. The legacy entries act as temporary
+>   data that's fed into the Device1.UUIDs property but everything else
+>   acts as if no services were discovered until connection.
+>
+> Arman Uguray (2):
+>   core: device: Fix bug in device_browse_gatt
+>   core: device: Fix broken GATT UUID management
+>
+>  plugins/sixaxis.c |   2 +-
+>  src/adapter.c     |   8 +-
+>  src/device.c      | 410 +++++++++++++++++++++++++++++++++++++++---------------
+>  src/device.h      |   6 +-
+>  4 files changed, 307 insertions(+), 119 deletions(-)
+>
+> --
+> 2.2.0.rc0.207.ga3a616c
+>
 
-Fixed, thanks!
-									Pavel
-
--- 
-(english) http://www.livejournal.com/~pavelmachek
-(cesky, pictures) http://atrey.karlin.mff.cuni.cz/~pavel/picture/horses/blog.html
+ping
