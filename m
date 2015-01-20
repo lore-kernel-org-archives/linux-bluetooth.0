@@ -1,116 +1,51 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 20 Jan 2015 18:36:04 +0100
-From: Pavel Machek <pavel@ucw.cz>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: Pali =?iso-8859-1?Q?Roh=E1r?= <pali.rohar@gmail.com>,
-	Sebastian Reichel <sre@debian.org>,
-	Sebastian Reichel <sre@ring0.de>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
-	linux-omap <linux-omap@vger.kernel.org>,
-	Tony Lindgren <tony@atomide.com>, khilman@kernel.org,
-	Aaro Koskinen <aaro.koskinen@iki.fi>, ivo.g.dimitrov.75@gmail.com,
-	linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] bluetooth: Add hci_h4p driver
-Message-ID: <20150120173604.GA712@amd>
-References: <20141223130219.GA5731@amd>
- <CB643345-4B50-4ED0-8C3E-296CD225754D@holtmann.org>
-MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <CB643345-4B50-4ED0-8C3E-296CD225754D@holtmann.org>
+Mime-Version: 1.0 (Mac OS X Mail 8.1 \(1993\))
+Subject: Re: [PATCH] mgmt-tester: Fix clang warning
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1421757693-17233-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Date: Tue, 20 Jan 2015 08:12:19 -0800
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <6BCE6C2A-2063-40BE-A6EB-8B325992B3CD@holtmann.org>
+References: <1421757693-17233-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+To: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi!
+Hi Andrei,
 
-> > Add HCI driver for H4 with Nokia extensions. This device is used on
-> > Nokia N900 cell phone.
-> > 
-> > Older version of this driver lived in staging, before being reverted
-> > in a4102f90e87cfaa3fdbed6fdf469b23f0eeb4bfd .
-> > 
-> > Signed-off-by: Pavel Machek <pavel@ucw.cz>
-> > Thanks-to: Sebastian Reichel <sre@debian.org>
-> > Thanks-to: Joe Perches <joe@perches.com>
-> > 
-> > ---
-> > 
-> > Please apply,
-> > 								Pavel
-> > 
-> > 
-> > Kconfig      |   10 
-> > Makefile     |    4 
-> > nokia_core.c | 1149 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-> > nokia_fw.c   |   99 +++++
-> > nokia_h4p.h  |  214 ++++++++++
-> > nokia_uart.c |  171 ++++++++
-> > 7 files changed, 1667 insertions(+)
-
-Speaking about formatting, could you properly format your emails, that
-is inserting newline after ~78 columns, to make them easier to reply
-to?
-
-> so when I run this through checkpatch --strict, then I get tons of warning that we have DOS style ^M line breaks. There are also trailing whitespace that need fixing. I can use cleanpatch to do this, but so can you.
->
-
-Strange, where do you see DOS style line breaks? Checkpatch here does
-not warn about that, and they really should not be there.
-
-> Even after doing that there are still obvious plain coding style violation in the patch. For example:
+> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 > 
-> ERROR: space prohibited before that ',' (ctx:WxW)
-> #610: FILE: drivers/bluetooth/nokia_core.c:517:
-> +			__h4p_set_auto_ctsrts(info, 0 , UART_EFR_RTS);
-
-Yeah, I should have catched that one.
-
-> CHECK: Alignment should match open parenthesis
-> #662: FILE: drivers/bluetooth/nokia_core.c:569:
-> +		h4p_outb(info, UART_OMAP_SCR,
-> +			     h4p_inb(info, UART_OMAP_SCR) |
+> Fixes clang warning below:
+> ...
+> tools/mgmt-tester.c:3805:2: warning: Value stored to 'id' is never read
+>        id = mgmt_register(data->mgmt, MGMT_EV_DISCOVERING,
+> data->mgmt_index,
+>        ^
+> ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+> 1 warning generated.
+> ...
+> ---
+> tools/mgmt-tester.c | 2 +-
+> 1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> CHECK: Blank lines aren't necessary before a close brace '}'
-> #692: FILE: drivers/bluetooth/nokia_core.c:599:
-> +
-> +}
+> diff --git a/tools/mgmt-tester.c b/tools/mgmt-tester.c
+> index 92351e4..295fef5 100644
+> --- a/tools/mgmt-tester.c
+> +++ b/tools/mgmt-tester.c
+> @@ -3802,7 +3802,7 @@ static void setup_start_discovery(const void *test_data)
+> 	uint16_t send_len = test->setup_send_len;
+> 	unsigned int id = 0;
 > 
-> These are only few. They are more and all these need fixing before I
-> even consider it.
+> -	id = mgmt_register(data->mgmt, MGMT_EV_DISCOVERING, data->mgmt_index,
+> +	mgmt_register(data->mgmt, MGMT_EV_DISCOVERING, data->mgmt_index,
+> 			   discovering_event, UINT_TO_PTR(id), NULL);
 
-Yeah, so first patch was too good for staging, and I "would be allowed
-to clean it up in tree", and now you run checkpatch --strict,
-complaining about very serious stuff such as "blank lines before }".
+this this is actually totally broken code. And not in the sense that clang reports it. You are not fixing the problem here. It is just masking the symptom.
 
-Yes, checkpatch produces a lot of junk, like warnings about
-mdelay(). I'm not sure how you'd want #662 above, formatted.
+Look into discovering_event callback and see what we do with the UINT_TO_PTR(0) that we are handing in. That code never did what the author was thinking it might do ;)
 
-pavel@amd:/data/l/linux-n900$ scripts/checkpatch.pl --strict --file
-drivers/bluetooth/*.c | wc -l 3194
-pavel@amd:/data/l/linux-n900$
+Regards
 
-...so I really can't know which checkpatch complains you consider
-serious and which are ok... And yes, I guess I should trim down those
-FSF notices.
+Marcel
 
-> Also this worries me:
-> 
-> WARNING: DT compatible string "brcm,uart,bcm2048" appears un-documented -- check ./Documentation/devicetree/bindings/
-> #1222: FILE: drivers/bluetooth/nokia_core.c:1129:
-> +	{ .compatible = "brcm,uart,bcm2048" },
-
-Yes, that wories me, too. It is one of reasons I wanted this to be
-merged to staging. Arguing about right bindings will take some time.
-
-I can fix the checkpatch stuff that makes sense. That does not include
-uglyfying code just for checkpatch.  Can you then take the patch, as
-you promised, and let me argue the bindings, and the other stuff that
-needs to be fixed?
-
-If not, can we agree that the driver in staging should be reverted, as
-Greg promised would be "easy", and I can clean it up there?
-
-Thanks,
-									Pavel
--- 
-(english) http://www.livejournal.com/~pavelmachek
-(cesky, pictures) http://atrey.karlin.mff.cuni.cz/~pavel/picture/horses/blog.html
