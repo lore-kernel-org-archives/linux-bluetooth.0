@@ -1,246 +1,49 @@
 Return-Path: <cyrus@holtmann.org>
-From: Sagar Nageshmurthy <s.nageshmurt@samsung.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Sagar Nageshmurthy <s.nageshmurt@samsung.com>
-Subject: [PATCH v1 1/1] media: Add properties watch for MPRIS Playlists
- interface
-Date: Wed, 21 Jan 2015 12:03:38 +0530
-Message-id: <1421822018-24800-1-git-send-email-s.nageshmurt@samsung.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+MIME-Version: 1.0
+In-Reply-To: <A73F36CA-2DD1-4EBE-A08F-E3CD0CC63ECA@holtmann.org>
+References: <CAEUmHyata35dg_=CMWau0AhjVwFU-cJT1eVyBsgpDHYRMp5uzw@mail.gmail.com>
+	<A73F36CA-2DD1-4EBE-A08F-E3CD0CC63ECA@holtmann.org>
+Date: Wed, 21 Jan 2015 10:57:30 +0530
+Message-ID: <CAEUmHyYR=NRMsPMkps413XSVDrNAKoJ8_X4eEgpp2Q6A8=3XSA@mail.gmail.com>
+Subject: Re: bluetooth-next tree compilation error
+From: Varka Bhadram <varkabhadram@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Parse below MediaPlayer2.Playlists properties according to MPRIS spec:
-- PlaylistCount
-- Orderings
-- ActivePlaylist
----
-v1: Remove compiler warnings
+Hi Marcel,
 
- profiles/audio/media.c |  183 ++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 183 insertions(+)
+On Wed, Jan 21, 2015 at 10:49 AM, Marcel Holtmann <marcel@holtmann.org> wro=
+te:
+> Hi Varka,
+>
+>> I am getting compilation error with bluetooth-next tree. No problem
+>> with net-next tree.
+>> ...
+>> CC      drivers/net/ethernet/ti/cpsw.o
+>> drivers/net/ethernet/ti/cpsw.c: In function =E2=80=98cpsw_ndo_poll_contr=
+oller=E2=80=99:
+>> drivers/net/ethernet/ti/cpsw.c:1635:24: error: =E2=80=98struct cpsw_priv=
+=E2=80=99 has
+>> no member named =E2=80=98irq=E2=80=99
+>> drivers/net/ethernet/ti/cpsw.c:1636:24: error: =E2=80=98struct cpsw_priv=
+=E2=80=99 has
+>> no member named =E2=80=98irq=E2=80=99
+>> make[4]: *** [drivers/net/ethernet/ti/cpsw.o] Error 1
+>> make[3]: *** [drivers/net/ethernet/ti] Error 2
+>> make[2]: *** [drivers/net/ethernet] Error 2
+>> make[1]: *** [drivers/net] Error 2
+>> make: *** [drivers] Error 2
+>
+> this is obviously not our fault. However just in case I pulled net-next i=
+nto bluetooth-next now.
+>
+Yes you correct. But the problem is we are using bluetooth-next tree
+for development. This problem wont be
+there if you update the tree with net-next. That you did. Great. Thanks...
 
-diff --git a/profiles/audio/media.c b/profiles/audio/media.c
-index ef7b910..92907a9 100644
---- a/profiles/audio/media.c
-+++ b/profiles/audio/media.c
-@@ -53,6 +53,7 @@
- #define MEDIA_INTERFACE "org.bluez.Media1"
- #define MEDIA_ENDPOINT_INTERFACE "org.bluez.MediaEndpoint1"
- #define MEDIA_PLAYER_INTERFACE "org.mpris.MediaPlayer2.Player"
-+#define MEDIA_PLAYER_PLAYLISTS_INTERFACE "org.mpris.MediaPlayer2.Playlists"
- 
- #define REQUEST_TIMEOUT (3 * 1000)		/* 3 seconds */
- 
-@@ -96,6 +97,7 @@ struct media_player {
- 	GHashTable		*track;		/* Player current track */
- 	guint			watch;
- 	guint			properties_watch;
-+	guint			playlists_watch;
- 	guint			seek_watch;
- 	char			*status;
- 	uint32_t		position;
-@@ -949,6 +951,7 @@ static void media_player_free(gpointer data)
- 
- 	g_dbus_remove_watch(conn, mp->watch);
- 	g_dbus_remove_watch(conn, mp->properties_watch);
-+	g_dbus_remove_watch(conn, mp->playlists_watch);
- 	g_dbus_remove_watch(conn, mp->seek_watch);
- 
- 	if (mp->track)
-@@ -1717,6 +1720,182 @@ static gboolean position_changed(DBusConnection *connection, DBusMessage *msg,
- 	return TRUE;
- }
- 
-+static gboolean set_playlistcount(struct media_player *mp,
-+							DBusMessageIter *iter)
-+{
-+	uint32_t playlist_count;
-+
-+	if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_UINT32)
-+		return FALSE;
-+
-+	dbus_message_iter_get_basic(iter, &playlist_count);
-+
-+	/* TODO: Add a struct member to hold playlist info */
-+	DBG("Playlist Count = %d", playlist_count);
-+
-+	return TRUE;
-+}
-+
-+static gboolean set_orderings(struct media_player *mp, DBusMessageIter *iter)
-+{
-+	DBusMessageIter entry;
-+	int ctype;
-+
-+	ctype = dbus_message_iter_get_arg_type(iter);
-+	if (ctype != DBUS_TYPE_ARRAY)
-+		return FALSE;
-+
-+	dbus_message_iter_recurse(iter, &entry);
-+
-+	while ((ctype = dbus_message_iter_get_arg_type(&entry)) !=
-+							DBUS_TYPE_INVALID) {
-+		const char *ordering;
-+
-+		if (ctype != DBUS_TYPE_STRING)
-+			return FALSE;
-+
-+		dbus_message_iter_get_basic(&entry, &ordering);
-+
-+		/* TODO: Add a struct member to hold playlist info */
-+		DBG("%s", ordering);
-+
-+		dbus_message_iter_next(&entry);
-+	}
-+
-+	return TRUE;
-+}
-+
-+static gboolean set_activeplaylist(struct media_player *mp,
-+							DBusMessageIter *iter)
-+{
-+	dbus_bool_t value;
-+	char *playlist_id = NULL;
-+	char *playlist_name = NULL;
-+	char *playlist_icon = NULL;
-+	DBusMessageIter playlist_iter;
-+	DBusMessageIter entry;
-+
-+	if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_STRUCT)
-+		return FALSE;
-+
-+	dbus_message_iter_recurse(iter, &entry);
-+
-+	dbus_message_iter_get_basic(&entry, &value);
-+	DBG("Active %s", value ? "TRUE" : "FALSE");
-+
-+	if (!value) {
-+		/* TODO: Update info regarding no active playlist */
-+		return TRUE;
-+	}
-+
-+	dbus_message_iter_next(&entry);
-+	if (dbus_message_iter_get_arg_type(&entry) != DBUS_TYPE_STRUCT)
-+		return FALSE;
-+
-+	dbus_message_iter_recurse(&entry, &playlist_iter);
-+	if (dbus_message_iter_get_arg_type(&playlist_iter) !=
-+							DBUS_TYPE_OBJECT_PATH)
-+		return FALSE;
-+
-+	dbus_message_iter_get_basic(&playlist_iter, &playlist_id);
-+
-+	/* TODO: Add a struct member to hold playlist info */
-+	DBG("Playlist Id %s", playlist_id);
-+
-+	dbus_message_iter_next(&playlist_iter);
-+	if (dbus_message_iter_get_arg_type(&playlist_iter) != DBUS_TYPE_STRING)
-+		return FALSE;
-+
-+	dbus_message_iter_get_basic(&playlist_iter, &playlist_name);
-+	DBG("Playlist Name %s", playlist_name);
-+
-+	dbus_message_iter_next(&playlist_iter);
-+	if (dbus_message_iter_get_arg_type(&playlist_iter) != DBUS_TYPE_STRING)
-+		return FALSE;
-+
-+	dbus_message_iter_get_basic(&playlist_iter, &playlist_icon);
-+	DBG("Playlist Icon %s", playlist_icon);
-+
-+	return TRUE;
-+}
-+
-+static gboolean set_playlist_property(struct media_player *mp, const char *key,
-+							DBusMessageIter *entry)
-+{
-+	DBusMessageIter var;
-+
-+	if (dbus_message_iter_get_arg_type(entry) != DBUS_TYPE_VARIANT)
-+		return FALSE;
-+
-+	dbus_message_iter_recurse(entry, &var);
-+
-+	if (strcasecmp(key, "PlaylistCount") == 0)
-+		return set_playlistcount(mp, &var);
-+
-+	if (strcasecmp(key, "Orderings") == 0)
-+		return set_orderings(mp, &var);
-+
-+	if (strcasecmp(key, "ActivePlaylist") == 0)
-+		return set_activeplaylist(mp, &var);
-+
-+	DBG("%s not supported, ignoring", key);
-+
-+	return TRUE;
-+}
-+
-+static gboolean parse_playlists_properties(struct media_player *mp,
-+							DBusMessageIter *iter)
-+{
-+	DBusMessageIter dict;
-+	int ctype;
-+
-+	ctype = dbus_message_iter_get_arg_type(iter);
-+	if (ctype != DBUS_TYPE_ARRAY)
-+		return FALSE;
-+
-+	dbus_message_iter_recurse(iter, &dict);
-+
-+	while ((ctype = dbus_message_iter_get_arg_type(&dict)) !=
-+							DBUS_TYPE_INVALID) {
-+		DBusMessageIter entry;
-+		const char *key;
-+
-+		if (ctype != DBUS_TYPE_DICT_ENTRY)
-+			return FALSE;
-+
-+		dbus_message_iter_recurse(&dict, &entry);
-+		if (dbus_message_iter_get_arg_type(&entry) != DBUS_TYPE_STRING)
-+			return FALSE;
-+
-+		dbus_message_iter_get_basic(&entry, &key);
-+		dbus_message_iter_next(&entry);
-+
-+		if (set_playlist_property(mp, key, &entry) == FALSE)
-+			return FALSE;
-+
-+		dbus_message_iter_next(&dict);
-+	}
-+
-+	return TRUE;
-+}
-+
-+static gboolean playlists_properties_changed(DBusConnection *connection,
-+					DBusMessage *msg, void *user_data)
-+{
-+	struct media_player *mp = user_data;
-+	DBusMessageIter iter;
-+
-+	DBG("sender=%s path=%s", mp->sender, mp->path);
-+
-+	dbus_message_iter_init(msg, &iter);
-+
-+	dbus_message_iter_next(&iter);
-+
-+	parse_playlists_properties(mp, &iter);
-+
-+	return TRUE;
-+}
-+
- static struct media_player *media_player_create(struct media_adapter *adapter,
- 						const char *sender,
- 						const char *path,
-@@ -1738,6 +1917,10 @@ static struct media_player *media_player_create(struct media_adapter *adapter,
- 						path, MEDIA_PLAYER_INTERFACE,
- 						properties_changed,
- 						mp, NULL);
-+	mp->playlists_watch = g_dbus_add_properties_watch(conn, sender, path,
-+						MEDIA_PLAYER_PLAYLISTS_INTERFACE,
-+						playlists_properties_changed,
-+						mp, NULL);
- 	mp->seek_watch = g_dbus_add_signal_watch(conn, sender,
- 						path, MEDIA_PLAYER_INTERFACE,
- 						"Seeked", position_changed,
--- 
-1.7.9.5
-
+> Regards
+>
+> Marcel
+>
