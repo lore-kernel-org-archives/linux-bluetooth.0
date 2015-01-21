@@ -1,72 +1,63 @@
 Return-Path: <cyrus@holtmann.org>
-From: Michael Janssen <jamuraa@chromium.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Michael Janssen <jamuraa@chromium.org>
-Subject: [PATCH BlueZ 02/23] unit/gatt: Add /TP/GAD/SR/BV-05-C test
-Date: Wed, 21 Jan 2015 12:28:39 -0800
-Message-Id: <1421872140-7581-3-git-send-email-jamuraa@chromium.org>
-In-Reply-To: <1421872140-7581-1-git-send-email-jamuraa@chromium.org>
-References: <1421872140-7581-1-git-send-email-jamuraa@chromium.org>
+MIME-Version: 1.0
+In-Reply-To: <CAHrH25RSoXhqBHGgLQR6CnBwS5TL29nG8G7uNqQOcyCcM6pemw@mail.gmail.com>
+References: <1421465191-1494-1-git-send-email-armansito@chromium.org>
+	<CAHrH25RSoXhqBHGgLQR6CnBwS5TL29nG8G7uNqQOcyCcM6pemw@mail.gmail.com>
+Date: Wed, 21 Jan 2015 22:28:38 +0200
+Message-ID: <CABBYNZJc2PhcT7FQyweZ7M4qqX6itVv+E5YpgcuLUtZpNDGJ=w@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 0/2] core: device: GATT fixes
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Arman Uguray <armansito@chromium.org>
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Verify that a Generic Attribute Profile server can discover service
-Characteristics of a specified UUID, using 16-bit UUIDs, and using
-128-bit UUIDs.
----
- unit/test-gatt.c | 39 +++++++++++++++++++++++++++++++++++++++
- 1 file changed, 39 insertions(+)
+Hi Arman,
 
-diff --git a/unit/test-gatt.c b/unit/test-gatt.c
-index 2f8750d..aa612dc 100644
---- a/unit/test-gatt.c
-+++ b/unit/test-gatt.c
-@@ -1694,6 +1694,45 @@ int main(int argc, char *argv[])
- 			raw_pdu(0x08, 0x14, 0x00, 0x20, 0x00, 0x03, 0x28),
- 			raw_pdu(0x01, 0x08, 0x12, 0x00, 0x0a));
- 
-+	define_test_server("/TP/GAD/SR/BV-05-C/small/1", test_server,
-+			ts_small_db, NULL,
-+			raw_pdu(0x03, 0x00, 0x02),
-+			raw_pdu(0x08, 0x10, 0xf0, 0x17, 0xf0, 0x03, 0x28),
-+			raw_pdu(0x09, 0x07, 0x12, 0xf0, 0x02, 0x13, 0xf0, 0x00,
-+					0x2a),
-+			raw_pdu(0x08, 0x13, 0xf0, 0x17, 0xf0, 0x03, 0x28),
-+			raw_pdu(0x09, 0x15, 0x14, 0xf0, 0x02, 0x15, 0xf0, 0xef,
-+					0xcd, 0xab, 0x89, 0x67, 0x45, 0x23,
-+					0x01, 0x00, 0x00, 0x00, 0x00, 0x09,
-+					0xb0, 0x00, 0x00),
-+			raw_pdu(0x08, 0x15, 0xf0, 0x17, 0xf0, 0x03, 0x28),
-+			raw_pdu(0x09, 0x07, 0x16, 0xf0, 0x02, 0x17, 0xf0, 0x01,
-+					0x2a),
-+			raw_pdu(0x08, 0x17, 0xf0, 0x17, 0xf0, 0x03, 0x28),
-+			raw_pdu(0x01, 0x08, 0x17, 0xf0, 0x0a));
-+
-+	define_test_server("/TP/GAD/SR/BV-05-C/small/2", test_server,
-+			ts_small_db, NULL,
-+			raw_pdu(0x03, 0x00, 0x02),
-+			raw_pdu(0x08, 0x01, 0x00, 0x0f, 0x00, 0x03, 0x28),
-+			raw_pdu(0x09, 0x07, 0x02, 0x00, 0x02, 0x03, 0x00, 0x29,
-+					0x2a),
-+			raw_pdu(0x08, 0x03, 0x00, 0x0f, 0x00, 0x03, 0x28),
-+			raw_pdu(0x01, 0x08, 0x03, 0x00, 0x0a));
-+
-+	define_test_server("/TP/GAD/SR/BV-05-C/large-1", test_server,
-+			ts_large_db_1, NULL,
-+			raw_pdu(0x03, 0x00, 0x02),
-+			raw_pdu(0x08, 0x20, 0x00, 0x29, 0x00, 0x03, 0x28),
-+			raw_pdu(0x09, 0x07, 0x22, 0x00, 0x02, 0x23, 0x00, 0x01,
-+				0xb0, 0x24, 0x00, 0x0a, 0x25, 0x00, 0x02, 0xb0,
-+				0x26, 0x00, 0x08, 0x27, 0x00, 0x02, 0xb0),
-+			raw_pdu(0x08, 0x27, 0x00, 0x29, 0x00, 0x03, 0x28),
-+			raw_pdu(0x09, 0x07, 0x28, 0x00, 0x08, 0x29, 0x00, 0x03,
-+				0xb0),
-+			raw_pdu(0x08, 0x29, 0x00, 0x29, 0x00, 0x03, 0x28),
-+			raw_pdu(0x01, 0x08, 0x29, 0x00, 0x0a));
-+
- 	define_test_att("/TP/GAD/CL/BV-06-C", test_search_descs, NULL, NULL,
- 			MTU_EXCHANGE_CLIENT_PDUS,
- 			raw_pdu(0x04, 0x13, 0x00, 0x16, 0x00),
+On Tue, Jan 20, 2015 at 10:16 PM, Arman Uguray <armansito@chromium.org> wrote:
+>> On Fri, Jan 16, 2015 at 7:26 PM, Arman Uguray <armansito@chromium.org> wrote:
+>> This patch fixes the following:
+>>
+>>   1. Bugs in GATT service browsing code-path that caused GAttrib-based
+>>   profiles to not work and caused D-Bus calls to "Pair" and/or "Connect"
+>>   to hang.
+>>
+>>   2. Reintroduced invalid service removal. This patch is the similar as
+>>   the one I submitted previously: it splits the UUID list into SDP and
+>>   GATT based lists and introduces new storage entries, except this patch
+>>   also includes a very simple migration mechanism from the existing
+>>   storage format to the new one.
+>>
+>>   The migration works by loading the UUIDs from the "Services" field and
+>>   delaying profile probing until connection establishment. Once a
+>>   connection is established and service discovery is performed, we
+>>   simply store the UUIDs in their new grouping and probe the profiles
+>>   and remove the previous entries. The legacy entries act as temporary
+>>   data that's fed into the Device1.UUIDs property but everything else
+>>   acts as if no services were discovered until connection.
+>>
+>> Arman Uguray (2):
+>>   core: device: Fix bug in device_browse_gatt
+>>   core: device: Fix broken GATT UUID management
+>>
+>>  plugins/sixaxis.c |   2 +-
+>>  src/adapter.c     |   8 +-
+>>  src/device.c      | 410 +++++++++++++++++++++++++++++++++++++++---------------
+>>  src/device.h      |   6 +-
+>>  4 files changed, 307 insertions(+), 119 deletions(-)
+>>
+>> --
+>> 2.2.0.rc0.207.ga3a616c
+>>
+
+This needs rebasing, first patch Ive actually fix part of the problem
+but we still need to fix the part where it does not probe without
+browse, for the second patch I would skip for now since we anyway
+don't remove in case of SDP and it might have corner cases when for
+example an error happens during discovering this might leads to
+removing drivers.
+
+
 -- 
-2.2.0.rc0.207.ga3a616c
-
+Luiz Augusto von Dentz
