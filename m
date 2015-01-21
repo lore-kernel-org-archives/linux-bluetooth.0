@@ -1,62 +1,61 @@
 Return-Path: <cyrus@holtmann.org>
-From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 2/2] android/pts: Update AVRCP PTS 6.0 results for android 5.0
-Date: Wed, 21 Jan 2015 16:35:44 +0100
-Message-Id: <1421854544-17726-2-git-send-email-grzegorz.kolodziejczyk@tieto.com>
-In-Reply-To: <1421854544-17726-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
-References: <1421854544-17726-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+Date: Wed, 21 Jan 2015 06:49:01 -0800 (PST)
+From: Szymon Janc <szymon.janc@tieto.com>
+To: M Ren <itux.ren@gmail.com>
+Cc: Johan Hedberg <johan.hedberg@gmail.com>,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: bluetoothctl only shows the prompt , then , not respond to keyboard input
+Message-ID: <7731012.NOZvVzLgJK@uw000953>
+In-Reply-To: <CACw_oNcCj=82Jut-Fy5qkat0mLBiAkta1Ma++nG14tH1VOiwnw@mail.gmail.com>
+References: <CACw_oNfbRKAv9XMBt3ycrozWbUAhkdbxUjOG1gLbEXGpx9R9hg@mail.gmail.com> <5952723.ng4jnReZS7@uw000953> <CACw_oNcCj=82Jut-Fy5qkat0mLBiAkta1Ma++nG14tH1VOiwnw@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch updates test case list and results for AVRCP profile against
-android 5.0.
----
- android/pts-avrcp.txt | 17 ++++++++++-------
- 1 file changed, 10 insertions(+), 7 deletions(-)
+Hi,
 
-diff --git a/android/pts-avrcp.txt b/android/pts-avrcp.txt
-index e6711ed..955b37e 100644
---- a/android/pts-avrcp.txt
-+++ b/android/pts-avrcp.txt
-@@ -1,7 +1,7 @@
- PTS test results for AVRCP
+On Wednesday 21 of January 2015 22:43:35 M Ren wrote:
+> Johan,
+> Iam afraid bluetoothd is running, since , hcitool and hciconfig work well .
+> I will make confirm tommorow .
+> btw, is there some debug way ?
+
+Those tools don't require bluetoothd to be running. Just use 'ps' to check if
+daemon is up.
  
--PTS version: 5.3
--Tested: 20-November-2014
-+PTS version: 6.0
-+Tested: 21-January-2015
- Android version: 5.0
- 
- Results:
-@@ -83,10 +83,11 @@ TC_CT_VLH_BI_03_C	PASS	Send SetAbsolute Volume command by pressing
- TC_CT_VLH_BI_04_C	PASS	adb logcat: check VOLUME_CHANGED value
- TC_CT_VLH_BV_01_C	PASS	Send SetAbsolute Volume command by pressing
- 				volume up or down buttons
--TC_CT_VLH_BV_01_I	PASS	adb logcat: check VOLUME_CHANGED value
--TC_CT_VLH_BV_02_I	PASS	Send SetAbsolute Volume command by pressing
-+TC_CT_VLH_BV_03_C	PASS	adb logcat: check VOLUME_CHANGED value
-+TC_CT_VLH_BV_01_I	PASS	Send SetAbsolute Volume command by pressing
-+				volume up or down buttons
-+TC_CT_VLH_BV_02_I	PASS 	Send SetAbsolute Volume command by pressing
- 				volume up or down buttons
--TC_CT_VLH_BV_03_C	PASS
- -------------------------------------------------------------------------------
- 
- 
-@@ -188,8 +189,10 @@ TC_TG_PTT_BV_02_I	PASS
- TC_TG_PTT_BV_03_I	N/A
- TC_TG_PTT_BV_04_I	N/A
- TC_TG_PTT_BV_05_I	N/A
--TC_TG_RCR_BV_02_C	PASS	One can use: lame --ta/tl for creating metadata
--TC_TG_RCR_BV_04_C	PASS
-+TC_TG_RCR_BV_02_C	PASS	Use modified media metadata (artist, title,
-+					album etc.) to be larger than 512 byte.
-+TC_TG_RCR_BV_04_C	PASS	Use modified media metadata (artist, title,
-+					album etc.) to be larger than 512 byte.
- TC_TG_VLH_BI_01_C	N/A
- TC_TG_VLH_BI_02_C	N/A
- TC_TG_VLH_BV_01_I	N/A
+> Szymon,
+> I am using 5.24 , so , can u help providing the commit id ?
+
+http://git.kernel.org/cgit/bluetooth/bluez.git/commit/?id=36d674036359a8e30546bd7799fca87fb903d181
+
+> 
+> 2015-01-21 22:33 GMT+08:00 Szymon Janc <szymon.janc@tieto.com>:
+> > Hi,
+> >
+> > On Wednesday 21 of January 2015 16:25:47 Johan Hedberg wrote:
+> >> Hi,
+> >>
+> >> On Wed, Jan 21, 2015, M Ren wrote:
+> >> > I encounter the issue.
+> >> > after I type bluetoothctl in shell,
+> >> > shell shows the [bluetoothctl] prompt,
+> >> > and then hang-up, like dead,
+> >> > do not respond to any input, include ctrl c ..
+> >> > I have to close the terminal window , or kill bluetoothctl in another
+> >> > terminal window.
+> >>
+> >> Usually this may happen if you don't have bluetoothd running (which
+> >> bluetoothctl expects to talk to). Waiting for D-Bus to be set up before
+> >> processing stdin is so that bluetoothctl can be scripted.
+> >
+> > Also not being able to close bluetoothctl in such case should be already
+> > fixed (since 5.22).
+> >
+> > --
+> > Best regards,
+> > Szymon Janc
+
 -- 
-1.9.3
-
+Best regards, 
+Szymon Janc
