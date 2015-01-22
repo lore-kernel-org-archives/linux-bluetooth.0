@@ -1,175 +1,66 @@
 Return-Path: <cyrus@holtmann.org>
-From: Jakub Pawlowski <jpawlowski@google.com>
+From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Jakub Pawlowski <jpawlowski@google.com>
-Subject: [PATCH v10 1/2] Bluetooth: Add le_scan_restart
-Date: Thu, 22 Jan 2015 07:34:25 -0800
-Message-Id: <1421940866-26060-1-git-send-email-jpawlowski@google.com>
+Subject: [PATCH 2/2] android/pts: Update DIS PTS 6.0 pixits, pics, results for android 5.0
+Date: Thu, 22 Jan 2015 16:01:52 +0100
+Message-Id: <1421938912-17448-2-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+In-Reply-To: <1421938912-17448-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+References: <1421938912-17448-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Currently there is no way to restart le scan, and it's needed in
-service scan method. The way it work: it disable, and then enable le
-scan on controller.
-
-Signed-off-by: Jakub Pawlowski <jpawlowski@google.com>
+This patch updates test pixits, pics, test case list with results for
+DIS profile against android 5.0.
 ---
- include/net/bluetooth/hci_core.h |  3 +++
- net/bluetooth/hci_core.c         | 58 ++++++++++++++++++++++++++++++++++++++++
- net/bluetooth/mgmt.c             |  7 ++++-
- 3 files changed, 67 insertions(+), 1 deletion(-)
+ android/pics-dis.txt  | 2 +-
+ android/pixit-dis.txt | 3 ++-
+ android/pts-dis.txt   | 4 ++--
+ 3 files changed, 5 insertions(+), 4 deletions(-)
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 7777124..de019eb 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -79,6 +79,7 @@ struct discovery_state {
- 	s8			rssi;
- 	u16			uuid_count;
- 	u8			(*uuids)[16];
-+	unsigned long		scan_end;
- };
+diff --git a/android/pics-dis.txt b/android/pics-dis.txt
+index 169173d..ed207c8 100644
+--- a/android/pics-dis.txt
++++ b/android/pics-dis.txt
+@@ -1,6 +1,6 @@
+ DIS PICS for the PTS tool.
  
- struct hci_conn_hash {
-@@ -351,6 +352,7 @@ struct hci_dev {
- 	unsigned long		dev_flags;
+-PTS version: 5.3
++PTS version: 6.0
  
- 	struct delayed_work	le_scan_disable;
-+	struct delayed_work	le_scan_restart;
+ * - different than PTS defaults
  
- 	__s8			adv_tx_power;
- 	__u8			adv_data[HCI_MAX_AD_LENGTH];
-@@ -527,6 +529,7 @@ static inline void hci_discovery_filter_clear(struct hci_dev *hdev)
- 	hdev->discovery.uuid_count = 0;
- 	kfree(hdev->discovery.uuids);
- 	hdev->discovery.uuids = NULL;
-+	hdev->discovery.scan_end = 0;
- }
+diff --git a/android/pixit-dis.txt b/android/pixit-dis.txt
+index 71729fe..13fe78f 100644
+--- a/android/pixit-dis.txt
++++ b/android/pixit-dis.txt
+@@ -1,6 +1,6 @@
+ DIS PIXIT for the PTS tool.
  
- bool hci_discovery_active(struct hci_dev *hdev);
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 34c17a0..478d788 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -1614,6 +1614,7 @@ static int hci_dev_do_close(struct hci_dev *hdev)
- 		cancel_delayed_work(&hdev->service_cache);
+-PTS version: 5.3
++PTS version: 6.0
  
- 	cancel_delayed_work_sync(&hdev->le_scan_disable);
-+	cancel_delayed_work_sync(&hdev->le_scan_restart);
+ * - different than PTS defaults
+ & - should be set to IUT Bluetooth address
+@@ -22,4 +22,5 @@ TSPX_delete_ltk						FALSE
+ TSPX_security_enabled					TRUE (*)
+ TSPX_iut_setup_att_over_br_edr				FALSE
+ TSPX_tester_appearance					0000
++TSPX_iut_use_resolvable_random_address			FALSE
+ -------------------------------------------------------------------------------
+diff --git a/android/pts-dis.txt b/android/pts-dis.txt
+index fb67687..857a149 100644
+--- a/android/pts-dis.txt
++++ b/android/pts-dis.txt
+@@ -1,7 +1,7 @@
+ PTS test results for DIS
  
- 	if (test_bit(HCI_MGMT, &hdev->dev_flags))
- 		cancel_delayed_work_sync(&hdev->rpa_expired);
-@@ -2790,12 +2791,15 @@ static void le_scan_disable_work_complete(struct hci_dev *hdev, u8 status,
+-PTS version: 5.3
+-Tested: 26-November-2014
++PTS version: 6.0
++Tested: 22-January-2015
+ Android version: 5.0
  
- 	switch (hdev->discovery.type) {
- 	case DISCOV_TYPE_LE:
-+		hdev->discovery.scan_end = 0;
- 		hci_dev_lock(hdev);
- 		hci_discovery_set_state(hdev, DISCOVERY_STOPPED);
- 		hci_dev_unlock(hdev);
- 		break;
- 
- 	case DISCOV_TYPE_INTERLEAVED:
-+		hdev->discovery.scan_end = 0;
-+
- 		hci_req_init(&req, hdev);
- 
- 		memset(&cp, 0, sizeof(cp));
-@@ -2827,6 +2831,8 @@ static void le_scan_disable_work(struct work_struct *work)
- 
- 	BT_DBG("%s", hdev->name);
- 
-+	cancel_delayed_work_sync(&hdev->le_scan_restart);
-+
- 	hci_req_init(&req, hdev);
- 
- 	hci_req_add_le_scan_disable(&req);
-@@ -2836,6 +2842,57 @@ static void le_scan_disable_work(struct work_struct *work)
- 		BT_ERR("Disable LE scanning request failed: err %d", err);
- }
- 
-+static void le_scan_restart_work_complete(struct hci_dev *hdev, u8 status,
-+					  u16 opcode)
-+{
-+	long timeout;
-+
-+	BT_DBG("%s", hdev->name);
-+	if (status) {
-+		BT_ERR("Failed to restart LE scan: status %d", status);
-+		return;
-+	}
-+
-+	if (!test_bit(HCI_QUIRK_STRICT_DUPLICATE_FILTER, &hdev->quirks) ||
-+	    !hdev->discovery.scan_end)
-+		return;
-+
-+	timeout = hdev->discovery.scan_end - jiffies;
-+
-+	if (timeout < 0)
-+		timeout = 0;
-+	queue_delayed_work(hdev->workqueue,
-+			   &hdev->le_scan_disable, timeout);
-+}
-+
-+static void le_scan_restart_work(struct work_struct *work)
-+{
-+	struct hci_dev *hdev = container_of(work, struct hci_dev,
-+					    le_scan_restart.work);
-+	struct hci_request req;
-+	struct hci_cp_le_set_scan_enable cp;
-+	int err;
-+
-+	BT_DBG("%s", hdev->name);
-+
-+	/* If controller is not scanning we are done. */
-+	if (!test_bit(HCI_LE_SCAN, &hdev->dev_flags))
-+		return;
-+
-+	hci_req_init(&req, hdev);
-+
-+	hci_req_add_le_scan_disable(&req);
-+
-+	memset(&cp, 0, sizeof(cp));
-+	cp.enable = LE_SCAN_ENABLE;
-+	cp.filter_dup = LE_SCAN_FILTER_DUP_ENABLE;
-+	hci_req_add(&req, HCI_OP_LE_SET_SCAN_ENABLE, sizeof(cp), &cp);
-+
-+	err = hci_req_run(&req, le_scan_restart_work_complete);
-+	if (err)
-+		BT_ERR("Restart LE scan request failed: err %d", err);
-+}
-+
- /* Copy the Identity Address of the controller.
-  *
-  * If the controller has a public BD_ADDR, then by default use that one.
-@@ -2931,6 +2988,7 @@ struct hci_dev *hci_alloc_dev(void)
- 	INIT_DELAYED_WORK(&hdev->power_off, hci_power_off);
- 	INIT_DELAYED_WORK(&hdev->discov_off, hci_discov_off);
- 	INIT_DELAYED_WORK(&hdev->le_scan_disable, le_scan_disable_work);
-+	INIT_DELAYED_WORK(&hdev->le_scan_restart, le_scan_restart_work);
- 
- 	skb_queue_head_init(&hdev->rx_q);
- 	skb_queue_head_init(&hdev->cmd_q);
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index f5c4d2e..c2b5f8a 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -3878,9 +3878,14 @@ static void start_discovery_complete(struct hci_dev *hdev, u8 status,
- 		break;
- 	}
- 
--	if (timeout)
-+	if (timeout) {
-+		if (hdev->discovery.uuid_count > 0 &&
-+		    test_bit(HCI_QUIRK_STRICT_DUPLICATE_FILTER, &hdev->quirks))
-+			hdev->discovery.scan_end = jiffies + timeout;
-+
- 		queue_delayed_work(hdev->workqueue,
- 				   &hdev->le_scan_disable, timeout);
-+	}
- 
- unlock:
- 	hci_dev_unlock(hdev);
+ Results:
 -- 
-2.2.0.rc0.207.ga3a616c
+1.9.3
 
