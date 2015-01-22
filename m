@@ -1,36 +1,110 @@
 Return-Path: <cyrus@holtmann.org>
-From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/2] android/gatt: Change device information service handle number
-Date: Thu, 22 Jan 2015 16:01:51 +0100
-Message-Id: <1421938912-17448-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+MIME-Version: 1.0
+In-Reply-To: <1421931451-13806-1-git-send-email-s.nageshmurt@samsung.com>
+References: <1421931451-13806-1-git-send-email-s.nageshmurt@samsung.com>
+Date: Thu, 22 Jan 2015 16:47:23 +0200
+Message-ID: <CABBYNZKg838tqk-ARwu_VYPC-L6YtORgWEwc_WOVURF=8F9bWQ@mail.gmail.com>
+Subject: Re: [PATCH 2/2] audio/avrcp: Handle SetAddressedPlayer command
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Sagar Nageshmurthy <s.nageshmurt@samsung.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch corrects number of handles which are reserved for DIS service
-while adding to gatt db. Sufficient amount for all DIS characteristics
-instances is 17.
+Hi Sagar,
 
-This is related to PTS test case:
-TC_DEC_BV_09_C - while all characteristics are registered, 15 handles in
-service wasn't sufficient to register PNP ID.
----
- android/gatt.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+On Thu, Jan 22, 2015 at 2:57 PM, Sagar Nageshmurthy
+<s.nageshmurt@samsung.com> wrote:
+> This patch handles the SetAddressedPlayer command for TG role.
+> ---
+>  profiles/audio/avrcp.c |   41 +++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 41 insertions(+)
+>
+> diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c
+> index 3826a91..cea081c 100644
+> --- a/profiles/audio/avrcp.c
+> +++ b/profiles/audio/avrcp.c
+> @@ -103,6 +103,7 @@
+>  #define AVRCP_REQUEST_CONTINUING       0x40
+>  #define AVRCP_ABORT_CONTINUING         0x41
+>  #define AVRCP_SET_ABSOLUTE_VOLUME      0x50
+> +#define AVRCP_SET_ADDRESSED_PLAYER     0x60
+>  #define AVRCP_SET_BROWSED_PLAYER       0x70
+>  #define AVRCP_GET_FOLDER_ITEMS         0x71
+>  #define AVRCP_CHANGE_PATH              0x72
+> @@ -1610,6 +1611,44 @@ err:
+>         return AVC_CTYPE_REJECTED;
+>  }
+>
+> +static uint8_t avrcp_handle_set_addressed_player(struct avrcp *session,
+> +                                               struct avrcp_header *pdu,
+> +                                                       uint8_t transaction)
+> +{
+> +       uint16_t player_id;
+> +       uint16_t len = ntohs(pdu->params_len);
+> +       struct avrcp_server *server = session->server;
+> +       GSList *l;
+> +
+> +       if (len != 2)
+> +               goto err;
+> +
+> +       player_id = bt_get_be16(&pdu->params[0]);
+> +
+> +       DBG("id = %d", player_id);
+> +
+> +       for (l = server->players; l; l = l->next) {
+> +               struct avrcp_player *player = l->data;
+> +
+> +               if (player->id == player_id) {
+> +                       session->target->player = player;
+> +                       pdu->params_len = htons(1);
+> +                       pdu->params[0] = AVRCP_STATUS_SUCCESS;
+> +                       return AVC_CTYPE_ACCEPTED;
+> +               }
+> +
+> +       }
 
-diff --git a/android/gatt.c b/android/gatt.c
-index 1d65c2a..3b690f9 100644
---- a/android/gatt.c
-+++ b/android/gatt.c
-@@ -6898,7 +6898,7 @@ static void register_device_info_service(void)
- 
- 	/* Device Information Service */
- 	bt_uuid16_create(&uuid, 0x180a);
--	service = gatt_db_add_service(gatt_db, &uuid, true, 15);
-+	service = gatt_db_add_service(gatt_db, &uuid, true, 17);
- 
- 	/* User data are not const hence (void *) cast is used */
- 	data = bt_config_get_name();
+Split the player lookup in a different function. Futhermore upon
+success there are a few event that needs to complete according to the
+spec (seeTable 6.43 Completion of notifications on addressed player
+changed).
+
+> +       pdu->params_len = htons(1);
+> +       pdu->params[0] = AVRCP_STATUS_PARAM_NOT_FOUND;
+
+Im not so sure this is the right error, I believe what shall be use is
+AVRCP_STATUS_INVALID_PLAYER_ID in this case.
+
+> +       return AVC_CTYPE_REJECTED;
+> +err:
+> +       pdu->params_len = htons(1);
+> +       pdu->params[0] = AVRCP_STATUS_INVALID_PARAM;
+> +
+> +       return AVC_CTYPE_REJECTED;
+> +}
+> +
+>  static const struct control_pdu_handler control_handlers[] = {
+>                 { AVRCP_GET_CAPABILITIES, AVC_CTYPE_STATUS,
+>                                         avrcp_handle_get_capabilities },
+> @@ -1641,6 +1680,8 @@ static const struct control_pdu_handler control_handlers[] = {
+>                                         avrcp_handle_request_continuing },
+>                 { AVRCP_ABORT_CONTINUING, AVC_CTYPE_CONTROL,
+>                                         avrcp_handle_abort_continuing },
+> +               { AVRCP_SET_ADDRESSED_PLAYER, AVC_CTYPE_CONTROL,
+> +                                       avrcp_handle_set_addressed_player },
+>                 { },
+>  };
+>
+> --
+> 1.7.9.5
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+
+
 -- 
-1.9.3
-
+Luiz Augusto von Dentz
