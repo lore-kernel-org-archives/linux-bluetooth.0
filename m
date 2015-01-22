@@ -1,58 +1,59 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1421931391-13768-1-git-send-email-s.nageshmurt@samsung.com>
-References: <1421931391-13768-1-git-send-email-s.nageshmurt@samsung.com>
-Date: Thu, 22 Jan 2015 16:33:00 +0200
-Message-ID: <CABBYNZLp4uwsTjxi0JP6hMs3+7S=fjFC1B313Wh2sEJWYX_mMw@mail.gmail.com>
-Subject: Re: [PATCH 1/2] audio/avrcp: Assign player id during player registration
+In-Reply-To: <1421872140-7581-1-git-send-email-jamuraa@chromium.org>
+References: <1421872140-7581-1-git-send-email-jamuraa@chromium.org>
+Date: Thu, 22 Jan 2015 16:17:12 +0200
+Message-ID: <CABBYNZKjxqs987YbokxTAKUWEGNo5tMQL6+RGXQcvu_gdh1qWA@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 00/23] More server GATT Test Spec tests
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Sagar Nageshmurthy <s.nageshmurt@samsung.com>
+To: Michael Janssen <jamuraa@chromium.org>
 Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Sagar,
+Hi Michael,
 
-On Thu, Jan 22, 2015 at 2:56 PM, Sagar Nageshmurthy
-<s.nageshmurt@samsung.com> wrote:
-> ---
->  profiles/audio/avrcp.c |    2 ++
->  1 file changed, 2 insertions(+)
+On Wed, Jan 21, 2015 at 10:28 PM, Michael Janssen <jamuraa@chromium.org> wrote:
+> Adds the remaining tests possible to implement given the current state
+> of gatt-server.  Functionality found broken or lacking was implemented.
 >
-> diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c
-> index 11de6ee..3826a91 100644
-> --- a/profiles/audio/avrcp.c
-> +++ b/profiles/audio/avrcp.c
-> @@ -3662,6 +3662,7 @@ struct avrcp_player *avrcp_register_player(struct btd_adapter *adapter,
->         struct avrcp_server *server;
->         struct avrcp_player *player;
->         GSList *l;
-> +       static uint16_t id = 0;
+> Read multiple is now supported.
 >
->         server = find_server(servers, adapter);
->         if (!server)
-> @@ -3672,6 +3673,7 @@ struct avrcp_player *avrcp_register_player(struct btd_adapter *adapter,
->         player->cb = cb;
->         player->user_data = user_data;
->         player->destroy = destroy;
-> +       player->id = ++id ? id : 1;
-
-It is still possible that the id is taken, that means you would have
-to do a lookup in the list the find out what is the next id available,
-also the id itself needs to be adjusted otherwise the very next player
-would attempt to register id 1 again.
-
->         server->players = g_slist_append(server->players, player);
+> Michael Janssen (23):
+>   unit/gatt: Add /TP/GAD/CL/BV-05-C test
+>   unit/gatt: Add /TP/GAD/SR/BV-05-C test
+>   unit/gatt: Add /TP/GAR/SR/BV-03-C test
+>   unit/gatt: Add /TP/GAR/SR/BI-06-C test
+>   unit/gatt: Add /TP/GAR/SR/BI-07-C test
+>   unit/gatt: Add /TP/GAR/SR/BI-08-C test
+>   unit/gatt: Add /TP/GAR/SR/BV-04-C test
+>   unit/gatt: Add /TP/GAR/SR/BI-12-C test
+>   shared/gatt-db: fix error read from invalid offset
+>   unit/gatt: Add /TP/GAR/SR/BI-13-C test
+>   unit/gatt: Add /TP/GAR/SR/BI-14-C test
+>   shared/gatt-server: Add read multiple support.
+>   unit/gatt: Add /TP/GAR/SR/BV-05-C test
+>   unit/gatt: Add /TP/GAR/SR/BI-18-C test
+>   unit/gatt: Add /TP/GAR/SR/BI-19-C test
+>   unit/gatt: Add /TP/GAR/SR/BV-06-C test
+>   unit/gatt: Add /TP/GAR/SR/BI-23-C test
+>   unit/gatt: Add /TP/GAR/SR/BI-24-C test
+>   unit/gatt: Add /TP/GAR/SR/BV-07-C test
+>   unit/gatt: Add /TP/GAR/SR/BV-08-C test
+>   unit/gatt: Add /TP/GAR/SR/BI-28-C test
+>   unit/gatt: Add /TP/GAR/SR/BI-29-C test
+>   unit/gatt: Add /TP/GAR/SR/BI-30-C test
+>
+>  src/shared/gatt-db.c     |   7 +-
+>  src/shared/gatt-server.c | 154 ++++++++++++++++++++++++++
+>  unit/test-gatt.c         | 276 +++++++++++++++++++++++++++++++++++++++++++++++
+>  3 files changed, 435 insertions(+), 2 deletions(-)
 >
 > --
-> 1.7.9.5
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> 2.2.0.rc0.207.ga3a616c
 
+Applied, thanks.
 
 
 -- 
