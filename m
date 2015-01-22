@@ -1,69 +1,83 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
+Date: Thu, 22 Jan 2015 13:54:08 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Jakub Pawlowski <jpawlowski@google.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] android/pts: Update DID PTS 6.0 pixits, pics, results for android 5.0
-Date: Thu, 22 Jan 2015 13:17:20 +0100
-Message-ID: <5514909.Mvpn7x4X3h@uw000953>
-In-Reply-To: <1421923225-25912-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
-References: <1421923225-25912-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+Subject: Re: [PATCH v9 2/2] Bluetooth: Add restarting to service discovery
+Message-ID: <20150122115408.GA15904@t440s.lan>
+References: <1421412071-18881-1-git-send-email-jpawlowski@google.com>
+ <1421412071-18881-2-git-send-email-jpawlowski@google.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1421412071-18881-2-git-send-email-jpawlowski@google.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Grzegorz,
+Hi Jakub,
 
-On Thursday 22 of January 2015 11:40:25 Grzegorz Kolodziejczyk wrote:
-> This patch updates test pixits, pics and case list and results for
-> DID profile against android 5.0.
-> ---
->  android/pics-did.txt  | 2 +-
->  android/pixit-did.txt | 2 +-
->  android/pts-did.txt   | 4 ++--
->  3 files changed, 4 insertions(+), 4 deletions(-)
+On Fri, Jan 16, 2015, Jakub Pawlowski wrote:
+> When using LE_SCAN_FILTER_DUP_ENABLE, some controllers would send
+> advertising report from each LE device only once. That means that we
+> don't get any updates on RSSI value, and makes Service Discovery very
+> slow. This patch adds restarting scan when in Service Discovery, and
+> device with filtered uuid is found, but it's not in RSSI range to send
+> event yet. This way if device moves into range, we will quickly get RSSI
+> update.
 > 
-> diff --git a/android/pics-did.txt b/android/pics-did.txt
-> index b516aa8..da2e090 100644
-> --- a/android/pics-did.txt
-> +++ b/android/pics-did.txt
-> @@ -1,6 +1,6 @@
->  DID PICS for the PTS tool.
->  
-> -PTS version: 5.3
-> +PTS version: 6.0
->  
->  * - different than PTS defaults
->  # - not yet implemented/supported
-> diff --git a/android/pixit-did.txt b/android/pixit-did.txt
-> index 99f411b..295febc 100644
-> --- a/android/pixit-did.txt
-> +++ b/android/pixit-did.txt
-> @@ -1,6 +1,6 @@
->  DID PIXIT for the PTS tool.
->  
-> -PTS version: 5.3
-> +PTS version: 6.0
->  
->  * - different than PTS defaults
->  & - should be set to IUT Bluetooth address
-> diff --git a/android/pts-did.txt b/android/pts-did.txt
-> index fedf779..8fd434d 100644
-> --- a/android/pts-did.txt
-> +++ b/android/pts-did.txt
-> @@ -1,7 +1,7 @@
->  PTS test results for DID
->  
-> -PTS version: 5.3
-> -Tested: 07-November-2014
-> +PTS version: 6.0
-> +Tested: 22-January-2015
->  Android version: 5.0
->  
->  Results:
+> Signed-off-by: Jakub Pawlowski <jpawlowski@google.com>
+> ---
+>  include/net/bluetooth/hci_core.h |  1 +
+>  net/bluetooth/mgmt.c             | 48 ++++++++++++++++++++++++++++++++++++----
+>  2 files changed, 45 insertions(+), 4 deletions(-)
 
-Applied, thanks. 
+A couple of minor things with this one still:
 
--- 
-Best regards, 
-Szymon Janc
+> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+> index de019eb..cbfc18e 100644
+> --- a/include/net/bluetooth/hci_core.h
+> +++ b/include/net/bluetooth/hci_core.h
+> @@ -1328,6 +1328,7 @@ void hci_sock_dev_event(struct hci_dev *hdev, int event);
+>  #define DISCOV_INTERLEAVED_TIMEOUT	5120	/* msec */
+>  #define DISCOV_INTERLEAVED_INQUIRY_LEN	0x04
+>  #define DISCOV_BREDR_INQUIRY_LEN	0x08
+> +#define DISCOV_LE_RESTART_DELAY		200	/* msec */
+
+Please put the msecs_to_jiffies() straight into the definition here (see
+our other similar defines in include/net/bluetooth/hci.h for examples).
+This makes the code using the define simpler (e.g. less need for line
+breaks).
+
+>  void mgmt_device_found(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
+>  		       u8 addr_type, u8 *dev_class, s8 rssi, u32 flags,
+>  		       u8 *eir, u16 eir_len, u8 *scan_rsp, u8 scan_rsp_len)
+> @@ -7224,7 +7238,9 @@ void mgmt_device_found(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
+>  	 * the results are also dropped.
+>  	 */
+>  	if (hdev->discovery.rssi != HCI_RSSI_INVALID &&
+> -	    (rssi < hdev->discovery.rssi || rssi == HCI_RSSI_INVALID))
+> +	    (rssi == HCI_RSSI_INVALID ||
+> +	    (rssi < hdev->discovery.rssi &&
+> +		!test_bit(HCI_QUIRK_STRICT_DUPLICATE_FILTER, &hdev->quirks))))
+
+This doesn't look like it's correctly aligned: the !test_bit should start
+at the same place as the 'r' of the rssi on the line above.
+
+> @@ -7296,7 +7320,15 @@ void mgmt_device_found(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
+>  						     hdev->discovery.uuid_count,
+>  						     hdev->discovery.uuids))
+>  				return;
+> -		}
+> +
+> +			/* we have service match. If duplicate filtering doesn't
+> +			 * honour RSSI hanges, restart scan to make sure we'll
+> +			 * get RSSI updates
+> +			 */
+> +			if (test_bit(HCI_QUIRK_STRICT_DUPLICATE_FILTER,
+> +				     &hdev->quirks))
+> +				restart_le_scan(hdev);
+> +			}
+
+Something's not quite right here indentation-wise. The closing } seems
+to be on the same level as the 'if' which can't be right?
+
+Johan
