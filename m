@@ -1,56 +1,74 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <001201d03494$5abd3d60$1037b820$@samsung.com>
-References: <1421229458-11207-1-git-send-email-gowtham.ab@samsung.com>
-	<001201d03494$5abd3d60$1037b820$@samsung.com>
-Date: Thu, 22 Jan 2015 11:03:27 +0200
-Message-ID: <CABBYNZK2-RW3p_k90d+3-hXW6wsha=6Aw-ix7eP7GXVTtuhuTg@mail.gmail.com>
-Subject: Re: [PATCH 0/3] Fix memory issue and trivial code cleaup
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Gowtham Anandha Babu <gowtham.ab@samsung.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	Bharat Panda <bharat.panda@samsung.com>, cpgs@samsung.com
+In-Reply-To: <7731012.NOZvVzLgJK@uw000953>
+References: <CACw_oNfbRKAv9XMBt3ycrozWbUAhkdbxUjOG1gLbEXGpx9R9hg@mail.gmail.com>
+	<5952723.ng4jnReZS7@uw000953>
+	<CACw_oNcCj=82Jut-Fy5qkat0mLBiAkta1Ma++nG14tH1VOiwnw@mail.gmail.com>
+	<7731012.NOZvVzLgJK@uw000953>
+Date: Thu, 22 Jan 2015 12:22:04 +0800
+Message-ID: <CACw_oNe+pLGtAF9cnEpXH5_sLH7Ph=TYR5AwrgajkZ5ydUF-Fg@mail.gmail.com>
+Subject: Re: bluetoothctl only shows the prompt , then , not respond to
+ keyboard input
+From: M Ren <itux.ren@gmail.com>
+To: Szymon Janc <szymon.janc@tieto.com>
+Cc: Johan Hedberg <johan.hedberg@gmail.com>,
+	linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Gowtham,
+thanks all , yes , it is bluetoothd and dbus-daemon reason,
+the keyboard now is connected .
 
-On Tue, Jan 20, 2015 at 11:34 AM, Gowtham Anandha Babu
-<gowtham.ab@samsung.com> wrote:
-> Ping.
+but keyboard don't work though,
+is there any specific way to debug this issue ?
+
+sorry , I'm new to bluez .
+
+2015-01-21 22:49 GMT+08:00 Szymon Janc <szymon.janc@tieto.com>:
+> Hi,
 >
->> -----Original Message-----
->> From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-
->> owner@vger.kernel.org] On Behalf Of Gowtham Anandha Babu
->> Sent: Wednesday, January 14, 2015 3:28 PM
->> To: linux-bluetooth@vger.kernel.org
->> Cc: bharat.panda@samsung.com; cpgs@samsung.com; Gowtham Anandha
->> Babu
->> Subject: [PATCH 0/3] Fix memory issue and trivial code cleaup
+> On Wednesday 21 of January 2015 22:43:35 M Ren wrote:
+>> Johan,
+>> Iam afraid bluetoothd is running, since , hcitool and hciconfig work well .
+>> I will make confirm tommorow .
+>> btw, is there some debug way ?
+>
+> Those tools don't require bluetoothd to be running. Just use 'ps' to check if
+> daemon is up.
+>
+>> Szymon,
+>> I am using 5.24 , so , can u help providing the commit id ?
+>
+> http://git.kernel.org/cgit/bluetooth/bluez.git/commit/?id=36d674036359a8e30546bd7799fca87fb903d181
+>
 >>
->> In gatt-client and gatt-helpers, the variables are accessed even after it
-> is
->> freed. Making the unref at appropriate places solved the issues.
->>
->> In tools, removed dead code warnings.
->>
->> Gowtham Anandha Babu (3):
->>   shared/gatt-helpers: Fix usage of freed memory
->>   shared/gatt-client: Fix usage of freed memory
->>   tools/hciattach_ath3k: Remove dead code warnings
->>
->>  src/shared/gatt-client.c  | 23 +++++++++++------------  src/shared/gatt-
->> helpers.c | 25 ++++++++++++++++---------
->>  tools/hciattach_ath3k.c   | 11 +----------
->>  3 files changed, 28 insertions(+), 31 deletions(-)
->>
->> --
->> 1.9.1
-
-Doesn't apply anymore, please rebase.
-
-
-
--- 
-Luiz Augusto von Dentz
+>> 2015-01-21 22:33 GMT+08:00 Szymon Janc <szymon.janc@tieto.com>:
+>> > Hi,
+>> >
+>> > On Wednesday 21 of January 2015 16:25:47 Johan Hedberg wrote:
+>> >> Hi,
+>> >>
+>> >> On Wed, Jan 21, 2015, M Ren wrote:
+>> >> > I encounter the issue.
+>> >> > after I type bluetoothctl in shell,
+>> >> > shell shows the [bluetoothctl] prompt,
+>> >> > and then hang-up, like dead,
+>> >> > do not respond to any input, include ctrl c ..
+>> >> > I have to close the terminal window , or kill bluetoothctl in another
+>> >> > terminal window.
+>> >>
+>> >> Usually this may happen if you don't have bluetoothd running (which
+>> >> bluetoothctl expects to talk to). Waiting for D-Bus to be set up before
+>> >> processing stdin is so that bluetoothctl can be scripted.
+>> >
+>> > Also not being able to close bluetoothctl in such case should be already
+>> > fixed (since 5.22).
+>> >
+>> > --
+>> > Best regards,
+>> > Szymon Janc
+>
+> --
+> Best regards,
+> Szymon Janc
