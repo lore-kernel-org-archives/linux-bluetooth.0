@@ -1,41 +1,50 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <20150122004130.GA4545@mail.example1.com>
-References: <20150122004130.GA4545@mail.example1.com>
-Date: Thu, 22 Jan 2015 11:32:05 +0200
-Message-ID: <CABBYNZLNYtZfQ-5nufAms77Ygu79Bxhc1zy6cfO+Gb2KYeYijw@mail.gmail.com>
-Subject: Re: [PATCH] tools/btsnoop: Fix opcode for SCO TX packet
+In-Reply-To: <1421837662-25727-1-git-send-email-s.nageshmurt@samsung.com>
+References: <1421837662-25727-1-git-send-email-s.nageshmurt@samsung.com>
+Date: Thu, 22 Jan 2015 11:12:02 +0200
+Message-ID: <CABBYNZL90zddWUdPbQovdBVfd8CcnQvsSk4BP05KrQx55MDcpw@mail.gmail.com>
+Subject: Re: [PATCH 1/1] audio/avrcp: Assign player id during player registration
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Jukka Kinnunen <jukka.kinnunen@iki.fi>
+To: Sagar Nageshmurthy <s.nageshmurt@samsung.com>
 Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jukka,
+Hi Sagar,
 
-On Thu, Jan 22, 2015 at 2:41 AM, Jukka Kinnunen <jukka.kinnunen@iki.fi> wrote:
+On Wed, Jan 21, 2015 at 12:54 PM, Sagar Nageshmurthy
+<s.nageshmurt@samsung.com> wrote:
 > ---
->  tools/btsnoop.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  profiles/audio/avrcp.c |    2 ++
+>  1 file changed, 2 insertions(+)
 >
-> diff --git a/tools/btsnoop.c b/tools/btsnoop.c
-> index 71191eb..3eb8082 100644
-> --- a/tools/btsnoop.c
-> +++ b/tools/btsnoop.c
-> @@ -230,7 +230,7 @@ next_packet:
->                 if (flags & 0x01)
->                         opcode = BTSNOOP_OPCODE_SCO_RX_PKT;
->                 else
-> -                       opcode = BTSNOOP_OPCODE_ACL_TX_PKT;
-> +                       opcode = BTSNOOP_OPCODE_SCO_TX_PKT;
->                 break;
->         case 0x04:
->                 opcode = BTSNOOP_OPCODE_EVENT_PKT;
+> diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c
+> index 11de6ee..d258c28 100644
+> --- a/profiles/audio/avrcp.c
+> +++ b/profiles/audio/avrcp.c
+> @@ -3662,6 +3662,7 @@ struct avrcp_player *avrcp_register_player(struct btd_adapter *adapter,
+>         struct avrcp_server *server;
+>         struct avrcp_player *player;
+>         GSList *l;
+> +       static uint16_t id = 0;
+>
+>         server = find_server(servers, adapter);
+>         if (!server)
+> @@ -3672,6 +3673,7 @@ struct avrcp_player *avrcp_register_player(struct btd_adapter *adapter,
+>         player->cb = cb;
+>         player->user_data = user_data;
+>         player->destroy = destroy;
+> +       player->id = ++id;
+>
+>         server->players = g_slist_append(server->players, player);
+>
 > --
-> 1.9.1
+> 1.7.9.5
 
-Pushed.
+Id reuse the id if possible, but we are not really using the id for
+anything in the TG so I wonder what is you plan regarding it?
 
 
 -- 
