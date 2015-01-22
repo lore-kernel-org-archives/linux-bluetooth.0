@@ -1,49 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 23 Jan 2015 04:38:52 +0000 (GMT)
-From: Sagar Nageshmurthy <s.nageshmurt@samsung.com>
-Subject: Re: Re: [PATCH 1/2] audio/avrcp: Assign player id during player
- registration
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Reply-to: s.nageshmurt@samsung.com
-MIME-version: 1.0
-Content-type: text/plain; charset=windows-1252
-MIME-version: 1.0
-Message-id: <994478336.28061421987932168.JavaMail.weblogic@epmlwas09b>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Thu, 22 Jan 2015 21:45:22 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 1/3] Bluetooth: Fix dependency for BR/EDR Secure
+ Connections mode on SSP
+Message-ID: <20150122194522.GA27250@t440s.P-661HNU-F1>
+References: <1421954122-15727-1-git-send-email-marcel@holtmann.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1421954122-15727-1-git-send-email-marcel@holtmann.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-SGkgTHVpeiwNCg0KLS0tLS0tLSBPcmlnaW5hbCBNZXNzYWdlIC0tLS0tLS0NClNlbmRlciA6IEx1
-aXogQXVndXN0byB2b24gRGVudHo8bHVpei5kZW50ekBnbWFpbC5jb20+DQpEYXRlIDogSmFuIDIy
-LCAyMDE1IDIwOjAzIChHTVQrMDU6MzApDQpUaXRsZSA6IFJlOiBbUEFUQ0ggMS8yXSBhdWRpby9h
-dnJjcDogQXNzaWduIHBsYXllciBpZCBkdXJpbmcgcGxheWVyIHJlZ2lzdHJhdGlvbg0KDQpIaSBT
-YWdhciwNCg0KT24gVGh1LCBKYW4gMjIsIDIwMTUgYXQgMjo1NiBQTSwgU2FnYXIgTmFnZXNobXVy
-dGh5DQp3cm90ZToNCj4gLS0tDQo+ICBwcm9maWxlcy9hdWRpby9hdnJjcC5jIHwgICAgMiArKw0K
-PiAgMSBmaWxlIGNoYW5nZWQsIDIgaW5zZXJ0aW9ucygrKQ0KPg0KPiBkaWZmIC0tZ2l0IGEvcHJv
-ZmlsZXMvYXVkaW8vYXZyY3AuYyBiL3Byb2ZpbGVzL2F1ZGlvL2F2cmNwLmMNCj4gaW5kZXggMTFk
-ZTZlZS4uMzgyNmE5MSAxMDA2NDQNCj4gLS0tIGEvcHJvZmlsZXMvYXVkaW8vYXZyY3AuYw0KPiAr
-KysgYi9wcm9maWxlcy9hdWRpby9hdnJjcC5jDQo+IEBAIC0zNjYyLDYgKzM2NjIsNyBAQCBzdHJ1
-Y3QgYXZyY3BfcGxheWVyICphdnJjcF9yZWdpc3Rlcl9wbGF5ZXIoc3RydWN0IGJ0ZF9hZGFwdGVy
-ICphZGFwdGVyLA0KPiAgICAgICAgIHN0cnVjdCBhdnJjcF9zZXJ2ZXIgKnNlcnZlcjsNCj4gICAg
-ICAgICBzdHJ1Y3QgYXZyY3BfcGxheWVyICpwbGF5ZXI7DQo+ICAgICAgICAgR1NMaXN0ICpsOw0K
-PiArICAgICAgIHN0YXRpYyB1aW50MTZfdCBpZCA9IDA7DQo+DQo+ICAgICAgICAgc2VydmVyID0g
-ZmluZF9zZXJ2ZXIoc2VydmVycywgYWRhcHRlcik7DQo+ICAgICAgICAgaWYgKCFzZXJ2ZXIpDQo+
-IEBAIC0zNjcyLDYgKzM2NzMsNyBAQCBzdHJ1Y3QgYXZyY3BfcGxheWVyICphdnJjcF9yZWdpc3Rl
-cl9wbGF5ZXIoc3RydWN0IGJ0ZF9hZGFwdGVyICphZGFwdGVyLA0KPiAgICAgICAgIHBsYXllci0+
-Y2IgPSBjYjsNCj4gICAgICAgICBwbGF5ZXItPnVzZXJfZGF0YSA9IHVzZXJfZGF0YTsNCj4gICAg
-ICAgICBwbGF5ZXItPmRlc3Ryb3kgPSBkZXN0cm95Ow0KPiArICAgICAgIHBsYXllci0+aWQgPSAr
-K2lkID8gaWQgOiAxOw0KDQpJdCBpcyBzdGlsbCBwb3NzaWJsZSB0aGF0IHRoZSBpZCBpcyB0YWtl
-biwgdGhhdCBtZWFucyB5b3Ugd291bGQgaGF2ZQ0KdG8gZG8gYSBsb29rdXAgaW4gdGhlIGxpc3Qg
-dGhlIGZpbmQgb3V0IHdoYXQgaXMgdGhlIG5leHQgaWQgYXZhaWxhYmxlLA0KYWxzbyB0aGUgaWQg
-aXRzZWxmIG5lZWRzIHRvIGJlIGFkanVzdGVkIG90aGVyd2lzZSB0aGUgdmVyeSBuZXh0IHBsYXll
-cg0Kd291bGQgYXR0ZW1wdCB0byByZWdpc3RlciBpZCAxIGFnYWluLg0KDQpJIGFncmVlLiBBcyB3
-ZSBoYXZlIHRvIGRvIGEgbG9va3VwIGluIHRoZSBsaXN0IEkgc2hhbGwgaW1wbGVtZW50IHJldXNh
-YmxlIGlkcyBpbiB0aGUgbmV4dCBwYXRjaC4NCg0KLS0NClNhZ2FyDQoNCj4gICAgICAgICBzZXJ2
-ZXItPnBsYXllcnMgPSBnX3NsaXN0X2FwcGVuZChzZXJ2ZXItPnBsYXllcnMsIHBsYXllcik7DQo+
-DQo+IC0tDQo+IDEuNy45LjUNCj4NCj4gLS0NCj4gVG8gdW5zdWJzY3JpYmUgZnJvbSB0aGlzIGxp
-c3Q6IHNlbmQgdGhlIGxpbmUgInVuc3Vic2NyaWJlIGxpbnV4LWJsdWV0b290aCIgaW4NCj4gdGhl
-IGJvZHkgb2YgYSBtZXNzYWdlIHRvIG1ham9yZG9tb0B2Z2VyLmtlcm5lbC5vcmcNCj4gTW9yZSBt
-YWpvcmRvbW8gaW5mbyBhdCAgaHR0cDovL3ZnZXIua2VybmVsLm9yZy9tYWpvcmRvbW8taW5mby5o
-dG1sDQoNCg0KDQotLSANCkx1aXogQXVndXN0byB2b24gRGVudHo=
+Hi Marcel,
 
+On Thu, Jan 22, 2015, Marcel Holtmann wrote:
+> The BR/EDR Secure Connections feature should only be enabled when the
+> Secure Simple Pairing mode has been enabled first. However since secure
+> connections is feature that is valid for BR/EDR and LE, this needs
+> special handling.
+> 
+> When enabling secure connections on a LE only configured controller,
+> thent the BR/EDR side should not be enabled in the controller. This
+> patches makes the BR/EDR Secure Connections feature depending on
+> enabling Secure Simple Pairing mode first.
+> 
+> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+> ---
+>  net/bluetooth/hci_core.c |  5 ++++-
+>  net/bluetooth/mgmt.c     | 14 ++++++++------
+>  2 files changed, 12 insertions(+), 7 deletions(-)
 
+All three patches have been applied to bluetooth-next. Thanks.
+
+Johan
