@@ -1,44 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
-From: Romain Izard <romain.izard.pro@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Romain Izard <romain.izard.pro@gmail.com>
-Subject: [PATCH 1/2] shared/gatt-server: Avoid memory corruption
-Date: Fri, 23 Jan 2015 15:25:15 +0100
-Message-Id: <1422023116-30516-1-git-send-email-romain.izard.pro@gmail.com>
+Message-ID: <54C2517E.4060209@hurleysoftware.com>
+Date: Fri, 23 Jan 2015 08:49:50 -0500
+From: Peter Hurley <peter@hurleysoftware.com>
+MIME-Version: 1.0
+To: Johan Hedberg <johan.hedberg@gmail.com>
+CC: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth: Fix "blocking ops when !TASK_RUNNING" with
+ sock_accept
+References: <1422014582-14391-1-git-send-email-johan.hedberg@gmail.com> <20150123124323.GA15371@t440s.lan>
+In-Reply-To: <20150123124323.GA15371@t440s.lan>
+Content-Type: text/plain; charset=utf-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-When sending notification and indication data, the size of the allocated
-packet is the smallest of the MTU and the payload size.
+Hi Johan,
 
-The copy procedure uses the payload size in all cases, which can lead to
-memory corruption. Use the packet size instead.
----
- src/shared/gatt-server.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+On 01/23/2015 07:43 AM, Johan Hedberg wrote:
+> Szymon pointed out that this change is mostly reverting fixes from Peter
+> Hurley from a few years back, i.e. the following commits:
+> 
+> 	552b0d3cb9ff648aa503011ef50ca24019cd0f5f
+> 	f9a3c20aa07462108fc6fd759dea956053f020bb
+> 	950e2d51e866623e4c360280aa63b85ab66d3403
+> 
+> So my patch is probably not the right fix for the issue. Any further
+> ideas on how to properly fix this are welcome. I didn't manage to find
+> anything similar to our accept_q in other (non-Bluetooth) socket types,
+> so I'm a bit lost why exactly it's needed in the first place.
 
-diff --git a/src/shared/gatt-server.c b/src/shared/gatt-server.c
-index b406ed6..dd9c88f 100644
---- a/src/shared/gatt-server.c
-+++ b/src/shared/gatt-server.c
-@@ -1506,7 +1506,7 @@ bool bt_gatt_server_send_notification(struct bt_gatt_server *server,
- 		return false;
- 
- 	put_le16(handle, pdu);
--	memcpy(pdu + 2, value, length);
-+	memcpy(pdu + 2, value, pdu_len - 2);
- 
- 	result = !!bt_att_send(server->att, BT_ATT_OP_HANDLE_VAL_NOT, pdu,
- 						pdu_len, NULL, NULL, NULL);
-@@ -1571,7 +1571,7 @@ bool bt_gatt_server_send_indication(struct bt_gatt_server *server,
- 	data->user_data = user_data;
- 
- 	put_le16(handle, pdu);
--	memcpy(pdu + 2, value, length);
-+	memcpy(pdu + 2, value, pdu_len - 2);
- 
- 	result = !!bt_att_send(server->att, BT_ATT_OP_HANDLE_VAL_IND, pdu,
- 							pdu_len, conf_cb,
--- 
-2.1.0
+Thanks for letting me know about this; I'll take care of it.
 
+Regards,
+Peter Hurley
