@@ -1,126 +1,84 @@
 Return-Path: <cyrus@holtmann.org>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] doc: Add new command for reading local OOB extended data information
-Date: Thu, 22 Jan 2015 21:17:58 -0800
-Message-Id: <1421990278-19492-1-git-send-email-marcel@holtmann.org>
+Date: Fri, 23 Jan 2015 04:51:59 +0000 (GMT)
+From: Sagar Nageshmurthy <s.nageshmurt@samsung.com>
+Subject: Re: Re: [PATCH 2/2] audio/avrcp: Handle SetAddressedPlayer command
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Reply-to: s.nageshmurt@samsung.com
+MIME-version: 1.0
+Content-type: text/plain; charset=windows-1252
+MIME-version: 1.0
+Message-id: <842250516.29241421988719338.JavaMail.weblogic@epmlwas09b>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- doc/mgmt-api.txt | 92 ++++++++++++++++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 90 insertions(+), 2 deletions(-)
+SGkgTHVpeiwNCg0KLS0tLS0tLSBPcmlnaW5hbCBNZXNzYWdlIC0tLS0tLS0NClNlbmRlciA6IEx1
+aXogQXVndXN0byB2b24gRGVudHo8bHVpei5kZW50ekBnbWFpbC5jb20+DQpEYXRlIDogSmFuIDIy
+LCAyMDE1IDIwOjE3IChHTVQrMDU6MzApDQpUaXRsZSA6IFJlOiBbUEFUQ0ggMi8yXSBhdWRpby9h
+dnJjcDogSGFuZGxlIFNldEFkZHJlc3NlZFBsYXllciBjb21tYW5kDQoNCkhpIFNhZ2FyLA0KDQpP
+biBUaHUsIEphbiAyMiwgMjAxNSBhdCAyOjU3IFBNLCBTYWdhciBOYWdlc2htdXJ0aHkNCndyb3Rl
+Og0KPiBUaGlzIHBhdGNoIGhhbmRsZXMgdGhlIFNldEFkZHJlc3NlZFBsYXllciBjb21tYW5kIGZv
+ciBURyByb2xlLg0KPiAtLS0NCj4gIHByb2ZpbGVzL2F1ZGlvL2F2cmNwLmMgfCAgIDQxICsrKysr
+KysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrDQo+ICAxIGZpbGUgY2hhbmdlZCwg
+NDEgaW5zZXJ0aW9ucygrKQ0KPg0KPiBkaWZmIC0tZ2l0IGEvcHJvZmlsZXMvYXVkaW8vYXZyY3Au
+YyBiL3Byb2ZpbGVzL2F1ZGlvL2F2cmNwLmMNCj4gaW5kZXggMzgyNmE5MS4uY2VhMDgxYyAxMDA2
+NDQNCj4gLS0tIGEvcHJvZmlsZXMvYXVkaW8vYXZyY3AuYw0KPiArKysgYi9wcm9maWxlcy9hdWRp
+by9hdnJjcC5jDQo+IEBAIC0xMDMsNiArMTAzLDcgQEANCj4gICNkZWZpbmUgQVZSQ1BfUkVRVUVT
+VF9DT05USU5VSU5HICAgICAgIDB4NDANCj4gICNkZWZpbmUgQVZSQ1BfQUJPUlRfQ09OVElOVUlO
+RyAgICAgICAgIDB4NDENCj4gICNkZWZpbmUgQVZSQ1BfU0VUX0FCU09MVVRFX1ZPTFVNRSAgICAg
+IDB4NTANCj4gKyNkZWZpbmUgQVZSQ1BfU0VUX0FERFJFU1NFRF9QTEFZRVIgICAgIDB4NjANCj4g
+ICNkZWZpbmUgQVZSQ1BfU0VUX0JST1dTRURfUExBWUVSICAgICAgIDB4NzANCj4gICNkZWZpbmUg
+QVZSQ1BfR0VUX0ZPTERFUl9JVEVNUyAgICAgICAgIDB4NzENCj4gICNkZWZpbmUgQVZSQ1BfQ0hB
+TkdFX1BBVEggICAgICAgICAgICAgIDB4NzINCj4gQEAgLTE2MTAsNiArMTYxMSw0NCBAQCBlcnI6
+DQo+ICAgICAgICAgcmV0dXJuIEFWQ19DVFlQRV9SRUpFQ1RFRDsNCj4gIH0NCj4NCj4gK3N0YXRp
+YyB1aW50OF90IGF2cmNwX2hhbmRsZV9zZXRfYWRkcmVzc2VkX3BsYXllcihzdHJ1Y3QgYXZyY3Ag
+KnNlc3Npb24sDQo+ICsgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgIHN0cnVjdCBhdnJjcF9oZWFkZXIgKnBkdSwNCj4gKyAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICB1aW50OF90IHRyYW5zYWN0aW9uKQ0KPiAr
+ew0KPiArICAgICAgIHVpbnQxNl90IHBsYXllcl9pZDsNCj4gKyAgICAgICB1aW50MTZfdCBsZW4g
+PSBudG9ocyhwZHUtPnBhcmFtc19sZW4pOw0KPiArICAgICAgIHN0cnVjdCBhdnJjcF9zZXJ2ZXIg
+KnNlcnZlciA9IHNlc3Npb24tPnNlcnZlcjsNCj4gKyAgICAgICBHU0xpc3QgKmw7DQo+ICsNCj4g
+KyAgICAgICBpZiAobGVuICE9IDIpDQo+ICsgICAgICAgICAgICAgICBnb3RvIGVycjsNCj4gKw0K
+PiArICAgICAgIHBsYXllcl9pZCA9IGJ0X2dldF9iZTE2KCZwZHUtPnBhcmFtc1swXSk7DQo+ICsN
+Cj4gKyAgICAgICBEQkcoImlkID0gJWQiLCBwbGF5ZXJfaWQpOw0KPiArDQo+ICsgICAgICAgZm9y
+IChsID0gc2VydmVyLT5wbGF5ZXJzOyBsOyBsID0gbC0+bmV4dCkgew0KPiArICAgICAgICAgICAg
+ICAgc3RydWN0IGF2cmNwX3BsYXllciAqcGxheWVyID0gbC0+ZGF0YTsNCj4gKw0KPiArICAgICAg
+ICAgICAgICAgaWYgKHBsYXllci0+aWQgPT0gcGxheWVyX2lkKSB7DQo+ICsgICAgICAgICAgICAg
+ICAgICAgICAgIHNlc3Npb24tPnRhcmdldC0+cGxheWVyID0gcGxheWVyOw0KPiArICAgICAgICAg
+ICAgICAgICAgICAgICBwZHUtPnBhcmFtc19sZW4gPSBodG9ucygxKTsNCj4gKyAgICAgICAgICAg
+ICAgICAgICAgICAgcGR1LT5wYXJhbXNbMF0gPSBBVlJDUF9TVEFUVVNfU1VDQ0VTUzsNCj4gKyAg
+ICAgICAgICAgICAgICAgICAgICAgcmV0dXJuIEFWQ19DVFlQRV9BQ0NFUFRFRDsNCj4gKyAgICAg
+ICAgICAgICAgIH0NCj4gKw0KPiArICAgICAgIH0NCg0KU3BsaXQgdGhlIHBsYXllciBsb29rdXAg
+aW4gYSBkaWZmZXJlbnQgZnVuY3Rpb24uIEZ1dGhlcm1vcmUgdXBvbg0Kc3VjY2VzcyB0aGVyZSBh
+cmUgYSBmZXcgZXZlbnQgdGhhdCBuZWVkcyB0byBjb21wbGV0ZSBhY2NvcmRpbmcgdG8gdGhlDQpz
+cGVjIChzZWVUYWJsZSA2LjQzIENvbXBsZXRpb24gb2Ygbm90aWZpY2F0aW9ucyBvbiBhZGRyZXNz
+ZWQgcGxheWVyDQpjaGFuZ2VkKS4NCg0KWWVzOyBJIHRob3VnaHQgb2YgaGFuZGxpbmcgaXQgd2l0
+aCBBZGRyZXNzZWQgUGxheWVyIENoYW5nZWQgbm90aWZpY2F0aW9uDQppbXBsZW1lbnRhdGlvbi4g
+SSBzaGFsbCBzaGFyZSB0aGUgcGF0Y2ggZm9yIHRoZSBzYW1lLg0KDQotLQ0KU2FnYXINCg0KPiAr
+ICAgICAgIHBkdS0+cGFyYW1zX2xlbiA9IGh0b25zKDEpOw0KPiArICAgICAgIHBkdS0+cGFyYW1z
+WzBdID0gQVZSQ1BfU1RBVFVTX1BBUkFNX05PVF9GT1VORDsNCg0KSW0gbm90IHNvIHN1cmUgdGhp
+cyBpcyB0aGUgcmlnaHQgZXJyb3IsIEkgYmVsaWV2ZSB3aGF0IHNoYWxsIGJlIHVzZSBpcw0KQVZS
+Q1BfU1RBVFVTX0lOVkFMSURfUExBWUVSX0lEIGluIHRoaXMgY2FzZS4NCg0KPiArICAgICAgIHJl
+dHVybiBBVkNfQ1RZUEVfUkVKRUNURUQ7DQo+ICtlcnI6DQo+ICsgICAgICAgcGR1LT5wYXJhbXNf
+bGVuID0gaHRvbnMoMSk7DQo+ICsgICAgICAgcGR1LT5wYXJhbXNbMF0gPSBBVlJDUF9TVEFUVVNf
+SU5WQUxJRF9QQVJBTTsNCj4gKw0KPiArICAgICAgIHJldHVybiBBVkNfQ1RZUEVfUkVKRUNURUQ7
+DQo+ICt9DQo+ICsNCj4gIHN0YXRpYyBjb25zdCBzdHJ1Y3QgY29udHJvbF9wZHVfaGFuZGxlciBj
+b250cm9sX2hhbmRsZXJzW10gPSB7DQo+ICAgICAgICAgICAgICAgICB7IEFWUkNQX0dFVF9DQVBB
+QklMSVRJRVMsIEFWQ19DVFlQRV9TVEFUVVMsDQo+ICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICBhdnJjcF9oYW5kbGVfZ2V0X2NhcGFiaWxpdGllcyB9LA0KPiBAQCAtMTY0
+MSw2ICsxNjgwLDggQEAgc3RhdGljIGNvbnN0IHN0cnVjdCBjb250cm9sX3BkdV9oYW5kbGVyIGNv
+bnRyb2xfaGFuZGxlcnNbXSA9IHsNCj4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgIGF2cmNwX2hhbmRsZV9yZXF1ZXN0X2NvbnRpbnVpbmcgfSwNCj4gICAgICAgICAgICAg
+ICAgIHsgQVZSQ1BfQUJPUlRfQ09OVElOVUlORywgQVZDX0NUWVBFX0NPTlRST0wsDQo+ICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBhdnJjcF9oYW5kbGVfYWJvcnRfY29u
+dGludWluZyB9LA0KPiArICAgICAgICAgICAgICAgeyBBVlJDUF9TRVRfQUREUkVTU0VEX1BMQVlF
+UiwgQVZDX0NUWVBFX0NPTlRST0wsDQo+ICsgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICBhdnJjcF9oYW5kbGVfc2V0X2FkZHJlc3NlZF9wbGF5ZXIgfSwNCj4gICAgICAgICAg
+ICAgICAgIHsgfSwNCj4gIH07DQo+DQo+IC0tDQo+IDEuNy45LjUNCj4NCj4gLS0NCj4gVG8gdW5z
+dWJzY3JpYmUgZnJvbSB0aGlzIGxpc3Q6IHNlbmQgdGhlIGxpbmUgInVuc3Vic2NyaWJlIGxpbnV4
+LWJsdWV0b290aCIgaW4NCj4gdGhlIGJvZHkgb2YgYSBtZXNzYWdlIHRvIG1ham9yZG9tb0B2Z2Vy
+Lmtlcm5lbC5vcmcNCj4gTW9yZSBtYWpvcmRvbW8gaW5mbyBhdCAgaHR0cDovL3ZnZXIua2VybmVs
+Lm9yZy9tYWpvcmRvbW8taW5mby5odG1sDQoNCg0KDQotLSANCkx1aXogQXVndXN0byB2b24gRGVu
+dHo=
 
-diff --git a/doc/mgmt-api.txt b/doc/mgmt-api.txt
-index 53600ec5b10e..ec930d6eaf63 100644
---- a/doc/mgmt-api.txt
-+++ b/doc/mgmt-api.txt
-@@ -1287,8 +1287,16 @@ Add Remote Out Of Band Data Command
- 	Secure Connections is disabled, then of course this is the
- 	same as not providing any data at all.
- 
--	When providing data for remote LE devices, then the P-192 fields
--	are not used and shall be set to zero value.
-+	When providing data for remote LE devices, then the Hash_192 field
-+	is used to provide the Security Manager TK Value. The Randomizer_192
-+	field is not used and shall be set to zero. The Hash_192 value can
-+	also be set to zero and that means that no Out Of Band data for
-+	LE legacy pairing is provided.
-+
-+	The Hash_256 and Randomizer_256 fields can be used for LE secure
-+	connections Out Of Band data. If only LE secure connections data
-+	is provided the Hash_P192 and Randomizer_P192 fields can be set
-+	to zero.
- 
- 	This command can be used when the controller is not powered and
- 	all settings will be programmed once powered.
-@@ -2221,6 +2229,86 @@ Start Service Discovery Command
- 				Invalid Index
- 
- 
-+Read Local Out Of Band Extended Data Command
-+============================================
-+
-+	Command Code:		0x003b
-+	Controller Index:	<controller id>
-+	Command Parameters:	Address_Type (1 Octet)
-+	Return Parameters:	Address_Type (1 Octet)
-+				EIR_Data_Length (2 Octets)
-+				EIR_Data (0-65535 Octets)
-+
-+	This command is used to read the local Out of Band data
-+	information and provide them encoded as extended inquiry
-+	response information or advertising data.
-+
-+	Possible values for the Address_Type parameter are a bit-wise or
-+	of the following bits:
-+
-+		0	BR/EDR
-+		1	LE Public
-+		2	LE Random
-+
-+	By combining these e.g. the following values are possible:
-+
-+		1	BR/EDR
-+		6	LE (public & random)
-+		7	Reserved (not in use)
-+
-+	For BR/EDR controller (Address_Type 1) the returned information
-+	will contain the following information:
-+
-+		Class of Device
-+		Simple Pairing Hash C-192
-+		Simple Pairing Randomizer R-192
-+		Simple Pairing Hash C-256 (optional)
-+		Simple Pairing Randomizer R-256 (optional)
-+		Service Class UUID (optional)
-+		Bluetooth Local Name (optional)
-+
-+	The Simple Pairing Hash C-256 and Simple Pairing Randomizer R-256
-+	fields are only included when secure connections has been enabled.
-+
-+	The Device Address (BD_ADDR) is not included in the EIR_Data and
-+	needs to be taken from controller information.
-+
-+	For LE controller (Address_Type 6) the returned information
-+	will contain the following information:
-+
-+		LE Bluetooth Device Address
-+		LE Role
-+		Security Manager TK Value
-+		Simple Pairing Hash C-256 (optional)
-+		Simple Pairing Randomizer R-256 (optional)
-+		Appearance (optional)
-+		Local Name (optional)
-+		Flags
-+
-+	The Simple Pairing Hash C-256 and Simple Pairing Randomizer R-256
-+	fields are only included when secure connections has been enabled.
-+
-+	The returned information from BR/EDR controller and LE controller
-+	types are not related to each other. Once they have been used
-+	over an Out Of Band link, a new set of information shall be
-+	requested.
-+
-+	This command can only be used when the controller is powered.
-+
-+	Values returned by this command become invalid when the controller
-+	is powered down. After each power-cycle it is required to call
-+	this command again to get updated information.
-+
-+	This command generates a Command Complete event on success or
-+	a Command Status event on failure.
-+
-+	Possible errors:	Not Supported
-+				Busy
-+				Invalid Parameters
-+				Not Powered
-+				Invalid Index
-+
-+
- Command Complete Event
- ======================
- 
--- 
-2.1.0
 
