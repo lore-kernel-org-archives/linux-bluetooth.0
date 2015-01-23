@@ -1,76 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
-From: Gilbert Gao <Gilbert.Gao@Qisda.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: RE: BlueZ question about HID profile
-Date: Fri, 23 Jan 2015 10:10:57 +0000
-Message-ID: <7FF7EC0D6ACE2E4297FA998A42F07AD6195B2106@QS-MBX02.benq.corp.com>
-References: <m3oaqfl79f.fsf@carbon.jhcloos.org>
- <D043D131-E9F8-43C1-8671-0EACAE810420@holtmann.org>
- <m361cklxwo.fsf@carbon.jhcloos.org>
- <C5CDA647-8415-44F3-9F89-0D596D76498F@holtmann.org>
- <m3zj9wkfsw.fsf@carbon.jhcloos.org>
- <7FF7EC0D6ACE2E4297FA998A42F07AD6195AF357@QS-MBX02.benq.corp.com>
- <E1E9C166-A11C-4A76-8B60-BF168C918F2B@holtmann.org>  
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH 2/2] Bluetooth: Remove incorrect check for BDADDR_BREDR address type
+Date: Fri, 23 Jan 2015 10:10:39 +0200
+Message-Id: <1422000639-4918-2-git-send-email-johan.hedberg@gmail.com>
+In-Reply-To: <1422000639-4918-1-git-send-email-johan.hedberg@gmail.com>
+References: <1422000639-4918-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+From: Johan Hedberg <johan.hedberg@intel.com>
 
-Hi,
+The Add Remote OOB Data mgmt command should allow data to be passed for
+LE as well. This patch removes a left-over check for BDADDR_BREDR that
+should not be there anymore.
 
-I add KEYB to sdp:
-#sdptool add KEYB
+Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+---
+ net/bluetooth/mgmt.c | 8 --------
+ 1 file changed, 8 deletions(-)
 
-And HID service can be found and connected by a remote dongle on PC,
->From log, connect_event_cb() is called, but this function calls input_device_set_channel(), in which find_device() returns NULL, because the global variable "devices" is NULL, so the connection can not be established.
-I want to know how to modify here for successful connection as a keyboard.
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 2c0de3e4e79a..862a005d9db2 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -3672,14 +3672,6 @@ static int add_remote_oob_data(struct sock *sk, struct hci_dev *hdev,
+ 		u8 *rand192, *hash192;
+ 		u8 status;
+ 
+-		if (cp->addr.type != BDADDR_BREDR) {
+-			err = cmd_complete(sk, hdev->id,
+-					   MGMT_OP_ADD_REMOTE_OOB_DATA,
+-					   MGMT_STATUS_INVALID_PARAMS,
+-					   &cp->addr, sizeof(cp->addr));
+-			goto unlock;
+-		}
+-
+ 		if (bdaddr_type_is_le(cp->addr.type)) {
+ 			rand192 = NULL;
+ 			hash192 = NULL;
+-- 
+2.1.0
 
-And I'm not very clear which interfaces should be called for HID device role to send data(such as a key press).
-
-Sicerely expect your advice! Thank you!
-
-Best Regards,
-Gilbert
-
-
------Original Message-----
-From: Gilbert Gao
-Sent: Tuesday, January 06, 2015 10:26 AM
-To: 'Marcel Holtmann'
-Cc: linux-bluetooth@vger.kernel.org
-Subject: RE: BlueZ question about HID profile
-
-Dear Marcel,
-
-Thank you very much!
-But now I'm not very clear about BlueZ HID implementation.
-Could you help to point out how to modify for a HID device role or any sample code?
-
-Best Regards,
-Gilbert
-
------Original Message-----
-From: Marcel Holtmann [mailto:marcel@holtmann.org]
-Sent: Tuesday, January 06, 2015 9:38 AM
-To: Gilbert Gao
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: BlueZ question about HID profile
-
-Hi Gilbert,
-
-> Here is an emergent question about BlueZ feature:
-> I read the doc "supported-features.txt", which says BlueZ supports HID host.
-> And my question is whether HID device is supported?
-> Or can I use BlueZ HID profile to implement the Bluetooth HID device such as a Bluetooth mouse or keyboard?
-
-it should be pretty simple to implement a HID device role. There have been external projects in the past that did this. The reason why this is not in BlueZ is mainly due to the fact that we would need to get the input events from some kind of source. So if you have that figured out, then it should be simple to provided HID device role.
-
-Regards
-
-Marcel
-
-
-**********************Confidentiality Notice************************
-The opinions and views expressed in this e-mail are solely those of the author and do not necessarily represent our company and its affiliates. If this e-mail is not originally intended for you, or received by you in error, do not disclose its content to anyone and delete it immediately. This e-mail may contain information that is legally privileged, confidential or exempt from disclosure.
