@@ -3,11 +3,11 @@ From: Peter Hurley <peter@hurleysoftware.com>
 To: Johan Hedberg <johan.hedberg@gmail.com>,
 	linux-bluetooth@vger.kernel.org
 Cc: Peter Hurley <peter@hurleysoftware.com>
-Subject: [PATCH v2] bluetooth: Fix nested sleeps
-Date: Fri, 23 Jan 2015 12:16:53 -0500
-Message-Id: <1422033413-17405-1-git-send-email-peter@hurleysoftware.com>
-In-Reply-To: <1422032904-17091-1-git-send-email-peter@hurleysoftware.com>
-References: <1422032904-17091-1-git-send-email-peter@hurleysoftware.com>
+Subject: [PATCH] bluetooth: Fix nested sleeps
+Date: Fri, 23 Jan 2015 12:08:24 -0500
+Message-Id: <1422032904-17091-1-git-send-email-peter@hurleysoftware.com>
+In-Reply-To: <1422014582-14391-1-git-send-email-johan.hedberg@gmail.com>
+References: <1422014582-14391-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
@@ -19,7 +19,7 @@ destroy the wait loop state.
 Use the newly-minted wait_woken() and DEFINE_WAIT_FUNC() for the
 wait loop. DEFINE_WAIT_FUNC() allows an alternate wake function
 to be specified; in this case, the predefined scheduler function,
-woken_wake_function(). This wait construct ensures wakeups will
+woken_wait_function(). This wait construct ensures wakeups will
 not be missed without requiring the wait loop to set the
 task state before condition evaluation. How this works:
 
@@ -36,9 +36,9 @@ wake_up_interruptible             |
                                   | wait_woken
                                   |   set TASK_INTERRUPTIBLE
                                   |   WQ_FLAG_WOKEN? yes
-                                  |   set TASK_RUNNING
                                   |
-                                  | - loop -
+                                  | set TASK_RUNNING
+                                  | loop
 				  |
 				  | is <condition> set?
                                   | yes - exit wait loop
@@ -48,12 +48,6 @@ in l2cap_sock_accept(), rfcomm_sock_accept() and sco_sock_accept().
 
 Signed-off-by: Peter Hurley <peter@hurleysoftware.com>
 ---
-
-v2: minor commit log fixes
-    * s/woken_wait_function/woken_wake_function/
-    * indent 'set TASK_RUNNING' under wait_woken to clarify
-      wait_woken() performs that operation
-
  net/bluetooth/l2cap_sock.c  | 9 ++++-----
  net/bluetooth/rfcomm/sock.c | 9 ++++-----
  net/bluetooth/sco.c         | 8 +++-----
