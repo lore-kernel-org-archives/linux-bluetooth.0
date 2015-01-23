@@ -1,69 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 23 Jan 2015 20:30:39 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Peter Hurley <peter@hurleysoftware.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v2] bluetooth: Fix nested sleeps
-Message-ID: <20150123183039.GA6061@t440s.P-661HNU-F1>
-References: <1422032904-17091-1-git-send-email-peter@hurleysoftware.com>
- <1422033413-17405-1-git-send-email-peter@hurleysoftware.com>
-MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1422033413-17405-1-git-send-email-peter@hurleysoftware.com>
+Mime-Version: 1.0 (Mac OS X Mail 8.1 \(1993\))
+Subject: Re: [PATCH] Bluetooth: Convert Set SC to use HCI Request
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1422020566-30680-1-git-send-email-johan.hedberg@gmail.com>
+Date: Fri, 23 Jan 2015 10:10:03 -0800
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <08C54AED-CD9E-4DCC-AB77-F14858CA6015@holtmann.org>
+References: <1422020566-30680-1-git-send-email-johan.hedberg@gmail.com>
+To: Johan Hedberg <johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Peter,
+Hi Johan,
 
-On Fri, Jan 23, 2015, Peter Hurley wrote:
-> l2cap/rfcomm/sco_sock_accept() are wait loops which may acquire
-> sleeping locks. Since both wait loops and sleeping locks use
-> task_struct.state to sleep and wake, the nested sleeping locks
-> destroy the wait loop state.
+> This patch converts the Set Secure Connection HCI handling to use a HCI
+> request instead of using a hard-coded callback in hci_event.c. This e.g.
+> ensures that we don't clear the flags incorrectly if something goes
+> wrong with the power up process (not related to a mgmt Set SC command).
 > 
-> Use the newly-minted wait_woken() and DEFINE_WAIT_FUNC() for the
-> wait loop. DEFINE_WAIT_FUNC() allows an alternate wake function
-> to be specified; in this case, the predefined scheduler function,
-> woken_wake_function(). This wait construct ensures wakeups will
-> not be missed without requiring the wait loop to set the
-> task state before condition evaluation. How this works:
+> The code can also be simplified a bit since only one pending Set SC
+> command is allowed, i.e. mgmt_pending_foreach usage is not needed.
 > 
->  CPU 0                            |  CPU 1
->                                   |
->                                   | is <condition> set?
->                                   | no
-> set <condition>                   |
->                                   |
-> wake_up_interruptible             |
->   woken_wake_function             |
->     set WQ_FLAG_WOKEN             |
->     try_to_wake_up                |
->                                   | wait_woken
->                                   |   set TASK_INTERRUPTIBLE
->                                   |   WQ_FLAG_WOKEN? yes
->                                   |   set TASK_RUNNING
->                                   |
->                                   | - loop -
-> 				  |
-> 				  | is <condition> set?
->                                   | yes - exit wait loop
-> 
-> Fixes "do not call blocking ops when !TASK_RUNNING" warnings
-> in l2cap_sock_accept(), rfcomm_sock_accept() and sco_sock_accept().
-> 
-> Signed-off-by: Peter Hurley <peter@hurleysoftware.com>
+> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 > ---
-> 
-> v2: minor commit log fixes
->     * s/woken_wait_function/woken_wake_function/
->     * indent 'set TASK_RUNNING' under wait_woken to clarify
->       wait_woken() performs that operation
-> 
->  net/bluetooth/l2cap_sock.c  | 9 ++++-----
->  net/bluetooth/rfcomm/sock.c | 9 ++++-----
->  net/bluetooth/sco.c         | 8 +++-----
->  3 files changed, 11 insertions(+), 15 deletions(-)
+> include/net/bluetooth/hci_core.h |  1 -
+> net/bluetooth/hci_event.c        |  4 +-
+> net/bluetooth/mgmt.c             | 92 +++++++++++++++++++++-------------------
+> 3 files changed, 50 insertions(+), 47 deletions(-)
 
-Applied to bluetooth-next. Thanks!
+patch has been applied to bluetooth-next tree.
 
-Johan
+Regards
+
+Marcel
+
