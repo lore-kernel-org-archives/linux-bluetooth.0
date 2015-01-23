@@ -1,116 +1,56 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 23 Jan 2015 14:43:23 +0200
+Date: Fri, 23 Jan 2015 14:14:26 +0200
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: peter@hurleysoftware.com
-Subject: Re: [PATCH] Bluetooth: Fix "blocking ops when !TASK_RUNNING" with
- sock_accept
-Message-ID: <20150123124323.GA15371@t440s.lan>
-References: <1422014582-14391-1-git-send-email-johan.hedberg@gmail.com>
+To: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 2/2] Bluetooth: Use reject error code in pair device
+ method
+Message-ID: <20150123121426.GA14616@t440s.lan>
+References: <1422014012-6840-1-git-send-email-lukasz.rymanowski@tieto.com>
+ <1422014012-6840-2-git-send-email-lukasz.rymanowski@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1422014582-14391-1-git-send-email-johan.hedberg@gmail.com>
+In-Reply-To: <1422014012-6840-2-git-send-email-lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Lukasz,
 
-On Fri, Jan 23, 2015, Johan Hedberg wrote:
-> Recent kernels have started giving the following style warnings:
+On Fri, Jan 23, 2015, Lukasz Rymanowski wrote:
+> If user space is trying to do LE pair but LE has not been enabled then
+> MGMT_STATUS_REJECT will be returned.
 > 
-> [  +0.000237] WARNING: CPU: 1 PID: 701 at kernel/sched/core.c:7300 __might_sleep+0x65/0xa3()
-> [  +0.000407] do not call blocking ops when !TASK_RUNNING; state=1 set at [<f88b0955>] l2cap_sock_accept+0x97/0x1b4 [bluetooth]
-> [  +0.000611] Modules linked in: btusb hci_vhci rfcomm bluetooth
-> [  +0.000305] CPU: 1 PID: 701 Comm: l2cap-tester Not tainted 3.19.0-rc4+ #1304
-> [  +0.000318] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.7.5-20140709_153950- 04/01/2014
-> [  +0.000463]  00000000 00000000 f2e81c70 c13e57df f2e81c9c f2e81c8c c103372c 00001c84
-> [  +0.000586]  c104e4a1 00000001 f5e93390 f5e93390 f2e81ca4 c103376e 00000009 f2e81c9c
-> [  +0.000422]  c15da812 f2e81cb8 f2e81cdc c104e4a1 c15da2ae 00001c84 c15da812 00000001
-> [  +0.000869] Call Trace:
-> [  +0.000073]  [<c13e57df>] dump_stack+0x49/0x73
-> [  +0.000182]  [<c103372c>] warn_slowpath_common+0x89/0xa0
-> [  +0.000225]  [<c104e4a1>] ? __might_sleep+0x65/0xa3
-> [  +0.000204]  [<c103376e>] warn_slowpath_fmt+0x2b/0x2f
-> [  +0.000215]  [<c104e4a1>] __might_sleep+0x65/0xa3
-> [  +0.000212]  [<f88b0955>] ? l2cap_sock_accept+0x97/0x1b4 [bluetooth]
-> [  +0.000297]  [<f88b0955>] ? l2cap_sock_accept+0x97/0x1b4 [bluetooth]
-> [  +0.000284]  [<c130bfad>] lock_sock_nested+0x23/0x77
-> [  +0.000219]  [<f888b25d>] bt_accept_dequeue+0x68/0x11b [bluetooth]
-> [  +0.000274]  [<c1060165>] ? trace_hardirqs_on+0xb/0xd
-> [  +0.000224]  [<f88b0985>] l2cap_sock_accept+0xc7/0x1b4 [bluetooth]
-> [  +0.000498]  [<f88b0985>] ? l2cap_sock_accept+0xc7/0x1b4 [bluetooth]
-> [  +0.000494]  [<c1051849>] ? wake_up_state+0x11/0x11
-> [  +0.000202]  [<c1309c27>] SYSC_accept4+0xf3/0x1af
-> [  +0.000194]  [<c11912b5>] ? security_socket_accept+0x14/0x16
-> [  +0.000252]  [<c1309c27>] ? SYSC_accept4+0xf3/0x1af
-> [  +0.000201]  [<c1061507>] ? lock_release_non_nested+0x137/0x217
-> [  +0.000256]  [<c10cd5bc>] ? might_fault+0x44/0x8b
-> [  +0.000190]  [<c10cd5bc>] ? might_fault+0x44/0x8b
-> [  +0.000196]  [<c11da2b0>] ? _copy_from_user+0x44/0x4e
-> [  +0.000210]  [<c130b3ea>] SYSC_socketcall+0xff/0x38c
-> [  +0.000205]  [<c105fdcb>] ? mark_lock+0x1e/0x1c5
-> [  +0.000186]  [<c10606d8>] ? __lock_acquire+0x342/0xc89
-> [  +0.000215]  [<c1060926>] ? __lock_acquire+0x590/0xc89
-> [  +0.000217]  [<c105ea2e>] ? __lock_is_held+0x2e/0x44
-> [  +0.000205]  [<c11106c9>] ? fsnotify+0x452/0x494
-> [  +0.000186]  [<c1060165>] ? trace_hardirqs_on+0xb/0xd
-> [  +0.000403]  [<c10e4516>] ? fsnotify_modify+0x4a/0x55
-> [  +0.000497]  [<c10e4516>] ? fsnotify_modify+0x4a/0x55
-> [  +0.000220]  [<c10e48eb>] ? vfs_write+0xbb/0xc5
-> [  +0.000186]  [<c106013f>] ? trace_hardirqs_on_caller+0x15f/0x17a
-> [  +0.000273]  [<c130b6a8>] SyS_socketcall+0x13/0x15
-> [  +0.000200]  [<c13ea628>] sysenter_do_call+0x12/0x12
+> Same result code will be returned also in case of BREDR pairing if BREDR
+> is not enabled.
 > 
-> The problematic code is bt_accept_dequeue() which calls the blocking
-> lock_sock() function. The simplest fix is to move setting
-> TASK_INTERRUPTIBLE after the call to bt_accept_dequeue(). This patch
-> makes this fix for our three socket types (L2CAP, RFCOMM & SCO).
+> Having separate error code for that scenario might be useful for
+> debugging at least.
 > 
-> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+> Signed-off-by: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 > ---
-> Note: Due to my limited experience with waitqueues and playing with the
-> task state, this can be considered a rather naive approach to the
-> problem. However, the patch seems to work fine in practice and
-> effectively removes the warning in question.
+>  net/bluetooth/mgmt.c | 2 ++
+>  1 file changed, 2 insertions(+)
 > 
->  net/bluetooth/l2cap_sock.c  | 4 ++--
->  net/bluetooth/rfcomm/sock.c | 4 ++--
->  net/bluetooth/sco.c         | 4 ++--
->  3 files changed, 6 insertions(+), 6 deletions(-)
-> 
-> diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
-> index 20206cd3acbc..8d723e6ae802 100644
-> --- a/net/bluetooth/l2cap_sock.c
-> +++ b/net/bluetooth/l2cap_sock.c
-> @@ -316,8 +316,6 @@ static int l2cap_sock_accept(struct socket *sock, struct socket *newsock,
->  	/* Wait for an incoming connection. (wake-one). */
->  	add_wait_queue_exclusive(sk_sleep(sk), &wait);
->  	while (1) {
-> -		set_current_state(TASK_INTERRUPTIBLE);
-> -
->  		if (sk->sk_state != BT_LISTEN) {
->  			err = -EBADFD;
->  			break;
-> @@ -327,6 +325,8 @@ static int l2cap_sock_accept(struct socket *sock, struct socket *newsock,
->  		if (nsk)
->  			break;
+> diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+> index 41e3005..e03e63c 100644
+> --- a/net/bluetooth/mgmt.c
+> +++ b/net/bluetooth/mgmt.c
+> @@ -3246,6 +3246,8 @@ static int pair_device(struct sock *sk, struct hci_dev *hdev, void *data,
 >  
-> +		set_current_state(TASK_INTERRUPTIBLE);
-> +
->  		if (!timeo) {
->  			err = -EAGAIN;
->  			break;
+>  		if (PTR_ERR(conn) == -EBUSY)
+>  			status = MGMT_STATUS_BUSY;
+> +		else if (PTR_ERR(conn) == -EOPNOTSUPP)
+> +			status = MGMT_STATUS_REJECTED;
+>  		else
+>  			status = MGMT_STATUS_CONNECT_FAILED;
 
-Szymon pointed out that this change is mostly reverting fixes from Peter
-Hurley from a few years back, i.e. the following commits:
+Good catch, but I'd like to keep this consistent with our handling of LE
+support elsewhere. Particularly, I'd like to follow the same semantics
+as the mgmt_le_support() helper function, meaning if the HW doesn't
+support LE we get NOT_SUPPORTED whereas if it does support LE but it's
+simply not enabled we get REJECTED.
 
-	552b0d3cb9ff648aa503011ef50ca24019cd0f5f
-	f9a3c20aa07462108fc6fd759dea956053f020bb
-	950e2d51e866623e4c360280aa63b85ab66d3403
-
-So my patch is probably not the right fix for the issue. Any further
-ideas on how to properly fix this are welcome. I didn't manage to find
-anything similar to our accept_q in other (non-Bluetooth) socket types,
-so I'm a bit lost why exactly it's needed in the first place.
+You could e.g. use EOPNOTSUPP for non-LE HW and ECONNREFUSED for LE not
+enabled (feel free to propose a better errno to mgmt status mapping).
 
 Johan
