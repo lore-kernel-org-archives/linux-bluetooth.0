@@ -1,31 +1,51 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Fri, 23 Jan 2015 20:00:12 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCH 2/2] Bluetooth: Use reject error code in pair device
+ method
+Message-ID: <20150123180012.GA32188@t440s.P-661HNU-F1>
+References: <1422014012-6840-1-git-send-email-lukasz.rymanowski@tieto.com>
+ <1422014012-6840-2-git-send-email-lukasz.rymanowski@tieto.com>
+ <20150123121426.GA14616@t440s.lan>
+ <CAMudyAsxs=-A8ByHCVLj28sR9fD0z3no==mAgeaRwJBk_S_0-Q@mail.gmail.com>
+MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 8.1 \(1993\))
-Subject: Re: [PATCH 2/2] Bluetooth: Remove incorrect check for BDADDR_BREDR address type
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1422000639-4918-2-git-send-email-johan.hedberg@gmail.com>
-Date: Fri, 23 Jan 2015 10:07:11 -0800
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <2DC6CBC6-850C-460C-AC64-295D3ABD6C02@holtmann.org>
-References: <1422000639-4918-1-git-send-email-johan.hedberg@gmail.com> <1422000639-4918-2-git-send-email-johan.hedberg@gmail.com>
-To: Johan Hedberg <johan.hedberg@gmail.com>
+In-Reply-To: <CAMudyAsxs=-A8ByHCVLj28sR9fD0z3no==mAgeaRwJBk_S_0-Q@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+Hi Lukasz,
 
-> The Add Remote OOB Data mgmt command should allow data to be passed for
-> LE as well. This patch removes a left-over check for BDADDR_BREDR that
-> should not be there anymore.
+On Fri, Jan 23, 2015, Lukasz Rymanowski wrote:
+> >>               if (PTR_ERR(conn) == -EBUSY)
+> >>                       status = MGMT_STATUS_BUSY;
+> >> +             else if (PTR_ERR(conn) == -EOPNOTSUPP)
+> >> +                     status = MGMT_STATUS_REJECTED;
+> >>               else
+> >>                       status = MGMT_STATUS_CONNECT_FAILED;
+> >
+> > Good catch, but I'd like to keep this consistent with our handling of LE
+> > support elsewhere. Particularly, I'd like to follow the same semantics
+> > as the mgmt_le_support() helper function, meaning if the HW doesn't
+> > support LE we get NOT_SUPPORTED whereas if it does support LE but it's
+> > simply not enabled we get REJECTED.
+> >
+> > You could e.g. use EOPNOTSUPP for non-LE HW and ECONNREFUSED for LE not
+> > enabled (feel free to propose a better errno to mgmt status mapping).
+> >
+> Ok.
+> I could not found any better error code than  ECONNREFUSED so I will go for it.
 > 
-> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
-> ---
-> net/bluetooth/mgmt.c | 8 --------
-> 1 file changed, 8 deletions(-)
+> Also going with your proposal I should probably change hci_connect_acl
+> in the same way.
+> Meaning return EOPNOTSUPP if it is LE only chip and ECONNREFUSED if it
+> is dual but
+> BREDR is disabled.
+> 
+> Do you agree?
 
-patch has been applied to bluetooth-next tree.
+Yes, sounds reasonable.
 
-Regards
-
-Marcel
-
+Johan
