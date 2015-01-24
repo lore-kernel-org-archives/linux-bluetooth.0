@@ -1,18 +1,18 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2] doc: Add new command and events for extended controller index list
-Date: Sun, 25 Jan 2015 00:57:31 +0100
-Message-Id: <1422143851-129529-1-git-send-email-marcel@holtmann.org>
+Subject: [PATCH] doc: Add new command and events for extended controller index list
+Date: Sun, 25 Jan 2015 00:39:04 +0100
+Message-Id: <1422142744-129390-1-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- doc/mgmt-api.txt | 105 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 105 insertions(+)
+ doc/mgmt-api.txt | 79 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 79 insertions(+)
 
 diff --git a/doc/mgmt-api.txt b/doc/mgmt-api.txt
-index b4bc6836eb69..379306b0d736 100644
+index b4bc6836eb69..52002bbdb3c4 100644
 --- a/doc/mgmt-api.txt
 +++ b/doc/mgmt-api.txt
 @@ -2310,6 +2310,63 @@ Read Local Out Of Band Extended Data Command
@@ -79,58 +79,32 @@ index b4bc6836eb69..379306b0d736 100644
  Command Complete Event
  ======================
  
-@@ -3035,3 +3092,51 @@ New Configuration Options Event
+@@ -3035,3 +3092,25 @@ New Configuration Options Event
  
  	This event indicates that one or more of the options for the
  	controller configuration has changed.
 +
 +
-+Extended Index Added Event
-+==========================
++Alternate Index Added Event
++===========================
 +
 +	Event Code:		0x0020
 +	Controller Index:	<controller id>
-+	Event Parameters:	Controller_Type[i] (1 Octet)
++	Event Parameters:
 +
-+	This event indicates that a new controller index has been
++	This event indicates that a new alternate controller has been
 +	added to the system.
 +
-+	Clients using the Read Controller Index List command will see
-+	the Index Added event instead and not a second event to indicate
-+	addition of a controller will be sent.
 +
-+	Clients using the Read Unconfigured Controller Index List command
-+	will see Unconfigured Index Added event instead and not a second
-+	event to indicate addition of an unconfigured controller will be sent.
-+
-+	Clients using only Read Extended Controller Index List will only see
-+	this event to indicate addition of any new controller type. However
-+	using Read Controller Index List and Read Unconfigured Controller
-+	Index List once will force the usage of the existing events.
-+
-+
-+Extended Index Removed Event
-+============================
++Alternate Index Removed Event
++=============================
 +
 +	Event Code:		0x0021
 +	Controller Index:	<controller id>
-+	Event Parameters:	Controller_Type[i] (1 Octet)
++	Event Parameters:
 +
-+	This event indicates that an existing controller index has been
++	This event indicates that an alternate controller has been
 +	removed from the system.
-+
-+	Clients using the Read Controller Index List command will see
-+	the Index Removed event instead and not a second event to indicate
-+	removal of a controller will be sent.
-+
-+	Clients using the Read Unconfigured Controller Index List command
-+	will see Unconfigured Index Removed event instead and not a second
-+	event to indicate removal of an unconfigured controller will be sent.
-+
-+	Clients using only Read Extended Controller Index List will only see
-+	this event to indicate removal of any new controller type. However
-+	using Read Controller Index List and Read Unconfigured Controller
-+	Index List once will force the usage of the existing events.
 -- 
 2.1.0
 
