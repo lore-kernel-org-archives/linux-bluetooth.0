@@ -1,110 +1,108 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] doc: Add new command and events for extended controller index list
-Date: Sun, 25 Jan 2015 00:39:04 +0100
-Message-Id: <1422142744-129390-1-git-send-email-marcel@holtmann.org>
+Content-Type: text/plain; charset=us-ascii
+Subject: Some thoughts about Enhanced Setup Synchronous Connection
+Message-Id: <F55AC761-6CE8-4E32-8686-010441177D91@holtmann.org>
+Date: Sat, 24 Jan 2015 13:59:47 -0800
+To: BlueZ development <linux-bluetooth@vger.kernel.org>
+Mime-Version: 1.0 (Mac OS X Mail 8.1 \(1993\))
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- doc/mgmt-api.txt | 79 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 79 insertions(+)
+Hi everyone,
 
-diff --git a/doc/mgmt-api.txt b/doc/mgmt-api.txt
-index b4bc6836eb69..52002bbdb3c4 100644
---- a/doc/mgmt-api.txt
-+++ b/doc/mgmt-api.txt
-@@ -2310,6 +2310,63 @@ Read Local Out Of Band Extended Data Command
- 				Invalid Index
- 
- 
-+Read Extended Controller Index List Command
-+===========================================
-+
-+	Command Code:		0x003c
-+	Controller Index:	<non-controller>
-+	Command Parameters:
-+	Return Parameters:	Num_Controllers (2 Octets)
-+				Controller_Index[i] (2 Octets)
-+				Controller_Type[i] (1 Octet)
-+
-+	This command returns the list of currently known controllers. It
-+	includes configured, unconfigured and alternate controllers.
-+
-+	Controllers added or removed after calling this command can be
-+	monitored using the Index Added, Index Removed, Unconfigured Index
-+	Added, Unconfigured Index Removed, Alternate Index Added and
-+	Alternate Index Removed events.
-+
-+	Instead of calling Read Controller Index List and Read Unconfigured
-+	Controller Index List, this command combines all the information
-+	and can be used to retrieve the controller list.
-+
-+	The Controller_Type parameter has these values:
-+
-+		0x00	Primary Controller (BR/EDR and/or LE)
-+		0x01	Unconfigured Controller (BR/EDR and/or LE)
-+		0x02	Alternate MAC/PHY Controller (AMP)
-+
-+	The 0x00 and 0x01 types indiciate a primary BR/EDR and/or LE
-+	controller. The difference is just if they need extra configuration
-+	or if they are fully configured.
-+
-+	An unconfigured controller can either move to a configured state
-+	by indicating Unconfigured Index Removed event followed by an
-+	Index Added event; or it can be removed from the system which
-+	would be indicated by the Unconfigured Index Removed event.
-+
-+	Controllers in configured state will be listed as 0x00 and controllers
-+	in unconfigured state will be listed as 0x01. A controller that is
-+	fully configured and supports configuration changes will be listed
-+	as 0x00.
-+
-+	Alternate MAC/PHY controllers will be listed as 0x02. They do not
-+	support the difference between configured and unconfigured state.
-+
-+	Calling this command and filtering for primary controllers will
-+	return the same index list as Read Controller Index List. The same
-+	applies for filtering for unconfigured controllers. In that case
-+	it is the same as calling Read Unconfigured Controller Index List.
-+
-+	Controllers marked as RAW only operation are currently not listed
-+	by this command.
-+
-+	This command generates a Command Complete event on success or
-+	a Command Status event on failure.
-+
-+
- Command Complete Event
- ======================
- 
-@@ -3035,3 +3092,25 @@ New Configuration Options Event
- 
- 	This event indicates that one or more of the options for the
- 	controller configuration has changed.
-+
-+
-+Alternate Index Added Event
-+===========================
-+
-+	Event Code:		0x0020
-+	Controller Index:	<controller id>
-+	Event Parameters:
-+
-+	This event indicates that a new alternate controller has been
-+	added to the system.
-+
-+
-+Alternate Index Removed Event
-+=============================
-+
-+	Event Code:		0x0021
-+	Controller Index:	<controller id>
-+	Event Parameters:
-+
-+	This event indicates that an alternate controller has been
-+	removed from the system.
--- 
-2.1.0
+there are few Bluetooth controllers that implement HCI support for Enhanced Setup Synchronous Connection and provide mSBC wideband speech encoding/decoding in the controller. It might make sense to start looking into adding support for this now.
+
+A good first step might be to start using the new HCI commands, but keep all new values to default mapping so that nothing changes for the remote devices, but internally we have the capabilities to utilize this new controller feature.
+
+The existing Setup Synchronous Connection command uses the following fields:
+
+	struct bt_hci_cmd_setup_sync_conn {
+		uint16_t handle;
+		uint32_t tx_bandwidth;
+		uint32_t rx_bandwidth;
+		uint16_t max_latency;
+		uint16_t voice_setting;
+		uint8_t  retrans_effort;
+		uint16_t pkt_type;
+	} __attribute__ ((packed));
+
+We are hardcoding the tx_bandwidth and rx_bandwidth to 0x00001f40, but I do not remember where that value came from actually.
+
+For the voice_setting, we allow either BT_VOICE_TRANSPARENT (0x0003) or BT_VOICE_CVSD_16BT (0x0060) setting and depending on which is selected, the other values are chosen. They are based on settings from the HFP specification.
+
+With BT_VOICE_CVSD_16BIT this decodes the following way:
+
+        Setting: 0x0060
+          Input Coding: Linear
+          Input Data Format: 2's complement
+          Input Sample Size: 16-bit
+          # of bits padding at MSB: 0
+          Air Coding Format: CVSD
+
+And the BT_VOICE_TRANSPARENT decodes as this:
+
+        Setting: 0x0003
+          Input Coding: Linear
+          Input Data Format: 1's complement
+          Input Sample Size: 8-bit
+          # of bits padding at MSB: 0
+          Air Coding Format: Transparent Data
+
+With the assumption that all other bits are ignored when Transparent Data is selected.
+
+For the new Enhanced Setup Synchronous Connection command we have many extra fields:
+
+	struct bt_hci_cmd_enhanced_setup_sync_conn {
+		uint16_t handle;
+		uint32_t tx_bandwidth;
+		uint32_t rx_bandwidth;
+		uint8_t  tx_coding_format[5];
+		uint8_t  rx_coding_format[5];
+		uint16_t tx_codec_frame_size;
+		uint16_t rx_codec_frame_size;
+		uint32_t input_bandwidth;
+		uint32_t output_bandwidth;
+		uint8_t  input_coding_format[5];
+		uint8_t  output_coding_format[5];
+		uint16_t input_coded_data_size;
+		uint16_t output_coded_data_size;
+		uint8_t  input_pcm_data_format;
+		uint8_t  output_pcm_data_format;
+		uint8_t  input_pcm_msb_position;
+		uint8_t  output_pcm_msb_position;
+		uint8_t  input_data_path;
+		uint8_t  output_data_path;
+		uint8_t  input_unit_size;
+		uint8_t  output_unit_size;
+		uint16_t max_latency;
+		uint16_t pkt_type;
+		uint8_t  retrans_effort;
+	} __attribute__ ((packed));
+
+To achieve proper compatibility with the existing command, the tx_bandwidth and rx_bandwidth will also both set to 0x00001f40.
+
+The tx_coding_format and rx_coding_format should be either set to CVSD (0x02) or Transparent (0x03) since at the moment the mSBC encoding/decoding is done in the host.
+
+For the tx_codec_frame_size and rx_codec_frame_size I have currently no idea what values are expected here for CVSD and which are expected from Transparent that carries mSBC payload.
+
+The input_bandwidth and output_bandwidth are values we most likely have to pick. No idea which ones are useful at the moment.
+
+For the input_coding_format and output_coding_format, I assume we have Linear PCM (0x04) when using CVSD and Transparent (0x03) when using Transparent for the air codec. In theory this could be both times PCM once we start selecting mSBC as air codec and the let the controller do the encoding/decoding. However the specifications mandates that for Transparent the tx_coding_format/rx_coding_format + input_coding_format/output_coding_format are the same.
+
+The input_coded_data_size and output_coded_data_size is unclear as well. I assume that should be 16-bits to match this up with what previously was used from the voice_setting. At least when using CVSD as air codec and Linear PCM as input/output. It is a bit unclear to what to set this to for Transparent input/output. Currently I would assume that it is suppose to be 8-bits then or maybe the controller expects it to be set to 0x00.
+
+For the input_pcm_data_format and output_pcm_data_format, the previous voice_setting uses 2's complement and with that that should be 0x02 then. It is only used when Linear PCM is selected and so for Transparent this would be set to 0x00.
+
+The input_pcm_msb_position and output_pcm_msb_position should map to the MSB padding and with that should be set to 0x00 for Linear PCM input/output selection. For Transparent this should be ignored and also set to 0x00.
+
+For input_data_path and output_data_path that would be set to HCI (0x00) and with that the input_unit_size and output_unit_size would also be set to 0x00.
+
+And then max_latency, pkt_type and retrains_effort are the same as with the previous command.
+
+In conclusion from what I can tell, only codec frame sizes and data sizes is something we should be filling in correctly. Otherwise we could start using the new commands. And the advantage would be that the host is now in control of selecting HCI as data path.
+
+Regards
+
+Marcel
 
