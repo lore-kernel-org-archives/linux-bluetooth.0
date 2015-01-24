@@ -1,21 +1,21 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v3] doc: Add new command and events for extended controller index list
-Date: Sun, 25 Jan 2015 01:01:08 +0100
-Message-Id: <1422144068-129775-1-git-send-email-marcel@holtmann.org>
+Subject: [PATCH v2] doc: Add new command and events for extended controller index list
+Date: Sun, 25 Jan 2015 00:57:31 +0100
+Message-Id: <1422143851-129529-1-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- doc/mgmt-api.txt | 108 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 108 insertions(+)
+ doc/mgmt-api.txt | 105 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 105 insertions(+)
 
 diff --git a/doc/mgmt-api.txt b/doc/mgmt-api.txt
-index b4bc6836eb69..aef37389c82e 100644
+index b4bc6836eb69..379306b0d736 100644
 --- a/doc/mgmt-api.txt
 +++ b/doc/mgmt-api.txt
-@@ -2310,6 +2310,66 @@ Read Local Out Of Band Extended Data Command
+@@ -2310,6 +2310,63 @@ Read Local Out Of Band Extended Data Command
  				Invalid Index
  
  
@@ -34,11 +34,8 @@ index b4bc6836eb69..aef37389c82e 100644
 +
 +	Controllers added or removed after calling this command can be
 +	monitored using the Index Added, Index Removed, Unconfigured Index
-+	Added and Unconfigured Index Removed events.
-+
-+	When clients only use this command, then addition and removal of
-+	controllers can be monitored using the Extended Index Added and
-+	Extended Index Removed events.
++	Added, Unconfigured Index Removed, Alternate Index Added and
++	Alternate Index Removed events.
 +
 +	Instead of calling Read Controller Index List and Read Unconfigured
 +	Controller Index List, this command combines all the information
@@ -82,7 +79,7 @@ index b4bc6836eb69..aef37389c82e 100644
  Command Complete Event
  ======================
  
-@@ -3035,3 +3095,51 @@ New Configuration Options Event
+@@ -3035,3 +3092,51 @@ New Configuration Options Event
  
  	This event indicates that one or more of the options for the
  	controller configuration has changed.
