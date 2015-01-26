@@ -1,208 +1,49 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 8.1 \(1993\))
-Subject: Re: [PATCH v10 1/2] Bluetooth: Add le_scan_restart
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1421940866-26060-1-git-send-email-jpawlowski@google.com>
-Date: Mon, 26 Jan 2015 12:44:44 -0800
+Date: Mon, 26 Jan 2015 22:27:28 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <8DD5957F-692E-42F3-B36C-42D25AD8FF78@holtmann.org>
-References: <1421940866-26060-1-git-send-email-jpawlowski@google.com>
-To: Jakub Pawlowski <jpawlowski@google.com>
+Subject: Re: [PATCH BlueZ 2/3] unit/gatt: Add TP/GAR/CL/BV-04-C/64K test
+Message-ID: <20150126202728.GA31780@t440s.P-661HNU-F1>
+References: <1422287118-25319-1-git-send-email-luiz.dentz@gmail.com>
+ <1422287118-25319-2-git-send-email-luiz.dentz@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1422287118-25319-2-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jakub,
+Hi Luiz,
 
-I would prefer if the subject is a bit more descriptive in the around 60 characters that you can use.
-
-> Currently there is no way to restart le scan, and it's needed in
-> service scan method. The way it work: it disable, and then enable le
-> scan on controller.
-
-Please add a bit of detailed description what this is for, why it is used etc.
-
-We expect that complicated changes come with a detailed description in the commit message. In a lot of cases I have seen commit messages that were longer than the actual patch. And that is totally acceptable.
-
-> 
-> Signed-off-by: Jakub Pawlowski <jpawlowski@google.com>
-> ---
-> include/net/bluetooth/hci_core.h |  3 +++
-> net/bluetooth/hci_core.c         | 58 ++++++++++++++++++++++++++++++++++++++++
-> net/bluetooth/mgmt.c             |  7 ++++-
-> 3 files changed, 67 insertions(+), 1 deletion(-)
-> 
-> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-> index 7777124..de019eb 100644
-> --- a/include/net/bluetooth/hci_core.h
-> +++ b/include/net/bluetooth/hci_core.h
-> @@ -79,6 +79,7 @@ struct discovery_state {
-> 	s8			rssi;
-> 	u16			uuid_count;
-> 	u8			(*uuids)[16];
-> +	unsigned long		scan_end;
-> };
-> 
-> struct hci_conn_hash {
-> @@ -351,6 +352,7 @@ struct hci_dev {
-> 	unsigned long		dev_flags;
-> 
-> 	struct delayed_work	le_scan_disable;
-> +	struct delayed_work	le_scan_restart;
-> 
-> 	__s8			adv_tx_power;
-> 	__u8			adv_data[HCI_MAX_AD_LENGTH];
-> @@ -527,6 +529,7 @@ static inline void hci_discovery_filter_clear(struct hci_dev *hdev)
-> 	hdev->discovery.uuid_count = 0;
-> 	kfree(hdev->discovery.uuids);
-> 	hdev->discovery.uuids = NULL;
-> +	hdev->discovery.scan_end = 0;
-> }
-> 
-> bool hci_discovery_active(struct hci_dev *hdev);
-> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-> index 34c17a0..478d788 100644
-> --- a/net/bluetooth/hci_core.c
-> +++ b/net/bluetooth/hci_core.c
-> @@ -1614,6 +1614,7 @@ static int hci_dev_do_close(struct hci_dev *hdev)
-> 		cancel_delayed_work(&hdev->service_cache);
-> 
-> 	cancel_delayed_work_sync(&hdev->le_scan_disable);
-> +	cancel_delayed_work_sync(&hdev->le_scan_restart);
-> 
-> 	if (test_bit(HCI_MGMT, &hdev->dev_flags))
-> 		cancel_delayed_work_sync(&hdev->rpa_expired);
-> @@ -2790,12 +2791,15 @@ static void le_scan_disable_work_complete(struct hci_dev *hdev, u8 status,
-> 
-> 	switch (hdev->discovery.type) {
-> 	case DISCOV_TYPE_LE:
-> +		hdev->discovery.scan_end = 0;
-> 		hci_dev_lock(hdev);
-> 		hci_discovery_set_state(hdev, DISCOVERY_STOPPED);
-> 		hci_dev_unlock(hdev);
-> 		break;
-> 
-> 	case DISCOV_TYPE_INTERLEAVED:
-> +		hdev->discovery.scan_end = 0;
+On Mon, Jan 26, 2015, Luiz Augusto von Dentz wrote:
+> +#define DATA_10B  0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff
 > +
-
-I wonder if it would not be better to just always set it to 0. We are setting the same value in both case statements. So why not just set it before entering the switch statement.
-
-> 		hci_req_init(&req, hdev);
-> 
-> 		memset(&cp, 0, sizeof(cp));
-> @@ -2827,6 +2831,8 @@ static void le_scan_disable_work(struct work_struct *work)
-> 
-> 	BT_DBG("%s", hdev->name);
-> 
-> +	cancel_delayed_work_sync(&hdev->le_scan_restart);
+> +#define DATA_100B DATA_10B, DATA_10B, DATA_10B, DATA_10B, DATA_10B, \
+> +			DATA_10B, DATA_10B, DATA_10B, DATA_10B, DATA_10B
 > +
-> 	hci_req_init(&req, hdev);
-> 
-> 	hci_req_add_le_scan_disable(&req);
-> @@ -2836,6 +2842,57 @@ static void le_scan_disable_work(struct work_struct *work)
-> 		BT_ERR("Disable LE scanning request failed: err %d", err);
-> }
-> 
-> +static void le_scan_restart_work_complete(struct hci_dev *hdev, u8 status,
-> +					  u16 opcode)
-> +{
-> +	long timeout;
+> +#define DATA_511B DATA_100B, DATA_100B, DATA_100B, DATA_100B, DATA_100B, \
+> +			DATA_10B, 0xff
 > +
-> +	BT_DBG("%s", hdev->name);
-
-Extra empty line here.
-
-> +	if (status) {
-> +		BT_ERR("Failed to restart LE scan: status %d", status);
-> +		return;
-> +	}
+> +#define DATA_512B DATA_511B, 0xff
 > +
-> +	if (!test_bit(HCI_QUIRK_STRICT_DUPLICATE_FILTER, &hdev->quirks) ||
-> +	    !hdev->discovery.scan_end)
-> +		return;
+> +#define DATA_4KB DATA_512B, DATA_512B, DATA_512B, DATA_512B, DATA_512B, \
+> +		DATA_512B, DATA_512B, DATA_512B
 > +
-> +	timeout = hdev->discovery.scan_end - jiffies;
+> +#define DATA_16KB DATA_4KB, DATA_4KB, DATA_4KB, DATA_4KB
 > +
-
-No empty line here.
-
-> +	if (timeout < 0)
-> +		timeout = 0;
-
-Since jiffies can wrap around, are we taking that into account.
-
-> +	queue_delayed_work(hdev->workqueue,
-> +			   &hdev->le_scan_disable, timeout);
-
-This function takes an unsigned long timeout. So I wonder if we not better use timing helper function to calculate the right timeout value. We really want to terminate the LE scanning on time and not 20 years in the future.
-
-> +}
+> +#define DATA_64KB DATA_16KB, DATA_16KB, DATA_16KB, DATA_16KB
 > +
-> +static void le_scan_restart_work(struct work_struct *work)
-> +{
-> +	struct hci_dev *hdev = container_of(work, struct hci_dev,
-> +					    le_scan_restart.work);
-> +	struct hci_request req;
-> +	struct hci_cp_le_set_scan_enable cp;
-> +	int err;
-> +
-> +	BT_DBG("%s", hdev->name);
-> +
-> +	/* If controller is not scanning we are done. */
-> +	if (!test_bit(HCI_LE_SCAN, &hdev->dev_flags))
-> +		return;
-> +
-> +	hci_req_init(&req, hdev);
-> +
-> +	hci_req_add_le_scan_disable(&req);
-> +
-> +	memset(&cp, 0, sizeof(cp));
-> +	cp.enable = LE_SCAN_ENABLE;
-> +	cp.filter_dup = LE_SCAN_FILTER_DUP_ENABLE;
-> +	hci_req_add(&req, HCI_OP_LE_SET_SCAN_ENABLE, sizeof(cp), &cp);
-> +
-> +	err = hci_req_run(&req, le_scan_restart_work_complete);
-> +	if (err)
-> +		BT_ERR("Restart LE scan request failed: err %d", err);
-> +}
-> +
-> /* Copy the Identity Address of the controller.
->  *
->  * If the controller has a public BD_ADDR, then by default use that one.
-> @@ -2931,6 +2988,7 @@ struct hci_dev *hci_alloc_dev(void)
-> 	INIT_DELAYED_WORK(&hdev->power_off, hci_power_off);
-> 	INIT_DELAYED_WORK(&hdev->discov_off, hci_discov_off);
-> 	INIT_DELAYED_WORK(&hdev->le_scan_disable, le_scan_disable_work);
-> +	INIT_DELAYED_WORK(&hdev->le_scan_restart, le_scan_restart_work);
-> 
-> 	skb_queue_head_init(&hdev->rx_q);
-> 	skb_queue_head_init(&hdev->cmd_q);
-> diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-> index f5c4d2e..c2b5f8a 100644
-> --- a/net/bluetooth/mgmt.c
-> +++ b/net/bluetooth/mgmt.c
-> @@ -3878,9 +3878,14 @@ static void start_discovery_complete(struct hci_dev *hdev, u8 status,
-> 		break;
-> 	}
-> 
-> -	if (timeout)
-> +	if (timeout) {
-> +		if (hdev->discovery.uuid_count > 0 &&
+> +/* 64KB + 383B */
+> +static const uint8_t long_data_2[] = { DATA_64KB, DATA_100B, DATA_100B,
+> +					DATA_100B, DATA_10B, DATA_10B, DATA_10B,
+> +					DATA_10B, DATA_10B, DATA_10B, DATA_10B,
+> +					DATA_10B, 0xff, 0xff, 0xff };
 
-I would check for the quirk first. That is the important one. In addition this should also check if a RSSI threshold is provided. Since you can have no UUID listed, but want to see devices fall below a certain RSSI threshold.
+Instead of all these complex defines wouldn't it be easier to just:
 
-> +		    test_bit(HCI_QUIRK_STRICT_DUPLICATE_FILTER, &hdev->quirks))
-> +			hdev->discovery.scan_end = jiffies + timeout;
-> +
-> 		queue_delayed_work(hdev->workqueue,
-> 				   &hdev->le_scan_disable, timeout);
-> +	}
-> 
-> unlock:
-> 	hci_dev_unlock(hdev);
+static const uint8_t long_data_2[0xffff + 383];
 
-Regards
+The only difference is that you'd have zeros instead of 0xff bytes as
+content.
 
-Marcel
-
+Johan
