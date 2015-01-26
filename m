@@ -1,50 +1,50 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: M Ren <itux.ren@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: question about no responds to my bluetooth keyboard
-Date: Mon, 26 Jan 2015 16:31:01 +0100
-Message-ID: <2117138.dNls5RaiQz@leonov>
-In-Reply-To: <CACw_oNeRd1nv0TFFdCrxEPtvcfhOdDiFY7TtYY2EGz9dUU2SkA@mail.gmail.com>
-References: <CACw_oNeRd1nv0TFFdCrxEPtvcfhOdDiFY7TtYY2EGz9dUU2SkA@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] Bluetooth: Enforce zero-valued hash/rand192 for LE OOB
+Date: Mon, 26 Jan 2015 15:07:51 +0200
+Message-Id: <1422277671-26069-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+From: Johan Hedberg <johan.hedberg@intel.com>
 
-On Monday 26 of January 2015 10:09:00 M Ren wrote:
-> [bluetooth]# connect 01:02:03:04:05:06
-> 
-> Hi,
-> 
-> The issue I met is simple:
-> I use bluetoothctl connect to a bluetooth keyboard on my dev board,
-> follow this instruction
-> https://wiki.archlinux.org/index.php/Bluetooth_keyboard [bluetooth]# power
-> on
-> [bluetooth]# agent KeyboardOnly
+Until legacy SMP OOB pairing is implemented user space should be given a
+clear error when trying to use it. This patch adds a corresponding check
+to the Add Remote OOB Data handler function which returns "invalid
+parameters" if non-zero Rand192 or Hash192 parameters were given for an
+LE address.
 
-Just use "agent on" instead of "agent KeyboardOnly".
+Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+---
+ net/bluetooth/mgmt.c | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
 
-> [bluetooth]# pairable on
-> [bluetooth]# pair 01:02:03:04:05:06
-> [bluetooth]# trust 01:02:03:04:05:06
-> [bluetooth]# connect 01:02:03:04:05:06
-> [bluetooth]# quit
-> output shows "Connection successful"
-> 
-> But dev board didn't respond to any keypress.
-> What maybe the reason ?
-> appreciate any advices, if some log is needed, please tell me.
-> 
-> BTW, keyboard on pc works ok.
-
-
-PS
-You may want to point to Arch Wiki guys to fix this.
-
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 25e40e82b9a2..cf257cc0e09d 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -3673,6 +3673,20 @@ static int add_remote_oob_data(struct sock *sk, struct hci_dev *hdev,
+ 		u8 status;
+ 
+ 		if (bdaddr_type_is_le(cp->addr.type)) {
++			static const u8 z16[16] = { 0 };
++
++			/* Enforce zero-valued 192-bit parameters as
++			 * long as legacy SMP OOB isn't implemented.
++			 */
++			if (memcmp(cp->rand192, z16, 16) ||
++			    memcmp(cp->hash192, z16, 16)) {
++				err = cmd_complete(sk, hdev->id,
++						   MGMT_OP_ADD_REMOTE_OOB_DATA,
++						   MGMT_STATUS_INVALID_PARAMS,
++						   addr, sizeof(*addr));
++				goto unlock;
++			}
++
+ 			rand192 = NULL;
+ 			hash192 = NULL;
+ 		} else {
 -- 
-BR
-Szymon Janc
+2.1.0
+
