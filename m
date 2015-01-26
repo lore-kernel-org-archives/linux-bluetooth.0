@@ -1,50 +1,57 @@
 Return-Path: <cyrus@holtmann.org>
-From: Johan Hedberg <johan.hedberg@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <CACw_oNeRd1nv0TFFdCrxEPtvcfhOdDiFY7TtYY2EGz9dUU2SkA@mail.gmail.com>
+References: <CACw_oNeRd1nv0TFFdCrxEPtvcfhOdDiFY7TtYY2EGz9dUU2SkA@mail.gmail.com>
+Date: Mon, 26 Jan 2015 18:06:29 +0800
+Message-ID: <CACw_oNcLV-TBAnhJ66PQDZuXi751exwnt=mfwBBvAVP7Y8dmzA@mail.gmail.com>
+Subject: Re: question about no responds to my bluetooth keyboard
+From: M Ren <itux.ren@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Enforce zero-valued hash/rand192 for LE OOB
-Date: Mon, 26 Jan 2015 15:07:51 +0200
-Message-Id: <1422277671-26069-1-git-send-email-johan.hedberg@gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@intel.com>
+does it need some special config in bluez ,
+I compile bluez like this :
+      --prefix=/usr \
+      --libdir=/usr/lib \
+      --sysconfdir=/etc \
+      --localstatedir=/var \
+      --build=$(ARCH_BUILD) \
+      --host=$(TARGET_ARCH) \
+      --enable-debug \
+      --disable-obex \
+      --enable-client \
+      --disable-systemd \
+      --disable-datafiles \
+      --enable-experimental \
+      --enable-sixaxis \
+      --with-udevdir=/etc/udev \
+      --with-dbusconfdir=/dummy/ \
+      --with-dbussystembusdir=/dummy/ \
+      --with-dbussessionbusdir=/dummy/
 
-Until legacy SMP OOB pairing is implemented user space should be given a
-clear error when trying to use it. This patch adds a corresponding check
-to the Add Remote OOB Data handler function which returns "invalid
-parameters" if non-zero Rand192 or Hash192 parameters were given for an
-LE address.
-
-Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
----
- net/bluetooth/mgmt.c | 14 ++++++++++++++
- 1 file changed, 14 insertions(+)
-
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 25e40e82b9a2..cf257cc0e09d 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -3673,6 +3673,20 @@ static int add_remote_oob_data(struct sock *sk, struct hci_dev *hdev,
- 		u8 status;
- 
- 		if (bdaddr_type_is_le(cp->addr.type)) {
-+			static const u8 z16[16] = { 0 };
-+
-+			/* Enforce zero-valued 192-bit parameters as
-+			 * long as legacy SMP OOB isn't implemented.
-+			 */
-+			if (memcmp(cp->rand192, z16, 16) ||
-+			    memcmp(cp->hash192, z16, 16)) {
-+				err = cmd_complete(sk, hdev->id,
-+						   MGMT_OP_ADD_REMOTE_OOB_DATA,
-+						   MGMT_STATUS_INVALID_PARAMS,
-+						   addr, sizeof(*addr));
-+				goto unlock;
-+			}
-+
- 			rand192 = NULL;
- 			hash192 = NULL;
- 		} else {
--- 
-2.1.0
-
+2015-01-26 10:09 GMT+08:00 M Ren <itux.ren@gmail.com>:
+> [bluetooth]# connect 01:02:03:04:05:06
+>
+> Hi,
+>
+> The issue I met is simple:
+> I use bluetoothctl connect to a bluetooth keyboard on my dev board,
+> follow this instruction https://wiki.archlinux.org/index.php/Bluetooth_keyboard
+> [bluetooth]# power on
+> [bluetooth]# agent KeyboardOnly
+> [bluetooth]# pairable on
+> [bluetooth]# pair 01:02:03:04:05:06
+> [bluetooth]# trust 01:02:03:04:05:06
+> [bluetooth]# connect 01:02:03:04:05:06
+> [bluetooth]# quit
+> output shows "Connection successful"
+>
+> But dev board didn't respond to any keypress.
+> What maybe the reason ?
+> appreciate any advices, if some log is needed, please tell me.
+>
+> BTW, keyboard on pc works ok.
+>
+> Thanks.
