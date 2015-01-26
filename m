@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 3/3] shared/gatt-client: Fix read long
-Date: Mon, 26 Jan 2015 17:45:18 +0200
-Message-Id: <1422287118-25319-3-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 2/3] unit/gatt: Add TP/GAR/CL/BV-04-C/64K test
+Date: Mon, 26 Jan 2015 17:45:17 +0200
+Message-Id: <1422287118-25319-2-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1422287118-25319-1-git-send-email-luiz.dentz@gmail.com>
 References: <1422287118-25319-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,204 +11,340 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-length is uint16_t so it may actually overflow in the expression
-length = op->offset - op->orig_offset causing invalid write:
-
-Invalid write of size 8
-   at 0x4C2E323: memcpy@@GLIBC_2.14 (in /usr/lib64/valgrind/vgpreload_memcheck-amd64-linux.so)
-   by 0x42CF5F: queue_foreach (queue.c:251)
-   by 0x423E95: complete_read_long_op (gatt-client.c:2014)
-   by 0x423E95: read_long_cb (gatt-client.c:2081)
-   by 0x41F4FB: handle_rsp (att.c:600)
+Verify the long reads works for values over 64 KBytes long.
 ---
- profiles/gap/gas.c       |  4 ++--
- src/gatt-client.c        | 16 +++++++++++-----
- src/shared/gatt-client.c |  2 +-
- src/shared/gatt-client.h |  2 +-
- tools/btgatt-client.c    | 12 ++++++------
- unit/test-gatt.c         |  4 ++--
- 6 files changed, 23 insertions(+), 17 deletions(-)
+ unit/test-gatt.c | 297 ++++++++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 295 insertions(+), 2 deletions(-)
 
-diff --git a/profiles/gap/gas.c b/profiles/gap/gas.c
-index f737949..7a7f6f4 100644
---- a/profiles/gap/gas.c
-+++ b/profiles/gap/gas.c
-@@ -99,7 +99,7 @@ static char *name2utf8(const uint8_t *name, uint16_t len)
- }
- 
- static void read_device_name_cb(bool success, uint8_t att_ecode,
--					const uint8_t *value, uint16_t length,
-+					const uint8_t *value, size_t length,
- 					void *user_data)
- {
- 	struct gas *gas = user_data;
-@@ -131,7 +131,7 @@ static void handle_device_name(struct gas *gas, uint16_t value_handle)
- }
- 
- static void read_appearance_cb(bool success, uint8_t att_ecode,
--					const uint8_t *value, uint16_t length,
-+					const uint8_t *value, size_t length,
- 					void *user_data)
- {
- 	struct gas *gas = user_data;
-diff --git a/src/gatt-client.c b/src/gatt-client.c
-index cb8ddf6..e9209ca 100644
---- a/src/gatt-client.c
-+++ b/src/gatt-client.c
-@@ -330,12 +330,13 @@ static void read_op_cb(struct gatt_db_attribute *attrib, int err,
- }
- 
- static void desc_read_cb(bool success, uint8_t att_ecode,
--					const uint8_t *value, uint16_t length,
-+					const uint8_t *value, size_t length,
- 					void *user_data)
- {
- 	struct async_dbus_op *op = user_data;
- 	struct descriptor *desc = op->data;
- 	struct service *service = desc->chrc->service;
-+	uint16_t mtu;
- 
- 	if (!success) {
- 		DBusMessage *reply = create_gatt_dbus_error(op->msg, att_ecode);
-@@ -356,7 +357,9 @@ static void desc_read_cb(bool success, uint8_t att_ecode,
- 	 * entire value. Perform a long read to obtain the rest, otherwise,
- 	 * we're done.
- 	 */
--	if (length == bt_gatt_client_get_mtu(service->client->gatt) - 1) {
-+	mtu =  bt_gatt_client_get_mtu(service->client->gatt) - 1;
-+
-+	if (length == mtu) {
- 		op->offset += length;
- 		desc->read_id = bt_gatt_client_read_long_value(
- 							service->client->gatt,
-@@ -763,11 +766,12 @@ static void write_characteristic_cb(struct gatt_db_attribute *attr, int err,
- }
- 
- static void chrc_read_cb(bool success, uint8_t att_ecode, const uint8_t *value,
--					uint16_t length, void *user_data)
-+					size_t length, void *user_data)
- {
- 	struct async_dbus_op *op = user_data;
- 	struct characteristic *chrc = op->data;
- 	struct service *service = chrc->service;
-+	uint16_t mtu;
- 
- 	if (!success) {
- 		DBusMessage *reply = create_gatt_dbus_error(op->msg, att_ecode);
-@@ -788,7 +792,9 @@ static void chrc_read_cb(bool success, uint8_t att_ecode, const uint8_t *value,
- 	 * entire value. Perform a long read to obtain the rest, otherwise,
- 	 * we're done.
- 	 */
--	if (length == bt_gatt_client_get_mtu(service->client->gatt) - 1) {
-+	mtu = bt_gatt_client_get_mtu(service->client->gatt) - 1;
-+
-+	if (length == mtu) {
- 		op->offset += length;
- 		chrc->read_id = bt_gatt_client_read_long_value(
- 							service->client->gatt,
-@@ -1261,7 +1267,7 @@ static void export_desc(struct gatt_db_attribute *attr, void *user_data)
- }
- 
- static void read_ext_props_cb(bool success, uint8_t att_ecode,
--					const uint8_t *value, uint16_t length,
-+					const uint8_t *value, size_t length,
- 					void *user_data)
- {
- 	struct characteristic *chrc = user_data;
-diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
-index 1acd34f..8439038 100644
---- a/src/shared/gatt-client.c
-+++ b/src/shared/gatt-client.c
-@@ -1995,7 +1995,7 @@ static void complete_read_long_op(struct read_long_op *op, bool success,
- 							uint8_t att_ecode)
- {
- 	uint8_t *value = NULL;
--	uint16_t length = 0;
-+	size_t length = 0;
- 
- 	if (!success)
- 		goto done;
-diff --git a/src/shared/gatt-client.h b/src/shared/gatt-client.h
-index 9a00feb..1722a4b 100644
---- a/src/shared/gatt-client.h
-+++ b/src/shared/gatt-client.h
-@@ -41,7 +41,7 @@ typedef void (*bt_gatt_client_callback_t)(bool success, uint8_t att_ecode,
- 							void *user_data);
- typedef void (*bt_gatt_client_debug_func_t)(const char *str, void *user_data);
- typedef void (*bt_gatt_client_read_callback_t)(bool success, uint8_t att_ecode,
--					const uint8_t *value, uint16_t length,
-+					const uint8_t *value, size_t length,
- 					void *user_data);
- typedef void (*bt_gatt_client_write_long_callback_t)(bool success,
- 					bool reliable_error, uint8_t att_ecode,
-diff --git a/tools/btgatt-client.c b/tools/btgatt-client.c
-index 62c4d3e..c779095 100644
---- a/tools/btgatt-client.c
-+++ b/tools/btgatt-client.c
-@@ -420,17 +420,17 @@ static void read_multiple_usage(void)
- }
- 
- static void read_multiple_cb(bool success, uint8_t att_ecode,
--					const uint8_t *value, uint16_t length,
-+					const uint8_t *value, size_t length,
- 					void *user_data)
- {
--	int i;
-+	size_t i;
- 
- 	if (!success) {
- 		PRLOG("\nRead multiple request failed: 0x%02x\n", att_ecode);
- 		return;
- 	}
- 
--	printf("\nRead multiple value (%u bytes):", length);
-+	printf("\nRead multiple value (%zu bytes):", length);
- 
- 	for (i = 0; i < length; i++)
- 		printf("%02x ", value[i]);
-@@ -484,9 +484,9 @@ static void read_value_usage(void)
- }
- 
- static void read_cb(bool success, uint8_t att_ecode, const uint8_t *value,
--					uint16_t length, void *user_data)
-+					size_t length, void *user_data)
- {
--	int i;
-+	size_t i;
- 
- 	if (!success) {
- 		PRLOG("\nRead request failed: 0x%02x\n", att_ecode);
-@@ -500,7 +500,7 @@ static void read_cb(bool success, uint8_t att_ecode, const uint8_t *value,
- 		return;
- 	}
- 
--	printf(" (%u bytes): ", length);
-+	printf(" (%zu bytes): ", length);
- 
- 	for (i = 0; i < length; i++)
- 		printf("%02x ", value[i]);
 diff --git a/unit/test-gatt.c b/unit/test-gatt.c
-index 299ef04..103c78e 100644
+index c49c71f..299ef04 100644
 --- a/unit/test-gatt.c
 +++ b/unit/test-gatt.c
-@@ -604,7 +604,7 @@ static void execute_context(struct context *context)
- }
- 
- static void test_read_cb(bool success, uint8_t att_ecode,
--					const uint8_t *value, uint16_t length,
-+					const uint8_t *value, size_t length,
- 					void *user_data)
- {
- 	struct context *context = user_data;
-@@ -1320,7 +1320,7 @@ static const struct test_step test_read_by_type_6 = {
+@@ -315,7 +315,7 @@ struct test_step {
+ 	uint8_t uuid[16];
+ 	uint8_t expected_att_ecode;
+ 	const uint8_t *value;
+-	uint16_t length;
++	size_t length;
  };
  
- static void multiple_read_cb(bool success, uint8_t att_ecode,
--					const uint8_t *value, uint16_t length,
-+					const uint8_t *value, size_t length,
- 					void *user_data)
+ struct db_attribute_test_data {
+@@ -1329,7 +1329,7 @@ static void multiple_read_cb(bool success, uint8_t att_ecode,
+ 	g_assert(att_ecode == step->expected_att_ecode);
+ 
+ 	if (success) {
+-		g_assert(length == step->length);
++		g_assert_cmpint(length, ==, step->length);
+ 		g_assert(memcmp(value, step->value, length) == 0);
+ 	}
+ 
+@@ -1449,6 +1449,37 @@ static const struct test_step test_long_read_1 = {
+ 	.length = 0x03
+ };
+ 
++#define DATA_10B  0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff
++
++#define DATA_100B DATA_10B, DATA_10B, DATA_10B, DATA_10B, DATA_10B, \
++			DATA_10B, DATA_10B, DATA_10B, DATA_10B, DATA_10B
++
++#define DATA_511B DATA_100B, DATA_100B, DATA_100B, DATA_100B, DATA_100B, \
++			DATA_10B, 0xff
++
++#define DATA_512B DATA_511B, 0xff
++
++#define DATA_4KB DATA_512B, DATA_512B, DATA_512B, DATA_512B, DATA_512B, \
++		DATA_512B, DATA_512B, DATA_512B
++
++#define DATA_16KB DATA_4KB, DATA_4KB, DATA_4KB, DATA_4KB
++
++#define DATA_64KB DATA_16KB, DATA_16KB, DATA_16KB, DATA_16KB
++
++/* 64KB + 383B */
++static const uint8_t long_data_2[] = { DATA_64KB, DATA_100B, DATA_100B,
++					DATA_100B, DATA_10B, DATA_10B, DATA_10B,
++					DATA_10B, DATA_10B, DATA_10B, DATA_10B,
++					DATA_10B, 0xff, 0xff, 0xff };
++
++static const struct test_step test_long_read_2 = {
++	.handle = 0x0003,
++	.func = test_long_read,
++	.expected_att_ecode = 0,
++	.value = long_data_2,
++	.length = sizeof(long_data_2)
++};
++
+ int main(int argc, char *argv[])
  {
- 	struct context *context = user_data;
+ 	struct gatt_db *service_db_1, *ts_small_db, *ts_large_db_1;
+@@ -1991,6 +2022,268 @@ int main(int argc, char *argv[])
+ 			raw_pdu(0x0c, 0x03, 0x00, 0x00, 0x00),
+ 			raw_pdu(0x0b, 0x01, 0x02, 0x03));
+ 
++	define_test_client("/TP/GAR/CL/BV-04-C/64K", test_client, service_db_1,
++			&test_long_read_2,
++			SERVICE_DATA_1_PDUS,
++			raw_pdu(0x0c, 0x03, 0x00, 0x00, 0x00),
++			raw_pdu(0x0d, DATA_511B),
++			raw_pdu(0x0c, 0x03, 0x00, 0xff, 0x01),
++			raw_pdu(0x0d, DATA_511B),
++			raw_pdu(0x0c, 0x03, 0x00, 0xfe, 0x03),
++			raw_pdu(0x0d, DATA_511B),
++			raw_pdu(0x0c, 0x03, 0x00, 0xfd, 0x05),
++			raw_pdu(0x0d, DATA_511B),
++			raw_pdu(0x0c, 0x03, 0x00, 0xfc, 0x07),
++			raw_pdu(0x0d, DATA_511B),
++			raw_pdu(0x0c, 0x03, 0x00, 0xfb, 0x09),
++			raw_pdu(0x0d, DATA_511B),
++			raw_pdu(0x0c, 0x03, 0x00, 0xfa, 0x0b),
++			raw_pdu(0x0d, DATA_511B),
++			raw_pdu(0x0c, 0x03, 0x00, 0xf9, 0x0d),
++			raw_pdu(0x0d, DATA_511B),
++			raw_pdu(0x0c, 0x03, 0x00, 0xf8, 0x0f),
++			raw_pdu(0x0d, DATA_511B),
++			raw_pdu(0x0c, 0x03, 0x00, 0xf7, 0x11),
++			raw_pdu(0x0d, DATA_511B),
++			raw_pdu(0x0c, 0x03, 0x00, 0xf6, 0x13),
++			raw_pdu(0x0d, DATA_511B),
++			raw_pdu(0x0c, 0x03, 0x00, 0xf5, 0x15),
++			raw_pdu(0x0d, DATA_511B),
++			raw_pdu(0x0c, 0x03, 0x00, 0xf4, 0x17),
++			raw_pdu(0x0d, DATA_511B),
++			raw_pdu(0x0c, 0x03, 0x00, 0xf3, 0x19),
++			raw_pdu(0x0d, DATA_511B),
++			raw_pdu(0x0c, 0x03, 0x00, 0xf2, 0x1b),
++			raw_pdu(0x0d, DATA_511B),
++			raw_pdu(0x0c, 0x03, 0x00, 0xf1, 0x1d),
++			raw_pdu(0x0d, DATA_511B),
++			raw_pdu(0x0c, 0x03, 0x00, 0xf0, 0x1f),
++			raw_pdu(0x0d, DATA_511B),
++			raw_pdu(0x0c, 0x03, 0x00, 0xef, 0x21),
++			raw_pdu(0x0d, DATA_511B),
++			raw_pdu(0x0c, 0x03, 0x00, 0xee, 0x23),
++			raw_pdu(0x0d, DATA_511B),
++			raw_pdu(0x0c, 0x03, 0x00, 0xed, 0x25),
++			raw_pdu(0x0d, DATA_511B),
++			raw_pdu(0x0c, 0x03, 0x00, 0xec, 0x27),
++			raw_pdu(0x0d, DATA_511B),
++			raw_pdu(0x0c, 0x03, 0x00, 0xeb, 0x29),
++			raw_pdu(0x0d, DATA_511B),
++			raw_pdu(0x0c, 0x03, 0x00, 0xea, 0x2b),
++			raw_pdu(0x0d, DATA_511B),
++			raw_pdu(0x0c, 0x03, 0x00, 0xe9, 0x2d),
++			raw_pdu(0x0d, DATA_511B),
++			raw_pdu(0x0c, 0x03, 0x00, 0xe8, 0x2f),
++			raw_pdu(0x0d, DATA_511B),
++			raw_pdu(0x0c, 0x03, 0x00, 0xe7, 0x31),
++			raw_pdu(0x0d, DATA_511B),
++			raw_pdu(0x0c, 0x03, 0x00, 0xe6, 0x33),
++			raw_pdu(0x0d, DATA_511B),
++			raw_pdu(0x0c, 0x03, 0x00, 0xe5, 0x35),
++			raw_pdu(0x0d, DATA_511B),
++			raw_pdu(0x0c, 0x03, 0x00, 0xe4, 0x37),
++			raw_pdu(0x0d, DATA_511B),
++			raw_pdu(0x0c, 0x03, 0x00, 0xe3, 0x39),
++			raw_pdu(0x0d, DATA_511B),
++			raw_pdu(0x0c, 0x03, 0x00, 0xe2, 0x3b),
++			raw_pdu(0x0d, DATA_511B),
++			raw_pdu(0x0c, 0x03, 0x00, 0xe1, 0x3d),
++			raw_pdu(0x0d, DATA_511B),
++			raw_pdu(0x0c, 0x03, 0x00, 0xe0, 0x3f),
++			raw_pdu(0x0d, DATA_511B),
++			raw_pdu(0x0c, 0x03, 0x00, 0xdf, 0x41),
++			raw_pdu(0x0d, DATA_511B),
++			raw_pdu(0x0c, 0x03, 0x00, 0xde, 0x43),
++			raw_pdu(0x0d, DATA_511B),
++			raw_pdu(0x0c, 0x03, 0x00, 0xdd, 0x45),
++			raw_pdu(0x0d, DATA_511B),
++			raw_pdu(0x0c, 0x03, 0x00, 0xdc, 0x47),
++			raw_pdu(0x0d, DATA_511B),
++			raw_pdu(0x0c, 0x03, 0x00, 0xdb, 0x49),
++			raw_pdu(0x0d, DATA_511B),
++			raw_pdu(0x0c, 0x03, 0x00, 0xda, 0x4b),
++			raw_pdu(0x0d, DATA_511B),
++			raw_pdu(0x0c, 0x03, 0x00, 0xd9, 0x4d),
++			raw_pdu(0x0d, DATA_511B),
++			raw_pdu(0x0c, 0x03, 0x00, 0xd8, 0x4f),
++			raw_pdu(0x0d, DATA_511B),
++			raw_pdu(0x0c, 0x03, 0x00, 0xd7, 0x51),
++			raw_pdu(0x0d, DATA_511B),
++			raw_pdu(0x0c, 0x03, 0x00, 0xd6, 0x53),
++			raw_pdu(0x0d, DATA_511B),
++			raw_pdu(0x0c, 0x03, 0x00, 0xd5, 0x55),
++			raw_pdu(0x0d, DATA_511B),
++			raw_pdu(0x0c, 0x03, 0x00, 0xd4, 0x57),
++			raw_pdu(0x0d, DATA_511B),
++			raw_pdu(0x0c, 0x03, 0x00, 0xd3, 0x59),
++			raw_pdu(0x0d, DATA_511B),
++			raw_pdu(0x0c, 0x03, 0x00, 0xd2, 0x5b),
++			raw_pdu(0x0d, DATA_511B),
++			raw_pdu(0x0c, 0x03, 0x00, 0xd1, 0x5d),
++			raw_pdu(0x0d, DATA_511B),
++			raw_pdu(0x0c, 0x03, 0x00, 0xd0, 0x5f),
++			raw_pdu(0x0d, DATA_511B),
++			raw_pdu(0x0c, 0x03, 0x00, 0xcf, 0x61),
++			raw_pdu(0x0d, DATA_511B),
++			raw_pdu(0x0c, 0x03, 0x00, 0xce, 0x63),
++			raw_pdu(0x0d, DATA_511B),
++			raw_pdu(0x0c, 0x03, 0x00, 0xcd, 0x65),
++			raw_pdu(0x0d, DATA_511B),
++			raw_pdu(0x0c, 0x03, 0x00, 0xcc, 0x67),
++			raw_pdu(0x0d, DATA_511B),
++			raw_pdu(0x0c, 0x03, 0x00, 0xcb, 0x69),
++			raw_pdu(0x0d, DATA_511B),
++			raw_pdu(0x0c, 0x03, 0x00, 0xca, 0x6b),
++			raw_pdu(0x0d, DATA_511B),
++			raw_pdu(0x0c, 0x03, 0x00, 0xc9, 0x6d),
++			raw_pdu(0x0d, DATA_511B),
++			raw_pdu(0x0c, 0x03, 0x00, 0xc8, 0x6f),
++			raw_pdu(0x0d, DATA_511B),
++			raw_pdu(0x0c, 0x03, 0x00, 0xc7, 0x71),
++			raw_pdu(0x0d, DATA_511B),
++			raw_pdu(0x0c, 0x03, 0x00, 0xc6, 0x73),
++			raw_pdu(0x0d, DATA_511B),
++			raw_pdu(0x0c, 0x03, 0x00, 0xc5, 0x75),
++			raw_pdu(0x0d, DATA_511B),
++			raw_pdu(0x0c, 0x03, 0x00, 0xc4, 0x77),
++			raw_pdu(0x0d, DATA_511B),
++			raw_pdu(0x0c, 0x03, 0x00, 0xc3, 0x79),
++			raw_pdu(0x0d, DATA_511B),
++			raw_pdu(0x0c, 0x03, 0x00, 0xc2, 0x7b),
++			raw_pdu(0x0d, DATA_511B),
++			raw_pdu(0x0c, 0x03, 0x00, 0xc1, 0x7d),
++			raw_pdu(0x0d, DATA_511B),
++			raw_pdu(0x0c, 0x03, 0x00, 0xc0, 0x7f),
++			raw_pdu(0x0d, DATA_511B),
++			raw_pdu(0x0c, 0x03, 0x00, 0xbf, 0x81),
++			raw_pdu(0x0d, DATA_511B),
++			raw_pdu(0x0c, 0x03, 0x00, 0xbe, 0x83),
++			raw_pdu(0x0d, DATA_511B),
++			raw_pdu(0x0c, 0x03, 0x00, 0xbd, 0x85),
++			raw_pdu(0x0d, DATA_511B),
++			raw_pdu(0x0c, 0x03, 0x00, 0xbc, 0x87),
++			raw_pdu(0x0d, DATA_511B),
++			raw_pdu(0x0c, 0x03, 0x00, 0xbb, 0x89),
++			raw_pdu(0x0d, DATA_511B),
++			raw_pdu(0x0c, 0x03, 0x00, 0xba, 0x8b),
++			raw_pdu(0x0d, DATA_511B),
++			raw_pdu(0x0c, 0x03, 0x00, 0xb9, 0x8d),
++			raw_pdu(0x0d, DATA_511B),
++			raw_pdu(0x0c, 0x03, 0x00, 0xb8, 0x8f),
++			raw_pdu(0x0d, DATA_511B),
++			raw_pdu(0x0c, 0x03, 0x00, 0xb7, 0x91),
++			raw_pdu(0x0d, DATA_511B),
++			raw_pdu(0x0c, 0x03, 0x00, 0xb6, 0x93),
++			raw_pdu(0x0d, DATA_511B),
++			raw_pdu(0x0c, 0x03, 0x00, 0xb5, 0x95),
++			raw_pdu(0x0d, DATA_511B),
++			raw_pdu(0x0c, 0x03, 0x00, 0xb4, 0x97),
++			raw_pdu(0x0d, DATA_511B),
++			raw_pdu(0x0c, 0x03, 0x00, 0xb3, 0x99),
++			raw_pdu(0x0d, DATA_511B),
++			raw_pdu(0x0c, 0x03, 0x00, 0xb2, 0x9b),
++			raw_pdu(0x0d, DATA_511B),
++			raw_pdu(0x0c, 0x03, 0x00, 0xb1, 0x9d),
++			raw_pdu(0x0d, DATA_511B),
++			raw_pdu(0x0c, 0x03, 0x00, 0xb0, 0x9f),
++			raw_pdu(0x0d, DATA_511B),
++			raw_pdu(0x0c, 0x03, 0x00, 0xaf, 0xa1),
++			raw_pdu(0x0d, DATA_511B),
++			raw_pdu(0x0c, 0x03, 0x00, 0xae, 0xa3),
++			raw_pdu(0x0d, DATA_511B),
++			raw_pdu(0x0c, 0x03, 0x00, 0xad, 0xa5),
++			raw_pdu(0x0d, DATA_511B),
++			raw_pdu(0x0c, 0x03, 0x00, 0xac, 0xa7),
++			raw_pdu(0x0d, DATA_511B),
++			raw_pdu(0x0c, 0x03, 0x00, 0xab, 0xa9),
++			raw_pdu(0x0d, DATA_511B),
++			raw_pdu(0x0c, 0x03, 0x00, 0xaa, 0xab),
++			raw_pdu(0x0d, DATA_511B),
++			raw_pdu(0x0c, 0x03, 0x00, 0xa9, 0xad),
++			raw_pdu(0x0d, DATA_511B),
++			raw_pdu(0x0c, 0x03, 0x00, 0xa8, 0xaf),
++			raw_pdu(0x0d, DATA_511B),
++			raw_pdu(0x0c, 0x03, 0x00, 0xa7, 0xb1),
++			raw_pdu(0x0d, DATA_511B),
++			raw_pdu(0x0c, 0x03, 0x00, 0xa6, 0xb3),
++			raw_pdu(0x0d, DATA_511B),
++			raw_pdu(0x0c, 0x03, 0x00, 0xa5, 0xb5),
++			raw_pdu(0x0d, DATA_511B),
++			raw_pdu(0x0c, 0x03, 0x00, 0xa4, 0xb7),
++			raw_pdu(0x0d, DATA_511B),
++			raw_pdu(0x0c, 0x03, 0x00, 0xa3, 0xb9),
++			raw_pdu(0x0d, DATA_511B),
++			raw_pdu(0x0c, 0x03, 0x00, 0xa2, 0xbb),
++			raw_pdu(0x0d, DATA_511B),
++			raw_pdu(0x0c, 0x03, 0x00, 0xa1, 0xbd),
++			raw_pdu(0x0d, DATA_511B),
++			raw_pdu(0x0c, 0x03, 0x00, 0xa0, 0xbf),
++			raw_pdu(0x0d, DATA_511B),
++			raw_pdu(0x0c, 0x03, 0x00, 0x9f, 0xc1),
++			raw_pdu(0x0d, DATA_511B),
++			raw_pdu(0x0c, 0x03, 0x00, 0x9e, 0xc3),
++			raw_pdu(0x0d, DATA_511B),
++			raw_pdu(0x0c, 0x03, 0x00, 0x9d, 0xc5),
++			raw_pdu(0x0d, DATA_511B),
++			raw_pdu(0x0c, 0x03, 0x00, 0x9c, 0xc7),
++			raw_pdu(0x0d, DATA_511B),
++			raw_pdu(0x0c, 0x03, 0x00, 0x9b, 0xc9),
++			raw_pdu(0x0d, DATA_511B),
++			raw_pdu(0x0c, 0x03, 0x00, 0x9a, 0xcb),
++			raw_pdu(0x0d, DATA_511B),
++			raw_pdu(0x0c, 0x03, 0x00, 0x99, 0xcd),
++			raw_pdu(0x0d, DATA_511B),
++			raw_pdu(0x0c, 0x03, 0x00, 0x98, 0xcf),
++			raw_pdu(0x0d, DATA_511B),
++			raw_pdu(0x0c, 0x03, 0x00, 0x97, 0xd1),
++			raw_pdu(0x0d, DATA_511B),
++			raw_pdu(0x0c, 0x03, 0x00, 0x96, 0xd3),
++			raw_pdu(0x0d, DATA_511B),
++			raw_pdu(0x0c, 0x03, 0x00, 0x95, 0xd5),
++			raw_pdu(0x0d, DATA_511B),
++			raw_pdu(0x0c, 0x03, 0x00, 0x94, 0xd7),
++			raw_pdu(0x0d, DATA_511B),
++			raw_pdu(0x0c, 0x03, 0x00, 0x93, 0xd9),
++			raw_pdu(0x0d, DATA_511B),
++			raw_pdu(0x0c, 0x03, 0x00, 0x92, 0xdb),
++			raw_pdu(0x0d, DATA_511B),
++			raw_pdu(0x0c, 0x03, 0x00, 0x91, 0xdd),
++			raw_pdu(0x0d, DATA_511B),
++			raw_pdu(0x0c, 0x03, 0x00, 0x90, 0xdf),
++			raw_pdu(0x0d, DATA_511B),
++			raw_pdu(0x0c, 0x03, 0x00, 0x8f, 0xe1),
++			raw_pdu(0x0d, DATA_511B),
++			raw_pdu(0x0c, 0x03, 0x00, 0x8e, 0xe3),
++			raw_pdu(0x0d, DATA_511B),
++			raw_pdu(0x0c, 0x03, 0x00, 0x8d, 0xe5),
++			raw_pdu(0x0d, DATA_511B),
++			raw_pdu(0x0c, 0x03, 0x00, 0x8c, 0xe7),
++			raw_pdu(0x0d, DATA_511B),
++			raw_pdu(0x0c, 0x03, 0x00, 0x8b, 0xe9),
++			raw_pdu(0x0d, DATA_511B),
++			raw_pdu(0x0c, 0x03, 0x00, 0x8a, 0xeb),
++			raw_pdu(0x0d, DATA_511B),
++			raw_pdu(0x0c, 0x03, 0x00, 0x89, 0xed),
++			raw_pdu(0x0d, DATA_511B),
++			raw_pdu(0x0c, 0x03, 0x00, 0x88, 0xef),
++			raw_pdu(0x0d, DATA_511B),
++			raw_pdu(0x0c, 0x03, 0x00, 0x87, 0xf1),
++			raw_pdu(0x0d, DATA_511B),
++			raw_pdu(0x0c, 0x03, 0x00, 0x86, 0xf3),
++			raw_pdu(0x0d, DATA_511B),
++			raw_pdu(0x0c, 0x03, 0x00, 0x85, 0xf5),
++			raw_pdu(0x0d, DATA_511B),
++			raw_pdu(0x0c, 0x03, 0x00, 0x84, 0xf7),
++			raw_pdu(0x0d, DATA_511B),
++			raw_pdu(0x0c, 0x03, 0x00, 0x83, 0xf9),
++			raw_pdu(0x0d, DATA_511B),
++			raw_pdu(0x0c, 0x03, 0x00, 0x82, 0xfb),
++			raw_pdu(0x0d, DATA_511B),
++			raw_pdu(0x0c, 0x03, 0x00, 0x81, 0xfd),
++			raw_pdu(0x0d, DATA_511B),
++			raw_pdu(0x0c, 0x03, 0x00, 0x80, 0xff),
++			raw_pdu(0x0d, DATA_511B));
++
+ 	define_test_client("/TP/GAR/CL/BV-05-C", test_client, service_db_1,
+ 			&test_multiple_read_1,
+ 			SERVICE_DATA_1_PDUS,
 -- 
 2.1.0
 
