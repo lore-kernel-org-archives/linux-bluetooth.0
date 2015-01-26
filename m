@@ -1,59 +1,156 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <20150126202728.GA31780@t440s.P-661HNU-F1>
-References: <1422287118-25319-1-git-send-email-luiz.dentz@gmail.com>
-	<1422287118-25319-2-git-send-email-luiz.dentz@gmail.com>
-	<20150126202728.GA31780@t440s.P-661HNU-F1>
-Date: Mon, 26 Jan 2015 23:42:30 +0200
-Message-ID: <CABBYNZ+keWMS0QjZy9V+-LBVWVvdDxjEHL5CCRK=93BYmtcaiA@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 2/3] unit/gatt: Add TP/GAR/CL/BV-04-C/64K test
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 8.1 \(1993\))
+Subject: Re: [PATCH v10 2/2] Bluetooth: Add restarting to service discovery
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1421940866-26060-2-git-send-email-jpawlowski@google.com>
+Date: Mon, 26 Jan 2015 12:52:42 -0800
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <D5B114BB-FF87-4F09-97AA-0622BF92FB06@holtmann.org>
+References: <1421940866-26060-1-git-send-email-jpawlowski@google.com> <1421940866-26060-2-git-send-email-jpawlowski@google.com>
+To: Jakub Pawlowski <jpawlowski@google.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+Hi Jakub,
 
-On Mon, Jan 26, 2015 at 10:27 PM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
-> Hi Luiz,
->
-> On Mon, Jan 26, 2015, Luiz Augusto von Dentz wrote:
->> +#define DATA_10B  0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff
->> +
->> +#define DATA_100B DATA_10B, DATA_10B, DATA_10B, DATA_10B, DATA_10B, \
->> +                     DATA_10B, DATA_10B, DATA_10B, DATA_10B, DATA_10B
->> +
->> +#define DATA_511B DATA_100B, DATA_100B, DATA_100B, DATA_100B, DATA_100B, \
->> +                     DATA_10B, 0xff
->> +
->> +#define DATA_512B DATA_511B, 0xff
->> +
->> +#define DATA_4KB DATA_512B, DATA_512B, DATA_512B, DATA_512B, DATA_512B, \
->> +             DATA_512B, DATA_512B, DATA_512B
->> +
->> +#define DATA_16KB DATA_4KB, DATA_4KB, DATA_4KB, DATA_4KB
->> +
->> +#define DATA_64KB DATA_16KB, DATA_16KB, DATA_16KB, DATA_16KB
->> +
->> +/* 64KB + 383B */
->> +static const uint8_t long_data_2[] = { DATA_64KB, DATA_100B, DATA_100B,
->> +                                     DATA_100B, DATA_10B, DATA_10B, DATA_10B,
->> +                                     DATA_10B, DATA_10B, DATA_10B, DATA_10B,
->> +                                     DATA_10B, 0xff, 0xff, 0xff };
->
-> Instead of all these complex defines wouldn't it be easier to just:
->
-> static const uint8_t long_data_2[0xffff + 383];
->
-> The only difference is that you'd have zeros instead of 0xff bytes as
-> content.
+> When using LE_SCAN_FILTER_DUP_ENABLE, some controllers would send
+> advertising report from each LE device only once. That means that we
+> don't get any updates on RSSI value, and makes Service Discovery very
+> slow. This patch adds restarting scan when in Service Discovery, and
+> device with filtered uuid is found, but it's not in RSSI range to send
+> event yet. This way if device moves into range, we will quickly get RSSI
+> update.
+> 
+> Signed-off-by: Jakub Pawlowski <jpawlowski@google.com>
+> ---
+> include/net/bluetooth/hci_core.h |  1 +
+> net/bluetooth/mgmt.c             | 46 +++++++++++++++++++++++++++++++++++++---
+> 2 files changed, 44 insertions(+), 3 deletions(-)
+> 
+> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+> index de019eb..aa5bea0 100644
+> --- a/include/net/bluetooth/hci_core.h
+> +++ b/include/net/bluetooth/hci_core.h
+> @@ -1328,6 +1328,7 @@ void hci_sock_dev_event(struct hci_dev *hdev, int event);
+> #define DISCOV_INTERLEAVED_TIMEOUT	5120	/* msec */
+> #define DISCOV_INTERLEAVED_INQUIRY_LEN	0x04
+> #define DISCOV_BREDR_INQUIRY_LEN	0x08
+> +#define DISCOV_LE_RESTART_DELAY		msecs_to_jiffies(200)	/* msec */
+> 
+> int mgmt_control(struct sock *sk, struct msghdr *msg, size_t len);
+> int mgmt_new_settings(struct hci_dev *hdev);
+> diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+> index c2b5f8a..67ef0ea 100644
+> --- a/net/bluetooth/mgmt.c
+> +++ b/net/bluetooth/mgmt.c
+> @@ -7195,6 +7195,20 @@ static bool eir_has_uuids(u8 *eir, u16 eir_len, u16 uuid_count, u8 (*uuids)[16])
+> 	return false;
+> }
+> 
+> +static void restart_le_scan(struct hci_dev *hdev)
+> +{
+> +	/* If controller is not scanning we are done. */
+> +	if (!test_bit(HCI_LE_SCAN, &hdev->dev_flags))
+> +		return;
+> +
+> +	if (time_after(jiffies + DISCOV_LE_RESTART_DELAY,
+> +		       hdev->discovery.scan_end))
+> +		return;
+> +
+> +	queue_delayed_work(hdev->workqueue, &hdev->le_scan_restart,
+> +			   DISCOV_LE_RESTART_DELAY);
+> +}
+> +
+> void mgmt_device_found(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
+> 		       u8 addr_type, u8 *dev_class, s8 rssi, u32 flags,
+> 		       u8 *eir, u16 eir_len, u8 *scan_rsp, u8 scan_rsp_len)
+> @@ -7224,7 +7238,9 @@ void mgmt_device_found(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
+> 	 * the results are also dropped.
+> 	 */
+> 	if (hdev->discovery.rssi != HCI_RSSI_INVALID &&
+> -	    (rssi < hdev->discovery.rssi || rssi == HCI_RSSI_INVALID))
+> +	    (rssi == HCI_RSSI_INVALID ||
+> +	    (rssi < hdev->discovery.rssi &&
+> +	     !test_bit(HCI_QUIRK_STRICT_DUPLICATE_FILTER, &hdev->quirks))))
+> 		return;
 
-Indeed it is much simpler, the content is not really important in the
-end, in the other hand it looks like the length limit for a value is
-512 bytes not 64 K so I there is a couple more changes needed.
+there is a comment above this if clause. So that one needs to be adjusted to take this new case into account.
 
+> 	/* Make sure that the buffer is big enough. The 5 extra bytes
+> @@ -7258,12 +7274,20 @@ void mgmt_device_found(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
+> 		 * kept and checking possible scan response data
+> 		 * will be skipped.
+> 		 */
+> -		if (hdev->discovery.uuid_count > 0)
+> +		if (hdev->discovery.uuid_count > 0) {
+> 			match = eir_has_uuids(eir, eir_len,
+> 					      hdev->discovery.uuid_count,
+> 					      hdev->discovery.uuids);
+> -		else
+> +			/* we have service match. If duplicate filtering doesn't
+> +			 * honour RSSI hanges, restart scan to make sure we'll
+> +			 * get RSSI updates
+> +			 */
 
--- 
-Luiz Augusto von Dentz
+Lets fix the spelling here first. Also skip the "we have service match". That is just something out of context and hard to read.
+
+			/* If duplicate filtering does not report RSSI changes, then
+			 * restart scanning to ensure updated result with updated
+			 * RSSI values.
+			 */
+
+> +			if (match && test_bit(HCI_QUIRK_STRICT_DUPLICATE_FILTER,
+> +					      &hdev->quirks))
+> +				restart_le_scan(hdev);
+> +		} else {
+> 			match = true;
+> +		}
+> 
+> 		if (!match && !scan_rsp_len)
+> 			return;
+> @@ -7296,6 +7320,14 @@ void mgmt_device_found(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
+> 						     hdev->discovery.uuid_count,
+> 						     hdev->discovery.uuids))
+> 				return;
+> +
+> +			/* we have service match. If duplicate filtering doesn't
+> +			 * honour RSSI hanges, restart scan to make sure we'll
+> +			 * get RSSI updates
+> +			 */
+
+Same here.
+
+> +			if (test_bit(HCI_QUIRK_STRICT_DUPLICATE_FILTER,
+> +				     &hdev->quirks))
+
+This really do not fit into a single line?
+
+> +				restart_le_scan(hdev);
+> 		}
+> 
+> 		/* Append scan response data to event */
+> @@ -7309,6 +7341,14 @@ void mgmt_device_found(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
+> 			return;
+> 	}
+> 
+> +	/* Check again wether RSSI value doesn't meet Service Discovery
+> +	 * threshold. This might evaluate to true only if
+> +	 * HCI_QUIRK_STRICT_DUPLICATE_FILTER is set.
+> +	 */
+
+	/* Validate the reported RSSI value against the RSSI threshold once more in
+	 * case HCI_QUIRK_STRICT_DUPLICATE_FILTER forced a restart of LE scanning.
+	 */
+
+> +	if (hdev->discovery.rssi != HCI_RSSI_INVALID &&
+> +	    rssi < hdev->discovery.rssi)
+> +		return;
+> +
+> 	ev->eir_len = cpu_to_le16(eir_len + scan_rsp_len);
+> 	ev_size = sizeof(*ev) + eir_len + scan_rsp_len;
+
+Regards
+
+Marcel
+
