@@ -1,49 +1,49 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 26 Jan 2015 22:27:28 +0200
+Date: Mon, 26 Jan 2015 22:19:30 +0200
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH BlueZ 2/3] unit/gatt: Add TP/GAR/CL/BV-04-C/64K test
-Message-ID: <20150126202728.GA31780@t440s.P-661HNU-F1>
-References: <1422287118-25319-1-git-send-email-luiz.dentz@gmail.com>
- <1422287118-25319-2-git-send-email-luiz.dentz@gmail.com>
+Subject: Re: [PATCH] Bluetooth: Enforce zero-valued hash/rand192 for LE OOB
+Message-ID: <20150126201930.GA30866@t440s.P-661HNU-F1>
+References: <1422277671-26069-1-git-send-email-johan.hedberg@gmail.com>
+ <4114F7BB-C37B-4D42-B182-7F2685817ED3@holtmann.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1422287118-25319-2-git-send-email-luiz.dentz@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <4114F7BB-C37B-4D42-B182-7F2685817ED3@holtmann.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+Hi Marcel,
 
-On Mon, Jan 26, 2015, Luiz Augusto von Dentz wrote:
-> +#define DATA_10B  0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff
-> +
-> +#define DATA_100B DATA_10B, DATA_10B, DATA_10B, DATA_10B, DATA_10B, \
-> +			DATA_10B, DATA_10B, DATA_10B, DATA_10B, DATA_10B
-> +
-> +#define DATA_511B DATA_100B, DATA_100B, DATA_100B, DATA_100B, DATA_100B, \
-> +			DATA_10B, 0xff
-> +
-> +#define DATA_512B DATA_511B, 0xff
-> +
-> +#define DATA_4KB DATA_512B, DATA_512B, DATA_512B, DATA_512B, DATA_512B, \
-> +		DATA_512B, DATA_512B, DATA_512B
-> +
-> +#define DATA_16KB DATA_4KB, DATA_4KB, DATA_4KB, DATA_4KB
-> +
-> +#define DATA_64KB DATA_16KB, DATA_16KB, DATA_16KB, DATA_16KB
-> +
-> +/* 64KB + 383B */
-> +static const uint8_t long_data_2[] = { DATA_64KB, DATA_100B, DATA_100B,
-> +					DATA_100B, DATA_10B, DATA_10B, DATA_10B,
-> +					DATA_10B, DATA_10B, DATA_10B, DATA_10B,
-> +					DATA_10B, 0xff, 0xff, 0xff };
+On Mon, Jan 26, 2015, Marcel Holtmann wrote:
+> > Until legacy SMP OOB pairing is implemented user space should be given a
+> > clear error when trying to use it. This patch adds a corresponding check
+> > to the Add Remote OOB Data handler function which returns "invalid
+> > parameters" if non-zero Rand192 or Hash192 parameters were given for an
+> > LE address.
+> > 
+> > Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+> > ---
+> > net/bluetooth/mgmt.c | 14 ++++++++++++++
+> > 1 file changed, 14 insertions(+)
+> > 
+> > diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+> > index 25e40e82b9a2..cf257cc0e09d 100644
+> > --- a/net/bluetooth/mgmt.c
+> > +++ b/net/bluetooth/mgmt.c
+> > @@ -3673,6 +3673,20 @@ static int add_remote_oob_data(struct sock *sk, struct hci_dev *hdev,
+> > 		u8 status;
+> > 
+> > 		if (bdaddr_type_is_le(cp->addr.type)) {
+> > +			static const u8 z16[16] = { 0 };
+> 
+> aren't these suppose to be done as = { 0, }; to ensure that the whole
+> array is zeroed?
 
-Instead of all these complex defines wouldn't it be easier to just:
-
-static const uint8_t long_data_2[0xffff + 383];
-
-The only difference is that you'd have zeros instead of 0xff bytes as
-content.
+I think either way should work. Even if there was no initialization at
+all the C-standard guarantees that static variables are initialized to
+zero unless initialized explicitly (this includes aggregate types like
+arrays). We could however leave out the 'static' part with something
+like you suggested since it's essentially redundant as far as the
+initialization is concerned.
 
 Johan
