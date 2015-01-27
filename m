@@ -1,33 +1,71 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 0/9] Read Long client unit tests
-Date: Tue, 27 Jan 2015 14:03:23 +0200
-Message-Id: <1422360212-19812-1-git-send-email-luiz.dentz@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Tue, 27 Jan 2015 13:09:10 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH v3] Bluetooth: btusb: Add firmware loading for Intel
+ Snowfield Peak devices
+Message-ID: <20150127110910.GB14108@t440s>
+References: <1422336828-32215-1-git-send-email-marcel@holtmann.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1422336828-32215-1-git-send-email-marcel@holtmann.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Marcel,
 
-These implement the unit tests for read long procedure as a client and
-fix the behavior for values over maximum length.
+On Mon, Jan 26, 2015, Marcel Holtmann wrote:
+> The Intel Snowfield Peak devices do not come with Bluetooth firmware
+> loaded and thus require a full download of the operational Bluetooth
+> firmware when the device is connected via USB.
+> 
+> Snowfield Peak devices start with a bootloader mode that only accepts
+> a very limited set of HCI commands. The supported commands are enough
+> to identify the hardware and select the right firmware to load.
+> 
+> Previous patches to the btusb driver allow overwriting the handling
+> for bulk receive endpoint packets and HCI events processing. The
+> firmware loading makes heavy use of these new internal callbacks.
+> 
+> This patch also introduces additional internal states to track if the
+> device is in bootloader or operational mode. This allows for correct
+> feedback about the firmware loading procedure.
+> 
+> Output from /sys/kernel/debug/usb/devices for this device:
+> 
+> T:  Bus=02 Lev=02 Prnt=02 Port=05 Cnt=01 Dev#=  3 Spd=12   MxCh= 0
+> D:  Ver= 2.01 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
+> P:  Vendor=8087 ProdID=0a2b Rev= 0.01
+> C:* #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
+> I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=81(I) Atr=03(Int.) MxPS=  64 Ivl=1ms
+> E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+> E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+> I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+> I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+> I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+> I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+> I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+> I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+> 
+> Based-on-patch-by: Tedd Ho-Jeong An <tedd.an@intel.com>.
+> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+> ---
+>  drivers/bluetooth/btusb.c | 571 +++++++++++++++++++++++++++++++++++++++++++++-
+>  1 file changed, 568 insertions(+), 3 deletions(-)
 
-Luiz Augusto von Dentz (9):
-  unit/gatt: Add TP/GAR/CL/BV-04-C test
-  unit/gatt: Add TP/GAR/CL/BV-04-C/512B test
-  shared/gatt-client: Fix read long value
-  unit/gatt: Add TP/GAR/CL/BI-12-C test
-  unit/gatt: Add TP/GAR/CL/BI-13-C test
-  unit/gatt: Add TP/GAR/CL/BI-14-C test
-  unit/gatt: Add TP/GAR/CL/BI-15-C test
-  unit/gatt: Add TP/GAR/CL/BI-16-C test
-  unit/gatt: Add TP/GAR/CL/BI-17-C test
+Applied to bluetooth-next. Thanks.
 
- src/shared/att-types.h   |   1 +
- src/shared/gatt-client.c |  12 ++-
- unit/test-gatt.c         | 224 ++++++++++++++++++++++++++++++++++++++++++++++-
- 3 files changed, 229 insertions(+), 8 deletions(-)
-
--- 
-2.1.0
-
+Johan
