@@ -1,56 +1,142 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 8.1 \(1993\))
-Subject: Re: Keeping hci interface powered
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <FC3579EF-F5AF-4B28-9E70-97080FA6DD2C@holtmann.org>
-Date: Mon, 26 Jan 2015 18:47:06 -0800
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <D396E7CE-E288-4BEA-BEC9-CAF85A6825BB@holtmann.org>
-References: <m3oaqfl79f.fsf@carbon.jhcloos.org> <D043D131-E9F8-43C1-8671-0EACAE810420@holtmann.org> <m361cklxwo.fsf@carbon.jhcloos.org> <C5CDA647-8415-44F3-9F89-0D596D76498F@holtmann.org> <m3zj9wkfsw.fsf@carbon.jhcloos.org> <FFFB52BA-6CC2-4E9E-ACA3-C3D2099BAA9B@holtmann.org> <m3tx04kat2.fsf@carbon.jhcloos.org> <FC3579EF-F5AF-4B28-9E70-97080FA6DD2C@holtmann.org>
-To: James Cloos <cloos@jhcloos.com>
+From: Jakub Pawlowski <jpawlowski@google.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Jakub Pawlowski <jpawlowski@google.com>
+Subject: [PATCH v11 2/2] Bluetooth: Add restarting to service discovery
+Date: Mon, 26 Jan 2015 18:18:58 -0800
+Message-Id: <1422325138-20113-2-git-send-email-jpawlowski@google.com>
+In-Reply-To: <1422325138-20113-1-git-send-email-jpawlowski@google.com>
+References: <1422325138-20113-1-git-send-email-jpawlowski@google.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi James,
+When using LE_SCAN_FILTER_DUP_ENABLE, some controllers would send
+advertising report from each LE device only once. That means that we
+don't get any updates on RSSI value, and makes Service Discovery very
+slow. This patch adds restarting scan when in Service Discovery, and
+device with filtered uuid is found, but it's not in RSSI range to send
+event yet. This way if device moves into range, we will quickly get RSSI
+update.
 
-> So the max_page value is 0, but it should be 1 for this controller. I think that is what is tripping up the command and not reading page 1. The page is clearly available as the other trace shows. And yes, the keyboard has Secure Simple Pairing enabled.
+Signed-off-by: Jakub Pawlowski <jpawlowski@google.com>
+---
+ include/net/bluetooth/hci_core.h |  1 +
+ net/bluetooth/mgmt.c             | 53 ++++++++++++++++++++++++++++++++++++----
+ 2 files changed, 49 insertions(+), 5 deletions(-)
 
-I got this keyboard now and the max_page value set to 0 is a clear bug with this keyboard. However, the kernel already works around this one. I did fix the command line userspace tools to include the same fix now.
-
->> MH> The LegacyPairing: no is not a 100% indication, but I assume your
->> MH> keyboard is actually a Bluetooth 2.1 keyboard with Secure Simple
->> MH> Pairing.
->>>> 
->> MH> Do you have an exact model number or link? We might have to buy one
->> MH> of these keyboards.
->>>> 
->>>> Lenovo's pages are:
->>>> 
->>>> http://shop.lenovo.com/us/en/itemdetails/0B47189/460/60AC6A0372B14F5BA7B12F1FF88E33C7
->>>> http://support.lenovo.com/en/documents/pd026744
->>>> 
->>>> I got that one to support my trackpoint addiction. :^/
->>>> 
->>>> Are there any good tech specs for bt available w/o cost?
->> 
->> MH> Can you capture a pairing procedure with your keyboard with btmon?
->> MH> Then I can tell what is actually going on between these two devices.
->> 
->> After unpairing, it refuses to re-pair at all.  So now no keyboard
->> whatsoever......
-> 
-> Most likely it has a button that you need to press or hold to make it forgot the current key.
-> 
-> And when in bluetoothctl, make sure you start an agent. That is the piece that will ask you for the passkey.
-
-So I did a basic pairing with this keyboard and it works as expected. It has SSP enabled and it does proper keyboard input handling for the passphrase.
-
-What I am thinking is that you initially pairing with Legacy Pairing and then switched on SSP later on. This confused the keyboard and it things to allow Legacy Pairing. However that is really not how this works in the end.
-
-When you make sure to remove all pairings and re-pair the keyboard it should all work fine and the keyboard should re-establish the encryption before trying to open HID control and interrupt channels.
-
-Regards
-
-Marcel
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 6261679..538fe38 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -1330,6 +1330,7 @@ void hci_sock_dev_event(struct hci_dev *hdev, int event);
+ #define DISCOV_INTERLEAVED_TIMEOUT	5120	/* msec */
+ #define DISCOV_INTERLEAVED_INQUIRY_LEN	0x04
+ #define DISCOV_BREDR_INQUIRY_LEN	0x08
++#define DISCOV_LE_RESTART_DELAY		msecs_to_jiffies(200)	/* msec */
+ 
+ int mgmt_control(struct sock *sk, struct msghdr *msg, size_t len);
+ int mgmt_new_settings(struct hci_dev *hdev);
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 2012163..93d5e18 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -7217,6 +7217,21 @@ static bool eir_has_uuids(u8 *eir, u16 eir_len, u16 uuid_count, u8 (*uuids)[16])
+ 	return false;
+ }
+ 
++static void restart_le_scan(struct hci_dev *hdev)
++{
++	/* If controller is not scanning we are done. */
++	if (!test_bit(HCI_LE_SCAN, &hdev->dev_flags))
++		return;
++
++	if (time_after(jiffies + DISCOV_LE_RESTART_DELAY,
++		       hdev->discovery.scan_start +
++		       hdev->discovery.scan_duration))
++		return;
++
++	queue_delayed_work(hdev->workqueue, &hdev->le_scan_restart,
++			   DISCOV_LE_RESTART_DELAY);
++}
++
+ void mgmt_device_found(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
+ 		       u8 addr_type, u8 *dev_class, s8 rssi, u32 flags,
+ 		       u8 *eir, u16 eir_len, u8 *scan_rsp, u8 scan_rsp_len)
+@@ -7239,14 +7254,18 @@ void mgmt_device_found(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
+ 
+ 	/* When using service discovery with a RSSI threshold, then check
+ 	 * if such a RSSI threshold is specified. If a RSSI threshold has
+-	 * been specified, then all results with a RSSI smaller than the
+-	 * RSSI threshold will be dropped.
++	 * been specified, and HCI_QUIRK_STRICT_DUPLICATE_FILTER is not set,
++	 * then all results with a RSSI smaller than the RSSI threshold will be
++	 * dropped. If the quirk is set, let it through for further processing,
++	 * as we might need to restart the scan.
+ 	 *
+ 	 * For BR/EDR devices (pre 1.2) providing no RSSI during inquiry,
+ 	 * the results are also dropped.
+ 	 */
+ 	if (hdev->discovery.rssi != HCI_RSSI_INVALID &&
+-	    (rssi < hdev->discovery.rssi || rssi == HCI_RSSI_INVALID))
++	    (rssi == HCI_RSSI_INVALID ||
++	    (rssi < hdev->discovery.rssi &&
++	     !test_bit(HCI_QUIRK_STRICT_DUPLICATE_FILTER, &hdev->quirks))))
+ 		return;
+ 
+ 	/* Make sure that the buffer is big enough. The 5 extra bytes
+@@ -7281,12 +7300,20 @@ void mgmt_device_found(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
+ 		 * kept and checking possible scan response data
+ 		 * will be skipped.
+ 		 */
+-		if (hdev->discovery.uuid_count > 0)
++		if (hdev->discovery.uuid_count > 0) {
+ 			match = eir_has_uuids(eir, eir_len,
+ 					      hdev->discovery.uuid_count,
+ 					      hdev->discovery.uuids);
+-		else
++			/* If duplicate filtering does not report RSSI changes,
++			 * then restart scanning to ensure updated result with
++			 * updated RSSI values.
++			 */
++			if (match && test_bit(HCI_QUIRK_STRICT_DUPLICATE_FILTER,
++					      &hdev->quirks))
++				restart_le_scan(hdev);
++		} else {
+ 			match = true;
++		}
+ 
+ 		if (!match && !scan_rsp_len)
+ 			return;
+@@ -7319,6 +7346,14 @@ void mgmt_device_found(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
+ 						     hdev->discovery.uuid_count,
+ 						     hdev->discovery.uuids))
+ 				return;
++
++			/* If duplicate filtering does not report RSSI changes,
++			 * then restart scanning to ensure updated result with
++			 * updated RSSI values.
++			 */
++			if (test_bit(HCI_QUIRK_STRICT_DUPLICATE_FILTER,
++				     &hdev->quirks))
++				restart_le_scan(hdev);
+ 		}
+ 
+ 		/* Append scan response data to event */
+@@ -7332,6 +7367,14 @@ void mgmt_device_found(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
+ 			return;
+ 	}
+ 
++	/* Validate the reported RSSI value against the RSSI threshold once more
++	 * incase HCI_QUIRK_STRICT_DUPLICATE_FILTER forced a restart of LE
++	 * scanning.
++	 */
++	if (hdev->discovery.rssi != HCI_RSSI_INVALID &&
++	    rssi < hdev->discovery.rssi)
++		return;
++
+ 	ev->eir_len = cpu_to_le16(eir_len + scan_rsp_len);
+ 	ev_size = sizeof(*ev) + eir_len + scan_rsp_len;
+ 
+-- 
+2.2.0.rc0.207.ga3a616c
 
