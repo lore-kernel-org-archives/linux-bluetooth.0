@@ -3,130 +3,178 @@ From: Gowtham Anandha Babu <gowtham.ab@samsung.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: bharat.panda@samsung.com, cpgs@samsung.com,
 	Gowtham Anandha Babu <gowtham.ab@samsung.com>
-Subject: [PATCH v1 2/3] shared/gatt-client: Fix usage of freed memory
-Date: Tue, 27 Jan 2015 14:23:19 +0530
-Message-id: <1422348800-5668-3-git-send-email-gowtham.ab@samsung.com>
+Subject: [PATCH v1 1/3] shared/gatt-helpers: Fix usage of freed memory
+Date: Tue, 27 Jan 2015 14:23:18 +0530
+Message-id: <1422348800-5668-2-git-send-email-gowtham.ab@samsung.com>
 In-reply-to: <1422348800-5668-1-git-send-email-gowtham.ab@samsung.com>
 References: <1422348800-5668-1-git-send-email-gowtham.ab@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-src/shared/gatt-client.c:534:14: warning: Use of memory after it is freed
-        op->success = false;
-        ~~~~~~~~~~~ ^
-src/shared/gatt-client.c:689:14: warning: Use of memory after it is freed
-        op->success = success;
-        ~~~~~~~~~~~ ^
-src/shared/gatt-client.c:790:14: warning: Use of memory after it is freed
-        op->success = success;
-        ~~~~~~~~~~~ ^
-src/shared/gatt-client.c:882:14: warning: Use of memory after it is freed
-        op->success = success;
-        ~~~~~~~~~~~ ^
-src/shared/gatt-client.c:950:14: warning: Use of memory after it is freed
-        op->success = success;
-        ~~~~~~~~~~~ ^
+src/shared/gatt-helpers.c:709:6: warning: Use of memory after it is freed
+        if (op->callback)
+            ^~~~~~~~~~~~
+src/shared/gatt-helpers.c:780:6: warning: Use of memory after it is freed
+        if (op->callback)
+            ^~~~~~~~~~~~
+src/shared/gatt-helpers.c:998:6: warning: Use of memory after it is freed
+        if (op->callback)
+            ^~~~~~~~~~~~
+src/shared/gatt-helpers.c:1020:32: warning: Use of memory after it is freed
+                op->callback(false, 0, NULL, data->op->user_data);
+                                             ^~~~~~~~
+src/shared/gatt-helpers.c:1112:6: warning: Use of memory after it is freed
+        if (op->callback)
+            ^~~~~~~~~~~~
+src/shared/gatt-helpers.c:1226:6: warning: Use of memory after it is freed
+        if (op->callback)
+            ^~~~~~~~~~~~
+src/shared/gatt-helpers.c:1332:6: warning: Use of memory after it is freed
+        if (op->callback)
+            ^~~~~~~~~~~~
+src/shared/gatt-helpers.c:1452:6: warning: Use of memory after it is freed
+        if (op->callback)
+            ^~~~~~~~~~~~
 ---
- src/shared/gatt-client.c | 16 +++++++++-------
- 1 file changed, 9 insertions(+), 7 deletions(-)
+ src/shared/gatt-helpers.c | 25 ++++++++++++++++---------
+ 1 file changed, 16 insertions(+), 9 deletions(-)
 
-diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
-index 1acd34f..12c9b2f 100644
---- a/src/shared/gatt-client.c
-+++ b/src/shared/gatt-client.c
-@@ -511,7 +511,6 @@ next:
+diff --git a/src/shared/gatt-helpers.c b/src/shared/gatt-helpers.c
+index 3864ed0..c9b24cc 100644
+--- a/src/shared/gatt-helpers.c
++++ b/src/shared/gatt-helpers.c
+@@ -686,7 +686,6 @@ static void read_by_grp_type_cb(uint8_t opcode, const void *pdu,
+ 							discovery_op_unref))
+ 			return;
  
- 		util_debug(client->debug_callback, client->debug_data,
- 				"Failed to start characteristic discovery");
 -		discovery_op_unref(op);
+ 		success = false;
+ 		goto done;
+ 	}
+@@ -708,6 +707,8 @@ success:
+ done:
+ 	if (op->callback)
+ 		op->callback(success, att_ecode, final_result, op->user_data);
++
++	discovery_op_unref(op);
+ }
+ 
+ static void find_by_type_val_cb(uint8_t opcode, const void *pdu,
+@@ -766,7 +767,6 @@ static void find_by_type_val_cb(uint8_t opcode, const void *pdu,
+ 							discovery_op_unref))
+ 			return;
+ 
+-		discovery_op_unref(op);
+ 		success = false;
+ 		goto done;
+ 	}
+@@ -779,6 +779,8 @@ success:
+ done:
+ 	if (op->callback)
+ 		op->callback(success, att_ecode, final_result, op->user_data);
++
++	discovery_op_unref(op);
+ }
+ 
+ static bool discover_services(struct bt_att *att, bt_uuid_t *uuid,
+@@ -977,7 +979,6 @@ static void read_included_cb(uint8_t opcode, const void *pdu,
+ 				discovery_op_ref(op), discovery_op_unref))
+ 			return;
+ 
+-		discovery_op_unref(op);
+ 		success = false;
+ 		goto done;
+ 	}
+@@ -997,6 +998,8 @@ static void read_included_cb(uint8_t opcode, const void *pdu,
+ done:
+ 	if (op->callback)
+ 		op->callback(success, att_ecode, final_result, op->user_data);
++
++	discovery_op_unref(op);
+ }
+ 
+ static void read_included(struct read_incl_data *data)
+@@ -1014,10 +1017,10 @@ static void read_included(struct read_incl_data *data)
+ 							read_included_unref))
+ 		return;
+ 
+-	read_included_unref(data);
+-
+ 	if (op->callback)
+ 		op->callback(false, 0, NULL, data->op->user_data);
++
++	read_included_unref(data);
+ }
+ 
+ static void discover_included_cb(uint8_t opcode, const void *pdu,
+@@ -1099,7 +1102,6 @@ static void discover_included_cb(uint8_t opcode, const void *pdu,
+ 							discovery_op_unref))
+ 			return;
+ 
+-		discovery_op_unref(op);
+ 		success = false;
  		goto failed;
  	}
- 
-@@ -528,11 +527,11 @@ next:
- 
- 	util_debug(client->debug_callback, client->debug_data,
- 					"Failed to start included discovery");
--	discovery_op_unref(op);
- 
+@@ -1111,6 +1113,8 @@ done:
  failed:
- 	op->success = false;
- 	op->complete_func(op, false, att_ecode);
+ 	if (op->callback)
+ 		op->callback(success, att_ecode, final_result, op->user_data);
++
 +	discovery_op_unref(op);
  }
  
- struct chrc {
-@@ -587,8 +586,11 @@ static bool discover_descs(struct discovery_op *op, bool *discovering)
+ bool bt_gatt_discover_included_services(struct bt_att *att,
+@@ -1213,7 +1217,6 @@ static void discover_chrcs_cb(uint8_t opcode, const void *pdu,
+ 						discovery_op_unref))
+ 			return;
  
- 		util_debug(client->debug_callback, client->debug_data,
- 					"Failed to start descriptor discovery");
 -		discovery_op_unref(op);
- 
-+		/*
-+		 * discovery_op_unref done in discover_chrcs_cb
-+		 * and discover_descs_cb functions
-+		 */
- 		goto failed;
+ 		success = false;
+ 		goto done;
  	}
- 
-@@ -680,7 +682,6 @@ next:
- 
- 	util_debug(client->debug_callback, client->debug_data,
- 				"Failed to start characteristic discovery");
--	discovery_op_unref(op);
- 
- failed:
- 	success = false;
-@@ -688,6 +689,7 @@ failed:
- done:
- 	op->success = success;
- 	op->complete_func(op, success, att_ecode);
+@@ -1226,6 +1229,8 @@ done:
+ 	if (op->callback)
+ 		op->callback(success, att_ecode, final_result,
+ 							op->user_data);
++
 +	discovery_op_unref(op);
  }
  
- static void discover_chrcs_cb(bool success, uint8_t att_ecode,
-@@ -781,7 +783,6 @@ next:
+ bool bt_gatt_discover_characteristics(struct bt_att *att,
+@@ -1321,7 +1326,6 @@ static void read_by_type_cb(uint8_t opcode, const void *pdu,
+ 						discovery_op_unref))
+ 			return;
  
- 	util_debug(client->debug_callback, client->debug_data,
- 				"Failed to start characteristic discovery");
--	discovery_op_unref(op);
- 
- failed:
- 	success = false;
-@@ -789,6 +790,7 @@ failed:
- done:
- 	op->success = success;
- 	op->complete_func(op, success, att_ecode);
+-		discovery_op_unref(op);
+ 		success = false;
+ 		goto done;
+ 	}
+@@ -1332,6 +1336,8 @@ done:
+ 	if (op->callback)
+ 		op->callback(success, att_ecode, success ? op->result_head :
+ 							NULL, op->user_data);
++
 +	discovery_op_unref(op);
  }
  
- static void discover_secondary_cb(bool success, uint8_t att_ecode,
-@@ -876,11 +878,11 @@ next:
+ bool bt_gatt_read_by_type(struct bt_att *att, uint16_t start, uint16_t end,
+@@ -1439,7 +1445,6 @@ static void discover_descs_cb(uint8_t opcode, const void *pdu,
+ 						discovery_op_unref))
+ 			return;
  
- 	util_debug(client->debug_callback, client->debug_data,
- 				"Failed to start included services discovery");
--	discovery_op_unref(op);
- 
+-		discovery_op_unref(op);
+ 		success = false;
+ 		goto done;
+ 	}
+@@ -1451,6 +1456,8 @@ success:
  done:
- 	op->success = success;
- 	op->complete_func(op, success, att_ecode);
+ 	if (op->callback)
+ 		op->callback(success, att_ecode, final_result, op->user_data);
++
 +	discovery_op_unref(op);
  }
  
- static void discover_primary_cb(bool success, uint8_t att_ecode,
-@@ -943,12 +945,12 @@ static void discover_primary_cb(bool success, uint8_t att_ecode,
- 
- 	util_debug(client->debug_callback, client->debug_data,
- 				"Failed to start secondary service discovery");
--	discovery_op_unref(op);
- 	success = false;
- 
- done:
- 	op->success = success;
- 	op->complete_func(op, success, att_ecode);
-+	discovery_op_unref(op);
- }
- 
- static void notify_client_ready(struct bt_gatt_client *client, bool success,
+ bool bt_gatt_discover_descriptors(struct bt_att *att,
 -- 
 1.9.1
 
