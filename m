@@ -1,62 +1,77 @@
 Return-Path: <cyrus@holtmann.org>
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2] Bluetooth: Enforce zero-valued hash/rand192 for LE OOB
-Date: Tue, 27 Jan 2015 12:55:52 +0200
-Message-Id: <1422356152-13920-1-git-send-email-johan.hedberg@gmail.com>
-In-Reply-To: <1422277671-26069-1-git-send-email-johan.hedberg@gmail.com>
-References: <1422277671-26069-1-git-send-email-johan.hedberg@gmail.com>
+From: Gowtham Anandha Babu <gowtham.ab@samsung.com>
+To: 'Luiz Augusto von Dentz' <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	'Bharat Panda' <bharat.panda@samsung.com>, cpgs@samsung.com
+References: <1421229458-11207-1-git-send-email-gowtham.ab@samsung.com>
+ <001201d03494$5abd3d60$1037b820$@samsung.com>
+ <CABBYNZK2-RW3p_k90d+3-hXW6wsha=6Aw-ix7eP7GXVTtuhuTg@mail.gmail.com>
+In-reply-to: <CABBYNZK2-RW3p_k90d+3-hXW6wsha=6Aw-ix7eP7GXVTtuhuTg@mail.gmail.com>
+Subject: RE: [PATCH 0/3] Fix memory issue and trivial code cleaup
+Date: Tue, 27 Jan 2015 14:28:17 +0530
+Message-id: <005b01d03a0f$6b232450$41696cf0$@samsung.com>
+MIME-version: 1.0
+Content-type: text/plain; charset=utf-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@intel.com>
+Hi Luiz,
 
-Until legacy SMP OOB pairing is implemented user space should be given a
-clear error when trying to use it. This patch adds a corresponding check
-to the Add Remote OOB Data handler function which returns "invalid
-parameters" if non-zero Rand192 or Hash192 parameters were given for an
-LE address.
+> -----Original Message-----
+> From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-
+> owner@vger.kernel.org] On Behalf Of Luiz Augusto von Dentz
+> Sent: Thursday, January 22, 2015 2:33 PM
+> To: Gowtham Anandha Babu
+> Cc: linux-bluetooth@vger.kernel.org; Bharat Panda; cpgs@samsung.com
+> Subject: Re: [PATCH 0/3] Fix memory issue and trivial code cleaup
+> 
+> Hi Gowtham,
+> 
+> On Tue, Jan 20, 2015 at 11:34 AM, Gowtham Anandha Babu
+> <gowtham.ab@samsung.com> wrote:
+> > Ping.
+> >
+> >> -----Original Message-----
+> >> From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-
+> >> owner@vger.kernel.org] On Behalf Of Gowtham Anandha Babu
+> >> Sent: Wednesday, January 14, 2015 3:28 PM
+> >> To: linux-bluetooth@vger.kernel.org
+> >> Cc: bharat.panda@samsung.com; cpgs@samsung.com; Gowtham
+> Anandha Babu
+> >> Subject: [PATCH 0/3] Fix memory issue and trivial code cleaup
+> >>
+> >> In gatt-client and gatt-helpers, the variables are accessed even
+> >> after it
+> > is
+> >> freed. Making the unref at appropriate places solved the issues.
+> >>
+> >> In tools, removed dead code warnings.
+> >>
+> >> Gowtham Anandha Babu (3):
+> >>   shared/gatt-helpers: Fix usage of freed memory
+> >>   shared/gatt-client: Fix usage of freed memory
+> >>   tools/hciattach_ath3k: Remove dead code warnings
+> >>
+> >>  src/shared/gatt-client.c  | 23 +++++++++++------------
+> >> src/shared/gatt- helpers.c | 25 ++++++++++++++++---------
+> >>  tools/hciattach_ath3k.c   | 11 +----------
+> >>  3 files changed, 28 insertions(+), 31 deletions(-)
+> >>
+> >> --
+> >> 1.9.1
+> 
+> Doesn't apply anymore, please rebase.
+> 
+> 
+I have rebased the patches and sent the v1 for the same.
 
-Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
----
-v2: Use a define instead of a variable for the zero-valued key
-
- net/bluetooth/mgmt.c | 15 +++++++++++++++
- 1 file changed, 15 insertions(+)
-
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 25e40e82b9a2..8417ab387d1a 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -131,6 +131,9 @@ static const u16 mgmt_events[] = {
- 
- #define CACHE_TIMEOUT	msecs_to_jiffies(2 * 1000)
- 
-+#define ZERO_KEY "\x00\x00\x00\x00\x00\x00\x00\x00" \
-+		 "\x00\x00\x00\x00\x00\x00\x00\x00"
-+
- struct pending_cmd {
- 	struct list_head list;
- 	u16 opcode;
-@@ -3673,6 +3676,18 @@ static int add_remote_oob_data(struct sock *sk, struct hci_dev *hdev,
- 		u8 status;
- 
- 		if (bdaddr_type_is_le(cp->addr.type)) {
-+			/* Enforce zero-valued 192-bit parameters as
-+			 * long as legacy SMP OOB isn't implemented.
-+			 */
-+			if (memcmp(cp->rand192, ZERO_KEY, 16) ||
-+			    memcmp(cp->hash192, ZERO_KEY, 16)) {
-+				err = cmd_complete(sk, hdev->id,
-+						   MGMT_OP_ADD_REMOTE_OOB_DATA,
-+						   MGMT_STATUS_INVALID_PARAMS,
-+						   addr, sizeof(*addr));
-+				goto unlock;
-+			}
-+
- 			rand192 = NULL;
- 			hash192 = NULL;
- 		} else {
--- 
-2.1.0
+Regards,
+Gowtham Anandha Babu
+> 
+> --
+> Luiz Augusto von Dentz
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org More majordomo
+> info at  http://vger.kernel.org/majordomo-info.html
 
