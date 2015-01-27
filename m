@@ -1,85 +1,139 @@
 Return-Path: <cyrus@holtmann.org>
-From: Marcel Holtmann <marcel@holtmann.org>
+From: Arman Uguray <armansito@chromium.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/3] Bluetooth: Clear P-192 values for OOB when in Secure Connections Only mode
-Date: Tue, 27 Jan 2015 16:04:31 -0800
-Message-Id: <1422403473-3542-1-git-send-email-marcel@holtmann.org>
+Cc: Arman Uguray <armansito@chromium.org>
+Subject: [RFC BlueZ v1] doc/gatt-api.txt: Updates to GattManager1
+Date: Tue, 27 Jan 2015 15:08:53 -0800
+Message-Id: <1422400133-2222-2-git-send-email-armansito@chromium.org>
+In-Reply-To: <1422400133-2222-1-git-send-email-armansito@chromium.org>
+References: <1422400133-2222-1-git-send-email-armansito@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-When Secure Connections Only mode has been enabled and remote OOB data
-is requested, then only provide P-256 hash and randomizer vaulues. The
-fields for P-192 hash and randomizer should be set to zero.
+This patch modifies GATT D-Bus API with minor additions for server-role.
+Renamed GattManager1 to GattServerManager1 for clarity, added new
+fields to the "options" argument to RegisterService and introduced the
+NewClientConfiguration method for server-side GattCharacteristic1
+implementations.
 
-Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+Change-Id: I298d286380941471b387846bf33288847f1ccee5
 ---
- net/bluetooth/hci_event.c | 46 ++++++++++++++++++++++++++--------------------
- 1 file changed, 26 insertions(+), 20 deletions(-)
+ doc/gatt-api.txt | 86 +++++++++++++++++++++++++++++++++++++++-----------------
+ 1 file changed, 60 insertions(+), 26 deletions(-)
 
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index e2b81adc232f..0850cad8c368 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -4163,33 +4163,39 @@ static void hci_remote_oob_data_request_evt(struct hci_dev *hdev,
- 		goto unlock;
+diff --git a/doc/gatt-api.txt b/doc/gatt-api.txt
+index bfeaf6d..513d398 100644
+--- a/doc/gatt-api.txt
++++ b/doc/gatt-api.txt
+@@ -109,6 +109,27 @@ Methods		array{byte} ReadValue()
  
- 	data = hci_find_remote_oob_data(hdev, &ev->bdaddr, BDADDR_BREDR);
--	if (data) {
--		if (bredr_sc_enabled(hdev)) {
--			struct hci_cp_remote_oob_ext_data_reply cp;
+ 			Possible Errors: org.bluez.Error.Failed
+ 
++		void NewClientConfiguration(object characteristic,
++							string device_address,
++							array{byte} value)
++
++			This method gets called when a remote device with BDADDR
++			|device_address| in the GATT client role writes to the
++			Client Characteristic Configuration descriptor of
++			the characteristic with object path |characteristic|,
++			which was exported by this profile.
++
++			The profile can use this to maintain a mapping of
++			clients that have configured the characteristic and
++			update its state based on the configuration value
++			|value|.
++
++			Local characteristics only.
++
++			Possible errors: org.bluez.NotAuthorized
++					 org.bluez.NotPaired
++					 org.bluez.NotSupported
++
+ Properties	string UUID [read-only]
+ 
+ 			128-bit characteristic UUID.
+@@ -205,41 +226,54 @@ Properties	string UUID [read-only]
+ 			which a PropertiesChanged signal will be emitted.
+ 
+ 
+-Service Manager hierarchy
+-=============================
 -
--			bacpy(&cp.bdaddr, &ev->bdaddr);
--			memcpy(cp.hash192, data->hash192, sizeof(cp.hash192));
--			memcpy(cp.rand192, data->rand192, sizeof(cp.rand192));
--			memcpy(cp.hash256, data->hash256, sizeof(cp.hash256));
--			memcpy(cp.rand256, data->rand256, sizeof(cp.rand256));
-+	if (!data) {
-+		struct hci_cp_remote_oob_data_neg_reply cp;
+-Service Manager allows external applications to register GATT based
+-services. Services must follow the API for Service and Characteristic
+-described above.
++GATT Service Manager hierarchy
++==============================
  
--			hci_send_cmd(hdev, HCI_OP_REMOTE_OOB_EXT_DATA_REPLY,
--				     sizeof(cp), &cp);
--		} else {
--			struct hci_cp_remote_oob_data_reply cp;
-+		bacpy(&cp.bdaddr, &ev->bdaddr);
-+		hci_send_cmd(hdev, HCI_OP_REMOTE_OOB_DATA_NEG_REPLY,
-+			     sizeof(cp), &cp);
-+		goto unlock;
-+	}
+-Local GATT services, characteristics and characteristic descriptors are
+-discovered automatically using the D-Bus Object Manager interface.
++GATT Service Manager allows external applications to implement local GATT-based
++services. An application may choose to implement one or more GATT services in
++the form of org.bluez.GattService1 object hierarchies and publish them in the
++local database in the server-role.
  
--			bacpy(&cp.bdaddr, &ev->bdaddr);
--			memcpy(cp.hash, data->hash192, sizeof(cp.hash));
--			memcpy(cp.rand, data->rand192, sizeof(cp.rand));
-+	if (bredr_sc_enabled(hdev)) {
-+		struct hci_cp_remote_oob_ext_data_reply cp;
+ Service		org.bluez
+-Interface	org.bluez.GattManager1 [Experimental]
++Interface	org.bluez.GattServiceManager1 [Experimental]
+ Object path	/org/bluez
  
--			hci_send_cmd(hdev, HCI_OP_REMOTE_OOB_DATA_REPLY,
--				     sizeof(cp), &cp);
-+		bacpy(&cp.bdaddr, &ev->bdaddr);
-+		if (test_bit(HCI_SC_ONLY, &hdev->dev_flags)) {
-+			memset(cp.hash192, 0, sizeof(cp.hash192));
-+			memset(cp.rand192, 0, sizeof(cp.rand192));
-+		} else {
-+			memcpy(cp.hash192, data->hash192, sizeof(cp.hash192));
-+			memcpy(cp.rand192, data->rand192, sizeof(cp.rand192));
- 		}
-+		memcpy(cp.hash256, data->hash256, sizeof(cp.hash256));
-+		memcpy(cp.rand256, data->rand256, sizeof(cp.rand256));
+-Methods		RegisterService(object service, dict options)
++Methods		void RegisterService(object service, dict options)
+ 
+-			Registers remote application service exported under
+-			interface GattService1. Characteristic objects must
+-			be hierarchical to their service and must use the
+-			interface GattCharacteristic1. D-Bus Object Manager
+-			is used to fetch the exported objects.
++			Registers a GattService1 hierarchy.
+ 
+-			"service" object path together with the D-Bus system
+-			bus connection ID define the identification of the
+-			application registering a GATT based service.
++			If an application disconnects from the bus all of its
++			registered services will be removed.
+ 
+-			Possible errors: org.bluez.Error.InvalidArguments
+-					 org.bluez.Error.AlreadyExists
++			Available options:
 +
-+		hci_send_cmd(hdev, HCI_OP_REMOTE_OOB_EXT_DATA_REPLY,
-+			     sizeof(cp), &cp);
- 	} else {
--		struct hci_cp_remote_oob_data_neg_reply cp;
-+		struct hci_cp_remote_oob_data_reply cp;
- 
- 		bacpy(&cp.bdaddr, &ev->bdaddr);
--		hci_send_cmd(hdev, HCI_OP_REMOTE_OOB_DATA_NEG_REPLY,
-+		memcpy(cp.hash, data->hash192, sizeof(cp.hash));
-+		memcpy(cp.rand, data->rand192, sizeof(cp.rand));
++				object ObjectManager
 +
-+		hci_send_cmd(hdev, HCI_OP_REMOTE_OOB_DATA_REPLY,
- 			     sizeof(cp), &cp);
- 	}
++					Specifies the object path to the node
++					that implements the
++					org.freedesktop.DBus.ObjectManager
++					interface for this application. This
++					must be the object manager that manages
++					the GattService1 objects. This is used
++					by BlueZ to monitor when services get
++					added and removed.
  
+-		UnregisterService(object service)
++				bool Advertised
+ 
+-			This unregisters the service that has been
+-			previously registered. The object path parameter
+-			must match the same value that has been used
+-			on registration.
++					Indicates whether or not this service
++					UUID should be advertised when the local
++					host has LE advertising enabled. This
++					will be ignored, if a sufficient number
++					of UUIDs have already been set for
++					advertising.
+ 
+ 			Possible errors: org.bluez.Error.InvalidArguments
+-					 org.bluez.Error.DoesNotExist
++			                 org.bluez.Error.AlreadyExists
++
++		void UnregisterProfile(object profile)
++
++			Unregister a GattService1 hierarchy that has been
++			previously registered. The object path parameter must
++			match the same value that was used on registration.
++
++			Possible errors: org.bluez.Error.DoesNotExist
 -- 
-2.1.0
+2.2.0.rc0.207.ga3a616c
 
