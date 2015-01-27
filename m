@@ -1,99 +1,204 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 8.1 \(1993\))
-Subject: Re: [PATCH] Bluetooth: Limit OOB to P-256 values for Secure Connection Only mode
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <2080375.GZdINHllEn@leonov>
-Date: Tue, 27 Jan 2015 12:39:45 -0800
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <8055BE26-B2E8-43A1-A038-D40AC32FB60E@holtmann.org>
-References: <1422386512-15819-1-git-send-email-marcel@holtmann.org> <2080375.GZdINHllEn@leonov>
-To: Szymon Janc <szymon.janc@tieto.com>
+From: Arman Uguray <armansito@chromium.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: Arman Uguray <armansito@chromium.org>
+Subject: [RFC BlueZ] doc/gatt-api.txt: Add GattProfile1 API
+Date: Tue, 27 Jan 2015 12:26:20 -0800
+Message-Id: <1422390380-26000-2-git-send-email-armansito@chromium.org>
+In-Reply-To: <1422390380-26000-1-git-send-email-armansito@chromium.org>
+References: <1422390380-26000-1-git-send-email-armansito@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Szymon,
+This patch adds the definition for the GattProfile1 and
+GattProfileManager1 D-Bus interfaces. This API allows applications to
+publish local GATT services for the server-role and manage client-role
+configurations and behavior, such as auto-connects, GATT connection
+life-time, subscribing to notifications/indications, etc.
 
->> When using Secure Connection Only mode, the P-192 hash and rand values
->> for BR/EDR and the TK value for LE are not valid. The Secure Connections
->> Only mode limits the encryption keys to P-256 derived values for both
->> transports. To avoid accidentally loading weak values for pairing just
->> restrict it to P-256 values.
-> 
-> If so, shouldn't enabling Secure Connection Only mode result in clearing OOB 
-> data (or at least removing legacy ones)?
+Change-Id: I26c20b6db9ad01c8dcf7ad3d2d03913117505963
+---
+ doc/gatt-api.txt | 158 ++++++++++++++++++++++++++++++++++++++++++++++---------
+ 1 file changed, 132 insertions(+), 26 deletions(-)
 
-most likely it should. However that can be a separate patch.
-
-I think actually any change to SSP or SC setting should cause the remote OOB information to be flushed.
-
->> 
->> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
->> ---
->> net/bluetooth/mgmt.c | 30 ++++++++++++++++++++++++++----
->> 1 file changed, 26 insertions(+), 4 deletions(-)
->> 
->> diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
->> index 8417ab387d1a..5c7340b1cd66 100644
->> --- a/net/bluetooth/mgmt.c
->> +++ b/net/bluetooth/mgmt.c
->> @@ -3660,6 +3660,21 @@ static int add_remote_oob_data(struct sock *sk,
->> struct hci_dev *hdev, goto unlock;
->> 		}
->> 
->> +		/* In case Secure Connections Only made has been enabled,
-> 
-> typo:  made -> mode
-
-Johan can make that change before applying the patch. However good catch.
-
-> 
->> +		 * do not allow providing P-192 hash and rand values.
->> +		 *
->> +		 * This actually means that in Secure Connections Only
->> +		 * mode this command with the legacy parameter list
->> +		 * is not supported at all.
->> +		 */
->> +		if (test_bit(HCI_SC_ONLY, &hdev->dev_flags)) {
->> +			err = cmd_complete(sk, hdev->id,
->> +					   MGMT_OP_ADD_REMOTE_OOB_DATA,
->> +					   MGMT_STATUS_INVALID_PARAMS,
->> +					   addr, sizeof(*addr));
->> +			goto unlock;
->> +		}
->> +
->> 		err = hci_add_remote_oob_data(hdev, &cp->addr.bdaddr,
->> 					      cp->addr.type, cp->hash,
->> 					      cp->rand, NULL, NULL);
->> @@ -3675,10 +3690,17 @@ static int add_remote_oob_data(struct sock *sk,
->> struct hci_dev *hdev, u8 *rand192, *hash192;
->> 		u8 status;
->> 
->> -		if (bdaddr_type_is_le(cp->addr.type)) {
->> -			/* Enforce zero-valued 192-bit parameters as
->> -			 * long as legacy SMP OOB isn't implemented.
->> -			 */
->> +		/* For Bluetooth LE, currently only P-256 hash and rand
->> +		 * values are allowed. The P-192 hash and rand values
->> +		 * are required to be zero. This is required since Legacy
->> +		 * Pairing for LE with OOB is not implemented yet.
->> +		 *
->> +		 * In case Secure Connections Only made has been enabled,
-> 
-> same typo
-
-Same here, Johan, please fix this before applying.
-
->> +		 * do not allow providing P-192 hash and rand values. It
->> +		 * is required that the values are zero here as well.
->> +		 */
->> +		if (bdaddr_type_is_le(cp->addr.type) ||
->> +		    test_bit(HCI_SC_ONLY, &hdev->dev_flags)) {
->> 			if (memcmp(cp->rand192, ZERO_KEY, 16) ||
->> 			    memcmp(cp->hash192, ZERO_KEY, 16)) {
->> 				err = cmd_complete(sk, hdev->id,
-
-Regards
-
-Marcel
+diff --git a/doc/gatt-api.txt b/doc/gatt-api.txt
+index bfeaf6d..8a64467 100644
+--- a/doc/gatt-api.txt
++++ b/doc/gatt-api.txt
+@@ -205,41 +205,147 @@ Properties	string UUID [read-only]
+ 			which a PropertiesChanged signal will be emitted.
+ 
+ 
+-Service Manager hierarchy
+-=============================
++GATT Profile Manager hierarchy
++==============================
+ 
+-Service Manager allows external applications to register GATT based
+-services. Services must follow the API for Service and Characteristic
+-described above.
+-
+-Local GATT services, characteristics and characteristic descriptors are
+-discovered automatically using the D-Bus Object Manager interface.
++GATT Profile Manager allows external applications to implement a GATT-based
++profile. An application may choose to implement one or more GATT services and
++publish them in the local database in the server role or it may be interested in
++remote GATT services in the client role.
+ 
+ Service		org.bluez
+-Interface	org.bluez.GattManager1 [Experimental]
++Interface	org.bluez.GattProfileManager1 [Experimental]
+ Object path	/org/bluez
+ 
+-Methods		RegisterService(object service, dict options)
++Methods		void RegisterProfile(object profile, dict options)
+ 
+-			Registers remote application service exported under
+-			interface GattService1. Characteristic objects must
+-			be hierarchical to their service and must use the
+-			interface GattCharacteristic1. D-Bus Object Manager
+-			is used to fetch the exported objects.
++			Registers a profile implementation.
+ 
+-			"service" object path together with the D-Bus system
+-			bus connection ID define the identification of the
+-			application registering a GATT based service.
++			If an application disconnects from the bus all of its
++			registered profiles will be removed.
+ 
+-			Possible errors: org.bluez.Error.InvalidArguments
+-					 org.bluez.Error.AlreadyExists
++			Available options:
++
++				string Role
++
++					Specifies which specific profile role
++					is implemented by the application.
++					The value of this option determines
++					which other options are mandatory.
++
++					Possible values: "client", "server"
++
++				object ObjectManager
++
++					Specifies the object path to the node
++					that implements the
++					org.freedesktop.DBus.ObjectManager
++					interface for this application. This
++					must be the object manager that manages
++					the GattService1 objects. This is used
++					by BlueZ to monitor when services get
++					added and removed.
++
++					Required for the "server" role. Not
++					allowed in "client" role.
++
++				array{object} Services
++
++					List of exported object paths that
++					implement the GattService1 interface
++					hierarchy. These services are
++					implemented by the application and will
++					be published in the local attribute
++					database.
++
++					Required for the "server" role. Not
++					allowed in "client" role.
++
++				array{string} UUIDs
++
++					List of remote service UUIDs that the
++					application wants to access. The
++					application will be notified for each
++					GATT service discovered on a remote
++					device that matches one of these UUIDs.
++
++					Required for the "client" role. Not
++					allowed in "server" role.
++
++				string AdvertisedUUID
++
++					The service UUID that should be
++					advertised when the local host is in
++					LE advertising mode while in the LE
++					peripheral role. This will be ignored,
++					if a sufficient number of UUIDs are
++					already set for advertising.
+ 
+-		UnregisterService(object service)
++					Optional for the "server" role. Not
++					allowed in "client" role.
+ 
+-			This unregisters the service that has been
+-			previously registered. The object path parameter
+-			must match the same value that has been used
+-			on registration.
++				boolean AutoConnect
++
++					If a device is found that contains one
++					or more of the desired remote UUIDs, it
++					will be automatically connected to.
++
++					Optional for the "client" role. Not
++					allowed in "server" role.
++
++				array{string} NotifyUUIDs
++
++					List of GATT characteristic UUIDs that
++					the application is interested in
++					receiving notifications/indications
++					from. If any of these characteristics
++					are discovered in a remote device and
++					they support notifications/indications,
++					they will be immediately enabled.
++
++					Optional for the "client" role. Not
++					allowed in the "server" role.
+ 
+ 			Possible errors: org.bluez.Error.InvalidArguments
+-					 org.bluez.Error.DoesNotExist
++			                 org.bluez.Error.AlreadyExists
++
++		void UnregisterProfile(object profile)
++
++			Unregister a profile that has been previously
++			registered. The object path parameter must match the
++			same value that has been used on registration. If the
++			profile is in the server role, all of its published GATT
++			services will be removed from the database.
++
++			Possible errors: org.bluez.Error.DoesNotExist
++
++
++GATT Profile hierarchy
++======================
++
++Represents a GATT-based profile implemented by an external application in either
++the server or client role. A profile can publish one or more local GATT services
++or may be interact with GATT services found on a remote device.
++
++Service		unique name
++Interface	org.bluez.GattProfile1 [Experimental]
++Object path	freely definable
++
++Methods		void NewClientConfiguration(object characteristic,
++							string device_address,
++							array{byte} value)
++
++			This method gets called when a remote device with BDADDR
++			|device_address| in the GATT client role writes to the
++			Client Characteristic Configuration descriptor of
++			the characteristic with object path |characteristic|,
++			which was exported by this profile.
++
++			The profile can use this to maintain a mapping of
++			clients that have configured the characteristic and
++			update its state based on the configuration value
++			|value|.
++
++			Possible errors: org.bluez.NotAuthorized
++					 org.bluez.NotPaired
++					 org.bluez.NotSupported
+-- 
+2.2.0.rc0.207.ga3a616c
 
