@@ -1,95 +1,155 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-Sender: armansito@google.com
-In-Reply-To: <CABBYNZK9grifuuy5exy-3EYn-mbDaYRaGXkSZwA9KqRZBQUMXg@mail.gmail.com>
-References: <CAAqhSf6mcSTrPyTrEu8KL7GFmnVGf9OjPNS+vNyARyhQZc=c6A@mail.gmail.com>
-	<01815345-0542-4F64-8535-9193F31D123E@holtmann.org>
-	<CAHrH25Rb_v_h_N3=90munc=OTLhkhbBdxRHDWdb4aLDfxZF+ww@mail.gmail.com>
-	<FBBCB89D-4126-4799-A7C0-811BAE12B7B0@holtmann.org>
-	<CABBYNZK9grifuuy5exy-3EYn-mbDaYRaGXkSZwA9KqRZBQUMXg@mail.gmail.com>
-Date: Tue, 27 Jan 2015 00:52:12 -0800
-Message-ID: <CAHrH25Q90_nqz_d3vhL03=zzhi21kGKo_8BqE6pSdXN2Mk26tg@mail.gmail.com>
-Subject: Re: GATT plugin
-From: Arman Uguray <armansito@chromium.org>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>, Tyler Arnold <choosetylernol@gmail.com>,
-	BlueZ development <linux-bluetooth@vger.kernel.org>
+In-Reply-To: <7FF7EC0D6ACE2E4297FA998A42F07AD6195B2527@QS-MBX02.benq.corp.com>
+References: <m3oaqfl79f.fsf@carbon.jhcloos.org>
+	<D043D131-E9F8-43C1-8671-0EACAE810420@holtmann.org>
+	<m361cklxwo.fsf@carbon.jhcloos.org>
+	<C5CDA647-8415-44F3-9F89-0D596D76498F@holtmann.org>
+	<m3zj9wkfsw.fsf@carbon.jhcloos.org>
+	<7FF7EC0D6ACE2E4297FA998A42F07AD6195AF357@QS-MBX02.benq.corp.com>
+	<E1E9C166-A11C-4A76-8B60-BF168C918F2B@holtmann.org>
+	<7FF7EC0D6ACE2E4297FA998A42F07AD6195B2106@QS-MBX02.benq.corp.com>
+	<CABBYNZK_YSjw0U7kCW9V1jmFDALyFPynfe2rwa8P4C2yQo36eg@mail.gmail.com>
+	<7FF7EC0D6ACE2E4297FA998A42F07AD6195B2527@QS-MBX02.benq.corp.com>
+Date: Tue, 27 Jan 2015 10:50:40 +0200
+Message-ID: <CABBYNZKy-UT9hykXNmieqiD3DAmeUqxjTG0aVf+evpD-nBFr2Q@mail.gmail.com>
+Subject: Re: BlueZ question about HID profile
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Gilbert Gao <Gilbert.Gao@qisda.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+Hi,
 
-> On Tue, Jan 27, 2015 at 12:38 AM, Luiz Augusto von Dentz <luiz.dentz@gmail.com> wrote:
-> Hi Marcel, Arman,
+On Tue, Jan 27, 2015 at 5:44 AM, Gilbert Gao <Gilbert.Gao@qisda.com> wrote:
+> Hi Luiz,
 >
-> On Tue, Jan 27, 2015 at 10:10 AM, Marcel Holtmann <marcel@holtmann.org> wrote:
->> Hi Arman,
+> Thanks a lot!
+> Assuming we have the input source and BlueZ working as a HID device,
+> what interface BlueZ will expose for us to send a key press to remote? /d=
+ev/xxx or function call?
+> In another word, how to transfer the key press from input device to BlueZ=
+?
+
+I guess you did not pay attention to the comment about top posting in the l=
+ist:
+
+http://www.bluez.org/development/lists/
+
+Regarding the mechanism to hand over the events, as I said it already,
+you probably need to come up with a proposal, something like
+InputManager.Register("/dev/xxx") could work but I did not think about
+the details and we could perhaps have the kernel doing some sort of
+pass-through mode if the source input is already an HID device.
+
+> Best Regards,
+> Gilbert
+>
+> -----Original Message-----
+> From: Luiz Augusto von Dentz [mailto:luiz.dentz@gmail.com]
+> Sent: Tuesday, January 27, 2015 12:13 AM
+> To: Gilbert Gao
+> Cc: Marcel Holtmann; linux-bluetooth@vger.kernel.org
+> Subject: Re: BlueZ question about HID profile
+>
+> Hi,
+>
+> On Fri, Jan 23, 2015 at 12:10 PM, Gilbert Gao <Gilbert.Gao@qisda.com> wro=
+te:
 >>
->>>>> I am building a GATT service/plugin for the bluetooth daemon and have
->>>>> ported 5.27 bluez to my embedded ARM platform.
->>>>>
->>>>> It seems like the GATT D-Bus API is not quite ready, so my options
->>>>> appear to be either building the plugin and linking it as a statically
->>>>> linked object or build it as a shared object library where the daemon
->>>>> will pick it up from /usr/local/lib/bluetooth/plugins
->>>>> Are both supported? I saw a message from about a year ago suggesting
->>>>> the shared object approach was not the best path.
->>>>
->>>> actually I would prefer if we get the GATT D-Bus API ready so that you can use it. Have you tried it? I am actually curious to hear what would be missing.
->>>>
->>>
->>> The GATT D-Bus API was mostly implemented for client role a little
->>> after the christmas release. I received push back on
->>> StartNotify/StopNotify for an edge case and I haven't come up with an
->>> alternative, so the API is behind the experimental flag and doesn't
->>> support enabling notifications.
->>>
->>> Server role support (over D-Bus) doesn't exist at all. If you run the
->>> daemon with -E, you'll see the org.bluez.GattManager1 interface
->>> exported but interacting with it virtually doesn't do anything.
->>>
->>> The thing is, the upstream review process has been taking way too long
->>> for us and we have some features to deliver, so I'm working on the
->>> remaining features within the ChromiumOS tree for now. So you won't
->>> see any patches from me any time soon. Last where I left off, we were
->>> discussing replacing GattManager1 with a new GattProfile1 &
->>> GattProfileManager1 API, so I may send out a proposal for that some
->>> time next week.
->
-> Im surprised to hear that, I thought we were actually moving too fast
-> given the amount of regressions we have introduced and there are still
-> some left and lots of cleanups to do in the core and complete the unit
-> tests.
->
-
-Yep, there's definitely a lot of internal work to do, especially for
-server-role. There are also regressions, though I believe we fixed
-most of those (I saw a lot of your patches fly by, thanks for those).
-I think I also have one patch that I need to rebase still.
-
->>> Otherwise, that's where the API stands :)
+>> Hi,
 >>
->> actually I would prefer if we get this upstream quicker. And that applies to GATT client and GATT server support. I was under the assumption that Luiz was working on this as well. So what can we do to make this go faster?
+>> I add KEYB to sdp:
+>> #sdptool add KEYB
+>>
+>> And HID service can be found and connected by a remote dongle on PC,
+>> From log, connect_event_cb() is called, but this function calls input_de=
+vice_set_channel(), in which find_device() returns NULL, because the global=
+ variable "devices" is NULL, so the connection can not be established.
+>> I want to know how to modify here for successful connection as a keyboar=
+d.
+>>
+>> And I'm not very clear which interfaces should be called for HID device =
+role to send data(such as a key press).
+>>
+>> Sicerely expect your advice! Thank you!
 >
-> Im doing the review as quick as I can, normally within 1-2 days, and
-> Im even fixing things myself to try to speed up the process.
+> First of all, no top posting in the mailing list please, second the
+> sdptool shall not be used since you did not have any plugin to
+> implement it won't work, in order for this to work input plugin
+> probably needs changes, it just happens to connect because the PSM are
+> the same for both roles but since there is no actual record for the
+> host the plugin will never be initialize to work with the device
+> connecting thus the error you are seeing.
 >
-
-I do very much appreciate that, but as I've expressed earlier, my
-frustration ultimately has to do with the timezone difference. Even if
-you reviewed it within an hour of seeing the patches, it will still
-take me another 12-24 hours to see your response and address it.
-
->> One small detail here. I hope we are clear that "service" in LE GATT means the server side and "profile" in LE GATT is actually the client. The GATT server exposes a service and the profile explains how a GATT client uses it.
+> We could in theory enable HID device record but then input needs to
+> handle incoming connections and interface with some event input that
+> you might have to register over D-Bus, if you don't really have an
+> input device to be used as a source you could use uinput to emulate
+> one then bluetoothd would have to listen to the events, translate (not
+> sure if this step is really needed though) them to HID and then send
+> to the remote.
 >
-> That perhaps needs changes then, we start using GattService1 as client side API.
->
+>> Best Regards,
+>> Gilbert
+>>
+>>
+>> -----Original Message-----
+>> From: Gilbert Gao
+>> Sent: Tuesday, January 06, 2015 10:26 AM
+>> To: 'Marcel Holtmann'
+>> Cc: linux-bluetooth@vger.kernel.org
+>> Subject: RE: BlueZ question about HID profile
+>>
+>> Dear Marcel,
+>>
+>> Thank you very much!
+>> But now I'm not very clear about BlueZ HID implementation.
+>> Could you help to point out how to modify for a HID device role or any s=
+ample code?
+>>
+>> Best Regards,
+>> Gilbert
+>>
+>> -----Original Message-----
+>> From: Marcel Holtmann [mailto:marcel@holtmann.org]
+>> Sent: Tuesday, January 06, 2015 9:38 AM
+>> To: Gilbert Gao
+>> Cc: linux-bluetooth@vger.kernel.org
+>> Subject: Re: BlueZ question about HID profile
+>>
+>> Hi Gilbert,
+>>
+>>> Here is an emergent question about BlueZ feature:
+>>> I read the doc "supported-features.txt", which says BlueZ supports HID =
+host.
+>>> And my question is whether HID device is supported?
+>>> Or can I use BlueZ HID profile to implement the Bluetooth HID device su=
+ch as a Bluetooth mouse or keyboard?
+>>
+>> it should be pretty simple to implement a HID device role. There have be=
+en external projects in the past that did this. The reason why this is not =
+in BlueZ is mainly due to the fact that we would need to get the input even=
+ts from some kind of source. So if you have that figured out, then it shoul=
+d be simple to provided HID device role.
+>>
 >> Regards
 >>
 >> Marcel
 >>
+>>
+>> **********************Confidentiality Notice************************
+>> The opinions and views expressed in this e-mail are solely those of the =
+author and do not necessarily represent our company and its affiliates. If =
+this e-mail is not originally intended for you, or received by you in error=
+, do not disclose its content to anyone and delete it immediately. This e-m=
+ail may contain information that is legally privileged, confidential or exe=
+mpt from disclosure.
 >> --
->> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+>> To unsubscribe from this list: send the line "unsubscribe linux-bluetoot=
+h" in
 >> the body of a message to majordomo@vger.kernel.org
 >> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 >
@@ -97,6 +157,15 @@ take me another 12-24 hours to see your response and address it.
 >
 > --
 > Luiz Augusto von Dentz
+> **********************Confidentiality Notice************************
+> The opinions and views expressed in this e-mail are solely those of the a=
+uthor and do not necessarily represent our company and its affiliates. If t=
+his e-mail is not originally intended for you, or received by you in error,=
+ do not disclose its content to anyone and delete it immediately. This e-ma=
+il may contain information that is legally privileged, confidential or exem=
+pt from disclosure.
 
-Thanks,
-Arman
+
+
+--=20
+Luiz Augusto von Dentz
