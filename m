@@ -1,32 +1,102 @@
 Return-Path: <cyrus@holtmann.org>
-From: Gowtham Anandha Babu <gowtham.ab@samsung.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: bharat.panda@samsung.com, cpgs@samsung.com,
-	Gowtham Anandha Babu <gowtham.ab@samsung.com>
-Subject: [PATCH v1 0/3] Fix memory issues and trivial code cleaup
-Date: Tue, 27 Jan 2015 14:23:17 +0530
-Message-id: <1422348800-5668-1-git-send-email-gowtham.ab@samsung.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+MIME-Version: 1.0
+Sender: armansito@google.com
+In-Reply-To: <CABBYNZK9grifuuy5exy-3EYn-mbDaYRaGXkSZwA9KqRZBQUMXg@mail.gmail.com>
+References: <CAAqhSf6mcSTrPyTrEu8KL7GFmnVGf9OjPNS+vNyARyhQZc=c6A@mail.gmail.com>
+	<01815345-0542-4F64-8535-9193F31D123E@holtmann.org>
+	<CAHrH25Rb_v_h_N3=90munc=OTLhkhbBdxRHDWdb4aLDfxZF+ww@mail.gmail.com>
+	<FBBCB89D-4126-4799-A7C0-811BAE12B7B0@holtmann.org>
+	<CABBYNZK9grifuuy5exy-3EYn-mbDaYRaGXkSZwA9KqRZBQUMXg@mail.gmail.com>
+Date: Tue, 27 Jan 2015 00:52:12 -0800
+Message-ID: <CAHrH25Q90_nqz_d3vhL03=zzhi21kGKo_8BqE6pSdXN2Mk26tg@mail.gmail.com>
+Subject: Re: GATT plugin
+From: Arman Uguray <armansito@chromium.org>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>, Tyler Arnold <choosetylernol@gmail.com>,
+	BlueZ development <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-In gatt-client and gatt-helpers, the variables are accessed
-even after it is freed. Making the unref at appropriate
-places solved the issues.
+Hi Luiz,
 
-In tools, removed dead code warnings.
+> On Tue, Jan 27, 2015 at 12:38 AM, Luiz Augusto von Dentz <luiz.dentz@gmail.com> wrote:
+> Hi Marcel, Arman,
+>
+> On Tue, Jan 27, 2015 at 10:10 AM, Marcel Holtmann <marcel@holtmann.org> wrote:
+>> Hi Arman,
+>>
+>>>>> I am building a GATT service/plugin for the bluetooth daemon and have
+>>>>> ported 5.27 bluez to my embedded ARM platform.
+>>>>>
+>>>>> It seems like the GATT D-Bus API is not quite ready, so my options
+>>>>> appear to be either building the plugin and linking it as a statically
+>>>>> linked object or build it as a shared object library where the daemon
+>>>>> will pick it up from /usr/local/lib/bluetooth/plugins
+>>>>> Are both supported? I saw a message from about a year ago suggesting
+>>>>> the shared object approach was not the best path.
+>>>>
+>>>> actually I would prefer if we get the GATT D-Bus API ready so that you can use it. Have you tried it? I am actually curious to hear what would be missing.
+>>>>
+>>>
+>>> The GATT D-Bus API was mostly implemented for client role a little
+>>> after the christmas release. I received push back on
+>>> StartNotify/StopNotify for an edge case and I haven't come up with an
+>>> alternative, so the API is behind the experimental flag and doesn't
+>>> support enabling notifications.
+>>>
+>>> Server role support (over D-Bus) doesn't exist at all. If you run the
+>>> daemon with -E, you'll see the org.bluez.GattManager1 interface
+>>> exported but interacting with it virtually doesn't do anything.
+>>>
+>>> The thing is, the upstream review process has been taking way too long
+>>> for us and we have some features to deliver, so I'm working on the
+>>> remaining features within the ChromiumOS tree for now. So you won't
+>>> see any patches from me any time soon. Last where I left off, we were
+>>> discussing replacing GattManager1 with a new GattProfile1 &
+>>> GattProfileManager1 API, so I may send out a proposal for that some
+>>> time next week.
+>
+> Im surprised to hear that, I thought we were actually moving too fast
+> given the amount of regressions we have introduced and there are still
+> some left and lots of cleanups to do in the core and complete the unit
+> tests.
+>
 
-*v1: Rebased.
+Yep, there's definitely a lot of internal work to do, especially for
+server-role. There are also regressions, though I believe we fixed
+most of those (I saw a lot of your patches fly by, thanks for those).
+I think I also have one patch that I need to rebase still.
 
-Gowtham Anandha Babu (3):
-  shared/gatt-helpers: Fix usage of freed memory
-  shared/gatt-client: Fix usage of freed memory
-  tools/hciattach_ath3k: Remove dead code warnings
+>>> Otherwise, that's where the API stands :)
+>>
+>> actually I would prefer if we get this upstream quicker. And that applies to GATT client and GATT server support. I was under the assumption that Luiz was working on this as well. So what can we do to make this go faster?
+>
+> Im doing the review as quick as I can, normally within 1-2 days, and
+> Im even fixing things myself to try to speed up the process.
+>
 
- src/shared/gatt-client.c  | 16 +++++++++-------
- src/shared/gatt-helpers.c | 25 ++++++++++++++++---------
- tools/hciattach_ath3k.c   | 11 +----------
- 3 files changed, 26 insertions(+), 26 deletions(-)
+I do very much appreciate that, but as I've expressed earlier, my
+frustration ultimately has to do with the timezone difference. Even if
+you reviewed it within an hour of seeing the patches, it will still
+take me another 12-24 hours to see your response and address it.
 
--- 
-1.9.1
+>> One small detail here. I hope we are clear that "service" in LE GATT means the server side and "profile" in LE GATT is actually the client. The GATT server exposes a service and the profile explains how a GATT client uses it.
+>
+> That perhaps needs changes then, we start using GattService1 as client side API.
+>
+>> Regards
+>>
+>> Marcel
+>>
+>> --
+>> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+>> the body of a message to majordomo@vger.kernel.org
+>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>
+>
+>
+> --
+> Luiz Augusto von Dentz
 
+Thanks,
+Arman
