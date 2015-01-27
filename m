@@ -1,70 +1,133 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 27 Jan 2015 13:09:10 +0200
+Date: Tue, 27 Jan 2015 13:06:49 +0200
 From: Johan Hedberg <johan.hedberg@gmail.com>
 To: Marcel Holtmann <marcel@holtmann.org>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v3] Bluetooth: btusb: Add firmware loading for Intel
- Snowfield Peak devices
-Message-ID: <20150127110910.GB14108@t440s>
-References: <1422336828-32215-1-git-send-email-marcel@holtmann.org>
+Subject: Re: [PATCH] Bluetooth: btusb: Add support for Dynex/Insignia USB
+ dongles
+Message-ID: <20150127110649.GA14108@t440s>
+References: <1422333332-17812-1-git-send-email-marcel@holtmann.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1422336828-32215-1-git-send-email-marcel@holtmann.org>
+In-Reply-To: <1422333332-17812-1-git-send-email-marcel@holtmann.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Marcel,
 
 On Mon, Jan 26, 2015, Marcel Holtmann wrote:
-> The Intel Snowfield Peak devices do not come with Bluetooth firmware
-> loaded and thus require a full download of the operational Bluetooth
-> firmware when the device is connected via USB.
+> The Dynex/Insignia USB dongles are Broadcom BCM20702B0 based and require
+> firmware update before operation.
 > 
-> Snowfield Peak devices start with a bootloader mode that only accepts
-> a very limited set of HCI commands. The supported commands are enough
-> to identify the hardware and select the right firmware to load.
-> 
-> Previous patches to the btusb driver allow overwriting the handling
-> for bulk receive endpoint packets and HCI events processing. The
-> firmware loading makes heavy use of these new internal callbacks.
-> 
-> This patch also introduces additional internal states to track if the
-> device is in bootloader or operational mode. This allows for correct
-> feedback about the firmware loading procedure.
-> 
-> Output from /sys/kernel/debug/usb/devices for this device:
-> 
-> T:  Bus=02 Lev=02 Prnt=02 Port=05 Cnt=01 Dev#=  3 Spd=12   MxCh= 0
-> D:  Ver= 2.01 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-> P:  Vendor=8087 ProdID=0a2b Rev= 0.01
-> C:* #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
-> I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=81(I) Atr=03(Int.) MxPS=  64 Ivl=1ms
-> E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+> T:  Bus=01 Lev=01 Prnt=01 Port=00 Cnt=01 Dev#=  2 Spd=12   MxCh= 0
+> D:  Ver= 2.00 Cls=ff(vend.) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
+> P:  Vendor=19ff ProdID=0239 Rev= 1.12
+> S:  Manufacturer=Broadcom Corp
+> S:  Product=BCM20702A0
+> C:* #Ifs= 4 Cfg#= 1 Atr=e0 MxPwr=  0mA
+> I:* If#= 0 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
 > E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-> I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+> E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+> I:* If#= 1 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
 > E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-> I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+> I:  If#= 1 Alt= 1 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
 > E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-> I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+> I:  If#= 1 Alt= 2 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
 > E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-> I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+> I:  If#= 1 Alt= 3 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
 > E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-> I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+> I:  If#= 1 Alt= 4 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
 > E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-> I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+> I:  If#= 1 Alt= 5 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
 > E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+> I:* If#= 2 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=ff Driver=(none)
+> E:  Ad=84(I) Atr=02(Bulk) MxPS=  32 Ivl=0ms
+> E:  Ad=04(O) Atr=02(Bulk) MxPS=  32 Ivl=0ms
+> I:* If#= 3 Alt= 0 #EPs= 0 Cls=fe(app. ) Sub=01 Prot=01 Driver=(none)
 > 
-> Based-on-patch-by: Tedd Ho-Jeong An <tedd.an@intel.com>.
+> Since this is an unsual USB vendor ID (0x19ff), these dongles are added
+> via USB_DEVICE macro and not USB_VENDOR_AND_INTERFACE_INFO as done for
+> mainstream Broadcom based dongles.
+> 
+> The latest known working firmware is BCM20702B0_002.001.014.0527.0557.hex
+> which needs to be converted using hex2hcd utility and then installed
+> as /lib/firmware/brcm/BCM20702A0-19ff-0239.hcd to make this device fully
+> operational.
+> 
+> Bluetooth: hci0: BCM: patching hci_ver=06 hci_rev=2000 lmp_ver=06 lmp_subver=410e
+> Bluetooth: hci0: BCM: firmware hci_ver=06 hci_rev=222d lmp_ver=06 lmp_subver=410e
+> 
+> With this firmware the device reports support for connectionless slave
+> broadcast (master and slave) feature used by 3D Glasses and TVs.
+> 
+>   < HCI Command: Read Local Extended Features (0x04|0x0004) plen 1
+>           Page: 2
+>   > HCI Event: Command Complete (0x0e) plen 14
+>         Read Local Extended Features (0x04|0x0004) ncmd 1
+>           Status: Success (0x00)
+>           Page: 2/2
+>           Features: 0x0f 0x00 0x00 0x00 0x00 0x00 0x00 0x00
+>             Connectionless Slave Broadcast - Master
+>             Connectionless Slave Broadcast - Slave
+>             Synchronization Train
+>             Synchronization Scan
+> 
+> However there are some flaws with this feature. The Set Event Mask Page 2
+> command is actually not supported and with that all connectionless slave
+> broadcast events are always enabled.
+> 
+>   < HCI Command: Set Event Mask Page 2 (0x03|0x0063) plen 8
+>           Mask: 0x00000000000f0000
+>             Synchronization Train Received
+>             Connectionless Slave Broadcast Receive
+>             Connectionless Slave Broadcast Timeout
+>             Truncated Page Complete
+>   > HCI Event: Command Complete (0x0e) plen 4
+>         Set Event Mask Page 2 (0x03|0x0063) ncmd 1
+>           Status: Unknown HCI Command (0x01)
+> 
+> In addition the Synchronization Train Received event is actually broken
+> on this controller. It mixes up the order of parameters. According to the
+> Bluetooth Core specification the fields are like this:
+> 
+>   struct hci_ev_sync_train_received {
+>           __u8     status;
+>           bdaddr_t bdaddr;
+>           __le32   offset;
+>           __u8     map[10];
+>           __u8     lt_addr;
+>           __le32   instant;
+>           __le16   interval;
+>           __u8     service_data;
+>   } __packed;
+> 
+> This controller however sends the service_data as 5th parameter instead
+> of having it as last parameter.
+> 
+>   struct hci_ev_sync_train_received {
+>           __u8     status;
+>           bdaddr_t bdaddr;
+>           __le32   offset;
+>           __u8     map[10];
+>           __u8     service_data;
+>           __u8     lt_addr;
+>           __le32   instant;
+>           __le16   interval;
+>   } __packed;
+> 
+> So anybody trying to use this hardware for utilizing connectionless slave
+> broadcast receivers (aka 3D Glasses), be warned about this shortcoming.
+> 
 > Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 > ---
->  drivers/bluetooth/btusb.c | 571 +++++++++++++++++++++++++++++++++++++++++++++-
->  1 file changed, 568 insertions(+), 3 deletions(-)
+>  drivers/bluetooth/btusb.c | 3 +++
+>  1 file changed, 3 insertions(+)
 
 Applied to bluetooth-next. Thanks.
 
