@@ -1,35 +1,49 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 8.1 \(1993\))
-Subject: Re: [PATCH v2] Bluetooth: Enforce zero-valued hash/rand192 for LE OOB
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1422356152-13920-1-git-send-email-johan.hedberg@gmail.com>
-Date: Tue, 27 Jan 2015 08:59:07 -0800
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <B5244DDB-AC76-479B-8C1B-870F259AC145@holtmann.org>
-References: <1422277671-26069-1-git-send-email-johan.hedberg@gmail.com> <1422356152-13920-1-git-send-email-johan.hedberg@gmail.com>
-To: Johan Hedberg <johan.hedberg@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <1422344977-26683-1-git-send-email-jsitnicki@gmail.com>
+References: <1422344977-26683-1-git-send-email-jsitnicki@gmail.com>
+Date: Tue, 27 Jan 2015 15:40:12 +0200
+Message-ID: <CABBYNZJxySFEuNJP_nU_0peC0B0=hGHQcQzWzFeBpNQug7JRMA@mail.gmail.com>
+Subject: Re: [PATCH 1/2] doc/device-api: Update possible errors for ConnectProfile
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Jakub Sitnicki <jsitnicki@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+Hi Jakub,
 
-> Until legacy SMP OOB pairing is implemented user space should be given a
-> clear error when trying to use it. This patch adds a corresponding check
-> to the Add Remote OOB Data handler function which returns "invalid
-> parameters" if non-zero Rand192 or Hash192 parameters were given for an
-> LE address.
-> 
-> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+On Tue, Jan 27, 2015 at 9:49 AM, Jakub Sitnicki <jsitnicki@gmail.com> wrote:
+> Make API documentation reflect the current implementation.
 > ---
-> v2: Use a define instead of a variable for the zero-valued key
-> 
-> net/bluetooth/mgmt.c | 15 +++++++++++++++
-> 1 file changed, 15 insertions(+)
+>  doc/device-api.txt | 8 +++++---
+>  1 file changed, 5 insertions(+), 3 deletions(-)
+>
+> diff --git a/doc/device-api.txt b/doc/device-api.txt
+> index 86d8af8..4f5e1d9 100644
+> --- a/doc/device-api.txt
+> +++ b/doc/device-api.txt
+> @@ -46,9 +46,11 @@ Methods              void Connect()
+>                         device. The UUID provided is the remote service
+>                         UUID for the profile.
+>
+> -                       Possible errors: org.bluez.Error.DoesNotExist
+> -                                        org.bluez.Error.AlreadyConnected
+> -                                        org.bluez.Error.ConnectFailed
+> +                       Possible errors: org.bluez.Error.Failed
+> +                                        org.bluez.Error.InProgress
+> +                                        org.bluez.Error.InvalidArguments
+> +                                        org.bluez.Error.NotAvailable
+> +                                        org.bluez.Error.NotReady
+>
+>                 void DisconnectProfile(string uuid)
+>
+> --
+> 1.9.3
 
-patch has been applied to bluetooth-next tree.
+Applied, thanks.
 
-Regards
 
-Marcel
-
+-- 
+Luiz Augusto von Dentz
