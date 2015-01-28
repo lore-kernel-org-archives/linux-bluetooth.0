@@ -1,104 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 8.1 \(1993\))
+Subject: Re: [PATCH 2/3] Bluetooth: Fix notifying discovery state when powering off
 From: Marcel Holtmann <marcel@holtmann.org>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Move smp_unregister() into hci_dev_do_close() function
-Date: Wed, 28 Jan 2015 14:10:28 -0800
-Message-Id: <1422483028-30261-1-git-send-email-marcel@holtmann.org>
+In-Reply-To: <1422450799-18548-2-git-send-email-johan.hedberg@gmail.com>
+Date: Wed, 28 Jan 2015 14:04:36 -0800
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <97C0B38C-BBA6-4045-9FF5-E671FD98D274@holtmann.org>
+References: <1422450799-18548-1-git-send-email-johan.hedberg@gmail.com> <1422450799-18548-2-git-send-email-johan.hedberg@gmail.com>
+To: Johan Hedberg <johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The smp_unregister() function needs to be called every time the
-controller is powered down. There are multiple entry points when
-this can happen. One is "hciconfig hci0 reset" which will throw
-a WARN_ON when LE support has been enabled.
+Hi Johan,
 
-[   78.564620] WARNING: CPU: 0 PID: 148 at net/bluetooth/smp.c:3075 smp_register+0xf1/0x170()
-[   78.564622] Modules linked in:
-[   78.564628] CPU: 0 PID: 148 Comm: kworker/u3:1 Not tainted 3.19.0-rc4-devel+ #404
-[   78.564629] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS
-[   78.564635] Workqueue: hci0 hci_rx_work
-[   78.564638]  ffffffff81b4a7a2 ffff88001cb2fb38 ffffffff8161d881 0000000080000000
-[   78.564642]  0000000000000000 ffff88001cb2fb78 ffffffff8103b870 696e55206e6f6f6d
-[   78.564645]  ffff88001d965000 0000000000000000 0000000000000000 ffff88001d965000
-[   78.564648] Call Trace:
-[   78.564655]  [<ffffffff8161d881>] dump_stack+0x4f/0x7b
-[   78.564662]  [<ffffffff8103b870>] warn_slowpath_common+0x80/0xc0
-[   78.564667]  [<ffffffff81544b00>] ? add_uuid+0x1f0/0x1f0
-[   78.564671]  [<ffffffff8103b955>] warn_slowpath_null+0x15/0x20
-[   78.564674]  [<ffffffff81562d81>] smp_register+0xf1/0x170
-[   78.564680]  [<ffffffff81081236>] ? lock_timer_base.isra.30+0x26/0x50
-[   78.564683]  [<ffffffff81544bf0>] powered_complete+0xf0/0x120
-[   78.564688]  [<ffffffff8152e622>] hci_req_cmd_complete+0x82/0x260
-[   78.564692]  [<ffffffff8153554f>] hci_cmd_complete_evt+0x6cf/0x2e20
-[   78.564697]  [<ffffffff81623e43>] ? _raw_spin_unlock_irqrestore+0x13/0x30
-[   78.564701]  [<ffffffff8106b0af>] ? __wake_up_sync_key+0x4f/0x60
-[   78.564705]  [<ffffffff8153a2ab>] hci_event_packet+0xbcb/0x2e70
-[   78.564709]  [<ffffffff814094d3>] ? skb_release_all+0x23/0x30
-[   78.564711]  [<ffffffff81409529>] ? kfree_skb+0x29/0x40
-[   78.564715]  [<ffffffff815296c8>] hci_rx_work+0x1c8/0x3f0
-[   78.564719]  [<ffffffff8105bd91>] ? get_parent_ip+0x11/0x50
-[   78.564722]  [<ffffffff8105be25>] ? preempt_count_add+0x55/0xb0
-[   78.564727]  [<ffffffff8104f65f>] process_one_work+0x12f/0x360
-[   78.564731]  [<ffffffff8104ff9b>] worker_thread+0x6b/0x4b0
-[   78.564735]  [<ffffffff8104ff30>] ? cancel_delayed_work_sync+0x10/0x10
-[   78.564738]  [<ffffffff810542fa>] kthread+0xea/0x100
-[   78.564742]  [<ffffffff81620000>] ? __schedule+0x3e0/0x980
-[   78.564745]  [<ffffffff81054210>] ? kthread_create_on_node+0x180/0x180
-[   78.564749]  [<ffffffff816246ec>] ret_from_fork+0x7c/0xb0
-[   78.564752]  [<ffffffff81054210>] ? kthread_create_on_node+0x180/0x180
-[   78.564755] ---[ end trace 8b0d943af76d3736 ]---
+> The discovery state should be set to stopped when the HCI device is
+> powered off. This patch adds the appropriate call to the
+> hci_discovery_set_state() function from hci_dev_do_close() which is
+> responsible for the power-off procedure.
+> 
+> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+> ---
+> net/bluetooth/hci_core.c | 2 ++
+> 1 file changed, 2 insertions(+)
 
-This warning is not critical and has only been placed in the code to
-actually catch this exact situation. To avoid triggering it move
-the smp_unregister() into hci_dev_do_close() which will now also
-take care of remove the SMP channel. It is safe to call this function
-since it only remove the channel if it has been previously registered.
+patch has been applied to bluetooth-next tree.
 
-Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
----
- net/bluetooth/hci_core.c | 8 ++------
- 1 file changed, 2 insertions(+), 6 deletions(-)
+Regards
 
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 79693a9ef4eb..5d4ac3fbbc08 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -1640,6 +1640,8 @@ static int hci_dev_do_close(struct hci_dev *hdev)
- 	hci_conn_hash_flush(hdev);
- 	hci_dev_unlock(hdev);
- 
-+	smp_unregister(hdev);
-+
- 	hci_notify(hdev, HCI_DEV_DOWN);
- 
- 	if (hdev->flush)
-@@ -2147,8 +2149,6 @@ static void hci_power_off(struct work_struct *work)
- 	BT_DBG("%s", hdev->name);
- 
- 	hci_dev_do_close(hdev);
--
--	smp_unregister(hdev);
- }
- 
- static void hci_error_reset(struct work_struct *work)
-@@ -2166,8 +2166,6 @@ static void hci_error_reset(struct work_struct *work)
- 	if (hci_dev_do_close(hdev))
- 		return;
- 
--	smp_unregister(hdev);
--
- 	hci_dev_do_open(hdev);
- }
- 
-@@ -3137,8 +3135,6 @@ void hci_unregister_dev(struct hci_dev *hdev)
- 		rfkill_destroy(hdev->rfkill);
- 	}
- 
--	smp_unregister(hdev);
--
- 	device_del(&hdev->dev);
- 
- 	debugfs_remove_recursive(hdev->debugfs);
--- 
-2.1.0
+Marcel
 
