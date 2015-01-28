@@ -1,60 +1,49 @@
 Return-Path: <cyrus@holtmann.org>
-From: Adam Lee <adam.lee@canonical.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Marcel Holtmann <marcel@holtmann.org>,
-	Gustavo Padovan <gustavo@padovan.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>
-Subject: [PATCH] Bluetooth: ath3k: workaround the compatibility issue with xHCI controller
-Date: Wed, 28 Jan 2015 14:52:32 -0500
-Message-Id: <1422474752-26871-1-git-send-email-adam.lee@canonical.com>
+MIME-Version: 1.0
+In-Reply-To: <CAHrH25Qfr9bRYad0scysHMcUD+SY651y4qZLk4EAWk-ym+970Q@mail.gmail.com>
+References: <CAHrH25Qfr9bRYad0scysHMcUD+SY651y4qZLk4EAWk-ym+970Q@mail.gmail.com>
+Date: Wed, 28 Jan 2015 11:21:32 +0200
+Message-ID: <CABBYNZLb4jHBuKLqyEaMTMBNzCBzFea=bRLgnkafWWyA8LqSNQ@mail.gmail.com>
+Subject: Re: GATT D-Bus API handling notifications
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Arman Uguray <armansito@chromium.org>
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>, Marcel Holtmann <marcel@holtmann.org>
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-BugLink: https://bugs.launchpad.net/bugs/1400215
+Hi Arman,
 
-ath3k devices fail to load firmwares on xHCI buses, but work well on
-EHCI, this might be a compatibility issue between xHCI and ath3k chips.
-As my testing result, those chips will work on xHCI buses again with
-this patch.
+On Wed, Jan 28, 2015 at 4:11 AM, Arman Uguray <armansito@chromium.org> wrote:
+> Hi Luiz,
+>
+> Earlier I chatted with Marcel on IRC about how we can resolve the
+> notification subscription issue that you were concerned about
+> (basically a server connecting and immediately sending a
+> notification). I think our consensus was that this mainly applies when
+> the two devices are bonded. In that case, we could make it so that the
+> exported GattService1 hierarchy stays around over disconnections if
+> there is a bond between the two devices. We would keep
+> StartNotify/StopNotify and keep around the data on external clients
+> that subscribed to notifications. Upon reconnection we would then
+> immediately register for notifications based on all the external
+> clients that subscribed.
+>
+> Would this address the case? I think this case really applies when the
+> remote CCC has been configured so the peripheral remembers the
+> configuration between disconnections, which should only happen when
+> the devices are bonded but I'm not sure.
+>
+> Let me know if that makes sense! Thanks!
 
-This workaround is from Qualcomm, they also did some workarounds in
-Windows driver.
 
-Signed-off-by: Adam Lee <adam.lee@canonical.com>
----
- drivers/bluetooth/ath3k.c | 7 +++++++
- 1 file changed, 7 insertions(+)
+Yep, I guess it makes sense to keep the whole attribute tree around
+for devices bonded as you said we can just resync the CCC upon
+connection, note that there are cases where the applications may
+disconnect or call StopNotify this would mean that we would write to
+CCC as soon as it reconnect thus it can still cause some traffic, at
+least at Bluetooth level, but that seems the cost of having the
+ability to dynamically trigger notifications.
 
-diff --git a/drivers/bluetooth/ath3k.c b/drivers/bluetooth/ath3k.c
-index 1ee27ac..98ae0b1 100644
---- a/drivers/bluetooth/ath3k.c
-+++ b/drivers/bluetooth/ath3k.c
-@@ -174,6 +174,7 @@ static const struct usb_device_id ath3k_blist_tbl[] = {
- #define USB_REQ_DFU_DNLOAD	1
- #define BULK_SIZE		4096
- #define FW_HDR_SIZE		20
-+#define TIMEGAP_US		100
- 
- static int ath3k_load_firmware(struct usb_device *udev,
- 				const struct firmware *firmware)
-@@ -205,6 +206,9 @@ static int ath3k_load_firmware(struct usb_device *udev,
- 	pipe = usb_sndbulkpipe(udev, 0x02);
- 
- 	while (count) {
-+		/* workaround the compatibility issue with xHCI controller*/
-+		usleep_range(TIMEGAP_US - 50, TIMEGAP_US);
-+
- 		size = min_t(uint, count, BULK_SIZE);
- 		memcpy(send_buf, firmware->data + sent, size);
- 
-@@ -302,6 +306,9 @@ static int ath3k_load_fwfile(struct usb_device *udev,
- 	pipe = usb_sndbulkpipe(udev, 0x02);
- 
- 	while (count) {
-+		/* workaround the compatibility issue with xHCI controller*/
-+		usleep_range(TIMEGAP_US - 50, TIMEGAP_US);
-+
- 		size = min_t(uint, count, BULK_SIZE);
- 		memcpy(send_buf, firmware->data + sent, size);
- 
+
 -- 
-2.1.4
+Luiz Augusto von Dentz
