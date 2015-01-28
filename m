@@ -1,33 +1,52 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-Sender: armansito@google.com
-Date: Tue, 27 Jan 2015 18:11:32 -0800
-Message-ID: <CAHrH25Qfr9bRYad0scysHMcUD+SY651y4qZLk4EAWk-ym+970Q@mail.gmail.com>
-Subject: GATT D-Bus API handling notifications
-From: Arman Uguray <armansito@chromium.org>
-To: BlueZ development <linux-bluetooth@vger.kernel.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>, Marcel Holtmann <marcel@holtmann.org>
-Content-Type: text/plain; charset=UTF-8
+From: Marcel Holtmann <marcel@holtmann.org>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH 3/3] Bluetooth: Check for P-256 OOB values in Secure Connections Only mode
+Date: Tue, 27 Jan 2015 16:04:33 -0800
+Message-Id: <1422403473-3542-3-git-send-email-marcel@holtmann.org>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+If Secure Connections Only mode has been enabled, the it is important
+to check that OOB data for P-256 values is provided. In case it is not,
+then tell the remote side that no OOB data is present.
 
-Earlier I chatted with Marcel on IRC about how we can resolve the
-notification subscription issue that you were concerned about
-(basically a server connecting and immediately sending a
-notification). I think our consensus was that this mainly applies when
-the two devices are bonded. In that case, we could make it so that the
-exported GattService1 hierarchy stays around over disconnections if
-there is a bond between the two devices. We would keep
-StartNotify/StopNotify and keep around the data on external clients
-that subscribed to notifications. Upon reconnection we would then
-immediately register for notifications based on all the external
-clients that subscribed.
+Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+---
+ net/bluetooth/hci_event.c | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
 
-Would this address the case? I think this case really applies when the
-remote CCC has been configured so the peripheral remembers the
-configuration between disconnections, which should only happen when
-the devices are bonded but I'm not sure.
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 8ed8516b18c7..00c160634e7b 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -36,6 +36,9 @@
+ #include "amp.h"
+ #include "smp.h"
+ 
++#define ZERO_KEY "\x00\x00\x00\x00\x00\x00\x00\x00" \
++		 "\x00\x00\x00\x00\x00\x00\x00\x00"
++
+ /* Handle HCI Event packets */
+ 
+ static void hci_cc_inquiry_cancel(struct hci_dev *hdev, struct sk_buff *skb)
+@@ -3864,6 +3867,16 @@ static u8 bredr_oob_data_present(struct hci_conn *conn)
+ 	if (!data)
+ 		return 0x00;
+ 
++	/* When Secure Connections Only mode is enabled, then the P-256
++	 * values are required. If they are not available, then do not
++	 * declare that OOB data is present.
++	 */
++	if (bredr_sc_enabled(hdev) &&
++	    test_bit(HCI_SC_ONLY, &hdev->dev_flags) &&
++	    (!memcmp(data->rand256, ZERO_KEY, 16) ||
++	     !memcmp(data->hash256, ZERO_KEY, 16)))
++		return 0x00;
++
+ 	if (conn->out || test_bit(HCI_CONN_REMOTE_OOB, &conn->flags))
+ 		return 0x01;
+ 
+-- 
+2.1.0
 
-Let me know if that makes sense! Thanks!
-Arman
