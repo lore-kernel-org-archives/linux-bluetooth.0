@@ -1,83 +1,271 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH 2/2] android/handsfree: Fix not selecting correct SDP record
-Date: Thu, 29 Jan 2015 00:31:00 +0100
-Message-Id: <1422487860-13212-2-git-send-email-szymon.janc@tieto.com>
-In-Reply-To: <1422487860-13212-1-git-send-email-szymon.janc@tieto.com>
-References: <1422487860-13212-1-git-send-email-szymon.janc@tieto.com>
+MIME-Version: 1.0
+In-Reply-To: <001f01d03b05$51536700$f3fa3500$@samsung.com>
+References: <1422348800-5668-1-git-send-email-gowtham.ab@samsung.com>
+	<1422348800-5668-2-git-send-email-gowtham.ab@samsung.com>
+	<CABBYNZK2WoRzxzkgQRsgUe0pjYzY0M1Ee0Ncx+n+J+iQmEpCkg@mail.gmail.com>
+	<001f01d03b05$51536700$f3fa3500$@samsung.com>
+Date: Wed, 28 Jan 2015 16:20:36 +0200
+Message-ID: <CABBYNZJT+qTgcpz0W3Z=rVuE6zHbr=MhKhO1SFb_UO9VTDGZqQ@mail.gmail.com>
+Subject: Re: [PATCH v1 1/3] shared/gatt-helpers: Fix usage of freed memory
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Gowtham Anandha Babu <gowtham.ab@samsung.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	Bharat Panda <bharat.panda@samsung.com>, cpgs@samsung.com
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-If remote device has both HFP AG and HFP HF records then we were
-always selecting first record. This could result in not being able
-to connect to HF if AG records happen to be first one.
+Hi Gowtham,
 
-Issue found on UPF 50.
----
- android/handsfree.c | 28 ++++++++++------------------
- 1 file changed, 10 insertions(+), 18 deletions(-)
+On Wed, Jan 28, 2015 at 4:18 PM, Gowtham Anandha Babu
+<gowtham.ab@samsung.com> wrote:
+> Hi Luiz,
+>
+>> -----Original Message-----
+>> From: Luiz Augusto von Dentz [mailto:luiz.dentz@gmail.com]
+>> Sent: Wednesday, January 28, 2015 6:37 PM
+>> To: Gowtham Anandha Babu
+>> Cc: linux-bluetooth@vger.kernel.org; Bharat Panda; cpgs@samsung.com
+>> Subject: Re: [PATCH v1 1/3] shared/gatt-helpers: Fix usage of freed memory
+>>
+>> Hi Gowtham,
+>>
+>> On Tue, Jan 27, 2015 at 10:53 AM, Gowtham Anandha Babu
+>> <gowtham.ab@samsung.com> wrote:
+>> > src/shared/gatt-helpers.c:709:6: warning: Use of memory after it is freed
+>> >         if (op->callback)
+>> >             ^~~~~~~~~~~~
+>> > src/shared/gatt-helpers.c:780:6: warning: Use of memory after it is freed
+>> >         if (op->callback)
+>> >             ^~~~~~~~~~~~
+>> > src/shared/gatt-helpers.c:998:6: warning: Use of memory after it is freed
+>> >         if (op->callback)
+>> >             ^~~~~~~~~~~~
+>> > src/shared/gatt-helpers.c:1020:32: warning: Use of memory after it is freed
+>> >                 op->callback(false, 0, NULL, data->op->user_data);
+>> >                                              ^~~~~~~~
+>> > src/shared/gatt-helpers.c:1112:6: warning: Use of memory after it is freed
+>> >         if (op->callback)
+>> >             ^~~~~~~~~~~~
+>> > src/shared/gatt-helpers.c:1226:6: warning: Use of memory after it is freed
+>> >         if (op->callback)
+>> >             ^~~~~~~~~~~~
+>> > src/shared/gatt-helpers.c:1332:6: warning: Use of memory after it is freed
+>> >         if (op->callback)
+>> >             ^~~~~~~~~~~~
+>> > src/shared/gatt-helpers.c:1452:6: warning: Use of memory after it is freed
+>> >         if (op->callback)
+>> >             ^~~~~~~~~~~~
+>> > ---
+>> >  src/shared/gatt-helpers.c | 25 ++++++++++++++++---------
+>> >  1 file changed, 16 insertions(+), 9 deletions(-)
+>> >
+>> > diff --git a/src/shared/gatt-helpers.c b/src/shared/gatt-helpers.c
+>> > index 3864ed0..c9b24cc 100644
+>> > --- a/src/shared/gatt-helpers.c
+>> > +++ b/src/shared/gatt-helpers.c
+>> > @@ -686,7 +686,6 @@ static void read_by_grp_type_cb(uint8_t opcode,
+>> const void *pdu,
+>> >                                                         discovery_op_unref))
+>> >                         return;
+>> >
+>> > -               discovery_op_unref(op);
+>> >                 success = false;
+>> >                 goto done;
+>> >         }
+>> > @@ -708,6 +707,8 @@ success:
+>> >  done:
+>> >         if (op->callback)
+>> >                 op->callback(success, att_ecode, final_result,
+>> > op->user_data);
+>> > +
+>> > +       discovery_op_unref(op);
+>> >  }
+>> >
+>> >  static void find_by_type_val_cb(uint8_t opcode, const void *pdu, @@
+>> > -766,7 +767,6 @@ static void find_by_type_val_cb(uint8_t opcode, const
+>> void *pdu,
+>> >                                                         discovery_op_unref))
+>> >                         return;
+>> >
+>> > -               discovery_op_unref(op);
+>> >                 success = false;
+>> >                 goto done;
+>> >         }
+>> > @@ -779,6 +779,8 @@ success:
+>> >  done:
+>> >         if (op->callback)
+>> >                 op->callback(success, att_ecode, final_result,
+>> > op->user_data);
+>> > +
+>> > +       discovery_op_unref(op);
+>> >  }
+>> >
+>> >  static bool discover_services(struct bt_att *att, bt_uuid_t *uuid, @@
+>> > -977,7 +979,6 @@ static void read_included_cb(uint8_t opcode, const void
+>> *pdu,
+>> >                                 discovery_op_ref(op), discovery_op_unref))
+>> >                         return;
+>> >
+>> > -               discovery_op_unref(op);
+>> >                 success = false;
+>> >                 goto done;
+>> >         }
+>> > @@ -997,6 +998,8 @@ static void read_included_cb(uint8_t opcode, const
+>> > void *pdu,
+>> >  done:
+>> >         if (op->callback)
+>> >                 op->callback(success, att_ecode, final_result,
+>> > op->user_data);
+>> > +
+>> > +       discovery_op_unref(op);
+>> >  }
+>> >
+>> >  static void read_included(struct read_incl_data *data) @@ -1014,10
+>> > +1017,10 @@ static void read_included(struct read_incl_data *data)
+>> >                                                         read_included_unref))
+>> >                 return;
+>> >
+>> > -       read_included_unref(data);
+>> > -
+>> >         if (op->callback)
+>> >                 op->callback(false, 0, NULL, data->op->user_data);
+>> > +
+>> > +       read_included_unref(data);
+>> >  }
+>> >
+>> >  static void discover_included_cb(uint8_t opcode, const void *pdu, @@
+>> > -1099,7 +1102,6 @@ static void discover_included_cb(uint8_t opcode,
+>> const void *pdu,
+>> >                                                         discovery_op_unref))
+>> >                         return;
+>> >
+>> > -               discovery_op_unref(op);
+>> >                 success = false;
+>> >                 goto failed;
+>> >         }
+>> > @@ -1111,6 +1113,8 @@ done:
+>> >  failed:
+>> >         if (op->callback)
+>> >                 op->callback(success, att_ecode, final_result,
+>> > op->user_data);
+>> > +
+>> > +       discovery_op_unref(op);
+>> >  }
+>> >
+>> >  bool bt_gatt_discover_included_services(struct bt_att *att, @@
+>> > -1213,7 +1217,6 @@ static void discover_chrcs_cb(uint8_t opcode, const
+>> void *pdu,
+>> >                                                 discovery_op_unref))
+>> >                         return;
+>> >
+>> > -               discovery_op_unref(op);
+>> >                 success = false;
+>> >                 goto done;
+>> >         }
+>> > @@ -1226,6 +1229,8 @@ done:
+>> >         if (op->callback)
+>> >                 op->callback(success, att_ecode, final_result,
+>> >
+>> > op->user_data);
+>> > +
+>> > +       discovery_op_unref(op);
+>> >  }
+>> >
+>> >  bool bt_gatt_discover_characteristics(struct bt_att *att, @@ -1321,7
+>> > +1326,6 @@ static void read_by_type_cb(uint8_t opcode, const void *pdu,
+>> >                                                 discovery_op_unref))
+>> >                         return;
+>> >
+>> > -               discovery_op_unref(op);
+>> >                 success = false;
+>> >                 goto done;
+>> >         }
+>> > @@ -1332,6 +1336,8 @@ done:
+>> >         if (op->callback)
+>> >                 op->callback(success, att_ecode, success ? op->result_head :
+>> >                                                         NULL,
+>> > op->user_data);
+>> > +
+>> > +       discovery_op_unref(op);
+>> >  }
+>> >
+>> >  bool bt_gatt_read_by_type(struct bt_att *att, uint16_t start,
+>> > uint16_t end, @@ -1439,7 +1445,6 @@ static void
+>> discover_descs_cb(uint8_t opcode, const void *pdu,
+>> >                                                 discovery_op_unref))
+>> >                         return;
+>> >
+>> > -               discovery_op_unref(op);
+>> >                 success = false;
+>> >                 goto done;
+>> >         }
+>> > @@ -1451,6 +1456,8 @@ success:
+>> >  done:
+>> >         if (op->callback)
+>> >                 op->callback(success, att_ecode, final_result,
+>> > op->user_data);
+>> > +
+>> > +       discovery_op_unref(op);
+>> >  }
+>> >
+>> >  bool bt_gatt_discover_descriptors(struct bt_att *att,
+>> > --
+>> > 1.9.1
+>>
+>> These were actually false positives of your static analyzer, in all occurrences
+>> there are actually extra references preventing the memory to be freed
+>> before use, next time please take the time to test this or even better create
+>> a unit test to reproduce the problem. For this specifically I had done
+>> something to track the actual pending operation but for gatt-client changes I
+>> would have had to change some APIs to do it properly and because of that I
+>> just revert it, perhaps it is worth doing something similar there if it continues
+>> to show as a problem in the static analyzers.
+>>
+>
+> Sorry for the false positives. I will check once again and test it before sending.
+> Meanwhile I am using clang static analyzer for testing. I did git pull and ran the tool.
+> It gave me the following warnings:
+>
+> src/shared/gatt-helpers.c:851:9: warning: Use of memory after it is freed
+>         return op->id ? true : false;
+>                ^~~~~~
+> 1 warning generated.
 
-diff --git a/android/handsfree.c b/android/handsfree.c
-index 98d40b3..c03fa6a 100644
---- a/android/handsfree.c
-+++ b/android/handsfree.c
-@@ -1621,10 +1621,11 @@ static int sdp_search_hsp(struct hf_device *dev)
- static void sdp_hfp_search_cb(sdp_list_t *recs, int err, gpointer data)
- {
- 	struct hf_device *dev = data;
--	sdp_list_t *protos, *classes;
-+	sdp_list_t *protos;
-+	sdp_record_t *rec;
- 	GError *gerr = NULL;
- 	GIOChannel *io;
--	uuid_t uuid;
-+	uuid_t class;
- 	int channel;
- 
- 	DBG("");
-@@ -1646,26 +1647,15 @@ static void sdp_hfp_search_cb(sdp_list_t *recs, int err, gpointer data)
- 		return;
- 	}
- 
--	if (sdp_get_service_classes(recs->data, &classes) < 0 || !classes) {
--		error("handsfree: unable to get service classes from record");
-+	sdp_uuid16_create(&class, HANDSFREE_SVCLASS_ID);
-+	rec = sdp_find_record_with_class(recs, class);
-+	if (!rec) {
-+		error("handsfree: invalid service record or not HFP");
- 		goto fail;
- 	}
- 
--	if (sdp_get_access_protos(recs->data, &protos) < 0) {
-+	if (sdp_get_access_protos(rec, &protos) < 0) {
- 		error("handsfree: unable to get access protocols from record");
--		sdp_list_free(classes, free);
--		goto fail;
--	}
--
--	/* TODO read remote version? */
--
--	memcpy(&uuid, classes->data, sizeof(uuid));
--	sdp_list_free(classes, free);
--
--	if (!sdp_uuid128_to_uuid(&uuid) || uuid.type != SDP_UUID16 ||
--			uuid.value.uuid16 != HANDSFREE_SVCLASS_ID) {
--		sdp_list_free(protos, NULL);
--		error("handsfree: invalid service record or not HFP");
- 		goto fail;
- 	}
- 
-@@ -1677,6 +1667,8 @@ static void sdp_hfp_search_cb(sdp_list_t *recs, int err, gpointer data)
- 		goto fail;
- 	}
- 
-+	/* TODO read remote version? */
-+
- 	io = bt_io_connect(connect_cb, dev, NULL, &gerr,
- 				BT_IO_OPT_SOURCE_BDADDR, &adapter_addr,
- 				BT_IO_OPT_DEST_BDADDR, &dev->bdaddr,
+Yep, this one seems valid, I will fix it asap.
+
+> src/shared/gatt-client.c:534:14: warning: Use of memory after it is freed
+>         op->success = false;
+>         ~~~~~~~~~~~ ^
+> src/shared/gatt-client.c:689:14: warning: Use of memory after it is freed
+>         op->success = success;
+>         ~~~~~~~~~~~ ^
+> src/shared/gatt-client.c:790:14: warning: Use of memory after it is freed
+>         op->success = success;
+>         ~~~~~~~~~~~ ^
+> src/shared/gatt-client.c:882:14: warning: Use of memory after it is freed
+>         op->success = success;
+>         ~~~~~~~~~~~ ^
+> src/shared/gatt-client.c:950:14: warning: Use of memory after it is freed
+>         op->success = success;
+>         ~~~~~~~~~~~ ^
+> src/shared/gatt-client.c:2328:2: warning: Use of memory after it is freed
+>         complete_write_long_op(req, success, 0, false);
+>         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+> src/shared/gatt-client.c:2350:2: warning: Use of memory after it is freed
+>         request_unref(req);
+>         ^~~~~~~~~~~~~~~~~~
+> 7 warnings generated.
+>
+> I think the gatt-helpers:  warning seems valid for me. But in gatt-client it is still
+> giving the warnings. Is it still false positive?
+
+These are false positives, it cause double free if we fix them in the
+way you did before but anyway I would have this code to cleanup in a
+single function and properly track pending requests back to ATT but in
+order to do that we need to change the APIs.
+
+
 -- 
-1.9.3
-
+Luiz Augusto von Dentz
