@@ -1,34 +1,61 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 8.1 \(1993\))
-Subject: Re: [PATCH 1/3] Bluetooth: Fix notifying discovery state upon reset
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1422450799-18548-1-git-send-email-johan.hedberg@gmail.com>
-Date: Wed, 28 Jan 2015 13:55:00 -0800
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <DD71F632-F381-48AF-B452-6F5DE5BC257E@holtmann.org>
-References: <1422450799-18548-1-git-send-email-johan.hedberg@gmail.com>
-To: Johan Hedberg <johan.hedberg@gmail.com>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Szymon Janc <szymon.janc@tieto.com>
+Subject: [PATCH 1/2] lib/sdp: Add sdp_find_record_with_class function
+Date: Thu, 29 Jan 2015 00:30:59 +0100
+Message-Id: <1422487860-13212-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+This function returns first records with specified service class.
+It may happen that remote device provides more records with same
+profile UUID. Device supporting HFP AG and HFP HS roles is example.
+In such case we need to get proper records based on service class.
+---
+ lib/sdp.c     | 12 ++++++++++++
+ lib/sdp_lib.h |  5 +++++
+ 2 files changed, 17 insertions(+)
 
-> When HCI_Reset is issued the discovery state is assumed to be stopped.
-> The hci_cc_reset() handler was trying to set the state but it was doing
-> it without using the hci_discovery_set_state() function. Because of this
-> e.g. the mgmt Discovering event could go without being sent. This patch
-> fixes the code to use the hci_discovery_set_state() function instead of
-> just blindly setting the state value.
-> 
-> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
-> ---
-> net/bluetooth/hci_event.c | 3 ++-
-> 1 file changed, 2 insertions(+), 1 deletion(-)
-
-patch has been applied to bluetooth-next tree.
-
-Regards
-
-Marcel
+diff --git a/lib/sdp.c b/lib/sdp.c
+index 2107e28..e77826d 100644
+--- a/lib/sdp.c
++++ b/lib/sdp.c
+@@ -1847,6 +1847,18 @@ int sdp_get_proto_port(const sdp_list_t *list, int proto)
+ 	return 0;
+ }
+ 
++sdp_record_t *sdp_find_record_with_class(const sdp_list_t *recs, uuid_t uuid)
++{
++	for (; recs; recs = recs->next) {
++		sdp_record_t *rec = recs->data;
++
++		if (!sdp_uuid_cmp(&rec->svclass, &uuid))
++			return rec;
++	}
++
++	return NULL;
++}
++
+ sdp_data_t *sdp_get_proto_desc(sdp_list_t *list, int proto)
+ {
+ 	for (; list; list = list->next) {
+diff --git a/lib/sdp_lib.h b/lib/sdp_lib.h
+index 3ded393..9828efb 100644
+--- a/lib/sdp_lib.h
++++ b/lib/sdp_lib.h
+@@ -244,6 +244,11 @@ int sdp_set_add_access_protos(sdp_record_t *rec, const sdp_list_t *proto);
+ int sdp_get_proto_port(const sdp_list_t *list, int proto);
+ 
+ /*
++ * Find record with specified service class
++ */
++sdp_record_t *sdp_find_record_with_class(const sdp_list_t *list, uuid_t uuid);
++
++/*
+  * Get protocol descriptor.
+  */
+ sdp_data_t *sdp_get_proto_desc(sdp_list_t *list, int proto);
+-- 
+1.9.3
 
