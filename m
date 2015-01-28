@@ -1,87 +1,87 @@
 Return-Path: <cyrus@holtmann.org>
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 3/3] Bluetooth: Perform a power cycle when receiving a HW Error
-Date: Wed, 28 Jan 2015 15:13:19 +0200
-Message-Id: <1422450799-18548-3-git-send-email-johan.hedberg@gmail.com>
-In-Reply-To: <1422450799-18548-1-git-send-email-johan.hedberg@gmail.com>
-References: <1422450799-18548-1-git-send-email-johan.hedberg@gmail.com>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 8.1 \(1993\))
+Subject: Re: [PATCH] Bluetooth: ath3k: workaround the compatibility issue with xHCI controller
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20150128201636.GA2659@adam-laptop>
+Date: Wed, 28 Jan 2015 12:22:51 -0800
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>,
+	"Gustavo F. Padovan" <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>
+Message-Id: <A2CF42D4-BB10-404D-B8C4-4E20410AD971@holtmann.org>
+References: <1422474752-26871-1-git-send-email-adam.lee@canonical.com> <0731CFAA-B45A-4DC2-8579-1A4E5E7707F3@holtmann.org> <20150128201636.GA2659@adam-laptop>
+To: Adam Lee <adam.lee@canonical.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@intel.com>
+Hi Adam,
 
-When we receive a Hardware Error HCI event the controller should be
-assumed to be non-functional until a full reset procedure has been
-performed with it. This patch adds a new hci_reset() helper function
-that can be triggered through a workqueue, and schedules the function to
-be called whenever a Hardware Error event occurs.
+>>> --- a/drivers/bluetooth/ath3k.c
+>>> +++ b/drivers/bluetooth/ath3k.c
+>>> @@ -174,6 +174,7 @@ static const struct usb_device_id ath3k_blist_tbl[] = {
+>>> #define USB_REQ_DFU_DNLOAD	1
+>>> #define BULK_SIZE		4096
+>>> #define FW_HDR_SIZE		20
+>>> +#define TIMEGAP_US		100
+>>> 
+>>> static int ath3k_load_firmware(struct usb_device *udev,
+>>> 				const struct firmware *firmware)
+>>> @@ -205,6 +206,9 @@ static int ath3k_load_firmware(struct usb_device *udev,
+>>> 	pipe = usb_sndbulkpipe(udev, 0x02);
+>>> 
+>>> 	while (count) {
+>>> +		/* workaround the compatibility issue with xHCI controller*/
+>>> +		usleep_range(TIMEGAP_US - 50, TIMEGAP_US);
+>>> +
+>> 
+>> why are you using a usleep_range() here. Why not just sleep for 100us.
+>> 
+>> Regards
+>> 
+>> Marcel
+> 
+> Yes, I intended to do that, but timer is not that simple, check this:
+> 
+> https://www.kernel.org/doc/Documentation/timers/timers-howto.txt
+> 
+> SLEEPING FOR ~USECS OR SMALL MSECS ( 10us - 20ms):
+> 	* Use usleep_range
+> 
+> 	- Why not msleep for (1ms - 20ms)?
+> 		Explained originally here:
+> 			http://lkml.org/lkml/2007/8/3/250
+> 		msleep(1~20) may not do what the caller intends, and
+> 		will often sleep longer (~20 ms actual sleep for any
+> 		value given in the 1~20ms range). In many cases this
+> 		is not the desired behavior.
+> 
+> 	- Why is there no "usleep" / What is a good range?
+> 		Since usleep_range is built on top of hrtimers, the
+> 		wakeup will be very precise (ish), thus a simple
+> 		usleep function would likely introduce a large number
+> 		of undesired interrupts.
+> 
+> 		With the introduction of a range, the scheduler is
+> 		free to coalesce your wakeup with any other wakeup
+> 		that may have happened for other reasons, or at the
+> 		worst case, fire an interrupt for your upper bound.
+> 
+> 		The larger a range you supply, the greater a chance
+> 		that you will not trigger an interrupt; this should
+> 		be balanced with what is an acceptable upper bound on
+> 		delay / performance for your specific code path. Exact
+> 		tolerances here are very situation specific, thus it
+> 		is left to the caller to determine a reasonable range.
 
-Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
----
- include/net/bluetooth/hci_core.h |  1 +
- net/bluetooth/hci_core.c         | 15 +++++++++++++++
- net/bluetooth/hci_event.c        |  2 ++
- 3 files changed, 18 insertions(+)
+I am still curious why you specified it like this. It would expect something like this:
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 0f5e59f1e3cb..3e3380c1e2d9 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -293,6 +293,7 @@ struct hci_dev {
- 
- 	struct work_struct	power_on;
- 	struct delayed_work	power_off;
-+	struct work_struct	reset;
- 
- 	__u16			discov_timeout;
- 	struct delayed_work	discov_off;
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 46aa702c189d..a6afce413842 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -2140,6 +2140,20 @@ static void hci_power_off(struct work_struct *work)
- 	smp_unregister(hdev);
- }
- 
-+static void hci_reset(struct work_struct *work)
-+{
-+	struct hci_dev *hdev = container_of(work, struct hci_dev, reset);
-+
-+	BT_DBG("%s", hdev->name);
-+
-+	if (hci_dev_do_close(hdev))
-+		return;
-+
-+	smp_unregister(hdev);
-+
-+	hci_dev_do_open(hdev);
-+}
-+
- static void hci_discov_off(struct work_struct *work)
- {
- 	struct hci_dev *hdev;
-@@ -2932,6 +2946,7 @@ struct hci_dev *hci_alloc_dev(void)
- 	INIT_WORK(&hdev->cmd_work, hci_cmd_work);
- 	INIT_WORK(&hdev->tx_work, hci_tx_work);
- 	INIT_WORK(&hdev->power_on, hci_power_on);
-+	INIT_WORK(&hdev->reset, hci_reset);
- 
- 	INIT_DELAYED_WORK(&hdev->power_off, hci_power_off);
- 	INIT_DELAYED_WORK(&hdev->discov_off, hci_discov_off);
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 4175470ff48e..0fd6f4d97b4a 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -3101,6 +3101,8 @@ static void hci_hardware_error_evt(struct hci_dev *hdev, struct sk_buff *skb)
- 	struct hci_ev_hardware_error *ev = (void *) skb->data;
- 
- 	BT_ERR("%s hardware error 0x%2.2x", hdev->name, ev->code);
-+
-+	queue_work(hdev->req_workqueue, &hdev->reset);
- }
- 
- static void hci_role_change_evt(struct hci_dev *hdev, struct sk_buff *skb)
--- 
-2.1.0
+	usleep_range(TIMEGAP_MIN, TIMEGAP_MAX);
+
+Btw. _US seems a bit to unclear if that is suppose to represent usec or something chip internal called US. If you want to keep it in there, then I prefer _USEC so I do not have to second guess every time I look at the code.
+
+Otherwise this is fine. Just use two constants and not some magic range calculation.
+
+Regards
+
+Marcel
 
