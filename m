@@ -1,62 +1,85 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 2/3] Bluetooth: Use helper function to determine BR/EDR OOB data present
-Date: Tue, 27 Jan 2015 16:04:32 -0800
-Message-Id: <1422403473-3542-2-git-send-email-marcel@holtmann.org>
+Subject: [PATCH 1/3] Bluetooth: Clear P-192 values for OOB when in Secure Connections Only mode
+Date: Tue, 27 Jan 2015 16:04:31 -0800
+Message-Id: <1422403473-3542-1-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-When replying to the IO capability request for Secure Simple Pairing and
-Secure Connections, the OOB data present fields needs to set. Instead of
-making the calculation inline, split this into a separate helper
-function.
+When Secure Connections Only mode has been enabled and remote OOB data
+is requested, then only provide P-256 hash and randomizer vaulues. The
+fields for P-192 hash and randomizer should be set to zero.
 
 Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- net/bluetooth/hci_event.c | 22 ++++++++++++++++------
- 1 file changed, 16 insertions(+), 6 deletions(-)
+ net/bluetooth/hci_event.c | 46 ++++++++++++++++++++++++++--------------------
+ 1 file changed, 26 insertions(+), 20 deletions(-)
 
 diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 0850cad8c368..8ed8516b18c7 100644
+index e2b81adc232f..0850cad8c368 100644
 --- a/net/bluetooth/hci_event.c
 +++ b/net/bluetooth/hci_event.c
-@@ -3855,6 +3855,21 @@ static u8 hci_get_auth_req(struct hci_conn *conn)
- 	return (conn->remote_auth & ~0x01) | (conn->auth_type & 0x01);
- }
+@@ -4163,33 +4163,39 @@ static void hci_remote_oob_data_request_evt(struct hci_dev *hdev,
+ 		goto unlock;
  
-+static u8 bredr_oob_data_present(struct hci_conn *conn)
-+{
-+	struct hci_dev *hdev = conn->hdev;
-+	struct oob_data *data;
-+
-+	data = hci_find_remote_oob_data(hdev, &conn->dst, BDADDR_BREDR);
-+	if (!data)
-+		return 0x00;
-+
-+	if (conn->out || test_bit(HCI_CONN_REMOTE_OOB, &conn->flags))
-+		return 0x01;
-+
-+	return 0x00;
-+}
-+
- static void hci_io_capa_request_evt(struct hci_dev *hdev, struct sk_buff *skb)
- {
- 	struct hci_ev_io_capa_request *ev = (void *) skb->data;
-@@ -3906,12 +3921,7 @@ static void hci_io_capa_request_evt(struct hci_dev *hdev, struct sk_buff *skb)
- 			conn->auth_type &= HCI_AT_NO_BONDING_MITM;
- 
- 		cp.authentication = conn->auth_type;
+ 	data = hci_find_remote_oob_data(hdev, &ev->bdaddr, BDADDR_BREDR);
+-	if (data) {
+-		if (bredr_sc_enabled(hdev)) {
+-			struct hci_cp_remote_oob_ext_data_reply cp;
 -
--		if (hci_find_remote_oob_data(hdev, &conn->dst, BDADDR_BREDR) &&
--		    (conn->out || test_bit(HCI_CONN_REMOTE_OOB, &conn->flags)))
--			cp.oob_data = 0x01;
--		else
--			cp.oob_data = 0x00;
-+		cp.oob_data = bredr_oob_data_present(conn);
+-			bacpy(&cp.bdaddr, &ev->bdaddr);
+-			memcpy(cp.hash192, data->hash192, sizeof(cp.hash192));
+-			memcpy(cp.rand192, data->rand192, sizeof(cp.rand192));
+-			memcpy(cp.hash256, data->hash256, sizeof(cp.hash256));
+-			memcpy(cp.rand256, data->rand256, sizeof(cp.rand256));
++	if (!data) {
++		struct hci_cp_remote_oob_data_neg_reply cp;
  
- 		hci_send_cmd(hdev, HCI_OP_IO_CAPABILITY_REPLY,
+-			hci_send_cmd(hdev, HCI_OP_REMOTE_OOB_EXT_DATA_REPLY,
+-				     sizeof(cp), &cp);
+-		} else {
+-			struct hci_cp_remote_oob_data_reply cp;
++		bacpy(&cp.bdaddr, &ev->bdaddr);
++		hci_send_cmd(hdev, HCI_OP_REMOTE_OOB_DATA_NEG_REPLY,
++			     sizeof(cp), &cp);
++		goto unlock;
++	}
+ 
+-			bacpy(&cp.bdaddr, &ev->bdaddr);
+-			memcpy(cp.hash, data->hash192, sizeof(cp.hash));
+-			memcpy(cp.rand, data->rand192, sizeof(cp.rand));
++	if (bredr_sc_enabled(hdev)) {
++		struct hci_cp_remote_oob_ext_data_reply cp;
+ 
+-			hci_send_cmd(hdev, HCI_OP_REMOTE_OOB_DATA_REPLY,
+-				     sizeof(cp), &cp);
++		bacpy(&cp.bdaddr, &ev->bdaddr);
++		if (test_bit(HCI_SC_ONLY, &hdev->dev_flags)) {
++			memset(cp.hash192, 0, sizeof(cp.hash192));
++			memset(cp.rand192, 0, sizeof(cp.rand192));
++		} else {
++			memcpy(cp.hash192, data->hash192, sizeof(cp.hash192));
++			memcpy(cp.rand192, data->rand192, sizeof(cp.rand192));
+ 		}
++		memcpy(cp.hash256, data->hash256, sizeof(cp.hash256));
++		memcpy(cp.rand256, data->rand256, sizeof(cp.rand256));
++
++		hci_send_cmd(hdev, HCI_OP_REMOTE_OOB_EXT_DATA_REPLY,
++			     sizeof(cp), &cp);
+ 	} else {
+-		struct hci_cp_remote_oob_data_neg_reply cp;
++		struct hci_cp_remote_oob_data_reply cp;
+ 
+ 		bacpy(&cp.bdaddr, &ev->bdaddr);
+-		hci_send_cmd(hdev, HCI_OP_REMOTE_OOB_DATA_NEG_REPLY,
++		memcpy(cp.hash, data->hash192, sizeof(cp.hash));
++		memcpy(cp.rand, data->rand192, sizeof(cp.rand));
++
++		hci_send_cmd(hdev, HCI_OP_REMOTE_OOB_DATA_REPLY,
  			     sizeof(cp), &cp);
+ 	}
+ 
 -- 
 2.1.0
 
