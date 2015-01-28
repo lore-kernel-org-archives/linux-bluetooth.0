@@ -1,78 +1,83 @@
 Return-Path: <cyrus@holtmann.org>
-From: Marcel Holtmann <marcel@holtmann.org>
+From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFC] Bluetooth: btusb: Handle out of order firmware loading complete event
-Date: Wed, 28 Jan 2015 07:58:23 -0800
-Message-Id: <1422460703-17918-1-git-send-email-marcel@holtmann.org>
+Subject: [PATCH] tools/sdptool: Check if HCI is powered UP before executing commands
+Date: Wed, 28 Jan 2015 14:40:21 +0100
+Message-Id: <1422452421-32092-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-When loading the Intel firmware it can happen that the firmware loading
-complete vendor event arrives before the command complete event for the
-last firmware fragment.
-
-< HCI Command: Vendor (0x3f|0x0009) plen 7
-        01 02 fc 03 00 00 00
-> HCI Event: Vendor (0xff) plen 5
-        06 00 00 00 00
-> HCI Event: Command Complete (0x0e) plen 4
-      Vendor (0x3f|0x0009) ncmd 31
-        Status: Success (0x00)
-
-This is mainly caused by the fact that the vendor command and its
-command complete event are transported over the bulk endpoints. The
-firmware loading complete event however is send over the interrupt
-endpoint. So with just bad timing one event arrives before the other.
-
-Currently the code does not account for it. There are precautions for
-receiving firmware loading complete event quickly, but not for receiving
-it before the command complete.
-
-Introduce an extra flag that tracks when the firmware sending has
-completed from the driver point of view and track the completion of
-the firmware loading procedure with a different flag. That way the
-wakeup can be handled properly.
-
-Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+Before executing commands should be checked if any or chosen HCI is
+powered up. If not further executing of command makes no sense.
 ---
- drivers/bluetooth/btusb.c | 9 +++++++--
- 1 file changed, 7 insertions(+), 2 deletions(-)
+ android/pics-spp.txt  |  2 +-
+ android/pixit-spp.txt |  2 +-
+ tools/sdptool.c       | 12 ++++++++++--
+ 3 files changed, 12 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 4fac6927ee11..25ca93d13209 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -280,8 +280,9 @@ static const struct usb_device_id blacklist_table[] = {
- #define BTUSB_DID_ISO_RESUME	4
- #define BTUSB_BOOTLOADER	5
- #define BTUSB_DOWNLOADING	6
--#define BTUSB_BOOTING		7
-+#define BTUSB_FIRMWARE_LOADED	7
- #define BTUSB_FIRMWARE_FAILED	8
-+#define BTUSB_BOOTING		9
+diff --git a/android/pics-spp.txt b/android/pics-spp.txt
+index f015236..d9bb883 100644
+--- a/android/pics-spp.txt
++++ b/android/pics-spp.txt
+@@ -1,6 +1,6 @@
+ SPP PICS for the PTS tool.
  
- struct btusb_data {
- 	struct hci_dev       *hdev;
-@@ -1788,7 +1789,9 @@ static int btusb_recv_event_intel(struct hci_dev *hdev, struct sk_buff *skb)
- 			if (skb->data[3] != 0x00)
- 				test_bit(BTUSB_FIRMWARE_FAILED, &data->flags);
+-PTS version: 5.3
++PTS version: 6.0
  
--			if (test_and_clear_bit(BTUSB_DOWNLOADING, &data->flags))
-+			if (test_and_clear_bit(BTUSB_DOWNLOADING,
-+					       &data->flags) &&
-+			    test_bit(BTUSB_FIRMWARE_LOADED, &data->flags))
- 				wake_up_interruptible(&hdev->req_wait_q);
+ * - different than PTS defaults
+ # - not yet implemented/supported
+diff --git a/android/pixit-spp.txt b/android/pixit-spp.txt
+index a8a8202..8e2d70f 100644
+--- a/android/pixit-spp.txt
++++ b/android/pixit-spp.txt
+@@ -1,6 +1,6 @@
+ SPP PIXIT for the PTS tool.
+ 
+-PTS version: 5.3
++PTS version: 6.0
+ 
+ * - different than PTS defaults
+ & - should be set to IUT Bluetooth address
+diff --git a/tools/sdptool.c b/tools/sdptool.c
+index 17561b1..9ff7a1c 100644
+--- a/tools/sdptool.c
++++ b/tools/sdptool.c
+@@ -4352,17 +4352,20 @@ static struct option main_options[] = {
+ 
+ int main(int argc, char *argv[])
+ {
+-	int i, opt;
++	int i, opt, err;
+ 
+ 	bacpy(&interface, BDADDR_ANY);
+ 
++	err = hci_get_route(NULL);
++
+ 	while ((opt=getopt_long(argc, argv, "+i:h", main_options, NULL)) != -1) {
+ 		switch(opt) {
+ 		case 'i':
+ 			if (!strncmp(optarg, "hci", 3))
+-				hci_devba(atoi(optarg + 3), &interface);
++				err = hci_devba(atoi(optarg + 3), &interface);
+ 			else
+ 				str2ba(optarg, &interface);
++				err = hci_get_route(&interface);
+ 			break;
+ 
+ 		case 'h':
+@@ -4374,6 +4377,11 @@ int main(int argc, char *argv[])
  		}
- 
-@@ -2151,6 +2154,8 @@ static int btusb_setup_intel_new(struct hci_dev *hdev)
- 		fw_ptr += cmd_len;
  	}
  
-+	set_bit(BTUSB_FIRMWARE_LOADED, &data->flags);
++	if (err < 0) {
++		printf("No powered on HCI interface found\n");
++		exit(0);
++	}
 +
- 	/* Before switching the device into operational mode and with that
- 	 * booting the loaded firmware, wait for the bootloader notification
- 	 * that all fragments have been successfully received.
+ 	argc -= optind;
+ 	argv += optind;
+ 	optind = 0;
 -- 
-2.1.0
+1.9.3
 
