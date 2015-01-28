@@ -1,40 +1,78 @@
 Return-Path: <cyrus@holtmann.org>
-From: Johan Hedberg <johan.hedberg@gmail.com>
+From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/3] Bluetooth: Fix notifying discovery state upon reset
-Date: Wed, 28 Jan 2015 15:13:17 +0200
-Message-Id: <1422450799-18548-1-git-send-email-johan.hedberg@gmail.com>
+Subject: [RFC] Bluetooth: btusb: Handle out of order firmware loading complete event
+Date: Wed, 28 Jan 2015 07:58:23 -0800
+Message-Id: <1422460703-17918-1-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@intel.com>
+When loading the Intel firmware it can happen that the firmware loading
+complete vendor event arrives before the command complete event for the
+last firmware fragment.
 
-When HCI_Reset is issued the discovery state is assumed to be stopped.
-The hci_cc_reset() handler was trying to set the state but it was doing
-it without using the hci_discovery_set_state() function. Because of this
-e.g. the mgmt Discovering event could go without being sent. This patch
-fixes the code to use the hci_discovery_set_state() function instead of
-just blindly setting the state value.
+< HCI Command: Vendor (0x3f|0x0009) plen 7
+        01 02 fc 03 00 00 00
+> HCI Event: Vendor (0xff) plen 5
+        06 00 00 00 00
+> HCI Event: Command Complete (0x0e) plen 4
+      Vendor (0x3f|0x0009) ncmd 31
+        Status: Success (0x00)
 
-Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+This is mainly caused by the fact that the vendor command and its
+command complete event are transported over the bulk endpoints. The
+firmware loading complete event however is send over the interrupt
+endpoint. So with just bad timing one event arrives before the other.
+
+Currently the code does not account for it. There are precautions for
+receiving firmware loading complete event quickly, but not for receiving
+it before the command complete.
+
+Introduce an extra flag that tracks when the firmware sending has
+completed from the driver point of view and track the completion of
+the firmware loading procedure with a different flag. That way the
+wakeup can be handled properly.
+
+Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- net/bluetooth/hci_event.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ drivers/bluetooth/btusb.c | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
 
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 00c160634e7b..4175470ff48e 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -200,7 +200,8 @@ static void hci_cc_reset(struct hci_dev *hdev, struct sk_buff *skb)
- 	/* Reset all non-persistent flags */
- 	hdev->dev_flags &= ~HCI_PERSISTENT_MASK;
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 4fac6927ee11..25ca93d13209 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -280,8 +280,9 @@ static const struct usb_device_id blacklist_table[] = {
+ #define BTUSB_DID_ISO_RESUME	4
+ #define BTUSB_BOOTLOADER	5
+ #define BTUSB_DOWNLOADING	6
+-#define BTUSB_BOOTING		7
++#define BTUSB_FIRMWARE_LOADED	7
+ #define BTUSB_FIRMWARE_FAILED	8
++#define BTUSB_BOOTING		9
  
--	hdev->discovery.state = DISCOVERY_STOPPED;
-+	hci_discovery_set_state(hdev, DISCOVERY_STOPPED);
+ struct btusb_data {
+ 	struct hci_dev       *hdev;
+@@ -1788,7 +1789,9 @@ static int btusb_recv_event_intel(struct hci_dev *hdev, struct sk_buff *skb)
+ 			if (skb->data[3] != 0x00)
+ 				test_bit(BTUSB_FIRMWARE_FAILED, &data->flags);
+ 
+-			if (test_and_clear_bit(BTUSB_DOWNLOADING, &data->flags))
++			if (test_and_clear_bit(BTUSB_DOWNLOADING,
++					       &data->flags) &&
++			    test_bit(BTUSB_FIRMWARE_LOADED, &data->flags))
+ 				wake_up_interruptible(&hdev->req_wait_q);
+ 		}
+ 
+@@ -2151,6 +2154,8 @@ static int btusb_setup_intel_new(struct hci_dev *hdev)
+ 		fw_ptr += cmd_len;
+ 	}
+ 
++	set_bit(BTUSB_FIRMWARE_LOADED, &data->flags);
 +
- 	hdev->inq_tx_power = HCI_TX_POWER_INVALID;
- 	hdev->adv_tx_power = HCI_TX_POWER_INVALID;
- 
+ 	/* Before switching the device into operational mode and with that
+ 	 * booting the loaded firmware, wait for the bootloader notification
+ 	 * that all fragments have been successfully received.
 -- 
 2.1.0
 
