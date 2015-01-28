@@ -1,31 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 28 Jan 2015 10:16:38 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/3] Bluetooth: Clear P-192 values for OOB when in Secure
- Connections Only mode
-Message-ID: <20150128081638.GA23114@t440s.lan>
-References: <1422403473-3542-1-git-send-email-marcel@holtmann.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1422403473-3542-1-git-send-email-marcel@holtmann.org>
+Sender: armansito@google.com
+Date: Tue, 27 Jan 2015 18:11:32 -0800
+Message-ID: <CAHrH25Qfr9bRYad0scysHMcUD+SY651y4qZLk4EAWk-ym+970Q@mail.gmail.com>
+Subject: GATT D-Bus API handling notifications
+From: Arman Uguray <armansito@chromium.org>
+To: BlueZ development <linux-bluetooth@vger.kernel.org>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>, Marcel Holtmann <marcel@holtmann.org>
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hi Luiz,
 
-On Tue, Jan 27, 2015, Marcel Holtmann wrote:
-> When Secure Connections Only mode has been enabled and remote OOB data
-> is requested, then only provide P-256 hash and randomizer vaulues. The
-> fields for P-192 hash and randomizer should be set to zero.
-> 
-> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
-> ---
->  net/bluetooth/hci_event.c | 46 ++++++++++++++++++++++++++--------------------
->  1 file changed, 26 insertions(+), 20 deletions(-)
+Earlier I chatted with Marcel on IRC about how we can resolve the
+notification subscription issue that you were concerned about
+(basically a server connecting and immediately sending a
+notification). I think our consensus was that this mainly applies when
+the two devices are bonded. In that case, we could make it so that the
+exported GattService1 hierarchy stays around over disconnections if
+there is a bond between the two devices. We would keep
+StartNotify/StopNotify and keep around the data on external clients
+that subscribed to notifications. Upon reconnection we would then
+immediately register for notifications based on all the external
+clients that subscribed.
 
+Would this address the case? I think this case really applies when the
+remote CCC has been configured so the peripheral remembers the
+configuration between disconnections, which should only happen when
+the devices are bonded but I'm not sure.
 
-All three patches in this set have been applied to bluetooth-next.
-Thanks.
-
-Johan
+Let me know if that makes sense! Thanks!
+Arman
