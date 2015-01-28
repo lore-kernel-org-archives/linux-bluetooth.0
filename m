@@ -1,152 +1,112 @@
 Return-Path: <cyrus@holtmann.org>
-From: Michael Janssen <jamuraa@chromium.org>
+From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: Michael Janssen <jamuraa@chromium.org>
-Subject: [RFC BlueZ 1/1] doc: Add Advertising API documentation
-Date: Wed, 28 Jan 2015 10:52:16 -0800
-Message-Id: <1422471136-18575-2-git-send-email-jamuraa@chromium.org>
-In-Reply-To: <1422471136-18575-1-git-send-email-jamuraa@chromium.org>
-References: <1422471136-18575-1-git-send-email-jamuraa@chromium.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Subject: [PATCH 1/2] Bluetooth: Perform a power cycle when receiving hardware error event
+Date: Wed, 28 Jan 2015 11:09:55 -0800
+Message-Id: <1422472196-9595-1-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- doc/advertising-api.txt | 124 ++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 124 insertions(+)
- create mode 100644 doc/advertising-api.txt
+When receiving a HCI Hardware Error event, the controller should be
+assumed to be non-functional until issuing a HCI Reset command.
 
-diff --git a/doc/advertising-api.txt b/doc/advertising-api.txt
-new file mode 100644
-index 0000000..6a325c7
---- /dev/null
-+++ b/doc/advertising-api.txt
-@@ -0,0 +1,124 @@
-+LE Advertising Manager
-+======================
+The Bluetooth hardware errors are vendor specific and so add a
+new hdev->hw_error callback that drivers can provide to run extra
+code to handle the hardware error.
+
+After completing the vendor specific error handling perform a full
+reset of the Bluetooth stack by closing and re-opening the transport.
+
+Based-on-patch-by: Johan Hedberg <johan.hedberg@intel.com>
+Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+---
+ include/net/bluetooth/hci_core.h |  3 +++
+ net/bluetooth/hci_core.c         | 21 +++++++++++++++++++++
+ net/bluetooth/hci_event.c        |  4 +++-
+ 3 files changed, 27 insertions(+), 1 deletion(-)
+
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 0f5e59f1e3cb..1780f1681ecf 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -232,6 +232,7 @@ struct hci_dev {
+ 	__u16		conn_info_min_age;
+ 	__u16		conn_info_max_age;
+ 	__u8		ssp_debug_mode;
++	__u8		hw_error_code;
+ 	__u32		clock;
+ 
+ 	__u16		devid_source;
+@@ -293,6 +294,7 @@ struct hci_dev {
+ 
+ 	struct work_struct	power_on;
+ 	struct delayed_work	power_off;
++	struct work_struct	error_reset;
+ 
+ 	__u16			discov_timeout;
+ 	struct delayed_work	discov_off;
+@@ -369,6 +371,7 @@ struct hci_dev {
+ 	int (*setup)(struct hci_dev *hdev);
+ 	int (*send)(struct hci_dev *hdev, struct sk_buff *skb);
+ 	void (*notify)(struct hci_dev *hdev, unsigned int evt);
++	void (*hw_error)(struct hci_dev *hdev, u8 code);
+ 	int (*set_bdaddr)(struct hci_dev *hdev, const bdaddr_t *bdaddr);
+ };
+ 
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index 46aa702c189d..0f98d9057ae7 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -2140,6 +2140,26 @@ static void hci_power_off(struct work_struct *work)
+ 	smp_unregister(hdev);
+ }
+ 
++static void hci_error_reset(struct work_struct *work)
++{
++	struct hci_dev *hdev = container_of(work, struct hci_dev, error_reset);
 +
-+LE Advertising Manager allows external applications to control the activity and
-+the content of LE Advertising Events.  Applications may use the properties of
-+this object to modify the advertising data elements included in Advertising
-+Events, and enable and disable advertising.
++	BT_DBG("%s", hdev->name);
 +
-+Service		org.bluez
-+Interface	org.bluez.LEAdvertisingManager1
-+Object path	/org/bluez/hciX
++	if (hdev->hw_error)
++		hdev->hw_error(hdev, hdev->hw_error_code);
++	else
++		BT_ERR("%s hardware error 0x%2.2x", hdev->name,
++		       hdev->hw_error_code);
 +
-+Methods		bool Advertise(int duration)
++	if (hci_dev_do_close(hdev))
++		return;
 +
-+			Begins advertising this device according to the
-+			settings.  Advertisement is enabled for duration seconds
-+			from method invocation.  A duration of -1 will
-+			continuously advertise.  To disable advertisement early,
-+			set duration to 0.
++	smp_unregister(hdev);
 +
-+			Possible errors: org.bluez.Error.NoData
++	hci_dev_do_open(hdev);
++}
 +
-+		void AdvertiseServiceUUID(string)
+ static void hci_discov_off(struct work_struct *work)
+ {
+ 	struct hci_dev *hdev;
+@@ -2932,6 +2952,7 @@ struct hci_dev *hci_alloc_dev(void)
+ 	INIT_WORK(&hdev->cmd_work, hci_cmd_work);
+ 	INIT_WORK(&hdev->tx_work, hci_tx_work);
+ 	INIT_WORK(&hdev->power_on, hci_power_on);
++	INIT_WORK(&hdev->error_reset, hci_error_reset);
+ 
+ 	INIT_DELAYED_WORK(&hdev->power_off, hci_power_off);
+ 	INIT_DELAYED_WORK(&hdev->discov_off, hci_discov_off);
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 4175470ff48e..a72a5f50728d 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -3100,7 +3100,9 @@ static void hci_hardware_error_evt(struct hci_dev *hdev, struct sk_buff *skb)
+ {
+ 	struct hci_ev_hardware_error *ev = (void *) skb->data;
+ 
+-	BT_ERR("%s hardware error 0x%2.2x", hdev->name, ev->code);
++	hdev->hw_error_code = ev->code;
 +
-+			This method adds a UUID to the set of services which
-+			should be included in the advertisement.  Use
-+			UnadvertiseServiceUUID to remove items from the list.
-+			GAP and GATT services cannot be added to the list.
-+
-+			Possible errors: org.bluez.Error.AlreadyExists
-+					 org.bluez.Error.InvalidArgument
-+
-+		void UnadvertiseServiceUUID(string)
-+			This method removes a UUID from the set of services
-+			which are included in the advertisement.
-+
-+			Possible errors: org.bluez.Error.DoesNotExist
-+
-+Properties	array{string} IncludedTypes
-+
-+			Indicates the data types which are included in the
-+			advertising data, and their order in the packet.  If the
-+			advertising data is too long, types that do not fit will
-+			be ignored, and the next type will be included if it
-+			does fit.  An exception to this is the "service-uuids"
-+			and the "local-name" type which will be shortened to fit
-+			as allowed by the specification.
-+
-+			The strings used for each type defined in the Core
-+			Specification Supplement and are indicated by these
-+			strings:
-+			* "service-uuids" - A list of Service UUIDs
-+			* "local-name" - Device name as defined by GAP
-+			* "flags" - the Advertising data flags
-+			* "manufacturer-data" - Manufacturer specific data
-+			* "tx-power" - TX Power Level
-+			* "slave-connection-interval" - Slave connection
-+				interval range for logical connections
-+			* "solicit-uuids" - Service Solicitation UUIDs
-+			* "service-data" - Service Data
-+			* "appearance" - Appearance as defined by GAP
-+			* "public-target-address" - Public Target Address
-+			* "random-target-address" - Random Target Address
-+			* "advertising-interval" - Advertising Interval
-+			* "le-address" - LE Device Address
-+			* "le-role" - LE Role
-+
-+			Defaults to: ["flags", "local-name"]
-+
-+			Possible Errors: org.bluez.Error.InvalidArguments
-+
-+		array(string) AdvertisedUUIDs (read-only)
-+
-+			Sorted List of UUIDs which are currently included in the
-+			"service-uuids" advertisement data type.
-+
-+		int Flags
-+
-+			bitfield of Boolean flags as defined in the Core
-+			Specification Supplement, Part A.1.3.2
-+
-+		array(array{byte}) ManufacturerSpecificData
-+
-+			Manufacturer specific data.  Each entry is transmitted
-+			as a a separate advertisement data type.
-+
-+		array(string) SolicitUUIDs
-+
-+			List of UUIDs to include in the
-+			"service-solicitation" advertisement data.
-+
-+		dict(string,array{byte}) ServiceData
-+
-+			Dictionary of Service UUIDs attached to data associated
-+			with that service to include in the "service-data"
-+			advertisement data.
-+
-+		array{byte} TargetAddress
-+
-+			Target Address to use in the "random-target-address" or
-+			"public-target-address"
-+
-+		int AdvertisingInterval
-+
-+			The interval to advertise at, in 0.625ms units.  Minimum
-+			is 32 (20ms), maximum is 16384 (10.24s)
-+
-+			Possible Errors: org.bluez.Error.InvalidArgument
-+
-+		array{byte} LEAddress
-+
-+			Address to advertise as the LE Address for this device.
-+
-+		string LEPreferred
-+
-+			The preferred role of this device if it supports both
-+			Central and Peripheral roles.  One of "central" or
-+			"peripheral".  This influences the advertised value of
-+			the "le-role" advertising data type when both modes are
-+			supported.
-+
-+		int AdvertisingLength (read-only)
-+
-+			Calculated length of the Advertising Data packet.
++	queue_work(hdev->req_workqueue, &hdev->error_reset);
+ }
+ 
+ static void hci_role_change_evt(struct hci_dev *hdev, struct sk_buff *skb)
 -- 
-2.2.0.rc0.207.ga3a616c
+2.1.0
 
