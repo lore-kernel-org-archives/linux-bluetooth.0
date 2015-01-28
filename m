@@ -1,93 +1,78 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1422388746-23627-1-git-send-email-armansito@chromium.org>
-References: <1422388746-23627-1-git-send-email-armansito@chromium.org>
-Date: Wed, 28 Jan 2015 15:10:23 +0200
-Message-ID: <CABBYNZ+_GESpMARUOwjLw55H_EKuYPJmqj4zFYAEW5dwn7Cgxg@mail.gmail.com>
-Subject: Re: [PATCH BlueZ v1] core: device: Fix bugs in device_browse_gatt
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Arman Uguray <armansito@chromium.org>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+From: Marcel Holtmann <marcel@holtmann.org>
+To: linux-bluetooth@vger.kernel.org
+Subject: [RFC] Bluetooth: btusb: Handle out of order firmware loading complete event
+Date: Wed, 28 Jan 2015 01:44:03 -0800
+Message-Id: <1422438243-15352-1-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Arman,
+When loading the Intel firmware it can happen that the firmware loading
+complete vendor event arrives before the command complete event for the
+last firmware fragment.
 
-On Tue, Jan 27, 2015 at 9:59 PM, Arman Uguray <armansito@chromium.org> wrote:
-> This patch fixes two issues in GATT service browsing:
->
-> 1. There was a bug in gatt_client_ready_cb that broke GAttrib-based
-> profiles by not creating gatt_primary structures if no browse request
-> exists at the time.
->
-> 2. In device_browse_gatt, a response to "Pair" wasn't always being sent
-> since the code didn't assign the DBusMessage pointer to the browse_req.
->
-> Change-Id: I9d2b24db19be9c55b971504750a1061df6366e84
-> ---
->  src/device.c | 18 +++++++++---------
->  1 file changed, 9 insertions(+), 9 deletions(-)
->
-> diff --git a/src/device.c b/src/device.c
-> index 2a5a883..814489a 100644
-> --- a/src/device.c
-> +++ b/src/device.c
-> @@ -3836,9 +3836,9 @@ done:
->         attio_cleanup(device);
->  }
->
-> -static void register_gatt_services(struct browse_req *req)
-> +static void register_gatt_services(struct btd_device *device)
->  {
-> -       struct btd_device *device = req->device;
-> +       struct browse_req *req = device->browse;
->         GSList *services = NULL;
->
->         if (!bt_gatt_client_is_ready(device->client))
-> @@ -3852,7 +3852,9 @@ static void register_gatt_services(struct browse_req *req)
->
->         btd_device_set_temporary(device, FALSE);
->
-> -       update_gatt_uuids(req, device->primaries, services);
-> +       if (req)
-> +               update_gatt_uuids(req, device->primaries, services);
-> +
->         g_slist_free_full(device->primaries, g_free);
->         device->primaries = NULL;
->
-> @@ -3886,8 +3888,7 @@ static void gatt_client_ready_cb(bool success, uint8_t att_ecode,
->
->         DBG("MTU: %u", device->att_mtu);
->
-> -       if (device->browse)
-> -               register_gatt_services(device->browse);
-> +       register_gatt_services(device);
->
->         device_accept_gatt_profiles(device);
->
-> @@ -4200,10 +4201,9 @@ static int device_browse_gatt(struct btd_device *device, DBusMessage *msg)
->                 if (!device->le_state.svc_resolved)
->                         return 0;
->
-> -               /*
-> -                * Services have already been discovered, so signal this browse
-> -                * request as resolved.
-> -                */
-> +               if (msg)
-> +                       req->msg = dbus_message_ref(msg);
+< HCI Command: Vendor (0x3f|0x0009) plen 7
+        01 02 fc 03 00 00 00
+> HCI Event: Vendor (0xff) plen 5
+        06 00 00 00 00
+> HCI Event: Command Complete (0x0e) plen 4
+      Vendor (0x3f|0x0009) ncmd 31
+        Status: Success (0x00)
 
-This is not really necessary anymore, browse_request_new does that
-automatically now.
+This is mainly caused by the fact that the vendor command and its
+command complete event are transported over the bulk endpoints. The
+firmware loading complete event however is send over the interrupt
+endpoint. So with just bad timing one event arrives before the other.
 
->                 device_svc_resolved(device, device->bdaddr_type, 0);
->                 return 0;
->         }
-> --
-> 2.2.0.rc0.207.ga3a616c
+Currently the code does not account for it. There are precautions for
+receiving firmware loading complete event quickly, but not for receiving
+it before the command complete.
 
-I fixup the myself and applied the patch, thanks for rebasing it.
+Introduce an extra flag that tracks when the firmware sending has
+completed from the driver point of view and track the completion of
+the firmware loading procedure with a different flag. That way the
+wakeup can be handled properly.
 
+Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+---
+ drivers/bluetooth/btusb.c | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
 
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 4fac6927ee11..25ca93d13209 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -280,8 +280,9 @@ static const struct usb_device_id blacklist_table[] = {
+ #define BTUSB_DID_ISO_RESUME	4
+ #define BTUSB_BOOTLOADER	5
+ #define BTUSB_DOWNLOADING	6
+-#define BTUSB_BOOTING		7
++#define BTUSB_FIRMWARE_LOADED	7
+ #define BTUSB_FIRMWARE_FAILED	8
++#define BTUSB_BOOTING		9
+ 
+ struct btusb_data {
+ 	struct hci_dev       *hdev;
+@@ -1788,7 +1789,9 @@ static int btusb_recv_event_intel(struct hci_dev *hdev, struct sk_buff *skb)
+ 			if (skb->data[3] != 0x00)
+ 				test_bit(BTUSB_FIRMWARE_FAILED, &data->flags);
+ 
+-			if (test_and_clear_bit(BTUSB_DOWNLOADING, &data->flags))
++			if (test_and_clear_bit(BTUSB_DOWNLOADING,
++					       &data->flags) &&
++			    test_bit(BTUSB_FIRMWARE_LOADED, &data->flags))
+ 				wake_up_interruptible(&hdev->req_wait_q);
+ 		}
+ 
+@@ -2151,6 +2154,8 @@ static int btusb_setup_intel_new(struct hci_dev *hdev)
+ 		fw_ptr += cmd_len;
+ 	}
+ 
++	set_bit(BTUSB_FIRMWARE_LOADED, &data->flags);
++
+ 	/* Before switching the device into operational mode and with that
+ 	 * booting the loaded firmware, wait for the bootloader notification
+ 	 * that all fragments have been successfully received.
 -- 
-Luiz Augusto von Dentz
+2.1.0
+
