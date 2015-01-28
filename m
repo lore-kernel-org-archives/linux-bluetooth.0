@@ -1,35 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 8.1 \(1993\))
-Subject: Re: [PATCH] Bluetooth: Fix check for SSP when enabling SC
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1422440598-12210-1-git-send-email-johan.hedberg@gmail.com>
-Date: Wed, 28 Jan 2015 18:38:13 -0800
+Date: Wed, 28 Jan 2015 10:14:39 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Arman Uguray <armansito@chromium.org>
 Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <2B36F20B-5AEA-4E43-9825-4F2F45DD7C33@holtmann.org>
-References: <1422440598-12210-1-git-send-email-johan.hedberg@gmail.com>
-To: Johan Hedberg <johan.hedberg@gmail.com>
+Subject: Re: [PATCH BlueZ v1] core: device: Fix bugs in device_browse_gatt
+Message-ID: <20150128081439.GA22704@t440s.lan>
+References: <1422388746-23627-1-git-send-email-armansito@chromium.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1422388746-23627-1-git-send-email-armansito@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+Hi Arman,
 
-> There's a check in set_secure_conn() that's supposed to ensure that SSP
-> is enabled before we try to request the controller to enable SC (since
-> SSP is a pre-requisite for it). However, this check only makes sense for
-> controllers actually supporting BR/EDR SC. If we have a 4.0 controller
-> we're only interested in the LE part of SC and should therefore not be
-> requiring SSP to be enabled. This patch adds an additional condition to
-> check for lmp_sc_capable(hdev) before requiring SSP to be enabled.
+On Tue, Jan 27, 2015, Arman Uguray wrote:
+> This patch fixes two issues in GATT service browsing:
 > 
-> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
-> ---
-> net/bluetooth/mgmt.c | 1 +
-> 1 file changed, 1 insertion(+)
+> 1. There was a bug in gatt_client_ready_cb that broke GAttrib-based
+> profiles by not creating gatt_primary structures if no browse request
+> exists at the time.
+> 
+> 2. In device_browse_gatt, a response to "Pair" wasn't always being sent
+> since the code didn't assign the DBusMessage pointer to the browse_req.
 
-patch has been applied to bluetooth-next tree.
+Please split this into two patches since these seem to be independent
+issues.
 
-Regards
+> Change-Id: I9d2b24db19be9c55b971504750a1061df6366e84
 
-Marcel
+And please leave this part out.
 
+Otherwise the actual code changes look good to me.
+
+Johan
