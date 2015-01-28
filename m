@@ -1,40 +1,87 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 28 Jan 2015 15:26:18 -0500
-From: Adam Lee <adam.lee@canonical.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>,
-	"Gustavo F. Padovan" <gustavo@padovan.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>
-Subject: Re: [PATCH] Bluetooth: ath3k: workaround the compatibility issue
- with xHCI controller
-Message-ID: <20150128202618.GB2659@adam-laptop>
-References: <1422474752-26871-1-git-send-email-adam.lee@canonical.com>
- <0731CFAA-B45A-4DC2-8579-1A4E5E7707F3@holtmann.org>
- <20150128201636.GA2659@adam-laptop>
- <A2CF42D4-BB10-404D-B8C4-4E20410AD971@holtmann.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <A2CF42D4-BB10-404D-B8C4-4E20410AD971@holtmann.org>
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH 3/3] Bluetooth: Perform a power cycle when receiving a HW Error
+Date: Wed, 28 Jan 2015 15:13:19 +0200
+Message-Id: <1422450799-18548-3-git-send-email-johan.hedberg@gmail.com>
+In-Reply-To: <1422450799-18548-1-git-send-email-johan.hedberg@gmail.com>
+References: <1422450799-18548-1-git-send-email-johan.hedberg@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Wed, Jan 28, 2015 at 12:22:51PM -0800, Marcel Holtmann wrote:
-> I am still curious why you specified it like this. It would expect something like this:
-> 
-> 	usleep_range(TIMEGAP_MIN, TIMEGAP_MAX);
-> 
-> Btw. _US seems a bit to unclear if that is suppose to represent usec
-> or something chip internal called US. If you want to keep it in there,
-> then I prefer _USEC so I do not have to second guess every time I look
-> at the code.
-> 
-> Otherwise this is fine. Just use two constants and not some magic
-> range calculation.
-> 
-> Regards
-> 
-> Marcel
+From: Johan Hedberg <johan.hedberg@intel.com>
 
-Good point, will resend, thanks.
+When we receive a Hardware Error HCI event the controller should be
+assumed to be non-functional until a full reset procedure has been
+performed with it. This patch adds a new hci_reset() helper function
+that can be triggered through a workqueue, and schedules the function to
+be called whenever a Hardware Error event occurs.
 
+Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+---
+ include/net/bluetooth/hci_core.h |  1 +
+ net/bluetooth/hci_core.c         | 15 +++++++++++++++
+ net/bluetooth/hci_event.c        |  2 ++
+ 3 files changed, 18 insertions(+)
+
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 0f5e59f1e3cb..3e3380c1e2d9 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -293,6 +293,7 @@ struct hci_dev {
+ 
+ 	struct work_struct	power_on;
+ 	struct delayed_work	power_off;
++	struct work_struct	reset;
+ 
+ 	__u16			discov_timeout;
+ 	struct delayed_work	discov_off;
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index 46aa702c189d..a6afce413842 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -2140,6 +2140,20 @@ static void hci_power_off(struct work_struct *work)
+ 	smp_unregister(hdev);
+ }
+ 
++static void hci_reset(struct work_struct *work)
++{
++	struct hci_dev *hdev = container_of(work, struct hci_dev, reset);
++
++	BT_DBG("%s", hdev->name);
++
++	if (hci_dev_do_close(hdev))
++		return;
++
++	smp_unregister(hdev);
++
++	hci_dev_do_open(hdev);
++}
++
+ static void hci_discov_off(struct work_struct *work)
+ {
+ 	struct hci_dev *hdev;
+@@ -2932,6 +2946,7 @@ struct hci_dev *hci_alloc_dev(void)
+ 	INIT_WORK(&hdev->cmd_work, hci_cmd_work);
+ 	INIT_WORK(&hdev->tx_work, hci_tx_work);
+ 	INIT_WORK(&hdev->power_on, hci_power_on);
++	INIT_WORK(&hdev->reset, hci_reset);
+ 
+ 	INIT_DELAYED_WORK(&hdev->power_off, hci_power_off);
+ 	INIT_DELAYED_WORK(&hdev->discov_off, hci_discov_off);
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 4175470ff48e..0fd6f4d97b4a 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -3101,6 +3101,8 @@ static void hci_hardware_error_evt(struct hci_dev *hdev, struct sk_buff *skb)
+ 	struct hci_ev_hardware_error *ev = (void *) skb->data;
+ 
+ 	BT_ERR("%s hardware error 0x%2.2x", hdev->name, ev->code);
++
++	queue_work(hdev->req_workqueue, &hdev->reset);
+ }
+ 
+ static void hci_role_change_evt(struct hci_dev *hdev, struct sk_buff *skb)
 -- 
-Adam Lee
+2.1.0
+
