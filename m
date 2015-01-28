@@ -1,38 +1,138 @@
 Return-Path: <cyrus@holtmann.org>
-From: Arman Uguray <armansito@chromium.org>
+From: Szymon Janc <szymon.janc@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: luiz.dentz@gmail.com, Arman Uguray <armansito@chromium.org>
-Subject: [PATCH BlueZ 0/5] core: gatt: Support enabling notifications
-Date: Wed, 28 Jan 2015 18:10:58 -0800
-Message-Id: <1422497463-32539-1-git-send-email-armansito@chromium.org>
+Cc: Szymon Janc <szymon.janc@tieto.com>
+Subject: [PATCH] Bluetooth: Fix sending Read Remote Exttended Features command
+Date: Wed, 28 Jan 2015 22:59:58 +0100
+Message-Id: <1422482398-8425-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch sets brings support for enabling notifications while in GATT
-client-role. The changes that are introduced are:
+This command should only be used if remote device reports that it
+supports extended features. Otherwise command will fail and connection
+will be dropped.
 
-  1. Implemented the StartNotify and StopNotify methods of the
-     GattCharacteristic1 interface. This are internally tied to
-     bt_gatt_client_register_notify and bt_gatt_client_unregister_notify.
-     These also manage notification sessions on a per dbus sender basis.
+Some devices support SSP but don't support extended features so
+current check for SSP support is not enough.
 
-  2. The exported GATT API objects are not removed in the event of a disconnect,
-     if the devices are bonded. All notification sessions are also persisted and
-     automatically re-enabled on reconnection. Also, adding new notification
-     sessions via StartNotify is allowed during disconnects.
+< HCI Command: Create Connection (0x01|0x0005) plen 13
+        Address: D0:9C:30:00:19:6F (Foster Electric Company, Limited)
+        Packet type: 0xcc18
+          DM1 may be used
+          DH1 may be used
+          DM3 may be used
+          DH3 may be used
+          DM5 may be used
+          DH5 may be used
+        Page scan repetition mode: R1 (0x01)
+        Page scan mode: Mandatory (0x00)
+        Clock offset: 0x94c8
+        Role switch: Allow slave (0x01)
+> HCI Event: Command Status (0x0f) plen 4
+      Create Connection (0x01|0x0005) ncmd 1
+        Status: Success (0x00)
+> HCI Event: Connect Complete (0x03) plen 11
+        Status: Success (0x00)
+        Handle: 5
+        Address: D0:9C:30:00:19:6F (Foster Electric Company, Limited)
+        Link type: ACL (0x01)
+        Encryption: Disabled (0x00)
+< HCI Command: Read Remote Supported Features (0x01|0x001b) plen 2
+        Handle: 5
+> HCI Event: Command Status (0x0f) plen 4
+      Read Remote Supported Features (0x01|0x001b) ncmd 1
+        Status: Success (0x00)
+> HCI Event: Page Scan Repetition Mode Change (0x20) plen 7
+        Address: D0:9C:30:00:19:6F (Foster Electric Company, Limited)
+        Page scan repetition mode: R1 (0x01)
+> HCI Event: Read Remote Supported Features (0x0b) plen 11
+        Status: Success (0x00)
+        Handle: 5
+        Features: 0xff 0xff 0x8f 0xfe 0xdb 0xff 0x5b 0x07
+          3 slot packets
+          5 slot packets
+          Encryption
+          Slot offset
+          Timing accuracy
+          Role switch
+          Hold mode
+          Sniff mode
+          Park state
+          Power control requests
+          Channel quality driven data rate (CQDDR)
+          SCO link
+          HV2 packets
+          HV3 packets
+          u-law log synchronous data
+          A-law log synchronous data
+          CVSD synchronous data
+          Paging parameter negotiation
+          Power control
+          Transparent synchronous data
+          Broadcast Encryption
+          Enhanced Data Rate ACL 2 Mbps mode
+          Enhanced Data Rate ACL 3 Mbps mode
+          Enhanced inquiry scan
+          Interlaced inquiry scan
+          Interlaced page scan
+          RSSI with inquiry results
+          Extended SCO link (EV3 packets)
+          EV4 packets
+          EV5 packets
+          AFH capable slave
+          AFH classification slave
+          LE Supported (Controller)
+          3-slot Enhanced Data Rate ACL packets
+          5-slot Enhanced Data Rate ACL packets
+          Sniff subrating
+          Pause encryption
+          AFH capable master
+          AFH classification master
+          Enhanced Data Rate eSCO 2 Mbps mode
+          Enhanced Data Rate eSCO 3 Mbps mode
+          3-slot Enhanced Data Rate eSCO packets
+          Extended Inquiry Response
+          Simultaneous LE and BR/EDR (Controller)
+          Secure Simple Pairing
+          Encapsulated PDU
+          Non-flushable Packet Boundary Flag
+          Link Supervision Timeout Changed Event
+          Inquiry TX Power Level
+          Enhanced Power Control
+< HCI Command: Read Remote Extended Features (0x01|0x001c) plen 3
+        Handle: 5
+        Page: 1
+> HCI Event: Command Status (0x0f) plen 4
+      Read Remote Extended Features (0x01|0x001c) ncmd 1
+        Status: Command Disallowed (0x0c)
+< HCI Command: Read Clock Offset (0x01|0x001f) plen 2
+        Handle: 5
+> HCI Event: Command Status (0x0f) plen 4
+      Read Clock Offset (0x01|0x001f) ncmd 1
+        Status: Success (0x00)
+< HCI Command: Disconnect (0x01|0x0006) plen 3
+        Handle: 5
+        Reason: Remote User Terminated Connection (0x13)
 
-Arman Uguray (5):
-  core: gatt: Implement GattCharacteristic1.StartNotify
-  core: gatt: Implement GattCharacteristic1.StopNotify
-  core: device: Don't check ready in service_removed
-  core: device: Add device_is_bonded_for_gatt
-  core: gatt: Keep objects over disconnects
+Signed-off-by: Szymon Janc <szymon.janc@tieto.com>
+---
+ net/bluetooth/hci_event.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
- src/device.c      |  31 +++-
- src/device.h      |   1 +
- src/gatt-client.c | 453 ++++++++++++++++++++++++++++++++++++++++++++++++++++--
- 3 files changed, 466 insertions(+), 19 deletions(-)
-
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index e2b81ad..5a16a23 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -2667,7 +2667,8 @@ static void hci_remote_features_evt(struct hci_dev *hdev,
+ 	if (conn->state != BT_CONFIG)
+ 		goto unlock;
+ 
+-	if (!ev->status && lmp_ssp_capable(hdev) && lmp_ssp_capable(conn)) {
++	if (!ev->status && lmp_ssp_capable(hdev) && lmp_ssp_capable(conn) &&
++	    lmp_ext_feat_capable(conn)) {
+ 		struct hci_cp_read_remote_ext_features cp;
+ 		cp.handle = ev->handle;
+ 		cp.page = 0x01;
 -- 
-2.2.0.rc0.207.ga3a616c
+1.9.3
 
