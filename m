@@ -1,112 +1,91 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/2] Bluetooth: Perform a power cycle when receiving hardware error event
-Date: Wed, 28 Jan 2015 11:09:55 -0800
-Message-Id: <1422472196-9595-1-git-send-email-marcel@holtmann.org>
+Subject: [PATCH 2/2] Bluetooth: btusb: Provide hardware error handler for Intel devices
+Date: Wed, 28 Jan 2015 11:09:56 -0800
+Message-Id: <1422472196-9595-2-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-When receiving a HCI Hardware Error event, the controller should be
-assumed to be non-functional until issuing a HCI Reset command.
+The Intel Bluetooth controllers can provide an additional exception
+info string when a hardware error event occurs. The core will now
+call hdev->hw_error to let the driver read out this information.
 
-The Bluetooth hardware errors are vendor specific and so add a
-new hdev->hw_error callback that drivers can provide to run extra
-code to handle the hardware error.
+This change will cause a reset of the hardware to bring it back
+into functional state and then read the Intel exception info
+string and print it along with the error information.
 
-After completing the vendor specific error handling perform a full
-reset of the Bluetooth stack by closing and re-opening the transport.
-
-Based-on-patch-by: Johan Hedberg <johan.hedberg@intel.com>
 Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- include/net/bluetooth/hci_core.h |  3 +++
- net/bluetooth/hci_core.c         | 21 +++++++++++++++++++++
- net/bluetooth/hci_event.c        |  4 +++-
- 3 files changed, 27 insertions(+), 1 deletion(-)
+ drivers/bluetooth/btusb.c | 42 ++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 42 insertions(+)
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 0f5e59f1e3cb..1780f1681ecf 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -232,6 +232,7 @@ struct hci_dev {
- 	__u16		conn_info_min_age;
- 	__u16		conn_info_max_age;
- 	__u8		ssp_debug_mode;
-+	__u8		hw_error_code;
- 	__u32		clock;
- 
- 	__u16		devid_source;
-@@ -293,6 +294,7 @@ struct hci_dev {
- 
- 	struct work_struct	power_on;
- 	struct delayed_work	power_off;
-+	struct work_struct	error_reset;
- 
- 	__u16			discov_timeout;
- 	struct delayed_work	discov_off;
-@@ -369,6 +371,7 @@ struct hci_dev {
- 	int (*setup)(struct hci_dev *hdev);
- 	int (*send)(struct hci_dev *hdev, struct sk_buff *skb);
- 	void (*notify)(struct hci_dev *hdev, unsigned int evt);
-+	void (*hw_error)(struct hci_dev *hdev, u8 code);
- 	int (*set_bdaddr)(struct hci_dev *hdev, const bdaddr_t *bdaddr);
- };
- 
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 46aa702c189d..0f98d9057ae7 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -2140,6 +2140,26 @@ static void hci_power_off(struct work_struct *work)
- 	smp_unregister(hdev);
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 70513b8d4d4a..b2753d79edcf 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -2266,6 +2266,46 @@ done:
+ 	return 0;
  }
  
-+static void hci_error_reset(struct work_struct *work)
++static void btusb_hw_error_intel(struct hci_dev *hdev, u8 code)
 +{
-+	struct hci_dev *hdev = container_of(work, struct hci_dev, error_reset);
++	struct sk_buff *skb;
++	u8 type = 0x00;
 +
-+	BT_DBG("%s", hdev->name);
++	BT_ERR("%s: Hardware error 0x%2.2x", hdev->name, code);
 +
-+	if (hdev->hw_error)
-+		hdev->hw_error(hdev, hdev->hw_error_code);
-+	else
-+		BT_ERR("%s hardware error 0x%2.2x", hdev->name,
-+		       hdev->hw_error_code);
-+
-+	if (hci_dev_do_close(hdev))
++	skb = __hci_cmd_sync(hdev, HCI_OP_RESET, 0, NULL, HCI_INIT_TIMEOUT);
++	if (IS_ERR(skb)) {
++		BT_ERR("%s: Reset after hardware error failed (%ld)",
++		       hdev->name, PTR_ERR(skb));
 +		return;
++	}
++	kfree_skb(skb);
 +
-+	smp_unregister(hdev);
++	skb = __hci_cmd_sync(hdev, 0xfc22, 1, &type, HCI_INIT_TIMEOUT);
++	if (IS_ERR(skb)) {
++		BT_ERR("%s: Retrieving Intel exception info failed (%ld)",
++		       hdev->name, PTR_ERR(skb));
++		return;
++	}
 +
-+	hci_dev_do_open(hdev);
++	if (skb->len != 13) {
++		BT_ERR("%s: Exception info size mismatch", hdev->name);
++		kfree_skb(skb);
++		return;
++	}
++
++	if (skb->data[0] != 0x00) {
++		BT_ERR("%s: Exception info command failure (%02x)",
++		       hdev->name, skb->data[0]);
++		kfree_skb(skb);
++		return;
++	}
++
++	BT_ERR("%s: Exception info %s", hdev->name, (char *)(skb->data + 1));
++
++	kfree_skb(skb);
 +}
 +
- static void hci_discov_off(struct work_struct *work)
+ static int btusb_set_bdaddr_intel(struct hci_dev *hdev, const bdaddr_t *bdaddr)
  {
- 	struct hci_dev *hdev;
-@@ -2932,6 +2952,7 @@ struct hci_dev *hci_alloc_dev(void)
- 	INIT_WORK(&hdev->cmd_work, hci_cmd_work);
- 	INIT_WORK(&hdev->tx_work, hci_tx_work);
- 	INIT_WORK(&hdev->power_on, hci_power_on);
-+	INIT_WORK(&hdev->error_reset, hci_error_reset);
+ 	struct sk_buff *skb;
+@@ -2649,12 +2689,14 @@ static int btusb_probe(struct usb_interface *intf,
  
- 	INIT_DELAYED_WORK(&hdev->power_off, hci_power_off);
- 	INIT_DELAYED_WORK(&hdev->discov_off, hci_discov_off);
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 4175470ff48e..a72a5f50728d 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -3100,7 +3100,9 @@ static void hci_hardware_error_evt(struct hci_dev *hdev, struct sk_buff *skb)
- {
- 	struct hci_ev_hardware_error *ev = (void *) skb->data;
+ 	if (id->driver_info & BTUSB_INTEL) {
+ 		hdev->setup = btusb_setup_intel;
++		hdev->hw_error = btusb_hw_error_intel;
+ 		hdev->set_bdaddr = btusb_set_bdaddr_intel;
+ 	}
  
--	BT_ERR("%s hardware error 0x%2.2x", hdev->name, ev->code);
-+	hdev->hw_error_code = ev->code;
-+
-+	queue_work(hdev->req_workqueue, &hdev->error_reset);
- }
+ 	if (id->driver_info & BTUSB_INTEL_NEW) {
+ 		hdev->send = btusb_send_frame_intel;
+ 		hdev->setup = btusb_setup_intel_new;
++		hdev->hw_error = btusb_hw_error_intel;
+ 		hdev->set_bdaddr = btusb_set_bdaddr_intel;
+ 	}
  
- static void hci_role_change_evt(struct hci_dev *hdev, struct sk_buff *skb)
 -- 
 2.1.0
 
