@@ -1,200 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1422348800-5668-2-git-send-email-gowtham.ab@samsung.com>
-References: <1422348800-5668-1-git-send-email-gowtham.ab@samsung.com>
-	<1422348800-5668-2-git-send-email-gowtham.ab@samsung.com>
-Date: Wed, 28 Jan 2015 15:07:25 +0200
-Message-ID: <CABBYNZK2WoRzxzkgQRsgUe0pjYzY0M1Ee0Ncx+n+J+iQmEpCkg@mail.gmail.com>
-Subject: Re: [PATCH v1 1/3] shared/gatt-helpers: Fix usage of freed memory
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Gowtham Anandha Babu <gowtham.ab@samsung.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	Bharat Panda <bharat.panda@samsung.com>, cpgs@samsung.com
-Content-Type: text/plain; charset=UTF-8
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH 1/3] Bluetooth: Fix notifying discovery state upon reset
+Date: Wed, 28 Jan 2015 15:13:17 +0200
+Message-Id: <1422450799-18548-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Gowtham,
+From: Johan Hedberg <johan.hedberg@intel.com>
 
-On Tue, Jan 27, 2015 at 10:53 AM, Gowtham Anandha Babu
-<gowtham.ab@samsung.com> wrote:
-> src/shared/gatt-helpers.c:709:6: warning: Use of memory after it is freed
->         if (op->callback)
->             ^~~~~~~~~~~~
-> src/shared/gatt-helpers.c:780:6: warning: Use of memory after it is freed
->         if (op->callback)
->             ^~~~~~~~~~~~
-> src/shared/gatt-helpers.c:998:6: warning: Use of memory after it is freed
->         if (op->callback)
->             ^~~~~~~~~~~~
-> src/shared/gatt-helpers.c:1020:32: warning: Use of memory after it is freed
->                 op->callback(false, 0, NULL, data->op->user_data);
->                                              ^~~~~~~~
-> src/shared/gatt-helpers.c:1112:6: warning: Use of memory after it is freed
->         if (op->callback)
->             ^~~~~~~~~~~~
-> src/shared/gatt-helpers.c:1226:6: warning: Use of memory after it is freed
->         if (op->callback)
->             ^~~~~~~~~~~~
-> src/shared/gatt-helpers.c:1332:6: warning: Use of memory after it is freed
->         if (op->callback)
->             ^~~~~~~~~~~~
-> src/shared/gatt-helpers.c:1452:6: warning: Use of memory after it is freed
->         if (op->callback)
->             ^~~~~~~~~~~~
-> ---
->  src/shared/gatt-helpers.c | 25 ++++++++++++++++---------
->  1 file changed, 16 insertions(+), 9 deletions(-)
->
-> diff --git a/src/shared/gatt-helpers.c b/src/shared/gatt-helpers.c
-> index 3864ed0..c9b24cc 100644
-> --- a/src/shared/gatt-helpers.c
-> +++ b/src/shared/gatt-helpers.c
-> @@ -686,7 +686,6 @@ static void read_by_grp_type_cb(uint8_t opcode, const void *pdu,
->                                                         discovery_op_unref))
->                         return;
->
-> -               discovery_op_unref(op);
->                 success = false;
->                 goto done;
->         }
-> @@ -708,6 +707,8 @@ success:
->  done:
->         if (op->callback)
->                 op->callback(success, att_ecode, final_result, op->user_data);
-> +
-> +       discovery_op_unref(op);
->  }
->
->  static void find_by_type_val_cb(uint8_t opcode, const void *pdu,
-> @@ -766,7 +767,6 @@ static void find_by_type_val_cb(uint8_t opcode, const void *pdu,
->                                                         discovery_op_unref))
->                         return;
->
-> -               discovery_op_unref(op);
->                 success = false;
->                 goto done;
->         }
-> @@ -779,6 +779,8 @@ success:
->  done:
->         if (op->callback)
->                 op->callback(success, att_ecode, final_result, op->user_data);
-> +
-> +       discovery_op_unref(op);
->  }
->
->  static bool discover_services(struct bt_att *att, bt_uuid_t *uuid,
-> @@ -977,7 +979,6 @@ static void read_included_cb(uint8_t opcode, const void *pdu,
->                                 discovery_op_ref(op), discovery_op_unref))
->                         return;
->
-> -               discovery_op_unref(op);
->                 success = false;
->                 goto done;
->         }
-> @@ -997,6 +998,8 @@ static void read_included_cb(uint8_t opcode, const void *pdu,
->  done:
->         if (op->callback)
->                 op->callback(success, att_ecode, final_result, op->user_data);
-> +
-> +       discovery_op_unref(op);
->  }
->
->  static void read_included(struct read_incl_data *data)
-> @@ -1014,10 +1017,10 @@ static void read_included(struct read_incl_data *data)
->                                                         read_included_unref))
->                 return;
->
-> -       read_included_unref(data);
-> -
->         if (op->callback)
->                 op->callback(false, 0, NULL, data->op->user_data);
-> +
-> +       read_included_unref(data);
->  }
->
->  static void discover_included_cb(uint8_t opcode, const void *pdu,
-> @@ -1099,7 +1102,6 @@ static void discover_included_cb(uint8_t opcode, const void *pdu,
->                                                         discovery_op_unref))
->                         return;
->
-> -               discovery_op_unref(op);
->                 success = false;
->                 goto failed;
->         }
-> @@ -1111,6 +1113,8 @@ done:
->  failed:
->         if (op->callback)
->                 op->callback(success, att_ecode, final_result, op->user_data);
-> +
-> +       discovery_op_unref(op);
->  }
->
->  bool bt_gatt_discover_included_services(struct bt_att *att,
-> @@ -1213,7 +1217,6 @@ static void discover_chrcs_cb(uint8_t opcode, const void *pdu,
->                                                 discovery_op_unref))
->                         return;
->
-> -               discovery_op_unref(op);
->                 success = false;
->                 goto done;
->         }
-> @@ -1226,6 +1229,8 @@ done:
->         if (op->callback)
->                 op->callback(success, att_ecode, final_result,
->                                                         op->user_data);
-> +
-> +       discovery_op_unref(op);
->  }
->
->  bool bt_gatt_discover_characteristics(struct bt_att *att,
-> @@ -1321,7 +1326,6 @@ static void read_by_type_cb(uint8_t opcode, const void *pdu,
->                                                 discovery_op_unref))
->                         return;
->
-> -               discovery_op_unref(op);
->                 success = false;
->                 goto done;
->         }
-> @@ -1332,6 +1336,8 @@ done:
->         if (op->callback)
->                 op->callback(success, att_ecode, success ? op->result_head :
->                                                         NULL, op->user_data);
-> +
-> +       discovery_op_unref(op);
->  }
->
->  bool bt_gatt_read_by_type(struct bt_att *att, uint16_t start, uint16_t end,
-> @@ -1439,7 +1445,6 @@ static void discover_descs_cb(uint8_t opcode, const void *pdu,
->                                                 discovery_op_unref))
->                         return;
->
-> -               discovery_op_unref(op);
->                 success = false;
->                 goto done;
->         }
-> @@ -1451,6 +1456,8 @@ success:
->  done:
->         if (op->callback)
->                 op->callback(success, att_ecode, final_result, op->user_data);
-> +
-> +       discovery_op_unref(op);
->  }
->
->  bool bt_gatt_discover_descriptors(struct bt_att *att,
-> --
-> 1.9.1
+When HCI_Reset is issued the discovery state is assumed to be stopped.
+The hci_cc_reset() handler was trying to set the state but it was doing
+it without using the hci_discovery_set_state() function. Because of this
+e.g. the mgmt Discovering event could go without being sent. This patch
+fixes the code to use the hci_discovery_set_state() function instead of
+just blindly setting the state value.
 
-These were actually false positives of your static analyzer, in all
-occurrences there are actually extra references preventing the memory
-to be freed before use, next time please take the time to test this or
-even better create a unit test to reproduce the problem. For this
-specifically I had done something to track the actual pending
-operation but for gatt-client changes I would have had to change some
-APIs to do it properly and because of that I just revert it, perhaps
-it is worth doing something similar there if it continues to show as a
-problem in the static analyzers.
+Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+---
+ net/bluetooth/hci_event.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 00c160634e7b..4175470ff48e 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -200,7 +200,8 @@ static void hci_cc_reset(struct hci_dev *hdev, struct sk_buff *skb)
+ 	/* Reset all non-persistent flags */
+ 	hdev->dev_flags &= ~HCI_PERSISTENT_MASK;
+ 
+-	hdev->discovery.state = DISCOVERY_STOPPED;
++	hci_discovery_set_state(hdev, DISCOVERY_STOPPED);
++
+ 	hdev->inq_tx_power = HCI_TX_POWER_INVALID;
+ 	hdev->adv_tx_power = HCI_TX_POWER_INVALID;
+ 
 -- 
-Luiz Augusto von Dentz
+2.1.0
+
