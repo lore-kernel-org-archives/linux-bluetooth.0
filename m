@@ -1,35 +1,136 @@
 Return-Path: <cyrus@holtmann.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 8.1 \(1993\))
-Subject: Re: [PATCH v2] Bluetooth: ath3k: workaround the compatibility issue with xHCI controller
+Subject: Re: [PATCH v2] Bluetooth: Fix sending Read Remote Extended Features command
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1422477027-8923-1-git-send-email-adam.lee@canonical.com>
-Date: Thu, 29 Jan 2015 10:14:37 -0800
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>,
-	"Gustavo F. Padovan" <gustavo@padovan.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>
-Message-Id: <12502301-5C02-406E-9451-0114874E41D2@holtmann.org>
-References: <1422477027-8923-1-git-send-email-adam.lee@canonical.com>
-To: Adam Lee <adam.lee@canonical.com>
+In-Reply-To: <1422545819-5522-1-git-send-email-szymon.janc@tieto.com>
+Date: Thu, 29 Jan 2015 08:03:04 -0800
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <5628B7DA-6764-4158-BDE4-59F016280EC2@holtmann.org>
+References: <1422545819-5522-1-git-send-email-szymon.janc@tieto.com>
+To: Szymon Janc <szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Adam,
+Hi Szymon,
 
-> BugLink: https://bugs.launchpad.net/bugs/1400215
+> This command should only be used if remote device reports that it
+> supports extended features. Otherwise command will fail and connection
+> will be dropped.
 > 
-> ath3k devices fail to load firmwares on xHCI buses, but work well on
-> EHCI, this might be a compatibility issue between xHCI and ath3k chips.
-> As my testing result, those chips will work on xHCI buses again with
-> this patch.
+> Some devices support SSP but don't support extended features so
+> current check for SSP support is not enought.
 > 
-> This workaround is from Qualcomm, they also did some workarounds in
-> Windows driver.
+> Instead of checking for SSP support just check if both ends support
+> Extended Feature.
 > 
-> Signed-off-by: Adam Lee <adam.lee@canonical.com>
+> < HCI Command: Create Connection (0x01|0x0005) plen 13
+>        Address: D0:9C:30:00:19:6F (Foster Electric Company, Limited)
+>        Packet type: 0xcc18
+>          DM1 may be used
+>          DH1 may be used
+>          DM3 may be used
+>          DH3 may be used
+>          DM5 may be used
+>          DH5 may be used
+>        Page scan repetition mode: R1 (0x01)
+>        Page scan mode: Mandatory (0x00)
+>        Clock offset: 0x94c8
+>        Role switch: Allow slave (0x01)
+>> HCI Event: Command Status (0x0f) plen 4
+>      Create Connection (0x01|0x0005) ncmd 1
+>        Status: Success (0x00)
+>> HCI Event: Connect Complete (0x03) plen 11
+>        Status: Success (0x00)
+>        Handle: 5
+>        Address: D0:9C:30:00:19:6F (Foster Electric Company, Limited)
+>        Link type: ACL (0x01)
+>        Encryption: Disabled (0x00)
+> < HCI Command: Read Remote Supported Features (0x01|0x001b) plen 2
+>        Handle: 5
+>> HCI Event: Command Status (0x0f) plen 4
+>      Read Remote Supported Features (0x01|0x001b) ncmd 1
+>        Status: Success (0x00)
+>> HCI Event: Page Scan Repetition Mode Change (0x20) plen 7
+>        Address: D0:9C:30:00:19:6F (Foster Electric Company, Limited)
+>        Page scan repetition mode: R1 (0x01)
+>> HCI Event: Read Remote Supported Features (0x0b) plen 11
+>        Status: Success (0x00)
+>        Handle: 5
+>        Features: 0xff 0xff 0x8f 0xfe 0xdb 0xff 0x5b 0x07
+>          3 slot packets
+>          5 slot packets
+>          Encryption
+>          Slot offset
+>          Timing accuracy
+>          Role switch
+>          Hold mode
+>          Sniff mode
+>          Park state
+>          Power control requests
+>          Channel quality driven data rate (CQDDR)
+>          SCO link
+>          HV2 packets
+>          HV3 packets
+>          u-law log synchronous data
+>          A-law log synchronous data
+>          CVSD synchronous data
+>          Paging parameter negotiation
+>          Power control
+>          Transparent synchronous data
+>          Broadcast Encryption
+>          Enhanced Data Rate ACL 2 Mbps mode
+>          Enhanced Data Rate ACL 3 Mbps mode
+>          Enhanced inquiry scan
+>          Interlaced inquiry scan
+>          Interlaced page scan
+>          RSSI with inquiry results
+>          Extended SCO link (EV3 packets)
+>          EV4 packets
+>          EV5 packets
+>          AFH capable slave
+>          AFH classification slave
+>          LE Supported (Controller)
+>          3-slot Enhanced Data Rate ACL packets
+>          5-slot Enhanced Data Rate ACL packets
+>          Sniff subrating
+>          Pause encryption
+>          AFH capable master
+>          AFH classification master
+>          Enhanced Data Rate eSCO 2 Mbps mode
+>          Enhanced Data Rate eSCO 3 Mbps mode
+>          3-slot Enhanced Data Rate eSCO packets
+>          Extended Inquiry Response
+>          Simultaneous LE and BR/EDR (Controller)
+>          Secure Simple Pairing
+>          Encapsulated PDU
+>          Non-flushable Packet Boundary Flag
+>          Link Supervision Timeout Changed Event
+>          Inquiry TX Power Level
+>          Enhanced Power Control
+> < HCI Command: Read Remote Extended Features (0x01|0x001c) plen 3
+>        Handle: 5
+>        Page: 1
+>> HCI Event: Command Status (0x0f) plen 4
+>      Read Remote Extended Features (0x01|0x001c) ncmd 1
+>        Status: Command Disallowed (0x0c)
+> < HCI Command: Read Clock Offset (0x01|0x001f) plen 2
+>        Handle: 5
+>> HCI Event: Command Status (0x0f) plen 4
+>      Read Clock Offset (0x01|0x001f) ncmd 1
+>        Status: Success (0x00)
+> < HCI Command: Disconnect (0x01|0x0006) plen 3
+>        Handle: 5
+>        Reason: Remote User Terminated Connection (0x13)
+> 
+> Signed-off-by: Szymon Janc <szymon.janc@tieto.com>
 > ---
-> drivers/bluetooth/ath3k.c | 8 ++++++++
-> 1 file changed, 8 insertions(+)
+> 
+> V2 - check for lmp_ext_feat_capable on both ends instead of
+>     ssp check as suggested by Marcel
+> 
+> net/bluetooth/hci_event.c | 3 ++-
+> 1 file changed, 2 insertions(+), 1 deletion(-)
 
 patch has been applied to bluetooth-next tree.
 
