@@ -1,39 +1,72 @@
 Return-Path: <cyrus@holtmann.org>
-From: Johan Hedberg <johan.hedberg@gmail.com>
+From: Arman Uguray <armansito@chromium.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Fix check for SSP when enabling SC
-Date: Wed, 28 Jan 2015 12:23:18 +0200
-Message-Id: <1422440598-12210-1-git-send-email-johan.hedberg@gmail.com>
+Cc: luiz.dentz@gmail.com, Arman Uguray <armansito@chromium.org>
+Subject: [PATCH BlueZ 4/5] core: device: Add device_is_bonded_for_gatt
+Date: Wed, 28 Jan 2015 18:11:02 -0800
+Message-Id: <1422497463-32539-5-git-send-email-armansito@chromium.org>
+In-Reply-To: <1422497463-32539-1-git-send-email-armansito@chromium.org>
+References: <1422497463-32539-1-git-send-email-armansito@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@intel.com>
+Added the device_is_bonded_for_gatt function, which returns true if
+the bonding state is true for the bearer over which the GATT db was
+populated. For now, this only returns the LE state but added for
+better layering, so that future changes to the internal logic can be
+simply performed here to avoid regressions.
 
-There's a check in set_secure_conn() that's supposed to ensure that SSP
-is enabled before we try to request the controller to enable SC (since
-SSP is a pre-requisite for it). However, this check only makes sense for
-controllers actually supporting BR/EDR SC. If we have a 4.0 controller
-we're only interested in the LE part of SC and should therefore not be
-requiring SSP to be enabled. This patch adds an additional condition to
-check for lmp_sc_capable(hdev) before requiring SSP to be enabled.
-
-Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+Change-Id: I6ebd16a1111aa38645a0a072536f4171d246b931
 ---
- net/bluetooth/mgmt.c | 1 +
- 1 file changed, 1 insertion(+)
+ src/device.c | 14 +++++++++++++-
+ src/device.h |  1 +
+ 2 files changed, 14 insertions(+), 1 deletion(-)
 
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 8417ab387d1a..78939e0ed1f4 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -4818,6 +4818,7 @@ static int set_secure_conn(struct sock *sk, struct hci_dev *hdev,
- 				  MGMT_STATUS_NOT_SUPPORTED);
+diff --git a/src/device.c b/src/device.c
+index 9cb5acb..2ef2b6a 100644
+--- a/src/device.c
++++ b/src/device.c
+@@ -506,8 +506,10 @@ static void gatt_client_cleanup(struct btd_device *device)
+ 	bt_gatt_client_unref(device->client);
+ 	device->client = NULL;
  
- 	if (test_bit(HCI_BREDR_ENABLED, &hdev->dev_flags) &&
-+	    lmp_sc_capable(hdev) &&
- 	    !test_bit(HCI_SSP_ENABLED, &hdev->dev_flags))
- 		return cmd_status(sk, hdev->id, MGMT_OP_SET_SECURE_CONN,
- 				  MGMT_STATUS_REJECTED);
+-	if (!device->le_state.bonded)
++	if (!device_is_bonded_for_gatt(device)) {
++		DBG("Device is not bonded, clearing client attribute cache");
+ 		gatt_db_clear(device->db);
++	}
+ }
+ 
+ static void attio_cleanup(struct btd_device *device)
+@@ -638,6 +640,16 @@ bool device_is_bonded(struct btd_device *device, uint8_t bdaddr_type)
+ 	return state->bonded;
+ }
+ 
++bool device_is_bonded_for_gatt(struct btd_device *device)
++{
++	/*
++	 * TODO: Once we properly support GATT over BR/EDR, we should remember
++	 * whether the GATT client  database was populated over LE or BR/EDR and
++	 * check the correct bonding state.
++	 */
++	return device->le_state.bonded;
++}
++
+ gboolean device_is_trusted(struct btd_device *device)
+ {
+ 	return device->trusted;
+diff --git a/src/device.h b/src/device.h
+index a7fefee..b4aead1 100644
+--- a/src/device.h
++++ b/src/device.h
+@@ -82,6 +82,7 @@ const char *device_get_path(const struct btd_device *device);
+ gboolean device_is_temporary(struct btd_device *device);
+ bool device_is_paired(struct btd_device *device, uint8_t bdaddr_type);
+ bool device_is_bonded(struct btd_device *device, uint8_t bdaddr_type);
++bool device_is_bonded_for_gatt(struct btd_device *device);
+ gboolean device_is_trusted(struct btd_device *device);
+ void device_set_paired(struct btd_device *dev, uint8_t bdaddr_type);
+ void device_set_unpaired(struct btd_device *dev, uint8_t bdaddr_type);
 -- 
-2.1.0
+2.2.0.rc0.207.ga3a616c
 
