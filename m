@@ -1,209 +1,88 @@
 Return-Path: <cyrus@holtmann.org>
+MIME-Version: 1.0
+In-Reply-To: <1422497463-32539-5-git-send-email-armansito@chromium.org>
+References: <1422497463-32539-1-git-send-email-armansito@chromium.org>
+	<1422497463-32539-5-git-send-email-armansito@chromium.org>
+Date: Thu, 29 Jan 2015 15:52:22 +0200
+Message-ID: <CABBYNZ+6OCd2tLfSVJt-dUYUc348jTik003jkwc+vFs-uKaS9w@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 4/5] core: device: Add device_is_bonded_for_gatt
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ] shared/gatt-client: Simplify read long value
-Date: Thu, 29 Jan 2015 17:09:33 +0200
-Message-Id: <1422544173-7729-1-git-send-email-luiz.dentz@gmail.com>
+To: Arman Uguray <armansito@chromium.org>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Arman,
 
-This removes the extra queue that acts as intermediate storage, instead
-the code will now storage everything in a single buffer and just realloc
-while appending new chunks.
----
- src/shared/gatt-client.c | 107 ++++++++++-------------------------------------
- 1 file changed, 21 insertions(+), 86 deletions(-)
+On Thu, Jan 29, 2015 at 4:11 AM, Arman Uguray <armansito@chromium.org> wrote:
+> Added the device_is_bonded_for_gatt function, which returns true if
+> the bonding state is true for the bearer over which the GATT db was
+> populated. For now, this only returns the LE state but added for
+> better layering, so that future changes to the internal logic can be
+> simply performed here to avoid regressions.
+>
+> Change-Id: I6ebd16a1111aa38645a0a072536f4171d246b931
+> ---
+>  src/device.c | 14 +++++++++++++-
+>  src/device.h |  1 +
+>  2 files changed, 14 insertions(+), 1 deletion(-)
+>
+> diff --git a/src/device.c b/src/device.c
+> index 9cb5acb..2ef2b6a 100644
+> --- a/src/device.c
+> +++ b/src/device.c
+> @@ -506,8 +506,10 @@ static void gatt_client_cleanup(struct btd_device *device)
+>         bt_gatt_client_unref(device->client);
+>         device->client = NULL;
+>
+> -       if (!device->le_state.bonded)
+> +       if (!device_is_bonded_for_gatt(device)) {
+> +               DBG("Device is not bonded, clearing client attribute cache");
+>                 gatt_db_clear(device->db);
+> +       }
+>  }
+>
+>  static void attio_cleanup(struct btd_device *device)
+> @@ -638,6 +640,16 @@ bool device_is_bonded(struct btd_device *device, uint8_t bdaddr_type)
+>         return state->bonded;
+>  }
+>
+> +bool device_is_bonded_for_gatt(struct btd_device *device)
+> +{
+> +       /*
+> +        * TODO: Once we properly support GATT over BR/EDR, we should remember
+> +        * whether the GATT client  database was populated over LE or BR/EDR and
+> +        * check the correct bonding state.
+> +        */
+> +       return device->le_state.bonded;
+> +}
+> +
+>  gboolean device_is_trusted(struct btd_device *device)
+>  {
+>         return device->trusted;
+> diff --git a/src/device.h b/src/device.h
+> index a7fefee..b4aead1 100644
+> --- a/src/device.h
+> +++ b/src/device.h
+> @@ -82,6 +82,7 @@ const char *device_get_path(const struct btd_device *device);
+>  gboolean device_is_temporary(struct btd_device *device);
+>  bool device_is_paired(struct btd_device *device, uint8_t bdaddr_type);
+>  bool device_is_bonded(struct btd_device *device, uint8_t bdaddr_type);
+> +bool device_is_bonded_for_gatt(struct btd_device *device);
 
-diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
-index 04fb4cb..a78e209 100644
---- a/src/shared/gatt-client.c
-+++ b/src/shared/gatt-client.c
-@@ -31,6 +31,7 @@
- 
- #include <assert.h>
- #include <limits.h>
-+#include <sys/uio.h>
- 
- #ifndef MAX
- #define MAX(a, b) ((a) > (b) ? (a) : (b))
-@@ -1927,54 +1928,13 @@ struct read_long_op {
- 	struct bt_gatt_client *client;
- 	int ref_count;
- 	uint16_t value_handle;
--	uint16_t orig_offset;
- 	uint16_t offset;
--	struct queue *blobs;
-+	struct iovec iov;
- 	bt_gatt_client_read_callback_t callback;
- 	void *user_data;
- 	bt_gatt_client_destroy_func_t destroy;
- };
- 
--struct blob {
--	uint8_t *data;
--	uint16_t offset;
--	uint16_t length;
--};
--
--static struct blob *create_blob(const uint8_t *data, uint16_t len,
--								uint16_t offset)
--{
--	struct blob *blob;
--
--	blob = new0(struct blob, 1);
--	if (!blob)
--		return NULL;
--
--	/* Truncate if the data would exceed maximum length */
--	if (offset + len > BT_ATT_MAX_VALUE_LEN)
--		len = BT_ATT_MAX_VALUE_LEN - offset;
--
--	blob->data = malloc(len);
--	if (!blob->data) {
--		free(blob);
--		return NULL;
--	}
--
--	memcpy(blob->data, data, len);
--	blob->length = len;
--	blob->offset = offset;
--
--	return blob;
--}
--
--static void destroy_blob(void *data)
--{
--	struct blob *blob = data;
--
--	free(blob->data);
--	free(blob);
--}
--
- static void destroy_read_long_op(void *data)
- {
- 	struct read_long_op *op = data;
-@@ -1982,46 +1942,31 @@ static void destroy_read_long_op(void *data)
- 	if (op->destroy)
- 		op->destroy(op->user_data);
- 
--	queue_destroy(op->blobs, destroy_blob);
--
-+	free(op->iov.iov_base);
- 	free(op);
- }
- 
--static void append_blob(void *data, void *user_data)
-+static bool append_chunk(struct read_long_op *op, const uint8_t *data,
-+								uint16_t len)
- {
--	struct blob *blob = data;
--	uint8_t *value = user_data;
--
--	memcpy(value + blob->offset, blob->data, blob->length);
--}
-+	void *buf;
- 
--static void complete_read_long_op(struct read_long_op *op, bool success,
--							uint8_t att_ecode)
--{
--	uint8_t *value = NULL;
--	uint16_t length = 0;
--
--	if (!success)
--		goto done;
--
--	length = op->offset - op->orig_offset;
-+	/* Truncate if the data would exceed maximum length */
-+	if (op->offset + len > BT_ATT_MAX_VALUE_LEN)
-+		len = BT_ATT_MAX_VALUE_LEN - op->offset;
- 
--	if (!length)
--		goto done;
-+	buf = realloc(op->iov.iov_base, op->iov.iov_len + len);
-+	if (!buf)
-+		return false;
- 
--	value = malloc(length);
--	if (!value) {
--		success = false;
--		goto done;
--	}
-+	op->iov.iov_base = buf;
- 
--	queue_foreach(op->blobs, append_blob, value - op->orig_offset);
-+	memcpy(op->iov.iov_base + op->iov.iov_len, data, len);
- 
--done:
--	if (op->callback)
--		op->callback(success, att_ecode, value, length, op->user_data);
-+	op->iov.iov_len += len;
-+	op->offset += len;
- 
--	free(value);
-+	return true;
- }
- 
- static void read_long_cb(uint8_t opcode, const void *pdu,
-@@ -2029,7 +1974,6 @@ static void read_long_cb(uint8_t opcode, const void *pdu,
- {
- 	struct request *req = user_data;
- 	struct read_long_op *op = req->data;
--	struct blob *blob;
- 	bool success;
- 	uint8_t att_ecode = 0;
- 
-@@ -2047,14 +1991,11 @@ static void read_long_cb(uint8_t opcode, const void *pdu,
- 	if (!length)
- 		goto success;
- 
--	blob = create_blob(pdu, length, op->offset);
--	if (!blob) {
-+	if (!append_chunk(op, pdu, length)) {
- 		success = false;
- 		goto done;
- 	}
- 
--	queue_push_tail(op->blobs, blob);
--	op->offset += blob->length;
- 	if (op->offset >= BT_ATT_MAX_VALUE_LEN)
- 		goto success;
- 
-@@ -2082,7 +2023,9 @@ success:
- 	success = true;
- 
- done:
--	complete_read_long_op(op, success, att_ecode);
-+	if (op->callback)
-+		op->callback(success, att_ecode, op->iov.iov_base,
-+						op->iov.iov_len, op->user_data);
- }
- 
- unsigned int bt_gatt_client_read_long_value(struct bt_gatt_client *client,
-@@ -2102,22 +2045,14 @@ unsigned int bt_gatt_client_read_long_value(struct bt_gatt_client *client,
- 	if (!op)
- 		return 0;
- 
--	op->blobs = queue_new();
--	if (!op->blobs) {
--		free(op);
--		return 0;
--	}
--
- 	req = request_create(client);
- 	if (!req) {
--		queue_destroy(op->blobs, free);
- 		free(op);
- 		return 0;
- 	}
- 
- 	op->client = client;
- 	op->value_handle = value_handle;
--	op->orig_offset = offset;
- 	op->offset = offset;
- 	op->callback = callback;
- 	op->user_data = user_data;
+Isn't this equivalent to device_is_bonded or perhaps we don't the
+type? I guess it is possible to retrieve in what transport we are
+connected and then check if we it is bonded.
+
+>  gboolean device_is_trusted(struct btd_device *device);
+>  void device_set_paired(struct btd_device *dev, uint8_t bdaddr_type);
+>  void device_set_unpaired(struct btd_device *dev, uint8_t bdaddr_type);
+> --
+> 2.2.0.rc0.207.ga3a616c
+>
+
+
+
 -- 
-2.1.0
-
+Luiz Augusto von Dentz
