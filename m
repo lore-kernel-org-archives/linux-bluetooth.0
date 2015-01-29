@@ -1,53 +1,103 @@
 Return-Path: <cyrus@holtmann.org>
-From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH 1/2] android/gatt: Fix initial setting of MTU
-Date: Thu, 29 Jan 2015 20:54:50 +0100
-Message-Id: <1422561291-12648-1-git-send-email-lukasz.rymanowski@tieto.com>
+MIME-Version: 1.0
+In-Reply-To: <CABBYNZ+6OCd2tLfSVJt-dUYUc348jTik003jkwc+vFs-uKaS9w@mail.gmail.com>
+References: <1422497463-32539-1-git-send-email-armansito@chromium.org>
+	<1422497463-32539-5-git-send-email-armansito@chromium.org>
+	<CABBYNZ+6OCd2tLfSVJt-dUYUc348jTik003jkwc+vFs-uKaS9w@mail.gmail.com>
+Date: Thu, 29 Jan 2015 11:46:34 -0800
+Message-ID: <CAHrH25TvixrEj6L3vWYJcV+4g=QNixYJ+7iaA98f4Ch+STTrgA@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 4/5] core: device: Add device_is_bonded_for_gatt
+From: Arman Uguray <armansito@chromium.org>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Initial setting of MTU should be IMTU. This is actually our assumption
-in other part of code, that IMTU is something we start with and change
-if needed after exchange MTU procedure.
+Hi Luiz,
 
-If we are not able to get IMTU from the socket just disconnect, there is
-something wrong going on.
+> On Thu, Jan 29, 2015 at 5:52 AM, Luiz Augusto von Dentz <luiz.dentz@gmail.com> wrote:
+> Hi Arman,
+>
+> On Thu, Jan 29, 2015 at 4:11 AM, Arman Uguray <armansito@chromium.org> wrote:
+>> Added the device_is_bonded_for_gatt function, which returns true if
+>> the bonding state is true for the bearer over which the GATT db was
+>> populated. For now, this only returns the LE state but added for
+>> better layering, so that future changes to the internal logic can be
+>> simply performed here to avoid regressions.
+>>
+>> Change-Id: I6ebd16a1111aa38645a0a072536f4171d246b931
+>> ---
+>>  src/device.c | 14 +++++++++++++-
+>>  src/device.h |  1 +
+>>  2 files changed, 14 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/src/device.c b/src/device.c
+>> index 9cb5acb..2ef2b6a 100644
+>> --- a/src/device.c
+>> +++ b/src/device.c
+>> @@ -506,8 +506,10 @@ static void gatt_client_cleanup(struct btd_device *device)
+>>         bt_gatt_client_unref(device->client);
+>>         device->client = NULL;
+>>
+>> -       if (!device->le_state.bonded)
+>> +       if (!device_is_bonded_for_gatt(device)) {
+>> +               DBG("Device is not bonded, clearing client attribute cache");
+>>                 gatt_db_clear(device->db);
+>> +       }
+>>  }
+>>
+>>  static void attio_cleanup(struct btd_device *device)
+>> @@ -638,6 +640,16 @@ bool device_is_bonded(struct btd_device *device, uint8_t bdaddr_type)
+>>         return state->bonded;
+>>  }
+>>
+>> +bool device_is_bonded_for_gatt(struct btd_device *device)
+>> +{
+>> +       /*
+>> +        * TODO: Once we properly support GATT over BR/EDR, we should remember
+>> +        * whether the GATT client  database was populated over LE or BR/EDR and
+>> +        * check the correct bonding state.
+>> +        */
+>> +       return device->le_state.bonded;
+>> +}
+>> +
+>>  gboolean device_is_trusted(struct btd_device *device)
+>>  {
+>>         return device->trusted;
+>> diff --git a/src/device.h b/src/device.h
+>> index a7fefee..b4aead1 100644
+>> --- a/src/device.h
+>> +++ b/src/device.h
+>> @@ -82,6 +82,7 @@ const char *device_get_path(const struct btd_device *device);
+>>  gboolean device_is_temporary(struct btd_device *device);
+>>  bool device_is_paired(struct btd_device *device, uint8_t bdaddr_type);
+>>  bool device_is_bonded(struct btd_device *device, uint8_t bdaddr_type);
+>> +bool device_is_bonded_for_gatt(struct btd_device *device);
+>
+> Isn't this equivalent to device_is_bonded or perhaps we don't the
+> type? I guess it is possible to retrieve in what transport we are
+> connected and then check if we it is bonded.
+>
 
-Without this patch you can face the issue with following scenario:
-1. On connection complete MTU is set to 23
-2. BfA sends Exchange MTU Request with MTU set to IMTU
-3. Remote device response with MTU equal to what BfA sends
-4. In that case, since remote MTU is equal to ours, there is no
-update in bt_att, so bt_att keep using  MTU = 23
-5. Remote sends packets highier then 23 and bt_att start to drop not
-complete packets.
+It's pretty much the same thing, except it would return the bonding
+state based on the transport that did the GATT discovery. I figured it
+would be better to have this function in one place so that we only
+have one place to change when we properly support GATT over BR/EDR in
+the future. Just using device_is_bonded and passing BDADDR_LE_PUBLIC
+for the bdaddr works too for now, we just need to remember to update
+them later. I'll go ahead and leave this out for now.
 
-Issue found and fix tested on UPF50
----
- android/gatt.c | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
+>>  gboolean device_is_trusted(struct btd_device *device);
+>>  void device_set_paired(struct btd_device *dev, uint8_t bdaddr_type);
+>>  void device_set_unpaired(struct btd_device *dev, uint8_t bdaddr_type);
+>> --
+>> 2.2.0.rc0.207.ga3a616c
+>>
+>
+>
+>
+> --
+> Luiz Augusto von Dentz
 
-diff --git a/android/gatt.c b/android/gatt.c
-index 466c1ea..ddec9ad 100644
---- a/android/gatt.c
-+++ b/android/gatt.c
-@@ -1511,8 +1511,12 @@ static void connect_cb(GIOChannel *io, GError *gerr, gpointer user_data)
- 	}
- 
- 	if (!bt_io_get(io, &gerr, BT_IO_OPT_IMTU, &mtu, BT_IO_OPT_CID, &cid,
--				BT_IO_OPT_INVALID) || cid == ATT_CID)
--		mtu = ATT_DEFAULT_LE_MTU;
-+							BT_IO_OPT_INVALID)) {
-+		error("gatt: Could not get imtu: %s", gerr->message);
-+		device_set_state(dev, DEVICE_DISCONNECTED);
-+		status = GATT_FAILURE;
-+		goto reply;
-+	}
- 
- 	attrib = g_attrib_new(io, mtu);
- 	if (!attrib) {
--- 
-1.8.4
-
+Arman
