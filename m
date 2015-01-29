@@ -1,95 +1,145 @@
 Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
-To: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] tools/sdptool: Check if HCI is powered UP before executing commands
-Date: Thu, 29 Jan 2015 16:47:54 +0100
-Message-ID: <2597711.MuBCiDUiW2@leonov>
-In-Reply-To: <1422452421-32092-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
-References: <1422452421-32092-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+To: linux-bluetooth@vger.kernel.org
+Cc: Szymon Janc <szymon.janc@tieto.com>
+Subject: [PATCH v2] Bluetooth: Fix sending Read Remote Extended Features command
+Date: Thu, 29 Jan 2015 16:36:59 +0100
+Message-Id: <1422545819-5522-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Grzegorz,
+This command should only be used if remote device reports that it
+supports extended features. Otherwise command will fail and connection
+will be dropped.
 
-On Wednesday 28 of January 2015 14:40:21 Grzegorz Kolodziejczyk wrote:
-> Before executing commands should be checked if any or chosen HCI is
-> powered up. If not further executing of command makes no sense.
-> ---
->  android/pics-spp.txt  |  2 +-
->  android/pixit-spp.txt |  2 +-
+Some devices support SSP but don't support extended features so
+current check for SSP support is not enought.
 
-This shouldn't be part of this patch.
+Instead of checking for SSP support just check if both ends support
+Extended Feature.
 
->  tools/sdptool.c       | 12 ++++++++++--
->  3 files changed, 12 insertions(+), 4 deletions(-)
-> 
-> diff --git a/android/pics-spp.txt b/android/pics-spp.txt
-> index f015236..d9bb883 100644
-> --- a/android/pics-spp.txt
-> +++ b/android/pics-spp.txt
-> @@ -1,6 +1,6 @@
->  SPP PICS for the PTS tool.
-> 
-> -PTS version: 5.3
-> +PTS version: 6.0
-> 
->  * - different than PTS defaults
->  # - not yet implemented/supported
-> diff --git a/android/pixit-spp.txt b/android/pixit-spp.txt
-> index a8a8202..8e2d70f 100644
-> --- a/android/pixit-spp.txt
-> +++ b/android/pixit-spp.txt
-> @@ -1,6 +1,6 @@
->  SPP PIXIT for the PTS tool.
-> 
-> -PTS version: 5.3
-> +PTS version: 6.0
-> 
->  * - different than PTS defaults
->  & - should be set to IUT Bluetooth address
-> diff --git a/tools/sdptool.c b/tools/sdptool.c
-> index 17561b1..9ff7a1c 100644
-> --- a/tools/sdptool.c
-> +++ b/tools/sdptool.c
-> @@ -4352,17 +4352,20 @@ static struct option main_options[] = {
-> 
->  int main(int argc, char *argv[])
->  {
-> -	int i, opt;
-> +	int i, opt, err;
-> 
->  	bacpy(&interface, BDADDR_ANY);
-> 
-> +	err = hci_get_route(NULL);
-> +
->  	while ((opt=getopt_long(argc, argv, "+i:h", main_options, NULL)) != -1) {
->  		switch(opt) {
->  		case 'i':
->  			if (!strncmp(optarg, "hci", 3))
-> -				hci_devba(atoi(optarg + 3), &interface);
-> +				err = hci_devba(atoi(optarg + 3), &interface);
->  			else
->  				str2ba(optarg, &interface);
-> +				err = hci_get_route(&interface);
->  			break;
-> 
->  		case 'h':
-> @@ -4374,6 +4377,11 @@ int main(int argc, char *argv[])
->  		}
->  	}
-> 
-> +	if (err < 0) {
-> +		printf("No powered on HCI interface found\n");
-> +		exit(0);
-> +	}
-> +
->  	argc -= optind;
->  	argv += optind;
->  	optind = 0;
+< HCI Command: Create Connection (0x01|0x0005) plen 13
+        Address: D0:9C:30:00:19:6F (Foster Electric Company, Limited)
+        Packet type: 0xcc18
+          DM1 may be used
+          DH1 may be used
+          DM3 may be used
+          DH3 may be used
+          DM5 may be used
+          DH5 may be used
+        Page scan repetition mode: R1 (0x01)
+        Page scan mode: Mandatory (0x00)
+        Clock offset: 0x94c8
+        Role switch: Allow slave (0x01)
+> HCI Event: Command Status (0x0f) plen 4
+      Create Connection (0x01|0x0005) ncmd 1
+        Status: Success (0x00)
+> HCI Event: Connect Complete (0x03) plen 11
+        Status: Success (0x00)
+        Handle: 5
+        Address: D0:9C:30:00:19:6F (Foster Electric Company, Limited)
+        Link type: ACL (0x01)
+        Encryption: Disabled (0x00)
+< HCI Command: Read Remote Supported Features (0x01|0x001b) plen 2
+        Handle: 5
+> HCI Event: Command Status (0x0f) plen 4
+      Read Remote Supported Features (0x01|0x001b) ncmd 1
+        Status: Success (0x00)
+> HCI Event: Page Scan Repetition Mode Change (0x20) plen 7
+        Address: D0:9C:30:00:19:6F (Foster Electric Company, Limited)
+        Page scan repetition mode: R1 (0x01)
+> HCI Event: Read Remote Supported Features (0x0b) plen 11
+        Status: Success (0x00)
+        Handle: 5
+        Features: 0xff 0xff 0x8f 0xfe 0xdb 0xff 0x5b 0x07
+          3 slot packets
+          5 slot packets
+          Encryption
+          Slot offset
+          Timing accuracy
+          Role switch
+          Hold mode
+          Sniff mode
+          Park state
+          Power control requests
+          Channel quality driven data rate (CQDDR)
+          SCO link
+          HV2 packets
+          HV3 packets
+          u-law log synchronous data
+          A-law log synchronous data
+          CVSD synchronous data
+          Paging parameter negotiation
+          Power control
+          Transparent synchronous data
+          Broadcast Encryption
+          Enhanced Data Rate ACL 2 Mbps mode
+          Enhanced Data Rate ACL 3 Mbps mode
+          Enhanced inquiry scan
+          Interlaced inquiry scan
+          Interlaced page scan
+          RSSI with inquiry results
+          Extended SCO link (EV3 packets)
+          EV4 packets
+          EV5 packets
+          AFH capable slave
+          AFH classification slave
+          LE Supported (Controller)
+          3-slot Enhanced Data Rate ACL packets
+          5-slot Enhanced Data Rate ACL packets
+          Sniff subrating
+          Pause encryption
+          AFH capable master
+          AFH classification master
+          Enhanced Data Rate eSCO 2 Mbps mode
+          Enhanced Data Rate eSCO 3 Mbps mode
+          3-slot Enhanced Data Rate eSCO packets
+          Extended Inquiry Response
+          Simultaneous LE and BR/EDR (Controller)
+          Secure Simple Pairing
+          Encapsulated PDU
+          Non-flushable Packet Boundary Flag
+          Link Supervision Timeout Changed Event
+          Inquiry TX Power Level
+          Enhanced Power Control
+< HCI Command: Read Remote Extended Features (0x01|0x001c) plen 3
+        Handle: 5
+        Page: 1
+> HCI Event: Command Status (0x0f) plen 4
+      Read Remote Extended Features (0x01|0x001c) ncmd 1
+        Status: Command Disallowed (0x0c)
+< HCI Command: Read Clock Offset (0x01|0x001f) plen 2
+        Handle: 5
+> HCI Event: Command Status (0x0f) plen 4
+      Read Clock Offset (0x01|0x001f) ncmd 1
+        Status: Success (0x00)
+< HCI Command: Disconnect (0x01|0x0006) plen 3
+        Handle: 5
+        Reason: Remote User Terminated Connection (0x13)
 
+Signed-off-by: Szymon Janc <szymon.janc@tieto.com>
+---
+
+V2 - check for lmp_ext_feat_capable on both ends instead of
+     ssp check as suggested by Marcel
+
+ net/bluetooth/hci_event.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index e2b81ad..f12526b 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -2667,7 +2667,8 @@ static void hci_remote_features_evt(struct hci_dev *hdev,
+ 	if (conn->state != BT_CONFIG)
+ 		goto unlock;
+ 
+-	if (!ev->status && lmp_ssp_capable(hdev) && lmp_ssp_capable(conn)) {
++	if (!ev->status && lmp_ext_feat_capable(hdev) &&
++	    lmp_ext_feat_capable(conn)) {
+ 		struct hci_cp_read_remote_ext_features cp;
+ 		cp.handle = ev->handle;
+ 		cp.page = 0x01;
 -- 
-BR
-Szymon Janc
+1.9.3
+
