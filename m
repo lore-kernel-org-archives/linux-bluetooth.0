@@ -2,57 +2,54 @@ Return-Path: <cyrus@holtmann.org>
 From: Arman Uguray <armansito@chromium.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: luiz.dentz@gmail.com, Arman Uguray <armansito@chromium.org>
-Subject: [PATCH BlueZ 3/5] core: device: Don't check ready in service_removed
-Date: Wed, 28 Jan 2015 18:11:01 -0800
-Message-Id: <1422497463-32539-4-git-send-email-armansito@chromium.org>
+Subject: [PATCH BlueZ 2/5] core: gatt: Implement GattCharacteristic1.StopNotify
+Date: Wed, 28 Jan 2015 18:11:00 -0800
+Message-Id: <1422497463-32539-3-git-send-email-armansito@chromium.org>
 In-Reply-To: <1422497463-32539-1-git-send-email-armansito@chromium.org>
 References: <1422497463-32539-1-git-send-email-armansito@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-shared/gatt-client clears a given gatt-db if there's an error during its
-init sequence, even if the given gatt-db was previously populated (e.g.
-from a cache). This is to make sure that the database contents are at no
-point invalid.
+This patch implements the StopNotify method of
+org.bluez.GattCharacteristic1.
 
-This patch removes a check for bt_gatt_client_is_ready and the
-corresponding early-return from btd_device's service_removed handler, so
-that other layers can be notified of invalidated gatt_db_attribute
-pointers.
-
-Change-Id: I8e188d0d0f81398b89f63183ed0708830b6dd9c5
+Change-Id: I2c941c9f1cdbfb1e8a02257b01fc7377b035e28d
 ---
- src/device.c | 17 +++++++++++++++--
- 1 file changed, 15 insertions(+), 2 deletions(-)
+ src/gatt-client.c | 21 +++++++++++++++++++--
+ 1 file changed, 19 insertions(+), 2 deletions(-)
 
-diff --git a/src/device.c b/src/device.c
-index 8dea70b..9cb5acb 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -2762,8 +2762,21 @@ static void gatt_service_removed(struct gatt_db_attribute *attr,
- 	struct gatt_primary *prim;
- 	uint16_t start, end;
+diff --git a/src/gatt-client.c b/src/gatt-client.c
+index 2f187ad..a3cebca 100644
+--- a/src/gatt-client.c
++++ b/src/gatt-client.c
+@@ -1165,8 +1165,25 @@ static DBusMessage *characteristic_start_notify(DBusConnection *conn,
+ static DBusMessage *characteristic_stop_notify(DBusConnection *conn,
+ 					DBusMessage *msg, void *user_data)
+ {
+-	/* TODO: Implement */
+-	return btd_error_failed(msg, "Not implemented");
++	struct characteristic *chrc = user_data;
++	struct bt_gatt_client *gatt = chrc->service->client->gatt;
++	const char *sender = dbus_message_get_sender(msg);
++	struct notify_client *client;
++
++	if (!chrc->notifying)
++		return btd_error_failed(msg, "Not notifying");
++
++	client = queue_remove_if(chrc->notify_clients, match_notify_sender,
++							(void *) sender);
++	if (!client)
++		return btd_error_failed(msg, "No notify session started");
++
++	bt_gatt_client_unregister_notify(gatt, client->notify_id);
++	update_notifying(chrc);
++
++	notify_client_unref(client);
++
++	return dbus_message_new_method_return(msg);
+ }
  
--	if (!bt_gatt_client_is_ready(device->client))
--		return;
-+	/*
-+	 * NOTE: shared/gatt-client clears the database in case of failure. This
-+	 * triggers the service_removed callback for all affected services.
-+	 * Hence, this function will be called in the following cases:
-+	 *
-+	 *    1. When a GATT service gets removed due to "Service Changed".
-+	 *
-+	 *    2. When a GATT service gets removed when the database get cleared
-+	 *       upon disconnection with a non-bonded device.
-+	 *
-+	 *    3. When a GATT service gets removed when the database get cleared
-+	 *       by shared/gatt-client when its initialization procedure fails,
-+	 *       e.g. due to an ATT protocol error or an unexpected disconnect.
-+	 *       In this case the gatt-client will not be ready.
-+	 */
- 
- 	gatt_db_attribute_get_service_handles(attr, &start, &end);
- 
+ static void append_desc_path(void *data, void *user_data)
 -- 
 2.2.0.rc0.207.ga3a616c
 
