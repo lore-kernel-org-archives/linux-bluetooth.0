@@ -1,103 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <CABBYNZ+6OCd2tLfSVJt-dUYUc348jTik003jkwc+vFs-uKaS9w@mail.gmail.com>
-References: <1422497463-32539-1-git-send-email-armansito@chromium.org>
-	<1422497463-32539-5-git-send-email-armansito@chromium.org>
-	<CABBYNZ+6OCd2tLfSVJt-dUYUc348jTik003jkwc+vFs-uKaS9w@mail.gmail.com>
-Date: Thu, 29 Jan 2015 11:46:34 -0800
-Message-ID: <CAHrH25TvixrEj6L3vWYJcV+4g=QNixYJ+7iaA98f4Ch+STTrgA@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 4/5] core: device: Add device_is_bonded_for_gatt
-From: Arman Uguray <armansito@chromium.org>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 8.1 \(1993\))
+Subject: Re: [PATCH] Bluetooth: Set HCI_QUIRK_STRICT_DUPLICATE_FILTER for BTUSB_ATH3012
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1422556714-12493-1-git-send-email-jpawlowski@google.com>
+Date: Thu, 29 Jan 2015 11:14:07 -0800
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <C231CA08-72E1-4518-953C-A2EADE09AE6D@holtmann.org>
+References: <1422556714-12493-1-git-send-email-jpawlowski@google.com>
+To: Jakub Pawlowski <jpawlowski@google.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+Hi Jakub,
 
-> On Thu, Jan 29, 2015 at 5:52 AM, Luiz Augusto von Dentz <luiz.dentz@gmail.com> wrote:
-> Hi Arman,
->
-> On Thu, Jan 29, 2015 at 4:11 AM, Arman Uguray <armansito@chromium.org> wrote:
->> Added the device_is_bonded_for_gatt function, which returns true if
->> the bonding state is true for the bearer over which the GATT db was
->> populated. For now, this only returns the LE state but added for
->> better layering, so that future changes to the internal logic can be
->> simply performed here to avoid regressions.
->>
->> Change-Id: I6ebd16a1111aa38645a0a072536f4171d246b931
->> ---
->>  src/device.c | 14 +++++++++++++-
->>  src/device.h |  1 +
->>  2 files changed, 14 insertions(+), 1 deletion(-)
->>
->> diff --git a/src/device.c b/src/device.c
->> index 9cb5acb..2ef2b6a 100644
->> --- a/src/device.c
->> +++ b/src/device.c
->> @@ -506,8 +506,10 @@ static void gatt_client_cleanup(struct btd_device *device)
->>         bt_gatt_client_unref(device->client);
->>         device->client = NULL;
->>
->> -       if (!device->le_state.bonded)
->> +       if (!device_is_bonded_for_gatt(device)) {
->> +               DBG("Device is not bonded, clearing client attribute cache");
->>                 gatt_db_clear(device->db);
->> +       }
->>  }
->>
->>  static void attio_cleanup(struct btd_device *device)
->> @@ -638,6 +640,16 @@ bool device_is_bonded(struct btd_device *device, uint8_t bdaddr_type)
->>         return state->bonded;
->>  }
->>
->> +bool device_is_bonded_for_gatt(struct btd_device *device)
->> +{
->> +       /*
->> +        * TODO: Once we properly support GATT over BR/EDR, we should remember
->> +        * whether the GATT client  database was populated over LE or BR/EDR and
->> +        * check the correct bonding state.
->> +        */
->> +       return device->le_state.bonded;
->> +}
->> +
->>  gboolean device_is_trusted(struct btd_device *device)
->>  {
->>         return device->trusted;
->> diff --git a/src/device.h b/src/device.h
->> index a7fefee..b4aead1 100644
->> --- a/src/device.h
->> +++ b/src/device.h
->> @@ -82,6 +82,7 @@ const char *device_get_path(const struct btd_device *device);
->>  gboolean device_is_temporary(struct btd_device *device);
->>  bool device_is_paired(struct btd_device *device, uint8_t bdaddr_type);
->>  bool device_is_bonded(struct btd_device *device, uint8_t bdaddr_type);
->> +bool device_is_bonded_for_gatt(struct btd_device *device);
->
-> Isn't this equivalent to device_is_bonded or perhaps we don't the
-> type? I guess it is possible to retrieve in what transport we are
-> connected and then check if we it is bonded.
->
+> The Bluetooth controllers from Atheros use a strict scanning filter
+> policy that filters based on Bluetooth device addresses and not on
+> RSSI. So tell the core about this.
+> 
+> Signed-off-by: Jakub Pawlowski <jpawlowski@google.com>
+> ---
+> drivers/bluetooth/btusb.c | 4 +++-
+> 1 file changed, 3 insertions(+), 1 deletion(-)
 
-It's pretty much the same thing, except it would return the bonding
-state based on the transport that did the GATT discovery. I figured it
-would be better to have this function in one place so that we only
-have one place to change when we properly support GATT over BR/EDR in
-the future. Just using device_is_bonded and passing BDADDR_LE_PUBLIC
-for the bdaddr works too for now, we just need to remember to update
-them later. I'll go ahead and leave this out for now.
+patch has been applied to bluetooth-next tree.
 
->>  gboolean device_is_trusted(struct btd_device *device);
->>  void device_set_paired(struct btd_device *dev, uint8_t bdaddr_type);
->>  void device_set_unpaired(struct btd_device *dev, uint8_t bdaddr_type);
->> --
->> 2.2.0.rc0.207.ga3a616c
->>
->
->
->
-> --
-> Luiz Augusto von Dentz
+Regards
 
-Arman
+Marcel
+
