@@ -1,118 +1,155 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <54C83C72.50607@esd-dev.be>
-Date: Wed, 28 Jan 2015 02:33:38 +0100
-From: =?UTF-8?B?TWF0aGlldSBPY2HDsWE=?= <mo@esd-dev.be>
-MIME-Version: 1.0
-To: "luiz.dentz@gmail.com >> Luiz Augusto von Dentz"
-	<luiz.dentz@gmail.com>
-CC: linux-bluetooth@vger.kernel.org
-Subject: Re: Notify problem in gatt plugin - solved
-References: <54BD2EBC.7040207@esd-dev.be> <CABBYNZLeCn1UypeiJ3p8PEZQffeHcpcjz5QDPzURMx4XCy2Dfw@mail.gmail.com> <54BEDA4E.30708@esd-dev.be>
-In-Reply-To: <54BEDA4E.30708@esd-dev.be>
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 8.1 \(1993\))
+Subject: Re: [PATCH] Bluetooth: Fix sending Read Remote Exttended Features command
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1422482398-8425-1-git-send-email-szymon.janc@tieto.com>
+Date: Wed, 28 Jan 2015 19:11:15 -0800
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <B677BF19-76BD-445C-98D4-E802B1B1FB22@holtmann.org>
+References: <1422482398-8425-1-git-send-email-szymon.janc@tieto.com>
+To: Szymon Janc <szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-I have finally solved the problem.
+Hi Szymon,
 
-For interested people, the notification mechanism showed in the 
-alert-server (profiles/alert/server.c), which I used as starting point, 
-is broken.
+> This command should only be used if remote device reports that it
+> supports extended features. Otherwise command will fail and connection
+> will be dropped.
+> 
+> Some devices support SSP but don't support extended features so
+> current check for SSP support is not enough.
+> 
+> < HCI Command: Create Connection (0x01|0x0005) plen 13
+>        Address: D0:9C:30:00:19:6F (Foster Electric Company, Limited)
+>        Packet type: 0xcc18
+>          DM1 may be used
+>          DH1 may be used
+>          DM3 may be used
+>          DH3 may be used
+>          DM5 may be used
+>          DH5 may be used
+>        Page scan repetition mode: R1 (0x01)
+>        Page scan mode: Mandatory (0x00)
+>        Clock offset: 0x94c8
+>        Role switch: Allow slave (0x01)
+>> HCI Event: Command Status (0x0f) plen 4
+>      Create Connection (0x01|0x0005) ncmd 1
+>        Status: Success (0x00)
+>> HCI Event: Connect Complete (0x03) plen 11
+>        Status: Success (0x00)
+>        Handle: 5
+>        Address: D0:9C:30:00:19:6F (Foster Electric Company, Limited)
+>        Link type: ACL (0x01)
+>        Encryption: Disabled (0x00)
+> < HCI Command: Read Remote Supported Features (0x01|0x001b) plen 2
+>        Handle: 5
+>> HCI Event: Command Status (0x0f) plen 4
+>      Read Remote Supported Features (0x01|0x001b) ncmd 1
+>        Status: Success (0x00)
+>> HCI Event: Page Scan Repetition Mode Change (0x20) plen 7
+>        Address: D0:9C:30:00:19:6F (Foster Electric Company, Limited)
+>        Page scan repetition mode: R1 (0x01)
+>> HCI Event: Read Remote Supported Features (0x0b) plen 11
+>        Status: Success (0x00)
+>        Handle: 5
+>        Features: 0xff 0xff 0x8f 0xfe 0xdb 0xff 0x5b 0x07
+>          3 slot packets
+>          5 slot packets
+>          Encryption
+>          Slot offset
+>          Timing accuracy
+>          Role switch
+>          Hold mode
+>          Sniff mode
+>          Park state
+>          Power control requests
+>          Channel quality driven data rate (CQDDR)
+>          SCO link
+>          HV2 packets
+>          HV3 packets
+>          u-law log synchronous data
+>          A-law log synchronous data
+>          CVSD synchronous data
+>          Paging parameter negotiation
+>          Power control
+>          Transparent synchronous data
+>          Broadcast Encryption
+>          Enhanced Data Rate ACL 2 Mbps mode
+>          Enhanced Data Rate ACL 3 Mbps mode
+>          Enhanced inquiry scan
+>          Interlaced inquiry scan
+>          Interlaced page scan
+>          RSSI with inquiry results
+>          Extended SCO link (EV3 packets)
+>          EV4 packets
+>          EV5 packets
+>          AFH capable slave
+>          AFH classification slave
+>          LE Supported (Controller)
+>          3-slot Enhanced Data Rate ACL packets
+>          5-slot Enhanced Data Rate ACL packets
+>          Sniff subrating
+>          Pause encryption
+>          AFH capable master
+>          AFH classification master
+>          Enhanced Data Rate eSCO 2 Mbps mode
+>          Enhanced Data Rate eSCO 3 Mbps mode
+>          3-slot Enhanced Data Rate eSCO packets
+>          Extended Inquiry Response
+>          Simultaneous LE and BR/EDR (Controller)
+>          Secure Simple Pairing
+>          Encapsulated PDU
+>          Non-flushable Packet Boundary Flag
+>          Link Supervision Timeout Changed Event
+>          Inquiry TX Power Level
+>          Enhanced Power Control
+> < HCI Command: Read Remote Extended Features (0x01|0x001c) plen 3
+>        Handle: 5
+>        Page: 1
+>> HCI Event: Command Status (0x0f) plen 4
+>      Read Remote Extended Features (0x01|0x001c) ncmd 1
+>        Status: Command Disallowed (0x0c)
 
-In src/shared/att.c:L306, a test condition prevents the sending of the 
-data if a callback is defined but not needed (and it is the case for a 
-notification).
+what kind of screwed up remote controller is this. This year is 2015 and this has been around for a very long time. If you support SSP you need to support extended features. Can you get the remote version information and also call "hcitool name" and check the trace for that.
 
-So in my plugin source code, in attio_connected_cb(), by simply changing:
-> ret = g_attrib_send(attrib, 0, pdu, len, destroy_notify_callback, cb, 
-> NULL); 
-to:
-> ret = g_attrib_send(attrib, 0, pdu, len, NULL, NULL, NULL);
-the notifications are now sent :)
+Someone should tell these people to fix their controller.
 
-Of course, the same change will fix the alert-server.
+Also Extended Inquiry Response is not allowed if SSP is disabled. And without features page 1, we can not even tell if SSP enabled in the host or not. This is really bad.
 
---
-Mathieu OCAÑA
+> < HCI Command: Read Clock Offset (0x01|0x001f) plen 2
+>        Handle: 5
+>> HCI Event: Command Status (0x0f) plen 4
+>      Read Clock Offset (0x01|0x001f) ncmd 1
+>        Status: Success (0x00)
+> < HCI Command: Disconnect (0x01|0x0006) plen 3
+>        Handle: 5
+>        Reason: Remote User Terminated Connection (0x13)
+> 
+> Signed-off-by: Szymon Janc <szymon.janc@tieto.com>
+> ---
+> net/bluetooth/hci_event.c | 3 ++-
+> 1 file changed, 2 insertions(+), 1 deletion(-)
+> 
+> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+> index e2b81ad..5a16a23 100644
+> --- a/net/bluetooth/hci_event.c
+> +++ b/net/bluetooth/hci_event.c
+> @@ -2667,7 +2667,8 @@ static void hci_remote_features_evt(struct hci_dev *hdev,
+> 	if (conn->state != BT_CONFIG)
+> 		goto unlock;
+> 
+> -	if (!ev->status && lmp_ssp_capable(hdev) && lmp_ssp_capable(conn)) {
+> +	if (!ev->status && lmp_ssp_capable(hdev) && lmp_ssp_capable(conn) &&
+> +	    lmp_ext_feat_capable(conn)) {
+> 		struct hci_cp_read_remote_ext_features cp;
+> 		cp.handle = ev->handle;
+> 		cp.page = 0x01;
 
+Since we have BR/EDR secure connections using page 2 for its features, we might actually just want to switch to check for lmp_exit_feat_capable from hdev and conn and remove the lmp_ssp_capable check. In the end that is what we are doing anyway.
 
-Le 20/01/2015 23:44, Mathieu Ocaña a écrit :
-> Hi Luiz,
->
-> Le 20/01/2015 10:30, Luiz Augusto von Dentz a écrit :
->> Hi Mathieu,
->>
->> On Mon, Jan 19, 2015 at 6:20 PM, Mathieu Ocaña <mo@esd-dev.be> wrote:
->>> Hello,
->>>
->>> I'm currently working on a plugin to implement a GATT peripheral. 
->>> Based on
->>> the plugins/gatt-example and the profiles/alert/server, I finally got
->>> something which works: read, write, with dbus signaling.
->>> But, notifications doesn't work...
->>> All seems ok until the call to "g_attrib_send()".
->>>
->>>>> static void attio_connected_cb(GAttrib *attrib, gpointer user_data)
->>>>> {
->>>>>    [...]
->>>>>    len = 
->>>>> enc_notification(p_adapter->batterylevel_chr.level_hnd_value,
->>>>>                      nd->value, nd->len, pdu, len);
->>>>>    [...]
->>>>>    ret = g_attrib_send(attrib, 0, pdu, len, destroy_notify_callback,
->>>>> cb, NULL);
->>>>>    return;
->>>>> }
->>>
->>> The parameters passed to g_attrib_send seems valid, I have verified 
->>> the pdu,
->>> len and user_data, but I'm not sure to understand well all the 
->>> fields of
->>> "attrib" (struct _GAttrib). Moreover the return value is 0.
->>>
->>> Some extra details:
->>> - the destroy_notify_callback is not called (maybe normal as the
->>> notification is not succesfully sent).
->>> - in g_attrib_send, the call to bt_att_send() return 0. After this 
->>> point my
->>> understanding of the source code became a little bit fuzzy.
->> You might not be connected then so perhaps there is a bug in attio
->> callback. Which version are you using?
-> I'm using the v5.27. I see no signs of disconnection in the debug 
-> messages, but I will explore this lead.
-> For now I use a Nordic dongle & software (master panel monitor) for my 
-> tests and the connection seems ok (even if the notificatons are not 
-> sent, the read/write operation are performed witout problem). But when 
-> I use gatttool I'm disconnected constantly after 5-15s, (in this case 
-> the debug log tells me it).
-> I have not yet tested with a BT LE-enabled smartphone, but if I'm also 
-> disconnected, maybe the two problems are related.
->
->>>> It would be great if someone could suggest me a fix or a workaround.
->>> I have also developped some extensions for the function 
->>> gatt_service_add(),
->>> such as the support of static value characteristic, and the 
->>> descriptors for
->>> presentation format, valid range and user description.
->>>> Before submitting this patch, I want to know which is the patch 
->>>> policy for
->>>> the bluez project? (validation test to perform, etc.).
->> It is documented in Submitting patches section in the HACKING:
->> https://git.kernel.org/cgit/bluetooth/bluez.git/tree/HACKING
-> Ok, I had totally forgotten this file. According to the coding 
-> standards, I've some modifications to do.
-> The answer is maybe obvious, but if I modify the behavior of the 
-> function gatt_service_add(), I should also patch the profiles and 
-> plugins which use it, accordingly?
->
-> Thank for your answer,
->
-> -- 
-> Mathieu OCAÑA
->
-> -- 
-> To unsubscribe from this list: send the line "unsubscribe 
-> linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+Regards
+
+Marcel
 
