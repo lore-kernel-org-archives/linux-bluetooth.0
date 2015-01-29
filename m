@@ -1,52 +1,72 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 29 Jan 2015 07:55:19 +0200
+Date: Thu, 29 Jan 2015 07:54:21 +0200
 From: Johan Hedberg <johan.hedberg@gmail.com>
 To: Marcel Holtmann <marcel@holtmann.org>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [RFC] Bluetooth: btusb: Handle out of order firmware loading
- complete event
-Message-ID: <20150129055519.GB6847@t440s.P-661HNU-F1>
-References: <1422438243-15352-1-git-send-email-marcel@holtmann.org>
+Subject: Re: [PATCH] Bluetooth: Move smp_unregister() into hci_dev_do_close()
+ function
+Message-ID: <20150129055421.GA6847@t440s.P-661HNU-F1>
+References: <1422483028-30261-1-git-send-email-marcel@holtmann.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1422438243-15352-1-git-send-email-marcel@holtmann.org>
+In-Reply-To: <1422483028-30261-1-git-send-email-marcel@holtmann.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Marcel,
 
 On Wed, Jan 28, 2015, Marcel Holtmann wrote:
-> When loading the Intel firmware it can happen that the firmware loading
-> complete vendor event arrives before the command complete event for the
-> last firmware fragment.
+> The smp_unregister() function needs to be called every time the
+> controller is powered down. There are multiple entry points when
+> this can happen. One is "hciconfig hci0 reset" which will throw
+> a WARN_ON when LE support has been enabled.
 > 
-> < HCI Command: Vendor (0x3f|0x0009) plen 7
->         01 02 fc 03 00 00 00
-> > HCI Event: Vendor (0xff) plen 5
->         06 00 00 00 00
-> > HCI Event: Command Complete (0x0e) plen 4
->       Vendor (0x3f|0x0009) ncmd 31
->         Status: Success (0x00)
+> [   78.564620] WARNING: CPU: 0 PID: 148 at net/bluetooth/smp.c:3075 smp_register+0xf1/0x170()
+> [   78.564622] Modules linked in:
+> [   78.564628] CPU: 0 PID: 148 Comm: kworker/u3:1 Not tainted 3.19.0-rc4-devel+ #404
+> [   78.564629] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS
+> [   78.564635] Workqueue: hci0 hci_rx_work
+> [   78.564638]  ffffffff81b4a7a2 ffff88001cb2fb38 ffffffff8161d881 0000000080000000
+> [   78.564642]  0000000000000000 ffff88001cb2fb78 ffffffff8103b870 696e55206e6f6f6d
+> [   78.564645]  ffff88001d965000 0000000000000000 0000000000000000 ffff88001d965000
+> [   78.564648] Call Trace:
+> [   78.564655]  [<ffffffff8161d881>] dump_stack+0x4f/0x7b
+> [   78.564662]  [<ffffffff8103b870>] warn_slowpath_common+0x80/0xc0
+> [   78.564667]  [<ffffffff81544b00>] ? add_uuid+0x1f0/0x1f0
+> [   78.564671]  [<ffffffff8103b955>] warn_slowpath_null+0x15/0x20
+> [   78.564674]  [<ffffffff81562d81>] smp_register+0xf1/0x170
+> [   78.564680]  [<ffffffff81081236>] ? lock_timer_base.isra.30+0x26/0x50
+> [   78.564683]  [<ffffffff81544bf0>] powered_complete+0xf0/0x120
+> [   78.564688]  [<ffffffff8152e622>] hci_req_cmd_complete+0x82/0x260
+> [   78.564692]  [<ffffffff8153554f>] hci_cmd_complete_evt+0x6cf/0x2e20
+> [   78.564697]  [<ffffffff81623e43>] ? _raw_spin_unlock_irqrestore+0x13/0x30
+> [   78.564701]  [<ffffffff8106b0af>] ? __wake_up_sync_key+0x4f/0x60
+> [   78.564705]  [<ffffffff8153a2ab>] hci_event_packet+0xbcb/0x2e70
+> [   78.564709]  [<ffffffff814094d3>] ? skb_release_all+0x23/0x30
+> [   78.564711]  [<ffffffff81409529>] ? kfree_skb+0x29/0x40
+> [   78.564715]  [<ffffffff815296c8>] hci_rx_work+0x1c8/0x3f0
+> [   78.564719]  [<ffffffff8105bd91>] ? get_parent_ip+0x11/0x50
+> [   78.564722]  [<ffffffff8105be25>] ? preempt_count_add+0x55/0xb0
+> [   78.564727]  [<ffffffff8104f65f>] process_one_work+0x12f/0x360
+> [   78.564731]  [<ffffffff8104ff9b>] worker_thread+0x6b/0x4b0
+> [   78.564735]  [<ffffffff8104ff30>] ? cancel_delayed_work_sync+0x10/0x10
+> [   78.564738]  [<ffffffff810542fa>] kthread+0xea/0x100
+> [   78.564742]  [<ffffffff81620000>] ? __schedule+0x3e0/0x980
+> [   78.564745]  [<ffffffff81054210>] ? kthread_create_on_node+0x180/0x180
+> [   78.564749]  [<ffffffff816246ec>] ret_from_fork+0x7c/0xb0
+> [   78.564752]  [<ffffffff81054210>] ? kthread_create_on_node+0x180/0x180
+> [   78.564755] ---[ end trace 8b0d943af76d3736 ]---
 > 
-> This is mainly caused by the fact that the vendor command and its
-> command complete event are transported over the bulk endpoints. The
-> firmware loading complete event however is send over the interrupt
-> endpoint. So with just bad timing one event arrives before the other.
-> 
-> Currently the code does not account for it. There are precautions for
-> receiving firmware loading complete event quickly, but not for receiving
-> it before the command complete.
-> 
-> Introduce an extra flag that tracks when the firmware sending has
-> completed from the driver point of view and track the completion of
-> the firmware loading procedure with a different flag. That way the
-> wakeup can be handled properly.
+> This warning is not critical and has only been placed in the code to
+> actually catch this exact situation. To avoid triggering it move
+> the smp_unregister() into hci_dev_do_close() which will now also
+> take care of remove the SMP channel. It is safe to call this function
+> since it only remove the channel if it has been previously registered.
 > 
 > Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 > ---
->  drivers/bluetooth/btusb.c | 9 +++++++--
->  1 file changed, 7 insertions(+), 2 deletions(-)
+>  net/bluetooth/hci_core.c | 8 ++------
+>  1 file changed, 2 insertions(+), 6 deletions(-)
 
-This made firmware loading again stable for me so I went ahead and
-applied the patch to bluetooth-next. Thanks.
+Applied to bluetooth-next. Thanks.
 
 Johan
