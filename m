@@ -1,145 +1,209 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH v2] Bluetooth: Fix sending Read Remote Extended Features command
-Date: Thu, 29 Jan 2015 16:36:59 +0100
-Message-Id: <1422545819-5522-1-git-send-email-szymon.janc@tieto.com>
+Subject: [PATCH BlueZ] shared/gatt-client: Simplify read long value
+Date: Thu, 29 Jan 2015 17:09:33 +0200
+Message-Id: <1422544173-7729-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This command should only be used if remote device reports that it
-supports extended features. Otherwise command will fail and connection
-will be dropped.
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Some devices support SSP but don't support extended features so
-current check for SSP support is not enought.
-
-Instead of checking for SSP support just check if both ends support
-Extended Feature.
-
-< HCI Command: Create Connection (0x01|0x0005) plen 13
-        Address: D0:9C:30:00:19:6F (Foster Electric Company, Limited)
-        Packet type: 0xcc18
-          DM1 may be used
-          DH1 may be used
-          DM3 may be used
-          DH3 may be used
-          DM5 may be used
-          DH5 may be used
-        Page scan repetition mode: R1 (0x01)
-        Page scan mode: Mandatory (0x00)
-        Clock offset: 0x94c8
-        Role switch: Allow slave (0x01)
-> HCI Event: Command Status (0x0f) plen 4
-      Create Connection (0x01|0x0005) ncmd 1
-        Status: Success (0x00)
-> HCI Event: Connect Complete (0x03) plen 11
-        Status: Success (0x00)
-        Handle: 5
-        Address: D0:9C:30:00:19:6F (Foster Electric Company, Limited)
-        Link type: ACL (0x01)
-        Encryption: Disabled (0x00)
-< HCI Command: Read Remote Supported Features (0x01|0x001b) plen 2
-        Handle: 5
-> HCI Event: Command Status (0x0f) plen 4
-      Read Remote Supported Features (0x01|0x001b) ncmd 1
-        Status: Success (0x00)
-> HCI Event: Page Scan Repetition Mode Change (0x20) plen 7
-        Address: D0:9C:30:00:19:6F (Foster Electric Company, Limited)
-        Page scan repetition mode: R1 (0x01)
-> HCI Event: Read Remote Supported Features (0x0b) plen 11
-        Status: Success (0x00)
-        Handle: 5
-        Features: 0xff 0xff 0x8f 0xfe 0xdb 0xff 0x5b 0x07
-          3 slot packets
-          5 slot packets
-          Encryption
-          Slot offset
-          Timing accuracy
-          Role switch
-          Hold mode
-          Sniff mode
-          Park state
-          Power control requests
-          Channel quality driven data rate (CQDDR)
-          SCO link
-          HV2 packets
-          HV3 packets
-          u-law log synchronous data
-          A-law log synchronous data
-          CVSD synchronous data
-          Paging parameter negotiation
-          Power control
-          Transparent synchronous data
-          Broadcast Encryption
-          Enhanced Data Rate ACL 2 Mbps mode
-          Enhanced Data Rate ACL 3 Mbps mode
-          Enhanced inquiry scan
-          Interlaced inquiry scan
-          Interlaced page scan
-          RSSI with inquiry results
-          Extended SCO link (EV3 packets)
-          EV4 packets
-          EV5 packets
-          AFH capable slave
-          AFH classification slave
-          LE Supported (Controller)
-          3-slot Enhanced Data Rate ACL packets
-          5-slot Enhanced Data Rate ACL packets
-          Sniff subrating
-          Pause encryption
-          AFH capable master
-          AFH classification master
-          Enhanced Data Rate eSCO 2 Mbps mode
-          Enhanced Data Rate eSCO 3 Mbps mode
-          3-slot Enhanced Data Rate eSCO packets
-          Extended Inquiry Response
-          Simultaneous LE and BR/EDR (Controller)
-          Secure Simple Pairing
-          Encapsulated PDU
-          Non-flushable Packet Boundary Flag
-          Link Supervision Timeout Changed Event
-          Inquiry TX Power Level
-          Enhanced Power Control
-< HCI Command: Read Remote Extended Features (0x01|0x001c) plen 3
-        Handle: 5
-        Page: 1
-> HCI Event: Command Status (0x0f) plen 4
-      Read Remote Extended Features (0x01|0x001c) ncmd 1
-        Status: Command Disallowed (0x0c)
-< HCI Command: Read Clock Offset (0x01|0x001f) plen 2
-        Handle: 5
-> HCI Event: Command Status (0x0f) plen 4
-      Read Clock Offset (0x01|0x001f) ncmd 1
-        Status: Success (0x00)
-< HCI Command: Disconnect (0x01|0x0006) plen 3
-        Handle: 5
-        Reason: Remote User Terminated Connection (0x13)
-
-Signed-off-by: Szymon Janc <szymon.janc@tieto.com>
+This removes the extra queue that acts as intermediate storage, instead
+the code will now storage everything in a single buffer and just realloc
+while appending new chunks.
 ---
+ src/shared/gatt-client.c | 107 ++++++++++-------------------------------------
+ 1 file changed, 21 insertions(+), 86 deletions(-)
 
-V2 - check for lmp_ext_feat_capable on both ends instead of
-     ssp check as suggested by Marcel
-
- net/bluetooth/hci_event.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
-
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index e2b81ad..f12526b 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -2667,7 +2667,8 @@ static void hci_remote_features_evt(struct hci_dev *hdev,
- 	if (conn->state != BT_CONFIG)
- 		goto unlock;
+diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
+index 04fb4cb..a78e209 100644
+--- a/src/shared/gatt-client.c
++++ b/src/shared/gatt-client.c
+@@ -31,6 +31,7 @@
  
--	if (!ev->status && lmp_ssp_capable(hdev) && lmp_ssp_capable(conn)) {
-+	if (!ev->status && lmp_ext_feat_capable(hdev) &&
-+	    lmp_ext_feat_capable(conn)) {
- 		struct hci_cp_read_remote_ext_features cp;
- 		cp.handle = ev->handle;
- 		cp.page = 0x01;
+ #include <assert.h>
+ #include <limits.h>
++#include <sys/uio.h>
+ 
+ #ifndef MAX
+ #define MAX(a, b) ((a) > (b) ? (a) : (b))
+@@ -1927,54 +1928,13 @@ struct read_long_op {
+ 	struct bt_gatt_client *client;
+ 	int ref_count;
+ 	uint16_t value_handle;
+-	uint16_t orig_offset;
+ 	uint16_t offset;
+-	struct queue *blobs;
++	struct iovec iov;
+ 	bt_gatt_client_read_callback_t callback;
+ 	void *user_data;
+ 	bt_gatt_client_destroy_func_t destroy;
+ };
+ 
+-struct blob {
+-	uint8_t *data;
+-	uint16_t offset;
+-	uint16_t length;
+-};
+-
+-static struct blob *create_blob(const uint8_t *data, uint16_t len,
+-								uint16_t offset)
+-{
+-	struct blob *blob;
+-
+-	blob = new0(struct blob, 1);
+-	if (!blob)
+-		return NULL;
+-
+-	/* Truncate if the data would exceed maximum length */
+-	if (offset + len > BT_ATT_MAX_VALUE_LEN)
+-		len = BT_ATT_MAX_VALUE_LEN - offset;
+-
+-	blob->data = malloc(len);
+-	if (!blob->data) {
+-		free(blob);
+-		return NULL;
+-	}
+-
+-	memcpy(blob->data, data, len);
+-	blob->length = len;
+-	blob->offset = offset;
+-
+-	return blob;
+-}
+-
+-static void destroy_blob(void *data)
+-{
+-	struct blob *blob = data;
+-
+-	free(blob->data);
+-	free(blob);
+-}
+-
+ static void destroy_read_long_op(void *data)
+ {
+ 	struct read_long_op *op = data;
+@@ -1982,46 +1942,31 @@ static void destroy_read_long_op(void *data)
+ 	if (op->destroy)
+ 		op->destroy(op->user_data);
+ 
+-	queue_destroy(op->blobs, destroy_blob);
+-
++	free(op->iov.iov_base);
+ 	free(op);
+ }
+ 
+-static void append_blob(void *data, void *user_data)
++static bool append_chunk(struct read_long_op *op, const uint8_t *data,
++								uint16_t len)
+ {
+-	struct blob *blob = data;
+-	uint8_t *value = user_data;
+-
+-	memcpy(value + blob->offset, blob->data, blob->length);
+-}
++	void *buf;
+ 
+-static void complete_read_long_op(struct read_long_op *op, bool success,
+-							uint8_t att_ecode)
+-{
+-	uint8_t *value = NULL;
+-	uint16_t length = 0;
+-
+-	if (!success)
+-		goto done;
+-
+-	length = op->offset - op->orig_offset;
++	/* Truncate if the data would exceed maximum length */
++	if (op->offset + len > BT_ATT_MAX_VALUE_LEN)
++		len = BT_ATT_MAX_VALUE_LEN - op->offset;
+ 
+-	if (!length)
+-		goto done;
++	buf = realloc(op->iov.iov_base, op->iov.iov_len + len);
++	if (!buf)
++		return false;
+ 
+-	value = malloc(length);
+-	if (!value) {
+-		success = false;
+-		goto done;
+-	}
++	op->iov.iov_base = buf;
+ 
+-	queue_foreach(op->blobs, append_blob, value - op->orig_offset);
++	memcpy(op->iov.iov_base + op->iov.iov_len, data, len);
+ 
+-done:
+-	if (op->callback)
+-		op->callback(success, att_ecode, value, length, op->user_data);
++	op->iov.iov_len += len;
++	op->offset += len;
+ 
+-	free(value);
++	return true;
+ }
+ 
+ static void read_long_cb(uint8_t opcode, const void *pdu,
+@@ -2029,7 +1974,6 @@ static void read_long_cb(uint8_t opcode, const void *pdu,
+ {
+ 	struct request *req = user_data;
+ 	struct read_long_op *op = req->data;
+-	struct blob *blob;
+ 	bool success;
+ 	uint8_t att_ecode = 0;
+ 
+@@ -2047,14 +1991,11 @@ static void read_long_cb(uint8_t opcode, const void *pdu,
+ 	if (!length)
+ 		goto success;
+ 
+-	blob = create_blob(pdu, length, op->offset);
+-	if (!blob) {
++	if (!append_chunk(op, pdu, length)) {
+ 		success = false;
+ 		goto done;
+ 	}
+ 
+-	queue_push_tail(op->blobs, blob);
+-	op->offset += blob->length;
+ 	if (op->offset >= BT_ATT_MAX_VALUE_LEN)
+ 		goto success;
+ 
+@@ -2082,7 +2023,9 @@ success:
+ 	success = true;
+ 
+ done:
+-	complete_read_long_op(op, success, att_ecode);
++	if (op->callback)
++		op->callback(success, att_ecode, op->iov.iov_base,
++						op->iov.iov_len, op->user_data);
+ }
+ 
+ unsigned int bt_gatt_client_read_long_value(struct bt_gatt_client *client,
+@@ -2102,22 +2045,14 @@ unsigned int bt_gatt_client_read_long_value(struct bt_gatt_client *client,
+ 	if (!op)
+ 		return 0;
+ 
+-	op->blobs = queue_new();
+-	if (!op->blobs) {
+-		free(op);
+-		return 0;
+-	}
+-
+ 	req = request_create(client);
+ 	if (!req) {
+-		queue_destroy(op->blobs, free);
+ 		free(op);
+ 		return 0;
+ 	}
+ 
+ 	op->client = client;
+ 	op->value_handle = value_handle;
+-	op->orig_offset = offset;
+ 	op->offset = offset;
+ 	op->callback = callback;
+ 	op->user_data = user_data;
 -- 
-1.9.3
+2.1.0
 
