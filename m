@@ -1,140 +1,88 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 8.1 \(1993\))
-Subject: Re: [PATCH v2] Bluetooth: Fix sending Read Remote Extended Features command
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1422545819-5522-1-git-send-email-szymon.janc@tieto.com>
-Date: Thu, 29 Jan 2015 08:03:04 -0800
+From: Szymon Janc <szymon.janc@tieto.com>
+To: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
 Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <5628B7DA-6764-4158-BDE4-59F016280EC2@holtmann.org>
-References: <1422545819-5522-1-git-send-email-szymon.janc@tieto.com>
-To: Szymon Janc <szymon.janc@tieto.com>
+Subject: Re: [PATCH] android/pts: Update SPP PTS 6.0 results for android 5.0
+Date: Thu, 29 Jan 2015 16:50:35 +0100
+Message-ID: <2555767.oRnzktzI9F@leonov>
+In-Reply-To: <1422525499-4483-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+References: <1422525499-4483-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Szymon,
+Hi Grzegorz,
 
-> This command should only be used if remote device reports that it
-> supports extended features. Otherwise command will fail and connection
-> will be dropped.
-> 
-> Some devices support SSP but don't support extended features so
-> current check for SSP support is not enought.
-> 
-> Instead of checking for SSP support just check if both ends support
-> Extended Feature.
-> 
-> < HCI Command: Create Connection (0x01|0x0005) plen 13
->        Address: D0:9C:30:00:19:6F (Foster Electric Company, Limited)
->        Packet type: 0xcc18
->          DM1 may be used
->          DH1 may be used
->          DM3 may be used
->          DH3 may be used
->          DM5 may be used
->          DH5 may be used
->        Page scan repetition mode: R1 (0x01)
->        Page scan mode: Mandatory (0x00)
->        Clock offset: 0x94c8
->        Role switch: Allow slave (0x01)
->> HCI Event: Command Status (0x0f) plen 4
->      Create Connection (0x01|0x0005) ncmd 1
->        Status: Success (0x00)
->> HCI Event: Connect Complete (0x03) plen 11
->        Status: Success (0x00)
->        Handle: 5
->        Address: D0:9C:30:00:19:6F (Foster Electric Company, Limited)
->        Link type: ACL (0x01)
->        Encryption: Disabled (0x00)
-> < HCI Command: Read Remote Supported Features (0x01|0x001b) plen 2
->        Handle: 5
->> HCI Event: Command Status (0x0f) plen 4
->      Read Remote Supported Features (0x01|0x001b) ncmd 1
->        Status: Success (0x00)
->> HCI Event: Page Scan Repetition Mode Change (0x20) plen 7
->        Address: D0:9C:30:00:19:6F (Foster Electric Company, Limited)
->        Page scan repetition mode: R1 (0x01)
->> HCI Event: Read Remote Supported Features (0x0b) plen 11
->        Status: Success (0x00)
->        Handle: 5
->        Features: 0xff 0xff 0x8f 0xfe 0xdb 0xff 0x5b 0x07
->          3 slot packets
->          5 slot packets
->          Encryption
->          Slot offset
->          Timing accuracy
->          Role switch
->          Hold mode
->          Sniff mode
->          Park state
->          Power control requests
->          Channel quality driven data rate (CQDDR)
->          SCO link
->          HV2 packets
->          HV3 packets
->          u-law log synchronous data
->          A-law log synchronous data
->          CVSD synchronous data
->          Paging parameter negotiation
->          Power control
->          Transparent synchronous data
->          Broadcast Encryption
->          Enhanced Data Rate ACL 2 Mbps mode
->          Enhanced Data Rate ACL 3 Mbps mode
->          Enhanced inquiry scan
->          Interlaced inquiry scan
->          Interlaced page scan
->          RSSI with inquiry results
->          Extended SCO link (EV3 packets)
->          EV4 packets
->          EV5 packets
->          AFH capable slave
->          AFH classification slave
->          LE Supported (Controller)
->          3-slot Enhanced Data Rate ACL packets
->          5-slot Enhanced Data Rate ACL packets
->          Sniff subrating
->          Pause encryption
->          AFH capable master
->          AFH classification master
->          Enhanced Data Rate eSCO 2 Mbps mode
->          Enhanced Data Rate eSCO 3 Mbps mode
->          3-slot Enhanced Data Rate eSCO packets
->          Extended Inquiry Response
->          Simultaneous LE and BR/EDR (Controller)
->          Secure Simple Pairing
->          Encapsulated PDU
->          Non-flushable Packet Boundary Flag
->          Link Supervision Timeout Changed Event
->          Inquiry TX Power Level
->          Enhanced Power Control
-> < HCI Command: Read Remote Extended Features (0x01|0x001c) plen 3
->        Handle: 5
->        Page: 1
->> HCI Event: Command Status (0x0f) plen 4
->      Read Remote Extended Features (0x01|0x001c) ncmd 1
->        Status: Command Disallowed (0x0c)
-> < HCI Command: Read Clock Offset (0x01|0x001f) plen 2
->        Handle: 5
->> HCI Event: Command Status (0x0f) plen 4
->      Read Clock Offset (0x01|0x001f) ncmd 1
->        Status: Success (0x00)
-> < HCI Command: Disconnect (0x01|0x0006) plen 3
->        Handle: 5
->        Reason: Remote User Terminated Connection (0x13)
-> 
-> Signed-off-by: Szymon Janc <szymon.janc@tieto.com>
+On Thursday 29 of January 2015 10:58:19 Grzegorz Kolodziejczyk wrote:
+> This patch updates test case list, pixits, pics and results for SPP
+> profile against android 5.0
 > ---
+>  android/pics-spp.txt  |  2 +-
+>  android/pixit-spp.txt |  2 +-
+>  android/pts-spp.txt   | 15 ++++++++-------
+>  3 files changed, 10 insertions(+), 9 deletions(-)
 > 
-> V2 - check for lmp_ext_feat_capable on both ends instead of
->     ssp check as suggested by Marcel
+> diff --git a/android/pics-spp.txt b/android/pics-spp.txt
+> index f015236..d9bb883 100644
+> --- a/android/pics-spp.txt
+> +++ b/android/pics-spp.txt
+> @@ -1,6 +1,6 @@
+>  SPP PICS for the PTS tool.
 > 
-> net/bluetooth/hci_event.c | 3 ++-
-> 1 file changed, 2 insertions(+), 1 deletion(-)
+> -PTS version: 5.3
+> +PTS version: 6.0
+> 
+>  * - different than PTS defaults
+>  # - not yet implemented/supported
+> diff --git a/android/pixit-spp.txt b/android/pixit-spp.txt
+> index a8a8202..8e2d70f 100644
+> --- a/android/pixit-spp.txt
+> +++ b/android/pixit-spp.txt
+> @@ -1,6 +1,6 @@
+>  SPP PIXIT for the PTS tool.
+> 
+> -PTS version: 5.3
+> +PTS version: 6.0
+> 
+>  * - different than PTS defaults
+>  & - should be set to IUT Bluetooth address
+> diff --git a/android/pts-spp.txt b/android/pts-spp.txt
+> index ea4e26c..6972020 100644
+> --- a/android/pts-spp.txt
+> +++ b/android/pts-spp.txt
+> @@ -1,7 +1,7 @@
+>  PTS test results for SPP
+> 
+> -PTS version: 5.3
+> -Tested: 12-November-2014
+> +PTS version: 6.0
+> +Tested: 29-January-2015
+>  Android version: 5.0
+> 
+>  Results:
+> @@ -13,11 +13,12 @@ N/A	test is disabled due to PICS setup
+>  ---------------------------------------------------------------------------
+> ---- Test Name		Result	Notes
+>  ---------------------------------------------------------------------------
+> ---- -TC_DevA_APP_BV_01_C	PASS	rctest -n -P <channel> <bdaddr>
+> -				Note: IUT should sdp query PTS in order to
+> -				check given channel for COM5
+> -TC_DevB_APP_BV_02_C	PASS	haltest: socket listen BTSOCK_RFCOMM
+> -				<srvc_name> <uuid>
+> +TC_DevA_APP_BV_01_C	PASS	sdptool browse <bdaddr> - check RFCOMM channel
+> +				rctest -n -P <channel> <bdaddr>
+> +TC_DevB_APP_BV_02_C	PASS	haltest: socket listen BTSOCK_RFCOMM 
+SerialPort
+> +					00001101
+> +				Note: IUT must be in connectable, discoverable
+> +					mode.
+>  TC_APP_BV_03_C		N/A	Missing in PTS
+>  				PTS issue #12388
+>  				Note: tests BV_03 : BV_6 currently not supported
 
-patch has been applied to bluetooth-next tree.
+Applied, thanks.
 
-Regards
-
-Marcel
-
+-- 
+BR
+Szymon Janc
