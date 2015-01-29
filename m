@@ -1,36 +1,51 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 28 Jan 2015 10:14:39 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Arman Uguray <armansito@chromium.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH BlueZ v1] core: device: Fix bugs in device_browse_gatt
-Message-ID: <20150128081439.GA22704@t440s.lan>
-References: <1422388746-23627-1-git-send-email-armansito@chromium.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1422388746-23627-1-git-send-email-armansito@chromium.org>
+In-Reply-To: <1422497463-32539-1-git-send-email-armansito@chromium.org>
+References: <1422497463-32539-1-git-send-email-armansito@chromium.org>
+Date: Wed, 28 Jan 2015 18:24:18 -0800
+Message-ID: <CAHrH25QJwk5WdHvdFF04DgCKnS4gRNeWZXaSh4DPfXJ0e2ppAA@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 0/5] core: gatt: Support enabling notifications
+From: Arman Uguray <armansito@chromium.org>
+To: BlueZ development <linux-bluetooth@vger.kernel.org>
+Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Arman,
+Hi,
 
-On Tue, Jan 27, 2015, Arman Uguray wrote:
-> This patch fixes two issues in GATT service browsing:
-> 
-> 1. There was a bug in gatt_client_ready_cb that broke GAttrib-based
-> profiles by not creating gatt_primary structures if no browse request
-> exists at the time.
-> 
-> 2. In device_browse_gatt, a response to "Pair" wasn't always being sent
-> since the code didn't assign the DBusMessage pointer to the browse_req.
+> On Wed, Jan 28, 2015 at 6:10 PM, Arman Uguray <armansito@chromium.org> wrote:
+> This patch sets brings support for enabling notifications while in GATT
+> client-role. The changes that are introduced are:
+>
+>   1. Implemented the StartNotify and StopNotify methods of the
+>      GattCharacteristic1 interface. This are internally tied to
+>      bt_gatt_client_register_notify and bt_gatt_client_unregister_notify.
+>      These also manage notification sessions on a per dbus sender basis.
+>
+>   2. The exported GATT API objects are not removed in the event of a disconnect,
+>      if the devices are bonded. All notification sessions are also persisted and
+>      automatically re-enabled on reconnection. Also, adding new notification
+>      sessions via StartNotify is allowed during disconnects.
+>
+> Arman Uguray (5):
+>   core: gatt: Implement GattCharacteristic1.StartNotify
+>   core: gatt: Implement GattCharacteristic1.StopNotify
+>   core: device: Don't check ready in service_removed
+>   core: device: Add device_is_bonded_for_gatt
+>   core: gatt: Keep objects over disconnects
+>
+>  src/device.c      |  31 +++-
+>  src/device.h      |   1 +
+>  src/gatt-client.c | 453 ++++++++++++++++++++++++++++++++++++++++++++++++++++--
+>  3 files changed, 466 insertions(+), 19 deletions(-)
+>
+> --
+> 2.2.0.rc0.207.ga3a616c
+>
 
-Please split this into two patches since these seem to be independent
-issues.
+I forgot to remove the Change-Id lines from the commit messages, so
+please ignore/remove them.
 
-> Change-Id: I9d2b24db19be9c55b971504750a1061df6366e84
-
-And please leave this part out.
-
-Otherwise the actual code changes look good to me.
-
-Johan
+Thanks,
+Arman
