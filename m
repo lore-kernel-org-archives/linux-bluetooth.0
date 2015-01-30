@@ -1,57 +1,35 @@
 Return-Path: <cyrus@holtmann.org>
-From: Sebastian Chlad <sebastian.chlad@tieto.com>
+Message-ID: <54CB81F5.3000401@mozilla.com>
+Date: Fri, 30 Jan 2015 14:07:01 +0100
+From: Thomas Zimmermann <tzimmermann@mozilla.com>
+MIME-Version: 1.0
 To: linux-bluetooth@vger.kernel.org
-Cc: Sebastian Chlad <sebastian.chlad@tieto.com>
-Subject: [PATCH] android/pts: PTS tests for OPP on Android 5 and PTS 6.0
-Date: Fri, 30 Jan 2015 14:22:53 +0100
-Message-Id: <1422624173-27223-1-git-send-email-sebastian.chlad@tieto.com>
+CC: Shawn Huang <shuang@mozilla.com>
+Subject: Extending BlueZ's HAL protocol
+Content-Type: text/plain; charset=utf-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- android/pics-opp.txt  | 2 +-
- android/pixit-opp.txt | 2 +-
- android/pts-opp.txt   | 4 ++--
- 3 files changed, 4 insertions(+), 4 deletions(-)
+Hello,
 
-diff --git a/android/pics-opp.txt b/android/pics-opp.txt
-index b2cf16f..4284da6 100644
---- a/android/pics-opp.txt
-+++ b/android/pics-opp.txt
-@@ -1,6 +1,6 @@
- OPP PICS for the PTS tool.
- 
--PTS version: 5.3
-+PTS version: 6.0
- 
- * - different than PTS defaults
- # - not yet implemented/supported
-diff --git a/android/pixit-opp.txt b/android/pixit-opp.txt
-index 9cd4bb1..385cc1f 100644
---- a/android/pixit-opp.txt
-+++ b/android/pixit-opp.txt
-@@ -1,6 +1,6 @@
- OPP PIXIT for the PTS tool.
- 
--PTS version: 5.3
-+PTS version: 6.0
- 
- * - different than PTS defaults
- & - should be set to IUT Bluetooth address
-diff --git a/android/pts-opp.txt b/android/pts-opp.txt
-index 7f81ad9..3f22a33 100644
---- a/android/pts-opp.txt
-+++ b/android/pts-opp.txt
-@@ -1,7 +1,7 @@
- PTS test results for OPP
- 
--PTS version: 5.3
--Tested: 17-November-2014
-+PTS version: 6.0
-+Tested: 30-January-2015
- Android version: 5.0
- 
- Results:
--- 
-1.9.3
+On Mozilla's Firefox OS, we use a daemon for running Bluedroid drivers
+in their own address space, and communicate with the daemon via BlueZ's
+HAL protocol. [1]
 
+We'd like to use the HAL protocol as-is, but several commands are not
+defined in the spec. We especially ran into this problem with
+Bluedroid's |bt_interface_t::config_hci_snoop_log|. BlueZ has a
+completely different mechanism for handling the command and probably
+won't ever require an opcode for it. Just adding an opcode for
+|config_hci_snoop_log| to our code base will probably collide with BlueZ
+official spec in the long run.
+
+Our proposal is to reserve two opcodes per service for extensions to
+commands and notifications. This would allow us to add the missing
+pieces without opcode collisions.
+
+Best regards
+Thomas
+
+[1]
+https://git.kernel.org/cgit/bluetooth/bluez.git/tree/android/hal-ipc-api.txt
