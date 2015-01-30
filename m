@@ -1,92 +1,129 @@
 Return-Path: <cyrus@holtmann.org>
 From: Johan Hedberg <johan.hedberg@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 2/2] Bluetooth: btusb: Use wait_on_bit_timeout() for BTUSB_BOOTING
-Date: Fri, 30 Jan 2015 10:58:55 +0200
-Message-Id: <1422608335-29090-2-git-send-email-johan.hedberg@gmail.com>
-In-Reply-To: <1422608335-29090-1-git-send-email-johan.hedberg@gmail.com>
-References: <1422608335-29090-1-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH 1/2] Bluetooth: btusb: Fix race when waiting for BTUSB_DOWNLOADING
+Date: Fri, 30 Jan 2015 10:58:54 +0200
+Message-Id: <1422608335-29090-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-The wait_on_bit_timeout() is a simpler and race-free way of waiting for
-a bit to be cleared than the current code in btusb.c. This patch updates
-the code to use the helper function (its btusb copy - to be later
-updated to use a global one).
+The test for BTUSB_DOWNLOADING must be after adding to the wait queue
+and setting the TASK_INTERRUPTIBLE state. Otherwise the flag may get
+cleared after we test for it and we end up getting a timeout since
+schedule_timeout() waits for the full duration. This patch uses a
+wait_on_bit_timeout() + wake_up_bit(). To perform the task both
+race-free as well as in a much simpler way.
+
+Since there's no global wait_on_bit_timeout() helper yet (even though
+all the building blocks for it are in place) this patch creates a
+temporary local btusb copy of it until the global one has made it to
+upstream trees.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- drivers/bluetooth/btusb.c | 44 +++++++++++++++++++-------------------------
- 1 file changed, 19 insertions(+), 25 deletions(-)
+ drivers/bluetooth/btusb.c | 67 ++++++++++++++++++++++++-----------------------
+ 1 file changed, 34 insertions(+), 33 deletions(-)
 
 diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 808568d2722f..f67bf761144e 100644
+index 3aa4b3c776b2..808568d2722f 100644
 --- a/drivers/bluetooth/btusb.c
 +++ b/drivers/bluetooth/btusb.c
-@@ -1822,8 +1822,10 @@ static int btusb_recv_event_intel(struct hci_dev *hdev, struct sk_buff *skb)
- 		 */
- 		if (skb->len == 9 && hdr->evt == 0xff && hdr->plen == 0x07 &&
- 		    skb->data[2] == 0x02) {
--			if (test_and_clear_bit(BTUSB_BOOTING, &data->flags))
+@@ -334,6 +334,16 @@ struct btusb_data {
+ 	int (*recv_bulk)(struct btusb_data *data, void *buffer, int count);
+ };
+ 
++static int btusb_wait_on_bit_timeout(void *word, int bit, unsigned long timeout,
++				     unsigned mode)
++{
++	might_sleep();
++	if (!test_bit(bit, word))
++		return 0;
++	return out_of_line_wait_on_bit_timeout(word, bit, bit_wait_timeout,
++					       mode, timeout);
++}
++
+ static inline void btusb_free_frags(struct btusb_data *data)
+ {
+ 	unsigned long flags;
+@@ -1800,8 +1810,10 @@ static int btusb_recv_event_intel(struct hci_dev *hdev, struct sk_buff *skb)
+ 
+ 			if (test_and_clear_bit(BTUSB_DOWNLOADING,
+ 					       &data->flags) &&
+-			    test_bit(BTUSB_FIRMWARE_LOADED, &data->flags))
 -				wake_up_interruptible(&hdev->req_wait_q);
-+			if (test_and_clear_bit(BTUSB_BOOTING, &data->flags)) {
++			    test_bit(BTUSB_FIRMWARE_LOADED, &data->flags)) {
 +				smp_mb__after_atomic();
-+				wake_up_bit(&data->flags, BTUSB_BOOTING);
++				wake_up_bit(&data->flags, BTUSB_DOWNLOADING);
 +			}
  		}
- 	}
  
-@@ -2236,33 +2238,25 @@ done:
+ 		/* When switching to the operational firmware the device
+@@ -2165,43 +2177,32 @@ static int btusb_setup_intel_new(struct hci_dev *hdev)
  
- 	/* The bootloader will not indicate when the device is ready. This
- 	 * is done by the operational firmware sending bootup notification.
+ 	set_bit(BTUSB_FIRMWARE_LOADED, &data->flags);
+ 
++	BT_INFO("%s: Waiting for firmware download to complete", hdev->name);
++
+ 	/* Before switching the device into operational mode and with that
+ 	 * booting the loaded firmware, wait for the bootloader notification
+ 	 * that all fragments have been successfully received.
+ 	 *
+-	 * When the event processing receives the notification, then this
+-	 * flag will be cleared. So just in case that happens really quickly,
+-	 * check it first before adding the wait queue.
++	 * When the event processing receives the notification, then the
++	 * BTUSB_DOWNLOADING flag will be cleared.
 +	 *
-+	 * Booting into operational firmware should not take longer than
-+	 * 1 second. However if that happens, then just fail the setup
-+	 * since something went wrong.
++	 * The firmware loading should not take longer than 5 seconds
++	 * and thus just timeout if that happens and fail the setup
++	 * of this device.
  	 */
--	if (test_bit(BTUSB_BOOTING, &data->flags)) {
+-	if (test_bit(BTUSB_DOWNLOADING, &data->flags)) {
 -		DECLARE_WAITQUEUE(wait, current);
 -		signed long timeout;
 -
--		BT_INFO("%s: Waiting for device to boot", hdev->name);
+-		BT_INFO("%s: Waiting for firmware download to complete",
+-			hdev->name);
 -
 -		add_wait_queue(&hdev->req_wait_q, &wait);
 -		set_current_state(TASK_INTERRUPTIBLE);
 -
--		/* Booting into operational firmware should not take
--		 * longer than 1 second. However if that happens, then
--		 * just fail the setup since something went wrong.
+-		/* The firmware loading should not take longer than 5 seconds
+-		 * and thus just timeout if that happens and fail the setup
+-		 * of this device.
 -		 */
--		timeout = schedule_timeout(msecs_to_jiffies(1000));
-+	BT_INFO("%s: Waiting for device to boot", hdev->name);
- 
+-		timeout = schedule_timeout(msecs_to_jiffies(5000));
+-
 -		remove_wait_queue(&hdev->req_wait_q, &wait);
-+	err = btusb_wait_on_bit_timeout(&data->flags, BTUSB_BOOTING,
-+					msecs_to_jiffies(1000),
-+					TASK_INTERRUPTIBLE);
- 
+-
 -		if (signal_pending(current)) {
--			BT_ERR("%s: Device boot interrupted", hdev->name);
--			return -EINTR;
+-			BT_ERR("%s: Firmware loading interrupted", hdev->name);
+-			err = -EINTR;
+-			goto done;
 -		}
++	err = btusb_wait_on_bit_timeout(&data->flags, BTUSB_DOWNLOADING,
++					msecs_to_jiffies(5000),
++					TASK_INTERRUPTIBLE);
 +	if (err == 1) {
-+		BT_ERR("%s: Device boot interrupted", hdev->name);
-+		return -EINTR;
++		BT_ERR("%s: Firmware loading interrupted", hdev->name);
++		err = -EINTR;
++		goto done;
 +	}
  
 -		if (!timeout) {
--			BT_ERR("%s: Device boot timeout", hdev->name);
--			return -ETIMEDOUT;
+-			BT_ERR("%s: Firmware loading timeout", hdev->name);
+-			err = -ETIMEDOUT;
+-			goto done;
 -		}
 +	if (err) {
-+		BT_ERR("%s: Device boot timeout", hdev->name);
-+		return -ETIMEDOUT;
++		BT_ERR("%s: Firmware loading timeout", hdev->name);
++		err = -ETIMEDOUT;
++		goto done;
  	}
  
- 	rettime = ktime_get();
+ 	if (test_bit(BTUSB_FIRMWARE_FAILED, &data->flags)) {
 -- 
 2.1.0
 
