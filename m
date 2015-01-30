@@ -1,77 +1,134 @@
 Return-Path: <cyrus@holtmann.org>
-From: Matej Dubovy <matej.dubovy@gmail.com>
+From: Michael Janssen <jamuraa@chromium.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: Matej Dubovy <matej.dubovy@gmail.com>
-Subject: [PATCH] Bluetooth: btusb: Add support for 04ca:0x2007, BCM43142
-Date: Fri, 30 Jan 2015 23:01:00 +0100
-Message-Id: <1422655260-4227-1-git-send-email-matej.dubovy@gmail.com>
+Cc: Michael Janssen <jamuraa@chromium.org>
+Subject: [RFC BlueZ v2 1/1] doc: Add LE Advertisements to Service Manager
+Date: Fri, 30 Jan 2015 11:53:02 -0800
+Message-Id: <1422647582-12829-2-git-send-email-jamuraa@chromium.org>
+In-Reply-To: <1422647582-12829-1-git-send-email-jamuraa@chromium.org>
+References: <1422647582-12829-1-git-send-email-jamuraa@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Please add support for sub BT chip on the combo card
-Broadcom 43142A0 (in Lenovo E145), 04ca:2007
-
-/sys/kernel/debug/usb/devices
-
-T:  Bus=05 Lev=01 Prnt=01 Port=01 Cnt=02 Dev#=  3 Spd=12   MxCh= 0
-D:  Ver= 2.00 Cls=ff(vend.) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-P:  Vendor=04ca ProdID=2007 Rev= 1.12
-S:  Manufacturer=Broadcom Corp
-S:  Product=BCM43142A0
-S:  SerialNumber=28E347EC73BD
-C:* #Ifs= 4 Cfg#= 1 Atr=e0 MxPwr=  0mA
-I:* If#= 0 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=01 Prot=01 Driver=(none)
-E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
-E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-I:* If#= 1 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=(none)
-E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-I:  If#= 1 Alt= 1 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=(none)
-E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-I:  If#= 1 Alt= 2 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=(none)
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-I:  If#= 1 Alt= 3 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=(none)
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-I:  If#= 1 Alt= 4 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=(none)
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-I:  If#= 1 Alt= 5 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=(none)
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-I:* If#= 2 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=ff Driver=(none)
-E:  Ad=84(I) Atr=02(Bulk) MxPS=  32 Ivl=0ms
-E:  Ad=04(O) Atr=02(Bulk) MxPS=  32 Ivl=0ms
-I:* If#= 3 Alt= 0 #EPs= 0 Cls=fe(app. ) Sub=01 Prot=01 Driver=(none)
-
-Firmware can be extracted from the latest Lenovo E145 Bluetooth driver
-for Windows (driver is however described as BCM20702 but contains also
-firwmare for BCM43142).
-Search for BCM43142A0_001.001.011.0122.0153.hex within hex files, then
-it must be converted using hex2hcd utility. Rename file to
-BCM43142A0-04ca-2007.hcd, then move to /lib/firmware/brcm/.
+Updates the documentation defining a service hierarchy which can be used
+for defining LE Advertisement data, and register these advertisements
+to be broadcast.
 ---
- drivers/bluetooth/btusb.c | 4 ++++
- 1 file changed, 4 insertions(+)
+ doc/gatt-api.txt | 89 +++++++++++++++++++++++++++++++++++++++++++++++++++++---
+ 1 file changed, 85 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index ea3d337..e643fd2 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -110,6 +110,10 @@ static const struct usb_device_id btusb_table[] = {
- 	{ USB_DEVICE(0x13d3, 0x3404),
- 	  .driver_info = BTUSB_BCM_PATCHRAM },
+diff --git a/doc/gatt-api.txt b/doc/gatt-api.txt
+index bfeaf6d..7fa9883 100644
+--- a/doc/gatt-api.txt
++++ b/doc/gatt-api.txt
+@@ -205,18 +205,77 @@ Properties	string UUID [read-only]
+ 			which a PropertiesChanged signal will be emitted.
  
-+	/* Broadcom BCM43142A0 */
-+	{ USB_DEVICE(0x04ca, 0x2007),
-+	  .driver_info = BTUSB_BCM_PATCHRAM },
+ 
++LE Advertisement Data hierarchy
++===============================
 +
- 	/* Foxconn - Hon Hai */
- 	{ USB_VENDOR_AND_INTERFACE_INFO(0x0489, 0xff, 0x01, 0x01),
- 	  .driver_info = BTUSB_BCM_PATCHRAM },
++Advertisement Data to be broadcast and parameters for such.  Properties which
++are not present will not be included.  Required advertisement data types will
++always be included.
++
++Service		org.bluez
++Interface	org.bluez.LEAdvertisement1
++Object path	[variable prefix]/{hci0,hci1,...}/ad_XX_XX_XX_XX_XX_XX
++
++Properties	string AdvertisingType
++
++			Determines the type of advertising packet requested.
++			Must be one of "connectable", "scannable", or
++			"nonconnectable".
++
++		array{string} ServiceUUIDs
++
++			List of UUIDs to include in the "Service UUID" field of
++			the Advertising Data. These will be compressed to 16-bit
++			or 32-bit addresses if appropriate to save space.
++
++		bool IncludeLocalName
++
++			If present and true, the local name will be included in
++			the Advertising Data. A partial name will be included if
++			enough space is not available
++
++		array{struct(uint16,array{byte})} ManufacturerSpecificData
++
++			Array of Manufactuer Specific Data fields to include in
++			the Advertising Data.  Each struct includes the
++			Manufacturer ID and the raw bytes to include.
++
++		bool IncludePower
++
++			If present and true, the TX Power Level will be included
++			in the Advertising Data.
++
++		array{string} SolicitUUIDs
++
++			Array of UUIDs to include in "Service Solicitation"
++			Advertisement Data. These will be compressed to 16-bit
++			or 32-bit addresses if appropriate to save space.
++
++		array{struct(string,array{byte})} ServiceData
++
++			Array of Service Data to include.  The string is the
++			UUID to include with the data, and will be compressed to
++			16 or 32 bit length if applicable.
++
++		bool IncludeAppearance
++
++			If present and true, the Appearance will be included
++			in the Advertising Data.
++
++
+ Service Manager hierarchy
+ =============================
+ 
+-Service Manager allows external applications to register GATT based
+-services. Services must follow the API for Service and Characteristic
+-described above.
++The Service Manager allows external applications to register GATT based
++services and LE Advertisements. Services must follow the API for Service
++and Characteristic described above.  LE Advertisements must follow the API
++for LE Advertisement Data described above.
+ 
+ Local GATT services, characteristics and characteristic descriptors are
+ discovered automatically using the D-Bus Object Manager interface.
+ 
+ Service		org.bluez
+-Interface	org.bluez.GattManager1 [Experimental]
++Interface	org.bluez.ServiceManager1 [Experimental]
+ Object path	/org/bluez
+ 
+ Methods		RegisterService(object service, dict options)
+@@ -243,3 +302,25 @@ Methods		RegisterService(object service, dict options)
+ 
+ 			Possible errors: org.bluez.Error.InvalidArguments
+ 					 org.bluez.Error.DoesNotExist
++
++		RegisterAdvertisement(object advertisement, dict options)
++
++			Registers an advertisement object to be sent over the LE
++			Advertising channel.  The service must be exported
++			under interface LEAdvertisement1. The last segment of
++			the object path determines the advertiser's address used
++			and is assumed to be a random address unless it matches
++			the public address.
++
++			Possible errors: org.bluez.Error.InvalidArguments
++					 org.bluez.Error.AlreadyExists
++					 org.bluez.Error.InvalidLength
++
++		UnregisterAdvertisement(object advertisement)
++
++			This unregisters the advertisement that has been
++			prevously registered.  The object path parameter must
++			match the same value that has been used on registration.
++
++			Possible errors: org.bluez.Error.InvalidArguments
++					 org.bluez.Error.DoesNotExist
 -- 
-2.1.4
+2.2.0.rc0.207.ga3a616c
 
