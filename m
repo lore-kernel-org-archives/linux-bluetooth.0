@@ -1,31 +1,38 @@
 Return-Path: <cyrus@holtmann.org>
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: linux-kernel@vger.kernel.org
-Cc: peterz@infradead.org, mingo@redhat.com, davem@davemloft.net,
-	linux-bluetooth@vger.kernel.org
-Subject: sched/wait: Introduce a wait_on_bit_timeout() helper function
-Date: Fri, 30 Jan 2015 13:14:35 +0200
-Message-Id: <1422616476-2917-1-git-send-email-johan.hedberg@gmail.com>
-Sender: linux-kernel-owner@vger.kernel.org
+From: Bharat Panda <bharat.panda@samsung.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: cpgs@samsung.com, Bharat Panda <bharat.panda@samsung.com>
+Subject: [PATCH ] obexd/client: clear pending transfers if fails
+Date: Fri, 30 Jan 2015 16:37:12 +0530
+Message-id: <1422616032-14968-1-git-send-email-bharat.panda@samsung.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+In case of obex transfer fails, clear all pending
+transfers in the session.
+---
+ obexd/client/session.c | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
 
-We'd need this helper function for the btusb driver for waiting for
-certain firmware loading stages which are indicated through a bit-field.
-For now we made a local copy in btusb [1] with the intention to switch to
-this global version as soon as it makes it upstream. If it's ok we can
-also take the patch through the bluetooth-next tree and get it from
-there upstream.
-
-Johan
-
-[1] http://marc.info/?l=linux-bluetooth&m=142260834526228&w=2
-
-----------------------------------------------------------------
-Johan Hedberg (1):
-      sched/wait: Introduce wait_on_bit_timeout()
-
- include/linux/wait.h | 26 ++++++++++++++++++++++++++
- 1 file changed, 26 insertions(+)
+diff --git a/obexd/client/session.c b/obexd/client/session.c
+index d2ae4fd..512d6b7 100644
+--- a/obexd/client/session.c
++++ b/obexd/client/session.c
+@@ -901,8 +901,12 @@ static void session_terminate_transfer(struct obc_session *session,
+ 
+ 	pending_request_free(p);
+ 
+-	if (session->p == NULL)
+-		session_process_queue(session);
++	if (session->p == NULL) {
++		if (gerr != NULL)
++			obc_session_shutdown(session);
++		else
++			session_process_queue(session);
++	}
+ 
+ 	obc_session_unref(session);
+ }
+-- 
+1.9.1
 
