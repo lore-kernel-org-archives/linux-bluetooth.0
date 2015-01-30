@@ -1,57 +1,130 @@
 Return-Path: <cyrus@holtmann.org>
+Sender: Larry Finger <larry.finger@gmail.com>
+Message-ID: <54CBA0CE.8030800@lwfinger.net>
+Date: Fri, 30 Jan 2015 09:18:38 -0600
+From: Larry Finger <Larry.Finger@lwfinger.net>
 MIME-Version: 1.0
-In-Reply-To: <001201d03c96$10ca2ab0$325e8010$@samsung.com>
-References: <1422452517-4240-1-git-send-email-gowtham.ab@samsung.com>
-	<001201d03c96$10ca2ab0$325e8010$@samsung.com>
-Date: Fri, 30 Jan 2015 17:32:53 +0200
-Message-ID: <CABBYNZKWB+dLTKgP-_znxrycq8VK8jNJPmVaGGBWPhK5Vf0BLw@mail.gmail.com>
-Subject: Re: [PATCH] test/pbap-client: Add support to fetch spd,fav PB
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Gowtham Anandha Babu <gowtham.ab@samsung.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	Bharat Panda <bharat.panda@samsung.com>, cpgs@samsung.com
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-bluetooth-owner@vger.kernel.org
+To: Marcel Holtmann <marcel@holtmann.org>,
+ Kalle Valo <kvalo@codeaurora.org>
+CC: linux-wireless@vger.kernel.org, Troy Tan <troy_tan@realsil.com.cn>,
+ netdev@vger.kernel.org, linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH V2 5/6] rtlwifi: btcoexist: Add routines for RTL8812AE
+ kernel socket communications
+References: <1422304934-9239-1-git-send-email-Larry.Finger@lwfinger.net> <1422304934-9239-6-git-send-email-Larry.Finger@lwfinger.net> <87h9v8zkuh.fsf@kamboji.qca.qualcomm.com> <EC423C22-AEA0-4232-A452-7A131C41780A@holtmann.org>
+In-Reply-To: <EC423C22-AEA0-4232-A452-7A131C41780A@holtmann.org>
+Content-Type: text/plain; charset=windows-1252; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Gowtham,
+On 01/30/2015 03:57 AM, Marcel Holtmann wrote:
 
-On Fri, Jan 30, 2015 at 4:07 PM, Gowtham Anandha Babu
-<gowtham.ab@samsung.com> wrote:
-> Ping.
+Marcel,
+
+> Hi Kalle,
 >
->> -----Original Message-----
->> From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-
->> owner@vger.kernel.org] On Behalf Of Gowtham Anandha Babu
->> Sent: Wednesday, January 28, 2015 7:12 PM
->> To: linux-bluetooth@vger.kernel.org
->> Cc: bharat.panda@samsung.com; cpgs@samsung.com; Gowtham Anandha
->> Babu
->> Subject: [PATCH] test/pbap-client: Add support to fetch spd,fav PB
+>> I'm adding bluetooth list to the discussion. Full patch is available
+>> here:
 >>
->> Adds support to fetch spd,fav phonebook.
->> Tested using PTS test case TC_PCE_PBB_BV_01_C.
->> ---
->>  test/pbap-client | 2 +-
->>  1 file changed, 1 insertion(+), 1 deletion(-)
+>> https://patchwork.kernel.org/patch/5712591/
 >>
->> diff --git a/test/pbap-client b/test/pbap-client index 51e26eb..16a786b
->> 100755
->> --- a/test/pbap-client
->> +++ b/test/pbap-client
->> @@ -170,6 +170,6 @@ if  __name__ == '__main__':
+>> Larry Finger <Larry.Finger@lwfinger.net> writes:
 >>
->>               pbap_client.flush_transfers(lambda: test_paths(paths[1:]))
+>>> From: Troy Tan <troy_tan@realsil.com.cn>
+>>>
+>>> This patch adds the routines used to communicate between the RTL8812AE (wifi)
+>>> device and the RTL8761AU (bluetooth) device that are part of the same chip.
+>>> Unlike other similar dual-function devices, this chip does not contain special
+>>> hardware that lets the firmware pass coexistence info from one part to the
+>>> other. As a result, this driver implements such communication as a kernel
+>>> socket.
+>>>
+>>> Signed-off-by: Troy Tan <troy_tan@realsil.com.cn>
+>>> Signed-off-by: Larry Finger <Larry.Finger@lwfinger.net>
+>>> ---
+>>> V2 - Add comments explaining the routine that sends a message via the
+>>> socket.
 >>
->> -     test_paths(["PB", "ICH", "OCH", "MCH", "CCH"])
->> +     test_paths(["PB", "ICH", "OCH", "MCH", "CCH", "SPD", "FAV"])
+>> The commit log is not still explaining that much about the actual
+>> functionality, so I investigated on my own:
 >>
->>       mainloop.run()
->> --
->> 1.9.1
+>>> +static u8 rtl_btcoex_create_kernel_socket(struct rtl_priv *rtlpriv,
+>>> +					  u8 is_invite)
+>>> +{
+>>> +	struct bt_coex_info *pcoex_info = &rtlpriv->coex_info;
+>>> +	s8 kernel_socket_err;
+>>> +
+>>> +	BTC_PRINT(BTC_MSG_SOCKET, SOCKET_CRITICAL,
+>>> +		  "%s CONNECT_PORT %d\n", __func__, CONNECT_PORT);
+>>> +
+>>> +	if (!pcoex_info) {
+>>> +		BTC_PRINT(BTC_MSG_SOCKET, SOCKET_CRITICAL, "coex_info: NULL\n");
+>>> +		return _FAIL;
+>>> +	}
+>>> +
+>>> +	kernel_socket_err = sock_create(PF_INET, SOCK_DGRAM, 0,
+>>> +					&pcoex_info->udpsock);
+>>> +	BTC_PRINT(BTC_MSG_SOCKET, SOCKET_CRITICAL,
+>>> +		  "binding socket, err = %d\n", kernel_socket_err);
+>>> +
+>>> +	if (kernel_socket_err < 0) {
+>>> +		BTC_PRINT(BTC_MSG_SOCKET, SOCKET_CRITICAL,
+>>> +			  "Error during creation of socket error:%d\n",
+>>> +			  kernel_socket_err);
+>>> +		return _FAIL;
+>>> +	}
+>>> +	memset(&pcoex_info->sin, 0, sizeof(pcoex_info->sin));
+>>> +	pcoex_info->sin.sin_family = AF_INET;
+>>> +	pcoex_info->sin.sin_port = htons(CONNECT_PORT);
+>>> +	pcoex_info->sin.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
+>>> +
+>>> +	memset(&pcoex_info->bt_addr, 0, sizeof(pcoex_info->bt_addr));
+>>> +	pcoex_info->bt_addr.sin_family = AF_INET;
+>>> +	pcoex_info->bt_addr.sin_port = htons(CONNECT_PORT_BT);
+>>> +	pcoex_info->bt_addr.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
+>>> +
+>>> +	pcoex_info->sk_store = NULL;
+>>> +
+>>> +	kernel_socket_err =
+>>> +	   pcoex_info->udpsock->ops->bind(pcoex_info->udpsock,
+>>> +					  (struct sockaddr *)&pcoex_info->sin,
+>>> +					  sizeof(pcoex_info->sin));
+>>> +	if (kernel_socket_err == 0) {
+>>> +		BTC_PRINT(BTC_MSG_SOCKET, SOCKET_CRITICAL,
+>>> +			  "binding socket success\n");
+>>> +		pcoex_info->udpsock->sk->sk_data_ready =
+>>> +			rtl_btcoex_recvmsg_int;
+>>> +		pcoex_info->sock_open |=  KERNEL_SOCKET_OK;
+>>> +		pcoex_info->bt_attend = false;
+>>> +		BTC_PRINT(BTC_MSG_SOCKET, SOCKET_CRITICAL,
+>>> +			  "WIFI sending attend_req\n");
+>>> +		rtl_btcoex_sendmsgbysocket(rtlpriv, attend_req,
+>>> +					   sizeof(attend_req), true);
+>>> +		return _SUCCESS;
+>>
+>> So the wireless driver communicates with the bluetooth driver (which is
+>> not in upstream) via a localhost UDP connection?
+>
+> I think the first order of business should be to get the Bluetooth driver upstream. Until that has happened this is all kinda pointless discussion.
 
-We should be doing this with obexctl, is there something missing there?
+I agree with this; however, the last time I tried to submit a BT driver for 
+Realtek, I was told that this driver should use some (as yet included) feature. 
+I have watched the driver development, and if that feature was ever included, it 
+was in a form that I did not recognize. I'm sorry that this is vague, but this 
+happened a long time ago.
 
+--snip--
 
--- 
-Luiz Augusto von Dentz
+>> I know there's a general need for something similar like this, but it
+>> needs to properly discussed and designed.
+>
+> This is just insane. Clear NAK.
+>
+> Two kernel modules will not use UDP ports over the loopback interface to communicate with each other.
+
+I will work on combining the latest BT drivers from Realtek with btusb to see if 
+I can achieve a patch that will both work with the Realtek hardware, and get 
+approval from the reviewers.
+
+What would be an approved method of communicating between two kernel modules? Is 
+there some example in the kernel that I could study?
+
+Larry
