@@ -1,52 +1,57 @@
 Return-Path: <cyrus@holtmann.org>
-From: Gowtham Anandha Babu <gowtham.ab@samsung.com>
+From: Sebastian Chlad <sebastian.chlad@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: bharat.panda@samsung.com, cpgs@samsung.com
-References: <1422452517-4240-1-git-send-email-gowtham.ab@samsung.com>
-In-reply-to: <1422452517-4240-1-git-send-email-gowtham.ab@samsung.com>
-Subject: RE: [PATCH] test/pbap-client: Add support to fetch spd,fav PB
-Date: Fri, 30 Jan 2015 19:37:02 +0530
-Message-id: <001201d03c96$10ca2ab0$325e8010$@samsung.com>
-MIME-version: 1.0
-Content-type: text/plain; charset=us-ascii
+Cc: Sebastian Chlad <sebastian.chlad@tieto.com>
+Subject: [PATCH] android/pts: PTS tests for OPP on Android 5 and PTS 6.0
+Date: Fri, 30 Jan 2015 14:22:53 +0100
+Message-Id: <1422624173-27223-1-git-send-email-sebastian.chlad@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Ping.
+---
+ android/pics-opp.txt  | 2 +-
+ android/pixit-opp.txt | 2 +-
+ android/pts-opp.txt   | 4 ++--
+ 3 files changed, 4 insertions(+), 4 deletions(-)
 
-> -----Original Message-----
-> From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-
-> owner@vger.kernel.org] On Behalf Of Gowtham Anandha Babu
-> Sent: Wednesday, January 28, 2015 7:12 PM
-> To: linux-bluetooth@vger.kernel.org
-> Cc: bharat.panda@samsung.com; cpgs@samsung.com; Gowtham Anandha
-> Babu
-> Subject: [PATCH] test/pbap-client: Add support to fetch spd,fav PB
-> 
-> Adds support to fetch spd,fav phonebook.
-> Tested using PTS test case TC_PCE_PBB_BV_01_C.
-> ---
->  test/pbap-client | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/test/pbap-client b/test/pbap-client index 51e26eb..16a786b
-> 100755
-> --- a/test/pbap-client
-> +++ b/test/pbap-client
-> @@ -170,6 +170,6 @@ if  __name__ == '__main__':
-> 
->  		pbap_client.flush_transfers(lambda: test_paths(paths[1:]))
-> 
-> -	test_paths(["PB", "ICH", "OCH", "MCH", "CCH"])
-> +	test_paths(["PB", "ICH", "OCH", "MCH", "CCH", "SPD", "FAV"])
-> 
->  	mainloop.run()
-> --
-> 1.9.1
-> 
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth"
-in
-> the body of a message to majordomo@vger.kernel.org More majordomo
-> info at  http://vger.kernel.org/majordomo-info.html
+diff --git a/android/pics-opp.txt b/android/pics-opp.txt
+index b2cf16f..4284da6 100644
+--- a/android/pics-opp.txt
++++ b/android/pics-opp.txt
+@@ -1,6 +1,6 @@
+ OPP PICS for the PTS tool.
+ 
+-PTS version: 5.3
++PTS version: 6.0
+ 
+ * - different than PTS defaults
+ # - not yet implemented/supported
+diff --git a/android/pixit-opp.txt b/android/pixit-opp.txt
+index 9cd4bb1..385cc1f 100644
+--- a/android/pixit-opp.txt
++++ b/android/pixit-opp.txt
+@@ -1,6 +1,6 @@
+ OPP PIXIT for the PTS tool.
+ 
+-PTS version: 5.3
++PTS version: 6.0
+ 
+ * - different than PTS defaults
+ & - should be set to IUT Bluetooth address
+diff --git a/android/pts-opp.txt b/android/pts-opp.txt
+index 7f81ad9..3f22a33 100644
+--- a/android/pts-opp.txt
++++ b/android/pts-opp.txt
+@@ -1,7 +1,7 @@
+ PTS test results for OPP
+ 
+-PTS version: 5.3
+-Tested: 17-November-2014
++PTS version: 6.0
++Tested: 30-January-2015
+ Android version: 5.0
+ 
+ Results:
+-- 
+1.9.3
 
