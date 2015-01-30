@@ -1,96 +1,57 @@
 Return-Path: <cyrus@holtmann.org>
-From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] android/pts: Update HID PTS 6.0 pixits, pics, results for android 5.0
-Date: Fri, 30 Jan 2015 16:45:39 +0100
-Message-Id: <1422632739-10844-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+MIME-Version: 1.0
+In-Reply-To: <001201d03c96$10ca2ab0$325e8010$@samsung.com>
+References: <1422452517-4240-1-git-send-email-gowtham.ab@samsung.com>
+	<001201d03c96$10ca2ab0$325e8010$@samsung.com>
+Date: Fri, 30 Jan 2015 17:32:53 +0200
+Message-ID: <CABBYNZKWB+dLTKgP-_znxrycq8VK8jNJPmVaGGBWPhK5Vf0BLw@mail.gmail.com>
+Subject: Re: [PATCH] test/pbap-client: Add support to fetch spd,fav PB
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Gowtham Anandha Babu <gowtham.ab@samsung.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	Bharat Panda <bharat.panda@samsung.com>, cpgs@samsung.com
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch updates test pixits, pics, test results for HID profile
-against android 5.0
----
- android/pics-hid.txt  |  2 +-
- android/pixit-hid.txt |  3 ++-
- android/pts-hid.txt   | 22 ++++++++++------------
- 3 files changed, 13 insertions(+), 14 deletions(-)
+Hi Gowtham,
 
-diff --git a/android/pics-hid.txt b/android/pics-hid.txt
-index aa03878..ffd0aff 100644
---- a/android/pics-hid.txt
-+++ b/android/pics-hid.txt
-@@ -1,6 +1,6 @@
- HID PICS for the PTS tool.
- 
--PTS version: 5.3
-+PTS version: 6.0
- 
- * - different than PTS defaults
- # - not yet implemented/supported
-diff --git a/android/pixit-hid.txt b/android/pixit-hid.txt
-index 42a3310..3c93fca 100644
---- a/android/pixit-hid.txt
-+++ b/android/pixit-hid.txt
-@@ -1,6 +1,6 @@
- HID PIXIT for the PTS tool.
- 
--PTS version: 5.3
-+PTS version: 6.0
- 
- * - different than PTS defaults
- & - should be set to IUT Bluetooth address
-@@ -27,4 +27,5 @@ TSPX_no_fail_verdicts					False
- TSPX_time_reconnect					30000
- TSPX_secure_simple_pairing_pass_key_confirmation	False
- TSPX_hid_report_id					1
-+TSPX_hid_report_data					ff00 (*)
- -------------------------------------------------------------------------------
-diff --git a/android/pts-hid.txt b/android/pts-hid.txt
-index 62a79e1..7918650 100644
---- a/android/pts-hid.txt
-+++ b/android/pts-hid.txt
-@@ -1,7 +1,7 @@
- PTS test results for HID
- 
--PTS version: 5.3
--Tested: 26-November-2014
-+PTS version: 6.0
-+Tested: 30-January-2015
- Android version: 5.0
- 
- Results:
-@@ -22,11 +22,10 @@ TC_HOS_HCR_BV_02_I	PASS
- TC_HOS_HCR_BV_03_I	N/A
- TC_HOS_HCR_BV_04_I	N/A
- TC_HOS_HDT_BV_01_I	PASS
--TC_HOS_HDT_BV_02_I	PASS	from shell execute:
--				haltest
--				bluetooth enable
--				hidhost connect <PTS bdaddr>
--				hidhost send_data <PTS bdaddr> ff00
-+TC_HOS_HDT_BV_02_I	PASS	haltest: hidhost connect <addr>
-+				hidhost send_data <addr> ff00
-+				NOTE: PTS displays wrong report data on popup
-+					PTS issue #13021
- TC_HOS_HDT_BV_03_I	N/A
- TC_HOS_HDT_BV_04_I	N/A
- TC_HOS_HID_BV_01_C	N/A
-@@ -38,11 +37,10 @@ TC_HOS_HID_BV_06_C	N/A
- TC_HOS_HID_BV_08_C	N/A
- TC_HOS_HID_BV_09_C	N/A
- TC_HOS_HID_BV_10_C	N/A
--TC_HOS_DAT_BV_01_C	PASS	from shell execute:
--				haltest
--				bluetooth enable
--				hidhost connect <PTS bdaddr>
--				hidhost send_data <PTS bdaddr> ff00
-+TC_HOS_DAT_BV_01_C	PASS	haltest: hidhost connect <addr>
-+				hidhost send_data <addr> ff00
-+				NOTE: PTS displays wrong report data on popup
-+					PTS issue #13021
- TC_HOS_DAT_BV_02_C	N/A
- TC_HOS_DAT_BI_01_C	N/A
- TC_HOS_DAT_BI_02_C	N/A
+On Fri, Jan 30, 2015 at 4:07 PM, Gowtham Anandha Babu
+<gowtham.ab@samsung.com> wrote:
+> Ping.
+>
+>> -----Original Message-----
+>> From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-
+>> owner@vger.kernel.org] On Behalf Of Gowtham Anandha Babu
+>> Sent: Wednesday, January 28, 2015 7:12 PM
+>> To: linux-bluetooth@vger.kernel.org
+>> Cc: bharat.panda@samsung.com; cpgs@samsung.com; Gowtham Anandha
+>> Babu
+>> Subject: [PATCH] test/pbap-client: Add support to fetch spd,fav PB
+>>
+>> Adds support to fetch spd,fav phonebook.
+>> Tested using PTS test case TC_PCE_PBB_BV_01_C.
+>> ---
+>>  test/pbap-client | 2 +-
+>>  1 file changed, 1 insertion(+), 1 deletion(-)
+>>
+>> diff --git a/test/pbap-client b/test/pbap-client index 51e26eb..16a786b
+>> 100755
+>> --- a/test/pbap-client
+>> +++ b/test/pbap-client
+>> @@ -170,6 +170,6 @@ if  __name__ == '__main__':
+>>
+>>               pbap_client.flush_transfers(lambda: test_paths(paths[1:]))
+>>
+>> -     test_paths(["PB", "ICH", "OCH", "MCH", "CCH"])
+>> +     test_paths(["PB", "ICH", "OCH", "MCH", "CCH", "SPD", "FAV"])
+>>
+>>       mainloop.run()
+>> --
+>> 1.9.1
+
+We should be doing this with obexctl, is there something missing there?
+
+
 -- 
-1.9.3
-
+Luiz Augusto von Dentz
