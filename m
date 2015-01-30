@@ -1,30 +1,172 @@
 Return-Path: <cyrus@holtmann.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 8.1 \(1993\))
-Subject: Re: [PATCH 2/2] Bluetooth: btusb: Use wait_on_bit_timeout() for BTUSB_BOOTING
+Subject: Re: [PATCH V2 5/6] rtlwifi: btcoexist: Add routines for RTL8812AE kernel socket communications
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1422608335-29090-2-git-send-email-johan.hedberg@gmail.com>
-Date: Fri, 30 Jan 2015 02:07:19 -0800
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <50FDE447-5E76-4272-BD13-B6EAC4C7006C@holtmann.org>
-References: <1422608335-29090-1-git-send-email-johan.hedberg@gmail.com> <1422608335-29090-2-git-send-email-johan.hedberg@gmail.com>
-To: Johan Hedberg <johan.hedberg@gmail.com>
+In-Reply-To: <87h9v8zkuh.fsf@kamboji.qca.qualcomm.com>
+Date: Fri, 30 Jan 2015 01:57:58 -0800
+Cc: Larry Finger <Larry.Finger@lwfinger.net>,
+	linux-wireless@vger.kernel.org, Troy Tan <troy_tan@realsil.com.cn>,
+	netdev@vger.kernel.org, linux-bluetooth@vger.kernel.org
+Message-Id: <EC423C22-AEA0-4232-A452-7A131C41780A@holtmann.org>
+References: <1422304934-9239-1-git-send-email-Larry.Finger@lwfinger.net> <1422304934-9239-6-git-send-email-Larry.Finger@lwfinger.net> <87h9v8zkuh.fsf@kamboji.qca.qualcomm.com>
+To: Kalle Valo <kvalo@codeaurora.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+Hi Kalle,
 
-> The wait_on_bit_timeout() is a simpler and race-free way of waiting for
-> a bit to be cleared than the current code in btusb.c. This patch updates
-> the code to use the helper function (its btusb copy - to be later
-> updated to use a global one).
+> I'm adding bluetooth list to the discussion. Full patch is available
+> here:
 > 
-> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
-> ---
-> drivers/bluetooth/btusb.c | 44 +++++++++++++++++++-------------------------
-> 1 file changed, 19 insertions(+), 25 deletions(-)
+> https://patchwork.kernel.org/patch/5712591/
+> 
+> Larry Finger <Larry.Finger@lwfinger.net> writes:
+> 
+>> From: Troy Tan <troy_tan@realsil.com.cn>
+>> 
+>> This patch adds the routines used to communicate between the RTL8812AE (wifi)
+>> device and the RTL8761AU (bluetooth) device that are part of the same chip.
+>> Unlike other similar dual-function devices, this chip does not contain special
+>> hardware that lets the firmware pass coexistence info from one part to the
+>> other. As a result, this driver implements such communication as a kernel
+>> socket.
+>> 
+>> Signed-off-by: Troy Tan <troy_tan@realsil.com.cn>
+>> Signed-off-by: Larry Finger <Larry.Finger@lwfinger.net>
+>> ---
+>> V2 - Add comments explaining the routine that sends a message via the
+>> socket.
+> 
+> The commit log is not still explaining that much about the actual
+> functionality, so I investigated on my own:
+> 
+>> +static u8 rtl_btcoex_create_kernel_socket(struct rtl_priv *rtlpriv,
+>> +					  u8 is_invite)
+>> +{
+>> +	struct bt_coex_info *pcoex_info = &rtlpriv->coex_info;
+>> +	s8 kernel_socket_err;
+>> +
+>> +	BTC_PRINT(BTC_MSG_SOCKET, SOCKET_CRITICAL,
+>> +		  "%s CONNECT_PORT %d\n", __func__, CONNECT_PORT);
+>> +
+>> +	if (!pcoex_info) {
+>> +		BTC_PRINT(BTC_MSG_SOCKET, SOCKET_CRITICAL, "coex_info: NULL\n");
+>> +		return _FAIL;
+>> +	}
+>> +
+>> +	kernel_socket_err = sock_create(PF_INET, SOCK_DGRAM, 0,
+>> +					&pcoex_info->udpsock);
+>> +	BTC_PRINT(BTC_MSG_SOCKET, SOCKET_CRITICAL,
+>> +		  "binding socket, err = %d\n", kernel_socket_err);
+>> +
+>> +	if (kernel_socket_err < 0) {
+>> +		BTC_PRINT(BTC_MSG_SOCKET, SOCKET_CRITICAL,
+>> +			  "Error during creation of socket error:%d\n",
+>> +			  kernel_socket_err);
+>> +		return _FAIL;
+>> +	}
+>> +	memset(&pcoex_info->sin, 0, sizeof(pcoex_info->sin));
+>> +	pcoex_info->sin.sin_family = AF_INET;
+>> +	pcoex_info->sin.sin_port = htons(CONNECT_PORT);
+>> +	pcoex_info->sin.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
+>> +
+>> +	memset(&pcoex_info->bt_addr, 0, sizeof(pcoex_info->bt_addr));
+>> +	pcoex_info->bt_addr.sin_family = AF_INET;
+>> +	pcoex_info->bt_addr.sin_port = htons(CONNECT_PORT_BT);
+>> +	pcoex_info->bt_addr.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
+>> +
+>> +	pcoex_info->sk_store = NULL;
+>> +
+>> +	kernel_socket_err =
+>> +	   pcoex_info->udpsock->ops->bind(pcoex_info->udpsock,
+>> +					  (struct sockaddr *)&pcoex_info->sin,
+>> +					  sizeof(pcoex_info->sin));
+>> +	if (kernel_socket_err == 0) {
+>> +		BTC_PRINT(BTC_MSG_SOCKET, SOCKET_CRITICAL,
+>> +			  "binding socket success\n");
+>> +		pcoex_info->udpsock->sk->sk_data_ready =
+>> +			rtl_btcoex_recvmsg_int;
+>> +		pcoex_info->sock_open |=  KERNEL_SOCKET_OK;
+>> +		pcoex_info->bt_attend = false;
+>> +		BTC_PRINT(BTC_MSG_SOCKET, SOCKET_CRITICAL,
+>> +			  "WIFI sending attend_req\n");
+>> +		rtl_btcoex_sendmsgbysocket(rtlpriv, attend_req,
+>> +					   sizeof(attend_req), true);
+>> +		return _SUCCESS;
+> 
+> So the wireless driver communicates with the bluetooth driver (which is
+> not in upstream) via a localhost UDP connection?
 
-patch has been applied to bluetooth-next tree.
+I think the first order of business should be to get the Bluetooth driver upstream. Until that has happened this is all kinda pointless discussion.
+
+>> +#define CONNECT_PORT 30000
+>> +#define CONNECT_PORT_BT 30001
+> 
+> And these are the UDP ports used.
+> 
+>> +struct hci_link_info {
+>> +	u16		connect_handle;
+>> +	u8		incoming_traffic_mode;
+>> +	u8		outgoing_traffic_mode;
+>> +	u8		bt_profile;
+>> +	u8		bt_corespec;
+>> +	s8		bt_RSSI;
+>> +	u8		traffic_profile;
+>> +	u8		link_role;
+>> +};
+>> +
+>> +#define	MAX_BT_ACL_LINK_NUM		8
+>> +
+>> +struct hci_ext_config {
+>> +	struct hci_link_info	acl_link[MAX_BT_ACL_LINK_NUM];
+>> +	u8	bt_operation_code;
+>> +	u16	current_connect_handle;
+>> +	u8	current_incoming_traffic_mode;
+>> +	u8	current_outgoing_traffic_mode;
+>> +
+>> +	u8	number_of_acl;
+>> +	u8	number_of_sco;
+>> +	u8	current_bt_status;
+>> +	u16	hci_ext_ver;
+>> +	bool	enable_wifi_scan_notify;
+>> +};
+> 
+> [...]
+> 
+>> +enum HCI_STATUS {
+>> +	/* Success */
+>> +	HCI_STATUS_SUCCESS				= 0x00,
+>> +	/* Unknown HCI Command */
+>> +	HCI_STATUS_UNKNOW_HCI_CMD			= 0x01,
+>> +	/* Unknown Connection Identifier */
+>> +	HCI_STATUS_UNKNOW_CONNECT_ID			= 0X02,
+>> +	/* Hardware Failure */
+>> +	HCI_STATUS_HW_FAIL				= 0X03,
+>> +	/* Page Timeout */
+>> +	HCI_STATUS_PAGE_TIMEOUT				= 0X04,
+>> +	/* Authentication Failure */
+>> +	HCI_STATUS_AUTH_FAIL				= 0X05,
+>> +	/* PIN or Key Missing */
+>> +	HCI_STATUS_PIN_OR_KEY_MISSING			= 0X06,
+>> +	/* Memory Capacity Exceeded */
+>> +	HCI_STATUS_MEM_CAP_EXCEED			= 0X07,
+>> +	/* Connection Timeout */
+>> +	HCI_STATUS_CONNECT_TIMEOUT			= 0X08,
+>> +	/* Connection Limit Exceeded */
+> 
+> And here's part of the information exchanged between the drivers.
+> 
+> This is something which needs to be properly reviewed both in wireless
+> and bluetooth lists, a wireless driver cannot just invent these on their
+> own. And using UDP sockets for this is in my opinion just horrible.
+> 
+> I know there's a general need for something similar like this, but it
+> needs to properly discussed and designed.
+
+This is just insane. Clear NAK.
+
+Two kernel modules will not use UDP ports over the loopback interface to communicate with each other.
 
 Regards
 
