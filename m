@@ -1,44 +1,96 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 8.1 \(1993\))
-Subject: Re: Extending BlueZ's HAL protocol
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <54CB81F5.3000401@mozilla.com>
-Date: Fri, 30 Jan 2015 09:59:59 -0800
-Cc: linux-bluetooth@vger.kernel.org, Shawn Huang <shuang@mozilla.com>
-Message-Id: <E422020A-9686-42FB-BB9A-2FEACDF59529@holtmann.org>
-References: <54CB81F5.3000401@mozilla.com>
-To: Thomas Zimmermann <tzimmermann@mozilla.com>
+From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] android/pts: Update HID PTS 6.0 pixits, pics, results for android 5.0
+Date: Fri, 30 Jan 2015 16:45:39 +0100
+Message-Id: <1422632739-10844-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Thomas,
+This patch updates test pixits, pics, test results for HID profile
+against android 5.0
+---
+ android/pics-hid.txt  |  2 +-
+ android/pixit-hid.txt |  3 ++-
+ android/pts-hid.txt   | 22 ++++++++++------------
+ 3 files changed, 13 insertions(+), 14 deletions(-)
 
-> On Mozilla's Firefox OS, we use a daemon for running Bluedroid drivers
-> in their own address space, and communicate with the daemon via BlueZ's
-> HAL protocol. [1]
-> 
-> We'd like to use the HAL protocol as-is, but several commands are not
-> defined in the spec. We especially ran into this problem with
-> Bluedroid's |bt_interface_t::config_hci_snoop_log|. BlueZ has a
-> completely different mechanism for handling the command and probably
-> won't ever require an opcode for it. Just adding an opcode for
-> |config_hci_snoop_log| to our code base will probably collide with BlueZ
-> official spec in the long run.
-> 
-> Our proposal is to reserve two opcodes per service for extensions to
-> commands and notifications. This would allow us to add the missing
-> pieces without opcode collisions.
-
-when you are using BlueZ for Android, we run the bluetoothd-snoop daemon to collect the traces. The reason why it is not in bluetoothd that provides all the other functionality is pretty simple. We do not have to and that is why we never bothered to define an opcode for it. That is the advantage of not being a huge monolithic block like Bluedroid.
-
-We rely on the Bluetooth subsystem and its monitor (snooping) functionality. The big advantage having this in a separate process is that it will not interfere with any other operation bluetoothd has to do. The kernel can schedule bluetoothd and bluetoothd-snoop individually.
-
-So bluetoothd-snoop is essentially a mini version of btmon where its only feature is to store traces in the old BTSnoop format (Frontline compatible). That said, nothing is stopping you from actually running btmon or hcidump on the target platform or multiple of them. We could even write a USB gadget driver that exports the traces over USB and you could run btmon / Wireshark on a PC to collect them.
-
-Can you just run bluetoothd-snoop as well and get the tracing feature that way? If you build BlueZ for Android and run it that way, that is what happens through the developer menu. It is fully integrated into the Android UI and we have been running it that way for a long time now.
-
-Regards
-
-Marcel
+diff --git a/android/pics-hid.txt b/android/pics-hid.txt
+index aa03878..ffd0aff 100644
+--- a/android/pics-hid.txt
++++ b/android/pics-hid.txt
+@@ -1,6 +1,6 @@
+ HID PICS for the PTS tool.
+ 
+-PTS version: 5.3
++PTS version: 6.0
+ 
+ * - different than PTS defaults
+ # - not yet implemented/supported
+diff --git a/android/pixit-hid.txt b/android/pixit-hid.txt
+index 42a3310..3c93fca 100644
+--- a/android/pixit-hid.txt
++++ b/android/pixit-hid.txt
+@@ -1,6 +1,6 @@
+ HID PIXIT for the PTS tool.
+ 
+-PTS version: 5.3
++PTS version: 6.0
+ 
+ * - different than PTS defaults
+ & - should be set to IUT Bluetooth address
+@@ -27,4 +27,5 @@ TSPX_no_fail_verdicts					False
+ TSPX_time_reconnect					30000
+ TSPX_secure_simple_pairing_pass_key_confirmation	False
+ TSPX_hid_report_id					1
++TSPX_hid_report_data					ff00 (*)
+ -------------------------------------------------------------------------------
+diff --git a/android/pts-hid.txt b/android/pts-hid.txt
+index 62a79e1..7918650 100644
+--- a/android/pts-hid.txt
++++ b/android/pts-hid.txt
+@@ -1,7 +1,7 @@
+ PTS test results for HID
+ 
+-PTS version: 5.3
+-Tested: 26-November-2014
++PTS version: 6.0
++Tested: 30-January-2015
+ Android version: 5.0
+ 
+ Results:
+@@ -22,11 +22,10 @@ TC_HOS_HCR_BV_02_I	PASS
+ TC_HOS_HCR_BV_03_I	N/A
+ TC_HOS_HCR_BV_04_I	N/A
+ TC_HOS_HDT_BV_01_I	PASS
+-TC_HOS_HDT_BV_02_I	PASS	from shell execute:
+-				haltest
+-				bluetooth enable
+-				hidhost connect <PTS bdaddr>
+-				hidhost send_data <PTS bdaddr> ff00
++TC_HOS_HDT_BV_02_I	PASS	haltest: hidhost connect <addr>
++				hidhost send_data <addr> ff00
++				NOTE: PTS displays wrong report data on popup
++					PTS issue #13021
+ TC_HOS_HDT_BV_03_I	N/A
+ TC_HOS_HDT_BV_04_I	N/A
+ TC_HOS_HID_BV_01_C	N/A
+@@ -38,11 +37,10 @@ TC_HOS_HID_BV_06_C	N/A
+ TC_HOS_HID_BV_08_C	N/A
+ TC_HOS_HID_BV_09_C	N/A
+ TC_HOS_HID_BV_10_C	N/A
+-TC_HOS_DAT_BV_01_C	PASS	from shell execute:
+-				haltest
+-				bluetooth enable
+-				hidhost connect <PTS bdaddr>
+-				hidhost send_data <PTS bdaddr> ff00
++TC_HOS_DAT_BV_01_C	PASS	haltest: hidhost connect <addr>
++				hidhost send_data <addr> ff00
++				NOTE: PTS displays wrong report data on popup
++					PTS issue #13021
+ TC_HOS_DAT_BV_02_C	N/A
+ TC_HOS_DAT_BI_01_C	N/A
+ TC_HOS_DAT_BI_02_C	N/A
+-- 
+1.9.3
 
