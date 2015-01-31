@@ -1,63 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 8.1 \(1993\))
+Subject: Re: [PATCH] Bluetooth: Set HCI_QUIRK_STRICT_DUPLICATE_FILTER for BTUSB_INTEL
 From: Marcel Holtmann <marcel@holtmann.org>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/2] Bluetooth: Store OOB data present value for each set of remote OOB data
-Date: Fri, 30 Jan 2015 23:10:05 -0800
-Message-Id: <1422688206-19350-1-git-send-email-marcel@holtmann.org>
+In-Reply-To: <1422672958-17279-1-git-send-email-jpawlowski@google.com>
+Date: Fri, 30 Jan 2015 20:04:07 -0800
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <58104EC7-E179-4F67-969F-E637E31952C1@holtmann.org>
+References: <1422672958-17279-1-git-send-email-jpawlowski@google.com>
+To: Jakub Pawlowski <jpawlowski@google.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Instead of doing complex calculation every time the OOB data is used,
-just calculate the OOB data present value and store it with the OOB
-data raw values.
+Hi Jakub,
 
-Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
----
- include/net/bluetooth/hci_core.h | 1 +
- net/bluetooth/hci_core.c         | 8 ++++++++
- 2 files changed, 9 insertions(+)
+> The Bluetooth controllers from Intel use a strict scanning filter
+> policy that filters based on Bluetooth device addresses and not on
+> RSSI. So tell the core about this.
+> 
+> Signed-off-by: Jakub Pawlowski <jpawlowski@google.com>
+> ---
+> drivers/bluetooth/btusb.c | 1 +
+> 1 file changed, 1 insertion(+)
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 1780f1681ecf..a37e10f4e2b3 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -145,6 +145,7 @@ struct oob_data {
- 	struct list_head list;
- 	bdaddr_t bdaddr;
- 	u8 bdaddr_type;
-+	u8 present;
- 	u8 hash192[16];
- 	u8 rand192[16];
- 	u8 hash256[16];
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 5d4ac3fbbc08..f045c062f8f0 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -2581,9 +2581,15 @@ int hci_add_remote_oob_data(struct hci_dev *hdev, bdaddr_t *bdaddr,
- 	if (hash192 && rand192) {
- 		memcpy(data->hash192, hash192, sizeof(data->hash192));
- 		memcpy(data->rand192, rand192, sizeof(data->rand192));
-+		if (hash256 && rand256)
-+			data->present = 0x03;
- 	} else {
- 		memset(data->hash192, 0, sizeof(data->hash192));
- 		memset(data->rand192, 0, sizeof(data->rand192));
-+		if (hash256 && rand256)
-+			data->present = 0x02;
-+		else
-+			data->present = 0x00;
- 	}
- 
- 	if (hash256 && rand256) {
-@@ -2592,6 +2598,8 @@ int hci_add_remote_oob_data(struct hci_dev *hdev, bdaddr_t *bdaddr,
- 	} else {
- 		memset(data->hash256, 0, sizeof(data->hash256));
- 		memset(data->rand256, 0, sizeof(data->rand256));
-+		if (hash192 && rand192)
-+			data->present = 0x01;
- 	}
- 
- 	BT_DBG("%s for %pMR", hdev->name, bdaddr);
--- 
-2.1.0
+patch has been applied to bluetooth-next tree.
+
+Regards
+
+Marcel
 
