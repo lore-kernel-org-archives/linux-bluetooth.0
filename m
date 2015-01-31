@@ -1,63 +1,74 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/2] Bluetooth: Expose Secure Simple Pairing debug mode setting in debugfs
-Date: Sat, 31 Jan 2015 13:39:21 -0800
-Message-Id: <1422740362-25024-1-git-send-email-marcel@holtmann.org>
+Subject: [PATCH] Bluetooth: Fix OOB data present for BR/EDR Secure Connections Only mode
+Date: Sat, 31 Jan 2015 13:20:27 -0800
+Message-Id: <1422739227-15093-1-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The value of the ssp_debug_mode should be accessible via debugfs to be
-able to determine if a BR/EDR controller generates debugs keys or not.
+When using Secure Connections Only mode, then only P-256 OOB data is
+valid and should be provided. In case userspace provides P-192 and P-256
+OOB data, then the P-192 values will be set to zero. However the present
+value of the IO capability exchange still mentioned that both values
+would be available. Fix this by telling the controller clearly that only
+the P-256 OOB data is present.
 
 Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- net/bluetooth/hci_debugfs.c | 23 ++++++++++++++++++++++-
- 1 file changed, 22 insertions(+), 1 deletion(-)
+ net/bluetooth/hci_event.c | 38 +++++++++++++++++++++-----------------
+ 1 file changed, 21 insertions(+), 17 deletions(-)
 
-diff --git a/net/bluetooth/hci_debugfs.c b/net/bluetooth/hci_debugfs.c
-index ead89a5ad9ce..dfbce7a69942 100644
---- a/net/bluetooth/hci_debugfs.c
-+++ b/net/bluetooth/hci_debugfs.c
-@@ -354,6 +354,24 @@ static int voice_setting_get(void *data, u64 *val)
- DEFINE_SIMPLE_ATTRIBUTE(voice_setting_fops, voice_setting_get,
- 			NULL, "0x%4.4llx\n");
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index af181f455f6f..1305a22c53b3 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -3871,24 +3871,28 @@ static u8 bredr_oob_data_present(struct hci_conn *conn)
+ 	if (!data)
+ 		return 0x00;
  
-+static ssize_t ssp_debug_mode_read(struct file *file, char __user *user_buf,
-+				   size_t count, loff_t *ppos)
-+{
-+	struct hci_dev *hdev = file->private_data;
-+	char buf[3];
+-	/* When Secure Connections Only mode is enabled, then the P-256
+-	 * values are required. If they are not available, then do not
+-	 * declare that OOB data is present.
+-	 */
+-	if (bredr_sc_enabled(hdev) &&
+-	    test_bit(HCI_SC_ONLY, &hdev->dev_flags) &&
+-	    (!memcmp(data->rand256, ZERO_KEY, 16) ||
+-	     !memcmp(data->hash256, ZERO_KEY, 16)))
+-		return 0x00;
+-
+ 	if (conn->out || test_bit(HCI_CONN_REMOTE_OOB, &conn->flags)) {
+-		/* When Secure Connections has been enabled, then just
+-		 * return the present value stored with the OOB data. It
+-		 * will contain the right information about which data
+-		 * is present.
+-		 */
+-		if (bredr_sc_enabled(hdev))
+-			return data->present;
++		if (bredr_sc_enabled(hdev)) {
++			/* When Secure Connections is enabled, then just
++			 * return the present value stored with the OOB
++			 * data. The stored value contains the right present
++			 * information. However it can only be trusted when
++			 * not in Secure Connection Only mode.
++			 */
++			if (!test_bit(HCI_SC_ONLY, &hdev->dev_flags))
++				return data->present;
 +
-+	buf[0] = hdev->ssp_debug_mode ? 'Y': 'N';
-+	buf[1] = '\n';
-+	buf[2] = '\0';
-+	return simple_read_from_buffer(user_buf, count, ppos, buf, 2);
-+}
++			/* When Secure Connections Only mode is enabled, then
++			 * the P-256 values are required. If they are not
++			 * available, then do not declare that OOB data is
++			 * present.
++			 */
++			if (!memcmp(data->rand256, ZERO_KEY, 16) ||
++			    !memcmp(data->hash256, ZERO_KEY, 16))
++				return 0x00;
 +
-+static const struct file_operations ssp_debug_mode_fops = {
-+	.open		= simple_open,
-+	.read		= ssp_debug_mode_read,
-+	.llseek		= default_llseek,
-+};
-+
- static int auto_accept_delay_set(void *data, u64 val)
- {
- 	struct hci_dev *hdev = data;
-@@ -474,9 +492,12 @@ void hci_debugfs_create_bredr(struct hci_dev *hdev)
- 	debugfs_create_file("voice_setting", 0444, hdev->debugfs, hdev,
- 			    &voice_setting_fops);
++			return 0x02;
++		}
  
--	if (lmp_ssp_capable(hdev))
-+	if (lmp_ssp_capable(hdev)) {
-+		debugfs_create_file("ssp_debug_mode", 0644, hdev->debugfs,
-+				    hdev, &ssp_debug_mode_fops);
- 		debugfs_create_file("auto_accept_delay", 0644, hdev->debugfs,
- 				    hdev, &auto_accept_delay_fops);
-+	}
- 
- 	if (lmp_sniff_capable(hdev)) {
- 		debugfs_create_file("idle_timeout", 0644, hdev->debugfs,
+ 		/* When Secure Connections is not enabled or actually
+ 		 * not supported by the hardware, then check that if
 -- 
 2.1.0
 
