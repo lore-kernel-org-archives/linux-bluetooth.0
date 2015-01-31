@@ -1,60 +1,59 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Expose debug keys usage setting via debugfs
-Date: Sat, 31 Jan 2015 15:12:06 -0800
-Message-Id: <1422745926-30299-1-git-send-email-marcel@holtmann.org>
+Subject: [PATCH v2 2/2] Bluetooth: Track changes from HCI Write Simple Pairing Debug Mode command
+Date: Sat, 31 Jan 2015 15:07:52 -0800
+Message-Id: <1422745672-27516-2-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-To allow easier debugging when debug keys are generated, provide debugfs
-entry for checking the setting of debug keys usage.
+When the HCI Write Simple Pairing Debug Mode command has been issued,
+the result needs to be tracked and stored. The hdev->ssp_debug_mode
+variable is already present, but was never updated when the mode in
+the controller was actually changed.
 
 Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- net/bluetooth/hci_debugfs.c | 22 ++++++++++++++++++++++
- 1 file changed, 22 insertions(+)
+ net/bluetooth/hci_event.c | 19 +++++++++++++++++++
+ 1 file changed, 19 insertions(+)
 
-diff --git a/net/bluetooth/hci_debugfs.c b/net/bluetooth/hci_debugfs.c
-index 51a424cfa94a..2272384755d5 100644
---- a/net/bluetooth/hci_debugfs.c
-+++ b/net/bluetooth/hci_debugfs.c
-@@ -212,6 +212,24 @@ static int conn_info_max_age_get(void *data, u64 *val)
- DEFINE_SIMPLE_ATTRIBUTE(conn_info_max_age_fops, conn_info_max_age_get,
- 			conn_info_max_age_set, "%llu\n");
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 1305a22c53b3..a3fb094822b6 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -1489,6 +1489,21 @@ unlock:
+ 	hci_dev_unlock(hdev);
+ }
  
-+static ssize_t use_debug_keys_read(struct file *file, char __user *user_buf,
-+				   size_t count, loff_t *ppos)
++static void hci_cc_write_ssp_debug_mode(struct hci_dev *hdev, struct sk_buff *skb)
 +{
-+	struct hci_dev *hdev = file->private_data;
-+	char buf[3];
++	u8 status = *((u8 *) skb->data);
++	u8 *mode;
 +
-+	buf[0] = test_bit(HCI_USE_DEBUG_KEYS, &hdev->dev_flags) ? 'Y': 'N';
-+	buf[1] = '\n';
-+	buf[2] = '\0';
-+	return simple_read_from_buffer(user_buf, count, ppos, buf, 2);
++	BT_DBG("%s status 0x%2.2x", hdev->name, status);
++
++	if (status)
++		return;
++
++	mode = hci_sent_cmd_data(hdev, HCI_OP_WRITE_SSP_DEBUG_MODE);
++	if (mode)
++		hdev->ssp_debug_mode = *mode;
 +}
 +
-+static const struct file_operations use_debug_keys_fops = {
-+	.open		= simple_open,
-+	.read		= use_debug_keys_read,
-+	.llseek		= default_llseek,
-+};
-+
- static ssize_t sc_only_mode_read(struct file *file, char __user *user_buf,
- 				 size_t count, loff_t *ppos)
+ static void hci_cs_inquiry(struct hci_dev *hdev, __u8 status)
  {
-@@ -249,6 +267,10 @@ void hci_debugfs_create_common(struct hci_dev *hdev)
- 	debugfs_create_file("conn_info_max_age", 0644, hdev->debugfs, hdev,
- 			    &conn_info_max_age_fops);
+ 	BT_DBG("%s status 0x%2.2x", hdev->name, status);
+@@ -2983,6 +2998,10 @@ static void hci_cmd_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
+ 		hci_cc_read_tx_power(hdev, skb);
+ 		break;
  
-+	if (lmp_ssp_capable(hdev) || lmp_le_capable(hdev))
-+		debugfs_create_file("use_debug_keys", 0444, hdev->debugfs,
-+				    hdev, &use_debug_keys_fops);
++	case HCI_OP_WRITE_SSP_DEBUG_MODE:
++		hci_cc_write_ssp_debug_mode(hdev, skb);
++		break;
 +
- 	if (lmp_sc_capable(hdev) || lmp_le_capable(hdev))
- 		debugfs_create_file("sc_only_mode", 0444, hdev->debugfs,
- 				    hdev, &sc_only_mode_fops);
+ 	default:
+ 		BT_DBG("%s opcode 0x%4.4x", hdev->name, opcode);
+ 		break;
 -- 
 2.1.0
 
