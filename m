@@ -1,59 +1,63 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 2/2] Bluetooth: Track changes from HCI Write Simple Pairing Debug Mode command
-Date: Sat, 31 Jan 2015 15:07:52 -0800
-Message-Id: <1422745672-27516-2-git-send-email-marcel@holtmann.org>
+Subject: [PATCH v2 1/2] Bluetooth: Expose Secure Simple Pairing debug mode setting in debugfs
+Date: Sat, 31 Jan 2015 15:07:51 -0800
+Message-Id: <1422745672-27516-1-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-When the HCI Write Simple Pairing Debug Mode command has been issued,
-the result needs to be tracked and stored. The hdev->ssp_debug_mode
-variable is already present, but was never updated when the mode in
-the controller was actually changed.
+The value of the ssp_debug_mode should be accessible via debugfs to be
+able to determine if a BR/EDR controller generates debugs keys or not.
 
 Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- net/bluetooth/hci_event.c | 19 +++++++++++++++++++
- 1 file changed, 19 insertions(+)
+ net/bluetooth/hci_debugfs.c | 23 ++++++++++++++++++++++-
+ 1 file changed, 22 insertions(+), 1 deletion(-)
 
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 1305a22c53b3..a3fb094822b6 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -1489,6 +1489,21 @@ unlock:
- 	hci_dev_unlock(hdev);
- }
+diff --git a/net/bluetooth/hci_debugfs.c b/net/bluetooth/hci_debugfs.c
+index ead89a5ad9ce..51a424cfa94a 100644
+--- a/net/bluetooth/hci_debugfs.c
++++ b/net/bluetooth/hci_debugfs.c
+@@ -354,6 +354,24 @@ static int voice_setting_get(void *data, u64 *val)
+ DEFINE_SIMPLE_ATTRIBUTE(voice_setting_fops, voice_setting_get,
+ 			NULL, "0x%4.4llx\n");
  
-+static void hci_cc_write_ssp_debug_mode(struct hci_dev *hdev, struct sk_buff *skb)
++static ssize_t ssp_debug_mode_read(struct file *file, char __user *user_buf,
++				   size_t count, loff_t *ppos)
 +{
-+	u8 status = *((u8 *) skb->data);
-+	u8 *mode;
++	struct hci_dev *hdev = file->private_data;
++	char buf[3];
 +
-+	BT_DBG("%s status 0x%2.2x", hdev->name, status);
-+
-+	if (status)
-+		return;
-+
-+	mode = hci_sent_cmd_data(hdev, HCI_OP_WRITE_SSP_DEBUG_MODE);
-+	if (mode)
-+		hdev->ssp_debug_mode = *mode;
++	buf[0] = hdev->ssp_debug_mode ? 'Y': 'N';
++	buf[1] = '\n';
++	buf[2] = '\0';
++	return simple_read_from_buffer(user_buf, count, ppos, buf, 2);
 +}
 +
- static void hci_cs_inquiry(struct hci_dev *hdev, __u8 status)
- {
- 	BT_DBG("%s status 0x%2.2x", hdev->name, status);
-@@ -2983,6 +2998,10 @@ static void hci_cmd_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
- 		hci_cc_read_tx_power(hdev, skb);
- 		break;
- 
-+	case HCI_OP_WRITE_SSP_DEBUG_MODE:
-+		hci_cc_write_ssp_debug_mode(hdev, skb);
-+		break;
++static const struct file_operations ssp_debug_mode_fops = {
++	.open		= simple_open,
++	.read		= ssp_debug_mode_read,
++	.llseek		= default_llseek,
++};
 +
- 	default:
- 		BT_DBG("%s opcode 0x%4.4x", hdev->name, opcode);
- 		break;
+ static int auto_accept_delay_set(void *data, u64 val)
+ {
+ 	struct hci_dev *hdev = data;
+@@ -474,9 +492,12 @@ void hci_debugfs_create_bredr(struct hci_dev *hdev)
+ 	debugfs_create_file("voice_setting", 0444, hdev->debugfs, hdev,
+ 			    &voice_setting_fops);
+ 
+-	if (lmp_ssp_capable(hdev))
++	if (lmp_ssp_capable(hdev)) {
++		debugfs_create_file("ssp_debug_mode", 0444, hdev->debugfs,
++				    hdev, &ssp_debug_mode_fops);
+ 		debugfs_create_file("auto_accept_delay", 0644, hdev->debugfs,
+ 				    hdev, &auto_accept_delay_fops);
++	}
+ 
+ 	if (lmp_sniff_capable(hdev)) {
+ 		debugfs_create_file("idle_timeout", 0644, hdev->debugfs,
 -- 
 2.1.0
 
