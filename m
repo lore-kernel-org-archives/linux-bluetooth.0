@@ -1,36 +1,76 @@
 Return-Path: <cyrus@holtmann.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 8.1 \(1993\))
-Subject: Re: [PATCH v11 2/2] Bluetooth: Add restarting to service discovery
+Subject: Re: [PATCH] Bluetooth: btusb: Add support for Lite-On (04ca) Broadcom based, BCM43142
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1422325138-20113-2-git-send-email-jpawlowski@google.com>
-Date: Sun, 1 Feb 2015 21:13:57 -0800
+In-Reply-To: <1422797492-1657-1-git-send-email-matej.dubovy@gmail.com>
+Date: Sun, 1 Feb 2015 12:37:58 -0800
 Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <F15B3FE9-19A2-44BF-9DE1-137F0993965C@holtmann.org>
-References: <1422325138-20113-1-git-send-email-jpawlowski@google.com> <1422325138-20113-2-git-send-email-jpawlowski@google.com>
-To: Jakub Pawlowski <jpawlowski@google.com>
+Message-Id: <E2038F3C-0E8B-4A01-81E0-D9CC2B2C468D@holtmann.org>
+References: <1422797492-1657-1-git-send-email-matej.dubovy@gmail.com>
+To: Matej Dubovy <matej.dubovy@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jakub,
+Hi Matej,
 
-> When using LE_SCAN_FILTER_DUP_ENABLE, some controllers would send
-> advertising report from each LE device only once. That means that we
-> don't get any updates on RSSI value, and makes Service Discovery very
-> slow. This patch adds restarting scan when in Service Discovery, and
-> device with filtered uuid is found, but it's not in RSSI range to send
-> event yet. This way if device moves into range, we will quickly get RSSI
-> update.
+> Please add support for sub BT chip on the combo card
+> Broadcom 43142A0 (in Lenovo E145), 04ca:2007
 > 
-> Signed-off-by: Jakub Pawlowski <jpawlowski@google.com>
+> /sys/kernel/debug/usb/devices
+> 
+> T:  Bus=05 Lev=01 Prnt=01 Port=01 Cnt=02 Dev#=  3 Spd=12   MxCh= 0
+> D:  Ver= 2.00 Cls=ff(vend.) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
+> P:  Vendor=04ca ProdID=2007 Rev= 1.12
+> S:  Manufacturer=Broadcom Corp
+> S:  Product=BCM43142A0
+> S:  SerialNumber=28E347EC73BD
+> C:* #Ifs= 4 Cfg#= 1 Atr=e0 MxPwr=  0mA
+> I:* If#= 0 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=01 Prot=01 Driver=(none)
+> E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
+> E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+> E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+> I:* If#= 1 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=(none)
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+> I:  If#= 1 Alt= 1 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=(none)
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+> I:  If#= 1 Alt= 2 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=(none)
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+> I:  If#= 1 Alt= 3 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=(none)
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+> I:  If#= 1 Alt= 4 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=(none)
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+> I:  If#= 1 Alt= 5 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=(none)
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+> I:* If#= 2 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=ff Driver=(none)
+> E:  Ad=84(I) Atr=02(Bulk) MxPS=  32 Ivl=0ms
+> E:  Ad=04(O) Atr=02(Bulk) MxPS=  32 Ivl=0ms
+> I:* If#= 3 Alt= 0 #EPs= 0 Cls=fe(app. ) Sub=01 Prot=01 Driver=(none)
+> 
+> Firmware for 04ca:2007 can be extracted from the latest Lenovo E145
+> Bluetooth driver for Windows (driver is however described as BCM20702
+> but contains also firwmare for BCM43142).
+> Search for BCM43142A0_001.001.011.0122.0153.hex within hex files, then
+> it must be converted using hex2hcd utility. Rename file to
+> BCM43142A0-04ca-2007.hcd, then move to /lib/firmware/brcm/.
 > ---
-> include/net/bluetooth/hci_core.h |  1 +
-> net/bluetooth/mgmt.c             | 53 ++++++++++++++++++++++++++++++++++++----
-> 2 files changed, 49 insertions(+), 5 deletions(-)
+> drivers/bluetooth/btusb.c | 4 ++++
+> 1 file changed, 4 insertions(+)
 
-this patch looks good. However I can only apply it once you added the comments to patch 1/2.
+this patch does not apply:
 
-I have also run this patch now for a while with out own controllers and all seems to be working as expected. However I would like to see some test cases for mgmt-tester afterwards that ensures it is working correctly.
+Applying: Bluetooth: btusb: Add support for Lite-On (04ca) Broadcom based, BCM43142
+error: patch failed: drivers/bluetooth/btusb.c:110
+error: drivers/bluetooth/btusb.c: patch does not apply
+Patch failed at 0001 Bluetooth: btusb: Add support for Lite-On (04ca) Broadcom based, BCM43142
+
+You need to send patches that apply against bluetooth-next.
 
 Regards
 
