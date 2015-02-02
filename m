@@ -1,79 +1,99 @@
 Return-Path: <cyrus@holtmann.org>
-From: Matej Dubovy <matej.dubovy@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Matej Dubovy <matej.dubovy@gmail.com>
-Subject: [PATCH] Bluetooth: btusb: Add support for Lite-On (04ca) Broadcom based, BCM43142
-Date: Mon,  2 Feb 2015 18:50:14 +0100
-Message-Id: <1422899414-1949-1-git-send-email-matej.dubovy@gmail.com>
-In-Reply-To: <E2038F3C-0E8B-4A01-81E0-D9CC2B2C468D@holtmann.org>
-References: <E2038F3C-0E8B-4A01-81E0-D9CC2B2C468D@holtmann.org>
+MIME-Version: 1.0
+In-Reply-To: <CABBYNZKoWUUsejivik-PpN6=8R1q=veSNTSJ39HJ4PZv420vkQ@mail.gmail.com>
+References: <1422664149-16322-1-git-send-email-armansito@chromium.org>
+	<CABBYNZKoWUUsejivik-PpN6=8R1q=veSNTSJ39HJ4PZv420vkQ@mail.gmail.com>
+Date: Mon, 2 Feb 2015 09:40:52 -0800
+Message-ID: <CAHrH25QhyX8Es+k28j+h21wwV0w5qUGRmqMgWwpWgvin5OAd9A@mail.gmail.com>
+Subject: Re: [PATCH BlueZ v2 0/5] core: gatt: Support enabling notifications
+From: Arman Uguray <armansito@chromium.org>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Please add support for sub BT chip on the combo card
-Broadcom 43142A0 (in Lenovo E145), 04ca:2007
+Hi Luiz,
 
-/sys/kernel/debug/usb/devices
+> On Mon, Feb 2, 2015 at 5:53 AM, Luiz Augusto von Dentz <luiz.dentz@gmail.com> wrote:
+> Hi Arman,
+>
+> On Sat, Jan 31, 2015 at 2:29 AM, Arman Uguray <armansito@chromium.org> wrote:
+>> *v2: Cancel ongoing CCC writes in bt_gatt_client_free.
+>>
+>> *v1: Make bt_gatt_register_notify cancellable via bt_gatt_unregister_notify.
+>>      notify_client_free now unregisters its notify id, which will cancel any
+>>      pending CCC write, as well as unregister a registered notify callback.
+>>
+>> This patch sets brings support for enabling notifications while in GATT
+>> client-role. The changes that are introduced are:
+>>
+>>   1. Implemented the StartNotify and StopNotify methods of the
+>>      GattCharacteristic1 interface. This are internally tied to
+>>      bt_gatt_client_register_notify and bt_gatt_client_unregister_notify.
+>>      These also manage notification sessions on a per dbus sender basis.
+>>
+>>   2. The exported GATT API objects are not removed in the event of a disconnect,
+>>      if the devices are bonded. All notification sessions are also persisted and
+>>      automatically re-enabled on reconnection. Also, adding new notification
+>>      sessions via StartNotify is allowed during disconnects.
+>>
+>> Arman Uguray (5):
+>>   shared/gatt: Make register_notify cancellable
+>>   core: gatt: Implement GattCharacteristic1.StartNotify
+>>   core: gatt: Implement GattCharacteristic1.StopNotify
+>>   core: device: Don't check ready in service_removed
+>>   core: gatt: Keep objects over disconnects
+>>
+>>  src/device.c             |  22 ++-
+>>  src/gatt-client.c        | 435 +++++++++++++++++++++++++++++++++++++++++++++--
+>>  src/shared/gatt-client.c | 129 ++++++++------
+>>  src/shared/gatt-client.h |   7 +-
+>>  tools/btgatt-client.c    |  17 +-
+>>  5 files changed, 530 insertions(+), 80 deletions(-)
+>>
+>> --
+>> 2.2.0.rc0.207.ga3a616c
+>
+> Pushed, but note that I had made a couple of changes. You should
+> really stop sending with your internal change-id and I really mean it
+> since it wasn't the first time, I know this is because you had these
+> patches for a while but we should really try to revert this trend now
+> that most API is upstream.
+>
 
-T:  Bus=05 Lev=01 Prnt=01 Port=01 Cnt=02 Dev#=  3 Spd=12   MxCh= 0
-D:  Ver= 2.00 Cls=ff(vend.) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-P:  Vendor=04ca ProdID=2007 Rev= 1.12
-S:  Manufacturer=Broadcom Corp
-S:  Product=BCM43142A0
-S:  SerialNumber=28E347EC73BD
-C:* #Ifs= 4 Cfg#= 1 Atr=e0 MxPwr=  0mA
-I:* If#= 0 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=01 Prot=01 Driver=(none)
-E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
-E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-I:* If#= 1 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=(none)
-E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-I:  If#= 1 Alt= 1 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=(none)
-E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-I:  If#= 1 Alt= 2 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=(none)
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-I:  If#= 1 Alt= 3 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=(none)
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-I:  If#= 1 Alt= 4 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=(none)
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-I:  If#= 1 Alt= 5 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=(none)
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-I:* If#= 2 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=ff Driver=(none)
-E:  Ad=84(I) Atr=02(Bulk) MxPS=  32 Ivl=0ms
-E:  Ad=04(O) Atr=02(Bulk) MxPS=  32 Ivl=0ms
-I:* If#= 3 Alt= 0 #EPs= 0 Cls=fe(app. ) Sub=01 Prot=01 Driver=(none)
+This started happening again after I moved things around on my
+machine, though I did remove the Change-Id lines in v3, looks like you
+applied v2. Sorry about the confusion.
 
-Firmware for 04ca:2007 can be extracted from the latest Lenovo E145
-Bluetooth driver for Windows (driver is however described as BCM20702
-but contains also firwmare for BCM43142).
-Search for BCM43142A0_001.001.011.0122.0153.hex within hex files, then
-it must be converted using hex2hcd utility. Rename file to
-BCM43142A0-04ca-2007.hcd, then move to /lib/firmware/brcm/.
----
- drivers/bluetooth/btusb.c | 4 ++++
- 1 file changed, 4 insertions(+)
+> Also, lets try a little bit the test cases running valgrind, Id just
+> had a smoke test with a HoG device and while it worked (luckily the
+> device has battery service and supported notifications) and this
+> showed up:
+>
+> http://fpaste.org/180066/87602814/
+>
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 067a11c..d33a9f3 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -118,6 +118,10 @@ static const struct usb_device_id btusb_table[] = {
- 	/* Broadcom BCM20702B0 (Dynex/Insignia) */
- 	{ USB_DEVICE(0x19ff, 0x0239), .driver_info = BTUSB_BCM_PATCHRAM },
- 
-+	/* Lite-On - Broadcom based */
-+	{ USB_VENDOR_AND_INTERFACE_INFO(0x04ca, 0xff, 0x01, 0x01),
-+	  .driver_info = BTUSB_BCM_PATCHRAM },
-+
- 	/* Foxconn - Hon Hai */
- 	{ USB_VENDOR_AND_INTERFACE_INFO(0x0489, 0xff, 0x01, 0x01),
- 	  .driver_info = BTUSB_BCM_PATCHRAM },
--- 
-2.1.4
+Thanks for doing that. Since I've been debugging on ChromiumOS devices
+and not my Ubuntu desktop, I've run into a few issues with running
+valgrind that I'm trying to resolve, hopefully things should be fixed
+soon.
 
+> I managed to fix the problems but Im not that happy that it too a
+> little while to figure out them because the code is a bit convoluted
+> in a few places, which is another reason things don't get applied as
+> quickly, furthermore the use of the same filename is really bad when
+> debugging and Im very tempted to move this code to gatt-dbus.{c,h} or
+> create gatt-dbus-client.{c,h}.
+>
+
+I thought the src vs src/shared namespacing would be sufficient but we
+could rename this to gatt-dbus-client or gatt-client-dbus to prevent
+confusion with the term "D-Bus client".
+
+>
+> --
+> Luiz Augusto von Dentz
+
+Thanks,
+Arman
