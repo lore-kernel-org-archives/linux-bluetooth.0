@@ -1,42 +1,110 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <F15B3FE9-19A2-44BF-9DE1-137F0993965C@holtmann.org>
-References: <1422325138-20113-1-git-send-email-jpawlowski@google.com>
-	<1422325138-20113-2-git-send-email-jpawlowski@google.com>
-	<F15B3FE9-19A2-44BF-9DE1-137F0993965C@holtmann.org>
-Date: Sun, 1 Feb 2015 23:07:48 -0800
-Message-ID: <CAD0=r8z3_pT5z1wjxcg2sqacLbSidBss9LbJs-ReyaiMBdarYQ@mail.gmail.com>
-Subject: Re: [PATCH v11 2/2] Bluetooth: Add restarting to service discovery
-From: Jakub Pawlowski <jpawlowski@google.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+From: Gowtham Anandha Babu <gowtham.ab@samsung.com>
+To: 'Luiz Augusto von Dentz' <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	'Bharat Panda' <bharat.panda@samsung.com>, cpgs@samsung.com
+References: <1422452517-4240-1-git-send-email-gowtham.ab@samsung.com>
+ <001201d03c96$10ca2ab0$325e8010$@samsung.com>
+ <CABBYNZKWB+dLTKgP-_znxrycq8VK8jNJPmVaGGBWPhK5Vf0BLw@mail.gmail.com>
+In-reply-to: <CABBYNZKWB+dLTKgP-_znxrycq8VK8jNJPmVaGGBWPhK5Vf0BLw@mail.gmail.com>
+Subject: RE: [PATCH] test/pbap-client: Add support to fetch spd,fav PB
+Date: Mon, 02 Feb 2015 12:20:32 +0530
+Message-id: <000801d03eb4$99812f00$cc838d00$@samsung.com>
+MIME-version: 1.0
+Content-type: text/plain; charset=utf-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Sun, Feb 1, 2015 at 9:13 PM, Marcel Holtmann <marcel@holtmann.org> wrote:
-> Hi Jakub,
->
->> When using LE_SCAN_FILTER_DUP_ENABLE, some controllers would send
->> advertising report from each LE device only once. That means that we
->> don't get any updates on RSSI value, and makes Service Discovery very
->> slow. This patch adds restarting scan when in Service Discovery, and
->> device with filtered uuid is found, but it's not in RSSI range to send
->> event yet. This way if device moves into range, we will quickly get RSSI
->> update.
->>
->> Signed-off-by: Jakub Pawlowski <jpawlowski@google.com>
->> ---
->> include/net/bluetooth/hci_core.h |  1 +
->> net/bluetooth/mgmt.c             | 53 ++++++++++++++++++++++++++++++++++++----
->> 2 files changed, 49 insertions(+), 5 deletions(-)
->
-> this patch looks good. However I can only apply it once you added the comments to patch 1/2.
->
-> I have also run this patch now for a while with out own controllers and all seems to be working as expected. However I would like to see some test cases for mgmt-tester afterwards that ensures it is working correctly.
->
-Ok, I'll look into that.
+Hi Luiz,
 
-> Regards
->
-> Marcel
->
+> -----Original Message-----
+> From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-
+> owner@vger.kernel.org] On Behalf Of Luiz Augusto von Dentz
+> Sent: Friday, January 30, 2015 9:03 PM
+> To: Gowtham Anandha Babu
+> Cc: linux-bluetooth@vger.kernel.org; Bharat Panda; cpgs@samsung.com
+> Subject: Re: [PATCH] test/pbap-client: Add support to fetch spd,fav PB
+> 
+> Hi Gowtham,
+> 
+> On Fri, Jan 30, 2015 at 4:07 PM, Gowtham Anandha Babu
+> <gowtham.ab@samsung.com> wrote:
+> > Ping.
+> >
+> >> -----Original Message-----
+> >> From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-
+> >> owner@vger.kernel.org] On Behalf Of Gowtham Anandha Babu
+> >> Sent: Wednesday, January 28, 2015 7:12 PM
+> >> To: linux-bluetooth@vger.kernel.org
+> >> Cc: bharat.panda@samsung.com; cpgs@samsung.com; Gowtham
+> Anandha Babu
+> >> Subject: [PATCH] test/pbap-client: Add support to fetch spd,fav PB
+> >>
+> >> Adds support to fetch spd,fav phonebook.
+> >> Tested using PTS test case TC_PCE_PBB_BV_01_C.
+> >> ---
+> >>  test/pbap-client | 2 +-
+> >>  1 file changed, 1 insertion(+), 1 deletion(-)
+> >>
+> >> diff --git a/test/pbap-client b/test/pbap-client index
+> >> 51e26eb..16a786b
+> >> 100755
+> >> --- a/test/pbap-client
+> >> +++ b/test/pbap-client
+> >> @@ -170,6 +170,6 @@ if  __name__ == '__main__':
+> >>
+> >>               pbap_client.flush_transfers(lambda:
+> >> test_paths(paths[1:]))
+> >>
+> >> -     test_paths(["PB", "ICH", "OCH", "MCH", "CCH"])
+> >> +     test_paths(["PB", "ICH", "OCH", "MCH", "CCH", "SPD", "FAV"])
+> >>
+> >>       mainloop.run()
+> >> --
+> >> 1.9.1
+> 
+> We should be doing this with obexctl, is there something missing there?
+> 
+> 
+
+In obexctl, we are selecting the phonebook based on user input. We are passing that as a dbus args simply without checking.
+All this phonebook objects ["PB", "ICH", "OCH", "MCH", "CCH", "SPD", "FAV"] are getting selected using obexctl.
+If we give other than the above mentioned phonebook, its showing ' org.bluez.obex.Error.InvalidArguments '.
+Below is the log for the same.
+
+[00:1B:DC:07:33:4E]# cd pb
+Attempting to Select to pb
+Select successful
+[00:1B:DC:07:33:4E]# cd och
+Attempting to Select to och
+Select successful
+[00:1B:DC:07:33:4E]# cd ich
+Attempting to Select to ich
+Select successful
+[00:1B:DC:07:33:4E]# cd mch
+Attempting to Select to mch
+Select successful
+[00:1B:DC:07:33:4E]# cd spd
+Attempting to Select to spd
+Select successful
+[00:1B:DC:07:33:4E]# cd fav
+Attempting to Select to fav
+Select successful
+[00:1B:DC:07:33:4E]# cd sdfa
+Attempting to Select to sdfa
+Failed to Select: org.bluez.obex.Error.InvalidArguments
+
+Do we need to add a check before passing this args? Because dbus itself is handling this issue by sending 'org.bluez.obex.Error.InvalidArguments'.
+I don’t think extra check is not required here.
+What do you think?
+
+Regards,
+Gowtham Anandha Babu
+
+> --
+> Luiz Augusto von Dentz
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org More majordomo
+> info at  http://vger.kernel.org/majordomo-info.html
+
