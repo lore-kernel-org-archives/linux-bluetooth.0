@@ -1,82 +1,222 @@
 Return-Path: <cyrus@holtmann.org>
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Remove mgmt_rp_read_local_oob_ext_data struct
-Date: Mon,  2 Feb 2015 13:23:42 +0200
-Message-Id: <1422876222-14858-1-git-send-email-johan.hedberg@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <1422544173-7729-1-git-send-email-luiz.dentz@gmail.com>
+References: <1422544173-7729-1-git-send-email-luiz.dentz@gmail.com>
+Date: Mon, 2 Feb 2015 12:39:02 +0200
+Message-ID: <CABBYNZLMm1RjdnOSCiq6vPPL+aWCfpr1EJU6VHsbJaxfzq+jTA@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] shared/gatt-client: Simplify read long value
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@intel.com>
+Hi,
 
-This extended return parameters struct conflicts with the new Read Local
-OOB Extended Data command definition. To avoid the conflict simply
-rename the old "extended" version to the normal one and update the code
-appropriately to take into account the two possible response PDU sizes.
+On Thu, Jan 29, 2015 at 5:09 PM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>
+> This removes the extra queue that acts as intermediate storage, instead
+> the code will now storage everything in a single buffer and just realloc
+> while appending new chunks.
+> ---
+>  src/shared/gatt-client.c | 107 ++++++++++-------------------------------------
+>  1 file changed, 21 insertions(+), 86 deletions(-)
+>
+> diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
+> index 04fb4cb..a78e209 100644
+> --- a/src/shared/gatt-client.c
+> +++ b/src/shared/gatt-client.c
+> @@ -31,6 +31,7 @@
+>
+>  #include <assert.h>
+>  #include <limits.h>
+> +#include <sys/uio.h>
+>
+>  #ifndef MAX
+>  #define MAX(a, b) ((a) > (b) ? (a) : (b))
+> @@ -1927,54 +1928,13 @@ struct read_long_op {
+>         struct bt_gatt_client *client;
+>         int ref_count;
+>         uint16_t value_handle;
+> -       uint16_t orig_offset;
+>         uint16_t offset;
+> -       struct queue *blobs;
+> +       struct iovec iov;
+>         bt_gatt_client_read_callback_t callback;
+>         void *user_data;
+>         bt_gatt_client_destroy_func_t destroy;
+>  };
+>
+> -struct blob {
+> -       uint8_t *data;
+> -       uint16_t offset;
+> -       uint16_t length;
+> -};
+> -
+> -static struct blob *create_blob(const uint8_t *data, uint16_t len,
+> -                                                               uint16_t offset)
+> -{
+> -       struct blob *blob;
+> -
+> -       blob = new0(struct blob, 1);
+> -       if (!blob)
+> -               return NULL;
+> -
+> -       /* Truncate if the data would exceed maximum length */
+> -       if (offset + len > BT_ATT_MAX_VALUE_LEN)
+> -               len = BT_ATT_MAX_VALUE_LEN - offset;
+> -
+> -       blob->data = malloc(len);
+> -       if (!blob->data) {
+> -               free(blob);
+> -               return NULL;
+> -       }
+> -
+> -       memcpy(blob->data, data, len);
+> -       blob->length = len;
+> -       blob->offset = offset;
+> -
+> -       return blob;
+> -}
+> -
+> -static void destroy_blob(void *data)
+> -{
+> -       struct blob *blob = data;
+> -
+> -       free(blob->data);
+> -       free(blob);
+> -}
+> -
+>  static void destroy_read_long_op(void *data)
+>  {
+>         struct read_long_op *op = data;
+> @@ -1982,46 +1942,31 @@ static void destroy_read_long_op(void *data)
+>         if (op->destroy)
+>                 op->destroy(op->user_data);
+>
+> -       queue_destroy(op->blobs, destroy_blob);
+> -
+> +       free(op->iov.iov_base);
+>         free(op);
+>  }
+>
+> -static void append_blob(void *data, void *user_data)
+> +static bool append_chunk(struct read_long_op *op, const uint8_t *data,
+> +                                                               uint16_t len)
+>  {
+> -       struct blob *blob = data;
+> -       uint8_t *value = user_data;
+> -
+> -       memcpy(value + blob->offset, blob->data, blob->length);
+> -}
+> +       void *buf;
+>
+> -static void complete_read_long_op(struct read_long_op *op, bool success,
+> -                                                       uint8_t att_ecode)
+> -{
+> -       uint8_t *value = NULL;
+> -       uint16_t length = 0;
+> -
+> -       if (!success)
+> -               goto done;
+> -
+> -       length = op->offset - op->orig_offset;
+> +       /* Truncate if the data would exceed maximum length */
+> +       if (op->offset + len > BT_ATT_MAX_VALUE_LEN)
+> +               len = BT_ATT_MAX_VALUE_LEN - op->offset;
+>
+> -       if (!length)
+> -               goto done;
+> +       buf = realloc(op->iov.iov_base, op->iov.iov_len + len);
+> +       if (!buf)
+> +               return false;
+>
+> -       value = malloc(length);
+> -       if (!value) {
+> -               success = false;
+> -               goto done;
+> -       }
+> +       op->iov.iov_base = buf;
+>
+> -       queue_foreach(op->blobs, append_blob, value - op->orig_offset);
+> +       memcpy(op->iov.iov_base + op->iov.iov_len, data, len);
+>
+> -done:
+> -       if (op->callback)
+> -               op->callback(success, att_ecode, value, length, op->user_data);
+> +       op->iov.iov_len += len;
+> +       op->offset += len;
+>
+> -       free(value);
+> +       return true;
+>  }
+>
+>  static void read_long_cb(uint8_t opcode, const void *pdu,
+> @@ -2029,7 +1974,6 @@ static void read_long_cb(uint8_t opcode, const void *pdu,
+>  {
+>         struct request *req = user_data;
+>         struct read_long_op *op = req->data;
+> -       struct blob *blob;
+>         bool success;
+>         uint8_t att_ecode = 0;
+>
+> @@ -2047,14 +1991,11 @@ static void read_long_cb(uint8_t opcode, const void *pdu,
+>         if (!length)
+>                 goto success;
+>
+> -       blob = create_blob(pdu, length, op->offset);
+> -       if (!blob) {
+> +       if (!append_chunk(op, pdu, length)) {
+>                 success = false;
+>                 goto done;
+>         }
+>
+> -       queue_push_tail(op->blobs, blob);
+> -       op->offset += blob->length;
+>         if (op->offset >= BT_ATT_MAX_VALUE_LEN)
+>                 goto success;
+>
+> @@ -2082,7 +2023,9 @@ success:
+>         success = true;
+>
+>  done:
+> -       complete_read_long_op(op, success, att_ecode);
+> +       if (op->callback)
+> +               op->callback(success, att_ecode, op->iov.iov_base,
+> +                                               op->iov.iov_len, op->user_data);
+>  }
+>
+>  unsigned int bt_gatt_client_read_long_value(struct bt_gatt_client *client,
+> @@ -2102,22 +2045,14 @@ unsigned int bt_gatt_client_read_long_value(struct bt_gatt_client *client,
+>         if (!op)
+>                 return 0;
+>
+> -       op->blobs = queue_new();
+> -       if (!op->blobs) {
+> -               free(op);
+> -               return 0;
+> -       }
+> -
+>         req = request_create(client);
+>         if (!req) {
+> -               queue_destroy(op->blobs, free);
+>                 free(op);
+>                 return 0;
+>         }
+>
+>         op->client = client;
+>         op->value_handle = value_handle;
+> -       op->orig_offset = offset;
+>         op->offset = offset;
+>         op->callback = callback;
+>         op->user_data = user_data;
+> --
+> 2.1.0
 
-Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
----
- include/net/bluetooth/mgmt.h |  4 ----
- net/bluetooth/mgmt.c         | 25 +++++++++----------------
- 2 files changed, 9 insertions(+), 20 deletions(-)
+Pushed.
 
-diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
-index 95c34d5180fa..e218a30f2061 100644
---- a/include/net/bluetooth/mgmt.h
-+++ b/include/net/bluetooth/mgmt.h
-@@ -301,10 +301,6 @@ struct mgmt_cp_user_passkey_neg_reply {
- #define MGMT_OP_READ_LOCAL_OOB_DATA	0x0020
- #define MGMT_READ_LOCAL_OOB_DATA_SIZE	0
- struct mgmt_rp_read_local_oob_data {
--	__u8	hash[16];
--	__u8	rand[16];
--} __packed;
--struct mgmt_rp_read_local_oob_ext_data {
- 	__u8	hash192[16];
- 	__u8	rand192[16];
- 	__u8	hash256[16];
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 9e50b5c09b02..9ec5390c85eb 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -7168,28 +7168,21 @@ void mgmt_read_local_oob_data_complete(struct hci_dev *hdev, u8 *hash192,
- 		cmd_status(cmd->sk, hdev->id, MGMT_OP_READ_LOCAL_OOB_DATA,
- 			   mgmt_status(status));
- 	} else {
--		if (bredr_sc_enabled(hdev) && hash256 && rand256) {
--			struct mgmt_rp_read_local_oob_ext_data rp;
-+		struct mgmt_rp_read_local_oob_data rp;
-+		size_t rp_size = sizeof(rp);
- 
--			memcpy(rp.hash192, hash192, sizeof(rp.hash192));
--			memcpy(rp.rand192, rand192, sizeof(rp.rand192));
-+		memcpy(rp.hash192, hash192, sizeof(rp.hash192));
-+		memcpy(rp.rand192, rand192, sizeof(rp.rand192));
- 
-+		if (bredr_sc_enabled(hdev) && hash256 && rand256) {
- 			memcpy(rp.hash256, hash256, sizeof(rp.hash256));
- 			memcpy(rp.rand256, rand256, sizeof(rp.rand256));
--
--			cmd_complete(cmd->sk, hdev->id,
--				     MGMT_OP_READ_LOCAL_OOB_DATA, 0,
--				     &rp, sizeof(rp));
- 		} else {
--			struct mgmt_rp_read_local_oob_data rp;
--
--			memcpy(rp.hash, hash192, sizeof(rp.hash));
--			memcpy(rp.rand, rand192, sizeof(rp.rand));
--
--			cmd_complete(cmd->sk, hdev->id,
--				     MGMT_OP_READ_LOCAL_OOB_DATA, 0,
--				     &rp, sizeof(rp));
-+			rp_size -= sizeof(rp.hash256) + sizeof(rp.rand256);
- 		}
-+
-+		cmd_complete(cmd->sk, hdev->id, MGMT_OP_READ_LOCAL_OOB_DATA, 0,
-+			     &rp, rp_size);
- 	}
- 
- 	mgmt_pending_remove(cmd);
+
 -- 
-2.1.0
-
+Luiz Augusto von Dentz
