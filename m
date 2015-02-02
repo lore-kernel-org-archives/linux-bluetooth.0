@@ -1,68 +1,45 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1422912017.30476.28.camel@perches.com>
-Subject: Re: [PATCH v2] net: bluetooth: hci_sock: Use 'const void *' instead
- of 'void *' for 2nd parameter of hci_test_bit()
-From: Joe Perches <joe@perches.com>
-To: Chen Gang S <gang.chen@sunrus.com.cn>
-Cc: marcel@holtmann.org, gustavo@padovan.org, johan.hedberg@gmail.com,
- "David S. Miller" <davem@davemloft.net>, linux-bluetooth@vger.kernel.org,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Date: Mon, 02 Feb 2015 13:20:17 -0800
-In-Reply-To: <54CFE8BE.5030700@sunrus.com.cn>
-References: <54CFE8BE.5030700@sunrus.com.cn>
-Content-Type: text/plain; charset="ISO-8859-1"
-Mime-Version: 1.0
+From: Szymon Janc <szymon.janc@gmail.com>
+To: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] android/pts: Update SPP TC_DevA_APP_BV_01_C instruction
+Date: Mon, 02 Feb 2015 22:06:57 +0100
+Message-ID: <3413618.MYqlWnmNeZ@athlon>
+In-Reply-To: <1422891458-13997-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+References: <1422891458-13997-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Tue, 2015-02-03 at 05:14 +0800, Chen Gang S wrote:
-> hci_test_bit() does not modify 2nd parameter, so it is better to let it
-> be constant, or may cause build warning. The related warning (with
-> allmodconfig under xtensa):
-[]
-> diff --git a/net/bluetooth/hci_sock.c b/net/bluetooth/hci_sock.c
-[]
-> @@ -46,7 +46,7 @@ struct hci_pinfo {
->  	unsigned short    channel;
->  };
->  
-> -static inline int hci_test_bit(int nr, void *addr)
-> +static inline int hci_test_bit(int nr, const void *addr)
->  {
->  	return *((__u32 *) addr + (nr >> 5)) & ((__u32) 1 << (nr & 31));
->  }
+Hi Grzegorz,
 
-It's probably better to use const __u32 * here too, but the
-real thing I wonder is whether or not there's an issue with
-one of the 2 uses of this function.
+On Monday 02 February 2015 16:37:38 Grzegorz Kolodziejczyk wrote:
+> This patch updates SPP test case instruction. Use haltest socket connect
+> command instead of rctest.
+> ---
+>  android/pts-spp.txt | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/android/pts-spp.txt b/android/pts-spp.txt
+> index 6972020..2d2815b 100644
+> --- a/android/pts-spp.txt
+> +++ b/android/pts-spp.txt
+> @@ -13,8 +13,8 @@ N/A	test is disabled due to PICS setup
+>  ---------------------------------------------------------------------------
+> ---- Test Name		Result	Notes
+>  ---------------------------------------------------------------------------
+> ---- -TC_DevA_APP_BV_01_C	PASS	sdptool browse <bdaddr> - check RFCOMM
+> channel -				rctest -n -P <channel> <bdaddr>
+> +TC_DevA_APP_BV_01_C	PASS	haltest: socket connect <PTS addr>
+> +					BTSOCK_RFCOMM 00001101 0
+>  TC_DevB_APP_BV_02_C	PASS	haltest: socket listen BTSOCK_RFCOMM 
+SerialPort
+>  					00001101
+>  				Note: IUT must be in connectable, discoverable
 
-One of them passes a unsigned long *, the other a u32 *.
+Applied, thanks.
 
-$ git grep -w hci_test_bit
-net/bluetooth/hci_sock.c:static inline int hci_test_bit(int nr, void *addr)
-net/bluetooth/hci_sock.c:       if (!hci_test_bit(flt_event, &flt->event_mask))
-net/bluetooth/hci_sock.c:                    !hci_test_bit(ocf & HCI_FLT_OCF_BITS,
-net/bluetooth/hci_sock.c-                                  &hci_sec_filter.ocf_mask[ogf])) &&
-
-hci_sec_filter.ocf_mask is __u32
-but flt->event_mask is unsigned long.
-
-Any possible issue here on 64-bit systems?
-
----
-
-$ git grep -A4 "struct hci_filter {"
-include/net/bluetooth/hci_sock.h:struct hci_filter {
-include/net/bluetooth/hci_sock.h-       unsigned long type_mask;
-include/net/bluetooth/hci_sock.h-       unsigned long event_mask[2];
-include/net/bluetooth/hci_sock.h-       __le16 opcode;
-include/net/bluetooth/hci_sock.h-};
-
----
-
-static bool is_filtered_packet(struct sock *sk, struct sk_buff *skb)
-{
-	struct hci_filter *flt;
-[...]
-	if (!hci_test_bit(flt_event, &flt->event_mask))
-		return true;
+-- 
+Szymon K. Janc
+szymon.janc@gmail.com
