@@ -1,74 +1,82 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1422596768-17058-1-git-send-email-lukasz.rymanowski@tieto.com>
-References: <1422596768-17058-1-git-send-email-lukasz.rymanowski@tieto.com>
-Date: Mon, 2 Feb 2015 12:40:48 +0100
-Message-ID: <CAMudyAt92tkc8004ubknBY5tHvhP=34SyLAceFj6k0u+Cws5Kg@mail.gmail.com>
-Subject: Re: [PATCH 1/2] android/gatt: Fix Find By Type request
-From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Cc: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Content-Type: text/plain; charset=UTF-8
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] Bluetooth: Remove mgmt_rp_read_local_oob_ext_data struct
+Date: Mon,  2 Feb 2015 13:23:42 +0200
+Message-Id: <1422876222-14858-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+From: Johan Hedberg <johan.hedberg@intel.com>
 
-On 30 January 2015 at 06:46, Lukasz Rymanowski
-<lukasz.rymanowski@tieto.com> wrote:
-> With this patch GATT will correctly response with attribute not found if
-> there is no attributes matching.
->
-> Issue found and fix tested on UPF50
-> ---
->  android/gatt.c | 7 ++++++-
->  1 file changed, 6 insertions(+), 1 deletion(-)
->
-> diff --git a/android/gatt.c b/android/gatt.c
-> index 466c1ea..3b0b81d 100644
-> --- a/android/gatt.c
-> +++ b/android/gatt.c
-> @@ -6258,6 +6258,7 @@ struct find_by_type_request_data {
->         uint8_t *search_value;
->         size_t search_vlen;
->         uint8_t error;
-> +       bool found;
->  };
->
->  static void find_by_type_request_cb(struct gatt_db_attribute *attrib,
-> @@ -6289,6 +6290,9 @@ static void find_by_type_request_cb(struct gatt_db_attribute *attrib,
->                                                         find_data->search_vlen);
->
->         queue_push_tail(find_data->device->pending_requests, request_data);
-> +
-> +       if (!find_data->found)
-> +               find_data->found = true;
->  }
->
->  static uint8_t find_by_type_request(const uint8_t *cmd, uint16_t cmd_len,
-> @@ -6315,11 +6319,12 @@ static uint8_t find_by_type_request(const uint8_t *cmd, uint16_t cmd_len,
->         data.search_vlen = search_vlen;
->         data.search_value = search_value;
->         data.device = device;
-> +       data.found = false;
->
->         gatt_db_find_by_type(gatt_db, start, end, &uuid,
->                                                 find_by_type_request_cb, &data);
->
-> -       if (data.error == ATT_ECODE_ATTR_NOT_FOUND) {
-> +       if (!data.found) {
->                 size_t mtu;
->                 uint8_t *rsp = g_attrib_get_buffer(device->attrib, &mtu);
+This extended return parameters struct conflicts with the new Read Local
+OOB Extended Data command definition. To avoid the conflict simply
+rename the old "extended" version to the normal one and update the code
+appropriately to take into account the two possible response PDU sizes.
 
-Ehen think longer about it, maybe we should move the fix somehow to
-gatt-db. E.x. find_by_type_request_cb would be called with *attrib ==
-NULL when there is any matching attribute.
+Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+---
+ include/net/bluetooth/mgmt.h |  4 ----
+ net/bluetooth/mgmt.c         | 25 +++++++++----------------
+ 2 files changed, 9 insertions(+), 20 deletions(-)
 
-Any comments?
+diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
+index 95c34d5180fa..e218a30f2061 100644
+--- a/include/net/bluetooth/mgmt.h
++++ b/include/net/bluetooth/mgmt.h
+@@ -301,10 +301,6 @@ struct mgmt_cp_user_passkey_neg_reply {
+ #define MGMT_OP_READ_LOCAL_OOB_DATA	0x0020
+ #define MGMT_READ_LOCAL_OOB_DATA_SIZE	0
+ struct mgmt_rp_read_local_oob_data {
+-	__u8	hash[16];
+-	__u8	rand[16];
+-} __packed;
+-struct mgmt_rp_read_local_oob_ext_data {
+ 	__u8	hash192[16];
+ 	__u8	rand192[16];
+ 	__u8	hash256[16];
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 9e50b5c09b02..9ec5390c85eb 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -7168,28 +7168,21 @@ void mgmt_read_local_oob_data_complete(struct hci_dev *hdev, u8 *hash192,
+ 		cmd_status(cmd->sk, hdev->id, MGMT_OP_READ_LOCAL_OOB_DATA,
+ 			   mgmt_status(status));
+ 	} else {
+-		if (bredr_sc_enabled(hdev) && hash256 && rand256) {
+-			struct mgmt_rp_read_local_oob_ext_data rp;
++		struct mgmt_rp_read_local_oob_data rp;
++		size_t rp_size = sizeof(rp);
+ 
+-			memcpy(rp.hash192, hash192, sizeof(rp.hash192));
+-			memcpy(rp.rand192, rand192, sizeof(rp.rand192));
++		memcpy(rp.hash192, hash192, sizeof(rp.hash192));
++		memcpy(rp.rand192, rand192, sizeof(rp.rand192));
+ 
++		if (bredr_sc_enabled(hdev) && hash256 && rand256) {
+ 			memcpy(rp.hash256, hash256, sizeof(rp.hash256));
+ 			memcpy(rp.rand256, rand256, sizeof(rp.rand256));
+-
+-			cmd_complete(cmd->sk, hdev->id,
+-				     MGMT_OP_READ_LOCAL_OOB_DATA, 0,
+-				     &rp, sizeof(rp));
+ 		} else {
+-			struct mgmt_rp_read_local_oob_data rp;
+-
+-			memcpy(rp.hash, hash192, sizeof(rp.hash));
+-			memcpy(rp.rand, rand192, sizeof(rp.rand));
+-
+-			cmd_complete(cmd->sk, hdev->id,
+-				     MGMT_OP_READ_LOCAL_OOB_DATA, 0,
+-				     &rp, sizeof(rp));
++			rp_size -= sizeof(rp.hash256) + sizeof(rp.rand256);
+ 		}
++
++		cmd_complete(cmd->sk, hdev->id, MGMT_OP_READ_LOCAL_OOB_DATA, 0,
++			     &rp, rp_size);
+ 	}
+ 
+ 	mgmt_pending_remove(cmd);
+-- 
+2.1.0
 
-\Łukasz
-
->
-> --
-> 1.8.4
->
