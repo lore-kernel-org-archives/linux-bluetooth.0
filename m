@@ -1,33 +1,85 @@
 Return-Path: <cyrus@holtmann.org>
-From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
+From: Szymon Janc <szymon.janc@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] android/pts: Update SPP TC_DevA_APP_BV_01_C instruction
-Date: Mon,  2 Feb 2015 16:37:38 +0100
-Message-Id: <1422891458-13997-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+Cc: Szymon Janc <szymon.janc@tieto.com>
+Subject: [PATCH v2 2/2] android/handsfree: Fix not selecting correct SDP HSP record
+Date: Mon,  2 Feb 2015 16:09:35 +0100
+Message-Id: <1422889775-13162-2-git-send-email-szymon.janc@tieto.com>
+In-Reply-To: <1422889775-13162-1-git-send-email-szymon.janc@tieto.com>
+References: <1422889775-13162-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch updates SPP test case instruction. Use haltest socket connect
-command instead of rctest.
+If remote device has both HSP AG and HSP HF records then we were
+always selecting first record. This could result in not being able
+to connect to HF if AG record happens to be first one.
 ---
- android/pts-spp.txt | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ android/handsfree.c | 30 ++++++++++++------------------
+ 1 file changed, 12 insertions(+), 18 deletions(-)
 
-diff --git a/android/pts-spp.txt b/android/pts-spp.txt
-index 6972020..2d2815b 100644
---- a/android/pts-spp.txt
-+++ b/android/pts-spp.txt
-@@ -13,8 +13,8 @@ N/A	test is disabled due to PICS setup
- -------------------------------------------------------------------------------
- Test Name		Result	Notes
- -------------------------------------------------------------------------------
--TC_DevA_APP_BV_01_C	PASS	sdptool browse <bdaddr> - check RFCOMM channel
--				rctest -n -P <channel> <bdaddr>
-+TC_DevA_APP_BV_01_C	PASS	haltest: socket connect <PTS addr>
-+					BTSOCK_RFCOMM 00001101 0
- TC_DevB_APP_BV_02_C	PASS	haltest: socket listen BTSOCK_RFCOMM SerialPort
- 					00001101
- 				Note: IUT must be in connectable, discoverable
+diff --git a/android/handsfree.c b/android/handsfree.c
+index ee6de10..76f5653 100644
+--- a/android/handsfree.c
++++ b/android/handsfree.c
+@@ -1536,10 +1536,10 @@ drop:
+ static void sdp_hsp_search_cb(sdp_list_t *recs, int err, gpointer data)
+ {
+ 	struct hf_device *dev = data;
+-	sdp_list_t *protos, *classes;
++	sdp_list_t *protos;
+ 	GError *gerr = NULL;
+ 	GIOChannel *io;
+-	uuid_t uuid;
++	uuid_t class;
+ 	int channel;
+ 
+ 	DBG("");
+@@ -1550,35 +1550,29 @@ static void sdp_hsp_search_cb(sdp_list_t *recs, int err, gpointer data)
+ 		goto fail;
+ 	}
+ 
+-	if (!recs || !recs->data) {
+-		info("handsfree: no HSP SDP records found");
+-		goto fail;
++	sdp_uuid16_create(&class, HEADSET_SVCLASS_ID);
++
++	/* Find record with proper service class */
++	for (; recs; recs = recs->next) {
++		sdp_record_t *rec = recs->data;
++
++		if (rec && !sdp_uuid_cmp(&rec->svclass, &class))
++			break;
+ 	}
+ 
+-	if (sdp_get_service_classes(recs->data, &classes) < 0 || !classes) {
+-		error("handsfree: unable to get service classes from record");
++	if (!recs || !recs->data) {
++		info("handsfree: no valid HSP SDP records found");
+ 		goto fail;
+ 	}
+ 
+ 	if (sdp_get_access_protos(recs->data, &protos) < 0) {
+ 		error("handsfree: unable to get access protocols from record");
+-		sdp_list_free(classes, free);
+ 		goto fail;
+ 	}
+ 
+ 	/* TODO read remote version? */
+ 	/* TODO read volume control support */
+ 
+-	memcpy(&uuid, classes->data, sizeof(uuid));
+-	sdp_list_free(classes, free);
+-
+-	if (!sdp_uuid128_to_uuid(&uuid) || uuid.type != SDP_UUID16 ||
+-			uuid.value.uuid16 != HEADSET_SVCLASS_ID) {
+-		sdp_list_free(protos, NULL);
+-		error("handsfree: invalid service record or not HSP");
+-		goto fail;
+-	}
+-
+ 	channel = sdp_get_proto_port(protos, RFCOMM_UUID);
+ 	sdp_list_foreach(protos, (sdp_list_func_t) sdp_list_free, NULL);
+ 	sdp_list_free(protos, NULL);
 -- 
 1.9.3
 
