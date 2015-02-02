@@ -1,60 +1,141 @@
 Return-Path: <cyrus@holtmann.org>
-From: Ian Coolidge <icoolidge@google.com>
+From: Jakub Pawlowski <jpawlowski@google.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Ian Coolidge <icoolidge@google.com>
-Subject: [PATCH] android/build: Create a target for hciconfig.
-Date: Sun,  1 Feb 2015 23:19:24 -0800
-Message-Id: <1422861564-30169-1-git-send-email-icoolidge@google.com>
+Cc: Jakub Pawlowski <jpawlowski@google.com>
+Subject: [PATCH v12 2/2] Bluetooth: Add restarting to service discovery
+Date: Sun,  1 Feb 2015 23:07:55 -0800
+Message-Id: <1422860875-3966-2-git-send-email-jpawlowski@google.com>
+In-Reply-To: <1422860875-3966-1-git-send-email-jpawlowski@google.com>
+References: <1422860875-3966-1-git-send-email-jpawlowski@google.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- android/Android.mk | 33 +++++++++++++++++++++++++++++++++
- 1 file changed, 33 insertions(+)
+When using LE_SCAN_FILTER_DUP_ENABLE, some controllers would send
+advertising report from each LE device only once. That means that we
+don't get any updates on RSSI value, and makes Service Discovery very
+slow. This patch adds restarting scan when in Service Discovery, and
+device with filtered uuid is found, but it's not in RSSI range to send
+event yet. This way if device moves into range, we will quickly get RSSI
+update.
 
-diff --git a/android/Android.mk b/android/Android.mk
-index c1a9eff..bf7e510 100644
---- a/android/Android.mk
-+++ b/android/Android.mk
-@@ -539,6 +539,39 @@ LOCAL_ADDITIONAL_DEPENDENCIES := $(LOCAL_PATH)/bluez/configure.ac
- include $(BUILD_EXECUTABLE)
+Signed-off-by: Jakub Pawlowski <jpawlowski@google.com>
+---
+ include/net/bluetooth/hci_core.h |  1 +
+ net/bluetooth/mgmt.c             | 53 ++++++++++++++++++++++++++++++++++++----
+ 2 files changed, 49 insertions(+), 5 deletions(-)
+
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index d3a232b..52863c3 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -1334,6 +1334,7 @@ void hci_sock_dev_event(struct hci_dev *hdev, int event);
+ #define DISCOV_INTERLEAVED_TIMEOUT	5120	/* msec */
+ #define DISCOV_INTERLEAVED_INQUIRY_LEN	0x04
+ #define DISCOV_BREDR_INQUIRY_LEN	0x08
++#define DISCOV_LE_RESTART_DELAY		msecs_to_jiffies(200)	/* msec */
  
- #
-+# hciconfig
-+#
+ int mgmt_control(struct sock *sk, struct msghdr *msg, size_t len);
+ int mgmt_new_settings(struct hci_dev *hdev);
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 93eadef..24b5f7f 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -7261,6 +7261,21 @@ static bool eir_has_uuids(u8 *eir, u16 eir_len, u16 uuid_count, u8 (*uuids)[16])
+ 	return false;
+ }
+ 
++static void restart_le_scan(struct hci_dev *hdev)
++{
++	/* If controller is not scanning we are done. */
++	if (!test_bit(HCI_LE_SCAN, &hdev->dev_flags))
++		return;
 +
-+include $(CLEAR_VARS)
++	if (time_after(jiffies + DISCOV_LE_RESTART_DELAY,
++		       hdev->discovery.scan_start +
++		       hdev->discovery.scan_duration))
++		return;
 +
-+LOCAL_SRC_FILES:= \
-+	bluez/lib/bluetooth.c \
-+	bluez/lib/hci.c \
-+	bluez/tools/csr.c \
-+	bluez/tools/csr_h4.c \
-+	bluez/tools/hciconfig.c
++	queue_delayed_work(hdev->workqueue, &hdev->le_scan_restart,
++			   DISCOV_LE_RESTART_DELAY);
++}
 +
-+LOCAL_C_INCLUDES := \
-+	$(LOCAL_PATH)/bluez \
-+	$(LOCAL_PATH)/bluez/lib \
-+	$(LOCAL_PATH)/bluez/tools \
-+	$(LOCAL_PATH)/bluez/src \
-+	$(LOCAL_PATH)/bluez/src/shared \
+ void mgmt_device_found(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
+ 		       u8 addr_type, u8 *dev_class, s8 rssi, u32 flags,
+ 		       u8 *eir, u16 eir_len, u8 *scan_rsp, u8 scan_rsp_len)
+@@ -7283,14 +7298,18 @@ void mgmt_device_found(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
+ 
+ 	/* When using service discovery with a RSSI threshold, then check
+ 	 * if such a RSSI threshold is specified. If a RSSI threshold has
+-	 * been specified, then all results with a RSSI smaller than the
+-	 * RSSI threshold will be dropped.
++	 * been specified, and HCI_QUIRK_STRICT_DUPLICATE_FILTER is not set,
++	 * then all results with a RSSI smaller than the RSSI threshold will be
++	 * dropped. If the quirk is set, let it through for further processing,
++	 * as we might need to restart the scan.
+ 	 *
+ 	 * For BR/EDR devices (pre 1.2) providing no RSSI during inquiry,
+ 	 * the results are also dropped.
+ 	 */
+ 	if (hdev->discovery.rssi != HCI_RSSI_INVALID &&
+-	    (rssi < hdev->discovery.rssi || rssi == HCI_RSSI_INVALID))
++	    (rssi == HCI_RSSI_INVALID ||
++	    (rssi < hdev->discovery.rssi &&
++	     !test_bit(HCI_QUIRK_STRICT_DUPLICATE_FILTER, &hdev->quirks))))
+ 		return;
+ 
+ 	/* Make sure that the buffer is big enough. The 5 extra bytes
+@@ -7325,12 +7344,20 @@ void mgmt_device_found(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
+ 		 * kept and checking possible scan response data
+ 		 * will be skipped.
+ 		 */
+-		if (hdev->discovery.uuid_count > 0)
++		if (hdev->discovery.uuid_count > 0) {
+ 			match = eir_has_uuids(eir, eir_len,
+ 					      hdev->discovery.uuid_count,
+ 					      hdev->discovery.uuids);
+-		else
++			/* If duplicate filtering does not report RSSI changes,
++			 * then restart scanning to ensure updated result with
++			 * updated RSSI values.
++			 */
++			if (match && test_bit(HCI_QUIRK_STRICT_DUPLICATE_FILTER,
++					      &hdev->quirks))
++				restart_le_scan(hdev);
++		} else {
+ 			match = true;
++		}
+ 
+ 		if (!match && !scan_rsp_len)
+ 			return;
+@@ -7363,6 +7390,14 @@ void mgmt_device_found(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
+ 						     hdev->discovery.uuid_count,
+ 						     hdev->discovery.uuids))
+ 				return;
 +
-+LOCAL_CFLAGS := $(BLUEZ_COMMON_CFLAGS)
++			/* If duplicate filtering does not report RSSI changes,
++			 * then restart scanning to ensure updated result with
++			 * updated RSSI values.
++			 */
++			if (test_bit(HCI_QUIRK_STRICT_DUPLICATE_FILTER,
++				     &hdev->quirks))
++				restart_le_scan(hdev);
+ 		}
+ 
+ 		/* Append scan response data to event */
+@@ -7376,6 +7411,14 @@ void mgmt_device_found(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
+ 			return;
+ 	}
+ 
++	/* Validate the reported RSSI value against the RSSI threshold once more
++	 * incase HCI_QUIRK_STRICT_DUPLICATE_FILTER forced a restart of LE
++	 * scanning.
++	 */
++	if (hdev->discovery.rssi != HCI_RSSI_INVALID &&
++	    rssi < hdev->discovery.rssi)
++		return;
 +
-+LOCAL_STATIC_LIBRARIES := \
-+	bluetooth-headers \
-+
-+LOCAL_MODULE_PATH := $(TARGET_OUT_OPTIONAL_EXECUTABLES)
-+LOCAL_MODULE_TAGS := debug
-+LOCAL_MODULE := hciconfig
-+
-+LOCAL_ADDITIONAL_DEPENDENCIES := $(LOCAL_PATH)/bluez/configure.ac
-+
-+include $(BUILD_EXECUTABLE)
-+
-+#
- # l2ping
- #
+ 	ev->eir_len = cpu_to_le16(eir_len + scan_rsp_len);
+ 	ev_size = sizeof(*ev) + eir_len + scan_rsp_len;
  
 -- 
 2.2.0.rc0.207.ga3a616c
