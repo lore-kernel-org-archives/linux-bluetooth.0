@@ -1,222 +1,83 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1422544173-7729-1-git-send-email-luiz.dentz@gmail.com>
-References: <1422544173-7729-1-git-send-email-luiz.dentz@gmail.com>
-Date: Mon, 2 Feb 2015 12:39:02 +0200
-Message-ID: <CABBYNZLMm1RjdnOSCiq6vPPL+aWCfpr1EJU6VHsbJaxfzq+jTA@mail.gmail.com>
-Subject: Re: [PATCH BlueZ] shared/gatt-client: Simplify read long value
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] android/pts: Update ScPP PTS 6.0 pixits, pics, results for android 5.0
+Date: Mon,  2 Feb 2015 10:52:21 +0100
+Message-Id: <1422870741-23423-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+This patch updates test pixits, pics, test results for ScPP profile
+against android 5.0
+---
+ android/pics-scpp.txt  |  2 +-
+ android/pixit-scpp.txt |  3 ++-
+ android/pts-scpp.txt   | 18 +++++++++---------
+ 3 files changed, 12 insertions(+), 11 deletions(-)
 
-On Thu, Jan 29, 2015 at 5:09 PM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->
-> This removes the extra queue that acts as intermediate storage, instead
-> the code will now storage everything in a single buffer and just realloc
-> while appending new chunks.
-> ---
->  src/shared/gatt-client.c | 107 ++++++++++-------------------------------------
->  1 file changed, 21 insertions(+), 86 deletions(-)
->
-> diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
-> index 04fb4cb..a78e209 100644
-> --- a/src/shared/gatt-client.c
-> +++ b/src/shared/gatt-client.c
-> @@ -31,6 +31,7 @@
->
->  #include <assert.h>
->  #include <limits.h>
-> +#include <sys/uio.h>
->
->  #ifndef MAX
->  #define MAX(a, b) ((a) > (b) ? (a) : (b))
-> @@ -1927,54 +1928,13 @@ struct read_long_op {
->         struct bt_gatt_client *client;
->         int ref_count;
->         uint16_t value_handle;
-> -       uint16_t orig_offset;
->         uint16_t offset;
-> -       struct queue *blobs;
-> +       struct iovec iov;
->         bt_gatt_client_read_callback_t callback;
->         void *user_data;
->         bt_gatt_client_destroy_func_t destroy;
->  };
->
-> -struct blob {
-> -       uint8_t *data;
-> -       uint16_t offset;
-> -       uint16_t length;
-> -};
-> -
-> -static struct blob *create_blob(const uint8_t *data, uint16_t len,
-> -                                                               uint16_t offset)
-> -{
-> -       struct blob *blob;
-> -
-> -       blob = new0(struct blob, 1);
-> -       if (!blob)
-> -               return NULL;
-> -
-> -       /* Truncate if the data would exceed maximum length */
-> -       if (offset + len > BT_ATT_MAX_VALUE_LEN)
-> -               len = BT_ATT_MAX_VALUE_LEN - offset;
-> -
-> -       blob->data = malloc(len);
-> -       if (!blob->data) {
-> -               free(blob);
-> -               return NULL;
-> -       }
-> -
-> -       memcpy(blob->data, data, len);
-> -       blob->length = len;
-> -       blob->offset = offset;
-> -
-> -       return blob;
-> -}
-> -
-> -static void destroy_blob(void *data)
-> -{
-> -       struct blob *blob = data;
-> -
-> -       free(blob->data);
-> -       free(blob);
-> -}
-> -
->  static void destroy_read_long_op(void *data)
->  {
->         struct read_long_op *op = data;
-> @@ -1982,46 +1942,31 @@ static void destroy_read_long_op(void *data)
->         if (op->destroy)
->                 op->destroy(op->user_data);
->
-> -       queue_destroy(op->blobs, destroy_blob);
-> -
-> +       free(op->iov.iov_base);
->         free(op);
->  }
->
-> -static void append_blob(void *data, void *user_data)
-> +static bool append_chunk(struct read_long_op *op, const uint8_t *data,
-> +                                                               uint16_t len)
->  {
-> -       struct blob *blob = data;
-> -       uint8_t *value = user_data;
-> -
-> -       memcpy(value + blob->offset, blob->data, blob->length);
-> -}
-> +       void *buf;
->
-> -static void complete_read_long_op(struct read_long_op *op, bool success,
-> -                                                       uint8_t att_ecode)
-> -{
-> -       uint8_t *value = NULL;
-> -       uint16_t length = 0;
-> -
-> -       if (!success)
-> -               goto done;
-> -
-> -       length = op->offset - op->orig_offset;
-> +       /* Truncate if the data would exceed maximum length */
-> +       if (op->offset + len > BT_ATT_MAX_VALUE_LEN)
-> +               len = BT_ATT_MAX_VALUE_LEN - op->offset;
->
-> -       if (!length)
-> -               goto done;
-> +       buf = realloc(op->iov.iov_base, op->iov.iov_len + len);
-> +       if (!buf)
-> +               return false;
->
-> -       value = malloc(length);
-> -       if (!value) {
-> -               success = false;
-> -               goto done;
-> -       }
-> +       op->iov.iov_base = buf;
->
-> -       queue_foreach(op->blobs, append_blob, value - op->orig_offset);
-> +       memcpy(op->iov.iov_base + op->iov.iov_len, data, len);
->
-> -done:
-> -       if (op->callback)
-> -               op->callback(success, att_ecode, value, length, op->user_data);
-> +       op->iov.iov_len += len;
-> +       op->offset += len;
->
-> -       free(value);
-> +       return true;
->  }
->
->  static void read_long_cb(uint8_t opcode, const void *pdu,
-> @@ -2029,7 +1974,6 @@ static void read_long_cb(uint8_t opcode, const void *pdu,
->  {
->         struct request *req = user_data;
->         struct read_long_op *op = req->data;
-> -       struct blob *blob;
->         bool success;
->         uint8_t att_ecode = 0;
->
-> @@ -2047,14 +1991,11 @@ static void read_long_cb(uint8_t opcode, const void *pdu,
->         if (!length)
->                 goto success;
->
-> -       blob = create_blob(pdu, length, op->offset);
-> -       if (!blob) {
-> +       if (!append_chunk(op, pdu, length)) {
->                 success = false;
->                 goto done;
->         }
->
-> -       queue_push_tail(op->blobs, blob);
-> -       op->offset += blob->length;
->         if (op->offset >= BT_ATT_MAX_VALUE_LEN)
->                 goto success;
->
-> @@ -2082,7 +2023,9 @@ success:
->         success = true;
->
->  done:
-> -       complete_read_long_op(op, success, att_ecode);
-> +       if (op->callback)
-> +               op->callback(success, att_ecode, op->iov.iov_base,
-> +                                               op->iov.iov_len, op->user_data);
->  }
->
->  unsigned int bt_gatt_client_read_long_value(struct bt_gatt_client *client,
-> @@ -2102,22 +2045,14 @@ unsigned int bt_gatt_client_read_long_value(struct bt_gatt_client *client,
->         if (!op)
->                 return 0;
->
-> -       op->blobs = queue_new();
-> -       if (!op->blobs) {
-> -               free(op);
-> -               return 0;
-> -       }
-> -
->         req = request_create(client);
->         if (!req) {
-> -               queue_destroy(op->blobs, free);
->                 free(op);
->                 return 0;
->         }
->
->         op->client = client;
->         op->value_handle = value_handle;
-> -       op->orig_offset = offset;
->         op->offset = offset;
->         op->callback = callback;
->         op->user_data = user_data;
-> --
-> 2.1.0
-
-Pushed.
-
-
+diff --git a/android/pics-scpp.txt b/android/pics-scpp.txt
+index db97c3a..6e4f599 100644
+--- a/android/pics-scpp.txt
++++ b/android/pics-scpp.txt
+@@ -1,6 +1,6 @@
+ ScPP PICS for the PTS tool.
+ 
+-PTS version: 5.3
++PTS version: 6.0
+ 
+ * - different than PTS defaults
+ 
+diff --git a/android/pixit-scpp.txt b/android/pixit-scpp.txt
+index cdf0b01..105c46a 100644
+--- a/android/pixit-scpp.txt
++++ b/android/pixit-scpp.txt
+@@ -1,6 +1,6 @@
+ ScPP PIXIT for the PTS tool.
+ 
+-PTS version: 5.3
++PTS version: 6.0
+ 
+ * - different than PTS defaults
+ & - should be set to IUT Bluetooth address
+@@ -21,4 +21,5 @@ TSPX_use_dynamic_pin					FALSE
+ TSPX_delete_ltk						FALSE
+ TSPX_security_enabled					FALSE
+ TSPX_tester_appearance					0000
++TSPX_iut_use_resolvable_random_address			FALSE
+ -------------------------------------------------------------------------------
+diff --git a/android/pts-scpp.txt b/android/pts-scpp.txt
+index a7c65a2..d747c49 100644
+--- a/android/pts-scpp.txt
++++ b/android/pts-scpp.txt
+@@ -1,7 +1,7 @@
+ PTS test results for ScPP
+ 
+-PTS version: 5.3
+-Tested: 25-November-2014
++PTS version: 6.0
++Tested: 02-February-2015
+ Android version: 5.0
+ 
+ Results:
+@@ -14,11 +14,11 @@ NONE	test result is none
+ -------------------------------------------------------------------------------
+ Test Name		Result	Notes
+ -------------------------------------------------------------------------------
+-TC_SPDS_SC_BV_01_I	PASS	PTS issue #12119
+-TC_SPDC_SC_BV_01_I	PASS	PTS issue #12119
+-TC_SPDC_SC_BV_02_I	PASS	PTS issue #12119
+-TC_SPDC_SC_BV_03_I	PASS	PTS issue #12119
+-TC_SPWF_SC_BV_01_I	PASS	PTS issue #12119
+-TC_SPCF_SC_BV_01_I	PASS	PTS issue #12119
+-TC_SPNF_SC_BV_01_I	PASS	PTS issue #12119
++TC_SPDS_SC_BV_01_I	PASS
++TC_SPDC_SC_BV_01_I	PASS
++TC_SPDC_SC_BV_02_I	PASS
++TC_SPDC_SC_BV_03_I	PASS
++TC_SPWF_SC_BV_01_I	PASS
++TC_SPCF_SC_BV_01_I	PASS
++TC_SPNF_SC_BV_01_I	PASS
+ -------------------------------------------------------------------------------
 -- 
-Luiz Augusto von Dentz
+1.9.3
+
