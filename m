@@ -1,12 +1,12 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Mon, 02 Feb 2015 13:06:17 -0800 (PST)
 From: Szymon Janc <szymon.janc@gmail.com>
 To: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] android/pts: Update ScPP PTS 6.0 pixits, pics, results for android 5.0
-Date: Mon, 02 Feb 2015 22:06:18 +0100
-Message-ID: <4211157.MgnH3CsIrX@athlon>
-In-Reply-To: <1422870741-23423-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
-References: <1422870741-23423-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+Subject: Re: [PATCH] android/pts: Update HID PTS 6.0 pixits, pics, results for android 5.0
+Message-ID: <12162994.ojUD2VNeLE@athlon>
+In-Reply-To: <1422632739-10844-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+References: <1422632739-10844-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -14,81 +14,93 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Grzegorz,
 
-On Monday 02 February 2015 10:52:21 Grzegorz Kolodziejczyk wrote:
-> This patch updates test pixits, pics, test results for ScPP profile
+On Friday 30 January 2015 16:45:39 Grzegorz Kolodziejczyk wrote:
+> This patch updates test pixits, pics, test results for HID profile
 > against android 5.0
 > ---
->  android/pics-scpp.txt  |  2 +-
->  android/pixit-scpp.txt |  3 ++-
->  android/pts-scpp.txt   | 18 +++++++++---------
->  3 files changed, 12 insertions(+), 11 deletions(-)
+>  android/pics-hid.txt  |  2 +-
+>  android/pixit-hid.txt |  3 ++-
+>  android/pts-hid.txt   | 22 ++++++++++------------
+>  3 files changed, 13 insertions(+), 14 deletions(-)
 > 
-> diff --git a/android/pics-scpp.txt b/android/pics-scpp.txt
-> index db97c3a..6e4f599 100644
-> --- a/android/pics-scpp.txt
-> +++ b/android/pics-scpp.txt
+> diff --git a/android/pics-hid.txt b/android/pics-hid.txt
+> index aa03878..ffd0aff 100644
+> --- a/android/pics-hid.txt
+> +++ b/android/pics-hid.txt
 > @@ -1,6 +1,6 @@
->  ScPP PICS for the PTS tool.
+>  HID PICS for the PTS tool.
 > 
 > -PTS version: 5.3
 > +PTS version: 6.0
 > 
 >  * - different than PTS defaults
-> 
-> diff --git a/android/pixit-scpp.txt b/android/pixit-scpp.txt
-> index cdf0b01..105c46a 100644
-> --- a/android/pixit-scpp.txt
-> +++ b/android/pixit-scpp.txt
+>  # - not yet implemented/supported
+> diff --git a/android/pixit-hid.txt b/android/pixit-hid.txt
+> index 42a3310..3c93fca 100644
+> --- a/android/pixit-hid.txt
+> +++ b/android/pixit-hid.txt
 > @@ -1,6 +1,6 @@
->  ScPP PIXIT for the PTS tool.
+>  HID PIXIT for the PTS tool.
 > 
 > -PTS version: 5.3
 > +PTS version: 6.0
 > 
 >  * - different than PTS defaults
 >  & - should be set to IUT Bluetooth address
-> @@ -21,4 +21,5 @@ TSPX_use_dynamic_pin					FALSE
->  TSPX_delete_ltk						FALSE
->  TSPX_security_enabled					FALSE
->  TSPX_tester_appearance					0000
-> +TSPX_iut_use_resolvable_random_address			FALSE
+> @@ -27,4 +27,5 @@ TSPX_no_fail_verdicts					False
+>  TSPX_time_reconnect					30000
+>  TSPX_secure_simple_pairing_pass_key_confirmation	False
+>  TSPX_hid_report_id					1
+> +TSPX_hid_report_data					ff00 (*)
 >  ---------------------------------------------------------------------------
-> ---- diff --git a/android/pts-scpp.txt b/android/pts-scpp.txt
-> index a7c65a2..d747c49 100644
-> --- a/android/pts-scpp.txt
-> +++ b/android/pts-scpp.txt
+> ---- diff --git a/android/pts-hid.txt b/android/pts-hid.txt
+> index 62a79e1..7918650 100644
+> --- a/android/pts-hid.txt
+> +++ b/android/pts-hid.txt
 > @@ -1,7 +1,7 @@
->  PTS test results for ScPP
+>  PTS test results for HID
 > 
 > -PTS version: 5.3
-> -Tested: 25-November-2014
+> -Tested: 26-November-2014
 > +PTS version: 6.0
-> +Tested: 02-February-2015
+> +Tested: 30-January-2015
 >  Android version: 5.0
 > 
 >  Results:
-> @@ -14,11 +14,11 @@ NONE	test result is none
->  ---------------------------------------------------------------------------
-> ---- Test Name		Result	Notes
->  ---------------------------------------------------------------------------
-> ---- -TC_SPDS_SC_BV_01_I	PASS	PTS issue #12119
-> -TC_SPDC_SC_BV_01_I	PASS	PTS issue #12119
-> -TC_SPDC_SC_BV_02_I	PASS	PTS issue #12119
-> -TC_SPDC_SC_BV_03_I	PASS	PTS issue #12119
-> -TC_SPWF_SC_BV_01_I	PASS	PTS issue #12119
-> -TC_SPCF_SC_BV_01_I	PASS	PTS issue #12119
-> -TC_SPNF_SC_BV_01_I	PASS	PTS issue #12119
-> +TC_SPDS_SC_BV_01_I	PASS
-> +TC_SPDC_SC_BV_01_I	PASS
-> +TC_SPDC_SC_BV_02_I	PASS
-> +TC_SPDC_SC_BV_03_I	PASS
-> +TC_SPWF_SC_BV_01_I	PASS
-> +TC_SPCF_SC_BV_01_I	PASS
-> +TC_SPNF_SC_BV_01_I	PASS
->  ---------------------------------------------------------------------------
-> ----
+> @@ -22,11 +22,10 @@ TC_HOS_HCR_BV_02_I	PASS
+>  TC_HOS_HCR_BV_03_I	N/A
+>  TC_HOS_HCR_BV_04_I	N/A
+>  TC_HOS_HDT_BV_01_I	PASS
+> -TC_HOS_HDT_BV_02_I	PASS	from shell execute:
+> -				haltest
+> -				bluetooth enable
+> -				hidhost connect <PTS bdaddr>
+> -				hidhost send_data <PTS bdaddr> ff00
+> +TC_HOS_HDT_BV_02_I	PASS	haltest: hidhost connect <addr>
+> +				hidhost send_data <addr> ff00
+> +				NOTE: PTS displays wrong report data on popup
+> +					PTS issue #13021
+>  TC_HOS_HDT_BV_03_I	N/A
+>  TC_HOS_HDT_BV_04_I	N/A
+>  TC_HOS_HID_BV_01_C	N/A
+> @@ -38,11 +37,10 @@ TC_HOS_HID_BV_06_C	N/A
+>  TC_HOS_HID_BV_08_C	N/A
+>  TC_HOS_HID_BV_09_C	N/A
+>  TC_HOS_HID_BV_10_C	N/A
+> -TC_HOS_DAT_BV_01_C	PASS	from shell execute:
+> -				haltest
+> -				bluetooth enable
+> -				hidhost connect <PTS bdaddr>
+> -				hidhost send_data <PTS bdaddr> ff00
+> +TC_HOS_DAT_BV_01_C	PASS	haltest: hidhost connect <addr>
+> +				hidhost send_data <addr> ff00
+> +				NOTE: PTS displays wrong report data on popup
+> +					PTS issue #13021
+>  TC_HOS_DAT_BV_02_C	N/A
+>  TC_HOS_DAT_BI_01_C	N/A
+>  TC_HOS_DAT_BI_02_C	N/A
 
-Applied, thanks.
+Patch applied, thanks.
 
 -- 
 Szymon K. Janc
