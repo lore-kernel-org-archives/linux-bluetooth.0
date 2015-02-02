@@ -1,92 +1,76 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
+From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH v2 1/2] android/handsfree: Fix not selecting correct SDP HFP record
-Date: Mon,  2 Feb 2015 16:09:34 +0100
-Message-Id: <1422889775-13162-1-git-send-email-szymon.janc@tieto.com>
+Subject: [PATCH v2] android/pts: Update SPP PTS 6.0 results for android 5.0
+Date: Mon,  2 Feb 2015 15:44:11 +0100
+Message-Id: <1422888251-12916-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-If remote device has both HFP AG and HFP HF records then we were
-always selecting first record. This could result in not being able
-to connect to HF if AG record happens to be first one.
-
-Issue found on UPF 50.
+This patch updates test case list, pixits, pics and results for SPP
+profile against android 5.0
 ---
- android/handsfree.c | 34 ++++++++++++++--------------------
- 1 file changed, 14 insertions(+), 20 deletions(-)
+ android/pics-spp.txt  |  2 +-
+ android/pixit-spp.txt |  2 +-
+ android/pts-spp.txt   | 15 ++++++++-------
+ 3 files changed, 10 insertions(+), 9 deletions(-)
 
-diff --git a/android/handsfree.c b/android/handsfree.c
-index 98d40b3..ee6de10 100644
---- a/android/handsfree.c
-+++ b/android/handsfree.c
-@@ -1621,10 +1621,10 @@ static int sdp_search_hsp(struct hf_device *dev)
- static void sdp_hfp_search_cb(sdp_list_t *recs, int err, gpointer data)
- {
- 	struct hf_device *dev = data;
--	sdp_list_t *protos, *classes;
-+	sdp_list_t *protos;
- 	GError *gerr = NULL;
- 	GIOChannel *io;
--	uuid_t uuid;
-+	uuid_t class;
- 	int channel;
+diff --git a/android/pics-spp.txt b/android/pics-spp.txt
+index f015236..d9bb883 100644
+--- a/android/pics-spp.txt
++++ b/android/pics-spp.txt
+@@ -1,6 +1,6 @@
+ SPP PICS for the PTS tool.
  
- 	DBG("");
-@@ -1635,6 +1635,16 @@ static void sdp_hfp_search_cb(sdp_list_t *recs, int err, gpointer data)
- 		goto fail;
- 	}
+-PTS version: 5.3
++PTS version: 6.0
  
-+	sdp_uuid16_create(&class, HANDSFREE_SVCLASS_ID);
-+
-+	/* Find record with proper service class */
-+	for (; recs; recs = recs->next) {
-+		sdp_record_t *rec = recs->data;
-+
-+		if (rec && !sdp_uuid_cmp(&rec->svclass, &class))
-+			break;
-+	}
-+
- 	if (!recs || !recs->data) {
- 		info("handsfree: no HFP SDP records found, trying HSP");
+ * - different than PTS defaults
+ # - not yet implemented/supported
+diff --git a/android/pixit-spp.txt b/android/pixit-spp.txt
+index a8a8202..8e2d70f 100644
+--- a/android/pixit-spp.txt
++++ b/android/pixit-spp.txt
+@@ -1,6 +1,6 @@
+ SPP PIXIT for the PTS tool.
  
-@@ -1646,26 +1656,8 @@ static void sdp_hfp_search_cb(sdp_list_t *recs, int err, gpointer data)
- 		return;
- 	}
+-PTS version: 5.3
++PTS version: 6.0
  
--	if (sdp_get_service_classes(recs->data, &classes) < 0 || !classes) {
--		error("handsfree: unable to get service classes from record");
--		goto fail;
--	}
--
- 	if (sdp_get_access_protos(recs->data, &protos) < 0) {
- 		error("handsfree: unable to get access protocols from record");
--		sdp_list_free(classes, free);
--		goto fail;
--	}
--
--	/* TODO read remote version? */
--
--	memcpy(&uuid, classes->data, sizeof(uuid));
--	sdp_list_free(classes, free);
--
--	if (!sdp_uuid128_to_uuid(&uuid) || uuid.type != SDP_UUID16 ||
--			uuid.value.uuid16 != HANDSFREE_SVCLASS_ID) {
--		sdp_list_free(protos, NULL);
--		error("handsfree: invalid service record or not HFP");
- 		goto fail;
- 	}
+ * - different than PTS defaults
+ & - should be set to IUT Bluetooth address
+diff --git a/android/pts-spp.txt b/android/pts-spp.txt
+index ea4e26c..bd0c13f 100644
+--- a/android/pts-spp.txt
++++ b/android/pts-spp.txt
+@@ -1,7 +1,7 @@
+ PTS test results for SPP
  
-@@ -1677,6 +1669,8 @@ static void sdp_hfp_search_cb(sdp_list_t *recs, int err, gpointer data)
- 		goto fail;
- 	}
+-PTS version: 5.3
+-Tested: 12-November-2014
++PTS version: 6.0
++Tested: 02-February-2015
+ Android version: 5.0
  
-+	/* TODO read remote version? */
-+
- 	io = bt_io_connect(connect_cb, dev, NULL, &gerr,
- 				BT_IO_OPT_SOURCE_BDADDR, &adapter_addr,
- 				BT_IO_OPT_DEST_BDADDR, &dev->bdaddr,
+ Results:
+@@ -13,11 +13,12 @@ N/A	test is disabled due to PICS setup
+ -------------------------------------------------------------------------------
+ Test Name		Result	Notes
+ -------------------------------------------------------------------------------
+-TC_DevA_APP_BV_01_C	PASS	rctest -n -P <channel> <bdaddr>
+-				Note: IUT should sdp query PTS in order to
+-				check given channel for COM5
+-TC_DevB_APP_BV_02_C	PASS	haltest: socket listen BTSOCK_RFCOMM
+-				<srvc_name> <uuid>
++TC_DevA_APP_BV_01_C	PASS	haltest: socket connect <PTS addr>
++					BTSOCK_RFCOMM 00001101 0
++TC_DevB_APP_BV_02_C	PASS	haltest: socket listen BTSOCK_RFCOMM SerialPort
++					00001101
++				Note: IUT must be in connectable, discoverable
++					mode.
+ TC_APP_BV_03_C		N/A	Missing in PTS
+ 				PTS issue #12388
+ 				Note: tests BV_03 : BV_6 currently not supported
 -- 
 1.9.3
 
