@@ -1,33 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 8.1 \(1993\))
-Subject: Re: [PATCH] Bluetooth: Remove mgmt_rp_read_local_oob_ext_data struct
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1422876222-14858-1-git-send-email-johan.hedberg@gmail.com>
-Date: Mon, 2 Feb 2015 09:31:20 -0800
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <8D5C444B-AD8E-4FF5-B2B3-88917491C3D2@holtmann.org>
-References: <1422876222-14858-1-git-send-email-johan.hedberg@gmail.com>
-To: Johan Hedberg <johan.hedberg@gmail.com>
+From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] android/pts: Update SPP TC_DevA_APP_BV_01_C instruction
+Date: Mon,  2 Feb 2015 16:37:38 +0100
+Message-Id: <1422891458-13997-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+This patch updates SPP test case instruction. Use haltest socket connect
+command instead of rctest.
+---
+ android/pts-spp.txt | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-> This extended return parameters struct conflicts with the new Read Local
-> OOB Extended Data command definition. To avoid the conflict simply
-> rename the old "extended" version to the normal one and update the code
-> appropriately to take into account the two possible response PDU sizes.
-> 
-> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
-> ---
-> include/net/bluetooth/mgmt.h |  4 ----
-> net/bluetooth/mgmt.c         | 25 +++++++++----------------
-> 2 files changed, 9 insertions(+), 20 deletions(-)
-
-patch has been applied to bluetooth-next tree.
-
-Regards
-
-Marcel
+diff --git a/android/pts-spp.txt b/android/pts-spp.txt
+index 6972020..2d2815b 100644
+--- a/android/pts-spp.txt
++++ b/android/pts-spp.txt
+@@ -13,8 +13,8 @@ N/A	test is disabled due to PICS setup
+ -------------------------------------------------------------------------------
+ Test Name		Result	Notes
+ -------------------------------------------------------------------------------
+-TC_DevA_APP_BV_01_C	PASS	sdptool browse <bdaddr> - check RFCOMM channel
+-				rctest -n -P <channel> <bdaddr>
++TC_DevA_APP_BV_01_C	PASS	haltest: socket connect <PTS addr>
++					BTSOCK_RFCOMM 00001101 0
+ TC_DevB_APP_BV_02_C	PASS	haltest: socket listen BTSOCK_RFCOMM SerialPort
+ 					00001101
+ 				Note: IUT must be in connectable, discoverable
+-- 
+1.9.3
 
