@@ -1,66 +1,90 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: Ian Coolidge <icoolidge@google.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] android/build: Create a target for hciconfig.
-Date: Tue, 03 Feb 2015 10:53:34 +0100
-Message-ID: <2544642.FWIBRmgKZO@uw000953>
-In-Reply-To: <1422865529-9857-2-git-send-email-icoolidge@google.com>
-References: <D620962F-0B39-4DF2-B9B1-CC5918193C9F@holtmann.org> <1422865529-9857-1-git-send-email-icoolidge@google.com> <1422865529-9857-2-git-send-email-icoolidge@google.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <009201d03f81$a37f89c0$ea7e9d40$@samsung.com>
+References: <009201d03f81$a37f89c0$ea7e9d40$@samsung.com>
+Date: Tue, 3 Feb 2015 10:58:23 +0200
+Message-ID: <CABBYNZLPvA=ya9cU9rFLDsVJDv0HB4RKQ++MTcRYxv0gKrDAGA@mail.gmail.com>
+Subject: Re: Unable to setup Gatt
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Bharat Bhusan Panda <bharat.panda@samsung.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	Arman Uguray <armansito@chromium.org>,
+	Gowtham Anandha Babu <gowtham.ab@samsung.com>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Ian,
+Hi Bharat,
 
-On Monday 02 of February 2015 00:25:29 Ian Coolidge wrote:
-> ---
->  android/Android.mk | 28 ++++++++++++++++++++++++++++
->  1 file changed, 28 insertions(+)
-> 
-> diff --git a/android/Android.mk b/android/Android.mk
-> index c1a9eff..ff71089 100644
-> --- a/android/Android.mk
-> +++ b/android/Android.mk
-> @@ -539,6 +539,34 @@ LOCAL_ADDITIONAL_DEPENDENCIES := $(LOCAL_PATH)/bluez/configure.ac
->  include $(BUILD_EXECUTABLE)
->  
->  #
-> +# hciconfig
-> +#
-> +
-> +include $(CLEAR_VARS)
-> +
-> +LOCAL_SRC_FILES:= \
-> +	bluez/tools/hciconfig.c \
-> +	bluez/tools/csr.c \
-> +	bluez/lib/bluetooth.c \
-> +	bluez/lib/hci.c \
-> +
-> +LOCAL_C_INCLUDES := \
-> +	$(LOCAL_PATH)/bluez \
-> +
-> +LOCAL_CFLAGS := $(BLUEZ_COMMON_CFLAGS)
-> +
-> +LOCAL_STATIC_LIBRARIES := \
-> +	bluetooth-headers \
-> +
-> +LOCAL_MODULE_PATH := $(TARGET_OUT_OPTIONAL_EXECUTABLES)
-> +LOCAL_MODULE_TAGS := debug
-> +LOCAL_MODULE := hciconfig
-> +
-> +LOCAL_ADDITIONAL_DEPENDENCIES := $(LOCAL_PATH)/bluez/configure.ac
-> +
-> +include $(BUILD_EXECUTABLE)
-> +
-> +#
->  # l2ping
->  #
->  
+On Tue, Feb 3, 2015 at 9:18 AM, Bharat Bhusan Panda
+<bharat.panda@samsung.com> wrote:
+> Hi,
+>
+>
+>
+> We are trying to setup two machines, with btgatt-server and btgatt-client
+> running on either side.
+>
+>
+>
+> On btgatt-server: (--index hci0 –r)
+>
+> 1.       hciconfig hci0 up
+>
+> 2.       hciconfig hci0 leadv
+>
+> 3.       bluetoothd is running with –ndE option.
+>
 
-Applied, thanks. 
+Afaik you should not run bluetoothd and btgatt-server along side
+because they both listen to the same cid. (ATT_CID = 4)
+
+>
+> “Started listening on ATT channel, waiting for connections”
+>
+>
+>
+> On btgatt-client: (--index hci0 –d <server addr>)
+>
+> 1.       hciconfig hci0 up
+>
+> 2.       bluetoothd –ndE
+>
+
+The is similar situation as the server, you have to decide what client
+you want to use and not try to use both together.
+
+>
+> After running btgatt-client with above options, it gets connected to
+> btgatt-server and returns below error message,
+>
+> “GATT Discovery procedure failed – error code 0x0a”
+>
+> Which means “ATTR_NOT_FOUND”, and ATT is not ready.
+>
+
+Most likely there where a conflict while setting up the server.
+
+>
+> Could anyone please help us, if we missed any steps to make the gatt
+> server/client up and running?
+
+Id say you should try with bluetoothd alone, try to pair and watch for
+objects being create with interface org.bluez.GattService1, you can
+monitor that with dbus-monitor for now until we are adapting
+bluetoothctl to show them, d-feet is another option. Also please make
+sure you have btmon running so in case you detect any problems you can
+send us the logs of the traffic.
+
+>
+>
+> Thanks,
+>
+> Best Regards,
+>
+> Bharat
+
+
 
 -- 
-Best regards, 
-Szymon Janc
+Luiz Augusto von Dentz
