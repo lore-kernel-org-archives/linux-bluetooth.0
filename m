@@ -1,31 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
-From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
-Subject: [PATCH] android/tester: Fix ccc descriptor handle
-Date: Tue,  3 Feb 2015 14:33:15 +0100
-Message-Id: <1422970395-22110-1-git-send-email-jakub.tyszkowski@tieto.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+From: Kalle Valo <kvalo@codeaurora.org>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: Larry Finger <Larry.Finger@lwfinger.net>,  linux-wireless <linux-wireless@vger.kernel.org>,  Troy Tan <troy_tan@realsil.com.cn>,  netdev@vger.kernel.org,  linux-bluetooth@vger.kernel.org
+Subject: btcoex subsystem
+References: <1422304934-9239-1-git-send-email-Larry.Finger@lwfinger.net>
+	<1422304934-9239-6-git-send-email-Larry.Finger@lwfinger.net>
+	<87h9v8zkuh.fsf@kamboji.qca.qualcomm.com>
+	<EC423C22-AEA0-4232-A452-7A131C41780A@holtmann.org>
+	<54CBA0CE.8030800@lwfinger.net>
+	<B814EF26-CBC9-43E4-A6C9-761A013F85C1@holtmann.org>
+Date: Tue, 03 Feb 2015 14:29:38 +0200
+In-Reply-To: <B814EF26-CBC9-43E4-A6C9-761A013F85C1@holtmann.org> (Marcel
+	Holtmann's message of "Fri, 30 Jan 2015 10:05:24 -0800")
+Message-ID: <874mr3xjnx.fsf_-_@kamboji.qca.qualcomm.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Some service handle count was recently changed.
----
- android/tester-gatt.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Marcel Holtmann <marcel@holtmann.org> writes:
 
-diff --git a/android/tester-gatt.c b/android/tester-gatt.c
-index 23c6609..15a54fa 100644
---- a/android/tester-gatt.c
-+++ b/android/tester-gatt.c
-@@ -1084,7 +1084,7 @@ static struct iovec send_notification_1[] = {
- static struct iovec att_read_req_op_v = raw_pdu(L2CAP_ATT_READ_REQ);
- static struct iovec att_write_req_op_v = raw_pdu(L2CAP_ATT_WRITE_REQ);
- 
--static struct iovec svc_change_ccc_handle_v = raw_pdu(0x1a, 0x00);
-+static struct iovec svc_change_ccc_handle_v = raw_pdu(0x1c, 0x00);
- static struct iovec svc_change_ccc_value_v = raw_pdu(0x00, 0x01);
- 
- static void gatt_client_register_action(void)
+>> I will work on combining the latest BT drivers from Realtek with
+>> btusb to see if I can achieve a patch that will both work with the
+>> Realtek hardware, and get approval from the reviewers.
+>> 
+>> What would be an approved method of communicating between two kernel
+>> modules? Is there some example in the kernel that I could study?
+>
+> We need a btcoex subsystem that both WiFi and Bluetooth can register
+> to and communicate with.
+
+The need for this seems to periodically come up, I remember needing
+something like that back in the Maemo wl1251 days and also ath6kl needed
+this. Are there any ideas for this subsystem? How would this btcoex
+subsystem work? What kind of information would it provide?
+
+Is this something we should discuss at Ottawa?
+
 -- 
-1.9.1
-
+Kalle Valo
