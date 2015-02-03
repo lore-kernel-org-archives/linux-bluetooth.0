@@ -1,40 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
-From: Kalle Valo <kvalo@codeaurora.org>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: Larry Finger <Larry.Finger@lwfinger.net>,  linux-wireless <linux-wireless@vger.kernel.org>,  Troy Tan <troy_tan@realsil.com.cn>,  netdev@vger.kernel.org,  linux-bluetooth@vger.kernel.org
-Subject: btcoex subsystem
-References: <1422304934-9239-1-git-send-email-Larry.Finger@lwfinger.net>
-	<1422304934-9239-6-git-send-email-Larry.Finger@lwfinger.net>
-	<87h9v8zkuh.fsf@kamboji.qca.qualcomm.com>
-	<EC423C22-AEA0-4232-A452-7A131C41780A@holtmann.org>
-	<54CBA0CE.8030800@lwfinger.net>
-	<B814EF26-CBC9-43E4-A6C9-761A013F85C1@holtmann.org>
-Date: Tue, 03 Feb 2015 14:29:38 +0200
-In-Reply-To: <B814EF26-CBC9-43E4-A6C9-761A013F85C1@holtmann.org> (Marcel
-	Holtmann's message of "Fri, 30 Jan 2015 10:05:24 -0800")
-Message-ID: <874mr3xjnx.fsf_-_@kamboji.qca.qualcomm.com>
+Message-ID: <54D0B4C0.8090801@mozilla.com>
+Date: Tue, 03 Feb 2015 12:45:04 +0100
+From: Thomas Zimmermann <tzimmermann@mozilla.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+To: Szymon Janc <szymon.janc@tieto.com>
+CC: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Documentation: HAL IPC uses 4 octects for socket channel
+References: <54D08B3F.5080202@mozilla.com> <1883387.StZLWa3Uue@uw000953>
+In-Reply-To: <1883387.StZLWa3Uue@uw000953>
+Content-Type: text/plain; charset=utf-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Marcel Holtmann <marcel@holtmann.org> writes:
+Hi
 
->> I will work on combining the latest BT drivers from Realtek with
->> btusb to see if I can achieve a patch that will both work with the
->> Realtek hardware, and get approval from the reviewers.
->> 
->> What would be an approved method of communicating between two kernel
->> modules? Is there some example in the kernel that I could study?
+Am 03.02.2015 um 12:35 schrieb Szymon Janc:
+> Hi Thomas,
 >
-> We need a btcoex subsystem that both WiFi and Bluetooth can register
-> to and communicate with.
+> On Tuesday 03 of February 2015 09:47:59 Thomas Zimmermann wrote:
+>> The documentations says that the HAL IPC uses 2 octets for socket
+>> channels, while |struct hal_cmd_socket_{listen,connect}| contain 4
+>> octets. This patch fixes the documentation accordingly.
+> I've applied the patch, thanks.
+>
+> Some notes though:
+> - I've fixed commit message prefix (we try to keep those consistent for
+>   easier history view)
+> - I've removed SoB line - we don't use it in userspace code
+> - for any future submissions please send patch inline (ie with git send-email)
+>   instead of attaching it
 
-The need for this seems to periodically come up, I remember needing
-something like that back in the Maemo wl1251 days and also ath6kl needed
-this. Are there any ideas for this subsystem? How would this btcoex
-subsystem work? What kind of information would it provide?
+Thanks a lot and sorry about the issues. It's my first patch here, I'll
+try to do better.
 
-Is this something we should discuss at Ottawa?
-
--- 
-Kalle Valo
+Best regards
+Thomas
