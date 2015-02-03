@@ -1,76 +1,153 @@
 Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
-To: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+To: Sebastian Chlad <sebastian.chlad@tieto.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v2 1/2] android/gatt: Fix initial setting of MTU
-Date: Tue, 03 Feb 2015 12:45:49 +0100
-Message-ID: <1432325.UU2MSNSUEs@uw000953>
-In-Reply-To: <1422564649-32210-1-git-send-email-lukasz.rymanowski@tieto.com>
-References: <1422564649-32210-1-git-send-email-lukasz.rymanowski@tieto.com>
+Subject: Re: [PATCH] android/pts: Updated PBAP PICS and PIXITs for PTS 6.0
+Date: Tue, 03 Feb 2015 12:39:49 +0100
+Message-ID: <2027777.9WVtTfIQf2@uw000953>
+In-Reply-To: <1422962484-30702-1-git-send-email-sebastian.chlad@tieto.com>
+References: <1422962484-30702-1-git-send-email-sebastian.chlad@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Łukasz,
+Hi Sebastian,
 
-On Thursday 29 of January 2015 21:50:48 Lukasz Rymanowski wrote:
-> Initial setting of MTU should be IMTU. This is actually our assumption
-> in other part of code, that IMTU is something we start with and change
-> if needed after exchange MTU procedure.
-> 
-> If we are not able to get IMTU from the socket just disconnect, there is
-> something wrong going on.
-> 
-> Without this patch you can face the issue with following scenario:
-> 1. On connection complete MTU is set to 23
-> 2. BfA sends Exchange MTU Request with MTU set to IMTU
-> 3. Remote device response with MTU equal to what BfA sends
-> 4. In that case, since remote MTU is equal to ours, there is no
-> update in bt_att, so bt_att keep using  MTU = 23
-> 5. Remote sends packets highier then 23 and bt_att start to drop not
-> complete packets.
-> 
-> Issue found and fix tested on UPF50
+On Tuesday 03 of February 2015 12:21:24 Sebastian Chlad wrote:
+> Tested against Android 5.0
 > ---
-> v2: Use local GError instead the one provided as a function parameter
+>  android/pics-pbap.txt  | 55 ++++++++++++++++++++++++++++++++++++++++----------
+>  android/pixit-pbap.txt |  2 +-
+>  android/pts-pbap.txt   |  4 ++--
+>  3 files changed, 47 insertions(+), 14 deletions(-)
 > 
->  android/gatt.c | 12 +++++++++---
->  1 file changed, 9 insertions(+), 3 deletions(-)
-> 
-> diff --git a/android/gatt.c b/android/gatt.c
-> index 466c1ea..23ffb9e 100644
-> --- a/android/gatt.c
-> +++ b/android/gatt.c
-> @@ -1488,6 +1488,7 @@ static void connect_cb(GIOChannel *io, GError *gerr, gpointer user_data)
->  	struct connect_data data;
->  	struct att_range range;
->  	uint32_t status;
-> +	GError *err = NULL;
->  	GAttrib *attrib;
->  	uint16_t mtu;
->  	uint16_t cid;
-> @@ -1510,9 +1511,14 @@ static void connect_cb(GIOChannel *io, GError *gerr, gpointer user_data)
->  		goto reply;
->  	}
+> diff --git a/android/pics-pbap.txt b/android/pics-pbap.txt
+> index cb4126c..afd100b 100644
+> --- a/android/pics-pbap.txt
+> +++ b/android/pics-pbap.txt
+> @@ -1,6 +1,6 @@
+>  PBAP PICS for the PTS tool.
 >  
-> -	if (!bt_io_get(io, &gerr, BT_IO_OPT_IMTU, &mtu, BT_IO_OPT_CID, &cid,
-> -				BT_IO_OPT_INVALID) || cid == ATT_CID)
-> -		mtu = ATT_DEFAULT_LE_MTU;
-> +	if (!bt_io_get(io, &err, BT_IO_OPT_IMTU, &mtu, BT_IO_OPT_CID, &cid,
-> +							BT_IO_OPT_INVALID)) {
-> +		error("gatt: Could not get imtu: %s", err->message);
-> +		device_set_state(dev, DEVICE_DISCONNECTED);
-> +		status = GATT_FAILURE;
-> +		g_error_free(err);
-> +		goto reply;
-> +	}
+> -PTS version: 5.3
+> +PTS version: 6.0
 >  
->  	attrib = g_attrib_new(io, mtu);
->  	if (!attrib) {
-> 
+>  * - different than PTS defaults
+>  # - not yet implemented/supported
+> @@ -8,26 +8,37 @@ PTS version: 5.3
+>  M - mandatory
+>  O - optional
+>  
+> -		Major Profile Version (X.Y)
+> +
+> +		Roles
+> +-------------------------------------------------------------------------------
+> +Parameter Name	Selected	Description
+> +-------------------------------------------------------------------------------
+> +TSPC_PBAP_1_1	False		Role: PCE (C.1)
+> +TSPC_PBAP_1_2	True (*)	Role: PSE (C.1)
+> +-------------------------------------------------------------------------------
+> +C1: It is mandatory to support at least one of the defined roles.
+> +-------------------------------------------------------------------------------
+> +
+> +
+> +		Client Major Profile Version (X.Y)
+>  -------------------------------------------------------------------------------
+>  Parameter Name	Selected	Description
+>  -------------------------------------------------------------------------------
+> -TSPC_PBAP_0_1	False		Role: PBAP 1.0 (C.1)
+> -TSPC_PBAP_0_2	True (*)	Role: PBAP 1.1 (C.1)
+> -TSPC_PBAP_0_3	False		Role: PBAP 1.2 (C.1)
+> +TSPC_PBAP_2a_1	False		PBAP 1.0 (C.1)
+> +TSPC_PBAP_2a_2	False		PBAP 1.1 (C.1)
+> +TSPC_PBAP_2a_3	False		PBAP 1.2 (C.1)
+>  -------------------------------------------------------------------------------
+>  C.1: Mandatory to support one and only one major profile version.
+>  -------------------------------------------------------------------------------
+>  
+>  
+> -		Roles
+> +		Client Minor Profile Version (X.Y)
+>  -------------------------------------------------------------------------------
+>  Parameter Name	Selected	Description
+>  -------------------------------------------------------------------------------
+> -TSPC_PBAP_1_1	False		Role: PCE (C.1)
+> -TSPC_PBAP_1_2	True (*)	Role: PSE (C.1)
+> +TSPC_PBAP_2b_1	False		PBAP 1.1.1 (C.1)
+>  -------------------------------------------------------------------------------
+> -C1: It is mandatory to support at least one of the defined roles.
+> +C.1: Optional if 2a/2 (PBAP 1.1) is supported, otherwise Excluded.
+>  -------------------------------------------------------------------------------
+>  
+>  
+> @@ -169,7 +180,29 @@ TSPC_PBAP_8_8	False (*)	PCE: Forbidden (M)
+>  -------------------------------------------------------------------------------
+>  
+>  
+> -		Supported features ( PSE )
+> +		Server Major Profile Version (X.Y)
+> +-------------------------------------------------------------------------------
+> +Parameter Name	Selected	Description
+> +-------------------------------------------------------------------------------
+> +TSPC_PBAP_9a_1	False		PBAP 1.0 (C.1)
+> +TSPC_PBAP_9a_2	True (*)	PBAP 1.1 (C.1)
+> +TSPC_PBAP_9a_3	False		PBAP 1.2 (C.1)
+> +-------------------------------------------------------------------------------
+> +C.1: Mandatory to support one and only one major profile version.
+> +-------------------------------------------------------------------------------
+> +
+> +
+> +		Server Minor Profile Version (X.Y.Z)
+> +-------------------------------------------------------------------------------
+> +Parameter Name	Selected	Description
+> +-------------------------------------------------------------------------------
+> +TSPC_PBAP_9b_1	False		PBAP 1.1.1 (C.1)
+> +-------------------------------------------------------------------------------
+> +C.1: Optional if 9a/2 (PBAP 1.1) is supported, otherwise Excluded.
+> +-------------------------------------------------------------------------------
+> +
+> +
+> +		Supported features (PSE)
+>  -------------------------------------------------------------------------------
+>  Parameter Name	Selected	Description
+>  -------------------------------------------------------------------------------
+> @@ -430,7 +463,7 @@ C.1: Optional to support if TSPC_PBAP_25_4 (OBEX SRM) is supported,
+>  -------------------------------------------------------------------------------
+>  Parameter Name	Selected	Description
+>  -------------------------------------------------------------------------------
+> -TSPC_PBAP_26_1	False (*)	PSE: GOEP v2.0 or later (M)
+> +TSPC_PBAP_26_1	False		PSE: GOEP v2.0 or later (M)
+>  TSPC_PBAP_26_2	False (*)	PSE: GOEP v2 Backwards Compatibility (M)
+>  TSPC_PBAP_26_3	False		PSE: OBEX over L2CAP (M)
+>  TSPC_PBAP_26_4	False		PSE: OBEX SRM (M)
+> diff --git a/android/pixit-pbap.txt b/android/pixit-pbap.txt
+> index f7a93c6..034456a 100644
+> --- a/android/pixit-pbap.txt
+> +++ b/android/pixit-pbap.txt
+> @@ -1,6 +1,6 @@
+>  PBAP PIXIT for the PTS tool.
+>  
+> -PTS version: 5.3
+> +PTS version: 6.0
+>  
+>  * - different than PTS defaults
+>  & - should be set to IUT Bluetooth address
+> diff --git a/android/pts-pbap.txt b/android/pts-pbap.txt
+> index 8194bd7..8931690 100644
+> --- a/android/pts-pbap.txt
+> +++ b/android/pts-pbap.txt
+> @@ -1,7 +1,7 @@
+>  PTS test results for PBAP
+>  
+> -PTS version: 5.3
+> -Tested: 17-November-2014
+> +PTS version: 6.0
+> +Tested: 30-January-2015
+>  Android version: 5.0
+>  
+>  Results:
 
-Both patches applied, thanks.
+Patch applied, thanks. 
 
 -- 
 Best regards, 
