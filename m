@@ -1,70 +1,60 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <54D08B3F.5080202@mozilla.com>
-Date: Tue, 03 Feb 2015 09:47:59 +0100
+Message-ID: <54D0881B.2020009@mozilla.com>
+Date: Tue, 03 Feb 2015 09:34:35 +0100
 From: Thomas Zimmermann <tzimmermann@mozilla.com>
 MIME-Version: 1.0
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Documentation: HAL IPC uses 4 octects for socket channel
-Content-Type: multipart/mixed;
- boundary="------------060002000501010405080903"
-Sender: linux-bluetooth-owner@vger.kernel.org
+To: Marcel Holtmann <marcel@holtmann.org>
+CC: linux-bluetooth@vger.kernel.org, Shawn Huang <shuang@mozilla.com>
+Subject: Re: Extending BlueZ's HAL protocol
+References: <54CB81F5.3000401@mozilla.com> <E422020A-9686-42FB-BB9A-2FEACDF59529@holtmann.org>
+In-Reply-To: <E422020A-9686-42FB-BB9A-2FEACDF59529@holtmann.org>
+Content-Type: text/plain; charset=windows-1252
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This is a multi-part message in MIME format.
---------------060002000501010405080903
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
+Hi Marcel
 
-The documentations says that the HAL IPC uses 2 octets for socket
-channels, while |struct hal_cmd_socket_{listen,connect}| contain 4
-octets. This patch fixes the documentation accordingly.
+Am 30.01.2015 um 18:59 schrieb Marcel Holtmann:
+> Hi Thomas,
+>
+>> On Mozilla's Firefox OS, we use a daemon for running Bluedroid drivers
+>> in their own address space, and communicate with the daemon via BlueZ's
+>> HAL protocol. [1]
+>>
+>> We'd like to use the HAL protocol as-is, but several commands are not
+>> defined in the spec. We especially ran into this problem with
+>> Bluedroid's |bt_interface_t::config_hci_snoop_log|. BlueZ has a
+>> completely different mechanism for handling the command and probably
+>> won't ever require an opcode for it. Just adding an opcode for
+>> |config_hci_snoop_log| to our code base will probably collide with BlueZ
+>> official spec in the long run.
+>>
+>> Our proposal is to reserve two opcodes per service for extensions to
+>> commands and notifications. This would allow us to add the missing
+>> pieces without opcode collisions.
+> when you are using BlueZ for Android, we run the bluetoothd-snoop daemon to collect the traces. The reason why it is not in bluetoothd that provides all the other functionality is pretty simple. We do not have to and that is why we never bothered to define an opcode for it. That is the advantage of not being a huge monolithic block like Bluedroid.
 
---------------060002000501010405080903
-Content-Type: text/x-patch;
- name="0001-Documentation-HAL-IPC-uses-4-octects-for-socket-chan.patch"
-Content-Transfer-Encoding: 7bit
-Content-Disposition: attachment;
- filename*0="0001-Documentation-HAL-IPC-uses-4-octects-for-socket-chan.pa";
- filename*1="tch"
+It's not that easy in our case, I guess. We still run Bluedroid, but
+wrapped it in it's own daemon and use BlueZ HAL protocol for
+communication. We try to be compatible to BlueZ, so that we can replace
+Bluedroid for BlueZ easily. However, we cannot drop Bluedroid, because
+that's what Android chipset vendors support.
 
->From 53c14fc8c07bf4196b61b3b7809dbe02313c49a7 Mon Sep 17 00:00:00 2001
-From: Thomas Zimmermann <tdz@users.sourceforge.net>
-Date: Tue, 3 Feb 2015 09:37:47 +0100
-Subject: [PATCH] Documentation: HAL IPC uses 4 octects for socket channel
+I think we somehow have to make our Bluedroid daemon call
+|config_hci_snoop_log|. One idea is the proposed opcode for vendor
+extensions (Mozilla would be the vendor in our case). The other idea
+would be to write our own |bluetooth-snoop|, which uses a different
+channel to instruct the Bluedroid daemon to call |config_hci_snoop_log|.
 
-The documentations says that the HAL IPC uses 2 octets for socket
-channels, while |struct hal_cmd_socket_{listen,connect}| contain 4
-octets. This patch fixes the documentation accordingly.
+Best regards
+Thomas
 
-Signed-off-by: Thomas Zimmermann <tdz@users.sourceforge.net>
----
- android/hal-ipc-api.txt |    4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/android/hal-ipc-api.txt b/android/hal-ipc-api.txt
-index f15c12e..515cf4e 100644
---- a/android/hal-ipc-api.txt
-+++ b/android/hal-ipc-api.txt
-@@ -456,7 +456,7 @@ Commands and responses:
- 		Command parameters: Socket type (1 octet)
- 		                    Service name (256 octets)
- 		                    Service UUID (16 octets)
--		                    Channel (2 octets)
-+		                    Channel (4 octets)
- 		                    Socket flags (1 octet)
- 		Response parameters: File descriptor (inline)
- 
-@@ -474,7 +474,7 @@ Commands and responses:
- 		Command parameters: Remote address (6 octets)
- 		                    Socket type (1 octet)
- 		                    Service UUID (16 octets)
--		                    Channel (2 octets)
-+		                    Channel (4 octets)
- 		                    Socket flags (1 octet)
- 		Response parameters: File descriptor (inline)
- 
--- 
-1.7.10.4
-
-
---------------060002000501010405080903--
+> We rely on the Bluetooth subsystem and its monitor (snooping) functionality. The big advantage having this in a separate process is that it will not interfere with any other operation bluetoothd has to do. The kernel can schedule bluetoothd and bluetoothd-snoop individually.
+>
+> So bluetoothd-snoop is essentially a mini version of btmon where its only feature is to store traces in the old BTSnoop format (Frontline compatible). That said, nothing is stopping you from actually running btmon or hcidump on the target platform or multiple of them. We could even write a USB gadget driver that exports the traces over USB and you could run btmon / Wireshark on a PC to collect them.
+>
+> Can you just run bluetoothd-snoop as well and get the tracing feature that way? If you build BlueZ for Android and run it that way, that is what happens through the developer menu. It is fully integrated into the Android UI and we have been running it that way for a long time now.
+>
+> Regards
+>
+> Marcel
+>
