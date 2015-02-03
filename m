@@ -1,42 +1,73 @@
 Return-Path: <cyrus@holtmann.org>
-From: Gowtham Anandha Babu <gowtham.ab@samsung.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: bharat.panda@samsung.com, cpgs@samsung.com,
-	Gowtham Anandha Babu <gowtham.ab@samsung.com>
-Subject: [PATCH] tools/btgatt-server: Fix help message for GATT
-Date: Tue, 03 Feb 2015 12:00:43 +0530
-Message-id: <1422945043-4387-1-git-send-email-gowtham.ab@samsung.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Message-ID: <54D03996.1070503@sunrus.com.cn>
+Date: Tue, 03 Feb 2015 10:59:34 +0800
+From: Chen Gang S <gang.chen@sunrus.com.cn>
+MIME-Version: 1.0
+To: Joe Perches <joe@perches.com>
+CC: marcel@holtmann.org, gustavo@padovan.org, johan.hedberg@gmail.com,
+ "David S. Miller" <davem@davemloft.net>,
+ linux-bluetooth@vger.kernel.org,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v2] net: bluetooth: hci_sock: Use 'const void *' instead
+ of 'void *' for 2nd parameter of hci_test_bit()
+References: <54CFE8BE.5030700@sunrus.com.cn> <1422912017.30476.28.camel@perches.com> <54D0332B.6050701@sunrus.com.cn>
+In-Reply-To: <54D0332B.6050701@sunrus.com.cn>
+Content-Type: text/plain; charset=windows-1252
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Added '\n' to make help message looks good as below:
-btgatt-server
-Usage:
-	btgatt-server [options]
-Options:
-	-i, --index <id>		Specify adapter index, e.g. hci0
-	-m, --mtu <mtu>			The ATT MTU to use
-	-s, --security-level <sec>	Set security level (low|medium|high)
-	-v, --verbose			Enable extra logging
-	-r, --heart-rate		Enable Heart Rate service
-	-h, --help			Display help
----
- tools/btgatt-server.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/tools/btgatt-server.c b/tools/btgatt-server.c
-index f6ad8c3..d27cf10 100644
---- a/tools/btgatt-server.c
-+++ b/tools/btgatt-server.c
-@@ -631,7 +631,7 @@ static void usage(void)
- 		"\t-s, --security-level <sec>\tSet security level (low|"
- 								"medium|high)\n"
- 		"\t-v, --verbose\t\t\tEnable extra logging\n"
--		"\t-r, --heart-rate\t\tEnable Heart Rate service"
-+		"\t-r, --heart-rate\t\tEnable Heart Rate service\n"
- 		"\t-h, --help\t\t\tDisplay help\n");
- }
- 
+On 2/3/15 10:32, Chen Gang S wrote:
+> On 2/3/15 05:20, Joe Perches wrote:
+>> On Tue, 2015-02-03 at 05:14 +0800, Chen Gang S wrote:
+>>> hci_test_bit() does not modify 2nd parameter, so it is better to let it
+>>> be constant, or may cause build warning. The related warning (with
+>>> allmodconfig under xtensa):
+>> []
+>>> diff --git a/net/bluetooth/hci_sock.c b/net/bluetooth/hci_sock.c
+>> []
+>>> @@ -46,7 +46,7 @@ struct hci_pinfo {
+>>>  	unsigned short    channel;
+>>>  };
+>>>  
+>>> -static inline int hci_test_bit(int nr, void *addr)
+>>> +static inline int hci_test_bit(int nr, const void *addr)
+>>>  {
+>>>  	return *((__u32 *) addr + (nr >> 5)) & ((__u32) 1 << (nr & 31));
+>>>  }
+>>
+>> It's probably better to use const __u32 * here too, but the
+>> real thing I wonder is whether or not there's an issue with
+>> one of the 2 uses of this function.
+>>
+>> One of them passes a unsigned long *, the other a u32 *.
+>>
+>> $ git grep -w hci_test_bit
+>> net/bluetooth/hci_sock.c:static inline int hci_test_bit(int nr, void *addr)
+>> net/bluetooth/hci_sock.c:       if (!hci_test_bit(flt_event, &flt->event_mask))
+>> net/bluetooth/hci_sock.c:                    !hci_test_bit(ocf & HCI_FLT_OCF_BITS,
+>> net/bluetooth/hci_sock.c-                                  &hci_sec_filter.ocf_mask[ogf])) &&
+>>
+>> hci_sec_filter.ocf_mask is __u32
+>> but flt->event_mask is unsigned long.
+>>
+>> Any possible issue here on 64-bit systems?
+>>
+> 
+> For me, it can not cause issue on 64-bit systems. hci_test_bit() treats
+> 'addr' as "__u32 *", and has to use the pointer to do something.
+> 
+
+'event_mask' is intended to type cast to "__u32 *" within 'hci_sock.c'.
+So for me, "const __u32 *" is better than "const void *" for 2nd
+parameter of hci_test_bit().
+
+If what I said above is correct, and also if necessary, I shall patch v3
+for it.
+
+
+Thanks.
 -- 
-1.9.1
+Chen Gang
 
+Open, share, and attitude like air, water, and life which God blessed
