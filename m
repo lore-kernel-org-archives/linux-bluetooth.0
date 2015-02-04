@@ -1,33 +1,52 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 04 Feb 2015 13:56:57 -0800 (PST)
-Message-Id: <20150204.135657.922951850114728698.davem@davemloft.net>
-To: johan.hedberg@gmail.com
-Cc: netdev@vger.kernel.org, linux-bluetooth@vger.kernel.org
-Subject: Re: pull request: bluetooth-next 2015-02-03
-From: David Miller <davem@davemloft.net>
-In-Reply-To: <20150203082123.GA13130@t440s.lan>
-References: <20150203082123.GA13130@t440s.lan>
-Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
-Sender: netdev-owner@vger.kernel.org
+Message-ID: <54D29379.8050104@sunrus.com.cn>
+Date: Thu, 05 Feb 2015 05:47:37 +0800
+From: Chen Gang S <gang.chen@sunrus.com.cn>
+MIME-Version: 1.0
+To: Marcel Holtmann <marcel@holtmann.org>,
+	Sergei Shtylyov <sergei.shtylyov@cogentembedded.com>
+CC: David Laight <David.Laight@ACULAB.COM>,
+	"Gustavo F. Padovan" <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v2] net: bluetooth: hci_sock: Use 'const void *' instead
+ of 'void *' for 2nd parameter of hci_test_bit()
+References: <54CFE8BE.5030700@sunrus.com.cn> <063D6719AE5E284EB5DD2968C1650D6D1CADA5E1@AcuExch.aculab.com> <54D27D68.7040501@cogentembedded.com> <0AB99BEA-C379-439C-AD80-5F2122AE37E5@holtmann.org>
+In-Reply-To: <0AB99BEA-C379-439C-AD80-5F2122AE37E5@holtmann.org>
+Content-Type: text/plain; charset=windows-1252
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@gmail.com>
-Date: Tue, 3 Feb 2015 10:21:23 +0200
-
-> Here's what's likely the last bluetooth-next pull request for 3.20.
-> Notable changes include:
+On 2/5/15 05:09, Marcel Holtmann wrote:
+> Hi Sergei,
 > 
->  - xHCI workaround + a new id for the ath3k driver
->  - Several new ids for the btusb driver
->  - Support for new Intel Bluetooth controllers
->  - Minor cleanups to ieee802154 code
->  - Nested sleep warning fix in socket accept() code path
->  - Fixes for Out of Band pairing handling
->  - Support for LE scan restarting for HCI_QUIRK_STRICT_DUPLICATE_FILTER
->  - Improvements to data we expose through debugfs
->  - Proper handling of Hardware Error HCI events
+>>>> -static inline int hci_test_bit(int nr, void *addr)
+>>>> +static inline int hci_test_bit(int nr, const void *addr)
+>>>>  {
+>>>>  	return *((__u32 *) addr + (nr >> 5)) & ((__u32) 1 << (nr & 31));
+>>>>  }
+>>
+>>> Is there a 'standard' function lurking that will do the above.
+>>> On x86 the cpus 'bit test' instruction will handle bit numbers
+>>> greater than the word size - so it can be a single instruction.
+>>
+>>   Of course, there's test_bit().
 > 
-> Please let me know if there are any issues pulling. Thanks.
+> we did leave hci_test_bit in the code since there are some userspace facing API that we can not change. Remember that the origin of this code is from 2.4.6 kernel.
+> 
+> So we can only change this if you can ensure not to break the userspace API. So might want to write unit tests to ensure working HCI filter before even considering touching this.
+> 
 
-Pulled, thanks Johan.
+For me, we have to remain hci_test_bit(), it is for "__u32 *" (which we
+can not change). The common test_bit() is for "unsigned long *", in this
+case, I guess it may cause issue under 64-bit environments.
+
+
+Thanks.
+-- 
+Chen Gang
+
+Open, share, and attitude like air, water, and life which God blessed
