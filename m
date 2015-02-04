@@ -1,369 +1,111 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Kim, Ben Young Tae" <ytkim@qca.qualcomm.com>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: [PATCH v4] Bluetooth: Add support for QCA ROME chipset family
-Date: Wed, 4 Feb 2015 19:45:02 +0000
-Message-ID: <e80d5700d3ea468491319d2580787dc5@nalasexr02e.na.qualcomm.com>
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2070.6\))
+Subject: Re: [RFC] Bluetooth: Remove Read Local Supported Features from AMP controller
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1423041640-28763-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Date: Wed, 4 Feb 2015 10:04:00 -0800
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <542FB12F-47F7-4BB8-96AD-9C798FBDFF43@holtmann.org>
+References: <1423041640-28763-1-git-send-email-Andrei.Emeltchenko.news@gmail.com> <1423041640-28763-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+To: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch supports ROME Bluetooth family from Qualcomm Atheros,
-e.g. QCA61x4 or QCA6574.
+Hi Andrei,
 
-New chipset have similar firmware downloading sequences to previous
-chipset from Atheros, however, it doesn't support vid/pid switching
-after downloading the patch so that firmware needs to be handled by
-btusb module directly.
+> Commit f6996cfe2f1db60a74765449f9b53c7591bcdc87 added reading Local
+> Supported Features which is causing errors for msm prima SoftAMP.
+> 
+> ...
+> < HCI Command: Reset (0x03|0x0003) plen 0                       [hci1]
+> 6.492798
+>> HCI Event: Command Complete (0x0e) plen 4                     [hci1]
+>> 6.501161
+>      Reset (0x03|0x0003) ncmd 1
+>        Status: Success (0x00)
+> < HCI Command: Read Local Version Infor.. (0x04|0x0001) plen 0  [hci1]
+> 6.501832
+>> HCI Event: Command Complete (0x0e) plen 12                    [hci1]
+>> 6.516970
+>      Read Local Version Information (0x04|0x0001) ncmd 1
+>        Status: Success (0x00)
+>        HCI version: Bluetooth 3.0 (0x05) - Revision 0 (0x0000)
+>        PAL version: Bluetooth 3.0 (0x01) - Subversion 0 (0x0000)
+>        Manufacturer: Qualcomm (29)
+> < HCI Command: Read Local Supported Com.. (0x04|0x0002) plen 0  [hci1]
+> 6.517092
+>> HCI Event: Command Complete (0x0e) plen 68                    [hci1]
+>> 6.525821
+>      Read Local Supported Commands (0x04|0x0002) ncmd 1
+>        Status: Success (0x00)
+>        Commands: 34 entries
+>          Reset (Octet 5 - Bit 7)
+>          Flush (Octet 6 - Bit 1)
+>          Read Connection Accept Timeout (Octet 7 - Bit 2)
+>          Write Connection Accept Timeout (Octet 7 - Bit 3)
+>          Read Link Supervision Timeout (Octet 11 - Bit 0)
+>          Write Link Supervision Timeout (Octet 11 - Bit 1)
+>          Read Local Version Information (Octet 14 - Bit 3)
+>          Read Buffer Size (Octet 14 - Bit 7)
+>          Read Failed Contact Counter (Octet 15 - Bit 2)
+>          Reset Failed Contact Counter (Octet 15 - Bit 3)
+>          Read Link Quality (Octet 15 - Bit 4)
+>          Read RSSI (Octet 15 - Bit 5)
+>          Enhanced Flush (Octet 19 - Bit 6)
+>          Create Physical Link (Octet 21 - Bit 0)
+>          Accept Physical Link (Octet 21 - Bit 1)
+>          Disconnect Physical Link (Octet 21 - Bit 2)
+>          Create Logical Link (Octet 21 - Bit 3)
+>          Accept Logical Link (Octet 21 - Bit 4)
+>          Disconnect Logical Link (Octet 21 - Bit 5)
+>          Logical Link Cancel (Octet 21 - Bit 6)
+>          Flow Specifcation Modify (Octet 21 - Bit 7)
+>          Read Logical Link Accept Timeout (Octet 22 - Bit 0)
+>          Write Logical Link Accept Timeout (Octet 22 - Bit 1)
+>          Set Event Mask Page 2 (Octet 22 - Bit 2)
+>          Read Location Data (Octet 22 - Bit 3)
+>          Write Location Data (Octet 22 - Bit 4)
+>          Read Local AMP Info (Octet 22 - Bit 5)
+>          Read Local AMP ASSOC (Octet 22 - Bit 6)
+>          Write Remote AMP ASSOC (Octet 22 - Bit 7)
+>          Read Flow Control Mode (Octet 23 - Bit 0)
+>          Write Flow Control Mode (Octet 23 - Bit 1)
+>          Read Data Block Size (Octet 23 - Bit 2)
+>          Read Best Effort Flush Timeout (Octet 24 - Bit 2)
+>          Write Best Effort Flush Timeout (Octet 24 - Bit 3)
+> < HCI Command: Read Local Supported Fea.. (0x04|0x0003) plen 0  [hci1]
+> 6.525974
+>> HCI Event: Command Status (0x0f) plen 4                       [hci1]
+>> 6.542668
+>      Read Local Supported Features (0x04|0x0003) ncmd 1
+>        Status: Unknown HCI Command (0x01)
+> ...
+> 
+> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> ---
+> net/bluetooth/hci_core.c | 3 ---
+> 1 file changed, 3 deletions(-)
+> 
+> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+> index 3322d3f..e695be5 100644
+> --- a/net/bluetooth/hci_core.c
+> +++ b/net/bluetooth/hci_core.c
+> @@ -400,9 +400,6 @@ static void amp_init(struct hci_request *req)
+> 	/* Read Local Supported Commands */
+> 	hci_req_add(req, HCI_OP_READ_LOCAL_COMMANDS, 0, NULL);
+> 
+> -	/* Read Local Supported Features */
+> -	hci_req_add(req, HCI_OP_READ_LOCAL_FEATURES, 0, NULL);
+> -
+> 	/* Read Local AMP Info */
+> 	hci_req_add(req, HCI_OP_READ_LOCAL_AMP_INFO, 0, NULL);
 
-ROME chipset can be differentiated from previous version by reading
-ROM version.
+can we turn this into a 2 stage init process for AMP controllers. So we do HCI Reset, HCI Read Local Version and HCI Read Local Supported Commands and then based on the supported commands we decide which other commands we issue during init sequence.
 
-T:  Bus=03 Lev=01 Prnt=01 Port=01 Cnt=01 Dev#= 16 Spd=12   MxCh= 0
-D:  Ver= 1.10 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-P:  Vendor=0cf3 ProdID=e300 Rev= 0.01
-C:* #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
-I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
-E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+If we can read the features page, I really prefer that we actually read it. Even while for AMP controllers in most cases it will be zero. According to a Core spec it is a valid command.
 
-T:  Bus=03 Lev=01 Prnt=01 Port=01 Cnt=01 Dev#=  8 Spd=12   MxCh= 0
-D:  Ver= 2.01 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-P:  Vendor=0cf3 ProdID=e360 Rev= 0.01
-C:* #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
-I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
-E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+Regards
 
-Signed-off-by: Ben Young Tae Kim <ytkim@qca.qualcomm.com>
----
- drivers/bluetooth/btusb.c | 254 ++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 254 insertions(+)
+Marcel
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index b876888..73ac521 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -52,6 +52,7 @@ static struct usb_driver btusb_driver;
- #define BTUSB_SWAVE		0x1000
- #define BTUSB_INTEL_NEW		0x2000
- #define BTUSB_AMP		0x4000
-+#define BTUSB_QCA_ROME		0x8000
- 
- static const struct usb_device_id btusb_table[] = {
- 	/* Generic Bluetooth USB device */
-@@ -212,6 +213,10 @@ static const struct usb_device_id blacklist_table[] = {
- 	{ USB_DEVICE(0x0489, 0xe036), .driver_info = BTUSB_ATH3012 },
- 	{ USB_DEVICE(0x0489, 0xe03c), .driver_info = BTUSB_ATH3012 },
- 
-+	/* QCA ROME chipset */
-+	{ USB_DEVICE(0x0cf3, 0xe300), .driver_info = BTUSB_QCA_ROME},
-+	{ USB_DEVICE(0x0cf3, 0xe360), .driver_info = BTUSB_QCA_ROME},
-+
- 	/* Broadcom BCM2035 */
- 	{ USB_DEVICE(0x0a5c, 0x2009), .driver_info = BTUSB_BCM92035 },
- 	{ USB_DEVICE(0x0a5c, 0x200a), .driver_info = BTUSB_WRONG_SCO_MTU },
-@@ -2584,6 +2589,250 @@ static int btusb_set_bdaddr_ath3012(struct hci_dev *hdev,
- 	return 0;
- }
- 
-+#define QCA_DFU_PACKET_LEN	4096
-+
-+#define QCA_GET_TARGET_VERSION	0x09
-+#define QCA_CHECK_STATUS	0x05
-+#define QCA_DFU_DOWNLOAD	0x01
-+
-+#define QCA_SYSCFG_UPDATED	0x40
-+#define QCA_PATCH_UPDATED	0x80
-+#define QCA_DFU_TIMEOUT		3000
-+
-+struct qca_version {
-+	__le32	rom_version;
-+	__le32	patch_version;
-+	__le32	ram_version;
-+	__le32	ref_clock;
-+	__u8	reserved[4];
-+} __packed;
-+
-+struct qca_rampatch_version {
-+	__le16	rom_version;
-+	__le16	patch_version;
-+} __packed;
-+
-+struct qca_device_info {
-+	__le32	rom_version;
-+	__u8	rampatch_hdr;	/* length of header in rampatch */
-+	__u8	nvm_hdr;	/* length of header in NVM */
-+	__u8	ver_offset;	/* offset of version structure in rampatch */
-+};
-+
-+static const struct qca_device_info qca_devices_table[] = {
-+	{ 0x00000100, 20, 4, 10 }, /* Rome 1.0 */
-+	{ 0x00000101, 20, 4, 10 }, /* Rome 1.1 */
-+	{ 0x00000201, 28, 4, 18 }, /* Rome 2.1 */
-+	{ 0x00000300, 28, 4, 18 }, /* Rome 3.0 */
-+	{ 0x00000302, 28, 4, 18 }, /* Rome 3.2 */
-+};
-+
-+static int btusb_qca_send_vendor_req(struct hci_dev *hdev, u8 request,
-+				     void *data, u16 size)
-+{
-+	struct btusb_data *btdata = hci_get_drvdata(hdev);
-+	struct usb_device *udev = btdata->udev;
-+	int pipe, err;
-+	u8 *buf;
-+
-+	buf = kmalloc(size, GFP_KERNEL);
-+	if (!buf)
-+		return -ENOMEM;
-+
-+	/* Found some of USB hosts have IOT issues with ours so that we should
-+	 * not wait until HCI layer is ready.
-+	 */
-+	pipe = usb_rcvctrlpipe(udev, 0);
-+	err = usb_control_msg(udev, pipe, request, USB_TYPE_VENDOR | USB_DIR_IN,
-+			      0, 0, buf, size, USB_CTRL_SET_TIMEOUT);
-+	if (err < 0) {
-+		BT_ERR("%s: Failed to access otp area (%d)", hdev->name, err);
-+		goto done;
-+	}
-+
-+	memcpy(data, buf, size);
-+
-+done:
-+	kfree(buf);
-+
-+	return err;
-+}
-+
-+static int btusb_setup_qca_download_fw(struct hci_dev *hdev,
-+				       const struct firmware *firmware,
-+				       size_t hdr_size)
-+{
-+	struct btusb_data *btdata = hci_get_drvdata(hdev);
-+	struct usb_device *udev = btdata->udev;
-+	size_t count, size, sent = 0;
-+	int pipe, len, err;
-+	u8 *buf;
-+
-+	buf = kmalloc(QCA_DFU_PACKET_LEN, GFP_KERNEL);
-+	if (!buf)
-+		return -ENOMEM;
-+
-+	count = firmware->size;
-+
-+	size = min_t(size_t, count, hdr_size);
-+	memcpy(buf, firmware->data, size);
-+
-+	/* USB patches should go down to controller through USB path
-+	 * because binary format fits to go down through USB channel.
-+	 * USB control path is for patching headers and USB bulk is for
-+	 * patch body.
-+	 */
-+	pipe = usb_sndctrlpipe(udev, 0);
-+	err = usb_control_msg(udev, pipe, QCA_DFU_DOWNLOAD, USB_TYPE_VENDOR,
-+			      0, 0, buf, size, USB_CTRL_SET_TIMEOUT);
-+	if (err < 0) {
-+		BT_ERR("%s: Failed to send headers (%d)", hdev->name, err);
-+		goto done;
-+	}
-+
-+	sent += size;
-+	count -= size;
-+
-+	while (count) {
-+		size = min_t(size_t, count, QCA_DFU_PACKET_LEN);
-+
-+		memcpy(buf, firmware->data + sent, size);
-+
-+		pipe = usb_sndbulkpipe(udev, 0x02);
-+		err = usb_bulk_msg(udev, pipe, buf, size, &len,
-+				   QCA_DFU_TIMEOUT);
-+		if (err < 0) {
-+			BT_ERR("%s: Failed to send body at %zd of %zd (%d)",
-+			       hdev->name, sent, firmware->size, err);
-+			break;
-+		}
-+
-+		if (size != len) {
-+			BT_ERR("%s: Failed to get bulk buffer", hdev->name);
-+			err = -EILSEQ;
-+			break;
-+		}
-+
-+		sent  += size;
-+		count -= size;
-+	}
-+
-+done:
-+	kfree(buf);
-+	return err;
-+}
-+
-+static int btusb_setup_qca_load_rampatch(struct hci_dev *hdev,
-+					 struct qca_version *ver,
-+					 const struct qca_device_info *info)
-+{
-+	struct qca_rampatch_version *rver;
-+	const struct firmware *fw;
-+	char fwname[64];
-+	int err;
-+
-+	snprintf(fwname, sizeof(fwname), "qca/rampatch_usb_%08x.bin",
-+		 le32_to_cpu(ver->rom_version));
-+
-+	err = request_firmware(&fw, fwname, &hdev->dev);
-+	if (err) {
-+		BT_ERR("%s: failed to request rampatch file: %s (%d)",
-+		       hdev->name, fwname, err);
-+		return err;
-+	}
-+
-+	BT_INFO("%s: using rampatch file: %s", hdev->name, fwname);
-+	rver = (struct qca_rampatch_version *)(fw->data + info->ver_offset);
-+	BT_INFO("%s: QCA: patch rome 0x%x build 0x%x, firmware rome 0x%x "
-+		"build 0x%x", hdev->name, le16_to_cpu(rver->rom_version),
-+		le16_to_cpu(rver->patch_version), le32_to_cpu(ver->rom_version),
-+		le32_to_cpu(ver->patch_version));
-+
-+	if (rver->rom_version != ver->rom_version ||
-+	    rver->patch_version <= ver->patch_version) {
-+		BT_ERR("%s: rampatch file version did not match with firmware",
-+		       hdev->name);
-+		err = -EINVAL;
-+		goto done;
-+	}
-+
-+	err = btusb_setup_qca_download_fw(hdev, fw, info->rampatch_hdr);
-+
-+done:
-+	release_firmware(fw);
-+
-+	return err;
-+}
-+
-+static int btusb_setup_qca_load_nvm(struct hci_dev *hdev,
-+				    struct qca_version *ver,
-+				    const struct qca_device_info *info)
-+{
-+	const struct firmware *fw;
-+	char fwname[64];
-+	int err;
-+
-+	snprintf(fwname, sizeof(fwname), "qca/nvm_usb_%08x.bin",
-+		 le32_to_cpu(ver->rom_version));
-+
-+	err = request_firmware(&fw, fwname, &hdev->dev);
-+	if (err) {
-+		BT_ERR("%s: failed to request NVM file: %s (%d)",
-+		       hdev->name, fwname, err);
-+		return err;
-+	}
-+
-+	BT_INFO("%s: using NVM file: %s", hdev->name, fwname);
-+
-+	err = btusb_setup_qca_download_fw(hdev, fw, info->nvm_hdr);
-+
-+	release_firmware(fw);
-+
-+	return err;
-+}
-+
-+static int btusb_setup_qca(struct hci_dev *hdev)
-+{
-+	const struct qca_device_info *info = NULL;
-+	struct qca_version ver;
-+	u8 status;
-+	int i, err;
-+
-+	err = btusb_qca_send_vendor_req(hdev, QCA_GET_TARGET_VERSION, &ver,
-+				        sizeof(ver));
-+	if (err < 0)
-+		return err;
-+
-+	for (i = 0; i < ARRAY_SIZE(qca_devices_table); i++) {
-+		if (ver.rom_version == qca_devices_table[i].rom_version)
-+			info = &qca_devices_table[i];
-+	}
-+	if (!info) {
-+		BT_ERR("%s: don't support firmware rome 0x%x", hdev->name,
-+		       le32_to_cpu(ver.rom_version));
-+		return -ENODEV;
-+	}
-+
-+	err = btusb_qca_send_vendor_req(hdev, QCA_CHECK_STATUS, &status,
-+					sizeof(status));
-+	if (err < 0)
-+		return err;
-+
-+	if (!(status & QCA_PATCH_UPDATED)) {
-+		err = btusb_setup_qca_load_rampatch(hdev, &ver, info);
-+		if (err < 0)
-+			return err;
-+	}
-+
-+	if (!(status & QCA_SYSCFG_UPDATED)) {
-+		err = btusb_setup_qca_load_nvm(hdev, &ver, info);
-+		if (err < 0)
-+			return err;
-+	}
-+
-+	return 0;
-+}
-+
- static int btusb_probe(struct usb_interface *intf,
- 		       const struct usb_device_id *id)
- {
-@@ -2736,6 +2985,11 @@ static int btusb_probe(struct usb_interface *intf,
- 		set_bit(HCI_QUIRK_STRICT_DUPLICATE_FILTER, &hdev->quirks);
- 	}
- 
-+	if (id->driver_info & BTUSB_QCA_ROME) {
-+		hdev->setup = btusb_setup_qca;
-+		hdev->set_bdaddr = btusb_set_bdaddr_ath3012;
-+	}
-+
- 	if (id->driver_info & BTUSB_AMP) {
- 		/* AMP controllers do not support SCO packets */
- 		data->isoc = NULL;
--- 
-1.9.1
