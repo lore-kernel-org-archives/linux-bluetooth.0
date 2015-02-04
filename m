@@ -1,103 +1,155 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+From: Arman Uguray <armansito@chromium.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFC] Bluetooth: Remove Read Local Supported Features from AMP controller
-Date: Wed,  4 Feb 2015 11:20:40 +0200
-Message-Id: <1423041640-28763-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1423041640-28763-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1423041640-28763-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Cc: Arman Uguray <armansito@chromium.org>
+Subject: [PATCH] shared/gatt: Allow register_notify without CCC
+Date: Tue,  3 Feb 2015 19:58:22 -0800
+Message-Id: <1423022302-27124-1-git-send-email-armansito@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Certain peripherals can expose a GATT characteristic with the
+notify/indicate property but with no Client Characteristic Configuration
+descriptor. Since bt_gatt_client_register_notify enforces a CCC as a
+requirement, it returns an error for such characteristics.
 
-Commit f6996cfe2f1db60a74765449f9b53c7591bcdc87 added reading Local
-Supported Features which is causing errors for msm prima SoftAMP.
-
-...
-< HCI Command: Reset (0x03|0x0003) plen 0                       [hci1]
-6.492798
-> HCI Event: Command Complete (0x0e) plen 4                     [hci1]
-> 6.501161
-      Reset (0x03|0x0003) ncmd 1
-        Status: Success (0x00)
-< HCI Command: Read Local Version Infor.. (0x04|0x0001) plen 0  [hci1]
-6.501832
-> HCI Event: Command Complete (0x0e) plen 12                    [hci1]
-> 6.516970
-      Read Local Version Information (0x04|0x0001) ncmd 1
-        Status: Success (0x00)
-        HCI version: Bluetooth 3.0 (0x05) - Revision 0 (0x0000)
-        PAL version: Bluetooth 3.0 (0x01) - Subversion 0 (0x0000)
-        Manufacturer: Qualcomm (29)
-< HCI Command: Read Local Supported Com.. (0x04|0x0002) plen 0  [hci1]
-6.517092
-> HCI Event: Command Complete (0x0e) plen 68                    [hci1]
-> 6.525821
-      Read Local Supported Commands (0x04|0x0002) ncmd 1
-        Status: Success (0x00)
-        Commands: 34 entries
-          Reset (Octet 5 - Bit 7)
-          Flush (Octet 6 - Bit 1)
-          Read Connection Accept Timeout (Octet 7 - Bit 2)
-          Write Connection Accept Timeout (Octet 7 - Bit 3)
-          Read Link Supervision Timeout (Octet 11 - Bit 0)
-          Write Link Supervision Timeout (Octet 11 - Bit 1)
-          Read Local Version Information (Octet 14 - Bit 3)
-          Read Buffer Size (Octet 14 - Bit 7)
-          Read Failed Contact Counter (Octet 15 - Bit 2)
-          Reset Failed Contact Counter (Octet 15 - Bit 3)
-          Read Link Quality (Octet 15 - Bit 4)
-          Read RSSI (Octet 15 - Bit 5)
-          Enhanced Flush (Octet 19 - Bit 6)
-          Create Physical Link (Octet 21 - Bit 0)
-          Accept Physical Link (Octet 21 - Bit 1)
-          Disconnect Physical Link (Octet 21 - Bit 2)
-          Create Logical Link (Octet 21 - Bit 3)
-          Accept Logical Link (Octet 21 - Bit 4)
-          Disconnect Logical Link (Octet 21 - Bit 5)
-          Logical Link Cancel (Octet 21 - Bit 6)
-          Flow Specifcation Modify (Octet 21 - Bit 7)
-          Read Logical Link Accept Timeout (Octet 22 - Bit 0)
-          Write Logical Link Accept Timeout (Octet 22 - Bit 1)
-          Set Event Mask Page 2 (Octet 22 - Bit 2)
-          Read Location Data (Octet 22 - Bit 3)
-          Write Location Data (Octet 22 - Bit 4)
-          Read Local AMP Info (Octet 22 - Bit 5)
-          Read Local AMP ASSOC (Octet 22 - Bit 6)
-          Write Remote AMP ASSOC (Octet 22 - Bit 7)
-          Read Flow Control Mode (Octet 23 - Bit 0)
-          Write Flow Control Mode (Octet 23 - Bit 1)
-          Read Data Block Size (Octet 23 - Bit 2)
-          Read Best Effort Flush Timeout (Octet 24 - Bit 2)
-          Write Best Effort Flush Timeout (Octet 24 - Bit 3)
-< HCI Command: Read Local Supported Fea.. (0x04|0x0003) plen 0  [hci1]
-6.525974
-> HCI Event: Command Status (0x0f) plen 4                       [hci1]
-> 6.542668
-      Read Local Supported Features (0x04|0x0003) ncmd 1
-        Status: Unknown HCI Command (0x01)
-...
-
-Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+This patch fixes this behavior so that bt_gatt_client_register_notify
+immediately registers the callback and returns success for
+characteristics with no CCC.
 ---
- net/bluetooth/hci_core.c | 3 ---
- 1 file changed, 3 deletions(-)
+ src/shared/gatt-client.c | 43 +++++++++++++++++++++++++------------------
+ 1 file changed, 25 insertions(+), 18 deletions(-)
 
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 3322d3f..e695be5 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -400,9 +400,6 @@ static void amp_init(struct hci_request *req)
- 	/* Read Local Supported Commands */
- 	hci_req_add(req, HCI_OP_READ_LOCAL_COMMANDS, 0, NULL);
+diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
+index 5edb991..d0fc054 100644
+--- a/src/shared/gatt-client.c
++++ b/src/shared/gatt-client.c
+@@ -88,6 +88,7 @@ struct bt_gatt_client {
+ 	 * the remote peripheral.
+ 	 */
+ 	unsigned int svc_chngd_ind_id;
++	bool svc_chngd_registered;
+ 	struct queue *svc_chngd_queue;  /* Queued service changed events */
+ 	bool in_svc_chngd;
  
--	/* Read Local Supported Features */
--	hci_req_add(req, HCI_OP_READ_LOCAL_FEATURES, 0, NULL);
+@@ -234,12 +235,6 @@ static struct notify_chrc *notify_chrc_create(struct bt_gatt_client *client,
+ 							&properties, NULL))
+ 			return NULL;
+ 
+-	/* Find the CCC characteristic */
+-	ccc = NULL;
+-	gatt_db_service_foreach_desc(attr, find_ccc, &ccc);
+-	if (!ccc)
+-		return NULL;
 -
- 	/* Read Local AMP Info */
- 	hci_req_add(req, HCI_OP_READ_LOCAL_AMP_INFO, 0, NULL);
+ 	chrc = new0(struct notify_chrc, 1);
+ 	if (!chrc)
+ 		return NULL;
+@@ -250,8 +245,17 @@ static struct notify_chrc *notify_chrc_create(struct bt_gatt_client *client,
+ 		return NULL;
+ 	}
  
++	/*
++	 * Find the CCC characteristic. Some characteristics that allow
++	 * notifications may not have a CCC descriptor. We treat these as
++	 * automatically successful.
++	 */
++	ccc = NULL;
++	gatt_db_service_foreach_desc(attr, find_ccc, &ccc);
++	if (ccc)
++		chrc->ccc_handle = gatt_db_attribute_get_handle(ccc);
++
+ 	chrc->value_handle = value_handle;
+-	chrc->ccc_handle = gatt_db_attribute_get_handle(ccc);
+ 	chrc->properties = properties;
+ 
+ 	queue_push_tail(client->notify_chrcs, chrc);
+@@ -1020,6 +1024,7 @@ static void service_changed_reregister_cb(uint16_t att_ecode, void *user_data)
+ 		util_debug(client->debug_callback, client->debug_data,
+ 			"Re-registered handler for \"Service Changed\" after "
+ 			"change in GATT service");
++		client->svc_chngd_registered = true;
+ 		return;
+ 	}
+ 
+@@ -1089,6 +1094,7 @@ static void service_changed_complete(struct discovery_op *op, bool success,
+ 	/* The GATT service was modified. Re-register the handler for
+ 	 * indications from the "Service Changed" characteristic.
+ 	 */
++	client->svc_chngd_registered = false;
+ 	client->svc_chngd_ind_id = bt_gatt_client_register_notify(client,
+ 					gatt_db_attribute_get_handle(attr),
+ 					service_changed_reregister_cb,
+@@ -1197,6 +1203,7 @@ static void service_changed_register_cb(uint16_t att_ecode, void *user_data)
+ 		goto done;
+ 	}
+ 
++	client->svc_chngd_registered = true;
+ 	client->ready = true;
+ 	success = true;
+ 	util_debug(client->debug_callback, client->debug_data,
+@@ -1239,13 +1246,16 @@ static void init_complete(struct discovery_op *op, bool success,
+ 					service_changed_register_cb,
+ 					service_changed_cb,
+ 					client, NULL);
+-	client->ready = false;
++
++	if (!client->svc_chngd_registered)
++		client->ready = false;
+ 
+ 	if (client->svc_chngd_ind_id)
+ 		return;
+ 
+ 	util_debug(client->debug_callback, client->debug_data,
+ 			"Failed to register handler for \"Service Changed\"");
++	success = false;
+ 
+ fail:
+ 	util_debug(client->debug_callback, client->debug_data,
+@@ -1423,18 +1433,17 @@ static void complete_unregister_notify(void *data)
+ 	 */
+ 	if (notify_data->att_id) {
+ 		bt_att_cancel(notify_data->client->att, notify_data->att_id);
+-		notify_data_unref(notify_data);
+-		return;
++		goto done;
+ 	}
+ 
+-	if (__sync_sub_and_fetch(&notify_data->chrc->notify_count, 1)) {
+-		notify_data_unref(notify_data);
+-		return;
+-	}
++	if (__sync_sub_and_fetch(&notify_data->chrc->notify_count, 1) ||
++						!notify_data->chrc->ccc_handle)
++		goto done;
+ 
+ 	if (notify_data_write_ccc(notify_data, false, disable_ccc_callback))
+ 		return;
+ 
++done:
+ 	notify_data_unref(notify_data);
+ }
+ 
+@@ -2571,9 +2580,7 @@ unsigned int bt_gatt_client_register_notify(struct bt_gatt_client *client,
+ 	/* Add the handler to the bt_gatt_client's general list */
+ 	queue_push_tail(client->notify_list, notify_data);
+ 
+-	/* Assign an ID to the handler and notify the caller that it was
+-	 * successfully registered.
+-	 */
++	/* Assign an ID to the handler. */
+ 	if (client->next_reg_id < 1)
+ 		client->next_reg_id = 1;
+ 
+@@ -2591,7 +2598,7 @@ unsigned int bt_gatt_client_register_notify(struct bt_gatt_client *client,
+ 	/*
+ 	 * If the ref count is not zero, then notifications are already enabled.
+ 	 */
+-	if (chrc->notify_count > 0) {
++	if (chrc->notify_count > 0 || !chrc->ccc_handle) {
+ 		complete_notify_request(notify_data);
+ 		return notify_data->id;
+ 	}
 -- 
-2.1.0
+2.2.0.rc0.207.ga3a616c
 
