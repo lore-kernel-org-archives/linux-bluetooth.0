@@ -1,56 +1,67 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 4 Feb 2015 18:28:56 -0800
-From: Tedd Ho-Jeong An <tedd.an@intel.com>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Cc: "An, Tedd" <tedd.an@intel.com>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	Marcel Holtmann <marcel@holtmann.org>
-Subject: [RFC 1/2] Bluetooth: Add led_off callback to manually turn off the
- LED before closing device
-Message-ID: <20150204182856.43bd5644@tedd-test>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2070.6\))
+Subject: Re: [PATCH] monitor: Fix minimum size for variable length events
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1858164.g9f32Se7Qq@leonov>
+Date: Wed, 4 Feb 2015 14:19:45 -0800
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <4BF8883E-0BE4-4C63-8209-C88A68A9B038@holtmann.org>
+References: <1423080848-7611-1-git-send-email-szymon.janc@tieto.com> <AEA5CFDB-68FD-41C0-9960-6EA1433DD4A5@holtmann.org> <1858164.g9f32Se7Qq@leonov>
+To: Szymon Janc <szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Tedd Ho-Jeong An <tedd.an@intel.com>
+Hi Szymon,
 
-This callback allows a vendor to send the vendor specific command, for example
-turn off the LED, before cloing the hci interface.
+>>> Those could lead to reading invalid memory if frames were corrupted.
+>>> ---
+>>> monitor/packet.c | 10 +++++-----
+>>> 1 file changed, 5 insertions(+), 5 deletions(-)
+>>> 
+>>> diff --git a/monitor/packet.c b/monitor/packet.c
+>>> index ba58d84..56a315b 100644
+>>> --- a/monitor/packet.c
+>>> +++ b/monitor/packet.c
+>>> @@ -8204,7 +8204,7 @@ static const struct event_data event_table[] = {
+>>> 
+>>> 	{ 0x01, "Inquiry Complete",
+>>> 	
+>>> 				inquiry_complete_evt, 1, true },
+>>> 	
+>>> 	{ 0x02, "Inquiry Result",
+>>> 
+>>> -				inquiry_result_evt, 1, false },
+>>> +				inquiry_result_evt, 8, false },
+>> 
+>> these are wrong. That is why fixed size is set to false here. It means that
+>> the callback function needs to ensure we do the right checks. If we don't,
+>> please with the callback functions.
+> 
+> If fixed==false then passed size is minimum required size and all callbacks 
+> are expecting those.
+> 
+> From packet_hci_event()
+> 
+> 	if (event_data->fixed) {
+> 		if (hdr->plen != event_data->size) {
+> 			print_text(COLOR_ERROR, "invalid packet size");
+> 			packet_hexdump(data, size);
+> 			return;
+> 		}
+> 	} else {
+> 		if (hdr->plen < event_data->size) {
+> 			print_text(COLOR_ERROR, "too short packet");
+> 			packet_hexdump(data, size);
+> 			return;
+> 		}
+> 	}
+> 
+> 	event_data->func(data, hdr->plen);
 
-Signed-off-by: Tedd Ho-Jeong An <tedd.an@intel.com>
----
- include/net/bluetooth/hci_core.h | 1 +
- net/bluetooth/hci_core.c         | 4 ++++
- 2 files changed, 5 insertions(+)
+yes exactly. And the minimum size for inquiry results is 1 octet. The num can be actually 0.
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 52863c3..99a9ecd 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -377,6 +377,7 @@ struct hci_dev {
- 	void (*notify)(struct hci_dev *hdev, unsigned int evt);
- 	void (*hw_error)(struct hci_dev *hdev, u8 code);
- 	int (*set_bdaddr)(struct hci_dev *hdev, const bdaddr_t *bdaddr);
-+	int (*led_off)(struct hci_dev *hdev);
- };
- 
- #define HCI_PHY_HANDLE(handle)	(handle & 0xff)
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 3322d3f..329f117 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -1591,6 +1591,10 @@ static int hci_dev_do_close(struct hci_dev *hdev)
- {
- 	BT_DBG("%s %p", hdev->name, hdev);
- 
-+	/* allows vendors to send the command before close the device */
-+	if (!test_bit(HCI_UNREGISTER, &hdev->dev_flags) && hdev->led_off)
-+		hdev->led_off(hdev);
-+
- 	cancel_delayed_work(&hdev->power_off);
- 
- 	hci_req_cancel(hdev, ENODEV);
--- 
-1.9.1
+Regards
+
+Marcel
 
