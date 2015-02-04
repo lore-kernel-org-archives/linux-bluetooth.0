@@ -1,221 +1,182 @@
 Return-Path: <cyrus@holtmann.org>
+MIME-Version: 1.0
+In-Reply-To: <1423022302-27124-1-git-send-email-armansito@chromium.org>
+References: <1423022302-27124-1-git-send-email-armansito@chromium.org>
+Date: Wed, 4 Feb 2015 16:26:29 +0200
+Message-ID: <CABBYNZLDAFdotoZMEr5AiBds3rJ_5KNM6WPS7VbtXmA7iT0rsQ@mail.gmail.com>
+Subject: Re: [PATCH] shared/gatt: Allow register_notify without CCC
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [RFC 1/9] client: Add support for GattService1
-Date: Wed,  4 Feb 2015 17:33:11 +0200
-Message-Id: <1423063999-15734-2-git-send-email-luiz.dentz@gmail.com>
-In-Reply-To: <1423063999-15734-1-git-send-email-luiz.dentz@gmail.com>
-References: <1423063999-15734-1-git-send-email-luiz.dentz@gmail.com>
+To: Arman Uguray <armansito@chromium.org>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Arman,
 
-This add support for GattService1 interface detection and prints when
-they are added or removed
----
- Makefile.tools                           |  1 +
- client/gatt.c                            | 90 ++++++++++++++++++++++++++++++++
- profiles/input/server.h => client/gatt.h |  6 +--
- client/main.c                            | 30 +++++++++++
- 4 files changed, 124 insertions(+), 3 deletions(-)
- create mode 100644 client/gatt.c
- copy profiles/input/server.h => client/gatt.h (84%)
+On Wed, Feb 4, 2015 at 5:58 AM, Arman Uguray <armansito@chromium.org> wrote:
+> Certain peripherals can expose a GATT characteristic with the
+> notify/indicate property but with no Client Characteristic Configuration
+> descriptor. Since bt_gatt_client_register_notify enforces a CCC as a
+> requirement, it returns an error for such characteristics.
 
-diff --git a/Makefile.tools b/Makefile.tools
-index e42e42d..64da54f 100644
---- a/Makefile.tools
-+++ b/Makefile.tools
-@@ -5,6 +5,7 @@ bin_PROGRAMS += client/bluetoothctl
- client_bluetoothctl_SOURCES = client/main.c \
- 					client/display.h client/display.c \
- 					client/agent.h client/agent.c \
-+					client/gatt.h client/gatt.c \
- 					monitor/uuid.h monitor/uuid.c
- client_bluetoothctl_LDADD = gdbus/libgdbus-internal.la @GLIB_LIBS@ @DBUS_LIBS@ \
- 				-lreadline
-diff --git a/client/gatt.c b/client/gatt.c
-new file mode 100644
-index 0000000..7de5c7b
---- /dev/null
-+++ b/client/gatt.c
-@@ -0,0 +1,90 @@
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2014  Intel Corporation. All rights reserved.
-+ *
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-+ *
-+ */
-+
-+#ifdef HAVE_CONFIG_H
-+#include <config.h>
-+#endif
-+
-+#include <stdio.h>
-+#include <errno.h>
-+#include <unistd.h>
-+#include <stdlib.h>
-+#include <stdbool.h>
-+
-+#include <readline/readline.h>
-+#include <readline/history.h>
-+#include <glib.h>
-+#include <gdbus.h>
-+
-+#include "monitor/uuid.h"
-+#include "display.h"
-+#include "gatt.h"
-+
-+/* String display constants */
-+#define COLORED_NEW	COLOR_GREEN "NEW" COLOR_OFF
-+#define COLORED_CHG	COLOR_YELLOW "CHG" COLOR_OFF
-+#define COLORED_DEL	COLOR_RED "DEL" COLOR_OFF
-+
-+static GList *services;
-+
-+static void print_service(GDBusProxy *proxy, const char *description)
-+{
-+	DBusMessageIter iter;
-+	const char *uuid, *text;
-+	dbus_bool_t primary;
-+
-+	if (g_dbus_proxy_get_property(proxy, "UUID", &iter) == FALSE)
-+		return;
-+
-+	dbus_message_iter_get_basic(&iter, &uuid);
-+
-+	if (g_dbus_proxy_get_property(proxy, "Primary", &iter) == FALSE)
-+		return;
-+
-+	dbus_message_iter_get_basic(&iter, &primary);
-+
-+	text = uuidstr_to_str(uuid);
-+	if (!text)
-+		text = uuid;
-+
-+	rl_printf("%s%s%sService %s %s %s\n",
-+				description ? "[" : "",
-+				description ? : "",
-+				description ? "] " : "",
-+				g_dbus_proxy_get_path(proxy),
-+				text, primary ? "(Primary)" : "(Secondary)");
-+}
-+
-+void gatt_add_service(GDBusProxy *proxy)
-+{
-+	services = g_list_append(services, proxy);
-+
-+	print_service(proxy, COLORED_NEW);
-+}
-+
-+void gatt_remove_service(GDBusProxy *proxy)
-+{
-+	services = g_list_remove(services, proxy);
-+
-+	print_service(proxy, COLORED_DEL);
-+}
-diff --git a/profiles/input/server.h b/client/gatt.h
-similarity index 84%
-copy from profiles/input/server.h
-copy to client/gatt.h
-index 74159bb..f049039 100644
---- a/profiles/input/server.h
-+++ b/client/gatt.h
-@@ -2,7 +2,7 @@
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-  *
-- *  Copyright (C) 2004-2010  Marcel Holtmann <marcel@holtmann.org>
-+ *  Copyright (C) 2014  Intel Corporation. All rights reserved.
-  *
-  *
-  *  This program is free software; you can redistribute it and/or modify
-@@ -21,5 +21,5 @@
-  *
-  */
- 
--int server_start(const bdaddr_t *src);
--void server_stop(const bdaddr_t *src);
-+void gatt_add_service(GDBusProxy *proxy);
-+void gatt_remove_service(GDBusProxy *proxy);
-diff --git a/client/main.c b/client/main.c
-index ea80ee7..ab644ba 100644
---- a/client/main.c
-+++ b/client/main.c
-@@ -41,6 +41,7 @@
- #include "monitor/uuid.h"
- #include "agent.h"
- #include "display.h"
-+#include "gatt.h"
- 
- /* String display constants */
- #define COLORED_NEW	COLOR_GREEN "NEW" COLOR_OFF
-@@ -284,6 +285,29 @@ static gboolean device_is_child(GDBusProxy *device, GDBusProxy *master)
- 	return FALSE;
- }
- 
-+static gboolean service_is_child(GDBusProxy *service)
-+{
-+	GList *l;
-+	DBusMessageIter iter;
-+	const char *device, *path;
-+
-+	if (g_dbus_proxy_get_property(service, "Device", &iter) == FALSE)
-+		return FALSE;
-+
-+	dbus_message_iter_get_basic(&iter, &device);
-+
-+	for (l = dev_list; l; l = g_list_next(l)) {
-+		GDBusProxy *proxy = l->data;
-+
-+		path = g_dbus_proxy_get_path(proxy);
-+
-+		if (!strcmp(path, device))
-+			return TRUE;
-+	}
-+
-+	return FALSE;
-+}
-+
- static void proxy_added(GDBusProxy *proxy, void *user_data)
- {
- 	const char *interface;
-@@ -311,6 +335,9 @@ static void proxy_added(GDBusProxy *proxy, void *user_data)
- 				agent_register(dbus_conn, agent_manager,
- 							auto_register_agent);
- 		}
-+	} else if (!strcmp(interface, "org.bluez.GattService1")) {
-+		if (service_is_child(proxy))
-+			gatt_add_service(proxy);
- 	}
- }
- 
-@@ -343,6 +370,9 @@ static void proxy_removed(GDBusProxy *proxy, void *user_data)
- 			if (auto_register_agent)
- 				agent_unregister(dbus_conn, NULL);
- 		}
-+	} else if (!strcmp(interface, "org.bluez.GattService1")) {
-+		if (service_is_child(proxy))
-+			gatt_remove_service(proxy);
- 	}
- }
- 
+Do you have some evidence of this? I don't mind not being too strict
+while receiving but we need to document why we are doing these
+changes, and btw this perhaps makes my argument of enabling
+notification by default even stronger since if such devices really
+exists they might be notifying us since the beginning.
+
+The other problem I now see is that there is probably no way to rate
+limit the notification, because they are profile specific, so if you
+had a problem with too much traffic on D-Bus this may already happen
+even if we register the notification on demand.
+
+> This patch fixes this behavior so that bt_gatt_client_register_notify
+> immediately registers the callback and returns success for
+> characteristics with no CCC.
+> ---
+>  src/shared/gatt-client.c | 43 +++++++++++++++++++++++++------------------
+>  1 file changed, 25 insertions(+), 18 deletions(-)
+>
+> diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
+> index 5edb991..d0fc054 100644
+> --- a/src/shared/gatt-client.c
+> +++ b/src/shared/gatt-client.c
+> @@ -88,6 +88,7 @@ struct bt_gatt_client {
+>          * the remote peripheral.
+>          */
+>         unsigned int svc_chngd_ind_id;
+> +       bool svc_chngd_registered;
+>         struct queue *svc_chngd_queue;  /* Queued service changed events */
+>         bool in_svc_chngd;
+>
+> @@ -234,12 +235,6 @@ static struct notify_chrc *notify_chrc_create(struct bt_gatt_client *client,
+>                                                         &properties, NULL))
+>                         return NULL;
+>
+> -       /* Find the CCC characteristic */
+> -       ccc = NULL;
+> -       gatt_db_service_foreach_desc(attr, find_ccc, &ccc);
+> -       if (!ccc)
+> -               return NULL;
+> -
+>         chrc = new0(struct notify_chrc, 1);
+>         if (!chrc)
+>                 return NULL;
+> @@ -250,8 +245,17 @@ static struct notify_chrc *notify_chrc_create(struct bt_gatt_client *client,
+>                 return NULL;
+>         }
+>
+> +       /*
+> +        * Find the CCC characteristic. Some characteristics that allow
+> +        * notifications may not have a CCC descriptor. We treat these as
+> +        * automatically successful.
+> +        */
+> +       ccc = NULL;
+> +       gatt_db_service_foreach_desc(attr, find_ccc, &ccc);
+> +       if (ccc)
+> +               chrc->ccc_handle = gatt_db_attribute_get_handle(ccc);
+> +
+>         chrc->value_handle = value_handle;
+> -       chrc->ccc_handle = gatt_db_attribute_get_handle(ccc);
+>         chrc->properties = properties;
+>
+>         queue_push_tail(client->notify_chrcs, chrc);
+> @@ -1020,6 +1024,7 @@ static void service_changed_reregister_cb(uint16_t att_ecode, void *user_data)
+>                 util_debug(client->debug_callback, client->debug_data,
+>                         "Re-registered handler for \"Service Changed\" after "
+>                         "change in GATT service");
+> +               client->svc_chngd_registered = true;
+>                 return;
+>         }
+>
+> @@ -1089,6 +1094,7 @@ static void service_changed_complete(struct discovery_op *op, bool success,
+>         /* The GATT service was modified. Re-register the handler for
+>          * indications from the "Service Changed" characteristic.
+>          */
+> +       client->svc_chngd_registered = false;
+>         client->svc_chngd_ind_id = bt_gatt_client_register_notify(client,
+>                                         gatt_db_attribute_get_handle(attr),
+>                                         service_changed_reregister_cb,
+> @@ -1197,6 +1203,7 @@ static void service_changed_register_cb(uint16_t att_ecode, void *user_data)
+>                 goto done;
+>         }
+>
+> +       client->svc_chngd_registered = true;
+>         client->ready = true;
+>         success = true;
+>         util_debug(client->debug_callback, client->debug_data,
+> @@ -1239,13 +1246,16 @@ static void init_complete(struct discovery_op *op, bool success,
+>                                         service_changed_register_cb,
+>                                         service_changed_cb,
+>                                         client, NULL);
+> -       client->ready = false;
+> +
+> +       if (!client->svc_chngd_registered)
+> +               client->ready = false;
+>
+>         if (client->svc_chngd_ind_id)
+>                 return;
+>
+>         util_debug(client->debug_callback, client->debug_data,
+>                         "Failed to register handler for \"Service Changed\"");
+> +       success = false;
+>
+>  fail:
+>         util_debug(client->debug_callback, client->debug_data,
+> @@ -1423,18 +1433,17 @@ static void complete_unregister_notify(void *data)
+>          */
+>         if (notify_data->att_id) {
+>                 bt_att_cancel(notify_data->client->att, notify_data->att_id);
+> -               notify_data_unref(notify_data);
+> -               return;
+> +               goto done;
+>         }
+>
+> -       if (__sync_sub_and_fetch(&notify_data->chrc->notify_count, 1)) {
+> -               notify_data_unref(notify_data);
+> -               return;
+> -       }
+> +       if (__sync_sub_and_fetch(&notify_data->chrc->notify_count, 1) ||
+> +                                               !notify_data->chrc->ccc_handle)
+> +               goto done;
+>
+>         if (notify_data_write_ccc(notify_data, false, disable_ccc_callback))
+>                 return;
+>
+> +done:
+>         notify_data_unref(notify_data);
+>  }
+>
+> @@ -2571,9 +2580,7 @@ unsigned int bt_gatt_client_register_notify(struct bt_gatt_client *client,
+>         /* Add the handler to the bt_gatt_client's general list */
+>         queue_push_tail(client->notify_list, notify_data);
+>
+> -       /* Assign an ID to the handler and notify the caller that it was
+> -        * successfully registered.
+> -        */
+> +       /* Assign an ID to the handler. */
+>         if (client->next_reg_id < 1)
+>                 client->next_reg_id = 1;
+>
+> @@ -2591,7 +2598,7 @@ unsigned int bt_gatt_client_register_notify(struct bt_gatt_client *client,
+>         /*
+>          * If the ref count is not zero, then notifications are already enabled.
+>          */
+> -       if (chrc->notify_count > 0) {
+> +       if (chrc->notify_count > 0 || !chrc->ccc_handle) {
+>                 complete_notify_request(notify_data);
+>                 return notify_data->id;
+>         }
+> --
+> 2.2.0.rc0.207.ga3a616c
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+
+
 -- 
-2.1.0
-
+Luiz Augusto von Dentz
