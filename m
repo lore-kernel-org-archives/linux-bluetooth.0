@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFC 9/9] client: Add write command
-Date: Wed,  4 Feb 2015 17:33:19 +0200
-Message-Id: <1423063999-15734-10-git-send-email-luiz.dentz@gmail.com>
+Subject: [RFC 1/9] client: Add support for GattService1
+Date: Wed,  4 Feb 2015 17:33:11 +0200
+Message-Id: <1423063999-15734-2-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1423063999-15734-1-git-send-email-luiz.dentz@gmail.com>
 References: <1423063999-15734-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,156 +11,211 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This command can be used to write attributes, it only works if an
-attribute has been selected with select-attribute.
-
-The data argument should be passed hexdump format, %02x separated by
-spaces, which is the same format used by read command.
+This add support for GattService1 interface detection and prints when
+they are added or removed
 ---
- client/gatt.c | 80 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- client/gatt.h |  1 +
- client/main.c | 17 +++++++++++++
- 3 files changed, 98 insertions(+)
+ Makefile.tools                           |  1 +
+ client/gatt.c                            | 90 ++++++++++++++++++++++++++++++++
+ profiles/input/server.h => client/gatt.h |  6 +--
+ client/main.c                            | 30 +++++++++++
+ 4 files changed, 124 insertions(+), 3 deletions(-)
+ create mode 100644 client/gatt.c
+ copy profiles/input/server.h => client/gatt.h (84%)
 
+diff --git a/Makefile.tools b/Makefile.tools
+index e42e42d..64da54f 100644
+--- a/Makefile.tools
++++ b/Makefile.tools
+@@ -5,6 +5,7 @@ bin_PROGRAMS += client/bluetoothctl
+ client_bluetoothctl_SOURCES = client/main.c \
+ 					client/display.h client/display.c \
+ 					client/agent.h client/agent.c \
++					client/gatt.h client/gatt.c \
+ 					monitor/uuid.h monitor/uuid.c
+ client_bluetoothctl_LDADD = gdbus/libgdbus-internal.la @GLIB_LIBS@ @DBUS_LIBS@ \
+ 				-lreadline
 diff --git a/client/gatt.c b/client/gatt.c
-index 56a9241..35150df 100644
---- a/client/gatt.c
+new file mode 100644
+index 0000000..7de5c7b
+--- /dev/null
 +++ b/client/gatt.c
-@@ -30,6 +30,7 @@
- #include <unistd.h>
- #include <stdlib.h>
- #include <stdbool.h>
-+#include <sys/uio.h>
- 
- #include <readline/readline.h>
- #include <readline/history.h>
-@@ -378,3 +379,82 @@ void gatt_read_attribute(GDBusProxy *proxy)
- 	rl_printf("Unable to read attribute %s\n",
- 						g_dbus_proxy_get_path(proxy));
- }
+@@ -0,0 +1,90 @@
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2014  Intel Corporation. All rights reserved.
++ *
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program; if not, write to the Free Software
++ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ *
++ */
 +
-+static void write_reply(DBusMessage *message, void *user_data)
++#ifdef HAVE_CONFIG_H
++#include <config.h>
++#endif
++
++#include <stdio.h>
++#include <errno.h>
++#include <unistd.h>
++#include <stdlib.h>
++#include <stdbool.h>
++
++#include <readline/readline.h>
++#include <readline/history.h>
++#include <glib.h>
++#include <gdbus.h>
++
++#include "monitor/uuid.h"
++#include "display.h"
++#include "gatt.h"
++
++/* String display constants */
++#define COLORED_NEW	COLOR_GREEN "NEW" COLOR_OFF
++#define COLORED_CHG	COLOR_YELLOW "CHG" COLOR_OFF
++#define COLORED_DEL	COLOR_RED "DEL" COLOR_OFF
++
++static GList *services;
++
++static void print_service(GDBusProxy *proxy, const char *description)
 +{
-+	DBusError error;
++	DBusMessageIter iter;
++	const char *uuid, *text;
++	dbus_bool_t primary;
 +
-+	dbus_error_init(&error);
-+
-+	if (dbus_set_error_from_message(&error, message) == TRUE) {
-+		rl_printf("Failed to write: %s\n", error.name);
-+		dbus_error_free(&error);
++	if (g_dbus_proxy_get_property(proxy, "UUID", &iter) == FALSE)
 +		return;
-+	}
-+}
 +
-+static void write_setup(DBusMessageIter *iter, void *user_data)
-+{
-+	struct iovec *iov = user_data;
-+	DBusMessageIter array;
++	dbus_message_iter_get_basic(&iter, &uuid);
 +
-+	dbus_message_iter_open_container(iter, DBUS_TYPE_ARRAY, "y", &array);
-+	dbus_message_iter_append_fixed_array(&array, DBUS_TYPE_BYTE,
-+						&iov->iov_base, iov->iov_len);
-+	dbus_message_iter_close_container(iter, &array);
-+}
-+
-+static void write_attribute(GDBusProxy *proxy, char *arg)
-+{
-+	struct iovec iov;
-+	uint8_t value[512];
-+	char *entry;
-+	int i;
-+
-+	for (i = 0; (entry = strsep(&arg, " \t")) != NULL; i++) {
-+		long int val;
-+		char *endptr = NULL;
-+
-+		if (*entry == '\0')
-+			continue;
-+
-+		if (i > 512) {
-+			rl_printf("Too much data\n");
-+			return;
-+		}
-+
-+		val = strtol(entry, &endptr, 0);
-+		if (!endptr || *endptr != '\0' || val > UINT8_MAX) {
-+			rl_printf("Invalid value at index %d\n", i);
-+			return;
-+		}
-+
-+		value[i] = val;
-+	}
-+
-+	iov.iov_base = value;
-+	iov.iov_len = i;
-+
-+	if (g_dbus_proxy_method_call(proxy, "WriteValue", write_setup,
-+					write_reply, &iov, NULL) == FALSE) {
-+		rl_printf("Failed to write\n");
++	if (g_dbus_proxy_get_property(proxy, "Primary", &iter) == FALSE)
 +		return;
-+	}
 +
-+	rl_printf("Attempting to write %s\n", g_dbus_proxy_get_path(proxy));
++	dbus_message_iter_get_basic(&iter, &primary);
++
++	text = uuidstr_to_str(uuid);
++	if (!text)
++		text = uuid;
++
++	rl_printf("%s%s%sService %s %s %s\n",
++				description ? "[" : "",
++				description ? : "",
++				description ? "] " : "",
++				g_dbus_proxy_get_path(proxy),
++				text, primary ? "(Primary)" : "(Secondary)");
 +}
 +
-+void gatt_write_attribute(GDBusProxy *proxy, const char *arg)
++void gatt_add_service(GDBusProxy *proxy)
 +{
-+	const char *iface;
++	services = g_list_append(services, proxy);
 +
-+	iface = g_dbus_proxy_get_interface(proxy);
-+	if (!strcmp(iface, "org.bluez.GattCharacteristic1") ||
-+				!strcmp(iface, "org.bluez.GattDescriptor1")) {
-+		write_attribute(proxy, (char *) arg);
-+		return;
-+	}
-+
-+	rl_printf("Unable to write attribute %s\n",
-+						g_dbus_proxy_get_path(proxy));
++	print_service(proxy, COLORED_NEW);
 +}
-diff --git a/client/gatt.h b/client/gatt.h
-index ac18a2a..b99f0f0 100644
---- a/client/gatt.h
++
++void gatt_remove_service(GDBusProxy *proxy)
++{
++	services = g_list_remove(services, proxy);
++
++	print_service(proxy, COLORED_DEL);
++}
+diff --git a/profiles/input/server.h b/client/gatt.h
+similarity index 84%
+copy from profiles/input/server.h
+copy to client/gatt.h
+index 74159bb..f049039 100644
+--- a/profiles/input/server.h
 +++ b/client/gatt.h
-@@ -35,3 +35,4 @@ GDBusProxy *gatt_select_attribute(const char *path);
- char *gatt_attribute_generator(const char *text, int state);
+@@ -2,7 +2,7 @@
+  *
+  *  BlueZ - Bluetooth protocol stack for Linux
+  *
+- *  Copyright (C) 2004-2010  Marcel Holtmann <marcel@holtmann.org>
++ *  Copyright (C) 2014  Intel Corporation. All rights reserved.
+  *
+  *
+  *  This program is free software; you can redistribute it and/or modify
+@@ -21,5 +21,5 @@
+  *
+  */
  
- void gatt_read_attribute(GDBusProxy *proxy);
-+void gatt_write_attribute(GDBusProxy *proxy, const char *arg);
+-int server_start(const bdaddr_t *src);
+-void server_stop(const bdaddr_t *src);
++void gatt_add_service(GDBusProxy *proxy);
++void gatt_remove_service(GDBusProxy *proxy);
 diff --git a/client/main.c b/client/main.c
-index e0f35e2..7184bde 100644
+index ea80ee7..ab644ba 100644
 --- a/client/main.c
 +++ b/client/main.c
-@@ -1222,6 +1222,21 @@ static void cmd_read(const char *arg)
- 	gatt_read_attribute(default_attr);
+@@ -41,6 +41,7 @@
+ #include "monitor/uuid.h"
+ #include "agent.h"
+ #include "display.h"
++#include "gatt.h"
+ 
+ /* String display constants */
+ #define COLORED_NEW	COLOR_GREEN "NEW" COLOR_OFF
+@@ -284,6 +285,29 @@ static gboolean device_is_child(GDBusProxy *device, GDBusProxy *master)
+ 	return FALSE;
  }
  
-+static void cmd_write(const char *arg)
++static gboolean service_is_child(GDBusProxy *service)
 +{
-+	if (!arg || !strlen(arg)) {
-+		rl_printf("Missing data argument\n");
-+		return;
++	GList *l;
++	DBusMessageIter iter;
++	const char *device, *path;
++
++	if (g_dbus_proxy_get_property(service, "Device", &iter) == FALSE)
++		return FALSE;
++
++	dbus_message_iter_get_basic(&iter, &device);
++
++	for (l = dev_list; l; l = g_list_next(l)) {
++		GDBusProxy *proxy = l->data;
++
++		path = g_dbus_proxy_get_path(proxy);
++
++		if (!strcmp(path, device))
++			return TRUE;
 +	}
 +
-+	if (!default_attr) {
-+		rl_printf("No attribute selected\n");
-+		return;
-+	}
-+
-+	gatt_write_attribute(default_attr, arg);
++	return FALSE;
 +}
 +
- static void cmd_version(const char *arg)
+ static void proxy_added(GDBusProxy *proxy, void *user_data)
  {
- 	rl_printf("Version %s\n", VERSION);
-@@ -1350,6 +1365,8 @@ static const struct {
- 	{ "select-attribute", "<attribute>",  cmd_select_attribute,
- 				"Select attribute", attribute_generator },
- 	{ "read",         NULL,       cmd_read, "Read attribute value" },
-+	{ "write",        "<data=[xx xx ...]>", cmd_write,
-+						"Write attribute value" },
- 	{ "version",      NULL,       cmd_version, "Display version" },
- 	{ "quit",         NULL,       cmd_quit, "Quit program" },
- 	{ "exit",         NULL,       cmd_quit },
+ 	const char *interface;
+@@ -311,6 +335,9 @@ static void proxy_added(GDBusProxy *proxy, void *user_data)
+ 				agent_register(dbus_conn, agent_manager,
+ 							auto_register_agent);
+ 		}
++	} else if (!strcmp(interface, "org.bluez.GattService1")) {
++		if (service_is_child(proxy))
++			gatt_add_service(proxy);
+ 	}
+ }
+ 
+@@ -343,6 +370,9 @@ static void proxy_removed(GDBusProxy *proxy, void *user_data)
+ 			if (auto_register_agent)
+ 				agent_unregister(dbus_conn, NULL);
+ 		}
++	} else if (!strcmp(interface, "org.bluez.GattService1")) {
++		if (service_is_child(proxy))
++			gatt_remove_service(proxy);
+ 	}
+ }
+ 
 -- 
 2.1.0
 
