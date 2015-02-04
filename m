@@ -1,98 +1,277 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1422596768-17058-1-git-send-email-lukasz.rymanowski@tieto.com>
-References: <1422596768-17058-1-git-send-email-lukasz.rymanowski@tieto.com>
-Date: Wed, 4 Feb 2015 10:30:36 +0100
-Message-ID: <CANLBX6DaN=F1f3UcAxKE85r_NneFzUBD=sKkjARL9vpO7CV-Rg@mail.gmail.com>
-Subject: Re: [PATCH 1/2] android/gatt: Fix Find By Type request
-From: Jakub Tyszkowski <tyszja@gmail.com>
-To: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
+From: Sagar Nageshmurthy <s.nageshmurt@samsung.com>
+To: linux-bluetooth@vger.kernel.org
+References: <1421822018-24800-1-git-send-email-s.nageshmurt@samsung.com>
+In-reply-to: <1421822018-24800-1-git-send-email-s.nageshmurt@samsung.com>
+Subject: RE: [PATCH v1 1/1] media: Add properties watch for MPRIS Playlists
+ interface
+Date: Wed, 04 Feb 2015 15:00:50 +0530
+Message-id: <004901d0405d$46fc7230$d4f55690$@samsung.com>
+MIME-version: 1.0
+Content-type: text/plain; charset=us-ascii
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Lukasz,
-
-2015-01-30 6:46 GMT+01:00 Lukasz Rymanowski <lukasz.rymanowski@tieto.com>:
-> With this patch GATT will correctly response with attribute not found if
-> there is no attributes matching.
->
-> Issue found and fix tested on UPF50
-> ---
->  android/gatt.c | 7 ++++++-
->  1 file changed, 6 insertions(+), 1 deletion(-)
->
-> diff --git a/android/gatt.c b/android/gatt.c
-> index 466c1ea..3b0b81d 100644
-> --- a/android/gatt.c
-> +++ b/android/gatt.c
-> @@ -6258,6 +6258,7 @@ struct find_by_type_request_data {
->         uint8_t *search_value;
->         size_t search_vlen;
->         uint8_t error;
-> +       bool found;
->  };
->
->  static void find_by_type_request_cb(struct gatt_db_attribute *attrib,
-> @@ -6289,6 +6290,9 @@ static void find_by_type_request_cb(struct gatt_db_attribute *attrib,
->                                                         find_data->search_vlen);
->
->         queue_push_tail(find_data->device->pending_requests, request_data);
-> +
-> +       if (!find_data->found)
-> +               find_data->found = true;
->  }
->
->  static uint8_t find_by_type_request(const uint8_t *cmd, uint16_t cmd_len,
-> @@ -6315,11 +6319,12 @@ static uint8_t find_by_type_request(const uint8_t *cmd, uint16_t cmd_len,
->         data.search_vlen = search_vlen;
->         data.search_value = search_value;
->         data.device = device;
-> +       data.found = false;
->
->         gatt_db_find_by_type(gatt_db, start, end, &uuid,
->                                                 find_by_type_request_cb, &data);
->
-> -       if (data.error == ATT_ECODE_ATTR_NOT_FOUND) {
-> +       if (!data.found) {
->                 size_t mtu;
->                 uint8_t *rsp = g_attrib_get_buffer(device->attrib, &mtu);
->
-> --
-> 1.8.4
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+Ping.
 
 
-Maybe this issue can be solved like this:
+-----Original Message-----
+From: Sagar Nageshmurthy [mailto:s.nageshmurt@samsung.com] 
+Sent: Wednesday, January 21, 2015 12:04 PM
+To: linux-bluetooth@vger.kernel.org
+Cc: Sagar Nageshmurthy
+Subject: [PATCH v1 1/1] media: Add properties watch for MPRIS Playlists
+interface
 
-@@ -6274,17 +6274,9 @@ static uint8_t find_by_type_request(const
-uint8_t *cmd, uint16_t cmd_len,
-        gatt_db_find_by_type(gatt_db, start, end, &uuid,
-                                                find_by_type_request_cb, &data);
+Parse below MediaPlayer2.Playlists properties according to MPRIS spec:
+- PlaylistCount
+- Orderings
+- ActivePlaylist
+---
+v1: Remove compiler warnings
 
--       if (data.error == ATT_ECODE_ATTR_NOT_FOUND) {
--               size_t mtu;
--               uint8_t *rsp = g_attrib_get_buffer(device->attrib, &mtu);
--
--               len = enc_error_resp(ATT_OP_FIND_BY_TYPE_REQ, start,
--                                       ATT_ECODE_ATTR_NOT_FOUND, rsp, mtu);
--               g_attrib_send(device->attrib, 0, rsp, len, NULL, NULL, NULL);
--               return 0;
--       }
--
--       if (!data.error)
-+       if (queue_isempty(device->pending_requests))
-+               data.error = ATT_ECODE_ATTR_NOT_FOUND;
-+       else
-                process_dev_pending_requests(device, ATT_OP_FIND_BY_TYPE_REQ);
+ profiles/audio/media.c |  183
+++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 183 insertions(+)
 
-        return data.error;
+diff --git a/profiles/audio/media.c b/profiles/audio/media.c index
+ef7b910..92907a9 100644
+--- a/profiles/audio/media.c
++++ b/profiles/audio/media.c
+@@ -53,6 +53,7 @@
+ #define MEDIA_INTERFACE "org.bluez.Media1"
+ #define MEDIA_ENDPOINT_INTERFACE "org.bluez.MediaEndpoint1"
+ #define MEDIA_PLAYER_INTERFACE "org.mpris.MediaPlayer2.Player"
++#define MEDIA_PLAYER_PLAYLISTS_INTERFACE "org.mpris.MediaPlayer2.Playlists"
+ 
+ #define REQUEST_TIMEOUT (3 * 1000)		/* 3 seconds */
+ 
+@@ -96,6 +97,7 @@ struct media_player {
+ 	GHashTable		*track;		/* Player current track */
+ 	guint			watch;
+ 	guint			properties_watch;
++	guint			playlists_watch;
+ 	guint			seek_watch;
+ 	char			*status;
+ 	uint32_t		position;
+@@ -949,6 +951,7 @@ static void media_player_free(gpointer data)
+ 
+ 	g_dbus_remove_watch(conn, mp->watch);
+ 	g_dbus_remove_watch(conn, mp->properties_watch);
++	g_dbus_remove_watch(conn, mp->playlists_watch);
+ 	g_dbus_remove_watch(conn, mp->seek_watch);
+ 
+ 	if (mp->track)
+@@ -1717,6 +1720,182 @@ static gboolean position_changed(DBusConnection
+*connection, DBusMessage *msg,
+ 	return TRUE;
+ }
+ 
++static gboolean set_playlistcount(struct media_player *mp,
++							DBusMessageIter
+*iter)
++{
++	uint32_t playlist_count;
++
++	if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_UINT32)
++		return FALSE;
++
++	dbus_message_iter_get_basic(iter, &playlist_count);
++
++	/* TODO: Add a struct member to hold playlist info */
++	DBG("Playlist Count = %d", playlist_count);
++
++	return TRUE;
++}
++
++static gboolean set_orderings(struct media_player *mp, DBusMessageIter 
++*iter) {
++	DBusMessageIter entry;
++	int ctype;
++
++	ctype = dbus_message_iter_get_arg_type(iter);
++	if (ctype != DBUS_TYPE_ARRAY)
++		return FALSE;
++
++	dbus_message_iter_recurse(iter, &entry);
++
++	while ((ctype = dbus_message_iter_get_arg_type(&entry)) !=
++							DBUS_TYPE_INVALID) {
++		const char *ordering;
++
++		if (ctype != DBUS_TYPE_STRING)
++			return FALSE;
++
++		dbus_message_iter_get_basic(&entry, &ordering);
++
++		/* TODO: Add a struct member to hold playlist info */
++		DBG("%s", ordering);
++
++		dbus_message_iter_next(&entry);
++	}
++
++	return TRUE;
++}
++
++static gboolean set_activeplaylist(struct media_player *mp,
++							DBusMessageIter
+*iter)
++{
++	dbus_bool_t value;
++	char *playlist_id = NULL;
++	char *playlist_name = NULL;
++	char *playlist_icon = NULL;
++	DBusMessageIter playlist_iter;
++	DBusMessageIter entry;
++
++	if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_STRUCT)
++		return FALSE;
++
++	dbus_message_iter_recurse(iter, &entry);
++
++	dbus_message_iter_get_basic(&entry, &value);
++	DBG("Active %s", value ? "TRUE" : "FALSE");
++
++	if (!value) {
++		/* TODO: Update info regarding no active playlist */
++		return TRUE;
++	}
++
++	dbus_message_iter_next(&entry);
++	if (dbus_message_iter_get_arg_type(&entry) != DBUS_TYPE_STRUCT)
++		return FALSE;
++
++	dbus_message_iter_recurse(&entry, &playlist_iter);
++	if (dbus_message_iter_get_arg_type(&playlist_iter) !=
++
+DBUS_TYPE_OBJECT_PATH)
++		return FALSE;
++
++	dbus_message_iter_get_basic(&playlist_iter, &playlist_id);
++
++	/* TODO: Add a struct member to hold playlist info */
++	DBG("Playlist Id %s", playlist_id);
++
++	dbus_message_iter_next(&playlist_iter);
++	if (dbus_message_iter_get_arg_type(&playlist_iter) !=
+DBUS_TYPE_STRING)
++		return FALSE;
++
++	dbus_message_iter_get_basic(&playlist_iter, &playlist_name);
++	DBG("Playlist Name %s", playlist_name);
++
++	dbus_message_iter_next(&playlist_iter);
++	if (dbus_message_iter_get_arg_type(&playlist_iter) !=
+DBUS_TYPE_STRING)
++		return FALSE;
++
++	dbus_message_iter_get_basic(&playlist_iter, &playlist_icon);
++	DBG("Playlist Icon %s", playlist_icon);
++
++	return TRUE;
++}
++
++static gboolean set_playlist_property(struct media_player *mp, const char
+*key,
++							DBusMessageIter
+*entry)
++{
++	DBusMessageIter var;
++
++	if (dbus_message_iter_get_arg_type(entry) != DBUS_TYPE_VARIANT)
++		return FALSE;
++
++	dbus_message_iter_recurse(entry, &var);
++
++	if (strcasecmp(key, "PlaylistCount") == 0)
++		return set_playlistcount(mp, &var);
++
++	if (strcasecmp(key, "Orderings") == 0)
++		return set_orderings(mp, &var);
++
++	if (strcasecmp(key, "ActivePlaylist") == 0)
++		return set_activeplaylist(mp, &var);
++
++	DBG("%s not supported, ignoring", key);
++
++	return TRUE;
++}
++
++static gboolean parse_playlists_properties(struct media_player *mp,
++							DBusMessageIter
+*iter)
++{
++	DBusMessageIter dict;
++	int ctype;
++
++	ctype = dbus_message_iter_get_arg_type(iter);
++	if (ctype != DBUS_TYPE_ARRAY)
++		return FALSE;
++
++	dbus_message_iter_recurse(iter, &dict);
++
++	while ((ctype = dbus_message_iter_get_arg_type(&dict)) !=
++							DBUS_TYPE_INVALID) {
++		DBusMessageIter entry;
++		const char *key;
++
++		if (ctype != DBUS_TYPE_DICT_ENTRY)
++			return FALSE;
++
++		dbus_message_iter_recurse(&dict, &entry);
++		if (dbus_message_iter_get_arg_type(&entry) !=
+DBUS_TYPE_STRING)
++			return FALSE;
++
++		dbus_message_iter_get_basic(&entry, &key);
++		dbus_message_iter_next(&entry);
++
++		if (set_playlist_property(mp, key, &entry) == FALSE)
++			return FALSE;
++
++		dbus_message_iter_next(&dict);
++	}
++
++	return TRUE;
++}
++
++static gboolean playlists_properties_changed(DBusConnection *connection,
++					DBusMessage *msg, void *user_data) {
++	struct media_player *mp = user_data;
++	DBusMessageIter iter;
++
++	DBG("sender=%s path=%s", mp->sender, mp->path);
++
++	dbus_message_iter_init(msg, &iter);
++
++	dbus_message_iter_next(&iter);
++
++	parse_playlists_properties(mp, &iter);
++
++	return TRUE;
++}
++
+ static struct media_player *media_player_create(struct media_adapter
+*adapter,
+ 						const char *sender,
+ 						const char *path,
+@@ -1738,6 +1917,10 @@ static struct media_player
+*media_player_create(struct media_adapter *adapter,
+ 						path,
+MEDIA_PLAYER_INTERFACE,
+ 						properties_changed,
+ 						mp, NULL);
++	mp->playlists_watch = g_dbus_add_properties_watch(conn, sender,
+path,
++
+MEDIA_PLAYER_PLAYLISTS_INTERFACE,
++
+playlists_properties_changed,
++						mp, NULL);
+ 	mp->seek_watch = g_dbus_add_signal_watch(conn, sender,
+ 						path,
+MEDIA_PLAYER_INTERFACE,
+ 						"Seeked", position_changed,
+--
+1.7.9.5
 
-
-Regards,
-Jakub Tyszkowski
