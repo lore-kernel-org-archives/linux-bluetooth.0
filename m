@@ -3,12 +3,12 @@ From: Jakub Pawlowski <jpawlowski@google.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Jakub Pawlowski <jpawlowski@google.com>
 Subject: [PATCH] shared/gatt-client: fix overflow bug in find_service_for_handle
-Date: Tue,  3 Feb 2015 18:16:25 -0800
-Message-Id: <1423016185-321-1-git-send-email-jpawlowski@google.com>
+Date: Tue,  3 Feb 2015 18:15:42 -0800
+Message-Id: <1423016142-32691-1-git-send-email-jpawlowski@google.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-find_service_for_handle was manually computing end handle. It was
+find_service_for_hanle was manually computing end handle. It was
 causing overflow for last service in range, that always ends at 0xFFFF.
 That caused service for handle not being found.
 
