@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFC 2/9] client: Add support for GattCharacteristic1
-Date: Wed,  4 Feb 2015 17:33:12 +0200
-Message-Id: <1423063999-15734-3-git-send-email-luiz.dentz@gmail.com>
+Subject: [RFC 5/9] client: Add command list-attributes
+Date: Wed,  4 Feb 2015 17:33:15 +0200
+Message-Id: <1423063999-15734-6-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1423063999-15734-1-git-send-email-luiz.dentz@gmail.com>
 References: <1423063999-15734-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,128 +11,92 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This add support for GattCharacteristici1 interface detection and
-prints when they are added or removed
+This command can be used to list service attributes of a device.
 ---
- client/gatt.c | 66 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- client/gatt.h |  3 +++
- client/main.c |  4 ++++
- 3 files changed, 73 insertions(+)
+ client/gatt.c | 30 ++++++++++++++++++++++++++++++
+ client/gatt.h |  2 ++
+ client/main.c | 13 +++++++++++++
+ 3 files changed, 45 insertions(+)
 
 diff --git a/client/gatt.c b/client/gatt.c
-index 7de5c7b..8fd113f 100644
+index 47785a8..723b6d6 100644
 --- a/client/gatt.c
 +++ b/client/gatt.c
-@@ -46,6 +46,7 @@
- #define COLORED_DEL	COLOR_RED "DEL" COLOR_OFF
+@@ -220,3 +220,33 @@ void gatt_remove_descriptor(GDBusProxy *proxy)
  
- static GList *services;
-+static GList *characteristics;
- 
- static void print_service(GDBusProxy *proxy, const char *description)
- {
-@@ -88,3 +89,68 @@ void gatt_remove_service(GDBusProxy *proxy)
- 
- 	print_service(proxy, COLORED_DEL);
+ 	print_descriptor(proxy, COLORED_DEL);
  }
 +
-+static void print_characteristic(GDBusProxy *proxy, const char *description)
-+{
-+	DBusMessageIter iter;
-+	const char *uuid, *text;
-+
-+	if (g_dbus_proxy_get_property(proxy, "UUID", &iter) == FALSE)
-+		return;
-+
-+	dbus_message_iter_get_basic(&iter, &uuid);
-+
-+	text = uuidstr_to_str(uuid);
-+	if (!text)
-+		text = uuid;
-+
-+	rl_printf("%s%s%sCharacteristic %s %s\n",
-+				description ? "[" : "",
-+				description ? : "",
-+				description ? "] " : "",
-+				g_dbus_proxy_get_path(proxy),
-+				text);
-+}
-+
-+static gboolean characteristic_is_child(GDBusProxy *characteristic)
++static void list_attributes(const char *path, GList *source)
 +{
 +	GList *l;
-+	DBusMessageIter iter;
-+	const char *service, *path;
 +
-+	if (!g_dbus_proxy_get_property(characteristic, "Service", &iter))
-+		return FALSE;
-+
-+	dbus_message_iter_get_basic(&iter, &service);
-+
-+	for (l = services; l; l = g_list_next(l)) {
++	for (l = source; l; l = g_list_next(l)) {
 +		GDBusProxy *proxy = l->data;
++		const char *proxy_path;
 +
-+		path = g_dbus_proxy_get_path(proxy);
++		proxy_path = g_dbus_proxy_get_path(proxy);
 +
-+		if (!strcmp(path, service))
-+			return TRUE;
++		if (!g_str_has_prefix(proxy_path, path))
++			continue;
++
++		if (source == services)
++			print_service(proxy, NULL);
++		else if (source == characteristics)
++			print_characteristic(proxy, NULL);
++		else if (source == descriptors)
++			print_descriptor(proxy, NULL);
++
++		list_attributes(proxy_path, source == services ? characteristics
++								: descriptors);
 +	}
-+
-+	return FALSE;
 +}
 +
-+void gatt_add_characteristic(GDBusProxy *proxy)
++void gatt_list_attributes(const char *path)
 +{
-+	if (!characteristic_is_child(proxy))
-+		return;
-+
-+	characteristics = g_list_append(characteristics, proxy);
-+
-+	print_characteristic(proxy, COLORED_NEW);
-+}
-+
-+void gatt_remove_characteristic(GDBusProxy *proxy)
-+{
-+	if (!characteristic_is_child(proxy))
-+		return;
-+
-+	characteristics = g_list_remove(characteristics, proxy);
-+
-+	print_characteristic(proxy, COLORED_DEL);
++	list_attributes(path, services);
 +}
 diff --git a/client/gatt.h b/client/gatt.h
-index f049039..924c4d9 100644
+index 8b30668..5785073 100644
 --- a/client/gatt.h
 +++ b/client/gatt.h
-@@ -23,3 +23,6 @@
+@@ -29,3 +29,5 @@ void gatt_remove_characteristic(GDBusProxy *proxy);
  
- void gatt_add_service(GDBusProxy *proxy);
- void gatt_remove_service(GDBusProxy *proxy);
+ void gatt_add_descriptor(GDBusProxy *proxy);
+ void gatt_remove_descriptor(GDBusProxy *proxy);
 +
-+void gatt_add_characteristic(GDBusProxy *proxy);
-+void gatt_remove_characteristic(GDBusProxy *proxy);
++void gatt_list_attributes(const char *device);
 diff --git a/client/main.c b/client/main.c
-index ab644ba..3db18af 100644
+index 72223d5..7cdb19a 100644
 --- a/client/main.c
 +++ b/client/main.c
-@@ -338,6 +338,8 @@ static void proxy_added(GDBusProxy *proxy, void *user_data)
- 	} else if (!strcmp(interface, "org.bluez.GattService1")) {
- 		if (service_is_child(proxy))
- 			gatt_add_service(proxy);
-+	} else if (!strcmp(interface, "org.bluez.GattCharacteristic1")) {
-+		gatt_add_characteristic(proxy);
- 	}
+@@ -1150,6 +1150,17 @@ static void cmd_disconn(const char *arg)
+ 	rl_printf("Attempting to disconnect from %s\n", arg);
  }
  
-@@ -373,6 +375,8 @@ static void proxy_removed(GDBusProxy *proxy, void *user_data)
- 	} else if (!strcmp(interface, "org.bluez.GattService1")) {
- 		if (service_is_child(proxy))
- 			gatt_remove_service(proxy);
-+	} else if (!strcmp(interface, "org.bluez.GattCharacteristic1")) {
-+		gatt_remove_characteristic(proxy);
- 	}
- }
- 
++static void cmd_list_attributes(const char *arg)
++{
++	GDBusProxy *proxy;
++
++	proxy = find_device(arg);
++	if (!proxy)
++		return;
++
++	gatt_list_attributes(g_dbus_proxy_get_path(proxy));
++}
++
+ static void cmd_version(const char *arg)
+ {
+ 	rl_printf("Version %s\n", VERSION);
+@@ -1268,6 +1279,8 @@ static const struct {
+ 							dev_generator },
+ 	{ "disconnect",   "[dev]",    cmd_disconn, "Disconnect device",
+ 							dev_generator },
++	{ "list-attributes", "[dev]", cmd_list_attributes, "List attributes",
++							dev_generator },
+ 	{ "version",      NULL,       cmd_version, "Display version" },
+ 	{ "quit",         NULL,       cmd_quit, "Quit program" },
+ 	{ "exit",         NULL,       cmd_quit },
 -- 
 2.1.0
 
