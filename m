@@ -2,42 +2,44 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH 1/3] shared/hfp: Fix calling callback without result_pending set
-Date: Thu,  5 Feb 2015 16:07:09 +0100
-Message-Id: <1423148831-25507-1-git-send-email-szymon.janc@tieto.com>
+Subject: [PATCH 3/3] shared/hfp: Fix not processing input from hfp_gw_send_error
+Date: Thu,  5 Feb 2015 16:07:11 +0100
+Message-Id: <1423148831-25507-3-git-send-email-szymon.janc@tieto.com>
+In-Reply-To: <1423148831-25507-1-git-send-email-szymon.janc@tieto.com>
+References: <1423148831-25507-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Always set pending_result before calling command callback.
+If for some reason there is more than one AT command in the ring
+buffer we should make sure that after upper layer sends error, AT
+parser gets back to reading data from ring buffer.
 
-If response will be send from callback pending_result will be
-cleared by either hfp_gw_send_result or hfp_gw_send_error.
+Same is already done in hfp_gw_send_result() and we should handle
+this in error response as well.
 ---
- src/shared/hfp.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ src/shared/hfp.c | 9 ++++++++-
+ 1 file changed, 8 insertions(+), 1 deletion(-)
 
 diff --git a/src/shared/hfp.c b/src/shared/hfp.c
-index 0ce3121..ea6494d 100644
+index 90e17c7..74ee979 100644
 --- a/src/shared/hfp.c
 +++ b/src/shared/hfp.c
-@@ -183,8 +183,8 @@ static void handle_unknown_at_command(struct hfp_gw *hfp,
- 							const char *data)
- {
- 	if (hfp->command_callback) {
--		hfp->command_callback(data, hfp->command_data);
- 		hfp->result_pending = true;
-+		hfp->command_callback(data, hfp->command_data);
- 	} else {
- 		hfp_gw_send_result(hfp, HFP_RESULT_ERROR);
- 	}
-@@ -263,6 +263,7 @@ done:
- 		return true;
- 	}
+@@ -778,7 +778,14 @@ bool hfp_gw_send_error(struct hfp_gw *hfp, enum hfp_error error)
  
-+	hfp->result_pending = true;
- 	handler->callback(&context, type, handler->user_data);
+ 	wakeup_writer(hfp);
+ 
+-	hfp->result_pending = false;
++	/*
++	 * There might be already something to read in the ring buffer.
++	 * If so, let's read it.
++	 */
++	if (hfp->result_pending) {
++		hfp->result_pending = false;
++		process_input(hfp);
++	}
  
  	return true;
+ }
 -- 
 1.9.1
 
