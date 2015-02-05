@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Johan Hedberg <johan.hedberg@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 5/7] Bluetooth: Remove unused hci_req_pending() function
-Date: Thu,  5 Feb 2015 11:18:23 +0200
-Message-Id: <1423127905-27281-6-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH 6/7] Bluetooth: Make hci_get_cmd_complete() function public
+Date: Thu,  5 Feb 2015 11:18:24 +0200
+Message-Id: <1423127905-27281-7-git-send-email-johan.hedberg@gmail.com>
 In-Reply-To: <1423127905-27281-1-git-send-email-johan.hedberg@gmail.com>
 References: <1423127905-27281-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,44 +11,47 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-The hci_req_pending() function has no users anymore, so simply remove
-it.
+Now that the HCI request API is able to pass the final skb to the
+callback it will be useful to have a helper function to dig out the
+actual cmd_complete parameters from it. We already have such a function
+in the form of hci_get_cmd_complete() and this patch makes it public for
+other code besides hci_core.c to use.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- include/net/bluetooth/hci_core.h | 2 --
- net/bluetooth/hci_core.c         | 5 -----
- 2 files changed, 7 deletions(-)
+ include/net/bluetooth/hci_core.h | 3 +++
+ net/bluetooth/hci_core.c         | 4 ++--
+ 2 files changed, 5 insertions(+), 2 deletions(-)
 
 diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index ed2220e607e4..7026885aefaf 100644
+index 7026885aefaf..1b18b1d6a299 100644
 --- a/include/net/bluetooth/hci_core.h
 +++ b/include/net/bluetooth/hci_core.h
-@@ -1296,8 +1296,6 @@ static inline int hci_check_conn_params(u16 min, u16 max, u16 latency,
- int hci_register_cb(struct hci_cb *hcb);
- int hci_unregister_cb(struct hci_cb *hcb);
+@@ -1308,6 +1308,9 @@ void hci_send_sco(struct hci_conn *conn, struct sk_buff *skb);
  
--bool hci_req_pending(struct hci_dev *hdev);
--
- struct sk_buff *__hci_cmd_sync(struct hci_dev *hdev, u16 opcode, u32 plen,
- 			       const void *param, u32 timeout);
- struct sk_buff *__hci_cmd_sync_ev(struct hci_dev *hdev, u16 opcode, u32 plen,
+ void *hci_sent_cmd_data(struct hci_dev *hdev, __u16 opcode);
+ 
++struct sk_buff *hci_get_cmd_complete(struct hci_dev *hdev, u16 opcode,
++				     u8 event, struct sk_buff *skb);
++
+ /* ----- HCI Sockets ----- */
+ void hci_send_to_sock(struct hci_dev *hdev, struct sk_buff *skb);
+ void hci_send_to_control(struct sk_buff *skb, struct sock *skip_sk);
 diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 47129ef01c0f..700f57762158 100644
+index 700f57762158..8a0a750b8463 100644
 --- a/net/bluetooth/hci_core.c
 +++ b/net/bluetooth/hci_core.c
-@@ -3492,11 +3492,6 @@ static void hci_send_frame(struct hci_dev *hdev, struct sk_buff *skb)
+@@ -166,8 +166,8 @@ static void hci_req_cancel(struct hci_dev *hdev, int err)
  	}
  }
  
--bool hci_req_pending(struct hci_dev *hdev)
--{
--	return (hdev->req_status == HCI_REQ_PEND);
--}
--
- /* Send HCI command */
- int hci_send_cmd(struct hci_dev *hdev, __u16 opcode, __u32 plen,
- 		 const void *param)
+-static struct sk_buff *hci_get_cmd_complete(struct hci_dev *hdev, u16 opcode,
+-					    u8 event, struct sk_buff *skb)
++struct sk_buff *hci_get_cmd_complete(struct hci_dev *hdev, u16 opcode,
++				     u8 event, struct sk_buff *skb)
+ {
+ 	struct hci_ev_cmd_complete *ev;
+ 	struct hci_event_hdr *hdr;
 -- 
 2.1.0
 
