@@ -1,77 +1,111 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <54D36024.5030904@sunrus.com.cn>
-Date: Thu, 05 Feb 2015 20:20:52 +0800
-From: Chen Gang S <gang.chen@sunrus.com.cn>
 MIME-Version: 1.0
-To: David Laight <David.Laight@ACULAB.COM>,
- Marcel Holtmann <marcel@holtmann.org>,
- Sergei Shtylyov <sergei.shtylyov@cogentembedded.com>
-CC: "Gustavo F. Padovan" <gustavo@padovan.org>,
- Johan Hedberg <johan.hedberg@gmail.com>,
- "David S. Miller" <davem@davemloft.net>,
- "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v2] net: bluetooth: hci_sock: Use 'const void *' instead
- of 'void *' for 2nd parameter of hci_test_bit()
-References: <54CFE8BE.5030700@sunrus.com.cn> <063D6719AE5E284EB5DD2968C1650D6D1CADA5E1@AcuExch.aculab.com> <54D27D68.7040501@cogentembedded.com> <0AB99BEA-C379-439C-AD80-5F2122AE37E5@holtmann.org> <54D29379.8050104@sunrus.com.cn> <063D6719AE5E284EB5DD2968C1650D6D1CADC42B@AcuExch.aculab.com>
-In-Reply-To: <063D6719AE5E284EB5DD2968C1650D6D1CADC42B@AcuExch.aculab.com>
-Content-Type: text/plain; charset=windows-1252
+In-Reply-To: <CANLBX6DaN=F1f3UcAxKE85r_NneFzUBD=sKkjARL9vpO7CV-Rg@mail.gmail.com>
+References: <1422596768-17058-1-git-send-email-lukasz.rymanowski@tieto.com>
+	<CANLBX6DaN=F1f3UcAxKE85r_NneFzUBD=sKkjARL9vpO7CV-Rg@mail.gmail.com>
+Date: Thu, 5 Feb 2015 11:58:59 +0100
+Message-ID: <CAN_7+YZsZNdqnnfLhLHdjzZA0+5xAkQsHVLVvT+znzM=1jihyA@mail.gmail.com>
+Subject: Re: [PATCH 1/2] android/gatt: Fix Find By Type request
+From: Lukasz Rymanowski <lukasz.rymanowski@gmail.com>
+To: Jakub Tyszkowski <tyszja@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On 2/5/15 18:14, David Laight wrote:
-> From: Chen Gang S [mailto:gang.chen@sunrus.com.cn]
->> On 2/5/15 05:09, Marcel Holtmann wrote:
->>> Hi Sergei,
->>>
->>>>>> -static inline int hci_test_bit(int nr, void *addr)
->>>>>> +static inline int hci_test_bit(int nr, const void *addr)
->>>>>>  {
->>>>>>  	return *((__u32 *) addr + (nr >> 5)) & ((__u32) 1 << (nr & 31));
->>>>>>  }
->>>>
->>>>> Is there a 'standard' function lurking that will do the above.
->>>>> On x86 the cpus 'bit test' instruction will handle bit numbers
->>>>> greater than the word size - so it can be a single instruction.
->>>>
->>>>   Of course, there's test_bit().
->>>
->>> we did leave hci_test_bit in the code since there are some userspace facing
->>> API that we can not change. Remember that the origin of this code is
->>> from 2.4.6 kernel.
->>>
->>> So we can only change this if you can ensure not to break the userspace API.
->>> So might want to write unit tests to ensure working HCI filter before even
->>> considering touching this.
->>>
->>
->> For me, we have to remain hci_test_bit(), it is for "__u32 *" (which we
->> can not change). The common test_bit() is for "unsigned long *", in this
->> case, I guess it may cause issue under 64-bit environments.
-> 
-> Except that half the time you are passing a 'long *' and you haven't
-> explained why this isn't broken on 64bit architectures.
+Hi Jakub,
+
+On Wed, Feb 4, 2015 at 10:30 AM, Jakub Tyszkowski <tyszja@gmail.com> wrote:
+> Hi Lukasz,
 >
- 
-Maybe we are misunderstanding with each other (excuse me for my pool
-English). What I want to say is:
+> 2015-01-30 6:46 GMT+01:00 Lukasz Rymanowski <lukasz.rymanowski@tieto.com>:
+>> With this patch GATT will correctly response with attribute not found if
+>> there is no attributes matching.
+>>
+>> Issue found and fix tested on UPF50
+>> ---
+>>  android/gatt.c | 7 ++++++-
+>>  1 file changed, 6 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/android/gatt.c b/android/gatt.c
+>> index 466c1ea..3b0b81d 100644
+>> --- a/android/gatt.c
+>> +++ b/android/gatt.c
+>> @@ -6258,6 +6258,7 @@ struct find_by_type_request_data {
+>>         uint8_t *search_value;
+>>         size_t search_vlen;
+>>         uint8_t error;
+>> +       bool found;
+>>  };
+>>
+>>  static void find_by_type_request_cb(struct gatt_db_attribute *attrib,
+>> @@ -6289,6 +6290,9 @@ static void find_by_type_request_cb(struct gatt_db_attribute *attrib,
+>>                                                         find_data->search_vlen);
+>>
+>>         queue_push_tail(find_data->device->pending_requests, request_data);
+>> +
+>> +       if (!find_data->found)
+>> +               find_data->found = true;
+>>  }
+>>
+>>  static uint8_t find_by_type_request(const uint8_t *cmd, uint16_t cmd_len,
+>> @@ -6315,11 +6319,12 @@ static uint8_t find_by_type_request(const uint8_t *cmd, uint16_t cmd_len,
+>>         data.search_vlen = search_vlen;
+>>         data.search_value = search_value;
+>>         data.device = device;
+>> +       data.found = false;
+>>
+>>         gatt_db_find_by_type(gatt_db, start, end, &uuid,
+>>                                                 find_by_type_request_cb, &data);
+>>
+>> -       if (data.error == ATT_ECODE_ATTR_NOT_FOUND) {
+>> +       if (!data.found) {
+>>                 size_t mtu;
+>>                 uint8_t *rsp = g_attrib_get_buffer(device->attrib, &mtu);
+>>
+>> --
+>> 1.8.4
+>>
+>> --
+>> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+>> the body of a message to majordomo@vger.kernel.org
+>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>
+>
+> Maybe this issue can be solved like this:
+>
+> @@ -6274,17 +6274,9 @@ static uint8_t find_by_type_request(const
+> uint8_t *cmd, uint16_t cmd_len,
+>         gatt_db_find_by_type(gatt_db, start, end, &uuid,
+>                                                 find_by_type_request_cb, &data);
+>
+> -       if (data.error == ATT_ECODE_ATTR_NOT_FOUND) {
+> -               size_t mtu;
+> -               uint8_t *rsp = g_attrib_get_buffer(device->attrib, &mtu);
+> -
+> -               len = enc_error_resp(ATT_OP_FIND_BY_TYPE_REQ, start,
+> -                                       ATT_ECODE_ATTR_NOT_FOUND, rsp, mtu);
+> -               g_attrib_send(device->attrib, 0, rsp, len, NULL, NULL, NULL);
+> -               return 0;
+> -       }
+> -
+> -       if (!data.error)
+> +       if (queue_isempty(device->pending_requests))
+> +               data.error = ATT_ECODE_ATTR_NOT_FOUND;
+> +       else
+>                 process_dev_pending_requests(device, ATT_OP_FIND_BY_TYPE_REQ);
+>
+>         return data.error;
+>
+>
 
- - hci_test_bit() is OK (current implementation can not cause issue for
-   64-bit machine).
+I considered that but this is still not a clear solution for me.
+I think rather to make gatt_db_find_by_type() return number of found attributes.
 
- - But if we use test_bit(), I guess it will cause issue for 64-bit
-   machine.
-
-
-> Note that on LE systems the size of the accesses used to access a dense
-> bit array don't matter. This is not true of BE systems.
-> 
-
-Yes, what you said above sounds reasonable to me, too.
-
-
-Thanks.
--- 
-Chen Gang
-
-Open, share, and attitude like air, water, and life which God blessed
+\Lukasz
+> Regards,
+> Jakub Tyszkowski
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
