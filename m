@@ -1,62 +1,131 @@
 Return-Path: <cyrus@holtmann.org>
-From: David Laight <David.Laight@ACULAB.COM>
-To: 'Chen Gang S' <gang.chen@sunrus.com.cn>, Marcel Holtmann
-	<marcel@holtmann.org>, Sergei Shtylyov <sergei.shtylyov@cogentembedded.com>
-CC: "Gustavo F. Padovan" <gustavo@padovan.org>, Johan Hedberg
-	<johan.hedberg@gmail.com>, "David S. Miller" <davem@davemloft.net>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: RE: [PATCH v2] net: bluetooth: hci_sock: Use 'const void *' instead
- of 'void *' for 2nd parameter of hci_test_bit()
-Date: Thu, 5 Feb 2015 10:14:51 +0000
-Message-ID: <063D6719AE5E284EB5DD2968C1650D6D1CADC42B@AcuExch.aculab.com>
-References: <54CFE8BE.5030700@sunrus.com.cn>
- <063D6719AE5E284EB5DD2968C1650D6D1CADA5E1@AcuExch.aculab.com>
- <54D27D68.7040501@cogentembedded.com>
- <0AB99BEA-C379-439C-AD80-5F2122AE37E5@holtmann.org>
- <54D29379.8050104@sunrus.com.cn>
-In-Reply-To: <54D29379.8050104@sunrus.com.cn>
-Content-Type: text/plain; charset="Windows-1252"
-MIME-Version: 1.0
+From: Gowtham Anandha Babu <gowtham.ab@samsung.com>
+To: 'Luiz Augusto von Dentz' <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	'Bharat Panda' <bharat.panda@samsung.com>, cpgs@samsung.com
+References: <1422452517-4240-1-git-send-email-gowtham.ab@samsung.com>
+ <001201d03c96$10ca2ab0$325e8010$@samsung.com>
+ <CABBYNZKWB+dLTKgP-_znxrycq8VK8jNJPmVaGGBWPhK5Vf0BLw@mail.gmail.com>
+ <000801d03eb4$99812f00$cc838d00$@samsung.com>
+In-reply-to: <000801d03eb4$99812f00$cc838d00$@samsung.com>
+Subject: RE: [PATCH] test/pbap-client: Add support to fetch spd,fav PB
+Date: Thu, 05 Feb 2015 15:02:27 +0530
+Message-id: <000401d04126$ad2c2ae0$078480a0$@samsung.com>
+MIME-version: 1.0
+Content-type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Chen Gang S [mailto:gang.chen@sunrus.com.cn]
-> On 2/5/15 05:09, Marcel Holtmann wrote:
-> > Hi Sergei,
-> >
-> >>>> -static inline int hci_test_bit(int nr, void *addr)
-> >>>> +static inline int hci_test_bit(int nr, const void *addr)
-> >>>>  {
-> >>>>  	return *((__u32 *) addr + (nr >> 5)) & ((__u32) 1 << (nr & 31));
-> >>>>  }
-> >>
-> >>> Is there a 'standard' function lurking that will do the above.
-> >>> On x86 the cpus 'bit test' instruction will handle bit numbers
-> >>> greater than the word size - so it can be a single instruction.
-> >>
-> >>   Of course, there's test_bit().
-> >
-> > we did leave hci_test_bit in the code since there are some userspace fa=
-cing
-> > API that we can not change. Remember that the origin of this code is
-> > from 2.4.6 kernel.
-> >
-> > So we can only change this if you can ensure not to break the userspace=
- API.
-> > So might want to write unit tests to ensure working HCI filter before e=
-ven
-> > considering touching this.
-> >
->=20
-> For me, we have to remain hci_test_bit(), it is for "__u32 *" (which we
-> can not change). The common test_bit() is for "unsigned long *", in this
-> case, I guess it may cause issue under 64-bit environments.
+Ping.
 
-Except that half the time you are passing a 'long *' and you haven't
-explained why this isn't broken on 64bit architectures.
+> -----Original Message-----
+> From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-
+> owner@vger.kernel.org] On Behalf Of Gowtham Anandha Babu
+> Sent: Monday, February 02, 2015 12:21 PM
+> To: 'Luiz Augusto von Dentz'
+> Cc: linux-bluetooth@vger.kernel.org; 'Bharat Panda'; cpgs@samsung.com
+> Subject: RE: [PATCH] test/pbap-client: Add support to fetch spd,fav PB
+> 
+> Hi Luiz,
+> 
+> > -----Original Message-----
+> > From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-
+> > owner@vger.kernel.org] On Behalf Of Luiz Augusto von Dentz
+> > Sent: Friday, January 30, 2015 9:03 PM
+> > To: Gowtham Anandha Babu
+> > Cc: linux-bluetooth@vger.kernel.org; Bharat Panda; cpgs@samsung.com
+> > Subject: Re: [PATCH] test/pbap-client: Add support to fetch spd,fav PB
+> >
+> > Hi Gowtham,
+> >
+> > On Fri, Jan 30, 2015 at 4:07 PM, Gowtham Anandha Babu
+> > <gowtham.ab@samsung.com> wrote:
+> > > Ping.
+> > >
+> > >> -----Original Message-----
+> > >> From: linux-bluetooth-owner@vger.kernel.org
+> > >> [mailto:linux-bluetooth- owner@vger.kernel.org] On Behalf Of
+> > >> Gowtham Anandha Babu
+> > >> Sent: Wednesday, January 28, 2015 7:12 PM
+> > >> To: linux-bluetooth@vger.kernel.org
+> > >> Cc: bharat.panda@samsung.com; cpgs@samsung.com; Gowtham
+> > Anandha Babu
+> > >> Subject: [PATCH] test/pbap-client: Add support to fetch spd,fav PB
+> > >>
+> > >> Adds support to fetch spd,fav phonebook.
+> > >> Tested using PTS test case TC_PCE_PBB_BV_01_C.
+> > >> ---
+> > >>  test/pbap-client | 2 +-
+> > >>  1 file changed, 1 insertion(+), 1 deletion(-)
+> > >>
+> > >> diff --git a/test/pbap-client b/test/pbap-client index
+> > >> 51e26eb..16a786b
+> > >> 100755
+> > >> --- a/test/pbap-client
+> > >> +++ b/test/pbap-client
+> > >> @@ -170,6 +170,6 @@ if  __name__ == '__main__':
+> > >>
+> > >>               pbap_client.flush_transfers(lambda:
+> > >> test_paths(paths[1:]))
+> > >>
+> > >> -     test_paths(["PB", "ICH", "OCH", "MCH", "CCH"])
+> > >> +     test_paths(["PB", "ICH", "OCH", "MCH", "CCH", "SPD", "FAV"])
+> > >>
+> > >>       mainloop.run()
+> > >> --
+> > >> 1.9.1
+> >
+> > We should be doing this with obexctl, is there something missing there?
+> >
+> >
+> 
+> In obexctl, we are selecting the phonebook based on user input. We are
+> passing that as a dbus args simply without checking.
+> All this phonebook objects ["PB", "ICH", "OCH", "MCH", "CCH", "SPD", "FAV"]
+> are getting selected using obexctl.
+> If we give other than the above mentioned phonebook, its showing '
+> org.bluez.obex.Error.InvalidArguments '.
+> Below is the log for the same.
+> 
+> [00:1B:DC:07:33:4E]# cd pb
+> Attempting to Select to pb
+> Select successful
+> [00:1B:DC:07:33:4E]# cd och
+> Attempting to Select to och
+> Select successful
+> [00:1B:DC:07:33:4E]# cd ich
+> Attempting to Select to ich
+> Select successful
+> [00:1B:DC:07:33:4E]# cd mch
+> Attempting to Select to mch
+> Select successful
+> [00:1B:DC:07:33:4E]# cd spd
+> Attempting to Select to spd
+> Select successful
+> [00:1B:DC:07:33:4E]# cd fav
+> Attempting to Select to fav
+> Select successful
+> [00:1B:DC:07:33:4E]# cd sdfa
+> Attempting to Select to sdfa
+> Failed to Select: org.bluez.obex.Error.InvalidArguments
+> 
+> Do we need to add a check before passing this args? Because dbus itself is
+> handling this issue by sending 'org.bluez.obex.Error.InvalidArguments'.
+> I don’t think extra check is not required here.
+> What do you think?
+> 
+> Regards,
+> Gowtham Anandha Babu
+> 
+> > --
+> > Luiz Augusto von Dentz
+> > --
+> > To unsubscribe from this list: send the line "unsubscribe
+> > linux-bluetooth" in the body of a message to majordomo@vger.kernel.org
+> > More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> 
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org More majordomo
+> info at  http://vger.kernel.org/majordomo-info.html
 
-Note that on LE systems the size of the accesses used to access a dense
-bit array don't matter. This is not true of BE systems.
-
-	David
