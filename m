@@ -1,63 +1,41 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <54D395C8.607@ubuntu.com>
-Date: Thu, 05 Feb 2015 17:09:44 +0100
-From: Sebastien Bacher <seb128@ubuntu.com>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] android/tester: Fix ccc descriptor handle
+Date: Thu, 05 Feb 2015 16:10:18 +0100
+Message-ID: <2567879.N39PURCVzr@uw000953>
+In-Reply-To: <1422970395-22110-1-git-send-email-jakub.tyszkowski@tieto.com>
+References: <1422970395-22110-1-git-send-email-jakub.tyszkowski@tieto.com>
 MIME-Version: 1.0
-To: linux-bluetooth@vger.kernel.org
-Subject: Restart bluetooth on failure?
-Content-Type: multipart/mixed;
- boundary="------------010709050404000403080801"
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This is a multi-part message in MIME format.
---------------010709050404000403080801
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
+Hi Jakub,
 
-Hey,
+On Tuesday 03 of February 2015 14:33:15 Jakub Tyszkowski wrote:
+> Some service handle count was recently changed.
+> ---
+>  android/tester-gatt.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/android/tester-gatt.c b/android/tester-gatt.c
+> index 23c6609..15a54fa 100644
+> --- a/android/tester-gatt.c
+> +++ b/android/tester-gatt.c
+> @@ -1084,7 +1084,7 @@ static struct iovec send_notification_1[] = {
+>  static struct iovec att_read_req_op_v = raw_pdu(L2CAP_ATT_READ_REQ);
+>  static struct iovec att_write_req_op_v = raw_pdu(L2CAP_ATT_WRITE_REQ);
+>  
+> -static struct iovec svc_change_ccc_handle_v = raw_pdu(0x1a, 0x00);
+> +static struct iovec svc_change_ccc_handle_v = raw_pdu(0x1c, 0x00);
+>  static struct iovec svc_change_ccc_value_v = raw_pdu(0x00, 0x01);
+>  
+>  static void gatt_client_register_action(void)
 
-Is there any reason bluetoothd is not restarted on failure? I recently
-hit a segfault in the service and it let the user client non-working,
-looks like the service doesn't get restarted either by systemd nor dbus
-activation
+Patch applied, thanks. 
 
-The attached patch uncomment the restart from the systemd service
-
-Cheers,
-Sebastien Bacher
-
---------------010709050404000403080801
-Content-Type: text/x-diff;
- name="0001-restart-service-on-failure.patch"
-Content-Transfer-Encoding: 7bit
-Content-Disposition: attachment;
- filename="0001-restart-service-on-failure.patch"
-
->From b5f1ca81438f9072fa1928d1603d25f062210665 Mon Sep 17 00:00:00 2001
-From: Sebastien Bacher <seb128@ubuntu.com>
-Date: Thu, 5 Feb 2015 17:06:04 +0100
-Subject: [PATCH] restart service on failure
-
----
- src/bluetooth.service.in | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/src/bluetooth.service.in b/src/bluetooth.service.in
-index 35e9457..36a8883 100644
---- a/src/bluetooth.service.in
-+++ b/src/bluetooth.service.in
-@@ -8,7 +8,7 @@ BusName=org.bluez
- ExecStart=@libexecdir@/bluetoothd
- NotifyAccess=main
- #WatchdogSec=10
--#Restart=on-failure
-+Restart=on-failure
- CapabilityBoundingSet=CAP_NET_ADMIN CAP_NET_BIND_SERVICE
- LimitNPROC=1
- 
 -- 
-2.1.4
-
-
---------------010709050404000403080801--
+Best regards, 
+Szymon Janc
