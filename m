@@ -1,45 +1,77 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH 3/3] shared/hfp: Fix not processing input from hfp_gw_send_error
-Date: Thu,  5 Feb 2015 16:07:11 +0100
-Message-Id: <1423148831-25507-3-git-send-email-szymon.janc@tieto.com>
-In-Reply-To: <1423148831-25507-1-git-send-email-szymon.janc@tieto.com>
-References: <1423148831-25507-1-git-send-email-szymon.janc@tieto.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Message-ID: <54D36024.5030904@sunrus.com.cn>
+Date: Thu, 05 Feb 2015 20:20:52 +0800
+From: Chen Gang S <gang.chen@sunrus.com.cn>
+MIME-Version: 1.0
+To: David Laight <David.Laight@ACULAB.COM>,
+ Marcel Holtmann <marcel@holtmann.org>,
+ Sergei Shtylyov <sergei.shtylyov@cogentembedded.com>
+CC: "Gustavo F. Padovan" <gustavo@padovan.org>,
+ Johan Hedberg <johan.hedberg@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>,
+ "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v2] net: bluetooth: hci_sock: Use 'const void *' instead
+ of 'void *' for 2nd parameter of hci_test_bit()
+References: <54CFE8BE.5030700@sunrus.com.cn> <063D6719AE5E284EB5DD2968C1650D6D1CADA5E1@AcuExch.aculab.com> <54D27D68.7040501@cogentembedded.com> <0AB99BEA-C379-439C-AD80-5F2122AE37E5@holtmann.org> <54D29379.8050104@sunrus.com.cn> <063D6719AE5E284EB5DD2968C1650D6D1CADC42B@AcuExch.aculab.com>
+In-Reply-To: <063D6719AE5E284EB5DD2968C1650D6D1CADC42B@AcuExch.aculab.com>
+Content-Type: text/plain; charset=windows-1252
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-If for some reason there is more than one AT command in the ring
-buffer we should make sure that after upper layer sends error, AT
-parser gets back to reading data from ring buffer.
+On 2/5/15 18:14, David Laight wrote:
+> From: Chen Gang S [mailto:gang.chen@sunrus.com.cn]
+>> On 2/5/15 05:09, Marcel Holtmann wrote:
+>>> Hi Sergei,
+>>>
+>>>>>> -static inline int hci_test_bit(int nr, void *addr)
+>>>>>> +static inline int hci_test_bit(int nr, const void *addr)
+>>>>>>  {
+>>>>>>  	return *((__u32 *) addr + (nr >> 5)) & ((__u32) 1 << (nr & 31));
+>>>>>>  }
+>>>>
+>>>>> Is there a 'standard' function lurking that will do the above.
+>>>>> On x86 the cpus 'bit test' instruction will handle bit numbers
+>>>>> greater than the word size - so it can be a single instruction.
+>>>>
+>>>>   Of course, there's test_bit().
+>>>
+>>> we did leave hci_test_bit in the code since there are some userspace facing
+>>> API that we can not change. Remember that the origin of this code is
+>>> from 2.4.6 kernel.
+>>>
+>>> So we can only change this if you can ensure not to break the userspace API.
+>>> So might want to write unit tests to ensure working HCI filter before even
+>>> considering touching this.
+>>>
+>>
+>> For me, we have to remain hci_test_bit(), it is for "__u32 *" (which we
+>> can not change). The common test_bit() is for "unsigned long *", in this
+>> case, I guess it may cause issue under 64-bit environments.
+> 
+> Except that half the time you are passing a 'long *' and you haven't
+> explained why this isn't broken on 64bit architectures.
+>
+ 
+Maybe we are misunderstanding with each other (excuse me for my pool
+English). What I want to say is:
 
-Same is already done in hfp_gw_send_result() and we should handle
-this in error response as well.
----
- src/shared/hfp.c | 9 ++++++++-
- 1 file changed, 8 insertions(+), 1 deletion(-)
+ - hci_test_bit() is OK (current implementation can not cause issue for
+   64-bit machine).
 
-diff --git a/src/shared/hfp.c b/src/shared/hfp.c
-index 90e17c7..74ee979 100644
---- a/src/shared/hfp.c
-+++ b/src/shared/hfp.c
-@@ -778,7 +778,14 @@ bool hfp_gw_send_error(struct hfp_gw *hfp, enum hfp_error error)
- 
- 	wakeup_writer(hfp);
- 
--	hfp->result_pending = false;
-+	/*
-+	 * There might be already something to read in the ring buffer.
-+	 * If so, let's read it.
-+	 */
-+	if (hfp->result_pending) {
-+		hfp->result_pending = false;
-+		process_input(hfp);
-+	}
- 
- 	return true;
- }
+ - But if we use test_bit(), I guess it will cause issue for 64-bit
+   machine.
+
+
+> Note that on LE systems the size of the accesses used to access a dense
+> bit array don't matter. This is not true of BE systems.
+> 
+
+Yes, what you said above sounds reasonable to me, too.
+
+
+Thanks.
 -- 
-1.9.1
+Chen Gang
 
+Open, share, and attitude like air, water, and life which God blessed
