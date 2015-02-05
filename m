@@ -1,162 +1,81 @@
 Return-Path: <cyrus@holtmann.org>
-From: Bharat Panda <bharat.panda@samsung.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: cpgs@samsung.com, Bharat Panda <bharat.panda@samsung.com>
-Subject: [PATCH ] shared/gatt: Get primary services by handle
-Date: Fri, 06 Feb 2015 12:56:57 +0530
-Message-id: <1423207617-22174-1-git-send-email-bharat.panda@samsung.com>
+Date: Thu, 5 Feb 2015 11:44:08 -0800
+From: Tedd Ho-Jeong An <tedd.an@intel.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Cc: "An, Tedd" <tedd.an@intel.com>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	Marcel Holtmann <marcel@holtmann.org>
+Subject: [PATCH 2/2] Bluetooth: Add device shutdown routine for Intel
+ Bluetooth device
+Message-ID: <20150205114408.7c50ab05@tedd-test>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Adds support for retrieving primary services from gatt-db
-by handle.
----
- src/shared/gatt-db.c  | 38 +++++++++++++++++++++++++++++++++++---
- src/shared/gatt-db.h  |  6 ++++++
- tools/btgatt-client.c |  8 ++++----
- 3 files changed, 45 insertions(+), 7 deletions(-)
+From: Tedd Ho-Jeong An <tedd.an@intel.com>
 
-diff --git a/src/shared/gatt-db.c b/src/shared/gatt-db.c
-index f72d58e..f22111b 100644
---- a/src/shared/gatt-db.c
-+++ b/src/shared/gatt-db.c
-@@ -1036,15 +1036,23 @@ void gatt_db_foreach_service(struct gatt_db *db, const bt_uuid_t *uuid,
- 						gatt_db_attribute_cb_t func,
- 						void *user_data)
- {
--	gatt_db_foreach_service_in_range(db, uuid, func, user_data, 0x0001,
--									0xffff);
-+	gatt_db_foreach_service_in_range(db, uuid, 0x0000, func, user_data,
-+					0x0001, 0xffff);
-+}
-+
-+void gatt_db_foreach_service_handle(struct gatt_db *db, uint16_t handle,
-+						gatt_db_attribute_cb_t func,
-+						void *user_data)
-+{
-+	gatt_db_foreach_service_in_range(db, NULL, handle, func, user_data,
-+					0x0001,	0xffff);
+This patch adds the device shutdown routine for Intel Bluetooth device.
+
+Some platforms have BT LED issue with Intel Bluetooth device that BT LED goes
+off 5 seconds after BT is turned off
+
+For Intel Bluetooth device, the BT LED is turned off when:
+- there is no active connection or radio activity
+- USB is suspend
+
+So, when the BT is turned off, it takes 5 seconds because USB suspend timeone
+is 5 seconds by default. And if the USB suspend is not enabled, BT LED won't be
+turned off.
+
+To fix this issue, recently Intel Bluetooth firmware patch had been submitted
+to turn off the BT LED explicitly by the vendor specific command(0xFC3F). And
+this patch sends this command to the device before closing the device.
+
+For backward compatibility of this command  with old firmware, this command was
+supported before, but it behaves same as HCI_RESET internally. So, it won't be
+the problem even if the system doesn't have the latest firmware patch.
+
+Signed-off-by: Tedd Ho-Jeong An <tedd.an@intel.com>
+---
+ drivers/bluetooth/btusb.c | 18 ++++++++++++++++++
+ 1 file changed, 18 insertions(+)
+
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index b876888..e0f8a15 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -2331,6 +2331,23 @@ static int btusb_set_bdaddr_intel(struct hci_dev *hdev, const bdaddr_t *bdaddr)
+ 	return 0;
  }
  
- struct foreach_data {
- 	gatt_db_attribute_cb_t func;
- 	const bt_uuid_t *uuid;
- 	void *user_data;
--	uint16_t start, end;
-+	uint16_t start, end, handle;
- };
- 
- static void foreach_service_in_range(void *data, void *user_data)
-@@ -1053,6 +1061,7 @@ static void foreach_service_in_range(void *data, void *user_data)
- 	struct foreach_data *foreach_data = user_data;
- 	uint16_t svc_start;
- 	bt_uuid_t uuid;
-+	uint16_t handle;
- 
- 	svc_start = get_handle_at_index(service, 0);
- 
-@@ -1064,6 +1073,11 @@ static void foreach_service_in_range(void *data, void *user_data)
- 									&uuid);
- 		if (bt_uuid_cmp(&uuid, foreach_data->uuid))
- 			return;
-+	} else if (foreach_data->handle) {
-+		gatt_db_attribute_get_service_handle(service->attributes[0],
-+							&handle);
-+		if (handle != foreach_data->handle)
-+			return;
++static int btusb_shutdown_intel(struct hci_dev *hdev)
++{
++	struct sk_buff *skb;
++	long ret;
++
++	skb = __hci_cmd_sync(hdev, 0xfc3f, 0, NULL, HCI_INIT_TIMEOUT);
++	if (IS_ERR(skb)) {
++		ret = PTR_ERR(skb);
++		BT_ERR("%s: turning off Intel device LED failed (%ld)",
++		       hdev->name, ret);
++		return ret;
++	}
++	kfree_skb(skb);
++
++	return 0;
++}
++
+ static int btusb_set_bdaddr_marvell(struct hci_dev *hdev,
+ 				    const bdaddr_t *bdaddr)
+ {
+@@ -2709,6 +2726,7 @@ static int btusb_probe(struct usb_interface *intf,
+ 	if (id->driver_info & BTUSB_INTEL) {
+ 		hdev->setup = btusb_setup_intel;
+ 		hdev->set_bdaddr = btusb_set_bdaddr_intel;
++		hdev->shutdown = btusb_shutdown_intel;
+ 		set_bit(HCI_QUIRK_STRICT_DUPLICATE_FILTER, &hdev->quirks);
  	}
- 
- 	foreach_data->func(service->attributes[0], foreach_data->user_data);
-@@ -1071,6 +1085,7 @@ static void foreach_service_in_range(void *data, void *user_data)
- 
- void gatt_db_foreach_service_in_range(struct gatt_db *db,
- 						const bt_uuid_t *uuid,
-+						uint16_t handle,
- 						gatt_db_attribute_cb_t func,
- 						void *user_data,
- 						uint16_t start_handle,
-@@ -1086,6 +1101,7 @@ void gatt_db_foreach_service_in_range(struct gatt_db *db,
- 	data.user_data = user_data;
- 	data.start = start_handle;
- 	data.end = end_handle;
-+	data.handle = handle;
- 
- 	queue_foreach(db->services, foreach_service_in_range, &data);
- }
-@@ -1273,6 +1289,22 @@ bool gatt_db_attribute_get_service_uuid(const struct gatt_db_attribute *attrib,
- 	return false;
- }
- 
-+bool gatt_db_attribute_get_service_handle(
-+					const struct gatt_db_attribute *attrib,
-+					uint16_t *handle)
-+{
-+	struct gatt_db_service *service;
-+
-+	if (!attrib || !handle)
-+		return false;
-+
-+	service = attrib->service;
-+
-+	*handle = service->attributes[0]->handle;
-+
-+	return true;
-+}
-+
- bool gatt_db_attribute_get_service_handles(
- 					const struct gatt_db_attribute *attrib,
- 					uint16_t *start_handle,
-diff --git a/src/shared/gatt-db.h b/src/shared/gatt-db.h
-index 37df4d5..4308fbc 100644
---- a/src/shared/gatt-db.h
-+++ b/src/shared/gatt-db.h
-@@ -122,8 +122,12 @@ void gatt_db_find_information(struct gatt_db *db, uint16_t start_handle,
- void gatt_db_foreach_service(struct gatt_db *db, const bt_uuid_t *uuid,
- 						gatt_db_attribute_cb_t func,
- 						void *user_data);
-+void gatt_db_foreach_service_handle(struct gatt_db *db, uint16_t handle,
-+						gatt_db_attribute_cb_t func,
-+						void *user_data);
- void gatt_db_foreach_service_in_range(struct gatt_db *db,
- 						const bt_uuid_t *uuid,
-+						uint16_t handle,
- 						gatt_db_attribute_cb_t func,
- 						void *user_data,
- 						uint16_t start_handle,
-@@ -165,6 +169,8 @@ uint16_t gatt_db_attribute_get_handle(const struct gatt_db_attribute *attrib);
- 
- bool gatt_db_attribute_get_service_uuid(const struct gatt_db_attribute *attrib,
- 							bt_uuid_t *uuid);
-+bool gatt_db_attribute_get_service_handle(const struct gatt_db_attribute *attrib,
-+							uint16_t *handle);
- 
- bool gatt_db_attribute_get_service_handles(
- 					const struct gatt_db_attribute *attrib,
-diff --git a/tools/btgatt-client.c b/tools/btgatt-client.c
-index 8bda89b..801fa7f 100644
---- a/tools/btgatt-client.c
-+++ b/tools/btgatt-client.c
-@@ -302,8 +302,7 @@ static void print_services_by_handle(struct client *cli, uint16_t handle)
- {
- 	printf("\n");
- 
--	/* TODO: Filter by handle */
--	gatt_db_foreach_service(cli->db, NULL, print_service, cli);
-+	gatt_db_foreach_service_handle(cli->db, handle, print_service, cli);
- }
- 
- static void ready_cb(bool success, uint8_t att_ecode, void *user_data)
-@@ -330,8 +329,9 @@ static void service_changed_cb(uint16_t start_handle, uint16_t end_handle,
- 	printf("\nService Changed handled - start: 0x%04x end: 0x%04x\n",
- 						start_handle, end_handle);
- 
--	gatt_db_foreach_service_in_range(cli->db, NULL, print_service, cli,
--						start_handle, end_handle);
-+	gatt_db_foreach_service_in_range(cli->db, NULL, 0x0000,
-+				print_service, cli,
-+				start_handle, end_handle);
- 	print_prompt();
- }
  
 -- 
 1.9.1
