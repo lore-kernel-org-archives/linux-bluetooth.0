@@ -1,280 +1,227 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <CAHrH25TOLzhdP_3BocdSdTK27j69AzpLGdT5Eci9n7=QWV6Ntg@mail.gmail.com>
-References: <1423022302-27124-1-git-send-email-armansito@chromium.org>
-	<CABBYNZLDAFdotoZMEr5AiBds3rJ_5KNM6WPS7VbtXmA7iT0rsQ@mail.gmail.com>
-	<CAHrH25TOLzhdP_3BocdSdTK27j69AzpLGdT5Eci9n7=QWV6Ntg@mail.gmail.com>
-Date: Thu, 5 Feb 2015 11:29:10 +0200
-Message-ID: <CABBYNZKpecQihk9e0A+_NOiF+bG5jTncok2pRL=N812NFFKDeQ@mail.gmail.com>
-Subject: Re: [PATCH] shared/gatt: Allow register_notify without CCC
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Arman Uguray <armansito@chromium.org>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH 7/7] Bluetooth: Convert local OOB data reading to use HCI request
+Date: Thu,  5 Feb 2015 11:18:25 +0200
+Message-Id: <1423127905-27281-8-git-send-email-johan.hedberg@gmail.com>
+In-Reply-To: <1423127905-27281-1-git-send-email-johan.hedberg@gmail.com>
+References: <1423127905-27281-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Arman,
+From: Johan Hedberg <johan.hedberg@intel.com>
 
-On Thu, Feb 5, 2015 at 12:05 AM, Arman Uguray <armansito@chromium.org> wrote:
-> Hi Luiz,
->
->> On Wed, Feb 4, 2015 at 6:26 AM, Luiz Augusto von Dentz <luiz.dentz@gmail.com> wrote:
->> Hi Arman,
->>
->> On Wed, Feb 4, 2015 at 5:58 AM, Arman Uguray <armansito@chromium.org> wrote:
->>> Certain peripherals can expose a GATT characteristic with the
->>> notify/indicate property but with no Client Characteristic Configuration
->>> descriptor. Since bt_gatt_client_register_notify enforces a CCC as a
->>> requirement, it returns an error for such characteristics.
->>
->> Do you have some evidence of this? I don't mind not being too strict
->> while receiving but we need to document why we are doing these
->> changes,...
->
-> I came across this while testing with a Nexus 6 device running Android
-> L. The application exposes a "Service Changed" characteristic with no
-> CCC, which is causing bt_gatt_client's initialization sequence to fail
-> (since it assumes that there will be a CCC and treats the absence as
-> an error). This seemed strange to me, so I did some digging, and the
-> Bluetooth developer page actually lists "None" for "Descriptors"
-> (https://developer.bluetooth.org/gatt/services/Pages/ServiceViewer.aspx?u=org.bluetooth.service.generic_attribute.xml)
-> of this characteristic.
->
-> However, this seemed incorrect to me, so I checked the Core Spec v4.2,
-> Vol 3, Part G, Section 7.1 "Service Changed", which states: "This
-> [Service Changed] Characteristic Value shall be configured to be
-> indicated, using the Client Characteristic Configuration descriptor by
-> a client. Indications caused by changes to the Service Changed
-> Characteristic Value shall be considered lost if the client has not
-> enabled indications in the Client Configuration Characteristic
-> Descriptor." Which means that the CCC is certainly mandatory, so this
-> must be an error in the developer page.
+Now that there's a HCI request API available where the callback receives
+the resulting skb, we can convert the local OOB data reading to use this
+new API. This patch does the necessary update in mgmt.c (which also
+requires moving the callback higher up since it's now a static function)
+and removes the custom calls from hci_event.c that are no-longer
+necessary.
 
-It is probably a bug, and in this case the device might not even be
-able to qualify since service changed has 2 tests: TP/GAS/CL/BV-01-C
-and TP/GAS/SR/BV-01-C. We should probably communicate that the
-documentation needs fixing and the TS should probably be updated as
-well to reflect CCC is mandatory in this case.
+Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+---
+ include/net/bluetooth/hci_core.h |   3 -
+ net/bluetooth/hci_event.c        |  12 ----
+ net/bluetooth/mgmt.c             | 119 ++++++++++++++++++++++++++-------------
+ 3 files changed, 80 insertions(+), 54 deletions(-)
 
-> Regardless, though, even if this is an error in the BlueDroid stack,
-> it means that some devices may have incorrectly implemented the spec
-> here, so we should probably tolerate this. BlueZ's server
-> implementation SHOULD regardless expose this descriptor, but the
-> client IMO shouldn't fail if the CCC generally doesn't exist.
-
-Provided the SIG don't come with invalid tests for service changed
-that is probably okay for the client, for the server I don't how it
-would pass TP/GAS/SR/BV-01-C without CCC except if PTS is ignoring the
-lack of CCC which IMO defeats the purpose of the test. So the argument
-for service changed is probably not valid here, but for custom
-attributes where there is no tests to validate the implemenation
-perhaps you have a point, but note that it still will need to set
-BT_GATT_CHRC_PROP_NOTIFY and BT_GATT_CHRC_PROP_INDICATE, btw such
-policies perhaps should be done directly in shared/gatt-client.c so we
-don't need have duplicated logic for Android.
-
->
->> ...and btw this perhaps makes my argument of enabling
->> notification by default even stronger since if such devices really
->> exists they might be notifying us since the beginning.
->>
->
-> Hmm, I don't know how this makes that argument any stronger.
-> bt_gatt_client already automatically registers for Service Changed,
-> and for external applications we still want to only notify if an app
-> is interested (which they can do now across connections).
->
-> Generally, I want to treat this as a corner-case, since it's not
-> really spec compliant behavior. Either way, it's probably not that bad
-> to have this fix so that we don't bork out immediately with devices
-> that behave incorrectly. Actually, it might be even more spec
-> compliant for us to simply ignore the Service Changed characteristic
-> if it's discovered but doesn't have a CCC, since the spec says
-> "changes to the Service Changed Characteristic Value shall be
-> considered lost if the client has not enabled indications in the
-> Client Configuration Characteristic Descriptor", which would end up
-> being a simpler fix on our end.
->
-> Either way, I'll wait for your response to determine what the right
-> behavior is here.
-
-For service changed perhaps, but since we are using
-bt_gatt_client_register_notify for any notification we would need to
-have a special case for service changed alone so I would not bother
-since broken stacks in this respect will probably not pass the
-qualification if the test spec where implemented properly, for any
-other char I would not be so strict since some OS may allow adding a
-characteristic with notifiy/indicate bits sets but without a CCC to
-enable them, actually Android probably allows that to happen already,
-sadly I think even our BlueZ for Android currently allows that.
-
->> The other problem I now see is that there is probably no way to rate
->> limit the notification, because they are profile specific, so if you
->> had a problem with too much traffic on D-Bus this may already happen
->> even if we register the notification on demand.
->>
->
-> Right, though I guess this is a separate issue that can be dealt with
-> at the D-Bus API level. shared/gatt-client has to still send all
-> notifications up, otherwise things like HoG wouldn't work well with a
-> rate limit. Anyway, we can do this at a D-Bus API level separately.
-> I'll add this to the general TODO list.
->
->>> This patch fixes this behavior so that bt_gatt_client_register_notify
->>> immediately registers the callback and returns success for
->>> characteristics with no CCC.
->>> ---
->>>  src/shared/gatt-client.c | 43 +++++++++++++++++++++++++------------------
->>>  1 file changed, 25 insertions(+), 18 deletions(-)
->>>
->>> diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
->>> index 5edb991..d0fc054 100644
->>> --- a/src/shared/gatt-client.c
->>> +++ b/src/shared/gatt-client.c
->>> @@ -88,6 +88,7 @@ struct bt_gatt_client {
->>>          * the remote peripheral.
->>>          */
->>>         unsigned int svc_chngd_ind_id;
->>> +       bool svc_chngd_registered;
->>>         struct queue *svc_chngd_queue;  /* Queued service changed events */
->>>         bool in_svc_chngd;
->>>
->>> @@ -234,12 +235,6 @@ static struct notify_chrc *notify_chrc_create(struct bt_gatt_client *client,
->>>                                                         &properties, NULL))
->>>                         return NULL;
->>>
->>> -       /* Find the CCC characteristic */
->>> -       ccc = NULL;
->>> -       gatt_db_service_foreach_desc(attr, find_ccc, &ccc);
->>> -       if (!ccc)
->>> -               return NULL;
->>> -
->>>         chrc = new0(struct notify_chrc, 1);
->>>         if (!chrc)
->>>                 return NULL;
->>> @@ -250,8 +245,17 @@ static struct notify_chrc *notify_chrc_create(struct bt_gatt_client *client,
->>>                 return NULL;
->>>         }
->>>
->>> +       /*
->>> +        * Find the CCC characteristic. Some characteristics that allow
->>> +        * notifications may not have a CCC descriptor. We treat these as
->>> +        * automatically successful.
->>> +        */
->>> +       ccc = NULL;
->>> +       gatt_db_service_foreach_desc(attr, find_ccc, &ccc);
->>> +       if (ccc)
->>> +               chrc->ccc_handle = gatt_db_attribute_get_handle(ccc);
->>> +
->>>         chrc->value_handle = value_handle;
->>> -       chrc->ccc_handle = gatt_db_attribute_get_handle(ccc);
->>>         chrc->properties = properties;
->>>
->>>         queue_push_tail(client->notify_chrcs, chrc);
->>> @@ -1020,6 +1024,7 @@ static void service_changed_reregister_cb(uint16_t att_ecode, void *user_data)
->>>                 util_debug(client->debug_callback, client->debug_data,
->>>                         "Re-registered handler for \"Service Changed\" after "
->>>                         "change in GATT service");
->>> +               client->svc_chngd_registered = true;
->>>                 return;
->>>         }
->>>
->>> @@ -1089,6 +1094,7 @@ static void service_changed_complete(struct discovery_op *op, bool success,
->>>         /* The GATT service was modified. Re-register the handler for
->>>          * indications from the "Service Changed" characteristic.
->>>          */
->>> +       client->svc_chngd_registered = false;
->>>         client->svc_chngd_ind_id = bt_gatt_client_register_notify(client,
->>>                                         gatt_db_attribute_get_handle(attr),
->>>                                         service_changed_reregister_cb,
->>> @@ -1197,6 +1203,7 @@ static void service_changed_register_cb(uint16_t att_ecode, void *user_data)
->>>                 goto done;
->>>         }
->>>
->>> +       client->svc_chngd_registered = true;
->>>         client->ready = true;
->>>         success = true;
->>>         util_debug(client->debug_callback, client->debug_data,
->>> @@ -1239,13 +1246,16 @@ static void init_complete(struct discovery_op *op, bool success,
->>>                                         service_changed_register_cb,
->>>                                         service_changed_cb,
->>>                                         client, NULL);
->>> -       client->ready = false;
->>> +
->>> +       if (!client->svc_chngd_registered)
->>> +               client->ready = false;
->>>
->>>         if (client->svc_chngd_ind_id)
->>>                 return;
->>>
->>>         util_debug(client->debug_callback, client->debug_data,
->>>                         "Failed to register handler for \"Service Changed\"");
->>> +       success = false;
->>>
->>>  fail:
->>>         util_debug(client->debug_callback, client->debug_data,
->>> @@ -1423,18 +1433,17 @@ static void complete_unregister_notify(void *data)
->>>          */
->>>         if (notify_data->att_id) {
->>>                 bt_att_cancel(notify_data->client->att, notify_data->att_id);
->>> -               notify_data_unref(notify_data);
->>> -               return;
->>> +               goto done;
->>>         }
->>>
->>> -       if (__sync_sub_and_fetch(&notify_data->chrc->notify_count, 1)) {
->>> -               notify_data_unref(notify_data);
->>> -               return;
->>> -       }
->>> +       if (__sync_sub_and_fetch(&notify_data->chrc->notify_count, 1) ||
->>> +                                               !notify_data->chrc->ccc_handle)
->>> +               goto done;
->>>
->>>         if (notify_data_write_ccc(notify_data, false, disable_ccc_callback))
->>>                 return;
->>>
->>> +done:
->>>         notify_data_unref(notify_data);
->>>  }
->>>
->>> @@ -2571,9 +2580,7 @@ unsigned int bt_gatt_client_register_notify(struct bt_gatt_client *client,
->>>         /* Add the handler to the bt_gatt_client's general list */
->>>         queue_push_tail(client->notify_list, notify_data);
->>>
->>> -       /* Assign an ID to the handler and notify the caller that it was
->>> -        * successfully registered.
->>> -        */
->>> +       /* Assign an ID to the handler. */
->>>         if (client->next_reg_id < 1)
->>>                 client->next_reg_id = 1;
->>>
->>> @@ -2591,7 +2598,7 @@ unsigned int bt_gatt_client_register_notify(struct bt_gatt_client *client,
->>>         /*
->>>          * If the ref count is not zero, then notifications are already enabled.
->>>          */
->>> -       if (chrc->notify_count > 0) {
->>> +       if (chrc->notify_count > 0 || !chrc->ccc_handle) {
->>>                 complete_notify_request(notify_data);
->>>                 return notify_data->id;
->>>         }
->>> --
->>> 2.2.0.rc0.207.ga3a616c
->>>
->>> --
->>> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
->>> the body of a message to majordomo@vger.kernel.org
->>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->>
->>
->>
->> --
->> Luiz Augusto von Dentz
->
-> Thanks,
-> Arman
-
-
-
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 1b18b1d6a299..bf45ef126339 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -1383,9 +1383,6 @@ void mgmt_ssp_enable_complete(struct hci_dev *hdev, u8 enable, u8 status);
+ void mgmt_set_class_of_dev_complete(struct hci_dev *hdev, u8 *dev_class,
+ 				    u8 status);
+ void mgmt_set_local_name_complete(struct hci_dev *hdev, u8 *name, u8 status);
+-void mgmt_read_local_oob_data_complete(struct hci_dev *hdev, u8 *hash192,
+-				       u8 *rand192, u8 *hash256, u8 *rand256,
+-				       u8 status);
+ void mgmt_device_found(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
+ 		       u8 addr_type, u8 *dev_class, s8 rssi, u32 flags,
+ 		       u8 *eir, u16 eir_len, u8 *scan_rsp, u8 scan_rsp_len);
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 791dfdfc18a4..0236f8f256c8 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -1045,11 +1045,6 @@ static void hci_cc_read_local_oob_data(struct hci_dev *hdev,
+ 	struct hci_rp_read_local_oob_data *rp = (void *) skb->data;
+ 
+ 	BT_DBG("%s status 0x%2.2x", hdev->name, rp->status);
+-
+-	hci_dev_lock(hdev);
+-	mgmt_read_local_oob_data_complete(hdev, rp->hash, rp->rand, NULL, NULL,
+-					  rp->status);
+-	hci_dev_unlock(hdev);
+ }
+ 
+ static void hci_cc_read_local_oob_ext_data(struct hci_dev *hdev,
+@@ -1058,15 +1053,8 @@ static void hci_cc_read_local_oob_ext_data(struct hci_dev *hdev,
+ 	struct hci_rp_read_local_oob_ext_data *rp = (void *) skb->data;
+ 
+ 	BT_DBG("%s status 0x%2.2x", hdev->name, rp->status);
+-
+-	hci_dev_lock(hdev);
+-	mgmt_read_local_oob_data_complete(hdev, rp->hash192, rp->rand192,
+-					  rp->hash256, rp->rand256,
+-					  rp->status);
+-	hci_dev_unlock(hdev);
+ }
+ 
+-
+ static void hci_cc_le_set_random_addr(struct hci_dev *hdev, struct sk_buff *skb)
+ {
+ 	__u8 status = *((__u8 *) skb->data);
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 9ec5390c85eb..0f7e78cf2494 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -3585,10 +3585,85 @@ failed:
+ 	return err;
+ }
+ 
++static void read_local_oob_data_complete(struct hci_dev *hdev, u8 status,
++				         u16 opcode, struct sk_buff *skb)
++{
++	struct mgmt_rp_read_local_oob_data mgmt_rp;
++	size_t rp_size = sizeof(mgmt_rp);
++	struct pending_cmd *cmd;
++
++	BT_DBG("%s status %u", hdev->name, status);
++
++	cmd = mgmt_pending_find(MGMT_OP_READ_LOCAL_OOB_DATA, hdev);
++	if (!cmd)
++		return;
++
++	if (status || !skb) {
++		cmd_status(cmd->sk, hdev->id, MGMT_OP_READ_LOCAL_OOB_DATA,
++			   status ? mgmt_status(status) : MGMT_STATUS_FAILED);
++		goto remove;
++	}
++
++	/* hci_get_cmd_complete() assumes ownership of the skb (it will
++	 * e.g. free it upon error), so we need to do an skb_get() to
++	 * have our own reference.
++	 */
++	skb = hci_get_cmd_complete(hdev, opcode, 0, skb_get(skb));
++	if (IS_ERR(skb)) {
++		BT_ERR("%s Unable to get local OOB response data (%ld)",
++		       hdev->name, PTR_ERR(skb));
++		cmd_status(cmd->sk, hdev->id, MGMT_OP_READ_LOCAL_OOB_DATA,
++			   MGMT_STATUS_FAILED);
++		goto remove;
++	}
++
++	memset(&mgmt_rp, 0, sizeof(mgmt_rp));
++
++	if (opcode == HCI_OP_READ_LOCAL_OOB_DATA) {
++		struct hci_rp_read_local_oob_data *rp = (void *) skb->data;
++
++		if (skb->len < sizeof(*rp)) {
++			cmd_status(cmd->sk, hdev->id,
++			           MGMT_OP_READ_LOCAL_OOB_DATA,
++				   MGMT_STATUS_FAILED);
++			goto free_skb;
++		}
++
++		memcpy(mgmt_rp.hash192, rp->hash, sizeof(rp->hash));
++		memcpy(mgmt_rp.rand192, rp->rand, sizeof(rp->rand));
++
++		rp_size -= sizeof(mgmt_rp.hash256) + sizeof(mgmt_rp.rand256);
++	} else {
++		struct hci_rp_read_local_oob_ext_data *rp = (void *) skb->data;
++
++		if (skb->len < sizeof(*rp)) {
++			cmd_status(cmd->sk, hdev->id,
++			           MGMT_OP_READ_LOCAL_OOB_DATA,
++				   MGMT_STATUS_FAILED);
++			goto free_skb;
++		}
++
++		memcpy(mgmt_rp.hash192, rp->hash192, sizeof(rp->hash192));
++		memcpy(mgmt_rp.rand192, rp->rand192, sizeof(rp->rand192));
++
++		memcpy(mgmt_rp.hash256, rp->hash256, sizeof(rp->hash256));
++		memcpy(mgmt_rp.rand256, rp->rand256, sizeof(rp->rand256));
++	}
++
++	cmd_complete(cmd->sk, hdev->id, MGMT_OP_READ_LOCAL_OOB_DATA,
++		     MGMT_STATUS_SUCCESS, &mgmt_rp, rp_size);
++
++free_skb:
++	kfree_skb(skb);
++remove:
++	mgmt_pending_remove(cmd);
++}
++
+ static int read_local_oob_data(struct sock *sk, struct hci_dev *hdev,
+ 			       void *data, u16 data_len)
+ {
+ 	struct pending_cmd *cmd;
++	struct hci_request req;
+ 	int err;
+ 
+ 	BT_DBG("%s", hdev->name);
+@@ -3619,12 +3694,14 @@ static int read_local_oob_data(struct sock *sk, struct hci_dev *hdev,
+ 		goto unlock;
+ 	}
+ 
++	hci_req_init(&req, hdev);
++
+ 	if (bredr_sc_enabled(hdev))
+-		err = hci_send_cmd(hdev, HCI_OP_READ_LOCAL_OOB_EXT_DATA,
+-				   0, NULL);
++		hci_req_add(&req, HCI_OP_READ_LOCAL_OOB_EXT_DATA, 0, NULL);
+ 	else
+-		err = hci_send_cmd(hdev, HCI_OP_READ_LOCAL_OOB_DATA, 0, NULL);
++		hci_req_add(&req, HCI_OP_READ_LOCAL_OOB_DATA, 0, NULL);
+ 
++	err = hci_req_run_skb(&req, read_local_oob_data_complete);
+ 	if (err < 0)
+ 		mgmt_pending_remove(cmd);
+ 
+@@ -7152,42 +7229,6 @@ void mgmt_set_local_name_complete(struct hci_dev *hdev, u8 *name, u8 status)
+ 		   cmd ? cmd->sk : NULL);
+ }
+ 
+-void mgmt_read_local_oob_data_complete(struct hci_dev *hdev, u8 *hash192,
+-				       u8 *rand192, u8 *hash256, u8 *rand256,
+-				       u8 status)
+-{
+-	struct pending_cmd *cmd;
+-
+-	BT_DBG("%s status %u", hdev->name, status);
+-
+-	cmd = mgmt_pending_find(MGMT_OP_READ_LOCAL_OOB_DATA, hdev);
+-	if (!cmd)
+-		return;
+-
+-	if (status) {
+-		cmd_status(cmd->sk, hdev->id, MGMT_OP_READ_LOCAL_OOB_DATA,
+-			   mgmt_status(status));
+-	} else {
+-		struct mgmt_rp_read_local_oob_data rp;
+-		size_t rp_size = sizeof(rp);
+-
+-		memcpy(rp.hash192, hash192, sizeof(rp.hash192));
+-		memcpy(rp.rand192, rand192, sizeof(rp.rand192));
+-
+-		if (bredr_sc_enabled(hdev) && hash256 && rand256) {
+-			memcpy(rp.hash256, hash256, sizeof(rp.hash256));
+-			memcpy(rp.rand256, rand256, sizeof(rp.rand256));
+-		} else {
+-			rp_size -= sizeof(rp.hash256) + sizeof(rp.rand256);
+-		}
+-
+-		cmd_complete(cmd->sk, hdev->id, MGMT_OP_READ_LOCAL_OOB_DATA, 0,
+-			     &rp, rp_size);
+-	}
+-
+-	mgmt_pending_remove(cmd);
+-}
+-
+ static inline bool has_uuid(u8 *uuid, u16 uuid_count, u8 (*uuids)[16])
+ {
+ 	int i;
 -- 
-Luiz Augusto von Dentz
+2.1.0
+
