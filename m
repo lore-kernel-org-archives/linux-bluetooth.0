@@ -1,111 +1,83 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <CANLBX6DaN=F1f3UcAxKE85r_NneFzUBD=sKkjARL9vpO7CV-Rg@mail.gmail.com>
-References: <1422596768-17058-1-git-send-email-lukasz.rymanowski@tieto.com>
-	<CANLBX6DaN=F1f3UcAxKE85r_NneFzUBD=sKkjARL9vpO7CV-Rg@mail.gmail.com>
-Date: Thu, 5 Feb 2015 11:58:59 +0100
-Message-ID: <CAN_7+YZsZNdqnnfLhLHdjzZA0+5xAkQsHVLVvT+znzM=1jihyA@mail.gmail.com>
-Subject: Re: [PATCH 1/2] android/gatt: Fix Find By Type request
-From: Lukasz Rymanowski <lukasz.rymanowski@gmail.com>
-To: Jakub Tyszkowski <tyszja@gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+In-Reply-To: <000401d04126$ad2c2ae0$078480a0$@samsung.com>
+References: <1422452517-4240-1-git-send-email-gowtham.ab@samsung.com>
+	<001201d03c96$10ca2ab0$325e8010$@samsung.com>
+	<CABBYNZKWB+dLTKgP-_znxrycq8VK8jNJPmVaGGBWPhK5Vf0BLw@mail.gmail.com>
+	<000801d03eb4$99812f00$cc838d00$@samsung.com>
+	<000401d04126$ad2c2ae0$078480a0$@samsung.com>
+Date: Thu, 5 Feb 2015 12:32:44 +0200
+Message-ID: <CABBYNZ+Yv2aH-WuN+yNDmyO=q7MvfQO7sN3s6TgrVn=pj25gag@mail.gmail.com>
+Subject: Re: [PATCH] test/pbap-client: Add support to fetch spd,fav PB
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Gowtham Anandha Babu <gowtham.ab@samsung.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	Bharat Panda <bharat.panda@samsung.com>, cpgs@samsung.com
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jakub,
+Hi Gowtham,
 
-On Wed, Feb 4, 2015 at 10:30 AM, Jakub Tyszkowski <tyszja@gmail.com> wrote:
-> Hi Lukasz,
+On Thu, Feb 5, 2015 at 11:32 AM, Gowtham Anandha Babu
+<gowtham.ab@samsung.com> wrote:
+> Ping.
 >
-> 2015-01-30 6:46 GMT+01:00 Lukasz Rymanowski <lukasz.rymanowski@tieto.com>:
->> With this patch GATT will correctly response with attribute not found if
->> there is no attributes matching.
+>> -----Original Message-----
+>> From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-
+>> owner@vger.kernel.org] On Behalf Of Gowtham Anandha Babu
+>> Sent: Monday, February 02, 2015 12:21 PM
+>> To: 'Luiz Augusto von Dentz'
+>> Cc: linux-bluetooth@vger.kernel.org; 'Bharat Panda'; cpgs@samsung.com
+>> Subject: RE: [PATCH] test/pbap-client: Add support to fetch spd,fav PB
 >>
->> Issue found and fix tested on UPF50
->> ---
->>  android/gatt.c | 7 ++++++-
->>  1 file changed, 6 insertions(+), 1 deletion(-)
+>> Hi Luiz,
 >>
->> diff --git a/android/gatt.c b/android/gatt.c
->> index 466c1ea..3b0b81d 100644
->> --- a/android/gatt.c
->> +++ b/android/gatt.c
->> @@ -6258,6 +6258,7 @@ struct find_by_type_request_data {
->>         uint8_t *search_value;
->>         size_t search_vlen;
->>         uint8_t error;
->> +       bool found;
->>  };
->>
->>  static void find_by_type_request_cb(struct gatt_db_attribute *attrib,
->> @@ -6289,6 +6290,9 @@ static void find_by_type_request_cb(struct gatt_db_attribute *attrib,
->>                                                         find_data->search_vlen);
->>
->>         queue_push_tail(find_data->device->pending_requests, request_data);
->> +
->> +       if (!find_data->found)
->> +               find_data->found = true;
->>  }
->>
->>  static uint8_t find_by_type_request(const uint8_t *cmd, uint16_t cmd_len,
->> @@ -6315,11 +6319,12 @@ static uint8_t find_by_type_request(const uint8_t *cmd, uint16_t cmd_len,
->>         data.search_vlen = search_vlen;
->>         data.search_value = search_value;
->>         data.device = device;
->> +       data.found = false;
->>
->>         gatt_db_find_by_type(gatt_db, start, end, &uuid,
->>                                                 find_by_type_request_cb, &data);
->>
->> -       if (data.error == ATT_ECODE_ATTR_NOT_FOUND) {
->> +       if (!data.found) {
->>                 size_t mtu;
->>                 uint8_t *rsp = g_attrib_get_buffer(device->attrib, &mtu);
->>
->> --
->> 1.8.4
->>
->> --
->> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
->> the body of a message to majordomo@vger.kernel.org
->> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->
->
-> Maybe this issue can be solved like this:
->
-> @@ -6274,17 +6274,9 @@ static uint8_t find_by_type_request(const
-> uint8_t *cmd, uint16_t cmd_len,
->         gatt_db_find_by_type(gatt_db, start, end, &uuid,
->                                                 find_by_type_request_cb, &data);
->
-> -       if (data.error == ATT_ECODE_ATTR_NOT_FOUND) {
-> -               size_t mtu;
-> -               uint8_t *rsp = g_attrib_get_buffer(device->attrib, &mtu);
-> -
-> -               len = enc_error_resp(ATT_OP_FIND_BY_TYPE_REQ, start,
-> -                                       ATT_ECODE_ATTR_NOT_FOUND, rsp, mtu);
-> -               g_attrib_send(device->attrib, 0, rsp, len, NULL, NULL, NULL);
-> -               return 0;
-> -       }
-> -
-> -       if (!data.error)
-> +       if (queue_isempty(device->pending_requests))
-> +               data.error = ATT_ECODE_ATTR_NOT_FOUND;
-> +       else
->                 process_dev_pending_requests(device, ATT_OP_FIND_BY_TYPE_REQ);
->
->         return data.error;
->
->
+>> > -----Original Message-----
+>> > From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-
+>> > owner@vger.kernel.org] On Behalf Of Luiz Augusto von Dentz
+>> > Sent: Friday, January 30, 2015 9:03 PM
+>> > To: Gowtham Anandha Babu
+>> > Cc: linux-bluetooth@vger.kernel.org; Bharat Panda; cpgs@samsung.com
+>> > Subject: Re: [PATCH] test/pbap-client: Add support to fetch spd,fav PB
+>> >
+>> > Hi Gowtham,
+>> >
+>> > On Fri, Jan 30, 2015 at 4:07 PM, Gowtham Anandha Babu
+>> > <gowtham.ab@samsung.com> wrote:
+>> > > Ping.
+>> > >
+>> > >> -----Original Message-----
+>> > >> From: linux-bluetooth-owner@vger.kernel.org
+>> > >> [mailto:linux-bluetooth- owner@vger.kernel.org] On Behalf Of
+>> > >> Gowtham Anandha Babu
+>> > >> Sent: Wednesday, January 28, 2015 7:12 PM
+>> > >> To: linux-bluetooth@vger.kernel.org
+>> > >> Cc: bharat.panda@samsung.com; cpgs@samsung.com; Gowtham
+>> > Anandha Babu
+>> > >> Subject: [PATCH] test/pbap-client: Add support to fetch spd,fav PB
+>> > >>
+>> > >> Adds support to fetch spd,fav phonebook.
+>> > >> Tested using PTS test case TC_PCE_PBB_BV_01_C.
+>> > >> ---
+>> > >>  test/pbap-client | 2 +-
+>> > >>  1 file changed, 1 insertion(+), 1 deletion(-)
+>> > >>
+>> > >> diff --git a/test/pbap-client b/test/pbap-client index
+>> > >> 51e26eb..16a786b
+>> > >> 100755
+>> > >> --- a/test/pbap-client
+>> > >> +++ b/test/pbap-client
+>> > >> @@ -170,6 +170,6 @@ if  __name__ == '__main__':
+>> > >>
+>> > >>               pbap_client.flush_transfers(lambda:
+>> > >> test_paths(paths[1:]))
+>> > >>
+>> > >> -     test_paths(["PB", "ICH", "OCH", "MCH", "CCH"])
+>> > >> +     test_paths(["PB", "ICH", "OCH", "MCH", "CCH", "SPD", "FAV"])
+>> > >>
+>> > >>       mainloop.run()
+>> > >> --
+>> > >> 1.9.1
 
-I considered that but this is still not a clear solution for me.
-I think rather to make gatt_db_find_by_type() return number of found attributes.
-
-\Lukasz
-> Regards,
-> Jakub Tyszkowski
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+Applied, thanks.
