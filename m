@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 07/12] client: Add attribute-info command
-Date: Fri,  6 Feb 2015 13:03:39 +0200
-Message-Id: <1423220624-18861-8-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 05/12] client: Add command list-attributes
+Date: Fri,  6 Feb 2015 13:03:37 +0200
+Message-Id: <1423220624-18861-6-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1423220624-18861-1-git-send-email-luiz.dentz@gmail.com>
 References: <1423220624-18861-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,139 +11,88 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-attribute-info can be used to print out attribute information.
+This command can be used to list service attributes of a device.
 ---
- client/main.c | 96 +++++++++++++++++++++++++++++++++++++++++++++++++----------
- 1 file changed, 81 insertions(+), 15 deletions(-)
+ client/gatt.c | 29 +++++++++++++++++++++++++++++
+ client/gatt.h |  2 ++
+ client/main.c | 13 +++++++++++++
+ 3 files changed, 44 insertions(+)
 
-diff --git a/client/main.c b/client/main.c
-index 1481694..614efca 100644
---- a/client/main.c
-+++ b/client/main.c
-@@ -160,7 +160,6 @@ static void print_iter(const char *label, const char *name,
- 	dbus_int16_t vals16;
- 	const char *valstr;
- 	DBusMessageIter subiter;
--	int type;
+diff --git a/client/gatt.c b/client/gatt.c
+index 47785a8..7c44a9f 100644
+--- a/client/gatt.c
++++ b/client/gatt.c
+@@ -220,3 +220,32 @@ void gatt_remove_descriptor(GDBusProxy *proxy)
  
- 	if (iter == NULL) {
- 		rl_printf("%s%s is nil\n", label, name);
-@@ -193,23 +192,23 @@ static void print_iter(const char *label, const char *name,
- 		dbus_message_iter_get_basic(iter, &vals16);
- 		rl_printf("%s%s: %d\n", label, name, vals16);
- 		break;
-+	case DBUS_TYPE_VARIANT:
-+		dbus_message_iter_recurse(iter, &subiter);
-+		print_iter(label, name, &subiter);
-+		break;
- 	case DBUS_TYPE_ARRAY:
- 		dbus_message_iter_recurse(iter, &subiter);
--		rl_printf("%s%s:\n", label, name);
--
--		do {
--			type = dbus_message_iter_get_arg_type(&subiter);
--			if (type == DBUS_TYPE_INVALID)
--				break;
--
--			if (type == DBUS_TYPE_STRING) {
--				dbus_message_iter_get_basic(&subiter, &valstr);
--				rl_printf("\t%s\n", valstr);
--			}
--
-+		while (dbus_message_iter_get_arg_type(&subiter) !=
-+							DBUS_TYPE_INVALID) {
-+			print_iter(label, name, &subiter);
- 			dbus_message_iter_next(&subiter);
--		} while(true);
--
-+		}
-+		break;
-+	case DBUS_TYPE_DICT_ENTRY:
-+		dbus_message_iter_recurse(iter, &subiter);
-+		dbus_message_iter_get_basic(&subiter, &valstr);
-+		dbus_message_iter_next(&subiter);
-+		print_iter(label, valstr, &subiter);
- 		break;
- 	default:
- 		rl_printf("%s%s has unsupported type\n", label, name);
-@@ -1212,6 +1211,71 @@ static void cmd_select_attribute(const char *arg)
- 		set_default_attribute(proxy);
+ 	print_descriptor(proxy, COLORED_DEL);
  }
- 
-+static struct GDBusProxy *find_attribute(const char *arg)
++
++static void list_attributes(const char *path, GList *source)
 +{
-+	GDBusProxy *proxy;
++	GList *l;
 +
-+	if (!arg || !strlen(arg)) {
-+		if (default_attr)
-+			return default_attr;
-+		rl_printf("Missing attribute argument\n");
-+		return NULL;
++	for (l = source; l; l = g_list_next(l)) {
++		GDBusProxy *proxy = l->data;
++		const char *proxy_path;
++
++		proxy_path = g_dbus_proxy_get_path(proxy);
++
++		if (!g_str_has_prefix(proxy_path, path))
++			continue;
++
++		if (source == services) {
++			print_service(proxy, NULL);
++			list_attributes(proxy_path, characteristics);
++		} else if (source == characteristics) {
++			print_characteristic(proxy, NULL);
++			list_attributes(proxy_path, descriptors);
++		} else if (source == descriptors)
++			print_descriptor(proxy, NULL);
 +	}
-+
-+	proxy = gatt_select_attribute(arg);
-+	if (!proxy) {
-+		rl_printf("Attribute %s not available\n", arg);
-+		return NULL;
-+	}
-+
-+	return proxy;
 +}
 +
-+static void cmd_attribute_info(const char *arg)
++void gatt_list_attributes(const char *path)
++{
++	list_attributes(path, services);
++}
+diff --git a/client/gatt.h b/client/gatt.h
+index 8b30668..5785073 100644
+--- a/client/gatt.h
++++ b/client/gatt.h
+@@ -29,3 +29,5 @@ void gatt_remove_characteristic(GDBusProxy *proxy);
+ 
+ void gatt_add_descriptor(GDBusProxy *proxy);
+ void gatt_remove_descriptor(GDBusProxy *proxy);
++
++void gatt_list_attributes(const char *device);
+diff --git a/client/main.c b/client/main.c
+index 72223d5..7cdb19a 100644
+--- a/client/main.c
++++ b/client/main.c
+@@ -1150,6 +1150,17 @@ static void cmd_disconn(const char *arg)
+ 	rl_printf("Attempting to disconnect from %s\n", arg);
+ }
+ 
++static void cmd_list_attributes(const char *arg)
 +{
 +	GDBusProxy *proxy;
-+	DBusMessageIter iter;
-+	const char *iface, *uuid, *text;
 +
-+	proxy = find_attribute(arg);
++	proxy = find_device(arg);
 +	if (!proxy)
 +		return;
 +
-+	if (g_dbus_proxy_get_property(proxy, "UUID", &iter) == FALSE)
-+		return;
-+
-+	dbus_message_iter_get_basic(&iter, &uuid);
-+
-+	text = uuidstr_to_str(uuid);
-+	if (!text)
-+		text = g_dbus_proxy_get_path(proxy);
-+
-+	iface = g_dbus_proxy_get_interface(proxy);
-+	if (!strcmp(iface, "org.bluez.GattService1")) {
-+		rl_printf("Service - %s\n", text);
-+
-+		print_property(proxy, "UUID");
-+		print_property(proxy, "Primary");
-+		print_property(proxy, "Characteristics");
-+		print_property(proxy, "Includes");
-+	} else if (!strcmp(iface, "org.bluez.GattCharacteristic1")) {
-+		rl_printf("Characteristic - %s\n", text);
-+
-+		print_property(proxy, "UUID");
-+		print_property(proxy, "Service");
-+		print_property(proxy, "Value");
-+		print_property(proxy, "Notifying");
-+		print_property(proxy, "Flags");
-+		print_property(proxy, "Descriptors");
-+	} else if (!strcmp(iface, "org.bluez.GattDescriptor1")) {
-+		rl_printf("Descriptor - %s\n", text);
-+
-+		print_property(proxy, "UUID");
-+		print_property(proxy, "Characteristic");
-+		print_property(proxy, "Value");
-+	}
++	gatt_list_attributes(g_dbus_proxy_get_path(proxy));
 +}
 +
  static void cmd_version(const char *arg)
  {
  	rl_printf("Version %s\n", VERSION);
-@@ -1339,6 +1403,8 @@ static const struct {
+@@ -1268,6 +1279,8 @@ static const struct {
  							dev_generator },
- 	{ "select-attribute", "<attribute>",  cmd_select_attribute,
- 				"Select attribute", attribute_generator },
-+	{ "attribute-info", "[attribute]",  cmd_attribute_info,
-+				"Select attribute", attribute_generator },
+ 	{ "disconnect",   "[dev]",    cmd_disconn, "Disconnect device",
+ 							dev_generator },
++	{ "list-attributes", "[dev]", cmd_list_attributes, "List attributes",
++							dev_generator },
  	{ "version",      NULL,       cmd_version, "Display version" },
  	{ "quit",         NULL,       cmd_quit, "Quit program" },
  	{ "exit",         NULL,       cmd_quit },
