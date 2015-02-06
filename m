@@ -1,87 +1,123 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1418850810-31655-1-git-send-email-jpawlowski@google.com>
-References: <1418850810-31655-1-git-send-email-jpawlowski@google.com>
-Date: Fri, 6 Feb 2015 15:08:00 -0800
-Message-ID: <CAD0=r8xZVpW0mEwuAORpw06Ki-aqZBZ=ybwwgKb2J1uJ6BaVCA@mail.gmail.com>
-Subject: Re: [PATCH v4] doc/adapter-api.txt: StartFilteredDiscovery method.
-From: Jakub Pawlowski <jpawlowski@google.com>
-To: BlueZ development <linux-bluetooth@vger.kernel.org>
-Cc: Jakub Pawlowski <jpawlowski@google.com>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2070.6\))
+Subject: Re: [PATCHv1] Bluetooth: Check supported commands before run
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1423237552-23080-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Date: Fri, 6 Feb 2015 09:00:39 -0800
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <7CB14AA1-0C38-4FA3-89FA-72D4BE4BC8FF@holtmann.org>
+References: <1423237552-23080-1-git-send-email-Andrei.Emeltchenko.news@gmail.com> <1423237552-23080-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+To: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Andrei,
 
-Since there are no more comments for this proposal, can we please submit
-this doc ?
-I'll send implementation for review today.
-
-Regards,
-Jakub
-
-On Wed, Dec 17, 2014 at 1:13 PM, Jakub Pawlowski <jpawlowski@google.com> wrote:
-> This patch proposes new method, StartFilteredDiscovery to D-Bus Adapter
-> API for desktop bluetoothd. It will allow for rapid discovery of nearby
-> devices that advertise services.
->
-> Signed-off-by: Jakub Pawlowski <jpawlowski@google.com>
+> Despite AMP initialization sequence commands are mandatory according to
+> Bluetooth Spec, some implementations do not support all mentioned
+> commands (specifically Remove Read Local Supported Features).
+> Initialization sequence is split to two stages, second stage only run
+> commands mentioned in Local Supported Commands response.
+> Fixes following bug:
+> ...
+> < HCI Command: Read Local Supported Fea.. (0x04|0x0003) plen 0  [hci1]
+> 6.525974
+>> HCI Event: Command Status (0x0f) plen 4                       [hci1]
+>> 6.542668
+>      Read Local Supported Features (0x04|0x0003) ncmd 1
+>        Status: Unknown HCI Command (0x01)
+> ...
+> 
+> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 > ---
->  doc/adapter-api.txt | 40 ++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 40 insertions(+)
->
-> diff --git a/doc/adapter-api.txt b/doc/adapter-api.txt
-> index 74d235a..e07c74c 100644
-> --- a/doc/adapter-api.txt
-> +++ b/doc/adapter-api.txt
-> @@ -22,6 +22,46 @@ Methods              void StartDiscovery()
->                         Possible errors: org.bluez.Error.NotReady
->                                          org.bluez.Error.Failed
->
-> +               void StartFilteredDiscovery(dict filter, string transport)
+> net/bluetooth/hci_core.c | 56 ++++++++++++++++++++++++++++++------------------
+> 1 file changed, 35 insertions(+), 21 deletions(-)
+> 
+> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+> index 3322d3f..5403155 100644
+> --- a/net/bluetooth/hci_core.c
+> +++ b/net/bluetooth/hci_core.c
+> @@ -399,21 +399,6 @@ static void amp_init(struct hci_request *req)
+> 
+> 	/* Read Local Supported Commands */
+> 	hci_req_add(req, HCI_OP_READ_LOCAL_COMMANDS, 0, NULL);
+> -
+> -	/* Read Local Supported Features */
+> -	hci_req_add(req, HCI_OP_READ_LOCAL_FEATURES, 0, NULL);
+> -
+> -	/* Read Local AMP Info */
+> -	hci_req_add(req, HCI_OP_READ_LOCAL_AMP_INFO, 0, NULL);
+> -
+> -	/* Read Data Blk size */
+> -	hci_req_add(req, HCI_OP_READ_DATA_BLOCK_SIZE, 0, NULL);
+
+lets keep AMP info and block size in the original level 1. They are mandatory and do not have any default values. So if they are not supported, lets fail the init sequence.
+
+> -
+> -	/* Read Flow Control Mode */
+> -	hci_req_add(req, HCI_OP_READ_FLOW_CONTROL_MODE, 0, NULL);
+> -
+> -	/* Read Location Data */
+> -	hci_req_add(req, HCI_OP_READ_LOCATION_DATA, 0, NULL);
+
+These two make sense to be optional since they have default values attached with it.
+
+Regards
+
+Marcel
+
+> }
+> 
+> static void hci_init1_req(struct hci_request *req, unsigned long opt)
+> @@ -578,6 +563,35 @@ static void hci_init2_req(struct hci_request *req, unsigned long opt)
+> {
+> 	struct hci_dev *hdev = req->hdev;
+> 
+> +	if (hdev->dev_type == HCI_AMP) {
+> +		/* Check the supported commands and only if the the command
+> +		 * is marked as supported send it
+> +		 */
 > +
-> +                       This method starts the device discovery session with
-> +                       filtering by uuids, and rssi or pathloss value. Use
-> +                       StopDiscovery to release the sessions acquired.
+> +		/* Read Local Supported Features */
+> +		if (hdev->commands[14] & 0x20)
+> +			hci_req_add(req, HCI_OP_READ_LOCAL_FEATURES, 0, NULL);
 > +
-> +                       transport parameter:
-> +                               "auto"  - interleaved scan, default value. It
-> +                                         will cause a BR/EDR & LE interleaved
-> +                                         scan on dual-mode controllers, on
-> +                                         single-mode (LE-only/BREDR-only)
-> +                                         controllers it will work on whatever
-> +                                         the controller supports.
-> +                               "bredr" - br/edr inquiry
-> +                               "le"    - le only scan
+> +		/* Read Local AMP Info */
+> +		if (hdev->commands[22] & 0x20)
+> +			hci_req_add(req, HCI_OP_READ_LOCAL_AMP_INFO, 0, NULL);
 > +
-> +                       Parameters that can be set in filter dictionary include
-> +                       the following:
+> +		/* Read Data Blk size */
+> +		if (hdev->commands[23] & 0x04)
+> +			hci_req_add(req, HCI_OP_READ_DATA_BLOCK_SIZE, 0, NULL);
 > +
-> +                       array{string} UUIDs : filtered service UUIDs (required)
-> +                       int16 RSSI      : RSSI threshold value (optional)
-> +                       uint16 pathloss : Pathloss threshold value (optional)
+> +		/* Read Flow Control Mode */
+> +		if (hdev->commands[23] & 0x01)
+> +			hci_req_add(req, HCI_OP_READ_FLOW_CONTROL_MODE, 0,
+> +				    NULL);
 > +
-> +                       When a device is found that advertise any UUID from
-> +                       UUIDs, it will be reported if:
-> +                       - pathloss and RSSI are both empty,
-> +                       - only pathloss param is set, device advertise TX pwer,
-> +                         and computed pathloss is less than pathloss param,
-> +                       - only RSSI param is set, and received RSSI is higher
-> +                         than RSSI param,
+> +		/* Read Location Data */
+> +		if (hdev->commands[22] & 0x08)
+> +			hci_req_add(req, HCI_OP_READ_LOCATION_DATA, 0, NULL);
 > +
-> +                       This process will start creating Device objects as new
-> +                       devices matching criteria are discovered. It will also
-> +                       emit PropertiesChanged signal for already existing
-> +                       Device objects, with updated RSSI value.
+> +		return;
+> +	}
 > +
-> +                       Possible errors: org.bluez.Error.NotReady
-> +                                        org.bluez.Error.Failed
-> +                                        org.bluez.Error.InvalidArguments
+> 	if (lmp_bredr_capable(hdev))
+> 		bredr_setup(req);
+> 	else
+> @@ -896,17 +910,17 @@ static int __hci_init(struct hci_dev *hdev)
+> 				    &dut_mode_fops);
+> 	}
+> 
+> +	err = __hci_req_sync(hdev, hci_init2_req, 0, HCI_INIT_TIMEOUT);
+> +	if (err < 0)
+> +		return err;
 > +
->                 void StopDiscovery()
->
->                         This method will cancel any previous StartDiscovery
-> --
-> 2.1.0
->
+
+I honestly was more thinking about an AMP specific 2nd init stage.
+
+Regards
+
+Marcel
+
