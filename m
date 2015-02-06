@@ -1,45 +1,286 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <54D4D012.4050108@endlessm.com>
-Date: Fri, 06 Feb 2015 14:30:42 +0000
-From: Mario Sanchez Prada <mario@endlessm.com>
 MIME-Version: 1.0
-To: linux-bluetooth@vger.kernel.org
-Subject: No SCO packets while trying to use a Bluetooth headset
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <CABBYNZKpecQihk9e0A+_NOiF+bG5jTncok2pRL=N812NFFKDeQ@mail.gmail.com>
+References: <1423022302-27124-1-git-send-email-armansito@chromium.org>
+	<CABBYNZLDAFdotoZMEr5AiBds3rJ_5KNM6WPS7VbtXmA7iT0rsQ@mail.gmail.com>
+	<CAHrH25TOLzhdP_3BocdSdTK27j69AzpLGdT5Eci9n7=QWV6Ntg@mail.gmail.com>
+	<CABBYNZKpecQihk9e0A+_NOiF+bG5jTncok2pRL=N812NFFKDeQ@mail.gmail.com>
+Date: Fri, 6 Feb 2015 06:19:16 -0800
+Message-ID: <CAHrH25TtP2Q7z2GRft8xyfXvtgc0ynd1QqUNCpiQNo=YAF2+7A@mail.gmail.com>
+Subject: Re: [PATCH] shared/gatt: Allow register_notify without CCC
+From: Arman Uguray <armansito@chromium.org>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Luiz,
 
-I have a problem with one Bluetooth host (chipset Realtek RTL8723BE) and a Bluetooth headset (Plantronics M50) I've been trying to find a solution for in the last days, without much success yet:
+> On Thu, Feb 5, 2015 at 1:29 AM, Luiz Augusto von Dentz <luiz.dentz@gmail.com> wrote:
+> Hi Arman,
+>
+> On Thu, Feb 5, 2015 at 12:05 AM, Arman Uguray <armansito@chromium.org> wrote:
+>> Hi Luiz,
+>>
+>>> On Wed, Feb 4, 2015 at 6:26 AM, Luiz Augusto von Dentz <luiz.dentz@gmail.com> wrote:
+>>> Hi Arman,
+>>>
+>>> On Wed, Feb 4, 2015 at 5:58 AM, Arman Uguray <armansito@chromium.org> wrote:
+>>>> Certain peripherals can expose a GATT characteristic with the
+>>>> notify/indicate property but with no Client Characteristic Configuration
+>>>> descriptor. Since bt_gatt_client_register_notify enforces a CCC as a
+>>>> requirement, it returns an error for such characteristics.
+>>>
+>>> Do you have some evidence of this? I don't mind not being too strict
+>>> while receiving but we need to document why we are doing these
+>>> changes,...
+>>
+>> I came across this while testing with a Nexus 6 device running Android
+>> L. The application exposes a "Service Changed" characteristic with no
+>> CCC, which is causing bt_gatt_client's initialization sequence to fail
+>> (since it assumes that there will be a CCC and treats the absence as
+>> an error). This seemed strange to me, so I did some digging, and the
+>> Bluetooth developer page actually lists "None" for "Descriptors"
+>> (https://developer.bluetooth.org/gatt/services/Pages/ServiceViewer.aspx?u=org.bluetooth.service.generic_attribute.xml)
+>> of this characteristic.
+>>
+>> However, this seemed incorrect to me, so I checked the Core Spec v4.2,
+>> Vol 3, Part G, Section 7.1 "Service Changed", which states: "This
+>> [Service Changed] Characteristic Value shall be configured to be
+>> indicated, using the Client Characteristic Configuration descriptor by
+>> a client. Indications caused by changes to the Service Changed
+>> Characteristic Value shall be considered lost if the client has not
+>> enabled indications in the Client Configuration Characteristic
+>> Descriptor." Which means that the CCC is certainly mandatory, so this
+>> must be an error in the developer page.
+>
+> It is probably a bug, and in this case the device might not even be
+> able to qualify since service changed has 2 tests: TP/GAS/CL/BV-01-C
+> and TP/GAS/SR/BV-01-C. We should probably communicate that the
+> documentation needs fixing and the TS should probably be updated as
+> well to reflect CCC is mandatory in this case.
+>
+>> Regardless, though, even if this is an error in the BlueDroid stack,
+>> it means that some devices may have incorrectly implemented the spec
+>> here, so we should probably tolerate this. BlueZ's server
+>> implementation SHOULD regardless expose this descriptor, but the
+>> client IMO shouldn't fail if the CCC generally doesn't exist.
+>
+> Provided the SIG don't come with invalid tests for service changed
+> that is probably okay for the client, for the server I don't how it
+> would pass TP/GAS/SR/BV-01-C without CCC except if PTS is ignoring the
+> lack of CCC which IMO defeats the purpose of the test. So the argument
+> for service changed is probably not valid here, but for custom
+> attributes where there is no tests to validate the implemenation
+> perhaps you have a point, but note that it still will need to set
+> BT_GATT_CHRC_PROP_NOTIFY and BT_GATT_CHRC_PROP_INDICATE, btw such
+> policies perhaps should be done directly in shared/gatt-client.c so we
+> don't need have duplicated logic for Android.
+>
+>>
+>>> ...and btw this perhaps makes my argument of enabling
+>>> notification by default even stronger since if such devices really
+>>> exists they might be notifying us since the beginning.
+>>>
+>>
+>> Hmm, I don't know how this makes that argument any stronger.
+>> bt_gatt_client already automatically registers for Service Changed,
+>> and for external applications we still want to only notify if an app
+>> is interested (which they can do now across connections).
+>>
+>> Generally, I want to treat this as a corner-case, since it's not
+>> really spec compliant behavior. Either way, it's probably not that bad
+>> to have this fix so that we don't bork out immediately with devices
+>> that behave incorrectly. Actually, it might be even more spec
+>> compliant for us to simply ignore the Service Changed characteristic
+>> if it's discovered but doesn't have a CCC, since the spec says
+>> "changes to the Service Changed Characteristic Value shall be
+>> considered lost if the client has not enabled indications in the
+>> Client Configuration Characteristic Descriptor", which would end up
+>> being a simpler fix on our end.
+>>
+>> Either way, I'll wait for your response to determine what the right
+>> behavior is here.
+>
+> For service changed perhaps, but since we are using
+> bt_gatt_client_register_notify for any notification we would need to
+> have a special case for service changed alone so I would not bother
+> since broken stacks in this respect will probably not pass the
+> qualification if the test spec where implemented properly, for any
+> other char I would not be so strict since some OS may allow adding a
+> characteristic with notifiy/indicate bits sets but without a CCC to
+> enable them, actually Android probably allows that to happen already,
+> sadly I think even our BlueZ for Android currently allows that.
+>
+>>> The other problem I now see is that there is probably no way to rate
+>>> limit the notification, because they are profile specific, so if you
+>>> had a problem with too much traffic on D-Bus this may already happen
+>>> even if we register the notification on demand.
+>>>
+>>
+>> Right, though I guess this is a separate issue that can be dealt with
+>> at the D-Bus API level. shared/gatt-client has to still send all
+>> notifications up, otherwise things like HoG wouldn't work well with a
+>> rate limit. Anyway, we can do this at a D-Bus API level separately.
+>> I'll add this to the general TODO list.
+>>
+>>>> This patch fixes this behavior so that bt_gatt_client_register_notify
+>>>> immediately registers the callback and returns success for
+>>>> characteristics with no CCC.
+>>>> ---
+>>>>  src/shared/gatt-client.c | 43 +++++++++++++++++++++++++------------------
+>>>>  1 file changed, 25 insertions(+), 18 deletions(-)
+>>>>
+>>>> diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
+>>>> index 5edb991..d0fc054 100644
+>>>> --- a/src/shared/gatt-client.c
+>>>> +++ b/src/shared/gatt-client.c
+>>>> @@ -88,6 +88,7 @@ struct bt_gatt_client {
+>>>>          * the remote peripheral.
+>>>>          */
+>>>>         unsigned int svc_chngd_ind_id;
+>>>> +       bool svc_chngd_registered;
+>>>>         struct queue *svc_chngd_queue;  /* Queued service changed events */
+>>>>         bool in_svc_chngd;
+>>>>
+>>>> @@ -234,12 +235,6 @@ static struct notify_chrc *notify_chrc_create(struct bt_gatt_client *client,
+>>>>                                                         &properties, NULL))
+>>>>                         return NULL;
+>>>>
+>>>> -       /* Find the CCC characteristic */
+>>>> -       ccc = NULL;
+>>>> -       gatt_db_service_foreach_desc(attr, find_ccc, &ccc);
+>>>> -       if (!ccc)
+>>>> -               return NULL;
+>>>> -
+>>>>         chrc = new0(struct notify_chrc, 1);
+>>>>         if (!chrc)
+>>>>                 return NULL;
+>>>> @@ -250,8 +245,17 @@ static struct notify_chrc *notify_chrc_create(struct bt_gatt_client *client,
+>>>>                 return NULL;
+>>>>         }
+>>>>
+>>>> +       /*
+>>>> +        * Find the CCC characteristic. Some characteristics that allow
+>>>> +        * notifications may not have a CCC descriptor. We treat these as
+>>>> +        * automatically successful.
+>>>> +        */
+>>>> +       ccc = NULL;
+>>>> +       gatt_db_service_foreach_desc(attr, find_ccc, &ccc);
+>>>> +       if (ccc)
+>>>> +               chrc->ccc_handle = gatt_db_attribute_get_handle(ccc);
+>>>> +
+>>>>         chrc->value_handle = value_handle;
+>>>> -       chrc->ccc_handle = gatt_db_attribute_get_handle(ccc);
+>>>>         chrc->properties = properties;
+>>>>
+>>>>         queue_push_tail(client->notify_chrcs, chrc);
+>>>> @@ -1020,6 +1024,7 @@ static void service_changed_reregister_cb(uint16_t att_ecode, void *user_data)
+>>>>                 util_debug(client->debug_callback, client->debug_data,
+>>>>                         "Re-registered handler for \"Service Changed\" after "
+>>>>                         "change in GATT service");
+>>>> +               client->svc_chngd_registered = true;
+>>>>                 return;
+>>>>         }
+>>>>
+>>>> @@ -1089,6 +1094,7 @@ static void service_changed_complete(struct discovery_op *op, bool success,
+>>>>         /* The GATT service was modified. Re-register the handler for
+>>>>          * indications from the "Service Changed" characteristic.
+>>>>          */
+>>>> +       client->svc_chngd_registered = false;
+>>>>         client->svc_chngd_ind_id = bt_gatt_client_register_notify(client,
+>>>>                                         gatt_db_attribute_get_handle(attr),
+>>>>                                         service_changed_reregister_cb,
+>>>> @@ -1197,6 +1203,7 @@ static void service_changed_register_cb(uint16_t att_ecode, void *user_data)
+>>>>                 goto done;
+>>>>         }
+>>>>
+>>>> +       client->svc_chngd_registered = true;
+>>>>         client->ready = true;
+>>>>         success = true;
+>>>>         util_debug(client->debug_callback, client->debug_data,
+>>>> @@ -1239,13 +1246,16 @@ static void init_complete(struct discovery_op *op, bool success,
+>>>>                                         service_changed_register_cb,
+>>>>                                         service_changed_cb,
+>>>>                                         client, NULL);
+>>>> -       client->ready = false;
+>>>> +
+>>>> +       if (!client->svc_chngd_registered)
+>>>> +               client->ready = false;
+>>>>
+>>>>         if (client->svc_chngd_ind_id)
+>>>>                 return;
+>>>>
+>>>>         util_debug(client->debug_callback, client->debug_data,
+>>>>                         "Failed to register handler for \"Service Changed\"");
+>>>> +       success = false;
+>>>>
+>>>>  fail:
+>>>>         util_debug(client->debug_callback, client->debug_data,
+>>>> @@ -1423,18 +1433,17 @@ static void complete_unregister_notify(void *data)
+>>>>          */
+>>>>         if (notify_data->att_id) {
+>>>>                 bt_att_cancel(notify_data->client->att, notify_data->att_id);
+>>>> -               notify_data_unref(notify_data);
+>>>> -               return;
+>>>> +               goto done;
+>>>>         }
+>>>>
+>>>> -       if (__sync_sub_and_fetch(&notify_data->chrc->notify_count, 1)) {
+>>>> -               notify_data_unref(notify_data);
+>>>> -               return;
+>>>> -       }
+>>>> +       if (__sync_sub_and_fetch(&notify_data->chrc->notify_count, 1) ||
+>>>> +                                               !notify_data->chrc->ccc_handle)
+>>>> +               goto done;
+>>>>
+>>>>         if (notify_data_write_ccc(notify_data, false, disable_ccc_callback))
+>>>>                 return;
+>>>>
+>>>> +done:
+>>>>         notify_data_unref(notify_data);
+>>>>  }
+>>>>
+>>>> @@ -2571,9 +2580,7 @@ unsigned int bt_gatt_client_register_notify(struct bt_gatt_client *client,
+>>>>         /* Add the handler to the bt_gatt_client's general list */
+>>>>         queue_push_tail(client->notify_list, notify_data);
+>>>>
+>>>> -       /* Assign an ID to the handler and notify the caller that it was
+>>>> -        * successfully registered.
+>>>> -        */
+>>>> +       /* Assign an ID to the handler. */
+>>>>         if (client->next_reg_id < 1)
+>>>>                 client->next_reg_id = 1;
+>>>>
+>>>> @@ -2591,7 +2598,7 @@ unsigned int bt_gatt_client_register_notify(struct bt_gatt_client *client,
+>>>>         /*
+>>>>          * If the ref count is not zero, then notifications are already enabled.
+>>>>          */
+>>>> -       if (chrc->notify_count > 0) {
+>>>> +       if (chrc->notify_count > 0 || !chrc->ccc_handle) {
+>>>>                 complete_notify_request(notify_data);
+>>>>                 return notify_data->id;
+>>>>         }
+>>>> --
+>>>> 2.2.0.rc0.207.ga3a616c
+>>>>
+>>>> --
+>>>> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+>>>> the body of a message to majordomo@vger.kernel.org
+>>>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>>>
+>>>
+>>>
+>>> --
+>>> Luiz Augusto von Dentz
+>>
+>> Thanks,
+>> Arman
+>
+>
+>
+> --
+> Luiz Augusto von Dentz
 
-Basically, I can pair the computer with the headset from my Linux machine, connect to it without trouble and select it as a PulseAudio output sink and input source using the HSP/HFP profile, but then I can not hear any sound coming out of the headphones, nor I can capture any sound with the microphone.
-
-For what I can see with hcidump, there seems to be BT traffic when connecting/disconnecting the headset, but no traffic at all once I try to play any sound through them with paplay, nor when trying to use the microphone.
-
-Also, I've observed that everything works fine if I used an external USB Bluetooth dongle in the same machine instead, which produces a slightly different dump with hcidump while connecting to the headset and then, of course, a lot of traffic once paplay is running (lots of SCO packets), which I can't see with the internal chipset.
-
-See the output of lsusb -vvv too for both devices:
- * lsusb for the internal BT device: http://goo.gl/bvBsr7
- * lsusb for the external BT dongle: http://goo.gl/gNT3oZ
-
-Also, here you can see the verbose logs of hcidump -X for both scenarios:
- * Not working (internal chipset): http://goo.gl/34hzQz
- * Working (external dongle): http://goo.gl/HeZPmM
-
-Besides these tests,  I've also ruled out a problem with the actual hardware by checking that the device actually works as expected when booting into Windows 7 and installing the Realtek drivers: no problems there.
-
-Surprisingly, that experiment with Windows provided me an interesting hint: yesterday morning, after using the headset perfectly in Windows, I've rebooted again into Linux and everything worked just fine there at that point, not sure why. I could see SCO packets being transmitted when using the headset both as an output sink and an input source, meaning I could both play sounds through the headphones and capture data with the microphone.
-
-Unfortunately, it stopped working after I powered off the machine and then powered on back again, and I could not reproduce this working scenario either ever since. So, I sadly don't have any log I can attach here now, but the fact that it worked for a while makes me think whether Windows would not have somehow initialized something in the chipset, or even in the headset itself, that persisted across reboots, going away when powering off.
-
-I'm not sure what that really means, just mentioning in case it rings any bell, because I've heard of other situations where some hardware X would work in Linux after rebooting from Windows, so perhaps this could be the case too? Here you have a dump of the USB/HCI traffic in Windows while installing the Realtek driver and connecting to the headset, as a .pcap file that can be examined with Wireshark: http://goo.gl/u6KBy2
-
-I've being studying all this data for a while already, but my knowledge in this matter is still quite limited and so I'd appreciate a few words of direction from someone more experienced to better know how to proceed now.
-
-Of course, feel free to ask for more information if needed.
-
-Thanks in advance,
-Mario
-
-PS: I'm using a Debian based distribution with a 3.13.0 kernel and BlueZ 5.23 as packaged by Ubuntu, although I've tried using the latest 5.28 release as well, but that did not get things any better either.
+ping
