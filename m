@@ -1,104 +1,45 @@
 Return-Path: <cyrus@holtmann.org>
+Message-ID: <54D4D012.4050108@endlessm.com>
+Date: Fri, 06 Feb 2015 14:30:42 +0000
+From: Mario Sanchez Prada <mario@endlessm.com>
 MIME-Version: 1.0
-In-Reply-To: <54D4ADB5.2040201@mozilla.com>
-References: <54CB81F5.3000401@mozilla.com>
-	<E422020A-9686-42FB-BB9A-2FEACDF59529@holtmann.org>
-	<54D0881B.2020009@mozilla.com>
-	<17F6E0D4-FB7F-4DB5-ABC2-A3A8268D7748@holtmann.org>
-	<54D4ADB5.2040201@mozilla.com>
-Date: Fri, 6 Feb 2015 16:56:50 +0200
-Message-ID: <CABBYNZ+Nr7aOvDwd5OhC3XOivBg29kVHx0puuqKTBSMBRu8-yw@mail.gmail.com>
-Subject: Re: Extending BlueZ's HAL protocol
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Thomas Zimmermann <tzimmermann@mozilla.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>,
-	BlueZ development <linux-bluetooth@vger.kernel.org>, Shawn Huang <shuang@mozilla.com>
-Content-Type: text/plain; charset=UTF-8
+To: linux-bluetooth@vger.kernel.org
+Subject: No SCO packets while trying to use a Bluetooth headset
+Content-Type: text/plain; charset=utf-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Thomas,
+Hi,
 
-On Fri, Feb 6, 2015 at 2:04 PM, Thomas Zimmermann
-<tzimmermann@mozilla.com> wrote:
-> Hi Marcel
->
->> can you tell me what's your chipset manufacturer? I mean there is almost=
- no chance that you are running on a Bluetooth chip that can not be easily =
-supported with BlueZ. All of them talk HCI and the only difference is some =
-minimal firmware loading, UART baudrate setting or other tiny details. Supp=
-orting a Bluetooth chip with BlueZ is most likely a lot easier than with Bl=
-uedroid.
->
-> Usually Qualcomm, but we try to support any chipset. Using BlueZ is not
-> just a technical issue though. I'd guess that there are possibly other
-> requirements (legal, partners, etc). Our plan is to provide BlueZ as a
-> drop-in replacement at some later point.
->
->>
->> You also realize that you can run Bluedroid on top of Bluetooth HCI User=
- Channel feature in the kernel. That way you use the kernel side HCI infras=
-tructure and existing drivers. At that point tools like hcidump, btmon and =
-even hcitool will just work as usual. It is a pretty nifty trick actually. =
-There is a libbt-vendor from Intel that will allow you to run Bluedroid on =
-top of Bluetooth kernel subsystem using HCI User Channel. It is only a few =
-hundred lines of code.
->
-> TBH I wouldn't rely on devices to have Bluetooth support enabled in the
-> kernel. My understanding is that Bluedroid is completely independent
-> from the kernel, so why should OEMs enable the kernel's BT module as well=
-?
+I have a problem with one Bluetooth host (chipset Realtek RTL8723BE) and a Bluetooth headset (Plantronics M50) I've been trying to find a solution for in the last days, without much success yet:
 
-Only, and really only, in the context of Android, many other Linux
-based OSes, which includes Chrome OS, Tizen, Ubuntu, etc, are using
-the Bluetooth kernel modules so chances are that there is already some
-support in the kernel. I must say that if you stay with Bluedroid's
-camp you are just contributing to the fragmentation of Bluetooth
-hardware adaptation in Linux, after this why would anyone here bother
-helping you? Marcel already pointed out what are the benefits of using
-the User Channel, together with the idea of supporting any Linux based
-platform, regardless what you run on userspace, should already be
-enough arguments to convince any OEM.
+Basically, I can pair the computer with the headset from my Linux machine, connect to it without trouble and select it as a PulseAudio output sink and input source using the HSP/HFP profile, but then I can not hear any sound coming out of the headphones, nor I can capture any sound with the microphone.
 
->>
->> Or have you actually tried to use the vendor provided libbt-vendor and h=
-ook it into BlueZ via /dev/vhci. That should actually work easily. So like =
-a tiny libhybris for Bluetooth. I say tiny since all Bluetooth chips talk H=
-CI and it will be pretty much super simple.
->>
->>> I think we somehow have to make our Bluedroid daemon call
->>> |config_hci_snoop_log|. One idea is the proposed opcode for vendor
->>> extensions (Mozilla would be the vendor in our case). The other idea
->>> would be to write our own |bluetooth-snoop|, which uses a different
->>> channel to instruct the Bluedroid daemon to call |config_hci_snoop_log|=
-.
->> We could potentially add such an opcode that does emulate this piece of =
-HAL detail. We did not add it since for us running HCI tracing / snooping i=
-n the same core process was never a viable option.
->>
->> If you would try to use HCI User Channel or wrap libbt-vendor into a /de=
-v/vhci as mentioned above, then you would actually not have to and could ju=
-st run bluetoothd-snoop like we do.
->
-> Thanks so far for all the information you provided. I think we'll have
-> to explore the possible options for the best solution; ideally something
-> that's compatible with BlueZ's daemon.
->
-> Best regards
-> Thomas
->
->>
->> Regards
->>
->> Marcel
->>
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth=
-" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+For what I can see with hcidump, there seems to be BT traffic when connecting/disconnecting the headset, but no traffic at all once I try to play any sound through them with paplay, nor when trying to use the microphone.
 
+Also, I've observed that everything works fine if I used an external USB Bluetooth dongle in the same machine instead, which produces a slightly different dump with hcidump while connecting to the headset and then, of course, a lot of traffic once paplay is running (lots of SCO packets), which I can't see with the internal chipset.
 
+See the output of lsusb -vvv too for both devices:
+ * lsusb for the internal BT device: http://goo.gl/bvBsr7
+ * lsusb for the external BT dongle: http://goo.gl/gNT3oZ
 
---=20
-Luiz Augusto von Dentz
+Also, here you can see the verbose logs of hcidump -X for both scenarios:
+ * Not working (internal chipset): http://goo.gl/34hzQz
+ * Working (external dongle): http://goo.gl/HeZPmM
+
+Besides these tests,  I've also ruled out a problem with the actual hardware by checking that the device actually works as expected when booting into Windows 7 and installing the Realtek drivers: no problems there.
+
+Surprisingly, that experiment with Windows provided me an interesting hint: yesterday morning, after using the headset perfectly in Windows, I've rebooted again into Linux and everything worked just fine there at that point, not sure why. I could see SCO packets being transmitted when using the headset both as an output sink and an input source, meaning I could both play sounds through the headphones and capture data with the microphone.
+
+Unfortunately, it stopped working after I powered off the machine and then powered on back again, and I could not reproduce this working scenario either ever since. So, I sadly don't have any log I can attach here now, but the fact that it worked for a while makes me think whether Windows would not have somehow initialized something in the chipset, or even in the headset itself, that persisted across reboots, going away when powering off.
+
+I'm not sure what that really means, just mentioning in case it rings any bell, because I've heard of other situations where some hardware X would work in Linux after rebooting from Windows, so perhaps this could be the case too? Here you have a dump of the USB/HCI traffic in Windows while installing the Realtek driver and connecting to the headset, as a .pcap file that can be examined with Wireshark: http://goo.gl/u6KBy2
+
+I've being studying all this data for a while already, but my knowledge in this matter is still quite limited and so I'd appreciate a few words of direction from someone more experienced to better know how to proceed now.
+
+Of course, feel free to ask for more information if needed.
+
+Thanks in advance,
+Mario
+
+PS: I'm using a Debian based distribution with a 3.13.0 kernel and BlueZ 5.23 as packaged by Ubuntu, although I've tried using the latest 5.28 release as well, but that did not get things any better either.
