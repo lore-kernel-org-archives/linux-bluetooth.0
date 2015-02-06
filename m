@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 03/12] client: Add support for GattDescriptor1
-Date: Fri,  6 Feb 2015 13:03:35 +0200
-Message-Id: <1423220624-18861-4-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 02/12] client: Add support for GattCharacteristic1
+Date: Fri,  6 Feb 2015 13:03:34 +0200
+Message-Id: <1423220624-18861-3-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1423220624-18861-1-git-send-email-luiz.dentz@gmail.com>
 References: <1423220624-18861-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,8 +11,8 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This add support for GattDescriptor1 interface detection and
-prints when they are added or removed.
+This add support for GattCharacteristici1 interface detection and
+prints when they are added or removed
 ---
  client/gatt.c | 66 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
  client/gatt.h |  3 +++
@@ -20,23 +20,23 @@ prints when they are added or removed.
  3 files changed, 73 insertions(+)
 
 diff --git a/client/gatt.c b/client/gatt.c
-index 8fd113f..47785a8 100644
+index 7de5c7b..8fd113f 100644
 --- a/client/gatt.c
 +++ b/client/gatt.c
-@@ -47,6 +47,7 @@
+@@ -46,6 +46,7 @@
+ #define COLORED_DEL	COLOR_RED "DEL" COLOR_OFF
  
  static GList *services;
- static GList *characteristics;
-+static GList *descriptors;
++static GList *characteristics;
  
  static void print_service(GDBusProxy *proxy, const char *description)
  {
-@@ -154,3 +155,68 @@ void gatt_remove_characteristic(GDBusProxy *proxy)
+@@ -88,3 +89,68 @@ void gatt_remove_service(GDBusProxy *proxy)
  
- 	print_characteristic(proxy, COLORED_DEL);
+ 	print_service(proxy, COLORED_DEL);
  }
 +
-+static void print_descriptor(GDBusProxy *proxy, const char *description)
++static void print_characteristic(GDBusProxy *proxy, const char *description)
 +{
 +	DBusMessageIter iter;
 +	const char *uuid, *text;
@@ -50,7 +50,7 @@ index 8fd113f..47785a8 100644
 +	if (!text)
 +		text = uuid;
 +
-+	rl_printf("%s%s%sDescriptor %s %s\n",
++	rl_printf("%s%s%sCharacteristic %s %s\n",
 +				description ? "[" : "",
 +				description ? : "",
 +				description ? "] " : "",
@@ -58,18 +58,18 @@ index 8fd113f..47785a8 100644
 +				text);
 +}
 +
-+static gboolean descriptor_is_child(GDBusProxy *characteristic)
++static gboolean characteristic_is_child(GDBusProxy *characteristic)
 +{
 +	GList *l;
 +	DBusMessageIter iter;
 +	const char *service, *path;
 +
-+	if (!g_dbus_proxy_get_property(characteristic, "Characteristic", &iter))
++	if (!g_dbus_proxy_get_property(characteristic, "Service", &iter))
 +		return FALSE;
 +
 +	dbus_message_iter_get_basic(&iter, &service);
 +
-+	for (l = characteristics; l; l = g_list_next(l)) {
++	for (l = services; l; l = g_list_next(l)) {
 +		GDBusProxy *proxy = l->data;
 +
 +		path = g_dbus_proxy_get_path(proxy);
@@ -81,55 +81,55 @@ index 8fd113f..47785a8 100644
 +	return FALSE;
 +}
 +
-+void gatt_add_descriptor(GDBusProxy *proxy)
++void gatt_add_characteristic(GDBusProxy *proxy)
 +{
-+	if (!descriptor_is_child(proxy))
++	if (!characteristic_is_child(proxy))
 +		return;
 +
-+	descriptors = g_list_append(descriptors, proxy);
++	characteristics = g_list_append(characteristics, proxy);
 +
-+	print_descriptor(proxy, COLORED_NEW);
++	print_characteristic(proxy, COLORED_NEW);
 +}
 +
-+void gatt_remove_descriptor(GDBusProxy *proxy)
++void gatt_remove_characteristic(GDBusProxy *proxy)
 +{
-+	if (!descriptor_is_child(proxy))
++	if (!characteristic_is_child(proxy))
 +		return;
 +
-+	descriptors = g_list_remove(descriptors, proxy);
++	characteristics = g_list_remove(characteristics, proxy);
 +
-+	print_descriptor(proxy, COLORED_DEL);
++	print_characteristic(proxy, COLORED_DEL);
 +}
 diff --git a/client/gatt.h b/client/gatt.h
-index 924c4d9..8b30668 100644
+index f049039..924c4d9 100644
 --- a/client/gatt.h
 +++ b/client/gatt.h
-@@ -26,3 +26,6 @@ void gatt_remove_service(GDBusProxy *proxy);
+@@ -23,3 +23,6 @@
  
- void gatt_add_characteristic(GDBusProxy *proxy);
- void gatt_remove_characteristic(GDBusProxy *proxy);
+ void gatt_add_service(GDBusProxy *proxy);
+ void gatt_remove_service(GDBusProxy *proxy);
 +
-+void gatt_add_descriptor(GDBusProxy *proxy);
-+void gatt_remove_descriptor(GDBusProxy *proxy);
++void gatt_add_characteristic(GDBusProxy *proxy);
++void gatt_remove_characteristic(GDBusProxy *proxy);
 diff --git a/client/main.c b/client/main.c
-index 3db18af..0590266 100644
+index ab644ba..3db18af 100644
 --- a/client/main.c
 +++ b/client/main.c
-@@ -340,6 +340,8 @@ static void proxy_added(GDBusProxy *proxy, void *user_data)
+@@ -338,6 +338,8 @@ static void proxy_added(GDBusProxy *proxy, void *user_data)
+ 	} else if (!strcmp(interface, "org.bluez.GattService1")) {
+ 		if (service_is_child(proxy))
  			gatt_add_service(proxy);
- 	} else if (!strcmp(interface, "org.bluez.GattCharacteristic1")) {
- 		gatt_add_characteristic(proxy);
-+	} else if (!strcmp(interface, "org.bluez.GattDescriptor1")) {
-+		gatt_add_descriptor(proxy);
++	} else if (!strcmp(interface, "org.bluez.GattCharacteristic1")) {
++		gatt_add_characteristic(proxy);
  	}
  }
  
-@@ -377,6 +379,8 @@ static void proxy_removed(GDBusProxy *proxy, void *user_data)
+@@ -373,6 +375,8 @@ static void proxy_removed(GDBusProxy *proxy, void *user_data)
+ 	} else if (!strcmp(interface, "org.bluez.GattService1")) {
+ 		if (service_is_child(proxy))
  			gatt_remove_service(proxy);
- 	} else if (!strcmp(interface, "org.bluez.GattCharacteristic1")) {
- 		gatt_remove_characteristic(proxy);
-+	} else if (!strcmp(interface, "org.bluez.GattDescriptor1")) {
-+		gatt_remove_descriptor(proxy);
++	} else if (!strcmp(interface, "org.bluez.GattCharacteristic1")) {
++		gatt_remove_characteristic(proxy);
  	}
  }
  
