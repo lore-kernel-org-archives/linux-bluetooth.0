@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 08/12] client/display: Add rl_hexdump
-Date: Fri,  6 Feb 2015 13:03:40 +0200
-Message-Id: <1423220624-18861-9-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 07/12] client: Add attribute-info command
+Date: Fri,  6 Feb 2015 13:03:39 +0200
+Message-Id: <1423220624-18861-8-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1423220624-18861-1-git-send-email-luiz.dentz@gmail.com>
 References: <1423220624-18861-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,69 +11,142 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
+attribute-info can be used to print out attribute information.
 ---
- client/display.c | 41 +++++++++++++++++++++++++++++++++++++++++
- client/display.h |  1 +
- 2 files changed, 42 insertions(+)
+ client/main.c | 96 +++++++++++++++++++++++++++++++++++++++++++++++++----------
+ 1 file changed, 81 insertions(+), 15 deletions(-)
 
-diff --git a/client/display.c b/client/display.c
-index 0f212b6..619973c 100644
---- a/client/display.c
-+++ b/client/display.c
-@@ -62,3 +62,44 @@ void rl_printf(const char *fmt, ...)
- 		free(saved_line);
- 	}
+diff --git a/client/main.c b/client/main.c
+index 1481694..614efca 100644
+--- a/client/main.c
++++ b/client/main.c
+@@ -160,7 +160,6 @@ static void print_iter(const char *label, const char *name,
+ 	dbus_int16_t vals16;
+ 	const char *valstr;
+ 	DBusMessageIter subiter;
+-	int type;
+ 
+ 	if (iter == NULL) {
+ 		rl_printf("%s%s is nil\n", label, name);
+@@ -193,23 +192,23 @@ static void print_iter(const char *label, const char *name,
+ 		dbus_message_iter_get_basic(iter, &vals16);
+ 		rl_printf("%s%s: %d\n", label, name, vals16);
+ 		break;
++	case DBUS_TYPE_VARIANT:
++		dbus_message_iter_recurse(iter, &subiter);
++		print_iter(label, name, &subiter);
++		break;
+ 	case DBUS_TYPE_ARRAY:
+ 		dbus_message_iter_recurse(iter, &subiter);
+-		rl_printf("%s%s:\n", label, name);
+-
+-		do {
+-			type = dbus_message_iter_get_arg_type(&subiter);
+-			if (type == DBUS_TYPE_INVALID)
+-				break;
+-
+-			if (type == DBUS_TYPE_STRING) {
+-				dbus_message_iter_get_basic(&subiter, &valstr);
+-				rl_printf("\t%s\n", valstr);
+-			}
+-
++		while (dbus_message_iter_get_arg_type(&subiter) !=
++							DBUS_TYPE_INVALID) {
++			print_iter(label, name, &subiter);
+ 			dbus_message_iter_next(&subiter);
+-		} while(true);
+-
++		}
++		break;
++	case DBUS_TYPE_DICT_ENTRY:
++		dbus_message_iter_recurse(iter, &subiter);
++		dbus_message_iter_get_basic(&subiter, &valstr);
++		dbus_message_iter_next(&subiter);
++		print_iter(label, valstr, &subiter);
+ 		break;
+ 	default:
+ 		rl_printf("%s%s has unsupported type\n", label, name);
+@@ -1212,6 +1211,71 @@ static void cmd_select_attribute(const char *arg)
+ 		set_default_attribute(proxy);
  }
-+
-+void rl_hexdump(const unsigned char *buf, size_t len)
+ 
++static struct GDBusProxy *find_attribute(const char *arg)
 +{
-+	static const char hexdigits[] = "0123456789abcdef";
-+	char str[68];
-+	size_t i;
++	GDBusProxy *proxy;
 +
-+	if (!len)
++	if (!arg || !strlen(arg)) {
++		if (default_attr)
++			return default_attr;
++		rl_printf("Missing attribute argument\n");
++		return NULL;
++	}
++
++	proxy = gatt_select_attribute(arg);
++	if (!proxy) {
++		rl_printf("Attribute %s not available\n", arg);
++		return NULL;
++	}
++
++	return proxy;
++}
++
++static void cmd_attribute_info(const char *arg)
++{
++	GDBusProxy *proxy;
++	DBusMessageIter iter;
++	const char *iface, *uuid, *text;
++
++	proxy = find_attribute(arg);
++	if (!proxy)
 +		return;
 +
-+	str[0] = ' ';
++	if (g_dbus_proxy_get_property(proxy, "UUID", &iter) == FALSE)
++		return;
 +
-+	for (i = 0; i < len; i++) {
-+		str[((i % 16) * 3) + 1] = ' ';
-+		str[((i % 16) * 3) + 2] = hexdigits[buf[i] >> 4];
-+		str[((i % 16) * 3) + 3] = hexdigits[buf[i] & 0xf];
-+		str[(i % 16) + 51] = isprint(buf[i]) ? buf[i] : '.';
++	dbus_message_iter_get_basic(&iter, &uuid);
 +
-+		if ((i + 1) % 16 == 0) {
-+			str[49] = ' ';
-+			str[50] = ' ';
-+			str[67] = '\0';
-+			rl_printf("%s\n", str);
-+			str[0] = ' ';
-+		}
-+	}
++	text = uuidstr_to_str(uuid);
++	if (!text)
++		text = g_dbus_proxy_get_path(proxy);
 +
-+	if (i % 16 > 0) {
-+		size_t j;
-+		for (j = (i % 16); j < 16; j++) {
-+			str[(j * 3) + 1] = ' ';
-+			str[(j * 3) + 2] = ' ';
-+			str[(j * 3) + 3] = ' ';
-+			str[j + 51] = ' ';
-+		}
-+		str[49] = ' ';
-+		str[50] = ' ';
-+		str[67] = '\0';
-+		rl_printf("%s\n", str);
++	iface = g_dbus_proxy_get_interface(proxy);
++	if (!strcmp(iface, "org.bluez.GattService1")) {
++		rl_printf("Service - %s\n", text);
++
++		print_property(proxy, "UUID");
++		print_property(proxy, "Primary");
++		print_property(proxy, "Characteristics");
++		print_property(proxy, "Includes");
++	} else if (!strcmp(iface, "org.bluez.GattCharacteristic1")) {
++		rl_printf("Characteristic - %s\n", text);
++
++		print_property(proxy, "UUID");
++		print_property(proxy, "Service");
++		print_property(proxy, "Value");
++		print_property(proxy, "Notifying");
++		print_property(proxy, "Flags");
++		print_property(proxy, "Descriptors");
++	} else if (!strcmp(iface, "org.bluez.GattDescriptor1")) {
++		rl_printf("Descriptor - %s\n", text);
++
++		print_property(proxy, "UUID");
++		print_property(proxy, "Characteristic");
++		print_property(proxy, "Value");
 +	}
 +}
-diff --git a/client/display.h b/client/display.h
-index 91a0be9..88dbbd0 100644
---- a/client/display.h
-+++ b/client/display.h
-@@ -30,3 +30,4 @@
- #define COLOR_BOLDWHITE	"\x1B[1;37m"
- 
- void rl_printf(const char *fmt, ...) __attribute__((format(printf, 1, 2)));
-+void rl_hexdump(const unsigned char *buf, size_t len);
++
+ static void cmd_version(const char *arg)
+ {
+ 	rl_printf("Version %s\n", VERSION);
+@@ -1339,6 +1403,8 @@ static const struct {
+ 							dev_generator },
+ 	{ "select-attribute", "<attribute>",  cmd_select_attribute,
+ 				"Select attribute", attribute_generator },
++	{ "attribute-info", "[attribute]",  cmd_attribute_info,
++				"Select attribute", attribute_generator },
+ 	{ "version",      NULL,       cmd_version, "Display version" },
+ 	{ "quit",         NULL,       cmd_quit, "Quit program" },
+ 	{ "exit",         NULL,       cmd_quit },
 -- 
 2.1.0
 
