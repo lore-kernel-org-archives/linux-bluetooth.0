@@ -1,297 +1,104 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <CAHrH25TtP2Q7z2GRft8xyfXvtgc0ynd1QqUNCpiQNo=YAF2+7A@mail.gmail.com>
-References: <1423022302-27124-1-git-send-email-armansito@chromium.org>
-	<CABBYNZLDAFdotoZMEr5AiBds3rJ_5KNM6WPS7VbtXmA7iT0rsQ@mail.gmail.com>
-	<CAHrH25TOLzhdP_3BocdSdTK27j69AzpLGdT5Eci9n7=QWV6Ntg@mail.gmail.com>
-	<CABBYNZKpecQihk9e0A+_NOiF+bG5jTncok2pRL=N812NFFKDeQ@mail.gmail.com>
-	<CAHrH25TtP2Q7z2GRft8xyfXvtgc0ynd1QqUNCpiQNo=YAF2+7A@mail.gmail.com>
-Date: Fri, 6 Feb 2015 16:58:08 +0200
-Message-ID: <CABBYNZLwKZkg7VQF66q36ySfagNu12pWhh_fTQDP5EjF7YeY9A@mail.gmail.com>
-Subject: Re: [PATCH] shared/gatt: Allow register_notify without CCC
+In-Reply-To: <54D4ADB5.2040201@mozilla.com>
+References: <54CB81F5.3000401@mozilla.com>
+	<E422020A-9686-42FB-BB9A-2FEACDF59529@holtmann.org>
+	<54D0881B.2020009@mozilla.com>
+	<17F6E0D4-FB7F-4DB5-ABC2-A3A8268D7748@holtmann.org>
+	<54D4ADB5.2040201@mozilla.com>
+Date: Fri, 6 Feb 2015 16:56:50 +0200
+Message-ID: <CABBYNZ+Nr7aOvDwd5OhC3XOivBg29kVHx0puuqKTBSMBRu8-yw@mail.gmail.com>
+Subject: Re: Extending BlueZ's HAL protocol
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Arman Uguray <armansito@chromium.org>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+To: Thomas Zimmermann <tzimmermann@mozilla.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+	BlueZ development <linux-bluetooth@vger.kernel.org>, Shawn Huang <shuang@mozilla.com>
 Content-Type: text/plain; charset=UTF-8
-Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Arman,
+Hi Thomas,
 
-On Fri, Feb 6, 2015 at 4:19 PM, Arman Uguray <armansito@chromium.org> wrote:
-> Hi Luiz,
+On Fri, Feb 6, 2015 at 2:04 PM, Thomas Zimmermann
+<tzimmermann@mozilla.com> wrote:
+> Hi Marcel
 >
->> On Thu, Feb 5, 2015 at 1:29 AM, Luiz Augusto von Dentz <luiz.dentz@gmail.com> wrote:
->> Hi Arman,
->>
->> On Thu, Feb 5, 2015 at 12:05 AM, Arman Uguray <armansito@chromium.org> wrote:
->>> Hi Luiz,
->>>
->>>> On Wed, Feb 4, 2015 at 6:26 AM, Luiz Augusto von Dentz <luiz.dentz@gmail.com> wrote:
->>>> Hi Arman,
->>>>
->>>> On Wed, Feb 4, 2015 at 5:58 AM, Arman Uguray <armansito@chromium.org> wrote:
->>>>> Certain peripherals can expose a GATT characteristic with the
->>>>> notify/indicate property but with no Client Characteristic Configuration
->>>>> descriptor. Since bt_gatt_client_register_notify enforces a CCC as a
->>>>> requirement, it returns an error for such characteristics.
->>>>
->>>> Do you have some evidence of this? I don't mind not being too strict
->>>> while receiving but we need to document why we are doing these
->>>> changes,...
->>>
->>> I came across this while testing with a Nexus 6 device running Android
->>> L. The application exposes a "Service Changed" characteristic with no
->>> CCC, which is causing bt_gatt_client's initialization sequence to fail
->>> (since it assumes that there will be a CCC and treats the absence as
->>> an error). This seemed strange to me, so I did some digging, and the
->>> Bluetooth developer page actually lists "None" for "Descriptors"
->>> (https://developer.bluetooth.org/gatt/services/Pages/ServiceViewer.aspx?u=org.bluetooth.service.generic_attribute.xml)
->>> of this characteristic.
->>>
->>> However, this seemed incorrect to me, so I checked the Core Spec v4.2,
->>> Vol 3, Part G, Section 7.1 "Service Changed", which states: "This
->>> [Service Changed] Characteristic Value shall be configured to be
->>> indicated, using the Client Characteristic Configuration descriptor by
->>> a client. Indications caused by changes to the Service Changed
->>> Characteristic Value shall be considered lost if the client has not
->>> enabled indications in the Client Configuration Characteristic
->>> Descriptor." Which means that the CCC is certainly mandatory, so this
->>> must be an error in the developer page.
->>
->> It is probably a bug, and in this case the device might not even be
->> able to qualify since service changed has 2 tests: TP/GAS/CL/BV-01-C
->> and TP/GAS/SR/BV-01-C. We should probably communicate that the
->> documentation needs fixing and the TS should probably be updated as
->> well to reflect CCC is mandatory in this case.
->>
->>> Regardless, though, even if this is an error in the BlueDroid stack,
->>> it means that some devices may have incorrectly implemented the spec
->>> here, so we should probably tolerate this. BlueZ's server
->>> implementation SHOULD regardless expose this descriptor, but the
->>> client IMO shouldn't fail if the CCC generally doesn't exist.
->>
->> Provided the SIG don't come with invalid tests for service changed
->> that is probably okay for the client, for the server I don't how it
->> would pass TP/GAS/SR/BV-01-C without CCC except if PTS is ignoring the
->> lack of CCC which IMO defeats the purpose of the test. So the argument
->> for service changed is probably not valid here, but for custom
->> attributes where there is no tests to validate the implemenation
->> perhaps you have a point, but note that it still will need to set
->> BT_GATT_CHRC_PROP_NOTIFY and BT_GATT_CHRC_PROP_INDICATE, btw such
->> policies perhaps should be done directly in shared/gatt-client.c so we
->> don't need have duplicated logic for Android.
->>
->>>
->>>> ...and btw this perhaps makes my argument of enabling
->>>> notification by default even stronger since if such devices really
->>>> exists they might be notifying us since the beginning.
->>>>
->>>
->>> Hmm, I don't know how this makes that argument any stronger.
->>> bt_gatt_client already automatically registers for Service Changed,
->>> and for external applications we still want to only notify if an app
->>> is interested (which they can do now across connections).
->>>
->>> Generally, I want to treat this as a corner-case, since it's not
->>> really spec compliant behavior. Either way, it's probably not that bad
->>> to have this fix so that we don't bork out immediately with devices
->>> that behave incorrectly. Actually, it might be even more spec
->>> compliant for us to simply ignore the Service Changed characteristic
->>> if it's discovered but doesn't have a CCC, since the spec says
->>> "changes to the Service Changed Characteristic Value shall be
->>> considered lost if the client has not enabled indications in the
->>> Client Configuration Characteristic Descriptor", which would end up
->>> being a simpler fix on our end.
->>>
->>> Either way, I'll wait for your response to determine what the right
->>> behavior is here.
->>
->> For service changed perhaps, but since we are using
->> bt_gatt_client_register_notify for any notification we would need to
->> have a special case for service changed alone so I would not bother
->> since broken stacks in this respect will probably not pass the
->> qualification if the test spec where implemented properly, for any
->> other char I would not be so strict since some OS may allow adding a
->> characteristic with notifiy/indicate bits sets but without a CCC to
->> enable them, actually Android probably allows that to happen already,
->> sadly I think even our BlueZ for Android currently allows that.
->>
->>>> The other problem I now see is that there is probably no way to rate
->>>> limit the notification, because they are profile specific, so if you
->>>> had a problem with too much traffic on D-Bus this may already happen
->>>> even if we register the notification on demand.
->>>>
->>>
->>> Right, though I guess this is a separate issue that can be dealt with
->>> at the D-Bus API level. shared/gatt-client has to still send all
->>> notifications up, otherwise things like HoG wouldn't work well with a
->>> rate limit. Anyway, we can do this at a D-Bus API level separately.
->>> I'll add this to the general TODO list.
->>>
->>>>> This patch fixes this behavior so that bt_gatt_client_register_notify
->>>>> immediately registers the callback and returns success for
->>>>> characteristics with no CCC.
->>>>> ---
->>>>>  src/shared/gatt-client.c | 43 +++++++++++++++++++++++++------------------
->>>>>  1 file changed, 25 insertions(+), 18 deletions(-)
->>>>>
->>>>> diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
->>>>> index 5edb991..d0fc054 100644
->>>>> --- a/src/shared/gatt-client.c
->>>>> +++ b/src/shared/gatt-client.c
->>>>> @@ -88,6 +88,7 @@ struct bt_gatt_client {
->>>>>          * the remote peripheral.
->>>>>          */
->>>>>         unsigned int svc_chngd_ind_id;
->>>>> +       bool svc_chngd_registered;
->>>>>         struct queue *svc_chngd_queue;  /* Queued service changed events */
->>>>>         bool in_svc_chngd;
->>>>>
->>>>> @@ -234,12 +235,6 @@ static struct notify_chrc *notify_chrc_create(struct bt_gatt_client *client,
->>>>>                                                         &properties, NULL))
->>>>>                         return NULL;
->>>>>
->>>>> -       /* Find the CCC characteristic */
->>>>> -       ccc = NULL;
->>>>> -       gatt_db_service_foreach_desc(attr, find_ccc, &ccc);
->>>>> -       if (!ccc)
->>>>> -               return NULL;
->>>>> -
->>>>>         chrc = new0(struct notify_chrc, 1);
->>>>>         if (!chrc)
->>>>>                 return NULL;
->>>>> @@ -250,8 +245,17 @@ static struct notify_chrc *notify_chrc_create(struct bt_gatt_client *client,
->>>>>                 return NULL;
->>>>>         }
->>>>>
->>>>> +       /*
->>>>> +        * Find the CCC characteristic. Some characteristics that allow
->>>>> +        * notifications may not have a CCC descriptor. We treat these as
->>>>> +        * automatically successful.
->>>>> +        */
->>>>> +       ccc = NULL;
->>>>> +       gatt_db_service_foreach_desc(attr, find_ccc, &ccc);
->>>>> +       if (ccc)
->>>>> +               chrc->ccc_handle = gatt_db_attribute_get_handle(ccc);
->>>>> +
->>>>>         chrc->value_handle = value_handle;
->>>>> -       chrc->ccc_handle = gatt_db_attribute_get_handle(ccc);
->>>>>         chrc->properties = properties;
->>>>>
->>>>>         queue_push_tail(client->notify_chrcs, chrc);
->>>>> @@ -1020,6 +1024,7 @@ static void service_changed_reregister_cb(uint16_t att_ecode, void *user_data)
->>>>>                 util_debug(client->debug_callback, client->debug_data,
->>>>>                         "Re-registered handler for \"Service Changed\" after "
->>>>>                         "change in GATT service");
->>>>> +               client->svc_chngd_registered = true;
->>>>>                 return;
->>>>>         }
->>>>>
->>>>> @@ -1089,6 +1094,7 @@ static void service_changed_complete(struct discovery_op *op, bool success,
->>>>>         /* The GATT service was modified. Re-register the handler for
->>>>>          * indications from the "Service Changed" characteristic.
->>>>>          */
->>>>> +       client->svc_chngd_registered = false;
->>>>>         client->svc_chngd_ind_id = bt_gatt_client_register_notify(client,
->>>>>                                         gatt_db_attribute_get_handle(attr),
->>>>>                                         service_changed_reregister_cb,
->>>>> @@ -1197,6 +1203,7 @@ static void service_changed_register_cb(uint16_t att_ecode, void *user_data)
->>>>>                 goto done;
->>>>>         }
->>>>>
->>>>> +       client->svc_chngd_registered = true;
->>>>>         client->ready = true;
->>>>>         success = true;
->>>>>         util_debug(client->debug_callback, client->debug_data,
->>>>> @@ -1239,13 +1246,16 @@ static void init_complete(struct discovery_op *op, bool success,
->>>>>                                         service_changed_register_cb,
->>>>>                                         service_changed_cb,
->>>>>                                         client, NULL);
->>>>> -       client->ready = false;
->>>>> +
->>>>> +       if (!client->svc_chngd_registered)
->>>>> +               client->ready = false;
->>>>>
->>>>>         if (client->svc_chngd_ind_id)
->>>>>                 return;
->>>>>
->>>>>         util_debug(client->debug_callback, client->debug_data,
->>>>>                         "Failed to register handler for \"Service Changed\"");
->>>>> +       success = false;
->>>>>
->>>>>  fail:
->>>>>         util_debug(client->debug_callback, client->debug_data,
->>>>> @@ -1423,18 +1433,17 @@ static void complete_unregister_notify(void *data)
->>>>>          */
->>>>>         if (notify_data->att_id) {
->>>>>                 bt_att_cancel(notify_data->client->att, notify_data->att_id);
->>>>> -               notify_data_unref(notify_data);
->>>>> -               return;
->>>>> +               goto done;
->>>>>         }
->>>>>
->>>>> -       if (__sync_sub_and_fetch(&notify_data->chrc->notify_count, 1)) {
->>>>> -               notify_data_unref(notify_data);
->>>>> -               return;
->>>>> -       }
->>>>> +       if (__sync_sub_and_fetch(&notify_data->chrc->notify_count, 1) ||
->>>>> +                                               !notify_data->chrc->ccc_handle)
->>>>> +               goto done;
->>>>>
->>>>>         if (notify_data_write_ccc(notify_data, false, disable_ccc_callback))
->>>>>                 return;
->>>>>
->>>>> +done:
->>>>>         notify_data_unref(notify_data);
->>>>>  }
->>>>>
->>>>> @@ -2571,9 +2580,7 @@ unsigned int bt_gatt_client_register_notify(struct bt_gatt_client *client,
->>>>>         /* Add the handler to the bt_gatt_client's general list */
->>>>>         queue_push_tail(client->notify_list, notify_data);
->>>>>
->>>>> -       /* Assign an ID to the handler and notify the caller that it was
->>>>> -        * successfully registered.
->>>>> -        */
->>>>> +       /* Assign an ID to the handler. */
->>>>>         if (client->next_reg_id < 1)
->>>>>                 client->next_reg_id = 1;
->>>>>
->>>>> @@ -2591,7 +2598,7 @@ unsigned int bt_gatt_client_register_notify(struct bt_gatt_client *client,
->>>>>         /*
->>>>>          * If the ref count is not zero, then notifications are already enabled.
->>>>>          */
->>>>> -       if (chrc->notify_count > 0) {
->>>>> +       if (chrc->notify_count > 0 || !chrc->ccc_handle) {
->>>>>                 complete_notify_request(notify_data);
->>>>>                 return notify_data->id;
->>>>>         }
->>>>> --
->>>>> 2.2.0.rc0.207.ga3a616c
->>>>>
->>>>> --
->>>>> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
->>>>> the body of a message to majordomo@vger.kernel.org
->>>>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->>>>
->>>>
->>>>
->>>> --
->>>> Luiz Augusto von Dentz
->>>
->>> Thanks,
->>> Arman
->>
->>
->>
->> --
->> Luiz Augusto von Dentz
+>> can you tell me what's your chipset manufacturer? I mean there is almost=
+ no chance that you are running on a Bluetooth chip that can not be easily =
+supported with BlueZ. All of them talk HCI and the only difference is some =
+minimal firmware loading, UART baudrate setting or other tiny details. Supp=
+orting a Bluetooth chip with BlueZ is most likely a lot easier than with Bl=
+uedroid.
 >
-> ping
+> Usually Qualcomm, but we try to support any chipset. Using BlueZ is not
+> just a technical issue though. I'd guess that there are possibly other
+> requirements (legal, partners, etc). Our plan is to provide BlueZ as a
+> drop-in replacement at some later point.
+>
+>>
+>> You also realize that you can run Bluedroid on top of Bluetooth HCI User=
+ Channel feature in the kernel. That way you use the kernel side HCI infras=
+tructure and existing drivers. At that point tools like hcidump, btmon and =
+even hcitool will just work as usual. It is a pretty nifty trick actually. =
+There is a libbt-vendor from Intel that will allow you to run Bluedroid on =
+top of Bluetooth kernel subsystem using HCI User Channel. It is only a few =
+hundred lines of code.
+>
+> TBH I wouldn't rely on devices to have Bluetooth support enabled in the
+> kernel. My understanding is that Bluedroid is completely independent
+> from the kernel, so why should OEMs enable the kernel's BT module as well=
+?
 
-This has been applied, I just forgot to comment.
+Only, and really only, in the context of Android, many other Linux
+based OSes, which includes Chrome OS, Tizen, Ubuntu, etc, are using
+the Bluetooth kernel modules so chances are that there is already some
+support in the kernel. I must say that if you stay with Bluedroid's
+camp you are just contributing to the fragmentation of Bluetooth
+hardware adaptation in Linux, after this why would anyone here bother
+helping you? Marcel already pointed out what are the benefits of using
+the User Channel, together with the idea of supporting any Linux based
+platform, regardless what you run on userspace, should already be
+enough arguments to convince any OEM.
+
+>>
+>> Or have you actually tried to use the vendor provided libbt-vendor and h=
+ook it into BlueZ via /dev/vhci. That should actually work easily. So like =
+a tiny libhybris for Bluetooth. I say tiny since all Bluetooth chips talk H=
+CI and it will be pretty much super simple.
+>>
+>>> I think we somehow have to make our Bluedroid daemon call
+>>> |config_hci_snoop_log|. One idea is the proposed opcode for vendor
+>>> extensions (Mozilla would be the vendor in our case). The other idea
+>>> would be to write our own |bluetooth-snoop|, which uses a different
+>>> channel to instruct the Bluedroid daemon to call |config_hci_snoop_log|=
+.
+>> We could potentially add such an opcode that does emulate this piece of =
+HAL detail. We did not add it since for us running HCI tracing / snooping i=
+n the same core process was never a viable option.
+>>
+>> If you would try to use HCI User Channel or wrap libbt-vendor into a /de=
+v/vhci as mentioned above, then you would actually not have to and could ju=
+st run bluetoothd-snoop like we do.
+>
+> Thanks so far for all the information you provided. I think we'll have
+> to explore the possible options for the best solution; ideally something
+> that's compatible with BlueZ's daemon.
+>
+> Best regards
+> Thomas
+>
+>>
+>> Regards
+>>
+>> Marcel
+>>
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth=
+" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
 
 
--- 
+--=20
 Luiz Augusto von Dentz
