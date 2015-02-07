@@ -1,60 +1,82 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH 1/5] android/gatt: Fix MTU exchange
-Date: Sat,  7 Feb 2015 16:18:14 +0100
-Message-Id: <1423322298-6502-1-git-send-email-szymon.janc@tieto.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Message-ID: <54D61229.9010904@sunrus.com.cn>
+Date: Sat, 07 Feb 2015 21:24:57 +0800
+From: Chen Gang S <gang.chen@sunrus.com.cn>
+MIME-Version: 1.0
+To: David Laight <David.Laight@ACULAB.COM>,
+ Marcel Holtmann <marcel@holtmann.org>,
+ Sergei Shtylyov <sergei.shtylyov@cogentembedded.com>,
+ Joe Perches <joe@perches.com>
+CC: "Gustavo F. Padovan" <gustavo@padovan.org>,
+ Johan Hedberg <johan.hedberg@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>,
+ "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Subject: [PATCH v3] net: bluetooth: hci_sock: Use 'const u32 *' instead of
+ 'void *' for 2nd parameter of hci_test_bit()
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This fix using invalid MTU on LE link. Previous attempt to fix this
-"android/gatt: Fix initial setting of MTU" was not correct since
-on LE default MTU is always 23 and we are not allowed to send bigger
-requests before MTU exchange was performed.
+hci_test_bit() does not modify 2nd parameter, so it is better to let it
+be constant, or may cause build warning. The related warning (with
+allmodconfig under xtensa):
 
-This was affecting multiple PTS GATT test cases.
+  net/bluetooth/hci_sock.c: In function 'hci_sock_sendmsg':
+  net/bluetooth/hci_sock.c:955:8: warning: passing argument 2 of 'hci_test_bit' discards 'const' qualifier from pointer target type [-Wdiscarded-array-qualifiers]
+          &hci_sec_filter.ocf_mask[ogf])) &&
+          ^
+  net/bluetooth/hci_sock.c:49:19: note: expected 'void *' but argument is of type 'const __u32 (*)[4] {aka const unsigned int (*)[4]}'
+   static inline int hci_test_bit(int nr, void *addr)
+                     ^
+
+hci_test_bit() always treats 2nd parameter is u32, and all callers also
+know about it, so 2nd parameter of hci_test_bit() need use 'const u32 *'
+instead of 'void *'.
+
+C language treats the array function parameter as a pointer, so the
+caller need not use '&' for the 2 demotion array, or it reports warning:
+'const unsigned int (*)[4]' is different with 'const unsigned int *'.
+
+
+Signed-off-by: Chen Gang <gang.chen.5i5j@gmail.com>
 ---
- android/gatt.c | 13 ++++++++++---
- 1 file changed, 10 insertions(+), 3 deletions(-)
+ net/bluetooth/hci_sock.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/android/gatt.c b/android/gatt.c
-index 5f3050f..f754f30 100644
---- a/android/gatt.c
-+++ b/android/gatt.c
-@@ -1490,7 +1490,7 @@ static void connect_cb(GIOChannel *io, GError *gerr, gpointer user_data)
- 	uint32_t status;
- 	GError *err = NULL;
- 	GAttrib *attrib;
--	uint16_t mtu;
-+	uint16_t mtu, cid;
+diff --git a/net/bluetooth/hci_sock.c b/net/bluetooth/hci_sock.c
+index 1d65c5b..04124ec 100644
+--- a/net/bluetooth/hci_sock.c
++++ b/net/bluetooth/hci_sock.c
+@@ -46,9 +46,9 @@ struct hci_pinfo {
+ 	unsigned short    channel;
+ };
  
- 	if (dev->state != DEVICE_CONNECT_READY) {
- 		error("gatt: Device not in a connecting state!?");
-@@ -1510,14 +1510,21 @@ static void connect_cb(GIOChannel *io, GError *gerr, gpointer user_data)
- 		goto reply;
- 	}
+-static inline int hci_test_bit(int nr, void *addr)
++static inline int hci_test_bit(int nr, const u32 *addr)
+ {
+-	return *((__u32 *) addr + (nr >> 5)) & ((__u32) 1 << (nr & 31));
++	return *(addr + (nr >> 5)) & ((u32) 1 << (nr & 31));
+ }
  
--	if (!bt_io_get(io, &err, BT_IO_OPT_IMTU, &mtu, BT_IO_OPT_INVALID)) {
--		error("gatt: Could not get imtu: %s", err->message);
-+	if (!bt_io_get(io, &err, BT_IO_OPT_IMTU, &mtu, BT_IO_OPT_CID, &cid,
-+							BT_IO_OPT_INVALID)) {
-+		error("gatt: Could not get imtu or cid: %s", err->message);
- 		device_set_state(dev, DEVICE_DISCONNECTED);
- 		status = GATT_FAILURE;
- 		g_error_free(err);
- 		goto reply;
- 	}
+ /* Security filter */
+@@ -107,7 +107,7 @@ static bool is_filtered_packet(struct sock *sk, struct sk_buff *skb)
  
-+	DBG("mtu %u cid %u", mtu, cid);
-+
-+	/* on LE we always start with default MTU */
-+	if (cid == ATT_CID)
-+		mtu = ATT_DEFAULT_LE_MTU;
-+
- 	attrib = g_attrib_new(io, mtu);
- 	if (!attrib) {
- 		error("gatt: unable to create new GAttrib instance");
+ 	flt_event = (*(__u8 *)skb->data & HCI_FLT_EVENT_BITS);
+ 
+-	if (!hci_test_bit(flt_event, &flt->event_mask))
++	if (!hci_test_bit(flt_event, (u32 *)&flt->event_mask))
+ 		return true;
+ 
+ 	/* Check filter only when opcode is set */
+@@ -952,7 +952,7 @@ static int hci_sock_sendmsg(struct kiocb *iocb, struct socket *sock,
+ 
+ 		if (((ogf > HCI_SFLT_MAX_OGF) ||
+ 		     !hci_test_bit(ocf & HCI_FLT_OCF_BITS,
+-				   &hci_sec_filter.ocf_mask[ogf])) &&
++				   hci_sec_filter.ocf_mask[ogf])) &&
+ 		    !capable(CAP_NET_RAW)) {
+ 			err = -EPERM;
+ 			goto drop;
 -- 
 1.9.3
-
