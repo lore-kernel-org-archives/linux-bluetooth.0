@@ -1,102 +1,185 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <54D75698.7010808@sunrus.com.cn>
-Date: Sun, 08 Feb 2015 20:29:12 +0800
-From: Chen Gang S <gang.chen@sunrus.com.cn>
-MIME-Version: 1.0
-To: Joe Perches <joe@perches.com>
-CC: David Laight <David.Laight@ACULAB.COM>,
- Marcel Holtmann <marcel@holtmann.org>,
- Sergei Shtylyov <sergei.shtylyov@cogentembedded.com>,
- "Gustavo F. Padovan" <gustavo@padovan.org>,
- Johan Hedberg <johan.hedberg@gmail.com>,
- "David S. Miller" <davem@davemloft.net>,
- "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Subject: Re: [PATCH v3] net: bluetooth: hci_sock: Use 'const u32 *' instead
- of 'void *' for 2nd parameter of hci_test_bit()
-References: <54D61229.9010904@sunrus.com.cn> <1423338774.2933.9.camel@perches.com> <54D6A729.1070905@sunrus.com.cn>
-In-Reply-To: <54D6A729.1070905@sunrus.com.cn>
-Content-Type: text/plain; charset=windows-1252
+From: Jakub Pawlowski <jpawlowski@google.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Jakub Pawlowski <jpawlowski@google.com>
+Subject: [PATCH BlueZ 2/4] core: adapter: Add parameter parsing to StartFilteredDiscovery
+Date: Sat,  7 Feb 2015 16:44:54 -0800
+Message-Id: <1423356294-14063-1-git-send-email-jpawlowski@google.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On 2/8/15 08:00, Chen Gang S wrote:
-> On 2/8/15 03:52, Joe Perches wrote:
->> On Sat, 2015-02-07 at 21:24 +0800, Chen Gang S wrote:
->>> hci_test_bit() does not modify 2nd parameter, so it is better to let it
->>> be constant, or may cause build warning. The related warning (with
->>> allmodconfig under xtensa):
->>>
->>>   net/bluetooth/hci_sock.c: In function 'hci_sock_sendmsg':
->>>   net/bluetooth/hci_sock.c:955:8: warning: passing argument 2 of 'hci_test_bit' discards 'const' qualifier from pointer target type [-Wdiscarded-array-qualifiers]
->>>           &hci_sec_filter.ocf_mask[ogf])) &&
->>>           ^
->>>   net/bluetooth/hci_sock.c:49:19: note: expected 'void *' but argument is of type 'const __u32 (*)[4] {aka const unsigned int (*)[4]}'
->>>    static inline int hci_test_bit(int nr, void *addr)
->>>                      ^
->>>
->>> hci_test_bit() always treats 2nd parameter is u32, and all callers also
->>> know about it, so 2nd parameter of hci_test_bit() need use 'const u32 *'
->>> instead of 'void *'.
->>>
->>> C language treats the array function parameter as a pointer, so the
->>> caller need not use '&' for the 2 demotion array, or it reports warning:
->>> 'const unsigned int (*)[4]' is different with 'const unsigned int *'.
->>
->> I still think you are possibly papering over potential bugs
->> on big-endian 64 bit systems.
->>
->> unsigned long vs u32.
->>
->> How are the bits actually set?
->>
-> 
->>>From current usage of event_mask, "(u32 *) f->event_mask" is only for
-> event_mask data storage, not for calculation (always as "u32 *" for
-> calculation).
-> 
->   [root@localhost linux-next]# grep -rn "\<event_mask\>" include/net/bluetooth net/bluetooth
->   include/net/bluetooth/hci_sock.h:51:	unsigned long event_mask[2];
+This patch adds parameter parsing and basic checks to
+StartFilteredDiscovery method.
+---
+ src/adapter.c | 144 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 144 insertions(+)
 
-e.g. use "unsigned char event_mask[2 * sizeof(unsigned long)]" instead
-of "unsigned long event_mask[2]".
-
-There is still no any issue within "hci_sock.c" (although I am not sure
-whether this modification may cause issues in another modules outside
-kernel).
-
-
-Thanks.
-
->   include/net/bluetooth/hci_sock.h:57:	__u32  event_mask[2];
->   net/bluetooth/hci_sock.c:59:	__u32 event_mask[2];
->   net/bluetooth/hci_sock.c:110:	if (!hci_test_bit(flt_event, (u32 *)&flt->event_mask))
->   net/bluetooth/hci_sock.c:1041:			uf.event_mask[0] = *((u32 *) f->event_mask + 0);
->   net/bluetooth/hci_sock.c:1042:			uf.event_mask[1] = *((u32 *) f->event_mask + 1);
->   net/bluetooth/hci_sock.c:1053:			uf.event_mask[0] &= *((u32 *) hci_sec_filter.event_mask + 0);
->   net/bluetooth/hci_sock.c:1054:			uf.event_mask[1] &= *((u32 *) hci_sec_filter.event_mask + 1);
->   net/bluetooth/hci_sock.c:1062:			*((u32 *) f->event_mask + 0) = uf.event_mask[0];
->   net/bluetooth/hci_sock.c:1063:			*((u32 *) f->event_mask + 1) = uf.event_mask[1];
->   net/bluetooth/hci_sock.c:1124:			uf.event_mask[0] = *((u32 *) f->event_mask + 0);
->   net/bluetooth/hci_sock.c:1125:			uf.event_mask[1] = *((u32 *) f->event_mask + 1);
-> 
-> Calculation is machine endian dependency, but event_mask is always as
-> "u32 *" for calculation, so there is no any type cast for calculation,
-> it is OK.
-> 
-> Storage is independent from machine endian, but it depends on machine
-> bits. In our case, 'unsigned long' array has enough space to accept u32
-> array, so there is no any data overwritten, it is OK.
-> 
-> 
-> By the way, I intended to remain event_mask as 'unsigned long' type,
-> because I am not quite sure whether it is also used by another modules
-> in kernel (or any other systems). May we change it to u32?
-> 
-> Thanks.
-> 
-
+diff --git a/src/adapter.c b/src/adapter.c
+index af6fafb..bece847 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -82,6 +82,8 @@
+ #define TEMP_DEV_TIMEOUT (3 * 60)
+ #define BONDING_TIMEOUT (2 * 60)
+ 
++#define	DISTNACE_VAL_INVALID	0x7FFF
++
+ static DBusConnection *dbus_conn = NULL;
+ 
+ static bool kernel_conn_control = false;
+@@ -1744,10 +1746,152 @@ static DBusMessage *start_discovery(DBusConnection *conn,
+ 	return dbus_message_new_method_return(msg);
+ }
+ 
++static bool parse_filtered_discovery_dict(char *key, DBusMessageIter *value,
++				    GSList *uuids, int16_t *rssi,
++				    uint16_t *pathloss)
++{
++	uint8_t type;
++
++	if (strcmp("UUIDs", key) == 0) {
++		DBusMessageIter arriter;
++
++		if (dbus_message_iter_get_arg_type(value) != DBUS_TYPE_ARRAY)
++			return false;
++		dbus_message_iter_recurse(value, &arriter);
++		while ((type = dbus_message_iter_get_arg_type(&arriter)) !=
++							DBUS_TYPE_INVALID) {
++			char *uuid_str;
++			char *result_uuid;
++			uuid_t uuid_tmp;
++
++			if (dbus_message_iter_get_arg_type(&arriter) !=
++							DBUS_TYPE_STRING)
++				return false;
++
++			dbus_message_iter_get_basic(&arriter, &uuid_str);
++			if (bt_string2uuid(&uuid_tmp, uuid_str) < 0)
++				return false;
++
++			result_uuid = bt_uuid2string(&uuid_tmp);
++
++			uuids = g_slist_prepend(uuids, result_uuid);
++
++		dbus_message_iter_next(&arriter);
++		}
++	} else if (strcmp("RSSI", key) == 0) {
++		if (dbus_message_iter_get_arg_type(value) != DBUS_TYPE_INT16)
++			return false;
++		dbus_message_iter_get_basic(value, rssi);
++		if (*rssi > 0 || *rssi < -127)
++			return false;
++	} else if (strcmp("pathloss", key) == 0) {
++		if (dbus_message_iter_get_arg_type(value) != DBUS_TYPE_UINT16)
++			return false;
++		dbus_message_iter_get_basic(value, pathloss);
++		if (*pathloss > 127)
++			return false;
++	} else {
++		DBG("Unknown key parameter: %s!\n", key);
++		return false;
++	}
++
++	return true;
++}
++
+ static DBusMessage *start_filtered_discovery(DBusConnection *conn,
+ 					DBusMessage *msg, void *user_data)
+ {
++	struct btd_adapter *adapter = user_data;
++	const char *sender = dbus_message_get_sender(msg);
++	DBusMessageIter iter, subiter, dictiter, variantiter;
++	uint16_t pathloss = DISTNACE_VAL_INVALID;
++	int16_t rssi = DISTNACE_VAL_INVALID;
++	GSList *uuids = NULL;
++	char *type_str;
++	uint8_t type;
++	GSList *list;
++
++	DBG("sender %s", sender);
++
++	if (!(adapter->current_settings & MGMT_SETTING_POWERED))
++		return btd_error_not_ready(msg);
++
++	/*
++	 * Every client can only start one discovery, if the client
++	 * already started a discovery then return an error.
++	 */
++	list = g_slist_find_custom(adapter->discovery_list, sender,
++						compare_sender);
++	if (list)
++		return btd_error_busy(msg);
++
++	/* parse parameters */
++	dbus_message_iter_init(msg, &iter);
++
++	if (dbus_message_iter_get_arg_type(&iter) != DBUS_TYPE_ARRAY ||
++	    dbus_message_iter_get_element_type(&iter) != DBUS_TYPE_DICT_ENTRY)
++		return btd_error_invalid_args(msg);
++
++	dbus_message_iter_recurse(&iter, &subiter);
++	do {
++		int type = dbus_message_iter_get_arg_type(&subiter);
++
++		if (type == DBUS_TYPE_INVALID)
++			break;
++
++		if (type == DBUS_TYPE_DICT_ENTRY) {
++			char *key;
++
++			dbus_message_iter_recurse(&subiter, &dictiter);
++
++			dbus_message_iter_get_basic(&dictiter, &key);
++			if (!dbus_message_iter_next(&dictiter))
++				return btd_error_invalid_args(msg);
++
++			if (dbus_message_iter_get_arg_type(&dictiter) !=
++							DBUS_TYPE_VARIANT)
++				return btd_error_invalid_args(msg);
++
++			dbus_message_iter_recurse(&dictiter, &variantiter);
++
++			if (!parse_filtered_discovery_dict(key, &variantiter,
++						uuids, &rssi, &pathloss))
++				goto invalid_args;
++		}
++
++		dbus_message_iter_next(&subiter);
++	} while (true);
++
++	if (!dbus_message_iter_next(&iter)) {
++		type = 7;
++	} else {
++		if (dbus_message_iter_get_arg_type(&iter) != DBUS_TYPE_STRING)
++			goto invalid_args;
++
++		dbus_message_iter_get_basic(&iter, &type_str);
++
++		if (strcmp(type_str, "bredr") == 0)
++			type = 1;
++		else if (strcmp(type_str, "le") == 0)
++			type = 6;
++		else if (strcmp(type_str, "auto") == 0)
++			type = 7;
++		else
++			goto invalid_args;
++	}
++
++	/* only pathlos or rssi can be set, never both*/
++	if (pathloss != DISTNACE_VAL_INVALID && rssi != DISTNACE_VAL_INVALID)
++		goto invalid_args;
++
++	DBG("filtered discovery params: type: %d rssi: %d pathloss: %d", type,
++							 rssi, pathloss);
++	g_slist_free_full(uuids, g_free);
+ 	return btd_error_failed(msg, "Not implemented yet");
++
++invalid_args:
++	g_slist_free_full(uuids, g_free);
++	return btd_error_invalid_args(msg);
+ }
+ 
+ static DBusMessage *stop_discovery(DBusConnection *conn,
 -- 
-Chen Gang
+2.2.0.rc0.207.ga3a616c
 
-Open, share, and attitude like air, water, and life which God blessed
