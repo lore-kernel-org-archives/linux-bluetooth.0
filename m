@@ -1,90 +1,58 @@
 Return-Path: <cyrus@holtmann.org>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 1/2] android/handsfree-client: Fix connection state defines
+Date: Mon, 09 Feb 2015 13:31:43 +0100
+Message-ID: <17152355.cJ5E5gWooh@leonov>
+In-Reply-To: <1423222193-27653-1-git-send-email-szymon.janc@tieto.com>
+References: <1423222193-27653-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
-In-Reply-To: <002f01d0445d$73759f40$5a60ddc0$@samsung.com>
-References: <1423220624-18861-1-git-send-email-luiz.dentz@gmail.com>
-	<1423220624-18861-13-git-send-email-luiz.dentz@gmail.com>
-	<002f01d0445d$73759f40$5a60ddc0$@samsung.com>
-Date: Mon, 9 Feb 2015 15:14:01 +0200
-Message-ID: <CABBYNZJ_Op_8SiiVHDY57j4juo6cok-73O_sCyaZBiciZFhQXA@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 12/12] client: Handle attribute notifications
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Gowtham Anandha Babu <gowtham.ab@samsung.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="us-ascii"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Gowtham,
+On Friday 06 of February 2015 12:29:52 Szymon Janc wrote:
+> Connected state was missing.
+> ---
+>  android/hal-ipc-api.txt | 5 +++--
+>  android/hal-msg.h       | 5 +++--
+>  2 files changed, 6 insertions(+), 4 deletions(-)
+> 
+> diff --git a/android/hal-ipc-api.txt b/android/hal-ipc-api.txt
+> index 515cf4e..77f2f57 100644
+> --- a/android/hal-ipc-api.txt
+> +++ b/android/hal-ipc-api.txt
+> @@ -2473,8 +2473,9 @@ Notifications:
+> 
+>  		Valid State values: 0x00 = Disconnected
+>  		                    0x01 = Connecting
+> -		                    0x02 = SLC Connected
+> -		                    0x03 = Disconnecting
+> +		                    0x02 = Connected
+> +		                    0x03 = SLC Connected
+> +		                    0x04 = Disconnecting
+> 
+>  		Peer Features is a bitmask of the supported features. Currently
+>  		available bits:
+> diff --git a/android/hal-msg.h b/android/hal-msg.h
+> index ecc1150..0ec07c7 100644
+> --- a/android/hal-msg.h
+> +++ b/android/hal-msg.h
+> @@ -2107,8 +2107,9 @@ struct hal_ev_gatt_server_congestion {
+> 
+>  #define HAL_HF_CLIENT_CONN_STATE_DISCONNECTED		0x00
+>  #define HAL_HF_CLIENT_CONN_STATE_CONNECTING		0x01
+> -#define HAL_HF_CLIENT_CONN_STATE_SLC_CONNECTED		0x02
+> -#define HAL_HF_CLIENT_CONN_STATE_DISCONNECTING		0x03
+> +#define HAL_HF_CLIENT_CONN_STATE_CONNECTED		0x02
+> +#define HAL_HF_CLIENT_CONN_STATE_SLC_CONNECTED		0x03
+> +#define HAL_HF_CLIENT_CONN_STATE_DISCONNECTING		0x04
+> 
+>  #define HAL_HF_CLIENT_PEER_FEAT_3WAY		0x00000001
+>  #define HAL_HF_CLIENT_PEER_FEAT_ECNR		0x00000002
 
-On Mon, Feb 9, 2015 at 1:41 PM, Gowtham Anandha Babu
-<gowtham.ab@samsung.com> wrote:
-> Hi Luiz,
->
->> -----Original Message-----
->> From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-
->> owner@vger.kernel.org] On Behalf Of Luiz Augusto von Dentz
->> Sent: Friday, February 06, 2015 4:34 PM
->> To: linux-bluetooth@vger.kernel.org
->> Subject: [PATCH BlueZ 12/12] client: Handle attribute notifications
->>
->> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->>
->> This enable printing properties changes to the current selected attribute.
->> ---
->>  client/main.c | 13 +++++++++++++
->>  1 file changed, 13 insertions(+)
->>
->> diff --git a/client/main.c b/client/main.c index 57b1201..fbfd8c8 100644
->> --- a/client/main.c
->> +++ b/client/main.c
->> @@ -158,6 +158,7 @@ static void print_iter(const char *label, const char
->> *name,
->>       dbus_uint32_t valu32;
->>       dbus_uint16_t valu16;
->>       dbus_int16_t vals16;
->> +     unsigned char byte;
->>       const char *valstr;
->>       DBusMessageIter subiter;
->>
->> @@ -192,6 +193,10 @@ static void print_iter(const char *label, const char
->> *name,
->>               dbus_message_iter_get_basic(iter, &vals16);
->>               rl_printf("%s%s: %d\n", label, name, vals16);
->>               break;
->> +     case DBUS_TYPE_BYTE:
->> +             dbus_message_iter_get_basic(iter, &byte);
->> +             rl_printf("%s%s: 0x%02x\n", label, name, byte);
->> +             break;
->>       case DBUS_TYPE_VARIANT:
->>               dbus_message_iter_recurse(iter, &subiter);
->>               print_iter(label, name, &subiter);
->> @@ -494,6 +499,14 @@ static void property_changed(GDBusProxy *proxy,
->> const char *name,
->>
->>               print_iter(str, name, iter);
->>               g_free(str);
->> +     } else if (proxy == default_attr) {
->> +             char *str;
->> +
->> +             str = g_strdup_printf("[" COLORED_CHG "] Attribute %s ",
->> +
->>       g_dbus_proxy_get_path(proxy));
->> +
->> +             print_iter(str, name, iter);
->
-> Here I suppose, g_free(str) should come. Because the returned string (str)
-> should be freed when no longer needed.
-> And str = g_strdup(""); seems like Dead assignment. Other than that
-> everything applied cleanly with no warnings/errors.
->
-> Regards,
-> Gowtham Anandha Babu
->
->> +             str = g_strdup("");
-
-Indeed this is a dead assignment, not sure why it did not catch during
-the build, perhaps that should be g_free not g_strdup.
-
+Both applied.
 
 -- 
-Luiz Augusto von Dentz
+BR
+Szymon Janc
