@@ -1,53 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
-From: David Laight <David.Laight@ACULAB.COM>
-To: 'Marcel Holtmann' <marcel@holtmann.org>
-CC: Chen Gang S <gang.chen@sunrus.com.cn>, Joe Perches <joe@perches.com>,
-	Sergei Shtylyov <sergei.shtylyov@cogentembedded.com>, "Gustavo F. Padovan"
-	<gustavo@padovan.org>, Johan Hedberg <johan.hedberg@gmail.com>, "David S.
- Miller" <davem@davemloft.net>, "linux-bluetooth@vger.kernel.org"
-	<linux-bluetooth@vger.kernel.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>
-Subject: RE: [PATCH v3] net: bluetooth: hci_sock: Use 'const u32 *' instead
- of 'void *' for 2nd parameter of hci_test_bit()
-Date: Mon, 9 Feb 2015 16:57:54 +0000
-Message-ID: <063D6719AE5E284EB5DD2968C1650D6D1CAE0B02@AcuExch.aculab.com>
-References: <54D61229.9010904@sunrus.com.cn>
- <1423338774.2933.9.camel@perches.com> <54D6A729.1070905@sunrus.com.cn>
- <54D75698.7010808@sunrus.com.cn>
- <BD721CC9-DD4D-480D-98E6-89CA868BA285@holtmann.org>
- <54D82D7D.3000308@sunrus.com.cn>
- <063D6719AE5E284EB5DD2968C1650D6D1CAE0823@AcuExch.aculab.com>
- <DECB4016-B7D2-4C0B-A055-ED3282F727EE@holtmann.org>
-In-Reply-To: <DECB4016-B7D2-4C0B-A055-ED3282F727EE@holtmann.org>
-Content-Type: text/plain; charset="Windows-1252"
-MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2070.6\))
+Subject: Re: [PATCH] Bluetooth: Restrict access for raw-only controllers
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <CAE2MWk=4BB_VFrNwo+yY9A+yT_FwCAHhLQG9_c7gZwVUon6cew@mail.gmail.com>
+Date: Mon, 9 Feb 2015 08:55:12 -0800
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
+Message-Id: <070A5502-B85F-4DFF-ABBE-33D5B05CE1BB@holtmann.org>
+References: <CAE2MWk=4BB_VFrNwo+yY9A+yT_FwCAHhLQG9_c7gZwVUon6cew@mail.gmail.com>
+To: Ujjal Roy <royujjal@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Marcel Holtmann
-> Hi David,
->=20
-> >> So at present, in kernel part, we can only say the original authors
-> >> intended to do like this. And only within kernel part, it can not caus=
-e
-> >> issue. I guess, original authors originally knew what we talk about.
-> >
-> > I've just searched for hci_u*filter it is all horrid.
-> > Look at the code for get/set_sockopt of HCI_FILTER.
-> > Someone seems to have done a complete 'bodge job' of fixing the user in=
-terface
-> > for apps (32bit and 64bit) on 64bit kernels.
->=20
-> we are actually fully aware of that. Just keep in mind that this code is =
-from 2.4.6 kernel and with
-> that most likely 14 years old by now. Unfortunately it ended up as usersp=
-ace API.
+Hi Ujjal,
 
-AFAICT the userspace API is always __u32[2] the long[2] is never exposed
-to userspace (certainly not through the socket option code).
+>>> /* Clear flags */
+>>> - hdev->flags = 0;
+>>> + hdev->flags &= BIT(HCI_RAW);
+> 
+> Is it for clearing the HCI_RAW flag? If so then it should be as below
+> am I right?
+> 
+>  /* Clear flags */
+> - hdev->flags = 0;
+> + hdev->flags &= ~BIT(HCI_RAW);
 
-Quite why all the casts were added - instead of changing the type
-is probably hidden in the annals of the source repo.
-Some serious archaeology might be in order.
+this is for clearing all flags except the HCI_RAW bit.
 
-	David
+Regards
+
+Marcel
+
