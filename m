@@ -1,110 +1,45 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <CAD0=r8xZVpW0mEwuAORpw06Ki-aqZBZ=ybwwgKb2J1uJ6BaVCA@mail.gmail.com>
-References: <1418850810-31655-1-git-send-email-jpawlowski@google.com>
-	<CAD0=r8xZVpW0mEwuAORpw06Ki-aqZBZ=ybwwgKb2J1uJ6BaVCA@mail.gmail.com>
-Date: Mon, 9 Feb 2015 12:25:34 +0200
-Message-ID: <CABBYNZJ0jqD2v5AinPztFDkV7nb4GARkdg1wMNZLGk87r4VVzQ@mail.gmail.com>
-Subject: Re: [PATCH v4] doc/adapter-api.txt: StartFilteredDiscovery method.
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Jakub Pawlowski <jpawlowski@google.com>
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+From: Sagar Nageshmurthy <s.nageshmurt@samsung.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Sagar Nageshmurthy <s.nageshmurt@samsung.com>
+Subject: [PATCH 1/1] doc/media-api: Add RegisterTrackList method
+Date: Mon, 09 Feb 2015 11:21:15 +0530
+Message-id: <1423461075-13898-1-git-send-email-s.nageshmurt@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jakub,
+Provides access to a short list of tracks which were recently played
+or will be played shortly.
+---
+ doc/media-api.txt |   15 +++++++++++++++
+ 1 file changed, 15 insertions(+)
 
-On Sat, Feb 7, 2015 at 1:08 AM, Jakub Pawlowski <jpawlowski@google.com> wrote:
-> Hi,
->
-> Since there are no more comments for this proposal, can we please submit
-> this doc ?
-> I'll send implementation for review today.
-
-I just take a look and there some things it might be worth discussing,
-see the comments bellow.
-
-> Regards,
-> Jakub
->
-> On Wed, Dec 17, 2014 at 1:13 PM, Jakub Pawlowski <jpawlowski@google.com> wrote:
->> This patch proposes new method, StartFilteredDiscovery to D-Bus Adapter
->> API for desktop bluetoothd. It will allow for rapid discovery of nearby
->> devices that advertise services.
->>
->> Signed-off-by: Jakub Pawlowski <jpawlowski@google.com>
->> ---
->>  doc/adapter-api.txt | 40 ++++++++++++++++++++++++++++++++++++++++
->>  1 file changed, 40 insertions(+)
->>
->> diff --git a/doc/adapter-api.txt b/doc/adapter-api.txt
->> index 74d235a..e07c74c 100644
->> --- a/doc/adapter-api.txt
->> +++ b/doc/adapter-api.txt
->> @@ -22,6 +22,46 @@ Methods              void StartDiscovery()
->>                         Possible errors: org.bluez.Error.NotReady
->>                                          org.bluez.Error.Failed
->>
->> +               void StartFilteredDiscovery(dict filter, string transport)
->> +
->> +                       This method starts the device discovery session with
->> +                       filtering by uuids, and rssi or pathloss value. Use
->> +                       StopDiscovery to release the sessions acquired.
->> +
->> +                       transport parameter:
->> +                               "auto"  - interleaved scan, default value. It
->> +                                         will cause a BR/EDR & LE interleaved
->> +                                         scan on dual-mode controllers, on
->> +                                         single-mode (LE-only/BREDR-only)
->> +                                         controllers it will work on whatever
->> +                                         the controller supports.
->> +                               "bredr" - br/edr inquiry
->> +                               "le"    - le only scan
-
-I think we can move the transport to the filters and make it optional
-assuming auto by default, this would mean the signature is just a
-dictionary. Btw, tere is no explanation what would happen if another
-process call StartDiscovery? Id say they could coexist but the
-implementation gets a bit trickier since that means we need to
-overwrite the transport.
-
->> +                       Parameters that can be set in filter dictionary include
->> +                       the following:
->> +
->> +                       array{string} UUIDs : filtered service UUIDs (required)
->> +                       int16 RSSI      : RSSI threshold value (optional)
->> +                       uint16 pathloss : Pathloss threshold value (optional)
->> +
->> +                       When a device is found that advertise any UUID from
->> +                       UUIDs, it will be reported if:
->> +                       - pathloss and RSSI are both empty,
->> +                       - only pathloss param is set, device advertise TX pwer,
->> +                         and computed pathloss is less than pathloss param,
->> +                       - only RSSI param is set, and received RSSI is higher
->> +                         than RSSI param,
->> +
->> +                       This process will start creating Device objects as new
->> +                       devices matching criteria are discovered. It will also
->> +                       emit PropertiesChanged signal for already existing
->> +                       Device objects, with updated RSSI value.
->> +
->> +                       Possible errors: org.bluez.Error.NotReady
->> +                                        org.bluez.Error.Failed
->> +                                        org.bluez.Error.InvalidArguments
->> +
->>                 void StopDiscovery()
->>
->>                         This method will cancel any previous StartDiscovery
->> --
->> 2.1.0
->>
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-
-
-
+diff --git a/doc/media-api.txt b/doc/media-api.txt
+index b17a151..9830136 100644
+--- a/doc/media-api.txt
++++ b/doc/media-api.txt
+@@ -62,6 +62,21 @@ Methods		void RegisterEndpoint(object endpoint, dict properties)
+ 			Possible Errors: org.bluez.Error.InvalidArguments
+ 					 org.bluez.Error.NotSupported
+ 
++		void RegisterTrackList(object player, dict properties)
++
++			Register a media player object to TrackList interface.
++
++			Object must be registered to sender using
++			RegisterPlayer.
++
++			Object must implement org.mpris.MediaPlayer2.TrackList
++			as defined in MPRIS 2.2 spec:
++
++			http://specifications.freedesktop.org/mpris-spec/latest/
++
++			Possible Errors: org.bluez.Error.NotAuthorized
++					 org.bluez.Error.InvalidArguments
++
+ 		void UnregisterPlayer(object player)
+ 
+ 			Unregister sender media player.
 -- 
-Luiz Augusto von Dentz
+1.7.9.5
+
