@@ -1,48 +1,45 @@
 Return-Path: <cyrus@holtmann.org>
-From: David Laight <David.Laight@ACULAB.COM>
-To: 'Chen Gang S' <gang.chen@sunrus.com.cn>, Marcel Holtmann
-	<marcel@holtmann.org>
-CC: Joe Perches <joe@perches.com>, Sergei Shtylyov
-	<sergei.shtylyov@cogentembedded.com>, "Gustavo F. Padovan"
-	<gustavo@padovan.org>, Johan Hedberg <johan.hedberg@gmail.com>, "David S.
- Miller" <davem@davemloft.net>, "linux-bluetooth@vger.kernel.org"
-	<linux-bluetooth@vger.kernel.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>
-Subject: RE: [PATCH v3] net: bluetooth: hci_sock: Use 'const u32 *' instead
- of 'void *' for 2nd parameter of hci_test_bit()
-Date: Mon, 9 Feb 2015 10:44:44 +0000
-Message-ID: <063D6719AE5E284EB5DD2968C1650D6D1CAE0823@AcuExch.aculab.com>
-References: <54D61229.9010904@sunrus.com.cn>
- <1423338774.2933.9.camel@perches.com> <54D6A729.1070905@sunrus.com.cn>
- <54D75698.7010808@sunrus.com.cn>
- <BD721CC9-DD4D-480D-98E6-89CA868BA285@holtmann.org>
- <54D82D7D.3000308@sunrus.com.cn>
-In-Reply-To: <54D82D7D.3000308@sunrus.com.cn>
-Content-Type: text/plain; charset="Windows-1252"
-MIME-Version: 1.0
+From: Szymon Janc <szymon.janc@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Szymon Janc <szymon.janc@tieto.com>
+Subject: [PATCH 2/2] android/handsfree: Relax AT+CMER handling
+Date: Mon,  9 Feb 2015 11:31:36 +0100
+Message-Id: <1423477896-5082-2-git-send-email-szymon.janc@tieto.com>
+In-Reply-To: <1423477896-5082-1-git-send-email-szymon.janc@tieto.com>
+References: <1423477896-5082-1-git-send-email-szymon.janc@tieto.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Chen Gang
-...
-> So at present, in kernel part, we can only say the original authors
-> intended to do like this. And only within kernel part, it can not cause
-> issue. I guess, original authors originally knew what we talk about.
+Spec says that HF may (not should) use AT+CMER=3,0,0,1 command to
+activate indicators. Since AT+CMER has additional bfr parameter that
+may be send by HF we should just skip it instead of failing.
 
-I've just searched for hci_u*filter it is all horrid.
-Look at the code for get/set_sockopt of HCI_FILTER.
-Someone seems to have done a complete 'bodge job' of fixing the user interf=
-ace
-for apps (32bit and 64bit) on 64bit kernels.
+This fix connection with Jaguar XF 2009 carkit.
+---
+ android/handsfree.c | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
 
-> This patch is for fixing building warnings without any negative effect.
-> And most of us are not the suitable members to continue analyzing. So
-> at present, for me, we can accept this patch.
+diff --git a/android/handsfree.c b/android/handsfree.c
+index 4020ed5..4af2a89 100644
+--- a/android/handsfree.c
++++ b/android/handsfree.c
+@@ -1197,11 +1197,14 @@ static void at_cmd_cmer(struct hfp_context *result, enum hfp_gw_cmd_type type,
+ 		if (!hfp_context_get_number(result, &val) || val > 1)
+ 			break;
+ 
++		dev->indicators_enabled = val;
++
++		/* skip bfr if present */
++		hfp_context_get_number(result, &val);
++
+ 		if (hfp_context_has_next(result))
+ 			break;
+ 
+-		dev->indicators_enabled = val;
+-
+ 		hfp_gw_send_result(dev->gw, HFP_RESULT_OK);
+ 
+ 		if (dev->features & HFP_HF_FEAT_3WAY)
+-- 
+1.9.1
 
-And, not uncommonly, it has shown up a 'bag of worms'.
-
-If you change 'hci_filter' to contain u32[2] then you can drop
-all of the casts and the temporary structures in the sockopt code.
-Just be aware of the tail-padding.
-
-	David
