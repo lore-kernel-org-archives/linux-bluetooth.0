@@ -1,50 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
+From: Gowtham Anandha Babu <gowtham.ab@samsung.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/3] shared/hfp: Fix calling callback without result_pending set
-Date: Mon, 09 Feb 2015 13:29:52 +0100
-Message-ID: <1829256.I1cL0rmahj@leonov>
-In-Reply-To: <1423148831-25507-1-git-send-email-szymon.janc@tieto.com>
-References: <1423148831-25507-1-git-send-email-szymon.janc@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Cc: bharat.panda@samsung.com, cpgs@samsung.com,
+	Gowtham Anandha Babu <gowtham.ab@samsung.com>
+Subject: [PATCH  3/3] unit/test-gatt: Fix duplicate test case number
+Date: Mon, 09 Feb 2015 17:53:24 +0530
+Message-id: <1423484604-24982-4-git-send-email-gowtham.ab@samsung.com>
+In-reply-to: <1423484604-24982-1-git-send-email-gowtham.ab@samsung.com>
+References: <1423484604-24982-1-git-send-email-gowtham.ab@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Thursday 05 of February 2015 16:07:09 Szymon Janc wrote:
-> Always set pending_result before calling command callback.
-> 
-> If response will be send from callback pending_result will be
-> cleared by either hfp_gw_send_result or hfp_gw_send_error.
-> ---
->  src/shared/hfp.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
-> 
-> diff --git a/src/shared/hfp.c b/src/shared/hfp.c
-> index 0ce3121..ea6494d 100644
-> --- a/src/shared/hfp.c
-> +++ b/src/shared/hfp.c
-> @@ -183,8 +183,8 @@ static void handle_unknown_at_command(struct hfp_gw
-> *hfp, const char *data)
->  {
->  	if (hfp->command_callback) {
-> -		hfp->command_callback(data, hfp->command_data);
->  		hfp->result_pending = true;
-> +		hfp->command_callback(data, hfp->command_data);
->  	} else {
->  		hfp_gw_send_result(hfp, HFP_RESULT_ERROR);
->  	}
-> @@ -263,6 +263,7 @@ done:
->  		return true;
->  	}
-> 
-> +	hfp->result_pending = true;
->  	handler->callback(&context, type, handler->user_data);
-> 
->  	return true;
+TP/GAR/CL/BI-22-C was duplicated as TP/GAR/CL/BI-21-C.
+---
+ unit/test-gatt.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-All patches applied.
-
+diff --git a/unit/test-gatt.c b/unit/test-gatt.c
+index 22c9823..cd90d83 100644
+--- a/unit/test-gatt.c
++++ b/unit/test-gatt.c
+@@ -2238,7 +2238,7 @@ int main(int argc, char *argv[])
+ 			raw_pdu(0x0e, 0x03, 0x00, 0x07, 0x00),
+ 			raw_pdu(0x01, 0x0e, 0x03, 0x00, 0x05));
+ 
+-	define_test_client("/TP/GAR/CL/BI-21-C", test_client, service_db_1,
++	define_test_client("/TP/GAR/CL/BI-22-C", test_client, service_db_1,
+ 			&test_multiple_read_6,
+ 			SERVICE_DATA_1_PDUS,
+ 			raw_pdu(0x0e, 0x03, 0x00, 0x07, 0x00),
 -- 
-BR
-Szymon Janc
+1.9.1
+
