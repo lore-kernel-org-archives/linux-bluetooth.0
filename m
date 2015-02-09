@@ -1,57 +1,49 @@
 Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/2] android/handsfree-client: Fix connection state defines
-Date: Mon, 09 Feb 2015 13:31:43 +0100
-Message-ID: <17152355.cJ5E5gWooh@leonov>
-In-Reply-To: <1423222193-27653-1-git-send-email-szymon.janc@tieto.com>
-References: <1423222193-27653-1-git-send-email-szymon.janc@tieto.com>
+Subject: Re: [PATCH 1/3] shared/hfp: Fix calling callback without result_pending set
+Date: Mon, 09 Feb 2015 13:29:52 +0100
+Message-ID: <1829256.I1cL0rmahj@leonov>
+In-Reply-To: <1423148831-25507-1-git-send-email-szymon.janc@tieto.com>
+References: <1423148831-25507-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Friday 06 of February 2015 12:29:52 Szymon Janc wrote:
-> Connected state was missing.
+On Thursday 05 of February 2015 16:07:09 Szymon Janc wrote:
+> Always set pending_result before calling command callback.
+> 
+> If response will be send from callback pending_result will be
+> cleared by either hfp_gw_send_result or hfp_gw_send_error.
 > ---
->  android/hal-ipc-api.txt | 5 +++--
->  android/hal-msg.h       | 5 +++--
->  2 files changed, 6 insertions(+), 4 deletions(-)
+>  src/shared/hfp.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
 > 
-> diff --git a/android/hal-ipc-api.txt b/android/hal-ipc-api.txt
-> index 515cf4e..77f2f57 100644
-> --- a/android/hal-ipc-api.txt
-> +++ b/android/hal-ipc-api.txt
-> @@ -2473,8 +2473,9 @@ Notifications:
+> diff --git a/src/shared/hfp.c b/src/shared/hfp.c
+> index 0ce3121..ea6494d 100644
+> --- a/src/shared/hfp.c
+> +++ b/src/shared/hfp.c
+> @@ -183,8 +183,8 @@ static void handle_unknown_at_command(struct hfp_gw
+> *hfp, const char *data)
+>  {
+>  	if (hfp->command_callback) {
+> -		hfp->command_callback(data, hfp->command_data);
+>  		hfp->result_pending = true;
+> +		hfp->command_callback(data, hfp->command_data);
+>  	} else {
+>  		hfp_gw_send_result(hfp, HFP_RESULT_ERROR);
+>  	}
+> @@ -263,6 +263,7 @@ done:
+>  		return true;
+>  	}
 > 
->  		Valid State values: 0x00 = Disconnected
->  		                    0x01 = Connecting
-> -		                    0x02 = SLC Connected
-> -		                    0x03 = Disconnecting
-> +		                    0x02 = Connected
-> +		                    0x03 = SLC Connected
-> +		                    0x04 = Disconnecting
+> +	hfp->result_pending = true;
+>  	handler->callback(&context, type, handler->user_data);
 > 
->  		Peer Features is a bitmask of the supported features. Currently
->  		available bits:
-> diff --git a/android/hal-msg.h b/android/hal-msg.h
-> index ecc1150..0ec07c7 100644
-> --- a/android/hal-msg.h
-> +++ b/android/hal-msg.h
-> @@ -2107,8 +2107,9 @@ struct hal_ev_gatt_server_congestion {
-> 
->  #define HAL_HF_CLIENT_CONN_STATE_DISCONNECTED		0x00
->  #define HAL_HF_CLIENT_CONN_STATE_CONNECTING		0x01
-> -#define HAL_HF_CLIENT_CONN_STATE_SLC_CONNECTED		0x02
-> -#define HAL_HF_CLIENT_CONN_STATE_DISCONNECTING		0x03
-> +#define HAL_HF_CLIENT_CONN_STATE_CONNECTED		0x02
-> +#define HAL_HF_CLIENT_CONN_STATE_SLC_CONNECTED		0x03
-> +#define HAL_HF_CLIENT_CONN_STATE_DISCONNECTING		0x04
-> 
->  #define HAL_HF_CLIENT_PEER_FEAT_3WAY		0x00000001
->  #define HAL_HF_CLIENT_PEER_FEAT_ECNR		0x00000002
+>  	return true;
 
-Both applied.
+All patches applied.
 
 -- 
 BR
