@@ -1,63 +1,249 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <54D9290A.8070306@sunrus.com.cn>
-Date: Tue, 10 Feb 2015 05:39:22 +0800
-From: Chen Gang S <gang.chen@sunrus.com.cn>
 MIME-Version: 1.0
-To: David Laight <David.Laight@ACULAB.COM>,
- 'Marcel Holtmann' <marcel@holtmann.org>
-CC: Joe Perches <joe@perches.com>,
- Sergei Shtylyov <sergei.shtylyov@cogentembedded.com>,
- "Gustavo F. Padovan" <gustavo@padovan.org>,
- Johan Hedberg <johan.hedberg@gmail.com>,
- "David S. Miller" <davem@davemloft.net>,
- "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Subject: Re: [PATCH v3] net: bluetooth: hci_sock: Use 'const u32 *' instead
- of 'void *' for 2nd parameter of hci_test_bit()
-References: <54D61229.9010904@sunrus.com.cn> <1423338774.2933.9.camel@perches.com> <54D6A729.1070905@sunrus.com.cn> <54D75698.7010808@sunrus.com.cn> <BD721CC9-DD4D-480D-98E6-89CA868BA285@holtmann.org> <54D82D7D.3000308@sunrus.com.cn> <063D6719AE5E284EB5DD2968C1650D6D1CAE0823@AcuExch.aculab.com> <DECB4016-B7D2-4C0B-A055-ED3282F727EE@holtmann.org> <063D6719AE5E284EB5DD2968C1650D6D1CAE0B02@AcuExch.aculab.com>
-In-Reply-To: <063D6719AE5E284EB5DD2968C1650D6D1CAE0B02@AcuExch.aculab.com>
-Content-Type: text/plain; charset=windows-1252
+In-Reply-To: <CABBYNZ+ua6VrgwQxaPm1T8xL0zStVKXkVTLvdknu0OQvGetdkQ@mail.gmail.com>
+References: <1418850810-31655-1-git-send-email-jpawlowski@google.com>
+	<CAD0=r8xZVpW0mEwuAORpw06Ki-aqZBZ=ybwwgKb2J1uJ6BaVCA@mail.gmail.com>
+	<CABBYNZJ0jqD2v5AinPztFDkV7nb4GARkdg1wMNZLGk87r4VVzQ@mail.gmail.com>
+	<CAD0=r8z_o_8mXL_4W_0vBeMOVh_6WgE3-9tEH7_C+RsRtfTPww@mail.gmail.com>
+	<CABBYNZ+ua6VrgwQxaPm1T8xL0zStVKXkVTLvdknu0OQvGetdkQ@mail.gmail.com>
+Date: Mon, 9 Feb 2015 11:31:18 -0800
+Message-ID: <CAD0=r8wHL2GXyBJs9zvfKDGmsa2C5E_g6YXrNfLhw+E1gU03Jw@mail.gmail.com>
+Subject: Re: [PATCH v4] doc/adapter-api.txt: StartFilteredDiscovery method.
+From: Jakub Pawlowski <jpawlowski@google.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On 2/10/15 00:57, David Laight wrote:
-> From: Marcel Holtmann
->> Hi David,
+Hi Luiz,
+
+On Mon, Feb 9, 2015 at 11:04 AM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> Hi Jakub,
+>
+> On Mon, Feb 9, 2015 at 8:12 PM, Jakub Pawlowski <jpawlowski@google.com> wrote:
+>> Hi Luiz,
 >>
->>>> So at present, in kernel part, we can only say the original authors
->>>> intended to do like this. And only within kernel part, it can not cause
->>>> issue. I guess, original authors originally knew what we talk about.
+>> On Mon, Feb 9, 2015 at 2:25 AM, Luiz Augusto von Dentz
+>> <luiz.dentz@gmail.com> wrote:
+>>> Hi Jakub,
 >>>
->>> I've just searched for hci_u*filter it is all horrid.
->>> Look at the code for get/set_sockopt of HCI_FILTER.
->>> Someone seems to have done a complete 'bodge job' of fixing the user interface
->>> for apps (32bit and 64bit) on 64bit kernels.
+>>> On Sat, Feb 7, 2015 at 1:08 AM, Jakub Pawlowski <jpawlowski@google.com> wrote:
+>>>> Hi,
+>>>>
+>>>> Since there are no more comments for this proposal, can we please submit
+>>>> this doc ?
+>>>> I'll send implementation for review today.
+>>>
+>>> I just take a look and there some things it might be worth discussing,
+>>> see the comments bellow.
+>>>
+>>>> Regards,
+>>>> Jakub
+>>>>
+>>>> On Wed, Dec 17, 2014 at 1:13 PM, Jakub Pawlowski <jpawlowski@google.com> wrote:
+>>>>> This patch proposes new method, StartFilteredDiscovery to D-Bus Adapter
+>>>>> API for desktop bluetoothd. It will allow for rapid discovery of nearby
+>>>>> devices that advertise services.
+>>>>>
+>>>>> Signed-off-by: Jakub Pawlowski <jpawlowski@google.com>
+>>>>> ---
+>>>>>  doc/adapter-api.txt | 40 ++++++++++++++++++++++++++++++++++++++++
+>>>>>  1 file changed, 40 insertions(+)
+>>>>>
+>>>>> diff --git a/doc/adapter-api.txt b/doc/adapter-api.txt
+>>>>> index 74d235a..e07c74c 100644
+>>>>> --- a/doc/adapter-api.txt
+>>>>> +++ b/doc/adapter-api.txt
+>>>>> @@ -22,6 +22,46 @@ Methods              void StartDiscovery()
+>>>>>                         Possible errors: org.bluez.Error.NotReady
+>>>>>                                          org.bluez.Error.Failed
+>>>>>
+>>>>> +               void StartFilteredDiscovery(dict filter, string transport)
+>>>>> +
+>>>>> +                       This method starts the device discovery session with
+>>>>> +                       filtering by uuids, and rssi or pathloss value. Use
+>>>>> +                       StopDiscovery to release the sessions acquired.
+>>>>> +
+>>>>> +                       transport parameter:
+>>>>> +                               "auto"  - interleaved scan, default value. It
+>>>>> +                                         will cause a BR/EDR & LE interleaved
+>>>>> +                                         scan on dual-mode controllers, on
+>>>>> +                                         single-mode (LE-only/BREDR-only)
+>>>>> +                                         controllers it will work on whatever
+>>>>> +                                         the controller supports.
+>>>>> +                               "bredr" - br/edr inquiry
+>>>>> +                               "le"    - le only scan
+>>>
+>>> I think we can move the transport to the filters and make it optional
+>>> assuming auto by default, this would mean the signature is just a
+>>> dictionary. Btw, tere is no explanation what would happen if another
+>>> process call StartDiscovery? Id say they could coexist but the
+>>> implementation gets a bit trickier since that means we need to
+>>> overwrite the transport.
+>>>
 >>
->> we are actually fully aware of that. Just keep in mind that this code is from 2.4.6 kernel and with
->> that most likely 14 years old by now. Unfortunately it ended up as userspace API.
-> 
-> AFAICT the userspace API is always __u32[2] the long[2] is never exposed
-> to userspace (certainly not through the socket option code).
-> 
-> Quite why all the casts were added - instead of changing the type
-> is probably hidden in the annals of the source repo.
-> Some serious archaeology might be in order.
-> 
+>> So the thing with transport is tricky:
+>> "le" is useful , using "bredr", or  "auto" doesn't have sense right
+>> now. Internally we parse only LE advertisements, I left the transport
+>> field because in future there might be some implementation for other
+>> transports (very, very unlikely, as there is no info about services in
+>> BT classic advertisement),
+>>
+>> The main reason why I created this method is that I needed to quickly
+>> discover LE devices that have particular UUID in advertisement, and
+>> get updates about how their RSSI change over time. Using "auto"
+>> internally does interleaved scan, so I get information about LE
+>> devices for few seconds, and then for few seconds we get nothing
+>> (which is very bad and kills my use case).
+>>
+>> That makes 'transport' parameter kind of special, and I decided to
+>> leave it outside the dicttionary, but I might put it into dictionary
+>> if you preffer it this way.
+>
+> I understand this may not be very useful for classic, so the default
+> could be LE only if that is the case, my point was to leave this
+> optional which means one less thing for the application to care about.
+>
+Ok, I'll make 'le' default and as part of dictionary.
+>> There are also few reasons why filtered discovery can't coexist with
+>> regular StartDiscovery:
+>> - StartDiscovery does scan using interleaved transport, or whatever is
+>> avaliable on controller, StartFilteredDiscovery must use what it gets
+>> as parameter, changing transport for filtered discovery makes it
+>> unusable.
+>> - StartDiscovery return all found devices, and don't send updates
+>> about RSSI changes under 8dB, StartFilteredDiscovery send updates
+>> about each, even small RSSI changes, and filter all devices not
+>> matching filter.
+>> - Right now both methods do very different things on kernel level, and
+>> there is proposal to add a separate controller level command that
+>> would implement filtered discovery, so in far future both methods
+>> would do very different things even on controller level.
+>
+> Hold on, you are saying this cannot coexist, not even with another
+> session of StartFilteredDiscovery? If this is the case this could
+> cause a lot of problems, the process that first call this method would
+> probably block every other user of the whole API? That has to be some
 
-For me, I guess what you said above sounds reasonable. But excuse me,
-I am not familiar with the related modules outside Linux kernel (at
-present, it is out of my border).
+StartFilteredDiscovery can be called multiple times by different
+clients, and all sessions would coexist, it's very important use case.
+I meant that StartFilteredDiscovery can't coexist with StartDiscovery
+at same time.
 
-I guess, I am not the suitable member to make the related fix patch for
-this issue. Welcome any other members to send the fix patch for it.
-
-And for me, if "hci_u*filter" is related with the modules outside kernel
-(I guess, it should be), I recommend to put it to the related "uapi"
-header.
+> way to defer the session until we can scan again, Im afraid we need
+> some agent here so we can notify the session has been dropped or put
+> on hold while other processes are doing other things like Connect,
+> etc.
 
 
-Thanks.
--- 
-Chen Gang
+>
+>> When you try to run StartFilteredDiscovery and StartDiscovery
+>> together, whichever was the last call wins, but I'm open to any
+>> suggestions there. Returning "Busy" in error when other scan method is
+>> running also seemed like good idea. I intentionally left this
+>> unspecified, as this might change later (I hope that this kind of
+>> detail might change in experimental API?). There are few projects that
+>> will use this FilteredDiscovery, I want to gather the feedback first,
+>> and then specify exact behaviour.
+>
+> Well how could you tell whether your session was dropped due to
+> another process calling StartDiscovery, busy is probably not an option
+> here, we should avoid try and error pattern while at D-Bus level since
+> they can cause excessive number of round-trips if the process just
+> retry every time.
+>
+>
 
-Open, share, and attitude like air, water, and life which God blessed
+Calling StartDiscovery should be more important than calling
+StartFilteredDiscovery, as it is already there, and all os-level scans
+use that, and changing it's behaviour would probably cause lots of
+regressions.
+
+So StartDiscovery should always succeed, and cause
+StartFilteredDiscovery to stop, or be paused.
+
+I'll add new adapter property: FilteredDiscovery, and then all clients
+using StartFilteredDiscovery will be notified when their scan was
+stopped and started back by changes to this property.
+
+Calls to StartFilteredDiscovery will be one that could get "Busy" as
+response, when StartDiscovery is running. Then the client would not
+blinly retry after timeout, but wait until "Discoverying" property is
+set to 'false' ( regular scan is over), or "Discovering" and
+"FilteredDiscovery" are both set to 'true' (FilteredDiscovery was
+brought back).
+
+So:
+
+1. Client 1 call StartFilteredDiscovery. "Discovering" and
+"FilteredDiscovery" properties are both set to 'true'
+2. Client 2 call StartFilteredDiscovery. "Discovering" and
+"FilteredDiscovery" properties are both set to 'true', both scans can
+coexist.
+3. Client 3 call StartDiscovery. It's more important than
+FilteredDiscovery, so "Discovering" is still 'true' and
+"FilteredDiscovery" is changed to 'false'.
+4. Client 4 tries to cal StartFilteredDiscovery and get 'Busy' as
+response, or he might just check that  (Discovering == true &&
+FilteredDiscovery == false) and decide not to try yet.
+5. Client 3 finishes discovery by calling StopDiscovery. That brings
+back filtered discovery, Discovering is still True, FilteredDiscovery
+is set back to 'true', clients 1,2,4, all gets property updated. Now
+client 1,2, are back in their scans, and client 4 can start his scan.
+6. When clients 1,2,4 finish by calling "StopDiscovery" ,
+"FilteredDiscovery" property is set back to 0.
+
+
+Does that sound reasonlable ?
+
+
+
+
+>
+>>
+>>>>> +                       Parameters that can be set in filter dictionary include
+>>>>> +                       the following:
+>>>>> +
+>>>>> +                       array{string} UUIDs : filtered service UUIDs (required)
+>>>>> +                       int16 RSSI      : RSSI threshold value (optional)
+>>>>> +                       uint16 pathloss : Pathloss threshold value (optional)
+>>>>> +
+>>>>> +                       When a device is found that advertise any UUID from
+>>>>> +                       UUIDs, it will be reported if:
+>>>>> +                       - pathloss and RSSI are both empty,
+>>>>> +                       - only pathloss param is set, device advertise TX pwer,
+>>>>> +                         and computed pathloss is less than pathloss param,
+>>>>> +                       - only RSSI param is set, and received RSSI is higher
+>>>>> +                         than RSSI param,
+>>>>> +
+>>>>> +                       This process will start creating Device objects as new
+>>>>> +                       devices matching criteria are discovered. It will also
+>>>>> +                       emit PropertiesChanged signal for already existing
+>>>>> +                       Device objects, with updated RSSI value.
+>>>>> +
+>>>>> +                       Possible errors: org.bluez.Error.NotReady
+>>>>> +                                        org.bluez.Error.Failed
+>>>>> +                                        org.bluez.Error.InvalidArguments
+>>>>> +
+>>>>>                 void StopDiscovery()
+>>>>>
+>>>>>                         This method will cancel any previous StartDiscovery
+>>>>> --
+>>>>> 2.1.0
+>>>>>
+>>>> --
+>>>> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+>>>> the body of a message to majordomo@vger.kernel.org
+>>>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>>>
+>>>
+>>>
+>>> --
+>>> Luiz Augusto von Dentz
+>
+>
+>
+> --
+> Luiz Augusto von Dentz
