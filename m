@@ -1,134 +1,61 @@
 Return-Path: <cyrus@holtmann.org>
-From: Daniel Drake <drake@endlessm.com>
-To: marcel@holtmann.org, gustavo@padovan.org, johan.hedberg@gmail.com
-Cc: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: btusb: Add helper for READ_LOCAL_VERSION command
-Date: Mon,  9 Feb 2015 16:49:07 -0600
-Message-Id: <1423522147-18818-1-git-send-email-drake@endlessm.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=windows-1252
+Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2070.6\))
+Subject: Re: [PATCH v3] net: bluetooth: hci_sock: Use 'const u32 *' instead of 'void *' for 2nd parameter of hci_test_bit()
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <54D9290A.8070306@sunrus.com.cn>
+Date: Mon, 9 Feb 2015 13:40:09 -0800
+Cc: David Laight <David.Laight@ACULAB.COM>,
+	Joe Perches <joe@perches.com>,
+	Sergei Shtylyov <sergei.shtylyov@cogentembedded.com>,
+	"Gustavo F. Padovan" <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Message-Id: <D00E9366-958A-4147-916B-E8D961A4A5D4@holtmann.org>
+References: <54D61229.9010904@sunrus.com.cn> <1423338774.2933.9.camel@perches.com> <54D6A729.1070905@sunrus.com.cn> <54D75698.7010808@sunrus.com.cn> <BD721CC9-DD4D-480D-98E6-89CA868BA285@holtmann.org> <54D82D7D.3000308@sunrus.com.cn> <063D6719AE5E284EB5DD2968C1650D6D1CAE0823@AcuExch.aculab.com> <DECB4016-B7D2-4C0B-A055-ED3282F727EE@holtmann.org> <063D6719AE5E284EB5DD2968C1650D6D1CAE0B02@AcuExch.aculab.com> <54D9290A.8070306@sunrus.com.cn>
+To: Chen Gang S <gang.chen@sunrus.com.cn>
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Multiple codepaths duplicate some simple code to read and
-sanity-check local version information. Before I add a couple more
-such codepaths, add a helper to reduce duplication.
+Hi Chen,
 
-Signed-off-by: Daniel Drake <drake@endlessm.com>
----
- drivers/bluetooth/btusb.c | 68 ++++++++++++++++++++++-------------------------
- 1 file changed, 32 insertions(+), 36 deletions(-)
+>>>>> So at present, in kernel part, we can only say the original authors
+>>>>> intended to do like this. And only within kernel part, it can not cause
+>>>>> issue. I guess, original authors originally knew what we talk about.
+>>>> 
+>>>> I've just searched for hci_u*filter it is all horrid.
+>>>> Look at the code for get/set_sockopt of HCI_FILTER.
+>>>> Someone seems to have done a complete 'bodge job' of fixing the user interface
+>>>> for apps (32bit and 64bit) on 64bit kernels.
+>>> 
+>>> we are actually fully aware of that. Just keep in mind that this code is from 2.4.6 kernel and with
+>>> that most likely 14 years old by now. Unfortunately it ended up as userspace API.
+>> 
+>> AFAICT the userspace API is always __u32[2] the long[2] is never exposed
+>> to userspace (certainly not through the socket option code).
+>> 
+>> Quite why all the casts were added - instead of changing the type
+>> is probably hidden in the annals of the source repo.
+>> Some serious archaeology might be in order.
+>> 
+> 
+> For me, I guess what you said above sounds reasonable. But excuse me,
+> I am not familiar with the related modules outside Linux kernel (at
+> present, it is out of my border).
+> 
+> I guess, I am not the suitable member to make the related fix patch for
+> this issue. Welcome any other members to send the fix patch for it.
+> 
+> And for me, if "hci_u*filter" is related with the modules outside kernel
+> (I guess, it should be), I recommend to put it to the related "uapi"
+> header.
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index b876888..3096308 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -1262,6 +1262,33 @@ static void btusb_waker(struct work_struct *work)
- 	usb_autopm_put_interface(data->intf);
- }
- 
-+static struct sk_buff *btusb_read_local_version(struct hci_dev *hdev)
-+{
-+	struct hci_rp_read_local_version *ver;
-+	struct sk_buff *skb = __hci_cmd_sync(hdev, HCI_OP_READ_LOCAL_VERSION,
-+					     0, NULL, HCI_INIT_TIMEOUT);
-+
-+	if (IS_ERR(skb)) {
-+		BT_ERR("%s: HCI_OP_READ_LOCAL_VERSION failed (%ld)",
-+		       hdev->name, PTR_ERR(skb));
-+		return skb;
-+	}
-+
-+	if (skb->len != sizeof(*ver)) {
-+		BT_ERR("%s: HCI_OP_READ_LOCAL_VERSION event length mismatch",
-+		       hdev->name);
-+		kfree_skb(skb);
-+		return ERR_PTR(-EIO);
-+	}
-+
-+	ver = (struct hci_rp_read_local_version *) skb->data;
-+	BT_INFO("%s: hci_ver=%02x hci_rev=%04x lmp_ver=%02x lmp_subver=%04x",
-+		hdev->name, ver->hci_ver, ver->hci_rev, ver->lmp_ver,
-+		ver->lmp_subver);
-+
-+	return skb;
-+}
-+
- static int btusb_setup_bcm92035(struct hci_dev *hdev)
- {
- 	struct sk_buff *skb;
-@@ -1286,12 +1313,9 @@ static int btusb_setup_csr(struct hci_dev *hdev)
- 
- 	BT_DBG("%s", hdev->name);
- 
--	skb = __hci_cmd_sync(hdev, HCI_OP_READ_LOCAL_VERSION, 0, NULL,
--			     HCI_INIT_TIMEOUT);
--	if (IS_ERR(skb)) {
--		BT_ERR("Reading local version failed (%ld)", -PTR_ERR(skb));
-+	skb = btusb_read_local_version(hdev);
-+	if (IS_ERR(skb))
- 		return -PTR_ERR(skb);
--	}
- 
- 	rp = (struct hci_rp_read_local_version *)skb->data;
- 
-@@ -2393,27 +2417,14 @@ static int btusb_setup_bcm_patchram(struct hci_dev *hdev)
- 	kfree_skb(skb);
- 
- 	/* Read Local Version Info */
--	skb = __hci_cmd_sync(hdev, HCI_OP_READ_LOCAL_VERSION, 0, NULL,
--			     HCI_INIT_TIMEOUT);
-+	skb = btusb_read_local_version(hdev);
- 	if (IS_ERR(skb)) {
- 		ret = PTR_ERR(skb);
--		BT_ERR("%s: HCI_OP_READ_LOCAL_VERSION failed (%ld)",
--		       hdev->name, ret);
--		goto done;
--	}
--
--	if (skb->len != sizeof(*ver)) {
--		BT_ERR("%s: HCI_OP_READ_LOCAL_VERSION event length mismatch",
--		       hdev->name);
--		kfree_skb(skb);
--		ret = -EIO;
- 		goto done;
- 	}
- 
- 	ver = (struct hci_rp_read_local_version *)skb->data;
--	BT_INFO("%s: BCM: patching hci_ver=%02x hci_rev=%04x lmp_ver=%02x "
--		"lmp_subver=%04x", hdev->name, ver->hci_ver, ver->hci_rev,
--		ver->lmp_ver, ver->lmp_subver);
-+	BT_INFO("%s: BCM: apply patch", hdev->name);
- 	kfree_skb(skb);
- 
- 	/* Start Download */
-@@ -2475,27 +2486,12 @@ reset_fw:
- 	kfree_skb(skb);
- 
- 	/* Read Local Version Info */
--	skb = __hci_cmd_sync(hdev, HCI_OP_READ_LOCAL_VERSION, 0, NULL,
--			     HCI_INIT_TIMEOUT);
-+	skb = btusb_read_local_version(hdev);
- 	if (IS_ERR(skb)) {
- 		ret = PTR_ERR(skb);
--		BT_ERR("%s: HCI_OP_READ_LOCAL_VERSION failed (%ld)",
--		       hdev->name, ret);
- 		goto done;
- 	}
- 
--	if (skb->len != sizeof(*ver)) {
--		BT_ERR("%s: HCI_OP_READ_LOCAL_VERSION event length mismatch",
--		       hdev->name);
--		kfree_skb(skb);
--		ret = -EIO;
--		goto done;
--	}
--
--	ver = (struct hci_rp_read_local_version *)skb->data;
--	BT_INFO("%s: BCM: firmware hci_ver=%02x hci_rev=%04x lmp_ver=%02x "
--		"lmp_subver=%04x", hdev->name, ver->hci_ver, ver->hci_rev,
--		ver->lmp_ver, ver->lmp_subver);
- 	kfree_skb(skb);
- 
- 	/* Read BD Address */
--- 
-2.1.0
+since that is such old code, the "uapi" is essentially what we have as libbluetooth from the BlueZ userspace code.
+
+Regards
+
+Marcel
 
