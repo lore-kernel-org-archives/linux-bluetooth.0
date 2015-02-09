@@ -1,90 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
-From: Gowtham Anandha Babu <gowtham.ab@samsung.com>
-To: 'Luiz Augusto von Dentz' <luiz.dentz@gmail.com>,
-	linux-bluetooth@vger.kernel.org
-References: <1423220624-18861-1-git-send-email-luiz.dentz@gmail.com>
- <1423220624-18861-13-git-send-email-luiz.dentz@gmail.com>
-In-reply-to: <1423220624-18861-13-git-send-email-luiz.dentz@gmail.com>
-Subject: RE: [PATCH BlueZ 12/12] client: Handle attribute notifications
-Date: Mon, 09 Feb 2015 17:11:50 +0530
-Message-id: <002f01d0445d$73759f40$5a60ddc0$@samsung.com>
-MIME-version: 1.0
-Content-type: text/plain; charset=us-ascii
-Sender: linux-bluetooth-owner@vger.kernel.org
+From: David Laight <David.Laight@ACULAB.COM>
+To: 'Chen Gang S' <gang.chen@sunrus.com.cn>, Marcel Holtmann
+	<marcel@holtmann.org>
+CC: Joe Perches <joe@perches.com>, Sergei Shtylyov
+	<sergei.shtylyov@cogentembedded.com>, "Gustavo F. Padovan"
+	<gustavo@padovan.org>, Johan Hedberg <johan.hedberg@gmail.com>, "David S.
+ Miller" <davem@davemloft.net>, "linux-bluetooth@vger.kernel.org"
+	<linux-bluetooth@vger.kernel.org>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>
+Subject: RE: [PATCH v3] net: bluetooth: hci_sock: Use 'const u32 *' instead
+ of 'void *' for 2nd parameter of hci_test_bit()
+Date: Mon, 9 Feb 2015 10:44:44 +0000
+Message-ID: <063D6719AE5E284EB5DD2968C1650D6D1CAE0823@AcuExch.aculab.com>
+References: <54D61229.9010904@sunrus.com.cn>
+ <1423338774.2933.9.camel@perches.com> <54D6A729.1070905@sunrus.com.cn>
+ <54D75698.7010808@sunrus.com.cn>
+ <BD721CC9-DD4D-480D-98E6-89CA868BA285@holtmann.org>
+ <54D82D7D.3000308@sunrus.com.cn>
+In-Reply-To: <54D82D7D.3000308@sunrus.com.cn>
+Content-Type: text/plain; charset="Windows-1252"
+MIME-Version: 1.0
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+From: Chen Gang
+...
+> So at present, in kernel part, we can only say the original authors
+> intended to do like this. And only within kernel part, it can not cause
+> issue. I guess, original authors originally knew what we talk about.
 
-> -----Original Message-----
-> From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-
-> owner@vger.kernel.org] On Behalf Of Luiz Augusto von Dentz
-> Sent: Friday, February 06, 2015 4:34 PM
-> To: linux-bluetooth@vger.kernel.org
-> Subject: [PATCH BlueZ 12/12] client: Handle attribute notifications
-> 
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> 
-> This enable printing properties changes to the current selected attribute.
-> ---
->  client/main.c | 13 +++++++++++++
->  1 file changed, 13 insertions(+)
-> 
-> diff --git a/client/main.c b/client/main.c index 57b1201..fbfd8c8 100644
-> --- a/client/main.c
-> +++ b/client/main.c
-> @@ -158,6 +158,7 @@ static void print_iter(const char *label, const char
-> *name,
->  	dbus_uint32_t valu32;
->  	dbus_uint16_t valu16;
->  	dbus_int16_t vals16;
-> +	unsigned char byte;
->  	const char *valstr;
->  	DBusMessageIter subiter;
-> 
-> @@ -192,6 +193,10 @@ static void print_iter(const char *label, const char
-> *name,
->  		dbus_message_iter_get_basic(iter, &vals16);
->  		rl_printf("%s%s: %d\n", label, name, vals16);
->  		break;
-> +	case DBUS_TYPE_BYTE:
-> +		dbus_message_iter_get_basic(iter, &byte);
-> +		rl_printf("%s%s: 0x%02x\n", label, name, byte);
-> +		break;
->  	case DBUS_TYPE_VARIANT:
->  		dbus_message_iter_recurse(iter, &subiter);
->  		print_iter(label, name, &subiter);
-> @@ -494,6 +499,14 @@ static void property_changed(GDBusProxy *proxy,
-> const char *name,
-> 
->  		print_iter(str, name, iter);
->  		g_free(str);
-> +	} else if (proxy == default_attr) {
-> +		char *str;
-> +
-> +		str = g_strdup_printf("[" COLORED_CHG "] Attribute %s ",
-> +
-> 	g_dbus_proxy_get_path(proxy));
-> +
-> +		print_iter(str, name, iter);
+I've just searched for hci_u*filter it is all horrid.
+Look at the code for get/set_sockopt of HCI_FILTER.
+Someone seems to have done a complete 'bodge job' of fixing the user interf=
+ace
+for apps (32bit and 64bit) on 64bit kernels.
 
-Here I suppose, g_free(str) should come. Because the returned string (str)
-should be freed when no longer needed.
-And str = g_strdup(""); seems like Dead assignment. Other than that
-everything applied cleanly with no warnings/errors.
+> This patch is for fixing building warnings without any negative effect.
+> And most of us are not the suitable members to continue analyzing. So
+> at present, for me, we can accept this patch.
 
-Regards,
-Gowtham Anandha Babu
+And, not uncommonly, it has shown up a 'bag of worms'.
 
-> +		str = g_strdup("");
->  	}
->  }
-> 
-> --
-> 2.1.0
-> 
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth"
-in
-> the body of a message to majordomo@vger.kernel.org More majordomo
-> info at  http://vger.kernel.org/majordomo-info.html
+If you change 'hci_filter' to contain u32[2] then you can drop
+all of the casts and the temporary structures in the sockopt code.
+Just be aware of the tail-padding.
 
+	David
