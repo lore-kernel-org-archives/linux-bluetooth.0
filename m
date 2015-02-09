@@ -1,56 +1,110 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH 1/2] android/handsfree: Don't disconnect on unknown command in SLC
-Date: Mon,  9 Feb 2015 11:31:35 +0100
-Message-Id: <1423477896-5082-1-git-send-email-szymon.janc@tieto.com>
+MIME-Version: 1.0
+In-Reply-To: <CAD0=r8xZVpW0mEwuAORpw06Ki-aqZBZ=ybwwgKb2J1uJ6BaVCA@mail.gmail.com>
+References: <1418850810-31655-1-git-send-email-jpawlowski@google.com>
+	<CAD0=r8xZVpW0mEwuAORpw06Ki-aqZBZ=ybwwgKb2J1uJ6BaVCA@mail.gmail.com>
+Date: Mon, 9 Feb 2015 12:25:34 +0200
+Message-ID: <CABBYNZJ0jqD2v5AinPztFDkV7nb4GARkdg1wMNZLGk87r4VVzQ@mail.gmail.com>
+Subject: Re: [PATCH v4] doc/adapter-api.txt: StartFilteredDiscovery method.
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Jakub Pawlowski <jpawlowski@google.com>
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-When connecting HFP simply reply with ERROR to any command not related
-to SLC creation but don't disconnect in such case.
+Hi Jakub,
 
-This fix connection issue with Jaguar XF 2009 carkit that sends
-AT+CPIN? command before AT+BRSF.
----
- android/handsfree.c | 9 ++-------
- 1 file changed, 2 insertions(+), 7 deletions(-)
+On Sat, Feb 7, 2015 at 1:08 AM, Jakub Pawlowski <jpawlowski@google.com> wrote:
+> Hi,
+>
+> Since there are no more comments for this proposal, can we please submit
+> this doc ?
+> I'll send implementation for review today.
 
-diff --git a/android/handsfree.c b/android/handsfree.c
-index 76f5653..4020ed5 100644
---- a/android/handsfree.c
-+++ b/android/handsfree.c
-@@ -315,12 +315,6 @@ static void at_cmd_unknown(const char *command, void *user_data)
- 	uint8_t buf[IPC_MTU];
- 	struct hal_ev_handsfree_unknown_at *ev = (void *) buf;
- 
--	if (dev->state != HAL_EV_HANDSFREE_CONN_STATE_SLC_CONNECTED) {
--		hfp_gw_send_result(dev->gw, HFP_RESULT_ERROR);
--		hfp_gw_disconnect(dev->gw);
--		return;
--	}
--
- 	bdaddr2android(&dev->bdaddr, ev->bdaddr);
- 
- 	/* copy while string including terminating NULL */
-@@ -1147,6 +1141,8 @@ static void at_cmd_ckpd(struct hfp_context *result, enum hfp_gw_cmd_type type,
- 
- static void register_post_slc_at(struct hf_device *dev)
- {
-+	hfp_gw_set_command_handler(dev->gw, at_cmd_unknown, dev, NULL);
-+
- 	if (dev->hsp) {
- 		hfp_gw_register(dev->gw, at_cmd_ckpd, "+CKPD", dev, NULL);
- 		hfp_gw_register(dev->gw, at_cmd_vgs, "+VGS", dev, NULL);
-@@ -1468,7 +1464,6 @@ static void connect_cb(GIOChannel *chan, GError *err, gpointer user_data)
- 	g_io_channel_set_close_on_unref(chan, FALSE);
- 
- 	hfp_gw_set_close_on_unref(dev->gw, true);
--	hfp_gw_set_command_handler(dev->gw, at_cmd_unknown, dev, NULL);
- 	hfp_gw_set_disconnect_handler(dev->gw, disconnect_watch, dev, NULL);
- 
- 	if (dev->hsp) {
+I just take a look and there some things it might be worth discussing,
+see the comments bellow.
+
+> Regards,
+> Jakub
+>
+> On Wed, Dec 17, 2014 at 1:13 PM, Jakub Pawlowski <jpawlowski@google.com> wrote:
+>> This patch proposes new method, StartFilteredDiscovery to D-Bus Adapter
+>> API for desktop bluetoothd. It will allow for rapid discovery of nearby
+>> devices that advertise services.
+>>
+>> Signed-off-by: Jakub Pawlowski <jpawlowski@google.com>
+>> ---
+>>  doc/adapter-api.txt | 40 ++++++++++++++++++++++++++++++++++++++++
+>>  1 file changed, 40 insertions(+)
+>>
+>> diff --git a/doc/adapter-api.txt b/doc/adapter-api.txt
+>> index 74d235a..e07c74c 100644
+>> --- a/doc/adapter-api.txt
+>> +++ b/doc/adapter-api.txt
+>> @@ -22,6 +22,46 @@ Methods              void StartDiscovery()
+>>                         Possible errors: org.bluez.Error.NotReady
+>>                                          org.bluez.Error.Failed
+>>
+>> +               void StartFilteredDiscovery(dict filter, string transport)
+>> +
+>> +                       This method starts the device discovery session with
+>> +                       filtering by uuids, and rssi or pathloss value. Use
+>> +                       StopDiscovery to release the sessions acquired.
+>> +
+>> +                       transport parameter:
+>> +                               "auto"  - interleaved scan, default value. It
+>> +                                         will cause a BR/EDR & LE interleaved
+>> +                                         scan on dual-mode controllers, on
+>> +                                         single-mode (LE-only/BREDR-only)
+>> +                                         controllers it will work on whatever
+>> +                                         the controller supports.
+>> +                               "bredr" - br/edr inquiry
+>> +                               "le"    - le only scan
+
+I think we can move the transport to the filters and make it optional
+assuming auto by default, this would mean the signature is just a
+dictionary. Btw, tere is no explanation what would happen if another
+process call StartDiscovery? Id say they could coexist but the
+implementation gets a bit trickier since that means we need to
+overwrite the transport.
+
+>> +                       Parameters that can be set in filter dictionary include
+>> +                       the following:
+>> +
+>> +                       array{string} UUIDs : filtered service UUIDs (required)
+>> +                       int16 RSSI      : RSSI threshold value (optional)
+>> +                       uint16 pathloss : Pathloss threshold value (optional)
+>> +
+>> +                       When a device is found that advertise any UUID from
+>> +                       UUIDs, it will be reported if:
+>> +                       - pathloss and RSSI are both empty,
+>> +                       - only pathloss param is set, device advertise TX pwer,
+>> +                         and computed pathloss is less than pathloss param,
+>> +                       - only RSSI param is set, and received RSSI is higher
+>> +                         than RSSI param,
+>> +
+>> +                       This process will start creating Device objects as new
+>> +                       devices matching criteria are discovered. It will also
+>> +                       emit PropertiesChanged signal for already existing
+>> +                       Device objects, with updated RSSI value.
+>> +
+>> +                       Possible errors: org.bluez.Error.NotReady
+>> +                                        org.bluez.Error.Failed
+>> +                                        org.bluez.Error.InvalidArguments
+>> +
+>>                 void StopDiscovery()
+>>
+>>                         This method will cancel any previous StartDiscovery
+>> --
+>> 2.1.0
+>>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+
+
 -- 
-1.9.1
-
+Luiz Augusto von Dentz
