@@ -1,66 +1,92 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <54D960C9.2010807@freescale.com>
-Date: Tue, 10 Feb 2015 09:37:13 +0800
-From: Zheng Tao-B46827 <b46827@freescale.com>
-MIME-Version: 1.0
-To: <linux-bluetooth@vger.kernel.org>
-Subject: BlueZ for Android 4.4.3
-Content-Type: text/plain; charset="utf-8"; format=flowed
+From: Jakub Pawlowski <jpawlowski@google.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Jakub Pawlowski <jpawlowski@google.com>
+Subject: [PATCH BlueZ v5] doc/adapter-api.txt: StartFilteredDiscovery method.
+Date: Mon,  9 Feb 2015 16:34:54 -0800
+Message-Id: <1423528495-13173-1-git-send-email-jpawlowski@google.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi, Peers
+This patch proposes new method, StartFilteredDiscovery to D-Bus Adapter
+API for desktop bluetoothd. It will allow for rapid discovery of nearby
+devices that advertise services.
 
-Thanks for your hard work that let us can experience BlueZ for Android. 
-  But I am faced with a audio/a2dp problems that stick me many weeks.
+It also adds FilteredDiscovery property, that is set to true when any
+StartFilteredDiscovery session is active.
 
-I’m try to port Bluez to kitkat 4.4.3, and many common profiles, such as 
-HIDP/FTP/GATT can function successfully. But the A2DP profile failed.
+Signed-off-by: Jakub Pawlowski <jpawlowski@google.com>
+---
+ doc/adapter-api.txt | 49 +++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 49 insertions(+)
 
-So, I try to debug it using haltest tool as follows(with USB Bluetooth 
-Dongle):
-
-1.bluetooth init
-
-2.bluetooth enable
-
-3.bluetooth get_profile_interface a2dp
-
-4.bluetooth start_discovery
-
-5.bluetooth create_bond xxxxxxxx
-
-6.audio init
-
-7.audio open_output_stream
-
-Then it will prompts:
-
-D/BlueZ   ( 1106): 
-external/bluetooth/bluez/android/hal-audio.c:audio_open_output_stream()
-
-D/BlueZ   ( 1106): 
-external/bluetooth/bluez/android/hal-audio.c:ipc_open_stream_cmd()
-
-E/BlueZ   ( 1106): audio: Invalid cmd socket passed to audio_ipc_cmd
-
-E/BlueZ   ( 1106): audio: cannot open output stream
-
-when I debug it , I found that
-
-BlueZ   ( 1106): 
-external/bluetooth/bluez/android/hal-audio.c:ipc_handler() Waiting for 
-connection ...
-
-And it seems that there is no audio socket to connect it.
-
-I’m not familiar with Bluez stack details, can you give some advice? 
-What should I do to enable audio/a2dp functionality and execute audio 
-play command? Thanks.
-
-----------------------------------------------
-
-*Best Regards!*
-
-Tony Zheng
+diff --git a/doc/adapter-api.txt b/doc/adapter-api.txt
+index 74d235a..b59019d 100644
+--- a/doc/adapter-api.txt
++++ b/doc/adapter-api.txt
+@@ -22,6 +22,50 @@ Methods		void StartDiscovery()
+ 			Possible errors: org.bluez.Error.NotReady
+ 					 org.bluez.Error.Failed
+ 
++		void StartFilteredDiscovery(dict filter)
++
++			This method starts the device discovery session with
++			filtering by uuids, and rssi or pathloss value. Use
++			StopDiscovery to release the sessions acquired.
++
++ 			Parameters that can be set in filter dictionary include
++ 			the following:
++
++			array{string} UUIDs : filtered service UUIDs (required)
++			int16 RSSI	: RSSI threshold value (optional)
++			uint16 pathloss	: Pathloss threshold value (optional)
++			string transport: type of scan to run
++
++			When a device is found that advertise any UUID from
++			UUIDs, it will be reported if:
++			- pathloss and RSSI are both empty,
++			- only pathloss param is set, device advertise TX pwer,
++			  and computed pathloss is less than pathloss param,
++			- only RSSI param is set, and received RSSI is higher
++			  than RSSI param,
++
++			transport parameter determines the type of scan:
++				"auto"	- interleaved scan
++				"bredr"	- br/edr inquiry
++				"le"	- le only scan, default value
++
++			This process will start creating Device objects as new
++			devices matching criteria are discovered. It will also
++			emit PropertiesChanged signal for already existing
++			Device objects, with updated RSSI value.
++
++			StartDiscovery (SD) takes precedence over
++			StartFilteredDiscovery (SFD). That means that you should
++			check Discovering property before calling SFD, otherwise
++			it would fail when any SD session is in progress.
++			Calling SD when SFD is in progress pause all SFD
++			sessions, and start them back when all SD sessions are
++			finished. When filtered discovery state is changed,
++			FilteredDiscovery variable is updated accordingly.
++
++			Possible errors: org.bluez.Error.NotReady
++					 org.bluez.Error.Failed
++
+ 		void StopDiscovery()
+ 
+ 			This method will cancel any previous StartDiscovery
+@@ -144,6 +188,11 @@ Properties	string Address [readonly]
+ 
+ 			Indicates that a device discovery procedure is active.
+ 
++		boolean FilteredDiscovery [readonly]
++
++			Indicates that a filtered device discovery procedure is
++			active.
++
+ 		array{string} UUIDs [readonly]
+ 
+ 			List of 128-bit UUIDs that represents the available
+-- 
+2.2.0.rc0.207.ga3a616c
 
