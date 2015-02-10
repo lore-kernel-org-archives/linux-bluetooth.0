@@ -1,35 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 2/2] TODO: Bump priority of signed writes
-Date: Tue, 10 Feb 2015 17:06:57 +0200
-Message-Id: <1423580817-16986-2-git-send-email-luiz.dentz@gmail.com>
-In-Reply-To: <1423580817-16986-1-git-send-email-luiz.dentz@gmail.com>
-References: <1423580817-16986-1-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 1/2] TODO: Add tasks for GATT client examples
+Date: Tue, 10 Feb 2015 17:06:56 +0200
+Message-Id: <1423580817-16986-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This has to be completed in order to finalize unit tests as well as use
-it in BfA.
 ---
- TODO | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ TODO | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
 
 diff --git a/TODO b/TODO
-index 62b33a0..e489221 100644
+index ca3779b..62b33a0 100644
 --- a/TODO
 +++ b/TODO
-@@ -102,7 +102,7 @@ ATT/GATT (new shared stack)
- - shared/att currently doesn't handle signed writes. It should be extended to
-   support signing outgoing and verify incoming ATT PDUs.
+@@ -113,6 +113,16 @@ ATT/GATT (new shared stack)
+   Priority: High
+   Complexity: C4
  
--  Priority: Medium
++- Write an example using client D-Bus API using C.
++
 +  Priority: High
-   Complexity: C1
- 
- - Add complete GATT test coverage in unit/test-gatt following the GATT test
++  Complexity: C2
++
++- Write an example using client D-Bus API using python.
++
++  Priority: High
++  Complexity: C2
++
+ - Define packed structs for ATT protocol PDUs in shared/att-types to improve
+   readability. We should probably do this once there are extensive unit tests
+   for gatt-client/gatt-server so that we don't accidentally break working code.
 -- 
 2.1.0
 
