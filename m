@@ -1,101 +1,109 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1423220624-18861-1-git-send-email-luiz.dentz@gmail.com>
-References: <1423220624-18861-1-git-send-email-luiz.dentz@gmail.com>
-Date: Tue, 10 Feb 2015 13:42:58 +0200
-Message-ID: <CABBYNZ+aUNKiy+PMOq__kw_Xh6=9cVgaocTRK2j42sDjw3+b6w@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 00/12] client: Add support for GATT API
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+From: percy-g2 <gahlotpercy@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Prashant Gahlot <gahlotpercy@gmail.com>
+Subject: [PATCH] [PATCH] Add support for ST-Ericsoon CG2900 chip
+Date: Tue, 10 Feb 2015 11:27:36 +0100
+Message-Id: <1423564056-30573-1-git-send-email-gahlotpercy@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+From: Prashant Gahlot <gahlotpercy@gmail.com>
 
-On Fri, Feb 6, 2015 at 1:03 PM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->
-> This adds basic support for GATT API, the main idea is that one can
-> navigate into the attributes and read and write values to them.
->
-> Some of the output of the changes can be found bellow:
->
-> [bluetooth]# connect XX:XX:XX:XX:XX:XX
-> Attempting to connect to XX:XX:XX:XX:XX:XX
-> [CHG] Device XX:XX:XX:XX:XX:XX Connected: yes
-> Connection successful
-> [CHG] Device XX:XX:XX:XX:XX:XX Paired: yes
-> [NEW] Service /org/bluez/hci0/dev_XX_XX_XX_XX_XX_XX/service0011 Battery Service (Primary)
-> [NEW] Characteristic /org/bluez/hci0/dev_XX_XX_XX_XX_XX_XX/service0011/char0012 Battery Level
-> [NEW] Descriptor /org/bluez/hci0/dev_XX_XX_XX_XX_XX_XX/service0011/char0012/desc0014 Client Characteristic Configuration
-> [Arc Touch Mouse SE]# select-attribute /org/bluez/hci0/dev_XX_XX_XX_XX_XX_XX/service0011
-> /org/bluez/hci0/dev_XX_XX_XX_XX_XX_XX/service0011                    /org/bluez/hci0/dev_XX_XX_XX_XX_XX_XX/service0011/char0012           /org/bluez/hci0/dev_XX_XX_XX_XX_XX_XX/service0011/char0012/desc0014
-> [Arc Touch Mouse SE]# select-attribute /org/bluez/hci0/dev_XX_XX_XX_XX_XX_XX/service0011
-> [Arc Touch Mouse SE:/service0011]# attribute-info
-> Service - Battery Service
->         UUID: 0000180f-0000-1000-8000-00805f9b34fb
->         Primary: yes
->         Characteristics: /org/bluez/hci0/dev_XX_XX_XX_XX_XX_XX/service0011/char0012
-> [Arc Touch Mouse SE:/service0011]# select-attribute /org/bluez/hci0/dev_XX_XX_XX_XX_XX_XX/service0011/char0012
-> [Arc Touch Mouse SE:/service0011/char0012]# attribute-info
-> Characteristic - Battery Level
->         UUID: 00002a19-0000-1000-8000-00805f9b34fb
->         Service: /org/bluez/hci0/dev_XX_XX_XX_XX_XX_XX/service0011
->         Notifying: no
->         Flags: read
->         Flags: notify
->         Descriptors: /org/bluez/hci0/dev_XX_XX_XX_XX_XX_XX/service0011/char0012/desc0014
-> [Arc Touch Mouse SE:/service0011/char0012]# read
-> Attempting to read /org/bluez/hci0/dev_XX_XX_XX_XX_XX_XX/service0011/char0012
-> [CHG] Attribute /org/bluez/hci0/dev_XX_XX_XX_XX_XX_XX/service0011/char0012 Value: 0x63
->   63                                               c
-> [Arc Touch Mouse SE:/service0011/char0012]# write 00
-> Attempting to write /org/bluez/hci0/dev_XX_XX_XX_XX_XX_XX/service0011/char0012
-> Failed to write: org.bluez.Error.NotSupported
-> [Arc Touch Mouse SE:/service0011/char0012]# notify on
-> [CHG] Attribute /org/bluez/hci0/dev_XX_XX_XX_XX_XX_XX/service0011/char0012 Notifying: yes
-> Notify started
-> [CHG] Attribute /org/bluez/hci0/dev_XX_XX_XX_XX_XX_XX/service0011/char0012 Value: 0x55
-> [CHG] Attribute /org/bluez/hci0/dev_XX_XX_XX_XX_XX_XX/service0011/char0012 Value: 0x56
-> [CHG] Attribute /org/bluez/hci0/dev_XX_XX_XX_XX_XX_XX/service0011/char0012 Value: 0x57
-> [CHG] Attribute /org/bluez/hci0/dev_XX_XX_XX_XX_XX_XX/service0011/char0012 Value: 0x58
-> [Arc Touch Mouse SE:/service0011/char0012]# notify off
-> [CHG] Attribute /org/bluez/hci0/dev_XX_XX_XX_XX_XX_XX/service0011/char0012 Notifying: no
-> Notify stopped
-> [Arc Touch Mouse SE:/service0011/char0012]#
->
-> Luiz Augusto von Dentz (12):
->   client: Add support for GattService1
->   client: Add support for GattCharacteristic1
->   client: Add support for GattDescriptor1
->   client: Make commands relative to device
->   client: Add command list-attributes
->   client: Add command select-attribute
->   client: Add attribute-info command
->   client/display: Add rl_hexdump
->   client: Add read command
->   client: Add write command
->   client: Add notify command
->   client: Handle attribute notifications
->
->  Makefile.tools   |   1 +
->  client/display.c |  41 +++++
->  client/display.h |   1 +
->  client/gatt.c    | 514 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
->  client/gatt.h    |  39 +++++
->  client/main.c    | 409 ++++++++++++++++++++++++++++++++++---------
->  6 files changed, 925 insertions(+), 80 deletions(-)
->  create mode 100644 client/gatt.c
->  create mode 100644 client/gatt.h
->
-> --
-> 2.1.0
+---
+ tools/hciattach.c | 21 ++++++++++++++-------
+ tools/hciattach.h |  1 +
+ 2 files changed, 15 insertions(+), 7 deletions(-)
 
-Pushed.
-
-
-
+diff --git a/tools/hciattach.c b/tools/hciattach.c
+index 14d3511..e66d2b8 100644
+--- a/tools/hciattach.c
++++ b/tools/hciattach.c
+@@ -1080,6 +1080,10 @@ struct uart_t uart[] = {
+ 	{ "texasalt",   0x0000, 0x0000, HCI_UART_LL,   115200, 115200,
+ 				FLOW_CTL, DISABLE_PM, NULL, texasalt, NULL   },
+ 
++	/* ST-Ericsson CG2900 GPS FM Bluetooth combo controller */
++	{ "cg2900",     0x0000, 0x0000, HCI_UART_STE,  115200, 115200,
++				FLOW_CTL, DISABLE_PM, NULL, NULL     },
++
+ 	/* ST Microelectronics minikits based on STLC2410/STLC2415 */
+ 	{ "st",         0x0000, 0x0000, HCI_UART_H4,    57600, 115200,
+ 				FLOW_CTL, DISABLE_PM,  NULL, st       },
+@@ -1187,10 +1191,10 @@ static struct uart_t * get_by_type(char *type)
+ }
+ 
+ /* Initialize UART driver */
+-static int init_uart(char *dev, struct uart_t *u, int send_break, int raw)
++static int init_uart(char *dev, struct uart_t *u, int send_break, int raw, int line_disc)
+ {
+ 	struct termios ti;
+-	int fd, i;
++	int fd;
+ 	unsigned long flags = 0;
+ 
+ 	if (raw)
+@@ -1250,8 +1254,7 @@ static int init_uart(char *dev, struct uart_t *u, int send_break, int raw)
+ 	}
+ 
+ 	/* Set TTY to N_HCI line discipline */
+-	i = N_HCI;
+-	if (ioctl(fd, TIOCSETD, &i) < 0) {
++	if (ioctl(fd, TIOCSETD, &line_disc) < 0) {
+ 		perror("Can't set line discipline");
+ 		return -1;
+ 	}
+@@ -1276,7 +1279,7 @@ static void usage(void)
+ {
+ 	printf("hciattach - HCI UART driver initialization utility\n");
+ 	printf("Usage:\n");
+-	printf("\thciattach [-n] [-p] [-b] [-r] [-t timeout] [-s initial_speed]"
++	printf("\thciattach [-n] [-p] [-a line_disc_nr] [-b] [-r] [-t timeout] [-s initial_speed]"
+ 			" <tty> <type | id> [speed] [flow|noflow]"
+ 			" [sleep|nosleep] [bdaddr]\n");
+ 	printf("\thciattach -l\n");
+@@ -1287,6 +1290,7 @@ int main(int argc, char *argv[])
+ 	struct uart_t *u = NULL;
+ 	int detach, printpid, raw, opt, i, n, ld, err;
+ 	int to = 10;
++	int line_disc = N_HCI;
+ 	int init_speed = 0;
+ 	int send_break = 0;
+ 	pid_t pid;
+@@ -1299,8 +1303,11 @@ int main(int argc, char *argv[])
+ 	printpid = 0;
+ 	raw = 0;
+ 
+-	while ((opt=getopt(argc, argv, "bnpt:s:lr")) != EOF) {
++	while ((opt=getopt(argc, argv, "bnpt:s:lra:")) != EOF) {
+ 		switch(opt) {
++		case 'a':
++			line_disc = atoi(optarg);
++			break;
+ 		case 'b':
+ 			send_break = 1;
+ 			break;
+@@ -1416,7 +1423,7 @@ int main(int argc, char *argv[])
+ 	alarm(to);
+ 	bcsp_max_retries = to;
+ 
+-	n = init_uart(dev, u, send_break, raw);
++	n = init_uart(dev, u, send_break, raw, line_disc);
+ 	if (n < 0) {
+ 		perror("Can't initialize device");
+ 		exit(1);
+diff --git a/tools/hciattach.h b/tools/hciattach.h
+index 2aaf075..94a4ebf 100644
+--- a/tools/hciattach.h
++++ b/tools/hciattach.h
+@@ -39,6 +39,7 @@
+ #define HCI_UART_H4DS	3
+ #define HCI_UART_LL	4
+ #define HCI_UART_ATH3K  5
++#define HCI_UART_STE 6
+ 
+ #define HCI_UART_RAW_DEVICE	0
+ #define HCI_UART_RESET_ON_INIT	1
 -- 
-Luiz Augusto von Dentz
+2.1.4
+
