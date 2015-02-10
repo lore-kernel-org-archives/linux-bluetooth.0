@@ -1,22 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-Date: Tue, 10 Feb 2015 19:22:25 +0530
-Message-ID: <CAE2MWkn0RBeZpiJy_6t0-3zs_DCikX4Qxqpa-FGr0MYWnOM_vw@mail.gmail.com>
-Subject: Query: HCI_RAW mode in Kernel 3.18
-From: Ujjal Roy <royujjal@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
+From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
+Subject: [PATCH 5/6] android/gatt: Remove reduntant comparison
+Date: Tue, 10 Feb 2015 13:48:13 +0100
+Message-Id: <1423572494-32037-5-git-send-email-jakub.tyszkowski@tieto.com>
+In-Reply-To: <1423572494-32037-1-git-send-email-jakub.tyszkowski@tieto.com>
+References: <1423572494-32037-1-git-send-email-jakub.tyszkowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-I have a question regarding RAW mode.
+This is not needed as we only have one type or the other.
+---
+ android/gatt.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Is it still possible to use RAW mode in Kernel 3.18? If so how to use
-the RAW mode? Please help me. I had an app which used to change the
-the mode to RAW (HCISETRAW command). This feature is removed from
-Kernel. Please reply and help me if there is any way to use the RAW
-mode.
+diff --git a/android/gatt.c b/android/gatt.c
+index 7b924af..9be750a 100644
+--- a/android/gatt.c
++++ b/android/gatt.c
+@@ -881,7 +881,7 @@ static void notify_app_connect_status(struct app_connection *conn,
+ 
+ 	if (conn->app->type == GATT_CLIENT)
+ 		send_client_connect_status_notify(conn, status);
+-	else if (conn->app->type == GATT_SERVER)
++	else
+ 		send_server_connection_state_notify(conn, !status);
+ }
+ 
+-- 
+1.9.1
 
-Thanks,
-UjjaL Roy
