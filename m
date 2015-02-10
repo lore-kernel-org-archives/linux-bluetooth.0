@@ -1,598 +1,195 @@
 Return-Path: <cyrus@holtmann.org>
-Sender: Larry Finger <larry.finger@gmail.com>
-Message-ID: <54DA40DB.7030806@lwfinger.net>
-Date: Tue, 10 Feb 2015 11:33:15 -0600
-From: Larry Finger <Larry.Finger@lwfinger.net>
-MIME-Version: 1.0
-To: Daniel Drake <drake@endlessm.com>, marcel@holtmann.org,
- gustavo@padovan.org, johan.hedberg@gmail.com
-CC: linux-bluetooth@vger.kernel.org, champion_chen@realsil.com.cn
-Subject: Re: [PATCH v3] Bluetooth: btusb: Add Realtek 8723A/8723B/8761A/8821A
- support
-References: <1423522782-18956-1-git-send-email-drake@endlessm.com>
-In-Reply-To: <1423522782-18956-1-git-send-email-drake@endlessm.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
+From: Mariusz Skamra <mariusz.skamra@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Mariusz Skamra <mariusz.skamra@tieto.com>
+Subject: [PATCH] android/pts: Update PTS GATT results
+Date: Tue, 10 Feb 2015 18:18:38 +0100
+Message-Id: <1423588718-8256-1-git-send-email-mariusz.skamra@tieto.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On 02/09/2015 04:59 PM, Daniel Drake wrote:
-> Realtek ship a variety of bluetooth USB devices that identify
-> themselves with standard USB Bluetooth device class values, but
-> require a special driver to actually work. Without that driver,
-> you never get any scan results.
->
-> More recently however, Realtek appear to have wisened up and simply
-> posted a firmware update that makes these devices comply with
-> normal btusb protocols. The firmware needs to be uploaded on each boot.
->
-> Based on Realtek code from https://github.com/lwfinger/rtl8723au_bt
-> ('new' branch).
->
-> This enables bluetooth support in the Gigabyte Brix GB-BXBT-2807 which
-> has this RTL8723BE USB device:
->
-> T:  Bus=01 Lev=01 Prnt=01 Port=01 Cnt=02 Dev#=  3 Spd=12   MxCh= 0
-> D:  Ver= 2.10 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-> P:  Vendor=13d3 ProdID=3410 Rev= 2.00
-> S:  Manufacturer=Realtek
-> S:  Product=Bluetooth Radio
-> S:  SerialNumber=00e04c000001
-> C:* #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=500mA
-> I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
-> E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-> E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-> I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-> I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-> I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-> I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-> I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-> I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
->
-> There is no change to the USB descriptor after firmware update,
-> however the version read by HCI_OP_READ_LOCAL_VERSION changes from
-> 0x8723 to 0x3083.
->
-> I also brought in support for the 8821A/8761A devices, which use
-> the same firmware uploading mechanism, plus the 8723A devices,
-> which use a more simplistic firmware format. I have not tested
-> with these additional devices.
->
-> Signed-off-by: Daniel Drake <drake@endlessm.com>
-> ---
->   drivers/bluetooth/btusb.c | 432 ++++++++++++++++++++++++++++++++++++++++++++++
->   1 file changed, 432 insertions(+)
->
-> Depends on:
->   Bluetooth: btusb: Add helper for READ_LOCAL_VERSION command
->
-> v3: Sorry for the long delay in getting back to this!
->   - Removed support for devices where we don't have firmware
->   - Divide 8723A/8723B codepaths based on driver_info constant
->   - Added more device IDs from latest Realtek code
->   - Addressed minor review comments
->   - Rename RTK --> RTL
->
-> v2:
->   - share main blacklist table with other devices
->   - epatch table parsing endian/alignment fixes
->   - BT_INFO message to inform user
->   - added missing kmalloc error check
->   - fixed skb leak
->   - style fixes
->
-> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-> index 3096308..0256ab2 100644
-> --- a/drivers/bluetooth/btusb.c
-> +++ b/drivers/bluetooth/btusb.c
-> @@ -24,6 +24,7 @@
->   #include <linux/module.h>
->   #include <linux/usb.h>
->   #include <linux/firmware.h>
-> +#include <asm/unaligned.h>
->
->   #include <net/bluetooth/bluetooth.h>
->   #include <net/bluetooth/hci_core.h>
-> @@ -52,6 +53,8 @@ static struct usb_driver btusb_driver;
->   #define BTUSB_SWAVE		0x1000
->   #define BTUSB_INTEL_NEW		0x2000
->   #define BTUSB_AMP		0x4000
-> +#define BTUSB_RTL8723A		0x8000
-> +#define BTUSB_RTL8723B		0x10000
->
->   static const struct usb_device_id btusb_table[] = {
->   	/* Generic Bluetooth USB device */
-> @@ -280,6 +283,58 @@ static const struct usb_device_id blacklist_table[] = {
->   	{ USB_VENDOR_AND_INTERFACE_INFO(0x8087, 0xe0, 0x01, 0x01),
->   	  .driver_info = BTUSB_IGNORE },
->
-> +	/* Realtek 8723AE Bluetooth devices */
-> +	{ USB_DEVICE(0x0930, 0x021d), .driver_info = BTUSB_RTL8723A },
-> +	{ USB_DEVICE(0x0bda, 0x0723), .driver_info = BTUSB_RTL8723A },
-> +	{ USB_DEVICE(0x0bda, 0x8723), .driver_info = BTUSB_RTL8723A },
-> +	{ USB_DEVICE(0x13d3, 0x3394), .driver_info = BTUSB_RTL8723A },
-> +
-> +	/* Realtek 8723AU Bluetooth devices */
-> +	{ USB_DEVICE(0x0bda, 0x0724), .driver_info = BTUSB_RTL8723A },
-> +	{ USB_DEVICE(0x0bda, 0x1724), .driver_info = BTUSB_RTL8723A },
-> +	{ USB_DEVICE(0x0bda, 0x8725), .driver_info = BTUSB_RTL8723A },
-> +	{ USB_DEVICE(0x0bda, 0x872a), .driver_info = BTUSB_RTL8723A },
-> +	{ USB_DEVICE(0x0bda, 0x872b), .driver_info = BTUSB_RTL8723A },
-> +	{ USB_DEVICE(0x0bda, 0xa724), .driver_info = BTUSB_RTL8723A },
-> +
-> +	/* Realtek 8723BE Bluetooth devices */
-> +	{ USB_DEVICE(0x0489, 0xe085), .driver_info = BTUSB_RTL8723B },
-> +	{ USB_DEVICE(0x0489, 0xe08b), .driver_info = BTUSB_RTL8723B },
-> +	{ USB_DEVICE(0x0bda, 0xb001), .driver_info = BTUSB_RTL8723B },
-> +	{ USB_DEVICE(0x0bda, 0xb002), .driver_info = BTUSB_RTL8723B },
-> +	{ USB_DEVICE(0x0bda, 0xb003), .driver_info = BTUSB_RTL8723B },
-> +	{ USB_DEVICE(0x0bda, 0xb004), .driver_info = BTUSB_RTL8723B },
-> +	{ USB_DEVICE(0x0bda, 0xb005), .driver_info = BTUSB_RTL8723B },
-> +	{ USB_DEVICE(0x0bda, 0xb723), .driver_info = BTUSB_RTL8723B },
-> +	{ USB_DEVICE(0x0bda, 0xb728), .driver_info = BTUSB_RTL8723B },
-> +	{ USB_DEVICE(0x0bda, 0xb72b), .driver_info = BTUSB_RTL8723B },
-> +	{ USB_DEVICE(0x13d3, 0x3410), .driver_info = BTUSB_RTL8723B },
-> +	{ USB_DEVICE(0x13d3, 0x3416), .driver_info = BTUSB_RTL8723B },
-> +	{ USB_DEVICE(0x13d3, 0x3459), .driver_info = BTUSB_RTL8723B },
-> +
-> +	/* Realtek 8723BU Bluetooth devices */
-> +	{ USB_DEVICE(0x0bda, 0xb720), .driver_info = BTUSB_RTL8723B },
-> +	{ USB_DEVICE(0x0bda, 0xb72a), .driver_info = BTUSB_RTL8723B },
-> +
-> +	/* Realtek 8821AE Bluetooth devices */
-> +	{ USB_DEVICE(0x0b05, 0x17dc), .driver_info = BTUSB_RTL8723B },
-> +	{ USB_DEVICE(0x0bda, 0x0821), .driver_info = BTUSB_RTL8723B },
-> +	{ USB_DEVICE(0x0bda, 0x8821), .driver_info = BTUSB_RTL8723B },
-> +	{ USB_DEVICE(0x13d3, 0x3414), .driver_info = BTUSB_RTL8723B },
-> +	{ USB_DEVICE(0x13d3, 0x3458), .driver_info = BTUSB_RTL8723B },
-> +	{ USB_DEVICE(0x13d3, 0x3461), .driver_info = BTUSB_RTL8723B },
-> +	{ USB_DEVICE(0x13d3, 0x3462), .driver_info = BTUSB_RTL8723B },
-> +
-> +	/* Realtek 8821AU Bluetooth devices */
-> +	{ USB_DEVICE(0x0bda, 0x0823), .driver_info = BTUSB_RTL8723B },
-> +
-> +	/* Realtek 8761AU Bluetooth devices */
-> +	{ USB_DEVICE(0x0bda, 0x8760), .driver_info = BTUSB_RTL8723B },
-> +	{ USB_DEVICE(0x0bda, 0x8761), .driver_info = BTUSB_RTL8723B },
-> +	{ USB_DEVICE(0x0bda, 0x8a60), .driver_info = BTUSB_RTL8723B },
-> +	{ USB_DEVICE(0x0bda, 0xa761), .driver_info = BTUSB_RTL8723B },
-> +	{ USB_DEVICE(0x0bda, 0xb761), .driver_info = BTUSB_RTL8723B },
-> +
->   	{ }	/* Terminating entry */
->   };
->
-> @@ -1341,6 +1396,377 @@ static int btusb_setup_csr(struct hci_dev *hdev)
->   	return ret;
->   }
->
-> +#define RTL_FRAG_LEN 252
-> +
-> +struct rtl_download_cmd {
-> +	uint8_t index;
-> +	uint8_t data[RTL_FRAG_LEN];
-> +} __packed;
-> +
-> +struct rtl_download_response {
-> +	uint8_t status;
-> +	uint8_t index;
-> +} __packed;
-> +
-> +struct rtl_rom_version_evt {
-> +	uint8_t status;
-> +	uint8_t version;
-> +} __packed;
-> +
-> +struct rtl_epatch_header {
-> +	uint8_t signature[8];
-> +	uint32_t fw_version;
-> +	uint16_t num_patches;
-> +} __packed;
-> +
-> +static const uint8_t RTL_EPATCH_SIGNATURE[] = {
-> +	0x52, 0x65, 0x61, 0x6C, 0x74, 0x65, 0x63, 0x68
-> +};
-> +
-> +#define RTL_ROM_LMP_3499	0x3499
-> +#define RTL_ROM_LMP_8723A	0x1200
-> +#define RTL_ROM_LMP_8723B	0x8723
-> +#define RTL_ROM_LMP_8821A	0x8821
-> +#define RTL_ROM_LMP_8761A	0x8761
-> +
-> +static int rtl_read_rom_version(struct hci_dev *hdev)
-> +{
-> +	struct rtl_rom_version_evt *rom_version;
-> +	struct sk_buff *skb;
-> +	int r;
-> +
-> +	/* Read RTL ROM version command */
-> +	skb = __hci_cmd_sync(hdev, 0xfc6d, 0, NULL, HCI_INIT_TIMEOUT);
-> +	if (IS_ERR(skb)) {
-> +		BT_ERR("Read ROM version failed (%ld)", PTR_ERR(skb));
-> +		return PTR_ERR(skb);
-> +	}
-> +
-> +	if (skb->len != sizeof(*rom_version)) {
-> +		BT_ERR("RTL version event length mismatch");
-> +		kfree_skb(skb);
-> +		return -EIO;
-> +	}
-> +
-> +	rom_version = (struct rtl_rom_version_evt *) skb->data;
-> +	BT_DBG("rom_version status=%x version=%x",
-> +	       rom_version->status, rom_version->version);
-> +	if (rom_version->status)
-> +		r = 0;
-> +	else
-> +		r = rom_version->version;
-> +
-> +	kfree_skb(skb);
-> +	return r;
-> +}
-> +
-> +static int rtl8723b_parse_firmware(struct hci_dev *hdev, u16 lmp_subver,
-> +				   const struct firmware *fw,
-> +				   unsigned char **_buf)
-> +{
-> +	const uint8_t extension_sig[] = { 0x51, 0x04, 0xfd, 0x77 };
-> +	struct rtl_epatch_header *epatch_info;
-> +	unsigned char *buf;
-> +	int i, len, rom_version;
-> +	size_t min_size;
-> +	uint8_t opcode, length, data;
-> +	int project_id = -1;
-> +	const unsigned char *fwptr, *chip_id_base;
-> +	const unsigned char *patch_length_base, *patch_offset_base;
-> +	u32 patch_offset = 0;
-> +	u16 patch_length;
-> +	const uint16_t project_id_to_lmp_subver[] = {
-> +		RTL_ROM_LMP_8723A,
-> +		RTL_ROM_LMP_8723B,
-> +		RTL_ROM_LMP_8821A,
-> +		RTL_ROM_LMP_8761A
-> +	};
-> +
-> +	rom_version = rtl_read_rom_version(hdev);
-> +	if (rom_version < 0)
-> +		return rom_version;
-> +
-> +	BT_DBG("lmp_subver=%x rom_version=%x", lmp_subver, rom_version);
-> +
-> +	min_size = sizeof(struct rtl_epatch_header) + sizeof(extension_sig) + 3;
-> +	if (fw->size < min_size)
-> +		return -EINVAL;
-> +
-> +	fwptr = fw->data + fw->size - sizeof(extension_sig);
-> +	if (memcmp(fwptr, extension_sig, sizeof(extension_sig)) != 0) {
-> +		BT_ERR("extension section signature mismatch");
-> +		return -EINVAL;
-> +	}
-> +
-> +	/* Loop from the end of the firmware parsing instructions, until
-> +	 * we find an instruction that identifies the "project ID" for the
-> +	 * hardware supported by this firwmare file.
-> +	 * Once we have that, we double-check that that project_id is suitable
-> +	 * for the hardware we are working with. */
-> +	while (fwptr >= fw->data + (sizeof(struct rtl_epatch_header) + 3)) {
-> +		opcode = *--fwptr;
-> +		length = *--fwptr;
-> +		data = *--fwptr;
-> +		BT_DBG("check op=%x len=%x data=%x", opcode, length, data);
-> +
-> +		if (opcode == 0xff) /* EOF */
-> +			break;
-> +
-> +		if (length == 0) {
-> +			BT_ERR("found instruction with length 0");
-> +			return -EINVAL;
-> +		}
-> +
-> +		if (opcode == 0 && length == 1) {
-> +			project_id = data;
-> +			break;
-> +		}
-> +
-> +		fwptr -= length;
-> +	}
-> +
-> +	if (project_id < 0) {
-> +		BT_ERR("failed to find version instruction");
-> +		return -EINVAL;
-> +	}
-> +
-> +	if (project_id > ARRAY_SIZE(project_id_to_lmp_subver)) {
-> +		BT_ERR("unknown project id %d", project_id);
-> +		return -EINVAL;
-> +	}
-> +
-> +	if (lmp_subver != project_id_to_lmp_subver[project_id]) {
-> +		BT_ERR("firmware is for %x but this is a %x",
-> +		       project_id_to_lmp_subver[project_id], lmp_subver);
-> +		return -EINVAL;
-> +	}
-> +
-> +	epatch_info = (struct rtl_epatch_header *) fw->data;
-> +	if (memcmp(epatch_info->signature, RTL_EPATCH_SIGNATURE, 8) != 0) {
-> +		BT_ERR("bad EPATCH signature");
-> +		return -EINVAL;
-> +	}
-> +
-> +	BT_DBG("fw_version=%x, num_patches=%d",
-> +	       epatch_info->fw_version, epatch_info->num_patches);
-> +
-> +	/* After the rtl_epatch_header there is a funky patch metadata section.
-> +	 * Assuming 2 patches, the layout is:
-> +	 * ChipID1 ChipID2 PatchLength1 PatchLength2 PatchOffset1 PatchOffset2
-> +	 *
-> +	 * Find the right patch for this chip. */
-> +	min_size += 8 * epatch_info->num_patches;
-> +	if (fw->size < min_size)
-> +		return -EINVAL;
-> +
-> +	chip_id_base = fw->data + sizeof(struct rtl_epatch_header);
-> +	patch_length_base = chip_id_base +
-> +			    (sizeof(u16) * epatch_info->num_patches);
-> +	patch_offset_base = patch_length_base +
-> +			    (sizeof(u16) * epatch_info->num_patches);
-> +	for (i = 0; i < epatch_info->num_patches; i++) {
-> +		u16 chip_id = get_unaligned_le16(chip_id_base +
-> +						 (i * sizeof(u16)));
-> +		if (chip_id == rom_version + 1) {
-> +			patch_length = get_unaligned_le16(patch_length_base +
-> +							  (i * sizeof(u16)));
-> +			patch_offset = get_unaligned_le32(patch_offset_base +
-> +							  (i * sizeof(u32)));
-> +			break;
-> +		}
-> +	}
-> +
-> +	if (!patch_offset) {
-> +		BT_ERR("didn't find patch for chip id %d", rom_version);
-> +		return -EINVAL;
-> +	}
-> +
-> +	BT_DBG("length=%x offset=%x index %d", patch_length, patch_offset, i);
-> +	min_size = patch_offset + patch_length;
-> +	if (fw->size < min_size)
-> +		return -EINVAL;
-> +
-> +	/* Copy the firmware into a new buffer and write the version at
-> +	 * the end. */
-> +	len = patch_length;
-> +	buf = kmemdup(fw->data + patch_offset, patch_length, GFP_KERNEL);
-> +	if (!buf)
-> +		return -ENOMEM;
-> +
-> +	memcpy(buf + patch_length - 4, &epatch_info->fw_version, 4);
-> +
-> +	*_buf = buf;
-> +	return len;
-> +}
-> +
-> +static int rtl_download_firmware(struct hci_dev *hdev,
-> +				 const unsigned char *data, int fw_len)
-> +{
-> +	struct rtl_download_cmd *dl_cmd;
-> +	int frag_num = fw_len / RTL_FRAG_LEN + 1;
-> +	int frag_len = RTL_FRAG_LEN;
-> +	int ret = 0;
-> +	int i;
-> +
-> +	dl_cmd = kmalloc(sizeof(struct rtl_download_cmd), GFP_KERNEL);
-> +	if (!dl_cmd)
-> +		return -ENOMEM;
-> +
-> +	for (i = 0; i < frag_num; i++) {
-> +		struct rtl_download_response *dl_resp;
-> +		struct sk_buff *skb;
-> +
-> +		BT_DBG("download fw (%d/%d)", i, frag_num);
-> +		dl_cmd->index = i;
-> +		if (i == (frag_num - 1)) {
-> +			dl_cmd->index |= 0x80; /* data end */
-> +			frag_len = fw_len % RTL_FRAG_LEN;
-> +		}
-> +		memcpy(dl_cmd->data, data, frag_len);
-> +
-> +		/* Send download command */
-> +		skb = __hci_cmd_sync(hdev, 0xfc20, frag_len + 1, dl_cmd,
-> +				     HCI_INIT_TIMEOUT);
-> +		if (IS_ERR(skb)) {
-> +			BT_ERR("download fw command failed (%ld)",
-> +			       PTR_ERR(skb));
-> +			ret = -PTR_ERR(skb);
-> +			goto out;
-> +		}
-> +
-> +		if (skb->len != sizeof(*dl_resp)) {
-> +			BT_ERR("download fw event length mismatch");
-> +			kfree_skb(skb);
-> +			ret = -EIO;
-> +			goto out;
-> +		}
-> +
-> +		dl_resp = (struct rtl_download_response *) skb->data;
-> +		if (dl_resp->status != 0) {
-> +			kfree_skb(skb);
-> +			ret = bt_to_errno(dl_resp->status);
-> +			goto out;
-> +		}
-> +
-> +		kfree_skb(skb);
-> +		data += RTL_FRAG_LEN;
-> +	}
-> +
-> +out:
-> +	kfree(dl_cmd);
-> +	return ret;
-> +}
-> +
-> +static int btusb_setup_rtl8723a(struct hci_dev *hdev)
-> +{
-> +	struct btusb_data *data = dev_get_drvdata(&hdev->dev);
-> +	struct usb_device *udev = interface_to_usbdev(data->intf);
-> +	struct sk_buff *skb;
-> +	struct hci_rp_read_local_version *resp;
-> +	const struct firmware *fw;
-> +	int ret;
-> +
-> +	skb = btusb_read_local_version(hdev);
-> +	if (IS_ERR(skb))
-> +		return -PTR_ERR(skb);
-> +
-> +	resp = (struct hci_rp_read_local_version *) skb->data;
-> +	if (resp->lmp_subver != RTL_ROM_LMP_8723A
-> +			&& resp->lmp_subver != RTL_ROM_LMP_3499) {
-> +		BT_INFO("rtl8723a: assuming no firmware upload needed.");
-> +		kfree_skb(skb);
-> +		return 0;
-> +	}
-> +
-> +	kfree_skb(skb);
-> +
-> +	ret = request_firmware(&fw, "rtl_bt/rtl8723a_fw.bin", &udev->dev);
-> +	if (ret < 0) {
-> +		BT_ERR("Failed to load rtl_bt/rtl8723a_fw.bin");
-> +		return ret;
-> +	}
-> +
-> +	if (fw->size < 8) {
-> +		ret = -EINVAL;
-> +		goto out;
-> +	}
-> +
-> +	/* Check that the firmware doesn't have the epatch signature
-> +	 * (which is only for RTL8723B and newer). */
-> +	if (memcmp(fw->data, RTL_EPATCH_SIGNATURE, 8) == 0) {
-> +		BT_ERR("RTL8723A: unexpected EPATCH signature!");
-> +		ret = -EINVAL;
-> +		goto out;
-> +	}
-> +
-> +	ret = rtl_download_firmware(hdev, fw->data, fw->size);
-> +
-> +out:
-> +	release_firmware(fw);
-> +	return ret;
-> +}
-> +
-> +static int btusb_setup_rtl8723b(struct hci_dev *hdev)
-> +{
-> +	struct btusb_data *data = dev_get_drvdata(&hdev->dev);
-> +	struct usb_device *udev = interface_to_usbdev(data->intf);
-> +	const char *fw_name;
-> +	unsigned char *fw_data;
-> +	u16 lmp_subver;
-> +	const struct firmware *fw;
-> +	struct hci_rp_read_local_version *resp;
-> +	struct sk_buff *skb;
-> +	int ret;
-> +
-> +	skb = btusb_read_local_version(hdev);
-> +	if (IS_ERR(skb))
-> +		return -PTR_ERR(skb);
-> +
-> +	resp = (struct hci_rp_read_local_version *) skb->data;
-> +	if (resp->status) {
-> +		BT_ERR("rtl fw version event failed (%02x)", resp->status);
-> +		kfree_skb(skb);
-> +		return bt_to_errno(resp->status);
-> +	}
-> +
-> +	lmp_subver = resp->lmp_subver;
-> +	kfree_skb(skb);
-> +
-> +	switch (lmp_subver) {
-> +	case RTL_ROM_LMP_8723B:
-> +		fw_name = "rtl_bt/rtl8723b_fw.bin";
-> +		break;
-> +	case RTL_ROM_LMP_8821A:
-> +		fw_name = "rtl_bt/rtl8821a_fw.bin";
-> +		break;
-> +	case RTL_ROM_LMP_8761A:
-> +		fw_name = "rtl_bt/rtl8761a_fw.bin";
-> +		break;
-> +	default:
-> +		BT_INFO("rtl8723b: assuming no firmware upload needed.");
-> +		return 0;
-> +	}
-> +
-> +	ret = request_firmware(&fw, fw_name, &udev->dev);
-> +	if (ret < 0) {
-> +		BT_ERR("Failed to load %s", fw_name);
-> +		return ret;
-> +	}
-> +
-> +	ret = rtl8723b_parse_firmware(hdev, lmp_subver, fw, &fw_data);
-> +	if (ret < 0)
-> +		goto out;
-> +
-> +	ret = rtl_download_firmware(hdev, fw_data, ret);
-> +	kfree(fw_data);
-> +	if (ret < 0)
-> +		goto out;
-> +
-> +out:
-> +	release_firmware(fw);
-> +	return ret;
-> +}
-> +
->   struct intel_version {
->   	u8 status;
->   	u8 hw_platform;
-> @@ -2732,6 +3158,12 @@ static int btusb_probe(struct usb_interface *intf,
->   		set_bit(HCI_QUIRK_STRICT_DUPLICATE_FILTER, &hdev->quirks);
->   	}
->
-> +	if (id->driver_info & BTUSB_RTL8723A)
-> +		hdev->setup = btusb_setup_rtl8723a;
-> +
-> +	if (id->driver_info & BTUSB_RTL8723B)
-> +		hdev->setup = btusb_setup_rtl8723b;
-> +
->   	if (id->driver_info & BTUSB_AMP) {
->   		/* AMP controllers do not support SCO packets */
->   		data->isoc = NULL;
->
+---
+ android/pics-gatt.txt  | 27 ++++++++++++++++++++-------
+ android/pixit-gatt.txt |  1 +
+ android/pts-gatt.txt   | 26 ++++++++++++++------------
+ 3 files changed, 35 insertions(+), 19 deletions(-)
 
-Daniel,
+diff --git a/android/pics-gatt.txt b/android/pics-gatt.txt
+index 6ff9c55..39c3bc2 100644
+--- a/android/pics-gatt.txt
++++ b/android/pics-gatt.txt
+@@ -1,6 +1,6 @@
+ GATT PICS for the PTS tool.
+ 
+-PTS version: 5.3
++PTS version: 6.0.1
+ 
+ * - different than PTS defaults
+ 
+@@ -13,8 +13,8 @@ Parameter Name	Selected	Description
+ -------------------------------------------------------------------------------
+ TSPC_GATT_1_1	True		Generic Attribute Profile Client (C.1)
+ TSPC_GATT_1_2	True		Generic Attribute Profile Server (C.2)
+-TSPC_GATT_1A_1	True		Complete GATT client (C.3)
+-TSPC_GATT_1A_2	True		Complete GATT server (C.4)
++TSPC_GATT_1_3	True		Complete GATT client (C.3)
++TSPC_GATT_1_4	True		Complete GATT server (C.4)
+ -------------------------------------------------------------------------------
+ C.1: Optional to support IF TSPC_GATT_2_2; else IF TSPC_GATT_2_1 it is mandatory
+ 	to support at least one of TSPC_GATT_1_1 OR TSPC_GATT_1_2
+@@ -45,7 +45,7 @@ C.2: Mandatory IF (SUM ICS 12/7 OR SUM ICS 12/9) is supported, otherwise
+ -------------------------------------------------------------------------------
+ Parameter Name	Selected	Description
+ -------------------------------------------------------------------------------
+-TSPC_GATT_3_1	True		Client: Exchange MTU (C.1)
++TSPC_GATT_3_1	True		Client: Exchange MTU (C.2)
+ TSPC_GATT_3_2	True		Client: Discover All Primary Services (C.1)
+ TSPC_GATT_3_3	True		Client: Discover Primary Services Service
+ 					UUID (C.1)
+@@ -118,7 +118,9 @@ TSPC_GATT_3B_36	True		Client: Characteristic Format: utf8s (M)
+ TSPC_GATT_3B_37	True		Client: Characteristic Format: utf16s (M)
+ TSPC_GATT_3B_38	True		Client: Characteristic Format: struct (M)
+ -------------------------------------------------------------------------------
+-C.1: Mandatory IF TSPC_GATT_1A_1 is supported, otherwise Optional
++C.1: Mandatory IF TSPC_GATT_1_3 is supported, otherwise Optional
++C.2: Mandatory IF TSPC_GATT_1_3 AND TSPC_GATT_2_2 is supported, otherwise 
++	Excluded
+ -------------------------------------------------------------------------------
+ 
+ 
+@@ -162,7 +164,7 @@ C.1: Mandatory IF service definitions on the server can be added, changed, or
+ 	removed, otherwise Optional
+ C.2: Mandatory IF GATT TSPC_GATT_4_13 is supported, otherwise Optional
+ C.3: Mandatory IF GATT TSPC_GATT_4_15 is supported, otherwise Optional
+-C.4: Mandatory IF GATT TSPC_GATT_1A_2 is supported, otherwise Optional
++C.4: Mandatory IF GATT TSPC_GATT_1_4 is supported, otherwise Optional
+ -------------------------------------------------------------------------------
+ 
+ 
+@@ -246,6 +248,15 @@ C.2: Optional IF TSPC_GATT_2_2 is supported, otherwise Excluded
+ -------------------------------------------------------------------------------
+ 
+ 
++                Attribute Protocol Client Messages
++-------------------------------------------------------------------------------
++Parameter Name  Selected        Description
++-------------------------------------------------------------------------------
++TSPC_GATT_8_1    True            Support for Multiple ATT bearers from same
++	device (O)
++-------------------------------------------------------------------------------
++
++
+ 		Attribute Protocol Client Messages
+ -------------------------------------------------------------------------------
+ Parameter Name	Selected	Description
+@@ -266,6 +277,7 @@ TSPC_ATT_3_21	True		Signed Write Command (O)
+ TSPC_ATT_3_22	True		Prepare Write Request (O)
+ TSPC_ATT_3_24	True		Execute Write Request (C.8)
+ TSPC_ATT_3_26	True		Handle Value Notification (M)
++TSPC_ATT_3_28	True		Handle Value Confirmation (M)
+ -------------------------------------------------------------------------------
+ C.6: Mandatory IF TSPC_ATT_3_16 is supported, otherwise Excluded
+ C.8: Mandatory IF TSPC_ATT_3_22 is supported, otherwise Excluded
+@@ -288,8 +300,9 @@ TSPC_ATT_4_19	True		Write Response (C.3)
+ TSPC_ATT_4_20	True		Write Command (O)
+ TSPC_ATT_4_21	True		Signed Write Command (O)
+ TSPC_ATT_4_23	True		Prepare Write Response (C.4)
+-TSPC_ATT_4_25	True		Execute Write Response (C.5)
++TSPC_ATT_4_25	True		Execute Write Response (C.4)
+ TSPC_ATT_4_26	True		Handle Value Notification (O)
++TSPC_ATT_4_27	True		Handle Value Indication	(O)
+ -------------------------------------------------------------------------------
+ C.2: Mandatory IF TSPC_ATT_4_14 is supported, otherwise Excluded
+ C.3: Mandatory IF TSPC_ATT_4_18 is supported, otherwise Excluded
+diff --git a/android/pixit-gatt.txt b/android/pixit-gatt.txt
+index 191e2c9..5699999 100644
+--- a/android/pixit-gatt.txt
++++ b/android/pixit-gatt.txt
+@@ -28,4 +28,5 @@ TSPX_use_dynamic_pin					FALSE
+ TSPX_delete_ltk						FALSE
+ TSPX_characteristic_readable				FALSE
+ TSPX_tester_appearance					0000
++TSPX_iut_use_resolvable_random_access			FALSE
+ -------------------------------------------------------------------------------
+diff --git a/android/pts-gatt.txt b/android/pts-gatt.txt
+index a452726..3ea3183 100644
+--- a/android/pts-gatt.txt
++++ b/android/pts-gatt.txt
+@@ -1,7 +1,7 @@
+ PTS test results for GATT
+ 
+-PTS version: 5.3
+-Tested: 05-December-2014
++PTS version: 6.0.1
++Tested: 02-February-2015
+ Android version: 5.0
+ 
+ Results:
+@@ -18,8 +18,7 @@ TC_GAC_CL_BV_01_C	PASS	haltest:
+ 				gattc search_service
+ 				gattc get_characteristic
+ 				gattc write_characteristic: type 3
+-TC_GAC_SR_BV_01_C	PASS	PTS issue #12357
+-				NOTE: tested with ETS attached to errata
++TC_GAC_SR_BV_01_C	FAIL	JIRA #BA-333
+ 				haltest:
+ 				gatts add_service
+ 				gatts add_chaaracteristic:
+@@ -49,12 +48,14 @@ TC_GAD_CL_BV_02_C	PASS	haltest:
+ 				gattc connect
+ 				gattc refresh
+ TC_GAD_CL_BV_03_C	PASS	haltest:
+-                                gattc register_client
+-                                gattc scan
+-                                gattc connect
+-                                gattc search_service
++				gattc register_client
++				gattc scan
++				gattc connect
++				gattc search_service
+ 				gattc get_included_service
+-				gattc_disconnect
++				gattc disconnect
++				gattc connect
++				gattc refresh
+ TC_GAD_CL_BV_04_C	PASS	haltest:
+ 				when requested: gattc get_characteristic
+ TC_GAD_CL_BV_05_C	PASS	haltest:
+@@ -696,7 +697,7 @@ TC_GAW_CL_BI_32_C	PASS	haltest:
+ 				gattc search_service
+ 				gattc get_characteristic: srvc_id based on
+ 								handle from logs
+-				gattc write_characteristic 2 <long_value>
++				gattc write_characteristic 3 <value>
+ 				gattc execute_write
+ 				gattc disconnect
+ TC_GAW_CL_BI_33_C	PASS	haltest:
+@@ -991,7 +992,7 @@ TC_GAW_SR_BI_31_C	PASS	haltest:
+ 				gatts add_descriptor: <permmisions> 17
+ 				gatts start_service
+ 				gatts send_response: <status> 12
+-TC_GAW_SR_BI_32_C	PASS	haltest:
++TC_GAW_SR_BI_32_C	FAIL	PTS issue #12823 haltest:
+ 				gatts add_service
+ 				gatts add_characteristic:
+ 						<properties> 10 <permissions> 17
+@@ -1077,7 +1078,7 @@ TC_GAT_CL_BV_01_C	PASS	haltest:
+ 				gattc get_characteristic: srvc_id based on
+ 								handle from logs
+ 				gattc read_characcteristic
+-				gattc disconnect
++				wait for 30 sec timeout
+ TC_GAT_CL_BV_02_C	PASS	haltest:
+ 				gattc connect
+ 				gattc search_service
+@@ -1085,6 +1086,7 @@ TC_GAT_CL_BV_02_C	PASS	haltest:
+ 								handle from logs
+ 				gattc write_characcteristic 2 <short_value>
+ 				gattc disconnect
++				wait for 30 sec timeout
+ TC_GAT_SR_BV_01_C	PASS	haltest:
+ 				gatts add_service
+ 				gatts add_characteristic:
+-- 
+1.9.1
 
-I have tested the patched driver on RTL8723AE, RTL8723BE, and RTL8821AE. I have 
-no BT devices for extended testing, but all 3 could pair with my cell phone and 
-discover a number of BT devices such as my TV, etc. I have an RTL8723AU that is 
-part of a Radxa Rock SBC, but I have not yet tested it.
-
-As you noted, there are some additional devices that are not included. I have 
-firmware for them, but I think leaving them out for the moment is best. For 
-completeness, these are the RTL8192EU (0bda:818b and 0bda:818c), the RTL8192EE 
-(0bda:8760 and 0bda:8761), and the RTL8812AE (0bda:8a60). My RTL8192EE devices 
-do not have BT - such a chip may not exist in the wild, and I have no RTL8812AE 
-or RTL8192EU chips. All of these supposedly have an lmp subversion of 0x8761, 
-thus the case section for RTL_ROM_LMP_8761A in btusb_setup_rtl8723b() will need 
-a second switch statement to select the correct firmware in case those devices 
-need to be added. That will be trivial when and if the need arises.
-
-Surely the driver needs to distinguish between the RTL8723A and the others. 
-There is no problem with using RTL8723B for the other description, but you 
-should probably add a comment to indicate that RTL8821A is also included.
-
-To get some additional testing, I will create a new branch for the BT repo at 
-GitHub.
-
-AFAIK, the firmware should be redistributable under the conditions of 
-"LICENCE.rtlwifi_firmware.txt" from the linux-firmware repo. Are you planning to 
-submit the firmware to that repo, or should I do it?
-
-If you wish, add a "Tested-by: Larry Finger <Larry.Finger@lwfinger.net>".
-
-Larry
