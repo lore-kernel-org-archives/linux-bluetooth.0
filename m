@@ -1,47 +1,63 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <54D9D9B1.30800@endlessm.com>
-References: <54D4D012.4050108@endlessm.com>
-	<54D9D9B1.30800@endlessm.com>
-Date: Tue, 10 Feb 2015 14:05:00 +0200
-Message-ID: <CABBYNZ+QQdL1t-m32R6kuWvKSdnyXVAgyWmiXY5UvFh=1kAMpg@mail.gmail.com>
-Subject: Re: No SCO packets while trying to use a Bluetooth headset
+In-Reply-To: <1423484604-24982-2-git-send-email-gowtham.ab@samsung.com>
+References: <1423484604-24982-1-git-send-email-gowtham.ab@samsung.com>
+	<1423484604-24982-2-git-send-email-gowtham.ab@samsung.com>
+Date: Tue, 10 Feb 2015 13:43:39 +0200
+Message-ID: <CABBYNZJqTAt67TcK9Hw7pc2o3A-oD29RhNfDFoOGX_3o-FCG2g@mail.gmail.com>
+Subject: Re: [PATCH 1/3] unit/gatt: Add TP/GAR/CL/BI-04-C test
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Mario Sanchez Prada <mario@endlessm.com>
+To: Gowtham Anandha Babu <gowtham.ab@samsung.com>
 Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	Larry.Finger@lwfinger.net
+	Bharat Panda <bharat.panda@samsung.com>, cpgs@samsung.com
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Mario,
+Hi Gowtham,
 
-On Tue, Feb 10, 2015 at 12:13 PM, Mario Sanchez Prada
-<mario@endlessm.com> wrote:
-> Hi again,
+On Mon, Feb 9, 2015 at 2:23 PM, Gowtham Anandha Babu
+<gowtham.ab@samsung.com> wrote:
+> Verify Generic Attribute Profile client behavior when the Read
+> Characteristic Value procedure fails due to insufficient authentication.
+> ---
+>  unit/test-gatt.c | 12 ++++++++++++
+>  1 file changed, 12 insertions(+)
 >
-> Just a quick heads up about the problem mentioned a few days ago (see [1]) to let you know that I've recently (yesterday) tried the latest kernel 3.19 and that did not make any difference either. I've tested this by applying Daniel's patch to add support for the RTL8723BE bluetooth device (see [2]) on top of the v3.19 tag from the kernel git repository, and I also used the latest release of BlueZ and PulseAudio, so the problem seems to be still relevant even with the latest code.
+> diff --git a/unit/test-gatt.c b/unit/test-gatt.c
+> index bbafbda..5952026 100644
+> --- a/unit/test-gatt.c
+> +++ b/unit/test-gatt.c
+> @@ -656,6 +656,12 @@ static const struct test_step test_read_4 = {
+>         .expected_att_ecode = 0x08,
+>  };
 >
-> At this point it's not clear to me what the problem could be, so I'd really appreciate any comment that might help fix or improve this situation. Larry Finger, I'm adding you to Cc as I understand you are the go-to person for these drivers, in case you could drop some light on this problem (e.g. perhaps you've seen something similar before?).
-
-I think your controller is not properly setup for SCO over HCI
-routing, probably Windows does that so while the controller is still
-powered it will work but as soon as you power it down it will loose
-these settings. I guess you will need to find what commands these are,
-from the logs it seems the Windows driver is doing something that
-wireshark cannot decode, perhaps it is not really HCI as it claims to
-be.
-
-> Thank you all,
-> Mario
+> +static const struct test_step test_read_5 = {
+> +       .handle = 0x0003,
+> +       .func = test_read,
+> +       .expected_att_ecode = 0x05,
+> +};
+> +
+>  static void att_write_cb(struct gatt_db_attribute *att, int err,
+>                                                                 void *user_data)
+>  {
+> @@ -1848,6 +1854,12 @@ int main(int argc, char *argv[])
+>                         raw_pdu(0x0a, 0x03, 0x00),
+>                         raw_pdu(0x01, 0x0a, 0x03, 0x00, 0x08));
 >
-> [1] http://article.gmane.org/gmane.linux.bluez.kernel/58759
-> [2] http://article.gmane.org/gmane.linux.bluez.kernel/58810
+> +       define_test_client("/TP/GAR/CL/BI-04-C", test_client, service_db_1,
+> +                       &test_read_5,
+> +                       SERVICE_DATA_1_PDUS,
+> +                       raw_pdu(0x0a, 0x03, 0x00),
+> +                       raw_pdu(0x01, 0x0a, 0x03, 0x00, 0x05));
+> +
+>         define_test_server("/TP/GAR/SR/BV-01-C/small", test_server,
+>                         ts_small_db, NULL,
+>                         raw_pdu(0x03, 0x00, 0x02),
 > --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> 1.9.1
 
+Applied, thanks.
 
 
 -- 
