@@ -1,37 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
-From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
+From: Kuba Pawlak <kubax.t.pawlak@intel.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/5] tools/mcaptest: Minor style fix
-Date: Tue, 10 Feb 2015 18:17:26 +0100
-Message-Id: <1423588650-12191-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+Cc: Kuba Pawlak <kubax.t.pawlak@intel.com>
+Subject: [PATCH] AVCTP: Set initial key repeat timeout to 300ms.
+Date: Tue, 10 Feb 2015 19:19:42 +0100
+Message-Id: <1423592382-26047-1-git-send-email-kubax.t.pawlak@intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch add white lines between neighbouring bodys.
----
- tools/mcaptest.c | 2 ++
- 1 file changed, 2 insertions(+)
-
-diff --git a/tools/mcaptest.c b/tools/mcaptest.c
-index 42734eb..980d21a 100644
---- a/tools/mcaptest.c
-+++ b/tools/mcaptest.c
-@@ -286,6 +286,7 @@ static void create_mcl_cb(struct mcap_mcl *mcap_mcl, GError *err, gpointer data)
- 	mcl = mcap_mcl_ref(mcap_mcl);
- 	trigger_mdl_action(data_mode);
- }
-+
- static void usage(void)
- {
- 	printf("mcaptest - MCAP testing ver %s\n", VERSION);
-@@ -320,6 +321,7 @@ static struct option main_options[] = {
- 	{ "data_ch",		1, 0, 'D' },
- 	{ 0, 0, 0, 0 }
- };
-+
- int main(int argc, char *argv[])
- {
- 	GError *err = NULL;
--- 
-1.9.3
+J0FWQyBQYW5lbCBTdWJ1bml0IFNwZWNpZmljYXRpb24nIG1hbmRhdGVzIHRoYXQ6ClRvIGhlbHAg
+dGhlIHRhcmdldCB0byBkZWNpZGUgd2hldGhlciBhIHByZXNzZWQgYnV0dG9uIGlzIGhvbGQKb3Ig
+bm90LCBpdCBpcyByZWNvbW1lbmRlZCB0aGF0IHRoZSBjb250cm9sbGVyIGhhdmUgY2FwYWJpbGl0
+eQpvZiBpc3N1aW5nIGEg4oCccmVsZWFzZeKAnSBjb21tYW5kIHdpdGhpbiAzMDAgbXMsIGFmdGVy
+IGl0IHJlY2VpdmVzCmEgcmVzcG9uc2UgdG8gdGhlIGxhc3Qg4oCccHJlc3PigJ0gY29tbWFuZC4g
+VGhlIHRhcmdldCBzaG91bGQgbm90Cmp1ZGdlIHRoZSB1c2VyIG9wZXJhdGlvbiB0byBiZSDigJxw
+cmVzcyBhbmQgaG9sZOKAnSB3aXRoaW4gdGhpcwozMDBtcy4iLiBUaGUga2VybmVsJ3MgZGVmYXVs
+dCB0aW1lb3V0IGlzIGN1cnJlbnRseSBzZXQgdG8gMjUwbXMKd2l0aCAzM21zIGJldHdlZW4gcmVw
+ZWF0cyB3aGljaCBtZWFucyBpdCB3aWxsIGlzc3VlIG9uZSByZXBlYXQKa2V5IGJlZm9yZSAzMDBt
+cyB3aW5kb3cgZWxhcHNlcy4KLS0tCiBwcm9maWxlcy9hdWRpby9hdmN0cC5jIHwgMiArKwogMSBm
+aWxlIGNoYW5nZWQsIDIgaW5zZXJ0aW9ucygrKQoKZGlmZiAtLWdpdCBhL3Byb2ZpbGVzL2F1ZGlv
+L2F2Y3RwLmMgYi9wcm9maWxlcy9hdWRpby9hdmN0cC5jCmluZGV4IGQ5MmYzMDQuLjU3MDcxYjUg
+MTAwNjQ0Ci0tLSBhL3Byb2ZpbGVzL2F1ZGlvL2F2Y3RwLmMKKysrIGIvcHJvZmlsZXMvYXVkaW8v
+YXZjdHAuYwpAQCAtMTA5MSwxMCArMTA5MSwxMiBAQCBzdGF0aWMgaW50IHVpbnB1dF9jcmVhdGUo
+Y2hhciAqbmFtZSkKIAkJCQkJCXN0cmVycm9yKC1lcnIpLCAtZXJyKTsKIAkJY2xvc2UoZmQpOwog
+CQlyZXR1cm4gZXJyOwogCX0KIAorCXNlbmRfZXZlbnQoZmQsIEVWX1JFUCwgUkVQX0RFTEFZLCAz
+MDApOworCiAJcmV0dXJuIGZkOwogfQogCiBzdGF0aWMgdm9pZCBpbml0X3VpbnB1dChzdHJ1Y3Qg
+YXZjdHAgKnNlc3Npb24pCiB7Ci0tIAoxLjcuMTEuNwoKSW50ZWwgR21iSApEb3JuYWNoZXIgU3Ry
+YXNzZSAxCjg1NjIyIEZlbGRraXJjaGVuL011ZW5jaGVuLCBEZXV0c2NobGFuZApTaXR6IGRlciBH
+ZXNlbGxzY2hhZnQ6IEZlbGRraXJjaGVuIGJlaSBNdWVuY2hlbgpHZXNjaGFlZnRzZnVlaHJlcjog
+Q2hyaXN0aWFuIExhbXByZWNodGVyLCBIYW5uZXMgU2Nod2FkZXJlciwgRG91Z2xhcyBMdXNrClJl
+Z2lzdGVyZ2VyaWNodDogTXVlbmNoZW4gSFJCIDQ3NDU2ClVzdC4tSWROci4vVkFUIFJlZ2lzdHJh
+dGlvbiBOby46IERFMTI5Mzg1ODk1CkNpdGliYW5rIEZyYW5rZnVydCBhLk0uIChCTFogNTAyIDEw
+OSAwMCkgNjAwMTE5MDUyCg==
 
