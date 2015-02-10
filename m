@@ -1,45 +1,55 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <54DA40DB.7030806@lwfinger.net>
-References: <1423522782-18956-1-git-send-email-drake@endlessm.com>
-	<54DA40DB.7030806@lwfinger.net>
-Date: Tue, 10 Feb 2015 19:01:15 -0600
-Message-ID: <CAD8Lp44htOrbdXEC-xcjPYrZG8EAePkhTQGiUwZXw2VbSBfbJQ@mail.gmail.com>
-Subject: Re: [PATCH v3] Bluetooth: btusb: Add Realtek 8723A/8723B/8761A/8821A support
-From: Daniel Drake <drake@endlessm.com>
-To: Larry Finger <Larry.Finger@lwfinger.net>
-Cc: Marcel Holtmann <marcel@holtmann.org>, "Gustavo F. Padovan" <gustavo@padovan.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	Linux Bluetooth mailing list <linux-bluetooth@vger.kernel.org>,
-	=?UTF-8?B?6ZmI6Imz6JCN?= <champion_chen@realsil.com.cn>
-Content-Type: text/plain; charset=UTF-8
+From: Michael Janssen <jamuraa@chromium.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: Michael Janssen <jamuraa@chromium.org>
+Subject: [PATCH BlueZ 1/8] gatt-client: skip discovery with no handles
+Date: Tue, 10 Feb 2015 12:16:17 -0800
+Message-Id: <1423599385-36295-2-git-send-email-jamuraa@chromium.org>
+In-Reply-To: <1423599385-36295-1-git-send-email-jamuraa@chromium.org>
+References: <1423599385-36295-1-git-send-email-jamuraa@chromium.org>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Tue, Feb 10, 2015 at 11:33 AM, Larry Finger
-<Larry.Finger@lwfinger.net> wrote:
-> I have tested the patched driver on RTL8723AE, RTL8723BE, and RTL8821AE. I
-> have no BT devices for extended testing, but all 3 could pair with my cell
-> phone and discover a number of BT devices such as my TV, etc. I have an
-> RTL8723AU that is part of a Radxa Rock SBC, but I have not yet tested it.
+If there are no handles in a defined service, it is not useful to try to
+discover anything in it, just go to the next service.
+---
+ src/shared/gatt-client.c | 9 +++++++++
+ 1 file changed, 9 insertions(+)
 
-Thanks for testing!
+diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
+index d0fc054..bfb9427 100644
+--- a/src/shared/gatt-client.c
++++ b/src/shared/gatt-client.c
+@@ -525,6 +525,9 @@ next:
+ 	if (!gatt_db_attribute_get_service_handles(attr, &start, &end))
+ 		goto failed;
+ 
++	if (start == end)
++		goto next;
++
+ 	if (bt_gatt_discover_included_services(client->att, start, end,
+ 							discover_incl_cb,
+ 							discovery_op_ref(op),
+@@ -675,6 +678,9 @@ next:
+ 	if (!gatt_db_attribute_get_service_handles(attr, &start, &end))
+ 		goto failed;
+ 
++	if (start == end)
++		goto next;
++
+ 	/* Move on to the next service */
+ 	op->cur_svc = attr;
+ 	if (bt_gatt_discover_characteristics(client->att, start, end,
+@@ -776,6 +782,9 @@ next:
+ 	if (!gatt_db_attribute_get_service_handles(attr, &start, &end))
+ 		goto failed;
+ 
++	if (start == end)
++		goto next;
++
+ 	/* Move on to the next service */
+ 	op->cur_svc = attr;
+ 	if (bt_gatt_discover_characteristics(client->att, start, end,
+-- 
+2.2.0.rc0.207.ga3a616c
 
-> As you noted, there are some additional devices that are not included. I
-> have firmware for them, but I think leaving them out for the moment is best.
-
-I agree, those can happen in later patches.
-
-I'll send a followup patch with the added comment and your tested-by,
-but first I'll wait a couple more days to see if there is more
-feedback.
-
-> AFAIK, the firmware should be redistributable under the conditions of
-> "LICENCE.rtlwifi_firmware.txt" from the linux-firmware repo. Are you
-> planning to submit the firmware to that repo, or should I do it?
-
-I'll do that too. Can you confirm which are the latest firmware files?
-For example in the 'new' branch there seem to be 2 different firmwares
-for rtl8723b at least.
-
-Thanks
-Daniel
