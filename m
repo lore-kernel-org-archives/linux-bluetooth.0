@@ -1,6 +1,6 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <54D96429.8000304@freescale.com>
-Date: Tue, 10 Feb 2015 09:51:37 +0800
+Message-ID: <54D960C9.2010807@freescale.com>
+Date: Tue, 10 Feb 2015 09:37:13 +0800
 From: Zheng Tao-B46827 <b46827@freescale.com>
 MIME-Version: 1.0
 To: <linux-bluetooth@vger.kernel.org>
