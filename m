@@ -1,85 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <54D96429.8000304@freescale.com>
-References: <54D96429.8000304@freescale.com>
-Date: Wed, 11 Feb 2015 09:16:38 +0100
-Message-ID: <CAN_7+Yai0m39=crfcqJdJZfoTOOuh4zxPi_46wn6EXbewHGf8g@mail.gmail.com>
-Subject: Re: BlueZ for Android 4.4.3
-From: Lukasz Rymanowski <lukasz.rymanowski@gmail.com>
-To: Zheng Tao-B46827 <b46827@freescale.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+From: Arman Uguray <armansito@chromium.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: luiz.dentz@gmail.com, Arman Uguray <armansito@chromium.org>
+Subject: [PATCH BlueZ 13/13] shared/gatt: Don't incorrectly terminate discovery
+Date: Tue, 10 Feb 2015 20:54:26 -0800
+Message-Id: <1423630466-26327-14-git-send-email-armansito@chromium.org>
+In-Reply-To: <1423630466-26327-1-git-send-email-armansito@chromium.org>
+References: <1423630466-26327-1-git-send-email-armansito@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Tony,
+bt_gatt_client terminates discovery if no primary services are found
+within the given range. This behavior is incorrect, as the given
+handle range may contain secondary services and those should be
+discovered regardless.
+---
+ src/shared/gatt-client.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-On Tue, Feb 10, 2015 at 2:51 AM, Zheng Tao-B46827 <b46827@freescale.com> wrote:
-> Hi, Peers
->
-> Thanks for your hard work that let us can experience BlueZ for Android.  But
-> I am faced with a audio/a2dp problems that stick me many weeks.
->
-> I’m try to port Bluez to kitkat 4.4.3, and many common profiles, such as
-> HIDP/FTP/GATT can function successfully. But the A2DP profile failed.
->
-> So, I try to debug it using haltest tool as follows(with USB Bluetooth
-> Dongle):
->
-> 1.bluetooth init
->
-> 2.bluetooth enable
->
-> 3.bluetooth get_profile_interface a2dp
->
-> 4.bluetooth start_discovery
->
-> 5.bluetooth create_bond xxxxxxxx
->
+diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
+index 0c8fa13..c3130e5 100644
+--- a/src/shared/gatt-client.c
++++ b/src/shared/gatt-client.c
+@@ -906,7 +906,7 @@ static void discover_primary_cb(bool success, uint8_t att_ecode,
+ 		util_debug(client->debug_callback, client->debug_data,
+ 					"Primary service discovery failed."
+ 					" ATT ECODE: 0x%02x", att_ecode);
+-		goto done;
++		goto secondary;
+ 	}
+ 
+ 	if (!result || !bt_gatt_iter_init(&iter, result)) {
+@@ -939,6 +939,7 @@ static void discover_primary_cb(bool success, uint8_t att_ecode,
+ 		queue_push_tail(op->pending_svcs, attr);
+ 	}
+ 
++secondary:
+ 	/* Discover secondary services */
+ 	if (bt_gatt_discover_secondary_services(client->att, NULL,
+ 							op->start, op->end,
+-- 
+2.2.0.rc0.207.ga3a616c
 
-Here you should setup A2DP using "av connect <bdaddr>." (don't forget
-to do av init before.)  Once you are connected you can open stream.
-
-
-> 6.audio init
->
-> 7.audio open_output_stream
->
-> Then it will prompts:
->
-> D/BlueZ   ( 1106):
-> external/bluetooth/bluez/android/hal-audio.c:audio_open_output_stream()
->
-> D/BlueZ   ( 1106):
-> external/bluetooth/bluez/android/hal-audio.c:ipc_open_stream_cmd()
->
-> E/BlueZ   ( 1106): audio: Invalid cmd socket passed to audio_ipc_cmd
->
-> E/BlueZ   ( 1106): audio: cannot open output stream
->
-> when I debug it , I found that
->
-> BlueZ   ( 1106): external/bluetooth/bluez/android/hal-audio.c:ipc_handler()
-> Waiting for connection ...
->
-> And it seems that there is no audio socket to connect it.
->
-> I’m not familiar with Bluez stack details, can you give some advice? What
-> should I do to enable audio/a2dp functionality and execute audio play
-> command? Thanks.
-
-
-\Lukasz
-
->
-> ----------------------------------------------
->
-> *Best Regards!*
->
-> Tony Zheng
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth"
-> in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
