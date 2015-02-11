@@ -2,356 +2,166 @@ Return-Path: <cyrus@holtmann.org>
 From: Arman Uguray <armansito@chromium.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: luiz.dentz@gmail.com, Arman Uguray <armansito@chromium.org>
-Subject: [PATCH BlueZ 03/13] core: Introduce btd_gatt_server.
-Date: Tue, 10 Feb 2015 20:54:16 -0800
-Message-Id: <1423630466-26327-4-git-send-email-armansito@chromium.org>
+Subject: [PATCH BlueZ 05/13] core: gatt: Add GATT/GAP services to local db
+Date: Tue, 10 Feb 2015 20:54:18 -0800
+Message-Id: <1423630466-26327-6-git-send-email-armansito@chromium.org>
 In-Reply-To: <1423630466-26327-1-git-send-email-armansito@chromium.org>
 References: <1423630466-26327-1-git-send-email-armansito@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch introduces src/gatt-server.* that handles incoming ATT
-connections, manages per-adapter shared/gatt-db instances, and routes
-connections to the corresponding device object. This is the layer that
-will handle all the CCC management and Service Changed handling.
+This patch adds the GATT & GAP services to the local GATT database.
 ---
- Makefile.am       |   1 +
- src/adapter.c     |   8 ++-
- src/gatt-server.c | 203 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
- src/gatt-server.h |  26 +++++++
- src/main.c        |   3 +
- 5 files changed, 239 insertions(+), 2 deletions(-)
- create mode 100644 src/gatt-server.c
- create mode 100644 src/gatt-server.h
+ src/gatt-server.c | 115 +++++++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 114 insertions(+), 1 deletion(-)
 
-diff --git a/Makefile.am b/Makefile.am
-index 60811f1..3c64426 100644
---- a/Makefile.am
-+++ b/Makefile.am
-@@ -167,6 +167,7 @@ src_bluetoothd_SOURCES = $(builtin_sources) \
- 			src/sdpd-server.c src/sdpd-request.c \
- 			src/sdpd-service.c src/sdpd-database.c \
- 			src/attrib-server.h src/attrib-server.c \
-+			src/gatt-server.h src/gatt-server.c \
- 			src/sdp-xml.h src/sdp-xml.c \
- 			src/sdp-client.h src/sdp-client.c \
- 			src/textfile.h src/textfile.c \
-diff --git a/src/adapter.c b/src/adapter.c
-index 1839286..db359ad 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -68,6 +68,7 @@
- #include "attrib/att.h"
- #include "attrib/gatt.h"
- #include "attrib-server.h"
-+#include "gatt-server.h"
- #include "eir.h"
+diff --git a/src/gatt-server.c b/src/gatt-server.c
+index 977a057..14e335e 100644
+--- a/src/gatt-server.c
++++ b/src/gatt-server.c
+@@ -29,6 +29,7 @@
+ #include "src/shared/util.h"
+ #include "src/shared/queue.h"
+ #include "src/shared/gatt-db.h"
++#include "src/shared/att-types.h"
+ #include "log.h"
+ #include "adapter.h"
+ #include "device.h"
+@@ -38,6 +39,9 @@
+ #define ATT_CID 4
+ #endif
  
- #define ADAPTER_INTERFACE	"org.bluez.Adapter1"
-@@ -302,6 +303,7 @@ static void dev_class_changed_callback(uint16_t index, uint16_t length,
- 	appearance[1] = rp->val[1] & 0x1f;	/* removes service class */
- 	appearance[2] = rp->val[2];
++#define UUID_GAP	0x1800
++#define UUID_GATT	0x1801
++
+ static struct queue *servers = NULL;
  
-+	/* TODO: Do this through btd_gatt_server instead */
- 	attrib_gap_set(adapter, GATT_CHARAC_APPEARANCE, appearance, 2);
+ struct btd_gatt_server {
+@@ -125,6 +129,115 @@ static bool match_adapter(const void *a, const void *b)
+ 	return server->adapter == adapter;
  }
  
-@@ -4014,6 +4016,7 @@ static void convert_sdp_entry(char *key, char *value, void *user_data)
- 	if (record_has_uuid(rec, att_uuid))
- 		goto failed;
- 
-+	/* TODO: Do this through btd_gatt_server */
- 	if (!gatt_parse_record(rec, &uuid, &psm, &start, &end))
- 		goto failed;
- 
-@@ -4548,7 +4551,7 @@ static void adapter_remove(struct btd_adapter *adapter)
- 	adapter->devices = NULL;
- 
- 	unload_drivers(adapter);
--	btd_adapter_gatt_server_stop(adapter);
-+	btd_gatt_server_unregister_adapter(adapter);
- 
- 	g_slist_free(adapter->pin_callbacks);
- 	adapter->pin_callbacks = NULL;
-@@ -6590,7 +6593,8 @@ static int adapter_register(struct btd_adapter *adapter)
- 		agent_unref(agent);
- 	}
- 
--	btd_adapter_gatt_server_start(adapter);
-+	if (!btd_gatt_server_register_adapter(adapter))
-+		error("Failed to register adapter with GATT server");
- 
- 	load_config(adapter);
- 	fix_storage(adapter);
-diff --git a/src/gatt-server.c b/src/gatt-server.c
-new file mode 100644
-index 0000000..977a057
---- /dev/null
-+++ b/src/gatt-server.c
-@@ -0,0 +1,203 @@
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2015  Google Inc.
-+ *
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ */
-+
-+#ifdef HAVE_CONFIG_H
-+#include <config.h>
-+#endif
-+
-+#include <stdint.h>
-+#include <stdlib.h>
-+
-+#include "lib/uuid.h"
-+#include "btio/btio.h"
-+#include "src/shared/util.h"
-+#include "src/shared/queue.h"
-+#include "src/shared/gatt-db.h"
-+#include "log.h"
-+#include "adapter.h"
-+#include "device.h"
-+#include "gatt-server.h"
-+
-+#ifndef ATT_CID
-+#define ATT_CID 4
-+#endif
-+
-+static struct queue *servers = NULL;
-+
-+struct btd_gatt_server {
-+	struct btd_adapter *adapter;
-+	struct gatt_db *db;
-+	GIOChannel *le_io;
-+};
-+
-+static void gatt_server_free(void *data)
++static void gap_device_name_read_cb(struct gatt_db_attribute *attrib,
++					unsigned int id, uint16_t offset,
++					uint8_t opcode, bdaddr_t *bdaddr,
++					uint8_t bdaddr_type, void *user_data)
 +{
-+	struct btd_gatt_server *server = data;
++	struct btd_gatt_server *server = user_data;
++	uint8_t error = 0;
++	size_t len = 0;
++	const uint8_t *value = NULL;
++	const char *device_name;
 +
-+	if (server->le_io) {
-+		g_io_channel_shutdown(server->le_io, FALSE, NULL);
-+		g_io_channel_unref(server->le_io);
++	DBG("GAP Device Name read request\n");
++
++	device_name = btd_adapter_get_name(server->adapter);
++	len = strlen(device_name);
++
++	if (offset > len) {
++		error = BT_ATT_ERROR_INVALID_OFFSET;
++		goto done;
 +	}
 +
-+	gatt_db_unref(server->db);
-+	btd_adapter_unref(server->adapter);
-+	free(server);
++	len -= offset;
++	value = len ? (const uint8_t *) &device_name[offset] : NULL;
++
++done:
++	gatt_db_attribute_read_result(attrib, id, error, value, len);
 +}
 +
-+bool btd_gatt_server_init(void)
++static void gap_appearance_read_cb(struct gatt_db_attribute *attrib,
++					unsigned int id, uint16_t offset,
++					uint8_t opcode, bdaddr_t *bdaddr,
++					uint8_t bdaddr_type, void *user_data)
 +{
++	struct btd_gatt_server *server = user_data;
++	uint8_t error = 0;
++	size_t len = 2;
++	const uint8_t *value = NULL;
++	uint8_t appearance[2];
++	uint32_t dev_class;
 +
-+	info("Initializing GATT server");
++	DBG("GAP Appearance read request\n");
 +
-+	servers = queue_new();
-+	if (!servers) {
-+		error("Failed to set up local GATT server");
-+		return false;
++	dev_class = btd_adapter_get_class(server->adapter);
++
++	if (offset > 2) {
++		error = BT_ATT_ERROR_INVALID_OFFSET;
++		goto done;
 +	}
 +
-+	return true;
++	appearance[0] = dev_class & 0x00ff;
++	appearance[1] = (dev_class >> 8) & 0x001f;
++
++	len -= offset;
++	value = len ? &appearance[offset] : NULL;
++
++done:
++	gatt_db_attribute_read_result(attrib, id, error, value, len);
 +}
 +
-+void btd_gatt_server_cleanup(void)
++static void populate_gap_service(struct btd_gatt_server *server)
 +{
-+	info("Cleaning up GATT server");
++	bt_uuid_t uuid;
++	struct gatt_db_attribute *service;
 +
-+	queue_destroy(servers, gatt_server_free);
-+	servers = NULL;
++	/* Add the GAP service */
++	bt_uuid16_create(&uuid, UUID_GAP);
++	service = gatt_db_add_service(server->db, &uuid, true, 5);
++
++	/*
++	 * Device Name characteristic.
++	 */
++	bt_uuid16_create(&uuid, GATT_CHARAC_DEVICE_NAME);
++	gatt_db_service_add_characteristic(service, &uuid, BT_ATT_PERM_READ,
++							BT_GATT_CHRC_PROP_READ,
++							gap_device_name_read_cb,
++							NULL, server);
++
++	/*
++	 * Device Appearance characteristic.
++	 */
++	bt_uuid16_create(&uuid, GATT_CHARAC_APPEARANCE);
++	gatt_db_service_add_characteristic(service, &uuid, BT_ATT_PERM_READ,
++							BT_GATT_CHRC_PROP_READ,
++							gap_appearance_read_cb,
++							NULL, server);
++
++	gatt_db_service_set_active(service, true);
 +}
 +
-+static void connect_cb(GIOChannel *io, GError *gerr, gpointer user_data)
++static void populate_gatt_service(struct btd_gatt_server *server)
 +{
-+	struct btd_adapter *adapter;
-+	struct btd_device *device;
-+	uint8_t dst_type;
-+	bdaddr_t src, dst;
++	bt_uuid_t uuid;
++	struct gatt_db_attribute *service;
 +
-+	DBG("New incoming LE ATT connection");
++	/* Add the GATT service */
++	bt_uuid16_create(&uuid, UUID_GATT);
++	service = gatt_db_add_service(server->db, &uuid, true, 1);
 +
-+	if (gerr) {
-+		error("%s", gerr->message);
-+		return;
-+	}
++	/* TODO: Add "Service Changed" characteristic and handle CCC */
 +
-+	bt_io_get(io, &gerr, BT_IO_OPT_SOURCE_BDADDR, &src,
-+						BT_IO_OPT_DEST_BDADDR, &dst,
-+						BT_IO_OPT_DEST_TYPE, &dst_type,
-+						BT_IO_OPT_INVALID);
-+	if (gerr) {
-+		error("bt_io_get: %s", gerr->message);
-+		g_error_free(gerr);
-+		return;
-+	}
-+
-+	adapter = adapter_find(&src);
-+	if (!adapter)
-+		return;
-+
-+	device = btd_adapter_get_device(adapter, &dst, dst_type);
-+	if (!device)
-+		return;
-+
-+	device_attach_att(device, io);
++	gatt_db_service_set_active(service, true);
 +}
 +
-+static bool match_adapter(const void *a, const void *b)
++static void register_core_services(struct btd_gatt_server *server)
 +{
-+	const struct btd_gatt_server *server = a;
-+	const struct btd_adapter *adapter = b;
-+
-+	return server->adapter == adapter;
++	populate_gap_service(server);
++	populate_gatt_service(server);
 +}
 +
-+bool btd_gatt_server_register_adapter(struct btd_adapter *adapter)
-+{
-+	struct btd_gatt_server *server;
-+	GError *gerr = NULL;
-+	const bdaddr_t *addr;
-+
-+	if (!adapter)
-+		return false;
-+
-+	if (!servers) {
-+		error("GATT server not initialized");
-+		return false;
-+	}
-+
-+	if (queue_find(servers, match_adapter, adapter)) {
-+		error("Adapter already registered with GATT server");
-+		return false;
-+	}
-+
-+	server = new0(struct btd_gatt_server, 1);
-+	if (!server)
-+		return false;
-+
-+	server->adapter = btd_adapter_ref(adapter);
-+	server->db = gatt_db_new();
-+	if (!server->db)
-+		goto fail;
-+
-+	addr = btd_adapter_get_address(adapter);
-+	server->le_io = bt_io_listen(connect_cb, NULL, NULL, NULL, &gerr,
-+					BT_IO_OPT_SOURCE_BDADDR, addr,
-+					BT_IO_OPT_SOURCE_TYPE, BDADDR_LE_PUBLIC,
-+					BT_IO_OPT_CID, ATT_CID,
-+					BT_IO_OPT_SEC_LEVEL, BT_IO_SEC_LOW,
-+					BT_IO_OPT_INVALID);
-+	if (!server->le_io) {
-+		error("Failed to start listening: %s", gerr->message);
-+		g_error_free(gerr);
-+		goto fail;
-+	}
-+
-+	queue_push_tail(servers, server);
-+
-+	/* TODO: Set up GAP/GATT services */
-+
-+	return true;
-+
-+fail:
-+	gatt_server_free(server);
-+
-+	return false;
-+}
-+
-+void btd_gatt_server_unregister_adapter(struct btd_adapter *adapter)
-+{
-+	if (!adapter || !servers)
-+		return;
-+
-+	queue_remove_all(servers, match_adapter, adapter, gatt_server_free);
-+}
-+
-+struct gatt_db *btd_gatt_server_get_db(struct btd_adapter *adapter)
-+{
-+	struct btd_gatt_server *server;
-+
-+	if (!servers) {
-+		error("GATT server not initialized");
-+		return false;
-+	}
-+
-+	server = queue_find(servers, match_adapter, adapter);
-+	if (!server)
-+		return false;
-+
-+	return server->db;
-+}
-diff --git a/src/gatt-server.h b/src/gatt-server.h
-new file mode 100644
-index 0000000..f97ad05
---- /dev/null
-+++ b/src/gatt-server.h
-@@ -0,0 +1,26 @@
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2015  Google Inc.
-+ *
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ */
-+
-+bool btd_gatt_server_init(void);
-+void btd_gatt_server_cleanup(void);
-+
-+bool btd_gatt_server_register_adapter(struct btd_adapter *adapter);
-+void btd_gatt_server_unregister_adapter(struct btd_adapter *adapter);
-+
-+struct gatt_db *btd_gatt_server_get_db(struct btd_adapter *adapter);
-diff --git a/src/main.c b/src/main.c
-index 061060d..510388a 100644
---- a/src/main.c
-+++ b/src/main.c
-@@ -56,6 +56,7 @@
- #include "agent.h"
- #include "profile.h"
- #include "gatt.h"
-+#include "gatt-server.h"
- #include "systemd.h"
+ bool btd_gatt_server_register_adapter(struct btd_adapter *adapter)
+ {
+ 	struct btd_gatt_server *server;
+@@ -168,7 +281,7 @@ bool btd_gatt_server_register_adapter(struct btd_adapter *adapter)
  
- #define BLUEZ_NAME "org.bluez"
-@@ -579,6 +580,7 @@ int main(int argc, char *argv[])
- 	g_dbus_set_flags(gdbus_flags);
+ 	queue_push_tail(servers, server);
  
- 	gatt_init();
-+	btd_gatt_server_init();
+-	/* TODO: Set up GAP/GATT services */
++	register_core_services(server);
  
- 	if (adapter_init() < 0) {
- 		error("Adapter handling initialization failed");
-@@ -642,6 +644,7 @@ int main(int argc, char *argv[])
+ 	return true;
  
- 	adapter_cleanup();
- 
-+	btd_gatt_server_cleanup();
- 	gatt_cleanup();
- 
- 	rfkill_exit();
 -- 
 2.2.0.rc0.207.ga3a616c
 
