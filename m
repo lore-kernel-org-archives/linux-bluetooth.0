@@ -1,68 +1,69 @@
 Return-Path: <cyrus@holtmann.org>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: Thomas Petazzoni <thomas.petazzoni@free-electrons.com>
+Cc: linux-bluetooth@vger.kernel.org, Marcel Holtmann <marcel@holtmann.org>
+Subject: Re: [PATCHv2] Link mcaptest with -lrt when needed
+Date: Wed, 11 Feb 2015 16:33:49 +0100
+Message-ID: <6010593.MLgLHOm4DO@uw000953>
+In-Reply-To: <1419891774-21158-1-git-send-email-thomas.petazzoni@free-electrons.com>
+References: <20141229232219.622fd4d8@free-electrons.com> <1419891774-21158-1-git-send-email-thomas.petazzoni@free-electrons.com>
 MIME-Version: 1.0
-In-Reply-To: <CABBYNZL-+ZTH9XhWA3vShh=3npJy2_Gx5U+UycB3qu_T-ZUrWg@mail.gmail.com>
-References: <1423599385-36295-1-git-send-email-jamuraa@chromium.org>
-	<1423599385-36295-10-git-send-email-jamuraa@chromium.org>
-	<CABBYNZJQf3CXJff=UfdTDh6eNU50VWu14BQ=3FTbsXR3jy7RbA@mail.gmail.com>
-	<CABBYNZL-+ZTH9XhWA3vShh=3npJy2_Gx5U+UycB3qu_T-ZUrWg@mail.gmail.com>
-Date: Wed, 11 Feb 2015 14:20:52 -0800
-Message-ID: <CAJLTA8gawvTAU5xG6=_A=2NEDLTPL3_GRALUdUs-aW0DzXgbbQ@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 0/8] Implement Notification / Indication TS Tests
-From: Michael Janssen <jamuraa@chromium.org>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset="utf-8"
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+Hi Thomas,
 
-On Wed, Feb 11, 2015 at 5:47 AM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> Hi,
->
-> On Wed, Feb 11, 2015 at 3:30 PM, Luiz Augusto von Dentz
-> <luiz.dentz@gmail.com> wrote:
->> Hi Michael,
->>
->> On Tue, Feb 10, 2015 at 10:16 PM, Michael Janssen <jamuraa@chromium.org> wrote:
->>> Implements the four defined tests around the Notification and Indication
->>> functionality in the unit tests.  Also includes some fixes to discovery when
->>> no handles could be found (services with no handles).
->>>
->>> Also adds some functionality to the unit testing, to support when there is no
->>> action required by the client and/or the server in a test, and checks for
->>> post data transmission.
->>>
->>> --
->>
->> Applied, thanks.
->
-> I gather the following number from the latest TS:
->
-> Group                       Client                          Server
-> Configuration             100% (1 / 1)                100% (1 / 1)
-> Discovery                  75% (6 / 8)                  75% (6 / 8)
-> Read                         57.5% (23 / 40)           47.6% (20 / 42)
-> Write                        0% (0 / 40)                  0% (0 / 40)
-> Notification/Indication 50% (1 / 2)                  50% (1 / 2)
-> Services                    0% (0 / 1)                   0% (0 / 1)
-> Timeouts                   0% (0 / 2)                   0% (0 / 1)
-> Attributes                  0% (0 / 10)                  0% (0 / 10)
-> Total                         29.8% (31 / 104)         26.7% 28 / 105
->
-> *I did not compute any extra tests we are doing, like small vs large
-> databases, still these numbers are quite low.
->
-> --
-> Luiz Augusto von Dentz
+On Monday 29 of December 2014 23:22:54 Thomas Petazzoni wrote:
+> The mcaptest tool uses the profiles/health/mcap.c source file, which
+> calls clock_getres(). This function is defined in librt in some C
+> libraries, so mcaptest should be linked against librt when needed,
+> otherwise one gets link failures such as:
+> 
+> ld: profiles/health/mcap.o: undefined reference to symbol 'clock_getres@@GLIBC_2.2.5'
+> ld: note: 'clock_getres@@GLIBC_2.2.5' is defined in DSO [...]/sysroot/lib64/librt.so.1 so try adding it to the linker command line
+> [...]/sysroot/lib64/librt.so.1: could not read symbols: Invalid operation
+> collect2: error: ld returned 1 exit status
+> Makefile:4184: recipe for target 'tools/mcaptest' failed
+> 
+> Signed-off-by: Thomas Petazzoni <thomas.petazzoni@free-electrons.com>
+> ---
+>  Makefile.tools | 2 +-
+>  configure.ac   | 5 +++++
+>  2 files changed, 6 insertions(+), 1 deletion(-)
+> 
+> diff --git a/Makefile.tools b/Makefile.tools
+> index bc827fe..fef3db5 100644
+> --- a/Makefile.tools
+> +++ b/Makefile.tools
+> @@ -195,7 +195,7 @@ tools_mcaptest_SOURCES = tools/mcaptest.c \
+>  				btio/btio.h btio/btio.c \
+>  				src/log.c src/log.h \
+>  				profiles/health/mcap.h profiles/health/mcap.c
+> -tools_mcaptest_LDADD = lib/libbluetooth-internal.la @GLIB_LIBS@
+> +tools_mcaptest_LDADD = lib/libbluetooth-internal.la @GLIB_LIBS@ @RT_LIBS@
+>  
+>  dist_man_MANS += tools/hciattach.1 tools/hciconfig.1 \
+>  			tools/hcitool.1 tools/hcidump.1 \
+> diff --git a/configure.ac b/configure.ac
+> index 4739c10..b0afba6 100644
+> --- a/configure.ac
+> +++ b/configure.ac
+> @@ -54,6 +54,11 @@ AC_CHECK_LIB(pthread, pthread_create, dummy=yes,
+>  AC_CHECK_LIB(dl, dlopen, dummy=yes,
+>  			AC_MSG_ERROR(dynamic linking loader is required))
+>  
+> +AC_SEARCH_LIBS([clock_getres], [rt],
+> +			[test "$ac_cv_search_clock_getres" = "none required" ||
+> +			RT_LIBS=$ac_cv_search_clock_getres])
+> +AC_SUBST([RT_LIBS])
+> +
+>  PKG_CHECK_MODULES(GLIB, glib-2.0 >= 2.28, dummy=yes,
+>  				AC_MSG_ERROR(GLib >= 2.28 is required))
+>  AC_SUBST(GLIB_CFLAGS)
 
-How do you obtain these numbers?  I would like to fix the tests that
-are not showing up.  All four of the Notification / Indication ones
-for example were just committed, so two are not tracking in this
-report.  I believe the read and Discovery ones are low as well.
+This seems to got lost in traffic.
+Since it doesn't apply anymore you would have to rebase it.
 
-Also, theoretically all the server tests should be run against as many
-of the 4 databases that are specified in the TS.  I was planning on
-only the small and single large to start, and come back to the other
-two large databases later if possible.
+-- 
+Best regards, 
+Szymon Janc
