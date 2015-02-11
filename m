@@ -1,141 +1,134 @@
 Return-Path: <cyrus@holtmann.org>
-From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] android/pts: Update SM pixits, pics and test results for PTS 6.0
-Date: Wed, 11 Feb 2015 13:51:38 +0100
-Message-Id: <1423659098-3053-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+MIME-Version: 1.0
+In-Reply-To: <54DB22D8.1020700@freescale.com>
+References: <54D96429.8000304@freescale.com>
+	<CAN_7+Yai0m39=crfcqJdJZfoTOOuh4zxPi_46wn6EXbewHGf8g@mail.gmail.com>
+	<54DB22D8.1020700@freescale.com>
+Date: Wed, 11 Feb 2015 12:41:10 +0100
+Message-ID: <CAN_7+YZu0v0zekp0LrQM3dbtkYL=cY_ALT5+exHDeyUmO_0uCQ@mail.gmail.com>
+Subject: Re: BlueZ for Android 4.4.3
+From: Lukasz Rymanowski <lukasz.rymanowski@gmail.com>
+To: Zheng Tao-B46827 <b46827@freescale.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch updates test pixits, pics, test results and their
-instructions for SM profile against android 5.0
----
- android/pics-sm.txt  |  2 +-
- android/pixit-sm.txt |  2 +-
- android/pts-sm.txt   | 59 +++++++++++++++++++++++++++++++++-------------------
- 3 files changed, 40 insertions(+), 23 deletions(-)
+Hi,
 
-diff --git a/android/pics-sm.txt b/android/pics-sm.txt
-index c1bfe0e..c5caec6 100644
---- a/android/pics-sm.txt
-+++ b/android/pics-sm.txt
-@@ -1,6 +1,6 @@
- SM PICS for the PTS tool.
- 
--PTS version: 5.3
-+PTS version: 6.0
- 
- * - different than PTS defaults
- 
-diff --git a/android/pixit-sm.txt b/android/pixit-sm.txt
-index 2d1442b..98e2ab5 100644
---- a/android/pixit-sm.txt
-+++ b/android/pixit-sm.txt
-@@ -1,6 +1,6 @@
- SM PIXIT for the PTS tool.
- 
--PTS version: 5.3
-+PTS version: 6.0
- 
- * - different than PTS defaults
- & - should be set to IUT Bluetooth address
-diff --git a/android/pts-sm.txt b/android/pts-sm.txt
-index 1ea0570..91737cc 100644
---- a/android/pts-sm.txt
-+++ b/android/pts-sm.txt
-@@ -1,9 +1,9 @@
- PTS test results for SM
- 
--PTS version: 5.3
--Tested: 28-November-2014
-+PTS version: 6.0
-+Tested: 11-February-2015
- Android version: 5.0
--kernel version: 3.18
-+kernel version: 3.20
- 
- Results:
- PASS	test passed
-@@ -20,10 +20,10 @@ TC_PROT_BV_02_C		PASS	btmgmt advertising on
- 				btmgmt pair -c 0x03 -t 0x01 <addr>
- TC_JW_BV_01_C		PASS	btmgmt pairable off
- 				btmgmt pair -c 0x03 -t 0x01 <addr>
--TC_JW_BV_02_C		PASS
-+TC_JW_BV_02_C		PASS	btmgmt advertising on
- TC_JW_BV_05_C		PASS	btmgmt pair -c 0x03 -t 0x01 <addr>
--TC_JW_BI_01_C		PASS
--TC_JW_BI_02_C		PASS
-+TC_JW_BI_01_C		PASS	btmgmt pair -c 0x03 -t 0x01 <addr>
-+TC_JW_BI_02_C		PASS	btmgmt pairable on
- TC_JW_BI_03_C		PASS	bluetoothd is NOT running
- 				btmgmt power on
- 				btmgmt le on
-@@ -56,25 +56,39 @@ TC_OOB_BV_01_C		N/A
- TC_OOB_BV_02_C		N/A
- TC_OOB_BV_03_C		N/A
- TC_OOB_BV_04_C		N/A
--TC_OOB_BV_05_C		PASS
--TC_OOB_BV_06_C		PASS
--TC_OOB_BV_07_C		PASS
--TC_OOB_BV_08_C		PASS
-+TC_OOB_BV_05_C		PASS	btmgmt pair -c 0x04 -t 0x01 <addr>
-+				Note: Enter valid passkey in PTS
-+TC_OOB_BV_06_C		PASS	btmgmt advertising on
-+				btmgmt monitor
-+				Note: Enter valid passkey in PTS
-+TC_OOB_BV_07_C		PASS	btmgmt pair -c 0x04 -t 0x01 <addr>
-+TC_OOB_BV_08_C		PASS	btmgmt advertising on
-+				btmgmt monitor
-+				Note: Accept pairing in btmgmt monitor
- TC_OOB_BV_09_C		N/A
- TC_OOB_BV_10_C		N/A
- TC_OOB_BI_01_C		N/A
- TC_OOB_BI_02_C		N/A
--TC_EKS_BV_01_C		PASS
--TC_EKS_BV_02_C		PASS
-+TC_EKS_BV_01_C		PASS	btmgmt pair -c 0x04 -t 0x01 <addr>
-+				Note: Enter valid passkey in PTS
-+TC_EKS_BV_02_C		PASS	btmgmt advertising on
-+				btmgmt monitor
-+				Note: Accept pairing in btmgmt monitor
- TC_EKS_BI_01_C		PASS	btmgmt io-cap 0x03
--TC_EKS_BI_02_C		PASS
-+				btmgmt pair -c 0x03 -t 0x01 <addr>
-+TC_EKS_BI_02_C		PASS	btmgmt advertising on
- TC_SIGN_BV_01_C		INC	PTS issue #12305
--TC_SIGN_BV_03_C		PASS	haltest
--				gattc listen
--
--TC_SIGN_BI_01_C		PASS	haltest
--				gattc listen
-+TC_SIGN_BV_03_C		PASS	haltest:
-+				gattc register_client 1234
-+				gattc listen 1 1
-+				Note: IUT must be connectable and discoverable
-+TC_SIGN_BI_01_C		PASS	haltest:
-+				gattc register client 1234
-+				gattc listen 1 1
-+				Note: IUT must be connectable and discoverable
- TC_KDU_BV_01_C		PASS	btmgmt pairable on
-+				btmgmt advertising on
-+				btmgmt connectable on
- TC_KDU_BV_02_C		PASS	PTS issue #12302
- 				Note: Can pass it with following instructions:
- 				btmgmt privacy on
-@@ -93,7 +107,10 @@ TC_KDU_BV_05_C		PASS	PTS issue #12302
- 				Set PIXIT TSPX_peer_type to 01
- TC_KDU_BV_06_C		PASS	btmgmt pair -c 0x03 -t 0x01 <addr>
- TC_KDU_BV_07_C		PASS	btmgmt pairable on
--TC_SIP_BV_01_C		PASS	btmgmt pair -c 0x03 -t 0x01 <addr>
--TC_SIP_BV_02_C		PASS	l2test -n -J4 -V le_public <addr>
--TC_SIE_BV_01_C		PASS	btmgmt pair -c 0x03 -t 0x01 <addr>
-+TC_SIP_BV_01_C		PASS	btmgmt advertising on
-+				btmgmt pair -c 0x03 -t 0x01 <addr>
-+TC_SIP_BV_02_C		PASS	btmgmt advertising off
-+				l2test -n -J4 -V le_public <addr>
-+TC_SIE_BV_01_C		PASS	btmgmt advertising on
-+				btmgmt pair -c 0x03 -t 0x01 <addr>
- -------------------------------------------------------------------------------
--- 
-1.9.3
+On Wed, Feb 11, 2015 at 10:37 AM, Zheng Tao-B46827 <b46827@freescale.com> wrote:
+> Hi, Lukasz
+> Thanks for your reply. Following you steps, the previous problem has been
+> resolved, but it seems that the connection is not stable. When I execute av
+> connect, I can hear "Connected" from my Bluetooth headset, but it will be
+> disconnected immediately which i can hear "disconnected".  And it will
+> prompt "I/bluetoothd( 1061): bluetoothd[1062]: Unable to find matching
+> endpoint". Is this a bug? can you give some advise?
+>
+>> av connect 24:fd:52:b6:a0:99
+> connection_state: connection_state=BTAV_CONNECTION_STATE_CONNECTING
+> remote_bd_addr=24:fd:52:b6:a0:99
+> if_av->connect: BT_STATUS_SUCCESS
+>> D/BlueZ   ( 1060):
+>> external/bluetooth/bluez/android/hal-a2dp.c:a2dp_connect()
+> acl_state_changed_cb: status=BT_STATUS_SUCCESS
+> remote_bd_addr=24:fd:52:b6:a0:99 state=BT_ACL_STATE_CONNECTED
+>> D/BlueZ   ( 1060):
+>> external/bluetooth/bluez/android/hal-bluetooth.c:handle_acl_state_changed()
+>> state 0
+> connection_state: connection_state=BTAV_CONNECTION_STATE_DISCONNECTED
+> remote_bd_addr=24:fd:52:b6:a0:99
+>> I/bluetoothd( 1061): bluetoothd[1062]: Unable to find matching endpoint
 
+Here is the clue.
+
+Can you provide btmon logs?
+
+> acl_state_changed_cb: status=BT_STATUS_SUCCESS
+> remote_bd_addr=24:fd:52:b6:a0:99 state=BT_ACL_STATE_DISCONNECTED
+>> D/BlueZ   ( 1060):
+>> external/bluetooth/bluez/android/hal-bluetooth.c:handle_acl_state_changed()
+>> state 1
+>
+>
+\Łukasz
+
+>
+> On 2/11/2015 4:16 PM, Lukasz Rymanowski wrote:
+>>
+>> Hi Tony,
+>>
+>> On Tue, Feb 10, 2015 at 2:51 AM, Zheng Tao-B46827 <b46827@freescale.com>
+>> wrote:
+>>>
+>>> Hi, Peers
+>>>
+>>> Thanks for your hard work that let us can experience BlueZ for Android.
+>>> But
+>>> I am faced with a audio/a2dp problems that stick me many weeks.
+>>>
+>>> I’m try to port Bluez to kitkat 4.4.3, and many common profiles, such as
+>>> HIDP/FTP/GATT can function successfully. But the A2DP profile failed.
+>>>
+>>> So, I try to debug it using haltest tool as follows(with USB Bluetooth
+>>> Dongle):
+>>>
+>>> 1.bluetooth init
+>>>
+>>> 2.bluetooth enable
+>>>
+>>> 3.bluetooth get_profile_interface a2dp
+>>>
+>>> 4.bluetooth start_discovery
+>>>
+>>> 5.bluetooth create_bond xxxxxxxx
+>>>
+>> Here you should setup A2DP using "av connect <bdaddr>." (don't forget
+>> to do av init before.)  Once you are connected you can open stream.
+>>
+>>
+>>> 6.audio init
+>>>
+>>> 7.audio open_output_stream
+>>>
+>>> Then it will prompts:
+>>>
+>>> D/BlueZ   ( 1106):
+>>> external/bluetooth/bluez/android/hal-audio.c:audio_open_output_stream()
+>>>
+>>> D/BlueZ   ( 1106):
+>>> external/bluetooth/bluez/android/hal-audio.c:ipc_open_stream_cmd()
+>>>
+>>> E/BlueZ   ( 1106): audio: Invalid cmd socket passed to audio_ipc_cmd
+>>>
+>>> E/BlueZ   ( 1106): audio: cannot open output stream
+>>>
+>>> when I debug it , I found that
+>>>
+>>> BlueZ   ( 1106):
+>>> external/bluetooth/bluez/android/hal-audio.c:ipc_handler()
+>>> Waiting for connection ...
+>>>
+>>> And it seems that there is no audio socket to connect it.
+>>>
+>>> I’m not familiar with Bluez stack details, can you give some advice? What
+>>> should I do to enable audio/a2dp functionality and execute audio play
+>>> command? Thanks.
+>>
+>>
+>> \Lukasz
+>>
+>>> ----------------------------------------------
+>>>
+>>> *Best Regards!*
+>>>
+>>> Tony Zheng
+>>>
+>>> --
+>>> To unsubscribe from this list: send the line "unsubscribe
+>>> linux-bluetooth"
+>>> in
+>>> the body of a message to majordomo@vger.kernel.org
+>>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>
+>
