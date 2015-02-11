@@ -1,130 +1,68 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1423630466-26327-2-git-send-email-armansito@chromium.org>
-References: <1423630466-26327-1-git-send-email-armansito@chromium.org>
-	<1423630466-26327-2-git-send-email-armansito@chromium.org>
-Date: Wed, 11 Feb 2015 16:21:34 +0200
-Message-ID: <CABBYNZJJrk_29EUXRhkRfFvARGZofT3vTmDBHVLhsQ-b4=Wbxw@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 01/13] shared/att: Add bt_att_get|set_bdaddr functions
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Arman Uguray <armansito@chromium.org>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] android/pts: Update AVCTP pixits, pics and test results for PTS 6.0
+Date: Wed, 11 Feb 2015 15:12:04 +0100
+Message-Id: <1423663924-3981-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Arman,
+This patch updates tet pixits, pics, test results and their instructions
+for AVCTP profile against android 5.0.
 
-On Wed, Feb 11, 2015 at 6:54 AM, Arman Uguray <armansito@chromium.org> wrote:
-> Added functions to get and set bdaddr_t* and bdaddr_type on a bt_att
-> structure.
-> ---
->  src/shared/att.c          | 28 ++++++++++++++++++++++++++++
->  src/shared/att.h          |  3 +++
->  src/shared/gatt-client.c  |  3 ++-
->  src/shared/gatt-helpers.c |  3 ++-
->  4 files changed, 35 insertions(+), 2 deletions(-)
->
-> diff --git a/src/shared/att.c b/src/shared/att.c
-> index a98909e..5b04c1f 100644
-> --- a/src/shared/att.c
-> +++ b/src/shared/att.c
-> @@ -76,6 +76,9 @@ struct bt_att {
->         unsigned int next_send_id;      /* IDs for "send" ops */
->         unsigned int next_reg_id;       /* IDs for registered callbacks */
->
-> +       bdaddr_t bdaddr;                /* BDADDR assigned to this transport */
-> +       uint8_t bdaddr_type;
->
->         bt_att_timeout_func_t timeout_callback;
->         bt_att_destroy_func_t timeout_destroy;
->         void *timeout_data;
-> @@ -889,6 +892,31 @@ bool bt_att_set_close_on_unref(struct bt_att *att, bool do_close)
->         return io_set_close_on_destroy(att->io, do_close);
->  }
->
-> +bool bt_att_get_bdaddr(struct bt_att *att, bdaddr_t *bdaddr, uint8_t *type)
-> +{
-> +       if (!att)
-> +               return false;
-> +
-> +       if (bdaddr)
-> +               *bdaddr = att->bdaddr;
-> +
-> +       if (type)
-> +               *type = att->bdaddr_type;
-> +
-> +       return true;
-> +}
-> +
-> +bool bt_att_set_bdaddr(struct bt_att *att, bdaddr_t *addr, uint8_t type)
-> +{
-> +       if (!att || !addr)
-> +               return false;
-> +
-> +       bacpy(&att->bdaddr, addr);
-> +       att->bdaddr_type = type;
-> +
-> +       return true;
-> +}
-> +
->  bool bt_att_set_debug(struct bt_att *att, bt_att_debug_func_t callback,
->                                 void *user_data, bt_att_destroy_func_t destroy)
->  {
-> diff --git a/src/shared/att.h b/src/shared/att.h
-> index cd00a1e..48241fc 100644
-> --- a/src/shared/att.h
-> +++ b/src/shared/att.h
-> @@ -35,6 +35,9 @@ void bt_att_unref(struct bt_att *att);
->
->  bool bt_att_set_close_on_unref(struct bt_att *att, bool do_close);
->
-> +bool bt_att_get_bdaddr(struct bt_att *att, bdaddr_t *bdaddr, uint8_t *type);
-> +bool bt_att_set_bdaddr(struct bt_att *att, bdaddr_t *addr, uint8_t type);
+PTS uses AVCTP ETS in version: 9.0.0.11
+---
+ android/pics-avctp.txt  | 2 +-
+ android/pixit-avctp.txt | 2 +-
+ android/pts-avctp.txt   | 5 +++--
+ 3 files changed, 5 insertions(+), 4 deletions(-)
 
-These will make caller depend on bluetooth.h which we probably don't
-want, can't we figure internally if what type of fd that is, perhaps
-with getpeername or getsockopt?
-
->  typedef void (*bt_att_response_func_t)(uint8_t opcode, const void *pdu,
->                                         uint16_t length, void *user_data);
->  typedef void (*bt_att_notify_func_t)(uint8_t opcode, const void *pdu,
-> diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
-> index d0fc054..0c8fa13 100644
-> --- a/src/shared/gatt-client.c
-> +++ b/src/shared/gatt-client.c
-> @@ -21,8 +21,9 @@
->   *
->   */
->
-> -#include "src/shared/att.h"
->  #include "lib/uuid.h"
-> +#include "lib/bluetooth.h"
-> +#include "src/shared/att.h"
->  #include "src/shared/gatt-helpers.h"
->  #include "src/shared/util.h"
->  #include "src/shared/queue.h"
-> diff --git a/src/shared/gatt-helpers.c b/src/shared/gatt-helpers.c
-> index a33f960..b469116 100644
-> --- a/src/shared/gatt-helpers.c
-> +++ b/src/shared/gatt-helpers.c
-> @@ -26,9 +26,10 @@
->  #include <config.h>
->  #endif
->
-> +#include "lib/uuid.h"
-> +#include "lib/bluetooth.h"
->  #include "src/shared/queue.h"
->  #include "src/shared/att.h"
-> -#include "lib/uuid.h"
->  #include "src/shared/gatt-helpers.h"
->  #include "src/shared/util.h"
->
-> --
-> 2.2.0.rc0.207.ga3a616c
->
-
-
-
+diff --git a/android/pics-avctp.txt b/android/pics-avctp.txt
+index 0afa33c..4fc599f 100644
+--- a/android/pics-avctp.txt
++++ b/android/pics-avctp.txt
+@@ -1,6 +1,6 @@
+ AVCTP PICS for the PTS tool.
+ 
+-PTS version: 5.3
++PTS version: 6.0
+ 
+ * - different than PTS defaults
+ # - not yet implemented/supported
+diff --git a/android/pixit-avctp.txt b/android/pixit-avctp.txt
+index f380e96..4b2c783 100644
+--- a/android/pixit-avctp.txt
++++ b/android/pixit-avctp.txt
+@@ -1,6 +1,6 @@
+ AVCTP PIXIT for the PTS tool.
+ 
+-PTS version: 5.3
++PTS version: 6.0
+ 
+ * - different than PTS defaults
+ & - should be set to IUT Bluetooth address
+diff --git a/android/pts-avctp.txt b/android/pts-avctp.txt
+index 7a5f4ce..d05aa05 100644
+--- a/android/pts-avctp.txt
++++ b/android/pts-avctp.txt
+@@ -1,7 +1,7 @@
+ PTS test results for AVCTP
+ 
+-PTS version: 5.3
+-Tested: 03-December-2014
++PTS version: 6.0
++Tested: 11-February-2015
+ Android version: 5.0
+ 
+ Results:
+@@ -21,6 +21,7 @@ TC_CT_CCM_BV_04_C	N/A
+ TC_CT_CCM_BI_01_C	N/A
+ TC_CT_NFR_BV_01_C	N/A
+ TC_CT_NFR_BV_04_C	PASS	haltest: rc set_volume 5
++				Note: IUT must be connectable and discoverable
+ TC_CT_FRA_BV_01_C	N/A
+ TC_CT_FRA_BV_04_C	N/A
+ -------------------------------------------------------------------------------
 -- 
-Luiz Augusto von Dentz
+1.9.3
+
