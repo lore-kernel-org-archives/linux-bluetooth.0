@@ -2,66 +2,72 @@ Return-Path: <cyrus@holtmann.org>
 From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
-Subject: [PATCH 10/10] android/gatt: Avoid copying pointers in matching functions
-Date: Wed, 11 Feb 2015 15:34:08 +0100
-Message-Id: <1423665248-5121-10-git-send-email-jakub.tyszkowski@tieto.com>
+Subject: [PATCH 09/10] android/gatt: Remove redundant matching function
+Date: Wed, 11 Feb 2015 15:34:07 +0100
+Message-Id: <1423665248-5121-9-git-send-email-jakub.tyszkowski@tieto.com>
 In-Reply-To: <1423665248-5121-1-git-send-email-jakub.tyszkowski@tieto.com>
 References: <1423665248-5121-1-git-send-email-jakub.tyszkowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This removes casting void* to struct pointers when there is no need to
-do so (pointer comparison).
+If NULL is passed as matching function, queue uses its internal
+'direct_match()' thus there is no need to duplicate this function.
 ---
- android/gatt.c | 12 ++++--------
- 1 file changed, 4 insertions(+), 8 deletions(-)
+ android/gatt.c | 13 ++++---------
+ 1 file changed, 4 insertions(+), 9 deletions(-)
 
 diff --git a/android/gatt.c b/android/gatt.c
-index cd0825a..3076a02 100644
+index c518d27..cd0825a 100644
 --- a/android/gatt.c
 +++ b/android/gatt.c
-@@ -350,9 +350,8 @@ static struct gatt_app *find_app_by_id(int32_t id)
+@@ -347,11 +347,6 @@ static struct gatt_app *find_app_by_id(int32_t id)
+ 	return queue_find(gatt_apps, match_app_by_id, INT_TO_PTR(id));
+ }
+ 
+-static bool match_by_value(const void *data, const void *user_data)
+-{
+-	return data == user_data;
+-}
+-
  static bool match_device_by_bdaddr(const void *data, const void *user_data)
  {
  	const struct gatt_device *dev = data;
--	const bdaddr_t *addr = user_data;
+@@ -564,7 +559,7 @@ static void unregister_notification(void *data)
+ 	 * triggered afterwards, but once client unregisters, device stays if
+ 	 * used by others. Then just unregister single handle.
+ 	 */
+-	if (!queue_find(gatt_devices, match_by_value, dev))
++	if (!queue_find(gatt_devices, NULL, dev))
+ 		return;
  
--	return !bacmp(&dev->bdaddr, addr);
-+	return !bacmp(&dev->bdaddr, user_data);
- }
+ 	if (notification->notif_id && dev)
+@@ -2072,7 +2067,7 @@ static void handle_client_unregister(const void *buf, uint16_t len)
  
- static bool match_device_by_state(const void *data, const void *user_data)
-@@ -408,17 +407,15 @@ static struct app_connection *find_connection_by_id(int32_t conn_id)
- static bool match_connection_by_device(const void *data, const void *user_data)
- {
- 	const struct app_connection *conn = data;
--	const struct gatt_device *dev = user_data;
+ 	DBG("");
  
--	return conn->device == dev;
-+	return conn->device == user_data;
- }
+-	listening_client = queue_find(listen_apps, match_by_value,
++	listening_client = queue_find(listen_apps, NULL,
+ 						INT_TO_PTR(cmd->client_if));
  
- static bool match_connection_by_app(const void *data, const void *user_data)
- {
- 	const struct app_connection *conn = data;
--	const struct gatt_app *app = user_data;
+ 	if (listening_client) {
+@@ -2199,7 +2194,7 @@ static void handle_client_listen(const void *buf, uint16_t len)
+ 		goto reply;
+ 	}
  
--	return conn->app == app;
-+	return conn->app == user_data;
- }
+-	listening_client = queue_find(listen_apps, match_by_value,
++	listening_client = queue_find(listen_apps, NULL,
+ 						INT_TO_PTR(cmd->client_if));
+ 	/* Start listening */
+ 	if (cmd->start) {
+@@ -7331,7 +7326,7 @@ bool bt_gatt_add_autoconnect(unsigned int id, const bdaddr_t *addr)
+ 	if (queue_isempty(dev->autoconnect_apps))
+ 		device_ref(dev);
  
- static struct gatt_device *find_device_by_addr(const bdaddr_t *addr)
-@@ -469,9 +466,8 @@ static bool match_srvc_by_bt_uuid(const void *data, const void *user_data)
- static bool match_srvc_by_range(const void *data, const void *user_data)
- {
- 	const struct service *srvc = data;
--	const struct att_range *range = user_data;
+-	if (!queue_find(dev->autoconnect_apps, match_by_value, INT_TO_PTR(id)))
++	if (!queue_find(dev->autoconnect_apps, NULL, INT_TO_PTR(id)))
+ 		return queue_push_head(dev->autoconnect_apps, INT_TO_PTR(id));
  
--	return !memcmp(&srvc->prim.range, range, sizeof(srvc->prim.range));
-+	return !memcmp(&srvc->prim.range, user_data, sizeof(srvc->prim.range));
- }
- 
- static bool match_char_by_higher_inst_id(const void *data,
+ 	return true;
 -- 
 1.9.1
 
