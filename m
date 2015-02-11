@@ -2,166 +2,140 @@ Return-Path: <cyrus@holtmann.org>
 From: Arman Uguray <armansito@chromium.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: luiz.dentz@gmail.com, Arman Uguray <armansito@chromium.org>
-Subject: [PATCH BlueZ 05/13] core: gatt: Add GATT/GAP services to local db
-Date: Tue, 10 Feb 2015 20:54:18 -0800
-Message-Id: <1423630466-26327-6-git-send-email-armansito@chromium.org>
+Subject: [PATCH BlueZ 04/13] core: Attach gatt-server to bt_att
+Date: Tue, 10 Feb 2015 20:54:17 -0800
+Message-Id: <1423630466-26327-5-git-send-email-armansito@chromium.org>
 In-Reply-To: <1423630466-26327-1-git-send-email-armansito@chromium.org>
 References: <1423630466-26327-1-git-send-email-armansito@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch adds the GATT & GAP services to the local GATT database.
+With this patch, btd_device now creates a bt_gatt_server and attaches
+it to the ATT transport which coexists with a bt_gatt_client.
 ---
- src/gatt-server.c | 115 +++++++++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 114 insertions(+), 1 deletion(-)
+ src/device.c | 45 +++++++++++++++++++++++++++++----------------
+ 1 file changed, 29 insertions(+), 16 deletions(-)
 
-diff --git a/src/gatt-server.c b/src/gatt-server.c
-index 977a057..14e335e 100644
---- a/src/gatt-server.c
-+++ b/src/gatt-server.c
-@@ -29,6 +29,7 @@
- #include "src/shared/util.h"
+diff --git a/src/device.c b/src/device.c
+index a28d6fb..b8b89cd 100644
+--- a/src/device.c
++++ b/src/device.c
+@@ -51,11 +51,13 @@
  #include "src/shared/queue.h"
  #include "src/shared/gatt-db.h"
-+#include "src/shared/att-types.h"
- #include "log.h"
+ #include "src/shared/gatt-client.h"
++#include "src/shared/gatt-server.h"
+ #include "btio/btio.h"
+ #include "lib/mgmt.h"
+ #include "attrib/att.h"
+ #include "hcid.h"
  #include "adapter.h"
++#include "gatt-server.h"
+ #include "attrib/gattrib.h"
+ #include "attio.h"
  #include "device.h"
-@@ -38,6 +39,9 @@
- #define ATT_CID 4
- #endif
+@@ -210,7 +212,6 @@ struct btd_device {
+ 	GAttrib		*attrib;
+ 	GSList		*attios;
+ 	GSList		*attios_offline;
+-	guint		attachid;		/* Attrib server attach */
  
-+#define UUID_GAP	0x1800
-+#define UUID_GATT	0x1801
-+
- static struct queue *servers = NULL;
+ 	struct bt_att *att;			/* The new ATT transport */
+ 	uint16_t att_mtu;			/* The ATT MTU */
+@@ -223,6 +224,7 @@ struct btd_device {
+ 	 */
+ 	struct gatt_db *db;			/* GATT db cache */
+ 	struct bt_gatt_client *client;		/* GATT client instance */
++	struct bt_gatt_server *server;		/* GATT server instance */
  
- struct btd_gatt_server {
-@@ -125,6 +129,115 @@ static bool match_adapter(const void *a, const void *b)
- 	return server->adapter == adapter;
+ 	struct btd_gatt_client *client_dbus;
+ 
+@@ -515,6 +517,15 @@ static void gatt_client_cleanup(struct btd_device *device)
+ 		gatt_db_clear(device->db);
  }
  
-+static void gap_device_name_read_cb(struct gatt_db_attribute *attrib,
-+					unsigned int id, uint16_t offset,
-+					uint8_t opcode, bdaddr_t *bdaddr,
-+					uint8_t bdaddr_type, void *user_data)
++static void gatt_server_cleanup(struct btd_device *device)
 +{
-+	struct btd_gatt_server *server = user_data;
-+	uint8_t error = 0;
-+	size_t len = 0;
-+	const uint8_t *value = NULL;
-+	const char *device_name;
++	if (!device->server)
++		return;
 +
-+	DBG("GAP Device Name read request\n");
-+
-+	device_name = btd_adapter_get_name(server->adapter);
-+	len = strlen(device_name);
-+
-+	if (offset > len) {
-+		error = BT_ATT_ERROR_INVALID_OFFSET;
-+		goto done;
-+	}
-+
-+	len -= offset;
-+	value = len ? (const uint8_t *) &device_name[offset] : NULL;
-+
-+done:
-+	gatt_db_attribute_read_result(attrib, id, error, value, len);
++	bt_gatt_server_unref(device->server);
++	device->server = NULL;
 +}
 +
-+static void gap_appearance_read_cb(struct gatt_db_attribute *attrib,
-+					unsigned int id, uint16_t offset,
-+					uint8_t opcode, bdaddr_t *bdaddr,
-+					uint8_t bdaddr_type, void *user_data)
-+{
-+	struct btd_gatt_server *server = user_data;
-+	uint8_t error = 0;
-+	size_t len = 2;
-+	const uint8_t *value = NULL;
-+	uint8_t appearance[2];
-+	uint32_t dev_class;
-+
-+	DBG("GAP Appearance read request\n");
-+
-+	dev_class = btd_adapter_get_class(server->adapter);
-+
-+	if (offset > 2) {
-+		error = BT_ATT_ERROR_INVALID_OFFSET;
-+		goto done;
-+	}
-+
-+	appearance[0] = dev_class & 0x00ff;
-+	appearance[1] = (dev_class >> 8) & 0x001f;
-+
-+	len -= offset;
-+	value = len ? &appearance[offset] : NULL;
-+
-+done:
-+	gatt_db_attribute_read_result(attrib, id, error, value, len);
-+}
-+
-+static void populate_gap_service(struct btd_gatt_server *server)
-+{
-+	bt_uuid_t uuid;
-+	struct gatt_db_attribute *service;
-+
-+	/* Add the GAP service */
-+	bt_uuid16_create(&uuid, UUID_GAP);
-+	service = gatt_db_add_service(server->db, &uuid, true, 5);
-+
-+	/*
-+	 * Device Name characteristic.
-+	 */
-+	bt_uuid16_create(&uuid, GATT_CHARAC_DEVICE_NAME);
-+	gatt_db_service_add_characteristic(service, &uuid, BT_ATT_PERM_READ,
-+							BT_GATT_CHRC_PROP_READ,
-+							gap_device_name_read_cb,
-+							NULL, server);
-+
-+	/*
-+	 * Device Appearance characteristic.
-+	 */
-+	bt_uuid16_create(&uuid, GATT_CHARAC_APPEARANCE);
-+	gatt_db_service_add_characteristic(service, &uuid, BT_ATT_PERM_READ,
-+							BT_GATT_CHRC_PROP_READ,
-+							gap_appearance_read_cb,
-+							NULL, server);
-+
-+	gatt_db_service_set_active(service, true);
-+}
-+
-+static void populate_gatt_service(struct btd_gatt_server *server)
-+{
-+	bt_uuid_t uuid;
-+	struct gatt_db_attribute *service;
-+
-+	/* Add the GATT service */
-+	bt_uuid16_create(&uuid, UUID_GATT);
-+	service = gatt_db_add_service(server->db, &uuid, true, 1);
-+
-+	/* TODO: Add "Service Changed" characteristic and handle CCC */
-+
-+	gatt_db_service_set_active(service, true);
-+}
-+
-+static void register_core_services(struct btd_gatt_server *server)
-+{
-+	populate_gap_service(server);
-+	populate_gatt_service(server);
-+}
-+
- bool btd_gatt_server_register_adapter(struct btd_adapter *adapter)
+ static void attio_cleanup(struct btd_device *device)
  {
- 	struct btd_gatt_server *server;
-@@ -168,7 +281,7 @@ bool btd_gatt_server_register_adapter(struct btd_adapter *adapter)
+ 	if (device->att_disconn_id)
+@@ -528,6 +539,7 @@ static void attio_cleanup(struct btd_device *device)
+ 	}
  
- 	queue_push_tail(servers, server);
+ 	gatt_client_cleanup(device);
++	gatt_server_cleanup(device);
  
--	/* TODO: Set up GAP/GATT services */
-+	register_core_services(server);
+ 	if (device->att) {
+ 		bt_att_unref(device->att);
+@@ -538,14 +550,6 @@ static void attio_cleanup(struct btd_device *device)
+ 		GAttrib *attrib = device->attrib;
  
- 	return true;
+ 		device->attrib = NULL;
+-
+-		if (device->attachid) {
+-			guint attachid = device->attachid;
+-
+-			device->attachid = 0;
+-			attrib_channel_detach(attrib, attachid);
+-		}
+-
+ 		g_attrib_cancel_all(attrib);
+ 		g_attrib_unref(attrib);
+ 	}
+@@ -3950,6 +3954,20 @@ static void gatt_client_init(struct btd_device *device)
+ 	}
+ }
  
++static void gatt_server_init(struct btd_device *device, struct gatt_db *db)
++{
++	if (!db) {
++		error("No local GATT database exists for this adapter");
++		return;
++	}
++
++	gatt_server_cleanup(device);
++
++	device->server = bt_gatt_server_new(db, device->att, device->att_mtu);
++	if (!device->server)
++		error("Failed to initialize bt_gatt_server");
++}
++
+ bool device_attach_att(struct btd_device *dev, GIOChannel *io)
+ {
+ 	GError *gerr = NULL;
+@@ -3989,23 +4007,18 @@ bool device_attach_att(struct btd_device *dev, GIOChannel *io)
+ 		return false;
+ 	}
+ 
+-	dev->attachid = attrib_channel_attach(attrib);
+-	if (dev->attachid == 0) {
+-		g_attrib_unref(attrib);
+-		error("Attribute server attach failure!");
+-		return false;
+-	}
+-
+ 	dev->attrib = attrib;
+ 	dev->att = g_attrib_get_att(attrib);
+ 
+ 	bt_att_ref(dev->att);
++	bt_att_set_bdaddr(dev->att, &dev->bdaddr, dev->bdaddr_type);
+ 
+ 	dev->att_disconn_id = bt_att_register_disconnect(dev->att,
+ 						att_disconnected_cb, dev, NULL);
+ 	bt_att_set_close_on_unref(dev->att, true);
+ 
+ 	gatt_client_init(dev);
++	gatt_server_init(dev, btd_gatt_server_get_db(dev->adapter));
+ 
+ 	/*
+ 	 * Remove the device from the connect_list and give the passive
 -- 
 2.2.0.rc0.207.ga3a616c
 
