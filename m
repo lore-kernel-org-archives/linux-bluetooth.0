@@ -2,84 +2,166 @@ Return-Path: <cyrus@holtmann.org>
 From: Arman Uguray <armansito@chromium.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: luiz.dentz@gmail.com, Arman Uguray <armansito@chromium.org>
-Subject: [PATCH BlueZ 12/13] core: adapter: Send UUIDs changed for GATT services
-Date: Tue, 10 Feb 2015 20:54:25 -0800
-Message-Id: <1423630466-26327-13-git-send-email-armansito@chromium.org>
+Subject: [PATCH BlueZ 11/13] core: gatt-server: Send "Service Changed"
+Date: Tue, 10 Feb 2015 20:54:24 -0800
+Message-Id: <1423630466-26327-12-git-send-email-armansito@chromium.org>
 In-Reply-To: <1423630466-26327-1-git-send-email-armansito@chromium.org>
 References: <1423630466-26327-1-git-send-email-armansito@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-btd_adapter now sends a PropertiesChanged signal for the "UUIDs"
-property when its associated gatt_db is modified.
+With this patch, the local GATT server sends out "Service Changed"
+indications to devices that have configured the corresponding CCC
+descriptor, when a local attribute database is modified.
 ---
- src/adapter.c | 22 ++++++++++++++++++++++
- 1 file changed, 22 insertions(+)
+ src/gatt-server.c | 116 ++++++++++++++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 112 insertions(+), 4 deletions(-)
 
-diff --git a/src/adapter.c b/src/adapter.c
-index beb9fda..ae74fa9 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -225,6 +225,8 @@ struct btd_adapter {
- 	unsigned int pair_device_id;
- 	guint pair_device_timeout;
- 
-+	unsigned int db_id;		/* Service event handler for GATT db */
-+
- 	bool is_default;		/* true if adapter is default one */
- };
- 
-@@ -4554,6 +4556,7 @@ static struct btd_adapter *btd_adapter_new(uint16_t index)
- static void adapter_remove(struct btd_adapter *adapter)
- {
- 	GSList *l;
-+	struct gatt_db *db;
- 
- 	DBG("Removing adapter %s", adapter->path);
- 
-@@ -4579,6 +4582,11 @@ static void adapter_remove(struct btd_adapter *adapter)
- 	adapter->devices = NULL;
- 
- 	unload_drivers(adapter);
-+
-+	db = btd_gatt_server_get_db(adapter);
-+	gatt_db_unregister(db, adapter->db_id);
-+	adapter->db_id = 0;
-+
- 	btd_gatt_server_unregister_adapter(adapter);
- 
- 	g_slist_free(adapter->pin_callbacks);
-@@ -6588,9 +6596,18 @@ static int set_did(struct btd_adapter *adapter, uint16_t vendor,
- 	return -EIO;
+diff --git a/src/gatt-server.c b/src/gatt-server.c
+index 9af58a0..73a4ef3 100644
+--- a/src/gatt-server.c
++++ b/src/gatt-server.c
+@@ -29,7 +29,8 @@
+ #include "src/shared/util.h"
+ #include "src/shared/queue.h"
+ #include "src/shared/gatt-db.h"
+-#include "src/shared/att-types.h"
++#include "src/shared/att.h"
++#include "src/shared/gatt-server.h"
+ #include "log.h"
+ #include "adapter.h"
+ #include "device.h"
+@@ -420,10 +421,117 @@ static void register_core_services(struct btd_gatt_server *server)
+ 	populate_gatt_service(server);
  }
  
-+static void services_modified(struct gatt_db_attribute *attrib, void *user_data)
-+{
-+	struct btd_adapter *adapter = user_data;
++struct not_data {
++	struct btd_gatt_server *server;
++	uint16_t handle, ccc_handle;
++	const uint8_t *value;
++	uint16_t len;
++	bool indicate;
++};
 +
-+	g_dbus_emit_property_changed(dbus_conn, adapter->path,
-+						ADAPTER_INTERFACE, "UUIDs");
++static void conf_cb(void *user_data)
++{
++	DBG("GATT server received confirmation");
 +}
 +
- static int adapter_register(struct btd_adapter *adapter)
- {
- 	struct agent *agent;
-+	struct gatt_db *db;
- 
- 	if (powering_down)
- 		return -EBUSY;
-@@ -6624,6 +6641,11 @@ static int adapter_register(struct btd_adapter *adapter)
- 	if (!btd_gatt_server_register_adapter(adapter))
- 		error("Failed to register adapter with GATT server");
- 
-+	db = btd_gatt_server_get_db(adapter);
-+	adapter->db_id = gatt_db_register(db, services_modified,
-+							services_modified,
-+							adapter, NULL);
++static void send_notification_to_device(void *data, void *user_data)
++{
++	struct device_state *device_state = data;
++	struct not_data *not_data = user_data;
++	struct ccc_state *ccc;
++	struct btd_device *device;
 +
- 	load_config(adapter);
- 	fix_storage(adapter);
- 	load_drivers(adapter);
++	ccc = find_ccc_state(device_state, not_data->ccc_handle);
++	if (!ccc)
++		return;
++
++	if (!ccc->value[0] || (not_data->indicate && !(ccc->value[0] & 0x02)))
++		return;
++
++	device = btd_adapter_get_device(not_data->server->adapter,
++						&device_state->bdaddr,
++						device_state->bdaddr_type);
++	if (!device)
++		return;
++
++	/*
++	 * TODO: If the device is not connected but bonded, send the
++	 * notification/indication when it becomes connected.
++	 */
++
++	if (!not_data->indicate) {
++		DBG("GATT server sending notification");
++		bt_gatt_server_send_notification(
++					btd_device_get_gatt_server(device),
++					not_data->handle, not_data->value,
++					not_data->len);
++		return;
++	}
++
++	DBG("GATT server sending indication");
++	bt_gatt_server_send_indication(btd_device_get_gatt_server(device),
++							not_data->handle,
++							not_data->value,
++							not_data->len, conf_cb,
++							NULL, NULL);
++}
++
++static void send_notification_to_devices(struct btd_gatt_server *server,
++					uint16_t handle, const uint8_t *value,
++					uint16_t len, uint16_t ccc_handle,
++					bool indicate)
++{
++	struct not_data not_data;
++
++	memset(&not_data, 0, sizeof(not_data));
++
++	not_data.server = server;
++	not_data.handle = handle;
++	not_data.ccc_handle = ccc_handle;
++	not_data.value = value;
++	not_data.len = len;
++	not_data.indicate = indicate;
++
++	queue_foreach(server->device_states, send_notification_to_device,
++								&not_data);
++}
++
++static void send_service_changed(struct btd_gatt_server *server,
++					struct gatt_db_attribute *attrib)
++{
++	uint16_t start, end;
++	uint8_t value[4];
++	uint16_t handle, ccc_handle;
++
++	if (!gatt_db_attribute_get_service_handles(attrib, &start, &end)) {
++		error("Failed to obtain changed service handles");
++		return;
++	}
++
++	handle = gatt_db_attribute_get_handle(server->svc_chngd);
++	ccc_handle = gatt_db_attribute_get_handle(server->svc_chngd_ccc);
++
++	if (!handle || !ccc_handle) {
++		error("Failed to obtain handles for \"Service Changed\""
++							" characteristic");
++		return;
++	}
++
++	put_le16(start, value);
++	put_le16(end, value + 2);
++
++	send_notification_to_devices(server, handle, value, sizeof(value),
++							ccc_handle, true);
++}
++
+ static void gatt_db_service_added(struct gatt_db_attribute *attrib,
+ 								void *user_data)
+ {
+-	/* TODO: Send out service changed signal */
++	struct btd_gatt_server *server = user_data;
++
++	DBG("GATT Service added to local database");
++
++	send_service_changed(server, attrib);
+ }
+ 
+ static bool ccc_match_service(const void *data, const void *match_data)
+@@ -452,9 +560,9 @@ static void gatt_db_service_removed(struct gatt_db_attribute *attrib,
+ 
+ 	DBG("Local GATT service removed");
+ 
+-	queue_foreach(server->device_states, remove_device_ccc, attrib);
++	send_service_changed(server, attrib);
+ 
+-	/* TODO: Send out service changed signal */
++	queue_foreach(server->device_states, remove_device_ccc, attrib);
+ }
+ 
+ bool btd_gatt_server_register_adapter(struct btd_adapter *adapter)
 -- 
 2.2.0.rc0.207.ga3a616c
 
