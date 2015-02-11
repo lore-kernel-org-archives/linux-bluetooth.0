@@ -2,64 +2,125 @@ Return-Path: <cyrus@holtmann.org>
 From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH v2 2/4] tools/mgmt-tester: Add test for pair on not supported transport
-Date: Wed, 11 Feb 2015 12:32:10 +0100
-Message-Id: <1423654332-32424-3-git-send-email-lukasz.rymanowski@tieto.com>
+Subject: [PATCH v2 3/4] tools/l2cap-tester: Add L2CAP LE Connection Reject test
+Date: Wed, 11 Feb 2015 12:32:11 +0100
+Message-Id: <1423654332-32424-4-git-send-email-lukasz.rymanowski@tieto.com>
 In-Reply-To: <1423654332-32424-1-git-send-email-lukasz.rymanowski@tieto.com>
 References: <1423654332-32424-1-git-send-email-lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-If controller is not capable for giver transport, kernel will reply on
-pair request with MGMT_STATUS_NOT_SUPPORTED
+This test checks if kernel correctly rejects LE connection when host is
+not configured to support LE.
 ---
- tools/mgmt-tester.c | 26 ++++++++++++++++++++++++++
- 1 file changed, 26 insertions(+)
+ tools/l2cap-tester.c | 45 +++++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 43 insertions(+), 2 deletions(-)
 
-diff --git a/tools/mgmt-tester.c b/tools/mgmt-tester.c
-index 3dff98f..18a5335 100644
---- a/tools/mgmt-tester.c
-+++ b/tools/mgmt-tester.c
-@@ -2511,6 +2511,26 @@ static const void *client_bdaddr_param_func(uint8_t *len)
- 	return bdaddr;
- }
- 
-+static const struct generic_data pair_device_not_supported_test_1 = {
-+	.setup_settings = settings_powered_bondable,
-+	.send_opcode = MGMT_OP_PAIR_DEVICE,
-+	.send_func = pair_device_send_param_func,
-+	.expect_status = MGMT_STATUS_NOT_SUPPORTED,
-+	.expect_func = pair_device_expect_param_func,
-+	.addr_type_avail = true,
-+	.addr_type = BDADDR_BREDR,
-+};
+diff --git a/tools/l2cap-tester.c b/tools/l2cap-tester.c
+index cf0fa38..7f03591 100644
+--- a/tools/l2cap-tester.c
++++ b/tools/l2cap-tester.c
+@@ -82,6 +82,9 @@ struct l2cap_data {
+ 	const void *pin;
+ 	uint8_t client_pin_len;
+ 	const void *client_pin;
 +
-+static const struct generic_data pair_device_not_supported_test_2 = {
-+	.setup_settings = settings_powered_bondable,
-+	.send_opcode = MGMT_OP_PAIR_DEVICE,
-+	.send_func = pair_device_send_param_func,
-+	.expect_status = MGMT_STATUS_NOT_SUPPORTED,
-+	.expect_func = pair_device_expect_param_func,
++	bool addr_type_avail;
++	uint8_t addr_type;
+ };
+ 
+ static void mgmt_debug(const char *str, void *user_data)
+@@ -441,6 +444,12 @@ static const struct l2cap_data le_client_connect_reject_test_1 = {
+ 	.expect_err = ECONNREFUSED,
+ };
+ 
++static const struct l2cap_data le_client_connect_reject_test_2 = {
++	.client_psm = 0x0080,
 +	.addr_type_avail = true,
 +	.addr_type = BDADDR_LE_PUBLIC,
 +};
 +
- static uint16_t settings_powered_bondable_le[] = { MGMT_OP_SET_LE,
- 							MGMT_OP_SET_BONDABLE,
- 							MGMT_OP_SET_POWERED,
-@@ -5099,6 +5119,12 @@ int main(int argc, char *argv[])
- 	test_bredrle("Pair Device - Power off 1",
- 				&pair_device_power_off_test_1,
- 				NULL, test_command_generic);
-+	test_le("Pair Device - Incorrect transport reject 1",
-+				&pair_device_not_supported_test_1,
-+				NULL, test_command_generic);
-+	test_bredr("Pair Device - Incorrect transport reject 2",
-+				&pair_device_not_supported_test_2,
-+				NULL, test_command_generic);
- 	test_bredrle("Pair Device - Reject on not enabled transport 1",
- 				&pair_device_reject_transport_not_enabled_1,
- 				NULL, test_command_generic);
+ static const struct l2cap_data le_client_connect_nval_psm_test = {
+ 	.client_psm = 0x0080,
+ 	.expect_err = ECONNREFUSED,
+@@ -943,6 +952,7 @@ failed:
+ static int create_l2cap_sock(struct test_data *data, uint16_t psm,
+ 						uint16_t cid, int sec_level)
+ {
++	const struct l2cap_data *l2data = data->test_data;
+ 	const uint8_t *master_bdaddr;
+ 	struct sockaddr_l2 addr;
+ 	int sk, err;
+@@ -968,7 +978,10 @@ static int create_l2cap_sock(struct test_data *data, uint16_t psm,
+ 	addr.l2_psm = htobs(psm);
+ 	addr.l2_cid = htobs(cid);
+ 	bacpy(&addr.l2_bdaddr, (void *) master_bdaddr);
+-	if (data->hciemu_type == HCIEMU_TYPE_LE)
++
++	if (l2data && l2data->addr_type_avail)
++		addr.l2_bdaddr_type = l2data->addr_type;
++	else if (data->hciemu_type == HCIEMU_TYPE_LE)
+ 		addr.l2_bdaddr_type = BDADDR_LE_PUBLIC;
+ 	else
+ 		addr.l2_bdaddr_type = BDADDR_BREDR;
+@@ -1003,6 +1016,7 @@ static int create_l2cap_sock(struct test_data *data, uint16_t psm,
+ static int connect_l2cap_sock(struct test_data *data, int sk, uint16_t psm,
+ 								uint16_t cid)
+ {
++	const struct l2cap_data *l2data = data->test_data;
+ 	const uint8_t *client_bdaddr;
+ 	struct sockaddr_l2 addr;
+ 	int err;
+@@ -1018,7 +1032,10 @@ static int connect_l2cap_sock(struct test_data *data, int sk, uint16_t psm,
+ 	bacpy(&addr.l2_bdaddr, (void *) client_bdaddr);
+ 	addr.l2_psm = htobs(psm);
+ 	addr.l2_cid = htobs(cid);
+-	if (data->hciemu_type == HCIEMU_TYPE_LE)
++
++	if (l2data && l2data->addr_type_avail)
++		addr.l2_bdaddr_type = l2data->addr_type;
++	else if (data->hciemu_type == HCIEMU_TYPE_LE)
+ 		addr.l2_bdaddr_type = BDADDR_LE_PUBLIC;
+ 	else
+ 		addr.l2_bdaddr_type = BDADDR_BREDR;
+@@ -1084,6 +1101,27 @@ static void test_connect(const void *test_data)
+ 	tester_print("Connect in progress");
+ }
+ 
++static void test_connect_reject(const void *test_data)
++{
++	struct test_data *data = tester_get_data();
++	const struct l2cap_data *l2data = data->test_data;
++	int sk;
++
++	sk = create_l2cap_sock(data, 0, l2data->cid, l2data->sec_level);
++	if (sk < 0) {
++		tester_test_failed();
++		return;
++	}
++
++	if (connect_l2cap_sock(data, sk, l2data->client_psm,
++							l2data->cid) < 0)
++		tester_test_passed();
++	else
++		tester_test_failed();
++
++	close(sk);
++}
++
+ static gboolean l2cap_listen_cb(GIOChannel *io, GIOCondition cond,
+ 							gpointer user_data)
+ {
+@@ -1396,6 +1434,9 @@ int main(int argc, char *argv[])
+ 	test_l2cap_le("L2CAP LE Client - Command Reject",
+ 					&le_client_connect_reject_test_1,
+ 					setup_powered_client, test_connect);
++	test_l2cap_bredr("L2CAP LE Client - Connection Reject",
++				&le_client_connect_reject_test_2,
++				setup_powered_client, test_connect_reject);
+ 	test_l2cap_le("L2CAP LE Client - Invalid PSM",
+ 					&le_client_connect_nval_psm_test,
+ 					setup_powered_client, test_connect);
 -- 
 1.8.4
 
