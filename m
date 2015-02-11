@@ -1,106 +1,53 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: Mariusz Skamra <mariusz.skamra@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/2] android/pts: Update GATT test results for PTS 6.0
-Date: Wed, 11 Feb 2015 15:07:30 +0100
-Message-ID: <1585400.pAhk2mDz15@uw000953>
-In-Reply-To: <1423661292-16660-1-git-send-email-mariusz.skamra@tieto.com>
-References: <1423661292-16660-1-git-send-email-mariusz.skamra@tieto.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <CABBYNZJQf3CXJff=UfdTDh6eNU50VWu14BQ=3FTbsXR3jy7RbA@mail.gmail.com>
+References: <1423599385-36295-1-git-send-email-jamuraa@chromium.org>
+	<1423599385-36295-10-git-send-email-jamuraa@chromium.org>
+	<CABBYNZJQf3CXJff=UfdTDh6eNU50VWu14BQ=3FTbsXR3jy7RbA@mail.gmail.com>
+Date: Wed, 11 Feb 2015 15:47:14 +0200
+Message-ID: <CABBYNZL-+ZTH9XhWA3vShh=3npJy2_Gx5U+UycB3qu_T-ZUrWg@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 0/8] Implement Notification / Indication TS Tests
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Michael Janssen <jamuraa@chromium.org>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Mariusz,
+Hi,
 
-On Wednesday 11 of February 2015 14:28:11 Mariusz Skamra wrote:
-> ---
->  android/pts-gatt.txt | 24 +++++++++++++-----------
->  1 file changed, 13 insertions(+), 11 deletions(-)
-> 
-> diff --git a/android/pts-gatt.txt b/android/pts-gatt.txt
-> index a452726..01bc947 100644
-> --- a/android/pts-gatt.txt
-> +++ b/android/pts-gatt.txt
-> @@ -1,7 +1,7 @@
->  PTS test results for GATT
->  
-> -PTS version: 5.3
-> -Tested: 05-December-2014
-> +PTS version: 6.0.1
-> +Tested: 02-February-2015
->  Android version: 5.0
->  
->  Results:
-> @@ -18,8 +18,7 @@ TC_GAC_CL_BV_01_C	PASS	haltest:
->  				gattc search_service
->  				gattc get_characteristic
->  				gattc write_characteristic: type 3
-> -TC_GAC_SR_BV_01_C	PASS	PTS issue #12357
-> -				NOTE: tested with ETS attached to errata
-> +TC_GAC_SR_BV_01_C	FAIL	PTS issue #13073
->  				haltest:
->  				gatts add_service
->  				gatts add_chaaracteristic:
-> @@ -49,12 +48,14 @@ TC_GAD_CL_BV_02_C	PASS	haltest:
->  				gattc connect
->  				gattc refresh
->  TC_GAD_CL_BV_03_C	PASS	haltest:
-> -                                gattc register_client
-> -                                gattc scan
-> -                                gattc connect
-> -                                gattc search_service
-> +				gattc register_client
-> +				gattc scan
-> +				gattc connect
-> +				gattc search_service
->  				gattc get_included_service
->  				gattc_disconnect
-> +				gattc connect
-> +				gattc refresh
->  TC_GAD_CL_BV_04_C	PASS	haltest:
->  				when requested: gattc get_characteristic
->  TC_GAD_CL_BV_05_C	PASS	haltest:
-> @@ -696,7 +697,7 @@ TC_GAW_CL_BI_32_C	PASS	haltest:
->  				gattc search_service
->  				gattc get_characteristic: srvc_id based on
->  								handle from logs
-> -				gattc write_characteristic 2 <long_value>
-> +				gattc write_characteristic 3 <value>
->  				gattc execute_write
->  				gattc disconnect
->  TC_GAW_CL_BI_33_C	PASS	haltest:
-> @@ -991,7 +992,7 @@ TC_GAW_SR_BI_31_C	PASS	haltest:
->  				gatts add_descriptor: <permmisions> 17
->  				gatts start_service
->  				gatts send_response: <status> 12
-> -TC_GAW_SR_BI_32_C	PASS	haltest:
-> +TC_GAW_SR_BI_32_C	FAIL	PTS issue #12823 haltest:
->  				gatts add_service
->  				gatts add_characteristic:
->  						<properties> 10 <permissions> 17
-> @@ -1077,7 +1078,7 @@ TC_GAT_CL_BV_01_C	PASS	haltest:
->  				gattc get_characteristic: srvc_id based on
->  								handle from logs
->  				gattc read_characcteristic
-> -				gattc disconnect
-> +				wait for 30 sec timeout
->  TC_GAT_CL_BV_02_C	PASS	haltest:
->  				gattc connect
->  				gattc search_service
-> @@ -1085,6 +1086,7 @@ TC_GAT_CL_BV_02_C	PASS	haltest:
->  								handle from logs
->  				gattc write_characcteristic 2 <short_value>
->  				gattc disconnect
-> +				wait for 30 sec timeout
->  TC_GAT_SR_BV_01_C	PASS	haltest:
->  				gatts add_service
->  				gatts add_characteristic:
-> 
+On Wed, Feb 11, 2015 at 3:30 PM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> Hi Michael,
+>
+> On Tue, Feb 10, 2015 at 10:16 PM, Michael Janssen <jamuraa@chromium.org> wrote:
+>> Implements the four defined tests around the Notification and Indication
+>> functionality in the unit tests.  Also includes some fixes to discovery when
+>> no handles could be found (services with no handles).
+>>
+>> Also adds some functionality to the unit testing, to support when there is no
+>> action required by the client and/or the server in a test, and checks for
+>> post data transmission.
+>>
+>> --
+>
+> Applied, thanks.
 
-Both patches applied, thanks.
+I gather the following number from the latest TS:
+
+Group                       Client                          Server
+Configuration             100% (1 / 1)                100% (1 / 1)
+Discovery                  75% (6 / 8)                  75% (6 / 8)
+Read                         57.5% (23 / 40)           47.6% (20 / 42)
+Write                        0% (0 / 40)                  0% (0 / 40)
+Notification/Indication 50% (1 / 2)                  50% (1 / 2)
+Services                    0% (0 / 1)                   0% (0 / 1)
+Timeouts                   0% (0 / 2)                   0% (0 / 1)
+Attributes                  0% (0 / 10)                  0% (0 / 10)
+Total                         29.8% (31 / 104)         26.7% 28 / 105
+
+*I did not compute any extra tests we are doing, like small vs large
+databases, still these numbers are quite low.
 
 -- 
-Best regards, 
-Szymon Janc
+Luiz Augusto von Dentz
