@@ -2,109 +2,106 @@ Return-Path: <cyrus@holtmann.org>
 From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
-Subject: [PATCH 06/10] android/gatt: Improve send_dev_complete_response
-Date: Wed, 11 Feb 2015 15:34:04 +0100
-Message-Id: <1423665248-5121-6-git-send-email-jakub.tyszkowski@tieto.com>
+Subject: [PATCH 05/10] android/gatt: Use g_attrib_send consistently
+Date: Wed, 11 Feb 2015 15:34:03 +0100
+Message-Id: <1423665248-5121-5-git-send-email-jakub.tyszkowski@tieto.com>
 In-Reply-To: <1423665248-5121-1-git-send-email-jakub.tyszkowski@tieto.com>
 References: <1423665248-5121-1-git-send-email-jakub.tyszkowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-For simple reads or writes there is no need to take the request out
-of the queue as it is destroyed at the end anyway. We can peek and
-check for errors even before switch statement.
+'g_attrib_send' do checks the 'length' parameter so there is no need
+for us to do this (and in most cases we don't). We can test the
+returned value in case we want to report error.
 ---
- android/gatt.c | 47 +++++++++++------------------------------------
- 1 file changed, 11 insertions(+), 36 deletions(-)
+ android/gatt.c | 31 +++++++++++--------------------
+ 1 file changed, 11 insertions(+), 20 deletions(-)
 
 diff --git a/android/gatt.c b/android/gatt.c
-index 81b0283..19232f7 100644
+index 7f95226..81b0283 100644
 --- a/android/gatt.c
 +++ b/android/gatt.c
-@@ -4455,6 +4455,17 @@ static void send_dev_complete_response(struct gatt_device *device,
- 		return;
+@@ -1068,9 +1068,7 @@ static void notify_att_range_change(struct gatt_device *dev,
+ 		break;
  	}
  
-+	val = queue_peek_head(device->pending_requests);
-+	if (!val) {
-+		error = ATT_ECODE_ATTR_NOT_FOUND;
-+		goto done;
-+	}
-+
-+	if (val->error) {
-+		error = val->error;
-+		goto done;
-+	}
-+
- 	switch (opcode) {
- 	case ATT_OP_READ_BY_TYPE_REQ: {
- 		struct att_data_list *adl;
-@@ -4514,25 +4525,11 @@ static void send_dev_complete_response(struct gatt_device *device,
- 		break;
- 	}
- 	case ATT_OP_READ_BLOB_REQ:
--		val = queue_pop_head(device->pending_requests);
--		if (val->error) {
--			error = val->error;
--			goto done;
--		}
--
- 		len = enc_read_blob_resp(val->value, val->length, val->offset,
- 								rsp, mtu);
--		destroy_pending_request(val);
- 		break;
- 	case ATT_OP_READ_REQ:
--		val = queue_pop_head(device->pending_requests);
--		if (val->error) {
--			error = val->error;
--			goto done;
--		}
--
- 		len = enc_read_resp(val->value, val->length, rsp, mtu);
--		destroy_pending_request(val);
- 		break;
- 	case ATT_OP_READ_BY_GROUP_REQ: {
- 		struct att_data_list *adl;
-@@ -4638,39 +4635,17 @@ static void send_dev_complete_response(struct gatt_device *device,
- 		break;
- 	}
- 	case ATT_OP_EXEC_WRITE_REQ:
--		val = queue_pop_head(device->pending_requests);
--		if (val->error) {
--			error = val->error;
--			goto done;
--		}
--
- 		len = enc_exec_write_resp(rsp);
--		destroy_pending_request(val);
- 		break;
- 	case ATT_OP_WRITE_REQ:
--		val = queue_pop_head(device->pending_requests);
--		if (val->error) {
--			error = val->error;
--			goto done;
--		}
--
- 		len = enc_write_resp(rsp);
--		destroy_pending_request(val);
- 		break;
- 	case ATT_OP_PREP_WRITE_REQ: {
- 		uint16_t handle;
+-	if (length)
+-		g_attrib_send(dev->attrib, 0, pdu, length,
+-						confirmation_cb, NULL, NULL);
++	g_attrib_send(dev->attrib, 0, pdu, length, confirmation_cb, NULL, NULL);
+ }
  
--		val = queue_pop_head(device->pending_requests);
--		if (val->error) {
--			error = val->error;
--			goto done;
--		}
--
- 		handle = gatt_db_attribute_get_handle(val->attrib);
--
- 		len = enc_prep_write_resp(handle, val->offset, val->value,
- 							val->length, rsp, mtu);
--		destroy_pending_request(val);
- 		break;
+ static struct app_connection *create_connection(struct gatt_device *device,
+@@ -1480,9 +1478,7 @@ static void ind_handler(const uint8_t *cmd, uint16_t cmd_len,
+ 	 */
+ 
+ 	resp_length = enc_confirmation(opdu, length);
+-	if (resp_length)
+-		g_attrib_send(dev->attrib, 0, opdu, resp_length, NULL, NULL,
+-									NULL);
++	g_attrib_send(dev->attrib, 0, opdu, resp_length, NULL, NULL, NULL);
+ }
+ 
+ static void connect_cb(GIOChannel *io, GError *gerr, gpointer user_data)
+@@ -4157,12 +4153,10 @@ static uint8_t test_read_write(bdaddr_t *bdaddr, bt_uuid_t *uuid, uint16_t op,
+ 		return HAL_STATUS_UNSUPPORTED;
  	}
- 	default:
+ 
+-	if (!length)
++	if (!g_attrib_send(dev->attrib, 0, pdu, length, test_command_result,
++								NULL, NULL))
+ 		return HAL_STATUS_FAILED;
+ 
+-	g_attrib_send(dev->attrib, 0, pdu, length, test_command_result, NULL,
+-									NULL);
+-
+ 	return HAL_STATUS_SUCCESS;
+ }
+ 
+@@ -5531,12 +5525,11 @@ static void handle_server_send_indication(const void *buf, uint16_t len)
+ 						cmd->len, pdu, mtu);
+ 	}
+ 
+-	if (length == 0) {
+-		error("gatt: Failed to encode indication");
++	if (!g_attrib_send(conn->device->attrib, 0, pdu, length,
++				confirmation_cb, UINT_TO_PTR(conn->id), NULL)) {
++		error("gatt: Failed to send indication");
+ 		status = HAL_STATUS_FAILED;
+ 	} else {
+-		g_attrib_send(conn->device->attrib, 0, pdu, length,
+-				confirmation_cb, UINT_TO_PTR(conn->id), NULL);
+ 		status = HAL_STATUS_SUCCESS;
+ 	}
+ 
+@@ -6143,13 +6136,13 @@ static uint8_t mtu_att_handle(const uint8_t *cmd, uint16_t cmd_len,
+ 
+ 	rsp = g_attrib_get_buffer(dev->attrib, &length);
+ 
++		return ATT_ECODE_UNLIKELY;
++
+ 	/* Respond with our MTU */
+ 	len = enc_mtu_resp(mtu, rsp, length);
+-	if (!len)
++	if (!g_attrib_send(dev->attrib, 0, rsp, len, NULL, NULL, NULL))
+ 		return ATT_ECODE_UNLIKELY;
+ 
+-	g_attrib_send(dev->attrib, 0, rsp, len, NULL, NULL, NULL);
+-
+ 	return 0;
+ }
+ 
+@@ -6703,9 +6696,7 @@ done:
+ 		resp_length = enc_error_resp(ipdu[0], 0x0000, status, opdu,
+ 									length);
+ 
+-	if (resp_length)
+-		g_attrib_send(dev->attrib, 0, opdu, resp_length, NULL, NULL,
+-									NULL);
++	g_attrib_send(dev->attrib, 0, opdu, resp_length, NULL, NULL, NULL);
+ }
+ 
+ static void connect_confirm(GIOChannel *io, void *user_data)
 -- 
 1.9.1
 
