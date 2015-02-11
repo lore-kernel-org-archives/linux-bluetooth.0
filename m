@@ -2,51 +2,95 @@ Return-Path: <cyrus@holtmann.org>
 From: Arman Uguray <armansito@chromium.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: luiz.dentz@gmail.com, Arman Uguray <armansito@chromium.org>
-Subject: [PATCH BlueZ 10/13] core: device: Add getter for GATT server
-Date: Tue, 10 Feb 2015 20:54:23 -0800
-Message-Id: <1423630466-26327-11-git-send-email-armansito@chromium.org>
+Subject: [PATCH BlueZ 09/13] core: Add Service Changed characteristic
+Date: Tue, 10 Feb 2015 20:54:22 -0800
+Message-Id: <1423630466-26327-10-git-send-email-armansito@chromium.org>
 In-Reply-To: <1423630466-26327-1-git-send-email-armansito@chromium.org>
 References: <1423630466-26327-1-git-send-email-armansito@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Added btd_device_get_gatt_server function.
+This patch exports the "Service Changed" characteristic and its CCC
+descriptor in btd_gatt_server.
 ---
- src/device.c | 8 ++++++++
- src/device.h | 1 +
- 2 files changed, 9 insertions(+)
+ src/gatt-server.c | 49 +++++++++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 47 insertions(+), 2 deletions(-)
 
-diff --git a/src/device.c b/src/device.c
-index b8b89cd..55db667 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -5093,6 +5093,14 @@ struct bt_gatt_client *btd_device_get_gatt_client(struct btd_device *device)
- 	return device->client;
+diff --git a/src/gatt-server.c b/src/gatt-server.c
+index 22faece..9af58a0 100644
+--- a/src/gatt-server.c
++++ b/src/gatt-server.c
+@@ -50,6 +50,10 @@ struct btd_gatt_server {
+ 	unsigned int db_id;
+ 	GIOChannel *le_io;
+ 	struct queue *device_states;
++	struct gatt_db_attribute *svc_chngd;
++	struct gatt_db_attribute *svc_chngd_ccc;
++	uint16_t svc_chngd_start;
++	uint16_t svc_chngd_end;
+ };
+ 
+ struct device_state {
+@@ -355,16 +359,57 @@ static void populate_gap_service(struct btd_gatt_server *server)
+ 	gatt_db_service_set_active(service, true);
  }
  
-+struct bt_gatt_server *btd_device_get_gatt_server(struct btd_device *device)
++static void gatt_svc_chngd_read_cb(struct gatt_db_attribute *attrib,
++					unsigned int id, uint16_t offset,
++					uint8_t opcode, bdaddr_t *bdaddr,
++					uint8_t bdaddr_type, void *user_data)
 +{
-+	if (!device)
-+		return NULL;
++	struct btd_gatt_server *server = user_data;
++	uint8_t ecode = 0;
++	size_t len;
++	const uint8_t *value = NULL;
++	uint8_t bytes[4];
 +
-+	return device->server;
++	if (server->svc_chngd_start && server->svc_chngd_end) {
++		memset(bytes, 0, sizeof(bytes));
++		put_le16(server->svc_chngd_start, bytes);
++		put_le16(server->svc_chngd_end, bytes + 2);
++		len = 4;
++	} else {
++		len = 0;
++	}
++
++	if (offset > len) {
++		ecode = BT_ATT_ERROR_INVALID_OFFSET;
++		goto done;
++	}
++
++	len -= offset;
++	value = len ? &bytes[offset] : NULL;
++
++done:
++	gatt_db_attribute_read_result(attrib, id, ecode, value, len);
 +}
 +
- void btd_device_gatt_set_service_changed(struct btd_device *device,
- 						uint16_t start, uint16_t end)
+ static void populate_gatt_service(struct btd_gatt_server *server)
  {
-diff --git a/src/device.h b/src/device.h
-index a7fefee..8edd0df 100644
---- a/src/device.h
-+++ b/src/device.h
-@@ -69,6 +69,7 @@ struct gatt_primary *btd_device_get_primary(struct btd_device *device,
- GSList *btd_device_get_primaries(struct btd_device *device);
- struct gatt_db *btd_device_get_gatt_db(struct btd_device *device);
- struct bt_gatt_client *btd_device_get_gatt_client(struct btd_device *device);
-+struct bt_gatt_server *btd_device_get_gatt_server(struct btd_device *device);
- void btd_device_gatt_set_service_changed(struct btd_device *device,
- 						uint16_t start, uint16_t end);
- bool device_attach_att(struct btd_device *dev, GIOChannel *io);
+ 	bt_uuid_t uuid;
+ 	struct gatt_db_attribute *service;
++	uint16_t start_handle;
+ 
+ 	/* Add the GATT service */
+ 	bt_uuid16_create(&uuid, UUID_GATT);
+-	service = gatt_db_add_service(server->db, &uuid, true, 1);
++	service = gatt_db_add_service(server->db, &uuid, true, 4);
++	gatt_db_attribute_get_service_handles(service, &start_handle, NULL);
++
++	bt_uuid16_create(&uuid, GATT_CHARAC_SERVICE_CHANGED);
++	server->svc_chngd = gatt_db_service_add_characteristic(service, &uuid,
++			BT_ATT_PERM_READ,
++			BT_GATT_CHRC_PROP_READ | BT_GATT_CHRC_PROP_INDICATE,
++			gatt_svc_chngd_read_cb, NULL, server);
+ 
+-	/* TODO: Add "Service Changed" characteristic and handle CCC */
++	server->svc_chngd_ccc = btd_gatt_server_add_ccc(server->adapter,
++								start_handle);
+ 
+ 	gatt_db_service_set_active(service, true);
+ }
 -- 
 2.2.0.rc0.207.ga3a616c
 
