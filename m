@@ -1,68 +1,79 @@
 Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
-To: Thomas Petazzoni <thomas.petazzoni@free-electrons.com>
-Cc: linux-bluetooth@vger.kernel.org, Marcel Holtmann <marcel@holtmann.org>
-Subject: Re: [PATCHv2] Link mcaptest with -lrt when needed
-Date: Wed, 11 Feb 2015 16:33:49 +0100
-Message-ID: <6010593.MLgLHOm4DO@uw000953>
-In-Reply-To: <1419891774-21158-1-git-send-email-thomas.petazzoni@free-electrons.com>
-References: <20141229232219.622fd4d8@free-electrons.com> <1419891774-21158-1-git-send-email-thomas.petazzoni@free-electrons.com>
+To: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] android/pts: Update AVCTP pixits, pics and test results for PTS 6.0
+Date: Wed, 11 Feb 2015 15:44:46 +0100
+Message-ID: <25888386.pCYphTH2in@uw000953>
+In-Reply-To: <1423663924-3981-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+References: <1423663924-3981-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Thomas,
+Hi Grzegorz,
 
-On Monday 29 of December 2014 23:22:54 Thomas Petazzoni wrote:
-> The mcaptest tool uses the profiles/health/mcap.c source file, which
-> calls clock_getres(). This function is defined in librt in some C
-> libraries, so mcaptest should be linked against librt when needed,
-> otherwise one gets link failures such as:
+On Wednesday 11 of February 2015 15:12:04 Grzegorz Kolodziejczyk wrote:
+> This patch updates tet pixits, pics, test results and their instructions
+> for AVCTP profile against android 5.0.
 > 
-> ld: profiles/health/mcap.o: undefined reference to symbol 'clock_getres@@GLIBC_2.2.5'
-> ld: note: 'clock_getres@@GLIBC_2.2.5' is defined in DSO [...]/sysroot/lib64/librt.so.1 so try adding it to the linker command line
-> [...]/sysroot/lib64/librt.so.1: could not read symbols: Invalid operation
-> collect2: error: ld returned 1 exit status
-> Makefile:4184: recipe for target 'tools/mcaptest' failed
-> 
-> Signed-off-by: Thomas Petazzoni <thomas.petazzoni@free-electrons.com>
+> PTS uses AVCTP ETS in version: 9.0.0.11
 > ---
->  Makefile.tools | 2 +-
->  configure.ac   | 5 +++++
->  2 files changed, 6 insertions(+), 1 deletion(-)
+>  android/pics-avctp.txt  | 2 +-
+>  android/pixit-avctp.txt | 2 +-
+>  android/pts-avctp.txt   | 5 +++--
+>  3 files changed, 5 insertions(+), 4 deletions(-)
 > 
-> diff --git a/Makefile.tools b/Makefile.tools
-> index bc827fe..fef3db5 100644
-> --- a/Makefile.tools
-> +++ b/Makefile.tools
-> @@ -195,7 +195,7 @@ tools_mcaptest_SOURCES = tools/mcaptest.c \
->  				btio/btio.h btio/btio.c \
->  				src/log.c src/log.h \
->  				profiles/health/mcap.h profiles/health/mcap.c
-> -tools_mcaptest_LDADD = lib/libbluetooth-internal.la @GLIB_LIBS@
-> +tools_mcaptest_LDADD = lib/libbluetooth-internal.la @GLIB_LIBS@ @RT_LIBS@
+> diff --git a/android/pics-avctp.txt b/android/pics-avctp.txt
+> index 0afa33c..4fc599f 100644
+> --- a/android/pics-avctp.txt
+> +++ b/android/pics-avctp.txt
+> @@ -1,6 +1,6 @@
+>  AVCTP PICS for the PTS tool.
 >  
->  dist_man_MANS += tools/hciattach.1 tools/hciconfig.1 \
->  			tools/hcitool.1 tools/hcidump.1 \
-> diff --git a/configure.ac b/configure.ac
-> index 4739c10..b0afba6 100644
-> --- a/configure.ac
-> +++ b/configure.ac
-> @@ -54,6 +54,11 @@ AC_CHECK_LIB(pthread, pthread_create, dummy=yes,
->  AC_CHECK_LIB(dl, dlopen, dummy=yes,
->  			AC_MSG_ERROR(dynamic linking loader is required))
+> -PTS version: 5.3
+> +PTS version: 6.0
 >  
-> +AC_SEARCH_LIBS([clock_getres], [rt],
-> +			[test "$ac_cv_search_clock_getres" = "none required" ||
-> +			RT_LIBS=$ac_cv_search_clock_getres])
-> +AC_SUBST([RT_LIBS])
-> +
->  PKG_CHECK_MODULES(GLIB, glib-2.0 >= 2.28, dummy=yes,
->  				AC_MSG_ERROR(GLib >= 2.28 is required))
->  AC_SUBST(GLIB_CFLAGS)
+>  * - different than PTS defaults
+>  # - not yet implemented/supported
+> diff --git a/android/pixit-avctp.txt b/android/pixit-avctp.txt
+> index f380e96..4b2c783 100644
+> --- a/android/pixit-avctp.txt
+> +++ b/android/pixit-avctp.txt
+> @@ -1,6 +1,6 @@
+>  AVCTP PIXIT for the PTS tool.
+>  
+> -PTS version: 5.3
+> +PTS version: 6.0
+>  
+>  * - different than PTS defaults
+>  & - should be set to IUT Bluetooth address
+> diff --git a/android/pts-avctp.txt b/android/pts-avctp.txt
+> index 7a5f4ce..d05aa05 100644
+> --- a/android/pts-avctp.txt
+> +++ b/android/pts-avctp.txt
+> @@ -1,7 +1,7 @@
+>  PTS test results for AVCTP
+>  
+> -PTS version: 5.3
+> -Tested: 03-December-2014
+> +PTS version: 6.0
+> +Tested: 11-February-2015
+>  Android version: 5.0
+>  
+>  Results:
+> @@ -21,6 +21,7 @@ TC_CT_CCM_BV_04_C	N/A
+>  TC_CT_CCM_BI_01_C	N/A
+>  TC_CT_NFR_BV_01_C	N/A
+>  TC_CT_NFR_BV_04_C	PASS	haltest: rc set_volume 5
+> +				Note: IUT must be connectable and discoverable
+>  TC_CT_FRA_BV_01_C	N/A
+>  TC_CT_FRA_BV_04_C	N/A
+>  -------------------------------------------------------------------------------
+> 
 
-This seems to got lost in traffic.
-Since it doesn't apply anymore you would have to rebase it.
+Applied, thanks.
 
 -- 
 Best regards, 
