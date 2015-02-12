@@ -1,41 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
-From: Mariusz Skamra <mariusz.skamra@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Mariusz Skamra <mariusz.skamra@tieto.com>
-Subject: [PATCH] android/pts: Update test notes for L2CAP
-Date: Thu, 12 Feb 2015 13:52:42 +0100
-Message-Id: <1423745562-15295-1-git-send-email-mariusz.skamra@tieto.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Thu, 12 Feb 2015 13:34:14 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Ethan <ethancsge@gmail.com>
+Cc: Pali =?iso-8859-1?Q?Roh=E1r?= <pali.rohar@gmail.com>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Gustavo Padovan <gustavo@padovan.org>,
+	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: 3.19-rc1 refuse connection from bluetooth headset
+Message-ID: <20150212113414.GA29887@t440s.lan>
+References: <201412241815.12922@pali>
+ <201412241932.27264@pali>
+ <20141224183737.GA21428@t440s.P-661HNU-DI-F1>
+ <201412241941.56927@pali>
+ <CAAAJ3CKFJ38pZF6WSD495W8JQmxBs1NcBDnag1q4qWhUE2_5qQ@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <CAAAJ3CKFJ38pZF6WSD495W8JQmxBs1NcBDnag1q4qWhUE2_5qQ@mail.gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Daemon should be stopped for test purposes.
----
- android/pts-l2cap.txt | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
+Hi Ethan,
 
-diff --git a/android/pts-l2cap.txt b/android/pts-l2cap.txt
-index b5fdb05..b625861 100644
---- a/android/pts-l2cap.txt
-+++ b/android/pts-l2cap.txt
-@@ -14,6 +14,8 @@ N/A    test is disabled due to PICS setup
- -------------------------------------------------------------------------------
- Test Name		Result	Notes
- -------------------------------------------------------------------------------
-+				For all tests daemon should be stopped then:
-+					setprop ctl.start hciattach
- TC_COS_CED_BV_01_C	PASS	l2test -n -P 4113 <bdaddr>
- TC_COS_CED_BV_03_C	PASS	l2test -y -N 1 -P 4113 <bdaddr>
- TC_COS_CED_BV_04_C	PASS	l2test -n -P 4113 <bdaddr>
-@@ -151,9 +153,6 @@ TC_ECF_BV_05_C		N/A
- TC_ECF_BV_06_C		N/A
- TC_ECF_BV_07_C		N/A
- TC_ECF_BV_08_C		N/A
--				NOTE: for LE tests daemon should be stopped
--				then:
--				setprop ctl.start hciattach
- TC_LE_CPU_BV_01_C	PASS	l2test -n -V le_public -J 4
- TC_LE_CPU_BV_02_C	PASS	l2test -n -V le_public -J 4 <braddr>
- TC_LE_CPU_BI_01_C	PASS	l2test -n -V le_public -J 4 <braddr>
--- 
-1.9.1
+On Thu, Feb 12, 2015, Ethan wrote:
+> I met similar issue in kernel 3.10 for Chromebook smart lock feature, I
+> have merged your patch but issue still happened.
 
+The whole feature of checking the whitelist when HCI_CONNECTABLE is not
+set was introduced only in kernel version 3.18. So it makes no sense to
+try to backport my patch to 3.10. If you have issues with 3.10 without
+my patch then it's something else that's going on and that deserves a
+separate email thread.
+
+Johan
