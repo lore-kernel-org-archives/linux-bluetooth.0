@@ -1,46 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <3A3386F2-F288-4B13-B31A-92ADF57505CC@holtmann.org>
-References: <1423522782-18956-1-git-send-email-drake@endlessm.com>
-	<3A3386F2-F288-4B13-B31A-92ADF57505CC@holtmann.org>
-Date: Thu, 12 Feb 2015 14:44:28 -0600
-Message-ID: <CAD8Lp44CQ5Au9YQ98==Lxpi3mMh+jbpZBOZFjVSweV5ykUyqbg@mail.gmail.com>
-Subject: Re: [PATCH v3] Bluetooth: btusb: Add Realtek 8723A/8723B/8761A/8821A support
-From: Daniel Drake <drake@endlessm.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: "Gustavo F. Padovan" <gustavo@padovan.org>, Johan Hedberg <johan.hedberg@gmail.com>,
-	Linux Bluetooth mailing list <linux-bluetooth@vger.kernel.org>, Larry Finger <larry.finger@lwfinger.net>,
-	=?UTF-8?B?6ZmI6Imz6JCN?= <champion_chen@realsil.com.cn>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2070.6\))
+Subject: Re: btcoex subsystem
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <874mr3xjnx.fsf_-_@kamboji.qca.qualcomm.com>
+Date: Thu, 12 Feb 2015 12:28:46 -0800
+Cc: Larry Finger <Larry.Finger@lwfinger.net>,
+	linux-wireless <linux-wireless@vger.kernel.org>,
+	Troy Tan <troy_tan@realsil.com.cn>, netdev@vger.kernel.org,
+	linux-bluetooth@vger.kernel.org
+Message-Id: <D5A7B08D-EA98-4A6E-A6BF-E19D87B5066A@holtmann.org>
+References: <1422304934-9239-1-git-send-email-Larry.Finger@lwfinger.net> <1422304934-9239-6-git-send-email-Larry.Finger@lwfinger.net> <87h9v8zkuh.fsf@kamboji.qca.qualcomm.com> <EC423C22-AEA0-4232-A452-7A131C41780A@holtmann.org> <54CBA0CE.8030800@lwfinger.net> <B814EF26-CBC9-43E4-A6C9-761A013F85C1@holtmann.org> <874mr3xjnx.fsf_-_@kamboji.qca.qualcomm.com>
+To: Kalle Valo <kvalo@codeaurora.org>
+Sender: netdev-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hi Kalle,
 
-Thanks for the feedback! It all makes sense, I just need clarification
-on one part.
+>>> I will work on combining the latest BT drivers from Realtek with
+>>> btusb to see if I can achieve a patch that will both work with the
+>>> Realtek hardware, and get approval from the reviewers.
+>>> 
+>>> What would be an approved method of communicating between two kernel
+>>> modules? Is there some example in the kernel that I could study?
+>> 
+>> We need a btcoex subsystem that both WiFi and Bluetooth can register
+>> to and communicate with.
+> 
+> The need for this seems to periodically come up, I remember needing
+> something like that back in the Maemo wl1251 days and also ath6kl needed
+> this. Are there any ideas for this subsystem? How would this btcoex
+> subsystem work? What kind of information would it provide?
+> 
+> Is this something we should discuss at Ottawa?
 
-On Thu, Feb 12, 2015 at 2:26 PM, Marcel Holtmann <marcel@holtmann.org> wrote:
->> +     if (id->driver_info & BTUSB_RTL8723A)
->> +             hdev->setup = btusb_setup_rtl8723a;
->> +
->> +     if (id->driver_info & BTUSB_RTL8723B)
->> +             hdev->setup = btusb_setup_rtl8723b;
->> +
->
-> I would really prefer to be able to detect this with a HCI command and not have a long list of chipsets.
+sadly something came up and I am not making it to Ottawa. However we should be talking about this at some point since Bluetooth has MWS for its coexistence which could be a good starting point. Something we have to look into for the Bluetooth subsystem at some point.
 
-Can you explain a little more what you mean here? I should have just 1
-entry point for both firmware types, where a HCI command is run, then
-it dispatches the appropriate firmware loading code?
+Regards
 
-I thought by doing it like I did in this patch, I was addressing one
-of your comments on the v2 patch, where you said:
+Marcel
 
-"You do know that you can add individual hdev->setup function for each
-different firmware loading mechanism. They do not need to be all the
-same. I get the feeling you are trying too hard to push it all into a
-single entry point."
-from http://www.spinics.net/lists/linux-bluetooth/msg50141.html
-
-Thanks
-Daniel
