@@ -1,37 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <54DC816C.2060806@my.bristol.ac.uk>
-Date: Thu, 12 Feb 2015 10:33:16 +0000
-From: Christopher Bainbridge <cb0128@my.bristol.ac.uk>
 MIME-Version: 1.0
-To: linux-bluetooth@vger.kernel.org
-Subject: NetworkServer1 exits when program exits
-Content-Type: text/plain; charset=utf-8; format=flowed
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <FC39A264-7D93-4BAA-9A85-7ACA6B762583@holtmann.org>
+References: <CAE2MWkn0RBeZpiJy_6t0-3zs_DCikX4Qxqpa-FGr0MYWnOM_vw@mail.gmail.com>
+	<FC39A264-7D93-4BAA-9A85-7ACA6B762583@holtmann.org>
+Date: Thu, 12 Feb 2015 14:32:20 +0530
+Message-ID: <CAE2MWkmrdftQjzqkVwHTjYZYH_XRyvPmG=q0ZJzCxJ5MAEt4Tw@mail.gmail.com>
+Subject: Re: Query: HCI_RAW mode in Kernel 3.18
+From: Ujjal Roy <royujjal@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+> what you want is to use the HCI User Channel if you need direct access to=
+ the HCI layer of a controller. Look at tools/3dsp.c and tools/ibeacon.c fo=
+r examples on how to use it. In src/shared/hci.c you find the internal deta=
+ils of the HCI User Channel. It is a lot cleaner way of using a controller'=
+s HCI interface exclusively.
+>
+> Regards
+>
+> Marcel
+>
 
-I've been trying to get NetworkServer1 service working without using 
-Python, as I'm working on a platform with limited resources. When I use 
-dbus-send...
-
-dbus-send --system --type=method_call --dest=org.bluez --print-reply 
-/org/bluez/hci0 org.bluez.NetworkServer1.Register string:nap string:tether
-
-I see the server registering, but then immediately unregistering. 
-According to the API documentation (doc/network-api.txt), this is what 
-is supposed to happen.
-
-Experimenting with Python on my PC, removing the 'unregister' line from 
-the test-nap script makes no difference at all (I get no error that the 
-NAP server is already registered, which I get if I run test-nap twice at 
-the same time). But this then removes the need for the 
-NetworkServer1.Unregister method call, and doesn't allow me to use 
-dbus-send to enable the NAP server.
-
-May I suggest that the NetworkServer1.Register method call doesn't 
-unregister when it exits? Or is there another way of registering a NAP 
-server that doesn't involve dbus-send or Python?
-
-Thanks
-Chris
+So, can you please help me to write an app? Is it possible to compile
+an app without using the bluez? I mean without placing and compiling
+the app inside bluez source code.
+If I want to create an app then what library should I have to include
+to compile successfully. Please suggest a way to build my own app to
+use user channel.
