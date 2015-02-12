@@ -2,56 +2,96 @@ Return-Path: <cyrus@holtmann.org>
 From: Arman Uguray <armansito@chromium.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: luiz.dentz@gmail.com, Arman Uguray <armansito@chromium.org>
-Subject: [PATCH BlueZ v1 09/14] core: Add Service Changed characteristic
-Date: Wed, 11 Feb 2015 19:17:39 -0800
-Message-Id: <1423711064-7390-10-git-send-email-armansito@chromium.org>
+Subject: [PATCH BlueZ v1 08/14] core: Setup added/removed handlers in GATT database
+Date: Wed, 11 Feb 2015 19:17:38 -0800
+Message-Id: <1423711064-7390-9-git-send-email-armansito@chromium.org>
 In-Reply-To: <1423711064-7390-1-git-send-email-armansito@chromium.org>
 References: <1423711064-7390-1-git-send-email-armansito@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch exports the "Service Changed" characteristic and its CCC
-descriptor in btd_gatt_server.
+Registered service added/removed handlers in btd_gatt_database.
 ---
- src/gatt-database.c | 14 ++++++++++++--
- 1 file changed, 12 insertions(+), 2 deletions(-)
+ src/gatt-database.c | 45 +++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 45 insertions(+)
 
 diff --git a/src/gatt-database.c b/src/gatt-database.c
-index b8dc361..48c8321 100644
+index 7b72515..b8dc361 100644
 --- a/src/gatt-database.c
 +++ b/src/gatt-database.c
-@@ -50,6 +50,8 @@ struct btd_gatt_database {
- 	unsigned int db_id;
+@@ -47,6 +47,7 @@ static struct queue *servers = NULL;
+ struct btd_gatt_database {
+ 	struct btd_adapter *adapter;
+ 	struct gatt_db *db;
++	unsigned int db_id;
  	GIOChannel *le_io;
  	struct queue *device_states;
-+	struct gatt_db_attribute *svc_chngd;
-+	struct gatt_db_attribute *svc_chngd_ccc;
  };
+@@ -194,6 +195,7 @@ static void gatt_server_free(void *data)
  
- struct device_state {
-@@ -359,12 +361,20 @@ static void populate_gatt_service(struct btd_gatt_database *server)
- {
- 	bt_uuid_t uuid;
- 	struct gatt_db_attribute *service;
-+	uint16_t start_handle;
- 
- 	/* Add the GATT service */
- 	bt_uuid16_create(&uuid, UUID_GATT);
--	service = gatt_db_add_service(server->db, &uuid, true, 1);
-+	service = gatt_db_add_service(server->db, &uuid, true, 4);
-+	gatt_db_attribute_get_service_handles(service, &start_handle, NULL);
- 
--	/* TODO: Add "Service Changed" characteristic and handle CCC */
-+	bt_uuid16_create(&uuid, GATT_CHARAC_SERVICE_CHANGED);
-+	server->svc_chngd = gatt_db_service_add_characteristic(service, &uuid,
-+				BT_ATT_PERM_READ, BT_GATT_CHRC_PROP_INDICATE,
-+				NULL, NULL, server);
-+
-+	server->svc_chngd_ccc = btd_gatt_database_add_ccc(server->adapter,
-+								start_handle);
- 
- 	gatt_db_service_set_active(service, true);
+ 	/* TODO: Persistently store CCC states before freeing them */
+ 	queue_destroy(server->device_states, device_state_free);
++	gatt_db_unregister(server->db, server->db_id);
+ 	gatt_db_unref(server->db);
+ 	btd_adapter_unref(server->adapter);
+ 	free(server);
+@@ -373,6 +375,43 @@ static void register_core_services(struct btd_gatt_database *server)
+ 	populate_gatt_service(server);
  }
+ 
++static void gatt_db_service_added(struct gatt_db_attribute *attrib,
++								void *user_data)
++{
++	/* TODO: Send out service changed signal */
++}
++
++static bool ccc_match_service(const void *data, const void *match_data)
++{
++	const struct ccc_state *ccc = data;
++	const struct gatt_db_attribute *attrib = match_data;
++	uint16_t start, end;
++
++	if (!gatt_db_attribute_get_service_handles(attrib, &start, &end))
++		return false;
++
++	return ccc->handle >= start && ccc->handle <= end;
++}
++
++static void remove_device_ccc(void *data, void *user_data)
++{
++	struct device_state *state = data;
++
++	queue_remove_all(state->ccc_states, ccc_match_service, user_data, free);
++}
++
++static void gatt_db_service_removed(struct gatt_db_attribute *attrib,
++								void *user_data)
++{
++	struct btd_gatt_database *server = user_data;
++
++	DBG("Local GATT service removed");
++
++	queue_foreach(server->device_states, remove_device_ccc, attrib);
++
++	/* TODO: Send out service changed signal */
++}
++
+ bool btd_gatt_database_register_adapter(struct btd_adapter *adapter)
+ {
+ 	struct btd_gatt_database *server;
+@@ -405,6 +444,12 @@ bool btd_gatt_database_register_adapter(struct btd_adapter *adapter)
+ 	if (!server->device_states)
+ 		goto fail;
+ 
++	server->db_id = gatt_db_register(server->db, gatt_db_service_added,
++							gatt_db_service_removed,
++							server, NULL);
++	if (!server->db_id)
++		goto fail;
++
+ 	addr = btd_adapter_get_address(adapter);
+ 	server->le_io = bt_io_listen(connect_cb, NULL, NULL, NULL, &gerr,
+ 					BT_IO_OPT_SOURCE_BDADDR, addr,
 -- 
 2.2.0.rc0.207.ga3a616c
 
