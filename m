@@ -1,109 +1,57 @@
 Return-Path: <cyrus@holtmann.org>
-From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] android/pts: Update HSP pixits, pics and test results for PTS 6.0
-Date: Thu, 12 Feb 2015 14:17:31 +0100
-Message-Id: <1423747051-31810-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+MIME-Version: 1.0
+In-Reply-To: <54DC816C.2060806@my.bristol.ac.uk>
+References: <54DC816C.2060806@my.bristol.ac.uk>
+Date: Thu, 12 Feb 2015 15:12:32 +0200
+Message-ID: <CABBYNZLjb4yf3iEC2HGBfaZsZ294wgTLfci9jq48Gc7VRT-Ygw@mail.gmail.com>
+Subject: Re: NetworkServer1 exits when program exits
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Christopher Bainbridge <cb0128@my.bristol.ac.uk>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch updates test pixits, pics and results for HSP profile against
-android 5.0
----
- android/pics-hfp.txt  | 8 ++++----
- android/pics-hsp.txt  | 6 +++---
- android/pixit-hsp.txt | 2 +-
- android/pts-hsp.txt   | 4 ++--
- 4 files changed, 10 insertions(+), 10 deletions(-)
+Hi Christopher,
 
-diff --git a/android/pics-hfp.txt b/android/pics-hfp.txt
-index 65f5112..da0eb23 100644
---- a/android/pics-hfp.txt
-+++ b/android/pics-hfp.txt
-@@ -1,6 +1,6 @@
- HFP PICS for the PTS tool.
- 
--PTS version: 5.3
-+PTS version: 6.0
- 
- * - different than PTS defaults
- # - not yet implemented/supported
-@@ -40,7 +40,7 @@ TSPC_HFP_2_1a	True (*)	SLC initiation during active ongoing call (O)
- TSPC_HFP_2_2	True		Phone Status Information (M)
- TSPC_HFP_2_3	True		Audio connection handling (M)
- TSPC_HFP_2_3a	False		Audio connection establishment independent of
--					call processing (O)
-+					a call processing (O)
- TSPC_HFP_2_3b	True (*)	eSCO support in Audio Connection (C.10)
- TSPC_HFP_2_3c	True (*)	Codec negotiation (C.7)
- TSPC_HFP_2_4a	False		Accept an incoming voice call
-@@ -83,7 +83,7 @@ TSPC_HFP_2_21b	False		Enhanced Call Control (C.3)
- TSPC_HFP_2_21c	True (*)	Enhanced Call Status with limited network
- 					notification (C.4)
- TSPC_HFP_2_22	False		Support for automatic link loss recovery (O)
--TSPC_HFP_2_23	True (*)	Individual Indicator Activation (C.9)
-+TSPC_HFP_2_23	True		Individual Indicator Activation (C.9)
- TSPC_HFP_2_24	True (*)	Wide Band Speech service (C.8)
- TSPC_HFP_2_25	False		Support roaming function (O)
- TSPC_HFP_2_26	False		HF Indicators (C.11)
-@@ -169,7 +169,7 @@ TSPC_HFP_3_22	False		Support for automatic link loss recovery (O)
- TSPC_HFP_3_23	False		Individual Indicator Activation (C.6)
- TSPC_HFP_3_24	False		Wide Band Speech service (C.6)
- TSPC_HFP_3_25	False		HF Indicators (C.8)
--TSPC_HFP_3_36	False		Support CVSD eSCO S4 setting (C.9)
-+TSPC_HFP_3_26	False		Support CVSD eSCO S4 setting (C.9)
- -------------------------------------------------------------------------------
- C.1: Mandatory if TSPC_HFP_3_12; otherwise excluded
- C.2: Optional if TSPC_HFP_3_12; otherwise excluded
-diff --git a/android/pics-hsp.txt b/android/pics-hsp.txt
-index 7e71b14..3818e74 100644
---- a/android/pics-hsp.txt
-+++ b/android/pics-hsp.txt
-@@ -1,6 +1,6 @@
- HSP PICS for the PTS tool.
- 
--PTS version: 5.3
-+PTS version: 6.0
- 
- * - different than PTS defaults
- # - not yet implemented/supported
-@@ -82,8 +82,8 @@ TSPC_HSP_3_11	False		Audio volume setting storage by HS (O)
- TSPC_HSP_3_12	False		Remote microphone gain control (C.2)
- TSPC_HSP_3_13	False		HS informs AG about local changes of microphone
-                                         gain (O)
--TSPC_HSP_3_14	False (*)	Microphone gain setting storage by HS (O)
--TSPC_HSP_3_15	False		Connection handling with Detach/Page (M)
-+TSPC_HSP_3_14	False		Microphone gain setting storage by HS (O)
-+TSPC_HSP_3_15	False (*)	Connection handling with Detach/Page (M)
- TSPC_HSP_3_16	False		Connection handling with Park Mode (C.3)
- -------------------------------------------------------------------------------
- C.1: Mandatory if TSPC_HSP_3_10 is supported, otherwise optional
-diff --git a/android/pixit-hsp.txt b/android/pixit-hsp.txt
-index 6be4731..d7a8e3c 100644
---- a/android/pixit-hsp.txt
-+++ b/android/pixit-hsp.txt
-@@ -1,6 +1,6 @@
- HSP PIXIT for the PTS tool.
- 
--PTS version: 5.3
-+PTS version: 6.0
- 
- * - different than PTS defaults
- & - should be set to IUT Bluetooth address
-diff --git a/android/pts-hsp.txt b/android/pts-hsp.txt
-index 9f03ead..04a6413 100644
---- a/android/pts-hsp.txt
-+++ b/android/pts-hsp.txt
-@@ -1,7 +1,7 @@
- PTS test results for HSP
- 
--PTS version: 5.3
--Tested: 24-November-2014
-+PTS version: 6.0
-+Tested: 12-February-2015
- Android version: 5.0
- 
- Results:
+On Thu, Feb 12, 2015 at 12:33 PM, Christopher Bainbridge
+<cb0128@my.bristol.ac.uk> wrote:
+> Hi,
+>
+> I've been trying to get NetworkServer1 service working without using Python,
+> as I'm working on a platform with limited resources. When I use dbus-send...
+>
+> dbus-send --system --type=method_call --dest=org.bluez --print-reply
+> /org/bluez/hci0 org.bluez.NetworkServer1.Register string:nap string:tether
+>
+> I see the server registering, but then immediately unregistering. According
+> to the API documentation (doc/network-api.txt), this is what is supposed to
+> happen.
+>
+> Experimenting with Python on my PC, removing the 'unregister' line from the
+> test-nap script makes no difference at all (I get no error that the NAP
+> server is already registered, which I get if I run test-nap twice at the
+> same time). But this then removes the need for the NetworkServer1.Unregister
+> method call, and doesn't allow me to use dbus-send to enable the NAP server.
+
+This has nothing to do with being already registered, see the real
+reason bellow.
+
+> May I suggest that the NetworkServer1.Register method call doesn't
+> unregister when it exits? Or is there another way of registering a NAP
+> server that doesn't involve dbus-send or Python?
+
+When you register bluetoothd will start tracking your application
+lifetime, actually the D-Bus connection, so in case your application
+exits the does the cleanup automatically, which is the reason
+dbus-send does not work since it exits immediately after done with the
+commands. Removing this tracking would probably leave us with
+unmanaged bridges which would require a totally different API to be
+able to list and unregister them. If you want a real solution for NAP
+you can check connman or similar solution for IP, it will stay
+register a bridge for you and do the tethering with other technologies
+such as WIFI, 3G and Ethernet.
+
+
 -- 
-1.9.3
-
+Luiz Augusto von Dentz
