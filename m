@@ -1,40 +1,619 @@
 Return-Path: <cyrus@holtmann.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2070.6\))
-Subject: Re: btcoex subsystem
+Subject: Re: [PATCH v3] Bluetooth: btusb: Add Realtek 8723A/8723B/8761A/8821A support
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <874mr3xjnx.fsf_-_@kamboji.qca.qualcomm.com>
-Date: Thu, 12 Feb 2015 12:28:46 -0800
-Cc: Larry Finger <Larry.Finger@lwfinger.net>,
-	linux-wireless <linux-wireless@vger.kernel.org>,
-	Troy Tan <troy_tan@realsil.com.cn>, netdev@vger.kernel.org,
-	linux-bluetooth@vger.kernel.org
-Message-Id: <D5A7B08D-EA98-4A6E-A6BF-E19D87B5066A@holtmann.org>
-References: <1422304934-9239-1-git-send-email-Larry.Finger@lwfinger.net> <1422304934-9239-6-git-send-email-Larry.Finger@lwfinger.net> <87h9v8zkuh.fsf@kamboji.qca.qualcomm.com> <EC423C22-AEA0-4232-A452-7A131C41780A@holtmann.org> <54CBA0CE.8030800@lwfinger.net> <B814EF26-CBC9-43E4-A6C9-761A013F85C1@holtmann.org> <874mr3xjnx.fsf_-_@kamboji.qca.qualcomm.com>
-To: Kalle Valo <kvalo@codeaurora.org>
-Sender: netdev-owner@vger.kernel.org
+In-Reply-To: <1423522782-18956-1-git-send-email-drake@endlessm.com>
+Date: Thu, 12 Feb 2015 12:26:29 -0800
+Cc: "Gustavo F. Padovan" <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	linux-bluetooth@vger.kernel.org, larry.finger@lwfinger.net,
+	champion_chen@realsil.com.cn
+Message-Id: <3A3386F2-F288-4B13-B31A-92ADF57505CC@holtmann.org>
+References: <1423522782-18956-1-git-send-email-drake@endlessm.com>
+To: Daniel Drake <drake@endlessm.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Kalle,
+Hi Daniel,
 
->>> I will work on combining the latest BT drivers from Realtek with
->>> btusb to see if I can achieve a patch that will both work with the
->>> Realtek hardware, and get approval from the reviewers.
->>> 
->>> What would be an approved method of communicating between two kernel
->>> modules? Is there some example in the kernel that I could study?
->> 
->> We need a btcoex subsystem that both WiFi and Bluetooth can register
->> to and communicate with.
+> Realtek ship a variety of bluetooth USB devices that identify
+> themselves with standard USB Bluetooth device class values, but
+> require a special driver to actually work. Without that driver,
+> you never get any scan results.
 > 
-> The need for this seems to periodically come up, I remember needing
-> something like that back in the Maemo wl1251 days and also ath6kl needed
-> this. Are there any ideas for this subsystem? How would this btcoex
-> subsystem work? What kind of information would it provide?
+> More recently however, Realtek appear to have wisened up and simply
+> posted a firmware update that makes these devices comply with
+> normal btusb protocols. The firmware needs to be uploaded on each boot.
 > 
-> Is this something we should discuss at Ottawa?
+> Based on Realtek code from https://github.com/lwfinger/rtl8723au_bt
+> ('new' branch).
+> 
+> This enables bluetooth support in the Gigabyte Brix GB-BXBT-2807 which
+> has this RTL8723BE USB device:
+> 
+> T:  Bus=01 Lev=01 Prnt=01 Port=01 Cnt=02 Dev#=  3 Spd=12   MxCh= 0
+> D:  Ver= 2.10 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
+> P:  Vendor=13d3 ProdID=3410 Rev= 2.00
+> S:  Manufacturer=Realtek
+> S:  Product=Bluetooth Radio
+> S:  SerialNumber=00e04c000001
+> C:* #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=500mA
+> I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
+> E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+> E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+> I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+> I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+> I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+> I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+> I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+> I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+> 
+> There is no change to the USB descriptor after firmware update,
+> however the version read by HCI_OP_READ_LOCAL_VERSION changes from
+> 0x8723 to 0x3083.
+> 
+> I also brought in support for the 8821A/8761A devices, which use
+> the same firmware uploading mechanism, plus the 8723A devices,
+> which use a more simplistic firmware format. I have not tested
+> with these additional devices.
+> 
+> Signed-off-by: Daniel Drake <drake@endlessm.com>
+> ---
+> drivers/bluetooth/btusb.c | 432 ++++++++++++++++++++++++++++++++++++++++++++++
+> 1 file changed, 432 insertions(+)
+> 
+> Depends on:
+> Bluetooth: btusb: Add helper for READ_LOCAL_VERSION command
+> 
+> v3: Sorry for the long delay in getting back to this!
+> - Removed support for devices where we don't have firmware
+> - Divide 8723A/8723B codepaths based on driver_info constant
+> - Added more device IDs from latest Realtek code
+> - Addressed minor review comments
+> - Rename RTK --> RTL
+> 
+> v2:
+> - share main blacklist table with other devices
+> - epatch table parsing endian/alignment fixes
+> - BT_INFO message to inform user
+> - added missing kmalloc error check
+> - fixed skb leak
+> - style fixes
+> 
+> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+> index 3096308..0256ab2 100644
+> --- a/drivers/bluetooth/btusb.c
+> +++ b/drivers/bluetooth/btusb.c
+> @@ -24,6 +24,7 @@
+> #include <linux/module.h>
+> #include <linux/usb.h>
+> #include <linux/firmware.h>
+> +#include <asm/unaligned.h>
+> 
+> #include <net/bluetooth/bluetooth.h>
+> #include <net/bluetooth/hci_core.h>
+> @@ -52,6 +53,8 @@ static struct usb_driver btusb_driver;
+> #define BTUSB_SWAVE		0x1000
+> #define BTUSB_INTEL_NEW		0x2000
+> #define BTUSB_AMP		0x4000
+> +#define BTUSB_RTL8723A		0x8000
+> +#define BTUSB_RTL8723B		0x10000
+> 
+> static const struct usb_device_id btusb_table[] = {
+> 	/* Generic Bluetooth USB device */
+> @@ -280,6 +283,58 @@ static const struct usb_device_id blacklist_table[] = {
+> 	{ USB_VENDOR_AND_INTERFACE_INFO(0x8087, 0xe0, 0x01, 0x01),
+> 	  .driver_info = BTUSB_IGNORE },
+> 
+> +	/* Realtek 8723AE Bluetooth devices */
+> +	{ USB_DEVICE(0x0930, 0x021d), .driver_info = BTUSB_RTL8723A },
+> +	{ USB_DEVICE(0x0bda, 0x0723), .driver_info = BTUSB_RTL8723A },
+> +	{ USB_DEVICE(0x0bda, 0x8723), .driver_info = BTUSB_RTL8723A },
+> +	{ USB_DEVICE(0x13d3, 0x3394), .driver_info = BTUSB_RTL8723A },
+> +
+> +	/* Realtek 8723AU Bluetooth devices */
+> +	{ USB_DEVICE(0x0bda, 0x0724), .driver_info = BTUSB_RTL8723A },
+> +	{ USB_DEVICE(0x0bda, 0x1724), .driver_info = BTUSB_RTL8723A },
+> +	{ USB_DEVICE(0x0bda, 0x8725), .driver_info = BTUSB_RTL8723A },
+> +	{ USB_DEVICE(0x0bda, 0x872a), .driver_info = BTUSB_RTL8723A },
+> +	{ USB_DEVICE(0x0bda, 0x872b), .driver_info = BTUSB_RTL8723A },
+> +	{ USB_DEVICE(0x0bda, 0xa724), .driver_info = BTUSB_RTL8723A },
+> +
+> +	/* Realtek 8723BE Bluetooth devices */
+> +	{ USB_DEVICE(0x0489, 0xe085), .driver_info = BTUSB_RTL8723B },
+> +	{ USB_DEVICE(0x0489, 0xe08b), .driver_info = BTUSB_RTL8723B },
+> +	{ USB_DEVICE(0x0bda, 0xb001), .driver_info = BTUSB_RTL8723B },
+> +	{ USB_DEVICE(0x0bda, 0xb002), .driver_info = BTUSB_RTL8723B },
+> +	{ USB_DEVICE(0x0bda, 0xb003), .driver_info = BTUSB_RTL8723B },
+> +	{ USB_DEVICE(0x0bda, 0xb004), .driver_info = BTUSB_RTL8723B },
+> +	{ USB_DEVICE(0x0bda, 0xb005), .driver_info = BTUSB_RTL8723B },
+> +	{ USB_DEVICE(0x0bda, 0xb723), .driver_info = BTUSB_RTL8723B },
+> +	{ USB_DEVICE(0x0bda, 0xb728), .driver_info = BTUSB_RTL8723B },
+> +	{ USB_DEVICE(0x0bda, 0xb72b), .driver_info = BTUSB_RTL8723B },
+> +	{ USB_DEVICE(0x13d3, 0x3410), .driver_info = BTUSB_RTL8723B },
+> +	{ USB_DEVICE(0x13d3, 0x3416), .driver_info = BTUSB_RTL8723B },
+> +	{ USB_DEVICE(0x13d3, 0x3459), .driver_info = BTUSB_RTL8723B },
+> +
+> +	/* Realtek 8723BU Bluetooth devices */
+> +	{ USB_DEVICE(0x0bda, 0xb720), .driver_info = BTUSB_RTL8723B },
+> +	{ USB_DEVICE(0x0bda, 0xb72a), .driver_info = BTUSB_RTL8723B },
+> +
+> +	/* Realtek 8821AE Bluetooth devices */
+> +	{ USB_DEVICE(0x0b05, 0x17dc), .driver_info = BTUSB_RTL8723B },
+> +	{ USB_DEVICE(0x0bda, 0x0821), .driver_info = BTUSB_RTL8723B },
+> +	{ USB_DEVICE(0x0bda, 0x8821), .driver_info = BTUSB_RTL8723B },
+> +	{ USB_DEVICE(0x13d3, 0x3414), .driver_info = BTUSB_RTL8723B },
+> +	{ USB_DEVICE(0x13d3, 0x3458), .driver_info = BTUSB_RTL8723B },
+> +	{ USB_DEVICE(0x13d3, 0x3461), .driver_info = BTUSB_RTL8723B },
+> +	{ USB_DEVICE(0x13d3, 0x3462), .driver_info = BTUSB_RTL8723B },
+> +
+> +	/* Realtek 8821AU Bluetooth devices */
+> +	{ USB_DEVICE(0x0bda, 0x0823), .driver_info = BTUSB_RTL8723B },
+> +
+> +	/* Realtek 8761AU Bluetooth devices */
+> +	{ USB_DEVICE(0x0bda, 0x8760), .driver_info = BTUSB_RTL8723B },
+> +	{ USB_DEVICE(0x0bda, 0x8761), .driver_info = BTUSB_RTL8723B },
+> +	{ USB_DEVICE(0x0bda, 0x8a60), .driver_info = BTUSB_RTL8723B },
+> +	{ USB_DEVICE(0x0bda, 0xa761), .driver_info = BTUSB_RTL8723B },
+> +	{ USB_DEVICE(0x0bda, 0xb761), .driver_info = BTUSB_RTL8723B },
+> +
 
-sadly something came up and I am not making it to Ottawa. However we should be talking about this at some point since Bluetooth has MWS for its coexistence which could be a good starting point. Something we have to look into for the Bluetooth subsystem at some point.
+do we need all of this? Or can we just issue a HCI command and figure which chipset it is. I remember we had some discussion on this. I just do not remember if it was possible or not.
+
+> 	{ }	/* Terminating entry */
+> };
+> 
+> @@ -1341,6 +1396,377 @@ static int btusb_setup_csr(struct hci_dev *hdev)
+> 	return ret;
+> }
+> 
+> +#define RTL_FRAG_LEN 252
+> +
+> +struct rtl_download_cmd {
+> +	uint8_t index;
+> +	uint8_t data[RTL_FRAG_LEN];
+> +} __packed;
+
+Why is this uint8_t and not __u8 like we do with the other structures.
+
+> +
+> +struct rtl_download_response {
+> +	uint8_t status;
+> +	uint8_t index;
+> +} __packed;
+> +
+> +struct rtl_rom_version_evt {
+> +	uint8_t status;
+> +	uint8_t version;
+> +} __packed;
+> +
+> +struct rtl_epatch_header {
+> +	uint8_t signature[8];
+> +	uint32_t fw_version;
+> +	uint16_t num_patches;
+
+__le32 and __le16 here please. Or the big endian variants in case this is in big endian.
+
+> +} __packed;
+> +
+> +static const uint8_t RTL_EPATCH_SIGNATURE[] = {
+> +	0x52, 0x65, 0x61, 0x6C, 0x74, 0x65, 0x63, 0x68
+> +};
+
+Why is this RTL_EPATCH_ uppercase. I prefer only to have defines in uppercase and not const arrays. However you could define it as string array.
+
+You could do "\x52\x65.." and so on to keep it as define.
+
+> +
+> +#define RTL_ROM_LMP_3499	0x3499
+> +#define RTL_ROM_LMP_8723A	0x1200
+> +#define RTL_ROM_LMP_8723B	0x8723
+> +#define RTL_ROM_LMP_8821A	0x8821
+> +#define RTL_ROM_LMP_8761A	0x8761
+> +
+> +static int rtl_read_rom_version(struct hci_dev *hdev)
+> +{
+> +	struct rtl_rom_version_evt *rom_version;
+> +	struct sk_buff *skb;
+> +	int r;
+> +
+> +	/* Read RTL ROM version command */
+> +	skb = __hci_cmd_sync(hdev, 0xfc6d, 0, NULL, HCI_INIT_TIMEOUT);
+> +	if (IS_ERR(skb)) {
+> +		BT_ERR("Read ROM version failed (%ld)", PTR_ERR(skb));
+> +		return PTR_ERR(skb);
+> +	}
+> +
+> +	if (skb->len != sizeof(*rom_version)) {
+> +		BT_ERR("RTL version event length mismatch");
+> +		kfree_skb(skb);
+> +		return -EIO;
+> +	}
+> +
+> +	rom_version = (struct rtl_rom_version_evt *) skb->data;
+> +	BT_DBG("rom_version status=%x version=%x",
+> +	       rom_version->status, rom_version->version);
+> +	if (rom_version->status)
+> +		r = 0;
+> +	else
+> +		r = rom_version->version;
+
+I wonder why not use a negative return value. Also lets use something clearer than just r as variable name.
+
+> +
+> +	kfree_skb(skb);
+> +	return r;
+> +}
+> +
+> +static int rtl8723b_parse_firmware(struct hci_dev *hdev, u16 lmp_subver,
+> +				   const struct firmware *fw,
+> +				   unsigned char **_buf)
+> +{
+> +	const uint8_t extension_sig[] = { 0x51, 0x04, 0xfd, 0x77 };
+> +	struct rtl_epatch_header *epatch_info;
+> +	unsigned char *buf;
+> +	int i, len, rom_version;
+> +	size_t min_size;
+> +	uint8_t opcode, length, data;
+> +	int project_id = -1;
+> +	const unsigned char *fwptr, *chip_id_base;
+> +	const unsigned char *patch_length_base, *patch_offset_base;
+> +	u32 patch_offset = 0;
+> +	u16 patch_length;
+> +	const uint16_t project_id_to_lmp_subver[] = {
+> +		RTL_ROM_LMP_8723A,
+> +		RTL_ROM_LMP_8723B,
+> +		RTL_ROM_LMP_8821A,
+> +		RTL_ROM_LMP_8761A
+> +	};
+> +
+> +	rom_version = rtl_read_rom_version(hdev);
+> +	if (rom_version < 0)
+> +		return rom_version;
+> +
+> +	BT_DBG("lmp_subver=%x rom_version=%x", lmp_subver, rom_version);
+> +
+> +	min_size = sizeof(struct rtl_epatch_header) + sizeof(extension_sig) + 3;
+> +	if (fw->size < min_size)
+> +		return -EINVAL;
+> +
+> +	fwptr = fw->data + fw->size - sizeof(extension_sig);
+> +	if (memcmp(fwptr, extension_sig, sizeof(extension_sig)) != 0) {
+
+	if (memcmp())
+
+> +		BT_ERR("extension section signature mismatch");
+> +		return -EINVAL;
+> +	}
+> +
+> +	/* Loop from the end of the firmware parsing instructions, until
+> +	 * we find an instruction that identifies the "project ID" for the
+> +	 * hardware supported by this firwmare file.
+> +	 * Once we have that, we double-check that that project_id is suitable
+> +	 * for the hardware we are working with. */
+
+	*/ on extra line.
+
+Please keep the coding style for the network subsystem in line.
+
+> +	while (fwptr >= fw->data + (sizeof(struct rtl_epatch_header) + 3)) {
+> +		opcode = *--fwptr;
+> +		length = *--fwptr;
+> +		data = *--fwptr;
+
+Extra empty line before debug statement.
+
+> +		BT_DBG("check op=%x len=%x data=%x", opcode, length, data);
+> +
+> +		if (opcode == 0xff) /* EOF */
+> +			break;
+> +
+> +		if (length == 0) {
+> +			BT_ERR("found instruction with length 0");
+> +			return -EINVAL;
+> +		}
+> +
+> +		if (opcode == 0 && length == 1) {
+> +			project_id = data;
+> +			break;
+> +		}
+> +
+> +		fwptr -= length;
+> +	}
+> +
+> +	if (project_id < 0) {
+> +		BT_ERR("failed to find version instruction");
+> +		return -EINVAL;
+> +	}
+> +
+> +	if (project_id > ARRAY_SIZE(project_id_to_lmp_subver)) {
+> +		BT_ERR("unknown project id %d", project_id);
+> +		return -EINVAL;
+> +	}
+> +
+> +	if (lmp_subver != project_id_to_lmp_subver[project_id]) {
+> +		BT_ERR("firmware is for %x but this is a %x",
+> +		       project_id_to_lmp_subver[project_id], lmp_subver);
+> +		return -EINVAL;
+> +	}
+> +
+> +	epatch_info = (struct rtl_epatch_header *) fw->data;
+> +	if (memcmp(epatch_info->signature, RTL_EPATCH_SIGNATURE, 8) != 0) {
+
+	if (memcmp())
+
+> +		BT_ERR("bad EPATCH signature");
+> +		return -EINVAL;
+> +	}
+> +
+> +	BT_DBG("fw_version=%x, num_patches=%d",
+> +	       epatch_info->fw_version, epatch_info->num_patches);
+> +
+> +	/* After the rtl_epatch_header there is a funky patch metadata section.
+> +	 * Assuming 2 patches, the layout is:
+> +	 * ChipID1 ChipID2 PatchLength1 PatchLength2 PatchOffset1 PatchOffset2
+> +	 *
+> +	 * Find the right patch for this chip. */
+> +	min_size += 8 * epatch_info->num_patches;
+> +	if (fw->size < min_size)
+> +		return -EINVAL;
+> +
+> +	chip_id_base = fw->data + sizeof(struct rtl_epatch_header);
+> +	patch_length_base = chip_id_base +
+> +			    (sizeof(u16) * epatch_info->num_patches);
+> +	patch_offset_base = patch_length_base +
+> +			    (sizeof(u16) * epatch_info->num_patches);
+> +	for (i = 0; i < epatch_info->num_patches; i++) {
+> +		u16 chip_id = get_unaligned_le16(chip_id_base +
+> +						 (i * sizeof(u16)));
+> +		if (chip_id == rom_version + 1) {
+> +			patch_length = get_unaligned_le16(patch_length_base +
+> +							  (i * sizeof(u16)));
+> +			patch_offset = get_unaligned_le32(patch_offset_base +
+> +							  (i * sizeof(u32)));
+> +			break;
+> +		}
+> +	}
+> +
+> +	if (!patch_offset) {
+> +		BT_ERR("didn't find patch for chip id %d", rom_version);
+> +		return -EINVAL;
+> +	}
+> +
+> +	BT_DBG("length=%x offset=%x index %d", patch_length, patch_offset, i);
+> +	min_size = patch_offset + patch_length;
+> +	if (fw->size < min_size)
+> +		return -EINVAL;
+> +
+> +	/* Copy the firmware into a new buffer and write the version at
+> +	 * the end. */
+> +	len = patch_length;
+> +	buf = kmemdup(fw->data + patch_offset, patch_length, GFP_KERNEL);
+> +	if (!buf)
+> +		return -ENOMEM;
+> +
+> +	memcpy(buf + patch_length - 4, &epatch_info->fw_version, 4);
+> +
+> +	*_buf = buf;
+> +	return len;
+> +}
+> +
+> +static int rtl_download_firmware(struct hci_dev *hdev,
+> +				 const unsigned char *data, int fw_len)
+> +{
+> +	struct rtl_download_cmd *dl_cmd;
+> +	int frag_num = fw_len / RTL_FRAG_LEN + 1;
+> +	int frag_len = RTL_FRAG_LEN;
+> +	int ret = 0;
+> +	int i;
+> +
+> +	dl_cmd = kmalloc(sizeof(struct rtl_download_cmd), GFP_KERNEL);
+> +	if (!dl_cmd)
+> +		return -ENOMEM;
+> +
+> +	for (i = 0; i < frag_num; i++) {
+> +		struct rtl_download_response *dl_resp;
+> +		struct sk_buff *skb;
+> +
+> +		BT_DBG("download fw (%d/%d)", i, frag_num);
+
+Extra empty line here after the debug statement.
+
+> +		dl_cmd->index = i;
+> +		if (i == (frag_num - 1)) {
+> +			dl_cmd->index |= 0x80; /* data end */
+> +			frag_len = fw_len % RTL_FRAG_LEN;
+> +		}
+> +		memcpy(dl_cmd->data, data, frag_len);
+> +
+> +		/* Send download command */
+> +		skb = __hci_cmd_sync(hdev, 0xfc20, frag_len + 1, dl_cmd,
+> +				     HCI_INIT_TIMEOUT);
+> +		if (IS_ERR(skb)) {
+> +			BT_ERR("download fw command failed (%ld)",
+> +			       PTR_ERR(skb));
+> +			ret = -PTR_ERR(skb);
+> +			goto out;
+> +		}
+> +
+> +		if (skb->len != sizeof(*dl_resp)) {
+> +			BT_ERR("download fw event length mismatch");
+> +			kfree_skb(skb);
+> +			ret = -EIO;
+> +			goto out;
+> +		}
+> +
+> +		dl_resp = (struct rtl_download_response *) skb->data;
+
+It is not consistent in the current driver, but *)skb->data please. No extra space.
+
+> +		if (dl_resp->status != 0) {
+> +			kfree_skb(skb);
+> +			ret = bt_to_errno(dl_resp->status);
+> +			goto out;
+> +		}
+> +
+> +		kfree_skb(skb);
+> +		data += RTL_FRAG_LEN;
+> +	}
+> +
+> +out:
+> +	kfree(dl_cmd);
+> +	return ret;
+> +}
+> +
+> +static int btusb_setup_rtl8723a(struct hci_dev *hdev)
+> +{
+> +	struct btusb_data *data = dev_get_drvdata(&hdev->dev);
+> +	struct usb_device *udev = interface_to_usbdev(data->intf);
+> +	struct sk_buff *skb;
+> +	struct hci_rp_read_local_version *resp;
+> +	const struct firmware *fw;
+> +	int ret;
+> +
+> +	skb = btusb_read_local_version(hdev);
+> +	if (IS_ERR(skb))
+> +		return -PTR_ERR(skb);
+> +
+> +	resp = (struct hci_rp_read_local_version *) skb->data;
+> +	if (resp->lmp_subver != RTL_ROM_LMP_8723A
+> +			&& resp->lmp_subver != RTL_ROM_LMP_3499) {
+
+Wrong coding style for indentation.
+
+> +		BT_INFO("rtl8723a: assuming no firmware upload needed.");
+> +		kfree_skb(skb);
+> +		return 0;
+> +	}
+> +
+> +	kfree_skb(skb);
+> +
+> +	ret = request_firmware(&fw, "rtl_bt/rtl8723a_fw.bin", &udev->dev);
+> +	if (ret < 0) {
+> +		BT_ERR("Failed to load rtl_bt/rtl8723a_fw.bin");
+> +		return ret;
+> +	}
+> +
+> +	if (fw->size < 8) {
+> +		ret = -EINVAL;
+> +		goto out;
+> +	}
+> +
+> +	/* Check that the firmware doesn't have the epatch signature
+> +	 * (which is only for RTL8723B and newer). */
+> +	if (memcmp(fw->data, RTL_EPATCH_SIGNATURE, 8) == 0) {
+
+Use !memcmp here.
+
+> +		BT_ERR("RTL8723A: unexpected EPATCH signature!");
+> +		ret = -EINVAL;
+> +		goto out;
+> +	}
+> +
+> +	ret = rtl_download_firmware(hdev, fw->data, fw->size);
+> +
+> +out:
+> +	release_firmware(fw);
+> +	return ret;
+> +}
+> +
+> +static int btusb_setup_rtl8723b(struct hci_dev *hdev)
+> +{
+> +	struct btusb_data *data = dev_get_drvdata(&hdev->dev);
+> +	struct usb_device *udev = interface_to_usbdev(data->intf);
+> +	const char *fw_name;
+> +	unsigned char *fw_data;
+> +	u16 lmp_subver;
+> +	const struct firmware *fw;
+> +	struct hci_rp_read_local_version *resp;
+> +	struct sk_buff *skb;
+> +	int ret;
+> +
+> +	skb = btusb_read_local_version(hdev);
+> +	if (IS_ERR(skb))
+> +		return -PTR_ERR(skb);
+> +
+> +	resp = (struct hci_rp_read_local_version *) skb->data;
+> +	if (resp->status) {
+> +		BT_ERR("rtl fw version event failed (%02x)", resp->status);
+> +		kfree_skb(skb);
+> +		return bt_to_errno(resp->status);
+> +	}
+> +
+> +	lmp_subver = resp->lmp_subver;
+
+This is missing endian conversion. My advice is to actually run make C=2.
+
+> +	kfree_skb(skb);
+> +
+> +	switch (lmp_subver) {
+> +	case RTL_ROM_LMP_8723B:
+> +		fw_name = "rtl_bt/rtl8723b_fw.bin";
+> +		break;
+> +	case RTL_ROM_LMP_8821A:
+> +		fw_name = "rtl_bt/rtl8821a_fw.bin";
+> +		break;
+> +	case RTL_ROM_LMP_8761A:
+> +		fw_name = "rtl_bt/rtl8761a_fw.bin";
+> +		break;
+> +	default:
+> +		BT_INFO("rtl8723b: assuming no firmware upload needed.");
+> +		return 0;
+> +	}
+> +
+> +	ret = request_firmware(&fw, fw_name, &udev->dev);
+> +	if (ret < 0) {
+> +		BT_ERR("Failed to load %s", fw_name);
+> +		return ret;
+> +	}
+> +
+> +	ret = rtl8723b_parse_firmware(hdev, lmp_subver, fw, &fw_data);
+> +	if (ret < 0)
+> +		goto out;
+> +
+> +	ret = rtl_download_firmware(hdev, fw_data, ret);
+> +	kfree(fw_data);
+> +	if (ret < 0)
+> +		goto out;
+> +
+> +out:
+> +	release_firmware(fw);
+> +	return ret;
+> +}
+> +
+> struct intel_version {
+> 	u8 status;
+> 	u8 hw_platform;
+> @@ -2732,6 +3158,12 @@ static int btusb_probe(struct usb_interface *intf,
+> 		set_bit(HCI_QUIRK_STRICT_DUPLICATE_FILTER, &hdev->quirks);
+> 	}
+> 
+> +	if (id->driver_info & BTUSB_RTL8723A)
+> +		hdev->setup = btusb_setup_rtl8723a;
+> +
+> +	if (id->driver_info & BTUSB_RTL8723B)
+> +		hdev->setup = btusb_setup_rtl8723b;
+> +
+
+I would really prefer to be able to detect this with a HCI command and not have a long list of chipsets.
+
+> 	if (id->driver_info & BTUSB_AMP) {
+> 		/* AMP controllers do not support SCO packets */
+> 		data->isoc = NULL;
 
 Regards
 
