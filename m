@@ -1,100 +1,58 @@
 Return-Path: <cyrus@holtmann.org>
-From: Bharat Panda <bharat.panda@samsung.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: cpgs@samsung.com, Bharat Panda <bharat.panda@samsung.com>
-Subject: [PATCH v2] tools/gatt-client: print read/write error messages
-Date: Thu, 12 Feb 2015 21:00:46 +0530
-Message-id: <1423755046-7688-1-git-send-email-bharat.panda@samsung.com>
+From: Bharat Bhusan Panda <bharat.panda@samsung.com>
+To: 'Johan Hedberg' <johan.hedberg@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org, cpgs@samsung.com
+References: <1423752296-6763-1-git-send-email-bharat.panda@samsung.com>
+ <20150212145733.GA6577@t440s.P-661HNU-F1>
+In-reply-to: <20150212145733.GA6577@t440s.P-661HNU-F1>
+Subject: RE: [PATCH ] tools/gatt-client: print read/write error messages
+Date: Thu, 12 Feb 2015 20:47:18 +0530
+Message-id: <004e01d046d7$037470a0$0a5d51e0$@samsung.com>
+MIME-version: 1.0
+Content-type: text/plain; charset=us-ascii
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Convert error codes to error messages for read/write value
-error responses.
----
- tools/btgatt-client.c | 49 ++++++++++++++++++++++++++++++++++++++++++++++---
- 1 file changed, 46 insertions(+), 3 deletions(-)
+Hi Johan,
 
-diff --git a/tools/btgatt-client.c b/tools/btgatt-client.c
-index 8bda89b..3dd75b4 100644
---- a/tools/btgatt-client.c
-+++ b/tools/btgatt-client.c
-@@ -74,6 +74,48 @@ static void print_prompt(void)
- 	fflush(stdout);
- }
- 
-+static const char *ecode_to_string(uint8_t ecode)
-+{
-+	switch (ecode) {
-+	case BT_ATT_ERROR_INVALID_HANDLE:
-+		return "Invalid Handle";
-+	case BT_ATT_ERROR_READ_NOT_PERMITTED:
-+		return "Read Not Permitted";
-+	case BT_ATT_ERROR_WRITE_NOT_PERMITTED:
-+		return "Write Not Permitted";
-+	case BT_ATT_ERROR_INVALID_PDU:
-+		return "Invalid PDU";
-+	case BT_ATT_ERROR_AUTHENTICATION:
-+		return "Authentication Required";
-+	case BT_ATT_ERROR_REQUEST_NOT_SUPPORTED:
-+		return "Request Not Supported";
-+	case BT_ATT_ERROR_INVALID_OFFSET:
-+		return "Invalid Offset";
-+	case BT_ATT_ERROR_AUTHORIZATION:
-+		return "Authorization Required";
-+	case BT_ATT_ERROR_PREPARE_QUEUE_FULL:
-+		return "Prepare Write Queue Full";
-+	case BT_ATT_ERROR_ATTRIBUTE_NOT_FOUND:
-+		return "Attribute Not Found";
-+	case BT_ATT_ERROR_ATTRIBUTE_NOT_LONG:
-+		return "Attribute Not Long";
-+	case BT_ATT_ERROR_INSUFFICIENT_ENCRYPTION_KEY_SIZE:
-+		return "Insuficient Encryption Key Size";
-+	case BT_ATT_ERROR_INVALID_ATTRIBUTE_VALUE_LEN:
-+		return "Invalid Attribute value len";
-+	case BT_ATT_ERROR_UNLIKELY:
-+		return "Unlikely Error";
-+	case BT_ATT_ERROR_INSUFFICIENT_ENCRYPTION:
-+		return "Insufficient Encryption";
-+	case BT_ATT_ERROR_UNSUPPORTED_GROUP_TYPE:
-+		return "Group type Not Supported";
-+	case BT_ATT_ERROR_INSUFFICIENT_RESOURCES:
-+		return "Insufficient Resources";
-+	default:
-+		return "Unknown error type";
-+	}
-+}
-+
- static void att_disconnect_cb(int err, void *user_data)
- {
- 	printf("Device disconnected: %s\n", strerror(err));
-@@ -489,7 +531,8 @@ static void read_cb(bool success, uint8_t att_ecode, const uint8_t *value,
- 	int i;
- 
- 	if (!success) {
--		PRLOG("\nRead request failed: 0x%02x\n", att_ecode);
-+		PRLOG("\nRead request failed: %s\n",
-+				ecode_to_string(att_ecode));
- 		return;
- 	}
- 
-@@ -596,7 +639,7 @@ static void write_cb(bool success, uint8_t att_ecode, void *user_data)
- 	if (success) {
- 		PRLOG("\nWrite successful\n");
- 	} else {
--		PRLOG("\nWrite failed: 0x%02x\n", att_ecode);
-+		PRLOG("\nWrite failed: %s\n", ecode_to_string(att_ecode));
- 	}
- }
- 
-@@ -726,7 +769,7 @@ static void write_long_cb(bool success, bool reliable_error, uint8_t att_ecode,
- 	} else if (reliable_error) {
- 		PRLOG("Reliable write not verified\n");
- 	} else {
--		PRLOG("Write failed: 0x%02x\n", att_ecode);
-+		PRLOG("\nWrite failed: %s\n", ecode_to_string(att_ecode));
- 	}
- }
- 
--- 
-1.9.1
+> -----Original Message-----
+> From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-
+> owner@vger.kernel.org] On Behalf Of Johan Hedberg
+> Sent: Thursday, February 12, 2015 8:28 PM
+> To: Bharat Panda
+> Cc: linux-bluetooth@vger.kernel.org; cpgs@samsung.com
+> Subject: Re: [PATCH ] tools/gatt-client: print read/write error messages
+> 
+> Hi Bharat,
+> 
+> On Thu, Feb 12, 2015, Bharat Panda wrote:
+> > +static char *ecode_to_string(uint8_t ecode)
+> 
+> This should be static const char *
+> 
+> > +{
+> > +	char *err = NULL;
+> > +
+> > +	switch (ecode) {
+> > +		case BT_ATT_ERROR_INVALID_HANDLE:
+> > +			err = "ERROR: Invalid Handle";
+> > +			break;
+> 
+> First of all, please follow the coding style: the case statement should
+start at
+> the same indentation as the switch. Secondly, you can make this all more
+> compact by removing the err variable:
+> 
+> 	case BT_ATT_ERROR_INVALID_HANDLE:
+> 		return "Invalid Handle";
+> 	case ...:
+> 		return "...";
+I have incorporated above review comments and submitted another version of
+the patch.
+
+Thanks.
+
+Best Regards,
+Bharat 
+
 
