@@ -1,47 +1,86 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 12 Feb 2015 22:02:10 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Szymon Janc <szymon.janc@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/2] tools/btmgmt: Fix crash in completion in interactive
- mode
-Message-ID: <20150212200210.GA10096@t440s.P-661HNU-F1>
-References: <1423758644-3122-1-git-send-email-szymon.janc@tieto.com>
-MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1423758644-3122-1-git-send-email-szymon.janc@tieto.com>
+Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2070.6\))
+Subject: Re: [PATCH 2/2] Bluetooth: Add device shutdown routine for Intel Bluetooth device
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20150205114408.7c50ab05@tedd-test>
+Date: Thu, 12 Feb 2015 11:49:31 -0800
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>
+Message-Id: <B6C686CB-66CB-4EE7-9085-61DFF90C2471@holtmann.org>
+References: <20150205114408.7c50ab05@tedd-test>
+To: Tedd Ho-Jeong An <tedd.an@intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Szymon,
+Hi Tedd,
 
-On Thu, Feb 12, 2015, Szymon Janc wrote:
-> Use separate indexes while iterating over all_cmd and interactive_cmd.
-> Fix following crash:
+> This patch adds the device shutdown routine for Intel Bluetooth device.
 > 
-> [mgmt]# ==2224== Invalid read of size 1
-> ==2224==    at 0x4A092F2: strlen (in /usr/lib64/valgrind/vgpreload_memcheck-amd64-linux.so)
-> ==2224==    by 0x323C8860AD: strdup (in /usr/lib64/libc-2.18.so)
-> ==2224==    by 0x323EC1D550: rl_completion_matches (in /usr/lib64/libreadline.so.6.2)
-> ==2224==    by 0x402BBC: cmd_completion (btmgmt.c:3427)
-> ==2224==    by 0x323EC1D608: ??? (in /usr/lib64/libreadline.so.6.2)
-> ==2224==    by 0x323EC1D783: rl_complete_internal (in /usr/lib64/libreadline.so.6.2)
-> ==2224==    by 0x323EC156DD: _rl_dispatch_subseq (in /usr/lib64/libreadline.so.6.2)
-> ==2224==    by 0x323EC159FF: readline_internal_char (in /usr/lib64/libreadline.so.6.2)
-> ==2224==    by 0x323EC2AB6C: rl_callback_read_char (in /usr/lib64/libreadline.so.6.2)
-> ==2224==    by 0x4032E8: prompt_read (btmgmt.c:3551)
-> ==2224==    by 0x419048: io_callback (io-mainloop.c:123)
-> ==2224==    by 0x419842: mainloop_run (mainloop.c:157)
-> ==2224==  Address 0x68 is not stack'd, malloc'd or (recently) free'd
+> Some platforms have BT LED issue with Intel Bluetooth device that BT LED goes
+> off 5 seconds after BT is turned off
+> 
+> For Intel Bluetooth device, the BT LED is turned off when:
+> - there is no active connection or radio activity
+> - USB is suspend
+> 
+> So, when the BT is turned off, it takes 5 seconds because USB suspend timeone
+> is 5 seconds by default. And if the USB suspend is not enabled, BT LED won't be
+> turned off.
+> 
+> To fix this issue, recently Intel Bluetooth firmware patch had been submitted
+> to turn off the BT LED explicitly by the vendor specific command(0xFC3F). And
+> this patch sends this command to the device before closing the device.
+> 
+> For backward compatibility of this command  with old firmware, this command was
+> supported before, but it behaves same as HCI_RESET internally. So, it won't be
+> the problem even if the system doesn't have the latest firmware patch.
+> 
+> Signed-off-by: Tedd Ho-Jeong An <tedd.an@intel.com>
 > ---
->  tools/btmgmt.c | 13 +++++++------
->  1 file changed, 7 insertions(+), 6 deletions(-)
+> drivers/bluetooth/btusb.c | 18 ++++++++++++++++++
+> 1 file changed, 18 insertions(+)
+> 
+> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+> index b876888..e0f8a15 100644
+> --- a/drivers/bluetooth/btusb.c
+> +++ b/drivers/bluetooth/btusb.c
+> @@ -2331,6 +2331,23 @@ static int btusb_set_bdaddr_intel(struct hci_dev *hdev, const bdaddr_t *bdaddr)
+> 	return 0;
+> }
+> 
+> +static int btusb_shutdown_intel(struct hci_dev *hdev)
+> +{
+> +	struct sk_buff *skb;
+> +	long ret;
+> +
 
-This patch has been applied. Thanks.
+please add a comment on why we are doing this and what it does. I know you have it in the commit message, but I think an extra one would be helpful here.
 
-For your second patch I went actually in the other directions and used
-NELEM() everywhere. I prefer that since it's a stronger guarantee of the
-table length than having to remember to put an empty element at the end
-of it.
+> +	skb = __hci_cmd_sync(hdev, 0xfc3f, 0, NULL, HCI_INIT_TIMEOUT);
+> +	if (IS_ERR(skb)) {
+> +		ret = PTR_ERR(skb);
+> +		BT_ERR("%s: turning off Intel device LED failed (%ld)",
+> +		       hdev->name, ret);
+> +		return ret;
+> +	}
+> +	kfree_skb(skb);
+> +
+> +	return 0;
+> +}
+> +
+> static int btusb_set_bdaddr_marvell(struct hci_dev *hdev,
+> 				    const bdaddr_t *bdaddr)
+> {
+> @@ -2709,6 +2726,7 @@ static int btusb_probe(struct usb_interface *intf,
+> 	if (id->driver_info & BTUSB_INTEL) {
+> 		hdev->setup = btusb_setup_intel;
+> 		hdev->set_bdaddr = btusb_set_bdaddr_intel;
+> +		hdev->shutdown = btusb_shutdown_intel;
 
-Johan
+Please sort it after setup().
+
+Regards
+
+Marcel
+
