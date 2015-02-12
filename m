@@ -1,252 +1,149 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <201412241941.56927@pali>
-References: <201412241815.12922@pali>
-	<201412241932.27264@pali>
-	<20141224183737.GA21428@t440s.P-661HNU-DI-F1>
-	<201412241941.56927@pali>
-Date: Thu, 12 Feb 2015 19:22:42 +0800
-Message-ID: <CAAAJ3CKFJ38pZF6WSD495W8JQmxBs1NcBDnag1q4qWhUE2_5qQ@mail.gmail.com>
-Subject: Re: 3.19-rc1 refuse connection from bluetooth headset
-From: Ethan <ethancsge@gmail.com>
-To: =?UTF-8?Q?Pali_Roh=C3=A1r?= <pali.rohar@gmail.com>
-Cc: Johan Hedberg <johan.hedberg@gmail.com>, Marcel Holtmann <marcel@holtmann.org>,
-	Gustavo Padovan <gustavo@padovan.org>, linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Content-Type: multipart/alternative; boundary=001a1139cfa8a9bc0d050ee25663
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [RFC] android/avdtp: Fix SEID assignment
+Date: Thu, 12 Feb 2015 13:00:18 +0200
+Message-Id: <1423738818-30130-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
---001a1139cfa8a9bc0d050ee25663
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Hi Johan,
+Fixes SEID generation for avdtp. Currently SEIDs were assigned assuming
+that SEID are registered and unregistered in the same order like:
+seid = g_slist_length(seps) + 1
+which makes it possible to reuse similar SEIDs
+---
+ android/avdtp.c   | 32 +++++++++++++++++++++++++++++---
+ unit/test-avdtp.c | 33 +++++++++++++++++++++++++++++++++
+ 2 files changed, 62 insertions(+), 3 deletions(-)
 
-I met similar issue in kernel 3.10 for Chromebook smart lock feature, I
-have merged your patch but issue still happened.
+diff --git a/android/avdtp.c b/android/avdtp.c
+index 22c492b..20f27d4 100644
+--- a/android/avdtp.c
++++ b/android/avdtp.c
+@@ -45,6 +45,7 @@
+ #include "../profiles/audio/a2dp-codecs.h"
+ 
+ #define MAX_SEID 0x3E
++static uint64_t seids;
+ 
+ #ifndef MAX
+ # define MAX(x, y) ((x) > (y) ? (x) : (y))
+@@ -3350,20 +3351,44 @@ int avdtp_delay_report(struct avdtp *session, struct avdtp_stream *stream,
+ 							&req, sizeof(req));
+ }
+ 
++static uint8_t avdtp_get_seid(void)
++{
++	uint64_t temp = seids;
++	uint8_t id = 1;
++
++	while (temp >>= 1)
++		id++;
++
++	if (id > MAX_SEID)
++		return 0;
++
++	seids |= (uint64_t) (0x01l << id);
++
++	DBG("seids 0x%04lx id %d", seids, id);
++
++	return id;
++}
++
++static void avdtp_clear_seid(uint8_t seid)
++{
++	seids &= ~(0x1l<<seid);
++
++	DBG("seids 0x%04lx cleared bit %d ", seids, seid);
++}
++
+ struct avdtp_local_sep *avdtp_register_sep(uint8_t type, uint8_t media_type,
+ 						uint8_t codec_type,
+ 						gboolean delay_reporting,
+ 						struct avdtp_sep_ind *ind,
+ 						struct avdtp_sep_cfm *cfm,
+-						void *user_data,
+-						uint8_t seid)
++						void *user_data, uint8_t seid)
+ {
+ 	struct avdtp_local_sep *sep;
+ 
+ 	sep = g_new0(struct avdtp_local_sep, 1);
+ 
+ 	sep->state = AVDTP_STATE_IDLE;
+-	sep->info.seid = seid;
++	sep->info.seid = avdtp_get_seid();
+ 	sep->info.type = type;
+ 	sep->info.media_type = media_type;
+ 	sep->codec = codec_type;
+@@ -3396,6 +3421,7 @@ int avdtp_unregister_sep(struct avdtp_local_sep *sep)
+ 	DBG("SEP %p unregistered: type:%d codec:%d seid:%d", sep,
+ 			sep->info.type, sep->codec, sep->info.seid);
+ 
++	avdtp_clear_seid(sep->info.seid);
+ 	g_free(sep);
+ 
+ 	return 0;
+diff --git a/unit/test-avdtp.c b/unit/test-avdtp.c
+index 03fd4b1..00b72f1 100644
+--- a/unit/test-avdtp.c
++++ b/unit/test-avdtp.c
+@@ -39,6 +39,8 @@
+ #include "src/log.h"
+ #include "android/avdtp.h"
+ 
++#define MAX_SEID 0x3E
++
+ GSList *lseps = NULL;
+ 
+ struct test_pdu {
+@@ -567,6 +569,35 @@ static void test_server_0_sep(gconstpointer data)
+ 	execute_context(context);
+ }
+ 
++static void unregister_sep(gpointer data, gpointer user_data)
++{
++	struct avdtp_local_sep *sep = data;
++
++	lseps = g_slist_remove(lseps, sep);
++	avdtp_unregister_sep(sep);
++}
++
++static void test_server_seid(gconstpointer data)
++{
++	struct context *context = create_context(0x0103, data);
++	struct avdtp_local_sep *sep;
++	int i;
++
++	for (i = 0; i < MAX_SEID; i++) {
++		sep = avdtp_register_sep(AVDTP_SEP_TYPE_SINK,
++						AVDTP_MEDIA_TYPE_AUDIO,
++						0x00, TRUE, &sep_ind, NULL,
++						context,
++						g_slist_length(lseps) + 1);
++		g_assert(sep);
++
++		lseps = g_slist_append(lseps, sep);
++		avdtp_set_lseps(context->session, lseps);
++	}
++
++	g_slist_foreach(lseps, unregister_sep, NULL);
++}
++
+ static gboolean sep_getcap_ind_frg(struct avdtp *session,
+ 					struct avdtp_local_sep *sep,
+ 					GSList **caps, uint8_t *err,
+@@ -774,6 +805,8 @@ int main(int argc, char *argv[])
+ 	 * To verify that the following procedures are implemented according to
+ 	 * their specification in AVDTP.
+ 	 */
++	define_test("/TP/SIG/SMG/BV-06-C-SEID-1", test_server_seid,
++			raw_pdu(0x00));
+ 	define_test("/TP/SIG/SMG/BV-05-C", test_client,
+ 			raw_pdu(0x00, 0x01));
+ 	define_test("/TP/SIG/SMG/BV-06-C", test_server,
+-- 
+2.1.0
 
-Also, issue was unable to reproduce once I remove the code as below, thanks=
-.
-
-#if 0
-        /* Require HCI_CONNECTABLE or a whitelist entry to accept the
-         * connection. These features are only touched through mgmt so
-         * only do the checks if HCI_MGMT is set.
-         */
-        if (test_bit(HCI_MGMT, &hdev->dev_flags) &&
-            !test_bit(HCI_CONNECTABLE, &hdev->dev_flags) &&
-            !hci_bdaddr_list_lookup(&hdev->whitelist, &ev->bdaddr,
-                                    BDADDR_BREDR)) {
-                    hci_reject_conn(hdev, &ev->bdaddr);
-                    return;
-        }
-
-#endif
-
-> HCI Event: Connect Request (0x04) plen 10                                =
-                                                        [hci0] 109.033033
-        Address: BC:F5:AC:70:16:D3 (OUI BC-F5-AC)
-        Class: 0x5a020c
-          Major class: Phone (cellular, cordless, payphone, modem)
-          Minor class: Smart phone
-          Networking (LAN, Ad hoc)
-          Capturing (Scanner, Microphone)
-          Object Transfer (v-Inbox, v-Folder)
-          Telephony (Cordless telephony, Modem, Headset)
-        Link type: ACL (0x01)
-< HCI Command: Reject Connection Request (0x01|0x000a) plen 7
-                                                            [hci0]
-109.033253
-        Address: BC:F5:AC:70:16:D3 (OUI BC-F5-AC)
-        Reason: Connection Rejected due to Unacceptable BD_ADDR (0x0f)
-> HCI Event: Command Status (0x0f) plen 4                                  =
-                                                        [hci0] 109.034026
-      Reject Connection Request (0x01|0x000a) ncmd 1
-        Status: Success (0x00)
-> HCI Event: Connect Complete (0x03) plen 11                               =
-                                                        [hci0] 109.116034
-        Status: Connection Rejected due to Unacceptable BD_ADDR (0x0f)
-        Handle: 65535
-        Address: BC:F5:AC:70:16:D3 (OUI BC-F5-AC)
-        Link type: ACL (0x01)
-        Encryption: Disabled (0x00)
-> HCI Event: Connect Request (0x04) plen 10                                =
-                                                        [hci0] 110.159024
-        Address: BC:F5:AC:70:16:D3 (OUI BC-F5-AC)
-        Class: 0x5a020c
-          Major class: Phone (cellular, cordless, payphone, modem)
-          Minor class: Smart phone
-          Networking (LAN, Ad hoc)
-          Capturing (Scanner, Microphone)
-          Object Transfer (v-Inbox, v-Folder)
-          Telephony (Cordless telephony, Modem, Headset)
-        Link type: ACL (0x01)
-< HCI Command: Reject Connection Request (0x01|0x000a) plen 7
-                                                            [hci0]
-110.159079
-        Address: BC:F5:AC:70:16:D3 (OUI BC-F5-AC)
-        Reason: Connection Rejected due to Unacceptable BD_ADDR (0x0f)
-> HCI Event: Command Status (0x0f) plen 4                                  =
-                                                        [hci0] 110.160018
-      Reject Connection Request (0x01|0x000a) ncmd 1
-        Status: Success (0x00)
-> HCI Event: Connect Complete (0x03) plen 11                               =
-                                                        [hci0] 110.248103
-        Status: Connection Rejected due to Unacceptable BD_ADDR (0x0f)
-        Handle: 65535
-        Address: BC:F5:AC:70:16:D3 (OUI BC-F5-AC)
-        Link type: ACL (0x01)
-        Encryption: Disabled (0x00)
-
-Ethan
-
-2014-12-25 2:41 GMT+08:00 Pali Roh=C3=A1r <pali.rohar@gmail.com>:
-
-> On Wednesday 24 December 2014 19:37:37 Johan Hedberg wrote:
-> > Hi Pali,
-> >
-> > On Wed, Dec 24, 2014, Pali Roh=C3=A1r wrote:
-> > > > Could you try the attached patch? I think the reason might
-> > > > be the dependence on the HCI_CONNECTABLE flag that's only
-> > > > set if the page scan was enabled through mgmt (which
-> > > > wouldn't be the case with BlueZ 4.98).
-> > > >
-> > > > Johan
-> > >
-> > > Hi Johan! Thanks for quick reply. Your patch fixes my
-> > > problem and auto-connection of my bluetooth headset is
-> > > working again. Will you forward patch to mainline kernel?
-> >
-> > Yes, we'll tag it from 3.17.x onwards where this was
-> > introduced.
-> >
-> > Johan
->
-> Ok, you can add my Tested-by line to patch.
->
-> --
-> Pali Roh=C3=A1r
-> pali.rohar@gmail.com
->
-
---001a1139cfa8a9bc0d050ee25663
-Content-Type: text/html; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-
-<div dir=3D"ltr"><div><div>Hi Johan,<br><br></div>I met similar issue in ke=
-rnel 3.10 for Chromebook smart lock feature, I have merged your patch but i=
-ssue still happened.<br><br></div>Also, issue was unable to reproduce once =
-I remove the code as below, thanks.<br><div><br></div><div>#if 0<br></div><=
-div>=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /* Require HCI_CONNECTABLE o=
-r a whitelist entry to accept the<br>=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0 * connection. These features are only touched through mgmt so<=
-br>=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * only do the checks if=
- HCI_MGMT is set.<br>=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 */<br=
->=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (test_bit(HCI_MGMT, &amp;hde=
-v-&gt;dev_flags) &amp;&amp;<br>=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0 !test_bit(HCI_CONNECTABLE, &amp;hdev-&gt;dev_flags=
-) &amp;&amp;<br>=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0 !hci_bdaddr_list_lookup(&amp;hdev-&gt;whitelist, &amp;ev-&gt;bdad=
-dr,<br>=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 BDADD=
-R_BREDR)) {<br>=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 hci_reject_conn(hdev=
-, &amp;ev-&gt;bdaddr);<br>=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return;<=
-br>=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }<br><br></div><div>#endif<br=
-></div><div><br><pre style=3D"color:rgb(0,0,0)">&gt; HCI Event: Connect Req=
-uest (0x04) plen 10                                                        =
-                                [hci0] 109.033033
-        Address: BC:F5:AC:70:16:D3 (OUI BC-F5-AC)
-        Class: 0x5a020c
-          Major class: Phone (cellular, cordless, payphone, modem)
-          Minor class: Smart phone
-          Networking (LAN, Ad hoc)
-          Capturing (Scanner, Microphone)
-          Object Transfer (v-Inbox, v-Folder)
-          Telephony (Cordless telephony, Modem, Headset)
-        Link type: ACL (0x01)
-&lt; HCI Command: Reject Connection Request (0x01|0x000a) plen 7           =
-                                                           [hci0] 109.03325=
-3
-        Address: BC:F5:AC:70:16:D3 (OUI BC-F5-AC)
-        Reason: Connection Rejected due to Unacceptable BD_ADDR (0x0f)
-&gt; HCI Event: Command Status (0x0f) plen 4                               =
-                                                           [hci0] 109.03402=
-6
-      Reject Connection Request (0x01|0x000a) ncmd 1
-        Status: Success (0x00)
-&gt; HCI Event: Connect Complete (0x03) plen 11                            =
-                                                           [hci0] 109.11603=
-4
-        Status: Connection Rejected due to Unacceptable BD_ADDR (0x0f)
-        Handle: 65535
-        Address: BC:F5:AC:70:16:D3 (OUI BC-F5-AC)
-        Link type: ACL (0x01)
-        Encryption: Disabled (0x00)
-&gt; HCI Event: Connect Request (0x04) plen 10                             =
-                                                           [hci0] 110.15902=
-4
-        Address: BC:F5:AC:70:16:D3 (OUI BC-F5-AC)
-        Class: 0x5a020c
-          Major class: Phone (cellular, cordless, payphone, modem)
-          Minor class: Smart phone
-          Networking (LAN, Ad hoc)
-          Capturing (Scanner, Microphone)
-          Object Transfer (v-Inbox, v-Folder)
-          Telephony (Cordless telephony, Modem, Headset)
-        Link type: ACL (0x01)
-&lt; HCI Command: Reject Connection Request (0x01|0x000a) plen 7           =
-                                                           [hci0] 110.15907=
-9
-        Address: BC:F5:AC:70:16:D3 (OUI BC-F5-AC)
-        Reason: Connection Rejected due to Unacceptable BD_ADDR (0x0f)
-&gt; HCI Event: Command Status (0x0f) plen 4                               =
-                                                           [hci0] 110.16001=
-8
-      Reject Connection Request (0x01|0x000a) ncmd 1
-        Status: Success (0x00)
-&gt; HCI Event: Connect Complete (0x03) plen 11                            =
-                                                           [hci0] 110.24810=
-3
-        Status: Connection Rejected due to Unacceptable BD_ADDR (0x0f)
-        Handle: 65535
-        Address: BC:F5:AC:70:16:D3 (OUI BC-F5-AC)
-        Link type: ACL (0x01)
-        Encryption: Disabled (0x00)</pre>Ethan<br></div></div><div class=3D=
-"gmail_extra"><br><div class=3D"gmail_quote">2014-12-25 2:41 GMT+08:00 Pali=
- Roh=C3=A1r <span dir=3D"ltr">&lt;<a href=3D"mailto:pali.rohar@gmail.com" t=
-arget=3D"_blank">pali.rohar@gmail.com</a>&gt;</span>:<br><blockquote class=
-=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1px #ccc solid;padd=
-ing-left:1ex"><span class=3D"">On Wednesday 24 December 2014 19:37:37 Johan=
- Hedberg wrote:<br>
-&gt; Hi Pali,<br>
-&gt;<br>
-&gt; On Wed, Dec 24, 2014, Pali Roh=C3=A1r wrote:<br>
-&gt; &gt; &gt; Could you try the attached patch? I think the reason might<b=
-r>
-&gt; &gt; &gt; be the dependence on the HCI_CONNECTABLE flag that&#39;s onl=
-y<br>
-&gt; &gt; &gt; set if the page scan was enabled through mgmt (which<br>
-&gt; &gt; &gt; wouldn&#39;t be the case with BlueZ 4.98).<br>
-&gt; &gt; &gt;<br>
-&gt; &gt; &gt; Johan<br>
-&gt; &gt;<br>
-&gt; &gt; Hi Johan! Thanks for quick reply. Your patch fixes my<br>
-&gt; &gt; problem and auto-connection of my bluetooth headset is<br>
-&gt; &gt; working again. Will you forward patch to mainline kernel?<br>
-&gt;<br>
-&gt; Yes, we&#39;ll tag it from 3.17.x onwards where this was<br>
-&gt; introduced.<br>
-&gt;<br>
-&gt; Johan<br>
-<br>
-</span>Ok, you can add my Tested-by line to patch.<br>
-<span class=3D"HOEnZb"><font color=3D"#888888"><br>
---<br>
-Pali Roh=C3=A1r<br>
-<a href=3D"mailto:pali.rohar@gmail.com">pali.rohar@gmail.com</a><br>
-</font></span></blockquote></div><br></div>
-
---001a1139cfa8a9bc0d050ee25663--
