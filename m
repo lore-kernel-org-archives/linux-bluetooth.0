@@ -1,46 +1,88 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <000f01d046d2$2e1048c0$8a30da40$@samsung.com>
-References: <000f01d046d2$2e1048c0$8a30da40$@samsung.com>
-Date: Thu, 12 Feb 2015 17:06:41 +0200
-Message-ID: <CABBYNZJxyro_85TcGorD1u=moZUSKRYhM6pERW=u=ncT+uDCxA@mail.gmail.com>
-Subject: Re: Query reagrding the MAS Instance Information Support patchset
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Gowtham Anandha Babu <gowtham.ab@samsung.com>
+In-Reply-To: <CABBYNZ+ccNzOHpAgj+3dCO6uyS_ZgH6GqGi-dh57vT1r+BpMrA@mail.gmail.com>
+References: <1423599385-36295-1-git-send-email-jamuraa@chromium.org>
+	<1423599385-36295-10-git-send-email-jamuraa@chromium.org>
+	<CABBYNZJQf3CXJff=UfdTDh6eNU50VWu14BQ=3FTbsXR3jy7RbA@mail.gmail.com>
+	<CABBYNZL-+ZTH9XhWA3vShh=3npJy2_Gx5U+UycB3qu_T-ZUrWg@mail.gmail.com>
+	<CAJLTA8gawvTAU5xG6=_A=2NEDLTPL3_GRALUdUs-aW0DzXgbbQ@mail.gmail.com>
+	<CABBYNZ+ccNzOHpAgj+3dCO6uyS_ZgH6GqGi-dh57vT1r+BpMrA@mail.gmail.com>
+Date: Thu, 12 Feb 2015 07:00:52 -0800
+Message-ID: <CAJLTA8hknDCgcviLk9RVd-uqaK2tVOEfREk2dCUh77xU2ytjQA@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 0/8] Implement Notification / Indication TS Tests
+From: Michael Janssen <jamuraa@chromium.org>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Gowtham,
+Hi Luiz,
 
-On Thu, Feb 12, 2015 at 4:42 PM, Gowtham Anandha Babu
-<gowtham.ab@samsung.com> wrote:
-> Hi Luiz,
+On Thu, Feb 12, 2015 at 5:38 AM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> Hi Michael,
 >
-> I have submitted a patch set to add support for MAP MAS Instance feature on
-> the month of October. Below are the links.
-> http://thread.gmane.org/gmane.linux.bluez.kernel/54106
-> http://article.gmane.org/gmane.linux.bluez.kernel/53974
-> http://article.gmane.org/gmane.linux.bluez.kernel/53975
-> http://article.gmane.org/gmane.linux.bluez.kernel/53976
-> http://article.gmane.org/gmane.linux.bluez.kernel/53977
-> http://thread.gmane.org/gmane.linux.bluez.kernel/54110
-> http://article.gmane.org/gmane.linux.bluez.kernel/53979
+> On Thu, Feb 12, 2015 at 12:20 AM, Michael Janssen <jamuraa@chromium.org> wrote:
+>> Hi Luiz,
+>>
+>> On Wed, Feb 11, 2015 at 5:47 AM, Luiz Augusto von Dentz
+>> <luiz.dentz@gmail.com> wrote:
+>>> Hi,
+>>>
+>>> On Wed, Feb 11, 2015 at 3:30 PM, Luiz Augusto von Dentz
+>>> <luiz.dentz@gmail.com> wrote:
+>>>> Hi Michael,
+>>>>
+>>>> On Tue, Feb 10, 2015 at 10:16 PM, Michael Janssen <jamuraa@chromium.org> wrote:
+>>>>> Implements the four defined tests around the Notification and Indication
+>>>>> functionality in the unit tests.  Also includes some fixes to discovery when
+>>>>> no handles could be found (services with no handles).
+>>>>>
+>>>>> Also adds some functionality to the unit testing, to support when there is no
+>>>>> action required by the client and/or the server in a test, and checks for
+>>>>> post data transmission.
+>>>>>
+>>>>> --
+>>>>
+>>>> Applied, thanks.
+>>>
+>>> I gather the following number from the latest TS:
+>>>
+>>> Group                       Client                          Server
+>>> Configuration             100% (1 / 1)                100% (1 / 1)
+>>> Discovery                  75% (6 / 8)                  75% (6 / 8)
+>>> Read                         57.5% (23 / 40)           47.6% (20 / 42)
+>>> Write                        0% (0 / 40)                  0% (0 / 40)
+>>> Notification/Indication 50% (1 / 2)                  50% (1 / 2)
+>>> Services                    0% (0 / 1)                   0% (0 / 1)
+>>> Timeouts                   0% (0 / 2)                   0% (0 / 1)
+>>> Attributes                  0% (0 / 10)                  0% (0 / 10)
+>>> Total                         29.8% (31 / 104)         26.7% 28 / 105
+>>>
+>>> *I did not compute any extra tests we are doing, like small vs large
+>>> databases, still these numbers are quite low.
+>>>
+>>> --
+>>> Luiz Augusto von Dentz
+>>
+>> How do you obtain these numbers?  I would like to fix the tests that
+>> are not showing up.  All four of the Notification / Indication ones
+>> for example were just committed, so two are not tracking in this
+>> report.  I believe the read and Discovery ones are low as well.
 >
-> But the suggestion provided was to wait until the Multiple MAS Instance
-> support.
-> Why can't we implement the multiple MAS Instance support on top of this?
-> Some fixes and cleanups are needed in the above submitted patches. I will
-> fix that.
-> Shall I resend the same?
-> What do you think?
+> Yep, I had not realize the group actually have two different suffixes,
+> GAN and GAI, anyway that adds just 2 test to the coverage.
+>
+>> Also, theoretically all the server tests should be run against as many
+>> of the 4 databases that are specified in the TS.  I was planning on
+>> only the small and single large to start, and come back to the other
+>> two large databases later if possible.
+>
+> That are duplicates, Im not taking into account them here since I want
+> to know how much the TS we are covering not the total number of tests.
 
-I still have plans to implement the folder structure as I mentioned,
-this would basically mean no API changes are needed, this would
-conflict with your changes. I have been some patches for this already
-which should be ready for submission next week.
-
-
--- 
-Luiz Augusto von Dentz
+So these are just manually checking for each test that is written?  If
+that's the case then would it be useful to note why some of the tests
+are not in, because it's missing functionality sometimes (for
+encryption / authorization / authentication read tests for example).
