@@ -1,103 +1,100 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
+From: Bharat Panda <bharat.panda@samsung.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH 2/2] tools/btmgmt: Handle commands tables in consistent way
-Date: Thu, 12 Feb 2015 17:30:44 +0100
-Message-Id: <1423758644-3122-2-git-send-email-szymon.janc@tieto.com>
-In-Reply-To: <1423758644-3122-1-git-send-email-szymon.janc@tieto.com>
-References: <1423758644-3122-1-git-send-email-szymon.janc@tieto.com>
+Cc: cpgs@samsung.com, Bharat Panda <bharat.panda@samsung.com>
+Subject: [PATCH v2] tools/gatt-client: print read/write error messages
+Date: Thu, 12 Feb 2015 21:00:46 +0530
+Message-id: <1423755046-7688-1-git-send-email-bharat.panda@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-In some places commands tables were accessed by fixed element count
-and in some places it was assumed that last element is zeroed.
-
-This could lead to accessing invalid memory since tables were
-not terminated with zeroed element (I couldn't crash the tool but
-this is most likely only due to static memory being zeroed).
-
-Be consistent and terminate arrays with zeroed element and use this
-for iterating.
+Convert error codes to error messages for read/write value
+error responses.
 ---
- tools/btmgmt.c | 19 ++++++++++---------
- 1 file changed, 10 insertions(+), 9 deletions(-)
+ tools/btgatt-client.c | 49 ++++++++++++++++++++++++++++++++++++++++++++++---
+ 1 file changed, 46 insertions(+), 3 deletions(-)
 
-diff --git a/tools/btmgmt.c b/tools/btmgmt.c
-index 0686ed6..c8fc9f6 100644
---- a/tools/btmgmt.c
-+++ b/tools/btmgmt.c
-@@ -3289,6 +3289,7 @@ static struct cmd_info all_cmd[] = {
- 	{ "add-device", cmd_add_device, "Add Device"			},
- 	{ "del-device", cmd_del_device, "Remove Device"			},
- 	{ "clr-devices",cmd_clr_devices,"Clear Devices"			},
-+	{ }
- };
- 
- static void cmd_quit(struct mgmt *mgmt, uint16_t index,
-@@ -3371,6 +3372,7 @@ static struct cmd_info interactive_cmd[] = {
- 	{ "quit",	cmd_quit,	"Exit program"			},
- 	{ "exit",	cmd_quit,	"Exit program"			},
- 	{ "help",	NULL,		"List supported commands"	},
-+	{ }
- };
- 
- static char *cmd_generator(const char *text, int state)
-@@ -3432,12 +3434,11 @@ static char **cmd_completion(const char *text, int start, int end)
- 	return matches;
+diff --git a/tools/btgatt-client.c b/tools/btgatt-client.c
+index 8bda89b..3dd75b4 100644
+--- a/tools/btgatt-client.c
++++ b/tools/btgatt-client.c
+@@ -74,6 +74,48 @@ static void print_prompt(void)
+ 	fflush(stdout);
  }
  
--static struct cmd_info *find_cmd(const char *cmd, struct cmd_info table[],
--							size_t cmd_count)
-+static struct cmd_info *find_cmd(const char *cmd, struct cmd_info table[])
++static const char *ecode_to_string(uint8_t ecode)
++{
++	switch (ecode) {
++	case BT_ATT_ERROR_INVALID_HANDLE:
++		return "Invalid Handle";
++	case BT_ATT_ERROR_READ_NOT_PERMITTED:
++		return "Read Not Permitted";
++	case BT_ATT_ERROR_WRITE_NOT_PERMITTED:
++		return "Write Not Permitted";
++	case BT_ATT_ERROR_INVALID_PDU:
++		return "Invalid PDU";
++	case BT_ATT_ERROR_AUTHENTICATION:
++		return "Authentication Required";
++	case BT_ATT_ERROR_REQUEST_NOT_SUPPORTED:
++		return "Request Not Supported";
++	case BT_ATT_ERROR_INVALID_OFFSET:
++		return "Invalid Offset";
++	case BT_ATT_ERROR_AUTHORIZATION:
++		return "Authorization Required";
++	case BT_ATT_ERROR_PREPARE_QUEUE_FULL:
++		return "Prepare Write Queue Full";
++	case BT_ATT_ERROR_ATTRIBUTE_NOT_FOUND:
++		return "Attribute Not Found";
++	case BT_ATT_ERROR_ATTRIBUTE_NOT_LONG:
++		return "Attribute Not Long";
++	case BT_ATT_ERROR_INSUFFICIENT_ENCRYPTION_KEY_SIZE:
++		return "Insuficient Encryption Key Size";
++	case BT_ATT_ERROR_INVALID_ATTRIBUTE_VALUE_LEN:
++		return "Invalid Attribute value len";
++	case BT_ATT_ERROR_UNLIKELY:
++		return "Unlikely Error";
++	case BT_ATT_ERROR_INSUFFICIENT_ENCRYPTION:
++		return "Insufficient Encryption";
++	case BT_ATT_ERROR_UNSUPPORTED_GROUP_TYPE:
++		return "Group type Not Supported";
++	case BT_ATT_ERROR_INSUFFICIENT_RESOURCES:
++		return "Insufficient Resources";
++	default:
++		return "Unknown error type";
++	}
++}
++
+ static void att_disconnect_cb(int err, void *user_data)
  {
--	size_t i;
-+	int i;
+ 	printf("Device disconnected: %s\n", strerror(err));
+@@ -489,7 +531,8 @@ static void read_cb(bool success, uint8_t att_ecode, const uint8_t *value,
+ 	int i;
  
--	for (i = 0; i < cmd_count; i++) {
-+	for (i = 0; table[i].cmd; i++) {
- 		if (!strcmp(table[i].cmd, cmd))
- 			return &table[i];
+ 	if (!success) {
+-		PRLOG("\nRead request failed: 0x%02x\n", att_ecode);
++		PRLOG("\nRead request failed: %s\n",
++				ecode_to_string(att_ecode));
+ 		return;
  	}
-@@ -3478,9 +3479,9 @@ static void rl_handler(char *input)
- 	argv = w.we_wordv;
- 	argc = w.we_wordc;
  
--	c = find_cmd(cmd, all_cmd, NELEM(all_cmd));
-+	c = find_cmd(cmd, all_cmd);
- 	if (!c && interactive)
--		c = find_cmd(cmd, interactive_cmd, NELEM(interactive_cmd));
-+		c = find_cmd(cmd, interactive_cmd);
+@@ -596,7 +639,7 @@ static void write_cb(bool success, uint8_t att_ecode, void *user_data)
+ 	if (success) {
+ 		PRLOG("\nWrite successful\n");
+ 	} else {
+-		PRLOG("\nWrite failed: 0x%02x\n", att_ecode);
++		PRLOG("\nWrite failed: %s\n", ecode_to_string(att_ecode));
+ 	}
+ }
  
- 	if (c && c->func) {
- 		c->func(mgmt, mgmt_index, argc, argv);
-@@ -3494,7 +3495,7 @@ static void rl_handler(char *input)
+@@ -726,7 +769,7 @@ static void write_long_cb(bool success, bool reliable_error, uint8_t att_ecode,
+ 	} else if (reliable_error) {
+ 		PRLOG("Reliable write not verified\n");
+ 	} else {
+-		PRLOG("Write failed: 0x%02x\n", att_ecode);
++		PRLOG("\nWrite failed: %s\n", ecode_to_string(att_ecode));
+ 	}
+ }
  
- 	print("Available commands:");
- 
--	for (i = 0; i < NELEM(all_cmd); i++) {
-+	for (i = 0; all_cmd[i].cmd; i++) {
- 		c = &all_cmd[i];
- 		if (c->doc)
- 			print("  %s %-*s %s", c->cmd,
-@@ -3504,7 +3505,7 @@ static void rl_handler(char *input)
- 	if (!interactive)
- 		goto free_we;
- 
--	for (i = 0; i < NELEM(interactive_cmd); i++) {
-+	for (i = 0; interactive_cmd[i].cmd; i++) {
- 		c = &interactive_cmd[i];
- 		if (c->doc)
- 			print("  %s %-*s %s", c->cmd,
-@@ -3603,7 +3604,7 @@ int main(int argc, char *argv[])
- 	if (argc > 0) {
- 		struct cmd_info *c;
- 
--		c = find_cmd(argv[0], all_cmd, NELEM(all_cmd));
-+		c = find_cmd(argv[0], all_cmd);
- 		if (!c) {
- 			fprintf(stderr, "Unknown command: %s\n", argv[0]);
- 			mgmt_unref(mgmt);
 -- 
-1.9.3
+1.9.1
 
