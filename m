@@ -1,39 +1,35 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 12 Feb 2015 16:57:33 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Bharat Panda <bharat.panda@samsung.com>
-Cc: linux-bluetooth@vger.kernel.org, cpgs@samsung.com
-Subject: Re: [PATCH ] tools/gatt-client: print read/write error messages
-Message-ID: <20150212145733.GA6577@t440s.P-661HNU-F1>
-References: <1423752296-6763-1-git-send-email-bharat.panda@samsung.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1423752296-6763-1-git-send-email-bharat.panda@samsung.com>
+From: Gowtham Anandha Babu <gowtham.ab@samsung.com>
+To: 'Luiz Augusto von Dentz' <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Query reagrding the MAS Instance Information Support patchset
+Date: Thu, 12 Feb 2015 20:12:47 +0530
+Message-id: <000f01d046d2$2e1048c0$8a30da40$@samsung.com>
+MIME-version: 1.0
+Content-type: text/plain; charset=US-ASCII
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Bharat,
+Hi Luiz,
 
-On Thu, Feb 12, 2015, Bharat Panda wrote:
-> +static char *ecode_to_string(uint8_t ecode)
+I have submitted a patch set to add support for MAP MAS Instance feature on
+the month of October. Below are the links.
+http://thread.gmane.org/gmane.linux.bluez.kernel/54106
+http://article.gmane.org/gmane.linux.bluez.kernel/53974
+http://article.gmane.org/gmane.linux.bluez.kernel/53975
+http://article.gmane.org/gmane.linux.bluez.kernel/53976
+http://article.gmane.org/gmane.linux.bluez.kernel/53977
+http://thread.gmane.org/gmane.linux.bluez.kernel/54110
+http://article.gmane.org/gmane.linux.bluez.kernel/53979
 
-This should be static const char *
+But the suggestion provided was to wait until the Multiple MAS Instance
+support.
+Why can't we implement the multiple MAS Instance support on top of this?
+Some fixes and cleanups are needed in the above submitted patches. I will
+fix that.
+Shall I resend the same?
+What do you think?
 
-> +{
-> +	char *err = NULL;
-> +
-> +	switch (ecode) {
-> +		case BT_ATT_ERROR_INVALID_HANDLE:
-> +			err = "ERROR: Invalid Handle";
-> +			break;
+Regards,
+Gowtham Anandha Babu
 
-First of all, please follow the coding style: the case statement should
-start at the same indentation as the switch. Secondly, you can make this
-all more compact by removing the err variable:
-
-	case BT_ATT_ERROR_INVALID_HANDLE:
-		return "Invalid Handle";
-	case ...:
-		return "...";
-
-Johan
