@@ -2,100 +2,55 @@ Return-Path: <cyrus@holtmann.org>
 From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH 3/3] tools/btgatt-client: Add support for set/get security on the link
-Date: Thu, 12 Feb 2015 18:00:08 +0100
-Message-Id: <1423760408-31020-4-git-send-email-lukasz.rymanowski@tieto.com>
+Subject: [PATCH 2/3] shared/gatt-client: Expose API to set/get security level on att
+Date: Thu, 12 Feb 2015 18:00:07 +0100
+Message-Id: <1423760408-31020-3-git-send-email-lukasz.rymanowski@tieto.com>
 In-Reply-To: <1423760408-31020-1-git-send-email-lukasz.rymanowski@tieto.com>
 References: <1423760408-31020-1-git-send-email-lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- tools/btgatt-client.c | 64 +++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 64 insertions(+)
+ src/shared/gatt-client.c | 17 +++++++++++++++++
+ src/shared/gatt-client.h |  3 +++
+ 2 files changed, 20 insertions(+)
 
-diff --git a/tools/btgatt-client.c b/tools/btgatt-client.c
-index 9416791..2d893c3 100644
---- a/tools/btgatt-client.c
-+++ b/tools/btgatt-client.c
-@@ -1072,6 +1072,66 @@ static void cmd_unregister_notify(struct client *cli, char *cmd_str)
- 	printf("Unregistered notify handler with id: %u\n", id);
+diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
+index 293e0c2..d27354e 100644
+--- a/src/shared/gatt-client.c
++++ b/src/shared/gatt-client.c
+@@ -2854,3 +2854,20 @@ bool bt_gatt_client_unregister_notify(struct bt_gatt_client *client,
+ 	complete_unregister_notify(notify_data);
+ 	return true;
  }
- 
-+static void set_sec_level_usage(void)
++
++bool bt_gatt_client_set_sec_level(struct bt_gatt_client *client,
++								int level)
 +{
-+	printf("Usage: set_sec_level <level>\n"
-+		"level: 1-3\n"
-+		"e.g.:\n"
-+		"\tset-sec-level 2\n");
++	if (!client)
++		return false;
++
++	return bt_att_set_sec_level(client->att, level);
 +}
 +
-+static void cmd_set_sec_level(struct client *cli, char *cmd_str)
++int bt_gatt_client_get_sec_level(struct bt_gatt_client *client)
 +{
-+	char *argvbuf[1];
-+	char **argv = argvbuf;
-+	int argc = 0;
-+	char *endptr = NULL;
-+	int level;
++	if (!client)
++		return -1;
 +
-+	if (!bt_gatt_client_is_ready(cli->gatt)) {
-+		printf("GATT client not initialized\n");
-+		return;
-+	}
-+
-+	if (!parse_args(cmd_str, 1, argv, &argc)) {
-+		printf("Too many arguments\n");
-+		set_sec_level_usage();
-+		return;
-+	}
-+
-+	if (argc < 1) {
-+		set_sec_level_usage();
-+		return;
-+	}
-+
-+	level = strtol(argv[0], &endptr, 0);
-+	if (!endptr || *endptr != '\0' || level < 1 || level > 3) {
-+		printf("Invalid level: %s\n", argv[0]);
-+		return;
-+	}
-+
-+	if (bt_gatt_client_set_sec_level(cli->gatt, level) < 0)
-+		printf("Could not set sec level\n");
-+	else
-+		printf("Setting security level %d success\n", level);
++	return bt_att_get_sec_level(client->att);
 +}
+diff --git a/src/shared/gatt-client.h b/src/shared/gatt-client.h
+index 46eb207..4346386 100644
+--- a/src/shared/gatt-client.h
++++ b/src/shared/gatt-client.h
+@@ -128,3 +128,6 @@ unsigned int bt_gatt_client_register_notify(struct bt_gatt_client *client,
+ 				bt_gatt_client_destroy_func_t destroy);
+ bool bt_gatt_client_unregister_notify(struct bt_gatt_client *client,
+ 							unsigned int id);
 +
-+static void cmd_get_sec_level(struct client *cli, char *cmd_str)
-+{
-+	int level;
-+
-+	if (!bt_gatt_client_is_ready(cli->gatt)) {
-+		printf("GATT client not initialized\n");
-+		return;
-+	}
-+
-+	level = bt_gatt_client_get_sec_level(cli->gatt);
-+	if (level < 0)
-+		printf("Could not set sec level\n");
-+	else
-+		printf("Security level: %u\n", level);
-+}
-+
- static void cmd_help(struct client *cli, char *cmd_str);
- 
- typedef void (*command_func_t)(struct client *cli, char *cmd_str);
-@@ -1100,6 +1160,10 @@ static struct {
- 			"\tSubscribe to not/ind from a characteristic" },
- 	{ "unregister-notify", cmd_unregister_notify,
- 						"Unregister a not/ind session"},
-+	{ "set-sec-level", cmd_set_sec_level,
-+					"Set security level on le connection"},
-+	{ "get-sec-level", cmd_get_sec_level,
-+					"Get security level on le connection"},
- 	{ }
- };
- 
++bool bt_gatt_client_set_sec_level(struct bt_gatt_client *client, int level);
++int bt_gatt_client_get_sec_level(struct bt_gatt_client *client);
 -- 
 1.8.4
 
