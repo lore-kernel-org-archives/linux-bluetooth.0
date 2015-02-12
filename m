@@ -2,121 +2,191 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [RFC 5/5] android: Fix btmgmt build
-Date: Thu, 12 Feb 2015 18:52:13 +0100
-Message-Id: <1423763533-15071-5-git-send-email-szymon.janc@tieto.com>
+Subject: [RFC 4/5] client/display: Rename to client/interactive
+Date: Thu, 12 Feb 2015 18:52:12 +0100
+Message-Id: <1423763533-15071-4-git-send-email-szymon.janc@tieto.com>
 In-Reply-To: <1423763533-15071-1-git-send-email-szymon.janc@tieto.com>
 References: <1423763533-15071-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Android doesn't provide readline library. Use dummy interactive
-implementation while building for Android. Interactive mode
-will not work but batch mode is functional.
-
-Eventually Android implementation might be written based on code
-used by haltest.
+This code is now handling other interactive mode functionality, not
+only display.
 ---
- android/Android.mk    |  1 +
- android/Makefile.am   |  1 +
- android/interactive.c | 64 +++++++++++++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 66 insertions(+)
- create mode 100644 android/interactive.c
+ Makefile.tools                      | 12 ++++++------
+ attrib/interactive.c                |  2 +-
+ client/agent.c                      |  2 +-
+ client/gatt.c                       |  2 +-
+ client/{display.c => interactive.c} |  2 +-
+ client/{display.h => interactive.h} |  0
+ client/main.c                       |  2 +-
+ tools/bluetooth-player.c            |  2 +-
+ tools/btmgmt.c                      |  2 +-
+ tools/obexctl.c                     |  2 +-
+ 10 files changed, 14 insertions(+), 14 deletions(-)
+ rename client/{display.c => interactive.c} (99%)
+ rename client/{display.h => interactive.h} (100%)
 
-diff --git a/android/Android.mk b/android/Android.mk
-index 289c1df..e01ed44 100644
---- a/android/Android.mk
-+++ b/android/Android.mk
-@@ -493,6 +493,7 @@ LOCAL_SRC_FILES := \
- 	bluez/src/shared/util.c \
- 	bluez/src/shared/gap.c \
- 	bluez/src/uuid-helper.c \
-+	bluez/android/interactive.c \
+diff --git a/Makefile.tools b/Makefile.tools
+index d721b4a..d112691 100644
+--- a/Makefile.tools
++++ b/Makefile.tools
+@@ -3,7 +3,7 @@ if CLIENT
+ bin_PROGRAMS += client/bluetoothctl
  
- LOCAL_C_INCLUDES := \
- 	$(LOCAL_PATH)/bluez \
-diff --git a/android/Makefile.am b/android/Makefile.am
-index 9e73be4..9115a82 100644
---- a/android/Makefile.am
-+++ b/android/Makefile.am
-@@ -220,6 +220,7 @@ endif
- EXTRA_DIST += android/Android.mk android/README \
- 				android/bluetoothd-wrapper.c \
- 				android/log.c \
-+				android/interactive.c \
- 				android/bluetoothd.te \
- 				android/bluetoothd_snoop.te \
- 				android/init.bluetooth.rc \
-diff --git a/android/interactive.c b/android/interactive.c
-new file mode 100644
-index 0000000..7da06f8
---- /dev/null
-+++ b/android/interactive.c
-@@ -0,0 +1,64 @@
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2015  Intel Corporation. All rights reserved.
-+ *
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-+ *
-+ */
-+
-+#include <stdbool.h>
-+#include <stddef.h>
-+
+ client_bluetoothctl_SOURCES = client/main.c \
+-					client/display.h client/display.c \
++					client/interactive.h client/interactive.c \
+ 					client/agent.h client/agent.c \
+ 					client/gatt.h client/gatt.c \
+ 					monitor/uuid.h monitor/uuid.c
+@@ -243,7 +243,7 @@ tools_hwdb_LDADD = lib/libbluetooth-internal.la
+ 
+ tools_hcieventmask_LDADD = lib/libbluetooth-internal.la
+ 
+-tools_btmgmt_SOURCES = tools/btmgmt.c src/uuid-helper.c client/display.c
++tools_btmgmt_SOURCES = tools/btmgmt.c src/uuid-helper.c client/interactive.c
+ tools_btmgmt_LDADD = lib/libbluetooth-internal.la src/libshared-mainloop.la \
+ 				-lreadline
+ 
+@@ -298,8 +298,8 @@ noinst_PROGRAMS += attrib/gatttool \
+ attrib_gatttool_SOURCES = attrib/gatttool.c attrib/att.c attrib/gatt.c \
+ 				attrib/gattrib.c btio/btio.c \
+ 				attrib/gatttool.h attrib/interactive.c \
+-				attrib/utils.c src/log.c client/display.c \
+-				client/display.h
++				attrib/utils.c src/log.c client/interactive.c \
++				client/interactive.h
+ attrib_gatttool_LDADD = lib/libbluetooth-internal.la \
+ 			src/libshared-mainloop.la \
+ 			src/libshared-glib.la @GLIB_LIBS@ -lreadline
+@@ -314,13 +314,13 @@ tools_obex_server_tool_SOURCES = $(gobex_sources) $(btio_sources) \
+ tools_obex_server_tool_LDADD = lib/libbluetooth-internal.la @GLIB_LIBS@
+ 
+ tools_bluetooth_player_SOURCES = tools/bluetooth-player.c \
+-				client/display.h client/display.c
++				client/interactive.h client/interactive.c
+ tools_bluetooth_player_LDADD = gdbus/libgdbus-internal.la \
+ 				src/libshared-mainloop.la \
+ 				@GLIB_LIBS@ @DBUS_LIBS@ -lreadline
+ 
+ tools_obexctl_SOURCES = tools/obexctl.c \
+-				client/display.h client/display.c
++				client/interactive.h client/interactive.c
+ tools_obexctl_LDADD = gdbus/libgdbus-internal.la src/libshared-mainloop.la \
+ 				@GLIB_LIBS@ @DBUS_LIBS@ -lreadline
+ endif
+diff --git a/attrib/interactive.c b/attrib/interactive.c
+index da8bcb9..56e1cae 100644
+--- a/attrib/interactive.c
++++ b/attrib/interactive.c
+@@ -45,7 +45,7 @@
+ #include "gattrib.h"
+ #include "gatt.h"
+ #include "gatttool.h"
+-#include "client/display.h"
 +#include "client/interactive.h"
-+
-+
-+bool interactive_init(const char *prompt, interactive_prompt_func_t cb,
-+					const struct interactive_command *cmd)
-+{
-+	return false;
-+}
-+
-+void interactive_cleanup(void)
-+{
-+
-+}
-+
-+void interactive_update_prompt(const char *prompt)
-+{
-+
-+}
-+
-+void interactive_prompt(const char *msg)
-+{
-+
-+}
-+
-+void interactive_release_prompt(void)
-+{
-+
-+}
-+
-+void interactive_printf(const char *fmt, ...)
-+{
-+
-+}
-+
-+void interactive_hexdump(const unsigned char *buf, size_t len)
-+{
-+
-+}
+ 
+ static GIOChannel *iochannel = NULL;
+ static GAttrib *attrib = NULL;
+diff --git a/client/agent.c b/client/agent.c
+index 4691afe..e9ba2a9 100644
+--- a/client/agent.c
++++ b/client/agent.c
+@@ -31,7 +31,7 @@
+ #include <readline/readline.h>
+ #include <gdbus.h>
+ 
+-#include "display.h"
++#include "interactive.h"
+ #include "agent.h"
+ 
+ #define AGENT_PATH "/org/bluez/agent"
+diff --git a/client/gatt.c b/client/gatt.c
+index 4bdbaba..14985a8 100644
+--- a/client/gatt.c
++++ b/client/gatt.c
+@@ -38,7 +38,7 @@
+ #include <gdbus.h>
+ 
+ #include "monitor/uuid.h"
+-#include "display.h"
++#include "interactive.h"
+ #include "gatt.h"
+ 
+ /* String display constants */
+diff --git a/client/display.c b/client/interactive.c
+similarity index 99%
+rename from client/display.c
+rename to client/interactive.c
+index 25eafe3..1089f4d 100644
+--- a/client/display.c
++++ b/client/interactive.c
+@@ -37,7 +37,7 @@
+ #include "src/shared/mainloop.h"
+ #include "src/shared/io.h"
+ 
+-#include "display.h"
++#include "interactive.h"
+ 
+ static char *saved_prompt = NULL;
+ static int saved_point = 0;
+diff --git a/client/display.h b/client/interactive.h
+similarity index 100%
+rename from client/display.h
+rename to client/interactive.h
+diff --git a/client/main.c b/client/main.c
+index 96781b2..17d596a 100644
+--- a/client/main.c
++++ b/client/main.c
+@@ -40,7 +40,7 @@
+ 
+ #include "monitor/uuid.h"
+ #include "agent.h"
+-#include "display.h"
++#include "interactive.h"
+ #include "gatt.h"
+ 
+ /* String display constants */
+diff --git a/tools/bluetooth-player.c b/tools/bluetooth-player.c
+index 22e0557..abc77e9 100644
+--- a/tools/bluetooth-player.c
++++ b/tools/bluetooth-player.c
+@@ -38,7 +38,7 @@
+ #include <glib.h>
+ #include <gdbus.h>
+ 
+-#include <client/display.h>
++#include "client/interactive.h"
+ 
+ /* String display constants */
+ #define COLORED_NEW	COLOR_GREEN "NEW" COLOR_OFF
+diff --git a/tools/btmgmt.c b/tools/btmgmt.c
+index b02af35..46b2f7c 100644
+--- a/tools/btmgmt.c
++++ b/tools/btmgmt.c
+@@ -48,7 +48,7 @@
+ #include "src/uuid-helper.h"
+ #include "lib/mgmt.h"
+ 
+-#include "client/display.h"
++#include "client/interactive.h"
+ #include "src/shared/mainloop.h"
+ #include "src/shared/io.h"
+ #include "src/shared/util.h"
+diff --git a/tools/obexctl.c b/tools/obexctl.c
+index c105b2f..493ae7f 100644
+--- a/tools/obexctl.c
++++ b/tools/obexctl.c
+@@ -40,7 +40,7 @@
+ #include <glib.h>
+ #include <gdbus.h>
+ 
+-#include <client/display.h>
++#include "client/interactive.h"
+ 
+ /* String display constants */
+ #define COLORED_NEW	COLOR_GREEN "NEW" COLOR_OFF
 -- 
 1.9.3
 
